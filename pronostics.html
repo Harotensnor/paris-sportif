@@ -2484,8 +2484,10 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-19T17:40:21.674103Z","today":"
   let __refreshTimer = null;
   let __refreshInFlight = false;
 
-  // Reads generated_at from current data and paints the indicator:
-  // fresh (<5 min), stale (5–15 min), very-stale (>15 min), offline (parse error).
+  // Reads generated_at from current data and paints the indicator.
+  // Site is fully auto: GitHub Actions cron = 5 min, client polls every 60 s.
+  // Normal age therefore sits between 0–10 min. Only flag when something breaks:
+  //   fresh (<12 min), stale (12–25 min), very-stale (>25 min → cron probably broken).
   function updateFreshness() {
     const ind = document.getElementById('refresh-indicator');
     if (!ind) return;
@@ -2502,16 +2504,20 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-19T17:40:21.674103Z","today":"
     const ageMin = Math.floor((Date.now() - gen.getTime()) / 60000);
     const hhmm = gen.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
     if (ageMin < 0) {
-      if (txtEl) txtEl.textContent = `Données à jour · ${hhmm}`;
-    } else if (ageMin < 5) {
-      if (txtEl) txtEl.textContent = `Données à jour · ${hhmm} (il y a ${ageMin} min)`;
-    } else if (ageMin < 15) {
+      if (txtEl) txtEl.textContent = `🟢 À jour · ${hhmm} · auto`;
+    } else if (ageMin < 2) {
+      if (txtEl) txtEl.textContent = `🟢 À jour · ${hhmm} · auto`;
+    } else if (ageMin < 12) {
+      if (txtEl) txtEl.textContent = `🟢 À jour · ${hhmm} (il y a ${ageMin} min) · auto 5 min`;
+    } else if (ageMin < 25) {
       ind.classList.add('stale');
-      if (txtEl) txtEl.textContent = `⚠️ Données: il y a ${ageMin} min — relance auto_refresh`;
+      if (txtEl) txtEl.textContent = `🟠 Dernière maj: il y a ${ageMin} min · prochaine auto en cours`;
     } else {
       ind.classList.add('very-stale');
       const label = ageMin < 120 ? `${ageMin} min` : `${Math.floor(ageMin/60)}h${String(ageMin%60).padStart(2,'0')}`;
-      if (txtEl) txtEl.textContent = `🔴 Données obsolètes · ${label} — lance LANCER.command`;
+      if (txtEl) {
+        txtEl.innerHTML = `🔴 Données obsolètes · ${label} · <a href="https://github.com/Harotensnor/paris-sportif/actions" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">vérifier le cron</a>`;
+      }
     }
   }
 
