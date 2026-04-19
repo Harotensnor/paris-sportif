@@ -1541,9 +1541,17 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-19T17:40:21.674103Z","today":"
     const now = Date.now();
     const data = window.PRONOSTICS_DATA;
 
-    // Build a cross-day pool so that when today's picks are exhausted the
-    // list rolls into early tomorrow — otherwise at 23h "today" is empty.
-    const pool = [];
+    // "Du jour" = calendar day in Europe/Paris timezone.
+    // A kickoff at 23:45 Paris time on Sunday is still "today". A kickoff
+    // at 00:30 Monday is tomorrow, even though it's only 30 min away.
+    const todayParis = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' }); // YYYY-MM-DD
+    const isSameParisDay = (d) => {
+      try { return d.toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' }) === todayParis; }
+      catch (e) { return false; }
+    };
+
+    const todayPool = [];
+    const futurePool = [];   // for the "Prochains pronos" fallback when today is empty
     const seen = new Set();
     const pushIfFresh = (m) => {
       if (!m || !m.id || seen.has(m.id)) return;
@@ -1553,29 +1561,34 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-19T17:40:21.674103Z","today":"
       const d = new Date(m.date);
       if (isNaN(d)) return;
       const startIn = Math.round((d.getTime() - now) / 60000);
-      if (startIn < 0) return;               // already kicked off
-      if (startIn > 48 * 60) return;         // >48h away, too far for "du jour"
+      if (startIn < 0) return;                  // already kicked off
+      if (startIn > 60 * 36) return;            // 36h ahead max for any fallback
       const pred = predictMatch(m);
       if (!pred || !pred.pick || pred.skip) return;
-      // For TOP 5 we require both reasonable confidence AND a valid odd so we
-      // can compute EV (cote × proba). We drop "lowConf" picks entirely.
       if (pred.lowConf) return;
       const pickOdd = pred.pick.key === '1' ? pred.odds?.home
                     : pred.pick.key === '2' ? pred.odds?.away
                     : pred.odds?.draw;
       if (!pickOdd || pickOdd < 1.05) return;
       seen.add(m.id);
-      pool.push({ m, pred, startIn, pickOdd });
+      const entry = { m, pred, startIn, pickOdd };
+      if (isSameParisDay(d)) todayPool.push(entry);
+      else futurePool.push(entry);
     };
 
     // 1) Start from the current sport's visible list (respects filter + search)
     (visible || []).forEach(pushIfFresh);
 
-    // 2) Fall back to all days across all sports when the filtered pool is thin.
-    //    This keeps the section populated late in the day.
-    if (pool.length < 10 && data?.days) {
+    // 2) Fall back to all days across all sports for the today-pool.
+    //    Critical: we must scan all days to catch matches that start late
+    //    in the day but are stored under today's key in data.js.
+    if (data?.days) {
       Object.values(data.days).forEach(arr => (arr || []).forEach(pushIfFresh));
     }
+
+    // Only "today" matches go into the Top 5 / Autres. Tomorrow's picks
+    // get their own dedicated section so Théo doesn't confuse the two.
+    const pool = todayPool;
 
     // ===== Ranking — fiabilité × cote =====
     // EV = proba_modèle × cote − 1   (espérance par euro misé)
@@ -1597,8 +1610,20 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-19T17:40:21.674103Z","today":"
     const top5 = scored.filter(x => x.ev > 0.02).slice(0, 5);
     const others = scored.filter(x => !top5.includes(x)).slice(0, 7);
 
+    // Tomorrow's picks — same EV > 0.02 gate, top 5 kept for a dedicated
+    // "Prochains pronos" section.
+    const futureScored = futurePool
+      .map(x => {
+        const p = x.pred.pick.prob;
+        const ev = p * x.pickOdd - 1;
+        const score = ev * Math.pow(p, 0.5);
+        return { ...x, ev, score };
+      })
+      .sort((a, b) => b.score - a.score);
+    const futureTop = futureScored.filter(x => x.ev > 0.02).slice(0, 5);
+
     const wrap = document.getElementById('top-picks-wrap');
-    if (!top5.length && !others.length) {
+    if (!top5.length && !others.length && !futureTop.length) {
       wrap.innerHTML = `
         <div class="section-header top-picks">
           <h2><span class="ico">⭐</span>Top pronostics du jour</h2>
@@ -1679,6 +1704,23 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-19T17:40:21.674103Z","today":"
       `;
     };
 
+    // Label for the "prochains" section: detect whether the future pool
+    // is tomorrow or later (e.g. if today is fully played + it's 23h).
+    let futureLabel = 'Prochains pronos';
+    if (futureTop.length) {
+      const firstDate = new Date(futureTop[0].m.date);
+      const tomorrowParis = (() => {
+        const t = new Date(); t.setDate(t.getDate() + 1);
+        return t.toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+      })();
+      const dLabel = firstDate.toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+      if (dLabel === tomorrowParis) futureLabel = 'Prochains pronos · demain';
+      else {
+        const dayName = firstDate.toLocaleDateString('fr-FR', { timeZone: 'Europe/Paris', weekday: 'long' });
+        futureLabel = `Prochains pronos · ${dayName}`;
+      }
+    }
+
     wrap.innerHTML = `
       ${top5.length ? `
         <div class="section-header top-picks">
@@ -1696,6 +1738,21 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-19T17:40:21.674103Z","today":"
         </div>
         <div class="top-picks-grid">
           ${others.map(renderOther).join('')}
+        </div>
+      ` : ''}
+      ${!top5.length && !others.length ? `
+        <div class="section-header top-picks">
+          <h2><span class="ico">⭐</span>Top pronostics du jour</h2>
+          <div class="hint">Pas (ou plus) de value bet sur les matchs d'aujourd'hui. ${futureTop.length ? 'Voici les prochains ci-dessous :' : 'Les prochains apparaîtront ici dès qu\'ils arrivent.'}</div>
+        </div>
+      ` : ''}
+      ${futureTop.length ? `
+        <div class="section-header top-picks" style="margin-top:18px;">
+          <h2><span class="ico">🌅</span>${esc(futureLabel)}</h2>
+          <div class="hint">Pronostics value pour la journée suivante — anticipation</div>
+        </div>
+        <div class="top-picks-grid">
+          ${futureTop.map(renderOther).join('')}
         </div>
       ` : ''}
     `;
