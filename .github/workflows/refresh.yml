@@ -1,0 +1,59 @@
+name: refresh-data
+
+# Re-run every 10 minutes from 06:00 to 02:00 UTC (covers 7h→03h CET).
+# Cloudflare Pages (or GitHub Pages / Netlify) auto-deploys every commit,
+# so the live site updates within ~1 minute of each push.
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: refresh-data
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run fetch pipeline
+        run: |
+          set -e
+          cd scripts
+          python3 fetch_live.py || true      # today only, ~15s
+          python3 patch_odds.py || true      # normalize ESPN odds
+          python3 fetch_tennis_odds.py || true
+          python3 fetch_rus_odds.py || true
+          python3 fetch_injuries.py || true
+          python3 patch_winamax.py || true
+          # Every 6th tick (= 1h), also run full sweep so tomorrow+ stays fresh
+          if [ $(( $(date +%M) % 60 )) -lt 10 ]; then
+            python3 fetch_v3.py || true
+            python3 fetch_tips.py || true
+            python3 fetch_forebet.py || true
+            python3 patch_winamax.py || true
+          fi
+
+      - name: Commit data updates
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data.js pronostics.html odds_history.jsonl 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git commit -m "data: auto-refresh $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git push
