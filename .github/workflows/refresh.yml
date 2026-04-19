@@ -1,11 +1,11 @@
 name: refresh-data
 
-# Re-run every 10 minutes from 06:00 to 02:00 UTC (covers 7h→03h CET).
-# Cloudflare Pages (or GitHub Pages / Netlify) auto-deploys every commit,
-# so the live site updates within ~1 minute of each push.
+# Re-run every 5 minutes. GitHub Pages auto-deploys every commit, so the
+# live site updates within ~1 minute of each push. Combined with the
+# client-side 60s poll, Théo sees fresh odds within ~6 min at worst.
 on:
   schedule:
-    - cron: '*/10 * * * *'
+    - cron: '*/5 * * * *'
   workflow_dispatch: {}
 
 permissions:
@@ -37,9 +37,10 @@ jobs:
           python3 fetch_tennis_odds.py || true
           python3 fetch_rus_odds.py || true
           python3 fetch_injuries.py || true
+          python3 fetch_h2h.py || true       # head-to-head histories
           python3 patch_winamax.py || true
-          # Every 6th tick (= 1h), also run full sweep so tomorrow+ stays fresh
-          if [ $(( $(date +%M) % 60 )) -lt 10 ]; then
+          # Every 12th tick (= 1h), also run full sweep so tomorrow+ stays fresh
+          if [ $(( $(date +%M) % 60 )) -lt 5 ]; then
             python3 fetch_v3.py || true
             python3 fetch_tips.py || true
             python3 fetch_forebet.py || true

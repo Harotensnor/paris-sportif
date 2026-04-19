@@ -74,8 +74,24 @@ SOCCER_LEAGUES = [
     ('idn.1', 'Liga Indonésie', 'Indonésie', 1),
     ('tha.1', 'Thai League', 'Thaïlande', 1),
     ('ind.1', 'Indian Super League', 'Inde', 1),
+    # Other European
+    ('dan.1', 'Superliga Danemark', 'Danemark', 2),
+    ('hun.1', 'NB I Hongrie', 'Hongrie', 1),
+    ('isr.1', 'Ligat ha\'Al', 'Israël', 1),
+    ('cro.1', 'HNL Croatie', 'Croatie', 2),
+    ('ser.1', 'SuperLiga Serbie', 'Serbie', 2),
+    ('slo.1', 'PrvaLiga Slovénie', 'Slovénie', 1),
+    ('fin.1', 'Veikkausliiga', 'Finlande', 1),
+    ('bul.1', 'First League Bulgarie', 'Bulgarie', 1),
     # Cups
     ('esp.copa_del_rey', 'Copa del Rey', 'Espagne', 3),
+    ('eng.fa', 'FA Cup', 'Angleterre', 4),
+    ('eng.league_cup', 'EFL Cup', 'Angleterre', 3),
+    ('fra.coupe_de_france', 'Coupe de France', 'France', 4),
+    ('ita.coppa_italia', 'Coppa Italia', 'Italie', 3),
+    ('ger.dfb_pokal', 'DFB-Pokal', 'Allemagne', 3),
+    ('por.taca', 'Taça de Portugal', 'Portugal', 2),
+    ('ned.knvb_beker', 'KNVB Beker', 'Pays-Bas', 2),
 ]
 
 BASKET_LEAGUES = [

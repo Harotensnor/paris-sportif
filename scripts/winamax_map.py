@@ -87,12 +87,39 @@ FOOTBALL_LEAGUES = {
     'uefa.champions': (True, 'europe/ligue-des-champions'),
     'uefa.europa': (True, 'europe/ligue-europa'),
     'uefa.europa.conf': (True, 'europe/conference-league'),
+    'uefa.nations': (True, 'europe/ligue-des-nations'),
+    'uefa.super': (True, 'europe/supercoupe-uefa'),
     'conmebol.libertadores': (True, 'amerique-sud/copa-libertadores'),
     'conmebol.sudamericana': (True, 'amerique-sud/copa-sudamericana'),
     'afc.champions': (True, 'asie/ligue-des-champions'),
     'caf.champions': (True, 'afrique/ligue-des-champions'),
     'fifa.world': (True, 'monde/coupe-du-monde'),
     'uefa.euro': (True, 'europe/euro'),
+
+    # --- Additional European leagues ---
+    'dan.1': (True, 'danemark/superliga'),
+    'hun.1': (True, 'hongrie/nb1'),
+    'isr.1': (True, None),
+    'cro.1': (True, 'croatie/hnl'),
+    'ser.1': (True, 'serbie/superliga'),
+    'slo.1': (True, None),
+    'fin.1': (True, None),
+    'bul.1': (True, None),
+    'pol.1': (True, 'pologne/ekstraklasa'),
+    'cze.1': (True, 'tchequie/synot-liga'),
+    'rou.1': (True, 'roumanie/liga-1'),
+    'ukr.1': (True, 'ukraine/premier-league'),
+    'kor.1': (True, 'coree/k-league'),
+    'sui.1': (True, 'suisse/super-league'),
+
+    # --- Cups ---
+    'eng.fa': (True, 'angleterre/fa-cup'),
+    'eng.league_cup': (True, 'angleterre/efl-cup'),
+    'fra.coupe_de_france': (True, 'france/coupe-de-france'),
+    'ita.coppa_italia': (True, 'italie/coppa-italia'),
+    'ger.dfb_pokal': (True, 'allemagne/dfb-pokal'),
+    'por.taca': (True, None),
+    'ned.knvb_beker': (True, None),
 }
 
 
