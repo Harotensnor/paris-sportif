@@ -3,6 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>Pronostics Sportifs — Football · Tennis · Basket</title>
 <style>
   :root {
@@ -2556,6 +2559,15 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-19T17:40:21.674103Z","today":"
     setInterval(() => { if (!__refreshInFlight) { render(); updateFreshness(); } }, 30 * 1000);
     // Paint freshness immediately on boot
     updateFreshness();
+    // Soft reload every 60 min to pick up new HTML/JS deployed via GitHub Pages.
+    // The meta Cache-Control tags help, but some browsers still serve cached HTML;
+    // this forces a clean fetch so users always run the latest UI code.
+    const __bootTime = Date.now();
+    setInterval(() => {
+      if (Date.now() - __bootTime > 60 * 60 * 1000) {
+        try { location.reload(); } catch (e) {}
+      }
+    }, 5 * 60 * 1000);
   }
 
   // ======= Boot =======
