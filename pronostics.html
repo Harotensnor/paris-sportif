@@ -667,6 +667,27 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T15:28:50.653595Z","today":"
   let currentDate;
   let searchTerm = '';
   let activeFilter = 'all';
+  // Advanced filters — persisted across sessions. Applied on top of activeFilter.
+  // kellyMin=0 disables. oddMax=0 disables. league=''|code filters by ESPN league_code.
+  const ADV_FILTER_KEY = 'advFilters';
+  let advFilters = (() => {
+    try {
+      const raw = JSON.parse(localStorage.getItem(ADV_FILTER_KEY) || '{}');
+      return {
+        kellyMin: parseFloat(raw.kellyMin) || 0,   // e.g. 0.02 = 2%
+        oddMin: parseFloat(raw.oddMin) || 0,        // min decimal odd
+        oddMax: parseFloat(raw.oddMax) || 0,        // max decimal odd (0 = no cap)
+        league: raw.league || '',                   // league_code or ''
+      };
+    } catch (e) { return { kellyMin: 0, oddMin: 0, oddMax: 0, league: '' }; }
+  })();
+  function saveAdvFilters() {
+    try { localStorage.setItem(ADV_FILTER_KEY, JSON.stringify(advFilters)); } catch (e) {}
+  }
+  function advFiltersActive() {
+    return advFilters.kellyMin > 0 || advFilters.oddMin > 0 || advFilters.oddMax > 0 || !!advFilters.league;
+  }
+  let advFiltersOpen = advFiltersActive();
   // Théo only bets on Winamax, so hide everything else by default.
   // Always on: non-Winamax events are stripped at the pipeline level (scripts/patch_winamax.py)
   // so the toggle is moot. Kept as a constant so existing filter gates stay readable.
@@ -1509,7 +1530,24 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T15:28:50.653595Z","today":"
       const hay = norm([home?.name, away?.name, m.league_name, m.venue, m.city, m.name].join(' '));
       if (!hay.includes(norm(q))) return false;
     }
+    // Advanced filters: league shortcut first (cheap), then pred-dependent gates.
+    if (advFilters.league && (m.league_code || '') !== advFilters.league) return false;
     const pred = predictMatch(m);
+    // Cote filters (applied to the model's pick, which is what the card surfaces)
+    if ((advFilters.oddMin > 0 || advFilters.oddMax > 0) && pred?.pick) {
+      const pk = pred.pick.key;
+      const o = pk === '1' ? pred.odds?.home : pk === '2' ? pred.odds?.away : pred.odds?.draw;
+      if (!o) return false;
+      if (advFilters.oddMin > 0 && o < advFilters.oddMin) return false;
+      if (advFilters.oddMax > 0 && o > advFilters.oddMax) return false;
+    }
+    // Kelly filter: require model-recommended stake of at least kellyMin fraction
+    if (advFilters.kellyMin > 0 && pred?.pick) {
+      const pk = pred.pick.key;
+      const o = pk === '1' ? pred.odds?.home : pk === '2' ? pred.odds?.away : pred.odds?.draw;
+      const k = o ? kellyStake(pred.pick.prob, o, bankroll, 0.5) : null;
+      if (!k || k.fraction < advFilters.kellyMin) return false;
+    }
     if (filter === 'value') return !!pred?.value;
     if (filter === 'lock') return !!pred?.isLock;
     if (filter === 'live') return m.status === 'STATUS_IN_PROGRESS';
@@ -1819,17 +1857,69 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T15:28:50.653595Z","today":"
       ${counts.tipsters ? `<button class="filter-btn ${activeFilter==='tipsters'?'active':''}" data-filter="tipsters">👥 Avec tipster <span class="count">${counts.tipsters}</span></button>` : ''}
       ${counts.results ? `<button class="filter-btn ${activeFilter==='won'?'active':''}" data-filter="won">✓ Gagnés <span class="count">${counts.won}</span></button>` : ''}
       ${counts.results ? `<button class="filter-btn ${activeFilter==='lost'?'active':''}" data-filter="lost">✗ Perdus <span class="count">${counts.lost}</span></button>` : ''}
+      <button class="filter-btn ${advFiltersActive()?'active':''}" data-adv-toggle style="display:inline-flex;align-items:center;gap:4px;">⚙️ Avancé${advFiltersActive()?' ●':''}</button>
       <span style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:16px;background:linear-gradient(135deg,#ff6b00 0%,#ff4e00 100%);color:#fff;font-size:12px;font-weight:600;letter-spacing:.4px;user-select:none;cursor:default;" title="Tous les matchs listés sont disponibles sur Winamax">
         <span>🎯</span>
         Winamax uniquement
       </span>
     `;
+    // Advanced filters panel (collapsible). League dropdown is populated from
+    // the current sport's events so it only offers leagues actually present.
+    const leagueOpts = [...new Set(sportEvents.map(m => m.league_code).filter(Boolean))]
+      .map(lc => {
+        const sample = sportEvents.find(m => m.league_code === lc);
+        return { code: lc, name: sample?.league_name || lc };
+      })
+      .sort((a, b) => a.name.localeCompare(b.name, 'fr'));
+    const advHtml = advFiltersOpen ? `
+      <div class="adv-filters" style="margin-top:10px;padding:12px;background:var(--surface,#111827);border:1px solid var(--border,#2a3744);border-radius:10px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;font-size:13px;">
+        <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;">
+          <input type="checkbox" id="adv-kelly" ${advFilters.kellyMin > 0 ? 'checked' : ''} style="cursor:pointer;"/>
+          <span>Kelly ≥ <strong>2%</strong></span>
+        </label>
+        <div style="display:inline-flex;align-items:center;gap:6px;">
+          <span style="color:var(--text-muted);">Cote</span>
+          <input type="number" id="adv-odd-min" value="${advFilters.oddMin || ''}" placeholder="min" step="0.1" min="1" style="width:58px;padding:4px 6px;background:var(--bg,#0c1220);border:1px solid var(--border);border-radius:6px;color:var(--text,#fff);font-size:12px;"/>
+          <span style="color:var(--text-muted);">→</span>
+          <input type="number" id="adv-odd-max" value="${advFilters.oddMax || ''}" placeholder="max" step="0.1" min="1" style="width:58px;padding:4px 6px;background:var(--bg,#0c1220);border:1px solid var(--border);border-radius:6px;color:var(--text,#fff);font-size:12px;"/>
+        </div>
+        <div style="display:inline-flex;align-items:center;gap:6px;">
+          <span style="color:var(--text-muted);">Ligue</span>
+          <select id="adv-league" style="padding:4px 8px;background:var(--bg,#0c1220);border:1px solid var(--border);border-radius:6px;color:var(--text,#fff);font-size:12px;">
+            <option value="">Toutes (${sportEvents.length})</option>
+            ${leagueOpts.map(l => `<option value="${esc(l.code)}" ${advFilters.league === l.code ? 'selected' : ''}>${esc(l.name)}</option>`).join('')}
+          </select>
+        </div>
+        ${advFiltersActive() ? `<button id="adv-reset" style="margin-left:auto;padding:5px 10px;background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.3);color:#f87171;border-radius:6px;cursor:pointer;font-size:12px;">↺ Réinitialiser</button>` : ''}
+      </div>` : '';
     const el = document.getElementById('filters');
-    el.innerHTML = html;
+    el.innerHTML = html + advHtml;
     el.querySelectorAll('.filter-btn').forEach(b => b.addEventListener('click', () => {
-      activeFilter = b.dataset.filter;
+      if (b.dataset.advToggle !== undefined) {
+        advFiltersOpen = !advFiltersOpen;
+      } else {
+        activeFilter = b.dataset.filter;
+      }
       render();
     }));
+    // Wire advanced controls
+    const byId = (id) => el.querySelector('#' + id);
+    const onAdvChange = () => { saveAdvFilters(); render(); };
+    if (byId('adv-kelly')) byId('adv-kelly').addEventListener('change', (e) => {
+      advFilters.kellyMin = e.target.checked ? 0.02 : 0; onAdvChange();
+    });
+    if (byId('adv-odd-min')) byId('adv-odd-min').addEventListener('change', (e) => {
+      advFilters.oddMin = parseFloat(e.target.value) || 0; onAdvChange();
+    });
+    if (byId('adv-odd-max')) byId('adv-odd-max').addEventListener('change', (e) => {
+      advFilters.oddMax = parseFloat(e.target.value) || 0; onAdvChange();
+    });
+    if (byId('adv-league')) byId('adv-league').addEventListener('change', (e) => {
+      advFilters.league = e.target.value || ''; onAdvChange();
+    });
+    if (byId('adv-reset')) byId('adv-reset').addEventListener('click', () => {
+      advFilters = { kellyMin: 0, oddMin: 0, oddMax: 0, league: '' }; onAdvChange();
+    });
   }
 
   function renderTopPicks(visible) {
@@ -3170,8 +3260,30 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T15:28:50.653595Z","today":"
           <td style="padding:6px 8px;text-align:right;"><button data-mybet-del="${esc(r.key)}" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;" title="Retirer du bilan">×</button></td>
         </tr>`;
       }).join('');
+      // Bankroll tracker: starting bankroll (Kelly reference) + cumulative
+      // settled P&L = current bankroll. Shows Théo his actual cash position
+      // as it evolves with his personal bets.
+      const startBankroll = bankroll;
+      const currentBankroll = startBankroll + mine.pl;
+      const bkDelta = mine.pl;
+      const bkDeltaPct = startBankroll > 0 ? (bkDelta / startBankroll * 100) : 0;
+      const bkColor = bkDelta >= 0 ? '#34d399' : '#f87171';
+      const bankrollCard = `
+        <div style="padding:16px;background:linear-gradient(135deg,${bkDelta>=0?'rgba(52,211,153,.18)':'rgba(248,113,113,.18)'} 0%,${bkDelta>=0?'rgba(16,185,129,.12)':'rgba(239,68,68,.12)'} 100%);border:1px solid ${bkDelta>=0?'rgba(52,211,153,.3)':'rgba(248,113,113,.3)'};border-radius:12px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div style="font-size:11px;color:var(--text-muted);letter-spacing:.5px;text-transform:uppercase;">Bankroll actuelle</div>
+            <div style="font-size:32px;font-weight:800;color:${bkColor};line-height:1.1;">${currentBankroll.toFixed(2)}€</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Départ ${startBankroll.toFixed(2)}€ · <span style="color:${bkColor};font-weight:600;">${bkDelta>=0?'+':''}${bkDelta.toFixed(2)}€ (${bkDeltaPct>=0?'+':''}${bkDeltaPct.toFixed(1)}%)</span></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <label style="font-size:11px;color:var(--text-muted);">Bankroll de départ :</label>
+            <input type="number" id="bankroll-input" value="${startBankroll.toFixed(2)}" min="1" step="1" style="width:80px;padding:4px 8px;background:var(--bg,#0c1220);border:1px solid var(--border,#2a3744);border-radius:6px;color:var(--text,#fff);font-size:13px;"/>
+            <span style="font-size:12px;color:var(--text-muted);">€</span>
+          </div>
+        </div>`;
       mySection = `
         <h2 style="margin:0 0 12px;font-size:20px;">💼 Mes paris — bilan perso</h2>
+        ${bankrollCard}
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px;">
           <div style="padding:14px;background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.2);border-radius:10px;">
             <div style="font-size:11px;color:var(--text-muted);letter-spacing:.5px;text-transform:uppercase;">Misé total</div>
@@ -3257,6 +3369,19 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T15:28:50.653595Z","today":"
       saveMyBets(all);
       renderBilanPage(wrap);
     }));
+    // Wire bankroll input — updates Kelly reference + re-renders so current
+    // bankroll card updates immediately.
+    const bkInput = wrap.querySelector('#bankroll-input');
+    if (bkInput) {
+      bkInput.addEventListener('change', () => {
+        const v = parseFloat(bkInput.value);
+        if (isFinite(v) && v > 0) {
+          bankroll = v;
+          try { localStorage.setItem('bankroll', String(v)); } catch (e) {}
+          renderBilanPage(wrap);
+        }
+      });
+    }
   }
 
   window.addEventListener('DOMContentLoaded', () => {
