@@ -6,6 +6,7 @@ import urllib.request
 import html as htmllib
 import unicodedata
 import concurrent.futures
+from datetime import datetime, timedelta
 from pathlib import Path
 
 DATA_JS = Path(__file__).resolve().parent.parent / 'data.js'
@@ -227,18 +228,24 @@ def main():
         pick_str = f"{t['pick']['label']} @ {t['pick']['odds']}" if t['pick'] else 'no pick'
         print(f"    [{t['competition']}] {t['teams']}: {pick_str}")
 
-    # Match tips to events
-    today = data.get('today') or '2026-04-18'
-    events = data.get('days', {}).get(today, [])
-    print(f'\nMatching against {len(events)} events for {today}...')
+    # Match tips to events — search today + next 2 days (RdJ publishes ahead)
+    # and across ALL sports (RdJ covers football, basket, tennis, etc.)
+    today = data.get('today') or datetime.utcnow().strftime('%Y-%m-%d')
+    try:
+        base = datetime.strptime(today, '%Y-%m-%d').date()
+        day_keys = [(base + timedelta(days=i)).strftime('%Y-%m-%d') for i in range(3)]
+    except Exception:
+        day_keys = [today]
+    events = []
+    for dk in day_keys:
+        events.extend(data.get('days', {}).get(dk, []))
+    print(f'\nMatching against {len(events)} events across {day_keys}...')
     attached = 0
     for tip in parsed:
         # Parse label like "Chelsea Manchester United" or "Lorient OM"
         best_score = 0
         best_event = None
         for e in events:
-            if e.get('sport') != 'football':
-                continue
             comps = e.get('competitors', []) or []
             home = next((c for c in comps if c.get('home_away') == 'home'), comps[0] if comps else {})
             away = next((c for c in comps if c.get('home_away') == 'away'), comps[1] if len(comps) > 1 else {})
@@ -248,14 +255,19 @@ def main():
                 best_score = score
                 best_event = e
         if best_event and best_score >= 5:
-            best_event.setdefault('tips', []).append({
+            new_tip = {
                 'source': tip['source'],
                 'url': tip['source_url'],
                 'pick': tip['pick']['label'] if tip['pick'] else None,
                 'odds': tip['pick']['odds'] if tip['pick'] else None,
                 'all_picks': tip['all_picks'],
                 'analysis': tip['analysis'],
-            })
+            }
+            # Dedupe: replace existing RdJ tip (same source + same url) rather than stacking
+            existing = best_event.get('tips') or []
+            existing = [t for t in existing if not (t.get('source') == tip['source'] and t.get('url') == tip['source_url'])]
+            existing.append(new_tip)
+            best_event['tips'] = existing
             attached += 1
             comps = best_event.get('competitors', [])
             names = ' vs '.join(c.get('name','?') for c in comps[:2])

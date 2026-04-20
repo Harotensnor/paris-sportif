@@ -2,6 +2,7 @@
 """Scrape forebet.com for today's football predictions + 1X2 odds.
 Merges into data.js as a second tipster source."""
 import json, re, urllib.request, unicodedata
+from datetime import datetime, timedelta
 from pathlib import Path
 import html as htmllib
 
@@ -130,8 +131,17 @@ def match_to_event(fb, events):
 def main():
     text = DATA_JS.read_text(encoding='utf-8')
     data = json.loads(re.search(r'=\s*(\{.*\})\s*;?\s*$', text, re.DOTALL).group(1))
-    today = data['today']
-    events = data['days'][today]
+    # Forebet publishes predictions for today + next ~2 days. Search the full window.
+    today = data.get('today') or datetime.utcnow().strftime('%Y-%m-%d')
+    try:
+        base = datetime.strptime(today, '%Y-%m-%d').date()
+        day_keys = [(base + timedelta(days=i)).strftime('%Y-%m-%d') for i in range(3)]
+    except Exception:
+        day_keys = [today]
+    events = []
+    for dk in day_keys:
+        events.extend(data.get('days', {}).get(dk, []))
+    print(f'Searching {len(events)} events across {day_keys}')
 
     print('Fetching forebet...')
     html = fetch(URL)

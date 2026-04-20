@@ -39,12 +39,16 @@ jobs:
           python3 fetch_injuries.py || true
           python3 fetch_h2h.py || true       # head-to-head histories
           python3 snapshot_odds.py || true   # freeze pre-match odds (persist post-match for bilan)
+          python3 fetch_forebet.py || true   # cheap: single HTML page, 40+ preds over 3 days
+          # Every 3rd tick (= 15 min), also refresh RdJ tipsters (10 HTTP reqs, respectful cadence)
+          MIN_MOD15=$(( $(date +%M) % 15 ))
+          if [ $MIN_MOD15 -lt 5 ]; then
+            python3 fetch_tips.py || true
+          fi
           python3 patch_winamax.py || true
-          # Every 12th tick (= 1h), also run full sweep so tomorrow+ stays fresh
+          # Every 12th tick (= 1h), also run full ESPN sweep so tomorrow+ stays fresh
           if [ $(( $(date +%M) % 60 )) -lt 5 ]; then
             python3 fetch_v3.py || true
-            python3 fetch_tips.py || true
-            python3 fetch_forebet.py || true
             python3 patch_winamax.py || true
           fi
 
