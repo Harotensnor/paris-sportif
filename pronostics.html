@@ -1689,6 +1689,7 @@
     <nav class="page-nav" id="page-nav">
       <button class="page-btn active" data-page="simples">🎯 Simples</button>
       <button class="page-btn" data-page="combines">🔗 Combinés</button>
+      <button class="page-btn" data-page="value">💎 Value Finder</button>
       <button class="page-btn" data-page="bilan">📊 Bilan</button>
     </nav>
   </div>
@@ -4857,11 +4858,187 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T13:14:27.667104Z","today":"
     updateFreshness();
   }
 
+  // ======= Value Finder =======
+  // Dedicated page that lists every +EV pick across all sports/leagues,
+  // sorted by expected value. Complements the Top 5 on the Simples page
+  // (which caps at 5 and is "fiabilité × cote"-ranked) by surfacing the
+  // full EV tail — including longer-odds picks the Top 5 can't show.
+  //
+  // Filters persisted in localStorage:
+  //   vf.sport:   'all' | 'football' | 'basketball' | 'hockey' | 'tennis'
+  //   vf.minEV:   2 | 5 | 10  (percent)
+  //   vf.minRel:  45 | 55 | 65  (reliability percent threshold)
+  //   vf.horizon: 'today' | '24h' | '48h'
+  const VF_KEYS = { sport: 'vf.sport', minEV: 'vf.minEV', minRel: 'vf.minRel', horizon: 'vf.horizon' };
+  function vfGet(key, dflt) {
+    try { const v = localStorage.getItem(key); return v != null ? v : dflt; }
+    catch (e) { return dflt; }
+  }
+  function vfSet(key, v) { try { localStorage.setItem(key, String(v)); } catch (e) {} }
+
+  function renderValueFinder(wrap) {
+    const data = window.PRONOSTICS_DATA;
+    const now = Date.now();
+    const sportFilter = vfGet(VF_KEYS.sport, 'all');
+    const minEV = Number(vfGet(VF_KEYS.minEV, '2')) / 100;
+    const minRel = Number(vfGet(VF_KEYS.minRel, '45')) / 100;
+    const horizon = vfGet(VF_KEYS.horizon, 'today');
+    const horizonMin = horizon === 'today' ? 60 * 18 : horizon === '24h' ? 60 * 24 : 60 * 48;
+
+    // Build the pool across all days/sports, respecting the Winamax toggle.
+    const rows = [];
+    const seen = new Set();
+    const todayParis = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+    Object.values((data && data.days) || {}).forEach(arr => (arr || []).forEach(m => {
+      if (!m || !m.id || seen.has(m.id)) return;
+      seen.add(m.id);
+      if (m.completed || m.status === 'STATUS_IN_PROGRESS') return;
+      if (winamaxOnly && !(m.winamax && m.winamax.available === true)) return;
+      if (sportFilter !== 'all' && m.sport !== sportFilter) return;
+      if (!m.date) return;
+      const d = new Date(m.date);
+      if (isNaN(d)) return;
+      const startIn = Math.round((d.getTime() - now) / 60000);
+      if (startIn < 0) return;
+      if (horizon === 'today') {
+        try {
+          if (d.toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' }) !== todayParis) return;
+        } catch (e) { return; }
+      } else if (startIn > horizonMin) return;
+      const pred = predictMatch(m);
+      if (!pred || !pred.pick || pred.skip) return;
+      const rel = pred.reliability ?? pred.pick.prob;
+      if (rel < minRel) return;
+      const pickOdd = pred.pick.key === '1' ? pred.odds?.home
+                    : pred.pick.key === '2' ? pred.odds?.away
+                    : pred.odds?.draw;
+      if (!pickOdd || pickOdd < 1.05) return;
+      const p = pred.pick.prob;
+      const ev = p * pickOdd - 1;
+      if (ev < minEV) return;
+      rows.push({ m, pred, pickOdd, ev, startIn, rel });
+    }));
+
+    // Sort by EV descending, tie-break by reliability
+    rows.sort((a, b) => (b.ev - a.ev) || (b.rel - a.rel));
+
+    const sports = [
+      ['all', 'Tous'], ['football', '⚽ Foot'], ['basketball', '🏀 Basket'],
+      ['hockey', '🏒 Hockey'], ['tennis', '🎾 Tennis'],
+    ];
+
+    const header = `
+      <div class="section-header" style="margin-bottom:16px;">
+        <h2><span class="ico">💎</span>Value Finder <span style="font-size:13px;font-weight:500;color:var(--text-dim2);margin-left:8px;">${rows.length} pick${rows.length>1?'s':''} trouvé${rows.length>1?'s':''}</span></h2>
+        <div class="hint">Tous les paris +EV à travers les sports/ligues, classés par valeur décroissante. Complète le Top 5 en montrant la longue traîne.</div>
+      </div>
+      <div id="vf-filters" style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:18px;padding:14px;background:rgba(255,255,255,.02);border-radius:10px;border:1px solid rgba(255,255,255,.05);">
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+          <span style="font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--text-dim2);">Sport</span>
+          ${sports.map(([v, lbl]) => `<button class="vf-chip ${sportFilter === v ? 'active' : ''}" data-k="sport" data-v="${v}" style="padding:5px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.08);background:${sportFilter===v?'var(--accent)':'rgba(255,255,255,.03)'};color:${sportFilter===v?'#fff':'var(--text-dim)'};font-size:12px;cursor:pointer;">${lbl}</button>`).join('')}
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+          <span style="font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--text-dim2);">Min EV</span>
+          ${[2, 5, 10].map(v => `<button class="vf-chip ${Math.round(minEV*100)===v?'active':''}" data-k="minEV" data-v="${v}" style="padding:5px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.08);background:${Math.round(minEV*100)===v?'var(--accent)':'rgba(255,255,255,.03)'};color:${Math.round(minEV*100)===v?'#fff':'var(--text-dim)'};font-size:12px;cursor:pointer;">${v}%+</button>`).join('')}
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+          <span style="font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--text-dim2);">Min fiabilité</span>
+          ${[45, 55, 65].map(v => `<button class="vf-chip ${Math.round(minRel*100)===v?'active':''}" data-k="minRel" data-v="${v}" style="padding:5px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.08);background:${Math.round(minRel*100)===v?'var(--accent)':'rgba(255,255,255,.03)'};color:${Math.round(minRel*100)===v?'#fff':'var(--text-dim)'};font-size:12px;cursor:pointer;">${v}%+</button>`).join('')}
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+          <span style="font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--text-dim2);">Horizon</span>
+          ${[['today','Aujourd\u2019hui'],['24h','24h'],['48h','48h']].map(([v,lbl]) => `<button class="vf-chip ${horizon===v?'active':''}" data-k="horizon" data-v="${v}" style="padding:5px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.08);background:${horizon===v?'var(--accent)':'rgba(255,255,255,.03)'};color:${horizon===v?'#fff':'var(--text-dim)'};font-size:12px;cursor:pointer;">${lbl}</button>`).join('')}
+        </div>
+      </div>
+    `;
+
+    const rowsHtml = rows.length === 0
+      ? `<div style="padding:40px;text-align:center;color:var(--text-dim2);background:rgba(255,255,255,.02);border-radius:10px;">Aucun pari ne passe les filtres actuels. Essaie de baisser les seuils ou d'élargir l'horizon.</div>`
+      : `<div style="display:flex;flex-direction:column;gap:8px;">
+          ${rows.map(r => {
+            const { m, pred, pickOdd, ev, startIn, rel } = r;
+            const { home, away } = getSides(m);
+            const league = m.league_name || (typeof sportLabel === 'function' ? sportLabel(m.sport) : m.sport);
+            const tIn = fmtIn(startIn);
+            const sportIco = m.sport === 'football' ? '⚽' : m.sport === 'basketball' ? '🏀' : m.sport === 'hockey' ? '🏒' : m.sport === 'tennis' ? '🎾' : '⚽';
+            const evPct = (ev * 100).toFixed(1);
+            const relPct = Math.round(rel * 100);
+            const kelly = kellyStake(pred.pick.prob, pickOdd, bankroll, 0.5);
+            const ko = kelly ? `${(kelly.fraction*100).toFixed(1)}% bankroll` : '—';
+            const hName = esc(home?.short || home?.abbr || home?.name || '?');
+            const aName = esc(away?.short || away?.abbr || away?.name || '?');
+            return `
+              <a href="#" class="vf-row" data-id="${esc(m.id)}" style="display:grid;grid-template-columns:56px 1fr 1fr 100px 100px 100px 100px;gap:12px;align-items:center;padding:12px 14px;background:rgba(255,255,255,.02);border-radius:8px;border:1px solid rgba(255,255,255,.04);text-decoration:none;color:inherit;transition:background .15s;" onmouseover="this.style.background='rgba(255,255,255,.04)'" onmouseout="this.style.background='rgba(255,255,255,.02)'">
+                <div style="font-size:11px;color:var(--text-dim2);line-height:1.3;">
+                  <div style="font-size:15px;">${sportIco}</div>
+                  <div style="font-variant-numeric:tabular-nums;">${tIn}</div>
+                </div>
+                <div style="min-width:0;">
+                  <div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${hName} <span style="color:var(--text-dim2);font-weight:400;">vs</span> ${aName}</div>
+                  <div style="font-size:11px;color:var(--text-dim2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(league)}</div>
+                </div>
+                <div style="font-size:13px;color:var(--accent);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">🎯 ${esc(pred.pick.label)}</div>
+                <div style="text-align:right;font-variant-numeric:tabular-nums;">
+                  <div style="font-size:14px;font-weight:700;color:var(--text);">@${pickOdd.toFixed(2)}</div>
+                  <div style="font-size:10.5px;color:var(--text-dim2);">cote</div>
+                </div>
+                <div style="text-align:right;font-variant-numeric:tabular-nums;">
+                  <div style="font-size:14px;font-weight:700;color:${relPct>=65?'#34d399':relPct>=55?'#a78bfa':'#fbbf24'};">${relPct}%</div>
+                  <div style="font-size:10.5px;color:var(--text-dim2);">fiabilité</div>
+                </div>
+                <div style="text-align:right;font-variant-numeric:tabular-nums;">
+                  <div style="font-size:14px;font-weight:700;color:#10b981;">+${evPct}%</div>
+                  <div style="font-size:10.5px;color:var(--text-dim2);">EV</div>
+                </div>
+                <div style="text-align:right;font-variant-numeric:tabular-nums;">
+                  <div style="font-size:12.5px;font-weight:600;color:var(--text-dim);">${ko}</div>
+                  <div style="font-size:10.5px;color:var(--text-dim2);">Kelly ½</div>
+                </div>
+              </a>
+            `;
+          }).join('')}
+        </div>`;
+
+    wrap.innerHTML = header + rowsHtml;
+
+    // Filter chip handlers
+    wrap.querySelectorAll('.vf-chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const k = btn.dataset.k;
+        const v = btn.dataset.v;
+        const keyMap = { sport: VF_KEYS.sport, minEV: VF_KEYS.minEV, minRel: VF_KEYS.minRel, horizon: VF_KEYS.horizon };
+        vfSet(keyMap[k], v);
+        renderValueFinder(wrap);
+      });
+    });
+
+    // Clicking a row jumps to the match modal — reuse the existing openMatch
+    // pipeline by scrolling to the match card on Simples page + clicking it.
+    wrap.querySelectorAll('.vf-row').forEach(a => {
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        const id = a.dataset.id;
+        currentPage = 'simples';
+        try { localStorage.setItem('currentPage', 'simples'); } catch (e2) {}
+        applyPageView();
+        setTimeout(() => {
+          const card = document.querySelector(`.match[data-id="${CSS.escape(id)}"]`);
+          if (card) {
+            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            card.style.outline = '2px solid var(--accent)';
+            setTimeout(() => { card.style.outline = ''; }, 2000);
+          }
+        }, 100);
+      });
+    });
+  }
+
   // ======= Boot =======
-  // Switch between the three pages: simples / combines / bilan
+  // Switch between the pages: simples / combines / value / bilan
   function applyPageView() {
     const isSimples = currentPage === 'simples';
     const isCombines = currentPage === 'combines';
+    const isValue = currentPage === 'value';
     const isBilan = currentPage === 'bilan';
 
     // Filter bar + top picks only for simples page. Bankroll bar lives
@@ -4883,9 +5060,19 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T13:14:27.667104Z","today":"
     const comb = document.getElementById('combines-wrap');
     if (comb) comb.style.display = isCombines ? '' : 'none';
 
-    // Summary bar: shown for simples + bilan, hidden for combines (combines have own header)
+    // Summary bar: shown for simples + bilan, hidden for combines/value (own header)
     const sum = document.getElementById('summary-bar');
-    if (sum) sum.style.display = isCombines ? 'none' : '';
+    if (sum) sum.style.display = (isCombines || isValue) ? 'none' : '';
+
+    // Value Finder page
+    let valueWrap = document.getElementById('value-wrap');
+    if (!valueWrap) {
+      valueWrap = document.createElement('div');
+      valueWrap.id = 'value-wrap';
+      (document.querySelector('main') || document.body).appendChild(valueWrap);
+    }
+    valueWrap.style.display = isValue ? '' : 'none';
+    if (isValue) renderValueFinder(valueWrap);
 
     // Bilan page: render dedicated view in #bilan-wrap
     let bilanWrap = document.getElementById('bilan-wrap');
