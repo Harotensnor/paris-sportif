@@ -500,11 +500,45 @@
 
   @media (max-width: 700px) {
     header { grid-template-columns: 1fr; }
-    .controls { justify-content: flex-start; }
+    .controls { justify-content: flex-start; flex-wrap: wrap; }
     .search { width: 100%; }
     main { padding: 16px; }
     .match-grid { grid-template-columns: 1fr; }
     nav.tabs { top: 112px; }
+    /* Smaller h1 / sub on phones */
+    header h1 { font-size: 20px; }
+    header .sub { font-size: 11px; }
+    /* Summary cards: 2 columns on narrow screens, 1 column on phones */
+    .summary-bar { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    /* Top picks grid: one column, no min-width */
+    .top-picks-grid { grid-template-columns: 1fr; }
+    .top-pick { padding: 12px !important; }
+    /* Combinés grid to single column */
+    .combine-grid { grid-template-columns: 1fr; }
+    /* Bankroll bar: wrap to its own row */
+    #bankroll-bar { flex-wrap: wrap; justify-content: flex-start; }
+    #bankroll-bar #bankroll-hint { display: none; }
+    /* Team rows: keep team name readable */
+    .team { grid-template-columns: 28px minmax(0,1fr) auto; gap: 8px; }
+    /* Match detail modal: full-width, less padding */
+    .teams-big { grid-template-columns: 1fr auto 1fr; gap: 8px; padding: 12px; }
+    /* Bilan tables: make them scrollable horizontally */
+    table { font-size: 12px !important; }
+    table th, table td { padding: 4px 6px !important; }
+    /* Section headers smaller */
+    .section-header h2 { font-size: 16px; }
+    .section-header .hint { font-size: 11px; }
+    /* Reduce large font-size blocks inside cards */
+    .tp-pick .tp-pick-label { font-size: 12px; }
+  }
+
+  /* Very narrow (≤420px, eg older iPhone portrait) */
+  @media (max-width: 420px) {
+    .summary-bar { grid-template-columns: 1fr; }
+    main { padding: 12px; }
+    header { padding: 12px 16px; }
+    .tp-head { flex-direction: column; align-items: flex-start; gap: 4px; }
+    .top-pick.top5 { padding-left: 44px !important; }
   }
 </style>
 </head>
