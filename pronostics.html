@@ -5218,130 +5218,77 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T19:21:02.611529Z","today":"
         </div>
       </div>
 
-      <!-- MODEL HERO: vue d'ensemble -->
-      ${modelHeroHtml}
+      <!-- VERDICT MODÈLE -->
+      ${(() => {
+        // One-glance verdict — no jargon, no streaks, no drawdown.
+        let vLbl, vColor, vBg, vDesc;
+        if (model.bets < 30) {
+          vLbl = '📊 Pas encore assez de recul';
+          vColor = '#fbbf24';
+          vBg = 'rgba(251,191,36,.10)';
+          vDesc = `${model.bets} pick${model.bets>1?'s':''} évalué${model.bets>1?'s':''} · il en faut au moins 30 pour tirer une conclusion fiable.`;
+        } else if (model.pl > 0 && roi > 3) {
+          vLbl = '✅ Modèle rentable';
+          vColor = '#34d399';
+          vBg = 'rgba(52,211,153,.10)';
+          vDesc = `Sur ${model.bets} picks, le modèle a généré <strong style="color:#34d399;">+${model.pl.toFixed(2)}u</strong>. Tu peux suivre ses recommandations, surtout les High confiance.`;
+        } else if (model.pl < 0 && roi < -3) {
+          vLbl = '❌ Modèle perdant';
+          vColor = '#f87171';
+          vBg = 'rgba(248,113,113,.10)';
+          vDesc = `Sur ${model.bets} picks, le modèle a perdu <strong style="color:#f87171;">${model.pl.toFixed(2)}u</strong>. À ce stade, éviter de le suivre aveuglément.`;
+        } else {
+          vLbl = '⚖️ Proche du break-even';
+          vColor = '#a78bfa';
+          vBg = 'rgba(167,139,250,.10)';
+          vDesc = `${model.pl>=0?'+':''}${model.pl.toFixed(2)}u sur ${model.bets} picks · ROI ${roi>=0?'+':''}${roi.toFixed(1)}%. Pas assez franc pour conclure, continue d'observer.`;
+        }
+        return `
+          <div class="bilan-section" style="background:${vBg};border-color:${vColor}44;">
+            <div class="bilan-section-head">
+              <h3 style="color:${vColor};">${vLbl}</h3>
+              <div class="meta">${model.bets} picks sur ${completed.length} matchs terminés</div>
+            </div>
+            <div style="font-size:15px;color:var(--text);line-height:1.6;margin-bottom:18px;">${vDesc}</div>
+            <div class="bilan-kpis" style="margin-top:0;">
+              <div class="bilan-kpi">
+                <div class="kpi-label">P&amp;L cumulé</div>
+                <div class="kpi-value ${model.pl>=0?'pos':'neg'}">${model.pl>=0?'+':''}${model.pl.toFixed(2)}u</div>
+                <div class="kpi-sub">mise flat 1u par pick</div>
+              </div>
+              <div class="bilan-kpi">
+                <div class="kpi-label">Win rate</div>
+                <div class="kpi-value">${model.bets ? wr.toFixed(0)+'%' : '—'}</div>
+                <div class="kpi-sub">${model.w}W · ${model.l}L</div>
+              </div>
+              <div class="bilan-kpi">
+                <div class="kpi-label">ROI</div>
+                <div class="kpi-value ${roi>=0?'pos':'neg'}">${model.bets ? (roi>=0?'+':'')+roi.toFixed(1)+'%' : '—'}</div>
+                <div class="kpi-sub">par pick joué</div>
+              </div>
+            </div>
+          </div>
+        `;
+      })()}
 
-      <!-- BUCKETS DE CONFIANCE + RECORDS -->
+      <!-- OÙ LE MODÈLE GAGNE : confiance + sport, côte à côte -->
       <div class="bilan-row-2">
         <div class="bilan-section">
           <div class="bilan-section-head">
-            <h3>🎯 ROI par niveau de confiance</h3>
-            <div class="meta">Buckets proba modèle</div>
+            <h3>🎯 Par niveau de confiance</h3>
+            <div class="meta">Suis les High, évite les Low</div>
           </div>
           <div class="bilan-sports">${bucketsHtml}</div>
         </div>
         <div class="bilan-section">
           <div class="bilan-section-head">
-            <h3>📈 Records du modèle</h3>
-            <div class="meta">Plus gros coups</div>
+            <h3>🏅 Par sport</h3>
+            <div class="meta">Tri par volume</div>
           </div>
-          <div class="bilan-sports">${recordsHtml}</div>
+          ${perSportHtml
+            ? `<div class="bilan-sports">${perSportHtml}</div>`
+            : `<div class="bilan-empty">Aucun résultat pour le moment.</div>`}
         </div>
-      </div>
-
-      <!-- EQUITY VS BASELINE -->
-      ${equityVsBaselineHtml ? `
-      <div class="bilan-section">
-        <div class="bilan-section-head">
-          <h3>📈 Modèle vs « toujours favori »</h3>
-          <div class="meta">Alpha cumulé par rapport au marché</div>
-        </div>
-        ${equityVsBaselineHtml}
-      </div>` : ''}
-
-      <!-- CALENDAR HEATMAP -->
-      <div class="bilan-section">
-        <div class="bilan-section-head">
-          <h3>🗓️ Calendrier P&amp;L (52 semaines)</h3>
-          <div class="meta">Chaque case = 1 jour · vert = +u · rouge = −u</div>
-        </div>
-        ${heatmapHtml}
-      </div>
-
-      <!-- ROI PAR HEURE + ROI PAR JOUR -->
-      <div class="bilan-row-2">
-        <div class="bilan-section">
-          <div class="bilan-section-head">
-            <h3>🕐 ROI par heure de kickoff</h3>
-            <div class="meta">Heure locale</div>
-          </div>
-          ${hourRowsHtml ? `
-            <div style="overflow-x:auto;">
-              <table class="bilan-table">
-                <thead><tr>
-                  <th>Heure</th>
-                  <th style="text-align:right;">Paris</th>
-                  <th style="text-align:right;">WR</th>
-                  <th style="text-align:right;">ROI</th>
-                  <th style="text-align:right;">P&amp;L</th>
-                </tr></thead>
-                <tbody>${hourRowsHtml}</tbody>
-              </table>
-            </div>
-          ` : `<div class="bilan-empty">Pas assez de volume pour ventiler par heure.</div>`}
-        </div>
-        <div class="bilan-section">
-          <div class="bilan-section-head">
-            <h3>📅 ROI par jour de semaine</h3>
-            <div class="meta">Lun → Dim</div>
-          </div>
-          ${dowRowsHtml ? `
-            <div style="overflow-x:auto;">
-              <table class="bilan-table">
-                <thead><tr>
-                  <th>Jour</th>
-                  <th style="text-align:right;">Paris</th>
-                  <th style="text-align:right;">WR</th>
-                  <th style="text-align:right;">ROI</th>
-                  <th style="text-align:right;">P&amp;L</th>
-                </tr></thead>
-                <tbody>${dowRowsHtml}</tbody>
-              </table>
-            </div>
-          ` : `<div class="bilan-empty">Pas assez de volume pour ventiler par jour.</div>`}
-        </div>
-      </div>
-
-      <!-- TOP 10 LIGUES -->
-      <div class="bilan-section">
-        <div class="bilan-section-head">
-          <h3>🏆 Top 10 ligues (par volume)</h3>
-          <div class="meta">Min 3 paris</div>
-        </div>
-        ${leaguesHtml ? `
-          <div style="overflow-x:auto;">
-            <table class="bilan-table">
-              <thead><tr>
-                <th>Ligue</th>
-                <th style="text-align:right;">Paris</th>
-                <th style="text-align:right;">WR</th>
-                <th style="text-align:right;">ROI</th>
-                <th style="text-align:right;">P&amp;L</th>
-              </tr></thead>
-              <tbody>${leaguesHtml}</tbody>
-            </table>
-          </div>
-        ` : `<div class="bilan-empty">Pas assez de volume par ligue pour le moment.</div>`}
-      </div>
-
-      <!-- CALIBRATION -->
-      <div class="bilan-section">
-        <div class="bilan-section-head">
-          <h3>🎯 Calibration du modèle</h3>
-          <div class="meta">Proba prédite vs taux de réussite observé</div>
-        </div>
-        ${renderReliabilityDiagram(computeCalibration())}
-      </div>
-
-      <!-- PAR SPORT -->
-      <div class="bilan-section">
-        <div class="bilan-section-head">
-          <h3>🏅 Performance par sport</h3>
-          <div class="meta">Tri par volume</div>
-        </div>
-        ${perSportHtml
-          ? `<div class="bilan-sports">${perSportHtml}</div>`
-          : `<div class="bilan-empty">Aucun résultat pour le moment.</div>`}
       </div>
 
       <!-- HISTORIQUE (tabs) -->
