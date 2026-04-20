@@ -20,20 +20,26 @@ def main():
     text = DATA_JS.read_text(encoding='utf-8')
     data = json.loads(re.search(r'=\s*(\{.*\})\s*;?\s*$', text, re.DOTALL).group(1))
 
-    stats = {'tagged': 0, 'available': 0, 'unavailable': 0}
-    for day, events in data.get('days', {}).items():
-        for ev in events:
+    stats = {'tagged': 0, 'available': 0, 'dropped': 0}
+    days = data.get('days', {}) or {}
+    for day in list(days.keys()):
+        kept = []
+        for ev in days[day]:
             info = lookup(ev)
+            stats['tagged'] += 1
+            # Théo only bets on Winamax — non-Winamax events are stripped entirely so
+            # they never reach the dashboard, not even hidden behind a toggle.
+            if not info['available']:
+                stats['dropped'] += 1
+                continue
             ev['winamax'] = {
-                'available': info['available'],
+                'available': True,
                 'url': info['url'],
                 'note': info['note'],
             }
-            stats['tagged'] += 1
-            if info['available']:
-                stats['available'] += 1
-            else:
-                stats['unavailable'] += 1
+            stats['available'] += 1
+            kept.append(ev)
+        days[day] = kept
 
     payload = json.dumps(data, ensure_ascii=False, separators=(',', ':'))
     DATA_JS.write_text(f'window.PRONOSTICS_DATA = {payload};\n', encoding='utf-8')
@@ -45,9 +51,9 @@ def main():
                        new_block, html_text, count=1, flags=re.DOTALL)
     HTML.write_text(html_text, encoding='utf-8')
 
-    print(f'[{t0:%H:%M:%S}] winamax tagging → {stats["tagged"]} events, '
-          f'{stats["available"]} on Winamax ({100*stats["available"]//max(1,stats["tagged"])}%), '
-          f'{stats["unavailable"]} hidden')
+    print(f'[{t0:%H:%M:%S}] winamax filter → {stats["tagged"]} events scanned, '
+          f'{stats["available"]} kept on Winamax ({100*stats["available"]//max(1,stats["tagged"])}%), '
+          f'{stats["dropped"]} dropped')
 
 
 if __name__ == '__main__':
