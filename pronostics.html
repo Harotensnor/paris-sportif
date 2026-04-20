@@ -4440,6 +4440,59 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T16:32:11.425877Z","today":"
     const modelChartHtml = renderRoiChart(modelChartRows, { title: 'P&L modèle cumulé (unité flat)' })
       || `<div class="bilan-empty">Pas encore assez de paris pour tracer une courbe.</div>`;
 
+    // ========= MODEL BREAKDOWN: buckets confiance + ligues + streak/records =========
+    // Buckets par proba modèle : high ≥ 0.65, mid 0.55–0.65, low 0.50–0.55
+    const bucket = { high: { w:0, l:0, pl:0, bets:0 }, mid: { w:0, l:0, pl:0, bets:0 }, low: { w:0, l:0, pl:0, bets:0 } };
+    const perLeague = {};
+    const byDay = new Map();  // date → delta sum
+    let biggestWin = null, biggestLoss = null;
+    // Streak: walk rows chronologically (oldest → newest) and track current run
+    const chronoRows = rows.slice().sort((a, b) => new Date(a.m.date) - new Date(b.m.date));
+    let curStreak = { type: null, count: 0 };     // type = 'W' or 'L'
+    let bestWin = { count: 0 }, worstLoss = { count: 0 };
+    let runType = null, runCount = 0;
+    chronoRows.forEach(r => {
+      const p = r.pred.pick.prob || 0;
+      const b = p >= 0.65 ? bucket.high : p >= 0.55 ? bucket.mid : bucket.low;
+      b.bets++;
+      const delta = r.res === 'won' ? (r.odd - 1) : -1;
+      if (r.res === 'won') b.w++; else b.l++;
+      b.pl += delta;
+
+      // Per league
+      const lgKey = r.m.league_name || r.m.league_id || '—';
+      const pl = perLeague[lgKey] = perLeague[lgKey] || { w:0, l:0, pl:0, bets:0 };
+      pl.bets++;
+      if (r.res === 'won') pl.w++; else pl.l++;
+      pl.pl += delta;
+
+      // Biggest single-bet win/loss
+      if (r.res === 'won' && (!biggestWin || delta > biggestWin.delta)) {
+        biggestWin = { delta, match: r.m, pred: r.pred, odd: r.odd };
+      }
+      if (r.res === 'lost' && (!biggestLoss || Math.abs(delta) > Math.abs(biggestLoss.delta))) {
+        biggestLoss = { delta, match: r.m, pred: r.pred, odd: r.odd };
+      }
+
+      // Day aggregate
+      const d = (r.m.date || '').slice(0, 10);
+      if (d) byDay.set(d, (byDay.get(d) || 0) + delta);
+
+      // Streak
+      const t = r.res === 'won' ? 'W' : 'L';
+      if (t === runType) runCount++;
+      else { runType = t; runCount = 1; }
+      if (t === 'W' && runCount > bestWin.count) bestWin = { count: runCount };
+      if (t === 'L' && runCount > worstLoss.count) worstLoss = { count: runCount };
+      curStreak = { type: runType, count: runCount };
+    });
+    // Best / worst day
+    let bestDay = null, worstDay = null;
+    for (const [d, v] of byDay.entries()) {
+      if (!bestDay || v > bestDay.delta) bestDay = { date: d, delta: v };
+      if (!worstDay || v < worstDay.delta) worstDay = { date: d, delta: v };
+    }
+
     // ========= PERSONAL STATS =========
     const mine = computeMyBilan();
     const hasMyBets = mine && mine.bets > 0;
@@ -4555,6 +4608,92 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T16:32:11.425877Z","today":"
 
     const bkPositive = bkDelta >= 0;
 
+    // ========= MODEL HERO + BREAKDOWN HTML =========
+    const modelPlPositive = model.pl >= 0;
+    const modelHeroHtml = `
+      <div class="bilan-hero ${modelPlPositive ? '' : 'negative'}" style="background:
+        radial-gradient(700px 350px at 100% 0%, rgba(167,139,250,.14), transparent 60%),
+        radial-gradient(600px 350px at 0% 100%, ${modelPlPositive?'rgba(52,211,153,.10)':'rgba(248,113,113,.10)'}, transparent 60%),
+        linear-gradient(180deg, #10101a 0%, #0b0b10 100%); border-color: rgba(167,139,250,.32);">
+        <div>
+          <div class="bk-label" style="color:#a78bfa;">📊 Bilan modèle · P&amp;L cumulé (flat 1u)</div>
+          <div class="bk-value" style="color:${modelPlPositive?'#34d399':'#f87171'};">${modelPlPositive?'+':''}${model.pl.toFixed(2)}u</div>
+          <div class="bk-delta ${modelPlPositive?'pos':'neg'}">
+            ${modelPlPositive?'↑':'↓'} ROI ${roi>=0?'+':''}${roi.toFixed(1)}% · WR ${wr.toFixed(0)}%
+          </div>
+          <div class="bk-start">${model.w}W · ${model.l}L sur ${model.bets} paris évalués</div>
+        </div>
+        <div class="bk-side">
+          <div class="bk-mini"><span class="lbl">Série en cours</span><span class="val" style="color:${curStreak.type==='W'?'#34d399':curStreak.type==='L'?'#f87171':'var(--text-dim)'};">${curStreak.count ? `${curStreak.count}${curStreak.type}` : '—'}</span></div>
+          <div class="bk-mini"><span class="lbl">Meilleure série W</span><span class="val" style="color:#34d399;">${bestWin.count || 0}W</span></div>
+          <div class="bk-mini"><span class="lbl">Pire série L</span><span class="val" style="color:#f87171;">${worstLoss.count || 0}L</span></div>
+          <div class="bk-mini"><span class="lbl">Paris évalués</span><span class="val">${model.bets}</span></div>
+        </div>
+      </div>
+    `;
+
+    // Buckets de confiance
+    const renderBucket = (lbl, b, color, rangeTxt) => {
+      const wr_ = b.bets ? (100*b.w/b.bets) : 0;
+      const roi_ = b.bets ? (100*b.pl/b.bets) : 0;
+      return `<div class="bilan-sport-card" style="border-color:${color}55;">
+        <div class="sport-name" style="color:${color};">${lbl} <span style="color:var(--text-dim2);font-weight:500;">· ${rangeTxt}</span></div>
+        <div class="sport-wr">${b.bets ? wr_.toFixed(0)+'%' : '—'} <span style="font-size:11px;color:var(--text-dim2);font-weight:500;letter-spacing:0;">WR</span></div>
+        <div class="sport-roi" style="color:${roi_>=0?'#34d399':'#f87171'};">ROI ${roi_>=0?'+':''}${roi_.toFixed(0)}% · ${b.bets} paris</div>
+      </div>`;
+    };
+    const bucketsHtml = `
+      ${renderBucket('🔒 High', bucket.high, '#34d399', '≥ 65%')}
+      ${renderBucket('⚖️ Mid', bucket.mid, '#a78bfa', '55–65%')}
+      ${renderBucket('🎲 Low', bucket.low, '#fbbf24', '50–55%')}
+    `;
+
+    // Top 10 ligues (tri par volume décroissant)
+    const leagueEntries = Object.entries(perLeague)
+      .filter(([, s]) => s.bets >= 3)
+      .sort((a, b) => b[1].bets - a[1].bets)
+      .slice(0, 10);
+    const leaguesHtml = leagueEntries.map(([name, s]) => {
+      const wr_ = s.bets ? (100*s.w/s.bets) : 0;
+      const roi_ = s.bets ? (100*s.pl/s.bets) : 0;
+      return `<tr>
+        <td style="font-weight:600;">${esc(name)}</td>
+        <td style="text-align:right;color:var(--text-dim);font-variant-numeric:tabular-nums;">${s.bets}</td>
+        <td style="text-align:right;font-variant-numeric:tabular-nums;">${wr_.toFixed(0)}%</td>
+        <td style="text-align:right;font-weight:700;font-variant-numeric:tabular-nums;color:${roi_>=0?'#34d399':'#f87171'};">${roi_>=0?'+':''}${roi_.toFixed(1)}%</td>
+        <td style="text-align:right;font-variant-numeric:tabular-nums;color:${s.pl>=0?'#34d399':'#f87171'};">${s.pl>=0?'+':''}${s.pl.toFixed(2)}u</td>
+      </tr>`;
+    }).join('');
+
+    // Records cards
+    const fmtMatchShort = (m) => {
+      if (!m) return '—';
+      const { home, away } = getSides(m);
+      return `${home?.short || home?.name || '?'} vs ${away?.short || away?.name || '?'}`;
+    };
+    const recordsHtml = `
+      <div class="bilan-sport-card">
+        <div class="sport-name" style="color:#34d399;">💥 Plus grosse cote gagnée</div>
+        <div class="sport-wr" style="color:#34d399;">${biggestWin ? '+'+biggestWin.delta.toFixed(2)+'u' : '—'}</div>
+        <div class="sport-roi" style="color:var(--text-dim);">${biggestWin ? esc(fmtMatchShort(biggestWin.match))+' @'+biggestWin.odd.toFixed(2) : 'aucune'}</div>
+      </div>
+      <div class="bilan-sport-card">
+        <div class="sport-name" style="color:#f87171;">💔 Plus grosse cote perdue</div>
+        <div class="sport-wr" style="color:#f87171;">${biggestLoss ? biggestLoss.delta.toFixed(2)+'u' : '—'}</div>
+        <div class="sport-roi" style="color:var(--text-dim);">${biggestLoss ? esc(fmtMatchShort(biggestLoss.match))+' @'+biggestLoss.odd.toFixed(2) : 'aucune'}</div>
+      </div>
+      <div class="bilan-sport-card">
+        <div class="sport-name" style="color:#34d399;">🏆 Meilleure journée</div>
+        <div class="sport-wr" style="color:#34d399;">${bestDay ? '+'+bestDay.delta.toFixed(2)+'u' : '—'}</div>
+        <div class="sport-roi" style="color:var(--text-dim);">${bestDay ? esc(fmtDate(bestDay.date)) : 'aucune'}</div>
+      </div>
+      <div class="bilan-sport-card">
+        <div class="sport-name" style="color:#f87171;">🕳️ Pire journée</div>
+        <div class="sport-wr" style="color:#f87171;">${worstDay ? worstDay.delta.toFixed(2)+'u' : '—'}</div>
+        <div class="sport-roi" style="color:var(--text-dim);">${worstDay ? esc(fmtDate(worstDay.date)) : 'aucune'}</div>
+      </div>
+    `;
+
     // ========= BUILD HTML =========
     wrap.innerHTML = `
       <!-- HERO: Bankroll current position -->
@@ -4627,6 +4766,49 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T16:32:11.425877Z","today":"
           </div>
           ${modelChartHtml}
         </div>
+      </div>
+
+      <!-- MODEL HERO: vue d'ensemble -->
+      ${modelHeroHtml}
+
+      <!-- BUCKETS DE CONFIANCE + RECORDS -->
+      <div class="bilan-row-2">
+        <div class="bilan-section">
+          <div class="bilan-section-head">
+            <h3>🎯 ROI par niveau de confiance</h3>
+            <div class="meta">Buckets proba modèle</div>
+          </div>
+          <div class="bilan-sports">${bucketsHtml}</div>
+        </div>
+        <div class="bilan-section">
+          <div class="bilan-section-head">
+            <h3>📈 Records du modèle</h3>
+            <div class="meta">Plus gros coups</div>
+          </div>
+          <div class="bilan-sports">${recordsHtml}</div>
+        </div>
+      </div>
+
+      <!-- TOP 10 LIGUES -->
+      <div class="bilan-section">
+        <div class="bilan-section-head">
+          <h3>🏆 Top 10 ligues (par volume)</h3>
+          <div class="meta">Min 3 paris</div>
+        </div>
+        ${leaguesHtml ? `
+          <div style="overflow-x:auto;">
+            <table class="bilan-table">
+              <thead><tr>
+                <th>Ligue</th>
+                <th style="text-align:right;">Paris</th>
+                <th style="text-align:right;">WR</th>
+                <th style="text-align:right;">ROI</th>
+                <th style="text-align:right;">P&amp;L</th>
+              </tr></thead>
+              <tbody>${leaguesHtml}</tbody>
+            </table>
+          </div>
+        ` : `<div class="bilan-empty">Pas assez de volume par ligue pour le moment.</div>`}
       </div>
 
       <!-- CALIBRATION -->
