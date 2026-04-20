@@ -20,6 +20,14 @@ Output shape on each event:
         'provider': 'DraftKings',
     }
 
+A second field `ev.closing_odds` is also written once the match is within
+10 minutes of kickoff or has already started. The closing line is the most
+efficient price the market produced — and CLV (closing-line value) is the
+single best leading indicator that a bettor is actually beating the market.
+By freezing the closing number too, the JS bilan can later compute:
+    CLV_leg = (our_price - closing_price) / closing_price
+positive = we locked in a better price than the market ended up settling at.
+
 The JS side (`predictMatch` in pronostics.html) now reads `odds_snapshot`
 as a fallback when `ev.odds` is empty, which lets us compute real
 retrospective picks.
@@ -111,18 +119,61 @@ def snapshot(event, now_iso):
     return True
 
 
+def closing_snapshot(event, now_dt, now_iso):
+    """Capture the closing odds (≤10 min to kickoff). Idempotent — once written,
+    never overwritten. The JS side can use this to compute CLV against the
+    price we actually took (odds_snapshot)."""
+    if event.get('closing_odds') and (event['closing_odds'].get('home') or event['closing_odds'].get('away')):
+        return False
+    # Need a valid kickoff datetime. Accept ISO with or without timezone.
+    raw = event.get('date')
+    if not raw:
+        return False
+    try:
+        iso = raw.replace('Z', '+00:00')
+        ko = datetime.fromisoformat(iso)
+        if ko.tzinfo is None:
+            ko = ko.replace(tzinfo=timezone.utc)
+    except (ValueError, TypeError):
+        return False
+    # Window: [kickoff-10min, kickoff+30min]. We want the latest price possible
+    # while the ESPN odds array is still populated. After kickoff ESPN typically
+    # drops the array within ~30 min, so that's the outer bound we try to grab.
+    delta_min = (ko - now_dt).total_seconds() / 60.0
+    if delta_min > 10:          # still too early
+        return False
+    if delta_min < -30:         # match has been running for more than 30 min — odds gone
+        return False
+    h, d, a, prov = best_odds_from_array(event.get('odds') or [])
+    if not h and not a:
+        return False
+    event['closing_odds'] = {
+        'captured_at': now_iso,
+        'minutes_to_ko': round(delta_min, 1),
+        'home': round(float(h), 3) if h else None,
+        'draw': round(float(d), 3) if d else None,
+        'away': round(float(a), 3) if a else None,
+        'provider': prov,
+    }
+    return True
+
+
 def main():
     d = load_data()
-    now_iso = datetime.now(timezone.utc).isoformat()
+    now_dt = datetime.now(timezone.utc)
+    now_iso = now_dt.isoformat()
     new_snaps = 0
+    new_closes = 0
     total = 0
     for day_key, events in d.get('days', {}).items():
         for ev in events:
             total += 1
             if snapshot(ev, now_iso):
                 new_snaps += 1
+            if closing_snapshot(ev, now_dt, now_iso):
+                new_closes += 1
     save_data(d)
-    print(f'[snapshot_odds] total={total} new_snapshots={new_snaps}')
+    print(f'[snapshot_odds] total={total} new_snapshots={new_snaps} new_closing={new_closes}')
 
 
 if __name__ == '__main__':

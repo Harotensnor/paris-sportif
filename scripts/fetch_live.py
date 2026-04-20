@@ -9,7 +9,7 @@ Runs: python3 fetch_live.py
 """
 import json, re, time
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
 import importlib.util, sys
 
 HERE = Path(__file__).resolve().parent
@@ -92,6 +92,60 @@ def archive_pre_match_odds(events):
         print(f'  archived {written} new pre-match odds rows → {ODDS_HISTORY.name}', flush=True)
 
 
+def rotate_odds_history(keep_days: int = 180, soft_cap: int = 20000):
+    """Keep odds_history.jsonl from growing unbounded.
+    Drops rows whose match `date` is older than `keep_days`, and also hard-caps
+    at `soft_cap` rows (keeping the most recent). Runs in-place; no-ops if the
+    file is missing or small. Any row we can't parse is dropped silently —
+    the archive is only informational, not a source of truth."""
+    if not ODDS_HISTORY.exists():
+        return
+    try:
+        sz = ODDS_HISTORY.stat().st_size
+    except OSError:
+        return
+    # Cheap guard: below ~2MB it's not worth rewriting on every tick.
+    if sz < 2_000_000:
+        # Still do a very light "lines count" trim only if file is long.
+        with ODDS_HISTORY.open('r', encoding='utf-8') as f:
+            lines = f.readlines()
+        if len(lines) <= soft_cap:
+            return
+        # Over soft_cap: keep the last soft_cap lines.
+        with ODDS_HISTORY.open('w', encoding='utf-8') as f:
+            f.writelines(lines[-soft_cap:])
+        print(f'  rotated odds_history: trimmed to last {soft_cap} rows', flush=True)
+        return
+    cutoff = datetime.utcnow() - timedelta(days=keep_days)
+    kept = []
+    dropped = 0
+    with ODDS_HISTORY.open('r', encoding='utf-8') as f:
+        for line in f:
+            try:
+                rec = json.loads(line)
+            except Exception:
+                dropped += 1
+                continue
+            raw = rec.get('date') or rec.get('captured_at') or ''
+            try:
+                iso = raw.replace('Z', '+00:00')
+                dt = datetime.fromisoformat(iso)
+                if dt.tzinfo is not None:
+                    dt = dt.replace(tzinfo=None)
+            except (ValueError, TypeError):
+                kept.append(line)
+                continue
+            if dt < cutoff:
+                dropped += 1
+                continue
+            kept.append(line)
+    if len(kept) > soft_cap:
+        kept = kept[-soft_cap:]
+    with ODDS_HISTORY.open('w', encoding='utf-8') as f:
+        f.writelines(kept)
+    print(f'  rotated odds_history: dropped {dropped}, kept {len(kept)}', flush=True)
+
+
 def main():
     t0 = time.time()
     today = datetime.now().date()
@@ -112,6 +166,8 @@ def main():
     # Archive pre-match odds (first time we see ML for a not-yet-started match).
     # This lets us compute real retrospective ROI later since ESPN drops odds post-kickoff.
     archive_pre_match_odds(events)
+    # Keep the jsonl archive from growing forever. 180-day window + 20k-row cap.
+    rotate_odds_history()
 
     # Merge into existing data.js
     text = DATA_JS.read_text(encoding='utf-8')

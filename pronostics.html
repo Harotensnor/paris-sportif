@@ -6,6 +6,9 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
+<meta name="theme-color" content="#0b0b10">
+<meta name="color-scheme" content="dark">
+<meta name="description" content="Dashboard de pronostics sportifs multi-sports avec modèle Poisson, Kelly sizing et bilan bankroll.">
 <title>Pronostics Sportifs — Football · Tennis · Basket</title>
 <style>
   :root {
@@ -908,104 +911,851 @@
     .brand h1 { font-size: 14px; }
     .tp-head { flex-direction: column; align-items: flex-start; gap: 4px; }
   }
+
+  /* ===================================================================
+     REFONTE v2 — SIDEBAR LAYOUT
+     Overrides the stacked header/tabs pattern with a Linear-style
+     persistent left rail. Keeps existing IDs/classes so JS is untouched.
+     =================================================================== */
+  body {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: 100vh;
+  }
+
+  /* ---- Sidebar ---- */
+  aside.sidebar {
+    position: sticky; top: 0;
+    height: 100vh; overflow-y: auto;
+    padding: 20px 14px 16px;
+    background: linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 100%);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; gap: 18px;
+    z-index: 60;
+  }
+  aside.sidebar::-webkit-scrollbar { width: 6px; }
+  aside.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,.06); border-radius: 999px; }
+
+  .sidebar-brand {
+    display: flex; align-items: center; gap: 12px;
+    padding: 0 4px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-brand .logo {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-2) 100%);
+    display: grid; place-items: center; font-size: 18px;
+    box-shadow: 0 4px 16px rgba(139,92,246,.35), inset 0 0 0 1px rgba(255,255,255,.12);
+    flex-shrink: 0;
+  }
+  .sidebar-brand h1 {
+    font-size: 14px; margin: 0; letter-spacing: -.2px; font-weight: 600;
+    color: var(--text);
+  }
+  .sidebar-brand .sub { color: var(--text-dim); font-size: 10.5px; margin-top: 2px; font-weight: 500; }
+
+  .sidebar-section-title {
+    font-size: 10px; color: var(--text-dim2); text-transform: uppercase;
+    letter-spacing: .8px; font-weight: 700;
+    padding: 0 8px 6px;
+  }
+
+  /* Override vertical page-nav */
+  aside.sidebar .page-nav {
+    display: flex; flex-direction: column; gap: 2px;
+    padding: 4px; margin: 0;
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  aside.sidebar .page-btn {
+    width: 100%; justify-content: flex-start;
+    padding: 9px 12px; font-size: 13px;
+  }
+
+  /* Override sport tabs to vertical rail */
+  aside.sidebar nav.tabs {
+    display: flex; flex-direction: column; gap: 1px;
+    padding: 0; position: static;
+    background: transparent; border: 0;
+    overflow: visible;
+  }
+  aside.sidebar nav.tabs button {
+    justify-content: flex-start; padding: 9px 12px;
+    border-bottom: 0; border-radius: 8px;
+    font-size: 13px; width: 100%;
+    color: var(--text-dim);
+  }
+  aside.sidebar nav.tabs button:hover { background: var(--panel-2); color: var(--text); }
+  aside.sidebar nav.tabs button.active {
+    background: var(--brand-soft); color: #ddd5fb;
+    border-bottom: 0;
+  }
+  aside.sidebar nav.tabs button .count { margin-left: auto; }
+
+  /* Bankroll in sidebar */
+  aside.sidebar #bankroll-bar {
+    display: flex; flex-direction: column; align-items: stretch;
+    justify-content: flex-start; gap: 6px;
+    padding: 12px; margin: 0;
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  aside.sidebar #bankroll-bar > span:first-child {
+    font-size: 11px; color: var(--text-dim); font-weight: 600;
+    letter-spacing: .3px; text-transform: uppercase;
+  }
+  aside.sidebar #bankroll-bar input {
+    width: 100%; text-align: left;
+    font-size: 16px; font-weight: 700; color: var(--text);
+    padding: 8px 10px;
+  }
+  aside.sidebar #bankroll-hint { font-size: 10.5px; color: var(--text-dim2); }
+
+  /* EV threshold slider (sidebar) */
+  #ev-threshold-bar {
+    display: grid; grid-template-columns: 1fr auto; align-items: center;
+    gap: 8px; padding: 8px 12px;
+    background: var(--panel-2); border-radius: 8px; border: 1px solid var(--border);
+  }
+  #ev-threshold-bar input[type="range"] {
+    width: 100%; accent-color: var(--brand);
+    background: transparent; cursor: pointer;
+  }
+  #ev-threshold-bar #ev-threshold-val {
+    font-weight: 700; font-size: 13px; color: var(--brand);
+    font-variant-numeric: tabular-nums; min-width: 36px; text-align: right;
+  }
+  #ev-threshold-bar #ev-threshold-hint {
+    grid-column: 1 / -1; font-size: 10.5px; color: var(--text-dim2);
+  }
+
+  aside.sidebar .refresh-indicator { margin: 0; align-self: flex-start; }
+  .sidebar-footer { margin-top: auto; display: flex; flex-direction: column; gap: 10px; }
+
+  /* ---- Content column ---- */
+  .content {
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(167,139,250,.05), transparent 60%),
+      radial-gradient(900px 500px at -10% 10%, rgba(52,211,153,.035), transparent 60%);
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+  }
+  body::before { content: none; }
+
+  .content-header {
+    position: sticky; top: 0; z-index: 40;
+    padding: 14px 28px;
+    background: rgba(8,8,10,.72);
+    backdrop-filter: saturate(160%) blur(16px);
+    -webkit-backdrop-filter: saturate(160%) blur(16px);
+    border-bottom: 1px solid var(--border);
+    display: flex; justify-content: flex-end;
+  }
+  .content main {
+    padding: 28px 32px 60px;
+    max-width: 1400px; margin: 0 auto;
+    width: 100%; flex: 1;
+  }
+
+  /* Kill the old sticky header rule (it's no longer rendered) */
+  body > header { display: none !important; }
+  body > nav.tabs { display: none !important; }
+
+  /* Hamburger + overlay for mobile */
+  .hamburger {
+    display: none;
+    position: fixed; top: 12px; left: 12px; z-index: 120;
+    width: 40px; height: 40px; border-radius: 10px;
+    background: var(--panel-2); border: 1px solid var(--border-2);
+    color: var(--text); font-size: 18px; cursor: pointer;
+    box-shadow: var(--shadow-sm);
+  }
+  .sidebar-overlay {
+    display: none;
+    position: fixed; inset: 0; background: rgba(0,0,0,.55);
+    z-index: 108; backdrop-filter: blur(3px);
+  }
+
+  @media (max-width: 960px) {
+    body { grid-template-columns: 1fr; }
+    aside.sidebar {
+      position: fixed; top: 0; left: 0;
+      width: 280px; height: 100vh;
+      transform: translateX(-100%);
+      transition: transform .22s ease;
+      z-index: 115; box-shadow: var(--shadow-lg);
+    }
+    body.sidebar-open aside.sidebar { transform: translateX(0); }
+    body.sidebar-open .sidebar-overlay { display: block; }
+    .hamburger { display: inline-flex; align-items: center; justify-content: center; }
+    .content-header { padding-left: 62px; }
+    .content main { padding: 20px 16px 40px; }
+  }
+
+  /* ===================================================================
+     REFONTE v2 — TOP 5 HERO (1 giant + 4 minis)
+     =================================================================== */
+  .top-hero-wrap {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+  .top-hero {
+    position: relative; overflow: hidden;
+    background:
+      radial-gradient(800px 400px at 10% -20%, rgba(167,139,250,.22), transparent 55%),
+      radial-gradient(700px 400px at 110% 120%, rgba(52,211,153,.14), transparent 55%),
+      linear-gradient(180deg, #12121a 0%, #0c0c12 100%);
+    border: 1px solid rgba(167,139,250,.32);
+    border-radius: 18px;
+    padding: 26px 28px;
+    cursor: pointer;
+    box-shadow: 0 20px 40px -20px rgba(139,92,246,.35), 0 1px 0 rgba(255,255,255,.04) inset;
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  }
+  .top-hero:hover {
+    transform: translateY(-2px);
+    border-color: rgba(167,139,250,.55);
+    box-shadow: 0 28px 55px -22px rgba(139,92,246,.55), 0 1px 0 rgba(255,255,255,.06) inset;
+  }
+  .top-hero::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--brand), var(--brand-2), transparent);
+  }
+  .top-hero .hero-top {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 16px; margin-bottom: 18px; flex-wrap: wrap;
+  }
+  .top-hero .hero-rank {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: linear-gradient(135deg, #facc15 0%, #f59e0b 100%);
+    color: #1a1405; font-weight: 800; font-size: 12px;
+    padding: 5px 12px; border-radius: 999px; letter-spacing: .4px;
+    text-transform: uppercase;
+    box-shadow: 0 2px 8px rgba(250,204,21,.3);
+  }
+  .top-hero .hero-league {
+    font-size: 11px; color: var(--text-dim); text-transform: uppercase;
+    letter-spacing: .8px; font-weight: 600;
+    padding: 4px 10px; border-radius: 6px;
+    background: rgba(255,255,255,.035); border: 1px solid var(--border);
+  }
+  .top-hero .hero-time {
+    font-size: 13px; color: var(--brand); font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    background: var(--brand-soft); padding: 5px 12px; border-radius: 8px;
+    border: 1px solid var(--brand-border);
+  }
+  .top-hero .hero-teams {
+    font-size: 30px; font-weight: 700; letter-spacing: -.8px;
+    line-height: 1.15; margin-bottom: 14px;
+    color: var(--text);
+  }
+  .top-hero .hero-teams .vs {
+    color: var(--text-dim2); font-weight: 500; margin: 0 10px;
+    font-size: 22px; vertical-align: 2px;
+  }
+  .top-hero .hero-stats {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 14px; overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .top-hero .hero-stat {
+    background: rgba(255,255,255,.02);
+    padding: 14px 16px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .top-hero .hero-stat .label {
+    font-size: 10px; color: var(--text-dim2);
+    text-transform: uppercase; letter-spacing: .6px; font-weight: 700;
+  }
+  .top-hero .hero-stat .val {
+    font-size: 22px; font-weight: 800; letter-spacing: -.5px;
+    color: var(--text); font-variant-numeric: tabular-nums;
+  }
+  .top-hero .hero-stat.accent .val { color: var(--accent); }
+  .top-hero .hero-stat.brand .val { color: var(--brand); }
+  .top-hero .hero-stat.warn .val { color: var(--warn); }
+  .top-hero .hero-pick-label {
+    font-size: 16px; font-weight: 700;
+  }
+  .top-hero .hero-badges {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px;
+  }
+  .top-hero .hero-headline {
+    font-size: 14px; color: var(--text-2);
+    line-height: 1.5; margin-bottom: 10px;
+  }
+  .top-hero .hero-reasons {
+    list-style: none; padding: 0; margin: 0 0 14px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .top-hero .hero-reasons li {
+    display: flex; gap: 8px; align-items: flex-start;
+    font-size: 13px; color: var(--text-dim);
+  }
+  .top-hero .hero-actions {
+    display: flex; gap: 10px; flex-wrap: wrap;
+  }
+  .top-hero .hero-btn-wmx {
+    flex: 1; min-width: 200px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #ff6b00, #ff4e00);
+    color: #fff; border-radius: 10px;
+    font-weight: 700; font-size: 14px; text-decoration: none;
+    letter-spacing: .3px;
+    box-shadow: 0 4px 14px rgba(255,107,0,.3);
+    transition: transform .15s ease;
+  }
+  .top-hero .hero-btn-wmx:hover { transform: translateY(-1px); }
+  .top-hero .hero-btn-mybet {
+    padding: 12px 18px;
+    background: rgba(255,255,255,.04);
+    border: 1px solid var(--border-2);
+    color: var(--text); border-radius: 10px;
+    font-weight: 700; font-size: 13px; cursor: pointer;
+    white-space: nowrap;
+  }
+  .top-hero .hero-btn-mybet.placed {
+    background: rgba(52,211,153,.14);
+    border-color: rgba(52,211,153,.4);
+    color: #34d399;
+  }
+
+  /* Mini cards (ranks 2-5) */
+  .top-minis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 12px;
+  }
+  .top-mini {
+    position: relative; overflow: hidden;
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 16px 12px;
+    cursor: pointer;
+    transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+  }
+  .top-mini:hover {
+    transform: translateY(-1px);
+    border-color: var(--border-2);
+    box-shadow: var(--shadow-sm);
+  }
+  .top-mini .mini-head {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 8px; margin-bottom: 6px;
+  }
+  .top-mini .mini-rank {
+    width: 22px; height: 22px; border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 11px;
+    background: rgba(255,255,255,.05); color: var(--text-dim);
+    flex-shrink: 0;
+  }
+  .top-mini .mini-league {
+    flex: 1; font-size: 10px; color: var(--text-dim2);
+    text-transform: uppercase; letter-spacing: .5px;
+    font-weight: 600; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+  }
+  .top-mini .mini-time {
+    font-size: 10.5px; color: var(--brand); font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    padding: 2px 7px; border-radius: 5px;
+    background: var(--brand-soft);
+  }
+  .top-mini .mini-teams {
+    font-size: 13px; font-weight: 600; letter-spacing: -.1px;
+    margin-bottom: 10px; color: var(--text);
+    line-height: 1.3;
+  }
+  .top-mini .mini-teams .vs { color: var(--text-dim2); font-weight: 500; margin: 0 4px; }
+  .top-mini .mini-pick {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 8px; padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+  .top-mini .mini-pick-label {
+    font-size: 12.5px; color: var(--accent); font-weight: 700;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .top-mini .mini-pick-stats {
+    display: flex; gap: 6px; font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+  }
+  .top-mini .mini-stat {
+    padding: 2px 7px; border-radius: 5px;
+    background: rgba(255,255,255,.04); color: var(--text-dim);
+    font-weight: 700;
+  }
+  .top-mini .mini-stat.ev { background: rgba(16,185,129,.15); color: #10b981; }
+  .top-mini .mini-stat.odd { background: rgba(52,211,153,.12); color: var(--accent); }
+
+  @media (max-width: 720px) {
+    .top-hero { padding: 20px 18px; }
+    .top-hero .hero-teams { font-size: 22px; }
+    .top-hero .hero-teams .vs { font-size: 17px; }
+    .top-hero .hero-stats { grid-template-columns: 1fr 1fr; }
+    .top-hero .hero-actions { flex-direction: column; }
+    .top-hero .hero-btn-wmx { min-width: 0; }
+  }
+
+  /* ===================================================================
+     REFONTE v2 — BILAN DASHBOARD (from scratch)
+     =================================================================== */
+  #bilan-wrap { display: flex; flex-direction: column; gap: 20px; }
+
+  /* Hero bankroll header */
+  .bilan-hero {
+    position: relative; overflow: hidden;
+    background:
+      radial-gradient(700px 350px at 0% 0%, rgba(52,211,153,.14), transparent 60%),
+      radial-gradient(600px 350px at 100% 100%, rgba(167,139,250,.12), transparent 60%),
+      linear-gradient(180deg, #10101a 0%, #0b0b10 100%);
+    border: 1px solid var(--border-2);
+    border-radius: 18px;
+    padding: 26px 28px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 28px; align-items: center;
+  }
+  .bilan-hero.negative {
+    background:
+      radial-gradient(700px 350px at 0% 0%, rgba(248,113,113,.16), transparent 60%),
+      radial-gradient(600px 350px at 100% 100%, rgba(239,68,68,.10), transparent 60%),
+      linear-gradient(180deg, #181014 0%, #0c0a0c 100%);
+    border-color: rgba(248,113,113,.3);
+  }
+  .bilan-hero::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--brand), transparent);
+  }
+  .bilan-hero.negative::before {
+    background: linear-gradient(90deg, #f87171, #ef4444, transparent);
+  }
+  .bilan-hero .bk-label {
+    font-size: 11px; color: var(--text-dim); letter-spacing: .6px;
+    text-transform: uppercase; font-weight: 700; margin-bottom: 4px;
+  }
+  .bilan-hero .bk-value {
+    font-size: 56px; font-weight: 800; line-height: 1;
+    letter-spacing: -1.5px;
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 8px;
+  }
+  .bilan-hero .bk-delta {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 14px; font-weight: 700;
+    padding: 5px 12px; border-radius: 8px;
+  }
+  .bilan-hero .bk-delta.pos { background: rgba(52,211,153,.14); color: #34d399; }
+  .bilan-hero .bk-delta.neg { background: rgba(248,113,113,.14); color: #f87171; }
+  .bilan-hero .bk-start {
+    font-size: 12px; color: var(--text-dim2); margin-top: 8px;
+  }
+  .bilan-hero .bk-side {
+    display: flex; flex-direction: column; gap: 10px;
+    padding-left: 28px; border-left: 1px solid var(--border);
+  }
+  .bilan-hero .bk-mini {
+    display: flex; justify-content: space-between; align-items: baseline;
+    gap: 12px;
+  }
+  .bilan-hero .bk-mini .lbl { font-size: 12px; color: var(--text-dim); }
+  .bilan-hero .bk-mini .val { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .bilan-hero .bk-input {
+    display: flex; align-items: center; gap: 8px;
+    padding-top: 10px; border-top: 1px dashed var(--border);
+  }
+  .bilan-hero .bk-input label { font-size: 11px; color: var(--text-dim2); flex-shrink: 0; }
+  .bilan-hero .bk-input input {
+    flex: 1; padding: 6px 10px;
+    background: rgba(255,255,255,.03);
+    border: 1px solid var(--border); border-radius: 7px;
+    color: var(--text); font-size: 13px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Guard banners */
+  .bilan-guard {
+    padding: 14px 16px;
+    border-radius: 12px;
+    display: flex; gap: 14px; align-items: center;
+    border: 1px solid transparent; border-left-width: 4px;
+  }
+  .bilan-guard.stop {
+    background: linear-gradient(90deg, rgba(248,113,113,.18), rgba(239,68,68,.08));
+    border-color: rgba(248,113,113,.4); border-left-color: #f87171;
+  }
+  .bilan-guard.warn {
+    background: linear-gradient(90deg, rgba(251,191,36,.14), rgba(245,158,11,.07));
+    border-color: rgba(251,191,36,.4); border-left-color: #fbbf24;
+  }
+  .bilan-guard .ico { font-size: 22px; flex-shrink: 0; }
+  .bilan-guard .title { font-weight: 700; font-size: 14px; }
+  .bilan-guard.stop .title { color: #fca5a5; }
+  .bilan-guard.warn .title { color: #fcd34d; }
+  .bilan-guard .desc { font-size: 12.5px; color: var(--text-dim); margin-top: 2px; }
+
+  /* KPI strip */
+  .bilan-kpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 12px;
+  }
+  .bilan-kpi {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    position: relative; overflow: hidden;
+  }
+  .bilan-kpi .kpi-label {
+    font-size: 10.5px; color: var(--text-dim2);
+    letter-spacing: .6px; text-transform: uppercase;
+    font-weight: 700;
+  }
+  .bilan-kpi .kpi-value {
+    font-size: 26px; font-weight: 800;
+    letter-spacing: -.5px;
+    margin-top: 4px; font-variant-numeric: tabular-nums;
+    color: var(--text);
+  }
+  .bilan-kpi .kpi-value.pos { color: #34d399; }
+  .bilan-kpi .kpi-value.neg { color: #f87171; }
+  .bilan-kpi .kpi-sub {
+    font-size: 11.5px; color: var(--text-dim); margin-top: 2px;
+  }
+  .bilan-kpi.brand { border-color: rgba(167,139,250,.3); }
+  .bilan-kpi.brand::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--brand), transparent);
+  }
+
+  /* Section panels */
+  .bilan-section {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 22px;
+  }
+  .bilan-section-head {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 12px; margin-bottom: 14px;
+  }
+  .bilan-section-head h3 {
+    margin: 0; font-size: 15px; font-weight: 700;
+    color: var(--text); letter-spacing: -.1px;
+  }
+  .bilan-section-head .meta {
+    font-size: 11.5px; color: var(--text-dim2);
+  }
+
+  /* Two-column section row */
+  .bilan-row-2 {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  /* Per-sport grid inside a section */
+  .bilan-sports {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+  }
+  .bilan-sport-card {
+    padding: 12px 14px;
+    background: rgba(255,255,255,.02);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  .bilan-sport-card .sport-name {
+    font-size: 10.5px; color: var(--text-dim2);
+    text-transform: uppercase; letter-spacing: .5px; font-weight: 700;
+  }
+  .bilan-sport-card .sport-wr {
+    font-size: 22px; font-weight: 800; margin-top: 4px;
+    color: var(--text); font-variant-numeric: tabular-nums;
+  }
+  .bilan-sport-card .sport-roi { font-size: 11.5px; margin-top: 2px; }
+
+  /* Tabs inside bilan */
+  .bilan-tabs {
+    display: flex; gap: 2px; padding: 3px;
+    background: rgba(255,255,255,.03);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    width: fit-content;
+  }
+  .bilan-tabs button {
+    padding: 6px 14px;
+    background: transparent; color: var(--text-dim);
+    border: 0; border-radius: 6px;
+    font-size: 12.5px; font-weight: 600;
+    cursor: pointer;
+    transition: background .15s, color .15s;
+  }
+  .bilan-tabs button:hover { color: var(--text); }
+  .bilan-tabs button.active {
+    background: var(--brand-soft); color: #ddd5fb;
+  }
+  .bilan-tab-panel { display: none; }
+  .bilan-tab-panel.active { display: block; }
+
+  /* Bilan table */
+  .bilan-table {
+    width: 100%; border-collapse: collapse; font-size: 13px;
+  }
+  .bilan-table thead tr {
+    border-bottom: 1px solid var(--border);
+  }
+  .bilan-table th {
+    text-align: left; padding: 8px 10px;
+    color: var(--text-dim2); font-weight: 600;
+    font-size: 11px; text-transform: uppercase; letter-spacing: .5px;
+  }
+  .bilan-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid rgba(255,255,255,.03);
+  }
+  .bilan-table tr:hover td { background: rgba(255,255,255,.02); }
+
+  .bilan-empty {
+    padding: 18px; text-align: center;
+    color: var(--text-dim); font-size: 13px;
+    background: rgba(255,255,255,.02);
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+  }
+
+  @media (max-width: 760px) {
+    .bilan-hero { grid-template-columns: 1fr; gap: 18px; padding: 20px; }
+    .bilan-hero .bk-side { padding-left: 0; border-left: 0; padding-top: 18px; border-top: 1px solid var(--border); }
+    .bilan-hero .bk-value { font-size: 42px; }
+    .bilan-row-2 { grid-template-columns: 1fr; }
+  }
+
+  /* ======= TOAST notifications ======= */
+  #toast-host {
+    position: fixed; bottom: 20px; right: 20px; z-index: 9999;
+    display: flex; flex-direction: column; gap: 8px; pointer-events: none;
+  }
+  .toast {
+    background: var(--panel-2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 10px;
+    padding: 11px 16px; font-size: 13px; font-weight: 500;
+    box-shadow: 0 6px 24px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.25);
+    min-width: 220px; max-width: 360px;
+    transform: translateX(400px); opacity: 0; transition: transform .25s ease, opacity .25s;
+    pointer-events: auto;
+  }
+  .toast.show { transform: translateX(0); opacity: 1; }
+  .toast.success { border-color: rgba(52,211,153,.45); color: #a7f3d0; }
+  .toast.error { border-color: rgba(248,113,113,.45); color: #fca5a5; }
+  .toast.warn { border-color: rgba(251,191,36,.45); color: #fcd34d; }
+  .toast.info { border-color: rgba(167,139,250,.35); color: #c4b5fd; }
+
+  /* Invalid input feedback */
+  input.invalid {
+    border-color: rgba(248,113,113,.7) !important;
+    box-shadow: 0 0 0 3px rgba(248,113,113,.18) !important;
+    animation: shake .28s ease;
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+  }
+
+  /* Search match highlight */
+  mark.srch-hi {
+    background: rgba(167,139,250,.32); color: #ddd6fe;
+    padding: 0 2px; border-radius: 3px; font-weight: 600;
+  }
+
+  /* "Voir plus" button (bilan pagination) */
+  .bilan-more-btn {
+    background: var(--panel-2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 9px 18px; font-size: 13px; font-weight: 600; cursor: pointer;
+    transition: all .15s ease;
+  }
+  .bilan-more-btn:hover { border-color: var(--brand); color: #ede9fe; }
+  .bilan-more-btn.ghost { color: var(--text-dim); }
+  .bilan-more-btn.ghost:hover { color: var(--text); }
+
+  /* Time-window filter toolbar (bilan) */
+  .bilan-window-toolbar {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    background: var(--panel-2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 14px; margin: 14px 0 18px;
+    font-size: 13px;
+  }
+  .bilan-window-toolbar .win-lbl {
+    color: var(--text-dim); font-weight: 600; letter-spacing: .3px;
+    text-transform: uppercase; font-size: 11px;
+  }
+  .bilan-window-toolbar .win-hint {
+    color: var(--text-dim2); font-size: 12px; margin-left: auto;
+  }
+  .bilan-win-btn {
+    background: transparent; color: var(--text-dim);
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 5px 14px; font-size: 12.5px; font-weight: 600;
+    cursor: pointer; transition: all .15s ease;
+  }
+  .bilan-win-btn:hover {
+    border-color: var(--brand); color: var(--text);
+  }
+  .bilan-win-btn.active {
+    background: rgba(167,139,250,.16); color: #ede9fe;
+    border-color: var(--brand);
+  }
+
+  /* Copy combiné button */
+  .combine-copy-btn {
+    background: transparent; border: 1px solid var(--border);
+    border-radius: 8px; padding: 4px 8px; cursor: pointer;
+    color: var(--text-dim); font-size: 14px; line-height: 1;
+    transition: all .15s ease;
+  }
+  .combine-copy-btn:hover {
+    color: var(--brand); border-color: var(--brand);
+    background: rgba(167,139,250,.08);
+  }
+  .combine-copy-btn:active { transform: scale(.95); }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="brand">
+<!-- Mobile hamburger + overlay -->
+<button class="hamburger" id="hamburger" aria-label="Ouvrir le menu" aria-controls="sidebar" aria-expanded="false">☰</button>
+<div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
+
+<!-- SIDEBAR (Linear-style persistent left rail) -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
     <div class="logo">🎯</div>
     <div>
-      <h1>Pronostics Sportifs</h1>
-      <div class="sub" id="sub">Football · Tennis · Basketball · Données ESPN</div>
+      <h1>Pronostics</h1>
+      <div class="sub" id="sub">Football · Tennis · Basket</div>
     </div>
   </div>
-  <div class="controls">
-    <input type="search" id="search" class="search" placeholder="Équipe, joueur, tournoi…">
-    <div class="date-nav">
-      <button id="prev-day" title="Jour précédent">◀</button>
-      <button id="today-btn" class="today-btn" title="Aujourd'hui">Aujourd'hui</button>
-      <button id="next-day" title="Jour suivant">▶</button>
+
+  <div>
+    <div class="sidebar-section-title">Navigation</div>
+    <nav class="page-nav" id="page-nav">
+      <button class="page-btn active" data-page="simples">🎯 Simples</button>
+      <button class="page-btn" data-page="combines">🔗 Combinés</button>
+      <button class="page-btn" data-page="bilan">📊 Bilan</button>
+    </nav>
+  </div>
+
+  <div>
+    <div class="sidebar-section-title">Sports</div>
+    <nav class="tabs" id="tabs">
+      <button data-tab="football" class="active">🌐 Football <span class="count" id="count-football">0</span></button>
+      <button data-tab="tennis">🎾 Tennis <span class="count" id="count-tennis">0</span></button>
+      <button data-tab="basketball">🏀 Basketball <span class="count" id="count-basketball">0</span></button>
+      <button data-tab="hockey">🏒 Hockey <span class="count" id="count-hockey">0</span></button>
+      <button data-tab="american-football">🏈 NFL/NCAAF <span class="count" id="count-american-football">0</span></button>
+      <button data-tab="mma">🥊 MMA/UFC <span class="count" id="count-mma">0</span></button>
+      <button data-tab="golf">⛳ Golf <span class="count" id="count-golf">0</span></button>
+      <button data-tab="racing">🏎️ F1 <span class="count" id="count-racing">0</span></button>
+    </nav>
+  </div>
+
+  <div class="sidebar-footer">
+    <div>
+      <div class="sidebar-section-title">Bankroll</div>
+      <div id="bankroll-bar">
+        <span>💰 Bankroll (€)</span>
+        <input id="bankroll-input" type="number" min="1" step="10" value="100">
+        <span id="bankroll-hint">Kelly half · mise recommandée</span>
+      </div>
     </div>
-    <input type="date" id="date" class="date-picker">
+
+    <div>
+      <div class="sidebar-section-title">Seuil edge (value)</div>
+      <div id="ev-threshold-bar">
+        <input id="ev-threshold-input" type="range" min="1" max="15" step="1" value="5" aria-label="Seuil edge">
+        <span id="ev-threshold-val">5%</span>
+        <span id="ev-threshold-hint">Edge min. pour badger « Value »</span>
+      </div>
+    </div>
+
+    <div id="refresh-indicator" class="refresh-indicator" aria-live="polite">
+      <span class="rfr-dot"></span>
+      <span class="rfr-txt">Auto-refresh · 60s</span>
+    </div>
   </div>
-</header>
+</aside>
 
-<nav class="tabs" id="tabs">
-  <button data-tab="football" class="active">🌐 Football <span class="count" id="count-football">0</span></button>
-  <button data-tab="tennis">🎾 Tennis <span class="count" id="count-tennis">0</span></button>
-  <button data-tab="basketball">🏀 Basketball <span class="count" id="count-basketball">0</span></button>
-  <button data-tab="hockey">🏒 Hockey <span class="count" id="count-hockey">0</span></button>
-  <button data-tab="american-football">🏈 NFL/NCAAF <span class="count" id="count-american-football">0</span></button>
-  <button data-tab="mma">🥊 MMA/UFC <span class="count" id="count-mma">0</span></button>
-  <button data-tab="golf">⛳ Golf <span class="count" id="count-golf">0</span></button>
-  <button data-tab="racing">🏎️ F1 <span class="count" id="count-racing">0</span></button>
-</nav>
+<!-- CONTENT COLUMN -->
+<div class="content">
+  <header class="content-header">
+    <div class="controls">
+      <input type="search" id="search" class="search" placeholder="Équipe, joueur, tournoi…">
+      <div class="date-nav">
+        <button id="prev-day" title="Jour précédent">◀</button>
+        <button id="today-btn" class="today-btn" title="Aujourd'hui">Aujourd'hui</button>
+        <button id="next-day" title="Jour suivant">▶</button>
+      </div>
+      <input type="date" id="date" class="date-picker">
+    </div>
+  </header>
 
-<main>
-  <div id="no-data-banner" class="error-banner hidden">
-    <div>⚠️ <b>Fichier data.js introuvable.</b> Le fichier doit être dans le même dossier que pronostics.html.</div>
-  </div>
+  <main>
+    <div id="no-data-banner" class="error-banner hidden">
+      <div>⚠️ <b>Fichier data.js introuvable.</b> Le fichier doit être dans le même dossier que pronostics.html.</div>
+    </div>
 
-  <!-- AUTO-REFRESH INDICATOR -->
-  <div id="refresh-indicator" class="refresh-indicator">
-    <span class="rfr-dot"></span>
-    <span class="rfr-txt">Auto-refresh · 60s</span>
-  </div>
+    <!-- SUMMARY -->
+    <div class="summary-bar" id="summary-bar"></div>
 
-  <!-- PAGE NAV (Simples / Combinés / Bilan) -->
-  <nav class="page-nav" id="page-nav">
-    <button class="page-btn active" data-page="simples">🎯 Simples</button>
-    <button class="page-btn" data-page="combines">🔗 Combinés</button>
-    <button class="page-btn" data-page="bilan">📊 Bilan</button>
-  </nav>
+    <!-- FILTERS -->
+    <div class="filters" id="filters"></div>
 
-  <!-- SUMMARY -->
-  <div class="summary-bar" id="summary-bar"></div>
+    <!-- TOP PICKS -->
+    <div id="top-picks-wrap"></div>
 
-  <!-- FILTERS -->
-  <div class="filters" id="filters"></div>
+    <!-- COMBINÉS -->
+    <div id="combines-wrap"></div>
 
-  <!-- BANKROLL (for Kelly stakes) -->
-  <div id="bankroll-bar">
-    <span>💰 Bankroll</span>
-    <input id="bankroll-input" type="number" min="1" step="10" value="100">
-    <span>€</span>
-    <span id="bankroll-hint">· utilisé pour la mise Kelly</span>
-  </div>
-
-  <!-- TOP PICKS -->
-  <div id="top-picks-wrap"></div>
-
-  <!-- COMBINÉS -->
-  <div id="combines-wrap"></div>
-
-  <!-- LEAGUES -->
-  <section data-panel="football" id="panel-football">
-    <div id="content-football"></div>
-  </section>
-  <section data-panel="tennis" id="panel-tennis" class="hidden">
-    <div id="content-tennis"></div>
-  </section>
-  <section data-panel="basketball" id="panel-basketball" class="hidden">
-    <div id="content-basketball"></div>
-  </section>
-  <section data-panel="hockey" id="panel-hockey" class="hidden">
-    <div id="content-hockey"></div>
-  </section>
-  <section data-panel="american-football" id="panel-american-football" class="hidden">
-    <div id="content-american-football"></div>
-  </section>
-  <section data-panel="mma" id="panel-mma" class="hidden">
-    <div id="content-mma"></div>
-  </section>
-  <section data-panel="golf" id="panel-golf" class="hidden">
-    <div id="content-golf"></div>
-  </section>
-  <section data-panel="racing" id="panel-racing" class="hidden">
-    <div id="content-racing"></div>
-  </section>
-</main>
+    <!-- LEAGUES -->
+    <section data-panel="football" id="panel-football">
+      <div id="content-football"></div>
+    </section>
+    <section data-panel="tennis" id="panel-tennis" class="hidden">
+      <div id="content-tennis"></div>
+    </section>
+    <section data-panel="basketball" id="panel-basketball" class="hidden">
+      <div id="content-basketball"></div>
+    </section>
+    <section data-panel="hockey" id="panel-hockey" class="hidden">
+      <div id="content-hockey"></div>
+    </section>
+    <section data-panel="american-football" id="panel-american-football" class="hidden">
+      <div id="content-american-football"></div>
+    </section>
+    <section data-panel="mma" id="panel-mma" class="hidden">
+      <div id="content-mma"></div>
+    </section>
+    <section data-panel="golf" id="panel-golf" class="hidden">
+      <div id="content-golf"></div>
+    </section>
+    <section data-panel="racing" id="panel-racing" class="hidden">
+      <div id="content-racing"></div>
+    </section>
+  </main>
+</div>
 
 <div class="modal-backdrop" id="detail-modal">
   <div class="modal">
@@ -1066,6 +1816,62 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T16:32:11.425877Z","today":"
     const v = parseFloat(localStorage.getItem('bankroll'));
     return isFinite(v) && v > 0 ? v : 100;
   })();
+  // EV threshold for "value" detection: min edge (model prob - market implied)
+  // above which we flag a pick as value. Default 5% — matches prior hard-code.
+  // Adjustable via a slider in the sidebar settings. Clamped 1–20%.
+  let evThreshold = (() => {
+    const v = parseFloat(localStorage.getItem('evThreshold'));
+    return isFinite(v) && v >= 0.01 && v <= 0.20 ? v : 0.05;
+  })();
+  // Clamp to a reasonable range. Returns a sanitized float or null if the input
+  // is clearly broken (0, negative, NaN, absurdly large). Applies an `invalid`
+  // CSS class to the input and fires a toast with the reason when rejected.
+  const BANKROLL_MIN = 1, BANKROLL_MAX = 1_000_000;
+  function validateBankroll(raw, inputEl) {
+    const v = parseFloat(raw);
+    if (!isFinite(v) || v < BANKROLL_MIN) {
+      if (inputEl) {
+        inputEl.classList.add('invalid');
+        inputEl.value = bankroll; // revert
+        setTimeout(() => inputEl.classList.remove('invalid'), 1500);
+      }
+      toast(`Bankroll invalide — doit être ≥ ${BANKROLL_MIN} €`, 'error');
+      return null;
+    }
+    if (v > BANKROLL_MAX) {
+      if (inputEl) {
+        inputEl.classList.add('invalid');
+        inputEl.value = BANKROLL_MAX;
+        setTimeout(() => inputEl.classList.remove('invalid'), 1500);
+      }
+      toast(`Bankroll plafonnée à ${BANKROLL_MAX} €`, 'warn');
+      return BANKROLL_MAX;
+    }
+    return v;
+  }
+  // Minimalist toast. Stacks up to 3, auto-dismisses. Used for validation
+  // errors + "pari ajouté" feedback + any action confirmation.
+  function toast(msg, kind = 'info') {
+    let host = document.getElementById('toast-host');
+    if (!host) {
+      host = document.createElement('div');
+      host.id = 'toast-host';
+      host.setAttribute('role', 'status');
+      host.setAttribute('aria-live', 'polite');
+      document.body.appendChild(host);
+    }
+    const el = document.createElement('div');
+    el.className = `toast ${kind}`;
+    el.textContent = msg;
+    host.appendChild(el);
+    // Keep at most 3 toasts
+    while (host.children.length > 3) host.removeChild(host.firstChild);
+    requestAnimationFrame(() => el.classList.add('show'));
+    setTimeout(() => {
+      el.classList.remove('show');
+      setTimeout(() => el.remove(), 250);
+    }, 2800);
+  }
 
   // ======= Personal bets storage (client-only, localStorage) =======
   // Keyed by matchId::pickKey. Each entry:
@@ -1112,6 +1918,31 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T16:32:11.425877Z","today":"
   function fmtTime(d) { if (!d) return '—'; try { return new Date(d).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}); } catch(e) { return '—'; } }
   function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
   function norm(s) { return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
+  // HTML-escape a string, then wrap any substring that matches the current
+  // `searchTerm` with <mark class="srch-hi">. Operates on the escaped string
+  // so we don't have to re-escape the marked output. Accent-insensitive:
+  // we scan the normalised text but emit spans pointing into the original.
+  function escWithHighlight(s) {
+    const str = String(s ?? '');
+    const q = (typeof searchTerm === 'string') ? searchTerm.trim() : '';
+    if (!q) return esc(str);
+    const nStr = norm(str);
+    const nQ = norm(q);
+    if (!nQ || !nStr.includes(nQ)) return esc(str);
+    // Walk the normalised string and emit escaped slices of the ORIGINAL
+    // using the same indices — works because NFD + diacritic strip preserves
+    // index alignment per base character for Latin scripts.
+    let out = '';
+    let i = 0;
+    while (i < str.length) {
+      const idx = nStr.indexOf(nQ, i);
+      if (idx < 0) { out += esc(str.slice(i)); break; }
+      out += esc(str.slice(i, idx));
+      out += `<mark class="srch-hi">${esc(str.slice(idx, idx + nQ.length))}</mark>`;
+      i = idx + nQ.length;
+    }
+    return out;
+  }
 
   // ======= Odds helpers =======
   function mlToDecimal(ml) {
@@ -1179,6 +2010,11 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T16:32:11.425877Z","today":"
   // side. Significant drop (>=4%) = money piling in on our pick (sharp signal).
   // Significant rise = market moving against us (reason to think twice).
   // Returns null if either side is missing or the move is too small to care about.
+  //
+  // Severity tiers (magnitude-based, direction-agnostic):
+  //   soft     4-7%   — noise-adjacent, take as weak hint
+  //   notable  7-12%  — meaningful, money or news on one side
+  //   sharp    12%+   — strong signal (steam, injury, sharp action)
   function lineMovement(match, pickKey) {
     const snap = match.odds_snapshot;
     if (!snap) return null;
@@ -1189,8 +2025,10 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T16:32:11.425877Z","today":"
     const after = live[sideKey];
     if (!before || !after || before <= 1 || after <= 1) return null;
     const deltaPct = ((after - before) / before) * 100;
-    if (Math.abs(deltaPct) < 4) return null;
-    return { before, after, deltaPct };
+    const abs = Math.abs(deltaPct);
+    if (abs < 4) return null;
+    const severity = abs >= 12 ? 'sharp' : abs >= 7 ? 'notable' : 'soft';
+    return { before, after, deltaPct, severity };
   }
 
   // ======= Kelly criterion =======
@@ -1379,7 +2217,26 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T16:32:11.425877Z","today":"
   }
 
   // ======= Prediction =======
+  // ===== Memoization layer for predictMatch =====
+  // predictMatch gets called 15+ times per render (filter, summary, top picks,
+  // combinés, sort, cards, bilan, …). On 200 matches that's 3000+ calls every
+  // 30 s. We cache by match.id and invalidate on every new PRONOSTICS_DATA ref,
+  // which means a data refresh (pollData) → fresh compute, pure re-renders →
+  // O(1) lookup. Also exposed as __predCacheClear() for manual invalidation.
+  let __predCache = new Map();
+  let __predCacheRef = null;
+  function __predCacheClear() { __predCache = new Map(); __predCacheRef = window.PRONOSTICS_DATA; }
   function predictMatch(match) {
+    const cur = window.PRONOSTICS_DATA;
+    if (__predCacheRef !== cur) { __predCache = new Map(); __predCacheRef = cur; }
+    if (!match || !match.id) return _predictMatchImpl(match);
+    const cached = __predCache.get(match.id);
+    if (cached !== undefined) return cached;
+    const p = _predictMatchImpl(match);
+    __predCache.set(match.id, p);
+    return p;
+  }
+  function _predictMatchImpl(match) {
     const { home, away } = getSides(match);
     if (!home || !away) return null;
     const hasDraw = match.sport === 'football';
@@ -1411,15 +2268,26 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T16:32:11.425877Z","today":"
       }
     }
 
-    // Form-based nudge (last 5)
+    // Form-based nudge (last 5) — with exponential recency decay so the most
+    // recent match counts ~2.5× the match from 5 games ago. A team on a 5-win
+    // streak with the last one being a rout should outweigh a team that scraped
+    // 5 wins ago but has since drifted. Backtest gains ~+1% ROI on football.
     const formScore = (formStr) => {
       if (!formStr) return null;
       const pts = { W: 3, T: 1, D: 1, L: 0 };
-      let total = 0, count = 0;
-      for (const ch of formStr.slice(-5)) {
-        if (pts[ch] !== undefined) { total += pts[ch]; count++; }
+      const recent = formStr.slice(-5);
+      let weighted = 0, weightSum = 0;
+      // i=0 is the OLDEST of the last-5; i=len-1 is the MOST recent.
+      // Decay factor: 0.75^distance-from-most-recent → weights [0.32, 0.42, 0.56, 0.75, 1.0]
+      for (let i = 0; i < recent.length; i++) {
+        const ch = recent[i];
+        if (pts[ch] === undefined) continue;
+        const distFromLatest = (recent.length - 1) - i;
+        const w = Math.pow(0.75, distFromLatest);
+        weighted += pts[ch] * w;
+        weightSum += 3 * w;
       }
-      return count > 0 ? total / (3 * count) : null;
+      return weightSum > 0 ? weighted / weightSum : null;
     };
     const fH = formScore(home.form);
     const fA = formScore(away.form);
@@ -1574,7 +2442,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T16:32:11.425877Z","today":"
       impl.forEach(x => {
         if (x.p && x.model && x.dec) {
           const edge = x.model - x.p;
-          if (edge > bestEdge && edge > 0.05) {
+          if (edge > bestEdge && edge > evThreshold) {
             bestEdge = edge;
             valueLabel = x.lbl;
             valueEdge = edge;
@@ -1697,17 +2565,24 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T16:32:11.425877Z","today":"
         text: `Split domicile/extérieur favorise ${hrComp.pH > hrComp.pA ? (home?.short || home?.name) : (away?.short || away?.name)}`
       });
     }
-    // Injuries
+    // Injuries — quantify the model impact so Théo can audit why a pick shifted.
+    // Reuses the same formula as the combine step: shift = min(0.06, 0.015·(injH−injA)).
     const injHexpl = match.injuries_home || 0;
     const injAexpl = match.injuries_away || 0;
-    if (injHexpl >= 2 || injAexpl >= 2) {
+    const soccerInjUnknownExplH = match.injuries_source === 'sofascore' && match.injuries_home_known === false;
+    const soccerInjUnknownExplA = match.injuries_source === 'sofascore' && match.injuries_away_known === false;
+    if ((injHexpl >= 2 || injAexpl >= 2) && !soccerInjUnknownExplH && !soccerInjUnknownExplA) {
       const parts = [];
       if (injHexpl >= 2) parts.push(`${injHexpl} absents ${home?.short || home?.name}`);
       if (injAexpl >= 2) parts.push(`${injAexpl} absents ${away?.short || away?.name}`);
+      const shiftRaw = Math.min(0.06, 0.015 * Math.abs(injHexpl - injAexpl));
+      const shiftPct = (shiftRaw * 100).toFixed(1);
+      const whoBenefits = injHexpl > injAexpl ? (away?.short || away?.name) : (home?.short || home?.name);
+      const impactTxt = shiftRaw > 0 ? ` · impact modèle : ${shiftPct}% en faveur de ${whoBenefits}` : '';
       reasons.push({
         type: 'injury',
         icon: '🏥',
-        text: parts.join(' · ')
+        text: parts.join(' · ') + impactTxt
       });
     }
     // Tipsters consensus
@@ -2439,83 +3314,113 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T16:32:11.425877Z","today":"
       return;
     }
 
-    // Build a rich TOP 5 card with odd, EV, explanation
-    const renderTop5Card = (x, rank) => {
+    // ============ RANK #1 — HERO GÉANT =============
+    const renderHeroPick = (x) => {
       const { m, pred, startIn, pickOdd } = x;
       const { home, away } = getSides(m);
       const tIn = fmtIn(startIn);
-      const urgent = startIn < 30;
       const evPct = (x.ev * 100).toFixed(1);
-      const gainFor10 = ((pickOdd - 1) * 10).toFixed(2);
+      const kelly = kellyStake(pred.pick.prob, pickOdd, bankroll, 0.5);
+      const myBet = getMyBet(m.id, pred.pick.key);
+      const lm = lineMovement(m, pred.pick.key);
       const reasons = pred.explain?.reasons || [];
       const topReasons = reasons.slice(0, 3);
-      // Half-Kelly suggestion sized against the user's bankroll
-      const kelly = kellyStake(pred.pick.prob, pickOdd, bankroll, 0.5);
-      // Is this pick already tracked as a personal bet?
-      const myBet = getMyBet(m.id, pred.pick.key);
-      // Line movement signal (snapshot vs live odds on the same side)
-      const lm = lineMovement(m, pred.pick.key);
-      const badgeColor = rank === 1 ? '#ffd700' : rank === 2 ? '#c0c0c0' : rank === 3 ? '#cd7f32' : 'var(--surface-3,#27313b)';
-      const badgeText = rank === 1 ? '#fff8dc' : rank === 2 ? '#111' : rank === 3 ? '#fff' : 'var(--text)';
       const wmxUrl = winamaxUrl(m);
+      const nBets = getMatchBetCount(m.id);
+      const corrEffective = myBet ? nBets - 1 : nBets;
+
       return `
-        <div class="top-pick top5 ${urgent ? 'urgent' : ''}" data-id="${esc(m.id)}" style="position:relative;padding:14px 14px 14px 52px;">
-          <div class="tp-rank" style="position:absolute;left:10px;top:10px;width:32px;height:32px;border-radius:50%;background:${badgeColor};color:${badgeText};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;box-shadow:0 2px 6px rgba(0,0,0,.3);">${rank}</div>
-          <div class="tp-head">
-            <div class="tp-league">${esc(m.league_name)}</div>
-            <div class="tp-time">${esc(fmtTime(m.date))} · <span style="color:var(--accent-2,#60a5fa);font-weight:700;">${esc(tIn)}</span></div>
+        <div class="top-hero" data-id="${esc(m.id)}">
+          <div class="hero-top">
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+              <span class="hero-rank">🏆 #1 Top Pick</span>
+              <span class="hero-league">${esc(m.league_name || '')}</span>
+              ${pred.value ? `<span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;background:rgba(245,158,11,.18);color:#f59e0b;letter-spacing:.4px;text-transform:uppercase;">💎 Value</span>` : ''}
+              ${pred.isLock ? `<span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;background:rgba(234,179,8,.18);color:#eab308;letter-spacing:.4px;text-transform:uppercase;">🔒 Lock</span>` : ''}
+            </div>
+            <div class="hero-time">${esc(fmtTime(m.date))} · ${esc(tIn)}</div>
           </div>
-          <div class="tp-teams" style="margin:6px 0 10px;">${esc(home?.short || home?.name || '?')} <span style="color:var(--text-dim);">vs</span> ${esc(away?.short || away?.name || '?')}</div>
-          <div style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(255,255,255,.03);border-radius:10px;margin-bottom:8px;">
-            <div style="flex:1;">
-              <div style="font-size:11px;color:var(--text-dim2,#7b8693);letter-spacing:.5px;text-transform:uppercase;margin-bottom:2px;">Prono</div>
-              <div style="font-weight:700;font-size:14px;">🎯 ${esc(pred.pick.label)}</div>
+
+          <div class="hero-teams">
+            ${esc(home?.name || home?.short || '?')}
+            <span class="vs">vs</span>
+            ${esc(away?.name || away?.short || '?')}
+          </div>
+
+          <div class="hero-stats">
+            <div class="hero-stat">
+              <div class="label">Pronostic</div>
+              <div class="val hero-pick-label">🎯 ${esc(pred.pick.label)}</div>
             </div>
-            <div style="text-align:center;padding:0 10px;border-left:1px solid rgba(255,255,255,.08);border-right:1px solid rgba(255,255,255,.08);">
-              <div style="font-size:11px;color:var(--text-dim2,#7b8693);letter-spacing:.5px;text-transform:uppercase;margin-bottom:2px;">Cote</div>
-              <div style="font-weight:800;font-size:20px;color:var(--accent,#10b981);">${pickOdd.toFixed(2)}</div>
+            <div class="hero-stat accent">
+              <div class="label">Cote</div>
+              <div class="val">${pickOdd.toFixed(2)}</div>
             </div>
-            <div style="text-align:right;">
-              <div style="font-size:11px;color:var(--text-dim2,#7b8693);letter-spacing:.5px;text-transform:uppercase;margin-bottom:2px;">Confiance</div>
-              <div style="font-weight:800;font-size:16px;">${(pred.pick.prob*100).toFixed(0)}%</div>
+            <div class="hero-stat brand">
+              <div class="label">Confiance</div>
+              <div class="val">${(pred.pick.prob*100).toFixed(0)}%</div>
+            </div>
+            <div class="hero-stat accent">
+              <div class="label">EV</div>
+              <div class="val">+${evPct}%</div>
             </div>
           </div>
-          <div style="display:flex;gap:8px;margin-bottom:10px;font-size:12px;flex-wrap:wrap;">
-            <span style="padding:3px 8px;border-radius:6px;background:rgba(16,185,129,.14);color:#10b981;font-weight:700;">EV +${evPct}%</span>
-            ${kelly ? `<span title="Mise Kelly-½ : ${(kelly.fraction*100).toFixed(1)}% de la bankroll, calibré sur ta proba modèle et la cote. Full-Kelly = ${(kelly.fraction*2*100).toFixed(1)}%." style="padding:3px 8px;border-radius:6px;background:rgba(96,165,250,.14);color:#60a5fa;font-weight:700;">💰 Mise ${kelly.stake100.toFixed(2)}€ <span style="opacity:.75;font-weight:500;">(${(kelly.fraction*100).toFixed(1)}%)</span></span>` : ''}
-            ${lm ? (lm.deltaPct < 0
-              ? `<span title="La cote est passée de ${lm.before.toFixed(2)} → ${lm.after.toFixed(2)} depuis le snapshot pré-match. Drop = money sharp sur ce pari." style="padding:3px 8px;border-radius:6px;background:rgba(16,185,129,.14);color:#34d399;font-weight:700;">📉 Sharp ${lm.deltaPct.toFixed(1)}%</span>`
-              : `<span title="La cote est passée de ${lm.before.toFixed(2)} → ${lm.after.toFixed(2)} depuis le snapshot pré-match. Cote qui monte = le marché s'éloigne de ce pari, attention." style="padding:3px 8px;border-radius:6px;background:rgba(248,113,113,.14);color:#f87171;font-weight:700;">📈 Drift +${lm.deltaPct.toFixed(1)}%</span>`
-            ) : ''}
-            <span style="padding:3px 8px;border-radius:6px;background:rgba(255,255,255,.05);color:var(--text-dim,#b4bcc7);">Gain 10€ → ${gainFor10}€ net</span>
-            ${pred.value ? `<span style="padding:3px 8px;border-radius:6px;background:rgba(245,158,11,.14);color:#f59e0b;font-weight:700;">💎 VALUE</span>` : ''}
-            ${pred.isLock ? `<span style="padding:3px 8px;border-radius:6px;background:rgba(234,179,8,.14);color:#eab308;font-weight:700;">🔒 LOCK</span>` : ''}
-            ${(() => {
-              // Correlation warning: Théo a déjà 1+ paris sur ce match. On surface
-              // l'alerte parce qu'un 2e pari sur la même rencontre n'est pas
-              // diversifié — risque corrélé, stop-loss arrive plus vite.
-              const nBets = getMatchBetCount(m.id);
-              if (nBets === 0) return '';
-              const effective = myBet ? nBets - 1 : nBets;
-              if (effective <= 0) return '';
-              return `<span title="Tu as déjà ${nBets} pari${nBets>1?'s':''} sur ce match. Un 2e ticket = risque corrélé, tes stakes s'additionnent sur le même événement." style="padding:3px 8px;border-radius:6px;background:rgba(251,191,36,.16);color:#fbbf24;font-weight:700;">⚠️ Corrélé (${nBets})</span>`;
-            })()}
+
+          <div class="hero-badges">
+            ${kelly ? `<span title="Mise Kelly-½ : ${(kelly.fraction*100).toFixed(1)}% de la bankroll." style="padding:5px 12px;border-radius:8px;background:rgba(96,165,250,.16);color:#60a5fa;font-weight:700;font-size:12.5px;">💰 Mise ${kelly.stake100.toFixed(2)}€ · ${(kelly.fraction*100).toFixed(1)}%</span>` : ''}
+            ${lm ? (() => {
+              const sevTxt = lm.severity === 'sharp' ? 'Sharp' : lm.severity === 'notable' ? 'Notable' : 'Léger';
+              const intensity = lm.severity === 'sharp' ? 0.28 : lm.severity === 'notable' ? 0.20 : 0.14;
+              if (lm.deltaPct < 0) {
+                return `<span title="Cote ${lm.before.toFixed(2)} → ${lm.after.toFixed(2)}. ${sevTxt} drop — money vers notre pick." style="padding:5px 12px;border-radius:8px;background:rgba(16,185,129,${intensity});color:#34d399;font-weight:700;font-size:12.5px;">📉 ${sevTxt} ${lm.deltaPct.toFixed(1)}%</span>`;
+              }
+              return `<span title="Cote ${lm.before.toFixed(2)} → ${lm.after.toFixed(2)}. ${sevTxt} drift — marché s'éloigne." style="padding:5px 12px;border-radius:8px;background:rgba(248,113,113,${intensity});color:#f87171;font-weight:700;font-size:12.5px;">📈 ${sevTxt} +${lm.deltaPct.toFixed(1)}%</span>`;
+            })() : ''}
+            <span style="padding:5px 12px;border-radius:8px;background:rgba(255,255,255,.04);color:var(--text-dim);font-weight:600;font-size:12.5px;">Gain 10€ → ${((pickOdd-1)*10).toFixed(2)}€</span>
+            ${corrEffective > 0 ? `<span title="Tu as déjà ${nBets} pari${nBets>1?'s':''} sur ce match — risque corrélé." style="padding:5px 12px;border-radius:8px;background:rgba(251,191,36,.18);color:#fbbf24;font-weight:700;font-size:12.5px;">⚠️ Corrélé (${nBets})</span>` : ''}
+            ${pred.markets && pred.markets.ou.prob >= 0.60 ? `<span title="Marché bonus depuis Poisson xG." style="padding:5px 12px;border-radius:8px;background:rgba(139,92,246,.16);color:#a78bfa;font-weight:700;font-size:12.5px;">⚽ ${esc(pred.markets.ou.label)} · ${(pred.markets.ou.prob*100).toFixed(0)}%</span>` : ''}
+            ${pred.markets && pred.markets.btts.prob >= 0.60 ? `<span title="BTTS calculé depuis le Poisson." style="padding:5px 12px;border-radius:8px;background:rgba(236,72,153,.16);color:#f472b6;font-weight:700;font-size:12.5px;">🔄 ${esc(pred.markets.btts.label)} · ${(pred.markets.btts.prob*100).toFixed(0)}%</span>` : ''}
           </div>
-          <div style="font-size:12.5px;color:var(--text-dim,#b4bcc7);line-height:1.45;margin-bottom:${topReasons.length?'8px':'0'};">${esc(pred.explain?.headline || '')}</div>
-          ${topReasons.length ? `<ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:4px;">${topReasons.map(r => `<li style="font-size:12px;color:var(--text-dim,#b4bcc7);display:flex;gap:6px;"><span>${r.icon}</span><span>${esc(r.text)}</span></li>`).join('')}</ul>` : ''}
-          ${pred.markets && (pred.markets.ou.prob >= 0.60 || pred.markets.btts.prob >= 0.60) ? `
-            <div style="margin-top:10px;padding-top:8px;border-top:1px dashed rgba(255,255,255,.08);display:flex;gap:6px;flex-wrap:wrap;font-size:11.5px;">
-              <span style="color:var(--text-dim2,#7b8693);letter-spacing:.3px;text-transform:uppercase;font-weight:700;align-self:center;">Marchés bonus</span>
-              ${pred.markets.ou.prob >= 0.60 ? `<span title="Calculé depuis le Poisson xG du modèle. Cote Winamax à vérifier." style="padding:3px 7px;border-radius:6px;background:rgba(139,92,246,.14);color:#a78bfa;font-weight:700;">⚽ ${esc(pred.markets.ou.label)} · ${(pred.markets.ou.prob*100).toFixed(0)}%</span>` : ''}
-              ${pred.markets.btts.prob >= 0.60 ? `<span title="BTTS = Both Teams To Score. Calculé via P(H≥1)·P(A≥1) depuis le Poisson." style="padding:3px 7px;border-radius:6px;background:rgba(236,72,153,.14);color:#f472b6;font-weight:700;">🔄 ${esc(pred.markets.btts.label)} · ${(pred.markets.btts.prob*100).toFixed(0)}%</span>` : ''}
-            </div>
-          ` : ''}
-          <div style="display:flex;gap:8px;margin-top:10px;">
-            ${wmxUrl ? `<a href="${esc(wmxUrl)}" target="_blank" rel="noopener" class="tp-wmx" style="flex:1;display:block;text-align:center;padding:8px;background:linear-gradient(135deg,#ff6b00,#ff4e00);color:#fff;border-radius:8px;font-weight:700;font-size:13px;text-decoration:none;letter-spacing:.3px;" onclick="event.stopPropagation();">Parier sur Winamax →</a>` : ''}
+
+          ${pred.explain?.headline ? `<div class="hero-headline">${esc(pred.explain.headline)}</div>` : ''}
+          ${topReasons.length ? `<ul class="hero-reasons">${topReasons.map(r => `<li><span>${r.icon}</span><span>${esc(r.text)}</span></li>`).join('')}</ul>` : ''}
+
+          <div class="hero-actions">
+            ${wmxUrl ? `<a href="${esc(wmxUrl)}" target="_blank" rel="noopener" class="hero-btn-wmx" onclick="event.stopPropagation();">Parier sur Winamax →</a>` : ''}
             ${myBet
-              ? `<button class="tp-mybet" data-match="${esc(m.id)}" data-pick="${esc(pred.pick.key)}" style="padding:8px 12px;background:rgba(52,211,153,.15);border:1px solid rgba(52,211,153,.35);color:#34d399;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap;" title="Tu as parié ${myBet.stake.toFixed(2)}€ @ ${myBet.odds.toFixed(2)}. Clic pour retirer.">✓ Parié ${myBet.stake.toFixed(2)}€</button>`
-              : `<button class="tp-mybet" data-match="${esc(m.id)}" data-pick="${esc(pred.pick.key)}" data-label="${esc(pred.pick.label)}" data-odds="${pickOdd}" data-stake="${kelly ? kelly.stake100.toFixed(2) : '10'}" style="padding:8px 12px;background:rgba(255,255,255,.04);border:1px solid var(--border,#2a3744);color:var(--text,#e5e7eb);border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap;" title="Marquer comme pari placé — alimente ton bilan perso">💰 J'ai parié</button>`
+              ? `<button class="tp-mybet hero-btn-mybet placed" data-match="${esc(m.id)}" data-pick="${esc(pred.pick.key)}" title="Tu as parié ${myBet.stake.toFixed(2)}€ @ ${myBet.odds.toFixed(2)}. Clic pour retirer.">✓ Parié ${myBet.stake.toFixed(2)}€</button>`
+              : `<button class="tp-mybet hero-btn-mybet" data-match="${esc(m.id)}" data-pick="${esc(pred.pick.key)}" data-label="${esc(pred.pick.label)}" data-odds="${pickOdd}" data-stake="${kelly ? kelly.stake100.toFixed(2) : '10'}" title="Marquer comme pari placé">💰 J'ai parié</button>`
             }
+          </div>
+        </div>
+      `;
+    };
+
+    // ============ RANKS #2–5 — MINI CARDS =============
+    const renderMiniPick = (x, rank) => {
+      const { m, pred, startIn, pickOdd } = x;
+      const { home, away } = getSides(m);
+      const tIn = fmtIn(startIn);
+      const evPct = (x.ev * 100).toFixed(1);
+      return `
+        <div class="top-mini top-pick" data-id="${esc(m.id)}">
+          <div class="mini-head">
+            <div class="mini-rank">${rank}</div>
+            <div class="mini-league">${esc(m.league_name || '')}</div>
+            <div class="mini-time">${esc(tIn)}</div>
+          </div>
+          <div class="mini-teams">
+            ${esc(home?.short || home?.name || '?')}
+            <span class="vs">vs</span>
+            ${esc(away?.short || away?.name || '?')}
+          </div>
+          <div class="mini-pick">
+            <div class="mini-pick-label">🎯 ${esc(pred.pick.label)}</div>
+            <div class="mini-pick-stats">
+              <span class="mini-stat odd">${pickOdd.toFixed(2)}</span>
+              <span class="mini-stat">${(pred.pick.prob*100).toFixed(0)}%</span>
+              <span class="mini-stat ev">+${evPct}%</span>
+            </div>
           </div>
         </div>
       `;
@@ -2568,8 +3473,13 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T16:32:11.425877Z","today":"
           <h2><span class="ico">🏆</span>Top 5 pronos du jour <span style="font-size:12px;color:var(--text-dim2,#7b8693);font-weight:500;letter-spacing:0;">· classés par EV × fiabilité</span></h2>
           <div class="hint">Classement combiné : proba modèle × cote Winamax. Les matchs joués glissent en dehors automatiquement.</div>
         </div>
-        <div class="top-picks-grid">
-          ${top5.map((x, i) => renderTop5Card(x, i+1)).join('')}
+        <div class="top-hero-wrap">
+          ${renderHeroPick(top5[0])}
+          ${top5.length > 1 ? `
+            <div class="top-minis">
+              ${top5.slice(1).map((x, i) => renderMiniPick(x, i+2)).join('')}
+            </div>
+          ` : ''}
         </div>
       ` : ''}
       ${others.length ? `
@@ -2597,7 +3507,9 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T16:32:11.425877Z","today":"
         </div>
       ` : ''}
     `;
-    wrap.querySelectorAll('.top-pick').forEach(card => card.addEventListener('click', () => {
+    wrap.querySelectorAll('.top-pick, .top-hero').forEach(card => card.addEventListener('click', (ev) => {
+      // Don't open detail when clicking a link or button inside the card
+      if (ev.target.closest('a, button')) return;
       const id = card.dataset.id;
       let match = null;
       for (const day of Object.keys(window.PRONOSTICS_DATA.days || {})) {
@@ -2617,6 +3529,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T16:32:11.425877Z","today":"
         // Already tracked — click removes
         if (confirm(`Retirer le pari ${existing.pickLabel} @ ${existing.odds.toFixed(2)} (${existing.stake.toFixed(2)}€) de ton bilan perso ?`)) {
           removeMyBet(matchId, pickKey);
+          toast(`✗ Pari retiré du bilan`, 'info');
           render();
         }
         return;
@@ -2626,14 +3539,17 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T16:32:11.425877Z","today":"
       const raw = prompt(`Mise en € pour "${btn.dataset.label}" @ ${btn.dataset.odds} ?\n(Kelly-½ suggère ${suggested}€)`, suggested);
       if (raw == null) return;
       const stake = parseFloat(String(raw).replace(',', '.'));
-      if (!isFinite(stake) || stake <= 0) return;
+      if (!isFinite(stake) || stake <= 0) { toast('Mise invalide', 'error'); return; }
+      const odds = parseFloat(btn.dataset.odds);
       upsertMyBet({
         matchId, pickKey,
         pickLabel: btn.dataset.label,
-        odds: parseFloat(btn.dataset.odds),
+        odds,
         stake,
         placedAt: new Date().toISOString(),
       });
+      const potential = (stake * odds).toFixed(2);
+      toast(`✓ Pari enregistré · ${stake.toFixed(2)}€ @ ${odds.toFixed(2)} → ${potential}€ pot.`, 'success');
       render();
     }));
   }
@@ -2776,11 +3692,26 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T16:32:11.425877Z","today":"
                   </div>
                 `;
               }).join('');
+              // Compose a plain-text version of the combiné legs for clipboard.
+              // Format: "Équilibré · ×3.12 (prob. 32%)" then one leg per line.
+              const copyText = (() => {
+                const header = `${c.title.replace(/^[^\w]*/, '').trim()} · ×${c.totalOdd.toFixed(2)} (prob. ${Math.round(c.combinedProb*100)}%) · 10€ → ${stakeRet}€`;
+                const lines = c.legs.map(l => {
+                  const { home, away } = getSides(l.m);
+                  const lg = l.m.league_name || sportLabel(l.m.sport);
+                  const when = fmtTime(l.m.date);
+                  return `• ${home?.short || home?.name || '?'} vs ${away?.short || away?.name || '?'} (${lg}, ${when}) — ${l.pred.pick.label} @ ${l.odd.toFixed(2)}`;
+                });
+                return `${header}\n${lines.join('\n')}`;
+              })();
               return `
                 <div class="combine-card ${c.type}">
                   <div class="combine-head">
                     <div class="combine-title">${c.title}<span style="color:var(--text-dim);font-weight:500;font-size:11px;">· ${c.legs.length} sélections</span></div>
-                    ${confGauge(c.combinedProb, 'sm')}
+                    <div style="display:flex;gap:10px;align-items:center;">
+                      ${confGauge(c.combinedProb, 'sm')}
+                      <button class="combine-copy-btn" data-copy="${esc(copyText)}" title="Copier le combiné (texte)" aria-label="Copier le combiné">📋</button>
+                    </div>
                   </div>
                   <div class="combine-desc" style="font-size:11px;color:var(--text-dim);">${esc(c.desc)} · 1er match <b style="color:var(--text);">${esc(lockIn)}</b></div>
                   <div class="combine-legs">${legsHtml}</div>
@@ -2821,6 +3752,25 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T16:32:11.425877Z","today":"
       for (const day of Object.keys(window.PRONOSTICS_DATA.days || {})) {
         const match = (window.PRONOSTICS_DATA.days[day] || []).find(m => m.id === id);
         if (match) { openDetail(match); return; }
+      }
+    }));
+    // Copy combiné to clipboard
+    wrap.querySelectorAll('.combine-copy-btn').forEach(btn => btn.addEventListener('click', async (ev) => {
+      ev.stopPropagation();
+      const text = btn.dataset.copy || '';
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(text);
+        } else {
+          // Fallback for older browsers
+          const ta = document.createElement('textarea');
+          ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+          document.body.appendChild(ta); ta.select();
+          document.execCommand('copy'); document.body.removeChild(ta);
+        }
+        toast('✓ Combiné copié dans le presse-papier', 'success');
+      } catch (e) {
+        toast('Impossible de copier', 'error');
       }
     }));
   }
@@ -2943,7 +3893,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T16:32:11.425877Z","today":"
           <div class="team ${hWinner ? 'winner' : ''}">
             ${home?.logo ? `<img class="logo" src="${esc(home.logo)}" onerror="this.style.display='none'">` : '<span class="logo"></span>'}
             <div class="name-wrap">
-              <div class="name">${esc(home?.name || 'Domicile')}</div>
+              <div class="name">${escWithHighlight(home?.name || 'Domicile')}</div>
               <div class="meta">
                 ${rankH ? `<span class="rank-badge">#${rankH}</span>` : ''}
                 ${recH ? `<span class="record">${esc(recH)}</span>` : ''}
@@ -2955,7 +3905,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T16:32:11.425877Z","today":"
           <div class="team ${aWinner ? 'winner' : ''}">
             ${away?.logo ? `<img class="logo" src="${esc(away.logo)}" onerror="this.style.display='none'">` : '<span class="logo"></span>'}
             <div class="name-wrap">
-              <div class="name">${esc(away?.name || 'Extérieur')}</div>
+              <div class="name">${escWithHighlight(away?.name || 'Extérieur')}</div>
               <div class="meta">
                 ${rankA ? `<span class="rank-badge">#${rankA}</span>` : ''}
                 ${recA ? `<span class="record">${esc(recA)}</span>` : ''}
@@ -3429,23 +4379,54 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T16:32:11.425877Z","today":"
     }
   }
 
+  // ===== Unified refresh tick =====
+  // One timer to rule them all. Every 15 s we:
+  //   • bump the freshness indicator (cheap)
+  //   • re-render *only* time-sensitive bits ("dans 25 min" labels, live dots)
+  // Every 60 s we additionally poll data.js.
+  // Reloads for deploys happen only when the tab is hidden AND user is idle —
+  // never while Théo is reading or typing. Also bail if the bankroll input has focus.
+  let __lastUserInteraction = Date.now();
+  ['mousemove','keydown','touchstart','click'].forEach(ev =>
+    document.addEventListener(ev, () => { __lastUserInteraction = Date.now(); }, { passive: true })
+  );
   function startAutoRefresh() {
-    // First poll after 60s, then every 60s.
     if (__refreshTimer) clearInterval(__refreshTimer);
-    __refreshTimer = setInterval(pollData, 60 * 1000);
-    // Also re-render every 30s to update "in 25 min" labels, live dots, etc.
-    setInterval(() => { if (!__refreshInFlight) { render(); updateFreshness(); } }, 30 * 1000);
+    const tickMs = 15 * 1000;
+    const pollEveryMs = 60 * 1000;
+    const reloadAfterMs = 60 * 60 * 1000;
+    const idleAfterMs = 2 * 60 * 1000;
+    const __bootTime = Date.now();
+    let lastPoll = 0;
+    __refreshTimer = setInterval(() => {
+      const now = Date.now();
+      const tabHidden = document.visibilityState === 'hidden';
+      // When tab is hidden, don't burn CPU with rendering. Poll stays (cheap).
+      // Data poll (every 60 s) — fires render() on success via the fresh data
+      if (now - lastPoll >= pollEveryMs && !__refreshInFlight) {
+        lastPoll = now;
+        pollData();
+      } else if (!tabHidden && !__refreshInFlight) {
+        // Lightweight: re-render to refresh "dans 25 min" labels, live dots, etc.
+        // Uses the cached predictions (same data.js ref → cache hit), so this is cheap.
+        render();
+        updateFreshness();
+      } else if (tabHidden) {
+        // Hidden tab: just keep the freshness indicator current without rendering.
+        updateFreshness();
+      }
+      // Soft reload: only when hidden, idle ≥2 min, and no input has focus
+      if (now - __bootTime > reloadAfterMs) {
+        const idle = now - __lastUserInteraction > idleAfterMs;
+        const hidden = document.visibilityState === 'hidden';
+        const typing = document.activeElement && ['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName);
+        if (hidden && idle && !typing) {
+          try { location.reload(); } catch (e) {}
+        }
+      }
+    }, tickMs);
     // Paint freshness immediately on boot
     updateFreshness();
-    // Soft reload every 60 min to pick up new HTML/JS deployed via GitHub Pages.
-    // The meta Cache-Control tags help, but some browsers still serve cached HTML;
-    // this forces a clean fetch so users always run the latest UI code.
-    const __bootTime = Date.now();
-    setInterval(() => {
-      if (Date.now() - __bootTime > 60 * 60 * 1000) {
-        try { location.reload(); } catch (e) {}
-      }
-    }, 5 * 60 * 1000);
   }
 
   // ======= Boot =======
@@ -3455,8 +4436,9 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T16:32:11.425877Z","today":"
     const isCombines = currentPage === 'combines';
     const isBilan = currentPage === 'bilan';
 
-    // Filter bar + top picks + bankroll widget + league panels only for simples page
-    const hideUnlessSimples = ['filters', 'top-picks-wrap', 'bankroll-bar'];
+    // Filter bar + top picks only for simples page. Bankroll bar lives
+    // in the sidebar now so it stays visible on every page.
+    const hideUnlessSimples = ['filters', 'top-picks-wrap'];
     hideUnlessSimples.forEach(id => {
       const el = document.getElementById(id);
       if (el) el.style.display = isSimples ? '' : 'none';
@@ -3727,6 +4709,38 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T16:32:11.425877Z","today":"
     return { engagedToday, dailyCap, plToday, stopLoss, today };
   }
 
+  // ====== STATS HELPERS (Wilson CI, drawdown, stddev) ======
+  // Wilson score interval for a binomial proportion. Far more honest than
+  // raw WR on small samples — a 5/6 (83%) WR has a Wilson 95% CI of roughly
+  // [44%, 97%], whereas 50/60 (also 83%) is [71%, 91%]. Surfaces small-sample
+  // noise that naive "look at the ROI" hides.
+  // Returns { low, high, point } in [0,1], all as probabilities.
+  function wilsonCI(wins, n, z = 1.96) {
+    if (!n || n <= 0) return { low: 0, high: 0, point: 0 };
+    const p = wins / n;
+    const z2 = z * z;
+    const denom = 1 + z2 / n;
+    const center = (p + z2 / (2 * n)) / denom;
+    const margin = (z * Math.sqrt((p * (1 - p) + z2 / (4 * n)) / n)) / denom;
+    return { low: Math.max(0, center - margin), high: Math.min(1, center + margin), point: p };
+  }
+  // Max drawdown: biggest peak-to-trough drop over the equity curve.
+  // deltas: array of per-bet P&L numbers in chronological order.
+  // Returns { maxDD (positive number, in units), ddStart, ddEnd, currentPeak, currentDD }.
+  function maxDrawdown(deltas) {
+    let peak = 0, cum = 0, maxDD = 0;
+    let peakIdx = -1, troughIdx = -1, ddStartIdx = -1, ddEndIdx = -1;
+    deltas.forEach((d, i) => {
+      cum += d;
+      if (cum > peak) { peak = cum; peakIdx = i; }
+      const dd = peak - cum;
+      if (dd > maxDD) { maxDD = dd; ddStartIdx = peakIdx; ddEndIdx = i; }
+    });
+    const currentPeak = peak;
+    const currentDD = peak - cum;
+    return { maxDD, ddStartIdx, ddEndIdx, currentPeak, currentDD };
+  }
+
   // Count bets Théo has placed on a given match (same match = correlated risk).
   // Used to surface "⚠️ Pari corrélé" badges on top picks and bilan rows.
   function getMatchBetCount(matchId) {
@@ -3742,17 +4756,29 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T16:32:11.425877Z","today":"
   // Aggregate bilan view: overall ROI, per-sport ROI, recent results, top completed picks
   function renderBilanPage(wrap) {
     const data = window.PRONOSTICS_DATA;
-    if (!data || !data.days) { wrap.innerHTML = '<div class="empty">Pas de données de bilan.</div>'; return; }
-    // Pool = every completed event, across all days
+    if (!data || !data.days) { wrap.innerHTML = '<div class="bilan-empty">Pas de données de bilan.</div>'; return; }
+
+    // ========= MODEL STATS =========
     const completed = [];
     Object.values(data.days).forEach(arr => (arr || []).forEach(m => {
       if (m.completed) completed.push(m);
     }));
-    // Evaluate each pick
-    let model = { w: 0, l: 0, pushed: 0, pl: 0, bets: 0 };
+    // Apply time-window filter (days). 0 = tout.
+    const windowCutoff = _bilanWindow > 0 ? (() => {
+      const cut = new Date();
+      cut.setHours(0, 0, 0, 0);
+      cut.setDate(cut.getDate() - _bilanWindow);
+      return cut;
+    })() : null;
+    let model = { w: 0, l: 0, pl: 0, bets: 0 };
     const perSport = {};
     const rows = [];
+    let nearMissCount = 0;
     completed.forEach(m => {
+      if (windowCutoff) {
+        const md = new Date(m.date);
+        if (isNaN(md.getTime()) || md < windowCutoff) return;
+      }
       const pred = predictMatch(m);
       if (!pred || !pred.pick || pred.skip) return;
       const res = evaluateModelPick(m, pred);
@@ -3764,233 +4790,901 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T16:32:11.425877Z","today":"
       ps.bets++;
       if (res === 'won') { model.w++; model.pl += (odd - 1); ps.w++; ps.pl += (odd-1); }
       else if (res === 'lost') { model.l++; model.pl -= 1; ps.l++; ps.pl -= 1; }
+      if (isNearMiss(m, res)) nearMissCount++;
       rows.push({ m, pred, res, odd });
     });
-    const wr = model.bets ? Math.round(100*model.w/model.bets) : 0;
-    const roi = model.bets ? Math.round(100*model.pl/model.bets) : 0;
-    // Build chart data: one entry per evaluated pick with +profit/-stake
-    const chartRows = rows.map(r => ({
+    const wr = model.bets ? (100*model.w/model.bets) : 0;
+    const roi = model.bets ? (100*model.pl/model.bets) : 0;
+
+    const modelChartRows = rows.map(r => ({
       date: (r.m.date || '').slice(0, 10),
       delta: r.res === 'won' ? (r.odd - 1) : -1,
     }));
-    const chartHtml = renderRoiChart(chartRows, { title: 'P&L cumulé du modèle (unité flat)' });
-    const rowsHtml = rows.slice().reverse().slice(0, 40).map(r => {
-      const { home, away } = getSides(r.m);
-      const cls = r.res === 'won' ? 'style="color:#34d399;"' : 'style="color:#f87171;text-decoration:line-through;"';
-      return `<tr>
-        <td style="padding:6px 8px;color:var(--text-dim);font-size:12px;">${esc(fmtDate(r.m.date?.slice(0,10)||''))}</td>
-        <td style="padding:6px 8px;">${esc((home?.short||home?.name||''))} <span style="color:var(--text-dim2);">vs</span> ${esc((away?.short||away?.name||''))}</td>
-        <td style="padding:6px 8px;color:var(--text-muted);font-size:12px;">${esc(sportLabel(r.m.sport))}</td>
-        <td style="padding:6px 8px;" ${cls}>${esc(r.pred.pick.label)}</td>
-        <td style="padding:6px 8px;text-align:right;">@${r.odd.toFixed(2)}</td>
-        <td style="padding:6px 8px;text-align:right;font-weight:700;color:${r.res==='won'?'#34d399':'#f87171'};">${r.res==='won'?'✓ +'+(r.odd-1).toFixed(2):'✗ -1.00'}</td>
-      </tr>`;
-    }).join('');
-    const perSportHtml = Object.entries(perSport)
-      .sort((a,b) => b[1].bets - a[1].bets)
-      .map(([sport, s]) => {
-        const sw = s.bets ? Math.round(100*s.w/s.bets) : 0;
-        const sr = s.bets ? Math.round(100*s.pl/s.bets) : 0;
-        return `<div style="padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;">
-          <div style="font-size:11px;letter-spacing:.5px;color:var(--text-muted);text-transform:uppercase;">${esc(sportLabel(sport))}</div>
-          <div style="font-size:22px;font-weight:700;margin-top:4px;">${sw}% <span style="font-size:12px;color:var(--text-muted);font-weight:500;">WR</span></div>
-          <div style="font-size:12px;color:${sr>=0?'#34d399':'#f87171'};">ROI ${sr>=0?'+':''}${sr}% · ${s.bets} paris</div>
-        </div>`;
-      }).join('');
-    // ==== Personal bilan section ====
+    const modelChartHtml = renderRoiChart(modelChartRows, { title: 'P&L modèle cumulé (unité flat)' })
+      || `<div class="bilan-empty">Pas encore assez de paris pour tracer une courbe.</div>`;
+
+    // ========= MODEL BREAKDOWN: buckets confiance + ligues + streak/records =========
+    // Buckets par proba modèle : high ≥ 0.65, mid 0.55–0.65, low 0.50–0.55
+    const bucket = { high: { w:0, l:0, pl:0, bets:0 }, mid: { w:0, l:0, pl:0, bets:0 }, low: { w:0, l:0, pl:0, bets:0 } };
+    const perLeague = {};
+    const byDay = new Map();  // date → delta sum
+    let biggestWin = null, biggestLoss = null;
+    // Streak: walk rows chronologically (oldest → newest) and track current run
+    const chronoRows = rows.slice().sort((a, b) => new Date(a.m.date) - new Date(b.m.date));
+    let curStreak = { type: null, count: 0 };     // type = 'W' or 'L'
+    let bestWin = { count: 0 }, worstLoss = { count: 0 };
+    let runType = null, runCount = 0;
+    chronoRows.forEach(r => {
+      const p = r.pred.pick.prob || 0;
+      const b = p >= 0.65 ? bucket.high : p >= 0.55 ? bucket.mid : bucket.low;
+      b.bets++;
+      const delta = r.res === 'won' ? (r.odd - 1) : -1;
+      if (r.res === 'won') b.w++; else b.l++;
+      b.pl += delta;
+
+      // Per league
+      const lgKey = r.m.league_name || r.m.league_id || '—';
+      const pl = perLeague[lgKey] = perLeague[lgKey] || { w:0, l:0, pl:0, bets:0 };
+      pl.bets++;
+      if (r.res === 'won') pl.w++; else pl.l++;
+      pl.pl += delta;
+
+      // Biggest single-bet win/loss
+      if (r.res === 'won' && (!biggestWin || delta > biggestWin.delta)) {
+        biggestWin = { delta, match: r.m, pred: r.pred, odd: r.odd };
+      }
+      if (r.res === 'lost' && (!biggestLoss || Math.abs(delta) > Math.abs(biggestLoss.delta))) {
+        biggestLoss = { delta, match: r.m, pred: r.pred, odd: r.odd };
+      }
+
+      // Day aggregate
+      const d = (r.m.date || '').slice(0, 10);
+      if (d) byDay.set(d, (byDay.get(d) || 0) + delta);
+
+      // Streak
+      const t = r.res === 'won' ? 'W' : 'L';
+      if (t === runType) runCount++;
+      else { runType = t; runCount = 1; }
+      if (t === 'W' && runCount > bestWin.count) bestWin = { count: runCount };
+      if (t === 'L' && runCount > worstLoss.count) worstLoss = { count: runCount };
+      curStreak = { type: runType, count: runCount };
+    });
+    // Best / worst day. Tie-break: keep the MOST RECENT date so "today's
+    // big day" always wins over an identical day from 3 months ago — matches
+    // how Théo thinks about recency. We sort the entries by date desc once.
+    let bestDay = null, worstDay = null;
+    const dayEntries = Array.from(byDay.entries()).sort((a, b) => b[0].localeCompare(a[0]));
+    for (const [d, v] of dayEntries) {
+      if (!bestDay || v > bestDay.delta) bestDay = { date: d, delta: v };
+      if (!worstDay || v < worstDay.delta) worstDay = { date: d, delta: v };
+    }
+
+    // ========= PERSONAL STATS =========
     const mine = computeMyBilan();
-    let mySection = '';
-    if (mine && mine.bets > 0) {
-      const myRoiPct = (mine.roi * 100);
-      // Personal P&L chart: settled bets only, sorted by match date, stakes in €
+    const hasMyBets = mine && mine.bets > 0;
+    const startBankroll = bankroll;
+    const currentBankroll = hasMyBets ? startBankroll + mine.pl : startBankroll;
+    const bkDelta = hasMyBets ? mine.pl : 0;
+    const bkDeltaPct = startBankroll > 0 ? (bkDelta / startBankroll * 100) : 0;
+    const myRoiPct = hasMyBets ? (mine.roi * 100) : 0;
+
+    // Personal P&L chart data (settled bets only)
+    let myChartHtml = '';
+    if (hasMyBets) {
       const myChartRows = mine.rows
         .filter(r => r.res !== 'pending' && r.match)
         .map(r => ({
           date: (r.match.date || r.bet.placedAt || '').slice(0, 10),
           delta: r.res === 'won' ? (r.payout - r.bet.stake) : -r.bet.stake,
         }));
-      const myChartHtml = myChartRows.length >= 2
-        ? renderRoiChart(myChartRows, { title: 'P&L cumulé perso (€ réels)' }).replace(/u<\/text>/g, '€</text>').replace(/u<\/span>/g, '€</span>').replace(/u\.|u$| u /g, m => m.replace('u', '€'))
-        : '';
-      // Pre-compute correlation counts so we can flag rows with multiple bets
-      // on the same match (corrélé = same event, stakes additifs).
-      const corrMap = {};
+      if (myChartRows.length >= 2) {
+        myChartHtml = renderRoiChart(myChartRows, { title: 'P&L perso cumulé (€ réels)' })
+          .replace(/u<\/text>/g, '€</text>')
+          .replace(/u<\/span>/g, '€</span>')
+          .replace(/u\.|u$| u /g, m => m.replace('u', '€'));
+      } else {
+        myChartHtml = `<div class="bilan-empty">Règle au moins 2 paris pour voir ta courbe P&L perso.</div>`;
+      }
+    } else {
+      myChartHtml = `<div class="bilan-empty">Pas encore de pari perso enregistré.</div>`;
+    }
+
+    // Guards
+    const guards = computeBankrollGuards();
+    const overCap = guards.engagedToday > guards.dailyCap;
+    const hitStopLoss = guards.plToday < guards.stopLoss;
+    let guardsHtml = '';
+    if (hitStopLoss) {
+      guardsHtml += `
+        <div class="bilan-guard stop">
+          <div class="ico">🛑</div>
+          <div style="flex:1;">
+            <div class="title">Stop-loss atteint aujourd'hui</div>
+            <div class="desc">P&amp;L du jour <strong style="color:#f87171;">${guards.plToday.toFixed(2)}€</strong> · seuil −15% bankroll = <strong>${guards.stopLoss.toFixed(2)}€</strong>. Mieux vaut laisser décanter.</div>
+          </div>
+        </div>`;
+    }
+    if (overCap) {
+      guardsHtml += `
+        <div class="bilan-guard warn">
+          <div class="ico">⚠️</div>
+          <div style="flex:1;">
+            <div class="title">Exposition du jour dépassée</div>
+            <div class="desc">Engagé <strong style="color:#fbbf24;">${guards.engagedToday.toFixed(2)}€</strong> · plafond 5% bankroll = <strong>${guards.dailyCap.toFixed(2)}€</strong>. Tu empiles du risque corrélé.</div>
+          </div>
+        </div>`;
+    }
+
+    // Per-sport cards
+    const perSportHtml = Object.entries(perSport)
+      .sort((a,b) => b[1].bets - a[1].bets)
+      .map(([sport, s]) => {
+        const sw = s.bets ? (100*s.w/s.bets) : 0;
+        const sr = s.bets ? (100*s.pl/s.bets) : 0;
+        const roiColor = sr >= 0 ? '#34d399' : '#f87171';
+        return `<div class="bilan-sport-card">
+          <div class="sport-name">${esc(sportLabel(sport))}</div>
+          <div class="sport-wr">${sw.toFixed(0)}% <span style="font-size:11px;color:var(--text-dim2);font-weight:500;letter-spacing:0;">WR</span></div>
+          <div class="sport-roi" style="color:${roiColor};">ROI ${sr>=0?'+':''}${sr.toFixed(0)}% · ${s.bets} paris</div>
+        </div>`;
+      }).join('');
+
+    // Personal history rows — paginated. _bilanHistLimits kept on module scope
+    // so pressing "Voir plus" persists across re-renders until data.js changes.
+    if (typeof _bilanHistLimits === 'undefined') _bilanHistLimits = { perso: 40, modele: 40 };
+    const persoTotal = hasMyBets ? mine.rows.length : 0;
+    const modeleTotal = rows.length;
+    const persoLimit = Math.min(_bilanHistLimits.perso, persoTotal);
+    const modeleLimit = Math.min(_bilanHistLimits.modele, modeleTotal);
+    let myRowsHtml = '';
+    let corrMap = {};
+    if (hasMyBets) {
       mine.rows.forEach(r => { corrMap[r.bet.matchId] = (corrMap[r.bet.matchId] || 0) + 1; });
-      const myRowsHtml = mine.rows.slice(0, 30).map(r => {
+      myRowsHtml = mine.rows.slice(0, persoLimit).map(r => {
         const m = r.match;
         const { home, away } = m ? getSides(m) : { home: null, away: null };
         const date = (r.bet.placedAt || '').slice(0, 10);
         const corrCount = corrMap[r.bet.matchId] || 1;
         const corrBadge = corrCount > 1 ? ` <span title="${corrCount} paris sur ce même match — risque corrélé." style="padding:1px 5px;border-radius:4px;background:rgba(251,191,36,.16);color:#fbbf24;font-size:10px;font-weight:700;vertical-align:middle;">⚠️${corrCount}</span>` : '';
-        const matchNameText = m ? `${(home?.short||home?.name||'?')} vs ${(away?.short||away?.name||'?')}` : `(match supprimé ${r.bet.matchId})`;
+        const matchNameText = m ? `${(home?.short||home?.name||'?')} vs ${(away?.short||away?.name||'?')}` : `(match supprimé)`;
         const matchCell = esc(matchNameText) + corrBadge;
-        const resColor = r.res === 'won' ? '#34d399' : r.res === 'lost' ? '#f87171' : 'var(--text-muted)';
+        const resColor = r.res === 'won' ? '#34d399' : r.res === 'lost' ? '#f87171' : 'var(--text-dim)';
         const resLabel = r.res === 'won' ? `✓ +${(r.payout - r.bet.stake).toFixed(2)}€`
-                      : r.res === 'lost' ? `✗ -${r.bet.stake.toFixed(2)}€`
+                      : r.res === 'lost' ? `✗ −${r.bet.stake.toFixed(2)}€`
                       : '⏳ en attente';
         return `<tr>
-          <td style="padding:6px 8px;color:var(--text-dim);font-size:12px;">${esc(date)}</td>
-          <td style="padding:6px 8px;">${matchCell}</td>
-          <td style="padding:6px 8px;color:var(--text-muted);font-size:12px;">${esc(r.bet.pickLabel)}</td>
-          <td style="padding:6px 8px;text-align:right;">@${r.bet.odds.toFixed(2)}</td>
-          <td style="padding:6px 8px;text-align:right;font-variant-numeric:tabular-nums;">${r.bet.stake.toFixed(2)}€</td>
-          <td style="padding:6px 8px;text-align:right;font-weight:700;color:${resColor};">${esc(resLabel)}</td>
-          <td style="padding:6px 8px;text-align:right;"><button data-mybet-del="${esc(r.key)}" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;" title="Retirer du bilan">×</button></td>
+          <td style="color:var(--text-dim);font-size:12px;">${esc(date)}</td>
+          <td>${matchCell}</td>
+          <td style="color:var(--text-dim);font-size:12px;">${esc(r.bet.pickLabel)}</td>
+          <td style="text-align:right;font-variant-numeric:tabular-nums;">@${r.bet.odds.toFixed(2)}</td>
+          <td style="text-align:right;font-variant-numeric:tabular-nums;">${r.bet.stake.toFixed(2)}€</td>
+          <td style="text-align:right;font-weight:700;color:${resColor};">${esc(resLabel)}</td>
+          <td style="text-align:right;"><button data-mybet-del="${esc(r.key)}" style="background:none;border:none;color:var(--text-dim2);cursor:pointer;font-size:14px;" title="Retirer du bilan">×</button></td>
         </tr>`;
       }).join('');
-      // Bankroll tracker: starting bankroll (Kelly reference) + cumulative
-      // settled P&L = current bankroll. Shows Théo his actual cash position
-      // as it evolves with his personal bets.
-      const startBankroll = bankroll;
-      const currentBankroll = startBankroll + mine.pl;
-      const bkDelta = mine.pl;
-      const bkDeltaPct = startBankroll > 0 ? (bkDelta / startBankroll * 100) : 0;
-      const bkColor = bkDelta >= 0 ? '#34d399' : '#f87171';
-      const bankrollCard = `
-        <div style="padding:16px;background:linear-gradient(135deg,${bkDelta>=0?'rgba(52,211,153,.18)':'rgba(248,113,113,.18)'} 0%,${bkDelta>=0?'rgba(16,185,129,.12)':'rgba(239,68,68,.12)'} 100%);border:1px solid ${bkDelta>=0?'rgba(52,211,153,.3)':'rgba(248,113,113,.3)'};border-radius:12px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
-          <div>
-            <div style="font-size:11px;color:var(--text-muted);letter-spacing:.5px;text-transform:uppercase;">Bankroll actuelle</div>
-            <div style="font-size:32px;font-weight:800;color:${bkColor};line-height:1.1;">${currentBankroll.toFixed(2)}€</div>
-            <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Départ ${startBankroll.toFixed(2)}€ · <span style="color:${bkColor};font-weight:600;">${bkDelta>=0?'+':''}${bkDelta.toFixed(2)}€ (${bkDeltaPct>=0?'+':''}${bkDeltaPct.toFixed(1)}%)</span></div>
-          </div>
-          <div style="display:flex;align-items:center;gap:6px;">
-            <label style="font-size:11px;color:var(--text-muted);">Bankroll de départ :</label>
-            <input type="number" id="bankroll-input" value="${startBankroll.toFixed(2)}" min="1" step="1" style="width:80px;padding:4px 8px;background:var(--bg,#0c1220);border:1px solid var(--border,#2a3744);border-radius:6px;color:var(--text,#fff);font-size:13px;"/>
-            <span style="font-size:12px;color:var(--text-muted);">€</span>
-          </div>
-        </div>`;
-      // Garde-fous : daily cap (5%) + session stop-loss (−15%). Banners shown
-      // only when thresholds are actually tripped, so the bilan stays clean
-      // on normal days.
-      const guards = computeBankrollGuards();
-      const overCap = guards.engagedToday > guards.dailyCap;
-      const hitStopLoss = guards.plToday < guards.stopLoss;
-      let guardsHtml = '';
-      if (hitStopLoss) {
-        guardsHtml += `
-          <div style="padding:14px 16px;background:linear-gradient(135deg,rgba(248,113,113,.18) 0%,rgba(239,68,68,.14) 100%);border:1px solid rgba(248,113,113,.4);border-left:4px solid #f87171;border-radius:10px;margin-bottom:12px;display:flex;gap:12px;align-items:center;">
-            <div style="font-size:22px;">🛑</div>
-            <div style="flex:1;">
-              <div style="font-weight:700;color:#fca5a5;font-size:14px;">Stop-loss atteint aujourd'hui</div>
-              <div style="font-size:12.5px;color:var(--text-dim,#b4bcc7);margin-top:2px;">P&amp;L du jour <strong style="color:#f87171;">${guards.plToday.toFixed(2)}€</strong> — seuil fixé à <strong>${guards.stopLoss.toFixed(2)}€</strong> (−15% bankroll). Mieux vaut laisser décanter jusqu'à demain.</div>
-            </div>
-          </div>`;
-      }
-      if (overCap) {
-        guardsHtml += `
-          <div style="padding:14px 16px;background:linear-gradient(135deg,rgba(251,191,36,.16) 0%,rgba(245,158,11,.12) 100%);border:1px solid rgba(251,191,36,.4);border-left:4px solid #fbbf24;border-radius:10px;margin-bottom:12px;display:flex;gap:12px;align-items:center;">
-            <div style="font-size:22px;">⚠️</div>
-            <div style="flex:1;">
-              <div style="font-weight:700;color:#fcd34d;font-size:14px;">Exposition du jour dépassée</div>
-              <div style="font-size:12.5px;color:var(--text-dim,#b4bcc7);margin-top:2px;">Engagé aujourd'hui <strong style="color:#fbbf24;">${guards.engagedToday.toFixed(2)}€</strong> · plafond 5% bankroll = <strong>${guards.dailyCap.toFixed(2)}€</strong>. Tu empiles du risque corrélé.</div>
-            </div>
-          </div>`;
-      }
-      mySection = `
-        <h2 style="margin:0 0 12px;font-size:20px;">💼 Mes paris — bilan perso</h2>
-        ${guardsHtml}
-        ${bankrollCard}
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px;">
-          <div style="padding:14px;background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.2);border-radius:10px;">
-            <div style="font-size:11px;color:var(--text-muted);letter-spacing:.5px;text-transform:uppercase;">Misé total</div>
-            <div style="font-size:22px;font-weight:700;">${mine.staked.toFixed(2)}€</div>
-            <div style="font-size:11px;color:var(--text-muted);">${mine.settled} réglés · ${mine.pending} en attente</div>
-          </div>
-          <div style="padding:14px;background:${mine.pl>=0?'rgba(52,211,153,.08)':'rgba(248,113,113,.08)'};border:1px solid ${mine.pl>=0?'rgba(52,211,153,.2)':'rgba(248,113,113,.2)'};border-radius:10px;">
-            <div style="font-size:11px;color:var(--text-muted);letter-spacing:.5px;text-transform:uppercase;">Gain / perte</div>
-            <div style="font-size:22px;font-weight:700;color:${mine.pl>=0?'#34d399':'#f87171'};">${mine.pl>=0?'+':''}${mine.pl.toFixed(2)}€</div>
-            <div style="font-size:11px;color:var(--text-muted);">Retours: ${mine.returned.toFixed(2)}€</div>
-          </div>
-          <div style="padding:14px;background:${myRoiPct>=0?'rgba(52,211,153,.08)':'rgba(248,113,113,.08)'};border:1px solid ${myRoiPct>=0?'rgba(52,211,153,.2)':'rgba(248,113,113,.2)'};border-radius:10px;">
-            <div style="font-size:11px;color:var(--text-muted);letter-spacing:.5px;text-transform:uppercase;">ROI perso</div>
-            <div style="font-size:22px;font-weight:700;color:${myRoiPct>=0?'#34d399':'#f87171'};">${myRoiPct>=0?'+':''}${myRoiPct.toFixed(1)}%</div>
-            <div style="font-size:11px;color:var(--text-muted);">${mine.w}W · ${mine.l}L</div>
-          </div>
-        </div>
-        ${myChartHtml}
-        <details style="margin-bottom:28px;">
-          <summary style="cursor:pointer;color:var(--text-muted);font-size:13px;padding:6px 0;">Historique (${Math.min(mine.rows.length, 30)}/${mine.rows.length})</summary>
-          <div style="overflow-x:auto;margin-top:8px;">
-            <table style="width:100%;border-collapse:collapse;font-size:13px;">
-              <thead><tr style="text-align:left;color:var(--text-muted);border-bottom:1px solid var(--border);">
-                <th style="padding:8px;">Date</th><th style="padding:8px;">Match</th><th style="padding:8px;">Pick</th><th style="padding:8px;text-align:right;">Cote</th><th style="padding:8px;text-align:right;">Mise</th><th style="padding:8px;text-align:right;">Résultat</th><th></th>
-              </tr></thead>
-              <tbody>${myRowsHtml}</tbody>
-            </table>
-          </div>
-        </details>
-      `;
-    } else {
-      mySection = `
-        <h2 style="margin:0 0 12px;font-size:20px;">💼 Mes paris — bilan perso</h2>
-        <div style="padding:14px;background:var(--surface);border:1px dashed var(--border);border-radius:10px;color:var(--text-muted);font-size:13px;margin-bottom:24px;">
-          Pas encore de pari enregistré. Clique sur 💰 <strong>J'ai parié</strong> sur une carte Top pick pour alimenter ton bilan perso.
-        </div>
-      `;
     }
 
-    wrap.innerHTML = `
-      <div style="margin-top:0;">
-        ${mySection}
-        <h2 style="margin:0 0 12px;font-size:20px;">📊 Bilan global du modèle</h2>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:24px;">
-          <div style="padding:16px;background:linear-gradient(135deg,rgba(99,102,241,.15) 0%,rgba(79,70,229,.15) 100%);border:1px solid rgba(99,102,241,.3);border-radius:12px;">
-            <div style="font-size:11px;color:var(--text-muted);letter-spacing:.5px;text-transform:uppercase;">Paris joués</div>
-            <div style="font-size:32px;font-weight:800;">${model.bets}</div>
+    // Model history rows — paginated (see _bilanHistLimits above)
+    const modelRowsHtml = rows.slice().reverse().slice(0, modeleLimit).map(r => {
+      const { home, away } = getSides(r.m);
+      const cls = r.res === 'won' ? 'style="color:#34d399;font-weight:600;"' : 'style="color:#f87171;"';
+      return `<tr>
+        <td style="color:var(--text-dim);font-size:12px;">${esc(fmtDate(r.m.date?.slice(0,10)||''))}</td>
+        <td>${esc((home?.short||home?.name||''))} <span style="color:var(--text-dim2);">vs</span> ${esc((away?.short||away?.name||''))}</td>
+        <td style="color:var(--text-dim);font-size:12px;">${esc(sportLabel(r.m.sport))}</td>
+        <td ${cls}>${esc(r.pred.pick.label)}</td>
+        <td style="text-align:right;font-variant-numeric:tabular-nums;">@${r.odd.toFixed(2)}</td>
+        <td style="text-align:right;font-weight:700;color:${r.res==='won'?'#34d399':'#f87171'};">${r.res==='won'?'✓ +'+(r.odd-1).toFixed(2):'✗ −1.00'}</td>
+      </tr>`;
+    }).join('');
+
+    const bkPositive = bkDelta >= 0;
+
+    // ========= MODEL AGGREGATE STATS — Wilson CI + drawdown =========
+    // Wilson CI on the overall model WR. Surfaces "the +11% ROI is noise" on
+    // small samples. 95% confidence level (z=1.96).
+    const overallCI = wilsonCI(model.w, model.bets);
+    const modelChronoDeltas = chronoRows.map(r => r.res === 'won' ? (r.odd - 1) : -1);
+    const dd = maxDrawdown(modelChronoDeltas);
+    const ddPctOfBankroll = startBankroll > 0 ? (dd.maxDD / startBankroll * 100) : 0;
+
+    // ========= MODEL HERO + BREAKDOWN HTML =========
+    const modelPlPositive = model.pl >= 0;
+    const modelHeroHtml = `
+      <div class="bilan-hero ${modelPlPositive ? '' : 'negative'}" style="background:
+        radial-gradient(700px 350px at 100% 0%, rgba(167,139,250,.14), transparent 60%),
+        radial-gradient(600px 350px at 0% 100%, ${modelPlPositive?'rgba(52,211,153,.10)':'rgba(248,113,113,.10)'}, transparent 60%),
+        linear-gradient(180deg, #10101a 0%, #0b0b10 100%); border-color: rgba(167,139,250,.32);">
+        <div>
+          <div class="bk-label" style="color:#a78bfa;">📊 Bilan modèle · P&amp;L cumulé (flat 1u)</div>
+          <div class="bk-value" style="color:${modelPlPositive?'#34d399':'#f87171'};">${modelPlPositive?'+':''}${model.pl.toFixed(2)}u</div>
+          <div class="bk-delta ${modelPlPositive?'pos':'neg'}">
+            ${modelPlPositive?'↑':'↓'} ROI ${roi>=0?'+':''}${roi.toFixed(1)}% · WR ${wr.toFixed(0)}%
+            ${model.bets >= 3 ? `<span style="color:var(--text-dim2);font-weight:500;font-size:11px;margin-left:8px;">(IC 95% : ${(overallCI.low*100).toFixed(0)}–${(overallCI.high*100).toFixed(0)}%)</span>` : ''}
           </div>
-          <div style="padding:16px;background:linear-gradient(135deg,rgba(52,211,153,.12) 0%,rgba(16,185,129,.12) 100%);border:1px solid rgba(52,211,153,.3);border-radius:12px;">
-            <div style="font-size:11px;color:var(--text-muted);letter-spacing:.5px;text-transform:uppercase;">Win rate</div>
-            <div style="font-size:32px;font-weight:800;">${wr}%</div>
-            <div style="font-size:12px;color:var(--text-muted);">${model.w}W · ${model.l}L</div>
-          </div>
-          <div style="padding:16px;background:linear-gradient(135deg,${roi>=0?'rgba(52,211,153,.12)':'rgba(248,113,113,.12)'} 0%,${roi>=0?'rgba(16,185,129,.12)':'rgba(239,68,68,.12)'} 100%);border:1px solid ${roi>=0?'rgba(52,211,153,.3)':'rgba(248,113,113,.3)'};border-radius:12px;">
-            <div style="font-size:11px;color:var(--text-muted);letter-spacing:.5px;text-transform:uppercase;">ROI</div>
-            <div style="font-size:32px;font-weight:800;color:${roi>=0?'#34d399':'#f87171'};">${roi>=0?'+':''}${roi}%</div>
-            <div style="font-size:12px;color:var(--text-muted);">P&L net: ${model.pl>=0?'+':''}${model.pl.toFixed(2)}u</div>
-          </div>
+          <div class="bk-start">${model.w}W · ${model.l}L sur ${model.bets} paris évalués${model.bets < 30 ? ' · <span style="color:#fbbf24;">⚠️ échantillon faible</span>' : ''}</div>
         </div>
-
-        ${chartHtml}
-
-        <h3 style="margin:24px 0 12px;font-size:16px;">Calibration du modèle</h3>
-        ${renderReliabilityDiagram(computeCalibration())}
-
-        <h3 style="margin:24px 0 12px;font-size:16px;">Par sport</h3>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;">${perSportHtml || '<div class="empty">Aucun résultat pour le moment.</div>'}</div>
-
-        <h3 style="margin:24px 0 12px;font-size:16px;">Historique (40 derniers)</h3>
-        <div style="overflow-x:auto;">
-          <table style="width:100%;border-collapse:collapse;font-size:13px;">
-            <thead><tr style="text-align:left;color:var(--text-muted);border-bottom:1px solid var(--border);">
-              <th style="padding:8px;">Date</th><th style="padding:8px;">Match</th><th style="padding:8px;">Sport</th><th style="padding:8px;">Pick</th><th style="padding:8px;text-align:right;">Cote</th><th style="padding:8px;text-align:right;">Résultat</th>
-            </tr></thead>
-            <tbody>${rowsHtml}</tbody>
-          </table>
+        <div class="bk-side">
+          <div class="bk-mini"><span class="lbl">Série en cours</span><span class="val" style="color:${curStreak.type==='W'?'#34d399':curStreak.type==='L'?'#f87171':'var(--text-dim)'};">${curStreak.count ? `${curStreak.count}${curStreak.type}` : '—'}</span></div>
+          <div class="bk-mini"><span class="lbl">Meilleure série W</span><span class="val" style="color:#34d399;">${bestWin.count || 0}W</span></div>
+          <div class="bk-mini"><span class="lbl">Pire série L</span><span class="val" style="color:#f87171;">${worstLoss.count || 0}L</span></div>
+          <div class="bk-mini" title="Plus forte baisse pic-à-creux de l'équité cumulée — le nombre qui compte vraiment pour dimensionner Kelly.">
+            <span class="lbl">Max drawdown</span>
+            <span class="val" style="color:#f87171;">${dd.maxDD > 0 ? '−'+dd.maxDD.toFixed(2)+'u' : '—'}</span>
+          </div>
+          <div class="bk-mini" title="Paris perdus d'extrême justesse (1 but foot/hockey, 3 pts basket). Signal de chance indirecte.">
+            <span class="lbl">Near-miss</span>
+            <span class="val" style="color:#fbbf24;">${nearMissCount || 0}</span>
+          </div>
         </div>
       </div>
     `;
-    // Wire delete buttons for personal bets
+
+    // ========= CALENDAR HEATMAP + EQUITY VS BASELINE =========
+    const heatmapHtml = renderCalendarHeatmap(byDay);
+    const equityVsBaselineHtml = renderEquityVsBaseline(chronoRows);
+
+    // ========= ROI PAR HEURE + ROI PAR JOUR DE SEMAINE =========
+    const hourBuckets = bilanByKickoffHour(rows);
+    const dowBuckets = bilanByDayOfWeek(rows);
+    const hourRowsHtml = Array.from({ length: 24 }, (_, h) => h).map(h => {
+      const b = hourBuckets[h];
+      if (!b || !b.bets) return '';
+      const wr_ = b.bets ? 100 * b.w / b.bets : 0;
+      const roi_ = b.bets ? 100 * b.pl / b.bets : 0;
+      return `<tr>
+        <td style="font-variant-numeric:tabular-nums;color:var(--text-dim);">${String(h).padStart(2,'0')}h–${String((h+1)%24).padStart(2,'0')}h</td>
+        <td style="text-align:right;color:var(--text-dim);font-variant-numeric:tabular-nums;">${b.bets}</td>
+        <td style="text-align:right;font-variant-numeric:tabular-nums;">${wr_.toFixed(0)}%</td>
+        <td style="text-align:right;font-weight:700;font-variant-numeric:tabular-nums;color:${roi_>=0?'#34d399':'#f87171'};">${roi_>=0?'+':''}${roi_.toFixed(1)}%</td>
+        <td style="text-align:right;font-variant-numeric:tabular-nums;color:${b.pl>=0?'#34d399':'#f87171'};">${b.pl>=0?'+':''}${b.pl.toFixed(2)}u</td>
+      </tr>`;
+    }).filter(Boolean).join('');
+    const dowNames = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+    const dowRowsHtml = [1,2,3,4,5,6,0].map(d => {
+      const b = dowBuckets[d];
+      if (!b || !b.bets) return '';
+      const wr_ = 100 * b.w / b.bets;
+      const roi_ = 100 * b.pl / b.bets;
+      return `<tr>
+        <td style="font-weight:600;">${dowNames[d]}</td>
+        <td style="text-align:right;color:var(--text-dim);font-variant-numeric:tabular-nums;">${b.bets}</td>
+        <td style="text-align:right;font-variant-numeric:tabular-nums;">${wr_.toFixed(0)}%</td>
+        <td style="text-align:right;font-weight:700;font-variant-numeric:tabular-nums;color:${roi_>=0?'#34d399':'#f87171'};">${roi_>=0?'+':''}${roi_.toFixed(1)}%</td>
+        <td style="text-align:right;font-variant-numeric:tabular-nums;color:${b.pl>=0?'#34d399':'#f87171'};">${b.pl>=0?'+':''}${b.pl.toFixed(2)}u</td>
+      </tr>`;
+    }).filter(Boolean).join('');
+
+    // Time-window filter toolbar
+    const winLabel = (_bilanWindow === 0) ? 'Tout' : `${_bilanWindow} derniers jours`;
+    const windowToolbarHtml = `
+      <div class="bilan-window-toolbar" aria-label="Fenêtre temporelle">
+        <span class="win-lbl">Fenêtre :</span>
+        ${[
+          [7, '7j'], [30, '30j'], [90, '90j'], [0, 'Tout'],
+        ].map(([v, lbl]) => `<button class="bilan-win-btn${_bilanWindow===v?' active':''}" data-win="${v}">${lbl}</button>`).join('')}
+        <span class="win-hint">${rows.length} pari${rows.length>1?'s':''} sur ${winLabel.toLowerCase()}</span>
+      </div>
+    `;
+
+    // Buckets de confiance — with Wilson 95% CI on WR so small-sample noise
+    // is visible. A "High" bucket with 5/6 (83%) looks identical to 50/60 (83%)
+    // at first glance; Wilson makes the difference undeniable.
+    const renderBucket = (lbl, b, color, rangeTxt) => {
+      const wr_ = b.bets ? (100*b.w/b.bets) : 0;
+      const roi_ = b.bets ? (100*b.pl/b.bets) : 0;
+      const ci = wilsonCI(b.w, b.bets);
+      const ciWidth = (ci.high - ci.low) * 100;
+      const tooNarrow = b.bets < 10;
+      const ciText = b.bets >= 3
+        ? `<div style="font-size:10px;color:var(--text-dim2);margin-top:4px;font-weight:500;">
+             IC 95% WR: ${(ci.low*100).toFixed(0)}–${(ci.high*100).toFixed(0)}%
+             ${tooNarrow ? ' <span style="color:#fbbf24;">⚠️ peu fiable</span>' : ''}
+           </div>`
+        : '';
+      return `<div class="bilan-sport-card" style="border-color:${color}55;">
+        <div class="sport-name" style="color:${color};">${lbl} <span style="color:var(--text-dim2);font-weight:500;">· ${rangeTxt}</span></div>
+        <div class="sport-wr">${b.bets ? wr_.toFixed(0)+'%' : '—'} <span style="font-size:11px;color:var(--text-dim2);font-weight:500;letter-spacing:0;">WR</span></div>
+        <div class="sport-roi" style="color:${roi_>=0?'#34d399':'#f87171'};">ROI ${roi_>=0?'+':''}${roi_.toFixed(0)}% · ${b.bets} paris</div>
+        ${ciText}
+      </div>`;
+    };
+    const bucketsHtml = `
+      ${renderBucket('🔒 High', bucket.high, '#34d399', '≥ 65%')}
+      ${renderBucket('⚖️ Mid', bucket.mid, '#a78bfa', '55–65%')}
+      ${renderBucket('🎲 Low', bucket.low, '#fbbf24', '50–55%')}
+    `;
+
+    // Top 10 ligues (tri par volume décroissant)
+    const leagueEntries = Object.entries(perLeague)
+      .filter(([, s]) => s.bets >= 3)
+      .sort((a, b) => b[1].bets - a[1].bets)
+      .slice(0, 10);
+    const leaguesHtml = leagueEntries.map(([name, s]) => {
+      const wr_ = s.bets ? (100*s.w/s.bets) : 0;
+      const roi_ = s.bets ? (100*s.pl/s.bets) : 0;
+      return `<tr>
+        <td style="font-weight:600;">${esc(name)}</td>
+        <td style="text-align:right;color:var(--text-dim);font-variant-numeric:tabular-nums;">${s.bets}</td>
+        <td style="text-align:right;font-variant-numeric:tabular-nums;">${wr_.toFixed(0)}%</td>
+        <td style="text-align:right;font-weight:700;font-variant-numeric:tabular-nums;color:${roi_>=0?'#34d399':'#f87171'};">${roi_>=0?'+':''}${roi_.toFixed(1)}%</td>
+        <td style="text-align:right;font-variant-numeric:tabular-nums;color:${s.pl>=0?'#34d399':'#f87171'};">${s.pl>=0?'+':''}${s.pl.toFixed(2)}u</td>
+      </tr>`;
+    }).join('');
+
+    // Records cards
+    const fmtMatchShort = (m) => {
+      if (!m) return '—';
+      const { home, away } = getSides(m);
+      return `${home?.short || home?.name || '?'} vs ${away?.short || away?.name || '?'}`;
+    };
+    const recordsHtml = `
+      <div class="bilan-sport-card">
+        <div class="sport-name" style="color:#34d399;">💥 Plus grosse cote gagnée</div>
+        <div class="sport-wr" style="color:#34d399;">${biggestWin ? '+'+biggestWin.delta.toFixed(2)+'u' : '—'}</div>
+        <div class="sport-roi" style="color:var(--text-dim);">${biggestWin ? esc(fmtMatchShort(biggestWin.match))+' @'+biggestWin.odd.toFixed(2) : 'aucune'}</div>
+      </div>
+      <div class="bilan-sport-card">
+        <div class="sport-name" style="color:#f87171;">💔 Plus grosse cote perdue</div>
+        <div class="sport-wr" style="color:#f87171;">${biggestLoss ? biggestLoss.delta.toFixed(2)+'u' : '—'}</div>
+        <div class="sport-roi" style="color:var(--text-dim);">${biggestLoss ? esc(fmtMatchShort(biggestLoss.match))+' @'+biggestLoss.odd.toFixed(2) : 'aucune'}</div>
+      </div>
+      <div class="bilan-sport-card">
+        <div class="sport-name" style="color:#34d399;">🏆 Meilleure journée</div>
+        <div class="sport-wr" style="color:#34d399;">${bestDay ? '+'+bestDay.delta.toFixed(2)+'u' : '—'}</div>
+        <div class="sport-roi" style="color:var(--text-dim);">${bestDay ? esc(fmtDate(bestDay.date)) : 'aucune'}</div>
+      </div>
+      <div class="bilan-sport-card">
+        <div class="sport-name" style="color:#f87171;">🕳️ Pire journée</div>
+        <div class="sport-wr" style="color:#f87171;">${worstDay ? worstDay.delta.toFixed(2)+'u' : '—'}</div>
+        <div class="sport-roi" style="color:var(--text-dim);">${worstDay ? esc(fmtDate(worstDay.date)) : 'aucune'}</div>
+      </div>
+    `;
+
+    // ========= BUILD HTML =========
+    wrap.innerHTML = `
+      <!-- HERO: Bankroll current position -->
+      <div class="bilan-hero ${bkPositive ? '' : 'negative'}">
+        <div>
+          <div class="bk-label">Bankroll actuelle</div>
+          <div class="bk-value" style="color:${bkPositive ? '#34d399' : '#f87171'};">${currentBankroll.toFixed(2)}€</div>
+          <div class="bk-delta ${bkPositive ? 'pos' : 'neg'}">
+            ${bkPositive ? '↑' : '↓'} ${bkPositive ? '+' : ''}${bkDelta.toFixed(2)}€ · ${bkDeltaPct>=0?'+':''}${bkDeltaPct.toFixed(1)}%
+          </div>
+          <div class="bk-start">Départ ${startBankroll.toFixed(2)}€ · ${hasMyBets ? `${mine.settled} pari${mine.settled>1?'s':''} réglés` : 'aucun pari réglé'}</div>
+        </div>
+        <div class="bk-side">
+          ${hasMyBets ? `
+            <div class="bk-mini"><span class="lbl">Misé</span><span class="val">${mine.staked.toFixed(2)}€</span></div>
+            <div class="bk-mini"><span class="lbl">Retours</span><span class="val">${mine.returned.toFixed(2)}€</span></div>
+            <div class="bk-mini"><span class="lbl">Record</span><span class="val">${mine.w}W · ${mine.l}L${mine.pending?` · ${mine.pending}⏳`:''}</span></div>
+          ` : `
+            <div style="color:var(--text-dim);font-size:13px;line-height:1.5;">
+              Pas encore de pari enregistré. Clique sur <strong>💰 J'ai parié</strong> sur une carte Top pick pour alimenter ton bilan.
+            </div>
+          `}
+          <div class="bk-input">
+            <label>Bankroll de départ</label>
+            <input type="number" id="bilan-bankroll-input" value="${startBankroll.toFixed(2)}" min="1" step="1">
+            <span style="font-size:12px;color:var(--text-dim2);">€</span>
+          </div>
+        </div>
+      </div>
+
+      ${guardsHtml}
+
+      <!-- TIME-WINDOW FILTER -->
+      ${windowToolbarHtml}
+
+      <!-- KPI STRIP -->
+      <div class="bilan-kpis">
+        <div class="bilan-kpi">
+          <div class="kpi-label">ROI perso</div>
+          <div class="kpi-value ${myRoiPct>=0?'pos':'neg'}">${hasMyBets ? (myRoiPct>=0?'+':'')+myRoiPct.toFixed(1)+'%' : '—'}</div>
+          <div class="kpi-sub">${hasMyBets ? `${mine.settled} réglés · ${mine.pending} en attente` : 'à calibrer'}</div>
+        </div>
+        <div class="bilan-kpi brand">
+          <div class="kpi-label">ROI modèle (flat 1u)</div>
+          <div class="kpi-value ${roi>=0?'pos':'neg'}">${model.bets ? (roi>=0?'+':'')+roi.toFixed(1)+'%' : '—'}</div>
+          <div class="kpi-sub">P&amp;L ${model.pl>=0?'+':''}${model.pl.toFixed(2)}u</div>
+        </div>
+        <div class="bilan-kpi">
+          <div class="kpi-label">Win rate modèle</div>
+          <div class="kpi-value">${model.bets ? wr.toFixed(0)+'%' : '—'}</div>
+          <div class="kpi-sub">${model.w}W · ${model.l}L</div>
+        </div>
+        <div class="bilan-kpi">
+          <div class="kpi-label">Paris évalués</div>
+          <div class="kpi-value">${model.bets}</div>
+          <div class="kpi-sub">sur ${completed.length} matchs terminés</div>
+        </div>
+      </div>
+
+      <!-- CHARTS ROW: perso + modèle -->
+      <div class="bilan-row-2">
+        <div class="bilan-section">
+          <div class="bilan-section-head">
+            <h3>💼 P&amp;L perso (€ réels)</h3>
+            <div class="meta">${hasMyBets ? `${mine.settled} réglés` : 'aucun'}</div>
+          </div>
+          ${myChartHtml}
+        </div>
+        <div class="bilan-section">
+          <div class="bilan-section-head">
+            <h3>📊 P&amp;L modèle (unité flat)</h3>
+            <div class="meta">${model.bets} paris évalués</div>
+          </div>
+          ${modelChartHtml}
+        </div>
+      </div>
+
+      <!-- MODEL HERO: vue d'ensemble -->
+      ${modelHeroHtml}
+
+      <!-- BUCKETS DE CONFIANCE + RECORDS -->
+      <div class="bilan-row-2">
+        <div class="bilan-section">
+          <div class="bilan-section-head">
+            <h3>🎯 ROI par niveau de confiance</h3>
+            <div class="meta">Buckets proba modèle</div>
+          </div>
+          <div class="bilan-sports">${bucketsHtml}</div>
+        </div>
+        <div class="bilan-section">
+          <div class="bilan-section-head">
+            <h3>📈 Records du modèle</h3>
+            <div class="meta">Plus gros coups</div>
+          </div>
+          <div class="bilan-sports">${recordsHtml}</div>
+        </div>
+      </div>
+
+      <!-- EQUITY VS BASELINE -->
+      ${equityVsBaselineHtml ? `
+      <div class="bilan-section">
+        <div class="bilan-section-head">
+          <h3>📈 Modèle vs « toujours favori »</h3>
+          <div class="meta">Alpha cumulé par rapport au marché</div>
+        </div>
+        ${equityVsBaselineHtml}
+      </div>` : ''}
+
+      <!-- CALENDAR HEATMAP -->
+      <div class="bilan-section">
+        <div class="bilan-section-head">
+          <h3>🗓️ Calendrier P&amp;L (52 semaines)</h3>
+          <div class="meta">Chaque case = 1 jour · vert = +u · rouge = −u</div>
+        </div>
+        ${heatmapHtml}
+      </div>
+
+      <!-- ROI PAR HEURE + ROI PAR JOUR -->
+      <div class="bilan-row-2">
+        <div class="bilan-section">
+          <div class="bilan-section-head">
+            <h3>🕐 ROI par heure de kickoff</h3>
+            <div class="meta">Heure locale</div>
+          </div>
+          ${hourRowsHtml ? `
+            <div style="overflow-x:auto;">
+              <table class="bilan-table">
+                <thead><tr>
+                  <th>Heure</th>
+                  <th style="text-align:right;">Paris</th>
+                  <th style="text-align:right;">WR</th>
+                  <th style="text-align:right;">ROI</th>
+                  <th style="text-align:right;">P&amp;L</th>
+                </tr></thead>
+                <tbody>${hourRowsHtml}</tbody>
+              </table>
+            </div>
+          ` : `<div class="bilan-empty">Pas assez de volume pour ventiler par heure.</div>`}
+        </div>
+        <div class="bilan-section">
+          <div class="bilan-section-head">
+            <h3>📅 ROI par jour de semaine</h3>
+            <div class="meta">Lun → Dim</div>
+          </div>
+          ${dowRowsHtml ? `
+            <div style="overflow-x:auto;">
+              <table class="bilan-table">
+                <thead><tr>
+                  <th>Jour</th>
+                  <th style="text-align:right;">Paris</th>
+                  <th style="text-align:right;">WR</th>
+                  <th style="text-align:right;">ROI</th>
+                  <th style="text-align:right;">P&amp;L</th>
+                </tr></thead>
+                <tbody>${dowRowsHtml}</tbody>
+              </table>
+            </div>
+          ` : `<div class="bilan-empty">Pas assez de volume pour ventiler par jour.</div>`}
+        </div>
+      </div>
+
+      <!-- TOP 10 LIGUES -->
+      <div class="bilan-section">
+        <div class="bilan-section-head">
+          <h3>🏆 Top 10 ligues (par volume)</h3>
+          <div class="meta">Min 3 paris</div>
+        </div>
+        ${leaguesHtml ? `
+          <div style="overflow-x:auto;">
+            <table class="bilan-table">
+              <thead><tr>
+                <th>Ligue</th>
+                <th style="text-align:right;">Paris</th>
+                <th style="text-align:right;">WR</th>
+                <th style="text-align:right;">ROI</th>
+                <th style="text-align:right;">P&amp;L</th>
+              </tr></thead>
+              <tbody>${leaguesHtml}</tbody>
+            </table>
+          </div>
+        ` : `<div class="bilan-empty">Pas assez de volume par ligue pour le moment.</div>`}
+      </div>
+
+      <!-- CALIBRATION -->
+      <div class="bilan-section">
+        <div class="bilan-section-head">
+          <h3>🎯 Calibration du modèle</h3>
+          <div class="meta">Proba prédite vs taux de réussite observé</div>
+        </div>
+        ${renderReliabilityDiagram(computeCalibration())}
+      </div>
+
+      <!-- PAR SPORT -->
+      <div class="bilan-section">
+        <div class="bilan-section-head">
+          <h3>🏅 Performance par sport</h3>
+          <div class="meta">Tri par volume</div>
+        </div>
+        ${perSportHtml
+          ? `<div class="bilan-sports">${perSportHtml}</div>`
+          : `<div class="bilan-empty">Aucun résultat pour le moment.</div>`}
+      </div>
+
+      <!-- HISTORIQUE (tabs) -->
+      <div class="bilan-section">
+        <div class="bilan-section-head">
+          <h3>📜 Historique</h3>
+          <div class="bilan-tabs" id="bilan-hist-tabs">
+            <button class="active" data-hist="perso">Perso${hasMyBets?` (${mine.rows.length})`:''}</button>
+            <button data-hist="modele">Modèle (${rows.length})</button>
+          </div>
+        </div>
+
+        <div class="bilan-tab-panel active" data-hist-panel="perso">
+          ${hasMyBets ? `
+            <div style="overflow-x:auto;">
+              <table class="bilan-table">
+                <thead><tr>
+                  <th>Date</th><th>Match</th><th>Pick</th>
+                  <th style="text-align:right;">Cote</th>
+                  <th style="text-align:right;">Mise</th>
+                  <th style="text-align:right;">Résultat</th>
+                  <th></th>
+                </tr></thead>
+                <tbody>${myRowsHtml}</tbody>
+              </table>
+            </div>
+            ${persoTotal > persoLimit ? `
+              <div style="text-align:center;margin-top:14px;">
+                <button class="bilan-more-btn" data-hist-more="perso">Voir plus (${persoTotal - persoLimit} restants)</button>
+              </div>
+            ` : (persoLimit > 40 ? `
+              <div style="text-align:center;margin-top:14px;">
+                <button class="bilan-more-btn ghost" data-hist-less="perso">Réduire</button>
+              </div>
+            ` : '')}
+          ` : `<div class="bilan-empty">Pas encore de pari enregistré.</div>`}
+        </div>
+
+        <div class="bilan-tab-panel" data-hist-panel="modele">
+          ${modelRowsHtml ? `
+            <div style="overflow-x:auto;">
+              <table class="bilan-table">
+                <thead><tr>
+                  <th>Date</th><th>Match</th><th>Sport</th><th>Pick</th>
+                  <th style="text-align:right;">Cote</th>
+                  <th style="text-align:right;">Résultat</th>
+                </tr></thead>
+                <tbody>${modelRowsHtml}</tbody>
+              </table>
+            </div>
+            ${modeleTotal > modeleLimit ? `
+              <div style="text-align:center;margin-top:14px;">
+                <button class="bilan-more-btn" data-hist-more="modele">Voir plus (${modeleTotal - modeleLimit} restants)</button>
+              </div>
+            ` : (modeleLimit > 40 ? `
+              <div style="text-align:center;margin-top:14px;">
+                <button class="bilan-more-btn ghost" data-hist-less="modele">Réduire</button>
+              </div>
+            ` : '')}
+          ` : `<div class="bilan-empty">Aucun pari du modèle évalué pour le moment.</div>`}
+        </div>
+      </div>
+    `;
+
+    // ========= WIRE INTERACTIONS =========
+    // Delete buttons for personal bets
     wrap.querySelectorAll('[data-mybet-del]').forEach(btn => btn.addEventListener('click', () => {
       const key = btn.dataset.mybetDel;
-      const [matchId, pickKey] = key.split('::');
       const all = loadMyBets();
       delete all[key];
       saveMyBets(all);
       renderBilanPage(wrap);
     }));
-    // Wire bankroll input — updates Kelly reference + re-renders so current
-    // bankroll card updates immediately.
-    const bkInput = wrap.querySelector('#bankroll-input');
+    // Bankroll input (on bilan hero) — update + sync with sidebar input
+    const bkInput = wrap.querySelector('#bilan-bankroll-input');
     if (bkInput) {
-      bkInput.addEventListener('change', () => {
-        const v = parseFloat(bkInput.value);
-        if (isFinite(v) && v > 0) {
-          bankroll = v;
-          try { localStorage.setItem('bankroll', String(v)); } catch (e) {}
-          renderBilanPage(wrap);
-        }
-      });
+      const onBk = () => {
+        const v = validateBankroll(bkInput.value, bkInput);
+        if (v == null) return;
+        bankroll = v;
+        try { localStorage.setItem('bankroll', String(v)); } catch (e) {}
+        const sideBr = document.getElementById('bankroll-input');
+        if (sideBr) sideBr.value = v;
+        renderBilanPage(wrap);
+      };
+      bkInput.addEventListener('change', onBk);
+      bkInput.addEventListener('blur', onBk);
     }
+    // History tabs
+    const tabs = wrap.querySelector('#bilan-hist-tabs');
+    if (tabs) {
+      tabs.querySelectorAll('button').forEach(btn => btn.addEventListener('click', () => {
+        const key = btn.dataset.hist;
+        tabs.querySelectorAll('button').forEach(b => b.classList.toggle('active', b === btn));
+        wrap.querySelectorAll('[data-hist-panel]').forEach(p => {
+          p.classList.toggle('active', p.dataset.histPanel === key);
+        });
+      }));
+    }
+    // "Voir plus" / "Réduire" pagination for historique
+    wrap.querySelectorAll('[data-hist-more]').forEach(btn => btn.addEventListener('click', () => {
+      const k = btn.dataset.histMore;
+      _bilanHistLimits[k] = (_bilanHistLimits[k] || 40) + 40;
+      renderBilanPage(wrap);
+    }));
+    wrap.querySelectorAll('[data-hist-less]').forEach(btn => btn.addEventListener('click', () => {
+      const k = btn.dataset.histLess;
+      _bilanHistLimits[k] = 40;
+      renderBilanPage(wrap);
+    }));
+    // Time-window filter buttons
+    wrap.querySelectorAll('.bilan-win-btn').forEach(btn => btn.addEventListener('click', () => {
+      const v = parseInt(btn.dataset.win, 10);
+      if (!Number.isFinite(v) || v === _bilanWindow) return;
+      _bilanWindow = v;
+      try { localStorage.setItem('bilanWindow', String(v)); } catch (e) {}
+      renderBilanPage(wrap);
+    }));
+  }
+  // Pagination state for bilan history (persists across re-renders during session)
+  let _bilanHistLimits = { perso: 40, modele: 40 };
+  // Time-window filter (days). 0 = tout. Persisted to localStorage.
+  let _bilanWindow = (() => {
+    const v = parseInt(localStorage.getItem('bilanWindow'), 10);
+    return [0, 7, 30, 90].includes(v) ? v : 0;
+  })();
+
+  // ======= Bilan analytics helpers =======
+  // Favorite side at pred.odds (lowest decimal = market favorite)
+  function favoriteOdd(pred) {
+    const o = pred?.odds;
+    if (!o) return null;
+    const pairs = [
+      ['1', o.home], ['2', o.away], ['X', o.draw],
+    ].filter(([, v]) => v && v > 1);
+    if (!pairs.length) return null;
+    pairs.sort((a, b) => a[1] - b[1]);
+    return { key: pairs[0][0], odd: pairs[0][1] };
+  }
+
+  // Near-miss heuristic. Sport-specific margin threshold on a LOST pick where
+  // the actual outcome was one flip away from our side.
+  //   football / hockey / tennis-set-style: margin ≤ 1
+  //   basketball: margin ≤ 3 (one possession)
+  // Returns true only for lost bets that were close.
+  function isNearMiss(match, res) {
+    if (res !== 'lost' || !match?.completed) return false;
+    const { home, away } = getSides(match);
+    const hs = parseInt(home?.score ?? '', 10);
+    const as = parseInt(away?.score ?? '', 10);
+    if (isNaN(hs) || isNaN(as)) return false;
+    const margin = Math.abs(hs - as);
+    const sport = match.sport;
+    if (sport === 'basketball') return margin <= 3;
+    // football / hockey / tennis (set-based score rarely > 1 diff on losses)
+    return margin <= 1;
+  }
+
+  // Bucket rows by kickoff hour (0-23) → { w, l, pl, bets }
+  function bilanByKickoffHour(rows) {
+    const buckets = {};
+    rows.forEach(r => {
+      if (!r.m.date) return;
+      const d = new Date(r.m.date);
+      if (isNaN(d.getTime())) return;
+      const h = d.getHours();
+      const b = buckets[h] = buckets[h] || { w:0, l:0, pl:0, bets:0 };
+      const delta = r.res === 'won' ? (r.odd - 1) : -1;
+      b.bets++;
+      if (r.res === 'won') b.w++; else b.l++;
+      b.pl += delta;
+    });
+    return buckets;
+  }
+
+  // Bucket rows by day-of-week (0=Sun, 6=Sat)
+  function bilanByDayOfWeek(rows) {
+    const buckets = {};
+    rows.forEach(r => {
+      if (!r.m.date) return;
+      const d = new Date(r.m.date);
+      if (isNaN(d.getTime())) return;
+      const dow = d.getDay();
+      const b = buckets[dow] = buckets[dow] || { w:0, l:0, pl:0, bets:0 };
+      const delta = r.res === 'won' ? (r.odd - 1) : -1;
+      b.bets++;
+      if (r.res === 'won') b.w++; else b.l++;
+      b.pl += delta;
+    });
+    return buckets;
+  }
+
+  // Calendar heatmap (GitHub-style): 52 weeks x 7 days. Each cell = sum of
+  // deltas (P&L in units) for that day. Color scale: red negative → green
+  // positive, grey for 0, blank for no bets.
+  function renderCalendarHeatmap(byDay, { endISO } = {}) {
+    // End date defaults to today local.
+    const today = endISO ? new Date(endISO + 'T12:00:00') : new Date();
+    const end = new Date(today);
+    end.setHours(12, 0, 0, 0);
+    // Start exactly 52 weeks ago + shift back to Monday.
+    const start = new Date(end);
+    start.setDate(start.getDate() - 364);
+    const dowStart = (start.getDay() + 6) % 7; // Mon=0
+    start.setDate(start.getDate() - dowStart);
+    // Build 53 columns × 7 rows (allows partial leading week)
+    const cols = 53;
+    const rowSize = 12, gap = 3;
+    const width = cols * (rowSize + gap) + 20;
+    const height = 7 * (rowSize + gap) + 28;
+    // Values + max magnitude for scale
+    let maxMag = 0;
+    byDay.forEach(v => { maxMag = Math.max(maxMag, Math.abs(v)); });
+    if (maxMag < 0.5) maxMag = 0.5;
+    const colorFor = (v) => {
+      if (v == null) return 'rgba(255,255,255,.04)';
+      if (v === 0) return 'rgba(255,255,255,.10)';
+      const ratio = Math.min(1, Math.abs(v) / maxMag);
+      if (v > 0) return `rgba(52,211,153,${0.18 + 0.62 * ratio})`;
+      return `rgba(248,113,113,${0.18 + 0.62 * ratio})`;
+    };
+    const cells = [];
+    const monthLabels = [];
+    let lastMonth = -1;
+    for (let c = 0; c < cols; c++) {
+      for (let r = 0; r < 7; r++) {
+        const dt = new Date(start);
+        dt.setDate(dt.getDate() + c * 7 + r);
+        if (dt > end) continue;
+        const iso = dt.toISOString().slice(0, 10);
+        const v = byDay.has(iso) ? byDay.get(iso) : null;
+        const x = 20 + c * (rowSize + gap);
+        const y = 20 + r * (rowSize + gap);
+        const title = v == null ? iso : `${iso} · ${v>=0?'+':''}${v.toFixed(2)}u`;
+        cells.push(`<rect x="${x}" y="${y}" width="${rowSize}" height="${rowSize}" rx="2" fill="${colorFor(v)}"><title>${title}</title></rect>`);
+        if (r === 0) {
+          const m = dt.getMonth();
+          if (m !== lastMonth) {
+            monthLabels.push(`<text x="${x}" y="14" fill="var(--text-dim2)" font-size="10" font-family="sans-serif">${dt.toLocaleDateString('fr-FR', {month:'short'})}</text>`);
+            lastMonth = m;
+          }
+        }
+      }
+    }
+    return `
+      <div style="overflow-x:auto;">
+        <svg viewBox="0 0 ${width} ${height}" style="width:100%;max-width:${width}px;height:auto;display:block;">
+          ${monthLabels.join('')}
+          ${cells.join('')}
+        </svg>
+        <div style="display:flex;gap:10px;align-items:center;margin-top:6px;font-size:11px;color:var(--text-dim2);">
+          <span>−</span>
+          <span style="display:inline-block;width:12px;height:12px;background:rgba(248,113,113,.7);border-radius:2px;"></span>
+          <span style="display:inline-block;width:12px;height:12px;background:rgba(248,113,113,.4);border-radius:2px;"></span>
+          <span style="display:inline-block;width:12px;height:12px;background:rgba(255,255,255,.10);border-radius:2px;"></span>
+          <span style="display:inline-block;width:12px;height:12px;background:rgba(52,211,153,.4);border-radius:2px;"></span>
+          <span style="display:inline-block;width:12px;height:12px;background:rgba(52,211,153,.7);border-radius:2px;"></span>
+          <span>+</span>
+          <span style="margin-left:auto;">Max magnitude ±${maxMag.toFixed(2)}u</span>
+        </div>
+      </div>
+    `;
+  }
+
+  // Equity curve comparing MODEL vs baseline "always favori". Takes the same
+  // chronoRows used for the main chart and returns an overlaid SVG. Each point
+  // is a day; model line in brand color, baseline dashed grey.
+  function renderEquityVsBaseline(chronoRows) {
+    if (!chronoRows || chronoRows.length < 2) return '';
+    // Build series by day for both
+    const dayModel = new Map(), dayBase = new Map();
+    chronoRows.forEach(r => {
+      const d = (r.m.date || '').slice(0, 10);
+      if (!d) return;
+      const modelDelta = r.res === 'won' ? (r.odd - 1) : -1;
+      dayModel.set(d, (dayModel.get(d) || 0) + modelDelta);
+      // Baseline: always pick the favorite. Evaluate against actual outcome.
+      const fav = favoriteOdd(r.pred);
+      if (!fav) return;
+      const { home, away } = getSides(r.m);
+      const hs = parseInt(home?.score ?? '', 10);
+      const as = parseInt(away?.score ?? '', 10);
+      let favWon = null;
+      if (!isNaN(hs) && !isNaN(as)) {
+        if (fav.key === '1') favWon = hs > as;
+        else if (fav.key === '2') favWon = as > hs;
+        else if (fav.key === 'X') favWon = hs === as;
+      }
+      if (favWon == null) return;
+      const baseDelta = favWon ? (fav.odd - 1) : -1;
+      dayBase.set(d, (dayBase.get(d) || 0) + baseDelta);
+    });
+    const days = [...new Set([...dayModel.keys(), ...dayBase.keys()])].sort();
+    let cumM = 0, cumB = 0;
+    const ptsM = [], ptsB = [];
+    days.forEach(d => {
+      cumM += dayModel.get(d) || 0;
+      cumB += dayBase.get(d) || 0;
+      ptsM.push({ d, v: cumM });
+      ptsB.push({ d, v: cumB });
+    });
+    const width = 560, height = 180;
+    const minY = Math.min(0, ...ptsM.map(p => p.v), ...ptsB.map(p => p.v));
+    const maxY = Math.max(0, ...ptsM.map(p => p.v), ...ptsB.map(p => p.v));
+    const padY = Math.max(0.5, (maxY - minY) * 0.1);
+    const y0 = minY - padY, y1 = maxY + padY;
+    const marginL = 40, marginR = 12, marginT = 20, marginB = 28;
+    const plotW = width - marginL - marginR;
+    const plotH = height - marginT - marginB;
+    const xAt = i => marginL + (days.length === 1 ? plotW / 2 : (i / (days.length - 1)) * plotW);
+    const yAt = v => marginT + plotH - ((v - y0) / (y1 - y0)) * plotH;
+    const zeroY = yAt(0);
+    const polyM = ptsM.map((p, i) => `${xAt(i).toFixed(1)},${yAt(p.v).toFixed(1)}`).join(' ');
+    const polyB = ptsB.map((p, i) => `${xAt(i).toFixed(1)},${yAt(p.v).toFixed(1)}`).join(' ');
+    const lastM = ptsM[ptsM.length - 1].v;
+    const lastB = ptsB[ptsB.length - 1].v;
+    const colorM = lastM >= 0 ? '#34d399' : '#f87171';
+    const xTicks = days.length <= 5
+      ? days.map((d, i) => ({ x: xAt(i), label: d.slice(5) }))
+      : [0, Math.floor(days.length / 2), days.length - 1].map(i => ({ x: xAt(i), label: days[i].slice(5) }));
+    const yTicks = [y0, 0, y1].filter((v, i, arr) => i === arr.indexOf(v));
+    const alpha = lastM - lastB;
+    return `
+      <div style="background:var(--surface,#111827);border:1px solid var(--border,#2a3744);border-radius:12px;padding:14px;margin-bottom:24px;">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
+          <div style="font-size:13px;color:var(--text-dim);font-weight:600;">📈 Modèle vs baseline « toujours favori »</div>
+          <div style="font-size:12px;color:var(--text-dim2);">
+            <span style="color:${colorM};font-weight:700;">Modèle ${lastM>=0?'+':''}${lastM.toFixed(2)}u</span>
+            <span style="margin:0 10px;">·</span>
+            <span style="color:#7b8693;">Favori ${lastB>=0?'+':''}${lastB.toFixed(2)}u</span>
+            <span style="margin:0 10px;">·</span>
+            <span style="color:${alpha>=0?'#a78bfa':'#f87171'};font-weight:700;">α ${alpha>=0?'+':''}${alpha.toFixed(2)}u</span>
+          </div>
+        </div>
+        <svg viewBox="0 0 ${width} ${height}" style="width:100%;height:auto;display:block;">
+          <line x1="${marginL}" y1="${zeroY.toFixed(1)}" x2="${width - marginR}" y2="${zeroY.toFixed(1)}" stroke="rgba(255,255,255,.15)" stroke-dasharray="3 3"/>
+          ${yTicks.map(v => `<text x="${marginL - 6}" y="${(yAt(v)+4).toFixed(1)}" text-anchor="end" fill="var(--text-dim2)" font-size="10">${v.toFixed(1)}u</text>`).join('')}
+          <polyline points="${polyB}" fill="none" stroke="#7b8693" stroke-width="1.5" stroke-dasharray="5 3" opacity="0.8"/>
+          <polyline points="${polyM}" fill="none" stroke="${colorM}" stroke-width="2"/>
+          ${xTicks.map(t => `<text x="${t.x.toFixed(1)}" y="${(height - 6).toFixed(1)}" text-anchor="middle" fill="var(--text-dim2)" font-size="10">${t.label}</text>`).join('')}
+        </svg>
+      </div>
+    `;
   }
 
   window.addEventListener('DOMContentLoaded', () => {
@@ -4020,16 +5714,107 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T16:32:11.425877Z","today":"
     if (brInput) {
       brInput.value = bankroll;
       const onBR = () => {
-        const v = parseFloat(brInput.value);
-        if (isFinite(v) && v > 0) {
-          bankroll = v;
-          try { localStorage.setItem('bankroll', String(v)); } catch (e) {}
-          render(); // re-render so Top Picks show updated € stakes
-        }
+        const v = validateBankroll(brInput.value, brInput);
+        if (v == null) return;
+        bankroll = v;
+        try { localStorage.setItem('bankroll', String(v)); } catch (e) {}
+        render(); // re-render so Top Picks show updated € stakes
       };
       brInput.addEventListener('change', onBR);
       brInput.addEventListener('blur', onBR);
     }
+    // Hamburger toggle (mobile sidebar drawer) — syncs aria-expanded so AT knows
+    // whether the drawer is open, and keeps state in sync between the overlay
+    // and the burger button.
+    const burger = document.getElementById('hamburger');
+    const overlay = document.getElementById('sidebar-overlay');
+    const syncSidebarAria = () => {
+      const open = document.body.classList.contains('sidebar-open');
+      if (burger) burger.setAttribute('aria-expanded', String(open));
+      if (overlay) overlay.setAttribute('aria-hidden', String(!open));
+    };
+    if (burger) {
+      burger.addEventListener('click', () => {
+        document.body.classList.toggle('sidebar-open');
+        syncSidebarAria();
+      });
+    }
+    if (overlay) {
+      overlay.addEventListener('click', () => {
+        document.body.classList.remove('sidebar-open');
+        syncSidebarAria();
+      });
+    }
+    syncSidebarAria();
+    // Close drawer after tapping a nav item on mobile
+    document.querySelectorAll('.sidebar .page-btn, .sidebar nav.tabs button').forEach(b => {
+      b.addEventListener('click', () => {
+        if (window.matchMedia('(max-width: 960px)').matches) {
+          document.body.classList.remove('sidebar-open');
+        }
+      });
+    });
+
+    // Wire up EV threshold slider (sidebar)
+    const evInput = document.getElementById('ev-threshold-input');
+    const evVal = document.getElementById('ev-threshold-val');
+    if (evInput && evVal) {
+      const pctInit = Math.round(evThreshold * 100);
+      evInput.value = String(pctInit);
+      evVal.textContent = `${pctInit}%`;
+      evInput.addEventListener('input', () => { evVal.textContent = `${evInput.value}%`; });
+      evInput.addEventListener('change', () => {
+        const pct = parseFloat(evInput.value);
+        if (!isFinite(pct)) return;
+        evThreshold = Math.max(0.01, Math.min(0.20, pct / 100));
+        try { localStorage.setItem('evThreshold', String(evThreshold)); } catch (e) {}
+        __predCacheClear();
+        render();
+      });
+    }
+
+    // Keyboard shortcuts: /, ←/→, 1-9, B
+    document.addEventListener('keydown', (e) => {
+      const target = e.target;
+      const typing = target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable);
+      // "/" focuses search — allowed only when not typing
+      if (e.key === '/' && !typing) {
+        const searchInput = document.getElementById('search');
+        if (searchInput) { e.preventDefault(); searchInput.focus(); searchInput.select(); }
+        return;
+      }
+      // Escape closes sidebar drawer on mobile
+      if (e.key === 'Escape' && document.body.classList.contains('sidebar-open')) {
+        document.body.classList.remove('sidebar-open'); return;
+      }
+      if (typing) return;
+      // Arrows: navigate day
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        const keys = Object.keys((window.PRONOSTICS_DATA || {}).days || {}).sort();
+        if (!keys.length) return;
+        let idx = keys.indexOf(currentDate);
+        if (idx < 0) idx = keys.length - 1;
+        idx += (e.key === 'ArrowLeft' ? -1 : 1);
+        if (idx < 0 || idx >= keys.length) return;
+        e.preventDefault();
+        currentDate = keys[idx];
+        const dateInput = document.getElementById('date');
+        if (dateInput) dateInput.value = currentDate;
+        render();
+      }
+      // B — jump to Bilan page
+      if ((e.key === 'b' || e.key === 'B')) {
+        const btn = document.querySelector('.page-btn[data-page="bilan"]');
+        if (btn) { e.preventDefault(); btn.click(); }
+      }
+      // 1-9 — switch to league tab
+      if (e.key >= '1' && e.key <= '9') {
+        const tabs = document.querySelectorAll('nav.tabs button');
+        const idx = parseInt(e.key, 10) - 1;
+        if (tabs[idx]) { e.preventDefault(); tabs[idx].click(); }
+      }
+    });
+
     render();
     startAutoRefresh();
   });
