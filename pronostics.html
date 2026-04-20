@@ -750,6 +750,25 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T12:11:01.060850Z","today":"
     return live;
   }
 
+  // ======= Line movement =======
+  // Compare the pre-match odds snapshot to the currently-live odds on the same
+  // side. Significant drop (>=4%) = money piling in on our pick (sharp signal).
+  // Significant rise = market moving against us (reason to think twice).
+  // Returns null if either side is missing or the move is too small to care about.
+  function lineMovement(match, pickKey) {
+    const snap = match.odds_snapshot;
+    if (!snap) return null;
+    const live = bestOdds(match.odds, match.sport === 'football');
+    if (!live) return null;
+    const sideKey = pickKey === '1' ? 'home' : pickKey === '2' ? 'away' : 'draw';
+    const before = snap[sideKey];
+    const after = live[sideKey];
+    if (!before || !after || before <= 1 || after <= 1) return null;
+    const deltaPct = ((after - before) / before) * 100;
+    if (Math.abs(deltaPct) < 4) return null;
+    return { before, after, deltaPct };
+  }
+
   // ======= Kelly criterion =======
   // Suggested stake as a fraction of bankroll. We use HALF-KELLY (scale=0.5)
   // by default — full Kelly maximizes long-run growth but has brutal drawdowns
@@ -1816,6 +1835,8 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T12:11:01.060850Z","today":"
       const kelly = kellyStake(pred.pick.prob, pickOdd, bankroll, 0.5);
       // Is this pick already tracked as a personal bet?
       const myBet = getMyBet(m.id, pred.pick.key);
+      // Line movement signal (snapshot vs live odds on the same side)
+      const lm = lineMovement(m, pred.pick.key);
       const badgeColor = rank === 1 ? '#ffd700' : rank === 2 ? '#c0c0c0' : rank === 3 ? '#cd7f32' : 'var(--surface-3,#27313b)';
       const badgeText = rank === 1 ? '#fff8dc' : rank === 2 ? '#111' : rank === 3 ? '#fff' : 'var(--text)';
       const wmxUrl = winamaxUrl(m);
@@ -1844,6 +1865,10 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T12:11:01.060850Z","today":"
           <div style="display:flex;gap:8px;margin-bottom:10px;font-size:12px;flex-wrap:wrap;">
             <span style="padding:3px 8px;border-radius:6px;background:rgba(16,185,129,.14);color:#10b981;font-weight:700;">EV +${evPct}%</span>
             ${kelly ? `<span title="Mise Kelly-½ : ${(kelly.fraction*100).toFixed(1)}% de la bankroll, calibré sur ta proba modèle et la cote. Full-Kelly = ${(kelly.fraction*2*100).toFixed(1)}%." style="padding:3px 8px;border-radius:6px;background:rgba(96,165,250,.14);color:#60a5fa;font-weight:700;">💰 Mise ${kelly.stake100.toFixed(2)}€ <span style="opacity:.75;font-weight:500;">(${(kelly.fraction*100).toFixed(1)}%)</span></span>` : ''}
+            ${lm ? (lm.deltaPct < 0
+              ? `<span title="La cote est passée de ${lm.before.toFixed(2)} → ${lm.after.toFixed(2)} depuis le snapshot pré-match. Drop = money sharp sur ce pari." style="padding:3px 8px;border-radius:6px;background:rgba(16,185,129,.14);color:#34d399;font-weight:700;">📉 Sharp ${lm.deltaPct.toFixed(1)}%</span>`
+              : `<span title="La cote est passée de ${lm.before.toFixed(2)} → ${lm.after.toFixed(2)} depuis le snapshot pré-match. Cote qui monte = le marché s'éloigne de ce pari, attention." style="padding:3px 8px;border-radius:6px;background:rgba(248,113,113,.14);color:#f87171;font-weight:700;">📈 Drift +${lm.deltaPct.toFixed(1)}%</span>`
+            ) : ''}
             <span style="padding:3px 8px;border-radius:6px;background:rgba(255,255,255,.05);color:var(--text-dim,#b4bcc7);">Gain 10€ → ${gainFor10}€ net</span>
             ${pred.value ? `<span style="padding:3px 8px;border-radius:6px;background:rgba(245,158,11,.14);color:#f59e0b;font-weight:700;">💎 VALUE</span>` : ''}
             ${pred.isLock ? `<span style="padding:3px 8px;border-radius:6px;background:rgba(234,179,8,.14);color:#eab308;font-weight:700;">🔒 LOCK</span>` : ''}
