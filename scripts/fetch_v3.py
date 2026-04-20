@@ -2,7 +2,7 @@
 """Enhanced fetch v3: massive league coverage + real moneyline odds from core endpoint."""
 import json
 import urllib.request
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 import concurrent.futures
 import os
 import time
@@ -356,8 +356,16 @@ def fetch_tennis_day(d):
                 tcity = safe_get(tourney, 'addresses', 0, 'city') or safe_get(tourney, 'venues', 0, 'address', 'city')
                 surface = safe_get(tourney, 'competitionType', 'text') or None
                 for grouping in tourney.get('groupings', []):
-                    round_name = safe_get(grouping, 'grouping', 'name', default='')
+                    # 'grouping.displayName' is the draw (e.g., "Men's Singles"),
+                    # 'grouping.slug' is the machine-readable form ('mens-singles', 'mens-doubles'…)
+                    draw_name = safe_get(grouping, 'grouping', 'displayName', default='') or \
+                                safe_get(grouping, 'grouping', 'name', default='')
+                    draw_slug = safe_get(grouping, 'grouping', 'slug', default='') or ''
                     for comp in grouping.get('competitions', []):
+                        # The ACTUAL round (e.g., "Qualifying 1st Round", "Round of 64") lives on
+                        # competition.round, not on grouping. Pull both: `round` = round name
+                        # (authoritative for quali detection), `draw` = singles/doubles/mixed.
+                        round_name = safe_get(comp, 'round', 'displayName', default='') or draw_name
                         competitors = comp.get('competitors') or []
                         athletes = []
                         for c in competitors:
@@ -394,6 +402,7 @@ def fetch_tennis_day(d):
                             'league_priority': 4,
                             'sport': 'tennis',
                             'round': round_name,
+                            'draw': draw_slug,  # 'mens-singles', 'womens-singles', 'mens-doubles', ...
                             'surface': surface,
                             '_sport_path': 'tennis',
                         })
@@ -482,11 +491,13 @@ def fetch_standings():
 # Main
 # ---------------------------------------------------------------------------
 def main():
-    today = date(2026, 4, 18)
+    # Today is resolved dynamically so cron runs always regenerate for the current
+    # day. The hardcoded fallback is only used if system clock is somehow broken.
+    today = date.today()
     days = [today + timedelta(days=i) for i in range(-2, 8)]
     result = {
-        'generated_at': '2026-04-18T12:00:00Z',
-        'today': '2026-04-18',
+        'generated_at': datetime.utcnow().isoformat() + 'Z',
+        'today': today.strftime('%Y-%m-%d'),
         'days': {},
         'standings': {},
     }

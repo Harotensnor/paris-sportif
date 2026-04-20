@@ -129,7 +129,14 @@ FOOTBALL_LEAGUES = {
 # Challenger: PARTIAL (some yes)
 # ITF W15/W25/W35 + M15/M25: almost always NO
 def tennis_available(event):
-    """event has: sport='tennis', league_code in ['atp','wta'], league_name (tournament name)."""
+    """event has: sport='tennis', league_code in ['atp','wta'], league_name (tournament name).
+
+    Winamax only covers ATP/WTA **main draw singles**. Explicitly filtered out:
+      * Challenger / ITF tours (always)
+      * Qualifying rounds (Winamax doesn't book them, even for Masters 1000 / Slams)
+      * Doubles / mixed draws (Winamax rarely books these, and the dashboard model is
+        tuned for singles — avoid surfacing them as picks)
+    """
     league = (event.get('league_name') or event.get('league') or '').lower()
     if not league:
         return (False, None)
@@ -139,6 +146,17 @@ def tennis_available(event):
                     'w15', 'w25', 'w35', 'w50', 'w60', 'w75', 'w100',
                     'm15', 'm25', 'm35', 'm50', 'm75', 'm100']
     if any(m in league for m in excl_markers):
+        return (False, None)
+    # Qualifying rounds: ESPN labels them 'Qualifying 1st Round', 'Qualifying Final', etc.
+    round_name = (event.get('round') or '').lower()
+    if 'qualif' in round_name:
+        return (False, None)
+    # Doubles / mixed: ESPN's grouping slug is 'mens-doubles', 'womens-doubles', 'mixed-doubles'.
+    # Keep only singles draws.
+    draw = (event.get('draw') or '').lower()
+    if draw and 'doubles' in draw:
+        return (False, None)
+    if draw and 'mixed' in draw:
         return (False, None)
     code = event.get('league_code', 'atp')
     slug = 'atp' if code == 'atp' else 'wta'
