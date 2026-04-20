@@ -1474,7 +1474,15 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T14:15:40.518155Z","today":"
     if (filter === 'value') return !!pred?.value;
     if (filter === 'lock') return !!pred?.isLock;
     if (filter === 'live') return m.status === 'STATUS_IN_PROGRESS';
-    if (filter === 'upcoming') return !m.completed && m.status !== 'STATUS_IN_PROGRESS';
+    if (filter === 'upcoming') {
+      // "À venir" = kickoff strictly in the future. ESPN sometimes leaves matches as
+      // STATUS_SCHEDULED well past their kickoff, so we can't just trust !completed.
+      if (m.completed || m.status === 'STATUS_IN_PROGRESS') return false;
+      if (!m.date) return false;
+      const d = new Date(m.date);
+      if (isNaN(d)) return false;
+      return d.getTime() > Date.now();
+    }
     if (filter === 'tipsters') return !!(m.tips && m.tips.length);
     if (filter === 'won') return evaluateModelPick(m, pred) === 'won';
     if (filter === 'lost') return evaluateModelPick(m, pred) === 'lost';
@@ -1507,9 +1515,13 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T14:15:40.518155Z","today":"
     });
 
     // === Counters per sport (pre-search, pre-filter) ===
+    // Honor winamaxOnly so the per-sport tab badges never promise matches the user can't bet on.
     const SPORTS = ['football','tennis','basketball','hockey','american-football','mma','golf','racing'];
+    const allForCounts = winamaxOnly
+      ? all.filter(m => m.winamax && m.winamax.available === true)
+      : all;
     SPORTS.forEach(s => {
-      const n = all.filter(m => m.sport === s).length;
+      const n = allForCounts.filter(m => m.sport === s).length;
       const el = document.getElementById('count-' + s);
       if (el) el.textContent = n;
       // Hide the tab entirely if zero events today
@@ -1719,16 +1731,30 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T14:15:40.518155Z","today":"
   }
 
   function renderFilters(sportEvents) {
+    // Respect the Winamax-only toggle: counts should match what the user will actually see.
+    // Otherwise "À venir 44" is misleading when the list below only shows 3 Winamax matches.
+    const pool = winamaxOnly
+      ? sportEvents.filter(m => m.winamax && m.winamax.available === true)
+      : sportEvents;
+    // "À venir" also excludes matches whose kickoff has already passed (ESPN is slow to flip
+    // STATUS_SCHEDULED → FINAL), so the count tracks real upcoming fixtures only.
+    const nowMs = Date.now();
+    const isUpcoming = (m) => {
+      if (m.completed || m.status === 'STATUS_IN_PROGRESS') return false;
+      if (!m.date) return false;
+      const d = new Date(m.date);
+      return !isNaN(d) && d.getTime() > nowMs;
+    };
     const counts = {
-      all: sportEvents.length,
-      value: sportEvents.filter(m => predictMatch(m)?.value).length,
-      lock: sportEvents.filter(m => predictMatch(m)?.isLock).length,
-      live: sportEvents.filter(m => m.status === 'STATUS_IN_PROGRESS').length,
-      upcoming: sportEvents.filter(m => !m.completed && m.status !== 'STATUS_IN_PROGRESS').length,
-      tipsters: sportEvents.filter(m => m.tips && m.tips.length).length,
-      results: sportEvents.filter(m => evaluateModelPick(m, predictMatch(m)) !== null).length,
-      won: sportEvents.filter(m => evaluateModelPick(m, predictMatch(m)) === 'won').length,
-      lost: sportEvents.filter(m => evaluateModelPick(m, predictMatch(m)) === 'lost').length,
+      all: pool.length,
+      value: pool.filter(m => predictMatch(m)?.value).length,
+      lock: pool.filter(m => predictMatch(m)?.isLock).length,
+      live: pool.filter(m => m.status === 'STATUS_IN_PROGRESS').length,
+      upcoming: pool.filter(isUpcoming).length,
+      tipsters: pool.filter(m => m.tips && m.tips.length).length,
+      results: pool.filter(m => evaluateModelPick(m, predictMatch(m)) !== null).length,
+      won: pool.filter(m => evaluateModelPick(m, predictMatch(m)) === 'won').length,
+      lost: pool.filter(m => evaluateModelPick(m, predictMatch(m)) === 'lost').length,
     };
     const html = `
       <button class="filter-btn ${activeFilter==='all'?'active':''}" data-filter="all">Tous <span class="count">${counts.all}</span></button>
