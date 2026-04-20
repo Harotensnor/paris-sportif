@@ -38,6 +38,7 @@ jobs:
           python3 fetch_rus_odds.py || true
           python3 fetch_injuries.py || true
           python3 fetch_h2h.py || true       # head-to-head histories
+          python3 snapshot_odds.py || true   # freeze pre-match odds (persist post-match for bilan)
           python3 patch_winamax.py || true
           # Every 12th tick (= 1h), also run full sweep so tomorrow+ stays fresh
           if [ $(( $(date +%M) % 60 )) -lt 5 ]; then
