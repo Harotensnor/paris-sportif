@@ -3003,9 +3003,14 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T19:21:02.611529Z","today":"
 
   function renderSummary(all, sportEvents, visible) {
     const data = window.PRONOSTICS_DATA;
-    const liveAll = all.filter(m => m.status === 'STATUS_IN_PROGRESS').length;
-    const valueAll = all.filter(m => predictMatch(m)?.value).length;
-    const lockAll = all.filter(m => predictMatch(m)?.isLock).length;
+    // Single pass — avoids 3 separate .filter() walks.
+    let liveAll = 0, valueAll = 0, lockAll = 0;
+    for (const m of all) {
+      if (m.status === 'STATUS_IN_PROGRESS') liveAll++;
+      const p = predictMatch(m);
+      if (p?.value) valueAll++;
+      if (p?.isLock) lockAll++;
+    }
     const gen = data?.generated_at ? new Date(data.generated_at).toLocaleDateString('fr-FR', { day:'numeric', month:'short', hour: '2-digit', minute: '2-digit'}) : '—';
 
     // === Performance bilan of completed matches today ===
@@ -3162,20 +3167,30 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T19:21:02.611529Z","today":"
       if (kind === 'tomorrow') return pDay === tomorrowParisStr;
       return false;
     };
+    // Single-pass tally — avoids 13 sequential .filter() walks on `pool`.
+    // predictMatch is cached but we still save the function-call overhead.
     const counts = {
-      all: pool.length,
-      value: pool.filter(m => predictMatch(m)?.value).length,
-      lock: pool.filter(m => predictMatch(m)?.isLock).length,
-      live: pool.filter(m => m.status === 'STATUS_IN_PROGRESS').length,
-      upcoming: pool.filter(isUpcoming).length,
-      next2h: pool.filter(m => kickoffCheck(m, 'next2h')).length,
-      tonight: pool.filter(m => kickoffCheck(m, 'tonight')).length,
-      tomorrow: pool.filter(m => kickoffCheck(m, 'tomorrow')).length,
-      tipsters: pool.filter(m => m.tips && m.tips.length).length,
-      results: pool.filter(m => evaluateModelPick(m, predictMatch(m)) !== null).length,
-      won: pool.filter(m => evaluateModelPick(m, predictMatch(m)) === 'won').length,
-      lost: pool.filter(m => evaluateModelPick(m, predictMatch(m)) === 'lost').length,
+      all: pool.length, value: 0, lock: 0, live: 0, upcoming: 0,
+      next2h: 0, tonight: 0, tomorrow: 0, tipsters: 0,
+      results: 0, won: 0, lost: 0,
     };
+    for (const m of pool) {
+      const pred = predictMatch(m);
+      if (pred?.value) counts.value++;
+      if (pred?.isLock) counts.lock++;
+      if (m.status === 'STATUS_IN_PROGRESS') counts.live++;
+      if (isUpcoming(m)) counts.upcoming++;
+      if (kickoffCheck(m, 'next2h')) counts.next2h++;
+      if (kickoffCheck(m, 'tonight')) counts.tonight++;
+      if (kickoffCheck(m, 'tomorrow')) counts.tomorrow++;
+      if (m.tips && m.tips.length) counts.tipsters++;
+      const res = evaluateModelPick(m, pred);
+      if (res !== null) {
+        counts.results++;
+        if (res === 'won') counts.won++;
+        else if (res === 'lost') counts.lost++;
+      }
+    }
     const html = `
       <button class="filter-btn ${activeFilter==='all'?'active':''}" data-filter="all">Tous <span class="count">${counts.all}</span></button>
       <button class="filter-btn ${activeFilter==='upcoming'?'active':''}" data-filter="upcoming">À venir <span class="count">${counts.upcoming}</span></button>
