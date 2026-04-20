@@ -1305,6 +1305,26 @@
   }
   .top-mini .mini-stat.ev { background: rgba(16,185,129,.15); color: #10b981; }
   .top-mini .mini-stat.odd { background: rgba(52,211,153,.12); color: var(--accent); }
+  /* Note / justification compacte — Chantier 7.
+     Rendue en bas de la carte, 1 ligne, italique-ish pour la dégager du
+     reste. La tooltip fallback (title) garde le texte complet accessible. */
+  .top-mini .mini-note, .top-pick .tp-note {
+    padding: 7px 10px 9px;
+    border-top: 1px solid var(--border);
+    display: flex; gap: 7px; align-items: center;
+    font-size: 11.5px; color: var(--text-dim2, #7b8693);
+    line-height: 1.35;
+    overflow: hidden;
+  }
+  .top-mini .mini-note > span:last-child,
+  .top-pick .tp-note > span:last-child {
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    flex: 1 1 auto;
+  }
+  .top-mini .mini-note > span:first-child,
+  .top-pick .tp-note > span:first-child {
+    flex: 0 0 auto; font-size: 13px;
+  }
 
   @media (max-width: 720px) {
     .top-hero { padding: 20px 18px; }
@@ -3455,6 +3475,10 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T20:09:16.067553Z","today":"
       const { home, away } = getSides(m);
       const tIn = fmtIn(startIn);
       const evPct = (x.ev * 100).toFixed(1);
+      // Note justifiant le pick — la plus signifiante (première = ordre
+      // implicite du model : market, form, H2H…). Garde 1 seule ligne pour
+      // ne pas casser le grid 2×2 mini.
+      const topReason = (pred.explain?.reasons || [])[0];
       return `
         <div class="top-mini top-pick" data-id="${esc(m.id)}">
           <div class="mini-head">
@@ -3475,6 +3499,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T20:09:16.067553Z","today":"
               <span class="mini-stat ev">+${evPct}%</span>
             </div>
           </div>
+          ${topReason ? `<div class="mini-note" title="${esc(topReason.text)}"><span>${topReason.icon}</span><span>${esc(topReason.text)}</span></div>` : ''}
         </div>
       `;
     };
@@ -3485,6 +3510,8 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T20:09:16.067553Z","today":"
       const { home, away } = getSides(m);
       const tIn = fmtIn(startIn);
       const urgent = startIn < 30;
+      // Note : 1 raison compacte — explicite pourquoi ce pick plutôt qu'un autre
+      const topReason = (pred.explain?.reasons || [])[0];
       return `
         <div class="top-pick ${urgent ? 'urgent' : ''}" data-id="${esc(m.id)}">
           <div class="tp-head">
@@ -3499,6 +3526,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T20:09:16.067553Z","today":"
             </div>
             <div class="tp-pick-conf">${(pred.pick.prob*100).toFixed(0)}% · <span style="color:var(--accent);">@${pickOdd.toFixed(2)}</span>${x.ev > 0 ? ` · <span style="color:#10b981;">EV +${(x.ev*100).toFixed(1)}%</span>` : ''}</div>
           </div>
+          ${topReason ? `<div class="tp-note" title="${esc(topReason.text)}"><span>${topReason.icon}</span><span>${esc(topReason.text)}</span></div>` : ''}
         </div>
       `;
     };
