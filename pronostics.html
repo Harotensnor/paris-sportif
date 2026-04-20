@@ -1462,7 +1462,9 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T14:15:40.518155Z","today":"
 
   function matchFilter(m, q, filter) {
     // Winamax-only gate: if user toggled it on, hide everything not available on Winamax
-    if (winamaxOnly && m.winamax && m.winamax.available === false) return false;
+    // Strict: only events explicitly confirmed on Winamax. Excludes both "available: false"
+    // and any missing/unknown winamax tag, so we never propose bets Théo can't actually place.
+    if (winamaxOnly && !(m.winamax && m.winamax.available === true)) return false;
     if (q) {
       const { home, away } = getSides(m);
       const hay = norm([home?.name, away?.name, m.league_name, m.venue, m.city, m.name].join(' '));
@@ -1779,7 +1781,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T14:15:40.518155Z","today":"
     const pushIfFresh = (m) => {
       if (!m || !m.id || seen.has(m.id)) return;
       if (m.completed || m.status === 'STATUS_IN_PROGRESS') return;
-      if (winamaxOnly && m.winamax && m.winamax.available === false) return;
+      if (winamaxOnly && !(m.winamax && m.winamax.available === true)) return;
       if (!m.date) return;
       const d = new Date(m.date);
       if (isNaN(d)) return;
@@ -2142,7 +2144,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T14:15:40.518155Z","today":"
     Object.values(data.days).forEach(arr => allEvents.push(...(arr || [])));
     // Winamax-only gate so combinés never suggest bets the user can't place.
     const filteredEvents = winamaxOnly
-      ? allEvents.filter(m => !(m.winamax && m.winamax.available === false))
+      ? allEvents.filter(m => m.winamax && m.winamax.available === true)
       : allEvents;
 
     // Three rolling time windows (minutes from now)
