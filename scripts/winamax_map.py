@@ -1,21 +1,304 @@
 #!/usr/bin/env python3
 """Winamax catalog mapping.
 
-For each ESPN league_code (or sport+league combo), specifies:
-  - available:  bool  (True if Winamax takes bets on this competition)
-  - slug:       str   (URL slug for deep-link to competition page)
+Primary strategy — the dynamic catalog (``winamax_catalog.json``) — is the
+ground truth: it comes straight from scraping Winamax's own pages via
+``fetch_winamax_catalog.py``. Each ESPN event is matched against a real
+Winamax match by sport + normalized league name + player/team names.
 
-Used by patch_odds.py / fetch_live.py / fetch_v3.py to tag each event with
-`winamax` info so the dashboard can:
-  1. Hide events where Winamax doesn't offer odds
-  2. Link directly to the competition page
-
-Winamax URL pattern:
-  https://www.winamax.fr/paris-sportifs/sports/{sport_slug}/{country_slug}/{league_slug}
-
-Where we don't know the exact slug, we link to the sport root page.
+Fallback — the static heuristic tables below — is only used when the
+catalog is unavailable (first run, scraper failure). They're broad enough
+to keep the dashboard usable but produce false positives, which is why
+the catalog-driven path is preferred.
 """
 from __future__ import annotations
+
+import json
+import re
+import unicodedata
+from pathlib import Path
+
+
+# ---------------------------------------------------------------------------
+# Catalog-driven lookup (primary path)
+# ---------------------------------------------------------------------------
+_CATALOG_PATH = Path(__file__).resolve().parent.parent / 'winamax_catalog.json'
+_CATALOG_CACHE: dict | None = None
+
+
+# ESPN sport string → Winamax sport_id
+_ESPN_TO_WINAMAX_SPORT = {
+    'football': 1,
+    'basketball': 2,
+    'baseball': 3,
+    'hockey': 4,
+    'tennis': 5,
+    'americanfootball': 16,
+    'mma': 117,
+}
+
+
+# Explicit ESPN league_code → Winamax tournament_id.
+# Grounded on the live catalog (see winamax_catalog.json). When the ESPN
+# league is listed here and does NOT appear in the catalog, the event is
+# treated as not-on-Winamax (i.e. we don't fall back to fuzzy matching,
+# because we know the canonical mapping). Leagues absent from this table
+# fall through to fuzzy name matching.
+_ESPN_CODE_TO_WMX_TID = {
+    # --- Football ---
+    'eng.1': 1,           # Premier League
+    'eng.2': 2,           # Championship
+    'eng.fa': 16,         # FA Cup
+    'esp.1': 36,          # LaLiga
+    'esp.2': 37,          # LaLiga 2
+    'ger.1': 42,          # Bundesliga
+    'ger.2': 41,          # 2. Bundesliga
+    'ita.1': 33,          # Serie A
+    'ita.2': 34,          # Serie B
+    'fra.1': 4,           # Ligue 1
+    'fra.2': 19,          # Ligue 2
+    'ned.1': 39,          # Eredivisie
+    'por.1': 52,          # Liga Portugal
+    'bel.1': 38,          # Jupiler Pro League
+    'tur.1': 62,          # Süper Lig
+    'aut.1': 29,          # Bundesliga Autriche
+    'swe.1': 24,          # Allsvenskan
+    'nor.1': 5,           # Eliteserien
+    'gre.1': 127,         # Super League Grèce
+    'arg.1': 162285,      # Primera División
+    'mex.1': 16753,       # Liga MX
+    'chn.1': 652,         # Super League Chine
+    'usa.1': 18,          # MLS
+    # --- Basketball ---
+    'nba': 177,
+    'fra.1': 2857,        # ⚠ collision: ESPN uses fra.1 for basket ProB too
+    # (The code collision on 'fra.1' between foot+basket is resolved at
+    # lookup-time by checking event.sport first.)
+    # --- Hockey ---
+    'nhl': 142,
+    'sweden.shl': 115,
+    'finland.liiga': 108,
+    'switzerland.nl': 96,
+    # --- Baseball ---
+    'mlb': 25,
+    # --- Football US ---
+    'nfl': 47,
+    # Tennis is handled purely by tournament name (ATP/WTA tournament
+    # names align closely between ESPN and Winamax).
+}
+
+
+# Heuristic stopwords for fuzzy league name matching
+_LEAGUE_STOPWORDS = {
+    'la', 'le', 'les', 'de', 'du', 'des', 'el', 'da', 'do', 'di',
+    'a', 'i', 'o', 'en', 'the', 'and', 'et', 'y', 'ey',
+    'liga', 'league', 'ligue', 'cup', 'coupe', 'division',
+    'primera', 'primeira', 'super',
+}
+
+
+def _league_tokens(name: str) -> set[str]:
+    """Significant tokens for league-name matching (length >= 4, not stopwords)."""
+    if not name:
+        return set()
+    s = unicodedata.normalize('NFD', name).encode('ascii', 'ignore').decode().lower()
+    s = re.sub(r'[^a-z0-9]+', ' ', s)
+    return {t for t in s.split() if len(t) >= 4 and t not in _LEAGUE_STOPWORDS}
+
+
+def _leagues_match(espn_name: str, wmx_name: str) -> bool:
+    """Conservative league-name matcher. Returns True only when there's a
+    strong signal they refer to the same competition.
+    """
+    e_norm = _norm(espn_name)
+    w_norm = _norm(wmx_name)
+    if not e_norm or not w_norm:
+        return False
+    # Exact normalized equality (best signal)
+    if e_norm == w_norm:
+        return True
+    # Substring match where the shorter name is >= 6 chars (filters out
+    # short common words but catches "LaLiga" ⊆ "La Liga 2" etc.)
+    shorter, longer = sorted([e_norm, w_norm], key=len)
+    if len(shorter) >= 6 and shorter in longer:
+        return True
+    # Significant token overlap: require all tokens of the shorter name
+    # to appear in the longer one, with at least one shared token of
+    # length >= 5 (so single "serie" match isn't enough but "bundesliga",
+    # "allsvenskan", "eredivisie" are).
+    e_t = _league_tokens(espn_name)
+    w_t = _league_tokens(wmx_name)
+    if not e_t or not w_t:
+        return False
+    shared = e_t & w_t
+    if not shared:
+        return False
+    short_t, long_t = (e_t, w_t) if len(e_t) <= len(w_t) else (w_t, e_t)
+    if not short_t.issubset(long_t):
+        return False
+    # At least one token must be meaningful (≥5 chars)
+    return any(len(t) >= 5 for t in shared)
+
+
+def _norm(s: str | None) -> str:
+    """Lowercase, strip accents, keep only alphanumerics. Safe on None."""
+    if not s:
+        return ''
+    s = unicodedata.normalize('NFD', s).encode('ascii', 'ignore').decode()
+    return re.sub(r'[^a-z0-9]', '', s.lower())
+
+
+def _load_catalog() -> dict | None:
+    """Lazy-load winamax_catalog.json. Returns None if missing or invalid."""
+    global _CATALOG_CACHE
+    if _CATALOG_CACHE is not None:
+        return _CATALOG_CACHE
+    if not _CATALOG_PATH.exists():
+        return None
+    try:
+        _CATALOG_CACHE = json.loads(_CATALOG_PATH.read_text(encoding='utf-8'))
+        return _CATALOG_CACHE
+    except (json.JSONDecodeError, OSError):
+        return None
+
+
+def _tournaments_for_sport(sport_id: int) -> list[dict]:
+    catalog = _load_catalog()
+    if not catalog:
+        return []
+    return [t for t in catalog.get('tournaments', []) if t.get('sport_id') == sport_id]
+
+
+def _name_tokens(full_name: str) -> set[str]:
+    """Break a player/team name into normalized last-name tokens.
+
+    Tennis Winamax strings are full names ("Nuno Borges"), ESPN delivers
+    the same ("Nuno Borges") OR initialed forms ("Borges N."). We tokenize
+    and look for *any* shared token ≥ 3 chars to match across formats.
+    Short tokens (de, la, van…) are filtered since they'd cause false hits.
+    """
+    if not full_name:
+        return set()
+    # Strip trailing "X." initial (ESPN tennis short form)
+    s = re.sub(r'\s+[A-Za-z]\.$', '', full_name.strip())
+    toks = set()
+    for t in re.split(r'[\s\-]+', s):
+        nt = _norm(t)
+        if len(nt) >= 3:
+            toks.add(nt)
+    return toks
+
+
+def _match_by_names(home_espn: str, away_espn: str, matches: list[dict]) -> dict | None:
+    """Find the Winamax match whose players overlap with the ESPN event.
+
+    Returns the matching dict from the catalog (with match_id, home, away),
+    or None if no pair scores a full home+away overlap.
+    """
+    h_e = _name_tokens(home_espn)
+    a_e = _name_tokens(away_espn)
+    if not h_e or not a_e:
+        return None
+    for m in matches:
+        h_w = _name_tokens(m.get('home', ''))
+        a_w = _name_tokens(m.get('away', ''))
+        # Direct orientation: home↔home, away↔away
+        if (h_e & h_w) and (a_e & a_w):
+            return m
+        # Reversed (Winamax sometimes flips home/away vs ESPN)
+        if (h_e & a_w) and (a_e & h_w):
+            return m
+    return None
+
+
+def lookup_catalog(event: dict) -> dict | None:
+    """Return {available, url, note, match_id, tournament} if event matches a
+    real Winamax match/tournament; None if catalog unavailable or no match.
+
+    Match resolution:
+      1. Sport mapping (ESPN sport → Winamax sport_id).
+      2. Tournament match:
+         a) Explicit ESPN-code → Winamax-tournament-id (authoritative).
+         b) Otherwise, conservative league-name match (_leagues_match).
+      3. Match-level: player/team name intersection on the matched tournament.
+         If no individual match matches → available=False (quali, retired,
+         doubles Winamax doesn't book, etc.).
+    """
+    sport = event.get('sport') or ''
+    wmx_sport = _ESPN_TO_WINAMAX_SPORT.get(sport)
+    if wmx_sport is None:
+        return None
+
+    tourns = _tournaments_for_sport(wmx_sport)
+    if not tourns:
+        return None
+
+    comps = event.get('competitors') or []
+    if len(comps) < 2:
+        return None
+    home = next((c for c in comps if c.get('home_away') == 'home'), comps[0])
+    away = next((c for c in comps if c.get('home_away') == 'away'), comps[1])
+
+    code = event.get('league_code') or ''
+    # Stage 1a: explicit ESPN code → Winamax tournament_id.
+    # Scoped per sport to handle ESPN code collisions (e.g. 'fra.1' can be
+    # football Ligue 1 OR basketball ProA depending on the event's sport).
+    candidates: list[dict] = []
+    if code in _ESPN_CODE_TO_WMX_TID:
+        want_tid = _ESPN_CODE_TO_WMX_TID[code]
+        for t in tourns:
+            if t.get('tournament_id') == want_tid:
+                candidates.append(t)
+        if candidates:
+            # If the explicit-code tournament is in the catalog but that
+            # match isn't listed → hard no (signal that Winamax stopped
+            # offering this specific fixture).
+            return _resolve_from_candidates(candidates, home, away,
+                                            note_not_found='match_not_in_listed_tournament')
+
+    # Stage 1b: fallback to conservative name matching.
+    league_name = event.get('league_name') or ''
+    for t in tourns:
+        if _leagues_match(league_name, t.get('tournament_name') or ''):
+            candidates.append(t)
+
+    if not candidates:
+        return {
+            'available': False,
+            'url': None,
+            'note': 'no_catalog_tournament_match',
+        }
+
+    return _resolve_from_candidates(candidates, home, away,
+                                    note_not_found='tournament_in_catalog_but_match_not_listed')
+
+
+def _resolve_from_candidates(candidates: list[dict], home: dict, away: dict,
+                             note_not_found: str) -> dict:
+    """Try to find a player/team match in any candidate tournament. Returns
+    available=True with a match-level URL if found, else available=False.
+    """
+    for t in candidates:
+        matches = t.get('matches') or []
+        matched = _match_by_names(home.get('name') or '', away.get('name') or '', matches)
+        if matched:
+            return {
+                'available': True,
+                'url': f"{t['url']}?match={matched['match_id']}",
+                'note': None,
+                'match_id': matched['match_id'],
+                'tournament': t['tournament_name'],
+            }
+    return {
+        'available': False,
+        'url': None,
+        'note': note_not_found,
+    }
+
+
+# ---------------------------------------------------------------------------
+# Static heuristics (fallback path)
+# ---------------------------------------------------------------------------
 
 # sport_slug mapping — Winamax's sport category slugs (French)
 SPORT_SLUGS = {
@@ -193,7 +476,26 @@ OTHER_SPORTS = {
 
 
 def lookup(event):
-    """Return dict with keys: available (bool), url (str|None), note (str|None)."""
+    """Return dict with keys: available (bool), url (str|None), note (str|None).
+
+    Primary path: the dynamic catalog (ground truth, scraped from Winamax).
+    Fallback path: static heuristic tables — only used when the catalog file
+    is missing (first bootstrap) or the event's sport isn't in the catalog.
+    """
+    # Try catalog first. It returns None if no data available for this sport.
+    cat_res = lookup_catalog(event)
+    if cat_res is not None:
+        # Strip catalog-only fields (match_id, tournament) for callers that
+        # only expect the public three keys. Optional fields stay useful
+        # when present but don't break existing consumers.
+        return {
+            'available': cat_res['available'],
+            'url': cat_res['url'],
+            'note': cat_res['note'],
+            'match_id': cat_res.get('match_id'),
+            'tournament': cat_res.get('tournament'),
+        }
+
     sport = event.get('sport') or ''
     code = event.get('league_code') or ''
     sport_slug = SPORT_SLUGS.get(sport)
