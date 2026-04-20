@@ -1041,6 +1041,19 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T15:28:50.653595Z","today":"
       formNudge = diff * 0.05; // max ±5% shift
     }
 
+    // Goal-differential nudge (last 5): complements form letters with actual
+    // margin. Team scoring 2.5 GF/G and conceding 0.8 is much more dangerous
+    // than one that scraped 5 wins 1-0. Only kicks in when both teams have
+    // ≥3 samples, to avoid noise.
+    let gdNudge = null;
+    const hs = home.form_stats, as_ = away.form_stats;
+    if (hs && as_ && hs.played5 >= 3 && as_.played5 >= 3) {
+      const gdH = (hs.avg_gf5 || 0) - (hs.avg_ga5 || 0);
+      const gdA = (as_.avg_gf5 || 0) - (as_.avg_ga5 || 0);
+      // Typical football gd range is ≈ [-2, +2]. Cap shift at ±4%.
+      gdNudge = Math.max(-0.04, Math.min(0.04, (gdH - gdA) * 0.015));
+    }
+
     // Poisson component (football only, needs standings with GF/GA)
     const poi = poissonComponent(match);
     // Home/Road record split (non-football only: basket/hockey/etc.)
@@ -1122,6 +1135,11 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T15:28:50.653595Z","today":"
         const scale = Math.abs(formNudge) > 0.03 ? 0.9 : 0.6;
         final.pH += formNudge * scale;
         final.pA -= formNudge * scale;
+      }
+      // Goal-differential nudge — stacks with formNudge but capped modestly.
+      if (gdNudge != null) {
+        final.pH += gdNudge;
+        final.pA -= gdNudge;
       }
       // Injury penalty: each severe absence (Out/Suspended/Doubtful) on either
       // side shifts the win prob by ~1.5% (cap at 6%). ESPN covers US sports
@@ -1213,6 +1231,21 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T15:28:50.653595Z","today":"
         icon: '🔥',
         text: `Forme ${side} : ${f >= 0.6 ? 'solide' : f >= 0.4 ? 'moyenne' : 'fragile'} (${(home?.form||away?.form)||''})`
       });
+    }
+    // Goal-differential reason — surfaces when the scoring margin gap is
+    // meaningful (>=0.8 goal/match delta). Complements the W/L letters.
+    if (hs && as_ && hs.played5 >= 3 && as_.played5 >= 3) {
+      const gdH = (hs.avg_gf5 || 0) - (hs.avg_ga5 || 0);
+      const gdA = (as_.avg_gf5 || 0) - (as_.avg_ga5 || 0);
+      if (Math.abs(gdH - gdA) >= 0.8) {
+        const leader = gdH > gdA ? (home?.short || home?.name) : (away?.short || away?.name);
+        const leadStats = gdH > gdA ? hs : as_;
+        reasons.push({
+          type: 'gd',
+          icon: '⚽',
+          text: `Différentiel buts favorable à ${leader} (${leadStats.avg_gf5.toFixed(1)} marqués / ${leadStats.avg_ga5.toFixed(1)} encaissés sur 5)`
+        });
+      }
     }
     // Records
     if (recH && recA && recH.games > 3 && recA.games > 3) {
@@ -2721,6 +2754,11 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T15:28:50.653595Z","today":"
             <div class="kv"><div class="k">Bilan</div><div class="v">${esc(getRecord(home) || 'n/a')}</div></div>
             ${recH ? `<div class="kv"><div class="k">% Victoires</div><div class="v">${recH.games > 0 ? ((recH.w/recH.games)*100).toFixed(1) : '—'}%</div></div>` : ''}
             ${home?.form ? `<div class="kv"><div class="k">Forme (5 derniers)</div><div class="v">${renderForm(home.form)}</div></div>` : ''}
+            ${home?.form_stats?.played5 ? `
+              <div class="kv"><div class="k">Buts marqués (5)</div><div class="v">${home.form_stats.gf5} <span style="color:var(--text-dim2,#7b8693);font-size:11px;">(${home.form_stats.avg_gf5.toFixed(1)}/m)</span></div></div>
+              <div class="kv"><div class="k">Buts encaissés (5)</div><div class="v">${home.form_stats.ga5} <span style="color:var(--text-dim2,#7b8693);font-size:11px;">(${home.form_stats.avg_ga5.toFixed(1)}/m)</span></div></div>
+              <div class="kv"><div class="k">Clean sheets (5)</div><div class="v">${home.form_stats.cleans5}</div></div>
+            ` : ''}
             ${stdH ? `
               <div class="kv"><div class="k">Classement</div><div class="v accent">#${esc(stdH.rank)}</div></div>
               <div class="kv"><div class="k">Points</div><div class="v">${esc(stdH.points || '—')}</div></div>
@@ -2732,6 +2770,11 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T15:28:50.653595Z","today":"
             <div class="kv"><div class="k">Bilan</div><div class="v">${esc(getRecord(away) || 'n/a')}</div></div>
             ${recA ? `<div class="kv"><div class="k">% Victoires</div><div class="v">${recA.games > 0 ? ((recA.w/recA.games)*100).toFixed(1) : '—'}%</div></div>` : ''}
             ${away?.form ? `<div class="kv"><div class="k">Forme (5 derniers)</div><div class="v">${renderForm(away.form)}</div></div>` : ''}
+            ${away?.form_stats?.played5 ? `
+              <div class="kv"><div class="k">Buts marqués (5)</div><div class="v">${away.form_stats.gf5} <span style="color:var(--text-dim2,#7b8693);font-size:11px;">(${away.form_stats.avg_gf5.toFixed(1)}/m)</span></div></div>
+              <div class="kv"><div class="k">Buts encaissés (5)</div><div class="v">${away.form_stats.ga5} <span style="color:var(--text-dim2,#7b8693);font-size:11px;">(${away.form_stats.avg_ga5.toFixed(1)}/m)</span></div></div>
+              <div class="kv"><div class="k">Clean sheets (5)</div><div class="v">${away.form_stats.cleans5}</div></div>
+            ` : ''}
             ${stdA ? `
               <div class="kv"><div class="k">Classement</div><div class="v accent">#${esc(stdA.rank)}</div></div>
               <div class="kv"><div class="k">Points</div><div class="v">${esc(stdA.points || '—')}</div></div>
