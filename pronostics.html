@@ -1927,6 +1927,31 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T16:32:11.425877Z","today":"
       if (isNaN(d)) return false;
       return d.getTime() > Date.now();
     }
+    // Kickoff-window filters: quick shortcuts for "what can I actually bet on now".
+    //   next2h   = kickoff within the next 2 hours (Théo's live-decision window)
+    //   tonight  = kickoff today ≥ 18:00 Europe/Paris
+    //   tomorrow = kickoff on tomorrow's Paris date
+    if (filter === 'next2h' || filter === 'tonight' || filter === 'tomorrow') {
+      if (m.completed || m.status === 'STATUS_IN_PROGRESS') return false;
+      if (!m.date) return false;
+      const d = new Date(m.date);
+      if (isNaN(d)) return false;
+      const now = Date.now();
+      if (filter === 'next2h') {
+        const delta = d.getTime() - now;
+        return delta > 0 && delta <= 2 * 3600 * 1000;
+      }
+      // Paris-local day comparison for tonight/tomorrow so DST shifts don't leak.
+      const pDay = d.toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+      const pHour = parseInt(d.toLocaleTimeString('fr-FR', { timeZone: 'Europe/Paris', hour: '2-digit', hour12: false }), 10);
+      const todayParis = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+      const tomorrowParis = (() => {
+        const t = new Date(); t.setDate(t.getDate() + 1);
+        return t.toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+      })();
+      if (filter === 'tonight') return pDay === todayParis && pHour >= 18 && d.getTime() > now;
+      if (filter === 'tomorrow') return pDay === tomorrowParis;
+    }
     if (filter === 'tipsters') return !!(m.tips && m.tips.length);
     if (filter === 'won') return evaluateModelPick(m, pred) === 'won';
     if (filter === 'lost') return evaluateModelPick(m, pred) === 'lost';
@@ -2204,12 +2229,35 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T16:32:11.425877Z","today":"
       const d = new Date(m.date);
       return !isNaN(d) && d.getTime() > nowMs;
     };
+    // Kickoff-window helpers (Paris-local) — matches matchFilter() semantics.
+    const todayParisStr = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+    const tomorrowParisStr = (() => {
+      const t = new Date(); t.setDate(t.getDate() + 1);
+      return t.toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+    })();
+    const kickoffCheck = (m, kind) => {
+      if (m.completed || m.status === 'STATUS_IN_PROGRESS' || !m.date) return false;
+      const d = new Date(m.date);
+      if (isNaN(d)) return false;
+      if (kind === 'next2h') {
+        const delta = d.getTime() - nowMs;
+        return delta > 0 && delta <= 2 * 3600 * 1000;
+      }
+      const pDay = d.toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+      const pHour = parseInt(d.toLocaleTimeString('fr-FR', { timeZone: 'Europe/Paris', hour: '2-digit', hour12: false }), 10);
+      if (kind === 'tonight') return pDay === todayParisStr && pHour >= 18 && d.getTime() > nowMs;
+      if (kind === 'tomorrow') return pDay === tomorrowParisStr;
+      return false;
+    };
     const counts = {
       all: pool.length,
       value: pool.filter(m => predictMatch(m)?.value).length,
       lock: pool.filter(m => predictMatch(m)?.isLock).length,
       live: pool.filter(m => m.status === 'STATUS_IN_PROGRESS').length,
       upcoming: pool.filter(isUpcoming).length,
+      next2h: pool.filter(m => kickoffCheck(m, 'next2h')).length,
+      tonight: pool.filter(m => kickoffCheck(m, 'tonight')).length,
+      tomorrow: pool.filter(m => kickoffCheck(m, 'tomorrow')).length,
       tipsters: pool.filter(m => m.tips && m.tips.length).length,
       results: pool.filter(m => evaluateModelPick(m, predictMatch(m)) !== null).length,
       won: pool.filter(m => evaluateModelPick(m, predictMatch(m)) === 'won').length,
@@ -2218,6 +2266,9 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T16:32:11.425877Z","today":"
     const html = `
       <button class="filter-btn ${activeFilter==='all'?'active':''}" data-filter="all">Tous <span class="count">${counts.all}</span></button>
       <button class="filter-btn ${activeFilter==='upcoming'?'active':''}" data-filter="upcoming">À venir <span class="count">${counts.upcoming}</span></button>
+      ${counts.next2h ? `<button class="filter-btn ${activeFilter==='next2h'?'active':''}" data-filter="next2h" title="Kickoff dans les 2 prochaines heures">⏱ Dans 2h <span class="count">${counts.next2h}</span></button>` : ''}
+      ${counts.tonight ? `<button class="filter-btn ${activeFilter==='tonight'?'active':''}" data-filter="tonight" title="Kickoff ce soir à partir de 18h (Paris)">🌙 Ce soir <span class="count">${counts.tonight}</span></button>` : ''}
+      ${counts.tomorrow ? `<button class="filter-btn ${activeFilter==='tomorrow'?'active':''}" data-filter="tomorrow" title="Kickoff demain (Paris)">📅 Demain <span class="count">${counts.tomorrow}</span></button>` : ''}
       <button class="filter-btn ${activeFilter==='live'?'active':''}" data-filter="live">🔴 En direct <span class="count">${counts.live}</span></button>
       <button class="filter-btn ${activeFilter==='value'?'active':''}" data-filter="value">💎 Value bets <span class="count">${counts.value}</span></button>
       <button class="filter-btn ${activeFilter==='lock'?'active':''}" data-filter="lock">🔒 Pronos forts <span class="count">${counts.lock}</span></button>
@@ -2439,6 +2490,16 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T16:32:11.425877Z","today":"
             <span style="padding:3px 8px;border-radius:6px;background:rgba(255,255,255,.05);color:var(--text-dim,#b4bcc7);">Gain 10€ → ${gainFor10}€ net</span>
             ${pred.value ? `<span style="padding:3px 8px;border-radius:6px;background:rgba(245,158,11,.14);color:#f59e0b;font-weight:700;">💎 VALUE</span>` : ''}
             ${pred.isLock ? `<span style="padding:3px 8px;border-radius:6px;background:rgba(234,179,8,.14);color:#eab308;font-weight:700;">🔒 LOCK</span>` : ''}
+            ${(() => {
+              // Correlation warning: Théo a déjà 1+ paris sur ce match. On surface
+              // l'alerte parce qu'un 2e pari sur la même rencontre n'est pas
+              // diversifié — risque corrélé, stop-loss arrive plus vite.
+              const nBets = getMatchBetCount(m.id);
+              if (nBets === 0) return '';
+              const effective = myBet ? nBets - 1 : nBets;
+              if (effective <= 0) return '';
+              return `<span title="Tu as déjà ${nBets} pari${nBets>1?'s':''} sur ce match. Un 2e ticket = risque corrélé, tes stakes s'additionnent sur le même événement." style="padding:3px 8px;border-radius:6px;background:rgba(251,191,36,.16);color:#fbbf24;font-weight:700;">⚠️ Corrélé (${nBets})</span>`;
+            })()}
           </div>
           <div style="font-size:12.5px;color:var(--text-dim,#b4bcc7);line-height:1.45;margin-bottom:${topReasons.length?'8px':'0'};">${esc(pred.explain?.headline || '')}</div>
           ${topReasons.length ? `<ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:4px;">${topReasons.map(r => `<li style="font-size:12px;color:var(--text-dim,#b4bcc7);display:flex;gap:6px;"><span>${r.icon}</span><span>${esc(r.text)}</span></li>`).join('')}</ul>` : ''}
@@ -3532,6 +3593,152 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T16:32:11.425877Z","today":"
     `;
   }
 
+  // ====== Calibration (reliability diagram) ======
+  // Walk completed events, run predictMatch on each, bucket the predicted pick
+  // probability into 10-point bins, and compare to the actual outcome. A well-
+  // calibrated model should have the bucket's observed win rate ≈ bucket midpoint.
+  // Anything off-diagonal = over- or under-confidence we should correct.
+  function computeCalibration() {
+    const data = window.PRONOSTICS_DATA;
+    if (!data || !data.days) return [];
+    // Bucket edges centred on the range we actually produce (45-95% — below that
+    // we rarely surface a pick). Using 7 buckets of 10 pts keeps sample sizes
+    // per bucket meaningful given the ~300-500 settled picks available.
+    const buckets = [
+      { lo: 0.40, hi: 0.50, mid: 0.45, n: 0, w: 0 },
+      { lo: 0.50, hi: 0.55, mid: 0.525, n: 0, w: 0 },
+      { lo: 0.55, hi: 0.60, mid: 0.575, n: 0, w: 0 },
+      { lo: 0.60, hi: 0.65, mid: 0.625, n: 0, w: 0 },
+      { lo: 0.65, hi: 0.70, mid: 0.675, n: 0, w: 0 },
+      { lo: 0.70, hi: 0.80, mid: 0.75, n: 0, w: 0 },
+      { lo: 0.80, hi: 1.01, mid: 0.875, n: 0, w: 0 },
+    ];
+    const seen = new Set();
+    Object.values(data.days).forEach(arr => (arr || []).forEach(m => {
+      if (!m.completed) return;
+      if (m.id && seen.has(m.id)) return;
+      if (m.id) seen.add(m.id);
+      const pred = predictMatch(m);
+      if (!pred || !pred.pick || pred.skip) return;
+      const res = evaluateModelPick(m, pred);
+      if (res == null) return;
+      const p = pred.pick.prob;
+      const b = buckets.find(bk => p >= bk.lo && p < bk.hi);
+      if (!b) return;
+      b.n++;
+      if (res === 'won') b.w++;
+    }));
+    return buckets.filter(b => b.n > 0).map(b => ({
+      bucket: `${Math.round(b.lo*100)}-${Math.round(b.hi*100)}%`,
+      predicted: b.mid,
+      actual: b.w / b.n,
+      n: b.n,
+    }));
+  }
+
+  // Inline SVG reliability diagram: scatter of (predicted, actual) with the
+  // perfect-calibration diagonal. Bubble radius scales with sample size so
+  // we instantly see which buckets are statistically noisy.
+  function renderReliabilityDiagram(cal) {
+    if (!cal || !cal.length) {
+      return `<div style="padding:14px;background:var(--surface);border:1px dashed var(--border);border-radius:10px;color:var(--text-muted);font-size:13px;">Pas encore assez de matchs joués pour tracer la calibration du modèle.</div>`;
+    }
+    const w = 560, h = 260;
+    const mL = 44, mR = 18, mT = 18, mB = 38;
+    const pw = w - mL - mR, ph = h - mT - mB;
+    // Both axes span 0.40 → 1.00 (the range we actually produce picks in)
+    const xAt = p => mL + ((p - 0.40) / 0.60) * pw;
+    const yAt = p => mT + ph - ((p - 0.40) / 0.60) * ph;
+    const maxN = Math.max(...cal.map(c => c.n));
+    const rAt = n => 5 + Math.sqrt(n / maxN) * 14;
+    // Grid lines at every 10pts
+    const ticks = [0.40, 0.50, 0.60, 0.70, 0.80, 0.90, 1.00];
+    const gridLines = ticks.map(t => `
+      <line x1="${xAt(t).toFixed(1)}" y1="${mT}" x2="${xAt(t).toFixed(1)}" y2="${(mT+ph).toFixed(1)}" stroke="rgba(255,255,255,.04)"/>
+      <line x1="${mL}" y1="${yAt(t).toFixed(1)}" x2="${(mL+pw).toFixed(1)}" y2="${yAt(t).toFixed(1)}" stroke="rgba(255,255,255,.04)"/>
+    `).join('');
+    const xLabels = ticks.map(t => `<text x="${xAt(t).toFixed(1)}" y="${(h-14).toFixed(1)}" text-anchor="middle" fill="var(--text-dim2,#7b8693)" font-size="10">${Math.round(t*100)}%</text>`).join('');
+    const yLabels = ticks.map(t => `<text x="${(mL-6).toFixed(1)}" y="${(yAt(t)+4).toFixed(1)}" text-anchor="end" fill="var(--text-dim2,#7b8693)" font-size="10">${Math.round(t*100)}%</text>`).join('');
+    // Perfect-calibration diagonal (predicted == actual)
+    const diag = `<line x1="${xAt(0.40).toFixed(1)}" y1="${yAt(0.40).toFixed(1)}" x2="${xAt(1.00).toFixed(1)}" y2="${yAt(1.00).toFixed(1)}" stroke="rgba(255,255,255,.25)" stroke-dasharray="4 4"/>`;
+    // Scatter points
+    const points = cal.map(c => {
+      const cx = xAt(c.predicted), cy = yAt(c.actual), r = rAt(c.n);
+      const off = c.actual - c.predicted;
+      const col = Math.abs(off) < 0.05 ? '#34d399' : Math.abs(off) < 0.10 ? '#eab308' : '#f87171';
+      return `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${r.toFixed(1)}" fill="${col}" fill-opacity=".25" stroke="${col}" stroke-width="2"><title>Prédit ${Math.round(c.predicted*100)}% · réel ${Math.round(c.actual*100)}% (${c.w ?? ''}${c.n} matchs · écart ${off>=0?'+':''}${Math.round(off*100)}pts)</title></circle>`;
+    }).join('');
+    // Summary: weighted mean absolute calibration error (MCE-style)
+    const totalN = cal.reduce((s, c) => s + c.n, 0);
+    const mae = cal.reduce((s, c) => s + Math.abs(c.actual - c.predicted) * c.n, 0) / totalN;
+    const maeColor = mae < 0.05 ? '#34d399' : mae < 0.10 ? '#eab308' : '#f87171';
+    return `
+      <div style="background:var(--surface,#111827);border:1px solid var(--border,#2a3744);border-radius:12px;padding:14px;margin-bottom:24px;">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:8px;">
+          <div style="font-size:13px;color:var(--text-dim,#b4bcc7);font-weight:600;">Diagramme de fiabilité · proba prédite vs taux observé</div>
+          <div style="font-size:12px;color:var(--text-muted);">Erreur absolue moyenne : <span style="color:${maeColor};font-weight:700;">${(mae*100).toFixed(1)}pts</span> · ${totalN} picks</div>
+        </div>
+        <svg viewBox="0 0 ${w} ${h}" style="width:100%;height:auto;display:block;" xmlns="http://www.w3.org/2000/svg">
+          ${gridLines}
+          ${diag}
+          ${xLabels}
+          ${yLabels}
+          <text x="${(mL+pw/2).toFixed(1)}" y="${(h-2).toFixed(1)}" text-anchor="middle" fill="var(--text-dim,#b4bcc7)" font-size="11" font-weight="600">Proba prédite</text>
+          <text x="12" y="${(mT+ph/2).toFixed(1)}" text-anchor="middle" fill="var(--text-dim,#b4bcc7)" font-size="11" font-weight="600" transform="rotate(-90 12 ${(mT+ph/2).toFixed(1)})">Taux réel observé</text>
+          ${points}
+        </svg>
+        <div style="font-size:11.5px;color:var(--text-muted);margin-top:6px;line-height:1.45;">
+          Un point sur la diagonale = modèle parfaitement calibré. Au-dessus = sous-confiance (on pourrait miser plus gros). En-dessous = sur-confiance (cap Kelly ½). Taille ∝ nombre de matchs.
+        </div>
+      </div>
+    `;
+  }
+
+  // ====== Bankroll garde-fous ======
+  // Two banners:
+  //  1. Daily exposure cap : total stake on today's not-yet-settled bets > 5% of bankroll → warn.
+  //  2. Session stop-loss   : today's settled P&L < -15% of bankroll → red banner, stop betting.
+  function computeBankrollGuards() {
+    const data = window.PRONOSTICS_DATA;
+    const bets = loadMyBets();
+    const today = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+    const byId = {};
+    if (data && data.days) {
+      Object.values(data.days).forEach(arr => (arr || []).forEach(m => { if (m.id) byId[m.id] = m; }));
+    }
+    let engagedToday = 0;
+    let plToday = 0;
+    Object.values(bets).forEach(b => {
+      const m = byId[b.matchId];
+      const matchDay = m?.date ? new Date(m.date).toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' }) : (b.placedAt || '').slice(0,10);
+      if (matchDay !== today) return;
+      if (!m || !m.completed) {
+        // still at risk today
+        engagedToday += b.stake;
+      } else {
+        const pseudo = { pick: { key: b.pickKey } };
+        const r = evaluateModelPick(m, pseudo);
+        if (r === 'won') plToday += b.stake * (b.odds - 1);
+        else if (r === 'lost') plToday += -b.stake;
+      }
+    });
+    const dailyCap = bankroll * 0.05;
+    const stopLoss = -bankroll * 0.15;
+    return { engagedToday, dailyCap, plToday, stopLoss, today };
+  }
+
+  // Count bets Théo has placed on a given match (same match = correlated risk).
+  // Used to surface "⚠️ Pari corrélé" badges on top picks and bilan rows.
+  function getMatchBetCount(matchId) {
+    if (!matchId) return 0;
+    const bets = loadMyBets();
+    let n = 0;
+    for (const k of Object.keys(bets)) {
+      if (bets[k].matchId === String(matchId)) n++;
+    }
+    return n;
+  }
+
   // Aggregate bilan view: overall ROI, per-sport ROI, recent results, top completed picks
   function renderBilanPage(wrap) {
     const data = window.PRONOSTICS_DATA;
@@ -3605,18 +3812,25 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T16:32:11.425877Z","today":"
       const myChartHtml = myChartRows.length >= 2
         ? renderRoiChart(myChartRows, { title: 'P&L cumulé perso (€ réels)' }).replace(/u<\/text>/g, '€</text>').replace(/u<\/span>/g, '€</span>').replace(/u\.|u$| u /g, m => m.replace('u', '€'))
         : '';
+      // Pre-compute correlation counts so we can flag rows with multiple bets
+      // on the same match (corrélé = same event, stakes additifs).
+      const corrMap = {};
+      mine.rows.forEach(r => { corrMap[r.bet.matchId] = (corrMap[r.bet.matchId] || 0) + 1; });
       const myRowsHtml = mine.rows.slice(0, 30).map(r => {
         const m = r.match;
         const { home, away } = m ? getSides(m) : { home: null, away: null };
         const date = (r.bet.placedAt || '').slice(0, 10);
-        const matchLabel = m ? `${(home?.short||home?.name||'?')} vs ${(away?.short||away?.name||'?')}` : `(match supprimé ${r.bet.matchId})`;
+        const corrCount = corrMap[r.bet.matchId] || 1;
+        const corrBadge = corrCount > 1 ? ` <span title="${corrCount} paris sur ce même match — risque corrélé." style="padding:1px 5px;border-radius:4px;background:rgba(251,191,36,.16);color:#fbbf24;font-size:10px;font-weight:700;vertical-align:middle;">⚠️${corrCount}</span>` : '';
+        const matchNameText = m ? `${(home?.short||home?.name||'?')} vs ${(away?.short||away?.name||'?')}` : `(match supprimé ${r.bet.matchId})`;
+        const matchCell = esc(matchNameText) + corrBadge;
         const resColor = r.res === 'won' ? '#34d399' : r.res === 'lost' ? '#f87171' : 'var(--text-muted)';
         const resLabel = r.res === 'won' ? `✓ +${(r.payout - r.bet.stake).toFixed(2)}€`
                       : r.res === 'lost' ? `✗ -${r.bet.stake.toFixed(2)}€`
                       : '⏳ en attente';
         return `<tr>
           <td style="padding:6px 8px;color:var(--text-dim);font-size:12px;">${esc(date)}</td>
-          <td style="padding:6px 8px;">${esc(matchLabel)}</td>
+          <td style="padding:6px 8px;">${matchCell}</td>
           <td style="padding:6px 8px;color:var(--text-muted);font-size:12px;">${esc(r.bet.pickLabel)}</td>
           <td style="padding:6px 8px;text-align:right;">@${r.bet.odds.toFixed(2)}</td>
           <td style="padding:6px 8px;text-align:right;font-variant-numeric:tabular-nums;">${r.bet.stake.toFixed(2)}€</td>
@@ -3645,8 +3859,36 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T16:32:11.425877Z","today":"
             <span style="font-size:12px;color:var(--text-muted);">€</span>
           </div>
         </div>`;
+      // Garde-fous : daily cap (5%) + session stop-loss (−15%). Banners shown
+      // only when thresholds are actually tripped, so the bilan stays clean
+      // on normal days.
+      const guards = computeBankrollGuards();
+      const overCap = guards.engagedToday > guards.dailyCap;
+      const hitStopLoss = guards.plToday < guards.stopLoss;
+      let guardsHtml = '';
+      if (hitStopLoss) {
+        guardsHtml += `
+          <div style="padding:14px 16px;background:linear-gradient(135deg,rgba(248,113,113,.18) 0%,rgba(239,68,68,.14) 100%);border:1px solid rgba(248,113,113,.4);border-left:4px solid #f87171;border-radius:10px;margin-bottom:12px;display:flex;gap:12px;align-items:center;">
+            <div style="font-size:22px;">🛑</div>
+            <div style="flex:1;">
+              <div style="font-weight:700;color:#fca5a5;font-size:14px;">Stop-loss atteint aujourd'hui</div>
+              <div style="font-size:12.5px;color:var(--text-dim,#b4bcc7);margin-top:2px;">P&amp;L du jour <strong style="color:#f87171;">${guards.plToday.toFixed(2)}€</strong> — seuil fixé à <strong>${guards.stopLoss.toFixed(2)}€</strong> (−15% bankroll). Mieux vaut laisser décanter jusqu'à demain.</div>
+            </div>
+          </div>`;
+      }
+      if (overCap) {
+        guardsHtml += `
+          <div style="padding:14px 16px;background:linear-gradient(135deg,rgba(251,191,36,.16) 0%,rgba(245,158,11,.12) 100%);border:1px solid rgba(251,191,36,.4);border-left:4px solid #fbbf24;border-radius:10px;margin-bottom:12px;display:flex;gap:12px;align-items:center;">
+            <div style="font-size:22px;">⚠️</div>
+            <div style="flex:1;">
+              <div style="font-weight:700;color:#fcd34d;font-size:14px;">Exposition du jour dépassée</div>
+              <div style="font-size:12.5px;color:var(--text-dim,#b4bcc7);margin-top:2px;">Engagé aujourd'hui <strong style="color:#fbbf24;">${guards.engagedToday.toFixed(2)}€</strong> · plafond 5% bankroll = <strong>${guards.dailyCap.toFixed(2)}€</strong>. Tu empiles du risque corrélé.</div>
+            </div>
+          </div>`;
+      }
       mySection = `
         <h2 style="margin:0 0 12px;font-size:20px;">💼 Mes paris — bilan perso</h2>
+        ${guardsHtml}
         ${bankrollCard}
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px;">
           <div style="padding:14px;background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.2);border-radius:10px;">
@@ -3709,6 +3951,9 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T16:32:11.425877Z","today":"
         </div>
 
         ${chartHtml}
+
+        <h3 style="margin:24px 0 12px;font-size:16px;">Calibration du modèle</h3>
+        ${renderReliabilityDiagram(computeCalibration())}
 
         <h3 style="margin:24px 0 12px;font-size:16px;">Par sport</h3>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;">${perSportHtml || '<div class="empty">Aucun résultat pour le moment.</div>'}</div>
