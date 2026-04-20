@@ -2433,19 +2433,59 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T13:14:27.667104Z","today":"
       }
     } catch (e) { /* ignore */ }
 
+    // ClubElo component (football only) — Chantier 9.
+    // Uses the continuously-updated Elo ratings from api.clubelo.com, injected
+    // into each competitor by patch_clubelo.py. Elo is an independent, calibrated
+    // strength signal that doesn't derive from the current odds nor our own
+    // Poisson, so it's especially useful when:
+    //   - the market is wide/soft (mid-table Ligue 1, small-sample early season),
+    //   - two teams have diverging long-term strength but similar recent form,
+    //   - our record/Poisson have little data (cup draws, relegated teams).
+    //
+    // Formula: standard Elo → win expectancy with a 65-pt home advantage, then
+    // carve out a draw probability that shrinks as |eloDiff| grows (close
+    // matchups draw more often). Coverage: 100% of top-5 leagues.
+    let eloComp = null;
+    let eloStats = null;
+    try {
+      const eloH = home?.elo?.value;
+      const eloA = away?.elo?.value;
+      if (typeof eloH === 'number' && typeof eloA === 'number' && match.sport === 'football') {
+        const HOME_ADV = 65; // Elo points — empirical football home advantage
+        const adjDiff = (eloH - eloA) + HOME_ADV;
+        const pH_nodraw = 1 / (1 + Math.pow(10, -adjDiff / 400));
+        if (hasDraw) {
+          // Draw prob ~ 30% at parity, decaying with |adjDiff|
+          const pD_elo = 0.30 * Math.exp(-Math.abs(adjDiff) / 280);
+          const scale = 1 - pD_elo;
+          eloComp = {
+            pH: pH_nodraw * scale,
+            pD: pD_elo,
+            pA: (1 - pH_nodraw) * scale,
+          };
+        } else {
+          eloComp = { pH: pH_nodraw, pD: 0, pA: 1 - pH_nodraw };
+        }
+        eloStats = { home: eloH, away: eloA, diff: Math.round(eloH - eloA) };
+      }
+    } catch (e) { /* ignore */ }
+
     // Combine — dynamic weighting based on which components are available
-    // Priority: odds > Poisson (standings-based) > home/road split > record > form > fallback
+    // Priority: odds > Poisson (standings-based) > home/road split > record > Elo > form > fallback
     // Weights tuned 2026-04-20 after bilan analysis (high-conf 86% WR on football):
     //   - Odds stay dominant (market is calibrated)
     //   - Poisson bumped 0.35→0.40 — it's our strongest independent signal for football
     //   - Record bumped 0.25→0.30 — helps disambiguate the 50-58% bucket
     //   - H2H bumped 0.15→0.20 — stable signal when ≥3 meetings exist
+    //   - Elo added at 0.25 (Chantier 9) — independent of odds/Poisson, complements
+    //     record by bringing long-term strength into the mix
     let final;
     const components = [];
     if (pH != null) components.push({ w: 0.50, pH, pD: (pD||0), pA });
     if (poi) components.push({ w: 0.40, pH: poi.pH, pD: poi.pD, pA: poi.pA });
     if (hrComp) components.push({ w: 0.30, pH: hrComp.pH, pD: 0, pA: hrComp.pA });
     if (recScore) components.push({ w: 0.30, pH: recScore.pH, pD: recScore.pD||0, pA: recScore.pA });
+    if (eloComp) components.push({ w: 0.25, pH: eloComp.pH, pD: eloComp.pD||0, pA: eloComp.pA });
     if (h2hComp) components.push({ w: 0.20, pH: h2hComp.pH, pD: h2hComp.pD||0, pA: h2hComp.pA });
     if (components.length) {
       const totW = components.reduce((s,c) => s + c.w, 0);
@@ -2637,6 +2677,18 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T13:14:27.667104Z","today":"
         text: `xG attendus (Poisson) : ${poi.lamH.toFixed(2)} – ${poi.lamA.toFixed(2)}`
       });
     }
+    // ClubElo differential (Chantier 9) — surface only when the delta is
+    // meaningful (≥30 pts ≈ ~6% raw win-prob shift). Below 30 the market
+    // and our other signals already capture it.
+    if (eloStats && Math.abs(eloStats.diff) >= 30) {
+      const leaderElo = eloStats.diff > 0 ? (home?.short || home?.name) : (away?.short || away?.name);
+      const diffAbs = Math.abs(eloStats.diff);
+      reasons.push({
+        type: 'elo',
+        icon: '📊',
+        text: `Elo ${eloStats.home} vs ${eloStats.away} (Δ ${diffAbs >= 0 ? '+' : ''}${eloStats.diff}) — avantage ${leaderElo}`
+      });
+    }
     // H2H
     if (h2hStats) {
       const { homeWins, awayWins, draws, n } = h2hStats;
@@ -2759,6 +2811,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T13:14:27.667104Z","today":"
         return { ou: ouPick, btts: bttsPick, raw: mk };
       })() : null,
       components: components.map(c => ({ w: c.w })),
+      elo: eloStats,  // { home, away, diff } — surfaced on the match modal
       explain: { headline, reasons }
     };
   }
