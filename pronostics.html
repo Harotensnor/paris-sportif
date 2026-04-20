@@ -2286,6 +2286,63 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T13:14:27.667104Z","today":"
     return { ...probs, lamH, lamA };
   }
 
+  // ======= Fixture congestion (Chantier 10) =======
+  // Builds a team_name → sorted[match_timestamps_utc] map over the entire
+  // data.js window (~3d past + ~10d future). Used by predictMatch to detect
+  // teams playing 3+ games in the 7 days before a match and apply a small
+  // probability penalty. All client-side — no new data source needed.
+  //
+  // Empirical football research: a team playing their 3rd match in 7 days
+  // scores ~0.10-0.15 fewer goals per game and has ~3-5% lower win probability
+  // vs a rested opponent (UEFA Champions League + Premier League studies).
+  // We translate that into ~1.5% per extra match above a 1-game baseline,
+  // capped at ±4% total differential.
+  let __congestionCache = null;
+  let __congestionCacheRef = null;
+  function getCongestionMap() {
+    const cur = window.PRONOSTICS_DATA;
+    if (__congestionCacheRef !== cur) {
+      __congestionCache = new Map();
+      const days = cur?.days || {};
+      for (const dkey in days) {
+        const list = days[dkey] || [];
+        for (const m of list) {
+          if (!m?.date) continue;
+          const t = Date.parse(m.date);
+          if (isNaN(t)) continue;
+          for (const c of m.competitors || []) {
+            const key = c?.name;
+            if (!key) continue;
+            let arr = __congestionCache.get(key);
+            if (!arr) { arr = []; __congestionCache.set(key, arr); }
+            arr.push(t);
+          }
+        }
+      }
+      for (const arr of __congestionCache.values()) arr.sort((a, b) => a - b);
+      __congestionCacheRef = cur;
+    }
+    return __congestionCache;
+  }
+
+  /**
+   * Count a team's matches in the `windowDays` days strictly BEFORE
+   * `matchTime` (excludes the match itself and any later fixture).
+   */
+  function congestionCount(teamName, matchTime, windowDays = 7) {
+    if (!teamName || !matchTime) return 0;
+    const arr = getCongestionMap().get(teamName);
+    if (!arr) return 0;
+    const windowStart = matchTime - windowDays * 24 * 3600 * 1000;
+    let n = 0;
+    for (const t of arr) {
+      if (t < windowStart) continue;
+      if (t >= matchTime) break;
+      n++;
+    }
+    return n;
+  }
+
   // ======= Prediction =======
   // ===== Memoization layer for predictMatch =====
   // predictMatch gets called 15+ times per render (filter, summary, top picks,
@@ -2378,6 +2435,30 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T13:14:27.667104Z","today":"
       const gdA = (as_.avg_gf5 || 0) - (as_.avg_ga5 || 0);
       // Typical football gd range is ≈ [-2, +2]. Cap shift at ±4%.
       gdNudge = Math.max(-0.04, Math.min(0.04, (gdH - gdA) * 0.015));
+    }
+
+    // Fixture congestion (Chantier 10, football only) — teams playing 3+
+    // matches in 7 days score less and win less. We compute a small
+    // differential nudge from each side's count of past matches in the
+    // 7-day window leading up to this match. The window + cache lives on
+    // data.js so it auto-invalidates on each refresh.
+    let congestionNudge = null;
+    let congestionStats = null;
+    if (match.sport === 'football' && match.date) {
+      const matchTime = Date.parse(match.date);
+      if (!isNaN(matchTime)) {
+        const hCnt = congestionCount(home?.name, matchTime, 7);
+        const aCnt = congestionCount(away?.name, matchTime, 7);
+        if (hCnt >= 2 || aCnt >= 2) {
+          // Only count "fatigue" above a 1-match baseline (1 game in 7 days
+          // is perfectly normal league cadence — no penalty). Then 1.5%
+          // per extra game, capped at ±4% total differential.
+          const hPen = Math.max(0, hCnt - 1) * 0.015;
+          const aPen = Math.max(0, aCnt - 1) * 0.015;
+          congestionNudge = Math.max(-0.04, Math.min(0.04, aPen - hPen));
+          congestionStats = { home: hCnt, away: aCnt };
+        }
+      }
     }
 
     // Poisson component (football only, needs standings with GF/GA)
@@ -2506,6 +2587,13 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T13:14:27.667104Z","today":"
       if (gdNudge != null) {
         final.pH += gdNudge;
         final.pA -= gdNudge;
+      }
+      // Fixture-congestion nudge — penalize the side with more matches in the
+      // ±7d window. Based on existing data.js schedule (no extra fetch).
+      // Positive congestionNudge means away team is more congested → boost home.
+      if (congestionNudge != null) {
+        final.pH += congestionNudge;
+        final.pA -= congestionNudge;
       }
       // Injury penalty: each severe absence (Out/Suspended/Doubtful) on either
       // side shifts the win prob by ~1.5% (cap at 6%). ESPN covers US sports
@@ -2689,6 +2777,19 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T13:14:27.667104Z","today":"
         text: `Elo ${eloStats.home} vs ${eloStats.away} (Δ ${diffAbs >= 0 ? '+' : ''}${eloStats.diff}) — avantage ${leaderElo}`
       });
     }
+    // Fixture congestion — surface when a side has ≥3 matches in a 7-day
+    // window. ≥3 in 7d is the canonical fatigue threshold used by coaches
+    // when asking for rotation; ≤2 is normal for cup-week schedules.
+    if (congestionStats && (congestionStats.home >= 3 || congestionStats.away >= 3)) {
+      const tired = congestionStats.home >= congestionStats.away
+        ? { team: home?.short || home?.name, cnt: congestionStats.home }
+        : { team: away?.short || away?.name, cnt: congestionStats.away };
+      reasons.push({
+        type: 'congestion',
+        icon: '🏃',
+        text: `${tired.team} ${tired.cnt} matchs en 7j — fatigue possible`
+      });
+    }
     // H2H
     if (h2hStats) {
       const { homeWins, awayWins, draws, n } = h2hStats;
@@ -2812,6 +2913,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T13:14:27.667104Z","today":"
       })() : null,
       components: components.map(c => ({ w: c.w })),
       elo: eloStats,  // { home, away, diff } — surfaced on the match modal
+      congestion: congestionStats,  // { home, away } — match count in ±7d window
       explain: { headline, reasons }
     };
   }
