@@ -643,6 +643,33 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T12:11:01.060850Z","today":"
     return isFinite(v) && v > 0 ? v : 100;
   })();
 
+  // ======= Personal bets storage (client-only, localStorage) =======
+  // Keyed by matchId::pickKey. Each entry:
+  //   { matchId, pickLabel, pickKey, odds, stake, placedAt, result: null|'won'|'lost' }
+  // Result is computed lazily from the current match state at render time — we
+  // don't freeze it, so if data fixes update a final score the bilan corrects
+  // itself automatically.
+  const MY_BETS_KEY = 'myBets';
+  function loadMyBets() {
+    try { return JSON.parse(localStorage.getItem(MY_BETS_KEY) || '{}') || {}; }
+    catch (e) { return {}; }
+  }
+  function saveMyBets(obj) {
+    try { localStorage.setItem(MY_BETS_KEY, JSON.stringify(obj)); } catch (e) {}
+  }
+  function myBetKey(matchId, pickKey) { return `${matchId}::${pickKey || '1X2'}`; }
+  function getMyBet(matchId, pickKey) { return loadMyBets()[myBetKey(matchId, pickKey)] || null; }
+  function upsertMyBet(bet) {
+    const all = loadMyBets();
+    all[myBetKey(bet.matchId, bet.pickKey)] = bet;
+    saveMyBets(all);
+  }
+  function removeMyBet(matchId, pickKey) {
+    const all = loadMyBets();
+    delete all[myBetKey(matchId, pickKey)];
+    saveMyBets(all);
+  }
+
   // ======= Date helpers =======
   function todayISO() {
     const g = window.PRONOSTICS_DATA?.today;
@@ -1787,6 +1814,8 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T12:11:01.060850Z","today":"
       const topReasons = reasons.slice(0, 3);
       // Half-Kelly suggestion sized against the user's bankroll
       const kelly = kellyStake(pred.pick.prob, pickOdd, bankroll, 0.5);
+      // Is this pick already tracked as a personal bet?
+      const myBet = getMyBet(m.id, pred.pick.key);
       const badgeColor = rank === 1 ? '#ffd700' : rank === 2 ? '#c0c0c0' : rank === 3 ? '#cd7f32' : 'var(--surface-3,#27313b)';
       const badgeText = rank === 1 ? '#fff8dc' : rank === 2 ? '#111' : rank === 3 ? '#fff' : 'var(--text)';
       const wmxUrl = winamaxUrl(m);
@@ -1828,7 +1857,13 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T12:11:01.060850Z","today":"
               ${pred.markets.btts.prob >= 0.60 ? `<span title="BTTS = Both Teams To Score. Calculé via P(H≥1)·P(A≥1) depuis le Poisson." style="padding:3px 7px;border-radius:6px;background:rgba(236,72,153,.14);color:#f472b6;font-weight:700;">🔄 ${esc(pred.markets.btts.label)} · ${(pred.markets.btts.prob*100).toFixed(0)}%</span>` : ''}
             </div>
           ` : ''}
-          ${wmxUrl ? `<a href="${esc(wmxUrl)}" target="_blank" rel="noopener" class="tp-wmx" style="display:block;text-align:center;margin-top:10px;padding:8px;background:linear-gradient(135deg,#ff6b00,#ff4e00);color:#fff;border-radius:8px;font-weight:700;font-size:13px;text-decoration:none;letter-spacing:.3px;" onclick="event.stopPropagation();">Parier sur Winamax →</a>` : ''}
+          <div style="display:flex;gap:8px;margin-top:10px;">
+            ${wmxUrl ? `<a href="${esc(wmxUrl)}" target="_blank" rel="noopener" class="tp-wmx" style="flex:1;display:block;text-align:center;padding:8px;background:linear-gradient(135deg,#ff6b00,#ff4e00);color:#fff;border-radius:8px;font-weight:700;font-size:13px;text-decoration:none;letter-spacing:.3px;" onclick="event.stopPropagation();">Parier sur Winamax →</a>` : ''}
+            ${myBet
+              ? `<button class="tp-mybet" data-match="${esc(m.id)}" data-pick="${esc(pred.pick.key)}" style="padding:8px 12px;background:rgba(52,211,153,.15);border:1px solid rgba(52,211,153,.35);color:#34d399;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap;" title="Tu as parié ${myBet.stake.toFixed(2)}€ @ ${myBet.odds.toFixed(2)}. Clic pour retirer.">✓ Parié ${myBet.stake.toFixed(2)}€</button>`
+              : `<button class="tp-mybet" data-match="${esc(m.id)}" data-pick="${esc(pred.pick.key)}" data-label="${esc(pred.pick.label)}" data-odds="${pickOdd}" data-stake="${kelly ? kelly.stake100.toFixed(2) : '10'}" style="padding:8px 12px;background:rgba(255,255,255,.04);border:1px solid var(--border,#2a3744);color:var(--text,#e5e7eb);border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap;" title="Marquer comme pari placé — alimente ton bilan perso">💰 J'ai parié</button>`
+            }
+          </div>
         </div>
       `;
     };
@@ -1917,6 +1952,36 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T12:11:01.060850Z","today":"
         if (match) break;
       }
       if (match) openDetail(match);
+    }));
+    // "J'ai parié" button — toggles personal bet tracking for that (match, pick).
+    // Stops propagation so it doesn't also open the match detail modal.
+    wrap.querySelectorAll('.tp-mybet').forEach(btn => btn.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      const matchId = btn.dataset.match;
+      const pickKey = btn.dataset.pick;
+      const existing = getMyBet(matchId, pickKey);
+      if (existing) {
+        // Already tracked — click removes
+        if (confirm(`Retirer le pari ${existing.pickLabel} @ ${existing.odds.toFixed(2)} (${existing.stake.toFixed(2)}€) de ton bilan perso ?`)) {
+          removeMyBet(matchId, pickKey);
+          render();
+        }
+        return;
+      }
+      // New bet: prompt for stake with Kelly as the default
+      const suggested = btn.dataset.stake || '10';
+      const raw = prompt(`Mise en € pour "${btn.dataset.label}" @ ${btn.dataset.odds} ?\n(Kelly-½ suggère ${suggested}€)`, suggested);
+      if (raw == null) return;
+      const stake = parseFloat(String(raw).replace(',', '.'));
+      if (!isFinite(stake) || stake <= 0) return;
+      upsertMyBet({
+        matchId, pickKey,
+        pickLabel: btn.dataset.label,
+        odds: parseFloat(btn.dataset.odds),
+        stake,
+        placedAt: new Date().toISOString(),
+      });
+      render();
     }));
   }
 
@@ -2768,6 +2833,46 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T12:11:01.060850Z","today":"
     });
   }
 
+  // ======= Personal-bets bilan (from localStorage) =======
+  // For each saved bet, look up the current match; if it's completed, compute
+  // the result against the saved pickKey and stake. This is the honest PERSONAL
+  // ROI — tied to the actual stakes Théo placed, not the flat-unit model ROI.
+  function computeMyBilan() {
+    const data = window.PRONOSTICS_DATA;
+    if (!data || !data.days) return null;
+    const bets = loadMyBets();
+    const byId = {};
+    Object.values(data.days).forEach(arr => (arr || []).forEach(m => { if (m.id) byId[m.id] = m; }));
+    let staked = 0, returned = 0, w = 0, l = 0, pending = 0;
+    const rows = [];
+    for (const [key, b] of Object.entries(bets)) {
+      const m = byId[b.matchId];
+      let res = 'pending', payout = 0;
+      if (m && m.completed) {
+        // Build a minimal pseudo-pred to reuse evaluateModelPick
+        const pseudo = { pick: { key: b.pickKey } };
+        const r = evaluateModelPick(m, pseudo);
+        if (r === 'won')  { res = 'won';  payout = b.stake * b.odds; w++; }
+        else if (r === 'lost') { res = 'lost'; payout = 0;             l++; }
+        else { res = 'pending'; }
+      }
+      if (res === 'pending') pending++;
+      if (res !== 'pending') { staked += b.stake; returned += payout; }
+      rows.push({ key, bet: b, match: m, res, payout });
+    }
+    const pl = returned - staked;
+    const roi = staked > 0 ? (pl / staked) : 0;
+    return {
+      bets: rows.length,
+      settled: w + l,
+      pending,
+      w, l,
+      staked, returned, pl,
+      roi,
+      rows: rows.sort((a, b) => (b.bet.placedAt || '').localeCompare(a.bet.placedAt || '')),
+    };
+  }
+
   // Aggregate bilan view: overall ROI, per-sport ROI, recent results, top completed picks
   function renderBilanPage(wrap) {
     const data = window.PRONOSTICS_DATA;
@@ -2820,8 +2925,73 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T12:11:01.060850Z","today":"
           <div style="font-size:12px;color:${sr>=0?'#34d399':'#f87171'};">ROI ${sr>=0?'+':''}${sr}% · ${s.bets} paris</div>
         </div>`;
       }).join('');
+    // ==== Personal bilan section ====
+    const mine = computeMyBilan();
+    let mySection = '';
+    if (mine && mine.bets > 0) {
+      const myRoiPct = (mine.roi * 100);
+      const myRowsHtml = mine.rows.slice(0, 30).map(r => {
+        const m = r.match;
+        const { home, away } = m ? getSides(m) : { home: null, away: null };
+        const date = (r.bet.placedAt || '').slice(0, 10);
+        const matchLabel = m ? `${(home?.short||home?.name||'?')} vs ${(away?.short||away?.name||'?')}` : `(match supprimé ${r.bet.matchId})`;
+        const resColor = r.res === 'won' ? '#34d399' : r.res === 'lost' ? '#f87171' : 'var(--text-muted)';
+        const resLabel = r.res === 'won' ? `✓ +${(r.payout - r.bet.stake).toFixed(2)}€`
+                      : r.res === 'lost' ? `✗ -${r.bet.stake.toFixed(2)}€`
+                      : '⏳ en attente';
+        return `<tr>
+          <td style="padding:6px 8px;color:var(--text-dim);font-size:12px;">${esc(date)}</td>
+          <td style="padding:6px 8px;">${esc(matchLabel)}</td>
+          <td style="padding:6px 8px;color:var(--text-muted);font-size:12px;">${esc(r.bet.pickLabel)}</td>
+          <td style="padding:6px 8px;text-align:right;">@${r.bet.odds.toFixed(2)}</td>
+          <td style="padding:6px 8px;text-align:right;font-variant-numeric:tabular-nums;">${r.bet.stake.toFixed(2)}€</td>
+          <td style="padding:6px 8px;text-align:right;font-weight:700;color:${resColor};">${esc(resLabel)}</td>
+          <td style="padding:6px 8px;text-align:right;"><button data-mybet-del="${esc(r.key)}" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;" title="Retirer du bilan">×</button></td>
+        </tr>`;
+      }).join('');
+      mySection = `
+        <h2 style="margin:0 0 12px;font-size:20px;">💼 Mes paris — bilan perso</h2>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px;">
+          <div style="padding:14px;background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.2);border-radius:10px;">
+            <div style="font-size:11px;color:var(--text-muted);letter-spacing:.5px;text-transform:uppercase;">Misé total</div>
+            <div style="font-size:22px;font-weight:700;">${mine.staked.toFixed(2)}€</div>
+            <div style="font-size:11px;color:var(--text-muted);">${mine.settled} réglés · ${mine.pending} en attente</div>
+          </div>
+          <div style="padding:14px;background:${mine.pl>=0?'rgba(52,211,153,.08)':'rgba(248,113,113,.08)'};border:1px solid ${mine.pl>=0?'rgba(52,211,153,.2)':'rgba(248,113,113,.2)'};border-radius:10px;">
+            <div style="font-size:11px;color:var(--text-muted);letter-spacing:.5px;text-transform:uppercase;">Gain / perte</div>
+            <div style="font-size:22px;font-weight:700;color:${mine.pl>=0?'#34d399':'#f87171'};">${mine.pl>=0?'+':''}${mine.pl.toFixed(2)}€</div>
+            <div style="font-size:11px;color:var(--text-muted);">Retours: ${mine.returned.toFixed(2)}€</div>
+          </div>
+          <div style="padding:14px;background:${myRoiPct>=0?'rgba(52,211,153,.08)':'rgba(248,113,113,.08)'};border:1px solid ${myRoiPct>=0?'rgba(52,211,153,.2)':'rgba(248,113,113,.2)'};border-radius:10px;">
+            <div style="font-size:11px;color:var(--text-muted);letter-spacing:.5px;text-transform:uppercase;">ROI perso</div>
+            <div style="font-size:22px;font-weight:700;color:${myRoiPct>=0?'#34d399':'#f87171'};">${myRoiPct>=0?'+':''}${myRoiPct.toFixed(1)}%</div>
+            <div style="font-size:11px;color:var(--text-muted);">${mine.w}W · ${mine.l}L</div>
+          </div>
+        </div>
+        <details style="margin-bottom:28px;">
+          <summary style="cursor:pointer;color:var(--text-muted);font-size:13px;padding:6px 0;">Historique (${Math.min(mine.rows.length, 30)}/${mine.rows.length})</summary>
+          <div style="overflow-x:auto;margin-top:8px;">
+            <table style="width:100%;border-collapse:collapse;font-size:13px;">
+              <thead><tr style="text-align:left;color:var(--text-muted);border-bottom:1px solid var(--border);">
+                <th style="padding:8px;">Date</th><th style="padding:8px;">Match</th><th style="padding:8px;">Pick</th><th style="padding:8px;text-align:right;">Cote</th><th style="padding:8px;text-align:right;">Mise</th><th style="padding:8px;text-align:right;">Résultat</th><th></th>
+              </tr></thead>
+              <tbody>${myRowsHtml}</tbody>
+            </table>
+          </div>
+        </details>
+      `;
+    } else {
+      mySection = `
+        <h2 style="margin:0 0 12px;font-size:20px;">💼 Mes paris — bilan perso</h2>
+        <div style="padding:14px;background:var(--surface);border:1px dashed var(--border);border-radius:10px;color:var(--text-muted);font-size:13px;margin-bottom:24px;">
+          Pas encore de pari enregistré. Clique sur 💰 <strong>J'ai parié</strong> sur une carte Top pick pour alimenter ton bilan perso.
+        </div>
+      `;
+    }
+
     wrap.innerHTML = `
       <div style="margin-top:0;">
+        ${mySection}
         <h2 style="margin:0 0 12px;font-size:20px;">📊 Bilan global du modèle</h2>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:24px;">
           <div style="padding:16px;background:linear-gradient(135deg,rgba(99,102,241,.15) 0%,rgba(79,70,229,.15) 100%);border:1px solid rgba(99,102,241,.3);border-radius:12px;">
@@ -2854,6 +3024,15 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T12:11:01.060850Z","today":"
         </div>
       </div>
     `;
+    // Wire delete buttons for personal bets
+    wrap.querySelectorAll('[data-mybet-del]').forEach(btn => btn.addEventListener('click', () => {
+      const key = btn.dataset.mybetDel;
+      const [matchId, pickKey] = key.split('::');
+      const all = loadMyBets();
+      delete all[key];
+      saveMyBets(all);
+      renderBilanPage(wrap);
+    }));
   }
 
   window.addEventListener('DOMContentLoaded', () => {
