@@ -2868,13 +2868,64 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T13:14:27.667104Z","today":"
       });
     }
 
+    // ======= Reliability (multi-source meta-confidence) =======
+    // The raw pickProb (best_pick[1]) is our best probability estimate and
+    // remains authoritative for EV math. But for the UI "fiabilité" gauge
+    // and tier bucketing, a richer score is more useful: it blends
+    //   (a) the pick's raw prob,
+    //   (b) the agreement between components (low dispersion → high conf),
+    //   (c) signal richness (more components present → more reliable).
+    // Component agreement is what a seasoned bettor calls "consensus" —
+    // when odds, Poisson, Elo, record and H2H all agree on the same side,
+    // the pick is dramatically more trustworthy than when they tug against
+    // each other.
+    let reliability = best_pick[1];
+    let reliabilityMeta = null;
+    {
+      const pickKey = best_pick[2]; // '1' | 'X' | '2'
+      const fieldMap = { '1': 'pH', 'X': 'pD', '2': 'pA' };
+      const field = fieldMap[pickKey];
+      const compProbs = components
+        .map(c => (c && typeof c[field] === 'number') ? c[field] : null)
+        .filter(x => x != null);
+      const pickProbVal = best_pick[1];
+      // Signal richness — saturates at 5 (odds + poisson + hr + record + elo + h2h
+      // = 6 max but realistically most events have 3-4). 2 components = 0.4,
+      // 4 = 0.8, 5+ = 1.0.
+      const richness = Math.min(1, Math.max(0, compProbs.length / 5));
+      let agreement = 0.5;  // neutral if we can't compute
+      if (compProbs.length >= 2) {
+        const mean = compProbs.reduce((a,b) => a+b, 0) / compProbs.length;
+        const variance = compProbs.reduce((a,b) => a + (b - mean)*(b - mean), 0) / compProbs.length;
+        const sd = Math.sqrt(variance);
+        // sd=0 → 1.0 (perfect consensus); sd=0.15+ → 0.0 (sharp disagreement).
+        // 0.15 chosen because a 15-pt dispersion on the pick's prob (e.g. one
+        // component says 45%, another says 75%) is the practical "divergence"
+        // threshold where the combined estimate should be distrusted.
+        agreement = Math.max(0, Math.min(1, 1 - sd / 0.15));
+      }
+      // Blend: agreement weighted 0.70, richness weighted 0.30. Boost factor
+      // maps to [0.85, 1.08] so reliability can be modestly higher OR lower
+      // than pickProb — never runaway.
+      const blend = 0.70 * agreement + 0.30 * richness;
+      const boost = 0.85 + 0.23 * blend;
+      reliability = Math.max(0.25, Math.min(0.98, pickProbVal * boost));
+      reliabilityMeta = {
+        pickProb: pickProbVal,
+        componentCount: compProbs.length,
+        agreement: Math.round(agreement * 100) / 100,
+        richness: Math.round(richness * 100) / 100,
+        boost: Math.round(boost * 1000) / 1000,
+      };
+    }
+
     // Generate a one-sentence headline summary
     let headline = '';
-    const conf = best_pick[1];
-    if (conf >= 0.72) headline = `Pari très solide — le modèle donne ${(conf*100).toFixed(0)}% de réussite`;
-    else if (conf >= 0.60) headline = `Bon pari — ${(conf*100).toFixed(0)}% de confiance`;
-    else if (conf >= 0.50) headline = `Pari jouable — ${(conf*100).toFixed(0)}% de confiance`;
-    else headline = `Incertain — ${(conf*100).toFixed(0)}% seulement, préférer un autre match`;
+    const conf = reliability;  // headline speaks to the UX confidence, not raw prob
+    if (conf >= 0.72) headline = `Pari très solide — fiabilité ${(conf*100).toFixed(0)}%`;
+    else if (conf >= 0.60) headline = `Bon pari — fiabilité ${(conf*100).toFixed(0)}%`;
+    else if (conf >= 0.50) headline = `Pari jouable — fiabilité ${(conf*100).toFixed(0)}%`;
+    else headline = `Incertain — fiabilité ${(conf*100).toFixed(0)}%, préférer un autre match`;
     if (valueLabel) {
       headline += ` · Edge +${(valueEdge*100).toFixed(1)}% sur la cote ${valueOdd.toFixed(2)}`;
     }
@@ -2882,17 +2933,24 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T13:14:27.667104Z","today":"
     return {
       probs: final,
       pick: { label: best_pick[0], prob: best_pick[1], key: best_pick[2], team: best_pick[3] },
+      // Reliability = meta-confidence (consensus × richness × pickProb).
+      // Used by UI gauges and tier bucketing. pickProb remains authoritative
+      // for EV / Kelly / value detection math.
+      reliability,
+      reliabilityMeta,
       odds: best,
       value: valueLabel ? { lbl: valueLabel, edge: valueEdge, odd: valueOdd } : null,
       hasDraw,
-      isLock: best_pick[1] >= 0.72,
+      isLock: reliability >= 0.72,
       // Thresholds tuned against the completed-match bilan (2026-04-20):
       //   <42% : 31% WR — pure noise, never surface ("skip")
       //   42-50% : 53% WR — coinflip, need strong value/lock to justify ("lowConf")
       //   50-58% : 56% WR
       //   58-72% : 86% WR — sweet spot, this is what Top 5 surfaces
-      lowConf: best_pick[1] < 0.50,
-      skip: best_pick[1] < 0.45,
+      // Now applied to `reliability` (not pickProb) so divergent components
+      // downgrade a match that would otherwise clear the threshold on raw prob.
+      lowConf: reliability < 0.50,
+      skip: reliability < 0.45,
       poisson: poi ? { xgH: poi.lamH, xgA: poi.lamA } : null,
       // Top-3 most probable exact scores under the Poisson model. Foot only
       // (Chantier 6). Rendu en carte sur le modal match.
@@ -3649,8 +3707,8 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T13:14:27.667104Z","today":"
               <div class="val">${pickOdd.toFixed(2)}</div>
             </div>
             <div class="hero-stat brand">
-              <div class="label">Confiance · ${confLabel(pred.pick.prob).lbl}</div>
-              <div class="val">${(pred.pick.prob*100).toFixed(0)}%</div>
+              <div class="label">Fiabilité · ${confLabel(pred.reliability ?? pred.pick.prob).lbl}</div>
+              <div class="val">${((pred.reliability ?? pred.pick.prob)*100).toFixed(0)}%</div>
             </div>
             <div class="hero-stat accent">
               <div class="label">EV</div>
@@ -4179,11 +4237,11 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T13:14:27.667104Z","today":"
 
     // Prediction
     const predHtml = pred ? (() => {
-      const cl = confLabel(pred.pick.prob);
+      const cl = confLabel(pred.reliability ?? pred.pick.prob);
       const finalCls = modelResult ? ' final-' + modelResult : '';
       const resultBadge = modelResult ? resultBadgeHtml(modelResult, pred.odds && modelResult === 'won' ?
         (pred.pick.key === '1' ? pred.odds.home : pred.pick.key === '2' ? pred.odds.away : pred.odds.draw) : null) : '';
-      const rightEl = isFinal ? resultBadge : confGauge(pred.pick.prob, 'md');
+      const rightEl = isFinal ? resultBadge : confGauge(pred.reliability ?? pred.pick.prob, 'md');
       // Explanation section — only pre-match, show the headline + top 2 reasons
       const reasons = pred.explain?.reasons || [];
       const showExplain = !isFinal && !isLive && reasons.length;
@@ -4413,7 +4471,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T13:14:27.667104Z","today":"
             <h4>🎯 Notre pronostic ${modelRes ? resultBadgeHtml(modelRes, modelRes === 'won' && pred.odds ? pickOdd : null) : ''}</h4>
             <div class="big-tip" style="${modelRes === 'lost' ? 'text-decoration:line-through; opacity:.7;' : ''}">${esc(pred.pick.label)}</div>
             <div class="big-conf">
-              <b>${(pred.pick.prob*100).toFixed(0)}%</b> de probabilité · confiance ${confLabel(pred.pick.prob).lbl}
+              <b>${(pred.pick.prob*100).toFixed(0)}%</b> de probabilité · fiabilité <b>${((pred.reliability ?? pred.pick.prob)*100).toFixed(0)}%</b> ${confLabel(pred.reliability ?? pred.pick.prob).lbl}
               ${pred.value ? ` · <span style="color:var(--accent);">💎 VALUE +${(pred.value.edge*100).toFixed(1)}% d'edge</span>` : ''}
               ${pred.isLock ? ` · <span class="badge lock">🔒 LOCK</span>` : ''}
             </div>
@@ -4430,6 +4488,26 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T13:14:27.667104Z","today":"
                 ${reasons.map(r => `<li style="display:flex;gap:10px;padding:8px 10px;background:rgba(255,255,255,.02);border-radius:6px;font-size:13px;line-height:1.4;"><span style="font-size:15px;">${r.icon}</span><span style="color:var(--text,#e6ebf2);">${esc(r.text)}</span></li>`).join('')}
               </ul>
             </div>` : ''}
+            ${pred.reliabilityMeta ? (() => {
+              const rm = pred.reliabilityMeta;
+              const consensusPct = rm.agreement != null ? Math.round(rm.agreement*100) : null;
+              const consensusLbl = consensusPct == null ? '—' :
+                                    consensusPct >= 80 ? `🟢 ${consensusPct}% (fort)` :
+                                    consensusPct >= 50 ? `🟡 ${consensusPct}% (partiel)` :
+                                                         `🔴 ${consensusPct}% (divergence)`;
+              const rawPct = (rm.pickProb*100).toFixed(0);
+              const relPct = ((pred.reliability ?? pred.pick.prob)*100).toFixed(0);
+              const delta = Math.round((pred.reliability - rm.pickProb) * 100);
+              const deltaTxt = delta === 0 ? '' : delta > 0 ? ` +${delta}pt` : ` ${delta}pt`;
+              return `<div style="margin-top:12px;padding:10px 12px;background:rgba(255,255,255,.02);border-radius:8px;border:1px solid rgba(255,255,255,.04);font-size:12px;color:var(--text-dim,#b4bcc7);line-height:1.5;">
+                <div style="font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-dim2,#7b8693);margin-bottom:6px;">🎚️ Décomposition fiabilité</div>
+                <div style="display:flex;gap:16px;flex-wrap:wrap;font-variant-numeric:tabular-nums;">
+                  <span><b style="color:var(--text,#e6ebf2);">${rm.componentCount}</b> sources</span>
+                  <span>consensus ${consensusLbl}</span>
+                  <span>proba brute <b style="color:var(--text,#e6ebf2);">${rawPct}%</b> → fiabilité <b style="color:var(--text,#e6ebf2);">${relPct}%</b><span style="color:${delta>0?'#10b981':delta<0?'#fca5a5':'var(--text-dim2)'};">${deltaTxt}</span></span>
+                </div>
+              </div>`;
+            })() : ''}
             ${pred.scores && pred.scores.length ? `
             <div style="margin-top:14px;">
               <div style="font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-dim2,#7b8693);margin-bottom:8px;">🎯 Scores les plus probables</div>
@@ -4954,7 +5032,10 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T13:14:27.667104Z","today":"
       if (!pred || !pred.pick || pred.skip) return;
       const res = evaluateModelPick(m, pred);
       if (res == null) return;
-      const p = pred.pick.prob;
+      // Reliability diagram buckets by the UI confidence (`reliability`), not
+      // the raw pick prob — this is what the user sees on the gauge, so
+      // calibrating it is what matters for decision-making.
+      const p = pred.reliability ?? pred.pick.prob;
       const b = buckets.find(bk => p >= bk.lo && p < bk.hi);
       if (!b) return;
       b.n++;
@@ -5158,7 +5239,10 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T13:14:27.667104Z","today":"
     // to watch. Adds a sanity check that 'X' picks are actually surfaced.
     const drawsBucket = { w:0, l:0, pl:0, bets:0 };
     rows.forEach(r => {
-      const p = r.pred.pick.prob || 0;
+      // Bucket by reliability (UI confidence), same reason as the reliability
+      // diagram above — the bilan should answer "are the labels we show
+      // actually calibrated?"
+      const p = r.pred.reliability ?? r.pred.pick.prob ?? 0;
       const b = p >= 0.65 ? bucket.high : p >= 0.55 ? bucket.mid : bucket.low;
       b.bets++;
       const delta = r.res === 'won' ? (r.odd - 1) : -1;
