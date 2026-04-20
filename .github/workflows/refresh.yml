@@ -28,6 +28,9 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Install deps
+        run: pip install curl_cffi --break-system-packages
+
       - name: Run fetch pipeline
         run: |
           set -e
@@ -36,7 +39,7 @@ jobs:
           python3 patch_odds.py || true      # normalize ESPN odds
           python3 fetch_tennis_odds.py || true
           python3 fetch_rus_odds.py || true
-          python3 fetch_injuries.py || true
+          python3 fetch_injuries.py || true  # ESPN: US sports (NBA/NHL/NFL/MLB)
           python3 fetch_h2h.py || true       # head-to-head histories
           python3 snapshot_odds.py || true   # freeze pre-match odds (persist post-match for bilan)
           python3 fetch_forebet.py || true   # cheap: single HTML page, 40+ preds over 3 days
@@ -45,18 +48,30 @@ jobs:
           if [ $MIN_MOD15 -lt 5 ]; then
             python3 fetch_tips.py || true
           fi
-          python3 patch_winamax.py || true
-          # Every 12th tick (= 1h), also run full ESPN sweep so tomorrow+ stays fresh
+          # Sofascore soccer injuries: slow (~85s), so only every 2h. The per-run
+          # patch step below re-attaches the cached data in <1s on every tick.
+          HOUR_MOD2=$(( $(date +%H) % 2 ))
+          if [ $HOUR_MOD2 -eq 0 ] && [ $MIN_MOD15 -lt 5 ]; then
+            python3 fetch_injuries_soccer.py || true
+          fi
+          # Every 12th tick (= 1h), also run full ESPN sweep + Winamax catalog
+          # so tomorrow+ stays fresh. Catalog scrape is slow (~1min) so it's
+          # also on the hourly cadence.
           if [ $(( $(date +%M) % 60 )) -lt 5 ]; then
             python3 fetch_v3.py || true
-            python3 patch_winamax.py || true
+            python3 fetch_winamax_catalog.py || true
           fi
+          python3 patch_winamax.py || true
+          # Patch soccer injuries AFTER patch_winamax so they survive the
+          # dedup/bucketing rewrite. Idempotent, ~0.1s.
+          python3 patch_injuries_soccer.py || true
 
       - name: Commit data updates
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data.js pronostics.html odds_history.jsonl 2>/dev/null || true
+          git add data.js pronostics.html odds_history.jsonl \
+                  injuries_soccer.json winamax_catalog.json 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "No changes to commit."
             exit 0
