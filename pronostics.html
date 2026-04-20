@@ -2455,15 +2455,48 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T20:09:16.067553Z","today":"
       // side shifts the win prob by ~1.5% (cap at 6%). ESPN covers US sports
       // (NBA/NHL/WNBA/NFL/MLB); Sofascore fills the gap for the top-5 soccer
       // leagues. For soccer, injuries_{home,away}_known=false means "we have
-      // no lineup data", so treat 0 as unknown rather than "full strength".
+      // no lineup data" for that side — we now apply a partial shift based on
+      // the known side only, rather than skipping entirely. Previously any
+      // single-side unknown would void the signal; that lost ~30% of soccer
+      // injury info on our Sofascore coverage.
       const injH = match.injuries_home || 0;
       const injA = match.injuries_away || 0;
       const soccerUnknownH = match.injuries_source === 'sofascore' && match.injuries_home_known === false;
       const soccerUnknownA = match.injuries_source === 'sofascore' && match.injuries_away_known === false;
-      if ((injH || injA) && !soccerUnknownH && !soccerUnknownA) {
-        const shift = Math.min(0.06, 0.015 * (injH - injA));
+      if (injH || injA) {
+        let effDelta;
+        if (!soccerUnknownH && !soccerUnknownA) {
+          // Both sides confirmed — full differential shift
+          effDelta = injH - injA;
+        } else if (!soccerUnknownH && soccerUnknownA) {
+          // Only home side known: penalize home by 0.6× (no counter-balance)
+          effDelta = injH * 0.6;
+        } else if (soccerUnknownH && !soccerUnknownA) {
+          effDelta = -injA * 0.6;
+        } else {
+          effDelta = 0; // both unknown
+        }
+        const shift = Math.max(-0.06, Math.min(0.06, 0.015 * effDelta));
         final.pH -= shift;
         final.pA += shift;
+      }
+
+      // Draw balance — Chantier 3 fix (2026-04-20). When all the nudges above
+      // have pushed the two sides close to parity, the draw stays at whatever
+      // the market/Poisson implied and becomes systematically under-weighted.
+      // The user explicitly flagged this : "j'ai l'impression que tu oublies
+      // les matchs nuls". We add a small positive bump to pD when pH and pA
+      // are near equal, pulled proportionally from both sides. Only applies to
+      // football (hasDraw).
+      if (hasDraw) {
+        const gap = Math.abs(final.pH - final.pA);
+        if (gap < 0.08) {
+          // Full bump (+3% to pD) when gap ~0, tapering to 0 as gap→0.08
+          const bump = 0.03 * (1 - gap / 0.08);
+          final.pH -= bump / 2;
+          final.pA -= bump / 2;
+          final.pD += bump;
+        }
       }
     } else {
       final = hasDraw ? { pH: 0.42, pD: 0.27, pA: 0.31 } : { pH: 0.55, pD: 0, pA: 0.45 };
