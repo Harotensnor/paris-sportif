@@ -14,7 +14,7 @@ Output: attaches ev.competitors[i].injuries = [{name, pos, status}] and
 
 Usage: python3 fetch_injuries.py
 """
-import json, re, time, ssl, urllib.request
+import json, re, time, ssl, urllib.request, urllib.error
 from pathlib import Path
 from datetime import datetime
 
@@ -38,12 +38,22 @@ ESPN_INJURY_PATHS = [
 
 def http_get_json(url, timeout=15):
     req = urllib.request.Request(url, headers={'User-Agent': UA})
-    return json.loads(urllib.request.urlopen(req, timeout=timeout, context=CTX).read())
+    try:
+        return json.loads(urllib.request.urlopen(req, timeout=timeout, context=CTX).read())
+    except urllib.error.HTTPError as e:
+        # Explicit rate-limit flag so retries can back off intelligently rather
+        # than being swallowed into a generic "error".
+        if e.code == 429:
+            print(f'  [rate-limit] ESPN 429 Too Many Requests on {url}', flush=True)
+        raise
 
 
 def fetch_injuries_for(league_code, espn_path):
     try:
         data = http_get_json(f'https://site.api.espn.com/apis/site/v2/sports/{espn_path}/injuries')
+    except urllib.error.HTTPError as e:
+        print(f'  {league_code}: HTTP {e.code} {e.reason}')
+        return {}
     except Exception as e:
         print(f'  {league_code}: error {e}')
         return {}

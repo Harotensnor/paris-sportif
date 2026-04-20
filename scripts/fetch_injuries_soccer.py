@@ -82,11 +82,16 @@ def _get(url: str) -> dict | None:
     except Exception as e:
         print(f'  ERR {url}: {e}', flush=True)
         return None
+    if r.status_code == 429:
+        print(f'  [rate-limit] Sofascore 429 on {url}', flush=True)
+        return None
     if r.status_code != 200:
+        print(f'  HTTP {r.status_code} on {url}', flush=True)
         return None
     try:
         return r.json()
-    except Exception:
+    except Exception as e:
+        print(f'  JSON parse error on {url}: {e}', flush=True)
         return None
 
 

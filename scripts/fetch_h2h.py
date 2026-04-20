@@ -70,7 +70,11 @@ def fetch_h2h(event):
         req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         raw = urllib.request.urlopen(req, timeout=10).read()
         d = json.loads(raw)
-    except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError) as e:
+    except urllib.error.HTTPError as e:
+        if e.code == 429:
+            print(f'  [rate-limit] ESPN 429 on h2h {event.get("id")}', flush=True, file=sys.stderr)
+        return None
+    except (urllib.error.URLError, TimeoutError):
         return None
     except Exception:
         return None

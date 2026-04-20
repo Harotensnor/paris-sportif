@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Enhanced fetch v3: massive league coverage + real moneyline odds from core endpoint."""
 import json
+import sys
 import urllib.request
+import urllib.error
 from datetime import date, datetime, timedelta
 import concurrent.futures
 import os
@@ -130,6 +132,12 @@ def fetch_json(url, timeout=20):
         req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         with urllib.request.urlopen(req, timeout=timeout) as r:
             return json.loads(r.read().decode('utf-8'))
+    except urllib.error.HTTPError as e:
+        if e.code == 429:
+            print(f'  [rate-limit] ESPN 429 on {url}', flush=True, file=sys.stderr)
+        else:
+            print(f'  HTTP {e.code} on {url}: {e.reason}', flush=True, file=sys.stderr)
+        return {'_err': f'HTTP {e.code}', '_status': e.code}
     except Exception as e:
         return {'_err': str(e)}
 
