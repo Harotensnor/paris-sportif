@@ -4,7 +4,7 @@ uses real odds instead of fallback probabilities.
 
 ESPN's details is like 'CHE +110' or 'LILL -205' — the featured team and its ML.
 We also have drawML. We infer the other side's ML from 1 - p(known) - p(draw)."""
-import json, re, unicodedata
+import json, re, sys, unicodedata
 from pathlib import Path
 
 DATA_JS = Path(__file__).resolve().parent.parent / 'data.js'
@@ -58,8 +58,11 @@ def enrich_odds(event):
         m = re.match(r'\s*([A-Za-z]{2,6})\s+([+-]?\d+(?:\.\d+)?)', det)
         if not m: continue
         abbr, ml_str = m.group(1), m.group(2)
-        try: ml_val = float(ml_str)
-        except: continue
+        try:
+            ml_val = float(ml_str)
+        except (TypeError, ValueError) as e:
+            print(f"[patch_odds] skip: bad ml_str {ml_str!r} ({e})", file=sys.stderr)
+            continue
         # Moneylines are typically |ml|>=100. Smaller values are likely point spreads, skip.
         if abs(ml_val) < 100:
             continue

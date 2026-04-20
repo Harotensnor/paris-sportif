@@ -6,7 +6,7 @@ from the pre-match odds archive at odds_history.jsonl.
 Use this when snapshot_odds.py was added after some matches had already
 completed (so they never had their pre-match odds captured into data.js).
 """
-import json, re
+import json, re, sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -34,7 +34,9 @@ def main():
         if not line: continue
         try:
             r = json.loads(line)
-        except: continue
+        except json.JSONDecodeError as e:
+            print(f"[backfill] skip malformed line: {e}", file=sys.stderr)
+            continue
         eid = str(r.get('id') or '')
         if not eid: continue
         # Prefer earliest (most pre-match)

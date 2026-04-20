@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Scrape forebet.com for today's football predictions + 1X2 odds.
 Merges into data.js as a second tipster source."""
-import json, re, urllib.request, unicodedata
+import json, re, sys, urllib.request, unicodedata
 from datetime import datetime, timedelta
 from pathlib import Path
 import html as htmllib
@@ -82,7 +82,8 @@ def parse_forebet(html):
         if om:
             try:
                 odds = {'home': float(om.group(1)), 'draw': float(om.group(2)), 'away': float(om.group(3))}
-            except: pass
+            except (TypeError, ValueError) as e:
+                print(f"[forebet] skip: bad odds {om.groups()!r} ({e})", file=sys.stderr)
         # Predicted score
         sm = re.search(r'<span class="scrmobpred ex_sc">(\d+)<span class="scrmobpreddash">-</span>(\d+)</span>', part)
         pred_score = None

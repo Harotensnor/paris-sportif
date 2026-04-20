@@ -1901,11 +1901,27 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T19:21:02.611529Z","today":"
   }
 
   // ======= Date helpers =======
+  // Extract YYYY-MM-DD from whatever the caller passes us: an ISO string
+  // ("2026-04-20T14:30:00Z"), a Date object, or already-short "2026-04-20".
+  // Returns '' for anything we can't parse rather than a garbage substring —
+  // `.slice(0,10)` on a malformed input silently returned half-garbage which
+  // then broke downstream date maths. isoDate() surfaces the problem early.
+  function isoDate(d) {
+    if (!d) return '';
+    if (d instanceof Date) {
+      return isNaN(d.getTime()) ? '' : d.toISOString().slice(0, 10);
+    }
+    const s = String(d);
+    // Fast path: already a YYYY-MM-DD prefix
+    if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
+    // Otherwise try to parse. Invalid → ''.
+    const parsed = new Date(s);
+    return isNaN(parsed.getTime()) ? '' : parsed.toISOString().slice(0, 10);
+  }
   function todayISO() {
     const g = window.PRONOSTICS_DATA?.today;
     if (g) return g;
-    const d = new Date();
-    return d.toISOString().slice(0,10);
+    return isoDate(new Date());
   }
   function addDays(iso, n) {
     const [y,m,d] = iso.split('-').map(Number);
@@ -2021,9 +2037,12 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T19:21:02.611529Z","today":"
     const live = bestOdds(match.odds, match.sport === 'football');
     if (!live) return null;
     const sideKey = pickKey === '1' ? 'home' : pickKey === '2' ? 'away' : 'draw';
-    const before = snap[sideKey];
-    const after = live[sideKey];
-    if (!before || !after || before <= 1 || after <= 1) return null;
+    const before = Number(snap[sideKey]);
+    const after = Number(live[sideKey]);
+    // Decimal odds are always > 1.0 — anything ≤ 1 means data corruption
+    // (ESPN sometimes returns 0, null, or a string like "N/A" we can't parse).
+    // Bail rather than produce "Sharp ∞%" badges.
+    if (!isFinite(before) || !isFinite(after) || before <= 1 || after <= 1) return null;
     const deltaPct = ((after - before) / before) * 100;
     const abs = Math.abs(deltaPct);
     if (abs < 4) return null;
@@ -4174,7 +4193,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T19:21:02.611529Z","today":"
                 winLbl = `→ ${winSide}`;
                 cls = ((mt.home||'').toLowerCase() === homeKey ? (mt.winner === 'home' ? 'home' : 'away') : (mt.winner === 'home' ? 'away' : 'home'));
               }
-              const date = mt.date ? (mt.date.slice(0,10)) : '';
+              const date = isoDate(mt.date);
               return `
                 <div style="display:grid;grid-template-columns:72px 1fr 60px 1fr 100px;gap:8px;align-items:center;padding:6px 8px;background:rgba(255,255,255,.02);border-radius:6px;font-size:12.5px;">
                   <span style="color:var(--text-dim2,#7b8693);font-family:monospace;">${esc(date)}</span>
@@ -4518,12 +4537,12 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T19:21:02.611529Z","today":"
   // Build an inline SVG line chart of the cumulative P&L curve.
   // Takes rows: [{ date: 'YYYY-MM-DD', delta: +0.85 | -1.00 }]. Assumes flat 1u
   // bets, so the Y axis is units (one lost bet = -1). Groups by day, accumulates.
-  function renderRoiChart(rows, { width = 560, height = 160, title } = {}) {
+  function renderRoiChart(rows, { width = 560, height = 160, title, unit = 'u' } = {}) {
     if (!rows || !rows.length) return '';
     // Group by day
     const byDay = new Map();
     rows.forEach(r => {
-      const d = (r.date || '').slice(0, 10);
+      const d = isoDate(r.date);
       if (!d) return;
       byDay.set(d, (byDay.get(d) || 0) + r.delta);
     });
@@ -4562,13 +4581,13 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T19:21:02.611529Z","today":"
     const yTicks = [y0, 0, y1].filter((v, i, arr) => i === arr.indexOf(v));
     return `
       <div style="background:var(--surface,#111827);border:1px solid var(--border,#2a3744);border-radius:12px;padding:14px;margin-bottom:24px;">
-        ${title ? `<div style="font-size:13px;color:var(--text-dim,#b4bcc7);margin-bottom:8px;font-weight:600;">${esc(title)} · <span style="color:${lastCum>=0?posColor:negColor};">${lastCum>=0?'+':''}${lastCum.toFixed(2)}u</span></div>` : ''}
+        ${title ? `<div style="font-size:13px;color:var(--text-dim,#b4bcc7);margin-bottom:8px;font-weight:600;">${esc(title)} · <span style="color:${lastCum>=0?posColor:negColor};">${lastCum>=0?'+':''}${lastCum.toFixed(2)}${unit}</span></div>` : ''}
         <svg viewBox="0 0 ${width} ${height}" style="width:100%;height:auto;display:block;" xmlns="http://www.w3.org/2000/svg">
           <line x1="${marginL}" y1="${zeroY.toFixed(1)}" x2="${width - marginR}" y2="${zeroY.toFixed(1)}" stroke="rgba(255,255,255,.15)" stroke-dasharray="3 3"/>
-          ${yTicks.map(v => `<text x="${marginL - 6}" y="${(yAt(v)+4).toFixed(1)}" text-anchor="end" fill="var(--text-dim2,#7b8693)" font-size="10" font-family="sans-serif">${v.toFixed(1)}u</text>`).join('')}
+          ${yTicks.map(v => `<text x="${marginL - 6}" y="${(yAt(v)+4).toFixed(1)}" text-anchor="end" fill="var(--text-dim2,#7b8693)" font-size="10" font-family="sans-serif">${v.toFixed(1)}${unit}</text>`).join('')}
           <path d="${areaPath}" fill="${areaFill}" stroke="none"/>
           <polyline points="${poly}" fill="none" stroke="${stroke}" stroke-width="2"/>
-          ${pts.map((p, i) => `<circle cx="${xAt(i).toFixed(1)}" cy="${yAt(p.cum).toFixed(1)}" r="2.5" fill="${stroke}"><title>${p.d}: ${p.cum>=0?'+':''}${p.cum.toFixed(2)}u</title></circle>`).join('')}
+          ${pts.map((p, i) => `<circle cx="${xAt(i).toFixed(1)}" cy="${yAt(p.cum).toFixed(1)}" r="2.5" fill="${stroke}"><title>${p.d}: ${p.cum>=0?'+':''}${p.cum.toFixed(2)}${unit}</title></circle>`).join('')}
           ${xTicks.map(t => `<text x="${t.x.toFixed(1)}" y="${(height - 6).toFixed(1)}" text-anchor="middle" fill="var(--text-dim2,#7b8693)" font-size="10" font-family="sans-serif">${t.label}</text>`).join('')}
         </svg>
       </div>
@@ -4692,7 +4711,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T19:21:02.611529Z","today":"
     let plToday = 0;
     Object.values(bets).forEach(b => {
       const m = byId[b.matchId];
-      const matchDay = m?.date ? new Date(m.date).toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' }) : (b.placedAt || '').slice(0,10);
+      const matchDay = m?.date ? new Date(m.date).toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' }) : isoDate(b.placedAt);
       if (matchDay !== today) return;
       if (!m || !m.completed) {
         // still at risk today
@@ -4773,7 +4792,6 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T19:21:02.611529Z","today":"
     let model = { w: 0, l: 0, pl: 0, bets: 0 };
     const perSport = {};
     const rows = [];
-    let nearMissCount = 0;
     completed.forEach(m => {
       if (windowCutoff) {
         const md = new Date(m.date);
@@ -4790,74 +4808,31 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T19:21:02.611529Z","today":"
       ps.bets++;
       if (res === 'won') { model.w++; model.pl += (odd - 1); ps.w++; ps.pl += (odd-1); }
       else if (res === 'lost') { model.l++; model.pl -= 1; ps.l++; ps.pl -= 1; }
-      if (isNearMiss(m, res)) nearMissCount++;
       rows.push({ m, pred, res, odd });
     });
     const wr = model.bets ? (100*model.w/model.bets) : 0;
     const roi = model.bets ? (100*model.pl/model.bets) : 0;
 
     const modelChartRows = rows.map(r => ({
-      date: (r.m.date || '').slice(0, 10),
+      date: isoDate(r.m.date),
       delta: r.res === 'won' ? (r.odd - 1) : -1,
     }));
     const modelChartHtml = renderRoiChart(modelChartRows, { title: 'P&L modèle cumulé (unité flat)' })
       || `<div class="bilan-empty">Pas encore assez de paris pour tracer une courbe.</div>`;
 
-    // ========= MODEL BREAKDOWN: buckets confiance + ligues + streak/records =========
-    // Buckets par proba modèle : high ≥ 0.65, mid 0.55–0.65, low 0.50–0.55
+    // ========= MODEL BREAKDOWN: buckets confiance =========
+    // Buckets par proba modèle : high ≥ 0.65, mid 0.55–0.65, low 0.50–0.55.
+    // Ordre n'a pas d'importance pour des buckets (pas de notion de streak/drawdown
+    // depuis la simplification du bilan — on a gardé juste ce qui s'affiche).
     const bucket = { high: { w:0, l:0, pl:0, bets:0 }, mid: { w:0, l:0, pl:0, bets:0 }, low: { w:0, l:0, pl:0, bets:0 } };
-    const perLeague = {};
-    const byDay = new Map();  // date → delta sum
-    let biggestWin = null, biggestLoss = null;
-    // Streak: walk rows chronologically (oldest → newest) and track current run
-    const chronoRows = rows.slice().sort((a, b) => new Date(a.m.date) - new Date(b.m.date));
-    let curStreak = { type: null, count: 0 };     // type = 'W' or 'L'
-    let bestWin = { count: 0 }, worstLoss = { count: 0 };
-    let runType = null, runCount = 0;
-    chronoRows.forEach(r => {
+    rows.forEach(r => {
       const p = r.pred.pick.prob || 0;
       const b = p >= 0.65 ? bucket.high : p >= 0.55 ? bucket.mid : bucket.low;
       b.bets++;
       const delta = r.res === 'won' ? (r.odd - 1) : -1;
       if (r.res === 'won') b.w++; else b.l++;
       b.pl += delta;
-
-      // Per league
-      const lgKey = r.m.league_name || r.m.league_id || '—';
-      const pl = perLeague[lgKey] = perLeague[lgKey] || { w:0, l:0, pl:0, bets:0 };
-      pl.bets++;
-      if (r.res === 'won') pl.w++; else pl.l++;
-      pl.pl += delta;
-
-      // Biggest single-bet win/loss
-      if (r.res === 'won' && (!biggestWin || delta > biggestWin.delta)) {
-        biggestWin = { delta, match: r.m, pred: r.pred, odd: r.odd };
-      }
-      if (r.res === 'lost' && (!biggestLoss || Math.abs(delta) > Math.abs(biggestLoss.delta))) {
-        biggestLoss = { delta, match: r.m, pred: r.pred, odd: r.odd };
-      }
-
-      // Day aggregate
-      const d = (r.m.date || '').slice(0, 10);
-      if (d) byDay.set(d, (byDay.get(d) || 0) + delta);
-
-      // Streak
-      const t = r.res === 'won' ? 'W' : 'L';
-      if (t === runType) runCount++;
-      else { runType = t; runCount = 1; }
-      if (t === 'W' && runCount > bestWin.count) bestWin = { count: runCount };
-      if (t === 'L' && runCount > worstLoss.count) worstLoss = { count: runCount };
-      curStreak = { type: runType, count: runCount };
     });
-    // Best / worst day. Tie-break: keep the MOST RECENT date so "today's
-    // big day" always wins over an identical day from 3 months ago — matches
-    // how Théo thinks about recency. We sort the entries by date desc once.
-    let bestDay = null, worstDay = null;
-    const dayEntries = Array.from(byDay.entries()).sort((a, b) => b[0].localeCompare(a[0]));
-    for (const [d, v] of dayEntries) {
-      if (!bestDay || v > bestDay.delta) bestDay = { date: d, delta: v };
-      if (!worstDay || v < worstDay.delta) worstDay = { date: d, delta: v };
-    }
 
     // ========= PERSONAL STATS =========
     const mine = computeMyBilan();
@@ -4874,14 +4849,11 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T19:21:02.611529Z","today":"
       const myChartRows = mine.rows
         .filter(r => r.res !== 'pending' && r.match)
         .map(r => ({
-          date: (r.match.date || r.bet.placedAt || '').slice(0, 10),
+          date: isoDate(r.match.date || r.bet.placedAt),
           delta: r.res === 'won' ? (r.payout - r.bet.stake) : -r.bet.stake,
         }));
       if (myChartRows.length >= 2) {
-        myChartHtml = renderRoiChart(myChartRows, { title: 'P&L perso cumulé (€ réels)' })
-          .replace(/u<\/text>/g, '€</text>')
-          .replace(/u<\/span>/g, '€</span>')
-          .replace(/u\.|u$| u /g, m => m.replace('u', '€'));
+        myChartHtml = renderRoiChart(myChartRows, { title: 'P&L perso cumulé (€ réels)', unit: '€' });
       } else {
         myChartHtml = `<div class="bilan-empty">Règle au moins 2 paris pour voir ta courbe P&L perso.</div>`;
       }
@@ -4943,7 +4915,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T19:21:02.611529Z","today":"
       myRowsHtml = mine.rows.slice(0, persoLimit).map(r => {
         const m = r.match;
         const { home, away } = m ? getSides(m) : { home: null, away: null };
-        const date = (r.bet.placedAt || '').slice(0, 10);
+        const date = isoDate(r.bet.placedAt);
         const corrCount = corrMap[r.bet.matchId] || 1;
         const corrBadge = corrCount > 1 ? ` <span title="${corrCount} paris sur ce même match — risque corrélé." style="padding:1px 5px;border-radius:4px;background:rgba(251,191,36,.16);color:#fbbf24;font-size:10px;font-weight:700;vertical-align:middle;">⚠️${corrCount}</span>` : '';
         const matchNameText = m ? `${(home?.short||home?.name||'?')} vs ${(away?.short||away?.name||'?')}` : `(match supprimé)`;
@@ -4969,7 +4941,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T19:21:02.611529Z","today":"
       const { home, away } = getSides(r.m);
       const cls = r.res === 'won' ? 'style="color:#34d399;font-weight:600;"' : 'style="color:#f87171;"';
       return `<tr>
-        <td style="color:var(--text-dim);font-size:12px;">${esc(fmtDate(r.m.date?.slice(0,10)||''))}</td>
+        <td style="color:var(--text-dim);font-size:12px;">${esc(fmtDate(isoDate(r.m.date)))}</td>
         <td>${esc((home?.short||home?.name||''))} <span style="color:var(--text-dim2);">vs</span> ${esc((away?.short||away?.name||''))}</td>
         <td style="color:var(--text-dim);font-size:12px;">${esc(sportLabel(r.m.sport))}</td>
         <td ${cls}>${esc(r.pred.pick.label)}</td>
@@ -4979,81 +4951,6 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T19:21:02.611529Z","today":"
     }).join('');
 
     const bkPositive = bkDelta >= 0;
-
-    // ========= MODEL AGGREGATE STATS — Wilson CI + drawdown =========
-    // Wilson CI on the overall model WR. Surfaces "the +11% ROI is noise" on
-    // small samples. 95% confidence level (z=1.96).
-    const overallCI = wilsonCI(model.w, model.bets);
-    const modelChronoDeltas = chronoRows.map(r => r.res === 'won' ? (r.odd - 1) : -1);
-    const dd = maxDrawdown(modelChronoDeltas);
-    const ddPctOfBankroll = startBankroll > 0 ? (dd.maxDD / startBankroll * 100) : 0;
-
-    // ========= MODEL HERO + BREAKDOWN HTML =========
-    const modelPlPositive = model.pl >= 0;
-    const modelHeroHtml = `
-      <div class="bilan-hero ${modelPlPositive ? '' : 'negative'}" style="background:
-        radial-gradient(700px 350px at 100% 0%, rgba(167,139,250,.14), transparent 60%),
-        radial-gradient(600px 350px at 0% 100%, ${modelPlPositive?'rgba(52,211,153,.10)':'rgba(248,113,113,.10)'}, transparent 60%),
-        linear-gradient(180deg, #10101a 0%, #0b0b10 100%); border-color: rgba(167,139,250,.32);">
-        <div>
-          <div class="bk-label" style="color:#a78bfa;">📊 Bilan modèle · P&amp;L cumulé (flat 1u)</div>
-          <div class="bk-value" style="color:${modelPlPositive?'#34d399':'#f87171'};">${modelPlPositive?'+':''}${model.pl.toFixed(2)}u</div>
-          <div class="bk-delta ${modelPlPositive?'pos':'neg'}">
-            ${modelPlPositive?'↑':'↓'} ROI ${roi>=0?'+':''}${roi.toFixed(1)}% · WR ${wr.toFixed(0)}%
-            ${model.bets >= 3 ? `<span style="color:var(--text-dim2);font-weight:500;font-size:11px;margin-left:8px;">(IC 95% : ${(overallCI.low*100).toFixed(0)}–${(overallCI.high*100).toFixed(0)}%)</span>` : ''}
-          </div>
-          <div class="bk-start">${model.w}W · ${model.l}L sur ${model.bets} paris évalués${model.bets < 30 ? ' · <span style="color:#fbbf24;">⚠️ échantillon faible</span>' : ''}</div>
-        </div>
-        <div class="bk-side">
-          <div class="bk-mini"><span class="lbl">Série en cours</span><span class="val" style="color:${curStreak.type==='W'?'#34d399':curStreak.type==='L'?'#f87171':'var(--text-dim)'};">${curStreak.count ? `${curStreak.count}${curStreak.type}` : '—'}</span></div>
-          <div class="bk-mini"><span class="lbl">Meilleure série W</span><span class="val" style="color:#34d399;">${bestWin.count || 0}W</span></div>
-          <div class="bk-mini"><span class="lbl">Pire série L</span><span class="val" style="color:#f87171;">${worstLoss.count || 0}L</span></div>
-          <div class="bk-mini" title="Plus forte baisse pic-à-creux de l'équité cumulée — le nombre qui compte vraiment pour dimensionner Kelly.">
-            <span class="lbl">Max drawdown</span>
-            <span class="val" style="color:#f87171;">${dd.maxDD > 0 ? '−'+dd.maxDD.toFixed(2)+'u' : '—'}</span>
-          </div>
-          <div class="bk-mini" title="Paris perdus d'extrême justesse (1 but foot/hockey, 3 pts basket). Signal de chance indirecte.">
-            <span class="lbl">Near-miss</span>
-            <span class="val" style="color:#fbbf24;">${nearMissCount || 0}</span>
-          </div>
-        </div>
-      </div>
-    `;
-
-    // ========= CALENDAR HEATMAP + EQUITY VS BASELINE =========
-    const heatmapHtml = renderCalendarHeatmap(byDay);
-    const equityVsBaselineHtml = renderEquityVsBaseline(chronoRows);
-
-    // ========= ROI PAR HEURE + ROI PAR JOUR DE SEMAINE =========
-    const hourBuckets = bilanByKickoffHour(rows);
-    const dowBuckets = bilanByDayOfWeek(rows);
-    const hourRowsHtml = Array.from({ length: 24 }, (_, h) => h).map(h => {
-      const b = hourBuckets[h];
-      if (!b || !b.bets) return '';
-      const wr_ = b.bets ? 100 * b.w / b.bets : 0;
-      const roi_ = b.bets ? 100 * b.pl / b.bets : 0;
-      return `<tr>
-        <td style="font-variant-numeric:tabular-nums;color:var(--text-dim);">${String(h).padStart(2,'0')}h–${String((h+1)%24).padStart(2,'0')}h</td>
-        <td style="text-align:right;color:var(--text-dim);font-variant-numeric:tabular-nums;">${b.bets}</td>
-        <td style="text-align:right;font-variant-numeric:tabular-nums;">${wr_.toFixed(0)}%</td>
-        <td style="text-align:right;font-weight:700;font-variant-numeric:tabular-nums;color:${roi_>=0?'#34d399':'#f87171'};">${roi_>=0?'+':''}${roi_.toFixed(1)}%</td>
-        <td style="text-align:right;font-variant-numeric:tabular-nums;color:${b.pl>=0?'#34d399':'#f87171'};">${b.pl>=0?'+':''}${b.pl.toFixed(2)}u</td>
-      </tr>`;
-    }).filter(Boolean).join('');
-    const dowNames = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
-    const dowRowsHtml = [1,2,3,4,5,6,0].map(d => {
-      const b = dowBuckets[d];
-      if (!b || !b.bets) return '';
-      const wr_ = 100 * b.w / b.bets;
-      const roi_ = 100 * b.pl / b.bets;
-      return `<tr>
-        <td style="font-weight:600;">${dowNames[d]}</td>
-        <td style="text-align:right;color:var(--text-dim);font-variant-numeric:tabular-nums;">${b.bets}</td>
-        <td style="text-align:right;font-variant-numeric:tabular-nums;">${wr_.toFixed(0)}%</td>
-        <td style="text-align:right;font-weight:700;font-variant-numeric:tabular-nums;color:${roi_>=0?'#34d399':'#f87171'};">${roi_>=0?'+':''}${roi_.toFixed(1)}%</td>
-        <td style="text-align:right;font-variant-numeric:tabular-nums;color:${b.pl>=0?'#34d399':'#f87171'};">${b.pl>=0?'+':''}${b.pl.toFixed(2)}u</td>
-      </tr>`;
-    }).filter(Boolean).join('');
 
     // Time-window filter toolbar
     const winLabel = (_bilanWindow === 0) ? 'Tout' : `${_bilanWindow} derniers jours`;
@@ -5093,52 +4990,6 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T19:21:02.611529Z","today":"
       ${renderBucket('🔒 High', bucket.high, '#34d399', '≥ 65%')}
       ${renderBucket('⚖️ Mid', bucket.mid, '#a78bfa', '55–65%')}
       ${renderBucket('🎲 Low', bucket.low, '#fbbf24', '50–55%')}
-    `;
-
-    // Top 10 ligues (tri par volume décroissant)
-    const leagueEntries = Object.entries(perLeague)
-      .filter(([, s]) => s.bets >= 3)
-      .sort((a, b) => b[1].bets - a[1].bets)
-      .slice(0, 10);
-    const leaguesHtml = leagueEntries.map(([name, s]) => {
-      const wr_ = s.bets ? (100*s.w/s.bets) : 0;
-      const roi_ = s.bets ? (100*s.pl/s.bets) : 0;
-      return `<tr>
-        <td style="font-weight:600;">${esc(name)}</td>
-        <td style="text-align:right;color:var(--text-dim);font-variant-numeric:tabular-nums;">${s.bets}</td>
-        <td style="text-align:right;font-variant-numeric:tabular-nums;">${wr_.toFixed(0)}%</td>
-        <td style="text-align:right;font-weight:700;font-variant-numeric:tabular-nums;color:${roi_>=0?'#34d399':'#f87171'};">${roi_>=0?'+':''}${roi_.toFixed(1)}%</td>
-        <td style="text-align:right;font-variant-numeric:tabular-nums;color:${s.pl>=0?'#34d399':'#f87171'};">${s.pl>=0?'+':''}${s.pl.toFixed(2)}u</td>
-      </tr>`;
-    }).join('');
-
-    // Records cards
-    const fmtMatchShort = (m) => {
-      if (!m) return '—';
-      const { home, away } = getSides(m);
-      return `${home?.short || home?.name || '?'} vs ${away?.short || away?.name || '?'}`;
-    };
-    const recordsHtml = `
-      <div class="bilan-sport-card">
-        <div class="sport-name" style="color:#34d399;">💥 Plus grosse cote gagnée</div>
-        <div class="sport-wr" style="color:#34d399;">${biggestWin ? '+'+biggestWin.delta.toFixed(2)+'u' : '—'}</div>
-        <div class="sport-roi" style="color:var(--text-dim);">${biggestWin ? esc(fmtMatchShort(biggestWin.match))+' @'+biggestWin.odd.toFixed(2) : 'aucune'}</div>
-      </div>
-      <div class="bilan-sport-card">
-        <div class="sport-name" style="color:#f87171;">💔 Plus grosse cote perdue</div>
-        <div class="sport-wr" style="color:#f87171;">${biggestLoss ? biggestLoss.delta.toFixed(2)+'u' : '—'}</div>
-        <div class="sport-roi" style="color:var(--text-dim);">${biggestLoss ? esc(fmtMatchShort(biggestLoss.match))+' @'+biggestLoss.odd.toFixed(2) : 'aucune'}</div>
-      </div>
-      <div class="bilan-sport-card">
-        <div class="sport-name" style="color:#34d399;">🏆 Meilleure journée</div>
-        <div class="sport-wr" style="color:#34d399;">${bestDay ? '+'+bestDay.delta.toFixed(2)+'u' : '—'}</div>
-        <div class="sport-roi" style="color:var(--text-dim);">${bestDay ? esc(fmtDate(bestDay.date)) : 'aucune'}</div>
-      </div>
-      <div class="bilan-sport-card">
-        <div class="sport-name" style="color:#f87171;">🕳️ Pire journée</div>
-        <div class="sport-wr" style="color:#f87171;">${worstDay ? worstDay.delta.toFixed(2)+'u' : '—'}</div>
-        <div class="sport-roi" style="color:var(--text-dim);">${worstDay ? esc(fmtDate(worstDay.date)) : 'aucune'}</div>
-      </div>
     `;
 
     // ========= BUILD HTML =========
@@ -5415,224 +5266,6 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T19:21:02.611529Z","today":"
     const v = parseInt(localStorage.getItem('bilanWindow'), 10);
     return [0, 7, 30, 90].includes(v) ? v : 0;
   })();
-
-  // ======= Bilan analytics helpers =======
-  // Favorite side at pred.odds (lowest decimal = market favorite)
-  function favoriteOdd(pred) {
-    const o = pred?.odds;
-    if (!o) return null;
-    const pairs = [
-      ['1', o.home], ['2', o.away], ['X', o.draw],
-    ].filter(([, v]) => v && v > 1);
-    if (!pairs.length) return null;
-    pairs.sort((a, b) => a[1] - b[1]);
-    return { key: pairs[0][0], odd: pairs[0][1] };
-  }
-
-  // Near-miss heuristic. Sport-specific margin threshold on a LOST pick where
-  // the actual outcome was one flip away from our side.
-  //   football / hockey / tennis-set-style: margin ≤ 1
-  //   basketball: margin ≤ 3 (one possession)
-  // Returns true only for lost bets that were close.
-  function isNearMiss(match, res) {
-    if (res !== 'lost' || !match?.completed) return false;
-    const { home, away } = getSides(match);
-    const hs = parseInt(home?.score ?? '', 10);
-    const as = parseInt(away?.score ?? '', 10);
-    if (isNaN(hs) || isNaN(as)) return false;
-    const margin = Math.abs(hs - as);
-    const sport = match.sport;
-    if (sport === 'basketball') return margin <= 3;
-    // football / hockey / tennis (set-based score rarely > 1 diff on losses)
-    return margin <= 1;
-  }
-
-  // Bucket rows by kickoff hour (0-23) → { w, l, pl, bets }
-  function bilanByKickoffHour(rows) {
-    const buckets = {};
-    rows.forEach(r => {
-      if (!r.m.date) return;
-      const d = new Date(r.m.date);
-      if (isNaN(d.getTime())) return;
-      const h = d.getHours();
-      const b = buckets[h] = buckets[h] || { w:0, l:0, pl:0, bets:0 };
-      const delta = r.res === 'won' ? (r.odd - 1) : -1;
-      b.bets++;
-      if (r.res === 'won') b.w++; else b.l++;
-      b.pl += delta;
-    });
-    return buckets;
-  }
-
-  // Bucket rows by day-of-week (0=Sun, 6=Sat)
-  function bilanByDayOfWeek(rows) {
-    const buckets = {};
-    rows.forEach(r => {
-      if (!r.m.date) return;
-      const d = new Date(r.m.date);
-      if (isNaN(d.getTime())) return;
-      const dow = d.getDay();
-      const b = buckets[dow] = buckets[dow] || { w:0, l:0, pl:0, bets:0 };
-      const delta = r.res === 'won' ? (r.odd - 1) : -1;
-      b.bets++;
-      if (r.res === 'won') b.w++; else b.l++;
-      b.pl += delta;
-    });
-    return buckets;
-  }
-
-  // Calendar heatmap (GitHub-style): 52 weeks x 7 days. Each cell = sum of
-  // deltas (P&L in units) for that day. Color scale: red negative → green
-  // positive, grey for 0, blank for no bets.
-  function renderCalendarHeatmap(byDay, { endISO } = {}) {
-    // End date defaults to today local.
-    const today = endISO ? new Date(endISO + 'T12:00:00') : new Date();
-    const end = new Date(today);
-    end.setHours(12, 0, 0, 0);
-    // Start exactly 52 weeks ago + shift back to Monday.
-    const start = new Date(end);
-    start.setDate(start.getDate() - 364);
-    const dowStart = (start.getDay() + 6) % 7; // Mon=0
-    start.setDate(start.getDate() - dowStart);
-    // Build 53 columns × 7 rows (allows partial leading week)
-    const cols = 53;
-    const rowSize = 12, gap = 3;
-    const width = cols * (rowSize + gap) + 20;
-    const height = 7 * (rowSize + gap) + 28;
-    // Values + max magnitude for scale
-    let maxMag = 0;
-    byDay.forEach(v => { maxMag = Math.max(maxMag, Math.abs(v)); });
-    if (maxMag < 0.5) maxMag = 0.5;
-    const colorFor = (v) => {
-      if (v == null) return 'rgba(255,255,255,.04)';
-      if (v === 0) return 'rgba(255,255,255,.10)';
-      const ratio = Math.min(1, Math.abs(v) / maxMag);
-      if (v > 0) return `rgba(52,211,153,${0.18 + 0.62 * ratio})`;
-      return `rgba(248,113,113,${0.18 + 0.62 * ratio})`;
-    };
-    const cells = [];
-    const monthLabels = [];
-    let lastMonth = -1;
-    for (let c = 0; c < cols; c++) {
-      for (let r = 0; r < 7; r++) {
-        const dt = new Date(start);
-        dt.setDate(dt.getDate() + c * 7 + r);
-        if (dt > end) continue;
-        const iso = dt.toISOString().slice(0, 10);
-        const v = byDay.has(iso) ? byDay.get(iso) : null;
-        const x = 20 + c * (rowSize + gap);
-        const y = 20 + r * (rowSize + gap);
-        const title = v == null ? iso : `${iso} · ${v>=0?'+':''}${v.toFixed(2)}u`;
-        cells.push(`<rect x="${x}" y="${y}" width="${rowSize}" height="${rowSize}" rx="2" fill="${colorFor(v)}"><title>${title}</title></rect>`);
-        if (r === 0) {
-          const m = dt.getMonth();
-          if (m !== lastMonth) {
-            monthLabels.push(`<text x="${x}" y="14" fill="var(--text-dim2)" font-size="10" font-family="sans-serif">${dt.toLocaleDateString('fr-FR', {month:'short'})}</text>`);
-            lastMonth = m;
-          }
-        }
-      }
-    }
-    return `
-      <div style="overflow-x:auto;">
-        <svg viewBox="0 0 ${width} ${height}" style="width:100%;max-width:${width}px;height:auto;display:block;">
-          ${monthLabels.join('')}
-          ${cells.join('')}
-        </svg>
-        <div style="display:flex;gap:10px;align-items:center;margin-top:6px;font-size:11px;color:var(--text-dim2);">
-          <span>−</span>
-          <span style="display:inline-block;width:12px;height:12px;background:rgba(248,113,113,.7);border-radius:2px;"></span>
-          <span style="display:inline-block;width:12px;height:12px;background:rgba(248,113,113,.4);border-radius:2px;"></span>
-          <span style="display:inline-block;width:12px;height:12px;background:rgba(255,255,255,.10);border-radius:2px;"></span>
-          <span style="display:inline-block;width:12px;height:12px;background:rgba(52,211,153,.4);border-radius:2px;"></span>
-          <span style="display:inline-block;width:12px;height:12px;background:rgba(52,211,153,.7);border-radius:2px;"></span>
-          <span>+</span>
-          <span style="margin-left:auto;">Max magnitude ±${maxMag.toFixed(2)}u</span>
-        </div>
-      </div>
-    `;
-  }
-
-  // Equity curve comparing MODEL vs baseline "always favori". Takes the same
-  // chronoRows used for the main chart and returns an overlaid SVG. Each point
-  // is a day; model line in brand color, baseline dashed grey.
-  function renderEquityVsBaseline(chronoRows) {
-    if (!chronoRows || chronoRows.length < 2) return '';
-    // Build series by day for both
-    const dayModel = new Map(), dayBase = new Map();
-    chronoRows.forEach(r => {
-      const d = (r.m.date || '').slice(0, 10);
-      if (!d) return;
-      const modelDelta = r.res === 'won' ? (r.odd - 1) : -1;
-      dayModel.set(d, (dayModel.get(d) || 0) + modelDelta);
-      // Baseline: always pick the favorite. Evaluate against actual outcome.
-      const fav = favoriteOdd(r.pred);
-      if (!fav) return;
-      const { home, away } = getSides(r.m);
-      const hs = parseInt(home?.score ?? '', 10);
-      const as = parseInt(away?.score ?? '', 10);
-      let favWon = null;
-      if (!isNaN(hs) && !isNaN(as)) {
-        if (fav.key === '1') favWon = hs > as;
-        else if (fav.key === '2') favWon = as > hs;
-        else if (fav.key === 'X') favWon = hs === as;
-      }
-      if (favWon == null) return;
-      const baseDelta = favWon ? (fav.odd - 1) : -1;
-      dayBase.set(d, (dayBase.get(d) || 0) + baseDelta);
-    });
-    const days = [...new Set([...dayModel.keys(), ...dayBase.keys()])].sort();
-    let cumM = 0, cumB = 0;
-    const ptsM = [], ptsB = [];
-    days.forEach(d => {
-      cumM += dayModel.get(d) || 0;
-      cumB += dayBase.get(d) || 0;
-      ptsM.push({ d, v: cumM });
-      ptsB.push({ d, v: cumB });
-    });
-    const width = 560, height = 180;
-    const minY = Math.min(0, ...ptsM.map(p => p.v), ...ptsB.map(p => p.v));
-    const maxY = Math.max(0, ...ptsM.map(p => p.v), ...ptsB.map(p => p.v));
-    const padY = Math.max(0.5, (maxY - minY) * 0.1);
-    const y0 = minY - padY, y1 = maxY + padY;
-    const marginL = 40, marginR = 12, marginT = 20, marginB = 28;
-    const plotW = width - marginL - marginR;
-    const plotH = height - marginT - marginB;
-    const xAt = i => marginL + (days.length === 1 ? plotW / 2 : (i / (days.length - 1)) * plotW);
-    const yAt = v => marginT + plotH - ((v - y0) / (y1 - y0)) * plotH;
-    const zeroY = yAt(0);
-    const polyM = ptsM.map((p, i) => `${xAt(i).toFixed(1)},${yAt(p.v).toFixed(1)}`).join(' ');
-    const polyB = ptsB.map((p, i) => `${xAt(i).toFixed(1)},${yAt(p.v).toFixed(1)}`).join(' ');
-    const lastM = ptsM[ptsM.length - 1].v;
-    const lastB = ptsB[ptsB.length - 1].v;
-    const colorM = lastM >= 0 ? '#34d399' : '#f87171';
-    const xTicks = days.length <= 5
-      ? days.map((d, i) => ({ x: xAt(i), label: d.slice(5) }))
-      : [0, Math.floor(days.length / 2), days.length - 1].map(i => ({ x: xAt(i), label: days[i].slice(5) }));
-    const yTicks = [y0, 0, y1].filter((v, i, arr) => i === arr.indexOf(v));
-    const alpha = lastM - lastB;
-    return `
-      <div style="background:var(--surface,#111827);border:1px solid var(--border,#2a3744);border-radius:12px;padding:14px;margin-bottom:24px;">
-        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
-          <div style="font-size:13px;color:var(--text-dim);font-weight:600;">📈 Modèle vs baseline « toujours favori »</div>
-          <div style="font-size:12px;color:var(--text-dim2);">
-            <span style="color:${colorM};font-weight:700;">Modèle ${lastM>=0?'+':''}${lastM.toFixed(2)}u</span>
-            <span style="margin:0 10px;">·</span>
-            <span style="color:#7b8693;">Favori ${lastB>=0?'+':''}${lastB.toFixed(2)}u</span>
-            <span style="margin:0 10px;">·</span>
-            <span style="color:${alpha>=0?'#a78bfa':'#f87171'};font-weight:700;">α ${alpha>=0?'+':''}${alpha.toFixed(2)}u</span>
-          </div>
-        </div>
-        <svg viewBox="0 0 ${width} ${height}" style="width:100%;height:auto;display:block;">
-          <line x1="${marginL}" y1="${zeroY.toFixed(1)}" x2="${width - marginR}" y2="${zeroY.toFixed(1)}" stroke="rgba(255,255,255,.15)" stroke-dasharray="3 3"/>
-          ${yTicks.map(v => `<text x="${marginL - 6}" y="${(yAt(v)+4).toFixed(1)}" text-anchor="end" fill="var(--text-dim2)" font-size="10">${v.toFixed(1)}u</text>`).join('')}
-          <polyline points="${polyB}" fill="none" stroke="#7b8693" stroke-width="1.5" stroke-dasharray="5 3" opacity="0.8"/>
-          <polyline points="${polyM}" fill="none" stroke="${colorM}" stroke-width="2"/>
-          ${xTicks.map(t => `<text x="${t.x.toFixed(1)}" y="${(height - 6).toFixed(1)}" text-anchor="middle" fill="var(--text-dim2)" font-size="10">${t.label}</text>`).join('')}
-        </svg>
-      </div>
-    `;
-  }
 
   window.addEventListener('DOMContentLoaded', () => {
     const data = window.PRONOSTICS_DATA;
