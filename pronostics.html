@@ -4883,9 +4883,10 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T20:09:16.067553Z","today":"
 
     // ========= MODEL BREAKDOWN: buckets confiance =========
     // Buckets par proba modèle : high ≥ 0.65, mid 0.55–0.65, low 0.50–0.55.
-    // Ordre n'a pas d'importance pour des buckets (pas de notion de streak/drawdown
-    // depuis la simplification du bilan — on a gardé juste ce qui s'affiche).
     const bucket = { high: { w:0, l:0, pl:0, bets:0 }, mid: { w:0, l:0, pl:0, bets:0 }, low: { w:0, l:0, pl:0, bets:0 } };
+    // Draws-specific tracking — user explicitly flagged draws as a category
+    // to watch. Adds a sanity check that 'X' picks are actually surfaced.
+    const drawsBucket = { w:0, l:0, pl:0, bets:0 };
     rows.forEach(r => {
       const p = r.pred.pick.prob || 0;
       const b = p >= 0.65 ? bucket.high : p >= 0.55 ? bucket.mid : bucket.low;
@@ -4893,60 +4894,12 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T20:09:16.067553Z","today":"
       const delta = r.res === 'won' ? (r.odd - 1) : -1;
       if (r.res === 'won') b.w++; else b.l++;
       b.pl += delta;
-    });
-
-    // ========= PERSONAL STATS =========
-    const mine = computeMyBilan();
-    const hasMyBets = mine && mine.bets > 0;
-    const startBankroll = bankroll;
-    const currentBankroll = hasMyBets ? startBankroll + mine.pl : startBankroll;
-    const bkDelta = hasMyBets ? mine.pl : 0;
-    const bkDeltaPct = startBankroll > 0 ? (bkDelta / startBankroll * 100) : 0;
-    const myRoiPct = hasMyBets ? (mine.roi * 100) : 0;
-
-    // Personal P&L chart data (settled bets only)
-    let myChartHtml = '';
-    if (hasMyBets) {
-      const myChartRows = mine.rows
-        .filter(r => r.res !== 'pending' && r.match)
-        .map(r => ({
-          date: isoDate(r.match.date || r.bet.placedAt),
-          delta: r.res === 'won' ? (r.payout - r.bet.stake) : -r.bet.stake,
-        }));
-      if (myChartRows.length >= 2) {
-        myChartHtml = renderRoiChart(myChartRows, { title: 'P&L perso cumulé (€ réels)', unit: '€' });
-      } else {
-        myChartHtml = `<div class="bilan-empty">Règle au moins 2 paris pour voir ta courbe P&L perso.</div>`;
+      if (r.pred.pick.key === 'X') {
+        drawsBucket.bets++;
+        if (r.res === 'won') drawsBucket.w++; else drawsBucket.l++;
+        drawsBucket.pl += delta;
       }
-    } else {
-      myChartHtml = `<div class="bilan-empty">Pas encore de pari perso enregistré.</div>`;
-    }
-
-    // Guards
-    const guards = computeBankrollGuards();
-    const overCap = guards.engagedToday > guards.dailyCap;
-    const hitStopLoss = guards.plToday < guards.stopLoss;
-    let guardsHtml = '';
-    if (hitStopLoss) {
-      guardsHtml += `
-        <div class="bilan-guard stop">
-          <div class="ico">🛑</div>
-          <div style="flex:1;">
-            <div class="title">Stop-loss atteint aujourd'hui</div>
-            <div class="desc">P&amp;L du jour <strong style="color:#f87171;">${guards.plToday.toFixed(2)}€</strong> · seuil −15% bankroll = <strong>${guards.stopLoss.toFixed(2)}€</strong>. Mieux vaut laisser décanter.</div>
-          </div>
-        </div>`;
-    }
-    if (overCap) {
-      guardsHtml += `
-        <div class="bilan-guard warn">
-          <div class="ico">⚠️</div>
-          <div style="flex:1;">
-            <div class="title">Exposition du jour dépassée</div>
-            <div class="desc">Engagé <strong style="color:#fbbf24;">${guards.engagedToday.toFixed(2)}€</strong> · plafond 5% bankroll = <strong>${guards.dailyCap.toFixed(2)}€</strong>. Tu empiles du risque corrélé.</div>
-          </div>
-        </div>`;
-    }
+    });
 
     // Per-sport cards
     const perSportHtml = Object.entries(perSport)
@@ -4962,42 +4915,14 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T20:09:16.067553Z","today":"
         </div>`;
       }).join('');
 
-    // Personal history rows — paginated. _bilanHistLimits kept on module scope
+    // Model history rows — paginated. _bilanHistLimits kept on module scope
     // so pressing "Voir plus" persists across re-renders until data.js changes.
+    // NB: post-refonte (2026-04-20) the bilan no longer has a perso tab, so
+    // we only track one limit key ("modele"). The old "perso" key is left
+    // defined but unused; keeping the shape stable avoids localStorage churn.
     if (typeof _bilanHistLimits === 'undefined') _bilanHistLimits = { perso: 40, modele: 40 };
-    const persoTotal = hasMyBets ? mine.rows.length : 0;
     const modeleTotal = rows.length;
-    const persoLimit = Math.min(_bilanHistLimits.perso, persoTotal);
     const modeleLimit = Math.min(_bilanHistLimits.modele, modeleTotal);
-    let myRowsHtml = '';
-    let corrMap = {};
-    if (hasMyBets) {
-      mine.rows.forEach(r => { corrMap[r.bet.matchId] = (corrMap[r.bet.matchId] || 0) + 1; });
-      myRowsHtml = mine.rows.slice(0, persoLimit).map(r => {
-        const m = r.match;
-        const { home, away } = m ? getSides(m) : { home: null, away: null };
-        const date = isoDate(r.bet.placedAt);
-        const corrCount = corrMap[r.bet.matchId] || 1;
-        const corrBadge = corrCount > 1 ? ` <span title="${corrCount} paris sur ce même match — risque corrélé." style="padding:1px 5px;border-radius:4px;background:rgba(251,191,36,.16);color:#fbbf24;font-size:10px;font-weight:700;vertical-align:middle;">⚠️${corrCount}</span>` : '';
-        const matchNameText = m ? `${(home?.short||home?.name||'?')} vs ${(away?.short||away?.name||'?')}` : `(match supprimé)`;
-        const matchCell = esc(matchNameText) + corrBadge;
-        const resColor = r.res === 'won' ? '#34d399' : r.res === 'lost' ? '#f87171' : 'var(--text-dim)';
-        const resLabel = r.res === 'won' ? `✓ +${(r.payout - r.bet.stake).toFixed(2)}€`
-                      : r.res === 'lost' ? `✗ −${r.bet.stake.toFixed(2)}€`
-                      : '⏳ en attente';
-        return `<tr>
-          <td style="color:var(--text-dim);font-size:12px;">${esc(date)}</td>
-          <td>${matchCell}</td>
-          <td style="color:var(--text-dim);font-size:12px;">${esc(r.bet.pickLabel)}</td>
-          <td style="text-align:right;font-variant-numeric:tabular-nums;">@${r.bet.odds.toFixed(2)}</td>
-          <td style="text-align:right;font-variant-numeric:tabular-nums;">${r.bet.stake.toFixed(2)}€</td>
-          <td style="text-align:right;font-weight:700;color:${resColor};">${esc(resLabel)}</td>
-          <td style="text-align:right;"><button data-mybet-del="${esc(r.key)}" style="background:none;border:none;color:var(--text-dim2);cursor:pointer;font-size:14px;" title="Retirer du bilan">×</button></td>
-        </tr>`;
-      }).join('');
-    }
-
-    // Model history rows — paginated (see _bilanHistLimits above)
     const modelRowsHtml = rows.slice().reverse().slice(0, modeleLimit).map(r => {
       const { home, away } = getSides(r.m);
       const cls = r.res === 'won' ? 'style="color:#34d399;font-weight:600;"' : 'style="color:#f87171;"';
@@ -5010,8 +4935,6 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T20:09:16.067553Z","today":"
         <td style="text-align:right;font-weight:700;color:${r.res==='won'?'#34d399':'#f87171'};">${r.res==='won'?'✓ +'+(r.odd-1).toFixed(2):'✗ −1.00'}</td>
       </tr>`;
     }).join('');
-
-    const bkPositive = bkDelta >= 0;
 
     // Time-window filter toolbar
     const winLabel = (_bilanWindow === 0) ? 'Tout' : `${_bilanWindow} derniers jours`;
@@ -5047,54 +4970,27 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T20:09:16.067553Z","today":"
         ${ciText}
       </div>`;
     };
+    // Extra line for draws — surfaces the category user asked us to watch.
+    const drawsCardHtml = drawsBucket.bets > 0
+      ? renderBucket('🤝 Match nul (X)', drawsBucket, '#60a5fa', 'foot uniquement')
+      : '';
     const bucketsHtml = `
       ${renderBucket('🔒 High', bucket.high, '#34d399', '≥ 65%')}
       ${renderBucket('⚖️ Mid', bucket.mid, '#a78bfa', '55–65%')}
       ${renderBucket('🎲 Low', bucket.low, '#fbbf24', '50–55%')}
+      ${drawsCardHtml}
     `;
 
     // ========= BUILD HTML =========
+    // Refonte 2026-04-20 : bilan modèle pur. Plus de bankroll/perso/tipsters —
+    // tout ça vit ailleurs (sidebar + carte matchs). Ici, un seul message :
+    // "est-ce que le modèle gagne de l'argent en pariant flat 1u ?"
     wrap.innerHTML = `
-      <!-- HERO: Bankroll current position -->
-      <div class="bilan-hero ${bkPositive ? '' : 'negative'}">
-        <div>
-          <div class="bk-label">Bankroll actuelle</div>
-          <div class="bk-value" style="color:${bkPositive ? '#34d399' : '#f87171'};">${currentBankroll.toFixed(2)}€</div>
-          <div class="bk-delta ${bkPositive ? 'pos' : 'neg'}">
-            ${bkPositive ? '↑' : '↓'} ${bkPositive ? '+' : ''}${bkDelta.toFixed(2)}€ · ${bkDeltaPct>=0?'+':''}${bkDeltaPct.toFixed(1)}%
-          </div>
-          <div class="bk-start">Départ ${startBankroll.toFixed(2)}€ · ${hasMyBets ? `${mine.settled} pari${mine.settled>1?'s':''} réglés` : 'aucun pari réglé'}</div>
-        </div>
-        <div class="bk-side">
-          ${hasMyBets ? `
-            <div class="bk-mini"><span class="lbl">Misé</span><span class="val">${mine.staked.toFixed(2)}€</span></div>
-            <div class="bk-mini"><span class="lbl">Retours</span><span class="val">${mine.returned.toFixed(2)}€</span></div>
-            <div class="bk-mini"><span class="lbl">Record</span><span class="val">${mine.w}W · ${mine.l}L${mine.pending?` · ${mine.pending}⏳`:''}</span></div>
-          ` : `
-            <div style="color:var(--text-dim);font-size:13px;line-height:1.5;">
-              Pas encore de pari enregistré. Clique sur <strong>💰 J'ai parié</strong> sur une carte Top pick pour alimenter ton bilan.
-            </div>
-          `}
-          <div class="bk-input">
-            <label>Bankroll de départ</label>
-            <input type="number" id="bilan-bankroll-input" value="${startBankroll.toFixed(2)}" min="1" step="1">
-            <span style="font-size:12px;color:var(--text-dim2);">€</span>
-          </div>
-        </div>
-      </div>
-
-      ${guardsHtml}
-
       <!-- TIME-WINDOW FILTER -->
       ${windowToolbarHtml}
 
-      <!-- KPI STRIP -->
+      <!-- KPI STRIP : modèle uniquement -->
       <div class="bilan-kpis">
-        <div class="bilan-kpi">
-          <div class="kpi-label">ROI perso</div>
-          <div class="kpi-value ${myRoiPct>=0?'pos':'neg'}">${hasMyBets ? (myRoiPct>=0?'+':'')+myRoiPct.toFixed(1)+'%' : '—'}</div>
-          <div class="kpi-sub">${hasMyBets ? `${mine.settled} réglés · ${mine.pending} en attente` : 'à calibrer'}</div>
-        </div>
         <div class="bilan-kpi brand">
           <div class="kpi-label">ROI modèle (flat 1u)</div>
           <div class="kpi-value ${roi>=0?'pos':'neg'}">${model.bets ? (roi>=0?'+':'')+roi.toFixed(1)+'%' : '—'}</div>
@@ -5112,22 +5008,13 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T20:09:16.067553Z","today":"
         </div>
       </div>
 
-      <!-- CHARTS ROW: perso + modèle -->
-      <div class="bilan-row-2">
-        <div class="bilan-section">
-          <div class="bilan-section-head">
-            <h3>💼 P&amp;L perso (€ réels)</h3>
-            <div class="meta">${hasMyBets ? `${mine.settled} réglés` : 'aucun'}</div>
-          </div>
-          ${myChartHtml}
+      <!-- MODEL P&L CHART -->
+      <div class="bilan-section">
+        <div class="bilan-section-head">
+          <h3>📊 P&amp;L modèle (unité flat)</h3>
+          <div class="meta">${model.bets} paris évalués</div>
         </div>
-        <div class="bilan-section">
-          <div class="bilan-section-head">
-            <h3>📊 P&amp;L modèle (unité flat)</h3>
-            <div class="meta">${model.bets} paris évalués</div>
-          </div>
-          ${modelChartHtml}
-        </div>
+        ${modelChartHtml}
       </div>
 
       <!-- VERDICT MODÈLE -->
@@ -5203,103 +5090,40 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T20:09:16.067553Z","today":"
         </div>
       </div>
 
-      <!-- HISTORIQUE (tabs) -->
+      <!-- HISTORIQUE MODÈLE -->
       <div class="bilan-section">
         <div class="bilan-section-head">
-          <h3>📜 Historique</h3>
-          <div class="bilan-tabs" id="bilan-hist-tabs">
-            <button class="active" data-hist="perso">Perso${hasMyBets?` (${mine.rows.length})`:''}</button>
-            <button data-hist="modele">Modèle (${rows.length})</button>
+          <h3>📜 Historique modèle</h3>
+          <div class="meta">${rows.length} pari${rows.length>1?'s':''}</div>
+        </div>
+        ${modelRowsHtml ? `
+          <div style="overflow-x:auto;">
+            <table class="bilan-table">
+              <thead><tr>
+                <th>Date</th><th>Match</th><th>Sport</th><th>Pick</th>
+                <th style="text-align:right;">Cote</th>
+                <th style="text-align:right;">Résultat</th>
+              </tr></thead>
+              <tbody>${modelRowsHtml}</tbody>
+            </table>
           </div>
-        </div>
-
-        <div class="bilan-tab-panel active" data-hist-panel="perso">
-          ${hasMyBets ? `
-            <div style="overflow-x:auto;">
-              <table class="bilan-table">
-                <thead><tr>
-                  <th>Date</th><th>Match</th><th>Pick</th>
-                  <th style="text-align:right;">Cote</th>
-                  <th style="text-align:right;">Mise</th>
-                  <th style="text-align:right;">Résultat</th>
-                  <th></th>
-                </tr></thead>
-                <tbody>${myRowsHtml}</tbody>
-              </table>
+          ${modeleTotal > modeleLimit ? `
+            <div style="text-align:center;margin-top:14px;">
+              <button class="bilan-more-btn" data-hist-more="modele">Voir plus (${modeleTotal - modeleLimit} restants)</button>
             </div>
-            ${persoTotal > persoLimit ? `
-              <div style="text-align:center;margin-top:14px;">
-                <button class="bilan-more-btn" data-hist-more="perso">Voir plus (${persoTotal - persoLimit} restants)</button>
-              </div>
-            ` : (persoLimit > 40 ? `
-              <div style="text-align:center;margin-top:14px;">
-                <button class="bilan-more-btn ghost" data-hist-less="perso">Réduire</button>
-              </div>
-            ` : '')}
-          ` : `<div class="bilan-empty">Pas encore de pari enregistré.</div>`}
-        </div>
-
-        <div class="bilan-tab-panel" data-hist-panel="modele">
-          ${modelRowsHtml ? `
-            <div style="overflow-x:auto;">
-              <table class="bilan-table">
-                <thead><tr>
-                  <th>Date</th><th>Match</th><th>Sport</th><th>Pick</th>
-                  <th style="text-align:right;">Cote</th>
-                  <th style="text-align:right;">Résultat</th>
-                </tr></thead>
-                <tbody>${modelRowsHtml}</tbody>
-              </table>
+          ` : (modeleLimit > 40 ? `
+            <div style="text-align:center;margin-top:14px;">
+              <button class="bilan-more-btn ghost" data-hist-less="modele">Réduire</button>
             </div>
-            ${modeleTotal > modeleLimit ? `
-              <div style="text-align:center;margin-top:14px;">
-                <button class="bilan-more-btn" data-hist-more="modele">Voir plus (${modeleTotal - modeleLimit} restants)</button>
-              </div>
-            ` : (modeleLimit > 40 ? `
-              <div style="text-align:center;margin-top:14px;">
-                <button class="bilan-more-btn ghost" data-hist-less="modele">Réduire</button>
-              </div>
-            ` : '')}
-          ` : `<div class="bilan-empty">Aucun pari du modèle évalué pour le moment.</div>`}
-        </div>
+          ` : '')}
+        ` : `<div class="bilan-empty">Aucun pari du modèle évalué pour le moment.</div>`}
       </div>
     `;
 
     // ========= WIRE INTERACTIONS =========
-    // Delete buttons for personal bets
-    wrap.querySelectorAll('[data-mybet-del]').forEach(btn => btn.addEventListener('click', () => {
-      const key = btn.dataset.mybetDel;
-      const all = loadMyBets();
-      delete all[key];
-      saveMyBets(all);
-      renderBilanPage(wrap);
-    }));
-    // Bankroll input (on bilan hero) — update + sync with sidebar input
-    const bkInput = wrap.querySelector('#bilan-bankroll-input');
-    if (bkInput) {
-      const onBk = () => {
-        const v = validateBankroll(bkInput.value, bkInput);
-        if (v == null) return;
-        bankroll = v;
-        try { localStorage.setItem('bankroll', String(v)); } catch (e) {}
-        const sideBr = document.getElementById('bankroll-input');
-        if (sideBr) sideBr.value = v;
-        renderBilanPage(wrap);
-      };
-      bkInput.addEventListener('change', onBk);
-      bkInput.addEventListener('blur', onBk);
-    }
-    // History tabs
-    const tabs = wrap.querySelector('#bilan-hist-tabs');
-    if (tabs) {
-      tabs.querySelectorAll('button').forEach(btn => btn.addEventListener('click', () => {
-        const key = btn.dataset.hist;
-        tabs.querySelectorAll('button').forEach(b => b.classList.toggle('active', b === btn));
-        wrap.querySelectorAll('[data-hist-panel]').forEach(p => {
-          p.classList.toggle('active', p.dataset.histPanel === key);
-        });
-      }));
-    }
+    // Post-refonte (2026-04-20): only pagination + window filter remain.
+    // Bankroll input lives on the sidebar; personal bet mgmt moved elsewhere.
+
     // "Voir plus" / "Réduire" pagination for historique
     wrap.querySelectorAll('[data-hist-more]').forEach(btn => btn.addEventListener('click', () => {
       const k = btn.dataset.histMore;
