@@ -562,10 +562,16 @@
   .conf-gauge svg { transform: rotate(-90deg); }
   .conf-gauge .cg-track { stroke: var(--panel-3); }
   .conf-gauge .cg-fill { fill: none; stroke-linecap: round; transition: stroke-dashoffset .5s ease; }
-  .conf-gauge.low .cg-fill { stroke: var(--danger); }
-  .conf-gauge.med .cg-fill { stroke: var(--warn); }
+  .conf-gauge.vlow .cg-fill { stroke: var(--text-dim2, #7b8693); }
+  .conf-gauge.low  .cg-fill { stroke: var(--danger); }
+  .conf-gauge.med  .cg-fill { stroke: var(--warn); }
   .conf-gauge.high .cg-fill { stroke: var(--accent); }
   .conf-gauge.vhigh .cg-fill { stroke: var(--brand); }
+  .conf-gauge.vlow .cg-txt { color: var(--text-dim2, #7b8693); }
+  .conf-gauge.low  .cg-txt { color: var(--danger); }
+  .conf-gauge.med  .cg-txt { color: var(--warn); }
+  .conf-gauge.high .cg-txt { color: var(--accent); }
+  .conf-gauge.vhigh .cg-txt { color: var(--brand); }
   .conf-gauge .cg-label {
     position: absolute; inset: 0; display: flex; flex-direction: column;
     align-items: center; justify-content: center; font-variant-numeric: tabular-nums;
@@ -2773,32 +2779,38 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T20:09:16.067553Z","today":"
     return `<span class="result-badge void">◦ Annulé</span>`;
   }
 
+  // Confidence tiers aligned with the bilan buckets (High ≥65%, Mid 55-65%,
+  // Low 50-55%, very low < 50%). Calibration du 2026-04-18 : High ≈ 83% WR,
+  // Low ≈ 46% WR (noise). Garder 3 tiers + "trop faible" pour ne pas polluer.
   function confLabel(p) {
-    if (p >= 0.72) return { lbl: 'Très forte', cls: 'high' };
-    if (p >= 0.58) return { lbl: 'Forte', cls: 'high' };
-    if (p >= 0.48) return { lbl: 'Moyenne', cls: 'med' };
-    if (p >= 0.40) return { lbl: 'Faible', cls: 'med' };
-    return { lbl: 'Très faible', cls: 'low' };
+    if (p >= 0.65) return { lbl: 'High',      cls: 'high',  color: '#34d399' };
+    if (p >= 0.55) return { lbl: 'Mid',       cls: 'med',   color: '#a78bfa' };
+    if (p >= 0.50) return { lbl: 'Low',       cls: 'low',   color: '#fbbf24' };
+    return            { lbl: 'Trop faible',   cls: 'vlow',  color: '#f87171' };
   }
 
   // Circular confidence gauge. prob in [0,1]. size: 'sm' | 'md' | 'lg'.
+  // Affiche % au centre + tier en dessous (High/Mid/Low) sauf en taille sm.
   function confGauge(prob, size = 'md') {
     const p = Math.max(0, Math.min(1, prob || 0));
-    const dims = { sm: { box: 36, r: 14, sw: 4 }, md: { box: 52, r: 21, sw: 5 }, lg: { box: 68, r: 28, sw: 6 } };
+    const dims = { sm: { box: 36, r: 14, sw: 4 }, md: { box: 56, r: 22, sw: 5 }, lg: { box: 72, r: 30, sw: 6 } };
     const d = dims[size] || dims.md;
     const c = 2 * Math.PI * d.r;
     const off = c * (1 - p);
-    const cls = p >= 0.72 ? 'vhigh' : p >= 0.58 ? 'high' : p >= 0.48 ? 'med' : 'low';
+    const t = confLabel(p);
     const cx = d.box / 2;
-    return `<div class="conf-gauge ${cls} ${size}">
-      <svg width="${d.box}" height="${d.box}" viewBox="0 0 ${d.box} ${d.box}">
+    // Map tier → CSS class (vhigh reserved for tier >= 0.72 inside High, to
+    // keep the stronger emerald shade for the truly strong High picks).
+    const cls = p >= 0.72 ? 'vhigh' : t.cls;
+    return `<div class="conf-gauge ${cls} ${size}" title="Confiance ${Math.round(p*100)}% — ${t.lbl}" aria-label="Confiance ${Math.round(p*100)}%, niveau ${t.lbl}">
+      <svg width="${d.box}" height="${d.box}" viewBox="0 0 ${d.box} ${d.box}" aria-hidden="true">
         <circle class="cg-track" cx="${cx}" cy="${cx}" r="${d.r}" fill="none" stroke-width="${d.sw}"></circle>
         <circle class="cg-fill" cx="${cx}" cy="${cx}" r="${d.r}" stroke-width="${d.sw}"
                 stroke-dasharray="${c.toFixed(2)}" stroke-dashoffset="${off.toFixed(2)}"></circle>
       </svg>
       <div class="cg-label">
         <div class="cg-pct">${Math.round(p*100)}%</div>
-        ${size !== 'sm' ? '<div class="cg-txt">conf.</div>' : ''}
+        ${size !== 'sm' ? `<div class="cg-txt">${t.lbl}</div>` : ''}
       </div>
     </div>`;
   }
@@ -3430,7 +3442,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T20:09:16.067553Z","today":"
               <div class="val">${pickOdd.toFixed(2)}</div>
             </div>
             <div class="hero-stat brand">
-              <div class="label">Confiance</div>
+              <div class="label">Confiance · ${confLabel(pred.pick.prob).lbl}</div>
               <div class="val">${(pred.pick.prob*100).toFixed(0)}%</div>
             </div>
             <div class="hero-stat accent">
