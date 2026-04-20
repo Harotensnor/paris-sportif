@@ -68,6 +68,15 @@
   }
 
   *, *::before, *::after { box-sizing: border-box; }
+  /* Keyboard accessibility — visible focus ring for interactive elements (only
+     on keyboard navigation, not mouse clicks). Matches the brand accent. */
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .match:focus-visible, .top-pick:focus-visible, .top-hero:focus-visible,
+  .combine-leg:focus-visible, [role="button"]:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: var(--r-sm);
+  }
   html, body {
     margin: 0; padding: 0;
     background: var(--bg); color: var(--text);
@@ -1757,14 +1766,14 @@
   </main>
 </div>
 
-<div class="modal-backdrop" id="detail-modal">
+<div class="modal-backdrop" id="detail-modal" role="dialog" aria-modal="true" aria-labelledby="detail-title" aria-hidden="true">
   <div class="modal">
     <div class="modal-head">
       <div>
         <h3 id="detail-title">Match</h3>
         <div class="league" id="detail-league"></div>
       </div>
-      <button class="modal-close" id="close-detail">Fermer ✕</button>
+      <button class="modal-close" id="close-detail" aria-label="Fermer la fenêtre de détails">Fermer ✕</button>
     </div>
     <div class="modal-body" id="detail-body"></div>
   </div>
@@ -2857,7 +2866,11 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T19:21:02.611529Z","today":"
     if (!formStr) return '';
     const chars = formStr.slice(-5).split('');
     const cls = big ? 'fm' : 'fm';
-    return `<div class="form">${chars.map(c => `<div class="${cls} ${c}">${c === 'T' ? 'D' : c}</div>`).join('')}</div>`;
+    const labels = { W: 'Victoire', L: 'Défaite', D: 'Match nul', T: 'Match nul' };
+    return `<div class="form" role="group" aria-label="Forme (5 derniers)">${chars.map(c => {
+      const lbl = labels[c] || 'Résultat inconnu';
+      return `<div class="${cls} ${c}" role="img" aria-label="${lbl}" title="${lbl}">${c === 'T' ? 'D' : c}</div>`;
+    }).join('')}</div>`;
   }
 
   function render() {
@@ -2975,11 +2988,17 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T19:21:02.611529Z","today":"
       `;
     }).join('');
 
-    el.querySelectorAll('.match').forEach(card => card.addEventListener('click', () => {
-      const id = card.dataset.id;
-      const match = visible.find(m => m.id === id);
-      if (match) openDetail(match);
-    }));
+    el.querySelectorAll('.match').forEach(card => {
+      const activate = () => {
+        const id = card.dataset.id;
+        const match = visible.find(m => m.id === id);
+        if (match) openDetail(match);
+      };
+      card.addEventListener('click', activate);
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
+      });
+    });
   }
 
   function renderSummary(all, sportEvents, visible) {
@@ -3526,17 +3545,26 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T19:21:02.611529Z","today":"
         </div>
       ` : ''}
     `;
-    wrap.querySelectorAll('.top-pick, .top-hero').forEach(card => card.addEventListener('click', (ev) => {
-      // Don't open detail when clicking a link or button inside the card
-      if (ev.target.closest('a, button')) return;
-      const id = card.dataset.id;
-      let match = null;
-      for (const day of Object.keys(window.PRONOSTICS_DATA.days || {})) {
-        match = (window.PRONOSTICS_DATA.days[day] || []).find(m => m.id === id);
-        if (match) break;
-      }
-      if (match) openDetail(match);
-    }));
+    wrap.querySelectorAll('.top-pick, .top-hero').forEach(card => {
+      // Make each card keyboard-accessible.
+      if (!card.hasAttribute('role')) card.setAttribute('role', 'button');
+      if (!card.hasAttribute('tabindex')) card.setAttribute('tabindex', '0');
+      const activate = (ev) => {
+        // Don't open detail when clicking a link or button inside the card
+        if (ev && ev.target && ev.target.closest && ev.target.closest('a, button')) return;
+        const id = card.dataset.id;
+        let match = null;
+        for (const day of Object.keys(window.PRONOSTICS_DATA.days || {})) {
+          match = (window.PRONOSTICS_DATA.days[day] || []).find(m => m.id === id);
+          if (match) break;
+        }
+        if (match) openDetail(match);
+      };
+      card.addEventListener('click', activate);
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(e); }
+      });
+    });
     // "J'ai parié" button — toggles personal bet tracking for that (match, pick).
     // Stops propagation so it doesn't also open the match detail modal.
     wrap.querySelectorAll('.tp-mybet').forEach(btn => btn.addEventListener('click', (ev) => {
@@ -3765,14 +3793,21 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T19:21:02.611529Z","today":"
       </div>
       <div class="combine-section">${sections}</div>
     `;
-    wrap.querySelectorAll('.combine-leg').forEach(el => el.addEventListener('click', () => {
-      const id = el.dataset.id;
-      // Search across all days
-      for (const day of Object.keys(window.PRONOSTICS_DATA.days || {})) {
-        const match = (window.PRONOSTICS_DATA.days[day] || []).find(m => m.id === id);
-        if (match) { openDetail(match); return; }
-      }
-    }));
+    wrap.querySelectorAll('.combine-leg').forEach(el => {
+      if (!el.hasAttribute('role')) el.setAttribute('role', 'button');
+      if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '0');
+      const activate = () => {
+        const id = el.dataset.id;
+        for (const day of Object.keys(window.PRONOSTICS_DATA.days || {})) {
+          const match = (window.PRONOSTICS_DATA.days[day] || []).find(m => m.id === id);
+          if (match) { openDetail(match); return; }
+        }
+      };
+      el.addEventListener('click', activate);
+      el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
+      });
+    });
     // Copy combiné to clipboard
     wrap.querySelectorAll('.combine-copy-btn').forEach(btn => btn.addEventListener('click', async (ev) => {
       ev.stopPropagation();
@@ -3902,8 +3937,9 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T19:21:02.611529Z","today":"
     })() : (isFinal && home && away ? `<div class="pred-block"><div style="color:var(--text-dim2); font-size:12px; text-align:center;">Résultat final</div></div>` : '');
 
     const showScore = isLive || isFinal;
+    const a11yLabel = `${home?.name || 'Domicile'} vs ${away?.name || 'Extérieur'}${isLive ? ' — en direct' : isFinal ? ' — terminé' : ' — à ' + fmtTime(m.date)}. Cliquer pour voir les détails.`;
     return `
-      <div class="${cardCls}" data-id="${esc(m.id)}">
+      <div class="${cardCls}" data-id="${esc(m.id)}" role="button" tabindex="0" aria-label="${esc(a11yLabel)}">
         <div class="head">
           <span class="time">${isLive ? '<span class="live-dot"></span>' : ''}${esc(statusText)}</span>
           <span class="venue">${esc(m.venue || m.city || '')}</span>
@@ -4301,7 +4337,12 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T19:21:02.611529Z","today":"
         </div>
       </div>
     `;
-    document.getElementById('detail-modal').classList.add('open');
+    const modal = document.getElementById('detail-modal');
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    // Move focus to the close button so keyboard users can dismiss via Enter/Space
+    const closeBtn = document.getElementById('close-detail');
+    if (closeBtn) closeBtn.focus({ preventScroll: true });
   }
 
   // ======= UI wiring =======
@@ -4324,9 +4365,14 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T19:21:02.611529Z","today":"
     searchTimer = setTimeout(() => { searchTerm = e.target.value; render(); }, 150);
   });
 
-  document.getElementById('close-detail').addEventListener('click', () => document.getElementById('detail-modal').classList.remove('open'));
-  document.getElementById('detail-modal').addEventListener('click', (e) => { if (e.target.id === 'detail-modal') e.target.classList.remove('open'); });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') document.getElementById('detail-modal').classList.remove('open'); });
+  const closeDetailModal = () => {
+    const m = document.getElementById('detail-modal');
+    m.classList.remove('open');
+    m.setAttribute('aria-hidden', 'true');
+  };
+  document.getElementById('close-detail').addEventListener('click', closeDetailModal);
+  document.getElementById('detail-modal').addEventListener('click', (e) => { if (e.target.id === 'detail-modal') closeDetailModal(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDetailModal(); });
 
   // ======= Auto-refresh =======
   // Polls data.js every 60s, merges fresh data into window.PRONOSTICS_DATA
