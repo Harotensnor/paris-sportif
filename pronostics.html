@@ -564,6 +564,15 @@
   <!-- FILTERS -->
   <div class="filters" id="filters"></div>
 
+  <!-- BANKROLL (for Kelly stakes) -->
+  <div id="bankroll-bar" style="display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:6px 4px;margin-bottom:6px;font-size:12px;color:var(--text-dim,#b4bcc7);">
+    <span style="letter-spacing:.3px;">💰 Bankroll</span>
+    <input id="bankroll-input" type="number" min="1" step="10" value="100"
+           style="width:80px;padding:4px 8px;border:1px solid var(--border,#2a3744);border-radius:6px;background:rgba(255,255,255,.03);color:var(--text,#e5e7eb);font-size:12px;text-align:right;font-variant-numeric:tabular-nums;">
+    <span>€</span>
+    <span id="bankroll-hint" style="font-size:11px;color:var(--text-dim2,#7b8693);">· utilisé pour la mise Kelly</span>
+  </div>
+
   <!-- TOP PICKS -->
   <div id="top-picks-wrap"></div>
 
@@ -628,6 +637,11 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T12:11:01.060850Z","today":"
   let winamaxOnly = (localStorage.getItem('winamaxOnly') ?? '1') === '1';
   // Current page view: simples (default) | combines | bilan
   let currentPage = localStorage.getItem('currentPage') || 'simples';
+  // Bankroll for Kelly-criterion stake suggestions. Persists across sessions.
+  let bankroll = (() => {
+    const v = parseFloat(localStorage.getItem('bankroll'));
+    return isFinite(v) && v > 0 ? v : 100;
+  })();
 
   // ======= Date helpers =======
   function todayISO() {
@@ -707,6 +721,28 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T12:11:01.060850Z","today":"
       };
     }
     return live;
+  }
+
+  // ======= Kelly criterion =======
+  // Suggested stake as a fraction of bankroll. We use HALF-KELLY (scale=0.5)
+  // by default — full Kelly maximizes long-run growth but has brutal drawdowns
+  // when the model over-estimates p. Half-Kelly keeps ~75% of the growth with
+  // far less variance, which is what you want for a real bankroll you can't
+  // infinitely replenish. Clamped: <0.5% → show nothing (not worth the friction),
+  // >10% → capped (any model claiming to bet 10%+ on a single leg is probably
+  // mis-calibrated on this match, so we refuse to take its word for it).
+  //
+  //   f* = (p·o − 1) / (o − 1)   ← full Kelly; numerator is the EV per euro
+  //
+  // Returns {fraction, stake10, stake100} or null when not actionable.
+  function kellyStake(p, decOdd, bankroll, scale) {
+    if (!p || !decOdd || decOdd <= 1) return null;
+    const k = (p * decOdd - 1) / (decOdd - 1);
+    if (!isFinite(k) || k <= 0) return null;
+    const frac = Math.min(0.10, k * (scale != null ? scale : 0.5));
+    if (frac < 0.005) return null;
+    const br = bankroll || 100;
+    return { fraction: frac, stake10: frac * 10, stake100: frac * br };
   }
 
   // ======= Competitor helpers =======
@@ -1712,6 +1748,8 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T12:11:01.060850Z","today":"
       const gainFor10 = ((pickOdd - 1) * 10).toFixed(2);
       const reasons = pred.explain?.reasons || [];
       const topReasons = reasons.slice(0, 3);
+      // Half-Kelly suggestion sized against the user's bankroll
+      const kelly = kellyStake(pred.pick.prob, pickOdd, bankroll, 0.5);
       const badgeColor = rank === 1 ? '#ffd700' : rank === 2 ? '#c0c0c0' : rank === 3 ? '#cd7f32' : 'var(--surface-3,#27313b)';
       const badgeText = rank === 1 ? '#fff8dc' : rank === 2 ? '#111' : rank === 3 ? '#fff' : 'var(--text)';
       const wmxUrl = winamaxUrl(m);
@@ -1737,8 +1775,9 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T12:11:01.060850Z","today":"
               <div style="font-weight:800;font-size:16px;">${(pred.pick.prob*100).toFixed(0)}%</div>
             </div>
           </div>
-          <div style="display:flex;gap:8px;margin-bottom:10px;font-size:12px;">
+          <div style="display:flex;gap:8px;margin-bottom:10px;font-size:12px;flex-wrap:wrap;">
             <span style="padding:3px 8px;border-radius:6px;background:rgba(16,185,129,.14);color:#10b981;font-weight:700;">EV +${evPct}%</span>
+            ${kelly ? `<span title="Mise Kelly-½ : ${(kelly.fraction*100).toFixed(1)}% de la bankroll, calibré sur ta proba modèle et la cote. Full-Kelly = ${(kelly.fraction*2*100).toFixed(1)}%." style="padding:3px 8px;border-radius:6px;background:rgba(96,165,250,.14);color:#60a5fa;font-weight:700;">💰 Mise ${kelly.stake100.toFixed(2)}€ <span style="opacity:.75;font-weight:500;">(${(kelly.fraction*100).toFixed(1)}%)</span></span>` : ''}
             <span style="padding:3px 8px;border-radius:6px;background:rgba(255,255,255,.05);color:var(--text-dim,#b4bcc7);">Gain 10€ → ${gainFor10}€ net</span>
             ${pred.value ? `<span style="padding:3px 8px;border-radius:6px;background:rgba(245,158,11,.14);color:#f59e0b;font-weight:700;">💎 VALUE</span>` : ''}
             ${pred.isLock ? `<span style="padding:3px 8px;border-radius:6px;background:rgba(234,179,8,.14);color:#eab308;font-weight:700;">🔒 LOCK</span>` : ''}
@@ -2644,8 +2683,8 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T12:11:01.060850Z","today":"
     const isCombines = currentPage === 'combines';
     const isBilan = currentPage === 'bilan';
 
-    // Filter bar + top picks + league panels only for simples page
-    const hideUnlessSimples = ['filters', 'top-picks-wrap'];
+    // Filter bar + top picks + bankroll widget + league panels only for simples page
+    const hideUnlessSimples = ['filters', 'top-picks-wrap', 'bankroll-bar'];
     hideUnlessSimples.forEach(id => {
       const el = document.getElementById(id);
       if (el) el.style.display = isSimples ? '' : 'none';
@@ -2795,6 +2834,21 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T12:11:01.060850Z","today":"
         applyPageView();
       });
     });
+    // Wire up bankroll input (persist + re-render Top Picks on change)
+    const brInput = document.getElementById('bankroll-input');
+    if (brInput) {
+      brInput.value = bankroll;
+      const onBR = () => {
+        const v = parseFloat(brInput.value);
+        if (isFinite(v) && v > 0) {
+          bankroll = v;
+          try { localStorage.setItem('bankroll', String(v)); } catch (e) {}
+          render(); // re-render so Top Picks show updated € stakes
+        }
+      };
+      brInput.addEventListener('change', onBR);
+      brInput.addEventListener('blur', onBR);
+    }
     render();
     startAutoRefresh();
   });
