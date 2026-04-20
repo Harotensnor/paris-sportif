@@ -2873,6 +2873,66 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T12:11:01.060850Z","today":"
     };
   }
 
+  // Build an inline SVG line chart of the cumulative P&L curve.
+  // Takes rows: [{ date: 'YYYY-MM-DD', delta: +0.85 | -1.00 }]. Assumes flat 1u
+  // bets, so the Y axis is units (one lost bet = -1). Groups by day, accumulates.
+  function renderRoiChart(rows, { width = 560, height = 160, title } = {}) {
+    if (!rows || !rows.length) return '';
+    // Group by day
+    const byDay = new Map();
+    rows.forEach(r => {
+      const d = (r.date || '').slice(0, 10);
+      if (!d) return;
+      byDay.set(d, (byDay.get(d) || 0) + r.delta);
+    });
+    const sortedDays = [...byDay.keys()].sort();
+    if (!sortedDays.length) return '';
+    let cum = 0;
+    const pts = sortedDays.map(d => {
+      cum += byDay.get(d);
+      return { d, cum };
+    });
+    // X: index evenly spaced; Y: domain padded
+    const minY = Math.min(0, ...pts.map(p => p.cum));
+    const maxY = Math.max(0, ...pts.map(p => p.cum));
+    const padY = Math.max(0.5, (maxY - minY) * 0.1);
+    const y0 = minY - padY, y1 = maxY + padY;
+    const marginL = 40, marginR = 12, marginT = 20, marginB = 28;
+    const plotW = width - marginL - marginR;
+    const plotH = height - marginT - marginB;
+    const xAt = i => marginL + (pts.length === 1 ? plotW / 2 : (i / (pts.length - 1)) * plotW);
+    const yAt = v => marginT + plotH - ((v - y0) / (y1 - y0)) * plotH;
+    const zeroY = yAt(0);
+    // Build polyline points
+    const poly = pts.map((p, i) => `${xAt(i).toFixed(1)},${yAt(p.cum).toFixed(1)}`).join(' ');
+    // Area under curve (from zero line)
+    const areaPath = pts.length
+      ? `M ${xAt(0).toFixed(1)} ${zeroY.toFixed(1)} L ${poly.split(' ').join(' L ')} L ${xAt(pts.length - 1).toFixed(1)} ${zeroY.toFixed(1)} Z`
+      : '';
+    const lastCum = pts[pts.length - 1].cum;
+    const posColor = '#34d399', negColor = '#f87171';
+    const stroke = lastCum >= 0 ? posColor : negColor;
+    const areaFill = lastCum >= 0 ? 'rgba(52,211,153,.18)' : 'rgba(248,113,113,.18)';
+    // X labels: show first, middle, last days
+    const xTicks = pts.length <= 5
+      ? pts.map((p, i) => ({ x: xAt(i), label: p.d.slice(5) }))
+      : [0, Math.floor(pts.length / 2), pts.length - 1].map(i => ({ x: xAt(i), label: pts[i].d.slice(5) }));
+    const yTicks = [y0, 0, y1].filter((v, i, arr) => i === arr.indexOf(v));
+    return `
+      <div style="background:var(--surface,#111827);border:1px solid var(--border,#2a3744);border-radius:12px;padding:14px;margin-bottom:24px;">
+        ${title ? `<div style="font-size:13px;color:var(--text-dim,#b4bcc7);margin-bottom:8px;font-weight:600;">${esc(title)} · <span style="color:${lastCum>=0?posColor:negColor};">${lastCum>=0?'+':''}${lastCum.toFixed(2)}u</span></div>` : ''}
+        <svg viewBox="0 0 ${width} ${height}" style="width:100%;height:auto;display:block;" xmlns="http://www.w3.org/2000/svg">
+          <line x1="${marginL}" y1="${zeroY.toFixed(1)}" x2="${width - marginR}" y2="${zeroY.toFixed(1)}" stroke="rgba(255,255,255,.15)" stroke-dasharray="3 3"/>
+          ${yTicks.map(v => `<text x="${marginL - 6}" y="${(yAt(v)+4).toFixed(1)}" text-anchor="end" fill="var(--text-dim2,#7b8693)" font-size="10" font-family="sans-serif">${v.toFixed(1)}u</text>`).join('')}
+          <path d="${areaPath}" fill="${areaFill}" stroke="none"/>
+          <polyline points="${poly}" fill="none" stroke="${stroke}" stroke-width="2"/>
+          ${pts.map((p, i) => `<circle cx="${xAt(i).toFixed(1)}" cy="${yAt(p.cum).toFixed(1)}" r="2.5" fill="${stroke}"><title>${p.d}: ${p.cum>=0?'+':''}${p.cum.toFixed(2)}u</title></circle>`).join('')}
+          ${xTicks.map(t => `<text x="${t.x.toFixed(1)}" y="${(height - 6).toFixed(1)}" text-anchor="middle" fill="var(--text-dim2,#7b8693)" font-size="10" font-family="sans-serif">${t.label}</text>`).join('')}
+        </svg>
+      </div>
+    `;
+  }
+
   // Aggregate bilan view: overall ROI, per-sport ROI, recent results, top completed picks
   function renderBilanPage(wrap) {
     const data = window.PRONOSTICS_DATA;
@@ -2902,6 +2962,12 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T12:11:01.060850Z","today":"
     });
     const wr = model.bets ? Math.round(100*model.w/model.bets) : 0;
     const roi = model.bets ? Math.round(100*model.pl/model.bets) : 0;
+    // Build chart data: one entry per evaluated pick with +profit/-stake
+    const chartRows = rows.map(r => ({
+      date: (r.m.date || '').slice(0, 10),
+      delta: r.res === 'won' ? (r.odd - 1) : -1,
+    }));
+    const chartHtml = renderRoiChart(chartRows, { title: 'P&L cumulé du modèle (unité flat)' });
     const rowsHtml = rows.slice().reverse().slice(0, 40).map(r => {
       const { home, away } = getSides(r.m);
       const cls = r.res === 'won' ? 'style="color:#34d399;"' : 'style="color:#f87171;text-decoration:line-through;"';
@@ -2930,6 +2996,16 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T12:11:01.060850Z","today":"
     let mySection = '';
     if (mine && mine.bets > 0) {
       const myRoiPct = (mine.roi * 100);
+      // Personal P&L chart: settled bets only, sorted by match date, stakes in €
+      const myChartRows = mine.rows
+        .filter(r => r.res !== 'pending' && r.match)
+        .map(r => ({
+          date: (r.match.date || r.bet.placedAt || '').slice(0, 10),
+          delta: r.res === 'won' ? (r.payout - r.bet.stake) : -r.bet.stake,
+        }));
+      const myChartHtml = myChartRows.length >= 2
+        ? renderRoiChart(myChartRows, { title: 'P&L cumulé perso (€ réels)' }).replace(/u<\/text>/g, '€</text>').replace(/u<\/span>/g, '€</span>').replace(/u\.|u$| u /g, m => m.replace('u', '€'))
+        : '';
       const myRowsHtml = mine.rows.slice(0, 30).map(r => {
         const m = r.match;
         const { home, away } = m ? getSides(m) : { home: null, away: null };
@@ -2968,6 +3044,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T12:11:01.060850Z","today":"
             <div style="font-size:11px;color:var(--text-muted);">${mine.w}W · ${mine.l}L</div>
           </div>
         </div>
+        ${myChartHtml}
         <details style="margin-bottom:28px;">
           <summary style="cursor:pointer;color:var(--text-muted);font-size:13px;padding:6px 0;">Historique (${Math.min(mine.rows.length, 30)}/${mine.rows.length})</summary>
           <div style="overflow-x:auto;margin-top:8px;">
@@ -3009,6 +3086,8 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-20T12:11:01.060850Z","today":"
             <div style="font-size:12px;color:var(--text-muted);">P&L net: ${model.pl>=0?'+':''}${model.pl.toFixed(2)}u</div>
           </div>
         </div>
+
+        ${chartHtml}
 
         <h3 style="margin:24px 0 12px;font-size:16px;">Par sport</h3>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;">${perSportHtml || '<div class="empty">Aucun résultat pour le moment.</div>'}</div>
