@@ -5419,6 +5419,70 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T13:14:27.667104Z","today":"
     const modelChartHtml = renderRoiChart(modelChartRows, { title: 'P&L modèle cumulé (unité flat)' })
       || `<div class="bilan-empty">Pas encore assez de paris pour tracer une courbe.</div>`;
 
+    // ========= CALIBRATION (reliability diagram + persistent MAE trend) =========
+    // Compute fresh calibration from the current bilan and store today's MAE
+    // snapshot in localStorage. Keep 60 days rolling. This lets us see if the
+    // calibration is improving as we add signals.
+    const cal = computeCalibration();
+    const calTotalN = cal.reduce((s, c) => s + c.n, 0);
+    const calMAE = calTotalN > 0
+      ? cal.reduce((s, c) => s + Math.abs(c.actual - c.predicted) * c.n, 0) / calTotalN
+      : null;
+    // Persist MAE history — one entry per calendar day (Paris TZ), keyed by day.
+    let maeHistory = [];
+    if (calMAE != null) {
+      try {
+        const today = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+        const raw = localStorage.getItem('bilan.maeHistory');
+        maeHistory = raw ? JSON.parse(raw) : [];
+        if (!Array.isArray(maeHistory)) maeHistory = [];
+        // Upsert today's entry
+        const idx = maeHistory.findIndex(x => x.day === today);
+        const entry = { day: today, mae: Math.round(calMAE * 10000) / 10000, n: calTotalN };
+        if (idx >= 0) maeHistory[idx] = entry;
+        else maeHistory.push(entry);
+        // Prune to last 60 days
+        maeHistory = maeHistory.slice(-60);
+        localStorage.setItem('bilan.maeHistory', JSON.stringify(maeHistory));
+      } catch (e) { maeHistory = []; }
+    }
+    // Sparkline: MAE over the last N snapshots (relative trend).
+    const renderMaeSparkline = (history) => {
+      if (!history || history.length < 3) return '';
+      const w = 180, h = 40, pad = 4;
+      const vals = history.map(x => x.mae);
+      const min = Math.min(...vals), max = Math.max(...vals);
+      const range = Math.max(0.001, max - min);
+      const xAt = i => pad + (i / (vals.length - 1)) * (w - 2 * pad);
+      const yAt = v => pad + (1 - (v - min) / range) * (h - 2 * pad);
+      const pts = vals.map((v, i) => `${xAt(i).toFixed(1)},${yAt(v).toFixed(1)}`).join(' ');
+      const last = history[history.length - 1], first = history[0];
+      const delta = last.mae - first.mae;
+      const stroke = delta <= 0 ? '#34d399' : '#f87171';  // down = improving = green
+      const deltaLbl = `${delta >= 0 ? '+' : ''}${(delta * 100).toFixed(1)}pt`;
+      return `
+        <div style="display:flex;align-items:center;gap:12px;margin-top:8px;font-size:12px;color:var(--text-dim);">
+          <span>Tendance MAE (${history.length}j):</span>
+          <svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="flex-shrink:0;">
+            <polyline points="${pts}" fill="none" stroke="${stroke}" stroke-width="1.6"/>
+            <circle cx="${xAt(vals.length - 1).toFixed(1)}" cy="${yAt(last.mae).toFixed(1)}" r="2.5" fill="${stroke}"/>
+          </svg>
+          <span style="color:${stroke};font-weight:600;font-variant-numeric:tabular-nums;">${deltaLbl}</span>
+          <span style="color:var(--text-dim2);">${delta <= 0 ? 'calibration qui s\'améliore' : 'calibration qui se dégrade'}</span>
+        </div>
+      `;
+    };
+    const reliabilitySectionHtml = `
+      <div class="bilan-section">
+        <div class="bilan-section-head">
+          <h3>🎚️ Calibration fiabilité</h3>
+          <div class="meta">Est-ce que la jauge dit la vérité ?</div>
+        </div>
+        ${renderReliabilityDiagram(cal)}
+        ${renderMaeSparkline(maeHistory)}
+      </div>
+    `;
+
     // ========= MODEL BREAKDOWN: buckets confiance =========
     // Buckets par proba modèle : high ≥ 0.65, mid 0.55–0.65, low 0.50–0.55.
     const bucket = { high: { w:0, l:0, pl:0, bets:0 }, mid: { w:0, l:0, pl:0, bets:0 }, low: { w:0, l:0, pl:0, bets:0 } };
@@ -5630,6 +5694,9 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T13:14:27.667104Z","today":"
             : `<div class="bilan-empty">Aucun résultat pour le moment.</div>`}
         </div>
       </div>
+
+      <!-- CALIBRATION FIABILITÉ : reliability diagram + sparkline MAE persistant -->
+      ${reliabilitySectionHtml}
 
       <!-- HISTORIQUE MODÈLE -->
       <div class="bilan-section">
