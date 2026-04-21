@@ -77,6 +77,9 @@ jobs:
           # ClubElo: single-call CSV fetch, self-throttles to 1 call / 20h so
           # safe to invoke on every tick. Cheap (<100 KB, <1s).
           python3 fetch_clubelo.py || true
+          # Weather (Open-Meteo): free, no key. Script self-throttles — skips
+          # if forecast <30min old OR kickoff >6h away. Typical run: <5s.
+          python3 fetch_weather.py || true
           python3 patch_winamax.py || true
           # Patch soccer injuries AFTER patch_winamax so they survive the
           # dedup/bucketing rewrite. Idempotent, ~0.1s.
@@ -88,6 +91,9 @@ jobs:
           python3 patch_lineups_soccer.py || true
           # Patch ClubElo ratings last (survives all prior rewrites). ~0.1s.
           python3 patch_clubelo.py || true
+          # Patch weather (survives all prior rewrites). Adds ev.weather to
+          # football events with a fresh forecast. ~0.1s.
+          python3 patch_weather.py || true
 
       - name: Commit data updates
         run: |
@@ -95,7 +101,8 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data.js pronostics.html odds_history.jsonl \
                   injuries_soccer.json winamax_catalog.json team_stats.json \
-                  lineups_soccer.json clubelo.json 2>/dev/null || true
+                  lineups_soccer.json clubelo.json weather.json \
+                  weather_geo_cache.json 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "No changes to commit."
             exit 0

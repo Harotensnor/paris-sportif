@@ -2464,6 +2464,34 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T13:14:27.667104Z","today":"
 
     // Poisson component (football only, needs standings with GF/GA)
     const poi = poissonComponent(match);
+    // Weather adjustment — heavy rain and strong wind depress total goals.
+    // Empirical: precip >3mm/h ≈ -0.2 goals, wind >25 km/h ≈ -0.15 goals.
+    // Applied to Poisson xG BEFORE O/U, BTTS and exact-scores are computed.
+    let weatherStats = null;
+    if (poi && match.sport === 'football' && match.weather) {
+      const w = match.weather;
+      let rainPenalty = 0, windPenalty = 0;
+      if (typeof w.precip_mm === 'number' && w.precip_mm > 1) {
+        rainPenalty = Math.min(0.25, (w.precip_mm - 1) * 0.04);
+      }
+      if (typeof w.wind_kmh === 'number' && w.wind_kmh > 20) {
+        windPenalty = Math.min(0.15, (w.wind_kmh - 20) * 0.007);
+      }
+      const penalty = rainPenalty + windPenalty;
+      if (penalty > 0.05) {
+        // Scale total xG down by up to ~10% (penalty of 0.20 → scale 0.90).
+        const scale = 1 - Math.min(0.20, penalty) / 2;
+        poi.lamH *= scale;
+        poi.lamA *= scale;
+        weatherStats = {
+          precip: w.precip_mm,
+          wind: w.wind_kmh,
+          penalty: Math.round(penalty * 100) / 100,
+          rain: rainPenalty > windPenalty,
+          city: w.city,
+        };
+      }
+    }
     // Home/Road record split (non-football only: basket/hockey/etc.)
     const hrComp = homeRoadComponent(match);
 
@@ -2791,6 +2819,23 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T13:14:27.667104Z","today":"
         text: `${tired.team} ${tired.cnt} matchs en 7j — fatigue possible`
       });
     }
+    // Weather — significant rain/wind detected, total goals nudged down.
+    if (weatherStats) {
+      const bits = [];
+      if (typeof weatherStats.precip === 'number' && weatherStats.precip > 1) {
+        bits.push(`pluie ${weatherStats.precip.toFixed(1)}mm/h`);
+      }
+      if (typeof weatherStats.wind === 'number' && weatherStats.wind > 20) {
+        bits.push(`vent ${Math.round(weatherStats.wind)}km/h`);
+      }
+      if (bits.length) {
+        reasons.push({
+          type: 'weather',
+          icon: weatherStats.rain ? '🌧️' : '💨',
+          text: `Météo ${weatherStats.city || ''}${weatherStats.city ? ' : ' : ''}${bits.join(', ')} — xG réduits`
+        });
+      }
+    }
     // H2H
     if (h2hStats) {
       const { homeWins, awayWins, draws, n } = h2hStats;
@@ -2973,6 +3018,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T13:14:27.667104Z","today":"
       components: components.map(c => ({ w: c.w })),
       elo: eloStats,  // { home, away, diff } — surfaced on the match modal
       congestion: congestionStats,  // { home, away } — match count in ±7d window
+      weather: weatherStats,  // { precip, wind, penalty, rain, city } or null
       explain: { headline, reasons }
     };
   }
