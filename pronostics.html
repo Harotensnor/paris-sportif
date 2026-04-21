@@ -2300,6 +2300,62 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
     return n;
   }
 
+  // ======= Reliability calibration (Chantier F) =======
+  // Historical reliability diagram → isotonic-ish remap. We run the raw
+  // (un-calibrated) reliability over completed matches, bucket it by predicted
+  // range, measure actual WR per bucket, then linearly interpolate between the
+  // bucket midpoints at query time. Net effect : if the model is systematically
+  // 3 pts over-confident in the 60-65% range, a raw 0.625 comes back as ~0.595.
+  //
+  // Recursion note : computeCalibration() calls predictMatch() which calls
+  // applyReliabilityCalibration(). The __reliabilityCalComputing flag short-
+  // circuits the recursion — during calibration bucketing we intentionally use
+  // the raw reliability (so the buckets measure the un-calibrated signal).
+  let __reliabilityCalMap = null;         // sorted [{predicted, actual, n}]
+  let __reliabilityCalRef = null;         // PRONOSTICS_DATA ref at last build
+  let __reliabilityCalComputing = false;  // recursion guard
+  function applyReliabilityCalibration(raw) {
+    if (__reliabilityCalComputing) return raw;
+    const cur = (typeof window !== 'undefined') ? window.PRONOSTICS_DATA : null;
+    if (__reliabilityCalRef !== cur) {
+      __reliabilityCalMap = null;
+      __reliabilityCalRef = cur;
+    }
+    if (__reliabilityCalMap === null) {
+      __reliabilityCalComputing = true;
+      try {
+        const buckets = (typeof computeCalibration === 'function') ? computeCalibration() : [];
+        // Need ≥3 populated buckets with ≥8 samples each for meaningful remap;
+        // otherwise we punt and return raw unchanged.
+        const solid = (buckets || []).filter(b => b.n >= 8);
+        __reliabilityCalMap = (solid.length >= 3)
+          ? solid.slice().sort((a, b) => a.predicted - b.predicted)
+          : [];
+      } catch (e) {
+        __reliabilityCalMap = [];
+      } finally {
+        __reliabilityCalComputing = false;
+        // Flush the predictMatch cache — the calibration build populated it
+        // with RAW (uncalibrated) reliability values via the recursion guard.
+        // We want future predictMatch calls to recompute with the newly-built
+        // calibration map applied.
+        try { __predCacheClear(); } catch (e) { /* defined just below */ }
+      }
+    }
+    const cal = __reliabilityCalMap;
+    if (!cal || !cal.length) return raw;
+    if (raw <= cal[0].predicted) return Math.min(raw, cal[0].actual);
+    if (raw >= cal[cal.length - 1].predicted) return cal[cal.length - 1].actual;
+    for (let i = 0; i < cal.length - 1; i++) {
+      if (raw >= cal[i].predicted && raw <= cal[i + 1].predicted) {
+        const span = cal[i + 1].predicted - cal[i].predicted;
+        const t = span > 0 ? (raw - cal[i].predicted) / span : 0;
+        return cal[i].actual + t * (cal[i + 1].actual - cal[i].actual);
+      }
+    }
+    return raw;
+  }
+
   // ======= Prediction =======
   // ===== Memoization layer for predictMatch =====
   // predictMatch gets called 15+ times per render (filter, summary, top picks,
@@ -2563,21 +2619,22 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
 
     // Combine — dynamic weighting based on which components are available
     // Priority: odds > Poisson (standings-based) > home/road split > record > Elo > form > fallback
-    // Weights tuned 2026-04-20 after bilan analysis (high-conf 86% WR on football):
-    //   - Odds stay dominant (market is calibrated)
-    //   - Poisson bumped 0.35→0.40 — it's our strongest independent signal for football
-    //   - Record bumped 0.25→0.30 — helps disambiguate the 50-58% bucket
-    //   - H2H bumped 0.15→0.20 — stable signal when ≥3 meetings exist
-    //   - Elo added at 0.25 (Chantier 9) — independent of odds/Poisson, complements
-    //     record by bringing long-term strength into the mix
+    // Weights tuned 2026-04-20 after bilan analysis, then rebuilt 2026-04-21 (Chantier F):
+    //   - Market odds still feed the PREDICTION (final probs) so non-football
+    //     sports retain a working pick label
+    //   - BUT market is flagged `isMarket:true` and EXCLUDED from the reliability
+    //     blend, per user spec — fiabilité must be a pure model signal,
+    //     calibrated against historical WR, not a reflection of the bookmaker.
+    //   - Within the pure-model subset: Poisson 0.50 (was 0.40), Elo 0.30
+    //     (was 0.25), HR 0.30, record 0.30, H2H 0.25 (was 0.20).
     let final;
     const components = [];
-    if (pH != null) components.push({ w: 0.50, pH, pD: (pD||0), pA });
-    if (poi) components.push({ w: 0.40, pH: poi.pH, pD: poi.pD, pA: poi.pA });
+    if (pH != null) components.push({ w: 0.50, pH, pD: (pD||0), pA, isMarket: true });
+    if (poi) components.push({ w: 0.50, pH: poi.pH, pD: poi.pD, pA: poi.pA });
     if (hrComp) components.push({ w: 0.30, pH: hrComp.pH, pD: 0, pA: hrComp.pA });
     if (recScore) components.push({ w: 0.30, pH: recScore.pH, pD: recScore.pD||0, pA: recScore.pA });
-    if (eloComp) components.push({ w: 0.25, pH: eloComp.pH, pD: eloComp.pD||0, pA: eloComp.pA });
-    if (h2hComp) components.push({ w: 0.20, pH: h2hComp.pH, pD: h2hComp.pD||0, pA: h2hComp.pA });
+    if (eloComp) components.push({ w: 0.30, pH: eloComp.pH, pD: eloComp.pD||0, pA: eloComp.pA });
+    if (h2hComp) components.push({ w: 0.25, pH: h2hComp.pH, pD: h2hComp.pD||0, pA: h2hComp.pA });
     if (components.length) {
       const totW = components.reduce((s,c) => s + c.w, 0);
       final = { pH: 0, pD: 0, pA: 0 };
@@ -2893,18 +2950,23 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
     // each other.
     let reliability = best_pick[1];
     let reliabilityMeta = null;
+    // Chantier F: only non-market components feed the reliability blend.
+    // Market odds are skipped via the isMarket flag (they still shape `final`
+    // above so the pick label exists, but they do NOT contribute to fiabilité).
+    let pureCompCount = 0;
     {
       const pickKey = best_pick[2]; // '1' | 'X' | '2'
       const fieldMap = { '1': 'pH', 'X': 'pD', '2': 'pA' };
       const field = fieldMap[pickKey];
-      const compProbs = components
+      const pureComponents = components.filter(c => !c.isMarket);
+      const compProbs = pureComponents
         .map(c => (c && typeof c[field] === 'number') ? c[field] : null)
         .filter(x => x != null);
+      pureCompCount = compProbs.length;
       const pickProbVal = best_pick[1];
-      // Signal richness — saturates at 5 (odds + poisson + hr + record + elo + h2h
-      // = 6 max but realistically most events have 3-4). 2 components = 0.4,
-      // 4 = 0.8, 5+ = 1.0.
-      const richness = Math.min(1, Math.max(0, compProbs.length / 5));
+      // Signal richness — saturates at 4 now that market is excluded (max pool
+      // = poisson + hr + record + elo + h2h = 5 but 3-4 is realistic).
+      const richness = Math.min(1, Math.max(0, compProbs.length / 4));
       let agreement = 0.5;  // neutral if we can't compute
       if (compProbs.length >= 2) {
         const mean = compProbs.reduce((a,b) => a+b, 0) / compProbs.length;
@@ -2921,13 +2983,20 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
       // than pickProb — never runaway.
       const blend = 0.70 * agreement + 0.30 * richness;
       const boost = 0.85 + 0.23 * blend;
-      reliability = Math.max(0.25, Math.min(0.98, pickProbVal * boost));
+      let rawReliability = Math.max(0.25, Math.min(0.98, pickProbVal * boost));
+      // Chantier F calibration — remap raw reliability to historical observed
+      // WR using the live reliability diagram. Prevents systematic over/under-
+      // confidence. Returns raw value unchanged if calibration data is thin.
+      const calibrated = applyReliabilityCalibration(rawReliability);
+      reliability = calibrated;
       reliabilityMeta = {
         pickProb: pickProbVal,
         componentCount: compProbs.length,
         agreement: Math.round(agreement * 100) / 100,
         richness: Math.round(richness * 100) / 100,
         boost: Math.round(boost * 1000) / 1000,
+        rawReliability: Math.round(rawReliability * 1000) / 1000,
+        calibrated: Math.abs(calibrated - rawReliability) > 0.005,
       };
     }
 
@@ -2948,16 +3017,18 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
       reliabilityMeta,
       odds: best,
       hasDraw,
-      isLock: reliability >= 0.72,
-      // Thresholds tuned against the completed-match bilan (2026-04-20):
-      //   <42% : 31% WR — pure noise, never surface ("skip")
-      //   42-50% : 53% WR — coinflip, need strong value/lock to justify ("lowConf")
-      //   50-58% : 56% WR
-      //   58-72% : 86% WR — sweet spot, this is what Top 5 surfaces
-      // Now applied to `reliability` (not pickProb) so divergent components
-      // downgrade a match that would otherwise clear the threshold on raw prob.
+      // Chantier F thresholds (2026-04-21, pur modèle + calibré) :
+      //   isLock ≥ 0.70 — cible du 80%+ WR, aligné sur la calibration historique
+      //   lowConf < 0.50 — downgrade visuel
+      //   skip < 0.45 OR fewer than 2 pure-model components — ne surface pas
+      // Le seuil isLock est descendu 0.72→0.70 car après calibration le modèle
+      // est monotone : ce qu'on mesure à 70% correspond vraiment à ~70% de WR.
+      isLock: reliability >= 0.70,
       lowConf: reliability < 0.50,
-      skip: reliability < 0.45,
+      // Defensive skip — without ≥2 non-market components the reliability
+      // isn't a consensus, it's basically pickProb×boost. User's ultra-selective
+      // spec (5-10 picks/j, 80%+ WR) demands real signal consensus.
+      skip: reliability < 0.45 || pureCompCount < 2,
       poisson: poi ? { xgH: poi.lamH, xgA: poi.lamA } : null,
       // Top-3 most probable exact scores under the Poisson model. Foot only
       // (Chantier 6). Rendu en carte sur le modal match.
