@@ -202,6 +202,15 @@
     background: var(--panel-3); color: var(--text);
     box-shadow: var(--shadow-xs), inset 0 0 0 1px var(--border-2);
   }
+  .page-btn .count {
+    color: var(--text-dim); font-weight: 600; font-size: 11px;
+    background: var(--panel-3); border: 1px solid var(--border);
+    padding: 1px 7px; border-radius: 999px; font-variant-numeric: tabular-nums;
+    min-width: 20px; text-align: center; margin-left: 2px;
+  }
+  .page-btn.active .count {
+    color: var(--brand); border-color: var(--brand-border); background: var(--brand-soft);
+  }
 
   /* ======= SUMMARY CARDS ======= */
   .summary-bar {
@@ -1670,6 +1679,7 @@
     <div class="sidebar-section-title">Navigation</div>
     <nav class="page-nav" id="page-nav">
       <button class="page-btn active" data-page="simples">🎯 Simples</button>
+      <button class="page-btn" data-page="locks">🔒 Locks <span class="count" id="count-locks">0</span></button>
       <button class="page-btn" data-page="combines">🔗 Combinés</button>
       <button class="page-btn" data-page="bilan">📊 Bilan</button>
     </nav>
@@ -3288,6 +3298,27 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
       const btn = document.querySelector(`[data-tab="${s}"]`);
       if (btn) btn.classList.toggle('hidden', n === 0);
     });
+
+    // === Locks counter in sidebar nav (live+upcoming, all days, all sports) ===
+    // Kept on every render so the badge stays fresh even when the user is on
+    // another page. Scans all stored days so tomorrow's locks count too.
+    const locksCountEl = document.getElementById('count-locks');
+    if (locksCountEl) {
+      const nowMs = Date.now();
+      let n = 0;
+      Object.values(data.days || {}).forEach(arr => (arr || []).forEach(m => {
+        if (winamaxOnly && !(m.winamax && m.winamax.available === true)) return;
+        if (m.completed || m.status === 'STATUS_FINAL' || m.status === 'STATUS_FULL_TIME') return;
+        if (!m.date) return;
+        const ko = new Date(m.date).getTime();
+        if (isNaN(ko)) return;
+        // Include live + upcoming (kicked off < 15 min ago still actionable-ish)
+        if (ko < nowMs - 15 * 60 * 1000) return;
+        const p = predictMatch(m);
+        if (p && p.pick && !p.skip && p.isLock) n++;
+      }));
+      locksCountEl.textContent = String(n);
+    }
 
     // === Filter current sport ===
     const sportEvents = all.filter(m => m.sport === currentSport);
@@ -5153,6 +5184,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
     const isCombines = currentPage === 'combines';
     const isValue = currentPage === 'value';
     const isBilan = currentPage === 'bilan';
+    const isLocks = currentPage === 'locks';
 
     // Filter bar + top picks only for simples page. Bankroll bar lives
     // in the sidebar now so it stays visible on every page.
@@ -5173,9 +5205,19 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
     const comb = document.getElementById('combines-wrap');
     if (comb) comb.style.display = isCombines ? '' : 'none';
 
-    // Summary bar: shown for simples + bilan, hidden for combines/value (own header)
+    // Summary bar: shown for simples + bilan, hidden for combines/value/locks (own header)
     const sum = document.getElementById('summary-bar');
-    if (sum) sum.style.display = (isCombines || isValue) ? 'none' : '';
+    if (sum) sum.style.display = (isCombines || isValue || isLocks) ? 'none' : '';
+
+    // Locks page: render dedicated list of all lock picks across all days/sports
+    let locksWrap = document.getElementById('locks-wrap');
+    if (!locksWrap) {
+      locksWrap = document.createElement('div');
+      locksWrap.id = 'locks-wrap';
+      (document.querySelector('main') || document.body).appendChild(locksWrap);
+    }
+    locksWrap.style.display = isLocks ? '' : 'none';
+    if (isLocks) renderLocksPage(locksWrap);
 
     // Value Finder page
     let valueWrap = document.getElementById('value-wrap');
@@ -5514,6 +5556,196 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
       if (bets[k].matchId === String(matchId)) n++;
     }
     return n;
+  }
+
+  // ======= Page Locks =======
+  // Chantier I — vue dédiée aux picks isLock (fiab ≥ 0.70) tous sports
+  // confondus, tous jours confondus. Split en trois sections : à venir,
+  // en cours, settled récents. Hero compact avec compteurs + WR lifetime.
+  function renderLocksPage(wrap) {
+    const data = window.PRONOSTICS_DATA;
+    if (!data || !data.days) { wrap.innerHTML = '<div class="bilan-empty">Pas de données disponibles.</div>'; return; }
+
+    // Collect every match (dedup by id) — scan all stored day keys, same logic as render().
+    const seenIds = new Set();
+    const allMatches = [];
+    Object.values(data.days).forEach(arr => (arr || []).forEach(m => {
+      if (m.id && seenIds.has(m.id)) return;
+      if (m.id) seenIds.add(m.id);
+      allMatches.push(m);
+    }));
+
+    // Keep only Winamax-available matches with a lock pick (fiab ≥ 0.70).
+    // predictMatch handles skip / lowConf / odds fallback already.
+    const lockMatches = [];
+    for (const m of allMatches) {
+      if (winamaxOnly && !(m.winamax && m.winamax.available === true)) continue;
+      const pred = predictMatch(m);
+      if (!pred || !pred.pick || pred.skip || !pred.isLock) continue;
+      lockMatches.push({ m, pred });
+    }
+
+    // Split by state: live, upcoming, settled (recent last 48h)
+    const now = Date.now();
+    const cutoffSettled = now - 48 * 3600 * 1000;
+    const live = [];
+    const upcoming = [];
+    const settled = [];
+    lockMatches.forEach(entry => {
+      const { m } = entry;
+      const isLive = m.status === 'STATUS_IN_PROGRESS';
+      const isFinal = m.completed || m.status === 'STATUS_FINAL' || m.status === 'STATUS_FULL_TIME';
+      const ko = m.date ? new Date(m.date).getTime() : NaN;
+      if (isLive) { live.push(entry); return; }
+      if (isFinal) {
+        if (!isNaN(ko) && ko >= cutoffSettled) settled.push(entry);
+        return;
+      }
+      if (!isNaN(ko) && ko > now - 15 * 60 * 1000) upcoming.push(entry);
+    });
+    upcoming.sort((a, b) => new Date(a.m.date) - new Date(b.m.date));
+    settled.sort((a, b) => new Date(b.m.date) - new Date(a.m.date));
+
+    // Sidebar counter: upcoming + live locks (actionable)
+    const counterEl = document.getElementById('count-locks');
+    if (counterEl) counterEl.textContent = String(upcoming.length + live.length);
+
+    // === Lifetime lock stats (for the hero header) ===
+    // Walks every completed match in the dataset and re-plays the lock pick
+    // against the stored odds. Mirrors the Bilan page logic but restricted to
+    // locks — gives Théo a "comment le modèle a fait sur les locks jusqu'ici"
+    // read in one glance.
+    let lw = 0, ll = 0, lpl = 0, lstake = 0;
+    Object.values(data.days).forEach(arr => (arr || []).forEach(m => {
+      if (!m.completed) return;
+      if (winamaxOnly && !(m.winamax && m.winamax.available === true)) return;
+      const pred = predictMatch(m);
+      if (!pred || !pred.pick || pred.skip || !pred.isLock) return;
+      const res = evaluateModelPick(m, pred);
+      if (res == null) return;
+      const odd = pred.odds && (pred.pick.key === '1' ? pred.odds.home : pred.pick.key === '2' ? pred.odds.away : pred.odds.draw);
+      if (!odd) return;
+      lstake++;
+      if (res === 'won') { lw++; lpl += (odd - 1); }
+      else if (res === 'lost') { ll++; lpl -= 1; }
+    }));
+    const lwr = lstake > 0 ? (100 * lw / lstake) : null;
+    const lroi = lstake > 0 ? (100 * lpl / lstake) : null;
+    const roiCol = lroi == null ? 'var(--text-dim)' : lroi > 0 ? '#34d399' : lroi < 0 ? '#f87171' : 'var(--text-dim)';
+    const wrCol = lwr == null ? 'var(--text-dim)' : lwr >= 70 ? '#34d399' : lwr >= 55 ? '#eab308' : '#f87171';
+
+    // === Build card list (reuses renderCard) grouped by day ===
+    function groupByDay(list) {
+      const buckets = new Map();
+      list.forEach(entry => {
+        const d = entry.m.date ? new Date(entry.m.date) : null;
+        let key;
+        try {
+          key = d ? d.toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' }) : 'unknown';
+        } catch (e) {
+          key = d ? (d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0')) : 'unknown';
+        }
+        if (!buckets.has(key)) buckets.set(key, []);
+        buckets.get(key).push(entry);
+      });
+      return buckets;
+    }
+    function dayLabel(iso) {
+      if (iso === 'unknown') return 'Date inconnue';
+      const today = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+      const tomorrow = (() => {
+        const d = new Date(); d.setDate(d.getDate() + 1);
+        return d.toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+      })();
+      if (iso === today) return '📅 Aujourd\'hui';
+      if (iso === tomorrow) return '➡️ Demain';
+      try {
+        return new Date(iso + 'T12:00:00').toLocaleDateString('fr-FR', { weekday: 'long', day: '2-digit', month: 'short' });
+      } catch (e) { return iso; }
+    }
+
+    function sectionHtml(title, hint, entries, sortAsc) {
+      if (!entries.length) return '';
+      const byDay = groupByDay(entries);
+      const dayKeys = [...byDay.keys()].sort((a, b) => sortAsc ? a.localeCompare(b) : b.localeCompare(a));
+      const blocks = dayKeys.map(k => {
+        const group = byDay.get(k);
+        return `
+          <div class="league-block">
+            <div class="league-header">
+              <div class="name">${dayLabel(k)}</div>
+              <div class="country"></div>
+              <div class="stats"><span class="pill">${group.length} lock${group.length > 1 ? 's' : ''}</span></div>
+            </div>
+            <div class="match-grid">${group.map(e => renderCard(e.m)).join('')}</div>
+          </div>`;
+      }).join('');
+      return `
+        <div class="locks-section" style="margin-top:18px;">
+          <div class="section-header top-picks" style="margin-top:6px;">
+            <h2><span class="ico">🔒</span>${title}</h2>
+            <div class="hint">${hint}</div>
+          </div>
+          ${blocks}
+        </div>`;
+    }
+
+    const heroHtml = `
+      <div class="bilan-kpis" style="margin-top:4px;">
+        <div class="bilan-kpi brand">
+          <div class="kpi-label">Locks à venir</div>
+          <div class="kpi-value">${upcoming.length + live.length}</div>
+          <div class="kpi-sub">${live.length ? live.length + ' live · ' : ''}${upcoming.length} upcoming</div>
+        </div>
+        <div class="bilan-kpi">
+          <div class="kpi-label">Settled récents</div>
+          <div class="kpi-value">${settled.length}</div>
+          <div class="kpi-sub">48 dernières heures</div>
+        </div>
+        <div class="bilan-kpi">
+          <div class="kpi-label">WR locks (historique)</div>
+          <div class="kpi-value" style="color:${wrCol};">${lwr != null ? lwr.toFixed(1) + '%' : '—'}</div>
+          <div class="kpi-sub">${lstake} lock${lstake > 1 ? 's' : ''} réglé${lstake > 1 ? 's' : ''}</div>
+        </div>
+        <div class="bilan-kpi">
+          <div class="kpi-label">ROI locks (historique)</div>
+          <div class="kpi-value" style="color:${roiCol};">${lroi != null ? (lroi >= 0 ? '+' : '') + lroi.toFixed(1) + '%' : '—'}</div>
+          <div class="kpi-sub">1€ flat par pick</div>
+        </div>
+      </div>`;
+
+    const emptyState = (!live.length && !upcoming.length && !settled.length)
+      ? `<div class="bilan-empty" style="margin-top:16px;">
+           Aucun lock actif. Le modèle est en mode ultra-sélectif (fiab ≥ 70% + ≥ 2 signaux purs).
+           Reviens dans quelques heures — les locks apparaissent dès qu'un match coche toutes les cases.
+         </div>`
+      : '';
+
+    wrap.innerHTML = `
+      <div style="max-width:1200px;margin:0 auto;padding:16px 8px 24px;">
+        <div class="section-header top-picks" style="margin-top:8px;">
+          <h2><span class="ico">🔒</span>Paris Locks — picks les plus solides</h2>
+          <div class="hint">Fiabilité ≥ 70% · ≥ 2 signaux indépendants · tous sports Winamax confondus</div>
+        </div>
+        ${heroHtml}
+        ${emptyState}
+        ${sectionHtml('🔴 En cours', 'Locks dont le match est déjà lancé', live, true)}
+        ${sectionHtml('⏭️ À venir', 'Triés par heure de coup d\'envoi', upcoming, true)}
+        ${sectionHtml('✅ Settled récents', 'Locks réglés dans les 48 dernières heures', settled, false)}
+      </div>`;
+
+    // Wire up card clicks → openDetail
+    wrap.querySelectorAll('.match').forEach(card => {
+      const activate = () => {
+        const id = card.dataset.id;
+        const match = lockMatches.find(e => e.m.id === id)?.m;
+        if (match) openDetail(match);
+      };
+      card.addEventListener('click', activate);
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
+      });
+    });
   }
 
   // Aggregate bilan view: overall ROI, per-sport ROI, recent results, top completed picks
