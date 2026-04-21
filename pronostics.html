@@ -8,7 +8,7 @@
 <meta http-equiv="Expires" content="0">
 <meta name="theme-color" content="#0b0b10">
 <meta name="color-scheme" content="dark">
-<meta name="description" content="Dashboard de pronostics sportifs multi-sports classés par fiabilité (modèle Poisson + ELO + forme + H2H).">
+<meta name="description" content="Dashboard de pronostics sportifs multi-sports classés par fiabilité (modèle statistique + puissance + forme + H2H).">
 <title>Pronostics Sportifs — Football · Tennis · Basket</title>
 <style>
   :root {
@@ -2186,7 +2186,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
     return {
       kind: 'exact',
       items: top.map(s => ({ home: s.home, away: s.away, prob: s.prob, label: `${s.home}-${s.away}` })),
-      caption: `Calculé à partir des buts marqués / encaissés sur les ${Math.min(h.sample, a.sample)} derniers matchs (modèle de Poisson).`,
+      caption: `Calculé à partir des buts marqués / encaissés sur les ${Math.min(h.sample, a.sample)} derniers matchs (modèle statistique).`,
     };
   }
 
@@ -2933,24 +2933,25 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
         text: `Classement #${rankH2} vs #${rankA2} — avantage ${leader}`
       });
     }
-    // Poisson xG
+    // Buts attendus (modèle statistique football) — Chantier L : renommé
+    // pour éviter le jargon "Poisson" côté UI.
     if (poi) {
       reasons.push({
         type: 'xg',
         icon: '⚽',
-        text: `xG attendus (Poisson) : ${poi.lamH.toFixed(2)} – ${poi.lamA.toFixed(2)}`
+        text: `Buts attendus : ${poi.lamH.toFixed(2)} – ${poi.lamA.toFixed(2)}`
       });
     }
-    // ClubElo differential (Chantier 9) — surface only when the delta is
-    // meaningful (≥30 pts ≈ ~6% raw win-prob shift). Below 30 the market
-    // and our other signals already capture it.
+    // Puissance d'équipe (signal ELO, Chantier 9) — Chantier L : libellé
+    // allégé, on retire le sigle "Elo" du texte visible. Le signal reste
+    // actif dans le modèle, on surface uniquement l'écart significatif.
     if (eloStats && Math.abs(eloStats.diff) >= 30) {
       const leaderElo = eloStats.diff > 0 ? (home?.short || home?.name) : (away?.short || away?.name);
       const diffAbs = Math.abs(eloStats.diff);
       reasons.push({
         type: 'elo',
         icon: '📊',
-        text: `Elo ${eloStats.home} vs ${eloStats.away} (Δ ${diffAbs >= 0 ? '+' : ''}${eloStats.diff}) — avantage ${leaderElo}`
+        text: `Puissance : Δ ${diffAbs >= 0 ? '+' : ''}${eloStats.diff} pts — avantage ${leaderElo}`
       });
     }
     // Fixture congestion — surface when a side has ≥3 matches in a 7-day
@@ -3961,8 +3962,8 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
             })() : ''}
             <span style="padding:5px 12px;border-radius:8px;background:rgba(255,255,255,.04);color:var(--text-dim);font-weight:600;font-size:12.5px;">Gain 10€ → ${((pickOdd-1)*10).toFixed(2)}€</span>
             ${corrEffective > 0 ? `<span title="Tu as déjà ${nBets} pari${nBets>1?'s':''} sur ce match — risque corrélé." style="padding:5px 12px;border-radius:8px;background:rgba(251,191,36,.18);color:#fbbf24;font-weight:700;font-size:12.5px;">⚠️ Corrélé (${nBets})</span>` : ''}
-            ${pred.markets && pred.markets.ou.prob >= 0.60 ? `<span title="Marché bonus depuis Poisson xG." style="padding:5px 12px;border-radius:8px;background:rgba(139,92,246,.16);color:#a78bfa;font-weight:700;font-size:12.5px;">⚽ ${esc(pred.markets.ou.label)} · ${(pred.markets.ou.prob*100).toFixed(0)}%</span>` : ''}
-            ${pred.markets && pred.markets.btts.prob >= 0.60 ? `<span title="BTTS calculé depuis le Poisson." style="padding:5px 12px;border-radius:8px;background:rgba(236,72,153,.16);color:#f472b6;font-weight:700;font-size:12.5px;">🔄 ${esc(pred.markets.btts.label)} · ${(pred.markets.btts.prob*100).toFixed(0)}%</span>` : ''}
+            ${pred.markets && pred.markets.ou.prob >= 0.60 ? `<span title="Marché bonus dérivé des buts attendus." style="padding:5px 12px;border-radius:8px;background:rgba(139,92,246,.16);color:#a78bfa;font-weight:700;font-size:12.5px;">⚽ ${esc(pred.markets.ou.label)} · ${(pred.markets.ou.prob*100).toFixed(0)}%</span>` : ''}
+            ${pred.markets && pred.markets.btts.prob >= 0.60 ? `<span title="Les deux équipes marquent — probabilité dérivée des buts attendus." style="padding:5px 12px;border-radius:8px;background:rgba(236,72,153,.16);color:#f472b6;font-weight:700;font-size:12.5px;">🔄 ${esc(pred.markets.btts.label)} · ${(pred.markets.btts.prob*100).toFixed(0)}%</span>` : ''}
           </div>
 
           ${pred.explain?.headline ? `<div class="hero-headline">${esc(pred.explain.headline)}</div>` : ''}
@@ -4468,14 +4469,9 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
       if (rf && typeof rf.yellowPerGame === 'number' && rf.yellowPerGame >= 4.5 && (rf.games || 0) >= 5) {
         badges.push(`<span class="badge neutral" style="background:rgba(251,191,36,.12);border-color:rgba(251,191,36,.35);color:#fbbf24;">🟨 Arbitre strict</span>`);
       }
-      // Écart ELO significatif (football)
-      if (m.sport === 'football' && home?.elo?.value != null && away?.elo?.value != null) {
-        const dE = Math.round(home.elo.value - away.elo.value);
-        if (Math.abs(dE) >= 100) {
-          const favAbbr = dE > 0 ? esc(home?.abbr || home?.short || 'H') : esc(away?.abbr || away?.short || 'A');
-          badges.push(`<span class="badge neutral" style="background:rgba(168,85,247,.12);border-color:rgba(168,85,247,.35);color:#c4b5fd;">📈 +${Math.abs(dE)} ELO ${favAbbr}</span>`);
-        }
-      }
+      // Badge ELO retiré de l'UI (Chantier L) — le signal reste actif dans le
+      // modèle (cf. eloStats + composant elo dans predictMatch) mais il n'est
+      // plus affiché sur les cartes. Jargon peu parlant pour un utilisateur.
       // Fixture congestion (football, ≥3 matches in 7d)
       if (m.sport === 'football') {
         const mt = new Date(m.date).getTime();
@@ -4807,7 +4803,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
                   ? '🏀 Projection du score final'
                   : '🎯 Scores les plus probables';
               const caption = isLegacyArr
-                ? 'Calculé à partir des expected goals (modèle de Poisson).'
+                ? 'Calculé à partir des buts attendus (modèle statistique).'
                 : (sc.caption || '');
               let chipsHtml;
               if (kind === 'basket') {
@@ -4855,15 +4851,15 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
         // ============== Contexte extérieur (Chantiers 9/10/13/14) ==============
         const w = match.weather;
         const ref = match.referee;
-        const eloH = home?.elo, eloA = away?.elo;
+        // Panneau ClubElo retiré de l'UI (Chantier L). Le signal reste actif
+        // dans le modèle, on ne l'expose plus visuellement.
         const matchTime = new Date(match.date).getTime();
         const congH = (match.sport === 'football' && home?.name) ? congestionCount(home.name, matchTime, 7) : 0;
         const congA = (match.sport === 'football' && away?.name) ? congestionCount(away.name, matchTime, 7) : 0;
         const hasWeather = w && (typeof w.precip_mm === 'number' || typeof w.wind_kmh === 'number' || typeof w.temp_c === 'number');
         const hasRef = ref && ref.name;
-        const hasElo = eloH?.value != null || eloA?.value != null;
         const hasCong = congH >= 2 || congA >= 2;
-        if (!hasWeather && !hasRef && !hasElo && !hasCong) return '';
+        if (!hasWeather && !hasRef && !hasCong) return '';
         const wcodeIcon = (c) => {
           if (c == null) return '🌡️';
           if (c >= 95) return '⛈️';
@@ -4874,8 +4870,6 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
           if (c >= 1 && c <= 3) return '⛅';
           return '☀️';
         };
-        const eloDelta = (eloH?.value != null && eloA?.value != null) ? Math.round(eloH.value - eloA.value) : null;
-        const eloFav = eloDelta == null ? '' : (eloDelta > 0 ? (home?.short || home?.name) : (eloDelta < 0 ? (away?.short || away?.name) : 'égalité'));
         return `
         <div class="section">
           <h4>🌐 Contexte extérieur</h4>
@@ -4895,13 +4889,6 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
                 ${typeof ref.yellowPerGame === 'number' ? `<div class="kv"><div class="k">Jaunes/match</div><div class="v ${ref.yellowPerGame >= 4.5 ? 'accent' : ''}">${ref.yellowPerGame.toFixed(2)}${ref.yellowPerGame >= 4.5 ? ' (strict)' : ref.yellowPerGame <= 3.0 ? ' (tolérant)' : ''}</div></div>` : ''}
                 ${typeof ref.redPerGame === 'number' ? `<div class="kv"><div class="k">Rouges/match</div><div class="v">${ref.redPerGame.toFixed(2)}</div></div>` : ''}
                 ${ref.games ? `<div class="kv"><div class="k">Échantillon</div><div class="v">${ref.games} matchs</div></div>` : ''}
-              </div>` : ''}
-            ${hasElo ? `
-              <div>
-                <h4 style="margin-top:0;font-size:11px;color:var(--text-dim);">📈 Puissance ClubElo</h4>
-                ${eloH?.value != null ? `<div class="kv"><div class="k">${esc(home?.short || home?.name)}</div><div class="v">${Math.round(eloH.value)} ${eloH.rank ? `<span style="color:var(--text-dim2,#7b8693);font-size:11px;">(#${eloH.rank} ${esc(eloH.country || '')})</span>` : ''}</div></div>` : ''}
-                ${eloA?.value != null ? `<div class="kv"><div class="k">${esc(away?.short || away?.name)}</div><div class="v">${Math.round(eloA.value)} ${eloA.rank ? `<span style="color:var(--text-dim2,#7b8693);font-size:11px;">(#${eloA.rank} ${esc(eloA.country || '')})</span>` : ''}</div></div>` : ''}
-                ${eloDelta != null ? `<div class="kv"><div class="k">Écart</div><div class="v ${Math.abs(eloDelta) > 100 ? 'accent' : ''}">${eloDelta > 0 ? '+' : ''}${eloDelta} pts${Math.abs(eloDelta) > 100 ? ` · fav. ${esc(eloFav)}` : ''}</div></div>` : ''}
               </div>` : ''}
             ${hasCong ? `
               <div>
