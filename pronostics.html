@@ -5564,6 +5564,103 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
     const modelChartHtml = renderRoiChart(modelChartRows, { title: 'P&L modèle cumulé (unité flat)' })
       || `<div class="bilan-empty">Pas encore assez de paris pour tracer une courbe.</div>`;
 
+    // ========= PORTEFEUILLE SIMULÉ 10€ =========
+    // "Si le modèle avait parié 1€ flat sur chaque lock (fiab ≥ 0.70)
+    // depuis le jour 1 en partant de 10€ de bankroll, où en serait-il
+    // aujourd'hui ?" — donne une lecture en euros concrets, pas en
+    // unités abstraites. Cumulatif (pas de reset), locks uniquement.
+    const WALLET_START = 10;
+    const WALLET_STAKE = 1;
+    const lockRows = rows
+      .filter(r => r.pred && r.pred.isLock)
+      .slice()
+      .sort((a, b) => new Date(a.m.date) - new Date(b.m.date));
+    // Group by day
+    const walletByDay = new Map();
+    lockRows.forEach(r => {
+      const day = isoDate(r.m.date);
+      if (!walletByDay.has(day)) walletByDay.set(day, { day, picks: [], w: 0, l: 0, delta: 0 });
+      const d = walletByDay.get(day);
+      const delta = r.res === 'won' ? WALLET_STAKE * (r.odd - 1) : -WALLET_STAKE;
+      d.picks.push(r);
+      d.delta += delta;
+      if (r.res === 'won') d.w++; else if (r.res === 'lost') d.l++;
+    });
+    const walletDays = [...walletByDay.values()].sort((a, b) => a.day.localeCompare(b.day));
+    let walletRunning = WALLET_START;
+    const walletSeries = [];
+    walletDays.forEach(d => {
+      d.openBalance = walletRunning;
+      walletRunning = Math.round((walletRunning + d.delta) * 100) / 100;
+      d.closeBalance = walletRunning;
+      walletSeries.push({ date: d.day, cum: walletRunning - WALLET_START, delta: d.delta });
+    });
+    const walletNow = walletRunning;
+    const walletPL = walletNow - WALLET_START;
+    const walletROIpct = lockRows.length ? (100 * walletPL / (lockRows.length * WALLET_STAKE)) : 0;
+    // Tiny equity chart: reuse renderRoiChart API shape (date + delta)
+    const walletChartRows = lockRows.map(r => ({
+      date: isoDate(r.m.date),
+      delta: r.res === 'won' ? WALLET_STAKE * (r.odd - 1) : -WALLET_STAKE,
+    }));
+    const walletChartHtml = walletChartRows.length
+      ? (renderRoiChart(walletChartRows, { title: `Capital 10€ → ${walletNow.toFixed(2)}€ (1€ flat par lock)`, unit: '€' })
+         || `<div class="bilan-empty">Pas encore assez de locks settled pour tracer la courbe.</div>`)
+      : `<div class="bilan-empty">Pas encore de locks settled. La simulation démarre dès qu'un pick ≥70% fiabilité est tranché.</div>`;
+    // Daily breakdown rows
+    const walletRowsHtml = walletDays.length
+      ? walletDays.slice().reverse().map(d => {
+          const deltaStr = (d.delta >= 0 ? '+' : '') + d.delta.toFixed(2) + '€';
+          const deltaCol = d.delta > 0 ? '#34d399' : d.delta < 0 ? '#f87171' : 'var(--text-dim)';
+          const dateLabel = new Date(d.day + 'T12:00:00').toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', weekday: 'short' });
+          return `
+            <div style="display:grid;grid-template-columns:110px 1fr 80px 90px 90px;gap:10px;align-items:center;padding:9px 12px;border-top:1px solid var(--border,#2a3744);font-size:13px;">
+              <div style="color:var(--text-dim,#b4bcc7);font-weight:600;">${dateLabel}</div>
+              <div style="color:var(--text-muted);">${d.picks.length} lock${d.picks.length>1?'s':''} · ${d.w}W · ${d.l}L</div>
+              <div style="color:var(--text-muted);text-align:right;font-variant-numeric:tabular-nums;">${d.openBalance.toFixed(2)}€</div>
+              <div style="color:${deltaCol};font-weight:700;text-align:right;font-variant-numeric:tabular-nums;">${deltaStr}</div>
+              <div style="color:var(--text);font-weight:700;text-align:right;font-variant-numeric:tabular-nums;">${d.closeBalance.toFixed(2)}€</div>
+            </div>`;
+        }).join('')
+      : '';
+    const walletRoiColor = walletPL > 0 ? '#34d399' : walletPL < 0 ? '#f87171' : 'var(--text-dim)';
+    const walletSectionHtml = `
+      <div class="bilan-section" style="border-color:${walletRoiColor}44;">
+        <div class="bilan-section-head">
+          <h3>💰 Portefeuille simulé (10€ de base · 1€ flat par lock)</h3>
+          <div class="meta">${lockRows.length} lock${lockRows.length>1?'s':''} settled${walletDays.length?` sur ${walletDays.length} jour${walletDays.length>1?'s':''}`:''}</div>
+        </div>
+        <div class="bilan-kpis" style="margin-top:0;margin-bottom:14px;">
+          <div class="bilan-kpi">
+            <div class="kpi-label">Capital actuel</div>
+            <div class="kpi-value" style="color:${walletRoiColor};">${walletNow.toFixed(2)}€</div>
+            <div class="kpi-sub">départ ${WALLET_START.toFixed(2)}€</div>
+          </div>
+          <div class="bilan-kpi">
+            <div class="kpi-label">P&amp;L cumulé</div>
+            <div class="kpi-value" style="color:${walletRoiColor};">${walletPL>=0?'+':''}${walletPL.toFixed(2)}€</div>
+            <div class="kpi-sub">${lockRows.length} lock${lockRows.length>1?'s':''} misé${lockRows.length>1?'s':''}</div>
+          </div>
+          <div class="bilan-kpi">
+            <div class="kpi-label">ROI par pick</div>
+            <div class="kpi-value" style="color:${walletRoiColor};">${lockRows.length ? (walletROIpct>=0?'+':'')+walletROIpct.toFixed(1)+'%' : '—'}</div>
+            <div class="kpi-sub">1€ flat stake</div>
+          </div>
+        </div>
+        ${walletChartHtml}
+        ${walletRowsHtml ? `
+          <div style="margin-top:14px;background:var(--surface,#111827);border:1px solid var(--border,#2a3744);border-radius:10px;overflow:hidden;">
+            <div style="display:grid;grid-template-columns:110px 1fr 80px 90px 90px;gap:10px;padding:10px 12px;font-size:11.5px;color:var(--text-dim2,#7b8693);font-weight:600;text-transform:uppercase;letter-spacing:.5px;">
+              <div>Jour</div>
+              <div>Picks</div>
+              <div style="text-align:right;">Ouverture</div>
+              <div style="text-align:right;">P&amp;L jour</div>
+              <div style="text-align:right;">Clôture</div>
+            </div>
+            ${walletRowsHtml}
+          </div>` : ''}
+      </div>`;
+
     // ========= CALIBRATION (reliability diagram + persistent MAE trend) =========
     // Compute fresh calibration from the current bilan and store today's MAE
     // snapshot in localStorage. Keep 60 days rolling. This lets us see if the
@@ -5766,6 +5863,9 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
         </div>
         ${modelChartHtml}
       </div>
+
+      <!-- PORTEFEUILLE SIMULÉ 10€ -->
+      ${walletSectionHtml}
 
       <!-- VERDICT MODÈLE -->
       ${(() => {
