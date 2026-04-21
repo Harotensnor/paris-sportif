@@ -80,6 +80,9 @@ jobs:
           # Weather (Open-Meteo): free, no key. Script self-throttles — skips
           # if forecast <30min old OR kickoff >6h away. Typical run: <5s.
           python3 fetch_weather.py || true
+          # Soccer referees (Sofascore): self-throttles to 1 call / 6h.
+          # Per-fixture event lookup, respectful cadence (0.3s between).
+          python3 fetch_referees_soccer.py || true
           python3 patch_winamax.py || true
           # Patch soccer injuries AFTER patch_winamax so they survive the
           # dedup/bucketing rewrite. Idempotent, ~0.1s.
@@ -94,6 +97,9 @@ jobs:
           # Patch weather (survives all prior rewrites). Adds ev.weather to
           # football events with a fresh forecast. ~0.1s.
           python3 patch_weather.py || true
+          # Patch referees last (survives all prior rewrites). Adds
+          # ev.referee to each top-5 soccer event. ~0.1s.
+          python3 patch_referees_soccer.py || true
 
       - name: Commit data updates
         run: |
@@ -102,7 +108,7 @@ jobs:
           git add data.js pronostics.html odds_history.jsonl \
                   injuries_soccer.json winamax_catalog.json team_stats.json \
                   lineups_soccer.json clubelo.json weather.json \
-                  weather_geo_cache.json 2>/dev/null || true
+                  weather_geo_cache.json referees_soccer.json 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "No changes to commit."
             exit 0

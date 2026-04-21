@@ -2492,6 +2492,31 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T13:14:27.667104Z","today":"
         };
       }
     }
+    // Referee adjustment — strict refs → slightly fewer goals (more
+    // stoppages), lenient refs → slightly more (flow). Typical range is
+    // 2.5 – 5.5 yellows per game; we only nudge outside [3.0, 4.5].
+    // Effect is small (±0.03 on each lam) but independent of our other
+    // signals, and the reason is informative for the user.
+    let refStats = null;
+    if (poi && match.sport === 'football' && match.referee && match.referee.name) {
+      const ref = match.referee;
+      const ypg = typeof ref.yellowPerGame === 'number' ? ref.yellowPerGame : null;
+      const g = ref.games || 0;
+      if (ypg != null && g >= 5) {
+        let tier = null;  // 'strict' | 'lenient' | null
+        if (ypg >= 4.5) tier = 'strict';
+        else if (ypg <= 3.0) tier = 'lenient';
+        if (tier) {
+          const delta = tier === 'strict' ? -0.03 : 0.02;
+          poi.lamH += delta;
+          poi.lamA += delta;
+          refStats = { name: ref.name, yellowPerGame: ypg, games: g, tier };
+        } else {
+          // Still expose the referee info (no nudge) so the UI can mention it.
+          refStats = { name: ref.name, yellowPerGame: ypg, games: g, tier: 'neutral' };
+        }
+      }
+    }
     // Home/Road record split (non-football only: basket/hockey/etc.)
     const hrComp = homeRoadComponent(match);
 
@@ -2819,6 +2844,22 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T13:14:27.667104Z","today":"
         text: `${tired.team} ${tired.cnt} matchs en 7j — fatigue possible`
       });
     }
+    // Referee — surface when strict/lenient (nudge applied) OR when
+    // neutral but we have the name (informative only).
+    if (refStats) {
+      const ypgTxt = refStats.yellowPerGame != null
+        ? `${refStats.yellowPerGame.toFixed(1)} jaunes/match`
+        : '';
+      let label = '';
+      if (refStats.tier === 'strict') label = 'Arbitre sévère';
+      else if (refStats.tier === 'lenient') label = 'Arbitre laxiste';
+      else label = 'Arbitre';
+      reasons.push({
+        type: 'referee',
+        icon: '🟨',
+        text: `${label} : ${refStats.name}${ypgTxt ? ` (${ypgTxt})` : ''}`
+      });
+    }
     // Weather — significant rain/wind detected, total goals nudged down.
     if (weatherStats) {
       const bits = [];
@@ -3019,6 +3060,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T13:14:27.667104Z","today":"
       elo: eloStats,  // { home, away, diff } — surfaced on the match modal
       congestion: congestionStats,  // { home, away } — match count in ±7d window
       weather: weatherStats,  // { precip, wind, penalty, rain, city } or null
+      referee: refStats,  // { name, yellowPerGame, games, tier } or null
       explain: { headline, reasons }
     };
   }
