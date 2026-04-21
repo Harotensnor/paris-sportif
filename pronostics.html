@@ -2146,6 +2146,127 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
     return scores.slice(0, k);
   }
 
+  // ======= Sport-specific score predictions (Chantier K) =======
+  // Expose un champ `pred.scores` aussi pour basket / hockey / tennis.
+  // Shape renvoyée : { kind, items: [{label, prob, home, away}], caption }
+  //   - kind 'exact'  : foot / hockey (scores exacts X-Y)
+  //   - kind 'basket' : 1 seul item {home, away, prob=1, label} = score médian projeté
+  //   - kind 'tennis' : scores en sets (2-0 / 2-1 / 3-1 etc.)
+
+  // Avg goals-for / goals-against sur les N derniers matchs (si dispo).
+  // Seuil minimum : 2 matchs. On descend à 2 (plutôt que 3) parce qu'en
+  // saison régulière finissante / début de playoffs, ESPN ne remonte parfois
+  // que 1-2 matchs dans last5 — mieux qu'aucune projection.
+  function last5Rates(side) {
+    const l5 = side?.last5;
+    if (!Array.isArray(l5) || l5.length < 2) return null;
+    let gf = 0, ga = 0, n = 0;
+    for (const r of l5) {
+      const f = Number(r?.gf), a = Number(r?.ga);
+      if (!isFinite(f) || !isFinite(a)) continue;
+      gf += f; ga += a; n++;
+    }
+    if (n < 2) return null;
+    return { scored: gf / n, conceded: ga / n, sample: n };
+  }
+
+  // Hockey : Poisson sur les buts avec petit home advantage.
+  function hockeyScorePrediction(match) {
+    if (match.sport !== 'hockey') return null;
+    const { home, away } = getSides(match);
+    const h = last5Rates(home), a = last5Rates(away);
+    if (!h || !a) return null;
+    // Moyenne de l'attaque d'un côté et de la défense de l'autre, pondéré par un
+    // léger home-ice advantage (~1.05x en NHL d'après la littérature).
+    const HOME_ADV = 1.05;
+    const lamH = Math.max(0.4, ((h.scored + a.conceded) / 2) * HOME_ADV);
+    const lamA = Math.max(0.4, ((a.scored + h.conceded) / 2) / HOME_ADV);
+    const top = poissonTopScores(lamH, lamA, 3, 8);
+    if (!top.length) return null;
+    return {
+      kind: 'exact',
+      items: top.map(s => ({ home: s.home, away: s.away, prob: s.prob, label: `${s.home}-${s.away}` })),
+      caption: `Calculé à partir des buts marqués / encaissés sur les ${Math.min(h.sample, a.sample)} derniers matchs (modèle de Poisson).`,
+    };
+  }
+
+  // Basket : scores exacts sont trop dispersés (variance naturelle ~10 pts par
+  // équipe) pour être affichés comme "top-3". On expose plutôt la médiane du
+  // score projeté et l'écart estimé, ce qui est bien plus lisible et utilisable
+  // pour les paris spread/total.
+  function basketScoreProjection(match) {
+    if (match.sport !== 'basketball') return null;
+    const { home, away } = getSides(match);
+    const h = last5Rates(home), a = last5Rates(away);
+    if (!h || !a) return null;
+    const HOME_ADV = 2.5; // ~2.5 pts d'home-court, consensus NBA.
+    const projH = Math.round((h.scored + a.conceded) / 2 + HOME_ADV / 2);
+    const projA = Math.round((a.scored + h.conceded) / 2 - HOME_ADV / 2);
+    const total = projH + projA;
+    const margin = projH - projA;
+    return {
+      kind: 'basket',
+      items: [{ home: projH, away: projA, prob: 1, label: `${projH}-${projA}` }],
+      total,
+      margin,
+      caption: `Projection lissée sur les ${Math.min(h.sample, a.sample)} derniers matchs (± ~8 pts par équipe en NBA).`,
+    };
+  }
+
+  // Tennis : depuis la proba de victoire de match, on résout la proba set par
+  // set (BO3 par défaut, BO5 si tournoi du Grand Chelem masculin) puis on
+  // calcule chaque score de sets possible.
+  function tennisScorePrediction(match, pMatchHome) {
+    if (match.sport !== 'tennis') return null;
+    if (!(pMatchHome > 0.02 && pMatchHome < 0.98)) return null;
+    const ln = (match.league_name || '').toLowerCase();
+    const isSlam = /grand slam|australian open|roland|french open|wimbledon|us open/.test(ln);
+    const isATP = /^atp/i.test(match.league_code || '') || /\batp\b/i.test(match.league_name || '');
+    const bestOf = (isSlam && isATP) ? 5 : 3;
+    // Résolution numérique : trouver p_set tel que P(winMatch | p_set) = pMatchHome.
+    // BO3 : p^2 + 2*p^2*(1-p)  = p^2 * (3 - 2p)
+    // BO5 : p^3 + 3*p^3*(1-p) + 6*p^3*(1-p)^2 = p^3 * (10 - 15p + 6p^2)
+    const matchProbFromSet = (p, bo) => {
+      if (bo === 5) return p*p*p * (10 - 15*p + 6*p*p);
+      return p*p * (3 - 2*p);
+    };
+    // Bisection sur [0.02, 0.98].
+    let lo = 0.02, hi = 0.98;
+    for (let i = 0; i < 40; i++) {
+      const mid = (lo + hi) / 2;
+      const v = matchProbFromSet(mid, bestOf);
+      if (v < pMatchHome) lo = mid; else hi = mid;
+    }
+    const pSetH = (lo + hi) / 2;
+    const q = 1 - pSetH;
+    let items;
+    if (bestOf === 3) {
+      items = [
+        { home: 2, away: 0, prob: pSetH * pSetH,          label: '2-0' },
+        { home: 2, away: 1, prob: 2 * pSetH * pSetH * q,  label: '2-1' },
+        { home: 1, away: 2, prob: 2 * q * q * pSetH,      label: '1-2' },
+        { home: 0, away: 2, prob: q * q,                  label: '0-2' },
+      ];
+    } else {
+      // BO5 probabilities (order matters: last set is decisive).
+      items = [
+        { home: 3, away: 0, prob: Math.pow(pSetH, 3),                          label: '3-0' },
+        { home: 3, away: 1, prob: 3 * Math.pow(pSetH, 3) * q,                  label: '3-1' },
+        { home: 3, away: 2, prob: 6 * Math.pow(pSetH, 3) * q * q,              label: '3-2' },
+        { home: 2, away: 3, prob: 6 * Math.pow(q, 3) * pSetH * pSetH,          label: '2-3' },
+        { home: 1, away: 3, prob: 3 * Math.pow(q, 3) * pSetH,                  label: '1-3' },
+        { home: 0, away: 3, prob: Math.pow(q, 3),                              label: '0-3' },
+      ];
+    }
+    items.sort((a, b) => b.prob - a.prob);
+    return {
+      kind: 'tennis',
+      bestOf,
+      items: items.slice(0, bestOf === 3 ? 3 : 4),
+      caption: `Probabilités par nombre de sets (best-of-${bestOf}) dérivées de la proba de victoire.`,
+    };
+  }
+
   // Secondary markets from the same Poisson model:
   //   Over/Under N.5  —  P(H+A > N) (default line 2.5, Winamax's most-liquid football total)
   //   BTTS            —  P(both teams score ≥ 1) — Poisson independence approximation
@@ -3040,9 +3161,23 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
       // spec (5-10 picks/j, 80%+ WR) demands real signal consensus.
       skip: reliability < 0.45 || pureCompCount < 2,
       poisson: poi ? { xgH: poi.lamH, xgA: poi.lamA } : null,
-      // Top-3 most probable exact scores under the Poisson model. Foot only
-      // (Chantier 6). Rendu en carte sur le modal match.
-      scores: poi ? poissonTopScores(poi.lamH, poi.lamA, 3) : null,
+      // Scores probables — shape varie selon le sport (Chantier 6 + K) :
+      //   foot   : array[{home, away, prob}] (legacy, kind 'exact' implicite)
+      //   hockey : {kind:'exact', items:[{home,away,prob,label}], caption}
+      //   basket : {kind:'basket', items:[{...}], total, margin, caption}
+      //   tennis : {kind:'tennis', bestOf, items:[{...}], caption}
+      // Rendu sur le modal match (openDetail) avec un switch par `kind`.
+      scores: (() => {
+        if (poi) return poissonTopScores(poi.lamH, poi.lamA, 3);
+        if (match.sport === 'hockey') return hockeyScorePrediction(match);
+        if (match.sport === 'basketball') return basketScoreProjection(match);
+        if (match.sport === 'tennis') {
+          // pick.prob = proba de victoire du pick ; pMatchHome selon la key
+          const ph = best_pick[2] === '1' ? best_pick[1] : (1 - best_pick[1]);
+          return tennisScorePrediction(match, ph);
+        }
+        return null;
+      })(),
       // Secondary markets derived from the same Poisson xG.
       // Only populated when the Poisson component exists (i.e. football + usable
       // standings). Gives Théo O/U 2.5 and BTTS reads with no extra scraping.
@@ -3241,6 +3376,26 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
   }
 
   // ======= Rendering =======
+  // Fallback : basket / hockey / tennis ont rarement un champ `form` pré-mâché
+  // par l'ingestion, mais `last5` expose des résultats W/L exploitables. On
+  // reconstruit un formStr à la volée si le champ direct est vide, pour éviter
+  // une bande de forme invisible sur les non-foot.
+  function derivedForm(side) {
+    if (!side) return null;
+    if (typeof side.form === 'string' && side.form.length) return side.form;
+    const l5 = side.last5;
+    if (!Array.isArray(l5) || !l5.length) return null;
+    // last5 peut être plus ancien → plus récent, ou l'inverse. On considère
+    // que l'ordre stocké est chronologique ascendant (date croissante) car
+    // c'est ce que les scrapers ESPN produisent. renderForm utilise .slice(-5)
+    // ⇒ on garde l'ordre naturel, les 5 derniers seulement.
+    const chars = l5.map(r => {
+      const v = (r?.result || '').toUpperCase();
+      return (v === 'W' || v === 'L' || v === 'D' || v === 'T') ? v : '';
+    }).filter(Boolean);
+    return chars.length ? chars.join('') : null;
+  }
+
   function renderForm(formStr, big=false) {
     if (!formStr) return '';
     const chars = formStr.slice(-5).split('');
@@ -4413,7 +4568,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
               <div class="meta">
                 ${rankH ? `<span class="rank-badge">#${rankH}</span>` : ''}
                 ${recH ? `<span class="record">${esc(recH)}</span>` : ''}
-                ${home?.form ? renderForm(home.form) : ''}
+                ${(() => { const f = derivedForm(home); return f ? renderForm(f) : ''; })()}
               </div>
             </div>
             <span class="score">${showScore ? esc(home?.score ?? '') : ''}</span>
@@ -4425,7 +4580,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
               <div class="meta">
                 ${rankA ? `<span class="rank-badge">#${rankA}</span>` : ''}
                 ${recA ? `<span class="record">${esc(recA)}</span>` : ''}
-                ${away?.form ? renderForm(away.form) : ''}
+                ${(() => { const f = derivedForm(away); return f ? renderForm(f) : ''; })()}
               </div>
             </div>
             <span class="score">${showScore ? esc(away?.score ?? '') : ''}</span>
@@ -4578,7 +4733,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
           ${home?.logo ? `<img src="${esc(home.logo)}" onerror="this.style.display='none'">` : ''}
           <div class="name">${esc(home?.name || '—')}</div>
           <div class="rec">${esc(getRecord(home) || '')}${stdH ? ` · #${esc(stdH.rank)} au classement · ${esc(stdH.points || 0)} pts` : ''}</div>
-          ${home?.form ? renderForm(home.form, true) : ''}
+          ${(() => { const f = derivedForm(home); return f ? renderForm(f, true) : ''; })()}
         </div>
         <div class="vs">
           ${isFinal ? `<div class="score">${esc(home?.score ?? '')} - ${esc(away?.score ?? '')}</div>` : '<div>VS</div>'}
@@ -4587,7 +4742,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
           ${away?.logo ? `<img src="${esc(away.logo)}" onerror="this.style.display='none'">` : ''}
           <div class="name">${esc(away?.name || '—')}</div>
           <div class="rec">${esc(getRecord(away) || '')}${stdA ? ` · #${esc(stdA.rank)} au classement · ${esc(stdA.points || 0)} pts` : ''}</div>
-          ${away?.form ? renderForm(away.form, true) : ''}
+          ${(() => { const f = derivedForm(away); return f ? renderForm(f, true) : ''; })()}
         </div>
       </div>
 
@@ -4636,14 +4791,57 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
                 </div>
               </div>`;
             })() : ''}
-            ${pred.scores && pred.scores.length ? `
-            <div style="margin-top:14px;">
-              <div style="font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-dim2,#7b8693);margin-bottom:8px;">🎯 Scores les plus probables</div>
-              <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                ${pred.scores.map((s, i) => `<span style="padding:8px 14px;border-radius:8px;background:${i===0?'rgba(16,185,129,.12)':'rgba(255,255,255,.04)'};border:1px solid ${i===0?'rgba(16,185,129,.3)':'rgba(255,255,255,.06)'};font-variant-numeric:tabular-nums;font-weight:${i===0?700:600};color:${i===0?'#10b981':'var(--text,#e6ebf2)'};display:inline-flex;align-items:center;gap:8px;"><span style="font-size:15px;">${s.home}-${s.away}</span><span style="color:var(--text-dim2,#7b8693);font-weight:500;font-size:12px;">${(s.prob*100).toFixed(1)}%</span></span>`).join('')}
-              </div>
-              <div style="margin-top:6px;font-size:10.5px;color:var(--text-dim2,#7b8693);line-height:1.3;">Calculé à partir des expected goals (modèle de Poisson).</div>
-            </div>` : ''}
+            ${(() => {
+              // Chantier K — rendu sport-aware du bloc "scores probables".
+              // Historique foot : pred.scores = array d'objets {home,away,prob}.
+              // Nouveaux shapes : objet {kind, items, caption, total?, margin?, bestOf?}.
+              const sc = pred.scores;
+              if (!sc) return '';
+              const isLegacyArr = Array.isArray(sc);
+              const items = isLegacyArr ? sc : (sc.items || []);
+              if (!items.length) return '';
+              const kind = isLegacyArr ? 'exact' : sc.kind;
+              const heading = kind === 'tennis'
+                ? `🎾 Scores en sets probables (BO${sc.bestOf || 3})`
+                : kind === 'basket'
+                  ? '🏀 Projection du score final'
+                  : '🎯 Scores les plus probables';
+              const caption = isLegacyArr
+                ? 'Calculé à partir des expected goals (modèle de Poisson).'
+                : (sc.caption || '');
+              let chipsHtml;
+              if (kind === 'basket') {
+                const it = items[0];
+                const total = sc.total != null ? sc.total : (it.home + it.away);
+                const margin = sc.margin != null ? sc.margin : (it.home - it.away);
+                const favLbl = margin === 0 ? 'Match serré'
+                  : margin > 0 ? `${esc(home?.short || home?.name || 'Dom.')} +${Math.abs(margin)}`
+                               : `${esc(away?.short || away?.name || 'Ext.')} +${Math.abs(margin)}`;
+                chipsHtml = `
+                  <span style="padding:8px 14px;border-radius:8px;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);font-variant-numeric:tabular-nums;font-weight:700;color:#10b981;display:inline-flex;align-items:center;gap:8px;">
+                    <span style="font-size:15px;">${it.home}-${it.away}</span>
+                    <span style="color:var(--text-dim2,#7b8693);font-weight:500;font-size:12px;">projeté</span>
+                  </span>
+                  <span style="padding:8px 14px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);font-variant-numeric:tabular-nums;font-weight:600;color:var(--text,#e6ebf2);">
+                    Total ${total}
+                  </span>
+                  <span style="padding:8px 14px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);font-weight:600;color:var(--text,#e6ebf2);">
+                    ${favLbl}
+                  </span>`;
+              } else {
+                chipsHtml = items.map((s, i) => `
+                  <span style="padding:8px 14px;border-radius:8px;background:${i===0?'rgba(16,185,129,.12)':'rgba(255,255,255,.04)'};border:1px solid ${i===0?'rgba(16,185,129,.3)':'rgba(255,255,255,.06)'};font-variant-numeric:tabular-nums;font-weight:${i===0?700:600};color:${i===0?'#10b981':'var(--text,#e6ebf2)'};display:inline-flex;align-items:center;gap:8px;">
+                    <span style="font-size:15px;">${s.label || (s.home+'-'+s.away)}</span>
+                    <span style="color:var(--text-dim2,#7b8693);font-weight:500;font-size:12px;">${(s.prob*100).toFixed(1)}%</span>
+                  </span>`).join('');
+              }
+              return `
+              <div style="margin-top:14px;">
+                <div style="font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-dim2,#7b8693);margin-bottom:8px;">${heading}</div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">${chipsHtml}</div>
+                ${caption ? `<div style="margin-top:6px;font-size:10.5px;color:var(--text-dim2,#7b8693);line-height:1.3;">${esc(caption)}</div>` : ''}
+              </div>`;
+            })()}
             ${!isFinal ? `<div style="margin-top:14px;">
               <a href="${esc(winamaxUrl(match))}" target="_blank" rel="noopener" class="winamax-btn">
                 <span class="ico">🎰</span> Parier sur Winamax
@@ -4951,7 +5149,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
             <div class="kv"><div class="k">Équipe</div><div class="v">${esc(home?.name || 'Dom.')}</div></div>
             <div class="kv"><div class="k">Bilan</div><div class="v">${esc(getRecord(home) || 'n/a')}</div></div>
             ${recH ? `<div class="kv"><div class="k">% Victoires</div><div class="v">${recH.games > 0 ? ((recH.w/recH.games)*100).toFixed(1) : '—'}%</div></div>` : ''}
-            ${home?.form ? `<div class="kv"><div class="k">Forme (5 derniers)</div><div class="v">${renderForm(home.form)}</div></div>` : ''}
+            ${(() => { const f = derivedForm(home); return f ? `<div class="kv"><div class="k">Forme (5 derniers)</div><div class="v">${renderForm(f)}</div></div>` : ''; })()}
             ${home?.form_stats?.played5 ? `
               <div class="kv"><div class="k">Buts marqués (5)</div><div class="v">${home.form_stats.gf5} <span style="color:var(--text-dim2,#7b8693);font-size:11px;">(${home.form_stats.avg_gf5.toFixed(1)}/m)</span></div></div>
               <div class="kv"><div class="k">Buts encaissés (5)</div><div class="v">${home.form_stats.ga5} <span style="color:var(--text-dim2,#7b8693);font-size:11px;">(${home.form_stats.avg_ga5.toFixed(1)}/m)</span></div></div>
@@ -4967,7 +5165,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
             <div class="kv"><div class="k">Équipe</div><div class="v">${esc(away?.name || 'Ext.')}</div></div>
             <div class="kv"><div class="k">Bilan</div><div class="v">${esc(getRecord(away) || 'n/a')}</div></div>
             ${recA ? `<div class="kv"><div class="k">% Victoires</div><div class="v">${recA.games > 0 ? ((recA.w/recA.games)*100).toFixed(1) : '—'}%</div></div>` : ''}
-            ${away?.form ? `<div class="kv"><div class="k">Forme (5 derniers)</div><div class="v">${renderForm(away.form)}</div></div>` : ''}
+            ${(() => { const f = derivedForm(away); return f ? `<div class="kv"><div class="k">Forme (5 derniers)</div><div class="v">${renderForm(f)}</div></div>` : ''; })()}
             ${away?.form_stats?.played5 ? `
               <div class="kv"><div class="k">Buts marqués (5)</div><div class="v">${away.form_stats.gf5} <span style="color:var(--text-dim2,#7b8693);font-size:11px;">(${away.form_stats.avg_gf5.toFixed(1)}/m)</span></div></div>
               <div class="kv"><div class="k">Buts encaissés (5)</div><div class="v">${away.form_stats.ga5} <span style="color:var(--text-dim2,#7b8693);font-size:11px;">(${away.form_stats.avg_ga5.toFixed(1)}/m)</span></div></div>
@@ -4993,6 +5191,77 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
         <h4>⭐ Joueurs clés</h4>
         ${leadersHtml}
       </div>` : ''}
+
+      ${(() => {
+        // Chantier K — panneau "stats équipes" sport-aware.
+        // Basket / hockey : home / road split depuis records (souvent dispo là où
+        // les standings détaillés et la forme ne le sont pas).
+        // Tennis : rank ATP/WTA + pays + surface.
+        const splitOf = (side) => {
+          const recs = side?.records || [];
+          const find = (t) => recs.find(r => (r.type || r.name || '').toLowerCase() === t);
+          const all = find('total') || find('overall');
+          const hm  = find('home');
+          const rd  = find('road') || find('away');
+          return {
+            overall: all?.summary,
+            home:    hm?.summary,
+            road:    rd?.summary,
+          };
+        };
+        if (match.sport === 'basketball' || match.sport === 'hockey') {
+          const hS = splitOf(home), aS = splitOf(away);
+          const hasAny = hS.overall || hS.home || hS.road || aS.overall || aS.home || aS.road;
+          if (!hasAny) return '';
+          const labelHome = match.sport === 'hockey' ? 'Domicile (saison)' : 'À domicile (saison)';
+          const labelRoad = match.sport === 'hockey' ? 'Extérieur (saison)' : 'À l\'extérieur (saison)';
+          return `
+          <div class="section">
+            <h4>📊 Splits domicile / extérieur</h4>
+            <div class="two-cols">
+              <div>
+                <h4 style="margin-top:0;font-size:11px;color:var(--text-dim);">${esc(home?.name || 'Dom.')}</h4>
+                ${hS.overall ? `<div class="kv"><div class="k">Bilan global</div><div class="v">${esc(hS.overall)}</div></div>` : ''}
+                ${hS.home ? `<div class="kv"><div class="k">${labelHome}</div><div class="v">${esc(hS.home)}</div></div>` : ''}
+                ${hS.road ? `<div class="kv"><div class="k">${labelRoad}</div><div class="v">${esc(hS.road)}</div></div>` : ''}
+              </div>
+              <div>
+                <h4 style="margin-top:0;font-size:11px;color:var(--text-dim);">${esc(away?.name || 'Ext.')}</h4>
+                ${aS.overall ? `<div class="kv"><div class="k">Bilan global</div><div class="v">${esc(aS.overall)}</div></div>` : ''}
+                ${aS.home ? `<div class="kv"><div class="k">${labelHome}</div><div class="v">${esc(aS.home)}</div></div>` : ''}
+                ${aS.road ? `<div class="kv"><div class="k">${labelRoad}</div><div class="v">${esc(aS.road)}</div></div>` : ''}
+              </div>
+            </div>
+          </div>`;
+        }
+        if (match.sport === 'tennis') {
+          const rankH = home?.rank, rankA = away?.rank;
+          const ctrH = home?.country, ctrA = away?.country;
+          const hasAny = rankH || rankA || ctrH || ctrA || match.surface || match.round;
+          if (!hasAny) return '';
+          return `
+          <div class="section">
+            <h4>🎾 Profil joueurs</h4>
+            <div class="two-cols">
+              <div>
+                <h4 style="margin-top:0;font-size:11px;color:var(--text-dim);">${esc(home?.name || '—')}</h4>
+                ${rankH ? `<div class="kv"><div class="k">Classement</div><div class="v">#${esc(rankH)}</div></div>` : ''}
+                ${ctrH ? `<div class="kv"><div class="k">Pays</div><div class="v">${esc(ctrH)}</div></div>` : ''}
+              </div>
+              <div>
+                <h4 style="margin-top:0;font-size:11px;color:var(--text-dim);">${esc(away?.name || '—')}</h4>
+                ${rankA ? `<div class="kv"><div class="k">Classement</div><div class="v">#${esc(rankA)}</div></div>` : ''}
+                ${ctrA ? `<div class="kv"><div class="k">Pays</div><div class="v">${esc(ctrA)}</div></div>` : ''}
+              </div>
+            </div>
+            ${(match.surface || match.round) ? `<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;font-size:12px;">
+              ${match.surface ? `<span style="padding:4px 10px;border-radius:6px;background:rgba(255,255,255,.04);color:var(--text-dim,#b4bcc7);">Surface : <b style="color:var(--text,#e6ebf2);">${esc(match.surface)}</b></span>` : ''}
+              ${match.round ? `<span style="padding:4px 10px;border-radius:6px;background:rgba(255,255,255,.04);color:var(--text-dim,#b4bcc7);">Tour : <b style="color:var(--text,#e6ebf2);">${esc(match.round)}</b></span>` : ''}
+            </div>` : ''}
+          </div>`;
+        }
+        return '';
+      })()}
 
       <div class="section">
         <h4>ℹ️ Informations match</h4>
