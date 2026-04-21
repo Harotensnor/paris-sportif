@@ -4307,6 +4307,58 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T13:14:27.667104Z","today":"
     const injH = m.injuries_home || 0, injA = m.injuries_away || 0;
     if (injH >= 2) badges.push(`<span class="badge neutral" style="background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.35);color:#fca5a5;">🏥 ${injH} absents ${esc(home?.abbr||'H')}</span>`);
     if (injA >= 2) badges.push(`<span class="badge neutral" style="background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.35);color:#fca5a5;">🏥 ${injA} absents ${esc(away?.abbr||'A')}</span>`);
+    // Chantier B — contextual badges (weather / referee / ELO / congestion)
+    if (!isLive && !isFinal) {
+      // Météo défavorable (pluie >3mm/h ou vent >25 km/h)
+      const wx = m.weather;
+      if (wx && ((typeof wx.precip_mm === 'number' && wx.precip_mm > 3) || (typeof wx.wind_kmh === 'number' && wx.wind_kmh > 25))) {
+        const ico = (typeof wx.precip_mm === 'number' && wx.precip_mm > 3) ? '🌧️' : '💨';
+        const txt = (typeof wx.precip_mm === 'number' && wx.precip_mm > 3)
+          ? `${wx.precip_mm.toFixed(1)}mm/h`
+          : `${Math.round(wx.wind_kmh)}km/h`;
+        badges.push(`<span class="badge neutral" style="background:rgba(96,165,250,.12);border-color:rgba(96,165,250,.35);color:#60a5fa;">${ico} ${esc(txt)}</span>`);
+      }
+      // Arbitre strict (jaunes/match >= 4.5)
+      const rf = m.referee;
+      if (rf && typeof rf.yellowPerGame === 'number' && rf.yellowPerGame >= 4.5 && (rf.games || 0) >= 5) {
+        badges.push(`<span class="badge neutral" style="background:rgba(251,191,36,.12);border-color:rgba(251,191,36,.35);color:#fbbf24;">🟨 Arbitre strict</span>`);
+      }
+      // Écart ELO significatif (football)
+      if (m.sport === 'football' && home?.elo?.value != null && away?.elo?.value != null) {
+        const dE = Math.round(home.elo.value - away.elo.value);
+        if (Math.abs(dE) >= 100) {
+          const favAbbr = dE > 0 ? esc(home?.abbr || home?.short || 'H') : esc(away?.abbr || away?.short || 'A');
+          badges.push(`<span class="badge neutral" style="background:rgba(168,85,247,.12);border-color:rgba(168,85,247,.35);color:#c4b5fd;">📈 +${Math.abs(dE)} ELO ${favAbbr}</span>`);
+        }
+      }
+      // Fixture congestion (football, ≥3 matches in 7d)
+      if (m.sport === 'football') {
+        const mt = new Date(m.date).getTime();
+        const cH = home?.name ? congestionCount(home.name, mt, 7) : 0;
+        const cA = away?.name ? congestionCount(away.name, mt, 7) : 0;
+        if (cH >= 3) badges.push(`<span class="badge neutral" style="background:rgba(249,115,22,.12);border-color:rgba(249,115,22,.35);color:#fb923c;">🟠 ${cH}m/7j ${esc(home?.abbr||'H')}</span>`);
+        if (cA >= 3) badges.push(`<span class="badge neutral" style="background:rgba(249,115,22,.12);border-color:rgba(249,115,22,.35);color:#fb923c;">🟠 ${cA}m/7j ${esc(away?.abbr||'A')}</span>`);
+      }
+      // Absent clé — un joueur avec rating >= 7 (Sofascore soccer) ou leader basket manquant
+      const keyAbsent = (side, sideAbbr) => {
+        const injs = side?.injuries || [];
+        const starters = side?.lineup?.starters || [];
+        const starterNames = new Set(starters.map(s => (s.name || '').toLowerCase()));
+        for (const inj of injs) {
+          const nm = (inj.player || inj.name || '').toLowerCase();
+          if (!nm) continue;
+          // Joueur titulaire habituel absent → signalé par Sofascore (type=1/2)
+          if ((inj.type === 1 || inj.type === 2 || /out|blessure|injur/i.test(inj.reason_label || inj.type || '')) && !starterNames.has(nm)) {
+            return inj.player || inj.name;
+          }
+        }
+        return null;
+      };
+      const kH = keyAbsent(home);
+      const kA = keyAbsent(away);
+      if (kH) badges.push(`<span class="badge neutral" style="background:rgba(239,68,68,.18);border-color:rgba(239,68,68,.45);color:#fca5a5;">🔴 ${esc(kH.split(' ').slice(-1)[0])} absent</span>`);
+      if (kA) badges.push(`<span class="badge neutral" style="background:rgba(239,68,68,.18);border-color:rgba(239,68,68,.45);color:#fca5a5;">🔴 ${esc(kA.split(' ').slice(-1)[0])} absent</span>`);
+    }
 
     // Tipsters block (compact) — also shown post-match with win/lost badges
     const tipsHtml = (m.tips && m.tips.length) ? `
@@ -4605,16 +4657,200 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T13:14:27.667104Z","today":"
               </div>
               <div style="margin-top:6px;font-size:10.5px;color:var(--text-dim2,#7b8693);line-height:1.3;">Calculé à partir des expected goals (modèle de Poisson).</div>
             </div>` : ''}
-            ${match.sport === 'football' && !isFinal ? `
-            <div style="margin-top:14px;padding:10px 12px;background:rgba(255,255,255,.02);border-radius:8px;border:1px dashed rgba(255,255,255,.08);">
-              <div style="font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-dim2,#7b8693);margin-bottom:4px;">⚽ Buteur probable</div>
-              <div style="font-size:12.5px;color:var(--text-dim,#b4bcc7);line-height:1.4;">Données joueurs à venir · enrichissement Sofascore prévu prochainement.</div>
-            </div>` : ''}
             ${!isFinal ? `<div style="margin-top:14px;">
               <a href="${esc(winamaxUrl(match))}" target="_blank" rel="noopener" class="winamax-btn">
                 <span class="ico">🎰</span> Parier sur Winamax
               </a>
             </div>` : ''}
+          </div>
+        </div>`;
+      })() : ''}
+
+      ${(() => {
+        // ============== Contexte extérieur (Chantiers 9/10/13/14) ==============
+        const w = match.weather;
+        const ref = match.referee;
+        const eloH = home?.elo, eloA = away?.elo;
+        const matchTime = new Date(match.date).getTime();
+        const congH = (match.sport === 'football' && home?.name) ? congestionCount(home.name, matchTime, 7) : 0;
+        const congA = (match.sport === 'football' && away?.name) ? congestionCount(away.name, matchTime, 7) : 0;
+        const hasWeather = w && (typeof w.precip_mm === 'number' || typeof w.wind_kmh === 'number' || typeof w.temp_c === 'number');
+        const hasRef = ref && ref.name;
+        const hasElo = eloH?.value != null || eloA?.value != null;
+        const hasCong = congH >= 2 || congA >= 2;
+        if (!hasWeather && !hasRef && !hasElo && !hasCong) return '';
+        const wcodeIcon = (c) => {
+          if (c == null) return '🌡️';
+          if (c >= 95) return '⛈️';
+          if (c >= 80) return '🌧️';
+          if (c >= 71) return '🌨️';
+          if (c >= 51) return '🌦️';
+          if (c >= 45) return '🌫️';
+          if (c >= 1 && c <= 3) return '⛅';
+          return '☀️';
+        };
+        const eloDelta = (eloH?.value != null && eloA?.value != null) ? Math.round(eloH.value - eloA.value) : null;
+        const eloFav = eloDelta == null ? '' : (eloDelta > 0 ? (home?.short || home?.name) : (eloDelta < 0 ? (away?.short || away?.name) : 'égalité'));
+        return `
+        <div class="section">
+          <h4>🌐 Contexte extérieur</h4>
+          <div class="two-cols">
+            ${hasWeather ? `
+              <div>
+                <h4 style="margin-top:0;font-size:11px;color:var(--text-dim);">${wcodeIcon(w.weather_code)} Météo ${w.city ? '· ' + esc(w.city) : ''}</h4>
+                ${typeof w.temp_c === 'number' ? `<div class="kv"><div class="k">Température</div><div class="v">${w.temp_c.toFixed(0)}°C</div></div>` : ''}
+                ${typeof w.precip_mm === 'number' ? `<div class="kv"><div class="k">Précipitations</div><div class="v ${w.precip_mm > 3 ? 'accent' : ''}">${w.precip_mm.toFixed(1)} mm/h${w.precip_mm > 3 ? ' 🌧️' : ''}</div></div>` : ''}
+                ${typeof w.wind_kmh === 'number' ? `<div class="kv"><div class="k">Vent</div><div class="v ${w.wind_kmh > 25 ? 'accent' : ''}">${Math.round(w.wind_kmh)} km/h${w.wind_kmh > 25 ? ' 💨' : ''}</div></div>` : ''}
+                ${(w.precip_mm > 3 || w.wind_kmh > 25) ? `<div style="margin-top:6px;font-size:11px;color:var(--text-dim2,#7b8693);line-height:1.3;">Conditions défavorables → xG réduits (moins de buts attendus).</div>` : ''}
+              </div>` : ''}
+            ${hasRef ? `
+              <div>
+                <h4 style="margin-top:0;font-size:11px;color:var(--text-dim);">🟨 Arbitre</h4>
+                <div class="kv"><div class="k">Nom</div><div class="v">${esc(ref.name)}</div></div>
+                ${typeof ref.yellowPerGame === 'number' ? `<div class="kv"><div class="k">Jaunes/match</div><div class="v ${ref.yellowPerGame >= 4.5 ? 'accent' : ''}">${ref.yellowPerGame.toFixed(2)}${ref.yellowPerGame >= 4.5 ? ' (strict)' : ref.yellowPerGame <= 3.0 ? ' (tolérant)' : ''}</div></div>` : ''}
+                ${typeof ref.redPerGame === 'number' ? `<div class="kv"><div class="k">Rouges/match</div><div class="v">${ref.redPerGame.toFixed(2)}</div></div>` : ''}
+                ${ref.games ? `<div class="kv"><div class="k">Échantillon</div><div class="v">${ref.games} matchs</div></div>` : ''}
+              </div>` : ''}
+            ${hasElo ? `
+              <div>
+                <h4 style="margin-top:0;font-size:11px;color:var(--text-dim);">📈 Puissance ClubElo</h4>
+                ${eloH?.value != null ? `<div class="kv"><div class="k">${esc(home?.short || home?.name)}</div><div class="v">${Math.round(eloH.value)} ${eloH.rank ? `<span style="color:var(--text-dim2,#7b8693);font-size:11px;">(#${eloH.rank} ${esc(eloH.country || '')})</span>` : ''}</div></div>` : ''}
+                ${eloA?.value != null ? `<div class="kv"><div class="k">${esc(away?.short || away?.name)}</div><div class="v">${Math.round(eloA.value)} ${eloA.rank ? `<span style="color:var(--text-dim2,#7b8693);font-size:11px;">(#${eloA.rank} ${esc(eloA.country || '')})</span>` : ''}</div></div>` : ''}
+                ${eloDelta != null ? `<div class="kv"><div class="k">Écart</div><div class="v ${Math.abs(eloDelta) > 100 ? 'accent' : ''}">${eloDelta > 0 ? '+' : ''}${eloDelta} pts${Math.abs(eloDelta) > 100 ? ` · fav. ${esc(eloFav)}` : ''}</div></div>` : ''}
+              </div>` : ''}
+            ${hasCong ? `
+              <div>
+                <h4 style="margin-top:0;font-size:11px;color:var(--text-dim);">🟠 Charge matchs (7j)</h4>
+                <div class="kv"><div class="k">${esc(home?.short || home?.name)}</div><div class="v ${congH >= 3 ? 'accent' : ''}">${congH} match${congH > 1 ? 's' : ''}${congH >= 3 ? ' 😵' : ''}</div></div>
+                <div class="kv"><div class="k">${esc(away?.short || away?.name)}</div><div class="v ${congA >= 3 ? 'accent' : ''}">${congA} match${congA > 1 ? 's' : ''}${congA >= 3 ? ' 😵' : ''}</div></div>
+                ${(congH >= 3 || congA >= 3) ? `<div style="margin-top:6px;font-size:11px;color:var(--text-dim2,#7b8693);line-height:1.3;">L'équipe la plus chargée subit un léger malus (fatigue cumulée).</div>` : ''}
+              </div>` : ''}
+          </div>
+        </div>`;
+      })()}
+
+      ${((home?.lineup?.starters?.length || 0) + (away?.lineup?.starters?.length || 0) > 0) ? (() => {
+        // ============== Compositions probables (Chantier 8 / patch_lineups_soccer) ==============
+        const renderSide = (side, label) => {
+          if (!side?.lineup?.starters?.length) {
+            return `
+              <div>
+                <h4 style="margin-top:0;font-size:11px;color:var(--text-dim);">${esc(label)}</h4>
+                <div style="color:var(--text-dim2,#7b8693);font-size:12px;">Composition non disponible.</div>
+              </div>`;
+          }
+          const lu = side.lineup;
+          const conf = lu.confirmed ? `<span style="padding:2px 7px;border-radius:4px;background:rgba(16,185,129,.15);color:#10b981;font-size:10px;font-weight:700;margin-left:8px;">CONFIRMÉE</span>` : `<span style="padding:2px 7px;border-radius:4px;background:rgba(255,255,255,.06);color:var(--text-dim2,#7b8693);font-size:10px;font-weight:700;margin-left:8px;">PROBABLE</span>`;
+          const starters = lu.starters.slice(0, 11).map(p => `
+            <div style="display:grid;grid-template-columns:28px 1fr auto;gap:6px;align-items:center;padding:4px 6px;background:rgba(255,255,255,.02);border-radius:4px;font-size:12px;">
+              <span style="color:var(--text-dim2,#7b8693);font-family:monospace;text-align:center;">${esc(p.shirt ?? '—')}</span>
+              <span style="color:var(--text,#e6ebf2);">${esc(p.name || '—')}${p.captain ? ' (C)' : ''}</span>
+              <span style="color:var(--text-dim2,#7b8693);font-size:11px;">${esc(p.pos || '')}${p.rating ? ` · ${p.rating}` : ''}</span>
+            </div>`).join('');
+          return `
+            <div>
+              <h4 style="margin-top:0;font-size:11px;color:var(--text-dim);">${esc(label)} · ${esc(lu.formation || '—')}${conf}</h4>
+              ${lu.coach ? `<div style="font-size:11.5px;color:var(--text-dim2,#7b8693);margin-bottom:6px;">Coach : ${esc(lu.coach)}</div>` : ''}
+              <div style="display:flex;flex-direction:column;gap:3px;">${starters}</div>
+            </div>`;
+        };
+        return `
+        <div class="section">
+          <h4>🧩 Compositions probables</h4>
+          <div class="two-cols">
+            ${renderSide(home, home?.name || 'Dom.')}
+            ${renderSide(away, away?.name || 'Ext.')}
+          </div>
+        </div>`;
+      })() : ''}
+
+      ${((home?.injuries?.length || 0) + (away?.injuries?.length || 0) > 0) ? (() => {
+        // ============== Blessés / absents nominatifs (Sofascore soccer + ESPN US sports) ==============
+        const reasonLabel = (inj) => {
+          if (inj.reason_label) return inj.reason_label;
+          const t = (inj.type || '').toLowerCase();
+          if (t.includes('susp')) return 'Suspension';
+          if (t.includes('intl') || t.includes('international')) return 'Sélection';
+          if (t.includes('doubt') || t.includes('question')) return 'Incertain';
+          if (t.includes('out') || t.includes('injur')) return 'Blessure';
+          return inj.reason || inj.type || 'Absent';
+        };
+        const reasonColor = (lbl) => {
+          const l = lbl.toLowerCase();
+          if (l.includes('blessure') || l.includes('out')) return '#fca5a5';
+          if (l.includes('susp')) return '#fbbf24';
+          if (l.includes('sélect') || l.includes('intl')) return '#60a5fa';
+          return '#b4bcc7';
+        };
+        const renderList = (side, label) => {
+          const injs = side?.injuries || [];
+          if (!injs.length) return `
+            <div>
+              <h4 style="margin-top:0;font-size:11px;color:var(--text-dim);">${esc(label)}</h4>
+              <div style="color:var(--text-dim2,#7b8693);font-size:12px;">Aucun absent signalé.</div>
+            </div>`;
+          return `
+            <div>
+              <h4 style="margin-top:0;font-size:11px;color:var(--text-dim);">${esc(label)} · ${injs.length} absent${injs.length > 1 ? 's' : ''}</h4>
+              <div style="display:flex;flex-direction:column;gap:4px;">
+                ${injs.map(inj => {
+                  const lbl = reasonLabel(inj);
+                  const col = reasonColor(lbl);
+                  return `
+                    <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:5px 8px;background:rgba(255,255,255,.02);border-radius:4px;font-size:12px;">
+                      <span style="color:var(--text,#e6ebf2);">${esc(inj.player || inj.name || '—')}${inj.position ? ` <span style="color:var(--text-dim2,#7b8693);font-size:10.5px;">(${esc(inj.position)})</span>` : ''}</span>
+                      <span style="color:${col};font-size:11px;font-weight:600;">${esc(lbl)}</span>
+                    </div>`;
+                }).join('')}
+              </div>
+            </div>`;
+        };
+        return `
+        <div class="section">
+          <h4>🏥 Absents nominatifs</h4>
+          <div class="two-cols">
+            ${renderList(home, home?.name || 'Dom.')}
+            ${renderList(away, away?.name || 'Ext.')}
+          </div>
+        </div>`;
+      })() : ''}
+
+      ${((home?.last5?.length || 0) + (away?.last5?.length || 0) > 0) ? (() => {
+        // ============== 5 derniers matchs détaillés ==============
+        const renderTable = (side, label) => {
+          const rows = side?.last5 || [];
+          if (!rows.length) return `
+            <div>
+              <h4 style="margin-top:0;font-size:11px;color:var(--text-dim);">${esc(label)}</h4>
+              <div style="color:var(--text-dim2,#7b8693);font-size:12px;">Pas d'historique récent.</div>
+            </div>`;
+          return `
+            <div>
+              <h4 style="margin-top:0;font-size:11px;color:var(--text-dim);">${esc(label)}</h4>
+              <div style="display:flex;flex-direction:column;gap:3px;">
+                ${rows.map(r => {
+                  const resCol = r.result === 'W' ? '#10b981' : r.result === 'L' ? '#fca5a5' : '#b4bcc7';
+                  const resBg  = r.result === 'W' ? 'rgba(16,185,129,.14)' : r.result === 'L' ? 'rgba(239,68,68,.12)' : 'rgba(255,255,255,.06)';
+                  const haIco = r.ha === 'home' ? '🏠' : '✈️';
+                  return `
+                    <div style="display:grid;grid-template-columns:70px 22px 22px 1fr 52px 18px;gap:6px;align-items:center;padding:4px 6px;background:rgba(255,255,255,.02);border-radius:4px;font-size:12px;">
+                      <span style="color:var(--text-dim2,#7b8693);font-family:monospace;font-size:11px;">${esc(isoDate(r.date))}</span>
+                      <span style="text-align:center;">${haIco}</span>
+                      <span style="text-align:center;padding:1px 0;border-radius:3px;background:${resBg};color:${resCol};font-weight:700;">${esc(r.result || '—')}</span>
+                      <span style="color:var(--text,#e6ebf2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(r.opp || '—')}</span>
+                      <span style="text-align:center;font-variant-numeric:tabular-nums;font-weight:600;color:var(--text,#e6ebf2);">${r.gf}-${r.ga}</span>
+                      <span></span>
+                    </div>`;
+                }).join('')}
+              </div>
+            </div>`;
+        };
+        return `
+        <div class="section">
+          <h4>📜 5 derniers matchs</h4>
+          <div class="two-cols">
+            ${renderTable(home, home?.name || 'Dom.')}
+            ${renderTable(away, away?.name || 'Ext.')}
           </div>
         </div>`;
       })() : ''}
