@@ -1464,6 +1464,142 @@
     background: linear-gradient(90deg, var(--brand), transparent);
   }
 
+  /* ========= Historique page (Chantier M) ========= */
+  .hist-filter-bar {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 14px; padding: 14px 16px; margin: 14px 0 18px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .hist-filter-row {
+    display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+  }
+  .hist-filter-label {
+    font-size: 11.5px; color: var(--text-dim2); font-weight: 600;
+    text-transform: uppercase; letter-spacing: .5px; min-width: 88px;
+  }
+  .hist-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .hist-chip {
+    background: var(--panel-2); color: var(--text-dim);
+    border: 1px solid var(--border); border-radius: 999px;
+    padding: 5px 12px; font-size: 12.5px; font-weight: 600;
+    cursor: pointer; transition: all .15s;
+    font-family: inherit;
+  }
+  .hist-chip:hover { background: rgba(255,255,255,.06); color: var(--text); }
+  .hist-chip.active {
+    background: rgba(167,139,250,.18); color: #c4b5fd;
+    border-color: rgba(167,139,250,.45);
+  }
+  .hist-filter-actions { justify-content: flex-end; gap: 8px; }
+  .hist-btn-primary, .hist-btn-secondary {
+    padding: 7px 14px; border-radius: 8px;
+    font-size: 12.5px; font-weight: 600; cursor: pointer;
+    font-family: inherit; transition: all .15s;
+  }
+  .hist-btn-primary {
+    background: rgba(167,139,250,.2); color: #c4b5fd;
+    border: 1px solid rgba(167,139,250,.4);
+  }
+  .hist-btn-primary:hover { background: rgba(167,139,250,.3); }
+  .hist-btn-secondary {
+    background: var(--panel-2); color: var(--text-dim);
+    border: 1px solid var(--border);
+  }
+  .hist-btn-secondary:hover { color: var(--text); background: rgba(255,255,255,.06); }
+
+  .hist-twocol {
+    display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+    gap: 14px; margin-bottom: 18px;
+  }
+  @media (max-width: 860px) {
+    .hist-twocol { grid-template-columns: 1fr; }
+  }
+  .hist-chart-card, .hist-sport-card {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 14px; padding: 14px 16px;
+  }
+  .hist-card-title {
+    font-size: 13px; font-weight: 700; color: var(--text);
+    margin-bottom: 10px; letter-spacing: -.1px;
+  }
+  .hist-sport-card { margin-bottom: 18px; }
+  .hist-sport-row {
+    display: grid; grid-template-columns: 120px 1fr 50px 55px 70px;
+    gap: 10px; align-items: center;
+    padding: 7px 0; border-top: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .hist-sport-row:first-of-type { border-top: none; }
+  .hist-sport-label { color: var(--text); font-weight: 600; }
+  .hist-sport-bar {
+    height: 8px; background: rgba(255,255,255,.05);
+    border-radius: 999px; overflow: hidden;
+  }
+  .hist-sport-bar-fill { height: 100%; border-radius: 999px; transition: width .3s; }
+  .hist-sport-stat {
+    font-variant-numeric: tabular-nums;
+    color: var(--text-dim); text-align: right;
+  }
+
+  .hist-day-list { display: flex; flex-direction: column; gap: 14px; }
+  .hist-day-block {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 14px; overflow: hidden;
+  }
+  .hist-day-head {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 10px; padding: 12px 16px;
+    background: rgba(255,255,255,.02);
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .hist-day-date {
+    font-size: 14px; font-weight: 700; color: var(--text);
+    text-transform: capitalize;
+  }
+  .hist-day-stats { display: flex; gap: 6px; flex-wrap: wrap; }
+  .hist-day-chip {
+    font-size: 11.5px; padding: 3px 10px; border-radius: 999px;
+    background: var(--panel-2); color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hist-day-body { padding: 0 4px 4px; }
+  .hist-pick-head, .hist-pick-row {
+    display: grid;
+    grid-template-columns: 34px minmax(0,1fr) 120px 60px 60px 50px 80px;
+    gap: 10px; align-items: center; padding: 9px 12px;
+    font-size: 12.5px;
+  }
+  .hist-pick-head {
+    font-size: 10.5px; color: var(--text-dim2);
+    font-weight: 600; text-transform: uppercase; letter-spacing: .5px;
+    border-bottom: 1px solid var(--border);
+  }
+  .hist-pick-row { border-bottom: 1px solid rgba(255,255,255,.02); cursor: pointer; transition: background .12s; }
+  .hist-pick-row:last-child { border-bottom: none; }
+  .hist-pick-row:hover { background: rgba(255,255,255,.03); }
+  .hist-pick-sport { font-size: 18px; text-align: center; }
+  .hist-pick-title {
+    color: var(--text); font-weight: 600;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .hist-pick-sub {
+    color: var(--text-dim2); font-size: 11px; margin-top: 1px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .hist-pick-cell {
+    color: var(--text-dim); font-variant-numeric: tabular-nums;
+  }
+  @media (max-width: 680px) {
+    .hist-pick-head, .hist-pick-row {
+      grid-template-columns: 28px minmax(0,1fr) 70px 50px 40px 70px;
+    }
+    .hist-pick-head > div:nth-child(5),
+    .hist-pick-row > div:nth-child(5) { display: none; }
+  }
+  /* ========= end Historique page ========= */
+
   /* Section panels */
   .bilan-section {
     background: var(--panel);
@@ -1681,6 +1817,7 @@
       <button class="page-btn active" data-page="simples">🎯 Simples</button>
       <button class="page-btn" data-page="locks">🔒 Locks <span class="count" id="count-locks">0</span></button>
       <button class="page-btn" data-page="combines">🔗 Combinés</button>
+      <button class="page-btn" data-page="historique">📜 Historique</button>
       <button class="page-btn" data-page="bilan">📊 Bilan</button>
     </nav>
   </div>
@@ -5447,6 +5584,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
     const isValue = currentPage === 'value';
     const isBilan = currentPage === 'bilan';
     const isLocks = currentPage === 'locks';
+    const isHistorique = currentPage === 'historique';
 
     // Filter bar + top picks only for simples page. Bankroll bar lives
     // in the sidebar now so it stays visible on every page.
@@ -5467,9 +5605,9 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
     const comb = document.getElementById('combines-wrap');
     if (comb) comb.style.display = isCombines ? '' : 'none';
 
-    // Summary bar: shown for simples + bilan, hidden for combines/value/locks (own header)
+    // Summary bar: shown for simples + bilan, hidden for combines/value/locks/historique (own header)
     const sum = document.getElementById('summary-bar');
-    if (sum) sum.style.display = (isCombines || isValue || isLocks) ? 'none' : '';
+    if (sum) sum.style.display = (isCombines || isValue || isLocks || isHistorique) ? 'none' : '';
 
     // Locks page: render dedicated list of all lock picks across all days/sports
     let locksWrap = document.getElementById('locks-wrap');
@@ -5480,6 +5618,16 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
     }
     locksWrap.style.display = isLocks ? '' : 'none';
     if (isLocks) renderLocksPage(locksWrap);
+
+    // Historique page: list of all settled picks with filters + daily stats + export
+    let historiqueWrap = document.getElementById('historique-wrap');
+    if (!historiqueWrap) {
+      historiqueWrap = document.createElement('div');
+      historiqueWrap.id = 'historique-wrap';
+      (document.querySelector('main') || document.body).appendChild(historiqueWrap);
+    }
+    historiqueWrap.style.display = isHistorique ? '' : 'none';
+    if (isHistorique) renderHistoriquePage(historiqueWrap);
 
     // Value Finder page
     let valueWrap = document.getElementById('value-wrap');
@@ -6008,6 +6156,472 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
       });
     });
+  }
+
+  // ======= Page Historique (Chantier M) =======
+  // Toutes les picks réglés, groupés par jour, avec filtres (sport, fiabilité,
+  // type de pick, bookmaker), graphes (P&L cumulé + WR glissante 7j),
+  // répartition par sport, export CSV et pagination.
+  //
+  // On réutilise predictMatch + evaluateModelPick (même pipeline que Bilan et
+  // Locks) pour garantir cohérence des chiffres entre les pages.
+  let _histFilters = {
+    sport: 'all',       // all | football | basketball | hockey | tennis
+    fiab: 'all',        // all | locks (≥70%) | hi (60-70%) | mid (50-60%) | low (<50%)
+    pickType: 'all',    // all | 1 | N | 2
+    bookmaker: 'winamax', // winamax | all
+  };
+  let _histDayLimit = 20;
+
+  function renderHistoriquePage(wrap) {
+    const data = window.PRONOSTICS_DATA;
+    if (!data || !data.days) {
+      wrap.innerHTML = '<div style="max-width:1200px;margin:0 auto;padding:16px 8px 24px;"><div class="bilan-empty">Pas de données d\'historique disponibles.</div></div>';
+      return;
+    }
+
+    // 1. Collecte des picks réglés (dedup par id, bookmaker pré-filtré)
+    const seen = new Set();
+    const picks = [];
+    Object.values(data.days).forEach(arr => (arr || []).forEach(m => {
+      if (!m.completed) return;
+      if (m.id && seen.has(m.id)) return;
+      if (m.id) seen.add(m.id);
+      const winaOk = _histFilters.bookmaker === 'all'
+        ? true
+        : (m.winamax && m.winamax.available === true);
+      if (!winaOk) return;
+      const pred = predictMatch(m);
+      if (!pred || !pred.pick || pred.skip) return;
+      const res = evaluateModelPick(m, pred);
+      if (res == null) return;
+      const odd = pred.odds && (pred.pick.key === '1' ? pred.odds.home : pred.pick.key === '2' ? pred.odds.away : pred.odds.draw);
+      if (!odd) return;
+      picks.push({ m, pred, res, odd });
+    }));
+
+    // 2. Filtres en page (sport / fiab / pickType)
+    const passFilter = (p) => {
+      if (_histFilters.sport !== 'all' && p.m.sport !== _histFilters.sport) return false;
+      const fiab = p.pred.reliability ?? p.pred.pick.prob;
+      if (_histFilters.fiab === 'locks' && !p.pred.isLock) return false;
+      if (_histFilters.fiab === 'hi' && (fiab < 0.60 || fiab >= 0.70)) return false;
+      if (_histFilters.fiab === 'mid' && (fiab < 0.50 || fiab >= 0.60)) return false;
+      if (_histFilters.fiab === 'low' && fiab >= 0.50) return false;
+      if (_histFilters.pickType !== 'all') {
+        const pk = p.pred.pick.key;
+        const want = _histFilters.pickType === 'N' ? 'X' : _histFilters.pickType;
+        if (pk !== want) return false;
+      }
+      return true;
+    };
+    const filtered = picks.filter(passFilter);
+
+    // 3. Stats globales
+    let totW = 0, totL = 0, totPL = 0;
+    filtered.forEach(p => {
+      if (p.res === 'won') { totW++; totPL += (p.odd - 1); }
+      else if (p.res === 'lost') { totL++; totPL -= 1; }
+    });
+    const totN = totW + totL;
+    const wr = totN ? (100 * totW / totN) : null;
+    const roi = totN ? (100 * totPL / totN) : null;
+
+    // 4. Group by day (Europe/Paris)
+    function dayKey(dateStr) {
+      try {
+        return new Date(dateStr).toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+      } catch (e) { return isoDate(dateStr); }
+    }
+    const byDay = new Map();
+    filtered.forEach(p => {
+      const k = dayKey(p.m.date);
+      if (!byDay.has(k)) byDay.set(k, { key: k, picks: [], w: 0, l: 0, pl: 0 });
+      const d = byDay.get(k);
+      d.picks.push(p);
+      if (p.res === 'won') { d.w++; d.pl += (p.odd - 1); }
+      else if (p.res === 'lost') { d.l++; d.pl -= 1; }
+    });
+    const days = [...byDay.values()].sort((a, b) => b.key.localeCompare(a.key));
+
+    let bestDay = null, worstDay = null;
+    days.forEach(d => {
+      if (bestDay == null || d.pl > bestDay.pl) bestDay = d;
+      if (worstDay == null || d.pl < worstDay.pl) worstDay = d;
+    });
+
+    // 5. Sport breakdown
+    const perSport = {};
+    filtered.forEach(p => {
+      const s = p.m.sport || 'autre';
+      if (!perSport[s]) perSport[s] = { sport: s, n: 0, w: 0, l: 0, pl: 0 };
+      const r = perSport[s];
+      r.n++;
+      if (p.res === 'won') { r.w++; r.pl += (p.odd - 1); }
+      else if (p.res === 'lost') { r.l++; r.pl -= 1; }
+    });
+    const sportRows = Object.values(perSport).sort((a, b) => b.n - a.n);
+
+    // 6. P&L cumulé chart (réutilise renderRoiChart)
+    const chartRows = filtered
+      .slice()
+      .sort((a, b) => new Date(a.m.date) - new Date(b.m.date))
+      .map(p => ({
+        date: isoDate(p.m.date),
+        delta: p.res === 'won' ? (p.odd - 1) : -1,
+      }));
+    const roiChartHtml = renderRoiChart(chartRows, { title: 'P&L cumulé (1u flat par pick)' })
+      || `<div class="bilan-empty">Pas encore assez de picks réglés pour tracer la courbe.</div>`;
+
+    // 7. WR glissante 7j
+    const daysChron = [...byDay.values()].sort((a, b) => a.key.localeCompare(b.key));
+    function addDaysISOLocal(iso, n) {
+      const [y,mo,dd] = iso.split('-').map(Number);
+      const dt = new Date(Date.UTC(y, mo-1, dd));
+      dt.setUTCDate(dt.getUTCDate() + n);
+      return dt.toISOString().slice(0, 10);
+    }
+    const wrPts = [];
+    daysChron.forEach((d, i) => {
+      const cut = addDaysISOLocal(d.key, -6);
+      let w = 0, n = 0;
+      for (let j = i; j >= 0 && daysChron[j].key >= cut; j--) {
+        w += daysChron[j].w;
+        n += daysChron[j].w + daysChron[j].l;
+      }
+      wrPts.push({ date: d.key, wr: n ? (100 * w / n) : null, n });
+    });
+    const wrChartHtml = renderWrChart(wrPts, 7);
+
+    // 8. Filter bar
+    const filterChipsHtml = (group, current, options) => options.map(o => `
+      <button class="hist-chip ${current === o.v ? 'active' : ''}" data-fgroup="${group}" data-fval="${esc(o.v)}">${esc(o.label)}${o.hint ? `<span style="opacity:.6;margin-left:4px;font-size:10.5px;">${esc(o.hint)}</span>` : ''}</button>
+    `).join('');
+
+    const filterBarHtml = `
+      <div class="hist-filter-bar">
+        <div class="hist-filter-row">
+          <div class="hist-filter-label">Sport</div>
+          <div class="hist-chips">${filterChipsHtml('sport', _histFilters.sport, [
+            { v: 'all', label: 'Tous' },
+            { v: 'football', label: '⚽ Foot' },
+            { v: 'basketball', label: '🏀 Basket' },
+            { v: 'hockey', label: '🏒 Hockey' },
+            { v: 'tennis', label: '🎾 Tennis' },
+          ])}</div>
+        </div>
+        <div class="hist-filter-row">
+          <div class="hist-filter-label">Fiabilité</div>
+          <div class="hist-chips">${filterChipsHtml('fiab', _histFilters.fiab, [
+            { v: 'all', label: 'Toutes' },
+            { v: 'locks', label: '🔒 Locks', hint: '≥70%' },
+            { v: 'hi', label: 'Hautes', hint: '60-70%' },
+            { v: 'mid', label: 'Moyennes', hint: '50-60%' },
+            { v: 'low', label: 'Basses', hint: '<50%' },
+          ])}</div>
+        </div>
+        <div class="hist-filter-row">
+          <div class="hist-filter-label">Type pick</div>
+          <div class="hist-chips">${filterChipsHtml('pickType', _histFilters.pickType, [
+            { v: 'all', label: 'Tous' },
+            { v: '1', label: '1 · Dom.' },
+            { v: 'N', label: 'N · Nul' },
+            { v: '2', label: '2 · Ext.' },
+          ])}</div>
+        </div>
+        <div class="hist-filter-row">
+          <div class="hist-filter-label">Bookmaker</div>
+          <div class="hist-chips">${filterChipsHtml('bookmaker', _histFilters.bookmaker, [
+            { v: 'winamax', label: 'Winamax seulement' },
+            { v: 'all', label: 'Tous' },
+          ])}</div>
+        </div>
+        <div class="hist-filter-row hist-filter-actions">
+          <button class="hist-btn-secondary" id="hist-reset">Réinitialiser</button>
+          <button class="hist-btn-primary" id="hist-export-csv">⬇ Export CSV (${filtered.length} picks)</button>
+        </div>
+      </div>
+    `;
+
+    // 9. Daily accordion
+    const visibleDays = days.slice(0, _histDayLimit);
+    const dayBlocksHtml = visibleDays.map(d => {
+      const dayN = d.w + d.l;
+      const dayWR = dayN ? (100 * d.w / dayN) : null;
+      const dayROI = dayN ? (100 * d.pl / dayN) : null;
+      const plCol = d.pl > 0 ? '#34d399' : d.pl < 0 ? '#f87171' : 'var(--text-dim)';
+      const wrColor = dayWR == null ? 'var(--text-dim)' : dayWR >= 65 ? '#34d399' : dayWR >= 50 ? '#eab308' : '#f87171';
+      const dayLabel = (() => {
+        try {
+          const today = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+          if (d.key === today) return '📅 Aujourd\'hui';
+          return new Date(d.key + 'T12:00:00').toLocaleDateString('fr-FR', { weekday: 'long', day: '2-digit', month: 'short', year: 'numeric' });
+        } catch (e) { return d.key; }
+      })();
+      const rowsHtml = d.picks
+        .slice()
+        .sort((a, b) => new Date(b.m.date) - new Date(a.m.date))
+        .map(p => {
+          const sportEm = p.m.sport === 'football' ? '⚽' : p.m.sport === 'basketball' ? '🏀' : p.m.sport === 'hockey' ? '🏒' : p.m.sport === 'tennis' ? '🎾' : '🎯';
+          const pickLbl = p.pred.pick.key === 'X'
+            ? 'N · Match nul'
+            : p.pred.pick.key === '1'
+              ? (p.m.competitors?.[0]?.short || p.m.competitors?.[0]?.name || '1')
+              : (p.m.competitors?.[1]?.short || p.m.competitors?.[1]?.name || '2');
+          const resIco = p.res === 'won'
+            ? '<span style="color:#34d399;font-weight:800;">✓</span>'
+            : '<span style="color:#f87171;font-weight:800;">✗</span>';
+          const delta = p.res === 'won' ? `+${(p.odd - 1).toFixed(2)}u` : '−1u';
+          const deltaCol = p.res === 'won' ? '#34d399' : '#f87171';
+          const fiab = p.pred.reliability ?? p.pred.pick.prob;
+          const fiabPct = Math.round(fiab * 100);
+          const matchName = esc(p.m.shortName || p.m.name || '—');
+          return `
+            <div class="hist-pick-row" data-match-id="${esc(p.m.id || '')}">
+              <div class="hist-pick-sport">${sportEm}</div>
+              <div class="hist-pick-match">
+                <div class="hist-pick-title">${matchName}</div>
+                <div class="hist-pick-sub">${esc(p.m.leagueShort || p.m.league || '')}${p.pred.isLock ? ' · 🔒 Lock' : ''}</div>
+              </div>
+              <div class="hist-pick-cell">${esc(pickLbl)}</div>
+              <div class="hist-pick-cell">${p.odd.toFixed(2)}</div>
+              <div class="hist-pick-cell" style="color:${fiabPct >= 70 ? '#34d399' : fiabPct >= 55 ? '#eab308' : '#f87171'};font-weight:700;">${fiabPct}%</div>
+              <div class="hist-pick-cell" style="text-align:center;">${resIco}</div>
+              <div class="hist-pick-cell" style="color:${deltaCol};font-weight:700;text-align:right;">${delta}</div>
+            </div>`;
+        }).join('');
+      return `
+        <div class="hist-day-block">
+          <div class="hist-day-head">
+            <div class="hist-day-date">${dayLabel}</div>
+            <div class="hist-day-stats">
+              <span class="hist-day-chip">${dayN} pick${dayN > 1 ? 's' : ''}</span>
+              <span class="hist-day-chip" style="color:${wrColor};">${d.w}W · ${d.l}L${dayWR != null ? ' · ' + dayWR.toFixed(0) + '%' : ''}</span>
+              <span class="hist-day-chip" style="color:${plCol};font-weight:700;">${d.pl >= 0 ? '+' : ''}${d.pl.toFixed(2)}u${dayROI != null ? ' · ROI ' + (dayROI >= 0 ? '+' : '') + dayROI.toFixed(1) + '%' : ''}</span>
+            </div>
+          </div>
+          <div class="hist-day-body">
+            <div class="hist-pick-head">
+              <div></div>
+              <div>Match</div>
+              <div>Pick</div>
+              <div>Cote</div>
+              <div>Fiab</div>
+              <div style="text-align:center;">Rés.</div>
+              <div style="text-align:right;">Δ</div>
+            </div>
+            ${rowsHtml}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    const moreBtnHtml = days.length > _histDayLimit
+      ? `<div style="text-align:center;margin-top:16px;"><button class="hist-btn-secondary" id="hist-more">Voir ${Math.min(20, days.length - _histDayLimit)} jours de plus · ${_histDayLimit}/${days.length} affichés</button></div>`
+      : '';
+    const lessBtnHtml = (_histDayLimit > 20 && days.length)
+      ? `<div style="text-align:center;margin-top:8px;"><button class="hist-btn-secondary" id="hist-less">Réduire</button></div>`
+      : '';
+
+    // 10. Sport breakdown bars
+    const maxN = Math.max(1, ...sportRows.map(r => r.n));
+    const sportChartHtml = sportRows.length ? `
+      <div class="hist-sport-card">
+        <div class="hist-card-title">Répartition par sport</div>
+        ${sportRows.map(r => {
+          const rWR = r.n ? (100 * r.w / r.n) : 0;
+          const rROI = r.n ? (100 * r.pl / r.n) : 0;
+          const barPct = Math.round(100 * r.n / maxN);
+          const plCol = r.pl > 0 ? '#34d399' : r.pl < 0 ? '#f87171' : '#94a3b8';
+          const em = r.sport === 'football' ? '⚽' : r.sport === 'basketball' ? '🏀' : r.sport === 'hockey' ? '🏒' : r.sport === 'tennis' ? '🎾' : '🎯';
+          return `
+            <div class="hist-sport-row">
+              <div class="hist-sport-label">${em} ${esc(r.sport)}</div>
+              <div class="hist-sport-bar"><div class="hist-sport-bar-fill" style="width:${barPct}%;background:${plCol};"></div></div>
+              <div class="hist-sport-stat">${r.n}</div>
+              <div class="hist-sport-stat">${rWR.toFixed(0)}%</div>
+              <div class="hist-sport-stat" style="color:${plCol};font-weight:700;">${rROI >= 0 ? '+' : ''}${rROI.toFixed(1)}%</div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    ` : '';
+
+    // 11. Hero KPIs
+    const roiCol = roi == null ? 'var(--text-dim)' : roi > 0 ? '#34d399' : roi < 0 ? '#f87171' : 'var(--text-dim)';
+    const wrCol = wr == null ? 'var(--text-dim)' : wr >= 65 ? '#34d399' : wr >= 50 ? '#eab308' : '#f87171';
+    const bestTxt = bestDay ? `${bestDay.key.slice(5)} · +${bestDay.pl.toFixed(2)}u` : '—';
+    const worstTxt = worstDay ? `${worstDay.key.slice(5)} · ${worstDay.pl.toFixed(2)}u` : '—';
+    const heroHtml = `
+      <div class="bilan-kpis" style="margin-top:4px;">
+        <div class="bilan-kpi brand">
+          <div class="kpi-label">Picks réglés</div>
+          <div class="kpi-value">${totN}</div>
+          <div class="kpi-sub">sur ${days.length} jour${days.length > 1 ? 's' : ''}</div>
+        </div>
+        <div class="bilan-kpi">
+          <div class="kpi-label">Taux de réussite</div>
+          <div class="kpi-value" style="color:${wrCol};">${wr != null ? wr.toFixed(1) + '%' : '—'}</div>
+          <div class="kpi-sub">${totW}W · ${totL}L</div>
+        </div>
+        <div class="bilan-kpi">
+          <div class="kpi-label">ROI moyen</div>
+          <div class="kpi-value" style="color:${roiCol};">${roi != null ? (roi >= 0 ? '+' : '') + roi.toFixed(1) + '%' : '—'}</div>
+          <div class="kpi-sub">${totPL >= 0 ? '+' : ''}${totPL.toFixed(2)}u cumulés</div>
+        </div>
+        <div class="bilan-kpi">
+          <div class="kpi-label">Meilleur / pire jour</div>
+          <div class="kpi-value" style="font-size:14px;line-height:1.35;">
+            <div style="color:#34d399;">${bestTxt}</div>
+            <div style="color:#f87171;">${worstTxt}</div>
+          </div>
+          <div class="kpi-sub">en unités flat</div>
+        </div>
+      </div>`;
+
+    const emptyStateHtml = filtered.length === 0
+      ? `<div class="bilan-empty" style="margin-top:18px;">Aucun pick ne correspond aux filtres actuels. Essaye "Réinitialiser" pour tout afficher.</div>`
+      : '';
+
+    wrap.innerHTML = `
+      <div style="max-width:1200px;margin:0 auto;padding:16px 8px 24px;">
+        <div class="section-header top-picks" style="margin-top:8px;">
+          <h2><span class="ico">📜</span>Historique des pronostics</h2>
+          <div class="hint">Tous les picks réglés, groupés par jour — filtre par sport, fiabilité, type ou bookmaker, puis exporte en CSV.</div>
+        </div>
+        ${heroHtml}
+        ${filterBarHtml}
+        ${emptyStateHtml}
+        ${filtered.length ? `
+          <div class="hist-twocol">
+            <div class="hist-chart-card">
+              <div class="hist-card-title">P&L cumulé (1€ flat par pick)</div>
+              ${roiChartHtml}
+            </div>
+            <div class="hist-chart-card">
+              <div class="hist-card-title">Taux de réussite glissant (fenêtre 7 jours)</div>
+              ${wrChartHtml}
+            </div>
+          </div>
+          ${sportChartHtml}
+          <div class="hist-day-list">
+            ${dayBlocksHtml}
+          </div>
+          ${moreBtnHtml}
+          ${lessBtnHtml}
+        ` : ''}
+      </div>`;
+
+    // 12. Wire interactions
+    wrap.querySelectorAll('.hist-chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const g = btn.dataset.fgroup, v = btn.dataset.fval;
+        if (_histFilters[g] === v) return;
+        _histFilters[g] = v;
+        _histDayLimit = 20;
+        renderHistoriquePage(wrap);
+      });
+    });
+    const resetBtn = wrap.querySelector('#hist-reset');
+    if (resetBtn) resetBtn.addEventListener('click', () => {
+      _histFilters = { sport: 'all', fiab: 'all', pickType: 'all', bookmaker: 'winamax' };
+      _histDayLimit = 20;
+      renderHistoriquePage(wrap);
+    });
+    const moreBtn = wrap.querySelector('#hist-more');
+    if (moreBtn) moreBtn.addEventListener('click', () => {
+      _histDayLimit += 20;
+      renderHistoriquePage(wrap);
+    });
+    const lessBtn = wrap.querySelector('#hist-less');
+    if (lessBtn) lessBtn.addEventListener('click', () => {
+      _histDayLimit = 20;
+      renderHistoriquePage(wrap);
+    });
+    const exportBtn = wrap.querySelector('#hist-export-csv');
+    if (exportBtn) exportBtn.addEventListener('click', () => {
+      exportHistoriqueCsv(filtered);
+    });
+    // Click on a pick row → open match detail modal (reuse existing infra)
+    wrap.querySelectorAll('.hist-pick-row').forEach(row => {
+      row.addEventListener('click', () => {
+        const id = row.dataset.matchId;
+        if (!id) return;
+        const match = filtered.find(p => p.m.id === id)?.m;
+        if (match) openDetail(match);
+      });
+    });
+  }
+
+  // Line chart for 7-day rolling win-rate. Distinct from renderRoiChart (which
+  // plots cumulative signed P&L) because a WR curve is bounded 0-100 and
+  // references the 50% baseline, not zero.
+  function renderWrChart(pts, windowDays) {
+    const valid = pts.filter(p => p.wr != null);
+    if (valid.length < 2) return '<div class="bilan-empty">Pas encore assez de jours pour tracer la courbe glissante.</div>';
+    const width = 560, height = 160;
+    const marginL = 40, marginR = 12, marginT = 20, marginB = 28;
+    const plotW = width - marginL - marginR;
+    const plotH = height - marginT - marginB;
+    const xAt = i => marginL + (valid.length === 1 ? plotW / 2 : (i / (valid.length - 1)) * plotW);
+    const yAt = v => marginT + plotH - (v / 100) * plotH;
+    const poly = valid.map((p, i) => `${xAt(i).toFixed(1)},${yAt(p.wr).toFixed(1)}`).join(' ');
+    const last = valid[valid.length - 1].wr;
+    const stroke = last >= 65 ? '#34d399' : last >= 50 ? '#eab308' : '#f87171';
+    const fill = last >= 65 ? 'rgba(52,211,153,.18)' : last >= 50 ? 'rgba(234,179,8,.18)' : 'rgba(248,113,113,.18)';
+    const areaPath = `M ${xAt(0).toFixed(1)} ${yAt(0).toFixed(1)} L ${poly.split(' ').join(' L ')} L ${xAt(valid.length-1).toFixed(1)} ${yAt(0).toFixed(1)} Z`;
+    const xTicks = valid.length <= 5
+      ? valid.map((p, i) => ({ x: xAt(i), label: p.date.slice(5) }))
+      : [0, Math.floor(valid.length/2), valid.length-1].map(i => ({ x: xAt(i), label: valid[i].date.slice(5) }));
+    const yTicks = [0, 50, 100];
+    return `
+      <div style="background:var(--surface,#111827);border:1px solid var(--border,#2a3744);border-radius:12px;padding:14px;">
+        <div style="font-size:13px;color:var(--text-dim,#b4bcc7);margin-bottom:8px;font-weight:600;">Glissement ${windowDays}j · actuel <span style="color:${stroke};font-weight:700;">${last.toFixed(1)}%</span></div>
+        <svg viewBox="0 0 ${width} ${height}" style="width:100%;height:auto;display:block;" xmlns="http://www.w3.org/2000/svg">
+          <line x1="${marginL}" y1="${yAt(50).toFixed(1)}" x2="${width - marginR}" y2="${yAt(50).toFixed(1)}" stroke="rgba(255,255,255,.15)" stroke-dasharray="3 3"/>
+          ${yTicks.map(v => `<text x="${marginL - 6}" y="${(yAt(v)+4).toFixed(1)}" text-anchor="end" fill="var(--text-dim2,#7b8693)" font-size="10" font-family="sans-serif">${v}%</text>`).join('')}
+          <path d="${areaPath}" fill="${fill}" stroke="none"/>
+          <polyline points="${poly}" fill="none" stroke="${stroke}" stroke-width="2"/>
+          ${valid.map((p, i) => `<circle cx="${xAt(i).toFixed(1)}" cy="${yAt(p.wr).toFixed(1)}" r="2.5" fill="${stroke}"><title>${p.date}: ${p.wr.toFixed(1)}% (${p.n} picks)</title></circle>`).join('')}
+          ${xTicks.map(t => `<text x="${t.x.toFixed(1)}" y="${(height - 6).toFixed(1)}" text-anchor="middle" fill="var(--text-dim2,#7b8693)" font-size="10" font-family="sans-serif">${t.label}</text>`).join('')}
+        </svg>
+      </div>`;
+  }
+
+  // CSV export with UTF-8 BOM so Excel/Numbers don't mangle accents.
+  function exportHistoriqueCsv(rows) {
+    if (!rows || !rows.length) return;
+    const header = ['date', 'sport', 'league', 'match', 'pick', 'cote', 'fiabilite_pct', 'resultat', 'delta_u'];
+    const csvRows = [header.join(',')];
+    const q = s => `"${String(s ?? '').replace(/"/g, '""')}"`;
+    rows.slice()
+      .sort((a, b) => new Date(a.m.date) - new Date(b.m.date))
+      .forEach(p => {
+        const fiab = Math.round((p.pred.reliability ?? p.pred.pick.prob) * 100);
+        const pickLbl = p.pred.pick.key === 'X' ? 'N' : p.pred.pick.key;
+        const delta = p.res === 'won' ? (p.odd - 1).toFixed(2) : '-1.00';
+        csvRows.push([
+          q(isoDate(p.m.date)),
+          q(p.m.sport || ''),
+          q(p.m.league || p.m.leagueShort || ''),
+          q(p.m.shortName || p.m.name || ''),
+          q(pickLbl),
+          q(p.odd.toFixed(2)),
+          q(fiab),
+          q(p.res === 'won' ? 'gagne' : 'perdu'),
+          q(delta),
+        ].join(','));
+      });
+    const csv = '\uFEFF' + csvRows.join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'historique-pronostics-' + isoDate(new Date()) + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
   // Aggregate bilan view: overall ROI, per-sport ROI, recent results, top completed picks
