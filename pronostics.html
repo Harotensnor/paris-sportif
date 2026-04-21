@@ -5311,17 +5311,17 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
   function computeCalibration() {
     const data = window.PRONOSTICS_DATA;
     if (!data || !data.days) return [];
-    // Bucket edges centred on the range we actually produce (45-95% — below that
-    // we rarely surface a pick). Using 7 buckets of 10 pts keeps sample sizes
-    // per bucket meaningful given the ~300-500 settled picks available.
+    // Bucket edges centrés sur la plage qu'on produit réellement (45-95%).
+    // Buckets larges (10pts) pour accumuler ≥5 matchs par bucket rapidement
+    // — le régime ultra-sélectif actuel (5-10 picks/j, skip <0.45) ne sort
+    // presque jamais de la zone 50-80%, donc 5 buckets bien peuplés valent
+    // mieux que 7 buckets à moitié vides qui tirent des bulles aberrantes.
     const buckets = [
-      { lo: 0.40, hi: 0.50, mid: 0.45, n: 0, w: 0 },
-      { lo: 0.50, hi: 0.55, mid: 0.525, n: 0, w: 0 },
-      { lo: 0.55, hi: 0.60, mid: 0.575, n: 0, w: 0 },
-      { lo: 0.60, hi: 0.65, mid: 0.625, n: 0, w: 0 },
-      { lo: 0.65, hi: 0.70, mid: 0.675, n: 0, w: 0 },
-      { lo: 0.70, hi: 0.80, mid: 0.75, n: 0, w: 0 },
-      { lo: 0.80, hi: 1.01, mid: 0.875, n: 0, w: 0 },
+      { lo: 0.40, hi: 0.55, mid: 0.475, n: 0, w: 0 },
+      { lo: 0.55, hi: 0.65, mid: 0.60,  n: 0, w: 0 },
+      { lo: 0.65, hi: 0.75, mid: 0.70,  n: 0, w: 0 },
+      { lo: 0.75, hi: 0.85, mid: 0.80,  n: 0, w: 0 },
+      { lo: 0.85, hi: 1.01, mid: 0.925, n: 0, w: 0 },
     ];
     const seen = new Set();
     Object.values(data.days).forEach(arr => (arr || []).forEach(m => {
@@ -5356,13 +5356,24 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
     if (!cal || !cal.length) {
       return `<div style="padding:14px;background:var(--surface);border:1px dashed var(--border);border-radius:10px;color:var(--text-muted);font-size:13px;">Pas encore assez de matchs joués pour tracer la calibration du modèle.</div>`;
     }
+    // Filtrer les buckets trop maigres (n<5) : avec 1-4 matchs, le WR observé
+    // rebondit entre 0% et 100% et pollue le diagramme avec des points aberrants
+    // qui ne disent rien sur la calibration. On les regroupe dans un compteur
+    // "buckets masqués" affiché en légende, sans les dessiner.
+    const MIN_N = 5;
+    const shown = cal.filter(c => c.n >= MIN_N);
+    const hidden = cal.filter(c => c.n < MIN_N);
+    const hiddenN = hidden.reduce((s, c) => s + c.n, 0);
+    if (!shown.length) {
+      return `<div style="padding:14px;background:var(--surface);border:1px dashed var(--border);border-radius:10px;color:var(--text-muted);font-size:13px;">Encore trop peu de matchs joués par bucket (min 5) pour tracer la calibration. ${cal.length} bucket(s) de &lt;5 matchs masqué(s) en attendant.</div>`;
+    }
     const w = 560, h = 260;
     const mL = 44, mR = 18, mT = 18, mB = 38;
     const pw = w - mL - mR, ph = h - mT - mB;
     // Both axes span 0.40 → 1.00 (the range we actually produce picks in)
     const xAt = p => mL + ((p - 0.40) / 0.60) * pw;
     const yAt = p => mT + ph - ((p - 0.40) / 0.60) * ph;
-    const maxN = Math.max(...cal.map(c => c.n));
+    const maxN = Math.max(...shown.map(c => c.n));
     const rAt = n => 5 + Math.sqrt(n / maxN) * 14;
     // Grid lines at every 10pts
     const ticks = [0.40, 0.50, 0.60, 0.70, 0.80, 0.90, 1.00];
@@ -5374,22 +5385,43 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
     const yLabels = ticks.map(t => `<text x="${(mL-6).toFixed(1)}" y="${(yAt(t)+4).toFixed(1)}" text-anchor="end" fill="var(--text-dim2,#7b8693)" font-size="10">${Math.round(t*100)}%</text>`).join('');
     // Perfect-calibration diagonal (predicted == actual)
     const diag = `<line x1="${xAt(0.40).toFixed(1)}" y1="${yAt(0.40).toFixed(1)}" x2="${xAt(1.00).toFixed(1)}" y2="${yAt(1.00).toFixed(1)}" stroke="rgba(255,255,255,.25)" stroke-dasharray="4 4"/>`;
-    // Scatter points
-    const points = cal.map(c => {
+    // Wilson 95% CI pour chaque bucket — visualise la marge d'erreur liée à
+    // la petite taille d'échantillon (sinon n=5 @ 100% WR paraît aussi certain
+    // que n=50 @ 80% WR, ce qui est trompeur).
+    const wilsonCI = (p, n) => {
+      if (n <= 0) return { lo: p, hi: p };
+      const z = 1.96;
+      const denom = 1 + (z*z)/n;
+      const centre = (p + (z*z)/(2*n)) / denom;
+      const margin = (z * Math.sqrt((p*(1-p)/n) + (z*z)/(4*n*n))) / denom;
+      return { lo: Math.max(0, centre - margin), hi: Math.min(1, centre + margin) };
+    };
+    // Scatter points + error bars
+    const points = shown.map(c => {
       const cx = xAt(c.predicted), cy = yAt(c.actual), r = rAt(c.n);
       const off = c.actual - c.predicted;
       const col = Math.abs(off) < 0.05 ? '#34d399' : Math.abs(off) < 0.10 ? '#eab308' : '#f87171';
-      return `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${r.toFixed(1)}" fill="${col}" fill-opacity=".25" stroke="${col}" stroke-width="2"><title>Prédit ${Math.round(c.predicted*100)}% · réel ${Math.round(c.actual*100)}% (${c.w ?? ''}${c.n} matchs · écart ${off>=0?'+':''}${Math.round(off*100)}pts)</title></circle>`;
+      const ci = wilsonCI(c.actual, c.n);
+      const yLo = yAt(Math.max(0.40, ci.lo)), yHi = yAt(Math.min(1.00, ci.hi));
+      // Vertical error bar only when CI is wide enough to mean something
+      const bar = (ci.hi - ci.lo) > 0.08
+        ? `<line x1="${cx.toFixed(1)}" y1="${yLo.toFixed(1)}" x2="${cx.toFixed(1)}" y2="${yHi.toFixed(1)}" stroke="${col}" stroke-opacity=".45" stroke-width="1.5"/>`
+        : '';
+      const w_won = c.w != null ? `${c.w}/` : '';
+      return `${bar}<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${r.toFixed(1)}" fill="${col}" fill-opacity=".25" stroke="${col}" stroke-width="2"><title>Prédit ${Math.round(c.predicted*100)}% · réel ${Math.round(c.actual*100)}% (${w_won}${c.n} matchs · écart ${off>=0?'+':''}${Math.round(off*100)}pts)</title></circle>`;
     }).join('');
-    // Summary: weighted mean absolute calibration error (MCE-style)
-    const totalN = cal.reduce((s, c) => s + c.n, 0);
-    const mae = cal.reduce((s, c) => s + Math.abs(c.actual - c.predicted) * c.n, 0) / totalN;
+    // Summary: weighted mean absolute calibration error (MCE-style), sur les buckets affichés
+    const totalN = shown.reduce((s, c) => s + c.n, 0);
+    const mae = shown.reduce((s, c) => s + Math.abs(c.actual - c.predicted) * c.n, 0) / totalN;
     const maeColor = mae < 0.05 ? '#34d399' : mae < 0.10 ? '#eab308' : '#f87171';
+    const hiddenNote = hidden.length
+      ? ` · <span style="color:var(--text-dim2,#7b8693);">${hidden.length} bucket${hidden.length>1?'s':''} masqué${hidden.length>1?'s':''} (&lt;${MIN_N} matchs, ${hiddenN} pick${hiddenN>1?'s':''})</span>`
+      : '';
     return `
       <div style="background:var(--surface,#111827);border:1px solid var(--border,#2a3744);border-radius:12px;padding:14px;margin-bottom:24px;">
         <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:8px;">
           <div style="font-size:13px;color:var(--text-dim,#b4bcc7);font-weight:600;">Diagramme de fiabilité · proba prédite vs taux observé</div>
-          <div style="font-size:12px;color:var(--text-muted);">Erreur absolue moyenne : <span style="color:${maeColor};font-weight:700;">${(mae*100).toFixed(1)}pts</span> · ${totalN} picks</div>
+          <div style="font-size:12px;color:var(--text-muted);">Erreur absolue moyenne : <span style="color:${maeColor};font-weight:700;">${(mae*100).toFixed(1)}pts</span> · ${totalN} picks${hiddenNote}</div>
         </div>
         <svg viewBox="0 0 ${w} ${h}" style="width:100%;height:auto;display:block;" xmlns="http://www.w3.org/2000/svg">
           ${gridLines}
@@ -5401,7 +5433,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
           ${points}
         </svg>
         <div style="font-size:11.5px;color:var(--text-muted);margin-top:6px;line-height:1.45;">
-          Un point sur la diagonale = modèle parfaitement calibré. Au-dessus = sous-confiance (on pourrait miser plus gros). En-dessous = sur-confiance (cap Kelly ½). Taille ∝ nombre de matchs.
+          Un point sur la diagonale = modèle parfaitement calibré. Au-dessus = sous-confiance du modèle (il gagne plus que ce qu'il prédit). En-dessous = sur-confiance (il gagne moins que ce qu'il prédit). Barre verticale = intervalle de confiance 95% (Wilson). Taille ∝ nombre de matchs. Buckets &lt;${MIN_N} matchs masqués.
         </div>
       </div>
     `;
