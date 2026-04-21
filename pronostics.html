@@ -2731,7 +2731,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
     // Pick
     const picks = hasDraw
       ? [['1 · ' + (home?.short || home?.abbr || home?.name), final.pH, '1', home?.name],
-         ['X · Match nul', final.pD, 'X', 'Match nul'],
+         ['N · Match nul', final.pD, 'X', 'Match nul'],
          ['2 · ' + (away?.short || away?.abbr || away?.name), final.pA, '2', away?.name]]
       : [['1 · ' + (home?.short || home?.abbr || home?.name), final.pH, '1', home?.name],
          ['2 · ' + (away?.short || away?.abbr || away?.name), final.pA, '2', away?.name]];
@@ -3245,10 +3245,16 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
     if (!formStr) return '';
     const chars = formStr.slice(-5).split('');
     const cls = big ? 'fm' : 'fm';
+    // Affichage français : V (Victoire), N (Nul), D (Défaite).
+    // On conserve les classes ESPN (W/D/T/L) côté CSS pour le code couleur, mais
+    // le texte affiché est traduit en fr. T (tie, NBA/NHL) et D (draw, foot) sont
+    // tous les deux des nuls → "N".
     const labels = { W: 'Victoire', L: 'Défaite', D: 'Match nul', T: 'Match nul' };
+    const displayMap = { W: 'V', L: 'D', D: 'N', T: 'N' };
     return `<div class="form" role="group" aria-label="Forme (5 derniers)">${chars.map(c => {
       const lbl = labels[c] || 'Résultat inconnu';
-      return `<div class="${cls} ${c}" role="img" aria-label="${lbl}" title="${lbl}">${c === 'T' ? 'D' : c}</div>`;
+      const disp = displayMap[c] || c;
+      return `<div class="${cls} ${c}" role="img" aria-label="${lbl}" title="${lbl}">${disp}</div>`;
     }).join('')}</div>`;
   }
 
@@ -4269,7 +4275,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
       if (pred.hasDraw) {
         oddsHtml = `<div class="odds-row three">
           <div class="odd ${isPick('1') ? 'pick' : ''} ${oH && oH < 2 ? 'fav' : ''}"><div class="lbl">1</div><div class="val">${fmt(oH)}</div></div>
-          <div class="odd ${isPick('X') ? 'pick' : ''}"><div class="lbl">X</div><div class="val">${fmt(oD)}</div></div>
+          <div class="odd ${isPick('X') ? 'pick' : ''}"><div class="lbl">N</div><div class="val">${fmt(oD)}</div></div>
           <div class="odd ${isPick('2') ? 'pick' : ''} ${oA && oA < 2 ? 'fav' : ''}"><div class="lbl">2</div><div class="val">${fmt(oA)}</div></div>
         </div>`;
       } else {
@@ -4518,7 +4524,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
           <tr>
             <th>Bookmaker</th>
             <th>1 (${esc(home?.abbr || 'Dom')})</th>
-            ${hasDraw ? '<th>X</th>' : ''}
+            ${hasDraw ? '<th>N</th>' : ''}
             <th>2 (${esc(away?.abbr || 'Ext')})</th>
             ${hasDraw ? '<th>Spread</th><th>O/U</th>' : '<th>Spread</th><th>Total</th>'}
           </tr>
@@ -6051,7 +6057,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
     };
     // Extra line for draws — surfaces the category user asked us to watch.
     const drawsCardHtml = drawsBucket.bets > 0
-      ? renderBucket('🤝 Match nul (X)', drawsBucket, '#60a5fa', 'foot uniquement')
+      ? renderBucket('🤝 Match nul (N)', drawsBucket, '#60a5fa', 'foot uniquement')
       : '';
     const bucketsHtml = `
       ${renderBucket('🔒 High', bucket.high, '#34d399', '≥ 65%')}
