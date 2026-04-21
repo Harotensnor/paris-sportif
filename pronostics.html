@@ -8,7 +8,7 @@
 <meta http-equiv="Expires" content="0">
 <meta name="theme-color" content="#0b0b10">
 <meta name="color-scheme" content="dark">
-<meta name="description" content="Dashboard de pronostics sportifs multi-sports avec modèle Poisson et détection de value.">
+<meta name="description" content="Dashboard de pronostics sportifs multi-sports classés par fiabilité (modèle Poisson + ELO + forme + H2H).">
 <title>Pronostics Sportifs — Football · Tennis · Basket</title>
 <style>
   :root {
@@ -1026,24 +1026,6 @@
   }
   aside.sidebar #bankroll-hint { font-size: 10.5px; color: var(--text-dim2); }
 
-  /* EV threshold slider (sidebar) */
-  #ev-threshold-bar {
-    display: grid; grid-template-columns: 1fr auto; align-items: center;
-    gap: 8px; padding: 8px 12px;
-    background: var(--panel-2); border-radius: 8px; border: 1px solid var(--border);
-  }
-  #ev-threshold-bar input[type="range"] {
-    width: 100%; accent-color: var(--brand);
-    background: transparent; cursor: pointer;
-  }
-  #ev-threshold-bar #ev-threshold-val {
-    font-weight: 700; font-size: 13px; color: var(--brand);
-    font-variant-numeric: tabular-nums; min-width: 36px; text-align: right;
-  }
-  #ev-threshold-bar #ev-threshold-hint {
-    grid-column: 1 / -1; font-size: 10.5px; color: var(--text-dim2);
-  }
-
   aside.sidebar .refresh-indicator { margin: 0; align-self: flex-start; }
   .sidebar-footer { margin-top: auto; display: flex; flex-direction: column; gap: 10px; }
 
@@ -1689,7 +1671,6 @@
     <nav class="page-nav" id="page-nav">
       <button class="page-btn active" data-page="simples">🎯 Simples</button>
       <button class="page-btn" data-page="combines">🔗 Combinés</button>
-      <button class="page-btn" data-page="value">💎 Value Finder</button>
       <button class="page-btn" data-page="bilan">📊 Bilan</button>
     </nav>
   </div>
@@ -1709,15 +1690,6 @@
   </div>
 
   <div class="sidebar-footer">
-    <div>
-      <div class="sidebar-section-title">Seuil edge (value)</div>
-      <div id="ev-threshold-bar">
-        <input id="ev-threshold-input" type="range" min="1" max="15" step="1" value="5" aria-label="Seuil edge">
-        <span id="ev-threshold-val">5%</span>
-        <span id="ev-threshold-hint">Edge min. pour badger « Value »</span>
-      </div>
-    </div>
-
     <div id="refresh-indicator" class="refresh-indicator" aria-live="polite">
       <span class="rfr-dot"></span>
       <span class="rfr-txt">Auto-refresh · 60s</span>
@@ -1842,13 +1814,6 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
   let bankroll = (() => {
     const v = parseFloat(localStorage.getItem('bankroll'));
     return isFinite(v) && v > 0 ? v : 100;
-  })();
-  // EV threshold for "value" detection: min edge (model prob - market implied)
-  // above which we flag a pick as value. Default 5% — matches prior hard-code.
-  // Adjustable via a slider in the sidebar settings. Clamped 1–20%.
-  let evThreshold = (() => {
-    const v = parseFloat(localStorage.getItem('evThreshold'));
-    return isFinite(v) && v >= 0.01 && v <= 0.20 ? v : 0.05;
   })();
   // Clamp to a reasonable range. Returns a sanitized float or null if the input
   // is clearly broken (0, negative, NaN, absurdly large). Applies an `invalid`
@@ -2706,28 +2671,6 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
     picks.sort((a,b) => b[1] - a[1]);
     const best_pick = picks[0];
 
-    // Value detection
-    let valueLabel = null, valueEdge = null, valueOdd = null;
-    if (best) {
-      const impl = [
-        { lbl: '1', p: impliedProb(best.home), dec: best.home, model: final.pH },
-        hasDraw ? { lbl: 'X', p: impliedProb(best.draw), dec: best.draw, model: final.pD } : null,
-        { lbl: '2', p: impliedProb(best.away), dec: best.away, model: final.pA },
-      ].filter(Boolean);
-      let bestEdge = 0;
-      impl.forEach(x => {
-        if (x.p && x.model && x.dec) {
-          const edge = x.model - x.p;
-          if (edge > bestEdge && edge > evThreshold) {
-            bestEdge = edge;
-            valueLabel = x.lbl;
-            valueEdge = edge;
-            valueOdd = x.dec;
-          }
-        }
-      });
-    }
-
     // ===== Explanation builder — for each pick, a short list of the
     // reasons the model leaned this way. Surfaced in the UI so Théo
     // understands the "why" of every prono.
@@ -2937,15 +2880,6 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
         });
       }
     }
-    // Value edge explanation
-    if (valueLabel && valueEdge) {
-      reasons.push({
-        type: 'value',
-        icon: '💎',
-        text: `Edge ${(valueEdge*100).toFixed(1)}% — le marché sous-cote ce pari`
-      });
-    }
-
     // ======= Reliability (multi-source meta-confidence) =======
     // The raw pickProb (best_pick[1]) is our best probability estimate and
     // remains authoritative for EV math. But for the UI "fiabilité" gauge
@@ -3004,20 +2938,15 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
     else if (conf >= 0.60) headline = `Bon pari — fiabilité ${(conf*100).toFixed(0)}%`;
     else if (conf >= 0.50) headline = `Pari jouable — fiabilité ${(conf*100).toFixed(0)}%`;
     else headline = `Incertain — fiabilité ${(conf*100).toFixed(0)}%, préférer un autre match`;
-    if (valueLabel) {
-      headline += ` · Edge +${(valueEdge*100).toFixed(1)}% sur la cote ${valueOdd.toFixed(2)}`;
-    }
 
     return {
       probs: final,
       pick: { label: best_pick[0], prob: best_pick[1], key: best_pick[2], team: best_pick[3] },
       // Reliability = meta-confidence (consensus × richness × pickProb).
-      // Used by UI gauges and tier bucketing. pickProb remains authoritative
-      // for EV / Kelly / value detection math.
+      // Used by UI gauges and tier bucketing.
       reliability,
       reliabilityMeta,
       odds: best,
-      value: valueLabel ? { lbl: valueLabel, edge: valueEdge, odd: valueOdd } : null,
       hasDraw,
       isLock: reliability >= 0.72,
       // Thresholds tuned against the completed-match bilan (2026-04-20):
@@ -3188,7 +3117,6 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
       if (advFilters.oddMin > 0 && o < advFilters.oddMin) return false;
       if (advFilters.oddMax > 0 && o > advFilters.oddMax) return false;
     }
-    if (filter === 'value') return !!pred?.value;
     if (filter === 'lock') return !!pred?.isLock;
     if (filter === 'live') return m.status === 'STATUS_IN_PROGRESS';
     if (filter === 'upcoming') {
@@ -3341,7 +3269,6 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
 
     el.innerHTML = leagues.map(([key, group]) => {
       const liveCount = group.filter(m => m.status === 'STATUS_IN_PROGRESS').length;
-      const valueCount = group.filter(m => predictMatch(m)?.value).length;
       return `
         <div class="league-block">
           <div class="league-header">
@@ -3349,7 +3276,6 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
             <div class="country">${esc(group[0].league_country || '')}</div>
             <div class="stats">
               ${liveCount ? `<span class="pill" style="color:var(--danger);">🔴 ${liveCount} live</span>` : ''}
-              ${valueCount ? `<span class="pill accent">💎 ${valueCount} value</span>` : ''}
               <span class="pill">${group.length} match${group.length > 1 ? 's' : ''}</span>
             </div>
           </div>
@@ -3374,11 +3300,10 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
   function renderSummary(all, sportEvents, visible) {
     const data = window.PRONOSTICS_DATA;
     // Single pass — avoids 3 separate .filter() walks.
-    let liveAll = 0, valueAll = 0, lockAll = 0;
+    let liveAll = 0, lockAll = 0;
     for (const m of all) {
       if (m.status === 'STATUS_IN_PROGRESS') liveAll++;
       const p = predictMatch(m);
-      if (p?.value) valueAll++;
       if (p?.isLock) lockAll++;
     }
     const gen = data?.generated_at ? new Date(data.generated_at).toLocaleDateString('fr-FR', { day:'numeric', month:'short', hour: '2-digit', minute: '2-digit'}) : '—';
@@ -3388,8 +3313,8 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
     //   1. "Bilan modèle"  — every pick where we had real odds (excludes `skip` = <42% confidence,
     //      no meaningful signal, and excludes matches where predictMatch fell back to the flat
     //      prior because no odds were ever captured)
-    //   2. "Bilan top picks" — only the high-conviction picks (either `isLock` or a `value` flag
-    //      with EV >2%), i.e. what Théo would actually bet on Winamax
+    //   2. "Bilan top picks" — only the high-conviction picks (isLock, fiabilité ≥ 72%),
+    //      i.e. what Théo would actually bet on Winamax
     let won = 0, lost = 0;                 // all recommended picks
     let wonWithOdds = 0, lostWithOdds = 0, stakeUnits = 0, returnUnits = 0;
     let topWon = 0, topLost = 0, topStake = 0, topReturn = 0;
@@ -3408,8 +3333,8 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
           stakeUnits += 1;
           if (r === 'won') { wonWithOdds++; returnUnits += pickOdd; }
           else { lostWithOdds++; }
-          // Top picks: lock or a clear value edge (EV > 2%)
-          const isTop = p.isLock || (p.value && p.value.edge != null && (p.pick.prob * pickOdd - 1) > 0.02);
+          // Top picks: lock (fiabilité ≥ 72%) — pure model confidence
+          const isTop = !!p.isLock;
           if (isTop) {
             topStake += 1;
             if (r === 'won') { topWon++; topReturn += pickOdd; }
@@ -3456,7 +3381,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
           <span style="color:var(--text-dim); font-size:14px;">/</span>
           <span style="color:#fca5a5;">${topLost}</span>
         </div>
-        <div class="sub">${topWinRate.toFixed(0)}% réussite · ROI ${topRoiSign}${topRoi.toFixed(1)}% · lock+value uniquement</div>
+        <div class="sub">${topWinRate.toFixed(0)}% réussite · ROI ${topRoiSign}${topRoi.toFixed(1)}% · locks uniquement (fiab. ≥ 72%)</div>
       </div>` : ''}
       ${total > 0 ? `
       <div class="summary-card ${winRate >= 50 ? 'primary' : 'danger'}">
@@ -3478,15 +3403,10 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
         </div>
         <div class="sub">${tipWinRate.toFixed(0)}% réussite · ROI ${tipRoiSign}${tipRoi.toFixed(1)}%</div>
       </div>` : ''}
-      <div class="summary-card primary">
-        <div class="lbl">💎 Value bets</div>
-        <div class="val">${valueAll}</div>
-        <div class="sub">opportunités avec edge positif</div>
-      </div>
       <div class="summary-card warn">
         <div class="lbl">🔒 Pronos forts</div>
         <div class="val">${lockAll}</div>
-        <div class="sub">confiance ≥ 72%</div>
+        <div class="sub">fiabilité ≥ 72%</div>
       </div>
       <div class="summary-card danger">
         <div class="lbl">🔴 En direct</div>
@@ -3540,13 +3460,12 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
     // Single-pass tally — avoids 13 sequential .filter() walks on `pool`.
     // predictMatch is cached but we still save the function-call overhead.
     const counts = {
-      all: pool.length, value: 0, lock: 0, live: 0, upcoming: 0,
+      all: pool.length, lock: 0, live: 0, upcoming: 0,
       next2h: 0, tonight: 0, tomorrow: 0, tipsters: 0,
       results: 0, won: 0, lost: 0,
     };
     for (const m of pool) {
       const pred = predictMatch(m);
-      if (pred?.value) counts.value++;
       if (pred?.isLock) counts.lock++;
       if (m.status === 'STATUS_IN_PROGRESS') counts.live++;
       if (isUpcoming(m)) counts.upcoming++;
@@ -3568,7 +3487,6 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
       ${counts.tonight ? `<button class="filter-btn ${activeFilter==='tonight'?'active':''}" data-filter="tonight" title="Kickoff ce soir à partir de 18h (Paris)">🌙 Ce soir <span class="count">${counts.tonight}</span></button>` : ''}
       ${counts.tomorrow ? `<button class="filter-btn ${activeFilter==='tomorrow'?'active':''}" data-filter="tomorrow" title="Kickoff demain (Paris)">📅 Demain <span class="count">${counts.tomorrow}</span></button>` : ''}
       <button class="filter-btn ${activeFilter==='live'?'active':''}" data-filter="live">🔴 En direct <span class="count">${counts.live}</span></button>
-      <button class="filter-btn ${activeFilter==='value'?'active':''}" data-filter="value">💎 Value bets <span class="count">${counts.value}</span></button>
       <button class="filter-btn ${activeFilter==='lock'?'active':''}" data-filter="lock">🔒 Pronos forts <span class="count">${counts.lock}</span></button>
       ${counts.tipsters ? `<button class="filter-btn ${activeFilter==='tipsters'?'active':''}" data-filter="tipsters">👥 Avec tipster <span class="count">${counts.tipsters}</span></button>` : ''}
       ${counts.results ? `<button class="filter-btn ${activeFilter==='won'?'active':''}" data-filter="won">✓ Gagnés <span class="count">${counts.won}</span></button>` : ''}
@@ -3689,36 +3607,30 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
     const pool = todayPool;
 
     // ===== Ranking — fiabilité × cote =====
-    // EV = proba_modèle × cote − 1   (espérance par euro misé)
-    // Score final = EV × confiance^0.5 + time-bonus pour matchs imminents
-    // -> privilégie la value MAIS ne pas récompenser une cote délirante à 20%
+    // Ranking pur-modèle : fiabilité uniquement (cote exclue du classement).
+    // La cote reste affichée à l'utilisateur mais n'influence pas la sélection.
+    // Time-bonus léger pour les matchs imminents (actionnables tout de suite).
     const scored = pool
       .map(x => {
-        const p = x.pred.pick.prob;
-        const ev = p * x.pickOdd - 1;                  // expected value per €
-        const reliabilityWeight = Math.pow(p, 0.5);    // 0.7→0.84, 0.55→0.74, 0.5→0.71
-        // Time bonus: imminent matches slightly preferred (actionable now)
-        const timeBonus = x.startIn < 60 ? 0.05 : x.startIn < 360 ? 0.05 * (1 - (x.startIn - 60) / 300) : 0;
-        const score = ev * reliabilityWeight + timeBonus;
-        return { ...x, ev, score };
+        const rel = x.pred.reliability ?? x.pred.pick.prob;
+        const timeBonus = x.startIn < 60 ? 0.02 : x.startIn < 360 ? 0.02 * (1 - (x.startIn - 60) / 300) : 0;
+        const score = rel + timeBonus;
+        return { ...x, score };
       })
       .sort((a, b) => b.score - a.score);
 
-    // Only keep picks with positive EV for the Top 5
-    const top5 = scored.filter(x => x.ev > 0.02).slice(0, 5);
-    const others = scored.filter(x => !top5.includes(x)).slice(0, 7);
+    // Ne garder que les picks fiables (≥ lowConf threshold) — exclus les coinflips.
+    const top5 = scored.filter(x => !x.pred.lowConf && !x.pred.skip).slice(0, 5);
+    const others = scored.filter(x => !top5.includes(x) && !x.pred.skip).slice(0, 7);
 
-    // Tomorrow's picks — same EV > 0.02 gate, top 5 kept for a dedicated
-    // "Prochains pronos" section.
+    // Tomorrow's picks — même gate fiabilité.
     const futureScored = futurePool
       .map(x => {
-        const p = x.pred.pick.prob;
-        const ev = p * x.pickOdd - 1;
-        const score = ev * Math.pow(p, 0.5);
-        return { ...x, ev, score };
+        const rel = x.pred.reliability ?? x.pred.pick.prob;
+        return { ...x, score: rel };
       })
       .sort((a, b) => b.score - a.score);
-    const futureTop = futureScored.filter(x => x.ev > 0.02).slice(0, 5);
+    const futureTop = futureScored.filter(x => !x.pred.lowConf && !x.pred.skip).slice(0, 5);
 
     const wrap = document.getElementById('top-picks-wrap');
     if (!top5.length && !others.length && !futureTop.length) {
@@ -3735,8 +3647,6 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
       const { m, pred, startIn, pickOdd } = x;
       const { home, away } = getSides(m);
       const tIn = fmtIn(startIn);
-      const evPct = (x.ev * 100).toFixed(1);
-      const kelly = kellyStake(pred.pick.prob, pickOdd, bankroll, 0.5);
       const myBet = getMyBet(m.id, pred.pick.key);
       const lm = lineMovement(m, pred.pick.key);
       const reasons = pred.explain?.reasons || [];
@@ -3751,7 +3661,6 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
             <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
               <span class="hero-rank">🏆 #1 Top Pick</span>
               <span class="hero-league">${esc(m.league_name || '')}</span>
-              ${pred.value ? `<span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;background:rgba(245,158,11,.18);color:#f59e0b;letter-spacing:.4px;text-transform:uppercase;">💎 Value</span>` : ''}
               ${pred.isLock ? `<span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;background:rgba(234,179,8,.18);color:#eab308;letter-spacing:.4px;text-transform:uppercase;">🔒 Lock</span>` : ''}
             </div>
             <div class="hero-time">${esc(fmtTime(m.date))} · ${esc(tIn)}</div>
@@ -3775,10 +3684,6 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
             <div class="hero-stat brand">
               <div class="label">Fiabilité · ${confLabel(pred.reliability ?? pred.pick.prob).lbl}</div>
               <div class="val">${((pred.reliability ?? pred.pick.prob)*100).toFixed(0)}%</div>
-            </div>
-            <div class="hero-stat accent">
-              <div class="label">EV</div>
-              <div class="val">+${evPct}%</div>
             </div>
           </div>
 
@@ -3816,7 +3721,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
       const { m, pred, startIn, pickOdd } = x;
       const { home, away } = getSides(m);
       const tIn = fmtIn(startIn);
-      const evPct = (x.ev * 100).toFixed(1);
+      const rel = Math.round((pred.reliability ?? pred.pick.prob) * 100);
       // Note justifiant le pick — la plus signifiante (première = ordre
       // implicite du model : market, form, H2H…). Garde 1 seule ligne pour
       // ne pas casser le grid 2×2 mini.
@@ -3837,8 +3742,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
             <div class="mini-pick-label">🎯 ${esc(pred.pick.label)}</div>
             <div class="mini-pick-stats">
               <span class="mini-stat odd">${pickOdd.toFixed(2)}</span>
-              <span class="mini-stat">${(pred.pick.prob*100).toFixed(0)}%</span>
-              <span class="mini-stat ev">+${evPct}%</span>
+              <span class="mini-stat">Fiab. ${rel}%</span>
             </div>
           </div>
           ${topReason ? `<div class="mini-note" title="${esc(topReason.text)}"><span>${topReason.icon}</span><span>${esc(topReason.text)}</span></div>` : ''}
@@ -3863,10 +3767,10 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
           <div class="tp-teams">${esc(home?.short || home?.name || '?')} <span style="color:var(--text-dim);">vs</span> ${esc(away?.short || away?.name || '?')}</div>
           <div class="tp-pick">
             <div class="tp-pick-label">
-              ${pred.value ? `<span class="tp-badge">VALUE</span>` : (pred.isLock ? `<span class="tp-badge" style="background:var(--warn);color:#0a0e17;">LOCK</span>` : '')}
+              ${pred.isLock ? `<span class="tp-badge" style="background:var(--warn);color:#0a0e17;">LOCK</span>` : ''}
               🎯 ${esc(pred.pick.label)}
             </div>
-            <div class="tp-pick-conf">${(pred.pick.prob*100).toFixed(0)}% · <span style="color:var(--accent);">@${pickOdd.toFixed(2)}</span>${x.ev > 0 ? ` · <span style="color:#10b981;">EV +${(x.ev*100).toFixed(1)}%</span>` : ''}</div>
+            <div class="tp-pick-conf">Fiabilité ${((pred.reliability ?? pred.pick.prob)*100).toFixed(0)}% · <span style="color:var(--accent);">@${pickOdd.toFixed(2)}</span></div>
           </div>
           ${topReason ? `<div class="tp-note" title="${esc(topReason.text)}"><span>${topReason.icon}</span><span>${esc(topReason.text)}</span></div>` : ''}
         </div>
@@ -3893,8 +3797,8 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
     wrap.innerHTML = `
       ${top5.length ? `
         <div class="section-header top-picks">
-          <h2><span class="ico">🏆</span>Top 5 pronos du jour <span style="font-size:12px;color:var(--text-dim2,#7b8693);font-weight:500;letter-spacing:0;">· classés par EV × fiabilité</span></h2>
-          <div class="hint">Classement combiné : proba modèle × cote Winamax. Les matchs joués glissent en dehors automatiquement.</div>
+          <h2><span class="ico">🏆</span>Top 5 pronos du jour <span style="font-size:12px;color:var(--text-dim2,#7b8693);font-weight:500;letter-spacing:0;">· classés par fiabilité</span></h2>
+          <div class="hint">Classement pur-modèle : fiabilité (consensus multi-sources). Les matchs joués glissent en dehors automatiquement.</div>
         </div>
         <div class="top-hero-wrap">
           ${renderHeroPick(top5[0])}
@@ -3908,7 +3812,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
       ${others.length ? `
         <div class="section-header top-picks" style="margin-top:18px;">
           <h2><span class="ico">⭐</span>Autres pronos du jour</h2>
-          <div class="hint">Pronostics value mais moins prioritaires que le top 5</div>
+          <div class="hint">Pronostics fiables mais moins prioritaires que le top 5</div>
         </div>
         <div class="top-picks-grid">
           ${others.map(renderOther).join('')}
@@ -3917,13 +3821,13 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
       ${!top5.length && !others.length ? `
         <div class="section-header top-picks">
           <h2><span class="ico">⭐</span>Top pronostics du jour</h2>
-          <div class="hint">Pas (ou plus) de value bet sur les matchs d'aujourd'hui. ${futureTop.length ? 'Voici les prochains ci-dessous :' : 'Les prochains apparaîtront ici dès qu\'ils arrivent.'}</div>
+          <div class="hint">Aucun prono fiable aujourd'hui. ${futureTop.length ? 'Voici les prochains ci-dessous :' : 'Les prochains apparaîtront ici dès qu\'ils arrivent.'}</div>
         </div>
       ` : ''}
       ${futureTop.length ? `
         <div class="section-header top-picks" style="margin-top:18px;">
           <h2><span class="ico">🌅</span>${esc(futureLabel)}</h2>
-          <div class="hint">Pronostics value pour la journée suivante — anticipation</div>
+          <div class="hint">Pronostics fiables pour la journée suivante — anticipation</div>
         </div>
         <div class="top-picks-grid">
           ${futureTop.map(renderOther).join('')}
@@ -4007,7 +3911,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
     const maxMinutes = opts.maxMinutes ?? -1;           // cap on kickoff time
     const safeTarget = opts.safeTarget ?? 3;
     const balancedTarget = opts.balancedTarget ?? 4;
-    const valueTarget = opts.valueTarget ?? 3;
+    const boldTarget = opts.boldTarget ?? 3;
 
     const now = Date.now();
     // Enrich with prediction, odds, time-to-kickoff
@@ -4018,7 +3922,8 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
         const odd = pickOddFor(pred);
         const d = m.date ? new Date(m.date) : null;
         const startIn = d && !isNaN(d) ? Math.round((d.getTime() - now) / 60000) : null;
-        return { m, pred, odd, startIn };
+        const rel = pred ? (pred.reliability ?? pred.pick?.prob) : null;
+        return { m, pred, odd, startIn, rel };
       })
       .filter(x => x.pred && x.pred.pick && x.odd && !x.pred.skip)
       // Skip anything already started (odds no longer bookable on Winamax
@@ -4026,29 +3931,31 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
       .filter(x => x.startIn !== null && x.startIn >= minMinutes && (maxMinutes < 0 || x.startIn <= maxMinutes));
 
     const safe = pool
-      .filter(x => x.pred.pick.prob >= 0.68 && x.odd >= 1.20 && x.odd <= 2.10)
-      .sort((a, b) => b.pred.pick.prob - a.pred.pick.prob)
+      .filter(x => x.rel >= 0.68 && x.odd >= 1.20 && x.odd <= 2.10)
+      .sort((a, b) => b.rel - a.rel)
       .slice(0, safeTarget);
 
     const balanced = pool
-      .filter(x => x.pred.pick.prob >= 0.55 && x.pred.pick.prob < 0.72 && x.odd >= 1.55 && x.odd <= 3.20)
+      .filter(x => x.rel >= 0.55 && x.rel < 0.72 && x.odd >= 1.55 && x.odd <= 3.20)
       .filter(x => !safe.find(s => s.m.id === x.m.id))
-      .sort((a, b) => (b.pred.pick.prob * 0.6 + (b.pred.value?.edge || 0) * 0.4) - (a.pred.pick.prob * 0.6 + (a.pred.value?.edge || 0) * 0.4))
+      .sort((a, b) => b.rel - a.rel)
       .slice(0, balancedTarget);
 
-    const value = pool
-      .filter(x => x.pred.value && x.pred.value.edge >= 0.05)
+    // "Audacieux" = picks fiables sur cotes plus hautes (fiab ≥ 55%, cote ≥ 2.2).
+    // Remplace l'ancien combiné "value" — toujours basé sur la fiabilité pure.
+    const bold = pool
+      .filter(x => x.rel >= 0.55 && x.odd >= 2.20 && x.odd <= 4.50)
       .filter(x => !safe.find(s => s.m.id === x.m.id) && !balanced.find(s => s.m.id === x.m.id))
-      .sort((a, b) => (b.pred.value.edge) - (a.pred.value.edge))
-      .slice(0, valueTarget);
+      .sort((a, b) => b.rel - a.rel)
+      .slice(0, boldTarget);
 
     // Sort each combiné's legs by kickoff time (earliest first)
-    [safe, balanced, value].forEach(arr => arr.sort((a, b) => a.startIn - b.startIn));
+    [safe, balanced, bold].forEach(arr => arr.sort((a, b) => a.startIn - b.startIn));
 
     const combines = [];
     if (safe.length >= 2) combines.push({ type: 'safe', title: '🛡️ Sécurisé', desc: 'Pronostics fiables (haute conf.)', legs: safe });
     if (balanced.length >= 3) combines.push({ type: 'balanced', title: '⚖️ Équilibré', desc: 'Bon rapport risque/gain', legs: balanced });
-    if (value.length >= 2) combines.push({ type: 'value', title: '💎 Value', desc: 'Pronostics sous-cotés (edge +5%)', legs: value });
+    if (bold.length >= 2) combines.push({ type: 'bold', title: '🎯 Audacieux', desc: 'Fiabilité correcte sur cotes plus hautes', legs: bold });
 
     return combines.map(c => {
       const totalOdd = c.legs.reduce((acc, l) => acc * l.odd, 1);
@@ -4241,7 +4148,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
     const statusText = isLive ? (m.detail || 'Live') : (isFinal ? (m.detail || 'Terminé') : fmtTime(m.date));
     const statusCls = isLive ? 'live' : (isFinal ? 'final' : '');
     const modelResult = evaluateModelPick(m, pred);
-    const cardCls = `match ${isLive ? 'live' : ''} ${isFinal ? 'final' : ''} ${pred?.value ? 'value' : ''} ${modelResult ? 'model-' + modelResult : ''}`;
+    const cardCls = `match ${isLive ? 'live' : ''} ${isFinal ? 'final' : ''} ${modelResult ? 'model-' + modelResult : ''}`;
 
     const recH = getRecord(home);
     const recA = getRecord(away);
@@ -4256,17 +4163,17 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
     if (pred?.odds && (pred.odds.home || pred.odds.away)) {
       const { home: oH, draw: oD, away: oA } = pred.odds;
       const fmt = (n) => n != null ? n.toFixed(2) : '—';
-      const isValue = (lbl) => pred.value?.lbl === lbl;
+      const isPick = (lbl) => pred.pick?.key === lbl;
       if (pred.hasDraw) {
         oddsHtml = `<div class="odds-row three">
-          <div class="odd ${isValue('1') ? 'value' : ''} ${oH && oH < 2 ? 'fav' : ''}"><div class="lbl">1</div><div class="val">${fmt(oH)}</div></div>
-          <div class="odd ${isValue('X') ? 'value' : ''}"><div class="lbl">X</div><div class="val">${fmt(oD)}</div></div>
-          <div class="odd ${isValue('2') ? 'value' : ''} ${oA && oA < 2 ? 'fav' : ''}"><div class="lbl">2</div><div class="val">${fmt(oA)}</div></div>
+          <div class="odd ${isPick('1') ? 'pick' : ''} ${oH && oH < 2 ? 'fav' : ''}"><div class="lbl">1</div><div class="val">${fmt(oH)}</div></div>
+          <div class="odd ${isPick('X') ? 'pick' : ''}"><div class="lbl">X</div><div class="val">${fmt(oD)}</div></div>
+          <div class="odd ${isPick('2') ? 'pick' : ''} ${oA && oA < 2 ? 'fav' : ''}"><div class="lbl">2</div><div class="val">${fmt(oA)}</div></div>
         </div>`;
       } else {
         oddsHtml = `<div class="odds-row two">
-          <div class="odd ${isValue('1') ? 'value' : ''} ${oH && oH < 2 ? 'fav' : ''}"><div class="lbl">1 ${esc(home?.abbr || '')}</div><div class="val">${fmt(oH)}</div></div>
-          <div class="odd ${isValue('2') ? 'value' : ''} ${oA && oA < 2 ? 'fav' : ''}"><div class="lbl">2 ${esc(away?.abbr || '')}</div><div class="val">${fmt(oA)}</div></div>
+          <div class="odd ${isPick('1') ? 'pick' : ''} ${oH && oH < 2 ? 'fav' : ''}"><div class="lbl">1 ${esc(home?.abbr || '')}</div><div class="val">${fmt(oH)}</div></div>
+          <div class="odd ${isPick('2') ? 'pick' : ''} ${oA && oA < 2 ? 'fav' : ''}"><div class="lbl">2 ${esc(away?.abbr || '')}</div><div class="val">${fmt(oA)}</div></div>
         </div>`;
       }
     }
@@ -4274,7 +4181,6 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
     // Badges
     const badges = [];
     if (isLive) badges.push(`<span class="badge live">🔴 LIVE</span>`);
-    if (pred?.value) badges.push(`<span class="badge value">💎 Value +${(pred.value.edge*100).toFixed(0)}%</span>`);
     if (pred?.isLock && !isFinal) badges.push(`<span class="badge lock">🔒 Lock</span>`);
     if (pred?.skip && !isFinal && !isLive) badges.push(`<span class="badge neutral" style="background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.35);color:#fca5a5;">⚠️ Prono faible</span>`);
     if ((m.league_priority || 0) >= 5) badges.push(`<span class="badge big">⭐ Top match</span>`);
@@ -4580,7 +4486,6 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
       ${pred ? (() => {
         const modelRes = evaluateModelPick(match, pred);
         const pickOdd = pred.odds ? (pred.pick.key === '1' ? pred.odds.home : pred.pick.key === '2' ? pred.odds.away : pred.odds.draw) : null;
-        const ev = (pickOdd && pred.pick.prob) ? (pred.pick.prob * pickOdd - 1) : null;
         const reasons = pred.explain?.reasons || [];
         return `
         <div class="section">
@@ -4588,14 +4493,12 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
             <h4>🎯 Notre pronostic ${modelRes ? resultBadgeHtml(modelRes, modelRes === 'won' && pred.odds ? pickOdd : null) : ''}</h4>
             <div class="big-tip" style="${modelRes === 'lost' ? 'text-decoration:line-through; opacity:.7;' : ''}">${esc(pred.pick.label)}</div>
             <div class="big-conf">
-              <b>${(pred.pick.prob*100).toFixed(0)}%</b> de probabilité · fiabilité <b>${((pred.reliability ?? pred.pick.prob)*100).toFixed(0)}%</b> ${confLabel(pred.reliability ?? pred.pick.prob).lbl}
-              ${pred.value ? ` · <span style="color:var(--accent);">💎 VALUE +${(pred.value.edge*100).toFixed(1)}% d'edge</span>` : ''}
+              Fiabilité <b>${((pred.reliability ?? pred.pick.prob)*100).toFixed(0)}%</b> ${confLabel(pred.reliability ?? pred.pick.prob).lbl}
               ${pred.isLock ? ` · <span class="badge lock">🔒 LOCK</span>` : ''}
             </div>
             ${pickOdd ? `<div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;font-size:13px;">
               <span style="padding:4px 10px;border-radius:6px;background:rgba(16,185,129,.12);color:#10b981;font-weight:700;">Cote @ ${pickOdd.toFixed(2)}</span>
-              ${ev!=null ? `<span style="padding:4px 10px;border-radius:6px;background:${ev>0?'rgba(16,185,129,.12)':'rgba(239,68,68,.12)'};color:${ev>0?'#10b981':'#fca5a5'};font-weight:700;">EV ${ev>=0?'+':''}${(ev*100).toFixed(1)}%</span>` : ''}
-              ${pickOdd ? `<span style="padding:4px 10px;border-radius:6px;background:rgba(255,255,255,.05);color:var(--text-dim,#b4bcc7);">Gain 10€ → ${((pickOdd-1)*10).toFixed(2)}€</span>` : ''}
+              <span style="padding:4px 10px;border-radius:6px;background:rgba(255,255,255,.05);color:var(--text-dim,#b4bcc7);">Gain 10€ → ${((pickOdd-1)*10).toFixed(2)}€</span>
             </div>` : ''}
             ${pred.explain?.headline ? `<div style="margin-top:14px;padding:12px 14px;background:rgba(255,255,255,.03);border-radius:8px;border-left:3px solid var(--accent,#10b981);font-size:13.5px;line-height:1.5;color:var(--text,#e6ebf2);">${esc(pred.explain.headline)}</div>` : ''}
             ${reasons.length ? `
@@ -5158,173 +5061,18 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
     updateFreshness();
   }
 
-  // ======= Value Finder =======
-  // Dedicated page that lists every +EV pick across all sports/leagues,
-  // sorted by expected value. Complements the Top 5 on the Simples page
-  // (which caps at 5 and is "fiabilité × cote"-ranked) by surfacing the
-  // full EV tail — including longer-odds picks the Top 5 can't show.
-  //
-  // Filters persisted in localStorage:
-  //   vf.sport:   'all' | 'football' | 'basketball' | 'hockey' | 'tennis'
-  //   vf.minEV:   2 | 5 | 10  (percent)
-  //   vf.minRel:  45 | 55 | 65  (reliability percent threshold)
-  //   vf.horizon: 'today' | '24h' | '48h'
-  const VF_KEYS = { sport: 'vf.sport', minEV: 'vf.minEV', minRel: 'vf.minRel', horizon: 'vf.horizon' };
-  function vfGet(key, dflt) {
-    try { const v = localStorage.getItem(key); return v != null ? v : dflt; }
-    catch (e) { return dflt; }
-  }
-  function vfSet(key, v) { try { localStorage.setItem(key, String(v)); } catch (e) {} }
-
+  // ======= Value Finder (retiré Chantier E) =======
+  // La page Value Finder a été retirée : on ne calcule plus ni EV ni edge.
+  // Le stub reste pour que les anciens bookmarks /?page=value retombent
+  // sur la page Simples sans casser l'app.
   function renderValueFinder(wrap) {
-    const data = window.PRONOSTICS_DATA;
-    const now = Date.now();
-    const sportFilter = vfGet(VF_KEYS.sport, 'all');
-    const minEV = Number(vfGet(VF_KEYS.minEV, '2')) / 100;
-    const minRel = Number(vfGet(VF_KEYS.minRel, '45')) / 100;
-    const horizon = vfGet(VF_KEYS.horizon, 'today');
-    const horizonMin = horizon === 'today' ? 60 * 18 : horizon === '24h' ? 60 * 24 : 60 * 48;
-
-    // Build the pool across all days/sports, respecting the Winamax toggle.
-    const rows = [];
-    const seen = new Set();
-    const todayParis = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
-    Object.values((data && data.days) || {}).forEach(arr => (arr || []).forEach(m => {
-      if (!m || !m.id || seen.has(m.id)) return;
-      seen.add(m.id);
-      if (m.completed || m.status === 'STATUS_IN_PROGRESS') return;
-      if (winamaxOnly && !(m.winamax && m.winamax.available === true)) return;
-      if (sportFilter !== 'all' && m.sport !== sportFilter) return;
-      if (!m.date) return;
-      const d = new Date(m.date);
-      if (isNaN(d)) return;
-      const startIn = Math.round((d.getTime() - now) / 60000);
-      if (startIn < 0) return;
-      if (horizon === 'today') {
-        try {
-          if (d.toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' }) !== todayParis) return;
-        } catch (e) { return; }
-      } else if (startIn > horizonMin) return;
-      const pred = predictMatch(m);
-      if (!pred || !pred.pick || pred.skip) return;
-      const rel = pred.reliability ?? pred.pick.prob;
-      if (rel < minRel) return;
-      const pickOdd = pred.pick.key === '1' ? pred.odds?.home
-                    : pred.pick.key === '2' ? pred.odds?.away
-                    : pred.odds?.draw;
-      if (!pickOdd || pickOdd < 1.05) return;
-      const p = pred.pick.prob;
-      const ev = p * pickOdd - 1;
-      if (ev < minEV) return;
-      rows.push({ m, pred, pickOdd, ev, startIn, rel });
-    }));
-
-    // Sort by EV descending, tie-break by reliability
-    rows.sort((a, b) => (b.ev - a.ev) || (b.rel - a.rel));
-
-    const sports = [
-      ['all', 'Tous'], ['football', '⚽ Foot'], ['basketball', '🏀 Basket'],
-      ['hockey', '🏒 Hockey'], ['tennis', '🎾 Tennis'],
-    ];
-
-    const header = `
-      <div class="section-header" style="margin-bottom:16px;">
-        <h2><span class="ico">💎</span>Value Finder <span style="font-size:13px;font-weight:500;color:var(--text-dim2);margin-left:8px;">${rows.length} pick${rows.length>1?'s':''} trouvé${rows.length>1?'s':''}</span></h2>
-        <div class="hint">Tous les paris +EV à travers les sports/ligues, classés par valeur décroissante. Complète le Top 5 en montrant la longue traîne.</div>
-      </div>
-      <div id="vf-filters" style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:18px;padding:14px;background:rgba(255,255,255,.02);border-radius:10px;border:1px solid rgba(255,255,255,.05);">
-        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-          <span style="font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--text-dim2);">Sport</span>
-          ${sports.map(([v, lbl]) => `<button class="vf-chip ${sportFilter === v ? 'active' : ''}" data-k="sport" data-v="${v}" style="padding:5px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.08);background:${sportFilter===v?'var(--accent)':'rgba(255,255,255,.03)'};color:${sportFilter===v?'#fff':'var(--text-dim)'};font-size:12px;cursor:pointer;">${lbl}</button>`).join('')}
-        </div>
-        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-          <span style="font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--text-dim2);">Min EV</span>
-          ${[2, 5, 10].map(v => `<button class="vf-chip ${Math.round(minEV*100)===v?'active':''}" data-k="minEV" data-v="${v}" style="padding:5px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.08);background:${Math.round(minEV*100)===v?'var(--accent)':'rgba(255,255,255,.03)'};color:${Math.round(minEV*100)===v?'#fff':'var(--text-dim)'};font-size:12px;cursor:pointer;">${v}%+</button>`).join('')}
-        </div>
-        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-          <span style="font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--text-dim2);">Min fiabilité</span>
-          ${[45, 55, 65].map(v => `<button class="vf-chip ${Math.round(minRel*100)===v?'active':''}" data-k="minRel" data-v="${v}" style="padding:5px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.08);background:${Math.round(minRel*100)===v?'var(--accent)':'rgba(255,255,255,.03)'};color:${Math.round(minRel*100)===v?'#fff':'var(--text-dim)'};font-size:12px;cursor:pointer;">${v}%+</button>`).join('')}
-        </div>
-        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-          <span style="font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--text-dim2);">Horizon</span>
-          ${[['today','Aujourd\u2019hui'],['24h','24h'],['48h','48h']].map(([v,lbl]) => `<button class="vf-chip ${horizon===v?'active':''}" data-k="horizon" data-v="${v}" style="padding:5px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.08);background:${horizon===v?'var(--accent)':'rgba(255,255,255,.03)'};color:${horizon===v?'#fff':'var(--text-dim)'};font-size:12px;cursor:pointer;">${lbl}</button>`).join('')}
-        </div>
-      </div>
-    `;
-
-    const rowsHtml = rows.length === 0
-      ? `<div style="padding:40px;text-align:center;color:var(--text-dim2);background:rgba(255,255,255,.02);border-radius:10px;">Aucun pari ne passe les filtres actuels. Essaie de baisser les seuils ou d'élargir l'horizon.</div>`
-      : `<div style="display:flex;flex-direction:column;gap:8px;">
-          ${rows.map(r => {
-            const { m, pred, pickOdd, ev, startIn, rel } = r;
-            const { home, away } = getSides(m);
-            const league = m.league_name || (typeof sportLabel === 'function' ? sportLabel(m.sport) : m.sport);
-            const tIn = fmtIn(startIn);
-            const sportIco = m.sport === 'football' ? '⚽' : m.sport === 'basketball' ? '🏀' : m.sport === 'hockey' ? '🏒' : m.sport === 'tennis' ? '🎾' : '⚽';
-            const evPct = (ev * 100).toFixed(1);
-            const relPct = Math.round(rel * 100);
-            const hName = esc(home?.short || home?.abbr || home?.name || '?');
-            const aName = esc(away?.short || away?.abbr || away?.name || '?');
-            return `
-              <a href="#" class="vf-row" data-id="${esc(m.id)}" style="display:grid;grid-template-columns:56px 1fr 1fr 100px 100px 100px;gap:12px;align-items:center;padding:12px 14px;background:rgba(255,255,255,.02);border-radius:8px;border:1px solid rgba(255,255,255,.04);text-decoration:none;color:inherit;transition:background .15s;" onmouseover="this.style.background='rgba(255,255,255,.04)'" onmouseout="this.style.background='rgba(255,255,255,.02)'">
-                <div style="font-size:11px;color:var(--text-dim2);line-height:1.3;">
-                  <div style="font-size:15px;">${sportIco}</div>
-                  <div style="font-variant-numeric:tabular-nums;">${tIn}</div>
-                </div>
-                <div style="min-width:0;">
-                  <div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${hName} <span style="color:var(--text-dim2);font-weight:400;">vs</span> ${aName}</div>
-                  <div style="font-size:11px;color:var(--text-dim2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(league)}</div>
-                </div>
-                <div style="font-size:13px;color:var(--accent);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">🎯 ${esc(pred.pick.label)}</div>
-                <div style="text-align:right;font-variant-numeric:tabular-nums;">
-                  <div style="font-size:14px;font-weight:700;color:var(--text);">@${pickOdd.toFixed(2)}</div>
-                  <div style="font-size:10.5px;color:var(--text-dim2);">cote</div>
-                </div>
-                <div style="text-align:right;font-variant-numeric:tabular-nums;">
-                  <div style="font-size:14px;font-weight:700;color:${relPct>=65?'#34d399':relPct>=55?'#a78bfa':'#fbbf24'};">${relPct}%</div>
-                  <div style="font-size:10.5px;color:var(--text-dim2);">fiabilité</div>
-                </div>
-                <div style="text-align:right;font-variant-numeric:tabular-nums;">
-                  <div style="font-size:14px;font-weight:700;color:#10b981;">+${evPct}%</div>
-                  <div style="font-size:10.5px;color:var(--text-dim2);">EV</div>
-                </div>
-              </a>
-            `;
-          }).join('')}
-        </div>`;
-
-    wrap.innerHTML = header + rowsHtml;
-
-    // Filter chip handlers
-    wrap.querySelectorAll('.vf-chip').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const k = btn.dataset.k;
-        const v = btn.dataset.v;
-        const keyMap = { sport: VF_KEYS.sport, minEV: VF_KEYS.minEV, minRel: VF_KEYS.minRel, horizon: VF_KEYS.horizon };
-        vfSet(keyMap[k], v);
-        renderValueFinder(wrap);
-      });
-    });
-
-    // Clicking a row jumps to the match modal — reuse the existing openMatch
-    // pipeline by scrolling to the match card on Simples page + clicking it.
-    wrap.querySelectorAll('.vf-row').forEach(a => {
-      a.addEventListener('click', (e) => {
-        e.preventDefault();
-        const id = a.dataset.id;
-        currentPage = 'simples';
-        try { localStorage.setItem('currentPage', 'simples'); } catch (e2) {}
-        applyPageView();
-        setTimeout(() => {
-          const card = document.querySelector(`.match[data-id="${CSS.escape(id)}"]`);
-          if (card) {
-            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            card.style.outline = '2px solid var(--accent)';
-            setTimeout(() => { card.style.outline = ''; }, 2000);
-          }
-        }, 100);
-      });
-    });
+    // Page retirée : on affiche un message explicatif si on atterrit ici.
+    wrap.innerHTML = `
+      <div style="padding:48px 24px;text-align:center;color:var(--text-dim);background:rgba(255,255,255,.02);border-radius:12px;max-width:640px;margin:32px auto;">
+        <div style="font-size:32px;margin-bottom:12px;">🎯</div>
+        <div style="font-size:18px;font-weight:600;color:var(--text);margin-bottom:8px;">Value Finder retiré</div>
+        <div style="font-size:13.5px;line-height:1.5;">Le modèle ne calcule plus d'EV ni d'edge. Tous les pronostics se consultent sur la page Simples, classés par fiabilité pure.</div>
+      </div>`;
   }
 
   // ======= Boot =======
@@ -6121,24 +5869,6 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T14:55:34.529126Z","today":"
         }
       });
     });
-
-    // Wire up EV threshold slider (sidebar)
-    const evInput = document.getElementById('ev-threshold-input');
-    const evVal = document.getElementById('ev-threshold-val');
-    if (evInput && evVal) {
-      const pctInit = Math.round(evThreshold * 100);
-      evInput.value = String(pctInit);
-      evVal.textContent = `${pctInit}%`;
-      evInput.addEventListener('input', () => { evVal.textContent = `${evInput.value}%`; });
-      evInput.addEventListener('change', () => {
-        const pct = parseFloat(evInput.value);
-        if (!isFinite(pct)) return;
-        evThreshold = Math.max(0.01, Math.min(0.20, pct / 100));
-        try { localStorage.setItem('evThreshold', String(evThreshold)); } catch (e) {}
-        __predCacheClear();
-        render();
-      });
-    }
 
     // Keyboard shortcuts: /, ←/→, 1-9, B
     document.addEventListener('keydown', (e) => {
