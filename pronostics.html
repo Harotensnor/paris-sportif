@@ -7405,16 +7405,16 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
     const modelChartHtml = renderRoiChart(modelChartRows, { title: 'P&L modèle cumulé (unité flat)' })
       || `<div class="bilan-empty">Pas encore assez de paris pour tracer une courbe.</div>`;
 
-    // ========= PORTEFEUILLE SIMULÉ 10€ =========
-    // "Si le modèle avait parié 1€ flat sur chaque lock (fiab ≥ 0.70)
-    // depuis le jour 1 en partant de 10€ de bankroll, où en serait-il
-    // aujourd'hui ?" — donne une lecture en euros concrets, pas en
-    // unités abstraites. Cumulatif (pas de reset), locks uniquement.
-    // Chantier R (2026-04-21) : le portefeuille est désormais découplé
-    // du filtre `_bilanWindow` — on recompute toujours depuis J1 à partir
-    // de `completed` (pas `rows`) pour que la courbe d'équity reste
-    // l'historique total, peu importe la fenêtre d'analyse choisie.
-    const WALLET_START = 10;
+    // ========= PORTEFEUILLE SIMULÉ — Chantier JJ (backtest what-if) =========
+    // Chantier EE (2026-04-21) a introduit le choix du stake mode.
+    // Chantier JJ (2026-04-22) ajoute les paramètres de démarrage :
+    //   - bankroll initial (10€ par défaut, 10-1000€)
+    //   - date de départ (défaut = date du premier lock réglé)
+    // Le tout persisté en localStorage. Permet de répondre à :
+    //   "Et si j'avais commencé avec 50€ le 15 avril en Kelly 0.25× ?"
+    // Le backtest NE MODIFIE PAS les picks réels ; il ne fait que rejouer
+    // la simulation de staking sur l'historique avec des paramètres custom.
+    const WALLET_START = _walletBacktestStart;   // était 10 hardcodé
     const WALLET_STAKE = 1; // legacy — utilisé pour labels "1€ flat par lock"
     // Rows pour le wallet — historique complet, pas de windowing.
     const walletAllRows = [];
@@ -7427,9 +7427,20 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
       if (!odd) return;
       walletAllRows.push({ m, pred, res, odd });
     });
-    const lockRows = walletAllRows
+    // Chantier JJ — tri puis filtre par date de départ.
+    const walletAllSorted = walletAllRows
       .slice()
       .sort((a, b) => new Date(a.m.date) - new Date(b.m.date));
+    const walletEarliestISO = walletAllSorted.length ? isoDate(walletAllSorted[0].m.date) : null;
+    // La date effective = _walletBacktestDate si définie ET ≥ earliest, sinon earliest.
+    const walletBacktestDateEff = (() => {
+      if (!_walletBacktestDate) return walletEarliestISO;
+      if (!walletEarliestISO) return null;
+      return _walletBacktestDate < walletEarliestISO ? walletEarliestISO : _walletBacktestDate;
+    })();
+    const lockRows = walletBacktestDateEff
+      ? walletAllSorted.filter(r => isoDate(r.m.date) >= walletBacktestDateEff)
+      : walletAllSorted;
     // Chantier EE — simulation de mise dynamique.
     // On itère dans l'ordre chronologique et on calcule la mise pour chaque
     // lock en fonction de la banque courante (Kelly) ou du montant flat choisi.
@@ -7618,12 +7629,40 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
           `<button class="wallet-stake-btn${_walletStakeMode===v?' active':''}" data-wsm="${v}" style="background:${_walletStakeMode===v?'var(--brand,#a78bfa)':'var(--bg-3,#0f1823)'};color:${_walletStakeMode===v?'#0a0e17':'var(--text)'};border:1px solid ${_walletStakeMode===v?'var(--brand,#a78bfa)':'var(--border,#2a3744)'};padding:4px 11px;font-size:12px;font-weight:600;border-radius:6px;cursor:pointer;">${lbl}</button>`).join('')}
         <span style="font-size:11px;color:var(--text-dim2);margin-left:2px;" title="Kelly utilise la fiabilité (modèle pur, sans marché) comme probabilité. Fraction plafonnée à 10% de banque.">ℹ️ rejoué sur l'historique</span>
       </div>`;
+
+    // Chantier JJ — toolbar backtest what-if.
+    // Permet de choisir la banque de départ (10-10000€) et la date de départ
+    // (à partir de laquelle on compte les locks). La date est clampée à
+    // walletEarliestISO côté code — on peut donc saisir n'importe quoi sans
+    // risque. Bouton reset = retour aux valeurs par défaut (10€ + earliest).
+    const todayISOStr = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+    const backtestDateDefault = walletBacktestDateEff || '';
+    const backtestIsDefault = (_walletBacktestStart === 10 && !_walletBacktestDate);
+    const walletBacktestToolbarHtml = `
+      <div style="display:flex;align-items:center;gap:10px;margin-top:8px;margin-bottom:4px;flex-wrap:wrap;">
+        <span style="font-size:11.5px;color:var(--text-dim2);font-weight:600;text-transform:uppercase;letter-spacing:.4px;">Backtest :</span>
+        <label style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text-dim);">
+          Départ
+          <input type="number" class="wallet-bt-start" min="10" max="10000" step="10" value="${_walletBacktestStart}" style="width:78px;background:var(--bg-3,#0f1823);color:var(--text);border:1px solid var(--border,#2a3744);border-radius:6px;padding:3px 6px;font-size:12px;font-variant-numeric:tabular-nums;" />
+          <span style="color:var(--text-dim2);">€</span>
+        </label>
+        <label style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text-dim);">
+          depuis
+          <input type="date" class="wallet-bt-date" min="${walletEarliestISO || ''}" max="${todayISOStr}" value="${backtestDateDefault}" style="background:var(--bg-3,#0f1823);color:var(--text);border:1px solid var(--border,#2a3744);border-radius:6px;padding:3px 6px;font-size:12px;" />
+        </label>
+        <button class="wallet-bt-reset" ${backtestIsDefault?'disabled':''} style="background:${backtestIsDefault?'var(--bg-3,#0f1823)':'var(--bg-2,#1a2432)'};color:${backtestIsDefault?'var(--text-dim2)':'var(--text-dim)'};border:1px solid var(--border,#2a3744);border-radius:6px;padding:3px 10px;font-size:12px;font-weight:600;cursor:${backtestIsDefault?'default':'pointer'};opacity:${backtestIsDefault?'.5':'1'};">↺ reset</button>
+        <span style="font-size:11px;color:var(--text-dim2);" title="Rejoue la simulation à partir de la date/banque choisie, avec la politique de mise sélectionnée.">ℹ️ what-if</span>
+      </div>`;
+    // Label date effective pour le h3 (vide si = earliest ou absent)
+    const walletDateLabel = (walletBacktestDateEff && walletBacktestDateEff !== walletEarliestISO)
+      ? ` · depuis ${walletBacktestDateEff}` : '';
     const walletSectionHtml = `
       <div class="bilan-section" style="border-color:${walletRoiColor}44;">
         <div class="bilan-section-head">
-          <h3>💰 Portefeuille simulé (10€ de base · ${walletStakeModeLbl} par lock)</h3>
+          <h3>💰 Portefeuille simulé (${WALLET_START.toFixed(WALLET_START%1?2:0)}€ de base · ${walletStakeModeLbl} par lock${walletDateLabel})</h3>
           <div class="meta">${lockRows.length} lock${lockRows.length>1?'s':''} settled${walletDays.length?` sur ${walletDays.length} jour${walletDays.length>1?'s':''}`:''}${_bilanWindow > 0 ? ' · toujours calculé depuis J1' : ''}</div>
         </div>
+        ${walletBacktestToolbarHtml}
         ${walletStakeToolbarHtml}
         <div class="bilan-kpis" style="margin-top:0;margin-bottom:14px;">
           <div class="bilan-kpi">
@@ -7805,6 +7844,129 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
             </div>`;
         })()
       : '';
+
+    // ========= Chantier OO — HEATMAP PERFORMANCE (sport × jour de semaine) =========
+    // Grille qui croise le sport (lignes) et le jour de semaine (colonnes).
+    // Chaque cellule = ROI (%) calculé sur les paris modèle terminés (flat 1u).
+    // But : repérer d'un coup les combos rentables ("tennis le dimanche") et
+    // les trous noirs ("foot le mardi perd -8%"). Utilise les mêmes `rows`
+    // que le reste du Bilan => respecte la fenêtre temporelle active.
+    //
+    // Couleurs : dégradé rouge→jaune→vert centré sur 0% ROI, intensité scalée
+    // par le volume (au moins 3 picks pour qu'une cellule soit colorée, sinon
+    // griffée discrète "n=X").
+    const heatmapHtml = (() => {
+      if (!rows.length) return '';
+      // Ordre lundi→dimanche (européen), avec libellés courts.
+      const DAY_NAMES = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+      // JS getDay() : 0=Dim, 1=Lun, ..., 6=Sam -> on map en 0=Lun..6=Dim.
+      const getDowEU = (d) => {
+        const n = new Date(d).getDay();
+        return (n + 6) % 7;
+      };
+      const cells = {};   // "sport|dow" -> { sport, dow, w, l, bets, pl }
+      const sportsSet = new Set();
+      rows.forEach(r => {
+        const dow = getDowEU(r.m.date);
+        if (!isFinite(dow)) return;
+        const sp = r.m.sport;
+        sportsSet.add(sp);
+        const k = sp + '|' + dow;
+        const c = cells[k] = cells[k] || { sport: sp, dow, w:0, l:0, bets:0, pl:0 };
+        c.bets++;
+        if (r.res === 'won') { c.w++; c.pl += (r.odd - 1); }
+        else if (r.res === 'lost') { c.l++; c.pl -= 1; }
+      });
+      // Trier les sports par volume total (lignes les plus denses en haut).
+      const sportVol = {};
+      Object.values(cells).forEach(c => { sportVol[c.sport] = (sportVol[c.sport]||0) + c.bets; });
+      const sports = [...sportsSet].sort((a,b) => sportVol[b] - sportVol[a]);
+      if (!sports.length) return '';
+
+      // Couleur ROI : palette divergente rouge→neutre→vert.
+      // On clip à ±25% pour que les cellules extrêmes ne bouffent pas le gradient.
+      const CLIP = 25;
+      const cellColor = (roi, bets) => {
+        if (bets < 3) return { bg: 'var(--bg-3,#0f1823)', text: 'var(--text-dim2)', border: 'var(--border,#2a3744)' };
+        const x = Math.max(-1, Math.min(1, roi / CLIP));
+        // intensité alpha scalée par volume (plafond à n=10)
+        const alpha = Math.min(1, 0.35 + (bets / 10) * 0.55);
+        if (x >= 0) {
+          // vert : 52,211,153 (#34d399)
+          return {
+            bg: `rgba(52,211,153,${(alpha * x).toFixed(3)})`,
+            text: x > 0.5 ? '#0a0e17' : 'var(--text)',
+            border: x > 0.3 ? '#34d39988' : 'var(--border,#2a3744)'
+          };
+        } else {
+          // rouge : 248,113,113 (#f87171)
+          return {
+            bg: `rgba(248,113,113,${(alpha * (-x)).toFixed(3)})`,
+            text: (-x) > 0.5 ? '#0a0e17' : 'var(--text)',
+            border: (-x) > 0.3 ? '#f8717188' : 'var(--border,#2a3744)'
+          };
+        }
+      };
+
+      // Best / worst cell pour le résumé bas de grille.
+      const qualCells = Object.values(cells).filter(c => c.bets >= 3);
+      qualCells.sort((a,b) => (b.pl/b.bets) - (a.pl/a.bets));
+      const bestCell = qualCells[0] || null;
+      const worstCell = qualCells[qualCells.length-1] || null;
+      const bestROI = bestCell ? (100 * bestCell.pl / bestCell.bets) : 0;
+      const worstROI = worstCell ? (100 * worstCell.pl / worstCell.bets) : 0;
+
+      const headerH = `
+        <div style="display:grid;grid-template-columns:140px repeat(7, 1fr);gap:4px;padding:0 2px;margin-bottom:4px;">
+          <div></div>
+          ${DAY_NAMES.map(d => `<div style="text-align:center;font-size:11px;color:var(--text-dim2);font-weight:600;text-transform:uppercase;letter-spacing:.4px;padding:4px 0;">${d}</div>`).join('')}
+        </div>`;
+      const rowsH = sports.map(sp => {
+        const rowCells = DAY_NAMES.map((_, dow) => {
+          const c = cells[sp + '|' + dow];
+          if (!c || !c.bets) {
+            return `<div style="background:var(--bg-3,#0f1823);border:1px solid var(--border,#2a3744);border-radius:6px;padding:10px 4px;text-align:center;font-size:11px;color:var(--text-dim2);" title="${sportLabel(sp)} · ${DAY_NAMES[dow]} : aucun pari">·</div>`;
+          }
+          const roi = 100 * c.pl / c.bets;
+          const wr = 100 * c.w / c.bets;
+          const col = cellColor(roi, c.bets);
+          const tip = `${sportLabel(sp)} · ${DAY_NAMES[dow]}
+${c.bets} pari${c.bets>1?'s':''} · ${c.w}W ${c.l}L
+WR ${wr.toFixed(0)}% · ROI ${roi>=0?'+':''}${roi.toFixed(1)}%
+P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
+          const label = c.bets < 3
+            ? `<div style="font-size:10px;color:${col.text};line-height:1.1;">n=${c.bets}</div>`
+            : `<div style="font-size:13px;font-weight:700;color:${col.text};line-height:1.1;">${roi>=0?'+':''}${roi.toFixed(0)}%</div>
+               <div style="font-size:10px;color:${col.text};opacity:.8;line-height:1.3;">${c.bets}p</div>`;
+          return `<div title="${tip.replace(/"/g,'&quot;')}" style="background:${col.bg};border:1px solid ${col.border};border-radius:6px;padding:8px 4px;text-align:center;font-variant-numeric:tabular-nums;">${label}</div>`;
+        }).join('');
+        return `
+          <div style="display:grid;grid-template-columns:140px repeat(7, 1fr);gap:4px;padding:2px;align-items:stretch;">
+            <div style="display:flex;align-items:center;gap:6px;padding:0 4px;font-size:12.5px;color:var(--text);font-weight:600;">
+              <span style="font-size:14px;">${sportIcon(sp)}</span>
+              <span>${esc(sportLabel(sp))}</span>
+            </div>
+            ${rowCells}
+          </div>`;
+      }).join('');
+
+      const footerH = (bestCell && worstCell && bestCell !== worstCell) ? `
+        <div style="padding:9px 12px;font-size:11px;color:var(--text-dim2);border-top:1px solid var(--border,#2a3744);background:var(--bg-3,#0f1823);margin-top:10px;border-radius:8px;">
+          <span style="color:#34d399;">🔥 Meilleur créneau</span> : ${esc(sportLabel(bestCell.sport))} le ${DAY_NAMES[bestCell.dow].toLowerCase()} (ROI ${bestROI>=0?'+':''}${bestROI.toFixed(0)}% · ${bestCell.bets} paris)
+          · <span style="color:#f87171;">❄️ Pire</span> : ${esc(sportLabel(worstCell.sport))} le ${DAY_NAMES[worstCell.dow].toLowerCase()} (${worstROI>=0?'+':''}${worstROI.toFixed(0)}% · ${worstCell.bets} paris)
+        </div>` : '';
+
+      return `
+        <div class="bilan-section">
+          <div class="bilan-section-head">
+            <h3>🗓️ Heatmap sport × jour</h3>
+            <div class="meta">ROI par créneau · flat 1u · ${rows.length} pari${rows.length>1?'s':''} · cellules &lt; 3 paris grisées</div>
+          </div>
+          ${headerH}
+          ${rowsH}
+          ${footerH}
+        </div>`;
+    })();
 
     // ========= Chantier FF — TIPSTERS SCORECARD =========
     // Agrège tous les pronos de tipsters externes (source + pick + cote) sur
@@ -8087,6 +8249,9 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
         </div>
       ` : ''}
 
+      <!-- Chantier OO — Heatmap sport × jour de semaine -->
+      ${heatmapHtml}
+
       <!-- Chantier FF — Tipsters scorecard : WR + ROI par source externe -->
       ${tipstersSectionHtml}
 
@@ -8162,6 +8327,46 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
       try { localStorage.setItem('walletStakeMode', v); } catch (e) {}
       renderBilanPage(wrap);
     }));
+    // Chantier JJ — backtest what-if : banque de départ
+    wrap.querySelectorAll('.wallet-bt-start').forEach(inp => {
+      const commit = () => {
+        let v = parseFloat(inp.value);
+        if (!isFinite(v)) v = 10;
+        v = Math.max(10, Math.min(10000, Math.round(v)));
+        if (v === _walletBacktestStart) return;
+        _walletBacktestStart = v;
+        try { localStorage.setItem('walletBacktestStart', String(v)); } catch (e) {}
+        renderBilanPage(wrap);
+      };
+      inp.addEventListener('change', commit);
+      inp.addEventListener('blur', commit);
+    });
+    // Chantier JJ — backtest what-if : date de départ
+    wrap.querySelectorAll('.wallet-bt-date').forEach(inp => {
+      inp.addEventListener('change', () => {
+        const v = inp.value;
+        const next = /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : null;
+        if (next === _walletBacktestDate) return;
+        _walletBacktestDate = next;
+        try {
+          if (next) localStorage.setItem('walletBacktestDate', next);
+          else localStorage.removeItem('walletBacktestDate');
+        } catch (e) {}
+        renderBilanPage(wrap);
+      });
+    });
+    // Chantier JJ — backtest what-if : reset
+    wrap.querySelectorAll('.wallet-bt-reset').forEach(btn => btn.addEventListener('click', () => {
+      if (btn.disabled) return;
+      if (_walletBacktestStart === 10 && !_walletBacktestDate) return;
+      _walletBacktestStart = 10;
+      _walletBacktestDate = null;
+      try {
+        localStorage.removeItem('walletBacktestStart');
+        localStorage.removeItem('walletBacktestDate');
+      } catch (e) {}
+      renderBilanPage(wrap);
+    }));
     // Chantier O — click handler sur les lignes "Par ligue" pour drill-down
     wrap.querySelectorAll('[data-league-row]').forEach(row => {
       row.addEventListener('click', () => {
@@ -8188,6 +8393,19 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
   let _walletStakeMode = (() => {
     const v = localStorage.getItem('walletStakeMode');
     return ['flat1','flat2','flat5','kelly025','kelly050'].includes(v) ? v : 'flat1';
+  })();
+  // Chantier JJ — Backtest what-if : bankroll de départ + date de départ
+  // customisables. Permet de simuler "et si j'avais commencé avec X€ le Y ?"
+  // Bankroll : clamp 10-10000€. Date : ISO YYYY-MM-DD ou null (= premier lock).
+  let _walletBacktestStart = (() => {
+    const v = parseFloat(localStorage.getItem('walletBacktestStart'));
+    if (!isFinite(v) || v < 10 || v > 10000) return 10;
+    return v;
+  })();
+  let _walletBacktestDate = (() => {
+    const v = localStorage.getItem('walletBacktestDate');
+    if (!v) return null;
+    return /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : null;
   })();
   function walletStakeLabel(mode) {
     return ({
