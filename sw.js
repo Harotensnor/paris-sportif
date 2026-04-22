@@ -1,4 +1,4 @@
-// Chantier S (révisé 2026-04-22 soir) — Service Worker pour Paris-Sportif.
+// Chantier S (révisé 2026-04-22 nuit) — Service Worker pour Paris-Sportif.
 //
 // Stratégie :
 //   * pronostics.html : NETWORK-FIRST (cache = fallback offline).
@@ -7,7 +7,7 @@
 //   * icônes / manifest : cache-first (change rarement).
 //   * tout le reste    : passthrough réseau.
 
-const CACHE_VERSION = 'paris-sportif-v14-2026-04-22-coach-ia-monte-carlo';
+const CACHE_VERSION = 'paris-sportif-v15-2026-04-22-sante-coach-ia-admin';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
