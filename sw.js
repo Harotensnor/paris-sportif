@@ -3,13 +3,11 @@
 // Stratégie :
 //   * pronostics.html : NETWORK-FIRST (cache = fallback offline).
 //   * data.js et JSON  : NETWORK-FIRST.
+//   * odds_history.jsonl : NETWORK-FIRST (Chantier PP).
 //   * icônes / manifest : cache-first (change rarement).
 //   * tout le reste    : passthrough réseau.
-//
-// Bump la version à chaque déploiement qui touche le SW lui-même ou la liste
-// d'assets. Le HTML est invalidé automatiquement grâce au network-first.
 
-const CACHE_VERSION = 'paris-sportif-v3-2026-04-22-jjoo';
+const CACHE_VERSION = 'paris-sportif-v5-2026-04-22-qq';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -64,6 +62,20 @@ self.addEventListener('fetch', (event) => {
 
   // data.js : NETWORK-FIRST.
   if (url.pathname.endsWith('/data.js') || url.pathname.endsWith('data.js')) {
+    event.respondWith(
+      fetch(req)
+        .then(resp => {
+          const respClone = resp.clone();
+          caches.open(RUNTIME_CACHE).then(c => c.put(req, respClone));
+          return resp;
+        })
+        .catch(() => caches.match(req))
+    );
+    return;
+  }
+
+  // odds_history.jsonl : NETWORK-FIRST (Chantier PP).
+  if (url.pathname.endsWith('/odds_history.jsonl') || url.pathname.endsWith('odds_history.jsonl')) {
     event.respondWith(
       fetch(req)
         .then(resp => {
