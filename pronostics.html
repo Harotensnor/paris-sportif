@@ -3899,8 +3899,12 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
           if (isNewLock(m.id)) nNew++;
         }
       }));
-      // Chantier Q — affiche "N (+K)" dans la sidebar quand K locks sont nouveaux
-      locksCountEl.textContent = nNew > 0 ? `${n} · ${nNew}🆕` : String(n);
+      // Chantier Q — affiche "N" ou "N · K🆕" quand certains locks sont nouveaux.
+      // Cas particulier : si tous les locks sont nouveaux (nNew === n) on évite
+      // la redondance visuelle "6 · 6🆕" et on affiche "N 🆕".
+      locksCountEl.textContent = nNew === 0 ? String(n)
+                               : nNew === n ? `${n} 🆕`
+                                            : `${n} · ${nNew}🆕`;
       if (nNew > 0) locksCountEl.classList.add('has-new'); else locksCountEl.classList.remove('has-new');
     }
 
@@ -4309,6 +4313,92 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
     const top5 = scored.filter(x => !x.pred.lowConf && !x.pred.skip).slice(0, 5);
     const others = scored.filter(x => !top5.includes(x) && !x.pred.skip).slice(0, 7);
 
+    // ===== Chantier DD — Pari du jour =====
+    // Le "Pari du jour" n'est PAS forcément le top 1 fiabilité : c'est le pick
+    // qui offre le meilleur compromis entre :
+    //   - conviction du modèle (fraction Kelly > 0)
+    //   - edge vs marché (fiabilité − cote implicite)
+    //   - fiabilité brute (éviter les picks fragiles)
+    //
+    // Formule : score = kellyFraction × max(edge + 0.02, 0.01) × fiabilité
+    // Seulement sur les LOCKs (fiab ≥ 0.70) avec cote valable (>1.20 pour écarter
+    // les picks "pratiquement donnés" qui n'ont pas de vraie value).
+    // Si aucun pick ne remplit ces critères → on ne force pas un pick moyen, on
+    // affiche un message de discipline ("pas de setup aujourd'hui"). Théo a
+    // demandé plusieurs fois de ne pas parier pour parier.
+    const pariDuJour = (() => {
+      const candidates = scored.filter(x => {
+        if (x.pred.skip || x.pred.lowConf) return false;
+        if (!x.pred.isLock) return false;
+        if (!x.pickOdd || x.pickOdd < 1.20) return false;
+        const rel = x.pred.reliability ?? x.pred.pick.prob;
+        const kFrac = kellyFraction(rel, x.pickOdd, 0.25);
+        if (kFrac <= 0) return false;     // −EV selon Kelly
+        return true;
+      }).map(x => {
+        const rel = x.pred.reliability ?? x.pred.pick.prob;
+        const kFrac = kellyFraction(rel, x.pickOdd, 0.25);
+        const edge = valueBetEdge(rel, x.pickOdd) || 0;
+        const score = kFrac * Math.max(edge + 0.02, 0.01) * rel;
+        return { ...x, kFrac, edge, pdjScore: score };
+      }).sort((a, b) => b.pdjScore - a.pdjScore);
+      return candidates[0] || null;
+    })();
+    // Rendu de la bannière "Pari du jour" : compacte, avec infos clés.
+    // Posée AU-DESSUS du top 5 pour capter l'œil en premier.
+    const renderPariDuJour = (x) => {
+      if (!x) return '';
+      const { m, pred, startIn, pickOdd, kFrac, edge } = x;
+      const { home, away } = getSides(m);
+      const rel = pred.reliability ?? pred.pick.prob;
+      const relPct = Math.round(rel * 100);
+      const edgePct = Math.round(edge * 100);
+      const kellyAmt = bankroll * kFrac;
+      const kellyPct = (kFrac * 100).toFixed(1);
+      const tIn = fmtIn(startIn);
+      const wmxUrl = winamaxUrl(m);
+      const myBet = getMyBet(m.id, pred.pick.key);
+      const urgent = startIn <= 120;  // ≤ 2h → teinte urgence
+      // Ne pas ré-afficher si le pick du jour = top 1 hero (redondance)
+      // → on le marque plutôt d'un ruban "🏆 Pari du jour" dans le hero.
+      // Détection : ici on n'a pas accès au top 1 directement, mais on peut
+      // comparer l'id du match plus bas (voir integration point).
+      return `
+        <div class="pari-du-jour" data-id="${esc(m.id)}" role="button" tabindex="0" style="
+          background: linear-gradient(135deg, rgba(167,139,250,.18), rgba(236,72,153,.12));
+          border: 1.5px solid rgba(167,139,250,.45);
+          border-radius: 16px;
+          padding: 18px 20px;
+          margin-bottom: 20px;
+          cursor: pointer;
+          position: relative;
+          overflow: hidden;
+        ">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <span style="font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#a78bfa;background:rgba(167,139,250,.15);padding:4px 10px;border-radius:6px;">🏆 Pari du jour</span>
+            <span style="font-size:11px;color:var(--text-dim2);font-weight:500;">meilleur compromis fiabilité × edge × Kelly</span>
+            ${urgent ? `<span style="font-size:11px;font-weight:700;color:#fbbf24;margin-left:auto;">⏱ ${esc(tIn)}</span>` : `<span style="font-size:11px;color:var(--text-dim2);margin-left:auto;">${esc(tIn)}</span>`}
+          </div>
+          <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:10px;">
+            <div style="font-size:17px;font-weight:700;color:var(--text);">${esc(home?.short || home?.name || '?')} <span style="color:var(--text-dim);font-weight:400;">vs</span> ${esc(away?.short || away?.name || '?')}</div>
+            <span style="font-size:11px;color:var(--text-dim2);">${esc(m.league_name || '')}</span>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px;">
+            <span style="padding:6px 12px;border-radius:8px;background:rgba(16,185,129,.18);color:#10b981;font-weight:700;font-size:14px;">${esc(pred.pick.label)} @ ${pickOdd.toFixed(2)}</span>
+            <span style="padding:5px 11px;border-radius:7px;background:rgba(255,255,255,.06);color:var(--text);font-weight:600;font-size:12.5px;">🎯 Fiab ${relPct}%</span>
+            <span style="padding:5px 11px;border-radius:7px;background:rgba(236,72,153,.18);color:#f472b6;font-weight:700;font-size:12.5px;">💎 Edge +${edgePct}pt</span>
+            <span style="padding:5px 11px;border-radius:7px;background:rgba(167,139,250,.18);color:#a78bfa;font-weight:700;font-size:12.5px;" title="Kelly 0.25× sur bankroll ${bankroll.toFixed(0)}€">💰 Kelly ${kellyAmt.toFixed(2)}€ (${kellyPct}%)</span>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            ${wmxUrl ? `<a href="${esc(wmxUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation();" style="padding:8px 16px;background:#e8163a;color:#fff;border-radius:8px;text-decoration:none;font-weight:700;font-size:13px;">Parier sur Winamax →</a>` : ''}
+            ${myBet
+              ? `<button class="tp-mybet" data-match="${esc(m.id)}" data-pick="${esc(pred.pick.key)}" title="Tu as parié ${myBet.stake.toFixed(2)}€ @ ${myBet.odds.toFixed(2)}. Clic pour retirer." style="padding:8px 14px;background:rgba(16,185,129,.2);color:#10b981;border:1px solid rgba(16,185,129,.4);border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;">✓ Parié ${myBet.stake.toFixed(2)}€</button>`
+              : `<button class="tp-mybet" data-match="${esc(m.id)}" data-pick="${esc(pred.pick.key)}" data-label="${esc(pred.pick.label)}" data-odds="${pickOdd}" data-stake="${kellyAmt.toFixed(2)}" title="Marquer comme pari placé (mise suggérée Kelly)" style="padding:8px 14px;background:rgba(167,139,250,.18);color:#a78bfa;border:1px solid rgba(167,139,250,.4);border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;">💰 J'ai parié (Kelly)</button>`
+            }
+          </div>
+        </div>`;
+    };
+
     // Tomorrow's picks — même gate fiabilité.
     const futureScored = futurePool
       .map(x => {
@@ -4492,13 +4582,25 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
       }
     }
 
+    // Chantier DD — si Pari du jour = top1 hero, ne pas afficher la bannière
+    // séparée (redondance). On laisse juste le hero normal dans ce cas.
+    // Sinon, on affiche la bannière PDJ au-dessus.
+    const pdjSameAsHero = pariDuJour && top5[0] && pariDuJour.m.id === top5[0].m.id;
+    const pdjBannerHtml = (pariDuJour && !pdjSameAsHero) ? renderPariDuJour(pariDuJour) : '';
+    // Ruban "Pari du jour" à injecter dans le hero si c'est le même pick
+    const heroPdjRibbon = pdjSameAsHero
+      ? `<div style="position:absolute;top:0;right:0;padding:6px 14px;background:linear-gradient(135deg,#a78bfa,#f472b6);color:#fff;font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;border-bottom-left-radius:10px;z-index:2;">🏆 Pari du jour</div>`
+      : '';
+
     wrap.innerHTML = `
+      ${pdjBannerHtml}
       ${top5.length ? `
         <div class="section-header top-picks">
           <h2><span class="ico">🏆</span>Top 5 pronos du jour <span style="font-size:12px;color:var(--text-dim2,#7b8693);font-weight:500;letter-spacing:0;">· classés par fiabilité</span></h2>
           <div class="hint">Classement pur-modèle : fiabilité (consensus multi-sources). Les matchs joués glissent en dehors automatiquement.</div>
         </div>
-        <div class="top-hero-wrap">
+        <div class="top-hero-wrap" style="position:relative;">
+          ${heroPdjRibbon}
           ${renderHeroPick(top5[0])}
           ${top5.length > 1 ? `
             <div class="top-minis">
@@ -4532,7 +4634,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
         </div>
       ` : ''}
     `;
-    wrap.querySelectorAll('.top-pick, .top-hero').forEach(card => {
+    wrap.querySelectorAll('.top-pick, .top-hero, .pari-du-jour').forEach(card => {
       // Make each card keyboard-accessible.
       if (!card.hasAttribute('role')) card.setAttribute('role', 'button');
       if (!card.hasAttribute('tabindex')) card.setAttribute('tabindex', '0');
