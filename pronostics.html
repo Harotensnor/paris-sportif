@@ -2299,6 +2299,40 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
   }
   function impliedProb(dec) { return dec ? 1/dec : null; }
 
+  // ======= Chantier BB — Kelly criterion =======
+  // Fraction of bankroll to stake, given our probability p and decimal odds.
+  // Kelly formula: f* = (p*b - q) / b where b = odds - 1, q = 1 - p.
+  // Returns 0 if the bet is −EV (f* <= 0). We apply a fractional Kelly
+  // multiplier (0.25 by default) because:
+  //   - full Kelly maximizes geometric growth BUT is extremely volatile,
+  //   - our p is a model estimate, not ground truth — fractional absorbs
+  //     the estimation error,
+  //   - most pro bettors use 0.25× to 0.5× Kelly in practice.
+  // Capped at 10% of bankroll per single bet (safety).
+  function kellyFraction(p, decimalOdds, kellyMultiplier = 0.25, capPct = 0.10) {
+    if (!(p > 0) || !(p < 1) || !(decimalOdds > 1)) return 0;
+    const b = decimalOdds - 1;
+    const q = 1 - p;
+    const f = (p * b - q) / b;
+    if (f <= 0) return 0;
+    return Math.min(capPct, f * kellyMultiplier);
+  }
+  function kellyStake(p, decimalOdds, bankrollValue, multiplier = 0.25) {
+    const frac = kellyFraction(p, decimalOdds, multiplier);
+    return Math.round(bankrollValue * frac * 100) / 100;
+  }
+
+  // ======= Chantier HH — Value bet detector =======
+  // Compare our (calibrated) model reliability to what the market implies.
+  // edge = reliability − implied(odds).  >= 5pt → value bet.
+  // Caveat: reliability is EXCLUDING market in its blend (cf. Chantier F),
+  // so this comparison is meaningful (not circular).
+  function valueBetEdge(reliability, decimalOdds) {
+    if (!(reliability > 0) || !(decimalOdds > 1)) return null;
+    const implied = 1 / decimalOdds;
+    return reliability - implied;
+  }
+
   /** Parse "BAL -140" style details into favorite moneyline */
   function parseDetailsForFavorite(details) {
     if (!details) return null;
@@ -2379,28 +2413,10 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
     return { before, after, deltaPct, severity };
   }
 
-  // ======= Kelly criterion =======
-  // Suggested stake as a fraction of bankroll. We use HALF-KELLY (scale=0.5)
-  // by default — full Kelly maximizes long-run growth but has brutal drawdowns
-  // when the model over-estimates p. Half-Kelly keeps ~75% of the growth with
-  // far less variance, which is what you want for a real bankroll you can't
-  // infinitely replenish. Clamped: <0.5% → show nothing (not worth the friction),
-  // >10% → capped (any model claiming to bet 10%+ on a single leg is probably
-  // mis-calibrated on this match, so we refuse to take its word for it).
-  //
-  //   f* = (p·o − 1) / (o − 1)   ← full Kelly; numerator is the EV per euro
-  //
-  // Returns {fraction, stake10, stake100} or null when not actionable.
-  function kellyStake(p, decOdd, bankroll, scale) {
-    if (!p || !decOdd || decOdd <= 1) return null;
-    const k = (p * decOdd - 1) / (decOdd - 1);
-    if (!isFinite(k) || k <= 0) return null;
-    const frac = Math.min(0.10, k * (scale != null ? scale : 0.5));
-    if (frac < 0.005) return null;
-    const br = bankroll || 100;
-    return { fraction: frac, stake10: frac * 10, stake100: frac * br };
-  }
-
+  // NB : l'ancienne fonction `kellyStake` retournant un objet
+  // {fraction, stake10, stake100} a été supprimée — elle entrait en conflit
+  // avec celle du Chantier BB (ligne 2320) qui renvoie un nombre. Les seuls
+  // call sites (hero top-picks, détail match) attendent bien un nombre.
   // ======= Competitor helpers =======
   function getSides(match) {
     const comps = match.competitors || [];
@@ -4367,6 +4383,18 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
               return `<span title="Cote ${lm.before.toFixed(2)} → ${lm.after.toFixed(2)}. ${sevTxt} drift — marché s'éloigne." style="padding:5px 12px;border-radius:8px;background:rgba(248,113,113,${intensity});color:#f87171;font-weight:700;font-size:12.5px;">📈 ${sevTxt} +${lm.deltaPct.toFixed(1)}%</span>`;
             })() : ''}
             <span style="padding:5px 12px;border-radius:8px;background:rgba(255,255,255,.04);color:var(--text-dim);font-weight:600;font-size:12.5px;">Gain 10€ → ${((pickOdd-1)*10).toFixed(2)}€</span>
+            ${(() => {
+              // Chantiers BB + HH sur le top-picks hero
+              const rel = pred.reliability ?? pred.pick.prob;
+              const kStake = kellyStake(rel, pickOdd, bankroll, 0.25);
+              const edge = valueBetEdge(rel, pickOdd);
+              const edgePct = edge != null ? Math.round(edge * 100) : null;
+              const isValue = edge != null && edge >= 0.05;
+              let out = '';
+              if (kStake > 0) out += `<span title="Kelly 0.25× — mise suggérée pour bankroll ${bankroll.toFixed(0)}€" style="padding:5px 12px;border-radius:8px;background:rgba(167,139,250,.18);color:#a78bfa;font-weight:700;font-size:12.5px;">💰 Kelly ${kStake.toFixed(2)}€</span>`;
+              if (isValue) out += `<span title="Edge modèle ${(rel*100).toFixed(0)}% vs cote implicite ${((1/pickOdd)*100).toFixed(0)}%" style="padding:5px 12px;border-radius:8px;background:rgba(236,72,153,.18);color:#f472b6;font-weight:700;font-size:12.5px;">💎 Value +${edgePct}pt</span>`;
+              return out;
+            })()}
             ${corrEffective > 0 ? `<span title="Tu as déjà ${nBets} pari${nBets>1?'s':''} sur ce match — risque corrélé." style="padding:5px 12px;border-radius:8px;background:rgba(251,191,36,.18);color:#fbbf24;font-weight:700;font-size:12.5px;">⚠️ Corrélé (${nBets})</span>` : ''}
             ${pred.markets && pred.markets.ou.prob >= 0.60 ? `<span title="Marché bonus dérivé des buts attendus." style="padding:5px 12px;border-radius:8px;background:rgba(139,92,246,.16);color:#a78bfa;font-weight:700;font-size:12.5px;">⚽ ${esc(pred.markets.ou.label)} · ${(pred.markets.ou.prob*100).toFixed(0)}%</span>` : ''}
             ${pred.markets && pred.markets.btts.prob >= 0.60 ? `<span title="Les deux équipes marquent — probabilité dérivée des buts attendus." style="padding:5px 12px;border-radius:8px;background:rgba(236,72,153,.16);color:#f472b6;font-weight:700;font-size:12.5px;">🔄 ${esc(pred.markets.btts.label)} · ${(pred.markets.btts.prob*100).toFixed(0)}%</span>` : ''}
@@ -5238,10 +5266,22 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
                 return ` · <span title="${esc(tooltip)}" style="padding:2px 8px;border-radius:10px;background:${bg};border:1px solid ${border};color:${color};font-size:11px;font-weight:700;letter-spacing:.3px;font-variant-numeric:tabular-nums;">📊 ${dq.score}/${dq.max} données</span>`;
               })()}
             </div>
-            ${pickOdd ? `<div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;font-size:13px;">
-              <span style="padding:4px 10px;border-radius:6px;background:rgba(16,185,129,.12);color:#10b981;font-weight:700;">Cote @ ${pickOdd.toFixed(2)}</span>
-              <span style="padding:4px 10px;border-radius:6px;background:rgba(255,255,255,.05);color:var(--text-dim,#b4bcc7);">Gain 10€ → ${((pickOdd-1)*10).toFixed(2)}€</span>
-            </div>` : ''}
+            ${pickOdd ? (() => {
+              // Chantiers BB + HH — Kelly staking + Value bet.
+              const rel = pred.reliability ?? pred.pick.prob;
+              const kStake025 = kellyStake(rel, pickOdd, bankroll, 0.25);
+              const kStake050 = kellyStake(rel, pickOdd, bankroll, 0.50);
+              const kFrac025 = kellyFraction(rel, pickOdd, 0.25);
+              const edge = valueBetEdge(rel, pickOdd);
+              const edgePct = edge != null ? Math.round(edge * 100) : null;
+              const isValue = edge != null && edge >= 0.05;
+              return `<div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;font-size:13px;">
+                <span style="padding:4px 10px;border-radius:6px;background:rgba(16,185,129,.12);color:#10b981;font-weight:700;">Cote @ ${pickOdd.toFixed(2)}</span>
+                <span style="padding:4px 10px;border-radius:6px;background:rgba(255,255,255,.05);color:var(--text-dim,#b4bcc7);">Gain 10€ → ${((pickOdd-1)*10).toFixed(2)}€</span>
+                ${kStake025 > 0 ? `<span title="Kelly 0.25×: (p·b − q) / b × 0.25. Limite 10% bankroll.&#10;Bankroll = ${bankroll.toFixed(0)}€&#10;0.50× = ${kStake050.toFixed(2)}€" style="padding:4px 10px;border-radius:6px;background:rgba(167,139,250,.14);color:#a78bfa;font-weight:700;">💰 Kelly 0.25× → ${kStake025.toFixed(2)}€ <span style="opacity:.7;font-weight:500;">(${(kFrac025*100).toFixed(1)}%)</span></span>` : `<span title="Kelly négatif : l'edge vs cote ne justifie pas de miser." style="padding:4px 10px;border-radius:6px;background:rgba(252,165,165,.12);color:#fca5a5;font-weight:600;">💰 Kelly = 0 (pas d'edge)</span>`}
+                ${isValue ? `<span title="Fiabilité modèle ${(rel*100).toFixed(0)}% vs cote implicite ${((1/pickOdd)*100).toFixed(0)}%. Écart positif = value." style="padding:4px 10px;border-radius:6px;background:rgba(236,72,153,.14);color:#f472b6;font-weight:700;">💎 Value +${edgePct}pt</span>` : (edge != null && edge > 0 && edge < 0.05 ? `<span title="Edge positif mais marginal (<5pt), marché correctement priced." style="padding:4px 10px;border-radius:6px;background:rgba(255,255,255,.05);color:var(--text-dim2,#7b8693);font-weight:600;">Edge +${edgePct}pt</span>` : '')}
+              </div>`;
+            })() : ''}
             ${pred.explain?.headline ? `<div style="margin-top:14px;padding:12px 14px;background:rgba(255,255,255,.03);border-radius:8px;border-left:3px solid var(--accent,#10b981);font-size:13.5px;line-height:1.5;color:var(--text,#e6ebf2);">${esc(pred.explain.headline)}</div>` : ''}
             ${reasons.length ? `
             <div style="margin-top:12px;">
@@ -7273,7 +7313,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
     // de `completed` (pas `rows`) pour que la courbe d'équity reste
     // l'historique total, peu importe la fenêtre d'analyse choisie.
     const WALLET_START = 10;
-    const WALLET_STAKE = 1;
+    const WALLET_STAKE = 1; // legacy — utilisé pour labels "1€ flat par lock"
     // Rows pour le wallet — historique complet, pas de windowing.
     const walletAllRows = [];
     completed.forEach(m => {
@@ -7288,13 +7328,24 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
     const lockRows = walletAllRows
       .slice()
       .sort((a, b) => new Date(a.m.date) - new Date(b.m.date));
-    // Group by day
+    // Chantier EE — simulation de mise dynamique.
+    // On itère dans l'ordre chronologique et on calcule la mise pour chaque
+    // lock en fonction de la banque courante (Kelly) ou du montant flat choisi.
+    // Permet de comparer différentes politiques de staking sans toucher
+    // au historique réel.
     const walletByDay = new Map();
+    let _runBank = WALLET_START;
+    let _totalStaked = 0;
     lockRows.forEach(r => {
       const day = isoDate(r.m.date);
       if (!walletByDay.has(day)) walletByDay.set(day, { day, picks: [], w: 0, l: 0, delta: 0 });
       const d = walletByDay.get(day);
-      const delta = r.res === 'won' ? WALLET_STAKE * (r.odd - 1) : -WALLET_STAKE;
+      const stake = Math.min(_runBank, walletStakeFor(_walletStakeMode, _runBank, r.pred.reliability ?? r.pred.pick.prob, r.odd));
+      const delta = r.res === 'won' ? stake * (r.odd - 1) : -stake;
+      r.stake = Math.round(stake * 100) / 100;   // mémorise pour la ligne
+      r.delta = Math.round(delta * 100) / 100;
+      _runBank = Math.max(0, _runBank + delta);
+      _totalStaked += stake;
       d.picks.push(r);
       d.delta += delta;
       if (r.res === 'won') d.w++; else if (r.res === 'lost') d.l++;
@@ -7310,7 +7361,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
     });
     const walletNow = walletRunning;
     const walletPL = walletNow - WALLET_START;
-    const walletROIpct = lockRows.length ? (100 * walletPL / (lockRows.length * WALLET_STAKE)) : 0;
+    const walletROIpct = _totalStaked > 0 ? (100 * walletPL / _totalStaked) : 0;
 
     // ===== Chantier N — Métriques de risque =====
     // Calculs dérivés de walletSeries (equity path) et walletDays (P&L
@@ -7365,12 +7416,15 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
     })();
 
     // Tiny equity chart: reuse renderRoiChart API shape (date + delta)
+    // Chantier EE — utilise les deltas réels calculés dynamiquement par lock
+    // (car la mise varie selon le mode : flat1/flat2/flat5/Kelly).
     const walletChartRows = lockRows.map(r => ({
       date: isoDate(r.m.date),
-      delta: r.res === 'won' ? WALLET_STAKE * (r.odd - 1) : -WALLET_STAKE,
+      delta: r.delta,
     }));
+    const walletStakeModeLbl = walletStakeLabel(_walletStakeMode);
     const walletChartHtml = walletChartRows.length
-      ? (renderRoiChart(walletChartRows, { title: `Capital 10€ → ${walletNow.toFixed(2)}€ (1€ flat par lock)`, unit: '€' })
+      ? (renderRoiChart(walletChartRows, { title: `Capital 10€ → ${walletNow.toFixed(2)}€ (${walletStakeModeLbl} par lock)`, unit: '€' })
          || `<div class="bilan-empty">Pas encore assez de locks settled pour tracer la courbe.</div>`)
       : `<div class="bilan-empty">Pas encore de locks settled. La simulation démarre dès qu'un pick ≥70% fiabilité est tranché.</div>`;
     // Daily breakdown rows — filtrés par l'horizon table uniquement
@@ -7451,12 +7505,24 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
         </div>`
       : '';
 
+    // Chantier EE — toolbar pour sélectionner la politique de staking.
+    // Ne modifie PAS les résultats réels ni les locks — c'est une simulation
+    // rejouée à la volée sur l'historique. Permet de comparer "et si j'avais
+    // mis 2€ flat ?" ou "et si j'avais Kelly 0.25× ?".
+    const walletStakeToolbarHtml = `
+      <div style="display:flex;align-items:center;gap:8px;margin-top:4px;margin-bottom:12px;flex-wrap:wrap;">
+        <span style="font-size:11.5px;color:var(--text-dim2);font-weight:600;text-transform:uppercase;letter-spacing:.4px;">Politique de mise :</span>
+        ${[['flat1','1€ flat'],['flat2','2€ flat'],['flat5','5€ flat'],['kelly025','Kelly ¼'],['kelly050','Kelly ½']].map(([v,lbl]) =>
+          `<button class="wallet-stake-btn${_walletStakeMode===v?' active':''}" data-wsm="${v}" style="background:${_walletStakeMode===v?'var(--brand,#a78bfa)':'var(--bg-3,#0f1823)'};color:${_walletStakeMode===v?'#0a0e17':'var(--text)'};border:1px solid ${_walletStakeMode===v?'var(--brand,#a78bfa)':'var(--border,#2a3744)'};padding:4px 11px;font-size:12px;font-weight:600;border-radius:6px;cursor:pointer;">${lbl}</button>`).join('')}
+        <span style="font-size:11px;color:var(--text-dim2);margin-left:2px;" title="Kelly utilise la fiabilité (modèle pur, sans marché) comme probabilité. Fraction plafonnée à 10% de banque.">ℹ️ rejoué sur l'historique</span>
+      </div>`;
     const walletSectionHtml = `
       <div class="bilan-section" style="border-color:${walletRoiColor}44;">
         <div class="bilan-section-head">
-          <h3>💰 Portefeuille simulé (10€ de base · 1€ flat par lock)</h3>
+          <h3>💰 Portefeuille simulé (10€ de base · ${walletStakeModeLbl} par lock)</h3>
           <div class="meta">${lockRows.length} lock${lockRows.length>1?'s':''} settled${walletDays.length?` sur ${walletDays.length} jour${walletDays.length>1?'s':''}`:''}${_bilanWindow > 0 ? ' · toujours calculé depuis J1' : ''}</div>
         </div>
+        ${walletStakeToolbarHtml}
         <div class="bilan-kpis" style="margin-top:0;margin-bottom:14px;">
           <div class="bilan-kpi">
             <div class="kpi-label">Capital actuel</div>
@@ -7471,7 +7537,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
           <div class="bilan-kpi">
             <div class="kpi-label">ROI par pick</div>
             <div class="kpi-value" style="color:${walletRoiColor};">${lockRows.length ? (walletROIpct>=0?'+':'')+walletROIpct.toFixed(1)+'%' : '—'}</div>
-            <div class="kpi-sub">1€ flat stake</div>
+            <div class="kpi-sub">sur ${_totalStaked.toFixed(2)}€ misés</div>
           </div>
         </div>
         ${riskMetricsHtml}
@@ -7637,6 +7703,98 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
             </div>`;
         })()
       : '';
+
+    // ========= Chantier FF — TIPSTERS SCORECARD =========
+    // Agrège tous les pronos de tipsters externes (source + pick + cote) sur
+    // les matchs terminés. Permet de voir qui bat le marché et qui coule.
+    // Respecte la fenêtre `_bilanWindow` (contrairement au wallet).
+    // Règles d'exclusion :
+    //  - Tipster sans cote (on ne peut pas calculer un ROI)
+    //  - Source anonyme ('autre', null) regroupée en "Inconnu"
+    //  - On ne garde que les sources avec ≥3 picks pour limiter le bruit.
+    const tipsterAgg = {};      // src -> { name, w, l, n, pl, bySport:{} }
+    let tipsterTotalN = 0;
+    completed.forEach(m => {
+      if (windowCutoff) {
+        const md = new Date(m.date);
+        if (isNaN(md.getTime()) || md < windowCutoff) return;
+      }
+      (m.tips || []).forEach(t => {
+        if (!t.pick || !(t.odds > 1)) return;
+        const tr = evaluateTipsterPick(t.pick, m);
+        if (tr == null) return;   // verdict ambigu
+        const srcKey = t.source || 'autre';
+        const srcName = sourceLabel(srcKey);
+        const b = tipsterAgg[srcKey] = tipsterAgg[srcKey] || { name: srcName, key: srcKey, w: 0, l: 0, n: 0, pl: 0, bySport: {} };
+        b.n++;
+        tipsterTotalN++;
+        const sp = b.bySport[m.sport] = b.bySport[m.sport] || { w:0, l:0, n:0, pl:0 };
+        sp.n++;
+        if (tr === 'won') { b.w++; b.pl += (t.odds - 1); sp.w++; sp.pl += (t.odds - 1); }
+        else if (tr === 'lost') { b.l++; b.pl -= 1; sp.l++; sp.pl -= 1; }
+      });
+    });
+    const tipsterEntries = Object.values(tipsterAgg)
+      .filter(b => b.n >= 3)
+      .sort((a, b) => {
+        // Tri ROI desc, tie-break volume desc.
+        const rA = a.n ? (100 * a.pl / a.n) : 0;
+        const rB = b.n ? (100 * b.pl / b.n) : 0;
+        if (Math.abs(rA - rB) > 0.1) return rB - rA;
+        return b.n - a.n;
+      });
+    // Médaille : badge pour le #1 (si ROI > 0) et warning pour le dernier (si ROI < 0).
+    const tipstersHtml = tipsterEntries.length ? (() => {
+      const winnerROI = 100 * tipsterEntries[0].pl / tipsterEntries[0].n;
+      const loserROI = 100 * tipsterEntries[tipsterEntries.length-1].pl / tipsterEntries[tipsterEntries.length-1].n;
+      const rowsH = tipsterEntries.map((b, idx) => {
+        const wr = 100 * b.w / b.n;
+        const roiT = 100 * b.pl / b.n;
+        const roiColor = roiT >= 3 ? '#34d399' : roiT <= -3 ? '#f87171' : 'var(--text-dim)';
+        const medal = idx === 0 && roiT > 0 ? '🥇 ' : idx === 1 && roiT > 0 ? '🥈 ' : idx === 2 && roiT > 0 ? '🥉 ' : '';
+        const warn = idx === tipsterEntries.length - 1 && roiT <= -3 && tipsterEntries.length >= 3 ? ' ⚠️' : '';
+        // Top sport du tipster
+        const topSport = Object.entries(b.bySport).sort((a,b)=>b[1].n-a[1].n)[0];
+        const topSportLbl = topSport ? `${sportIcon(topSport[0])} ${topSport[1].n}` : '';
+        return `
+          <div style="display:grid;grid-template-columns:28px 1fr 90px 90px 80px 90px;gap:8px;align-items:center;padding:10px 12px;border-top:1px solid var(--border,#2a3744);font-size:13px;">
+            <div style="color:var(--text-dim2);font-weight:600;text-align:center;">${idx+1}</div>
+            <div style="color:var(--text);font-weight:600;">${medal}${esc(b.name)}${warn}</div>
+            <div style="color:var(--text-dim);font-size:12px;">${b.n} pick${b.n>1?'s':''} · ${topSportLbl}</div>
+            <div style="color:var(--text);text-align:right;font-variant-numeric:tabular-nums;">${wr.toFixed(0)}%<span style="font-size:10px;color:var(--text-dim2);margin-left:3px;">WR</span></div>
+            <div style="color:${roiColor};text-align:right;font-weight:600;font-variant-numeric:tabular-nums;">${b.pl>=0?'+':''}${b.pl.toFixed(2)}u</div>
+            <div style="color:${roiColor};text-align:right;font-weight:700;font-variant-numeric:tabular-nums;">${roiT>=0?'+':''}${roiT.toFixed(0)}%</div>
+          </div>`;
+      }).join('');
+      // Comparaison au modèle : est-ce qu'un tipster bat-il le modèle ?
+      const modelROI = model.bets ? (100 * model.pl / model.bets) : 0;
+      const beatModel = tipsterEntries.filter(b => (100*b.pl/b.n) > modelROI).length;
+      return `
+        <div style="background:var(--surface,#111827);border:1px solid var(--border,#2a3744);border-radius:10px;overflow:hidden;">
+          <div style="display:grid;grid-template-columns:28px 1fr 90px 90px 80px 90px;gap:8px;padding:10px 12px;font-size:11px;color:var(--text-dim2,#7b8693);font-weight:600;text-transform:uppercase;letter-spacing:.5px;">
+            <div style="text-align:center;">#</div>
+            <div>Tipster</div>
+            <div>Volume</div>
+            <div style="text-align:right;">Win rate</div>
+            <div style="text-align:right;">P&amp;L</div>
+            <div style="text-align:right;">ROI</div>
+          </div>
+          ${rowsH}
+          <div style="padding:9px 12px;font-size:11px;color:var(--text-dim2);border-top:1px solid var(--border,#2a3744);background:var(--bg-3,#0f1823);">
+            ${tipsterEntries.length >= 2 ? `<span style="color:${winnerROI>0?'#34d399':'var(--text-dim)'};">🏆 Meilleur</span> : ${esc(tipsterEntries[0].name)} (${winnerROI>=0?'+':''}${winnerROI.toFixed(0)}%)` : ''}
+            ${tipsterEntries.length >= 3 && loserROI <= -3 ? ` · <span style="color:#f87171;">⚠️ Fuir</span> : ${esc(tipsterEntries[tipsterEntries.length-1].name)} (${loserROI.toFixed(0)}%)` : ''}
+            ${model.bets >= 10 ? ` · <span style="color:var(--text-dim);">vs modèle (${modelROI>=0?'+':''}${modelROI.toFixed(0)}%)</span> : <b style="color:${beatModel>0?'#fbbf24':'var(--text-dim)'};">${beatModel}</b>/${tipsterEntries.length} tipster${tipsterEntries.length>1?'s':''} font mieux` : ''}
+          </div>
+        </div>`;
+    })() : '';
+    const tipstersSectionHtml = tipsterEntries.length ? `
+      <div class="bilan-section">
+        <div class="bilan-section-head">
+          <h3>👥 Tipsters scorecard</h3>
+          <div class="meta">${tipsterTotalN} prono${tipsterTotalN>1?'s':''} évalué${tipsterTotalN>1?'s':''} · ${tipsterEntries.length} source${tipsterEntries.length>1?'s':''} qualifiée${tipsterEntries.length>1?'s':''} (min 3 picks)</div>
+        </div>
+        ${tipstersHtml}
+      </div>` : '';
 
     // Model history rows — paginated. _bilanHistLimits kept on module scope
     // so pressing "Voir plus" persists across re-renders until data.js changes.
@@ -7827,6 +7985,9 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
         </div>
       ` : ''}
 
+      <!-- Chantier FF — Tipsters scorecard : WR + ROI par source externe -->
+      ${tipstersSectionHtml}
+
       <!-- CALIBRATION FIABILITÉ : reliability diagram + sparkline MAE persistant -->
       ${reliabilitySectionHtml}
 
@@ -7891,6 +8052,14 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
       try { localStorage.setItem('walletTableWindow', String(v)); } catch (e) {}
       renderBilanPage(wrap);
     }));
+    // Chantier EE — toggle politique de mise (flat / Kelly)
+    wrap.querySelectorAll('.wallet-stake-btn').forEach(btn => btn.addEventListener('click', () => {
+      const v = btn.dataset.wsm;
+      if (!['flat1','flat2','flat5','kelly025','kelly050'].includes(v) || v === _walletStakeMode) return;
+      _walletStakeMode = v;
+      try { localStorage.setItem('walletStakeMode', v); } catch (e) {}
+      renderBilanPage(wrap);
+    }));
     // Chantier O — click handler sur les lignes "Par ligue" pour drill-down
     wrap.querySelectorAll('[data-league-row]').forEach(row => {
       row.addEventListener('click', () => {
@@ -7911,6 +8080,36 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-21T18:42:27.232198Z","today":"
     const v = parseInt(localStorage.getItem('walletTableWindow'), 10);
     return [0, 7, 30].includes(v) ? v : 30;
   })();
+  // Chantier EE — Simulation bankroll : mode de mise du portefeuille simulé.
+  // 'flat1' (default legacy) | 'flat2' | 'flat5' | 'kelly025' | 'kelly050'
+  // Persisté en localStorage. Le bankroll de départ reste 10€ pour comparabilité.
+  let _walletStakeMode = (() => {
+    const v = localStorage.getItem('walletStakeMode');
+    return ['flat1','flat2','flat5','kelly025','kelly050'].includes(v) ? v : 'flat1';
+  })();
+  function walletStakeLabel(mode) {
+    return ({
+      flat1:     '1€ flat',
+      flat2:     '2€ flat',
+      flat5:     '5€ flat',
+      kelly025:  'Kelly 0.25×',
+      kelly050:  'Kelly 0.50×',
+    })[mode] || '1€ flat';
+  }
+  // Étant donné la banque courante et un lock, renvoie la mise à engager.
+  // Pour flat : montant fixe (plafonné à la banque si elle est faible).
+  // Pour Kelly : fraction × banque courante, plancher à 0.10€ (pour éviter
+  // des mises dérisoires sur une banque vidée), plafond 10% de banque.
+  function walletStakeFor(mode, runningBank, reliability, odd) {
+    switch (mode) {
+      case 'flat2':    return Math.min(runningBank, 2);
+      case 'flat5':    return Math.min(runningBank, 5);
+      case 'kelly025': return Math.max(0.10, runningBank * kellyFraction(reliability, odd, 0.25));
+      case 'kelly050': return Math.max(0.10, runningBank * kellyFraction(reliability, odd, 0.50));
+      case 'flat1':
+      default:         return Math.min(runningBank, 1);
+    }
+  }
 
   window.addEventListener('DOMContentLoaded', () => {
     const data = window.PRONOSTICS_DATA;
