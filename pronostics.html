@@ -7686,15 +7686,17 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-22T16:55:34.650266Z","today":"
     if (countEl) countEl.textContent = String(alerts.length);
 
     wrap.innerHTML = `
-      <div style="max-width:900px;margin:0 auto;padding:16px 8px 24px;">
-        <div style="margin-bottom:20px;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+      <div style="max-width:1280px;margin:0 auto;padding:4px 0 0;font-variant-numeric:tabular-nums;">
+        <div style="margin-bottom:24px;padding:32px 0 20px;border-bottom:1px solid var(--border);position:relative;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+          <div style="position:absolute;top:0;left:0;width:40px;height:3px;background:var(--warn);border-radius:0 0 2px 2px;"></div>
           <div>
-            <h1 style="margin:0;font-size:32px;font-weight:800;letter-spacing:-1px;color:var(--text);">Alertes</h1>
-            <div style="font-size:13px;color:var(--text-dim);margin-top:4px;">${alerts.length} notification${alerts.length>1?'s':''} · temps réel</div>
+            <div style="font-size:11px;color:var(--warn);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Notifications · ${alerts.length}</div>
+            <h1 style="margin:0 0 6px;font-size:40px;font-weight:800;letter-spacing:-1.4px;color:var(--text);line-height:1;">Alertes</h1>
+            <div style="font-size:14px;color:var(--text-dim);">Mouvements importants de la journée : nouveaux paris sûrs, séries, alertes anti-panique.</div>
           </div>
           ${alerts.length ? `<button id="clear-alerts" style="background:var(--panel);border:1px solid var(--border);color:var(--text-dim);border-radius:var(--r);padding:8px 14px;font-size:12px;cursor:pointer;">Tout marquer comme lu</button>` : ''}
         </div>
-        <div style="display:grid;gap:10px;">${alertsHtml}</div>
+        <div style="display:grid;gap:10px;max-width:900px;">${alertsHtml}</div>
       </div>`;
 
     wrap.querySelectorAll('[data-alert-action]').forEach(card => {
@@ -8365,16 +8367,18 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-22T16:55:34.650266Z","today":"
     } catch (e) {}
 
     wrap.innerHTML = `
-      <div style="max-width:900px;margin:0 auto;padding:16px 8px 24px;">
-        <div style="margin-bottom:24px;display:flex;align-items:center;gap:16px;">
-          <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--purple));display:grid;place-items:center;font-size:28px;color:#fff;font-weight:700;">T</div>
-          <div>
-            <h1 style="margin:0;font-size:28px;font-weight:700;letter-spacing:-.8px;color:var(--text);">Théo</h1>
-            <div style="font-size:13px;color:var(--text-dim);margin-top:2px;">theoboulnois@gmail.com · membre depuis J1</div>
+      <div style="max-width:1280px;margin:0 auto;padding:4px 0 0;font-variant-numeric:tabular-nums;">
+        <div style="margin-bottom:24px;padding:32px 0 20px;border-bottom:1px solid var(--border);position:relative;display:flex;align-items:center;gap:18px;flex-wrap:wrap;">
+          <div style="position:absolute;top:0;left:0;width:40px;height:3px;background:var(--brand);border-radius:0 0 2px 2px;"></div>
+          <div style="width:56px;height:56px;border-radius:50%;background:var(--panel-2);border:1px solid var(--border-2);display:grid;place-items:center;font-size:22px;color:var(--text);font-weight:800;flex-shrink:0;">T</div>
+          <div style="min-width:0;flex:1;">
+            <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:4px;">Compte</div>
+            <h1 style="margin:0 0 4px;font-size:36px;font-weight:800;letter-spacing:-1.2px;color:var(--text);line-height:1;">Théo</h1>
+            <div style="font-size:13px;color:var(--text-dim);">theoboulnois@gmail.com</div>
           </div>
         </div>
 
-        <div style="display:grid;gap:14px;">
+        <div style="display:grid;gap:14px;max-width:900px;">
 
           <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;">
             <h3 style="margin:0 0 12px;font-size:16px;font-weight:700;color:var(--text);">🎨 Apparence</h3>
@@ -9755,10 +9759,12 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-22T16:55:34.650266Z","today":"
     })();
 
     wrap.innerHTML = `
-      <div style="max-width:1200px;margin:0 auto;padding:16px 8px 24px;">
-        <div class="section-header top-picks" style="margin-top:8px;">
-          <h2><span class="ico">📜</span>Historique des pronostics</h2>
-          <div class="hint">Tous les picks réglés, groupés par jour — filtre par sport, fiabilité, type ou bookmaker, puis exporte en CSV.</div>
+      <div style="max-width:1280px;margin:0 auto;padding:4px 0 0;font-variant-numeric:tabular-nums;">
+        <div style="margin-bottom:24px;padding:32px 0 20px;border-bottom:1px solid var(--border);position:relative;">
+          <div style="position:absolute;top:0;left:0;width:40px;height:3px;background:var(--info);border-radius:0 0 2px 2px;"></div>
+          <div style="font-size:11px;color:var(--info);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Archives du modèle</div>
+          <h1 style="margin:0 0 6px;font-size:40px;font-weight:800;letter-spacing:-1.4px;color:var(--text);line-height:1;">Historique</h1>
+          <div style="font-size:14px;color:var(--text-dim);max-width:700px;">Tous les pronostics réglés, groupés par jour. Filtre par sport, confiance, type ou site de paris, puis exporte en CSV.</div>
         </div>
         ${heroHtml}
         ${patternsHtml}
@@ -12167,7 +12173,17 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     // Refonte 2026-04-20 : bilan modèle pur. Plus de bankroll/perso/tipsters —
     // tout ça vit ailleurs (sidebar + carte matchs). Ici, un seul message :
     // "est-ce que le modèle gagne de l'argent en pariant flat 1u ?"
+    const _modelRoi = model.bets ? roi : null;
     wrap.innerHTML = `
+      <div style="max-width:1280px;margin:0 auto;padding:4px 0 0;font-variant-numeric:tabular-nums;">
+        <div style="margin-bottom:24px;padding:32px 0 20px;border-bottom:1px solid var(--border);position:relative;">
+          <div style="position:absolute;top:0;left:0;width:40px;height:3px;background:${_modelRoi == null ? 'var(--text-dim)' : _modelRoi >= 0 ? 'var(--accent)' : 'var(--danger)'};border-radius:0 0 2px 2px;"></div>
+          <div style="font-size:11px;color:${_modelRoi == null ? 'var(--text-dim)' : _modelRoi >= 0 ? 'var(--accent)' : 'var(--danger)'};text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Performance du modèle · ${model.bets || 0} pari${(model.bets||0)>1?'s':''}</div>
+          <h1 style="margin:0 0 6px;font-size:40px;font-weight:800;letter-spacing:-1.4px;color:var(--text);line-height:1;">Bilan</h1>
+          <div style="font-size:14px;color:var(--text-dim);max-width:700px;">Le modèle gagne-t-il de l'argent en mise fixe ? Courbe, rentabilité, risque et comparaison sport par sport.</div>
+        </div>
+      </div>
+
       <!-- TIME-WINDOW FILTER -->
       ${windowToolbarHtml}
 
