@@ -7,7 +7,7 @@
 //   * icônes / manifest : cache-first (change rarement).
 //   * tout le reste    : passthrough réseau.
 
-const CACHE_VERSION = 'paris-sportif-v39-2026-04-23-v26.2-card-badges-simplified';
+const CACHE_VERSION = 'paris-sportif-v40-2026-04-23-v26.3-headers-pages';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
