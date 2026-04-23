@@ -11348,11 +11348,16 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-22T16:55:34.650266Z","today":"
     const perSport = {};
     const perLeague = {}; // Chantier O — aggregation par ligue
     const rows = [];
+    // v26.5 — Compute available sports BEFORE applying sport filter (for filter UI)
+    // Only sports with ≥1 evaluated pick in the time window make it into the pills.
+    const _sportsInWindow = new Set();
     completed.forEach(m => {
       if (windowCutoff) {
         const md = new Date(m.date);
         if (isNaN(md.getTime()) || md < windowCutoff) return;
       }
+      // v26.5 — Apply sport filter (drill-down)
+      if (_bilanSport && m.sport !== _bilanSport) return;
       const pred = predictMatch(m);
       if (!pred || !pred.pick || pred.skip) return;
       const res = evaluateModelPick(m, pred);
@@ -11376,6 +11381,33 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-22T16:55:34.650266Z","today":"
     });
     const wr = model.bets ? (100*model.w/model.bets) : 0;
     const roi = model.bets ? (100*model.pl/model.bets) : 0;
+
+    // v26.5 — Discover sports present in current time window (before filter)
+    // to render the sport-filter pills. Counts picks per sport (using a quick
+    // pre-pass); only sports with ≥1 evaluable pick appear.
+    const _sportCounts = {};
+    completed.forEach(m => {
+      if (windowCutoff) {
+        const md = new Date(m.date);
+        if (isNaN(md.getTime()) || md < windowCutoff) return;
+      }
+      const pp = predictMatch(m);
+      if (!pp || !pp.pick || pp.skip) return;
+      const r = evaluateModelPick(m, pp);
+      if (r == null) return;
+      const o = pp.odds && (pp.pick.key === '1' ? pp.odds.home : pp.pick.key === '2' ? pp.odds.away : pp.odds.draw);
+      if (!o) return;
+      _sportCounts[m.sport] = (_sportCounts[m.sport] || 0) + 1;
+    });
+    const _availSports = Object.entries(_sportCounts).sort((a,b) => b[1]-a[1]);
+    const _totalPicksInWindow = _availSports.reduce((s, [,c]) => s + c, 0);
+    const _sportFilterHtml = _availSports.length >= 2 ? `
+      <div style="max-width:1280px;margin:0 auto 16px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-variant-numeric:tabular-nums;">
+        <span style="font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-dim2);font-weight:700;margin-right:4px;">Filtrer par sport</span>
+        <button class="bilan-sport-btn${_bilanSport === null ? ' active' : ''}" data-sport="" title="Tous les sports" style="padding:6px 12px;border-radius:6px;border:1px solid ${_bilanSport === null ? 'var(--brand)' : 'var(--border)'};background:${_bilanSport === null ? 'rgba(167,139,250,.12)' : 'var(--panel)'};color:${_bilanSport === null ? 'var(--brand)' : 'var(--text-dim)'};font-size:12px;font-weight:${_bilanSport === null ? 700 : 500};cursor:pointer;display:inline-flex;align-items:center;gap:6px;">Tous<span style="opacity:.6;">${_totalPicksInWindow}</span></button>
+        ${_availSports.map(([sp, n]) => `<button class="bilan-sport-btn${_bilanSport === sp ? ' active' : ''}" data-sport="${esc(sp)}" title="${esc(sportLabel(sp))} · ${n} pari${n>1?'s':''}" style="padding:6px 12px;border-radius:6px;border:1px solid ${_bilanSport === sp ? 'var(--brand)' : 'var(--border)'};background:${_bilanSport === sp ? 'rgba(167,139,250,.12)' : 'var(--panel)'};color:${_bilanSport === sp ? 'var(--brand)' : 'var(--text-dim)'};font-size:12px;font-weight:${_bilanSport === sp ? 700 : 500};cursor:pointer;display:inline-flex;align-items:center;gap:6px;">${sportIcon(sp)} ${esc(sportLabel(sp))}<span style="opacity:.6;">${n}</span></button>`).join('')}
+      </div>
+    ` : '';
 
     const modelChartRows = rows.map(r => ({
       date: isoDate(r.m.date),
@@ -11778,15 +11810,16 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-22T16:55:34.650266Z","today":"
       }
     });
 
-    // Per-sport cards
+    // Per-sport cards — v26.5 clickable when not already drilled (data-sport)
     const perSportHtml = Object.entries(perSport)
       .sort((a,b) => b[1].bets - a[1].bets)
       .map(([sport, s]) => {
         const sw = s.bets ? (100*s.w/s.bets) : 0;
         const sr = s.bets ? (100*s.pl/s.bets) : 0;
         const roiColor = sr >= 0 ? '#34d399' : '#f87171';
-        return `<div class="bilan-sport-card">
-          <div class="sport-name"><span class="sport-ico" aria-hidden="true">${sportIcon(sport)}</span> ${esc(sportLabel(sport))}</div>
+        const clickable = !_bilanSport;
+        return `<div class="bilan-sport-card"${clickable ? ` data-sport="${esc(sport)}" title="Cliquer pour filtrer le Bilan sur ${esc(sportLabel(sport))}" style="cursor:pointer;"` : ''}>
+          <div class="sport-name"><span class="sport-ico" aria-hidden="true">${sportIcon(sport)}</span> ${esc(sportLabel(sport))}${clickable ? ' <span style="font-size:10px;color:var(--text-dim2);opacity:.6;margin-left:4px;">→</span>' : ''}</div>
           <div class="sport-wr">${sw.toFixed(0)}% <span style="font-size:11px;color:var(--text-dim2);font-weight:500;letter-spacing:0;">WR</span></div>
           <div class="sport-roi" style="color:${roiColor};">Rentabilité ${sr>=0?'+':''}${sr.toFixed(0)}% · ${s.bets} paris</div>
         </div>`;
@@ -12179,10 +12212,13 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         <div style="margin-bottom:24px;padding:32px 0 20px;border-bottom:1px solid var(--border);position:relative;">
           <div style="position:absolute;top:0;left:0;width:40px;height:3px;background:${_modelRoi == null ? 'var(--text-dim)' : _modelRoi >= 0 ? 'var(--accent)' : 'var(--danger)'};border-radius:0 0 2px 2px;"></div>
           <div style="font-size:11px;color:${_modelRoi == null ? 'var(--text-dim)' : _modelRoi >= 0 ? 'var(--accent)' : 'var(--danger)'};text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Performance du modèle · ${model.bets || 0} pari${(model.bets||0)>1?'s':''}</div>
-          <h1 style="margin:0 0 6px;font-size:40px;font-weight:800;letter-spacing:-1.4px;color:var(--text);line-height:1;">Bilan</h1>
-          <div style="font-size:14px;color:var(--text-dim);max-width:700px;">Le modèle gagne-t-il de l'argent en mise fixe ? Courbe, rentabilité, risque et comparaison sport par sport.</div>
+          <h1 style="margin:0 0 6px;font-size:40px;font-weight:800;letter-spacing:-1.4px;color:var(--text);line-height:1;">Bilan${_bilanSport ? ` · <span style="font-size:18px;font-weight:600;color:var(--brand);letter-spacing:-.3px;">${sportIcon(_bilanSport)} ${esc(sportLabel(_bilanSport))}</span>` : ''}</h1>
+          <div style="font-size:14px;color:var(--text-dim);max-width:700px;">${_bilanSport ? `Drill-down <strong style="color:var(--text);">${esc(sportLabel(_bilanSport))}</strong> — toutes les stats ci-dessous sont filtrées sur ce sport uniquement.` : `Le modèle gagne-t-il de l'argent en mise fixe ? Courbe, rentabilité, risque et comparaison sport par sport.`}</div>
         </div>
       </div>
+
+      <!-- v26.5 — SPORT FILTER PILLS (drill-down) -->
+      ${_sportFilterHtml}
 
       <!-- TIME-WINDOW FILTER -->
       ${windowToolbarHtml}
@@ -12439,6 +12475,27 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         row.classList.toggle('expanded');
       });
     });
+    // v26.5 — Sport filter pills (drill-down)
+    wrap.querySelectorAll('.bilan-sport-btn').forEach(btn => btn.addEventListener('click', () => {
+      const sp = btn.dataset.sport || null;
+      if (sp === _bilanSport) return;
+      _bilanSport = sp;
+      try {
+        if (sp) localStorage.setItem('bilanSport', sp);
+        else localStorage.removeItem('bilanSport');
+      } catch (e) {}
+      renderBilanPage(wrap);
+    }));
+    // v26.5 — Per-sport cards clickable : click = filter Bilan to that sport
+    wrap.querySelectorAll('.bilan-sport-card[data-sport]').forEach(card => card.addEventListener('click', () => {
+      const sp = card.dataset.sport;
+      if (!sp || sp === _bilanSport) return;
+      _bilanSport = sp;
+      try { localStorage.setItem('bilanSport', sp); } catch (e) {}
+      renderBilanPage(wrap);
+      // Scroll to top so user sees the new filter applied
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }));
   }
   // Pagination state for bilan history (persists across re-renders during session)
   let _bilanHistLimits = { perso: 40, modele: 40 };
@@ -12446,6 +12503,13 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
   let _bilanWindow = (() => {
     const v = parseInt(localStorage.getItem('bilanWindow'), 10);
     return [0, 7, 30, 90].includes(v) ? v : 0;
+  })();
+  // v26.5 — Sport filter (drill-down). null = tous les sports. Persisted.
+  // Si défini, filtre model/wallet/chart/buckets/histoire à un sport unique.
+  let _bilanSport = (() => {
+    const v = localStorage.getItem('bilanSport');
+    const valid = ['football','basketball','tennis','hockey','american-football','mma','golf','racing','baseball'];
+    return v && valid.includes(v) ? v : null;
   })();
   // Chantier R — Horizon d'affichage pour la table Portefeuille 10€
   // (indépendant de _bilanWindow ; ne change pas les KPIs/courbe).
