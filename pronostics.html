@@ -7234,7 +7234,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-22T16:55:34.650266Z","today":"
             alerts.push({
               ts: now, icon: '🆕', type: 'Nouveau lock', color: 'gold',
               title: `${m.home} vs ${m.away}`,
-              body: `Lock Winamax détecté · ${((pred.reliability||0)*100).toFixed(0)}% fiabilité`,
+              body: `Nouveau pari sûr Winamax · ${((pred.reliability||0)*100).toFixed(0)}% de confiance`,
               action: 'locks'
             });
           }
@@ -9947,11 +9947,11 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-22T16:55:34.650266Z","today":"
     // Construire le paragraphe — tone coach direct
     const lines = [];
     // Ouverture : état de forme
-    if (roi >= 15) lines.push(`🔥 Tu claques du <b style="color:#10b981;">${roi.toFixed(1)}% ROI</b> sur ${tot} picks — le modèle sort sa meilleure forme.`);
-    else if (roi >= 5) lines.push(`✅ <b style="color:#10b981;">+${roi.toFixed(1)}% ROI</b> sur ${tot} picks — rentable, tiens la ligne.`);
-    else if (roi >= -5) lines.push(`⚖️ <b>${roi >= 0 ? '+' : ''}${roi.toFixed(1)}% ROI</b> sur ${tot} picks — à l'équilibre, patience.`);
-    else if (roi >= -15) lines.push(`⚠️ <b style="color:#fbbf24;">${roi.toFixed(1)}% ROI</b> sur ${tot} picks — passage à vide, check si tu respectes les locks.`);
-    else lines.push(`🧊 <b style="color:#f87171;">${roi.toFixed(1)}% ROI</b> sur ${tot} picks — sérieuse glissade, relis les picks des 2 dernières semaines.`);
+    if (roi >= 15) lines.push(`🔥 <b style="color:#10b981;">+${roi.toFixed(1)}% de rentabilité</b> sur ${tot} paris — le modèle est en pleine forme.`);
+    else if (roi >= 5) lines.push(`✅ <b style="color:#10b981;">+${roi.toFixed(1)}% de rentabilité</b> sur ${tot} paris — rentable, tiens la ligne.`);
+    else if (roi >= -5) lines.push(`⚖️ <b>${roi >= 0 ? '+' : ''}${roi.toFixed(1)}% de rentabilité</b> sur ${tot} paris — à l'équilibre, patience.`);
+    else if (roi >= -15) lines.push(`⚠️ <b style="color:#fbbf24;">${roi.toFixed(1)}% de rentabilité</b> sur ${tot} paris — passage à vide, vérifie si tu suis bien les paris sûrs.`);
+    else lines.push(`🧊 <b style="color:#f87171;">${roi.toFixed(1)}% de rentabilité</b> sur ${tot} paris — glissade sérieuse, relis tes paris des 2 dernières semaines.`);
 
     // Tendance 7j vs 30j
     if (roi7 != null && roi30 != null && r7.length >= 5 && r30.length >= 10) {
@@ -9962,18 +9962,18 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-22T16:55:34.650266Z","today":"
 
     // Sport fort
     if (bestSport) {
-      lines.push(`💪 Ton meilleur sport : <b>${esc(sportLabel(bestSport.k) || bestSport.k)}</b> (+${bestSport.roi.toFixed(0)}% sur ${bestSport.bets} picks). Charge dessus.`);
+      lines.push(`💪 Ton meilleur sport : <b>${esc(sportLabel(bestSport.k) || bestSport.k)}</b> (+${bestSport.roi.toFixed(0)}% sur ${bestSport.bets} paris). Charge dessus.`);
     }
     // Sport faible
     if (worstSport) {
-      lines.push(`🚫 <b>${esc(sportLabel(worstSport.k) || worstSport.k)}</b> te plombe (${worstSport.roi.toFixed(0)}% sur ${worstSport.bets} picks). Skip ou ne mise que les locks.`);
+      lines.push(`🚫 <b>${esc(sportLabel(worstSport.k) || worstSport.k)}</b> te plombe (${worstSport.roi.toFixed(0)}% sur ${worstSport.bets} paris). Évite ou ne mise que les paris sûrs.`);
     }
 
     // Streak
     if (streak >= 4 && streakType === 'won') {
-      lines.push(`🔥 Série de ${streak} victoires — ne monte pas les stakes, reste en Kelly 0.25×.`);
+      lines.push(`🔥 Série de ${streak} victoires — n'augmente pas les mises, reste sur la mise conseillée.`);
     } else if (streak >= 3 && streakType === 'lost') {
-      lines.push(`🧘 ${streak} défaites d'affilée — pas de martingale, prends une pause de 24h si t'es sur le point de tilt.`);
+      lines.push(`🧘 ${streak} défaites d'affilée — pas de grosse mise pour te refaire, prends une pause de 24h si tu sens la panique monter.`);
     }
 
     // Wallet snapshot
@@ -9999,22 +9999,22 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-22T16:55:34.650266Z","today":"
     if (pred.isLock) {
       lines.push(`🔒 Classé <b>pari sûr</b> à ${(rel * 100).toFixed(0)}% — le modèle est suffisamment serein pour le mettre dans les paris du jour.`);
     } else if (rel >= 0.60) {
-      lines.push(`🎯 Fiabilité solide <b>${(rel * 100).toFixed(0)}%</b> — pas un lock mais un pick propre.`);
+      lines.push(`🎯 Confiance solide <b>${(rel * 100).toFixed(0)}%</b> — pas un pari sûr mais un bon pari.`);
     } else if (rel >= 0.50) {
-      lines.push(`⚖️ Fiabilité moyenne <b>${(rel * 100).toFixed(0)}%</b> — pick serré, mise en Kelly si tu y vas.`);
+      lines.push(`⚖️ Confiance moyenne <b>${(rel * 100).toFixed(0)}%</b> — pari serré, suis la mise conseillée si tu y vas.`);
     } else {
-      lines.push(`⚠️ Fiabilité faible <b>${(rel * 100).toFixed(0)}%</b> — pas de conviction forte, skip sauf si value énorme.`);
+      lines.push(`⚠️ Confiance faible <b>${(rel * 100).toFixed(0)}%</b> — pas de conviction forte, passe ton tour sauf gros avantage.`);
     }
 
     // Value
     if (pickOdd && typeof valueBetEdge === 'function') {
       const edge = valueBetEdge(rel, pickOdd);
       if (edge != null && edge >= 0.05) {
-        lines.push(`💎 Le marché te paie @${pickOdd.toFixed(2)} alors que le modèle donne ${(rel * 100).toFixed(0)}% — value de <b>+${Math.round(edge * 100)}pt</b>, exactement le type de cote qu'on cherche.`);
+        lines.push(`💎 La cote @${pickOdd.toFixed(2)} est généreuse alors qu'on estime ${(rel * 100).toFixed(0)}% de chances — avantage de <b>+${Math.round(edge * 100)}pts</b>, exactement le type de cote qu'on cherche.`);
       } else if (edge != null && edge >= 0) {
         lines.push(`🎚️ Cote @${pickOdd.toFixed(2)} alignée avec la proba modèle — pas de grosse value, pari neutre.`);
       } else if (edge != null && edge < 0) {
-        lines.push(`🟡 Cote @${pickOdd.toFixed(2)} sous la proba modèle — le marché a déjà intégré l'edge, mieux vaut passer.`);
+        lines.push(`🟡 Cote @${pickOdd.toFixed(2)} trop basse par rapport à nos estimations — le bookmaker n'a pas laissé d'avantage, mieux vaut passer.`);
       }
     }
 
@@ -10046,9 +10046,9 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-22T16:55:34.650266Z","today":"
     if (pickOdd && typeof kellyStake === 'function' && typeof bankroll !== 'undefined') {
       const k = kellyStake(rel, pickOdd, bankroll, 0.25);
       if (k > 0) {
-        lines.push(`💰 Kelly suggère <b>${k.toFixed(2)}€</b> (0.25×). Ne dépasse pas cette taille.`);
+        lines.push(`💰 Mise conseillée : <b>${k.toFixed(2)}€</b>. Ne dépasse pas cette somme sur ce pari.`);
       } else {
-        lines.push(`💰 Kelly = 0 — pas de stake mathématiquement justifié, même si le pick t'inspire.`);
+        lines.push(`💰 Aucune mise recommandée — le pari n'est pas assez avantageux, même s'il t'inspire.`);
       }
     }
 
@@ -10278,11 +10278,11 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-22T16:55:34.650266Z","today":"
 
     // Ouverture
     if (locks.length >= 3) {
-      lines.push(`🔥 <b>${locks.length} locks</b> dans le top 5 — fiabilité moyenne <b>${(avgRel * 100).toFixed(0)}%</b>. Journée à haute conviction.`);
+      lines.push(`🔥 <b>${locks.length} paris sûrs</b> dans le top 5 — confiance moyenne <b>${(avgRel * 100).toFixed(0)}%</b>. Journée à haute conviction.`);
     } else if (locks.length >= 1) {
-      lines.push(`✅ <b>${locks.length} lock${locks.length > 1 ? 's' : ''}</b> sur 5 — fiabilité moyenne <b>${(avgRel * 100).toFixed(0)}%</b>. Sélection nette.`);
+      lines.push(`✅ <b>${locks.length} pari${locks.length > 1 ? 's' : ''} sûr${locks.length > 1 ? 's' : ''}</b> sur 5 — confiance moyenne <b>${(avgRel * 100).toFixed(0)}%</b>. Sélection nette.`);
     } else {
-      lines.push(`⚖️ Aucun lock dans le top 5 — fiabilité moyenne <b>${(avgRel * 100).toFixed(0)}%</b>. Journée prudente, reste en petite mise.`);
+      lines.push(`⚖️ Aucun pari sûr dans le top 5 — confiance moyenne <b>${(avgRel * 100).toFixed(0)}%</b>. Journée prudente, reste en petite mise.`);
     }
 
     // Sport dominant
@@ -10300,7 +10300,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-22T16:55:34.650266Z","today":"
     });
     if (bestValue && bestValue.edge >= 0.05) {
       const { home, away } = getSides(bestValue.x.m);
-      lines.push(`💎 Meilleure value : <b>${esc(home?.short || home?.name || '?')} vs ${esc(away?.short || away?.name || '?')}</b> → <b>+${Math.round(bestValue.edge * 100)}pt</b>. Priorise celui-là si tu joues qu'un seul match.`);
+      lines.push(`💎 Meilleur avantage : <b>${esc(home?.short || home?.name || '?')} vs ${esc(away?.short || away?.name || '?')}</b> → <b>+${Math.round(bestValue.edge * 100)}pts</b>. Priorise celui-là si tu joues qu'un seul match.`);
     }
 
     // Conseil bankroll
@@ -10311,7 +10311,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-22T16:55:34.650266Z","today":"
     }, 0);
     if (totalKelly > 0) {
       const pct = bankroll > 0 ? (100 * totalKelly / bankroll) : 0;
-      lines.push(`💰 Kelly cumulé sur le top 5 : <b>${totalKelly.toFixed(2)}€</b> (${pct.toFixed(0)}% bankroll). Divise ou priorise selon risque.`);
+      lines.push(`💰 Mises conseillées cumulées sur le top 5 : <b>${totalKelly.toFixed(2)}€</b> (${pct.toFixed(0)}% de ta cagnotte). Divise ou priorise selon le risque.`);
     }
 
     return lines.map(l => `<div style="margin:6px 0;">${l}</div>`).join('');
@@ -10329,11 +10329,11 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-22T16:55:34.650266Z","today":"
 
     // Ouverture
     if (all.length >= 5) {
-      lines.push(`🔒 <b>${all.length} locks actifs</b> (fiabilité moyenne <b>${(avgRel * 100).toFixed(0)}%</b>, cote moyenne <b>@${avgOdd.toFixed(2)}</b>). Journée chargée — garde la discipline Kelly.`);
+      lines.push(`🔒 <b>${all.length} paris sûrs actifs</b> (confiance moyenne <b>${(avgRel * 100).toFixed(0)}%</b>, cote moyenne <b>@${avgOdd.toFixed(2)}</b>). Journée chargée — garde la discipline sur les mises.`);
     } else if (all.length >= 2) {
-      lines.push(`🔒 <b>${all.length} locks actifs</b> — fiabilité moyenne <b>${(avgRel * 100).toFixed(0)}%</b>, cote moyenne <b>@${avgOdd.toFixed(2)}</b>. Sélection raisonnable.`);
+      lines.push(`🔒 <b>${all.length} paris sûrs actifs</b> — confiance moyenne <b>${(avgRel * 100).toFixed(0)}%</b>, cote moyenne <b>@${avgOdd.toFixed(2)}</b>. Sélection raisonnable.`);
     } else {
-      lines.push(`🔒 <b>1 seul lock</b> actif — fiabilité <b>${(avgRel * 100).toFixed(0)}%</b>, cote <b>@${avgOdd.toFixed(2)}</b>. Jour calme.`);
+      lines.push(`🔒 <b>1 seul pari sûr</b> actif — confiance <b>${(avgRel * 100).toFixed(0)}%</b>, cote <b>@${avgOdd.toFixed(2)}</b>. Jour calme.`);
     }
 
     // Sport dominant
@@ -10391,7 +10391,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-22T16:55:34.650266Z","today":"
     } else if (upcomingLocks.length >= 1) {
       lines.push(`✅ <b>${upcomingLocks.length} lock${upcomingLocks.length > 1 ? 's' : ''}</b> à venir sur <b>${totalUpcoming} matchs</b>. Sélection propre, pas de sur-exposition.`);
     } else {
-      lines.push(`⚖️ Aucun lock à venir — ${totalUpcoming} match${totalUpcoming > 1 ? 's' : ''} restant${totalUpcoming > 1 ? 's' : ''}. Jour prudent, stake réduit.`);
+      lines.push(`⚖️ Aucun pari sûr à venir — ${totalUpcoming} match${totalUpcoming > 1 ? 's' : ''} restant${totalUpcoming > 1 ? 's' : ''}. Jour prudent, petite mise.`);
     }
 
     // Best value à venir
@@ -10404,7 +10404,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-22T16:55:34.650266Z","today":"
     });
     if (bestValue && bestValue.edge >= 0.05) {
       const { home, away } = getSides(bestValue.x.m);
-      lines.push(`💎 Meilleure value : <b>${esc(home?.short || home?.name || '?')} vs ${esc(away?.short || away?.name || '?')}</b> → <b>+${Math.round(bestValue.edge * 100)}pt</b>.`);
+      lines.push(`💎 Meilleur avantage : <b>${esc(home?.short || home?.name || '?')} vs ${esc(away?.short || away?.name || '?')}</b> → <b>+${Math.round(bestValue.edge * 100)}pts</b>.`);
     }
 
     // Live en cours
@@ -11605,8 +11605,8 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     const tipstersSectionHtml = tipsterEntries.length ? `
       <div class="bilan-section">
         <div class="bilan-section-head">
-          <h3>👥 Tipsters scorecard</h3>
-          <div class="meta">${tipsterTotalN} prono${tipsterTotalN>1?'s':''} évalué${tipsterTotalN>1?'s':''} · ${tipsterEntries.length} source${tipsterEntries.length>1?'s':''} qualifiée${tipsterEntries.length>1?'s':''} (min 3 picks)</div>
+          <h3>👥 Performance des pronostiqueurs</h3>
+          <div class="meta">${tipsterTotalN} prono${tipsterTotalN>1?'s':''} évalué${tipsterTotalN>1?'s':''} · ${tipsterEntries.length} source${tipsterEntries.length>1?'s':''} qualifiée${tipsterEntries.length>1?'s':''} (min 3 paris)</div>
         </div>
         ${tipstersHtml}
       </div>` : '';
