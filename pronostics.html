@@ -1096,6 +1096,26 @@
   body.agent-inside .detail-track-btn,
   body.agent-inside [data-suivi-page="mesparis"],
   body.agent-inside [data-suivi-page="backtest"] { display: none !important; }
+
+  /* v28.4 — Mobile responsive Accueil agent (sous 640px, card stack au lieu de table 7 cols) */
+  @media (max-width: 640px) {
+    body.agent-home main { padding: 12px 8px 80px !important; }
+    /* Hero cagnotte : taille réduite */
+    #dashboard-wrap > div > div:first-child > div:nth-child(2) { font-size: 42px !important; }
+    /* Positions du jour : ligne plus compacte */
+    .agent-pos-row { grid-template-columns: 40px 1fr 55px 60px 55px !important; gap: 6px !important; font-size: 11.5px !important; }
+    .agent-pos-row > div:nth-child(5), .agent-pos-row > div:nth-child(6) { display: none !important; }
+    /* Tableau "tous les matchs" : simplifié */
+    #agent-all-matches > div[style*="grid-template-columns"] { grid-template-columns: 18px 20px 1fr 50px 50px !important; font-size: 10.5px !important; gap: 4px !important; }
+    #agent-all-matches > div[style*="grid-template-columns"] > div:nth-child(4),
+    #agent-all-matches > div[style*="grid-template-columns"] > div:nth-child(7) { display: none !important; }
+    /* Buteurs : réduire colonnes */
+    /* Filter bar : plus compacte */
+    #agent-all-matches select { font-size: 10px !important; padding: 3px 6px !important; }
+  }
+  /* v28.4 — Skeleton pulse animation (pour les sections en cours de calcul) */
+  @keyframes agent-skeleton-pulse { 0%,100% { opacity: .5; } 50% { opacity: .8; } }
+  .agent-skeleton { background: var(--panel); border-radius: 8px; animation: agent-skeleton-pulse 1.2s ease-in-out infinite; }
   /* v27 — Return button shown only when off-home */
   .agent-return {
     position: sticky; top: 64px; z-index: 30;
@@ -8026,6 +8046,14 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-22T16:55:34.650266Z","today":"
             <div style="color:var(--text-dim);font-size:18px;font-weight:300;" data-bilan-chevron>▾</div>
           </div>
           <div id="agent-bilan-inline" style="display:none;padding:16px 0;"></div>
+          <!-- v28.4 — Export CSV cagnotte historique -->
+          <div class="agent-accordion" data-agent-export-csv style="display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-top:1px solid var(--border);cursor:pointer;">
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--text);">Exporter l'historique ${agent.series.length?`· ${agent.series.length} paris`:''}</div>
+              <div style="font-size:11px;color:var(--text-dim);margin-top:2px;">Télécharger un CSV : date · match · pick · cote · mise · résultat · cagnotte</div>
+            </div>
+            <div style="color:var(--text-dim);font-size:18px;font-weight:300;">⬇</div>
+          </div>
           <div class="agent-accordion" data-agent-reset style="display:flex;justify-content:space-between;align-items:center;padding:16px 0;cursor:pointer;">
             <div>
               <div style="font-size:13px;font-weight:600;color:var(--text);">Réinitialiser le modèle</div>
@@ -8101,15 +8129,20 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-22T16:55:34.650266Z","today":"
       renderDashboardPage(wrap);
     });
     // v28.2 — Bilan inline accordion : render renderBilanPage dans le div caché
+    // v28.4 — Préserve la position de scroll et scroll doux vers le toggle après render
     const bilanToggle = wrap.querySelector('[data-toggle-bilan]');
     const bilanBox = wrap.querySelector('#agent-bilan-inline');
     const bilanChev = wrap.querySelector('[data-bilan-chevron]');
     if (bilanToggle && bilanBox) {
       bilanToggle.addEventListener('click', () => {
         const open = bilanBox.style.display !== 'none';
+        const togglePos = bilanToggle.getBoundingClientRect().top;
         if (open) {
           bilanBox.style.display = 'none';
           if (bilanChev) bilanChev.textContent = '▾';
+          // Compense le saut de scroll causé par la disparition du contenu
+          const newPos = bilanToggle.getBoundingClientRect().top;
+          window.scrollBy({ top: newPos - togglePos, behavior: 'instant' });
         } else {
           bilanBox.style.display = '';
           if (bilanChev) bilanChev.textContent = '▴';
@@ -8117,9 +8150,34 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-22T16:55:34.650266Z","today":"
             try { if (typeof renderBilanPage === 'function') renderBilanPage(bilanBox); bilanBox._rendered = true; }
             catch(e) { bilanBox.innerHTML = '<div style="color:var(--text-dim);font-size:12px;">Erreur chargement Bilan.</div>'; }
           }
+          // Scroll smooth vers le toggle après ouverture
+          setTimeout(() => bilanToggle.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
         }
       });
     }
+    // v28.4 — Export CSV cagnotte historique
+    const exportBtn = wrap.querySelector('[data-agent-export-csv]');
+    if (exportBtn) exportBtn.addEventListener('click', () => {
+      try {
+        if (!agent.series || agent.series.length === 0) {
+          alert('Aucun pari réglé à exporter.');
+          return;
+        }
+        const rows = [['date', 'sport', 'pick_odds', 'stake_EUR', 'result', 'pl_EUR', 'bankroll_EUR']];
+        agent.series.forEach(p => {
+          const d = new Date(p.t).toISOString().slice(0, 16).replace('T', ' ');
+          rows.push([d, p.sport || '', (p.odd||0).toFixed(2), (p.stake||0).toFixed(2), p.res || '', (p.pl||0).toFixed(2), (p.nav||0).toFixed(2)]);
+        });
+        const csv = rows.map(r => r.map(c => typeof c === 'string' && c.includes(',') ? `"${c}"` : c).join(',')).join('\n');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `agent-cagnotte-${new Date().toISOString().slice(0,10)}.csv`;
+        document.body.appendChild(a); a.click();
+        setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+      } catch(e) { console.warn('CSV export failed:', e); alert('Erreur export CSV'); }
+    });
     // v27.2 — Auto-tuning : Activer une règle proposée
     wrap.querySelectorAll('[data-rule-activate]').forEach(btn => btn.addEventListener('click', () => {
       const id = btn.dataset.ruleActivate;
