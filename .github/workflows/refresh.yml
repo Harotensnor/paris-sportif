@@ -67,6 +67,12 @@ jobs:
             python3 fetch_v3.py || true
             python3 fetch_winamax_catalog.py || true
           fi
+          # v28 — fetch multi-market odds (O/U 2.5, BTTS, 1N2) depuis les pages
+          # tournoi Winamax. Cadence 15 min (tournament pages deja lentes).
+          MIN_MOD15_MKT=$(( $(date +%M) % 15 ))
+          if [ $MIN_MOD15_MKT -lt 5 ]; then
+            python3 fetch_winamax_markets.py || true
+          fi
           # Team-stats (last-5 goal/form enrichies): slow (~4min for 334 teams),
           # run on 4h cadence. Team form changes at most once per match day so
           # this is plenty fresh.
@@ -84,6 +90,9 @@ jobs:
           # Per-fixture event lookup, respectful cadence (0.3s between).
           python3 fetch_referees_soccer.py || true
           python3 patch_winamax.py || true
+          # v28 — Patch multi-market odds (uses ev.winamax.match_id from patch_winamax).
+          # Must run AFTER patch_winamax, BEFORE other patches that rewrite data.js.
+          python3 patch_winamax_markets.py || true
           # Patch soccer injuries AFTER patch_winamax so they survive the
           # dedup/bucketing rewrite. Idempotent, ~0.1s.
           python3 patch_injuries_soccer.py || true
@@ -106,7 +115,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data.js pronostics.html odds_history.jsonl \
-                  injuries_soccer.json winamax_catalog.json team_stats.json \
+                  injuries_soccer.json winamax_catalog.json winamax_markets.json team_stats.json \
                   lineups_soccer.json clubelo.json weather.json \
                   weather_geo_cache.json referees_soccer.json 2>/dev/null || true
           if git diff --cached --quiet; then
