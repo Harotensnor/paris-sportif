@@ -7,7 +7,7 @@
 //   * icônes / manifest : cache-first (change rarement).
 //   * tout le reste    : passthrough réseau.
 
-const CACHE_VERSION = 'paris-sportif-v19-2026-04-22-refonte-v21-light-apple';
+const CACHE_VERSION = 'paris-sportif-v20-2026-04-23-refonte-v22-dark-backtest-onboard';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
