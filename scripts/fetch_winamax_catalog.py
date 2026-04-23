@@ -1,43 +1,27 @@
 #!/usr/bin/env python3
-"""Scrape Winamax's public catalog — THE source of truth for "is it bookable?"
+"""Scrape Winamax's full state tree in ONE request — THE source of truth for
+"what's bookable, at what 1N2 odds, in which tournament".
 
-Output: ``winamax_catalog.json`` at repo root, consumed by ``patch_winamax.py``.
+v28 (2026-04-23) : total rewrite. The old version looped over each tournament
+and re-fetched the tournament page (204 requests, often blocked by Winamax
+or timing out on GHA, producing an empty catalog). The new version hits
+ONLY ``/paris-sportifs/sports/1`` whose ``PRELOADED_STATE`` already contains
+the COMPLETE tree : all sports, categories, tournaments, matches, main bets
+(= Résultat 1N2), outcomes and odds (decimal). One request, no delays, no
+per-tournament fan-out.
 
-Winamax injects its full match catalog into ``var PRELOADED_STATE = {...}``
-on every ``/paris-sportifs/...`` page. curl_cffi with Chrome impersonation
-bypasses the 403 that plain urllib/requests hits.
+Outputs :
+  * ``winamax_catalog.json`` — same schema as before (tournament + matches list)
+  * ``winamax_markets.json`` — map match_id -> 1N2 odds {home, draw, away}
 
-Schema::
-
-    {
-      "generated_at": "2026-04-20T17:45:00Z",
-      "sports": {                # sport_id -> sport name
-        "1": "Football", "5": "Tennis", ...
-      },
-      "tournaments": [           # list of tournaments currently accepting bets
-        {
-          "sport_id": 5,
-          "sport_name": "Tennis",
-          "category_id": 3,
-          "category_name": "ATP",
-          "tournament_id": 175543,
-          "tournament_name": "Madrid",
-          "url": "https://www.winamax.fr/paris-sportifs/sports/5/3/175543",
-          "match_count": 22,
-          "matches": [
-            {"match_id": 70965902, "home": "Nuno Borges",
-             "away": "Mariano Navone"}
-          ]
-        },
-        ...
-      ]
-    }
+Consumers :
+  * ``patch_winamax.py``         -> reads winamax_catalog.json  (match availability)
+  * ``patch_winamax_markets.py`` -> reads winamax_markets.json  (1N2 odds injection)
 """
 from __future__ import annotations
 import json
 import re
 import sys
-import time
 from datetime import datetime
 from pathlib import Path
 
@@ -47,124 +31,160 @@ except ImportError:
     print('ERROR: curl_cffi not installed. Run: pip install curl_cffi --break-system-packages')
     sys.exit(1)
 
-OUT = Path(__file__).resolve().parent.parent / 'winamax_catalog.json'
-BASE = 'https://www.winamax.fr/paris-sportifs'
+ROOT        = Path(__file__).resolve().parent.parent
+OUT_CAT     = ROOT / 'winamax_catalog.json'
+OUT_MARKETS = ROOT / 'winamax_markets.json'
+INDEX_URL   = 'https://www.winamax.fr/paris-sportifs/sports/1'
 
-# Sports we care about. Winamax exposes more (cyclisme, darts...) but these are
-# the ones that intersect with our ESPN pipeline.
-SPORTS_OF_INTEREST = [1, 2, 3, 4, 5, 16, 117]  # foot, basket, baseball, hockey, tennis, football us, MMA
+SPORTS_OF_INTEREST = {1, 2, 3, 4, 5, 16, 117}  # foot, basket, baseball, hockey, tennis, us-foot, MMA
+SPORTS_STR = {str(s) for s in SPORTS_OF_INTEREST}
 
 
-def fetch_state(url: str) -> dict | None:
-    """Hit a Winamax page, extract PRELOADED_STATE as a dict."""
+def fetch_index_state() -> dict | None:
     try:
-        r = cr.get(url, impersonate='chrome110', timeout=20)
+        r = cr.get(INDEX_URL, impersonate='chrome110', timeout=25)
     except Exception as e:
-        print(f'  ERR {url}: {e}', flush=True)
+        print(f'  ERR GET {INDEX_URL}: {e}', flush=True)
         return None
     if r.status_code != 200:
-        print(f'  HTTP {r.status_code} for {url}', flush=True)
+        print(f'  HTTP {r.status_code} on index', flush=True)
         return None
     m = re.search(r'var PRELOADED_STATE = (\{.*?\});\s*\n', r.text, re.DOTALL)
     if not m:
+        print('  no PRELOADED_STATE in index response', flush=True)
         return None
     try:
         return json.loads(m.group(1))
     except json.JSONDecodeError as e:
-        print(f'  JSON decode err for {url}: {e}', flush=True)
+        print(f'  JSON decode err: {e}', flush=True)
         return None
 
 
-def collect_catalog() -> dict:
-    """Walk every sport → every category → every tournament, collecting matches."""
-    t0 = time.time()
-    print(f'[{datetime.now():%H:%M:%S}] Winamax catalog scrape', flush=True)
+def build_outputs(state: dict) -> tuple[dict, dict]:
+    """Build both catalog + markets from a single PRELOADED_STATE dict."""
+    sports      = state.get('sports')      or {}
+    categories  = state.get('categories')  or {}
+    tournaments = state.get('tournaments') or {}
+    matches     = state.get('matches')     or {}
+    bets        = state.get('bets')        or {}
+    outcomes    = state.get('outcomes')    or {}
+    odds        = state.get('odds')        or {}
 
-    # A single home page load gives us the global sport/category/tournament index.
-    index = fetch_state(f'{BASE}/sports/1')
-    if not index:
-        print('  FAILED to load index — aborting')
-        return {}
+    # Build tournament_id -> (sport_id, category_id) lookup by walking sports+categories
+    t_parents: dict[str, tuple[str, str]] = {}
+    for sid, sport in sports.items():
+        if sid not in SPORTS_STR: continue
+        if not isinstance(sport, dict): continue
+        for cid in sport.get('categories') or []:
+            cat = categories.get(str(cid))
+            if not isinstance(cat, dict): continue
+            for tid in cat.get('tournaments') or []:
+                t_parents[str(tid)] = (sid, str(cid))
 
-    sports_d = index.get('sports') or {}
-    cats_d = index.get('categories') or {}
-    tourns_d = index.get('tournaments') or {}
+    # Iterate matches once, bucket by tournament, keep only sports of interest
+    t_matches: dict[str, list[dict]] = {}
+    for mid, mm in matches.items():
+        if not isinstance(mm, dict): continue
+        if mm.get('sportId') not in SPORTS_OF_INTEREST: continue
+        tid = mm.get('tournamentId')
+        if not tid: continue
+        title = mm.get('title') or ''
+        parts = [p.strip() for p in title.split(' - ', 1)]
+        if len(parts) != 2: continue
+        t_matches.setdefault(str(tid), []).append({
+            'match_id': int(mid),
+            'home': parts[0],
+            'away': parts[1],
+        })
 
+    # Build catalog tournaments list
     out_sports: dict[str, str] = {}
     out_tourns: list[dict] = []
-
-    # Walk each sport of interest
-    for sid_int in SPORTS_OF_INTEREST:
-        sid = str(sid_int)
-        sport = sports_d.get(sid)
-        if not sport:
-            print(f'  skip sport {sid} (not in index)')
-            continue
+    for tid_str, mlist in t_matches.items():
+        parents = t_parents.get(tid_str)
+        if not parents: continue
+        sid, cid = parents
+        t   = tournaments.get(tid_str) or {}
+        sport = sports.get(sid) or {}
+        cat   = categories.get(cid) or {}
         sport_name = sport.get('sportName') or f'sport{sid}'
         out_sports[sid] = sport_name
-        cat_ids = sport.get('categories') or []
-        print(f'  sport {sid} {sport_name!r}: {len(cat_ids)} categories', flush=True)
+        out_tourns.append({
+            'sport_id': int(sid),
+            'sport_name': sport_name,
+            'category_id': int(cid) if cid.isdigit() else None,
+            'category_name': cat.get('categoryName') or '?',
+            'tournament_id': int(tid_str),
+            'tournament_name': t.get('tournamentName') or '?',
+            'url': f'https://www.winamax.fr/paris-sportifs/sports/{sid}/{cid}/{tid_str}',
+            'match_count': int(t.get('mainMatchCount') or len(mlist)),
+            'matches': mlist,
+        })
 
-        for cid in cat_ids:
-            cat = cats_d.get(str(cid)) or {}
-            cat_name = cat.get('categoryName') or '?'
-            for tid in cat.get('tournaments') or []:
-                t = tourns_d.get(str(tid)) or {}
-                t_name = t.get('tournamentName') or '?'
-                main_cnt = int(t.get('mainMatchCount') or 0)
-                tourn_url = f'{BASE}/sports/{sid}/{cid}/{tid}'
-                matches: list[dict] = []
-                # Only fetch match detail if there are actual main matches to bet
-                if main_cnt > 0:
-                    page = fetch_state(tourn_url)
-                    if page:
-                        for mid, mobj in (page.get('matches') or {}).items():
-                            # Keep only matches in THIS tournament (the page
-                            # can surface matches from other tournaments in
-                            # "related" sections).
-                            if str(mobj.get('tournamentId')) != str(tid):
-                                continue
-                            # title format: "Home - Away"
-                            title = mobj.get('title') or ''
-                            parts = [p.strip() for p in title.split(' - ')]
-                            if len(parts) != 2:
-                                continue
-                            matches.append({
-                                'match_id': int(mid),
-                                'home': parts[0],
-                                'away': parts[1],
-                            })
-                    time.sleep(0.4)  # be polite
-                out_tourns.append({
-                    'sport_id': sid_int,
-                    'sport_name': sport_name,
-                    'category_id': cid,
-                    'category_name': cat_name,
-                    'tournament_id': tid,
-                    'tournament_name': t_name,
-                    'url': tourn_url,
-                    'match_count': main_cnt,
-                    'matches': matches,
-                })
-
-    elapsed = time.time() - t0
-    total_matches = sum(len(t['matches']) for t in out_tourns)
-    print(f'[{datetime.now():%H:%M:%S}] Done: {len(out_tourns)} tournaments, '
-          f'{total_matches} individual matches ({elapsed:.1f}s)', flush=True)
-    return {
+    catalog = {
         'generated_at': datetime.utcnow().isoformat() + 'Z',
         'sports': out_sports,
         'tournaments': out_tourns,
     }
 
+    # Build markets : match_id -> 1N2 from mainBetId (Résultat / Vainqueur)
+    markets_by_mid: dict[str, dict] = {}
+    for mid, mm in matches.items():
+        if not isinstance(mm, dict): continue
+        if mm.get('sportId') not in SPORTS_OF_INTEREST: continue
+        mbid = mm.get('mainBetId')
+        if not mbid: continue
+        b = bets.get(str(mbid))
+        if not isinstance(b, dict): continue
+        btn = b.get('betTypeName') or ''
+        if btn not in ('Résultat', 'Vainqueur', 'Résultat final', 'Vainqueur du match'):
+            continue
+        oids = b.get('outcomes') or []
+        if len(oids) not in (2, 3): continue
+        vals = []
+        for oid in oids:
+            o = outcomes.get(str(oid)) or {}
+            od = odds.get(str(oid))
+            try:
+                od = float(od) if od is not None else None
+            except (TypeError, ValueError):
+                od = None
+            vals.append((o.get('label') or '', od))
+        mkt_1n2: dict = {}
+        if len(vals) == 3 and all(v[1] for v in vals):
+            mkt_1n2 = {'home': vals[0][1], 'draw': vals[1][1], 'away': vals[2][1]}
+        elif len(vals) == 2 and all(v[1] for v in vals):
+            mkt_1n2 = {'home': vals[0][1], 'away': vals[1][1]}
+        if not mkt_1n2: continue
+        markets_by_mid[str(mid)] = {
+            'tournament_id': mm.get('tournamentId'),
+            'title': mm.get('title'),
+            'odds': {'1n2': mkt_1n2},
+            'fetched_at': datetime.utcnow().isoformat() + 'Z',
+        }
+
+    markets = {
+        'generated_at': datetime.utcnow().isoformat() + 'Z',
+        'matches': markets_by_mid,
+    }
+    return catalog, markets
+
 
 def main() -> int:
-    catalog = collect_catalog()
-    if not catalog:
+    print(f'[{datetime.now():%H:%M:%S}] fetch_winamax_catalog v28 (index-only)', flush=True)
+    state = fetch_index_state()
+    if not state:
+        print('  FAILED — keeping previous files unchanged')
         return 1
-    OUT.write_text(json.dumps(catalog, ensure_ascii=False, separators=(',', ':')),
-                   encoding='utf-8')
-    print(f'  wrote {OUT} ({OUT.stat().st_size / 1024:.1f}KB)', flush=True)
+    catalog, markets = build_outputs(state)
+    n_tourns = len(catalog['tournaments'])
+    n_matches = sum(len(t['matches']) for t in catalog['tournaments'])
+    n_markets = len(markets['matches'])
+    print(f'  catalog: {n_tourns} tournaments, {n_matches} matches', flush=True)
+    print(f'  markets: {n_markets} matches with 1N2 odds', flush=True)
+    OUT_CAT.write_text(json.dumps(catalog, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+    OUT_MARKETS.write_text(json.dumps(markets, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+    print(f'  wrote {OUT_CAT.name} ({OUT_CAT.stat().st_size/1024:.1f}KB) + {OUT_MARKETS.name} ({OUT_MARKETS.stat().st_size/1024:.1f}KB)', flush=True)
     return 0
 
 

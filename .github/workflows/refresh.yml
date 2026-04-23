@@ -63,15 +63,12 @@ jobs:
           # Every 12th tick (= 1h), also run full ESPN sweep + Winamax catalog
           # so tomorrow+ stays fresh. Catalog scrape is slow (~1min) so it's
           # also on the hourly cadence.
+          # v28 — Winamax index scrape : en une seule requete, produit a la fois
+          # winamax_catalog.json (tournois + matchs) ET winamax_markets.json
+          # (1N2 odds par match). Tres rapide (~2s) donc on le lance a chaque tick.
+          python3 fetch_winamax_catalog.py || true
           if [ $(( $(date +%M) % 60 )) -lt 5 ]; then
             python3 fetch_v3.py || true
-            python3 fetch_winamax_catalog.py || true
-          fi
-          # v28 — fetch multi-market odds (O/U 2.5, BTTS, 1N2) depuis les pages
-          # tournoi Winamax. Cadence 15 min (tournament pages deja lentes).
-          MIN_MOD15_MKT=$(( $(date +%M) % 15 ))
-          if [ $MIN_MOD15_MKT -lt 5 ]; then
-            python3 fetch_winamax_markets.py || true
           fi
           # Team-stats (last-5 goal/form enrichies): slow (~4min for 334 teams),
           # run on 4h cadence. Team form changes at most once per match day so
