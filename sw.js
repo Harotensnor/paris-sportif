@@ -7,7 +7,7 @@
 //   * icônes / manifest : cache-first (change rarement).
 //   * tout le reste    : passthrough réseau.
 
-const CACHE_VERSION = 'paris-sportif-v21-2026-04-23-v22.1-vocab-cleanup';
+const CACHE_VERSION = 'paris-sportif-v22-2026-04-23-v22.2-statuses-dict-fix';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
