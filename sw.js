@@ -7,7 +7,7 @@
 //   * icônes / manifest : cache-first (change rarement).
 //   * tout le reste    : passthrough réseau.
 
-const CACHE_VERSION = 'paris-sportif-v52-2026-04-23-v28.5-force-refresh-btn';
+const CACHE_VERSION = 'paris-sportif-v53-2026-04-23-v28.6-top-picks-parier';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
