@@ -7,7 +7,7 @@
 //   * icônes / manifest : cache-first (change rarement).
 //   * tout le reste    : passthrough réseau.
 
-const CACHE_VERSION = 'paris-sportif-v23-2026-04-23-v23-refonte-debutant-nav6';
+const CACHE_VERSION = 'paris-sportif-v24-2026-04-23-v23.1-expose-funcs-cmd-palette';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
