@@ -7,7 +7,7 @@
 //   * icônes / manifest : cache-first (change rarement).
 //   * tout le reste    : passthrough réseau.
 
-const CACHE_VERSION = 'paris-sportif-v28-2026-04-23-v23.5-fix-overlap';
+const CACHE_VERSION = 'paris-sportif-v29-2026-04-23-v24-prono-joueur-buteur';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
