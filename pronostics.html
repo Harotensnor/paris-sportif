@@ -7644,8 +7644,19 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-22T16:55:34.650266Z","today":"
       });
     });
 
-    // Trier par meilleur pari buts (max des deux probas BTTS/OU)
+    // v24.2 — Trier d'abord par disponibilité des compositions (prono buteur possible), puis par meilleur pari buts
+    matches.forEach(entry => {
+      const h = entry.m.competitors.find(c => c.home_away === 'home');
+      const a = entry.m.competitors.find(c => c.home_away === 'away');
+      entry.hasLineup = !!(
+        (h && h.lineup && h.lineup.starters && h.lineup.starters.length) ||
+        (a && a.lineup && a.lineup.starters && a.lineup.starters.length)
+      );
+    });
     matches.sort((a,b) => {
+      // Compositions dispos = priorité max
+      if (a.hasLineup !== b.hasLineup) return a.hasLineup ? -1 : 1;
+      // Puis par proba max OU/BTTS
       const sa = Math.max(a.pred.markets.ou.prob || 0, a.pred.markets.btts.prob || 0);
       const sb = Math.max(b.pred.markets.ou.prob || 0, b.pred.markets.btts.prob || 0);
       return sb - sa;
@@ -7712,8 +7723,18 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-22T16:55:34.650266Z","today":"
             // v24 — Section "Joueurs qui peuvent marquer"
             const scorers = predictLikelyScorers(m, pred);
             if (!scorers || !scorers.length) {
-              return `<div style="margin-top:12px;padding:10px 12px;background:var(--panel-2);border:1px dashed var(--border-2);border-radius:var(--r);font-size:11.5px;color:var(--text-dim);">
-                <b>🎯 Joueurs buteurs :</b> compositions pas encore annoncées pour ce match. Reviens 1-2h avant le coup d'envoi.
+              // v24.2 — Calculer l'heure approximative de retour (1h avant kickoff)
+              let returnTime = '';
+              try {
+                const ko = new Date(m.date);
+                const when = new Date(ko.getTime() - 60 * 60 * 1000);
+                if (!isNaN(when.getTime())) {
+                  returnTime = when.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit', timeZone:'Europe/Paris' });
+                }
+              } catch(e){}
+              return `<div style="margin-top:12px;padding:12px 14px;background:var(--info-soft);border:1px solid rgba(96,165,250,.25);border-radius:var(--r);font-size:12px;color:var(--text-2);line-height:1.5;">
+                <div style="font-weight:700;color:var(--info);margin-bottom:3px;">⏳ Prono joueurs buteurs : bientôt dispo</div>
+                <div>Les compositions officielles sont annoncées <b>1 heure avant le coup d'envoi</b>${returnTime ? ` — reviens vers <b>${returnTime}</b>` : ''}. D'ici là, on ne peut pas estimer qui va marquer.</div>
               </div>`;
             }
             const top = scorers.slice(0, 5);
@@ -7758,15 +7779,37 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-22T16:55:34.650266Z","today":"
            <div style="font-size:12.5px;max-width:360px;margin:0 auto;">Les cotes Winamax pour les matchs d'aujourd'hui et demain ne sont pas encore ouvertes ou les matchs n'ont pas assez de données. Reviens en fin de matinée !</div>
          </div>`;
 
+    // v24.2 — Stats pour la bannière
+    const nWithLineup = matches.filter(x => x.hasLineup).length;
+    const nTotal = matches.length;
+
     wrap.innerHTML = `
       <div style="max-width:1100px;margin:0 auto;padding:16px 8px 24px;">
         <div style="margin-bottom:20px;padding:24px;background:linear-gradient(135deg,var(--brand-soft),var(--accent-soft));border:1px solid var(--border);border-radius:var(--r-xl);">
-          <h1 style="margin:0 0 6px;font-size:28px;font-weight:700;letter-spacing:-.8px;color:var(--text);">⚽ Prono buts</h1>
-          <div style="font-size:13px;color:var(--text-dim);max-width:640px;">Pour chaque match de foot aujourd'hui et demain, on te dit les chances qu'il y ait beaucoup de buts (+ de 2,5 buts) ou que les deux équipes marquent.</div>
+          <h1 style="margin:0 0 6px;font-size:28px;font-weight:700;letter-spacing:-.8px;color:var(--text);">⚽ Buteurs</h1>
+          <div style="font-size:13px;color:var(--text-dim);max-width:640px;">Deux pronos pour chaque match de foot : les <b>chances de buts</b> (+ de 2,5 buts / les 2 équipes marquent) ET les <b>joueurs les plus susceptibles de marquer</b>.</div>
         </div>
 
+        ${nTotal > 0 ? `
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:16px;">
+          <div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r);">
+            <div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;font-weight:700;">Matchs analysés</div>
+            <div style="font-size:22px;font-weight:800;color:var(--text);margin-top:2px;font-variant-numeric:tabular-nums;">${nTotal}</div>
+          </div>
+          <div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r);">
+            <div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;font-weight:700;">Compos dispo</div>
+            <div style="font-size:22px;font-weight:800;color:${nWithLineup>0?'var(--accent)':'var(--text-dim)'};margin-top:2px;font-variant-numeric:tabular-nums;">${nWithLineup}</div>
+            <div style="font-size:10.5px;color:var(--text-dim);">prono joueurs possibles</div>
+          </div>
+          <div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r);">
+            <div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;font-weight:700;">En attente</div>
+            <div style="font-size:22px;font-weight:800;color:var(--warn);margin-top:2px;font-variant-numeric:tabular-nums;">${nTotal - nWithLineup}</div>
+            <div style="font-size:10.5px;color:var(--text-dim);compos annoncées 1h avant</div>
+          </div>
+        </div>` : ''}
+
         <div style="padding:12px 14px;background:var(--info-soft);border:1px solid rgba(96,165,250,.25);border-radius:var(--r);font-size:12.5px;color:var(--text-2);line-height:1.5;margin-bottom:16px;">
-          <b style="color:var(--info);">💡 Comment ça marche ?</b> On analyse l'attaque et la défense des deux équipes, plus le contexte (météo, arbitre, forme). Plus le <b>nombre de buts attendus</b> est élevé, plus il y a de chances que le match dépasse 2,5 buts.
+          <b style="color:var(--info);">💡 Comment ça marche ?</b> On estime les buts à partir de l'attaque/défense des deux équipes + le contexte (météo, arbitre, forme). Pour <b>les joueurs buteurs</b>, il nous faut la composition d'équipe — annoncée <b>1h avant le coup d'envoi</b>.
         </div>
 
         ${cardsHtml}
