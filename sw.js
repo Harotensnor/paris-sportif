@@ -7,7 +7,7 @@
 //   * icônes / manifest : cache-first (change rarement).
 //   * tout le reste    : passthrough réseau.
 
-const CACHE_VERSION = 'paris-sportif-v29-2026-04-23-v24-prono-joueur-buteur';
+const CACHE_VERSION = 'paris-sportif-v30-2026-04-23-v24.1-fr-injured-forme-tous-sports';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
