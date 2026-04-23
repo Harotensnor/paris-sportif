@@ -5535,53 +5535,34 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-22T16:55:34.650266Z","today":"
       }
     }
 
-    // Badges
+    // v26.2 — Badges : uniquement les 3 décisifs (LIVE, Pari sûr, Top match)
     const badges = [];
-    if (isLive) badges.push(`<span class="badge live">🔴 LIVE</span>`);
-    if (pred?.isLock && !isFinal) badges.push(`<span class="badge lock">🔒 Pari sûr${isNewLock(m.id) ? ' <span style="background:#eab308;color:#0a0e17;padding:0 4px;border-radius:3px;font-size:9px;margin-left:2px;">🆕</span>' : ''}</span>`);
-    if (pred?.skip && !isFinal && !isLive) badges.push(`<span class="badge neutral" style="background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.35);color:#fca5a5;">⚠️ Prono faible</span>`);
-    if ((m.league_priority || 0) >= 5) badges.push(`<span class="badge big">⭐ Top match</span>`);
-    if (m.tips && m.tips.length) badges.push(`<span class="badge neutral">👥 ${m.tips.length} tipster${m.tips.length > 1 ? 's' : ''}</span>`);
-    // Injury badges — ESPN for NBA/NHL/WNBA/NFL/MLB, Sofascore for top-5 soccer
-    const injH = m.injuries_home || 0, injA = m.injuries_away || 0;
-    if (injH >= 2) badges.push(`<span class="badge neutral" style="background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.35);color:#fca5a5;">🏥 ${injH} absents ${esc(home?.abbr||'H')}</span>`);
-    if (injA >= 2) badges.push(`<span class="badge neutral" style="background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.35);color:#fca5a5;">🏥 ${injA} absents ${esc(away?.abbr||'A')}</span>`);
-    // Chantier B — contextual badges (weather / referee / ELO / congestion)
+    if (isLive) badges.push(`<span class="badge live">LIVE</span>`);
+    if (pred?.isLock && !isFinal) badges.push(`<span class="badge lock">Pari sûr${isNewLock(m.id) ? ' <span style="background:#eab308;color:#0a0e17;padding:0 4px;border-radius:3px;font-size:9px;margin-left:2px;">NOUVEAU</span>' : ''}</span>`);
+    if ((m.league_priority || 0) >= 5) badges.push(`<span class="badge big">Top match</span>`);
+
+    // v26.2 — Ligne contextuelle synthétique (météo + arbitre + congestion + absents clés) — plus discret qu'une collection de badges
+    const ctxBits = [];
     if (!isLive && !isFinal) {
-      // Météo défavorable (pluie >3mm/h ou vent >25 km/h)
       const wx = m.weather;
-      if (wx && ((typeof wx.precip_mm === 'number' && wx.precip_mm > 3) || (typeof wx.wind_kmh === 'number' && wx.wind_kmh > 25))) {
-        const ico = (typeof wx.precip_mm === 'number' && wx.precip_mm > 3) ? '🌧️' : '💨';
-        const txt = (typeof wx.precip_mm === 'number' && wx.precip_mm > 3)
-          ? `${wx.precip_mm.toFixed(1)}mm/h`
-          : `${Math.round(wx.wind_kmh)}km/h`;
-        badges.push(`<span class="badge neutral" style="background:rgba(96,165,250,.12);border-color:rgba(96,165,250,.35);color:#60a5fa;">${ico} ${esc(txt)}</span>`);
-      }
-      // Arbitre strict (jaunes/match >= 4.5)
+      if (wx && typeof wx.precip_mm === 'number' && wx.precip_mm > 3) ctxBits.push(`Pluie ${wx.precip_mm.toFixed(1)}mm/h`);
+      else if (wx && typeof wx.wind_kmh === 'number' && wx.wind_kmh > 25) ctxBits.push(`Vent ${Math.round(wx.wind_kmh)}km/h`);
       const rf = m.referee;
-      if (rf && typeof rf.yellowPerGame === 'number' && rf.yellowPerGame >= 4.5 && (rf.games || 0) >= 5) {
-        badges.push(`<span class="badge neutral" style="background:rgba(251,191,36,.12);border-color:rgba(251,191,36,.35);color:#fbbf24;">🟨 Arbitre strict</span>`);
-      }
-      // Badge ELO retiré de l'UI (Chantier L) — le signal reste actif dans le
-      // modèle (cf. eloStats + composant elo dans predictMatch) mais il n'est
-      // plus affiché sur les cartes. Jargon peu parlant pour un utilisateur.
-      // Fixture congestion (football, ≥3 matches in 7d)
+      if (rf && typeof rf.yellowPerGame === 'number' && rf.yellowPerGame >= 4.5 && (rf.games || 0) >= 5) ctxBits.push(`Arbitre strict`);
       if (m.sport === 'football') {
         const mt = new Date(m.date).getTime();
         const cH = home?.name ? congestionCount(home.name, mt, 7) : 0;
         const cA = away?.name ? congestionCount(away.name, mt, 7) : 0;
-        if (cH >= 3) badges.push(`<span class="badge neutral" style="background:rgba(249,115,22,.12);border-color:rgba(249,115,22,.35);color:#fb923c;">🟠 ${cH}m/7j ${esc(home?.abbr||'H')}</span>`);
-        if (cA >= 3) badges.push(`<span class="badge neutral" style="background:rgba(249,115,22,.12);border-color:rgba(249,115,22,.35);color:#fb923c;">🟠 ${cA}m/7j ${esc(away?.abbr||'A')}</span>`);
+        if (cH >= 3) ctxBits.push(`${esc(home?.abbr||'H')} calendrier chargé (${cH}m/7j)`);
+        if (cA >= 3) ctxBits.push(`${esc(away?.abbr||'A')} calendrier chargé (${cA}m/7j)`);
       }
-      // Absent clé — un joueur avec rating >= 7 (Sofascore soccer) ou leader basket manquant
-      const keyAbsent = (side, sideAbbr) => {
+      const keyAbsent = (side) => {
         const injs = side?.injuries || [];
         const starters = side?.lineup?.starters || [];
         const starterNames = new Set(starters.map(s => (s.name || '').toLowerCase()));
         for (const inj of injs) {
           const nm = (inj.player || inj.name || '').toLowerCase();
           if (!nm) continue;
-          // Joueur titulaire habituel absent → signalé par Sofascore (type=1/2)
           if ((inj.type === 1 || inj.type === 2 || /out|blessure|injur/i.test(inj.reason_label || inj.type || '')) && !starterNames.has(nm)) {
             return inj.player || inj.name;
           }
@@ -5590,9 +5571,15 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-22T16:55:34.650266Z","today":"
       };
       const kH = keyAbsent(home);
       const kA = keyAbsent(away);
-      if (kH) badges.push(`<span class="badge neutral" style="background:rgba(239,68,68,.18);border-color:rgba(239,68,68,.45);color:#fca5a5;">🔴 ${esc(kH.split(' ').slice(-1)[0])} absent</span>`);
-      if (kA) badges.push(`<span class="badge neutral" style="background:rgba(239,68,68,.18);border-color:rgba(239,68,68,.45);color:#fca5a5;">🔴 ${esc(kA.split(' ').slice(-1)[0])} absent</span>`);
+      if (kH) ctxBits.push(`${esc(kH.split(' ').slice(-1)[0])} absent (${esc(home?.abbr||'H')})`);
+      if (kA) ctxBits.push(`${esc(kA.split(' ').slice(-1)[0])} absent (${esc(away?.abbr||'A')})`);
+      const injH = m.injuries_home || 0, injA = m.injuries_away || 0;
+      if (injH >= 2 && !kH) ctxBits.push(`${injH} absents ${esc(home?.abbr||'H')}`);
+      if (injA >= 2 && !kA) ctxBits.push(`${injA} absents ${esc(away?.abbr||'A')}`);
     }
+    const contextLine = ctxBits.length
+      ? `<div style="padding:6px 12px;font-size:11px;color:var(--text-dim);line-height:1.5;margin-top:2px;">${ctxBits.slice(0, 4).map(b => esc(b)).join(' · ')}${ctxBits.length > 4 ? ` · +${ctxBits.length - 4}` : ''}</div>`
+      : '';
 
     // Tipsters block (compact) — also shown post-match with win/lost badges
     const tipsHtml = (m.tips && m.tips.length) ? `
@@ -5707,6 +5694,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-22T16:55:34.650266Z","today":"
           </div>
         </div>
         ${badges.length ? `<div class="badges">${badges.join('')}</div>` : ''}
+        ${contextLine}
         ${(() => {
           // v25 — Écart de force (Elo) en 1 ligne + cote marché vs modèle
           if (isFinal) return '';
