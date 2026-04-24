@@ -7459,39 +7459,9 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-24T13:40:31.757647Z","today":"
     return false;
   }
 
-  // v28.3 — Pause/stop-loss/take-profit : calcule si l'agent doit être en pause
-  //   Stop-loss : cagnotte -30% sur les 7 derniers jours → pause 24h
-  //   Take-profit : gain +10% dans la journée en cours → pause jusqu'au lendemain
-  //   Retourne { paused: bool, reason: string, until: timestamp }
-  function _agentPauseStatus(agentResult) {
-    if (!agentResult || !agentResult.series || agentResult.series.length === 0) return { paused: false };
-    const now = Date.now();
-    const last = agentResult.series[agentResult.series.length - 1];
-    const nav = agentResult.nav;
-    // Override manuel possible (si user veut forcer)
-    const manualPauseUntil = parseInt(localStorage.getItem('agentPauseUntil') || '0', 10);
-    if (manualPauseUntil && manualPauseUntil > now) {
-      return { paused: true, reason: 'pause manuelle', until: manualPauseUntil };
-    }
-    // Stop-loss : -30% sur 7j glissants
-    const cut7 = now - 7 * 86400000;
-    let nav7dAgo = agentResult.start;
-    for (const p of agentResult.series) { if (p.t > cut7) break; nav7dAgo = p.nav; }
-    if (nav7dAgo > 0 && (nav - nav7dAgo) / nav7dAgo < -0.30) {
-      // pause jusqu'à demain 00h00
-      const tomorrow = new Date(); tomorrow.setHours(24, 0, 0, 0);
-      return { paused: true, reason: `stop-loss · cagnotte −${Math.abs(Math.round((nav-nav7dAgo)/nav7dAgo*100))}% sur 7 jours`, until: tomorrow.getTime() };
-    }
-    // Take-profit : +10% dans la journée en cours
-    const startOfDay = new Date(); startOfDay.setHours(0, 0, 0, 0);
-    let navStartOfDay = agentResult.start;
-    for (const p of agentResult.series) { if (p.t >= startOfDay.getTime()) break; navStartOfDay = p.nav; }
-    if (navStartOfDay > 0 && (nav - navStartOfDay) / navStartOfDay >= 0.10) {
-      const tomorrow = new Date(); tomorrow.setHours(24, 0, 0, 0);
-      return { paused: true, reason: `take-profit · journée déjà à +${Math.round((nav-navStartOfDay)/navStartOfDay*100)}%`, until: tomorrow.getTime() };
-    }
-    return { paused: false };
-  }
+  // (v28.3 pause logic removed — user wants the model to never stop generating picks.
+  //  Picks are now always computed, regardless of daily/weekly P&L. Risk controls
+  //  remain via Kelly 0.25× + cap 10% + data-stale guard.)
   function _proposedRules(scorableRaw) {
     // Returns array of candidate rules that would have avoided loss buckets.
     // Conditions: min 10 paris in bucket, flat-1u ROI ≤ -5%
@@ -7734,11 +7704,11 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-24T13:40:31.757647Z","today":"
 
     // v27.1 — Positions du jour avec Kelly strict (skip si edge ≤0) + cap journalier 20%
     const KELLY_FRAC = 0.25, CAP_PCT = 0.10, MIN_STAKE = 0.10, DAILY_CAP_PCT = 0.20;
-    // v28.3 — Pause status : stop-loss / take-profit / manuel
-    const pauseStatus = _agentPauseStatus(agent);
     const rawCandidates = [];
-    // v28.3 — Si en pause OU data obsolète (v28.8), skip la génération de positions
-    if (pauseStatus.paused || _dataIsStale) {
+    // v28.8 — Si data obsolète (>4h), skip la génération de positions (évite de
+    // recommander des matchs déjà joués). Pause stop-loss/take-profit supprimée
+    // (le modèle ne s'arrête jamais sur demande utilisateur).
+    if (_dataIsStale) {
       // pas de nouvelles positions (agent silencieux quand data pas fiable)
     } else
     today.forEach(m => {
@@ -8016,72 +7986,6 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-24T13:40:31.757647Z","today":"
           </div>
         </div>` : ''}
 
-        <div style="padding:44px 0 32px;">
-          <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:10px;">Cagnotte du modèle</div>
-          <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:6px;flex-wrap:wrap;">
-            <div style="font-size:56px;font-weight:800;letter-spacing:-2.2px;line-height:1;color:var(--text);">${nav.toFixed(2)}€</div>
-            ${agent.series.length ? `<div style="font-size:18px;color:${deltaColor};font-weight:700;">${deltaSign}${agent.deltaPct7.toFixed(1)}%</div>
-            <div style="font-size:13px;color:var(--text-dim);">sur 7 jours</div>` : ''}
-            ${pauseStatus.paused ? `<div style="padding:4px 10px;background:rgba(251,191,36,.15);color:#fbbf24;border:1px solid rgba(251,191,36,.3);border-radius:6px;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;">⏸ Modèle en pause · ${esc(pauseStatus.reason)}</div>` : ''}
-          </div>
-          <div style="font-size:13px;color:var(--text-dim);margin-bottom:18px;max-width:620px;line-height:1.5;">
-            ${agent.series.length
-              ? `Parti de <strong style="color:var(--text);">${start.toFixed(0)}€ le ${esc(startDateStr)}</strong> — multipliée par <strong style="color:${multiplier>=1?'var(--accent)':'var(--danger)'};">${multiplier.toFixed(2)}×</strong> en ${daysSinceStart} jours. <strong style="color:var(--text);">${agent.series.length}</strong> paris joués · Kelly 0.25× · cap 10% · plancher 0.10€.`
-              : `En attente des premiers matchs réglés pour démarrer.`}
-          </div>
-          ${sparkPath ? `<div style="height:64px;background:var(--panel);border-radius:8px;border:1px solid var(--border);padding:8px 12px;">
-            <svg viewBox="0 0 ${sparkW} ${sparkH}" style="width:100%;height:48px;display:block;" preserveAspectRatio="none">
-              <path d="${sparkPath}" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
-            </svg>
-          </div>` : ''}
-        </div>
-
-        <div style="padding:28px 0;border-top:1px solid var(--border);">
-          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;">
-            <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;">Positions du jour · ${positions.length} ouverte${positions.length>1?'s':''}${totalStaked>0?` · ${totalStaked.toFixed(2)}€ engagés`:''}</div>
-            <div style="font-size:12px;color:var(--brand);font-weight:500;cursor:pointer;" data-scroll-to="allmatches">Voir tous ↓</div>
-          </div>
-          ${positions.length ? `
-            <div class="agent-pos-grid" style="display:grid;grid-template-columns:56px 1fr 80px 72px 80px 90px;gap:12px;padding:6px 12px;color:var(--text-dim);font-size:10px;letter-spacing:.8px;text-transform:uppercase;font-weight:700;">
-              <div>Conf.</div><div>Pari</div><div>Cote</div><div>Mise</div><div>Gain pot.</div><div>Statut</div>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:4px;">${positions.slice(0,10).map(positionRow).join('')}</div>
-            ${positions.length > 10 ? `<div style="padding:10px;text-align:center;color:var(--text-dim);font-size:11px;cursor:pointer;" data-scroll-to="allmatches">+ ${positions.length-10} autres positions · <span style="color:var(--brand);">voir plus bas</span></div>` : ''}
-          ` : `<div style="padding:24px;text-align:center;color:var(--text-dim);font-size:13px;">Aucun match Winamax sélectionné aujourd'hui.</div>`}
-        </div>
-
-        ${ys ? `
-        <div style="padding:28px 0;border-top:1px solid var(--border);">
-          <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:8px;">Hier · ${ys.total} pari${ys.total>1?'s':''}</div>
-          <div style="font-size:28px;font-weight:800;letter-spacing:-.8px;margin-bottom:4px;">
-            <span style="color:${yPlColor};">${ys.pl>=0?'+':''}${ys.pl.toFixed(2)}€</span>
-            <span style="font-size:13px;color:var(--text-dim);font-weight:500;"> · ${ys.wins} gagnés · ${ys.losses} perdus · WR ${ysWr}%</span>
-          </div>
-          ${lesson ? `<div style="margin-top:14px;padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--brand);border-radius:0 8px 8px 0;font-size:13px;line-height:1.55;color:var(--text-dim);">
-            <span style="color:var(--brand);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:4px;">Ce que le modèle a appris</span>
-            ${lesson}
-          </div>` : ''}
-        </div>` : ''}
-
-        ${tuningBlockHtml}
-
-        ${psArr.length ? `
-        <div style="padding:28px 0;border-top:1px solid var(--border);">
-          <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:14px;">Où le modèle performe · 7 derniers jours</div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:10px;">
-            ${psArr.slice(0, 4).map(([sp, s]) => {
-              const wr = s.bets ? Math.round(100 * s.w / s.bets) : 0;
-              const roi = s.invested ? (s.pl / s.invested * 100) : 0;
-              const roiColor = roi >= 0 ? 'var(--accent)' : 'var(--danger)';
-              return `<div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:10px;">
-                <div style="font-size:11px;color:var(--text-dim);margin-bottom:3px;">${esc(sportLabel(sp))}</div>
-                <div style="font-size:20px;font-weight:700;color:${roiColor};letter-spacing:-.4px;">${roi>=0?'+':''}${roi.toFixed(0)}%</div>
-                <div style="font-size:11px;color:var(--text-dim);">${s.bets} paris · ${wr}% WR</div>
-              </div>`;
-            }).join('')}
-          </div>
-        </div>` : ''}
-
         <!-- v28.2 — Section COMBINÉS inline -->
         ${combinesPicks.length ? `
         <div style="padding:28px 0;border-top:1px solid var(--border);">
@@ -8187,6 +8091,77 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-24T13:40:31.757647Z","today":"
               </div>`;
             }).join('')}
             ${allTodayMatches.length > 30 ? `<div style="padding:8px;text-align:center;color:var(--text-dim);font-size:11px;">+ ${allTodayMatches.length - 30} autres matchs non affichés</div>` : ''}
+          </div>
+        </div>` : ''}
+
+        <!-- Séparateur : les sections suivantes concernent le MODÈLE interne -->
+        <div style="padding:36px 0 12px;border-top:1px solid var(--border);margin-top:12px;">
+          <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1.8px;font-weight:700;opacity:.7;">— Le modèle en chiffres —</div>
+          <div style="font-size:11px;color:var(--text-dim);margin-top:4px;opacity:.7;">Validation interne, historique et calibration. Les picks pour toi sont ci-dessus.</div>
+        </div>
+
+        <div style="padding:20px 0 24px;">
+          <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:10px;">Cagnotte du modèle</div>
+          <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:6px;flex-wrap:wrap;">
+            <div style="font-size:40px;font-weight:800;letter-spacing:-1.5px;line-height:1;color:var(--text);">${nav.toFixed(2)}€</div>
+            ${agent.series.length ? `<div style="font-size:18px;color:${deltaColor};font-weight:700;">${deltaSign}${agent.deltaPct7.toFixed(1)}%</div>
+            <div style="font-size:13px;color:var(--text-dim);">sur 7 jours</div>` : ''}
+          </div>
+          <div style="font-size:13px;color:var(--text-dim);margin-bottom:18px;max-width:620px;line-height:1.5;">
+            ${agent.series.length
+              ? `Parti de <strong style="color:var(--text);">${start.toFixed(0)}€ le ${esc(startDateStr)}</strong> — multipliée par <strong style="color:${multiplier>=1?'var(--accent)':'var(--danger)'};">${multiplier.toFixed(2)}×</strong> en ${daysSinceStart} jours. <strong style="color:var(--text);">${agent.series.length}</strong> paris joués · Kelly 0.25× · cap 10% · plancher 0.10€.`
+              : `En attente des premiers matchs réglés pour démarrer.`}
+          </div>
+          ${sparkPath ? `<div style="height:64px;background:var(--panel);border-radius:8px;border:1px solid var(--border);padding:8px 12px;">
+            <svg viewBox="0 0 ${sparkW} ${sparkH}" style="width:100%;height:48px;display:block;" preserveAspectRatio="none">
+              <path d="${sparkPath}" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+            </svg>
+          </div>` : ''}
+        </div>
+
+        <div style="padding:28px 0;border-top:1px solid var(--border);">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;">
+            <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;">Positions du jour · ${positions.length} ouverte${positions.length>1?'s':''}${totalStaked>0?` · ${totalStaked.toFixed(2)}€ engagés`:''}</div>
+            <div style="font-size:12px;color:var(--brand);font-weight:500;cursor:pointer;" data-scroll-to="allmatches">Voir tous ↓</div>
+          </div>
+          ${positions.length ? `
+            <div class="agent-pos-grid" style="display:grid;grid-template-columns:56px 1fr 80px 72px 80px 90px;gap:12px;padding:6px 12px;color:var(--text-dim);font-size:10px;letter-spacing:.8px;text-transform:uppercase;font-weight:700;">
+              <div>Conf.</div><div>Pari</div><div>Cote</div><div>Mise</div><div>Gain pot.</div><div>Statut</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px;">${positions.slice(0,10).map(positionRow).join('')}</div>
+            ${positions.length > 10 ? `<div style="padding:10px;text-align:center;color:var(--text-dim);font-size:11px;cursor:pointer;" data-scroll-to="allmatches">+ ${positions.length-10} autres positions · <span style="color:var(--brand);">voir plus bas</span></div>` : ''}
+          ` : `<div style="padding:24px;text-align:center;color:var(--text-dim);font-size:13px;">Aucun match Winamax sélectionné aujourd'hui.</div>`}
+        </div>
+
+        ${ys ? `
+        <div style="padding:28px 0;border-top:1px solid var(--border);">
+          <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:8px;">Hier · ${ys.total} pari${ys.total>1?'s':''}</div>
+          <div style="font-size:28px;font-weight:800;letter-spacing:-.8px;margin-bottom:4px;">
+            <span style="color:${yPlColor};">${ys.pl>=0?'+':''}${ys.pl.toFixed(2)}€</span>
+            <span style="font-size:13px;color:var(--text-dim);font-weight:500;"> · ${ys.wins} gagnés · ${ys.losses} perdus · WR ${ysWr}%</span>
+          </div>
+          ${lesson ? `<div style="margin-top:14px;padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--brand);border-radius:0 8px 8px 0;font-size:13px;line-height:1.55;color:var(--text-dim);">
+            <span style="color:var(--brand);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:4px;">Ce que le modèle a appris</span>
+            ${lesson}
+          </div>` : ''}
+        </div>` : ''}
+
+        ${tuningBlockHtml}
+
+        ${psArr.length ? `
+        <div style="padding:28px 0;border-top:1px solid var(--border);">
+          <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:14px;">Où le modèle performe · 7 derniers jours</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:10px;">
+            ${psArr.slice(0, 4).map(([sp, s]) => {
+              const wr = s.bets ? Math.round(100 * s.w / s.bets) : 0;
+              const roi = s.invested ? (s.pl / s.invested * 100) : 0;
+              const roiColor = roi >= 0 ? 'var(--accent)' : 'var(--danger)';
+              return `<div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:10px;">
+                <div style="font-size:11px;color:var(--text-dim);margin-bottom:3px;">${esc(sportLabel(sp))}</div>
+                <div style="font-size:20px;font-weight:700;color:${roiColor};letter-spacing:-.4px;">${roi>=0?'+':''}${roi.toFixed(0)}%</div>
+                <div style="font-size:11px;color:var(--text-dim);">${s.bets} paris · ${wr}% WR</div>
+              </div>`;
+            }).join('')}
           </div>
         </div>` : ''}
 
