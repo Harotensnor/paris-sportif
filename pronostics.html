@@ -7705,6 +7705,12 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-24T12:45:33.303805Z","today":"
     });
     const sparkPath = pts.length ? 'M' + pts.join(' L') : '';
 
+    // v28.7 — CRITIQUE : si la data est obsolète (>4h), on ne montre PAS de picks.
+    //   Sinon le site suggère de parier sur des matchs qui n'existent plus / ont déjà joué.
+    //   Déclaration hissée ici (utilisée par les blocs ci-dessous avant l'auto-refresh).
+    const _dataAgeMin = data.generated_at ? Math.floor((Date.now() - new Date(data.generated_at).getTime())/60000) : 9999;
+    const _dataIsStale = _dataAgeMin > 240; // 4h
+
     // v27.1 — Positions du jour avec Kelly strict (skip si edge ≤0) + cap journalier 20%
     const KELLY_FRAC = 0.25, CAP_PCT = 0.10, MIN_STAKE = 0.10, DAILY_CAP_PCT = 0.20;
     // v28.3 — Pause status : stop-loss / take-profit / manuel
@@ -7899,11 +7905,8 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-24T12:45:33.303805Z","today":"
       const v = parseFloat(localStorage.getItem('userBankroll'));
       return (isFinite(v) && v > 0) ? v : 50;
     })();
-    // v28.7 — CRITIQUE : si la data est obsolète (>4h), on ne montre PAS de picks
-    //   Sinon le site suggère de parier sur des matchs qui n'existent plus / ont déjà joué.
-    const _dataAgeMin = data.generated_at ? Math.floor((Date.now() - new Date(data.generated_at).getTime())/60000) : 9999;
-    const _dataIsStale = _dataAgeMin > 240; // 4h
     // v28.8 — AUTO force-refresh si data >6h obsolète (1 fois par session seulement)
+    // (_dataAgeMin / _dataIsStale sont déclarés plus haut — hissage pour fix TDZ)
     if (_dataAgeMin > 360 && !sessionStorage.getItem('autoRefreshDone')) {
       try {
         sessionStorage.setItem('autoRefreshDone', '1');

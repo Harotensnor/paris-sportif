@@ -1,87 +1,121 @@
 #!/usr/bin/env python3
-"""Refresh data.js every 60 seconds for minute-by-minute updates.
+"""Refresh data.js continuously for the local dev server.
 
-Runs in background alongside serveur.py. For each tick:
-  1. Re-fetch today's scoreboards from ESPN (fast, ~8-15s)
-  2. Enrich odds for today+tomorrow (ESPN core endpoint)
-  3. Re-scrape forebet / ruedesjoueurs every 10 minutes (they rarely change)
-  4. Write data.js (the HTML client polls this file every 60s)
+Runs alongside serveur.py. Each 60s tick executes a subset of the pipeline
+defined in .github/workflows/refresh.yml, honoring per-script cadences
+(fast/light scripts on every tick, slow scripts throttled).
 
-Usage: python3 auto_refresh.py
+The goal is that `python serveur.py` locally produces data equivalent
+to what GitHub Actions commits to prod — no more "stale local data"
+surprises when iterating on pronostics.html.
+
+Usage: python auto_refresh.py
        (or started automatically by serveur.py)
 """
-import sys, os, time, subprocess, traceback
+import sys, time, subprocess, traceback
 from pathlib import Path
 from datetime import datetime
 
 HERE = Path(__file__).resolve().parent
-PROJECT = HERE.parent.parent  # /sessions/compassionate-eloquent-sagan/
-SCRIPTS = PROJECT  # fetch_*.py live in the session root
+PROJECT = HERE                     # auto_refresh.py lives at project root
+SCRIPTS = PROJECT / 'scripts'      # fetch/patch scripts moved here in v27+
 
-INTERVAL = 60  # seconds between refreshes
-TIPSTER_INTERVAL = 600  # re-scrape tipsters every 10 min
+INTERVAL = 60  # seconds between ticks
 
 
-def run(cmd, cwd=None, timeout=180):
-    """Run a script, return (rc, stdout_tail)."""
+def run(script_name, timeout=180):
+    """Run a scripts/<name>.py, return (rc, tail_of_output)."""
+    path = SCRIPTS / script_name
+    if not path.exists():
+        return -3, f'missing: {path.name}'
     try:
-        p = subprocess.run([sys.executable, cmd], cwd=cwd or PROJECT,
+        p = subprocess.run([sys.executable, str(path)], cwd=PROJECT,
                            capture_output=True, text=True, timeout=timeout)
         out = (p.stdout + p.stderr).strip().splitlines()
-        return p.returncode, '\n'.join(out[-3:])
+        return p.returncode, '\n'.join(out[-2:])
     except subprocess.TimeoutExpired:
         return -1, 'timeout'
     except Exception as ex:
         return -2, f'error: {ex!r}'
 
 
+def ts():
+    return datetime.now().strftime('%H:%M:%S')
+
+
+# Pipeline stages — mirror refresh.yml order.
+#   Each entry: (script, cadence_ticks, timeout_sec)
+#   cadence_ticks = 1 → every tick (60s)
+#                   5 → every 5 min, etc.
+#
+# Slow scripts (soccer injuries ~85s, team stats ~4min) are self-throttled
+# internally too; the cadence here mostly gates how often we *try*.
+FETCH_STAGES = [
+    # (script, ticks, timeout)
+    ('fetch_live.py',              1,   60),
+    ('fetch_tennis_odds.py',       5,   60),
+    ('fetch_rus_odds.py',          5,   30),
+    ('fetch_injuries.py',         10,   60),   # ESPN: NBA/NHL/NFL/MLB
+    ('fetch_h2h.py',              15,   60),
+    ('snapshot_odds.py',           1,   30),   # freeze pre-match odds
+    ('fetch_forebet.py',           5,   60),
+    ('fetch_tips.py',             15,  120),   # RdJ, respectful cadence
+    ('fetch_injuries_soccer.py', 120,  180),   # Sofascore, ~2h
+    ('fetch_lineups_soccer.py',  120,  180),   # Sofascore, ~2h
+    ('fetch_winamax_catalog.py',   1,   60),   # <2s typical
+    ('fetch_v3.py',               15,  300),   # full sweep
+    ('fetch_team_stats.py',      240,  300),   # ~4min, 4h cadence
+    ('fetch_clubelo.py',           1,   30),   # self-throttled 1/20h
+    ('fetch_weather.py',           1,   30),   # self-throttled
+    ('fetch_referees_soccer.py',   1,   30),   # self-throttled 1/6h
+]
+
+# Patches always run after fetches (idempotent, ~0.1-1s each).
+# Order matters: patch_winamax first (establishes winamax.match_id),
+# then markets, then enrichers that must survive dedup/bucketing.
+PATCH_STAGES = [
+    ('patch_odds.py',               1,   60),
+    ('patch_winamax.py',            1,   30),
+    ('patch_winamax_markets.py',    1,   30),
+    ('patch_injuries_soccer.py',    1,   30),
+    ('patch_team_stats.py',         1,   30),
+    ('patch_lineups_soccer.py',     1,   30),
+    ('patch_clubelo.py',            1,   30),
+    ('patch_weather.py',            1,   30),
+    ('patch_referees_soccer.py',    1,   30),
+]
+
+
+def run_stage(stages, tick):
+    """Run each stage whose cadence matches the current tick."""
+    for script, cadence, timeout in stages:
+        if tick % cadence != 0 and tick != 1:
+            continue
+        rc, out = run(script, timeout=timeout)
+        tag = 'OK' if rc == 0 else f'rc={rc}'
+        if rc != 0 or cadence > 1:
+            # Keep the log quiet for fast recurring successes
+            print(f'[{ts()}]   {script:<32} {tag}  {out[:80]}', flush=True)
+
+
 def main():
-    print(f'[{datetime.now():%H:%M:%S}] auto_refresh started (interval={INTERVAL}s)', flush=True)
+    print(f'[{ts()}] auto_refresh started · interval={INTERVAL}s · scripts={SCRIPTS}', flush=True)
+    if not SCRIPTS.exists():
+        print(f'[{ts()}] FATAL: scripts dir missing at {SCRIPTS}', flush=True)
+        sys.exit(1)
     tick = 0
-    last_tipster = 0
     while True:
         t0 = time.time()
         tick += 1
+        print(f'[{ts()}] tick {tick} start', flush=True)
         try:
-            # fast live refresh (today only, ~10-15s)
-            rc, out = run(str(SCRIPTS / 'fetch_live.py'), timeout=60)
-            elapsed = time.time() - t0
-            print(f'[{datetime.now():%H:%M:%S}] tick {tick} · fetch_live rc={rc} ({elapsed:.1f}s) · {out}', flush=True)
-
-            # Always patch whatever odds we have
-            rc2, _ = run(str(SCRIPTS / 'patch_odds.py'), timeout=60)
-            # Tag each event with Winamax availability + deep link (runs every tick, <1s)
-            run(str(SCRIPTS / 'patch_winamax.py'), timeout=30)
-            # Tennis odds (TE) every 5 minutes — they're a separate network call
-            if tick == 1 or tick % 5 == 0:
-                rc3, out3 = run(str(SCRIPTS / 'fetch_tennis_odds.py'), timeout=60)
-                if rc3 == 0:
-                    print(f'[{datetime.now():%H:%M:%S}]   tennis odds refreshed · {out3}', flush=True)
-            # Russian Premier League odds (BetExplorer) every 5 minutes
-            if tick == 1 or tick % 5 == 0:
-                rc4, out4 = run(str(SCRIPTS / 'fetch_rus_odds.py'), timeout=30)
-                if rc4 == 0:
-                    print(f'[{datetime.now():%H:%M:%S}]   rus.1 odds refreshed · {out4}', flush=True)
-            # Injuries (ESPN, covers NBA/NHL/NFL/MLB/WNBA) every 10 minutes
-            if tick == 1 or tick % 10 == 0:
-                rc5, out5 = run(str(SCRIPTS / 'fetch_injuries.py'), timeout=60)
-                if rc5 == 0:
-                    print(f'[{datetime.now():%H:%M:%S}]   injuries refreshed · {out5}', flush=True)
-            # Tipsters every 10 min
-            if time.time() - last_tipster > TIPSTER_INTERVAL:
-                run(str(SCRIPTS / 'fetch_tips.py'), timeout=60)
-                run(str(SCRIPTS / 'fetch_forebet.py'), timeout=60)
-                last_tipster = time.time()
-                print(f'[{datetime.now():%H:%M:%S}]   tipsters refreshed', flush=True)
-            # Full sweep every 15 min (to keep future days fresh)
-            if tick % 15 == 0:
-                run(str(SCRIPTS / 'fetch_v3.py'), timeout=300)
-                print(f'[{datetime.now():%H:%M:%S}]   full sweep done', flush=True)
+            run_stage(FETCH_STAGES, tick)
+            run_stage(PATCH_STAGES, tick)
         except Exception:
             traceback.print_exc()
-
-        # Sleep to next tick (account for elapsed time)
-        remain = max(1, INTERVAL - (time.time() - t0))
+        elapsed = time.time() - t0
+        print(f'[{ts()}] tick {tick} done in {elapsed:.1f}s', flush=True)
+        remain = max(1, INTERVAL - elapsed)
         time.sleep(remain)
 
 
