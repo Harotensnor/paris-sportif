@@ -1029,6 +1029,15 @@
     header { padding: 10px 14px; }
     .brand h1 { font-size: 14px; }
     .tp-head { flex-direction: column; align-items: flex-start; gap: 4px; }
+    /* Dashboard "Positions du jour" grid — on narrow screens, drop Gain pot. + Statut */
+    .agent-pos-grid {
+      grid-template-columns: 42px 1fr 50px 56px !important;
+      gap: 8px !important;
+      padding-left: 8px !important;
+      padding-right: 8px !important;
+    }
+    .agent-pos-grid > :nth-child(5),
+    .agent-pos-grid > :nth-child(6) { display: none !important; }
   }
 
   /* ===================================================================
@@ -2141,13 +2150,14 @@
     <button data-tab="golf">⛳ Golf <span class="count" id="count-golf">0</span></button>
     <button data-tab="racing">🏎️ F1 <span class="count" id="count-racing">0</span></button>
   </nav>
-
-  <!-- Refresh indicator flottant dans la topbar (caché sur mobile) -->
-  <div id="refresh-indicator" class="refresh-indicator topbar-refresh" aria-live="polite">
-    <span class="rfr-dot"></span>
-    <span class="rfr-txt">Auto-refresh · 60s</span>
-  </div>
 </header>
+
+<!-- Refresh indicator flottant — hors du header car backdrop-filter du header
+     crée un nouveau containing block qui piège les position:fixed descendants -->
+<div id="refresh-indicator" class="refresh-indicator topbar-refresh" aria-live="polite">
+  <span class="rfr-dot"></span>
+  <span class="rfr-txt">Auto-refresh · 60s</span>
+</div>
 
 <!-- Overlay pour le menu mobile -->
 <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
@@ -7703,7 +7713,18 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-24T13:20:31.531304Z","today":"
       const y = sparkH - padS - (sparkH - 2*padS) * ((v - minV) / denom);
       return x.toFixed(1) + ',' + y.toFixed(1);
     });
-    const sparkPath = pts.length ? 'M' + pts.join(' L') : '';
+    // Avec 0 ou 1 point, on dessine une ligne horizontale au niveau "start"
+    // pour éviter une spark vide (SVG path `M x,y` seul = rien de visible).
+    let sparkPath;
+    if (pts.length >= 2) {
+      sparkPath = 'M' + pts.join(' L');
+    } else if (pts.length === 1) {
+      const [x, y] = pts[0].split(',');
+      sparkPath = `M${padS},${y} L${sparkW - padS},${y}`;
+    } else {
+      const y = (sparkH / 2).toFixed(1);
+      sparkPath = `M${padS},${y} L${sparkW - padS},${y}`;
+    }
 
     // v28.7 — CRITIQUE : si la data est obsolète (>4h), on ne montre PAS de picks.
     //   Sinon le site suggère de parier sur des matchs qui n'existent plus / ont déjà joué.
@@ -7885,7 +7906,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-24T13:20:31.531304Z","today":"
       const timeLbl = p.isLive ? `LIVE ${p.m.clock || ''}` : (typeof fmtTime === 'function' ? fmtTime(p.m.date) : new Date(p.m.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}));
       const timeBg = p.isLive ? 'rgba(52,211,153,.18)' : 'rgba(123,134,147,.15)';
       const timeColor = p.isLive ? 'var(--accent)' : 'var(--text-dim)';
-      return `<div class="agent-pos-row" data-match-id="${esc(String(p.m.id||''))}" style="display:grid;grid-template-columns:56px 1fr 80px 72px 80px 90px;gap:12px;padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-radius:8px;align-items:center;cursor:pointer;font-variant-numeric:tabular-nums;font-size:12.5px;transition:background .12s;">
+      return `<div class="agent-pos-row agent-pos-grid" data-match-id="${esc(String(p.m.id||''))}" style="display:grid;grid-template-columns:56px 1fr 80px 72px 80px 90px;gap:12px;padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-radius:8px;align-items:center;cursor:pointer;font-variant-numeric:tabular-nums;font-size:12.5px;transition:background .12s;">
         <div style="color:${confColor};font-weight:700;font-size:11.5px;">${Math.round(p.rel*100)}%</div>
         <div style="color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(pickLabel)}${marketTag}</div>
         <div style="color:var(--text-dim);">@${p.odd.toFixed(2)}</div>
@@ -8021,7 +8042,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-24T13:20:31.531304Z","today":"
             <div style="font-size:12px;color:var(--brand);font-weight:500;cursor:pointer;" data-scroll-to="allmatches">Voir tous ↓</div>
           </div>
           ${positions.length ? `
-            <div style="display:grid;grid-template-columns:56px 1fr 80px 72px 80px 90px;gap:12px;padding:6px 12px;color:var(--text-dim);font-size:10px;letter-spacing:.8px;text-transform:uppercase;font-weight:700;">
+            <div class="agent-pos-grid" style="display:grid;grid-template-columns:56px 1fr 80px 72px 80px 90px;gap:12px;padding:6px 12px;color:var(--text-dim);font-size:10px;letter-spacing:.8px;text-transform:uppercase;font-weight:700;">
               <div>Conf.</div><div>Pari</div><div>Cote</div><div>Mise</div><div>Gain pot.</div><div>Statut</div>
             </div>
             <div style="display:flex;flex-direction:column;gap:4px;">${positions.slice(0,10).map(positionRow).join('')}</div>
