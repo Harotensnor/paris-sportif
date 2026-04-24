@@ -142,6 +142,10 @@ def _extract_player(p: dict) -> dict | None:
         'shirt': shirt,
         'rating': rating,
         'captain': captain,
+        # Sofascore player id — lets the UI fetch a face shot via
+        # https://img.sofascore.com/api/v1/player/{id}/image. Optional, skipped
+        # when the payload doesn't expose it (some probable lineups omit ids).
+        'pid': pl.get('id'),
     }
 
 
