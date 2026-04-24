@@ -7871,9 +7871,10 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-24T14:20:30.039393Z","today":"
       }
     } catch(e) { console.warn('combinés inline:', e); }
 
-    // Buteurs foot : matches foot du jour avec BTTS ou Over/Under confiance élevée
-    // v28.8 — Vide si data obsolète (évite buteurs fantômes)
-    const buteursFoot = _dataIsStale ? [] : today.filter(m => !m.completed && m.sport === 'football').map(m => {
+    // Buts du match : matches foot du jour avec OU 2.5 ou BTTS confiance élevée
+    // (c'est un marché "total de buts" — pas "quel joueur marque").
+    // v28.8 — Vide si data obsolète
+    const butsDuMatch = _dataIsStale ? [] : today.filter(m => !m.completed && m.sport === 'football').map(m => {
       try {
         const pred = predictMatch(m);
         if (!pred || !pred.markets) return null;
@@ -7885,6 +7886,75 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-24T14:20:30.039393Z","today":"
         return { m, home, away, pick: bestSide, prob: bestSide.prob, ts: new Date(m.date).getTime() };
       } catch(e) { return null; }
     }).filter(Boolean).sort((a,b) => b.prob - a.prob).slice(0, 6);
+    // Alias pour compat ascendante du template (le nom de variable est utilisé plus bas)
+    const buteursFoot = butsDuMatch;
+
+    // === Prochaines opportunités par fenêtre de temps (4h/12h/24h) ===
+    // Picks classés par confiance dans la fenêtre — utile pour "quoi parier maintenant ?".
+    const nowMs = Date.now();
+    const tomorrowIsoTW = (() => {
+      const d = new Date(); d.setDate(d.getDate() + 1);
+      return d.toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+    })();
+    const upcomingWin = _dataIsStale ? [] : [].concat(
+      (data.days[todayIso] || []),
+      (data.days[tomorrowIsoTW] || [])
+    ).filter(m => !m.completed && !m.live && m.winamax && m.winamax.available === true).map(m => {
+      try {
+        const pred = predictMatch(m);
+        if (!pred || !pred.pick || pred.skip) return null;
+        const pk = pred.pick.key;
+        const odd = pred.odds && (pk === '1' ? pred.odds.home : pk === '2' ? pred.odds.away : pred.odds.draw);
+        if (!odd) return null;
+        const rel = pred.reliability ?? pred.pick.prob;
+        const ts = new Date(m.date).getTime();
+        if (!isFinite(ts) || ts < nowMs) return null;
+        const edge = rel - 1 / odd;
+        return { m, pred, odd, rel, edge, ts };
+      } catch (e) { return null; }
+    }).filter(Boolean);
+    const _topInWin = (hours) => {
+      const cutoff = nowMs + hours * 3600 * 1000;
+      return upcomingWin.filter(x => x.ts <= cutoff)
+        .sort((a, b) => b.rel - a.rel)
+        .slice(0, 3);
+    };
+    const topNext4h = _topInWin(4);
+    const topNext12h = _topInWin(12);
+    const topNext24h = _topInWin(24);
+
+    // === Joueurs buteurs probables (prochaine 24h) ===
+    // Utilise predictLikelyScorers (Poisson × position × lineup, exclut les blessés).
+    const scorersToday = _dataIsStale ? [] : (() => {
+      const arr = [];
+      [].concat((data.days[todayIso] || []), (data.days[tomorrowIsoTW] || []))
+        .forEach(m => {
+          if (m.sport !== 'football' || m.completed) return;
+          if (!(m.winamax && m.winamax.available === true)) return;
+          const ts = new Date(m.date).getTime();
+          if (!isFinite(ts) || ts < nowMs) return;
+          try {
+            const pred = predictMatch(m);
+            if (!pred || pred.skip) return;
+            if (typeof predictLikelyScorers !== 'function') return;
+            const scorers = predictLikelyScorers(m, pred);
+            if (!scorers || !scorers.length) return;
+            const homeC = (m.competitors && m.competitors.find(c => c.home_away === 'home')) || {};
+            const awayC = (m.competitors && m.competitors.find(c => c.home_away === 'away')) || {};
+            scorers.slice(0, 2).forEach(s => {
+              if (s.prob < 0.28) return;
+              arr.push({
+                name: s.name, captain: !!s.captain, pos: s.pos || '',
+                prob: s.prob, impliedOdd: s.impliedOdd, teamName: s.teamName,
+                homeName: homeC.name || '?', awayName: awayC.name || '?',
+                ts, mId: m.id,
+                url: m.winamax && m.winamax.url || null,
+              });
+            });
+          } catch (e) { /* skip */ }
+        });
+      return arr.sort((a, b) => b.prob - a.prob).slice(0, 8);
+    })();
 
     // v27.2 — Auto-tuning : règles proposées + actives
     const proposedRules = _proposedRules(agent.scorableRaw || []);
@@ -8047,20 +8117,68 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-24T14:20:30.039393Z","today":"
           </div>
         </div>` : ''}
 
-        <!-- v28.2 — Section COMBINÉS inline -->
+        <!-- Prochaines opportunités par fenêtre (4h / 12h / 24h) -->
+        ${(topNext4h.length + topNext12h.length + topNext24h.length) ? `
+        <div style="padding:36px 0 24px;border-top:1px solid var(--border);">
+          <div style="margin-bottom:14px;">
+            <div style="font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;">Prochaines opportunités</div>
+            <div style="font-size:20px;font-weight:800;color:var(--text);letter-spacing:-.5px;margin-top:2px;">Top pronos à venir</div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;">
+            ${[
+              ['Prochaines 4h', topNext4h, '#fbbf24'],
+              ['Prochaines 12h', topNext12h, 'var(--brand)'],
+              ['Prochaines 24h', topNext24h, 'var(--accent)'],
+            ].map(([lbl, arr, col]) => {
+              if (!arr.length) {
+                return `<div style="padding:14px;background:var(--panel);border:1px solid var(--border);border-radius:10px;opacity:.6;">
+                  <div style="font-size:10px;color:${col};letter-spacing:.6px;text-transform:uppercase;font-weight:700;">${esc(lbl)}</div>
+                  <div style="font-size:12px;color:var(--text-dim);margin-top:8px;">Aucun pick qualifié dans cette fenêtre.</div>
+                </div>`;
+              }
+              const picksHtml = arr.map(x => {
+                const { home, away } = (typeof getSides === 'function') ? getSides(x.m) : { home: {}, away: {} };
+                const hn = (home && home.name) || '?';
+                const an = (away && away.name) || '?';
+                const tLbl = (typeof fmtTime === 'function') ? fmtTime(x.m.date) : new Date(x.m.date).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+                const confColor = x.rel >= 0.70 ? 'var(--accent)' : x.rel >= 0.60 ? '#fbbf24' : 'var(--text-dim)';
+                return `<div class="agent-pos-row" data-match-id="${esc(String(x.m.id || ''))}" style="padding:8px 10px;border-radius:6px;cursor:pointer;font-size:12px;line-height:1.35;">
+                  <div style="display:flex;justify-content:space-between;gap:6px;align-items:baseline;">
+                    <div style="color:${confColor};font-weight:700;font-size:12.5px;">${Math.round(x.rel * 100)}%</div>
+                    <div style="color:var(--text-dim);font-size:10.5px;font-variant-numeric:tabular-nums;">${esc(tLbl)}</div>
+                  </div>
+                  <div style="color:var(--text);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(x.pred.pick.label)}</div>
+                  <div style="color:var(--text-dim);font-size:10.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(hn)} vs ${esc(an)} <span style="opacity:.8;">@${x.odd.toFixed(2)}</span></div>
+                </div>`;
+              }).join('');
+              return `<div style="padding:14px;background:var(--panel);border:1px solid var(--border);border-top:3px solid ${col};border-radius:10px;">
+                <div style="font-size:10px;color:${col};letter-spacing:.6px;text-transform:uppercase;font-weight:700;margin-bottom:8px;">${esc(lbl)} <span style="color:var(--text-dim);opacity:.7;">· ${arr.length}</span></div>
+                <div style="display:flex;flex-direction:column;gap:4px;">${picksHtml}</div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>` : ''}
+
+        <!-- v28.2 — Section COMBINÉS inline (titre plus visible) -->
         ${combinesPicks.length ? `
         <div style="padding:28px 0;border-top:1px solid var(--border);">
-          <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:14px;">Combinés suggérés du jour · ${combinesPicks.length}</div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;margin-bottom:14px;">
+            <div>
+              <div style="font-size:11px;color:#bf5af2;text-transform:uppercase;letter-spacing:1.4px;font-weight:700;">🎲 Combinés suggérés</div>
+              <div style="font-size:18px;font-weight:800;color:var(--text);letter-spacing:-.4px;margin-top:2px;">${combinesPicks.length} combiné${combinesPicks.length > 1 ? 's' : ''} du jour</div>
+            </div>
+            <button class="page-btn" data-page="combines" style="padding:6px 14px;border:1px solid var(--border);background:var(--panel);color:var(--brand);border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">Voir tous les combinés →</button>
+          </div>
           <div style="display:flex;flex-direction:column;gap:8px;">
             ${combinesPicks.map((c, idx) => {
               const legs = (c.picks || c.legs || []).slice(0, 6);
               const totalOdd = legs.reduce((p, l) => p * (l.odd || 1), 1);
               const totalProb = legs.reduce((p, l) => p * (l.rel || l.prob || 0.5), 1);
               const title = c.label || c.name || (idx === 0 ? 'Combiné sûr' : idx === 1 ? 'Combiné équilibré' : 'Combiné audacieux');
-              return `<div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:8px;font-variant-numeric:tabular-nums;">
+              return `<div style="padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-left:3px solid #bf5af2;border-radius:0 8px 8px 0;font-variant-numeric:tabular-nums;">
                 <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;">
-                  <div style="font-size:13px;font-weight:600;color:var(--text);">${esc(title)} <span style="color:var(--text-dim);font-weight:400;">· ${legs.length} match${legs.length>1?'s':''}</span></div>
-                  <div style="font-size:14px;color:var(--accent);font-weight:700;">@${totalOdd.toFixed(2)}</div>
+                  <div style="font-size:14px;font-weight:700;color:var(--text);">${esc(title)} <span style="color:var(--text-dim);font-weight:400;">· ${legs.length} match${legs.length>1?'s':''}</span></div>
+                  <div style="font-size:16px;color:var(--accent);font-weight:800;">@${totalOdd.toFixed(2)}</div>
                 </div>
                 <div style="display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--text-dim);">
                   ${legs.map(l => {
@@ -8069,7 +8187,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-24T14:20:30.039393Z","today":"
                     return `<div>· <span style="color:var(--text);">${esc(pickLabel)}</span> — ${esc(matchName)} <span style="opacity:.6;">@${(l.odd||0).toFixed(2)}</span></div>`;
                   }).join('')}
                 </div>
-                <div style="margin-top:6px;font-size:11px;color:var(--text-dim);">Proba combinée ${(totalProb*100).toFixed(1)}% · gain 1€→${(totalOdd-1).toFixed(2)}€</div>
+                <div style="margin-top:8px;font-size:11px;color:var(--text-dim);">Proba combinée ${(totalProb*100).toFixed(1)}% · mise 1€ → gain <strong style="color:var(--accent);">+${(totalOdd-1).toFixed(2)}€</strong></div>
               </div>`;
             }).join('')}
           </div>
@@ -8078,7 +8196,10 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-24T14:20:30.039393Z","today":"
         <!-- v28.2 — Section BUTEURS foot inline -->
         ${buteursFoot.length ? `
         <div style="padding:28px 0;border-top:1px solid var(--border);">
-          <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:14px;">Buteurs foot · ${buteursFoot.length} picks</div>
+          <div style="margin-bottom:14px;">
+            <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;">Buts dans le match · ${buteursFoot.length} pick${buteursFoot.length>1?'s':''}</div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:2px;opacity:.75;">Marché Plus/Moins de 2.5 buts &amp; Les 2 équipes marquent (total de buts, pas quel joueur marque).</div>
+          </div>
           <div style="display:flex;flex-direction:column;gap:4px;">
             ${buteursFoot.map(b => {
               const hLbl = (b.home && b.home.name) || '?';
@@ -8092,6 +8213,35 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-24T14:20:30.039393Z","today":"
                 <div style="color:var(--text-dim);font-size:11px;text-align:right;">${esc(tLbl)}</div>
               </div>`;
             }).join('')}
+          </div>
+        </div>` : ''}
+
+        <!-- Joueurs buteurs probables (top 8 scorers next 24h) -->
+        ${scorersToday.length ? `
+        <div style="padding:28px 0;border-top:1px solid var(--border);">
+          <div style="margin-bottom:14px;">
+            <div style="font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;">⚽ Joueurs buteurs probables</div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:2px;opacity:.8;">Top ${scorersToday.length} joueurs avec la meilleure chance de marquer au moins 1 but (Poisson × position × compo, blessés exclus).</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            ${scorersToday.map(s => {
+              const pb = (s.prob * 100).toFixed(0);
+              const tLbl = (typeof fmtTime === 'function') ? fmtTime(s.ts) : new Date(s.ts).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+              const oddLbl = s.impliedOdd ? '@' + s.impliedOdd.toFixed(2) : '—';
+              return `<div class="agent-pos-row" data-match-id="${esc(String(s.mId || ''))}" style="display:grid;grid-template-columns:56px 1fr auto auto auto;gap:12px;padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-radius:8px;align-items:center;cursor:pointer;font-variant-numeric:tabular-nums;font-size:12.5px;">
+                <div style="color:var(--accent);font-weight:700;font-size:11.5px;">${pb}%</div>
+                <div style="color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                  <strong>${esc(s.name)}${s.captain ? ' ©' : ''}</strong>
+                  <span style="color:var(--text-dim);opacity:.75;font-size:11px;margin-left:4px;">${esc(s.teamName)}${s.pos ? ' · ' + esc(s.pos) : ''}</span>
+                </div>
+                <div style="color:var(--text-dim);font-size:11px;opacity:.8;">vs</div>
+                <div style="color:var(--text-dim);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px;">${esc(s.homeName === s.teamName ? s.awayName : s.homeName)}</div>
+                <div style="color:var(--text-dim);font-size:11px;text-align:right;white-space:nowrap;">${esc(oddLbl)} · ${esc(tLbl)}</div>
+              </div>`;
+            }).join('')}
+          </div>
+          <div style="margin-top:10px;font-size:11px;color:var(--text-dim);opacity:.75;">
+            Marché Winamax : "<em>Buteur du match</em>" ou "<em>Premier buteur</em>" (selon le match).
           </div>
         </div>` : ''}
 
