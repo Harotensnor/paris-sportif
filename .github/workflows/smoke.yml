@@ -1,0 +1,46 @@
+name: smoke-e2e
+
+# Fait tourner un headless Chromium sur chaque push vers main (et chaque PR),
+# ouvre pronostics.html, clique toutes les pages et capte les erreurs JS.
+# Bloque les régressions type TDZ avant qu'elles n'arrivent en prod.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'pronostics.html'
+      - 'sw.js'
+      - 'scripts/smoke_e2e.js'
+      - '.github/workflows/smoke.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'pronostics.html'
+      - 'sw.js'
+  workflow_dispatch: {}
+
+concurrency:
+  group: smoke-e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install playwright
+        run: |
+          npm init -y
+          npm install --no-save playwright@1
+
+      - name: Install chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run smoke
+        run: node scripts/smoke_e2e.js
