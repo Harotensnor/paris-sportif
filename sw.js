@@ -7,7 +7,11 @@
 //   * icônes / manifest : cache-first (change rarement).
 //   * tout le reste    : passthrough réseau.
 
-const CACHE_VERSION = 'paris-sportif-v57-2026-04-23-v28.10-perf-stale-plus-undo-reset';
+// CACHE_VERSION is auto-stamped by .github/workflows/refresh.yml on each deploy.
+// The "Stamp sw.js" step replaces this entire line with the current UTC timestamp,
+// so every deploy invalidates all caches → users see the new pronostics.html
+// without needing Ctrl+Shift+R. Manual edits stay valid for local dev.
+const CACHE_VERSION = 'paris-sportif-v58-2026-04-24-baseline';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
