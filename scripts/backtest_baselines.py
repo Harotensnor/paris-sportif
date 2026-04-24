@@ -10,7 +10,7 @@ win or lose money.
 Output: ``backtest_report.json`` (machine-readable) + ``backtest_report.md``
 (human-readable summary at repo root). Run on demand:
 
-    python3 scripts/backtest.py
+    python3 scripts/backtest_baselines.py
 
 Caveats (read this before drawing conclusions):
 

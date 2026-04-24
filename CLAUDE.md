@@ -64,7 +64,7 @@ rejouer la pipeline GitHub Actions toutes les 60 s (cadences par script).
   - `winamax_map.py` — **module partagé** (import par 7 scripts),
     `_norm`/`_name_tokens`/`lookup` pour matching équipes ↔ Winamax.
   - `snapshot_odds.py` → `odds_history.jsonl` (freeze pre-match odds).
-  - `backtest.py` — évaluation, **baselines marché uniquement** (pas le
+  - `backtest_baselines.py` — évaluation, **baselines marché uniquement** (pas le
     modèle prod) — chantier ouvert.
 
 - **`auto_refresh.py`** — orchestrateur local, miroir de `refresh.yml`
@@ -125,7 +125,7 @@ Tous commités car c'est la "base de données" du site statique.
   source ou patch doit être ajouté aux deux endroits (sinon dev local ≠ prod).
 - **`paris-sportif.html`** : ancien HTML legacy, non référencé par
   `index.html`. Candidat à suppression.
-- **`backtest.py` vs `backtest_v2.py`** : `backtest.py` évalue des stratégies
+- **`backtest_baselines.py` vs `backtest_v2.py`** : `backtest_baselines.py` évalue des stratégies
   marché (fav/dog/draw/value), PAS `predictMatch` — ne pas l'utiliser pour
   juger la perf du modèle prod. `backtest_v2.py` appelle la vraie fonction
   `predictMatch` via `model_loader.py` (V8 embarqué, une seule source de
