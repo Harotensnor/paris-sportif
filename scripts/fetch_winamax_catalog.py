@@ -182,6 +182,14 @@ def main() -> int:
     n_markets = len(markets['matches'])
     print(f'  catalog: {n_tourns} tournaments, {n_matches} matches', flush=True)
     print(f'  markets: {n_markets} matches with 1N2 odds', flush=True)
+    # Sanity guard : Winamax sometimes returns 200 with a partial PRELOADED_STATE
+    # (Cloudflare soft-block, preloader not yet hydrated). The result is a
+    # valid but near-empty catalog that, when written, erases a healthy one
+    # and makes the whole downstream patch_winamax drop today's matches.
+    # We keep whatever is on disk if the fresh payload looks suspicious.
+    if n_tourns < 10 or n_matches < 50:
+        print('  SUSPICIOUS (below safety threshold) — keeping previous files unchanged')
+        return 1
     OUT_CAT.write_text(json.dumps(catalog, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
     OUT_MARKETS.write_text(json.dumps(markets, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
     print(f'  wrote {OUT_CAT.name} ({OUT_CAT.stat().st_size/1024:.1f}KB) + {OUT_MARKETS.name} ({OUT_MARKETS.stat().st_size/1024:.1f}KB)', flush=True)
