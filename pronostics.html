@@ -1206,6 +1206,12 @@
     margin: 0; padding: 5px 12px; font-size: 10.5px;
     background: var(--panel); border: 1px solid var(--border);
     border-radius: 999px;
+    /* Sur écrans étroits, ne pas chevaucher le FAB chatbot (coin bas-droit) */
+    max-width: calc(100vw - 100px);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  @media (max-width: 420px) {
+    .refresh-indicator.topbar-refresh { bottom: 86px; }
   }
 
   /* Hide old body > header / body > nav.tabs leftovers */

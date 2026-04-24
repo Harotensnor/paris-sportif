@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Backtest v2 — évalue la VRAIE fonction `predictMatch` sur l'historique.
 
-Différence clef avec `backtest.py` (v1) :
+Différence clef avec `backtest_baselines.py` (v1) :
 - v1 teste des baselines de marché (favori, dog, draw, value).
 - v2 appelle `predictMatch` (extrait de pronostics.html via model_loader).
 
@@ -354,7 +354,7 @@ def render_markdown(report: dict) -> str:
     lines.append('> 📊 **v2** évalue la vraie fonction `predictMatch` qui vit dans '
                  '`pronostics.html`. Les chiffres ci-dessous reflètent ce que le '
                  'dashboard aurait fait si tu avais parié flat 1u chaque pick. '
-                 'La baseline marché reste dans `backtest.py` / `backtest_report.md`.')
+                 'La baseline marché reste dans `backtest_baselines.py` / `backtest_report.md`.')
     lines.append('')
 
     overall = report['overall']

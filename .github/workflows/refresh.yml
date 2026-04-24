@@ -1,11 +1,14 @@
 name: refresh-data
 
-# Re-run every 5 minutes. GitHub Pages auto-deploys every commit, so the
-# live site updates within ~1 minute of each push. Combined with the
-# client-side 60s poll, Théo sees fresh odds within ~6 min at worst.
+# Re-run every 5 minutes during active hours (10-23 UTC), every 30 minutes
+# overnight (0-9 UTC). Reduces ~75% of CI minutes and commit noise during
+# hours where few matches are live. Matches the site's prime-time window
+# (late afternoon → late night Europe / daytime Americas).
+# Client-side 60s poll + visibilitychange refresh keep the UX fresh.
 on:
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '*/5 10-23 * * *'    # day: every 5 min
+    - cron: '*/30 0-9 * * *'     # night: every 30 min
   workflow_dispatch: {}
 
 permissions:
