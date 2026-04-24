@@ -3171,6 +3171,8 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-24T18:10:49.028297Z","today":"
             name: p.name || '?',
             pos,
             captain: !!p.captain,
+            // v29 — Sofascore player id (when available) for face-shot rendering.
+            pid: p.pid || null,
             teamName: side?.name || side?.short || '?',
             teamShort: side?.short || side?.name || '?',
             teamAbbr: side?.abbr || '',
@@ -5532,8 +5534,14 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-24T18:10:49.028297Z","today":"
           const aC = l.m.competitors && l.m.competitors.find(c => c.home_away === 'away') || {};
           const hName = hC.name || hC.short || '?';
           const aName = aC.name || aC.short || '?';
+          // v29 — face shot via Sofascore CDN when player id is known. The
+          // img hides itself on 404 so missing photos fall back cleanly.
+          const faceHtml = l.scorer.pid
+            ? `<img src="https://img.sofascore.com/api/v1/player/${l.scorer.pid}/image" alt="" style="width:36px;height:36px;border-radius:50%;object-fit:cover;background:var(--bg);border:1px solid var(--border);flex-shrink:0;" onerror="this.style.display='none'">`
+            : `<div style="width:36px;height:36px;border-radius:50%;background:var(--bg);border:1px solid var(--border);display:grid;place-items:center;font-size:13px;font-weight:700;color:var(--text-dim);flex-shrink:0;">${esc((l.scorer.name||'?').split(/\s+/).slice(-1)[0]?.[0]||'?')}</div>`;
           return `
-          <div style="display:grid;grid-template-columns:1fr auto auto;gap:12px;padding:10px 12px;border-bottom:1px solid var(--border);align-items:center;">
+          <div style="display:grid;grid-template-columns:36px 1fr auto auto;gap:12px;padding:10px 12px;border-bottom:1px solid var(--border);align-items:center;">
+            ${faceHtml}
             <div style="min-width:0;">
               <div style="font-size:13.5px;font-weight:600;color:var(--text);">${esc(l.scorer.name)}${l.scorer.captain ? ' ©' : ''} <span style="color:var(--text-dim);font-weight:500;">marque</span></div>
               <div style="font-size:11px;color:var(--text-dim);">${esc(hName)} vs ${esc(aName)} · ${esc(l.m.league_name || l.m.league_code || '')}</div>
@@ -9253,9 +9261,14 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-24T18:10:49.028297Z","today":"
               const probPct = (s.prob * 100).toFixed(0);
               const confColor = s.prob >= 0.50 ? 'var(--accent)' : s.prob >= 0.35 ? 'var(--info)' : s.prob >= 0.22 ? 'var(--warn)' : 'var(--text-dim)';
               const posIcon = s.pos === 'F' ? '⚔️' : s.pos === 'M' ? '🎯' : s.pos === 'D' ? '🛡️' : '🧤';
+              // v29 — face shot via Sofascore CDN when the Sofascore player id
+              // is known ; falls back to the position emoji when not available.
+              const faceHtml = s.pid
+                ? `<img src="https://img.sofascore.com/api/v1/player/${s.pid}/image" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;background:var(--bg);border:1px solid var(--border);" onerror="this.outerHTML='<div style=\\'font-size:14px;width:28px;height:28px;display:grid;place-items:center;\\'>${posIcon}</div>'">`
+                : `<div style="font-size:14px;width:28px;height:28px;display:grid;place-items:center;">${posIcon}</div>`;
               return `
-                <div style="display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;padding:7px 10px;border-bottom:1px solid var(--border);align-items:center;">
-                  <div style="font-size:14px;">${posIcon}</div>
+                <div style="display:grid;grid-template-columns:28px 1fr auto auto;gap:10px;padding:7px 10px;border-bottom:1px solid var(--border);align-items:center;">
+                  ${faceHtml}
                   <div style="min-width:0;">
                     <div style="font-size:13px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(s.name)}${s.captain ? ' <span style="color:var(--gold);font-size:10px;" title="Capitaine">©</span>' : ''}</div>
                     <div style="font-size:10.5px;color:var(--text-dim);">${esc(s.teamShort)}</div>
