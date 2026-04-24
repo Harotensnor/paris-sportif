@@ -125,5 +125,9 @@ Tous commités car c'est la "base de données" du site statique.
   source ou patch doit être ajouté aux deux endroits (sinon dev local ≠ prod).
 - **`paris-sportif.html`** : ancien HTML legacy, non référencé par
   `index.html`. Candidat à suppression.
-- **`backtest.py`** : évalue des stratégies marché (fav/dog/draw/value),
-  pas `predictMatch`. N'utilise pas pour juger la perf du modèle prod.
+- **`backtest.py` vs `backtest_v2.py`** : `backtest.py` évalue des stratégies
+  marché (fav/dog/draw/value), PAS `predictMatch` — ne pas l'utiliser pour
+  juger la perf du modèle prod. `backtest_v2.py` appelle la vraie fonction
+  `predictMatch` via `model_loader.py` (V8 embarqué, une seule source de
+  vérité dans `pronostics.html`). Cron hebdo dans `backtest.yml`, sortie
+  `backtest_report_v2.{json,md}`.
