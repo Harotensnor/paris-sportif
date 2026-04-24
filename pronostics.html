@@ -7161,6 +7161,19 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-24T14:10:34.219204Z","today":"
     try { updateSanteBadge(); } catch (e) {}
   }
 
+  // Chantier 5 — Refresh silencieux quand l'onglet redevient actif (si data > 60s).
+  //   Évite que l'utilisateur voie la pastille "stale" après un retour rapide.
+  //   Si la data est fresh (< 60s), on ne poll pas (éviter bruit réseau inutile).
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState !== 'visible') return;
+    try {
+      const pd = window.PRONOSTICS_DATA;
+      if (!pd || !pd.generated_at) { pollData(); return; }
+      const ageSec = (Date.now() - new Date(pd.generated_at).getTime()) / 1000;
+      if (ageSec > 60 && !__refreshInFlight) pollData();
+    } catch (e) { /* fail-safe */ }
+  });
+
   // Met à jour uniquement le compteur d'alertes dans la nav (warn + crit),
   // sans re-render la page Santé. Appelée toutes les 15 s.
   function updateSanteBadge() {

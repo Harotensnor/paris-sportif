@@ -107,6 +107,14 @@ jobs:
           # ev.referee to each top-5 soccer event. ~0.1s.
           python3 patch_referees_soccer.py || true
 
+      - name: Stamp sw.js CACHE_VERSION
+        # Bumps the service worker cache key on every deploy, so browsers fetch
+        # the fresh pronostics.html + data.js instead of serving stale cache.
+        # Only stamped when other files actually changed (see next step).
+        run: |
+          BUILD_ID=$(date -u +'%Y%m%d-%H%M%S')
+          sed -i "s|^const CACHE_VERSION = .*|const CACHE_VERSION = 'paris-sportif-${BUILD_ID}';|" sw.js
+
       - name: Commit data updates
         run: |
           git config user.name "github-actions[bot]"
@@ -115,9 +123,13 @@ jobs:
                   injuries_soccer.json winamax_catalog.json winamax_markets.json team_stats.json \
                   lineups_soccer.json clubelo.json weather.json \
                   weather_geo_cache.json referees_soccer.json 2>/dev/null || true
+          # Only stamp sw.js if we have real content changes — otherwise
+          # discard the version bump to avoid 288 empty commits/day.
           if git diff --cached --quiet; then
-            echo "No changes to commit."
+            git checkout -- sw.js
+            echo "No content changes — sw.js stamp reverted."
             exit 0
           fi
+          git add sw.js
           git commit -m "data: auto-refresh $(date -u +'%Y-%m-%d %H:%M UTC')"
           git push
