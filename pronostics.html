@@ -1086,8 +1086,11 @@
     scrollbar-width: none;
   }
   nav.topbar-nav::-webkit-scrollbar { display: none; }
-  /* v27 — One-feed Agent mode : hide topnav/FAB/search on home, simplify header */
-  body.agent-home nav.topbar-nav,
+  /* v27 — One-feed Agent mode : hide FAB/search on home, simplify header.
+     v30 (2026-04-24) : la nav principale reste visible sur home aussi —
+     sans nav, l'user ne peut pas naviguer autrement que via les CTA du
+     hero, ce qui casse le sens d'une refonte nav. On garde seulement la
+     simplification : pas de search/date/FAB/sous-navs sur home. */
   body.agent-home .topbar-utils .search-wrap,
   body.agent-home .topbar-utils .date-nav,
   body.agent-home .topbar-utils .date-picker,
