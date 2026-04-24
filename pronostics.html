@@ -3152,15 +3152,57 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-24T14:05:28.213721Z","today":"
     } catch (e) { return null; }
   }
 
+  // Chantier 4 — Calibration probabilités via backtest_v2
+  //   Quand `backtest_report_v2.json` est disponible et contient au moins 20
+  //   picks (seuil anti-bruit), on ajuste la `rel` du modèle en ajoutant le
+  //   `gap` du décile correspondant (cap ±5pt pour éviter overcorrection sur
+  //   petits échantillons). Noop si le rapport est absent ou trop maigre.
+  //   Invalidation du cache predictMatch quand la calib arrive.
+  window.__modelCalibration = null; // { bins: [...], total_n: number }
+  function _calibrateProb(rawProb) {
+    const cal = window.__modelCalibration;
+    if (!cal || !cal.bins || !cal.total_n || cal.total_n < 20) return rawProb;
+    if (!isFinite(rawProb) || rawProb <= 0 || rawProb >= 1) return rawProb;
+    for (const bin of cal.bins) {
+      if (bin.n >= 3 && bin.gap != null && rawProb >= bin.lo && rawProb < bin.hi) {
+        const adj = Math.max(-0.05, Math.min(0.05, bin.gap));
+        return Math.max(0.01, Math.min(0.99, rawProb + adj));
+      }
+    }
+    return rawProb;
+  }
+  async function _loadModelCalibration() {
+    try {
+      const r = await fetch('backtest_report_v2.json?t=' + Date.now(), { cache: 'no-store' });
+      if (!r.ok) return;
+      const rep = await r.json();
+      window.__modelCalibration = {
+        bins: rep.calibration || [],
+        total_n: (rep.overall && rep.overall.n) || 0,
+      };
+      // Invalidate memoized predictions so subsequent renders apply calibration
+      if (typeof __predCache !== 'undefined') __predCache = new Map();
+    } catch (e) { /* calibration optional, ignore */ }
+  }
+  // Fire once; safe to call before DOM is ready (fetch is async)
+  _loadModelCalibration();
+
   function predictMatch(match) {
     const cur = window.PRONOSTICS_DATA;
     if (__predCacheRef !== cur) { __predCache = new Map(); __predCacheRef = cur; }
-    if (!match || !match.id) return _predictMatchImpl(match);
+    if (!match || !match.id) return _applyCalibration(_predictMatchImpl(match));
     const cached = __predCache.get(match.id);
     if (cached !== undefined) return cached;
-    const p = _predictMatchImpl(match);
+    const p = _applyCalibration(_predictMatchImpl(match));
     __predCache.set(match.id, p);
     return p;
+  }
+  function _applyCalibration(p) {
+    if (!p || !isFinite(p.rel)) return p;
+    const adjusted = _calibrateProb(p.rel);
+    if (adjusted === p.rel) return p;
+    // Return a shallow clone to avoid mutating the original pred across callers
+    return { ...p, rel: adjusted, rel_raw: p.rel, calibrated: true };
   }
   function _predictMatchImpl(match) {
     const { home, away } = getSides(match);
@@ -8883,11 +8925,16 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-24T14:05:28.213721Z","today":"
 
     wrap.innerHTML = `
       <div style="max-width:1100px;margin:0 auto;padding:16px 8px 24px;">
+        <!-- Rapport backtest_v2 : vrai modèle predictMatch, cron hebdo -->
+        <div id="bt-v2" style="margin-bottom:32px;padding:20px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);">
+          <div style="color:var(--text-dim);text-align:center;padding:24px;font-size:13px;">Chargement du backtest modèle…</div>
+        </div>
+
         <div style="margin-bottom:28px;padding:32px 0 20px;border-bottom:1px solid var(--border);position:relative;">
           <div style="position:absolute;top:0;left:0;width:40px;height:3px;background:${totalProfit>=0?'var(--accent)':'var(--danger)'};border-radius:0 0 2px 2px;"></div>
-          <div style="font-size:11px;color:${totalProfit>=0?'var(--accent)':'var(--danger)'};text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Analyse · 6 mois</div>
+          <div style="font-size:11px;color:${totalProfit>=0?'var(--accent)':'var(--danger)'};text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Tes paris · 6 mois</div>
           <h1 style="margin:0 0 6px;font-size:40px;font-weight:800;letter-spacing:-1.4px;color:var(--text);line-height:1.1;">Performance</h1>
-          <div style="font-size:15px;color:var(--text-dim);max-width:640px;">Ta courbe de cagnotte sur 6 mois et ce qui t'a fait gagner (ou perdre).</div>
+          <div style="font-size:15px;color:var(--text-dim);max-width:640px;">Ta courbe de cagnotte sur 6 mois (les paris que tu as marqués gagné/perdu).</div>
         </div>
 
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px;">
@@ -8952,6 +8999,141 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-24T14:05:28.213721Z","today":"
       const b = document.querySelector('.page-btn[data-page="mesparis"]');
       if (b) b.click();
     });
+
+    // Chantier 3 — charger + rendre le rapport backtest_v2 (vrai modèle predictMatch)
+    _renderBacktestV2(wrap.querySelector('#bt-v2'));
+  }
+
+  // ============================================================
+  // Chantier 3 — Backtest v2 (vrai modèle predictMatch via mini-racer,
+  // généré par scripts/backtest_v2.py, cron hebdo .github/workflows/backtest.yml).
+  // Source : backtest_report_v2.json à la racine.
+  // ============================================================
+  async function _renderBacktestV2(host) {
+    if (!host) return;
+    let rep = null;
+    try {
+      const r = await fetch('backtest_report_v2.json?t=' + Date.now(), { cache: 'no-store' });
+      if (!r.ok) throw new Error('http ' + r.status);
+      rep = await r.json();
+    } catch (e) {
+      host.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-dim);font-size:13px;">
+        <div style="color:var(--warn);font-weight:600;margin-bottom:4px;">Rapport backtest indisponible</div>
+        <div>Le cron hebdomadaire n'a pas encore produit <code>backtest_report_v2.json</code>. Il tourne chaque dimanche 03:00 UTC.</div>
+      </div>`;
+      return;
+    }
+    host.innerHTML = _renderBacktestV2HTML(rep);
+  }
+
+  function _renderBacktestV2HTML(rep) {
+    const esc2 = (typeof esc === 'function') ? esc : (s) => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const ov = rep.overall || {};
+    const roi = ov.flat_roi_pct != null ? ov.flat_roi_pct : 0;
+    const roiColor = roi >= 0 ? 'var(--accent)' : 'var(--danger)';
+    const kellyColor = (ov.kelly_pnl || 0) >= 0 ? 'var(--accent)' : 'var(--danger)';
+    const brier = ov.brier != null ? ov.brier.toFixed(4) : '—';
+    const brierColor = ov.brier < 0.20 ? 'var(--accent)' : ov.brier < 0.24 ? '#fbbf24' : 'var(--danger)';
+    const dateRange = rep.date_range || {};
+    const gen = rep.generated_at ? new Date(rep.generated_at).toLocaleString('fr-FR', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
+
+    // Table helper
+    const tableRow = (k, s) => {
+      const wr = s.win_rate != null ? (s.win_rate * 100).toFixed(0) + '%' : '—';
+      const r = s.flat_roi_pct != null ? (s.flat_roi_pct >= 0 ? '+' : '') + s.flat_roi_pct.toFixed(1) + '%' : '—';
+      const rColor = (s.flat_roi_pct || 0) >= 0 ? 'var(--accent)' : 'var(--danger)';
+      const b = s.brier != null ? s.brier.toFixed(3) : '—';
+      return `<tr>
+        <td style="padding:6px 10px;color:var(--text);">${esc2(k)}</td>
+        <td style="padding:6px 10px;text-align:right;color:var(--text-dim);">${s.n}</td>
+        <td style="padding:6px 10px;text-align:right;color:var(--text-dim);">${wr}</td>
+        <td style="padding:6px 10px;text-align:right;color:${rColor};font-weight:700;">${r}</td>
+        <td style="padding:6px 10px;text-align:right;color:var(--text-dim);">${b}</td>
+      </tr>`;
+    };
+    const table = (title, rows) => rows.length ? `
+      <div style="margin-top:18px;">
+        <div style="font-size:10px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;font-weight:700;margin-bottom:6px;">${esc2(title)}</div>
+        <table style="width:100%;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums;">
+          <thead><tr style="color:var(--text-dim);font-weight:600;border-bottom:1px solid var(--border);">
+            <th style="padding:6px 10px;text-align:left;">Clé</th>
+            <th style="padding:6px 10px;text-align:right;">N</th>
+            <th style="padding:6px 10px;text-align:right;">WR</th>
+            <th style="padding:6px 10px;text-align:right;">ROI</th>
+            <th style="padding:6px 10px;text-align:right;">Brier</th>
+          </tr></thead>
+          <tbody>${rows.join('')}</tbody>
+        </table>
+      </div>` : '';
+
+    const bySport = Object.entries(rep.by_sport || {}).sort((a,b) => b[1].n - a[1].n).map(([k,s]) => tableRow(k, s));
+    const byTier = Object.entries(rep.by_tier || {}).map(([k,s]) => tableRow(k, s));
+    const byCote = Object.entries(rep.by_cote_bucket || {}).map(([k,s]) => tableRow(k, s));
+    const byLeague = Object.entries(rep.by_league || {}).sort((a,b) => b[1].n - a[1].n).slice(0, 8).map(([k,s]) => tableRow(k, s));
+
+    // Calibration bars
+    const calib = (rep.calibration || []).filter(b => b.n > 0);
+    const calibHtml = calib.length ? `
+      <div style="margin-top:18px;">
+        <div style="font-size:10px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;font-weight:700;margin-bottom:10px;">Calibration · fiabilité des probas</div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;font-variant-numeric:tabular-nums;">
+          ${calib.map(b => {
+            const pm = (b.prob_mean * 100).toFixed(0);
+            const wr = (b.win_rate * 100).toFixed(0);
+            const gap = b.gap;
+            const gapColor = Math.abs(gap) < 0.1 ? 'var(--accent)' : Math.abs(gap) < 0.2 ? '#fbbf24' : 'var(--danger)';
+            const barW = Math.max(pm, wr);
+            return `<div style="display:grid;grid-template-columns:80px 1fr 70px;gap:12px;align-items:center;">
+              <div style="color:var(--text-dim);">${(b.lo*100).toFixed(0)}–${(b.hi*100).toFixed(0)}% <span style="opacity:.6;">(${b.n})</span></div>
+              <div style="position:relative;height:18px;">
+                <div style="position:absolute;left:0;top:0;height:8px;width:${pm}%;background:var(--brand);opacity:.5;border-radius:2px;" title="Proba moyenne ${pm}%"></div>
+                <div style="position:absolute;left:0;bottom:0;height:8px;width:${wr}%;background:var(--accent);border-radius:2px;" title="Win rate réel ${wr}%"></div>
+              </div>
+              <div style="color:${gapColor};text-align:right;font-weight:700;">${gap >= 0 ? '+' : ''}${(gap*100).toFixed(0)}pt</div>
+            </div>`;
+          }).join('')}
+        </div>
+        <div style="margin-top:8px;font-size:10px;color:var(--text-dim);">
+          Barres : <span style="color:var(--brand);">proba dite par le modèle</span> vs <span style="color:var(--accent);">win rate réel</span>. Gap = écart.
+        </div>
+      </div>` : '';
+
+    return `
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+        <div>
+          <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;">Performance du modèle</div>
+          <div style="font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.6px;margin-top:2px;">Backtest du vrai predictMatch</div>
+        </div>
+        <div style="font-size:11px;color:var(--text-dim);">Généré ${esc2(gen)} · ${rep.n_events} picks</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;">
+        <div style="padding:12px;background:var(--panel-2);border-radius:8px;">
+          <div style="font-size:10px;color:var(--text-dim);letter-spacing:.6px;text-transform:uppercase;">Win rate</div>
+          <div style="font-size:22px;font-weight:800;color:var(--text);margin-top:2px;">${((ov.win_rate||0)*100).toFixed(0)}%</div>
+          <div style="font-size:10px;color:var(--text-dim);">${ov.wins||0}/${ov.n||0}</div>
+        </div>
+        <div style="padding:12px;background:var(--panel-2);border-radius:8px;">
+          <div style="font-size:10px;color:var(--text-dim);letter-spacing:.6px;text-transform:uppercase;">ROI flat 1u</div>
+          <div style="font-size:22px;font-weight:800;color:${roiColor};margin-top:2px;">${roi >= 0 ? '+' : ''}${roi.toFixed(1)}%</div>
+          <div style="font-size:10px;color:var(--text-dim);">${(ov.flat_pnl||0).toFixed(2)}u</div>
+        </div>
+        <div style="padding:12px;background:var(--panel-2);border-radius:8px;">
+          <div style="font-size:10px;color:var(--text-dim);letter-spacing:.6px;text-transform:uppercase;">Kelly 0.25× cumul</div>
+          <div style="font-size:22px;font-weight:800;color:${kellyColor};margin-top:2px;">${(ov.kelly_pnl||0) >= 0 ? '+' : ''}${(ov.kelly_pnl||0).toFixed(2)}u</div>
+          <div style="font-size:10px;color:var(--text-dim);">bankroll 100u → ${(rep.bankroll_final_kelly||0).toFixed(2)}u</div>
+        </div>
+        <div style="padding:12px;background:var(--panel-2);border-radius:8px;">
+          <div style="font-size:10px;color:var(--text-dim);letter-spacing:.6px;text-transform:uppercase;" title="0 = parfait, 0.25 = pile/face">Brier score</div>
+          <div style="font-size:22px;font-weight:800;color:${brierColor};margin-top:2px;">${brier}</div>
+          <div style="font-size:10px;color:var(--text-dim);">cote moy ${(ov.avg_cote||0).toFixed(2)}</div>
+        </div>
+      </div>
+      ${table('Par tier de confiance', byTier)}
+      ${table('Par sport', bySport)}
+      ${table('Par range de cote', byCote)}
+      ${table('Top ligues', byLeague)}
+      ${calibHtml}
+    `;
   }
 
   // ====== v23 — Bibliothèque de leçons apprises ======
