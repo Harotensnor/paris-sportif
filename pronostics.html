@@ -1092,7 +1092,8 @@
   body.agent-home .topbar-utils .date-nav,
   body.agent-home .topbar-utils .date-picker,
   body.agent-home .qb-fab,
-  body.agent-home #suivi-subnav { display: none !important; }
+  body.agent-home #suivi-subnav,
+  body.agent-home #pronos-subnav { display: none !important; }
   body.agent-home .topbar-utils { gap: 8px; }
   body.agent-home header.topbar { background: transparent; border-bottom-color: transparent; }
   body.agent-inside .qb-fab { display: none !important; }
@@ -1183,6 +1184,63 @@
   }
   nav.topbar-nav .page-btn.active .count { background: var(--brand-soft); color: var(--brand); }
 
+  /* v30 — Hubs (dropdowns groupant les sous-pages) */
+  nav.topbar-nav .hub {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  nav.topbar-nav .hub-btn {
+    flex-shrink: 0;
+    padding: 8px 12px; font-size: 13px; font-weight: 500;
+    color: var(--text-dim); background: none; border: none;
+    border-radius: var(--r-sm); cursor: pointer;
+    display: inline-flex; align-items: center; gap: 5px;
+    transition: color .15s, background .15s;
+    white-space: nowrap; font-family: inherit;
+  }
+  nav.topbar-nav .hub-btn:hover { color: var(--text); background: var(--panel-2); }
+  nav.topbar-nav .hub-btn.active {
+    color: var(--text); background: var(--panel-2); font-weight: 600;
+    box-shadow: 0 1px 0 rgba(255,255,255,.04) inset, 0 -1px 0 var(--border) inset;
+  }
+  nav.topbar-nav .hub-btn .chev {
+    font-size: 9px; color: var(--text-dim2);
+    transition: transform .15s;
+    line-height: 1;
+  }
+  nav.topbar-nav .hub.open .hub-btn .chev { transform: rotate(180deg); }
+  nav.topbar-nav .hub-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    min-width: 210px;
+    background: var(--panel);
+    border: 1px solid var(--border-2);
+    border-radius: 10px;
+    box-shadow: var(--shadow-lg);
+    padding: 6px;
+    z-index: 62;
+    flex-direction: column;
+    gap: 2px;
+  }
+  nav.topbar-nav .hub.open .hub-menu { display: flex; }
+  nav.topbar-nav .hub-menu .page-btn {
+    justify-content: flex-start;
+    width: 100%;
+    padding: 9px 12px;
+    font-size: 13px;
+    text-align: left;
+  }
+  nav.topbar-nav .hub-menu .page-btn:hover {
+    background: var(--panel-3);
+  }
+  nav.topbar-nav .hub-menu .page-btn.active {
+    color: var(--brand); background: var(--brand-soft);
+  }
+
   /* --- Utilities droite : search + date --- */
   .topbar-utils {
     display: flex; align-items: center; gap: 10px; flex-shrink: 0;
@@ -1264,10 +1322,15 @@
     .topbar-menu { display: inline-flex; align-items: center; justify-content: center; }
     .content main { padding: 20px 14px 80px; }
 
-    /* Menu ouvert = drawer vertical en overlay */
+    /* Menu ouvert = drawer vertical en overlay.
+       Note : header.topbar a backdrop-filter qui crée un containing block
+       pour position:fixed. top:0/bottom:0 clampent alors le drawer à la
+       hauteur du header (~82px). On force 100dvh (fallback 100vh) pour
+       que le drawer prenne toute la hauteur du viewport. */
     body.sidebar-open nav.topbar-nav {
       display: flex; flex-direction: column; gap: 4px;
-      position: fixed; top: 0; right: 0; bottom: 0; width: 280px; max-width: 85vw;
+      position: fixed; top: 0; right: 0; width: 280px; max-width: 85vw;
+      height: 100vh; height: 100dvh;
       background: var(--panel); padding: 62px 14px 20px;
       border-left: 1px solid var(--border-2);
       z-index: 58; overflow-y: auto;
@@ -1275,6 +1338,29 @@
     }
     body.sidebar-open nav.topbar-nav .page-btn {
       justify-content: flex-start; width: 100%; padding: 12px 14px; font-size: 14px;
+    }
+    /* v30 — mobile drawer : hubs s'affichent comme sections dépliées.
+       Pas de dropdown, tous les boutons enfants sont visibles. */
+    body.sidebar-open nav.topbar-nav .hub {
+      display: flex; flex-direction: column; width: 100%;
+      border-top: 1px solid var(--border);
+      padding-top: 8px; margin-top: 4px;
+    }
+    body.sidebar-open nav.topbar-nav .hub .hub-btn {
+      justify-content: flex-start; width: 100%;
+      padding: 8px 14px; font-size: 11px; font-weight: 700;
+      color: var(--text-dim2); text-transform: uppercase; letter-spacing: .06em;
+      cursor: default; pointer-events: none;
+    }
+    body.sidebar-open nav.topbar-nav .hub .hub-btn .chev { display: none; }
+    body.sidebar-open nav.topbar-nav .hub-menu {
+      display: flex !important; flex-direction: column;
+      position: static; background: none; border: none;
+      box-shadow: none; padding: 0; gap: 2px;
+      min-width: 0;
+    }
+    body.sidebar-open nav.topbar-nav .hub-menu .page-btn {
+      padding: 11px 20px; font-size: 14px;
     }
     body.sidebar-open .sidebar-overlay { display: block; }
   }
@@ -2132,26 +2218,41 @@
       </div>
     </a>
 
+    <!-- v30 refonte nav : 4 hubs (Aujourd'hui / Pronos / Ma perf / Plus).
+         Desktop = dropdowns ; mobile = sections dans le drawer. Remplace
+         8 boutons empilés + 7 pages "cachées" accessibles au hasard. -->
     <nav class="topbar-nav" id="page-nav" aria-label="Navigation principale">
-      <button class="page-btn active" data-page="dashboard">Accueil</button>
-      <button class="page-btn" data-page="tous">Tous les pronos</button>
-      <button class="page-btn" data-page="locks">Paris sûrs <span class="count" id="count-locks">0</span></button>
-      <button class="page-btn" data-page="buteurs">Buteurs</button>
-      <button class="page-btn" data-page="combines">Combinés</button>
-      <button class="page-btn" data-page="mesparis">Mon suivi</button>
-      <button class="page-btn" data-page="academie">Guide</button>
-      <button class="page-btn" data-page="profil">Profil <span class="count" id="count-sante-alerts">0</span></button>
+      <button class="page-btn hub-solo active" data-page="dashboard">🎯 Aujourd'hui</button>
+      <div class="hub" data-hub="pronos">
+        <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">⚡ Pronos <span class="chev">▾</span></button>
+        <div class="hub-menu" role="menu" aria-label="Sous-menu Pronos">
+          <button class="page-btn" data-page="tous">Tous les pronos</button>
+          <button class="page-btn" data-page="locks">Paris sûrs <span class="count" id="count-locks">0</span></button>
+          <button class="page-btn" data-page="buteurs">Buteurs</button>
+          <button class="page-btn" data-page="combines">Combinés</button>
+          <button class="page-btn" data-page="simples">Paris du jour (par sport)</button>
+          <button class="page-btn" data-page="top">Top du jour</button>
+        </div>
+      </div>
+      <div class="hub" data-hub="perf">
+        <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">📊 Ma perf <span class="chev">▾</span></button>
+        <div class="hub-menu" role="menu" aria-label="Sous-menu Ma perf">
+          <button class="page-btn" data-page="mesparis">Mes paris</button>
+          <button class="page-btn" data-page="historique">Historique</button>
+          <button class="page-btn" data-page="bilan">Bilan</button>
+          <button class="page-btn" data-page="backtest">Performance</button>
+        </div>
+      </div>
+      <div class="hub" data-hub="plus">
+        <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">⋯ Plus <span class="chev">▾</span></button>
+        <div class="hub-menu" role="menu" aria-label="Sous-menu Plus">
+          <button class="page-btn" data-page="academie">Guide</button>
+          <button class="page-btn" data-page="credibilite">Crédibilité</button>
+          <button class="page-btn" data-page="alertes">Alertes</button>
+          <button class="page-btn" data-page="profil">Profil <span class="count" id="count-sante-alerts">0</span></button>
+        </div>
+      </div>
     </nav>
-    <!-- v23 pages accessibles en fallback mais hors nav principale -->
-    <div style="display:none;">
-      <button class="page-btn" data-page="top" aria-hidden="true"></button>
-      <button class="page-btn" data-page="backtest" aria-hidden="true"></button>
-      <button class="page-btn" data-page="alertes" aria-hidden="true"></button>
-      <button class="page-btn" data-page="historique" aria-hidden="true"></button>
-      <button class="page-btn" data-page="bilan" aria-hidden="true"></button>
-      <button class="page-btn" data-page="simples" aria-hidden="true"></button>
-      <button class="page-btn" data-page="credibilite" aria-hidden="true"></button>
-    </div>
 
     <div class="topbar-utils">
       <div class="search-wrap" style="position:relative;">
@@ -10205,6 +10306,42 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-24T18:35:25.073442Z","today":"
       suiviNav.style.display = 'none';
     }
 
+    // v30 — Sous-nav "Pronos" (tous/locks/buteurs/combines/simples/top).
+    // Mêmes onglets que le dropdown Pronos, mais rendus en ligne au-dessus
+    // de la page pour que l'user switche sans rouvrir le menu.
+    const pronosPages = ['tous', 'locks', 'buteurs', 'combines', 'simples', 'top'];
+    const isPronos = pronosPages.includes(currentPage);
+    let pronosNav = document.getElementById('pronos-subnav');
+    if (isPronos) {
+      if (!pronosNav) {
+        pronosNav = document.createElement('div');
+        pronosNav.id = 'pronos-subnav';
+        pronosNav.style.cssText = 'max-width:1100px;margin:0 auto;padding:12px 8px 4px;display:flex;gap:6px;flex-wrap:wrap;';
+        (document.querySelector('main') || document.body).insertBefore(pronosNav, (document.querySelector('main') || document.body).firstChild);
+      }
+      const tabs = [
+        { k:'tous',     emoji:'📋', label:'Tous' },
+        { k:'locks',    emoji:'🔒', label:'Paris sûrs' },
+        { k:'buteurs',  emoji:'⚽', label:'Buteurs' },
+        { k:'combines', emoji:'🔗', label:'Combinés' },
+        { k:'simples',  emoji:'🎯', label:'Par sport' },
+        { k:'top',      emoji:'⭐', label:'Top du jour' },
+      ];
+      pronosNav.innerHTML = tabs.map(t => `
+        <button data-pronos-page="${t.k}" style="padding:8px 14px;border-radius:var(--r);border:1px solid ${currentPage===t.k?'var(--brand)':'var(--border-2)'};background:${currentPage===t.k?'var(--brand-soft)':'var(--panel)'};color:${currentPage===t.k?'var(--brand)':'var(--text-2)'};font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;">${t.emoji} ${t.label}</button>
+      `).join('');
+      pronosNav.querySelectorAll('[data-pronos-page]').forEach(b => {
+        b.addEventListener('click', () => {
+          currentPage = b.dataset.pronosPage;
+          try { localStorage.setItem('currentPage', currentPage); } catch(e){}
+          applyPageView();
+        });
+      });
+      pronosNav.style.display = '';
+    } else if (pronosNav) {
+      pronosNav.style.display = 'none';
+    }
+
     // Filter bar only for simples. Top picks wrap est exclusivement sur la
     // page Top Pronos (plus affiché en tête des Simples).
     const el = document.getElementById('filters');
@@ -10420,6 +10557,19 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-24T18:35:25.073442Z","today":"
     // Highlight active nav button — CSS handles styling via .active class
     document.querySelectorAll('.page-btn').forEach(b => {
       b.classList.toggle('active', b.dataset.page === currentPage);
+    });
+    // v30 — Highlight active hub (Pronos/Ma perf/Plus) when current page
+    // is one of its children. Dashboard stays as a solo button.
+    const HUB_PAGES = {
+      pronos: ['tous', 'locks', 'buteurs', 'combines', 'simples', 'top', 'value'],
+      perf:   ['mesparis', 'historique', 'bilan', 'backtest'],
+      plus:   ['academie', 'credibilite', 'alertes', 'profil', 'sante'],
+    };
+    document.querySelectorAll('nav.topbar-nav .hub').forEach(h => {
+      const k = h.dataset.hub;
+      const pages = HUB_PAGES[k] || [];
+      const btn = h.querySelector('.hub-btn');
+      if (btn) btn.classList.toggle('active', pages.includes(currentPage));
     });
   }
 
@@ -14207,7 +14357,53 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       currentPage = btn.dataset.page;
       try { localStorage.setItem('currentPage', currentPage); } catch (e) {}
       applyPageView();
+      // v30 — ferme le dropdown hub contenant ce page-btn si besoin
+      const parentHub = btn.closest('.hub');
+      if (parentHub) {
+        parentHub.classList.remove('open');
+        const hb = parentHub.querySelector('.hub-btn');
+        if (hb) hb.setAttribute('aria-expanded', 'false');
+      }
       try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch(e) {}
+    });
+
+    // v30 — Hub dropdowns : toggle au clic, ferme au clic extérieur, un seul
+    // ouvert à la fois. Sur mobile (drawer ouvert) les .hub-btn sont
+    // pointer-events:none → ce handler ne s'exécute pas, les menus sont
+    // dépliés en permanence comme sections.
+    document.querySelectorAll('nav.topbar-nav .hub .hub-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const hub = btn.closest('.hub');
+        if (!hub) return;
+        const wasOpen = hub.classList.contains('open');
+        document.querySelectorAll('nav.topbar-nav .hub.open').forEach(h => {
+          h.classList.remove('open');
+          const b2 = h.querySelector('.hub-btn');
+          if (b2) b2.setAttribute('aria-expanded', 'false');
+        });
+        if (!wasOpen) {
+          hub.classList.add('open');
+          btn.setAttribute('aria-expanded', 'true');
+        }
+      });
+    });
+    document.addEventListener('click', (e) => {
+      if (e.target && e.target.closest && e.target.closest('nav.topbar-nav .hub')) return;
+      document.querySelectorAll('nav.topbar-nav .hub.open').forEach(h => {
+        h.classList.remove('open');
+        const b = h.querySelector('.hub-btn');
+        if (b) b.setAttribute('aria-expanded', 'false');
+      });
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      const open = document.querySelector('nav.topbar-nav .hub.open');
+      if (open) {
+        open.classList.remove('open');
+        const b = open.querySelector('.hub-btn');
+        if (b) { b.setAttribute('aria-expanded', 'false'); b.focus(); }
+      }
     });
 
     // v22 — Onboarding au premier chargement (après 800ms pour pas bloquer la UI)
