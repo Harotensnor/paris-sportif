@@ -123,8 +123,6 @@ Tous commités car c'est la "base de données" du site statique.
   leurs `const` tout en haut de la fonction pour éviter les TDZ.
 - **Synchronisation `auto_refresh.py` ↔ `refresh.yml`** : toute nouvelle
   source ou patch doit être ajouté aux deux endroits (sinon dev local ≠ prod).
-- **`paris-sportif.html`** : ancien HTML legacy, non référencé par
-  `index.html`. Candidat à suppression.
 - **`backtest_baselines.py` vs `backtest_v2.py`** : `backtest_baselines.py` évalue des stratégies
   marché (fav/dog/draw/value), PAS `predictMatch` — ne pas l'utiliser pour
   juger la perf du modèle prod. `backtest_v2.py` appelle la vraie fonction
