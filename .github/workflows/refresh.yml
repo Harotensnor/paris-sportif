@@ -152,4 +152,18 @@ jobs:
           fi
           git add sw.js
           git commit -m "data: auto-refresh $(date -u +'%Y-%m-%d %H:%M UTC')"
-          git push
+          # Retry on race conditions: when a manual push or another cron run
+          # advances main between checkout and push, naive `git push` hits
+          # non-fast-forward. Pull --rebase the autostash and retry up to 3x.
+          # `git pull` works with fetch-depth: 1 because we only need to
+          # rebase a handful of commits ahead.
+          for attempt in 1 2 3; do
+            if git push; then
+              echo "Push succeeded on attempt $attempt."
+              exit 0
+            fi
+            echo "Push rejected (attempt $attempt) — pulling --rebase and retrying."
+            git pull --rebase --autostash origin main
+          done
+          echo "Push still failing after 3 retries — surfacing as a job failure."
+          exit 1
