@@ -1325,6 +1325,19 @@
   .topbar-utils .date-nav button,
   .topbar-utils .date-picker { padding: 6px 10px; font-size: 12px; }
 
+  /* v30 — Pulse subtil sur top-picks dont le match commence imminent (<30min).
+     Border ambre clignote doucement pour attirer l'attention sans agression. */
+  @keyframes v30-imminent-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(251,191,36,0); border-left-color: var(--accent); }
+    50%      { box-shadow: 0 0 0 4px rgba(251,191,36,.18); border-left-color: #fbbf24; }
+  }
+  .dash-pick-card.imminent {
+    animation: v30-imminent-pulse 2.4s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .dash-pick-card.imminent { animation: none; border-left-color: #fbbf24; }
+  }
+
   /* v30 Sprint 5 — Theme toggle button (in topbar-utils) */
   .theme-toggle {
     width: 32px; height: 32px; padding: 0;
@@ -3713,6 +3726,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
         }
       }
       const startingSoon = diffMs < 60 * 60000 && diffMs > -60000;
+      const isImminent = diffMs < 30 * 60000 && diffMs > -60000;
       const el = card.querySelector('.dpc-countdown');
       if (el && el.textContent !== label) {
         el.textContent = label;
@@ -3720,6 +3734,8 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
         el.style.background = startingSoon ? 'rgba(251,191,36,.15)' : 'transparent';
         el.style.border = startingSoon ? '1px solid rgba(251,191,36,.4)' : '1px solid var(--border-2)';
       }
+      // v30 — Toggle imminent class for pulse animation
+      card.classList.toggle('imminent', isImminent);
     });
     // Tous rows : version compacte "X min" sans "dans"
     const rows = document.querySelectorAll('.tous-row[data-match-date]');
@@ -9054,10 +9070,15 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
                 const ms = (new Date(p.m.date).getTime()) - Date.now();
                 return ms < 60 * 60000 && ms > -60000;   // <60min away
               };
+              // v30 — `imminent` (<30min) déclenche le pulse animation
+              const _isImminent = (() => {
+                const ms = (new Date(p.m.date).getTime()) - Date.now();
+                return ms < 30 * 60000 && ms > -60000;
+              })();
               const _countdownColor = _isStartingSoon() ? '#fbbf24' : 'var(--text-dim)';
               const _countdownBg = _isStartingSoon() ? 'rgba(251,191,36,.15)' : 'transparent';
               const _countdownBorder = _isStartingSoon() ? '1px solid rgba(251,191,36,.4)' : '1px solid var(--border-2)';
-              return `<div class="dash-pick-card" id="${cardId}" data-match-id="${esc(String(p.m.id))}" data-match-date="${esc(String(p.m.date||''))}" data-odd="${p.odd}" style="padding:16px;background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:0 10px 10px 0;">
+              return `<div class="dash-pick-card${_isImminent ? ' imminent' : ''}" id="${cardId}" data-match-id="${esc(String(p.m.id))}" data-match-date="${esc(String(p.m.date||''))}" data-odd="${p.odd}" style="padding:16px;background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:0 10px 10px 0;">
                 <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;gap:8px;">
                   <div style="font-size:10px;color:var(--text-dim);letter-spacing:.5px;text-transform:uppercase;">${sIco} ${esc((typeof sportLabel==='function')?sportLabel(p.m.sport):p.m.sport)}</div>
                   <div style="display:flex;gap:6px;align-items:baseline;font-size:10px;">
