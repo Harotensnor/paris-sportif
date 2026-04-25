@@ -169,6 +169,73 @@ def _tournaments_for_sport(sport_id: int) -> list[dict]:
     return [t for t in catalog.get('tournaments', []) if t.get('sport_id') == sport_id]
 
 
+# Alias map for cross-language team name variants. ESPN serves names in
+# English/Spanish/Italian/etc., Winamax uses French translations. Without
+# this, "Barcelona" (ESPN) vs "Barcelone" (Winamax FR) would not share a
+# single token and the match drops out of the catalog → user sees a hole
+# in today's La Liga listing. Keep one canonical token per concept; both
+# the ESPN form and the Winamax form normalize to it.
+# Format: { normalized_input_token : canonical_token }
+# normalized_input_token = output of _norm() (lowercase, no accents, no spaces)
+_TEAM_NAME_ALIASES: dict[str, str] = {
+    # Spain — La Liga
+    'barcelona': 'barca', 'barcelone': 'barca', 'fcbarcelona': 'barca', 'fcbarcelone': 'barca',
+    'mallorca': 'mallorca', 'majorque': 'mallorca',
+    'sevilla': 'sevilla', 'seville': 'sevilla',
+    'realsociedad': 'sociedad',
+    'realmadrid': 'realmadrid',  # already aligned, but pin the canonical
+    'realbetis': 'betis', 'betis': 'betis', 'betissevilla': 'betis',
+    'espanyol': 'espanyol', 'espanyolbarcelone': 'espanyol',
+    'rayovallecano': 'rayo',
+    'celta': 'celta', 'celtavigo': 'celta',
+    'realsaragosse': 'zaragoza', 'realzaragoza': 'zaragoza', 'saragosse': 'zaragoza', 'zaragoza': 'zaragoza',
+    'corogne': 'coruna', 'lacoruna': 'coruna', 'depcoruna': 'coruna', 'deportivolacoruna': 'coruna',
+    'gijon': 'gijon', 'sportinggijon': 'gijon',
+    'malaga': 'malaga',
+    'grenade': 'granada', 'granada': 'granada',
+    # Italy
+    'naples': 'napoli', 'napoli': 'napoli',
+    'milan': 'milan', 'acmilan': 'milan',
+    'inter': 'inter', 'intermilan': 'inter', 'internazionale': 'inter',
+    'come': 'como', 'como': 'como',
+    'rome': 'roma', 'roma': 'roma', 'asrome': 'roma', 'asroma': 'roma',
+    'bologne': 'bologna', 'bologna': 'bologna',
+    'turin': 'torino', 'torino': 'torino',
+    'juventus': 'juventus', 'juve': 'juventus',
+    'fiorentina': 'fiorentina', 'florence': 'fiorentina',
+    'cagliari': 'cagliari',
+    # Germany
+    'munich': 'munchen', 'munchen': 'munchen', 'bayernmunich': 'bayern', 'bayern': 'bayern',
+    'breme': 'bremen', 'bremen': 'bremen', 'werderbreme': 'werder', 'werderbremen': 'werder', 'werder': 'werder',
+    'cologne': 'koln', 'koln': 'koln', 'fccologne': 'koln',
+    'fribourg': 'freiburg', 'freiburg': 'freiburg',
+    'mayence': 'mainz', 'mainz': 'mainz',
+    'hanovre': 'hannover', 'hannover': 'hannover',
+    'augsbourg': 'augsburg', 'augsburg': 'augsburg',
+    'nuremberg': 'nurnberg', 'nurnberg': 'nurnberg',
+    'wolfsbourg': 'wolfsburg', 'wolfsburg': 'wolfsburg',
+    'francfort': 'frankfurt', 'frankfurt': 'frankfurt', 'eintrachtfrancfort': 'frankfurt',
+    # Czech / Eastern Europe
+    'praguesparta': 'sparta', 'sparta': 'sparta', 'spartaprague': 'sparta',
+    'slaviaprague': 'slavia', 'slavia': 'slavia',
+    'duklaprague': 'dukla',
+    'plzen': 'plzen', 'viktoriaplzen': 'plzen',
+    # Portugal
+    'porto': 'porto', 'fcporto': 'porto',
+    'sporting': 'sporting', 'sportingportugal': 'sporting',
+    'benfica': 'benfica',
+    'bragua': 'braga', 'braga': 'braga',
+    # Misc European common
+    'ac': '',  # noise
+}
+
+
+def _alias(token: str) -> str:
+    """Map a normalized token through the alias table. Returns the canonical
+    form (e.g. 'barcelone' → 'barca') or the input unchanged if no alias."""
+    return _TEAM_NAME_ALIASES.get(token, token)
+
+
 def _name_tokens(full_name: str) -> set[str]:
     """Break a player/team name into normalized last-name tokens.
 
@@ -176,16 +243,30 @@ def _name_tokens(full_name: str) -> set[str]:
     the same ("Nuno Borges") OR initialed forms ("Borges N."). We tokenize
     and look for *any* shared token ≥ 3 chars to match across formats.
     Short tokens (de, la, van…) are filtered since they'd cause false hits.
+
+    v30 fix: also pass each token through _alias() so cross-language variants
+    (Barcelona ↔ Barcelone, Mallorca ↔ Majorque) collapse to a shared canonical
+    token. Without this, ESPN→Winamax matching drops half the La Liga slate
+    on French-localized Winamax catalogs.
     """
     if not full_name:
         return set()
     # Strip trailing "X." initial (ESPN tennis short form)
     s = re.sub(r'\s+[A-Za-z]\.$', '', full_name.strip())
     toks = set()
+    # Also tokenize the FULL normalized name (sometimes "FC Barcelone" → 'fcbarcelone'
+    # is the only form that maps cleanly via the alias table).
+    full_norm = _norm(s)
+    if full_norm:
+        a = _alias(full_norm)
+        if a and len(a) >= 3:
+            toks.add(a)
     for t in re.split(r'[\s\-]+', s):
         nt = _norm(t)
         if len(nt) >= 3:
-            toks.add(nt)
+            toks.add(_alias(nt))
+    # Drop any empty strings introduced by aliases that map to ''
+    toks.discard('')
     return toks
 
 
