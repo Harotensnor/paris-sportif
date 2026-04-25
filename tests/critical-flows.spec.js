@@ -240,3 +240,66 @@ test.describe('Match modal — Reims regression', () => {
     expect(text.trim()).not.toBe('vs');
   });
 });
+
+// v30 — Tests for last batch of features
+test.describe('Hash navigation (PWA shortcuts)', () => {
+  test('location.hash=#locks navigates to Locks page', async ({ page }) => {
+    await page.goto(URL + '#locks');
+    await expect.poll(async () =>
+      await page.evaluate(() => localStorage.getItem('currentPage'))
+    ).toBe('locks');
+    // Locks wrap should be visible (children > 0)
+    await page.waitForFunction(() => {
+      const w = document.getElementById('locks-wrap');
+      return w && w.children.length > 0;
+    }, { timeout: 3000 });
+  });
+});
+
+test.describe('Daily P&L chip (with corrupted bet data)', () => {
+  test('renders without NaN/Invalid Date even when bet fields are strings', async ({ page }) => {
+    await page.goto(URL);
+    const todayIso = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+    await page.evaluate((iso) => {
+      // Inject mix of valid + corrupted bets
+      localStorage.setItem('paris_sportif_tracked_bets', JSON.stringify({
+        b1: { added_at: `${iso}T08:00:00Z`, stake: 'abc', odds: 'xyz', status: 'gagné' },
+        b2: { added_at: `${iso}T10:00:00Z`, stake: 5, odds: 2.0, status: 'gagné' },
+        b3: { added_at: 'bad-date', stake: 3, odds: 1.8, status: 'perdu' },
+      }));
+      localStorage.setItem('currentPage', 'dashboard');
+      if (typeof applyPageView === 'function') applyPageView();
+    }, todayIso);
+    const dashWrap = page.locator('#dashboard-wrap');
+    const txt = await dashWrap.innerText();
+    expect(txt).not.toMatch(/\bNaN\b/);
+    expect(txt).not.toMatch(/Invalid Date/i);
+    expect(txt).not.toMatch(/undefined/i);
+    // Daily P&L chip should be visible
+    await expect(dashWrap.locator('text=AUJOURD\'HUI').first()).toBeVisible();
+    // Cleanup
+    await page.evaluate(() => localStorage.removeItem('paris_sportif_tracked_bets'));
+  });
+});
+
+test.describe('Notif toggle button', () => {
+  test('renders in topbar with appropriate state', async ({ page }) => {
+    await page.goto(URL);
+    const notifBtn = page.locator('#notif-toggle');
+    await expect(notifBtn).toBeVisible();
+    const icon = await notifBtn.textContent();
+    expect(['🔕', '🔔']).toContain(icon.trim());
+  });
+});
+
+test.describe('Health indicator', () => {
+  test('renders dot with appropriate color/title', async ({ page }) => {
+    await page.goto(URL);
+    const healthBtn = page.locator('#health-indicator');
+    await expect(healthBtn).toBeVisible();
+    // Title should describe pipeline state once health.json fetched
+    await expect.poll(async () => await healthBtn.getAttribute('title'), {
+      timeout: 5000
+    }).toMatch(/Pipeline|sant|chargement|indisponible/i);
+  });
+});
