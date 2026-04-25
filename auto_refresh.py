@@ -85,6 +85,11 @@ PATCH_STAGES = [
     ('patch_referees_soccer.py',    1,   30),
     # Pipeline status snapshot (health.json) — runs every tick, cheap.
     ('build_health.py',             1,   15),
+    # Chantier #3 lazy-load — DOIT tourner en DERNIER. Lit data.js (full),
+    # écrit data_today.json + data_manifest.json + ré-inline LITE blob dans
+    # pronostics.html. Sans ça, le client tomberait toujours sur le fallback
+    # data.js et perdrait le bénéfice du lazy-load.
+    ('finalize_inline.py',          1,   15),
 ]
 
 
