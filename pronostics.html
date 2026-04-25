@@ -18,6 +18,50 @@
      pour l'enrichissement des cotes (utilisé en dev, jamais en prod sur Pages). -->
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://a.espncdn.com https://a1.espncdn.com https://a2.espncdn.com https://a3.espncdn.com https://a4.espncdn.com https://www.gstatic.com; connect-src 'self' https://api.clubelo.com https://sports.core.api.espn.com https://site.api.espn.com; font-src 'self' data:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
+<!-- v30 — Open Graph + Twitter Card pour le partage social. URL canonique
+     vers https://harotensnor.github.io/paris-sportif/. Image dérivée de
+     l'icon 512x512 PWA. Hash routes (#locks, #bilan…) gardent la même
+     og:url root — preview cohérent quel que soit le partage. -->
+<link rel="canonical" href="https://harotensnor.github.io/paris-sportif/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:site_name" content="Paris-Sportif">
+<meta property="og:url" content="https://harotensnor.github.io/paris-sportif/">
+<meta property="og:title" content="Pronostics Sportifs — modèle data-driven, calibré, honnête">
+<meta property="og:description" content="Pronos foot/tennis/basket/hockey classés par confiance. 16 signaux, calibration historique, mises Kelly disciplinées. Site éducatif gratuit, 18+, jouer comporte des risques.">
+<meta property="og:image" content="https://harotensnor.github.io/paris-sportif/icon-512.png">
+<meta property="og:image:width" content="512">
+<meta property="og:image:height" content="512">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Pronostics Sportifs — modèle data-driven">
+<meta name="twitter:description" content="Pronos foot/tennis/basket/hockey classés par confiance. Calibration historique vérifiable, mises Kelly disciplinées.">
+<meta name="twitter:image" content="https://harotensnor.github.io/paris-sportif/icon-512.png">
+<!-- v30 — JSON-LD : description du site (WebSite) + organisation. Les
+     SportsEvent individuels sont injectés dynamiquement au boot par
+     `_injectMatchSchemas` à partir de PRONOSTICS_DATA (max 5 hero matchs
+     pour éviter de spammer le crawler). -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Paris-Sportif",
+  "alternateName": "Pronostics Sportifs",
+  "url": "https://harotensnor.github.io/paris-sportif/",
+  "description": "Pronostics sportifs multi-sports (foot, tennis, basket, hockey) classés par confiance d'un modèle data-driven calibré sur l'historique. Site éducatif, 18+.",
+  "inLanguage": "fr-FR",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Paris-Sportif",
+    "url": "https://harotensnor.github.io/paris-sportif/",
+    "logo": "https://harotensnor.github.io/paris-sportif/icon-512.png"
+  },
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://harotensnor.github.io/paris-sportif/#/search?q={search_term_string}",
+    "query-input": "required name=search_term_string"
+  }
+}
+</script>
 <!-- Chantier S — PWA -->
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -10069,8 +10113,8 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T22:35:26.502202Z","today":"
             ? (streak >= 5 ? 'Le modèle est en pleine forme. Reste discipliné sur Kelly — la moyenne se rappellera tôt ou tard.' : 'Bon momentum modèle. Continue à suivre les picks lock prioritairement.')
             : (streak >= 5 ? 'Le modèle traverse une bad run. Ne double pas la mise ; les conditions s\'inversent.' : 'Petite passe à vide. Les locks restent à >70% historiquement, garde le cap.');
           return `
-            <div style="display:flex;align-items:center;gap:14px;padding:14px 18px;margin:18px 0;background:${bg};border:1px solid ${border};border-left:3px solid ${col};border-radius:0 10px 10px 0;">
-              <div style="font-size:24px;line-height:1;">${icon}</div>
+            <div role="status" aria-live="polite" style="display:flex;align-items:center;gap:14px;padding:14px 18px;margin:18px 0;background:${bg};border:1px solid ${border};border-left:3px solid ${col};border-radius:0 10px 10px 0;">
+              <div style="font-size:24px;line-height:1;" aria-hidden="true">${icon}</div>
               <div style="flex:1;min-width:0;">
                 <div style="font-size:11px;color:${col};text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:2px;">🤖 Série du modèle</div>
                 <div style="font-size:14.5px;font-weight:700;color:var(--text);margin-bottom:2px;">${lbl} <span style="font-size:12.5px;font-weight:600;color:var(--text-dim);margin-left:8px;">5 derniers : ${sparkChars}</span></div>
@@ -10104,8 +10148,8 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T22:35:26.502202Z","today":"
             </li>`;
           }).join('');
           return `
-            <div style="display:flex;align-items:flex-start;gap:14px;padding:14px 18px;margin:18px 0;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.25);border-left:3px solid #f87171;border-radius:0 10px 10px 0;">
-              <div style="font-size:24px;line-height:1;flex-shrink:0;">🚫</div>
+            <div role="status" aria-live="polite" style="display:flex;align-items:flex-start;gap:14px;padding:14px 18px;margin:18px 0;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.25);border-left:3px solid #f87171;border-radius:0 10px 10px 0;">
+              <div style="font-size:24px;line-height:1;flex-shrink:0;" aria-hidden="true">🚫</div>
               <div style="flex:1;min-width:0;">
                 <div style="font-size:11px;color:#f87171;text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:4px;">Sports en perte</div>
                 <div style="font-size:13.5px;color:var(--text);font-weight:600;margin-bottom:6px;">${losers.length === 1 ? 'Un sport coûte cher' : `${losers.length} sports coûtent cher`} sur les derniers paris</div>
@@ -11371,15 +11415,26 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T22:35:26.502202Z","today":"
       </div>`;
     };
 
+    // v30 — Empty state UX : on aide l'utilisateur à passer à demain ou
+    // vider les filtres au lieu de juste afficher "Aucun match".
+    const _emptyState = (msg, withTomorrow) => `
+      <div style="padding:48px 24px;text-align:center;color:var(--text-dim);">
+        <div style="font-size:32px;margin-bottom:10px;line-height:1;opacity:.5;">📅</div>
+        <div style="font-size:14px;margin-bottom:14px;">${msg}</div>
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+          ${filtersActive ? '<button data-tous-reset style="padding:8px 14px;font-size:12px;background:transparent;color:var(--text);border:1px solid var(--border-2);border-radius:8px;cursor:pointer;font-weight:600;">↻ Vider les filtres</button>' : ''}
+          ${withTomorrow ? '<button data-go-tomorrow style="padding:8px 14px;font-size:12px;background:var(--brand);color:#08080a;border:none;border-radius:8px;cursor:pointer;font-weight:700;">Voir demain →</button>' : ''}
+        </div>
+      </div>`;
     const pendingHtml = pending.length
       ? pending.map(p => renderRow(p, false)).join('')
-      : '<div style="padding:40px;text-align:center;color:var(--text-dim);">Aucun match à venir pour aujourd\'hui.</div>';
+      : _emptyState("Aucun match à venir pour aujourd'hui.", true);
     const inProgressHtml = inProgress.length
       ? inProgress.map(p => renderRow(p, false)).join('')
-      : '<div style="padding:40px;text-align:center;color:var(--text-dim);">Aucun match en cours.</div>';
+      : _emptyState("Aucun match en cours.", false);
     const finishedHtml = finished.length
       ? finished.map(p => renderRow(p, true)).join('')
-      : '<div style="padding:40px;text-align:center;color:var(--text-dim);">Aucun match terminé aujourd\'hui.</div>';
+      : _emptyState("Aucun match terminé aujourd'hui.", false);
 
     wrap.innerHTML = `
       <div style="max-width:1100px;margin:0 auto;padding:16px 8px 24px;font-variant-numeric:tabular-nums;">
@@ -11502,14 +11557,25 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T22:35:26.502202Z","today":"
       try { localStorage.setItem('tousSort', sortSel.value); } catch(e) {}
       renderTousPage(wrap);
     });
-    // Reset all filters
-    const resetBtn = wrap.querySelector('[data-tous-reset]');
-    if (resetBtn) resetBtn.addEventListener('click', () => {
-      try {
-        localStorage.removeItem('tousFilters');
-        localStorage.removeItem('tousSort');
-      } catch(e) {}
-      renderTousPage(wrap);
+    // Reset all filters — querySelectorAll because the button can appear in
+    // both the filter bar and any empty-state placeholder block.
+    wrap.querySelectorAll('[data-tous-reset]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        try {
+          localStorage.removeItem('tousFilters');
+          localStorage.removeItem('tousSort');
+        } catch(e) {}
+        renderTousPage(wrap);
+      });
+    });
+    // v30 — "Voir demain" depuis l'empty state (pas de match aujourd'hui).
+    // Délégué au bouton existant #next-day de la topbar pour rester DRY ;
+    // ce dernier déjà gère le reload de la liste via render().
+    wrap.querySelectorAll('[data-go-tomorrow]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const nextBtn = document.getElementById('next-day');
+        if (nextBtn) nextBtn.click();
+      });
     });
   }
 
@@ -17833,6 +17899,56 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     } catch (e) {
       return false;
     }
+  }
+
+  // v30 — Inject up to 5 SportsEvent JSON-LD schemas for today's top matches
+  // so Google can index them as rich snippets (sport, teams, kickoff, venue).
+  // Runs once at boot from PRONOSTICS_DATA — keeps DOM lean by capping at 5.
+  function _injectMatchSchemas() {
+    try {
+      const data = window.PRONOSTICS_DATA;
+      if (!data || !data.days) return;
+      const today = data.days[data.today] || [];
+      const upcoming = today
+        .filter(m => m && !m.completed && m.winamax && m.winamax.available === true && m.date)
+        .sort((a, b) => new Date(a.date) - new Date(b.date))
+        .slice(0, 5);
+      if (!upcoming.length) return;
+      const sportMap = {
+        football: 'Soccer', tennis: 'Tennis', basketball: 'Basketball',
+        hockey: 'IceHockey', baseball: 'Baseball', mma: 'MartialArt',
+        'american-football': 'AmericanFootball', rugby: 'Rugby', golf: 'Golf',
+      };
+      upcoming.forEach(m => {
+        const home = (m.competitors && m.competitors[0]) || {};
+        const away = (m.competitors && m.competitors[1]) || {};
+        const schema = {
+          '@context': 'https://schema.org',
+          '@type': 'SportsEvent',
+          name: m.name || `${home.name || ''} vs ${away.name || ''}`,
+          startDate: m.date,
+          sport: sportMap[m.sport] || 'SportEvent',
+          eventStatus: m.live ? 'https://schema.org/EventInProgress' : 'https://schema.org/EventScheduled',
+          eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+          competitor: [
+            { '@type': 'SportsTeam', name: home.name || 'Home' },
+            { '@type': 'SportsTeam', name: away.name || 'Away' },
+          ],
+        };
+        if (m.venue) schema.location = { '@type': 'Place', name: m.venue, address: m.city || '' };
+        if (m.league_name) schema.superEvent = { '@type': 'SportsEvent', name: m.league_name };
+        const tag = document.createElement('script');
+        tag.type = 'application/ld+json';
+        tag.textContent = JSON.stringify(schema);
+        document.head.appendChild(tag);
+      });
+    } catch(e) { /* silent — never break boot for SEO */ }
+  }
+  // Defer to idle so it doesn't compete with first paint
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(_injectMatchSchemas, { timeout: 3000 });
+  } else {
+    setTimeout(_injectMatchSchemas, 1500);
   }
 
   // v30 — Consent RGPD pour localStorage. Affichée tant que l'utilisateur

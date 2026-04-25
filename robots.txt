@@ -1,0 +1,32 @@
+# robots.txt — Paris-Sportif (GitHub Pages)
+# Site: https://harotensnor.github.io/paris-sportif/
+
+User-agent: *
+Allow: /
+# Le scraper ESPN/Sofascore tape déjà ces endpoints, pas la peine que des
+# bots indexent nos JSON sidecars (data brute, pas user-facing).
+Disallow: /data.js
+Disallow: /data_today.json
+Disallow: /data_manifest.json
+Disallow: /odds_history.jsonl
+Disallow: /winamax_catalog.json
+Disallow: /winamax_markets.json
+Disallow: /winamax_my_bets.json
+Disallow: /injuries_soccer.json
+Disallow: /lineups_soccer.json
+Disallow: /referees_soccer.json
+Disallow: /team_form.json
+Disallow: /team_stats.json
+Disallow: /clubelo.json
+Disallow: /weather.json
+Disallow: /weather_geo_cache.json
+Disallow: /backtest_report.json
+Disallow: /backtest_report.md
+Disallow: /backtest_report_v2.json
+Disallow: /backtest_report_v2.md
+Disallow: /health.json
+Disallow: /scripts/
+Disallow: /tests/
+Disallow: /.github/
+
+Sitemap: https://harotensnor.github.io/paris-sportif/sitemap.xml
