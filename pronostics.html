@@ -5722,8 +5722,17 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
       const pickKey = btn.dataset.pick;
       const existing = getMyBet(matchId, pickKey);
       if (existing) {
-        // Already tracked — click removes
-        if (confirm(`Retirer le pari ${existing.pickLabel} @ ${existing.odds.toFixed(2)} (${existing.stake.toFixed(2)}€) de ton bilan perso ?`)) {
+        // Already tracked — click removes (modal custom, plus prompt() fragile)
+        const exStake = (Number(existing.stake) || 0).toFixed(2);
+        const exOdds = (Number(existing.odds) || 0).toFixed(2);
+        const ok = await _showConfirm({
+          title: '🗑️ Retirer ce pari ?',
+          body: `<b>${esc(existing.pickLabel || 'Pick')}</b> @ ${exOdds} pour <b>${exStake}€</b><br><span style="color:var(--text-dim);font-size:12px;">Le pari sera retiré de ton bilan personnel.</span>`,
+          confirmLabel: 'Retirer',
+          cancelLabel: 'Annuler',
+          danger: true,
+        });
+        if (ok) {
           removeMyBet(matchId, pickKey);
           toast(`✗ Pari retiré du bilan`, 'info');
           render();
@@ -7442,7 +7451,16 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
       const pickKey = btn.dataset.pick;
       const existing = typeof getMyBet === 'function' ? getMyBet(matchId, pickKey) : null;
       if (existing) {
-        if (confirm(`Retirer le pari ${existing.pickLabel} @ ${existing.odds.toFixed(2)} (${existing.stake.toFixed(2)}€) de ton bilan perso ?`)) {
+        const exStake = (Number(existing.stake) || 0).toFixed(2);
+        const exOdds = (Number(existing.odds) || 0).toFixed(2);
+        const ok = await _showConfirm({
+          title: '🗑️ Retirer ce pari ?',
+          body: `<b>${esc(existing.pickLabel || 'Pick')}</b> @ ${exOdds} pour <b>${exStake}€</b><br><span style="color:var(--text-dim);font-size:12px;">Le pari sera retiré de ton bilan personnel.</span>`,
+          confirmLabel: 'Retirer',
+          cancelLabel: 'Annuler',
+          danger: true,
+        });
+        if (ok) {
           if (typeof removeMyBet === 'function') removeMyBet(matchId, pickKey);
           if (typeof toast === 'function') toast(`✗ Pari retiré du bilan`, 'info');
           // Refresh modal button label in-place sans relancer openDetail()
@@ -7949,6 +7967,46 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
   }
   // Expose pour scripts séparés (enhancements v20 etc.)
   try { window._showStakePrompt = _showStakePrompt; } catch(e){}
+
+  // v30 — Modal custom pour confirmation (remplace confirm() qui ne
+  // marche pas en PWA installée etc.). Async — retourne true / false.
+  // opts : { title, body, confirmLabel, cancelLabel, danger? }
+  function _showConfirm(opts = {}) {
+    const title = opts.title || 'Confirmer';
+    const body = opts.body || '';
+    const confirmLbl = opts.confirmLabel || 'OK';
+    const cancelLbl = opts.cancelLabel || 'Annuler';
+    const danger = !!opts.danger;
+    return new Promise((resolve) => {
+      const existing = document.getElementById('__confirm-modal');
+      if (existing) existing.remove();
+      const div = document.createElement('div');
+      div.id = '__confirm-modal';
+      div.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);z-index:100002;display:flex;align-items:center;justify-content:center;padding:20px;';
+      div.innerHTML = `
+        <div style="background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:24px;width:min(420px,94vw);box-shadow:0 16px 48px rgba(0,0,0,.5);">
+          <h3 style="margin:0 0 12px;font-size:16px;color:var(--text);font-weight:700;">${esc(title)}</h3>
+          <div style="font-size:13.5px;color:var(--text-2);line-height:1.55;margin-bottom:18px;">${body}</div>
+          <div style="display:flex;gap:8px;justify-content:flex-end;">
+            <button id="__confirm-cancel" type="button" style="padding:8px 14px;background:transparent;color:var(--text-dim);border:1px solid var(--border-2);border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;">${esc(cancelLbl)}</button>
+            <button id="__confirm-ok" type="button" style="padding:8px 18px;background:${danger ? '#f87171' : 'var(--brand)'};color:${danger ? '#fff' : '#08080a'};border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700;">${esc(confirmLbl)}</button>
+          </div>
+        </div>`;
+      document.body.appendChild(div);
+      const cleanup = (val) => { div.remove(); resolve(val); };
+      div.querySelector('#__confirm-ok').addEventListener('click', () => cleanup(true));
+      div.querySelector('#__confirm-cancel').addEventListener('click', () => cleanup(false));
+      div.addEventListener('click', (e) => { if (e.target === div) cleanup(false); });
+      const onKey = (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); cleanup(true); document.removeEventListener('keydown', onKey); }
+        if (e.key === 'Escape') { e.preventDefault(); cleanup(false); document.removeEventListener('keydown', onKey); }
+      };
+      document.addEventListener('keydown', onKey);
+      // Focus le bouton confirm pour Enter quick
+      setTimeout(() => { try { div.querySelector('#__confirm-ok').focus(); } catch(e){} }, 50);
+    });
+  }
+  try { window._showConfirm = _showConfirm; } catch(e){}
 
   function _hardReload() {
     try {
