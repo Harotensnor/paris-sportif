@@ -131,11 +131,21 @@ def extract_markets_from_state(state: dict) -> dict[str, dict]:
 
             # Classify. 1N2 : 3 odds matching home/draw/away titles.
             if _match_keyword(btitle, MARKET_KEYWORDS_1N2) and '1n2' not in markets:
-                # Winamax sort est souvent : home, draw, away (foot) ou home, away (2-way)
+                # Winamax orders the selections as it pleases — sometimes the
+                # match title order, sometimes favorite-first. We can't infer
+                # ESPN home/away from the index alone, so we also persist the
+                # selection labels (player/team names). patch_winamax_markets
+                # then resolves home/away by matching those labels against ESPN.
                 if len(oitems) == 3:
-                    markets['1n2'] = {'home': oitems[0][1], 'draw': oitems[1][1], 'away': oitems[2][1]}
+                    markets['1n2'] = {
+                        'home': oitems[0][1], 'draw': oitems[1][1], 'away': oitems[2][1],
+                        'home_name': oitems[0][0], 'away_name': oitems[2][0],
+                    }
                 elif len(oitems) == 2:
-                    markets['1n2'] = {'home': oitems[0][1], 'away': oitems[1][1]}
+                    markets['1n2'] = {
+                        'home': oitems[0][1], 'away': oitems[1][1],
+                        'home_name': oitems[0][0], 'away_name': oitems[1][0],
+                    }
 
             # Over/Under 2.5 : titre du bet mentionne buts et line 2.5
             if _match_keyword(btitle, MARKET_KEYWORDS_OU25) and 'ou25' not in markets:

@@ -9509,20 +9509,39 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T17:40:27.179318Z","today":"
       const t = new Date(m.date).getTime();
       return isFinite(t) ? t > _nowMs : true;
     };
+    // v30 — Sports en perte sur backtest_v2 : exclure des top picks pour éviter
+    // la contradiction avec le bandeau "Sports en perte · skip recommandé".
+    // Mêmes seuils que le bandeau (n>=3, ROI<-10%) + opt-out via Profil.
+    const _losingSports = (() => {
+      try {
+        const prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}');
+        if (prefs.disableSportRoiAlerts === true) return new Set();
+      } catch(e){}
+      const rep = window.__backtestReportV2;
+      if (!rep || !rep.by_sport) return new Set();
+      return new Set(Object.entries(rep.by_sport)
+        .filter(([s, d]) => d && d.n >= 3 && d.flat_roi_pct < -10)
+        .map(([s]) => s));
+    })();
     const topPicks = _dataIsStale ? [] : allTodayRaw
-      .filter(x => !x.m.live && !x.m.completed && _notStarted(x.m) && x.edge > 0.05 && x.rel >= 0.55)
+      .filter(x => !x.m.live && !x.m.completed && _notStarted(x.m) && x.edge > 0.05 && x.rel >= 0.55 && !_losingSports.has(x.m.sport))
       .sort((a, b) => b.edge - a.edge)
       .slice(0, 3)
       .map(x => {
+        // v30 — Aligner odd/rel sur best (1n2 Winamax / OU / BTTS) pour que la
+        // card affiche un trio cohérent : Cote, Conf et Edge calculés sur le
+        // MÊME pari. Sinon edge=best mais odd=pred.odds (ESPN 1n2) → tooltip
+        // "Edge = rel − 1/odd" devient mensonger.
+        const xx = x.best ? { ...x, odd: x.best.odd, rel: x.best.rel, edge: x.best.edge } : x;
         // Kelly pour le bankroll perso : Kelly 0.25 cap 10% plancher 1€
-        const k = (typeof kellyFraction === 'function') ? kellyFraction(x.rel, x.odd, 0.25) : Math.max(0, ((x.rel*x.odd-1)/Math.max(0.01, x.odd-1)) * 0.25);
+        const k = (typeof kellyFraction === 'function') ? kellyFraction(xx.rel, xx.odd, 0.25) : Math.max(0, ((xx.rel*xx.odd-1)/Math.max(0.01, xx.odd-1)) * 0.25);
         let stake = userBankroll * k;
         const capAbs = userBankroll * 0.10;
         if (stake > capAbs) stake = capAbs;
         stake = Math.max(1, Math.round(stake)); // arrondi à l'euro entier — no centimes
-        const gain = stake * (x.odd - 1);
-        const { home, away } = (typeof getSides === 'function') ? getSides(x.m) : { home: {}, away: {} };
-        return { ...x, stake, gain, homeName: home?.name || '?', awayName: away?.name || '?', homeLogo: home?.logo || '', awayLogo: away?.logo || '' };
+        const gain = stake * (xx.odd - 1);
+        const { home, away } = (typeof getSides === 'function') ? getSides(xx.m) : { home: {}, away: {} };
+        return { ...xx, stake, gain, homeName: home?.name || '?', awayName: away?.name || '?', homeLogo: home?.logo || '', awayLogo: away?.logo || '' };
       });
 
     // v29 — Hero hook : show today's headline pick as the featured banner.
@@ -9534,8 +9553,10 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T17:40:27.179318Z","today":"
         .filter(x => !x.m.live && !x.m.completed && _notStarted(x.m) && x.rel >= 0.55)
         .sort((a, b) => b.rel - a.rel)[0];
       if (fallback) {
-        const { home, away } = (typeof getSides === 'function') ? getSides(fallback.m) : { home: {}, away: {} };
-        heroPick = { ...fallback, homeName: home?.name || '?', awayName: away?.name || '?', homeLogo: home?.logo || '', awayLogo: away?.logo || '', _noEdge: true };
+        // v30 — promouvoir best comme dans topPicks pour cohérence d'affichage
+        const ff = fallback.best ? { ...fallback, odd: fallback.best.odd, rel: fallback.best.rel, edge: fallback.best.edge } : fallback;
+        const { home, away } = (typeof getSides === 'function') ? getSides(ff.m) : { home: {}, away: {} };
+        heroPick = { ...ff, homeName: home?.name || '?', awayName: away?.name || '?', homeLogo: home?.logo || '', awayLogo: away?.logo || '', _noEdge: true };
       }
     }
     const bestLeague = heroPick ? (heroPick.m.league_name || '') : '';
@@ -9829,7 +9850,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T17:40:27.179318Z","today":"
                 </div>
                 <div style="padding:10px 12px;background:rgba(167,139,250,.10);border-radius:6px;margin-bottom:10px;font-size:13px;">
                   <div style="color:var(--text-dim);font-size:10px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:3px;">Mise conseillée</div>
-                  <div class="dpc-summary"><strong class="dpc-stake-val" style="color:var(--brand);font-size:18px;">${fmtEur(p.stake)}</strong> <span style="color:var(--text-dim);">→ gain <strong class="dpc-gain-val" style="color:var(--accent);">+${fmtEur(p.gain)}</strong></span></div>
+                  <div class="dpc-summary"><strong class="dpc-stake-val" style="color:var(--brand);font-size:18px;">${fmtEur(p.stake)}</strong> <span style="color:var(--text-dim);">→ gain <strong class="dpc-gain-val" style="color:var(--accent);">+${p.gain < 1 ? p.gain.toFixed(2) + '€' : fmtEur(p.gain)}</strong></span></div>
                 </div>
                 <!-- v30 Sprint 3 : toggle analyse complète + ajusteur mise inline -->
                 ${(allReasons.length > 3 || true) ? `
@@ -9856,7 +9877,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T17:40:27.179318Z","today":"
                     <span style="color:var(--text-dim);font-size:13px;">€</span>
                     <button type="button" class="dpc-stake-adj" data-card="${cardId}" data-delta="0.5" aria-label="Augmenter mise" style="width:30px;height:30px;background:var(--panel);border:1px solid var(--border-2);color:var(--text);border-radius:6px;cursor:pointer;font-size:16px;font-weight:700;line-height:1;">+</button>
                   </div>
-                  <div style="margin-top:8px;font-size:12px;color:var(--text-dim);">Gain potentiel : <strong class="dpc-live-gain" data-card="${cardId}" style="color:var(--accent);font-size:14px;">+${fmtEur(p.gain)}</strong></div>
+                  <div style="margin-top:8px;font-size:12px;color:var(--text-dim);">Gain potentiel : <strong class="dpc-live-gain" data-card="${cardId}" style="color:var(--accent);font-size:14px;">+${p.gain < 1 ? p.gain.toFixed(2) + '€' : fmtEur(p.gain)}</strong></div>
                 </div>` : ''}
                 <a href="${esc(url)}" target="_blank" rel="noopener" style="display:block;width:100%;padding:10px;background:var(--brand);color:#08080a;text-align:center;border-radius:6px;font-weight:700;font-size:13px;text-decoration:none;">Parier sur Winamax ↗</a>
               </div>`;
@@ -10306,9 +10327,13 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T17:40:27.179318Z","today":"
       const stake = Math.max(0.10, rawStake);
       const odd = rawOdd;
       const gain = stake * (odd - 1);
-      if (gainEl) gainEl.textContent = `+${gain.toFixed(2)}€`;
-      if (stakeVal) stakeVal.textContent = `${stake.toFixed(2)}€`;
-      if (gainSum) gainSum.textContent = `+${gain.toFixed(2)}€`;
+      // v30 — Format cohérent avec le render initial : centimes si <1€,
+      // arrondi sinon. Évite "+0.03€" en update et "+0€" en init pour le
+      // même pari, et "+1.06€" en update vs "+1€" en init.
+      const fmtMon = (n) => n < 1 ? `${n.toFixed(2)}€` : `${Math.round(n)}€`;
+      if (gainEl) gainEl.textContent = `+${fmtMon(gain)}`;
+      if (stakeVal) stakeVal.textContent = fmtMon(stake);
+      if (gainSum) gainSum.textContent = `+${fmtMon(gain)}`;
     };
     wrap.querySelectorAll('.dpc-stake-adj').forEach(btn => {
       btn.addEventListener('click', (e) => {

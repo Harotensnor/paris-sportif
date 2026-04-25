@@ -18,10 +18,63 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
+HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+from winamax_map import _name_tokens
+
 ROOT     = Path(__file__).resolve().parent.parent
 DATA_JS  = ROOT / 'data.js'
 HTML     = ROOT / 'pronostics.html'
 MARKETS  = ROOT / 'winamax_markets.json'
+
+
+def _names_match(name_a: str, name_b: str) -> bool:
+    """True if the two names share at least one normalized last-name token.
+    Re-uses the matcher already used by winamax_map.lookup so behavior stays
+    consistent (handles 'Borges N.' ↔ 'Nuno Borges', accents, aliases…)."""
+    if not name_a or not name_b:
+        return False
+    return bool(_name_tokens(name_a) & _name_tokens(name_b))
+
+
+def _align_markets_to_espn(markets: dict, ev: dict) -> None:
+    """Mutate markets['1n2'] in place so .home / .away match the ESPN
+    competitors order, swapping when Winamax stored the favorite under the
+    "wrong" side relative to ESPN.
+
+    Symptom this fixes (2026-04-25) : ESPN had Cristian home + Sabalenka away,
+    fetch_winamax_markets.py wrote ``{'home': 1.02, 'away': 14.5, ...}`` from
+    Winamax's own first-listed selection (Sabalenka). The JS reads .home/.away
+    assuming ESPN order → priced 'A. Sabalenka' at @14.5 and surfaced a fake
+    +69pt edge on the dashboard.
+
+    Decision is name-based, not title-based: we read ``home_name`` /
+    ``away_name`` written by the fetcher (the actual selection labels of the
+    1N2 odds, not the match title — those can disagree per the Tsitsipas vs
+    Bublik case where the title was 'Bublik - Tsitsipas' yet the favorite
+    odd was listed first). OU/BTTS are team-agnostic so no swap is needed.
+    """
+    n12 = markets.get('1n2')
+    if not isinstance(n12, dict) or 'home' not in n12 or 'away' not in n12:
+        return
+    wx_home_name = n12.get('home_name') or ''
+    wx_away_name = n12.get('away_name') or ''
+    competitors = ev.get('competitors') or []
+    if len(competitors) != 2 or not wx_home_name or not wx_away_name:
+        return
+    espn_home = (competitors[0] or {}).get('name') or ''
+    espn_away = (competitors[1] or {}).get('name') or ''
+    if not espn_home or not espn_away:
+        return
+    home_aligned = _names_match(espn_home, wx_home_name)
+    away_aligned = _names_match(espn_away, wx_home_name)
+    # Swap only when the Winamax 'home' selection matches ESPN's away AND
+    # not ESPN's home. If both match (rare same-surname) or neither (name
+    # mismatch elsewhere), leave as-is rather than risk the wrong direction.
+    if away_aligned and not home_aligned:
+        n12['home'], n12['away'] = n12['away'], n12['home']
+        if 'home_name' in n12 and 'away_name' in n12:
+            n12['home_name'], n12['away_name'] = n12['away_name'], n12['home_name']
 
 
 def main() -> int:
@@ -57,8 +110,14 @@ def main() -> int:
             mk = markets_by_mid.get(str(mid))
             if not mk:
                 continue
-            # Attach only the odds subtree (clean, no redundancy)
-            wx['markets'] = mk.get('odds') or {}
+            # Attach only the odds subtree (clean, no redundancy).
+            # Deep-copy 1n2 since we may mutate home/away in alignment.
+            odds_block = dict(mk.get('odds') or {})
+            if isinstance(odds_block.get('1n2'), dict):
+                odds_block['1n2'] = dict(odds_block['1n2'])
+            # 1n2 home/away can be flipped vs ESPN — realign before storing
+            _align_markets_to_espn(odds_block, ev)
+            wx['markets'] = odds_block
             wx['markets_fetched_at'] = mk.get('fetched_at')
             ev['winamax'] = wx
             stats['matched'] += 1
