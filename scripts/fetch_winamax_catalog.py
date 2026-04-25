@@ -34,30 +34,62 @@ except ImportError:
 ROOT        = Path(__file__).resolve().parent.parent
 OUT_CAT     = ROOT / 'winamax_catalog.json'
 OUT_MARKETS = ROOT / 'winamax_markets.json'
-INDEX_URL   = 'https://www.winamax.fr/paris-sportifs/sports/1'
 
+# Each sport has its own landing page whose PRELOADED_STATE only contains
+# THAT sport's tree. The football index does NOT include basket/tennis/etc.
+# matches — that was a v28 oversight that meant Théo only saw foot picks
+# even though Winamax accepts bets on every sport listed here.
+# v30 fix : fetch one page per sport, merge the trees.
 SPORTS_OF_INTEREST = {1, 2, 3, 4, 5, 16, 117}  # foot, basket, baseball, hockey, tennis, us-foot, MMA
 SPORTS_STR = {str(s) for s in SPORTS_OF_INTEREST}
+INDEX_URL_FMT = 'https://www.winamax.fr/paris-sportifs/sports/{sid}'
 
 
-def fetch_index_state() -> dict | None:
+def fetch_index_state(sport_id: int) -> dict | None:
+    """Fetch the PRELOADED_STATE blob for one sport's landing page."""
+    url = INDEX_URL_FMT.format(sid=sport_id)
     try:
-        r = cr.get(INDEX_URL, impersonate='chrome110', timeout=25)
+        r = cr.get(url, impersonate='chrome110', timeout=25)
     except Exception as e:
-        print(f'  ERR GET {INDEX_URL}: {e}', flush=True)
+        print(f'  ERR GET {url}: {e}', flush=True)
         return None
     if r.status_code != 200:
-        print(f'  HTTP {r.status_code} on index', flush=True)
+        print(f'  HTTP {r.status_code} on {url}', flush=True)
         return None
     m = re.search(r'var PRELOADED_STATE = (\{.*?\});\s*\n', r.text, re.DOTALL)
     if not m:
-        print('  no PRELOADED_STATE in index response', flush=True)
+        print(f'  no PRELOADED_STATE on sport {sport_id}', flush=True)
         return None
     try:
         return json.loads(m.group(1))
     except json.JSONDecodeError as e:
-        print(f'  JSON decode err: {e}', flush=True)
+        print(f'  JSON decode err sport {sport_id}: {e}', flush=True)
         return None
+
+
+def fetch_all_states() -> dict:
+    """Fetch PRELOADED_STATE for each sport, merge into a single state dict
+    with the union of all sports/categories/tournaments/matches/bets/etc.
+    Latter-fetched sports overwrite earlier ones on key collisions, but in
+    practice IDs are sport-scoped so collisions are rare. We start with the
+    football page (largest, most stable) so partial failures still leave us
+    with a viable catalog."""
+    merged = {
+        'sports': {}, 'categories': {}, 'tournaments': {},
+        'matches': {}, 'bets': {}, 'outcomes': {}, 'odds': {},
+    }
+    fetched = []
+    for sid in sorted(SPORTS_OF_INTEREST, key=lambda s: 0 if s == 1 else s):
+        state = fetch_index_state(sid)
+        if not state:
+            continue
+        fetched.append(sid)
+        for k in merged.keys():
+            v = state.get(k)
+            if isinstance(v, dict):
+                merged[k].update(v)
+    print(f'  fetched {len(fetched)}/{len(SPORTS_OF_INTEREST)} sport pages: {fetched}', flush=True)
+    return merged
 
 
 def build_outputs(state: dict) -> tuple[dict, dict]:
@@ -171,16 +203,22 @@ def build_outputs(state: dict) -> tuple[dict, dict]:
 
 
 def main() -> int:
-    print(f'[{datetime.now():%H:%M:%S}] fetch_winamax_catalog v28 (index-only)', flush=True)
-    state = fetch_index_state()
-    if not state:
-        print('  FAILED — keeping previous files unchanged')
+    print(f'[{datetime.now():%H:%M:%S}] fetch_winamax_catalog v30 (multi-sport)', flush=True)
+    state = fetch_all_states()
+    if not state.get('matches'):
+        print('  FAILED — no matches retrieved, keeping previous files unchanged')
         return 1
     catalog, markets = build_outputs(state)
     n_tourns = len(catalog['tournaments'])
     n_matches = sum(len(t['matches']) for t in catalog['tournaments'])
     n_markets = len(markets['matches'])
+    # Per-sport breakdown for debug.
+    by_sport: dict[str, int] = {}
+    for t in catalog['tournaments']:
+        sn = t.get('sport_name', '?')
+        by_sport[sn] = by_sport.get(sn, 0) + len(t.get('matches') or [])
     print(f'  catalog: {n_tourns} tournaments, {n_matches} matches', flush=True)
+    print(f'  by sport: {by_sport}', flush=True)
     print(f'  markets: {n_markets} matches with 1N2 odds', flush=True)
     # Sanity guard : Winamax sometimes returns 200 with a partial PRELOADED_STATE
     # (Cloudflare soft-block, preloader not yet hydrated). The result is a
