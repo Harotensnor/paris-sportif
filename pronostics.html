@@ -10994,7 +10994,11 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
     const roiColor = roi >= 0 ? 'var(--accent)' : 'var(--danger)';
     const kellyColor = (ov.kelly_pnl || 0) >= 0 ? 'var(--accent)' : 'var(--danger)';
     const brier = ov.brier != null ? ov.brier.toFixed(4) : '—';
-    const brierColor = ov.brier < 0.20 ? 'var(--accent)' : ov.brier < 0.24 ? '#fbbf24' : 'var(--danger)';
+    // FIX audit #11 : null < 0.20 retourne `true` en JS → couleur verte
+    // mensongère sur "—" Brier vide. Guard explicite.
+    const brierColor = ov.brier == null
+      ? 'var(--text-dim)'
+      : ov.brier < 0.20 ? 'var(--accent)' : ov.brier < 0.24 ? '#fbbf24' : 'var(--danger)';
     const dateRange = rep.date_range || {};
     const gen = rep.generated_at ? new Date(rep.generated_at).toLocaleString('fr-FR', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
 
@@ -11065,7 +11069,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
           <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;">Performance du modèle</div>
           <div style="font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.6px;margin-top:2px;">Backtest du vrai predictMatch</div>
         </div>
-        <div style="font-size:11px;color:var(--text-dim);">Généré ${esc2(gen)} · ${rep.n_events} picks</div>
+        <div style="font-size:11px;color:var(--text-dim);">Généré ${esc2(gen)}${rep.n_events != null ? ` · ${rep.n_events} picks` : ''}</div>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;">
         <div style="padding:12px;background:var(--panel-2);border-radius:8px;">
@@ -11467,7 +11471,13 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
       else document.documentElement.removeAttribute('data-reader');
     });
     const bankEl = wrap.querySelector('#pref-bankroll');
-    if (bankEl) bankEl.addEventListener('input', (e) => savePrefs({ bankrollStart: Number(e.target.value) || 10 }));
+    if (bankEl) bankEl.addEventListener('input', (e) => {
+      // FIX audit #8 : Number("0") || 10 réécrit silencieusement 0 en 10.
+      // Mieux : isFinite + bornes [1, 10000].
+      const v = parseFloat(e.target.value);
+      const safe = isFinite(v) && v >= 1 && v <= 10000 ? v : 10;
+      savePrefs({ bankrollStart: safe });
+    });
     const lockEl = wrap.querySelector('#pref-lock-threshold');
     const lockLbl = wrap.querySelector('#pref-lock-label');
     if (lockEl && lockLbl) lockEl.addEventListener('input', (e) => {
@@ -11514,9 +11524,28 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
     if (resetBtn) resetBtn.addEventListener('click', () => {
       if (!confirm('Supprimer TOUS les réglages et paris suivis ? Action irréversible.')) return;
       try {
-        ['userPrefs','trackedBets','myBets','seenLockIds',
+        // FIX audit #6 : la liste fixe oubliait les clés bilan/wallet/agent/etc.
+        // → l'utilisateur cliquait "Tout réinitialiser" et restait avec ses
+        // anciens filtres bilan, ses choix wallet, etc. Maintenant on purge
+        // par préfixe blacklist + liste fixe pour plus court.
+        const fixedKeys = ['userPrefs','trackedBets','myBets','seenLockIds',
          'paris_sportif_tracked_bets','paris_sportif_user_lessons_v1',
-         'chatbot_history_v1','paris_sportif_js_errors_v1'].forEach(k => localStorage.removeItem(k));
+         'chatbot_history_v1','paris_sportif_js_errors_v1',
+         'currentPage','userBankroll','agentResetTs','tousFilters','tousSort','tousTab',
+         'bilanWindow','bilanSport','walletStakeMode','walletBacktestStart',
+         'walletBacktestDate','walletPicksMode','walletTableWindow',
+         'pwaInstallSnoozeUntil','notifiedPickIds'];
+        fixedKeys.forEach(k => localStorage.removeItem(k));
+        // Purge tout ce qui commence par 'agent' ou 'bilan.' ou 'paris_sportif_' (sauf garder rien)
+        const toRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (!k) continue;
+          if (k.startsWith('agent') || k.startsWith('bilan.') || k.startsWith('paris_sportif_')) {
+            toRemove.push(k);
+          }
+        }
+        toRemove.forEach(k => localStorage.removeItem(k));
         if (typeof toast === 'function') toast('✓ Tout réinitialisé', 'success');
         renderProfilPage(wrap);
       } catch (e) {}
@@ -11528,7 +11557,9 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
         const cur = JSON.parse(localStorage.getItem('userPrefs') || '{}');
         delete cur.beginnerBannerDismissed;
         localStorage.setItem('userPrefs', JSON.stringify(cur));
-        if (typeof toast === 'function') toast('✓ Bannière débutant réactivée', 'success');
+        // FIX audit #9 : feedback explicite, l'utilisateur ne voit pas la
+        // bannière apparaître ici (elle est sur Accueil).
+        if (typeof toast === 'function') toast('✓ Bannière réactivée — visible sur Accueil', 'success');
       } catch(e){}
     });
     // v23 — bouton "Effacer ce que j'ai appris"
@@ -14762,7 +14793,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
     // FIX TDZ : remonté ici (utilisé dans walletChartHtml juste en dessous).
     const walletPicksLabel = _walletPicksMode === 'locks' ? 'par lock' : 'par pick';
     const walletChartHtml = walletChartRows.length
-      ? (renderRoiChart(walletChartRows, { title: `Capital 10€ → ${walletNow.toFixed(2)}€ (${walletStakeModeLbl} ${walletPicksLabel})`, unit: '€' })
+      ? (renderRoiChart(walletChartRows, { title: `Capital ${WALLET_START.toFixed(WALLET_START%1?2:0)}€ → ${walletNow.toFixed(2)}€ (${walletStakeModeLbl} ${walletPicksLabel})`, unit: '€' })
          || `<div class="bilan-empty">Pas encore assez de picks settled pour tracer la courbe.</div>`)
       : `<div class="bilan-empty">Pas encore de picks settled. La simulation démarre dès qu'un pick est tranché.</div>`;
     // Daily breakdown rows — filtrés par l'horizon table uniquement
