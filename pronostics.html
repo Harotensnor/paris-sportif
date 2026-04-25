@@ -16346,9 +16346,12 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       '<kbd style="background:#22222a;padding:4px 10px;border-radius:5px;font-family:monospace;">M</kbd><span>Mon suivi</span>' +
       '<kbd style="background:#22222a;padding:4px 10px;border-radius:5px;font-family:monospace;">G</kbd><span>Guide</span>' +
       '<kbd style="background:#22222a;padding:4px 10px;border-radius:5px;font-family:monospace;">P</kbd><span>Profil</span>' +
-      '<kbd style="background:#22222a;padding:4px 10px;border-radius:5px;font-family:monospace;">Maj+T</kbd><span>Basculer sombre/clair</span>' +
+      '<kbd style="background:#22222a;padding:4px 10px;border-radius:5px;font-family:monospace;">/</kbd><span>Focus la recherche</span>' +
+      '<kbd style="background:#22222a;padding:4px 10px;border-radius:5px;font-family:monospace;">↑ ↓</kbd><span>Naviguer dans les suggestions</span>' +
+      '<kbd style="background:#22222a;padding:4px 10px;border-radius:5px;font-family:monospace;">←  →</kbd><span>Jour précédent / suivant</span>' +
+      '<kbd style="background:#22222a;padding:4px 10px;border-radius:5px;font-family:monospace;">Maj+T</kbd><span>Cycler thème (sombre/clair/auto)</span>' +
       '<kbd style="background:#22222a;padding:4px 10px;border-radius:5px;font-family:monospace;">?</kbd><span>Cette aide</span>' +
-      '<kbd style="background:#22222a;padding:4px 10px;border-radius:5px;font-family:monospace;">Esc</kbd><span>Fermer modal</span>' +
+      '<kbd style="background:#22222a;padding:4px 10px;border-radius:5px;font-family:monospace;">Esc</kbd><span>Fermer modal / suggestions</span>' +
       '</div>' +
       '<div style="text-align:right;margin-top:18px;">' +
       '<button id="__close-shortcuts" style="background:#a78bfa;color:#fff;border:none;padding:8px 16px;' +
@@ -16367,9 +16370,11 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       var typing = e.target && e.target.matches && e.target.matches('input,textarea,select,[contenteditable="true"]');
       if (typing) return;
       if (cmdModal && cmdModal.style.display !== 'none') return;
+      // v30 fix : `?` nécessite Shift sur la plupart des claviers, donc l'early
+      // return historique sur shiftKey killait le shortcut. On le check d'abord.
+      if (e.key === '?'){ e.preventDefault(); showShortcutsHelp(); return; }
       // v23 — shortcuts single-key (pas de shift, évite conflit avec Maj+T qui bascule theme)
       if (e.shiftKey || e.ctrlKey || e.metaKey || e.altKey) return;
-      if (e.key === '?'){ e.preventDefault(); showShortcutsHelp(); }
       else if (e.key === 'h'){ var b=document.querySelector('.page-btn[data-page="dashboard"]'); if(b) b.click(); }
       else if (e.key === 's'){ var b=document.querySelector('.page-btn[data-page="simples"]'); if(b) b.click(); }
       else if (e.key === 'l'){ var b=document.querySelector('.page-btn[data-page="locks"]'); if(b) b.click(); }
