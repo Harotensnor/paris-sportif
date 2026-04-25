@@ -5716,7 +5716,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
     });
     // "J'ai parié" button — toggles personal bet tracking for that (match, pick).
     // Stops propagation so it doesn't also open the match detail modal.
-    wrap.querySelectorAll('.tp-mybet').forEach(btn => btn.addEventListener('click', (ev) => {
+    wrap.querySelectorAll('.tp-mybet').forEach(btn => btn.addEventListener('click', async (ev) => {
       ev.stopPropagation();
       const matchId = btn.dataset.match;
       const pickKey = btn.dataset.pick;
@@ -5730,9 +5730,9 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
         }
         return;
       }
-      // New bet: prompt for stake
+      // New bet: open stake prompt modal (was prompt() — fragile en PWA)
       const suggested = btn.dataset.stake || '1';
-      const raw = prompt(`Mise en € ? (défaut 1)`, suggested);
+      const raw = await _showStakePrompt(suggested, 'Mise en € ?');
       if (raw == null) return;
       const stake = parseFloat(String(raw).replace(',', '.'));
       if (!isFinite(stake) || stake <= 0) { toast('Mise invalide', 'error'); return; }
@@ -7436,7 +7436,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
     // Le handler global `wrap.querySelectorAll('.tp-mybet')` est scopé au wrap
     // de render, donc la modal n'est pas couverte. On attache ici un handler
     // local qui réplique la logique (prompt mise, save, toast, re-render).
-    body.querySelectorAll('.tp-mybet.detail-track-btn').forEach(btn => btn.addEventListener('click', (ev) => {
+    body.querySelectorAll('.tp-mybet.detail-track-btn').forEach(btn => btn.addEventListener('click', async (ev) => {
       ev.stopPropagation();
       const matchId = btn.dataset.match;
       const pickKey = btn.dataset.pick;
@@ -7457,7 +7457,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
         return;
       }
       const suggested = btn.dataset.stake || '1';
-      const raw = prompt(`Mise en € ? (défaut 1)`, suggested);
+      const raw = await _showStakePrompt(suggested, 'Mise en € ?');
       if (raw == null) return;
       const stake = parseFloat(String(raw).replace(',', '.'));
       if (!isFinite(stake) || stake <= 0) { if (typeof toast === 'function') toast('Mise invalide', 'error'); return; }
@@ -7903,6 +7903,53 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
   // ignore le param, mais le navigateur traite l'URL comme nouvelle ressource
   // et refait le fetch. Combiné avec le SW cache déjà delete au préalable
   // (cf force-refresh), on a une vraie fresh charge.
+  // v30 — Modal custom pour saisie de mise (remplace prompt() qui ne
+  // marche pas dans certains contextes : PWA installée, sandbox iframe,
+  // browsers sécurisés). Async — retourne la valeur ou null si annulé.
+  function _showStakePrompt(suggested = '1', label = 'Mise en € ?') {
+    return new Promise((resolve) => {
+      // Si modal existe déjà (rare double-click), le supprimer
+      const existing = document.getElementById('__stake-prompt-modal');
+      if (existing) existing.remove();
+      const div = document.createElement('div');
+      div.id = '__stake-prompt-modal';
+      div.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);z-index:100002;display:flex;align-items:center;justify-content:center;padding:20px;';
+      div.innerHTML = `
+        <div style="background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:24px;width:min(360px,94vw);box-shadow:0 16px 48px rgba(0,0,0,.5);">
+          <h3 style="margin:0 0 6px;font-size:16px;color:var(--text);font-weight:700;">💰 ${esc(label)}</h3>
+          <div style="font-size:12px;color:var(--text-dim);margin-bottom:12px;">Mise suggérée par Kelly. Modifie si tu veux.</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:14px;">
+            <input id="__stake-input" type="number" step="0.10" min="0.10" max="10000" value="${esc(suggested)}" autofocus style="flex:1;padding:10px 12px;background:var(--panel-2,rgba(255,255,255,.04));border:1px solid var(--border-2);color:var(--text);border-radius:8px;font-size:16px;font-variant-numeric:tabular-nums;">
+            <span style="color:var(--text-dim);font-size:14px;">€</span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;">
+            ${[1,2,5,10].map(v => `<button data-quick="${v}" type="button" style="flex:1;padding:6px 8px;background:var(--panel);border:1px solid var(--border-2);color:var(--text-dim);border-radius:5px;cursor:pointer;font-size:12px;font-weight:600;">${v}€</button>`).join('')}
+          </div>
+          <div style="display:flex;gap:8px;justify-content:flex-end;">
+            <button id="__stake-cancel" type="button" style="padding:8px 14px;background:transparent;color:var(--text-dim);border:1px solid var(--border-2);border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;">Annuler</button>
+            <button id="__stake-ok" type="button" style="padding:8px 18px;background:var(--brand);color:#08080a;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700;">Valider</button>
+          </div>
+        </div>`;
+      document.body.appendChild(div);
+      const input = div.querySelector('#__stake-input');
+      const cleanup = (val) => { div.remove(); resolve(val); };
+      div.querySelector('#__stake-ok').addEventListener('click', () => cleanup(input.value));
+      div.querySelector('#__stake-cancel').addEventListener('click', () => cleanup(null));
+      div.addEventListener('click', (e) => { if (e.target === div) cleanup(null); });
+      div.querySelectorAll('[data-quick]').forEach(b => {
+        b.addEventListener('click', () => { input.value = b.dataset.quick; input.focus(); });
+      });
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); cleanup(input.value); }
+        if (e.key === 'Escape') { e.preventDefault(); cleanup(null); }
+      });
+      // Auto-focus + select all
+      setTimeout(() => { try { input.focus(); input.select(); } catch(e){} }, 50);
+    });
+  }
+  // Expose pour scripts séparés (enhancements v20 etc.)
+  try { window._showStakePrompt = _showStakePrompt; } catch(e){}
+
   function _hardReload() {
     try {
       const u = new URL(location.href);
