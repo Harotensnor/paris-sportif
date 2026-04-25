@@ -89,6 +89,11 @@ jobs:
           # Soccer referees (Sofascore): self-throttles to 1 call / 6h.
           # Per-fixture event lookup, respectful cadence (0.3s between).
           python3 fetch_referees_soccer.py || true
+          # v30 — Recent W/L form for NBA/WNBA/NHL/MLB/NFL (ESPN doesnt
+          # ship .form for these sports natively). Self-throttled 6h.
+          if [ $(( $(date +%M) % 30 )) -lt 5 ]; then
+            python3 fetch_team_form.py || true
+          fi
           python3 patch_winamax.py || true
           # v28 — Patch multi-market odds (uses ev.winamax.match_id from patch_winamax).
           # Must run AFTER patch_winamax, BEFORE other patches that rewrite data.js.
@@ -109,6 +114,9 @@ jobs:
           # Patch referees last (survives all prior rewrites). Adds
           # ev.referee to each top-5 soccer event. ~0.1s.
           python3 patch_referees_soccer.py || true
+          # v30 — Inject team_form.json (last 5 W/L) into competitor.form
+          # for NBA/NHL/MLB/NFL events. Idempotent, ~0.1s.
+          python3 patch_team_form.py || true
           # Build health.json — compact pipeline status snapshot. Visible at
           # https://harotensnor.github.io/paris-sportif/health.json so we can
           # spot stale/missing sources without scraping the workflow logs.
@@ -134,7 +142,7 @@ jobs:
                   injuries_soccer.json winamax_catalog.json winamax_markets.json team_stats.json \
                   lineups_soccer.json clubelo.json weather.json \
                   weather_geo_cache.json referees_soccer.json health.json \
-                  data_today.json data_manifest.json 2>/dev/null || true
+                  data_today.json data_manifest.json team_form.json 2>/dev/null || true
           # Only stamp sw.js if we have real content changes — otherwise
           # discard the version bump to avoid 288 empty commits/day.
           if git diff --cached --quiet; then
