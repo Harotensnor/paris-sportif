@@ -11323,7 +11323,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T22:45:28.811632Z","today":"
           <div><span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Edge = notre probabilité − probabilité implicite de la cote. > 0 = on est plus optimiste que le bookmaker (=valeur).">Edge</span> <b style="color:${edgeColor};">${p.edge>=0?'+':''}${Math.round(p.edge*100)}pt</b></div>
         </div>
         <div style="text-align:right;">
-          ${isFini ? resBadge : `<a href="${esc(url)}" target="_blank" rel="noopener" onclick="event.stopPropagation();" style="display:inline-block;padding:6px 12px;background:var(--brand);color:#08080a;border-radius:6px;font-weight:700;font-size:11.5px;text-decoration:none;">Winamax ↗</a>`}
+          ${isFini ? resBadge : ''}
         </div>
       </div>`;
     };
