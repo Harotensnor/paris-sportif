@@ -7931,10 +7931,13 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
       if (existing) existing.remove();
       const div = document.createElement('div');
       div.id = '__stake-prompt-modal';
+      div.setAttribute('role', 'dialog');
+      div.setAttribute('aria-modal', 'true');
+      div.setAttribute('aria-labelledby', '__stake-prompt-title');
       div.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);z-index:100002;display:flex;align-items:center;justify-content:center;padding:20px;';
       div.innerHTML = `
         <div style="background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:24px;width:min(360px,94vw);box-shadow:0 16px 48px rgba(0,0,0,.5);">
-          <h3 style="margin:0 0 6px;font-size:16px;color:var(--text);font-weight:700;">💰 ${esc(label)}</h3>
+          <h3 id="__stake-prompt-title" style="margin:0 0 6px;font-size:16px;color:var(--text);font-weight:700;">💰 ${esc(label)}</h3>
           <div style="font-size:12px;color:var(--text-dim);margin-bottom:12px;">Mise suggérée par Kelly. Modifie si tu veux.</div>
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:14px;">
             <input id="__stake-input" type="number" step="0.10" min="0.10" max="10000" value="${esc(suggested)}" autofocus style="flex:1;padding:10px 12px;background:var(--panel-2,rgba(255,255,255,.04));border:1px solid var(--border-2);color:var(--text);border-radius:8px;font-size:16px;font-variant-numeric:tabular-nums;">
@@ -7982,11 +7985,15 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
       if (existing) existing.remove();
       const div = document.createElement('div');
       div.id = '__confirm-modal';
+      div.setAttribute('role', 'dialog');
+      div.setAttribute('aria-modal', 'true');
+      div.setAttribute('aria-labelledby', '__confirm-title');
+      div.setAttribute('aria-describedby', '__confirm-body');
       div.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);z-index:100002;display:flex;align-items:center;justify-content:center;padding:20px;';
       div.innerHTML = `
         <div style="background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:24px;width:min(420px,94vw);box-shadow:0 16px 48px rgba(0,0,0,.5);">
-          <h3 style="margin:0 0 12px;font-size:16px;color:var(--text);font-weight:700;">${esc(title)}</h3>
-          <div style="font-size:13.5px;color:var(--text-2);line-height:1.55;margin-bottom:18px;">${body}</div>
+          <h3 id="__confirm-title" style="margin:0 0 12px;font-size:16px;color:var(--text);font-weight:700;">${esc(title)}</h3>
+          <div id="__confirm-body" style="font-size:13.5px;color:var(--text-2);line-height:1.55;margin-bottom:18px;">${body}</div>
           <div style="display:flex;gap:8px;justify-content:flex-end;">
             <button id="__confirm-cancel" type="button" style="padding:8px 14px;background:transparent;color:var(--text-dim);border:1px solid var(--border-2);border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;">${esc(cancelLbl)}</button>
             <button id="__confirm-ok" type="button" style="padding:8px 18px;background:${danger ? '#f87171' : 'var(--brand)'};color:${danger ? '#fff' : '#08080a'};border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700;">${esc(confirmLbl)}</button>
