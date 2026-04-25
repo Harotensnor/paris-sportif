@@ -7145,10 +7145,44 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
     render();
   });
 
-  document.getElementById('date').addEventListener('change', (e) => { currentDate = e.target.value; render(); });
-  document.getElementById('prev-day').addEventListener('click', () => { currentDate = addDays(currentDate, -1); document.getElementById('date').value = currentDate; render(); });
-  document.getElementById('next-day').addEventListener('click', () => { currentDate = addDays(currentDate, 1); document.getElementById('date').value = currentDate; render(); });
-  document.getElementById('today-btn').addEventListener('click', () => { currentDate = todayISO(); document.getElementById('date').value = currentDate; render(); });
+  // v30 — Date nav : label "today-btn" devient contextuel (Hier / Aujourd'hui /
+  // Demain / DD/MM) pour signaler clairement où on est. Click = retour à
+  // aujourd'hui (utile quand on s'est éloigné de plusieurs jours).
+  function _refreshDateNavLabel() {
+    const btn = document.getElementById('today-btn');
+    if (!btn) return;
+    const t = todayISO();
+    // currentDate est assigné plus tard dans l'init (ligne ~14729) ; pendant
+    // le tout premier passage, il peut être undefined → on assume "today".
+    if (!currentDate) { btn.textContent = 'Aujourd\'hui'; btn.title = 'Aujourd\'hui'; return; }
+    const diff = Math.round((new Date(currentDate) - new Date(t)) / 86400000);
+    let lbl;
+    if (!isFinite(diff)) lbl = 'Aujourd\'hui';
+    else if (diff === 0) lbl = 'Aujourd\'hui';
+    else if (diff === -1) lbl = 'Hier';
+    else if (diff === 1) lbl = 'Demain';
+    else if (diff === -2) lbl = 'Avant-hier';
+    else if (diff === 2) lbl = 'Après-demain';
+    else if (diff < 0) lbl = `J−${-diff}`;
+    else lbl = `J+${diff}`;
+    btn.textContent = lbl;
+    // Subtle visual cue : when not on today, the button gets the brand color
+    // so it's obvious it's a "jump back" affordance.
+    if (diff === 0) {
+      btn.style.color = '';
+      btn.style.fontWeight = '500';
+      btn.title = 'Aujourd\'hui';
+    } else {
+      btn.style.color = 'var(--brand)';
+      btn.style.fontWeight = '700';
+      btn.title = 'Cliquer pour revenir à aujourd\'hui';
+    }
+  }
+  document.getElementById('date').addEventListener('change', (e) => { currentDate = e.target.value; _refreshDateNavLabel(); render(); });
+  document.getElementById('prev-day').addEventListener('click', () => { currentDate = addDays(currentDate, -1); document.getElementById('date').value = currentDate; _refreshDateNavLabel(); render(); });
+  document.getElementById('next-day').addEventListener('click', () => { currentDate = addDays(currentDate, 1); document.getElementById('date').value = currentDate; _refreshDateNavLabel(); render(); });
+  document.getElementById('today-btn').addEventListener('click', () => { currentDate = todayISO(); document.getElementById('date').value = currentDate; _refreshDateNavLabel(); render(); });
+  _refreshDateNavLabel();
 
   let searchTimer;
   document.getElementById('search').addEventListener('input', (e) => {
@@ -14697,6 +14731,8 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       navigator.serviceWorker.register('sw.js').catch(() => { /* silencieux */ });
     }
     currentDate = todayISO();
+    // v30 — Maintenant que currentDate est set, refresh le label "today-btn".
+    if (typeof _refreshDateNavLabel === 'function') _refreshDateNavLabel();
     const keys = Object.keys(data.days || {}).sort();
     if (!keys.includes(currentDate) && keys.length) currentDate = keys[0];
     document.getElementById('date').value = currentDate;
