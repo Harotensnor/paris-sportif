@@ -20,6 +20,11 @@ const SHELL_ASSETS = [
   'icon.svg',
   'icon-192.png',
   'icon-512.png',
+  // FIX Bug 7 — pré-cache pronostics.html pour fallback offline garanti
+  // (avant : caches.match('pronostics.html') au offline catch dépendait
+  // d'un précédent fetch ayant rempli le runtime cache, ce qui n'était
+  // pas garanti pour les premières navigations).
+  'pronostics.html',
 ];
 
 self.addEventListener('install', (event) => {
