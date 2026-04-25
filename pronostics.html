@@ -9499,8 +9499,20 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
       const stakeVal = card ? card.querySelector('.dpc-stake-val') : null;
       const gainSum = card ? card.querySelector('.dpc-gain-val') : null;
       if (!input) return;
-      const stake = Math.max(0.10, parseFloat(input.value) || 0);
-      const odd = parseFloat(card.dataset.odd) || 1;
+      // FIX Bug 5 : input vide → afficher '—' au lieu de forced 0.10€
+      // (avant : parseFloat('') → NaN → || 0 → Math.max(0.10, 0) → 0.10
+      // ce qui affichait silencieusement +0.10€ pour un input vide).
+      // FIX Bug 9 : data-odd manquant → pas de gain affiché plutôt que +0€
+      const rawStake = parseFloat(input.value);
+      const rawOdd = parseFloat(card.dataset.odd);
+      if (!isFinite(rawStake) || rawStake <= 0 || !isFinite(rawOdd) || rawOdd <= 1) {
+        if (gainEl) gainEl.textContent = '—';
+        if (stakeVal) stakeVal.textContent = '—';
+        if (gainSum) gainSum.textContent = '—';
+        return;
+      }
+      const stake = Math.max(0.10, rawStake);
+      const odd = rawOdd;
       const gain = stake * (odd - 1);
       if (gainEl) gainEl.textContent = `+${gain.toFixed(2)}€`;
       if (stakeVal) stakeVal.textContent = `${stake.toFixed(2)}€`;
@@ -10627,9 +10639,17 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
     const byDay = {};
     settled.forEach(b => {
       // date field est `added_at` (ISO string), fallback sur date/ts
-      const dateSrc = b.added_at || b.date || (b.ts ? new Date(b.ts).toISOString() : null);
+      // FIX Bug 8 : si added_at est un timestamp numérique (Date.now() stocké
+      // bêtement), String(1700000000000).slice(0,10)='1700000000' qui n'est
+      // pas une date ISO et la comparaison < startIso retourne n'importe quoi.
+      // Convertir en ISO d'abord si c'est un nombre.
+      let dateSrc = b.added_at || b.date || (b.ts ? new Date(b.ts).toISOString() : null);
       if (!dateSrc) return;
+      if (typeof dateSrc === 'number') {
+        try { dateSrc = new Date(dateSrc).toISOString(); } catch(e) { return; }
+      }
       const d = String(dateSrc).slice(0, 10);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return;   // skip mal formé
       if (d < startIso) return;
       if (!byDay[d]) byDay[d] = { profit: 0, wins: 0, losses: 0, bets: 0 };
       const stake = Number(b.stake) || 1;
@@ -11470,11 +11490,23 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
   }
   function _renderOddsSparkline(slotEl, matchId, pickKey) {
     if (!slotEl || !matchId) return;
-    slotEl.innerHTML = '<div style="font-size:11px;color:var(--text-dim);padding:6px 0;">⏳ Chargement historique…</div>';
+    // FIX Bug 6 : show "Chargement…" seulement si le fetch n'est pas déjà
+    // résolu (sinon le slot reste avec ce message si user re-ferme avant
+    // que la promise tire). Le cas standard (fetch déjà résolu) skip la
+    // 1ère écriture innerHTML.
+    const alreadyLoaded = !!__oddsHistoryByMatch;
+    if (!alreadyLoaded) {
+      slotEl.innerHTML = '<div style="font-size:11px;color:var(--text-dim);padding:6px 0;">⏳ Chargement historique…</div>';
+    }
     _loadOddsHistory().then(byId => {
       const series = byId.get(String(matchId));
       if (!series || series.length < 2) {
         slotEl.innerHTML = '';
+        // FIX Bug 6 : reset le flag rendered pour permettre une nouvelle
+        // tentative de render au prochain expand (cas où l'historique
+        // arrive après le 1er fetch mais nous avons fermé entre temps).
+        const expandEl = slotEl.closest('.dpc-expand');
+        if (expandEl) delete expandEl.dataset.sparkRendered;
         return;
       }
       // Choose which series to plot based on pickKey ('1'=home, '2'=away, 'X'=draw)
