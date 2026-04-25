@@ -2439,6 +2439,8 @@
         <button id="next-day" type="button" title="Jour suivant" aria-label="Aller au jour suivant">▶</button>
       </div>
       <input type="date" id="date" class="date-picker">
+      <!-- v30 — Indicateur santé pipeline (lit health.json) -->
+      <button id="health-indicator" class="theme-toggle" type="button" aria-label="Santé du pipeline de données" title="Santé du pipeline : chargement…" style="font-size:9px;">●</button>
       <!-- v30 — Notif toggle (Notification API locale, alerte sur edge ≥10%) -->
       <button id="notif-toggle" class="theme-toggle" type="button" aria-label="Activer alertes pronos forte valeur" title="Notifs : alertes quand un pari edge ≥10% apparaît">🔕</button>
       <!-- v30 Sprint 5 — Theme toggle button (mirror of Maj+T shortcut) -->
@@ -3509,6 +3511,55 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
   }
   // Fire once; safe to call before DOM is ready (fetch is async)
   _loadModelCalibration();
+
+  // v30 — Pipeline health indicator (topbar dot lit health.json publié toutes
+  // les 5min par refresh.yml). Couleur :
+  //   • vert : data <30min ET aucun warning
+  //   • orange : data 30min-2h OU warnings non-bloquants
+  //   • rouge : data >2h OU sources critiques manquantes
+  // Bouton click → ouvre la page Crédibilité (où on pourrait afficher plus
+  // de détails, futur).
+  async function _refreshHealthIndicator() {
+    const btn = document.getElementById('health-indicator');
+    if (!btn) return;
+    let h;
+    try {
+      const r = await fetch('health.json?t=' + Date.now(), { cache: 'no-store' });
+      if (!r.ok) throw new Error('http ' + r.status);
+      h = await r.json();
+    } catch (e) {
+      btn.style.color = 'var(--text-dim)';
+      btn.title = 'Santé pipeline : health.json indisponible';
+      return;
+    }
+    const ageMin = isFinite(h.data_age_min) ? h.data_age_min : 999;
+    const warnings = Array.isArray(h.warnings) ? h.warnings : [];
+    let color, label;
+    if (ageMin < 30 && warnings.length === 0) { color = '#34d399'; label = '🟢 Pipeline OK'; }
+    else if (ageMin < 120 && warnings.length <= 2) { color = '#fbbf24'; label = '🟠 Pipeline ralenti'; }
+    else { color = '#f87171'; label = '🔴 Pipeline en panne'; }
+    btn.style.color = color;
+    // Build a detailed tooltip
+    const lines = [];
+    lines.push(`${label}`);
+    lines.push(`Données : ${ageMin < 60 ? `${ageMin} min` : `${(ageMin/60).toFixed(1)} h`}`);
+    if (h.sources) {
+      const src = Object.entries(h.sources)
+        .filter(([_, v]) => v && v.age_min != null)
+        .sort((a,b) => a[1].age_min - b[1].age_min);
+      const summary = src.slice(0, 5).map(([k, v]) => `  ${k}: ${v.age_min}min`).join('\n');
+      if (summary) lines.push('Sources récentes :\n' + summary);
+    }
+    if (warnings.length) {
+      lines.push(`Warnings (${warnings.length}) :\n  ` + warnings.slice(0, 3).join('\n  '));
+    }
+    btn.title = lines.join('\n');
+    btn.setAttribute('aria-label', label);
+  }
+  _refreshHealthIndicator();
+  // Refresh every 2min, plus à chaque pollData (data refresh).
+  setInterval(_refreshHealthIndicator, 2 * 60 * 1000);
+  window._refreshHealthIndicator = _refreshHealthIndicator;
 
   function predictMatch(match) {
     const cur = window.PRONOSTICS_DATA;
@@ -7552,6 +7603,10 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
         // pour que les sparklines reflètent les dernières mesures.
         if (typeof window._invalidateOddsHistoryCache === 'function') {
           window._invalidateOddsHistoryCache();
+        }
+        // v30 — Refresh health indicator après chaque data refresh (cohérence)
+        if (typeof window._refreshHealthIndicator === 'function') {
+          window._refreshHealthIndicator();
         }
         render();
         updateFreshness();
@@ -15444,6 +15499,15 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         const labels = { dark: 'sombre', light: 'clair', auto: 'auto (système)' };
         if (typeof toast === 'function') toast('🎨 Thème : ' + labels[next], 'info');
       } catch(e){}
+    });
+
+    // v30 — Health indicator click → ouvre la page Crédibilité (où le user
+    // peut voir le détail performances + bientôt état pipeline complet).
+    const healthBtn = document.getElementById('health-indicator');
+    if (healthBtn) healthBtn.addEventListener('click', () => {
+      try { localStorage.setItem('currentPage', 'credibilite'); } catch(e){}
+      if (typeof currentPage !== 'undefined') currentPage = 'credibilite';
+      if (typeof applyPageView === 'function') applyPageView();
     });
 
     document.addEventListener('keydown', (e) => {
