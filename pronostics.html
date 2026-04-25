@@ -9311,6 +9311,41 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
             </div>`;
         })()}
 
+        <!-- v30 — ROI alerts par sport : warning si sport en perte sur backtest_v2 -->
+        ${(() => {
+          // Skip si user a désactivé via Profil
+          let prefs = {};
+          try { prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}'); } catch(e){}
+          if (prefs.disableSportRoiAlerts === true) return '';
+          // Check : backtest report by_sport, alerter sur sports avec ≥3 paris ET ROI < -10%
+          const rep = window.__backtestReportV2;
+          if (!rep || !rep.by_sport) return '';
+          const losers = Object.entries(rep.by_sport)
+            .filter(([s, d]) => d && d.n >= 3 && d.flat_roi_pct < -10)
+            .sort((a, b) => a[1].flat_roi_pct - b[1].flat_roi_pct);
+          if (!losers.length) return '';
+          const sportEm = { football:'⚽', tennis:'🎾', basketball:'🏀', hockey:'🏒', baseball:'⚾', 'american-football':'🏈', mma:'🥊', golf:'⛳', racing:'🏎️', rugby:'🏉' };
+          const items = losers.slice(0, 3).map(([s, d]) => {
+            const em = sportEm[s] || '🎯';
+            const roi = d.flat_roi_pct.toFixed(1);
+            const sign = roi >= 0 ? '+' : '';
+            return `<li style="display:flex;align-items:baseline;gap:8px;padding:4px 0;font-size:12.5px;color:var(--text);line-height:1.4;">
+              <span style="flex-shrink:0;">${em}</span>
+              <span style="flex:1;"><b>${esc(s.charAt(0).toUpperCase()+s.slice(1))}</b> · ${d.n} pari${d.n>1?'s':''} · <span style="color:#f87171;font-weight:700;">${sign}${roi}%</span></span>
+            </li>`;
+          }).join('');
+          return `
+            <div style="display:flex;align-items:flex-start;gap:14px;padding:14px 18px;margin:18px 0;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.25);border-left:3px solid #f87171;border-radius:0 10px 10px 0;">
+              <div style="font-size:24px;line-height:1;flex-shrink:0;">🚫</div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:11px;color:#f87171;text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:4px;">Sports en perte</div>
+                <div style="font-size:13.5px;color:var(--text);font-weight:600;margin-bottom:6px;">${losers.length === 1 ? 'Un sport coûte cher' : `${losers.length} sports coûtent cher`} sur les derniers paris</div>
+                <ul style="list-style:none;padding:0;margin:6px 0 0;">${items}</ul>
+                <div style="font-size:11.5px;color:var(--text-dim);margin-top:8px;line-height:1.4;">Skip-recommandé jusqu'à ce que le modèle s'améliore. <button class="page-btn" data-page="credibilite" style="background:transparent;border:none;color:var(--brand);text-decoration:underline;cursor:pointer;font-size:11.5px;padding:0;">Détails Crédibilité →</button></div>
+              </div>
+            </div>`;
+        })()}
+
         <!-- v30 — Activité récente : 5 derniers paris réglés -->
         ${(() => {
           let bets;
