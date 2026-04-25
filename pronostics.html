@@ -530,6 +530,16 @@
     background: var(--danger); animation: pulse 1.8s ease infinite;
   }
   @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .5; transform: scale(1.25); } }
+  /* v30 #4 — Flash animation déclenchée quand un score LIVE change entre
+     deux polls. Pulse vert + scale léger pour attirer l'œil sans casser
+     la lecture. La classe .score-flash est ajoutée par pollData() puis
+     retirée 1.5s après pour permettre re-déclenchement. */
+  @keyframes scoreFlash {
+    0%   { background: rgba(52,211,153,0); transform: scale(1); }
+    20%  { background: rgba(52,211,153,.85); transform: scale(1.18); color: #08080a; }
+    100% { background: rgba(52,211,153,0); transform: scale(1); }
+  }
+  .score.score-flash { animation: scoreFlash 1.4s ease-out; border-radius: 6px; padding: 0 4px; }
   .match .venue {
     color: var(--text-dim2); font-size: 11px;
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
@@ -7917,6 +7927,20 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
         }
       }
     }
+    // v30 #4 — Si au moins un match est LIVE, indiquer le mode polling
+    // accéléré (30s au lieu de 60s). Petit badge à droite, non intrusif.
+    try {
+      const hasLive = (function(){
+        const d = window.PRONOSTICS_DATA;
+        if (!d || !d.days) return false;
+        const todayIso = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+        return (d.days[todayIso] || []).some(m => m && m.status === 'STATUS_IN_PROGRESS' && !m.completed);
+      })();
+      if (hasLive && txtEl && !txtEl.innerHTML.includes('data-live-badge')) {
+        const badge = ' · <span data-live-badge style="background:rgba(239,68,68,.18);color:#fca5a5;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.4px;">🔴 LIVE · poll 30s</span>';
+        txtEl.innerHTML = txtEl.innerHTML + badge;
+      }
+    } catch(e){}
   }
 
   // FIX bug #11 : `_hardReload()` est non-standard et déprécié — tous
@@ -8045,7 +8069,50 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
       const m = txt.match(/window\.PRONOSTICS_DATA\s*=\s*(\{[\s\S]*\})\s*;?\s*$/);
       if (m) {
         const fresh = JSON.parse(m[1]);
+        // v30 #4 — Snapshot des scores AVANT update pour détecter les
+        // changements live. Stocké sur window pour que render() puisse
+        // l'utiliser après mise à jour du DOM.
+        const oldScores = {};
+        try {
+          const dOld = window.PRONOSTICS_DATA;
+          if (dOld?.days) {
+            Object.values(dOld.days).forEach(arr => {
+              (arr || []).forEach(ev => {
+                if (ev && ev.id && ev.status === 'STATUS_IN_PROGRESS') {
+                  const home = (ev.competitors || []).find(c => c.homeAway === 'home');
+                  const away = (ev.competitors || []).find(c => c.homeAway === 'away');
+                  oldScores[ev.id] = {
+                    home: home?.score ?? null,
+                    away: away?.score ?? null,
+                  };
+                }
+              });
+            });
+          }
+        } catch(e){}
         window.PRONOSTICS_DATA = fresh;
+        // Compare scores et marque les match IDs ayant changé pour flash post-render.
+        const changedIds = new Set();
+        try {
+          if (fresh?.days) {
+            Object.values(fresh.days).forEach(arr => {
+              (arr || []).forEach(ev => {
+                if (!ev || !ev.id) return;
+                const prev = oldScores[ev.id];
+                if (!prev) return;
+                const home = (ev.competitors || []).find(c => c.homeAway === 'home');
+                const away = (ev.competitors || []).find(c => c.homeAway === 'away');
+                const newH = home?.score ?? null;
+                const newA = away?.score ?? null;
+                if (String(newH) !== String(prev.home) || String(newA) !== String(prev.away)) {
+                  changedIds.add(String(ev.id));
+                }
+              });
+            });
+          }
+        } catch(e){}
+        // Le render() ci-dessous regénère le DOM ; on flash juste après.
+        window.__pendingScoreFlash = changedIds;
         // v30 — Si la bannière "📡 Synchronisation…" est visible (boot
         // avec data stale), la retirer maintenant que fresh data arrive.
         const syncBanner = document.getElementById('__boot-sync-banner');
@@ -8069,6 +8136,25 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
           window._updateFooterLastUpdate();
         }
         render();
+        // v30 #4 — Applique le flash sur les scores qui viennent de changer.
+        // Doit tourner APRÈS render() qui regénère les .match cards.
+        try {
+          const ids = window.__pendingScoreFlash;
+          if (ids && ids.size) {
+            ids.forEach(id => {
+              const card = document.querySelector(`.match[data-id="${CSS.escape(id)}"]`);
+              if (!card) return;
+              card.querySelectorAll('.score').forEach(el => {
+                el.classList.remove('score-flash');
+                // force reflow pour pouvoir relancer l'animation si re-flash
+                void el.offsetWidth;
+                el.classList.add('score-flash');
+                setTimeout(() => el.classList.remove('score-flash'), 1600);
+              });
+            });
+            window.__pendingScoreFlash = null;
+          }
+        } catch(e){}
         updateFreshness();
         // v30 — Scan fresh data pour les picks edge ≥10% non encore notifiés.
         // Ne déclenche les notifs que si l'utilisateur a opt-in (Notification
@@ -8173,13 +8259,27 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
   ['mousemove','keydown','touchstart','click'].forEach(ev =>
     document.addEventListener(ev, () => { __lastUserInteraction = Date.now(); }, { passive: true })
   );
+  // v30 #4 — Détecte si un match LIVE est en cours dans data.js. Utilisé
+  // pour adapter la cadence de polling : 30s au lieu de 60s quand au moins
+  // un match est in-progress (le user veut voir les scores bouger), 60s
+  // sinon (économie batterie / réseau).
+  function _hasLiveMatch() {
+    try {
+      const d = window.PRONOSTICS_DATA;
+      if (!d || !d.days) return false;
+      const todayIso = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+      const today = d.days[todayIso] || [];
+      return today.some(m => m && m.status === 'STATUS_IN_PROGRESS' && !m.completed);
+    } catch(e) { return false; }
+  }
   function startAutoRefresh() {
     if (__refreshTimer) clearInterval(__refreshTimer);
     const tickMs = 15 * 1000;
-    const pollEveryMs = 60 * 1000;
     const reloadAfterMs = 60 * 60 * 1000;
     const idleAfterMs = 2 * 60 * 1000;
     const __bootTime = Date.now();
+    // v30 #4 — Polling adaptive : 30s en mode live, 60s sinon.
+    // Variable au lieu de const car ré-évaluée à chaque tick.
     // v30 — IMMEDIATE first poll at boot. Avant : la 1ère pollData ne
     // tirait qu'à T+60s, donc le user voyait la version cachée inline
     // (potentiellement plusieurs heures stale via SW cache) pendant 1
@@ -8218,8 +8318,14 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
     __refreshTimer = setInterval(() => {
       const now = Date.now();
       const tabHidden = document.visibilityState === 'hidden';
+      // v30 #4 — Polling adaptive : 30s si match LIVE en cours, 60s sinon.
+      // Réévalué à chaque tick (une nouvelle rencontre peut passer en LIVE
+      // entre deux ticks). Cap à 30s pour éviter de marteler le serveur
+      // (le cron côté serveur ne génère pas plus vite que 5min en pratique
+      // mais snapshot_odds + fetch_live peuvent être plus fréquents).
+      const pollEveryMs = _hasLiveMatch() ? 30 * 1000 : 60 * 1000;
       // When tab is hidden, don't burn CPU with rendering. Poll stays (cheap).
-      // Data poll (every 60 s) — fires render() on success via the fresh data
+      // Data poll (every 60 s, ou 30s en mode live) — fires render() on success via the fresh data
       if (now - lastPoll >= pollEveryMs && !__refreshInFlight) {
         lastPoll = now;
         pollData();
