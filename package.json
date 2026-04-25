@@ -1,0 +1,14 @@
+{
+  "name": "paris-sportif",
+  "version": "1.0.0",
+  "description": "Static sports betting predictions site (single HTML file). Tests only — no build step.",
+  "private": true,
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.0"
+  }
+}
