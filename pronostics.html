@@ -8735,6 +8735,11 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
                     ${allReasons.map(r => `<li style="display:flex;align-items:flex-start;gap:6px;padding:4px 0;font-size:12px;color:var(--text);line-height:1.4;"><span style="flex-shrink:0;font-size:13px;">${esc(r.icon||'•')}</span><span>${esc(r.text||'')}</span></li>`).join('')}
                   </ul>` : ''}
                   <div style="font-size:10px;color:var(--brand);letter-spacing:.5px;text-transform:uppercase;font-weight:700;margin-bottom:6px;">💰 Ajuster ma mise</div>
+                  <!-- v30 : presets de mise rapides (avant l'ajusteur fin) -->
+                  <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:7px;">
+                    ${[1, 2, 5, 10].map(v => `<button type="button" class="dpc-stake-preset" data-card="${cardId}" data-preset="${v}" style="flex:1;min-width:42px;padding:5px 6px;background:var(--panel);border:1px solid var(--border-2);color:var(--text-dim);border-radius:5px;cursor:pointer;font-size:11.5px;font-weight:600;font-variant-numeric:tabular-nums;">${v}€</button>`).join('')}
+                    <button type="button" class="dpc-stake-preset" data-card="${cardId}" data-preset="kelly" data-kelly-amount="${p.stake}" title="Mise recommandée par Kelly fractionné (¼) sur ta cagnotte" style="flex:1.4;min-width:50px;padding:5px 6px;background:rgba(167,139,250,.15);border:1px solid var(--brand);color:var(--brand);border-radius:5px;cursor:pointer;font-size:11.5px;font-weight:700;">⚡ Kelly</button>
+                  </div>
                   <div style="display:flex;align-items:center;gap:8px;">
                     <button type="button" class="dpc-stake-adj" data-card="${cardId}" data-delta="-0.5" aria-label="Diminuer mise" style="width:30px;height:30px;background:var(--panel);border:1px solid var(--border-2);color:var(--text);border-radius:6px;cursor:pointer;font-size:16px;font-weight:700;line-height:1;">−</button>
                     <input type="number" class="dpc-stake-input" data-card="${cardId}" value="${p.stake.toFixed(2)}" min="0.10" max="10000" step="0.10" style="flex:1;padding:6px 8px;background:var(--panel);border:1px solid var(--border-2);color:var(--text);border-radius:6px;font-size:13px;font-variant-numeric:tabular-nums;text-align:right;">
@@ -9190,6 +9195,29 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
         const cur = parseFloat(input.value) || 0;
         input.value = Math.max(0.10, cur + delta).toFixed(2);
         _dpcRecalc(cardId);
+      });
+    });
+    // v30 — Presets de mise rapides (1€, 2€, 5€, 10€, ⚡ Kelly)
+    wrap.querySelectorAll('.dpc-stake-preset').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const cardId = btn.dataset.card;
+        const preset = btn.dataset.preset;
+        const input = wrap.querySelector(`.dpc-stake-input[data-card="${cardId}"]`);
+        if (!input) return;
+        let value;
+        if (preset === 'kelly') {
+          value = parseFloat(btn.dataset.kellyAmount) || 1;
+        } else {
+          value = parseFloat(preset) || 1;
+        }
+        input.value = Math.max(0.10, value).toFixed(2);
+        _dpcRecalc(cardId);
+        // Visual flash on the chosen preset (highlight)
+        wrap.querySelectorAll(`.dpc-stake-preset[data-card="${cardId}"]`).forEach(b => {
+          b.style.background = b === btn ? 'rgba(167,139,250,.25)' : '';
+          b.style.color = b === btn ? 'var(--brand)' : '';
+        });
       });
     });
     wrap.querySelectorAll('.dpc-stake-input').forEach(inp => {
