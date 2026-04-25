@@ -5790,18 +5790,10 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T22:45:28.811632Z","today":"
             <div style="font-size:17px;font-weight:700;color:var(--text);">${esc(home?.short || home?.name || '?')} <span style="color:var(--text-dim);font-weight:400;">vs</span> ${esc(away?.short || away?.name || '?')}</div>
             <span style="font-size:11px;color:var(--text-dim2);">${esc(m.league_name || '')}</span>
           </div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px;">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
             <span style="padding:6px 12px;border-radius:8px;background:rgba(16,185,129,.18);color:#10b981;font-weight:700;font-size:14px;">${esc(pred.pick.label)} @ ${pickOdd.toFixed(2)}</span>
             <span style="padding:5px 11px;border-radius:7px;background:rgba(255,255,255,.06);color:var(--text);font-weight:600;font-size:12.5px;">🎯 Fiab ${relPct}%</span>
             <span style="padding:5px 11px;border-radius:7px;background:rgba(236,72,153,.18);color:#f472b6;font-weight:700;font-size:12.5px;">💎 Edge +${edgePct}pt</span>
-            <span style="padding:5px 11px;border-radius:7px;background:rgba(167,139,250,.18);color:#a78bfa;font-weight:700;font-size:12.5px;" title="Kelly 0.25× sur bankroll ${bankroll.toFixed(0)}€">💰 Kelly ${kellyAmt.toFixed(2)}€ (${kellyPct}%)</span>
-          </div>
-          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-            ${wmxUrl ? `<a href="${esc(wmxUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation();" style="padding:8px 16px;background:#e8163a;color:#fff;border-radius:8px;text-decoration:none;font-weight:700;font-size:13px;">Parier sur Winamax →</a>` : ''}
-            ${myBet
-              ? `<button class="tp-mybet" data-match="${esc(m.id)}" data-pick="${esc(pred.pick.key)}" title="Tu as parié ${(Number(myBet.stake)||0).toFixed(2)}€ @ ${(Number(myBet.odds)||0).toFixed(2)}. Clic pour retirer." style="padding:8px 14px;background:rgba(16,185,129,.2);color:#10b981;border:1px solid rgba(16,185,129,.4);border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;">✓ Parié ${(Number(myBet.stake)||0).toFixed(2)}€</button>`
-              : `<button class="tp-mybet" data-match="${esc(m.id)}" data-pick="${esc(pred.pick.key)}" data-label="${esc(pred.pick.label)}" data-odds="${pickOdd}" data-stake="${kellyAmt.toFixed(2)}" title="Marquer comme pari placé (mise suggérée Kelly)" style="padding:8px 14px;background:rgba(167,139,250,.18);color:#a78bfa;border:1px solid rgba(167,139,250,.4);border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;">💰 J'ai parié (Kelly)</button>`
-            }
           </div>
         </div>`;
     };
@@ -5879,34 +5871,21 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T22:45:28.811632Z","today":"
               }
               return `<span title="Cote ${lm.before.toFixed(2)} → ${lm.after.toFixed(2)}. ${sevTxt} drift — marché s'éloigne." style="padding:5px 12px;border-radius:8px;background:rgba(248,113,113,${intensity});color:#f87171;font-weight:700;font-size:12.5px;">📈 ${sevTxt} +${lm.deltaPct.toFixed(1)}%</span>`;
             })() : ''}
-            <span style="padding:5px 12px;border-radius:8px;background:rgba(255,255,255,.04);color:var(--text-dim);font-weight:600;font-size:12.5px;">Gain 10€ → ${((pickOdd-1)*10).toFixed(2)}€</span>
             ${(() => {
-              // Chantiers BB + HH sur le top-picks hero
               const rel = pred.reliability ?? pred.pick.prob;
-              const kStake = kellyStake(rel, pickOdd, bankroll, 0.25);
               const edge = valueBetEdge(rel, pickOdd);
               const edgePct = edge != null ? Math.round(edge * 100) : null;
               const isValue = edge != null && edge >= 0.05;
-              let out = '';
-              if (kStake > 0) out += `<span title="Kelly 0.25× — mise suggérée pour bankroll ${bankroll.toFixed(0)}€" style="padding:5px 12px;border-radius:8px;background:rgba(167,139,250,.18);color:#a78bfa;font-weight:700;font-size:12.5px;">💰 Kelly ${kStake.toFixed(2)}€</span>`;
-              if (isValue) out += `<span title="Edge modèle ${(rel*100).toFixed(0)}% vs cote implicite ${((1/pickOdd)*100).toFixed(0)}%" style="padding:5px 12px;border-radius:8px;background:rgba(236,72,153,.18);color:#f472b6;font-weight:700;font-size:12.5px;">💎 Value +${edgePct}pt</span>`;
-              return out;
+              return isValue
+                ? `<span title="Edge modèle ${(rel*100).toFixed(0)}% vs cote implicite ${((1/pickOdd)*100).toFixed(0)}%" style="padding:5px 12px;border-radius:8px;background:rgba(236,72,153,.18);color:#f472b6;font-weight:700;font-size:12.5px;">💎 Value +${edgePct}pt</span>`
+                : '';
             })()}
-            ${corrEffective > 0 ? `<span title="Tu as déjà ${nBets} pari${nBets>1?'s':''} sur ce match — risque corrélé." style="padding:5px 12px;border-radius:8px;background:rgba(251,191,36,.18);color:#fbbf24;font-weight:700;font-size:12.5px;">⚠️ Corrélé (${nBets})</span>` : ''}
             ${pred.markets && pred.markets.ou.prob >= 0.60 ? `<span title="Marché bonus dérivé des buts attendus." style="padding:5px 12px;border-radius:8px;background:rgba(139,92,246,.16);color:#a78bfa;font-weight:700;font-size:12.5px;">⚽ ${esc(pred.markets.ou.label)} · ${(pred.markets.ou.prob*100).toFixed(0)}%</span>` : ''}
             ${pred.markets && pred.markets.btts.prob >= 0.60 ? `<span title="Les deux équipes marquent — probabilité dérivée des buts attendus." style="padding:5px 12px;border-radius:8px;background:rgba(236,72,153,.16);color:#f472b6;font-weight:700;font-size:12.5px;">🔄 ${esc(pred.markets.btts.label)} · ${(pred.markets.btts.prob*100).toFixed(0)}%</span>` : ''}
           </div>
 
           ${pred.explain?.headline ? `<div class="hero-headline">${esc(pred.explain.headline)}</div>` : ''}
           ${topReasons.length ? `<ul class="hero-reasons">${topReasons.map(r => `<li><span>${r.icon}</span><span>${esc(r.text)}</span></li>`).join('')}</ul>` : ''}
-
-          <div class="hero-actions">
-            ${wmxUrl ? `<a href="${esc(wmxUrl)}" target="_blank" rel="noopener" class="hero-btn-wmx" onclick="event.stopPropagation();">Parier sur Winamax →</a>` : ''}
-            ${myBet
-              ? `<button class="tp-mybet hero-btn-mybet placed" data-match="${esc(m.id)}" data-pick="${esc(pred.pick.key)}" title="Tu as parié ${(Number(myBet.stake)||0).toFixed(2)}€ @ ${(Number(myBet.odds)||0).toFixed(2)}. Clic pour retirer.">✓ Parié ${(Number(myBet.stake)||0).toFixed(2)}€</button>`
-              : `<button class="tp-mybet hero-btn-mybet" data-match="${esc(m.id)}" data-pick="${esc(pred.pick.key)}" data-label="${esc(pred.pick.label)}" data-odds="${pickOdd}" data-stake="10" title="Marquer comme pari placé">💰 J'ai parié</button>`
-            }
-          </div>
         </div>
       `;
     };
@@ -5921,13 +5900,8 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T22:45:28.811632Z","today":"
       // implicite du model : market, form, H2H…). Garde 1 seule ligne pour
       // ne pas casser le grid 2×2 mini.
       const topReason = (pred.explain?.reasons || [])[0];
-      // Chantier 71 (2026-04-22) — "J'ai parié" sur minis aussi
-      const myBet = typeof getMyBet === 'function' ? getMyBet(m.id, pred.pick.key) : null;
-      const kStake = kellyStake(pred.reliability ?? pred.pick.prob, pickOdd, bankroll, 0.25);
-      const suggestedStake = kStake > 0 ? kStake.toFixed(2) : '1';
-      const betBtnHtml = myBet
-        ? `<button class="tp-mybet mini-btn-mybet placed" data-match="${esc(m.id)}" data-pick="${esc(pred.pick.key)}" title="Tu as parié ${(Number(myBet.stake)||0).toFixed(2)}€ @ ${(Number(myBet.odds)||0).toFixed(2)}. Clic pour retirer." aria-label="Retirer le pari du suivi" onclick="event.stopPropagation();" style="margin-top:8px;padding:5px 10px;background:rgba(16,185,129,.2);color:#10b981;border:1px solid rgba(16,185,129,.4);border-radius:6px;font-weight:700;font-size:11.5px;cursor:pointer;align-self:flex-start;">✓ ${(Number(myBet.stake)||0).toFixed(2)}€</button>`
-        : `<button class="tp-mybet mini-btn-mybet" data-match="${esc(m.id)}" data-pick="${esc(pred.pick.key)}" data-label="${esc(pred.pick.label)}" data-odds="${pickOdd}" data-stake="${suggestedStake}" title="Marquer comme pari placé (Kelly ${kStake.toFixed(2)}€)" aria-label="Enregistrer ce pari pour suivi" onclick="event.stopPropagation();" style="margin-top:8px;padding:5px 10px;background:rgba(167,139,250,.18);color:#a78bfa;border:1px solid rgba(167,139,250,.4);border-radius:6px;font-weight:700;font-size:11.5px;cursor:pointer;align-self:flex-start;">💰 J'ai parié</button>`;
+      // v30 — bouton "J'ai parié" retiré.
+      const betBtnHtml = '';
       return `
         <div class="top-mini top-pick" data-id="${esc(m.id)}">
           <div class="mini-head">
@@ -5961,13 +5935,8 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T22:45:28.811632Z","today":"
       const urgent = startIn < 30;
       // Note : 1 raison compacte — explicite pourquoi ce pick plutôt qu'un autre
       const topReason = (pred.explain?.reasons || [])[0];
-      // Chantier 71 (2026-04-22) — "J'ai parié" sur cartes "autres pronos" aussi
-      const myBet = typeof getMyBet === 'function' ? getMyBet(m.id, pred.pick.key) : null;
-      const kStake = kellyStake(pred.reliability ?? pred.pick.prob, pickOdd, bankroll, 0.25);
-      const suggestedStake = kStake > 0 ? kStake.toFixed(2) : '1';
-      const betBtnHtml = myBet
-        ? `<button class="tp-mybet" data-match="${esc(m.id)}" data-pick="${esc(pred.pick.key)}" title="Tu as parié ${(Number(myBet.stake)||0).toFixed(2)}€ @ ${(Number(myBet.odds)||0).toFixed(2)}. Clic pour retirer." aria-label="Retirer le pari du suivi" onclick="event.stopPropagation();" style="margin-top:6px;padding:4px 9px;background:rgba(16,185,129,.2);color:#10b981;border:1px solid rgba(16,185,129,.4);border-radius:5px;font-weight:700;font-size:11px;cursor:pointer;">✓ ${(Number(myBet.stake)||0).toFixed(2)}€</button>`
-        : `<button class="tp-mybet" data-match="${esc(m.id)}" data-pick="${esc(pred.pick.key)}" data-label="${esc(pred.pick.label)}" data-odds="${pickOdd}" data-stake="${suggestedStake}" title="Marquer comme pari placé" aria-label="Enregistrer ce pari pour suivi" onclick="event.stopPropagation();" style="margin-top:6px;padding:4px 9px;background:rgba(167,139,250,.18);color:#a78bfa;border:1px solid rgba(167,139,250,.4);border-radius:5px;font-weight:700;font-size:11px;cursor:pointer;">💰 J'ai parié</button>`;
+      // v30 — "J'ai parié" + Kelly retirés.
+      const betBtnHtml = '';
       return `
         <div class="top-pick ${urgent ? 'urgent' : ''}" data-id="${esc(m.id)}">
           <div class="tp-head">
@@ -6015,20 +5984,8 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T22:45:28.811632Z","today":"
       ? `<div style="position:absolute;top:0;right:0;padding:6px 14px;background:linear-gradient(135deg,#a78bfa,#f472b6);color:#fff;font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;border-bottom-left-radius:10px;z-index:2;">🏆 Pari du jour</div>`
       : '';
 
-    // Chantier GGGG — Top Pronos narratif IA
-    const topNarrativeHtml = (() => {
-      try {
-        const body = buildTopPronosNarrative(top5, futureTop);
-        if (!body) return '';
-        return `<div style="margin:14px 0;padding:14px 18px;background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--brand);border-radius:12px;">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-            <span style="font-size:16px;">🤖</span>
-            <h3 style="margin:0;font-size:13px;letter-spacing:.4px;text-transform:uppercase;color:var(--text-dim);font-weight:700;">Coach IA — lecture du top</h3>
-          </div>
-          <div style="font-size:13.5px;line-height:1.5;color:var(--text,#e6ebf2);">${body}</div>
-        </div>`;
-      } catch (e) { console.warn('[GGGG] top narrative failed', e); return ''; }
-    })();
+    // v30 — Coach IA top-pronos narrative retirée.
+    const topNarrativeHtml = '';
 
     wrap.innerHTML = `
       ${pdjBannerHtml}
@@ -6406,8 +6363,8 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T22:45:28.811632Z","today":"
         if (!picked.legs || !picked.legs.length) {
           return `<div class="ia-combine-card" style="margin:16px 0;padding:16px 18px;background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--brand);border-radius:12px;">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-              <span style="font-size:18px;">🤖</span>
-              <h3 style="margin:0;font-size:14px;letter-spacing:.4px;text-transform:uppercase;color:var(--text-dim);font-weight:700;">Coach IA — Combiné optimal</h3>
+              <span style="font-size:18px;">🎲</span>
+              <h3 style="margin:0;font-size:14px;letter-spacing:.4px;text-transform:uppercase;color:var(--text-dim);font-weight:700;">Combiné optimal</h3>
             </div>
             <div style="font-size:13px;color:var(--text-dim,#b4bcc7);line-height:1.5;">${esc(picked.reason || 'Pas de suggestion disponible.')}</div>
           </div>`;
@@ -6432,8 +6389,8 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T22:45:28.811632Z","today":"
           }).join('\n');
         return `<div class="ia-combine-card" style="margin:16px 0;padding:16px 18px;background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--brand);border-radius:12px;">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;flex-wrap:wrap;">
-            <span style="font-size:18px;">🤖</span>
-            <h3 style="margin:0;font-size:14px;letter-spacing:.4px;text-transform:uppercase;color:var(--text-dim);font-weight:700;">Coach IA — Combiné optimal</h3>
+            <span style="font-size:18px;">🎲</span>
+            <h3 style="margin:0;font-size:14px;letter-spacing:.4px;text-transform:uppercase;color:var(--text-dim);font-weight:700;">Combiné optimal</h3>
             <div style="margin-left:auto;display:flex;gap:6px;">
               ${[2,3,4].map(n => `<button class="eeee-size-btn${n===size?' active':''}" data-size="${n}" style="padding:4px 10px;background:${n===size?'rgba(167,139,250,.3)':'rgba(255,255,255,.05)'};color:${n===size?'#a78bfa':'var(--text-dim)'};border:1px solid ${n===size?'rgba(167,139,250,.5)':'rgba(255,255,255,.1)'};border-radius:6px;font-size:12px;cursor:pointer;font-weight:600;">${n} legs</button>`).join('')}
               <button class="eeee-copy-btn" data-copy="${esc(copyTxt)}" title="Copier le combiné" style="padding:4px 10px;background:rgba(255,255,255,.05);color:var(--text-dim);border:1px solid rgba(255,255,255,.1);border-radius:6px;font-size:12px;cursor:pointer;">📋</button>
@@ -7220,43 +7177,20 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T22:45:28.811632Z","today":"
               })()}
             </div>
             ${pickOdd ? (() => {
-              // Chantiers BB + HH — Kelly staking + Value bet.
+              // v30 — Mise conseillée Kelly + bouton "J'ai parié" + bouton
+              // Winamax retirés (user n'enregistre pas ses paris ici). On
+              // garde uniquement la cote affichée + l'edge si value, parce
+              // que c'est de l'info modèle (pas une CTA d'engagement).
               const rel = pred.reliability ?? pred.pick.prob;
-              const kStake025 = kellyStake(rel, pickOdd, bankroll, 0.25);
-              const kStake050 = kellyStake(rel, pickOdd, bankroll, 0.50);
-              const kFrac025 = kellyFraction(rel, pickOdd, 0.25);
               const edge = valueBetEdge(rel, pickOdd);
               const edgePct = edge != null ? Math.round(edge * 100) : null;
               const isValue = edge != null && edge >= 0.05;
-              // Track-bet button — Chantier 72 (2026-04-22) : tracker depuis la modal.
-              const existingBet = typeof getMyBet === 'function' && match.id != null
-                ? getMyBet(match.id, pred.pick.key) : null;
-              const suggestedStake = kStake025 > 0 ? kStake025.toFixed(2) : '1';
               return `<div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;font-size:13px;">
                 <span style="padding:4px 10px;border-radius:6px;background:rgba(16,185,129,.12);color:#10b981;font-weight:700;">Cote @ ${pickOdd.toFixed(2)}</span>
-                <span style="padding:4px 10px;border-radius:6px;background:rgba(255,255,255,.05);color:var(--text-dim,#b4bcc7);">Gain 10€ → ${((pickOdd-1)*10).toFixed(2)}€</span>
-                ${kStake025 > 0 ? `<span title="Mise conseillée (formule de Kelly / 4). Limite 10% de cagnotte.&#10;Cagnotte = ${bankroll.toFixed(0)}€&#10;Version plus agressive : ${kStake050.toFixed(2)}€" style="padding:4px 10px;border-radius:6px;background:rgba(167,139,250,.14);color:#a78bfa;font-weight:700;">💰 Mise conseillée : ${kStake025.toFixed(2)}€ <span style="opacity:.7;font-weight:500;">(${(kFrac025*100).toFixed(1)}%)</span></span>` : `<span title="La cote ne justifie pas de miser — pas d'avantage." style="padding:4px 10px;border-radius:6px;background:rgba(252,165,165,.12);color:#fca5a5;font-weight:600;">💰 Ne pas miser (pas d'avantage)</span>`}
-                ${isValue ? `<span title="On estime ${(rel*100).toFixed(0)}% de chances de gagner alors que la cote n'en prévoit que ${((1/pickOdd)*100).toFixed(0)}%. Tu as un vrai avantage." style="padding:4px 10px;border-radius:6px;background:rgba(236,72,153,.14);color:#f472b6;font-weight:700;">💎 +${edgePct}pt d'avantage</span>` : (edge != null && edge > 0 && edge < 0.05 ? `<span title="Léger avantage (moins de 5 points). Pas très intéressant." style="padding:4px 10px;border-radius:6px;background:rgba(255,255,255,.05);color:var(--text-dim2,#7b8693);font-weight:600;">+${edgePct}pt</span>` : '')}
-              </div>
-              <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
-                <button class="tp-mybet detail-track-btn" data-match="${esc(match.id)}" data-pick="${esc(pred.pick.key)}" data-label="${esc(pred.pick.label)}" data-odds="${pickOdd}" data-stake="${suggestedStake}" aria-label="${existingBet ? 'Retirer le pari du suivi' : 'Enregistrer ce pari pour suivi'}" title="${existingBet ? `Déjà tracké : ${existingBet.pickLabel} @ ${existingBet.odds.toFixed(2)} · ${existingBet.stake.toFixed(2)}€. Cliquer pour retirer.` : 'Marquer comme pari placé et suivre le résultat'}" style="padding:10px 18px;background:${existingBet ? 'rgba(52,211,153,.18)' : 'rgba(167,139,250,.18)'};color:${existingBet ? '#34d399' : '#a78bfa'};border:1px solid ${existingBet ? 'rgba(52,211,153,.4)' : 'rgba(167,139,250,.4)'};border-radius:8px;font-weight:700;font-size:13.5px;cursor:pointer;">${existingBet ? `✓ Tracké (${existingBet.stake.toFixed(0)}€ @ ${existingBet.odds.toFixed(2)})` : `💰 J'ai parié`}</button>
+                ${isValue ? `<span title="Le modèle estime ${(rel*100).toFixed(0)}% de chances alors que la cote n'en prévoit que ${((1/pickOdd)*100).toFixed(0)}%." style="padding:4px 10px;border-radius:6px;background:rgba(236,72,153,.14);color:#f472b6;font-weight:700;">💎 +${edgePct}pt d'avantage</span>` : (edge != null && edge > 0 && edge < 0.05 ? `<span title="Léger avantage (<5pt) — pas très intéressant." style="padding:4px 10px;border-radius:6px;background:rgba(255,255,255,.05);color:var(--text-dim2,#7b8693);font-weight:600;">+${edgePct}pt</span>` : '')}
               </div>`;
             })() : ''}
             ${pred.explain?.headline ? `<div style="margin-top:14px;padding:12px 14px;background:rgba(255,255,255,.03);border-radius:8px;border-left:3px solid var(--accent,#10b981);font-size:13.5px;line-height:1.5;color:var(--text,#e6ebf2);">${esc(pred.explain.headline)}</div>` : ''}
-            ${(() => {
-              // Chantier DDDD — Coach IA explication du pick
-              try {
-                const nar = buildMatchNarrative(match, pred);
-                if (!nar) return '';
-                return `<div style="margin-top:12px;padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--brand);border-radius:10px;">
-                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-                    <span style="font-size:16px;">🤖</span>
-                    <span style="font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-dim2,#7b8693);font-weight:700;">Coach IA — lecture du match</span>
-                  </div>
-                  <div style="font-size:13.5px;line-height:1.5;color:var(--text,#e6ebf2);">${nar}</div>
-                </div>`;
-              } catch (e) { console.warn('[DDDD] match narrative failed', e); return ''; }
-            })()}
             ${reasons.length ? `
             <div style="margin-top:12px;">
               <div style="font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-dim2,#7b8693);margin-bottom:8px;">Pourquoi ce pronostic</div>
@@ -7467,11 +7401,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T22:45:28.811632Z","today":"
                 <div style="margin-top:6px;font-size:10.5px;color:var(--text-dim2,#7b8693);line-height:1.3;">Picks alternatifs dérivés des buts attendus (${pred.poisson ? `xG ${pred.poisson.xgH.toFixed(2)}–${pred.poisson.xgA.toFixed(2)}` : 'modèle Poisson'}). ⭐ = ≥65%.</div>
               </div>`;
             })()}
-            ${!isFinal ? `<div style="margin-top:14px;">
-              <a href="${esc(winamaxUrl(match))}" target="_blank" rel="noopener" class="winamax-btn">
-                <span class="ico">🎰</span> Parier sur Winamax
-              </a>
-            </div>` : ''}
+            <!-- v30 — Bouton Parier sur Winamax retiré de la modal détail. -->
           </div>
         </div>`;
       })() : ''}
@@ -10293,38 +10223,21 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T22:45:28.811632Z","today":"
                   <div><span style="color:var(--text-dim);border-bottom:1px dotted var(--text-dim);cursor:help;" title="Confiance du modèle : probabilité estimée que ce pari gagne. ≥70 % = très fiable.">Conf</span> <strong style="color:var(--text);">${Math.round(p.rel*100)}%</strong></div>
                   <div><span style="color:var(--text-dim);border-bottom:1px dotted var(--text-dim);cursor:help;" title="Edge = notre probabilité − probabilité implicite de la cote. > 0 = on est plus optimiste que le bookmaker (=valeur).">Edge</span> <strong style="color:${edgeColor};">+${Math.round(p.edge*100)}pt</strong></div>
                 </div>
-                <div style="padding:10px 12px;background:rgba(167,139,250,.10);border-radius:6px;margin-bottom:10px;font-size:13px;">
-                  <div style="color:var(--text-dim);font-size:10px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:3px;">Mise conseillée</div>
-                  <div class="dpc-summary"><strong class="dpc-stake-val" style="color:var(--brand);font-size:18px;">${fmtEur(p.stake)}</strong> <span style="color:var(--text-dim);">→ gain <strong class="dpc-gain-val" style="color:var(--accent);">+${p.gain < 1 ? p.gain.toFixed(2) + '€' : fmtEur(p.gain)}</strong></span></div>
-                </div>
-                <!-- v30 Sprint 3 : toggle analyse complète + ajusteur mise inline -->
-                ${(allReasons.length > 3 || true) ? `
-                <button type="button" class="dpc-toggle" data-toggle-card="${cardId}" data-card="${cardId}" data-match-id="${esc(String(p.m.id || ''))}" data-pick-key="${esc(p.pred.pick.key || '')}" aria-expanded="false" style="width:100%;padding:8px 10px;margin-bottom:8px;background:transparent;border:1px dashed var(--border-2);color:var(--text-dim);border-radius:6px;font-size:11.5px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-weight:600;">
-                  <span>🔍 Voir l'analyse complète${allReasons.length > 3 ? ` · ${allReasons.length} raisons` : ''}</span>
+                <!-- v30 — Mise conseillée + ajusteur Kelly + bouton Winamax
+                     retirés (user n'enregistre pas ses paris, ne mise pas
+                     ici). Reste : signaux du modèle (toggle expand). -->
+                ${allReasons.length ? `
+                <button type="button" class="dpc-toggle" data-toggle-card="${cardId}" data-card="${cardId}" data-match-id="${esc(String(p.m.id || ''))}" data-pick-key="${esc(p.pred.pick.key || '')}" aria-expanded="false" style="width:100%;padding:8px 10px;margin-top:6px;margin-bottom:8px;background:transparent;border:1px dashed var(--border-2);color:var(--text-dim);border-radius:6px;font-size:11.5px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-weight:600;">
+                  <span>🔍 Voir l'analyse complète · ${allReasons.length} raison${allReasons.length>1?'s':''}</span>
                   <span class="dpc-chev" style="transition:transform .2s;">▾</span>
                 </button>
-                <div class="dpc-expand" id="${cardId}-expand" style="display:none;padding:10px 12px;margin-bottom:10px;background:rgba(167,139,250,.04);border:1px solid rgba(167,139,250,.15);border-radius:8px;">
-                  <!-- v30 — Slot pour la sparkline cote (lazy-rendered au 1er expand) -->
+                <div class="dpc-expand" id="${cardId}-expand" style="display:none;padding:10px 12px;margin-bottom:6px;background:rgba(167,139,250,.04);border:1px solid rgba(167,139,250,.15);border-radius:8px;">
                   <div id="${cardId}-spark"></div>
-                  ${allReasons.length ? `<div style="font-size:10px;color:var(--brand);letter-spacing:.5px;text-transform:uppercase;font-weight:700;margin-bottom:6px;">📊 Tous les signaux (${allReasons.length})</div>
-                  <ul style="list-style:none;padding:0;margin:0 0 12px;display:flex;flex-direction:column;gap:5px;">
+                  <div style="font-size:10px;color:var(--brand);letter-spacing:.5px;text-transform:uppercase;font-weight:700;margin-bottom:6px;">📊 Tous les signaux (${allReasons.length})</div>
+                  <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:5px;">
                     ${allReasons.map(r => `<li style="display:flex;align-items:flex-start;gap:6px;padding:4px 0;font-size:12px;color:var(--text);line-height:1.4;"><span style="flex-shrink:0;font-size:13px;">${esc(r.icon||'•')}</span><span>${esc(r.text||'')}</span></li>`).join('')}
-                  </ul>` : ''}
-                  <div style="font-size:10px;color:var(--brand);letter-spacing:.5px;text-transform:uppercase;font-weight:700;margin-bottom:6px;">💰 Ajuster ma mise</div>
-                  <!-- v30 : presets de mise rapides (avant l'ajusteur fin) -->
-                  <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:7px;">
-                    ${[1, 2, 5, 10].map(v => `<button type="button" class="dpc-stake-preset" data-card="${cardId}" data-preset="${v}" style="flex:1;min-width:42px;padding:5px 6px;background:var(--panel);border:1px solid var(--border-2);color:var(--text-dim);border-radius:5px;cursor:pointer;font-size:11.5px;font-weight:600;font-variant-numeric:tabular-nums;">${v}€</button>`).join('')}
-                    <button type="button" class="dpc-stake-preset" data-card="${cardId}" data-preset="kelly" data-kelly-amount="${p.stake}" title="Mise recommandée par Kelly fractionné (¼) sur ta cagnotte" style="flex:1.4;min-width:50px;padding:5px 6px;background:rgba(167,139,250,.15);border:1px solid var(--brand);color:var(--brand);border-radius:5px;cursor:pointer;font-size:11.5px;font-weight:700;">⚡ Kelly</button>
-                  </div>
-                  <div style="display:flex;align-items:center;gap:8px;">
-                    <button type="button" class="dpc-stake-adj" data-card="${cardId}" data-delta="-0.5" aria-label="Diminuer mise" style="width:30px;height:30px;background:var(--panel);border:1px solid var(--border-2);color:var(--text);border-radius:6px;cursor:pointer;font-size:16px;font-weight:700;line-height:1;">−</button>
-                    <input type="number" class="dpc-stake-input" data-card="${cardId}" value="${p.stake.toFixed(2)}" min="0.10" max="10000" step="0.10" style="flex:1;padding:6px 8px;background:var(--panel);border:1px solid var(--border-2);color:var(--text);border-radius:6px;font-size:13px;font-variant-numeric:tabular-nums;text-align:right;">
-                    <span style="color:var(--text-dim);font-size:13px;">€</span>
-                    <button type="button" class="dpc-stake-adj" data-card="${cardId}" data-delta="0.5" aria-label="Augmenter mise" style="width:30px;height:30px;background:var(--panel);border:1px solid var(--border-2);color:var(--text);border-radius:6px;cursor:pointer;font-size:16px;font-weight:700;line-height:1;">+</button>
-                  </div>
-                  <div style="margin-top:8px;font-size:12px;color:var(--text-dim);">Gain potentiel : <strong class="dpc-live-gain" data-card="${cardId}" style="color:var(--accent);font-size:14px;">+${p.gain < 1 ? p.gain.toFixed(2) + '€' : fmtEur(p.gain)}</strong></div>
+                  </ul>
                 </div>` : ''}
-                <a href="${esc(url)}" target="_blank" rel="noopener" style="display:block;width:100%;padding:10px;background:var(--brand);color:#08080a;text-align:center;border-radius:6px;font-weight:700;font-size:13px;text-decoration:none;">Parier sur Winamax ↗</a>
               </div>`;
             }).join('')}
           </div>
@@ -13295,16 +13208,9 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T22:45:28.811632Z","today":"
             }
             return true;
           });
-          const body = buildSimplesQuickTake(filtered);
-          iaSimples.innerHTML = body ? `
-            <div style="margin:12px 0;padding:12px 16px;background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--brand);border-radius:10px;">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-                <span style="font-size:14px;">🤖</span>
-                <span style="font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--text-dim2,#7b8693);font-weight:700;">Coach IA — snapshot du jour</span>
-              </div>
-              <div style="font-size:13px;line-height:1.5;color:var(--text,#e6ebf2);">${body}</div>
-            </div>` : '';
-        } catch (e) { console.warn('[IIII] simples quick-take failed', e); iaSimples.innerHTML = ''; }
+          // v30 — Coach IA snapshot Simples retiré.
+          iaSimples.innerHTML = '';
+        } catch (e) { iaSimples.innerHTML = ''; }
       }
     }
 
@@ -14383,8 +14289,10 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T22:45:28.811632Z","today":"
       ? `<div class="bilan-empty" style="margin-top:18px;">Aucun pick ne correspond aux filtres actuels. Essaye "Réinitialiser" pour tout afficher.</div>`
       : '';
 
-    // Chantier FFFF — Détecteur de patterns IA sur paris trackés
-    const patternsHtml = (() => {
+    // v30 — Coach IA patterns détectés retiré (dépendait de paris trackés
+    // que l'utilisateur n'enregistre pas).
+    const patternsHtml = '';
+    const _COACH_FFFF_REMOVED = (() => {
       try {
         if (typeof loadTrackedBets !== 'function' || typeof detectHistoriquePatterns !== 'function') return '';
         const all = loadTrackedBets();
@@ -15017,7 +14925,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T22:45:28.811632Z","today":"
     wrap.innerHTML = `
       <div style="max-width:1200px;margin:0 auto;padding:16px 20px 24px;">
         <div class="section-header top-picks" style="margin-top:8px;">
-          <h2><span class="ico">⚙️</span>Santé du site — Coach IA admin</h2>
+          <h2><span class="ico">⚙️</span>Santé du site</h2>
           <div class="hint">État technique en temps réel · fraîcheur des données, couverture, SW, erreurs, stockage</div>
         </div>
 
@@ -15064,7 +14972,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T22:45:28.811632Z","today":"
         ${errListHtml}
 
         <div style="margin-top:24px;font-size:11px;color:var(--text-dim);font-style:italic;line-height:1.6;">
-          💡 Le Coach IA recalcule automatiquement à chaque visite de cette page. Les actions (🔁 Forcer refresh, 🔄 Re-register SW, 🧹 Nettoyer caches) sont manuelles et réversibles.
+          💡 Les checks sont recalculés à chaque visite de cette page. Les actions (🔁 Forcer refresh, 🔄 Re-register SW, 🧹 Nettoyer caches) sont manuelles et réversibles.
         </div>
       </div>`;
 
@@ -19693,12 +19601,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     const homeName = homeC.name || homeC.short || '?';
     const awayName = awayC.name || awayC.short || '?';
     const pickLabel = key === '1' ? homeName : key === '2' ? awayName : 'Match nul';
-    // Mise conseillée : 2% de la bankroll, cap à 3€
-    const prefs = (() => { try { return JSON.parse(localStorage.getItem('userPrefs') || '{}'); } catch(e){ return {}; } })();
-    const bk = Number(prefs.bankrollStart) || 10;
-    let stake = Math.max(0.5, Math.min(3, bk * 0.02));
-    // Arrondir à 0.5€
-    stake = Math.round(stake * 2) / 2;
 
     // Phrase "pourquoi" simple
     const confPct = Math.round(rel * 100);
@@ -19709,8 +19611,9 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
 
     const hour = (() => { try { return new Date(m.date).toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit', timeZone:'Europe/Paris' }); } catch(e){ return ''; }})();
 
-    const potentialWin = (stake * odd).toFixed(2);
-
+    // v30 — Mise conseillée + boutons Winamax/J'ai parié retirés (pure
+    // info modèle, pas de CTA d'engagement). Le user voit le pick + la
+    // confiance + la raison, et ferme.
     overlay.innerHTML = `
       <div class="qb-card">
         <button class="close" data-close>×</button>
@@ -19719,21 +19622,14 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         <div class="meta">${hour ? hour + ' · ' : ''}${esc(m.league_name || m.league_code || '')} · cote @${odd.toFixed(2)}</div>
 
         <div class="big">
-          <div class="label">Je mise sur</div>
+          <div class="label">Pick du modèle</div>
           <div class="amount" style="font-size:22px;letter-spacing:-.4px;">${esc(pickLabel)}</div>
-        </div>
-
-        <div class="big" style="background:linear-gradient(135deg,var(--accent-soft),var(--brand-soft));">
-          <div class="label">Mise conseillée</div>
-          <div class="amount">${stake.toFixed(2)}€</div>
-          <div class="sub">→ Tu gagnes <b style="color:var(--accent);">${potentialWin}€</b> si ça marche</div>
         </div>
 
         <div class="reason">💡 ${reason}</div>
 
-        <div class="cta">
-          <a href="${esc(typeof winamaxUrl === 'function' ? winamaxUrl(m) : 'https://www.winamax.fr/paris-sportifs/')}" target="_blank" rel="noopener" class="primary" data-close>🎰 Parier sur Winamax</a>
-          <button class="secondary" data-track-id="${esc(String(m.id))}" data-pick-label="${esc(pickLabel)}" data-odd="${odd.toFixed(2)}" data-stake="${stake.toFixed(2)}" data-sport="${esc(m.sport || '')}" data-league="${esc(m.league_name || m.league_code || '')}" data-home="${esc(homeName)}" data-away="${esc(awayName)}">📝 J'ai parié — l'ajouter au suivi</button>
+        <div class="cta" style="justify-content:flex-end;">
+          <button class="secondary" data-close>Fermer</button>
         </div>
       </div>`;
 
