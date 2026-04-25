@@ -8087,6 +8087,61 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
     window.pollData = pollData;
     window.predictMatch = predictMatch;
   } catch(e){}
+  // v30 — Helper diagnostique pour la console.
+  // Utilisation : window.__diag() — print state synthétique du site.
+  // Utile pour debug rapide quand quelque chose semble bizarre.
+  window.__diag = function() {
+    const d = window.PRONOSTICS_DATA;
+    const ageMin = d?.generated_at ? Math.round((Date.now() - new Date(d.generated_at).getTime()) / 60000) : null;
+    const dayCount = d?.days ? Object.keys(d.days).length : 0;
+    let totalEvents = 0, withWinamax = 0;
+    if (d?.days) Object.values(d.days).forEach(arr => {
+      (arr || []).forEach(m => {
+        totalEvents++;
+        if (m.winamax && m.winamax.available) withWinamax++;
+      });
+    });
+    let prefs = {};
+    try { prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}'); } catch(e){}
+    let trackedCount = 0;
+    try {
+      const t = JSON.parse(localStorage.getItem('paris_sportif_tracked_bets') || '{}');
+      trackedCount = Object.keys(t || {}).length;
+    } catch(e){}
+    let errCount = 0;
+    try { errCount = (JSON.parse(localStorage.getItem('paris_sportif_js_errors_v1') || '[]') || []).length; } catch(e){}
+    const out = {
+      data: {
+        generated_at: d?.generated_at || '?',
+        age_min: ageMin,
+        days: dayCount,
+        events: totalEvents,
+        winamax_available: withWinamax,
+        is_stale: ageMin != null && ageMin > 240,
+      },
+      user: {
+        currentPage: localStorage.getItem('currentPage') || '?',
+        bankroll: parseFloat(localStorage.getItem('userBankroll') || '0') || 0,
+        theme: prefs.theme || 'dark',
+        notifsEnabled: !!prefs.pushNotifs,
+        trackedBetsCount: trackedCount,
+      },
+      health: {
+        sw_supported: 'serviceWorker' in navigator,
+        sw_active: !!navigator.serviceWorker?.controller,
+        notif_permission: 'Notification' in window ? Notification.permission : 'unsupported',
+        js_errors_logged: errCount,
+        backtest_loaded: !!window.__backtestReportV2,
+        calibration_loaded: !!window.__modelCalibration,
+      },
+      cache_version: typeof CACHE_VERSION !== 'undefined' ? CACHE_VERSION : '?',
+    };
+    console.log('%c🔍 Paris-Sportif diag', 'color:#a78bfa;font-weight:700;font-size:14px;');
+    console.table(out.data);
+    console.table(out.user);
+    console.table(out.health);
+    return out;
+  };
 
   // ===== Unified refresh tick =====
   // One timer to rule them all. Every 15 s we:
