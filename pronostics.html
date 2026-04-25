@@ -4482,6 +4482,19 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T22:30:41.595047Z","today":"
         text: `Classement #${rankH2} vs #${rankA2} — avantage ${leader}`
       });
     }
+    // v30 — Honesty banner pour tennis : si rank est le SEUL signal non-marché,
+    // on le dit. L'utilisateur sait que c'est un pick "rank-only", plus volatile
+    // que les picks foot multi-signaux.
+    if (match.sport === 'tennis') {
+      const nonMarketSignals = (rankH2 && rankA2) ? 1 : 0;  // rank c'est le seul signal côté tennis
+      if (nonMarketSignals <= 1) {
+        reasons.push({
+          type: 'tennis_caveat',
+          icon: '⚠️',
+          text: `Tennis : modèle limité au classement ATP/WTA (pas de forme/H2H disponible) — pick plus volatile`
+        });
+      }
+    }
     // Buts attendus (modèle statistique football) — Chantier L : renommé
     // pour éviter le jargon "Poisson" côté UI.
     if (poi) {
@@ -4766,14 +4779,34 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T22:30:41.595047Z","today":"
       //   skip < 0.45 OR fewer than 2 pure-model components — ne surface pas
       // Le seuil isLock est descendu 0.72→0.70 car après calibration le modèle
       // est monotone : ce qu'on mesure à 70% correspond vraiment à ~70% de WR.
-      isLock: reliability >= 0.70,
+      // v30 — Sports avec petit échantillon backtest (basket/hockey/baseball/
+      // tennis : <10 picks réglés en historique calibration) → seuil isLock
+      // remonté à 0.75 pour éviter de surfacer des locks sur-confiants quand
+      // la calibration historique manque de signal.
+      isLock: (() => {
+        const thinSports = new Set(['tennis', 'basketball', 'hockey', 'baseball']);
+        return thinSports.has(match.sport)
+          ? reliability >= 0.75
+          : reliability >= 0.70;
+      })(),
       lowConf: reliability < 0.50,
       // Defensive skip — without ≥2 non-market components the reliability
       // isn't a consensus, it's basically pickProb×boost. User's ultra-selective
       // spec (5-10 picks/j, 80%+ WR) demands real signal consensus.
       // Tennis exception: ATP/WTA rank alone is a strong non-market signal
       // (tennis outcomes correlate ~0.7 with rank diff), so 1 component suffices.
-      skip: reliability < 0.45 || pureCompCount < (match.sport === 'tennis' ? 1 : 2),
+      // v30 — tighten tennis skip when ranks are close (|log gap| < 0.30 = within
+      // a factor 1.35x). Rank-only is reliable on lopsided matchups (#1 vs #50)
+      // but unreliable when both players are within ~30 ranks of each other.
+      skip: reliability < 0.45
+        || pureCompCount < (match.sport === 'tennis' ? 1 : 2)
+        || (match.sport === 'tennis'
+            && home?.rank && away?.rank
+            && Math.abs(Math.log(Number(away.rank)) - Math.log(Number(home.rank))) < 0.30),
+      // v30 — Sports with thin backtest history (basketball/hockey n<10 in
+      // backtest_v2) get a stricter lock threshold: 0.75 instead of 0.70.
+      // Avoids over-confident "lock" labels on tiny samples.
+      isLockStrict: reliability >= 0.75,
       poisson: poi ? { xgH: poi.lamH, xgA: poi.lamA } : null,
       // Scores probables — shape varie selon le sport (Chantier 6 + K) :
       //   foot   : array[{home, away, prob}] (legacy, kind 'exact' implicite)
@@ -6543,34 +6576,60 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T22:30:41.595047Z","today":"
   // slug usually matches league_code (nba, nhl, mlb, ufc, atp, wta…) or the
   // league_code's part after the dot (eng.1 → eng_1, esp.1 → esp_1, etc.).
   // Returns null if we can't form a likely URL — caller falls back gracefully.
+  // v30 — Cache localStorage des URLs 404 connues : ESPN renvoie 404 pour ~27
+  // codes ligue (esp_1, ger_1, eng_fa, bel_1, sco_1…). Plutôt que de relancer
+  // ces requêtes à chaque page, on les note et on retourne null au prochain
+  // appel. Le cache est nettoyé au-delà de 7 jours pour récupérer les ligues
+  // dont l'asset est apparu entre-temps. Coalesce : on n'écrit qu'une fois
+  // par jour (anti-thrashing localStorage).
+  const _LEAGUE_LOGO_404_KEY = 'leagueLogo404Cache';
+  let _leagueLogo404Cache = (() => {
+    try {
+      const raw = JSON.parse(localStorage.getItem(_LEAGUE_LOGO_404_KEY) || '{}');
+      const cutoff = Date.now() - 7 * 86400000;
+      const fresh = {};
+      Object.entries(raw).forEach(([k, v]) => { if (v > cutoff) fresh[k] = v; });
+      return fresh;
+    } catch(e) { return {}; }
+  })();
+  let _leagueLogo404Dirty = false;
+  function _leagueLogoMark404(url) {
+    if (!url || _leagueLogo404Cache[url]) return;
+    _leagueLogo404Cache[url] = Date.now();
+    _leagueLogo404Dirty = true;
+  }
+  // Flush dirty cache once per minute (event-driven, no localStorage spam)
+  setInterval(() => {
+    if (!_leagueLogo404Dirty) return;
+    try { localStorage.setItem(_LEAGUE_LOGO_404_KEY, JSON.stringify(_leagueLogo404Cache)); } catch(e){}
+    _leagueLogo404Dirty = false;
+  }, 60 * 1000);
+  window._leagueLogoMark404 = _leagueLogoMark404;
+
   function leagueLogoUrl(match) {
     if (!match || !match.league_code) return null;
     const code = String(match.league_code);
     const sport = match.sport;
+    let url = null;
     // Football: ESPN uses dot-separated codes mapped to numeric IDs in their
     // CDN, but the slug form (eng_1, esp_1, fra_1) also works for many.
     if (sport === 'football') {
       const slug = code.replace(/\./g, '_');
-      return `https://a.espncdn.com/i/leaguelogos/soccer/500/${slug}.png`;
+      url = `https://a.espncdn.com/i/leaguelogos/soccer/500/${slug}.png`;
+    } else if (sport === 'basketball') {
+      url = `https://a.espncdn.com/i/leaguelogos/basketball/500/${code}.png`;
+    } else if (sport === 'hockey') {
+      url = `https://a.espncdn.com/i/leaguelogos/hockey/500/${code}.png`;
+    } else if (sport === 'baseball') {
+      url = `https://a.espncdn.com/i/leaguelogos/baseball/500/${code}.png`;
+    } else if (sport === 'tennis') {
+      url = `https://a.espncdn.com/i/leaguelogos/tennis/500/${code}.png`;
+    } else if (sport === 'mma') {
+      url = `https://a.espncdn.com/i/leaguelogos/mma/500/${code}.png`;
     }
-    if (sport === 'basketball') {
-      return `https://a.espncdn.com/i/leaguelogos/basketball/500/${code}.png`;
-    }
-    if (sport === 'hockey') {
-      return `https://a.espncdn.com/i/leaguelogos/hockey/500/${code}.png`;
-    }
-    if (sport === 'baseball') {
-      return `https://a.espncdn.com/i/leaguelogos/baseball/500/${code}.png`;
-    }
-    if (sport === 'tennis') {
-      // ESPN tennis: atp / wta / itf live in different paths; fallback to
-      // generic icon if no clean URL.
-      return `https://a.espncdn.com/i/leaguelogos/tennis/500/${code}.png`;
-    }
-    if (sport === 'mma') {
-      return `https://a.espncdn.com/i/leaguelogos/mma/500/${code}.png`;
-    }
-    return null;
+    // Skip URLs marquées 404 dans la session précédente — saves ~150ms FCP.
+    if (url && _leagueLogo404Cache[url]) return null;
+    return url;
   }
 
   // v30 — Sport-specific contextual info shown above the betting odds.
@@ -6837,7 +6896,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T22:30:41.595047Z","today":"
             const lname = m.league_name || m.league_code || '';
             const ico = sportIcon(m.sport);
             return `<span class="venue" style="display:inline-flex;align-items:center;gap:5px;">
-              ${lurl ? `<img src="${esc(lurl)}" alt="" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'">` : `<span style="font-size:11px;">${ico}</span>`}
+              ${lurl ? `<img src="${esc(lurl)}" alt="" loading="lazy" decoding="async" style="width:14px;height:14px;object-fit:contain;" onerror="window._leagueLogoMark404 && window._leagueLogoMark404(this.src);this.outerHTML='<span style=\\'font-size:11px;\\'>${ico}</span>';">` : `<span style="font-size:11px;">${ico}</span>`}
               <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:140px;">${esc(lname)}</span>
             </span>`;
           })()}
@@ -18315,6 +18374,34 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
                 : `il y a ${Math.round(ageMin/(24*60))} j`;
       el.textContent = `📅 Données ${lbl}`;
       el.title = `Dernière actualisation : ${new Date(data.generated_at).toLocaleString('fr-FR')}`;
+      // v30 — Si la session reste ouverte longtemps et que data passe stale
+      // (>2h), force-reload une seule fois (avec retry après 30 min). Ce
+      // poll rattrape les utilisateurs qui laissent l'onglet ouvert toute
+      // la journée — sinon ils voient des pronos sur des matchs déjà finis.
+      if (ageMin > 120) {
+        try {
+          const lastTry = parseInt(sessionStorage.getItem('autoRefreshDoneAt') || '0', 10);
+          const sinceLast = (Date.now() - lastTry) / 60000;
+          if (!isFinite(sinceLast) || sinceLast > 30) {
+            sessionStorage.setItem('autoRefreshDoneAt', String(Date.now()));
+            // Toast informatif visible pour l'utilisateur (pas un reload silencieux)
+            try { if (typeof toast === 'function') toast(`Données ${lbl} — actualisation automatique`, 'info'); } catch(e){}
+            (async () => {
+              try {
+                if ('serviceWorker' in navigator) {
+                  const rs = await navigator.serviceWorker.getRegistrations();
+                  await Promise.all(rs.map(r => r.unregister()));
+                }
+                if ('caches' in window) {
+                  const keys = await caches.keys();
+                  await Promise.all(keys.map(k => caches.delete(k)));
+                }
+              } catch(err) { /* silent */ }
+              setTimeout(() => location.reload(), 1500);
+            })();
+          }
+        } catch(e) { /* silent */ }
+      }
     }
     _updateFooterLastUpdate();
     setInterval(_updateFooterLastUpdate, 60 * 1000);   // refresh label every min
