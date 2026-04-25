@@ -2437,6 +2437,22 @@
 </head>
 <body>
 
+<!-- v30 — PWA install banner (apparait quand le navigateur le permet) -->
+<div id="pwa-install-banner" style="display:none;position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:90;background:var(--panel);border:1px solid var(--brand);border-radius:14px;padding:12px 16px 12px 14px;box-shadow:0 8px 28px rgba(0,0,0,.35);max-width:380px;width:calc(100% - 32px);">
+  <div style="display:flex;align-items:flex-start;gap:12px;">
+    <div style="font-size:24px;line-height:1;">📱</div>
+    <div style="flex:1;min-width:0;">
+      <div style="font-size:13.5px;font-weight:700;color:var(--text);line-height:1.25;margin-bottom:3px;">Installer Paris-Sportif sur ton mobile</div>
+      <div style="font-size:11.5px;color:var(--text-dim);line-height:1.4;">Accès rapide, hors-ligne, et notifs paris forte valeur. 0 espace pris (PWA).</div>
+    </div>
+    <button id="pwa-install-dismiss" type="button" aria-label="Fermer" style="background:none;border:none;color:var(--text-dim);font-size:20px;line-height:1;cursor:pointer;padding:0 4px;">×</button>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:10px;">
+    <button id="pwa-install-go" type="button" style="flex:1;padding:8px 12px;background:var(--brand);color:#08080a;border:none;border-radius:8px;font-weight:700;font-size:12.5px;cursor:pointer;">Installer</button>
+    <button id="pwa-install-later" type="button" style="padding:8px 12px;background:transparent;color:var(--text-dim);border:1px solid var(--border-2);border-radius:8px;font-weight:600;font-size:12.5px;cursor:pointer;">Plus tard</button>
+  </div>
+</div>
+
 <!-- v30 — Skip-to-content link (visible uniquement au focus clavier).
      Permet aux utilisateurs au clavier / screen reader de sauter directement
      au contenu principal sans tabber dans toute la nav. -->
@@ -15801,6 +15817,63 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); brandBtn.click(); }
       });
     }
+    // v30 — PWA install prompt banner. Le navigateur émet beforeinstallprompt
+    // quand le site est installable (PWA + manifest OK + 1ère visite repassée).
+    // On capture l'événement, le diffère, et propose un banner discret.
+    // Snooze : 7 jours via localStorage. "Plus tard" = re-snooze.
+    // "Installer" = fire le prompt natif via deferredPrompt.prompt().
+    let _pwaDeferredPrompt = null;
+    const PWA_SNOOZE_KEY = 'pwaInstallSnoozeUntil';
+    const _pwaIsSnoozed = () => {
+      try {
+        const v = parseInt(localStorage.getItem(PWA_SNOOZE_KEY), 10);
+        return isFinite(v) && Date.now() < v;
+      } catch(e) { return false; }
+    };
+    const _pwaSnooze = (days) => {
+      try { localStorage.setItem(PWA_SNOOZE_KEY, String(Date.now() + days * 86400000)); } catch(e){}
+    };
+    const _pwaShowBanner = () => {
+      const banner = document.getElementById('pwa-install-banner');
+      if (!banner) return;
+      banner.style.display = 'block';
+    };
+    const _pwaHideBanner = () => {
+      const banner = document.getElementById('pwa-install-banner');
+      if (banner) banner.style.display = 'none';
+    };
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      _pwaDeferredPrompt = e;
+      // Ne pas afficher si snooze actif ou déjà installé (display-mode standalone)
+      try {
+        if (window.matchMedia('(display-mode: standalone)').matches) return;
+      } catch(e){}
+      if (_pwaIsSnoozed()) return;
+      // Délais 30s pour ne pas spammer dès l'arrivée
+      setTimeout(_pwaShowBanner, 30000);
+    });
+    window.addEventListener('appinstalled', () => {
+      _pwaHideBanner();
+      _pwaSnooze(365); // une fois installé, plus jamais demander
+      if (typeof toast === 'function') toast('🎉 App installée — bon paris !', 'success');
+    });
+    const _pwaGoBtn = document.getElementById('pwa-install-go');
+    const _pwaLaterBtn = document.getElementById('pwa-install-later');
+    const _pwaDismissBtn = document.getElementById('pwa-install-dismiss');
+    if (_pwaGoBtn) _pwaGoBtn.addEventListener('click', async () => {
+      if (!_pwaDeferredPrompt) { _pwaHideBanner(); return; }
+      try {
+        _pwaDeferredPrompt.prompt();
+        const choice = await _pwaDeferredPrompt.userChoice;
+        if (choice && choice.outcome === 'dismissed') _pwaSnooze(7);
+        _pwaDeferredPrompt = null;
+      } catch(e){}
+      _pwaHideBanner();
+    });
+    if (_pwaLaterBtn) _pwaLaterBtn.addEventListener('click', () => { _pwaSnooze(7); _pwaHideBanner(); });
+    if (_pwaDismissBtn) _pwaDismissBtn.addEventListener('click', () => { _pwaSnooze(30); _pwaHideBanner(); });
+
     // v30 — Footer page-link buttons → navigate to corresponding page
     document.querySelectorAll('.footer-link[data-page-link]').forEach(btn => {
       btn.addEventListener('click', () => {
