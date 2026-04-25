@@ -3908,6 +3908,30 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T18:35:28.506209Z","today":"
       formNudge = diff * 0.05; // max ±5% shift
     }
 
+    // v30 — Form momentum (last-3 vs last-5). Captures *direction* on top
+    // of the formScore *level*. A team going 3W in their last 3 after a
+    // mediocre L5 is heating up; a team WWWWW with 0W in the last 3 has
+    // cooled. Caps at ±3% (smaller than formNudge — momentum is a tiebreaker).
+    const momentumScore = (formStr) => {
+      if (!formStr || formStr.length < 5) return null;
+      const f3 = formScore(formStr.slice(-3));
+      const f5 = formScore(formStr.slice(-5));
+      if (f3 == null || f5 == null) return null;
+      return f3 - f5; // > 0 = heating up, < 0 = cooling
+    };
+    const momH = momentumScore(home.form);
+    const momA = momentumScore(away.form);
+    let momentumNudge = null;
+    let momentumStats = null;
+    if (momH !== null && momA !== null) {
+      momentumNudge = Math.max(-0.03, Math.min(0.03, (momH - momA) * 0.05));
+      momentumStats = {
+        home: Math.round(momH * 100) / 100,
+        away: Math.round(momA * 100) / 100,
+        diff: Math.round((momH - momA) * 100) / 100,
+      };
+    }
+
     // Goal-differential nudge (last 5): complements form letters with actual
     // margin. Team scoring 2.5 GF/G and conceding 0.8 is much more dangerous
     // than one that scraped 5 wins 1-0. Only kicks in when both teams have
@@ -3947,30 +3971,80 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T18:35:28.506209Z","today":"
 
     // Poisson component (football only, needs standings with GF/GA)
     const poi = poissonComponent(match);
-    // Weather adjustment — heavy rain and strong wind depress total goals.
-    // Empirical: precip >3mm/h ≈ -0.2 goals, wind >25 km/h ≈ -0.15 goals.
-    // Applied to Poisson xG BEFORE O/U, BTTS and exact-scores are computed.
+    // v30 — Defensive quality / attacking drought adjustment.
+    // Independent from form letters (which mix defense + attack) and from
+    // weather. Strong defense (≥60% clean sheets last 5) suppresses the
+    // opponent's xG; cold attack (≥60% failed_to_score last 5) suppresses
+    // own xG. Both effects flow into O/U 2.5 and BTTS via Poisson.
+    let cleanSheetStats = null;
+    if (poi && match.sport === 'football') {
+      const hs = home.form_stats, as_ = away.form_stats;
+      if (hs && as_ && hs.played5 >= 3 && as_.played5 >= 3) {
+        const hCleanRate  = (hs.cleans5         || 0) / hs.played5;
+        const aCleanRate  = (as_.cleans5        || 0) / as_.played5;
+        const hFailRate   = (hs.failed_to_score5 || 0) / hs.played5;
+        const aFailRate   = (as_.failed_to_score5 || 0) / as_.played5;
+        // Excess vs a 30%-baseline maps to a scaling factor on the
+        // OPPONENT's xG (defense) and on OWN xG (attack drought).
+        const hDef = Math.max(0, hCleanRate - 0.30);
+        const aDef = Math.max(0, aCleanRate - 0.30);
+        const hAttDrought = Math.max(0, hFailRate - 0.30);
+        const aAttDrought = Math.max(0, aFailRate - 0.30);
+        const lamHscale = 1 - Math.min(0.15, hAttDrought * 0.4 + aDef * 0.4);
+        const lamAscale = 1 - Math.min(0.15, aAttDrought * 0.4 + hDef * 0.4);
+        if (lamHscale < 0.97 || lamAscale < 0.97) {
+          poi.lamH *= lamHscale;
+          poi.lamA *= lamAscale;
+          cleanSheetStats = {
+            homeCleans: hs.cleans5, awayCleans: as_.cleans5,
+            homeFailed: hs.failed_to_score5, awayFailed: as_.failed_to_score5,
+            lamHscale: Math.round(lamHscale * 1000) / 1000,
+            lamAscale: Math.round(lamAscale * 1000) / 1000,
+          };
+        }
+      }
+    }
+    // Weather adjustment — heavy rain, strong wind, and extreme cold all
+    // depress total goals. Empirical: precip >3mm/h ≈ -0.2 goals, wind
+    // >25 km/h ≈ -0.15, sub-zero temps ≈ -0.10 (cold ball, slower legs,
+    // freeze-thaw on pitch). Applied to Poisson xG BEFORE O/U, BTTS and
+    // exact-scores are computed. v30: add temp_c as a third axis.
     let weatherStats = null;
     if (poi && match.sport === 'football' && match.weather) {
       const w = match.weather;
-      let rainPenalty = 0, windPenalty = 0;
+      let rainPenalty = 0, windPenalty = 0, coldPenalty = 0;
       if (typeof w.precip_mm === 'number' && w.precip_mm > 1) {
         rainPenalty = Math.min(0.25, (w.precip_mm - 1) * 0.04);
       }
       if (typeof w.wind_kmh === 'number' && w.wind_kmh > 20) {
         windPenalty = Math.min(0.15, (w.wind_kmh - 20) * 0.007);
       }
-      const penalty = rainPenalty + windPenalty;
+      // v30 — cold weather: <5°C nudges xG down. Goals/game in winter
+      // matches with sub-5°C kick-offs trail summer averages by ~7% in
+      // top-5 league data. <0°C amplifies (pitch hardens, ball control
+      // drops). Above 5°C no penalty (neutral / hot weather slightly
+      // boosts, but we don't model that side yet — too noisy).
+      if (typeof w.temp_c === 'number' && w.temp_c < 5) {
+        const below = Math.max(0, 5 - w.temp_c);  // °C below threshold
+        coldPenalty = Math.min(0.12, below * 0.012);
+      }
+      const penalty = rainPenalty + windPenalty + coldPenalty;
       if (penalty > 0.05) {
-        // Scale total xG down by up to ~10% (penalty of 0.20 → scale 0.90).
-        const scale = 1 - Math.min(0.20, penalty) / 2;
+        // Scale total xG down by up to ~12% (penalty of 0.24 → scale 0.88).
+        const scale = 1 - Math.min(0.22, penalty) / 2;
         poi.lamH *= scale;
         poi.lamA *= scale;
+        // Identify the dominant axis for the UI label.
+        let dominant = 'rain';
+        if (windPenalty > rainPenalty && windPenalty > coldPenalty) dominant = 'wind';
+        else if (coldPenalty > rainPenalty && coldPenalty > windPenalty) dominant = 'cold';
         weatherStats = {
           precip: w.precip_mm,
           wind: w.wind_kmh,
+          temp: w.temp_c,
           penalty: Math.round(penalty * 100) / 100,
-          rain: rainPenalty > windPenalty,
+          dominant,
+          rain: dominant === 'rain',  // legacy alias for older UI code
           city: w.city,
         };
       }
@@ -3980,10 +4054,15 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T18:35:28.506209Z","today":"
     // 2.5 – 5.5 yellows per game; we only nudge outside [3.0, 4.5].
     // Effect is small (±0.03 on each lam) but independent of our other
     // signals, and the reason is informative for the user.
+    // v30 — Add red-cards-per-game as a SECONDARY signal: refs who give
+    // red cards regularly (>0.10 reds/game = ~1 red every 10 games)
+    // truncate matches more often → fewer goals. Independent from yellows
+    // and from rain/cold (so it stacks rather than overlaps).
     let refStats = null;
     if (poi && match.sport === 'football' && match.referee && match.referee.name) {
       const ref = match.referee;
       const ypg = typeof ref.yellowPerGame === 'number' ? ref.yellowPerGame : null;
+      const rpg = typeof ref.redPerGame === 'number' ? ref.redPerGame : null;
       const g = ref.games || 0;
       if (ypg != null && g >= 5) {
         let tier = null;  // 'strict' | 'lenient' | null
@@ -3993,15 +4072,52 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T18:35:28.506209Z","today":"
           const delta = tier === 'strict' ? -0.03 : 0.02;
           poi.lamH += delta;
           poi.lamA += delta;
-          refStats = { name: ref.name, yellowPerGame: ypg, games: g, tier };
-        } else {
-          // Still expose the referee info (no nudge) so the UI can mention it.
-          refStats = { name: ref.name, yellowPerGame: ypg, games: g, tier: 'neutral' };
         }
+        // Red-card axis (independent). >0.10 reds/game ≈ -0.02 lam each side.
+        // Cap at -0.04 (extreme refs > 0.20 reds/game).
+        let redDelta = 0;
+        if (rpg != null && rpg > 0.10) {
+          redDelta = -Math.min(0.04, (rpg - 0.10) * 0.4);
+          poi.lamH += redDelta;
+          poi.lamA += redDelta;
+        }
+        refStats = {
+          name: ref.name,
+          yellowPerGame: ypg,
+          redPerGame: rpg,
+          games: g,
+          tier: tier || 'neutral',
+          redDelta: redDelta < 0 ? Math.round(redDelta * 1000) / 1000 : 0,
+        };
       }
     }
     // Home/Road record split (non-football only: basket/hockey/etc.)
     const hrComp = homeRoadComponent(match);
+
+    // v30 — Lineup confirmation signal. Foot-only. Confirmed lineups land
+    // ~30 min before kickoff and resolve a lot of ambiguity (rotated XI?
+    // key player benched? formation shift?). When both sides confirmed,
+    // reliability gets a small bump; when only predicted, a penalty.
+    // Hoisted here (before reasons builder + reliability calc) so it's
+    // visible to both — TDZ is a real foot-gun in this IIFE.
+    let lineupBoost = 0;
+    let lineupStats = null;
+    if (match.sport === 'football') {
+      const luH = home && home.lineup;
+      const luA = away && away.lineup;
+      if (luH || luA) {
+        const hConf = !!(luH && luH.confirmed);
+        const aConf = !!(luA && luA.confirmed);
+        if (hConf && aConf) lineupBoost = 0.025;       // both confirmed
+        else if (hConf || aConf) lineupBoost = 0.012;  // one confirmed
+        else lineupBoost = -0.010;                      // both predicted only
+        lineupStats = {
+          homeConfirmed: hConf,
+          awayConfirmed: aConf,
+          boost: Math.round(lineupBoost * 1000) / 1000,
+        };
+      }
+    }
 
     // H2H component — last 3-6 meetings. Direction: which team has won
     // more recent encounters between these two teams.
@@ -4133,6 +4249,13 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T18:35:28.506209Z","today":"
         const scale = Math.abs(formNudge) > 0.03 ? 0.9 : 0.6;
         final.pH += formNudge * scale;
         final.pA -= formNudge * scale;
+      }
+      // v30 — Momentum nudge (direction on top of level). Stacks with form
+      // because they measure different things: form = avg of last 5,
+      // momentum = trend within last 5.
+      if (momentumNudge != null) {
+        final.pH += momentumNudge;
+        final.pA -= momentumNudge;
       }
       // Goal-differential nudge — stacks with formNudge but capped modestly.
       if (gdNudge != null) {
@@ -4323,20 +4446,25 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T18:35:28.506209Z","today":"
     // Referee — surface when strict/lenient (nudge applied) OR when
     // neutral but we have the name (informative only).
     if (refStats) {
-      const ypgTxt = refStats.yellowPerGame != null
-        ? `${refStats.yellowPerGame.toFixed(1)} jaunes/match`
-        : '';
+      const bits = [];
+      if (refStats.yellowPerGame != null) bits.push(`${refStats.yellowPerGame.toFixed(1)} jaunes/m`);
+      if (refStats.redPerGame != null && refStats.redPerGame > 0.05) bits.push(`${refStats.redPerGame.toFixed(2)} rouges/m`);
       let label = '';
       if (refStats.tier === 'strict') label = 'Arbitre sévère';
       else if (refStats.tier === 'lenient') label = 'Arbitre laxiste';
       else label = 'Arbitre';
+      // v30 — flag the red-card axis if it dragged xG: redDelta < 0 means
+      // the ref's red-card frequency cost ~lam goals on each side.
+      const redFlag = refStats.redDelta && refStats.redDelta < 0
+        ? ` — rouges fréquents → buts attendus ↓`
+        : '';
       reasons.push({
         type: 'referee',
         icon: '🟨',
-        text: `${label} : ${refStats.name}${ypgTxt ? ` (${ypgTxt})` : ''}`
+        text: `${label} : ${refStats.name}${bits.length ? ` (${bits.join(', ')})` : ''}${redFlag}`
       });
     }
-    // Weather — significant rain/wind detected, total goals nudged down.
+    // Weather — significant rain/wind/cold detected, total goals nudged down.
     if (weatherStats) {
       const bits = [];
       if (typeof weatherStats.precip === 'number' && weatherStats.precip > 1) {
@@ -4345,10 +4473,16 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T18:35:28.506209Z","today":"
       if (typeof weatherStats.wind === 'number' && weatherStats.wind > 20) {
         bits.push(`vent ${Math.round(weatherStats.wind)}km/h`);
       }
+      if (typeof weatherStats.temp === 'number' && weatherStats.temp < 5) {
+        bits.push(`${weatherStats.temp.toFixed(0)}°C`);
+      }
       if (bits.length) {
+        const icon = weatherStats.dominant === 'cold' ? '🥶'
+                   : weatherStats.dominant === 'wind' ? '💨'
+                   : '🌧️';
         reasons.push({
           type: 'weather',
-          icon: weatherStats.rain ? '🌧️' : '💨',
+          icon,
           text: `Météo ${weatherStats.city || ''}${weatherStats.city ? ' : ' : ''}${bits.join(', ')} — xG réduits`
         });
       }
@@ -4383,6 +4517,49 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T18:35:28.506209Z","today":"
         icon: '🏠',
         text: `Split domicile/extérieur favorise ${hrComp.pH > hrComp.pA ? (home?.short || home?.name) : (away?.short || away?.name)}`
       });
+    }
+    // v30 — Form momentum (last-3 vs last-5). Surface only when the trend
+    // is meaningful (≥0.10 absolute delta) so we don't add noise.
+    if (momentumStats && Math.abs(momentumStats.diff) >= 0.10) {
+      const heating = momentumStats.diff > 0
+        ? (home?.short || home?.name)
+        : (away?.short || away?.name);
+      reasons.push({
+        type: 'momentum',
+        icon: '📈',
+        text: `Dynamique en hausse pour ${heating} (3 derniers > 5 derniers)`
+      });
+    }
+    // v30 — Defensive quality / attacking drought (cleans + failed_to_score).
+    // Surface when one side's defense or one side's attack stands out
+    // enough to actually scale lamH or lamA.
+    if (cleanSheetStats) {
+      const reasonsCS = [];
+      if (cleanSheetStats.homeCleans >= 3) reasonsCS.push(`${home?.short || home?.name} : ${cleanSheetStats.homeCleans} clean sheets/5`);
+      if (cleanSheetStats.awayCleans >= 3) reasonsCS.push(`${away?.short || away?.name} : ${cleanSheetStats.awayCleans} clean sheets/5`);
+      if (cleanSheetStats.homeFailed >= 3) reasonsCS.push(`${home?.short || home?.name} muets ${cleanSheetStats.homeFailed}/5`);
+      if (cleanSheetStats.awayFailed >= 3) reasonsCS.push(`${away?.short || away?.name} muets ${cleanSheetStats.awayFailed}/5`);
+      if (reasonsCS.length) {
+        reasons.push({
+          type: 'cleansheets',
+          icon: '🛡️',
+          text: `Profil défense/attaque : ${reasonsCS.join(' · ')} — buts attendus ajustés`
+        });
+      }
+    }
+    // v30 — Lineup confirmation (foot only). Confirmé = signal frais,
+    // predicted = doute, absent sur top-5 = pénalité subtile.
+    if (lineupStats) {
+      let txt = '';
+      if (lineupStats.homeConfirmed && lineupStats.awayConfirmed) {
+        txt = 'Compositions confirmées des deux côtés — fiabilité accrue';
+      } else if (lineupStats.homeConfirmed || lineupStats.awayConfirmed) {
+        const which = lineupStats.homeConfirmed ? (home?.short || home?.name) : (away?.short || away?.name);
+        txt = `Composition confirmée pour ${which}`;
+      } else {
+        txt = 'Compositions encore prédictives — incertitude résiduelle';
+      }
+      reasons.push({ type: 'lineup', icon: '📋', text: txt });
     }
     // Injuries — quantify the model impact so Théo can audit why a pick shifted.
     // Reuses the same formula as the combine step: shift = min(0.06, 0.015·(injH−injA)).
@@ -4469,6 +4646,13 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T18:35:28.506209Z","today":"
       const blend = 0.70 * agreement + 0.30 * richness;
       const boost = 0.85 + 0.23 * blend;
       let rawReliability = Math.max(0.25, Math.min(0.98, pickProbVal * boost));
+      // v30 — Apply lineup confirmation bump *before* calibration so the
+      // calibration diagram sees a coherent reliability distribution
+      // (otherwise we'd ship the boost downstream of the historic mapping
+      // and overshoot at the high end).
+      if (lineupBoost) {
+        rawReliability = Math.max(0.25, Math.min(0.98, rawReliability + lineupBoost));
+      }
       // Chantier F calibration — remap raw reliability to historical observed
       // WR using the live reliability diagram. Prevents systematic over/under-
       // confidence. Returns raw value unchanged if calibration data is thin.
@@ -4482,6 +4666,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T18:35:28.506209Z","today":"
         boost: Math.round(boost * 1000) / 1000,
         rawReliability: Math.round(rawReliability * 1000) / 1000,
         calibrated: Math.abs(calibrated - rawReliability) > 0.005,
+        lineupBoost: lineupBoost ? Math.round(lineupBoost * 1000) / 1000 : 0,
       };
     }
 
@@ -4572,8 +4757,11 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T18:35:28.506209Z","today":"
       })(),
       elo: eloStats,  // { home, away, diff } — surfaced on the match modal
       congestion: congestionStats,  // { home, away } — match count in ±7d window
-      weather: weatherStats,  // { precip, wind, penalty, rain, city } or null
-      referee: refStats,  // { name, yellowPerGame, games, tier } or null
+      weather: weatherStats,  // { precip, wind, temp, penalty, dominant, city } or null
+      referee: refStats,  // { name, yellowPerGame, redPerGame, games, tier, redDelta } or null
+      momentum: momentumStats,  // { home, away, diff } trend in form L3 vs L5
+      cleanSheets: cleanSheetStats,  // { homeCleans, awayCleans, lamHscale, lamAscale } or null
+      lineup: lineupStats,  // { homeConfirmed, awayConfirmed, boost } or null
       explain: { headline, reasons }
     };
   }
