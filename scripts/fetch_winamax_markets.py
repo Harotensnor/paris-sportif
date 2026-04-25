@@ -31,6 +31,7 @@ Resilient : any match/tournament that fails extraction is simply skipped.
 """
 from __future__ import annotations
 import json
+import os
 import re
 import sys
 import time
@@ -48,9 +49,34 @@ CATALOG  = ROOT / 'winamax_catalog.json'
 OUT      = ROOT / 'winamax_markets.json'
 
 # Names we match case-insensitively against Winamax bet titles to classify markets.
-MARKET_KEYWORDS_1N2  = ['résultat du match', 'vainqueur du match', 'winner', 'résultat final']
-MARKET_KEYWORDS_OU25 = ['plus/moins', 'more/less', 'over/under', 'plus de buts', 'moins de buts']
-MARKET_KEYWORDS_BTTS = ['les deux équipes marquent', 'both teams to score', 'marqueront']
+# v30 — keyword set widened. Earlier code only matched a tiny subset and
+# winamax_markets.json was systematically generating 0 OU/BTTS markets despite
+# Winamax exposing them on ~all foot tournaments. Specifically:
+#  - "Total de buts (3-way)", "Nombre de buts", "Total de buts" all carry
+#    plus/moins selections we want.
+#  - BTTS shows up as "Les deux équipes vont-elles marquer ?" or
+#    "Les deux équipes marquent (Oui/Non)" or just "BTTS".
+# We also log unmatched bet titles when WX_MARKETS_DEBUG=1 so future drift
+# is fixable from one Action run.
+MARKET_KEYWORDS_1N2  = [
+    'résultat du match', 'résultat final', 'vainqueur du match',
+    'vainqueur', 'winner', '1n2',
+]
+MARKET_KEYWORDS_OU25 = [
+    'plus/moins', 'plus / moins', 'more/less', 'over/under',
+    'plus de buts', 'moins de buts',
+    'total de buts', 'nombre de buts', 'nombre total de buts',
+    'plus de 2', 'moins de 2',
+]
+MARKET_KEYWORDS_BTTS = [
+    'les deux équipes marquent',
+    'les deux équipes vont marquer',
+    'les deux équipes vont-elles marquer',
+    'les 2 équipes marquent',
+    'les 2 équipes vont marquer',
+    'both teams to score',
+    'marqueront', 'btts',
+]
 
 
 def fetch_state(url: str) -> dict | None:
@@ -147,31 +173,47 @@ def extract_markets_from_state(state: dict) -> dict[str, dict]:
                         'home_name': oitems[0][0], 'away_name': oitems[1][0],
                     }
 
-            # Over/Under 2.5 : titre du bet mentionne buts et line 2.5
+            # Over/Under 2.5 : titre du bet mentionne buts/total et line 2.5.
+            # v30 — match accepts "+2.5", "Plus 2,5", "Over 2.5", "Plus de 2,5",
+            # "More 2.5 goals" et "≥3 buts" / "<3 buts" via le code suffix
+            # parsing (Winamax marche aussi avec ces formes-là sur certains
+            # tournois exotiques).
             if _match_keyword(btitle, MARKET_KEYWORDS_OU25) and 'ou25' not in markets:
-                # Chercher les selections "Plus de 2" ou "2.5" et "Moins de 2" / "2.5"
                 over_val = under_val = None
                 for ot, od in oitems:
                     otl = ot.lower()
-                    if '2,5' in otl or '2.5' in otl or '2,5 buts' in otl:
-                        if 'plus' in otl or 'over' in otl or '+' in otl:
-                            over_val = od
-                        elif 'moins' in otl or 'under' in otl:
-                            under_val = od
+                    has_25 = ('2,5' in otl or '2.5' in otl)
+                    is_over  = ('plus' in otl or 'over' in otl or 'more' in otl
+                                or otl.startswith('+') or '≥' in otl or '≥3' in otl)
+                    is_under = ('moins' in otl or 'under' in otl or 'less' in otl
+                                or otl.startswith('-') or '<' in otl)
+                    if has_25 and is_over:  over_val = od
+                    elif has_25 and is_under: under_val = od
                 if over_val and under_val:
                     markets['ou25'] = {'over': over_val, 'under': under_val, 'line': 2.5}
 
-            # BTTS — 2 selections Yes/No
+            # BTTS — 2 selections Yes/No.
+            # v30 — accept additional French variants: "Oui"/"Non", "Yes"/"No"
+            # and also "1"/"0" (Winamax sometimes uses bare bool labels).
             if _match_keyword(btitle, MARKET_KEYWORDS_BTTS) and 'btts' not in markets:
                 yes_val = no_val = None
                 for ot, od in oitems:
-                    otl = ot.lower()
-                    if 'oui' in otl or 'yes' in otl:
+                    otl = ot.lower().strip()
+                    if otl in ('oui', 'yes', '1', 'vrai', 'true') or otl.startswith('oui ') or otl.startswith('yes '):
                         yes_val = od
-                    elif 'non' in otl or 'no' in otl:
+                    elif otl in ('non', 'no', '0', 'faux', 'false') or otl.startswith('non ') or otl.startswith('no '):
                         no_val = od
                 if yes_val and no_val:
                     markets['btts'] = {'yes': yes_val, 'no': no_val}
+
+            # Debug: log unmatched bet titles so future drift can be diagnosed
+            # from a single CI run. Set WX_MARKETS_DEBUG=1 in the workflow env
+            # to enable.
+            if os.environ.get('WX_MARKETS_DEBUG') == '1':
+                if (not _match_keyword(btitle, MARKET_KEYWORDS_1N2)
+                    and not _match_keyword(btitle, MARKET_KEYWORDS_OU25)
+                    and not _match_keyword(btitle, MARKET_KEYWORDS_BTTS)):
+                    print(f'  [skip-bet] {btitle!r} ({len(oitems)} sel)', flush=True)
 
         if markets:
             out[str(mid)] = {

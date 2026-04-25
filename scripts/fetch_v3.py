@@ -112,7 +112,13 @@ OTHER_LEAGUES = [
     ('hockey', 'nhl', 'NHL', 'Am. Nord', 5),
     ('hockey', 'mens-college-hockey', 'NCAA Hockey M.', 'États-Unis', 2),
     ('hockey', 'womens-college-hockey', 'NCAA Hockey F.', 'États-Unis', 1),
-    # baseball intentionally removed (user doesn't bet it)
+    # v30 — baseball restored: Winamax exposes 3 baseball tournaments
+    # (~28 matches) but without ESPN context the model can't price them
+    # → no edge surfaces. Adding ESPN MLB/MiLB unlocks the catalog match
+    # so baseball matchups get a 1n2 prediction and join the pool of
+    # parisable events.
+    ('baseball', 'mlb', 'MLB', 'États-Unis', 4),
+    ('baseball', 'milb', 'MiLB', 'États-Unis', 1),
     ('football', 'nfl', 'NFL', 'États-Unis', 5),
     ('football', 'college-football', 'NCAAF', 'États-Unis', 3),
     ('mma', 'ufc', 'UFC', 'International', 4),
