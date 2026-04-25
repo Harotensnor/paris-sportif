@@ -7775,6 +7775,17 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
     const m = document.getElementById('detail-modal');
     m.classList.remove('open');
     m.setAttribute('aria-hidden', 'true');
+    // v30 — Si l'URL contient ?match=<id> (modale ouverte via lien partagé),
+    // on nettoie le param au close pour que l'URL reflète l'état actuel.
+    // Évite que l'utilisateur partage une URL "stale" qui s'auto-ouvrira
+    // une modale au refresh.
+    try {
+      const url = new URL(location.href);
+      if (url.searchParams.has('match')) {
+        url.searchParams.delete('match');
+        history.replaceState(null, '', url.pathname + (url.search ? url.search : '') + url.hash);
+      }
+    } catch(e) {}
   };
   // v30 — Expose openDetail / closeDetailModal sur window pour permettre
   // aux scripts séparés (enhancements v20 / restoreShared) d'y accéder.
