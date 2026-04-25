@@ -303,3 +303,47 @@ test.describe('Health indicator', () => {
     }).toMatch(/Pipeline|sant|chargement|indisponible/i);
   });
 });
+
+test.describe('Custom modals (replace prompt/confirm)', () => {
+  test('_showStakePrompt opens with quick presets and resolves on Valider', async ({ page }) => {
+    await page.goto(URL);
+    await page.waitForFunction(() => typeof window._showStakePrompt === 'function');
+    // Trigger modal
+    const valuePromise = page.evaluate(() => window._showStakePrompt('5', 'Test mise'));
+    const modal = page.locator('#__stake-prompt-modal');
+    await expect(modal).toBeVisible();
+    // Quick preset 10€
+    await modal.locator('[data-quick="10"]').click();
+    await expect(modal.locator('#__stake-input')).toHaveValue('10');
+    // Click valider
+    await modal.locator('#__stake-ok').click();
+    expect(await valuePromise).toBe('10');
+  });
+
+  test('_showConfirm danger style + cancel returns false', async ({ page }) => {
+    await page.goto(URL);
+    await page.waitForFunction(() => typeof window._showConfirm === 'function');
+    const valuePromise = page.evaluate(() => window._showConfirm({
+      title: 'Test',
+      body: 'Body',
+      confirmLabel: 'Yes',
+      cancelLabel: 'No',
+      danger: true,
+    }));
+    const modal = page.locator('#__confirm-modal');
+    await expect(modal).toBeVisible();
+    await expect(modal.locator('#__confirm-ok')).toContainText('Yes');
+    // Click cancel
+    await modal.locator('#__confirm-cancel').click();
+    expect(await valuePromise).toBe(false);
+  });
+
+  test('_showConfirm Escape key resolves false', async ({ page }) => {
+    await page.goto(URL);
+    await page.waitForFunction(() => typeof window._showConfirm === 'function');
+    const valuePromise = page.evaluate(() => window._showConfirm({ title: 'Test', body: 'Body' }));
+    await expect(page.locator('#__confirm-modal')).toBeVisible();
+    await page.keyboard.press('Escape');
+    expect(await valuePromise).toBe(false);
+  });
+});
