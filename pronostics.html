@@ -14269,9 +14269,14 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
         byStatus[bet.status].push({ key, bet });
       }
       if (bet.status !== 'en cours') {
-        totalStaked += bet.stake || 0;
+        // FIX : si bet.stake = 'abc' (string corrompu), 'abc' || 0 retourne
+        // 'abc' (truthy) → totalStaked = 0 + 'abc' = '0abc' string concat
+        // → roi calculation casse silencieusement. Forcer Number coerce.
+        const _stake = Number(bet.stake) || 0;
+        const _odds = Number(bet.odds) || Number(bet.odd) || 0;
+        totalStaked += _stake;
         if (bet.status === 'gagné') {
-          totalReturned += (bet.stake || 0) * (bet.odds || 0);
+          totalReturned += _stake * _odds;
         }
       }
     });
