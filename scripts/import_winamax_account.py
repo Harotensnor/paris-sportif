@@ -540,6 +540,100 @@ def _summarize(bets: list[dict], model_start_iso: str | None) -> dict:
     return summary
 
 
+def _refresh_cookie_jar(sess):
+    """Apres chaque requete, le serveur Winamax renvoie de nouveaux cookies
+    (Set-Cookie headers, ex AWSALB qui rotation 24h, PHPSESSIONID rafraichi
+    server-side). curl_cffi met automatiquement à jour sess.cookies. On
+    sérialise cet état frais dans .winamax_session pour que la prochaine
+    exécution réutilise les cookies les plus à jour. Résultat : tant que
+    le script tourne >= 1x par 30 jours, la session ne meurt jamais."""
+    pairs = []
+    seen_names = set()  # Garder le 1er trouvé par nom (le serveur peut renvoyer doublons par sous-domaine)
+    # curl_cffi expose le sous-jacent http.cookiejar.CookieJar via .jar
+    jar = getattr(sess.cookies, 'jar', None) or sess.cookies
+    for c in jar:
+        domain = getattr(c, 'domain', '') or ''
+        if not domain.endswith('winamax.fr'):
+            continue
+        name = getattr(c, 'name', '') or ''
+        value = getattr(c, 'value', '') or ''
+        if not name or value is None:
+            continue
+        if name in seen_names:
+            continue
+        seen_names.add(name)
+        pairs.append(f'{name}={value}')
+    if pairs:
+        new_header = '; '.join(pairs)
+        try:
+            COOKIE_FILE.write_text(new_header, encoding='utf-8')
+            print(f'  cookie jar refreshed -> .winamax_session ({len(pairs)} cookies, {len(new_header)} chars)', flush=True)
+        except Exception as e:
+            print(f'  warn cookie persist: {e}', flush=True)
+
+
+def _auto_commit_push(repo_root: Path):
+    """Apres import reussi, commit + push winamax_my_bets.json sur la branche
+    courante (qui est aussi la deploy branch GitHub Pages). Le serveur
+    GitHub Pages se reconstruit automatiquement (~1 min) et la section
+    'Mes paris Winamax' du Bilan reflete les derniers chiffres.
+
+    Idempotent : si le fichier n'a pas change (pas de nouveaux paris depuis
+    le dernier run), on skip silencieusement."""
+    import subprocess
+    try:
+        # 1. Stage
+        rc = subprocess.run(['git', '-C', str(repo_root), 'add', 'winamax_my_bets.json'],
+                            capture_output=True, timeout=10).returncode
+        if rc != 0:
+            print('  git add failed', flush=True)
+            return
+
+        # 2. Check if there's actually a diff staged
+        diff = subprocess.run(['git', '-C', str(repo_root), 'diff', '--cached', '--quiet', '--', 'winamax_my_bets.json'],
+                              capture_output=True, timeout=10)
+        if diff.returncode == 0:
+            # Aucun changement — paris identiques au commit précédent
+            print('  no change in winamax_my_bets.json, skip commit', flush=True)
+            return
+
+        # 3. Commit. On utilise --no-verify pour bypass les hooks (pas de
+        # tests/lint nécessaires sur un fichier de données).
+        ts = datetime.now().strftime('%Y-%m-%d %H:%M')
+        msg = f'data: winamax bets auto-refresh {ts}'
+        rc = subprocess.run(['git', '-C', str(repo_root), 'commit', '-m', msg],
+                            capture_output=True, timeout=15).returncode
+        if rc != 0:
+            print(f'  git commit failed (rc={rc})', flush=True)
+            return
+        print(f'  ✓ committed: {msg}', flush=True)
+
+        # 4. Push. On utilise `push origin HEAD` qui pousse vers une branche
+        # remote du même nom que la branche locale (sans dépendre de l'upstream
+        # config qui peut être tordue dans un worktree). Si quelqu'un d'autre
+        # a push entre-temps (peu probable car seul ce script touche le
+        # fichier), on tente un pull --rebase avant retry.
+        push = subprocess.run(['git', '-C', str(repo_root), 'push', 'origin', 'HEAD'],
+                              capture_output=True, timeout=30)
+        if push.returncode == 0:
+            print('  ✓ pushed to origin', flush=True)
+            return
+        # Retry après pull
+        print(f'  push failed once ({push.stderr.decode("utf-8", errors="ignore")[:120]}), retry after pull --rebase…', flush=True)
+        subprocess.run(['git', '-C', str(repo_root), 'pull', '--rebase', 'origin', 'HEAD'],
+                       capture_output=True, timeout=30)
+        push2 = subprocess.run(['git', '-C', str(repo_root), 'push', 'origin', 'HEAD'],
+                               capture_output=True, timeout=30)
+        if push2.returncode == 0:
+            print('  ✓ pushed to origin (after rebase)', flush=True)
+        else:
+            print(f'  ✗ push still failed: {push2.stderr.decode("utf-8", errors="ignore")[:200]}', flush=True)
+    except subprocess.TimeoutExpired:
+        print('  auto-push timeout', flush=True)
+    except Exception as e:
+        print(f'  auto-push err: {e}', flush=True)
+
+
 def main():
     _setup_logging()
     t0 = time.time()
@@ -608,6 +702,17 @@ def main():
         'summary': summary,
     }
     OUT_BETS.write_text(json.dumps(out, ensure_ascii=False, indent=2), encoding='utf-8')
+
+    # v30 — Persiste les cookies frais retournés par le serveur Winamax
+    # (chaque requête refresh la session côté serveur, AWSALB rotate 24h,
+    # etc.). Tant que ce script tourne 6h auto, la session reste vivante
+    # indéfiniment sans intervention manuelle.
+    _refresh_cookie_jar(sess)
+
+    # v30 — Auto-commit + push sur GitHub. Le site déployé reflète les
+    # derniers paris dans la minute. Skip si aucun changement.
+    if deduped:
+        _auto_commit_push(ROOT)
 
     elapsed = time.time() - t0
     print(f'[winamax_import] [{datetime.now():%H:%M:%S}] done in {elapsed:.1f}s', flush=True)
