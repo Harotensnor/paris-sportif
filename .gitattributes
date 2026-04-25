@@ -1,0 +1,19 @@
+# Force LF endings for all text files. The repo's local git config has
+# `core.autocrlf=false` while the global is `true`, so contributors on
+# Windows otherwise get CRLF in working tree → giant phantom diffs whenever
+# auto_refresh.py rewrites pronostics.html/data.js. This file removes that
+# entire class of bug.
+* text=auto eol=lf
+
+# Binary lockdown : never normalize EOL on these
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.webp binary
+*.ico  binary
+*.pdf  binary
+*.zip  binary
+*.gz   binary
+*.woff binary
+*.woff2 binary

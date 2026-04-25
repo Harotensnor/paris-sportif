@@ -109,6 +109,10 @@ jobs:
           # Patch referees last (survives all prior rewrites). Adds
           # ev.referee to each top-5 soccer event. ~0.1s.
           python3 patch_referees_soccer.py || true
+          # Build health.json — compact pipeline status snapshot. Visible at
+          # https://harotensnor.github.io/paris-sportif/health.json so we can
+          # spot stale/missing sources without scraping the workflow logs.
+          python3 build_health.py || true
 
       - name: Stamp sw.js CACHE_VERSION
         # Bumps the service worker cache key on every deploy, so browsers fetch
@@ -125,7 +129,7 @@ jobs:
           git add data.js pronostics.html odds_history.jsonl \
                   injuries_soccer.json winamax_catalog.json winamax_markets.json team_stats.json \
                   lineups_soccer.json clubelo.json weather.json \
-                  weather_geo_cache.json referees_soccer.json 2>/dev/null || true
+                  weather_geo_cache.json referees_soccer.json health.json 2>/dev/null || true
           # Only stamp sw.js if we have real content changes — otherwise
           # discard the version bump to avoid 288 empty commits/day.
           if git diff --cached --quiet; then

@@ -83,6 +83,8 @@ PATCH_STAGES = [
     ('patch_clubelo.py',            1,   30),
     ('patch_weather.py',            1,   30),
     ('patch_referees_soccer.py',    1,   30),
+    # Pipeline status snapshot (health.json) — runs every tick, cheap.
+    ('build_health.py',             1,   15),
 ]
 
 
