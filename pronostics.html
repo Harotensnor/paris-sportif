@@ -1404,6 +1404,67 @@
     }
   }
 
+  /* v30 — Footer site */
+  .site-footer {
+    margin-top: 60px;
+    padding: 24px 0 32px;
+    border-top: 1px solid var(--border);
+    background: rgba(0,0,0,.02);
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+  .footer-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px 28px;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .footer-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-2);
+    font-weight: 600;
+  }
+  .footer-logo { font-size: 16px; }
+  .footer-version {
+    font-size: 10.5px; opacity: .55; font-weight: 500;
+    padding: 2px 6px; border-radius: 4px;
+    background: var(--panel); border: 1px solid var(--border);
+  }
+  .footer-links {
+    display: inline-flex;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+  .footer-link {
+    color: var(--text-dim);
+    text-decoration: none;
+    background: none; border: none; padding: 0; cursor: pointer;
+    font: inherit; font-size: 12px;
+    transition: color .15s;
+  }
+  .footer-link:hover, .footer-link:focus-visible { color: var(--brand); }
+  .footer-meta {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-end;
+    font-size: 11px;
+    color: var(--text-dim2);
+  }
+  .footer-meta-item { line-height: 1.3; }
+  @media (max-width: 720px) {
+    .footer-inner { justify-content: flex-start; }
+    .footer-meta { align-items: flex-start; }
+    .footer-links { gap: 14px; font-size: 12.5px; }
+  }
+
   /* --- Hamburger mobile --- */
   .topbar-menu {
     display: none;
@@ -2524,6 +2585,30 @@
       <div id="content-racing"></div>
     </section>
   </main>
+
+  <!-- v30 — Footer discret en bas de chaque page -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <span class="footer-logo">🎯</span>
+        <span class="footer-text">Paris-Sportif</span>
+        <span class="footer-version" id="footer-version">v30</span>
+      </div>
+      <nav class="footer-links" aria-label="Liens du site">
+        <a href="https://github.com/Harotensnor/paris-sportif" target="_blank" rel="noopener" class="footer-link" title="Code source sur GitHub">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="vertical-align:middle;margin-right:4px;"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+          GitHub
+        </a>
+        <button type="button" class="footer-link" data-page-link="credibilite" title="Comment fonctionne le modèle">📊 Méthode</button>
+        <button type="button" class="footer-link" data-page-link="academie" title="Glossaire et explications">📖 Académie</button>
+        <button type="button" class="footer-link" data-page-link="backtest" title="Performance vérifiable du modèle">📈 Backtest</button>
+      </nav>
+      <div class="footer-meta">
+        <span class="footer-meta-item" id="footer-last-update" title="Dernière actualisation des données">📅 —</span>
+        <span class="footer-meta-item">⚖️ Site éducatif · 18+ · jouer comporte des risques</span>
+      </div>
+    </div>
+  </footer>
 </div>
 
 <div class="modal-backdrop" id="detail-modal" role="dialog" aria-modal="true" aria-labelledby="detail-title" aria-hidden="true">
@@ -7655,6 +7740,10 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
         // v30 — Refresh health indicator après chaque data refresh (cohérence)
         if (typeof window._refreshHealthIndicator === 'function') {
           window._refreshHealthIndicator();
+        }
+        // v30 — Refresh footer last-update label
+        if (typeof window._updateFooterLastUpdate === 'function') {
+          window._updateFooterLastUpdate();
         }
         render();
         updateFreshness();
@@ -15712,6 +15801,37 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); brandBtn.click(); }
       });
     }
+    // v30 — Footer page-link buttons → navigate to corresponding page
+    document.querySelectorAll('.footer-link[data-page-link]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.pageLink;
+        if (!target) return;
+        const navBtn = document.querySelector(`.page-btn[data-page="${target}"]`);
+        if (navBtn) navBtn.click();
+        try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch(e){}
+      });
+    });
+    // v30 — Footer "Last update" timestamp from data.generated_at
+    function _updateFooterLastUpdate() {
+      const el = document.getElementById('footer-last-update');
+      if (!el) return;
+      const data = window.PRONOSTICS_DATA;
+      if (!data || !data.generated_at) {
+        el.textContent = '📅 —';
+        return;
+      }
+      const ts = new Date(data.generated_at).getTime();
+      const ageMin = Math.max(0, Math.round((Date.now() - ts) / 60000));
+      const lbl = ageMin < 1 ? 'à l\'instant'
+                : ageMin < 60 ? `il y a ${ageMin} min`
+                : ageMin < 24*60 ? `il y a ${Math.round(ageMin/60)} h`
+                : `il y a ${Math.round(ageMin/(24*60))} j`;
+      el.textContent = `📅 Données ${lbl}`;
+      el.title = `Dernière actualisation : ${new Date(data.generated_at).toLocaleString('fr-FR')}`;
+    }
+    _updateFooterLastUpdate();
+    setInterval(_updateFooterLastUpdate, 60 * 1000);   // refresh label every min
+    window._updateFooterLastUpdate = _updateFooterLastUpdate;
 
     // Keyboard shortcuts: /, ←/→, 1-9, B
     document.addEventListener('keydown', (e) => {
