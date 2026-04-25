@@ -15616,24 +15616,40 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T13:01:48.719549Z","today":"
   // ============================================================
   function _renderWinamaxImportSetup() {
     return `
-      <div style="padding:18px 22px;background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--brand);border-radius:0 10px 10px 0;">
+      <div style="padding:22px;background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--brand);border-radius:0 12px 12px 0;">
         <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;margin-bottom:8px;">🎯 Mes paris Winamax</div>
-        <h3 style="margin:0 0 10px;font-size:18px;font-weight:700;color:var(--text);">Importer ton historique pour alimenter le bilan</h3>
-        <div style="font-size:13px;color:var(--text-2);line-height:1.55;margin-bottom:12px;">
-          <p style="margin:0 0 8px;">Pour que le bilan reflète <b>tes vrais paris</b> (mises, gains, ROI réel), un script local va chercher l'historique sur ton compte Winamax.</p>
-          <p style="margin:0 0 8px;color:var(--text-dim);"><b>Procédure (one-shot, ~2 min)</b> :</p>
-          <ol style="margin:0;padding-left:22px;color:var(--text-dim);">
-            <li>Connecte-toi sur <a href="https://www.winamax.fr" target="_blank" rel="noopener" style="color:var(--brand);">winamax.fr</a> dans ton navigateur.</li>
-            <li>F12 → onglet <b>Application</b> → <b>Cookies</b> → <code>https://www.winamax.fr</code>.</li>
-            <li>Copie la valeur du cookie <code>API_SESS</code> (ou <code>PHPSESSID</code>).</li>
-            <li>Colle-la dans un fichier <code>.winamax_session</code> à la racine du projet.</li>
-            <li>Lance : <code>python scripts/import_winamax_account.py</code></li>
-            <li>Recharge cette page → tes paris s'affichent ici.</li>
+        <h3 style="margin:0 0 10px;font-size:20px;font-weight:800;color:var(--text);">Activer l'import auto pour alimenter le bilan</h3>
+        <div style="font-size:13.5px;color:var(--text-2);line-height:1.6;margin-bottom:14px;">
+          Le script local va chercher l'historique sur ton compte Winamax (mises, gains, paris en cours, combinés) toutes les 6h, puis remplit cette page avec tes <b>vraies</b> stats — pas juste la simulation modèle.
+        </div>
+
+        <!-- Setup AUTO recommandé -->
+        <div style="padding:14px 16px;background:var(--panel-2);border:1px solid var(--accent);border-radius:10px;margin-bottom:12px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <span style="font-size:18px;">⚡</span>
+            <div style="font-size:14px;color:var(--accent);font-weight:700;">Setup auto (recommandé · 1 click)</div>
+          </div>
+          <ol style="margin:0;padding-left:22px;color:var(--text-2);font-size:13px;line-height:1.7;">
+            <li>Connecte-toi sur <a href="https://www.winamax.fr" target="_blank" rel="noopener" style="color:var(--brand);">winamax.fr</a> dans ton navigateur (Chrome / Edge / Firefox).</li>
+            <li>Double-clique <code style="background:var(--panel);padding:2px 6px;border-radius:3px;">scripts\\setup_winamax_task.bat</code> → installe une tâche Windows qui tourne toutes les 6h.</li>
+            <li>Le script auto-extrait le cookie depuis Chrome (DPAPI), pas de copier-coller à faire.</li>
+            <li>Recharge cette page → tes paris apparaissent ici.</li>
           </ol>
         </div>
-        <div style="font-size:11.5px;color:var(--text-dim2);margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
-          ℹ️ <b>Privacy :</b> <code>winamax_my_bets.json</code> est dans <code>.gitignore</code>, donc tes paris restent en local — rien n'est commit / déployé.
-          Pour automatiser, tu peux planifier le script via le Planificateur de tâches Windows (toutes les 6h par exemple).
+
+        <!-- Setup MANUEL (fallback) -->
+        <details style="padding:12px 16px;background:var(--panel-2);border:1px solid var(--border-2);border-radius:10px;">
+          <summary style="cursor:pointer;font-size:13px;color:var(--text-dim);font-weight:600;user-select:none;">Si l'auto-extract ne marche pas → procédure manuelle (cookie collé à la main)</summary>
+          <ol style="margin:10px 0 0;padding-left:22px;color:var(--text-dim);font-size:12.5px;line-height:1.7;">
+            <li>F12 → onglet <b>Application</b> → <b>Cookies</b> → <code>https://www.winamax.fr</code>.</li>
+            <li>Copie la valeur du cookie <code>API_SESS</code> (ou <code>PHPSESSID</code>).</li>
+            <li>Crée <code>.winamax_session</code> à la racine du projet, colle la valeur.</li>
+            <li>Lance <code>python scripts/import_winamax_account.py</code></li>
+          </ol>
+        </details>
+
+        <div style="font-size:11.5px;color:var(--text-dim2);margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">
+          🔒 <b>Privacy :</b> <code>winamax_my_bets.json</code> + <code>.winamax_session</code> sont dans <code>.gitignore</code>. Tes paris restent en local, rien n'est commit / déployé sur GitHub Pages.
         </div>
       </div>
     `;
@@ -15750,7 +15766,12 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T13:01:48.719549Z","today":"
           <div>
             <div style="font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;margin-bottom:4px;">Mes paris Winamax · importés</div>
             <h2 style="margin:0;font-size:24px;font-weight:800;color:var(--text);letter-spacing:-.5px;">${bets.length} pari${bets.length>1?'s':''} suivis</h2>
-            <div style="font-size:12px;color:var(--text-dim);margin-top:3px;">Dernière synchro il y a ${ageLabel} · <code style="font-size:10px;background:var(--panel);padding:2px 5px;border-radius:3px;">python scripts/import_winamax_account.py</code> pour rafraîchir</div>
+            <div style="font-size:12px;color:var(--text-dim);margin-top:3px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <span>Dernière synchro il y a <b style="color:${ageMin != null && ageMin < 720 ? '#34d399' : ageMin != null && ageMin < 1440 ? '#fbbf24' : '#f87171'};">${ageLabel}</b></span>
+              ${doc.source ? `<span style="padding:1px 7px;background:rgba(167,139,250,.15);color:var(--brand);border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.4px;">${doc.source === 'chrome' ? '🤖 AUTO chrome' : doc.source === 'firefox' ? '🤖 AUTO firefox' : '✋ MANUEL'}</span>` : ''}
+              <span style="color:var(--text-dim2);">·</span>
+              <span style="color:var(--text-dim);">refresh: <code style="font-size:10px;background:var(--panel);padding:1px 5px;border-radius:3px;">python scripts/import_winamax_account.py</code></span>
+            </div>
           </div>
           ${modelStart ? `<div style="font-size:11px;color:var(--text-dim);background:rgba(167,139,250,.12);padding:5px 11px;border-radius:6px;border:1px solid rgba(167,139,250,.3);">Activation modèle : <b style="color:var(--brand);">${modelStart.slice(0,10)}</b></div>` : `<button id="set-model-start-btn" style="padding:6px 12px;font-size:12px;font-weight:600;background:var(--panel);color:var(--brand);border:1px solid var(--brand);border-radius:6px;cursor:pointer;">⚙️ Définir date activation modèle</button>`}
         </div>

@@ -17,7 +17,27 @@ est dans `.gitignore` donc jamais committé. Conséquence : la fonctionnalité
 **ne marche que sur localhost** (via `python serveur.py`), **pas** sur la
 version GitHub Pages.
 
-## Installation (one-shot, ~2 minutes)
+## ⚡ Setup auto recommandé (Windows · 1 click)
+
+Le scénario optimal sur Windows :
+
+1. **Connecte-toi sur [winamax.fr](https://www.winamax.fr)** dans Chrome / Edge / Firefox.
+2. **Double-clique** `scripts\setup_winamax_task.bat` (fichier dans le repo).
+3. Le script :
+   - Vérifie Python + installe `curl_cffi`, `beautifulsoup4`, `pywin32`, `pycryptodome` si absents.
+   - Lance un test (extraction auto du cookie depuis Chrome via DPAPI).
+   - Crée une **tâche planifiée Windows** qui tourne **toutes les 6h** (commence dans 2 min).
+4. **Recharge ton site localhost** → la section "Mes paris Winamax" affiche tout.
+
+Pour modifier la fréquence : `.\scripts\setup_winamax_task.ps1 -IntervalHours 12`
+Pour supprimer la tâche : `.\scripts\setup_winamax_task.ps1 -Remove`
+
+Voir l'état de la tâche : Win+R → `taskschd.msc` → "Paris-Sportif Winamax Import".
+Logs : `winamax_import.log` à la racine du projet.
+
+---
+
+## Installation manuelle (fallback · si l'auto-extract ne marche pas)
 
 ### 1. Connecte-toi sur Winamax dans ton navigateur
 
