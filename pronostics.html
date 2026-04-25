@@ -2407,8 +2407,12 @@
   .help-tooltip.show { opacity:1; transform:translateY(0); }
   .help-tooltip b { color:var(--text); }
 
-  /* === v22 theme toggle pills + onboarding === */
-  .theme-toggle { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  /* === v22 theme toggle pills + onboarding ===
+     Renommé en `.pref-pill-group` (v30) pour éviter la collision avec
+     `.theme-toggle` plus haut qui style les BOUTONS circulaires 32x32 de
+     la topbar. Le container Profil héritait silencieusement de width/height
+     32px → toutes les pills se chevauchaient dans une boîte minuscule. */
+  .pref-pill-group { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
   .theme-pill { display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:var(--r); border:1px solid var(--border-2); background:var(--panel); color:var(--text-2); cursor:pointer; font-weight:600; font-size:13px; transition:all .15s; }
   .theme-pill:hover { border-color:var(--brand-border); color:var(--text); }
   .theme-pill.active { background:var(--brand-soft); border-color:var(--brand-border); color:var(--brand); }
@@ -9348,25 +9352,32 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T17:40:27.179318Z","today":"
       try {
         const pred = predictMatch(m);
         if (!pred || !pred.pick || pred.skip) return null;
+        const best = (typeof _agentBestPick === 'function') ? _agentBestPick(m, pred) : null;
         const pk = pred.pick.key;
-        const odd = pred.odds && (pk === '1' ? pred.odds.home : pk === '2' ? pred.odds.away : pred.odds.draw);
+        const odd = best ? best.odd : (pred.odds && (pk === '1' ? pred.odds.home : pk === '2' ? pred.odds.away : pred.odds.draw));
         if (!odd) return null;
-        const rel = pred.reliability ?? pred.pick.prob;
+        const rel = best ? best.rel : (pred.reliability ?? pred.pick.prob);
         const ts = new Date(m.date).getTime();
         if (!isFinite(ts) || ts < nowMs) return null;
-        const edge = rel - 1 / odd;
-        return { m, pred, odd, rel, edge, ts };
+        const edge = best ? best.edge : (rel - 1 / odd);
+        return { m, pred, best, odd, rel, edge, ts };
       } catch (e) { return null; }
     }).filter(Boolean);
-    const _topInWin = (hours) => {
-      const cutoff = nowMs + hours * 3600 * 1000;
-      return upcomingWin.filter(x => x.ts <= cutoff)
-        .sort((a, b) => b.rel - a.rel)
+    // v30 — Fenêtres mutuellement exclusives + filtre edge>0 pour éviter les
+    // doublons d'un match dans 4h/12h/24h ET les picks no-value (Sabalenka @1.02
+    // sortait en "Top promo" parce que le tri était par confiance pure, sans
+    // tenir compte du fait qu'à @1.02 le marché est plus optimiste que nous).
+    const _topInWin = (hMin, hMax) => {
+      const lo = nowMs + hMin * 3600 * 1000;
+      const hi = nowMs + hMax * 3600 * 1000;
+      return upcomingWin
+        .filter(x => x.ts > lo && x.ts <= hi && x.edge > 0)
+        .sort((a, b) => b.edge - a.edge)
         .slice(0, 3);
     };
-    const topNext4h = _topInWin(4);
-    const topNext12h = _topInWin(12);
-    const topNext24h = _topInWin(24);
+    const topNext4h  = _topInWin(0, 4);
+    const topNext12h = _topInWin(4, 12);
+    const topNext24h = _topInWin(12, 24);
 
     // === Joueurs buteurs probables (prochaine 24h) ===
     // Utilise predictLikelyScorers (Poisson × position × lineup, exclut les blessés).
@@ -9908,9 +9919,9 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T17:40:27.179318Z","today":"
           </div>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;">
             ${[
-              ['Prochaines 4h', topNext4h, '#fbbf24'],
-              ['Prochaines 12h', topNext12h, 'var(--brand)'],
-              ['Prochaines 24h', topNext24h, 'var(--accent)'],
+              ['Dans 0–4h', topNext4h, '#fbbf24'],
+              ['Dans 4–12h', topNext12h, 'var(--brand)'],
+              ['Dans 12–24h', topNext24h, 'var(--accent)'],
             ].map(([lbl, arr, col]) => {
               if (!arr.length) {
                 return `<div style="padding:14px;background:var(--panel);border:1px solid var(--border);border-radius:10px;opacity:.6;">
@@ -12159,7 +12170,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T17:40:27.179318Z","today":"
           <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;">
             <h3 style="margin:0 0 12px;font-size:16px;font-weight:700;color:var(--text);">🎨 Apparence</h3>
             <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">Choisis la couleur du site.</div>
-            <div class="theme-toggle">
+            <div class="pref-pill-group">
               <button class="theme-pill ${currentTheme==='dark'?'active':''}" data-theme-btn="dark">🌙 Sombre</button>
               <button class="theme-pill ${currentTheme==='light'?'active':''}" data-theme-btn="light">☀️ Clair</button>
             </div>
@@ -12179,7 +12190,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T17:40:27.179318Z","today":"
           <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;">
             <h3 style="margin:0 0 12px;font-size:16px;font-weight:700;color:var(--text);">🎯 Mon niveau</h3>
             <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">On adapte le site à ton niveau.</div>
-            <div class="theme-toggle">
+            <div class="pref-pill-group">
               <button class="theme-pill ${currentLevel==='debutant'?'active':''}" data-level-btn="debutant">🌱 Débutant</button>
               <button class="theme-pill ${currentLevel==='confirme'?'active':''}" data-level-btn="confirme">🎯 Confirmé</button>
               <button class="theme-pill ${currentLevel==='pro'?'active':''}" data-level-btn="pro">📊 Pro</button>
