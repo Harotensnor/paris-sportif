@@ -566,16 +566,25 @@ def lookup(event):
     # Try catalog first. It returns None if no data available for this sport.
     cat_res = lookup_catalog(event)
     if cat_res is not None:
-        # Strip catalog-only fields (match_id, tournament) for callers that
-        # only expect the public three keys. Optional fields stay useful
-        # when present but don't break existing consumers.
-        return {
-            'available': cat_res['available'],
-            'url': cat_res['url'],
-            'note': cat_res['note'],
-            'match_id': cat_res.get('match_id'),
-            'tournament': cat_res.get('tournament'),
-        }
+        # v30 — Catalog gave a definitive answer? trust it. Catalog said
+        # available=True OR catalog said available=False with a STRONG signal
+        # ("match_not_in_listed_tournament" = explicit ESPN→Winamax tid mapping
+        # exists, tournament IS in catalog, this exact match isn't booked).
+        # In all other "weak" failure modes ("no_catalog_tournament_match",
+        # "tournament_in_catalog_but_match_not_listed") the catalog might just
+        # be partial — fall back to legacy heuristics (broad coverage so
+        # Théo doesn't lose betable matches that the scraper missed).
+        weak_notes = {'no_catalog_tournament_match',
+                      'tournament_in_catalog_but_match_not_listed'}
+        if cat_res['available'] or cat_res.get('note') not in weak_notes:
+            return {
+                'available': cat_res['available'],
+                'url': cat_res['url'],
+                'note': cat_res['note'],
+                'match_id': cat_res.get('match_id'),
+                'tournament': cat_res.get('tournament'),
+            }
+        # else: weak miss → fall through to legacy heuristics below.
 
     sport = event.get('sport') or ''
     code = event.get('league_code') or ''
