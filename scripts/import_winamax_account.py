@@ -105,9 +105,24 @@ def _setup_logging():
 
 # Endpoints à essayer dans l'ordre. Winamax les change parfois ; le
 # script teste chacune et garde celle qui répond avec du contenu utile.
+# v30 — Ajout des paramètres de filtre de date (ho_display=bettingHistory)
+# parce que le formulaire history.php est inerte sans eux : sur GET sans
+# params on récupère juste le shell HTML, pas les paris.
+from datetime import datetime as _dt
+_today = _dt.now()
+_year_start = _today.replace(month=1, day=1)
+_DATE_QS = (
+    f'?ho_display=bettingHistory'
+    f'&history_date_from_day={_year_start.day:02d}'
+    f'&history_date_from_month={_year_start.month:02d}'
+    f'&history_date_from_year={_year_start.year}'
+    f'&history_date_to_day={_today.day:02d}'
+    f'&history_date_to_month={_today.month:02d}'
+    f'&history_date_to_year={_today.year}'
+)
 HISTORY_URLS = [
+    f'https://www.winamax.fr/account/history.php{_DATE_QS}',
     'https://www.winamax.fr/account/history.php',
-    'https://www.winamax.fr/account/history',
 ]
 PENDING_URLS = [
     'https://www.winamax.fr/account/pendingbets.php',
@@ -215,11 +230,16 @@ def _build_session(cookie_value: str):
     return sess
 
 
-def _try_fetch(sess, urls: list[str], tag: str) -> tuple[str, str] | None:
-    """Tente chaque URL, garde la première qui répond avec du contenu non-trivial."""
+def _try_fetch(sess, urls: list[str], tag: str, post_data: dict | None = None) -> tuple[str, str] | None:
+    """Tente chaque URL, garde la première qui répond avec du contenu non-trivial.
+    Si post_data est fourni, fait un POST x-www-form-urlencoded au lieu de GET."""
     for url in urls:
         try:
-            r = sess.get(url, timeout=20, allow_redirects=True)
+            if post_data is not None:
+                r = sess.post(url, data=post_data, timeout=20, allow_redirects=True,
+                              headers={'Content-Type': 'application/x-www-form-urlencoded'})
+            else:
+                r = sess.get(url, timeout=20, allow_redirects=True)
         except Exception as e:
             print(f'  [{tag}] ERR {url}: {e}', flush=True)
             continue
@@ -241,46 +261,143 @@ def _try_fetch(sess, urls: list[str], tag: str) -> tuple[str, str] | None:
     return None
 
 
-def _extract_bets_from_html(html: str) -> list[dict]:
-    """Parse le HTML d'une page d'historique Winamax pour extraire les paris.
+def _decode_html_entities(s: str) -> str:
+    """Décode les entités HTML courantes Winamax (&Eacute;, &eacute;, etc.)."""
+    if not s: return s
+    import html as _html
+    return _html.unescape(s).strip()
 
-    Comme Winamax change régulièrement sa structure, on essaie d'abord
-    les sélecteurs les plus couramment vus, puis on tombe sur des
-    heuristiques regex pour les champs essentiels (date, mise, gain,
-    statut). Au pire on retourne une liste vide et le HTML brut sert
-    pour adapter les sélecteurs."""
+
+def _extract_bets_from_html(html: str) -> list[dict]:
+    """Parse le HTML de l'historique Paris Sportifs Winamax.
+
+    Structure observée (audit 2026-04-25) :
+      <tr><td>{REF}</td><td>{DATE_HHMMSS}</td><td>{Simple|Multiple|...}</td>
+          <td>{Gagné|Perdu|...}</td><td>{stake_eur}</td><td>{gain_eur}</td></tr>
+      <tr><td colspan="6" class="bet-detail">
+          <div class="line {occured|not-occured}">
+            <b>{Sport} - {Country} - {League} - </b>
+            {Home} / {Away}
+            <br/>R&eacute;sultat : {Pick}
+          </div>
+          [more legs...]
+      </td></tr>
+    """
     bets: list[dict] = []
-    if HAS_BS4:
-        soup = BeautifulSoup(html, 'html.parser')
-        # Stratégie 1 : Winamax embarque souvent les données dans un
-        # __NEXT_DATA__ ou un JSON inline. On cherche d'abord ça.
-        for script in soup.find_all('script'):
-            txt = script.string or ''
-            if not txt:
-                continue
-            # Cherche un objet "bets":[...] ou "history":[...]
-            for key in ('"bets":', '"history":', '"transactions":', '"placedBets":'):
-                if key in txt:
-                    # Tente d'extraire l'array JSON
-                    m = re.search(re.escape(key) + r'\s*(\[[\s\S]*?\])\s*[,}]', txt)
-                    if m:
-                        try:
-                            parsed = json.loads(m.group(1))
-                            if isinstance(parsed, list) and parsed:
-                                bets.extend(_normalize_bet_objects(parsed))
-                        except json.JSONDecodeError:
-                            pass
-        # Stratégie 2 : sélecteurs classiques
-        if not bets:
-            # Winamax utilise souvent des classes type "bet-row" / "history-row"
-            for el in soup.select('.bet-row, .history-row, [data-bet-id]'):
-                bet = _parse_bet_element(el)
-                if bet:
-                    bets.append(bet)
-    if not bets:
-        # Stratégie 3 : regex de secours sur les patterns connus
-        for m in re.finditer(r'(?:data-bet-id|id="bet-|class="bet")\s*=\s*"([^"]+)"', html):
-            bets.append({'id': m.group(1), '_raw': True})
+
+    # Pattern : extraire chaque paire de <tr> (ligne synthèse + ligne details)
+    # Le ref Winamax est ~8 chars alphanumériques majuscules (68RLU2K6, 68S8N7GJ…)
+    bet_pattern = re.compile(
+        r'<tr>\s*<td>([A-Z0-9]{6,12})</td>\s*'    # 1: ref
+        r'<td>(\d{2}/\d{2}/\d{4}\s+\d{2}:\d{2}:\d{2})</td>\s*'  # 2: date
+        r'<td>([^<]+)</td>\s*'                    # 3: type
+        r'<td>([^<]+)</td>\s*'                    # 4: status (with trailing spaces)
+        r'<td>([^<]+)</td>\s*'                    # 5: stake (eur)
+        r'<td>([^<]+)</td>\s*</tr>\s*'            # 6: gain (eur)
+        r'<tr>\s*<td\s+colspan="6"\s+class="bet-detail">(.*?)</td>\s*</tr>',  # 7: legs HTML
+        re.DOTALL,
+    )
+
+    leg_pattern = re.compile(
+        r'<div class="line ([^"]+)">'
+        r'\s*<b>([^<]*?)</b>\s*'      # 2: "Sport - Country - League -"
+        r'([^<]*?)<br/?>'              # 3: "Home / Away"
+        r'\s*([^<]*?)</div>',          # 4: "Résultat : Pick" or "Vainqueur : Pick" etc.
+        re.DOTALL,
+    )
+
+    def _parse_eur(s: str) -> float | None:
+        if not s: return None
+        s = s.strip().replace(',', '.').replace(' ', '').replace('€', '')
+        try: return float(s)
+        except (ValueError, TypeError): return None
+
+    def _parse_date_fr(s: str) -> str | None:
+        # "01/01/2026 12:56:09" -> ISO 8601
+        m = re.match(r'(\d{2})/(\d{2})/(\d{4})\s+(\d{2}:\d{2}:\d{2})', s.strip())
+        if not m: return None
+        d, mo, y, t = m.groups()
+        return f'{y}-{mo}-{d}T{t}'
+
+    sport_em_map = {
+        'football': 'football', 'basketball': 'basketball', 'tennis': 'tennis',
+        'hockey sur glace': 'hockey', 'hockey': 'hockey', 'baseball': 'baseball',
+        'rugby': 'rugby', 'volley': 'volleyball', 'football américain': 'american-football',
+        'football americain': 'american-football', 'mma': 'mma', 'boxe': 'boxing',
+    }
+
+    for m in bet_pattern.finditer(html):
+        ref, date_str, btype, status, stake, gain, legs_html = m.groups()
+        legs = []
+        for lm in leg_pattern.finditer(legs_html):
+            outcome, hdr, teams, pick_line = lm.groups()
+            hdr = _decode_html_entities(hdr).rstrip(' -').strip()
+            teams = _decode_html_entities(teams).strip()
+            pick_line = _decode_html_entities(pick_line).strip()
+            # Parse "Sport - Country - League"
+            parts = [p.strip() for p in hdr.split(' - ') if p.strip()]
+            sport_name = parts[0] if parts else ''
+            country = parts[1] if len(parts) > 1 else ''
+            league = parts[2] if len(parts) > 2 else (parts[1] if len(parts) > 1 else '')
+            sport_norm = sport_em_map.get(sport_name.lower(), sport_name.lower() or 'unknown')
+            # Parse "Home / Away"
+            home, away = '', ''
+            if ' / ' in teams:
+                home, _, away = teams.partition(' / ')
+            event = teams or ''
+            # Parse "Résultat : X" or "Vainqueur : X"
+            pick = ''
+            for prefix in ('Résultat :', 'Vainqueur :', 'Score exact :', 'Pari :'):
+                if pick_line.startswith(prefix):
+                    pick = pick_line[len(prefix):].strip()
+                    break
+            else:
+                pick = pick_line
+            legs.append({
+                'event': event,
+                'home': home.strip(),
+                'away': away.strip(),
+                'pick': pick,
+                'sport': sport_norm,
+                'country': country,
+                'league': league,
+                'won': outcome == 'occured',  # green tick = leg won
+            })
+
+        status_clean = _decode_html_entities(status).strip().lower()
+        bet_status = (
+            'won' if 'gagné' in status_clean or 'gagne' in status_clean
+            else 'lost' if 'perdu' in status_clean
+            else 'pending' if 'cours' in status_clean
+            else 'void' if 'annul' in status_clean
+            else 'pending'
+        )
+        type_clean = _decode_html_entities(btype).strip().lower()
+        bet_type = (
+            'combine' if 'multiple' in type_clean
+            else 'systeme' if 'syst' in type_clean
+            else 'single'
+        )
+        stake_f = _parse_eur(stake)
+        gain_f = _parse_eur(gain)
+        # Estimer la cote totale : gain / stake si gagné, sinon agrégat des legs
+        odds = None
+        if bet_status == 'won' and stake_f and gain_f and stake_f > 0:
+            odds = round(gain_f / stake_f, 3)
+
+        bets.append({
+            'id': ref,
+            'date': _parse_date_fr(date_str),
+            'stake': stake_f,
+            'odds': odds,
+            'status': bet_status,
+            'potential_gain': gain_f if bet_status in ('won', 'pending') else None,
+            'actual_gain': gain_f if bet_status == 'won' else (0.0 if bet_status == 'lost' else None),
+            'type': bet_type,
+            'legs': legs,
+            'currency': 'EUR',
+        })
+
     return bets
 
 
@@ -442,8 +559,21 @@ def main():
     print(f'[winamax_import] [{datetime.now():%H:%M:%S}] starting (cookie len={len(cookie)})', flush=True)
 
     all_bets = []
-    # Historique réglé
-    hist = _try_fetch(sess, HISTORY_URLS, 'history')
+    # Historique réglé — GET avec to_display=betting + range de date.
+    # Le param magique pour Paris Sportifs est `to_display=betting`
+    # (pas `bettingHistory` ni `sportbets` — confirmé via l'inspection des
+    # tab links de la page elle-même, audit 2026-04-25).
+    betting_url = (
+        f'https://www.winamax.fr/account/history.php'
+        f'?to_display=betting'
+        f'&history_date_from_day={_year_start.day:02d}'
+        f'&history_date_from_month={_year_start.month:02d}'
+        f'&history_date_from_year={_year_start.year}'
+        f'&history_date_to_day={_today.day:02d}'
+        f'&history_date_to_month={_today.month:02d}'
+        f'&history_date_to_year={_today.year}'
+    )
+    hist = _try_fetch(sess, [betting_url], 'history')
     if hist:
         url, html = hist
         bets = _extract_bets_from_html(html)
