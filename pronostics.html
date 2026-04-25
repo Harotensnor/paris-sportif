@@ -8042,6 +8042,14 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
       if (m) {
         const fresh = JSON.parse(m[1]);
         window.PRONOSTICS_DATA = fresh;
+        // v30 — Si la bannière "📡 Synchronisation…" est visible (boot
+        // avec data stale), la retirer maintenant que fresh data arrive.
+        const syncBanner = document.getElementById('__boot-sync-banner');
+        if (syncBanner) {
+          syncBanner.style.background = 'linear-gradient(90deg,#34d399 0%,#10b981 100%)';
+          syncBanner.innerHTML = '✓ Données à jour';
+          setTimeout(() => syncBanner.remove(), 1500);
+        }
         // FIX #12 : odds_history.jsonl peut avoir reçu de nouveaux snapshots
         // (le pipeline re-snapshot toutes les 2h) → invalide le cache mémoire
         // pour que les sparklines reflètent les dernières mesures.
@@ -8168,7 +8176,41 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
     const reloadAfterMs = 60 * 60 * 1000;
     const idleAfterMs = 2 * 60 * 1000;
     const __bootTime = Date.now();
-    let lastPoll = 0;
+    // v30 — IMMEDIATE first poll at boot. Avant : la 1ère pollData ne
+    // tirait qu'à T+60s, donc le user voyait la version cachée inline
+    // (potentiellement plusieurs heures stale via SW cache) pendant 1
+    // minute avant que les vraies fresh data arrivent. Maintenant on
+    // poll dès le boot pour minimiser la fenêtre "version stale visible".
+    let lastPoll = Date.now();
+    // Si data inline détectée stale (>30min) au boot, afficher une
+    // bannière visible "Synchronisation…" qui disparaît au refresh OK.
+    try {
+      const d = window.PRONOSTICS_DATA;
+      const ageMs = d?.generated_at ? (Date.now() - new Date(d.generated_at).getTime()) : 0;
+      if (ageMs > 30 * 60000) {
+        const banner = document.createElement('div');
+        banner.id = '__boot-sync-banner';
+        banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99;padding:10px 16px;background:linear-gradient(90deg,rgba(167,139,250,.95) 0%,rgba(52,211,153,.85) 100%);color:#08080a;font-size:13px;font-weight:700;text-align:center;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 2px 12px rgba(0,0,0,.3);';
+        banner.setAttribute('role', 'status');
+        banner.setAttribute('aria-live', 'polite');
+        banner.innerHTML = `
+          <span style="display:inline-block;width:14px;height:14px;border:2px solid #08080a;border-top-color:transparent;border-radius:50%;animation:bsync-spin 0.8s linear infinite;"></span>
+          📡 Synchronisation des dernières données… (la version affichée est en cache)
+        `;
+        // Inject keyframes once
+        if (!document.getElementById('__boot-sync-style')) {
+          const style = document.createElement('style');
+          style.id = '__boot-sync-style';
+          style.textContent = '@keyframes bsync-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}';
+          document.head.appendChild(style);
+        }
+        document.body.appendChild(banner);
+        // Auto-hide après 30s même si pollData ne réussit pas (évite que
+        // la bannière reste indéfiniment si le serveur est down)
+        setTimeout(() => banner.remove(), 30000);
+      }
+    } catch(e){}
+    pollData();
     __refreshTimer = setInterval(() => {
       const now = Date.now();
       const tabHidden = document.visibilityState === 'hidden';
