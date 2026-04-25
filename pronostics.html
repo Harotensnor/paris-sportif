@@ -7755,8 +7755,34 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T18:40:28.998091Z","today":"
         if (match.sport === 'tennis') {
           const rankH = home?.rank, rankA = away?.rank;
           const ctrH = home?.country, ctrA = away?.country;
-          const hasAny = rankH || rankA || ctrH || ctrA || match.surface || match.round;
+          // v30 — Winamax 1N2 quote alignment now reaches tennis (home_name
+          // present in markets makes ESPN/Winamax order match), so we can
+          // surface the bookmaker price next to the player profile.
+          const wxN12 = match.winamax?.markets?.['1n2'];
+          const oddH = wxN12 && typeof wxN12.home === 'number' ? wxN12.home : null;
+          const oddA = wxN12 && typeof wxN12.away === 'number' ? wxN12.away : null;
+          const impH = oddH ? Math.round(100 / oddH) : null;
+          const impA = oddA ? Math.round(100 / oddA) : null;
+          // Rank delta for the headline.
+          const rankDelta = (rankH && rankA) ? Math.abs(Number(rankH) - Number(rankA)) : null;
+          const favRank = (rankH && rankA) ? (Number(rankH) < Number(rankA) ? 'home' : 'away') : null;
+          const hasAny = rankH || rankA || ctrH || ctrA || match.surface || match.round || oddH || oddA;
           if (!hasAny) return '';
+          // Last-5 / form letters for tennis (when fetch_team_form populates them).
+          const formH = home?.form || (home?.last5?.map(r => r.result).join('') || '');
+          const formA = away?.form || (away?.last5?.map(r => r.result).join('') || '');
+          // H2H summary (if any).
+          const h2hList = (match.h2h?.meetings || []);
+          let h2hHomeWins = 0, h2hAwayWins = 0;
+          if (h2hList.length) {
+            const homeKey = (home?.name || '').toLowerCase();
+            h2hList.forEach(mt => {
+              const aLow = (mt.home || '').toLowerCase();
+              const histHomeIsHome = aLow === homeKey;
+              if (mt.winner === 'home') histHomeIsHome ? h2hHomeWins++ : h2hAwayWins++;
+              else if (mt.winner === 'away') histHomeIsHome ? h2hAwayWins++ : h2hHomeWins++;
+            });
+          }
           return `
           <div class="section">
             <h4>🎾 Profil joueurs</h4>
@@ -7765,16 +7791,23 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T18:40:28.998091Z","today":"
                 <h4 style="margin-top:0;font-size:11px;color:var(--text-dim);">${esc(home?.name || '—')}</h4>
                 ${rankH ? `<div class="kv"><div class="k">Classement</div><div class="v">#${esc(rankH)}</div></div>` : ''}
                 ${ctrH ? `<div class="kv"><div class="k">Pays</div><div class="v">${esc(ctrH)}</div></div>` : ''}
+                ${oddH ? `<div class="kv"><div class="k">Cote Winamax</div><div class="v" style="font-variant-numeric:tabular-nums;">@${oddH.toFixed(2)} <span style="color:var(--text-dim2,#7b8693);font-size:11px;">(${impH}%)</span></div></div>` : ''}
+                ${formH ? `<div class="kv"><div class="k">5 derniers</div><div class="v" style="font-family:monospace;letter-spacing:1px;">${esc(formH.slice(-5))}</div></div>` : ''}
+                ${h2hList.length ? `<div class="kv"><div class="k">H2H gagnés</div><div class="v">${h2hHomeWins}/${h2hList.length}</div></div>` : ''}
               </div>
               <div>
                 <h4 style="margin-top:0;font-size:11px;color:var(--text-dim);">${esc(away?.name || '—')}</h4>
                 ${rankA ? `<div class="kv"><div class="k">Classement</div><div class="v">#${esc(rankA)}</div></div>` : ''}
                 ${ctrA ? `<div class="kv"><div class="k">Pays</div><div class="v">${esc(ctrA)}</div></div>` : ''}
+                ${oddA ? `<div class="kv"><div class="k">Cote Winamax</div><div class="v" style="font-variant-numeric:tabular-nums;">@${oddA.toFixed(2)} <span style="color:var(--text-dim2,#7b8693);font-size:11px;">(${impA}%)</span></div></div>` : ''}
+                ${formA ? `<div class="kv"><div class="k">5 derniers</div><div class="v" style="font-family:monospace;letter-spacing:1px;">${esc(formA.slice(-5))}</div></div>` : ''}
+                ${h2hList.length ? `<div class="kv"><div class="k">H2H gagnés</div><div class="v">${h2hAwayWins}/${h2hList.length}</div></div>` : ''}
               </div>
             </div>
-            ${(match.surface || match.round) ? `<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;font-size:12px;">
+            ${(match.surface || match.round || rankDelta != null) ? `<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;font-size:12px;">
               ${match.surface ? `<span style="padding:4px 10px;border-radius:6px;background:rgba(255,255,255,.04);color:var(--text-dim,#b4bcc7);">Surface : <b style="color:var(--text,#e6ebf2);">${esc(match.surface)}</b></span>` : ''}
               ${match.round ? `<span style="padding:4px 10px;border-radius:6px;background:rgba(255,255,255,.04);color:var(--text-dim,#b4bcc7);">Tour : <b style="color:var(--text,#e6ebf2);">${esc(match.round)}</b></span>` : ''}
+              ${rankDelta != null && rankDelta >= 5 ? `<span style="padding:4px 10px;border-radius:6px;background:rgba(167,139,250,.10);color:var(--brand,#a78bfa);">Δ rang ${rankDelta} — favori : <b>${esc(favRank === 'home' ? (home?.short || home?.name || '?') : (away?.short || away?.name || '?'))}</b></span>` : ''}
             </div>` : ''}
           </div>`;
         }
