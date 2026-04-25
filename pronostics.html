@@ -15605,6 +15605,242 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T13:01:48.719549Z","today":"
     }));
   }
 
+  // ============================================================
+  // v30 — Mes paris Winamax (import via scripts/import_winamax_account.py)
+  // ------------------------------------------------------------
+  // Rendu de la section qui affiche les paris importés depuis le compte
+  // Winamax de Théo. Color coding par tier de confiance + icônes sport,
+  // séparation singles / combinés, bilan filtrable "depuis activation
+  // modèle". Les données sont 100% locales (winamax_my_bets.json est
+  // gitignored), donc cette section n'apparait que sur localhost.
+  // ============================================================
+  function _renderWinamaxImportSetup() {
+    return `
+      <div style="padding:18px 22px;background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--brand);border-radius:0 10px 10px 0;">
+        <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;margin-bottom:8px;">🎯 Mes paris Winamax</div>
+        <h3 style="margin:0 0 10px;font-size:18px;font-weight:700;color:var(--text);">Importer ton historique pour alimenter le bilan</h3>
+        <div style="font-size:13px;color:var(--text-2);line-height:1.55;margin-bottom:12px;">
+          <p style="margin:0 0 8px;">Pour que le bilan reflète <b>tes vrais paris</b> (mises, gains, ROI réel), un script local va chercher l'historique sur ton compte Winamax.</p>
+          <p style="margin:0 0 8px;color:var(--text-dim);"><b>Procédure (one-shot, ~2 min)</b> :</p>
+          <ol style="margin:0;padding-left:22px;color:var(--text-dim);">
+            <li>Connecte-toi sur <a href="https://www.winamax.fr" target="_blank" rel="noopener" style="color:var(--brand);">winamax.fr</a> dans ton navigateur.</li>
+            <li>F12 → onglet <b>Application</b> → <b>Cookies</b> → <code>https://www.winamax.fr</code>.</li>
+            <li>Copie la valeur du cookie <code>API_SESS</code> (ou <code>PHPSESSID</code>).</li>
+            <li>Colle-la dans un fichier <code>.winamax_session</code> à la racine du projet.</li>
+            <li>Lance : <code>python scripts/import_winamax_account.py</code></li>
+            <li>Recharge cette page → tes paris s'affichent ici.</li>
+          </ol>
+        </div>
+        <div style="font-size:11.5px;color:var(--text-dim2);margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+          ℹ️ <b>Privacy :</b> <code>winamax_my_bets.json</code> est dans <code>.gitignore</code>, donc tes paris restent en local — rien n'est commit / déployé.
+          Pour automatiser, tu peux planifier le script via le Planificateur de tâches Windows (toutes les 6h par exemple).
+        </div>
+      </div>
+    `;
+  }
+
+  function _renderWinamaxImported(doc) {
+    const bets = Array.isArray(doc.bets) ? doc.bets : [];
+    const summary = doc.summary || {};
+    const importedAt = doc.imported_at ? new Date(doc.imported_at) : null;
+    const ageMin = importedAt ? Math.floor((Date.now() - importedAt.getTime()) / 60000) : null;
+    const ageLabel = ageMin == null ? '?' : ageMin < 60 ? `${ageMin}min` : ageMin < 1440 ? `${Math.floor(ageMin/60)}h` : `${Math.floor(ageMin/1440)}j`;
+
+    // Filtrage "depuis activation modèle" — lit la prefs localStorage
+    let userPrefs = {};
+    try { userPrefs = JSON.parse(localStorage.getItem('userPrefs') || '{}'); } catch(e){}
+    const modelStart = userPrefs.modelStartDate || doc.model_start_date || null;
+    const modelStartTs = modelStart ? new Date(modelStart).getTime() : 0;
+
+    // Match imported bets against model picks (cross-reference). Ce mapping
+    // permet d'afficher un code couleur (lock=🔒, standard=🟢, hors-modèle=⚪)
+    // selon ce que disait le modèle au moment du pari.
+    const _matchTier = (bet) => {
+      if (!bet || !bet.legs || !bet.legs.length) return null;
+      // Pour chaque leg, tente de trouver un event correspondant dans data.days
+      const data = window.PRONOSTICS_DATA;
+      if (!data?.days) return null;
+      const allEvents = [];
+      Object.values(data.days).forEach(arr => allEvents.push(...(arr || [])));
+      let bestTier = null;
+      for (const leg of bet.legs) {
+        const evName = (leg.event || '').toLowerCase();
+        if (!evName) continue;
+        for (const ev of allEvents) {
+          const evN = (ev.name || '').toLowerCase();
+          if (evN && (evN.includes(evName.split(' vs ')[0]?.split(' ')[0] || '_X_') || evName.includes(evN.split(' ')[0]))) {
+            try {
+              const pred = predictMatch(ev);
+              if (!pred || pred.skip) continue;
+              const t = pred.isLock ? 'lock' : (pred.reliability >= 0.55 ? 'standard' : 'low');
+              if (!bestTier || (t === 'lock')) bestTier = t;
+            } catch(e){}
+            break;
+          }
+        }
+      }
+      return bestTier;
+    };
+
+    // Bucket par "depuis activation modèle"
+    const sinceModel = bets.filter(b => {
+      if (!modelStartTs) return true;
+      const t = b.date ? new Date(b.date).getTime() : 0;
+      return t >= modelStartTs;
+    });
+
+    // Stats
+    const _calc = (list) => {
+      let stake = 0, gain = 0, w = 0, l = 0, p = 0, singles = 0, combines = 0;
+      list.forEach(b => {
+        const s = Number(b.stake) || 0;
+        stake += s;
+        if (b.status === 'won') { w++; gain += (Number(b.actual_gain) || 0); }
+        else if (b.status === 'lost') { l++; gain -= s; }
+        else { p++; }
+        if (b.type === 'combine') combines++;
+        else singles++;
+      });
+      const settled = w + l;
+      return { stake, gain, w, l, p, singles, combines, wr: settled ? (100 * w / settled) : null, roi: stake ? (100 * gain / stake) : null, n: list.length };
+    };
+    const allStats = _calc(bets);
+    const modelStats = _calc(sinceModel);
+
+    const sportEm = (s) => ({ football:'⚽', tennis:'🎾', basketball:'🏀', hockey:'🏒', baseball:'⚾', mma:'🥊', rugby:'🏉' }[s] || '🏅');
+    const tierColor = (t) => t === 'lock' ? '#fbbf24' : t === 'standard' ? '#34d399' : t === 'low' ? '#f87171' : '#94a3b8';
+    const tierLabel = (t) => t === 'lock' ? '🔒 Lock' : t === 'standard' ? '🟢 Standard' : t === 'low' ? '🟡 Low conf' : '⚪ Hors-modèle';
+    const statusColor = (s) => s === 'won' ? '#34d399' : s === 'lost' ? '#f87171' : s === 'pending' ? '#a78bfa' : '#94a3b8';
+    const statusLabel = (s) => s === 'won' ? '✓ Gagné' : s === 'lost' ? '✗ Perdu' : s === 'pending' ? '⏳ En cours' : '— Annulé';
+    const fmtEur = (n) => (n == null || isNaN(n)) ? '—' : (n >= 0 ? '+' : '') + n.toFixed(2) + '€';
+
+    const renderBetRow = (b) => {
+      const tier = _matchTier(b);
+      const sport = (b.legs && b.legs[0] && b.legs[0].sport) || 'unknown';
+      const isCombine = b.type === 'combine' || (b.legs && b.legs.length > 1);
+      const dateStr = b.date ? new Date(b.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }) : '—';
+      const headerLeg = (b.legs && b.legs[0]) || {};
+      const eventLabel = isCombine ? `🎰 Combiné · ${b.legs.length} matchs` : (headerLeg.event || 'Pari unique');
+      const pickLabel = isCombine ? b.legs.map(l => l.pick || '?').join(' · ') : (headerLeg.pick || '');
+      return `
+        <div style="display:grid;grid-template-columns:60px 1fr 110px 90px 100px;gap:10px;padding:10px 14px;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${tierColor(tier)};border-radius:0 8px 8px 0;align-items:center;font-size:12.5px;">
+          <div style="font-size:11px;color:var(--text-dim);">${dateStr}</div>
+          <div style="overflow:hidden;">
+            <div style="font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${sportEm(sport)} ${esc(eventLabel)}</div>
+            <div style="font-size:11px;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(pickLabel)}${tier ? ` · <span style="color:${tierColor(tier)};">${tierLabel(tier)}</span>` : ''}</div>
+          </div>
+          <div style="text-align:right;font-variant-numeric:tabular-nums;">
+            <div style="color:var(--text);font-weight:600;">${b.stake != null ? Number(b.stake).toFixed(2)+'€' : '—'}</div>
+            <div style="font-size:10.5px;color:var(--text-dim);">@ ${b.odds != null ? Number(b.odds).toFixed(2) : '—'}</div>
+          </div>
+          <div style="text-align:right;color:${statusColor(b.status)};font-weight:600;">${statusLabel(b.status)}</div>
+          <div style="text-align:right;font-variant-numeric:tabular-nums;font-weight:700;color:${b.status === 'won' ? '#34d399' : b.status === 'lost' ? '#f87171' : 'var(--text-dim)'};">
+            ${b.status === 'won' ? fmtEur(Number(b.actual_gain) - Number(b.stake)) : b.status === 'lost' ? fmtEur(-Number(b.stake)) : (b.status === 'pending' && b.potential_gain ? '~' + fmtEur(Number(b.potential_gain) - Number(b.stake)) : '—')}
+          </div>
+        </div>
+      `;
+    };
+
+    const sortedBets = [...bets].sort((a, b) => (new Date(b.date || 0)) - (new Date(a.date || 0)));
+    const recentBets = sortedBets.slice(0, 25);
+
+    return `
+      <div style="padding:24px;background:var(--panel-2);border:1px solid var(--border);border-radius:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:18px;">
+          <div>
+            <div style="font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;margin-bottom:4px;">Mes paris Winamax · importés</div>
+            <h2 style="margin:0;font-size:24px;font-weight:800;color:var(--text);letter-spacing:-.5px;">${bets.length} pari${bets.length>1?'s':''} suivis</h2>
+            <div style="font-size:12px;color:var(--text-dim);margin-top:3px;">Dernière synchro il y a ${ageLabel} · <code style="font-size:10px;background:var(--panel);padding:2px 5px;border-radius:3px;">python scripts/import_winamax_account.py</code> pour rafraîchir</div>
+          </div>
+          ${modelStart ? `<div style="font-size:11px;color:var(--text-dim);background:rgba(167,139,250,.12);padding:5px 11px;border-radius:6px;border:1px solid rgba(167,139,250,.3);">Activation modèle : <b style="color:var(--brand);">${modelStart.slice(0,10)}</b></div>` : `<button id="set-model-start-btn" style="padding:6px 12px;font-size:12px;font-weight:600;background:var(--panel);color:var(--brand);border:1px solid var(--brand);border-radius:6px;cursor:pointer;">⚙️ Définir date activation modèle</button>`}
+        </div>
+
+        <!-- Stats globales vs depuis modèle -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:20px;">
+          <div style="padding:14px;background:var(--panel);border-radius:10px;border-left:3px solid var(--text-dim);">
+            <div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">Tout l'historique</div>
+            <div style="font-size:24px;font-weight:800;color:${allStats.roi == null ? 'var(--text-dim)' : allStats.roi >= 0 ? '#34d399' : '#f87171'};margin-top:4px;letter-spacing:-.5px;">${allStats.roi == null ? '—' : (allStats.roi >= 0 ? '+' : '') + allStats.roi.toFixed(1) + '%'}</div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:3px;">${allStats.n} paris · ${allStats.w}W ${allStats.l}L · ${fmtEur(allStats.gain)}</div>
+          </div>
+          ${modelStart ? `
+          <div style="padding:14px;background:var(--panel);border-radius:10px;border-left:3px solid var(--brand);">
+            <div style="font-size:10.5px;color:var(--brand);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">Depuis activation modèle</div>
+            <div style="font-size:24px;font-weight:800;color:${modelStats.roi == null ? 'var(--text-dim)' : modelStats.roi >= 0 ? '#34d399' : '#f87171'};margin-top:4px;letter-spacing:-.5px;">${modelStats.roi == null ? '—' : (modelStats.roi >= 0 ? '+' : '') + modelStats.roi.toFixed(1) + '%'}</div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:3px;">${modelStats.n} paris · ${modelStats.w}W ${modelStats.l}L · ${fmtEur(modelStats.gain)}</div>
+          </div>` : ''}
+          <div style="padding:14px;background:var(--panel);border-radius:10px;border-left:3px solid #fbbf24;">
+            <div style="font-size:10.5px;color:#fbbf24;text-transform:uppercase;letter-spacing:.6px;font-weight:700;">Combinés</div>
+            <div style="font-size:24px;font-weight:800;color:var(--text);margin-top:4px;letter-spacing:-.5px;">${allStats.combines}</div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:3px;">vs ${allStats.singles} simples</div>
+          </div>
+          <div style="padding:14px;background:var(--panel);border-radius:10px;border-left:3px solid #a78bfa;">
+            <div style="font-size:10.5px;color:#a78bfa;text-transform:uppercase;letter-spacing:.6px;font-weight:700;">En cours</div>
+            <div style="font-size:24px;font-weight:800;color:var(--text);margin-top:4px;letter-spacing:-.5px;">${allStats.p}</div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:3px;">paris non réglés</div>
+          </div>
+        </div>
+
+        <!-- Liste des paris récents -->
+        <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:8px;">25 derniers paris</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          ${recentBets.length ? recentBets.map(renderBetRow).join('') : '<div style="padding:30px;text-align:center;color:var(--text-dim);">Aucun pari importé pour l\'instant.</div>'}
+        </div>
+        <div style="font-size:11px;color:var(--text-dim2);margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">
+          🎨 <b>Code couleur</b> : barre 🔒 jaune = lock du modèle, 🟢 vert = pick standard, 🟡 rouge = low conf, ⚪ gris = pari hors modèle (ou non matché).
+        </div>
+      </div>
+    `;
+  }
+
+  // Modal personnalisée pour saisie date (prompt() interdit en PWA standalone).
+  function _showDatePrompt(currentValue, title, body) {
+    return new Promise((resolve) => {
+      const overlay = document.createElement('div');
+      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);padding:16px;';
+      overlay.innerHTML = `
+        <div style="max-width:420px;width:100%;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:22px;box-shadow:0 12px 40px rgba(0,0,0,.4);">
+          <h3 style="margin:0 0 8px;font-size:18px;color:var(--text);font-weight:700;">${esc(title)}</h3>
+          <div style="font-size:13px;color:var(--text-dim);line-height:1.5;margin-bottom:14px;">${body || ''}</div>
+          <input type="date" value="${esc(currentValue || '')}" style="width:100%;padding:10px 12px;font-size:14px;background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:8px;font-variant-numeric:tabular-nums;">
+          <div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end;">
+            <button data-cancel style="padding:8px 16px;font-size:13px;background:var(--panel-2);color:var(--text-2);border:1px solid var(--border-2);border-radius:7px;cursor:pointer;font-weight:600;">Annuler</button>
+            <button data-ok style="padding:8px 16px;font-size:13px;background:var(--brand);color:#08080a;border:none;border-radius:7px;cursor:pointer;font-weight:700;">Valider</button>
+          </div>
+        </div>
+      `;
+      const cleanup = (val) => { try { document.body.removeChild(overlay); } catch(_){} resolve(val); };
+      overlay.querySelector('[data-cancel]').addEventListener('click', () => cleanup(null));
+      overlay.querySelector('[data-ok]').addEventListener('click', () => cleanup(overlay.querySelector('input').value || null));
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) cleanup(null); });
+      overlay.querySelector('input').addEventListener('keydown', (e) => { if (e.key === 'Enter') cleanup(e.target.value); if (e.key === 'Escape') cleanup(null); });
+      document.body.appendChild(overlay);
+      setTimeout(() => overlay.querySelector('input')?.focus(), 50);
+    });
+  }
+
+  // Wire le bouton "Définir date activation modèle" (délégué au document
+  // car il est rendu async après l'init de renderBilanPage)
+  document.addEventListener('click', async (e) => {
+    const btn = e.target.closest('#set-model-start-btn');
+    if (!btn) return;
+    e.preventDefault();
+    let prefs = {};
+    try { prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}'); } catch(_){}
+    const cur = prefs.modelStartDate || '';
+    const v = await _showDatePrompt(
+      cur || new Date().toISOString().slice(0,10),
+      'Date d\'activation du modèle',
+      'Les paris avant cette date n\'utilisaient pas tes pronos, donc le bilan "<b>depuis activation</b>" les exclut pour mesurer la perf <b>réelle</b> du modèle.'
+    );
+    if (!v) return;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return;
+    prefs.modelStartDate = v;
+    localStorage.setItem('userPrefs', JSON.stringify(prefs));
+    // Re-render Bilan pour appliquer
+    const wrap = document.getElementById('bilan-wrap');
+    if (wrap && typeof renderBilanPage === 'function') renderBilanPage(wrap);
+  });
+
   // Aggregate bilan view: overall ROI, per-sport ROI, recent results, top completed picks
   function renderBilanPage(wrap) {
     const data = window.PRONOSTICS_DATA;
@@ -16656,7 +16892,30 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
           ` : '')}
         ` : `<div class="bilan-empty">Aucun pari du modèle évalué pour le moment.</div>`}
       </div>
+
+      <!-- v30 — Mes paris Winamax (importés via scripts/import_winamax_account.py) -->
+      <div id="winamax-import-section" style="margin:32px auto 24px;max-width:1280px;padding:0 4px;">
+        <div style="padding:14px 16px;background:var(--panel-2);border:1px solid var(--border);border-radius:10px;color:var(--text-dim);font-size:13px;text-align:center;">
+          🎯 Chargement de tes paris Winamax importés…
+        </div>
+      </div>
     `;
+
+    // v30 — Charge winamax_my_bets.json (peut ne pas exister si Théo n'a
+    // pas encore lancé scripts/import_winamax_account.py). Échec silencieux
+    // → on cache la section. Succès → on render avec color coding.
+    (async () => {
+      const sec = wrap.querySelector('#winamax-import-section');
+      if (!sec) return;
+      try {
+        const r = await fetch(`winamax_my_bets.json?t=${Date.now()}`, { cache: 'no-store' });
+        if (!r.ok) throw new Error('not_found');
+        const doc = await r.json();
+        sec.innerHTML = _renderWinamaxImported(doc);
+      } catch (e) {
+        sec.innerHTML = _renderWinamaxImportSetup();
+      }
+    })();
 
     // ========= WIRE INTERACTIONS =========
     // Post-refonte (2026-04-20): only pagination + window filter remain.
