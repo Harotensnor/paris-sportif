@@ -11744,8 +11744,17 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
       setTimeout(() => URL.revokeObjectURL(url), 500);
     });
     const resetBtn = wrap.querySelector('#reset-all');
-    if (resetBtn) resetBtn.addEventListener('click', () => {
-      if (!confirm('Supprimer TOUS les réglages et paris suivis ? Action irréversible.')) return;
+    if (resetBtn) resetBtn.addEventListener('click', async () => {
+      const ok = (typeof window._showConfirm === 'function')
+        ? await window._showConfirm({
+            title: '⚠️ Tout réinitialiser ?',
+            body: 'Supprimer <b>TOUS</b> les réglages, paris suivis, préférences thème, filtres, etc.<br><br><span style="color:var(--danger);font-weight:600;">Action irréversible.</span>',
+            confirmLabel: 'Tout supprimer',
+            cancelLabel: 'Annuler',
+            danger: true,
+          })
+        : confirm('Supprimer TOUS les réglages et paris suivis ? Action irréversible.');
+      if (!ok) return;
       try {
         // FIX audit #6 : la liste fixe oubliait les clés bilan/wallet/agent/etc.
         // → l'utilisateur cliquait "Tout réinitialiser" et restait avec ses
@@ -11787,8 +11796,17 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
     });
     // v23 — bouton "Effacer ce que j'ai appris"
     const clearLessons = wrap.querySelector('#clear-user-lessons');
-    if (clearLessons) clearLessons.addEventListener('click', () => {
-      if (!confirm('Effacer toutes tes leçons apprises ?')) return;
+    if (clearLessons) clearLessons.addEventListener('click', async () => {
+      const ok = (typeof window._showConfirm === 'function')
+        ? await window._showConfirm({
+            title: '🧠 Effacer les leçons ?',
+            body: 'Toutes tes leçons apprises (insights ROI/streaks/sport) seront supprimées. Le coach IA repartira de zéro.',
+            confirmLabel: 'Effacer',
+            cancelLabel: 'Garder',
+            danger: true,
+          })
+        : confirm('Effacer toutes tes leçons apprises ?');
+      if (!ok) return;
       try {
         localStorage.removeItem('paris_sportif_user_lessons_v1');
         if (typeof toast === 'function') toast('✓ Leçons effacées', 'success');
@@ -13586,8 +13604,16 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
       detail: lsBytes < 0 ? 'Impossible d\'évaluer.' : `${lsMb.toFixed(2)} MB utilisés sur ~5 MB max (dépend du navigateur).`,
       action: lsStatus !== 'ok' ? {
         label: '🧹 Nettoyer caches non-critiques',
-        run: () => {
-          if (!confirm('Vider les caches non-critiques (historique fiabilité, seen-locks) ? Ça ne touche pas à tes paris trackés ni préférences.')) return;
+        run: async () => {
+          const ok = (typeof window._showConfirm === 'function')
+            ? await window._showConfirm({
+                title: '🧹 Vider les caches non-critiques ?',
+                body: 'Supprime <b>historique fiabilité</b> + <b>seen-locks</b>.<br><br><span style="color:var(--text-dim);font-size:12px;">Ne touche pas à tes paris trackés ni préférences.</span>',
+                confirmLabel: 'Vider',
+                cancelLabel: 'Annuler',
+              })
+            : confirm('Vider les caches non-critiques (historique fiabilité, seen-locks) ? Ça ne touche pas à tes paris trackés ni préférences.');
+          if (!ok) return;
           try {
             localStorage.removeItem('reliability_history_v1');
             localStorage.removeItem('seenLocks');
