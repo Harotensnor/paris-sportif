@@ -8819,6 +8819,45 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
           </div>
         </div>
 
+        <!-- v30 — Streak banner : visible quand le user a une série ≥2 -->
+        ${(() => {
+          let streak = 0, streakType = null;
+          try {
+            const trackedRaw = (typeof loadTrackedBets === 'function') ? loadTrackedBets() : null;
+            if (!trackedRaw) return '';
+            const trackedArr = Array.isArray(trackedRaw) ? trackedRaw : Object.values(trackedRaw || {});
+            const settled = trackedArr
+              .filter(b => b && (b.status === 'gagné' || b.status === 'perdu'))
+              .sort((a,b) => (b.added_at || '').localeCompare(a.added_at || ''));
+            for (const b of settled) {
+              const won = b.status === 'gagné';
+              if (streakType == null) { streakType = won ? 'won' : 'lost'; streak = 1; continue; }
+              if ((won && streakType === 'won') || (!won && streakType === 'lost')) streak++;
+              else break;
+            }
+          } catch(e) { return ''; }
+          if (streak < 2) return '';
+          const isWin = streakType === 'won';
+          const col = isWin ? '#10b981' : '#f87171';
+          const bg = isWin ? 'rgba(16,185,129,.08)' : 'rgba(248,113,113,.08)';
+          const border = isWin ? 'rgba(16,185,129,.3)' : 'rgba(248,113,113,.3)';
+          const icon = isWin ? '🔥' : '🧊';
+          const lbl = isWin ? `${streak} victoires d'affilée` : `${streak} défaites d'affilée`;
+          const advice = isWin
+            ? (streak >= 5 ? 'Belle série, mais ne change pas tes mises — la régression à la moyenne arrive toujours.' : 'Bonne forme, reste discipliné sur Kelly.')
+            : (streak >= 5 ? 'Pause recommandée. Réduis la mise de moitié ou skip 1-2 jours.' : 'Pas grave, ça arrive. Vérifie que tu suis bien les paris sûrs.');
+          return `
+            <div style="display:flex;align-items:center;gap:14px;padding:14px 18px;margin:18px 0;background:${bg};border:1px solid ${border};border-left:3px solid ${col};border-radius:0 10px 10px 0;">
+              <div style="font-size:24px;line-height:1;">${icon}</div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:11px;color:${col};text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:2px;">Série en cours</div>
+                <div style="font-size:14.5px;font-weight:700;color:var(--text);margin-bottom:2px;">${lbl}</div>
+                <div style="font-size:12.5px;color:var(--text-dim);line-height:1.4;">${advice}</div>
+              </div>
+              <button class="page-btn" data-page="mesparis" style="padding:7px 12px;background:transparent;color:var(--text-dim);border:1px solid var(--border-2);border-radius:6px;font-size:11.5px;font-weight:600;cursor:pointer;flex-shrink:0;">Voir mes paris →</button>
+            </div>`;
+        })()}
+
         <!-- v28.7 — Warning data obsolète : PRIORITAIRE sur tout le reste -->
         ${_dataIsStale ? `
         <div style="padding:24px;margin:24px 0;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.3);border-left:3px solid var(--danger);border-radius:0 10px 10px 0;">
