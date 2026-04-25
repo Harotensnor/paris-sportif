@@ -258,11 +258,53 @@ def enrich_event_odds(event, sport_slug, league_code):
     return merge_odds(existing, more)
 
 
+def extract_scorers(comp, sport):
+    """Pull goal-scorer events out of `competition.details[]` (foot only).
+
+    ESPN's scoreboard already inlines `details` once a match is completed;
+    each entry has a `type.text` we filter on for goal-related events. The
+    `athletesInvolved` array gives us the player(s); for own goals we keep
+    the type so the UI can label it. Silent-empty when the endpoint hasn't
+    populated this yet (early kick-off, niche league).
+    """
+    if sport != 'football':
+        return []
+    if not safe_get(comp, 'status', 'type', 'completed', default=False):
+        return []
+    out = []
+    for d in (comp.get('details') or []):
+        try:
+            t = d.get('type') or {}
+            t_text = (t.get('text') or t.get('name') or '').lower()
+            # ESPN soccer event types: "Goal", "Penalty Goal", "Own Goal".
+            # Free kicks counted as goals (type.text == 'Free Kick Goal') too.
+            if 'goal' not in t_text:
+                continue
+            athletes = d.get('athletesInvolved') or []
+            team_id = str(safe_get(d, 'team', 'id', default=''))
+            clock = d.get('clock') or {}
+            minute = clock.get('displayValue') if isinstance(clock, dict) else None
+            for a in athletes:
+                name = a.get('displayName') or a.get('name')
+                if not name:
+                    continue
+                out.append({
+                    'name': name,
+                    'team_id': team_id,
+                    'minute': minute,
+                    'type': t.get('text') or 'Goal',
+                })
+        except Exception:
+            continue
+    return out
+
+
 def compact_event(e, league_code, league_name, league_country, sport, priority=3, sport_path='soccer'):
     comp = (e.get('competitions') or [{}])[0]
     competitors = comp.get('competitors') or []
     notes = comp.get('notes') or []
     broadcasts = comp.get('broadcasts') or []
+    scorers = extract_scorers(comp, sport)
     return {
         'id': e.get('id'),
         'date': e.get('date'),
@@ -286,6 +328,7 @@ def compact_event(e, league_code, league_name, league_country, sport, priority=3
         'league_priority': priority,
         'sport': sport,
         '_sport_path': sport_path,  # internal for odds enrichment
+        'scorers': scorers,  # v30: foot-only goal scorers (when match is completed)
     }
 
 
