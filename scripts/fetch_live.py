@@ -22,23 +22,42 @@ spec = importlib.util.spec_from_file_location('v3', HERE / 'fetch_v3.py')
 v3 = importlib.util.module_from_spec(spec); spec.loader.exec_module(v3)
 
 
-def _seen_ids():
-    """Load set of event IDs already archived, so we only write each one once."""
-    seen = set()
+def _last_capture_per_id():
+    """For each event ID, return the most recent `captured_at` timestamp (datetime UTC).
+    Used to throttle re-captures so we get a real time-series (sparkline UI)
+    while keeping file growth bounded (cf rotate_odds_history)."""
+    last: dict[str, datetime] = {}
     if not ODDS_HISTORY.exists():
-        return seen
+        return last
     try:
         with ODDS_HISTORY.open('r', encoding='utf-8') as f:
             for line in f:
                 try:
                     rec = json.loads(line)
-                    if rec.get('id'):
-                        seen.add(str(rec['id']))
                 except Exception:
                     continue
+                eid = rec.get('id')
+                ts = rec.get('captured_at')
+                if not eid or not ts:
+                    continue
+                try:
+                    # ISO 8601 with trailing 'Z'
+                    dt = datetime.fromisoformat(ts.rstrip('Z'))
+                except Exception:
+                    continue
+                eid_s = str(eid)
+                prev = last.get(eid_s)
+                if prev is None or dt > prev:
+                    last[eid_s] = dt
     except Exception:
         pass
-    return seen
+    return last
+
+
+def _seen_ids():
+    """Backwards-compat shim — preserved for any external callers that
+    still expect a flat set of IDs."""
+    return set(_last_capture_per_id().keys())
 
 
 def _best_ml(event):
@@ -56,18 +75,31 @@ def _best_ml(event):
 
 
 def archive_pre_match_odds(events):
-    """Append ML odds for each new pre-kickoff event to ODDS_HISTORY (jsonl).
-    Only writes an event the first time we see it (idempotent)."""
+    """Append ML odds for each pre-kickoff event to ODDS_HISTORY (jsonl).
+
+    Captures :
+      • the FIRST time we see a match (opening line)
+      • again every RECAPTURE_HOURS afterwards, so we build a real
+        time-series for the sparkline UI ("📉 Évolution cote") in
+        pronostics.html. File growth stays bounded by rotate_odds_history()
+        which trims to the last 20 000 rows.
+    """
+    RECAPTURE_HOURS = 2.0
     now = datetime.utcnow()
-    seen = _seen_ids()
+    last_seen = _last_capture_per_id()
     written = 0
     with ODDS_HISTORY.open('a', encoding='utf-8') as f:
         for ev in events:
             if ev.get('completed') or ev.get('status') == 'STATUS_IN_PROGRESS':
                 continue
             eid = str(ev.get('id') or '')
-            if not eid or eid in seen:
+            if not eid:
                 continue
+            prev = last_seen.get(eid)
+            if prev is not None:
+                age_h = (now - prev).total_seconds() / 3600.0
+                if age_h < RECAPTURE_HOURS:
+                    continue
             ml = _best_ml(ev)
             if not ml:
                 continue
@@ -86,7 +118,7 @@ def archive_pre_match_odds(events):
                 'spread': ml.get('spread'),
             }
             f.write(json.dumps(rec, ensure_ascii=False) + '\n')
-            seen.add(eid)
+            last_seen[eid] = now
             written += 1
     if written:
         print(f'  archived {written} new pre-match odds rows → {ODDS_HISTORY.name}', flush=True)
