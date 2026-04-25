@@ -2647,7 +2647,10 @@
         <h3 id="detail-title">Match</h3>
         <div class="league" id="detail-league"></div>
       </div>
-      <button class="modal-close" id="close-detail" aria-label="Fermer la fenêtre de détails">Fermer ✕</button>
+      <div style="display:flex;gap:8px;flex-shrink:0;align-items:center;">
+        <button id="share-detail" type="button" class="modal-close" aria-label="Partager ce match" title="Partager — copie un lien vers ce match" style="padding:6px 10px;font-size:13px;">📤 Partager</button>
+        <button class="modal-close" id="close-detail" aria-label="Fermer la fenêtre de détails">Fermer ✕</button>
+      </div>
     </div>
     <div class="modal-body" id="detail-body"></div>
   </div>
@@ -6521,7 +6524,11 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
     // Chantier Q — ouvrir un lock = le marquer comme vu
     if (pred && pred.isLock && match.id != null) markLockSeen(match.id);
 
-    document.getElementById('detail-title').textContent = match.name || `${home?.name} vs ${away?.name}`;
+    // v30 — Stocke aussi match.id sur le title pour permettre au bouton
+    // partager de construire un share URL ciblé sur ce match.
+    const _titleEl = document.getElementById('detail-title');
+    _titleEl.textContent = match.name || `${home?.name} vs ${away?.name}`;
+    _titleEl.dataset.matchId = String(match.id || '');
     document.getElementById('detail-league').textContent = `${match.league_name}${match.round ? ' · ' + match.round : ''} · ${fmtFullDate(currentDate)} · ${fmtTime(match.date)}${match.venue ? ' · ' + match.venue : ''}`;
 
     const recH = parseRecord(getRecord(home));
@@ -7772,6 +7779,36 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
   document.getElementById('close-detail').addEventListener('click', closeDetailModal);
   document.getElementById('detail-modal').addEventListener('click', (e) => { if (e.target.id === 'detail-modal') closeDetailModal(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDetailModal(); });
+  // v30 — Share button sur la modale match. Construit un share URL avec
+  // ?match=<id> qui pourrait être restauré au boot (futur), partage via
+  // Web Share API natif (mobile) ou copy-to-clipboard (desktop).
+  const shareDetailBtn = document.getElementById('share-detail');
+  if (shareDetailBtn) shareDetailBtn.addEventListener('click', async () => {
+    try {
+      // Lit l'id du match courant via le data-* du title (set au openDetail)
+      const titleEl = document.getElementById('detail-title');
+      const matchId = titleEl?.dataset.matchId || '';
+      const matchName = titleEl?.textContent || 'Match';
+      const url = matchId
+        ? `${location.origin}${location.pathname}?match=${encodeURIComponent(matchId)}`
+        : location.href;
+      const text = `Regarde ce match sur Paris-Sportif : ${matchName}`;
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: matchName, text, url });
+          return;
+        } catch (e) {
+          if (e && e.name === 'AbortError') return;  // user cancelled
+        }
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(url);
+        if (typeof toast === 'function') toast('✅ Lien copié dans le presse-papier', 'success');
+      } else {
+        try { prompt('Copie ce lien :', url); } catch (e) {}
+      }
+    } catch (e) { console.warn('share failed:', e); }
+  });
 
   // ======= Auto-refresh =======
   // Polls data.js every 60s, merges fresh data into window.PRONOSTICS_DATA
@@ -16617,6 +16654,23 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
   function restoreShared(){
     var params = new URLSearchParams(window.location.search);
     var share = params.get('share');
+    var matchParam = params.get('match');
+    // v30 — ?match=<id> ouvre la modale du match partagé après que data
+    // soit chargée + render initial. Construit l'objet match en scannant
+    // PRONOSTICS_DATA.days.
+    if (matchParam) {
+      setTimeout(function(){
+        var data = window.PRONOSTICS_DATA;
+        if (!data || !data.days) return;
+        var found = null;
+        Object.values(data.days).forEach(function(arr){
+          (arr || []).forEach(function(m){
+            if (String(m.id) === String(matchParam)) found = m;
+          });
+        });
+        if (found && typeof openDetail === 'function') openDetail(found);
+      }, 800);
+    }
     if (!share) return;
     try {
       var state = JSON.parse(atob(share));
