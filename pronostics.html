@@ -6957,23 +6957,46 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
       })() : ''}
 
       <div class="section">
-        <h4>📊 Probabilités modélisées</h4>
-        <div class="prob-row">
-          <div class="lbl">Victoire ${esc(home?.short || home?.name || '1')}</div>
-          ${barOf(probs.pH)}
-          <div class="val">${((probs.pH||0)*100).toFixed(1)}%</div>
-        </div>
-        ${hasDraw ? `
-        <div class="prob-row">
-          <div class="lbl">Match nul</div>
-          ${barOf(probs.pD)}
-          <div class="val">${((probs.pD||0)*100).toFixed(1)}%</div>
-        </div>` : ''}
-        <div class="prob-row">
-          <div class="lbl">Victoire ${esc(away?.short || away?.name || '2')}</div>
-          ${barOf(probs.pA)}
-          <div class="val">${((probs.pA||0)*100).toFixed(1)}%</div>
-        </div>
+        <h4>📊 Probabilités modélisées vs marché</h4>
+        ${(() => {
+          // v30 — Comparaison côte-à-côte modèle vs marché. Les probas marché
+          // sont extraites de pred.odds (Winamax priorisé) via 1/odd, puis
+          // normalisées pour sommer à 1 (retire l'overround bookmaker).
+          // Edge = pModel - pMarket. Positif = on est plus optimiste que le
+          // marché → potentiel value.
+          const o = pred?.odds || {};
+          const inv = (n) => isFinite(n) && n > 0 ? 1/n : null;
+          const ih = inv(o.home), ia = inv(o.away), id = hasDraw ? inv(o.draw) : null;
+          const sum = (ih||0) + (ia||0) + (id||0);
+          const mH = ih && sum ? ih/sum : null;
+          const mA = ia && sum ? ia/sum : null;
+          const mD = id && sum ? id/sum : null;
+          const fmtP = (p) => p == null ? '—' : `${(p*100).toFixed(1)}%`;
+          const edgeOf = (model, market) => (model != null && market != null) ? (model - market) : null;
+          const edgeFmt = (e) => e == null ? '' : `<span style="color:${e>0.03?'#34d399':e<-0.03?'#f87171':'var(--text-dim)'};font-weight:600;font-size:11px;">${e>=0?'+':''}${(e*100).toFixed(1)}pt</span>`;
+          const barCmpHtml = (label, modelP, marketP) => {
+            const e = edgeOf(modelP, marketP);
+            return `<div style="display:grid;grid-template-columns:1fr auto;gap:6px;align-items:center;margin-bottom:10px;">
+              <div style="font-size:13px;color:var(--text);font-weight:500;">${esc(label)}</div>
+              ${edgeFmt(e)}
+              <div style="grid-column:1/-1;display:grid;grid-template-columns:60px 1fr 60px;gap:8px;align-items:center;font-size:11px;">
+                <div style="color:var(--brand);text-align:right;font-weight:700;font-variant-numeric:tabular-nums;">${fmtP(modelP)}</div>
+                <div style="position:relative;height:8px;background:var(--panel-2,rgba(255,255,255,.04));border-radius:4px;overflow:hidden;">
+                  <div style="position:absolute;left:0;top:0;height:100%;width:${Math.max(0,Math.min(100,(modelP||0)*100))}%;background:var(--brand);opacity:.85;"></div>
+                  <div style="position:absolute;left:0;top:0;height:100%;width:${Math.max(0,Math.min(100,(marketP||0)*100))}%;background:transparent;border-right:2px solid var(--text);opacity:.55;"></div>
+                </div>
+                <div style="color:var(--text-dim);font-variant-numeric:tabular-nums;">${fmtP(marketP)}</div>
+              </div>
+            </div>`;
+          };
+          const legend = `<div style="display:flex;gap:14px;font-size:10.5px;color:var(--text-dim);margin-bottom:8px;">
+            <div><span style="display:inline-block;width:10px;height:6px;background:var(--brand);opacity:.85;vertical-align:middle;margin-right:4px;border-radius:2px;"></span>Modèle</div>
+            <div><span style="display:inline-block;width:10px;height:8px;border-right:2px solid var(--text);vertical-align:middle;margin-right:4px;opacity:.55;"></span>Marché (Winamax, sans marge)</div>
+          </div>`;
+          return legend + barCmpHtml(`Victoire ${esc(home?.short || home?.name || '1')}`, probs.pH, mH)
+            + (hasDraw ? barCmpHtml('Match nul', probs.pD, mD) : '')
+            + barCmpHtml(`Victoire ${esc(away?.short || away?.name || '2')}`, probs.pA, mA);
+        })()}
       </div>
 
       <div class="section">
