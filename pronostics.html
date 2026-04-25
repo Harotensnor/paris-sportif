@@ -16538,19 +16538,34 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     URL.revokeObjectURL(url);
     window.__toast('✅ CSV téléchargé (' + bets.length + ' paris)', 'success');
   };
-  window.__copyShareLink = function(){
+  window.__copyShareLink = async function(){
     var activePage = document.querySelector('.page-btn.active, [data-page].active');
     var page = activePage ? (activePage.dataset.page || 'simples') : 'simples';
     var state = { page: page, ts: Date.now() };
     var encoded = btoa(JSON.stringify(state));
     var shareUrl = window.location.origin + window.location.pathname + '?share=' + encoded;
-    if (navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(shareUrl).then(function(){
-        window.__toast('✅ Lien copié', 'success');
-      }).catch(function(){ prompt('Copie ce lien:', shareUrl); });
-    } else {
-      prompt('Copie ce lien:', shareUrl);
+    var title = 'Paris-Sportif — ' + page;
+    var text = 'Mes pronostics du jour sur Paris-Sportif';
+    // v30 — Modern Web Share API first (mobile native share sheet),
+    // fallback to clipboard, fallback to prompt en dernier recours.
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: title, text: text, url: shareUrl });
+        window.__toast('✅ Partagé', 'success');
+        return;
+      } catch (e) {
+        // User cancelled share sheet — silently continue to clipboard
+        if (e && e.name === 'AbortError') return;
+      }
     }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        window.__toast('✅ Lien copié dans le presse-papier', 'success');
+        return;
+      } catch (e) { /* fallthrough to prompt */ }
+    }
+    try { prompt('Copie ce lien:', shareUrl); } catch (e) { /* sandbox */ }
   };
   function restoreShared(){
     var params = new URLSearchParams(window.location.search);
