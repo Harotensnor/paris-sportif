@@ -7385,6 +7385,54 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
       if (box) box.style.display = 'none';
     }
   });
+  // v30 — Navigation clavier dans search-suggest : ↑/↓ pour naviguer,
+  // Enter pour activer l'item highlighted, Esc pour fermer. Avant : seul
+  // le clic souris fonctionnait, la page était inutilisable au clavier.
+  (function _wireSearchKeyboard() {
+    const search = document.getElementById('search');
+    const box = document.getElementById('search-suggest');
+    if (!search || !box) return;
+    let cursorIdx = -1;
+    const _highlight = () => {
+      const items = box.querySelectorAll('.search-suggest-item');
+      items.forEach((el, i) => {
+        if (i === cursorIdx) {
+          el.style.background = 'rgba(167,139,250,.15)';
+          el.style.outline = '1px solid var(--brand)';
+          el.scrollIntoView({ block: 'nearest' });
+        } else {
+          el.style.background = '';
+          el.style.outline = '';
+        }
+      });
+    };
+    search.addEventListener('keydown', (e) => {
+      if (box.style.display === 'none') return;
+      const items = box.querySelectorAll('.search-suggest-item');
+      if (!items.length) return;
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        cursorIdx = (cursorIdx + 1) % items.length;
+        _highlight();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        cursorIdx = cursorIdx <= 0 ? items.length - 1 : cursorIdx - 1;
+        _highlight();
+      } else if (e.key === 'Enter') {
+        if (cursorIdx >= 0 && cursorIdx < items.length) {
+          e.preventDefault();
+          items[cursorIdx].click();
+          cursorIdx = -1;
+        }
+      } else if (e.key === 'Escape') {
+        box.style.display = 'none';
+        cursorIdx = -1;
+        search.blur();
+      }
+    });
+    // Reset cursor when input changes
+    search.addEventListener('input', () => { cursorIdx = -1; });
+  })();
 
   // Chantier AA — Recherche globale avec autocomplete.
   // Indexe équipes, ligues, villes et pays depuis les matchs chargés.
