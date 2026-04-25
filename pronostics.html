@@ -17043,6 +17043,127 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     // tout ça vit ailleurs (sidebar + carte matchs). Ici, un seul message :
     // "est-ce que le modèle gagne de l'argent en pariant flat 1u ?"
     const _modelRoi = model.bets ? roi : null;
+
+    // v30 — "Comment fonctionne le modèle" : section pédagogique en bas
+    // de la page Bilan. L'utilisateur a demandé "tu ajouteras des
+    // explications du modèle sur le site dans son bilan en version qui
+    // explique tout". On expose les 13+ signaux que predictMatch
+    // utilise réellement, leur poids, leur sport, et un mini-glossaire.
+    const _modelSignals = [
+      { icon: '📊', name: 'Marché (cotes implicites)',
+        sport: 'Tous',
+        weight: 'Pondération 0.50 dans le mix probabiliste — sert de baseline calibrée par les bookmakers, mais EXCLU du calcul de fiabilité (sinon on se contenterait de copier le marché).',
+        what: 'On prend les cotes 1n2 (Winamax prioritaire, sinon ESPN/TennisExplorer/BetExplorer), on enlève la marge bookmaker, et on convertit en probabilités.' },
+      { icon: '⚽', name: 'Buts attendus (Poisson)',
+        sport: 'Football',
+        weight: 'Pondération 0.50 — composante principale du modèle foot.',
+        what: 'Modèle Poisson basé sur les buts marqués/encaissés moyens des deux équipes (forme L5 + saison) ajustés par avantage domicile (×1.25). Donne aussi xG → marchés OU 2.5 et BTTS.' },
+      { icon: '💪', name: 'Force ELO (ClubElo)',
+        sport: 'Football',
+        weight: 'Pondération 0.30 — signal indépendant des cotes.',
+        what: 'Ratings Elo dynamiques de api.clubelo.com, ajustés d\'un home advantage de 65 points. La proba de nul décroît avec |elo_diff|. Particulièrement utile sur les matchs déséquilibrés où le marché peut être lent.' },
+      { icon: '🏠', name: 'Domicile / Extérieur (split)',
+        sport: 'Basket / Hockey',
+        weight: 'Pondération 0.30 — fondation des sports US.',
+        what: 'Records home/road séparés (15-3 à domicile vs 8-10 dehors). Avec home advantage de ×1.12 (basket) ou ×1.08 (hockey) si on n\'a pas le split.' },
+      { icon: '📈', name: 'Bilan saison',
+        sport: 'Tous',
+        weight: 'Pondération 0.30.',
+        what: 'Win rate sur l\'ensemble de la saison (V + N×0.5) / matchs. Signal stable mais lent.' },
+      { icon: '🏆', name: 'Classement ATP/WTA',
+        sport: 'Tennis',
+        weight: 'Pondération 0.40 — seul signal non-marché en tennis.',
+        what: 'Log-ratio des rangs : #1 vs #50 ≈ 80% favorite, #20 vs #100 ≈ 68%, rangs identiques ≈ coin-flip.' },
+      { icon: '⚔️', name: 'Face-à-face',
+        sport: 'Tous',
+        weight: 'Pondération 0.25.',
+        what: '3 à 5 dernières confrontations entre les deux équipes. Plus c\'est récent, plus ça compte. Stable au-delà de 2 meetings.' },
+      { icon: '🔥', name: 'Forme L5 (avec décay)',
+        sport: 'Tous',
+        weight: 'Nudge ±5%.',
+        what: '5 derniers résultats avec poids exponentiel : le dernier match compte ~2.5× le 5e plus ancien. Une équipe qui scrape 5 wins anciens passe APRÈS une qui aligne 3 wins frais.' },
+      { icon: '📈', name: 'Momentum L3 vs L5 (v30)',
+        sport: 'Tous',
+        weight: 'Nudge ±3% (capté).',
+        what: 'Direction sur le niveau : une équipe LLLLW qui prend WWW est sur une autre trajectoire qu\'une équipe WWWWW qui prend LLL. Stacke avec le formScore.' },
+      { icon: '⚽', name: 'Différentiel buts L5',
+        sport: 'Football',
+        weight: 'Nudge ±4%.',
+        what: 'Marge moyenne (buts marqués − encaissés) sur 5 matchs. Une équipe qui scrape 5 wins 1-0 vs une qui marque 3 par match : pas le même profil.' },
+      { icon: '🛡️', name: 'Profil défense / attaque (v30)',
+        sport: 'Football',
+        weight: 'Scale lamH/lamA jusqu\'à -15%.',
+        what: 'Clean sheets et failed_to_score sur L5. ≥60% clean sheets shrinke l\'xG adverse de 12% ; ≥60% matchs muets shrinke l\'xG propre. Affecte O/U 2.5 et BTTS.' },
+      { icon: '🥶', name: 'Météo (pluie / vent / froid v30)',
+        sport: 'Football',
+        weight: 'Scale Poisson jusqu\'à -12%.',
+        what: 'Pluie >1mm/h, vent >20 km/h, ou température <5°C dépriment l\'xG total. Trois axes empilables, dominante reportée.' },
+      { icon: '🟨', name: 'Profil arbitre (jaunes + rouges v30)',
+        sport: 'Football',
+        weight: 'Nudge ±0.03 sur xG (yellows) + ±0.04 (reds).',
+        what: 'Yellows hors [3.0–4.5]/match → strict ou laxiste, ajuste lamH/lamA. Rouges >0.10/match (≈1 rouge tous les 10 matchs) coupent encore le total. Indépendants l\'un de l\'autre.' },
+      { icon: '🏥', name: 'Blessures sévères',
+        sport: 'Football / Basket / Hockey',
+        weight: 'Nudge ±1.5% par absence, cap 6%.',
+        what: 'Sofascore (top-5 ligues foot) + ESPN (NBA/NHL/NFL/MLB). Down-weight si seul un côté est connu pour ne pas traiter "pas de data" comme "pas d\'absent".' },
+      { icon: '📋', name: 'Compositions confirmées (v30)',
+        sport: 'Football',
+        weight: 'Boost reliability ±2.5pp.',
+        what: 'Compos confirmées (≈30 min avant kick-off) résolvent l\'ambiguïté rotation/joueur clé : +2.5pp si les deux côtés, +1.2pp si un seul, -1pp si tout est en mode "predicted".' },
+      { icon: '🏃', name: 'Charge de matchs (7j)',
+        sport: 'Football',
+        weight: 'Nudge ±4%.',
+        what: '≥3 matchs en 7 jours = fatigue documentée → -1.5% par match au-delà du baseline 1/semaine. Fonctionne sans nouveau fetch (calculé sur le calendrier data.js).' },
+    ];
+    const _signalCardHtml = (s) => `
+      <div style="padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-radius:10px;display:flex;flex-direction:column;gap:6px;">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;">
+          <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--text);"><span style="font-size:18px;">${s.icon}</span>${esc(s.name)}</div>
+          <div style="font-size:10.5px;color:var(--brand);background:rgba(167,139,250,.10);padding:3px 8px;border-radius:4px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;white-space:nowrap;">${esc(s.sport)}</div>
+        </div>
+        <div style="font-size:11.5px;color:var(--text-dim2,#7b8693);font-weight:600;">${esc(s.weight)}</div>
+        <div style="font-size:12.5px;color:var(--text-dim);line-height:1.5;">${esc(s.what)}</div>
+      </div>`;
+    const _modelExplainerHtml = `
+      <section class="bilan-section" id="model-explainer" style="margin-top:32px;padding-top:24px;border-top:1px solid var(--border);">
+        <div class="bilan-section-head">
+          <h3>🧠 Comment fonctionne le modèle</h3>
+          <div class="meta">${_modelSignals.length} signaux actifs</div>
+        </div>
+        <div style="font-size:13.5px;color:var(--text-dim);line-height:1.6;max-width:820px;margin:0 0 18px;">
+          Le modèle <code style="background:rgba(255,255,255,.04);padding:1px 6px;border-radius:4px;">predictMatch</code> combine plusieurs signaux pour produire une probabilité par issue (1, N, 2). Chaque signal a un <strong>poids</strong> dans le mix, et la cohérence inter-signaux contribue à la <strong>fiabilité</strong> finale (qui est ensuite calibrée sur l'historique réel — voir section au-dessus). Les cotes du marché alimentent la prédiction (sinon les sports sans signal non-marché disparaîtraient) mais sont <em>exclues</em> du calcul de fiabilité — un pari fiable, c'est un pari où plusieurs signaux <em>indépendants</em> du marché sont d'accord.
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin-bottom:24px;">
+          ${_modelSignals.map(_signalCardHtml).join('')}
+        </div>
+
+        <div class="bilan-section-head" style="margin-top:24px;">
+          <h3>🎚️ Pourquoi parle-t-on de "fiabilité" et pas juste de "probabilité" ?</h3>
+        </div>
+        <div style="font-size:13.5px;color:var(--text-dim);line-height:1.6;max-width:820px;margin:0 0 12px;">
+          La <strong>probabilité</strong> brute du pick (ex : 65%) est ce que le mix pondéré produit. La <strong>fiabilité</strong> (ex : 60%) est cette proba <em>recalibrée</em> sur l'historique : si le modèle disait 65% mais qu'historiquement on n'a gagné qu'à 60% à ce niveau, on affiche 60% — pour pas te vendre du rêve. Cette calibration tourne en continu (voir le diagramme plus haut). Sur les 5 paris d'un même bucket, on attend que la fiabilité affichée corresponde à la win rate observée.
+        </div>
+        <div style="font-size:13.5px;color:var(--text-dim);line-height:1.6;max-width:820px;margin:0 0 24px;">
+          Trois autres facteurs pénalisent ou récompensent la fiabilité brute :
+          <ul style="margin:8px 0 0;padding-left:24px;">
+            <li><strong>Consensus</strong> entre signaux : si 4 signaux disent 65% mais le 5e dit 30%, l'écart-type pénalise la fiabilité.</li>
+            <li><strong>Richesse</strong> : un pick avec 4 signaux non-marché actifs est plus fiable qu'un pick avec 2 (saturation à 4).</li>
+            <li><strong>Compositions confirmées</strong> (foot v30) : +2.5pp si les deux compos sont confirmées, ±0 sinon, -1pp si tout est en "predicted".</li>
+          </ul>
+        </div>
+
+        <div class="bilan-section-head" style="margin-top:24px;">
+          <h3>📚 Glossaire express</h3>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:8px;font-size:12.5px;line-height:1.5;color:var(--text-dim);">
+          <div style="padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-radius:8px;"><strong style="color:var(--text);">ROI flat 1u</strong> : profit/perte si on mise 1 unité fixe sur chaque pari du modèle. Pas de Kelly, pas de progressive — juste 1u sec.</div>
+          <div style="padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-radius:8px;"><strong style="color:var(--text);">Brier score</strong> : moyenne du carré des écarts entre proba prédite et résultat (0 ou 1). Plus c'est bas, mieux c'est. <em>0.18 = bon, 0.25 = moyen, 0.30+ = à revoir.</em></div>
+          <div style="padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-radius:8px;"><strong style="color:var(--text);">Edge</strong> : différence entre notre probabilité et la probabilité implicite de la cote. >5pt = value bet potentielle, &lt;0 = on est plus pessimiste que le marché → skip.</div>
+          <div style="padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-radius:8px;"><strong style="color:var(--text);">Kelly fractionné (¼)</strong> : formule de mise optimale qui maximise la croissance long-terme sans ruiner sur les bad runs. On utilise ¼ Kelly + cap à 10% de la cagnotte = sécurité supplémentaire.</div>
+          <div style="padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-radius:8px;"><strong style="color:var(--text);">Lock</strong> : pari à fiabilité ≥70%, censé tomber ≥80% des fois (cible). C'est là que la mise est la plus grosse en Kelly.</div>
+          <div style="padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-radius:8px;"><strong style="color:var(--text);">Skip</strong> : pari avec moins de 2 signaux non-marché OU fiabilité &lt;45%. On ne le surface pas.</div>
+        </div>
+      </section>`;
     wrap.innerHTML = `
       <div style="max-width:1280px;margin:0 auto;padding:4px 0 0;font-variant-numeric:tabular-nums;">
         <div style="margin-bottom:24px;padding:32px 0 20px;border-bottom:1px solid var(--border);position:relative;">
@@ -17185,6 +17306,9 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
 
       <!-- CALIBRATION FIABILITÉ : reliability diagram + sparkline MAE persistant -->
       ${reliabilitySectionHtml}
+
+      <!-- v30 — Comment fonctionne le modèle (pédagogique) -->
+      ${_modelExplainerHtml}
 
       <!-- HISTORIQUE MODÈLE -->
       <div class="bilan-section">
