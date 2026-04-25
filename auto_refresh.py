@@ -58,6 +58,7 @@ FETCH_STAGES = [
     ('fetch_injuries.py',         10,   60),   # ESPN: NBA/NHL/NFL/MLB
     ('fetch_h2h.py',              15,   60),
     ('snapshot_odds.py',           1,   30),   # freeze pre-match odds
+    ('snapshot_results.py',        1,   30),   # archive completed matches (long backtest window)
     ('fetch_forebet.py',           5,   60),
     ('fetch_tips.py',             15,  120),   # RdJ, respectful cadence
     ('fetch_injuries_soccer.py', 120,  180),   # Sofascore, ~2h

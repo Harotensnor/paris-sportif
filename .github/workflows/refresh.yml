@@ -45,6 +45,7 @@ jobs:
           python3 fetch_injuries.py || true  # ESPN: US sports (NBA/NHL/NFL/MLB)
           python3 fetch_h2h.py || true       # head-to-head histories
           python3 snapshot_odds.py || true   # freeze pre-match odds (persist post-match for bilan)
+          python3 snapshot_results.py || true # archive completed matches into results_archive.jsonl (long backtest window)
           python3 fetch_forebet.py || true   # cheap: single HTML page, 40+ preds over 3 days
           # Every 3rd tick (= 15 min), also refresh RdJ tipsters (10 HTTP reqs, respectful cadence)
           MIN_MOD15=$(( $(date +%M) % 15 ))
@@ -142,7 +143,8 @@ jobs:
                   injuries_soccer.json winamax_catalog.json winamax_markets.json team_stats.json \
                   lineups_soccer.json clubelo.json weather.json \
                   weather_geo_cache.json referees_soccer.json health.json \
-                  data_today.json data_manifest.json team_form.json 2>/dev/null || true
+                  data_today.json data_manifest.json team_form.json \
+                  results_archive.jsonl 2>/dev/null || true
           # Only stamp sw.js if we have real content changes — otherwise
           # discard the version bump to avoid 288 empty commits/day.
           if git diff --cached --quiet; then
