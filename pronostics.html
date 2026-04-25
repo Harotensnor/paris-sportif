@@ -11087,6 +11087,37 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T18:50:32.814440Z","today":"
       const confColor = p.rel >= 0.70 ? 'var(--accent)' : p.rel >= 0.60 ? '#fbbf24' : 'var(--text-dim)';
       const edgeColor = p.edge > 0.10 ? 'var(--accent)' : p.edge > 0.05 ? '#fbbf24' : 'var(--text-dim)';
       const pickLabel = p.pred.pick.label || 'Pick';
+      // v30 — Score prédit + score réel (foot only).
+      // Le top-1 de pred.scores est le score le plus probable selon Poisson;
+      // m.competitors[].score est le score réel (string ESPN, parfois "—").
+      const isFoot = p.m.sport === 'football';
+      const predScores = (p.pred.scores && Array.isArray(p.pred.scores))
+        ? p.pred.scores
+        : (p.pred.scores && Array.isArray(p.pred.scores.items) && (p.pred.scores.kind === 'exact' || !p.pred.scores.kind))
+          ? p.pred.scores.items
+          : [];
+      const topScore = predScores[0];
+      const realHome = parseInt((p.m.competitors && p.m.competitors[0] && p.m.competitors[0].score) || '', 10);
+      const realAway = parseInt((p.m.competitors && p.m.competitors[1] && p.m.competitors[1].score) || '', 10);
+      const hasRealScore = isFini && Number.isFinite(realHome) && Number.isFinite(realAway);
+      const scoreCorrect = (topScore && hasRealScore) ? (topScore.home === realHome && topScore.away === realAway) : false;
+      // v30 — Buteurs prédits (top-2) + buteurs réels (depuis m.scorers).
+      // predictLikelyScorers exige les xG; ne tirera rien sans Poisson.
+      let predScorers = [];
+      try {
+        if (isFoot && typeof predictLikelyScorers === 'function') {
+          const all = predictLikelyScorers(p.m, p.pred) || [];
+          predScorers = all.slice(0, 2);
+        }
+      } catch(e){}
+      const realScorers = (isFoot && Array.isArray(p.m.scorers)) ? p.m.scorers : [];
+      const predScorerHit = (predScorers.length && realScorers.length) ? predScorers.some(ps =>
+        realScorers.some(rs => {
+          const a = String(ps.name || '').toLowerCase().split(/\s+/);
+          const b = String(rs.name || '').toLowerCase().split(/\s+/);
+          // Token intersection on last names ≥ 3 chars (handles "Mbappé K." vs "Kylian Mbappé").
+          return a.some(t => t.length >= 3 && b.includes(t));
+        })) : false;
       const sportEm = { football:'⚽', tennis:'🎾', basketball:'🏀', hockey:'🏒', baseball:'⚾', 'american-football':'🏈', mma:'🥊', golf:'⛳', racing:'🏎️', rugby:'🏉' }[p.m.sport] || '🎯';
       const league = p.m.league_name || '';
       const url = (p.m.winamax && p.m.winamax.url) || 'https://www.winamax.fr/paris-sportifs';
@@ -11122,6 +11153,18 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T18:50:32.814440Z","today":"
             ${teamLogo(hLogo)}<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(hn)}</span><span style="color:var(--text-dim);font-weight:400;">vs</span>${teamLogo(aLogo)}<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(an)}</span>
           </div>
           <div style="font-size:12px;color:var(--brand);font-weight:600;margin-top:3px;">→ ${esc(pickLabel)}</div>
+          ${isFoot && topScore ? `
+            <div style="font-size:11px;color:var(--text-dim);margin-top:3px;font-variant-numeric:tabular-nums;">
+              <span style="opacity:.75;">Score prédit</span>
+              <b style="color:var(--text);">${topScore.home}-${topScore.away}</b>
+              ${typeof topScore.prob === 'number' ? `<span style="color:var(--text-dim2);font-size:10px;">(${(topScore.prob*100).toFixed(0)}%)</span>` : ''}
+              ${hasRealScore ? `<span style="color:var(--text-dim2);">→</span><b style="color:${scoreCorrect ? '#34d399' : 'var(--text-dim)'};">${realHome}-${realAway}</b><span style="font-size:11px;">${scoreCorrect ? ' ✓' : ' ✗'}</span>` : ''}
+            </div>` : ''}
+          ${isFoot && (predScorers.length || realScorers.length) ? `
+            <div style="font-size:11px;color:var(--text-dim);margin-top:2px;line-height:1.35;">
+              ${predScorers.length ? `<span style="opacity:.75;">⚽ Buteurs probables :</span> <b style="color:var(--text);">${predScorers.map(s => `${esc(s.name)} (${Math.round(s.prob*100)}%)`).join(', ')}</b>` : ''}
+              ${realScorers.length ? `${predScorers.length ? '<br>' : ''}<span style="opacity:.75;">→ Marqueurs :</span> <b style="color:${predScorerHit ? '#34d399' : 'var(--text)'};">${realScorers.map(s => `${esc(s.name)}${s.minute ? ` ${esc(s.minute)}` : ''}`).join(', ')}</b>${predScorerHit ? ' <span style="color:#34d399;">✓ pick touché</span>' : ''}` : ''}
+            </div>` : ''}
         </div>
         <div style="display:flex;flex-direction:column;gap:2px;font-size:11px;">
           <div><span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Confiance du modèle : probabilité estimée que ce pari gagne. ≥70 % = très fiable.">Conf</span> <b style="color:${confColor};">${Math.round(p.rel*100)}%</b> · <span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Cote décimale Winamax. Gain potentiel = mise × cote. Ex : 10 € @ 2.10 → 21 €.">Cote</span> <b style="color:var(--text);">@${p.odd.toFixed(2)}</b></div>
