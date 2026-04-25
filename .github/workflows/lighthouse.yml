@@ -1,0 +1,95 @@
+name: lighthouse
+
+# Tracking continu de la perf web — runs Lighthouse contre une instance
+# python http.server qui sert pronostics.html. Catch les régressions FCP/
+# LCP/TBT/CLS avant qu'elles n'arrivent en prod.
+#
+# Déclenché sur push qui touche le HTML/sw/data, et manuellement.
+# Pas en cron (Lighthouse est sensible aux variations réseau et on n'a
+# pas besoin de scores quotidiens).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'pronostics.html'
+      - 'sw.js'
+      - 'manifest.webmanifest'
+      - 'index.html'
+      - '.github/workflows/lighthouse.yml'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lighthouse-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Lighthouse CLI
+        run: npm install --no-save lighthouse@12 chrome-launcher
+
+      - name: Start static server
+        run: |
+          python -m http.server 8765 &
+          for i in 1 2 3 4 5 6; do
+            sleep 1
+            if curl -fsS http://localhost:8765/pronostics.html -o /dev/null; then break; fi
+          done
+
+      - name: Run Lighthouse
+        run: |
+          npx lighthouse http://localhost:8765/pronostics.html \
+            --output=json --output=html \
+            --output-path=./lighthouse \
+            --chrome-flags="--headless --no-sandbox --disable-gpu" \
+            --only-categories=performance,accessibility,best-practices,seo \
+            --quiet
+
+      - name: Print scores
+        run: |
+          node -e '
+            const r = require("./lighthouse.report.json");
+            const cats = r.categories;
+            const fmt = c => ((c.score || 0) * 100).toFixed(0).padStart(3) + "/100";
+            console.log("=== Lighthouse scores ===");
+            console.log("Performance     :", fmt(cats.performance));
+            console.log("Accessibility   :", fmt(cats.accessibility));
+            console.log("Best practices  :", fmt(cats["best-practices"]));
+            console.log("SEO             :", fmt(cats.seo));
+            console.log("");
+            const audits = r.audits;
+            const m = (id) => audits[id] && audits[id].displayValue ? audits[id].displayValue : "-";
+            console.log("FCP (1st paint)  :", m("first-contentful-paint"));
+            console.log("LCP (largest)    :", m("largest-contentful-paint"));
+            console.log("TBT (blocking)   :", m("total-blocking-time"));
+            console.log("CLS (layout)     :", m("cumulative-layout-shift"));
+            console.log("Speed Index      :", m("speed-index"));
+            console.log("Total weight     :", m("total-byte-weight"));
+            console.log("Unused JS        :", m("unused-javascript"));
+          '
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-report
+          path: |
+            lighthouse.report.html
+            lighthouse.report.json
+          retention-days: 30
