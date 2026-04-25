@@ -7776,6 +7776,12 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
     m.classList.remove('open');
     m.setAttribute('aria-hidden', 'true');
   };
+  // v30 — Expose openDetail / closeDetailModal sur window pour permettre
+  // aux scripts séparés (enhancements v20 / restoreShared) d'y accéder.
+  // Sans ça, ?match=<id> dans l'URL ne pouvait pas ouvrir la modale car
+  // restoreShared vit dans un script tag différent (autre IIFE).
+  window.openDetail = openDetail;
+  window.closeDetailModal = closeDetailModal;
   document.getElementById('close-detail').addEventListener('click', closeDetailModal);
   document.getElementById('detail-modal').addEventListener('click', (e) => { if (e.target.id === 'detail-modal') closeDetailModal(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDetailModal(); });
@@ -16668,7 +16674,9 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
             if (String(m.id) === String(matchParam)) found = m;
           });
         });
-        if (found && typeof openDetail === 'function') openDetail(found);
+        // FIX scope : openDetail vit dans un autre script tag, donc on
+        // doit passer par window.openDetail (exposé explicitement).
+        if (found && typeof window.openDetail === 'function') window.openDetail(found);
       }, 800);
     }
     if (!share) return;
