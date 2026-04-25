@@ -11130,7 +11130,13 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T22:55:24.079929Z","today":"
   // retrouve sa vue à chaque retour sur la page.
   function renderTousPage(wrap) {
     const data = window.PRONOSTICS_DATA;
-    const todayIso = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+    // v30 — Bug fix : on utilisait `new Date()` directement, donc la nav
+    // prev-day/next-day n'avait aucun effet sur Tous. Utiliser currentDate
+    // (variable globale IIFE-scopée mise à jour par les boutons ◀ ▶ et
+    // l'input date de la topbar) pour respecter le jour navigué.
+    const todayIso = (typeof currentDate === 'string' && currentDate)
+      ? currentDate
+      : new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
     const today = (data && data.days && data.days[todayIso]) || [];
     const winaToday = today.filter(m => m.winamax && m.winamax.available === true);
 
@@ -11226,8 +11232,20 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T22:55:24.079929Z","today":"
     const wrPct = settledCount > 0 ? Math.round(100 * totalWon / settledCount) : 0;
     const filtersActive = tousFilters.sports.length > 0 || tousFilters.minEdge > 0 || tousFilters.minConf > 0 || tousSort !== 'kickoff';
 
+    // v30 — Si l'onglet sauvegardé est vide pour le jour courant, on bascule
+    // intelligemment vers un onglet rempli (à venir > en cours > finis) pour
+    // ne pas montrer un écran "Aucun match" alors que d'autres onglets ont
+    // du contenu. Évite la confusion "page vide" quand tabSelected=finished
+    // sur un jour à venir, ou pending sur un jour passé.
     const activeTab = (() => {
-      try { return localStorage.getItem('tousTab') || 'pending'; } catch(e) { return 'pending'; }
+      let saved = 'pending';
+      try { saved = localStorage.getItem('tousTab') || 'pending'; } catch(e) {}
+      const counts = { pending: pending.length, inprogress: inProgress.length, finished: finished.length };
+      if (counts[saved] > 0) return saved;
+      if (counts.pending > 0) return 'pending';
+      if (counts.inprogress > 0) return 'inprogress';
+      if (counts.finished > 0) return 'finished';
+      return saved; // tout est vide → garder la préférence
     })();
 
     const renderRow = (p, isFini) => {
@@ -15749,60 +15767,23 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T22:55:24.079929Z","today":"
     };
 
     if (!betEntries.length) {
-      // v30 — Empty state actionnable : pas juste une description, des CTAs.
-      // L'utilisateur arrive ici avec une intention ("où sont mes paris ?")
-      // mais s'il a 0 pari, il faut le guider vers le geste suivant.
+      // v30 — Page Mes paris simplifiée : le bouton "J'ai parié" n'existe
+      // plus (retiré pour la cohérence "site informationnel"), donc le
+      // tracking manuel n'a plus de point d'entrée. La page se concentre
+      // exclusivement sur l'import Winamax (winamax_my_bets.json) en
+      // attendant que l'utilisateur l'ait configuré.
       wrap.innerHTML = `
         <div style="max-width:1200px;margin:0 auto;padding:24px;">
-          <!-- v30 — Slot pour les paris importés Winamax (chargé async) -->
-          <div id="mesparis-winamax-slot" style="margin-bottom:24px;">
+          <div style="padding:40px 0 24px;border-bottom:1px solid var(--border);margin-bottom:24px;">
+            <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Suivi · paris importés</div>
+            <h1 style="margin:0 0 6px;font-size:32px;font-weight:800;letter-spacing:-1.1px;color:var(--text);line-height:1.1;">Mes paris</h1>
+            <div style="font-size:14px;color:var(--text-dim);max-width:640px;line-height:1.5;">Synchronisation directe depuis ton compte Winamax via <code style="background:rgba(255,255,255,.05);padding:2px 6px;border-radius:4px;">scripts/import_winamax_account.py</code>. Si tu n'as pas encore lancé l'import, suis les instructions ci-dessous.</div>
+          </div>
+          <!-- Slot pour les paris importés Winamax (chargé async) -->
+          <div id="mesparis-winamax-slot">
             <div style="padding:14px 16px;background:var(--panel-2);border:1px solid var(--border);border-radius:10px;color:var(--text-dim);font-size:13px;text-align:center;">
               🎯 Chargement de tes paris Winamax importés…
             </div>
-          </div>
-        </div>
-        <div style="max-width:640px;margin:0 auto;padding:40px 24px;">
-          <div style="text-align:center;margin-bottom:32px;">
-            <div style="font-size:56px;margin-bottom:14px;opacity:.85;">📝</div>
-            <h1 style="margin:0 0 8px;font-size:28px;font-weight:800;letter-spacing:-.6px;color:var(--text);">Mes paris (manuels)</h1>
-            <div style="color:var(--text-dim);font-size:14.5px;line-height:1.5;max-width:440px;margin:0 auto;">
-              Tu peux aussi tracker manuellement des paris hors-Winamax pour comparer avec les pronos du modèle.
-              <br/><b style="color:var(--text-2);">Aucun pari manuel — voici par où commencer :</b>
-            </div>
-          </div>
-          <!-- 3 CTAs : où trouver les paris à tracker -->
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:24px;">
-            <button class="page-btn" data-page="top" style="padding:18px 16px;background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:0 12px 12px 0;cursor:pointer;text-align:left;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.transform='translateX(2px)';" onmouseout="this.style.borderColor='var(--border)';this.style.transform='';this.style.borderLeftColor='var(--accent)';">
-              <div style="font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:4px;">Recommandé pour débuter</div>
-              <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px;">⭐ Top Pronos du jour</div>
-              <div style="font-size:12px;color:var(--text-dim);line-height:1.4;">Mes 3-5 meilleures opportunités, prêt-à-parier avec mise calculée.</div>
-            </button>
-            <button class="page-btn" data-page="locks" style="padding:18px 16px;background:var(--panel);border:1px solid var(--border);border-left:3px solid #fbbf24;border-radius:0 12px 12px 0;cursor:pointer;text-align:left;transition:all .15s;" onmouseover="this.style.borderColor='#fbbf24';this.style.transform='translateX(2px)';" onmouseout="this.style.borderColor='var(--border)';this.style.transform='';this.style.borderLeftColor='#fbbf24';">
-              <div style="font-size:11px;color:#fbbf24;text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:4px;">Si tu joues prudent</div>
-              <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px;">🔒 Paris sûrs</div>
-              <div style="font-size:12px;color:var(--text-dim);line-height:1.4;">Fiabilité ≥72%. Mises plus petites mais hit rate élevé.</div>
-            </button>
-            <button class="page-btn" data-page="tous" style="padding:18px 16px;background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--brand);border-radius:0 12px 12px 0;cursor:pointer;text-align:left;transition:all .15s;" onmouseover="this.style.borderColor='var(--brand)';this.style.transform='translateX(2px)';" onmouseout="this.style.borderColor='var(--border)';this.style.transform='';this.style.borderLeftColor='var(--brand)';">
-              <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:4px;">Vue d'ensemble</div>
-              <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px;">📋 Tous les pronos</div>
-              <div style="font-size:12px;color:var(--text-dim);line-height:1.4;">Tous les paris du jour, filtrables par sport, edge, confiance.</div>
-            </button>
-          </div>
-
-          <!-- How-to mini guide -->
-          <div style="padding:18px 22px;background:var(--panel);border:1px solid var(--border);border-radius:12px;line-height:1.6;font-size:13.5px;color:var(--text-2);">
-            <div style="font-size:12px;color:var(--brand);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:8px;">📖 Comment ça marche</div>
-            <ol style="margin:0;padding-left:18px;">
-              <li style="margin-bottom:6px;">Va sur Top, Locks, ou Tous les pronos</li>
-              <li style="margin-bottom:6px;">Click sur une ligne match → modale avec analyse complète</li>
-              <li style="margin-bottom:6px;">Clique <b style="color:var(--brand);">'J'ai parié'</b> pour tracker ta mise</li>
-              <li>Reviens ici pour voir ton P&amp;L réel, statut (en cours / gagné / perdu) et ROI cumulé</li>
-            </ol>
-          </div>
-
-          <!-- Discrete : pourquoi tracker -->
-          <div style="margin-top:20px;padding:14px 18px;background:rgba(167,139,250,.06);border-left:3px solid var(--brand);border-radius:0 8px 8px 0;font-size:12.5px;color:var(--text-2);line-height:1.5;">
-            <b style="color:var(--brand);">💡 Pourquoi tracker ?</b> Sans tracking, tu ne sais pas si tu gagnes vraiment ni où tu perds. La page Bilan croise tes paris avec celles du modèle pour montrer où tu surperformes/sous-performes.
           </div>
         </div>`;
       _injectWinamaxSection();
