@@ -123,6 +123,17 @@ rejouer la pipeline GitHub Actions toutes les 60 s (cadences par script).
 - **Théme 3-state** : `userPrefs.theme` ∈ {dark, light, auto}. `auto`
   résout via `prefers-color-scheme` au boot pré-body + écoute le change
   en live. Cycle Maj+T = dark → light → auto → dark.
+- **`prompt()` / `confirm()` interdits** : ces APIs natives ne marchent
+  pas en PWA installée (iOS Safari standalone), iframes sandbox, et
+  certains browsers sécurisés. Toujours utiliser les modals custom :
+  - `await window._showStakePrompt(suggested, label)` → string ou null
+  - `await window._showConfirm({ title, body, confirmLabel, cancelLabel,
+    danger })` → true ou false
+  Ces modals sont async, ARIA-annotés, supportent Enter/Esc, body en
+  HTML, et un fallback `confirm()` si jamais le helper n'est pas chargé.
+- **Helper console** : `window.__diag()` print structure synthétique de
+  l'état du site (data age, user prefs, sw status, calibration loaded,
+  etc.). Utile pour debug rapide quand un user signale un problème.
 
 ## Dev local
 
