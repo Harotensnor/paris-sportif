@@ -142,3 +142,101 @@ test.describe('Date nav', () => {
     await expect(todayBtn).toContainText("Aujourd'hui");
   });
 });
+
+// v30 — New feature tests added in this autonomous session
+test.describe('Crédibilité page', () => {
+  test('shows calibration plot + performance breakdown sections', async ({ page }) => {
+    await page.goto(URL);
+    // Wait for backtest_report_v2.json to be fetched
+    await page.waitForFunction(() => window.__backtestReportV2 != null, { timeout: 5000 });
+    // Navigate to credibilite via direct localStorage
+    await page.evaluate(() => {
+      localStorage.setItem('currentPage', 'credibilite');
+      if (typeof applyPageView === 'function') applyPageView();
+    });
+    // Check sections present
+    await expect(page.locator('h2', { hasText: '📊 Performance par segment' })).toBeVisible();
+    await expect(page.locator('h2', { hasText: '🎯 Calibration du modèle' })).toBeVisible();
+    // SVG plot
+    const svg = page.locator('svg[viewBox="0 0 380 280"]');
+    await expect(svg).toBeVisible();
+    // At least the diagonal line should be present
+    await expect(svg.locator('line[stroke-dasharray="4,4"]')).toHaveCount(1);
+  });
+});
+
+test.describe('Footer', () => {
+  test('renders with GitHub link + page-link buttons that navigate', async ({ page }) => {
+    await page.goto(URL);
+    const footer = page.locator('footer.site-footer');
+    await expect(footer).toBeVisible();
+    // GitHub link
+    const ghLink = footer.locator('a[href*="github.com"]');
+    await expect(ghLink).toBeVisible();
+    expect(await ghLink.getAttribute('href')).toContain('paris-sportif');
+    // Click "Méthode" → navigate to credibilite
+    await footer.locator('button.footer-link', { hasText: 'Méthode' }).click();
+    await expect.poll(async () =>
+      await page.evaluate(() => localStorage.getItem('currentPage'))
+    ).toBe('credibilite');
+  });
+});
+
+test.describe('Mes paris empty state', () => {
+  test('shows 3 actionable CTAs when no tracked bets', async ({ page }) => {
+    await page.goto(URL);
+    // Ensure no tracked bets
+    await page.evaluate(() => {
+      localStorage.removeItem('paris_sportif_tracked_bets');
+      localStorage.setItem('currentPage', 'mesparis');
+      if (typeof applyPageView === 'function') applyPageView();
+    });
+    const wrap = page.locator('#mesparis-wrap');
+    await expect(wrap.locator('button.page-btn[data-page="top"]')).toBeVisible();
+    await expect(wrap.locator('button.page-btn[data-page="locks"]')).toBeVisible();
+    await expect(wrap.locator('button.page-btn[data-page="tous"]')).toBeVisible();
+    // Click "Top Pronos" CTA → navigate
+    await wrap.locator('button.page-btn[data-page="top"]').click();
+    await expect.poll(async () =>
+      await page.evaluate(() => localStorage.getItem('currentPage'))
+    ).toBe('top');
+  });
+});
+
+test.describe('Help modal', () => {
+  test('opens with ? key and lists keyboard shortcuts', async ({ page }) => {
+    await page.goto(URL);
+    // Press ? (Shift+/)
+    await page.keyboard.press('Shift+/');
+    const modal = page.locator('#__shortcuts-modal');
+    await expect(modal).toBeVisible();
+    await expect(modal).toContainText('Raccourcis clavier');
+    await expect(modal).toContainText('Maj+T');
+    await expect(modal).toContainText('Focus la recherche');
+    // Esc closes
+    await page.keyboard.press('Escape');
+    await expect(modal).toBeHidden().catch(async () => {
+      // Modal may be removed entirely from DOM
+      await expect(page.locator('#__shortcuts-modal')).toHaveCount(0);
+    });
+  });
+});
+
+test.describe('Match modal — Reims regression', () => {
+  test('clicking a Tous row opens modal with valid team names (no "undefined vs undefined")', async ({ page }) => {
+    await page.goto(URL);
+    await page.evaluate(() => {
+      localStorage.setItem('currentPage', 'tous');
+      if (typeof applyPageView === 'function') applyPageView();
+    });
+    const rows = page.locator('.tous-row[data-match-id]');
+    const count = await rows.count();
+    test.skip(count === 0, 'No rows today — cannot test modal');
+    await rows.first().click();
+    const title = page.locator('#detail-title');
+    await expect(title).toBeVisible();
+    const text = await title.textContent();
+    expect(text).not.toMatch(/undefined/i);
+    expect(text.trim()).not.toBe('vs');
+  });
+});
