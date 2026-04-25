@@ -9947,17 +9947,33 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
       });
     });
     const reset = wrap.querySelector('[data-agent-reset]');
-    if (reset) reset.addEventListener('click', () => {
+    if (reset) reset.addEventListener('click', async () => {
       // v28.10 — Si un reset récent (<10 min) existe, c'est un clic d'annulation
       const prevReset = parseInt(localStorage.getItem('agentResetTs') || '0', 10);
+      const _confirmFn = (opts) => (typeof window._showConfirm === 'function')
+        ? window._showConfirm(opts)
+        : Promise.resolve(confirm(opts.body || opts.title));
       if (prevReset && (Date.now() - prevReset) < 600000) {
-        if (confirm('Annuler le reset précédent et restaurer ta cagnotte pré-reset ?')) {
+        const ok = await _confirmFn({
+          title: '↩️ Annuler le reset ?',
+          body: 'Restaurer ta cagnotte pré-reset (annulation possible jusqu\'à 10 min après le reset).',
+          confirmLabel: 'Annuler le reset',
+          cancelLabel: 'Garder',
+        });
+        if (ok) {
           try { localStorage.removeItem('agentResetTs'); } catch(e){}
           renderDashboardPage(wrap);
         }
         return;
       }
-      if (!confirm('Remettre la cagnotte du modèle à 10€ maintenant et oublier tout l\'historique antérieur ? (Annulable 10 minutes après)')) return;
+      const ok = await _confirmFn({
+        title: '🔄 Reset la cagnotte ?',
+        body: 'Remettre la cagnotte du modèle à <b>10€</b> et oublier tout l\'historique antérieur.<br><span style="color:var(--text-dim);font-size:12px;">Annulable pendant 10 minutes après le reset.</span>',
+        confirmLabel: 'Reset',
+        cancelLabel: 'Annuler',
+        danger: true,
+      });
+      if (!ok) return;
       try { localStorage.setItem('agentResetTs', String(Date.now())); } catch(e){}
       renderDashboardPage(wrap);
     });
@@ -14828,9 +14844,19 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
       updateTrackedBet(key, { status: 'annulé' });
       renderMesParis(wrap);
     }));
-    wrap.querySelectorAll('.tracked-bet-delete').forEach(btn => btn.addEventListener('click', () => {
+    wrap.querySelectorAll('.tracked-bet-delete').forEach(btn => btn.addEventListener('click', async () => {
       const key = btn.dataset.key;
-      if (confirm('Supprimer ce pari ?')) {
+      // v30 — modal custom au lieu de confirm() (fragile en PWA)
+      const ok = (typeof window._showConfirm === 'function')
+        ? await window._showConfirm({
+            title: '🗑️ Supprimer ce pari ?',
+            body: 'Le pari sera retiré définitivement de ton historique.',
+            confirmLabel: 'Supprimer',
+            cancelLabel: 'Annuler',
+            danger: true,
+          })
+        : confirm('Supprimer ce pari ?');
+      if (ok) {
         removeTrackedBet(key);
         renderMesParis(wrap);
       }
