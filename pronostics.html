@@ -2722,6 +2722,16 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T18:10:28.868257Z","today":"
     } catch(e) { return null; }
   }
   let currentPage = _pageFromHash() || localStorage.getItem('currentPage') || 'dashboard';
+  // PWA shortcuts arrive via #hash (no hashchange event fires), so sync the
+  // hash-derived page to localStorage at boot. Without this, opening
+  // /pronostics.html#locks lands on Locks but `currentPage` in localStorage
+  // still points to wherever the user was last (or 'dashboard'), so any tab
+  // restored from session after the shortcut would jump back.
+  try {
+    if (_pageFromHash() && localStorage.getItem('currentPage') !== currentPage) {
+      localStorage.setItem('currentPage', currentPage);
+    }
+  } catch(e){}
   // Sync hash → currentPage quand le user revient via back/forward navigation
   window.addEventListener('hashchange', () => {
     const p = _pageFromHash();
@@ -18173,8 +18183,17 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       'border-radius:8px;cursor:pointer;font-size:13px;">Fermer</button>' +
       '</div></div>';
     document.body.appendChild(div);
-    div.querySelector('#__close-shortcuts').onclick = function(){ div.remove(); };
-    div.onclick = function(e){ if (e.target === div) div.remove(); };
+    var _closeShortcuts = function(){
+      div.remove();
+      document.removeEventListener('keydown', _onShortcutsKey, true);
+    };
+    var _onShortcutsKey = function(ev){
+      if (ev.key === 'Escape') { ev.preventDefault(); _closeShortcuts(); }
+    };
+    div.querySelector('#__close-shortcuts').onclick = _closeShortcuts;
+    div.onclick = function(e){ if (e.target === div) _closeShortcuts(); };
+    // Esc closes — capture phase so it wins against later page handlers
+    document.addEventListener('keydown', _onShortcutsKey, true);
   }
   function initShortcuts(){
     document.addEventListener('keydown', function(e){
