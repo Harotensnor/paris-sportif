@@ -33,18 +33,26 @@ rejouer la pipeline GitHub Actions toutes les 60 s (cadences par script).
 
 ## Fichiers clés
 
-- **`pronostics.html`** (~14700 l) — SPA : toute l'app (HTML + CSS + JS).
+- **`pronostics.html`** (~16500 l) — SPA : toute l'app (HTML + CSS + JS).
   Regroupe ~15 pages (dashboard, simples, combinés, locks, mes paris,
-  buteurs, bilan, alertes, historique, académie, profil, backtest, top…)
-  via `applyPageView()` (l. ~9410) et un dispatcher click sur `.page-btn`.
+  buteurs, bilan, alertes, historique, académie, profil, backtest, top,
+  crédibilité…) via `applyPageView()` et un dispatcher click sur `.page-btn`.
   Fonctions critiques :
-  - `renderDashboardPage(wrap)` (l. ~7669) — vue Accueil, la plus riche.
-  - `predictMatch(m)` — modèle de scoring, utilisé par l'agent IA et par
-    les pages simples/combinés.
+  - `renderDashboardPage(wrap)` — vue Accueil, la plus riche.
+    Contient maintenant : daily P&L chip, streak banner, activité récente
+    (5 derniers paris), top picks avec countdown timer + pulse imminent,
+    prochaines opportunités, cards aside live/upcoming cliquables.
+  - `predictMatch(m)` — modèle de scoring, mémoïsé via `__predCache`.
   - `_agentReplay()`, `_agentPauseStatus()`, `_agentBestPick()` —
     gestion cagnotte + règles auto-tuning + Kelly.
-  - Storage local : `localStorage` (clés `agent*`, `myBets`, `currentPage`,
-    `userBankroll`, `agentResetTs`…).
+  - `renderCredibilitePage(wrap)` — calibration plot SVG + perf par sport/cote/tier,
+    lit `window.__backtestReportV2` depuis `_loadModelCalibration`.
+  - Storage local : `localStorage`. Préfixes connus : `agent*`, `bilan.*`,
+    `paris_sportif_*`. Clés notables : `currentPage`, `userBankroll`,
+    `agentResetTs`, `tousFilters`, `tousSort`, `tousTab`, `userPrefs.theme`
+    (3-state dark/light/auto), `userPrefs.pushNotifs`, `pwaInstallSnoozeUntil`,
+    `notifiedPickIds`, `paris_sportif_tracked_bets`, `seenLockIds`,
+    `paris_sportif_user_lessons_v1`, `paris_sportif_js_errors_v1`.
 
 - **`data.js`** (~1.3 MB, généré) — export `PRONOSTICS_DATA = {generated_at,
   today, days: {ISO: [events]}}`. Chaque event a : id, sport, league_code,
@@ -71,14 +79,26 @@ rejouer la pipeline GitHub Actions toutes les 60 s (cadences par script).
   avec cadences par script (1/5/10/15/120/240 ticks). Doit rester
   synchrone avec le workflow.
 
-- **`.github/workflows/refresh.yml`** — cron `*/5 * * * *`, exécute la
-  pipeline, commit `data.js` + sidecars (~paris après 1 min sur le site).
+- **`.github/workflows/refresh.yml`** — cron `*/5 10-23 * * *` jour /
+  `*/30 0-9 * * *` nuit, exécute la pipeline, commit `data.js` + sidecars.
+  Inclut `build_health.py` qui produit `health.json` à chaque tick.
+
+- **`.github/workflows/e2e.yml`** — déclenche les tests Playwright
+  (14 tests dans `tests/critical-flows.spec.js`) sur push main + PR
+  qui touchent `pronostics.html` / `tests/`. CI catch les régressions
+  nav, modale, theme, filter bar, hash navigation, etc.
+
+- **`scripts/build_health.py`** — produit `health.json` lu par le
+  health indicator topbar (`window._refreshHealthIndicator`). Statut
+  vert/orange/rouge selon âge data + warnings sources.
 
 ## Conventions
 
 - **UN SEUL FICHIER HTML** : `pronostics.html` contient tout. Pas de bundler,
   pas de build step. Modifier directement.
 - **`index.html`** redirige vers `pronostics.html` (pour GitHub Pages).
+- **`.gitattributes`** force LF eol partout — sans ça les édits Windows
+  produisent des diffs phantoms à chaque commit (CRLF/LF flip-flop).
 - **Variables `let`/`const` en scope IIFE** — attention TDZ : une `const`
   utilisée avant sa ligne de déclaration, même conditionnellement, lève
   `ReferenceError: Cannot access X before initialization`. Toujours hisser
@@ -88,6 +108,21 @@ rejouer la pipeline GitHub Actions toutes les 60 s (cadences par script).
   auto force-refresh 1× par session.
 - **Pipeline patch** : `patch_winamax` doit tourner **avant** tous les
   autres patchs (établit `ev.winamax.match_id` utilisé par les enrichisseurs).
+- **Noms équipes** : `m.home` / `m.away` n'existent PAS sur les events
+  PRONOSTICS_DATA. Les noms vivent dans `m.competitors[].name`. Toujours
+  passer par `getSides(m)` qui retourne `{home: {name, short, logo, ...}, away: {...}}`.
+  Ne JAMAIS interpoler `${m.home}` direct — on a déjà chassé 7 occurrences
+  de cette régression v24.3.
+- **Garde `Number(x) || 0`** : préférer `Number(x) || 0` à `x || 0` quand
+  x peut être une string corrompue ('abc'). 'abc' || 0 → 'abc' (truthy)
+  qui casse les `.toFixed()` ensuite. Helper `_normNum` partout dans
+  renderBet et co.
+- **`location.hash`** : 4 valeurs supportées au boot (#dashboard, #locks,
+  #bilan, #combines, etc.) pour les PWA shortcuts du manifest. Listener
+  hashchange pour back/forward.
+- **Théme 3-state** : `userPrefs.theme` ∈ {dark, light, auto}. `auto`
+  résout via `prefers-color-scheme` au boot pré-body + écoute le change
+  en live. Cycle Maj+T = dark → light → auto → dark.
 
 ## Dev local
 
@@ -113,8 +148,19 @@ push `data: auto-refresh <UTC>` toutes les 5 min.
 `data.js`, `odds_history.jsonl`, `clubelo.json`, `injuries_soccer.json`,
 `lineups_soccer.json`, `referees_soccer.json`, `team_stats.json`,
 `weather.json`, `weather_geo_cache.json`, `winamax_catalog.json`,
-`winamax_markets.json`, `backtest_report.json`, `backtest_report.md`.
+`winamax_markets.json`, `backtest_report.json`, `backtest_report.md`,
+`backtest_report_v2.json`, `backtest_report_v2.md`, `health.json`.
 Tous commités car c'est la "base de données" du site statique.
+
+## Tests
+
+- `tests/critical-flows.spec.js` — 14 tests Playwright (boot, hubs nav,
+  theme cycle, Tous filter, date nav, calibration, footer, mes paris
+  empty, help modal, Reims regression, hash navigation, daily P&L
+  resilience, notif btn, health indicator).
+- `playwright.config.js` — 2 projets (chromium-desktop + Pixel 5).
+  webServer python http.server port 8765.
+- Run local : `npx playwright test`. CI : `.github/workflows/e2e.yml`.
 
 ## Zones fragiles connues
 
