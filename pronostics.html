@@ -9864,17 +9864,30 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T22:02:48.500322Z","today":"
                 <button class="page-btn" data-page="tous" style="padding:10px 16px;background:var(--brand);color:#08080a;border:none;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;box-shadow:0 4px 14px rgba(139,92,246,.35);">Voir tous les pronos →</button>
               </div>
             </div>
-            ${heroPick ? `
-            <div style="padding:18px 20px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);border-left:3px solid var(--accent);border-radius:0 12px 12px 0;min-width:260px;">
-              <div style="font-size:10px;color:var(--accent);letter-spacing:.8px;text-transform:uppercase;font-weight:700;margin-bottom:6px;">⭐ Prono vedette</div>
-              <div style="font-size:15px;font-weight:700;color:var(--text);line-height:1.25;">${esc(heroPick.homeName)} <span style="color:var(--text-dim);font-weight:400;">vs</span> ${esc(heroPick.awayName)}</div>
-              <div style="font-size:11px;color:var(--text-dim);margin-top:2px;">${esc(bestLeague.slice(0,30))} · ${esc(fmtTime(heroPick.m.date))}</div>
-              <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:baseline;gap:12px;">
-                <div style="font-size:22px;font-weight:800;color:var(--accent);letter-spacing:-.4px;">@${heroPick.odd.toFixed(2)}</div>
-                <div style="font-size:11px;color:var(--text-dim);">Conf. <b style="color:var(--text);">${Math.round(heroPick.rel*100)}%</b>${heroPick._noEdge ? '' : ` · Edge <b style="color:var(--accent);">+${Math.round(heroPick.edge*100)}pt</b>`}</div>
-              </div>
-              <div style="margin-top:6px;font-size:12px;color:var(--text);font-weight:600;">→ ${esc((heroPick.best && heroPick.best.label) || heroPick.pred.pick.label || 'Pick')}</div>
-            </div>` : `
+            ${heroPick ? (() => {
+              // v30 — Voix du modèle : 1 phrase explicative tirée des reasons.
+              // On choisit la première reason non-marché (le marché c'est juste
+              // la cote, pas un argument du modèle). Si rien, on retombe sur
+              // le headline généré par predictMatch.
+              const _reasons = heroPick.pred?.explain?.reasons || [];
+              const _modelVoice = (() => {
+                const nonMarket = _reasons.find(r => r && r.type !== 'market');
+                if (nonMarket && nonMarket.text) return nonMarket.text;
+                return heroPick.pred?.explain?.headline || '';
+              })();
+              return `
+              <div class="dash-hero-pick" data-match-id="${esc(String(heroPick.m.id || ''))}" role="button" tabindex="0" aria-label="Ouvrir la fiche match du prono vedette" style="padding:18px 20px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);border-left:3px solid var(--accent);border-radius:0 12px 12px 0;min-width:260px;cursor:pointer;transition:transform .12s, background .12s;" onmouseover="this.style.background='rgba(16,185,129,.13)';this.style.transform='translateY(-1px)';" onmouseout="this.style.background='rgba(16,185,129,.08)';this.style.transform='translateY(0)';">
+                <div style="font-size:10px;color:var(--accent);letter-spacing:.8px;text-transform:uppercase;font-weight:700;margin-bottom:6px;">⭐ Prono vedette · clic pour la fiche</div>
+                <div style="font-size:15px;font-weight:700;color:var(--text);line-height:1.25;">${esc(heroPick.homeName)} <span style="color:var(--text-dim);font-weight:400;">vs</span> ${esc(heroPick.awayName)}</div>
+                <div style="font-size:11px;color:var(--text-dim);margin-top:2px;">${esc(bestLeague.slice(0,30))} · ${esc(fmtTime(heroPick.m.date))}</div>
+                <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:baseline;gap:12px;">
+                  <div style="font-size:22px;font-weight:800;color:var(--accent);letter-spacing:-.4px;">@${heroPick.odd.toFixed(2)}</div>
+                  <div style="font-size:11px;color:var(--text-dim);">Conf. <b style="color:var(--text);">${Math.round(heroPick.rel*100)}%</b>${heroPick._noEdge ? '' : ` · Edge <b style="color:var(--accent);">+${Math.round(heroPick.edge*100)}pt</b>`}</div>
+                </div>
+                <div style="margin-top:6px;font-size:12px;color:var(--text);font-weight:600;">→ ${esc((heroPick.best && heroPick.best.label) || heroPick.pred.pick.label || 'Pick')}</div>
+                ${_modelVoice ? `<div style="margin-top:10px;padding:8px 10px;background:rgba(255,255,255,.04);border-radius:6px;font-size:11.5px;color:var(--text-dim);line-height:1.45;border-left:2px solid var(--brand);"><span style="color:var(--brand);font-weight:700;">🤖 Le modèle dit :</span> ${esc(_modelVoice)}</div>` : ''}
+              </div>`;
+            })() : `
             <div style="padding:18px 20px;background:rgba(148,163,184,.06);border:1px dashed var(--border-2);border-radius:12px;min-width:260px;text-align:center;">
               <div style="font-size:11px;color:var(--text-dim);letter-spacing:.5px;text-transform:uppercase;font-weight:600;">Aucun prono vedette</div>
               <div style="font-size:12.5px;color:var(--text-dim2,#7b8693);margin-top:6px;line-height:1.4;">Pas de match avec edge ≥ 5% et conf. ≥ 55% disponible.</div>
@@ -9882,42 +9895,46 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T22:02:48.500322Z","today":"
           </div>
         </div>
 
-        <!-- v30 — Streak banner : visible quand le user a une série ≥2 -->
+        <!-- v30 — Streak banner : MODÈLE (pas perso). On regarde les derniers
+             picks réglés par _agentReplay (foot/tennis/basket/hockey) et on
+             affiche la séquence W/L courante. L'user n'a pas besoin de tracker
+             ses paris, le modèle parle pour lui-même. -->
         ${(() => {
+          if (_dataIsStale) return '';
+          if (!agent || !Array.isArray(agent.scorableRaw)) return '';
+          // scorableRaw est trié chronologiquement asc → on prend la fin.
+          const settled = agent.scorableRaw.filter(s => s.res === 'won' || s.res === 'lost');
+          if (settled.length < 2) return '';
           let streak = 0, streakType = null;
-          try {
-            const trackedRaw = (typeof loadTrackedBets === 'function') ? loadTrackedBets() : null;
-            if (!trackedRaw) return '';
-            const trackedArr = Array.isArray(trackedRaw) ? trackedRaw : Object.values(trackedRaw || {});
-            const settled = trackedArr
-              .filter(b => b && (b.status === 'gagné' || b.status === 'perdu'))
-              .sort((a,b) => (b.added_at || '').localeCompare(a.added_at || ''));
-            for (const b of settled) {
-              const won = b.status === 'gagné';
-              if (streakType == null) { streakType = won ? 'won' : 'lost'; streak = 1; continue; }
-              if ((won && streakType === 'won') || (!won && streakType === 'lost')) streak++;
-              else break;
-            }
-          } catch(e) { return ''; }
+          for (let i = settled.length - 1; i >= 0; i--) {
+            const r = settled[i].res;
+            if (streakType == null) { streakType = r; streak = 1; continue; }
+            if (r === streakType) streak++;
+            else break;
+          }
           if (streak < 2) return '';
           const isWin = streakType === 'won';
           const col = isWin ? '#10b981' : '#f87171';
           const bg = isWin ? 'rgba(16,185,129,.08)' : 'rgba(248,113,113,.08)';
           const border = isWin ? 'rgba(16,185,129,.3)' : 'rgba(248,113,113,.3)';
           const icon = isWin ? '🔥' : '🧊';
-          const lbl = isWin ? `${streak} victoires d'affilée` : `${streak} défaites d'affilée`;
+          const lbl = isWin ? `${streak} picks gagnés d'affilée` : `${streak} picks perdus d'affilée`;
+          // Derniers 5 résultats du modèle pour le sparkline texte.
+          const last5 = settled.slice(-5).map(s => s.res === 'won' ? '✓' : '✗').join(' ');
+          const last5Cols = settled.slice(-5).map(s => s.res === 'won' ? '#10b981' : '#f87171');
+          const sparkChars = settled.slice(-5).map((s, i) => `<span style="color:${last5Cols[i]};">${s.res === 'won' ? '✓' : '✗'}</span>`).join(' ');
           const advice = isWin
-            ? (streak >= 5 ? 'Belle série, mais ne change pas tes mises — la régression à la moyenne arrive toujours.' : 'Bonne forme, reste discipliné sur Kelly.')
-            : (streak >= 5 ? 'Pause recommandée. Réduis la mise de moitié ou skip 1-2 jours.' : 'Pas grave, ça arrive. Vérifie que tu suis bien les paris sûrs.');
+            ? (streak >= 5 ? 'Le modèle est en pleine forme. Reste discipliné sur Kelly — la moyenne se rappellera tôt ou tard.' : 'Bon momentum modèle. Continue à suivre les picks lock prioritairement.')
+            : (streak >= 5 ? 'Le modèle traverse une bad run. Ne double pas la mise ; les conditions s\'inversent.' : 'Petite passe à vide. Les locks restent à >70% historiquement, garde le cap.');
           return `
             <div style="display:flex;align-items:center;gap:14px;padding:14px 18px;margin:18px 0;background:${bg};border:1px solid ${border};border-left:3px solid ${col};border-radius:0 10px 10px 0;">
               <div style="font-size:24px;line-height:1;">${icon}</div>
               <div style="flex:1;min-width:0;">
-                <div style="font-size:11px;color:${col};text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:2px;">Série en cours</div>
-                <div style="font-size:14.5px;font-weight:700;color:var(--text);margin-bottom:2px;">${lbl}</div>
+                <div style="font-size:11px;color:${col};text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:2px;">🤖 Série du modèle</div>
+                <div style="font-size:14.5px;font-weight:700;color:var(--text);margin-bottom:2px;">${lbl} <span style="font-size:12.5px;font-weight:600;color:var(--text-dim);margin-left:8px;">5 derniers : ${sparkChars}</span></div>
                 <div style="font-size:12.5px;color:var(--text-dim);line-height:1.4;">${advice}</div>
               </div>
-              <button class="page-btn" data-page="mesparis" style="padding:7px 12px;background:transparent;color:var(--text-dim);border:1px solid var(--border-2);border-radius:6px;font-size:11.5px;font-weight:600;cursor:pointer;flex-shrink:0;">Voir mes paris →</button>
+              <button class="page-btn" data-page="bilan" style="padding:7px 12px;background:transparent;color:var(--text-dim);border:1px solid var(--border-2);border-radius:6px;font-size:11.5px;font-weight:600;cursor:pointer;flex-shrink:0;">Voir bilan →</button>
             </div>`;
         })()}
 
@@ -9956,53 +9973,47 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T22:02:48.500322Z","today":"
             </div>`;
         })()}
 
-        <!-- v30 — Activité récente : 5 derniers paris réglés -->
+        <!-- v30 — "Activité récente" retirée (dépendait des paris trackés
+             que l'user n'enregistre pas). Le focus du dashboard est sur les
+             pronos du modèle, pas sur le bilan personnel. -->
         ${(() => {
-          let bets;
-          try { bets = (typeof loadTrackedBets === 'function') ? loadTrackedBets() : null; } catch(e) { return ''; }
-          if (!bets) return '';
-          const arr = Array.isArray(bets) ? bets : Object.values(bets || {});
-          const settled = arr.filter(b => b && (b.status === 'gagné' || b.status === 'perdu'))
-            .sort((a, b) => {
-              const ta = a.added_at ? new Date(a.added_at).getTime() : 0;
-              const tb = b.added_at ? new Date(b.added_at).getTime() : 0;
-              return tb - ta;
-            })
-            .slice(0, 5);
-          if (settled.length < 2) return '';   // pas la peine si <2 paris
+          // v30 — "5 derniers picks du modèle" remplace l'activité perso :
+          // on liste les 5 dernières évaluations de l'agent (won/lost) avec
+          // le résultat, l'edge et le P&L flat 1u — pour que l'user voie ce
+          // que le modèle aurait fait sans rien tracker.
+          if (_dataIsStale) return '';
+          if (!agent || !Array.isArray(agent.scorableRaw) || agent.scorableRaw.length < 2) return '';
+          const last5 = agent.scorableRaw.slice(-5).reverse();
           const fmtRel = (ts) => {
             if (!ts) return '—';
-            const d = new Date(ts);
-            if (isNaN(d.getTime())) return '—';
-            const diff = Date.now() - d.getTime();
+            const diff = Date.now() - ts;
             if (diff < 60000) return 'à l\'instant';
             if (diff < 3600000) return `il y a ${Math.round(diff/60000)} min`;
             if (diff < 24*3600000) return `il y a ${Math.round(diff/3600000)} h`;
             return `il y a ${Math.round(diff/(24*3600000))} j`;
           };
-          const items = settled.map(b => {
-            const stake = Number(b.stake) || 0;
-            const odds = Number(b.odds) || Number(b.odd) || 0;
-            const won = b.status === 'gagné';
-            const pl = (stake > 0 && odds > 0) ? (won ? stake * (odds - 1) : -stake) : 0;
+          const items = last5.map(s => {
+            const won = s.res === 'won';
+            const pl = won ? (s.odd - 1) : -1;
             const col = won ? '#34d399' : '#f87171';
             const ico = won ? '✓' : '✗';
-            const teams = (b.match_label || b.label || `${b.home || '?'} vs ${b.away || '?'}`).slice(0, 50);
-            const pickLabel = (b.pickLabel || b.pick || '').slice(0, 28);
-            return `<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--border);font-size:12.5px;">
+            const sides = (typeof getSides === 'function') ? getSides(s.m) : { home: {}, away: {} };
+            const teams = `${(sides.home && sides.home.short) || (sides.home && sides.home.name) || '?'} vs ${(sides.away && sides.away.short) || (sides.away && sides.away.name) || '?'}`.slice(0, 50);
+            const pickLabel = ((s.best && s.best.label) || s.pred?.pick?.label || '').slice(0, 28);
+            return `<div data-match-id="${esc(String(s.m.id || ''))}" class="agent-pos-row" style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--border);font-size:12.5px;cursor:pointer;transition:background .12s;" onmouseover="this.style.background='rgba(255,255,255,.03)';" onmouseout="this.style.background='';">
               <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:${col}22;color:${col};font-weight:700;font-size:12px;flex-shrink:0;">${ico}</span>
               <div style="flex:1;min-width:0;line-height:1.3;">
                 <div style="color:var(--text);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(teams)}</div>
-                <div style="font-size:11px;color:var(--text-dim);">${pickLabel ? esc(pickLabel) + ' · ' : ''}${esc(fmtRel(b.added_at))}</div>
+                <div style="font-size:11px;color:var(--text-dim);">${pickLabel ? esc(pickLabel) + ' @ ' + s.odd.toFixed(2) + ' · ' : ''}${esc(fmtRel(s.ts))}</div>
               </div>
-              <div style="color:${col};font-weight:700;font-variant-numeric:tabular-nums;flex-shrink:0;">${pl >= 0 ? '+' : ''}${pl.toFixed(2)}€</div>
+              <div style="color:${col};font-weight:700;font-variant-numeric:tabular-nums;flex-shrink:0;">${pl >= 0 ? '+' : ''}${pl.toFixed(2)}u</div>
             </div>`;
           }).join('');
           return `
             <div style="margin:14px 0 0;padding:0;background:var(--panel);border:1px solid var(--border);border-radius:10px;overflow:hidden;">
               <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border);">
-                <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">📋 Activité récente</div>
-                <button class="page-btn" data-page="mesparis" style="padding:4px 9px;background:transparent;color:var(--text-dim);border:1px solid var(--border-2);border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;">Voir tout</button>
+                <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">🤖 5 derniers picks du modèle</div>
+                <button class="page-btn" data-page="bilan" style="padding:4px 9px;background:transparent;color:var(--text-dim);border:1px solid var(--border-2);border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;">Voir bilan</button>
               </div>
               ${items}
             </div>`;
@@ -10066,7 +10077,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T22:02:48.500322Z","today":"
               const _countdownColor = _isStartingSoon() ? '#fbbf24' : 'var(--text-dim)';
               const _countdownBg = _isStartingSoon() ? 'rgba(251,191,36,.15)' : 'transparent';
               const _countdownBorder = _isStartingSoon() ? '1px solid rgba(251,191,36,.4)' : '1px solid var(--border-2)';
-              return `<div class="dash-pick-card${_isImminent ? ' imminent' : ''}" id="${cardId}" data-match-id="${esc(String(p.m.id))}" data-match-date="${esc(String(p.m.date||''))}" data-odd="${p.odd}" style="padding:16px;background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:0 10px 10px 0;">
+              return `<div class="dash-pick-card${_isImminent ? ' imminent' : ''}" id="${cardId}" data-match-id="${esc(String(p.m.id))}" data-match-date="${esc(String(p.m.date||''))}" data-odd="${p.odd}" role="button" tabindex="0" aria-label="Ouvrir la fiche match" style="padding:16px;background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:0 10px 10px 0;cursor:pointer;transition:background .12s, transform .12s;"
                 <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;gap:8px;">
                   <div style="font-size:10px;color:var(--text-dim);letter-spacing:.5px;text-transform:uppercase;">${sIco} ${esc((typeof sportLabel==='function')?sportLabel(p.m.sport):p.m.sport)}</div>
                   <div style="display:flex;gap:6px;align-items:baseline;font-size:10px;">
@@ -10082,6 +10093,12 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T22:02:48.500322Z","today":"
                   <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(p.awayName)}</span>
                 </div>
                 <div style="font-size:16px;color:var(--brand);font-weight:700;margin:10px 0 4px;">→ ${esc(pickLabel)}</div>
+                ${(() => {
+                  // v30 — Voix du modèle : 1 phrase courte, prend la 1ère reason
+                  // non-marché (le modèle parle, pas le bookmaker).
+                  const voice = (allReasons.find(r => r && r.type !== 'market') || {}).text;
+                  return voice ? `<div style="margin:6px 0 8px;padding:6px 10px;background:rgba(167,139,250,.08);border-left:2px solid var(--brand);border-radius:0 4px 4px 0;font-size:11.5px;color:var(--text-dim);line-height:1.4;"><span style="color:var(--brand);font-weight:700;">🤖</span> ${esc(voice)}</div>` : '';
+                })()}
                 ${allReasons.length ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin:6px 0 10px;">
                   ${allReasons.slice(0, 3).map(r => `<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:999px;font-size:10.5px;color:var(--text-dim);line-height:1.3;" title="${esc(r.text||'')}">${esc(r.icon||'')} ${esc((r.text||'').slice(0,42))}${(r.text||'').length>42?'…':''}</span>`).join('')}
                 </div>` : ''}
@@ -10700,6 +10717,42 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T22:02:48.500322Z","today":"
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           _asideRowOpen(row);
+        }
+      });
+    });
+    // v30 — Hero pick + top opportunity cards cliquables → ouvre modale.
+    // Guarde sur les controls internes (button, a, input) pour ne pas
+    // intercepter les clics sur "Parier sur Winamax", l'ajusteur de mise,
+    // les presets stake, le toggle "Voir l'analyse complète", etc.
+    const _matchById = (id) => {
+      let found = null;
+      Object.values(data.days || {}).forEach(arr => (arr || []).forEach(m => { if (String(m.id) === id) found = m; }));
+      return found;
+    };
+    const _isInteractiveTarget = (el) => {
+      if (!el) return false;
+      // Walk up to the card root and stop if we hit a form-ish element first.
+      while (el && !el.matches?.('.dash-pick-card, .dash-hero-pick')) {
+        if (el.matches?.('button, a, input, select, textarea, [data-toggle-card], [data-stake-preset], .dpc-stake-adj, .dpc-stake-input')) return true;
+        el = el.parentElement;
+      }
+      return false;
+    };
+    const _openCardMatch = (card) => {
+      const id = card.dataset.matchId;
+      if (!id) return;
+      const m = _matchById(id);
+      if (m && typeof openDetail === 'function') openDetail(m);
+    };
+    wrap.querySelectorAll('.dash-hero-pick, .dash-pick-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        if (_isInteractiveTarget(e.target)) return;
+        _openCardMatch(card);
+      });
+      card.addEventListener('keydown', (e) => {
+        if ((e.key === 'Enter' || e.key === ' ') && e.target === card) {
+          e.preventDefault();
+          _openCardMatch(card);
         }
       });
     });
