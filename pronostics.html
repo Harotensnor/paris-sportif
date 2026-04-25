@@ -7969,6 +7969,14 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
       if (ind) ind.classList.remove('refreshing');
     }
   }
+  // v30 — Expose pollData + predictMatch sur window pour le debug console
+  // et pour permettre aux scripts séparés (enhancements v20) de les
+  // utiliser. predictMatch est déjà appelé en plein de places, donc
+  // sa visibilité explicite réduit la surface de bugs scope.
+  try {
+    window.pollData = pollData;
+    window.predictMatch = predictMatch;
+  } catch(e){}
 
   // ===== Unified refresh tick =====
   // One timer to rule them all. Every 15 s we:
@@ -12745,6 +12753,10 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
     const passFilter = (p) => {
       if (_histFilters.sport !== 'all' && p.m.sport !== _histFilters.sport) return false;
       const fiab = p.pred.reliability ?? p.pred.pick.prob;
+      // FIX audit Histo #7 : exclure les picks avec fiab null/NaN AVANT
+      // les filtres bucket — sinon ils passent en "low" et affichent
+      // "NaN%" plus loin dans la liste.
+      if (fiab == null || !isFinite(fiab)) return false;
       if (_histFilters.fiab === 'locks' && !p.pred.isLock) return false;
       if (_histFilters.fiab === 'hi' && (fiab < 0.60 || fiab >= 0.70)) return false;
       if (_histFilters.fiab === 'mid' && (fiab < 0.50 || fiab >= 0.60)) return false;
@@ -12769,10 +12781,16 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
     const roi = totN ? (100 * totPL / totN) : null;
 
     // 4. Group by day (Europe/Paris)
+    // FIX audit Histo #3 : new Date('foo').toLocaleDateString() retourne
+    // "Invalid Date" en string (pas une exception → catch jamais
+    // déclenché). Ajout d'un guard explicite isNaN sur le timestamp.
     function dayKey(dateStr) {
+      if (!dateStr) return '';
       try {
-        return new Date(dateStr).toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
-      } catch (e) { return isoDate(dateStr); }
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return '';
+        return d.toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+      } catch (e) { return ''; }
     }
     const byDay = new Map();
     filtered.forEach(p => {
@@ -13119,8 +13137,12 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
       row.addEventListener('click', () => {
         const id = row.dataset.matchId;
         if (!id) return;
-        const match = filtered.find(p => p.m.id === id)?.m;
-        if (match) openDetail(match);
+        const match = filtered.find(p => String(p.m.id) === String(id))?.m;
+        // FIX audit Histo #8 : guard typeof openDetail pour éviter
+        // ReferenceError silencieuse si la fonction n'est pas accessible
+        // dans certains contextes (re-render après navigation rapide).
+        if (match && typeof openDetail === 'function') openDetail(match);
+        else if (match && typeof window.openDetail === 'function') window.openDetail(match);
       });
     });
   }
@@ -13409,7 +13431,13 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
             const keys = await caches.keys();
             await Promise.all(keys.map(k => caches.delete(k)));
             toast('SW désinscrit — reload la page', 'success');
-            setTimeout(() => _hardReload(), 800);
+            // FIX audit Santé #4 : guard typeof pour éviter de laisser
+            // l'utilisateur en état dégradé si _hardReload n'est pas
+            // accessible. Fallback sur location.reload() standard.
+            setTimeout(() => {
+              if (typeof _hardReload === 'function') _hardReload();
+              else location.reload();
+            }, 800);
           } catch (e) { toast('Echec: ' + (e.message || e), 'error'); }
         }
       } : null });
@@ -13557,10 +13585,21 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
         <div style="font-size:12px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;font-weight:600;margin-bottom:8px;">🐞 Dernières erreurs JS</div>
         <div style="background:rgba(248,113,113,.04);border:1px solid rgba(248,113,113,.2);border-radius:8px;overflow:hidden;">
           ${errList.slice(-10).reverse().map(e => {
-            const when = new Date(e.t).toLocaleString('fr-FR', { timeZone: 'Europe/Paris', day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+            // FIX audit Santé #7 : guard new Date(e.t) qui peut produire
+            // Invalid Date si e.t est corrompu, et e.page/e.type/e.msg
+            // peuvent être undefined si l'entrée du ring buffer est
+            // malformée → "Invalid Date · page=undefined" affiché sinon.
+            const _t = e && e.t;
+            const _d = _t ? new Date(_t) : null;
+            const when = (_d && !isNaN(_d.getTime()))
+              ? _d.toLocaleString('fr-FR', { timeZone: 'Europe/Paris', day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' })
+              : '?';
+            const _type = (e && e.type) || '?';
+            const _msg = (e && e.msg) || '(message vide)';
+            const _page = (e && e.page) || '—';
             return `<div style="padding:8px 12px;border-bottom:1px solid var(--border);font-size:11px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--text-dim);">
-              <div style="color:var(--text);"><b>[${esc(e.type)}]</b> ${esc(e.msg)}</div>
-              <div style="margin-top:2px;">${when} · page=${esc(e.page)}</div>
+              <div style="color:var(--text);"><b>[${esc(_type)}]</b> ${esc(_msg)}</div>
+              <div style="margin-top:2px;">${esc(when)} · page=${esc(_page)}</div>
             </div>`;
           }).join('')}
         </div>
