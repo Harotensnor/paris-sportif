@@ -60,8 +60,48 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 COOKIE_FILE = ROOT / '.winamax_session'
 OUT_BETS = ROOT / 'winamax_my_bets.json'
+LOG_FILE = ROOT / 'winamax_import.log'
 RAW_DIR = ROOT / '.winamax_raw'
 RAW_DIR.mkdir(exist_ok=True)
+
+
+def _setup_logging():
+    """Append stdout/stderr to winamax_import.log (en plus de la console)
+    pour que la tâche planifiée Windows laisse une trace consultable.
+    On garde une rotation simple : si le fichier > 1MB, on rename en
+    .log.1 pour ne pas grossir indéfiniment."""
+    try:
+        if LOG_FILE.exists() and LOG_FILE.stat().st_size > 1_000_000:
+            backup = LOG_FILE.with_suffix('.log.1')
+            try: backup.unlink()
+            except OSError: pass
+            LOG_FILE.rename(backup)
+    except OSError:
+        pass
+
+    class _Tee:
+        """Duplicate stdout to console + log file."""
+        def __init__(self, stream, log_handle):
+            self._s = stream; self._l = log_handle
+        def write(self, data):
+            try: self._s.write(data)
+            except Exception: pass
+            try: self._l.write(data); self._l.flush()
+            except Exception: pass
+        def flush(self):
+            try: self._s.flush()
+            except Exception: pass
+            try: self._l.flush()
+            except Exception: pass
+        def __getattr__(self, name): return getattr(self._s, name)
+
+    try:
+        log_handle = open(LOG_FILE, 'a', encoding='utf-8', buffering=1)
+        log_handle.write(f'\n=== {datetime.now():%Y-%m-%d %H:%M:%S} === run start\n')
+        sys.stdout = _Tee(sys.stdout, log_handle)
+        sys.stderr = _Tee(sys.stderr, log_handle)
+    except OSError:
+        pass
 
 # Endpoints à essayer dans l'ordre. Winamax les change parfois ; le
 # script teste chacune et garde celle qui répond avec du contenu utile.
@@ -92,15 +132,44 @@ except ImportError:
 
 
 def _read_cookie() -> str:
-    if not COOKIE_FILE.exists():
-        print(f'[winamax_import] ❌ Fichier cookie absent : {COOKIE_FILE}')
-        print('[winamax_import]    Voir docstring du script pour la procédure.')
-        sys.exit(2)
-    raw = COOKIE_FILE.read_text(encoding='utf-8').strip()
-    if not raw:
-        print(f'[winamax_import] ❌ {COOKIE_FILE} est vide.')
-        sys.exit(2)
-    return raw
+    """Stratégie de récupération du cookie en cascade :
+    1. Fichier .winamax_session (si présent et non-vide) → priorité absolue
+       (Théo a explicitement collé un cookie, on l'utilise)
+    2. Auto-extraction depuis Chrome/Edge/Brave/Firefox local → automatisation
+       sans manipulation manuelle (cf scripts/winamax_cookie_extractor.py)
+    3. Échec → message clair avec procédure manuelle.
+    """
+    # 1. Manuel
+    if COOKIE_FILE.exists():
+        raw = COOKIE_FILE.read_text(encoding='utf-8').strip()
+        if raw:
+            print(f'[winamax_import] cookie source: .winamax_session ({len(raw)} chars)', flush=True)
+            _COOKIE_SOURCE['name'] = 'manual'
+            return raw
+
+    # 2. Auto-extract
+    try:
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        from winamax_cookie_extractor import extract_winamax_cookie
+        result = extract_winamax_cookie()
+        if result:
+            cookie, source = result
+            print(f'[winamax_import] cookie source: auto-extract {source} ({len(cookie)} chars)', flush=True)
+            _COOKIE_SOURCE['name'] = source
+            return cookie
+    except Exception as e:
+        print(f'[winamax_import] auto-extract a échoué : {e}', flush=True)
+
+    # 3. Échec
+    print(f'[winamax_import] ❌ Aucun cookie disponible.')
+    print(f'    Crée {COOKIE_FILE} (cf docs/winamax-import.md)')
+    print('    OU connecte-toi à winamax.fr dans Chrome/Firefox sur cette machine.')
+    sys.exit(2)
+
+
+# Mutable container pour propager la source du cookie jusqu'à main()
+# (pour qu'elle apparaisse dans winamax_my_bets.json → UI status pill)
+_COOKIE_SOURCE: dict = {'name': 'unknown'}
 
 
 def _build_session(cookie_value: str):
@@ -327,6 +396,7 @@ def _summarize(bets: list[dict], model_start_iso: str | None) -> dict:
 
 
 def main():
+    _setup_logging()
     t0 = time.time()
     cookie = _read_cookie()
     sess = _build_session(cookie)
@@ -375,6 +445,7 @@ def main():
     out = {
         'imported_at': datetime.utcnow().isoformat() + 'Z',
         'model_start_date': model_start,
+        'source': _COOKIE_SOURCE.get('name', 'unknown'),
         'bets': deduped,
         'summary': summary,
     }
