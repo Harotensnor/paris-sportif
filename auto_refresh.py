@@ -68,6 +68,9 @@ FETCH_STAGES = [
     ('fetch_clubelo.py',           1,   30),   # self-throttled 1/20h
     ('fetch_weather.py',           1,   30),   # self-throttled
     ('fetch_referees_soccer.py',   1,   30),   # self-throttled 1/6h
+    # v30 — Recent W/L form for NBA/WNBA/NHL/MLB/NFL teams (ESPN ne fournit
+    # pas .form sur ces sports, contrairement au foot). Self-throttled 6h.
+    ('fetch_team_form.py',        15,  120),
 ]
 
 # Patches always run after fetches (idempotent, ~0.1-1s each).
@@ -83,6 +86,9 @@ PATCH_STAGES = [
     ('patch_clubelo.py',            1,   30),
     ('patch_weather.py',            1,   30),
     ('patch_referees_soccer.py',    1,   30),
+    # v30 — Inject ESPN team_form.json (last 5 W/L) into competitor.form
+    # for NBA/NHL/MLB/NFL events.
+    ('patch_team_form.py',          1,   15),
     # Pipeline status snapshot (health.json) — runs every tick, cheap.
     ('build_health.py',             1,   15),
     # Chantier #3 lazy-load — DOIT tourner en DERNIER. Lit data.js (full),
