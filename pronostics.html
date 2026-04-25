@@ -9,6 +9,15 @@
 <meta name="theme-color" content="#08080a" id="theme-color-meta">
 <meta name="color-scheme" content="dark light">
 <meta name="description" content="Pronostics sportifs multi-sports classés par confiance (modèle statistique + force des équipes + forme + face-à-face).">
+<!-- v30 — Content-Security-Policy. GitHub Pages ne permet pas de custom
+     headers, donc on passe par meta http-equiv. `'unsafe-inline'` reste
+     nécessaire pour les <script> et <style> inlinés (single-file SPA, pas
+     de build step) — `'unsafe-eval'` est explicitement omis. ESPN CDN whitelisté
+     pour les logos d'équipes ; sw.js cache localement, donc pas d'autre source.
+     `connect-src` autorise les sidecars JSON (relative) + les fetch ESPN core
+     pour l'enrichissement des cotes (utilisé en dev, jamais en prod sur Pages). -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://a.espncdn.com https://a1.espncdn.com https://a2.espncdn.com https://a3.espncdn.com https://a4.espncdn.com https://www.gstatic.com; connect-src 'self' https://api.clubelo.com https://sports.core.api.espn.com https://site.api.espn.com; font-src 'self' data:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <!-- Chantier S — PWA -->
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1482,10 +1491,49 @@
     color: var(--text-dim2);
   }
   .footer-meta-item { line-height: 1.3; }
+  /* v30 — ANJ-mandated banner (FR). Persistent, distinct from .footer-inner so
+     it stays visible even if a flexbox row collapses on tiny screens. */
+  .footer-anj {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 18px;
+    margin: 8px 14px 14px;
+    background: rgba(248, 113, 113, .04);
+    border: 1px solid rgba(248, 113, 113, .18);
+    border-radius: 8px;
+    font-size: 11.5px;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+  .footer-anj-pill { display: inline-flex; align-items: center; gap: 4px; }
+  .footer-anj-link {
+    color: var(--text);
+    font-weight: 700;
+    text-decoration: none;
+    border-bottom: 1px dotted var(--text-dim);
+  }
+  .footer-anj-link:hover, .footer-anj-link:focus-visible { color: var(--brand); border-bottom-color: var(--brand); }
+  .footer-anj-pill-link {
+    color: var(--text-dim);
+    text-decoration: none;
+    border: 1px solid var(--border-2);
+    padding: 3px 9px;
+    border-radius: 999px;
+    transition: color .12s, border-color .12s;
+  }
+  .footer-anj-pill-link:hover, .footer-anj-pill-link:focus-visible {
+    color: var(--brand);
+    border-color: var(--brand);
+  }
+  .footer-anj-meta { color: var(--text-dim2, #7b8693); font-size: 10.5px; }
   @media (max-width: 720px) {
     .footer-inner { justify-content: flex-start; }
     .footer-meta { align-items: flex-start; }
     .footer-links { gap: 14px; font-size: 12.5px; }
+    .footer-anj { font-size: 11px; gap: 6px 10px; padding: 10px 12px; }
   }
 
   /* --- Hamburger mobile --- */
@@ -2629,6 +2677,23 @@
     </section>
   </main>
 
+  <!-- v30 — RGPD : bannière cookies/consentement localStorage. Affichée tant
+       que `userPrefs.consentLocalStorage` n'est pas explicitement réglé.
+       Auto-accept silencieux si un état existant est détecté (legacy users
+       qui avaient déjà des prefs avant l'ajout de la bannière). -->
+  <div id="consent-banner" role="dialog" aria-modal="false" aria-labelledby="consent-title" style="display:none;position:fixed;left:0;right:0;bottom:0;z-index:99999;padding:14px 18px;background:rgba(11,11,16,.96);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-top:1px solid var(--border);box-shadow:0 -4px 24px rgba(0,0,0,.45);">
+    <div style="max-width:1100px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;font-size:13px;color:var(--text);line-height:1.45;">
+      <div style="flex:1;min-width:280px;">
+        <div id="consent-title" style="font-weight:700;margin-bottom:3px;">🍪 Stockage local — préférences uniquement</div>
+        <div style="color:var(--text-dim);font-size:12.5px;">Le site garde tes préférences (thème, niveau, paris suivis) <strong style="color:var(--text);">uniquement dans ton navigateur</strong> via localStorage. Pas de cookies tiers, pas de tracking, pas de data envoyée nulle part. <a href="#" data-consent-details style="color:var(--brand);text-decoration:underline;">En savoir plus</a></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button type="button" id="consent-decline" style="padding:9px 16px;background:transparent;border:1px solid var(--border-2);color:var(--text-dim);border-radius:8px;font-size:12.5px;font-weight:600;cursor:pointer;">Refuser</button>
+        <button type="button" id="consent-accept" style="padding:9px 18px;background:var(--brand);color:#08080a;border:none;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;">Accepter</button>
+      </div>
+    </div>
+  </div>
+
   <!-- v30 — Footer discret en bas de chaque page -->
   <footer class="site-footer" role="contentinfo">
     <div class="footer-inner">
@@ -2648,8 +2713,16 @@
       </nav>
       <div class="footer-meta">
         <span class="footer-meta-item" id="footer-last-update" title="Dernière actualisation des données">📅 —</span>
-        <span class="footer-meta-item">⚖️ Site éducatif · 18+ · jouer comporte des risques</span>
+        <span class="footer-meta-item">⚖️ Site éducatif · réservé aux 18+ · jouer comporte des risques</span>
       </div>
+    </div>
+    <!-- v30 — Bandeau ANJ obligatoire (France). Numéro Joueurs Info Service
+         + lien anj.fr requis sur tout site qui parle paris sportifs. -->
+    <div class="footer-anj" role="region" aria-label="Avertissement jeu responsable">
+      <span class="footer-anj-pill">🛡️ Jouer comporte des risques : isolement, endettement, dépendance.</span>
+      <span class="footer-anj-pill">📞 Joueurs Info Service : <a href="tel:0974751313" class="footer-anj-link">09 74 75 13 13</a> <span class="footer-anj-meta">(appel non surtaxé)</span></span>
+      <a href="https://www.anj.fr/" target="_blank" rel="noopener" class="footer-anj-pill footer-anj-pill-link">🔗 anj.fr — Autorité nationale des jeux</a>
+      <a href="https://www.joueurs-info-service.fr/" target="_blank" rel="noopener" class="footer-anj-pill footer-anj-pill-link">🔗 joueurs-info-service.fr</a>
     </div>
   </footer>
 </div>
@@ -9860,6 +9933,16 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T22:25:25.924376Z","today":"
               </div>
               <h1 style="margin:0 0 8px;font-size:38px;font-weight:800;letter-spacing:-1.3px;line-height:1.05;color:var(--text);background:linear-gradient(90deg, var(--text) 0%, var(--brand) 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">Tes meilleurs pronos du jour</h1>
               <div style="font-size:14.5px;color:var(--text-dim);max-width:520px;line-height:1.5;margin-bottom:14px;">Modèle data-driven, signaux croisés, mises Kelly disciplinées. On ne mise que sur <b style="color:var(--text);">Winamax</b>, on surface les meilleurs edges.</div>
+              <!-- v30 — Disclaimer variabilité court-terme. Anti-tilt + transparence
+                   honnête : un WR observé de 60% sur 100 picks reste compatible
+                   avec une série de 4-5 défaites. Visible dès le hero pour
+                   éviter que l'utilisateur ne casse son Kelly après une bad run. -->
+              <details style="max-width:520px;margin-bottom:14px;font-size:12px;color:var(--text-dim2,#7b8693);">
+                <summary style="cursor:pointer;color:var(--text-dim);font-weight:600;list-style:none;display:inline-flex;align-items:center;gap:6px;border-bottom:1px dotted var(--text-dim);">⚠️ Avertissement honnêteté <span style="opacity:.6;font-size:10px;">(clic pour développer)</span></summary>
+                <div style="margin-top:8px;padding:10px 12px;background:rgba(248,113,113,.05);border-left:2px solid #f87171;border-radius:0 6px 6px 0;line-height:1.55;color:var(--text-dim);font-size:12px;">
+                  Le modèle vise <strong style="color:var(--text);">~60% de réussite</strong> sur le long terme (mesuré sur backtest). Sur le court terme, <strong style="color:#fca5a5;">3 à 5 pertes consécutives sont normales</strong> et n'indiquent pas un dysfonctionnement. <strong style="color:var(--text);">Reste sur Kelly fractionné</strong>, ne double pas la mise après une perte, et accepte la variance. Les performances passées ne garantissent pas les futures. Ce site est un outil d'aide, pas une garantie.
+                </div>
+              </details>
               <div style="display:flex;gap:8px;flex-wrap:wrap;">
                 <button class="page-btn" data-page="tous" style="padding:10px 16px;background:var(--brand);color:#08080a;border:none;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;box-shadow:0 4px 14px rgba(139,92,246,.35);">Voir tous les pronos →</button>
               </div>
@@ -17692,6 +17775,66 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       return false;
     }
   }
+
+  // v30 — Consent RGPD pour localStorage. Affichée tant que l'utilisateur
+  // n'a pas explicitement répondu. Auto-accept silencieux si legacy data
+  // détectée (compat utilisateurs existants qui avaient des prefs avant).
+  function _initConsentBanner() {
+    let prefs = {};
+    try { prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}'); } catch(e){}
+    if (prefs.consentLocalStorage === 'accepted' || prefs.consentLocalStorage === 'declined') return;
+    // Legacy detection : si l'utilisateur a déjà des clés persistées, on
+    // considère qu'il a tacitement accepté (pas la première fois qu'il vient).
+    const legacyKeys = ['userPrefs', 'currentPage', 'bankroll', 'paris_sportif_tracked_bets', 'agentRules'];
+    const hasLegacy = legacyKeys.some(k => {
+      const v = localStorage.getItem(k);
+      return v != null && v !== '' && v !== '{}' && v !== '[]';
+    });
+    if (hasLegacy) {
+      prefs.consentLocalStorage = 'accepted';
+      try { localStorage.setItem('userPrefs', JSON.stringify(prefs)); } catch(e){}
+      return;
+    }
+    const banner = document.getElementById('consent-banner');
+    if (!banner) return;
+    banner.style.display = 'block';
+    const set = (val) => {
+      try {
+        const p = JSON.parse(localStorage.getItem('userPrefs') || '{}');
+        p.consentLocalStorage = val;
+        p.consentTs = new Date().toISOString();
+        localStorage.setItem('userPrefs', JSON.stringify(p));
+      } catch(e){}
+      banner.style.display = 'none';
+    };
+    banner.querySelector('#consent-accept')?.addEventListener('click', () => set('accepted'));
+    banner.querySelector('#consent-decline')?.addEventListener('click', () => {
+      // On garde le flag pour ne pas re-afficher la bannière, mais on
+      // enregistre l'intention. Les writes localStorage continuent (on
+      // ne wraperait pas tout le code) MAIS on n'affichera plus rien
+      // de personnalisé (no-op futur si jamais on ajoute du tracking).
+      set('declined');
+    });
+    banner.querySelector('[data-consent-details]')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (typeof window._showConfirm === 'function') {
+        window._showConfirm({
+          title: '🍪 Détails du stockage local',
+          body: 'Le site enregistre dans le <code>localStorage</code> de ton navigateur :<br><br>' +
+                '• <strong>Préférences UI</strong> (thème dark/light, niveau débutant/pro, sports favoris)<br>' +
+                '• <strong>Cagnotte simulée</strong> + paris suivis manuellement (si tu en ajoutes)<br>' +
+                '• <strong>Historique de fiabilité</strong> + règles d\'auto-tuning du modèle<br>' +
+                '• <strong>État de navigation</strong> (page courante, filtres)<br><br>' +
+                'Aucune donnée ne sort de ton navigateur. Pas de cookies tiers, pas de Google Analytics, pas de pixel de tracking. Tu peux tout effacer en vidant le localStorage de ton navigateur.',
+          confirmLabel: 'Compris',
+          cancelLabel: ''
+        });
+      } else {
+        alert('Le site stocke uniquement tes préférences (thème, paris suivis, historique modèle) dans ton navigateur. Aucune donnée ne sort.');
+      }
+    });
+  }
+  _initConsentBanner();
 
   window.addEventListener('DOMContentLoaded', () => {
     const data = window.PRONOSTICS_DATA;
