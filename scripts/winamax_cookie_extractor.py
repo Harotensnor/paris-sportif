@@ -34,12 +34,21 @@ import sys
 import tempfile
 from pathlib import Path
 
-# Noms de cookies à chercher (Winamax change parfois)
-TARGET_COOKIE_NAMES = ('API_SESS', 'API_SESS_PROFILE', 'PHPSESSID', 'sessionId', 'wnxsess')
+# Noms de cookies à chercher (Winamax change parfois). PHPSESSIONID est
+# le nom courant en 2026 (vu sur Chrome de Théo, audit 2026-04-25).
+TARGET_COOKIE_NAMES = ('PHPSESSIONID', 'API_SESS', 'API_SESS_PROFILE', 'PHPSESSID', 'sessionId', 'wnxsess')
 
 
 def _try_decrypt_chrome_value(encrypted: bytes, key: bytes) -> str | None:
-    """Déchiffre un cookie Chrome v10/v11 (AES-GCM avec la clé maître DPAPI)."""
+    """Déchiffre un cookie Chrome v10/v11 (AES-GCM avec la clé maître DPAPI).
+
+    NOTE : depuis Chrome 127+ (août 2024), les cookies sont chiffrés au format
+    v20 (App-Bound Encryption). La clé v20 est doublement protégée (SYSTEM
+    DPAPI puis User DPAPI) et nécessite des privilèges admin pour être
+    déchiffrée. Cette fonction retourne None pour v20 → l'extraction auto
+    bascule alors sur le cache, et si pas de cache, l'utilisateur doit
+    coller manuellement le cookie header depuis DevTools Network tab.
+    """
     if not encrypted or len(encrypted) < 32:
         return None
     try:
@@ -55,6 +64,10 @@ def _try_decrypt_chrome_value(encrypted: bytes, key: bytes) -> str | None:
             return cipher.decrypt_and_verify(ct, tag).decode('utf-8', errors='replace')
         except Exception:
             return None
+    if encrypted[:3] == b'v20':
+        # App-Bound Encryption — non déchiffrable sans admin elevation.
+        # Le caller verra None et basculera sur le cache / mode manuel.
+        return None
     return None
 
 

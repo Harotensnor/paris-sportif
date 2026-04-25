@@ -173,12 +173,40 @@ _COOKIE_SOURCE: dict = {'name': 'unknown'}
 
 
 def _build_session(cookie_value: str):
-    """Construit une session curl_cffi avec le cookie utilisateur."""
+    """Construit une session curl_cffi avec le cookie utilisateur.
+
+    cookie_value peut être :
+      A) Un cookie header complet "name1=val1; name2=val2; ..." (recommandé,
+         copié depuis DevTools Network tab → onglet Headers → Cookie:)
+      B) Une simple valeur de session (genre PHPSESSIONID seule)
+
+    Le mode A est nécessaire depuis Chrome 127+ qui chiffre les cookies en
+    v20 (App-Bound Encryption) et bloque l'extraction par script. La parade :
+    Théo copie le header Cookie complet depuis l'onglet Network.
+    """
     sess = cr.Session(impersonate='chrome110')
-    # Plusieurs noms possibles selon la version Winamax — on les met tous,
-    # le serveur ignore ceux qu'il ne connaît pas.
-    for cookie_name in ('API_SESS', 'API_SESS_PROFILE', 'PHPSESSID', 'sessionId'):
-        sess.cookies.set(cookie_name, cookie_value, domain='.winamax.fr', path='/')
+    # Détection format A vs B
+    has_equals = '=' in cookie_value
+    has_multi = ';' in cookie_value or has_equals
+    if has_multi and has_equals:
+        # Format A : parse les paires nom=valeur
+        for pair in cookie_value.split(';'):
+            pair = pair.strip()
+            if '=' not in pair:
+                continue
+            name, _, val = pair.partition('=')
+            name = name.strip(); val = val.strip()
+            if not name:
+                continue
+            try:
+                sess.cookies.set(name, val, domain='.winamax.fr', path='/')
+            except Exception:
+                pass
+    else:
+        # Format B : simple valeur — essaie comme PHPSESSIONID puis fallback
+        # sur les autres noms historiques (Winamax change parfois).
+        for cookie_name in ('PHPSESSIONID', 'API_SESS', 'API_SESS_PROFILE', 'PHPSESSID', 'sessionId'):
+            sess.cookies.set(cookie_name, cookie_value, domain='.winamax.fr', path='/')
     sess.headers.update({
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
