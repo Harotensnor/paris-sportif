@@ -113,6 +113,10 @@ jobs:
           # https://harotensnor.github.io/paris-sportif/health.json so we can
           # spot stale/missing sources without scraping the workflow logs.
           python3 build_health.py || true
+          # Chantier #3 lazy-load — DOIT tourner en DERNIER. Lit data.js (full),
+          # écrit data_today.json + data_manifest.json + ré-inline LITE blob
+          # dans pronostics.html. Réduit le 1er paint de ~1.4 MB à ~0.4 MB.
+          python3 finalize_inline.py || true
 
       - name: Stamp sw.js CACHE_VERSION
         # Bumps the service worker cache key on every deploy, so browsers fetch
@@ -129,7 +133,8 @@ jobs:
           git add data.js pronostics.html odds_history.jsonl \
                   injuries_soccer.json winamax_catalog.json winamax_markets.json team_stats.json \
                   lineups_soccer.json clubelo.json weather.json \
-                  weather_geo_cache.json referees_soccer.json health.json 2>/dev/null || true
+                  weather_geo_cache.json referees_soccer.json health.json \
+                  data_today.json data_manifest.json 2>/dev/null || true
           # Only stamp sw.js if we have real content changes — otherwise
           # discard the version bump to avoid 288 empty commits/day.
           if git diff --cached --quiet; then

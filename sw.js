@@ -83,6 +83,23 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Chantier #3 lazy-load — data_today.json + data_manifest.json : NETWORK-FIRST.
+  // Ces fichiers sont rafraîchis à chaque tick du cron, donc on veut
+  // toujours la dernière version. Cache fallback si offline.
+  if (url.pathname.endsWith('/data_today.json') || url.pathname.endsWith('data_today.json') ||
+      url.pathname.endsWith('/data_manifest.json') || url.pathname.endsWith('data_manifest.json')) {
+    event.respondWith(
+      fetch(req)
+        .then(resp => {
+          const respClone = resp.clone();
+          caches.open(RUNTIME_CACHE).then(c => c.put(req, respClone));
+          return resp;
+        })
+        .catch(() => caches.match(req))
+    );
+    return;
+  }
+
   // odds_history.jsonl : NETWORK-FIRST (Chantier PP).
   if (url.pathname.endsWith('/odds_history.jsonl') || url.pathname.endsWith('odds_history.jsonl')) {
     event.respondWith(
