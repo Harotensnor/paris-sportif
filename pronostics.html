@@ -15254,18 +15254,41 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T13:01:48.719549Z","today":"
       new Date(b[1].added_at) - new Date(a[1].added_at)
     );
 
+    // v30 — Charge winamax_my_bets.json en async et l'affiche en haut
+    // de la page Mes paris. Renderé après le innerHTML pour ne pas bloquer.
+    const _injectWinamaxSection = () => {
+      const slot = wrap.querySelector('#mesparis-winamax-slot');
+      if (!slot) return;
+      fetch(`winamax_my_bets.json?t=${Date.now()}`, { cache: 'no-store' })
+        .then(r => r.ok ? r.json() : Promise.reject('not_found'))
+        .then(doc => {
+          slot.innerHTML = _renderWinamaxImported(doc);
+        })
+        .catch(() => {
+          slot.innerHTML = _renderWinamaxImportSetup();
+        });
+    };
+
     if (!betEntries.length) {
       // v30 — Empty state actionnable : pas juste une description, des CTAs.
       // L'utilisateur arrive ici avec une intention ("où sont mes paris ?")
       // mais s'il a 0 pari, il faut le guider vers le geste suivant.
       wrap.innerHTML = `
+        <div style="max-width:1200px;margin:0 auto;padding:24px;">
+          <!-- v30 — Slot pour les paris importés Winamax (chargé async) -->
+          <div id="mesparis-winamax-slot" style="margin-bottom:24px;">
+            <div style="padding:14px 16px;background:var(--panel-2);border:1px solid var(--border);border-radius:10px;color:var(--text-dim);font-size:13px;text-align:center;">
+              🎯 Chargement de tes paris Winamax importés…
+            </div>
+          </div>
+        </div>
         <div style="max-width:640px;margin:0 auto;padding:40px 24px;">
           <div style="text-align:center;margin-bottom:32px;">
             <div style="font-size:56px;margin-bottom:14px;opacity:.85;">📝</div>
-            <h1 style="margin:0 0 8px;font-size:28px;font-weight:800;letter-spacing:-.6px;color:var(--text);">Mes paris</h1>
+            <h1 style="margin:0 0 8px;font-size:28px;font-weight:800;letter-spacing:-.6px;color:var(--text);">Mes paris (manuels)</h1>
             <div style="color:var(--text-dim);font-size:14.5px;line-height:1.5;max-width:440px;margin:0 auto;">
-              Track tes paris ici pour voir ton ROI réel, ta winrate, et apprendre de tes choix.
-              <br/><b style="color:var(--text-2);">Aucun pari encore — voici par où commencer :</b>
+              Tu peux aussi tracker manuellement des paris hors-Winamax pour comparer avec les pronos du modèle.
+              <br/><b style="color:var(--text-2);">Aucun pari manuel — voici par où commencer :</b>
             </div>
           </div>
           <!-- 3 CTAs : où trouver les paris à tracker -->
@@ -15303,6 +15326,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T13:01:48.719549Z","today":"
             <b style="color:var(--brand);">💡 Pourquoi tracker ?</b> Sans tracking, tu ne sais pas si tu gagnes vraiment ni où tu perds. La page Bilan croise tes paris avec celles du modèle pour montrer où tu surperformes/sous-performes.
           </div>
         </div>`;
+      _injectWinamaxSection();
       return;
     }
 
@@ -15511,11 +15535,18 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T13:01:48.719549Z","today":"
 
     wrap.innerHTML = `
       <div style="max-width:1280px;margin:0 auto;padding:4px 0 0;font-variant-numeric:tabular-nums;">
+        <!-- v30 — Slot Winamax importés (chargé async, prend la priorité visuelle) -->
+        <div id="mesparis-winamax-slot" style="margin:24px 0;">
+          <div style="padding:14px 16px;background:var(--panel-2);border:1px solid var(--border);border-radius:10px;color:var(--text-dim);font-size:13px;text-align:center;">
+            🎯 Chargement de tes paris Winamax importés…
+          </div>
+        </div>
+
         <div style="margin-bottom:24px;padding:32px 0 20px;border-bottom:1px solid var(--border);position:relative;">
           <div style="position:absolute;top:0;left:0;width:40px;height:3px;background:${pl >= 0 ? 'var(--accent)' : 'var(--danger)'};border-radius:0 0 2px 2px;"></div>
-          <div style="font-size:11px;color:${pl >= 0 ? 'var(--accent)' : 'var(--danger)'};text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Suivi · ${betEntries.length} pari${betEntries.length>1?'s':''}</div>
-          <h1 style="margin:0 0 6px;font-size:40px;font-weight:800;letter-spacing:-1.4px;color:var(--text);line-height:1;">Mes paris</h1>
-          <div style="font-size:14px;color:var(--text-dim);max-width:640px;">Tes paris réellement placés, leur état, et ce qu'en dit la data au fil du temps.</div>
+          <div style="font-size:11px;color:${pl >= 0 ? 'var(--accent)' : 'var(--danger)'};text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Suivi manuel · ${betEntries.length} pari${betEntries.length>1?'s':''}</div>
+          <h1 style="margin:0 0 6px;font-size:40px;font-weight:800;letter-spacing:-1.4px;color:var(--text);line-height:1;">Mes paris (manuels)</h1>
+          <div style="font-size:14px;color:var(--text-dim);max-width:640px;">Paris que tu as trackés manuellement via "J'ai parié" — utile pour comparer aux pronos du modèle.</div>
         </div>
 
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;background:var(--panel);margin-bottom:24px;">
@@ -15540,6 +15571,9 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T13:01:48.719549Z","today":"
         ${sectionHtml('perdu', '❌ Perdus', byStatus['perdu'])}
         ${sectionHtml('annulé', '⛔ Annulés', byStatus['annulé'])}
       </div>`;
+
+    // v30 — Charge la section Winamax importé dans son slot dédié (asynchrone)
+    _injectWinamaxSection();
 
     // Chantier ZZZZ — toggle détails du Coach IA
     const coachToggleBtn = wrap.querySelector('#coach-toggle-details');
