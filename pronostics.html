@@ -2621,7 +2621,7 @@
       <div class="footer-brand">
         <span class="footer-logo">🎯</span>
         <span class="footer-text">Paris-Sportif</span>
-        <span class="footer-version" id="footer-version">v30</span>
+        <span class="footer-version" id="footer-version" role="button" tabindex="0" style="cursor:pointer;" title="Voir les nouveautés v30">v30</span>
       </div>
       <nav class="footer-links" aria-label="Liens du site">
         <a href="https://github.com/Harotensnor/paris-sportif" target="_blank" rel="noopener" class="footer-link" title="Code source sur GitHub">
@@ -16413,6 +16413,52 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     });
     if (_pwaLaterBtn) _pwaLaterBtn.addEventListener('click', () => { _pwaSnooze(7); _pwaHideBanner(); });
     if (_pwaDismissBtn) _pwaDismissBtn.addEventListener('click', () => { _pwaSnooze(30); _pwaHideBanner(); });
+
+    // v30 — Click sur badge version footer → modal récap nouveautés
+    const versionBadge = document.getElementById('footer-version');
+    if (versionBadge) {
+      const _showWhatsNew = () => {
+        const features = [
+          '🎯 Calibration plot — preuve d\'honnêteté du modèle (page Crédibilité)',
+          '📊 Performance par sport / cote / tier (page Crédibilité)',
+          '⏱️ Match countdown timer "dans X min" + pulse imminent <30min',
+          '💰 Daily P&L chip prominent (dashboard)',
+          '🔥 Streak banner (≥2 paris consécutifs)',
+          '📋 Activité récente (5 derniers paris) sur dashboard',
+          '⚡ Quick stake presets (1/2/5/10€/Kelly) sur cards expand',
+          '🟢 Health indicator pipeline topbar',
+          '⌨️ Search keyboard nav (↑↓ Enter Esc)',
+          '📤 Bouton partager match (URL ?match=ID)',
+          '🌓 Thème 3-state (dark / light / auto système)',
+          '📱 PWA install prompt + 4 shortcuts manifest',
+          '🦶 Footer + tooltips info Edge/Conf/Cote',
+          '❓ Help modal raccourcis (touche ?)',
+        ];
+        const html = '<div style="text-align:left;padding:8px 0;">' +
+          '<h3 style="margin:0 0 12px;font-size:18px;color:var(--text);">🎉 Nouveautés v30</h3>' +
+          '<div style="font-size:11px;color:var(--text-dim);margin-bottom:14px;">Cliquer sur l\'icône Calibration en bas à gauche du Crédibilité pour voir notre meilleur écart vs prédictions.</div>' +
+          '<ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:7px;font-size:13px;color:var(--text-2);line-height:1.5;">' +
+          features.map(f => `<li>${f}</li>`).join('') + '</ul></div>';
+        // Réutiliser le pattern showShortcutsHelp si dispo
+        const existing = document.getElementById('__whatsnew-modal');
+        if (existing) { existing.remove(); return; }
+        const div = document.createElement('div');
+        div.id = '__whatsnew-modal';
+        div.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);z-index:100001;display:flex;align-items:center;justify-content:center;padding:20px;cursor:pointer;';
+        const inner = document.createElement('div');
+        inner.style.cssText = 'background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:24px;width:min(520px,94vw);max-height:80vh;overflow:auto;cursor:auto;';
+        inner.innerHTML = html + '<div style="text-align:right;margin-top:18px;"><button id="__whatsnew-close" style="background:var(--brand);color:#08080a;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700;">Fermer</button></div>';
+        inner.addEventListener('click', e => e.stopPropagation());
+        div.appendChild(inner);
+        document.body.appendChild(div);
+        div.addEventListener('click', () => div.remove());
+        inner.querySelector('#__whatsnew-close').addEventListener('click', () => div.remove());
+      };
+      versionBadge.addEventListener('click', _showWhatsNew);
+      versionBadge.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); _showWhatsNew(); }
+      });
+    }
 
     // v30 — Footer page-link buttons → navigate to corresponding page
     document.querySelectorAll('.footer-link[data-page-link]').forEach(btn => {
