@@ -3792,11 +3792,16 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
     return p;
   }
   function _applyCalibration(p) {
-    if (!p || !isFinite(p.rel)) return p;
-    const adjusted = _calibrateProb(p.rel);
-    if (adjusted === p.rel) return p;
+    // FIX audit Simples #3 : champ pred = `reliability` (pas `rel`).
+    // Avant : isFinite(p.rel) → false → return inchangé → fonction no-op.
+    // Pas de symptôme visible (la calibration est déjà appliquée inline
+    // dans _predictMatchImpl), mais code mort qui prêtait à confusion.
+    // On le rend correct au cas où un caller bypass _predictMatchImpl.
+    if (!p || !isFinite(p.reliability) || p.calibrated) return p;
+    const adjusted = _calibrateProb(p.reliability);
+    if (adjusted === p.reliability) return p;
     // Return a shallow clone to avoid mutating the original pred across callers
-    return { ...p, rel: adjusted, rel_raw: p.rel, calibrated: true };
+    return { ...p, reliability: adjusted, reliability_raw: p.reliability, calibrated: true };
   }
   function _predictMatchImpl(match) {
     const { home, away } = getSides(match);
@@ -5226,7 +5231,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
         <div style="display:inline-flex;align-items:center;gap:6px;">
           <span style="color:var(--text-muted);">Ligue</span>
           <select id="adv-league" style="padding:4px 8px;background:var(--panel-2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;">
-            <option value="">Toutes (${sportEvents.length})</option>
+            <option value="">Toutes (${pool.length})</option>
             ${leagueOpts.map(l => `<option value="${esc(l.code)}" ${advFilters.league === l.code ? 'selected' : ''}>${esc(l.name)}</option>`).join('')}
           </select>
         </div>
@@ -11865,8 +11870,37 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
           const data = window.PRONOSTICS_DATA;
           const all = [];
           if (data && data.days) {
-            const todayIso = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
-            (data.days[todayIso] || []).forEach(m => all.push(m));
+            // FIX audit Simples #2 : Coach IA snapshot doit refléter le jour
+            // SÉLECTIONNÉ par l'utilisateur (currentDate), pas seulement
+            // today. Avant : si l'utilisateur naviguait sur demain, le
+            // snapshot continuait à parler des locks du jour réel.
+            // Plus : scanner aussi les buckets adjacents pour les TZ-shifted
+            // matchs (ESPN range les Brasileirão tardifs sous le jour UTC
+            // précédent), cohérent avec render() qui fait pareil.
+            const targetDate = (typeof currentDate !== 'undefined' && currentDate) ? currentDate : new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+            const seenIds = new Set();
+            const _addBucket = (iso) => {
+              ((data.days[iso]) || []).forEach(m => {
+                if (m.id && seenIds.has(m.id)) return;
+                if (m.id) seenIds.add(m.id);
+                // Filtrer pour ne garder que les matchs qui correspondent au
+                // jour Europe/Paris cible (utile pour les TZ-shifted)
+                try {
+                  const matchDay = new Date(m.date).toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+                  if (matchDay === targetDate) all.push(m);
+                } catch (e) { all.push(m); }
+              });
+            };
+            // Scan today + ±1 jour pour capturer les TZ-shifted
+            _addBucket(targetDate);
+            const _shifted = (iso, days) => {
+              try {
+                const d = new Date(iso); d.setDate(d.getDate() + days);
+                return d.toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+              } catch (e) { return iso; }
+            };
+            _addBucket(_shifted(targetDate, -1));
+            _addBucket(_shifted(targetDate, 1));
           }
           // Appliquer les mêmes filtres que la page (Winamax + sport courant)
           const filtered = all.filter(m => {
@@ -14036,7 +14070,11 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T00:20:08.422602Z","today":"
       return !isNaN(t) && t > now && !x.m.completed;
     });
     const upcomingLocks = upcoming.filter(x => x.pred.isLock);
-    const liveCount = allMatches.filter(m => m.live && !m.completed).length;
+    // FIX audit Simples #1 : `m.live` n'est jamais set par les scrapers Python.
+    // Le seul indicateur live valide est `m.status === 'STATUS_IN_PROGRESS'`
+    // (cohérent avec ligne 4972 et le reste du code). Avant : liveCount
+    // toujours 0 → le bandeau "X en direct" du Coach IA ne s'affichait jamais.
+    const liveCount = allMatches.filter(m => m.status === 'STATUS_IN_PROGRESS' && !m.completed).length;
 
     const lines = [];
     const totalVisible = allMatches.length;
