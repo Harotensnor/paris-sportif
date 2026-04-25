@@ -44,6 +44,7 @@ sys.path.insert(0, str(ROOT / 'scripts'))
 
 DATA_JS = ROOT / 'data.js'
 ODDS_HISTORY = ROOT / 'odds_history.jsonl'
+RESULTS_ARCHIVE = ROOT / 'results_archive.jsonl'
 REPORT_JSON = ROOT / 'backtest_report_v2.json'
 REPORT_MD = ROOT / 'backtest_report_v2.md'
 
@@ -120,6 +121,56 @@ def load_odds_history() -> dict:
     return out
 
 
+def load_results_archive() -> list[dict]:
+    """Charge results_archive.jsonl (matchs completed archivés au fil des
+    ticks par snapshot_results.py). Retourne une liste d'events shapés
+    comme dans data.js (champs id/sport/league_*/date/competitors/odds/etc.)
+    afin que le backtest puisse les traiter de la même manière. Chaque
+    entrée a aussi été déjà filtrée à `completed: true`. La fenêtre est
+    bornée par l'ancienneté du fichier (append-only depuis sa création).
+    """
+    if not RESULTS_ARCHIVE.exists():
+        return []
+    out = []
+    seen = set()  # déduplication par id si jamais le fichier en a doublonné
+    with RESULTS_ARCHIVE.open(encoding='utf-8') as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                row = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            mid = str(row.get('id') or '')
+            if not mid or mid in seen:
+                continue
+            seen.add(mid)
+            # Re-shape pour ressembler à data.js[event] : on ajoute winamax
+            # markers que predictMatch peut lire.
+            ev = {
+                'id': row.get('id'),
+                'sport': row.get('sport'),
+                'league_code': row.get('league_code'),
+                'league_name': row.get('league_name'),
+                'date': row.get('date'),
+                'name': row.get('name'),
+                'competitors': row.get('competitors') or [],
+                'completed': True,
+                'odds': row.get('odds') or [],
+            }
+            if row.get('odds_snapshot'):
+                ev['odds_snapshot'] = row['odds_snapshot']
+            if row.get('closing_odds'):
+                ev['closing_odds'] = row['closing_odds']
+            if row.get('winamax_markets'):
+                ev['winamax'] = {'available': True, 'markets': row['winamax_markets']}
+            if row.get('scorers'):
+                ev['scorers'] = row['scorers']
+            out.append(ev)
+    return out
+
+
 def resolve_outcome(ev: dict) -> str | None:
     """Renvoie 'home' | 'away' | 'draw' ou None si impossible à résoudre."""
     comps = ev.get('competitors') or []
@@ -182,16 +233,23 @@ def run_backtest(opts) -> dict:
           file=sys.stderr)
     loader = ModelLoader()
 
-    print("[backtest] Chargement de data.js + odds_history.jsonl...",
+    print("[backtest] Chargement de data.js + odds_history.jsonl + results_archive.jsonl...",
           file=sys.stderr)
     pron_data = load_pronostics_data()
     odds_hist = load_odds_history()
+    archive = load_results_archive()
     print(f"[backtest] odds_history : {len(odds_hist)} entries", file=sys.stderr)
+    print(f"[backtest] results_archive : {len(archive)} entries", file=sys.stderr)
 
     loader.set_data(pron_data, odds_history=odds_hist)
 
-    # Lister les matchs résolus pour lesquels on a des cotes pre-match
+    # Lister les matchs résolus pour lesquels on a des cotes pre-match.
+    # Source 1 : data.js (les jours encore dans la fenêtre glissante ESPN)
+    # Source 2 : results_archive.jsonl (les jours plus anciens, archivés
+    #            au fil des ticks). Les ids déjà vus dans data.js sont
+    #            filtrés pour ne pas doublonner.
     candidates = []
+    seen_ids: set[str] = set()
     for day, events in (pron_data.get('days') or {}).items():
         for ev in events:
             if not ev.get('completed'):
@@ -201,14 +259,35 @@ def run_backtest(opts) -> dict:
             outcome = resolve_outcome(ev)
             if outcome is None:
                 continue
-            # Il nous faut des cotes : odds live, ou odds_snapshot, ou odds_history
             has_odds = bool(ev.get('odds')) or bool(ev.get('odds_snapshot')) \
                        or str(ev.get('id')) in odds_hist
             if not has_odds:
                 continue
+            mid = str(ev.get('id') or '')
+            if mid:
+                seen_ids.add(mid)
             candidates.append((ev, outcome))
-    print(f"[backtest] {len(candidates)} matchs résolus avec cotes pre-match",
-          file=sys.stderr)
+    n_from_data = len(candidates)
+    # v30 — Étendre avec l'archive pour les matchs antérieurs à la fenêtre data.js
+    for ev in archive:
+        if opts.sport and ev.get('sport') != opts.sport:
+            continue
+        mid = str(ev.get('id') or '')
+        if not mid or mid in seen_ids:
+            continue
+        outcome = resolve_outcome(ev)
+        if outcome is None:
+            continue
+        has_odds = bool(ev.get('odds')) or bool(ev.get('odds_snapshot')) \
+                   or mid in odds_hist
+        if not has_odds:
+            continue
+        seen_ids.add(mid)
+        candidates.append((ev, outcome))
+    n_from_archive = len(candidates) - n_from_data
+    print(f"[backtest] {len(candidates)} matchs résolus "
+          f"({n_from_data} depuis data.js + {n_from_archive} depuis archive) "
+          f"avec cotes pre-match", file=sys.stderr)
     if opts.limit and opts.limit > 0:
         candidates = candidates[: opts.limit]
         print(f"[backtest] limite -> {len(candidates)} matchs", file=sys.stderr)

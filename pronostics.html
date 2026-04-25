@@ -4925,31 +4925,78 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-25T23:15:27.349824Z","today":"
   // de savoir si la prédiction est "riche" ou "light".
   function computeDataQuality(match) {
     if (!match) return { score: 0, max: 4, items: [] };
+    // v30 — Score 4/4 sport-aware. Les axes spécifiques à un sport
+    // (Sofascore foot top-5 pour blessures/lineups/arbitre, weather
+    // pour outdoor) auto-OK quand la source n'existe pas pour ce sport,
+    // pour ne pas pénaliser. Les matchs completed auto-OK aussi sur les
+    // axes prédictifs (weather/lineups deviennent inutiles post-match).
+    const sport = match.sport;
+    const isCompleted = !!match.completed;
+    const isFoot = sport === 'football';
+    const SOFASCORE_LEAGUES = new Set(['eng.1','esp.1','ger.1','ita.1','fra.1']);
+    const isFootTop5 = isFoot && SOFASCORE_LEAGUES.has(match.league_code);
+    const ESPN_INJURY_SPORTS = new Set(['basketball','hockey','baseball','american-football']);
+    const hasInjurySource = isFootTop5 || ESPN_INJURY_SPORTS.has(sport);
+    const ESPN_H2H_SPORTS = new Set(['football','basketball','hockey','tennis']);
+    const hasH2HSource = ESPN_H2H_SPORTS.has(sport);
+    const hasWeatherSource = isFootTop5;
+    const hasRefSource = isFootTop5;
+
     const items = [];
-    // 1. Compos / blessures
-    const hasInjuries =
-      (match.injuries_home != null && match.injuries_home >= 0) ||
-      (match.injuries_away != null && match.injuries_away >= 0) ||
-      !!match.injuries_source;
-    items.push({ key: 'injuries', label: 'Compos / Blessures', ok: hasInjuries, icon: '🏥' });
-    // 2. Météo (foot seulement — ailleurs, on compte OK pour ne pas pénaliser)
-    const hasWeather = match.sport !== 'football'
+    // 1. Cotes : universel
+    const hasOdds = !!(match.winamax?.markets || (match.odds && match.odds.length));
+    items.push({ key: 'odds', label: 'Cotes', ok: hasOdds, icon: '💰' });
+    // 2. Compos / blessures (sport-aware)
+    const injuriesOk = !hasInjurySource || isCompleted
       ? true
-      : !!(match.weather && (typeof match.weather.precip_mm === 'number'
-           || typeof match.weather.wind_kmh === 'number'
-           || typeof match.weather.temp_c === 'number'));
-    items.push({ key: 'weather', label: 'Météo', ok: hasWeather, icon: '🌤️' });
-    // 3. H2H
-    const hasH2H = !!(match.h2h && Array.isArray(match.h2h.meetings) && match.h2h.meetings.length >= 1);
-    items.push({ key: 'h2h', label: 'Face-à-face', ok: hasH2H, icon: '⚔️' });
-    // 4. Arbitre (foot seulement — ailleurs, OK)
-    const hasRef = match.sport !== 'football'
-      ? true
-      : !!(match.referee && match.referee.name);
-    items.push({ key: 'referee', label: 'Arbitre', ok: hasRef, icon: '🟨' });
+      : (match.injuries_home != null && match.injuries_home >= 0) ||
+        (match.injuries_away != null && match.injuries_away >= 0) ||
+        !!match.injuries_source;
+    items.push({ key: 'injuries', label: hasInjurySource ? 'Compos / Blessures' : 'Compos (N/A pour ce sport)', ok: injuriesOk, icon: '🏥' });
+    // 3. Face-à-face
+    const h2hOk = !hasH2HSource ? true
+      : !!(match.h2h && Array.isArray(match.h2h.meetings) && match.h2h.meetings.length >= 1);
+    items.push({ key: 'h2h', label: hasH2HSource ? 'Face-à-face' : 'H2H (N/A pour ce sport)', ok: h2hOk, icon: '⚔️' });
+    // 4. Conditions sport-specific
+    let conditionsOk, conditionsLabel, conditionsIcon;
+    if (hasWeatherSource && !isCompleted) {
+      const hasWeather = !!(match.weather && (typeof match.weather.precip_mm === 'number'
+        || typeof match.weather.wind_kmh === 'number'
+        || typeof match.weather.temp_c === 'number'));
+      const hasRef = !hasRefSource ? true : !!(match.referee && match.referee.name);
+      conditionsOk = hasWeather && hasRef;
+      conditionsLabel = `Météo${hasRefSource ? ' + arbitre' : ''}`;
+      conditionsIcon = '🌤️';
+    } else if (sport === 'tennis') {
+      const comps = match.competitors || [];
+      conditionsOk = comps.length >= 2 && !!comps[0]?.rank && !!comps[1]?.rank;
+      conditionsLabel = 'Classement ATP/WTA';
+      conditionsIcon = '🏆';
+    } else if (sport === 'basketball' || sport === 'hockey' || sport === 'baseball') {
+      const comps = match.competitors || [];
+      const hasSplit = comps.some(c => (c.records || []).some(r => /home|road|away/i.test(r.type || r.name || '')));
+      conditionsOk = hasSplit;
+      conditionsLabel = 'Splits dom/ext';
+      conditionsIcon = '🏠';
+    } else if (isFoot) {
+      const comps = match.competitors || [];
+      const hasFormStats = comps.some(c => c.form_stats?.played5 >= 3);
+      const hasForm = comps.some(c => c.form && c.form.length >= 3);
+      conditionsOk = hasFormStats || hasForm;
+      conditionsLabel = 'Forme récente';
+      conditionsIcon = '🔥';
+    } else {
+      conditionsOk = true;
+      conditionsLabel = 'Contexte (N/A)';
+      conditionsIcon = '🌤️';
+    }
+    items.push({ key: 'conditions', label: conditionsLabel, ok: conditionsOk, icon: conditionsIcon });
+
     const score = items.filter(i => i.ok).length;
     return { score, max: 4, items };
   }
+  // v30 — Expose pour debugging (window.__diag + audit user).
+  if (typeof window !== 'undefined') window.computeDataQuality = computeDataQuality;
 
   // Chantier W — évalue la position du pick EN CE MOMENT sur un match live.
   // Retourne 'winning' | 'losing' | 'tied' | null (null si pas de score ou pas live).

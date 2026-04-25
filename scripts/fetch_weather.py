@@ -395,9 +395,15 @@ def main() -> int:
             if old and is_fresh(old, ko_iso, now):
                 n_fresh += 1
                 continue
-            # Resolve home team → city
+            # Resolve home team → city. ESPN field is `home_away` (string), not
+            # `home` (bool) — older code looked for the bool and silently
+            # skipped every match. Bug fixed v30.
             comps = ev.get('competitors') or []
-            home = next((c for c in comps if c.get('home')), None)
+            home = next((c for c in comps if c.get('home_away') == 'home'), None)
+            if not home:
+                # Fallback : take the first competitor (some ESPN payloads
+                # don't tag home_away on tournament-style sports).
+                home = comps[0] if comps else None
             if not home:
                 n_skipped += 1
                 continue
