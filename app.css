@@ -1800,6 +1800,29 @@
     body.agent-inside .ed-hero {
       max-width: calc(100vw - 264px - 308px - 64px);
     }
+    /* v31.7.13 — Quand sidebar (240px) + right rail (272px) sont actifs
+       simultanement (>=1280px), 4 colonnes 1fr ne tiennent pas confortablement
+       sur viewports etroits 1280-1500px. Force 3 colonnes ; la 4eme stat (EDGE)
+       passe en dessous des 3 premieres en visualité.
+       Au-dessus de 1500px, 4 colonnes redeviennent OK (assez d'espace). */
+    body.agent-home .ed-hero__stats,
+    body.agent-inside .ed-hero__stats {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    body.agent-home .ed-hero__stat--edge,
+    body.agent-inside .ed-hero__stat--edge {
+      grid-column: 1 / -1;
+    }
+  }
+  @media (min-width: 1500px) {
+    body.agent-home .ed-hero__stats,
+    body.agent-inside .ed-hero__stats {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    body.agent-home .ed-hero__stat--edge,
+    body.agent-inside .ed-hero__stat--edge {
+      grid-column: auto;
+    }
   }
 
   @media (max-width: 520px) {
