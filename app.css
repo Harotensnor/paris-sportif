@@ -1665,6 +1665,95 @@
     body.sidebar-open .sidebar-overlay { display: block; }
   }
 
+  /* v31.5 — DESKTOP SIDEBAR MODE (≥1100px) — la nav passe en sidebar verticale
+     gauche FIXE et toujours visible. Les hubs s'expandent en sections (titre +
+     items vertical), comme le drawer mobile mais sans hamburger. La topbar reste
+     en haut pour brand + search + date-nav + theme. Le contenu prend
+     `margin-left: 240px`.
+
+     Pourquoi 1100px : en dessous, on perd trop d'espace horizontal pour le
+     contenu (cartes de match, tableaux bilan deviennent étroits). Au-dessus,
+     la sidebar améliore vraiment l'orientation (5 catégories + 12 items).
+
+     Mobile/tablette < 1100px : reste en drawer hamburger comme avant.
+  */
+  @media (min-width: 1100px) {
+    /* Sidebar : fixed-left, full height below topbar */
+    nav.topbar-nav {
+      display: flex !important; flex-direction: column;
+      position: fixed; left: 0; top: 56px; bottom: 0;
+      width: 240px;
+      background: var(--panel); border-right: 1px solid var(--border);
+      padding: 14px 10px 28px;
+      overflow-y: auto;
+      z-index: 40; gap: 4px;
+      flex: none;
+    }
+    /* Brand stays in topbar but constrained to width: 240px so it visually
+       aligns with the sidebar column underneath */
+    header.topbar .topbar-inner { padding-left: 16px; padding-right: 18px; }
+    .topbar-brand { width: 224px; }
+    /* Hide the hamburger on desktop, sidebar is always visible */
+    .topbar-menu { display: none !important; }
+    /* Hub-solo button (Aujourd'hui) : full width, bigger */
+    nav.topbar-nav .page-btn.hub-solo {
+      width: 100%; justify-content: flex-start;
+      padding: 11px 14px; font-size: 14px; font-weight: 700;
+      margin-bottom: 8px;
+    }
+    /* Each .hub becomes a section : header (uppercase label) + always-expanded menu */
+    nav.topbar-nav .hub {
+      display: flex; flex-direction: column; width: 100%;
+      border-top: 1px solid var(--border);
+      padding-top: 10px; margin-top: 6px;
+    }
+    nav.topbar-nav .hub:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+    nav.topbar-nav .hub .hub-btn {
+      justify-content: flex-start; width: 100%;
+      padding: 6px 14px 4px; font-size: 11px; font-weight: 700;
+      color: var(--text-dim2); text-transform: uppercase; letter-spacing: .08em;
+      cursor: default; pointer-events: none;
+      background: transparent;
+    }
+    nav.topbar-nav .hub .hub-btn .chev { display: none; }
+    nav.topbar-nav .hub-menu {
+      display: flex !important; flex-direction: column;
+      position: static; background: none; border: none;
+      box-shadow: none; padding: 0; gap: 2px;
+      min-width: 0; transform: none; opacity: 1;
+    }
+    nav.topbar-nav .hub-menu .page-btn {
+      width: 100%; justify-content: flex-start;
+      padding: 9px 14px; font-size: 13.5px; font-weight: 500;
+      border-radius: 7px;
+      text-decoration: none; /* for <a> page-btn (Apprendre links) */
+    }
+    nav.topbar-nav .hub-menu .page-btn:hover {
+      background: var(--panel-2); color: var(--text);
+    }
+    nav.topbar-nav .hub-menu .page-btn.active {
+      background: var(--brand-soft, rgba(167,139,250,.16));
+      color: var(--brand); font-weight: 600;
+    }
+    nav.topbar-nav .hub-menu .page-btn .count {
+      margin-left: auto;
+      background: var(--panel-2); color: var(--text-dim);
+      padding: 1px 7px; border-radius: 999px; font-size: 10.5px; font-weight: 700;
+    }
+    /* Content gets pushed right by the sidebar width. On dashboard the
+       right-rail aside (v29-dash-aside) reste géré par sa propre règle à
+       ≥1280px (padding-right: 308px) — on n'override pas le right padding
+       pour éviter que l'aside chevauche le contenu. */
+    .content main { padding-left: 264px !important; max-width: none; }
+    /* Mobile bottom nav is hidden on desktop (sidebar replaces it) */
+    .mobile-bottom-nav { display: none !important; }
+    /* La sport sub-bar (#tabs) chevaucherait la sidebar en haut. Sur desktop
+       sidebar mode, on la masque : les pages qui filtrent par sport (Tous,
+       Top, Buteurs) ont leurs propres chips inline dans le contenu, donc
+       pas de perte fonctionnelle. */
+    nav.topbar-sports { display: none !important; }
+  }
+
   @media (max-width: 520px) {
     .topbar-utils .search { display: none; } /* on cache la search, la command palette reste */
     .topbar-brand { padding-right: 10px; border-right: 0; }

@@ -14874,6 +14874,14 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         syncSidebarAria();
       });
     }
+    // v31.5 — bouton "Menu" du bottom-nav mobile : même action que le hamburger
+    const mbnMenu = document.getElementById('mbn-menu-btn');
+    if (mbnMenu) {
+      mbnMenu.addEventListener('click', () => {
+        document.body.classList.toggle('sidebar-open');
+        syncSidebarAria();
+      });
+    }
     syncSidebarAria();
     // Close drawer after tapping a nav item on mobile
     document.querySelectorAll('#page-nav .page-btn, nav.topbar-sports button').forEach(b => {

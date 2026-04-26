@@ -363,37 +363,51 @@
       </div>
     </a>
 
-    <!-- v30 refonte nav : 4 hubs (Aujourd'hui / Pronos / Ma perf / Plus).
-         Desktop = dropdowns ; mobile = sections dans le drawer. Remplace
-         8 boutons empilés + 7 pages "cachées" accessibles au hasard. -->
+    <!-- v31.5 — Nav restructurée : 5 hubs catégorisés (Pronos / Ma perf /
+         Transparence / Apprendre / Compte) au lieu de 3 ("Plus" était fourre-
+         tout). Sur desktop ≥1100px, ce <nav> est rendu en SIDEBAR VERTICALE
+         GAUCHE (cf. app.css `.sidenav-mode`). Sur mobile, drawer hamburger
+         comme avant. Pages "simples" + "value" supprimées du nav (orphan /
+         redondant avec "Tous"). -->
     <nav class="topbar-nav" id="page-nav" aria-label="Navigation principale">
       <button class="page-btn hub-solo active" data-page="dashboard">🎯 Aujourd'hui</button>
       <div class="hub" data-hub="pronos">
-        <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">⚡ Pronos <span class="chev">▾</span></button>
+        <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">🏆 Pronos <span class="chev">▾</span></button>
         <div class="hub-menu" role="menu" aria-label="Sous-menu Pronos">
-          <button class="page-btn" data-page="tous">Tous les pronos</button>
-          <button class="page-btn" data-page="locks">Paris sûrs <span class="count" id="count-locks">0</span></button>
-          <button class="page-btn" data-page="buteurs">Buteurs</button>
-          <button class="page-btn" data-page="combines">Combinés</button>
-          <button class="page-btn" data-page="simples">Paris du jour (par sport)</button>
-          <button class="page-btn" data-page="top">Top du jour</button>
+          <button class="page-btn" data-page="top">⭐ Top du jour</button>
+          <button class="page-btn" data-page="locks">🔒 Locks <span class="count" id="count-locks">0</span></button>
+          <button class="page-btn" data-page="tous">📋 Tous les matchs</button>
+          <button class="page-btn" data-page="combines">🔗 Combinés</button>
+          <button class="page-btn" data-page="buteurs">⚽ Buteurs</button>
         </div>
       </div>
       <div class="hub" data-hub="perf">
         <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">📊 Ma perf <span class="chev">▾</span></button>
         <div class="hub-menu" role="menu" aria-label="Sous-menu Ma perf">
-          <button class="page-btn" data-page="historique">Historique</button>
-          <button class="page-btn" data-page="bilan">Bilan</button>
-          <button class="page-btn" data-page="backtest">Performance</button>
+          <button class="page-btn" data-page="bilan">💰 Bilan</button>
+          <button class="page-btn" data-page="historique">📜 Historique</button>
         </div>
       </div>
-      <div class="hub" data-hub="plus">
-        <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">⋯ Plus <span class="chev">▾</span></button>
-        <div class="hub-menu" role="menu" aria-label="Sous-menu Plus">
-          <button class="page-btn" data-page="academie">Guide</button>
-          <button class="page-btn" data-page="credibilite">Crédibilité</button>
-          <button class="page-btn" data-page="alertes">Alertes <span class="count" id="count-alertes">0</span></button>
-          <button class="page-btn" data-page="profil">Profil <span class="count" id="count-sante-alerts">0</span></button>
+      <div class="hub" data-hub="transparence">
+        <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">🔍 Transparence <span class="chev">▾</span></button>
+        <div class="hub-menu" role="menu" aria-label="Sous-menu Transparence">
+          <button class="page-btn" data-page="backtest">📈 Backtest</button>
+          <button class="page-btn" data-page="credibilite">📐 Crédibilité</button>
+        </div>
+      </div>
+      <div class="hub" data-hub="apprendre">
+        <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">📚 Apprendre <span class="chev">▾</span></button>
+        <div class="hub-menu" role="menu" aria-label="Sous-menu Apprendre">
+          <a class="page-btn" href="comment-lire-un-prono.html">📖 Comment lire un prono</a>
+          <a class="page-btn" href="methodologie.html">📐 Méthodologie</a>
+          <a class="page-btn" href="academie.html">📚 Académie (lexique)</a>
+        </div>
+      </div>
+      <div class="hub" data-hub="compte">
+        <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">⚙️ Compte <span class="chev">▾</span></button>
+        <div class="hub-menu" role="menu" aria-label="Sous-menu Compte">
+          <button class="page-btn" data-page="profil">👤 Profil &amp; Santé <span class="count" id="count-sante-alerts">0</span></button>
+          <button class="page-btn" data-page="alertes">🔔 Alertes <span class="count" id="count-alertes">0</span></button>
         </div>
       </div>
     </nav>
@@ -570,20 +584,26 @@
      hubs à chevrons en topbar pour la navigation principale mobile. -->
 <nav id="mobile-bottom-nav" class="mobile-bottom-nav" role="navigation" aria-label="Navigation mobile principale">
   <button type="button" class="mbn-btn page-btn" data-page="dashboard" aria-label="Accueil">
-    <span class="mbn-icon" aria-hidden="true">🏠</span>
+    <span class="mbn-icon" aria-hidden="true">🎯</span>
     <span class="mbn-label">Accueil</span>
   </button>
-  <button type="button" class="mbn-btn page-btn" data-page="tous" aria-label="Tous les matchs">
-    <span class="mbn-icon" aria-hidden="true">⚽</span>
-    <span class="mbn-label">Matchs</span>
+  <button type="button" class="mbn-btn page-btn" data-page="top" aria-label="Top du jour">
+    <span class="mbn-icon" aria-hidden="true">⭐</span>
+    <span class="mbn-label">Top</span>
   </button>
   <button type="button" class="mbn-btn page-btn" data-page="locks" aria-label="Paris sûrs (locks)">
     <span class="mbn-icon" aria-hidden="true">🔒</span>
     <span class="mbn-label">Locks</span>
   </button>
   <button type="button" class="mbn-btn page-btn" data-page="bilan" aria-label="Bilan du modèle">
-    <span class="mbn-icon" aria-hidden="true">📊</span>
+    <span class="mbn-icon" aria-hidden="true">💰</span>
     <span class="mbn-label">Bilan</span>
+  </button>
+  <!-- v31.5 — 5e item : ouvre la sidebar drawer (toutes les autres catégories).
+       Réutilise le hamburger existant via dispatchEvent. -->
+  <button type="button" class="mbn-btn" id="mbn-menu-btn" aria-label="Plus d'options" aria-controls="page-nav">
+    <span class="mbn-icon" aria-hidden="true">☰</span>
+    <span class="mbn-label">Menu</span>
   </button>
 </nav>
 
@@ -864,9 +884,10 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-26T14:35:25.781404Z","today":"
 
   // ========== CHANTIER JJJ — Command palette + shortcuts ==========
   var commands = [
-    {label:'Aller à Accueil', icon:'🏠', keywords:'accueil home dashboard', action: function(){ var b=document.querySelector('.page-btn[data-page="dashboard"]'); if(b) b.click(); }},
-    {label:'Aller à Paris du jour', icon:'🎯', keywords:'paris simples matchs du jour', action: function(){ var b=document.querySelector('.page-btn[data-page="simples"]'); if(b) b.click(); }},
-    {label:'Aller à Paris sûrs', icon:'🔒', keywords:'paris surs locks meilleurs', action: function(){ var b=document.querySelector('.page-btn[data-page="locks"]'); if(b) b.click(); }},
+    {label:'Aller à Accueil', icon:'🎯', keywords:'accueil home dashboard aujourd hui', action: function(){ var b=document.querySelector('.page-btn[data-page="dashboard"]'); if(b) b.click(); }},
+    {label:'Aller à Top du jour', icon:'⭐', keywords:'top meilleurs picks jour', action: function(){ var b=document.querySelector('.page-btn[data-page="top"]'); if(b) b.click(); }},
+    {label:'Aller à Locks', icon:'🔒', keywords:'paris surs locks meilleurs haute confiance', action: function(){ var b=document.querySelector('.page-btn[data-page="locks"]'); if(b) b.click(); }},
+    {label:'Aller à Tous les matchs', icon:'📋', keywords:'tous matchs simples liste paris du jour', action: function(){ var b=document.querySelector('.page-btn[data-page="tous"]'); if(b) b.click(); }},
     {label:'Aller à Buteurs', icon:'⚽', keywords:'buteurs buts over under btts', action: function(){ var b=document.querySelector('.page-btn[data-page="buteurs"]'); if(b) b.click(); }},
     {label:'Aller à Combinés', icon:'🔗', keywords:'combines combos', action: function(){ var b=document.querySelector('.page-btn[data-page="combines"]'); if(b) b.click(); }},
     // v30 — Entrée "Mes paris" retirée du command palette (page supprimée).
@@ -1010,12 +1031,16 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-26T14:35:25.781404Z","today":"
       // v23 — shortcuts single-key (pas de shift, évite conflit avec Maj+T qui bascule theme)
       if (e.shiftKey || e.ctrlKey || e.metaKey || e.altKey) return;
       else if (e.key === 'h'){ var b=document.querySelector('.page-btn[data-page="dashboard"]'); if(b) b.click(); }
-      else if (e.key === 's'){ var b=document.querySelector('.page-btn[data-page="simples"]'); if(b) b.click(); }
+      // v31.5 — 's' redirige vers Tous (page "simples" supprimée du nav)
+      else if (e.key === 's'){ var b=document.querySelector('.page-btn[data-page="tous"]'); if(b) b.click(); }
+      // v31.5 — 't' = Top du jour (nouvelle landing pronos)
+      else if (e.key === 't'){ var b=document.querySelector('.page-btn[data-page="top"]'); if(b) b.click(); }
       else if (e.key === 'l'){ var b=document.querySelector('.page-btn[data-page="locks"]'); if(b) b.click(); }
       else if (e.key === 'c'){ var b=document.querySelector('.page-btn[data-page="combines"]'); if(b) b.click(); }
       else if (e.key === 'b'){ var b=document.querySelector('.page-btn[data-page="buteurs"]'); if(b) b.click(); }
       else if (e.key === 'm'){ var b=document.querySelector('.page-btn[data-page="bilan"]'); if(b) b.click(); }  // 'm' redirige vers Bilan (Mes paris retiré)
-      else if (e.key === 'g'){ var b=document.querySelector('.page-btn[data-page="academie"]'); if(b) b.click(); }
+      // v31.5 — 'g' (Académie) ouvre maintenant la page statique externe
+      else if (e.key === 'g'){ window.location.href = 'academie.html'; }
       else if (e.key === 'p'){ var b=document.querySelector('.page-btn[data-page="profil"]'); if(b) b.click(); }
     });
   }
