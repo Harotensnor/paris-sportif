@@ -8284,6 +8284,53 @@
           </article>
         `}
 
+        ${(() => {
+          // v31.7.35 — Stats hero strip : 4 KPIs cliquables sous le hero
+          // qui donnent en 2s la vue d'ensemble du jour (locks · picks ·
+          // combinés · matchs live). Cliquables → naviguent vers les pages
+          // correspondantes. C'est la "page d'accueil revisitée" demandée
+          // par l'utilisateur — densifie le top fold sans saturer.
+          if (_dataIsStale) return '';
+          let _nLocks = 0, _nPicks = 0, _nLive = 0, _nMatchs = 0;
+          const _allToday = (data?.days?.[todayISO()] || []);
+          _allToday.forEach(m => {
+            _nMatchs++;
+            if (m.live || m.status === 'STATUS_IN_PROGRESS') _nLive++;
+            if (m.completed) return;
+            const pp = predictMatch(m);
+            if (pp && !pp.skip) {
+              _nPicks++;
+              if (pp.isLock) _nLocks++;
+            }
+          });
+          // Compte les combinés disponibles via _allToday avec ≥3 picks lock-able
+          const _nCombines = _nPicks >= 2 ? Math.min(3, Math.floor(_nPicks / 2)) : 0;
+          if (_nMatchs === 0) return '';
+          return `
+          <nav class="dash-stats-strip" aria-label="Statistiques du jour">
+            <button type="button" class="dash-stat-item page-btn" data-page="locks" aria-label="${_nLocks} locks disponibles">
+              <span class="dash-stat-icon" style="color:var(--tier-lock);">🔒</span>
+              <span class="dash-stat-val">${_nLocks}</span>
+              <span class="dash-stat-lbl">Locks</span>
+            </button>
+            <button type="button" class="dash-stat-item page-btn" data-page="tous" aria-label="${_nPicks} pronostics disponibles">
+              <span class="dash-stat-icon" style="color:var(--accent);">🎯</span>
+              <span class="dash-stat-val">${_nPicks}</span>
+              <span class="dash-stat-lbl">Pronos</span>
+            </button>
+            <button type="button" class="dash-stat-item page-btn" data-page="combines" aria-label="${_nCombines} combinés disponibles">
+              <span class="dash-stat-icon" style="color:var(--brand);">🎰</span>
+              <span class="dash-stat-val">${_nCombines}</span>
+              <span class="dash-stat-lbl">Combinés</span>
+            </button>
+            <div class="dash-stat-item dash-stat-item--info" aria-label="${_nMatchs} matchs aujourd'hui">
+              <span class="dash-stat-icon" style="color:${_nLive ? 'var(--danger)' : 'var(--text-dim)'};">${_nLive ? '🔴' : '📅'}</span>
+              <span class="dash-stat-val">${_nLive || _nMatchs}</span>
+              <span class="dash-stat-lbl">${_nLive ? 'En direct' : 'Matchs jour'}</span>
+            </div>
+          </nav>`;
+        })()}
+
         <!-- v31.7 — Streak banner + ROI alerts retirées (page Aujourd'hui
              surchargée selon retour user). La streak du modèle reste visible
              dans Bilan / Crédibilité ; les sports en perte sont visibles
