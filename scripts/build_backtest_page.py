@@ -24,6 +24,7 @@ from html import escape
 
 ROOT = Path(__file__).resolve().parent.parent
 REPORT = ROOT / 'backtest_report_v2.json'
+BASELINES = ROOT / 'backtest_report.json'  # v31.7.18 — strategies marche
 OUTPUT = ROOT / 'backtest.html'
 
 
@@ -205,6 +206,74 @@ def render_calibration(cal: list[dict]) -> str:
             f'<span class="{color_class(gap if gap is None else (-abs(gap)))}">{fmt_signed(gap * 100 if gap is not None else None, 1, "pp")}</span>' if gap is not None else '—',
         ])
     return render_table(['Bin probabilité', 'N', 'Prob moyenne', 'WR observé', 'Gap'], rows)
+
+
+def render_benchmarks(overall: dict, baselines: dict) -> str:
+    """v31.7.18 — Tableau "Vs benchmarks marché" : compare le ROI du modèle
+    aux 5 strategies baselines de backtest_baselines.py (favorite, dog, home,
+    value_zone, low_overround). Chaque ligne montre WR + ROI + delta vs
+    modèle. Permet de répondre publiquement : "le modèle bat-il les
+    heuristiques simples ?"."""
+    if not baselines:
+        return '<p style="color:#a3a3aa;font-size:13px;">Pas de baselines disponibles (backtest_report.json absent).</p>'
+
+    model_roi = overall.get('flat_roi_pct') or 0
+    model_n = overall.get('n') or 0
+
+    labels = {
+        'favorite': ('🥇 Favori marché', 'Toujours parier le favori (cote la plus basse)'),
+        'dog': ('🐶 Outsider', 'Toujours parier l\'outsider'),
+        'home': ('🏠 Domicile systématique', 'Toujours parier l\'équipe à domicile'),
+        'value_zone': ('💎 Value zone (cote 1.5–3.0)', 'Favori marché dans la zone Kelly-fertile'),
+        'low_overround': ('📉 Low overround', 'Match avec faible marge bookmaker'),
+    }
+
+    rows = []
+    # Modele en première ligne
+    delta_self = 0
+    delta_str = '<span style="color:#a3a3aa;">référence</span>'
+    rows.append(f'''<tr style="background:rgba(167,139,250,.08);">
+      <td><b>🤖 Modèle predictMatch</b><br><span style="font-size:11px;color:#a3a3aa;">{model_n} picks réglés</span></td>
+      <td style="text-align:right;">{model_n}</td>
+      <td style="text-align:right;">{fmt_pct(overall.get("win_rate"), 1)}</td>
+      <td style="text-align:right;color:{"#34d399" if model_roi > 0 else "#f87171" if model_roi < 0 else "#a3a3aa"};font-weight:700;">{fmt_signed(model_roi, 1, "%")}</td>
+      <td style="text-align:right;">{delta_str}</td>
+    </tr>''')
+
+    for key, (lbl, sub) in labels.items():
+        s = baselines.get(key, {}).get('overall', {})
+        if not s or not s.get('n'):
+            continue
+        roi = s.get('roi_pct') or 0
+        delta = model_roi - roi
+        delta_color = '#34d399' if delta > 0 else '#f87171' if delta < -0.5 else '#a3a3aa'
+        delta_sign = '+' if delta > 0 else ''
+        rows.append(f'''<tr>
+      <td><b>{lbl}</b><br><span style="font-size:11px;color:#a3a3aa;">{escape(sub)}</span></td>
+      <td style="text-align:right;">{s.get("n", 0)}</td>
+      <td style="text-align:right;">{(s.get("win_rate") or 0)*100:.1f}%</td>
+      <td style="text-align:right;color:{"#34d399" if roi > 0 else "#f87171" if roi < 0 else "#a3a3aa"};">{roi:+.1f}%</td>
+      <td style="text-align:right;color:{delta_color};font-weight:600;">{delta_sign}{delta:.1f}pt</td>
+    </tr>''')
+
+    if not rows[1:]:  # Only model row, no baselines
+        return '<p style="color:#a3a3aa;font-size:13px;">Pas de strategies baselines à comparer.</p>'
+
+    return f'''<table>
+      <thead>
+        <tr>
+          <th>Stratégie</th>
+          <th style="text-align:right;">N</th>
+          <th style="text-align:right;">WR</th>
+          <th style="text-align:right;">ROI flat</th>
+          <th style="text-align:right;">Δ vs modèle</th>
+        </tr>
+      </thead>
+      <tbody>{''.join(rows)}</tbody>
+    </table>
+    <p style="font-size:12px;color:#a3a3aa;margin-top:8px;">
+      Δ positif = le modèle bat la stratégie de cette ligne. Source : <code>backtest_baselines.py</code> (cron hebdo, baselines marché vs <code>backtest_v2.py</code> qui mesure le vrai modèle).
+    </p>'''
 
 
 def render_top_leagues(by_league: dict, limit: int = 12) -> str:
@@ -454,6 +523,9 @@ PAGE_TEMPLATE = '''<!DOCTYPE html>
   <h2 id="bucket">💸 Par bucket de cote <span class="subtle">— gros favori vs outsider</span></h2>
   {table_bucket}
 
+  <h2 id="benchmarks">🆚 Vs benchmarks marché <span class="subtle">— le modèle bat-il les heuristiques simples ?</span></h2>
+  {table_benchmarks}
+
   <h2 id="calibration">📊 Calibration probabiliste <span class="subtle">— quand on dit 70%, on gagne 70% ?</span></h2>
   <p style="font-size:13px;color:#a3a3aa;margin:0 0 12px;">Plus le <b>gap</b> est proche de 0, mieux le modèle est calibré.
   <code>+pp</code> = modèle sous-estime · <code>-pp</code> = modèle sur-estime.</p>
@@ -530,6 +602,14 @@ def main() -> int:
         generated_human = generated_at
         generated_iso = generated_at
 
+    # v31.7.18 — Charge baselines marche pour comparaison (optionnel).
+    baselines = {}
+    if BASELINES.exists():
+        try:
+            baselines = json.loads(BASELINES.read_text(encoding='utf-8')).get('strategies', {})
+        except (json.JSONDecodeError, OSError):
+            baselines = {}
+
     html = PAGE_TEMPLATE.format(
         n=n,
         wr_str=wr_str,
@@ -546,6 +626,7 @@ def main() -> int:
         table_bucket=render_by_cote_bucket(by_bucket),
         table_calibration=render_calibration(calibration),
         table_leagues=render_top_leagues(by_league, limit=12),
+        table_benchmarks=render_benchmarks(overall, baselines),
     )
 
     OUTPUT.write_text(html, encoding='utf-8')
