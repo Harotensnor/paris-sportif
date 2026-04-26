@@ -110,6 +110,8 @@ PATCH_STAGES = [
     # v31 — Static credibilite.html (calibration + Brier + log-loss + SVG).
     # Lit backtest_report_v2.json, produit credibilite.html. ~0.3s.
     ('build_credibilite_page.py',   1,   15),
+    # v31.7.4 — OG images (1200x630 PNG) pour pages statiques. ~3s.
+    ('build_og_images.py',          5,   30),
     # Chantier #3 lazy-load — DOIT tourner en DERNIER. Lit data.js (full),
     # écrit data_today.json + data_manifest.json + ré-inline LITE blob dans
     # pronostics.html. Sans ça, le client tomberait toujours sur le fallback

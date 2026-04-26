@@ -32,7 +32,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install deps
-        run: pip install curl_cffi --break-system-packages
+        run: pip install curl_cffi pillow --break-system-packages
 
       - name: Run fetch pipeline
         run: |
@@ -151,6 +151,8 @@ jobs:
           python3 build_feed.py || true
           # v31 — Static credibilite.html (calibration + Brier + log-loss).
           python3 build_credibilite_page.py || true
+          # v31.7.4 — OG images (1200x630 PNG) pour pages statiques. Cheap (~3s).
+          python3 build_og_images.py || true
           # Chantier #3 lazy-load — DOIT tourner en DERNIER. Lit data.js (full),
           # écrit data_today.json + data_manifest.json + ré-inline LITE blob
           # dans pronostics.html. Réduit le 1er paint de ~1.4 MB à ~0.4 MB.

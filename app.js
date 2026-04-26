@@ -5410,6 +5410,147 @@
         ${oddsTableHtml}
       </div>
 
+      ${(() => {
+        // v31.7.4 — Section "Chiffres clés" sport-aware. Affiche les stats les
+        // plus actionables selon le sport, avec gracieux degrade si data manque.
+        const sport = match.sport;
+        const homeC = home || {};
+        const awayC = away || {};
+        const fmtN = (n, dec=1) => (n == null || !isFinite(n)) ? '—' : Number(n).toFixed(dec);
+        const fmtPct = (n) => (n == null || !isFinite(n)) ? '—' : (n*100).toFixed(0) + '%';
+        const fmtForm = (s) => {
+          if (!s || typeof s !== 'string') return '';
+          return s.split('').map(c => {
+            const col = c==='W' ? '#34d399' : c==='L' ? '#fca5a5' : 'var(--text-dim2)';
+            const ch = c==='W' ? '✓' : c==='L' ? '✗' : '·';
+            return `<span style="display:inline-block;width:16px;height:16px;line-height:16px;text-align:center;border-radius:50%;background:${col}22;color:${col};font-weight:700;font-size:10px;margin-right:1px;">${ch}</span>`;
+          }).join('');
+        };
+        const kvBlock = (rows) => `<div class="two-cols">
+          <div>${rows.home.map(([k,v]) => `<div class="kv"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('')}</div>
+          <div>${rows.away.map(([k,v]) => `<div class="kv"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('')}</div>
+        </div>`;
+
+        if (sport === 'football') {
+          const eloH = homeC.elo, eloA = awayC.elo;
+          const fsH = homeC.form_stats || {}, fsA = awayC.form_stats || {};
+          const cal = match.fd_calibration;
+          if (!eloH && !eloA && !fsH.played5 && !fsA.played5 && !cal) return '';
+          const homeRows = [];
+          const awayRows = [];
+          if (eloH) homeRows.push(['Clubelo', `<b>${fmtN(eloH.value, 0)}</b> · niv. ${eloH.level}${eloH.rank ? ' · #' + eloH.rank : ''}`]);
+          if (eloA) awayRows.push(['Clubelo', `<b>${fmtN(eloA.value, 0)}</b> · niv. ${eloA.level}${eloA.rank ? ' · #' + eloA.rank : ''}`]);
+          if (fsH.played5) {
+            homeRows.push(['Buts marqués / encaissés (5)', `<b>${fmtN(fsH.avg_gf5, 1)}</b> · ${fmtN(fsH.avg_ga5, 1)}`]);
+            homeRows.push(['Bilan 5 derniers', `${fsH.wins5}V · ${fsH.draws5}N · ${fsH.losses5}D`]);
+            if (fsH.cleans5 != null) homeRows.push(['Clean sheets / loupés', `${fsH.cleans5} · ${fsH.failed_to_score5}`]);
+          }
+          if (fsA.played5) {
+            awayRows.push(['Buts marqués / encaissés (5)', `<b>${fmtN(fsA.avg_gf5, 1)}</b> · ${fmtN(fsA.avg_ga5, 1)}`]);
+            awayRows.push(['Bilan 5 derniers', `${fsA.wins5}V · ${fsA.draws5}N · ${fsA.losses5}D`]);
+            if (fsA.cleans5 != null) awayRows.push(['Clean sheets / loupés', `${fsA.cleans5} · ${fsA.failed_to_score5}`]);
+          }
+          const calRow = cal ? `<div style="margin-top:14px;padding:12px 14px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;font-size:12.5px;color:var(--text-dim);line-height:1.7;">
+            <div style="font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.4px;font-weight:700;margin-bottom:6px;">Calibration ligue (${cal.n} matchs historiques)</div>
+            <span style="color:var(--text);">⚽ ${fmtN(cal.avg_goals, 2)}</span> buts/match ·
+            <span style="color:var(--text);">🏠 ${fmtPct(cal.home_wr)}</span> dom. ·
+            <span style="color:var(--text);">⚖️ ${fmtPct(cal.draw_rate)}</span> nul ·
+            <span style="color:var(--text);">✈️ ${fmtPct(cal.away_wr)}</span> ext. ·
+            <span style="color:var(--text);">📈 +2.5 ${fmtPct(cal.over25_rate)}</span> ·
+            <span style="color:var(--text);">🎯 BTTS ${fmtPct(cal.btts_rate)}</span>
+          </div>` : '';
+          return `<div class="section">
+            <h4>📊 Chiffres clés foot</h4>
+            ${kvBlock({ home: homeRows, away: awayRows })}
+            ${calRow}
+          </div>`;
+        }
+
+        if (sport === 'tennis') {
+          const tf = match.tennis_features;
+          if (!tf || (!tf.home && !tf.away)) return '';
+          const tH = tf.home || {}, tA = tf.away || {};
+          const sf = tf.surface;
+          const sfDiff = tf.surface_elo_diff;
+          const homeRows = [];
+          const awayRows = [];
+          if (tH.elo) homeRows.push(['Elo global', `<b>${fmtN(tH.elo, 0)}</b>${tH.rank ? ' · #' + tH.rank : ''}`]);
+          if (tA.elo) awayRows.push(['Elo global', `<b>${fmtN(tA.elo, 0)}</b>${tA.rank ? ' · #' + tA.rank : ''}`]);
+          if (sf && tH.surface_elo && tH.surface_elo[sf] != null) homeRows.push([`Elo ${sf}`, `<b>${fmtN(tH.surface_elo[sf], 0)}</b>`]);
+          if (sf && tA.surface_elo && tA.surface_elo[sf] != null) awayRows.push([`Elo ${sf}`, `<b>${fmtN(tA.surface_elo[sf], 0)}</b>`]);
+          if (tH.last10) homeRows.push(['Forme 10 derniers', `<span>${fmtForm(tH.last10)}</span> · ${tH.wins_last10}V`]);
+          if (tA.last10) awayRows.push(['Forme 10 derniers', `<span>${fmtForm(tA.last10)}</span> · ${tA.wins_last10}V`]);
+          if (tH.fatigue_14d != null) homeRows.push(['Matchs derniers 14j', `<b>${tH.fatigue_14d}</b>`]);
+          if (tA.fatigue_14d != null) awayRows.push(['Matchs derniers 14j', `<b>${tA.fatigue_14d}</b>`]);
+          const sfBanner = sf && sfDiff != null ? `<div style="margin-bottom:14px;padding:10px 12px;background:${Math.abs(sfDiff) > 100 ? 'rgba(167,139,250,.08)' : 'rgba(255,255,255,.02)'};border:1px solid ${Math.abs(sfDiff) > 100 ? 'rgba(167,139,250,.18)' : 'var(--border)'};border-left:3px solid ${sfDiff > 0 ? 'var(--brand)' : 'var(--info)'};border-radius:0 8px 8px 0;font-size:12.5px;color:var(--text);"><b>Surface ${sf}</b> · diff Elo ${sfDiff > 0 ? '+' : ''}${fmtN(sfDiff, 0)} pts en faveur de ${sfDiff > 0 ? esc(homeC.name||'home') : esc(awayC.name||'away')}</div>` : '';
+          return `<div class="section">
+            <h4>📊 Chiffres clés tennis</h4>
+            ${sfBanner}
+            ${kvBlock({ home: homeRows, away: awayRows })}
+          </div>`;
+        }
+
+        if (sport === 'hockey') {
+          const ns = match.nhl_stats;
+          if (!ns) return '';
+          const sH = ns.home || {}, sA = ns.away || {};
+          const gH = sH.goalie || {}, gA = sA.goalie || {};
+          const homeRows = [];
+          const awayRows = [];
+          if (sH.gf_per_game != null) homeRows.push(['Buts pour / contre', `<b>${fmtN(sH.gf_per_game, 2)}</b> · ${fmtN(sH.ga_per_game, 2)}`]);
+          if (sA.gf_per_game != null) awayRows.push(['Buts pour / contre', `<b>${fmtN(sA.gf_per_game, 2)}</b> · ${fmtN(sA.ga_per_game, 2)}`]);
+          if (sH.l10_wins != null) homeRows.push(['10 derniers', `${sH.l10_wins}V · ${sH.l10_losses}D · ${sH.l10_ot_losses || 0} OTL`]);
+          if (sA.l10_wins != null) awayRows.push(['10 derniers', `${sA.l10_wins}V · ${sA.l10_losses}D · ${sA.l10_ot_losses || 0} OTL`]);
+          if (gH.name) homeRows.push(['Gardien probable', `<b>${esc(gH.name)}</b> · SV% <b>${fmtN(gH.save_pct*100, 1)}</b> · GAA ${fmtN(gH.gaa, 2)}`]);
+          if (gA.name) awayRows.push(['Gardien probable', `<b>${esc(gA.name)}</b> · SV% <b>${fmtN(gA.save_pct*100, 1)}</b> · GAA ${fmtN(gA.gaa, 2)}`]);
+          if (sH.points != null) homeRows.push(['Points · GP', `${sH.points} · ${sH.gp}`]);
+          if (sA.points != null) awayRows.push(['Points · GP', `${sA.points} · ${sA.gp}`]);
+          return `<div class="section">
+            <h4>🥅 Chiffres clés NHL</h4>
+            ${kvBlock({ home: homeRows, away: awayRows })}
+          </div>`;
+        }
+
+        if (sport === 'baseball') {
+          const mp = match.mlb_pitchers;
+          const fsH = homeC.form_stats || {}, fsA = awayC.form_stats || {};
+          if (!mp && !fsH.played5 && !fsA.played5) return '';
+          const homeRows = [];
+          const awayRows = [];
+          if (mp && mp.home && mp.home.name) homeRows.push(['Pitcher probable', `<b>${esc(mp.home.name)}</b> · ERA <b>${fmtN(mp.home.era, 2)}</b> · WHIP ${fmtN(mp.home.whip, 2)} · K/9 ${fmtN(mp.home.k9, 1)} (${mp.home.hand || '?'})`]);
+          if (mp && mp.away && mp.away.name) awayRows.push(['Pitcher probable', `<b>${esc(mp.away.name)}</b> · ERA <b>${fmtN(mp.away.era, 2)}</b> · WHIP ${fmtN(mp.away.whip, 2)} · K/9 ${fmtN(mp.away.k9, 1)} (${mp.away.hand || '?'})`]);
+          if (fsH.played5) homeRows.push(['Forme 5 derniers', `${fsH.wins5}V · ${fsH.losses5}D · runs ${fmtN(fsH.avg_gf5, 1)}/${fmtN(fsH.avg_ga5, 1)}`]);
+          if (fsA.played5) awayRows.push(['Forme 5 derniers', `${fsA.wins5}V · ${fsA.losses5}D · runs ${fmtN(fsA.avg_gf5, 1)}/${fmtN(fsA.avg_ga5, 1)}`]);
+          return `<div class="section">
+            <h4>⚾ Chiffres clés MLB</h4>
+            ${kvBlock({ home: homeRows, away: awayRows })}
+          </div>`;
+        }
+
+        if (sport === 'basketball') {
+          const fsH = homeC.form_stats || {}, fsA = awayC.form_stats || {};
+          if (!fsH.played5 && !fsA.played5) return '';
+          const homeRows = [];
+          const awayRows = [];
+          if (fsH.played5) {
+            homeRows.push(['Points marqués / encaissés (5)', `<b>${fmtN(fsH.avg_gf5, 1)}</b> · ${fmtN(fsH.avg_ga5, 1)}`]);
+            homeRows.push(['Bilan 5 derniers', `${fsH.wins5}V · ${fsH.losses5}D`]);
+            if (homeC.form) homeRows.push(['Forme', `<span>${fmtForm(homeC.form)}</span>`]);
+          }
+          if (fsA.played5) {
+            awayRows.push(['Points marqués / encaissés (5)', `<b>${fmtN(fsA.avg_gf5, 1)}</b> · ${fmtN(fsA.avg_ga5, 1)}`]);
+            awayRows.push(['Bilan 5 derniers', `${fsA.wins5}V · ${fsA.losses5}D`]);
+            if (awayC.form) awayRows.push(['Forme', `<span>${fmtForm(awayC.form)}</span>`]);
+          }
+          return `<div class="section">
+            <h4>🏀 Chiffres clés basket</h4>
+            ${kvBlock({ home: homeRows, away: awayRows })}
+          </div>`;
+        }
+
+        return '';
+      })()}
+
       <div class="section">
         <h4>📈 Statistiques saison</h4>
         <div class="two-cols">
@@ -5584,6 +5725,46 @@
     `;
 
     // v30 — Handler "J'ai parié" retiré : Théo n'enregistre pas ses paris.
+
+    // v31.7.4 — Modal détail mobile : sections collapsibles pour réduire le
+    // scroll vertical (qui faisait jusqu'à 5400px sur foot top-5). Sur ≤720px,
+    // chaque .section devient cliquable au niveau du h4, le contenu est masqué
+    // par défaut sauf la première section (Notre pronostic).
+    if (window.matchMedia('(max-width: 720px)').matches) {
+      const sections = body.querySelectorAll('.section');
+      sections.forEach((sec, idx) => {
+        const h4 = sec.querySelector('h4');
+        if (!h4) return;
+        sec.classList.add('section-collapsible');
+        // Premier section ouverte par défaut, autres fermées
+        if (idx === 0) {
+          sec.setAttribute('data-collapsed', 'false');
+        } else {
+          sec.setAttribute('data-collapsed', 'true');
+        }
+        // h4 devient le toggle
+        h4.style.cursor = 'pointer';
+        h4.setAttribute('role', 'button');
+        h4.setAttribute('tabindex', '0');
+        // Ajouter un chevron à droite
+        if (!h4.querySelector('.section-chevron')) {
+          const chev = document.createElement('span');
+          chev.className = 'section-chevron';
+          chev.setAttribute('aria-hidden', 'true');
+          chev.textContent = '▾';
+          chev.style.cssText = 'margin-left:auto;transition:transform .2s ease;font-size:14px;color:var(--text-dim);';
+          h4.appendChild(chev);
+        }
+        const toggle = () => {
+          const collapsed = sec.getAttribute('data-collapsed') === 'true';
+          sec.setAttribute('data-collapsed', String(!collapsed));
+        };
+        h4.addEventListener('click', toggle);
+        h4.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+        });
+      });
+    }
 
     const modal = document.getElementById('detail-modal');
     modal.classList.add('open');

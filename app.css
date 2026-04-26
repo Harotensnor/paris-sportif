@@ -3578,6 +3578,44 @@
     user-select: none;
   }
 
+  /* --- v31.7.4 — Modal détail mobile : sections collapsibles --- */
+  @media (max-width: 720px) {
+    .section-collapsible[data-collapsed="true"] > *:not(h4) {
+      display: none;
+    }
+    .section-collapsible h4 {
+      padding: 12px 14px;
+      margin: -14px -14px 0;
+      background: var(--panel-2);
+      border-radius: 10px;
+      transition: background .15s ease;
+      user-select: none;
+    }
+    .section-collapsible[data-collapsed="false"] h4 {
+      margin-bottom: 12px;
+      border-radius: 10px 10px 0 0;
+    }
+    .section-collapsible h4:hover {
+      background: var(--panel-3);
+    }
+    .section-collapsible h4:focus-visible {
+      outline: 2px solid var(--brand);
+      outline-offset: 2px;
+    }
+    .section-collapsible[data-collapsed="true"] .section-chevron {
+      transform: rotate(-90deg);
+    }
+    /* La première section (Notre pronostic) garde son padding original */
+    .section-collapsible {
+      padding: 14px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 12px !important;
+      border-bottom: 1px solid var(--border) !important;
+    }
+  }
+
   /* --- Mobile : compactness pass --- */
   @media (max-width: 720px) {
     main h1 { font-size: 22px !important; }
