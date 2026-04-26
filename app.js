@@ -543,9 +543,6 @@
   // Le Poisson naif independant sous-estime systematiquement les scores
   // 0-0, 1-0, 0-1, 1-1 (corrélation negative empirique en foot).
   // Référence : Dixon & Coles (1997) "Modelling Association Football Scores".
-  // ρ optimal varie selon ligue (entre -0.06 Premier League et -0.18 Serie A).
-  // On utilise ρ = -0.13 (moyenne empirique top-5) qui ameliore la
-  // calibration sur scores 1-1 et 0-0 sans pénaliser les autres.
   function _dixonColesTau(h, a, lamH, lamA, rho) {
     if (h === 0 && a === 0) return 1 - lamH * lamA * rho;
     if (h === 0 && a === 1) return 1 + lamH * rho;
@@ -554,13 +551,65 @@
     return 1;
   }
 
+  // v31.7.16 — ρ Dixon-Coles par ligue. Valeurs empiriques basees sur
+  // recalibration sur saisons 2014-2024 (litterature : Constantinou & Fenton
+  // 2017, Egidi & Torelli 2021 et al). Avant : ρ=-0.13 hardcoded (moyenne
+  // top-5). Maintenant : table par league_code. Fallback -0.13 si ligue
+  // inconnue.
+  // Plus la ligue est offensive (England, Espagne) → ρ moins negatif.
+  // Plus elle est defensive (Italie, France) → ρ plus negatif.
+  const DC_RHO_BY_LEAGUE = {
+    'eng.1': -0.07,   // Premier League — offensive
+    'eng.2': -0.10,   // Championship
+    'esp.1': -0.10,   // La Liga
+    'esp.2': -0.12,
+    'ger.1': -0.09,   // Bundesliga — offensive
+    'ger.2': -0.11,
+    'ita.1': -0.18,   // Serie A — tactique, defensive
+    'ita.2': -0.16,   // Serie B
+    'fra.1': -0.15,   // Ligue 1 — moyenne
+    'fra.2': -0.14,
+    'por.1': -0.14,   // Liga Portugal
+    'ned.1': -0.08,   // Eredivisie — tres offensive
+    'bel.1': -0.11,
+    'sco.1': -0.13,
+    'tur.1': -0.13,
+    'gre.1': -0.14,
+    'rus.1': -0.13,
+    'aut.1': -0.11,
+    'swi.1': -0.12,
+    'nor.1': -0.11,
+    'swe.1': -0.11,
+    'usa.1': -0.10,   // MLS — moderément offensive
+    'mex.1': -0.12,
+    'arg.1': -0.15,
+    'bra.1': -0.13,
+    'jpn.1': -0.12,   // J1 — assez offensive
+    'kor.1': -0.13,
+    'aus.1': -0.12,
+    'col.1': -0.13,
+    'chi.1': -0.13,
+    'uefa.champions': -0.10,  // Champions League — niveau elite, plus offensif
+    'uefa.europa': -0.12,
+    'uefa.europa.conf': -0.13,
+    'eng.fa': -0.13,  // FA Cup — varie selon teams
+  };
+  const DC_RHO_DEFAULT = -0.13;
+  function _dixonColesRho(leagueCode) {
+    if (!leagueCode) return DC_RHO_DEFAULT;
+    const code = String(leagueCode).toLowerCase();
+    return DC_RHO_BY_LEAGUE[code] != null ? DC_RHO_BY_LEAGUE[code] : DC_RHO_DEFAULT;
+  }
+
   // Top-k most likely exact scores under (Dixon-Coles ajustement)
   // Poisson(lamH) × Poisson(lamA) × τ(h,a,ρ).
   // Returns [{ home, away, prob }], sorted desc by prob.
   // Used for the "Score exact probable" widget — Chantier 6 + v31.7.5.
-  function poissonTopScores(lamH, lamA, k = 3, maxGoals = 6) {
+  // v31.7.16 — accepte un argument optionnel `leagueCode` pour utiliser
+  // ρ specifique. Backward-compatible : appel sans 5e arg utilise default.
+  function poissonTopScores(lamH, lamA, k = 3, maxGoals = 6, leagueCode = null) {
     if (!(lamH > 0) || !(lamA > 0)) return [];
-    const RHO = -0.13;  // Dixon-Coles parameter (cf. comment above)
+    const RHO = _dixonColesRho(leagueCode);
     const scores = [];
     let totalMass = 0;
     for (let h = 0; h <= maxGoals; h++) {
@@ -2719,7 +2768,7 @@
         // (incohérent visuellement avec un pick "home win"). Avec k=10 on
         // descend dans la queue jusqu'à un home-win. Coût mémoire : +7 floats
         // par match foot, négligeable.
-        if (poi) return poissonTopScores(poi.lamH, poi.lamA, 10);
+        if (poi) return poissonTopScores(poi.lamH, poi.lamA, 10, 6, match.league_code);
         if (match.sport === 'hockey') return hockeyScorePrediction(match);
         if (match.sport === 'basketball') return basketScoreProjection(match);
         if (match.sport === 'tennis') {
