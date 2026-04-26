@@ -143,11 +143,22 @@ Hygiène moderne :
 
 ## Conventions
 
-- **DASHBOARD = SPA monolithique** : `pronostics.html` contient tout le code
-  dynamique (HTML + CSS + JS inline). Pas de bundler, pas de build step.
-  Modifier directement. v31 : pages éditoriales (legal/methodologie/academie/
-  comment-lire/backtest/credibilite) sont SORTIES en HTML statiques séparés
-  pour le SEO, mais le dashboard reste dans pronostics.html.
+- **DASHBOARD = SPA séparée 3 fichiers** depuis v31.1 (audit perf) :
+  - `pronostics.html` (~600 KB) — HTML shell + LITE data blob inline (écrit
+    par finalize_inline.py) + petits boot scripts (theme loader, JSON-LD,
+    enhancement module, FAB).
+  - `app.css` (~100 KB) — toutes les styles. Cacheable agressivement.
+  - `app.js` (~880 KB) — IIFE principale (predictMatch, renderXxxPage,
+    _agentReplay, etc.). Loaded avec `defer`, exécution après parse +
+    après lecture du LITE blob inline (l'ordre est respecté par defer).
+  - Service worker en stale-while-revalidate pour app.css/app.js — cache
+    instantané + refresh background. CACHE_VERSION bumpé à chaque deploy
+    pour invalider proprement.
+  - Toujours **pas de bundler, pas de npm**. Modifier app.css / app.js
+    directement. Le split a été fait one-shot via `.cache/split_pronostics.py`
+    (script jetable, plus utilisé). v31 : pages éditoriales (legal/methodologie/
+    academie/comment-lire/backtest/credibilite) sont SORTIES en HTML statiques
+    séparés pour le SEO.
 - **`index.html`** = vraie landing page indexable depuis v31 (avant : redirect
   vers pronostics.html). Hero + value prop + cards explicatives + CTA dashboard.
 - **`.gitattributes`** force LF eol partout — sans ça les édits Windows

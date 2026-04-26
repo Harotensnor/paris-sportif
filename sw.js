@@ -25,6 +25,12 @@ const SHELL_ASSETS = [
   // d'un précédent fetch ayant rempli le runtime cache, ce qui n'était
   // pas garanti pour les premières navigations).
   'pronostics.html',
+  // v31 — app.css + app.js extraits depuis pronostics.html (audit ChatGPT).
+  // Pré-cachés agressivement parce qu'ils ne changent presque jamais
+  // (vs pronostics.html qui change à chaque cron tick avec le LITE blob).
+  // CACHE_VERSION stamp invalide tout à chaque vrai changement de code.
+  'app.css',
+  'app.js',
 ];
 
 self.addEventListener('install', (event) => {
@@ -110,6 +116,25 @@ self.addEventListener('fetch', (event) => {
           return resp;
         })
         .catch(() => caches.match(req))
+    );
+    return;
+  }
+
+  // v31 — app.css + app.js : STALE-WHILE-REVALIDATE. Servir le cache
+  // immédiatement (instant render) ET refetch en background pour la prochaine
+  // visite. Couplé au stamp CACHE_VERSION qui est bumpé à chaque vrai
+  // changement, on a le meilleur des deux mondes : rapide ET frais.
+  if (url.pathname.endsWith('/app.css') || url.pathname.endsWith('app.css') ||
+      url.pathname.endsWith('/app.js')  || url.pathname.endsWith('app.js')) {
+    event.respondWith(
+      caches.match(req).then(hit => {
+        const fetchPromise = fetch(req).then(resp => {
+          const respClone = resp.clone();
+          caches.open(SHELL_CACHE).then(c => c.put(req, respClone));
+          return resp;
+        }).catch(() => hit);  // network fail → fallback to cache
+        return hit || fetchPromise;  // immediate cache, refresh background
+      })
     );
     return;
   }
