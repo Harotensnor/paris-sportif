@@ -8726,7 +8726,7 @@
         return diff < 60 * 60000 && diff > -60000;
       })();
       const _cntColor = isFini ? 'var(--text-dim2)' : _cntSoon ? '#fbbf24' : 'var(--text-dim2)';
-      return `<div class="tous-row" data-match-id="${esc(String(p.m.id || ''))}" data-match-date="${esc(String(p.m.date || ''))}" style="display:grid;grid-template-columns:72px 1fr 200px 110px;gap:14px;padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${isFini ? (p.res==='won'?'#34d399':p.res==='lost'?'#fca5a5':'var(--text-dim)') : (p.rel>=0.70 ? 'var(--accent)' : 'var(--brand)')};border-radius:0 10px 10px 0;align-items:center;cursor:pointer;font-variant-numeric:tabular-nums;">
+      return `<div class="tous-row" data-match-id="${esc(String(p.m.id || ''))}" data-match-date="${esc(String(p.m.date || ''))}" style="display:grid;gap:14px;padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${isFini ? (p.res==='won'?'#34d399':p.res==='lost'?'#fca5a5':'var(--text-dim)') : (p.rel>=0.70 ? 'var(--accent)' : 'var(--brand)')};border-radius:0 10px 10px 0;align-items:center;cursor:pointer;font-variant-numeric:tabular-nums;">
         <div style="text-align:left;">
           <div style="font-size:11px;color:var(--text-dim2,#7b8693);font-weight:600;">${sportEm} ${esc(tLbl)}</div>
           ${!isFini && _cntLabel ? `<div class="tous-cnt" style="font-size:9.5px;color:${_cntColor};margin-top:1px;font-weight:600;${_cntSoon?'background:rgba(251,191,36,.12);padding:1px 5px;border-radius:3px;display:inline-block;':''}">${esc(_cntLabel)}</div>` : ''}
@@ -10355,10 +10355,15 @@
     };
 
     if (picked.length < 2) {
+      const fallbackHint = type === 'jour'
+        ? 'Essaie la <b><button class="page-btn" data-page="montante-weekend" style="background:transparent;border:none;color:var(--brand);text-decoration:underline;cursor:pointer;font-size:inherit;font-family:inherit;padding:0;font-weight:700;">Montante du weekend</button></b> ou de la <b><button class="page-btn" data-page="montante-semaine" style="background:transparent;border:none;color:var(--brand);text-decoration:underline;cursor:pointer;font-size:inherit;font-family:inherit;padding:0;font-weight:700;">semaine</button></b> — fenêtre temporelle plus large = plus de matchs séquentiels disponibles.'
+        : type === 'weekend'
+          ? 'Essaie la <b><button class="page-btn" data-page="montante-semaine" style="background:transparent;border:none;color:var(--brand);text-decoration:underline;cursor:pointer;font-size:inherit;font-family:inherit;padding:0;font-weight:700;">Montante de la semaine</button></b> pour étendre la fenêtre.'
+          : 'Reviens plus tard quand le calendrier des prochains jours sera plus rempli.';
       wrap.innerHTML = `
         <div style="max-width:960px;margin:0 auto;padding:0 8px;">
           <div style="margin:24px 0 18px;">
-            <span class="section-eyebrow">Montante</span>
+            <span class="section-eyebrow">Montante séquentielle</span>
             <h1 class="section-title-v2">${titleByType[type]}</h1>
             <p class="section-subtitle-v2">Le modèle n'a pas trouvé assez de picks séquentiels respectant les critères.</p>
           </div>
@@ -10366,10 +10371,11 @@
             <span class="es-icon">🎯</span>
             <div class="es-title">Pas assez de picks séquentiels</div>
             <div class="es-body">
-              Une montante demande des matchs <b>qui ne se chevauchent pas dans le temps</b> (tu dois encaisser le gain de l'étape 1 avant de remiser sur l'étape 2).
-              ${candidates.length ? `${candidates.length} candidat${candidates.length>1?'s':''} haute confiance trouvé${candidates.length>1?'s':''} mais ils sont trop proches dans le temps ou tous dans le même sport/ligue.` : 'Aucun candidat haute confiance dans la fenêtre.'}
-              Reviens plus tard ou consulte les <button class="page-btn" data-page="locks" style="background:transparent;border:none;color:var(--brand);text-decoration:underline;cursor:pointer;font-size:inherit;font-family:inherit;padding:0;">Locks</button> pour les picks individuels.
+              Une montante demande des matchs <b>qui ne se chevauchent pas dans le temps</b> (tu dois encaisser le gain de l'étape 1 avant de remiser sur l'étape 2).<br><br>
+              ${candidates.length ? `<b>${candidates.length}</b> candidat${candidates.length>1?'s':''} haute confiance dans la fenêtre, mais trop proches temporellement ou tous dans le même sport/ligue.` : 'Aucun candidat haute confiance dans la fenêtre temporelle.'}<br><br>
+              ${fallbackHint}
             </div>
+            <button class="page-btn es-cta" data-page="locks" style="margin-top:16px;">🔒 Voir les Locks individuels</button>
           </div>
         </div>`;
       return;
@@ -10651,6 +10657,20 @@
     if (el) el.style.display = isSimples ? '' : 'none';
     const tp = document.getElementById('top-picks-wrap');
     if (tp) tp.style.display = isTop ? '' : 'none';
+    // v31.7.2 — Ajouter un h1 sur la page Top (audit a note l'absence)
+    let topH1 = document.getElementById('top-page-h1');
+    if (isTop && tp) {
+      if (!topH1) {
+        topH1 = document.createElement('div');
+        topH1.id = 'top-page-h1';
+        topH1.style.cssText = 'max-width:1100px;margin:0 auto;padding:8px 8px 0;';
+        topH1.innerHTML = '<span class="section-eyebrow">Sélection du modèle</span><h1 class="section-title-v2" style="margin-bottom:6px;">⭐ Top du jour</h1><p class="section-subtitle-v2" style="margin-bottom:18px;">Les picks les plus solides selon le modèle, classés par valeur (edge × confiance).</p>';
+        tp.parentElement.insertBefore(topH1, tp);
+      }
+      topH1.style.display = '';
+    } else if (topH1) {
+      topH1.style.display = 'none';
+    }
     // League panels
     document.querySelectorAll('[data-panel]').forEach(el => {
       el.style.display = isSimples ? '' : 'none';

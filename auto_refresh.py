@@ -69,8 +69,8 @@ FETCH_STAGES = [
     ('patch_nhl_stats.py',         1,   15),
     ('fetch_forebet.py',           5,   60),
     ('fetch_tips.py',             15,  120),   # RdJ, respectful cadence
-    ('fetch_injuries_soccer.py', 120,  180),   # Sofascore, ~2h
-    ('fetch_lineups_soccer.py',  120,  180),   # Sofascore, ~2h
+    ('fetch_injuries_soccer.py',  30,  180),   # Sofascore, every 30min (self-throttle interne)
+    ('fetch_lineups_soccer.py',   30,  180),   # Sofascore, every 30min (self-throttle interne)
     ('fetch_winamax_catalog.py',   1,   60),   # <2s typical
     ('fetch_v3.py',               15,  300),   # full sweep
     ('fetch_team_stats.py',      240,  300),   # ~4min, 4h cadence

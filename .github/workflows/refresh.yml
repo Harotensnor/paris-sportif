@@ -52,16 +52,14 @@ jobs:
           if [ $MIN_MOD15 -lt 5 ]; then
             python3 fetch_tips.py || true
           fi
-          # Sofascore soccer injuries: slow (~85s), so only every 2h. The per-run
-          # patch step below re-attaches the cached data in <1s on every tick.
-          HOUR_MOD2=$(( $(date +%H) % 2 ))
-          if [ $HOUR_MOD2 -eq 0 ] && [ $MIN_MOD15 -lt 5 ]; then
+          # v31.7.2 — Sofascore soccer injuries + lineups : avant la condition
+          # `HOUR_MOD2 == 0 && MIN_MOD15 < 5` ne firait que 4×/jour aux minutes
+          # 0/15/30/45 des heures paires, et data restait stale 36h+ quand un
+          # tick ratait. Maintenant : fire toutes les 30min, le script lui-même
+          # auto-throttle si Sofascore renvoie 429/erreur récente.
+          MIN_MOD30=$(( $(date +%M) % 30 ))
+          if [ $MIN_MOD30 -lt 5 ]; then
             python3 fetch_injuries_soccer.py || true
-          fi
-          # Sofascore soccer lineups: same cadence as injuries (same endpoint,
-          # same rate-limit budget). Lineups lock ~1h before kickoff, so
-          # refreshing every 2h captures the pre-match reveal window.
-          if [ $HOUR_MOD2 -eq 0 ] && [ $MIN_MOD15 -lt 5 ]; then
             python3 fetch_lineups_soccer.py || true
           fi
           # Every 12th tick (= 1h), also run full ESPN sweep + Winamax catalog
