@@ -1,31 +1,37 @@
 
   :root {
-    /* REFONTE v22 — Theme sombre par défaut (2026-04-23) */
-    --bg: #08080a;
-    --bg-2: #0c0c0f;
-    --bg-3: #0f0f13;
-    --panel: #121215;
-    --panel-2: #17171b;
-    --panel-3: #1c1c22;
-    --panel-4: #22222a;
+    /* REFONTE v22 — Theme sombre par défaut (2026-04-23)
+       v31.7.34 — Identité visuelle "betting pro" : contraste boosté, couleurs
+       sport-aware, tier color hierarchy distinctive. */
+    --bg: #06070a;
+    --bg-2: #0a0b10;
+    --bg-3: #0e1016;
+    --panel: #11131a;
+    --panel-2: #161823;
+    --panel-3: #1c1f2c;
+    --panel-4: #232636;
 
     --border: rgba(255,255,255,.06);
     --border-2: rgba(255,255,255,.10);
     --border-3: rgba(255,255,255,.16);
 
-    --text: #ededef;
-    --text-2: #c2c2c6;
-    --text-dim: #8a8a90;
-    --text-dim2: #5c5c62;
+    --text: #f1f3f9;
+    --text-2: #c8ccd8;
+    --text-dim: #8b8fa0;
+    --text-dim2: #5c5f70;
 
-    --brand: #a78bfa;
-    --brand-2: #8b5cf6;
-    --brand-soft: rgba(167,139,250,.12);
-    --brand-border: rgba(167,139,250,.28);
+    /* v31.7.34 — Brand violet plus lumineux pour meilleur contraste sur le
+       fond très sombre (#06070a). #b6a0ff vs ancien #a78bfa : +8% lumin
+       sans perdre la teinte signature, AAA contraste sur bg. */
+    --brand: #b6a0ff;
+    --brand-2: #9d80f7;
+    --brand-soft: rgba(182,160,255,.13);
+    --brand-border: rgba(182,160,255,.30);
 
-    --accent: #34d399;
+    /* Accent emeraude un peu plus saturé pour le punch des indicateurs WIN */
+    --accent: #2dd4a8;
     --accent-2: #10b981;
-    --accent-soft: rgba(52,211,153,.10);
+    --accent-soft: rgba(45,212,168,.12);
 
     --danger: #f87171;
     --danger-soft: rgba(248,113,113,.10);
@@ -34,7 +40,28 @@
     --info: #60a5fa;
     --info-soft: rgba(96,165,250,.10);
     --purple: #c084fc;
-    --gold: #eab308;
+    --gold: #f59e0b;
+
+    /* v31.7.34 — Tier hierarchy. Couleurs distinctes pour les badges
+       Lock/Standard/Lowconf, qui apparaissent dans 100+ endroits. */
+    --tier-lock: #f59e0b;        /* or — réussite vérifiée */
+    --tier-lock-soft: rgba(245,158,11,.14);
+    --tier-standard: #b6a0ff;    /* brand */
+    --tier-standard-soft: rgba(182,160,255,.13);
+    --tier-lowconf: #94a3b8;     /* slate */
+    --tier-lowconf-soft: rgba(148,163,184,.12);
+
+    /* v31.7.34 — Couleurs sport-aware. Permet de scanner visuellement
+       le sport d'un match en un coup d'œil. Utilisées dans les borders
+       gauche des cards et le badge sport. */
+    --sport-football: #2dd4a8;     /* vert (terrain) */
+    --sport-tennis: #f59e0b;       /* or (terre battue / terrain) */
+    --sport-basketball: #fb7c33;   /* orange (ballon NBA) */
+    --sport-hockey: #38bdf8;       /* bleu glacier */
+    --sport-baseball: #f87171;     /* rouge (couture balle) */
+    --sport-american-football: #a78bfa; /* violet */
+    --sport-mma: #ef4444;
+    --sport-rugby: #84cc16;
 
     --shadow-xs: 0 1px 2px rgba(0,0,0,.25);
     --shadow-sm: 0 2px 8px rgba(0,0,0,.30);
@@ -91,7 +118,24 @@
     --info: #0a84ff;
     --info-soft: rgba(10,132,255,.10);
     --purple: #bf5af2;
-    --gold: #ffd60a;
+    --gold: #ff9f0a;
+
+    /* v31.7.34 — Tier + sport en mode clair */
+    --tier-lock: #d97706;
+    --tier-lock-soft: rgba(217,119,6,.10);
+    --tier-standard: #5e5ce6;
+    --tier-standard-soft: rgba(94,92,230,.10);
+    --tier-lowconf: #6b7280;
+    --tier-lowconf-soft: rgba(107,114,128,.08);
+
+    --sport-football: #248a3d;
+    --sport-tennis: #d97706;
+    --sport-basketball: #ea580c;
+    --sport-hockey: #0284c7;
+    --sport-baseball: #dc2626;
+    --sport-american-football: #5e5ce6;
+    --sport-mma: #b91c1c;
+    --sport-rugby: #65a30d;
 
     --shadow-xs: 0 1px 2px rgba(0,0,0,.04);
     --shadow-sm: 0 2px 8px rgba(0,0,0,.06);
@@ -1201,13 +1245,17 @@
     padding-right: 18px;
   }
   .topbar-brand:hover { opacity: .85; }
+  /* v31.7.34 — Logo SVG inline (32×32). Anciennement emoji 🎯 (rendu
+     incohérent entre OS, pas brandable). Maintenant courbe ROI ascendante
+     en gradient brand→accent. */
   .topbar-brand .tb-logo {
-    width: 30px; height: 30px; border-radius: 8px;
-    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-2) 100%);
-    display: grid; place-items: center; font-size: 15px;
-    box-shadow: 0 4px 12px rgba(139,92,246,.25), inset 0 0 0 1px rgba(255,255,255,.12);
-    flex-shrink: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    transition: transform .18s cubic-bezier(.34,1.56,.64,1);
   }
+  .topbar-brand:hover .tb-logo { transform: scale(1.08) rotate(-3deg); }
+  .topbar-brand .tb-logo svg { display: block; }
   .topbar-brand .tb-brand-text { display: flex; flex-direction: column; line-height: 1.1; }
   .topbar-brand .tb-brand-name { font-size: 14px; font-weight: 700; letter-spacing: -.2px; color: var(--text); }
   .topbar-brand .tb-brand-sub { font-size: 10px; color: var(--text-dim); margin-top: 1px; font-weight: 500; }
