@@ -920,9 +920,39 @@
         // Need ≥3 populated buckets with ≥8 samples each for meaningful remap;
         // otherwise we punt and return raw unchanged.
         const solid = (buckets || []).filter(b => b.n >= 8);
-        __reliabilityCalMap = (solid.length >= 3)
+        let sorted = (solid.length >= 3)
           ? solid.slice().sort((a, b) => a.predicted - b.predicted)
           : [];
+        // v31.7.8 — Pool Adjacent Violators (PAV) pour isotonic regression.
+        // Force la monotonicité ascendante des `actual` (si bucket k+1 a un
+        // actual < bucket k, on les fusionne en moyenne pondérée par n).
+        // Avant: interpolation linéaire pure → pouvait créer des inversions
+        //        bizarres style 60% raw → 0.55 mais 65% raw → 0.50 si les
+        //        buckets observés violaient la monotonie (bruit échantillonnage).
+        // Après: garantie d'avoir une fonction de calibration monotone, ce qui
+        //        est mathématiquement attendu d'un modèle bien calibré.
+        if (sorted.length >= 3) {
+          // Copie pour mutation
+          const pav = sorted.map(b => ({ predicted: b.predicted, actual: b.actual, n: b.n }));
+          let changed = true;
+          while (changed) {
+            changed = false;
+            for (let i = 0; i < pav.length - 1; i++) {
+              if (pav[i].actual > pav[i + 1].actual) {
+                // Fusion : moyenne pondérée par n
+                const totalN = pav[i].n + pav[i + 1].n;
+                const merged = (pav[i].actual * pav[i].n + pav[i + 1].actual * pav[i + 1].n) / totalN;
+                pav[i].actual = merged;
+                pav[i + 1].actual = merged;
+                pav[i].n = totalN;
+                pav[i + 1].n = totalN;
+                changed = true;
+              }
+            }
+          }
+          sorted = pav;
+        }
+        __reliabilityCalMap = sorted;
       } catch (e) {
         __reliabilityCalMap = [];
       } finally {
@@ -4798,7 +4828,66 @@
         if (venue) enjeuLines.push(`📍 ${venue}`);
         // Synthèse texte enjeu (si suffisamment de données)
         let enjeuText = '';
-        if (stdH && stdA) {
+        // v31.7.8 — Derby auto-detect : table de derbys connus (foot top-5).
+        // Match si les deux équipes sont dans la table sous la même clé.
+        // Priorité sur les autres patterns d'enjeu (un derby est plus saillant).
+        const DERBYS = {
+          // Espagne
+          'el-clasico': ['real madrid', 'barcelona', 'fc barcelona', 'real madrid cf'],
+          'derbi-madrileno': ['real madrid', 'atletico madrid', 'atlético', 'atletico de madrid', 'real madrid cf'],
+          'derbi-sevillano': ['sevilla', 'sevilla fc', 'real betis', 'betis'],
+          // Italie
+          'derby-milan': ['milan', 'ac milan', 'inter', 'internazionale', 'fc internazionale'],
+          'derby-rome': ['as roma', 'roma', 'lazio', 'ss lazio'],
+          'derby-italie': ['juventus', 'inter', 'ac milan', 'milan'],
+          'derby-turin': ['juventus', 'torino'],
+          // Angleterre
+          'north-london': ['arsenal', 'tottenham', 'tottenham hotspur'],
+          'merseyside': ['liverpool', 'everton'],
+          'manchester': ['manchester united', 'manchester city', 'man united', 'man city'],
+          'old-firm': ['celtic', 'rangers'],
+          // Allemagne
+          'der-klassiker': ['bayern munich', 'borussia dortmund', 'bayern münchen', 'fc bayern münchen', 'fc bayern'],
+          'revierderby': ['borussia dortmund', 'schalke', 'fc schalke 04'],
+          // France
+          'classique': ['paris saint-germain', 'psg', 'olympique de marseille', 'marseille', 'om'],
+          'rhone-alpes': ['olympique lyonnais', 'lyon', 'saint-etienne', 'saint-étienne', 'as saint-etienne', 'asse'],
+          'derby-nord': ['lille', 'losc', 'lens', 'rc lens'],
+        };
+        const _norm = (s) => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9 ]/g, '').trim();
+        const hN = _norm(home?.name);
+        const aN = _norm(away?.name);
+        const derbyMatch = (() => {
+          for (const [key, names] of Object.entries(DERBYS)) {
+            const hMatch = names.some(n => hN.includes(n) || n.includes(hN));
+            const aMatch = names.some(n => aN.includes(n) || n.includes(aN));
+            if (hMatch && aMatch) {
+              const labels = {
+                'el-clasico': '🔥 EL CLÁSICO — le match le plus regardé du monde',
+                'derbi-madrileno': '🔥 Derbi madrileño — Real vs Atlético, rivalité historique',
+                'derbi-sevillano': '🔥 Derbi sevillano — Sevilla vs Betis',
+                'derby-milan': '🔥 Derby della Madonnina — Milan vs Inter',
+                'derby-rome': '🔥 Derby della Capitale — Roma vs Lazio',
+                'derby-italie': '🔥 Derby d\'Italia — choc entre clubs historiques',
+                'derby-turin': '🔥 Derby della Mole — Juventus vs Torino',
+                'north-london': '🔥 North London Derby — Arsenal vs Tottenham',
+                'merseyside': '🔥 Merseyside Derby — Liverpool vs Everton',
+                'manchester': '🔥 Manchester Derby — United vs City',
+                'old-firm': '🔥 Old Firm — Celtic vs Rangers',
+                'der-klassiker': '🔥 Der Klassiker — Bayern vs Dortmund',
+                'revierderby': '🔥 Revierderby — Dortmund vs Schalke',
+                'classique': '🔥 Le Classique — PSG vs Marseille',
+                'rhone-alpes': '🔥 Derby rhônalpin — Lyon vs Saint-Étienne',
+                'derby-nord': '🔥 Derby du Nord — Lille vs Lens',
+              };
+              return labels[key] || '🔥 Derby — rivalité historique';
+            }
+          }
+          return null;
+        })();
+        if (derbyMatch) {
+          enjeuText = derbyMatch + '. Forme et statistiques pèsent moins, l\'engagement est tout.';
+        } else if (stdH && stdA) {
           const rH = parseInt(stdH.rank, 10), rA = parseInt(stdA.rank, 10);
           if (isFinite(rH) && isFinite(rA)) {
             const top4 = (r) => r <= 4, bot4 = (r) => r >= 14;
