@@ -3472,6 +3472,11 @@
       if (panel) panel.classList.toggle('hidden', s !== currentSport);
     });
     const el = document.getElementById('content-' + currentSport);
+    // v31.7.41 — Bug fix : render() peut être appelé depuis pollData
+    // alors qu'on est sur une page sans panel sport (bilan/locks/top/etc).
+    // Le DOM #content-{sport} n'existe alors plus → el = null → innerHTML
+    // crash. Guard tôt et silent skip si on n'est pas sur la vue panel.
+    if (!el) return;
 
     if (!visible.length) {
       const msg = searchTerm
