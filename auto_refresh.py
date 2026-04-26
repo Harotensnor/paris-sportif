@@ -98,6 +98,9 @@ PATCH_STAGES = [
     # v30 — Inject ESPN team_form.json (last 5 W/L) into competitor.form
     # for NBA/NHL/MLB/NFL events.
     ('patch_team_form.py',          1,   15),
+    # v31.7.37 — NBA team season stats (PPG/pace/record/last10).
+    ('fetch_nba_team_stats.py',     5,   30),
+    ('patch_nba_team_stats.py',     1,   15),
     # Pipeline status snapshot (health.json) — runs every tick, cheap.
     ('build_health.py',             1,   15),
     # v31.7.23 — Dixon-Coles ρ par ligue mesuré en CI (likelihood max).
