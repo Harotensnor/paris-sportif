@@ -8682,7 +8682,12 @@
         <!-- v30 Sprint 4 — Filter bar (sticky on scroll, slides under topbar at top:56px) -->
         <div class="tous-filter-bar" style="position:sticky;top:56px;z-index:20;margin:18px 0 10px;padding:14px;background:var(--panel);border:1px solid var(--border);border-radius:10px;display:flex;flex-direction:column;gap:12px;backdrop-filter:saturate(140%) blur(8px);-webkit-backdrop-filter:saturate(140%) blur(8px);">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-            <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.8px;font-weight:700;">🎛️ Filtrer &amp; trier</div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.8px;font-weight:700;">🎛️ Filtrer &amp; trier</div>
+              <!-- v31.2 — Compteur résultats explicite (audit UX). Le visiteur voit
+                   immédiatement combien de matchs passent les filtres actuels. -->
+              <span aria-live="polite" style="display:inline-flex;align-items:center;padding:3px 9px;background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);border-radius:999px;font-size:11.5px;font-weight:700;color:var(--brand);font-variant-numeric:tabular-nums;">${pending.length + inProgress.length + finished.length} résultat${(pending.length + inProgress.length + finished.length)>1?'s':''}</span>
+            </div>
             ${filtersActive ? '<button data-tous-reset style="padding:5px 10px;font-size:11px;background:transparent;color:var(--text-dim);border:1px solid var(--border-2);border-radius:6px;cursor:pointer;font-weight:600;">↻ Réinitialiser</button>' : ''}
           </div>
           ${sportsAvailable.length > 1 ? `
@@ -14430,7 +14435,18 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
   window.addEventListener('DOMContentLoaded', () => {
     const data = window.PRONOSTICS_DATA;
     if (!data) {
-      document.getElementById('no-data-banner').classList.remove('hidden');
+      const banner = document.getElementById('no-data-banner');
+      banner.classList.remove('hidden');
+      // v31.2 — Wire retry button. Force reload + cache bypass.
+      const retryBtn = document.getElementById('no-data-retry');
+      if (retryBtn) {
+        retryBtn.addEventListener('click', () => {
+          retryBtn.textContent = '⏳ Reconnexion…';
+          retryBtn.disabled = true;
+          // Bypass cache : reload with random hash so SW network-first refetches
+          location.href = location.pathname + '?_retry=' + Date.now();
+        });
+      }
       return;
     }
     // Chantier Q — purge des matchId vus qui ne figurent plus dans data.js
@@ -14868,8 +14884,17 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         if (window.matchMedia('(display-mode: standalone)').matches) return;
       } catch(e){}
       if (_pwaIsSnoozed()) return;
-      // Délais 30s pour ne pas spammer dès l'arrivée
-      setTimeout(_pwaShowBanner, 30000);
+      // v31.2 — UX audit : compter les visites (engagement signal). Ne montrer
+      // l'install banner qu'à partir de la 2e visite, pour ne pas saturer le
+      // premier écran d'un nouveau visiteur. Premier touch = découverte du site,
+      // 2e+ touch = intent réel.
+      let visitCount = 0;
+      try { visitCount = parseInt(localStorage.getItem('pwaVisitCount') || '0', 10); } catch(e){}
+      visitCount = (isFinite(visitCount) ? visitCount : 0) + 1;
+      try { localStorage.setItem('pwaVisitCount', String(visitCount)); } catch(e){}
+      if (visitCount < 2) return;  // 1ère visite = pas de prompt
+      // Délais étendu à 60s (audit UX : laisser l'utilisateur explorer avant de proposer)
+      setTimeout(_pwaShowBanner, 60000);
     });
     window.addEventListener('appinstalled', () => {
       _pwaHideBanner();

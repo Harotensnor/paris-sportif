@@ -282,8 +282,22 @@
       <span style="font-size:14px;line-height:1;">←</span>
       <span>Retour à l'Accueil</span>
     </button>
-    <div id="no-data-banner" class="error-banner hidden">
-      <div>⚠️ <b>Fichier data.js introuvable.</b> Le fichier doit être dans le même dossier que pronostics.html.</div>
+    <!-- v31.2 — Friendly error state (audit UX). Avant : "Fichier data.js
+         introuvable" brut, casse la confiance. Maintenant : message rassurant
+         avec retry + dernier refresh + offline fallback explanation. -->
+    <div id="no-data-banner" class="error-banner hidden" role="alert" aria-live="polite">
+      <div style="text-align:center;padding:18px 16px;background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.25);border-left:3px solid var(--brand);border-radius:0 12px 12px 0;max-width:520px;margin:18px auto;">
+        <div style="font-size:24px;margin-bottom:8px;opacity:.6;">📡</div>
+        <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px;">Reconnexion en cours…</div>
+        <div style="font-size:13px;color:var(--text-dim);margin-bottom:14px;line-height:1.5;">
+          Les données du jour ne sont pas encore arrivées. Le cron GitHub Actions met à jour le site toutes les 5 minutes.
+          Si tu es hors-ligne, le service worker peut servir une version cache.
+        </div>
+        <button type="button" id="no-data-retry" style="padding:8px 18px;background:var(--brand);color:#08080a;border:none;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;min-height:36px;">↻ Réessayer</button>
+        <div style="font-size:11px;color:var(--text-dim2,#7b8693);margin-top:10px;">
+          Si l'erreur persiste, ouvre une <a href="https://github.com/Harotensnor/paris-sportif/issues" target="_blank" rel="noopener" style="color:var(--brand);">issue GitHub</a>.
+        </div>
+      </div>
     </div>
 
     <!-- IIII : COACH IA SIMPLES QUICK-TAKE -->
@@ -378,6 +392,29 @@
     </div>
   </footer>
 </div>
+
+<!-- v31.2 — Bottom nav mobile sticky (audit UX). Visible uniquement < 720px.
+     3 entrées principales pour les tâches les plus fréquentes : Accueil
+     (vue value picks), Tous les matchs, Mes locks. Réduit la dépendance aux
+     hubs à chevrons en topbar pour la navigation principale mobile. -->
+<nav id="mobile-bottom-nav" class="mobile-bottom-nav" role="navigation" aria-label="Navigation mobile principale">
+  <button type="button" class="mbn-btn page-btn" data-page="dashboard" aria-label="Accueil">
+    <span class="mbn-icon" aria-hidden="true">🏠</span>
+    <span class="mbn-label">Accueil</span>
+  </button>
+  <button type="button" class="mbn-btn page-btn" data-page="tous" aria-label="Tous les matchs">
+    <span class="mbn-icon" aria-hidden="true">⚽</span>
+    <span class="mbn-label">Matchs</span>
+  </button>
+  <button type="button" class="mbn-btn page-btn" data-page="locks" aria-label="Paris sûrs (locks)">
+    <span class="mbn-icon" aria-hidden="true">🔒</span>
+    <span class="mbn-label">Locks</span>
+  </button>
+  <button type="button" class="mbn-btn page-btn" data-page="bilan" aria-label="Bilan du modèle">
+    <span class="mbn-icon" aria-hidden="true">📊</span>
+    <span class="mbn-label">Bilan</span>
+  </button>
+</nav>
 
 <div class="modal-backdrop" id="detail-modal" role="dialog" aria-modal="true" aria-labelledby="detail-title" aria-hidden="true">
   <div class="modal">
