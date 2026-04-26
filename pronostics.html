@@ -95,6 +95,13 @@
 <meta name="apple-mobile-web-app-title" content="Pronostics">
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Pronostics Sportifs — Football · Tennis · Basket</title>
+<!-- v31 — Analytics opt-in (privacy-first). Le fichier `analytics.config.js`
+     est OPTIONNEL : son absence est silencieuse (404 → no-op). Si présent,
+     il définit `window.ANALYTICS_PLAUSIBLE_DOMAIN` ou
+     `window.ANALYTICS_CLOUDFLARE_TOKEN`, et le script tiers correspondant
+     n'est chargé QU'APRÈS consentement explicite (cf. _maybeEnableAnalytics).
+     Pas de tracking par défaut. -->
+<script src="analytics.config.js" defer onerror="this.remove();"></script>
 <style>
   :root {
     /* REFONTE v22 — Theme sombre par défaut (2026-04-23) */
@@ -220,6 +227,22 @@
   /* Débutant : on met en avant les éléments pédagogiques */
   html[data-level="debutant"] .beginner-hint { display: block !important; }
   html:not([data-level="debutant"]) .beginner-hint { display: none !important; }
+
+  /* v31 — Différentiation UI plus concrète entre les 3 niveaux.
+     Pro : densité maximale, raisons techniques visibles (Brier, CLV, edge),
+           avertissements minimisés (le user les connaît).
+     Débutant : padding généreux, headlines compacts, opacités douces sur les
+                chiffres bruts pour ne pas effrayer.
+     Confirmé : défaut, équilibre des deux. */
+  html[data-level="pro"] .v29-hero { padding: 18px 20px 16px !important; }
+  html[data-level="pro"] .v29-hero h1 { font-size: 28px !important; }
+  html[data-level="pro"] .pro-hidden { display: none !important; }
+  html[data-level="pro"] details summary { font-size: 11px; }
+  html[data-level="debutant"] .pro-only { display: none !important; }
+  html[data-level="debutant"] .reason-row,
+  html[data-level="debutant"] .pdj-line { padding: 8px 12px !important; line-height: 1.6 !important; }
+  html[data-level="debutant"] details[open] summary,
+  html[data-level="debutant"] details summary { font-weight: 600; }
 
   *, *::before, *::after { box-sizing: border-box; }
   /* Keyboard accessibility — visible focus ring for interactive elements (only
@@ -2685,6 +2708,10 @@
         <button id="next-day" type="button" title="Jour suivant" aria-label="Aller au jour suivant">▶</button>
       </div>
       <input type="date" id="date" class="date-picker">
+      <!-- v31 — Niveau (débutant/confirmé/pro) toggle visible.
+           Click cycle : 🌱 Débutant → 🎯 Confirmé → 📊 Pro → 🌱.
+           Persisté dans userPrefs.level + écho data-level sur <html>. -->
+      <button id="level-toggle" class="theme-toggle" type="button" aria-label="Basculer niveau (débutant / confirmé / pro)" title="Niveau d'expérience · clic pour cycler">🎯</button>
       <!-- v30 — Indicateur santé pipeline (lit health.json) -->
       <button id="health-indicator" class="theme-toggle" type="button" aria-label="Santé du pipeline de données" title="Santé du pipeline : chargement…" style="font-size:9px;">●</button>
       <!-- v30 — Notif toggle (Notification API locale, alerte sur edge ≥10%) -->
@@ -2801,10 +2828,10 @@
           <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="vertical-align:middle;margin-right:4px;"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
           GitHub
         </a>
-        <button type="button" class="footer-link" data-page-link="methodologie" title="Protocole formel + dictionnaire des métriques">📐 Méthodologie</button>
+        <a href="methodologie.html" class="footer-link" title="Protocole + métriques (page statique indexable)">📐 Méthodologie</a>
         <button type="button" class="footer-link" data-page-link="academie" title="Glossaire et explications">📖 Académie</button>
         <button type="button" class="footer-link" data-page-link="backtest" title="Performance vérifiable du modèle">📈 Backtest</button>
-        <button type="button" class="footer-link" data-page-link="legal" title="À propos · Confidentialité · Mentions légales">⚖️ Légal &amp; confidentialité</button>
+        <a href="legal.html" class="footer-link" title="À propos · Confidentialité · Mentions légales (page statique)">⚖️ Légal</a>
       </nav>
       <div class="footer-meta">
         <span class="footer-meta-item" id="footer-last-update" title="Dernière actualisation des données">📅 —</span>
@@ -17349,6 +17376,48 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     setTimeout(_injectMatchSchemas, 1500);
   }
 
+  // v31 — Analytics opt-in (privacy-first), désactivé par défaut.
+  //
+  // Le site est livré SANS tracker. Pour activer une mesure d'audience
+  // anonyme (≠ Google Analytics), Théo peut configurer l'une de ces
+  // deux options dans `analytics.config.js` (à créer au root) :
+  //
+  //   window.ANALYTICS_PLAUSIBLE_DOMAIN = "paris-sportif.example";  // Plausible cloud
+  //   // OU
+  //   window.ANALYTICS_CLOUDFLARE_TOKEN = "abc123...";              // Cloudflare Web Analytics
+  //
+  // Plausible : https://plausible.io  — privacy-first, pas de cookies, pas de PII.
+  // Cloudflare Web Analytics : https://www.cloudflare.com/web-analytics/  — gratuit, RUM.
+  //
+  // Le script tiers n'est INJECTÉ QU'APRÈS le consentement explicite
+  // (clic "Accepter" dans la bannière). Au refus, rien ne charge.
+  // Conforme aux règles CNIL sur les traceurs.
+  let _analyticsLoaded = false;
+  function _maybeEnableAnalytics() {
+    if (_analyticsLoaded) return;
+    let prefs = {};
+    try { prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}'); } catch(e){}
+    if (prefs.consentLocalStorage !== 'accepted') return;
+    if (window.ANALYTICS_PLAUSIBLE_DOMAIN) {
+      const s = document.createElement('script');
+      s.defer = true;
+      s.dataset.domain = window.ANALYTICS_PLAUSIBLE_DOMAIN;
+      s.src = 'https://plausible.io/js/script.js';
+      document.head.appendChild(s);
+      _analyticsLoaded = true;
+      console.log('[analytics] Plausible loaded for', window.ANALYTICS_PLAUSIBLE_DOMAIN);
+    } else if (window.ANALYTICS_CLOUDFLARE_TOKEN) {
+      const s = document.createElement('script');
+      s.defer = true;
+      s.src = 'https://static.cloudflareinsights.com/beacon.min.js';
+      s.dataset.cfBeacon = JSON.stringify({ token: window.ANALYTICS_CLOUDFLARE_TOKEN });
+      document.head.appendChild(s);
+      _analyticsLoaded = true;
+      console.log('[analytics] Cloudflare Web Analytics loaded');
+    }
+    // Sinon : aucun analytics configuré, on no-op silencieusement.
+  }
+
   // v30 — Consent RGPD pour localStorage. Affichée tant que l'utilisateur
   // n'a pas explicitement répondu. Auto-accept silencieux si legacy data
   // détectée (compat utilisateurs existants qui avaient des prefs avant).
@@ -17380,12 +17449,15 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       } catch(e){}
       banner.style.display = 'none';
     };
-    banner.querySelector('#consent-accept')?.addEventListener('click', () => set('accepted'));
+    banner.querySelector('#consent-accept')?.addEventListener('click', () => {
+      set('accepted');
+      _maybeEnableAnalytics();  // v31 : load Plausible/Cloudflare AFTER consent
+    });
     banner.querySelector('#consent-decline')?.addEventListener('click', () => {
       // On garde le flag pour ne pas re-afficher la bannière, mais on
       // enregistre l'intention. Les writes localStorage continuent (on
-      // ne wraperait pas tout le code) MAIS on n'affichera plus rien
-      // de personnalisé (no-op futur si jamais on ajoute du tracking).
+      // ne wraperait pas tout le code) MAIS on ne charge AUCUN tracker
+      // ni script analytics.
       set('declined');
     });
     banner.querySelector('[data-consent-details]')?.addEventListener('click', (e) => {
@@ -17408,6 +17480,9 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     });
   }
   _initConsentBanner();
+  // v31 — Si déjà accepté lors d'une visite précédente, activer analytics
+  // (uniquement si Théo a configuré PLAUSIBLE_DOMAIN ou CLOUDFLARE_TOKEN).
+  _maybeEnableAnalytics();
 
   window.addEventListener('DOMContentLoaded', () => {
     const data = window.PRONOSTICS_DATA;
@@ -17659,6 +17734,38 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         _applyTheme(next);
         const labels = { dark: 'sombre', light: 'clair', auto: 'auto (système)' };
         if (typeof toast === 'function') toast('🎨 Thème : ' + labels[next], 'info');
+      } catch(e){}
+    });
+
+    // v31 — Level toggle (débutant / confirmé / pro). Cycle au clic +
+    // applique data-level sur <html> (les CSS rules `.help-dot` /
+    // `.beginner-hint` réagissent automatiquement).
+    const levelBtn = document.getElementById('level-toggle');
+    const _levelLabels = { debutant: '🌱 Débutant', confirme: '🎯 Confirmé', pro: '📊 Pro' };
+    const _levelIcons = { debutant: '🌱', confirme: '🎯', pro: '📊' };
+    const _levelTitle = (lv) => `Niveau : ${_levelLabels[lv] || lv} · clic pour cycler`;
+    const _applyLevel = (lv) => {
+      try { document.documentElement.setAttribute('data-level', lv); } catch(e){}
+      if (levelBtn) {
+        levelBtn.textContent = _levelIcons[lv] || '🎯';
+        levelBtn.title = _levelTitle(lv);
+        levelBtn.setAttribute('aria-label', _levelTitle(lv));
+      }
+    };
+    try {
+      const p0 = JSON.parse(localStorage.getItem('userPrefs') || '{}');
+      _applyLevel(['debutant', 'confirme', 'pro'].includes(p0.level) ? p0.level : 'confirme');
+    } catch(e){ _applyLevel('confirme'); }
+    if (levelBtn) levelBtn.addEventListener('click', () => {
+      try {
+        const p = JSON.parse(localStorage.getItem('userPrefs') || '{}');
+        const cur = ['debutant', 'confirme', 'pro'].includes(p.level) ? p.level : 'confirme';
+        const cycle = { debutant: 'confirme', confirme: 'pro', pro: 'debutant' };
+        const next = cycle[cur];
+        p.level = next;
+        localStorage.setItem('userPrefs', JSON.stringify(p));
+        _applyLevel(next);
+        if (typeof toast === 'function') toast('🎯 Niveau : ' + _levelLabels[next], 'info');
       } catch(e){}
     });
 

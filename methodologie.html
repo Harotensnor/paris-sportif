@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Méthodologie — Paris-Sportif (protocole, métriques, biais)</title>
+<meta name="description" content="Protocole formel du modèle Paris-Sportif : sources de données (ESPN, Sofascore, Sackmann, Football-Data, MLB, NHL), pipeline, dictionnaire des métriques (ROI, Brier, CLV, Kelly), protocole de backtest reproductible, biais et limites.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://harotensnor.github.io/paris-sportif/methodologie.html">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Méthodologie Paris-Sportif — protocole, métriques, biais">
+<meta property="og:description" content="Sources de données, pipeline, dictionnaire des métriques (ROI, Brier, CLV, Kelly), protocole de backtest reproductible, biais et limites.">
+<meta property="og:url" content="https://harotensnor.github.io/paris-sportif/methodologie.html">
+<meta property="og:image" content="https://harotensnor.github.io/paris-sportif/icon-512.png">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#08080a">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://harotensnor.github.io/paris-sportif/#org",
+      "name": "Paris-Sportif",
+      "url": "https://harotensnor.github.io/paris-sportif/",
+      "logo": "https://harotensnor.github.io/paris-sportif/icon-512.png",
+      "founder": { "@type": "Person", "name": "Théo Boulnois" },
+      "sameAs": ["https://github.com/Harotensnor/paris-sportif"]
+    },
+    {
+      "@type": "TechArticle",
+      "headline": "Méthodologie du modèle Paris-Sportif",
+      "url": "https://harotensnor.github.io/paris-sportif/methodologie.html",
+      "datePublished": "2026-04-26",
+      "dateModified": "2026-04-26",
+      "author": { "@type": "Person", "name": "Théo Boulnois" },
+      "publisher": { "@id": "https://harotensnor.github.io/paris-sportif/#org" },
+      "inLanguage": "fr-FR",
+      "about": "Protocole de pronostics sportifs data-driven : sources, métriques, backtest, biais",
+      "audience": { "@type": "Audience", "audienceType": "developers, analysts, sports-betting researchers" }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://harotensnor.github.io/paris-sportif/" },
+        { "@type": "ListItem", "position": 2, "name": "Méthodologie", "item": "https://harotensnor.github.io/paris-sportif/methodologie.html" }
+      ]
+    }
+  ]
+}
+</script>
+
+<style>
+  :root { color-scheme: dark light; }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: "SF Pro Display", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #08080a;
+    color: #e6ebf2;
+    line-height: 1.65;
+    letter-spacing: -.01em;
+  }
+  body { min-height: 100vh; }
+  a { color: #a78bfa; text-decoration: none; }
+  a:hover, a:focus { text-decoration: underline; }
+  code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: .92em; background: rgba(167,139,250,.1); padding: 1px 5px; border-radius: 4px; }
+  header.topbar {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(8,8,10,.85); backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,.06);
+    padding: 12px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .brand { display: flex; align-items: center; gap: 8px; font-weight: 800; letter-spacing: -.5px; }
+  .brand-logo { font-size: 22px; }
+  .brand-text { font-size: 17px; }
+  .topbar nav a {
+    margin-left: 16px; font-size: 13.5px; color: #a3a3aa; font-weight: 500;
+  }
+  .topbar nav a:hover { color: #e6ebf2; text-decoration: none; }
+  main { max-width: 920px; margin: 0 auto; padding: 16px 20px 60px; }
+  h1 {
+    margin: 28px 0 6px; font-size: 36px; font-weight: 800;
+    letter-spacing: -1.2px; line-height: 1.05;
+  }
+  .lead {
+    font-size: 14px; color: #a3a3aa; max-width: 640px;
+    border-left: 3px solid #10b981; padding: 4px 0 4px 12px; margin: 0 0 28px;
+  }
+  h2 { font-size: 22px; margin: 32px 0 12px; scroll-margin-top: 70px; }
+  h3 { font-size: 15px; margin: 14px 0 8px; }
+  section.card {
+    padding: 18px;
+    background: #121215;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 12px;
+    font-size: 13.5px;
+    color: #c5c5cc;
+    margin-bottom: 16px;
+  }
+  section.card.danger {
+    background: rgba(248,113,113,.06);
+    border-color: rgba(248,113,113,.3);
+    border-left: 3px solid #f87171;
+    border-radius: 0 12px 12px 0;
+  }
+  ul, ol { padding-left: 22px; margin: 0 0 12px; }
+  ul li, ol li { margin-bottom: 4px; }
+  p { margin: 0 0 10px; }
+  dl { margin: 0; display: grid; grid-template-columns: 1fr; gap: 14px; }
+  dt { font-weight: 700; color: #e6ebf2; }
+  dd { margin: 4px 0 0; color: #a3a3aa; }
+  .toc {
+    display: flex; gap: 6px; flex-wrap: wrap;
+    margin: 0 0 22px; font-size: 12px;
+  }
+  .toc a {
+    padding: 6px 12px; background: #121215; border: 1px solid rgba(255,255,255,.08);
+    border-radius: 6px; color: #e6ebf2;
+  }
+  .toc a:hover { border-color: #a78bfa; text-decoration: none; }
+  table { width: 100%; font-size: 12.5px; border-collapse: collapse; }
+  thead { color: #6b6b73; font-weight: 700; text-transform: uppercase; font-size: 10.5px; letter-spacing: .5px; text-align: left; }
+  thead th { padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,.08); }
+  tbody td { padding: 8px; border-bottom: 1px solid rgba(255,255,255,.04); vertical-align: top; }
+  .uppercase-pill {
+    display: inline-block; font-size: 11px; color: #10b981;
+    text-transform: uppercase; letter-spacing: 1.4px; font-weight: 700;
+    margin: 24px 0 4px;
+  }
+  footer.site-footer {
+    border-top: 1px solid rgba(255,255,255,.06);
+    margin-top: 40px;
+    padding: 24px 20px;
+    text-align: center;
+    font-size: 12.5px;
+    color: #6b6b73;
+  }
+  footer.site-footer nav a { margin: 0 10px; color: #a3a3aa; }
+  @media (prefers-color-scheme: light) {
+    html, body { background: #f5f5f7; color: #08080a; }
+    section.card { background: #fff; border-color: rgba(0,0,0,.08); color: #2a2a30; }
+    .topbar { background: rgba(245,245,247,.85); border-bottom-color: rgba(0,0,0,.08); }
+    .topbar nav a { color: #444; }
+    .toc a { background: #fff; color: #08080a; }
+    code { background: rgba(167,139,250,.15); }
+    dt { color: #08080a; }
+    dd { color: #444; }
+  }
+  @media (max-width: 600px) {
+    h1 { font-size: 28px; }
+    table { font-size: 11.5px; }
+    table thead { display: none; }
+    table tbody td { display: block; padding: 4px 0; border: none; }
+    table tbody tr { border-bottom: 1px solid rgba(255,255,255,.06); padding: 8px 0; display: block; }
+  }
+</style>
+</head>
+<body>
+<header class="topbar" role="banner">
+  <a href="./" class="brand" aria-label="Retour à l'accueil Paris-Sportif">
+    <span class="brand-logo">🎯</span>
+    <span class="brand-text">Paris-Sportif</span>
+  </a>
+  <nav aria-label="Pages éditoriales">
+    <a href="./">Accueil</a>
+    <a href="legal.html">Légal</a>
+    <a href="https://github.com/Harotensnor/paris-sportif" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+</header>
+
+<main>
+  <nav aria-label="Fil d'ariane" style="font-size:12px;color:#6b6b73;margin-top:14px;">
+    <a href="./" style="color:#6b6b73;">Accueil</a> ›
+    <span style="color:#a3a3aa;">Méthodologie</span>
+  </nav>
+
+  <span class="uppercase-pill">Protocole &amp; définitions</span>
+  <h1>📐 Méthodologie</h1>
+  <p class="lead">Tout ce qu'il faut pour reproduire ou auditer la promesse data-driven du site. Pas de boîte noire.</p>
+
+  <nav class="toc" aria-label="Sommaire">
+    <a href="#sources">📚 Sources</a>
+    <a href="#pipeline">⚙️ Pipeline</a>
+    <a href="#metriques">📏 Dictionnaire des métriques</a>
+    <a href="#backtest">🔬 Protocole backtest</a>
+    <a href="#biais">⚠️ Biais &amp; limites</a>
+  </nav>
+
+  <h2 id="sources">📚 Sources de données</h2>
+  <section class="card">
+    <p style="color:#6b6b73;">Toutes les sources ci-dessous sont publiques. Le code des fetchers est dans <code>scripts/fetch_*.py</code> sur le repo.</p>
+    <table>
+      <thead><tr>
+        <th>Source</th><th>Sport(s)</th><th>Apport</th><th>Cadence</th>
+      </tr></thead>
+      <tbody>
+        <tr><td><b>ESPN</b> (scoreboard + core API)</td><td>Tous</td><td>Calendrier, scores live, cotes ML, classements, blessures US</td><td>5 min</td></tr>
+        <tr><td><b>Sofascore</b></td><td>Foot top-5</td><td>Compositions, blessures, arbitres</td><td>2 h</td></tr>
+        <tr><td><b>Winamax catalog</b></td><td>Tous</td><td>Cotes 1N2 (publiques, sans login)</td><td>5 min</td></tr>
+        <tr><td><b>ClubElo</b></td><td>Foot</td><td>Elo des clubs (sur ~30 ans d'historique)</td><td>20 h</td></tr>
+        <tr><td><b>Jeff Sackmann</b> (tennis_atp / tennis_wta)</td><td>Tennis</td><td>Elo + Elo surface + L10 + fatigue + H2H</td><td>24 h</td></tr>
+        <tr><td><b>Football-Data.co.uk</b></td><td>Foot 14 ligues</td><td>Closing odds + calibration ligue (BTTS, +2.5, avg goals)</td><td>6 h</td></tr>
+        <tr><td><b>MLB Stats API</b></td><td>Baseball</td><td>Pitcher partant probable + ERA/WHIP/K9/BB9</td><td>15 min</td></tr>
+        <tr><td><b>NHL API</b></td><td>Hockey</td><td>Pace (GF/GA), goalie SV%, splits home/road</td><td>15 min</td></tr>
+        <tr><td><b>Open-Meteo</b></td><td>Foot</td><td>Météo prévue au coup d'envoi (température, pluie, vent)</td><td>30 min</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <h2 id="pipeline">⚙️ Pipeline</h2>
+  <section class="card">
+    <p>Toutes les 5 minutes (jour) / 30 minutes (nuit), GitHub Actions enchaîne :</p>
+    <ol>
+      <li><strong>Fetchers</strong> (<code>scripts/fetch_*.py</code>) : interrogent les sources et produisent des sidecars JSON par domaine.</li>
+      <li><strong>Patchers</strong> (<code>scripts/patch_*.py</code>) : injectent les sidecars dans <code>data.js</code> (le JSON principal).</li>
+      <li><strong>Snapshot des cotes pré-match</strong> (<code>snapshot_odds.py</code>) : fige la cote courante dans <code>odds_history.jsonl</code> avant kickoff. Sans ce snapshot, on ne peut pas calculer le CLV après coup.</li>
+      <li><strong>Archive des résultats</strong> (<code>snapshot_results.py</code>) : append-only dans <code>results_archive.jsonl</code>. Permet une fenêtre de backtest qui ne se rétrécit pas avec le rolling de <code>data.js</code>.</li>
+      <li><strong>Build health snapshot</strong> + <strong>finalize inline</strong> + commit + push.</li>
+    </ol>
+    <p style="color:#6b6b73;">Le workflow complet est dans <a href="https://github.com/Harotensnor/paris-sportif/blob/main/.github/workflows/refresh.yml" target="_blank" rel="noopener">.github/workflows/refresh.yml</a>.</p>
+  </section>
+
+  <h2 id="metriques">📏 Dictionnaire des métriques</h2>
+  <section class="card">
+    <dl>
+      <div>
+        <dt>WR (taux de réussite)</dt>
+        <dd>Nombre de picks gagnés ÷ nombre total de picks réglés. Pure base, ignore la cote. Un WR 60% sans cote moyenne ne dit rien sur la rentabilité.</dd>
+      </div>
+      <div>
+        <dt>ROI flat (mise plate)</dt>
+        <dd><code>(somme_retours − somme_mises) ÷ somme_mises × 100</code>. Mise constante 1 unité par pick. Mesure brute de la rentabilité indépendante du staking.</dd>
+      </div>
+      <div>
+        <dt>Edge (avantage marché)</dt>
+        <dd><code>p_modèle − (1 ÷ cote)</code>. Si modèle dit 60% et cote = 1.80 (implicite 55.6%), edge = +4.4 pts. Positif = on a un avantage théorique sur le marché.</dd>
+      </div>
+      <div>
+        <dt>Kelly fractionnaire</dt>
+        <dd><code>f* = (b·p − q) ÷ b</code> où b = cote − 1, p = prob modèle, q = 1 − p. On applique <strong>0.25× Kelly cap 10% bankroll</strong> par défaut : croissance à long terme avec variance contenue. Le Kelly plein est correct mathématiquement mais brûle les bankrolls réelles à cause du modèle imparfait.</dd>
+      </div>
+      <div>
+        <dt>Brier score</dt>
+        <dd><code>Σ (p_modèle − résultat)² ÷ N</code>. Mesure l'erreur de prédiction probabiliste. <strong>0 = parfait, 0.25 = pile/face.</strong> Un Brier &lt; 0.22 sur ≥150 picks indique un signal réel.</dd>
+      </div>
+      <div>
+        <dt>Calibration</dt>
+        <dd>Quand le modèle dit "70% de chance", est-ce que 70% de ces prédictions gagnent vraiment ? On bin par tranche de 10pp et on compare prob_moyenne vs win_rate observé. Gap &lt; 5pp partout = bien calibré.</dd>
+      </div>
+      <div>
+        <dt>CLV (Closing Line Value)</dt>
+        <dd>Cote prise au moment du pick comparée à la cote juste avant kickoff. <strong>+CLV moyen sur ≥50 paris = preuve qu'on bat le marché</strong>, indépendamment du résultat short-term. C'est le signal que les bookmakers utilisent pour identifier les "smart money".</dd>
+      </div>
+      <div>
+        <dt>Tier de fiabilité</dt>
+        <dd>
+          <ul style="margin:6px 0 0;">
+            <li><strong>lock</strong> : prob ≥ 72% + ≥3 composants non-marché concordants</li>
+            <li><strong>standard</strong> : prob ≥ 55% avec couverture data minimale</li>
+            <li><strong>lowconf</strong> : prob ≥ 50% mais data thin</li>
+            <li><strong>skip</strong> : prob &lt; 50% ou inversion modèle / marché</li>
+          </ul>
+        </dd>
+      </div>
+    </dl>
+  </section>
+
+  <h2 id="backtest">🔬 Protocole de backtest</h2>
+  <section class="card">
+    <ul>
+      <li><strong>Univers</strong> : tous les matchs réglés dans <code>data.js</code> (fenêtre rolling 13 jours) + <code>results_archive.jsonl</code> (append-only depuis le déploiement de l'archive).</li>
+      <li><strong>Capture cote</strong> : la cote prise en compte est celle figée par <code>snapshot_odds.py</code> dans <code>odds_history.jsonl</code> au plus proche du coup d'envoi (typiquement 5-15 min avant). Pas de cote post-match, pas de cote "early".</li>
+      <li><strong>Modèle évalué</strong> : la vraie fonction <code>predictMatch()</code> embarquée dans <code>pronostics.html</code>, exécutée en Python via <code>scripts/model_loader.py</code> (V8 embarqué) — pas une réimplémentation simplifiée.</li>
+      <li><strong>Filtrage</strong> : on évalue tous les picks que le modèle aurait surfacés (lock + standard + lowconf), pas une sélection rétroactive. Les "skip" sont aussi tracés mais hors-ROI (ils représentent ce que le modèle <em>refuse</em> de jouer).</li>
+      <li><strong>Paris annulés</strong> : exclus du calcul de WR et de ROI. Comptés séparément dans les métadonnées.</li>
+      <li><strong>Staking évalué</strong> : Kelly 0.25× cap 10% bankroll, démarrage 100 unités. ROI flat 1u/pick reporté en parallèle pour comparaison.</li>
+      <li><strong>Cron</strong> : <code>backtest.yml</code> rejoue tout chaque dimanche, écrit <code>backtest_report_v2.{json,md}</code> à la racine.</li>
+      <li><strong>Reproductibilité</strong> : tout est public. Tu peux <code>git clone</code> et relancer <code>python scripts/backtest_v2.py</code> sur ta machine. Les sorties <code>.json</code> + <code>.md</code> sont dans le repo, comparables historiquement.</li>
+    </ul>
+  </section>
+
+  <h2 id="biais">⚠️ Biais &amp; limites</h2>
+  <section class="card danger">
+    <ul>
+      <li><strong>Faible n par segment</strong> : les ROI par sport / par ligue sur quelques semaines peuvent être pure variance. Il faut typiquement <strong>≥150 paris</strong> dans une catégorie pour qu'un ROI ait du sens. Avant ça, c'est du bruit.</li>
+      <li><strong>Look-ahead bias possible</strong> : le modèle utilise des features (forme L5, classements, blessures) qui sont scrapées à un moment donné. Si une ligne d'historique scrape les blessures de "maintenant" pour évaluer un match passé, on a un look-ahead. Mitigation : les snapshots sont datés, mais 100% de l'historique pré-snapshot est imparfait.</li>
+      <li><strong>Survivorship bias léger</strong> : seuls les events que ESPN+Sofascore couvrent sont inclus. Les ligues sous-couvertes (Asie, Amérique du Sud) ont moins de signaux disponibles donc des picks plus volatiles. Ne pas extrapoler la perf moyenne aux sous-segments mal couverts.</li>
+      <li><strong>Variance court terme</strong> : un WR cible 60% sur le long terme reste compatible avec des séries de 4-5 défaites consécutives. <strong>3-5 pertes d'affilée sont normales</strong>, ne pas casser son Kelly après une bad run. Le hasard reste irréductible.</li>
+      <li><strong>Modèle calibré sur le passé</strong> : les paramètres (poids des composants, seuils des tiers) ont été tunés sur l'historique. Une rupture structurelle (changement de règle, nouveau format) peut dégrader la perf jusqu'à recalibrage. Le journal des changements modèle est dans le commit log.</li>
+      <li><strong>Pas de garantie</strong> : "Les performances passées ne garantissent pas les performances futures." Phrase légale mais aussi vraie. Ce site est un outil d'aide à la décision, pas une promesse de gains.</li>
+    </ul>
+  </section>
+
+  <p style="margin-top:32px;padding:14px 16px;background:#0c0c0f;border:1px dashed rgba(255,255,255,.1);border-radius:8px;font-size:12.5px;color:#6b6b73;text-align:center;">
+    Une question, une remarque méthodologique, un biais que je n'ai pas vu ? Ouvre une <a href="https://github.com/Harotensnor/paris-sportif/issues" target="_blank" rel="noopener">issue GitHub</a>. La transparence c'est aussi accepter d'être contredit.
+  </p>
+</main>
+
+<footer class="site-footer" role="contentinfo">
+  <nav aria-label="Liens du site">
+    <a href="./">Accueil</a> ·
+    <a href="legal.html">Légal &amp; confidentialité</a> ·
+    <a href="https://github.com/Harotensnor/paris-sportif" target="_blank" rel="noopener">GitHub</a> ·
+    <a href="https://www.anj.fr/" target="_blank" rel="noopener">ANJ</a>
+  </nav>
+  <div style="margin-top:8px;">⚖️ Site éducatif · réservé aux 18+ · jouer comporte des risques</div>
+</footer>
+</body>
+</html>
