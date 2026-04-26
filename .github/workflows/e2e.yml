@@ -46,6 +46,8 @@ jobs:
           python-version: '3.11'
       - name: Check pipeline drift
         run: python3 scripts/check_pipeline_drift.py
+      - name: Check no conflict markers (anti-rebase-fail safety)
+        run: python3 scripts/check_no_conflict_markers.py
 
   test:
     runs-on: ubuntu-latest

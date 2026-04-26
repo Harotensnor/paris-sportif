@@ -32,9 +32,11 @@ SCRIPTS_DIR = ROOT / 'scripts'
 EXCLUDED = {
     'model_loader.py',          # module helper importé par backtest_v2.py
     'winamax_map.py',           # module helper importé par 7+ scripts
+    '_data_io.py',              # v31.7.8 : module helper partage data.js I/O
     'backtest_v2.py',           # cron hebdo dédié (backtest.yml), pas refresh
     'backtest_baselines.py',    # outil de recherche, pas en prod
     'check_pipeline_drift.py',  # ce script lui-même
+    'check_no_conflict_markers.py',  # CI safety net, pas pipeline
 }
 
 
