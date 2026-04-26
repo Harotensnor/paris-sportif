@@ -143,6 +143,12 @@ jobs:
           # https://harotensnor.github.io/paris-sportif/health.json so we can
           # spot stale/missing sources without scraping the workflow logs.
           python3 build_health.py || true
+          # v31.7.23 — Mesure ρ Dixon-Coles par ligue via likelihood max.
+          # Lent (~2-5s pour 40 ligues), tourne 1×/jour à minute=0 (cron).
+          # Tant qu'une ligue n'a pas ≥40 matchs archivés, fallback litterature.
+          if [ "$(date -u +'%H:%M')" = "00:00" ] || [ ! -f dixon_coles_rho.json ]; then
+            python3 measure_dixon_coles_rho.py || true
+          fi
           # v31 — Static backtest page (audit ChatGPT recommandation). Lit
           # backtest_report_v2.json, produit backtest.html indexable sans JS.
           # Le JSON change ~1×/semaine donc le HTML aussi mais c'est cheap.
@@ -192,7 +198,7 @@ jobs:
                   data_today.json data_manifest.json team_form.json \
                   results_archive.jsonl tennis_ratings.json footballdata.json \
                   mlb_pitchers.json nhl_stats.json backtest.html feed.xml \
-                  credibilite.html stadiums.json \
+                  credibilite.html stadiums.json dixon_coles_rho.json \
                   og-default.png og-backtest.png og-credibilite.png og-methodologie.png 2>/dev/null || true
           # Only stamp sw.js if we have real content changes — otherwise
           # discard the version bump to avoid 288 empty commits/day.

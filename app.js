@@ -595,9 +595,30 @@
     'eng.fa': -0.13,  // FA Cup — varie selon teams
   };
   const DC_RHO_DEFAULT = -0.13;
+  // v31.7.23 — Override par mesure CI (likelihood max). Quand
+  // dixon_coles_rho.json a `source: 'measured'` pour une ligue, on l'utilise
+  // au lieu du litterature value. Loader async, fallback gracieux.
+  let __dcRhoMeasured = null;
+  if (typeof window !== 'undefined') {
+    fetch('dixon_coles_rho.json', { cache: 'force-cache' })
+      .then(r => r.ok ? r.json() : null)
+      .then(j => {
+        if (j && j.leagues) {
+          const map = {};
+          for (const [lg, info] of Object.entries(j.leagues)) {
+            if (info && info.source === 'measured' && typeof info.rho_used === 'number') {
+              map[lg] = info.rho_used;
+            }
+          }
+          __dcRhoMeasured = map;
+        }
+      })
+      .catch(() => { __dcRhoMeasured = {}; });
+  }
   function _dixonColesRho(leagueCode) {
     if (!leagueCode) return DC_RHO_DEFAULT;
     const code = String(leagueCode).toLowerCase();
+    if (__dcRhoMeasured && __dcRhoMeasured[code] != null) return __dcRhoMeasured[code];
     return DC_RHO_BY_LEAGUE[code] != null ? DC_RHO_BY_LEAGUE[code] : DC_RHO_DEFAULT;
   }
 

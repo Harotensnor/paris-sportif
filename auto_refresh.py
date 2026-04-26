@@ -100,6 +100,10 @@ PATCH_STAGES = [
     ('patch_team_form.py',          1,   15),
     # Pipeline status snapshot (health.json) — runs every tick, cheap.
     ('build_health.py',             1,   15),
+    # v31.7.23 — Dixon-Coles ρ par ligue mesuré en CI (likelihood max).
+    # Lent (~2-5s pour 40 ligues) ; cadence 240 ticks (~4h) en local.
+    # En prod la cadence est 1×/jour (cron H=00:00 UTC) — voir refresh.yml.
+    ('measure_dixon_coles_rho.py',  240, 60),
     # v31 — Static backtest page generator (audit ChatGPT recommandation
     # "Construire un historique public des paris"). Lit backtest_report_v2.json,
     # produit backtest.html indexable sans JS. ~0.3s.
