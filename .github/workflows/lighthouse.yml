@@ -61,20 +61,23 @@ jobs:
             --only-categories=performance,accessibility,best-practices,seo \
             --quiet
 
-      - name: Print scores
+      - name: Print scores + fail on threshold regressions
         run: |
           node -e '
             const r = require("./lighthouse.report.json");
             const cats = r.categories;
+            const audits = r.audits;
             const fmt = c => ((c.score || 0) * 100).toFixed(0).padStart(3) + "/100";
+            const num = c => Math.round((c.score || 0) * 100);
             console.log("=== Lighthouse scores ===");
             console.log("Performance     :", fmt(cats.performance));
             console.log("Accessibility   :", fmt(cats.accessibility));
             console.log("Best practices  :", fmt(cats["best-practices"]));
             console.log("SEO             :", fmt(cats.seo));
             console.log("");
-            const audits = r.audits;
             const m = (id) => audits[id] && audits[id].displayValue ? audits[id].displayValue : "-";
+            const ms = (id) => audits[id] ? Math.round(audits[id].numericValue || 0) : 0;
+            const cls = audits["cumulative-layout-shift"] ? +audits["cumulative-layout-shift"].numericValue : 0;
             console.log("FCP (1st paint)  :", m("first-contentful-paint"));
             console.log("LCP (largest)    :", m("largest-contentful-paint"));
             console.log("TBT (blocking)   :", m("total-blocking-time"));
@@ -82,6 +85,34 @@ jobs:
             console.log("Speed Index      :", m("speed-index"));
             console.log("Total weight     :", m("total-byte-weight"));
             console.log("Unused JS        :", m("unused-javascript"));
+            console.log("");
+
+            // v31 — Seuils d alerte (issue audit ChatGPT 2026-04-26).
+            // Volontairement permissifs au démarrage : on capte les vraies
+            // régressions (drop > 10pp) sans bloquer la CI sur un site
+            // monolithique connu pour son poids JS. Resserrer après refactor.
+            const thresholds = {
+              "Accessibility": { score: num(cats.accessibility), min: 90 },
+              "Best practices": { score: num(cats["best-practices"]), min: 85 },
+              "SEO":             { score: num(cats.seo),             min: 90 },
+              "Performance":     { score: num(cats.performance),     min: 30 }, // pragmatic for monolith
+              "LCP (ms)":        { score: ms("largest-contentful-paint"), max: 6000 },
+              "TBT (ms)":        { score: ms("total-blocking-time"),     max: 3500 },
+              "CLS":             { score: cls,                            max: 0.1 },
+            };
+            console.log("=== Thresholds check ===");
+            let failed = 0;
+            for (const [k, v] of Object.entries(thresholds)) {
+              const ok = (v.min !== undefined) ? v.score >= v.min : v.score <= v.max;
+              const cmp = (v.min !== undefined) ? ">= " + v.min : "<= " + v.max;
+              console.log((ok ? "✓" : "✗") + " " + k.padEnd(18) + " " + String(v.score).padStart(8) + "  (target " + cmp + ")");
+              if (!ok) failed++;
+            }
+            if (failed > 0) {
+              console.log("");
+              console.log(failed + " threshold(s) failed. CI marked as failure.");
+              process.exit(1);
+            }
           '
 
       - name: Upload report
