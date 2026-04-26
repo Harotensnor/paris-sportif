@@ -108,6 +108,9 @@ PATCH_STAGES = [
     # "Construire un historique public des paris"). Lit backtest_report_v2.json,
     # produit backtest.html indexable sans JS. ~0.3s.
     ('build_backtest_page.py',      1,   15),
+    # v31.7.29 — Patch index.html stats-strip depuis backtest_report_v2.json.
+    # Idempotent, cheap (~0.05s). Idéal pour single source of truth.
+    ('patch_index_stats.py',        1,   15),
     # v31 — RSS feed (top picks du jour). Lit data.js, produit feed.xml.
     # Discoverable par feed readers + Google News. ~0.2s.
     ('build_feed.py',               1,   15),
