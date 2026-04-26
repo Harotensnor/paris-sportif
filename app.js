@@ -11858,6 +11858,80 @@
     `;
   }
 
+  // v31.7.22 — Multi-series ROI chart : superpose plusieurs fenêtres sur
+  // le même graphe. `seriesArray` = [{ label, color, rows }]. Chaque rows
+  // est { date, delta }. L'axe X est l'union des dates triées ; chaque
+  // série n'apparaît qu'à partir de sa première date présente. Aligné sur
+  // un Y partagé (toutes courbes scalées identique pour comparaison).
+  function renderRoiChartMulti(seriesArray, { width = 560, height = 200, title, unit = 'u' } = {}) {
+    if (!seriesArray || !seriesArray.length) return '';
+    // Pour chaque série, calcul cumulatif par jour.
+    const seriesPts = seriesArray.map(s => {
+      const byDay = new Map();
+      (s.rows || []).forEach(r => {
+        const d = isoDate(r.date);
+        if (!d) return;
+        byDay.set(d, (byDay.get(d) || 0) + r.delta);
+      });
+      const sortedDays = [...byDay.keys()].sort();
+      let cum = 0;
+      const pts = sortedDays.map(d => { cum += byDay.get(d); return { d, cum }; });
+      return { label: s.label, color: s.color, pts, finalCum: pts.length ? pts[pts.length-1].cum : 0 };
+    }).filter(s => s.pts.length > 0);
+    if (!seriesPts.length) return '';
+    // Union de toutes les dates pour l'axe X.
+    const allDates = new Set();
+    seriesPts.forEach(s => s.pts.forEach(p => allDates.add(p.d)));
+    const xDays = [...allDates].sort();
+    const xIdx = new Map(xDays.map((d, i) => [d, i]));
+    // Y domain partagé pour toutes les séries.
+    let minY = 0, maxY = 0;
+    seriesPts.forEach(s => s.pts.forEach(p => {
+      if (p.cum < minY) minY = p.cum;
+      if (p.cum > maxY) maxY = p.cum;
+    }));
+    const padY = Math.max(0.5, (maxY - minY) * 0.1);
+    const y0 = minY - padY, y1 = maxY + padY;
+    const marginL = 40, marginR = 12, marginT = 26, marginB = 28;
+    const plotW = width - marginL - marginR;
+    const plotH = height - marginT - marginB;
+    const xAt = i => marginL + (xDays.length === 1 ? plotW / 2 : (i / (xDays.length - 1)) * plotW);
+    const yAt = v => marginT + plotH - ((v - y0) / (y1 - y0)) * plotH;
+    const zeroY = yAt(0);
+    // Polylines + circles pour chaque série.
+    const polys = seriesPts.map(s => {
+      const points = s.pts.map(p => `${xAt(xIdx.get(p.d)).toFixed(1)},${yAt(p.cum).toFixed(1)}`).join(' ');
+      return `<polyline points="${points}" fill="none" stroke="${s.color}" stroke-width="2" opacity="0.85"/>`;
+    }).join('');
+    const circles = seriesPts.map(s => s.pts.map(p =>
+      `<circle cx="${xAt(xIdx.get(p.d)).toFixed(1)}" cy="${yAt(p.cum).toFixed(1)}" r="2" fill="${s.color}"><title>${s.label} · ${p.d}: ${p.cum>=0?'+':''}${p.cum.toFixed(2)}${unit}</title></circle>`
+    ).join('')).join('');
+    const xTicks = xDays.length <= 5
+      ? xDays.map((d, i) => ({ x: xAt(i), label: d.slice(5) }))
+      : [0, Math.floor(xDays.length / 2), xDays.length - 1].map(i => ({ x: xAt(i), label: xDays[i].slice(5) }));
+    const yTicks = [y0, 0, y1].filter((v, i, arr) => i === arr.indexOf(v));
+    // Légende : un chip par série avec final cumul.
+    const legend = seriesPts.map(s =>
+      `<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--text-dim,#b4bcc7);">
+        <span style="width:10px;height:10px;border-radius:2px;background:${s.color};"></span>
+        <b>${esc(s.label)}</b> <span style="color:${s.finalCum>=0?'#34d399':'#f87171'};">${s.finalCum>=0?'+':''}${s.finalCum.toFixed(2)}${unit}</span>
+      </span>`
+    ).join(' · ');
+    return `
+      <div style="background:var(--surface,#111827);border:1px solid var(--border,#2a3744);border-radius:12px;padding:14px;margin-bottom:24px;">
+        ${title ? `<div style="font-size:13px;color:var(--text-dim,#b4bcc7);margin-bottom:8px;font-weight:600;">${esc(title)}</div>` : ''}
+        <div style="margin-bottom:10px;">${legend}</div>
+        <svg viewBox="0 0 ${width} ${height}" style="width:100%;height:auto;display:block;" xmlns="http://www.w3.org/2000/svg">
+          <line x1="${marginL}" y1="${zeroY.toFixed(1)}" x2="${width - marginR}" y2="${zeroY.toFixed(1)}" stroke="rgba(255,255,255,.15)" stroke-dasharray="3 3"/>
+          ${yTicks.map(v => `<text x="${marginL - 6}" y="${(yAt(v)+4).toFixed(1)}" text-anchor="end" fill="var(--text-dim2,#7b8693)" font-size="10" font-family="sans-serif">${v.toFixed(1)}${unit}</text>`).join('')}
+          ${polys}
+          ${circles}
+          ${xTicks.map(t => `<text x="${t.x.toFixed(1)}" y="${(height - 6).toFixed(1)}" text-anchor="middle" fill="var(--text-dim2,#7b8693)" font-size="10" font-family="sans-serif">${t.label}</text>`).join('')}
+        </svg>
+      </div>
+    `;
+  }
+
   // ====== Calibration (reliability diagram) ======
   // Walk completed events, run predictMatch on each, bucket the predicted pick
   // probability into 10-point bins, and compare to the actual outcome. A well-
@@ -14151,8 +14225,41 @@
       date: isoDate(r.m.date),
       delta: r.res === 'won' ? (r.odd - 1) : -1,
     }));
-    const modelChartHtml = renderRoiChart(modelChartRows, { title: 'P&L modèle cumulé (unité flat)' })
-      || `<div class="bilan-empty">Pas encore assez de paris pour tracer une courbe.</div>`;
+    // v31.7.22 — Mode "Comparer fenêtres" : si activé, on calcule indépendamment
+    // 7j/30j/90j à partir de `completed` (ignore le filtre _bilanWindow car il
+    // est forcément contraint à une seule fenêtre). Sport filter respecté.
+    let modelChartHtml;
+    if (_bilanCompareMode) {
+      const today = new Date(); today.setHours(0,0,0,0);
+      const buildSeriesRows = (windowDays) => {
+        const cutoff = new Date(today); cutoff.setDate(cutoff.getDate() - windowDays);
+        const out = [];
+        completed.forEach(m => {
+          const md = new Date(m.date);
+          if (isNaN(md.getTime()) || md < cutoff) return;
+          if (_bilanSport && m.sport !== _bilanSport) return;
+          const pred = predictMatch(m);
+          if (!pred || !pred.pick || pred.skip) return;
+          const res = evaluateModelPick(m, pred);
+          if (res == null) return;
+          const odd = pred.odds && (pred.pick.key === '1' ? pred.odds.home : pred.pick.key === '2' ? pred.odds.away : pred.odds.draw);
+          if (!odd) return;
+          out.push({ date: isoDate(m.date), delta: res === 'won' ? (odd - 1) : -1 });
+        });
+        return out;
+      };
+      const series = [
+        { label: '7j',  color: '#fbbf24', rows: buildSeriesRows(7) },
+        { label: '30j', color: '#a78bfa', rows: buildSeriesRows(30) },
+        { label: '90j', color: '#60a5fa', rows: buildSeriesRows(90) },
+      ].filter(s => s.rows.length > 0);
+      modelChartHtml = (series.length
+        ? renderRoiChartMulti(series, { title: 'P&L modèle cumulé — superposition 7j / 30j / 90j' })
+        : '') || `<div class="bilan-empty">Pas encore assez de paris pour tracer une courbe.</div>`;
+    } else {
+      modelChartHtml = renderRoiChart(modelChartRows, { title: 'P&L modèle cumulé (unité flat)' })
+        || `<div class="bilan-empty">Pas encore assez de paris pour tracer une courbe.</div>`;
+    }
 
     // ========= PORTEFEUILLE SIMULÉ — Chantier JJ (backtest what-if) =========
     // Chantier EE (2026-04-21) a introduit le choix du stake mode.
@@ -14887,6 +14994,7 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
           const tooltip = isDisabled ? `Dispo dans ${daysNeeded} jour${daysNeeded>1?'s':''}` : '';
           return `<button class="bilan-win-btn${_bilanWindow===v?' active':''}" data-win="${v}" ${disabledAttr} title="${tooltip}" style="${isDisabled ? 'opacity:.5;cursor:not-allowed;' : ''}">${lbl}</button>`;
         }).join('')}
+        <button id="bilan-compare-toggle" class="bilan-win-btn${_bilanCompareMode ? ' active' : ''}" title="${_bilanCompareMode ? 'Désactiver la comparaison multi-fenêtres' : 'Superposer 7j/30j/90j sur le même chart'}" style="margin-left:8px;border-color:${_bilanCompareMode ? 'var(--brand)' : 'var(--border)'};">📊 Comparer</button>
         <span class="win-hint">${rows.length} pari${rows.length>1?'s':''} sur ${winLabel.toLowerCase()}</span>
       </div>
     `;
@@ -15294,12 +15402,24 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     // Chantier WW — bilan window buttons with disable check
     wrap.querySelectorAll('.bilan-win-btn').forEach(btn => btn.addEventListener('click', () => {
       if (btn.disabled) return;
+      // v31.7.22 — Le bouton "Comparer" partage la classe .bilan-win-btn pour
+      // l'apparence mais a un data-* différent. Skip ici, géré ci-dessous.
+      if (btn.id === 'bilan-compare-toggle') return;
       const v = parseInt(btn.dataset.win, 10);
       if (!Number.isFinite(v) || v === _bilanWindow) return;
       _bilanWindow = v;
       try { localStorage.setItem('bilanWindow', String(v)); } catch (e) {}
       renderBilanPage(wrap);
     }));
+    // v31.7.22 — Bouton "Comparer" : toggle multi-window superposé.
+    const _compareBtn = wrap.querySelector('#bilan-compare-toggle');
+    if (_compareBtn) {
+      _compareBtn.addEventListener('click', () => {
+        _bilanCompareMode = !_bilanCompareMode;
+        try { localStorage.setItem('bilanCompareMode', _bilanCompareMode ? '1' : '0'); } catch (e) {}
+        renderBilanPage(wrap);
+      });
+    }
     // Chantier R — toggle horizon table portefeuille
     wrap.querySelectorAll('.wallet-tbl-btn').forEach(btn => btn.addEventListener('click', () => {
       const v = parseInt(btn.dataset.wtw, 10);
@@ -15428,6 +15548,12 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
   let _bilanWindow = (() => {
     const v = parseInt(localStorage.getItem('bilanWindow'), 10);
     return [0, 7, 30, 90].includes(v) ? v : 0;
+  })();
+  // v31.7.22 — Mode "Comparer fenêtres" : superpose 7j/30j/90j sur le même
+  // chart pour visualiser comment la courte/moyenne/longue fenêtre se
+  // comportent simultanément. Le toggle est un bool persisté.
+  let _bilanCompareMode = (() => {
+    return localStorage.getItem('bilanCompareMode') === '1';
   })();
   // v26.5 — Sport filter (drill-down). null = tous les sports. Persisted.
   // Si défini, filtre model/wallet/chart/buckets/histoire à un sport unique.
