@@ -261,6 +261,65 @@ def render_worst_picks(worst_picks: list) -> str:
     </p>'''
 
 
+def render_best_picks(best_picks: list) -> str:
+    """v31.7.27 — 10 plus beaux gains du modèle. Symétrique à worst_picks
+    pour balance la transparence : on publie aussi les succès (sinon le
+    framing biaise vers le négatif). Trié par cote desc — un underdog qui
+    gagne pèse plus qu'un favori qui gagne."""
+    if not best_picks:
+        return '<p style="color:#a3a3aa;font-size:13px;">Pas encore de gains à afficher.</p>'
+
+    sport_emoji = {
+        'football': '⚽', 'tennis': '🎾', 'basketball': '🏀',
+        'hockey': '🏒', 'baseball': '⚾', 'american-football': '🏈',
+        'mma': '🥊', 'rugby': '🏉',
+    }
+
+    rows = []
+    for p in best_picks:
+        em = sport_emoji.get(p.get('sport') or '', '🎯')
+        date = (p.get('date') or '')[:10]
+        name = p.get('name') or '?'
+        pick = p.get('pick') or '?'
+        pick_lbl = '1 (Domicile)' if pick == '1' else '2 (Extérieur)' if pick == '2' else 'X (Nul)'
+        prob = p.get('pick_prob') or 0
+        cote = p.get('cote') or 0
+        pnl = p.get('pnl') or 0
+        tier_lbl = {'lock': '🔒 Lock', 'standard': '📋 Standard'}.get(p.get('tier'), '—')
+        rows.append(f'''<tr>
+      <td><span style="font-size:14px;">{em}</span> <b>{escape(name)}</b></td>
+      <td style="text-align:right;font-size:11px;color:#a3a3aa;">{date}</td>
+      <td style="text-align:right;">{escape(pick_lbl)}</td>
+      <td style="text-align:right;color:#a3a3aa;">{prob*100:.0f}%</td>
+      <td style="text-align:right;font-variant-numeric:tabular-nums;">@{cote:.2f}</td>
+      <td style="text-align:right;font-weight:600;color:#34d399;">+{pnl:.2f}u</td>
+      <td style="text-align:right;font-size:11px;color:#a3a3aa;">{tier_lbl}</td>
+    </tr>''')
+
+    return f'''<p style="font-size:13px;color:#a3a3aa;margin:0 0 12px;">
+      Les <b>10 plus beaux gains</b>, classés par cote (un underdog qui gagne pèse plus qu'un favori qui gagne).
+      On publie aussi les succès pour <b>balancer la transparence</b> : si on publie nos pires erreurs (ci-dessous),
+      on doit aussi publier nos plus beaux coups, sinon le framing biaise négatif.
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>Match</th>
+          <th style="text-align:right;">Date</th>
+          <th style="text-align:right;">Pick</th>
+          <th style="text-align:right;">Conf.</th>
+          <th style="text-align:right;">Cote</th>
+          <th style="text-align:right;">Gain</th>
+          <th style="text-align:right;">Tier</th>
+        </tr>
+      </thead>
+      <tbody>{''.join(rows)}</tbody>
+    </table>
+    <p style="font-size:12px;color:#a3a3aa;margin-top:8px;">
+      Source : <code>backtest_report_v2.json#best_picks</code> (cron hebdo).
+    </p>'''
+
+
 def render_streaks(streaks: dict) -> str:
     """v31.7.21 — Streaks publics. Affiche longest win/lose + streak courante
     + top 3 win/lose runs avec dates. Le but est la transparence : le modèle
@@ -647,6 +706,9 @@ PAGE_TEMPLATE = '''<!DOCTYPE html>
   <h2 id="streaks">📈 Séries <span class="subtle">— les "chauds" et les "froids" du modèle</span></h2>
   {table_streaks}
 
+  <h2 id="best">🏆 Plus beaux gains <span class="subtle">— les 10 succès les mieux payés</span></h2>
+  {table_best_picks}
+
   <h2 id="worst">😬 Pires picks <span class="subtle">— transparence sur les erreurs du modèle</span></h2>
   {table_worst_picks}
 
@@ -752,6 +814,7 @@ def main() -> int:
         table_leagues=render_top_leagues(by_league, limit=12),
         table_benchmarks=render_benchmarks(overall, baselines),
         table_worst_picks=render_worst_picks(report.get('worst_picks') or []),
+        table_best_picks=render_best_picks(report.get('best_picks') or []),
         table_streaks=render_streaks(report.get('streaks') or {}),
     )
 
