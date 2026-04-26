@@ -4,6 +4,9 @@ auto_refresh.log
 *.tmp
 .DS_Store
 data.json
+# Cache local des sources externes (footballdata, MLB pitchers, tennis CSV).
+# Re-téléchargeable, pas besoin de versionner.
+.cache/
 # Playwright / Node
 node_modules/
 playwright-report/
