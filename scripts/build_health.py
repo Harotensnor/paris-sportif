@@ -54,6 +54,15 @@ def _count_events(d):
     if not isinstance(d, dict): return None
     return {'events': len(d.get('events') or {})}
 
+def _count_injuries(d):
+    """Sofascore injuries : la data est par EQUIPE (clé `teams`) avec une
+    liste de joueurs blessés par équipe. v31.7.5 fix : avant on comptait
+    `events` qui retournait toujours 0 (mauvaise clé)."""
+    if not isinstance(d, dict): return None
+    teams = d.get('teams') or {}
+    total_players = sum(len(v) if isinstance(v, list) else 0 for v in teams.values())
+    return {'teams': len(teams), 'players': total_players}
+
 def _count_clubelo(d):
     if not isinstance(d, dict): return None
     return {'clubs': len(d.get('ratings') or d.get('clubs') or d)}
@@ -61,11 +70,11 @@ def _count_clubelo(d):
 SOURCES = [
     ('winamax_catalog', 'winamax_catalog.json', _count_winamax_catalog),
     ('winamax_markets', 'winamax_markets.json', _count_winamax_markets),
-    ('injuries_soccer', 'injuries_soccer.json', _count_events),
+    ('injuries_soccer', 'injuries_soccer.json', _count_injuries),
     ('lineups_soccer',  'lineups_soccer.json',  _count_events),
     ('team_stats',      'team_stats.json',      lambda d: {'teams': len(d.get('teams') or {}) if isinstance(d, dict) else 0}),
     ('clubelo',         'clubelo.json',         _count_clubelo),
-    ('weather',         'weather.json',         lambda d: {'events': len(d.get('forecasts') or {}) if isinstance(d, dict) else 0}),
+    ('weather',         'weather.json',         lambda d: {'events': len(d.get('matches') or d.get('forecasts') or {}) if isinstance(d, dict) else 0}),
     ('referees_soccer', 'referees_soccer.json', _count_events),
 ]
 
