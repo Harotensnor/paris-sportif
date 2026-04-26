@@ -10191,30 +10191,53 @@
 
 
   // =========================================================================
-  // v31.7 — MONTANTES (du jour / weekend / semaine)
+  // v31.7.1 — MONTANTES SÉQUENTIELLES (du jour / weekend / semaine)
   // -------------------------------------------------------------------------
-  // Concept : combiner N picks haute confiance pour multiplier la mise.
-  // L'utilisateur place une mise initiale (1u par défaut), si tous les picks
-  // gagnent il récupère 1u × cote_totale. Si un seul tombe → tout perdu.
+  // Concept REEL d'une montante (corrigé par retour user) :
+  //   - Pari 1 (étape 1) : on mise 10€ sur le match X
+  //   - On ATTEND le résultat. Si on gagne → on récupère 10€ × cote_X
+  //   - Pari 2 (étape 2) : on remet TOUT (mise+gain) sur le match Y
+  //     (qui DOIT démarrer après la fin du match X)
+  //   - Et ainsi de suite jusqu'à étape N.
+  //   - Si UN seul pari tombe → tout est perdu.
   //
-  // Honesty caveat : aucune montante n'est "garantie". Plus on combine, plus
-  // la variance s'accumule (la prob TOTALE = produit des probs individuelles).
-  // Le site DOIT afficher clairement la prob combinée et le risque.
+  // CONTRAINTE TEMPORELLE CRITIQUE : les matchs doivent être séquentiels
+  // (pas de chevauchement temporel). Buffer = durée match + 30min pour
+  // récupérer les gains et reposer la mise.
   //
-  // Algo de sélection :
-  //   - jour     : picks d'aujourd'hui, 2-3 max, conf ≥ 72%, cote ind. 1.30-2.10
-  //   - weekend  : picks samedi+dimanche, 3-4 max, conf ≥ 70%, cote 1.30-2.50
-  //   - semaine  : picks 7 jours, 5 max, conf ≥ 70%, cote 1.30-2.80
+  // Algo (greedy par kickoff ASC) :
+  //   1. Filtre candidates (haute conf, cote dans plage, pas live/done)
+  //   2. Sort par kickoff ASC
+  //   3. Greedy : prendre 1er candidat, puis chercher le plus tôt qui
+  //      démarre après earliest_next_ts = prev.ts + duree(prev.sport) + 30min
+  //   4. Continue jusqu'à atteindre targetN OU plus de candidats valides
+  //   5. Diversification : max 2 picks même sport, max 2 même ligue
   //
-  // Sécurités :
-  //   - Diversification sport (max 2 picks même sport)
-  //   - Diversification ligue (max 2 picks même ligue)
-  //   - Pas de picks live ou completed
-  //   - Filter cote ind. min 1.30 (marge marché trop faible en dessous)
-  //
-  // Sortie : carte montante avec liste des picks, cote totale, prob combinée
-  // (transparente), disclaimer fort.
+  // Affichage : timeline "étapes" claire, pour chaque étape la mise courante,
+  // la cote, le gain potentiel qui devient la mise de l'étape suivante.
   // =========================================================================
+
+  // Durée moyenne d'un match par sport (en minutes) — buffer permettant de
+  // garantir que le résultat est connu avant de remiser sur l'étape suivante.
+  const SPORT_DURATION_MIN = {
+    football: 120,            // 90min + arrêts + mi-temps
+    tennis: 180,              // BO3, peut aller à 5h en BO5 — on prend 3h moyen
+    basketball: 150,          // 4×12min + temps morts + prolongation possible
+    hockey: 150,              // 3×20min + arrêts + prolongation possible
+    baseball: 210,            // 9 manches, longueur très variable
+    'american-football': 210, // 4×15min + arrêts nombreux
+    mma: 60,                  // Carte rapide, fin variable
+    rugby: 100,               // 2×40min + arrêts
+    golf: 360,                // Round complet, on conseille pas montante golf
+    racing: 150,              // F1 ~2h, autres variables
+  };
+  const STEP_BUFFER_MIN = 30;  // marge après match pour reporter la mise
+
+  function _matchEndTs(c) {
+    const dur = (SPORT_DURATION_MIN[c.sport] || 180) + STEP_BUFFER_MIN;
+    return c.ts + dur * 60 * 1000;
+  }
+
   function renderMontantePage(wrap, type) {
     const data = window.PRONOSTICS_DATA;
     if (!data || !data.days) {
@@ -10232,8 +10255,7 @@
     for (let i = 0; i < dayCount; i++) {
       const d = new Date(todayDate);
       if (type === 'weekend') {
-        // Pour le weekend : on prend samedi + dimanche les plus proches
-        // (semaine en cours ou suivante)
+        // Samedi+dimanche les plus proches (semaine en cours ou suivante)
         const dow = d.getUTCDay();
         const daysToSat = (6 - dow + 7) % 7;
         d.setUTCDate(d.getUTCDate() + daysToSat + i);
@@ -10243,23 +10265,29 @@
       dates.push(d.toISOString().slice(0, 10));
     }
 
-    // Collect candidate picks
-    const candidates = [];
+    // Plage cote/conf selon type
     const odd_min = 1.30;
     const odd_max = type === 'jour' ? 2.10 : type === 'weekend' ? 2.50 : 2.80;
     const conf_min = type === 'jour' ? 0.72 : 0.70;
+    const targetN  = type === 'jour' ? 3 : type === 'weekend' ? 4 : 5;
 
+    // Collect candidate picks (filtre haute conf + cote in range)
+    const candidates = [];
+    const nowTs = Date.now();
     for (const date of dates) {
       const events = (data.days || {})[date] || [];
       for (const m of events) {
         if (m.live || m.completed) continue;
         if (m.status === 'STATUS_FINAL' || m.status === 'STATUS_IN_PROGRESS') continue;
+        const ts = new Date(m.date).getTime();
+        if (!isFinite(ts)) continue;
+        // Skip matchs déjà commencés (pas de mise possible)
+        if (ts < nowTs) continue;
         let pred;
         try { pred = (typeof predictMatch === 'function') ? predictMatch(m) : null; } catch(e){ continue; }
         if (!pred || !pred.pick) continue;
         const rel = pred.reliability ?? pred.pick.prob;
         if (rel < conf_min) continue;
-        // Trouver la cote du pick
         let odd = null;
         const wm = (m.winamax && m.winamax.markets && m.winamax.markets['1n2']) || {};
         if (pred.pick.key === '1') odd = wm.home;
@@ -10269,9 +10297,7 @@
         if (!isFinite(odd) || odd < odd_min || odd > odd_max) continue;
 
         candidates.push({
-          m, pred, rel,
-          odd,
-          ts: new Date(m.date).getTime(),
+          m, pred, rel, odd, ts,
           sport: m.sport,
           league: m.league_code || m.league_name || '',
           edge: rel - (1/odd),
@@ -10279,45 +10305,53 @@
       }
     }
 
-    // Tri : edge desc, puis confiance desc
-    candidates.sort((a, b) => (b.edge - a.edge) || (b.rel - a.rel));
+    // ALGO MONTANTE SÉQUENTIELLE :
+    // 1. Sort par kickoff ASC (timeline)
+    // 2. Pour chaque slot, prendre le candidat dispo avec le meilleur score
+    //    composite (edge + conf), respectant la contrainte temporelle ET
+    //    la diversification.
+    candidates.sort((a, b) => a.ts - b.ts);
 
-    // Diversification : max 2 par sport, max 2 par ligue
     const picked = [];
     const sportCount = {}, leagueCount = {};
-    const targetN = type === 'jour' ? 3 : type === 'weekend' ? 4 : 5;
-    for (const c of candidates) {
-      if (picked.length >= targetN) break;
-      if ((sportCount[c.sport] || 0) >= 2) continue;
-      if (c.league && (leagueCount[c.league] || 0) >= 2) continue;
-      picked.push(c);
-      sportCount[c.sport] = (sportCount[c.sport] || 0) + 1;
-      if (c.league) leagueCount[c.league] = (leagueCount[c.league] || 0) + 1;
+    let earliestNextTs = nowTs;
+
+    while (picked.length < targetN) {
+      // Filtrer ceux qui démarrent après earliestNextTs et respectent
+      // diversification.
+      const eligible = candidates.filter(c => {
+        if (c.ts < earliestNextTs) return false;
+        if (picked.includes(c)) return false;
+        if ((sportCount[c.sport] || 0) >= 2) return false;
+        if (c.league && (leagueCount[c.league] || 0) >= 2) return false;
+        return true;
+      });
+      if (!eligible.length) break;
+
+      // Parmi les éligibles, prendre celui avec le meilleur edge × conf
+      // (mais on reste dans la window kickoff ascendante : on prend en
+      // priorité les premiers, mais avec un compromis qualité).
+      // Stratégie : prendre le BEST eligible parmi les 5 plus tôt dispo.
+      const window = eligible.slice(0, 5);
+      window.sort((a, b) => (b.rel * b.edge) - (a.rel * a.edge));
+      const chosen = window[0];
+
+      picked.push(chosen);
+      sportCount[chosen.sport] = (sportCount[chosen.sport] || 0) + 1;
+      if (chosen.league) leagueCount[chosen.league] = (leagueCount[chosen.league] || 0) + 1;
+      earliestNextTs = _matchEndTs(chosen);
     }
-
-    // Calcul combiné
-    const totalOdd = picked.reduce((p, c) => p * c.odd, 1);
-    const totalProb = picked.reduce((p, c) => p * c.rel, 1);
-    const stake = 10; // mise simulée 10€
-    const gain = stake * totalOdd;
-    const netGain = gain - stake;
-
-    // Risk label
-    let riskLabel, riskColor, riskBg;
-    if (totalProb >= 0.50) { riskLabel = 'Risque modéré'; riskColor = '#34d399'; riskBg = 'rgba(52,211,153,.10)'; }
-    else if (totalProb >= 0.30) { riskLabel = 'Risque équilibré'; riskColor = '#fbbf24'; riskBg = 'rgba(251,191,36,.10)'; }
-    else { riskLabel = 'Risque élevé'; riskColor = '#f87171'; riskBg = 'rgba(248,113,113,.10)'; }
 
     // Header (titre + intro)
     const titleByType = {
-      jour: '📅 Montante du jour',
+      jour:    '📅 Montante du jour',
       weekend: '🗓️ Montante du weekend',
       semaine: '📆 Montante de la semaine',
     };
     const subByType = {
-      jour: `${picked.length} picks haute confiance d'aujourd'hui · diversification sport/ligue`,
-      weekend: `${picked.length} picks haute confiance samedi & dimanche · diversification sport/ligue`,
-      semaine: `${picked.length} picks haute confiance sur 7 jours · diversification sport/ligue`,
+      jour:    `${picked.length} étape${picked.length>1?'s':''} séquentielle${picked.length>1?'s':''} sur la journée — chaque pari démarre après le précédent`,
+      weekend: `${picked.length} étape${picked.length>1?'s':''} séquentielle${picked.length>1?'s':''} samedi & dimanche`,
+      semaine: `${picked.length} étape${picked.length>1?'s':''} séquentielle${picked.length>1?'s':''} sur 7 jours`,
     };
 
     if (picked.length < 2) {
@@ -10326,41 +10360,92 @@
           <div style="margin:24px 0 18px;">
             <span class="section-eyebrow">Montante</span>
             <h1 class="section-title-v2">${titleByType[type]}</h1>
-            <p class="section-subtitle-v2">${subByType[type]}</p>
+            <p class="section-subtitle-v2">Le modèle n'a pas trouvé assez de picks séquentiels respectant les critères.</p>
           </div>
           <div class="empty-state">
             <span class="es-icon">🎯</span>
-            <div class="es-title">Pas assez de picks haute confiance</div>
-            <div class="es-body">Le modèle a trouvé ${picked.length} pick${picked.length>1?'s':''} sur la fenêtre. Une montante solide demande au moins 2 picks. Reviens plus tard ou consulte les <button class="page-btn" data-page="locks" style="background:transparent;border:none;color:var(--brand);text-decoration:underline;cursor:pointer;font-size:inherit;font-family:inherit;padding:0;">Locks</button> pour les picks individuels.</div>
+            <div class="es-title">Pas assez de picks séquentiels</div>
+            <div class="es-body">
+              Une montante demande des matchs <b>qui ne se chevauchent pas dans le temps</b> (tu dois encaisser le gain de l'étape 1 avant de remiser sur l'étape 2).
+              ${candidates.length ? `${candidates.length} candidat${candidates.length>1?'s':''} haute confiance trouvé${candidates.length>1?'s':''} mais ils sont trop proches dans le temps ou tous dans le même sport/ligue.` : 'Aucun candidat haute confiance dans la fenêtre.'}
+              Reviens plus tard ou consulte les <button class="page-btn" data-page="locks" style="background:transparent;border:none;color:var(--brand);text-decoration:underline;cursor:pointer;font-size:inherit;font-family:inherit;padding:0;">Locks</button> pour les picks individuels.
+            </div>
           </div>
         </div>`;
       return;
     }
 
-    // Build picks HTML
-    const picksHtml = picked.map((p, i) => {
-      const sides = (typeof getSides === 'function') ? getSides(p.m) : { home: {}, away: {} };
+    // CALCUL PROGRESSIF DES MISES (montante réelle)
+    // Étape 1 : mise initiale. Si gagne → mise étape 2 = mise1 × cote1.
+    // Étape N : mise N = mise (N-1) × cote (N-1).
+    const initialStake = 10; // 10€ simulés
+    const steps = [];
+    let currentStake = initialStake;
+    for (const c of picked) {
+      const grossPayout = currentStake * c.odd;
+      steps.push({
+        ...c,
+        stake: currentStake,
+        payout: grossPayout,
+      });
+      currentStake = grossPayout; // gain devient la mise suivante
+    }
+    const finalPayout = steps[steps.length - 1].payout;
+    const totalNetGain = finalPayout - initialStake;
+    const totalProb = picked.reduce((p, c) => p * c.rel, 1);
+
+    // Risk label (basé sur la prob TOTALE de réussir la chaîne)
+    let riskLabel, riskColor, riskBg;
+    if (totalProb >= 0.50) { riskLabel = 'Risque modéré';   riskColor = '#34d399'; riskBg = 'rgba(52,211,153,.10)'; }
+    else if (totalProb >= 0.30) { riskLabel = 'Risque équilibré'; riskColor = '#fbbf24'; riskBg = 'rgba(251,191,36,.10)'; }
+    else                    { riskLabel = 'Risque élevé';   riskColor = '#f87171'; riskBg = 'rgba(248,113,113,.10)'; }
+
+    // Build steps HTML : timeline verticale avec mise → cote → gain
+    const sportEmMap = { football:'⚽', tennis:'🎾', basketball:'🏀', hockey:'🏒', baseball:'⚾', 'american-football':'🏈', mma:'🥊', golf:'⛳', racing:'🏎️', rugby:'🏉' };
+    const stepsHtml = steps.map((s, i) => {
+      const sides = (typeof getSides === 'function') ? getSides(s.m) : { home: {}, away: {} };
       const homeName = (sides.home && (sides.home.short || sides.home.name)) || '?';
       const awayName = (sides.away && (sides.away.short || sides.away.name)) || '?';
-      const sportEm = { football:'⚽', tennis:'🎾', basketball:'🏀', hockey:'🏒', baseball:'⚾', 'american-football':'🏈', mma:'🥊', golf:'⛳', racing:'🏎️', rugby:'🏉' }[p.sport] || '🎯';
-      const dateStr = new Date(p.m.date).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' });
-      const timeStr = new Date(p.m.date).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-      const pickLabel = (p.pred.pick && p.pred.pick.label) || p.pred.pick.key || '?';
+      const sportEm = sportEmMap[s.sport] || '🎯';
+      const dateStr = new Date(s.m.date).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' });
+      const timeStr = new Date(s.m.date).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+      const pickLabel = (s.pred.pick && s.pred.pick.label) || s.pred.pick.key || '?';
+      const isLast = (i === steps.length - 1);
+      const dur = SPORT_DURATION_MIN[s.sport] || 180;
+      const endTime = new Date(s.m.date).getTime() + dur * 60000;
+      const endStr = new Date(endTime).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
       return `
-        <div class="montante-pick" data-match-id="${esc(String(p.m.id || ''))}" role="button" tabindex="0" aria-label="Pick ${i+1} : ${esc(homeName)} vs ${esc(awayName)}" style="display:grid;grid-template-columns:32px 1fr 100px 80px;gap:12px;align-items:center;padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);cursor:pointer;transition:all .18s ease;">
-          <div style="width:30px;height:30px;display:grid;place-items:center;border-radius:50%;background:var(--brand-soft);color:var(--brand);font-weight:800;font-size:14px;">${i+1}</div>
-          <div style="min-width:0;">
-            <div style="font-size:11px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.4px;font-weight:600;">${sportEm} ${esc(p.league.slice(0,28))} · ${esc(dateStr)} ${esc(timeStr)}</div>
-            <div style="font-size:14px;font-weight:600;color:var(--text);margin-top:3px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(homeName)} <span style="color:var(--text-dim);">vs</span> ${esc(awayName)}</div>
-            <div style="font-size:12px;color:var(--brand);font-weight:600;margin-top:2px;">→ ${esc(pickLabel)}</div>
+        <div class="montante-step" data-match-id="${esc(String(s.m.id || ''))}" role="button" tabindex="0" aria-label="Étape ${i+1} : ${esc(homeName)} vs ${esc(awayName)}" style="position:relative;display:grid;grid-template-columns:48px 1fr;gap:14px;padding:0;cursor:pointer;">
+          <!-- Timeline number + connector line -->
+          <div style="display:flex;flex-direction:column;align-items:center;padding-top:18px;">
+            <div style="width:40px;height:40px;display:grid;place-items:center;border-radius:50%;background:var(--brand);color:#08080a;font-weight:800;font-size:16px;box-shadow:0 4px 12px rgba(167,139,250,.30);flex-shrink:0;">${i+1}</div>
+            ${!isLast ? '<div style="width:2px;flex:1;background:linear-gradient(180deg, var(--brand) 0%, var(--brand-soft) 100%);margin-top:6px;min-height:24px;"></div>' : ''}
           </div>
-          <div style="text-align:right;">
-            <div style="font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.4px;">Cote</div>
-            <div style="font-size:16px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;">@${p.odd.toFixed(2)}</div>
-          </div>
-          <div style="text-align:right;">
-            <div style="font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.4px;">Conf.</div>
-            <div style="font-size:16px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;">${Math.round(p.rel*100)}%</div>
+          <!-- Step card -->
+          <div style="padding:16px 18px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:${isLast?'0':'12px'};transition:all .18s ease;">
+            <!-- Top : sport + date + heure -->
+            <div style="font-size:11px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.4px;font-weight:600;margin-bottom:6px;">${sportEm} ${esc(s.league.slice(0,32))} · ${esc(dateStr)} ${esc(timeStr)} → ~${esc(endStr)}</div>
+            <!-- Teams -->
+            <div style="font-size:15px;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:4px;">${esc(homeName)} <span style="color:var(--text-dim);font-weight:400;">vs</span> ${esc(awayName)}</div>
+            <!-- Pick -->
+            <div style="font-size:13px;color:var(--brand);font-weight:600;margin-bottom:12px;">→ ${esc(pickLabel)} · Confiance ${Math.round(s.rel*100)}%</div>
+            <!-- Stake → Cote → Payout flow -->
+            <div style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:8px;align-items:center;padding:10px 12px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;">
+              <div style="text-align:center;">
+                <div style="font-size:9.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.3px;">Mise</div>
+                <div style="font-size:15px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;">${s.stake.toFixed(2)}€</div>
+              </div>
+              <div style="color:var(--text-dim2);font-size:14px;">×</div>
+              <div style="text-align:center;">
+                <div style="font-size:9.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.3px;">Cote</div>
+                <div style="font-size:15px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;">@${s.odd.toFixed(2)}</div>
+              </div>
+              <div style="color:var(--text-dim2);font-size:14px;">=</div>
+              <div style="text-align:center;">
+                <div style="font-size:9.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.3px;">${isLast ? 'Gain final' : 'Étape ' + (i+2)}</div>
+                <div style="font-size:15px;font-weight:800;color:${isLast ? 'var(--accent)' : 'var(--brand)'};font-variant-numeric:tabular-nums;">${s.payout.toFixed(2)}€</div>
+              </div>
+            </div>
           </div>
         </div>`;
     }).join('');
@@ -10369,43 +10454,44 @@
     wrap.innerHTML = `
       <div style="max-width:960px;margin:0 auto;padding:0 8px;">
         <div style="margin:24px 0 18px;">
-          <span class="section-eyebrow">Montante</span>
+          <span class="section-eyebrow">Montante séquentielle</span>
           <h1 class="section-title-v2">${titleByType[type]}</h1>
           <p class="section-subtitle-v2">${subByType[type]}</p>
         </div>
 
-        <!-- Carte récap : cote totale + gain potentiel + risk -->
+        <!-- Carte récap : départ → arrivée + risque -->
         <div style="background:linear-gradient(135deg, var(--panel) 0%, var(--panel-2) 100%);border:1px solid var(--border-2);border-radius:var(--r-lg);padding:24px 26px;margin-bottom:18px;position:relative;overflow:hidden;">
           <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle, var(--brand) 0%, transparent 60%);opacity:.10;pointer-events:none;"></div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;align-items:center;">
+          <div style="display:grid;grid-template-columns:1fr auto 1fr 1fr;gap:18px;align-items:center;">
             <div>
-              <div style="font-size:11px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">Cote combinée</div>
-              <div style="font-size:38px;font-weight:800;color:var(--accent);letter-spacing:-.8px;font-variant-numeric:tabular-nums;line-height:1;margin-top:4px;">@${totalOdd.toFixed(2)}</div>
-              <div style="font-size:11.5px;color:var(--text-dim);margin-top:4px;">${picked.length} picks</div>
+              <div style="font-size:11px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">Mise initiale</div>
+              <div style="font-size:32px;font-weight:800;color:var(--text);letter-spacing:-.6px;font-variant-numeric:tabular-nums;line-height:1;margin-top:4px;">${initialStake.toFixed(2)}€</div>
+              <div style="font-size:11px;color:var(--text-dim);margin-top:4px;">Étape 1</div>
+            </div>
+            <div style="font-size:24px;color:var(--brand);">→</div>
+            <div>
+              <div style="font-size:11px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">Gain potentiel final</div>
+              <div style="font-size:32px;font-weight:800;color:var(--accent);letter-spacing:-.6px;font-variant-numeric:tabular-nums;line-height:1;margin-top:4px;">${finalPayout.toFixed(2)}€</div>
+              <div style="font-size:11.5px;color:var(--accent);margin-top:4px;font-weight:600;">+${totalNetGain.toFixed(2)}€ net (×${(finalPayout/initialStake).toFixed(2)})</div>
             </div>
             <div>
-              <div style="font-size:11px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">Pour 10€ misés</div>
-              <div style="font-size:30px;font-weight:800;color:var(--text);letter-spacing:-.6px;font-variant-numeric:tabular-nums;line-height:1;margin-top:4px;">${gain.toFixed(2)}€</div>
-              <div style="font-size:11.5px;color:var(--accent);margin-top:4px;font-weight:600;">+${netGain.toFixed(2)}€ net</div>
-            </div>
-            <div>
-              <div style="font-size:11px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">Probabilité combinée</div>
+              <div style="font-size:11px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">Probabilité de tout réussir</div>
               <div style="font-size:30px;font-weight:800;color:${riskColor};letter-spacing:-.6px;font-variant-numeric:tabular-nums;line-height:1;margin-top:4px;">${(totalProb*100).toFixed(1)}%</div>
               <div style="display:inline-block;font-size:10.5px;color:${riskColor};background:${riskBg};padding:2px 8px;border-radius:999px;margin-top:5px;font-weight:700;">${riskLabel}</div>
             </div>
           </div>
         </div>
 
-        <!-- Disclaimer honnêteté (FORT, sans gris pâle) -->
+        <!-- Disclaimer fort -->
         <div class="sp-callout warn" style="margin:0 0 22px;">
-          <strong>⚠️ Aucune montante n'est garantie.</strong> Plus on combine, plus la variance s'accumule : si <b>un seul</b> pick tombe, l'intégralité de la mise est perdue. Le pourcentage <b>${(totalProb*100).toFixed(1)}%</b> ci-dessus est la probabilité que <b>tous</b> les picks gagnent ensemble. Cette page est un outil pédagogique, pas une recommandation de mise. Mise éducative simulée à 10€ — adapte à ta bankroll. <b>18+ · jouer comporte des risques</b>.
+          <strong>⚠️ Comment fonctionne une montante :</strong> tu mises sur l'étape 1, tu <b>attends le résultat</b>, puis tu remises <b>l'intégralité du gain</b> (mise + bénéfice) sur l'étape 2, et ainsi de suite. Si <b>une seule étape tombe</b>, la chaîne est cassée et tout est perdu. Probabilité de tout réussir = <b>${(totalProb*100).toFixed(1)}%</b>. Aucune garantie. Outil pédagogique, pas une recommandation. <b>18+ · jouer comporte des risques</b>.
         </div>
 
-        <!-- Liste des picks -->
+        <!-- Timeline des étapes -->
         <div style="margin-bottom:24px;">
-          <div style="font-size:12px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:10px;">📋 Picks de la montante</div>
-          <div style="display:flex;flex-direction:column;gap:8px;">
-            ${picksHtml}
+          <div style="font-size:12px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:12px;">📋 Timeline des ${steps.length} étapes</div>
+          <div style="display:flex;flex-direction:column;gap:0;">
+            ${stepsHtml}
           </div>
         </div>
 
@@ -10415,15 +10501,16 @@
           <ul style="margin:6px 0 0;padding-left:22px;">
             <li>Picks confiance ≥ ${Math.round(conf_min*100)}% (modèle multi-sources calibré)</li>
             <li>Cote individuelle ${odd_min.toFixed(2)}–${odd_max.toFixed(2)} (zone Kelly-fertile)</li>
+            <li><b>Séquentialité garantie</b> : chaque match démarre après la fin du précédent + 30min (pour récupérer le gain et reposer)</li>
             <li>Diversification : max 2 picks par sport, max 2 par ligue</li>
-            <li>Sélection : top edge marché × confiance modèle</li>
+            <li>Sélection : top edge marché × confiance modèle dans la fenêtre kickoff</li>
           </ul>
         </div>
       </div>
     `;
 
-    // Wire clicks on picks → ouvrir modal détail
-    wrap.querySelectorAll('.montante-pick[data-match-id]').forEach(el => {
+    // Wire clicks on steps → ouvrir modal détail
+    wrap.querySelectorAll('.montante-step[data-match-id]').forEach(el => {
       el.addEventListener('click', () => {
         const id = el.getAttribute('data-match-id');
         if (!id) return;
@@ -10435,8 +10522,9 @@
         const m = allEvents.find(x => String(x.id) === String(id));
         if (m && typeof openDetail === 'function') openDetail(m);
       });
-      el.addEventListener('mouseover', () => { el.style.borderColor = 'var(--border-3)'; el.style.transform = 'translateY(-2px)'; el.style.boxShadow = 'var(--shadow-sm)'; });
-      el.addEventListener('mouseout', () => { el.style.borderColor = 'var(--border)'; el.style.transform = ''; el.style.boxShadow = ''; });
+      const card = el.querySelector('div[style*="background:var(--panel)"]');
+      el.addEventListener('mouseover', () => { if (card) { card.style.borderColor = 'var(--brand-border)'; card.style.transform = 'translateY(-1px)'; card.style.boxShadow = 'var(--shadow-sm)'; } });
+      el.addEventListener('mouseout', () => { if (card) { card.style.borderColor = 'var(--border)'; card.style.transform = ''; card.style.boxShadow = ''; } });
       el.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el.click(); }
       });
