@@ -2383,7 +2383,13 @@
       //   tennis : {kind:'tennis', bestOf, items:[{...}], caption}
       // Rendu sur le modal match (openDetail) avec un switch par `kind`.
       scores: (() => {
-        if (poi) return poissonTopScores(poi.lamH, poi.lamA, 3);
+        // v31.5 — k=10 (avant 3) pour que le filtre "score le plus probable
+        // CONDITIONNEL au pick" trouve toujours un score cohérent. Ex : pick=1
+        // mais top-3 globaux = [1-1, 0-0, 1-0] → l'affichage pickait 1-1
+        // (incohérent visuellement avec un pick "home win"). Avec k=10 on
+        // descend dans la queue jusqu'à un home-win. Coût mémoire : +7 floats
+        // par match foot, négligeable.
+        if (poi) return poissonTopScores(poi.lamH, poi.lamA, 10);
         if (match.sport === 'hockey') return hockeyScorePrediction(match);
         if (match.sport === 'basketball') return basketScoreProjection(match);
         if (match.sport === 'tennis') {
@@ -8587,7 +8593,21 @@
         : (p.pred.scores && Array.isArray(p.pred.scores.items) && (p.pred.scores.kind === 'exact' || !p.pred.scores.kind))
           ? p.pred.scores.items
           : [];
-      const topScore = predScores[0];
+      // v31.5 — Score prédit COHÉRENT avec le pick (avant : on prenait le mode
+      // global du Poisson, ce qui pouvait afficher "1-1" alors que le pick
+      // était "1 · St. Étienne" — incohérence visuelle confusante).
+      // Logique : si pick=1, on cherche dans predScores le score le plus
+      // probable AVEC home > away. Idem pour X (home === away) et 2 (home < away).
+      // Si aucun score cohérent dans le top-10 (rare), fallback global.
+      const _pickKey = (p.pred.pick && p.pred.pick.key) || '';
+      const _consistent = (s) => {
+        if (!s || typeof s.home !== 'number' || typeof s.away !== 'number') return false;
+        if (_pickKey === '1') return s.home > s.away;
+        if (_pickKey === '2') return s.home < s.away;
+        if (_pickKey === 'X') return s.home === s.away;
+        return true;  // pick non-1N2 (BTTS, O/U, etc.) → on garde le mode global
+      };
+      const topScore = predScores.find(_consistent) || predScores[0];
       // Use home_away tag rather than positional [0]/[1] — ESPN sometimes
       // returns the away team first (frequent on US sports + tennis where
       // there's no real home/away). Mismatched ordering caused "score
