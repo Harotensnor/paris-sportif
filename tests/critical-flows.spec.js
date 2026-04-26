@@ -203,24 +203,8 @@ test.describe('Footer', () => {
   });
 });
 
-test.describe('Mes paris empty state', () => {
-  test('shows 3 actionable CTAs when no tracked bets', async ({ page }) => {
-    await page.goto(URL);
-    // Ensure no tracked bets, then navigate via hash
-    await page.evaluate(() => { localStorage.removeItem('paris_sportif_tracked_bets'); });
-    await page.evaluate(() => { location.hash = '#mesparis'; });
-    await page.waitForFunction(() => localStorage.getItem('currentPage') === 'mesparis', { timeout: 5000 });
-    const wrap = page.locator('#mesparis-wrap');
-    await expect(wrap.locator('button.page-btn[data-page="top"]')).toBeVisible();
-    await expect(wrap.locator('button.page-btn[data-page="locks"]')).toBeVisible();
-    await expect(wrap.locator('button.page-btn[data-page="tous"]')).toBeVisible();
-    // Click "Top Pronos" CTA → navigate
-    await wrap.locator('button.page-btn[data-page="top"]').click();
-    await expect.poll(async () =>
-      await page.evaluate(() => localStorage.getItem('currentPage'))
-    ).toBe('top');
-  });
-});
+// v30 — "Mes paris empty state" test retiré : la page elle-même est partie
+// (Théo n'enregistre pas ses paris sur le site).
 
 test.describe('Help modal', () => {
   test('opens with ? key and lists keyboard shortcuts', async ({ page }) => {
@@ -276,32 +260,9 @@ test.describe('Hash navigation (PWA shortcuts)', () => {
   });
 });
 
-test.describe('Daily P&L chip (with corrupted bet data)', () => {
-  test('renders without NaN/Invalid Date even when bet fields are strings', async ({ page }) => {
-    await page.goto(URL);
-    const todayIso = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
-    await page.evaluate((iso) => {
-      // Inject mix of valid + corrupted bets
-      localStorage.setItem('paris_sportif_tracked_bets', JSON.stringify({
-        b1: { added_at: `${iso}T08:00:00Z`, stake: 'abc', odds: 'xyz', status: 'gagné' },
-        b2: { added_at: `${iso}T10:00:00Z`, stake: 5, odds: 2.0, status: 'gagné' },
-        b3: { added_at: 'bad-date', stake: 3, odds: 1.8, status: 'perdu' },
-      }));
-    }, todayIso);
-    // Force re-render after the corrupted bets are seeded; dashboard is the
-    // default page so we just call applyPageView (no nav change needed).
-    await page.evaluate(() => { if (typeof applyPageView === 'function') applyPageView(); });
-    const dashWrap = page.locator('#dashboard-wrap');
-    const txt = await dashWrap.innerText();
-    expect(txt).not.toMatch(/\bNaN\b/);
-    expect(txt).not.toMatch(/Invalid Date/i);
-    expect(txt).not.toMatch(/undefined/i);
-    // Daily P&L chip should be visible
-    await expect(dashWrap.locator('text=AUJOURD\'HUI').first()).toBeVisible();
-    // Cleanup
-    await page.evaluate(() => localStorage.removeItem('paris_sportif_tracked_bets'));
-  });
-});
+// v30 — "Daily P&L chip" test retiré : le chip lui-même est parti avec
+// les paris trackés. Le dashboard reste sain (test "Boot" couvre déjà
+// le rendu sans erreur console).
 
 test.describe('Notif toggle button', () => {
   test('renders in topbar with appropriate state', async ({ page }) => {
