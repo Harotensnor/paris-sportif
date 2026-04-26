@@ -749,6 +749,31 @@ def main() -> int:
                 key=lambda r: -r['pick_prob']
             )[:10]
         ],
+        # v31.7.27 — Best picks : symétrique à worst_picks. Les 10 paris où
+        # le modèle a gagné le plus (gain unit = (cote-1) car flat 1u). On
+        # publie aussi les succès pour balancer la transparence : si on
+        # publie nos pires erreurs, on doit aussi publier nos plus beaux
+        # coups, sinon on biaise vers le négatif. Critère :
+        # ranking par cote desc parmi les wins (un underdog qui gagne >>
+        # un favori qui gagne). Limite 10.
+        'best_picks': [
+            {
+                'id': r.get('id'),
+                'date': r.get('date'),
+                'name': r.get('name'),
+                'sport': r.get('sport'),
+                'league_code': r.get('league_code'),
+                'pick': r.get('pick'),
+                'pick_prob': round(r['pick_prob'], 3),
+                'cote': r['cote'],
+                'tier': r.get('tier'),
+                'pnl': round(r['cote'] - 1, 2),
+            }
+            for r in sorted(
+                [r for r in rows if r.get('won')],
+                key=lambda r: -r['cote']
+            )[:10]
+        ],
         # On NE publie PAS la liste complète de picks dans le JSON pour éviter
         # que backtest_report_v2.json ne gonfle (déjà 500+ events en archive).
         # Si besoin d'inspection pick-par-pick, relancer avec --limit + print.
