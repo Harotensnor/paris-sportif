@@ -9717,7 +9717,22 @@
           <div style="padding:18px;background:var(--panel);border:1px solid var(--border);border-radius:12px;line-height:1.55;font-size:13.5px;color:var(--text-2);margin-bottom:14px;">
             Le test ultime d'un modèle de probabilité : <b>quand je dis "70% de chance", est-ce que 70% de ces prédictions gagnent vraiment ?</b> Si oui, le modèle est calibré (honnête). Si non, ses pourcentages sont du bruit.
           </div>
-          <div style="padding:18px;background:var(--panel);border:1px solid var(--border);border-radius:12px;">
+          ${(() => {
+            // v31.7.13 — Dropdown granularité bins (5/10/20). Backend prêt
+            // depuis v31.7.10 (calibration_5/10/20 dans backtest_report_v2).
+            const bt = window.__backtestReportV2;
+            if (!bt || !bt.calibration_5 || !bt.calibration_20) return '';
+            return `
+            <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin:0 4px 8px;font-size:12px;">
+              <span style="color:var(--text-dim);">Granularité</span>
+              <select id="cred-bins-select" style="background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:6px;padding:5px 8px;font-size:12px;cursor:pointer;font-family:inherit;">
+                <option value="5">5 bins (gros tableaux)</option>
+                <option value="10" selected>10 bins (défaut)</option>
+                <option value="20">20 bins (fin grain)</option>
+              </select>
+            </div>`;
+          })()}
+          <div id="cred-calibration-svg" style="padding:18px;background:var(--panel);border:1px solid var(--border);border-radius:12px;">
             ${_renderCalibrationSvg()}
           </div>
           <div style="margin-top:10px;font-size:12px;color:var(--text-dim2);line-height:1.5;">
@@ -9736,6 +9751,27 @@
           Code source, pipeline de données et backtest publics. Questions, suggestions : ouvre une issue sur le repo GitHub.
         </section>
       </div>`;
+    // v31.7.13 — Wire dropdown granularité bins.
+    const sel = wrap.querySelector('#cred-bins-select');
+    const svgWrap = wrap.querySelector('#cred-calibration-svg');
+    if (sel && svgWrap) {
+      sel.addEventListener('change', (e) => {
+        const n = e.target.value;
+        const bt = window.__backtestReportV2;
+        if (!bt) return;
+        // Swap window.__modelCalibration.bins on the fly puis re-render
+        const newBins = (n === '5') ? bt.calibration_5
+                      : (n === '20') ? bt.calibration_20
+                      : bt.calibration;
+        if (newBins) {
+          window.__modelCalibration = {
+            bins: newBins,
+            total_n: (bt.overall && bt.overall.n) || 0,
+          };
+          svgWrap.innerHTML = _renderCalibrationSvg();
+        }
+      });
+    }
   }
 
   function renderAcademiePage(wrap) {
