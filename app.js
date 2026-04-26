@@ -3042,6 +3042,110 @@
     return null;
   }
 
+  // v31.7.36 — Post-mortem auto sur les pronos perdus.
+  // Utilité : quand un match est perdu, le modèle explique POURQUOI sa
+  // prédiction n'a pas tenu. Permet à l'utilisateur de comprendre la
+  // variance et d'éviter le biais "le modèle est cassé après 1 défaite".
+  // Aussi utile pour identifier des patterns d'erreur récurrents
+  // (ex : ligues où le modèle se trompe systématiquement).
+  //
+  // Returns { headline, factors[] } ou null si non applicable.
+  function buildLossPostMortem(match, pred) {
+    if (!match?.completed || !pred) return null;
+    const res = evaluateModelPick(match, pred);
+    if (res !== 'lost') return null;
+    const { home, away } = getSides(match);
+    const hs = parseInt(home?.score ?? '', 10);
+    const as = parseInt(away?.score ?? '', 10);
+    if (isNaN(hs) || isNaN(as)) return null;
+
+    const key = pred.pick.key;
+    const factors = [];
+    let headline = '';
+
+    // Score prédit vs réel (foot uniquement)
+    let predHome = null, predAway = null;
+    if (match.sport === 'football' && pred.scores && pred.scores.kind === 'exact'
+        && pred.scores.items && pred.scores.items.length) {
+      const top = pred.scores.items[0];
+      predHome = top.home;
+      predAway = top.away;
+    }
+
+    // Headline contextualisé selon le type de défaite
+    if (key === '1') {
+      // On pariait home, mais home n'a pas gagné
+      if (hs === as) {
+        headline = `Match nul ${hs}-${as} : home a manqué d'efficacité offensive face à une défense plus solide que prévu.`;
+        factors.push({ icon: '🥅', text: `Home a marqué ${hs} but${hs>1?'s':''} (vs ${predHome ?? '?'} prédit), insuffisant pour s'imposer.` });
+      } else if (as > hs) {
+        const margin = as - hs;
+        headline = margin >= 2
+          ? `Défaite nette ${hs}-${as} : l'équipe extérieure a complètement maîtrisé le match.`
+          : `Défaite serrée ${hs}-${as} : home a craqué dans les détails.`;
+        factors.push({ icon: '🥅', text: `Away a marqué ${as} but${as>1?'s':''} (vs ${predAway ?? '?'} prédit) — le bloc offensif away a été sous-estimé.` });
+      }
+    } else if (key === '2') {
+      // On pariait away, mais away n'a pas gagné
+      if (hs === as) {
+        headline = `Match nul ${hs}-${as} : away n'a pas su capitaliser sur ses opportunités à l'extérieur.`;
+        factors.push({ icon: '✈️', text: `Effet de l'extérieur a probablement été sous-estimé — pression du public + voyage.` });
+      } else if (hs > as) {
+        const margin = hs - as;
+        headline = margin >= 2
+          ? `Défaite nette ${hs}-${as} : home a roulé sur le match, away n'a jamais existé.`
+          : `Défaite serrée ${hs}-${as} : home a su exploiter son avantage du terrain.`;
+        factors.push({ icon: '🏠', text: `Home advantage probablement sous-estimé pour cette ligue — à recalibrer.` });
+      }
+    } else if (key === 'X') {
+      // On pariait nul, match a été tranché
+      if (hs > as) {
+        headline = `Pas de nul (${hs}-${as}) : home a fait la différence offensivement.`;
+      } else {
+        headline = `Pas de nul (${hs}-${as}) : away a converti ses occasions.`;
+      }
+      factors.push({ icon: '⚖️', text: `Le pari sur le nul est intrinsèquement risqué (cote moyenne 3.20+) — utilise-le avec parcimonie.` });
+    }
+
+    // Facteurs liés aux signaux qui se sont retournés
+    const reasons = pred.explain?.reasons || [];
+    const topReason = reasons.find(r => r && r.type !== 'market');
+    if (topReason && topReason.text) {
+      factors.push({
+        icon: '🤖',
+        text: `Signal principal cité : "${topReason.text}" — apparemment invalidé par les événements du match.`,
+      });
+    }
+
+    // Si data quality faible, le mentionner comme facteur excusant
+    const dq = (typeof computeDataQuality === 'function') ? computeDataQuality(match) : null;
+    if (dq && dq.score <= 2) {
+      factors.push({
+        icon: '📊',
+        text: `Qualité des données pré-match faible (${dq.score}/${dq.max}) : le modèle a tiré avec moins d'info que d'habitude.`,
+      });
+    }
+
+    // Sport-specific notes
+    if (match.sport === 'football' && predHome != null && predAway != null) {
+      const totGoalsPred = predHome + predAway;
+      const totGoalsReal = hs + as;
+      if (Math.abs(totGoalsReal - totGoalsPred) >= 2) {
+        factors.push({
+          icon: '⚽',
+          text: `Match ${totGoalsReal > totGoalsPred ? 'plus offensif' : 'plus défensif'} que prévu (${totGoalsReal} buts vs ${totGoalsPred} prédits).`,
+        });
+      }
+    }
+
+    return {
+      headline,
+      factors: factors.slice(0, 3),  // max 3 pour ne pas saturer
+      score: { home: hs, away: as },
+      predScore: predHome != null ? { home: predHome, away: predAway } : null,
+    };
+  }
+
   // For tipster picks (free-text labels like "Victoire Marseille", "Match nul",
   // "Match nul ou Manchester United", "X ou 2", etc.)
   function evaluateTipsterPick(label, match) {
@@ -5433,6 +5537,25 @@
               </div>`;
             })()}
             ${pred.explain?.headline ? `<div style="margin-top:10px;padding:12px 14px;background:rgba(255,255,255,.03);border-radius:8px;border-left:3px solid var(--accent,#10b981);font-size:13.5px;line-height:1.5;color:var(--text,#e6ebf2);">${esc(pred.explain.headline)}</div>` : ''}
+            ${(() => {
+              // v31.7.36 — Post-mortem auto pour les pronos perdus.
+              // Affiche pourquoi le modèle s'est trompé pour aider l'user
+              // à comprendre la variance et déclencher des améliorations
+              // futures du modèle (logique apprenante).
+              const pm = (typeof buildLossPostMortem === 'function') ? buildLossPostMortem(match, pred) : null;
+              if (!pm) return '';
+              return `<div style="margin-top:14px;padding:14px 16px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.20);border-left:3px solid var(--danger);border-radius:0 8px 8px 0;font-size:13.5px;line-height:1.6;color:var(--text);">
+                <div style="font-size:11px;color:var(--danger);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:8px;">🔍 Post-mortem — pourquoi le modèle s'est trompé</div>
+                ${pm.headline ? `<div style="font-weight:600;margin-bottom:8px;">${esc(pm.headline)}</div>` : ''}
+                ${pm.factors.length ? `
+                  <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px;">
+                    ${pm.factors.map(f => `<li style="display:flex;gap:10px;font-size:12.5px;line-height:1.45;"><span aria-hidden="true">${f.icon}</span><span style="color:var(--text-dim);">${esc(f.text)}</span></li>`).join('')}
+                  </ul>` : ''}
+                <div style="margin-top:8px;font-size:11px;color:var(--text-dim2);font-style:italic;">
+                  💡 Cette analyse est automatique — le modèle apprend de ses erreurs en intégrant les patterns d'échec dans le backtest hebdomadaire (recalibration ρ Dixon-Coles + ajustement priors par ligue).
+                </div>
+              </div>`;
+            })()}
             ${reasons.length ? `
             <div style="margin-top:12px;">
               <div style="font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-dim2,#7b8693);margin-bottom:8px;">Pourquoi ce pronostic</div>
