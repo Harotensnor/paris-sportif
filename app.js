@@ -9933,254 +9933,14 @@
   // disclosure relation Winamax (=aucune affiliation, aucune rémunération).
   // Page rendue côté client comme les autres mais avec contenu en clair
   // (pas de données dynamiques) → indexable par crawl JS.
-  function renderLegalPage(wrap) {
-    wrap.innerHTML = `
-      <div style="max-width:920px;margin:0 auto;padding:16px 16px 60px;line-height:1.65;color:var(--text);">
-        <div style="margin-bottom:24px;padding:32px 0 20px;border-bottom:1px solid var(--border);position:relative;">
-          <div style="position:absolute;top:0;left:0;width:40px;height:3px;background:var(--brand);border-radius:0 0 2px 2px;"></div>
-          <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Transparence &amp; conformité</div>
-          <h1 style="margin:0 0 6px;font-size:36px;font-weight:800;letter-spacing:-1.2px;line-height:1.05;">⚖️ Légal &amp; confidentialité</h1>
-          <div style="font-size:14px;color:var(--text-dim);max-width:640px;">Qui édite ce site, où sont stockées les données, quelle relation avec Winamax. Tout ce que tu dois savoir pour décider si tu fais confiance.</div>
-        </div>
+  // v31.1 — renderLegalPage retirée (page statique legal.html à la place)
 
-        <section style="margin-top:28px;">
-          <h2 style="font-size:20px;color:var(--text);margin:0 0 12px;">👤 À propos</h2>
-          <div style="padding:18px;background:var(--panel);border:1px solid var(--border);border-radius:12px;font-size:14px;color:var(--text-2);">
-            <p style="margin:0 0 10px;"><strong>Paris-Sportif</strong> est un projet personnel et open-source édité par <strong>Théo Boulnois</strong> (particulier, France). C'est un outil <strong>éducatif et expérimental</strong> destiné à explorer l'efficacité d'un modèle data-driven sur des paris sportifs.</p>
-            <p style="margin:0 0 10px;">Le site n'est <strong>pas</strong> un opérateur de jeu, n'accepte aucun pari, ne traite aucune mise. Il publie des analyses statistiques sur des matchs à venir, sourcées depuis des bases publiques (ESPN, Sofascore, Jeff Sackmann, Football-Data.co.uk, MLB Stats API, NHL API, ClubElo, Open-Meteo, Winamax catalog).</p>
-            <p style="margin:0;">Code source intégralement public et auditable : <a href="https://github.com/Harotensnor/paris-sportif" target="_blank" rel="noopener" style="color:var(--brand);">github.com/Harotensnor/paris-sportif</a>. Toute personne peut vérifier comment le modèle est construit, comment les métriques sont calculées, et comment les pronos sont générés.</p>
-          </div>
-        </section>
-
-        <section style="margin-top:24px;">
-          <h2 style="font-size:20px;color:var(--text);margin:0 0 12px;">📞 Contact &amp; mentions légales</h2>
-          <div style="padding:18px;background:var(--panel);border:1px solid var(--border);border-radius:12px;font-size:13.5px;color:var(--text-2);">
-            <div style="display:grid;grid-template-columns:160px 1fr;gap:6px 14px;">
-              <div style="color:var(--text-dim);">Éditeur</div><div>Théo Boulnois (particulier, France)</div>
-              <div style="color:var(--text-dim);">Statut</div><div>Projet personnel non commercial · pas de société constituée</div>
-              <div style="color:var(--text-dim);">Responsable de publication</div><div>Théo Boulnois</div>
-              <div style="color:var(--text-dim);">Contact</div><div>Issue GitHub : <a href="https://github.com/Harotensnor/paris-sportif/issues" target="_blank" rel="noopener" style="color:var(--brand);">github.com/Harotensnor/paris-sportif/issues</a></div>
-              <div style="color:var(--text-dim);">Hébergeur</div><div>GitHub Pages (GitHub Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA)</div>
-              <div style="color:var(--text-dim);">URL canonique</div><div><code style="font-size:12px;">https://harotensnor.github.io/paris-sportif/</code></div>
-              <div style="color:var(--text-dim);">Public visé</div><div>Adultes (18+), résidence France, à des fins éducatives uniquement</div>
-            </div>
-          </div>
-        </section>
-
-        <section style="margin-top:24px;">
-          <h2 style="font-size:20px;color:var(--text);margin:0 0 12px;">🔒 Politique de confidentialité</h2>
-          <div style="padding:18px;background:var(--panel);border:1px solid var(--border);border-radius:12px;font-size:13.5px;color:var(--text-2);">
-            <h3 style="font-size:15px;margin:0 0 8px;color:var(--text);">Ce qu'on stocke</h3>
-            <p style="margin:0 0 12px;">Le site utilise <strong>uniquement</strong> le <code>localStorage</code> de ton navigateur pour conserver tes préférences (thème, page active, banque par défaut, alertes vues). <strong>Rien n'est envoyé à un serveur tiers.</strong> Pas d'analytics, pas de Google Analytics, pas de Meta Pixel, pas de Tag Manager, pas de Hotjar, pas de cookies tiers.</p>
-
-            <h3 style="font-size:15px;margin:14px 0 8px;color:var(--text);">Ce que GitHub Pages voit (côté hébergeur)</h3>
-            <p style="margin:0 0 12px;">L'hébergeur GitHub Pages enregistre techniquement ton adresse IP et ton User-Agent dans ses logs serveur, à des fins de sécurité (anti-DDoS, anti-abus). Ces logs sont gérés par GitHub Inc. selon leur <a href="https://docs.github.com/site-policy/privacy-policies/github-privacy-statement" target="_blank" rel="noopener" style="color:var(--brand);">privacy statement</a>. Je n'ai aucun accès direct à ces logs.</p>
-
-            <h3 style="font-size:15px;margin:14px 0 8px;color:var(--text);">Ressources externes chargées</h3>
-            <p style="margin:0 0 8px;">La page charge ces ressources tierces (purement présentationnelles) :</p>
-            <ul style="margin:0 0 12px;padding-left:22px;">
-              <li><code>a.espncdn.com</code> — logos d'équipes (sourcés depuis ESPN scoreboard)</li>
-              <li><code>fonts.gstatic.com</code> — Google Fonts (Inter), aucune donnée personnelle envoyée par le chargement de la font selon les <a href="https://developers.google.com/fonts/faq/privacy" target="_blank" rel="noopener" style="color:var(--brand);">FAQ Google Fonts</a></li>
-            </ul>
-            <p style="margin:0 0 12px;">Aucune ressource publicitaire, aucun tracker marketing.</p>
-
-            <h3 style="font-size:15px;margin:14px 0 8px;color:var(--text);">Effacer tes données</h3>
-            <p style="margin:0 0 12px;">Tout est dans ton navigateur. Vide le localStorage du domaine <code>harotensnor.github.io</code> via les DevTools (F12 → Application → Local Storage → clear) ou utilise le bouton <em>Reset complet</em> sur la page Profil. Aucune copie distante n'existe.</p>
-
-            <h3 style="font-size:15px;margin:14px 0 8px;color:var(--text);">Tes droits RGPD</h3>
-            <p style="margin:0;">Comme le site ne collecte aucune donnée personnelle côté serveur, les droits d'accès / rectification / effacement / portabilité s'exercent directement dans ton navigateur (localStorage). Pour toute question : passe par une <a href="https://github.com/Harotensnor/paris-sportif/issues" target="_blank" rel="noopener" style="color:var(--brand);">issue GitHub</a>.</p>
-          </div>
-        </section>
-
-        <section style="margin-top:24px;">
-          <h2 style="font-size:20px;color:var(--text);margin:0 0 12px;">🎰 Relation avec Winamax</h2>
-          <div style="padding:18px;background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.3);border-left:3px solid var(--brand);border-radius:0 12px 12px 0;font-size:13.5px;color:var(--text-2);">
-            <p style="margin:0 0 10px;"><strong>Aucune affiliation. Aucune rémunération. Aucun accord commercial.</strong></p>
-            <p style="margin:0 0 10px;">Le site cite <strong>Winamax</strong> comme bookmaker de référence pour deux raisons concrètes :</p>
-            <ul style="margin:0 0 10px;padding-left:22px;">
-              <li>C'est l'opérateur que j'utilise personnellement (avec licence ANJ valide) — donc c'est la cote que je vois quand je teste mes pronos.</li>
-              <li>Leur catalogue est public, scrapeable, et permet de comparer la cote modèle à un marché réel sans payer un fournisseur d'odds.</li>
-            </ul>
-            <p style="margin:0 0 10px;">Les liens <em>"Voir sur Winamax"</em> sont de simples liens vers la page publique du match. <strong>Pas d'identifiant d'affiliation, pas de tag de tracking, pas de redirection commerciale</strong> — vérifiable dans le code source de cette page (cherche <code>winamax.fr</code>).</p>
-            <p style="margin:0;">Si à l'avenir une relation commerciale était mise en place, ce serait <strong>déclaré explicitement ici et à côté de chaque lien</strong>, avant toute mise en production. Cet engagement est pris en clair pour qu'il puisse être contesté si non respecté.</p>
-          </div>
-        </section>
-
-        <section style="margin-top:24px;">
-          <h2 style="font-size:20px;color:var(--text);margin:0 0 12px;">⚠️ Avertissement jeu responsable</h2>
-          <div style="padding:18px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.3);border-left:3px solid #f87171;border-radius:0 12px 12px 0;font-size:13.5px;color:var(--text-2);">
-            <p style="margin:0 0 10px;"><strong>Le site n'est pas un conseil financier.</strong> Le modèle vise ~60% de réussite sur le long terme (mesuré sur backtest), mais 3 à 5 défaites consécutives sont normales et n'indiquent pas un dysfonctionnement.</p>
-            <p style="margin:0 0 10px;"><strong>Réservé aux 18+.</strong> Les paris sportifs créent un risque réel d'isolement, d'endettement et de dépendance. La place du hasard est irréductible.</p>
-            <p style="margin:0;">📞 Joueurs Info Service : <a href="tel:0974751313" style="color:var(--brand);">09 74 75 13 13</a> (appel non surtaxé) · <a href="https://www.anj.fr/" target="_blank" rel="noopener" style="color:var(--brand);">anj.fr</a> · <a href="https://www.joueurs-info-service.fr/" target="_blank" rel="noopener" style="color:var(--brand);">joueurs-info-service.fr</a></p>
-          </div>
-        </section>
-
-        <section style="margin-top:24px;">
-          <h2 style="font-size:20px;color:var(--text);margin:0 0 12px;">📜 Journal des changements</h2>
-          <div style="padding:18px;background:var(--panel);border:1px solid var(--border);border-radius:12px;font-size:13px;color:var(--text-2);">
-            <p style="margin:0 0 8px;color:var(--text-dim);">Ce site est versionné dans Git. L'historique complet (commit + diff) est public sur GitHub.</p>
-            <p style="margin:0 0 8px;"><strong>v31 (2026-04-26)</strong> — Audit ChatGPT : page Légal + Méthodologie formelle ajoutées, JSON-LD Organization enrichi, disclosure Winamax explicite.</p>
-            <p style="margin:0 0 8px;"><strong>v30 (2026-04-25)</strong> — Suppression de la page "Mes paris" (manuel + import Winamax). Intégration sources externes (Sackmann tennis Elo+H2H+L10, Football-Data closing, MLB pitchers, NHL API). Fix alignement Winamax 1n2 (65 events corrigés).</p>
-            <p style="margin:0;"><strong>v29 et avant</strong> — Voir <a href="https://github.com/Harotensnor/paris-sportif/commits/main" target="_blank" rel="noopener" style="color:var(--brand);">historique Git complet</a>.</p>
-          </div>
-        </section>
-
-        <div style="margin-top:32px;padding:14px 16px;background:var(--panel-2);border:1px dashed var(--border-2);border-radius:8px;font-size:12.5px;color:var(--text-dim);text-align:center;">
-          Cette page est volontairement statique et indexable. Aucun JS dynamique, aucune ressource lourde — pour qu'un crawler puisse la lire et qu'un visiteur sceptique puisse vérifier en 30 secondes.
-        </div>
-      </div>
-    `;
-    // Wire footer-style data-page-link buttons defined inline
-    wrap.querySelectorAll('button[data-page-link]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const target = document.querySelector(`.page-btn[data-page="${btn.dataset.pageLink}"]`);
-        if (target) target.click();
-      });
-    });
-  }
 
   // ======= v31 — Page Méthodologie formelle =======
   // Dictionnaire des métriques + protocole de backtest + sources de données
   // + section biais et limites. Réponse à l'audit ChatGPT 2026-04-26.
-  function renderMethodologiePage(wrap) {
-    wrap.innerHTML = `
-      <div style="max-width:920px;margin:0 auto;padding:16px 16px 60px;line-height:1.65;color:var(--text);">
-        <div style="margin-bottom:24px;padding:32px 0 20px;border-bottom:1px solid var(--border);position:relative;">
-          <div style="position:absolute;top:0;left:0;width:40px;height:3px;background:var(--accent);border-radius:0 0 2px 2px;"></div>
-          <div style="font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Protocole &amp; définitions</div>
-          <h1 style="margin:0 0 6px;font-size:36px;font-weight:800;letter-spacing:-1.2px;line-height:1.05;">📐 Méthodologie</h1>
-          <div style="font-size:14px;color:var(--text-dim);max-width:640px;">Tout ce qu'il faut pour reproduire ou auditer la promesse data-driven du site. Pas de boîte noire.</div>
-        </div>
+  // v31.1 — renderMethodologiePage retirée (page statique methodologie.html à la place)
 
-        <nav style="display:flex;gap:6px;flex-wrap:wrap;margin:0 0 22px;font-size:12px;">
-          <a href="#methode-sources" style="padding:6px 12px;background:var(--panel);border:1px solid var(--border);border-radius:6px;color:var(--text);text-decoration:none;">📚 Sources</a>
-          <a href="#methode-pipeline" style="padding:6px 12px;background:var(--panel);border:1px solid var(--border);border-radius:6px;color:var(--text);text-decoration:none;">⚙️ Pipeline</a>
-          <a href="#methode-metriques" style="padding:6px 12px;background:var(--panel);border:1px solid var(--border);border-radius:6px;color:var(--text);text-decoration:none;">📏 Dictionnaire des métriques</a>
-          <a href="#methode-backtest" style="padding:6px 12px;background:var(--panel);border:1px solid var(--border);border-radius:6px;color:var(--text);text-decoration:none;">🔬 Protocole backtest</a>
-          <a href="#methode-biais" style="padding:6px 12px;background:var(--panel);border:1px solid var(--border);border-radius:6px;color:var(--text);text-decoration:none;">⚠️ Biais &amp; limites</a>
-        </nav>
-
-        <section id="methode-sources" style="margin-top:24px;scroll-margin-top:80px;">
-          <h2 style="font-size:20px;color:var(--text);margin:0 0 12px;">📚 Sources de données</h2>
-          <div style="padding:18px;background:var(--panel);border:1px solid var(--border);border-radius:12px;font-size:13.5px;color:var(--text-2);">
-            <p style="margin:0 0 12px;color:var(--text-dim);">Toutes les sources ci-dessous sont publiques. Le code des fetchers est dans <code>scripts/fetch_*.py</code> sur le repo.</p>
-            <table style="width:100%;font-size:12.5px;border-collapse:collapse;">
-              <thead><tr style="border-bottom:1px solid var(--border);text-align:left;color:var(--text-dim);font-weight:700;text-transform:uppercase;font-size:10.5px;letter-spacing:.5px;">
-                <th style="padding:6px 8px;">Source</th><th style="padding:6px 8px;">Sport(s)</th><th style="padding:6px 8px;">Apport</th><th style="padding:6px 8px;">Cadence</th>
-              </tr></thead>
-              <tbody style="font-size:12.5px;">
-                <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;"><b>ESPN</b> (scoreboard + core API)</td><td style="padding:8px;">Tous</td><td style="padding:8px;">Calendrier, scores live, cotes ML, classements, blessures US</td><td style="padding:8px;">5 min</td></tr>
-                <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;"><b>Sofascore</b></td><td style="padding:8px;">Foot top-5</td><td style="padding:8px;">Compositions, blessures, arbitres</td><td style="padding:8px;">2 h</td></tr>
-                <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;"><b>Winamax catalog</b></td><td style="padding:8px;">Tous</td><td style="padding:8px;">Cotes 1N2 (publiques, sans login)</td><td style="padding:8px;">5 min</td></tr>
-                <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;"><b>ClubElo</b></td><td style="padding:8px;">Foot</td><td style="padding:8px;">Elo des clubs (sur ~30 ans d'historique)</td><td style="padding:8px;">20 h</td></tr>
-                <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;"><b>Jeff Sackmann</b> (tennis_atp / tennis_wta)</td><td style="padding:8px;">Tennis</td><td style="padding:8px;">Elo + Elo surface + L10 + fatigue + H2H</td><td style="padding:8px;">24 h</td></tr>
-                <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;"><b>Football-Data.co.uk</b></td><td style="padding:8px;">Foot 14 ligues</td><td style="padding:8px;">Closing odds + calibration ligue (BTTS, +2.5, avg goals)</td><td style="padding:8px;">6 h</td></tr>
-                <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;"><b>MLB Stats API</b></td><td style="padding:8px;">Baseball</td><td style="padding:8px;">Pitcher partant probable + ERA/WHIP/K9/BB9</td><td style="padding:8px;">15 min</td></tr>
-                <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;"><b>NHL API</b></td><td style="padding:8px;">Hockey</td><td style="padding:8px;">Pace (GF/GA), goalie SV%, splits home/road</td><td style="padding:8px;">15 min</td></tr>
-                <tr><td style="padding:8px;"><b>Open-Meteo</b></td><td style="padding:8px;">Foot</td><td style="padding:8px;">Météo prévue au coup d'envoi (température, pluie, vent)</td><td style="padding:8px;">30 min</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <section id="methode-pipeline" style="margin-top:24px;scroll-margin-top:80px;">
-          <h2 style="font-size:20px;color:var(--text);margin:0 0 12px;">⚙️ Pipeline</h2>
-          <div style="padding:18px;background:var(--panel);border:1px solid var(--border);border-radius:12px;font-size:13.5px;color:var(--text-2);">
-            <p style="margin:0 0 10px;">Toutes les 5 minutes (jour) / 30 minutes (nuit), GitHub Actions enchaîne :</p>
-            <ol style="margin:0 0 10px;padding-left:22px;">
-              <li><strong>Fetchers</strong> (<code>scripts/fetch_*.py</code>) : interrogent les sources et produisent des sidecars JSON par domaine.</li>
-              <li><strong>Patchers</strong> (<code>scripts/patch_*.py</code>) : injectent les sidecars dans <code>data.js</code> (le JSON principal).</li>
-              <li><strong>Snapshot des cotes pré-match</strong> (<code>snapshot_odds.py</code>) : fige la cote courante dans <code>odds_history.jsonl</code> avant kickoff. Sans ce snapshot, on ne peut pas calculer le CLV après coup.</li>
-              <li><strong>Archive des résultats</strong> (<code>snapshot_results.py</code>) : append-only dans <code>results_archive.jsonl</code>. Permet une fenêtre de backtest qui ne se rétrécit pas avec le rolling de <code>data.js</code>.</li>
-              <li><strong>Build health snapshot</strong> + <strong>finalize inline</strong> + commit + push.</li>
-            </ol>
-            <p style="margin:0;color:var(--text-dim);">Le workflow complet est dans <a href="https://github.com/Harotensnor/paris-sportif/blob/main/.github/workflows/refresh.yml" target="_blank" rel="noopener" style="color:var(--brand);">.github/workflows/refresh.yml</a>.</p>
-          </div>
-        </section>
-
-        <section id="methode-metriques" style="margin-top:24px;scroll-margin-top:80px;">
-          <h2 style="font-size:20px;color:var(--text);margin:0 0 12px;">📏 Dictionnaire des métriques</h2>
-          <div style="padding:18px;background:var(--panel);border:1px solid var(--border);border-radius:12px;font-size:13.5px;color:var(--text-2);">
-            <dl style="margin:0;display:grid;grid-template-columns:1fr;gap:14px;">
-              <div>
-                <dt style="font-weight:700;color:var(--text);">WR (taux de réussite)</dt>
-                <dd style="margin:4px 0 0;color:var(--text-dim);">Nombre de picks gagnés ÷ nombre total de picks réglés. Pure base, ignore la cote. Un WR 60% sans cote moyenne ne dit rien sur la rentabilité.</dd>
-              </div>
-              <div>
-                <dt style="font-weight:700;color:var(--text);">ROI flat (mise plate)</dt>
-                <dd style="margin:4px 0 0;color:var(--text-dim);"><code>(somme_retours − somme_mises) ÷ somme_mises × 100</code>. Mise constante 1 unité par pick. Mesure brute de la rentabilité indépendante du staking.</dd>
-              </div>
-              <div>
-                <dt style="font-weight:700;color:var(--text);">Edge (avantage marché)</dt>
-                <dd style="margin:4px 0 0;color:var(--text-dim);"><code>p_modèle − (1 ÷ cote)</code>. Si modèle dit 60% et cote = 1.80 (implicite 55.6%), edge = +4.4 pts. Positif = on a un avantage théorique sur le marché.</dd>
-              </div>
-              <div>
-                <dt style="font-weight:700;color:var(--text);">Kelly fractionnaire</dt>
-                <dd style="margin:4px 0 0;color:var(--text-dim);"><code>f* = (b·p − q) ÷ b</code> où b = cote − 1, p = prob modèle, q = 1 − p. On applique <strong>0.25× Kelly cap 10% bankroll</strong> par défaut : croissance à long terme avec variance contenue. Le Kelly plein est correct mathématiquement mais brûle les bankrolls réelles à cause du modèle imparfait.</dd>
-              </div>
-              <div>
-                <dt style="font-weight:700;color:var(--text);">Brier score</dt>
-                <dd style="margin:4px 0 0;color:var(--text-dim);"><code>Σ (p_modèle − résultat)² ÷ N</code>. Mesure l'erreur de prédiction probabiliste. <strong>0 = parfait, 0.25 = pile/face.</strong> Un Brier &lt; 0.22 sur ≥150 picks indique un signal réel.</dd>
-              </div>
-              <div>
-                <dt style="font-weight:700;color:var(--text);">Calibration</dt>
-                <dd style="margin:4px 0 0;color:var(--text-dim);">Quand le modèle dit "70% de chance", est-ce que 70% de ces prédictions gagnent vraiment ? On bin par tranche de 10pp et on compare prob_moyenne vs win_rate observé. Gap &lt; 5pp partout = bien calibré.</dd>
-              </div>
-              <div>
-                <dt style="font-weight:700;color:var(--text);">CLV (Closing Line Value)</dt>
-                <dd style="margin:4px 0 0;color:var(--text-dim);">Cote prise au moment du pick comparée à la cote juste avant kickoff. <strong>+CLV moyen sur ≥50 paris = preuve qu'on bat le marché</strong>, indépendamment du résultat short-term. C'est le signal que les bookmakers utilisent pour identifier les "smart money".</dd>
-              </div>
-              <div>
-                <dt style="font-weight:700;color:var(--text);">Tier de fiabilité</dt>
-                <dd style="margin:4px 0 0;color:var(--text-dim);">
-                  <ul style="margin:6px 0 0;padding-left:22px;">
-                    <li><strong>lock</strong> : prob ≥ 72% + ≥3 composants non-marché concordants</li>
-                    <li><strong>standard</strong> : prob ≥ 55% avec couverture data minimale</li>
-                    <li><strong>lowconf</strong> : prob ≥ 50% mais data thin</li>
-                    <li><strong>skip</strong> : prob &lt; 50% ou inversion modèle / marché</li>
-                  </ul>
-                </dd>
-              </div>
-            </dl>
-          </div>
-        </section>
-
-        <section id="methode-backtest" style="margin-top:24px;scroll-margin-top:80px;">
-          <h2 style="font-size:20px;color:var(--text);margin:0 0 12px;">🔬 Protocole de backtest</h2>
-          <div style="padding:18px;background:var(--panel);border:1px solid var(--border);border-radius:12px;font-size:13.5px;color:var(--text-2);">
-            <ul style="margin:0;padding-left:22px;">
-              <li><strong>Univers</strong> : tous les matchs réglés dans <code>data.js</code> (fenêtre rolling 13 jours) + <code>results_archive.jsonl</code> (append-only depuis le déploiement de l'archive).</li>
-              <li><strong>Capture cote</strong> : la cote prise en compte est celle figée par <code>snapshot_odds.py</code> dans <code>odds_history.jsonl</code> au plus proche du coup d'envoi (typiquement 5-15 min avant). Pas de cote post-match, pas de cote "early".</li>
-              <li><strong>Modèle évalué</strong> : la vraie fonction <code>predictMatch()</code> embarquée dans <code>pronostics.html</code>, exécutée en Python via <code>scripts/model_loader.py</code> (V8 embarqué) — pas une réimplémentation simplifiée.</li>
-              <li><strong>Filtrage</strong> : on évalue tous les picks que le modèle aurait surfacés (lock + standard + lowconf), pas une sélection rétroactive. Les "skip" sont aussi tracés mais hors-ROI (ils représentent ce que le modèle <em>refuse</em> de jouer).</li>
-              <li><strong>Paris annulés</strong> : exclus du calcul de WR et de ROI. Comptés séparément dans les métadonnées.</li>
-              <li><strong>Staking évalué</strong> : Kelly 0.25× cap 10% bankroll, démarrage 100 unités. ROI flat 1u/pick reporté en parallèle pour comparaison.</li>
-              <li><strong>Cron</strong> : <code>backtest.yml</code> rejoue tout chaque dimanche, écrit <code>backtest_report_v2.{json,md}</code> à la racine.</li>
-              <li><strong>Reproductibilité</strong> : tout est public. Tu peux <code>git clone</code> et relancer <code>python scripts/backtest_v2.py</code> sur ta machine. Les sorties <code>.json</code> + <code>.md</code> sont dans le repo, comparables historiquement.</li>
-            </ul>
-          </div>
-        </section>
-
-        <section id="methode-biais" style="margin-top:24px;scroll-margin-top:80px;">
-          <h2 style="font-size:20px;color:var(--text);margin:0 0 12px;">⚠️ Biais &amp; limites</h2>
-          <div style="padding:18px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.3);border-left:3px solid #f87171;border-radius:0 12px 12px 0;font-size:13.5px;color:var(--text-2);">
-            <ul style="margin:0;padding-left:22px;">
-              <li><strong>Faible n par segment</strong> : les ROI par sport / par ligue sur quelques semaines peuvent être pure variance. Il faut typiquement <strong>≥150 paris</strong> dans une catégorie pour qu'un ROI ait du sens. Avant ça, c'est du bruit.</li>
-              <li><strong>Look-ahead bias possible</strong> : le modèle utilise des features (forme L5, classements, blessures) qui sont scrapées à un moment donné. Si une ligne d'historique scrape les blessures de "maintenant" pour évaluer un match passé, on a un look-ahead. Mitigation : les snapshots sont datés, mais 100% de l'historique pré-snapshot est imparfait.</li>
-              <li><strong>Survivorship bias léger</strong> : seuls les events que ESPN+Sofascore couvrent sont inclus. Les ligues sous-couvertes (Asie, Amérique du Sud) ont moins de signaux disponibles donc des picks plus volatiles. Ne pas extrapoler la perf moyenne aux sous-segments mal couverts.</li>
-              <li><strong>Variance court terme</strong> : un WR cible 60% sur le long terme reste compatible avec des séries de 4-5 défaites consécutives. <strong>3-5 pertes d'affilée sont normales</strong>, ne pas casser son Kelly après une bad run. Le hasard reste irréductible.</li>
-              <li><strong>Modèle calibré sur le passé</strong> : les paramètres (poids des composants, seuils des tiers) ont été tunés sur l'historique. Une rupture structurelle (changement de règle, nouveau format) peut dégrader la perf jusqu'à recalibrage. Le journal des changements modèle est dans le commit log.</li>
-              <li><strong>Pas de garantie</strong> : "Les performances passées ne garantissent pas les performances futures." Phrase légale mais aussi vraie. Ce site est un outil d'aide à la décision, pas une promesse de gains.</li>
-            </ul>
-          </div>
-        </section>
-
-        <div style="margin-top:32px;padding:14px 16px;background:var(--panel-2);border:1px dashed var(--border-2);border-radius:8px;font-size:12.5px;color:var(--text-dim);text-align:center;">
-          Une question, une remarque méthodologique, un biais que je n'ai pas vu ? Ouvre une <a href="https://github.com/Harotensnor/paris-sportif/issues" target="_blank" rel="noopener" style="color:var(--brand);">issue GitHub</a>. La transparence c'est aussi accepter d'être contredit.
-        </div>
-      </div>
-    `;
-  }
 
   function todayIsoName() {
     try { return new Date().toISOString().slice(0,10); } catch (e) { return 'export'; }
@@ -10645,27 +10405,19 @@
     profilWrap.style.display = isProfil ? '' : 'none';
     if (isProfil) renderProfilPage(profilWrap);
 
-    // v31 — Page Légal / Confidentialité / À propos
-    const isLegal = currentPage === 'legal';
-    let legalWrap = document.getElementById('legal-wrap');
-    if (!legalWrap) {
-      legalWrap = document.createElement('div');
-      legalWrap.id = 'legal-wrap';
-      (document.querySelector('main') || document.body).appendChild(legalWrap);
+    // v31.1 — Hash routes #legal et #methodologie redirigent vers les pages
+    // statiques HTML (legal.html / methodologie.html). Économie : ~26 KB
+    // de JS (renderLegalPage + renderMethodologiePage supprimés). Le contenu
+    // vit maintenant dans UN SEUL endroit (le fichier statique), pas
+    // dupliqué entre SPA et HTML statique.
+    if (currentPage === 'legal') {
+      window.location.replace('legal.html');
+      return;
     }
-    legalWrap.style.display = isLegal ? '' : 'none';
-    if (isLegal) renderLegalPage(legalWrap);
-
-    // v31 — Page Méthodologie formelle (dictionnaire + protocole + biais)
-    const isMethodologie = currentPage === 'methodologie';
-    let methodoWrap = document.getElementById('methodologie-wrap');
-    if (!methodoWrap) {
-      methodoWrap = document.createElement('div');
-      methodoWrap.id = 'methodologie-wrap';
-      (document.querySelector('main') || document.body).appendChild(methodoWrap);
+    if (currentPage === 'methodologie') {
+      window.location.replace('methodologie.html');
+      return;
     }
-    methodoWrap.style.display = isMethodologie ? '' : 'none';
-    if (isMethodologie) renderMethodologiePage(methodoWrap);
 
     // v29 — Tous les pronos du jour (fini / pas fini tabs)
     let tousWrap = document.getElementById('tous-wrap');

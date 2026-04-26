@@ -97,6 +97,19 @@
 <!-- Chantier S — PWA -->
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="alternate" type="application/rss+xml" href="feed.xml" title="Paris-Sportif — Top picks du jour (RSS)">
+<!-- v31.1 — Preload hints. Dit au browser "ces fichiers sont critiques, fetch-les en parallèle
+     avec le HTML parse". Le browser commence le download dès la lecture du <head>, sans attendre
+     que les <link>/<script> arrivent dans le body. Gain mesurable sur LCP / FCP. -->
+<link rel="preload" href="app.css" as="style">
+<link rel="preload" href="app.js" as="script">
+<link rel="preload" href="data.js" as="script">
+<link rel="preload" href="data_today.json" as="fetch" type="application/json" crossorigin="anonymous">
+<!-- v31.1 — DNS-prefetch pour les CDN tiers utilisés sur la page (logos ESPN). -->
+<link rel="dns-prefetch" href="//a.espncdn.com">
+<link rel="dns-prefetch" href="//a1.espncdn.com">
+<link rel="dns-prefetch" href="//a2.espncdn.com">
+<link rel="dns-prefetch" href="//a3.espncdn.com">
+<link rel="dns-prefetch" href="//a4.espncdn.com">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Pronostics">
