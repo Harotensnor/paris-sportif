@@ -2803,3 +2803,305 @@
     }
     html { scroll-behavior: auto !important; }
   }
+
+  /* =========================================================================
+     v31.6 — VISUAL POLISH (audit visuel 2026-04-26)
+     -------------------------------------------------------------------------
+     Améliorations globales qui ripple sur toutes les pages :
+       - Cards (match/summary/panel) : subtle gradient overlay + lift hover
+       - Tables (bilan/historique) : padding +50%, alternation subtile
+       - Empty states : classe `.empty-state` réutilisable
+       - Section headers : eyebrow pattern (label uppercase + titre)
+       - CTA buttons : glow primary, fill secondary on hover
+       - Badges : palette enrichie (success/warn/danger/info)
+       - Focus visible : ring uniforme partout
+     ========================================================================= */
+
+  /* --- Match cards : gradient overlay subtil + hover plus prononcé --- */
+  .match {
+    /* Override : transition plus lente et plus riche */
+    transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease, background .18s ease;
+  }
+  .match::after {
+    /* Glow gradient subtil au hover, dirigé depuis le coin haut-gauche */
+    content: ''; position: absolute; inset: 0; border-radius: inherit;
+    background: linear-gradient(135deg, rgba(167,139,250,.06) 0%, transparent 40%);
+    opacity: 0; transition: opacity .25s ease;
+    pointer-events: none;
+  }
+  .match:hover::after { opacity: 1; }
+  .match:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+    border-color: var(--border-3);
+  }
+  .match:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+  }
+
+  /* --- Summary cards : barre latérale épaisse avec gradient --- */
+  .summary-card::before {
+    width: 3px;
+    background: linear-gradient(180deg, var(--border) 0%, var(--border-2) 100%);
+  }
+  .summary-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+  }
+  .summary-card.primary::before {
+    background: linear-gradient(180deg, var(--accent) 0%, var(--accent-2) 100%);
+  }
+  .summary-card.warn::before {
+    background: linear-gradient(180deg, var(--warn) 0%, #f59e0b 100%);
+  }
+  .summary-card.info::before {
+    background: linear-gradient(180deg, var(--info) 0%, #3b82f6 100%);
+  }
+  .summary-card.danger::before {
+    background: linear-gradient(180deg, var(--danger) 0%, #ef4444 100%);
+  }
+  .summary-card.brand::before {
+    background: linear-gradient(180deg, var(--brand) 0%, var(--brand-2) 100%);
+  }
+  .summary-card.brand .val { color: var(--brand); }
+
+  /* --- Tables : padding aéré + alternation + sticky head --- */
+  .bilan-table {
+    border-collapse: separate; border-spacing: 0;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    overflow: hidden;
+  }
+  .bilan-table th {
+    padding: 12px 14px;
+    background: var(--panel-2);
+    border-bottom: 1px solid var(--border-2);
+  }
+  .bilan-table td {
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .bilan-table tbody tr:nth-child(even) td { background: rgba(255,255,255,.015); }
+  .bilan-table tbody tr:hover td { background: var(--brand-soft); transition: background .12s ease; }
+  .bilan-table tbody tr:last-child td { border-bottom: none; }
+  html[data-theme="light"] .bilan-table tbody tr:nth-child(even) td { background: rgba(0,0,0,.012); }
+
+  /* --- Empty state réutilisable (avant : 50× styles inline) --- */
+  .empty-state {
+    padding: 40px 24px; text-align: center;
+    background: var(--panel);
+    border: 1px dashed var(--border-2);
+    border-radius: var(--r);
+    color: var(--text-dim);
+  }
+  .empty-state .es-icon {
+    font-size: 44px; margin-bottom: 10px; opacity: .55;
+    line-height: 1; display: block;
+  }
+  .empty-state .es-title {
+    font-size: 16px; font-weight: 700; color: var(--text);
+    margin: 0 0 6px; letter-spacing: -.2px;
+  }
+  .empty-state .es-body {
+    font-size: 13.5px; color: var(--text-dim);
+    margin: 0 auto; max-width: 420px; line-height: 1.55;
+  }
+  .empty-state .es-cta {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 16px; padding: 10px 18px;
+    background: var(--brand); color: #08080a;
+    border: none; border-radius: var(--r-sm);
+    font-weight: 700; font-size: 13.5px; cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 2px 12px rgba(167,139,250,.25);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .empty-state .es-cta:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(167,139,250,.35);
+  }
+  /* Override de .bilan-empty pour utiliser le nouveau look */
+  .bilan-empty {
+    padding: 40px 24px;
+    background: var(--panel);
+    border: 1px dashed var(--border-2);
+    border-radius: var(--r);
+  }
+
+  /* --- Section header : eyebrow + titre + action --- */
+  .section-eyebrow {
+    display: inline-block;
+    font-size: 11px; text-transform: uppercase; letter-spacing: .12em;
+    color: var(--brand); font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .section-title-v2 {
+    font-size: 22px; font-weight: 700; letter-spacing: -.4px;
+    color: var(--text); margin: 0 0 6px;
+    line-height: 1.2;
+  }
+  .section-subtitle-v2 {
+    font-size: 13.5px; color: var(--text-dim);
+    margin: 0; line-height: 1.5;
+  }
+
+  /* --- CTA primary glow --- */
+  .cta-primary,
+  button.cta-primary,
+  a.cta-primary {
+    position: relative;
+    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-2) 100%);
+    color: #08080a; border: none;
+    padding: 11px 22px; border-radius: var(--r-sm);
+    font-weight: 700; font-size: 13.5px; cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(139,92,246,.35),
+                inset 0 1px 0 rgba(255,255,255,.18);
+    transition: transform .18s ease, box-shadow .18s ease;
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    min-height: 44px;
+  }
+  .cta-primary:hover,
+  button.cta-primary:hover,
+  a.cta-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(139,92,246,.45),
+                inset 0 1px 0 rgba(255,255,255,.22);
+  }
+  .cta-primary:active { transform: translateY(0); }
+
+  /* --- Secondary CTA : remplit au hover --- */
+  .cta-secondary {
+    background: transparent; color: var(--text);
+    border: 1px solid var(--border-2);
+    padding: 11px 20px; border-radius: var(--r-sm);
+    font-weight: 600; font-size: 13.5px; cursor: pointer;
+    text-decoration: none;
+    transition: all .18s ease;
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    min-height: 44px;
+  }
+  .cta-secondary:hover {
+    background: var(--panel-2);
+    border-color: var(--brand-border);
+    color: var(--brand);
+  }
+
+  /* --- Badges palette (réutilisable partout) --- */
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 999px;
+    font-size: 11px; font-weight: 700; letter-spacing: .2px;
+    line-height: 1.4;
+  }
+  .badge-success { background: var(--accent-soft); color: var(--accent); border: 1px solid rgba(52,211,153,.22); }
+  .badge-warn    { background: var(--warn-soft);   color: var(--warn);   border: 1px solid rgba(251,191,36,.22); }
+  .badge-danger  { background: var(--danger-soft); color: var(--danger); border: 1px solid rgba(248,113,113,.22); }
+  .badge-info    { background: var(--info-soft);   color: var(--info);   border: 1px solid rgba(96,165,250,.22); }
+  .badge-brand   { background: var(--brand-soft);  color: var(--brand);  border: 1px solid var(--brand-border); }
+  .badge-muted   { background: var(--panel-2);     color: var(--text-dim);border: 1px solid var(--border); }
+
+  /* --- Focus visible : ring uniforme sur tous les interactifs --- */
+  :focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  button:focus-visible,
+  a:focus-visible,
+  [role="button"]:focus-visible {
+    outline-offset: 3px;
+  }
+
+  /* --- Améliorations top-pick card (s'il existe encore) --- */
+  .top-pick {
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  }
+  .top-pick:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+  }
+
+  /* --- Améliorations ed-hero (déjà existant, on polit le hover + le ring) --- */
+  .ed-hero {
+    box-shadow: 0 1px 0 rgba(255,255,255,.03) inset, var(--shadow-sm);
+    transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+  }
+  .ed-hero:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 1px 0 rgba(255,255,255,.04) inset, var(--shadow);
+  }
+  .ed-hero__pill {
+    background: linear-gradient(135deg, rgba(52,211,153,.18) 0%, rgba(52,211,153,.08) 100%);
+    border: 1px solid rgba(52,211,153,.28);
+  }
+
+  /* --- Filter chips : effet subtil au hover, glow quand actif --- */
+  .filter-btn {
+    transition: all .15s ease;
+  }
+  .filter-btn:hover {
+    transform: translateY(-1px);
+  }
+  .filter-btn.active {
+    box-shadow: 0 2px 8px rgba(167,139,250,.20);
+  }
+
+  /* --- Sidebar items : subtle indent + brand bar quand actif --- */
+  @media (min-width: 1100px) {
+    nav.topbar-nav .hub-menu .page-btn {
+      position: relative;
+    }
+    nav.topbar-nav .hub-menu .page-btn::before {
+      content: ''; position: absolute; left: 0; top: 8px; bottom: 8px;
+      width: 3px; background: transparent;
+      border-radius: 0 3px 3px 0;
+      transition: background .15s ease;
+    }
+    nav.topbar-nav .hub-menu .page-btn.active::before {
+      background: var(--brand);
+    }
+    nav.topbar-nav .hub-menu .page-btn.active {
+      padding-left: 18px;
+    }
+  }
+
+  /* --- Topbar : glow subtil sous le header --- */
+  header.topbar {
+    box-shadow: 0 1px 0 rgba(255,255,255,.02) inset,
+                0 1px 12px rgba(0,0,0,.18);
+  }
+
+  /* --- Scrollbars custom (Firefox + Webkit) --- */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--panel-3) transparent;
+  }
+  *::-webkit-scrollbar { width: 10px; height: 10px; }
+  *::-webkit-scrollbar-track { background: transparent; }
+  *::-webkit-scrollbar-thumb {
+    background: var(--panel-3);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  *::-webkit-scrollbar-thumb:hover { background: var(--panel-4); background-clip: padding-box; }
+
+  /* --- Body subtle background grid (depth) --- */
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background:
+      radial-gradient(800px 400px at 85% -5%, rgba(167,139,250,.05), transparent 60%),
+      radial-gradient(600px 300px at -5% 8%, rgba(52,211,153,.03), transparent 60%);
+    opacity: 1;
+  }
+  html[data-theme="light"] body::after {
+    background:
+      radial-gradient(800px 400px at 85% -5%, rgba(94,92,230,.06), transparent 60%),
+      radial-gradient(600px 300px at -5% 8%, rgba(48,209,88,.04), transparent 60%);
+  }
