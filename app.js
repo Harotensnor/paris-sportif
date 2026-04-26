@@ -9778,20 +9778,26 @@
             if (!rep) return '<div style="padding:18px;background:var(--panel);border:1px solid var(--border);border-radius:12px;color:var(--text-dim);font-size:13px;">Rapport backtest pas encore chargé.</div>';
             const fmtRoi = (n) => isFinite(n) ? `${n >= 0 ? '+' : ''}${n.toFixed(1)}%` : '—';
             const fmtWr = (n) => isFinite(n) ? `${(n*100).toFixed(0)}%` : '—';
+            const fmtBrier = (n) => isFinite(n) ? n.toFixed(3) : '—';
             const colorOf = (roi) => !isFinite(roi) ? 'var(--text-dim)' : roi > 5 ? '#34d399' : roi < -5 ? '#f87171' : '#fbbf24';
+            // v31.7.17 — Brier color : <0.20 excellent, 0.20-0.25 OK, >0.25 weak.
+            const colorBrier = (b) => !isFinite(b) ? 'var(--text-dim)' : b < 0.20 ? '#34d399' : b < 0.25 ? '#fbbf24' : '#f87171';
             const rowOf = (label, d, sub) => {
               if (!d || !d.n) return '';
               const roi = d.flat_roi_pct;
               const col = colorOf(roi);
-              return `<div style="display:grid;grid-template-columns:1fr 60px 80px 80px;gap:8px;padding:9px 12px;border-bottom:1px solid var(--border);align-items:center;font-size:12.5px;">
+              const brier = d.brier;
+              const colB = colorBrier(brier);
+              return `<div style="display:grid;grid-template-columns:1fr 50px 70px 70px 60px;gap:8px;padding:9px 12px;border-bottom:1px solid var(--border);align-items:center;font-size:12.5px;">
                 <div><b style="color:var(--text);">${esc(label)}</b>${sub?` <span style="color:var(--text-dim2);font-size:11px;">${esc(sub)}</span>`:''}</div>
                 <div style="color:var(--text-dim);text-align:right;font-variant-numeric:tabular-nums;">${d.n} pari${d.n>1?'s':''}</div>
                 <div style="color:var(--text-2);text-align:right;font-variant-numeric:tabular-nums;">${fmtWr(d.win_rate)} WR</div>
                 <div style="color:${col};font-weight:700;text-align:right;font-variant-numeric:tabular-nums;">${fmtRoi(roi)}</div>
+                <div title="Brier score (≤0.20 excellent, ≤0.25 OK, >0.25 faible)" style="color:${colB};font-weight:600;text-align:right;font-variant-numeric:tabular-nums;">${fmtBrier(brier)}</div>
               </div>`;
             };
-            const headerOf = (lbl) => `<div style="display:grid;grid-template-columns:1fr 60px 80px 80px;gap:8px;padding:8px 12px;font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;font-weight:700;border-bottom:1px solid var(--border-2);background:var(--panel-2,rgba(255,255,255,.02));">
-              <div>${esc(lbl)}</div><div style="text-align:right;">N</div><div style="text-align:right;">Réussite</div><div style="text-align:right;">ROI</div>
+            const headerOf = (lbl) => `<div style="display:grid;grid-template-columns:1fr 50px 70px 70px 60px;gap:8px;padding:8px 12px;font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;font-weight:700;border-bottom:1px solid var(--border-2);background:var(--panel-2,rgba(255,255,255,.02));">
+              <div>${esc(lbl)}</div><div style="text-align:right;">N</div><div style="text-align:right;">Réussite</div><div style="text-align:right;">ROI</div><div style="text-align:right;" title="Brier score : qualité calibration des probas">Brier</div>
             </div>`;
             // by_sport
             const bySport = Object.entries(rep.by_sport || {}).sort((a,b) => (b[1].n||0) - (a[1].n||0));
