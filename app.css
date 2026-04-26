@@ -1161,22 +1161,28 @@
 
   /* v29 — Desktop sidebar widgets : fixed right rail at wide viewports, hidden below.
      v31.7.18 fix : !important sur display:none pour eviter que le rail
-     s'affiche sur mobile/tablette par erreur (user a screenshote le rail
-     en pleine largeur — possible bug css cascade override). */
+     s'affiche sur mobile/tablette par erreur.
+     v31.7.20 fix user feedback : "déplace cagnotte/top picks/en direct
+     vers la droite, met tout en bordure à droite". Avant right:16px
+     (16px de marge), maintenant right:0 (collé bord droit). Width passe
+     de 272 a 280 pour mieux tenir le contenu sans rognage. */
   .v29-dash-aside { display: none !important; }
   @media (min-width: 1280px) {
     .v29-dash-aside {
       display: block !important;
       position: fixed;
-      right: 16px;
+      right: 0;
       top: 84px;
-      width: 272px;
+      width: 280px;
       max-height: calc(100vh - 104px);
       overflow-y: auto;
       z-index: 50;
       scrollbar-width: thin;
+      padding: 0 16px 0 12px;
+      box-sizing: border-box;
     }
-    body.agent-home main, body.agent-inside main { padding-right: 308px !important; }
+    /* Padding-right main : 280 (rail) + 12 (gap) = 292px */
+    body.agent-home main, body.agent-inside main { padding-right: 292px !important; }
   }
   /* v31.7.18 — Force masque mobile/tablette explicite (defensive). Si une
      regle quelque part echappe, ce belt-and-suspenders garantit que le
@@ -1801,13 +1807,12 @@
   }
 
   /* v31.7.10 — Safeguard sur le chevauchement right rail / ed-hero.
-     A >=1280px le right rail (.v29-dash-aside) est position:fixed à right:16px
-     width:272px. Force le ed-hero a un max-width safe pour ne pas s'etendre
-     dans le rail. */
+     v31.7.20 : ajusté avec nouveaux dimensions (right:0, width:280,
+     padding-right main:292). Marge de safety 64px conservée. */
   @media (min-width: 1280px) {
     body.agent-home .ed-hero,
     body.agent-inside .ed-hero {
-      max-width: calc(100vw - 264px - 308px - 64px);
+      max-width: calc(100vw - 264px - 292px - 64px);
     }
     /* v31.7.13 — Quand sidebar (240px) + right rail (272px) sont actifs
        simultanement (>=1280px), 4 colonnes 1fr ne tiennent pas confortablement,
