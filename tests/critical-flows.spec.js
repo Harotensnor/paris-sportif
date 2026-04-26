@@ -399,3 +399,77 @@ test.describe('Winamax 1n2 alignment integrity', () => {
     expect(result.misaligned).toBe(0);
   });
 });
+
+// v31 — Smoke tests on the static editorial pages introduced post-audit.
+// Each page must :
+//  1. Load with status 200 (no 404 on deploy)
+//  2. Have the expected canonical URL pointing to itself
+//  3. Have a JSON-LD block (structured data presence)
+//  4. Have an h1 that's not empty
+//  5. Have working cross-links back to / (for nav cohesion)
+test.describe('Static editorial pages — SEO sanity', () => {
+  const STATIC_PAGES = [
+    { url: '/index.html',                    h1Pattern: /Pronostics/, canonical: 'https://harotensnor.github.io/paris-sportif/' },
+    { url: '/legal.html',                    h1Pattern: /Légal/,      canonical: 'legal.html' },
+    { url: '/methodologie.html',             h1Pattern: /Méthodologie/, canonical: 'methodologie.html' },
+    { url: '/academie.html',                 h1Pattern: /Académie/,   canonical: 'academie.html' },
+    { url: '/comment-lire-un-prono.html',    h1Pattern: /lire un pronostic/i, canonical: 'comment-lire-un-prono.html' },
+    { url: '/backtest.html',                 h1Pattern: /Backtest/,   canonical: 'backtest.html' },
+    { url: '/credibilite.html',              h1Pattern: /honnête/i,   canonical: 'credibilite.html' },
+  ];
+
+  for (const page of STATIC_PAGES) {
+    test(`${page.url} — indexable + canonical + JSON-LD`, async ({ page: pwPage }) => {
+      const response = await pwPage.goto(page.url);
+      expect(response.status()).toBeLessThan(400);
+
+      // h1 present and matches expected pattern
+      const h1 = await pwPage.locator('h1').first().textContent();
+      expect(h1).toBeTruthy();
+      expect(h1).toMatch(page.h1Pattern);
+
+      // canonical link
+      const canonicalHref = await pwPage.locator('link[rel="canonical"]').getAttribute('href');
+      expect(canonicalHref).toContain(page.canonical);
+
+      // JSON-LD structured data
+      const ldCount = await pwPage.locator('script[type="application/ld+json"]').count();
+      expect(ldCount).toBeGreaterThan(0);
+
+      // Cross-link back to /
+      const homeLink = pwPage.locator('a[href="./"]').first();
+      expect(await homeLink.count()).toBeGreaterThan(0);
+    });
+  }
+});
+
+test.describe('feed.xml — RSS structure', () => {
+  test('valid RSS 2.0 with channel + items', async ({ page }) => {
+    const response = await page.goto('/feed.xml');
+    expect(response.status()).toBeLessThan(400);
+    const xml = await response.text();
+    expect(xml).toContain('<rss version="2.0"');
+    expect(xml).toContain('<channel>');
+    expect(xml).toContain('<title>Paris-Sportif');
+    expect(xml).toContain('<atom:link');
+    expect(xml).toContain('<lastBuildDate>');
+  });
+});
+
+test.describe('humans.txt + security.txt', () => {
+  test('humans.txt 200 + content', async ({ page }) => {
+    const response = await page.goto('/humans.txt');
+    expect(response.status()).toBeLessThan(400);
+    const txt = await response.text();
+    expect(txt).toContain('Théo Boulnois');
+    expect(txt).toContain('TEAM');
+  });
+  test('.well-known/security.txt 200 + RFC 9116 fields', async ({ page }) => {
+    const response = await page.goto('/.well-known/security.txt');
+    expect(response.status()).toBeLessThan(400);
+    const txt = await response.text();
+    expect(txt).toContain('Contact:');
+    expect(txt).toContain('Expires:');
+    expect(txt).toContain('Canonical:');
+  });
+});

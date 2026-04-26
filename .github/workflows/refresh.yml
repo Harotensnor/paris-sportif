@@ -149,6 +149,10 @@ jobs:
           # backtest_report_v2.json, produit backtest.html indexable sans JS.
           # Le JSON change ~1×/semaine donc le HTML aussi mais c'est cheap.
           python3 build_backtest_page.py || true
+          # v31 — RSS feed (top picks du jour). Lit data.js, produit feed.xml.
+          python3 build_feed.py || true
+          # v31 — Static credibilite.html (calibration + Brier + log-loss).
+          python3 build_credibilite_page.py || true
           # Chantier #3 lazy-load — DOIT tourner en DERNIER. Lit data.js (full),
           # écrit data_today.json + data_manifest.json + ré-inline LITE blob
           # dans pronostics.html. Réduit le 1er paint de ~1.4 MB à ~0.4 MB.
@@ -172,7 +176,8 @@ jobs:
                   weather_geo_cache.json referees_soccer.json health.json \
                   data_today.json data_manifest.json team_form.json \
                   results_archive.jsonl tennis_ratings.json footballdata.json \
-                  mlb_pitchers.json nhl_stats.json backtest.html 2>/dev/null || true
+                  mlb_pitchers.json nhl_stats.json backtest.html feed.xml \
+                  credibilite.html 2>/dev/null || true
           # Only stamp sw.js if we have real content changes — otherwise
           # discard the version bump to avoid 288 empty commits/day.
           if git diff --cached --quiet; then
