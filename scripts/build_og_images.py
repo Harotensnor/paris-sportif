@@ -196,7 +196,15 @@ def draw_topic(out_path: Path, eyebrow: str, title: str, sub: str, report=None, 
 
 def main():
     report = load_backtest()
-    draw_default(ROOT / 'og-default.png', report)
+    # v31.7.7 — Try/except around chaque image pour qu'un crash sur une
+    # image ne bloque pas la generation des autres.
+    def _safe(fn, name):
+        try:
+            fn()
+            return True
+        except Exception as e:
+            print(f'[og] {name} FAILED: {type(e).__name__}: {str(e)[:100]}')
+            return False
     sub_stats = ''
     if report:
         wr = report.get('global_winrate')
@@ -204,27 +212,28 @@ def main():
         n = report.get('n_settled')
         if wr is not None and roi is not None and n is not None:
             sub_stats = f'WR {wr*100:.1f}% · ROI flat {"+" if roi >= 0 else ""}{roi:.1f}% · {n} picks réglés'
-    draw_topic(
+    _safe(lambda: draw_default(ROOT / 'og-default.png', report), 'og-default.png')
+    _safe(lambda: draw_topic(
         ROOT / 'og-backtest.png',
         eyebrow='Backtest',
         title='Performance vérifiable du modèle',
         sub=sub_stats or 'Backtest hebdo via vrai predictMatch.',
         accent=GREEN,
-    )
-    draw_topic(
+    ), 'og-backtest.png')
+    _safe(lambda: draw_topic(
         ROOT / 'og-credibilite.png',
         eyebrow='Crédibilité',
         title='Le modèle dit la vérité sur ses probabilités ?',
         sub='Diagramme de calibration, Brier score, log-loss.',
         accent=PURPLE,
-    )
-    draw_topic(
+    ), 'og-credibilite.png')
+    _safe(lambda: draw_topic(
         ROOT / 'og-methodologie.png',
         eyebrow='Méthodologie',
         title='Protocole, métriques, biais — sans boîte noire',
         sub='9 sources publiques · pipeline open · backtest reproductible',
         accent=(96, 165, 250),
-    )
+    ), 'og-methodologie.png')
     return 0
 
 
