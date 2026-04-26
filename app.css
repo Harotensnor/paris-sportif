@@ -685,6 +685,55 @@
     border-radius: 999px; background: var(--panel-3);
   }
 
+  /* v31.7.35 — Stats hero strip : 4 KPIs cliquables sous le hero du
+     dashboard. Format pills horizontales, scroll horizontal sur mobile.
+     Donne la vue d'ensemble du jour en 2s. */
+  .dash-stats-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin: 16px 0 18px;
+  }
+  .dash-stat-item {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 14px 10px; min-height: 72px;
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text); cursor: pointer;
+    transition: background .15s, border-color .15s, transform .12s;
+    font-family: inherit;
+    text-align: center;
+  }
+  .dash-stat-item:not(.dash-stat-item--info):hover {
+    background: var(--panel-2);
+    border-color: var(--brand-border);
+    transform: translateY(-1px);
+  }
+  .dash-stat-item--info { cursor: default; opacity: .85; }
+  .dash-stat-icon {
+    font-size: 18px; line-height: 1; margin-bottom: 4px;
+  }
+  .dash-stat-val {
+    font-size: 22px; font-weight: 800; color: var(--text);
+    line-height: 1.1; font-variant-numeric: tabular-nums;
+    letter-spacing: -.5px;
+  }
+  .dash-stat-lbl {
+    font-size: 10.5px; color: var(--text-dim);
+    text-transform: uppercase; letter-spacing: .8px;
+    font-weight: 700; margin-top: 3px;
+  }
+  @media (max-width: 720px) {
+    .dash-stats-strip {
+      grid-template-columns: repeat(4, 1fr); gap: 6px;
+    }
+    .dash-stat-item { padding: 10px 6px; min-height: 64px; }
+    .dash-stat-val { font-size: 18px; }
+    .dash-stat-lbl { font-size: 9.5px; letter-spacing: .4px; }
+    .dash-stat-icon { font-size: 14px; margin-bottom: 2px; }
+  }
+
   /* v31.7.32 — CTA fidélisation. Petit banner en fin de dashboard avec
      prochaine MAJ + RSS + lien backtest. But : créer une routine
      quotidienne. Discret (~70px desktop, ~120px mobile). */
