@@ -1,0 +1,633 @@
+/* =========================================================================
+   static-page.css — Polish visuel partagé pour les 7 pages éditoriales
+   (index, legal, methodologie, academie, comment-lire-un-prono,
+   credibilite, backtest).
+   -------------------------------------------------------------------------
+   Pourquoi un fichier séparé : les pages statiques ont chacune leur bloc
+   <style> inline (taillé pour leur structure). Ce fichier ajoute par
+   ABOVE les rules existantes — il ne remplace pas, il enrichit le polish.
+   Tout selecteur ici est intentionnellement robuste pour fonctionner sans
+   casser les rules existantes.
+
+   Conventions :
+   - Variables CSS alignées sur app.css (palette identique)
+   - Animations respect `prefers-reduced-motion`
+   - Toutes les classes prefixées `.sp-*` (static-page) pour eviter les
+     collisions avec des classes des pages individuelles.
+   ========================================================================= */
+
+/* --- Design tokens partagés (alignés sur app.css) --- */
+:root {
+  --sp-brand: #a78bfa;
+  --sp-brand-2: #8b5cf6;
+  --sp-accent: #34d399;
+  --sp-accent-2: #10b981;
+  --sp-text: #e6ebf2;
+  --sp-text-2: #c5cad2;
+  --sp-text-dim: #8b8f9a;
+  --sp-text-dim2: #6b7280;
+  --sp-bg: #08080a;
+  --sp-panel: #0f0f14;
+  --sp-panel-2: #14141a;
+  --sp-border: rgba(255,255,255,.08);
+  --sp-border-2: rgba(255,255,255,.14);
+
+  --sp-radius-sm: 10px;
+  --sp-radius: 14px;
+  --sp-radius-lg: 18px;
+
+  --sp-shadow-sm: 0 2px 8px rgba(0,0,0,.30);
+  --sp-shadow:    0 6px 20px rgba(0,0,0,.40);
+  --sp-shadow-lg: 0 14px 44px rgba(0,0,0,.55);
+
+  --sp-trans: .18s ease;
+}
+
+/* --- Reset léger pour TOUTES les pages : letter-spacing serré + smoothing --- */
+html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+body { font-feature-settings: "cv11", "ss01", "kern"; }
+
+/* --- Eyebrow (label uppercase qui chapeaute un titre) --- */
+.sp-eyebrow {
+  display: inline-block;
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .14em;
+  color: var(--sp-brand);
+  margin-bottom: 10px;
+  position: relative;
+}
+.sp-eyebrow::before {
+  content: ''; display: inline-block;
+  width: 18px; height: 2px;
+  background: linear-gradient(90deg, var(--sp-brand), transparent);
+  vertical-align: middle;
+  margin-right: 8px; border-radius: 2px;
+}
+
+/* --- Hero pattern : titre énorme + subtitle muted + 1-2 CTAs --- */
+.sp-hero {
+  padding: 64px 0 48px;
+  text-align: center;
+  position: relative;
+}
+.sp-hero h1 {
+  font-size: clamp(28px, 5vw, 52px);
+  font-weight: 800;
+  letter-spacing: -1.2px;
+  line-height: 1.05;
+  margin: 0 0 16px;
+  background: linear-gradient(135deg, var(--sp-text) 0%, var(--sp-brand) 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.sp-hero p.sp-lede {
+  font-size: clamp(15px, 1.6vw, 18px);
+  color: var(--sp-text-dim);
+  max-width: 640px; margin: 0 auto 32px;
+  line-height: 1.6;
+}
+
+/* --- CTA buttons (alignés sur app.css .cta-primary / .cta-secondary) --- */
+.sp-cta-row {
+  display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+  margin-top: 24px;
+}
+.sp-cta-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 24px; min-height: 44px;
+  background: linear-gradient(135deg, var(--sp-brand) 0%, var(--sp-brand-2) 100%);
+  color: #08080a; font-weight: 700; font-size: 14px;
+  border: none; border-radius: var(--sp-radius-sm);
+  text-decoration: none; cursor: pointer;
+  box-shadow: 0 4px 14px rgba(139,92,246,.35),
+              inset 0 1px 0 rgba(255,255,255,.18);
+  transition: transform var(--sp-trans), box-shadow var(--sp-trans);
+}
+.sp-cta-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(139,92,246,.45),
+              inset 0 1px 0 rgba(255,255,255,.22);
+  text-decoration: none;
+}
+.sp-cta-secondary {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 22px; min-height: 44px;
+  background: transparent;
+  color: var(--sp-text); font-weight: 600; font-size: 14px;
+  border: 1px solid var(--sp-border-2); border-radius: var(--sp-radius-sm);
+  text-decoration: none; cursor: pointer;
+  transition: all var(--sp-trans);
+}
+.sp-cta-secondary:hover {
+  background: var(--sp-panel-2);
+  border-color: var(--sp-brand);
+  color: var(--sp-brand);
+  text-decoration: none;
+}
+
+/* --- Card pattern (article, panel) avec hover lift --- */
+.sp-card {
+  background: var(--sp-panel);
+  border: 1px solid var(--sp-border);
+  border-radius: var(--sp-radius);
+  padding: 24px 26px;
+  transition: transform var(--sp-trans), border-color var(--sp-trans), box-shadow var(--sp-trans);
+  position: relative;
+  overflow: hidden;
+}
+.sp-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--sp-border-2);
+  box-shadow: var(--sp-shadow-sm);
+}
+.sp-card h3 {
+  margin: 0 0 8px;
+  font-size: 18px; font-weight: 700; letter-spacing: -.3px;
+  color: var(--sp-text);
+}
+.sp-card p {
+  margin: 0; color: var(--sp-text-dim);
+  font-size: 14px; line-height: 1.6;
+}
+
+/* --- Card grid (3-2-1 cols responsive) --- */
+.sp-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin: 32px 0;
+}
+
+/* --- Stat card (gros chiffre + label) --- */
+.sp-stat {
+  background: var(--sp-panel);
+  border: 1px solid var(--sp-border);
+  border-left: 3px solid var(--sp-brand);
+  border-radius: var(--sp-radius-sm);
+  padding: 20px 22px;
+  position: relative;
+  overflow: hidden;
+}
+.sp-stat::after {
+  content: ''; position: absolute; right: -20px; top: -20px;
+  width: 80px; height: 80px; border-radius: 50%;
+  background: radial-gradient(circle, var(--sp-brand) 0%, transparent 60%);
+  opacity: .08;
+}
+.sp-stat .sp-stat-val {
+  font-size: 28px; font-weight: 800; letter-spacing: -.5px;
+  color: var(--sp-text); font-variant-numeric: tabular-nums;
+  display: block; line-height: 1.1; margin-bottom: 4px;
+}
+.sp-stat .sp-stat-label {
+  font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .08em;
+  color: var(--sp-text-dim);
+}
+.sp-stat.success { border-left-color: var(--sp-accent); }
+.sp-stat.success::after { background: radial-gradient(circle, var(--sp-accent) 0%, transparent 60%); }
+
+/* --- Section divider (séparateur subtil entre blocs longs) --- */
+.sp-divider {
+  height: 1px; border: none;
+  background: linear-gradient(90deg, transparent, var(--sp-border-2), transparent);
+  margin: 56px 0;
+}
+
+/* --- Lists polish (bullets brand-colored) --- */
+.sp-list { list-style: none; padding: 0; margin: 0; }
+.sp-list li {
+  position: relative;
+  padding: 8px 0 8px 26px;
+  color: var(--sp-text-2);
+  line-height: 1.65;
+}
+.sp-list li::before {
+  content: '→';
+  position: absolute; left: 0; top: 8px;
+  color: var(--sp-brand);
+  font-weight: 700;
+}
+
+/* --- Inline code chips (var, term) --- */
+.sp-chip {
+  display: inline-block;
+  padding: 2px 8px; border-radius: 999px;
+  font-size: 11px; font-weight: 600;
+  background: var(--sp-panel-2);
+  color: var(--sp-brand);
+  border: 1px solid rgba(167,139,250,.20);
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
+/* --- Section header pattern --- */
+.sp-section-header {
+  margin: 48px 0 24px;
+  text-align: left;
+}
+.sp-section-header h2 {
+  font-size: clamp(22px, 3vw, 32px);
+  font-weight: 700; letter-spacing: -.6px;
+  color: var(--sp-text); margin: 0 0 8px; line-height: 1.2;
+}
+.sp-section-header p.sp-section-sub {
+  font-size: 14.5px; color: var(--sp-text-dim);
+  margin: 0; max-width: 640px; line-height: 1.6;
+}
+
+/* --- Breadcrumb (in-page nav) --- */
+.sp-breadcrumb {
+  display: flex; gap: 8px; align-items: center;
+  font-size: 12.5px; color: var(--sp-text-dim);
+  margin-bottom: 24px;
+}
+.sp-breadcrumb a {
+  color: var(--sp-text-dim);
+  text-decoration: none;
+  transition: color var(--sp-trans);
+}
+.sp-breadcrumb a:hover { color: var(--sp-brand); text-decoration: none; }
+.sp-breadcrumb .sp-bc-sep { color: var(--sp-border-2); user-select: none; }
+
+/* --- Callout (info/warn boxes) --- */
+.sp-callout {
+  padding: 16px 20px; border-radius: var(--sp-radius-sm);
+  background: rgba(167,139,250,.06);
+  border: 1px solid rgba(167,139,250,.18);
+  border-left: 3px solid var(--sp-brand);
+  color: var(--sp-text-2);
+  font-size: 14px; line-height: 1.6;
+  margin: 24px 0;
+}
+.sp-callout.warn {
+  background: rgba(251,191,36,.06);
+  border-color: rgba(251,191,36,.18);
+  border-left-color: #fbbf24;
+}
+.sp-callout.danger {
+  background: rgba(248,113,113,.06);
+  border-color: rgba(248,113,113,.18);
+  border-left-color: #f87171;
+}
+.sp-callout.success {
+  background: rgba(52,211,153,.06);
+  border-color: rgba(52,211,153,.18);
+  border-left-color: var(--sp-accent);
+}
+.sp-callout strong { color: var(--sp-text); font-weight: 700; }
+
+/* --- Table polish --- */
+.sp-table {
+  width: 100%; border-collapse: separate; border-spacing: 0;
+  background: var(--sp-panel);
+  border: 1px solid var(--sp-border);
+  border-radius: var(--sp-radius);
+  overflow: hidden;
+  font-size: 13.5px;
+  margin: 24px 0;
+}
+.sp-table th {
+  text-align: left; padding: 14px 18px;
+  background: var(--sp-panel-2);
+  border-bottom: 1px solid var(--sp-border-2);
+  color: var(--sp-text-dim); font-weight: 600;
+  font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em;
+}
+.sp-table td {
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--sp-border);
+  color: var(--sp-text-2); line-height: 1.55;
+}
+.sp-table tr:nth-child(even) td { background: rgba(255,255,255,.012); }
+.sp-table tr:hover td { background: rgba(167,139,250,.05); transition: background .12s ease; }
+.sp-table tr:last-child td { border-bottom: none; }
+
+/* --- Inline KPI bar (used on backtest, credibilite) --- */
+.sp-kpi-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin: 24px 0 32px;
+}
+
+/* --- Animations (respect prefers-reduced-motion) --- */
+@media (prefers-reduced-motion: no-preference) {
+  .sp-fade-in {
+    animation: spFadeIn .55s ease both;
+  }
+  @keyframes spFadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .sp-card { animation: spFadeIn .55s ease both; }
+  .sp-card:nth-child(2) { animation-delay: .04s; }
+  .sp-card:nth-child(3) { animation-delay: .08s; }
+  .sp-card:nth-child(4) { animation-delay: .12s; }
+  .sp-card:nth-child(5) { animation-delay: .16s; }
+  .sp-card:nth-child(6) { animation-delay: .20s; }
+}
+
+/* --- Focus visible : ring brand 2px (alignement avec SPA) --- */
+.sp-card:focus-visible,
+.sp-cta-primary:focus-visible,
+.sp-cta-secondary:focus-visible,
+.sp-breadcrumb a:focus-visible {
+  outline: 2px solid var(--sp-brand);
+  outline-offset: 3px;
+}
+
+/* --- Mobile responsive --- */
+@media (max-width: 720px) {
+  .sp-hero { padding: 40px 16px 32px; }
+  .sp-card { padding: 20px 18px; }
+  .sp-stat { padding: 16px 18px; }
+  .sp-stat .sp-stat-val { font-size: 24px; }
+  .sp-section-header { margin: 32px 0 18px; }
+  .sp-divider { margin: 32px 0; }
+  .sp-table { font-size: 12.5px; }
+  .sp-table th, .sp-table td { padding: 10px 12px; }
+}
+
+/* =========================================================================
+   v31.6.1 — UPGRADE DES CLASSES EXISTANTES (sans toucher au HTML)
+   -------------------------------------------------------------------------
+   Comme cette feuille est linkée APRÈS les <style> inline de chaque page,
+   on overrride pour donner un look polished aux selecteurs déjà utilisés
+   par les pages.
+   ========================================================================= */
+
+/* --- Body : ajout du fond gradient subtil cohérent avec la SPA --- */
+body {
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgba(167,139,250,.10), transparent 60%),
+    radial-gradient(900px 500px at -10% 10%, rgba(16,185,129,.06), transparent 60%),
+    #08080a !important;
+  -webkit-font-smoothing: antialiased;
+}
+@media (prefers-color-scheme: light) {
+  body {
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(94,92,230,.10), transparent 60%),
+      radial-gradient(900px 500px at -10% 10%, rgba(48,209,88,.05), transparent 60%),
+      #f5f5f7 !important;
+  }
+}
+
+/* --- Topbar : box-shadow subtle pour depth --- */
+header.topbar {
+  box-shadow: 0 1px 0 rgba(255,255,255,.02) inset,
+              0 2px 12px rgba(0,0,0,.18) !important;
+}
+
+/* --- Brand : scale slight au hover --- */
+header.topbar .brand,
+header.topbar a.brand {
+  transition: transform .22s ease, opacity .22s ease;
+}
+header.topbar .brand:hover,
+header.topbar a.brand:hover {
+  transform: translateY(-1px);
+  opacity: 1;
+}
+
+/* --- Uppercase pill (eyebrow) : preserved colors but with gradient lead-in --- */
+.uppercase-pill {
+  position: relative;
+  padding-left: 24px;
+}
+.uppercase-pill::before {
+  content: ''; position: absolute;
+  left: 0; top: 50%; transform: translateY(-50%);
+  width: 16px; height: 2px;
+  background: linear-gradient(90deg, currentColor, transparent);
+  border-radius: 2px;
+}
+
+/* --- H1 : gradient text systematique sur toutes les pages --- */
+main > h1,
+.sp-hero h1 {
+  background: linear-gradient(135deg, #ffffff 0%, #a78bfa 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+@media (prefers-color-scheme: light) {
+  main > h1,
+  .sp-hero h1 {
+    background: linear-gradient(135deg, #08080a 0%, #5e5ce6 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+/* --- Section.card (cards content) : hover lift + smoother shadow --- */
+section.card {
+  transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+  position: relative;
+  overflow: hidden;
+}
+section.card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(167,139,250,.20) !important;
+  box-shadow: 0 6px 20px rgba(0,0,0,.30);
+}
+/* Add a subtle gradient accent on top-left at hover */
+section.card::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(167,139,250,.04) 0%, transparent 40%);
+  opacity: 0; transition: opacity .25s ease;
+  pointer-events: none;
+  border-radius: inherit;
+}
+section.card:hover::before { opacity: 1; }
+
+/* Variantes purple/danger/info gardent leur look mais hover plus polished */
+section.card.purple:hover { border-color: rgba(167,139,250,.45) !important; }
+section.card.danger:hover { border-color: rgba(248,113,113,.45) !important; }
+
+/* --- TOC pills : hover glow brand --- */
+.toc a {
+  transition: all .18s ease;
+  position: relative;
+}
+.toc a:hover {
+  border-color: #a78bfa !important;
+  background: rgba(167,139,250,.08) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(167,139,250,.15);
+  text-decoration: none;
+}
+
+/* --- Breadcrumb : subtle hover pulse --- */
+.breadcrumb a {
+  transition: color .15s ease;
+}
+.breadcrumb a:hover {
+  color: #a78bfa !important;
+  text-decoration: none;
+}
+
+/* --- KPI cards (credibilite / backtest) : gradient accent + hover --- */
+.kpi-card {
+  transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+  position: relative; overflow: hidden;
+}
+.kpi-card::after {
+  content: ''; position: absolute;
+  top: -30px; right: -30px;
+  width: 80px; height: 80px; border-radius: 50%;
+  background: radial-gradient(circle, #a78bfa 0%, transparent 70%);
+  opacity: .10;
+  transition: opacity .25s ease;
+  pointer-events: none;
+}
+.kpi-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(167,139,250,.22) !important;
+  box-shadow: 0 6px 20px rgba(0,0,0,.30);
+}
+.kpi-card:hover::after { opacity: .18; }
+
+/* KPI value (le gros chiffre) : letter-spacing serré + tabular-nums déjà là */
+.kpi-value {
+  letter-spacing: -.8px !important;
+}
+
+/* --- Tables : aération + alternation + hover row --- */
+table {
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+}
+table tbody tr:nth-child(even) td {
+  background: rgba(255,255,255,.012) !important;
+}
+table tbody tr:hover td {
+  background: rgba(167,139,250,.05) !important;
+  transition: background .12s ease;
+}
+@media (prefers-color-scheme: light) {
+  table tbody tr:nth-child(even) td { background: rgba(0,0,0,.012) !important; }
+  table tbody tr:hover td { background: rgba(94,92,230,.05) !important; }
+}
+
+/* --- Mock card (comment-lire) : subtle pulse around the corner pill --- */
+.mock-card {
+  transition: transform .22s ease, box-shadow .22s ease;
+}
+.mock-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(167,139,250,.20);
+}
+.mock-card .corner {
+  box-shadow: 0 2px 8px rgba(167,139,250,.30);
+}
+
+/* --- Stats strip (index.html) : hover lift + gradient corner --- */
+.stats-strip > * {
+  transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+  position: relative;
+  overflow: hidden;
+}
+.stats-strip > *:hover {
+  transform: translateY(-2px);
+  border-color: rgba(167,139,250,.20);
+  box-shadow: 0 6px 20px rgba(0,0,0,.25);
+}
+
+/* --- CTA buttons sur la landing : glow plus prononcé --- */
+.cta-primary {
+  background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%) !important;
+  box-shadow: 0 4px 14px rgba(139,92,246,.35),
+              inset 0 1px 0 rgba(255,255,255,.18) !important;
+  transition: transform .18s ease, box-shadow .18s ease !important;
+}
+.cta-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(139,92,246,.45),
+              inset 0 1px 0 rgba(255,255,255,.22) !important;
+}
+.cta-secondary {
+  transition: all .18s ease !important;
+}
+.cta-secondary:hover {
+  border-color: #a78bfa !important;
+  background: rgba(167,139,250,.08) !important;
+  transform: translateY(-1px);
+}
+
+/* --- Footer site : separator gradient au lieu de flat border --- */
+footer.site-footer {
+  border-top: none !important;
+  position: relative;
+  padding-top: 32px !important;
+}
+footer.site-footer::before {
+  content: ''; position: absolute;
+  top: 0; left: 50%; transform: translateX(-50%);
+  width: 60%; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(167,139,250,.20), transparent);
+}
+footer.site-footer nav a {
+  transition: color .15s ease;
+}
+footer.site-footer nav a:hover {
+  color: #a78bfa !important;
+  text-decoration: none;
+}
+
+/* --- Pill (page index hero) : pulse subtle --- */
+.pill .dot {
+  animation: spPulseDot 2s ease infinite;
+}
+@keyframes spPulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: .5; transform: scale(1.25); }
+}
+
+/* --- Code chips : softer brand background --- */
+code {
+  transition: background .15s ease;
+}
+code:hover {
+  background: rgba(167,139,250,.18) !important;
+}
+
+/* --- Anj-pill (legal.html) : subtle lift au hover --- */
+.anj-pill {
+  transition: transform .15s ease, border-color .15s ease;
+}
+.anj-pill:hover {
+  transform: translateY(-1px);
+  border-color: rgba(248,113,113,.45) !important;
+}
+
+/* --- Definition lists (academie.html) : space + hover indicator --- */
+dl > div {
+  position: relative;
+  padding-left: 6px;
+  border-left: 2px solid transparent;
+  transition: border-left-color .18s ease, padding-left .18s ease;
+}
+dl > div:hover {
+  border-left-color: rgba(167,139,250,.40);
+  padding-left: 12px;
+}
+
+/* --- Banner / callout (meta-banner, danger-banner) : hover glow --- */
+.meta-banner,
+.danger-banner {
+  transition: box-shadow .22s ease, border-color .22s ease;
+}
+.meta-banner:hover {
+  box-shadow: 0 4px 14px rgba(167,139,250,.18);
+}
+.danger-banner:hover {
+  box-shadow: 0 4px 14px rgba(248,113,113,.18);
+}
+
+/* --- Mobile breathing room --- */
+@media (max-width: 600px) {
+  main { padding-left: 16px !important; padding-right: 16px !important; }
+  section.card { padding: 16px !important; }
+  .kpi-card { padding: 14px 16px !important; }
+}
