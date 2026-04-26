@@ -59,6 +59,10 @@ FETCH_STAGES = [
     ('fetch_h2h.py',              15,   60),
     ('snapshot_odds.py',           1,   30),   # freeze pre-match odds
     ('snapshot_results.py',        1,   30),   # archive completed matches (long backtest window)
+    ('fetch_tennis_sackmann.py',   1,   60),   # ATP/WTA Elo + surface + fatigue, 24h cache
+    ('patch_tennis_features.py',   1,   30),
+    ('fetch_footballdata.py',      1,   60),   # closing odds + league calibration, 6h cache
+    ('patch_footballdata.py',      1,   30),
     ('fetch_forebet.py',           5,   60),
     ('fetch_tips.py',             15,  120),   # RdJ, respectful cadence
     ('fetch_injuries_soccer.py', 120,  180),   # Sofascore, ~2h
