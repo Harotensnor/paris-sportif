@@ -1176,7 +1176,6 @@
   body.agent-inside #beginner-banner,
   body.agent-home .detail-track-btn,
   body.agent-inside .detail-track-btn,
-  body.agent-inside [data-suivi-page="mesparis"],
   body.agent-inside [data-suivi-page="backtest"] { display: none !important; }
 
   /* v29 — Hero banner stacks on narrow viewports (prevents clipped pick card) */
@@ -2607,7 +2606,6 @@
       <div class="hub" data-hub="perf">
         <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">📊 Ma perf <span class="chev">▾</span></button>
         <div class="hub-menu" role="menu" aria-label="Sous-menu Ma perf">
-          <button class="page-btn" data-page="mesparis">Mes paris</button>
           <button class="page-btn" data-page="historique">Historique</button>
           <button class="page-btn" data-page="bilan">Bilan</button>
           <button class="page-btn" data-page="backtest">Performance</button>
@@ -2831,7 +2829,8 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-26T07:05:26.266944Z","today":"
   // ex pronostics.html#locks → on lit location.hash pour set la bonne page.
   // Sans ce guard, le manifest shortcuts (#locks #bilan #combines) ne
   // marchaient pas — l'utilisateur arrivait toujours sur dashboard.
-  const VALID_PAGES = ['dashboard','tous','locks','buteurs','combines','simples','top','mesparis','historique','bilan','backtest','academie','credibilite','alertes','profil','sante','value'];
+  const VALID_PAGES = ['dashboard','tous','locks','buteurs','combines','simples','top','historique','bilan','backtest','academie','credibilite','alertes','profil','sante','value'];
+  // v30 — 'mesparis' retiré : Théo n'enregistre pas ses paris sur le site.
   function _pageFromHash() {
     try {
       const h = (location.hash || '').replace(/^#/, '').trim();
@@ -6421,80 +6420,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-26T07:05:26.266944Z","today":"
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(e); }
       });
     });
-    // "J'ai parié" button — toggles personal bet tracking for that (match, pick).
-    // Stops propagation so it doesn't also open the match detail modal.
-    wrap.querySelectorAll('.tp-mybet').forEach(btn => btn.addEventListener('click', async (ev) => {
-      ev.stopPropagation();
-      const matchId = btn.dataset.match;
-      const pickKey = btn.dataset.pick;
-      const existing = getMyBet(matchId, pickKey);
-      if (existing) {
-        // Already tracked — click removes (modal custom, plus prompt() fragile)
-        const exStake = (Number(existing.stake) || 0).toFixed(2);
-        const exOdds = (Number(existing.odds) || 0).toFixed(2);
-        const ok = await _showConfirm({
-          title: '🗑️ Retirer ce pari ?',
-          body: `<b>${esc(existing.pickLabel || 'Pick')}</b> @ ${exOdds} pour <b>${exStake}€</b><br><span style="color:var(--text-dim);font-size:12px;">Le pari sera retiré de ton bilan personnel.</span>`,
-          confirmLabel: 'Retirer',
-          cancelLabel: 'Annuler',
-          danger: true,
-        });
-        if (ok) {
-          removeMyBet(matchId, pickKey);
-          toast(`✗ Pari retiré du bilan`, 'info');
-          render();
-        }
-        return;
-      }
-      // New bet: open stake prompt modal (was prompt() — fragile en PWA)
-      const suggested = btn.dataset.stake || '1';
-      const raw = await _showStakePrompt(suggested, 'Mise en € ?');
-      if (raw == null) return;
-      const stake = parseFloat(String(raw).replace(',', '.'));
-      if (!isFinite(stake) || stake <= 0) { toast('Mise invalide', 'error'); return; }
-      const odds = parseFloat(btn.dataset.odds);
-      if (!isFinite(odds) || odds <= 1) { toast('Cote invalide', 'error'); return; }
-
-      // Find match data for tracked bets
-      const data = window.PRONOSTICS_DATA;
-      let matchData = null;
-      if (data && data.days) {
-        for (const day of Object.keys(data.days)) {
-          const m = (data.days[day] || []).find(m => m.id === matchId);
-          if (m) { matchData = m; break; }
-        }
-      }
-
-      // Chantier UU — save to tracked bets in addition to personal bets
-      if (matchData) {
-        // Données ESPN-like : équipes dans competitors[].name + home_away.
-        const competitors = matchData.competitors || [];
-        const homeC = competitors.find(c => c.home_away === 'home') || competitors[0] || {};
-        const awayC = competitors.find(c => c.home_away === 'away') || competitors[1] || {};
-        addTrackedBet({
-          id: matchId,
-          sport: matchData.sport || '?',
-          league: matchData.league_name || matchData.league || matchData.leagueShort || '?',
-          home: homeC.name || homeC.short || matchData.home || '?',
-          away: awayC.name || awayC.short || matchData.away || '?',
-          kickoff: matchData.date || '?',
-          pick_label: btn.dataset.label,
-          odds: odds,
-          stake: stake,
-        });
-      }
-
-      upsertMyBet({
-        matchId, pickKey,
-        pickLabel: btn.dataset.label,
-        odds,
-        stake,
-        placedAt: new Date().toISOString(),
-      });
-      const potential = (stake * odds).toFixed(2);
-      toast(`✓ Pari enregistré · ${stake.toFixed(2)}€ @ ${odds.toFixed(2)} → ${potential}€ pot.`, 'success');
-      render();
-    }));
+    // v30 — Handler "J'ai parié" (.tp-mybet) retiré : tracking utilisateur désactivé.
   }
 
   // ======= COMBINÉS (parlays) =======
@@ -8310,90 +8236,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-26T07:05:26.266944Z","today":"
       </div>
     `;
 
-    // Chantier 72 (2026-04-22) — Wire "J'ai parié" button dans la modal détail.
-    // Le handler global `wrap.querySelectorAll('.tp-mybet')` est scopé au wrap
-    // de render, donc la modal n'est pas couverte. On attache ici un handler
-    // local qui réplique la logique (prompt mise, save, toast, re-render).
-    body.querySelectorAll('.tp-mybet.detail-track-btn').forEach(btn => btn.addEventListener('click', async (ev) => {
-      ev.stopPropagation();
-      const matchId = btn.dataset.match;
-      const pickKey = btn.dataset.pick;
-      const existing = typeof getMyBet === 'function' ? getMyBet(matchId, pickKey) : null;
-      if (existing) {
-        const exStake = (Number(existing.stake) || 0).toFixed(2);
-        const exOdds = (Number(existing.odds) || 0).toFixed(2);
-        const ok = await _showConfirm({
-          title: '🗑️ Retirer ce pari ?',
-          body: `<b>${esc(existing.pickLabel || 'Pick')}</b> @ ${exOdds} pour <b>${exStake}€</b><br><span style="color:var(--text-dim);font-size:12px;">Le pari sera retiré de ton bilan personnel.</span>`,
-          confirmLabel: 'Retirer',
-          cancelLabel: 'Annuler',
-          danger: true,
-        });
-        if (ok) {
-          if (typeof removeMyBet === 'function') removeMyBet(matchId, pickKey);
-          if (typeof toast === 'function') toast(`✗ Pari retiré du bilan`, 'info');
-          // Refresh modal button label in-place sans relancer openDetail()
-          btn.innerHTML = `💰 J'ai parié`;
-          btn.style.background = 'rgba(167,139,250,.18)';
-          btn.style.color = '#a78bfa';
-          btn.style.borderColor = 'rgba(167,139,250,.4)';
-          btn.setAttribute('aria-label', 'Enregistrer ce pari pour suivi');
-          btn.setAttribute('title', 'Marquer comme pari placé et suivre le résultat');
-          if (typeof render === 'function') render();
-        }
-        return;
-      }
-      const suggested = btn.dataset.stake || '1';
-      const raw = await _showStakePrompt(suggested, 'Mise en € ?');
-      if (raw == null) return;
-      const stake = parseFloat(String(raw).replace(',', '.'));
-      if (!isFinite(stake) || stake <= 0) { if (typeof toast === 'function') toast('Mise invalide', 'error'); return; }
-      const odds = parseFloat(btn.dataset.odds);
-      if (!isFinite(odds) || odds <= 1) { if (typeof toast === 'function') toast('Cote invalide', 'error'); return; }
-
-      const data = window.PRONOSTICS_DATA;
-      let matchData = null;
-      if (data && data.days) {
-        for (const day of Object.keys(data.days)) {
-          const m = (data.days[day] || []).find(m => m.id === matchId);
-          if (m) { matchData = m; break; }
-        }
-      }
-      if (matchData && typeof addTrackedBet === 'function') {
-        const competitors = matchData.competitors || [];
-        const homeC = competitors.find(c => c.home_away === 'home') || competitors[0] || {};
-        const awayC = competitors.find(c => c.home_away === 'away') || competitors[1] || {};
-        addTrackedBet({
-          id: matchId,
-          sport: matchData.sport || '?',
-          league: matchData.league_name || matchData.league || matchData.leagueShort || '?',
-          home: homeC.name || homeC.short || matchData.home || '?',
-          away: awayC.name || awayC.short || matchData.away || '?',
-          kickoff: matchData.date || '?',
-          pick_label: btn.dataset.label,
-          odds: odds,
-          stake: stake,
-        });
-      }
-      if (typeof upsertMyBet === 'function') {
-        upsertMyBet({
-          matchId, pickKey,
-          pickLabel: btn.dataset.label,
-          odds,
-          stake,
-          placedAt: new Date().toISOString(),
-        });
-      }
-      const potential = (stake * odds).toFixed(2);
-      if (typeof toast === 'function') toast(`✓ Pari enregistré · ${stake.toFixed(2)}€ @ ${odds.toFixed(2)} → ${potential}€ pot.`, 'success');
-      // Update modal button immediately without closing
-      btn.innerHTML = `✓ Tracké (${stake.toFixed(0)}€ @ ${odds.toFixed(2)})`;
-      btn.style.background = 'rgba(52,211,153,.18)';
-      btn.style.color = '#34d399';
-      btn.style.borderColor = 'rgba(52,211,153,.4)';
-      btn.setAttribute('aria-label', 'Retirer le pari du suivi');
-      if (typeof render === 'function') render();
-    }));
+    // v30 — Handler "J'ai parié" retiré : Théo n'enregistre pas ses paris.
 
     const modal = document.getElementById('detail-modal');
     modal.classList.add('open');
@@ -9472,30 +9315,8 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-26T07:05:26.266944Z","today":"
       }
     } catch (e) {}
 
-    // 2. Streak user actuel
-    try {
-      const trackedRaw = (typeof loadTrackedBets === 'function') ? loadTrackedBets() : {};
-      const trackedArr = Array.isArray(trackedRaw) ? trackedRaw : Object.values(trackedRaw || {});
-      const settled = trackedArr.filter(b => b && (b.status === 'gagné' || b.status === 'perdu')).sort((a,b) => (b.added_at||'').localeCompare(a.added_at||''));
-      if (settled.length >= 3) {
-        let streak = 0, last = null;
-        for (const b of settled) {
-          const win = b.status === 'gagné';
-          if (last === null) { last = win; streak = 1; }
-          else if (last === win) streak++;
-          else break;
-        }
-        if (streak >= 3) {
-          items.push({
-            kind: 'streak', priority: 8,
-            icon: last ? '🔥' : '❄️',
-            title: last ? `${streak} Victoires d'affilée` : `${streak} Défaites d'affilée`,
-            body: last ? `Bonne forme, reste discipliné sur la mise.` : `Pause recommandée ou mise réduite.`,
-            action: 'mesparis', color: last ? 'green' : 'red'
-          });
-        }
-      }
-    } catch (e) {}
+    // v30 — Streak user retiré : Théo n'enregistre pas ses paris.
+    // La série du modèle (auto-trackée) reste affichée via _agentReplay().
 
     // 3. Top value du jour
     try {
@@ -9541,38 +9362,8 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-26T07:05:26.266944Z","today":"
       }
     } catch (e) {}
 
-    // 5. Pattern tip
-    try {
-      const trackedRaw = (typeof loadTrackedBets === 'function') ? loadTrackedBets() : {};
-      const trackedArr = Array.isArray(trackedRaw) ? trackedRaw : Object.values(trackedRaw || {});
-      const settled = trackedArr.filter(b => b && (b.status === 'gagné' || b.status === 'perdu'));
-      if (settled.length >= 10) {
-        const wins = settled.filter(b => b.status === 'gagné').length;
-        const wr = wins / settled.length;
-        items.push({
-          kind: 'pattern', priority: 4,
-          icon: '📈', title: `${(wr*100).toFixed(0)}% de réussite au total`,
-          body: `Sur ${settled.length} paris — détails dans Historique.`,
-          action: 'historique', color: 'indigo'
-        });
-      }
-    } catch (e) {}
-
-    // 6. Bankroll snapshot
-    try {
-      const bilan = (typeof computeMyBilan === 'function') ? computeMyBilan() : null;
-      if (bilan && typeof bilan.pl === 'number') {
-        const start = 10;
-        const nav = start + bilan.pl;
-        items.push({
-          kind: 'wallet', priority: 5,
-          icon: nav >= start ? '💰' : '📉',
-          title: `Portefeuille ${nav.toFixed(2)}€`,
-          body: nav >= start ? `+${(nav-start).toFixed(2)}€ depuis J1.` : `${(nav-start).toFixed(2)}€ depuis J1, reste patient.`,
-          action: 'bilan', color: nav >= start ? 'green' : 'orange'
-        });
-      }
-    } catch (e) {}
+    // v30 — Pattern tip + Bankroll snapshot retirés : ils dépendaient des
+    // paris trackés par l'utilisateur, qu'on n'enregistre plus.
 
     return items.sort((a,b) => b.priority - a.priority);
   }
@@ -10282,55 +10073,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-26T07:05:26.266944Z","today":"
     wrap.innerHTML = `
       <div style="max-width:1100px;margin:0 auto;padding:0 20px;font-variant-numeric:tabular-nums;">
 
-        <!-- v30 — Daily P&L chip : visible si l'utilisateur a des paris aujourd'hui -->
-        ${(() => {
-          let bets;
-          try { bets = (typeof loadTrackedBets === 'function') ? loadTrackedBets() : null; } catch(e) { return ''; }
-          if (!bets) return '';
-          const arr = Array.isArray(bets) ? bets : Object.values(bets || {});
-          const todayIso = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
-          const todays = arr.filter(b => {
-            if (!b) return false;
-            const dateSrc = b.added_at || b.date;
-            if (!dateSrc) return false;
-            const d = String(dateSrc).slice(0, 10);
-            return d === todayIso;
-          });
-          if (!todays.length) return '';
-          let pl = 0, won = 0, lost = 0, pending = 0;
-          todays.forEach(b => {
-            const stake = Number(b.stake) || 0;
-            const odds = Number(b.odds) || Number(b.odd) || 0;
-            // Skip bets with corrupt stake/odds — a missing odds defaulting
-            // to 0 would flip a winning bet into pl -= stake. Decimal odds
-            // are always > 1 ; anything else is dirty storage.
-            if (stake <= 0) return;
-            if (b.status === 'gagné') {
-              if (odds <= 1) return;  // can't credit gains without valid odds
-              won++; pl += stake * (odds - 1);
-            }
-            else if (b.status === 'perdu') { lost++; pl -= stake; }
-            else if (b.status === 'en cours') pending++;
-          });
-          const settled = won + lost;
-          const plColor = pl > 0 ? '#34d399' : pl < 0 ? '#f87171' : 'var(--text-dim)';
-          const plSign = pl >= 0 ? '+' : '';
-          const plBg = pl > 0 ? 'rgba(52,211,153,.10)' : pl < 0 ? 'rgba(248,113,113,.10)' : 'rgba(123,134,147,.06)';
-          const plBorder = pl > 0 ? 'rgba(52,211,153,.3)' : pl < 0 ? 'rgba(248,113,113,.3)' : 'var(--border)';
-          return `
-            <div style="display:flex;align-items:center;gap:14px;padding:12px 18px;margin:14px 0 0;background:${plBg};border:1px solid ${plBorder};border-left:3px solid ${plColor};border-radius:0 10px 10px 0;flex-wrap:wrap;">
-              <div style="font-size:24px;line-height:1;flex-shrink:0;">${pl > 0 ? '💰' : pl < 0 ? '📉' : '⚖️'}</div>
-              <div style="flex:1;min-width:0;">
-                <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:2px;">Aujourd'hui</div>
-                <div style="font-size:15px;font-weight:700;color:var(--text);line-height:1.3;">
-                  ${settled ? `<b style="color:${plColor};font-size:18px;">${plSign}${pl.toFixed(2)}€</b> sur ${settled} pari${settled>1?'s':''} réglé${settled>1?'s':''}` : 'Aucun pari réglé pour le moment'}
-                  ${pending ? ` <span style="color:var(--text-dim);font-weight:500;font-size:13px;">· ${pending} en cours</span>` : ''}
-                </div>
-                ${settled ? `<div style="font-size:11.5px;color:var(--text-dim);margin-top:2px;">${won} gagné${won>1?'s':''} · ${lost} perdu${lost>1?'s':''}</div>` : ''}
-              </div>
-              <button class="page-btn" data-page="mesparis" style="padding:7px 14px;background:transparent;color:var(--text);border:1px solid var(--border-2);border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0;">Détail →</button>
-            </div>`;
-        })()}
+        <!-- v30 — Daily P&L chip retiré : Théo n'enregistre pas ses paris. -->
 
         <!-- v29 — Hero banner : vivid, Winamax-style, with live top pick -->
         <div class="v29-hero" style="position:relative;margin:20px 0 10px;padding:28px 26px 26px;background:linear-gradient(135deg, rgba(167,139,250,.18) 0%, rgba(52,211,153,.09) 55%, rgba(251,191,36,.06) 100%), linear-gradient(180deg, var(--panel) 0%, var(--bg) 100%);border:1px solid var(--border);border-radius:16px;overflow:hidden;">
@@ -11378,21 +11121,8 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-26T07:05:26.266944Z","today":"
       });
     } catch (e) {}
 
-    // Tilt guard (3+ défaites)
-    try {
-      const trackedRaw = (typeof loadTrackedBets === 'function') ? loadTrackedBets() : {};
-      const trackedArr = Array.isArray(trackedRaw) ? trackedRaw : Object.values(trackedRaw || {});
-      const settled = trackedArr.filter(b => b && (b.status === 'gagné' || b.status === 'perdu')).sort((a,b) => (b.added_at||'').localeCompare(a.added_at||''));
-      const last3 = settled.slice(0,3);
-      if (last3.length === 3 && last3.every(b => b.status === 'perdu')) {
-        alerts.push({
-          ts: now, icon: '⚠️', type: 'Alerte anti-panique', color: 'red',
-          title: '3 défaites consécutives',
-          body: 'Prends une pause ou réduis la mise — discipline avant tout.',
-          action: 'historique'
-        });
-      }
-    } catch (e) {}
+    // v30 — Tilt guard retiré : il s'appuyait sur les paris trackés
+    // par l'utilisateur. La série du modèle remplace ce signal.
 
     // Matchs live
     try {
@@ -11410,27 +11140,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-26T07:05:26.266944Z","today":"
       });
     } catch (e) {}
 
-    // Wins récentes
-    try {
-      const trackedRaw = (typeof loadTrackedBets === 'function') ? loadTrackedBets() : {};
-      const trackedArr = Array.isArray(trackedRaw) ? trackedRaw : Object.values(trackedRaw || {});
-      const dayAgo = Date.now() - 24*3600*1000;
-      const recentWin = trackedArr.filter(b => {
-        if (!b || b.status !== 'gagné') return false;
-        const ts = b.added_at ? new Date(b.added_at).getTime() : 0;
-        return ts >= dayAgo;
-      }).slice(0,3);
-      recentWin.forEach(b => {
-        const stake = Number(b.stake) || 0;
-        const odd = Number(b.odds) || Number(b.odd) || 1;
-        alerts.push({
-          ts: b.added_at ? new Date(b.added_at).getTime() : now, icon: '✅', type: 'Pari gagné', color: 'green',
-          title: `+${(stake * (odd - 1)).toFixed(2)}€`,
-          body: `${b.home || '?'} vs ${b.away || '?'} · cote ${odd.toFixed(2)}`,
-          action: 'historique'
-        });
-      });
-    } catch (e) {}
+    // v30 — "Wins récentes" retiré : alimenté par les paris trackés.
 
     const colMap = {
       gold: '#ffd60a', green: '#30d158', red: '#ff3b30', orange: '#ff9f0a',
@@ -12096,80 +11806,8 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-26T07:05:26.266944Z","today":"
           })()}
         </section>
 
-        <section style="margin-top:32px;">
-          <h2 style="font-size:18px;margin:0 0 12px;color:var(--text);letter-spacing:-.3px;">💎 CLV — Tu bats le marché ?</h2>
-          <div style="padding:18px;background:var(--panel);border:1px solid var(--border);border-radius:12px;line-height:1.55;font-size:13.5px;color:var(--text-2);margin-bottom:14px;">
-            Le <b>Closing Line Value (CLV)</b> mesure si tu prends une cote MEILLEURE que celle juste avant le coup d'envoi. <b>+CLV moyen sur 50+ paris = la preuve que le modèle bat le marché</b>, indépendamment des résultats à court terme. C'est le signal que les bookmakers utilisent pour identifier les "smart money".
-          </div>
-          ${(() => {
-            // Aggregate CLV across all tracked bets
-            try {
-              const tb = (typeof loadTrackedBets === 'function') ? loadTrackedBets() : null;
-              if (!tb) return '<div style="padding:18px;background:var(--panel);border:1px solid var(--border);border-radius:12px;color:var(--text-dim);font-size:13px;">Aucun pari tracké pour calculer CLV.</div>';
-              const arr = Array.isArray(tb) ? tb : Object.values(tb || {});
-              const clvList = [];
-              arr.forEach(bet => {
-                const m = (typeof window._findMatchById === 'function') ? window._findMatchById(bet.id || bet.match_id) : null;
-                const clv = m && (typeof window._computeCLV === 'function') ? window._computeCLV(bet, m) : null;
-                if (clv) clvList.push(clv.value);
-              });
-              if (!clvList.length) {
-                return `<div style="padding:18px;background:var(--panel);border:1px solid var(--border);border-radius:12px;color:var(--text-dim);font-size:13px;">
-                  <div style="font-size:32px;margin-bottom:8px;opacity:.4;">📡</div>
-                  <div>Pas encore de paris avec closing line capturé.</div>
-                  <div style="font-size:11.5px;margin-top:4px;color:var(--text-dim2);">La fenêtre de capture est étroite (≤10min avant kickoff). Les paris pris early ou les matchs où ESPN drop les odds avant kickoff ne sont pas comptés. Continue à parier — la donnée s'accumule.</div>
-                </div>`;
-              }
-              const mean = clvList.reduce((s, v) => s + v, 0) / clvList.length;
-              const positive = clvList.filter(v => v > 0).length;
-              const positivePct = (100 * positive / clvList.length).toFixed(0);
-              const meanCol = mean > 0.005 ? '#34d399' : mean < -0.005 ? '#f87171' : '#fbbf24';
-              const meanLbl = mean > 0.02 ? 'Excellent — tu bats clairement le marché' : mean > 0 ? 'Positif — léger edge sur le marché' : mean > -0.02 ? 'Neutre — proche de l\'efficience marché' : 'Négatif — tu prends des cotes moins bonnes que le closing';
-              // Mini histogram (10 buckets de -5pt à +5pt)
-              const buckets = Array(11).fill(0);
-              clvList.forEach(v => {
-                const idx = Math.max(0, Math.min(10, Math.round((v + 0.05) * 100)));
-                buckets[idx]++;
-              });
-              const maxB = Math.max(...buckets, 1);
-              const histW = 280, histH = 60, barW = histW / 11;
-              const histPath = buckets.map((n, i) => {
-                const h = (n / maxB) * (histH - 8);
-                const x = i * barW;
-                const y = histH - h;
-                const isCenter = i === 5;
-                const col = i < 5 ? '#f87171' : i > 5 ? '#34d399' : 'var(--text-dim)';
-                return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${(barW - 1.5).toFixed(1)}" height="${h.toFixed(1)}" fill="${col}" opacity="${isCenter ? '.4' : '.7'}"/>`;
-              }).join('');
-              return `
-                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:12px;">
-                  <div style="padding:14px;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${meanCol};border-radius:0 10px 10px 0;">
-                    <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;font-weight:700;">CLV moyen</div>
-                    <div style="font-size:26px;font-weight:800;color:${meanCol};margin-top:4px;letter-spacing:-.5px;font-variant-numeric:tabular-nums;">${mean >= 0 ? '+' : ''}${(mean * 100).toFixed(2)}pt</div>
-                    <div style="font-size:11px;color:var(--text-dim);margin-top:4px;line-height:1.3;">${esc(meanLbl)}</div>
-                  </div>
-                  <div style="padding:14px;background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--brand);border-radius:0 10px 10px 0;">
-                    <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;font-weight:700;">CLV positif</div>
-                    <div style="font-size:26px;font-weight:800;color:var(--text);margin-top:4px;letter-spacing:-.5px;font-variant-numeric:tabular-nums;">${positivePct}%</div>
-                    <div style="font-size:11px;color:var(--text-dim);margin-top:4px;">sur ${clvList.length} pari${clvList.length>1?'s':''}</div>
-                  </div>
-                </div>
-                <div style="padding:14px;background:var(--panel);border:1px solid var(--border);border-radius:12px;">
-                  <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:8px;">Distribution</div>
-                  <svg viewBox="0 0 ${histW} ${histH + 16}" width="100%" height="${histH + 16}" style="display:block;">
-                    ${histPath}
-                    <line x1="${(5.5 * barW).toFixed(1)}" y1="0" x2="${(5.5 * barW).toFixed(1)}" y2="${histH}" stroke="var(--text-dim)" stroke-width="0.5" stroke-dasharray="2,2"/>
-                    <text x="2" y="${histH + 12}" fill="var(--text-dim)" font-size="9.5">−5pt</text>
-                    <text x="${(5.5 * barW).toFixed(1)}" y="${histH + 12}" fill="var(--text-dim)" font-size="9.5" text-anchor="middle">0</text>
-                    <text x="${histW - 2}" y="${histH + 12}" fill="var(--text-dim)" font-size="9.5" text-anchor="end">+5pt</text>
-                  </svg>
-                  <div style="font-size:11px;color:var(--text-dim);line-height:1.4;margin-top:6px;">Plus la masse se déplace à droite (vert) plus tu bats systématiquement le marché. La référence : le 0 (cote = closing).</div>
-                </div>
-              `;
-            } catch(e) {
-              return '<div style="padding:18px;color:var(--danger);font-size:12px;">Erreur calcul CLV : ' + esc(String(e.message || e)) + '</div>';
-            }
-          })()}
+        <!-- v30 — Section CLV retirée : elle agrégeait les paris trackés (loadTrackedBets). -->
+
         </section>
 
         <section style="margin-top:32px;">
@@ -12444,246 +12082,25 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-26T07:05:26.266944Z","today":"
       </div>`;
   }
 
-  // ====== v22 — Page Backtest + Attribution ======
+  // v30 — renderBacktestPage simplifiée : ne rend QUE le rapport modèle
+  // backtest_v2 (cron hebdo). Avant, cette page agrégeait aussi les paris
+  // trackés par l'utilisateur (courbe 6 mois, attribution sport/signal).
+  // Théo n'enregistre pas ses paris sur le site → tout ce bloc retiré.
   function renderBacktestPage(wrap) {
-    // v22.2 fix: loadTrackedBets retourne un objet (pas un array), statuts en FR
-    let trackedArr = [];
-    try {
-      const raw = (typeof loadTrackedBets === 'function') ? loadTrackedBets() : {};
-      trackedArr = Array.isArray(raw) ? raw : Object.values(raw || {});
-    } catch(e){}
-    // v23.2 fix : paris annulés exclus du backtest (distortent le taux de victoire)
-    const settled = trackedArr.filter(b => b && (b.status === 'gagné' || b.status === 'perdu'));
-
-    const now = new Date();
-    const startDate = new Date(now.getTime() - 183 * 86400000);
-    const startIso = startDate.toISOString().slice(0, 10);
-    const byDay = {};
-    settled.forEach(b => {
-      // date field est `added_at` (ISO string), fallback sur date/ts
-      // FIX Bug 8 : si added_at est un timestamp numérique (Date.now() stocké
-      // bêtement), String(1700000000000).slice(0,10)='1700000000' qui n'est
-      // pas une date ISO et la comparaison < startIso retourne n'importe quoi.
-      // Convertir en ISO d'abord si c'est un nombre.
-      let dateSrc = b.added_at || b.date || (b.ts ? new Date(b.ts).toISOString() : null);
-      if (!dateSrc) return;
-      if (typeof dateSrc === 'number') {
-        try { dateSrc = new Date(dateSrc).toISOString(); } catch(e) { return; }
-      }
-      const d = String(dateSrc).slice(0, 10);
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return;   // skip mal formé
-      if (d < startIso) return;
-      if (!byDay[d]) byDay[d] = { profit: 0, wins: 0, losses: 0, bets: 0 };
-      const stake = Number(b.stake) || 0;
-      const odd = Number(b.odds) || Number(b.odd) || Number(b.cote) || 0;
-      // Skip rows with corrupt stake/odds — they would otherwise inject
-      // a fake stake=1 (€) at odd=2 and credit a phantom +1€ on every
-      // "gagné" row missing a real cote, polluting the bilan curve.
-      if (stake <= 0) return;
-      if (b.status === 'gagné' && odd <= 1) return;
-      let pl = 0;
-      if (b.status === 'gagné') { pl = stake * (odd - 1); byDay[d].wins++; }
-      else if (b.status === 'perdu') { pl = -stake; byDay[d].losses++; }
-      byDay[d].profit += pl;
-      byDay[d].bets++;
-    });
-
-    const days = Object.keys(byDay).sort();
-    let cum = 10;
-    const curve = days.map(d => {
-      cum += byDay[d].profit;
-      return { date: d, cum, ...byDay[d] };
-    });
-
-    // Filter the totals on the same validity guard so totalStake / wr / roi
-    // align with what the curve was built on.
-    const validSettled = settled.filter(b => {
-      const stake = Number(b.stake) || 0;
-      const odd = Number(b.odds) || Number(b.odd) || Number(b.cote) || 0;
-      if (stake <= 0) return false;
-      if (b.status === 'gagné' && odd <= 1) return false;
-      return true;
-    });
-    const totalBets = validSettled.length;
-    const totalWins = validSettled.filter(b => b.status === 'gagné').length;
-    const totalProfit = curve.length ? curve[curve.length - 1].cum - 10 : 0;
-    const totalStake = validSettled.reduce((s, b) => s + (Number(b.stake) || 0), 0);
-    const roi = totalStake > 0 ? (totalProfit / totalStake) * 100 : 0;
-    const wr = totalBets > 0 ? (totalWins / totalBets) * 100 : 0;
-
-    // Attribution par sport — itère sur validSettled pour aligner avec
-    // les totaux et la courbe (sinon les sports avec stakes corrompus
-    // injectent un faux pari à 1€ @ 2.0 et faussent les "best/worst sport").
-    const sportAgg = {};
-    validSettled.forEach(b => {
-      const sport = b.sport || 'autre';
-      if (!sportAgg[sport]) sportAgg[sport] = { profit: 0, bets: 0, wins: 0, stake: 0 };
-      const stake = Number(b.stake) || 0;
-      const odd = Number(b.odds) || Number(b.odd) || Number(b.cote) || 0;
-      sportAgg[sport].stake += stake;
-      sportAgg[sport].bets++;
-      if (b.status === 'gagné') { sportAgg[sport].wins++; sportAgg[sport].profit += stake * (odd - 1); }
-      else if (b.status === 'perdu') { sportAgg[sport].profit -= stake; }
-    });
-    const sportRows = Object.entries(sportAgg).sort((a,b) => b[1].profit - a[1].profit);
-
-    // Attribution par type de signal
-    const signalAgg = {};
-    settled.forEach(b => {
-      const srcs = Array.isArray(b.sources) && b.sources.length ? b.sources : ['marche'];
-      srcs.forEach(src => {
-        const key = (src || 'marche').toLowerCase();
-        if (!signalAgg[key]) signalAgg[key] = { wins: 0, bets: 0 };
-        signalAgg[key].bets++;
-        if (b.status === 'gagné') signalAgg[key].wins++;
-      });
-    });
-
-    // Courbe SVG
-    let curveSvg = '';
-    if (curve.length >= 2) {
-      const W = 800, H = 220, padL = 44, padR = 10, padT = 20, padB = 30;
-      const minY = Math.min(10, ...curve.map(p => p.cum));
-      const maxY = Math.max(12, ...curve.map(p => p.cum));
-      const xStep = (W - padL - padR) / (curve.length - 1);
-      const yScale = (H - padT - padB) / (maxY - minY);
-      const points = curve.map((p, i) => `${padL + i * xStep},${H - padB - (p.cum - minY) * yScale}`).join(' ');
-      const areaPoints = `${padL},${H - padB} ${points} ${padL + (curve.length - 1) * xStep},${H - padB}`;
-      const endCum = curve[curve.length - 1].cum;
-      const lineColor = endCum >= 10 ? 'var(--accent)' : 'var(--danger)';
-      const fillColor = endCum >= 10 ? 'rgba(52,211,153,.15)' : 'rgba(248,113,113,.12)';
-      const baselineY = H - padB - (10 - minY) * yScale;
-      curveSvg = `
-        <svg viewBox="0 0 ${W} ${H}" width="100%" style="max-height:260px;display:block;">
-          <polygon points="${areaPoints}" fill="${fillColor}" />
-          <polyline points="${points}" fill="none" stroke="${lineColor}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-          <line x1="${padL}" y1="${baselineY}" x2="${W - padR}" y2="${baselineY}" stroke="var(--border-2)" stroke-dasharray="4 4" stroke-width="1"/>
-          <text x="${padL - 6}" y="${baselineY + 4}" fill="var(--text-dim)" font-size="11" text-anchor="end">10€</text>
-          <text x="${padL - 6}" y="${padT + 4}" fill="var(--text-dim)" font-size="11" text-anchor="end">${maxY.toFixed(0)}€</text>
-          <text x="${padL - 6}" y="${H - padB + 2}" fill="var(--text-dim)" font-size="11" text-anchor="end">${minY.toFixed(0)}€</text>
-          <text x="${padL}" y="${H - 6}" fill="var(--text-dim)" font-size="10">${curve[0].date}</text>
-          <text x="${W - padR}" y="${H - 6}" fill="var(--text-dim)" font-size="10" text-anchor="end">${curve[curve.length-1].date}</text>
-        </svg>`;
-    } else {
-      curveSvg = `<div style="padding:40px;text-align:center;color:var(--text-dim);background:var(--panel-2);border-radius:var(--r);border:1px dashed var(--border-2);">Pas encore assez de paris réglés pour tracer une courbe. Reviens après quelques jours de suivi.</div>`;
-    }
-
-    let verdict;
-    if (totalBets === 0) verdict = { emoji: '📭', color: 'var(--text-dim)', text: `Ton historique est vide. <button type="button" id="cta-goto-mesparis" style="background:var(--brand);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:12px;font-weight:600;cursor:pointer;margin-left:6px;">Aller à Mes paris →</button> pour commencer à suivre.` };
-    else if (totalBets < 20) verdict = { emoji: '🌱', color: 'var(--warn)', text: `Seulement ${totalBets} paris réglés. Trop tôt pour conclure — il faut 50 à 100 paris pour juger une stratégie.` };
-    else if (roi > 8) verdict = { emoji: '🏆', color: 'var(--accent)', text: `Excellent : +${roi.toFixed(1)}% de rentabilité sur ${totalBets} paris. Au-dessus de 5%, ta stratégie crée de la valeur réelle.` };
-    else if (roi > 0) verdict = { emoji: '✅', color: 'var(--info)', text: `Rentabilité positive (+${roi.toFixed(1)}%). Pas encore excellent mais tu bats le bookmaker — continue.` };
-    else verdict = { emoji: '📉', color: 'var(--danger)', text: `Rentabilité négative (${roi.toFixed(1)}%). Regarde quels sports te coûtent — peut-être faut-il en arrêter certains.` };
-
-    const sportRowsHtml = sportRows.map(([sp, s]) => {
-      const spRoi = s.stake > 0 ? (s.profit / s.stake) * 100 : 0;
-      const spWr = s.bets > 0 ? (s.wins / s.bets) * 100 : 0;
-      const color = spRoi >= 0 ? 'var(--accent)' : 'var(--danger)';
-      let spEmoji = '🎯', spLabel = sp;
-      try { spEmoji = (typeof sportEmoji === 'function' ? sportEmoji(sp) : '🎯'); spLabel = (typeof sportLabel === 'function' ? (sportLabel(sp) || sp) : sp); } catch(e){}
-      return `
-        <div style="display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr 1fr;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border);align-items:center;">
-          <div style="font-size:13px;font-weight:600;color:var(--text);">${spEmoji} ${esc(spLabel)}</div>
-          <div style="font-size:13px;color:var(--text-2);text-align:right;font-variant-numeric:tabular-nums;">${s.bets}</div>
-          <div style="font-size:13px;color:var(--text-2);text-align:right;font-variant-numeric:tabular-nums;">${spWr.toFixed(0)}%</div>
-          <div style="font-size:13px;color:${color};text-align:right;font-variant-numeric:tabular-nums;font-weight:700;">${spRoi>=0?'+':''}${spRoi.toFixed(1)}%</div>
-          <div style="font-size:13px;color:${color};text-align:right;font-variant-numeric:tabular-nums;font-weight:700;">${s.profit>=0?'+':''}${s.profit.toFixed(2)}€</div>
-        </div>`;
-    }).join('') || `<div style="padding:20px;text-align:center;color:var(--text-dim);">Pas de données par sport.</div>`;
-
-    const signalLabels = { marche: 'Cote bookmaker', forme: 'Forme récente', elo: 'Puissance (Elo)', h2h: 'Face-à-face' };
-    const signalRowsHtml = Object.entries(signalAgg).filter(([,v]) => v.bets > 0).map(([sig, s]) => {
-      const sigWr = s.bets > 0 ? (s.wins / s.bets) * 100 : 0;
-      const sigLabel = signalLabels[sig] || sig;
-      return `
-        <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border);">
-          <div style="flex:1;font-size:13px;font-weight:600;color:var(--text);">${esc(sigLabel)}</div>
-          <div style="font-size:12px;color:var(--text-dim);">${s.bets} paris</div>
-          <div style="width:120px;background:var(--panel-3);border-radius:var(--r-sm);height:8px;overflow:hidden;">
-            <div style="height:100%;width:${Math.min(100,sigWr).toFixed(0)}%;background:${sigWr>=60?'var(--accent)':sigWr>=50?'var(--info)':'var(--warn)'};transition:width .3s;"></div>
-          </div>
-          <div style="font-size:13px;font-weight:700;color:var(--text);min-width:48px;text-align:right;font-variant-numeric:tabular-nums;">${sigWr.toFixed(0)}%</div>
-        </div>`;
-    }).join('') || `<div style="padding:20px;text-align:center;color:var(--text-dim);">Pas encore assez de paris avec sources connues.</div>`;
-
     wrap.innerHTML = `
       <div style="max-width:1100px;margin:0 auto;padding:16px 8px 24px;">
-        <!-- Rapport backtest_v2 : vrai modèle predictMatch, cron hebdo -->
-        <div id="bt-v2" style="margin-bottom:32px;padding:20px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);">
+        <div style="margin-bottom:24px;padding:32px 0 20px;border-bottom:1px solid var(--border);position:relative;">
+          <div style="position:absolute;top:0;left:0;width:40px;height:3px;background:var(--brand);border-radius:0 0 2px 2px;"></div>
+          <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Performance modèle · cron hebdo</div>
+          <h1 style="margin:0 0 6px;font-size:40px;font-weight:800;letter-spacing:-1.4px;color:var(--text);line-height:1.1;">Performance</h1>
+          <div style="font-size:15px;color:var(--text-dim);max-width:640px;">Backtest réel de <code>predictMatch</code> sur l'archive des matchs réglés. Cron <code>backtest.yml</code> rejoue tous les picks chaque dimanche, ROI/WR/Brier/calibration ci-dessous.</div>
+        </div>
+
+        <!-- Rapport backtest_v2 : vrai modèle predictMatch -->
+        <div id="bt-v2" style="padding:20px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);">
           <div style="color:var(--text-dim);text-align:center;padding:24px;font-size:13px;">Chargement du backtest modèle…</div>
         </div>
-
-        <div style="margin-bottom:28px;padding:32px 0 20px;border-bottom:1px solid var(--border);position:relative;">
-          <div style="position:absolute;top:0;left:0;width:40px;height:3px;background:${totalProfit>=0?'var(--accent)':'var(--danger)'};border-radius:0 0 2px 2px;"></div>
-          <div style="font-size:11px;color:${totalProfit>=0?'var(--accent)':'var(--danger)'};text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Tes paris · 6 mois</div>
-          <h1 style="margin:0 0 6px;font-size:40px;font-weight:800;letter-spacing:-1.4px;color:var(--text);line-height:1.1;">Performance</h1>
-          <div style="font-size:15px;color:var(--text-dim);max-width:640px;">Ta courbe de cagnotte sur 6 mois (les paris que tu as marqués gagné/perdu).</div>
-        </div>
-
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px;">
-          <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;">
-            <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:600;">Paris réglés ${(typeof helpDot === 'function') ? helpDot('Nombre total de paris que tu as marqués comme gagnés ou perdus. Sert de base pour toutes les stats ci-dessous.') : ''}</div>
-            <div style="font-size:24px;font-weight:800;color:var(--text);margin-top:4px;font-variant-numeric:tabular-nums;">${totalBets}</div>
-          </div>
-          <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;">
-            <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:600;">Taux de victoire ${(typeof helpDot === 'function') ? helpDot('Sur 100 paris réglés, combien tu en as gagnés. <b>Exemple : 60% = 6 paris gagnés sur 10.</b> Attention : un haut taux ne veut pas toujours dire que tu gagnes de l\'argent (dépend des cotes).') : ''}</div>
-            <div style="font-size:24px;font-weight:800;color:var(--text);margin-top:4px;font-variant-numeric:tabular-nums;">${wr.toFixed(0)}%</div>
-          </div>
-          <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;">
-            <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:600;">Rentabilité ${(typeof helpDot === 'function') ? helpDot('Sur 100€ misés, combien tu récupères en plus ? <b>+10% = tu as gagné 10€ net.</b> Au-dessus de +5% sur 100+ paris, c\'est solide.') : ''}</div>
-            <div style="font-size:24px;font-weight:800;color:${roi>=0?'var(--accent)':'var(--danger)'};margin-top:4px;font-variant-numeric:tabular-nums;">${roi>=0?'+':''}${roi.toFixed(1)}%</div>
-          </div>
-          <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;">
-            <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:600;">Gain total ${(typeof helpDot === 'function') ? helpDot('Le total des gains moins les pertes en euros, cumulé sur toute la période.') : ''}</div>
-            <div style="font-size:24px;font-weight:800;color:${totalProfit>=0?'var(--accent)':'var(--danger)'};margin-top:4px;font-variant-numeric:tabular-nums;">${totalProfit>=0?'+':''}${totalProfit.toFixed(2)}€</div>
-          </div>
-        </div>
-
-        <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;margin-bottom:20px;">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-            <div style="font-size:24px;">${verdict.emoji}</div>
-            <div>
-              <div style="font-size:10px;color:var(--brand);text-transform:uppercase;letter-spacing:.8px;font-weight:700;">Verdict IA</div>
-              <div style="font-size:14px;color:${verdict.color};font-weight:600;">${verdict.text}</div>
-            </div>
-          </div>
-          ${curveSvg}
-        </div>
-
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;">
-          <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;">
-            <div style="padding:14px 16px;border-bottom:1px solid var(--border);background:var(--panel-2);">
-              <div style="font-size:14px;font-weight:700;color:var(--text);">🏆 Par sport</div>
-              <div style="font-size:11px;color:var(--text-dim);">Quel sport te rapporte vraiment</div>
-            </div>
-            <div style="display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr 1fr;gap:12px;padding:10px 14px;background:var(--panel-2);border-bottom:1px solid var(--border);font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;font-weight:700;">
-              <div>Sport</div><div style="text-align:right;">Paris</div><div style="text-align:right;">% W</div><div style="text-align:right;">Rentab.</div><div style="text-align:right;">Gain</div>
-            </div>
-            ${sportRowsHtml}
-          </div>
-
-          <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;">
-            <div style="padding:14px 16px;border-bottom:1px solid var(--border);background:var(--panel-2);">
-              <div style="font-size:14px;font-weight:700;color:var(--text);">🔬 Par signal</div>
-              <div style="font-size:11px;color:var(--text-dim);">Lequel t'a le plus fait gagner</div>
-            </div>
-            ${signalRowsHtml}
-          </div>
-        </div>
-
-        <div style="margin-top:20px;padding:14px 16px;background:var(--panel-2);border:1px dashed var(--border-2);border-radius:var(--r);font-size:12px;color:var(--text-dim);line-height:1.6;">
-          ℹ️ L'historique est construit à partir des paris que tu as suivis dans <b>Mes paris</b>. Plus tu suis de paris, plus la courbe devient fiable. Il faut minimum 50-100 paris réglés pour tirer des conclusions solides.
-        </div>
       </div>`;
-
-    // v23.2 — CTA empty state: bouton Aller à Mes paris
-    const ctaGoto = wrap.querySelector('#cta-goto-mesparis');
-    if (ctaGoto) ctaGoto.addEventListener('click', () => {
-      const b = document.querySelector('.page-btn[data-page="mesparis"]');
-      if (b) b.click();
-    });
-
-    // Chantier 3 — charger + rendre le rapport backtest_v2 (vrai modèle predictMatch)
     _renderBacktestV2(wrap.querySelector('#bt-v2'));
   }
 
@@ -13129,7 +12546,6 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-26T07:05:26.266944Z","today":"
           <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;">
             <h3 style="margin:0 0 12px;font-size:16px;font-weight:700;color:var(--text);">📤 Exports</h3>
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
-              <button id="export-csv-all" style="background:var(--brand);color:#fff;border:none;border-radius:var(--r);padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:var(--shadow-sm);">Exporter mes paris (CSV)</button>
               <button id="export-json-prefs" style="background:var(--panel-2);color:var(--text);border:1px solid var(--border);border-radius:var(--r);padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;">Exporter réglages (JSON)</button>
             </div>
           </div>
@@ -13220,20 +12636,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-26T07:05:26.266944Z","today":"
         renderProfilPage(wrap);
       });
     });
-    const exportCsv = wrap.querySelector('#export-csv-all');
-    if (exportCsv) exportCsv.addEventListener('click', () => {
-      try {
-        const trackedRaw = (typeof loadTrackedBets === 'function') ? loadTrackedBets() : {};
-        const trackedArr = Array.isArray(trackedRaw) ? trackedRaw : Object.values(trackedRaw || {});
-        const rows = [['date','home','away','league','sport','pick','stake','odds','status']];
-        trackedArr.forEach(b => rows.push([b.added_at||'', b.home||'', b.away||'', b.league||'', b.sport||'', b.pick_label||'', b.stake||'', b.odds||'', b.status||'']));
-        const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a'); a.href = url; a.download = 'mes-paris-'+todayIsoName()+'.csv'; a.click();
-        setTimeout(() => URL.revokeObjectURL(url), 500);
-      } catch (e) { console.warn('[Profil] export csv failed', e); }
-    });
+    // v30 — Bouton Export CSV "Mes paris" retiré (la page elle-même est partie).
     const exportJson = wrap.querySelector('#export-json-prefs');
     if (exportJson) exportJson.addEventListener('click', () => {
       const payload = (function(){ try { return JSON.parse(localStorage.getItem('userPrefs') || '{}') || {}; } catch(e) { return {}; } })();
@@ -13484,8 +12887,11 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-26T07:05:26.266944Z","today":"
     // v29 — Crédibilité / méthode (ROI vérifiable + qui suis-je)
     const isCredibilite = currentPage === 'credibilite';
 
-    // v23 — Sous-nav "Mon suivi" (mesparis/historique/bilan/backtest)
-    const suiviPages = ['mesparis', 'historique', 'bilan', 'backtest'];
+    // v23 — Sous-nav "Mon suivi" (historique/bilan/backtest).
+    // v30 — "Mes paris" retiré : Théo n'enregistre pas ses paris sur le
+    // site (ni manuel, ni import Winamax). Tout le tracking utilisateur
+    // a été désactivé.
+    const suiviPages = ['historique', 'bilan', 'backtest'];
     const isSuivi = suiviPages.includes(currentPage);
     let suiviNav = document.getElementById('suivi-subnav');
     if (isSuivi) {
@@ -13496,7 +12902,6 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-26T07:05:26.266944Z","today":"
         (document.querySelector('main') || document.body).insertBefore(suiviNav, (document.querySelector('main') || document.body).firstChild);
       }
       const tabs = [
-        { k:'mesparis',   emoji:'📝', label:'Mes paris' },
         { k:'historique', emoji:'📜', label:'Historique' },
         { k:'bilan',      emoji:'📊', label:'Bilan' },
         { k:'backtest',   emoji:'📈', label:'Performance' },
@@ -13684,21 +13089,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-26T07:05:26.266944Z","today":"
       }
     }
 
-    // Chantier UU — Mes paris page
-    const isMesParis = currentPage === 'mesparis';
-    let mesParisWrap = document.getElementById('mesparis-wrap');
-    if (!mesParisWrap) {
-      mesParisWrap = document.createElement('div');
-      mesParisWrap.id = 'mesparis-wrap';
-      (document.querySelector('main') || document.body).appendChild(mesParisWrap);
-    }
-    mesParisWrap.style.display = isMesParis ? '' : 'none';
-    if (isMesParis) {
-      renderMesParis(mesParisWrap);
-      if (window.PRONOSTICS_DATA && window.PRONOSTICS_DATA._lite && typeof window._ensureFullData === 'function') {
-        window._ensureFullData().then(() => { try { renderMesParis(mesParisWrap); } catch(e){} }).catch(()=>{});
-      }
-    }
+    // v30 — Mes paris : page retirée. Voir suiviPages plus haut.
 
     // Chantier BBBB — Santé (Coach IA admin) — accessible via Profil
     let santeWrap = document.getElementById('sante-wrap');
@@ -13816,7 +13207,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-26T07:05:26.266944Z","today":"
     // is one of its children. Dashboard stays as a solo button.
     const HUB_PAGES = {
       pronos: ['tous', 'locks', 'buteurs', 'combines', 'simples', 'top', 'value'],
-      perf:   ['mesparis', 'historique', 'bilan', 'backtest'],
+      perf:   ['historique', 'bilan', 'backtest'],
       plus:   ['academie', 'credibilite', 'alertes', 'profil', 'sante'],
     };
     document.querySelectorAll('nav.topbar-nav .hub').forEach(h => {
@@ -14707,34 +14098,10 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-26T07:05:26.266944Z","today":"
       ? `<div class="bilan-empty" style="margin-top:18px;">Aucun pick ne correspond aux filtres actuels. Essaye "Réinitialiser" pour tout afficher.</div>`
       : '';
 
-    // v30 — Coach IA patterns détectés retiré (dépendait de paris trackés
-    // que l'utilisateur n'enregistre pas).
+    // v30 — Coach IA patterns détectés retiré : il agrégeait les paris
+    // trackés par l'utilisateur. Le bloc complet (IIFE FFFF) était dead
+    // code après le précédent ass="const patternsHtml = ''", on le supprime.
     const patternsHtml = '';
-    const _COACH_FFFF_REMOVED = (() => {
-      try {
-        if (typeof loadTrackedBets !== 'function' || typeof detectHistoriquePatterns !== 'function') return '';
-        const all = loadTrackedBets();
-        const settled = Object.values(all).filter(b => b && (b.status === 'gagné' || b.status === 'perdu'));
-        const r = detectHistoriquePatterns(settled);
-        if (!r || !r.insights || !r.insights.length) return '';
-        const colorFor = (tone) => tone === 'good' ? '#10b981' : tone === 'bad' ? '#f87171' : '#a78bfa';
-        const bgFor = (tone) => tone === 'good' ? 'rgba(16,185,129,.08)' : tone === 'bad' ? 'rgba(248,113,113,.08)' : 'rgba(167,139,250,.08)';
-        const borderFor = (tone) => tone === 'good' ? 'rgba(16,185,129,.25)' : tone === 'bad' ? 'rgba(248,113,113,.25)' : 'rgba(167,139,250,.25)';
-        const listHtml = r.insights.map(i => `
-          <div style="display:flex;gap:12px;padding:12px 14px;background:${bgFor(i.tone)};border:1px solid ${borderFor(i.tone)};border-left:3px solid ${colorFor(i.tone)};border-radius:8px;font-size:13.5px;line-height:1.5;color:var(--text,#e6ebf2);">
-            <span style="font-size:18px;flex-shrink:0;">${i.icon}</span>
-            <span>${i.text}</span>
-          </div>`).join('');
-        return `<div style="margin:16px 0;padding:16px 18px;background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--brand);border-radius:12px;">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-            <span style="font-size:18px;">🤖</span>
-            <h3 style="margin:0;font-size:14px;letter-spacing:.4px;text-transform:uppercase;color:var(--text-dim);font-weight:700;">Coach IA — patterns détectés</h3>
-            <span style="margin-left:auto;font-size:11px;color:var(--text-dim2,#7b8693);">sur ${r.meta.n} paris réglés</span>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:8px;">${listHtml}</div>
-        </div>`;
-      } catch (e) { console.warn('[FFFF] detectHistoriquePatterns failed', e); return ''; }
-    })();
 
     wrap.innerHTML = `
       <div style="max-width:1280px;margin:0 auto;padding:4px 0 0;font-variant-numeric:tabular-nums;">
@@ -16154,618 +15521,11 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-26T07:05:26.266944Z","today":"
     };
   }
 
-  function renderMesParis(wrap) {
-    const bets = loadTrackedBets();
-    const betEntries = Object.entries(bets).sort((a, b) =>
-      new Date(b[1].added_at) - new Date(a[1].added_at)
-    );
+  // v30 — renderMesParis + _renderWinamaxImportSetup + _renderWinamaxImported
+  // + _showDatePrompt + handler set-model-start-btn : tous retirés.
+  // Théo n'enregistre pas ses paris sur le site (ni manuel, ni import).
 
-    // v30 — Charge winamax_my_bets.json en async et l'affiche en haut
-    // de la page Mes paris. Renderé après le innerHTML pour ne pas bloquer.
-    const _injectWinamaxSection = () => {
-      const slot = wrap.querySelector('#mesparis-winamax-slot');
-      if (!slot) return;
-      fetch(`winamax_my_bets.json?t=${Date.now()}`, { cache: 'no-store' })
-        .then(r => r.ok ? r.json() : Promise.reject('not_found'))
-        .then(doc => {
-          slot.innerHTML = _renderWinamaxImported(doc);
-        })
-        .catch(() => {
-          slot.innerHTML = _renderWinamaxImportSetup();
-        });
-    };
-
-    if (!betEntries.length) {
-      // v30 — Page Mes paris simplifiée : le bouton "J'ai parié" n'existe
-      // plus (retiré pour la cohérence "site informationnel"), donc le
-      // tracking manuel n'a plus de point d'entrée. La page se concentre
-      // exclusivement sur l'import Winamax (winamax_my_bets.json) en
-      // attendant que l'utilisateur l'ait configuré.
-      wrap.innerHTML = `
-        <div style="max-width:1200px;margin:0 auto;padding:24px;">
-          <div style="padding:40px 0 24px;border-bottom:1px solid var(--border);margin-bottom:24px;">
-            <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Suivi · paris importés</div>
-            <h1 style="margin:0 0 6px;font-size:32px;font-weight:800;letter-spacing:-1.1px;color:var(--text);line-height:1.1;">Mes paris</h1>
-            <div style="font-size:14px;color:var(--text-dim);max-width:640px;line-height:1.5;">Synchronisation directe depuis ton compte Winamax via <code style="background:rgba(255,255,255,.05);padding:2px 6px;border-radius:4px;">scripts/import_winamax_account.py</code>. Si tu n'as pas encore lancé l'import, suis les instructions ci-dessous.</div>
-          </div>
-          <!-- Slot pour les paris importés Winamax (chargé async) -->
-          <div id="mesparis-winamax-slot">
-            <div style="padding:14px 16px;background:var(--panel-2);border:1px solid var(--border);border-radius:10px;color:var(--text-dim);font-size:13px;text-align:center;">
-              🎯 Chargement de tes paris Winamax importés…
-            </div>
-          </div>
-        </div>`;
-      _injectWinamaxSection();
-      return;
-    }
-
-    // Group bets by status
-    const byStatus = { 'en cours': [], 'gagné': [], 'perdu': [], 'annulé': [] };
-    let totalStaked = 0, totalReturned = 0;
-
-    betEntries.forEach(([key, bet]) => {
-      if (byStatus[bet.status] !== undefined) {
-        byStatus[bet.status].push({ key, bet });
-      }
-      if (bet.status !== 'en cours') {
-        // FIX : si bet.stake = 'abc' (string corrompu), 'abc' || 0 retourne
-        // 'abc' (truthy) → totalStaked = 0 + 'abc' = '0abc' string concat
-        // → roi calculation casse silencieusement. Forcer Number coerce.
-        const _stake = Number(bet.stake) || 0;
-        const _odds = Number(bet.odds) || Number(bet.odd) || 0;
-        totalStaked += _stake;
-        if (bet.status === 'gagné') {
-          totalReturned += _stake * _odds;
-        }
-      }
-    });
-
-    const pl = totalReturned - totalStaked;
-    const roi = totalStaked > 0 ? (100 * pl / totalStaked) : 0;
-    const plColor = pl > 0 ? '#34d399' : pl < 0 ? '#f87171' : 'var(--text-dim)';
-
-    const renderBet = (key, bet) => {
-      // FIX Bug 2 + 3 : guards sur les champs critiques au cas où le bet
-      // est mal formé (migration ancienne version, import, corruption).
-      // Avant : "Invalid Date", "NaN€", ou TypeError sur bet.stake.toFixed().
-      const _normNum = (v) => { const n = Number(v); return isFinite(n) ? n : 0; };
-      const stake = _normNum(bet.stake);
-      const odds = _normNum(bet.odds);
-      const addedDate = bet.added_at
-        ? (() => {
-            const d = new Date(bet.added_at);
-            return isNaN(d.getTime()) ? '—' : d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
-          })()
-        : '—';
-      const statusColor =
-        bet.status === 'gagné' ? '#34d399' :
-        bet.status === 'perdu' ? '#f87171' :
-        bet.status === 'annulé' ? 'var(--text-dim2)' :
-        'var(--text-dim)';
-      const statusEmoji =
-        bet.status === 'gagné' ? '✅' :
-        bet.status === 'perdu' ? '❌' :
-        bet.status === 'annulé' ? '⛔' : '⏳';
-
-      const potentialReturn = (stake > 0 && odds > 0) ? (stake * odds).toFixed(2) : '—';
-      const betResult = (stake > 0 && odds > 0)
-        ? (bet.status === 'gagné' ? `+${(stake * (odds - 1)).toFixed(2)}€` :
-           bet.status === 'perdu' ? `-${stake.toFixed(2)}€` : '—')
-        : '—';
-
-      // v30 — CLV badge : closing line value vs cote prise.
-      // Si match a closing_odds capturé par snapshot_odds.py + le pickKey est
-      // résolvable, on affiche un petit badge coloré (vert positif, rouge négatif).
-      let clvBadge = '';
-      try {
-        const matchObj = (typeof window._findMatchById === 'function') ? window._findMatchById(bet.id || bet.match_id) : null;
-        const clv = matchObj && (typeof window._computeCLV === 'function') ? window._computeCLV(bet, matchObj) : null;
-        if (clv) {
-          const col = clv.value > 0.005 ? '#34d399' : clv.value < -0.005 ? '#f87171' : 'var(--text-dim)';
-          const bg = clv.value > 0.005 ? 'rgba(52,211,153,.12)' : clv.value < -0.005 ? 'rgba(248,113,113,.12)' : 'rgba(123,134,147,.08)';
-          clvBadge = `<span title="CLV : ta cote ${clv.takenOdd.toFixed(2)} vs closing ${clv.closingOdd.toFixed(2)}. Positif = tu as battu le marché." style="display:inline-block;padding:2px 7px;background:${bg};color:${col};border-radius:6px;font-size:10.5px;font-weight:700;margin-left:6px;cursor:help;">CLV ${esc(clv.pct)}</span>`;
-        }
-      } catch(e){}
-
-      let actionButtons = '';
-      if (bet.status === 'en cours') {
-        actionButtons = `
-          <button class="tracked-bet-win" data-key="${esc(key)}" style="padding:4px 8px;background:rgba(52,211,153,.18);color:#34d399;border:1px solid rgba(52,211,153,.3);border-radius:6px;font-size:11px;cursor:pointer;margin-right:4px;">✓ Gagné</button>
-          <button class="tracked-bet-loss" data-key="${esc(key)}" style="padding:4px 8px;background:rgba(248,113,113,.18);color:#f87171;border:1px solid rgba(248,113,113,.3);border-radius:6px;font-size:11px;cursor:pointer;margin-right:4px;">✗ Perdu</button>
-          <button class="tracked-bet-cancel" data-key="${esc(key)}" style="padding:4px 8px;background:rgba(255,255,255,.05);color:var(--text-dim2);border:1px solid var(--border);border-radius:6px;font-size:11px;cursor:pointer;">Annuler</button>`;
-      }
-      const deleteBtn = `<button class="tracked-bet-delete" data-key="${esc(key)}" style="padding:4px 8px;background:rgba(255,255,255,.05);color:var(--text-dim2);border:1px solid var(--border);border-radius:6px;font-size:11px;cursor:pointer;margin-left:auto;">Supprimer</button>`;
-
-      return `
-        <div style="display:grid;grid-template-columns:1fr;gap:12px;padding:12px 14px;border-bottom:1px solid var(--border);font-size:13px;">
-          <div style="display:flex;gap:8px;align-items:center;">
-            <div style="flex:1;">
-              <div style="font-weight:600;color:var(--text);">${esc(bet.home || '?')} vs ${esc(bet.away || '?')}</div>
-              <div style="font-size:11px;color:var(--text-dim);">${esc(bet.league || '?')} · ${addedDate}</div>
-            </div>
-            <div style="text-align:right;font-weight:600;color:${statusColor};">${statusEmoji} ${bet.status}</div>
-          </div>
-          <div style="display:grid;grid-template-columns:auto auto auto auto;gap:16px;font-size:12px;color:var(--text-dim);">
-            <div>
-              <div style="font-size:10px;text-transform:uppercase;letter-spacing:.3px;">Pick</div>
-              <div style="color:var(--text);font-weight:500;">${esc(bet.pick_label || '?')}</div>
-            </div>
-            <div>
-              <div style="font-size:10px;text-transform:uppercase;letter-spacing:.3px;">Cote</div>
-              <div style="color:var(--text);font-weight:500;">${odds.toFixed(2)}${clvBadge}</div>
-            </div>
-            <div>
-              <div style="font-size:10px;text-transform:uppercase;letter-spacing:.3px;">Mise</div>
-              <div style="color:var(--text);font-weight:500;">${stake.toFixed(2)}€</div>
-            </div>
-            <div>
-              <div style="font-size:10px;text-transform:uppercase;letter-spacing:.3px;">Retour pot.</div>
-              <div style="color:var(--text);font-weight:500;">${potentialReturn}€</div>
-            </div>
-          </div>
-          ${bet.status !== 'en cours' ? `
-            <div style="text-align:right;font-weight:700;color:${statusColor};font-size:13px;">
-              Résultat : ${betResult}
-            </div>
-          ` : ''}
-          ${bet.status !== 'en cours' ? (() => {
-            try {
-              const narrative = (typeof generatePostMatchNarrative === 'function') ? generatePostMatchNarrative(bet) : '';
-              if (!narrative) return '';
-              return `<div style="padding:10px 12px;background:rgba(167,139,250,.06);border-left:2px solid var(--brand);border-radius:6px;font-size:12.5px;color:var(--text-2);line-height:1.5;">
-                <div style="font-size:10px;color:var(--brand);text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:4px;">🤖 Analyse IA</div>
-                ${narrative}
-              </div>`;
-            } catch(e) { return ''; }
-          })() : ''}
-          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;">
-            ${actionButtons}
-            ${deleteBtn}
-          </div>
-        </div>`;
-    };
-
-    const sectionHtml = (status, label, bets) => {
-      if (!bets.length) return '';
-      return `
-        <div style="margin-bottom:24px;">
-          <div style="font-size:13px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;padding:0 14px;">${label}</div>
-          <div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;overflow:hidden;">
-            ${bets.map(({key, bet}) => renderBet(key, bet)).join('')}
-          </div>
-        </div>`;
-    };
-
-    // Chantier ZZZZ — bloc Coach IA (insights + tables)
-    const coach = computeCoachInsights();
-    const coachBlockHtml = (coach && coach.total > 0) ? (() => {
-      const kindStyle = (k) => {
-        if (k === 'good') return 'background:rgba(52,211,153,.08);border-left:3px solid #34d399;color:var(--text);';
-        if (k === 'bad')  return 'background:rgba(248,113,113,.08);border-left:3px solid #f87171;color:var(--text);';
-        return 'background:rgba(234,179,8,.08);border-left:3px solid #eab308;color:var(--text);';
-      };
-      const insightsHtml = coach.insights.map(i => `
-        <div style="padding:10px 14px;border-radius:8px;margin-bottom:8px;font-size:13px;line-height:1.5;${kindStyle(i.kind)}">
-          <span style="margin-right:8px;">${i.icon}</span>${i.text}
-        </div>
-      `).join('') || '<div style="padding:10px 14px;color:var(--text-dim);font-size:13px;">Pas encore assez de signal. Continue à tracker — les conseils arrivent.</div>';
-
-      const renderTable = (title, rows, showSport) => {
-        if (!rows || !rows.length) return '';
-        const top = rows.slice(0, 6);
-        return `
-          <div style="margin-top:14px;">
-            <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;font-weight:600;padding:0 4px 6px;">${esc(title)}</div>
-            <div style="background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;overflow:hidden;">
-              ${top.map((r, idx) => {
-                const col = r.roi >= 10 ? '#34d399' : r.roi <= -10 ? '#f87171' : 'var(--text-dim)';
-                return `
-                  <div style="display:grid;grid-template-columns:1fr 60px 70px 70px;gap:8px;padding:8px 12px;${idx < top.length - 1 ? 'border-bottom:1px solid var(--border);' : ''}font-size:12px;align-items:center;">
-                    <div style="color:var(--text);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(r.key)}">${esc(r.key)}</div>
-                    <div style="text-align:right;color:var(--text-dim);font-variant-numeric:tabular-nums;">${r.w}–${r.l}</div>
-                    <div style="text-align:right;color:var(--text-dim);font-variant-numeric:tabular-nums;">${r.wr.toFixed(0)}%</div>
-                    <div style="text-align:right;color:${col};font-weight:700;font-variant-numeric:tabular-nums;">${r.roi >= 0 ? '+' : ''}${r.roi.toFixed(1)}%</div>
-                  </div>`;
-              }).join('')}
-            </div>
-          </div>`;
-      };
-
-      const plCoachCol = coach.pl > 0 ? '#34d399' : coach.pl < 0 ? '#f87171' : 'var(--text-dim)';
-      return `
-        <div style="margin-bottom:28px;background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--brand);border-radius:var(--r-lg);padding:20px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
-            <div>
-              <div style="font-size:10px;color:var(--brand);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;">Coach personnel</div>
-              <div style="font-size:18px;font-weight:800;color:var(--text);letter-spacing:-.3px;margin:2px 0 3px;">Ce que dit ta data</div>
-              <div style="font-size:12px;color:var(--text-dim);">
-                ${coach.total} pari${coach.total > 1 ? 's' : ''} réglé${coach.total > 1 ? 's' : ''} · <b>${coach.wr.toFixed(1)}%</b> gagnés · rentabilité <span style="color:${plCoachCol};font-weight:700;">${coach.roi >= 0 ? '+' : ''}${coach.roi.toFixed(1)}%</span> · solde <span style="color:${plCoachCol};font-weight:700;">${coach.pl >= 0 ? '+' : ''}${coach.pl.toFixed(2)}€</span>
-              </div>
-            </div>
-            <button id="coach-toggle-details" style="background:var(--panel-2);color:var(--brand);border:1px solid var(--brand-border);border-radius:var(--r);padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;">Voir détails</button>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:0;">
-            ${insightsHtml}
-          </div>
-          <div id="coach-details-panel" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;">
-              ${renderTable('Par sport', coach.bySport)}
-              ${renderTable('Par ligue', coach.byLeague.slice(0, 6))}
-              ${renderTable('Par tranche de cote', coach.byOdds)}
-              ${renderTable('Par créneau horaire', coach.byTime)}
-              ${renderTable('Par jour de la semaine', coach.byDow)}
-            </div>
-            <div style="margin-top:10px;font-size:11px;color:var(--text-dim);font-style:italic;">
-              Lecture : W–L · Win Rate · ROI. Les insights ci-dessus s'appuient sur ces tables — plus tu tracks, plus ils deviennent précis.
-            </div>
-          </div>
-        </div>`;
-    })() : '';
-
-    wrap.innerHTML = `
-      <div style="max-width:1280px;margin:0 auto;padding:4px 0 0;font-variant-numeric:tabular-nums;">
-        <!-- v30 — Slot Winamax importés (chargé async, prend la priorité visuelle) -->
-        <div id="mesparis-winamax-slot" style="margin:24px 0;">
-          <div style="padding:14px 16px;background:var(--panel-2);border:1px solid var(--border);border-radius:10px;color:var(--text-dim);font-size:13px;text-align:center;">
-            🎯 Chargement de tes paris Winamax importés…
-          </div>
-        </div>
-
-        <div style="margin-bottom:24px;padding:32px 0 20px;border-bottom:1px solid var(--border);position:relative;">
-          <div style="position:absolute;top:0;left:0;width:40px;height:3px;background:${pl >= 0 ? 'var(--accent)' : 'var(--danger)'};border-radius:0 0 2px 2px;"></div>
-          <div style="font-size:11px;color:${pl >= 0 ? 'var(--accent)' : 'var(--danger)'};text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Suivi manuel · ${betEntries.length} pari${betEntries.length>1?'s':''}</div>
-          <h1 style="margin:0 0 6px;font-size:40px;font-weight:800;letter-spacing:-1.4px;color:var(--text);line-height:1;">Mes paris (manuels)</h1>
-          <div style="font-size:14px;color:var(--text-dim);max-width:640px;">Paris que tu as trackés manuellement via "J'ai parié" — utile pour comparer aux pronos du modèle.</div>
-        </div>
-
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;background:var(--panel);margin-bottom:24px;">
-          <div style="padding:18px 22px;border-right:1px solid var(--border);">
-            <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;">Gains / pertes</div>
-            <div style="font-size:26px;font-weight:800;color:${plColor};margin-top:6px;">${pl >= 0 ? '+' : ''}${pl.toFixed(2)}€</div>
-          </div>
-          <div style="padding:18px 22px;border-right:1px solid var(--border);">
-            <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;">Rentabilité</div>
-            <div style="font-size:26px;font-weight:800;color:${plColor};margin-top:6px;">${roi >= 0 ? '+' : ''}${roi.toFixed(1)}%</div>
-          </div>
-          <div style="padding:18px 22px;">
-            <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;">Total misé</div>
-            <div style="font-size:26px;font-weight:800;color:var(--text);margin-top:6px;">${totalStaked.toFixed(2)}€</div>
-          </div>
-        </div>
-
-        ${coachBlockHtml}
-
-        ${sectionHtml('en cours', '⏳ En cours', byStatus['en cours'])}
-        ${sectionHtml('gagné', '✅ Gagnés', byStatus['gagné'])}
-        ${sectionHtml('perdu', '❌ Perdus', byStatus['perdu'])}
-        ${sectionHtml('annulé', '⛔ Annulés', byStatus['annulé'])}
-      </div>`;
-
-    // v30 — Charge la section Winamax importé dans son slot dédié (asynchrone)
-    _injectWinamaxSection();
-
-    // Chantier ZZZZ — toggle détails du Coach IA
-    const coachToggleBtn = wrap.querySelector('#coach-toggle-details');
-    const coachDetailsPanel = wrap.querySelector('#coach-details-panel');
-    if (coachToggleBtn && coachDetailsPanel) {
-      coachToggleBtn.addEventListener('click', (ev) => {
-        ev.stopPropagation();
-        const open = coachDetailsPanel.style.display !== 'none';
-        coachDetailsPanel.style.display = open ? 'none' : '';
-        coachToggleBtn.textContent = open ? '📊 Voir détails' : '▲ Masquer détails';
-      });
-    }
-
-    // Event listeners
-    wrap.querySelectorAll('.tracked-bet-win').forEach(btn => btn.addEventListener('click', () => {
-      const key = btn.dataset.key;
-      const bets = loadTrackedBets();
-      const bet = bets[key];
-      updateTrackedBet(key, { status: 'gagné' });
-      // v23 — Génère et sauvegarde leçon
-      try {
-        if (bet && typeof extractLessonFromBet === 'function') {
-          const lesson = extractLessonFromBet({ ...bet, status: 'gagné' });
-          if (lesson) saveUserLesson(lesson);
-        }
-      } catch(e){}
-      renderMesParis(wrap);
-    }));
-    wrap.querySelectorAll('.tracked-bet-loss').forEach(btn => btn.addEventListener('click', () => {
-      const key = btn.dataset.key;
-      const bets = loadTrackedBets();
-      const bet = bets[key];
-      updateTrackedBet(key, { status: 'perdu' });
-      try {
-        if (bet && typeof extractLessonFromBet === 'function') {
-          const lesson = extractLessonFromBet({ ...bet, status: 'perdu' });
-          if (lesson) saveUserLesson(lesson);
-        }
-      } catch(e){}
-      renderMesParis(wrap);
-    }));
-    wrap.querySelectorAll('.tracked-bet-cancel').forEach(btn => btn.addEventListener('click', () => {
-      const key = btn.dataset.key;
-      updateTrackedBet(key, { status: 'annulé' });
-      renderMesParis(wrap);
-    }));
-    wrap.querySelectorAll('.tracked-bet-delete').forEach(btn => btn.addEventListener('click', async () => {
-      const key = btn.dataset.key;
-      // v30 — modal custom au lieu de confirm() (fragile en PWA)
-      const ok = (typeof window._showConfirm === 'function')
-        ? await window._showConfirm({
-            title: '🗑️ Supprimer ce pari ?',
-            body: 'Le pari sera retiré définitivement de ton historique.',
-            confirmLabel: 'Supprimer',
-            cancelLabel: 'Annuler',
-            danger: true,
-          })
-        : confirm('Supprimer ce pari ?');
-      if (ok) {
-        removeTrackedBet(key);
-        renderMesParis(wrap);
-      }
-    }));
-  }
-
-  // ============================================================
-  // v30 — Mes paris Winamax (import via scripts/import_winamax_account.py)
-  // ------------------------------------------------------------
-  // Rendu de la section qui affiche les paris importés depuis le compte
-  // Winamax de Théo. Color coding par tier de confiance + icônes sport,
-  // séparation singles / combinés, bilan filtrable "depuis activation
-  // modèle". Les données sont 100% locales (winamax_my_bets.json est
-  // gitignored), donc cette section n'apparait que sur localhost.
-  // ============================================================
-  function _renderWinamaxImportSetup() {
-    return `
-      <div style="padding:22px;background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--brand);border-radius:0 12px 12px 0;">
-        <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;margin-bottom:8px;">🎯 Mes paris Winamax</div>
-        <h3 style="margin:0 0 10px;font-size:20px;font-weight:800;color:var(--text);">Activer l'import auto pour alimenter le bilan</h3>
-        <div style="font-size:13.5px;color:var(--text-2);line-height:1.6;margin-bottom:14px;">
-          Le script local va chercher l'historique sur ton compte Winamax (mises, gains, paris en cours, combinés) toutes les 6h, puis remplit cette page avec tes <b>vraies</b> stats — pas juste la simulation modèle.
-        </div>
-
-        <!-- Setup AUTO recommandé -->
-        <div style="padding:14px 16px;background:var(--panel-2);border:1px solid var(--accent);border-radius:10px;margin-bottom:12px;">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-            <span style="font-size:18px;">⚡</span>
-            <div style="font-size:14px;color:var(--accent);font-weight:700;">Setup auto (recommandé · 1 click)</div>
-          </div>
-          <ol style="margin:0;padding-left:22px;color:var(--text-2);font-size:13px;line-height:1.7;">
-            <li>Connecte-toi sur <a href="https://www.winamax.fr" target="_blank" rel="noopener" style="color:var(--brand);">winamax.fr</a> dans ton navigateur (Chrome / Edge / Firefox).</li>
-            <li>Double-clique <code style="background:var(--panel);padding:2px 6px;border-radius:3px;">scripts\\setup_winamax_task.bat</code> → installe une tâche Windows qui tourne toutes les 6h.</li>
-            <li>Le script auto-extrait le cookie depuis Chrome (DPAPI), pas de copier-coller à faire.</li>
-            <li>Recharge cette page → tes paris apparaissent ici.</li>
-          </ol>
-        </div>
-
-        <!-- Setup MANUEL (fallback) -->
-        <details style="padding:12px 16px;background:var(--panel-2);border:1px solid var(--border-2);border-radius:10px;">
-          <summary style="cursor:pointer;font-size:13px;color:var(--text-dim);font-weight:600;user-select:none;">Si l'auto-extract ne marche pas → procédure manuelle (cookie collé à la main)</summary>
-          <ol style="margin:10px 0 0;padding-left:22px;color:var(--text-dim);font-size:12.5px;line-height:1.7;">
-            <li>F12 → onglet <b>Application</b> → <b>Cookies</b> → <code>https://www.winamax.fr</code>.</li>
-            <li>Copie la valeur du cookie <code>API_SESS</code> (ou <code>PHPSESSID</code>).</li>
-            <li>Crée <code>.winamax_session</code> à la racine du projet, colle la valeur.</li>
-            <li>Lance <code>python scripts/import_winamax_account.py</code></li>
-          </ol>
-        </details>
-
-        <div style="font-size:11.5px;color:var(--text-dim2);margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">
-          🔒 <b>Privacy :</b> <code>winamax_my_bets.json</code> + <code>.winamax_session</code> sont dans <code>.gitignore</code>. Tes paris restent en local, rien n'est commit / déployé sur GitHub Pages.
-        </div>
-      </div>
-    `;
-  }
-
-  function _renderWinamaxImported(doc) {
-    const bets = Array.isArray(doc.bets) ? doc.bets : [];
-    const summary = doc.summary || {};
-    const importedAt = doc.imported_at ? new Date(doc.imported_at) : null;
-    const ageMin = importedAt ? Math.floor((Date.now() - importedAt.getTime()) / 60000) : null;
-    const ageLabel = ageMin == null ? '?' : ageMin < 60 ? `${ageMin}min` : ageMin < 1440 ? `${Math.floor(ageMin/60)}h` : `${Math.floor(ageMin/1440)}j`;
-
-    // Filtrage "depuis activation modèle" — lit la prefs localStorage
-    let userPrefs = {};
-    try { userPrefs = JSON.parse(localStorage.getItem('userPrefs') || '{}'); } catch(e){}
-    const modelStart = userPrefs.modelStartDate || doc.model_start_date || null;
-    const modelStartTs = modelStart ? new Date(modelStart).getTime() : 0;
-
-    // Match imported bets against model picks (cross-reference). Ce mapping
-    // permet d'afficher un code couleur (lock=🔒, standard=🟢, hors-modèle=⚪)
-    // selon ce que disait le modèle au moment du pari.
-    const _matchTier = (bet) => {
-      if (!bet || !bet.legs || !bet.legs.length) return null;
-      // Pour chaque leg, tente de trouver un event correspondant dans data.days
-      const data = window.PRONOSTICS_DATA;
-      if (!data?.days) return null;
-      const allEvents = [];
-      Object.values(data.days).forEach(arr => allEvents.push(...(arr || [])));
-      let bestTier = null;
-      for (const leg of bet.legs) {
-        const evName = (leg.event || '').toLowerCase();
-        if (!evName) continue;
-        for (const ev of allEvents) {
-          const evN = (ev.name || '').toLowerCase();
-          if (evN && (evN.includes(evName.split(' vs ')[0]?.split(' ')[0] || '_X_') || evName.includes(evN.split(' ')[0]))) {
-            try {
-              const pred = predictMatch(ev);
-              if (!pred || pred.skip) continue;
-              const t = pred.isLock ? 'lock' : (pred.reliability >= 0.55 ? 'standard' : 'low');
-              if (!bestTier || (t === 'lock')) bestTier = t;
-            } catch(e){}
-            break;
-          }
-        }
-      }
-      return bestTier;
-    };
-
-    // Bucket par "depuis activation modèle"
-    const sinceModel = bets.filter(b => {
-      if (!modelStartTs) return true;
-      const t = b.date ? new Date(b.date).getTime() : 0;
-      return t >= modelStartTs;
-    });
-
-    // Stats
-    const _calc = (list) => {
-      let stake = 0, gain = 0, w = 0, l = 0, p = 0, singles = 0, combines = 0;
-      list.forEach(b => {
-        const s = Number(b.stake) || 0;
-        stake += s;
-        if (b.status === 'won') { w++; gain += (Number(b.actual_gain) || 0); }
-        else if (b.status === 'lost') { l++; gain -= s; }
-        else { p++; }
-        if (b.type === 'combine') combines++;
-        else singles++;
-      });
-      const settled = w + l;
-      return { stake, gain, w, l, p, singles, combines, wr: settled ? (100 * w / settled) : null, roi: stake ? (100 * gain / stake) : null, n: list.length };
-    };
-    const allStats = _calc(bets);
-    const modelStats = _calc(sinceModel);
-
-    const sportEm = (s) => ({ football:'⚽', tennis:'🎾', basketball:'🏀', hockey:'🏒', baseball:'⚾', mma:'🥊', rugby:'🏉' }[s] || '🏅');
-    const tierColor = (t) => t === 'lock' ? '#fbbf24' : t === 'standard' ? '#34d399' : t === 'low' ? '#f87171' : '#94a3b8';
-    const tierLabel = (t) => t === 'lock' ? '🔒 Lock' : t === 'standard' ? '🟢 Standard' : t === 'low' ? '🟡 Low conf' : '⚪ Hors-modèle';
-    const statusColor = (s) => s === 'won' ? '#34d399' : s === 'lost' ? '#f87171' : s === 'pending' ? '#a78bfa' : '#94a3b8';
-    const statusLabel = (s) => s === 'won' ? '✓ Gagné' : s === 'lost' ? '✗ Perdu' : s === 'pending' ? '⏳ En cours' : '— Annulé';
-    const fmtEur = (n) => (n == null || isNaN(n)) ? '—' : (n >= 0 ? '+' : '') + n.toFixed(2) + '€';
-
-    const renderBetRow = (b) => {
-      const tier = _matchTier(b);
-      const sport = (b.legs && b.legs[0] && b.legs[0].sport) || 'unknown';
-      const isCombine = b.type === 'combine' || (b.legs && b.legs.length > 1);
-      const dateStr = b.date ? new Date(b.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }) : '—';
-      const headerLeg = (b.legs && b.legs[0]) || {};
-      const eventLabel = isCombine ? `🎰 Combiné · ${b.legs.length} matchs` : (headerLeg.event || 'Pari unique');
-      const pickLabel = isCombine ? b.legs.map(l => l.pick || '?').join(' · ') : (headerLeg.pick || '');
-      return `
-        <div style="display:grid;grid-template-columns:60px 1fr 110px 90px 100px;gap:10px;padding:10px 14px;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${tierColor(tier)};border-radius:0 8px 8px 0;align-items:center;font-size:12.5px;">
-          <div style="font-size:11px;color:var(--text-dim);">${dateStr}</div>
-          <div style="overflow:hidden;">
-            <div style="font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${sportEm(sport)} ${esc(eventLabel)}</div>
-            <div style="font-size:11px;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(pickLabel)}${tier ? ` · <span style="color:${tierColor(tier)};">${tierLabel(tier)}</span>` : ''}</div>
-          </div>
-          <div style="text-align:right;font-variant-numeric:tabular-nums;">
-            <div style="color:var(--text);font-weight:600;">${b.stake != null ? Number(b.stake).toFixed(2)+'€' : '—'}</div>
-            <div style="font-size:10.5px;color:var(--text-dim);">@ ${b.odds != null ? Number(b.odds).toFixed(2) : '—'}</div>
-          </div>
-          <div style="text-align:right;color:${statusColor(b.status)};font-weight:600;">${statusLabel(b.status)}</div>
-          <div style="text-align:right;font-variant-numeric:tabular-nums;font-weight:700;color:${b.status === 'won' ? '#34d399' : b.status === 'lost' ? '#f87171' : 'var(--text-dim)'};">
-            ${b.status === 'won' ? fmtEur(Number(b.actual_gain) - Number(b.stake)) : b.status === 'lost' ? fmtEur(-Number(b.stake)) : (b.status === 'pending' && b.potential_gain ? '~' + fmtEur(Number(b.potential_gain) - Number(b.stake)) : '—')}
-          </div>
-        </div>
-      `;
-    };
-
-    const sortedBets = [...bets].sort((a, b) => (new Date(b.date || 0)) - (new Date(a.date || 0)));
-    const recentBets = sortedBets.slice(0, 25);
-
-    return `
-      <div style="padding:24px;background:var(--panel-2);border:1px solid var(--border);border-radius:14px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:18px;">
-          <div>
-            <div style="font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;margin-bottom:4px;">Mes paris Winamax · importés</div>
-            <h2 style="margin:0;font-size:24px;font-weight:800;color:var(--text);letter-spacing:-.5px;">${bets.length} pari${bets.length>1?'s':''} suivis</h2>
-            <div style="font-size:12px;color:var(--text-dim);margin-top:3px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-              <span>Dernière synchro il y a <b style="color:${ageMin != null && ageMin < 720 ? '#34d399' : ageMin != null && ageMin < 1440 ? '#fbbf24' : '#f87171'};">${ageLabel}</b></span>
-              ${doc.source ? `<span style="padding:1px 7px;background:rgba(167,139,250,.15);color:var(--brand);border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.4px;">${doc.source === 'chrome' ? '🤖 AUTO chrome' : doc.source === 'firefox' ? '🤖 AUTO firefox' : '✋ MANUEL'}</span>` : ''}
-              <span style="color:var(--text-dim2);">·</span>
-              <span style="color:var(--text-dim);">refresh: <code style="font-size:10px;background:var(--panel);padding:1px 5px;border-radius:3px;">python scripts/import_winamax_account.py</code></span>
-            </div>
-          </div>
-          ${modelStart ? `<div style="font-size:11px;color:var(--text-dim);background:rgba(167,139,250,.12);padding:5px 11px;border-radius:6px;border:1px solid rgba(167,139,250,.3);">Activation modèle : <b style="color:var(--brand);">${modelStart.slice(0,10)}</b></div>` : `<button id="set-model-start-btn" style="padding:6px 12px;font-size:12px;font-weight:600;background:var(--panel);color:var(--brand);border:1px solid var(--brand);border-radius:6px;cursor:pointer;">⚙️ Définir date activation modèle</button>`}
-        </div>
-
-        <!-- Stats globales vs depuis modèle -->
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:20px;">
-          <div style="padding:14px;background:var(--panel);border-radius:10px;border-left:3px solid var(--text-dim);">
-            <div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">Tout l'historique</div>
-            <div style="font-size:24px;font-weight:800;color:${allStats.roi == null ? 'var(--text-dim)' : allStats.roi >= 0 ? '#34d399' : '#f87171'};margin-top:4px;letter-spacing:-.5px;">${allStats.roi == null ? '—' : (allStats.roi >= 0 ? '+' : '') + allStats.roi.toFixed(1) + '%'}</div>
-            <div style="font-size:11px;color:var(--text-dim);margin-top:3px;">${allStats.n} paris · ${allStats.w}W ${allStats.l}L · ${fmtEur(allStats.gain)}</div>
-          </div>
-          ${modelStart ? `
-          <div style="padding:14px;background:var(--panel);border-radius:10px;border-left:3px solid var(--brand);">
-            <div style="font-size:10.5px;color:var(--brand);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">Depuis activation modèle</div>
-            <div style="font-size:24px;font-weight:800;color:${modelStats.roi == null ? 'var(--text-dim)' : modelStats.roi >= 0 ? '#34d399' : '#f87171'};margin-top:4px;letter-spacing:-.5px;">${modelStats.roi == null ? '—' : (modelStats.roi >= 0 ? '+' : '') + modelStats.roi.toFixed(1) + '%'}</div>
-            <div style="font-size:11px;color:var(--text-dim);margin-top:3px;">${modelStats.n} paris · ${modelStats.w}W ${modelStats.l}L · ${fmtEur(modelStats.gain)}</div>
-          </div>` : ''}
-          <div style="padding:14px;background:var(--panel);border-radius:10px;border-left:3px solid #fbbf24;">
-            <div style="font-size:10.5px;color:#fbbf24;text-transform:uppercase;letter-spacing:.6px;font-weight:700;">Combinés</div>
-            <div style="font-size:24px;font-weight:800;color:var(--text);margin-top:4px;letter-spacing:-.5px;">${allStats.combines}</div>
-            <div style="font-size:11px;color:var(--text-dim);margin-top:3px;">vs ${allStats.singles} simples</div>
-          </div>
-          <div style="padding:14px;background:var(--panel);border-radius:10px;border-left:3px solid #a78bfa;">
-            <div style="font-size:10.5px;color:#a78bfa;text-transform:uppercase;letter-spacing:.6px;font-weight:700;">En cours</div>
-            <div style="font-size:24px;font-weight:800;color:var(--text);margin-top:4px;letter-spacing:-.5px;">${allStats.p}</div>
-            <div style="font-size:11px;color:var(--text-dim);margin-top:3px;">paris non réglés</div>
-          </div>
-        </div>
-
-        <!-- Liste des paris récents -->
-        <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:8px;">25 derniers paris</div>
-        <div style="display:flex;flex-direction:column;gap:6px;">
-          ${recentBets.length ? recentBets.map(renderBetRow).join('') : '<div style="padding:30px;text-align:center;color:var(--text-dim);">Aucun pari importé pour l\'instant.</div>'}
-        </div>
-        <div style="font-size:11px;color:var(--text-dim2);margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">
-          🎨 <b>Code couleur</b> : barre 🔒 jaune = lock du modèle, 🟢 vert = pick standard, 🟡 rouge = low conf, ⚪ gris = pari hors modèle (ou non matché).
-        </div>
-      </div>
-    `;
-  }
-
-  // Modal personnalisée pour saisie date (prompt() interdit en PWA standalone).
-  function _showDatePrompt(currentValue, title, body) {
-    return new Promise((resolve) => {
-      const overlay = document.createElement('div');
-      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);padding:16px;';
-      overlay.innerHTML = `
-        <div style="max-width:420px;width:100%;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:22px;box-shadow:0 12px 40px rgba(0,0,0,.4);">
-          <h3 style="margin:0 0 8px;font-size:18px;color:var(--text);font-weight:700;">${esc(title)}</h3>
-          <div style="font-size:13px;color:var(--text-dim);line-height:1.5;margin-bottom:14px;">${body || ''}</div>
-          <input type="date" value="${esc(currentValue || '')}" style="width:100%;padding:10px 12px;font-size:14px;background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:8px;font-variant-numeric:tabular-nums;">
-          <div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end;">
-            <button data-cancel style="padding:8px 16px;font-size:13px;background:var(--panel-2);color:var(--text-2);border:1px solid var(--border-2);border-radius:7px;cursor:pointer;font-weight:600;">Annuler</button>
-            <button data-ok style="padding:8px 16px;font-size:13px;background:var(--brand);color:#08080a;border:none;border-radius:7px;cursor:pointer;font-weight:700;">Valider</button>
-          </div>
-        </div>
-      `;
-      const cleanup = (val) => { try { document.body.removeChild(overlay); } catch(_){} resolve(val); };
-      overlay.querySelector('[data-cancel]').addEventListener('click', () => cleanup(null));
-      overlay.querySelector('[data-ok]').addEventListener('click', () => cleanup(overlay.querySelector('input').value || null));
-      overlay.addEventListener('click', (e) => { if (e.target === overlay) cleanup(null); });
-      overlay.querySelector('input').addEventListener('keydown', (e) => { if (e.key === 'Enter') cleanup(e.target.value); if (e.key === 'Escape') cleanup(null); });
-      document.body.appendChild(overlay);
-      setTimeout(() => overlay.querySelector('input')?.focus(), 50);
-    });
-  }
-
-  // Wire le bouton "Définir date activation modèle" (délégué au document
-  // car il est rendu async après l'init de renderBilanPage)
-  document.addEventListener('click', async (e) => {
-    const btn = e.target.closest('#set-model-start-btn');
-    if (!btn) return;
-    e.preventDefault();
-    let prefs = {};
-    try { prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}'); } catch(_){}
-    const cur = prefs.modelStartDate || '';
-    const v = await _showDatePrompt(
-      cur || new Date().toISOString().slice(0,10),
-      'Date d\'activation du modèle',
-      'Les paris avant cette date n\'utilisaient pas tes pronos, donc le bilan "<b>depuis activation</b>" les exclut pour mesurer la perf <b>réelle</b> du modèle.'
-    );
-    if (!v) return;
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return;
-    prefs.modelStartDate = v;
-    localStorage.setItem('userPrefs', JSON.stringify(prefs));
-    // Re-render Bilan pour appliquer
-    const wrap = document.getElementById('bilan-wrap');
-    if (wrap && typeof renderBilanPage === 'function') renderBilanPage(wrap);
-  });
-
-  // Aggregate bilan view: overall ROI, per-sport ROI, recent results, top completed picks
+    // Aggregate bilan view: overall ROI, per-sport ROI, recent results, top completed picks
   function renderBilanPage(wrap) {
     const data = window.PRONOSTICS_DATA;
     if (!data || !data.days) { wrap.innerHTML = '<div class="bilan-empty">Pas de données de bilan.</div>'; return; }
@@ -17964,29 +16724,9 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         ` : `<div class="bilan-empty">Aucun pari du modèle évalué pour le moment.</div>`}
       </div>
 
-      <!-- v30 — Mes paris Winamax (importés via scripts/import_winamax_account.py) -->
-      <div id="winamax-import-section" style="margin:32px auto 24px;max-width:1280px;padding:0 4px;">
-        <div style="padding:14px 16px;background:var(--panel-2);border:1px solid var(--border);border-radius:10px;color:var(--text-dim);font-size:13px;text-align:center;">
-          🎯 Chargement de tes paris Winamax importés…
-        </div>
-      </div>
+      <!-- v30 — Section Winamax importée retirée : Théo n'enregistre pas
+           ses paris sur le site (ni manuel, ni import). -->
     `;
-
-    // v30 — Charge winamax_my_bets.json (peut ne pas exister si Théo n'a
-    // pas encore lancé scripts/import_winamax_account.py). Échec silencieux
-    // → on cache la section. Succès → on render avec color coding.
-    (async () => {
-      const sec = wrap.querySelector('#winamax-import-section');
-      if (!sec) return;
-      try {
-        const r = await fetch(`winamax_my_bets.json?t=${Date.now()}`, { cache: 'no-store' });
-        if (!r.ok) throw new Error('not_found');
-        const doc = await r.json();
-        sec.innerHTML = _renderWinamaxImported(doc);
-      } catch (e) {
-        sec.innerHTML = _renderWinamaxImportSetup();
-      }
-    })();
 
     // ========= WIRE INTERACTIONS =========
     // Post-refonte (2026-04-20): only pagination + window filter remain.
@@ -19200,7 +17940,7 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     {label:'Aller à Paris sûrs', icon:'🔒', keywords:'paris surs locks meilleurs', action: function(){ var b=document.querySelector('.page-btn[data-page="locks"]'); if(b) b.click(); }},
     {label:'Aller à Buteurs', icon:'⚽', keywords:'buteurs buts over under btts', action: function(){ var b=document.querySelector('.page-btn[data-page="buteurs"]'); if(b) b.click(); }},
     {label:'Aller à Combinés', icon:'🔗', keywords:'combines combos', action: function(){ var b=document.querySelector('.page-btn[data-page="combines"]'); if(b) b.click(); }},
-    {label:'Aller à Mon suivi (Mes paris)', icon:'📝', keywords:'mes paris tracked mon suivi', action: function(){ var b=document.querySelector('.page-btn[data-page="mesparis"]'); if(b) b.click(); }},
+    // v30 — Entrée "Mes paris" retirée du command palette (page supprimée).
     {label:'Aller à Performance (Backtest)', icon:'📈', keywords:'backtest performance courbe', action: function(){ var b=document.querySelector('.page-btn[data-page="backtest"]'); if(b) b.click(); }},
     {label:'Aller à Historique', icon:'📜', keywords:'historique passe ancien', action: function(){ var b=document.querySelector('.page-btn[data-page="historique"]'); if(b) b.click(); }},
     {label:'Aller à Bilan', icon:'📊', keywords:'bilan stats resume', action: function(){ var b=document.querySelector('.page-btn[data-page="bilan"]'); if(b) b.click(); }},
@@ -19208,7 +17948,7 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     {label:'Aller à Alertes', icon:'🔔', keywords:'alertes notifications warnings', action: function(){ var b=document.querySelector('.page-btn[data-page="alertes"]'); if(b) b.click(); }},
     {label:'Aller au Guide', icon:'📚', keywords:'guide academie help aide', action: function(){ var b=document.querySelector('.page-btn[data-page="academie"]'); if(b) b.click(); }},
     {label:'Aller au Profil / Santé', icon:'👤', keywords:'profil reglages parametres sante', action: function(){ var b=document.querySelector('.page-btn[data-page="profil"]'); if(b) b.click(); }},
-    {label:'Exporter mes paris en CSV', icon:'📥', keywords:'export csv telecharger download', action: function(){ window.__exportTrackedBetsCSV(); }},
+    // v30 — Entrée "Exporter mes paris CSV" retirée du command palette.
     {label:'Copier lien de partage', icon:'🔗', keywords:'share lien partager copier', action: function(){ window.__copyShareLink(); }},
     {label:'Afficher les raccourcis clavier', icon:'⌨️', keywords:'shortcuts raccourcis clavier help aide', action: function(){ showShortcutsHelp(); }},
     {label:'Forcer refresh données (hard reload)', icon:'🔄', keywords:'reload refresh actualiser', action: function(){ _hardReload(); }}
@@ -19345,7 +18085,7 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       else if (e.key === 'l'){ var b=document.querySelector('.page-btn[data-page="locks"]'); if(b) b.click(); }
       else if (e.key === 'c'){ var b=document.querySelector('.page-btn[data-page="combines"]'); if(b) b.click(); }
       else if (e.key === 'b'){ var b=document.querySelector('.page-btn[data-page="buteurs"]'); if(b) b.click(); }
-      else if (e.key === 'm'){ var b=document.querySelector('.page-btn[data-page="mesparis"]'); if(b) b.click(); }
+      else if (e.key === 'm'){ var b=document.querySelector('.page-btn[data-page="bilan"]'); if(b) b.click(); }  // 'm' redirige vers Bilan (Mes paris retiré)
       else if (e.key === 'g'){ var b=document.querySelector('.page-btn[data-page="academie"]'); if(b) b.click(); }
       else if (e.key === 'p'){ var b=document.querySelector('.page-btn[data-page="profil"]'); if(b) b.click(); }
     });
@@ -19461,46 +18201,8 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     populateCalHeatmapGrid(container);
   }
 
-  // ========== CHANTIER BBB — UI buttons on Mes paris ==========
-  // Fix 2026-04-22 : barre export injectée comme SIBLING de #mesparis-wrap
-  // (avant), pas comme enfant. renderMesParis fait wrap.innerHTML='...' à
-  // chaque clic ✓ Gagné / ✗ Perdu / 🗑 Supprimer → écrase la barre. En
-  // étant sibling, elle survit. Visibilité togglée selon nav active.
-  function isMesParisActive(){
-    var navBtn = document.querySelector('[data-page="mesparis"]');
-    return navBtn && navBtn.classList.contains('active');
-  }
-  function updateMesParisBarVisibility(){
-    var b = document.getElementById('__mp-export-bar');
-    if (!b) return;
-    b.style.display = isMesParisActive() ? 'flex' : 'none';
-  }
-  function injectMesParisActions(){
-    // Si la barre existe déjà, toggle visibilité et exit.
-    if (document.getElementById('__mp-export-bar')){
-      updateMesParisBarVisibility();
-      return;
-    }
-    var mpWrap = document.getElementById('mesparis-wrap');
-    if (!mpWrap) return;
-    var bar = document.createElement('div');
-    bar.id = '__mp-export-bar';
-    bar.className = '__export-bar';
-    bar.style.cssText = 'display:none;gap:8px;margin:12px auto;max-width:1200px;padding:0 12px;flex-wrap:wrap;';
-    bar.innerHTML =
-      '<button class="__btn-export" aria-label="Exporter les paris en CSV" style="background:#a78bfa;color:#fff;border:none;padding:8px 14px;' +
-      'border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;">📥 Exporter CSV</button>' +
-      '<button class="__btn-share" aria-label="Copier le lien de partage" style="background:#17171b;color:#ededef;border:1px solid rgba(255,255,255,0.12);' +
-      'padding:8px 14px;border-radius:8px;cursor:pointer;font-size:13px;">🔗 Copier lien</button>' +
-      '<button class="__btn-shortcuts" aria-label="Afficher les raccourcis clavier" style="background:#17171b;color:#ededef;border:1px solid rgba(255,255,255,0.12);' +
-      'padding:8px 14px;border-radius:8px;cursor:pointer;font-size:13px;">⌨️ Raccourcis</button>';
-    // Insérer AVANT #mesparis-wrap pour apparaître en tête de la page.
-    mpWrap.parentNode.insertBefore(bar, mpWrap);
-    bar.querySelector('.__btn-export').onclick = function(){ window.__exportTrackedBetsCSV(); };
-    bar.querySelector('.__btn-share').onclick = function(){ window.__copyShareLink(); };
-    bar.querySelector('.__btn-shortcuts').onclick = function(){ showShortcutsHelp(); };
-    updateMesParisBarVisibility();
-  }
+  // v30 — Barre d'actions Mes paris retirée avec la page elle-même.
+  function injectMesParisActions(){ /* no-op : page Mes paris retirée */ }
 
   // ========== CHANTIER JJJ — Floating hint Cmd+K ==========
   // v24.5 — Retiré car chevauchait le FAB chatbot (tous deux bottom-right).
@@ -19742,27 +18444,28 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       } catch (e) { return `Erreur en lisant le wallet.`; }
     }
 
-    // Streak
+    // Streak — v30 : question redirigée vers la perf du modèle (cagnotte
+    // auto-trackée) puisque l'utilisateur n'enregistre plus ses propres paris.
     if (/streak|série|perf|derni[eè]re|forme/i.test(Q)) {
-      if (!loadTrackedBets_fn) return `Pas encore de paris suivis pour analyser ta forme.`;
       try {
-        const raw = loadTrackedBets_fn();
-        const betsArr = Array.isArray(raw) ? raw : Object.values(raw || {});
-        const settled = betsArr.filter(b => b && (b.status === 'gagné' || b.status === 'perdu')).sort((a,b) => (b.added_at||'').localeCompare(a.added_at||''));
-        if (!settled.length) return `Aucun pari réglé. Commence à suivre tes paris depuis l'onglet 📝 Mes paris.`;
+        const ag = (typeof _agentReplay === 'function') ? _agentReplay() : null;
+        if (!ag || !ag.scorable || !ag.scorable.length) {
+          return `Le modèle n'a pas encore de picks réglés à analyser. Reviens dans quelques heures, après les premiers résultats du jour.`;
+        }
+        const settled = ag.scorable.slice().reverse();  // newest first
         let streak = 0, last = null;
-        for (const b of settled) {
-          const w = b.status === 'gagné';
+        for (const r of settled) {
+          const w = !!r.win;
           if (last === null) { last = w; streak = 1; }
           else if (last === w) streak++;
           else break;
         }
         const last5 = settled.slice(0, 5);
-        const wr5 = last5.filter(b => b.status === 'gagné').length / last5.length;
-        if (last === true) return `🔥 Tu es sur <b>${streak}</b> victoire${streak>1?'s':''} d'affilée, réussite sur les 5 derniers : ${(wr5*100).toFixed(0)}%. Reste discipliné, pas de grosse mise sous l'euphorie.`;
-        if (last === false && streak >= 3) return `❄️ ${streak} défaites d'affilée. Pause recommandée ou mise réduite de moitié. Réussite 5 derniers : ${(wr5*100).toFixed(0)}%.`;
-        return `Série actuelle : ${streak} ${last?'victoire'+(streak>1?'s':''):'défaite'+(streak>1?'s':'')}. Réussite 5 derniers : ${(wr5*100).toFixed(0)}%. Rien à signaler.`;
-      } catch (e) { return `Erreur en lisant les paris.`; }
+        const wr5 = last5.length ? last5.filter(r => r.win).length / last5.length : 0;
+        if (last === true) return `🔥 Le modèle est sur <b>${streak}</b> victoire${streak>1?'s':''} d'affilée. Réussite sur les 5 derniers : ${(wr5*100).toFixed(0)}%. Reste discipliné, pas de grosse mise sous l'euphorie.`;
+        if (last === false && streak >= 3) return `❄️ ${streak} défaites d'affilée pour le modèle. Période normale (3-5 défaites = variance attendue). Réussite 5 derniers : ${(wr5*100).toFixed(0)}%.`;
+        return `Série modèle : ${streak} ${last?'victoire'+(streak>1?'s':''):'défaite'+(streak>1?'s':'')}. Réussite 5 derniers : ${(wr5*100).toFixed(0)}%. Voir le bilan complet onglet 📊 Bilan.`;
+      } catch (e) { return `Erreur en lisant la cagnotte modèle.`; }
     }
 
     // Mise / conseil stake
@@ -20077,27 +18780,7 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       }
     });
 
-    const trackBtn = overlay.querySelector('[data-track-id]');
-    if (trackBtn) trackBtn.addEventListener('click', () => {
-      try {
-        const d = trackBtn.dataset;
-        if (typeof addTrackedBet === 'function') {
-          addTrackedBet({
-            id: d.trackId,
-            sport: d.sport,
-            league: d.league,
-            home: d.home,
-            away: d.away,
-            kickoff: m.date || '',
-            pick_label: d.pickLabel,
-            odds: parseFloat(d.odd),
-            stake: parseFloat(d.stake),
-          });
-          if (typeof toast === 'function') toast('✓ Pari ajouté à ton suivi', 'success');
-        }
-      } catch(e){}
-      overlay.remove();
-    });
+    // v30 — handler trackBtn retiré (bouton lui-même n'existe plus).
   }
 
   // Inject FAB
