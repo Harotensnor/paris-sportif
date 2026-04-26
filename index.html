@@ -1,13 +1,488 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8">
-<title>Paris Sportif</title>
-<meta http-equiv="refresh" content="0;url=pronostics.html">
-<link rel="canonical" href="pronostics.html">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Paris-Sportif — Pronostics multi-sports data-driven, ouvert et vérifiable</title>
+<meta name="description" content="Pronostics sportifs (foot, tennis, basket, hockey, baseball) calculés par un modèle Elo + Poisson + Sackmann + Football-Data + MLB/NHL APIs. Backtest WR 58.7%, ROI flat +7.2%, Locks @ 87%. Open-source, sans tracking, sans affiliation. Site éducatif 18+.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://harotensnor.github.io/paris-sportif/">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Paris-Sportif — Pronostics data-driven, ouvert et vérifiable">
+<meta property="og:description" content="Modèle multi-sources, backtest hebdo, code open-source. Aucune affiliation, aucun tracking.">
+<meta property="og:url" content="https://harotensnor.github.io/paris-sportif/">
+<meta property="og:image" content="https://harotensnor.github.io/paris-sportif/icon-512.png">
+<meta property="og:locale" content="fr_FR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#08080a" id="theme-color-meta">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://harotensnor.github.io/paris-sportif/#org",
+      "name": "Paris-Sportif",
+      "url": "https://harotensnor.github.io/paris-sportif/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://harotensnor.github.io/paris-sportif/icon-512.png",
+        "width": 512,
+        "height": 512
+      },
+      "founder": { "@type": "Person", "name": "Théo Boulnois" },
+      "sameAs": ["https://github.com/Harotensnor/paris-sportif"],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer support",
+        "url": "https://github.com/Harotensnor/paris-sportif/issues",
+        "availableLanguage": ["French", "English"]
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://harotensnor.github.io/paris-sportif/#website",
+      "url": "https://harotensnor.github.io/paris-sportif/",
+      "name": "Paris-Sportif",
+      "description": "Pronostics sportifs multi-sports data-driven, open-source.",
+      "inLanguage": "fr-FR",
+      "publisher": { "@id": "https://harotensnor.github.io/paris-sportif/#org" }
+    },
+    {
+      "@type": "WebPage",
+      "name": "Accueil",
+      "url": "https://harotensnor.github.io/paris-sportif/",
+      "isPartOf": { "@id": "https://harotensnor.github.io/paris-sportif/#website" },
+      "inLanguage": "fr-FR",
+      "primaryImageOfPage": {
+        "@type": "ImageObject",
+        "url": "https://harotensnor.github.io/paris-sportif/icon-512.png"
+      }
+    }
+  ]
+}
+</script>
+
+<style>
+  :root { color-scheme: dark light; }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: "SF Pro Display", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #08080a;
+    color: #e6ebf2;
+    line-height: 1.6;
+    letter-spacing: -.01em;
+    font-feature-settings: "cv11", "ss01";
+  }
+  body {
+    min-height: 100vh;
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(167,139,250,.18), transparent 60%),
+      radial-gradient(900px 500px at -10% 10%, rgba(16,185,129,.10), transparent 60%),
+      #08080a;
+  }
+  a { color: #a78bfa; text-decoration: none; }
+  a:hover, a:focus { text-decoration: underline; }
+  code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: .92em; background: rgba(167,139,250,.1); padding: 1px 5px; border-radius: 4px; }
+
+  header.topbar {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(8,8,10,.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,.06);
+    padding: 14px 22px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: -.5px; color: inherit; }
+  .brand-logo { font-size: 24px; }
+  .brand-text { font-size: 18px; }
+  .brand-sub { display: block; font-size: 11px; font-weight: 500; color: rgba(255,255,255,.5); letter-spacing: 0; }
+  header.topbar nav a {
+    margin-left: 18px; font-size: 13.5px; color: #a3a3aa; font-weight: 500;
+    min-height: 36px; display: inline-flex; align-items: center;
+  }
+  header.topbar nav a:hover { color: #e6ebf2; text-decoration: none; }
+  .cta-primary {
+    background: #a78bfa; color: #08080a !important;
+    padding: 9px 18px; border-radius: 8px; font-weight: 700; font-size: 13.5px;
+    box-shadow: 0 4px 14px rgba(139,92,246,.35);
+    margin-left: 18px;
+    min-height: 36px;
+    display: inline-flex; align-items: center;
+  }
+  .cta-primary:hover { background: #8b5cf6; text-decoration: none; }
+
+  main { max-width: 1100px; margin: 0 auto; padding: 0 22px; }
+
+  /* Hero */
+  section.hero {
+    padding: 64px 0 32px;
+  }
+  .pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 5px 12px;
+    background: rgba(167,139,250,.15);
+    border: 1px solid rgba(167,139,250,.3);
+    border-radius: 999px;
+    font-size: 11.5px; color: #a78bfa; font-weight: 700;
+    letter-spacing: .5px; text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .pill .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #34d399;
+    box-shadow: 0 0 8px #34d399;
+  }
+  h1 {
+    margin: 0 0 14px; font-size: 48px; font-weight: 800;
+    letter-spacing: -1.6px; line-height: 1.05; color: #fff;
+    background: linear-gradient(90deg, #fff 0%, #a78bfa 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .lead {
+    font-size: 17px; color: #a3a3aa;
+    max-width: 640px; margin: 0 0 22px;
+  }
+  .lead strong { color: #e6ebf2; }
+  .ctas { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .cta-secondary {
+    padding: 10px 18px; background: rgba(255,255,255,.04);
+    color: #e6ebf2 !important; border-radius: 8px; font-weight: 600;
+    font-size: 13.5px; border: 1px solid rgba(255,255,255,.1);
+    min-height: 36px; display: inline-flex; align-items: center;
+  }
+  .cta-secondary:hover { background: rgba(255,255,255,.08); text-decoration: none; }
+
+  /* Stats strip */
+  .stats-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+    margin: 32px 0 0;
+  }
+  .stat-card {
+    padding: 18px 20px;
+    background: #121215;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 12px;
+  }
+  .stat-card .label {
+    font-size: 11px; color: #a3a3aa; font-weight: 700;
+    letter-spacing: .8px; text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .stat-card .value {
+    font-size: 30px; font-weight: 800; letter-spacing: -.8px;
+    color: #fff; font-variant-numeric: tabular-nums;
+  }
+  .stat-card .value.pos { color: #34d399; }
+  .stat-card .value.neutral { color: #a78bfa; }
+  .stat-card .sub {
+    font-size: 12px; color: #a3a3aa; margin-top: 4px;
+  }
+
+  /* Sections */
+  section.block { padding: 56px 0 8px; }
+  h2 {
+    font-size: 28px; font-weight: 800; letter-spacing: -.8px;
+    margin: 0 0 8px; color: #fff;
+  }
+  .h2-sub { font-size: 14px; color: #a3a3aa; margin: 0 0 24px; max-width: 600px; }
+
+  /* Cards row */
+  .cards-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 14px;
+  }
+  .feature-card {
+    padding: 22px;
+    background: #121215;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 12px;
+  }
+  .feature-card .icon {
+    font-size: 28px; line-height: 1;
+    margin-bottom: 10px;
+    display: block;
+  }
+  .feature-card h3 {
+    font-size: 16px; font-weight: 700; margin: 0 0 6px; color: #fff;
+  }
+  .feature-card p {
+    font-size: 13.5px; color: #a3a3aa; margin: 0; line-height: 1.55;
+  }
+
+  /* Sources grid */
+  .sources-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+  }
+  .source-card {
+    padding: 14px 16px;
+    background: rgba(255,255,255,.02);
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: 10px;
+    font-size: 13px;
+  }
+  .source-card b { color: #fff; }
+  .source-card .meta { font-size: 11.5px; color: #a3a3aa; margin-top: 2px; }
+
+  /* Honesty banner */
+  .honesty {
+    margin-top: 28px;
+    padding: 16px 18px;
+    background: rgba(248,113,113,.06);
+    border: 1px solid rgba(248,113,113,.25);
+    border-left: 3px solid #f87171;
+    border-radius: 0 12px 12px 0;
+    font-size: 13.5px; line-height: 1.55;
+    color: #c5c5cc;
+  }
+  .honesty strong { color: #fca5a5; }
+
+  /* Final CTA */
+  section.final-cta {
+    margin: 56px 0 32px;
+    padding: 44px 28px;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(167,139,250,.18), transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(16,185,129,.15), transparent 50%),
+      #121215;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 18px;
+    text-align: center;
+  }
+  section.final-cta h2 { font-size: 26px; margin-bottom: 8px; }
+  section.final-cta p { font-size: 14.5px; color: #a3a3aa; margin: 0 0 22px; }
+
+  /* Footer */
+  footer.site-footer {
+    border-top: 1px solid rgba(255,255,255,.06);
+    margin-top: 24px;
+    padding: 28px 22px 36px;
+    text-align: center;
+    font-size: 12.5px;
+    color: #6b6b73;
+  }
+  footer.site-footer nav { margin-bottom: 12px; }
+  footer.site-footer nav a { margin: 0 10px; color: #a3a3aa; }
+  .anj-row { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 12px; }
+  .anj-pill {
+    padding: 6px 12px;
+    background: rgba(248,113,113,.08);
+    border: 1px solid rgba(248,113,113,.25);
+    border-radius: 999px;
+    font-size: 11.5px;
+    color: #fca5a5;
+  }
+  .anj-pill a { color: inherit; }
+
+  /* Light mode */
+  @media (prefers-color-scheme: light) {
+    html, body { background: #f5f5f7; color: #08080a; }
+    body {
+      background:
+        radial-gradient(1200px 600px at 80% -10%, rgba(167,139,250,.10), transparent 60%),
+        radial-gradient(900px 500px at -10% 10%, rgba(16,185,129,.06), transparent 60%),
+        #f5f5f7;
+    }
+    h1 { color: #08080a; background: linear-gradient(90deg, #08080a 0%, #8b5cf6 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    .stat-card, .feature-card { background: #fff; border-color: rgba(0,0,0,.08); }
+    .stat-card .value { color: #08080a; }
+    .source-card { background: #fff; border-color: rgba(0,0,0,.08); }
+    .source-card b { color: #08080a; }
+    h2, .feature-card h3 { color: #08080a; }
+    section.final-cta { background: linear-gradient(180deg, rgba(167,139,250,.08), rgba(255,255,255,.6)), #fff; border-color: rgba(0,0,0,.08); }
+    header.topbar { background: rgba(245,245,247,.85); border-bottom-color: rgba(0,0,0,.08); }
+    header.topbar nav a { color: #444; }
+    code { background: rgba(167,139,250,.15); }
+    .lead { color: #444; }
+    .lead strong { color: #08080a; }
+    .h2-sub { color: #444; }
+    .feature-card p, .source-card .meta, .stat-card .label, .stat-card .sub { color: #444; }
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    h1 { font-size: 36px; }
+    section.hero { padding: 40px 0 16px; }
+    section.block { padding: 36px 0 4px; }
+    h2 { font-size: 22px; }
+    header.topbar { padding: 12px 16px; }
+    header.topbar nav a:not(.cta-primary) { display: none; }
+    .cta-primary { padding: 8px 14px; font-size: 12.5px; margin-left: 0; }
+  }
+
+  /* Skip link a11y */
+  .skip-link {
+    position: absolute; left: -1000px; top: 0;
+    background: #a78bfa; color: #08080a;
+    padding: 8px 12px; border-radius: 0 0 8px 0;
+    font-weight: 700;
+    z-index: 100;
+  }
+  .skip-link:focus { left: 0; outline: none; }
+</style>
 </head>
 <body>
-<p>Redirection vers <a href="pronostics.html">pronostics.html</a>…</p>
-<script>location.replace('pronostics.html');</script>
+<a href="#main" class="skip-link">Aller au contenu principal</a>
+
+<header class="topbar" role="banner">
+  <a href="./" class="brand" aria-label="Paris-Sportif accueil">
+    <span class="brand-logo">🎯</span>
+    <span>
+      <span class="brand-text">Paris-Sportif</span>
+      <span class="brand-sub">Football · Tennis · Basket</span>
+    </span>
+  </a>
+  <nav aria-label="Navigation principale">
+    <a href="methodologie.html">Méthodologie</a>
+    <a href="academie.html">Académie</a>
+    <a href="legal.html">Légal</a>
+    <a href="https://github.com/Harotensnor/paris-sportif" target="_blank" rel="noopener">GitHub</a>
+    <a href="pronostics.html" class="cta-primary">Voir les pronos →</a>
+  </nav>
+</header>
+
+<main id="main">
+
+<section class="hero">
+  <span class="pill"><span class="dot"></span>Open-source · Backtest hebdo · Aucune affiliation</span>
+  <h1>Pronostics sportifs vérifiables, pas commerciaux.</h1>
+  <p class="lead">
+    Un modèle qui combine <strong>9 sources de données publiques</strong>
+    (ESPN, Sofascore, Sackmann, ClubElo, Football-Data, MLB Stats,
+    NHL API, Open-Meteo, Winamax catalog) pour produire des pronos foot,
+    tennis, basket, hockey et baseball. <strong>Code 100% public</strong>,
+    backtest reproductible, mises calculées en Kelly fractionné.
+    <strong>Site éducatif, 18+, aucun pari traité, aucune commission.</strong>
+  </p>
+  <div class="ctas">
+    <a href="pronostics.html" class="cta-primary">📊 Voir le dashboard live →</a>
+    <a href="methodologie.html" class="cta-secondary">📐 Méthodologie</a>
+    <a href="https://github.com/Harotensnor/paris-sportif" class="cta-secondary" target="_blank" rel="noopener">⚙️ Code source</a>
+  </div>
+
+  <div class="stats-strip" role="region" aria-label="Performance du modèle (backtest hebdomadaire)">
+    <div class="stat-card">
+      <div class="label">Win rate (locks)</div>
+      <div class="value pos">87%</div>
+      <div class="sub">45 picks haute confiance · backtest 2026-04</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">ROI flat (toutes confs)</div>
+      <div class="value pos">+7.2%</div>
+      <div class="sub">179 picks · mise plate 1u/pari</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Brier score</div>
+      <div class="value neutral">0.216</div>
+      <div class="sub">Random = 0.25 · plus bas = mieux</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Bankroll Kelly 0.25×</div>
+      <div class="value pos">+78%</div>
+      <div class="sub">100u → 178u sur la période</div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="comment">
+  <h2>🔍 Comment ça marche</h2>
+  <p class="h2-sub">Le modèle ne cache rien. Chaque pick est expliqué par les composants qui l'ont produit, et la fiabilité est calibrée contre l'historique réel.</p>
+  <div class="cards-row">
+    <article class="feature-card">
+      <span class="icon">🔢</span>
+      <h3>Multi-source pondéré</h3>
+      <p>Marché (50%), Force (Elo / Sackmann surface), Forme L5/L10, Face-à-face, Météo, Compos, Goalie/Pitcher, Calibration ligue. Chaque sport a ses signaux propres.</p>
+    </article>
+    <article class="feature-card">
+      <span class="icon">🎯</span>
+      <h3>Fiabilité calibrée</h3>
+      <p>Tier <code>lock</code>, <code>standard</code>, <code>lowconf</code>, <code>skip</code>. Les "70% prédits" gagnent vraiment ~70% en backtest (gap &lt; 5pp).</p>
+    </article>
+    <article class="feature-card">
+      <span class="icon">💰</span>
+      <h3>Mises Kelly disciplinées</h3>
+      <p>Kelly fractionnaire 0.25× cap 10% bankroll. Contient la variance court terme tout en captant la croissance long terme. Pas de "double-down après défaite".</p>
+    </article>
+    <article class="feature-card">
+      <span class="icon">📊</span>
+      <h3>Backtest hebdo automatique</h3>
+      <p>Cron du dimanche rejoue tous les picks contre les résultats réels via le vrai <code>predictMatch()</code>. ROI / WR / Brier / calibration mis à jour automatiquement.</p>
+    </article>
+    <article class="feature-card">
+      <span class="icon">⚖️</span>
+      <h3>Honnêteté avant tout</h3>
+      <p>Pas d'affiliation Winamax. Pas d'analytics par défaut. Pas de promesse de gains. Le hasard reste irréductible — 3-5 défaites d'affilée sont normales.</p>
+    </article>
+    <article class="feature-card">
+      <span class="icon">🔓</span>
+      <h3>Code 100% public</h3>
+      <p>Tu peux <code>git clone</code> et reproduire le backtest sur ta machine. Aucune boîte noire, aucun secret commercial. <a href="https://github.com/Harotensnor/paris-sportif" target="_blank" rel="noopener">Voir le repo →</a></p>
+    </article>
+  </div>
+</section>
+
+<section class="block" id="sources">
+  <h2>📚 Sources de données</h2>
+  <p class="h2-sub">9 sources publiques, gratuites, scrapées toutes les 5-30 minutes selon la nature.</p>
+  <div class="sources-grid">
+    <div class="source-card"><b>ESPN</b> · scoreboard + cotes ML<div class="meta">Tous sports · 5 min</div></div>
+    <div class="source-card"><b>Sofascore</b> · compos + blessures + arbitres<div class="meta">Foot top-5 · 2 h</div></div>
+    <div class="source-card"><b>Winamax catalog</b> · cotes 1N2 publiques<div class="meta">Tous · 5 min</div></div>
+    <div class="source-card"><b>ClubElo</b> · Elo des clubs (~30 ans)<div class="meta">Foot · 20 h</div></div>
+    <div class="source-card"><b>Jeff Sackmann</b> · Elo ATP/WTA + surface + H2H<div class="meta">Tennis · 24 h</div></div>
+    <div class="source-card"><b>Football-Data</b> · closing odds + calibration ligue<div class="meta">Foot 14 ligues · 6 h</div></div>
+    <div class="source-card"><b>MLB Stats API</b> · pitcher partant + ERA/WHIP<div class="meta">Baseball · 15 min</div></div>
+    <div class="source-card"><b>NHL API</b> · pace + goalie SV%<div class="meta">Hockey · 15 min</div></div>
+    <div class="source-card"><b>Open-Meteo</b> · météo kickoff<div class="meta">Foot · 30 min</div></div>
+  </div>
+
+  <div class="honesty">
+    <strong>⚠️ À lire avant de mettre un euro.</strong>
+    Le modèle vise ~60% de réussite sur le long terme (mesuré sur backtest), mais
+    <strong>3 à 5 défaites consécutives sont normales</strong> et n'indiquent pas un dysfonctionnement.
+    Les performances passées ne garantissent pas les performances futures.
+    Ce site est un outil d'aide à la décision, pas une promesse de gains.
+    <a href="methodologie.html#biais">Lire la section biais &amp; limites</a> pour comprendre les conditions de validité du modèle.
+  </div>
+</section>
+
+<section class="final-cta">
+  <h2>Prêt à voir les pronos du jour ?</h2>
+  <p>Le dashboard live ré-actualise toutes les 5 minutes via le cron GitHub Actions.</p>
+  <a href="pronostics.html" class="cta-primary">📊 Ouvrir le dashboard →</a>
+</section>
+
+</main>
+
+<footer class="site-footer" role="contentinfo">
+  <nav aria-label="Liens du site">
+    <a href="pronostics.html">Dashboard</a> ·
+    <a href="methodologie.html">Méthodologie</a> ·
+    <a href="academie.html">Académie</a> ·
+    <a href="legal.html">Légal &amp; confidentialité</a> ·
+    <a href="https://github.com/Harotensnor/paris-sportif" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+  <div>⚖️ Site éducatif · réservé aux 18+ · jouer comporte des risques</div>
+  <div class="anj-row">
+    <span class="anj-pill">📞 Joueurs Info Service : <a href="tel:0974751313">09 74 75 13 13</a></span>
+    <span class="anj-pill"><a href="https://www.anj.fr/" target="_blank" rel="noopener">🔗 anj.fr</a></span>
+    <span class="anj-pill"><a href="https://www.joueurs-info-service.fr/" target="_blank" rel="noopener">🔗 joueurs-info-service.fr</a></span>
+  </div>
+  <div style="margin-top:12px;font-size:11px;opacity:.6;">
+    Code éditeur : Théo Boulnois · projet personnel non commercial · sans tracking, sans affiliation
+  </div>
+</footer>
+
 </body>
 </html>
