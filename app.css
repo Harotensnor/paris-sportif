@@ -1159,11 +1159,14 @@
     .v29-hero-grid { grid-template-columns: 1fr !important; }
   }
 
-  /* v29 — Desktop sidebar widgets : fixed right rail at wide viewports, hidden below. */
-  .v29-dash-aside { display: none; }
+  /* v29 — Desktop sidebar widgets : fixed right rail at wide viewports, hidden below.
+     v31.7.18 fix : !important sur display:none pour eviter que le rail
+     s'affiche sur mobile/tablette par erreur (user a screenshote le rail
+     en pleine largeur — possible bug css cascade override). */
+  .v29-dash-aside { display: none !important; }
   @media (min-width: 1280px) {
     .v29-dash-aside {
-      display: block;
+      display: block !important;
       position: fixed;
       right: 16px;
       top: 84px;
@@ -1174,6 +1177,12 @@
       scrollbar-width: thin;
     }
     body.agent-home main, body.agent-inside main { padding-right: 308px !important; }
+  }
+  /* v31.7.18 — Force masque mobile/tablette explicite (defensive). Si une
+     regle quelque part echappe, ce belt-and-suspenders garantit que le
+     rail est cache sur tout viewport <1280px. */
+  @media (max-width: 1279px) {
+    .v29-dash-aside { display: none !important; }
   }
 
   /* v30 — Sprint 2 : Hero compact on mobile (H1 otherwise 38px+ dwarfs the screen) */
