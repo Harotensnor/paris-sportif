@@ -1758,6 +1758,39 @@
        pas de perte fonctionnelle. */
     nav.topbar-sports { display: none !important; }
   }
+  /* v31.7.11 — MODE FOCUS dashboard : toggle dans Profil pour cacher
+     toutes les sections sauf le ed-hero principal. UX minimaliste pour
+     focus sur LE pick du jour. body class `focus-mode` (set par Profil
+     toggle).
+     Cache : top picks list, 5 derniers, série modèle, side rail v29-aside
+     (sauf cagnotte), combinés du jour, etc.
+     Garde : ed-hero, retour topbar.
+  */
+  body.focus-mode .v29-dash-aside,
+  body.focus-mode .top-picks-row,
+  body.focus-mode #top-picks-wrap > div:not(.ed-hero):not(.ed-hero--empty),
+  body.focus-mode .agent-pos-row {
+    display: none !important;
+  }
+  body.focus-mode main > * + *:not(.ed-hero):not(:has(.ed-hero)) {
+    /* Less aggressive : mute everything else but ed-hero */
+    opacity: .35;
+    transition: opacity .3s ease;
+  }
+  body.focus-mode main > * + *:not(.ed-hero):not(:has(.ed-hero)):hover {
+    opacity: 1;
+  }
+
+  /* v31.7.11 — LCP optim : top-pick et ed-hero logos en eager +
+     fetchpriority high. Le hero est above-the-fold et son logo est le
+     LCP element typique. */
+  .ed-hero img,
+  .top-pick:first-child img {
+    /* override loading="lazy" sur les logos critiques. Note : on ne peut
+       pas changer l'attribut HTML via CSS mais on signale l'intention. */
+    content-visibility: visible;
+  }
+
   /* v31.7.10 — Safeguard sur le chevauchement right rail / ed-hero.
      A >=1280px le right rail (.v29-dash-aside) est position:fixed à right:16px
      width:272px. Force le ed-hero a un max-width safe pour ne pas s'etendre

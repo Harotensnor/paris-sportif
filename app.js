@@ -867,6 +867,48 @@
     return n;
   }
 
+  // v31.7.11 — Voyage longue distance US sports (NBA/NHL/MLB).
+  // Charge stadiums.json une fois au boot, expose `daysSinceTravel(team,
+  // sport, abbr, currentVenueAbbr, time)` qui calcule la distance Haversine
+  // entre le stade du match précédent et celui du match courant.
+  let __stadiumsCache = null;
+  let __stadiumsLoading = null;
+  async function _loadStadiums() {
+    if (__stadiumsCache) return __stadiumsCache;
+    if (__stadiumsLoading) return __stadiumsLoading;
+    __stadiumsLoading = fetch('stadiums.json', { cache: 'force-cache' })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { __stadiumsCache = d || {}; return __stadiumsCache; })
+      .catch(() => { __stadiumsCache = {}; return __stadiumsCache; });
+    return __stadiumsLoading;
+  }
+  // Fire au boot
+  if (typeof window !== 'undefined') _loadStadiums();
+  function _haversineKm(lat1, lon1, lat2, lon2) {
+    const toRad = (d) => d * Math.PI / 180;
+    const R = 6371;  // earth radius km
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2)**2;
+    return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  }
+  // Renvoie la distance km parcourue par l'équipe `awayAbbr` pour rejoindre
+  // le stade `homeAbbr` depuis son dernier match (last venue dans la
+  // congestion timeline). Renvoie null si data incomplete (premier match
+  // de la saison, abbr inconnue, sport non supporté).
+  function travelDistanceKm(sport, fromAbbr, toAbbr) {
+    const std = __stadiumsCache;
+    if (!std) return null;
+    const sportKey = sport === 'basketball' ? 'nba'
+                   : sport === 'hockey' ? 'nhl'
+                   : sport === 'baseball' ? 'mlb' : null;
+    if (!sportKey || !std[sportKey]) return null;
+    const a = std[sportKey][fromAbbr];
+    const b = std[sportKey][toAbbr];
+    if (!a || !b) return null;
+    return _haversineKm(a[0], a[1], b[0], b[1]);
+  }
+
   // v31.7.6 — Repos depuis le dernier match. Renvoie le nombre de jours
   // (float) entre `matchTime` et le match précédent de l'équipe.
   // - Si pas de match précédent dans la fenêtre 14j : null (data manquante).
@@ -10265,6 +10307,15 @@
           </div>
 
           <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;">
+            <h3 style="margin:0 0 12px;font-size:16px;font-weight:700;color:var(--text);">🎯 Mode focus</h3>
+            <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;line-height:1.5;">Sur le Dashboard, masque toutes les sections sauf le top pick du jour. Idéal pour décider rapidement.</div>
+            <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;">
+              <input id="pref-focus-mode" type="checkbox" ${prefs.focusMode === true ? 'checked' : ''} style="width:16px;height:16px;accent-color:var(--brand);"/>
+              <span style="font-size:13px;color:var(--text);">Activer le mode focus</span>
+            </label>
+          </div>
+
+          <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;">
             <h3 style="margin:0 0 12px;font-size:16px;font-weight:700;color:var(--text);">⚽ Sports favoris</h3>
             <div style="display:flex;flex-wrap:wrap;gap:8px;">${sportsBtns}</div>
             <div style="font-size:12px;color:var(--text-dim);margin-top:8px;">Les sports favoris seront priorisés dans le feed Accueil.</div>
@@ -10424,6 +10475,14 @@
       savePrefs({ reader: on ? 'on' : 'off' });
       if (on) document.documentElement.setAttribute('data-reader', 'on');
       else document.documentElement.removeAttribute('data-reader');
+    });
+    // v31.7.11 — Mode focus dashboard
+    const focusModeEl = wrap.querySelector('#pref-focus-mode');
+    if (focusModeEl) focusModeEl.addEventListener('change', (e) => {
+      const on = e.target.checked;
+      savePrefs({ focusMode: on });
+      if (on) document.body.classList.add('focus-mode');
+      else document.body.classList.remove('focus-mode');
     });
     const bankEl = wrap.querySelector('#pref-bankroll');
     if (bankEl) bankEl.addEventListener('input', (e) => {

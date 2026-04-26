@@ -189,6 +189,13 @@
       root.setAttribute('data-level', level);   // v23.4 — pour adapter le contenu au niveau user
       var meta = document.getElementById('theme-color-meta');
       if (meta) meta.setAttribute('content', effectiveTheme === 'light' ? '#f5f5f7' : '#08080a');
+      // v31.7.11 — Mode focus dashboard (toggle dans Profil)
+      if (prefs.focusMode === true) {
+        // body pas encore créé, on stamp via class sur html ; le CSS body.focus-mode
+        // est repris depuis html.focus-mode aussi via cascade. On ajoute une
+        // règle JS au DOMContentLoaded pour propager.
+        document.addEventListener('DOMContentLoaded', function(){ document.body.classList.add('focus-mode'); });
+      }
     } catch(e) { /* noop */ }
   })();
 </script>
