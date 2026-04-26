@@ -236,6 +236,21 @@ Tous commités car c'est la "base de données" du site statique.
 - `playwright.config.js` — 2 projets (chromium-desktop + Pixel 5).
   webServer python http.server port 8765.
 - Run local : `npx playwright test`. CI : `.github/workflows/e2e.yml`.
+- **`scripts/check_pipeline_drift.py`** (v31.4) — diff `auto_refresh.py`
+  vs `refresh.yml`. Tourne en CI (e2e.yml `drift` job, ~5s) et bloque la
+  merge si un script est dans une pipeline mais pas l'autre. Lancer en
+  local : `python scripts/check_pipeline_drift.py`.
+
+## Web Vitals (v31.4)
+
+Tracker inline minimaliste dans `pronostics.html` (avant `app.js` defer).
+Capture LCP / FCP / CLS / INP / TTFB via `PerformanceObserver`, persiste
+les 50 dernières sessions dans `localStorage.paris_sportif_web_vitals_v1`.
+**Aucun envoi réseau** (privacy-first).
+
+Pour inspecter : ouvrir la console et `window.__webVitals()` → table des
+20 dernières sessions. Utile pour mesurer l'impact d'un refacto avant/après
+sans compte Sentry / GA.
 
 ## Zones fragiles connues
 
@@ -244,9 +259,15 @@ Tous commités car c'est la "base de données" du site statique.
   leurs `const` tout en haut de la fonction pour éviter les TDZ.
 - **Synchronisation `auto_refresh.py` ↔ `refresh.yml`** : toute nouvelle
   source ou patch doit être ajouté aux deux endroits (sinon dev local ≠ prod).
+  Depuis v31.4 : `check_pipeline_drift.py` mécanise la règle (CI bloque
+  la merge si drift).
+- **`model_loader.py` lit `app.js`** depuis v31.1 (split). Si app.js
+  absent, fallback `pronostics.html`. Si l'IIFE qui contient
+  `window.predictMatch = predictMatch` est renommée/déplacée, le loader
+  lèvera. `python scripts/model_loader.py` smoke-teste rapidement.
 - **`backtest_baselines.py` vs `backtest_v2.py`** : `backtest_baselines.py` évalue des stratégies
   marché (fav/dog/draw/value), PAS `predictMatch` — ne pas l'utiliser pour
   juger la perf du modèle prod. `backtest_v2.py` appelle la vraie fonction
   `predictMatch` via `model_loader.py` (V8 embarqué, une seule source de
-  vérité dans `pronostics.html`). Cron hebdo dans `backtest.yml`, sortie
+  vérité dans `app.js`). Cron hebdo dans `backtest.yml`, sortie
   `backtest_report_v2.{json,md}`.

@@ -2600,20 +2600,22 @@
   }
   .ed-hero__cta-btn {
     display: inline-flex; align-items: center; justify-content: center;
-    padding: 10px 18px;
+    padding: 11px 18px;
     background: var(--brand); color: #08080a;
     border: none; border-radius: 8px;
     font-weight: 700; font-size: 13.5px;
     box-shadow: 0 4px 14px rgba(139,92,246,.3);
-    min-height: 40px;
+    /* v31.4 — 44px = WCAG 2.5.5 (target size minimum) + Apple HIG.
+       Avant 40px : passable desktop, étriqué pouce mobile. */
+    min-height: 44px;
   }
   .ed-hero__secondary {
     display: inline-flex; align-items: center; justify-content: center;
-    padding: 10px 16px;
+    padding: 11px 16px;
     background: transparent; color: var(--text);
     border: 1px solid var(--border-2); border-radius: 8px;
     font-weight: 600; font-size: 13px;
-    cursor: pointer; min-height: 40px;
+    cursor: pointer; min-height: 44px;
     font-family: inherit;
   }
   .ed-hero__secondary:hover, .ed-hero__secondary:focus-visible {
