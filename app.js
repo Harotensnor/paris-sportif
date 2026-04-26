@@ -7008,6 +7008,22 @@
     window.predictMatch = predictMatch;
   } catch(e){}
 
+  // v31.7.26 — Test API exposée pour Playwright unit tests. Permet d'asserter
+  // sur les helpers purs (dixonColesTau, haversineKm, poissonPmf, etc.) sans
+  // setup Jest ni bundler. Accessible via window.__testAPI dans les specs.
+  // Le surcoût est <1KB et zero runtime impact (juste des refs à des fns
+  // déjà allouées en mémoire).
+  try {
+    window.__testAPI = {
+      _dixonColesTau,
+      _dixonColesRho,
+      _haversineKm,
+      poissonPmf,
+      poissonTopScores,
+      isoDate,
+    };
+  } catch(e){}
+
   // v30 #3 — Lazy-load full history. PRONOSTICS_DATA inline n'a que today.
   // _ensureFullData() fetch data.js (1.4 MB) UNE SEULE FOIS et fusionne
   // tous les jours dans .days. Memoizé via une promise pour gérer les
