@@ -31,6 +31,21 @@ const SHELL_ASSETS = [
   // CACHE_VERSION stamp invalide tout à chaque vrai changement de code.
   'app.css',
   'app.js',
+  // v31.7.4 — Static editorial pages : cachées agressive pour navigation
+  // rapide depuis le menu Apprendre. Régénérées rarement (build_*_page.py
+  // sur changement data, mais HTML stable).
+  'static-page.css',
+  'index.html',
+  'methodologie.html',
+  'academie.html',
+  'comment-lire-un-prono.html',
+  'legal.html',
+  // v31.7.4 — OG images partagées sur reseaux sociaux : cache 24h+ vu
+  // qu'elles ne changent que quand backtest_report_v2 change.
+  'og-default.png',
+  'og-backtest.png',
+  'og-credibilite.png',
+  'og-methodologie.png',
 ];
 
 self.addEventListener('install', (event) => {
