@@ -2,27 +2,51 @@ name: e2e-tests
 
 # Run Playwright critical-flow tests on PRs and pushes to main.
 # Catches regressions in nav/theme/filter bar before they ship to GH Pages.
+# Also runs the pipeline drift checker (auto_refresh.py vs refresh.yml).
 on:
   push:
     branches: [main]
     paths:
       - 'pronostics.html'
+      - 'app.js'
+      - 'app.css'
       - 'tests/**'
       - 'playwright.config.js'
       - 'package.json'
       - '.github/workflows/e2e.yml'
+      - 'auto_refresh.py'
+      - '.github/workflows/refresh.yml'
+      - 'scripts/**'
   pull_request:
     paths:
       - 'pronostics.html'
+      - 'app.js'
+      - 'app.css'
       - 'tests/**'
       - 'playwright.config.js'
       - 'package.json'
+      - 'auto_refresh.py'
+      - '.github/workflows/refresh.yml'
+      - 'scripts/**'
   workflow_dispatch: {}
 
 permissions:
   contents: read
 
 jobs:
+  drift:
+    # Très rapide (~5s), bloque la CI si auto_refresh.py et refresh.yml
+    # divergent. Évite les "marche en local mais pas en prod" sournois.
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check pipeline drift
+        run: python3 scripts/check_pipeline_drift.py
+
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 10

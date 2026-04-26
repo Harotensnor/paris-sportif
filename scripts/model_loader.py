@@ -1,15 +1,22 @@
-"""Charge `predictMatch` depuis pronostics.html et l'expose à Python.
+"""Charge `predictMatch` depuis app.js (ou pronostics.html en fallback)
+et l'expose à Python.
 
 Stratégie B1 (slice à la volée, Chantier backtest v2) :
-- Lire le fichier HTML
-- Extraire le corps de la grande IIFE (lignes ~2227-13602) qui contient
-  predictMatch + tous ses helpers
+- Lire le fichier source (`app.js` depuis v31.1 split, sinon `pronostics.html`)
+- Extraire le corps de la grande IIFE qui contient predictMatch +
+  tous ses helpers
 - Stubber window/document/localStorage/navigator/setTimeout/etc. (les
   callbacks DOMContentLoaded ne s'exécutent pas hors navigateur)
 - Évaluer dans py_mini_racer (V8 embarqué, ES2020+)
 - Récupérer window.predictMatch, la fonction est exposée en fin d'IIFE
 
-Une seule vérité de terrain : pronostics.html. Pas de duplication Python.
+Une seule vérité de terrain : app.js (anciennement pronostics.html).
+Pas de duplication Python.
+
+v31.4 — Le code source officiel est `app.js` depuis le split v31.1.
+`model_loader.py` cherche d'abord app.js, et fallback sur
+pronostics.html si app.js n'existe pas (utile pour les anciennes
+branches / archives).
 
 Usage :
     loader = ModelLoader()
@@ -30,35 +37,69 @@ except ImportError:
     )
 
 ROOT = Path(__file__).resolve().parent.parent
+APP_JS = ROOT / 'app.js'
 PRONOSTICS_HTML = ROOT / 'pronostics.html'
 
-# Ancres pour localiser la grande IIFE. On ne se fie PAS aux numéros de ligne
-# (le fichier évolue). On trouve le premier `(function() {` après `<script>`
-# et son `})();` fermant qui précède le bloc `// v23 — Expose ...`.
-# Il y a plusieurs IIFE dans pronostics.html ; celle qu'on veut est
-# identifiée par la présence de `window.predictMatch = predictMatch` à l'intérieur.
-IIFE_OPEN_RE = re.compile(r'<script>\s*\(function\(\)\s*\{', re.MULTILINE)
-IIFE_CLOSE_RE = re.compile(r'\n\s*\}\)\(\);\s*\n</script>')
+
+def _resolve_source_path() -> Path:
+    """Renvoie app.js si présent (v31.1+), sinon pronostics.html (legacy)."""
+    if APP_JS.exists():
+        return APP_JS
+    return PRONOSTICS_HTML
 
 
-def _extract_model_iife_body(html: str) -> str:
+def _extract_model_iife_body(source_text: str, *, is_html: bool) -> str:
     """Extrait le corps (sans `(function() {` ni `})();`) de l'IIFE qui
-    définit predictMatch. Renvoie la source JS prête à eval."""
-    # On cherche toutes les IIFE dans des <script>, et on garde celle qui
-    # contient `window.predictMatch = predictMatch`.
-    script_blocks = re.findall(
-        r'<script[^>]*>\s*(\(function\(\)\s*\{[\s\S]*?\n\s*\}\)\(\);)\s*</script>',
-        html,
-    )
+    définit predictMatch. Renvoie la source JS prête à eval.
+
+    - is_html=True : fichier pronostics.html (cherche dans des <script>)
+    - is_html=False : fichier app.js (le tout est déjà du JS, on cherche
+      l'IIFE complète au top-level)
+    """
+    if is_html:
+        # On cherche toutes les IIFE dans des <script>, et on garde celle qui
+        # contient `window.predictMatch = predictMatch`.
+        script_blocks = re.findall(
+            r'<script[^>]*>\s*(\(function\(\)\s*\{[\s\S]*?\n\s*\}\)\(\);)\s*</script>',
+            source_text,
+        )
+        candidates = list(script_blocks)
+    else:
+        # app.js : on lit tout le fichier comme une seule source. Il peut y
+        # avoir plusieurs IIFE successives ; on les capture toutes au top-level
+        # (lignes commençant par `(function`) et on garde celle qui contient
+        # l'export `window.predictMatch = predictMatch`.
+        candidates = []
+        # Scan ligne par ligne pour trouver les IIFE top-level
+        lines = source_text.split('\n')
+        i = 0
+        while i < len(lines):
+            line = lines[i].lstrip()
+            if line.startswith('(function()') or line.startswith('(function ()'):
+                # Trouve le `})();` correspondant en cherchant la prochaine
+                # ligne qui commence (sans indentation) par `})();`
+                start = i
+                j = i + 1
+                while j < len(lines):
+                    if lines[j].rstrip() == '})();':
+                        candidates.append('\n'.join(lines[start:j + 1]))
+                        i = j + 1
+                        break
+                    j += 1
+                else:
+                    i += 1
+            else:
+                i += 1
+
     target = None
-    for block in script_blocks:
+    for block in candidates:
         if 'window.predictMatch = predictMatch' in block:
             target = block
             break
     if target is None:
         raise RuntimeError(
             "Impossible de trouver l'IIFE contenant "
-            "`window.predictMatch = predictMatch` dans pronostics.html. "
+            "`window.predictMatch = predictMatch` dans la source. "
             "Le slice du modèle a probablement changé."
         )
     # Retirer le `(function() {` initial et le `})();` final
@@ -197,14 +238,23 @@ class ModelLoader:
     """Charge une fois la lib JS puis permet d'appeler predictMatch à la
     demande avec un contexte de données (PRONOSTICS_DATA + odds_history)."""
 
-    def __init__(self, html_path: Path = PRONOSTICS_HTML):
-        self.html_path = html_path
+    def __init__(self, source_path: Path | None = None):
+        # v31.4 — `source_path` peut pointer sur `app.js` (recommandé,
+        # v31.1+) ou `pronostics.html` (legacy, fallback). Par défaut, on
+        # résout automatiquement vers app.js si présent.
+        self.source_path = source_path or _resolve_source_path()
         self.ctx = py_mini_racer.MiniRacer()
         self._load()
 
+    # Compat legacy : certains call sites passent encore `html_path=`.
+    @property
+    def html_path(self) -> Path:
+        return self.source_path
+
     def _load(self) -> None:
-        html = self.html_path.read_text(encoding='utf-8')
-        body = _extract_model_iife_body(html)
+        text = self.source_path.read_text(encoding='utf-8')
+        is_html = self.source_path.suffix.lower() == '.html'
+        body = _extract_model_iife_body(text, is_html=is_html)
         # Ordre : stubs d'abord, puis l'IIFE body (qui assigne
         # window.predictMatch à la fin).
         self.ctx.eval(_STUBS_JS)
@@ -254,7 +304,8 @@ if __name__ == '__main__':
     # Smoke test : charge le modèle et essaie de prédire sur un match
     # bidon. Sort avec succès si predictMatch renvoie un dict (même vide).
     import sys
-    print("[model_loader] Chargement de pronostics.html...")
+    src = _resolve_source_path()
+    print(f"[model_loader] Chargement de {src.name}...")
     loader = ModelLoader()
     print("[model_loader] OK, window.predictMatch exposée.")
     loader.set_data({'days': {}}, odds_history={})

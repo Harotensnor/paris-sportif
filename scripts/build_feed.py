@@ -70,12 +70,30 @@ def rfc822(dt: datetime) -> str:
     return dt.strftime('%a, %d %b %Y %H:%M:%S +0000')
 
 
+# v31.4 — Plage de cotes utile pour le RSS. Avant : on publiait des cotes à
+# 1.01 (Sinner @ favoris archi-écrasants), inutilisables en pari réel et qui
+# faisaient ressembler le feed à une liste de "win rate" gonflée. Maintenant
+# on cible la fenêtre où il y a un vrai marché : 1.40 ≤ cote ≤ 4.20.
+# - cote < 1.40 → favori plat, edge marginal, pas d'intérêt éditorial
+# - cote > 4.20 → outsider, bruit dominant sur les petits échantillons
+ODD_MIN = 1.40
+ODD_MAX = 4.20
+
+# Fourchette de probabilité implicite correspondante (avec marge bookmaker
+# ~5%, on tape la zone 25-70% — exactement la zone Kelly-fertile). On garde
+# aussi un floor de 0.30 sur la prob pour éviter les long-shots.
+PROB_MIN = 0.25
+PROB_MAX = 0.72
+
+
 def collect_top_picks(data: dict, limit: int = 15) -> list[dict]:
     """Return upcoming, non-completed events with Winamax 1n2 odds and a
-    pre-computed pick. We don't run predictMatch here (Python can't), so
-    we rely on a simple heuristic : highest implied prob (lowest odd) on
-    the side already favored by the market. This is a "best market pick"
-    fallback; the real model picks are in pronostics.html."""
+    pick dans la fenêtre [ODD_MIN, ODD_MAX]. On ne fait PAS tourner
+    predictMatch (Python pur, pas de V8 dans le runner refresh.yml) — on
+    publie les meilleurs favoris marché de la journée dans la zone
+    Kelly-fertile, soit la même heuristique que le tab "Top picks" du
+    dashboard côté serveur. Le dashboard reste la source officielle ;
+    le RSS est un teaser optimisé feed reader."""
     today = data.get('today')
     days = data.get('days') or {}
     today_evs = days.get(today, []) or []
@@ -93,17 +111,22 @@ def collect_top_picks(data: dict, limit: int = 15) -> list[dict]:
         if not h or not a:
             continue
         try:
-            home_prob = 1.0 / float(h)
-            away_prob = 1.0 / float(a)
+            home_odd = float(h)
+            away_odd = float(a)
+            home_prob = 1.0 / home_odd
+            away_prob = 1.0 / away_odd
         except (TypeError, ValueError):
             continue
         # Best side = highest implied prob
         if home_prob > away_prob:
-            pick_side, pick_odd, pick_prob = 'home', float(h), home_prob
+            pick_side, pick_odd, pick_prob = 'home', home_odd, home_prob
         else:
-            pick_side, pick_odd, pick_prob = 'away', float(a), away_prob
-        # Filter on confidence ≥ 0.55 (~"standard" tier or higher)
-        if pick_prob < 0.55:
+            pick_side, pick_odd, pick_prob = 'away', away_odd, away_prob
+        # v31.4 — fenêtre cote ET fenêtre prob (cohérentes mais doublement
+        # filtrées au cas où une cote aberrante passerait).
+        if pick_odd < ODD_MIN or pick_odd > ODD_MAX:
+            continue
+        if pick_prob < PROB_MIN or pick_prob > PROB_MAX:
             continue
         picks.append({
             'ev': ev,
@@ -111,7 +134,9 @@ def collect_top_picks(data: dict, limit: int = 15) -> list[dict]:
             'pick_odd': pick_odd,
             'pick_prob': pick_prob,
         })
-    # Sort by pick_prob desc, take top N
+    # Sort by pick_prob desc, take top N. La logique : à edge marché égal,
+    # on préfère le favori (variance plus basse, plus pédagogique pour le
+    # lecteur RSS qui ne trade pas activement).
     picks.sort(key=lambda x: -x['pick_prob'])
     return picks[:limit]
 
@@ -127,12 +152,13 @@ def render_item(p: dict) -> str:
     pick_team = home_name if p['pick_side'] == 'home' else away_name
     pick_label = f"{'1' if p['pick_side'] == 'home' else '2'} · {pick_team}"
     title = f'{emoji} {home_name} vs {away_name} · {league}'
+    # v31.4 — Description allégée. Avant : disclaimer cryptique sur predictMatch.
+    # Maintenant : on annonce clairement que c'est le favori marché, et on
+    # renvoie au dashboard pour le pick officiel (calibré + Kelly).
     desc = (
-        f'Pick : <b>{pick_label}</b> @ {p["pick_odd"]:.2f} '
-        f'(prob marché {p["pick_prob"] * 100:.0f}%). '
-        f'Source : <a href="{DASH_URL}">{DASH_URL}</a>. '
-        f'<em>Le pick affiché ici est le favori marché ; le pick officiel du modèle '
-        f'(predictMatch) est sur le dashboard et peut différer en cas d\'edge.</em>'
+        f'Favori marché : <b>{pick_label}</b> @ {p["pick_odd"]:.2f} '
+        f'(probabilité implicite {p["pick_prob"] * 100:.0f}%). '
+        f'<a href="{DASH_URL}#match-{ev.get("id", "")}">Voir le pick calibré sur le dashboard →</a>'
     )
     # ISO date → RSS pubdate
     date_str = ev.get('date') or ''
@@ -162,17 +188,17 @@ def render_item(p: dict) -> str:
 FEED_TEMPLATE = '''<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
   <channel>
-    <title>Paris-Sportif — Top picks du jour</title>
+    <title>Paris-Sportif — Favoris marché du jour (foot, tennis, NBA, NHL, MLB)</title>
     <link>{site}</link>
     <atom:link href="{site}feed.xml" rel="self" type="application/rss+xml" />
-    <description>Pronostics sportifs data-driven (foot, tennis, basket, hockey, baseball). Mise à jour toutes les 5 minutes via cron. Site éducatif open-source, 18+, aucune affiliation.</description>
+    <description>Favoris marché du jour dans la fenêtre Kelly-fertile (cote 1.40-4.20). Foot, tennis, NBA, NHL, MLB. Mise à jour toutes les 5 minutes. Le pick calibré officiel (modèle + Kelly) est sur le dashboard. Site éducatif open-source, 18+, aucune affiliation.</description>
     <language>fr-FR</language>
     <copyright>Théo Boulnois — projet personnel non commercial</copyright>
     <managingEditor>https://github.com/Harotensnor/paris-sportif/issues (Théo Boulnois)</managingEditor>
     <pubDate>{pubdate}</pubDate>
     <lastBuildDate>{pubdate}</lastBuildDate>
     <generator>scripts/build_feed.py · paris-sportif</generator>
-    <ttl>15</ttl>
+    <ttl>5</ttl>
     <image>
       <url>{site}icon-512.png</url>
       <title>Paris-Sportif</title>

@@ -8,7 +8,7 @@
 <meta http-equiv="Expires" content="0">
 <meta name="theme-color" content="#08080a" id="theme-color-meta">
 <meta name="color-scheme" content="dark light">
-<meta name="description" content="Pronostics sportifs multi-sports classés par confiance (modèle statistique + force des équipes + forme + face-à-face).">
+<meta name="description" content="Pronostics foot, tennis, NBA, NHL, MLB classés par confiance d'un modèle data-driven (Elo, Poisson, Sackmann, 9 sources). Calibration historique vérifiable, mises Kelly disciplinées. Site éducatif, open-source, sans tracker, 18+.">
 <!-- v31 — Content-Security-Policy resserrée (audit ChatGPT 2026-04-26).
      GitHub Pages ne permet pas de custom headers, donc on passe par meta
      http-equiv. `'unsafe-inline'` reste nécessaire pour les <script> et
@@ -90,6 +90,36 @@
         "target": "https://harotensnor.github.io/paris-sportif/#/search?q={search_term_string}",
         "query-input": "required name=search_term_string"
       }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://harotensnor.github.io/paris-sportif/pronostics.html#breadcrumb",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Accueil",
+          "item": "https://harotensnor.github.io/paris-sportif/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Dashboard pronostics",
+          "item": "https://harotensnor.github.io/paris-sportif/pronostics.html"
+        }
+      ]
+    },
+    {
+      "@type": "WebApplication",
+      "@id": "https://harotensnor.github.io/paris-sportif/pronostics.html#app",
+      "name": "Dashboard Paris-Sportif",
+      "url": "https://harotensnor.github.io/paris-sportif/pronostics.html",
+      "applicationCategory": "SportsApplication",
+      "operatingSystem": "Web",
+      "browserRequirements": "Requires JavaScript. Best on Chromium, Firefox, Safari.",
+      "isAccessibleForFree": true,
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+      "publisher": { "@id": "https://harotensnor.github.io/paris-sportif/#org" }
     }
   ]
 }
@@ -113,8 +143,13 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Pronostics">
+<!-- v31.4 — Favicons explicites (avant : seul apple-touch-icon était déclaré,
+     les browsers desktop tombaient sur un 404 /favicon.ico silencieux). -->
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title>Pronostics Sportifs — Football · Tennis · Basket</title>
+<title>Pronostics Sportifs — foot, tennis, NBA, NHL, MLB · modèle data-driven calibré</title>
 <!-- v31 — Analytics opt-in (privacy-first). Le fichier `analytics.config.js`
      est OPTIONNEL : son absence est silencieuse (404 → no-op). Si présent,
      il définit `window.ANALYTICS_PLAUSIBLE_DOMAIN` ou
@@ -157,8 +192,144 @@
     } catch(e) { /* noop */ }
   })();
 </script>
+<script>
+  // v31.4 — Web Vitals tracker minimaliste (privacy-first, 100% local).
+  //
+  // Capture LCP / INP / CLS / FCP / TTFB via PerformanceObserver, garde
+  // les 50 dernières sessions dans localStorage et expose `window.__webVitals()`
+  // pour debug console. AUCUN envoi réseau — l'utilisateur peut consulter
+  // ou exporter ses données, et c'est tout.
+  //
+  // Pourquoi inline pré-app.js ? Il faut s'enregistrer AVANT le LCP/FCP
+  // pour les capter. Le bundle web-vitals officiel pèse 5 KB ; ici on
+  // tombe à ~1.5 KB grâce à l'usage direct de PerformanceObserver.
+  //
+  // Les valeurs lues sont consolidées au beforeunload + visibilitychange
+  // (l'INP n'est connu qu'à la dernière interaction). Stockage clé
+  // `paris_sportif_web_vitals_v1`, ring buffer de 50.
+  (function() {
+    if (!('PerformanceObserver' in window)) return;
+    var STORAGE_KEY = 'paris_sportif_web_vitals_v1';
+    var MAX_SESSIONS = 50;
+    var session = {
+      ts: Date.now(),
+      url: location.pathname,
+      ua: (navigator.userAgent || '').slice(0, 100),
+      conn: (navigator.connection && navigator.connection.effectiveType) || 'unknown',
+      LCP: null, FCP: null, CLS: 0, INP: null, TTFB: null,
+    };
+
+    function record(metric, value) {
+      session[metric] = value;
+    }
+
+    function persist() {
+      try {
+        var raw = localStorage.getItem(STORAGE_KEY);
+        var arr = raw ? JSON.parse(raw) : [];
+        if (!Array.isArray(arr)) arr = [];
+        arr.push(session);
+        if (arr.length > MAX_SESSIONS) arr = arr.slice(-MAX_SESSIONS);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+      } catch (e) { /* quota / private mode → silent skip */ }
+    }
+
+    // LCP — largest-contentful-paint
+    try {
+      new PerformanceObserver(function(list) {
+        var entries = list.getEntries();
+        var last = entries[entries.length - 1];
+        if (last) record('LCP', Math.round(last.startTime));
+      }).observe({ type: 'largest-contentful-paint', buffered: true });
+    } catch (e) {}
+
+    // FCP — first-contentful-paint
+    try {
+      new PerformanceObserver(function(list) {
+        list.getEntries().forEach(function(e) {
+          if (e.name === 'first-contentful-paint') record('FCP', Math.round(e.startTime));
+        });
+      }).observe({ type: 'paint', buffered: true });
+    } catch (e) {}
+
+    // CLS — cumulative-layout-shift (somme des shifts non-input)
+    try {
+      var clsValue = 0;
+      new PerformanceObserver(function(list) {
+        list.getEntries().forEach(function(e) {
+          if (!e.hadRecentInput) clsValue += e.value;
+        });
+        record('CLS', Math.round(clsValue * 1000) / 1000);
+      }).observe({ type: 'layout-shift', buffered: true });
+    } catch (e) {}
+
+    // INP — interaction-to-next-paint (max sur la session)
+    try {
+      var maxInp = 0;
+      new PerformanceObserver(function(list) {
+        list.getEntries().forEach(function(e) {
+          if (e.duration > maxInp) {
+            maxInp = e.duration;
+            record('INP', Math.round(maxInp));
+          }
+        });
+      }).observe({ type: 'event', buffered: true, durationThreshold: 16 });
+    } catch (e) {}
+
+    // TTFB — depuis Navigation Timing
+    try {
+      var nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+      if (nav) record('TTFB', Math.round(nav.responseStart));
+    } catch (e) {}
+
+    // Persiste à la fin de la session (visibilitychange est plus fiable
+    // que beforeunload sur mobile/PWA).
+    var persisted = false;
+    function once() {
+      if (persisted) return;
+      persisted = true;
+      persist();
+    }
+    addEventListener('visibilitychange', function() {
+      if (document.visibilityState === 'hidden') once();
+    });
+    addEventListener('pagehide', once);
+
+    // Console helper
+    window.__webVitals = function() {
+      try {
+        var raw = localStorage.getItem(STORAGE_KEY);
+        var arr = raw ? JSON.parse(raw) : [];
+        console.table(arr.slice(-20));
+        return arr;
+      } catch (e) { return []; }
+    };
+  })();
+</script>
 </head>
 <body>
+
+<!-- v31.4 — Fallback noscript : si JavaScript est désactivé/bloqué, on
+     affiche un panneau qui pointe vers les pages éditoriales statiques
+     (legal/methodologie/academie/credibilite/backtest) qui sont 100%
+     indexables sans JS. Évite l'écran vide silencieux pour ~1% des
+     visiteurs (TOR, Lynx, navigateurs corporate restrictifs). -->
+<noscript>
+  <div style="max-width:680px;margin:48px auto;padding:24px 28px;background:#0f0f14;border:1px solid #2a2a30;border-radius:16px;color:#e6ebf2;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;line-height:1.6;">
+    <h1 style="margin:0 0 12px;font-size:22px;color:#a78bfa;">⚠️ JavaScript requis pour le dashboard live</h1>
+    <p style="margin:0 0 16px;font-size:14.5px;color:#c5cad2;">Le dashboard temps réel a besoin de JavaScript pour afficher les pronostics calibrés et calculer les mises Kelly. <b>Aucun tracker, aucune pub, aucune affiliation</b> — uniquement le rendu local des données déjà téléchargées.</p>
+    <p style="margin:0 0 16px;font-size:14.5px;color:#c5cad2;">En attendant, ces pages sont <b>entièrement statiques</b> et lisibles sans JS :</p>
+    <ul style="margin:0 0 16px;padding-left:22px;font-size:14px;line-height:1.85;">
+      <li><a href="methodologie.html" style="color:#a78bfa;">📐 Méthodologie</a> — protocole, sources, dictionnaire des métriques</li>
+      <li><a href="academie.html" style="color:#a78bfa;">📚 Académie</a> — glossaire 22 termes (cotes, valeur, mise, qualité, signaux)</li>
+      <li><a href="comment-lire-un-prono.html" style="color:#a78bfa;">📖 Comment lire un prono</a> — pédago + erreurs classiques</li>
+      <li><a href="credibilite.html" style="color:#a78bfa;">📊 Crédibilité</a> — diagramme de calibration + Brier + log-loss</li>
+      <li><a href="backtest.html" style="color:#a78bfa;">🧪 Backtest</a> — KPIs et performances par tier/sport/ligue</li>
+      <li><a href="legal.html" style="color:#a78bfa;">⚖️ Mentions légales</a> — disclaimer, vie privée, 18+</li>
+    </ul>
+    <p style="margin:0;font-size:13px;color:#8b8f9a;">Code source ouvert : <a href="https://github.com/Harotensnor/paris-sportif" style="color:#a78bfa;">github.com/Harotensnor/paris-sportif</a></p>
+  </div>
+</noscript>
 
 <!-- v30 — PWA install banner (apparait quand le navigateur le permet) -->
 <div id="pwa-install-banner" style="display:none;position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:90;background:var(--panel);border:1px solid var(--brand);border-radius:14px;padding:12px 16px 12px 14px;box-shadow:0 8px 28px rgba(0,0,0,.35);max-width:380px;width:calc(100% - 32px);">
