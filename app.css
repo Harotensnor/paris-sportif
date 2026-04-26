@@ -1093,6 +1093,11 @@
     display: flex; align-items: center; gap: 18px;
     padding: 10px 24px; min-height: 56px;
   }
+  /* v31.5.1 — Nav sortie du topbar (cf. fix containing-block backdrop-filter).
+     On pousse les utils à droite via margin-left:auto pour conserver le
+     "brand à gauche / utils à droite" qui était assuré avant par flex:1 sur
+     la nav. Sans ça, brand + utils sont collés à gauche après le retrait. */
+  .topbar-utils { margin-left: auto; }
 
   /* --- Brand (compact à gauche) --- */
   .topbar-brand {
