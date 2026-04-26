@@ -622,6 +622,29 @@ def main() -> int:
         # ces pairs directement, plus besoin de recompute le PAV en JS.
         'isotonic_pairs': isotonic_calibration_pairs(rows),
         'bankroll_final_kelly': bt['bankroll_final_kelly'],
+        # v31.7.19 — Worst picks : 10 plus gros echecs (modele tres confiant
+        # qui a perdu). Critère : (pick_prob - 0) × (1 si lost else 0)
+        # ranking par pick_prob desc parmi les losses. Le but est la
+        # TRANSPARENCE — on publie nos pires erreurs pour que l'user voie
+        # ou le modele se trompe. Limite a 10 + champs minimum (id, date,
+        # name, sport, league, pick, prob, cote) pour ne pas gonfler.
+        'worst_picks': [
+            {
+                'id': r.get('id'),
+                'date': r.get('date'),
+                'name': r.get('name'),
+                'sport': r.get('sport'),
+                'league_code': r.get('league_code'),
+                'pick': r.get('pick'),
+                'pick_prob': round(r['pick_prob'], 3),
+                'cote': r['cote'],
+                'tier': r.get('tier'),
+            }
+            for r in sorted(
+                [r for r in rows if not r.get('won') and r.get('pick_prob', 0) >= 0.65],
+                key=lambda r: -r['pick_prob']
+            )[:10]
+        ],
         # On NE publie PAS la liste complète de picks dans le JSON pour éviter
         # que backtest_report_v2.json ne gonfle (déjà 500+ events en archive).
         # Si besoin d'inspection pick-par-pick, relancer avec --limit + print.
