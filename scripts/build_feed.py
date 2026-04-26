@@ -218,9 +218,11 @@ FEED_TEMPLATE = '''<?xml version="1.0" encoding="UTF-8"?>
     <generator>scripts/build_feed.py · paris-sportif</generator>
     <ttl>5</ttl>
     <image>
-      <url>{site}icon-512.png</url>
+      <url>{site}og-default.png</url>
       <title>Paris-Sportif</title>
       <link>{site}</link>
+      <width>1200</width>
+      <height>630</height>
     </image>
 {items}
   </channel>

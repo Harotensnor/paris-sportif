@@ -192,7 +192,8 @@ jobs:
                   data_today.json data_manifest.json team_form.json \
                   results_archive.jsonl tennis_ratings.json footballdata.json \
                   mlb_pitchers.json nhl_stats.json backtest.html feed.xml \
-                  credibilite.html 2>/dev/null || true
+                  credibilite.html \
+                  og-default.png og-backtest.png og-credibilite.png og-methodologie.png 2>/dev/null || true
           # Only stamp sw.js if we have real content changes — otherwise
           # discard the version bump to avoid 288 empty commits/day.
           if git diff --cached --quiet; then
