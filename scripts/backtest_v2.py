@@ -420,6 +420,57 @@ def calibration_bins(rows: list[dict], n_bins: int = 10) -> list[dict]:
     return out
 
 
+def isotonic_calibration_pairs(rows: list[dict], min_n_per_bucket: int = 8) -> list[dict]:
+    """v31.7.14 — Recalibration isotonic via PAV (Pool Adjacent Violators).
+    Avant : le PAV tournait dans app.js sur le client (slowdown au boot,
+    seul les visiteurs avec backtest deja charge en beneficiaient).
+    Maintenant : compute en CI Python, expose les pairs (predicted, actual)
+    monotones dans backtest_report_v2.json. Le client utilise direct.
+
+    Algorithme :
+      1. Bucket les rows par 10 percentiles de pick_prob
+      2. Pour chaque bucket avec ≥min_n_per_bucket samples : (predicted, actual)
+      3. Tri ascendant par predicted
+      4. PAV : merge les paires non-monotones via moyenne ponderee par n
+      5. Renvoie la liste finale {predicted, actual, n}
+
+    Returns : [] si pas assez de data (≥3 buckets fournis), sinon liste
+    monotone garantie.
+    """
+    n_bins = 10
+    bins: list[list[dict]] = [[] for _ in range(n_bins)]
+    for r in rows:
+        idx = min(n_bins - 1, max(0, int(r['pick_prob'] * n_bins)))
+        bins[idx].append(r)
+    pairs = []
+    for b in bins:
+        if len(b) < min_n_per_bucket:
+            continue
+        p = mean(r['pick_prob'] for r in b)
+        wr = sum(1 for r in b if r['won']) / len(b)
+        pairs.append({'predicted': round(p, 4), 'actual': round(wr, 4), 'n': len(b)})
+    if len(pairs) < 3:
+        return []  # Pas assez de signal
+    # Sort ascending by predicted (devrait l'etre par construction, safety)
+    pairs.sort(key=lambda x: x['predicted'])
+    # PAV : while any adjacent violation exists, merge via weighted average
+    changed = True
+    while changed:
+        changed = False
+        for i in range(len(pairs) - 1):
+            if pairs[i]['actual'] > pairs[i + 1]['actual']:
+                # Merge bucket i + i+1
+                total_n = pairs[i]['n'] + pairs[i + 1]['n']
+                merged_actual = (pairs[i]['actual'] * pairs[i]['n'] +
+                                 pairs[i + 1]['actual'] * pairs[i + 1]['n']) / total_n
+                pairs[i]['actual'] = round(merged_actual, 4)
+                pairs[i + 1]['actual'] = round(merged_actual, 4)
+                pairs[i]['n'] = total_n
+                pairs[i + 1]['n'] = total_n
+                changed = True
+    return pairs
+
+
 def render_markdown(report: dict) -> str:
     lines = ['# Backtest ROI — VRAI modèle (v2)', '']
     lines.append(f"Généré : {report['generated_at']}  ")
@@ -567,6 +618,9 @@ def main() -> int:
         # permettre un select dropdown cote front (granularite ajustable).
         'calibration_5': calibration_bins(rows, n_bins=5),
         'calibration_20': calibration_bins(rows, n_bins=20),
+        # v31.7.14 — Recalibration isotonic (PAV) precomputee. Le client lit
+        # ces pairs directement, plus besoin de recompute le PAV en JS.
+        'isotonic_pairs': isotonic_calibration_pairs(rows),
         'bankroll_final_kelly': bt['bankroll_final_kelly'],
         # On NE publie PAS la liste complète de picks dans le JSON pour éviter
         # que backtest_report_v2.json ne gonfle (déjà 500+ events en archive).

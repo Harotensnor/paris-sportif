@@ -991,6 +991,19 @@
     if (__reliabilityCalMap === null) {
       __reliabilityCalComputing = true;
       try {
+        // v31.7.14 — Si le backtest expose des isotonic_pairs precomputees
+        // (PAV deja applique en CI Python), on les utilise directement.
+        // Avant : on faisait le PAV cote client a chaque boot.
+        const rep = window.__backtestReportV2;
+        const precomputed = rep && Array.isArray(rep.isotonic_pairs) && rep.isotonic_pairs.length >= 3
+          ? rep.isotonic_pairs
+          : null;
+        if (precomputed) {
+          __reliabilityCalMap = precomputed.slice().sort((a, b) => a.predicted - b.predicted);
+          // Skip le PAV cote client puisque deja applique en CI
+          // (les pairs CI sont garanties monotones par construction PAV).
+          return;
+        }
         const buckets = (typeof computeCalibration === 'function') ? computeCalibration() : [];
         // Need ≥3 populated buckets with ≥8 samples each for meaningful remap;
         // otherwise we punt and return raw unchanged.
