@@ -208,6 +208,59 @@ def render_calibration(cal: list[dict]) -> str:
     return render_table(['Bin probabilité', 'N', 'Prob moyenne', 'WR observé', 'Gap'], rows)
 
 
+def render_worst_picks(worst_picks: list) -> str:
+    """v31.7.19 — 10 pires picks (modèle très confiant qui a perdu).
+    Affiche en transparence pour montrer ou le modele se trompe le plus.
+    Critère : prob >= 65% mais résultat lost. Trié par pick_prob desc."""
+    if not worst_picks:
+        return '<p style="color:#a3a3aa;font-size:13px;">Pas de pires picks à afficher (aucune perte avec confiance ≥65%).</p>'
+
+    sport_emoji = {
+        'football': '⚽', 'tennis': '🎾', 'basketball': '🏀',
+        'hockey': '🏒', 'baseball': '⚾', 'american-football': '🏈',
+        'mma': '🥊', 'rugby': '🏉',
+    }
+
+    rows = []
+    for p in worst_picks:
+        em = sport_emoji.get(p.get('sport') or '', '🎯')
+        date = (p.get('date') or '')[:10]
+        name = p.get('name') or '?'
+        pick = p.get('pick') or '?'
+        pick_lbl = '1 (Domicile)' if pick == '1' else '2 (Extérieur)' if pick == '2' else 'X (Nul)'
+        prob = p.get('pick_prob') or 0
+        cote = p.get('cote') or 0
+        tier_lbl = {'lock': '🔒 Lock', 'standard': '📋 Standard'}.get(p.get('tier'), '—')
+        rows.append(f'''<tr>
+      <td><span style="font-size:14px;">{em}</span> <b>{escape(name)}</b></td>
+      <td style="text-align:right;font-size:11px;color:#a3a3aa;">{date}</td>
+      <td style="text-align:right;">{escape(pick_lbl)}</td>
+      <td style="text-align:right;color:#fbbf24;font-weight:600;">{prob*100:.0f}%</td>
+      <td style="text-align:right;font-variant-numeric:tabular-nums;">@{cote:.2f}</td>
+      <td style="text-align:right;font-size:11px;color:#a3a3aa;">{tier_lbl}</td>
+    </tr>''')
+
+    return f'''<p style="font-size:13px;color:#a3a3aa;margin:0 0 12px;">
+      Les <b>10 picks les plus douloureux</b> : modèle très confiant (prob ≥65%) qui a perdu. On les publie pour que tu voies <b>où le modèle se trompe le plus</b>. Conseil de modeste : pas de modèle parfait, ces erreurs font partie de la variance — l'objectif est qu'elles restent <b>moins fréquentes</b> que la prob suggère.
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>Match</th>
+          <th style="text-align:right;">Date</th>
+          <th style="text-align:right;">Pick</th>
+          <th style="text-align:right;">Conf.</th>
+          <th style="text-align:right;">Cote</th>
+          <th style="text-align:right;">Tier</th>
+        </tr>
+      </thead>
+      <tbody>{''.join(rows)}</tbody>
+    </table>
+    <p style="font-size:12px;color:#a3a3aa;margin-top:8px;">
+      Source : <code>backtest_report_v2.json#worst_picks</code> (cron hebdo).
+    </p>'''
+
+
 def render_benchmarks(overall: dict, baselines: dict) -> str:
     """v31.7.18 — Tableau "Vs benchmarks marché" : compare le ROI du modèle
     aux 5 strategies baselines de backtest_baselines.py (favorite, dog, home,
@@ -526,6 +579,9 @@ PAGE_TEMPLATE = '''<!DOCTYPE html>
   <h2 id="benchmarks">🆚 Vs benchmarks marché <span class="subtle">— le modèle bat-il les heuristiques simples ?</span></h2>
   {table_benchmarks}
 
+  <h2 id="worst">😬 Pires picks <span class="subtle">— transparence sur les erreurs du modèle</span></h2>
+  {table_worst_picks}
+
   <h2 id="calibration">📊 Calibration probabiliste <span class="subtle">— quand on dit 70%, on gagne 70% ?</span></h2>
   <p style="font-size:13px;color:#a3a3aa;margin:0 0 12px;">Plus le <b>gap</b> est proche de 0, mieux le modèle est calibré.
   <code>+pp</code> = modèle sous-estime · <code>-pp</code> = modèle sur-estime.</p>
@@ -627,6 +683,7 @@ def main() -> int:
         table_calibration=render_calibration(calibration),
         table_leagues=render_top_leagues(by_league, limit=12),
         table_benchmarks=render_benchmarks(overall, baselines),
+        table_worst_picks=render_worst_picks(report.get('worst_picks') or []),
     )
 
     OUTPUT.write_text(html, encoding='utf-8')

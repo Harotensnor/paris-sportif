@@ -1824,12 +1824,14 @@
     body.agent-inside .ed-hero__stats {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
+    /* v31.7.19 — Centrage EDGE robuste : grid-column 2 met l'item dans la
+       colonne du milieu (2eme sur 3) qui est par construction centree.
+       Avant : grid-column: 1/-1 + max-width + justify-self center, mais
+       width:100% court-circuitait le centrage et l'item s'alignait a gauche
+       (cf screenshot user v31.7.18). Maintenant simple + garanti. */
     body.agent-home .ed-hero__stat--edge,
     body.agent-inside .ed-hero__stat--edge {
-      grid-column: 1 / -1;
-      max-width: 360px;
-      justify-self: center;
-      width: 100%;
+      grid-column: 2;
     }
   }
 
