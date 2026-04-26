@@ -685,14 +685,50 @@
     // Moyenne de l'attaque d'un côté et de la défense de l'autre, pondéré par un
     // léger home-ice advantage (~1.05x en NHL d'après la littérature).
     const HOME_ADV = 1.05;
-    const lamH = Math.max(0.4, ((h.scored + a.conceded) / 2) * HOME_ADV);
-    const lamA = Math.max(0.4, ((a.scored + h.conceded) / 2) / HOME_ADV);
+    let hScored = h.scored, hConceded = h.conceded;
+    let aScored = a.scored, aConceded = a.conceded;
+    let captionExtras = [];
+    // v31.7.25 — Sport-specific NHL : si nhl_stats dispo, blend last5 (form
+    // récente, variance haute) avec season averages (signal stable) à 60/40.
+    // Réduit la variance des prédictions sur les derniers matchs.
+    if (match.nhl_stats && match.nhl_stats.home_pace != null && match.nhl_stats.away_pace != null) {
+      const seasonHomeGf = match.nhl_stats.home_pace;   // fields nommés "pace" mais c'est GF/G
+      const seasonAwayGf = match.nhl_stats.away_pace;
+      // Pas de season GA exposé directement — on utilise pace de l'adversaire
+      // comme proxy (les équipes vs adversaire moyen). Approximation : season GA
+      // ≈ ligue average (~2.95 GF/game) ; on blend simplement les GF.
+      hScored = 0.6 * h.scored + 0.4 * seasonHomeGf;
+      aScored = 0.6 * a.scored + 0.4 * seasonAwayGf;
+      captionExtras.push('moyenne saison NHL pondérée');
+    }
+    // v31.7.25 — Goalie save_pct correction. Si goalie titulaire dispo et
+    // sv% différent de la moyenne ligue (~0.905), corriger le lambda adverse.
+    // Élite (sv% ≥ 0.92) : réduit lambda adverse de ~12%.
+    // Faible (sv% ≤ 0.89) : augmente lambda adverse de ~10%.
+    const NHL_AVG_SVPCT = 0.905;
+    const tweakByGoalie = (svPct) => {
+      if (!isFinite(svPct) || svPct <= 0 || svPct >= 1) return 1;
+      // Effective shots faced ≈ 30/game. lambda adverse ≈ 30 * (1 - sv%).
+      // Ratio = (1 - sv%) / (1 - avg). Inverse car goalie ↑ = adverse ↓.
+      const ratio = (1 - svPct) / (1 - NHL_AVG_SVPCT);
+      // Clamp à [0.85, 1.15] pour éviter overcorrection.
+      return Math.max(0.85, Math.min(1.15, ratio));
+    };
+    const homeGoalieFactor = tweakByGoalie(match.nhl_stats?.home_goalie?.save_pct);
+    const awayGoalieFactor = tweakByGoalie(match.nhl_stats?.away_goalie?.save_pct);
+    if (homeGoalieFactor !== 1 || awayGoalieFactor !== 1) {
+      captionExtras.push('correction goalie sv%');
+    }
+    const lamH = Math.max(0.4, ((hScored + aConceded * awayGoalieFactor) / 2) * HOME_ADV);
+    const lamA = Math.max(0.4, ((aScored + hConceded * homeGoalieFactor) / 2) / HOME_ADV);
     const top = poissonTopScores(lamH, lamA, 3, 8);
     if (!top.length) return null;
+    const baseCap = `Calculé à partir des buts marqués / encaissés sur les ${Math.min(h.sample, a.sample)} derniers matchs`;
+    const extras = captionExtras.length ? ` + ${captionExtras.join(', ')}` : '';
     return {
       kind: 'exact',
       items: top.map(s => ({ home: s.home, away: s.away, prob: s.prob, label: `${s.home}-${s.away}` })),
-      caption: `Calculé à partir des buts marqués / encaissés sur les ${Math.min(h.sample, a.sample)} derniers matchs (modèle statistique).`,
+      caption: `${baseCap}${extras} (modèle statistique).`,
     };
   }
 
