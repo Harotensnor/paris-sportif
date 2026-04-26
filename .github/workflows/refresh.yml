@@ -155,6 +155,12 @@ jobs:
           if [ "$(date -u +'%H:%M')" = "00:00" ] || [ ! -f dixon_coles_rho.json ]; then
             python3 measure_dixon_coles_rho.py || true
           fi
+          # v31.7.39 — Forces offensives/défensives Maher (1982) par ligue.
+          # Output team_strengths.json. Tourne 1×/jour à 00:05 (5min après ρ).
+          # ≥40 matchs/ligue requis sinon skip ligue. Activera au fil du temps.
+          if [ "$(date -u +'%H:%M')" = "00:05" ] || [ ! -f team_strengths.json ]; then
+            python3 measure_team_strengths.py || true
+          fi
           # v31 — Static backtest page (audit ChatGPT recommandation). Lit
           # backtest_report_v2.json, produit backtest.html indexable sans JS.
           # Le JSON change ~1×/semaine donc le HTML aussi mais c'est cheap.
@@ -208,7 +214,7 @@ jobs:
                   results_archive.jsonl tennis_ratings.json footballdata.json \
                   mlb_pitchers.json nhl_stats.json backtest.html feed.xml \
                   credibilite.html stadiums.json dixon_coles_rho.json index.html \
-                  nba_team_stats.json \
+                  nba_team_stats.json team_strengths.json \
                   og-default.png og-backtest.png og-credibilite.png og-methodologie.png 2>/dev/null || true
           # Only stamp sw.js if we have real content changes — otherwise
           # discard the version bump to avoid 288 empty commits/day.
