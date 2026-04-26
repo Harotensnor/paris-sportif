@@ -75,6 +75,19 @@ def render_overall_kpis(o: dict) -> str:
     roi = o.get('flat_roi_pct')
     kelly = o.get('kelly_pnl')
     brier = o.get('brier')
+    # v31.7.38 — CLV (closing line value). KPI séparé : indicateur le plus
+    # fiable d'edge réel. Affiché seulement si >0 picks ont closing odds.
+    avg_clv = o.get('avg_clv_pct')
+    n_with_clv = o.get('n_with_clv', 0)
+    clv_card = ''
+    if n_with_clv > 0 and avg_clv is not None:
+        clv_color = 'pos' if avg_clv > 0 else 'neg' if avg_clv < 0 else ''
+        clv_card = f'''
+      <div class="kpi-card">
+        <div class="kpi-label">CLV moyen</div>
+        <div class="kpi-value {clv_color}">{fmt_signed(avg_clv, 2, '%')}</div>
+        <div class="kpi-sub" title="Closing Line Value : (notre cote / cote close) - 1. Positif = on a battu le marché.">{n_with_clv} picks · vs cote close</div>
+      </div>'''
     return f'''
     <div class="kpi-strip">
       <div class="kpi-card">
@@ -106,7 +119,7 @@ def render_overall_kpis(o: dict) -> str:
         <div class="kpi-label">Log-loss</div>
         <div class="kpi-value">{fmt_num(o.get('logloss'), 4)}</div>
         <div class="kpi-sub">Plus bas = mieux calibré</div>
-      </div>
+      </div>{clv_card}
     </div>'''
 
 
