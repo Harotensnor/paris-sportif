@@ -1,0 +1,37 @@
+# humanstxt.org — http://humanstxt.org/Standard.html
+
+# TEAM
+
+  Editor + dev + cleaner: Théo Boulnois
+  Contact: see https://github.com/Harotensnor/paris-sportif/issues
+  Location: France
+  Site: https://harotensnor.github.io/paris-sportif/
+
+# THANKS
+
+  Jeff Sackmann (tennis_atp / tennis_wta)
+  ClubElo (Lars Schiefler)
+  ESPN scoreboard public API
+  Sofascore (compositions / blessures)
+  MLB Advanced Media (statsapi.mlb.com)
+  NHL.com (api-web.nhle.com)
+  Football-Data.co.uk (Joseph Buchdahl)
+  Open-Meteo (free weather forecast API)
+
+# TECH
+
+  Hosting: GitHub Pages (HTTPS, no custom headers)
+  Backend: GitHub Actions cron (refresh.yml every 5 min daytime)
+  Pipeline: Python 3.11 (~30 fetcher / patcher scripts)
+  Frontend: vanilla JS / vanilla CSS (no bundler, no framework, no build step)
+  Static pages: hand-coded HTML (~17 KB each, indexable, JSON-LD)
+  Service worker: offline cache + CACHE_VERSION on every deploy
+  Tests: Playwright (e2e), Lighthouse CI (perf/SEO/a11y thresholds)
+
+# PHILOSOPHY
+
+  Open source. Reproducible backtest. Honest about variance.
+  No affiliation, no analytics by default, no premium tier.
+  18+. Educational only. Not financial advice.
+
+  Last update: 2026-04-26

@@ -104,6 +104,12 @@ PATCH_STAGES = [
     # "Construire un historique public des paris"). Lit backtest_report_v2.json,
     # produit backtest.html indexable sans JS. ~0.3s.
     ('build_backtest_page.py',      1,   15),
+    # v31 — RSS feed (top picks du jour). Lit data.js, produit feed.xml.
+    # Discoverable par feed readers + Google News. ~0.2s.
+    ('build_feed.py',               1,   15),
+    # v31 — Static credibilite.html (calibration + Brier + log-loss + SVG).
+    # Lit backtest_report_v2.json, produit credibilite.html. ~0.3s.
+    ('build_credibilite_page.py',   1,   15),
     # Chantier #3 lazy-load — DOIT tourner en DERNIER. Lit data.js (full),
     # écrit data_today.json + data_manifest.json + ré-inline LITE blob dans
     # pronostics.html. Sans ça, le client tomberait toujours sur le fallback

@@ -9,14 +9,17 @@
 <meta name="theme-color" content="#08080a" id="theme-color-meta">
 <meta name="color-scheme" content="dark light">
 <meta name="description" content="Pronostics sportifs multi-sports classés par confiance (modèle statistique + force des équipes + forme + face-à-face).">
-<!-- v30 — Content-Security-Policy. GitHub Pages ne permet pas de custom
-     headers, donc on passe par meta http-equiv. `'unsafe-inline'` reste
-     nécessaire pour les <script> et <style> inlinés (single-file SPA, pas
-     de build step) — `'unsafe-eval'` est explicitement omis. ESPN CDN whitelisté
-     pour les logos d'équipes ; sw.js cache localement, donc pas d'autre source.
-     `connect-src` autorise les sidecars JSON (relative) + les fetch ESPN core
-     pour l'enrichissement des cotes (utilisé en dev, jamais en prod sur Pages). -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://a.espncdn.com https://a1.espncdn.com https://a2.espncdn.com https://a3.espncdn.com https://a4.espncdn.com https://www.gstatic.com; connect-src 'self' https://api.clubelo.com https://sports.core.api.espn.com https://site.api.espn.com; font-src 'self' data:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'">
+<!-- v31 — Content-Security-Policy resserrée (audit ChatGPT 2026-04-26).
+     GitHub Pages ne permet pas de custom headers, donc on passe par meta
+     http-equiv. `'unsafe-inline'` reste nécessaire pour les <script> et
+     <style> inlinés (single-file SPA, pas de build step) — `'unsafe-eval'`
+     est explicitement omis. ESPN CDN whitelisté pour les logos d'équipes ;
+     sw.js cache localement. `connect-src` autorise les sidecars JSON
+     (relative) + les fetch ESPN core pour l'enrichissement des cotes.
+     v31 ajoute : object-src 'none', media-src 'none', worker-src 'self',
+     manifest-src 'self', upgrade-insecure-requests, plausible.io et
+     cloudflareinsights pour analytics opt-in. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://plausible.io https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://a.espncdn.com https://a1.espncdn.com https://a2.espncdn.com https://a3.espncdn.com https://a4.espncdn.com https://www.gstatic.com; connect-src 'self' https://api.clubelo.com https://sports.core.api.espn.com https://site.api.espn.com https://plausible.io https://cloudflareinsights.com; font-src 'self' data:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; media-src 'none'; worker-src 'self'; manifest-src 'self'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <!-- v30 — Open Graph + Twitter Card pour le partage social. URL canonique
      vers https://harotensnor.github.io/paris-sportif/. Image dérivée de
@@ -93,6 +96,7 @@
 </script>
 <!-- Chantier S — PWA -->
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="alternate" type="application/rss+xml" href="feed.xml" title="Paris-Sportif — Top picks du jour (RSS)">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Pronostics">

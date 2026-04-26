@@ -1,35 +1,84 @@
 # Paris Sportif — Guide Claude
 
-Site statique de pronostics sportifs (foot, tennis, basket, hockey, …) avec
-un agent IA qui gère une "cagnotte modèle" (Kelly fractionné, cap 10%),
+Site statique de pronostics sportifs (foot, tennis, basket, hockey, baseball)
+avec un agent IA qui gère une "cagnotte modèle" (Kelly fractionné, cap 10%),
 des pronostics simples/combinés, et une vue bilan. Déployé sur GitHub Pages.
 Client = navigateur ; données = fichier `data.js` régénéré en continu.
 
-## Architecture
+## Architecture v31 (post-audit ChatGPT 2026-04-26)
+
+L'audit a recommandé de découper le HTML monolithique. Solution **hybride**
+sans bundler : pages de contenu = HTML statiques séparés, dashboard = SPA.
 
 ```
 ┌────────────────────┐       cron 5 min       ┌──────────────────┐
 │ .github/workflows/ │  ───────────────────▶  │   GitHub Pages   │
-│   refresh.yml      │    commit data.js      │  (déploiement)   │
+│   refresh.yml      │    commit *.html       │  (déploiement)   │
 └─────────┬──────────┘                        └──────────────────┘
-          │ exécute scripts/*.py                        │
-          ▼                                             ▼
-   ┌─────────────┐    scrape ESPN / Sofascore /    ┌──────────────┐
-   │ scripts/    │    Winamax / BetExplorer /  ──▶ │ data.js +    │
-   │  fetch_*.py │    ClubElo / OpenMeteo / RdJ    │ JSON sidecars│
-   │  patch_*.py │                                 └──────────────┘
-   └─────────────┘                                         │
-                                                           ▼
-                                         ┌────────────────────────┐
-                                         │  pronostics.html       │
-                                         │   (SPA ~14700 lignes)  │
-                                         │  + sw.js (offline)     │
-                                         └────────────────────────┘
+          │ exécute scripts/*.py
+          ▼
+   ┌─────────────────────┐    scrape 9 sources    ┌─────────────────────┐
+   │ scripts/fetch_*.py  │  (ESPN, Sofascore,    │ data.js + sidecars  │
+   │ scripts/patch_*.py  │  Winamax, ClubElo,    │ (JSON par domaine)  │
+   │ scripts/build_*.py  │  Sackmann, FB-Data,   │                     │
+   └──────────┬──────────┘  MLB, NHL, Open-Meteo)└──────────┬──────────┘
+              │                                              │
+              ▼                                              ▼
+   ┌──────────────────────┐                    ┌──────────────────────┐
+   │ Pages STATIQUES      │                    │ pronostics.html      │
+   │  index.html (landing)│                    │  (SPA dynamique,     │
+   │  legal.html          │                    │   ~16500 lignes)     │
+   │  methodologie.html   │                    │  + sw.js (offline)   │
+   │  academie.html       │                    └──────────────────────┘
+   │  comment-lire-       │
+   │      un-prono.html   │   build_*.py (Python) régénèrent à
+   │  backtest.html ◄─────┼───── chaque tick depuis JSON :
+   │  credibilite.html ◄──┤        backtest.html ← backtest_report_v2.json
+   │  feed.xml ◄──────────┤        credibilite.html ← backtest_report_v2.json
+   └──────────────────────┘        feed.xml ← data.js
 ```
+
+**Convention "no build step" préservée** : pas de bundler, pas de npm,
+pas de Astro. Les pages statiques sont du HTML hand-coded (~15-25 KB
+chacune), régénérées par scripts Python à chaque cron tick.
 
 En local : `python serveur.py` lance un HTTP server (port 8765), ouvre
 `pronostics.html`, et démarre `auto_refresh.py` en arrière-plan pour
 rejouer la pipeline GitHub Actions toutes les 60 s (cadences par script).
+
+## Pages statiques v31
+
+Hand-coded HTML, indexables sans JS, JSON-LD complet, CSP stricte.
+Chacune sert un rôle SEO/éditorial distinct :
+
+- **`index.html`** (~21 KB) — Landing page. Hero + 6 cards "comment ça
+  marche" + 9 sources + "Ce site c'est quoi" + CTA dashboard. Indexée
+  prioritaire (priority 1.0 sitemap). Canonical = `/`.
+- **`legal.html`** (~15 KB) — À propos / mentions légales / politique
+  de confidentialité / disclosure Winamax (aucune affiliation).
+- **`methodologie.html`** (~18 KB) — Protocole formel : 9 sources,
+  pipeline, dictionnaire des métriques (8 entrées), protocole de
+  backtest, biais et limites. JSON-LD `TechArticle`.
+- **`academie.html`** (~17 KB) — Glossaire complet, 22 termes en
+  5 sections (cotes, valeur, mise, qualité, signaux). JSON-LD `Article`.
+- **`comment-lire-un-prono.html`** (~17 KB) — Pédago débutants : maquette
+  de carte annotée + tier explainer + erreurs classiques. JSON-LD
+  `HowTo` (rich result éligible).
+- **`backtest.html`** (~18 KB, **généré**) — KPIs + tables tier/sport/
+  bucket/calibration/ligues. Régénéré à chaque cron tick par
+  `scripts/build_backtest_page.py`. JSON-LD `Dataset`.
+- **`credibilite.html`** (~17 KB, **généré**) — Diagramme calibration
+  SVG + Brier + log-loss + tableau bins. Régénéré par
+  `scripts/build_credibilite_page.py`. JSON-LD `TechArticle`.
+- **`feed.xml`** (~13 KB, **généré**) — RSS 2.0 des top picks du jour
+  (15 items, prob ≥ 55%). Régénéré par `scripts/build_feed.py`.
+  Discoverable feed readers + Google News.
+
+Hygiène moderne :
+- `humans.txt` — credits + tech stack
+- `.well-known/security.txt` — RFC 9116 disclosure policy
+- `manifest.webmanifest` — PWA installable
+- `robots.txt` + `sitemap.xml` (15 URLs prioritisées)
 
 ## Fichiers clés
 
@@ -94,9 +143,13 @@ rejouer la pipeline GitHub Actions toutes les 60 s (cadences par script).
 
 ## Conventions
 
-- **UN SEUL FICHIER HTML** : `pronostics.html` contient tout. Pas de bundler,
-  pas de build step. Modifier directement.
-- **`index.html`** redirige vers `pronostics.html` (pour GitHub Pages).
+- **DASHBOARD = SPA monolithique** : `pronostics.html` contient tout le code
+  dynamique (HTML + CSS + JS inline). Pas de bundler, pas de build step.
+  Modifier directement. v31 : pages éditoriales (legal/methodologie/academie/
+  comment-lire/backtest/credibilite) sont SORTIES en HTML statiques séparés
+  pour le SEO, mais le dashboard reste dans pronostics.html.
+- **`index.html`** = vraie landing page indexable depuis v31 (avant : redirect
+  vers pronostics.html). Hero + value prop + cards explicatives + CTA dashboard.
 - **`.gitattributes`** force LF eol partout — sans ça les édits Windows
   produisent des diffs phantoms à chaque commit (CRLF/LF flip-flop).
 - **Variables `let`/`const` en scope IIFE** — attention TDZ : une `const`
