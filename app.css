@@ -3089,6 +3089,54 @@
   }
   *::-webkit-scrollbar-thumb:hover { background: var(--panel-4); background-clip: padding-box; }
 
+  /* v31.7.2 — Modal détail : sur mobile, sections additionnelles collapsable
+     pour réduire le scroll. Les sections critiques (Notre prono + Contexte +
+     reasons) restent toujours ouvertes. Les sections secondaires (probas vs
+     marché, cotes bookmakers, scores probables) deviennent <details> closed
+     par défaut sur mobile. */
+  @media (max-width: 720px) {
+    /* Modal devient quasi-fullscreen sur mobile pour eviter de tronquer */
+    .modal-backdrop .modal {
+      max-width: 100% !important;
+      max-height: 95vh !important;
+      border-radius: 16px 16px 0 0 !important;
+    }
+    /* Sections secondaires plus compactes */
+    .modal .section h4 {
+      font-size: 14px !important;
+      margin-bottom: 8px !important;
+    }
+    .modal .section { margin-bottom: 16px !important; }
+  }
+
+  /* v31.7.2 — Page Tous : grid responsive (avant 72px 1fr 200px 110px fixe
+     => overflow horizontal sur mobile <520px). Maintenant flexbox-like avec
+     grid-template-columns dynamiques selon viewport. */
+  .tous-row {
+    grid-template-columns: 72px 1fr 200px 110px;
+  }
+  @media (max-width: 720px) {
+    .tous-row {
+      grid-template-columns: 64px 1fr 100px;
+      gap: 10px !important;
+      padding: 12px 12px !important;
+    }
+    /* Sur mobile, on cache la 4e colonne (Edge) et on déplace l'edge inline
+       avec la confiance — voir le contenu ajusté côté JS si on veut. */
+    .tous-row > div:nth-child(4) {
+      display: none;
+    }
+  }
+  @media (max-width: 480px) {
+    .tous-row {
+      grid-template-columns: 56px 1fr 88px;
+      font-size: 12px;
+    }
+    .tous-row > div:nth-child(2) > div:first-child {
+      font-size: 12.5px !important;
+    }
+  }
+
   /* --- Body subtle background grid (depth) --- */
   body::after {
     content: '';

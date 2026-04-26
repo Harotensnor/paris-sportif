@@ -46,7 +46,7 @@ from winamax_map import _norm
 
 OUT = Path(__file__).resolve().parent.parent / 'referees_soccer.json'
 API = 'https://api.sofascore.com/api/v1'
-STALE_H = 6  # refresh at most every 6h
+STALE_H = 2  # v31.7.2 : 2h (avant 6h — coverage referee 8% trop faible)
 
 # Same five leagues as fetch_injuries_soccer / fetch_lineups_soccer.
 LEAGUES: dict[str, int] = {
