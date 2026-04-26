@@ -107,6 +107,9 @@ PATCH_STAGES = [
     # Lent (~2-5s pour 40 ligues) ; cadence 240 ticks (~4h) en local.
     # En prod la cadence est 1×/jour (cron H=00:00 UTC) — voir refresh.yml.
     ('measure_dixon_coles_rho.py',  240, 60),
+    # v31.7.39 — Forces offensives/défensives par équipe (Maher 1982).
+    # Cadence 240 ticks (~4h). Activera quand ≥40 matchs/ligue.
+    ('measure_team_strengths.py',   240, 60),
     # v31 — Static backtest page generator (audit ChatGPT recommandation
     # "Construire un historique public des paris"). Lit backtest_report_v2.json,
     # produit backtest.html indexable sans JS. ~0.3s.
