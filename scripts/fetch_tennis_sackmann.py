@@ -160,11 +160,25 @@ def _safe_int(s: str) -> int | None:
         return None
 
 
-def build_ratings(matches: list[tuple[str, dict]]) -> dict:
-    """Compute global Elo, surface Elo, fatigue, last-10 from chronologically
-    sorted matches. Each input is (tour, match_dict).
+def _h2h_key(a: str, b: str) -> str:
+    """Build a deterministic pair key. Sorted alphabetically so 'a|b' and
+    'b|a' map to the same bucket — the per-pair record stores wins_a/wins_b
+    where 'a' is the alphabetically-smaller normalized name."""
+    return f'{a}|{b}' if a < b else f'{b}|{a}'
 
-    Returns a dict of player normalized-name → ratings.
+
+def build_ratings(matches: list[tuple[str, dict]]) -> tuple[dict, dict]:
+    """Compute global Elo, surface Elo, fatigue, last-10, AND pair-wise H2H
+    from chronologically sorted matches. Each input is (tour, match_dict).
+
+    Returns a tuple (player_ratings, h2h_pairs).
+    h2h_pairs[pair_key] = {
+        'p1': normA, 'p2': normB,
+        'p1_wins': N, 'p2_wins': M,
+        'last_date': 'YYYY-MM-DD',
+        'last_winner': 'p1' | 'p2',
+        'last_surface': 'Clay' | ...,
+    }
     """
     matches.sort(key=lambda x: x[1]['tourney_date'])
     elo_global: dict[str, float] = defaultdict(lambda: INITIAL_ELO)
@@ -175,6 +189,7 @@ def build_ratings(matches: list[tuple[str, dict]]) -> dict:
     raw_names: dict[str, str] = {}
     tour_of: dict[str, str] = {}
     last_rank: dict[str, int] = {}
+    h2h: dict[str, dict] = {}
 
     for tour, m in matches:
         date = parse_date(m['tourney_date'])
@@ -216,6 +231,22 @@ def build_ratings(matches: list[tuple[str, dict]]) -> dict:
             last_rank[wnorm] = wr
         if lr is not None:
             last_rank[lnorm] = lr
+        # Update H2H — sort key alphabetically, track wins per side.
+        # ESPN tennis events frequently have thin or zero H2H from the API
+        # (the summary endpoint only returns it for the most popular
+        # players); Sackmann's CSVs cover every ATP/WTA match in our 2-year
+        # window so the coverage is much fatter.
+        pkey = _h2h_key(wnorm, lnorm)
+        rec = h2h.get(pkey)
+        if rec is None:
+            rec = {'p1': min(wnorm, lnorm), 'p2': max(wnorm, lnorm),
+                   'p1_wins': 0, 'p2_wins': 0, 'last_date': '', 'last_winner': '', 'last_surface': ''}
+            h2h[pkey] = rec
+        winner_slot = 'p1_wins' if wnorm == rec['p1'] else 'p2_wins'
+        rec[winner_slot] += 1
+        rec['last_date'] = date.strftime('%Y-%m-%d')
+        rec['last_winner'] = 'p1' if wnorm == rec['p1'] else 'p2'
+        rec['last_surface'] = surface
 
     # Compute matches_14d (fatigue) at the end of the dataset using each
     # player's actual last match window.
@@ -255,7 +286,11 @@ def build_ratings(matches: list[tuple[str, dict]]) -> dict:
             'rank': last_rank.get(norm),
             'n_matches': n_matches[norm],
         }
-    return out
+    # Filter h2h to pairs where BOTH players survived the n_matches >= 3
+    # noise cut. Otherwise the h2h dict is dominated by one-shot encounters
+    # involving qualifiers that we won't be able to look up anyway.
+    valid_h2h = {k: v for k, v in h2h.items() if v['p1'] in out and v['p2'] in out}
+    return out, valid_h2h
 
 
 def main() -> int:
@@ -290,15 +325,17 @@ def main() -> int:
         print('[tennis_sackmann] no matches fetched, skipping output.', flush=True)
         return 0
 
-    ratings = build_ratings(all_matches)
+    ratings, h2h = build_ratings(all_matches)
     payload = {
         'generated_at': now.isoformat(),
         'tour_seasons': used_seasons,
         'attribution': 'Tennis match data CC BY-NC-SA Jeff Sackmann (https://github.com/JeffSackmann)',
         'players': ratings,
+        'h2h': h2h,
     }
     OUTPUT.write_text(json.dumps(payload, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
-    print(f'[{now:%H:%M:%S}] tennis_sackmann: {len(ratings)} players → {OUTPUT.name} '
+    print(f'[{now:%H:%M:%S}] tennis_sackmann: {len(ratings)} players · '
+          f'{len(h2h)} h2h pairs → {OUTPUT.name} '
           f'({OUTPUT.stat().st_size // 1024} KB)', flush=True)
     return 0
 
