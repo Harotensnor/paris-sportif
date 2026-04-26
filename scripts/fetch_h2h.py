@@ -164,7 +164,14 @@ def should_refetch(event, now):
 def main():
     d = load_data()
     now_utc = datetime.now(timezone.utc)
-    horizon = now_utc + timedelta(hours=72)
+    # v31.7.4 — Horizon passe de 72h a 120h (5 jours) pour couvrir tout le
+    # weekend + lundi des grandes ligues europeennes. Cap passe de 180 a 280
+    # pour gerer les ~200 nouveaux matchs additionnels.
+    # Lower bound passe de `start < now` a `start < now - 2h` pour permettre
+    # le rattrapage des matchs marques "upcoming" mais qui ont commence dans
+    # l'heure (ESPN status update lag).
+    horizon = now_utc + timedelta(hours=120)
+    lower_bound = now_utc - timedelta(hours=2)
     days = d.get('days', {})
     checked = 0
     enriched = 0
@@ -179,7 +186,7 @@ def main():
                 start = datetime.fromisoformat(ev['date'].replace('Z','+00:00'))
             except Exception:
                 continue
-            if start < now_utc or start > horizon:
+            if start < lower_bound or start > horizon:
                 continue
             if not should_refetch(ev, now_utc):
                 continue
@@ -188,7 +195,7 @@ def main():
             if wm.get('available') is False:
                 continue
             checked += 1
-            if checked > 180:    # cap per run (~90s at 2 req/s)
+            if checked > 280:    # cap per run (~140s at 2 req/s)
                 break
             try:
                 meetings = fetch_h2h(ev)
@@ -202,7 +209,7 @@ def main():
             if meetings:
                 enriched += 1
             time.sleep(0.5)     # 2 req/s
-        if checked > 180:
+        if checked > 280:
             break
     save_data(d)
     print(f'[h2h] checked={checked} enriched={enriched} errors={errors}')
