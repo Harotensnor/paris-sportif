@@ -823,10 +823,18 @@
   // capped at ±4% total differential.
   let __congestionCache = null;
   let __congestionCacheRef = null;
+  // v31.7.12 — Cache parallèle pour le tracking du VENUE par match. Permet
+  // au signal voyage US sports de calculer la distance entre le venue
+  // précédent d'une équipe et le venue courant. Format :
+  //   Map<teamName, [{ ts, hostAbbr, sport }, ...]>
+  // hostAbbr = abbr de l'équipe DOMICILE (host) du match — c'est le venue
+  // PHYSIQUE pour les deux équipes du match.
+  let __venueTimelineCache = null;
   function getCongestionMap() {
     const cur = window.PRONOSTICS_DATA;
     if (__congestionCacheRef !== cur) {
       __congestionCache = new Map();
+      __venueTimelineCache = new Map();
       const days = cur?.days || {};
       for (const dkey in days) {
         const list = days[dkey] || [];
@@ -834,19 +842,44 @@
           if (!m?.date) continue;
           const t = Date.parse(m.date);
           if (isNaN(t)) continue;
-          for (const c of m.competitors || []) {
+          // Find the home competitor (host) for venue tracking
+          const comps = m.competitors || [];
+          const hostComp = comps.find(c => c?.home_away === 'home') || comps[0];
+          const hostAbbr = hostComp?.abbr || null;
+          for (const c of comps) {
             const key = c?.name;
             if (!key) continue;
             let arr = __congestionCache.get(key);
             if (!arr) { arr = []; __congestionCache.set(key, arr); }
             arr.push(t);
+            // Venue timeline (separate, plus riche)
+            let varr = __venueTimelineCache.get(key);
+            if (!varr) { varr = []; __venueTimelineCache.set(key, varr); }
+            varr.push({ ts: t, hostAbbr, sport: m.sport });
           }
         }
       }
       for (const arr of __congestionCache.values()) arr.sort((a, b) => a - b);
+      for (const arr of __venueTimelineCache.values()) arr.sort((a, b) => a.ts - b.ts);
       __congestionCacheRef = cur;
     }
     return __congestionCache;
+  }
+  // v31.7.12 — Helper : renvoie l'entrée venue timeline la plus récente
+  // STRICTEMENT AVANT matchTime (lookback ≤ 14j). null si rien.
+  function lastVenueBeforeMatch(teamName, matchTime, lookbackDays = 14) {
+    if (!teamName || !matchTime) return null;
+    getCongestionMap();  // ensures __venueTimelineCache is built
+    const arr = __venueTimelineCache?.get(teamName);
+    if (!arr || !arr.length) return null;
+    const windowStart = matchTime - lookbackDays * 24 * 3600 * 1000;
+    for (let i = arr.length - 1; i >= 0; i--) {
+      const e = arr[i];
+      if (e.ts >= matchTime) continue;
+      if (e.ts < windowStart) break;
+      return e;  // most recent strictly before
+    }
+    return null;
   }
 
   /**
@@ -1404,6 +1437,7 @@
     let congestionStats = null;
     let restNudge = null;
     let restStats = null;
+    let travelStats = null;  // v31.7.12 — voyage US sports (NBA/NHL/MLB)
     if (match.sport === 'football' && match.date) {
       const matchTime = Date.parse(match.date);
       if (!isNaN(matchTime)) {
@@ -1942,6 +1976,57 @@
         final.pH += motiveNudge;
         final.pA -= motiveNudge;
       }
+
+      // v31.7.12 — Voyage longue distance (NBA/NHL/MLB seulement).
+      // Pénalise la team AWAY ayant parcouru >2000km depuis son dernier
+      // match. Échelonné :
+      //   <2000km   : aucune pénalité (déplacement courant)
+      //   2000-3500 : -0.010 (déplacement long)
+      //   >3500     : -0.018 (transcontinental, jet lag possible)
+      // Côté HOME, la team est typiquement chez elle, donc pas de
+      // pénalité voyage (elle a juste joué soit chez elle, soit ailleurs
+      // mais elle est rentrée).
+      let travelNudge = 0;
+      if (['basketball', 'hockey', 'baseball'].includes(match.sport) && match.date) {
+        const matchTime = Date.parse(match.date);
+        if (!isNaN(matchTime)) {
+          // home venue = abbr du home competitor du match courant
+          const homeAbbr = home?.abbr;
+          if (homeAbbr) {
+            const homeLast = lastVenueBeforeMatch(home?.name, matchTime);
+            const awayLast = lastVenueBeforeMatch(away?.name, matchTime);
+            // Distance que home a parcourue : last venue → home venue (souvent 0 si home retournée)
+            const homeKm = homeLast && homeLast.hostAbbr
+              ? travelDistanceKm(match.sport, homeLast.hostAbbr, homeAbbr)
+              : null;
+            // Distance que away a parcourue : last venue → home venue (le venue du match)
+            const awayKm = awayLast && awayLast.hostAbbr
+              ? travelDistanceKm(match.sport, awayLast.hostAbbr, homeAbbr)
+              : null;
+            const penalty = (km) => {
+              if (km == null) return 0;
+              if (km < 2000) return 0;
+              if (km < 3500) return -0.010;
+              return -0.018;
+            };
+            const hPen = penalty(homeKm);
+            const aPen = penalty(awayKm);
+            // Si l'une des équipes est plus pénalisée que l'autre, nudge.
+            // Differential cap ±0.02.
+            travelNudge = Math.max(-0.02, Math.min(0.02, aPen - hPen));
+            if (Math.abs(travelNudge) > 0.005) {
+              travelStats = {
+                home_km: homeKm != null ? Math.round(homeKm) : null,
+                away_km: awayKm != null ? Math.round(awayKm) : null,
+              };
+            }
+          }
+        }
+      }
+      if (travelNudge !== 0) {
+        final.pH += travelNudge;
+        final.pA -= travelNudge;
+      }
       // Injury penalty: each severe absence (Out/Suspended/Doubtful) on either
       // side shifts the win prob by ~1.5% (cap at 6%). ESPN covers US sports
       // (NBA/NHL/WNBA/NFL/MLB); Sofascore fills the gap for the top-5 soccer
@@ -2307,6 +2392,22 @@
           type: 'rest',
           icon: '😴',
           text,
+        });
+      }
+    }
+    // v31.7.12 — Voyage longue distance reason (US sports : NBA/NHL/MLB).
+    if (travelStats && (travelStats.away_km != null || travelStats.home_km != null)) {
+      const longSide = (travelStats.away_km != null && travelStats.away_km >= 2000)
+        ? { team: away?.short || away?.name, km: travelStats.away_km, side: 'away' }
+        : (travelStats.home_km != null && travelStats.home_km >= 2000)
+          ? { team: home?.short || home?.name, km: travelStats.home_km, side: 'home' }
+          : null;
+      if (longSide) {
+        const lbl = longSide.km >= 3500 ? 'voyage transcontinental' : 'voyage long';
+        reasons.push({
+          type: 'travel',
+          icon: '✈️',
+          text: `${longSide.team} : ${lbl} (${longSide.km}km depuis dernier match)`
         });
       }
     }
