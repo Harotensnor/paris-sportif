@@ -9279,20 +9279,45 @@
             <!-- Axis titles -->
             <text x="${W/2}" y="${H-6}" font-size="11" fill="var(--text-2)" text-anchor="middle" font-weight="600">Probabilité prédite (modèle)</text>
             <text x="12" y="${H/2}" font-size="11" fill="var(--text-2)" text-anchor="middle" font-weight="600" transform="rotate(-90 12 ${H/2})">Taux de réussite réel</text>
-            <!-- Data points -->
-            ${usable.map(b => {
-              const cx = x(b.prob_mean), cy = y(b.win_rate);
-              const col = Math.abs(b.gap||0) < 0.05 ? '#34d399' : Math.abs(b.gap||0) < 0.10 ? '#fbbf24' : '#f87171';
-              return `
-                <circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${r(b.n).toFixed(1)}" fill="${col}" opacity=".7" stroke="var(--bg)" stroke-width="1.5">
-                  <title>Bucket ${(b.lo*100)|0}-${(b.hi*100)|0}% : prédit ${(b.prob_mean*100).toFixed(0)}%, réel ${(b.win_rate*100).toFixed(0)}% (n=${b.n})</title>
-                </circle>`;
-            }).join('')}
+            <!-- Data points + Wilson 95% CI vertical bars (v31.7.7) -->
+            ${(() => {
+              // Wilson score interval at 95% (z=1.96). Plus robuste que normal
+              // approximation pour petits n. Référence : Wilson (1927).
+              const Z = 1.96;
+              const Z2 = Z * Z;
+              const wilsonCI = (k, n) => {
+                if (!n || n < 1) return null;
+                const p = k / n;
+                const denom = 1 + Z2 / n;
+                const center = (p + Z2 / (2*n)) / denom;
+                const halfwidth = (Z * Math.sqrt((p*(1-p) + Z2/(4*n)) / n)) / denom;
+                return { lo: Math.max(0, center - halfwidth), hi: Math.min(1, center + halfwidth) };
+              };
+              return usable.map(b => {
+                const cx = x(b.prob_mean), cy = y(b.win_rate);
+                const col = Math.abs(b.gap||0) < 0.05 ? '#34d399' : Math.abs(b.gap||0) < 0.10 ? '#fbbf24' : '#f87171';
+                // Compute Wilson CI on actual win count (k = win_rate * n)
+                const k = Math.round((b.win_rate || 0) * b.n);
+                const ci = wilsonCI(k, b.n);
+                const ciBar = ci ? `
+                  <line x1="${cx.toFixed(1)}" y1="${y(ci.lo).toFixed(1)}" x2="${cx.toFixed(1)}" y2="${y(ci.hi).toFixed(1)}" stroke="${col}" stroke-width="1.5" opacity=".4"/>
+                  <line x1="${(cx-3).toFixed(1)}" y1="${y(ci.lo).toFixed(1)}" x2="${(cx+3).toFixed(1)}" y2="${y(ci.lo).toFixed(1)}" stroke="${col}" stroke-width="1.5" opacity=".4"/>
+                  <line x1="${(cx-3).toFixed(1)}" y1="${y(ci.hi).toFixed(1)}" x2="${(cx+3).toFixed(1)}" y2="${y(ci.hi).toFixed(1)}" stroke="${col}" stroke-width="1.5" opacity=".4"/>
+                ` : '';
+                const ciLabel = ci ? ` · IC95% [${(ci.lo*100).toFixed(0)}-${(ci.hi*100).toFixed(0)}%]` : '';
+                return `
+                  ${ciBar}
+                  <circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${r(b.n).toFixed(1)}" fill="${col}" opacity=".75" stroke="var(--bg)" stroke-width="1.5">
+                    <title>Bucket ${(b.lo*100)|0}-${(b.hi*100)|0}% : prédit ${(b.prob_mean*100).toFixed(0)}%, réel ${(b.win_rate*100).toFixed(0)}% (n=${b.n})${ciLabel}</title>
+                  </circle>`;
+              }).join('');
+            })()}
           </svg>
           <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:16px;font-size:11.5px;color:var(--text-dim);">
             <div><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#34d399;margin-right:4px;vertical-align:middle;"></span>écart &lt;5pt</div>
             <div><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#fbbf24;margin-right:4px;vertical-align:middle;"></span>écart 5-10pt</div>
             <div><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f87171;margin-right:4px;vertical-align:middle;"></span>écart &gt;10pt</div>
+            <div><span style="display:inline-block;width:8px;height:1.5px;background:#7b8693;margin-right:4px;vertical-align:middle;"></span>IC 95% Wilson</div>
             <div style="opacity:.7;">— diagonale = calibration parfaite</div>
           </div>
           <div style="font-size:13px;color:var(--text-2);text-align:center;line-height:1.5;max-width:480px;">
