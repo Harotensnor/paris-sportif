@@ -183,10 +183,23 @@ def build_outputs(state: dict) -> tuple[dict, dict]:
                 od = None
             vals.append((o.get('label') or '', od))
         mkt_1n2: dict = {}
+        # Persist the selection labels (home_name/away_name) alongside the
+        # odds. patch_winamax_markets._align_markets_to_espn needs them to
+        # detect when Winamax stored its 'home' selection under what is
+        # actually ESPN's away competitor (frequent on tennis where the
+        # favorite is listed first regardless of match-title order).
+        # Without these labels the alignment is a no-op and we surface
+        # absurd edges like Arthur Fils @6.00 vs Nava on clay.
         if len(vals) == 3 and all(v[1] for v in vals):
-            mkt_1n2 = {'home': vals[0][1], 'draw': vals[1][1], 'away': vals[2][1]}
+            mkt_1n2 = {
+                'home': vals[0][1], 'draw': vals[1][1], 'away': vals[2][1],
+                'home_name': vals[0][0], 'away_name': vals[2][0],
+            }
         elif len(vals) == 2 and all(v[1] for v in vals):
-            mkt_1n2 = {'home': vals[0][1], 'away': vals[1][1]}
+            mkt_1n2 = {
+                'home': vals[0][1], 'away': vals[1][1],
+                'home_name': vals[0][0], 'away_name': vals[1][0],
+            }
         if not mkt_1n2: continue
         markets_by_mid[str(mid)] = {
             'tournament_id': mm.get('tournamentId'),
