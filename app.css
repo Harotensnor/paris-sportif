@@ -1804,9 +1804,13 @@
        simultanement (>=1280px), 4 colonnes 1fr ne tiennent pas confortablement,
        meme a 1900px+ (le hero peut s'etendre dans la zone du rail malgre
        max-width). Force 3 colonnes en permanence quand sidebar+rail actifs ;
-       la 4eme stat (EDGE) passe en pleine largeur en dessous.
-       v31.7.15 fix : supprime la sur-règle 1500px qui re-causait le bug a
-       grand viewport. */
+       la 4eme stat (EDGE) passe sous les 3 premieres mais pas en full-width
+       (visuellement disgracieux — preuve user screenshot v31.7.17).
+       Visuel : EDGE centree max-width 320px, sa propre row.
+       v31.7.15 : supprime la sur-règle 1500px qui re-causait le bug a
+       grand viewport.
+       v31.7.17 : EDGE max-width + center au lieu de full-width pour
+       elegance visuelle. */
     body.agent-home .ed-hero__stats,
     body.agent-inside .ed-hero__stats {
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1814,6 +1818,9 @@
     body.agent-home .ed-hero__stat--edge,
     body.agent-inside .ed-hero__stat--edge {
       grid-column: 1 / -1;
+      max-width: 360px;
+      justify-self: center;
+      width: 100%;
     }
   }
 
