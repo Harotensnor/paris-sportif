@@ -1745,7 +1745,7 @@
       background: var(--panel-2); color: var(--text-dim);
       padding: 1px 7px; border-radius: 999px; font-size: 10.5px; font-weight: 700;
     }
-    /* Content gets pushed right by the sidebar width. On dashboard the
+    /* Content gets pushed right by the sidebar width. On dashboard le
        right-rail aside (v29-dash-aside) reste géré par sa propre règle à
        ≥1280px (padding-right: 308px) — on n'override pas le right padding
        pour éviter que l'aside chevauche le contenu. */
@@ -1757,6 +1757,16 @@
        Top, Buteurs) ont leurs propres chips inline dans le contenu, donc
        pas de perte fonctionnelle. */
     nav.topbar-sports { display: none !important; }
+  }
+  /* v31.7.10 — Safeguard sur le chevauchement right rail / ed-hero.
+     A >=1280px le right rail (.v29-dash-aside) est position:fixed à right:16px
+     width:272px. Force le ed-hero a un max-width safe pour ne pas s'etendre
+     dans le rail. */
+  @media (min-width: 1280px) {
+    body.agent-home .ed-hero,
+    body.agent-inside .ed-hero {
+      max-width: calc(100vw - 264px - 308px - 64px);
+    }
   }
 
   @media (max-width: 520px) {
@@ -3437,8 +3447,12 @@
   }
 
   /* --- "Retour" button (back to dashboard) : subtle pill --- */
-  .agent-return {
-    display: inline-flex; align-items: center; gap: 6px;
+  /* v31.7.10 fix : on ne force PAS display:inline-flex ici — la règle base
+     (line ~1265) cache le bouton sauf body.agent-inside. Mon polish v31.7.3
+     avait casse cette logique en mettant display:inline-flex sans condition,
+     resultat : bouton "Retour à l'Accueil" affiche meme sur le dashboard. */
+  body.agent-inside .agent-return {
+    align-items: center; gap: 6px;
     margin: 16px 0 8px;
     padding: 8px 14px;
     background: transparent;
@@ -3449,7 +3463,7 @@
     cursor: pointer;
     transition: all .15s ease;
   }
-  .agent-return:hover {
+  body.agent-inside .agent-return:hover {
     color: var(--text);
     border-color: var(--brand-border);
     background: var(--brand-soft);

@@ -2975,9 +2975,13 @@
       // Chantier Q — affiche "N" ou "N · K🆕" quand certains locks sont nouveaux.
       // Cas particulier : si tous les locks sont nouveaux (nNew === n) on évite
       // la redondance visuelle "6 · 6🆕" et on affiche "N 🆕".
+      // v31.7.10 fix : sur sidebar etroite (240px), le format "37 · 35🆕"
+      // se faisait tronquer en "37 · 35" sans l'emoji. Quand nNew est >50% de n,
+      // on simplifie en "N 🆕" (badge groupé). Sinon "N" simple si pas de
+      // nouveaux ou "N · K🆕" comme avant si signal pertinent (qq nouveaux).
       locksCountEl.textContent = nNew === 0 ? String(n)
-                               : nNew === n ? `${n} 🆕`
-                                            : `${n} · ${nNew}🆕`;
+                               : (nNew === n || nNew > n * 0.5) ? `${n} 🆕`
+                                                                  : `${n} · ${nNew}🆕`;
       if (nNew > 0) locksCountEl.classList.add('has-new'); else locksCountEl.classList.remove('has-new');
     }
 
