@@ -2,8 +2,35 @@
 
 Site statique de pronostics sportifs (foot, tennis, basket, hockey, baseball)
 avec un agent IA qui gère une "cagnotte modèle" (Kelly fractionné, cap 10%),
-des pronostics simples/combinés, et une vue bilan. Déployé sur GitHub Pages.
-Client = navigateur ; données = fichier `data.js` régénéré en continu.
+des pronostics simples/combinés/montantes séquentielles, et une vue bilan.
+Déployé sur GitHub Pages. Client = navigateur ; données = fichier `data.js`
+régénéré en continu.
+
+## Architecture v31.7 (mise à jour 2026-04-26 nuit)
+
+**Refonte IA navigation v31.5** : sidebar verticale gauche desktop ≥1100px
+(6 hubs : Aujourd'hui solo, Pronos, Ma perf, Transparence, Apprendre, Compte),
+mobile bottom nav 5 items (Accueil/Top/Locks/Bilan/Menu) + drawer hamburger.
+
+**Ajouts récents v31.7.x** :
+- 🎯 **Catégorie Montantes** (3 sous-pages : jour / weekend / semaine).
+  Algo SÉQUENTIEL : étape N démarre après fin étape N-1 + buffer 30min.
+  Calcul progressif des mises (10€ → cote × → étape suivante).
+- 📊 **Modal détail enrichie** : section "Contexte du match" (cadre / forme /
+  conditions) + synthèse rédigée "Pourquoi ce prono est fiable" + section
+  "Chiffres clés" sport-aware (Clubelo + GF/GA foot, Elo surface tennis,
+  Goalie+SV% NHL, Pitcher ERA MLB, points/forme NBA). Sur mobile ≤720px,
+  sections collapsibles (premier ouvert, autres fermées).
+- 🤖 Modèle Dixon-Coles 1997 (foot) : correction τ pour scores nuls bas
+  (ρ = -0.13). Améliore calibration P(0-0), P(1-1), P(1-0), P(0-1).
+- 🖼️ **OG images dédiées** 1200×630 PNG générées au cron par
+  `scripts/build_og_images.py` (Pillow). 4 templates : og-default
+  (hero+KPIs backtest), og-backtest, og-credibilite, og-methodologie.
+- 📰 RSS feed narratif : description avec ligue + kickoff + value label
+  (Solide / Équilibré / Outsider). ttl 5min cale sur cron.
+- 🛠️ Service Worker pre-cache élargi : 5 pages statiques + 4 OG PNG.
+
+**Coach IA flottant supprimé v31.7** (`.cb-fab` retiré, ~300 lignes en moins).
 
 ## Architecture v31 (post-audit ChatGPT 2026-04-26)
 
@@ -240,6 +267,10 @@ Tous commités car c'est la "base de données" du site statique.
   vs `refresh.yml`. Tourne en CI (e2e.yml `drift` job, ~5s) et bloque la
   merge si un script est dans une pipeline mais pas l'autre. Lancer en
   local : `python scripts/check_pipeline_drift.py`.
+- **`scripts/build_og_images.py`** (v31.7.4) — génère 4 PNG 1200×630 :
+  og-default (hero + KPIs backtest), og-backtest, og-credibilite,
+  og-methodologie. Pillow requis (installé via refresh.yml). Skip
+  gracieux si Pillow absent. Cadence 5 ticks (~25 min).
 
 ## Web Vitals (v31.4)
 
