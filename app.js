@@ -5033,23 +5033,56 @@
           'el-clasico': ['real madrid', 'barcelona', 'fc barcelona', 'real madrid cf'],
           'derbi-madrileno': ['real madrid', 'atletico madrid', 'atlético', 'atletico de madrid', 'real madrid cf'],
           'derbi-sevillano': ['sevilla', 'sevilla fc', 'real betis', 'betis'],
+          'derbi-vasco': ['athletic bilbao', 'real sociedad', 'athletic club'],
+          'derbi-catalan': ['barcelona', 'fc barcelona', 'espanyol', 'rcd espanyol'],
+          'derbi-valenciano': ['valencia', 'valencia cf', 'levante', 'villarreal'],
           // Italie
           'derby-milan': ['milan', 'ac milan', 'inter', 'internazionale', 'fc internazionale'],
           'derby-rome': ['as roma', 'roma', 'lazio', 'ss lazio'],
           'derby-italie': ['juventus', 'inter', 'ac milan', 'milan'],
           'derby-turin': ['juventus', 'torino'],
+          'derby-genova': ['genoa', 'sampdoria', 'uc sampdoria'],
+          'derby-naples': ['napoli', 'roma', 'salernitana'],
           // Angleterre
           'north-london': ['arsenal', 'tottenham', 'tottenham hotspur'],
           'merseyside': ['liverpool', 'everton'],
           'manchester': ['manchester united', 'manchester city', 'man united', 'man city'],
           'old-firm': ['celtic', 'rangers'],
+          'birmingham': ['aston villa', 'birmingham city', 'wolves'],
+          'tyne-wear': ['newcastle united', 'sunderland', 'newcastle'],
+          'london': ['arsenal', 'chelsea', 'tottenham hotspur', 'tottenham', 'west ham', 'fulham', 'crystal palace'],
           // Allemagne
           'der-klassiker': ['bayern munich', 'borussia dortmund', 'bayern münchen', 'fc bayern münchen', 'fc bayern'],
           'revierderby': ['borussia dortmund', 'schalke', 'fc schalke 04'],
+          'nordderby': ['hamburger sv', 'hsv', 'werder bremen', 'sv werder bremen'],
+          'frankfurter': ['eintracht frankfurt', 'mainz 05', 'sv darmstadt'],
           // France
           'classique': ['paris saint-germain', 'psg', 'olympique de marseille', 'marseille', 'om'],
           'rhone-alpes': ['olympique lyonnais', 'lyon', 'saint-etienne', 'saint-étienne', 'as saint-etienne', 'asse'],
           'derby-nord': ['lille', 'losc', 'lens', 'rc lens'],
+          'derby-bretagne': ['stade rennais', 'rennes', 'fc nantes', 'nantes'],
+          'cote-azur': ['ogc nice', 'nice', 'as monaco', 'monaco'],
+          // Portugal
+          'derby-lisbonne': ['benfica', 'sl benfica', 'sporting cp', 'sporting'],
+          'derby-eternel-portugal': ['porto', 'fc porto', 'benfica', 'sl benfica'],
+          // Pays-Bas
+          'de-klassieker': ['ajax', 'feyenoord', 'afc ajax'],
+          'eindhoven-derby': ['psv', 'psv eindhoven', 'fc eindhoven'],
+          // Belgique
+          'derby-bruxelles': ['rsc anderlecht', 'anderlecht', 'union saint-gilloise', 'union sg'],
+          // Turquie
+          'kıtalar-arası': ['galatasaray', 'fenerbahçe', 'fenerbahce', 'beşiktaş', 'besiktas'],
+          // Grece
+          'derby-athenes': ['olympiakos', 'panathinaikos', 'aek athens', 'aek'],
+          // Argentine (foot d'Amerique du Sud detecte si data dispo)
+          'superclasico': ['boca juniors', 'river plate', 'club atletico river plate', 'club atletico boca juniors'],
+          // Bresil
+          'choque-rei': ['palmeiras', 'corinthians', 'sao paulo', 'são paulo'],
+          'fla-flu': ['flamengo', 'fluminense'],
+          // USA / MLS
+          'mls-cascadia': ['seattle sounders', 'portland timbers', 'vancouver whitecaps'],
+          // Canaux divers — championnat européen
+          'derby-classique': ['celtic', 'rangers'],
         };
         const _norm = (s) => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9 ]/g, '').trim();
         const hN = _norm(home?.name);
@@ -5063,19 +5096,43 @@
                 'el-clasico': '🔥 EL CLÁSICO — le match le plus regardé du monde',
                 'derbi-madrileno': '🔥 Derbi madrileño — Real vs Atlético, rivalité historique',
                 'derbi-sevillano': '🔥 Derbi sevillano — Sevilla vs Betis',
+                'derbi-vasco': '🔥 Derbi vasco — Athletic vs Real Sociedad',
+                'derbi-catalan': '🔥 Derbi catalan — Barça vs Espanyol',
+                'derbi-valenciano': '🔥 Derbi valenciano',
                 'derby-milan': '🔥 Derby della Madonnina — Milan vs Inter',
                 'derby-rome': '🔥 Derby della Capitale — Roma vs Lazio',
                 'derby-italie': '🔥 Derby d\'Italia — choc entre clubs historiques',
                 'derby-turin': '🔥 Derby della Mole — Juventus vs Torino',
+                'derby-genova': '🔥 Derby della Lanterna — Genoa vs Sampdoria',
+                'derby-naples': '🔥 Choc du Sud italien',
                 'north-london': '🔥 North London Derby — Arsenal vs Tottenham',
                 'merseyside': '🔥 Merseyside Derby — Liverpool vs Everton',
                 'manchester': '🔥 Manchester Derby — United vs City',
                 'old-firm': '🔥 Old Firm — Celtic vs Rangers',
+                'birmingham': '🔥 Second City Derby — Birmingham',
+                'tyne-wear': '🔥 Tyne–Wear Derby — Newcastle vs Sunderland',
+                'london': '🔥 Derby londonien',
                 'der-klassiker': '🔥 Der Klassiker — Bayern vs Dortmund',
                 'revierderby': '🔥 Revierderby — Dortmund vs Schalke',
+                'nordderby': '🔥 Nordderby — HSV vs Werder Brême',
+                'frankfurter': '🔥 Derby de Hesse',
                 'classique': '🔥 Le Classique — PSG vs Marseille',
                 'rhone-alpes': '🔥 Derby rhônalpin — Lyon vs Saint-Étienne',
                 'derby-nord': '🔥 Derby du Nord — Lille vs Lens',
+                'derby-bretagne': '🔥 Derby breton — Rennes vs Nantes',
+                'cote-azur': '🔥 Derby de la Côte d\'Azur — Nice vs Monaco',
+                'derby-lisbonne': '🔥 Derby de Lisbonne — Benfica vs Sporting',
+                'derby-eternel-portugal': '🔥 O Clássico — Benfica vs Porto',
+                'de-klassieker': '🔥 De Klassieker — Ajax vs Feyenoord',
+                'eindhoven-derby': '🔥 Derby d\'Eindhoven',
+                'derby-bruxelles': '🔥 Derby de Bruxelles',
+                'kıtalar-arası': '🔥 Derby intercontinental — Galatasaray / Fenerbahçe / Beşiktaş',
+                'derby-athenes': '🔥 Derby d\'Athènes',
+                'superclasico': '🔥 SUPERCLÁSICO — Boca Juniors vs River Plate',
+                'choque-rei': '🔥 Choque-Rei — derby de São Paulo',
+                'fla-flu': '🔥 Fla-Flu — Flamengo vs Fluminense',
+                'mls-cascadia': '🔥 Cascadia Cup — Pacific NW MLS',
+                'derby-classique': '🔥 Derby classique',
               };
               return labels[key] || '🔥 Derby — rivalité historique';
             }
