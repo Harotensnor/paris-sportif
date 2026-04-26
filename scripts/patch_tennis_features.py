@@ -49,6 +49,58 @@ def load_data():
     return json.loads(m.group(1))
 
 
+# Surface inference from tournament name. Covers all ATP/WTA Masters 1000,
+# Grand Slams, and the most common 250/500. Extended fallback uses
+# month-based ATP-tour heuristic (Apr-May Mediterranean = clay, late
+# Jun-early Jul = grass, rest = hard). Indoor tournaments are Hard.
+_CLAY_TOURNAMENTS = {
+    'mutua madrid open', 'madrid open', 'rome open', 'internazionali bnl',
+    'monte carlo', 'roland garros', 'french open', 'barcelona open',
+    'banc sabadell', 'estoril open', 'munich open', 'bmw open',
+    'hamburg open', 'kitzbuhel', 'umag', 'gstaad', 'bastad',
+    'rio open', 'argentina open', 'cordoba open', 'rio de janeiro',
+    'catalonia open', 'saint malo', "open 35 de saint malo",
+    'morocco open', 'marrakech',
+}
+_GRASS_TOURNAMENTS = {
+    'wimbledon', "queen's club", 'queens club', 'eastbourne open',
+    'mallorca open', 'halle open', 'terra wortmann', 's-hertogenbosch',
+    "rosmalen", 'stuttgart open', 'newport',
+}
+_HARD_TOURNAMENTS = {
+    # Default for everything else listed below; many overlap with implicit
+    # hard but listing them speeds the keyword test
+    'australian open', 'us open', 'indian wells', 'bnp paribas open',
+    'miami open', 'cincinnati open', 'western southern', 'rogers cup',
+    'canadian open', 'shanghai masters', 'paris masters', 'rolex paris',
+    'huzhou open', 'jiangxi open', 'tokyo open', 'beijing open',
+    'china open',
+}
+
+
+def infer_surface(league_name: str, date_str: str) -> str:
+    """Return 'Clay' / 'Grass' / 'Hard' from tournament name + date heuristic."""
+    if not league_name:
+        return ''
+    low = league_name.lower()
+    for kw in _CLAY_TOURNAMENTS:
+        if kw in low: return 'Clay'
+    for kw in _GRASS_TOURNAMENTS:
+        if kw in low: return 'Grass'
+    for kw in _HARD_TOURNAMENTS:
+        if kw in low: return 'Hard'
+    # Fallback by month for tournaments we don't recognize
+    try:
+        month = int((date_str or '')[5:7])
+    except Exception:
+        return ''
+    if 4 <= month <= 6:
+        return 'Clay'
+    if month == 7:
+        return 'Grass'
+    return 'Hard'
+
+
 def lookup_player(name: str, players: dict, by_token: dict) -> dict | None:
     """Resolve an ESPN-style player name to its Sackmann record. Tries
     exact normalized lookup first, then last-name token intersection."""
@@ -129,7 +181,10 @@ def main() -> int:
                     'n_matches': p.get('n_matches') or 0,
                 }
 
-            surface = ev.get('surface') or ''
+            surface = ev.get('surface') or infer_surface(
+                ev.get('league_name') or '',
+                ev.get('date') or '',
+            )
             features = {
                 'home': shape(ph),
                 'away': shape(pa),
