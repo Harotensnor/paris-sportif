@@ -22,7 +22,10 @@
      vers https://harotensnor.github.io/paris-sportif/. Image dérivée de
      l'icon 512x512 PWA. Hash routes (#locks, #bilan…) gardent la même
      og:url root — preview cohérent quel que soit le partage. -->
-<link rel="canonical" href="https://harotensnor.github.io/paris-sportif/">
+<!-- v31 — canonical = self ; / pointe maintenant vers la landing page index.html
+     (vraie page indexable, pas un redirect). Sans cette correction, Google
+     dédupliquait pronostics.html sous l'URL / et perdait le vrai contenu. -->
+<link rel="canonical" href="https://harotensnor.github.io/paris-sportif/pronostics.html">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="fr_FR">
 <meta property="og:site_name" content="Paris-Sportif">
@@ -2829,7 +2832,7 @@
           GitHub
         </a>
         <a href="methodologie.html" class="footer-link" title="Protocole + métriques (page statique indexable)">📐 Méthodologie</a>
-        <button type="button" class="footer-link" data-page-link="academie" title="Glossaire et explications">📖 Académie</button>
+        <a href="academie.html" class="footer-link" title="Glossaire complet (page statique indexable)">📖 Académie</a>
         <button type="button" class="footer-link" data-page-link="backtest" title="Performance vérifiable du modèle">📈 Backtest</button>
         <a href="legal.html" class="footer-link" title="À propos · Confidentialité · Mentions légales (page statique)">⚖️ Légal</a>
       </nav>
@@ -17495,8 +17498,16 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     // Chantier S — enregistrement du service worker pour installabilité PWA.
     // On ignore silencieusement sur navigateurs qui ne supportent pas (Safari
     // en mode privé, vieux Edge, file://). Pas de bloquant.
+    // v31 — déféré au-delà du FCP (idle callback + 2s) pour ne pas bloquer
+    // le rendu initial. La 1re visite ne profitera pas du cache, mais la 2e
+    // si — c'est le bon trade-off pour un dashboard live.
     if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-      navigator.serviceWorker.register('sw.js').catch(() => { /* silencieux */ });
+      const _registerSW = () => navigator.serviceWorker.register('sw.js').catch(() => {});
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(_registerSW, { timeout: 5000 });
+      } else {
+        setTimeout(_registerSW, 2000);
+      }
     }
     currentDate = todayISO();
     // v30 — Maintenant que currentDate est set, refresh le label "today-btn".

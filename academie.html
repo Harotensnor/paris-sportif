@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Académie — Lexique des paris sportifs (Paris-Sportif)</title>
+<meta name="description" content="Glossaire complet des termes paris sportifs : cote décimale vs implicite, edge, Kelly fractionnaire, Brier score, CLV, calibration, value bet, lock, Poisson, Elo, surface Elo. Explications simples, exemples chiffrés.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://harotensnor.github.io/paris-sportif/academie.html">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Académie — Lexique des paris sportifs">
+<meta property="og:description" content="Glossaire complet des termes paris sportifs : edge, Kelly, Brier, CLV, value bet, et plus.">
+<meta property="og:url" content="https://harotensnor.github.io/paris-sportif/academie.html">
+<meta property="og:image" content="https://harotensnor.github.io/paris-sportif/icon-512.png">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#08080a">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://harotensnor.github.io/paris-sportif/#org",
+      "name": "Paris-Sportif",
+      "url": "https://harotensnor.github.io/paris-sportif/"
+    },
+    {
+      "@type": "Article",
+      "headline": "Académie — Lexique des paris sportifs",
+      "url": "https://harotensnor.github.io/paris-sportif/academie.html",
+      "datePublished": "2026-04-26",
+      "dateModified": "2026-04-26",
+      "author": { "@type": "Person", "name": "Théo Boulnois" },
+      "publisher": { "@id": "https://harotensnor.github.io/paris-sportif/#org" },
+      "inLanguage": "fr-FR",
+      "about": "Glossaire des termes techniques en paris sportifs : cotes, probabilités, value betting, Kelly, calibration"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://harotensnor.github.io/paris-sportif/" },
+        { "@type": "ListItem", "position": 2, "name": "Académie", "item": "https://harotensnor.github.io/paris-sportif/academie.html" }
+      ]
+    }
+  ]
+}
+</script>
+
+<style>
+  :root { color-scheme: dark light; }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: "SF Pro Display", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #08080a; color: #e6ebf2;
+    line-height: 1.65; letter-spacing: -.01em;
+  }
+  body { min-height: 100vh; }
+  a { color: #a78bfa; text-decoration: none; }
+  a:hover, a:focus { text-decoration: underline; }
+  code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: .92em; background: rgba(167,139,250,.1); padding: 1px 5px; border-radius: 4px; }
+  header.topbar {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(8,8,10,.85); backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,.06);
+    padding: 12px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .brand { display: flex; align-items: center; gap: 8px; font-weight: 800; letter-spacing: -.5px; }
+  .brand-logo { font-size: 22px; }
+  .brand-text { font-size: 17px; }
+  .topbar nav a {
+    margin-left: 16px; font-size: 13.5px; color: #a3a3aa; font-weight: 500;
+    min-height: 36px; display: inline-flex; align-items: center;
+  }
+  .topbar nav a:hover { color: #e6ebf2; text-decoration: none; }
+  main { max-width: 920px; margin: 0 auto; padding: 16px 20px 60px; }
+  .breadcrumb { font-size: 12px; color: #6b6b73; margin-top: 14px; }
+  .uppercase-pill {
+    display: inline-block; font-size: 11px; color: #a78bfa;
+    text-transform: uppercase; letter-spacing: 1.4px; font-weight: 700;
+    margin: 24px 0 4px;
+  }
+  h1 { margin: 4px 0 6px; font-size: 36px; font-weight: 800; letter-spacing: -1.2px; line-height: 1.05; }
+  .lead { font-size: 14px; color: #a3a3aa; max-width: 640px; border-left: 3px solid #a78bfa; padding: 4px 0 4px 12px; margin: 0 0 28px; }
+  h2 { font-size: 22px; margin: 32px 0 12px; scroll-margin-top: 70px; }
+  section.card {
+    padding: 18px;
+    background: #121215;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 12px;
+    font-size: 13.5px;
+    color: #c5c5cc;
+    margin-bottom: 16px;
+  }
+  dl { margin: 0; display: grid; grid-template-columns: 1fr; gap: 18px; }
+  dt {
+    font-weight: 700; color: #fff; font-size: 16px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    padding-bottom: 4px; margin-bottom: 6px;
+  }
+  dd { margin: 0; color: #a3a3aa; }
+  dd p { margin: 0 0 8px; }
+  dd .ex {
+    margin-top: 8px; padding: 10px 12px;
+    background: rgba(167,139,250,.06); border-left: 2px solid #a78bfa;
+    border-radius: 0 6px 6px 0; font-size: 12.5px;
+  }
+  dd .ex strong { color: #c4b5fd; }
+  .toc {
+    display: flex; gap: 6px; flex-wrap: wrap;
+    margin: 0 0 22px; font-size: 12px;
+  }
+  .toc a {
+    padding: 6px 12px; background: #121215;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 6px; color: #e6ebf2;
+    min-height: 32px; display: inline-flex; align-items: center;
+  }
+  .toc a:hover { border-color: #a78bfa; text-decoration: none; }
+  footer.site-footer {
+    border-top: 1px solid rgba(255,255,255,.06);
+    margin-top: 40px; padding: 24px 20px;
+    text-align: center; font-size: 12.5px; color: #6b6b73;
+  }
+  footer.site-footer nav a { margin: 0 10px; color: #a3a3aa; }
+  @media (prefers-color-scheme: light) {
+    html, body { background: #f5f5f7; color: #08080a; }
+    section.card { background: #fff; border-color: rgba(0,0,0,.08); color: #2a2a30; }
+    .topbar { background: rgba(245,245,247,.85); border-bottom-color: rgba(0,0,0,.08); }
+    .topbar nav a { color: #444; }
+    .toc a { background: #fff; color: #08080a; }
+    code { background: rgba(167,139,250,.15); }
+    dt { color: #08080a; border-bottom-color: rgba(0,0,0,.08); }
+    dd { color: #444; }
+  }
+  @media (max-width: 600px) {
+    h1 { font-size: 28px; }
+    h2 { font-size: 19px; }
+    .topbar nav { display: none; }
+  }
+</style>
+</head>
+<body>
+<header class="topbar" role="banner">
+  <a href="./" class="brand" aria-label="Retour à l'accueil Paris-Sportif">
+    <span class="brand-logo">🎯</span>
+    <span class="brand-text">Paris-Sportif</span>
+  </a>
+  <nav aria-label="Pages éditoriales">
+    <a href="./">Accueil</a>
+    <a href="methodologie.html">Méthodologie</a>
+    <a href="legal.html">Légal</a>
+  </nav>
+</header>
+
+<main>
+  <nav class="breadcrumb" aria-label="Fil d'ariane">
+    <a href="./" style="color:#6b6b73;">Accueil</a> ›
+    <span style="color:#a3a3aa;">Académie</span>
+  </nav>
+
+  <span class="uppercase-pill">Glossaire</span>
+  <h1>📖 Académie</h1>
+  <p class="lead">Tous les termes techniques utilisés sur le dashboard, expliqués simplement avec un exemple chiffré. Référence pour quand un signal "edge +12pt" ou "Brier 0.18" t'intrigue.</p>
+
+  <nav class="toc" aria-label="Sommaire">
+    <a href="#cotes">📊 Cotes &amp; probabilités</a>
+    <a href="#valeur">💎 Valeur &amp; sélection</a>
+    <a href="#mise">💰 Mise &amp; bankroll</a>
+    <a href="#qualite">🎯 Qualité du modèle</a>
+    <a href="#signaux">🔬 Signaux du modèle</a>
+  </nav>
+
+  <h2 id="cotes">📊 Cotes &amp; probabilités</h2>
+  <section class="card">
+    <dl>
+      <div>
+        <dt>Cote décimale (européenne)</dt>
+        <dd>
+          <p>Combien tu récupères pour 1€ misé, mise comprise. C'est la convention française et celle qu'affiche Winamax. Une cote de 2.50 = pour 1€ misé tu récupères 2.50€ en cas de victoire (donc 1.50€ de gain net).</p>
+          <div class="ex"><strong>Exemple</strong> : tu mises 10€ à la cote 1.85. Tu gagnes → tu récupères 18.50€, soit 8.50€ net. Tu perds → tu perds 10€.</div>
+        </dd>
+      </div>
+      <div>
+        <dt>Probabilité implicite</dt>
+        <dd>
+          <p>La probabilité que le marché donne à un évènement, lue à partir de la cote. Formule : <code>p_implicite = 1 / cote</code>. Une cote 2.00 implique 50% de chance, une cote 4.00 implique 25%.</p>
+          <div class="ex"><strong>Exemple</strong> : un match avec cote 1.50 victoire domicile → marché pense que le domicile gagne ~67% du temps (1 / 1.50). Réservé aux matchs <em>très</em> déséquilibrés.</div>
+        </dd>
+      </div>
+      <div>
+        <dt>Marge bookmaker (vig)</dt>
+        <dd>
+          <p>Les bookmakers ne fixent pas des cotes "honnêtes". Ils ajoutent une marge (5-8% typiquement). Si tu additionnes les probabilités implicites des 3 issues 1N2, tu obtiens ≈1.05-1.08 au lieu de 1.00. C'est pour ça qu'un parieur "moyen" est perdant à long terme : il faut battre la marge.</p>
+        </dd>
+      </div>
+    </dl>
+  </section>
+
+  <h2 id="valeur">💎 Valeur &amp; sélection</h2>
+  <section class="card">
+    <dl>
+      <div>
+        <dt>Edge (avantage marché)</dt>
+        <dd>
+          <p>Différence entre la probabilité que <em>tu</em> calcules et celle que le marché propose. <code>edge = p_modèle − p_implicite</code>. Positif = le marché sous-estime, c'est une opportunité.</p>
+          <div class="ex"><strong>Exemple</strong> : modèle dit 60% pour Lyon, cote 1.80 (implicite 55.6%). Edge = +4.4pt. Si répété sur 100 paris à edge +4pt, espérance théorique +4€/100€ misés.</div>
+        </dd>
+      </div>
+      <div>
+        <dt>Value bet</dt>
+        <dd>
+          <p>Pari où l'edge est positif. Les paris sportifs profitables se construisent <strong>uniquement</strong> sur des value bets répétés, pas sur les "coups de cœur".</p>
+        </dd>
+      </div>
+      <div>
+        <dt>Tier de fiabilité (lock / standard / lowconf / skip)</dt>
+        <dd>
+          <p>Classement du modèle selon la confiance dans le pick :</p>
+          <ul style="margin:6px 0;padding-left:22px;">
+            <li><strong>lock</strong> 🔒 : prob ≥ 72% + ≥3 composants non-marché concordants. C'est le top du top.</li>
+            <li><strong>standard</strong> ✅ : prob ≥ 55% avec couverture data minimale.</li>
+            <li><strong>lowconf</strong> ⚠️ : prob ≥ 50% mais data thin (peu de matches, sources réduites).</li>
+            <li><strong>skip</strong> 🚫 : prob &lt; 50% ou inversion modèle/marché. <em>Ne pas miser.</em></li>
+          </ul>
+        </dd>
+      </div>
+    </dl>
+  </section>
+
+  <h2 id="mise">💰 Mise &amp; bankroll</h2>
+  <section class="card">
+    <dl>
+      <div>
+        <dt>Bankroll (cagnotte)</dt>
+        <dd>
+          <p>L'argent que tu consacres aux paris, à part de tes finances quotidiennes. Règle d'or : <strong>n'utilise que ce que tu peux perdre intégralement</strong> sans impact sur ton mode de vie.</p>
+        </dd>
+      </div>
+      <div>
+        <dt>Kelly fractionnaire</dt>
+        <dd>
+          <p>Formule mathématique qui calcule la mise optimale pour maximiser la croissance long terme : <code>f* = (b·p − q) / b</code>, où <code>b</code> = cote − 1, <code>p</code> = prob modèle, <code>q</code> = 1 − p. On applique <strong>0.25× Kelly cap 10% bankroll</strong> par défaut.</p>
+          <div class="ex"><strong>Pourquoi 0.25× et pas Kelly plein ?</strong> Le Kelly plein est mathématiquement optimal MAIS il suppose que ta probabilité modèle est exacte. En pratique, elle a une marge d'erreur. 0.25× réduit la variance d'environ 75% en n'enlevant qu'environ 25% de la croissance — un trade-off très favorable.</div>
+        </dd>
+      </div>
+      <div>
+        <dt>Mise plate (flat stake)</dt>
+        <dd>
+          <p>Mise constante par pari (typiquement 1u). Très utile pour mesurer la <em>vraie</em> performance du modèle indépendamment du staking. Le ROI flat est la métrique de référence.</p>
+        </dd>
+      </div>
+    </dl>
+  </section>
+
+  <h2 id="qualite">🎯 Qualité du modèle</h2>
+  <section class="card">
+    <dl>
+      <div>
+        <dt>Win rate (WR / taux de réussite)</dt>
+        <dd>
+          <p>Nombre de picks gagnés ÷ nombre total. <strong>Ne dit rien à lui seul.</strong> Un WR 60% sur des cotes 1.30 fait perdre de l'argent (perd 80€/100€ misés). Un WR 40% sur cotes 3.00 en fait gagner (+20€/100€).</p>
+        </dd>
+      </div>
+      <div>
+        <dt>ROI flat</dt>
+        <dd>
+          <p>Retour sur investissement à mise plate. <code>(retours − mises) / mises × 100</code>. <strong>+5% sur 200+ paris = solide.</strong> +10% = excellent. +20% sur peu de paris = variance.</p>
+        </dd>
+      </div>
+      <div>
+        <dt>Brier score</dt>
+        <dd>
+          <p>Mesure l'erreur de prédiction probabiliste, en moyenne sur tous les picks. <code>Σ(p_modèle − résultat)² / N</code>. <strong>0 = parfait, 0.25 = pile/face.</strong> Un Brier &lt; 0.22 sur ≥150 picks indique un signal réel.</p>
+          <div class="ex"><strong>Exemple</strong> : si le modèle dit 70% et la victoire arrive, l'erreur sur cette ligne est <code>(0.7 − 1)² = 0.09</code>. Plus on prédit confiant et juste, plus le Brier baisse.</div>
+        </dd>
+      </div>
+      <div>
+        <dt>Calibration</dt>
+        <dd>
+          <p>Quand le modèle dit "70% de chance", est-ce que 70% de ces prédictions gagnent vraiment dans la réalité ? Si oui, le modèle est <em>calibré</em> (honnête). Sinon, ses pourcentages sont du bruit.</p>
+          <div class="ex">On bin les picks par tranche de prob (50-60%, 60-70%, etc.) et on regarde le WR observé dans chaque tranche. <strong>Gap &lt; 5pp partout = bien calibré.</strong></div>
+        </dd>
+      </div>
+      <div>
+        <dt>CLV (Closing Line Value)</dt>
+        <dd>
+          <p>Cote prise au moment du pick comparée à la cote juste avant le coup d'envoi. <strong>+CLV moyen sur 50+ paris = preuve qu'on bat le marché</strong>, indépendamment du résultat short-term.</p>
+          <div class="ex">C'est le signal que les bookmakers eux-mêmes utilisent pour identifier les "smart money" — les parieurs qui prennent systématiquement la cote AVANT que le marché s'aligne. Si ton CLV est positif sur la durée, tu joues mieux que le consensus.</div>
+        </dd>
+      </div>
+    </dl>
+  </section>
+
+  <h2 id="signaux">🔬 Signaux du modèle</h2>
+  <section class="card">
+    <dl>
+      <div>
+        <dt>Elo</dt>
+        <dd>
+          <p>Note de force d'une équipe ou d'un joueur, mise à jour après chaque match. Hérité du chess (Arpad Elo, 1960s). Un écart de 100pts ≈ 64% de chances pour le plus fort. Utilisé en foot (ClubElo) et tennis (Sackmann).</p>
+        </dd>
+      </div>
+      <div>
+        <dt>Surface Elo (tennis)</dt>
+        <dd>
+          <p>Elo séparé par surface (Hard, Clay, Grass). Nadal sur terre battue ≠ Nadal sur gazon. Sans cette ventilation, le modèle perd un signal majeur. Exposé pour ATP/WTA via les CSV de Jeff Sackmann.</p>
+        </dd>
+      </div>
+      <div>
+        <dt>Modèle Poisson (foot)</dt>
+        <dd>
+          <p>Modèle statistique qui prédit la distribution du nombre de buts. À partir de l'attaque/défense des deux équipes, calcule la probabilité de chaque score (0-0, 1-0, 2-1...). Permet de dériver les marchés Over/Under, BTTS, score exact.</p>
+        </dd>
+      </div>
+      <div>
+        <dt>xG (expected goals)</dt>
+        <dd>
+          <p>Le nombre de buts qu'<em>aurait dû</em> marquer une équipe selon la qualité de ses occasions. Un xG = 1.8 vs but inscrit = 0 indique malchance/grand gardien adverse. Sur la durée, xG converge vers les buts réels.</p>
+        </dd>
+      </div>
+      <div>
+        <dt>Forme L5 / L10</dt>
+        <dd>
+          <p>Résultats des 5 derniers matchs (foot) ou 10 derniers matchs (tennis Sackmann). Capté comme W/L/D dans une chaîne ("WWLDW"). Signal court-terme important mais sujet à variance.</p>
+        </dd>
+      </div>
+      <div>
+        <dt>Fatigue (tennis)</dt>
+        <dd>
+          <p>Nombre de matchs joués dans les 14 derniers jours. >5 matchs = chargé, joue sur la puissance de service et la récupération. Pénalise typiquement le joueur le plus chargé contre un adversaire frais.</p>
+        </dd>
+      </div>
+      <div>
+        <dt>Pace NHL (différentiel buts/match)</dt>
+        <dd>
+          <p>(Buts marqués − Buts encaissés) / matchs. Positif = équipe qui domine. Une équipe à +1.0/m vs −0.5/m = écart de 1.5/m de différence systémique.</p>
+        </dd>
+      </div>
+      <div>
+        <dt>Pitcher partant (MLB)</dt>
+        <dd>
+          <p>Le lanceur qui commence le match. Sa qualité (ERA, WHIP, K/9) est de loin le signal #1 en baseball. Un même match avec deux pitchers différents peut basculer la cote de +30%.</p>
+        </dd>
+      </div>
+      <div>
+        <dt>Calibration ligue (Football-Data)</dt>
+        <dd>
+          <p>Statistiques agrégées par ligue : moyenne de buts/match, taux BTTS, taux Over 2.5, win rate domicile. Permet au modèle Poisson de s'ajuster (Eredivisie ≠ Serie A en pace).</p>
+        </dd>
+      </div>
+    </dl>
+  </section>
+
+  <p style="margin-top:32px;padding:14px 16px;background:#0c0c0f;border:1px dashed rgba(255,255,255,.1);border-radius:8px;font-size:12.5px;color:#6b6b73;text-align:center;">
+    📐 Pour le détail mathématique de la composition modèle (poids des composants, seuils des tiers, formules exactes), voir <a href="methodologie.html">la page Méthodologie</a>. Pour le code, voir <a href="https://github.com/Harotensnor/paris-sportif" target="_blank" rel="noopener">le repo GitHub</a>.
+  </p>
+</main>
+
+<footer class="site-footer" role="contentinfo">
+  <nav aria-label="Liens du site">
+    <a href="./">Accueil</a> ·
+    <a href="methodologie.html">Méthodologie</a> ·
+    <a href="legal.html">Légal</a> ·
+    <a href="https://github.com/Harotensnor/paris-sportif" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+  <div style="margin-top:8px;">⚖️ Site éducatif · réservé aux 18+ · jouer comporte des risques</div>
+</footer>
+</body>
+</html>
