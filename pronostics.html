@@ -483,6 +483,26 @@
 <!-- Overlay pour le menu mobile -->
 <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
 
+<!-- v31.7.32 — Trust strip dynamique. Affiché 1× par session pour les
+     visiteurs anonymes, persiste hidden après dismiss (localStorage).
+     Populé au boot par window.__backtestReportV2. Fournit en 3s la preuve
+     "le modèle marche" qui rassure un newcomer.
+     - hidden par défaut, JS le révèle quand __backtestReportV2 chargé
+     - dismiss persiste 30j via localStorage trustStripHiddenUntil -->
+<div id="trust-strip" class="trust-strip hidden" role="region" aria-label="Performance du modèle">
+  <a href="backtest.html" class="trust-strip-link" title="Voir le backtest complet" id="trust-strip-link">
+    <span class="trust-strip-stat"><span class="trust-strip-val" id="trust-locks-wr">—</span><span class="trust-strip-lbl">locks WR</span></span>
+    <span class="trust-strip-sep" aria-hidden="true">·</span>
+    <span class="trust-strip-stat"><span class="trust-strip-val" id="trust-roi">—</span><span class="trust-strip-lbl">ROI flat</span></span>
+    <span class="trust-strip-sep" aria-hidden="true">·</span>
+    <span class="trust-strip-stat"><span class="trust-strip-val" id="trust-brier">—</span><span class="trust-strip-lbl">Brier</span></span>
+    <span class="trust-strip-sep" aria-hidden="true">·</span>
+    <span class="trust-strip-stat"><span class="trust-strip-val" id="trust-n">—</span><span class="trust-strip-lbl">picks réglés</span></span>
+    <span class="trust-strip-cta">→ voir backtest complet</span>
+  </a>
+  <button type="button" id="trust-strip-close" class="trust-strip-close" aria-label="Masquer la barre de performance pour 30 jours" title="Masquer (30j)">✕</button>
+</div>
+
 <div class="content">
   <main id="main-content" tabindex="-1">
     <button class="agent-return" id="agent-return-btn" aria-label="Retour à l'Accueil">
