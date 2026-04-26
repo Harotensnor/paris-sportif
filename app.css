@@ -2488,3 +2488,54 @@
   .onboard-opt b { display:block; margin-bottom:4px; }
   .onboard-opt .descr { color:var(--text-dim); font-size:12px; font-weight:normal; }
   .onboard-card .skip { background:none; border:none; color:var(--text-dim); cursor:pointer; text-decoration:underline; font-size:12px; margin-top:6px; font-family:inherit; }
+
+  /* v31.2 — Bottom nav mobile sticky (audit UX). Affichée < 720px uniquement.
+     Réduit la friction de navigation entre Dashboard / Tous / Locks / Bilan
+     sur mobile, vs les hubs à chevrons de la topbar (qui restent dispos pour
+     les pages secondaires). 56px de hauteur, safe-area-inset-bottom pris en
+     compte (iOS notched). Active state = couleur brand sur l'icône + label. */
+  .mobile-bottom-nav {
+    display: none;
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 80;
+    padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0px));
+    background: rgba(8,8,10,.92);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -4px 16px rgba(0,0,0,.3);
+  }
+  .mbn-btn {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 2px; padding: 8px 4px; border: none; background: transparent; color: var(--text-dim);
+    font-family: inherit; font-size: 10.5px; font-weight: 600; letter-spacing: .2px; cursor: pointer;
+    border-radius: 8px; min-height: 44px; line-height: 1;
+    transition: color .15s, background .15s;
+  }
+  .mbn-btn:hover, .mbn-btn:focus-visible { color: var(--text); background: rgba(255,255,255,.04); }
+  .mbn-btn.active { color: var(--brand); background: rgba(167,139,250,.12); }
+  .mbn-icon { font-size: 18px; line-height: 1; }
+  .mbn-label { font-size: 10.5px; }
+  @media (max-width: 720px) {
+    .mobile-bottom-nav { display: flex; }
+    /* Spacer en bas du body pour ne pas que le contenu se cache derrière la nav */
+    body { padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px)); }
+  }
+
+  /* v31.2 — Audit UX accessibilité dynamique : respecter prefers-reduced-motion
+     globalement. Le système d'exploitation expose la préférence ; on la traite
+     comme une instruction stricte (animations & transitions désactivées,
+     scroll-behavior immédiat, smooth-scroll off). Cf. recommandations W3C WAI
+     pour les utilisateurs avec troubles vestibulaires / sensibilité au motion.
+     Les éléments individuels avec leur propre `animation:none` étaient locaux ;
+     ce bloc est la safety-net globale. */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+    html { scroll-behavior: auto !important; }
+  }
