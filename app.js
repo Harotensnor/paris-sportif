@@ -1287,10 +1287,52 @@
       window.__backtestReportV2 = rep;
       // Invalidate memoized predictions so subsequent renders apply calibration
       if (typeof __predCache !== 'undefined') __predCache = new Map();
+      // v31.7.32 — Trust strip : populer dès que le report est chargé.
+      _populateTrustStrip(rep);
     } catch (e) { /* calibration optional, ignore */ }
   }
   // Fire once; safe to call before DOM is ready (fetch is async)
   _loadModelCalibration();
+
+  // v31.7.32 — Trust strip helper. Lit __backtestReportV2 et patch les 4
+  // KPIs visibles (locks WR / ROI flat / Brier / n picks). Respecte le
+  // dismiss persisté en localStorage `trustStripHiddenUntil` (timestamp ms).
+  function _populateTrustStrip(rep) {
+    const strip = document.getElementById('trust-strip');
+    if (!strip || !rep) return;
+    // Vérifier le dismiss
+    try {
+      const until = parseInt(localStorage.getItem('trustStripHiddenUntil') || '0', 10);
+      if (until > Date.now()) return;  // Encore masqué
+    } catch (e) {}
+    const overall = rep.overall || {};
+    const locks = (rep.by_tier || {}).lock || {};
+    const setText = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+    if (locks.n > 0) {
+      setText('trust-locks-wr', Math.round((locks.win_rate || 0) * 100) + '%');
+    } else {
+      setText('trust-locks-wr', '—');
+    }
+    if (overall.n > 0) {
+      const roiPct = overall.flat_roi_pct || 0;
+      setText('trust-roi', (roiPct >= 0 ? '+' : '') + roiPct.toFixed(1) + '%');
+      setText('trust-brier', (overall.brier || 0).toFixed(3));
+      setText('trust-n', overall.n);
+    }
+    strip.classList.remove('hidden');
+    // Wire dismiss button
+    const closeBtn = document.getElementById('trust-strip-close');
+    if (closeBtn && !closeBtn._wired) {
+      closeBtn._wired = true;
+      closeBtn.addEventListener('click', () => {
+        try {
+          // Masque pour 30 jours
+          localStorage.setItem('trustStripHiddenUntil', String(Date.now() + 30 * 86400 * 1000));
+        } catch (e) {}
+        strip.classList.add('hidden');
+      });
+    }
+  }
 
   // v30 — Pipeline health indicator (topbar dot lit health.json publié toutes
   // les 5min par refresh.yml). Couleur :
@@ -8790,6 +8832,31 @@
         <span class="dcp-bal">${nav.toFixed(2)}€</span>
         <span class="dcp-delta ${agent.delta7 >= 0 ? 'up' : 'down'}">${deltaSign}${Math.round((agent.deltaPct7 ?? 0)*10)/10}%</span>
       </button>`}
+
+      ${_dataIsStale ? '' : (() => {
+        // v31.7.32 — CTA fidélisation. Routine quotidienne : pronostics
+        // mis à jour 5min/30min selon l'heure. On indique la prochaine MAJ
+        // + lien RSS + lien install PWA. Petit, discret, pas intrusif.
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const dayName = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'][tomorrow.getDay()];
+        const dayNum = tomorrow.getDate();
+        const monthName = ['jan.','fév.','mars','avr.','mai','juin','juil.','août','sep.','oct.','nov.','déc.'][tomorrow.getMonth()];
+        return `
+        <section class="dash-return-cta" role="region" aria-label="Reviens demain pour les nouveaux pronostics">
+          <div class="dash-return-cta-inner">
+            <div class="dash-return-icon" aria-hidden="true">📅</div>
+            <div class="dash-return-text">
+              <div class="dash-return-title">Pronos mis à jour toutes les 5 min</div>
+              <div class="dash-return-sub">Reviens <b>${dayName} ${dayNum} ${monthName}</b> pour découvrir les nouveaux pronostics du jour. Cron GitHub Actions, 100 % automatique.</div>
+            </div>
+            <div class="dash-return-actions">
+              <a href="feed.xml" class="dash-return-btn" title="Flux RSS — recevoir les pronos dans ton lecteur">📰 RSS</a>
+              <a href="backtest.html" class="dash-return-btn" title="Voir le backtest hebdomadaire">📊 Backtest</a>
+            </div>
+          </div>
+        </section>`;
+      })()}
     `;
 
     // v30 — Sprint 2 : Pill click scrolls to cagnotte header panel

@@ -641,6 +641,99 @@
     border-radius: 999px; background: var(--panel-3);
   }
 
+  /* v31.7.32 — CTA fidélisation. Petit banner en fin de dashboard avec
+     prochaine MAJ + RSS + lien backtest. But : créer une routine
+     quotidienne. Discret (~70px desktop, ~120px mobile). */
+  .dash-return-cta {
+    margin: 24px auto 8px; max-width: 1100px;
+  }
+  .dash-return-cta-inner {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 16px;
+    background: linear-gradient(135deg, rgba(167,139,250,.05) 0%, rgba(52,211,153,.04) 100%);
+    border: 1px dashed rgba(167,139,250,.25);
+    border-radius: 12px;
+  }
+  .dash-return-icon {
+    flex: none; width: 40px; height: 40px;
+    border-radius: 10px;
+    background: rgba(167,139,250,.10);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+  .dash-return-text { flex: 1; min-width: 0; }
+  .dash-return-title {
+    font-size: 14px; font-weight: 700; color: var(--text);
+    margin-bottom: 2px;
+  }
+  .dash-return-sub {
+    font-size: 12.5px; color: var(--text-dim); line-height: 1.4;
+  }
+  .dash-return-actions { flex: none; display: inline-flex; gap: 6px; }
+  .dash-return-btn {
+    padding: 6px 12px; border-radius: 8px;
+    background: var(--panel); color: var(--text-dim);
+    border: 1px solid var(--border); text-decoration: none;
+    font-size: 12px; font-weight: 600;
+    transition: background .12s, color .12s, border-color .12s;
+  }
+  .dash-return-btn:hover {
+    background: rgba(167,139,250,.08); color: var(--brand);
+    border-color: rgba(167,139,250,.40);
+  }
+  @media (max-width: 720px) {
+    .dash-return-cta-inner { flex-direction: column; align-items: flex-start; gap: 10px; padding: 12px; }
+    .dash-return-actions { width: 100%; }
+    .dash-return-btn { flex: 1; text-align: center; }
+  }
+
+  /* v31.7.32 — Trust strip : barre fine au-dessus du dashboard avec les 4
+     KPIs du backtest (locks WR / ROI / Brier / n). Donne en 3s la preuve
+     sociale "ce site marche" pour un newcomer. Dismiss persisté 30j. */
+  .trust-strip {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; padding: 8px 16px;
+    background: linear-gradient(90deg, rgba(167,139,250,.06) 0%, rgba(52,211,153,.06) 100%);
+    border-bottom: 1px solid var(--border);
+    font-size: 12.5px; font-variant-numeric: tabular-nums;
+  }
+  .trust-strip.hidden { display: none; }
+  .trust-strip-link {
+    flex: 1; display: flex; align-items: center; gap: 14px;
+    color: var(--text); text-decoration: none; flex-wrap: wrap;
+    transition: color .12s;
+  }
+  .trust-strip-link:hover { color: var(--brand); }
+  .trust-strip-stat { display: inline-flex; align-items: baseline; gap: 5px; }
+  .trust-strip-val { font-weight: 800; color: var(--accent); font-size: 14px; }
+  .trust-strip-lbl { color: var(--text-dim); font-size: 11.5px; }
+  .trust-strip-sep { color: var(--text-dim2); }
+  .trust-strip-cta {
+    margin-left: auto; padding: 3px 10px; border-radius: 999px;
+    background: rgba(167,139,250,.10); color: var(--brand);
+    font-size: 11.5px; font-weight: 600;
+    border: 1px solid rgba(167,139,250,.25);
+  }
+  .trust-strip-link:hover .trust-strip-cta {
+    background: rgba(167,139,250,.18); border-color: var(--brand);
+  }
+  .trust-strip-close {
+    flex: none; width: 26px; height: 26px; border-radius: 50%;
+    border: 1px solid var(--border); background: var(--panel);
+    color: var(--text-dim); font-size: 13px; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: background .12s, color .12s;
+  }
+  .trust-strip-close:hover { background: var(--panel-3); color: var(--text); }
+  /* Mobile : empile, masque le CTA, garde les 4 stats */
+  @media (max-width: 720px) {
+    .trust-strip { padding: 6px 12px; font-size: 11.5px; gap: 8px; }
+    .trust-strip-link { gap: 10px; }
+    .trust-strip-cta { display: none; }
+    .trust-strip-val { font-size: 12.5px; }
+    .trust-strip-lbl { font-size: 10.5px; }
+  }
+
   /* Refresh indicator — minimal */
   .refresh-indicator {
     display: inline-flex; align-items: center; gap: 8px;
