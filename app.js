@@ -1863,6 +1863,43 @@
         final.pH += restNudge;
         final.pA -= restNudge;
       }
+      // v31.7.10 — Motivation contexte fin de saison (foot top-5 europe).
+      // Heuristique : entre avril et mai (mois 4-5), une équipe en zone
+      // top 4 (visée Champion's League) ou bottom 3 (relégation) a un
+      // surplus de motivation typiquement +1pt sur P(victoire).
+      // Si UNE équipe est dans une zone tendue ET PAS l'autre, on nudge
+      // (max ±0.015). Si LES DEUX, ça s'annule.
+      // Signal léger (capped low) car heuristique grossière sans data
+      // "journées restantes" précise.
+      let motiveNudge = 0;
+      if (match.sport === 'football') {
+        // v31.7.10 fix : `stdH/stdA` sont des locals d'openDetail, pas
+        // disponibles dans _predictMatchImpl. On lit le rang depuis
+        // competitor.rank (champ ESPN standard) ou competitor.standings.rank.
+        const matchDate = match.date ? new Date(match.date) : null;
+        if (matchDate && !isNaN(matchDate.getTime())) {
+          const month = matchDate.getUTCMonth() + 1;  // 1-12
+          if (month >= 4 && month <= 5) {
+            const _rank = (c) => {
+              if (!c) return NaN;
+              if (c.rank != null) return parseInt(c.rank, 10);
+              if (c.standings && c.standings.rank != null) return parseInt(c.standings.rank, 10);
+              return NaN;
+            };
+            const rH = _rank(home);
+            const rA = _rank(away);
+            const inHotZone = (r) => isFinite(r) && (r <= 4 || r >= 16);
+            const hHot = inHotZone(rH);
+            const aHot = inHotZone(rA);
+            if (hHot && !aHot) motiveNudge = +0.012;
+            else if (!hHot && aHot) motiveNudge = -0.012;
+          }
+        }
+      }
+      if (motiveNudge !== 0) {
+        final.pH += motiveNudge;
+        final.pA -= motiveNudge;
+      }
       // Injury penalty: each severe absence (Out/Suspended/Doubtful) on either
       // side shifts the win prob by ~1.5% (cap at 6%). ESPN covers US sports
       // (NBA/NHL/WNBA/NFL/MLB); Sofascore fills the gap for the top-5 soccer
