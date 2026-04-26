@@ -742,16 +742,33 @@
     const h = last5Rates(home), a = last5Rates(away);
     if (!h || !a) return null;
     const HOME_ADV = 2.5; // ~2.5 pts d'home-court, consensus NBA.
-    const projH = Math.round((h.scored + a.conceded) / 2 + HOME_ADV / 2);
-    const projA = Math.round((a.scored + h.conceded) / 2 - HOME_ADV / 2);
+    let hScored = h.scored, hConceded = h.conceded;
+    let aScored = a.scored, aConceded = a.conceded;
+    let captionExtras = [];
+    // v31.7.37 — NBA-specific : si nba_stats dispo (saison), blend last5 avec
+    // season averages 60/40 pour réduire la variance des projections.
+    // Logique identique à NHL hockeyScorePrediction v31.7.25.
+    const hStats = home?.nba_stats;
+    const aStats = away?.nba_stats;
+    if (hStats && aStats && hStats.pf_avg > 0 && aStats.pf_avg > 0) {
+      hScored = 0.6 * h.scored + 0.4 * hStats.pf_avg;
+      hConceded = 0.6 * h.conceded + 0.4 * hStats.pa_avg;
+      aScored = 0.6 * a.scored + 0.4 * aStats.pf_avg;
+      aConceded = 0.6 * a.conceded + 0.4 * aStats.pa_avg;
+      captionExtras.push('moyenne saison NBA pondérée');
+    }
+    const projH = Math.round((hScored + aConceded) / 2 + HOME_ADV / 2);
+    const projA = Math.round((aScored + hConceded) / 2 - HOME_ADV / 2);
     const total = projH + projA;
     const margin = projH - projA;
+    const baseCap = `Projection lissée sur les ${Math.min(h.sample, a.sample)} derniers matchs`;
+    const extras = captionExtras.length ? ` + ${captionExtras.join(', ')}` : '';
     return {
       kind: 'basket',
       items: [{ home: projH, away: projA, prob: 1, label: `${projH}-${projA}` }],
       total,
       margin,
-      caption: `Projection lissée sur les ${Math.min(h.sample, a.sample)} derniers matchs (± ~8 pts par équipe en NBA).`,
+      caption: `${baseCap}${extras} (± ~8 pts par équipe en NBA).`,
     };
   }
 

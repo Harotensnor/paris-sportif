@@ -139,6 +139,12 @@ jobs:
             python3 fetch_nhl_stats.py || true
           fi
           python3 patch_nhl_stats.py || true
+          # v31.7.37 — NBA team stats via ESPN public endpoint (PPG / pace
+          # proxy / record / last10). 30min cache. Enrichit basketScoreProjection.
+          if [ $MIN_MOD15 -lt 5 ]; then
+            python3 fetch_nba_team_stats.py || true
+          fi
+          python3 patch_nba_team_stats.py || true
           # Build health.json — compact pipeline status snapshot. Visible at
           # https://harotensnor.github.io/paris-sportif/health.json so we can
           # spot stale/missing sources without scraping the workflow logs.
@@ -202,6 +208,7 @@ jobs:
                   results_archive.jsonl tennis_ratings.json footballdata.json \
                   mlb_pitchers.json nhl_stats.json backtest.html feed.xml \
                   credibilite.html stadiums.json dixon_coles_rho.json index.html \
+                  nba_team_stats.json \
                   og-default.png og-backtest.png og-credibilite.png og-methodologie.png 2>/dev/null || true
           # Only stamp sw.js if we have real content changes — otherwise
           # discard the version bump to avoid 288 empty commits/day.
