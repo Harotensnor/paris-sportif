@@ -261,6 +261,71 @@ def render_worst_picks(worst_picks: list) -> str:
     </p>'''
 
 
+def render_streaks(streaks: dict) -> str:
+    """v31.7.21 — Streaks publics. Affiche longest win/lose + streak courante
+    + top 3 win/lose runs avec dates. Le but est la transparence : le modèle
+    gagne en moyenne, mais il y a des "froids" et des "chauds" qu'on publie.
+    """
+    if not streaks or (not streaks.get('longest_win') and not streaks.get('longest_lose')):
+        return '<p style="color:#a3a3aa;font-size:13px;">Pas assez de données pour calculer les séries.</p>'
+
+    cur = streaks.get('current_streak') or 0
+    if cur > 0:
+        cur_html = f'<span style="color:#34d399;font-weight:700;">🔥 {cur} wins consécutifs</span>'
+    elif cur < 0:
+        cur_html = f'<span style="color:#f87171;font-weight:700;">❄️ {abs(cur)} loses consécutifs</span>'
+    else:
+        cur_html = '<span style="color:#a3a3aa;">⚪ Aucune série en cours</span>'
+
+    longest_win = streaks.get('longest_win', 0)
+    longest_lose = streaks.get('longest_lose', 0)
+
+    # Top runs avec dates
+    top_win_html = ''
+    top_lose_html = ''
+    if streaks.get('top_win_runs'):
+        items = []
+        for r in streaks['top_win_runs'][:3]:
+            ds = (r.get('date_start') or '?')[:10]
+            de = (r.get('date_end') or '?')[:10]
+            items.append(f'<li><b>{r["len"]}</b> wins ({ds} → {de})</li>')
+        top_win_html = f'<div><h4 style="margin:12px 0 6px;font-size:13px;color:#34d399;">🔥 Top 3 séries gagnantes</h4><ol style="font-size:13px;padding-left:18px;color:#d4d4d8;">{"".join(items)}</ol></div>'
+    if streaks.get('top_lose_runs'):
+        items = []
+        for r in streaks['top_lose_runs'][:3]:
+            ds = (r.get('date_start') or '?')[:10]
+            de = (r.get('date_end') or '?')[:10]
+            items.append(f'<li><b>{r["len"]}</b> loses ({ds} → {de})</li>')
+        top_lose_html = f'<div><h4 style="margin:12px 0 6px;font-size:13px;color:#f87171;">❄️ Top 3 séries perdantes</h4><ol style="font-size:13px;padding-left:18px;color:#d4d4d8;">{"".join(items)}</ol></div>'
+
+    return f'''<p style="font-size:13px;color:#a3a3aa;margin:0 0 12px;">
+      Les paris sportifs sont <b>variance-driven</b> : un modèle profitable a quand même des "froids"
+      (séries de 5-7 perdants) et des "chauds" (séries de 6-10 gagnants). On publie les deux pour
+      <b>désamorcer le biais d'overconfidence</b> quand ça enchaîne.
+    </p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;">
+      <div style="padding:12px 14px;background:#0c0c0f;border:1px solid rgba(255,255,255,.08);border-radius:8px;">
+        <div style="font-size:11px;color:#a3a3aa;text-transform:uppercase;letter-spacing:.5px;">En cours</div>
+        <div style="font-size:15px;margin-top:4px;">{cur_html}</div>
+      </div>
+      <div style="padding:12px 14px;background:#0c0c0f;border:1px solid rgba(52,211,153,.25);border-radius:8px;">
+        <div style="font-size:11px;color:#a3a3aa;text-transform:uppercase;letter-spacing:.5px;">Plus longue série gagnante</div>
+        <div style="font-size:22px;color:#34d399;font-weight:700;margin-top:4px;">{longest_win}</div>
+      </div>
+      <div style="padding:12px 14px;background:#0c0c0f;border:1px solid rgba(248,113,113,.25);border-radius:8px;">
+        <div style="font-size:11px;color:#a3a3aa;text-transform:uppercase;letter-spacing:.5px;">Plus longue série perdante</div>
+        <div style="font-size:22px;color:#f87171;font-weight:700;margin-top:4px;">{longest_lose}</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+      {top_win_html}
+      {top_lose_html}
+    </div>
+    <p style="font-size:12px;color:#a3a3aa;margin-top:12px;">
+      Source : <code>backtest_report_v2.json#streaks</code> (cron hebdo).
+    </p>'''
+
+
 def render_benchmarks(overall: dict, baselines: dict) -> str:
     """v31.7.18 — Tableau "Vs benchmarks marché" : compare le ROI du modèle
     aux 5 strategies baselines de backtest_baselines.py (favorite, dog, home,
@@ -579,6 +644,9 @@ PAGE_TEMPLATE = '''<!DOCTYPE html>
   <h2 id="benchmarks">🆚 Vs benchmarks marché <span class="subtle">— le modèle bat-il les heuristiques simples ?</span></h2>
   {table_benchmarks}
 
+  <h2 id="streaks">📈 Séries <span class="subtle">— les "chauds" et les "froids" du modèle</span></h2>
+  {table_streaks}
+
   <h2 id="worst">😬 Pires picks <span class="subtle">— transparence sur les erreurs du modèle</span></h2>
   {table_worst_picks}
 
@@ -684,6 +752,7 @@ def main() -> int:
         table_leagues=render_top_leagues(by_league, limit=12),
         table_benchmarks=render_benchmarks(overall, baselines),
         table_worst_picks=render_worst_picks(report.get('worst_picks') or []),
+        table_streaks=render_streaks(report.get('streaks') or {}),
     )
 
     OUTPUT.write_text(html, encoding='utf-8')

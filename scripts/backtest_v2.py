@@ -397,6 +397,85 @@ def bucket_by(rows: list[dict], key: str) -> dict[str, dict]:
     return {k: summarize(v) for k, v in sorted(groups.items())}
 
 
+def compute_streaks(rows: list[dict]) -> dict:
+    """v31.7.21 — Streaks publics. Calcule longest win/lose streak + courant.
+
+    Triés par date ascendante puis itère. Stocke aussi le top 3 win streaks
+    avec date_start/date_end pour transparence ("le modèle a touché 8 picks
+    d'affilée du 12 mars au 18 mars sur PL+Liga"). Le but est de publier
+    autant les bonnes que les mauvaises séries pour ne pas cherry-pick.
+
+    Returns : dict avec longest_win, longest_lose, current_streak (signed :
+    +N pour win, -N pour lose, 0 si dernier pick draw/void), top_win_runs[],
+    top_lose_runs[].
+    """
+    if not rows:
+        return {
+            'longest_win': 0, 'longest_lose': 0, 'current_streak': 0,
+            'top_win_runs': [], 'top_lose_runs': [],
+        }
+    # Tri chronologique. Tie-break par id pour stabilité.
+    chrono = sorted(rows, key=lambda r: (r.get('date') or '', r.get('id') or ''))
+
+    runs_win: list[dict] = []
+    runs_lose: list[dict] = []
+    cur_kind: str | None = None
+    cur_len = 0
+    cur_start_date: str | None = None
+    cur_end_date: str | None = None
+
+    def flush():
+        nonlocal cur_kind, cur_len, cur_start_date, cur_end_date
+        if cur_kind == 'win' and cur_len > 0:
+            runs_win.append({'len': cur_len,
+                             'date_start': cur_start_date,
+                             'date_end': cur_end_date})
+        elif cur_kind == 'lose' and cur_len > 0:
+            runs_lose.append({'len': cur_len,
+                              'date_start': cur_start_date,
+                              'date_end': cur_end_date})
+        cur_kind = None
+        cur_len = 0
+        cur_start_date = None
+        cur_end_date = None
+
+    for r in chrono:
+        kind = 'win' if r.get('won') else 'lose'
+        d = r.get('date') or ''
+        if kind == cur_kind:
+            cur_len += 1
+            cur_end_date = d
+        else:
+            flush()
+            cur_kind = kind
+            cur_len = 1
+            cur_start_date = d
+            cur_end_date = d
+    flush()
+
+    longest_win = max((r['len'] for r in runs_win), default=0)
+    longest_lose = max((r['len'] for r in runs_lose), default=0)
+
+    # Current streak = dernier run, signé
+    last = chrono[-1]
+    last_kind = 'win' if last.get('won') else 'lose'
+    cur = 0
+    for r in reversed(chrono):
+        k = 'win' if r.get('won') else 'lose'
+        if k != last_kind:
+            break
+        cur += 1
+    current_streak = cur if last_kind == 'win' else -cur
+
+    return {
+        'longest_win': longest_win,
+        'longest_lose': longest_lose,
+        'current_streak': current_streak,
+        'top_win_runs': sorted(runs_win, key=lambda r: -r['len'])[:3],
+        'top_lose_runs': sorted(runs_lose, key=lambda r: -r['len'])[:3],
+    }
+
+
 def calibration_bins(rows: list[dict], n_bins: int = 10) -> list[dict]:
     """Courbe de calibration : regroupe par proba prédite (déciles), compare
     au WR observé. Modèle parfait = prob_mean == win_rate dans chaque bin."""
@@ -501,6 +580,28 @@ def render_markdown(report: dict) -> str:
     lines.append(f"- **Brier** : {overall['brier']} (0 = parfait, 0.25 = pile/face)")
     lines.append(f"- **Log-loss** : {overall['logloss']} (plus bas = mieux calibré)")
     lines.append('')
+
+    # v31.7.21 — Streaks publics
+    streaks = report.get('streaks') or {}
+    if streaks.get('longest_win') or streaks.get('longest_lose'):
+        lines.append('## Séries')
+        lines.append('')
+        cur = streaks.get('current_streak') or 0
+        cur_label = (f"🔥 **{cur}** wins consécutifs" if cur > 0
+                     else f"❄️ **{abs(cur)}** loses consécutifs" if cur < 0
+                     else '⚪ aucune série en cours')
+        lines.append(f"- Streak courante : {cur_label}")
+        lines.append(f"- Plus longue série gagnante : **{streaks.get('longest_win', 0)}**")
+        lines.append(f"- Plus longue série perdante : **{streaks.get('longest_lose', 0)}**")
+        if streaks.get('top_win_runs'):
+            tw = streaks['top_win_runs'][0]
+            lines.append(f"- Top run win : {tw['len']} picks "
+                         f"({tw.get('date_start','?')} → {tw.get('date_end','?')})")
+        if streaks.get('top_lose_runs'):
+            tl = streaks['top_lose_runs'][0]
+            lines.append(f"- Top run lose : {tl['len']} picks "
+                         f"({tl.get('date_start','?')} → {tl.get('date_end','?')})")
+        lines.append('')
 
     # Par tier
     lines.append('## Par tier de fiabilité')
@@ -621,6 +722,9 @@ def main() -> int:
         # v31.7.14 — Recalibration isotonic (PAV) precomputee. Le client lit
         # ces pairs directement, plus besoin de recompute le PAV en JS.
         'isotonic_pairs': isotonic_calibration_pairs(rows),
+        # v31.7.21 — Streaks publics (transparence). On expose les longest
+        # win/lose streaks ainsi que la streak courante (signed).
+        'streaks': compute_streaks(rows),
         'bankroll_final_kelly': bt['bankroll_final_kelly'],
         # v31.7.19 — Worst picks : 10 plus gros echecs (modele tres confiant
         # qui a perdu). Critère : (pick_prob - 0) × (1 si lost else 0)
