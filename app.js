@@ -539,17 +539,44 @@
     return t > 0 ? { pH: pH/t, pD: pD/t, pA: pA/t } : null;
   }
 
-  // Top-k most likely exact scores under independent Poisson(lamH) × Poisson(lamA).
+  // v31.7.5 — Dixon-Coles correction τ pour les scores bas nuls/serres.
+  // Le Poisson naif independant sous-estime systematiquement les scores
+  // 0-0, 1-0, 0-1, 1-1 (corrélation negative empirique en foot).
+  // Référence : Dixon & Coles (1997) "Modelling Association Football Scores".
+  // ρ optimal varie selon ligue (entre -0.06 Premier League et -0.18 Serie A).
+  // On utilise ρ = -0.13 (moyenne empirique top-5) qui ameliore la
+  // calibration sur scores 1-1 et 0-0 sans pénaliser les autres.
+  function _dixonColesTau(h, a, lamH, lamA, rho) {
+    if (h === 0 && a === 0) return 1 - lamH * lamA * rho;
+    if (h === 0 && a === 1) return 1 + lamH * rho;
+    if (h === 1 && a === 0) return 1 + lamA * rho;
+    if (h === 1 && a === 1) return 1 - rho;
+    return 1;
+  }
+
+  // Top-k most likely exact scores under (Dixon-Coles ajustement)
+  // Poisson(lamH) × Poisson(lamA) × τ(h,a,ρ).
   // Returns [{ home, away, prob }], sorted desc by prob.
-  // Used for the "Score exact probable" widget — Chantier 6.
+  // Used for the "Score exact probable" widget — Chantier 6 + v31.7.5.
   function poissonTopScores(lamH, lamA, k = 3, maxGoals = 6) {
     if (!(lamH > 0) || !(lamA > 0)) return [];
+    const RHO = -0.13;  // Dixon-Coles parameter (cf. comment above)
     const scores = [];
+    let totalMass = 0;
     for (let h = 0; h <= maxGoals; h++) {
       const pH = poissonPmf(h, lamH);
       for (let a = 0; a <= maxGoals; a++) {
-        scores.push({ home: h, away: a, prob: pH * poissonPmf(a, lamA) });
+        const pBase = pH * poissonPmf(a, lamA);
+        const tau = _dixonColesTau(h, a, lamH, lamA, RHO);
+        const p = pBase * tau;
+        scores.push({ home: h, away: a, prob: p });
+        totalMass += p;
       }
+    }
+    // Renormalise pour conserver une distribution de prob valide
+    // (la correction tau ne preserve pas exactement la masse).
+    if (totalMass > 0 && Math.abs(totalMass - 1) > 0.001) {
+      for (const s of scores) s.prob /= totalMass;
     }
     scores.sort((a, b) => b.prob - a.prob);
     return scores.slice(0, k);

@@ -152,12 +152,30 @@ def render_item(p: dict) -> str:
     pick_team = home_name if p['pick_side'] == 'home' else away_name
     pick_label = f"{'1' if p['pick_side'] == 'home' else '2'} · {pick_team}"
     title = f'{emoji} {home_name} vs {away_name} · {league}'
-    # v31.4 — Description allégée. Avant : disclaimer cryptique sur predictMatch.
-    # Maintenant : on annonce clairement que c'est le favori marché, et on
-    # renvoie au dashboard pour le pick officiel (calibré + Kelly).
+    # v31.7.4 — Description plus narrative + heure kickoff + ROI implicite.
+    # Avant : juste cote + prob. Maintenant : contexte temporel + value
+    # narrative pour donner au lecteur RSS une vraie info actionnable.
+    try:
+        if ev.get('date'):
+            kdt = datetime.fromisoformat(ev['date'].replace('Z', '+00:00'))
+            kickoff_local = kdt.strftime('%d/%m à %Hh%M UTC')
+        else:
+            kickoff_local = ''
+    except (ValueError, AttributeError):
+        kickoff_local = ''
+    implied_pct = int(p['pick_prob'] * 100)
+    odd = p['pick_odd']
+    # Narrative selon force du favori
+    if implied_pct >= 65:
+        narrative = f'Favori solide.'
+    elif implied_pct >= 50:
+        narrative = f'Match équilibré, léger avantage marché.'
+    else:
+        narrative = f'Outsider, value bet potentielle.'
     desc = (
-        f'Favori marché : <b>{pick_label}</b> @ {p["pick_odd"]:.2f} '
-        f'(probabilité implicite {p["pick_prob"] * 100:.0f}%). '
+        f'<b>{league}</b>{f" · coup d\'envoi {kickoff_local}" if kickoff_local else ""}.<br>'
+        f'Favori marché : <b>{pick_label}</b> @ <b>{odd:.2f}</b> '
+        f'(probabilité implicite <b>{implied_pct}%</b>). {narrative}<br>'
         f'<a href="{DASH_URL}#match-{ev.get("id", "")}">Voir le pick calibré sur le dashboard →</a>'
     )
     # ISO date → RSS pubdate

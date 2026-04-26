@@ -473,3 +473,127 @@ test.describe('humans.txt + security.txt', () => {
     expect(txt).toContain('Canonical:');
   });
 });
+
+// =========================================================================
+// v31.7.4 — Tests des features récentes (Montante / Modal Contexte / Mobile)
+// =========================================================================
+test.describe('Montante (séquentielle)', () => {
+  test('Montante du weekend rend une timeline sequentielle ou empty state', async ({ page }) => {
+    await page.goto(URL);
+    await page.evaluate(() => { localStorage.setItem('currentPage', 'montante-weekend'); });
+    await page.reload();
+    await expect(page.locator('main h1:visible')).toContainText(/Montante/i, { timeout: 5000 });
+    // Either timeline (.montante-step) OR empty state with CTA
+    const hasSteps = await page.locator('.montante-step').count();
+    const hasEmpty = await page.locator('.empty-state').count();
+    expect(hasSteps + hasEmpty).toBeGreaterThan(0);
+    if (hasSteps > 1) {
+      // Validate sequential calculation : step N stake = step (N-1) payout
+      const steps = await page.locator('.montante-step').evaluateAll(els => els.map(el => {
+        const labels = Array.from(el.querySelectorAll('div')).filter(d => /^(Mise|Cote|Étape \d+|Gain final)$/.test((d.textContent || '').trim()));
+        return labels.map(l => (l.nextElementSibling?.textContent || '').trim());
+      }));
+      // Each step's "next stake" should equal the next step's "stake"
+      for (let i = 0; i < steps.length - 1; i++) {
+        const nextLabel = steps[i][2];   // e.g. "15.00€"
+        const nextStake = steps[i+1][0]; // e.g. "15.00€"
+        expect(nextLabel).toBe(nextStake);
+      }
+    }
+  });
+
+  test('Montante du jour (souvent empty) affiche fallback CTA vers weekend', async ({ page }) => {
+    await page.goto(URL);
+    await page.evaluate(() => { localStorage.setItem('currentPage', 'montante-jour'); });
+    await page.reload();
+    await expect(page.locator('main h1:visible')).toContainText(/Montante du jour/i, { timeout: 5000 });
+    // Si empty state : CTA vers locks ou montante-weekend doit etre present
+    const empty = await page.locator('.empty-state').count();
+    if (empty > 0) {
+      const fallbackHasCTA = await page.locator('.empty-state .es-cta, .empty-state button').count();
+      expect(fallbackHasCTA).toBeGreaterThan(0);
+    }
+  });
+});
+
+test.describe('Modal détail enrichie', () => {
+  test('Section Contexte du match presente sur modal foot', async ({ page }) => {
+    await page.goto(URL);
+    await page.waitForFunction(() => !!(window.PRONOSTICS_DATA && window.PRONOSTICS_DATA.days));
+    // Find a foot match and open via openDetail
+    const opened = await page.evaluate(() => {
+      const data = window.PRONOSTICS_DATA;
+      const events = [];
+      for (const d in data.days) events.push(...(data.days[d] || []));
+      const foot = events.find(m => m.sport === 'football' && !m.live && !m.completed);
+      if (!foot || typeof window.openDetail !== 'function') return false;
+      window.openDetail(foot);
+      return true;
+    });
+    expect(opened).toBe(true);
+    await expect(page.locator('#detail-modal.open, .modal-backdrop.open')).toBeVisible({ timeout: 3000 });
+    // Section Contexte du match doit etre visible
+    await expect(page.locator('text=/Contexte du match/i').first()).toBeVisible();
+    // Synthese "Pourquoi ce prono est fiable" doit etre visible
+    await expect(page.locator('text=/Pourquoi ce prono est fiable/i').first()).toBeVisible();
+  });
+
+  test('Modal mobile : sections collapsibles fonctionnent', async ({ page, viewport }) => {
+    test.skip(viewport && viewport.width > 720, 'Mobile-only test');
+    await page.goto(URL);
+    await page.waitForFunction(() => !!(window.PRONOSTICS_DATA && window.PRONOSTICS_DATA.days));
+    await page.evaluate(() => {
+      const data = window.PRONOSTICS_DATA;
+      const events = [];
+      for (const d in data.days) events.push(...(data.days[d] || []));
+      const foot = events.find(m => m.sport === 'football' && !m.live && !m.completed);
+      if (foot && typeof window.openDetail === 'function') window.openDetail(foot);
+    });
+    await page.waitForTimeout(500);
+    // Premiere section ouverte, autres fermees
+    const collapsibles = await page.locator('.section-collapsible').count();
+    expect(collapsibles).toBeGreaterThan(1);
+    const opened = await page.locator('.section-collapsible[data-collapsed="false"]').count();
+    expect(opened).toBeGreaterThanOrEqual(1);
+  });
+});
+
+test.describe('Sidebar 5 catégories (desktop)', () => {
+  test('Sidebar contient 5 hubs nommés', async ({ page, viewport }) => {
+    test.skip(viewport && viewport.width < 1100, 'Desktop sidebar mode requires >=1100px');
+    await page.goto(URL);
+    const hubs = await page.locator('nav.topbar-nav .hub').evaluateAll(els =>
+      els.map(el => el.dataset.hub)
+    );
+    expect(hubs).toEqual(expect.arrayContaining(['pronos', 'perf', 'transparence', 'apprendre', 'compte']));
+    expect(hubs.includes('montantes')).toBe(true);
+  });
+});
+
+test.describe('Mobile bottom nav 5 items', () => {
+  test('Bottom nav affiche 5 items dont Top et Menu', async ({ page, viewport }) => {
+    test.skip(viewport && viewport.width > 720, 'Mobile-only test');
+    await page.goto(URL);
+    const items = await page.locator('#mobile-bottom-nav .mbn-btn').evaluateAll(els =>
+      els.map(el => (el.querySelector('.mbn-label') || {}).textContent || '')
+    );
+    expect(items.length).toBe(5);
+    expect(items).toEqual(expect.arrayContaining(['Accueil', 'Top', 'Locks', 'Bilan', 'Menu']));
+  });
+
+  test('Bouton Menu mobile ouvre la sidebar drawer', async ({ page, viewport }) => {
+    test.skip(viewport && viewport.width > 720, 'Mobile-only test');
+    await page.goto(URL);
+    await page.locator('#mbn-menu-btn').click();
+    await expect(page.locator('body')).toHaveClass(/sidebar-open/);
+  });
+});
+
+test.describe('Top page', () => {
+  test('A un h1 visible "Top du jour"', async ({ page }) => {
+    await page.goto(URL);
+    await page.locator('.page-btn[data-page="top"]').first().click();
+    await expect(page.locator('#top-page-h1 h1')).toBeVisible({ timeout: 3000 });
+    await expect(page.locator('#top-page-h1 h1')).toContainText(/Top du jour/i);
+  });
+});
