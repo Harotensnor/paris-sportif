@@ -9537,6 +9537,28 @@
         return diff < 60 * 60000 && diff > -60000;
       })();
       const _cntColor = isFini ? 'var(--text-dim2)' : _cntSoon ? '#fbbf24' : 'var(--text-dim2)';
+      // v31.7.33 — Foot details (score prédit + buteurs) DÉPLACÉS dans une
+      // bande full-width SOUS le match. Avant : empilés dans la col 2 (1fr)
+      // qui compressait tout, faisait brouillon. Maintenant : ligne dédiée
+      // avec border-top discrète + 2 colonnes (score | buteurs) sur desktop,
+      // empilées sur mobile. "Marqueurs" → "Buteurs réels" pour cohérence.
+      const _hasFootDetails = isFoot && (topScore || predScorers.length || realScorers.length);
+      const _footDetailsHtml = _hasFootDetails ? `
+        <div class="tous-row-foot-details" style="grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 18px;padding-top:10px;margin-top:2px;border-top:1px dashed rgba(255,255,255,.08);font-size:11.5px;line-height:1.4;">
+          ${topScore ? `
+            <div style="color:var(--text-dim);font-variant-numeric:tabular-nums;">
+              <span style="font-size:10px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.5px;font-weight:700;display:block;margin-bottom:3px;">📊 Score prédit</span>
+              <b style="color:var(--text);font-size:13px;">${topScore.home}-${topScore.away}</b>
+              ${typeof topScore.prob === 'number' ? `<span style="color:var(--text-dim2);font-size:10.5px;margin-left:4px;">(${(topScore.prob*100).toFixed(0)}%)</span>` : ''}
+              ${hasRealScore ? `<span style="color:var(--text-dim2);margin:0 4px;">→ réel</span><b style="color:${scoreCorrect ? '#34d399' : 'var(--text-dim)'};font-size:13px;">${realHome}-${realAway}</b><span style="font-size:11px;margin-left:3px;">${scoreCorrect ? '✓' : '✗'}</span>` : ''}
+            </div>` : ''}
+          ${(predScorers.length || realScorers.length) ? `
+            <div style="color:var(--text-dim);">
+              <span style="font-size:10px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.5px;font-weight:700;display:block;margin-bottom:3px;">⚽ Buteurs</span>
+              ${predScorers.length ? `<div><span style="opacity:.75;">Probables :</span> <b style="color:var(--text);">${predScorers.map(s => `${esc(s.name)} <span style="color:var(--text-dim2);font-weight:400;">(${Math.round(s.prob*100)}%)</span>`).join(', ')}</b></div>` : ''}
+              ${realScorers.length ? `<div style="margin-top:${predScorers.length?'2':'0'}px;"><span style="opacity:.75;">Réels :</span> <b style="color:${predScorerHit ? '#34d399' : 'var(--text)'};">${realScorers.map(s => `${esc(s.name)}${s.minute ? ` <span style="color:var(--text-dim2);font-weight:400;">${esc(s.minute)}</span>` : ''}`).join(', ')}</b>${predScorerHit ? ' <span style="color:#34d399;font-weight:600;">✓ pick touché</span>' : ''}</div>` : ''}
+            </div>` : ''}
+        </div>` : '';
       return `<div class="tous-row" data-match-id="${esc(String(p.m.id || ''))}" data-match-date="${esc(String(p.m.date || ''))}" style="display:grid;gap:14px;padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${isFini ? (p.res==='won'?'#34d399':p.res==='lost'?'#fca5a5':'var(--text-dim)') : (p.rel>=0.70 ? 'var(--accent)' : 'var(--brand)')};border-radius:0 10px 10px 0;align-items:center;cursor:pointer;font-variant-numeric:tabular-nums;">
         <div style="text-align:left;">
           <div style="font-size:11px;color:var(--text-dim2,#7b8693);font-weight:600;">${sportEm} ${esc(tLbl)}</div>
@@ -9548,18 +9570,6 @@
             ${teamLogo(hLogo)}<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(hn)}</span><span style="color:var(--text-dim);font-weight:400;">vs</span>${teamLogo(aLogo)}<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(an)}</span>
           </div>
           <div style="font-size:12px;color:var(--brand);font-weight:600;margin-top:3px;">→ ${esc(pickLabel)}</div>
-          ${isFoot && topScore ? `
-            <div style="font-size:11px;color:var(--text-dim);margin-top:3px;font-variant-numeric:tabular-nums;">
-              <span style="opacity:.75;">Score prédit</span>
-              <b style="color:var(--text);">${topScore.home}-${topScore.away}</b>
-              ${typeof topScore.prob === 'number' ? `<span style="color:var(--text-dim2);font-size:10px;">(${(topScore.prob*100).toFixed(0)}%)</span>` : ''}
-              ${hasRealScore ? `<span style="color:var(--text-dim2);">→</span><b style="color:${scoreCorrect ? '#34d399' : 'var(--text-dim)'};">${realHome}-${realAway}</b><span style="font-size:11px;">${scoreCorrect ? ' ✓' : ' ✗'}</span>` : ''}
-            </div>` : ''}
-          ${isFoot && (predScorers.length || realScorers.length) ? `
-            <div style="font-size:11px;color:var(--text-dim);margin-top:2px;line-height:1.35;">
-              ${predScorers.length ? `<span style="opacity:.75;">⚽ Buteurs probables :</span> <b style="color:var(--text);">${predScorers.map(s => `${esc(s.name)} (${Math.round(s.prob*100)}%)`).join(', ')}</b>` : ''}
-              ${realScorers.length ? `${predScorers.length ? '<br>' : ''}<span style="opacity:.75;">→ Marqueurs :</span> <b style="color:${predScorerHit ? '#34d399' : 'var(--text)'};">${realScorers.map(s => `${esc(s.name)}${s.minute ? ` ${esc(s.minute)}` : ''}`).join(', ')}</b>${predScorerHit ? ' <span style="color:#34d399;">✓ pick touché</span>' : ''}` : ''}
-            </div>` : ''}
         </div>
         <div style="display:flex;flex-direction:column;gap:2px;font-size:11px;">
           <div><span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Confiance du modèle : probabilité estimée que ce pari gagne. ≥70 % = très fiable.">Conf</span> <b style="color:${confColor};">${Math.round(p.rel*100)}%</b> · <span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Cote décimale Winamax. Gain potentiel = mise × cote. Ex : 10 € @ 2.10 → 21 €.">Cote</span> <b style="color:var(--text);">@${p.odd.toFixed(2)}</b></div>
@@ -9568,6 +9578,7 @@
         <div style="text-align:right;">
           ${isFini ? resBadge : ''}
         </div>
+        ${_footDetailsHtml}
       </div>`;
     };
 
