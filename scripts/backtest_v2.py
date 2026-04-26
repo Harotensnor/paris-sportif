@@ -563,6 +563,10 @@ def main() -> int:
         'by_cote_bucket': bucket_by(rows, 'cote_bucket'),
         'by_tier': bucket_by(rows, 'tier'),
         'calibration': calibration_bins(rows, n_bins=10),
+        # v31.7.10 — Multi-binning : 5/10/20 bins servis simultanement pour
+        # permettre un select dropdown cote front (granularite ajustable).
+        'calibration_5': calibration_bins(rows, n_bins=5),
+        'calibration_20': calibration_bins(rows, n_bins=20),
         'bankroll_final_kelly': bt['bankroll_final_kelly'],
         # On NE publie PAS la liste complète de picks dans le JSON pour éviter
         # que backtest_report_v2.json ne gonfle (déjà 500+ events en archive).
