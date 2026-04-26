@@ -153,6 +153,9 @@ jobs:
           # backtest_report_v2.json, produit backtest.html indexable sans JS.
           # Le JSON change ~1×/semaine donc le HTML aussi mais c'est cheap.
           python3 build_backtest_page.py || true
+          # v31.7.29 — Patch les 4 stats hardcodées dans index.html depuis
+          # backtest_report_v2.json (single source of truth). Cheap, idempotent.
+          python3 patch_index_stats.py || true
           # v31 — RSS feed (top picks du jour). Lit data.js, produit feed.xml.
           python3 build_feed.py || true
           # v31 — Static credibilite.html (calibration + Brier + log-loss).
@@ -198,7 +201,7 @@ jobs:
                   data_today.json data_manifest.json team_form.json \
                   results_archive.jsonl tennis_ratings.json footballdata.json \
                   mlb_pitchers.json nhl_stats.json backtest.html feed.xml \
-                  credibilite.html stadiums.json dixon_coles_rho.json \
+                  credibilite.html stadiums.json dixon_coles_rho.json index.html \
                   og-default.png og-backtest.png og-credibilite.png og-methodologie.png 2>/dev/null || true
           # Only stamp sw.js if we have real content changes — otherwise
           # discard the version bump to avoid 288 empty commits/day.
