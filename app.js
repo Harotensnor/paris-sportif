@@ -37,7 +37,7 @@
   // ex pronostics.html#locks → on lit location.hash pour set la bonne page.
   // Sans ce guard, le manifest shortcuts (#locks #bilan #combines) ne
   // marchaient pas — l'utilisateur arrivait toujours sur dashboard.
-  const VALID_PAGES = ['dashboard','tous','locks','buteurs','combines','simples','top','historique','bilan','backtest','academie','credibilite','alertes','profil','sante','value','legal','methodologie'];
+  const VALID_PAGES = ['dashboard','tous','locks','buteurs','combines','simples','top','historique','bilan','backtest','academie','credibilite','alertes','profil','sante','value','legal','methodologie','montante-jour','montante-weekend','montante-semaine'];
   // v30 — 'mesparis' retiré : Théo n'enregistre pas ses paris sur le site.
   // v31 — 'legal' + 'methodologie' ajoutés (transparence + dictionnaire des
   // métriques, en réponse à l'audit ChatGPT 2026-04-26).
@@ -7367,83 +7367,11 @@
           </article>
         `}
 
-        <!-- v30 — Streak banner : MODÈLE (pas perso). On regarde les derniers
-             picks réglés par _agentReplay (foot/tennis/basket/hockey) et on
-             affiche la séquence W/L courante. L'user n'a pas besoin de tracker
-             ses paris, le modèle parle pour lui-même. -->
-        ${(() => {
-          if (_dataIsStale) return '';
-          if (!agent || !Array.isArray(agent.scorableRaw)) return '';
-          // scorableRaw est trié chronologiquement asc → on prend la fin.
-          const settled = agent.scorableRaw.filter(s => s.res === 'won' || s.res === 'lost');
-          if (settled.length < 2) return '';
-          let streak = 0, streakType = null;
-          for (let i = settled.length - 1; i >= 0; i--) {
-            const r = settled[i].res;
-            if (streakType == null) { streakType = r; streak = 1; continue; }
-            if (r === streakType) streak++;
-            else break;
-          }
-          if (streak < 2) return '';
-          const isWin = streakType === 'won';
-          const col = isWin ? '#10b981' : '#f87171';
-          const bg = isWin ? 'rgba(16,185,129,.08)' : 'rgba(248,113,113,.08)';
-          const border = isWin ? 'rgba(16,185,129,.3)' : 'rgba(248,113,113,.3)';
-          const icon = isWin ? '🔥' : '🧊';
-          const lbl = isWin ? `${streak} picks gagnés d'affilée` : `${streak} picks perdus d'affilée`;
-          // Derniers 5 résultats du modèle pour le sparkline texte.
-          const last5 = settled.slice(-5).map(s => s.res === 'won' ? '✓' : '✗').join(' ');
-          const last5Cols = settled.slice(-5).map(s => s.res === 'won' ? '#10b981' : '#f87171');
-          const sparkChars = settled.slice(-5).map((s, i) => `<span style="color:${last5Cols[i]};">${s.res === 'won' ? '✓' : '✗'}</span>`).join(' ');
-          const advice = isWin
-            ? (streak >= 5 ? 'Le modèle est en pleine forme. Reste discipliné sur Kelly — la moyenne se rappellera tôt ou tard.' : 'Bon momentum modèle. Continue à suivre les picks lock prioritairement.')
-            : (streak >= 5 ? 'Le modèle traverse une bad run. Ne double pas la mise ; les conditions s\'inversent.' : 'Petite passe à vide. Les locks restent à >70% historiquement, garde le cap.');
-          return `
-            <div role="status" aria-live="polite" style="display:flex;align-items:center;gap:14px;padding:14px 18px;margin:18px 0;background:${bg};border:1px solid ${border};border-left:3px solid ${col};border-radius:0 10px 10px 0;">
-              <div style="font-size:24px;line-height:1;" aria-hidden="true">${icon}</div>
-              <div style="flex:1;min-width:0;">
-                <div style="font-size:11px;color:${col};text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:2px;">🤖 Série du modèle</div>
-                <div style="font-size:14.5px;font-weight:700;color:var(--text);margin-bottom:2px;">${lbl} <span style="font-size:12.5px;font-weight:600;color:var(--text-dim);margin-left:8px;">5 derniers : ${sparkChars}</span></div>
-                <div style="font-size:12.5px;color:var(--text-dim);line-height:1.4;">${advice}</div>
-              </div>
-              <button class="page-btn" data-page="bilan" style="padding:7px 12px;background:transparent;color:var(--text-dim);border:1px solid var(--border-2);border-radius:6px;font-size:11.5px;font-weight:600;cursor:pointer;flex-shrink:0;">Voir bilan →</button>
-            </div>`;
-        })()}
-
-        <!-- v30 — ROI alerts par sport : warning si sport en perte sur backtest_v2 -->
-        ${(() => {
-          // Skip si user a désactivé via Profil
-          let prefs = {};
-          try { prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}'); } catch(e){}
-          if (prefs.disableSportRoiAlerts === true) return '';
-          // Check : backtest report by_sport, alerter sur sports avec ≥3 paris ET ROI < -10%
-          const rep = window.__backtestReportV2;
-          if (!rep || !rep.by_sport) return '';
-          const losers = Object.entries(rep.by_sport)
-            .filter(([s, d]) => d && d.n >= 3 && d.flat_roi_pct < -10)
-            .sort((a, b) => a[1].flat_roi_pct - b[1].flat_roi_pct);
-          if (!losers.length) return '';
-          const sportEm = { football:'⚽', tennis:'🎾', basketball:'🏀', hockey:'🏒', baseball:'⚾', 'american-football':'🏈', mma:'🥊', golf:'⛳', racing:'🏎️', rugby:'🏉' };
-          const items = losers.slice(0, 3).map(([s, d]) => {
-            const em = sportEm[s] || '🎯';
-            const roi = d.flat_roi_pct.toFixed(1);
-            const sign = roi >= 0 ? '+' : '';
-            return `<li style="display:flex;align-items:baseline;gap:8px;padding:4px 0;font-size:12.5px;color:var(--text);line-height:1.4;">
-              <span style="flex-shrink:0;">${em}</span>
-              <span style="flex:1;"><b>${esc(s.charAt(0).toUpperCase()+s.slice(1))}</b> · ${d.n} pari${d.n>1?'s':''} · <span style="color:#f87171;font-weight:700;">${sign}${roi}%</span></span>
-            </li>`;
-          }).join('');
-          return `
-            <div role="status" aria-live="polite" style="display:flex;align-items:flex-start;gap:14px;padding:14px 18px;margin:18px 0;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.25);border-left:3px solid #f87171;border-radius:0 10px 10px 0;">
-              <div style="font-size:24px;line-height:1;flex-shrink:0;" aria-hidden="true">🚫</div>
-              <div style="flex:1;min-width:0;">
-                <div style="font-size:11px;color:#f87171;text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:4px;">Sports en perte</div>
-                <div style="font-size:13.5px;color:var(--text);font-weight:600;margin-bottom:6px;">${losers.length === 1 ? 'Un sport coûte cher' : `${losers.length} sports coûtent cher`} sur les derniers paris</div>
-                <ul style="list-style:none;padding:0;margin:6px 0 0;">${items}</ul>
-                <div style="font-size:11.5px;color:var(--text-dim);margin-top:8px;line-height:1.4;">Skip-recommandé jusqu'à ce que le modèle s'améliore. <button class="page-btn" data-page="credibilite" style="background:transparent;border:none;color:var(--brand);text-decoration:underline;cursor:pointer;font-size:11.5px;padding:0;">Détails Crédibilité →</button></div>
-              </div>
-            </div>`;
-        })()}
+        <!-- v31.7 — Streak banner + ROI alerts retirées (page Aujourd'hui
+             surchargée selon retour user). La streak du modèle reste visible
+             dans Bilan / Crédibilité ; les sports en perte sont visibles
+             dans Crédibilité aussi. Le dashboard se recentre sur ce qui est
+             actionable maintenant : top picks + 5 derniers + warning data. -->
 
         <!-- v30 — "Activité récente" retirée (dépendait des paris trackés
              que l'user n'enregistre pas). Le focus du dashboard est sur les
@@ -7916,8 +7844,15 @@
         // the dashboard feels less mobile on desktop.
         if (_dataIsStale) return '';
         const liveNow = today.filter(m => m.live).slice(0, 2);
+        // v31.7 — Avant : on prenait les 3 PROCHAINS coups d'envoi quels qu'ils
+        // soient (incluant des picks low-conf risqués). Le user trouvait ça
+        // confusant — il pensait que c'etait des recommandations alors que
+        // c'etait juste des matchs à venir. Maintenant : on filtre sur
+        // confiance ≥ 65% ET edge ≥ 0 pour ne montrer QUE des picks solides
+        // qui sont aussi proches dans le temps.
         const upcoming = allTodayRaw
           .filter(x => !x.m.live && !x.m.completed && _notStarted(x.m))
+          .filter(x => x.rel >= 0.65)
           .sort((a, b) => a.ts - b.ts)
           .slice(0, 3);
         const fmtCountdown = (m) => {
@@ -7962,7 +7897,8 @@
             <div style="font-size:10.5px;color:var(--text-dim);margin-top:6px;">Partie de 10€ le ${esc(startDateStr)} · ${(agent.series?.length || 0)} pari${(agent.series?.length || 0)>1?'s':''}</div>
           </div>
           <div style="padding:14px 14px 12px;background:var(--panel);border:1px solid var(--border);border-radius:10px;margin-bottom:10px;">
-            <div style="font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-dim);font-weight:700;margin-bottom:8px;">⏱ Prochains coups d'envoi</div>
+            <div style="font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-dim);font-weight:700;margin-bottom:6px;">⭐ Top picks à venir</div>
+            <div style="font-size:10.5px;color:var(--text-dim2);margin-bottom:8px;line-height:1.4;">Picks confiance ≥65% qui démarrent bientôt.</div>
             ${upcomingHtml}
           </div>
           <div style="padding:14px 14px 12px;background:var(--panel);border:1px solid var(--border);border-radius:10px;">
@@ -10123,6 +10059,260 @@
   }
 
 
+  // =========================================================================
+  // v31.7 — MONTANTES (du jour / weekend / semaine)
+  // -------------------------------------------------------------------------
+  // Concept : combiner N picks haute confiance pour multiplier la mise.
+  // L'utilisateur place une mise initiale (1u par défaut), si tous les picks
+  // gagnent il récupère 1u × cote_totale. Si un seul tombe → tout perdu.
+  //
+  // Honesty caveat : aucune montante n'est "garantie". Plus on combine, plus
+  // la variance s'accumule (la prob TOTALE = produit des probs individuelles).
+  // Le site DOIT afficher clairement la prob combinée et le risque.
+  //
+  // Algo de sélection :
+  //   - jour     : picks d'aujourd'hui, 2-3 max, conf ≥ 72%, cote ind. 1.30-2.10
+  //   - weekend  : picks samedi+dimanche, 3-4 max, conf ≥ 70%, cote 1.30-2.50
+  //   - semaine  : picks 7 jours, 5 max, conf ≥ 70%, cote 1.30-2.80
+  //
+  // Sécurités :
+  //   - Diversification sport (max 2 picks même sport)
+  //   - Diversification ligue (max 2 picks même ligue)
+  //   - Pas de picks live ou completed
+  //   - Filter cote ind. min 1.30 (marge marché trop faible en dessous)
+  //
+  // Sortie : carte montante avec liste des picks, cote totale, prob combinée
+  // (transparente), disclaimer fort.
+  // =========================================================================
+  function renderMontantePage(wrap, type) {
+    const data = window.PRONOSTICS_DATA;
+    if (!data || !data.days) {
+      wrap.innerHTML = '<div class="empty-state"><span class="es-icon">⏳</span><div class="es-title">Données indisponibles</div><div class="es-body">Le modèle attend les données du jour. Reviens dans quelques minutes.</div></div>';
+      return;
+    }
+
+    // Selection horizon temporel
+    const today = data.today;
+    const todayDate = new Date(today + 'T00:00:00Z');
+    const dayCount = type === 'jour' ? 1 : type === 'weekend' ? 2 : 7;
+
+    // Build list of dates to scan
+    const dates = [];
+    for (let i = 0; i < dayCount; i++) {
+      const d = new Date(todayDate);
+      if (type === 'weekend') {
+        // Pour le weekend : on prend samedi + dimanche les plus proches
+        // (semaine en cours ou suivante)
+        const dow = d.getUTCDay();
+        const daysToSat = (6 - dow + 7) % 7;
+        d.setUTCDate(d.getUTCDate() + daysToSat + i);
+      } else {
+        d.setUTCDate(d.getUTCDate() + i);
+      }
+      dates.push(d.toISOString().slice(0, 10));
+    }
+
+    // Collect candidate picks
+    const candidates = [];
+    const odd_min = 1.30;
+    const odd_max = type === 'jour' ? 2.10 : type === 'weekend' ? 2.50 : 2.80;
+    const conf_min = type === 'jour' ? 0.72 : 0.70;
+
+    for (const date of dates) {
+      const events = (data.days || {})[date] || [];
+      for (const m of events) {
+        if (m.live || m.completed) continue;
+        if (m.status === 'STATUS_FINAL' || m.status === 'STATUS_IN_PROGRESS') continue;
+        let pred;
+        try { pred = (typeof predictMatch === 'function') ? predictMatch(m) : null; } catch(e){ continue; }
+        if (!pred || !pred.pick) continue;
+        const rel = pred.reliability ?? pred.pick.prob;
+        if (rel < conf_min) continue;
+        // Trouver la cote du pick
+        let odd = null;
+        const wm = (m.winamax && m.winamax.markets && m.winamax.markets['1n2']) || {};
+        if (pred.pick.key === '1') odd = wm.home;
+        else if (pred.pick.key === '2') odd = wm.away;
+        else if (pred.pick.key === 'X') odd = wm.draw;
+        odd = Number(odd);
+        if (!isFinite(odd) || odd < odd_min || odd > odd_max) continue;
+
+        candidates.push({
+          m, pred, rel,
+          odd,
+          ts: new Date(m.date).getTime(),
+          sport: m.sport,
+          league: m.league_code || m.league_name || '',
+          edge: rel - (1/odd),
+        });
+      }
+    }
+
+    // Tri : edge desc, puis confiance desc
+    candidates.sort((a, b) => (b.edge - a.edge) || (b.rel - a.rel));
+
+    // Diversification : max 2 par sport, max 2 par ligue
+    const picked = [];
+    const sportCount = {}, leagueCount = {};
+    const targetN = type === 'jour' ? 3 : type === 'weekend' ? 4 : 5;
+    for (const c of candidates) {
+      if (picked.length >= targetN) break;
+      if ((sportCount[c.sport] || 0) >= 2) continue;
+      if (c.league && (leagueCount[c.league] || 0) >= 2) continue;
+      picked.push(c);
+      sportCount[c.sport] = (sportCount[c.sport] || 0) + 1;
+      if (c.league) leagueCount[c.league] = (leagueCount[c.league] || 0) + 1;
+    }
+
+    // Calcul combiné
+    const totalOdd = picked.reduce((p, c) => p * c.odd, 1);
+    const totalProb = picked.reduce((p, c) => p * c.rel, 1);
+    const stake = 10; // mise simulée 10€
+    const gain = stake * totalOdd;
+    const netGain = gain - stake;
+
+    // Risk label
+    let riskLabel, riskColor, riskBg;
+    if (totalProb >= 0.50) { riskLabel = 'Risque modéré'; riskColor = '#34d399'; riskBg = 'rgba(52,211,153,.10)'; }
+    else if (totalProb >= 0.30) { riskLabel = 'Risque équilibré'; riskColor = '#fbbf24'; riskBg = 'rgba(251,191,36,.10)'; }
+    else { riskLabel = 'Risque élevé'; riskColor = '#f87171'; riskBg = 'rgba(248,113,113,.10)'; }
+
+    // Header (titre + intro)
+    const titleByType = {
+      jour: '📅 Montante du jour',
+      weekend: '🗓️ Montante du weekend',
+      semaine: '📆 Montante de la semaine',
+    };
+    const subByType = {
+      jour: `${picked.length} picks haute confiance d'aujourd'hui · diversification sport/ligue`,
+      weekend: `${picked.length} picks haute confiance samedi & dimanche · diversification sport/ligue`,
+      semaine: `${picked.length} picks haute confiance sur 7 jours · diversification sport/ligue`,
+    };
+
+    if (picked.length < 2) {
+      wrap.innerHTML = `
+        <div style="max-width:960px;margin:0 auto;padding:0 8px;">
+          <div style="margin:24px 0 18px;">
+            <span class="section-eyebrow">Montante</span>
+            <h1 class="section-title-v2">${titleByType[type]}</h1>
+            <p class="section-subtitle-v2">${subByType[type]}</p>
+          </div>
+          <div class="empty-state">
+            <span class="es-icon">🎯</span>
+            <div class="es-title">Pas assez de picks haute confiance</div>
+            <div class="es-body">Le modèle a trouvé ${picked.length} pick${picked.length>1?'s':''} sur la fenêtre. Une montante solide demande au moins 2 picks. Reviens plus tard ou consulte les <button class="page-btn" data-page="locks" style="background:transparent;border:none;color:var(--brand);text-decoration:underline;cursor:pointer;font-size:inherit;font-family:inherit;padding:0;">Locks</button> pour les picks individuels.</div>
+          </div>
+        </div>`;
+      return;
+    }
+
+    // Build picks HTML
+    const picksHtml = picked.map((p, i) => {
+      const sides = (typeof getSides === 'function') ? getSides(p.m) : { home: {}, away: {} };
+      const homeName = (sides.home && (sides.home.short || sides.home.name)) || '?';
+      const awayName = (sides.away && (sides.away.short || sides.away.name)) || '?';
+      const sportEm = { football:'⚽', tennis:'🎾', basketball:'🏀', hockey:'🏒', baseball:'⚾', 'american-football':'🏈', mma:'🥊', golf:'⛳', racing:'🏎️', rugby:'🏉' }[p.sport] || '🎯';
+      const dateStr = new Date(p.m.date).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' });
+      const timeStr = new Date(p.m.date).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+      const pickLabel = (p.pred.pick && p.pred.pick.label) || p.pred.pick.key || '?';
+      return `
+        <div class="montante-pick" data-match-id="${esc(String(p.m.id || ''))}" role="button" tabindex="0" aria-label="Pick ${i+1} : ${esc(homeName)} vs ${esc(awayName)}" style="display:grid;grid-template-columns:32px 1fr 100px 80px;gap:12px;align-items:center;padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);cursor:pointer;transition:all .18s ease;">
+          <div style="width:30px;height:30px;display:grid;place-items:center;border-radius:50%;background:var(--brand-soft);color:var(--brand);font-weight:800;font-size:14px;">${i+1}</div>
+          <div style="min-width:0;">
+            <div style="font-size:11px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.4px;font-weight:600;">${sportEm} ${esc(p.league.slice(0,28))} · ${esc(dateStr)} ${esc(timeStr)}</div>
+            <div style="font-size:14px;font-weight:600;color:var(--text);margin-top:3px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(homeName)} <span style="color:var(--text-dim);">vs</span> ${esc(awayName)}</div>
+            <div style="font-size:12px;color:var(--brand);font-weight:600;margin-top:2px;">→ ${esc(pickLabel)}</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.4px;">Cote</div>
+            <div style="font-size:16px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;">@${p.odd.toFixed(2)}</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.4px;">Conf.</div>
+            <div style="font-size:16px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;">${Math.round(p.rel*100)}%</div>
+          </div>
+        </div>`;
+    }).join('');
+
+    // Render
+    wrap.innerHTML = `
+      <div style="max-width:960px;margin:0 auto;padding:0 8px;">
+        <div style="margin:24px 0 18px;">
+          <span class="section-eyebrow">Montante</span>
+          <h1 class="section-title-v2">${titleByType[type]}</h1>
+          <p class="section-subtitle-v2">${subByType[type]}</p>
+        </div>
+
+        <!-- Carte récap : cote totale + gain potentiel + risk -->
+        <div style="background:linear-gradient(135deg, var(--panel) 0%, var(--panel-2) 100%);border:1px solid var(--border-2);border-radius:var(--r-lg);padding:24px 26px;margin-bottom:18px;position:relative;overflow:hidden;">
+          <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle, var(--brand) 0%, transparent 60%);opacity:.10;pointer-events:none;"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;align-items:center;">
+            <div>
+              <div style="font-size:11px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">Cote combinée</div>
+              <div style="font-size:38px;font-weight:800;color:var(--accent);letter-spacing:-.8px;font-variant-numeric:tabular-nums;line-height:1;margin-top:4px;">@${totalOdd.toFixed(2)}</div>
+              <div style="font-size:11.5px;color:var(--text-dim);margin-top:4px;">${picked.length} picks</div>
+            </div>
+            <div>
+              <div style="font-size:11px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">Pour 10€ misés</div>
+              <div style="font-size:30px;font-weight:800;color:var(--text);letter-spacing:-.6px;font-variant-numeric:tabular-nums;line-height:1;margin-top:4px;">${gain.toFixed(2)}€</div>
+              <div style="font-size:11.5px;color:var(--accent);margin-top:4px;font-weight:600;">+${netGain.toFixed(2)}€ net</div>
+            </div>
+            <div>
+              <div style="font-size:11px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">Probabilité combinée</div>
+              <div style="font-size:30px;font-weight:800;color:${riskColor};letter-spacing:-.6px;font-variant-numeric:tabular-nums;line-height:1;margin-top:4px;">${(totalProb*100).toFixed(1)}%</div>
+              <div style="display:inline-block;font-size:10.5px;color:${riskColor};background:${riskBg};padding:2px 8px;border-radius:999px;margin-top:5px;font-weight:700;">${riskLabel}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Disclaimer honnêteté (FORT, sans gris pâle) -->
+        <div class="sp-callout warn" style="margin:0 0 22px;">
+          <strong>⚠️ Aucune montante n'est garantie.</strong> Plus on combine, plus la variance s'accumule : si <b>un seul</b> pick tombe, l'intégralité de la mise est perdue. Le pourcentage <b>${(totalProb*100).toFixed(1)}%</b> ci-dessus est la probabilité que <b>tous</b> les picks gagnent ensemble. Cette page est un outil pédagogique, pas une recommandation de mise. Mise éducative simulée à 10€ — adapte à ta bankroll. <b>18+ · jouer comporte des risques</b>.
+        </div>
+
+        <!-- Liste des picks -->
+        <div style="margin-bottom:24px;">
+          <div style="font-size:12px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:10px;">📋 Picks de la montante</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            ${picksHtml}
+          </div>
+        </div>
+
+        <!-- Aide / méthodologie -->
+        <div class="sp-callout">
+          <strong>Comment cette montante est construite :</strong>
+          <ul style="margin:6px 0 0;padding-left:22px;">
+            <li>Picks confiance ≥ ${Math.round(conf_min*100)}% (modèle multi-sources calibré)</li>
+            <li>Cote individuelle ${odd_min.toFixed(2)}–${odd_max.toFixed(2)} (zone Kelly-fertile)</li>
+            <li>Diversification : max 2 picks par sport, max 2 par ligue</li>
+            <li>Sélection : top edge marché × confiance modèle</li>
+          </ul>
+        </div>
+      </div>
+    `;
+
+    // Wire clicks on picks → ouvrir modal détail
+    wrap.querySelectorAll('.montante-pick[data-match-id]').forEach(el => {
+      el.addEventListener('click', () => {
+        const id = el.getAttribute('data-match-id');
+        if (!id) return;
+        const allEvents = [];
+        for (const d of dates) {
+          const evs = (data.days || {})[d] || [];
+          allEvents.push(...evs);
+        }
+        const m = allEvents.find(x => String(x.id) === String(id));
+        if (m && typeof openDetail === 'function') openDetail(m);
+      });
+      el.addEventListener('mouseover', () => { el.style.borderColor = 'var(--border-3)'; el.style.transform = 'translateY(-2px)'; el.style.boxShadow = 'var(--shadow-sm)'; });
+      el.addEventListener('mouseout', () => { el.style.borderColor = 'var(--border)'; el.style.transform = ''; el.style.boxShadow = ''; });
+      el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el.click(); }
+      });
+    });
+  }
+
+
   // ======= Boot =======
   // Switch between the pages: simples / combines / value / bilan
   function applyPageView() {
@@ -10160,6 +10350,11 @@
     const isTous = currentPage === 'tous';
     // v29 — Crédibilité / méthode (ROI vérifiable + qui suis-je)
     const isCredibilite = currentPage === 'credibilite';
+    // v31.7 — Montantes (declared early to avoid TDZ in summary-bar visibility check)
+    const isMontanteJour     = currentPage === 'montante-jour';
+    const isMontanteWeekend  = currentPage === 'montante-weekend';
+    const isMontanteSemaine  = currentPage === 'montante-semaine';
+    const isMontante = isMontanteJour || isMontanteWeekend || isMontanteSemaine;
 
     // v23 — Sous-nav "Mon suivi" (historique/bilan/backtest).
     // v30 — "Mes paris" retiré : Théo n'enregistre pas ses paris sur le
@@ -10252,7 +10447,7 @@
 
     // Summary bar: shown for simples + bilan + top, hidden for combines/value/locks/historique/sante + nouvelles pages
     const sum = document.getElementById('summary-bar');
-    if (sum) sum.style.display = (isCombines || isValue || isLocks || isHistorique || isSante || isDashboard || isAlertes || isAcademie || isBacktest || isProfil || isButeurs || isTous || isCredibilite) ? 'none' : '';
+    if (sum) sum.style.display = (isCombines || isValue || isLocks || isHistorique || isSante || isDashboard || isAlertes || isAcademie || isBacktest || isProfil || isButeurs || isTous || isCredibilite || isMontante) ? 'none' : '';
 
     // Chantier IIII — Simples quick-take IA (visible only on Simples)
     const iaSimples = document.getElementById('ia-simples-wrap');
@@ -10452,6 +10647,19 @@
     }
     profilWrap.style.display = isProfil ? '' : 'none';
     if (isProfil) renderProfilPage(profilWrap);
+
+    // v31.7 — Montantes (consts isMontante* declared at top of function for TDZ)
+    let montanteWrap = document.getElementById('montante-wrap');
+    if (!montanteWrap) {
+      montanteWrap = document.createElement('div');
+      montanteWrap.id = 'montante-wrap';
+      (document.querySelector('main') || document.body).appendChild(montanteWrap);
+    }
+    montanteWrap.style.display = isMontante ? '' : 'none';
+    if (isMontante) {
+      const type = isMontanteJour ? 'jour' : isMontanteWeekend ? 'weekend' : 'semaine';
+      renderMontantePage(montanteWrap, type);
+    }
 
     // v31.1 — Hash routes #legal et #methodologie redirigent vers les pages
     // statiques HTML (legal.html / methodologie.html). Économie : ~26 KB
