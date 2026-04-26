@@ -37,7 +37,7 @@
   // ex pronostics.html#locks → on lit location.hash pour set la bonne page.
   // Sans ce guard, le manifest shortcuts (#locks #bilan #combines) ne
   // marchaient pas — l'utilisateur arrivait toujours sur dashboard.
-  const VALID_PAGES = ['dashboard','tous','locks','buteurs','combines','simples','top','historique','bilan','backtest','academie','credibilite','alertes','profil','sante','value','legal','methodologie','montante-jour','montante-weekend','montante-semaine'];
+  const VALID_PAGES = ['dashboard','tous','locks','buteurs','combines','simples','top','historique','bilan','backtest','academie','credibilite','alertes','profil','sante','legal','methodologie','montante-jour','montante-weekend','montante-semaine'];
   // v30 — 'mesparis' retiré : Théo n'enregistre pas ses paris sur le site.
   // v31 — 'legal' + 'methodologie' ajoutés (transparence + dictionnaire des
   // métriques, en réponse à l'audit ChatGPT 2026-04-26).
@@ -867,6 +867,31 @@
     return n;
   }
 
+  // v31.7.6 — Repos depuis le dernier match. Renvoie le nombre de jours
+  // (float) entre `matchTime` et le match précédent de l'équipe.
+  // - Si pas de match précédent dans la fenêtre 14j : null (data manquante).
+  // - Si <2 jours = fatigue extrême (perf -3pt typique).
+  // - Si >10 jours = potentielle rouille (perf -1pt typique).
+  // - Optimum ~3-7 jours.
+  // Coût: O(log n) sur la timeline triée par équipe.
+  function daysSinceLastMatch(teamName, matchTime, lookbackDays = 14) {
+    if (!teamName || !matchTime) return null;
+    const arr = getCongestionMap().get(teamName);
+    if (!arr || !arr.length) return null;
+    const windowStart = matchTime - lookbackDays * 24 * 3600 * 1000;
+    // arr est trié ASC. Trouver le dernier match strictement avant matchTime.
+    let lastTs = null;
+    for (let i = arr.length - 1; i >= 0; i--) {
+      const t = arr[i];
+      if (t >= matchTime) continue;
+      if (t < windowStart) break;
+      lastTs = t;
+      break;  // on a trouvé le plus récent
+    }
+    if (lastTs == null) return null;
+    return (matchTime - lastTs) / (24 * 3600 * 1000);
+  }
+
   // ======= Reliability calibration (Chantier F) =======
   // Historical reliability diagram → isotonic-ish remap. We run the raw
   // (un-calibrated) reliability over completed matches, bucket it by predicted
@@ -1305,6 +1330,8 @@
     // data.js so it auto-invalidates on each refresh.
     let congestionNudge = null;
     let congestionStats = null;
+    let restNudge = null;
+    let restStats = null;
     if (match.sport === 'football' && match.date) {
       const matchTime = Date.parse(match.date);
       if (!isNaN(matchTime)) {
@@ -1318,6 +1345,26 @@
           const aPen = Math.max(0, aCnt - 1) * 0.015;
           congestionNudge = Math.max(-0.04, Math.min(0.04, aPen - hPen));
           congestionStats = { home: hCnt, away: aCnt };
+        }
+
+        // v31.7.6 — Signal repos minimum. Pénalise les équipes ayant joué
+        // <2 jours avant le match, et plus subtilement >10 jours (rouille).
+        // Optimum 4-6 jours.
+        const hDays = daysSinceLastMatch(home?.name, matchTime);
+        const aDays = daysSinceLastMatch(away?.name, matchTime);
+        const restPenalty = (d) => {
+          if (d == null) return 0;
+          if (d < 2) return -0.025;        // <48h très fatigué
+          if (d < 3) return -0.012;        // 48-72h fatigué
+          if (d > 12) return -0.012;       // rouille extrême
+          if (d > 9) return -0.005;        // léger manque de rythme
+          return 0;                         // 3-9j optimum
+        };
+        const hRest = restPenalty(hDays);
+        const aRest = restPenalty(aDays);
+        if (hRest !== 0 || aRest !== 0) {
+          restNudge = Math.max(-0.03, Math.min(0.03, aRest - hRest));
+          restStats = { home: hDays != null ? +hDays.toFixed(1) : null, away: aDays != null ? +aDays.toFixed(1) : null };
         }
       }
     }
@@ -1778,6 +1825,14 @@
         final.pH += congestionNudge;
         final.pA -= congestionNudge;
       }
+      // v31.7.6 — Rest-window nudge : applique un nudge supplementaire base
+      // sur le repos mini (jours depuis dernier match). Indépendant de
+      // congestion (qui mesure la charge cumulee 7j) — capture la fatigue
+      // aigue (<48h) et la rouille (>10j). Plafonne a ±0.03.
+      if (restNudge != null) {
+        final.pH += restNudge;
+        final.pA -= restNudge;
+      }
       // Injury penalty: each severe absence (Out/Suspended/Doubtful) on either
       // side shifts the win prob by ~1.5% (cap at 6%). ESPN covers US sports
       // (NBA/NHL/WNBA/NFL/MLB); Sofascore fills the gap for the top-5 soccer
@@ -2120,6 +2175,31 @@
         icon: '🏃',
         text: `${tired.team} ${tired.cnt} matchs en 7j — fatigue possible`
       });
+    }
+    // v31.7.6 — Repos / fatigue extreme. Affiche seulement les cas notables :
+    // un cote a moins de 3j de repos (ou plus de 9j) et l'autre dans la fenetre
+    // optimum.
+    if (restStats && (restStats.home != null || restStats.away != null)) {
+      const flag = (d) => d != null && (d < 3 || d > 9);
+      if (flag(restStats.home) || flag(restStats.away)) {
+        const homeBad = flag(restStats.home);
+        const awayBad = flag(restStats.away);
+        let text = '';
+        if (homeBad && awayBad) {
+          text = `Repos atypique des deux cotes : ${home?.short || 'home'} ${restStats.home}j / ${away?.short || 'away'} ${restStats.away}j`;
+        } else if (homeBad) {
+          const lbl = restStats.home < 3 ? 'fatigue (< 3j de repos)' : 'rouille (> 9j sans match)';
+          text = `${home?.short || 'home'} : ${lbl} (${restStats.home}j depuis dernier match)`;
+        } else if (awayBad) {
+          const lbl = restStats.away < 3 ? 'fatigue (< 3j de repos)' : 'rouille (> 9j sans match)';
+          text = `${away?.short || 'away'} : ${lbl} (${restStats.away}j depuis dernier match)`;
+        }
+        reasons.push({
+          type: 'rest',
+          icon: '😴',
+          text,
+        });
+      }
     }
     // Referee — surface when strict/lenient (nudge applied) OR when
     // neutral but we have the name (informative only).
@@ -6734,19 +6814,10 @@
     badge.style.color = critN > 0 ? '#f87171' : '#eab308';
   }
 
-  // ======= Value Finder (retiré Chantier E) =======
-  // La page Value Finder a été retirée : on ne calcule plus ni EV ni edge.
-  // Le stub reste pour que les anciens bookmarks /?page=value retombent
-  // sur la page Simples sans casser l'app.
-  function renderValueFinder(wrap) {
-    // Page retirée : on affiche un message explicatif si on atterrit ici.
-    wrap.innerHTML = `
-      <div style="padding:48px 24px;text-align:center;color:var(--text-dim);background:rgba(255,255,255,.02);border-radius:12px;max-width:640px;margin:32px auto;">
-        <div style="font-size:32px;margin-bottom:12px;">🎯</div>
-        <div style="font-size:18px;font-weight:600;color:var(--text);margin-bottom:8px;">Value Finder retiré</div>
-        <div style="font-size:13.5px;line-height:1.5;">Le modèle ne calcule plus d'EV ni d'edge. Tous les pronostics se consultent sur la page Simples, classés par fiabilité pure.</div>
-      </div>`;
-  }
+  // v31.7.6 — renderValueFinder + valueWrap dispatcher retires (audit cleanup).
+  // La page #value n'avait plus aucun lien dans la nav depuis v25+ (chantier E)
+  // et son stub etait du code mort. Les anciens bookmarks /?page=value
+  // tombent maintenant sur dashboard via le fallback de _pageFromHash().
 
   // ===================================================================
   // ====== REFONTE v21 — Pages Dashboard / Alertes / Académie /  ======
@@ -10076,6 +10147,64 @@
 
           ${santeHtml}
 
+          ${(() => {
+            // v31.7.6 — Web Vitals dashboard local. Lit les data du tracker
+            // installé en pre-app.js (paris_sportif_web_vitals_v1).
+            // Affiche : médianes des 20 dernieres sessions LCP/FCP/CLS/INP/TTFB.
+            let sessions = [];
+            try { sessions = JSON.parse(localStorage.getItem('paris_sportif_web_vitals_v1') || '[]'); } catch(e){}
+            if (!Array.isArray(sessions) || sessions.length < 3) return `
+              <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;">
+                <h3 style="margin:0 0 8px;font-size:16px;font-weight:700;color:var(--text);">⚡ Performance navigateur</h3>
+                <div style="font-size:12.5px;color:var(--text-dim);">Pas encore assez de sessions enregistrées (${sessions.length}/3 minimum). Reviens après quelques visites pour voir tes Web Vitals.</div>
+              </div>`;
+            const recent = sessions.slice(-20);
+            const median = (arr) => {
+              const xs = arr.filter(x => x != null && isFinite(x)).sort((a,b)=>a-b);
+              if (!xs.length) return null;
+              const m = Math.floor(xs.length / 2);
+              return xs.length % 2 ? xs[m] : (xs[m-1] + xs[m]) / 2;
+            };
+            const lcps = recent.map(s => s.LCP);
+            const fcps = recent.map(s => s.FCP);
+            const inps = recent.map(s => s.INP);
+            const clss = recent.map(s => s.CLS);
+            const ttfbs = recent.map(s => s.TTFB);
+            const mLCP = median(lcps), mFCP = median(fcps), mINP = median(inps), mCLS = median(clss), mTTFB = median(ttfbs);
+            // Web Vitals thresholds (Google) :
+            //   LCP : <2500ms good, <4000ms needs improvement
+            //   FCP : <1800ms good, <3000ms needs improvement
+            //   INP : <200ms good, <500ms needs improvement
+            //   CLS : <0.10 good, <0.25 needs improvement
+            //   TTFB: <800ms good, <1800ms needs improvement
+            const tier = (val, good, ni) => val == null ? 'na' : val <= good ? 'good' : val <= ni ? 'ni' : 'poor';
+            const colorTier = (t) => t === 'good' ? '#34d399' : t === 'ni' ? '#fbbf24' : t === 'poor' ? '#f87171' : 'var(--text-dim2)';
+            const lblTier = (t) => t === 'good' ? 'Bon' : t === 'ni' ? 'À améliorer' : t === 'poor' ? 'Mauvais' : '—';
+            const fmtMs = (v) => v == null ? '—' : `${Math.round(v)}ms`;
+            const fmtN = (v, dec=3) => v == null ? '—' : v.toFixed(dec);
+            const card = (label, val, fmt, tk, hint) => `
+              <div style="padding:14px 16px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-left:3px solid ${colorTier(tk)};border-radius:8px;">
+                <div style="font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.4px;font-weight:700;margin-bottom:4px;">${label}</div>
+                <div style="font-size:22px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;letter-spacing:-.4px;">${fmt(val)}</div>
+                <div style="font-size:10.5px;color:${colorTier(tk)};font-weight:700;margin-top:2px;">${lblTier(tk)} · ${hint}</div>
+              </div>`;
+            return `
+              <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;">
+                <h3 style="margin:0 0 4px;font-size:16px;font-weight:700;color:var(--text);">⚡ Performance navigateur</h3>
+                <div style="font-size:12px;color:var(--text-dim);margin-bottom:14px;">Médianes des ${recent.length} dernières sessions sur ce navigateur. Aucune donnée n'est envoyée sur internet.</div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));gap:10px;">
+                  ${card('LCP', mLCP, fmtMs, tier(mLCP, 2500, 4000), 'cible <2.5s')}
+                  ${card('FCP', mFCP, fmtMs, tier(mFCP, 1800, 3000), 'cible <1.8s')}
+                  ${card('INP', mINP, fmtMs, tier(mINP, 200, 500), 'cible <200ms')}
+                  ${card('CLS', mCLS, (v) => fmtN(v, 3), tier(mCLS, 0.10, 0.25), 'cible <0.10')}
+                  ${card('TTFB', mTTFB, fmtMs, tier(mTTFB, 800, 1800), 'cible <800ms')}
+                </div>
+                <div style="margin-top:12px;font-size:11px;color:var(--text-dim2);">
+                  Console : <code style="background:var(--panel-2);padding:1px 5px;border-radius:3px;">__webVitals()</code> pour le détail.
+                </div>
+              </div>`;
+          })()}
+
           <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;">
             <h3 style="margin:0 0 12px;font-size:16px;font-weight:700;color:var(--text);">📤 Exports</h3>
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -10761,7 +10890,7 @@
     } catch(e){}
     const isSimples = currentPage === 'simples';
     const isCombines = currentPage === 'combines';
-    const isValue = currentPage === 'value';
+    const isValue = false;  // v31.7.6 — page 'value' retirée (cf. cleanup)
     const isBilan = currentPage === 'bilan';
     const isLocks = currentPage === 'locks';
     const isHistorique = currentPage === 'historique';
@@ -10980,15 +11109,7 @@
       }
     }
 
-    // Value Finder page
-    let valueWrap = document.getElementById('value-wrap');
-    if (!valueWrap) {
-      valueWrap = document.createElement('div');
-      valueWrap.id = 'value-wrap';
-      (document.querySelector('main') || document.body).appendChild(valueWrap);
-    }
-    valueWrap.style.display = isValue ? '' : 'none';
-    if (isValue) renderValueFinder(valueWrap);
+    // v31.7.6 — Value Finder page retiree (cleanup), plus de wrap a maintenir.
 
     // Bilan page: render dedicated view in #bilan-wrap
     let bilanWrap = document.getElementById('bilan-wrap');
