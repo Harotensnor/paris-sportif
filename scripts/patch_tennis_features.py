@@ -126,6 +126,10 @@ def lookup_player(name: str, players: dict, by_token: dict) -> dict | None:
     return players[candidates[0][1]]
 
 
+def _h2h_key(a: str, b: str) -> str:
+    return f'{a}|{b}' if a < b else f'{b}|{a}'
+
+
 def main() -> int:
     if not RATINGS.exists():
         print(f'[patch_tennis_features] {RATINGS.name} missing — run '
@@ -133,6 +137,7 @@ def main() -> int:
         return 0
     ratings = json.loads(RATINGS.read_text(encoding='utf-8'))
     players = ratings.get('players') or {}
+    h2h_pairs = ratings.get('h2h') or {}
     if not players:
         print('[patch_tennis_features] empty players dict, skip.', flush=True)
         return 0
@@ -145,7 +150,7 @@ def main() -> int:
 
     data = load_data()
     days = data.get('days') or {}
-    stats = {'events': 0, 'matched_full': 0, 'matched_partial': 0, 'unmatched': 0}
+    stats = {'events': 0, 'matched_full': 0, 'matched_partial': 0, 'unmatched': 0, 'h2h_attached': 0}
 
     for _day, evs in days.items():
         for ev in (evs or []):
@@ -154,9 +159,14 @@ def main() -> int:
             comps = ev.get('competitors') or []
             if len(comps) != 2:
                 continue
-            stats['events'] += 1
             home = comps[0].get('name') or comps[0].get('short') or ''
             away = comps[1].get('name') or comps[1].get('short') or ''
+            # Skip future-bracket placeholders — they don't represent a real
+            # match yet, so counting them as "unmatched" pollutes the metric.
+            # ESPN ships these as "TBD" until the previous round resolves.
+            if 'TBD' in home or 'TBD' in away or not home or not away:
+                continue
+            stats['events'] += 1
             ph = lookup_player(home, players, by_token)
             pa = lookup_player(away, players, by_token)
             if not ph and not pa:
@@ -198,6 +208,36 @@ def main() -> int:
             elif ph and pa:
                 # No surface known → fall back to global elo diff
                 features['surface_elo_diff'] = round((ph.get('elo') or 1500) - (pa.get('elo') or 1500), 1)
+            # H2H lookup — both players must be in the Sackmann dataset.
+            # ESPN tennis H2H is thin/empty for most matches; Sackmann's full
+            # tour history fills the gap. Resolve normalized names via the
+            # player's stored 'name' field passed back through _norm.
+            if ph and pa:
+                hnorm = _norm(ph.get('name') or '')
+                anorm = _norm(pa.get('name') or '')
+                if hnorm and anorm and hnorm != anorm:
+                    pkey = _h2h_key(hnorm, anorm)
+                    rec = h2h_pairs.get(pkey)
+                    if rec:
+                        # Map p1/p2 stats to home/away semantics
+                        if rec.get('p1') == hnorm:
+                            home_wins, away_wins = rec.get('p1_wins', 0), rec.get('p2_wins', 0)
+                        else:
+                            home_wins, away_wins = rec.get('p2_wins', 0), rec.get('p1_wins', 0)
+                        last_winner = None
+                        if rec.get('last_winner') == 'p1':
+                            last_winner = 'home' if rec.get('p1') == hnorm else 'away'
+                        elif rec.get('last_winner') == 'p2':
+                            last_winner = 'home' if rec.get('p2') == hnorm else 'away'
+                        if home_wins or away_wins:
+                            features['h2h'] = {
+                                'home_wins': home_wins,
+                                'away_wins': away_wins,
+                                'last_date': rec.get('last_date') or '',
+                                'last_winner': last_winner,
+                                'last_surface': rec.get('last_surface') or '',
+                            }
+                            stats['h2h_attached'] += 1
             ev['tennis_features'] = features
 
     payload = json.dumps(data, ensure_ascii=False, separators=(',', ':'))
@@ -212,7 +252,8 @@ def main() -> int:
     print(f'[{datetime.now():%H:%M:%S}] patch_tennis_features: '
           f'{stats["events"]} tennis events scanned · '
           f'{stats["matched_full"]} full · {stats["matched_partial"]} partial · '
-          f'{stats["unmatched"]} unmatched (challenger/qualifier ?)', flush=True)
+          f'{stats["unmatched"]} unmatched (challenger/qualifier ?) · '
+          f'{stats["h2h_attached"]} H2H attached', flush=True)
     return 0
 
 
