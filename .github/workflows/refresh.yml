@@ -158,6 +158,21 @@ jobs:
           # dans pronostics.html. Réduit le 1er paint de ~1.4 MB à ~0.4 MB.
           python3 finalize_inline.py || true
 
+      - name: Stamp asset versions in pronostics.html
+        # v31.3 — Cache-busting basé sur le hash du contenu : `?v=<hash8>` pour
+        # app.css et app.js dans pronostics.html. Le hash change UNIQUEMENT
+        # quand le fichier change (vs un timestamp build qui changerait à
+        # chaque tick et invaliderait le cache 288×/jour).
+        # Les browsers respectent correctement le cache HTTP : si ?v= est
+        # identique au précédent, ils servent depuis cache. Sinon, fresh.
+        run: |
+          APP_CSS_HASH=$(git hash-object app.css | head -c 8)
+          APP_JS_HASH=$(git hash-object app.js | head -c 8)
+          # Replace existing ?v=XXX or add it if missing
+          sed -i -E "s|app\.css(\?v=[a-f0-9]+)?|app.css?v=${APP_CSS_HASH}|g" pronostics.html
+          sed -i -E "s|app\.js(\?v=[a-f0-9]+)?|app.js?v=${APP_JS_HASH}|g" pronostics.html
+          echo "Stamped: app.css?v=${APP_CSS_HASH}, app.js?v=${APP_JS_HASH}"
+
       - name: Stamp sw.js CACHE_VERSION
         # Bumps the service worker cache key on every deploy, so browsers fetch
         # the fresh pronostics.html + data.js instead of serving stale cache.
