@@ -285,6 +285,7 @@
       <li><strong>Staking évalué</strong> : Kelly 0.25× cap 10% bankroll, démarrage 100 unités. ROI flat 1u/pick reporté en parallèle pour comparaison.</li>
       <li><strong>Cron</strong> : <code>backtest.yml</code> rejoue tout chaque dimanche, écrit <code>backtest_report_v2.{json,md}</code> à la racine.</li>
       <li><strong>Reproductibilité</strong> : tout est public. Tu peux <code>git clone</code> et relancer <code>python scripts/backtest_v2.py</code> sur ta machine. Les sorties <code>.json</code> + <code>.md</code> sont dans le repo, comparables historiquement.</li>
+      <li><strong>Transparence symétrique</strong> (v31.7.27) : on publie aussi les <a href="backtest.html#best">10 plus beaux gains</a> et les <a href="backtest.html#worst">10 pires picks</a> en symétrie pour ne pas biaiser le framing négatif. Les <a href="backtest.html#streaks">séries publiques</a> (longest win/lose + streak courante) sont aussi visibles, pour montrer que les "froids" font partie du jeu.</li>
     </ul>
   </section>
 
