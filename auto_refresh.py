@@ -100,6 +100,10 @@ PATCH_STAGES = [
     ('patch_team_form.py',          1,   15),
     # Pipeline status snapshot (health.json) — runs every tick, cheap.
     ('build_health.py',             1,   15),
+    # v31 — Static backtest page generator (audit ChatGPT recommandation
+    # "Construire un historique public des paris"). Lit backtest_report_v2.json,
+    # produit backtest.html indexable sans JS. ~0.3s.
+    ('build_backtest_page.py',      1,   15),
     # Chantier #3 lazy-load — DOIT tourner en DERNIER. Lit data.js (full),
     # écrit data_today.json + data_manifest.json + ré-inline LITE blob dans
     # pronostics.html. Sans ça, le client tomberait toujours sur le fallback

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Backtest — Performance vérifiable du modèle Paris-Sportif</title>
+<meta name="description" content="Performance réelle du modèle Paris-Sportif sur 179 picks réglés : WR 58.7%, ROI flat +7.2%, Brier 0.2163, Kelly +77.8u. Backtest hebdo via vrai predictMatch(). Tableaux par tier, sport, ligue, cote, calibration.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://harotensnor.github.io/paris-sportif/backtest.html">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Backtest — Performance vérifiable du modèle Paris-Sportif">
+<meta property="og:description" content="WR 58.7% · ROI flat +7.2% · Brier 0.2163 · 179 picks · backtest hebdo">
+<meta property="og:url" content="https://harotensnor.github.io/paris-sportif/backtest.html">
+<meta property="og:image" content="https://harotensnor.github.io/paris-sportif/icon-512.png">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#08080a">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://harotensnor.github.io/paris-sportif/#org",
+      "name": "Paris-Sportif",
+      "url": "https://harotensnor.github.io/paris-sportif/",
+      "founder": { "@type": "Person", "name": "Théo Boulnois" },
+      "sameAs": ["https://github.com/Harotensnor/paris-sportif"]
+    },
+    {
+      "@type": "Dataset",
+      "name": "Paris-Sportif backtest model performance",
+      "description": "Performance vérifiée du modèle predictMatch sur 179 picks réglés (2026-04-23T18:45Z → 2026-04-25T21:30Z). WR 58.7%, ROI flat +7.2%, Brier 0.2163.",
+      "url": "https://harotensnor.github.io/paris-sportif/backtest.html",
+      "creator": { "@id": "https://harotensnor.github.io/paris-sportif/#org" },
+      "datePublished": "2026-04-26T06:38:18Z",
+      "dateModified": "2026-04-26T06:38:18Z",
+      "license": "https://github.com/Harotensnor/paris-sportif/blob/main/LICENSE",
+      "distribution": [
+        { "@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://harotensnor.github.io/paris-sportif/backtest_report_v2.json" },
+        { "@type": "DataDownload", "encodingFormat": "text/markdown", "contentUrl": "https://harotensnor.github.io/paris-sportif/backtest_report_v2.md" }
+      ],
+      "variableMeasured": ["win rate", "ROI flat", "Brier score", "log-loss", "calibration"]
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://harotensnor.github.io/paris-sportif/" },
+        { "@type": "ListItem", "position": 2, "name": "Backtest", "item": "https://harotensnor.github.io/paris-sportif/backtest.html" }
+      ]
+    }
+  ]
+}
+</script>
+
+<style>
+  :root { color-scheme: dark light; }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: "SF Pro Display", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #08080a; color: #e6ebf2;
+    line-height: 1.6; letter-spacing: -.01em;
+    font-variant-numeric: tabular-nums;
+  }
+  body { min-height: 100vh; }
+  a { color: #a78bfa; text-decoration: none; }
+  a:hover, a:focus { text-decoration: underline; }
+  code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: .92em; background: rgba(167,139,250,.1); padding: 1px 5px; border-radius: 4px; }
+  header.topbar {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(8,8,10,.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,.06);
+    padding: 12px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .brand { display: flex; align-items: center; gap: 8px; font-weight: 800; letter-spacing: -.5px; color: inherit; }
+  .brand-logo { font-size: 22px; }
+  .brand-text { font-size: 17px; }
+  .topbar nav a { margin-left: 16px; font-size: 13.5px; color: #a3a3aa; font-weight: 500; min-height: 36px; display: inline-flex; align-items: center; }
+  .topbar nav a:hover { color: #e6ebf2; text-decoration: none; }
+  main { max-width: 1100px; margin: 0 auto; padding: 16px 20px 60px; }
+  .breadcrumb { font-size: 12px; color: #6b6b73; margin-top: 14px; }
+  .uppercase-pill {
+    display: inline-block; font-size: 11px; color: #34d399;
+    text-transform: uppercase; letter-spacing: 1.4px; font-weight: 700;
+    margin: 24px 0 4px;
+  }
+  h1 { margin: 4px 0 6px; font-size: 36px; font-weight: 800; letter-spacing: -1.2px; line-height: 1.05; }
+  .lead { font-size: 14px; color: #a3a3aa; max-width: 640px; border-left: 3px solid #34d399; padding: 4px 0 4px 12px; margin: 0 0 28px; }
+  h2 { font-size: 22px; margin: 36px 0 12px; scroll-margin-top: 70px; color: #fff; }
+  h2 .subtle { font-size: 13px; font-weight: 500; color: #a3a3aa; margin-left: 8px; }
+
+  .kpi-strip {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;
+    margin: 0 0 22px;
+  }
+  .kpi-card {
+    padding: 16px 18px;
+    background: #121215;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 12px;
+  }
+  .kpi-label { font-size: 11px; color: #a3a3aa; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; margin-bottom: 4px; }
+  .kpi-value { font-size: 28px; font-weight: 800; letter-spacing: -.6px; color: #fff; }
+  .kpi-value.pos { color: #34d399; }
+  .kpi-value.neg { color: #f87171; }
+  .kpi-value.neu { color: #a78bfa; }
+  .kpi-sub { font-size: 11.5px; color: #a3a3aa; margin-top: 4px; }
+
+  .pos { color: #34d399; font-weight: 600; }
+  .neg { color: #f87171; font-weight: 600; }
+  .neu { color: #fbbf24; font-weight: 500; }
+
+  table {
+    width: 100%; border-collapse: collapse; margin: 0 0 16px;
+    background: #121215; border: 1px solid rgba(255,255,255,.08);
+    border-radius: 10px; overflow: hidden;
+    font-size: 13.5px;
+  }
+  caption { caption-side: top; text-align: left; font-size: 12px; color: #6b6b73; margin-bottom: 6px; }
+  thead th {
+    background: rgba(255,255,255,.03);
+    color: #a3a3aa; font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .6px;
+    text-align: left; padding: 10px 12px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+  }
+  tbody td {
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(255,255,255,.04);
+    color: #c5c5cc;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody td:nth-child(2), tbody td:nth-child(3), tbody td:nth-child(4),
+  tbody td:nth-child(5), tbody td:nth-child(6), tbody td:nth-child(7) {
+    text-align: right;
+  }
+
+  .meta-banner {
+    margin: 0 0 22px; padding: 14px 16px;
+    background: rgba(167,139,250,.08);
+    border: 1px solid rgba(167,139,250,.25);
+    border-left: 3px solid #a78bfa;
+    border-radius: 0 10px 10px 0;
+    font-size: 13px; color: #c5c5cc;
+  }
+  .danger-banner {
+    margin: 24px 0 0; padding: 14px 16px;
+    background: rgba(248,113,113,.06);
+    border: 1px solid rgba(248,113,113,.25);
+    border-left: 3px solid #f87171;
+    border-radius: 0 10px 10px 0;
+    font-size: 13px; color: #c5c5cc;
+  }
+  .danger-banner strong { color: #fca5a5; }
+  footer.site-footer {
+    border-top: 1px solid rgba(255,255,255,.06);
+    margin-top: 40px; padding: 24px 20px;
+    text-align: center; font-size: 12.5px; color: #6b6b73;
+  }
+  footer.site-footer nav a { margin: 0 10px; color: #a3a3aa; }
+  @media (prefers-color-scheme: light) {
+    html, body { background: #f5f5f7; color: #08080a; }
+    .topbar { background: rgba(245,245,247,.85); border-bottom-color: rgba(0,0,0,.08); }
+    .topbar nav a { color: #444; }
+    .kpi-card, table { background: #fff; border-color: rgba(0,0,0,.08); color: #2a2a30; }
+    .kpi-value { color: #08080a; }
+    h2 { color: #08080a; }
+    thead th { background: rgba(0,0,0,.03); color: #444; border-bottom-color: rgba(0,0,0,.08); }
+    tbody td { color: #2a2a30; border-bottom-color: rgba(0,0,0,.04); }
+    code { background: rgba(167,139,250,.15); }
+  }
+  @media (max-width: 600px) {
+    h1 { font-size: 28px; }
+    h2 { font-size: 18px; }
+    .topbar nav { display: none; }
+    .kpi-strip { grid-template-columns: 1fr 1fr; }
+    table { font-size: 12px; }
+    table thead th, table tbody td { padding: 6px 8px; }
+  }
+</style>
+</head>
+<body>
+<header class="topbar" role="banner">
+  <a href="./" class="brand" aria-label="Retour à l'accueil Paris-Sportif">
+    <span class="brand-logo">🎯</span>
+    <span class="brand-text">Paris-Sportif</span>
+  </a>
+  <nav aria-label="Pages éditoriales">
+    <a href="./">Accueil</a>
+    <a href="methodologie.html">Méthodologie</a>
+    <a href="academie.html">Académie</a>
+    <a href="legal.html">Légal</a>
+  </nav>
+</header>
+
+<main>
+  <nav class="breadcrumb" aria-label="Fil d'ariane">
+    <a href="./" style="color:#6b6b73;">Accueil</a> ›
+    <span style="color:#a3a3aa;">Backtest</span>
+  </nav>
+
+  <span class="uppercase-pill">Performance vérifiable · cron hebdo</span>
+  <h1>📈 Backtest du modèle</h1>
+  <p class="lead">
+    Performance réelle du modèle <code>predictMatch()</code> rejouée chaque dimanche sur tous les picks réglés depuis l'archivage
+    (<code>results_archive.jsonl</code> + <code>data.js</code>). Vrai modèle exécuté via <code>scripts/model_loader.py</code>,
+    pas une réimplémentation simplifiée.
+  </p>
+
+  <div class="meta-banner">
+    📅 Période : <b>2026-04-23T18:45Z</b> → <b>2026-04-25T21:30Z</b><br>
+    🔄 Régénéré : <b>2026-04-26 06:38 UTC</b><br>
+    📦 Sources brutes : <a href="backtest_report_v2.json">backtest_report_v2.json</a> · <a href="backtest_report_v2.md">.md</a> · <a href="results_archive.jsonl">results_archive.jsonl</a>
+  </div>
+
+  <h2 id="kpis">🎯 Vue d'ensemble</h2>
+  
+    <div class="kpi-strip">
+      <div class="kpi-card">
+        <div class="kpi-label">Picks réglés</div>
+        <div class="kpi-value">179</div>
+        <div class="kpi-sub">105 gagnés · 74 perdus</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Win rate</div>
+        <div class="kpi-value pos">58.7%</div>
+        <div class="kpi-sub">cote moy. 1.96 · prob moy. 52.6%</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">ROI flat</div>
+        <div class="kpi-value pos">+7.2%</div>
+        <div class="kpi-sub">P&amp;L +12.88u · mise plate 1u/pick</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Kelly 0.25× (cap 10%)</div>
+        <div class="kpi-value pos">+77.81u</div>
+        <div class="kpi-sub">Bankroll 100u → 177.81u</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Brier score</div>
+        <div class="kpi-value pos">0.2163</div>
+        <div class="kpi-sub">0 = parfait · 0.25 = pile/face</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Log-loss</div>
+        <div class="kpi-value">0.6221</div>
+        <div class="kpi-sub">Plus bas = mieux calibré</div>
+      </div>
+    </div>
+
+  <h2 id="tier">🏷️ Par tier de fiabilité <span class="subtle">— ce que vaut la jauge</span></h2>
+  <table><thead><tr><th>Tier</th><th>N</th><th>WR</th><th>ROI flat</th><th>P&amp;L flat</th><th>P&amp;L Kelly</th><th>Brier</th></tr></thead><tbody><tr><td><b>🔒 Lock</b></td><td>45</td><td><span class="pos">87%</span></td><td><span class="pos">+26.4%</span></td><td>+11.87u</td><td>+41.68u</td><td>0.147</td></tr><tr><td><b>✅ Standard</b></td><td>40</td><td><span class="pos">62%</span></td><td><span class="pos">+12.8%</span></td><td>+5.13u</td><td>+12.47u</td><td>0.235</td></tr><tr><td><b>⚠️ Low conf</b></td><td>13</td><td><span class="neu">54%</span></td><td><span class="pos">+25.7%</span></td><td>+3.34u</td><td>+13.00u</td><td>0.256</td></tr><tr><td><b>🚫 Skip</b></td><td>81</td><td><span class="neg">42%</span></td><td><span class="neg">-9.2%</span></td><td>-7.46u</td><td>+10.66u</td><td>0.239</td></tr></tbody></table>
+
+  <h2 id="sport">🏆 Par sport <span class="subtle">— où le modèle gagne, où il perd</span></h2>
+  <table><thead><tr><th>Sport</th><th>N</th><th>WR</th><th>ROI flat</th><th>P&amp;L flat</th><th>P&amp;L Kelly</th><th>Brier</th></tr></thead><tbody><tr><td><b>⚽ Foot</b></td><td>160</td><td><span class="pos">59%</span></td><td><span class="pos">+8.1%</span></td><td>+12.96u</td><td>+70.31u</td><td>0.214</td></tr><tr><td><b>🏀 Basket</b></td><td>8</td><td><span class="neg">38%</span></td><td><span class="neg">-51.5%</span></td><td>-4.12u</td><td>+0.00u</td><td>0.245</td></tr><tr><td><b>🏒 Hockey</b></td><td>7</td><td><span class="pos">57%</span></td><td><span class="pos">+14.6%</span></td><td>+1.02u</td><td>+7.15u</td><td>0.233</td></tr><tr><td><b>⚾ Baseball</b></td><td>4</td><td><span class="pos">100%</span></td><td><span class="pos">+75.5%</span></td><td>+3.02u</td><td>+0.35u</td><td>0.219</td></tr></tbody></table>
+
+  <h2 id="bucket">💸 Par bucket de cote <span class="subtle">— gros favori vs outsider</span></h2>
+  <table><thead><tr><th>Bucket de cote</th><th>N</th><th>WR</th><th>ROI flat</th><th>Brier</th></tr></thead><tbody><tr><td>💎 Gros favori (cote ≤ 1.40)</td><td>30</td><td><span class="pos">83%</span></td><td><span class="pos">+10.0%</span></td><td>0.146</td></tr><tr><td>📊 Favori (1.40 < cote ≤ 1.85)</td><td>76</td><td><span class="pos">66%</span></td><td><span class="pos">+14.1%</span></td><td>0.225</td></tr><tr><td>⚖️ Pile/face (1.85 < cote ≤ 2.50)</td><td>61</td><td><span class="neg">44%</span></td><td><span class="neu">+2.8%</span></td><td>0.243</td></tr><tr><td>🎲 Outsider (cote > 2.50)</td><td>12</td><td><span class="neg">25%</span></td><td><span class="neg">-21.2%</span></td><td>0.201</td></tr></tbody></table>
+
+  <h2 id="calibration">📊 Calibration probabiliste <span class="subtle">— quand on dit 70%, on gagne 70% ?</span></h2>
+  <p style="font-size:13px;color:#a3a3aa;margin:0 0 12px;">Plus le <b>gap</b> est proche de 0, mieux le modèle est calibré.
+  <code>+pp</code> = modèle sous-estime · <code>-pp</code> = modèle sur-estime.</p>
+  <table><thead><tr><th>Bin probabilité</th><th>N</th><th>Prob moyenne</th><th>WR observé</th><th>Gap</th></tr></thead><tbody><tr><td>[0.3–0.4]</td><td>24</td><td>37.7%</td><td>41.7%</td><td><span class="neu">+4.0pp</span></td></tr><tr><td>[0.4–0.5]</td><td>57</td><td>45.2%</td><td>42.1%</td><td><span class="neu">-3.1pp</span></td></tr><tr><td>[0.5–0.6]</td><td>56</td><td>54.6%</td><td>62.5%</td><td><span class="neu">+7.9pp</span></td></tr><tr><td>[0.6–0.7]</td><td>28</td><td>64.8%</td><td>78.6%</td><td><span class="neu">+13.8pp</span></td></tr><tr><td>[0.7–0.8]</td><td>11</td><td>73.0%</td><td>100.0%</td><td><span class="neu">+27.0pp</span></td></tr><tr><td>[0.8–0.9]</td><td>2</td><td>84.9%</td><td>100.0%</td><td><span class="neu">+15.1pp</span></td></tr><tr><td>[0.9–1.0]</td><td>1</td><td>91.4%</td><td>100.0%</td><td><span class="neu">+8.6pp</span></td></tr></tbody></table>
+
+  <h2 id="leagues">🏟️ Top ligues par volume</h2>
+  <table><thead><tr><th>Ligue</th><th>N</th><th>WR</th><th>ROI flat</th><th>Brier</th></tr></thead><tbody><tr><td><code>eng.3</code></td><td>12</td><td><span class="neu">50%</span></td><td><span class="neg">-17.2%</span></td><td>0.175</td></tr><tr><td><code>eng.4</code></td><td>12</td><td><span class="pos">58%</span></td><td><span class="neg">-9.5%</span></td><td>0.174</td></tr><tr><td><code>eng.2</code></td><td>9</td><td><span class="neg">44%</span></td><td><span class="neg">-10.2%</span></td><td>0.233</td></tr><tr><td><code>fra.2</code></td><td>8</td><td><span class="neg">38%</span></td><td><span class="neg">-24.4%</span></td><td>0.241</td></tr><tr><td><code>ita.2</code></td><td>8</td><td><span class="neu">50%</span></td><td><span class="neg">-12.9%</span></td><td>0.185</td></tr><tr><td><code>jpn.1</code></td><td>8</td><td><span class="pos">75%</span></td><td><span class="pos">+58.7%</span></td><td>0.244</td></tr><tr><td><code>nba</code></td><td>8</td><td><span class="neg">38%</span></td><td><span class="neg">-51.5%</span></td><td>0.245</td></tr><tr><td><code>ger.1</code></td><td>7</td><td><span class="pos">71%</span></td><td><span class="pos">+28.3%</span></td><td>0.192</td></tr><tr><td><code>nhl</code></td><td>7</td><td><span class="pos">57%</span></td><td><span class="pos">+14.6%</span></td><td>0.233</td></tr><tr><td><code>eng.1</code></td><td>6</td><td><span class="pos">83%</span></td><td><span class="pos">+60.5%</span></td><td>0.252</td></tr><tr><td><code>ven.1</code></td><td>6</td><td><span class="pos">67%</span></td><td><span class="pos">+33.5%</span></td><td>0.207</td></tr><tr><td><code>col.1</code></td><td>5</td><td><span class="neg">20%</span></td><td><span class="neg">-63.3%</span></td><td>0.315</td></tr></tbody></table>
+
+  <div class="danger-banner">
+    <strong>⚠️ Petite n.</strong> 179 picks restent insuffisants pour conclure définitivement
+    sur les sous-segments (sport, ligue, bucket de cote). Il faut typiquement <b>≥150 paris</b> par
+    catégorie pour qu'un ROI ait du sens. Avant ça, c'est de la variance. Voir <a href="methodologie.html#biais">méthodologie · biais &amp; limites</a>.
+  </div>
+
+  <p style="margin-top:32px;padding:14px 16px;background:#0c0c0f;border:1px dashed rgba(255,255,255,.1);border-radius:8px;font-size:12.5px;color:#6b6b73;text-align:center;">
+    📐 Définitions des métriques (WR, ROI flat, Brier, Kelly, calibration, CLV, tier de fiabilité) :
+    <a href="academie.html">Académie</a>. Protocole de backtest complet :
+    <a href="methodologie.html#backtest">Méthodologie</a>.
+  </p>
+</main>
+
+<footer class="site-footer" role="contentinfo">
+  <nav aria-label="Liens du site">
+    <a href="./">Accueil</a> ·
+    <a href="methodologie.html">Méthodologie</a> ·
+    <a href="academie.html">Académie</a> ·
+    <a href="legal.html">Légal</a> ·
+    <a href="https://github.com/Harotensnor/paris-sportif" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+  <div style="margin-top:8px;">⚖️ Site éducatif · réservé aux 18+ · jouer comporte des risques</div>
+</footer>
+</body>
+</html>

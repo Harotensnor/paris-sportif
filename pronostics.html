@@ -17395,6 +17395,64 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
   // Le script tiers n'est INJECTÉ QU'APRÈS le consentement explicite
   // (clic "Accepter" dans la bannière). Au refus, rien ne charge.
   // Conforme aux règles CNIL sur les traceurs.
+  // v31 — Plan d'événements (audit ChatGPT 2026-04-26 #2). Liste des events
+  // que le site tracker SI un provider analytics est activé. Tant qu'aucun
+  // n'est configuré, psEvent() est un no-op silencieux. Quand Plausible
+  // est wired, les events partent automatiquement via window.plausible(...).
+  // Cette approche garantit qu'on ne perd pas l'instrumentation entre
+  // l'activation et la désactivation (audit / opt-out).
+  //
+  // Schéma des events :
+  //   view_prono             — match modal/card opened
+  //   click_prono_card       — top pick / value pick clicked
+  //   click_methodology      — link to /methodologie.html
+  //   click_backtest         — link to /backtest.html or #backtest
+  //   click_academie         — link to /academie.html
+  //   newsletter_submit      — (pas d'inscription mail aujourd'hui)
+  //   click_bookmaker_outbound — clic vers winamax.fr
+  //   scroll_75              — scroll 75% de la page
+  //   consent_accept         — bandeau RGPD accepté
+  //   consent_refuse         — bandeau RGPD refusé
+  window.psEvent = function(name, props) {
+    try {
+      if (typeof window.plausible === 'function') {
+        window.plausible(name, props ? { props: props } : undefined);
+      } else if (typeof window.dataLayer !== 'undefined') {
+        window.dataLayer.push({ event: name, ...(props || {}) });
+      }
+      // Sinon : no-op silencieux (analytics non configurés).
+    } catch (e) { /* never let tracking break the page */ }
+  };
+
+  // Délégué global : capter automatiquement les clics outbound vers Winamax
+  // + les nav vers les pages éditoriales statiques.
+  document.addEventListener('click', function(e) {
+    const a = e.target.closest && e.target.closest('a');
+    if (!a) return;
+    const href = a.getAttribute('href') || '';
+    if (href.startsWith('http') && href.includes('winamax.fr')) {
+      window.psEvent('click_bookmaker_outbound', { dest: 'winamax' });
+    } else if (href.endsWith('methodologie.html') || href === '#methodologie') {
+      window.psEvent('click_methodology');
+    } else if (href.endsWith('academie.html') || href === '#academie') {
+      window.psEvent('click_academie');
+    } else if (href.endsWith('backtest.html') || href === '#backtest') {
+      window.psEvent('click_backtest');
+    }
+  }, { capture: true, passive: true });
+
+  // Scroll 75% — tracé une seule fois par session
+  let _scroll75Fired = false;
+  window.addEventListener('scroll', function() {
+    if (_scroll75Fired) return;
+    const h = document.documentElement;
+    const pct = (h.scrollTop + h.clientHeight) / (h.scrollHeight || 1);
+    if (pct >= 0.75) {
+      _scroll75Fired = true;
+      window.psEvent('scroll_75');
+    }
+  }, { passive: true });
+
   let _analyticsLoaded = false;
   function _maybeEnableAnalytics() {
     if (_analyticsLoaded) return;
@@ -17455,6 +17513,7 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     banner.querySelector('#consent-accept')?.addEventListener('click', () => {
       set('accepted');
       _maybeEnableAnalytics();  // v31 : load Plausible/Cloudflare AFTER consent
+      if (typeof window.psEvent === 'function') window.psEvent('consent_accept');
     });
     banner.querySelector('#consent-decline')?.addEventListener('click', () => {
       // On garde le flag pour ne pas re-afficher la bannière, mais on
@@ -17462,6 +17521,10 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       // ne wraperait pas tout le code) MAIS on ne charge AUCUN tracker
       // ni script analytics.
       set('declined');
+      // Note : on ne fire PAS consent_refuse via window.psEvent ici parce
+      // que ça déclencherait Plausible — qui n'est pas chargé puisque l'user
+      // a refusé. Si jamais il faut compter les refus, prévoir un endpoint
+      // dédié non-personnel (count uniquement).
     });
     banner.querySelector('[data-consent-details]')?.addEventListener('click', (e) => {
       e.preventDefault();

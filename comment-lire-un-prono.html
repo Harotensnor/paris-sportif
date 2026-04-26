@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Comment lire un pronostic — Guide débutant Paris-Sportif</title>
+<meta name="description" content="Lire un pronostic du dashboard Paris-Sportif en 2 minutes : pick, cote, fiabilité, edge, mise recommandée, raisons du modèle. Guide visuel pour débutants, sans jargon mathématique.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://harotensnor.github.io/paris-sportif/comment-lire-un-prono.html">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Comment lire un pronostic — Guide débutant">
+<meta property="og:description" content="Lire un pronostic du dashboard Paris-Sportif en 2 minutes. Sans jargon.">
+<meta property="og:url" content="https://harotensnor.github.io/paris-sportif/comment-lire-un-prono.html">
+<meta property="og:image" content="https://harotensnor.github.io/paris-sportif/icon-512.png">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#08080a">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://harotensnor.github.io/paris-sportif/#org",
+      "name": "Paris-Sportif",
+      "url": "https://harotensnor.github.io/paris-sportif/",
+      "founder": { "@type": "Person", "name": "Théo Boulnois" },
+      "sameAs": ["https://github.com/Harotensnor/paris-sportif"]
+    },
+    {
+      "@type": "HowTo",
+      "name": "Comment lire un pronostic Paris-Sportif",
+      "description": "Guide pas-à-pas pour comprendre une carte de prono : pick, cote, fiabilité, edge, mise recommandée, raisons du modèle.",
+      "url": "https://harotensnor.github.io/paris-sportif/comment-lire-un-prono.html",
+      "totalTime": "PT2M",
+      "step": [
+        { "@type": "HowToStep", "name": "Identifier le pick", "text": "Regarde la ligne 'Pick' : c'est l'issue que le modèle recommande (1 = domicile, N = nul, 2 = extérieur)." },
+        { "@type": "HowToStep", "name": "Lire la cote", "text": "La cote (ex: 1.85) indique combien tu récupères pour 1€ misé. Plus la cote est haute, plus l'issue est jugée improbable." },
+        { "@type": "HowToStep", "name": "Vérifier la fiabilité", "text": "Le pourcentage de fiabilité (ex: 72%) est la probabilité estimée par le modèle. Compare-la à la cote pour évaluer la valeur." },
+        { "@type": "HowToStep", "name": "Évaluer l'edge", "text": "L'edge (ex: +12pt) est l'écart entre la fiabilité du modèle et la probabilité implicite de la cote. Positif = bonne valeur potentielle." },
+        { "@type": "HowToStep", "name": "Lire les raisons", "text": "Le bloc 'Pourquoi ce pronostic' liste les composants qui ont produit le pick : marché, Elo, forme, blessures, météo." }
+      ],
+      "publisher": { "@id": "https://harotensnor.github.io/paris-sportif/#org" },
+      "inLanguage": "fr-FR"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://harotensnor.github.io/paris-sportif/" },
+        { "@type": "ListItem", "position": 2, "name": "Comment lire un pronostic", "item": "https://harotensnor.github.io/paris-sportif/comment-lire-un-prono.html" }
+      ]
+    }
+  ]
+}
+</script>
+
+<style>
+  :root { color-scheme: dark light; }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: "SF Pro Display", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #08080a; color: #e6ebf2;
+    line-height: 1.65; letter-spacing: -.01em;
+  }
+  body { min-height: 100vh; }
+  a { color: #a78bfa; text-decoration: none; }
+  a:hover, a:focus { text-decoration: underline; }
+  code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: .92em; background: rgba(167,139,250,.1); padding: 1px 5px; border-radius: 4px; }
+  header.topbar {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(8,8,10,.85); backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,.06);
+    padding: 12px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .brand { display: flex; align-items: center; gap: 8px; font-weight: 800; letter-spacing: -.5px; }
+  .brand-logo { font-size: 22px; }
+  .brand-text { font-size: 17px; }
+  .topbar nav a { margin-left: 16px; font-size: 13.5px; color: #a3a3aa; font-weight: 500; min-height: 36px; display: inline-flex; align-items: center; }
+  .topbar nav a:hover { color: #e6ebf2; text-decoration: none; }
+  main { max-width: 920px; margin: 0 auto; padding: 16px 20px 60px; }
+  .breadcrumb { font-size: 12px; color: #6b6b73; margin-top: 14px; }
+  .uppercase-pill {
+    display: inline-block; font-size: 11px; color: #fbbf24;
+    text-transform: uppercase; letter-spacing: 1.4px; font-weight: 700;
+    margin: 24px 0 4px;
+  }
+  h1 { margin: 4px 0 6px; font-size: 36px; font-weight: 800; letter-spacing: -1.2px; line-height: 1.05; }
+  .lead { font-size: 14px; color: #a3a3aa; max-width: 640px; border-left: 3px solid #fbbf24; padding: 4px 0 4px 12px; margin: 0 0 28px; }
+  h2 { font-size: 22px; margin: 36px 0 12px; color: #fff; scroll-margin-top: 70px; }
+
+  /* Mock prono card — illustrates what the dashboard shows */
+  .mock-card {
+    margin: 28px 0;
+    padding: 22px;
+    background: rgba(167,139,250,.06);
+    border: 1px solid rgba(167,139,250,.3);
+    border-radius: 14px;
+    position: relative;
+  }
+  .mock-card .corner {
+    position: absolute; top: -10px; left: 18px;
+    background: #a78bfa; color: #08080a;
+    padding: 4px 10px; font-size: 10.5px; font-weight: 700;
+    border-radius: 999px; letter-spacing: .5px; text-transform: uppercase;
+  }
+  .mock-row {
+    display: flex; flex-wrap: wrap; gap: 18px;
+    align-items: baseline; margin-bottom: 10px;
+  }
+  .teams { font-size: 17px; font-weight: 700; color: #fff; }
+  .teams .vs { color: #6b6b73; font-weight: 400; margin: 0 6px; }
+  .meta { font-size: 12px; color: #a3a3aa; }
+  .pick-row {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    margin-top: 14px; padding-top: 14px;
+    border-top: 1px solid rgba(255,255,255,.08);
+  }
+  .badge {
+    padding: 5px 11px; border-radius: 7px; font-weight: 700;
+    font-size: 13px; font-variant-numeric: tabular-nums;
+    position: relative;
+  }
+  .badge.pick { background: rgba(16,185,129,.18); color: #10b981; font-size: 14px; padding: 6px 12px; }
+  .badge.rel  { background: rgba(255,255,255,.06); color: #e6ebf2; }
+  .badge.edge { background: rgba(236,72,153,.18); color: #f472b6; }
+  .badge.kelly{ background: rgba(167,139,250,.18); color: #a78bfa; }
+
+  /* Annotation arrows */
+  .annotated { position: relative; }
+  .annot-list {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 14px; margin-top: 16px;
+  }
+  .annot-card {
+    padding: 14px 16px;
+    background: #121215; border: 1px solid rgba(255,255,255,.08);
+    border-radius: 10px; font-size: 13px; color: #c5c5cc;
+  }
+  .annot-card .num {
+    display: inline-block; width: 24px; height: 24px;
+    background: #fbbf24; color: #08080a;
+    border-radius: 50%; text-align: center; line-height: 24px;
+    font-weight: 800; font-size: 13px; margin-right: 8px;
+  }
+  .annot-card h3 { font-size: 14px; margin: 0 0 6px; color: #fff; display: inline; }
+
+  /* Reasons panel mock */
+  .reasons-panel {
+    margin: 14px 0 0;
+    padding: 12px 14px;
+    background: rgba(255,255,255,.03);
+    border-radius: 8px;
+    font-size: 13px; color: #c5c5cc;
+  }
+  .reason-row {
+    padding: 6px 0;
+    border-bottom: 1px dashed rgba(255,255,255,.06);
+  }
+  .reason-row:last-child { border-bottom: none; }
+  .reason-icon { display: inline-block; width: 22px; }
+
+  section.card {
+    padding: 18px;
+    background: #121215;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 12px;
+    font-size: 13.5px;
+    color: #c5c5cc;
+    margin-bottom: 16px;
+  }
+  section.card.warn {
+    background: rgba(248,113,113,.06);
+    border-color: rgba(248,113,113,.25);
+    border-left: 3px solid #f87171;
+    border-radius: 0 12px 12px 0;
+  }
+  ul, ol { padding-left: 22px; margin: 0 0 12px; }
+  ul li, ol li { margin-bottom: 6px; }
+  p { margin: 0 0 10px; }
+  footer.site-footer {
+    border-top: 1px solid rgba(255,255,255,.06);
+    margin-top: 40px; padding: 24px 20px;
+    text-align: center; font-size: 12.5px; color: #6b6b73;
+  }
+  footer.site-footer nav a { margin: 0 10px; color: #a3a3aa; }
+  @media (prefers-color-scheme: light) {
+    html, body { background: #f5f5f7; color: #08080a; }
+    section.card, .annot-card { background: #fff; border-color: rgba(0,0,0,.08); color: #2a2a30; }
+    .mock-card { background: rgba(167,139,250,.05); }
+    h2, .teams, .annot-card h3 { color: #08080a; }
+    .topbar { background: rgba(245,245,247,.85); border-bottom-color: rgba(0,0,0,.08); }
+    .topbar nav a { color: #444; }
+    code { background: rgba(167,139,250,.15); }
+    .badge.rel { background: rgba(0,0,0,.05); color: #08080a; }
+    .reasons-panel { background: rgba(0,0,0,.03); color: #2a2a30; }
+  }
+  @media (max-width: 600px) {
+    h1 { font-size: 26px; }
+    h2 { font-size: 18px; }
+    .topbar nav { display: none; }
+    .annot-list { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<header class="topbar" role="banner">
+  <a href="./" class="brand" aria-label="Retour à l'accueil Paris-Sportif">
+    <span class="brand-logo">🎯</span>
+    <span class="brand-text">Paris-Sportif</span>
+  </a>
+  <nav aria-label="Pages éditoriales">
+    <a href="./">Accueil</a>
+    <a href="academie.html">Académie</a>
+    <a href="methodologie.html">Méthodologie</a>
+    <a href="legal.html">Légal</a>
+  </nav>
+</header>
+
+<main>
+  <nav class="breadcrumb" aria-label="Fil d'ariane">
+    <a href="./" style="color:#6b6b73;">Accueil</a> ›
+    <span style="color:#a3a3aa;">Comment lire un pronostic</span>
+  </nav>
+
+  <span class="uppercase-pill">⏱ 2 minutes · Niveau débutant</span>
+  <h1>📖 Comment lire un pronostic</h1>
+  <p class="lead">Guide visuel des éléments d'une carte de prono sur le dashboard. Tu sortiras d'ici en sachant exactement ce que veut dire <code>@1.85 · 72% · +14pt</code>.</p>
+
+  <h2>👀 Voici une carte de pronostic</h2>
+  <p>Ci-dessous une simulation de ce que tu vois sur le dashboard quand un match a un pick. C'est une <em>maquette</em> — la vraie carte se trouve dans <a href="pronostics.html">pronostics.html</a>.</p>
+
+  <div class="mock-card">
+    <span class="corner">⭐ Top pick</span>
+    <div class="mock-row">
+      <span class="teams">Lyon <span class="vs">vs</span> Toulouse</span>
+      <span class="meta">Ligue 1 · Aujourd'hui 21:00</span>
+    </div>
+    <div class="pick-row">
+      <span class="badge pick">→ 1 · Lyon</span>
+      <span class="badge rel">@ 1.85</span>
+      <span class="badge rel">🎯 Fiab. 72%</span>
+      <span class="badge edge">💎 Edge +14pt</span>
+      <span class="badge kelly">💰 Kelly 5.4u</span>
+    </div>
+    <div class="reasons-panel">
+      <div class="reason-row"><span class="reason-icon">📊</span>Marché implicite : 54% (cote 1.85)</div>
+      <div class="reason-row"><span class="reason-icon">💪</span>Force Elo : avantage Lyon (+78 pts)</div>
+      <div class="reason-row"><span class="reason-icon">🔥</span>Forme L5 : Lyon WWWLW vs Toulouse LDLLL</div>
+      <div class="reason-row"><span class="reason-icon">⚽</span>Buts attendus : 2.10 – 0.95 (Poisson)</div>
+      <div class="reason-row"><span class="reason-icon">🩹</span>Blessures Toulouse : 2 titulaires absents</div>
+    </div>
+  </div>
+
+  <h2>🔢 Décrypter chaque élément</h2>
+  <div class="annot-list">
+    <div class="annot-card">
+      <span class="num">1</span><h3>Le pick (→ 1 · Lyon)</h3>
+      <p style="margin-top:6px;">L'issue recommandée. <code>1</code> = victoire domicile · <code>N</code> = nul · <code>2</code> = victoire extérieur. Le nom de l'équipe est rappelé pour éviter les confusions.</p>
+    </div>
+    <div class="annot-card">
+      <span class="num">2</span><h3>La cote (@ 1.85)</h3>
+      <p style="margin-top:6px;">Cote décimale sourcée depuis Winamax. Pour 1€ misé tu récupères 1.85€ si tu gagnes (mise comprise → 0.85€ net). Plus elle est haute, plus l'issue est jugée improbable par le marché.</p>
+    </div>
+    <div class="annot-card">
+      <span class="num">3</span><h3>Fiabilité (72%)</h3>
+      <p style="margin-top:6px;">La probabilité que le modèle estime pour ce pick. Pas une certitude — un 72% perd toujours 28% du temps. Mais en backtest, les "70%" ont gagné ~70% (gap &lt; 5pp).</p>
+    </div>
+    <div class="annot-card">
+      <span class="num">4</span><h3>Edge (+14pt)</h3>
+      <p style="margin-top:6px;">L'écart entre ta fiabilité (72%) et la probabilité implicite de la cote (1/1.85 = 54%). +14pt = le marché sous-estime, c'est la "value". Un edge négatif = le marché a raison, on skip.</p>
+    </div>
+    <div class="annot-card">
+      <span class="num">5</span><h3>Mise Kelly (5.4u)</h3>
+      <p style="margin-top:6px;">Mise calculée par la formule Kelly fractionnaire (0.25× cap 10% bankroll). Optimisée pour la croissance long terme avec variance contenue. Si ta cagnotte est 100€, mise 5.40€.</p>
+    </div>
+    <div class="annot-card">
+      <span class="num">6</span><h3>Le panneau "raisons"</h3>
+      <p style="margin-top:6px;">Liste des composants qui ont produit ce pick (marché, Elo, forme, xG Poisson, blessures, météo, compos…). Si tu ne comprends pas pourquoi le modèle préfère Lyon, tu trouves la réponse là.</p>
+    </div>
+  </div>
+
+  <h2>🎯 La règle d'or : Edge + Fiabilité</h2>
+  <section class="card">
+    <p>Un bon pari combine <strong>les deux</strong> :</p>
+    <ul>
+      <li><strong>Fiabilité élevée</strong> (≥ 60%) = le modèle est confiant. Mais sans edge, c'est un gros favori sans valeur — la cote est trop courte.</li>
+      <li><strong>Edge élevé</strong> (≥ +5pt) = la cote est sous-évaluée. Mais sur fiabilité 50%, c'est volatile.</li>
+      <li><strong>Les deux ensemble</strong> = c'est ce que le modèle classe en <code>lock</code> 🔒 sur le dashboard. WR backtest 87% sur ces tier-locks.</li>
+    </ul>
+  </section>
+
+  <h2>🚦 Comprendre les tiers de fiabilité</h2>
+  <section class="card">
+    <ul>
+      <li><strong>🔒 lock</strong> : prob ≥ 72% + ≥3 composants non-marché concordants. Top picks, plus volume.</li>
+      <li><strong>✅ standard</strong> : prob ≥ 55% avec couverture data minimale. Solide, à miser plus modestement.</li>
+      <li><strong>⚠️ lowconf</strong> : prob ≥ 50% mais data thin. Considérer comme un signal, pas un ordre.</li>
+      <li><strong>🚫 skip</strong> : prob &lt; 50% ou inversion modèle/marché. <em>Ne pas miser.</em></li>
+    </ul>
+  </section>
+
+  <h2>❌ Erreurs classiques à éviter</h2>
+  <section class="card warn">
+    <ul>
+      <li><strong>Miser sur tous les picks</strong>. Le modèle filtre déjà — un "skip" est une décision intentionnelle. Forcer un skip = casser le filtrage.</li>
+      <li><strong>Doubler la mise après une défaite</strong>. La variance court-terme est normale. 3-5 défaites consécutives = attendu, ne pas paniquer.</li>
+      <li><strong>Ignorer Kelly et miser plus</strong>. Kelly suppose que ta probabilité est exacte. Misant plus fort, tu accélères la ruine si tu te trompes — pas la croissance si tu as raison.</li>
+      <li><strong>Comparer sur 10 picks</strong>. Il faut typiquement 100-200 paris pour qu'un ROI commence à signifier quelque chose. Avant ça, c'est du bruit.</li>
+      <li><strong>Suivre un seul sport</strong>. Un sport en perte (-50% ROI) sur 8 paris peut juste être de la malchance. Diversifier amortit la variance.</li>
+    </ul>
+  </section>
+
+  <h2>📚 Pour aller plus loin</h2>
+  <section class="card">
+    <p>Ce guide ne couvre que la lecture d'une carte. Pour comprendre comment le modèle est construit :</p>
+    <ul>
+      <li><a href="academie.html">📖 Académie</a> — glossaire complet (22 termes : Elo, Brier, CLV, Kelly, Poisson, xG, etc.)</li>
+      <li><a href="methodologie.html">📐 Méthodologie</a> — protocole formel + dictionnaire des métriques + biais &amp; limites</li>
+      <li><a href="backtest.html">📈 Backtest</a> — performance vérifiée du modèle sur l'historique</li>
+      <li><a href="https://github.com/Harotensnor/paris-sportif" target="_blank" rel="noopener">⚙️ Code source</a> — toute la logique <code>predictMatch()</code> est lisible</li>
+    </ul>
+  </section>
+
+  <p style="margin-top:32px;padding:14px 16px;background:#0c0c0f;border:1px dashed rgba(255,255,255,.1);border-radius:8px;font-size:12.5px;color:#6b6b73;text-align:center;">
+    💡 La meilleure manière d'apprendre : regarde 5-10 picks différents sur le <a href="pronostics.html">dashboard live</a>, lis les raisons à chaque fois. Tu vas vite repérer les patterns.
+  </p>
+</main>
+
+<footer class="site-footer" role="contentinfo">
+  <nav aria-label="Liens du site">
+    <a href="./">Accueil</a> ·
+    <a href="academie.html">Académie</a> ·
+    <a href="methodologie.html">Méthodologie</a> ·
+    <a href="backtest.html">Backtest</a> ·
+    <a href="legal.html">Légal</a>
+  </nav>
+  <div style="margin-top:8px;">⚖️ Site éducatif · réservé aux 18+ · jouer comporte des risques</div>
+</footer>
+</body>
+</html>
