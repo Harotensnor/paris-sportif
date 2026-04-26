@@ -4652,6 +4652,90 @@
         </div>
       </div>
 
+      ${(() => {
+        // v31.7 — Section "Contexte du match" : toujours visible, donne le
+        // décor avant les chiffres (enjeu, forme courte, conditions).
+        // Réponse au retour user : "ajoute un texte qui explique le contexte
+        // de la rencontre, enjeux et autre".
+        const sportEm = { football:'⚽', tennis:'🎾', basketball:'🏀', hockey:'🏒', baseball:'⚾', 'american-football':'🏈', mma:'🥊', golf:'⛳', racing:'🏎️', rugby:'🏉' }[match.sport] || '🎯';
+        const dateLong = (() => {
+          try {
+            return new Date(match.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+          } catch(e) { return ''; }
+        })();
+        const timeStr = fmtTime(match.date);
+        const venue = match.venue ? `${esc(match.venue)}${match.city ? ` · ${esc(match.city)}` : ''}` : '';
+        // Forme courte : 3 derniers W/L/D par équipe via derivedForm
+        const formH = derivedForm(home);
+        const formA = derivedForm(away);
+        const fmtForm3 = (f) => {
+          if (!f || !Array.isArray(f.results) || !f.results.length) return null;
+          const last3 = f.results.slice(-3);
+          return last3.map(r => {
+            const ch = r === 'W' ? '✓' : r === 'L' ? '✗' : '·';
+            const col = r === 'W' ? '#34d399' : r === 'L' ? '#fca5a5' : 'var(--text-dim2)';
+            return `<span style="display:inline-block;width:18px;height:18px;line-height:18px;text-align:center;border-radius:50%;background:${col}22;color:${col};font-weight:700;font-size:11px;margin-right:2px;">${ch}</span>`;
+          }).join('');
+        };
+        const formHtml = (formH && fmtForm3(formH)) || '';
+        const formAHtml = (formA && fmtForm3(formA)) || '';
+        // Météo (foot avec data)
+        const weather = match.weather && (match.weather.temp_c != null || match.weather.condition) ? match.weather : null;
+        // Référé (foot)
+        const ref = match.referee && match.referee.name ? match.referee : null;
+        // Importance contexte : on déduit de la presence de h2h, importance, etc.
+        const meetingsCount = (match.h2h?.meetings || []).length;
+        const enjeuLines = [];
+        enjeuLines.push(`${sportEm} <b>${esc(match.league_name || match.league_code || 'Compétition')}</b>`);
+        if (dateLong) enjeuLines.push(`📅 ${dateLong} · ${timeStr}`);
+        if (venue) enjeuLines.push(`📍 ${venue}`);
+        // Synthèse texte enjeu (si suffisamment de données)
+        let enjeuText = '';
+        if (stdH && stdA) {
+          const rH = parseInt(stdH.rank, 10), rA = parseInt(stdA.rank, 10);
+          if (isFinite(rH) && isFinite(rA)) {
+            const top4 = (r) => r <= 4, bot4 = (r) => r >= 14;
+            if (top4(rH) && top4(rA)) enjeuText = '🔥 Choc de haut de tableau — les deux équipes visent le podium.';
+            else if (bot4(rH) && bot4(rA)) enjeuText = '🛟 Match de bas de tableau — enjeu maintien fort des deux côtés.';
+            else if (top4(rH) && bot4(rA)) enjeuText = `📈 ${esc(home?.short || home?.name || 'Domicile')} cherche à confirmer en haut de tableau face à un adversaire en difficulté.`;
+            else if (bot4(rH) && top4(rA)) enjeuText = `📈 ${esc(away?.short || away?.name || 'Extérieur')} en confiance face à une équipe en zone rouge — match piège.`;
+            else if (Math.abs(rH - rA) <= 3) enjeuText = '⚖️ Équipes au coude-à-coude au classement — match équilibré sur le papier.';
+          }
+        }
+
+        return `
+        <div class="section" style="margin-top:18px;">
+          <h4 style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+            <span style="font-size:20px;">📍</span>
+            <span>Contexte du match</span>
+          </h4>
+          ${enjeuText ? `<div style="padding:12px 14px;margin-bottom:14px;background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.18);border-left:3px solid var(--brand);border-radius:0 8px 8px 0;font-size:13.5px;color:var(--text);line-height:1.55;">${enjeuText}</div>` : ''}
+          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:14px;">
+            <div style="padding:14px 16px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;">
+              <div style="font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:8px;">🏆 Cadre</div>
+              <div style="font-size:13px;line-height:1.7;color:var(--text-2);">${enjeuLines.join('<br>')}</div>
+            </div>
+            <div style="padding:14px 16px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;">
+              <div style="font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:8px;">📊 Forme (3 derniers)</div>
+              <div style="font-size:13px;color:var(--text-2);line-height:1.6;">
+                ${formHtml ? `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span style="font-weight:600;color:var(--text);min-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(home?.short || home?.name || '?')}</span><span>${formHtml}</span></div>` : ''}
+                ${formAHtml ? `<div style="display:flex;align-items:center;gap:8px;"><span style="font-weight:600;color:var(--text);min-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(away?.short || away?.name || '?')}</span><span>${formAHtml}</span></div>` : ''}
+                ${(!formHtml && !formAHtml) ? '<span style="color:var(--text-dim2);">Forme indisponible pour ce match.</span>' : ''}
+              </div>
+            </div>
+            <div style="padding:14px 16px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;">
+              <div style="font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:8px;">🌤️ Conditions</div>
+              <div style="font-size:13px;color:var(--text-2);line-height:1.6;">
+                ${weather ? `🌡️ ${weather.temp_c != null ? Math.round(weather.temp_c) + '°C' : '—'}${weather.condition ? ' · ' + esc(weather.condition) : ''}${weather.wind_kmh != null ? ' · 💨 ' + Math.round(weather.wind_kmh) + ' km/h' : ''}<br>` : ''}
+                ${ref ? `👤 Arbitre : <b>${esc(ref.name)}</b>${ref.cards_per_match != null ? ` · ${(+ref.cards_per_match).toFixed(1)} cartons/match` : ''}<br>` : ''}
+                ${meetingsCount ? `⚔️ ${meetingsCount} confrontation${meetingsCount>1?'s':''} récente${meetingsCount>1?'s':''} (voir plus bas)<br>` : ''}
+                ${(!weather && !ref && !meetingsCount) ? '<span style="color:var(--text-dim2);">Pas de conditions externes notables détectées.</span>' : ''}
+              </div>
+            </div>
+          </div>
+        </div>`;
+      })()}
+
       ${pred ? (() => {
         const modelRes = evaluateModelPick(match, pred);
         const liveSt = evaluateLivePick(match, pred);
@@ -4703,7 +4787,54 @@
                 ${isValue ? `<span title="Le modèle estime ${(rel*100).toFixed(0)}% de chances alors que la cote n'en prévoit que ${((1/pickOdd)*100).toFixed(0)}%." style="padding:4px 10px;border-radius:6px;background:rgba(236,72,153,.14);color:#f472b6;font-weight:700;">💎 +${edgePct}pt d'avantage</span>` : (edge != null && edge > 0 && edge < 0.05 ? `<span title="Léger avantage (<5pt) — pas très intéressant." style="padding:4px 10px;border-radius:6px;background:rgba(255,255,255,.05);color:var(--text-dim2,#7b8693);font-weight:600;">+${edgePct}pt</span>` : '')}
               </div>`;
             })() : ''}
-            ${pred.explain?.headline ? `<div style="margin-top:14px;padding:12px 14px;background:rgba(255,255,255,.03);border-radius:8px;border-left:3px solid var(--accent,#10b981);font-size:13.5px;line-height:1.5;color:var(--text,#e6ebf2);">${esc(pred.explain.headline)}</div>` : ''}
+            ${(() => {
+              // v31.7 — "Pourquoi ce prono est fiable" : synthèse rédigée en
+              // français, toujours présente (ne dépend pas d'une explain.headline
+              // pré-générée). Utilise les signaux disponibles pour expliquer.
+              const rel = pred.reliability ?? pred.pick.prob;
+              const rm = pred.reliabilityMeta || {};
+              const rsCount = (pred.explain?.reasons || []).length;
+              const dq = computeDataQuality(match);
+              // Confiance label
+              let confLbl;
+              if (rel >= 0.78) confLbl = 'très haute confiance';
+              else if (rel >= 0.70) confLbl = 'haute confiance';
+              else if (rel >= 0.60) confLbl = 'confiance modérée';
+              else if (rel >= 0.50) confLbl = 'confiance limite';
+              else confLbl = 'faible confiance';
+              // Edge label
+              const edgeNum = pickOdd ? valueBetEdge(rel, pickOdd) : null;
+              let edgeLbl = '';
+              if (edgeNum != null) {
+                if (edgeNum >= 0.10) edgeLbl = ` Le marché sous-estime nettement cette issue : avantage de <b>+${Math.round(edgeNum*100)}pt</b> entre notre estimation et la cote — c'est une vraie value bet.`;
+                else if (edgeNum >= 0.05) edgeLbl = ` Avantage marché modeste mais réel : <b>+${Math.round(edgeNum*100)}pt</b> entre notre prob et la cote.`;
+                else if (edgeNum >= 0) edgeLbl = ' Le marché et notre modèle sont alignés — pas de gros edge identifié, le pick suit la cote.';
+                else edgeLbl = ` Le marché est plus optimiste que nous (${Math.round(-edgeNum*100)}pt en moins) — restons prudents sur la mise.`;
+              }
+              // Sources synthèse
+              let srcLbl = '';
+              if (rm.componentCount) {
+                srcLbl = ` Cette estimation combine <b>${rm.componentCount}</b> source${rm.componentCount>1?'s':''} de signal`;
+                if (rm.agreement != null) {
+                  const ag = Math.round(rm.agreement * 100);
+                  if (ag >= 80) srcLbl += `, qui convergent fortement (consensus ${ag}%)`;
+                  else if (ag >= 50) srcLbl += `, avec un consensus partiel (${ag}%)`;
+                  else srcLbl += `, mais avec des signaux divergents (consensus ${ag}%) — méfiance`;
+                }
+                srcLbl += '.';
+              }
+              // Data quality
+              let dqLbl = '';
+              if (dq.score >= 4) dqLbl = ` Les données disponibles sont <b>complètes</b> (${dq.score}/${dq.max}).`;
+              else if (dq.score === 3) dqLbl = ` Les données sont <b>raisonnables</b> (${dq.score}/${dq.max}).`;
+              else if (dq.score === 2) dqLbl = ` Les données sont <b>partielles</b> (${dq.score}/${dq.max}) — à pondérer.`;
+              else dqLbl = ` Données <b>incomplètes</b> (${dq.score}/${dq.max}) — confiance modérée.`;
+              return `<div style="margin-top:14px;padding:14px 16px;background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.18);border-left:3px solid var(--brand);border-radius:0 8px 8px 0;font-size:13.5px;line-height:1.6;color:var(--text);">
+                <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:8px;">💡 Pourquoi ce prono est fiable</div>
+                <div>Le modèle classe ce pick en <b>${confLbl}</b> (${(rel*100).toFixed(0)}%).${srcLbl}${edgeLbl}${dqLbl}${rsCount > 0 ? ` Voir les <b>${rsCount} signal${rsCount>1?'s':''}</b> détaillé${rsCount>1?'s':''} ci-dessous.` : ''}</div>
+              </div>`;
+            })()}
+            ${pred.explain?.headline ? `<div style="margin-top:10px;padding:12px 14px;background:rgba(255,255,255,.03);border-radius:8px;border-left:3px solid var(--accent,#10b981);font-size:13.5px;line-height:1.5;color:var(--text,#e6ebf2);">${esc(pred.explain.headline)}</div>` : ''}
             ${reasons.length ? `
             <div style="margin-top:12px;">
               <div style="font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-dim2,#7b8693);margin-bottom:8px;">Pourquoi ce pronostic</div>
