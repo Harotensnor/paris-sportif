@@ -3153,3 +3153,450 @@
       radial-gradient(800px 400px at 85% -5%, rgba(94,92,230,.06), transparent 60%),
       radial-gradient(600px 300px at -5% 8%, rgba(48,209,88,.04), transparent 60%);
   }
+
+  /* =========================================================================
+     v31.7.3 — VISUAL COHERENCE PASS (audit complet 2026-04-26)
+     -------------------------------------------------------------------------
+     Polish global qui ripple sur toutes les pages SPA :
+       - Page headers : eyebrow + h1 + sub uniformes
+       - Cards : hover lift + border glow standardisés
+       - Section h4 : style cohérent partout
+       - Tables : sticky head + alternation + hover row
+       - Empty states : icône + titre + body + CTA polish
+       - Loading skeletons : placeholders au lieu de vides
+       - Animations : entrée subtile au switch de page
+       - Badges : sport emoji + state badges harmonisés
+       - Modal détail : sections avec breathing room
+       - Inline tables overflow : scroll-x propre
+       - Aside sidebar : items hoverable mieux
+     ========================================================================= */
+
+  /* --- Page headers : pattern uniforme partout (eyebrow + h1 + sub) --- */
+  main h1 {
+    font-size: clamp(22px, 3.2vw, 30px);
+    font-weight: 800;
+    letter-spacing: -.6px;
+    line-height: 1.15;
+    color: var(--text);
+    margin: 0 0 8px;
+  }
+  main .section-eyebrow + h1,
+  main .section-title-v2 {
+    margin-top: 4px;
+  }
+  main .section-subtitle-v2 {
+    font-size: 13.5px;
+    color: var(--text-dim);
+    margin: 0 0 20px;
+    line-height: 1.55;
+    max-width: 720px;
+  }
+
+  /* --- Section h4 (utilisé dans modal détail + nombreuses pages) --- */
+  .section h4 {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 12px;
+    letter-spacing: -.2px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* --- Section spacing : 28-32px entre sections principales --- */
+  .section + .section,
+  main > div + div[class*="wrap"] {
+    margin-top: 28px;
+  }
+
+  /* --- Cards (.match, .top-pick, .panel, etc.) : hover unifié --- */
+  .top-pick, .pred-panel, .card, .panel,
+  .summary-card, .filter-btn,
+  .ed-hero, .match {
+    /* Toutes les cards interactives ont la même transition */
+    transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease;
+  }
+
+  /* --- Pred-panel (boîte "Notre pronostic" dans modal) : polish --- */
+  .pred-panel {
+    background: linear-gradient(135deg, var(--panel) 0%, var(--panel-2) 100%);
+    border: 1px solid var(--border-2);
+    border-radius: var(--r);
+    padding: 20px 22px;
+    margin-bottom: 18px;
+  }
+
+  /* --- Inline tables (modal odds, h2h, etc.) : containers responsive --- */
+  .modal table {
+    font-size: 12.5px;
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+  }
+  .modal table thead th {
+    background: var(--panel-2);
+    color: var(--text-dim2);
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border-2);
+    font-weight: 700;
+  }
+  .modal table tbody td {
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .modal table tbody tr:last-child td { border-bottom: none; }
+
+  /* --- Filter bar : chips lift + active glow --- */
+  .filter-btn {
+    border-radius: var(--r-sm);
+    padding: 8px 14px;
+    font-weight: 600;
+  }
+  .filter-btn.active {
+    background: linear-gradient(135deg, var(--brand-soft) 0%, rgba(167,139,250,.06) 100%);
+    color: var(--brand);
+    border-color: var(--brand-border);
+    box-shadow: 0 2px 8px rgba(167,139,250,.18);
+  }
+
+  /* --- Aside upcoming row (right rail dashboard) : interactions polies --- */
+  .aside-upcoming-row, .aside-live-row {
+    border-radius: 8px !important;
+    padding: 10px 12px !important;
+    margin-bottom: 8px !important;
+    transition: transform .15s ease, background .15s ease, border-color .15s ease;
+    border: 1px solid transparent !important;
+  }
+  .aside-upcoming-row:hover, .aside-live-row:hover {
+    transform: translateY(-1px);
+    border-color: var(--border-2) !important;
+  }
+
+  /* --- Bilan / Historique : tables aérées + sticky head --- */
+  .bilan-table thead {
+    position: sticky; top: 0; z-index: 5;
+  }
+  .bilan-table thead th {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  /* --- Loading skeleton (pour quand pred est en cours de calc) --- */
+  .skeleton {
+    display: inline-block;
+    background: linear-gradient(90deg, var(--panel-2) 0%, var(--panel-3) 50%, var(--panel-2) 100%);
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.5s ease-in-out infinite;
+    border-radius: 6px;
+    color: transparent;
+  }
+  @keyframes skeletonShimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .skeleton { animation: none; background: var(--panel-2); }
+  }
+
+  /* --- Page transition : fade-in subtle --- */
+  main.page-fade-in > * {
+    animation: pageFadeIn .35s ease both;
+  }
+  main.page-fade-in > *:nth-child(1) { animation-delay: 0s; }
+  main.page-fade-in > *:nth-child(2) { animation-delay: .04s; }
+  main.page-fade-in > *:nth-child(3) { animation-delay: .08s; }
+  main.page-fade-in > *:nth-child(4) { animation-delay: .12s; }
+  @keyframes pageFadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    main.page-fade-in > * { animation: none !important; }
+  }
+
+  /* --- Modal détail : breathing room + better section dividers --- */
+  .modal-backdrop .modal {
+    border-radius: 18px;
+  }
+  .modal .section {
+    margin-bottom: 22px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid var(--border);
+  }
+  .modal .section:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  .modal-head {
+    border-bottom: 1px solid var(--border-2);
+    padding-bottom: 14px;
+    margin-bottom: 14px;
+  }
+
+  /* --- Sidebar (desktop) : active item plus visible --- */
+  @media (min-width: 1100px) {
+    nav.topbar-nav .page-btn.active {
+      background: linear-gradient(135deg, var(--brand-soft) 0%, rgba(167,139,250,.04) 100%);
+      box-shadow: inset 0 0 0 1px var(--brand-border);
+    }
+    nav.topbar-nav .hub:hover .hub-btn {
+      color: var(--text);
+    }
+  }
+
+  /* --- Mobile bottom nav : active state plus marqué --- */
+  .mobile-bottom-nav .mbn-btn.active {
+    color: var(--brand);
+    background: linear-gradient(180deg, rgba(167,139,250,.10) 0%, transparent 100%);
+  }
+  .mobile-bottom-nav .mbn-btn.active::after {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 18px; height: 3px;
+    background: var(--brand);
+    border-radius: 2px;
+  }
+  .mobile-bottom-nav .mbn-btn {
+    position: relative;
+  }
+
+  /* --- Match card : score + badges polish --- */
+  .match .score {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -.3px;
+  }
+  .match .badge.lock {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+    color: #08080a;
+    box-shadow: 0 2px 8px rgba(52,211,153,.22);
+  }
+
+  /* --- Confidence pill (used in many cards) : polish --- */
+  .pred-conf-lbl, [class*="conf"] b {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -.2px;
+  }
+
+  /* --- Inputs / form : focus ring brand --- */
+  input[type="text"], input[type="search"], input[type="number"],
+  input[type="date"], input[type="email"], textarea, select {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: var(--r-sm);
+    font-family: inherit;
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+  input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--brand-border);
+    box-shadow: 0 0 0 3px var(--brand-soft);
+  }
+
+  /* --- Sport emojis : alignment cohérent --- */
+  .sport-emoji {
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 1;
+    margin-right: 4px;
+  }
+
+  /* --- Topbar utils icons : hover lift --- */
+  .theme-toggle, #notif-toggle, #level-toggle, #health-indicator, #theme-toggle {
+    transition: transform .15s ease, color .15s ease, background .15s ease;
+  }
+  .theme-toggle:hover, #notif-toggle:hover, #level-toggle:hover, #theme-toggle:hover {
+    transform: scale(1.1);
+  }
+
+  /* --- Modal close button : visible et large --- */
+  .modal-close, #close-detail, #share-detail {
+    background: var(--panel-2);
+    border: 1px solid var(--border-2);
+    color: var(--text-2);
+    padding: 8px 14px;
+    border-radius: var(--r-sm);
+    font-weight: 600;
+    font-size: 12.5px;
+    cursor: pointer;
+    transition: all .15s ease;
+  }
+  .modal-close:hover, #close-detail:hover, #share-detail:hover {
+    background: var(--panel-3);
+    border-color: var(--border-3);
+    color: var(--text);
+  }
+
+  /* --- "Retour" button (back to dashboard) : subtle pill --- */
+  .agent-return {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin: 16px 0 8px;
+    padding: 8px 14px;
+    background: transparent;
+    border: 1px solid var(--border-2);
+    color: var(--text-dim);
+    border-radius: 999px;
+    font-size: 12.5px; font-weight: 600;
+    cursor: pointer;
+    transition: all .15s ease;
+  }
+  .agent-return:hover {
+    color: var(--text);
+    border-color: var(--brand-border);
+    background: var(--brand-soft);
+  }
+
+  /* --- Avertissement honnêteté (homepage) : subtle visual --- */
+  details > summary {
+    cursor: pointer;
+    user-select: none;
+    transition: color .15s ease;
+  }
+  details > summary:hover {
+    color: var(--brand);
+  }
+  details[open] > summary {
+    margin-bottom: 8px;
+  }
+
+  /* --- Icons consistency : sport emojis a uniform size in lists --- */
+  [class*="row"] [aria-hidden="true"]:not(.mbn-icon),
+  .top-pick [aria-hidden="true"] {
+    font-size: 1.05em;
+  }
+
+  /* --- Date picker : harmonisé avec le thème --- */
+  input[type="date"] {
+    color-scheme: dark;
+  }
+  html[data-theme="light"] input[type="date"] {
+    color-scheme: light;
+  }
+
+  /* --- Improved loading state (data refresh) --- */
+  body.is-refreshing main {
+    opacity: .85;
+    transition: opacity .2s ease;
+    pointer-events: none;
+  }
+
+  /* --- Better tooltip system (.help-tooltip) --- */
+  .help-tooltip {
+    background: var(--panel);
+    border: 1px solid var(--border-2);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 12.5px;
+    color: var(--text);
+    line-height: 1.5;
+    max-width: 280px;
+    box-shadow: var(--shadow);
+    z-index: 999;
+    position: fixed;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .15s ease;
+  }
+  .help-tooltip.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .help-dot {
+    display: inline-grid; place-items: center;
+    width: 16px; height: 16px;
+    background: var(--panel-2); border: 1px solid var(--border-2);
+    border-radius: 50%;
+    color: var(--text-dim);
+    font-size: 10px; font-weight: 700;
+    cursor: help;
+    margin-left: 4px;
+    transition: all .15s ease;
+  }
+  .help-dot:hover {
+    background: var(--brand-soft);
+    border-color: var(--brand);
+    color: var(--brand);
+  }
+
+  /* --- Better divider subtle --- */
+  hr, .divider {
+    border: none;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border-2), transparent);
+    margin: 24px 0;
+  }
+
+  /* --- Lists styling (when user-content) --- */
+  .lead, .modal p, .modal li {
+    line-height: 1.6;
+  }
+
+  /* --- "Voir bilan / Voir détail" inline buttons : polish --- */
+  button[class*="btn"][style*="background:transparent"]:hover,
+  button.page-btn[style*="background:transparent"]:hover {
+    color: var(--brand) !important;
+  }
+
+  /* --- Better refresh indicator --- */
+  .refresh-indicator {
+    transition: opacity .2s ease, transform .2s ease;
+  }
+  .refresh-indicator .rfr-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px rgba(52,211,153,.6);
+    animation: pulse 1.8s ease infinite;
+  }
+
+  /* --- Toast (notification flottante) : slide-in animation --- */
+  #toast.show {
+    animation: toastSlideIn .35s cubic-bezier(.22,1,.36,1) both;
+  }
+  @keyframes toastSlideIn {
+    from { transform: translateX(120%); opacity: 0; }
+    to   { transform: translateX(0); opacity: 1; }
+  }
+
+  /* --- Prevent layout shift while images load --- */
+  img[loading="lazy"] {
+    background: var(--panel-2);
+    min-width: 16px; min-height: 16px;
+  }
+
+  /* --- Force consistent button-like elements visual style --- */
+  [role="button"] {
+    user-select: none;
+  }
+
+  /* --- Mobile : compactness pass --- */
+  @media (max-width: 720px) {
+    main h1 { font-size: 22px !important; }
+    .section h4 { font-size: 13px !important; }
+    .modal-backdrop .modal {
+      padding: 14px !important;
+    }
+    .summary-card { padding: 14px !important; }
+    .summary-card .val { font-size: 22px !important; }
+    .summary-card .lbl { font-size: 9.5px !important; }
+    .pred-panel { padding: 16px !important; }
+    .ed-hero__match { font-size: 22px !important; }
+    .ed-hero__stat { padding: 10px 12px !important; }
+    .top-pick { padding: 14px !important; }
+    /* Footer footer site polish */
+    footer.site-footer nav {
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px 12px;
+    }
+  }
+
