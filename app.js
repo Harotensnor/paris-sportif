@@ -7285,62 +7285,81 @@
 
         <!-- v30 — Daily P&L chip retiré : Théo n'enregistre pas ses paris. -->
 
-        <!-- v29 — Hero banner : vivid, Winamax-style, with live top pick -->
-        <div class="v29-hero" style="position:relative;margin:20px 0 10px;padding:28px 26px 26px;background:linear-gradient(135deg, rgba(167,139,250,.18) 0%, rgba(52,211,153,.09) 55%, rgba(251,191,36,.06) 100%), linear-gradient(180deg, var(--panel) 0%, var(--bg) 100%);border:1px solid var(--border);border-radius:16px;overflow:hidden;">
-          <div style="position:absolute;top:-40px;right:-40px;width:220px;height:220px;background:radial-gradient(circle, rgba(167,139,250,.3) 0%, transparent 70%);pointer-events:none;"></div>
-          <div style="position:absolute;bottom:-60px;left:-30px;width:180px;height:180px;background:radial-gradient(circle, rgba(52,211,153,.2) 0%, transparent 70%);pointer-events:none;"></div>
-          <div class="v29-hero-grid" style="position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:center;">
-            <div>
-              <div style="display:inline-flex;align-items:center;gap:8px;padding:4px 12px;background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);border-radius:999px;font-size:11px;color:var(--brand);font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:12px;">
-                <span style="display:inline-block;width:6px;height:6px;background:#34d399;border-radius:50%;box-shadow:0 0 8px #34d399;"></span>
-                Mis à jour ${_dataAgeMin < 10 ? "à l'instant" : _dataAgeMin < 60 ? `il y a ${_dataAgeMin}min` : `il y a ${Math.floor(_dataAgeMin/60)}h`}
+        <!-- v31.3 — Hero éditorial mobile-first (audit UX dashboard éditorial).
+             Avant : H1 marketing + subtitle verbeux + heroPick card en colonne droite.
+             Après : UNE SEULE promesse au-dessus du fold = TOP PICK clair, sans
+             bruit visuel concurrent. Le visiteur sait en 3s : quel match, quelle
+             cote, quelle confiance, 2 raisons, CTA Voir détail. -->
+        ${heroPick ? (() => {
+          const _reasons = heroPick.pred?.explain?.reasons || [];
+          // Top 2 raisons non-marché pour donner du contexte sans saturer
+          const _topReasons = _reasons.filter(r => r && r.type !== 'market').slice(0, 2);
+          const _now = Date.now();
+          const _kickoff = heroPick.m.date ? new Date(heroPick.m.date).getTime() : 0;
+          const _minToKickoff = _kickoff > _now ? Math.round((_kickoff - _now) / 60000) : null;
+          const _kickoffLabel = _minToKickoff == null
+            ? (heroPick.m.date ? fmtTime(heroPick.m.date) : '')
+            : _minToKickoff < 60 ? `dans ${_minToKickoff}min` : (_minToKickoff < 1440 ? `dans ${Math.round(_minToKickoff/60)}h` : fmtTime(heroPick.m.date));
+          return `
+          <article class="ed-hero" data-match-id="${esc(String(heroPick.m.id || ''))}" role="button" tabindex="0" aria-label="Top pick : ${esc(heroPick.homeName)} vs ${esc(heroPick.awayName)} — clic pour fiche détaillée">
+            <header class="ed-hero__top">
+              <span class="ed-hero__pill">⭐ Top pick du jour</span>
+              <span class="ed-hero__refresh" aria-live="polite">
+                <span class="ed-hero__dot" aria-hidden="true"></span>
+                MAJ ${_dataAgeMin < 10 ? "à l'instant" : _dataAgeMin < 60 ? `il y a ${_dataAgeMin}min` : `il y a ${Math.floor(_dataAgeMin/60)}h`}
+              </span>
+            </header>
+            <h1 class="ed-hero__match">${esc(heroPick.homeName)} <span class="ed-hero__vs">vs</span> ${esc(heroPick.awayName)}</h1>
+            <p class="ed-hero__meta">${esc(bestLeague.slice(0,40))}${_kickoffLabel ? ` · <b>${esc(_kickoffLabel)}</b>` : ''}</p>
+            <div class="ed-hero__stats" aria-label="Statistiques principales">
+              <div class="ed-hero__stat">
+                <span class="ed-hero__label">Pick</span>
+                <strong class="ed-hero__pick-label">${esc((heroPick.best && heroPick.best.label) || heroPick.pred.pick.label || 'Pick')}</strong>
               </div>
-              <h1 style="margin:0 0 8px;font-size:38px;font-weight:800;letter-spacing:-1.3px;line-height:1.05;color:var(--text);background:linear-gradient(90deg, var(--text) 0%, var(--brand) 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">Tes meilleurs pronos du jour</h1>
-              <div style="font-size:14.5px;color:var(--text-dim);max-width:520px;line-height:1.5;margin-bottom:14px;">Modèle data-driven, signaux croisés, mises Kelly disciplinées. On ne mise que sur <b style="color:var(--text);">Winamax</b>, on surface les meilleurs edges.</div>
-              <!-- v30 — Disclaimer variabilité court-terme. Anti-tilt + transparence
-                   honnête : un WR observé de 60% sur 100 picks reste compatible
-                   avec une série de 4-5 défaites. Visible dès le hero pour
-                   éviter que l'utilisateur ne casse son Kelly après une bad run. -->
-              <details style="max-width:520px;margin-bottom:14px;font-size:12px;color:var(--text-dim2,#7b8693);">
-                <summary style="cursor:pointer;color:var(--text-dim);font-weight:600;list-style:none;display:inline-flex;align-items:center;gap:6px;border-bottom:1px dotted var(--text-dim);">⚠️ Avertissement honnêteté <span style="opacity:.6;font-size:10px;">(clic pour développer)</span></summary>
-                <div style="margin-top:8px;padding:10px 12px;background:rgba(248,113,113,.05);border-left:2px solid #f87171;border-radius:0 6px 6px 0;line-height:1.55;color:var(--text-dim);font-size:12px;">
-                  Le modèle vise <strong style="color:var(--text);">~60% de réussite</strong> sur le long terme (mesuré sur backtest). Sur le court terme, <strong style="color:#fca5a5;">3 à 5 pertes consécutives sont normales</strong> et n'indiquent pas un dysfonctionnement. <strong style="color:var(--text);">Reste sur Kelly fractionné</strong>, ne double pas la mise après une perte, et accepte la variance. Les performances passées ne garantissent pas les futures. Ce site est un outil d'aide, pas une garantie.
-                </div>
-              </details>
-              <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                <button class="page-btn" data-page="tous" style="padding:10px 16px;background:var(--brand);color:#08080a;border:none;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;box-shadow:0 4px 14px rgba(139,92,246,.35);">Voir tous les pronos →</button>
+              <div class="ed-hero__stat">
+                <span class="ed-hero__label">Cote</span>
+                <strong class="ed-hero__odd">@${heroPick.odd.toFixed(2)}</strong>
               </div>
+              <div class="ed-hero__stat">
+                <span class="ed-hero__label">Confiance</span>
+                <strong class="ed-hero__conf">${Math.round(heroPick.rel*100)}%</strong>
+              </div>
+              ${heroPick._noEdge ? '' : `<div class="ed-hero__stat ed-hero__stat--edge">
+                <span class="ed-hero__label">Edge</span>
+                <strong class="ed-hero__edge">+${Math.round(heroPick.edge*100)}pt</strong>
+              </div>`}
             </div>
-            ${heroPick ? (() => {
-              // v30 — Voix du modèle : 1 phrase explicative tirée des reasons.
-              // On choisit la première reason non-marché (le marché c'est juste
-              // la cote, pas un argument du modèle). Si rien, on retombe sur
-              // le headline généré par predictMatch.
-              const _reasons = heroPick.pred?.explain?.reasons || [];
-              const _modelVoice = (() => {
-                const nonMarket = _reasons.find(r => r && r.type !== 'market');
-                if (nonMarket && nonMarket.text) return nonMarket.text;
-                return heroPick.pred?.explain?.headline || '';
-              })();
-              return `
-              <div class="dash-hero-pick" data-match-id="${esc(String(heroPick.m.id || ''))}" role="button" tabindex="0" aria-label="Ouvrir la fiche match du prono vedette" style="padding:18px 20px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);border-left:3px solid var(--accent);border-radius:0 12px 12px 0;min-width:260px;cursor:pointer;transition:transform .12s, background .12s;" onmouseover="this.style.background='rgba(16,185,129,.13)';this.style.transform='translateY(-1px)';" onmouseout="this.style.background='rgba(16,185,129,.08)';this.style.transform='translateY(0)';">
-                <div style="font-size:10px;color:var(--accent);letter-spacing:.8px;text-transform:uppercase;font-weight:700;margin-bottom:6px;">⭐ Prono vedette · clic pour la fiche</div>
-                <div style="font-size:15px;font-weight:700;color:var(--text);line-height:1.25;">${esc(heroPick.homeName)} <span style="color:var(--text-dim);font-weight:400;">vs</span> ${esc(heroPick.awayName)}</div>
-                <div style="font-size:11px;color:var(--text-dim);margin-top:2px;">${esc(bestLeague.slice(0,30))} · ${esc(fmtTime(heroPick.m.date))}</div>
-                <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:baseline;gap:12px;">
-                  <div style="font-size:22px;font-weight:800;color:var(--accent);letter-spacing:-.4px;">@${heroPick.odd.toFixed(2)}</div>
-                  <div style="font-size:11px;color:var(--text-dim);">Conf. <b style="color:var(--text);">${Math.round(heroPick.rel*100)}%</b>${heroPick._noEdge ? '' : ` · Edge <b style="color:var(--accent);">+${Math.round(heroPick.edge*100)}pt</b>`}</div>
-                </div>
-                <div style="margin-top:6px;font-size:12px;color:var(--text);font-weight:600;">→ ${esc((heroPick.best && heroPick.best.label) || heroPick.pred.pick.label || 'Pick')}</div>
-                ${_modelVoice ? `<div style="margin-top:10px;padding:8px 10px;background:rgba(255,255,255,.04);border-radius:6px;font-size:11.5px;color:var(--text-dim);line-height:1.45;border-left:2px solid var(--brand);"><span style="color:var(--brand);font-weight:700;">🤖 Le modèle dit :</span> ${esc(_modelVoice)}</div>` : ''}
-              </div>`;
-            })() : `
-            <div style="padding:18px 20px;background:rgba(148,163,184,.06);border:1px dashed var(--border-2);border-radius:12px;min-width:260px;text-align:center;">
-              <div style="font-size:11px;color:var(--text-dim);letter-spacing:.5px;text-transform:uppercase;font-weight:600;">Aucun prono vedette</div>
-              <div style="font-size:12.5px;color:var(--text-dim2,#7b8693);margin-top:6px;line-height:1.4;">Pas de match avec edge ≥ 5% et conf. ≥ 55% disponible.</div>
-            </div>`}
-          </div>
-        </div>
+            ${_topReasons.length ? `
+              <div class="ed-hero__reasons" aria-label="Pourquoi ce pick">
+                <div class="ed-hero__reasons-title">Pourquoi ce pick :</div>
+                ${_topReasons.map(r => `<div class="ed-hero__reason"><span aria-hidden="true">${r.icon || '•'}</span> ${esc(r.text)}</div>`).join('')}
+              </div>
+            ` : ''}
+            <footer class="ed-hero__cta">
+              <span class="ed-hero__cta-btn">Voir le détail →</span>
+              <button type="button" class="ed-hero__secondary page-btn" data-page="tous" onclick="event.stopPropagation();">Tous les pronos</button>
+            </footer>
+          </article>
+          <details class="ed-hero__honesty">
+            <summary>⚠️ Avertissement honnêteté <span class="ed-hero__honesty-hint">(clic pour développer)</span></summary>
+            <div>
+              Le modèle vise <strong>~60% de réussite</strong> sur le long terme (mesuré sur backtest). Sur le court terme, <strong>3 à 5 pertes consécutives sont normales</strong> et n'indiquent pas un dysfonctionnement. Reste sur Kelly fractionné, ne double pas la mise après une perte, accepte la variance. Les performances passées ne garantissent pas les futures. Ce site est un outil d'aide, pas une garantie. <a href="legal.html">Détails légaux</a> · <a href="methodologie.html#biais">Biais &amp; limites</a>
+            </div>
+          </details>` ;
+        })() : `
+          <article class="ed-hero ed-hero--empty">
+            <header class="ed-hero__top">
+              <span class="ed-hero__pill">⭐ Top pick du jour</span>
+            </header>
+            <p class="ed-hero__empty">
+              Pas de match avec edge ≥ 5% et confiance ≥ 55% disponible aujourd'hui.
+              Le modèle préfère ne rien recommander plutôt que de surfacer du bruit.
+            </p>
+            <footer class="ed-hero__cta">
+              <button type="button" class="ed-hero__cta-btn page-btn" data-page="tous">Tous les pronos</button>
+            </footer>
+          </article>
+        `}
 
         <!-- v30 — Streak banner : MODÈLE (pas perso). On regarde les derniers
              picks réglés par _agentReplay (foot/tennis/basket/hockey) et on
@@ -8174,7 +8193,11 @@
       const m = _matchById(id);
       if (m && typeof openDetail === 'function') openDetail(m);
     };
-    wrap.querySelectorAll('.dash-hero-pick, .dash-pick-card').forEach(card => {
+    // v31.3 — .ed-hero ajouté au selector. C'est le nouveau hero éditorial
+    // qui remplace .dash-hero-pick depuis l'audit UX dashboard. Même handler
+    // (open match modal au click), mais nouveau markup. Ancien sélecteur
+    // gardé en safety pour les caches transitoires.
+    wrap.querySelectorAll('.ed-hero[data-match-id], .dash-hero-pick, .dash-pick-card').forEach(card => {
       card.addEventListener('click', (e) => {
         if (_isInteractiveTarget(e.target)) return;
         _openCardMatch(card);
