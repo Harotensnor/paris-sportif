@@ -334,6 +334,17 @@ def run_backtest(opts) -> dict:
                 else 'lowconf' if pred.get('lowConf')
                 else 'standard')
 
+        # v31.7.38 — CLV (Closing Line Value). Si on a le closing odd
+        # (capturé par snapshot_odds.py 10min avant kickoff), on calcule
+        # la valeur capturée vs le marché à la fermeture. Positif = on a
+        # battu le marché. Indicateur le plus fiable d'edge réel.
+        # CLV_pct = (our_odds / closing_odds - 1) × 100
+        closing_odds_obj = ev.get('closing_odds') or {}
+        closing_cote = closing_odds_obj.get(pick_side)
+        clv_pct = None
+        if closing_cote and closing_cote > 1:
+            clv_pct = (cote / closing_cote - 1) * 100
+
         results.append({
             'id': ev.get('id'),
             'name': ev.get('name'),
@@ -346,6 +357,8 @@ def run_backtest(opts) -> dict:
             'reliability': reliability,
             'tier': tier,
             'cote': cote,
+            'closing_cote': closing_cote,
+            'clv_pct': clv_pct,
             'cote_bucket': bucket_for(cote),
             'outcome': outcome,
             'won': won,
@@ -370,10 +383,13 @@ def summarize(rows: list[dict]) -> dict:
         return {'n': 0, 'wins': 0, 'losses': 0, 'win_rate': 0.0,
                 'flat_roi_pct': 0.0, 'kelly_pnl': 0.0,
                 'brier': 0.0, 'logloss': 0.0, 'avg_cote': 0.0,
-                'avg_pick_prob': 0.0}
+                'avg_pick_prob': 0.0, 'avg_clv_pct': None, 'n_with_clv': 0}
     wins = sum(1 for r in rows if r['won'])
     flat_pnl = sum(r['flat_pnl'] for r in rows)
     kelly_pnl = sum(r['kelly_pnl'] for r in rows)
+    # v31.7.38 — CLV moyen sur les rows avec closing_odds disponible.
+    clv_rows = [r for r in rows if r.get('clv_pct') is not None]
+    avg_clv = round(mean(r['clv_pct'] for r in clv_rows), 2) if clv_rows else None
     return {
         'n': len(rows),
         'wins': wins,
@@ -386,6 +402,8 @@ def summarize(rows: list[dict]) -> dict:
         'logloss': round(mean(r['logloss'] for r in rows), 4),
         'avg_cote': round(mean(r['cote'] for r in rows), 2),
         'avg_pick_prob': round(mean(r['pick_prob'] for r in rows), 3),
+        'avg_clv_pct': avg_clv,
+        'n_with_clv': len(clv_rows),
     }
 
 
