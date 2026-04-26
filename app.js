@@ -14286,11 +14286,12 @@
     });
     const _availSports = Object.entries(_sportCounts).sort((a,b) => b[1]-a[1]);
     const _totalPicksInWindow = _availSports.reduce((s, [,c]) => s + c, 0);
+    // v31.7.28 a11y : role=toolbar + aria-pressed sur les pills sport-filter.
     const _sportFilterHtml = _availSports.length >= 2 ? `
-      <div style="max-width:1280px;margin:0 auto 16px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-variant-numeric:tabular-nums;">
+      <div role="toolbar" aria-label="Filtrer le bilan par sport" style="max-width:1280px;margin:0 auto 16px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-variant-numeric:tabular-nums;">
         <span style="font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-dim2);font-weight:700;margin-right:4px;">Filtrer par sport</span>
-        <button class="bilan-sport-btn${_bilanSport === null ? ' active' : ''}" data-sport="" title="Tous les sports" style="padding:6px 12px;border-radius:6px;border:1px solid ${_bilanSport === null ? 'var(--brand)' : 'var(--border)'};background:${_bilanSport === null ? 'rgba(167,139,250,.12)' : 'var(--panel)'};color:${_bilanSport === null ? 'var(--brand)' : 'var(--text-dim)'};font-size:12px;font-weight:${_bilanSport === null ? 700 : 500};cursor:pointer;display:inline-flex;align-items:center;gap:6px;">Tous<span style="opacity:.6;">${_totalPicksInWindow}</span></button>
-        ${_availSports.map(([sp, n]) => `<button class="bilan-sport-btn${_bilanSport === sp ? ' active' : ''}" data-sport="${esc(sp)}" title="${esc(sportLabel(sp))} · ${n} pari${n>1?'s':''}" style="padding:6px 12px;border-radius:6px;border:1px solid ${_bilanSport === sp ? 'var(--brand)' : 'var(--border)'};background:${_bilanSport === sp ? 'rgba(167,139,250,.12)' : 'var(--panel)'};color:${_bilanSport === sp ? 'var(--brand)' : 'var(--text-dim)'};font-size:12px;font-weight:${_bilanSport === sp ? 700 : 500};cursor:pointer;display:inline-flex;align-items:center;gap:6px;">${sportIcon(sp)} ${esc(sportLabel(sp))}<span style="opacity:.6;">${n}</span></button>`).join('')}
+        <button class="bilan-sport-btn${_bilanSport === null ? ' active' : ''}" data-sport="" title="Tous les sports" aria-label="Afficher tous les sports" aria-pressed="${_bilanSport === null}" style="padding:6px 12px;border-radius:6px;border:1px solid ${_bilanSport === null ? 'var(--brand)' : 'var(--border)'};background:${_bilanSport === null ? 'rgba(167,139,250,.12)' : 'var(--panel)'};color:${_bilanSport === null ? 'var(--brand)' : 'var(--text-dim)'};font-size:12px;font-weight:${_bilanSport === null ? 700 : 500};cursor:pointer;display:inline-flex;align-items:center;gap:6px;">Tous<span style="opacity:.6;">${_totalPicksInWindow}</span></button>
+        ${_availSports.map(([sp, n]) => `<button class="bilan-sport-btn${_bilanSport === sp ? ' active' : ''}" data-sport="${esc(sp)}" title="${esc(sportLabel(sp))} · ${n} pari${n>1?'s':''}" aria-label="Filtrer sur ${esc(sportLabel(sp))}, ${n} pari${n>1?'s':''}" aria-pressed="${_bilanSport === sp}" style="padding:6px 12px;border-radius:6px;border:1px solid ${_bilanSport === sp ? 'var(--brand)' : 'var(--border)'};background:${_bilanSport === sp ? 'rgba(167,139,250,.12)' : 'var(--panel)'};color:${_bilanSport === sp ? 'var(--brand)' : 'var(--text-dim)'};font-size:12px;font-weight:${_bilanSport === sp ? 700 : 500};cursor:pointer;display:inline-flex;align-items:center;gap:6px;">${sportIcon(sp)} ${esc(sportLabel(sp))}<span style="opacity:.6;">${n}</span></button>`).join('')}
       </div>
     ` : '';
 
@@ -15055,19 +15056,23 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       daysOfDataAvailable = Math.floor((today - earliest) / (1000 * 60 * 60 * 24));
     }
 
+    // v31.7.28 a11y : role=toolbar + aria-label descriptifs sur chaque
+    // bouton fenêtre + aria-pressed pour le toggle Comparer.
     const windowToolbarHtml = `
-      <div class="bilan-window-toolbar" aria-label="Fenêtre temporelle">
+      <div class="bilan-window-toolbar" role="toolbar" aria-label="Fenêtre temporelle du bilan">
         <span class="win-lbl">Fenêtre :</span>
         ${[
-          [7, '7j'], [30, '30j'], [90, '90j'], [0, 'Tout'],
-        ].map(([v, lbl]) => {
+          [7, '7j', '7 derniers jours'], [30, '30j', '30 derniers jours'],
+          [90, '90j', '90 derniers jours'], [0, 'Tout', 'Historique complet'],
+        ].map(([v, lbl, full]) => {
           const isDisabled = v > 0 && v > daysOfDataAvailable;
           const daysNeeded = v - daysOfDataAvailable;
           const disabledAttr = isDisabled ? 'disabled' : '';
-          const tooltip = isDisabled ? `Dispo dans ${daysNeeded} jour${daysNeeded>1?'s':''}` : '';
-          return `<button class="bilan-win-btn${_bilanWindow===v?' active':''}" data-win="${v}" ${disabledAttr} title="${tooltip}" style="${isDisabled ? 'opacity:.5;cursor:not-allowed;' : ''}">${lbl}</button>`;
+          const tooltip = isDisabled ? `Dispo dans ${daysNeeded} jour${daysNeeded>1?'s':''}` : full;
+          const isActive = _bilanWindow === v;
+          return `<button class="bilan-win-btn${isActive?' active':''}" data-win="${v}" ${disabledAttr} title="${tooltip}" aria-label="Filtrer sur ${full}" aria-pressed="${isActive}" style="${isDisabled ? 'opacity:.5;cursor:not-allowed;' : ''}">${lbl}</button>`;
         }).join('')}
-        <button id="bilan-compare-toggle" class="bilan-win-btn${_bilanCompareMode ? ' active' : ''}" title="${_bilanCompareMode ? 'Désactiver la comparaison multi-fenêtres' : 'Superposer 7j/30j/90j sur le même chart'}" style="margin-left:8px;border-color:${_bilanCompareMode ? 'var(--brand)' : 'var(--border)'};">📊 Comparer</button>
+        <button id="bilan-compare-toggle" class="bilan-win-btn${_bilanCompareMode ? ' active' : ''}" title="${_bilanCompareMode ? 'Désactiver la comparaison multi-fenêtres' : 'Superposer 7j/30j/90j sur le même chart'}" aria-label="Mode comparaison multi-fenêtres" aria-pressed="${_bilanCompareMode}" style="margin-left:8px;border-color:${_bilanCompareMode ? 'var(--brand)' : 'var(--border)'};">📊 Comparer</button>
         <span class="win-hint">${rows.length} pari${rows.length>1?'s':''} sur ${winLabel.toLowerCase()}</span>
       </div>
     `;
