@@ -1801,10 +1801,12 @@
       max-width: calc(100vw - 264px - 308px - 64px);
     }
     /* v31.7.13 — Quand sidebar (240px) + right rail (272px) sont actifs
-       simultanement (>=1280px), 4 colonnes 1fr ne tiennent pas confortablement
-       sur viewports etroits 1280-1500px. Force 3 colonnes ; la 4eme stat (EDGE)
-       passe en dessous des 3 premieres en visualité.
-       Au-dessus de 1500px, 4 colonnes redeviennent OK (assez d'espace). */
+       simultanement (>=1280px), 4 colonnes 1fr ne tiennent pas confortablement,
+       meme a 1900px+ (le hero peut s'etendre dans la zone du rail malgre
+       max-width). Force 3 colonnes en permanence quand sidebar+rail actifs ;
+       la 4eme stat (EDGE) passe en pleine largeur en dessous.
+       v31.7.15 fix : supprime la sur-règle 1500px qui re-causait le bug a
+       grand viewport. */
     body.agent-home .ed-hero__stats,
     body.agent-inside .ed-hero__stats {
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1812,16 +1814,6 @@
     body.agent-home .ed-hero__stat--edge,
     body.agent-inside .ed-hero__stat--edge {
       grid-column: 1 / -1;
-    }
-  }
-  @media (min-width: 1500px) {
-    body.agent-home .ed-hero__stats,
-    body.agent-inside .ed-hero__stats {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-    body.agent-home .ed-hero__stat--edge,
-    body.agent-inside .ed-hero__stat--edge {
-      grid-column: auto;
     }
   }
 
