@@ -63,6 +63,10 @@ FETCH_STAGES = [
     ('patch_tennis_features.py',   1,   30),
     ('fetch_footballdata.py',      1,   60),   # closing odds + league calibration, 6h cache
     ('patch_footballdata.py',      1,   30),
+    ('fetch_mlb_pitchers.py',      5,   60),   # MLB Stats API probable pitchers, 6h cache
+    ('patch_mlb_pitchers.py',      1,   15),
+    ('fetch_nhl_stats.py',        10,   60),   # NHL official API team stats + starting goalie, 10min cache
+    ('patch_nhl_stats.py',         1,   15),
     ('fetch_forebet.py',           5,   60),
     ('fetch_tips.py',             15,  120),   # RdJ, respectful cadence
     ('fetch_injuries_soccer.py', 120,  180),   # Sofascore, ~2h

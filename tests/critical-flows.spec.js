@@ -368,3 +368,73 @@ test.describe('Custom modals (replace prompt/confirm)', () => {
     expect(await valuePromise).toBe(false);
   });
 });
+
+// Regression guard for the Winamax 1n2 alignment bug fixed in b6b8e1b.
+// fetch_winamax_catalog.py persists `home_name` / `away_name` selection
+// labels alongside the {home, away} odds so patch_winamax_markets can
+// detect when Winamax stored its 'home' selection under what is actually
+// ESPN's away competitor (frequent on tennis where the favorite is listed
+// first regardless of match-title order). Without these labels, the
+// alignment patch silently no-ops and we surface absurd edges (Fils @6.00
+// vs Nava on clay was the canary that caught it).
+test.describe('Winamax 1n2 alignment integrity', () => {
+  test('every winamax.markets.1n2 with labels matches ESPN competitors order', async ({ page }) => {
+    await page.goto(URL);
+    // Wait for the lazy-loaded full payload (the inline LITE blob covers
+    // today; data.js is fetched right after first paint and merged in).
+    await page.waitForFunction(() => {
+      const d = window.PRONOSTICS_DATA;
+      return d && d.days && Object.keys(d.days).length > 1;
+    }, { timeout: 8000 });
+
+    const result = await page.evaluate(() => {
+      function tokens(s) {
+        if (!s) return new Set();
+        const norm = String(s).normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9 ]/g, ' ');
+        const parts = norm.split(/\s+/).filter(Boolean);
+        const out = new Set(parts);
+        if (parts.length >= 2) out.add(parts.join(''));
+        return out;
+      }
+      const days = window.PRONOSTICS_DATA?.days || {};
+      let total = 0, misaligned = 0;
+      const samples = [];
+      for (const evs of Object.values(days)) {
+        for (const ev of (evs || [])) {
+          const n12 = ev?.winamax?.markets?.['1n2'];
+          if (!n12 || !n12.home_name || !n12.away_name) continue;
+          const comps = ev.competitors || [];
+          if (comps.length !== 2) continue;
+          const espnHome = comps[0]?.name || '';
+          const espnAway = comps[1]?.name || '';
+          if (!espnHome || !espnAway) continue;
+          total++;
+          const wxHomeT = tokens(n12.home_name);
+          const espnHomeT = tokens(espnHome);
+          const espnAwayT = tokens(espnAway);
+          const homeShared = [...wxHomeT].some(t => espnHomeT.has(t));
+          const awayShared = [...wxHomeT].some(t => espnAwayT.has(t));
+          // Misaligned when Winamax 'home' matches ESPN 'away' but NOT
+          // ESPN 'home'. Same logic as patch_winamax_markets._align_markets_to_espn.
+          if (awayShared && !homeShared) {
+            misaligned++;
+            if (samples.length < 5) {
+              samples.push({
+                espn: `${espnHome} vs ${espnAway}`,
+                wx: `${n12.home_name} vs ${n12.away_name}`,
+                odds: `${n12.home} | ${n12.away}`,
+              });
+            }
+          }
+        }
+      }
+      return { total, misaligned, samples };
+    });
+
+    if (result.misaligned > 0) {
+      console.error('Winamax misalignments:', JSON.stringify(result.samples, null, 2));
+    }
+    expect(result.total).toBeGreaterThan(0);  // sanity : the labels feature is shipped
+    expect(result.misaligned).toBe(0);
+  });
+});

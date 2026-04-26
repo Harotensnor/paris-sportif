@@ -127,6 +127,20 @@ jobs:
           # 6h cache on the source CSVs.
           python3 fetch_footballdata.py || true
           python3 patch_footballdata.py || true
+          # v30 — MLB probable pitchers (statsapi.mlb.com, no key, free).
+          # Single biggest non-market signal in baseball : starting
+          # pitcher ERA differential. 6h cache per pitcher.
+          if [ $MIN_MOD15 -lt 5 ]; then
+            python3 fetch_mlb_pitchers.py || true
+          fi
+          python3 patch_mlb_pitchers.py || true
+          # v30 — NHL official API (api-web.nhle.com, no key, free).
+          # Replaces MoneyPuck (Cloudflare-blocked). Team pace + starting
+          # goalie SV%. 10min cache.
+          if [ $MIN_MOD15 -lt 5 ]; then
+            python3 fetch_nhl_stats.py || true
+          fi
+          python3 patch_nhl_stats.py || true
           # Build health.json — compact pipeline status snapshot. Visible at
           # https://harotensnor.github.io/paris-sportif/health.json so we can
           # spot stale/missing sources without scraping the workflow logs.
@@ -153,7 +167,8 @@ jobs:
                   lineups_soccer.json clubelo.json weather.json \
                   weather_geo_cache.json referees_soccer.json health.json \
                   data_today.json data_manifest.json team_form.json \
-                  results_archive.jsonl tennis_ratings.json footballdata.json 2>/dev/null || true
+                  results_archive.jsonl tennis_ratings.json footballdata.json \
+                  mlb_pitchers.json nhl_stats.json 2>/dev/null || true
           # Only stamp sw.js if we have real content changes — otherwise
           # discard the version bump to avoid 288 empty commits/day.
           if git diff --cached --quiet; then
