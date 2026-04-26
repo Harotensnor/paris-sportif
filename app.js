@@ -14743,6 +14743,13 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       <!-- TIME-WINDOW FILTER -->
       ${windowToolbarHtml}
 
+      <!-- v31.7.8 — Bouton Export CSV du bilan -->
+      <div style="max-width:1280px;margin:0 auto 14px;display:flex;justify-content:flex-end;gap:8px;align-items:center;">
+        <button id="bilan-export-csv" type="button" style="padding:8px 14px;background:transparent;border:1px solid var(--border-2);color:var(--text-dim);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .15s ease;">
+          ⬇ Export CSV (${rows.length} paris)
+        </button>
+      </div>
+
       <!-- CCCC : COACH IA NARRATIVE -->
       ${narrativeHtml}
 
@@ -15022,6 +15029,36 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       // Scroll to top so user sees the new filter applied
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }));
+    // v31.7.8 — Export CSV du bilan (rows actuel = filtre window+sport)
+    const exportBtn = wrap.querySelector('#bilan-export-csv');
+    if (exportBtn) {
+      exportBtn.addEventListener('click', () => {
+        // CSV header
+        const lines = ['date,sport,league,home,away,pick,odd,confidence,result,pl_units'];
+        rows.forEach(r => {
+          const sides = (typeof getSides === 'function') ? getSides(r.m) : { home: {}, away: {} };
+          const homeName = (sides.home?.name || '?').replace(/[",\n]/g, ' ').slice(0, 60);
+          const awayName = (sides.away?.name || '?').replace(/[",\n]/g, ' ').slice(0, 60);
+          const date = (r.m.date || '').slice(0, 10);
+          const league = (r.m.league_name || '').replace(/[",\n]/g, ' ');
+          const pick = (r.pred.pick?.label || r.pred.pick?.key || '').replace(/[",\n]/g, ' ');
+          const conf = ((r.pred.reliability ?? r.pred.pick?.prob ?? 0) * 100).toFixed(1);
+          const pl = r.res === 'won' ? (r.odd - 1).toFixed(2) : '-1.00';
+          lines.push(`${date},${r.m.sport},"${league}","${homeName}","${awayName}","${pick}",${r.odd.toFixed(2)},${conf},${r.res},${pl}`);
+        });
+        const csv = lines.join('\n');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const sportSuffix = _bilanSport ? `-${_bilanSport}` : '';
+        const winSuffix = _bilanWindow > 0 ? `-${_bilanWindow}j` : '';
+        a.download = `bilan${sportSuffix}${winSuffix}-${new Date().toISOString().slice(0,10)}.csv`;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1500);
+        try { if (typeof toast === 'function') toast('✓ CSV téléchargé', 'success'); } catch(e){}
+      });
+    }
   }
   // Pagination state for bilan history (persists across re-renders during session)
   let _bilanHistLimits = { perso: 40, modele: 40 };
