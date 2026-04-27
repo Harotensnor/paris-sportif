@@ -232,9 +232,85 @@
     background: var(--panel);
     border: 1px solid var(--border);
     border-radius: var(--r-lg);
-    padding: 18px;
+    padding: 20px;
   }
   .card-base--compact { padding: 14px 16px; }
+  .card-base--md { padding: 18px; }
+  /* v31.7.67 — Pattern card "info" plus petit, padding 10×12, border-radius 8 */
+  .card-info {
+    padding: 10px 12px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  /* Section heading h3 récurrent */
+  .section-h3 {
+    margin: 0 0 12px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  /* H2 page récurrent */
+  .page-h2 {
+    font-size: 18px;
+    margin: 0 0 12px;
+    color: var(--text);
+    letter-spacing: -.3px;
+  }
+  /* H1 hero (40px) — pattern récurrent dans renderXxxPage */
+  .page-h1 {
+    margin: 0 0 6px;
+    font-size: 40px;
+    font-weight: 800;
+    letter-spacing: -1.4px;
+    color: var(--text);
+    line-height: 1.1;
+  }
+  /* Page wrap container — max-width:1280, padding:4px, tabular */
+  .page-wrap {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 4px 0 0;
+    font-variant-numeric: tabular-nums;
+  }
+  /* Page header section avec border-bottom */
+  .page-header {
+    margin-bottom: 24px;
+    padding: 32px 0 20px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+  /* Eyebrow tiny label avec margin-bottom */
+  .lbl-tiny-mb {
+    font-size: 11px;
+    letter-spacing: .6px;
+    text-transform: uppercase;
+    color: var(--text-dim2, #7b8693);
+    margin-bottom: 8px;
+  }
+  /* Truncate text utility */
+  .text-trunc-x {
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  /* Eyebrow tiny avec font 11.5px et margin-bottom 4 */
+  .lbl-mini {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    margin-bottom: 4px;
+  }
+  /* Section pill background light */
+  .card-soft {
+    padding: 14px 16px;
+    background: rgba(255,255,255,.02);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
 
   /* v31.7.42 — A11y utility : visually-hidden mais accessible aux SR.
      Utilisé pour les labels des inputs sans texte visible (bankroll, etc.). */
