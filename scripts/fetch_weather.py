@@ -275,6 +275,10 @@ def geocode(name: str, geo_cache: dict) -> tuple[str, float, float] | None:
 
 
 def resolve_city(team_name: str, geo_cache: dict) -> tuple[str, float, float] | None:
+    """Legacy : resolve par nom d'équipe seul. Reste pour compat ; à
+    préférer : `resolve_event_location(ev, ...)` qui utilise event.city
+    en priorité (audit-2026-04-27 P3).
+    """
     key = normalize(team_name)
     if key in CITIES:
         return CITIES[key]
@@ -286,6 +290,67 @@ def resolve_city(team_name: str, geo_cache: dict) -> tuple[str, float, float] | 
                 return CITIES[k2]
     # Geocode fallback
     return geocode(team_name, geo_cache)
+
+
+def resolve_event_location(ev: dict, geo_cache: dict) -> tuple[str, float, float, str] | None:
+    """AUDIT-2026-04-27 (P3) — Résolution prioritaire par event.city + country.
+
+    L'ancienne logique géocodait le NOM DE L'EQUIPE quand la table
+    statique n'avait pas l'entrée. Open-Meteo retourne alors le 1er
+    résultat mondial → Tarma/ADT → Ada, Stockholm/AIK → Aiken,
+    Glasgow/Rangers → Rangersdorf.
+
+    Nouveau ordre :
+      1. event.city (+ country) → geocode "Okayama, Japan"
+      2. event.venue (+ country) → geocode "Camp Nou, Spain"
+      3. mapping statique CITIES par nom d'équipe
+      4. (rejected) géocodage du nom d'équipe : confiance trop faible
+
+    Retourne (city, lat, lon, source) où source ∈ {event_city,
+    event_venue, static_team, geocode_team_low_conf}. Le frontend peut
+    ignorer la météo si source = low_conf.
+    """
+    # 1) event.city + country : la source la plus fiable
+    ev_city = (ev.get('city') or '').strip()
+    ev_country = (ev.get('country') or '').strip()
+    if ev_city:
+        query = f'{ev_city}, {ev_country}' if ev_country else ev_city
+        loc = geocode(query, geo_cache)
+        if loc:
+            return (loc[0], loc[1], loc[2], 'event_city')
+        # Sans country, retry sur city seul
+        if ev_country:
+            loc = geocode(ev_city, geo_cache)
+            if loc:
+                return (loc[0], loc[1], loc[2], 'event_city')
+
+    # 2) venue + country : utile pour Camp Nou, Old Trafford, etc.
+    ev_venue = (ev.get('venue') or '').strip()
+    if ev_venue and ev_country:
+        loc = geocode(f'{ev_venue}, {ev_country}', geo_cache)
+        if loc:
+            return (loc[0], loc[1], loc[2], 'event_venue')
+
+    # 3) Mapping statique team_name -> city
+    comps = ev.get('competitors') or []
+    home = next((c for c in comps if c.get('home_away') == 'home'), None) or (comps[0] if comps else None)
+    if home:
+        hname = home.get('name') or home.get('short') or ''
+        if hname:
+            key = normalize(hname)
+            if key in CITIES:
+                c = CITIES[key]
+                return (c[0], c[1], c[2], 'static_team')
+            for suf in ('fc', 'cf', 'ac', 'sc', 'united', 'city'):
+                if key.endswith(suf):
+                    k2 = key[:-len(suf)]
+                    if k2 in CITIES:
+                        c = CITIES[k2]
+                        return (c[0], c[1], c[2], 'static_team')
+
+    # 4) Pas de fallback géocodage par nom d'équipe : on retourne None.
+    # Le caller logge un skip plutôt que d'injecter une météo douteuse.
+    return None
 
 
 def fetch_forecast(lat: float, lon: float, kickoff_iso: str) -> dict | None:
@@ -395,30 +460,24 @@ def main() -> int:
             if old and is_fresh(old, ko_iso, now):
                 n_fresh += 1
                 continue
-            # Resolve home team → city. ESPN field is `home_away` (string), not
-            # `home` (bool) — older code looked for the bool and silently
-            # skipped every match. Bug fixed v30.
-            comps = ev.get('competitors') or []
-            home = next((c for c in comps if c.get('home_away') == 'home'), None)
-            if not home:
-                # Fallback : take the first competitor (some ESPN payloads
-                # don't tag home_away on tournament-style sports).
-                home = comps[0] if comps else None
-            if not home:
-                n_skipped += 1
-                continue
-            hname = home.get('name') or home.get('short') or ''
-            loc = resolve_city(hname, geo_cache)
+            # AUDIT-2026-04-27 (P3) — Résolution préférée par event.city
+            # + country (Open-Meteo retourne fiablement la bonne ville).
+            # Avant : geocode par nom d'équipe → Tarma/ADT → Ada,
+            # Stockholm/AIK → Aiken. resolve_event_location() retourne
+            # None plutôt que d'injecter une météo douteuse, le match
+            # est skip dans ce cas.
+            loc = resolve_event_location(ev, geo_cache)
             if not loc:
                 n_skipped += 1
                 continue
-            city, lat, lon = loc
+            city, lat, lon, source = loc
             w = fetch_forecast(lat, lon, ko_iso)
             if not w:
                 n_skipped += 1
                 continue
             matches_out[mid] = {
                 'city': city, 'lat': lat, 'lon': lon,
+                'source': source,  # event_city | event_venue | static_team
                 'kickoff': ko_iso,
                 'temp_c': w.get('temp_c'),
                 'precip_mm': w.get('precip_mm'),
