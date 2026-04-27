@@ -6,6 +6,31 @@ des pronostics simples/combinés/montantes séquentielles, et une vue bilan.
 Déployé sur GitHub Pages. Client = navigateur ; données = fichier `data.js`
 régénéré en continu.
 
+## Architecture v31.7.8x (mise à jour 2026-04-27 — pack audit Codex)
+
+**Pack audit Codex 2026-04-27** (`AUDIT_CLAUDE_PACK_2026-04-27/`) :
+3 root causes data critiques traitées en P1/P2/P3.
+
+- **v31.7.83** Stop NBA→foot contamination via team_stats. ESPN partage
+  les `team_id` entre sports (tid=20 = Boston Celtics ET Unión Santa Fe).
+  L'ancienne pipeline patchait des stats NBA sur clubs argentins
+  (avg_gf5=100, last5 vs Lakers 91-123). Fix : clé composite `lc:tid`
+  dans `fetch_team_stats.py` + `patch_team_stats.py`, garde-fou sport-
+  mismatch + cleanup proactif des form_stats déjà contaminés. Confirmé :
+  7 contaminations live nettoyées, 96 sport-mismatch désormais skip.
+- **v31.7.84** Health sémantique + Winamax-exact priorité dans
+  `getMatchOdds`. `build_health.py` ajoute `quality_checks` :
+  `winamax_exact_ratio`, `actionable_external_odds` (events avec
+  Winamax exact MAIS odds_snapshot externe DraftKings/TennisExplorer
+  → 187 sur la data live), `football_invalid_form`. `getMatchOdds`
+  prioritise désormais `winamax.markets['1n2']` en pré-match (avant :
+  ESPN live → odds_snapshot externe → Winamax dernier).
+- **v31.7.85** Météo : `resolve_event_location` priorise `event.city +
+  country` au lieu de géocoder le nom d'équipe. Fix les "Tarma →
+  Ada", "Stockholm → Aiken", "Glasgow → Rangersdorf". Ajoute
+  `weather.source` pour traçabilité (event_city / event_venue /
+  static_team).
+
 ## Architecture v31.7.7x (mise à jour 2026-04-27 — sweep visuel)
 
 **Sweep audit visuel 2026-04-27 (suite)** :
