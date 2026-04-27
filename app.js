@@ -43,7 +43,7 @@
   // legacy) mais aucun lien ne pointe plus vers cette valeur.
   // v31.7.77 — 'calendrier' ajouté pour vue 7 jours groupée (user feedback
   // "je veux voir au moins une semaine de pronos jour par jour").
-  const VALID_PAGES = ['dashboard','tous','locks','buteurs','combines','top','historique','bilan','backtest','academie','credibilite','alertes','profil','sante','legal','methodologie','montante-jour','montante-weekend','montante-semaine','compare','calendrier'];
+  const VALID_PAGES = ['dashboard','tous','locks','buteurs','combines','top','historique','bilan','backtest','academie','credibilite','alertes','profil','sante','legal','methodologie','montante-jour','montante-weekend','montante-semaine','compare','calendrier','league'];
   // v30 — 'mesparis' retiré : Théo n'enregistre pas ses paris sur le site.
   // v31 — 'legal' + 'methodologie' ajoutés (transparence + dictionnaire des
   // métriques, en réponse à l'audit ChatGPT 2026-04-26).
@@ -10788,6 +10788,48 @@
           </div>
         </section>
 
+        ${(() => {
+          // AUDIT-2026-04-27 (Sprint 5 #25) — Brier per-sport breakdown.
+          // Surface où le modèle est calibré vs où il dérive. Brier <0.20
+          // = bonne calibration, 0.20-0.25 = ok, >0.25 = à recalibrer.
+          const bt2 = window.__backtestReportV2;
+          const bySport = bt2 && bt2.by_sport;
+          if (!bySport) return '';
+          const rows = Object.entries(bySport).filter(([_, s]) => s && s.n >= 5);
+          if (!rows.length) return '';
+          rows.sort((a, b) => b[1].n - a[1].n);
+          const sportEm = { football:'⚽', tennis:'🎾', basketball:'🏀', hockey:'🏒', baseball:'⚾' };
+          return `
+          <section style="margin-top:32px;">
+            <h2 class="page-h2">📊 Calibration par sport</h2>
+            <div style="font-size:13px;color:var(--text-dim);margin-bottom:14px;line-height:1.5;">
+              Le Brier mesure la qualité des probabilités prédites (0 = parfait, 0.25 = pile/face). Permet de voir où le modèle est calibré vs où il dérive.
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;">
+              ${rows.map(([sp, s]) => {
+                const brier = s.brier || 0;
+                const col = brier < 0.20 ? 'var(--accent)' : brier < 0.25 ? '#fbbf24' : '#f87171';
+                const lbl = brier < 0.20 ? 'Excellente' : brier < 0.25 ? 'Correcte' : 'À recalibrer';
+                const roi = s.flat_roi_pct || 0;
+                const roiCol = roi > 0 ? 'var(--accent)' : 'var(--danger)';
+                return `<div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;border-left:4px solid ${col};">
+                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                    <span style="font-size:18px;">${sportEm[sp] || '🎯'}</span>
+                    <span style="font-size:14px;font-weight:700;color:var(--text);text-transform:capitalize;">${esc(sp)}</span>
+                    <span style="margin-left:auto;font-size:10px;color:var(--text-dim);">n=${s.n}</span>
+                  </div>
+                  <div style="display:flex;gap:14px;font-size:12.5px;align-items:baseline;">
+                    <div><span style="color:var(--text-dim);">Brier</span> <b style="color:${col};">${brier.toFixed(3)}</b></div>
+                    <div><span style="color:var(--text-dim);">WR</span> <b style="color:var(--text);">${(s.win_rate*100).toFixed(0)}%</b></div>
+                    <div><span style="color:var(--text-dim);">ROI</span> <b style="color:${roiCol};">${roi >= 0 ? '+' : ''}${roi.toFixed(1)}%</b></div>
+                  </div>
+                  <div style="font-size:11px;color:${col};margin-top:6px;font-weight:600;">${lbl}</div>
+                </div>`;
+              }).join('')}
+            </div>
+          </section>`;
+        })()}
+
         <section style="margin-top:32px;">
           <h2 class="page-h2">⚠️ Ce que je ne promets pas</h2>
           <div style="padding:18px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2);border-left:3px solid #fca5a5;border-radius:0 10px 10px 0;line-height:1.6;font-size:13.5px;color:var(--text-2);">
@@ -12508,6 +12550,8 @@
     const isMontante = isMontanteJour || isMontanteWeekend || isMontanteSemaine;
     // v31.7.77 — Calendrier (declared early for the same TDZ reason)
     const isCalendrier = currentPage === 'calendrier';
+    // AUDIT-2026-04-27 (Sprint 5 #24) — League deep-dive page
+    const isLeague = currentPage === 'league';
 
     // v23 — Sous-nav "Mon suivi" (historique/bilan/backtest).
     // v30 — "Mes paris" retiré : Théo n'enregistre pas ses paris sur le
@@ -12614,7 +12658,7 @@
 
     // Summary bar: shown for simples + bilan + top, hidden for combines/value/locks/historique/sante + nouvelles pages
     const sum = document.getElementById('summary-bar');
-    if (sum) sum.style.display = (isCombines || isValue || isLocks || isHistorique || isSante || isDashboard || isAlertes || isAcademie || isBacktest || isProfil || isButeurs || isTous || isCredibilite || isMontante || isCalendrier) ? 'none' : '';
+    if (sum) sum.style.display = (isCombines || isValue || isLocks || isHistorique || isSante || isDashboard || isAlertes || isAcademie || isBacktest || isProfil || isButeurs || isTous || isCredibilite || isMontante || isCalendrier || isLeague) ? 'none' : '';
 
     // Chantier IIII — Simples quick-take IA (visible only on Simples)
     const iaSimples = document.getElementById('ia-simples-wrap');
@@ -12723,6 +12767,18 @@
       calendrierWrap.id = 'calendrier-wrap';
       (document.querySelector('main') || document.body).appendChild(calendrierWrap);
     }
+    // AUDIT-2026-04-27 (Sprint 5 #24) — League deep-dive
+    let leagueWrap = document.getElementById('league-wrap');
+    if (!leagueWrap) {
+      leagueWrap = document.createElement('div');
+      leagueWrap.id = 'league-wrap';
+      (document.querySelector('main') || document.body).appendChild(leagueWrap);
+    }
+    leagueWrap.style.display = isLeague ? '' : 'none';
+    if (isLeague) {
+      try { renderLeaguePage(leagueWrap); } catch(e) { console.warn('renderLeaguePage failed', e); }
+    }
+
     calendrierWrap.style.display = isCalendrier ? '' : 'none';
     if (isCalendrier) {
       // AUDIT-2026-04-27 (Sprint 3 #15) — Skeleton pendant _ensureFullData.
@@ -13836,6 +13892,116 @@
         }
       });
     });
+  }
+
+  // AUDIT-2026-04-27 (Sprint 5 #24) — Per-league deep-dive page.
+  // Lit window.__backtestReportV2.by_league[<lc>] et affiche un panneau
+  // détaillé : KPIs (n, WR, ROI, Brier), per-cote-bucket, top wins/loses
+  // récents pour cette ligue. Hash URL : #league/eng.1 → ouvre direct.
+  function renderLeaguePage(wrap) {
+    const bt = window.__backtestReportV2 || window.__backtestReport;
+    // Récupère le league_code depuis le hash : #league/eng.1
+    const m = (location.hash || '').match(/^#league\/([\w.\-]+)/);
+    const lc = m ? m[1] : null;
+    if (!lc) {
+      // Liste des ligues disponibles avec mini-stats
+      const leagues = (bt && bt.by_league) || {};
+      const sorted = Object.entries(leagues)
+        .filter(([k, v]) => v && v.n >= 5)
+        .sort((a, b) => (b[1].flat_roi_pct || 0) - (a[1].flat_roi_pct || 0));
+      wrap.innerHTML = `
+        <div class="page-wrap">
+          <div class="page-header">
+            <div class="lbl-tiny" style="color:var(--brand);">Performance · par ligue</div>
+            <h1 class="page-h1">📊 Ligues</h1>
+            <div style="font-size:14px;color:var(--text-dim);">Drill-down ROI/WR/Brier par ligue. Clique pour voir le détail.</div>
+          </div>
+          ${sorted.length === 0 ? `<div class="bilan-empty">Pas assez de données par ligue (minimum 5 picks). Le backtest hebdo enrichit ce panneau au fil du temps.</div>` :
+            `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;margin-top:16px;">
+              ${sorted.map(([key, v]) => {
+                const roi = v.flat_roi_pct || 0;
+                const roiCol = roi > 5 ? 'var(--accent)' : roi > 0 ? 'var(--warn)' : 'var(--danger)';
+                return `<button class="page-btn" data-page="league" data-league-code="${esc(key)}" style="text-align:left;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;font-family:inherit;color:var(--text);">
+                  <div style="font-size:13px;font-weight:700;margin-bottom:4px;">${esc(key)}</div>
+                  <div style="display:flex;gap:14px;font-size:12px;color:var(--text-dim);">
+                    <span><b style="color:var(--text);">${v.n}</b> picks</span>
+                    <span><b style="color:var(--text);">${(v.win_rate*100).toFixed(0)}%</b> WR</span>
+                    <span style="color:${roiCol};font-weight:700;">${roi >= 0 ? '+' : ''}${roi.toFixed(1)}% ROI</span>
+                  </div>
+                </button>`;
+              }).join('')}
+            </div>`
+          }
+        </div>`;
+      // Wire clicks → set hash + re-render
+      wrap.querySelectorAll('button[data-league-code]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const code = btn.dataset.leagueCode;
+          if (!code) return;
+          history.replaceState(null, '', location.pathname + location.search + `#league/${code}`);
+          renderLeaguePage(wrap);
+        });
+      });
+      return;
+    }
+    // Détail d'une ligue
+    const stats = bt?.by_league?.[lc];
+    if (!stats) {
+      wrap.innerHTML = `
+        <div class="page-wrap">
+          <div class="page-header">
+            <div class="lbl-tiny" style="color:var(--brand);">Performance · ${esc(lc)}</div>
+            <h1 class="page-h1">${esc(lc)}</h1>
+            <div style="font-size:14px;color:var(--text-dim);">Pas de données backtest pour cette ligue.</div>
+          </div>
+          <div style="margin-top:16px;">
+            <button class="page-btn" data-page="league" onclick="history.replaceState(null,'',location.pathname+'#league'); renderLeaguePage && renderLeaguePage(this.closest('#league-wrap'));" style="background:var(--panel);border:1px solid var(--border);color:var(--text);padding:8px 14px;border-radius:8px;cursor:pointer;">← Toutes les ligues</button>
+          </div>
+        </div>`;
+      return;
+    }
+    const roi = stats.flat_roi_pct || 0;
+    const roiCi = stats.flat_roi_ci_pct || [0, 0];
+    const wrCi = stats.win_rate_ci || [0, 0];
+    const roiCol = roi > 5 ? 'var(--accent)' : roi > 0 ? 'var(--warn)' : 'var(--danger)';
+    wrap.innerHTML = `
+      <div class="page-wrap">
+        <div class="page-header">
+          <div class="lbl-tiny" style="color:var(--brand);">Performance · ligue</div>
+          <h1 class="page-h1">📊 ${esc(lc)}</h1>
+          <div style="font-size:14px;color:var(--text-dim);">Backtest sur ${stats.n} picks réglés.</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px;">
+          <div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;">
+            <div class="lbl-mini">N picks</div>
+            <div style="font-size:24px;font-weight:800;color:var(--text);">${stats.n}</div>
+            <div style="font-size:10.5px;color:var(--text-dim);margin-top:4px;">${stats.wins}W · ${stats.losses}L</div>
+          </div>
+          <div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;">
+            <div class="lbl-mini">Win rate</div>
+            <div style="font-size:24px;font-weight:800;color:var(--text);">${(stats.win_rate*100).toFixed(1)}%</div>
+            <div style="font-size:10.5px;color:var(--text-dim);margin-top:4px;">IC95 [${(wrCi[0]*100).toFixed(0)}-${(wrCi[1]*100).toFixed(0)}%]</div>
+          </div>
+          <div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;border-left:4px solid ${roiCol};">
+            <div class="lbl-mini">ROI flat</div>
+            <div style="font-size:24px;font-weight:800;color:${roiCol};">${roi >= 0 ? '+' : ''}${roi.toFixed(1)}%</div>
+            <div style="font-size:10.5px;color:var(--text-dim);margin-top:4px;">IC95 [${roiCi[0].toFixed(1)}, ${roiCi[1].toFixed(1)}]pt</div>
+          </div>
+          <div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;">
+            <div class="lbl-mini">Brier</div>
+            <div style="font-size:24px;font-weight:800;color:var(--text);">${(stats.brier || 0).toFixed(3)}</div>
+            <div style="font-size:10.5px;color:var(--text-dim);margin-top:4px;">Cote moy. ${(stats.avg_cote || 0).toFixed(2)}</div>
+          </div>
+        </div>
+        <div style="margin-top:18px;font-size:12.5px;color:var(--text-dim);background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.18);border-radius:8px;padding:12px 14px;line-height:1.5;">
+          ℹ️ Données backtest hebdomadaire (cron dimanche). Pour la perf en cours de semaine, voir page <button class="page-btn" data-page="bilan" style="background:transparent;border:none;color:var(--info);text-decoration:underline;cursor:pointer;font-size:inherit;font-weight:700;padding:0;">Bilan</button>.
+        </div>
+        <div style="margin-top:16px;">
+          <button class="page-btn" data-page="league" onclick="history.replaceState(null,'',location.pathname+'#league');" style="background:var(--panel);border:1px solid var(--border);color:var(--text);padding:8px 14px;border-radius:8px;cursor:pointer;">← Toutes les ligues</button>
+        </div>
+      </div>`;
   }
 
   function renderHistoriquePage(wrap) {
