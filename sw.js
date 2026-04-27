@@ -15,43 +15,50 @@ const CACHE_VERSION = 'paris-sportif-20260427-184838';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
-const SHELL_ASSETS = [
+// AUDIT-2026-04-27 (Sprint 10 #19) — Split en 2 listes :
+// PRECACHE = chargé à l'install (taille critique au boot)
+// LAZY_CACHE_FIRST = listé dans SHELL_ASSETS pour le matcher cache-first
+//                    mais PAS chargé à l'install (premier hit network).
+// L'union des deux = SHELL_ASSETS pour préserver la logique de matching.
+const PRECACHE_ASSETS = [
   'manifest.webmanifest',
   'icon.svg',
   'icon-192.png',
   'icon-512.png',
   // FIX Bug 7 — pré-cache pronostics.html pour fallback offline garanti
-  // (avant : caches.match('pronostics.html') au offline catch dépendait
-  // d'un précédent fetch ayant rempli le runtime cache, ce qui n'était
-  // pas garanti pour les premières navigations).
   'pronostics.html',
   // v31 — app.css + app.js extraits depuis pronostics.html (audit ChatGPT).
-  // Pré-cachés agressivement parce qu'ils ne changent presque jamais
-  // (vs pronostics.html qui change à chaque cron tick avec le LITE blob).
   // CACHE_VERSION stamp invalide tout à chaque vrai changement de code.
   'app.css',
   'app.js',
-  // v31.7.4 — Static editorial pages : cachées agressive pour navigation
-  // rapide depuis le menu Apprendre. Régénérées rarement (build_*_page.py
-  // sur changement data, mais HTML stable).
+  // Landing page indexable + son CSS partagé.
   'static-page.css',
   'index.html',
-  'methodologie.html',
-  'academie.html',
-  'comment-lire-un-prono.html',
-  'legal.html',
-  // v31.7.4 — OG images partagées sur reseaux sociaux : cache 24h+ vu
-  // qu'elles ne changent que quand backtest_report_v2 change.
+  // OG images partagées sur reseaux sociaux : cache 24h+
   'og-default.png',
   'og-backtest.png',
   'og-credibilite.png',
   'og-methodologie.png',
 ];
 
+// Pages éditoriales : seulement ~5% des sessions visitent ces pages.
+// Pas pré-cachées (économie ~80KB au boot) mais cache-first au premier hit.
+const LAZY_CACHE_FIRST = [
+  'methodologie.html',
+  'academie.html',
+  'comment-lire-un-prono.html',
+  'legal.html',
+];
+
+const SHELL_ASSETS = [...PRECACHE_ASSETS, ...LAZY_CACHE_FIRST];
+
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(SHELL_CACHE)
-      .then(cache => cache.addAll(SHELL_ASSETS).catch(() => { /* pas bloquant */ }))
+      // AUDIT-2026-04-27 (Sprint 10 #19) — Pré-cache uniquement les
+      // assets critiques. Les pages éditoriales seront fetch network
+      // au premier hit puis cachées via le matcher cache-first ci-bas.
+      .then(cache => cache.addAll(PRECACHE_ASSETS).catch(() => { /* pas bloquant */ }))
       .then(() => self.skipWaiting())
   );
 });
