@@ -260,7 +260,7 @@ PAGE_TEMPLATE = '''<!DOCTYPE html>
     </div>
   </div>
 
-  <h2>📊 Diagramme de fiabilité</h2>
+  <h2>📈 Calibration : ce qu'on annonce vs ce qu'on observe</h2>
   <section class="card">
     <p>Chaque cercle est un bin de prédictions, positionné par sa probabilité moyenne (axe X) et son win rate observé (axe Y). La taille du cercle reflète le nombre de picks dans le bin. <strong>La diagonale violette est la calibration parfaite</strong> : modèle qui dit X%, gagne X%.</p>
     {svg_diagram}

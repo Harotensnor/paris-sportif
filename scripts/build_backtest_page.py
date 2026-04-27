@@ -341,11 +341,19 @@ def render_streaks(streaks: dict) -> str:
     if not streaks or (not streaks.get('longest_win') and not streaks.get('longest_lose')):
         return '<p style="color:#a3a3aa;font-size:13px;">Pas assez de données pour calculer les séries.</p>'
 
+    # v31.7.47 — Audit chantier 9.2 : "loses consécutifs" → "défaites
+    # d'affilée" (français correct + accord pluriel).
+    def _word_fr(n, kind):
+        if kind == 'win':
+            return 'victoire' if n == 1 else 'victoires'
+        return 'défaite' if n == 1 else 'défaites'
+
     cur = streaks.get('current_streak') or 0
     if cur > 0:
-        cur_html = f'<span style="color:#34d399;font-weight:700;">🔥 {cur} wins consécutifs</span>'
+        cur_html = f'<span style="color:#34d399;font-weight:700;">🔥 {cur} {_word_fr(cur, "win")} d\'affilée</span>'
     elif cur < 0:
-        cur_html = f'<span style="color:#f87171;font-weight:700;">❄️ {abs(cur)} loses consécutifs</span>'
+        n = abs(cur)
+        cur_html = f'<span style="color:#f87171;font-weight:700;">❄️ {n} {_word_fr(n, "lose")} d\'affilée</span>'
     else:
         cur_html = '<span style="color:#a3a3aa;">⚪ Aucune série en cours</span>'
 
@@ -360,14 +368,16 @@ def render_streaks(streaks: dict) -> str:
         for r in streaks['top_win_runs'][:3]:
             ds = (r.get('date_start') or '?')[:10]
             de = (r.get('date_end') or '?')[:10]
-            items.append(f'<li><b>{r["len"]}</b> wins ({ds} → {de})</li>')
+            n = r["len"]
+            items.append(f'<li><b>{n}</b> {_word_fr(n, "win")} ({ds} → {de})</li>')
         top_win_html = f'<div><h4 style="margin:12px 0 6px;font-size:13px;color:#34d399;">🔥 Top 3 séries gagnantes</h4><ol style="font-size:13px;padding-left:18px;color:#d4d4d8;">{"".join(items)}</ol></div>'
     if streaks.get('top_lose_runs'):
         items = []
         for r in streaks['top_lose_runs'][:3]:
             ds = (r.get('date_start') or '?')[:10]
             de = (r.get('date_end') or '?')[:10]
-            items.append(f'<li><b>{r["len"]}</b> loses ({ds} → {de})</li>')
+            n = r["len"]
+            items.append(f'<li><b>{n}</b> {_word_fr(n, "lose")} ({ds} → {de})</li>')
         top_lose_html = f'<div><h4 style="margin:12px 0 6px;font-size:13px;color:#f87171;">❄️ Top 3 séries perdantes</h4><ol style="font-size:13px;padding-left:18px;color:#d4d4d8;">{"".join(items)}</ol></div>'
 
     return f'''<p style="font-size:13px;color:#a3a3aa;margin:0 0 12px;">

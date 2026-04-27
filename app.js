@@ -4470,7 +4470,7 @@
     if (!sections) {
       wrap.innerHTML = `
         <div class="section-header top-picks" style="margin-top:16px;">
-          <h2><span class="ico">🎰</span>Combinés suggérés</h2>
+          <h2><span class="ico">🎯</span>Combinés suggérés</h2>
           <div class="hint">Aucun combiné disponible — aucun match avec cotes dans la fenêtre pré-match.</div>
         </div>`;
       return;
@@ -8532,7 +8532,7 @@
               <span class="dash-stat-lbl">Pronos</span>
             </button>
             <button type="button" class="dash-stat-item page-btn" data-page="combines" aria-label="${_nCombines} combinés disponibles">
-              <span class="dash-stat-icon" style="color:var(--brand);">🎰</span>
+              <span class="dash-stat-icon" style="color:var(--brand);">🎯</span>
               <span class="dash-stat-val">${_nCombines}</span>
               <span class="dash-stat-lbl">Combinés</span>
             </button>
@@ -10352,7 +10352,7 @@
       { icon: '🎯', title: 'Qualité des données', desc: `On note la fraîcheur des infos avant chaque prono : cotes à jour ? forme récente connue ? face-à-face dispo ? Si on n'a pas assez d'infos fiables, on saute le match plutôt que de deviner.`, color: '#0a84ff' },
       { icon: '💰', title: 'Cagnotte simulée', desc: `Le Bilan affiche une cagnotte théorique qui démarre à 10€ et mise 1€ sur chaque pari sûr. Ça te dit honnêtement ce que la stratégie aurait rapporté si tu l'avais suivie depuis le début.`, color: '#30d158' },
       { icon: '📈', title: 'Rentabilité (ROI)', desc: `Sur 100€ misés, combien tu gagnes net ? +15% veut dire 15€ de bonus. Au-delà de +5% sur 100 paris et plus, tu bats sérieusement le bookmaker — ta stratégie crée de la valeur.`, color: '#5e5ce6' },
-      { icon: '🎰', title: 'Ce que dit la cote', desc: `La cote reflète la probabilité vue par le bookmaker. Cote 2,00 = 50% selon lui. Cote 1,50 = 66%. Cote 3,00 = 33%. Il rajoute une marge au passage — c'est sa commission.`, color: '#bf5af2' },
+      { icon: '📊', title: 'Ce que dit la cote', desc: `La cote reflète la probabilité vue par le bookmaker. Cote 2,00 = 50% selon lui. Cote 1,50 = 66%. Cote 3,00 = 33%. Il rajoute une marge au passage — c'est sa commission.`, color: '#bf5af2' },
       { icon: '🏦', title: 'Gestion de cagnotte', desc: `Règle d'or : jamais plus de 2 à 5% de ta cagnotte sur un seul pari. Même un pari sûr à 70% peut perdre — et la poisse peut t'enchaîner 5 défaites. Si tu mises 10%, une mauvaise série te met à sec.`, color: '#ffd60a' },
       { icon: '🤖', title: 'Ton coach IA', desc: `L'IA du site ne contacte aucun serveur : elle lit tes paris, ton historique, tes résultats, et commente en direct depuis ton téléphone. Tout reste chez toi.`, color: '#5e5ce6' },
       { icon: '🎯', title: 'Calibration du modèle', desc: `C'est le test ultime d'honnêteté d'un modèle de proba : quand on dit "70% de chance", est-ce que 70% de ces prédictions gagnent vraiment ? Sur la page Crédibilité, tu vois un graphique qui place les vraies fréquences contre les probas annoncées. Plus c'est proche de la diagonale, plus le modèle ne ment pas.`, color: '#34d399' },
@@ -10534,7 +10534,7 @@
           })()}
 
           <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
-            ${(m.winamax && m.winamax.available === true) ? `<a href="${esc(winamaxUrl(m))}" target="_blank" rel="noopener" style="flex:1;text-align:center;background:var(--brand);color:#fff;text-decoration:none;padding:9px 14px;border-radius:var(--r);font-size:12.5px;font-weight:600;">🎰 Parier sur Winamax</a>` : `<div style="flex:1;text-align:center;background:var(--panel-2);color:var(--text-dim);padding:9px 14px;border-radius:var(--r);font-size:12.5px;">Cote pas encore dispo</div>`}
+            ${(m.winamax && m.winamax.available === true) ? `<a href="${esc(winamaxUrl(m))}" target="_blank" rel="noopener" style="flex:1;text-align:center;background:var(--brand);color:#fff;text-decoration:none;padding:9px 14px;border-radius:var(--r);font-size:12.5px;font-weight:600;">📊 Voir la cote sur Winamax ↗</a>` : `<div style="flex:1;text-align:center;background:var(--panel-2);color:var(--text-dim);padding:9px 14px;border-radius:var(--r);font-size:12.5px;">Cote pas encore dispo</div>`}
           </div>
         </div>`;
     };
