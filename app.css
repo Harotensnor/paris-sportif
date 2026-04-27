@@ -1461,7 +1461,15 @@
     border-bottom: 1px solid var(--border);
     display: flex; gap: 2px; flex-wrap: nowrap;
     overflow-x: auto;
+    /* AUDIT-2026-04-27 (Sprint 24 #28) — Scroll horizontal smooth + scrollbar
+       discrète sur mobile. Avec 5 tabs sur viewport <380px on a un scroll
+       horizontal nécessaire. */
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
   }
+  .md-tabs::-webkit-scrollbar { height: 3px; }
+  .md-tabs::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 2px; }
   .md-tab {
     padding: 10px 14px;
     border: none; background: transparent;
@@ -2404,6 +2412,21 @@
   .card-md { padding: var(--space-4); border-radius: var(--r-md); }
   .card-lg { padding: var(--space-5) var(--space-6); border-radius: var(--r); }
 
+  /* AUDIT-2026-04-27 (Sprint 24 #30) — Global reduced-motion safety net.
+     Audit : 19 keyframes définis, 12 reduced-motion blocks. Pour ne
+     rien laisser passer, ce bloc global cap les animations à 0.01ms
+     (= immédiat) pour tous les utilisateurs avec prefers-reduced-motion.
+     Les blocs spécifiques plus haut (display:none sur skeleton/confetti)
+     restent prioritaires car plus spécifiques. */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
   /* AUDIT-2026-04-27 (Sprint 18 #28) — Confetti animation pour win streak.
      Activé par class `.has-confetti` sur un container. CSS-only via
      pseudo-elements + keyframes (pas de canvas, pas de lib externe). */
@@ -2678,6 +2701,23 @@
     .pari-du-jour,
     .pred-panel button {
       min-height: 44px;
+    }
+    /* AUDIT-2026-04-27 (Sprint 24 #27) — Touch targets WCAG 2.5.5 final.
+       Audit après v31.7 : ces classes étaient encore <36px sur mobile. */
+    .md-tab,
+    .modal-close,
+    .nav-new-badge,
+    .breadcrumbs button,
+    [data-smart-dismiss],
+    .md-nav-chip {
+      min-height: 36px;
+    }
+    /* Boutons primaires "action" : 44px strict */
+    .ed-hero__cta-btn,
+    .toast-item button,
+    button.combine-copy-btn {
+      min-height: 44px;
+      min-width: 44px;
     }
     /* Chips de filtre étaient parfois 28×28 — bump */
     .filter-btn,
