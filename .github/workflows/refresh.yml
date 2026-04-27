@@ -207,26 +207,27 @@ jobs:
           BUILD_ID=$(date -u +'%Y%m%d-%H%M%S')
           sed -i "s|^const CACHE_VERSION = .*|const CACHE_VERSION = 'paris-sportif-${BUILD_ID}';|" sw.js
 
-      # AUDIT-2026-04-27 (Sprint 32 #37) — Auto-rollback wired.
-      # Si data.js a perdu >50% events vs HEAD~1, refuse de commit.
+      # AUDIT-2026-04-27 (Sprint 32 #37 + Sprint 45 #21) — Auto-rollback complet.
+      # Si data.js a perdu >50% events vs HEAD~1, refuse le commit ENTIER
+      # (pas juste data.js). Sinon les sidecars JSON modifiés sans data.js
+      # cohérent créent un état incohérent pour le prochain run.
       - name: Check data integrity (auto-rollback if -50%)
-        run: python3 scripts/check_data_integrity.py || {
-          echo "::warning::data.js integrity check failed — reverting"
-          git checkout -- data.js pronostics.html
-          exit 0
-        }
+        run: |
+          if ! python3 scripts/check_data_integrity.py; then
+            echo "::warning::data.js integrity check failed — reverting ALL changes"
+            # Reset complet : annule TOUS les changements non-staged
+            git checkout HEAD -- .
+            # Skip le commit suivant en marquant un flag
+            echo "ROLLBACK_TRIGGERED=1" >> $GITHUB_ENV
+          fi
         continue-on-error: true
 
-      # AUDIT-2026-04-27 (Sprint 32 #39) — Backup snapshot quotidien.
-      # Cadence : 1 fois par jour à 23:55 UTC environ (cron tick le plus
-      # proche). Détection via heure 23 + minute >= 50.
+      # AUDIT-2026-04-27 (Sprint 32 #39 + Sprint 45 #22) — Backup quotidien.
+      # Le script backup_data_snapshot.py est idempotent (si fichier du
+      # jour existe, skip). Donc on peut l'appeler à chaque tick sans
+      # risque de doublons. Évite le bug "skip si cron pas tick à 23:5x".
       - name: Daily data.js backup snapshot
-        run: |
-          HOUR=$(date -u +%H)
-          MIN=$(date -u +%M)
-          if [ "$HOUR" = "23" ] && [ "$MIN" -ge "50" ]; then
-            python3 scripts/backup_data_snapshot.py || true
-          fi
+        run: python3 scripts/backup_data_snapshot.py || true
 
       # AUDIT-2026-04-27 (Sprint 32 #38) — Health alerts via Discord.
       # Optional : tourne seulement si DISCORD_HEALTH_WEBHOOK secret set.
@@ -249,7 +250,9 @@ jobs:
                   credibilite.html stadiums.json dixon_coles_rho.json index.html \
                   nba_team_stats.json team_strengths.json team_strengths_mle.json \
                   og-default.png og-backtest.png og-credibilite.png og-methodologie.png \
-                  archives/ 2>/dev/null || true
+                  2>/dev/null || true
+          # Sprint 45 #24 — archives/ retiré du git add : rolling local
+          # 30j conservé hors versionning (cf .gitignore).
           # Only stamp sw.js if we have real content changes — otherwise
           # discard the version bump to avoid 288 empty commits/day.
           if git diff --cached --quiet; then
