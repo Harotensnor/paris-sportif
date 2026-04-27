@@ -1379,6 +1379,31 @@
     color: var(--info);
   }
 
+  /* AUDIT-2026-04-27 (Ticket 2) — Mini-badge source de cote pour la
+     liste Tous (1 char W/E/A inline avec la cote). Hover affiche le
+     tooltip explicatif. */
+  .cote-src-mini {
+    display: inline-block;
+    width: 14px; height: 14px; line-height: 14px;
+    text-align: center; font-size: 9px; font-weight: 800;
+    border-radius: 3px; vertical-align: text-top;
+    margin-left: 3px; cursor: help;
+    background: var(--panel-2); color: var(--text-dim2);
+    border: 1px solid var(--border);
+  }
+  .cote-src-mini.wnx {
+    background: var(--accent-soft); color: var(--accent);
+    border-color: rgba(52,211,153,.3);
+  }
+  .cote-src-mini.ext {
+    background: var(--warn-soft); color: var(--warn);
+    border-color: rgba(251,191,36,.35);
+  }
+  .cote-src-mini.hist {
+    background: rgba(96,165,250,.10); color: var(--info);
+    border-color: rgba(96,165,250,.25);
+  }
+
   /* AUDIT-2026-04-27 (Ticket 5) — Sticky anchor nav modal détail.
      Sticky en haut du body modal, défile pas avec le contenu. */
   .md-nav {
