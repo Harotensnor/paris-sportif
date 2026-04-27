@@ -2292,14 +2292,24 @@
       }
     }
     // Form
+    // v31.7.70 — Fix UX bug : avant le format était "favorable à X (home vs away)"
+    // qui faisait croire à l'utilisateur que la 1ère valeur appartenait à X.
+    // Maintenant on liste leader EN PREMIER avec son nom explicite + suiveur.
+    // Ex : "Forme favorable à U. Católica (U. Católica WWWDW · Manta LLLLL)"
     if (fH !== null && fA !== null) {
       const diff = fH - fA;
       if (Math.abs(diff) > 0.15) {
-        const leader = diff > 0 ? (home?.short || home?.name) : (away?.short || away?.name);
+        const homeName = home?.short || home?.name || 'Home';
+        const awayName = away?.short || away?.name || 'Away';
+        const leaderIsHome = diff > 0;
+        const leader = leaderIsHome ? homeName : awayName;
+        const other = leaderIsHome ? awayName : homeName;
+        const leaderForm = leaderIsHome ? (home?.form || '?') : (away?.form || '?');
+        const otherForm = leaderIsHome ? (away?.form || '?') : (home?.form || '?');
         reasons.push({
           type: 'form',
           icon: '🔥',
-          text: `Forme favorable à ${leader} (${home?.form||'?'} vs ${away?.form||'?'})`
+          text: `Forme favorable à ${leader} (${leader} ${leaderForm} · ${other} ${otherForm})`
         });
       }
     } else if (fH !== null || fA !== null) {
@@ -2313,40 +2323,53 @@
     }
     // Goal-differential reason — surfaces when the scoring margin gap is
     // meaningful (>=0.8 goal/match delta). Complements the W/L letters.
+    // v31.7.70 — Format clarifié avec nom équipe leader explicite.
     if (hs && as_ && hs.played5 >= 3 && as_.played5 >= 3) {
       const gdH = (hs.avg_gf5 || 0) - (hs.avg_ga5 || 0);
       const gdA = (as_.avg_gf5 || 0) - (as_.avg_ga5 || 0);
       if (Math.abs(gdH - gdA) >= 0.8) {
-        const leader = gdH > gdA ? (home?.short || home?.name) : (away?.short || away?.name);
-        const leadStats = gdH > gdA ? hs : as_;
+        const leaderIsHome = gdH > gdA;
+        const leader = leaderIsHome ? (home?.short || home?.name) : (away?.short || away?.name);
+        const leadStats = leaderIsHome ? hs : as_;
         reasons.push({
           type: 'gd',
           icon: '⚽',
-          text: `Différentiel buts favorable à ${leader} (${leadStats.avg_gf5.toFixed(1)} marqués / ${leadStats.avg_ga5.toFixed(1)} encaissés sur 5)`
+          text: `Différentiel buts favorable à ${leader} : ${leadStats.avg_gf5.toFixed(1)} marqués / ${leadStats.avg_ga5.toFixed(1)} encaissés (5 derniers)`
         });
       }
     }
     // Records
+    // v31.7.70 — Fix UX bug : même problème d'ordre que la forme.
+    // Format clarifié : "X 6-4-0 · Y 1-1-8" au lieu de l'ambiguë "(6-4-0 vs 1-1-8)".
     if (recH && recA && recH.games > 3 && recA.games > 3) {
       const wrH = (recH.w + recH.d*0.5) / Math.max(recH.games, 1);
       const wrA = (recA.w + recA.d*0.5) / Math.max(recA.games, 1);
       if (Math.abs(wrH - wrA) > 0.12) {
-        const leader = wrH > wrA ? (home?.short || home?.name) : (away?.short || away?.name);
+        const homeName = home?.short || home?.name || 'Home';
+        const awayName = away?.short || away?.name || 'Away';
+        const leaderIsHome = wrH > wrA;
+        const leader = leaderIsHome ? homeName : awayName;
+        const other = leaderIsHome ? awayName : homeName;
+        const leaderRec = leaderIsHome ? `${recH.w}-${recH.d}-${recH.l}` : `${recA.w}-${recA.d}-${recA.l}`;
+        const otherRec = leaderIsHome ? `${recA.w}-${recA.d}-${recA.l}` : `${recH.w}-${recH.d}-${recH.l}`;
         reasons.push({
           type: 'record',
           icon: '📈',
-          text: `Bilan saison avantage ${leader} (${recH.w}-${recH.d}-${recH.l} vs ${recA.w}-${recA.d}-${recA.l})`
+          text: `Bilan saison avantage ${leader} (${leader} ${leaderRec} · ${other} ${otherRec})`
         });
       }
     }
     // Rankings
     const rankH2 = home?.rank, rankA2 = away?.rank;
     if (rankH2 && rankA2 && Math.abs(rankH2 - rankA2) >= 3) {
-      const leader = rankH2 < rankA2 ? (home?.short || home?.name) : (away?.short || away?.name);
+      // v31.7.70 — Format clarifié : nom + classement par équipe pour zéro ambiguïté.
+      const homeName = home?.short || home?.name || 'Home';
+      const awayName = away?.short || away?.name || 'Away';
+      const leader = rankH2 < rankA2 ? homeName : awayName;
       reasons.push({
         type: 'rank',
         icon: '🏆',
-        text: `Classement #${rankH2} vs #${rankA2} — avantage ${leader}`
+        text: `Classement : ${homeName} #${rankH2} · ${awayName} #${rankA2} — avantage ${leader}`
       });
     }
     // v30 — Tennis Sackmann reasons (when tennis_features attached).
