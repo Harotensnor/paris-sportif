@@ -6,6 +6,17 @@ des pronostics simples/combinés/montantes séquentielles, et une vue bilan.
 Déployé sur GitHub Pages. Client = navigateur ; données = fichier `data.js`
 régénéré en continu.
 
+## Architecture v31.7.7x (mise à jour 2026-04-27 — sweep visuel)
+
+**Sweep audit visuel 2026-04-27 (suite)** :
+- **v31.7.70** Bug UX critique reasons "X vs Y" ambigu fixé (LLLLL vs WWWDW)
+- **v31.7.71** Trust-strip cachait sidebar gauche + chevauchait right rail (CSS var --trust-h)
+- **v31.7.72** Bug compteur Locks 46 vs 6 incohérent (aligné sur le jour)
+- **v31.7.73** Theme accent variants : 49 hex hardcodés migrés vers CSS vars
+- **v31.7.74** "MAJ à l'instant" seuil 10min→2min + badge v24 stale
+- **v31.7.75** Renommage "Aujourd'hui"→"🏠 Accueil" + 5 KPIs stats strip + hero empty state enrichi
+- **v31.7.76** Page Alertes enrichie : 4 sources (locks imminents <30min, value bets ≥15pt, hot/cold streaks 3 picks)
+
 ## Architecture v31.7.x (mise à jour 2026-04-27 — gros sweep audit)
 
 **Sweep audit complet 2026-04-27** : 26 commits du chantier audit + V2/V3.
