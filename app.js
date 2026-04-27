@@ -10936,6 +10936,8 @@
     const currentContrast = prefs.contrast || 'normal';
     const currentReader = prefs.reader || 'off';
     const currentLevel = prefs.level || 'confirme';
+    // v31.7.61 — Theme accent variant : default | lime | amber
+    const currentAccent = prefs.accent || 'default';
 
     const availableSports = ['football', 'tennis', 'basketball', 'hockey', 'baseball', 'rugby', 'mma'];
 
@@ -10979,6 +10981,13 @@
             <div class="pref-pill-group">
               <button class="theme-pill ${currentTheme==='dark'?'active':''}" data-theme-btn="dark">🌙 Sombre</button>
               <button class="theme-pill ${currentTheme==='light'?'active':''}" data-theme-btn="light">☀️ Clair</button>
+            </div>
+            <!-- v31.7.61 — Accent variant picker (audit V2 #12) -->
+            <div style="font-size:12px;color:var(--text-dim);margin:14px 0 6px;">Accent (couleur des éléments WIN/positifs).</div>
+            <div class="pref-pill-group">
+              <button class="theme-pill ${currentAccent==='default'?'active':''}" data-accent-btn="default">🟢 Émeraude (défaut)</button>
+              <button class="theme-pill ${currentAccent==='lime'?'active':''}" data-accent-btn="lime">🟡 Lime (sportif)</button>
+              <button class="theme-pill ${currentAccent==='amber'?'active':''}" data-accent-btn="amber">🟠 Ambre (chaleur)</button>
             </div>
             <div style="margin-top:16px;display:flex;gap:16px;flex-wrap:wrap;">
               <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;">
@@ -11201,6 +11210,18 @@
         else root.removeAttribute('data-theme');
         const meta = document.getElementById('theme-color-meta');
         if (meta) meta.setAttribute('content', theme === 'light' ? '#f5f5f7' : '#08080a');
+        renderProfilPage(wrap);
+      });
+    });
+    // v31.7.61 — Accent variant picker
+    wrap.querySelectorAll('[data-accent-btn]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const accent = btn.dataset.accentBtn;
+        savePrefs({ accent });
+        const root = document.documentElement;
+        if (accent === 'default') root.removeAttribute('data-accent');
+        else root.setAttribute('data-accent', accent);
+        try { if (typeof toast === 'function') toast('✓ Accent : ' + accent, 'success'); } catch(e){}
         renderProfilPage(wrap);
       });
     });
