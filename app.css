@@ -2409,6 +2409,66 @@
   .card-md { padding: var(--space-4); border-radius: var(--r-md); }
   .card-lg { padding: var(--space-5) var(--space-6); border-radius: var(--r); }
 
+  /* AUDIT-2026-04-27 (Sprint 17 #21) — Breadcrumbs sur sub-pages.
+     Style consistant : "Section > Sous-section" en haut de la page,
+     petit, cliquable pour remonter d'un cran. */
+  .breadcrumbs {
+    display: flex; align-items: center; gap: 6px;
+    padding: 12px 0 8px;
+    font-size: var(--fs-sm);
+    color: var(--text-dim);
+    flex-wrap: wrap;
+  }
+  .breadcrumbs a,
+  .breadcrumbs button {
+    color: var(--text-dim);
+    text-decoration: none;
+    background: none; border: none; padding: 0;
+    cursor: pointer;
+    font-family: inherit; font-size: inherit;
+    transition: color 120ms;
+  }
+  .breadcrumbs a:hover,
+  .breadcrumbs button:hover {
+    color: var(--brand);
+  }
+  .breadcrumbs .sep {
+    color: var(--text-dim2);
+    font-size: 11px;
+  }
+  .breadcrumbs .current {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  /* AUDIT-2026-04-27 (Sprint 17 #23) — Active state sidebar nav clair.
+     Trait latéral 3px coloré --brand pour marquer l'item actif fort. */
+  .sidebar-left .page-btn.active,
+  .sidebar-left button.active[data-page] {
+    position: relative;
+  }
+  .sidebar-left .page-btn.active::before,
+  .sidebar-left button.active[data-page]::before {
+    content: '';
+    position: absolute;
+    left: -10px; top: 8px; bottom: 8px;
+    width: 3px;
+    background: var(--brand);
+    border-radius: 0 var(--r-xs) var(--r-xs) 0;
+  }
+
+  /* AUDIT-2026-04-27 (Sprint 17 #24) — Indicateur de scroll modal.
+     Barre de progression top-modal qui montre où on est dans le scroll.
+     Activée via JS qui tracke modal-body.scrollTop. */
+  .modal-progress {
+    position: absolute;
+    top: 0; left: 0;
+    height: 3px; width: 0%;
+    background: var(--brand);
+    transition: width 80ms linear;
+    z-index: 3;
+  }
+
   /* AUDIT-2026-04-27 (Sprint 16 #18) — Toast stack en bas-droit.
      Empile jusqu'à 3 toasts, chaque toast s'auto-dismiss après 4s.
      Slide-in depuis la droite, slide-out vers la droite + fade. */
