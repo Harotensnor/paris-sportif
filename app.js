@@ -3404,10 +3404,12 @@
         .filter(c => !c.isMarket && typeof c[field] === 'number')
         .map(c => ({ name: c.name, delta: c[field] - baseline, w: c.w }));
       // Cherche 1 push positif + 1 push négatif sur le pick (au-delà du
-      // bruit, seuil ±5pt). Les deux doivent avoir un poids significatif
+      // bruit, seuil ±7pt). Les deux doivent avoir un poids significatif
       // (w >= 0.15) pour ne pas alerter sur des signaux marginaux.
-      const pushPos = deltas.filter(d => d.delta >= 0.05 && d.w >= 0.15);
-      const pushNeg = deltas.filter(d => d.delta <= -0.05 && d.w >= 0.15);
+      // Sprint 43 #13 — bumpé ±5pt → ±7pt après feedback : trop sensible,
+      // déclenchait sur des matchs équilibrés normaux.
+      const pushPos = deltas.filter(d => d.delta >= 0.07 && d.w >= 0.15);
+      const pushNeg = deltas.filter(d => d.delta <= -0.07 && d.w >= 0.15);
       if (pushPos.length && pushNeg.length) {
         // Top push de chaque côté
         pushPos.sort((a, b) => b.delta - a.delta);
@@ -6867,8 +6869,12 @@
               stdA?.rank ? `#${stdA.rank}` : null));
             rows.push(rowOf('Points', stdH?.points, stdA?.points));
           }
+          // AUDIT-2026-04-27 (Sprint 43 #11) — Hide entirely si pas
+          // assez de rows valides (≥2 sur 7 possibles). Sur tennis
+          // / NBA / NHL où form_stats foot manque, on évite une
+          // table quasi-vide qui pollue le visuel.
           const validRows = rows.filter(r => r);
-          if (!validRows.length) return '';
+          if (validRows.length < 2) return '';
           return `<div style="margin-bottom:14px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;padding:10px 14px;">
             <div style="display:grid;grid-template-columns:1fr 110px 1fr;gap:10px;padding:6px 4px;border-bottom:1px solid var(--border-2);font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;font-weight:700;align-items:center;">
               <div style="text-align:right;">${esc(home?.short || home?.name || 'Dom.')}</div>
