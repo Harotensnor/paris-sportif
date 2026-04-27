@@ -422,17 +422,11 @@
     <button class="topbar-menu" id="hamburger" aria-label="Menu" aria-controls="page-nav" aria-expanded="false">☰</button>
   </div>
 
-  <!-- Sports sub-bar — affiché seulement sur la page Paris du jour -->
-  <nav class="topbar-sports" id="tabs" aria-label="Sports">
-    <button data-tab="football" class="active">⚽ Football <span class="count" id="count-football">0</span></button>
-    <button data-tab="tennis">🎾 Tennis <span class="count" id="count-tennis">0</span></button>
-    <button data-tab="basketball">🏀 Basketball <span class="count" id="count-basketball">0</span></button>
-    <button data-tab="hockey">🏒 Hockey <span class="count" id="count-hockey">0</span></button>
-    <button data-tab="american-football">🏈 NFL/NCAAF <span class="count" id="count-american-football">0</span></button>
-    <button data-tab="mma">🥊 MMA/UFC <span class="count" id="count-mma">0</span></button>
-    <button data-tab="golf">⛳ Golf <span class="count" id="count-golf">0</span></button>
-    <button data-tab="racing">🏎️ F1 <span class="count" id="count-racing">0</span></button>
-  </nav>
+  <!-- v31.7.51 — Sports sub-bar retirée (audit chantier 4.2 cleanup).
+       La page "simples" qui utilisait cette nav n'est plus dans aucun
+       sous-menu visible. Les filtres par sport sont maintenant inline
+       dans les pages "Tous"/"Top"/"Buteurs". `currentSport` JS reste
+       initialisé à 'football' par défaut. -->
 </header>
 
 <!-- v31.5.1 — Nav restructurée : 5 hubs catégorisés (Pronos / Ma perf /
