@@ -6,6 +6,36 @@ des pronostics simples/combinés/montantes séquentielles, et une vue bilan.
 Déployé sur GitHub Pages. Client = navigateur ; données = fichier `data.js`
 régénéré en continu.
 
+## Architecture v31.7.x (mise à jour 2026-04-27 — gros sweep audit)
+
+**Sweep audit complet 2026-04-27** : 26 commits du chantier audit + V2/V3.
+Versions notables :
+- **v31.7.42** A11y axe-clean + focus trap modal détail
+- **v31.7.43** Link-in-text-block 6 pages éditoriales + .contrib-prompt
+- **v31.7.44** RGPD email retiré + bug FAB cagnotte mobile fixé
+- **v31.7.45** Modal Bienvenue→RGPD ordre cascade
+- **v31.7.46** Modal détail forme L5 cohérence (bug fmtForm3)
+- **v31.7.47** Copy review : "défaites" / "Voir cote" / pas d'emoji casino
+- **v31.7.48** Sticky headers + tri client tableaux backtest
+- **v31.7.49** save_data_js() atomique + retry HTTP 429/503
+- **v31.7.50** Utility classes V0 (.info-banner, .kpi-tile)
+- **v31.7.52** Colonne TIER complète backtest (mapping étendu)
+- **v31.7.54** Profit calendar GitHub-style (heatmap 365j)
+- **v31.7.55** Sparkline cumulative ROI tableaux best/worst
+- **v31.7.56** PWA install prompt smarter (≥3 pages distinctes)
+- **v31.7.57** Académie sport-aware (9 termes par sport)
+- **v31.7.58** Comparateur 2 dates côte à côte (#compare)
+- **v31.7.59** Discord webhook intégration (Profil)
+- **v31.7.60** Pipeline tier 2 leagues (15 ligues vs 5)
+- **v31.7.61** Theme variant lime/amber
+- **v31.7.62** CLV moy. per-tier dans tableau backtest
+- **v31.7.63** Full Bivariate Poisson MLE Dixon-Coles
+- **v31.7.64** Visual regression Playwright snapshots
+- **v31.7.65** Utility classes V2 (.lbl-tiny, .flex-row, .text-{xs..xl}, .card-base)
+- **v31.7.66** Cleanup bind('tabs') orphelin
+- **v31.7.67** Migration inline → utility (-41 occurrences)
+- **v31.7.68** Prefetch pages éditoriales
+
 ## Architecture v31.7 (mise à jour 2026-04-26 nuit)
 
 **Refonte IA navigation v31.5** : sidebar verticale gauche desktop ≥1100px
