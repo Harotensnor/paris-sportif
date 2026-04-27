@@ -110,6 +110,9 @@ PATCH_STAGES = [
     # v31.7.39 — Forces offensives/défensives par équipe (Maher 1982).
     # Cadence 240 ticks (~4h). Activera quand ≥40 matchs/ligue.
     ('measure_team_strengths.py',   240, 60),
+    # v31.7.63 — Full Bivariate Poisson MLE Dixon-Coles (joint α/β/γ/ρ).
+    # Plus lent (~30s/ligue avec ≥40 matchs), donc cadence faible (480 ticks).
+    ('measure_team_strengths_mle.py', 480, 120),
     # v31 — Static backtest page generator (audit ChatGPT recommandation
     # "Construire un historique public des paris"). Lit backtest_report_v2.json,
     # produit backtest.html indexable sans JS. ~0.3s.
