@@ -9189,11 +9189,14 @@
           icon = '📊'; text = 'Bilan de la journée : voir comment le modèle s\'en est sorti.';
           page = 'bilan'; cta = 'Voir bilan';
         }
-        return `<div id="smart-suggest-banner" style="margin:0 0 16px;padding:10px 16px;background:linear-gradient(90deg, rgba(167,139,250,.10), rgba(52,211,153,.05));border:1px solid rgba(167,139,250,.20);border-left:3px solid var(--brand);border-radius:0 var(--r-sm) var(--r-sm) 0;display:flex;align-items:center;gap:12px;font-size:13.5px;color:var(--text-2);">
+        // AUDIT-2026-04-27 (Sprint 24 #26) — flex-wrap pour mobile
+        // étroit. Sans wrap, le button CTA peut overflow le banner
+        // sur viewport <360px et casser la mise en page.
+        return `<div id="smart-suggest-banner" style="margin:0 0 16px;padding:10px 16px;background:linear-gradient(90deg, rgba(167,139,250,.10), rgba(52,211,153,.05));border:1px solid rgba(167,139,250,.20);border-left:3px solid var(--brand);border-radius:0 var(--r-sm) var(--r-sm) 0;display:flex;align-items:center;gap:12px;font-size:13.5px;color:var(--text-2);flex-wrap:wrap;">
           <span style="font-size:20px;line-height:1;">${icon}</span>
-          <span style="flex:1;">${esc(text)}</span>
+          <span style="flex:1;min-width:140px;">${esc(text)}</span>
           <button class="page-btn" data-page="${esc(page)}" style="padding:6px 12px;background:var(--brand);color:#08080a;border:none;border-radius:var(--r-xs);cursor:pointer;font-size:12px;font-weight:700;white-space:nowrap;">${esc(cta)} →</button>
-          <button id="smart-suggest-dismiss" data-smart-dismiss style="background:transparent;border:none;color:var(--text-dim2);font-size:18px;cursor:pointer;padding:0 4px;line-height:1;" aria-label="Masquer la suggestion" data-tooltip="Masquer pour aujourd'hui">×</button>
+          <button id="smart-suggest-dismiss" data-smart-dismiss style="background:transparent;border:none;color:var(--text-dim2);font-size:18px;cursor:pointer;padding:0 4px;line-height:1;min-width:32px;min-height:32px;" aria-label="Masquer la suggestion" data-tooltip="Masquer pour aujourd'hui">×</button>
         </div>`;
       } catch (e) { return ''; }
     })();
