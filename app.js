@@ -13824,6 +13824,11 @@
           <div style="font-size:11px;color:var(--info);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Archives du modèle</div>
           <h1 style="margin:0 0 6px;font-size:40px;font-weight:800;letter-spacing:-1.4px;color:var(--text);line-height:1;">Historique</h1>
           <div style="font-size:14px;color:var(--text-dim);max-width:700px;">Tous les pronostics réglés, groupés par jour. Filtre par sport, confiance, type ou site de paris, puis exporte en CSV.</div>
+          <!-- v31.7.78 — Note rolling window data.js (~14 jours) + lien backtest -->
+          <div style="margin-top:14px;padding:10px 14px;background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.20);border-left:3px solid var(--info);border-radius:0 8px 8px 0;font-size:12.5px;color:var(--text-dim);max-width:700px;line-height:1.5;">
+            ℹ️ Cette page affiche l'historique présent dans <code style="background:var(--panel-3);padding:1px 5px;border-radius:3px;">data.js</code> (fenêtre rolling ~14 jours).
+            Pour <b>tout l'historique vérifié</b> (depuis le déploiement, sans rolling), va sur la <button class="page-btn" data-page="backtest" style="background:transparent;border:none;color:var(--info);text-decoration:underline;cursor:pointer;font-size:inherit;font-family:inherit;padding:0;font-weight:700;">page Backtest</button> qui scanne <code style="background:var(--panel-3);padding:1px 5px;border-radius:3px;">results_archive.jsonl</code> + <code style="background:var(--panel-3);padding:1px 5px;border-radius:3px;">odds_history.jsonl</code> côté Python.
+          </div>
         </div>
         ${heroHtml}
         ${patternsHtml}
