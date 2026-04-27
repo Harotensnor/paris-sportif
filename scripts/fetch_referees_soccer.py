@@ -48,13 +48,26 @@ OUT = Path(__file__).resolve().parent.parent / 'referees_soccer.json'
 API = 'https://api.sofascore.com/api/v1'
 STALE_H = 2  # v31.7.2 : 2h (avant 6h — coverage referee 8% trop faible)
 
-# Same five leagues as fetch_injuries_soccer / fetch_lineups_soccer.
+# v31.7.60 — Extension tier 2 (audit V2 #11), aligné avec
+# fetch_injuries_soccer + fetch_lineups_soccer.
 LEAGUES: dict[str, int] = {
+    # Tier 1
     'eng.1': 17,
     'esp.1': 8,
     'ger.1': 35,
     'ita.1': 23,
     'fra.1': 34,
+    # Tier 2
+    'ned.1': 37,
+    'por.1': 238,
+    'tur.1': 52,
+    'bel.1': 38,
+    'sco.1': 36,
+    'eng.2': 18,
+    'esp.2': 54,
+    'ita.2': 24,
+    'ger.2': 44,
+    'fra.2': 182,
 }
 
 

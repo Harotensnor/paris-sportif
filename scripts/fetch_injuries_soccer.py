@@ -56,13 +56,25 @@ OUT = Path(__file__).resolve().parent.parent / 'injuries_soccer.json'
 API = 'https://api.sofascore.com/api/v1'
 
 # ESPN league code → Sofascore uniqueTournament id.
-# Focused on the five leagues where injury data actually moves the line.
+# v31.7.60 — Extension tier 2 (audit V2 #11). Couverture étendue.
 LEAGUES: dict[str, int] = {
+    # Tier 1
     'eng.1': 17,   # Premier League
     'esp.1': 8,    # LaLiga
     'ger.1': 35,   # Bundesliga
     'ita.1': 23,   # Serie A
     'fra.1': 34,   # Ligue 1
+    # Tier 2 (ajout v31.7.60)
+    'ned.1': 37,   # Eredivisie
+    'por.1': 238,  # Liga Portugal
+    'tur.1': 52,   # Süper Lig
+    'bel.1': 38,   # Pro League
+    'sco.1': 36,   # Scottish Premiership
+    'eng.2': 18,   # Championship (England)
+    'esp.2': 54,   # La Liga 2
+    'ita.2': 24,   # Serie B
+    'ger.2': 44,   # 2. Bundesliga
+    'fra.2': 182,  # Ligue 2
 }
 
 REASON_LABELS = {
