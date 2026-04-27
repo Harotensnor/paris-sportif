@@ -1625,19 +1625,19 @@
   /* v29 — Desktop sidebar widgets : fixed right rail at wide viewports, hidden below.
      v31.7.18 fix : !important sur display:none pour eviter que le rail
      s'affiche sur mobile/tablette par erreur.
-     v31.7.20 fix user feedback : "déplace cagnotte/top picks/en direct
-     vers la droite, met tout en bordure à droite". Avant right:16px
-     (16px de marge), maintenant right:0 (collé bord droit). Width passe
-     de 272 a 280 pour mieux tenir le contenu sans rognage. */
+     v31.7.20 fix user feedback : right:0, width:280.
+     v31.7.71 fix bug user : trust-strip ajoute ~38px sous le topbar et la
+     sidebar/rail (position:fixed) ne suivent pas → chevauchement avec le
+     hero. Solution : top calculé avec --trust-h (set par JS au boot). */
   .v29-dash-aside { display: none !important; }
   @media (min-width: 1280px) {
     .v29-dash-aside {
       display: block !important;
       position: fixed;
       right: 0;
-      top: 84px;
+      top: calc(84px + var(--trust-h, 0px));
       width: 280px;
-      max-height: calc(100vh - 104px);
+      max-height: calc(100vh - 104px - var(--trust-h, 0px));
       overflow-y: auto;
       z-index: 50;
       scrollbar-width: thin;
@@ -2164,10 +2164,15 @@
      Mobile/tablette < 1100px : reste en drawer hamburger comme avant.
   */
   @media (min-width: 1100px) {
-    /* Sidebar : fixed-left, full height below topbar */
+    /* Sidebar : fixed-left, full height below topbar.
+       v31.7.71 — top calculé avec --trust-h (var CSS set par JS quand
+       le trust-strip est visible) pour que "Aujourd'hui" ne soit pas
+       caché derrière la barre de stats backtest. */
     nav.topbar-nav {
       display: flex !important; flex-direction: column;
-      position: fixed; left: 0; top: 56px; bottom: 0;
+      position: fixed; left: 0;
+      top: calc(56px + var(--trust-h, 0px));
+      bottom: 0;
       width: 240px;
       background: var(--panel); border-right: 1px solid var(--border);
       padding: 14px 10px 28px;
