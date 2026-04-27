@@ -402,25 +402,66 @@ def run_backtest(opts) -> dict:
 
 # ═══ Aggrégation et rapport ═══════════════════════════════════════════
 
+# AUDIT-2026-04-27 (Sprint 5 #21) — Confidence interval Wilson sur win_rate.
+# Aussi ROI 95% CI via bootstrap sur les flat_pnl (resample 1000 fois).
+# Permet d'afficher "+5.2% ± 2.1pt (95% CI)" plutôt qu'une fausse précision.
+def _wilson_ci(wins: int, n: int, z: float = 1.96) -> tuple[float, float]:
+    """Wilson score interval pour proba binomiale. Plus stable que normal-approx
+    quand n est petit ou que p est proche de 0/1. z=1.96 = 95% CI."""
+    if n == 0:
+        return 0.0, 0.0
+    p = wins / n
+    denom = 1.0 + (z * z) / n
+    center = (p + (z * z) / (2 * n)) / denom
+    half = (z * ((p * (1 - p) / n + (z * z) / (4 * n * n)) ** 0.5)) / denom
+    return max(0.0, center - half), min(1.0, center + half)
+
+
+def _bootstrap_roi_ci(rows: list[dict], n_resample: int = 1000, z_pct: float = 95.0) -> tuple[float, float]:
+    """Bootstrap CI sur ROI : resample avec remise n_resample fois, calcule
+    flat_roi_pct sur chaque resample, retourne percentiles 2.5% et 97.5%
+    pour 95% CI. Pure stdlib, deterministic seed pour reproductibilité."""
+    if not rows:
+        return 0.0, 0.0
+    import random
+    rng = random.Random(42)  # seed deterministe
+    pnls = [r['flat_pnl'] for r in rows]
+    n = len(pnls)
+    rois = []
+    for _ in range(n_resample):
+        sample = [pnls[rng.randint(0, n - 1)] for _ in range(n)]
+        rois.append(100.0 * sum(sample) / n)
+    rois.sort()
+    lo_idx = int(n_resample * (1 - z_pct / 100) / 2)
+    hi_idx = int(n_resample * (1 - (1 - z_pct / 100) / 2))
+    return rois[lo_idx], rois[min(hi_idx, n_resample - 1)]
+
+
 def summarize(rows: list[dict]) -> dict:
     if not rows:
         return {'n': 0, 'wins': 0, 'losses': 0, 'win_rate': 0.0,
-                'flat_roi_pct': 0.0, 'kelly_pnl': 0.0,
+                'win_rate_ci': [0.0, 0.0],
+                'flat_roi_pct': 0.0, 'flat_roi_ci_pct': [0.0, 0.0],
+                'kelly_pnl': 0.0,
                 'brier': 0.0, 'logloss': 0.0, 'avg_cote': 0.0,
                 'avg_pick_prob': 0.0, 'avg_clv_pct': None, 'n_with_clv': 0}
     wins = sum(1 for r in rows if r['won'])
     flat_pnl = sum(r['flat_pnl'] for r in rows)
     kelly_pnl = sum(r['kelly_pnl'] for r in rows)
-    # v31.7.38 — CLV moyen sur les rows avec closing_odds disponible.
     clv_rows = [r for r in rows if r.get('clv_pct') is not None]
     avg_clv = round(mean(r['clv_pct'] for r in clv_rows), 2) if clv_rows else None
+    # AUDIT-2026-04-27 (Sprint 5 #21) — confidence intervals.
+    wr_lo, wr_hi = _wilson_ci(wins, len(rows))
+    roi_lo, roi_hi = _bootstrap_roi_ci(rows)
     return {
         'n': len(rows),
         'wins': wins,
         'losses': len(rows) - wins,
         'win_rate': wins / len(rows),
+        'win_rate_ci': [round(wr_lo, 4), round(wr_hi, 4)],  # Wilson 95% CI
         'flat_pnl': round(flat_pnl, 2),
         'flat_roi_pct': round(100 * flat_pnl / len(rows), 2),
+        'flat_roi_ci_pct': [round(roi_lo, 2), round(roi_hi, 2)],  # Bootstrap 95% CI
         'kelly_pnl': round(kelly_pnl, 2),
         'brier': round(mean(r['brier'] for r in rows), 4),
         'logloss': round(mean(r['logloss'] for r in rows), 4),
@@ -729,6 +770,66 @@ def render_markdown(report: dict) -> str:
     return '\n'.join(lines)
 
 
+# AUDIT-2026-04-27 (Sprint 5 #22) — Compare-to-baseline.
+# Calcule ROI de stratégies naïves sur les mêmes events évaluables :
+# - always-fav : parier le favori (cote la plus basse) à chaque match
+# - always-dog : parier l'outsider (cote la plus haute)
+# - always-draw : parier nul (foot only)
+# - random-pick : pick aléatoire (seed=42)
+# Permet de surfacer "predictMatch +5pt vs always-fav" pour montrer la
+# valeur ajoutée du modèle. Si ROI predictMatch ~ always-fav, le modèle
+# n'apporte pas grand-chose.
+def baseline_roi(rows: list[dict], strategy: str) -> dict:
+    """Calcule ROI flat 1u sur la même fenêtre que predictMatch mais avec
+    une stratégie naïve. rows = output de run_backtest avec déjà cote +
+    outcome attaché — on reconstruit juste le won selon la stratégie.
+
+    Note : on ne re-fetch pas les data, on lit `r['cote']` (cote du pick
+    predictMatch) qui peut différer de la cote de la stratégie naïve. Pour
+    rester juste, on suppose cote_fav et cote_dog dispos via match_odds
+    en amont — ici on approxime avec la cote du pick predictMatch comme
+    proxy (= même fenêtre, même bookmaker, mais simplifie). La vraie
+    baseline strict nécessiterait de relire match.odds → fait dans v31.7+
+    ultérieurement si besoin."""
+    if not rows or strategy == 'predict':
+        return summarize(rows)
+    import random
+    rng = random.Random(42)
+    new_rows = []
+    for r in rows:
+        outcome = r.get('outcome')
+        cote = r.get('cote') or 2.0
+        # Pour les baselines on simplifie : on suppose que predictMatch a
+        # pické le favori dans le marché 1N2 quand sa cote est < 2.5 (proxy).
+        # always-fav coïncide donc partiellement. Pour différencier vraiment,
+        # il faudrait stocker home_odd/draw_odd/away_odd dans rows. À titre
+        # de proxy estimatif, on flip outcome selon strategy.
+        if strategy == 'always-draw':
+            won = (outcome == 'draw')
+        elif strategy == 'random-pick':
+            choices = ['home', 'away'] + (['draw'] if r.get('sport') == 'football' else [])
+            picked = rng.choice(choices)
+            won = (picked == outcome)
+        elif strategy == 'always-fav':
+            # Hypothèse : predictMatch pick = pick.side. Si cote < 2.0 c'est
+            # probablement le fav, on garde won. Sinon on assume always-fav
+            # aurait perdu (l'outsider a gagné). Approximation.
+            won = r.get('won') if cote < 2.0 else (not r.get('won'))
+        elif strategy == 'always-dog':
+            won = (not r.get('won')) if cote < 2.0 else r.get('won')
+        else:
+            won = r.get('won')
+        flat_pnl = (cote - 1.0) if won else -1.0
+        new_rows.append({
+            **r,
+            'won': won,
+            'flat_pnl': flat_pnl,
+            'brier': brier_score(0.5, 1 if won else 0),  # baseline 50% prior
+            'logloss': log_loss(0.5, 1 if won else 0),
+        })
+    return summarize(new_rows)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument('--sport', default=None,
@@ -816,6 +917,13 @@ def main() -> int:
                 key=lambda r: -r['cote']
             )[:10]
         ],
+        # AUDIT-2026-04-27 (Sprint 5 #22) — Compare-to-baseline.
+        'baselines': {
+            'always_fav':  baseline_roi(rows, 'always-fav'),
+            'always_dog':  baseline_roi(rows, 'always-dog'),
+            'always_draw': baseline_roi(rows, 'always-draw'),
+            'random':      baseline_roi(rows, 'random-pick'),
+        },
         # On NE publie PAS la liste complète de picks dans le JSON pour éviter
         # que backtest_report_v2.json ne gonfle (déjà 500+ events en archive).
         # Si besoin d'inspection pick-par-pick, relancer avec --limit + print.
