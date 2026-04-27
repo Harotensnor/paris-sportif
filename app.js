@@ -2973,6 +2973,38 @@
     else if (conf >= 0.50) headline = `Pari jouable — fiabilité ${(conf*100).toFixed(0)}%`;
     else headline = `Incertain — fiabilité ${(conf*100).toFixed(0)}%, préférer un autre match`;
 
+    // AUDIT-2026-04-27 (Sprint 7 #4) — Disagreement signal explicit.
+    // Détecte les composants non-marché qui poussent dans des directions
+    // OPPOSÉES sur le pick choisi. Ex : Elo dit "favori home +0.10" mais
+    // forme L5 dit "favori away +0.08". Le modèle a fait son blend mais
+    // la divergence reste informative pour l'user (signal de prudence).
+    try {
+      const pickKey = best_pick[2];
+      const fieldMap = { '1': 'pH', 'X': 'pD', '2': 'pA' };
+      const field = fieldMap[pickKey];
+      const baseline = hasDraw ? (1 / 3) : 0.5;
+      const deltas = components
+        .filter(c => !c.isMarket && typeof c[field] === 'number')
+        .map(c => ({ name: c.name, delta: c[field] - baseline, w: c.w }));
+      // Cherche 1 push positif + 1 push négatif sur le pick (au-delà du
+      // bruit, seuil ±5pt). Les deux doivent avoir un poids significatif
+      // (w >= 0.15) pour ne pas alerter sur des signaux marginaux.
+      const pushPos = deltas.filter(d => d.delta >= 0.05 && d.w >= 0.15);
+      const pushNeg = deltas.filter(d => d.delta <= -0.05 && d.w >= 0.15);
+      if (pushPos.length && pushNeg.length) {
+        // Top push de chaque côté
+        pushPos.sort((a, b) => b.delta - a.delta);
+        pushNeg.sort((a, b) => a.delta - b.delta);
+        const pos = pushPos[0];
+        const neg = pushNeg[0];
+        reasons.push({
+          type: 'disagreement',
+          icon: '⚠️',
+          text: `Signaux contradictoires : ${pos.name} pousse +${Math.round(pos.delta * 100)}pt mais ${neg.name} pousse ${Math.round(neg.delta * 100)}pt — prudence sur ce pick`,
+        });
+      }
+    } catch (e) { /* fail-safe : ne casse pas la prédiction si la détection foire */ }
+
     return {
       probs: final,
       pick: { label: best_pick[0], prob: best_pick[1], key: best_pick[2], team: best_pick[3] },
@@ -5693,6 +5725,20 @@
             <div class="big-tip" style="${modelRes === 'lost' ? 'text-decoration:line-through; opacity:.7;' : ''}">${esc(pred.pick.label)}</div>
             <div class="big-conf">
               Fiabilité <b>${((pred.reliability ?? pred.pick.prob)*100).toFixed(0)}%</b> ${confLabel(pred.reliability ?? pred.pick.prob).lbl}
+              ${(() => {
+                // AUDIT-2026-04-27 (Sprint 7 #5) — Honest uncertainty.
+                // Si le backtest publie un win_rate_ci pour ce sport,
+                // on affiche l'IC95 derrière la fiabilité. Évite la
+                // fausse précision : "65% [IC95 52-77%]" est plus
+                // honnête que "65%" sec quand n=18 picks par sport.
+                try {
+                  const bt = window.__backtestReportV2;
+                  const sportData = bt && bt.by_sport && bt.by_sport[match.sport];
+                  if (!sportData || !sportData.win_rate_ci || sportData.n < 20) return '';
+                  const [lo, hi] = sportData.win_rate_ci;
+                  return ` <span style="font-size:11px;color:var(--text-dim);font-weight:500;" title="Intervalle de confiance Wilson 95% sur le WR ${match.sport} (n=${sportData.n}). Plus l'IC est large, plus l'incertitude est grande.">[IC95 ${(lo*100).toFixed(0)}-${(hi*100).toFixed(0)}%]</span>`;
+                } catch(e) { return ''; }
+              })()}
               ${pred.isLock ? ` · <span class="badge lock">🔒 PARI SÛR</span>` : ''}
               ${(() => {
                 // Chantier V — Badge qualité des données. Couleur selon le score.
