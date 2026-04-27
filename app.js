@@ -12722,9 +12722,28 @@
     }
     calendrierWrap.style.display = isCalendrier ? '' : 'none';
     if (isCalendrier) {
-      renderCalendrierPage(calendrierWrap);
+      // AUDIT-2026-04-27 (Sprint 3 #15) — Skeleton pendant _ensureFullData.
+      // Le LITE blob n'a que today, donc renderCalendrierPage avec lite
+      // affiche peu de jours. On préfère skeleton 7-rows que rendu
+      // anémique qui flickerait au moment du fetch full.
       if (window.PRONOSTICS_DATA && window.PRONOSTICS_DATA._lite && typeof window._ensureFullData === 'function') {
-        window._ensureFullData().then(() => { try { renderCalendrierPage(calendrierWrap); } catch(e){} }).catch(()=>{});
+        calendrierWrap.innerHTML = `
+          <div class="page-wrap" style="padding:0 8px 24px;">
+            <div class="page-header">
+              <div class="lbl-tiny" style="color:var(--brand);">Pronos · 7 jours</div>
+              <h1 class="page-h1">📅 Calendrier des pronos</h1>
+              <div class="skeleton-text w-70"></div>
+            </div>
+            <div style="margin-top:16px;">
+              ${'<div class="skeleton-card tall"></div>'.repeat(3)}
+            </div>
+          </div>`;
+        window._ensureFullData().then(() => { try { renderCalendrierPage(calendrierWrap); } catch(e){} }).catch(()=>{
+          // Si le fetch échoue, rends quand même avec ce qu'on a (LITE).
+          try { renderCalendrierPage(calendrierWrap); } catch(e){}
+        });
+      } else {
+        renderCalendrierPage(calendrierWrap);
       }
     }
 
@@ -17500,6 +17519,51 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
   // (uniquement si Théo a configuré PLAUSIBLE_DOMAIN ou CLOUDFLARE_TOKEN).
   _maybeEnableAnalytics();
 
+  // AUDIT-2026-04-27 (Sprint 3 #14) — Mode offline UX banner.
+  // Plutôt que laisser l'user devant un site qui semble cassé sans
+  // raison quand sa connexion tombe, on affiche une bannière jaune
+  // visible avec timestamp de la dernière donnée disponible.
+  (function setupOfflineBanner() {
+    const ensureBanner = () => {
+      let b = document.getElementById('offline-banner');
+      if (b) return b;
+      b = document.createElement('div');
+      b.id = 'offline-banner';
+      b.className = 'offline-banner';
+      b.setAttribute('role', 'status');
+      b.setAttribute('aria-live', 'polite');
+      // Insère en haut du body, sous la trust-strip s'il y en a une.
+      const refNode = document.body.firstChild;
+      document.body.insertBefore(b, refNode);
+      return b;
+    };
+    const updateBanner = () => {
+      const b = ensureBanner();
+      if (navigator.onLine) {
+        b.classList.remove('visible');
+        document.body.classList.remove('has-offline-banner');
+        return;
+      }
+      const data = window.PRONOSTICS_DATA;
+      let when = '';
+      if (data && data.generated_at) {
+        try {
+          const d = new Date(data.generated_at);
+          if (!isNaN(d.getTime())) {
+            when = ` · données du ${d.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' })}`;
+          }
+        } catch(e){}
+      }
+      b.textContent = `📡 Mode offline${when} — les nouvelles cotes ne s'actualiseront pas.`;
+      b.classList.add('visible');
+      document.body.classList.add('has-offline-banner');
+    };
+    window.addEventListener('online', updateBanner);
+    window.addEventListener('offline', updateBanner);
+    if (document.readyState !== 'loading') updateBanner();
+    else document.addEventListener('DOMContentLoaded', updateBanner, { once: true });
+  })();
+
   window.addEventListener('DOMContentLoaded', () => {
     const data = window.PRONOSTICS_DATA;
     if (!data) {
@@ -17997,6 +18061,20 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         try { localStorage.setItem('pwaPagesSeen', JSON.stringify(pagesSeen.slice(-10))); } catch(e){}
       }
       if (pagesSeen.length < 3) return;  // pas assez de pages explorées
+
+      // AUDIT-2026-04-27 (Sprint 3 #13) — Signal d'engagement supplémentaire :
+      // l'user a marqué au moins 1 lock comme vu (action active sur le
+      // produit, pas juste de la navigation). Sans ça on prompt PWA même
+      // pour un user qui scroll sans s'investir.
+      let hasSeenLock = false;
+      try {
+        const raw = localStorage.getItem('seenLockIds');
+        const arr = raw ? JSON.parse(raw) : [];
+        hasSeenLock = Array.isArray(arr) && arr.length > 0;
+      } catch(e){}
+      // OU l'user a navigué ≥5 pages distinctes (encore plus exploratoire)
+      const hasStrongExplore = pagesSeen.length >= 5;
+      if (!hasSeenLock && !hasStrongExplore) return;
 
       // Délais 60s — laisse l'user explorer encore avant le prompt
       setTimeout(_pwaShowBanner, 60000);
