@@ -137,6 +137,105 @@
     setTimeout(() => targetEl.classList.remove('has-confetti'), 2400);
   };
 
+  // AUDIT-2026-04-27 (Sprint 26 #8) — Keyboard avoidance mobile.
+  // Quand un input prend focus sur mobile, le keyboard pousse le
+  // viewport. Si l'input est en bas (filtre, search), il peut être
+  // caché. On scroll-into-view automatiquement avec 80px de marge.
+  document.addEventListener('focusin', (e) => {
+    if (window.innerWidth > 720) return;
+    const t = e.target;
+    if (!t || (t.tagName !== 'INPUT' && t.tagName !== 'TEXTAREA' && t.tagName !== 'SELECT')) return;
+    setTimeout(() => {
+      try {
+        const rect = t.getBoundingClientRect();
+        // Si l'input est dans la moitié inférieure du viewport, scroll-into-view
+        if (rect.top > window.innerHeight / 2) {
+          t.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      } catch (e) {}
+    }, 300);  // attendre que le keyboard soit ouvert
+  });
+
+  // AUDIT-2026-04-27 (Sprint 26 #10) — Haptic feedback helper.
+  // Vibre brièvement (10ms) sur Android. iOS Safari ignore (pas de
+  // vibrate API). Pour les events importants : new lock, win streak,
+  // tap CTA primaire.
+  window._haptic = function haptic(pattern = 10) {
+    try {
+      if (navigator.vibrate) navigator.vibrate(pattern);
+    } catch (e) {}
+  };
+
+  // AUDIT-2026-04-27 (Sprint 26 #6) — Pull-to-refresh dashboard mobile.
+  // Geste overscroll en haut du dashboard → indicator + fetch data.
+  // Activé seulement sur mobile (max-width: 720px) et au top du scroll.
+  (function setupPullToRefresh() {
+    if (!('ontouchstart' in window)) return;
+    let startY = 0;
+    let pullDistance = 0;
+    let pulling = false;
+    let indicator = null;
+    const THRESHOLD = 80;
+    const ensureIndicator = () => {
+      if (indicator) return indicator;
+      indicator = document.createElement('div');
+      indicator.className = 'ptr-indicator';
+      indicator.setAttribute('role', 'status');
+      indicator.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(indicator);
+      return indicator;
+    };
+    document.addEventListener('touchstart', (e) => {
+      if (window.innerWidth > 720) return;
+      // Pas de PTR si scroll body > 0 (l'user veut juste scroll up normal)
+      const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
+      if (scrollY > 5) return;
+      // Pas de PTR si on est dans une modal
+      if (document.getElementById('detail-modal')?.classList.contains('open')) return;
+      startY = e.touches[0].clientY;
+      pulling = true;
+    }, { passive: true });
+    document.addEventListener('touchmove', (e) => {
+      if (!pulling) return;
+      pullDistance = Math.max(0, e.touches[0].clientY - startY);
+      if (pullDistance > 20) {
+        const ind = ensureIndicator();
+        const ready = pullDistance >= THRESHOLD;
+        ind.textContent = ready ? '↺ Relâche pour rafraîchir' : '↓ Tire pour rafraîchir';
+        ind.classList.toggle('visible', pullDistance > 30);
+      }
+    }, { passive: true });
+    document.addEventListener('touchend', () => {
+      if (!pulling) return;
+      pulling = false;
+      if (pullDistance >= THRESHOLD && indicator) {
+        indicator.textContent = 'Rafraîchissement…';
+        indicator.classList.add('refreshing');
+        // Trigger force-refresh data : appelle pollData si dispo
+        try {
+          if (typeof window.pollData === 'function') {
+            window.pollData(true).finally(() => {
+              setTimeout(() => {
+                if (indicator) {
+                  indicator.classList.remove('visible', 'refreshing');
+                }
+              }, 600);
+            });
+          } else {
+            setTimeout(() => {
+              if (indicator) indicator.classList.remove('visible', 'refreshing');
+            }, 1200);
+          }
+        } catch (e) {
+          if (indicator) indicator.classList.remove('visible', 'refreshing');
+        }
+      } else if (indicator) {
+        indicator.classList.remove('visible');
+      }
+      pullDistance = 0;
+    }, { passive: true });
+  })();
+
   // AUDIT-2026-04-27 (Sprint 22 #18) — Migration inline onclick → delegation
   // pour CSP friendlier (préparation à passer en CSP strict sans
   // 'unsafe-inline' un jour).
