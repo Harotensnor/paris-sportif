@@ -6596,13 +6596,11 @@
     else console.warn(`[wiring] #${id} introuvable au boot — handler ${ev} ignoré`);
     return el;
   }
-  bind('tabs', 'click', (e) => {
-    const btn = e.target.closest('button[data-tab]'); if (!btn) return;
-    document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('active', b === btn));
-    currentSport = btn.dataset.tab;
-    activeFilter = 'all';
-    render();
-  });
+  // v31.7.66 — Sport tabs handler retiré : #tabs n'existe plus dans le DOM
+  // depuis le cleanup v31.7.51 (audit reported 4.2). Le bind helper aurait
+  // émis un console.warn à chaque boot pour rien.
+  // currentSport reste 'football' (default), modifiable via les filtres
+  // inline des pages Tous/Top/Buteurs.
 
   // v30 — Date nav : label "today-btn" devient contextuel (Hier / Aujourd'hui /
   // Demain / DD/MM) pour signaler clairement où on est. Click = retour à
