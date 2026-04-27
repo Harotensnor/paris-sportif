@@ -93,8 +93,18 @@
       radial-gradient(900px 500px at -10% 10%, rgba(16,185,129,.10), transparent 60%),
       #08080a;
   }
-  a { color: #a78bfa; text-decoration: none; }
-  a:hover, a:focus { text-decoration: underline; }
+  a { color: #a78bfa; }
+  a:hover, a:focus { text-decoration: underline; text-decoration-thickness: 2px; }
+  /* v31.7.43 — Liens dans corps de texte soulignés (WCAG 1.4.1, fix audit) */
+  .lead a, .honesty a, section.block p a, .h2-sub a, section.final-cta p a,
+  footer.site-footer p a, .feature-card p a, .anj-pill a {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+  }
+  header.topbar a, footer.site-footer nav a, .cta-primary, .cta-secondary {
+    text-decoration: none !important;
+  }
   code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: .92em; background: rgba(167,139,250,.1); padding: 1px 5px; border-radius: 4px; }
 
   header.topbar {

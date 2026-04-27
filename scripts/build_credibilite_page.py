@@ -229,8 +229,8 @@ PAGE_TEMPLATE = '''<!DOCTYPE html>
 
 <main>
   <nav class="breadcrumb" aria-label="Fil d'ariane">
-    <a href="./" style="color:#6b6b73;">Accueil</a> ›
-    <span style="color:#a3a3aa;">Crédibilité</span>
+    <a href="./">Accueil</a> ›
+    <span style="color:#9ba1ac;">Crédibilité</span>
   </nav>
 
   <span class="uppercase-pill">Calibration probabiliste</span>
@@ -287,7 +287,7 @@ PAGE_TEMPLATE = '''<!DOCTYPE html>
     <p>Concrètement, si tu mises selon Kelly fractionnaire, ton espérance de croissance long-terme dépend directement de la précision de tes probabilités. Un modèle mal calibré qui produit 60% sur des matchs où la vraie prob est 50% va te faire perdre de l'argent même avec un staking parfait.</p>
   </section>
 
-  <p style="margin-top:32px;padding:14px 16px;background:#0c0c0f;border:1px dashed rgba(255,255,255,.1);border-radius:8px;font-size:12.5px;color:#6b6b73;text-align:center;">
+  <p class="contrib-prompt">
     📐 Métriques détaillées (WR par tier, ROI par sport, calibration sur sous-segments) :
     <a href="backtest.html">Backtest</a>. Définitions : <a href="academie.html">Académie</a>. Protocole formel : <a href="methodologie.html">Méthodologie</a>.
     <br><br>
