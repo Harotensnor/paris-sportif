@@ -406,6 +406,30 @@
    *  model's bilan becomes meaningless — every finished match defaults to
    *  a flat "home 55%" prior, turning the bilan into a home-WR measurement. */
   function getMatchOdds(match, hasDraw) {
+    // AUDIT-2026-04-27 (P2) — Promesse Winamax-only : la cote utilisée
+    // pour predictMatch (edge, market_implied, label) doit être Winamax
+    // quand un match exact existe. Avant : on lisait match.odds (ESPN
+    // live, vide pour upcoming) puis odds_snapshot (DraftKings /
+    // TennisExplorer / BetExplorer cap turé en pré-match) AVANT winamax.
+    // Résultat : 187 events live avec Winamax exact recevaient leur
+    // edge calculé sur cote DraftKings/TennisExplorer (divergence
+    // observée : Cádiz Winamax 1.92 vs DraftKings 2.05 → +7% edge fictif).
+    // Fix : Winamax exact PROVERSE en pré-match. Live ESPN reste
+    // prioritaire pour les matchs en cours (cotes pré-match Winamax
+    // figées dès le coup d'envoi).
+    const isLive = match && (match.live || match.status === 'STATUS_IN_PROGRESS');
+    const wxOdds = match && match.winamax && match.winamax.markets && match.winamax.markets['1n2'];
+    const wxValid = wxOdds && (wxOdds.home || wxOdds.away) && match.winamax.match_id;
+    if (!isLive && wxValid) {
+      return {
+        home: wxOdds.home || null,
+        draw: hasDraw ? (wxOdds.draw || null) : null,
+        away: wxOdds.away || null,
+        spread: null,
+        overUnder: null,
+        _fromWinamax: true,
+      };
+    }
     const live = bestOdds(match.odds, hasDraw);
     if (live && (live.home || live.away)) return live;
     const snap = match.odds_snapshot;
@@ -419,14 +443,9 @@
         _fromSnapshot: true,
       };
     }
-    // v30 — Winamax 1N2 markets fallback. ESPN ne fournit pas dodds pour
-    // tennis / MMA / certains matchs basket. patch_winamax_markets.py
-    // remplit ev.winamax.markets.1n2 = {home, draw?, away}. Sans cette
-    // source, tous ces events tombaient sur "no odds" -> predictMatch
-    // les filtrait et la page Tous nen affichait aucun (24 tennis = 0
-    // dans Tous au lieu detre listes).
-    const wxOdds = match.winamax && match.winamax.markets && match.winamax.markets['1n2'];
-    if (wxOdds && (wxOdds.home || wxOdds.away)) {
+    // Fallback Winamax pour le cas live (où on n'a pas eu de match
+    // exact pré-match mais où les markets sont arrivés en cours).
+    if (wxValid) {
       return {
         home: wxOdds.home || null,
         draw: hasDraw ? (wxOdds.draw || null) : null,
