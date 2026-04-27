@@ -3592,7 +3592,7 @@
                   <div style="font-weight:600;color:var(--text);">${esc(pred.pick.label)}</div>
                   <div style="font-size:12px;color:var(--text-dim);">${pickOdd.toFixed(2)} · ${(rel*100).toFixed(0)}%</div>
                 </div>
-                <div style="background:rgba(52,211,153,.18);border:1px solid rgba(52,211,153,.3);color:#34d399;padding:6px 10px;border-radius:6px;font-weight:700;font-size:12px;white-space:nowrap;">+${Math.round(edge*100)}%</div>
+                <div style="background:rgba(52,211,153,.18);border:1px solid rgba(52,211,153,.3);color:var(--accent);padding:6px 10px;border-radius:6px;font-weight:700;font-size:12px;white-space:nowrap;">+${Math.round(edge*100)}%</div>
               </div>
             `;
           }).join('')}
@@ -3867,7 +3867,7 @@
             ${leagueOpts.map(l => `<option value="${esc(l.code)}" ${advFilters.league === l.code ? 'selected' : ''}>${esc(l.name)}</option>`).join('')}
           </select>
         </div>
-        ${advFiltersActive() ? `<button id="adv-reset" style="margin-left:auto;padding:5px 10px;background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.3);color:#f87171;border-radius:6px;cursor:pointer;font-size:12px;">↺ Réinitialiser</button>` : ''}
+        ${advFiltersActive() ? `<button id="adv-reset" style="margin-left:auto;padding:5px 10px;background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.3);color:var(--danger);border-radius:6px;cursor:pointer;font-size:12px;">↺ Réinitialiser</button>` : ''}
       </div>` : '';
     const el = document.getElementById('filters');
     el.innerHTML = html + advHtml;
@@ -4032,16 +4032,16 @@
           overflow: hidden;
         ">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-            <span style="font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#a78bfa;background:rgba(167,139,250,.15);padding:4px 10px;border-radius:6px;">🏆 Pari du jour</span>
+            <span style="font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--brand);background:rgba(167,139,250,.15);padding:4px 10px;border-radius:6px;">🏆 Pari du jour</span>
             <span style="font-size:11px;color:var(--text-dim2);font-weight:500;">meilleur compromis fiabilité × edge × Kelly</span>
-            ${urgent ? `<span style="font-size:11px;font-weight:700;color:#fbbf24;margin-left:auto;">⏱ ${esc(tIn)}</span>` : `<span style="font-size:11px;color:var(--text-dim2);margin-left:auto;">${esc(tIn)}</span>`}
+            ${urgent ? `<span style="font-size:11px;font-weight:700;color:var(--warn);margin-left:auto;">⏱ ${esc(tIn)}</span>` : `<span style="font-size:11px;color:var(--text-dim2);margin-left:auto;">${esc(tIn)}</span>`}
           </div>
           <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:10px;">
             <div style="font-size:17px;font-weight:700;color:var(--text);">${esc(home?.short || home?.name || '?')} <span style="color:var(--text-dim);font-weight:400;">vs</span> ${esc(away?.short || away?.name || '?')}</div>
             <span style="font-size:11px;color:var(--text-dim2);">${esc(m.league_name || '')}</span>
           </div>
           <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-            <span style="padding:6px 12px;border-radius:8px;background:rgba(16,185,129,.18);color:#10b981;font-weight:700;font-size:14px;">${esc(pred.pick.label)} @ ${pickOdd.toFixed(2)}</span>
+            <span style="padding:6px 12px;border-radius:8px;background:rgba(16,185,129,.18);color:var(--accent);font-weight:700;font-size:14px;">${esc(pred.pick.label)} @ ${pickOdd.toFixed(2)}</span>
             <span style="padding:5px 11px;border-radius:7px;background:rgba(255,255,255,.06);color:var(--text);font-weight:600;font-size:12.5px;">🎯 Fiab ${relPct}%</span>
             <span style="padding:5px 11px;border-radius:7px;background:rgba(236,72,153,.18);color:#f472b6;font-weight:700;font-size:12.5px;">💎 Edge +${edgePct}pt</span>
           </div>
@@ -4117,9 +4117,9 @@
               const sevTxt = lm.severity === 'sharp' ? 'Sharp' : lm.severity === 'notable' ? 'Notable' : 'Léger';
               const intensity = lm.severity === 'sharp' ? 0.28 : lm.severity === 'notable' ? 0.20 : 0.14;
               if (lm.deltaPct < 0) {
-                return `<span title="Cote ${lm.before.toFixed(2)} → ${lm.after.toFixed(2)}. ${sevTxt} drop — money vers notre pick." style="padding:5px 12px;border-radius:8px;background:rgba(16,185,129,${intensity});color:#34d399;font-weight:700;font-size:12.5px;">📉 ${sevTxt} ${lm.deltaPct.toFixed(1)}%</span>`;
+                return `<span title="Cote ${lm.before.toFixed(2)} → ${lm.after.toFixed(2)}. ${sevTxt} drop — money vers notre pick." style="padding:5px 12px;border-radius:8px;background:rgba(16,185,129,${intensity});color:var(--accent);font-weight:700;font-size:12.5px;">📉 ${sevTxt} ${lm.deltaPct.toFixed(1)}%</span>`;
               }
-              return `<span title="Cote ${lm.before.toFixed(2)} → ${lm.after.toFixed(2)}. ${sevTxt} drift — marché s'éloigne." style="padding:5px 12px;border-radius:8px;background:rgba(248,113,113,${intensity});color:#f87171;font-weight:700;font-size:12.5px;">📈 ${sevTxt} +${lm.deltaPct.toFixed(1)}%</span>`;
+              return `<span title="Cote ${lm.before.toFixed(2)} → ${lm.after.toFixed(2)}. ${sevTxt} drift — marché s'éloigne." style="padding:5px 12px;border-radius:8px;background:rgba(248,113,113,${intensity});color:var(--danger);font-weight:700;font-size:12.5px;">📈 ${sevTxt} +${lm.deltaPct.toFixed(1)}%</span>`;
             })() : ''}
             ${(() => {
               const rel = pred.reliability ?? pred.pick.prob;
@@ -4130,7 +4130,7 @@
                 ? `<span title="Edge modèle ${(rel*100).toFixed(0)}% vs cote implicite ${((1/pickOdd)*100).toFixed(0)}%" style="padding:5px 12px;border-radius:8px;background:rgba(236,72,153,.18);color:#f472b6;font-weight:700;font-size:12.5px;">💎 Value +${edgePct}pt</span>`
                 : '';
             })()}
-            ${pred.markets && pred.markets.ou.prob >= 0.60 ? `<span title="Marché bonus dérivé des buts attendus." style="padding:5px 12px;border-radius:8px;background:rgba(139,92,246,.16);color:#a78bfa;font-weight:700;font-size:12.5px;">⚽ ${esc(pred.markets.ou.label)} · ${(pred.markets.ou.prob*100).toFixed(0)}%</span>` : ''}
+            ${pred.markets && pred.markets.ou.prob >= 0.60 ? `<span title="Marché bonus dérivé des buts attendus." style="padding:5px 12px;border-radius:8px;background:rgba(139,92,246,.16);color:var(--brand);font-weight:700;font-size:12.5px;">⚽ ${esc(pred.markets.ou.label)} · ${(pred.markets.ou.prob*100).toFixed(0)}%</span>` : ''}
             ${pred.markets && pred.markets.btts.prob >= 0.60 ? `<span title="Les deux équipes marquent — probabilité dérivée des buts attendus." style="padding:5px 12px;border-radius:8px;background:rgba(236,72,153,.16);color:#f472b6;font-weight:700;font-size:12.5px;">🔄 ${esc(pred.markets.btts.label)} · ${(pred.markets.btts.prob*100).toFixed(0)}%</span>` : ''}
           </div>
 
@@ -4553,12 +4553,12 @@
           return `<div class="combine-leg" data-id="${esc(l.m.id)}" style="display:flex;flex-direction:column;gap:3px;padding:10px 12px;background:rgba(255,255,255,.03);border-radius:8px;border:1px solid rgba(255,255,255,.05);">
             <div style="font-size:13px;font-weight:600;">${esc(home?.short || home?.name || '?')} <span style="color:var(--text-dim2);">vs</span> ${esc(away?.short || away?.name || '?')}</div>
             <div style="font-size:11px;color:var(--text-dim,#b4bcc7);">${esc(lg)} · ${esc(when)}</div>
-            <div style="margin-top:4px;display:flex;align-items:center;gap:8px;"><span style="color:#10b981;font-weight:600;font-size:13px;">🎯 ${esc(l.pred.pick.label)}</span><span style="color:var(--text-dim);font-size:11px;">(${Math.round((l.rel||0)*100)}%)</span><span style="margin-left:auto;color:#a78bfa;font-weight:700;font-size:13px;">@${l.odd.toFixed(2)}</span></div>
+            <div style="margin-top:4px;display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-weight:600;font-size:13px;">🎯 ${esc(l.pred.pick.label)}</span><span style="color:var(--text-dim);font-size:11px;">(${Math.round((l.rel||0)*100)}%)</span><span style="margin-left:auto;color:var(--brand);font-weight:700;font-size:13px;">@${l.odd.toFixed(2)}</span></div>
           </div>`;
         }).join('');
         const retHtml = picked.totalOdd ? (10 * picked.totalOdd).toFixed(2) : '—';
         const epPct = picked.expectedPL != null ? (picked.expectedPL * 100).toFixed(0) : '0';
-        const epTone = (picked.expectedPL || 0) > 0 ? 'color:#10b981;' : 'color:#fca5a5;';
+        const epTone = (picked.expectedPL || 0) > 0 ? 'color:var(--accent);' : 'color:#fca5a5;';
         const copyTxt = `🤖 Combiné IA × ${picked.totalOdd.toFixed(2)} (prob. ${Math.round((picked.combProb||0)*100)}%) · 10€ → ${retHtml}€\n` +
           picked.legs.map(l => {
             const { home, away } = getSides(l.m);
@@ -4576,10 +4576,10 @@
           <div style="font-size:12px;color:var(--text-dim,#b4bcc7);margin-bottom:12px;line-height:1.4;">${picked.legs.length} locks Winamax anti-corrélés (max 1 leg par ligue-jour, max 2 par sport). Filtré par proba × ln(cote).</div>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin-bottom:12px;">${legsHtml}</div>
           <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;padding-top:10px;border-top:1px solid rgba(255,255,255,.06);">
-            <div><span style="font-size:11px;color:var(--text-dim2,#7b8693);">Cote totale</span> <b style="color:#a78bfa;font-size:18px;margin-left:6px;">×${picked.totalOdd.toFixed(2)}</b></div>
+            <div><span style="font-size:11px;color:var(--text-dim2,#7b8693);">Cote totale</span> <b style="color:var(--brand);font-size:18px;margin-left:6px;">×${picked.totalOdd.toFixed(2)}</b></div>
             <div><span style="font-size:11px;color:var(--text-dim2,#7b8693);">Prob. combinée</span> <b style="margin-left:6px;">${Math.round((picked.combProb||0)*100)}%</b></div>
             <div><span style="font-size:11px;color:var(--text-dim2,#7b8693);">Espérance P&L (1u)</span> <b style="${epTone}margin-left:6px;">${(picked.expectedPL||0)>=0?'+':''}${epPct}%</b></div>
-            <div style="margin-left:auto;font-size:13px;"><span style="color:var(--text-dim,#b4bcc7);">10€ →</span> <b style="color:#10b981;font-size:16px;">${retHtml}€</b></div>
+            <div style="margin-left:auto;font-size:13px;"><span style="color:var(--text-dim,#b4bcc7);">10€ →</span> <b style="color:var(--accent);font-size:16px;">${retHtml}€</b></div>
           </div>
         </div>`;
       } catch (e) { console.warn('[EEEE] suggestCombineIA failed', e); return ''; }
@@ -5040,8 +5040,8 @@
       // Chantier W — indicateur live sur le pick (gagnant / en cours / perdant)
       const liveSt = isLive ? evaluateLivePick(m, pred) : null;
       const liveBadge = liveSt ? (() => {
-        if (liveSt === 'winning') return `<span style="background:rgba(16,185,129,.18);border:1px solid rgba(16,185,129,.4);color:#10b981;padding:2px 7px;border-radius:10px;font-size:10.5px;font-weight:700;letter-spacing:.3px;margin-left:6px;">✓ gagnant</span>`;
-        if (liveSt === 'tied')    return `<span style="background:rgba(251,191,36,.18);border:1px solid rgba(251,191,36,.4);color:#fbbf24;padding:2px 7px;border-radius:10px;font-size:10.5px;font-weight:700;letter-spacing:.3px;margin-left:6px;">⏱️ en cours</span>`;
+        if (liveSt === 'winning') return `<span style="background:rgba(16,185,129,.18);border:1px solid rgba(16,185,129,.4);color:var(--accent);padding:2px 7px;border-radius:10px;font-size:10.5px;font-weight:700;letter-spacing:.3px;margin-left:6px;">✓ gagnant</span>`;
+        if (liveSt === 'tied')    return `<span style="background:rgba(251,191,36,.18);border:1px solid rgba(251,191,36,.4);color:var(--warn);padding:2px 7px;border-radius:10px;font-size:10.5px;font-weight:700;letter-spacing:.3px;margin-left:6px;">⏱️ en cours</span>`;
         return `<span style="background:rgba(252,165,165,.18);border:1px solid rgba(252,165,165,.4);color:#fca5a5;padding:2px 7px;border-radius:10px;font-size:10.5px;font-weight:700;letter-spacing:.3px;margin-left:6px;">✗ perdant</span>`;
       })() : '';
       return `
@@ -5538,8 +5538,8 @@
         const pickOdd = pred.odds ? (pred.pick.key === '1' ? pred.odds.home : pred.pick.key === '2' ? pred.odds.away : pred.odds.draw) : null;
         const reasons = pred.explain?.reasons || [];
         const liveBadgeDetail = liveSt ? (() => {
-          if (liveSt === 'winning') return ` <span style="background:rgba(16,185,129,.18);border:1px solid rgba(16,185,129,.4);color:#10b981;padding:3px 9px;border-radius:11px;font-size:12px;font-weight:700;letter-spacing:.3px;">🔴 LIVE · Gagnant</span>`;
-          if (liveSt === 'tied')    return ` <span style="background:rgba(251,191,36,.18);border:1px solid rgba(251,191,36,.4);color:#fbbf24;padding:3px 9px;border-radius:11px;font-size:12px;font-weight:700;letter-spacing:.3px;">🔴 LIVE · En cours</span>`;
+          if (liveSt === 'winning') return ` <span style="background:rgba(16,185,129,.18);border:1px solid rgba(16,185,129,.4);color:var(--accent);padding:3px 9px;border-radius:11px;font-size:12px;font-weight:700;letter-spacing:.3px;">🔴 LIVE · Gagnant</span>`;
+          if (liveSt === 'tied')    return ` <span style="background:rgba(251,191,36,.18);border:1px solid rgba(251,191,36,.4);color:var(--warn);padding:3px 9px;border-radius:11px;font-size:12px;font-weight:700;letter-spacing:.3px;">🔴 LIVE · En cours</span>`;
           return ` <span style="background:rgba(252,165,165,.18);border:1px solid rgba(252,165,165,.4);color:#fca5a5;padding:3px 9px;border-radius:11px;font-size:12px;font-weight:700;letter-spacing:.3px;">🔴 LIVE · Perdant</span>`;
         })() : '';
         return `
@@ -5579,7 +5579,7 @@
               const edgePct = edge != null ? Math.round(edge * 100) : null;
               const isValue = edge != null && edge >= 0.05;
               return `<div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;font-size:13px;">
-                <span style="padding:4px 10px;border-radius:6px;background:rgba(16,185,129,.12);color:#10b981;font-weight:700;">Cote @ ${pickOdd.toFixed(2)}</span>
+                <span style="padding:4px 10px;border-radius:6px;background:rgba(16,185,129,.12);color:var(--accent);font-weight:700;">Cote @ ${pickOdd.toFixed(2)}</span>
                 ${isValue ? `<span title="Le modèle estime ${(rel*100).toFixed(0)}% de chances alors que la cote n'en prévoit que ${((1/pickOdd)*100).toFixed(0)}%." style="padding:4px 10px;border-radius:6px;background:rgba(236,72,153,.14);color:#f472b6;font-weight:700;">💎 +${edgePct}pt d'avantage</span>` : (edge != null && edge > 0 && edge < 0.05 ? `<span title="Léger avantage (<5pt) — pas très intéressant." style="padding:4px 10px;border-radius:6px;background:rgba(255,255,255,.05);color:var(--text-dim2,#7b8693);font-weight:600;">+${edgePct}pt</span>` : '')}
               </div>`;
             })() : ''}
@@ -5808,7 +5808,7 @@
                   : margin > 0 ? `${esc(home?.short || home?.name || 'Dom.')} +${Math.abs(margin)}`
                                : `${esc(away?.short || away?.name || 'Ext.')} +${Math.abs(margin)}`;
                 chipsHtml = `
-                  <span style="padding:8px 14px;border-radius:8px;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);font-variant-numeric:tabular-nums;font-weight:700;color:#10b981;display:inline-flex;align-items:center;gap:8px;">
+                  <span style="padding:8px 14px;border-radius:8px;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);font-variant-numeric:tabular-nums;font-weight:700;color:var(--accent);display:inline-flex;align-items:center;gap:8px;">
                     <span style="font-size:15px;">${it.home}-${it.away}</span>
                     <span style="color:var(--text-dim2,#7b8693);font-weight:500;font-size:12px;">projeté</span>
                   </span>
@@ -5931,7 +5931,7 @@
               </div>`;
           }
           const lu = side.lineup;
-          const conf = lu.confirmed ? `<span style="padding:2px 7px;border-radius:4px;background:rgba(16,185,129,.15);color:#10b981;font-size:10px;font-weight:700;margin-left:8px;">CONFIRMÉE</span>` : `<span style="padding:2px 7px;border-radius:4px;background:rgba(255,255,255,.06);color:var(--text-dim2,#7b8693);font-size:10px;font-weight:700;margin-left:8px;">PROBABLE</span>`;
+          const conf = lu.confirmed ? `<span style="padding:2px 7px;border-radius:4px;background:rgba(16,185,129,.15);color:var(--accent);font-size:10px;font-weight:700;margin-left:8px;">CONFIRMÉE</span>` : `<span style="padding:2px 7px;border-radius:4px;background:rgba(255,255,255,.06);color:var(--text-dim2,#7b8693);font-size:10px;font-weight:700;margin-left:8px;">PROBABLE</span>`;
           const starters = lu.starters.slice(0, 11).map(p => `
             <div style="display:grid;grid-template-columns:28px 1fr auto;gap:6px;align-items:center;padding:4px 6px;background:rgba(255,255,255,.02);border-radius:4px;font-size:12px;">
               <span style="color:var(--text-dim2,#7b8693);font-family:monospace;text-align:center;">${esc(p.shirt ?? '—')}</span>
@@ -6149,7 +6149,7 @@
         <div class="section">
           <h4>⚔️ Face-à-face récents</h4>
           <div style="display:flex;gap:10px;margin-bottom:10px;font-size:12.5px;flex-wrap:wrap;">
-            <span style="padding:4px 10px;border-radius:6px;background:rgba(16,185,129,.12);color:#10b981;font-weight:700;">${esc(home?.short||home?.name)}: ${hw}V</span>
+            <span style="padding:4px 10px;border-radius:6px;background:rgba(16,185,129,.12);color:var(--accent);font-weight:700;">${esc(home?.short||home?.name)}: ${hw}V</span>
             ${dr ? `<span style="padding:4px 10px;border-radius:6px;background:rgba(255,255,255,.06);color:var(--text-dim,#b4bcc7);font-weight:700;">Nuls: ${dr}</span>` : ''}
             <span style="padding:4px 10px;border-radius:6px;background:rgba(96,165,250,.12);color:#60a5fa;font-weight:700;">${esc(away?.short||away?.name)}: ${aw}V</span>
           </div>
@@ -8868,7 +8868,7 @@
                       <span style="color:${confCol};font-weight:700;font-size:11.5px;">${Math.round(legProb)}%</span>
                       <span class="text-trunc-x"><span style="color:var(--text-dim);">${esc(matchName)}</span> — <b>${esc(pickLabel)}</b></span>
                       <span style="color:var(--text-dim2,#7b8693);font-size:11px;">${esc(legTime)}</span>
-                      <span style="color:#a78bfa;font-weight:600;">@${(l.odd||0).toFixed(2)}</span>
+                      <span style="color:var(--brand);font-weight:600;">@${(l.odd||0).toFixed(2)}</span>
                     </div>`;
                   }).join('')}
                 </div>
@@ -9144,7 +9144,7 @@
           <div style="padding:14px 14px 12px;background:var(--panel);border:1px solid var(--border);border-radius:10px;margin-bottom:10px;">
             <div style="font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-dim);font-weight:700;margin-bottom:4px;">💰 Cagnotte modèle</div>
             <div style="font-size:24px;font-weight:800;letter-spacing:-.5px;color:var(--text);">${nav.toFixed(2)}€</div>
-            <div style="font-size:11.5px;color:${deltaColor};font-weight:600;margin-top:2px;">${deltaSign}${Math.round((agent.deltaPct7 ?? 0)*10)/10}% sur 7j</div>
+            <div style="font-size:11.5px;color:${deltaColor};font-weight:600;margin-top:2px;">${deltaSign}${Math.round((agent.deltaPct7 ?? 0)*10)/10}% ${daysSinceStart < 7 ? `depuis le début (${daysSinceStart}j)` : 'sur 7j'}</div>
             <div style="font-size:10.5px;color:var(--text-dim);margin-top:6px;">Partie de 10€ le ${esc(startDateStr)} · ${(agent.series?.length || 0)} pari${(agent.series?.length || 0)>1?'s':''}</div>
           </div>
           <div style="padding:14px 14px 12px;background:var(--panel);border:1px solid var(--border);border-radius:10px;margin-bottom:10px;">
@@ -9881,7 +9881,7 @@
       const sportEm = { football:'⚽', tennis:'🎾', basketball:'🏀', hockey:'🏒', baseball:'⚾', 'american-football':'🏈', mma:'🥊', golf:'⛳', racing:'🏎️', rugby:'🏉' }[p.m.sport] || '🎯';
       const league = p.m.league_name || '';
       const url = (p.m.winamax && p.m.winamax.url) || 'https://www.winamax.fr/paris-sportifs';
-      const resBadge = isFini ? (p.res === 'won' ? '<span style="padding:3px 10px;background:rgba(52,211,153,.15);color:#34d399;font-weight:700;font-size:11px;border-radius:999px;">✓ GAGNÉ</span>' : p.res === 'lost' ? '<span style="padding:3px 10px;background:rgba(248,113,113,.15);color:#fca5a5;font-weight:700;font-size:11px;border-radius:999px;">✗ PERDU</span>' : '<span style="padding:3px 10px;background:rgba(148,163,184,.15);color:#94a3b8;font-weight:600;font-size:11px;border-radius:999px;">? n/a</span>') : '';
+      const resBadge = isFini ? (p.res === 'won' ? '<span style="padding:3px 10px;background:rgba(52,211,153,.15);color:var(--accent);font-weight:700;font-size:11px;border-radius:999px;">✓ GAGNÉ</span>' : p.res === 'lost' ? '<span style="padding:3px 10px;background:rgba(248,113,113,.15);color:#fca5a5;font-weight:700;font-size:11px;border-radius:999px;">✗ PERDU</span>' : '<span style="padding:3px 10px;background:rgba(148,163,184,.15);color:#94a3b8;font-weight:600;font-size:11px;border-radius:999px;">? n/a</span>') : '';
       const teamLogo = (src) => src ? `<img src="${esc(src)}" alt="" style="width:22px;height:22px;object-fit:contain;border-radius:3px;" loading="lazy">` : '<span style="display:inline-block;width:22px;height:22px;"></span>';
       // v30 — Countdown intégré sous l'heure : "dans 9h57" / "dans 25 min"
       const _cntLabel = (() => {
@@ -9921,7 +9921,7 @@
             <div style="color:var(--text-dim);">
               <span style="font-size:10px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.5px;font-weight:700;display:block;margin-bottom:3px;">⚽ Buteurs</span>
               ${predScorers.length ? `<div><span style="opacity:.75;">Probables :</span> <b style="color:var(--text);">${predScorers.map(s => `${esc(s.name)} <span style="color:var(--text-dim2);font-weight:400;">(${Math.round(s.prob*100)}%)</span>`).join(', ')}</b></div>` : ''}
-              ${realScorers.length ? `<div style="margin-top:${predScorers.length?'2':'0'}px;"><span style="opacity:.75;">Réels :</span> <b style="color:${predScorerHit ? '#34d399' : 'var(--text)'};">${realScorers.map(s => `${esc(s.name)}${s.minute ? ` <span style="color:var(--text-dim2);font-weight:400;">${esc(s.minute)}</span>` : ''}`).join(', ')}</b>${predScorerHit ? ' <span style="color:#34d399;font-weight:600;">✓ pick touché</span>' : ''}</div>` : ''}
+              ${realScorers.length ? `<div style="margin-top:${predScorers.length?'2':'0'}px;"><span style="opacity:.75;">Réels :</span> <b style="color:${predScorerHit ? '#34d399' : 'var(--text)'};">${realScorers.map(s => `${esc(s.name)}${s.minute ? ` <span style="color:var(--text-dim2);font-weight:400;">${esc(s.minute)}</span>` : ''}`).join(', ')}</b>${predScorerHit ? ' <span style="color:var(--accent);font-weight:600;">✓ pick touché</span>' : ''}</div>` : ''}
             </div>` : ''}
         </div>` : '';
       return `<div class="tous-row" data-match-id="${esc(String(p.m.id || ''))}" data-match-date="${esc(String(p.m.date || ''))}" style="display:grid;gap:14px;padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${isFini ? (p.res==='won'?'#34d399':p.res==='lost'?'#fca5a5':'var(--text-dim)') : (p.rel>=0.70 ? 'var(--accent)' : 'var(--brand)')};border-radius:0 10px 10px 0;align-items:center;cursor:pointer;font-variant-numeric:tabular-nums;">
@@ -13427,8 +13427,8 @@
               ? (p.m.competitors?.[0]?.short || p.m.competitors?.[0]?.name || '1')
               : (p.m.competitors?.[1]?.short || p.m.competitors?.[1]?.name || '2');
           const resIco = p.res === 'won'
-            ? '<span style="color:#34d399;font-weight:800;">✓</span>'
-            : '<span style="color:#f87171;font-weight:800;">✗</span>';
+            ? '<span style="color:var(--accent);font-weight:800;">✓</span>'
+            : '<span style="color:var(--danger);font-weight:800;">✗</span>';
           const delta = p.res === 'won' ? `+${(p.odd - 1).toFixed(2)}u` : '−1u';
           const deltaCol = p.res === 'won' ? '#34d399' : '#f87171';
           const fiab = p.pred.reliability ?? p.pred.pick.prob;
@@ -13531,8 +13531,8 @@
         <div class="bilan-kpi">
           <div class="kpi-label">Meilleur / pire jour</div>
           <div class="kpi-value" style="font-size:14px;line-height:1.35;">
-            <div style="color:#34d399;">${bestTxt}</div>
-            <div style="color:#f87171;">${worstTxt}</div>
+            <div style="color:var(--accent);">${bestTxt}</div>
+            <div style="color:var(--danger);">${worstTxt}</div>
           </div>
           <div class="kpi-sub">en unités flat</div>
         </div>
@@ -14037,7 +14037,7 @@
     checks.push({ key: 'cron-link', label: '⚙️ GitHub Actions (cron)', status: 'info',
       value: 'lien direct',
       detail: 'Clique pour ouvrir la page Actions et vérifier que le workflow refresh-data tourne.',
-      extraHtml: `<a href="https://github.com/Harotensnor/paris-sportif/actions" target="_blank" rel="noopener" style="color:#a78bfa;font-weight:600;text-decoration:underline;">→ github.com/Harotensnor/paris-sportif/actions</a>` });
+      extraHtml: `<a href="https://github.com/Harotensnor/paris-sportif/actions" target="_blank" rel="noopener" style="color:var(--brand);font-weight:600;text-decoration:underline;">→ github.com/Harotensnor/paris-sportif/actions</a>` });
 
     return { checks, meta: { totalToday, todayWinCount: todayWin.length, totalRemaining,
       perSportRemaining, lockCount, lsMb, recentErrorCount: recent.length } };
@@ -14066,15 +14066,15 @@
     }
 
     const statusPill = (s) => {
-      if (s === 'ok') return '<span style="background:rgba(52,211,153,.18);color:#34d399;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;letter-spacing:.4px;">OK</span>';
+      if (s === 'ok') return '<span style="background:rgba(52,211,153,.18);color:var(--accent);padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;letter-spacing:.4px;">OK</span>';
       if (s === 'warn') return '<span style="background:rgba(234,179,8,.18);color:#eab308;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;letter-spacing:.4px;">WARN</span>';
-      if (s === 'crit') return '<span style="background:rgba(248,113,113,.18);color:#f87171;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;letter-spacing:.4px;">CRIT</span>';
+      if (s === 'crit') return '<span style="background:rgba(248,113,113,.18);color:var(--danger);padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;letter-spacing:.4px;">CRIT</span>';
       return '<span style="background:rgba(255,255,255,.06);color:var(--text-dim);padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;letter-spacing:.4px;">INFO</span>';
     };
     const sideColor = (s) => s === 'ok' ? '#34d399' : s === 'warn' ? '#eab308' : s === 'crit' ? '#f87171' : '#a78bfa';
 
     const checkRow = (c, idx) => {
-      const actionBtn = c.action ? `<button class="sante-action-btn" data-action-idx="${idx}" style="background:rgba(167,139,250,.15);color:#a78bfa;border:1px solid rgba(167,139,250,.3);border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;">${esc(c.action.label)}</button>` : '';
+      const actionBtn = c.action ? `<button class="sante-action-btn" data-action-idx="${idx}" style="background:rgba(167,139,250,.15);color:var(--brand);border:1px solid rgba(167,139,250,.3);border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;">${esc(c.action.label)}</button>` : '';
       const extraHtml = c.extraHtml || '';
       return `
         <div class="sante-row" style="display:grid;grid-template-columns:44px 1fr auto;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);align-items:center;">
@@ -14191,7 +14191,7 @@
         <div style="margin-top:22px;">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
             <div style="font-size:13px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;">📋 Tous les checks</div>
-            <button id="sante-rerun-btn" style="background:rgba(167,139,250,.15);color:#a78bfa;border:1px solid rgba(167,139,250,.3);border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;">🔁 Re-vérifier</button>
+            <button id="sante-rerun-btn" style="background:rgba(167,139,250,.15);color:var(--brand);border:1px solid rgba(167,139,250,.3);border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;">🔁 Re-vérifier</button>
           </div>
           <div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;overflow:hidden;">
             ${checks.map((c, i) => checkRow(c, i)).join('')}
@@ -14282,11 +14282,11 @@
     // Construire le paragraphe — tone coach direct
     const lines = [];
     // Ouverture : état de forme
-    if (roi >= 15) lines.push(`🔥 <b style="color:#10b981;">+${roi.toFixed(1)}% de rentabilité</b> sur ${tot} paris — le modèle est en pleine forme.`);
-    else if (roi >= 5) lines.push(`✅ <b style="color:#10b981;">+${roi.toFixed(1)}% de rentabilité</b> sur ${tot} paris — rentable, tiens la ligne.`);
+    if (roi >= 15) lines.push(`🔥 <b style="color:var(--accent);">+${roi.toFixed(1)}% de rentabilité</b> sur ${tot} paris — le modèle est en pleine forme.`);
+    else if (roi >= 5) lines.push(`✅ <b style="color:var(--accent);">+${roi.toFixed(1)}% de rentabilité</b> sur ${tot} paris — rentable, tiens la ligne.`);
     else if (roi >= -5) lines.push(`⚖️ <b>${roi >= 0 ? '+' : ''}${roi.toFixed(1)}% de rentabilité</b> sur ${tot} paris — à l'équilibre, patience.`);
-    else if (roi >= -15) lines.push(`⚠️ <b style="color:#fbbf24;">${roi.toFixed(1)}% de rentabilité</b> sur ${tot} paris — passage à vide, vérifie si tu suis bien les paris sûrs.`);
-    else lines.push(`🧊 <b style="color:#f87171;">${roi.toFixed(1)}% de rentabilité</b> sur ${tot} paris — glissade sérieuse, relis tes paris des 2 dernières semaines.`);
+    else if (roi >= -15) lines.push(`⚠️ <b style="color:var(--warn);">${roi.toFixed(1)}% de rentabilité</b> sur ${tot} paris — passage à vide, vérifie si tu suis bien les paris sûrs.`);
+    else lines.push(`🧊 <b style="color:var(--danger);">${roi.toFixed(1)}% de rentabilité</b> sur ${tot} paris — glissade sérieuse, relis tes paris des 2 dernières semaines.`);
 
     // Tendance 7j vs 30j
     if (roi7 != null && roi30 != null && r7.length >= 5 && r30.length >= 10) {
@@ -15423,19 +15423,19 @@
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;">
             <div title="Plus grande chute depuis un sommet. Indique le pire passage qu'il faut être prêt à encaisser.">
               <div style="font-size:11px;color:var(--text-dim);">Drawdown max</div>
-              <div style="font-size:16px;font-weight:700;color:#f87171;font-variant-numeric:tabular-nums;">${ddLbl}<span style="font-size:11px;font-weight:500;color:var(--text-dim2);">${ddPctLbl}</span></div>
+              <div style="font-size:16px;font-weight:700;color:var(--danger);font-variant-numeric:tabular-nums;">${ddLbl}<span style="font-size:11px;font-weight:500;color:var(--text-dim2);">${ddPctLbl}</span></div>
             </div>
             <div title="Plus longue série de picks consécutifs perdants depuis le démarrage.">
               <div style="font-size:11px;color:var(--text-dim);">Pire série L</div>
-              <div style="font-size:16px;font-weight:700;color:#f87171;font-variant-numeric:tabular-nums;">${maxLossStreak} pick${maxLossStreak>1?'s':''}</div>
+              <div style="font-size:16px;font-weight:700;color:var(--danger);font-variant-numeric:tabular-nums;">${maxLossStreak} pick${maxLossStreak>1?'s':''}</div>
             </div>
             <div title="Plus longue série de picks consécutifs gagnants.">
               <div style="font-size:11px;color:var(--text-dim);">Meilleure série W</div>
-              <div style="font-size:16px;font-weight:700;color:#34d399;font-variant-numeric:tabular-nums;">${maxWinStreak} pick${maxWinStreak>1?'s':''}</div>
+              <div style="font-size:16px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;">${maxWinStreak} pick${maxWinStreak>1?'s':''}</div>
             </div>
             <div title="Pourcentage de jours où le solde a progressé.">
               <div style="font-size:11px;color:var(--text-dim);">Jours verts</div>
-              <div style="font-size:16px;font-weight:700;color:#34d399;font-variant-numeric:tabular-nums;">${greenPct}%<span style="font-size:11px;font-weight:500;color:var(--text-dim2);"> (${greenDays}/${totalDays})</span></div>
+              <div style="font-size:16px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;">${greenPct}%<span style="font-size:11px;font-weight:500;color:var(--text-dim2);"> (${greenDays}/${totalDays})</span></div>
             </div>
             <div title="Écart-type du P&L journalier. Plus c'est haut, plus la variance entre jours est marquée.">
               <div style="font-size:11px;color:var(--text-dim);">Volatilité</div>
@@ -15443,11 +15443,11 @@
             </div>
             <div title="Meilleur jour depuis J1">
               <div style="font-size:11px;color:var(--text-dim);">Meilleur jour</div>
-              <div style="font-size:16px;font-weight:700;color:#34d399;font-variant-numeric:tabular-nums;">${bestDay ? (bestDay.delta >= 0 ? '+' : '')+bestDay.delta.toFixed(2)+'€' : '—'}<span style="font-size:11px;font-weight:500;color:var(--text-dim2);"> · ${bestDayDate}</span></div>
+              <div style="font-size:16px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;">${bestDay ? (bestDay.delta >= 0 ? '+' : '')+bestDay.delta.toFixed(2)+'€' : '—'}<span style="font-size:11px;font-weight:500;color:var(--text-dim2);"> · ${bestDayDate}</span></div>
             </div>
             <div title="Pire jour depuis J1">
               <div style="font-size:11px;color:var(--text-dim);">Pire jour</div>
-              <div style="font-size:16px;font-weight:700;color:#f87171;font-variant-numeric:tabular-nums;">${worstDay ? worstDay.delta.toFixed(2)+'€' : '—'}<span style="font-size:11px;font-weight:500;color:var(--text-dim2);"> · ${worstDayDate}</span></div>
+              <div style="font-size:16px;font-weight:700;color:var(--danger);font-variant-numeric:tabular-nums;">${worstDay ? worstDay.delta.toFixed(2)+'€' : '—'}<span style="font-size:11px;font-weight:500;color:var(--text-dim2);"> · ${worstDayDate}</span></div>
             </div>
           </div>
         </div>`;
@@ -15696,8 +15696,8 @@
               ${moreCount ? `<div style="padding:8px 12px;font-size:11px;color:var(--text-dim2);border-top:1px solid var(--border,#2a3744);">+ ${moreCount} ligue${moreCount>1?'s':''} avec moins de volume</div>` : ''}
               ${leagueEntries.length >= 2 ? `
                 <div style="padding:9px 12px;font-size:11px;color:var(--text-dim2);border-top:1px solid var(--border,#2a3744);background:var(--bg-3,#0f1823);">
-                  <span style="color:#34d399;">💡 Meilleure ligue</span> : ${esc(leagueEntries[0].name)} (ROI ${bestROI>=0?'+':''}${bestROI.toFixed(0)}%)
-                  · <span style="color:#f87171;">⚠️ Pire</span> : ${esc(leagueEntries[leagueEntries.length-1].name)} (${worstROI>=0?'+':''}${worstROI.toFixed(0)}%)
+                  <span style="color:var(--accent);">💡 Meilleure ligue</span> : ${esc(leagueEntries[0].name)} (ROI ${bestROI>=0?'+':''}${bestROI.toFixed(0)}%)
+                  · <span style="color:var(--danger);">⚠️ Pire</span> : ${esc(leagueEntries[leagueEntries.length-1].name)} (${worstROI>=0?'+':''}${worstROI.toFixed(0)}%)
                 </div>` : ''}
             </div>`;
         })()
@@ -15826,8 +15826,8 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
 
       const footerH = (bestCell && worstCell && bestCell !== worstCell) ? `
         <div style="padding:9px 12px;font-size:11px;color:var(--text-dim2);border-top:1px solid var(--border,#2a3744);background:var(--bg-3,#0f1823);margin-top:10px;border-radius:8px;">
-          <span style="color:#34d399;">🔥 Meilleur créneau</span> : ${esc(sportLabel(bestCell.sport))} le ${DAY_NAMES[bestCell.dow].toLowerCase()} (ROI ${bestROI>=0?'+':''}${bestROI.toFixed(0)}% · ${bestCell.bets} paris)
-          · <span style="color:#f87171;">❄️ Pire</span> : ${esc(sportLabel(worstCell.sport))} le ${DAY_NAMES[worstCell.dow].toLowerCase()} (${worstROI>=0?'+':''}${worstROI.toFixed(0)}% · ${worstCell.bets} paris)
+          <span style="color:var(--accent);">🔥 Meilleur créneau</span> : ${esc(sportLabel(bestCell.sport))} le ${DAY_NAMES[bestCell.dow].toLowerCase()} (ROI ${bestROI>=0?'+':''}${bestROI.toFixed(0)}% · ${bestCell.bets} paris)
+          · <span style="color:var(--danger);">❄️ Pire</span> : ${esc(sportLabel(worstCell.sport))} le ${DAY_NAMES[worstCell.dow].toLowerCase()} (${worstROI>=0?'+':''}${worstROI.toFixed(0)}% · ${worstCell.bets} paris)
         </div>` : insufficientDataMsg;
 
       return `
@@ -15920,7 +15920,7 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
           ${rowsH}
           <div style="padding:9px 12px;font-size:11px;color:var(--text-dim2);border-top:1px solid var(--border,#2a3744);background:var(--bg-3,#0f1823);">
             ${tipsterEntries.length >= 2 ? `<span style="color:${winnerROI>0?'#34d399':'var(--text-dim)'};">🏆 Meilleur</span> : ${esc(tipsterEntries[0].name)} (${winnerROI>=0?'+':''}${winnerROI.toFixed(0)}%)` : ''}
-            ${tipsterEntries.length >= 3 && loserROI <= -3 ? ` · <span style="color:#f87171;">⚠️ Fuir</span> : ${esc(tipsterEntries[tipsterEntries.length-1].name)} (${loserROI.toFixed(0)}%)` : ''}
+            ${tipsterEntries.length >= 3 && loserROI <= -3 ? ` · <span style="color:var(--danger);">⚠️ Fuir</span> : ${esc(tipsterEntries[tipsterEntries.length-1].name)} (${loserROI.toFixed(0)}%)` : ''}
             ${model.bets >= 10 ? ` · <span style="color:var(--text-dim);">vs modèle (${modelROI>=0?'+':''}${modelROI.toFixed(0)}%)</span> : <b style="color:${beatModel>0?'#fbbf24':'var(--text-dim)'};">${beatModel}</b>/${tipsterEntries.length} tipster${tipsterEntries.length>1?'s':''} font mieux` : ''}
           </div>
         </div>`;
@@ -15944,7 +15944,7 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     const modeleLimit = Math.min(_bilanHistLimits.modele, modeleTotal);
     const modelRowsHtml = rows.slice().reverse().slice(0, modeleLimit).map(r => {
       const { home, away } = getSides(r.m);
-      const cls = r.res === 'won' ? 'style="color:#34d399;font-weight:600;"' : 'style="color:#f87171;"';
+      const cls = r.res === 'won' ? 'style="color:var(--accent);font-weight:600;"' : 'style="color:var(--danger);"';
       return `<tr>
         <td style="color:var(--text-dim);font-size:12px;">${esc(fmtDate(isoDate(r.m.date)))}</td>
         <td>${esc((home?.short||home?.name||''))} <span style="color:var(--text-dim2);">vs</span> ${esc((away?.short||away?.name||''))}</td>
@@ -16001,7 +16001,7 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       const ciText = b.bets >= 3
         ? `<div style="font-size:10px;color:var(--text-dim2);margin-top:4px;font-weight:500;">
              IC 95% WR: ${(ci.low*100).toFixed(0)}–${(ci.high*100).toFixed(0)}%
-             ${tooNarrow ? ' <span style="color:#fbbf24;">⚠️ peu fiable</span>' : ''}
+             ${tooNarrow ? ' <span style="color:var(--warn);">⚠️ peu fiable</span>' : ''}
            </div>`
         : '';
       return `<div class="bilan-sport-card" style="border-color:${color}55;">
@@ -16258,12 +16258,12 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
           vLbl = '✅ Modèle rentable';
           vColor = '#34d399';
           vBg = 'rgba(52,211,153,.10)';
-          vDesc = `Sur ${model.bets} picks, le modèle a généré <strong style="color:#34d399;">+${model.pl.toFixed(2)}u</strong>. Tu peux suivre ses recommandations, surtout les High confiance.`;
+          vDesc = `Sur ${model.bets} picks, le modèle a généré <strong style="color:var(--accent);">+${model.pl.toFixed(2)}u</strong>. Tu peux suivre ses recommandations, surtout les High confiance.`;
         } else if (model.pl < 0 && roi < -3) {
           vLbl = '❌ Modèle perdant';
           vColor = '#f87171';
           vBg = 'rgba(248,113,113,.10)';
-          vDesc = `Sur ${model.bets} picks, le modèle a perdu <strong style="color:#f87171;">${model.pl.toFixed(2)}u</strong>. À ce stade, éviter de le suivre aveuglément.`;
+          vDesc = `Sur ${model.bets} picks, le modèle a perdu <strong style="color:var(--danger);">${model.pl.toFixed(2)}u</strong>. À ce stade, éviter de le suivre aveuglément.`;
         } else {
           vLbl = '⚖️ Proche du break-even';
           vColor = '#a78bfa';
