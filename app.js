@@ -2425,11 +2425,15 @@
         const hW = (typeof ts.home_wins_last10 === 'number') ? ts.home_wins_last10 : (ts.home_last10.match(/W/g) || []).length;
         const aW = (typeof ts.away_wins_last10 === 'number') ? ts.away_wins_last10 : (ts.away_last10.match(/W/g) || []).length;
         if (Math.abs(hW - aW) >= 2) {
+          // v31.7.79 — UX clarté : éviter "X 7/10 vs 3/10" où le 2e chiffre
+          // n'est rattaché à personne. On étiquette les 2 côtés explicitement
+          // (cf. fix v31.7.70 sur la forme L5 foot).
           const leader = hW > aW ? (home?.short || home?.name) : (away?.short || away?.name);
+          const other  = hW > aW ? (away?.short || away?.name) : (home?.short || home?.name);
           reasons.push({
             type: 'tennis_form10',
             icon: '🔥',
-            text: `Forme : ${leader} ${Math.max(hW, aW)}/10 vs ${Math.min(hW, aW)}/10`,
+            text: `Forme : ${leader} ${Math.max(hW, aW)}/10 · ${other} ${Math.min(hW, aW)}/10`,
           });
         }
       }
@@ -2479,13 +2483,19 @@
     // territory).
     if (match.sport === 'hockey' && nhlStats) {
       if (Math.abs(nhlStats.pace_diff) >= 1.0) {
+        // v31.7.79 — UX clarté : éviter l'ambiguïté "X +0.50/m vs +0.30/m"
+        // (lecteur ne sait pas lequel des 2 chiffres appartient à X). On
+        // étiquette les 2 côtés explicitement, comme on l'a fait pour la
+        // forme L5 (cf. v31.7.70).
         const better = nhlStats.pace_diff > 0 ? (home?.short || home?.name) : (away?.short || away?.name);
+        const worse  = nhlStats.pace_diff > 0 ? (away?.short || away?.name) : (home?.short || home?.name);
         const betterPace = nhlStats.pace_diff > 0 ? nhlStats.home_pace : nhlStats.away_pace;
-        const worsePace = nhlStats.pace_diff > 0 ? nhlStats.away_pace : nhlStats.home_pace;
+        const worsePace  = nhlStats.pace_diff > 0 ? nhlStats.away_pace : nhlStats.home_pace;
+        const fmt = (v) => `${v>=0?'+':''}${v.toFixed(2)}/m`;
         reasons.push({
           type: 'nhl_pace',
           icon: '🏒',
-          text: `Différentiel buts : ${better} ${betterPace>=0?'+':''}${betterPace.toFixed(2)}/m vs ${worsePace>=0?'+':''}${worsePace.toFixed(2)}/m`,
+          text: `Différentiel buts : ${better} ${fmt(betterPace)} · ${worse} ${fmt(worsePace)}`,
         });
       }
       if (nhlStats.home_goalie?.save_pct && nhlStats.away_goalie?.save_pct) {
@@ -10598,10 +10608,13 @@
     });
 
     const fmtDate = (iso) => iso === todayIso ? "Aujourd'hui" : "Demain";
-    const confLabel = (p) => p >= 0.72 ? { text: 'Très probable', color: 'var(--accent)' } :
-                              p >= 0.60 ? { text: 'Probable', color: 'var(--info)' } :
-                              p >= 0.45 ? { text: 'Incertain', color: 'var(--warn)' } :
-                                          { text: 'Peu probable', color: 'var(--danger)' };
+    // v31.7.81 — Bug visible : `${color}22` avec une CSS var produit
+    // `var(--accent)22`, invalide → le badge n'avait jamais de background.
+    // On ajoute un champ `bg` qui pointe vers le soft variant du theme.
+    const confLabel = (p) => p >= 0.72 ? { text: 'Très probable', color: 'var(--accent)', bg: 'var(--accent-soft)' } :
+                              p >= 0.60 ? { text: 'Probable',     color: 'var(--info)',   bg: 'var(--info-soft)' } :
+                              p >= 0.45 ? { text: 'Incertain',    color: 'var(--warn)',   bg: 'var(--warn-soft)' } :
+                                          { text: 'Peu probable', color: 'var(--danger)', bg: 'var(--danger-soft)' };
 
     const cardHtml = (entry) => {
       const { m, pred, dayIso } = entry;
@@ -10637,7 +10650,7 @@
             <div style="background:var(--panel-2);border:1px solid var(--border);border-left:3px solid var(--brand);border-radius:var(--r);padding:12px 14px;">
               <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
                 <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;font-weight:700;">🥅 Nombre de buts</div>
-                <span style="font-size:10px;padding:2px 8px;border-radius:999px;background:${ouConf.color}22;color:${ouConf.color};font-weight:700;">${ouConf.text}</span>
+                <span style="font-size:10px;padding:2px 8px;border-radius:999px;background:${ouConf.bg};color:${ouConf.color};font-weight:700;">${ouConf.text}</span>
               </div>
               <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px;">${esc(ou.label)}</div>
               <div style="display:flex;gap:14px;font-size:12px;color:var(--text-2);font-variant-numeric:tabular-nums;">
@@ -10649,7 +10662,7 @@
             <div style="background:var(--panel-2);border:1px solid var(--border);border-left:3px solid var(--purple);border-radius:var(--r);padding:12px 14px;">
               <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
                 <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;font-weight:700;">🔄 Les deux marquent ?</div>
-                <span style="font-size:10px;padding:2px 8px;border-radius:999px;background:${bttsConf.color}22;color:${bttsConf.color};font-weight:700;">${bttsConf.text}</span>
+                <span style="font-size:10px;padding:2px 8px;border-radius:999px;background:${bttsConf.bg};color:${bttsConf.color};font-weight:700;">${bttsConf.text}</span>
               </div>
               <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px;">${esc(btts.label)}</div>
               <div style="display:flex;gap:14px;font-size:12px;color:var(--text-2);font-variant-numeric:tabular-nums;">
@@ -11775,7 +11788,9 @@
       const first = pts[0].v, last = pts[pts.length-1].v;
       const moveDelta = last - first;
       const movePct = (moveDelta / first) * 100;
-      const movColor = Math.abs(movePct) < 1 ? 'var(--text-dim)' : movePct > 0 ? '#34d399' : '#f87171';
+      // v31.7.81 — Garde le color en hex pour SVG fill/stroke (les CSS vars
+      // ne sont pas garanties dans presentation attributes).
+      const movColor = Math.abs(movePct) < 1 ? '#9ca3af' : movePct > 0 ? '#34d399' : '#f87171';
       const moveSign = movePct >= 0 ? '+' : '';
       const moveLbl = Math.abs(movePct) < 1 ? '≈ stable' : `${moveSign}${movePct.toFixed(1)}%`;
       const moveArrow = Math.abs(movePct) < 1 ? '→' : movePct > 0 ? '↗' : '↘';
@@ -12047,7 +12062,7 @@
             <!-- Pick -->
             <div style="font-size:13px;color:var(--brand);font-weight:600;margin-bottom:12px;">→ ${esc(pickLabel)} · Confiance ${Math.round(s.rel*100)}%</div>
             <!-- Stake → Cote → Payout flow -->
-            <div style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:8px;align-items:center;padding:10px 12px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;">
+            <div class="montante-step-flow" style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:8px;align-items:center;padding:10px 12px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;">
               <div style="text-align:center;">
                 <div style="font-size:9.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.3px;">Mise</div>
                 <div style="font-size:15px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;">${s.stake.toFixed(2)}€</div>
@@ -12077,9 +12092,9 @@
         </div>
 
         <!-- Carte récap : départ → arrivée + risque -->
-        <div style="background:linear-gradient(135deg, var(--panel) 0%, var(--panel-2) 100%);border:1px solid var(--border-2);border-radius:var(--r-lg);padding:24px 26px;margin-bottom:18px;position:relative;overflow:hidden;">
+        <div class="montante-recap" style="background:linear-gradient(135deg, var(--panel) 0%, var(--panel-2) 100%);border:1px solid var(--border-2);border-radius:var(--r-lg);padding:24px 26px;margin-bottom:18px;position:relative;overflow:hidden;">
           <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle, var(--brand) 0%, transparent 60%);opacity:.10;pointer-events:none;"></div>
-          <div style="display:grid;grid-template-columns:1fr auto 1fr 1fr;gap:18px;align-items:center;">
+          <div class="montante-recap-grid" style="display:grid;grid-template-columns:1fr auto 1fr 1fr;gap:18px;align-items:center;">
             <div>
               <div class="lbl-tiny">Mise initiale</div>
               <div style="font-size:32px;font-weight:800;color:var(--text);letter-spacing:-.6px;font-variant-numeric:tabular-nums;line-height:1;margin-top:4px;">${initialStake.toFixed(2)}€</div>
@@ -12191,6 +12206,8 @@
     const isMontanteWeekend  = currentPage === 'montante-weekend';
     const isMontanteSemaine  = currentPage === 'montante-semaine';
     const isMontante = isMontanteJour || isMontanteWeekend || isMontanteSemaine;
+    // v31.7.77 — Calendrier (declared early for the same TDZ reason)
+    const isCalendrier = currentPage === 'calendrier';
 
     // v23 — Sous-nav "Mon suivi" (historique/bilan/backtest).
     // v30 — "Mes paris" retiré : Théo n'enregistre pas ses paris sur le
@@ -12297,7 +12314,7 @@
 
     // Summary bar: shown for simples + bilan + top, hidden for combines/value/locks/historique/sante + nouvelles pages
     const sum = document.getElementById('summary-bar');
-    if (sum) sum.style.display = (isCombines || isValue || isLocks || isHistorique || isSante || isDashboard || isAlertes || isAcademie || isBacktest || isProfil || isButeurs || isTous || isCredibilite || isMontante) ? 'none' : '';
+    if (sum) sum.style.display = (isCombines || isValue || isLocks || isHistorique || isSante || isDashboard || isAlertes || isAcademie || isBacktest || isProfil || isButeurs || isTous || isCredibilite || isMontante || isCalendrier) ? 'none' : '';
 
     // Chantier IIII — Simples quick-take IA (visible only on Simples)
     const iaSimples = document.getElementById('ia-simples-wrap');
@@ -12399,8 +12416,7 @@
       }
     }
 
-    // v31.7.77 — Calendrier 7 jours
-    const isCalendrier = currentPage === 'calendrier';
+    // v31.7.77 — Calendrier 7 jours (isCalendrier déjà déclaré plus haut pour TDZ)
     let calendrierWrap = document.getElementById('calendrier-wrap');
     if (!calendrierWrap) {
       calendrierWrap = document.createElement('div');
@@ -15679,7 +15695,10 @@
             </div>`;
         }).join('')
       : '';
-    const walletRoiColor = walletPL > 0 ? '#34d399' : walletPL < 0 ? '#f87171' : 'var(--text-dim)';
+    // v31.7.81 — Mélange hex/CSS-var ici crée un bug : `${walletRoiColor}44`
+    // pour neutre produit `var(--text-dim)44` invalide → border-color cassé.
+    // On garde tout en hex pour la concaténation alpha.
+    const walletRoiColor = walletPL > 0 ? '#34d399' : walletPL < 0 ? '#f87171' : '#7b8693';
 
     // Bloc "Métriques de risque" (Chantier N) — posé en 2e rangée de KPIs.
     // Rendu conditionnel : on ne l'affiche pas tant qu'il n'y a pas au moins
