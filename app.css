@@ -2612,7 +2612,10 @@
     height: 3px; width: 0%;
     background: var(--brand);
     transition: width 80ms linear;
-    z-index: 3;
+    /* Sprint 41 #3 — z-index 6 pour passer au-dessus de .md-tabs (z:5)
+       et du modal-head (sticky). Sinon barre clippée par les tabs. */
+    z-index: 6;
+    pointer-events: none;
   }
 
   /* AUDIT-2026-04-27 (Sprint 16 #18) — Toast stack en bas-droit.

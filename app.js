@@ -195,16 +195,20 @@
       startY = e.touches[0].clientY;
       pulling = true;
     }, { passive: true });
+    // AUDIT-2026-04-27 (Sprint 41 #2) — passive: false pour pouvoir
+    // preventDefault() et bloquer le bounce overscroll iOS Safari.
     document.addEventListener('touchmove', (e) => {
       if (!pulling) return;
       pullDistance = Math.max(0, e.touches[0].clientY - startY);
       if (pullDistance > 20) {
+        // Bloque le bounce overscroll natif iOS qui interfère
+        try { e.preventDefault(); } catch (err) {}
         const ind = ensureIndicator();
         const ready = pullDistance >= THRESHOLD;
         ind.textContent = ready ? '↺ Relâche pour rafraîchir' : '↓ Tire pour rafraîchir';
         ind.classList.toggle('visible', pullDistance > 30);
       }
-    }, { passive: true });
+    }, { passive: false });
     document.addEventListener('touchend', () => {
       if (!pulling) return;
       pulling = false;
@@ -7448,7 +7452,14 @@
         let currentY = 0;
         let dragging = false;
         const onStart = (e) => {
-          // Drag handle = la zone du head ou le before-handle (juste au-dessus)
+          // AUDIT-2026-04-27 (Sprint 41 #4) — Skip drag si touch sur
+          // le close button ou tout élément interactif dans le head.
+          // Évite que le drag interfère avec le tap close.
+          const target = e.target;
+          if (target && target.closest && target.closest('button, a, input, [role="button"]')) {
+            dragging = false;
+            return;
+          }
           const t = e.touches ? e.touches[0] : e;
           startY = t.clientY;
           dragging = true;
@@ -9462,12 +9473,18 @@
     // l'user a déjà cliqué dessus aujourd'hui (localStorage).
     const _hourSuggestion = (() => {
       try {
-        // AUDIT-2026-04-27 (Sprint 25 #2) — Comparaison timestamp UTC
-        // au lieu de date locale Paris. Avant : si l'user voyage entre
-        // fuseaux ou si la date Paris change pendant la session (00:00),
-        // le banner réapparaissait. Maintenant : dismissed pour 18h glissantes.
+        // AUDIT-2026-04-27 (Sprint 25 #2 + Sprint 41 #5) — Dismiss UTC
+        // 18h glissantes + protection clock skew. Si l'horloge système
+        // est décalée >24h dans le futur (suspect), on ignore le dismiss
+        // pour éviter qu'un user soit bloqué pour toujours.
         const dismissedTs = parseInt(localStorage.getItem('smartSuggestionDismissedTs') || '0', 10);
-        if (isFinite(dismissedTs) && (Date.now() - dismissedTs) < 18 * 3600 * 1000) return '';
+        const now = Date.now();
+        const diff = now - dismissedTs;
+        // Skip dismiss si :
+        // - dismissedTs invalid (non finite ou 0)
+        // - diff négatif (clock went backward, suspect)
+        // - diff > 24h (older than expected window)
+        if (isFinite(dismissedTs) && dismissedTs > 0 && diff > 0 && diff < 18 * 3600 * 1000) return '';
         const hour = parseInt(
           new Date().toLocaleTimeString('fr-FR', { timeZone: 'Europe/Paris', hour: '2-digit', hour12: false }),
           10
@@ -13339,19 +13356,31 @@
         _main.classList.add('page-fade-in');
       }
     } catch(e){}
-    // AUDIT-2026-04-27 (Sprint 20 #6 + Sprint 25 #3) — Scan auto des
-    // [data-anim-count]. Pour gérer le cas LITE→FULL re-render
-    // (lazy data charge après applyPageView et déclenche un nouveau
-    // render), on scan IMMÉDIATEMENT puis on observe les futures
-    // mutations DOM pour 3 secondes.
+    // AUDIT-2026-04-27 (Sprint 41 #1) — Fix MutationObserver infinite loop.
+    // Avant : MO observait main sans filter. _animateCounter modifie
+    // textContent → MO refire → re-scan → potentielle boucle (les
+    // animDone flag aidaient mais la MO continuait à scan inutilement).
+    // Maintenant : scan une fois immédiat + une fois après 1s (couvre
+    // LITE→FULL). Plus de MO. Si un nouveau KPI apparaît hors fenêtre,
+    // pas grave (perte cosmétique uniquement).
     try {
+      // Sprint 42 #8 — Skip si data-anim-to manquant ou pas finite.
+      // Évite "0%" affiché à la place du placeholder "—".
       const scanAndAnimate = () => {
         document.querySelectorAll('[data-anim-count]:not([data-anim-done])').forEach(el => {
-          const to = parseFloat(el.dataset.animTo);
-          if (!isFinite(to)) return;
+          const rawTo = el.dataset.animTo;
+          if (rawTo === undefined || rawTo === '' || rawTo === '—') {
+            el.dataset.animDone = '1';  // skip mais marque pour ne plus rescan
+            return;
+          }
+          const to = parseFloat(rawTo);
+          if (!isFinite(to)) {
+            el.dataset.animDone = '1';
+            return;
+          }
           const suffix = el.dataset.animSuffix || '';
           const showSign = el.dataset.animSign === '1';
-          const decimals = (el.dataset.animTo.split('.')[1] || '').length;
+          const decimals = (rawTo.split('.')[1] || '').length;
           const fmt = (v) => {
             const sign = showSign && v >= 0 ? '+' : '';
             return sign + v.toFixed(decimals) + suffix;
@@ -13363,14 +13392,7 @@
         });
       };
       setTimeout(scanAndAnimate, 50);
-      // Observe les rendus async (LITE → FULL) pendant 3s pour catch
-      // les nouveaux KPIs introduits par re-render après _ensureFullData.
-      const _main = document.querySelector('main');
-      if (_main && typeof MutationObserver === 'function') {
-        const obs = new MutationObserver(() => scanAndAnimate());
-        obs.observe(_main, { childList: true, subtree: true });
-        setTimeout(() => obs.disconnect(), 3000);
-      }
+      setTimeout(scanAndAnimate, 1500);  // couvre LITE→FULL re-render
     } catch(e){}
     const isSimples = currentPage === 'simples';
     const isCombines = currentPage === 'combines';
