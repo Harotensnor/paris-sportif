@@ -8561,23 +8561,27 @@
               <span class="ed-hero__pill">⭐ Top pick du jour</span>
             </header>
             <p class="ed-hero__empty">
-              Pas de match avec edge ≥ 5% et confiance ≥ 55% disponible aujourd'hui.
-              Le modèle préfère ne rien recommander plutôt que de surfacer du bruit.
+              <strong>Pas de match avec edge ≥ 5% et confiance ≥ 55%</strong> disponible aujourd'hui.
+              <br><br>
+              Le modèle préfère ne rien recommander plutôt que de surfacer du bruit. C'est <em>normal</em> certains jours — les conditions de marché ne sont pas toujours favorables.
             </p>
             <footer class="ed-hero__cta">
-              <button type="button" class="ed-hero__cta-btn page-btn" data-page="tous">Tous les pronos</button>
+              <button type="button" class="ed-hero__cta-btn page-btn" data-page="tous">📋 Voir tous les matchs</button>
+              <button type="button" class="ed-hero__secondary page-btn" data-page="locks">🔒 Locks à venir</button>
+              <button type="button" class="ed-hero__secondary page-btn" data-page="backtest">📈 Backtest</button>
             </footer>
           </article>
         `}
 
         ${(() => {
-          // v31.7.35 — Stats hero strip : 4 KPIs cliquables sous le hero
-          // qui donnent en 2s la vue d'ensemble du jour (locks · picks ·
-          // combinés · matchs live). Cliquables → naviguent vers les pages
-          // correspondantes. C'est la "page d'accueil revisitée" demandée
-          // par l'utilisateur — densifie le top fold sans saturer.
+          // v31.7.35 → v31.7.75 : Stats hero strip enrichi à 5 KPIs cliquables
+          // (locks · pronos · combinés · buteurs · live/matchs). Plus pertinent
+          // que le précédent "matchs jour" qui doublonnait avec la page Tous.
+          // Le compteur Combinés est maintenant calé sur la même heuristique
+          // que renderCombines (locks combo + safe + balanced + bold).
           if (_dataIsStale) return '';
           let _nLocks = 0, _nPicks = 0, _nLive = 0, _nMatchs = 0;
+          let _nButeursMatch = 0;  // nb matchs foot avec buteurs probables
           const _allToday = (data?.days?.[todayISO()] || []);
           _allToday.forEach(m => {
             _nMatchs++;
@@ -8588,9 +8592,20 @@
               _nPicks++;
               if (pp.isLock) _nLocks++;
             }
+            // Buteurs probables foot : seulement matchs foot non-completés
+            // avec lineups ou xG > 0 (heuristique) → potentiellement avec buteurs
+            if (m.sport === 'football' && !m.completed && (m.lineups || m.h2h)) {
+              _nButeursMatch++;
+            }
           });
-          // Compte les combinés disponibles via _allToday avec ≥3 picks lock-able
-          const _nCombines = _nPicks >= 2 ? Math.min(3, Math.floor(_nPicks / 2)) : 0;
+          // Combinés : estimation basée sur locks (Lock Combo si ≥2 locks)
+          // + safe combo si ≥2 picks fiables + balanced/bold ≥3 picks each.
+          // Approximation cohérente avec renderCombines() lockCombo logic.
+          let _nCombines = 0;
+          if (_nLocks >= 2) _nCombines++;
+          if (_nPicks >= 2) _nCombines++;
+          if (_nPicks >= 5) _nCombines++;
+          if (_nPicks >= 6) _nCombines++;
           if (_nMatchs === 0) return '';
           return `
           <nav class="dash-stats-strip" aria-label="Statistiques du jour">
@@ -8605,14 +8620,19 @@
               <span class="dash-stat-lbl">Pronos</span>
             </button>
             <button type="button" class="dash-stat-item page-btn" data-page="combines" aria-label="${_nCombines} combinés disponibles">
-              <span class="dash-stat-icon" style="color:var(--brand);">🎯</span>
+              <span class="dash-stat-icon" style="color:var(--brand);">🔗</span>
               <span class="dash-stat-val">${_nCombines}</span>
               <span class="dash-stat-lbl">Combinés</span>
             </button>
-            <div class="dash-stat-item dash-stat-item--info" aria-label="${_nMatchs} matchs aujourd'hui">
+            <button type="button" class="dash-stat-item page-btn" data-page="buteurs" aria-label="${_nButeursMatch} matchs avec buteurs probables">
+              <span class="dash-stat-icon" style="color:var(--warn);">⚽</span>
+              <span class="dash-stat-val">${_nButeursMatch}</span>
+              <span class="dash-stat-lbl">Buteurs</span>
+            </button>
+            <div class="dash-stat-item dash-stat-item--info" aria-label="${_nMatchs} matchs aujourd'hui${_nLive ? ', dont ' + _nLive + ' en direct' : ''}">
               <span class="dash-stat-icon" style="color:${_nLive ? 'var(--danger)' : 'var(--text-dim)'};">${_nLive ? '🔴' : '📅'}</span>
               <span class="dash-stat-val">${_nLive || _nMatchs}</span>
-              <span class="dash-stat-lbl">${_nLive ? 'En direct' : 'Matchs jour'}</span>
+              <span class="dash-stat-lbl">${_nLive ? 'En direct' : 'Matchs'}</span>
             </div>
           </nav>`;
         })()}
