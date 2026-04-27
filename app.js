@@ -14692,6 +14692,57 @@
     });
   }
 
+  // AUDIT-2026-04-27 (Sprint 34 #10) — Export/Import settings JSON.
+  // Permet à l'user d'exporter ses préférences (theme, accent, lock
+  // threshold, bankroll, sports favoris, etc.) et de les ré-importer
+  // sur un autre device — sync sans serveur.
+  window._exportSettings = function exportSettings() {
+    const keys = [
+      'userPrefs', 'bankroll', 'userBankroll',
+      'tousFilters', 'tousSort', 'tousTab',
+      'tousFilterPresets', 'paris_sportif_bookmarks',
+      'paris_sportif_recent_matches',
+    ];
+    const out = { exported_at: new Date().toISOString(), version: 1, settings: {} };
+    keys.forEach(k => {
+      try {
+        const v = localStorage.getItem(k);
+        if (v !== null) out.settings[k] = v;
+      } catch (e) {}
+    });
+    return out;
+  };
+  window._downloadSettings = function downloadSettings() {
+    try {
+      const data = window._exportSettings();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `paris-sportif-settings-${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1500);
+      if (typeof toast === 'function') toast('✓ Paramètres exportés', 'success');
+    } catch (e) {
+      if (typeof toast === 'function') toast('Export échoué', 'error');
+    }
+  };
+  window._importSettings = function importSettings(jsonStr) {
+    try {
+      const data = JSON.parse(jsonStr);
+      if (!data || !data.settings) throw new Error('Invalid format');
+      let count = 0;
+      Object.entries(data.settings).forEach(([k, v]) => {
+        try { localStorage.setItem(k, v); count++; } catch (e) {}
+      });
+      if (typeof toast === 'function') toast(`✓ ${count} paramètres importés (recharge la page)`, 'success');
+      return count;
+    } catch (e) {
+      if (typeof toast === 'function') toast('Import échoué : JSON invalide', 'error');
+      return 0;
+    }
+  };
+
   // AUDIT-2026-04-27 (Sprint 33 #2) — Page Favoris (bookmarks).
   function renderFavorisPage(wrap) {
     const data = window.PRONOSTICS_DATA;
