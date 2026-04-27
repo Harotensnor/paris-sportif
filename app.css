@@ -1511,6 +1511,42 @@
     width: 100%; max-width: 920px; margin: auto;
     box-shadow: var(--shadow-lg); overflow: hidden;
   }
+  /* AUDIT-2026-04-27 (Sprint 15 #13) — Bottom sheet sur mobile.
+     Slide-up depuis le bas avec drag handle visible, dismissable
+     en swipe-down (JS). Sur desktop reste centré classique. */
+  @media (max-width: 720px) {
+    .modal-backdrop {
+      align-items: flex-end;
+      padding: 0;
+    }
+    .modal {
+      max-width: 100%;
+      max-height: 92vh;
+      border-radius: var(--r-xl) var(--r-xl) 0 0;
+      border-bottom: none;
+      animation: modal-slide-up 280ms cubic-bezier(.32,.72,0,1);
+    }
+    /* Drag handle visible en haut du sheet */
+    .modal::before {
+      content: '';
+      display: block;
+      width: 40px; height: 4px;
+      background: var(--text-dim2);
+      border-radius: var(--r-pill);
+      margin: 8px auto 0;
+      opacity: 0.6;
+    }
+    .modal-head {
+      padding-top: 12px;  /* compact, le handle prend la place */
+    }
+  }
+  @keyframes modal-slide-up {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .modal { animation: none; }
+  }
   .modal-head {
     position: sticky; top: 0; background: var(--panel);
     padding: 18px 22px; border-bottom: 1px solid var(--border);
@@ -2372,6 +2408,32 @@
   .card-sm { padding: var(--space-3); border-radius: var(--r-sm); }
   .card-md { padding: var(--space-4); border-radius: var(--r-md); }
   .card-lg { padding: var(--space-5) var(--space-6); border-radius: var(--r); }
+
+  /* AUDIT-2026-04-27 (Sprint 15 #11) — Touch targets ≥44px sur mobile.
+     WCAG 2.5.5 demande 44×44px min pour les éléments cliquables.
+     Sur mobile, on bump les boutons trop petits via min-height. */
+  @media (max-width: 720px) {
+    button:not(.cb-fab):not(.modal-close):not(.md-tab),
+    .page-btn,
+    a[role="button"],
+    [role="button"]:not(.cb-fab) {
+      min-height: 36px;  /* baseline confort */
+    }
+    /* Cibles primaires plus grandes */
+    .mbn-btn,
+    button.summary-bar-btn,
+    .pari-du-jour,
+    .pred-panel button {
+      min-height: 44px;
+    }
+    /* Chips de filtre étaient parfois 28×28 — bump */
+    .filter-btn,
+    [data-tous-sport],
+    [data-tous-tab] {
+      min-height: 36px;
+      min-width: 36px;
+    }
+  }
 
   /* AUDIT-2026-04-27 (Sprint 14 #10) — Border-color softening ladder.
      --border (.06)  : default, subtle
