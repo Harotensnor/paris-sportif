@@ -9642,7 +9642,89 @@
       });
     } catch (e) {}
 
-    // v30 — "Wins récentes" retiré : alimenté par les paris trackés.
+    // v31.7.76 — Imminent locks (kickoff < 30min) - alerte action immédiate
+    try {
+      const today = ((data && data.days && data.days[todayIso]) || []).filter(m => m.winamax && m.winamax.available === true);
+      today.forEach(m => {
+        if (m.completed || m.live) return;
+        if (!m.date) return;
+        const ko = new Date(m.date).getTime();
+        const minToKickoff = (ko - now) / 60000;
+        if (minToKickoff <= 0 || minToKickoff > 30) return;
+        try {
+          const pred = predictMatch(m);
+          if (!pred || !pred.isLock) return;
+          const s = (typeof getSides === 'function') ? getSides(m) : { home: {}, away: {} };
+          const hN = s.home?.name || '?', aN = s.away?.name || '?';
+          alerts.push({
+            ts: now, icon: '⏰', type: 'Lock imminent', color: 'orange',
+            title: `${hN} vs ${aN}`,
+            body: `Pari sûr · démarre dans ${Math.round(minToKickoff)}min · ${((pred.reliability||0)*100).toFixed(0)}% conf.`,
+            action: 'locks'
+          });
+        } catch(e) {}
+      });
+    } catch (e) {}
+
+    // v31.7.76 — Edge alerts (≥15pt edge) - opportunités value bet
+    try {
+      const today = ((data && data.days && data.days[todayIso]) || []).filter(m => m.winamax && m.winamax.available === true);
+      today.forEach(m => {
+        if (m.completed || m.live) return;
+        try {
+          const pred = predictMatch(m);
+          if (!pred || !pred.pick || pred.skip) return;
+          const odd = pred.odds && (pred.pick.key === '1' ? pred.odds.home : pred.pick.key === '2' ? pred.odds.away : pred.odds.draw);
+          if (!odd) return;
+          const rel = pred.reliability ?? pred.pick.prob;
+          const edge = rel - 1/odd;
+          if (edge < 0.15) return;
+          const s = (typeof getSides === 'function') ? getSides(m) : { home: {}, away: {} };
+          const hN = s.home?.name || '?', aN = s.away?.name || '?';
+          alerts.push({
+            ts: now, icon: '💎', type: 'Value bet (+15pt)', color: 'purple',
+            title: `${hN} vs ${aN}`,
+            body: `${pred.pick.label} @${odd.toFixed(2)} · edge +${Math.round(edge*100)}pt · ${Math.round(rel*100)}% conf.`,
+            action: 'tous'
+          });
+        } catch(e) {}
+      });
+    } catch (e) {}
+
+    // v31.7.76 — Streak modèle : si 3 wins ou 3 losses consécutifs sur les
+    // derniers picks réglés du jour, l'utilisateur doit savoir.
+    try {
+      const settled = [];
+      Object.values(data?.days || {}).forEach(arr => (arr || []).forEach(m => {
+        if (!m.completed) return;
+        if (winamaxOnly && !(m.winamax && m.winamax.available === true)) return;
+        const pred = predictMatch(m);
+        if (!pred || !pred.pick || pred.skip) return;
+        const r = evaluateModelPick(m, pred);
+        if (r === 'won' || r === 'lost') {
+          settled.push({ m, pred, res: r, ts: m.date ? new Date(m.date).getTime() : 0 });
+        }
+      }));
+      settled.sort((a, b) => b.ts - a.ts);
+      const last3 = settled.slice(0, 3);
+      if (last3.length === 3) {
+        if (last3.every(x => x.res === 'won')) {
+          alerts.push({
+            ts: now, icon: '🔥', type: 'Hot streak', color: 'green',
+            title: '3 victoires consécutives',
+            body: 'Le modèle est dans une bonne phase. Reste discipliné, ne sur-mise pas (variance).',
+            action: 'bilan'
+          });
+        } else if (last3.every(x => x.res === 'lost')) {
+          alerts.push({
+            ts: now, icon: '❄️', type: 'Cold streak', color: 'blue',
+            title: '3 défaites consécutives',
+            body: 'Mauvaise série en cours. C\'est NORMAL (3-5 pertes d\'affilée arrivent). Ne change rien à ton Kelly.',
+            action: 'bilan'
+          });
+        }
+      }
+    } catch (e) {}
 
     const colMap = {
       gold: '#ffd60a', green: '#30d158', red: '#ff3b30', orange: '#ff9f0a',
