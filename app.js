@@ -410,10 +410,20 @@
     if (dt) return { el: dt, text: dt.dataset.tooltip };
     const tt = el.closest('[title]');
     if (tt && tt.title) {
-      // Migrate title → data-tooltip (one-shot pour ne pas double-fire)
-      tt.dataset.tooltip = tt.title;
+      // Migrate title → data-tooltip (one-shot pour ne pas double-fire).
+      // Sprint 42 #7 — Préserve l'accessible name : si l'élément n'a
+      // ni aria-label ni text content, on copie title vers aria-label
+      // avant de removeAttribute. Évite la perte d'a11y pour SR.
+      const txt = tt.title;
+      tt.dataset.tooltip = txt;
+      const hasAccessibleName = tt.getAttribute('aria-label')
+                             || tt.getAttribute('aria-labelledby')
+                             || (tt.textContent || '').trim();
+      if (!hasAccessibleName) {
+        tt.setAttribute('aria-label', txt);
+      }
       tt.removeAttribute('title');
-      return { el: tt, text: tt.dataset.tooltip };
+      return { el: tt, text: txt };
     }
     return null;
   }
@@ -487,10 +497,10 @@
     el.className = `toast-item ${kind}`;
     el.textContent = msg;
     host.appendChild(el);
-    // AUDIT-2026-04-27 (Sprint 25 #5) — Cap dynamique : 2 toasts sur
-    // mobile étroit (peut overflow), 3 sur desktop.
-    const isNarrow = window.innerWidth < 380;
-    const cap = isNarrow ? 2 : 3;
+    // AUDIT-2026-04-27 (Sprint 25 #5 + Sprint 42 #6) — Cap dynamique
+    // qui re-évalue à chaque toast (donc react au resize entre 2
+    // toasts sans listener supplémentaire).
+    const cap = window.innerWidth < 380 ? 2 : 3;
     while (host.children.length > cap) host.removeChild(host.firstChild);
     setTimeout(() => {
       el.classList.add('dismissing');
@@ -7852,7 +7862,20 @@
         viewedAt: Date.now(),
       });
       arr = arr.slice(0, 10);
-      localStorage.setItem('paris_sportif_recent_matches', JSON.stringify(arr));
+      try {
+        localStorage.setItem('paris_sportif_recent_matches', JSON.stringify(arr));
+      } catch (quotaErr) {
+        // AUDIT-2026-04-27 (Sprint 42 #9) — QuotaExceededError détecté.
+        // Tente une purge des plus vieux puis retry. Si toujours fail,
+        // on swallow silencieusement (tracking n'est pas critique).
+        if (quotaErr && quotaErr.name === 'QuotaExceededError') {
+          try {
+            // Purge agressive : ne garde que les 3 plus récents
+            const trimmed = arr.slice(0, 3);
+            localStorage.setItem('paris_sportif_recent_matches', JSON.stringify(trimmed));
+          } catch (e2) { /* swallow, tracking optional */ }
+        }
+      }
     } catch (e) {}
   };
   // Wrap openDetail pour tracker automatique
@@ -14931,8 +14954,14 @@
         e.stopPropagation();
         const id = btn.dataset.bookmarkToggle;
         if (id && typeof window._toggleBookmark === 'function') {
+          // AUDIT-2026-04-27 (Sprint 42 #10) — Save/restore scroll
+          // pour éviter le saut au top sur re-render.
+          const savedScrollY = window.scrollY || document.documentElement.scrollTop;
           window._toggleBookmark(id);
           renderFavorisPage(wrap);
+          requestAnimationFrame(() => {
+            try { window.scrollTo({ top: savedScrollY, behavior: 'auto' }); } catch (e) {}
+          });
         }
       });
     });
