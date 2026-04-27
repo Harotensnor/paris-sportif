@@ -217,13 +217,19 @@ def aggregate(matches: list[dict]) -> dict:
 
 def main() -> int:
     t0 = time.time()
+    # AUDIT-2026-04-27 (Sprint 32 #36) — Adoption logger structuré.
+    # Import lazy pour ne pas crasher si _log absent (run direct dev).
+    try:
+        from _log import log
+    except ImportError:
+        def log(s, lvl, msg, data=None):
+            print(f'[{lvl}] [{s}] {msg}' + (f' ({data})' if data else ''), flush=True)
     teams = load_upcoming_teams()
     if not teams:
-        print('[team_stats] no upcoming teams to enrich — aborting')
+        log('fetch_team_stats', 'warn', 'no upcoming teams to enrich — aborting')
         return 1
 
-    print(f'[{datetime.now():%H:%M:%S}] team_stats: {len(teams)} unique teams to scan',
-          flush=True)
+    log('fetch_team_stats', 'info', 'starting scan', {'teams': len(teams)})
 
     out: dict[str, dict] = {}
     errs = 0

@@ -29,16 +29,28 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
-# AUDIT-2026-04-27 (Sprint 23 #21) — Budgets ajustés.
+# AUDIT-2026-04-27 (Sprint 23 #21 + Sprint 32 #40) — Budgets globaux + per-page.
 # app.js bumpé 1100→1200 après Sprint 13-22 qui ont ajouté beaucoup
 # de valeur (design tokens, helpers UI, modal tabs, page Ligue, etc.).
 # Le vrai gain serait découpage ESM — backlog. Pour l'instant headroom.
-# app.css bumpé 200→230 idem (utility classes V3, animations, etc.).
+# Sprint 32 #40 ajoute des budgets par-page éditoriale pour catch les
+# régressions individuelles sur les pages secondaires.
 BUDGETS_KB = {
-    'app.js':          1200,
-    'app.css':          230,
-    'pronostics.html':  650,
-    'sw.js':             15,
+    # Core SPA
+    'app.js':                    1200,
+    'app.css':                    230,
+    'pronostics.html':            650,
+    'sw.js':                       15,
+    # Pages éditoriales (régénérées par build_*_page.py — taille stable)
+    'index.html':                  35,
+    'methodologie.html':           35,
+    'academie.html':               40,
+    'comment-lire-un-prono.html':  35,
+    'legal.html':                  20,
+    'static-page.css':             25,
+    # Pages générées par scripts (peuvent varier selon data)
+    'backtest.html':               80,
+    'credibilite.html':            70,
 }
 
 
