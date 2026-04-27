@@ -6515,6 +6515,53 @@
     // Move focus to the close button so keyboard users can dismiss via Enter/Space
     const closeBtn = document.getElementById('close-detail');
     if (closeBtn) closeBtn.focus({ preventScroll: true });
+    // v31.7.42 — Focus trap a11y. Sans ça, Tab dans la modal sort vers
+    // le contenu derrière (anti-pattern critique pour clavier+SR).
+    if (window._modalTrapRelease) window._modalTrapRelease();
+    window._modalTrapRelease = _trapFocus(modal, () => {
+      if (typeof window.closeDetailModal === 'function') window.closeDetailModal();
+    });
+  }
+
+  // v31.7.42 — Focus trap utility pour la modal détail (audit 2026-04-27).
+  // Cycle Tab/Shift+Tab dans la modal, intercepte Escape pour fermer.
+  // Restitue le focus au déclencheur précédent à la fermeture.
+  function _trapFocus(container, onEscape) {
+    if (!container) return () => {};
+    const focusableSel = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    const prevActive = document.activeElement;
+
+    function getList() {
+      return Array.from(container.querySelectorAll(focusableSel))
+        .filter(el => el.offsetParent !== null);
+    }
+
+    function onKeyDown(e) {
+      if (e.key === 'Escape' && typeof onEscape === 'function') {
+        e.preventDefault();
+        onEscape();
+        return;
+      }
+      if (e.key !== 'Tab') return;
+      const list = getList();
+      if (!list.length) return;
+      const first = list[0], last = list[list.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+
+    container.addEventListener('keydown', onKeyDown);
+    return function release() {
+      container.removeEventListener('keydown', onKeyDown);
+      if (prevActive && typeof prevActive.focus === 'function') {
+        try { prevActive.focus({ preventScroll: true }); } catch (e) {}
+      }
+    };
   }
 
   // ======= UI wiring =======
@@ -6781,6 +6828,11 @@
     const m = document.getElementById('detail-modal');
     m.classList.remove('open');
     m.setAttribute('aria-hidden', 'true');
+    // v31.7.42 — Release focus trap (a11y).
+    if (window._modalTrapRelease) {
+      try { window._modalTrapRelease(); } catch(e){}
+      window._modalTrapRelease = null;
+    }
     // v30 — Si l'URL contient ?match=<id> (modale ouverte via lien partagé),
     // on nettoie le param au close pour que l'URL reflète l'état actuel.
     // Évite que l'utilisateur partage une URL "stale" qui s'auto-ouvrira
@@ -8369,7 +8421,7 @@
             ? (heroPick.m.date ? fmtTime(heroPick.m.date) : '')
             : _minToKickoff < 60 ? `dans ${_minToKickoff}min` : (_minToKickoff < 1440 ? `dans ${Math.round(_minToKickoff/60)}h` : fmtTime(heroPick.m.date));
           return `
-          <article class="ed-hero" data-match-id="${esc(String(heroPick.m.id || ''))}" role="button" tabindex="0" aria-label="Top pick : ${esc(heroPick.homeName)} vs ${esc(heroPick.awayName)} — clic pour fiche détaillée">
+          <article class="ed-hero" data-match-id="${esc(String(heroPick.m.id || ''))}">
             <header class="ed-hero__top">
               <span class="ed-hero__pill">⭐ Top pick du jour</span>
               <span class="ed-hero__refresh" aria-live="polite">
@@ -8404,8 +8456,8 @@
               </div>
             ` : ''}
             <footer class="ed-hero__cta">
-              <span class="ed-hero__cta-btn">Voir le détail →</span>
-              <button type="button" class="ed-hero__secondary page-btn" data-page="tous" onclick="event.stopPropagation();">Tous les pronos</button>
+              <button type="button" class="ed-hero__cta-btn ed-hero__primary" data-match-id="${esc(String(heroPick.m.id || ''))}" aria-label="Voir le détail du match ${esc(heroPick.homeName)} vs ${esc(heroPick.awayName)}">Voir le détail →</button>
+              <button type="button" class="ed-hero__secondary page-btn" data-page="tous">Tous les pronos</button>
             </footer>
           </article>
           <details class="ed-hero__honesty">
@@ -8545,8 +8597,8 @@
               <div style="font-size:28px;font-weight:800;letter-spacing:-0.8px;color:var(--text);line-height:1.1;">${topPicks.length === 1 ? 'La meilleure opportunité du jour' : `Les ${topPicks.length} meilleures opportunités du jour`}</div>
             </div>
             <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-dim);">
-              Ma cagnotte :
-              <input type="number" id="user-bankroll-input" value="${userBankroll}" min="10" max="10000" step="10" style="width:72px;padding:4px 8px;background:var(--panel);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:12px;font-variant-numeric:tabular-nums;text-align:right;">€
+              <label for="user-bankroll-input">Ma cagnotte :</label>
+              <input type="number" id="user-bankroll-input" value="${userBankroll}" min="10" max="10000" step="10" aria-label="Bankroll en euros" style="width:72px;padding:4px 8px;background:var(--panel);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:12px;font-variant-numeric:tabular-nums;text-align:right;">€
             </div>
           </div>
           <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));gap:10px;">
@@ -8797,18 +8849,18 @@
           </div>
           <!-- v28.3 filter bar -->
           <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;font-size:11px;">
-            <select data-agent-filter="sport" style="background:var(--panel);border:1px solid var(--border);color:var(--text);padding:4px 8px;border-radius:5px;font-size:11px;">
+            <select data-agent-filter="sport" aria-label="Filtrer par sport" style="background:var(--panel);border:1px solid var(--border);color:var(--text);padding:4px 8px;border-radius:5px;font-size:11px;">
               <option value="" ${!fSport?'selected':''}>Tous sports</option>
               ${sportsPresent.map(sp => `<option value="${esc(sp)}" ${fSport===sp?'selected':''}>${esc((typeof sportLabel==='function')?sportLabel(sp):sp)}</option>`).join('')}
             </select>
-            <select data-agent-filter="conf" style="background:var(--panel);border:1px solid var(--border);color:var(--text);padding:4px 8px;border-radius:5px;font-size:11px;">
+            <select data-agent-filter="conf" aria-label="Filtrer par confiance minimale" style="background:var(--panel);border:1px solid var(--border);color:var(--text);padding:4px 8px;border-radius:5px;font-size:11px;">
               <option value="0" ${fConf===0?'selected':''}>Conf. min</option>
               <option value="50" ${fConf===50?'selected':''}>≥ 50%</option>
               <option value="60" ${fConf===60?'selected':''}>≥ 60%</option>
               <option value="70" ${fConf===70?'selected':''}>≥ 70%</option>
               <option value="80" ${fConf===80?'selected':''}>≥ 80%</option>
             </select>
-            <select data-agent-filter="edge" style="background:var(--panel);border:1px solid var(--border);color:var(--text);padding:4px 8px;border-radius:5px;font-size:11px;">
+            <select data-agent-filter="edge" aria-label="Filtrer par edge minimal" style="background:var(--panel);border:1px solid var(--border);color:var(--text);padding:4px 8px;border-radius:5px;font-size:11px;">
               <option value="-100" ${fEdge===-100?'selected':''}>Edge min</option>
               <option value="0" ${fEdge===0?'selected':''}>≥ 0pt</option>
               <option value="5" ${fEdge===5?'selected':''}>≥ 5pt</option>
@@ -9273,13 +9325,26 @@
     // qui remplace .dash-hero-pick depuis l'audit UX dashboard. Même handler
     // (open match modal au click), mais nouveau markup. Ancien sélecteur
     // gardé en safety pour les caches transitoires.
+    // v31.7.42 — A11y fix nested-interactive : .ed-hero n'est plus role=button.
+    // Au lieu, .ed-hero__primary (bouton CTA) ouvre le détail au click (clavier OK).
+    // Le click sur le reste de .ed-hero reste fonctionnel (cliquabilité globale).
+    wrap.querySelectorAll('.ed-hero__primary[data-match-id]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const matchId = btn.dataset.matchId;
+        if (!matchId) return;
+        const data = window.PRONOSTICS_DATA?.days || {};
+        const m = Object.values(data).flat().find(x => String(x?.id) === String(matchId));
+        if (m && typeof openDetail === 'function') openDetail(m);
+      });
+    });
     wrap.querySelectorAll('.ed-hero[data-match-id], .dash-hero-pick, .dash-pick-card').forEach(card => {
       card.addEventListener('click', (e) => {
         if (_isInteractiveTarget(e.target)) return;
         _openCardMatch(card);
       });
       card.addEventListener('keydown', (e) => {
-        if ((e.key === 'Enter' || e.key === ' ') && e.target === card) {
+        if ((e.key === 'Enter' || e.key === ' ') && e.target === card && card.getAttribute('role') === 'button') {
           e.preventDefault();
           _openCardMatch(card);
         }
