@@ -216,10 +216,16 @@ def build_outputs(state: dict) -> tuple[dict, dict]:
 
 
 def main() -> int:
-    print(f'[{datetime.now():%H:%M:%S}] fetch_winamax_catalog v30 (multi-sport)', flush=True)
+    # AUDIT-2026-04-27 (Sprint 39 #31) — Adoption logger structuré.
+    try:
+        from _log import log
+    except ImportError:
+        def log(s, lvl, msg, data=None):
+            print(f'[{lvl}] [{s}] {msg}' + (f' ({data})' if data else ''), flush=True)
+    log('fetch_winamax_catalog', 'info', 'starting v30 multi-sport scrape')
     state = fetch_all_states()
     if not state.get('matches'):
-        print('  FAILED — no matches retrieved, keeping previous files unchanged')
+        log('fetch_winamax_catalog', 'error', 'no matches retrieved, keeping previous files unchanged')
         return 1
     catalog, markets = build_outputs(state)
     n_tourns = len(catalog['tournaments'])
