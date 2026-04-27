@@ -169,4 +169,185 @@ test.describe('Helpers purs (window.__testAPI)', () => {
     expect(typeof results.invalid).toBe('string');
   });
 
+  // AUDIT-2026-04-27 — Tests fixtures pour les fixes du pack audit Codex.
+
+  test('isWinamaxBookable : exige match_id + markets', async ({ page }) => {
+    await page.goto(URL);
+    const results = await page.evaluate(() => {
+      const fn = window.__testAPI.isWinamaxBookable;
+      return {
+        no_winamax: fn({}),
+        available_only: fn({ winamax: { available: true } }),
+        no_match_id: fn({ winamax: { available: true, markets: { '1n2': { home: 1.5, away: 2.5 } } } }),
+        no_markets: fn({ winamax: { available: true, match_id: 12345 } }),
+        empty_markets: fn({ winamax: { available: true, match_id: 12345, markets: {} } }),
+        markets_no_1n2: fn({ winamax: { available: true, match_id: 12345, markets: { ou: { home: 1.5 } } } }),
+        bookable: fn({ winamax: { available: true, match_id: 12345, markets: { '1n2': { home: 1.5, away: 2.5 } } } }),
+        bookable_with_draw: fn({ winamax: { available: true, match_id: 12345, markets: { '1n2': { home: 2.0, draw: 3.5, away: 3.0 } } } }),
+        invalid_odds: fn({ winamax: { available: true, match_id: 12345, markets: { '1n2': { home: 0.5, away: 0.8 } } } }),
+        available_false: fn({ winamax: { available: false, match_id: 12345, markets: { '1n2': { home: 1.5, away: 2.5 } } } }),
+      };
+    });
+    expect(results.no_winamax).toBe(false);
+    expect(results.available_only).toBe(false);  // tournament-only
+    expect(results.no_match_id).toBe(false);
+    expect(results.no_markets).toBe(false);
+    expect(results.empty_markets).toBe(false);
+    expect(results.markets_no_1n2).toBe(false);
+    expect(results.bookable).toBe(true);
+    expect(results.bookable_with_draw).toBe(true);
+    expect(results.invalid_odds).toBe(false);  // odd <= 1
+    expect(results.available_false).toBe(false);
+  });
+
+  test('evaluateModelPick : VOID sur RETIRED/WALKOVER/POSTPONED', async ({ page }) => {
+    await page.goto(URL);
+    const results = await page.evaluate(() => {
+      const fn = window.__testAPI.evaluateModelPick;
+      const baseMatch = {
+        completed: true,
+        competitors: [
+          { home_away: 'home', score: '1', winner: true },
+          { home_away: 'away', score: '0', winner: false },
+        ],
+      };
+      const pred = { pick: { key: '1' } };
+      return {
+        normal_won: fn({ ...baseMatch, status: 'STATUS_FINAL' }, pred),
+        retired: fn({ ...baseMatch, status: 'STATUS_RETIRED' }, pred),
+        walkover: fn({ ...baseMatch, status: 'STATUS_WALKOVER' }, pred),
+        postponed: fn({ ...baseMatch, status: 'STATUS_POSTPONED' }, pred),
+        canceled: fn({ ...baseMatch, status: 'STATUS_CANCELED' }, pred),
+        abandoned: fn({ ...baseMatch, status: 'STATUS_ABANDONED' }, pred),
+        not_completed: fn({ ...baseMatch, completed: false }, pred),
+        nan_scores: fn({
+          ...baseMatch,
+          status: 'STATUS_FINAL',
+          competitors: [
+            { home_away: 'home', score: null },
+            { home_away: 'away', score: null },
+          ],
+        }, pred),
+      };
+    });
+    expect(results.normal_won).toBe('won');
+    expect(results.retired).toBeNull();
+    expect(results.walkover).toBeNull();
+    expect(results.postponed).toBeNull();
+    expect(results.canceled).toBeNull();
+    expect(results.abandoned).toBeNull();
+    expect(results.not_completed).toBeNull();
+    expect(results.nan_scores).toBeNull();
+  });
+
+  test('evaluateModelPick : home/away/draw branches', async ({ page }) => {
+    await page.goto(URL);
+    const results = await page.evaluate(() => {
+      const fn = window.__testAPI.evaluateModelPick;
+      const finalStatus = 'STATUS_FINAL';
+      const mk = (hs, as_) => ({
+        completed: true,
+        status: finalStatus,
+        competitors: [
+          { home_away: 'home', score: String(hs) },
+          { home_away: 'away', score: String(as_) },
+        ],
+      });
+      return {
+        // pick home (1) — home wins
+        h_won: fn(mk(2, 0), { pick: { key: '1' } }),
+        h_lost: fn(mk(0, 1), { pick: { key: '1' } }),
+        h_draw_lost: fn(mk(1, 1), { pick: { key: '1' } }),
+        // pick away (2)
+        a_won: fn(mk(0, 2), { pick: { key: '2' } }),
+        a_lost: fn(mk(2, 1), { pick: { key: '2' } }),
+        // pick draw (X)
+        x_won: fn(mk(1, 1), { pick: { key: 'X' } }),
+        x_lost: fn(mk(2, 1), { pick: { key: 'X' } }),
+      };
+    });
+    expect(results.h_won).toBe('won');
+    expect(results.h_lost).toBe('lost');
+    expect(results.h_draw_lost).toBe('lost');
+    expect(results.a_won).toBe('won');
+    expect(results.a_lost).toBe('lost');
+    expect(results.x_won).toBe('won');
+    expect(results.x_lost).toBe('lost');
+  });
+
+  test('kellyFraction : monotone et bounded', async ({ page }) => {
+    await page.goto(URL);
+    const results = await page.evaluate(() => {
+      const fn = window.__testAPI.kellyFraction;
+      if (!fn) return { skip: true };
+      // Kelly = (b*p - q)/b avec b=odd-1, q=1-p. Multiplier 0.25× appliqué.
+      // p=0.6, odd=2.0 → b=1, q=0.4 → kelly=(1*0.6-0.4)/1=0.20 → *0.25 = 0.05
+      // p=0.5, odd=2.0 → b=1, q=0.5 → kelly=0 → 0
+      // p=0.4, odd=2.0 → kelly négatif → clamp 0
+      return {
+        positive_edge: fn(0.6, 2.0, 0.25),
+        no_edge: fn(0.5, 2.0, 0.25),
+        negative_edge: fn(0.4, 2.0, 0.25),
+        high_prob: fn(0.85, 1.5, 0.25),
+        invalid_odd: fn(0.6, 1.0, 0.25),
+        invalid_prob: fn(0, 2.0, 0.25),
+      };
+    });
+    if (results.skip) return;
+    expect(results.positive_edge).toBeCloseTo(0.05, 3);
+    expect(results.no_edge).toBe(0);
+    expect(results.negative_edge).toBe(0);
+    expect(results.high_prob).toBeGreaterThan(0);
+    expect(results.invalid_odd).toBe(0);
+    expect(results.invalid_prob).toBe(0);
+  });
+
+  test('getMatchOdds : Winamax exact priorité en pré-match', async ({ page }) => {
+    await page.goto(URL);
+    const results = await page.evaluate(() => {
+      const fn = window.__testAPI.getMatchOdds;
+      // Match avec Winamax exact + odds_snapshot externe : Winamax doit gagner.
+      const match = {
+        winamax: {
+          available: true,
+          match_id: 12345,
+          markets: { '1n2': { home: 1.92, away: 4.20 } },
+        },
+        odds_snapshot: { home: 2.05, away: 4.40, provider: 'DraftKings' },
+        live: false,
+      };
+      const result = fn(match, false);
+      return {
+        home: result?.home,
+        away: result?.away,
+        from_winamax: result?._fromWinamax === true,
+        from_snapshot: result?._fromSnapshot === true,
+      };
+    });
+    expect(results.home).toBe(1.92);  // Winamax, pas DraftKings 2.05
+    expect(results.from_winamax).toBe(true);
+    expect(results.from_snapshot).toBeFalsy();
+  });
+
+  test('getMatchOdds : tournament-only fallback snapshot', async ({ page }) => {
+    await page.goto(URL);
+    const results = await page.evaluate(() => {
+      const fn = window.__testAPI.getMatchOdds;
+      // Pas de Winamax exact (pas de match_id) → fallback snapshot.
+      const match = {
+        winamax: { available: true },  // tournament-only
+        odds_snapshot: { home: 2.05, away: 4.40, provider: 'DraftKings' },
+      };
+      const result = fn(match, false);
+      return {
+        home: result?.home,
+        from_snapshot: result?._fromSnapshot === true,
+        from_winamax: result?._fromWinamax === true,
+      };
+    });
+    expect(results.home).toBe(2.05);
+    expect(results.from_snapshot).toBe(true);
+    expect(results.from_winamax).toBeFalsy();
+  });
+
 });

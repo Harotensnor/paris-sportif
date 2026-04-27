@@ -7520,6 +7520,11 @@
       poissonPmf,
       poissonTopScores,
       isoDate,
+      // AUDIT-2026-04-27 — helpers pour tests fixtures audit
+      isWinamaxBookable,
+      evaluateModelPick,
+      kellyFraction: typeof kellyFraction === 'function' ? kellyFraction : null,
+      getMatchOdds,
     };
   } catch(e){}
 

@@ -66,17 +66,36 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+// AUDIT-2026-04-27 (Option E) — Helper au lieu de doublons slash/no-slash.
+// `endsWith('data.js')` couvre déjà '/data.js' donc l'OR redondant ne servait
+// à rien (sauf complexifier la lecture). Désormais une seule fonction.
+function pathEndsWith(url, name) {
+  // Match `name` à la fin du chemin, soit après un / soit comme chemin entier.
+  const p = url.pathname;
+  return p === '/' + name || p.endsWith('/' + name) || p === name;
+}
+
+// Network-first wrapper standard (rafraîchit cache à chaque hit).
+function networkFirst(req, cacheName) {
+  return fetch(req)
+    .then(resp => {
+      const respClone = resp.clone();
+      caches.open(cacheName).then(c => c.put(req, respClone));
+      return resp;
+    })
+    .catch(() => caches.match(req));
+}
+
 self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
 
-  // pronostics.html : NETWORK-FIRST, fallback cache.
-  const isHtml = url.pathname.endsWith('/pronostics.html')
-              || url.pathname.endsWith('pronostics.html')
-              || url.pathname === '/'
-              || url.pathname.endsWith('/');
+  const path = url.pathname;
+
+  // pronostics.html : NETWORK-FIRST, fallback cache + précaché shell.
+  const isHtml = pathEndsWith(url, 'pronostics.html') || path === '/' || path.endsWith('/');
   if (isHtml) {
     event.respondWith(
       fetch(req)
@@ -90,57 +109,23 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // data.js : NETWORK-FIRST.
-  if (url.pathname.endsWith('/data.js') || url.pathname.endsWith('data.js')) {
-    event.respondWith(
-      fetch(req)
-        .then(resp => {
-          const respClone = resp.clone();
-          caches.open(RUNTIME_CACHE).then(c => c.put(req, respClone));
-          return resp;
-        })
-        .catch(() => caches.match(req))
-    );
+  // Données dynamiques rafraîchies par le cron : NETWORK-FIRST.
+  // Couvre data.js + sidecar JSON + odds_history.jsonl + manifest.
+  const isDynamicData =
+    pathEndsWith(url, 'data.js') ||
+    pathEndsWith(url, 'data_today.json') ||
+    pathEndsWith(url, 'data_manifest.json') ||
+    pathEndsWith(url, 'odds_history.jsonl') ||
+    pathEndsWith(url, 'health.json');
+  if (isDynamicData) {
+    event.respondWith(networkFirst(req, RUNTIME_CACHE));
     return;
   }
 
-  // Chantier #3 lazy-load — data_today.json + data_manifest.json : NETWORK-FIRST.
-  // Ces fichiers sont rafraîchis à chaque tick du cron, donc on veut
-  // toujours la dernière version. Cache fallback si offline.
-  if (url.pathname.endsWith('/data_today.json') || url.pathname.endsWith('data_today.json') ||
-      url.pathname.endsWith('/data_manifest.json') || url.pathname.endsWith('data_manifest.json')) {
-    event.respondWith(
-      fetch(req)
-        .then(resp => {
-          const respClone = resp.clone();
-          caches.open(RUNTIME_CACHE).then(c => c.put(req, respClone));
-          return resp;
-        })
-        .catch(() => caches.match(req))
-    );
-    return;
-  }
-
-  // odds_history.jsonl : NETWORK-FIRST (Chantier PP).
-  if (url.pathname.endsWith('/odds_history.jsonl') || url.pathname.endsWith('odds_history.jsonl')) {
-    event.respondWith(
-      fetch(req)
-        .then(resp => {
-          const respClone = resp.clone();
-          caches.open(RUNTIME_CACHE).then(c => c.put(req, respClone));
-          return resp;
-        })
-        .catch(() => caches.match(req))
-    );
-    return;
-  }
-
-  // v31 — app.css + app.js : STALE-WHILE-REVALIDATE. Servir le cache
+  // app.css + app.js : STALE-WHILE-REVALIDATE. Servir le cache
   // immédiatement (instant render) ET refetch en background pour la prochaine
-  // visite. Couplé au stamp CACHE_VERSION qui est bumpé à chaque vrai
-  // changement, on a le meilleur des deux mondes : rapide ET frais.
-  if (url.pathname.endsWith('/app.css') || url.pathname.endsWith('app.css') ||
-      url.pathname.endsWith('/app.js')  || url.pathname.endsWith('app.js')) {
+  // visite. Couplé au stamp CACHE_VERSION bumpé à chaque vrai changement.
+  if (pathEndsWith(url, 'app.css') || pathEndsWith(url, 'app.js')) {
     event.respondWith(
       caches.match(req).then(hit => {
         const fetchPromise = fetch(req).then(resp => {
@@ -154,8 +139,8 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Icônes / manifest : cache-first.
-  if (SHELL_ASSETS.some(a => url.pathname.endsWith('/' + a) || url.pathname.endsWith(a))) {
+  // Icônes / manifest / pages éditoriales : cache-first.
+  if (SHELL_ASSETS.some(a => pathEndsWith(url, a))) {
     event.respondWith(
       caches.match(req).then(hit => hit || fetch(req).then(resp => {
         const respClone = resp.clone();
