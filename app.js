@@ -1341,6 +1341,9 @@
       setText('trust-n', overall.n);
     }
     strip.classList.remove('hidden');
+    // v31.7.71 — Set --trust-h pour que la sidebar et le right-rail
+    // soient repoussés sous le trust strip (sinon ils chevauchent le hero).
+    _updateTrustStripHeight();
     // Wire dismiss button
     const closeBtn = document.getElementById('trust-strip-close');
     if (closeBtn && !closeBtn._wired) {
@@ -1351,8 +1354,29 @@
           localStorage.setItem('trustStripHiddenUntil', String(Date.now() + 30 * 86400 * 1000));
         } catch (e) {}
         strip.classList.add('hidden');
+        // v31.7.71 — Reset --trust-h à 0 (sidebar/rail remontent)
+        document.documentElement.style.setProperty('--trust-h', '0px');
       });
     }
+  }
+
+  // v31.7.71 — Mesure dynamique de la hauteur du trust-strip et set en
+  // CSS var pour que les éléments position:fixed (sidebar, right-rail)
+  // soient correctement repoussés. Appelé quand le strip s'affiche +
+  // au resize (responsive line-wrap peut changer la hauteur).
+  function _updateTrustStripHeight() {
+    const strip = document.getElementById('trust-strip');
+    if (!strip || strip.classList.contains('hidden')) {
+      document.documentElement.style.setProperty('--trust-h', '0px');
+      return;
+    }
+    const h = strip.offsetHeight || 0;
+    document.documentElement.style.setProperty('--trust-h', h + 'px');
+  }
+  if (typeof window !== 'undefined') {
+    window.addEventListener('resize', () => {
+      try { _updateTrustStripHeight(); } catch(e){}
+    });
   }
 
   // v30 — Pipeline health indicator (topbar dot lit health.json publié toutes
