@@ -10124,6 +10124,21 @@
       const confColor = p.rel >= 0.70 ? 'var(--accent)' : p.rel >= 0.60 ? '#fbbf24' : 'var(--text-dim)';
       const edgeColor = p.edge > 0.10 ? 'var(--accent)' : p.edge > 0.05 ? '#fbbf24' : 'var(--text-dim)';
       const pickLabel = p.pred.pick.label || 'Pick';
+      // AUDIT-2026-04-27 (Ticket 2 — suite) — Source de cote dans la liste
+      // Tous. Le tooltip "Cote décimale Winamax" ment pour les events
+      // tournament-only où la cote vient d'un snapshot DraftKings/etc.
+      // Mini-badge inline 1 char (W / E / A / —) pour ne pas surcharger.
+      let _coteSrc = '';
+      const _o = p.pred && p.pred.odds;
+      if (_o) {
+        if (_o._fromWinamax) {
+          _coteSrc = `<span class="cote-src-mini wnx" title="Cote Winamax exacte (bookable)">W</span>`;
+        } else if (_o._fromSnapshot) {
+          _coteSrc = `<span class="cote-src-mini ext" title="Cote externe figée — pas Winamax exact">E</span>`;
+        } else if (_o._fromHistory) {
+          _coteSrc = `<span class="cote-src-mini hist" title="Cote historique (post-match, archive)">A</span>`;
+        }
+      }
       // v30 — Score prédit + score réel (foot only).
       // Le top-1 de pred.scores est le score le plus probable selon Poisson;
       // m.competitors[].score est le score réel (string ESPN, parfois "—").
@@ -10234,7 +10249,7 @@
           <div style="font-size:12px;color:var(--brand);font-weight:600;margin-top:3px;">→ ${esc(pickLabel)}</div>
         </div>
         <div style="display:flex;flex-direction:column;gap:2px;font-size:11px;">
-          <div><span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Confiance du modèle : probabilité estimée que ce pari gagne. ≥70 % = très fiable.">Conf</span> <b style="color:${confColor};">${Math.round(p.rel*100)}%</b> · <span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Cote décimale Winamax. Gain potentiel = mise × cote. Ex : 10 € @ 2.10 → 21 €.">Cote</span> <b style="color:var(--text);">@${p.odd.toFixed(2)}</b></div>
+          <div><span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Confiance du modèle : probabilité estimée que ce pari gagne. ≥70 % = très fiable.">Conf</span> <b style="color:${confColor};">${Math.round(p.rel*100)}%</b> · <span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Cote décimale. La source (Winamax / externe / archive) est indiquée à côté.">Cote</span> <b style="color:var(--text);">@${p.odd.toFixed(2)}</b> ${_coteSrc}</div>
           <div><span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Edge = notre probabilité − probabilité implicite de la cote. > 0 = on est plus optimiste que le bookmaker (=valeur).">Edge</span> <b style="color:${edgeColor};">${p.edge>=0?'+':''}${Math.round(p.edge*100)}pt</b></div>
         </div>
         <div style="text-align:right;">
