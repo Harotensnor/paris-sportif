@@ -10684,8 +10684,31 @@
       } catch(e) { return null; }
     }).filter(Boolean);
 
-    // v30 Sprint 4 — load persistent filter + sort state
+    // v30 Sprint 4 — load persistent filter + sort state.
+    // AUDIT-2026-04-27 (Sprint 27 #15) — Override par URL hash si présent.
+    // Format : `#tous?sport=football&sport=tennis&edge=0.05&conf=0.65`
+    // Permet le partage de URL avec filtres préselectionnés.
+    const _readUrlFilters = () => {
+      try {
+        const hash = location.hash || '';
+        const qIdx = hash.indexOf('?');
+        if (qIdx < 0) return null;
+        const params = new URLSearchParams(hash.slice(qIdx + 1));
+        const sports = params.getAll('sport');
+        const edge = parseFloat(params.get('edge') || '0');
+        const conf = parseFloat(params.get('conf') || '0');
+        if (sports.length === 0 && !edge && !conf) return null;
+        return {
+          sports: sports.filter(Boolean),
+          minEdge: isFinite(edge) ? edge : 0,
+          minConf: isFinite(conf) ? conf : 0,
+        };
+      } catch (e) { return null; }
+    };
     const _readFilters = () => {
+      // URL > localStorage > defaults
+      const fromUrl = _readUrlFilters();
+      if (fromUrl) return fromUrl;
       try {
         const raw = localStorage.getItem('tousFilters');
         if (raw) {
@@ -10710,6 +10733,53 @@
     const tousSort = _readSort();
     const _saveFilters = () => {
       try { localStorage.setItem('tousFilters', JSON.stringify(tousFilters)); } catch(e) {}
+      // Sprint 27 #15 — Sync filters → URL hash pour partage facile
+      try {
+        const hash = '#tous';
+        const params = new URLSearchParams();
+        tousFilters.sports.forEach(s => params.append('sport', s));
+        if (tousFilters.minEdge > 0) params.set('edge', tousFilters.minEdge);
+        if (tousFilters.minConf > 0) params.set('conf', tousFilters.minConf);
+        const q = params.toString();
+        const newHash = q ? `${hash}?${q}` : hash;
+        if (location.hash !== newHash) {
+          history.replaceState(null, '', location.pathname + location.search + newHash);
+        }
+      } catch (e) {}
+    };
+
+    // AUDIT-2026-04-27 (Sprint 27 #14) — Saved filter presets.
+    // Permet de save l'état des filtres actuels avec un nom et de
+    // les recharger plus tard. Persisté en localStorage.
+    window._loadSavedFilterPresets = () => {
+      try {
+        return JSON.parse(localStorage.getItem('tousFilterPresets') || '[]') || [];
+      } catch (e) { return []; }
+    };
+    window._saveFilterPreset = (name) => {
+      if (!name || typeof name !== 'string') return false;
+      try {
+        const presets = window._loadSavedFilterPresets();
+        const exists = presets.findIndex(p => p.name === name);
+        const preset = { name, filters: { ...tousFilters }, savedAt: Date.now() };
+        if (exists >= 0) presets[exists] = preset;
+        else presets.push(preset);
+        localStorage.setItem('tousFilterPresets', JSON.stringify(presets.slice(-10)));
+        return true;
+      } catch (e) { return false; }
+    };
+    window._applyFilterPreset = (name) => {
+      const presets = window._loadSavedFilterPresets();
+      const p = presets.find(x => x.name === name);
+      if (!p) return false;
+      try {
+        localStorage.setItem('tousFilters', JSON.stringify(p.filters));
+        if (typeof renderTousPage === 'function') {
+          const wrap = document.getElementById('tous-wrap');
+          if (wrap) renderTousPage(wrap);
+        }
+        return true;
+      } catch (e) { return false; }
     };
 
     // Sports présents aujourd'hui (pour ne pas afficher des pills vides)
