@@ -7000,6 +7000,56 @@
     // Move focus to the close button so keyboard users can dismiss via Enter/Space
     const closeBtn = document.getElementById('close-detail');
     if (closeBtn) closeBtn.focus({ preventScroll: true });
+
+    // AUDIT-2026-04-27 (Sprint 15 #13) — Drag-to-dismiss bottom sheet mobile.
+    // Touch-track la translation Y du modal, si swipe-down > 100px → close.
+    // Activé seulement sur viewport étroit ; desktop reste centré.
+    if (window.matchMedia('(max-width: 720px)').matches) {
+      const sheet = modal.querySelector('.modal');
+      const head = modal.querySelector('.modal-head');
+      if (sheet && head && !sheet.dataset.dragWired) {
+        let startY = 0;
+        let currentY = 0;
+        let dragging = false;
+        const onStart = (e) => {
+          // Drag handle = la zone du head ou le before-handle (juste au-dessus)
+          const t = e.touches ? e.touches[0] : e;
+          startY = t.clientY;
+          dragging = true;
+          sheet.style.transition = 'none';
+        };
+        const onMove = (e) => {
+          if (!dragging) return;
+          const t = e.touches ? e.touches[0] : e;
+          const dy = t.clientY - startY;
+          if (dy > 0) {
+            currentY = dy;
+            sheet.style.transform = `translateY(${dy}px)`;
+          }
+        };
+        const onEnd = () => {
+          if (!dragging) return;
+          dragging = false;
+          sheet.style.transition = 'transform 200ms cubic-bezier(.32,.72,0,1)';
+          if (currentY > 100) {
+            sheet.style.transform = 'translateY(100%)';
+            setTimeout(() => {
+              if (typeof window.closeDetailModal === 'function') window.closeDetailModal();
+              sheet.style.transform = '';
+              sheet.style.transition = '';
+            }, 200);
+          } else {
+            sheet.style.transform = '';
+          }
+          currentY = 0;
+        };
+        head.addEventListener('touchstart', onStart, { passive: true });
+        head.addEventListener('touchmove', onMove, { passive: true });
+        head.addEventListener('touchend', onEnd, { passive: true });
+        head.addEventListener('touchcancel', onEnd, { passive: true });
+        sheet.dataset.dragWired = '1';
+      }
+    }
     // v31.7.42 — Focus trap a11y. Sans ça, Tab dans la modal sort vers
     // le contenu derrière (anti-pattern critique pour clavier+SR).
     if (window._modalTrapRelease) window._modalTrapRelease();
