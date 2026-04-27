@@ -429,6 +429,109 @@ test.describe('Helpers purs (window.__testAPI)', () => {
     expect(hasAberrantGd).toBe(false);
   });
 
+  // AUDIT-2026-04-27 (Sprint 22 #17) — Tests fixtures helpers UI Sprint 16/18.
+  test('_animateCounter : interpolate de 0 à to', async ({ page }) => {
+    await page.goto(URL);
+    const result = await page.evaluate(async () => {
+      const el = document.createElement('span');
+      el.id = 'tt-counter';
+      document.body.appendChild(el);
+      window._animateCounter(el, { to: 100, duration: 100 });
+      await new Promise(r => setTimeout(r, 200));  // wait beyond duration
+      const final = el.textContent;
+      el.remove();
+      return final;
+    });
+    expect(['100', '99', '101']).toContain(result);  // tolerance pour rounding
+  });
+
+  test('_animateCounter : respect prefers-reduced-motion', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto(URL);
+    const result = await page.evaluate(() => {
+      const el = document.createElement('span');
+      document.body.appendChild(el);
+      window._animateCounter(el, { to: 50, duration: 1000 });
+      const immediate = el.textContent;
+      el.remove();
+      return immediate;
+    });
+    expect(result).toBe('50');  // saute direct à la valeur finale
+  });
+
+  test('_spawnConfetti : crée des particules puis les retire', async ({ page }) => {
+    await page.goto(URL);
+    const initialCount = await page.evaluate(() => {
+      const target = document.createElement('div');
+      target.id = 'tt-confetti';
+      target.style.cssText = 'position:relative;width:200px;height:100px;';
+      document.body.appendChild(target);
+      window._spawnConfetti(target, 12);
+      return target.querySelectorAll('.confetti-piece').length;
+    });
+    expect(initialCount).toBe(12);
+    // Wait beyond animation duration (2400ms)
+    await page.waitForTimeout(2700);
+    const afterCount = await page.evaluate(() => {
+      const target = document.getElementById('tt-confetti');
+      const n = target.querySelectorAll('.confetti-piece').length;
+      target.remove();
+      return n;
+    });
+    expect(afterCount).toBe(0);
+  });
+
+  test('toast : limite à 3 toasts max (FIFO)', async ({ page }) => {
+    await page.goto(URL);
+    const count = await page.evaluate(() => {
+      window.toast('Toast 1', 'info');
+      window.toast('Toast 2', 'success');
+      window.toast('Toast 3', 'warn');
+      window.toast('Toast 4', 'error');
+      window.toast('Toast 5', 'info');
+      const host = document.getElementById('toast-host');
+      return host ? host.children.length : 0;
+    });
+    expect(count).toBe(3);  // les 2 premiers sont sortis
+  });
+
+  test('tooltip : data-tooltip s\'affiche au focus', async ({ page }) => {
+    await page.goto(URL);
+    const result = await page.evaluate(async () => {
+      const btn = document.createElement('button');
+      btn.dataset.tooltip = 'Test tooltip text';
+      btn.id = 'tt-tooltip-test';
+      btn.textContent = 'Hover me';
+      document.body.appendChild(btn);
+      btn.focus();
+      await new Promise(r => setTimeout(r, 150));
+      const pop = document.querySelector('.u-tooltip-popover.visible');
+      const text = pop ? pop.textContent : null;
+      btn.remove();
+      return text;
+    });
+    expect(result).toBe('Test tooltip text');
+  });
+
+  test('tooltip : title="" migré automatiquement vers data-tooltip', async ({ page }) => {
+    await page.goto(URL);
+    const result = await page.evaluate(async () => {
+      const btn = document.createElement('button');
+      btn.title = 'Native title';
+      btn.id = 'tt-title-migrate';
+      btn.textContent = 'Test';
+      document.body.appendChild(btn);
+      btn.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+      await new Promise(r => setTimeout(r, 100));
+      const hasDataTooltip = btn.dataset.tooltip === 'Native title';
+      const titleRemoved = !btn.hasAttribute('title');
+      btn.remove();
+      return { hasDataTooltip, titleRemoved };
+    });
+    expect(result.hasDataTooltip).toBe(true);
+    expect(result.titleRemoved).toBe(true);
+  });
+
   test('isWinamaxBookable : edge cases pollution data', async ({ page }) => {
     await page.goto(URL);
     const results = await page.evaluate(() => {

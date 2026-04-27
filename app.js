@@ -137,6 +137,41 @@
     setTimeout(() => targetEl.classList.remove('has-confetti'), 2400);
   };
 
+  // AUDIT-2026-04-27 (Sprint 22 #18) — Migration inline onclick → delegation
+  // pour CSP friendlier (préparation à passer en CSP strict sans
+  // 'unsafe-inline' un jour).
+  document.addEventListener('click', (e) => {
+    // Smart suggestion banner dismiss
+    if (e.target.closest && e.target.closest('[data-smart-dismiss]')) {
+      try {
+        const today = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+        localStorage.setItem('smartSuggestionDismissed', today);
+        const b = document.getElementById('smart-suggest-banner');
+        if (b) b.style.display = 'none';
+      } catch (err) { /* swallow */ }
+      e.stopPropagation();
+      return;
+    }
+    // League back button (data-league-back="list")
+    const leagueBack = e.target.closest && e.target.closest('[data-league-back="list"]');
+    if (leagueBack) {
+      try {
+        history.replaceState(null, '', location.pathname + '#league');
+        const wrap = document.getElementById('league-wrap');
+        // renderLeaguePage est définie plus bas dans la même IIFE,
+        // donc accessible via window après l'expose ci-dessous.
+        if (wrap && typeof window.renderLeaguePage === 'function') {
+          window.renderLeaguePage(wrap);
+        } else if (wrap && typeof renderLeaguePage === 'function') {
+          renderLeaguePage(wrap);
+        }
+      } catch (err) {}
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+  });
+
   // AUDIT-2026-04-27 (Sprint 17 #25) — Cmd/Ctrl-K focus search.
   // Raccourci clavier global qui focus la search bar de la topbar.
   // Évite à l'user de chercher l'input à la souris.
@@ -9158,7 +9193,7 @@
           <span style="font-size:20px;line-height:1;">${icon}</span>
           <span style="flex:1;">${esc(text)}</span>
           <button class="page-btn" data-page="${esc(page)}" style="padding:6px 12px;background:var(--brand);color:#08080a;border:none;border-radius:var(--r-xs);cursor:pointer;font-size:12px;font-weight:700;white-space:nowrap;">${esc(cta)} →</button>
-          <button id="smart-suggest-dismiss" onclick="try { localStorage.setItem('smartSuggestionDismissed', new Date().toLocaleDateString('fr-CA',{timeZone:'Europe/Paris'})); var b=document.getElementById('smart-suggest-banner'); if(b) b.style.display='none'; } catch(e) {}" style="background:transparent;border:none;color:var(--text-dim2);font-size:18px;cursor:pointer;padding:0 4px;line-height:1;" aria-label="Masquer la suggestion" data-tooltip="Masquer pour aujourd'hui">×</button>
+          <button id="smart-suggest-dismiss" data-smart-dismiss style="background:transparent;border:none;color:var(--text-dim2);font-size:18px;cursor:pointer;padding:0 4px;line-height:1;" aria-label="Masquer la suggestion" data-tooltip="Masquer pour aujourd'hui">×</button>
         </div>`;
       } catch (e) { return ''; }
     })();
@@ -14337,6 +14372,8 @@
     });
   }
 
+  // AUDIT-2026-04-27 (Sprint 22 #18) — Expose pour CSP-safe delegation.
+  // window.renderLeaguePage défini explicitement après la définition.
   // AUDIT-2026-04-27 (Sprint 5 #24) — Per-league deep-dive page.
   // Lit window.__backtestReportV2.by_league[<lc>] et affiche un panneau
   // détaillé : KPIs (n, WR, ROI, Brier), per-cote-bucket, top wins/loses
@@ -14398,7 +14435,7 @@
         <span class="sep">›</span>
         <button data-page="backtest" class="page-btn">Performance</button>
         <span class="sep">›</span>
-        <button onclick="history.replaceState(null,'',location.pathname+'#league'); if(typeof renderLeaguePage==='function')renderLeaguePage(this.closest('#league-wrap'));">Ligues</button>
+        <button data-league-back="list">Ligues</button>
         <span class="sep">›</span>
         <span class="current">${esc(lc)}</span>
       </nav>`;
@@ -14412,7 +14449,7 @@
             <div style="font-size:14px;color:var(--text-dim);">Pas de données backtest pour cette ligue.</div>
           </div>
           <div style="margin-top:16px;">
-            <button class="page-btn" data-page="league" onclick="history.replaceState(null,'',location.pathname+'#league'); renderLeaguePage && renderLeaguePage(this.closest('#league-wrap'));" style="background:var(--panel);border:1px solid var(--border);color:var(--text);padding:8px 14px;border-radius:8px;cursor:pointer;">← Toutes les ligues</button>
+            <button class="page-btn" data-page="league" data-league-back="list" style="background:var(--panel);border:1px solid var(--border);color:var(--text);padding:8px 14px;border-radius:var(--r-sm);cursor:pointer;">← Toutes les ligues</button>
           </div>
         </div>`;
       return;
@@ -14455,10 +14492,12 @@
           ℹ️ Données backtest hebdomadaire (cron dimanche). Pour la perf en cours de semaine, voir page <button class="page-btn" data-page="bilan" style="background:transparent;border:none;color:var(--info);text-decoration:underline;cursor:pointer;font-size:inherit;font-weight:700;padding:0;">Bilan</button>.
         </div>
         <div style="margin-top:16px;">
-          <button class="page-btn" data-page="league" onclick="history.replaceState(null,'',location.pathname+'#league');" style="background:var(--panel);border:1px solid var(--border);color:var(--text);padding:8px 14px;border-radius:8px;cursor:pointer;">← Toutes les ligues</button>
+          <button class="page-btn" data-page="league" data-league-back="list" style="background:var(--panel);border:1px solid var(--border);color:var(--text);padding:8px 14px;border-radius:var(--r-sm);cursor:pointer;">← Toutes les ligues</button>
         </div>
       </div>`;
   }
+  // Expose for CSP-safe delegation handler (Sprint 22 #18)
+  try { window.renderLeaguePage = renderLeaguePage; } catch (e) {}
 
   function renderHistoriquePage(wrap) {
     const data = window.PRONOSTICS_DATA;
