@@ -2048,6 +2048,35 @@
       }
     }
 
+    // AUDIT-2026-04-27 (Sprint 30 #28) — NBA back-to-back fatigue.
+    // Une équipe NBA qui a joué hier (back-to-back) marque ~3pt de
+    // moins en moyenne (étude NBA stats 2018-2023). Différentiel se
+    // traduit en -2% prob de gagner. Étendu à NHL aussi (cadence
+    // similaire 4 matchs/sem). MLB exclu (cadence quotidienne normale).
+    if (!restNudge && (match.sport === 'basketball' || match.sport === 'hockey') && match.date) {
+      const matchTime = Date.parse(match.date);
+      if (!isNaN(matchTime)) {
+        const hDays = daysSinceLastMatch(home?.name, matchTime);
+        const aDays = daysSinceLastMatch(away?.name, matchTime);
+        const b2bPenalty = (d) => {
+          if (d == null) return 0;
+          if (d < 1.0) return -0.020;  // joué la veille (back-to-back strict)
+          if (d < 1.5) return -0.012;  // <36h
+          return 0;
+        };
+        const hRest = b2bPenalty(hDays);
+        const aRest = b2bPenalty(aDays);
+        if (hRest !== 0 || aRest !== 0) {
+          restNudge = Math.max(-0.025, Math.min(0.025, aRest - hRest));
+          restStats = {
+            home: hDays != null ? +hDays.toFixed(1) : null,
+            away: aDays != null ? +aDays.toFixed(1) : null,
+            kind: 'b2b',
+          };
+        }
+      }
+    }
+
     // Poisson component (football only, needs standings with GF/GA)
     const poi = poissonComponent(match);
     // v30 — Defensive quality / attacking drought adjustment.
