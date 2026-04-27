@@ -41,7 +41,9 @@
   // n'était plus dans aucun sous-menu visible. Le code render reste safe
   // (silent fall-through si quelqu'un set currentPage='simples' via hash
   // legacy) mais aucun lien ne pointe plus vers cette valeur.
-  const VALID_PAGES = ['dashboard','tous','locks','buteurs','combines','top','historique','bilan','backtest','academie','credibilite','alertes','profil','sante','legal','methodologie','montante-jour','montante-weekend','montante-semaine','compare'];
+  // v31.7.77 — 'calendrier' ajouté pour vue 7 jours groupée (user feedback
+  // "je veux voir au moins une semaine de pronos jour par jour").
+  const VALID_PAGES = ['dashboard','tous','locks','buteurs','combines','top','historique','bilan','backtest','academie','credibilite','alertes','profil','sante','legal','methodologie','montante-jour','montante-weekend','montante-semaine','compare','calendrier'];
   // v30 — 'mesparis' retiré : Théo n'enregistre pas ses paris sur le site.
   // v31 — 'legal' + 'methodologie' ajoutés (transparence + dictionnaire des
   // métriques, en réponse à l'audit ChatGPT 2026-04-26).
@@ -12397,6 +12399,22 @@
       }
     }
 
+    // v31.7.77 — Calendrier 7 jours
+    const isCalendrier = currentPage === 'calendrier';
+    let calendrierWrap = document.getElementById('calendrier-wrap');
+    if (!calendrierWrap) {
+      calendrierWrap = document.createElement('div');
+      calendrierWrap.id = 'calendrier-wrap';
+      (document.querySelector('main') || document.body).appendChild(calendrierWrap);
+    }
+    calendrierWrap.style.display = isCalendrier ? '' : 'none';
+    if (isCalendrier) {
+      renderCalendrierPage(calendrierWrap);
+      if (window.PRONOSTICS_DATA && window.PRONOSTICS_DATA._lite && typeof window._ensureFullData === 'function') {
+        window._ensureFullData().then(() => { try { renderCalendrierPage(calendrierWrap); } catch(e){} }).catch(()=>{});
+      }
+    }
+
     // v31.7.6 — Value Finder page retiree (cleanup), plus de wrap a maintenir.
 
     // Bilan page: render dedicated view in #bilan-wrap
@@ -13322,6 +13340,156 @@
     bookmaker: 'winamax', // winamax | all
   };
   let _histDayLimit = 20;
+
+  // v31.7.77 — Page Calendrier : affiche les pronos sur 7 jours forward,
+  // groupés jour par jour. Réponse au feedback user "je veux voir au moins
+  // une semaine de pronos jour par jour" — la page Tous était limitée à 1
+  // seul jour (currentDate).
+  function renderCalendrierPage(wrap) {
+    const data = window.PRONOSTICS_DATA;
+    if (!data || !data.days) {
+      wrap.innerHTML = '<div class="page-wrap"><div class="bilan-empty">Pas de données calendrier disponibles.</div></div>';
+      return;
+    }
+
+    // Calcule les 7 prochains jours à partir d'aujourd'hui (Europe/Paris)
+    const todayIso = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+    const days = [];
+    const todayDt = new Date(todayIso + 'T00:00:00Z');
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(todayDt);
+      d.setUTCDate(d.getUTCDate() + i);
+      days.push(d.toISOString().slice(0, 10));
+    }
+
+    // Pour chaque jour, collecter les picks Winamax avec pred valide
+    const dayBuckets = days.map(iso => {
+      const evs = (data.days[iso] || []).filter(m => m.winamax && m.winamax.available === true);
+      const picks = [];
+      evs.forEach(m => {
+        if (m.completed) return;
+        try {
+          const pred = predictMatch(m);
+          if (!pred || !pred.pick || pred.skip || pred.lowConf) return;
+          const odd = pred.odds && (pred.pick.key === '1' ? pred.odds.home : pred.pick.key === '2' ? pred.odds.away : pred.odds.draw);
+          if (!odd) return;
+          const rel = pred.reliability ?? pred.pick.prob;
+          picks.push({ m, pred, odd, rel, isLock: pred.isLock });
+        } catch(e) {}
+      });
+      // Tri : locks d'abord, puis confiance descendante
+      picks.sort((a, b) => {
+        if (a.isLock !== b.isLock) return a.isLock ? -1 : 1;
+        return b.rel - a.rel;
+      });
+      return { iso, picks, nLocks: picks.filter(p => p.isLock).length };
+    });
+
+    // Day label en français
+    const dayLabel = (iso) => {
+      try {
+        const d = new Date(iso + 'T12:00:00Z');
+        const dow = d.getUTCDay();
+        const dowLbl = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'][dow];
+        const dayN = d.getUTCDate();
+        const monthLbl = ['Jan.','Fév.','Mars','Avr.','Mai','Juin','Juil.','Août','Sep.','Oct.','Nov.','Déc.'][d.getUTCMonth()];
+        if (iso === todayIso) return `📅 Aujourd'hui · ${dowLbl} ${dayN} ${monthLbl}`;
+        return `${dowLbl} ${dayN} ${monthLbl}`;
+      } catch(e) { return iso; }
+    };
+
+    // Render une carte pick compacte
+    const renderPickRow = (p) => {
+      const { home, away } = (typeof getSides === 'function') ? getSides(p.m) : { home: {}, away: {} };
+      const hN = home?.short || home?.name || '?';
+      const aN = away?.short || away?.name || '?';
+      const tLbl = (typeof fmtTime === 'function') ? fmtTime(p.m.date) : '';
+      const lockBadge = p.isLock ? `<span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;background:var(--tier-lock-soft);color:var(--tier-lock);font-size:10px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;">🔒 LOCK</span>` : '';
+      const sportEm = (typeof sportEmoji === 'function') ? sportEmoji(p.m.sport) : '🎯';
+      const pickLbl = (p.pred.pick && p.pred.pick.label) || 'Pick';
+      const relColor = p.rel >= 0.70 ? 'var(--accent)' : p.rel >= 0.60 ? 'var(--warn)' : 'var(--text-dim)';
+      const lg = p.m.league_name || p.m.league || '';
+      return `
+        <div class="cal-pick-row" data-match-id="${esc(String(p.m.id || ''))}" role="button" tabindex="0" style="display:grid;grid-template-columns:60px 1fr auto auto;gap:10px;padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${p.isLock ? 'var(--tier-lock)' : 'var(--accent)'};border-radius:0 8px 8px 0;align-items:center;cursor:pointer;font-variant-numeric:tabular-nums;margin-bottom:4px;">
+          <div style="font-size:12px;color:var(--text-dim);font-weight:600;">${esc(tLbl)}</div>
+          <div style="min-width:0;">
+            <div style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--text);">
+              <span style="font-size:13px;">${sportEm}</span>
+              <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(hN)} <span style="color:var(--text-dim2);font-weight:400;">vs</span> ${esc(aN)}</span>
+              ${lockBadge}
+            </div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(lg.slice(0, 40))} · <b style="color:var(--brand);">→ ${esc(pickLbl)}</b></div>
+          </div>
+          <div style="font-size:13px;font-weight:700;color:${relColor};">${Math.round(p.rel * 100)}%</div>
+          <div style="font-size:13px;color:var(--text);">@${p.odd.toFixed(2)}</div>
+        </div>`;
+    };
+
+    // Render une section jour
+    const renderDaySection = (bucket) => {
+      const isToday = bucket.iso === todayIso;
+      const lbl = dayLabel(bucket.iso);
+      if (!bucket.picks.length) {
+        return `
+        <section style="margin-bottom:24px;">
+          <h2 style="font-size:14px;font-weight:700;color:var(--text);margin:0 0 8px;letter-spacing:-.3px;${isToday ? 'color:var(--accent);' : ''}">${esc(lbl)}</h2>
+          <div style="padding:14px 16px;background:var(--panel);border:1px dashed var(--border-2);border-radius:8px;font-size:12px;color:var(--text-dim2);text-align:center;">Aucun pronostic value ce jour.</div>
+        </section>`;
+      }
+      const top10 = bucket.picks.slice(0, 10);
+      const moreCount = bucket.picks.length - top10.length;
+      return `
+        <section style="margin-bottom:24px;">
+          <h2 style="font-size:14px;font-weight:700;color:var(--text);margin:0 0 8px;letter-spacing:-.3px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;${isToday ? 'color:var(--accent);' : ''}">
+            <span>${esc(lbl)}</span>
+            <span style="font-size:11px;color:var(--text-dim);font-weight:500;">${bucket.picks.length} prono${bucket.picks.length>1?'s':''} · ${bucket.nLocks} lock${bucket.nLocks>1?'s':''}</span>
+          </h2>
+          <div>${top10.map(renderPickRow).join('')}</div>
+          ${moreCount > 0 ? `<div style="margin-top:6px;font-size:11px;color:var(--text-dim2);text-align:center;">+ ${moreCount} prono${moreCount>1?'s':''} de plus pour ce jour (Page Tous · navigue avec ◀▶)</div>` : ''}
+        </section>`;
+    };
+
+    const totalPicks = dayBuckets.reduce((s, b) => s + b.picks.length, 0);
+    const totalLocks = dayBuckets.reduce((s, b) => s + b.nLocks, 0);
+
+    wrap.innerHTML = `
+      <div class="page-wrap" style="padding:0 8px 24px;">
+        <div class="page-header">
+          <div style="position:absolute;top:0;left:0;width:40px;height:3px;background:var(--brand);border-radius:0 0 2px 2px;"></div>
+          <div class="lbl-tiny" style="color:var(--brand);">Pronos · 7 jours</div>
+          <h1 class="page-h1">📅 Calendrier des pronos</h1>
+          <div style="font-size:14px;color:var(--text-dim);">Vue d'ensemble sur 7 jours forward — <b style="color:var(--text);">${totalPicks} pronostics</b> dont <b style="color:var(--tier-lock);">${totalLocks} locks 🔒</b>. Toggle vers Tous pour les filtres avancés.</div>
+        </div>
+        <div style="margin-top:16px;">
+          ${dayBuckets.map(renderDaySection).join('')}
+        </div>
+        <div style="margin-top:24px;padding:14px 16px;background:rgba(167,139,250,.04);border:1px dashed var(--brand-border);border-radius:8px;font-size:12.5px;color:var(--text-dim);">
+          💡 Astuce : clique un match pour voir le détail. Pour la vue détaillée d'un seul jour avec filtres sport / edge / confiance, va sur <button class="page-btn" data-page="tous" style="background:transparent;border:none;color:var(--brand);text-decoration:underline;cursor:pointer;font-size:inherit;font-family:inherit;padding:0;font-weight:700;">Tous les matchs</button>.
+        </div>
+      </div>`;
+
+    // Wire click → openDetail (réutilise pattern Tous)
+    wrap.querySelectorAll('.cal-pick-row[data-match-id]').forEach(row => {
+      row.addEventListener('click', () => {
+        const id = row.dataset.matchId;
+        if (!id) return;
+        const allDays = window.PRONOSTICS_DATA?.days || {};
+        for (const evs of Object.values(allDays)) {
+          const m = (evs || []).find(x => String(x?.id) === id);
+          if (m) {
+            if (typeof openDetail === 'function') openDetail(m);
+            break;
+          }
+        }
+      });
+      row.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          row.click();
+        }
+      });
+    });
+  }
 
   function renderHistoriquePage(wrap) {
     const data = window.PRONOSTICS_DATA;
