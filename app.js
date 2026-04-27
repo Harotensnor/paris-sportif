@@ -1442,6 +1442,9 @@
       btn.title = 'Santé pipeline : health.json indisponible';
       return;
     }
+    // AUDIT-2026-04-27 (Sprint 4 #20) — expose health pour la page Santé
+    // qui peut lire window.__healthData et afficher quality_checks.
+    try { window.__healthData = h; } catch(e){}
     const ageMin = isFinite(h.data_age_min) ? h.data_age_min : 999;
     const warnings = Array.isArray(h.warnings) ? h.warnings : [];
     let color, label;
@@ -14801,6 +14804,53 @@
           <div style="font-size:13px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;">🧠 Recommandations</div>
           ${recoHtml}
         </div>
+
+        ${(() => {
+          // AUDIT-2026-04-27 (Sprint 4 #20) — Quality checks visibles
+          // dans la page Santé. Lit window.__healthData rempli par
+          // _refreshHealthIndicator. Permet à l'user de voir d'un coup
+          // d'œil les checks sémantiques (Winamax exact ratio, foot
+          // invalid form, etc.) sans aller lire le JSON brut.
+          const h = window.__healthData;
+          const q = h && h.quality_checks;
+          if (!q) return '';
+          const ratio = q.winamax_exact_ratio;
+          const ratioPct = (ratio != null && isFinite(ratio)) ? Math.round(ratio * 100) : null;
+          const ratioColor = ratioPct == null ? 'var(--text-dim)'
+                           : ratioPct >= 70 ? '#34d399'
+                           : ratioPct >= 50 ? '#eab308'
+                                            : '#f87171';
+          const fbInv = Number(q.football_invalid_form || 0);
+          const fbColor = fbInv === 0 ? '#34d399' : '#f87171';
+          const ext = Number(q.actionable_external_odds || 0);
+          const extColor = ext === 0 ? '#34d399' : ext < 50 ? '#eab308' : '#f87171';
+          return `
+          <div style="margin-top:22px;">
+            <div style="font-size:13px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;">📊 Quality checks data (sémantique)</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;">
+              <div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;border-left:4px solid ${ratioColor};">
+                <div class="lbl-mini">Winamax exact ratio</div>
+                <div style="font-size:24px;font-weight:800;color:${ratioColor};font-variant-numeric:tabular-nums;">${ratioPct == null ? '—' : ratioPct + '%'}</div>
+                <div style="font-size:11px;color:var(--text-dim);margin-top:4px;line-height:1.4;">${q.winamax_exact || 0} / ${q.winamax_available || 0} events ont match_id + markets bookable.</div>
+              </div>
+              <div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;border-left:4px solid ${fbColor};">
+                <div class="lbl-mini">Stats foot invalides</div>
+                <div style="font-size:24px;font-weight:800;color:${fbColor};font-variant-numeric:tabular-nums;">${fbInv}</div>
+                <div style="font-size:11px;color:var(--text-dim);margin-top:4px;line-height:1.4;">${fbInv === 0 ? '✓ Aucune contamination cross-sport détectée.' : `${fbInv} foot competitor(s) avec avg_gf5/ga5 > 5 (NBA-level).`}</div>
+              </div>
+              <div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;border-left:4px solid ${extColor};">
+                <div class="lbl-mini">Cotes externes actionnables</div>
+                <div style="font-size:24px;font-weight:800;color:${extColor};font-variant-numeric:tabular-nums;">${ext}</div>
+                <div style="font-size:11px;color:var(--text-dim);margin-top:4px;line-height:1.4;">${ext === 0 ? '✓ Tous les events Winamax exact utilisent la cote Winamax.' : `${ext} events Winamax exact mais snapshot DraftKings/etc.`}</div>
+              </div>
+              <div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;">
+                <div class="lbl-mini">Events scannés</div>
+                <div style="font-size:24px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;">${q.total_events || 0}</div>
+                <div style="font-size:11px;color:var(--text-dim);margin-top:4px;line-height:1.4;">${q.upcoming_events || 0} à venir · ${q.winamax_tournament_only || 0} tournoi-only</div>
+              </div>
+            </div>
+          </div>`;
+        })()}
 
         <div style="margin-top:22px;">
           <div style="font-size:13px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;">🎯 Matchs restants par sport</div>

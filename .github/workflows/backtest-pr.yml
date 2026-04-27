@@ -1,0 +1,83 @@
+name: backtest-on-pr
+
+# AUDIT-2026-04-27 (Sprint 4 #16) — Backtest auto sur PR.
+# Rejoue backtest_v2.py sur la HEAD de la PR ET sur main, puis compare
+# le ROI. Fail si ROI baisse de plus de 2pt vs main → catch les
+# régressions silencieuses du modèle avant qu'elles ne mergent.
+#
+# Ne tourne QUE sur PR qui touchent app.js (le modèle vit dans l'IIFE
+# d'app.js, lu via model_loader.py). Évite de tourner sur les PR doc/
+# CSS qui ne peuvent pas affecter predictMatch.
+
+on:
+  pull_request:
+    paths:
+      - 'app.js'
+      - 'scripts/backtest_v2.py'
+      - 'scripts/model_loader.py'
+      - '.github/workflows/backtest-pr.yml'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  backtest-compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout PR HEAD
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # need both branches
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install deps
+        run: pip install mini-racer --break-system-packages
+
+      - name: Run backtest on PR HEAD
+        id: pr_backtest
+        run: |
+          python3 scripts/backtest_v2.py > /tmp/backtest_pr.log 2>&1 || {
+            echo "PR backtest failed — assume infinite regression"
+            echo "pr_roi=-999" >> $GITHUB_OUTPUT
+            cat /tmp/backtest_pr.log | tail -30
+            exit 0
+          }
+          PR_ROI=$(python3 -c "import json; r = json.load(open('backtest_report_v2.json')); print(r.get('overall', {}).get('flat_roi_pct', -999))")
+          echo "PR ROI = $PR_ROI"
+          echo "pr_roi=$PR_ROI" >> $GITHUB_OUTPUT
+          mv backtest_report_v2.json /tmp/pr_report.json
+
+      - name: Run backtest on main
+        id: main_backtest
+        run: |
+          git checkout origin/main -- app.js scripts/backtest_v2.py scripts/model_loader.py 2>/dev/null || true
+          python3 scripts/backtest_v2.py > /tmp/backtest_main.log 2>&1 || {
+            echo "Main backtest failed — assume neutral"
+            echo "main_roi=0" >> $GITHUB_OUTPUT
+            exit 0
+          }
+          MAIN_ROI=$(python3 -c "import json; r = json.load(open('backtest_report_v2.json')); print(r.get('overall', {}).get('flat_roi_pct', 0))")
+          echo "Main ROI = $MAIN_ROI"
+          echo "main_roi=$MAIN_ROI" >> $GITHUB_OUTPUT
+
+      - name: Compare ROI
+        run: |
+          PR_ROI="${{ steps.pr_backtest.outputs.pr_roi }}"
+          MAIN_ROI="${{ steps.main_backtest.outputs.main_roi }}"
+          DELTA=$(python3 -c "print(round(float('$PR_ROI') - float('$MAIN_ROI'), 2))")
+          echo "## Backtest comparison"
+          echo "Main ROI: $MAIN_ROI%"
+          echo "PR ROI:   $PR_ROI%"
+          echo "Delta:    $DELTA pt"
+          # Fail si baisse de >2pt (tolérance pour bruit naturel)
+          python3 -c "import sys; d = float('$DELTA'); sys.exit(1 if d < -2.0 else 0)" || {
+            echo "::error::ROI regression: PR ROI ${PR_ROI}% vs main ${MAIN_ROI}% (delta ${DELTA}pt < -2pt threshold)"
+            exit 1
+          }
+          echo "::notice::ROI delta ${DELTA}pt within tolerance (threshold: -2pt)"
