@@ -17350,6 +17350,19 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       if (!btn || !btn.dataset || !btn.dataset.page) return;
       currentPage = btn.dataset.page;
       try { localStorage.setItem('currentPage', currentPage); } catch (e) {}
+      // AUDIT-2026-04-27 — Sync URL hash sur la nav SPA. Avant : la
+      // page changeait visuellement et `currentPage` bougeait, mais
+      // `location.hash` restait sur l'ancienne page. Casse partage
+      // de lien, refresh, back/forward. `replaceState` évite de
+      // déclencher hashchange (= récursion) et ne pollue pas
+      // l'historique. Si l'user veut back, il revient au hash
+      // précédent qui était valide, puis hashchange synchronise.
+      try {
+        const targetHash = '#' + currentPage;
+        if (location.hash !== targetHash) {
+          history.replaceState(null, '', location.pathname + location.search + targetHash);
+        }
+      } catch (e) {}
       applyPageView();
       // v30 — ferme le dropdown hub contenant ce page-btn si besoin
       const parentHub = btn.closest('.hub');
