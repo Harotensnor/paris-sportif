@@ -48,6 +48,8 @@ jobs:
         run: python3 scripts/check_pipeline_drift.py
       - name: Check no conflict markers (anti-rebase-fail safety)
         run: python3 scripts/check_no_conflict_markers.py
+      - name: Check health.json quality_checks (sprint 1 #4)
+        run: python3 scripts/check_health_quality.py
 
   test:
     runs-on: ubuntu-latest

@@ -98,7 +98,16 @@ def _ml_to_dec(ml):
 
 def snapshot(event, now_iso):
     """Capture current odds into ev.odds_snapshot (idempotent — only writes if
-    snapshot missing AND match is still upcoming AND odds are real)."""
+    snapshot missing AND match is still upcoming AND odds are real).
+
+    AUDIT-2026-04-27 (Sprint 1 #1) — Sources étendues. Avant : ne lisait
+    QUE event.odds (ESPN). Pour les qualifs WTA / Challenger / matchs où
+    ESPN ne donne pas de cote, on tombait à `[]` et le bilan ne pouvait
+    jamais évaluer ces picks → 24 matchs terminés sans cote (cf v31.7.92
+    "non-trackables"). Désormais on essaie aussi `event.winamax.markets`
+    en fallback, ce qui couvre les cas où le mapping Winamax exact
+    existe mais ESPN n'a pas de odds.
+    """
     # Don't touch events that already have a snapshot
     if event.get('odds_snapshot') and (event['odds_snapshot'].get('home') or event['odds_snapshot'].get('away')):
         return False
@@ -107,6 +116,18 @@ def snapshot(event, now_iso):
     if event.get('completed') or 'IN_PROGRESS' in status or 'HALF' in status or 'FINAL' in status:
         return False
     h, d, a, prov = best_odds_from_array(event.get('odds') or [])
+    # AUDIT-2026-04-27 — fallback Winamax markets si ESPN odds vide.
+    # Uniquement quand c'est un match exact (match_id présent) — on ne
+    # snapshot pas les fallback tournament-only (cote inexistante).
+    if not h and not a:
+        wnx = event.get('winamax') or {}
+        mks = wnx.get('markets') or {}
+        m1n2 = mks.get('1n2') or {}
+        wh = m1n2.get('home')
+        wa = m1n2.get('away')
+        wd = m1n2.get('draw')
+        if wnx.get('match_id') and (wh or wa):
+            h, d, a, prov = wh, wd, wa, 'winamax'
     if not h and not a:
         return False
     event['odds_snapshot'] = {

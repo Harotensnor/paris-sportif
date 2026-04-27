@@ -99,7 +99,42 @@ def main() -> int:
     data = json.loads(m.group(1))
     days = data.get('days', {}) or {}
 
-    stats = {'events': 0, 'matched': 0}
+    # AUDIT-2026-04-27 (Sprint 1 #3) — Garde-fou cotes absurdes.
+    # Si l'extraction Winamax retourne une cote < 1.01 (impossible en réel)
+    # ou > 1000 (juste avant un retrait de marché, valeur poubelle), ou si
+    # la marge bookmaker calculée est > 25% (= cotes incohérentes, doublon
+    # de joueur, etc.), on skip plutôt que d'écrire un market piégé qui
+    # surfacerait un faux edge énorme dans predictMatch.
+    def _markets_look_sane(odds_block: dict) -> tuple[bool, str]:
+        n12 = odds_block.get('1n2') if isinstance(odds_block, dict) else None
+        if not isinstance(n12, dict):
+            return True, ''  # pas de 1n2 = on n'a rien à valider sur 1N2
+        h = n12.get('home')
+        a = n12.get('away')
+        d = n12.get('draw')
+        try:
+            h = float(h) if h is not None else None
+            a = float(a) if a is not None else None
+            d = float(d) if d is not None else None
+        except (TypeError, ValueError):
+            return False, 'cotes 1n2 non numériques'
+        # Cotes individuelles dans plages physiques
+        for label, v in (('home', h), ('draw', d), ('away', a)):
+            if v is not None and (v < 1.01 or v > 1000):
+                return False, f'{label} cote hors plage [1.01, 1000] : {v}'
+        # Marge bookmaker = somme des prob implicites - 1.0. Au-delà de
+        # 25%, c'est suspect (Winamax ~6-8% en pratique, jamais 25%+).
+        implied = 0.0
+        for v in (h, d, a):
+            if v is not None and v > 1:
+                implied += 1.0 / v
+        if implied > 1.25:
+            return False, f'marge bookmaker > 25% (implied={implied:.2%})'
+        # Coté unique <= 1.01 trahit un fav énorme post-match (cote retirée
+        # juste avant le coup d'envoi, valeur stale).
+        return True, ''
+
+    stats = {'events': 0, 'matched': 0, 'rejected_insane': 0}
     for day, evs in days.items():
         for ev in evs:
             stats['events'] += 1
@@ -115,6 +150,14 @@ def main() -> int:
             odds_block = dict(mk.get('odds') or {})
             if isinstance(odds_block.get('1n2'), dict):
                 odds_block['1n2'] = dict(odds_block['1n2'])
+            # AUDIT — Refuse les markets absurdes plutôt que de pourrir
+            # predictMatch avec un faux edge.
+            ok, reason = _markets_look_sane(odds_block)
+            if not ok:
+                stats['rejected_insane'] += 1
+                ev_label = (ev.get('name') or f'mid={mid}')[:60]
+                print(f'  [reject] {ev_label} — {reason}', file=sys.stderr)
+                continue
             # 1n2 home/away can be flipped vs ESPN — realign before storing
             _align_markets_to_espn(odds_block, ev)
             wx['markets'] = odds_block
@@ -133,8 +176,11 @@ def main() -> int:
                            new_block, html_text, count=1, flags=re.DOTALL)
         HTML.write_text(html_text, encoding='utf-8')
 
-    print(f'[{datetime.now():%H:%M:%S}] patch_winamax_markets: '
-          f'{stats["matched"]}/{stats["events"]} events enriched with Winamax markets')
+    msg = (f'[{datetime.now():%H:%M:%S}] patch_winamax_markets: '
+           f'{stats["matched"]}/{stats["events"]} events enriched with Winamax markets')
+    if stats.get('rejected_insane'):
+        msg += f" · rejected {stats['rejected_insane']} insane markets"
+    print(msg)
     return 0
 
 
