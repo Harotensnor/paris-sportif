@@ -79,4 +79,82 @@ test.describe('Visual regression — pages statiques', () => {
     });
   });
 
+  // AUDIT-2026-04-27 (Sprint 4 #17) — Visual regression étendu.
+  // Capture les zones structurelles qui ne devraient pas bouger entre 2
+  // commits si le code n'a pas changé. Tolérance large (5%) pour les
+  // valeurs dynamiques (compteurs, dates).
+
+  test('sidebar verticale gauche', async ({ page }) => {
+    await page.goto('/pronostics.html');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForFunction(() => window.PRONOSTICS_DATA != null, { timeout: 10000 }).catch(() => {});
+    await page.waitForTimeout(800);
+    const sidebar = page.locator('aside.sidebar-left, .sidebar-left').first();
+    if (await sidebar.count() === 0) test.skip();
+    await expect(sidebar).toHaveScreenshot('sidebar-left.png', {
+      maxDiffPixelRatio: 0.05,
+      animations: 'disabled',
+    });
+  });
+
+  test('page Tous filter bar structure', async ({ page }) => {
+    await page.goto('/pronostics.html#tous');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForFunction(() => window.PRONOSTICS_DATA != null, { timeout: 10000 }).catch(() => {});
+    await page.waitForTimeout(1500);
+    const filterBar = page.locator('.tous-filter-bar').first();
+    if (await filterBar.count() === 0) test.skip();
+    await expect(filterBar).toHaveScreenshot('tous-filter-bar.png', {
+      maxDiffPixelRatio: 0.05,
+      animations: 'disabled',
+    });
+  });
+
+  test('page Locks header structure', async ({ page }) => {
+    await page.goto('/pronostics.html#locks');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForFunction(() => window.PRONOSTICS_DATA != null, { timeout: 10000 }).catch(() => {});
+    await page.waitForTimeout(1500);
+    // Locks header — first .page-header inside #locks-wrap if it exists,
+    // else first .page-header in main.
+    const header = page.locator('#locks-wrap .page-header, main .page-header').first();
+    if (await header.count() === 0) test.skip();
+    await expect(header).toHaveScreenshot('locks-header.png', {
+      maxDiffPixelRatio: 0.10,  // KPIs Locks bougent jour à jour
+      animations: 'disabled',
+    });
+  });
+
+  test('page Calendrier 7j structure', async ({ page }) => {
+    await page.goto('/pronostics.html#calendrier');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForFunction(() => window.PRONOSTICS_DATA != null, { timeout: 10000 }).catch(() => {});
+    // Skeleton apparait pendant _ensureFullData — attendre que le rendu réel arrive
+    await page.waitForTimeout(2500);
+    const wrap = page.locator('#calendrier-wrap .page-header').first();
+    if (await wrap.count() === 0) test.skip();
+    await expect(wrap).toHaveScreenshot('calendrier-header.png', {
+      maxDiffPixelRatio: 0.05,
+      animations: 'disabled',
+    });
+  });
+
+  test('modal détail tabs structure', async ({ page }) => {
+    await page.goto('/pronostics.html#tous');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForFunction(() => window.PRONOSTICS_DATA != null, { timeout: 10000 }).catch(() => {});
+    await page.waitForTimeout(1500);
+    // Click sur la première carte match pour ouvrir la modal
+    const firstCard = page.locator('[data-match-id], .card[data-id], .match-row').first();
+    if (await firstCard.count() === 0) test.skip();
+    await firstCard.click({ trial: false }).catch(() => {});
+    await page.waitForTimeout(800);
+    const tabs = page.locator('.md-tabs').first();
+    if (await tabs.count() === 0) test.skip();
+    await expect(tabs).toHaveScreenshot('modal-detail-tabs.png', {
+      maxDiffPixelRatio: 0.05,
+      animations: 'disabled',
+    });
+  });
+
 });
