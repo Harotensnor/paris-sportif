@@ -2409,6 +2409,101 @@
   .card-md { padding: var(--space-4); border-radius: var(--r-md); }
   .card-lg { padding: var(--space-5) var(--space-6); border-radius: var(--r); }
 
+  /* AUDIT-2026-04-27 (Sprint 18 #28) — Confetti animation pour win streak.
+     Activé par class `.has-confetti` sur un container. CSS-only via
+     pseudo-elements + keyframes (pas de canvas, pas de lib externe). */
+  .has-confetti { position: relative; overflow: hidden; }
+  .has-confetti::before,
+  .has-confetti::after {
+    content: '';
+    position: absolute;
+    pointer-events: none;
+    width: 8px; height: 14px;
+    top: -20px;
+    background: var(--accent);
+    animation: confetti-fall 1800ms cubic-bezier(.5,0,.5,1) forwards;
+  }
+  .has-confetti::before { left: 18%; background: var(--brand); animation-delay: 100ms; }
+  .has-confetti::after  { left: 78%; background: var(--warn); animation-delay: 250ms; }
+  /* Un wrapper avec plusieurs spans pour avoir vraiment plusieurs particules */
+  .confetti-piece {
+    position: absolute;
+    width: 6px; height: 12px;
+    top: -20px;
+    pointer-events: none;
+    animation: confetti-fall 2000ms cubic-bezier(.5,0,.5,1) forwards;
+  }
+  @keyframes confetti-fall {
+    0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+    80%  { opacity: 1; }
+    100% { transform: translateY(120%) rotate(720deg); opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .has-confetti::before, .has-confetti::after,
+    .confetti-piece { display: none; }
+  }
+
+  /* AUDIT-2026-04-27 (Sprint 18 #29) — Badge "Nouveau" pour features récentes.
+     Affiché à côté du label de menu pendant 7 jours après l'ajout. */
+  .nav-new-badge {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 6px;
+    padding: 1px 6px;
+    border-radius: var(--r-pill);
+    background: var(--brand-soft);
+    color: var(--brand);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: var(--tracking-widest);
+    text-transform: uppercase;
+    line-height: 1.4;
+    animation: pulse-soft 2s ease-in-out infinite;
+  }
+  @keyframes pulse-soft {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.65; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .nav-new-badge { animation: none; }
+  }
+
+  /* AUDIT-2026-04-27 (Sprint 18 #27) — Empty state amélioré.
+     Plus de personnalité, moins clinique. Utilisé par renderXxxPage
+     qui n'a rien à afficher. */
+  .empty-state-v2 {
+    text-align: center;
+    padding: var(--space-12) var(--space-6);
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  .empty-state-v2 .es-illustration {
+    font-size: 64px;
+    line-height: 1;
+    margin-bottom: var(--space-4);
+    opacity: 0.7;
+    filter: grayscale(0.2);
+  }
+  .empty-state-v2 .es-title-v2 {
+    font-size: var(--fs-lg);
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: var(--space-2);
+    letter-spacing: var(--tracking-tight);
+  }
+  .empty-state-v2 .es-body-v2 {
+    font-size: var(--fs-sm);
+    color: var(--text-dim);
+    line-height: var(--lh-relaxed);
+    margin-bottom: var(--space-6);
+  }
+  .empty-state-v2 .es-actions-v2 {
+    display: flex;
+    gap: var(--space-2);
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
   /* AUDIT-2026-04-27 (Sprint 17 #21) — Breadcrumbs sur sub-pages.
      Style consistant : "Section > Sous-section" en haut de la page,
      petit, cliquable pour remonter d'un cran. */
