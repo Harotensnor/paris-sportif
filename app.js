@@ -271,6 +271,81 @@
     }
   });
 
+  // AUDIT-2026-04-27 (Sprint 38 #28) — Keyboard shortcut overlay.
+  // Press `?` ouvre un modal listant les raccourcis disponibles.
+  // Press Esc ferme. Pattern Linear/GitHub.
+  function _showShortcutsOverlay() {
+    let overlay = document.getElementById('keyboard-shortcuts-overlay');
+    if (overlay) {
+      overlay.style.display = '';
+      return;
+    }
+    overlay = document.createElement('div');
+    overlay.id = 'keyboard-shortcuts-overlay';
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-label', 'Raccourcis clavier');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:500;padding:20px;';
+    overlay.innerHTML = `
+      <div style="background:var(--panel);border:1px solid var(--border-2);border-radius:var(--r-lg);max-width:480px;width:100%;padding:var(--space-6);box-shadow:var(--shadow-lg);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4);">
+          <h3 style="margin:0;font-size:var(--fs-lg);">⌨️ Raccourcis clavier</h3>
+          <button id="kbd-close" style="background:var(--panel-3);border:1px solid var(--border);border-radius:var(--r-sm);padding:6px 12px;cursor:pointer;color:var(--text);font-family:inherit;">✕</button>
+        </div>
+        <div style="display:grid;gap:8px;font-size:var(--fs-sm);">
+          ${[
+            ['?', 'Afficher cette aide'],
+            ['Esc', 'Fermer modal/overlay'],
+            ['Cmd/Ctrl+K', 'Focus la barre de recherche'],
+            ['Maj+T', 'Cycle thème (sombre/clair/auto)'],
+            ['Tab', 'Naviguer entre les contrôles'],
+            ['Shift+Tab', 'Naviguer en arrière'],
+            ['Enter / Space', 'Activer un bouton focusé'],
+            ['Arrow Left / Right', 'Naviguer entre les onglets modal'],
+          ].map(([k, desc]) => `
+            <div style="display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;padding:6px 0;">
+              <kbd style="background:var(--panel-2);border:1px solid var(--border-2);border-radius:var(--r-xs);padding:3px 8px;font-family:monospace;font-size:11px;font-weight:600;min-width:80px;text-align:center;color:var(--text);">${esc(k)}</kbd>
+              <span style="color:var(--text-dim);">${esc(desc)}</span>
+            </div>
+          `).join('')}
+        </div>
+        <div style="margin-top:var(--space-4);padding-top:var(--space-4);border-top:1px solid var(--border);font-size:11px;color:var(--text-dim2);text-align:center;">
+          Press <kbd style="background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-xs);padding:1px 5px;font-family:monospace;font-size:10px;">?</kbd> any time to show this overlay.
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+    const close = () => { overlay.style.display = 'none'; };
+    overlay.querySelector('#kbd-close')?.addEventListener('click', close);
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+    overlay.querySelector('#kbd-close')?.focus();
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== '?' || e.metaKey || e.ctrlKey || e.altKey) return;
+    const tag = (e.target && e.target.tagName) || '';
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+    e.preventDefault();
+    _showShortcutsOverlay();
+  });
+
+  // AUDIT-2026-04-27 (Sprint 38 #27) — ARIA live region pour data refresh.
+  // Annonce "Données mises à jour" au lecteur d'écran quand pollData
+  // termine (peu intrusif, role=status + aria-live polite).
+  let __sraLive = null;
+  window._announceSR = function announceSR(msg) {
+    try {
+      if (!__sraLive) {
+        __sraLive = document.createElement('div');
+        __sraLive.setAttribute('role', 'status');
+        __sraLive.setAttribute('aria-live', 'polite');
+        __sraLive.setAttribute('aria-atomic', 'true');
+        __sraLive.style.cssText = 'position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;';
+        document.body.appendChild(__sraLive);
+      }
+      __sraLive.textContent = msg;
+    } catch (e) {}
+  };
+
   // AUDIT-2026-04-27 (Sprint 17 #25) — Cmd/Ctrl-K focus search.
   // Raccourci clavier global qui focus la search bar de la topbar.
   // Évite à l'user de chercher l'input à la souris.
