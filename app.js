@@ -4607,10 +4607,10 @@
 
     wrap.innerHTML = `
       <div style="max-width:1280px;margin:0 auto;padding:4px 0 0;">
-        <div style="margin-bottom:24px;padding:32px 0 20px;border-bottom:1px solid var(--border);position:relative;">
+        <div class="page-header">
           <div style="position:absolute;top:0;left:0;width:40px;height:3px;background:var(--purple);border-radius:0 0 2px 2px;"></div>
           <div style="font-size:11px;color:var(--purple);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Multi-paris</div>
-          <h1 style="margin:0 0 6px;font-size:40px;font-weight:800;letter-spacing:-1.4px;color:var(--text);line-height:1.1;">Combinés</h1>
+          <h1 class="page-h1">Combinés</h1>
           <div style="font-size:14px;color:var(--text-dim);max-width:640px;">Paris combinés générés automatiquement, anti-corrélés, recalculés en continu. À utiliser avec modération.</div>
         </div>
         ${iaCombineHtml}
@@ -5455,11 +5455,11 @@
           </h4>
           ${enjeuText ? `<div style="padding:12px 14px;margin-bottom:14px;background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.18);border-left:3px solid var(--brand);border-radius:0 8px 8px 0;font-size:13.5px;color:var(--text);line-height:1.55;">${enjeuText}</div>` : ''}
           <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:14px;">
-            <div style="padding:14px 16px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;">
+            <div class="card-soft">
               <div style="font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:8px;">🏆 Cadre</div>
               <div style="font-size:13px;line-height:1.7;color:var(--text-2);">${enjeuLines.join('<br>')}</div>
             </div>
-            <div style="padding:14px 16px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;">
+            <div class="card-soft">
               <div style="font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:8px;">📊 Forme (3 derniers)</div>
               <div style="font-size:13px;color:var(--text-2);line-height:1.6;">
                 ${formHtml ? `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span style="font-weight:600;color:var(--text);min-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(home?.short || home?.name || '?')}</span><span>${formHtml}</span></div>` : ''}
@@ -5467,7 +5467,7 @@
                 ${(!formHtml && !formAHtml) ? '<span style="color:var(--text-dim2);">Forme indisponible pour ce match.</span>' : ''}
               </div>
             </div>
-            <div style="padding:14px 16px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;">
+            <div class="card-soft">
               <div style="font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:8px;">🌤️ Conditions</div>
               <div style="font-size:13px;color:var(--text-2);line-height:1.6;">
                 ${weather ? `🌡️ ${weather.temp_c != null ? Math.round(weather.temp_c) + '°C' : '—'}${weather.condition ? ' · ' + esc(weather.condition) : ''}${weather.wind_kmh != null ? ' · 💨 ' + Math.round(weather.wind_kmh) + ' km/h' : ''}<br>` : ''}
@@ -5601,7 +5601,7 @@
             })()}
             ${reasons.length ? `
             <div style="margin-top:12px;">
-              <div style="font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-dim2,#7b8693);margin-bottom:8px;">Pourquoi ce pronostic</div>
+              <div class="lbl-tiny-mb">Pourquoi ce pronostic</div>
               <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px;">
                 ${reasons.map(r => `<li style="display:flex;gap:10px;padding:8px 10px;background:rgba(255,255,255,.02);border-radius:6px;font-size:13px;line-height:1.4;"><span style="font-size:15px;">${r.icon}</span><span style="color:var(--text,#e6ebf2);">${esc(r.text)}</span></li>`).join('')}
               </ul>
@@ -5648,7 +5648,7 @@
                 const totalWeight = Object.values(factors).reduce((a,b)=>a+b, 0);
                 const normalized = Object.fromEntries(Object.entries(factors).map(([k,v]) => [k, v / totalWeight * 100]));
                 return `<div style="margin-top:12px;padding:10px 12px;background:rgba(255,255,255,.02);border-radius:8px;border:1px solid rgba(255,255,255,.04);">
-                  <div style="font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-dim2,#7b8693);margin-bottom:8px;">📊 Composé de</div>
+                  <div class="lbl-tiny-mb">📊 Composé de</div>
                   <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:12px;">
                     ${Object.entries(normalized).filter(([_,w]) => w > 0).map(([name, pct]) => {
                       let shortName = name.replace(/Forme|/g, '').replace(/Marché|/g, '').replace(/H2H|/g, '').trim();
@@ -5712,7 +5712,7 @@
               if (contribs.length === 0) return '';
               const top = contribs.slice(0, 3);
               return `<div style="margin-top:12px;padding:10px 12px;background:rgba(255,255,255,.02);border-radius:8px;border:1px solid rgba(255,255,255,.04);">
-                <div style="font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-dim2,#7b8693);margin-bottom:8px;">🎯 Pourquoi ce pick ?</div>
+                <div class="lbl-tiny-mb">🎯 Pourquoi ce pick ?</div>
                 <div style="display:flex;gap:6px;flex-wrap:wrap;">
                   ${top.map(c => {
                     const deltaPct = Math.round(c.delta * 100);
@@ -5775,7 +5775,7 @@
               }
               return `
               <div style="margin-top:14px;">
-                <div style="font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-dim2,#7b8693);margin-bottom:8px;">${heading}</div>
+                <div class="lbl-tiny-mb">${heading}</div>
                 <div style="display:flex;gap:8px;flex-wrap:wrap;">${chipsHtml}</div>
                 ${caption ? `<div style="margin-top:6px;font-size:10.5px;color:var(--text-dim2,#7b8693);line-height:1.3;">${esc(caption)}</div>` : ''}
               </div>`;
@@ -5801,7 +5801,7 @@
                 </div>`;
               };
               return `<div style="margin-top:14px;">
-                <div style="font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-dim2,#7b8693);margin-bottom:8px;">🥅 Marchés buts (Poisson)</div>
+                <div class="lbl-tiny-mb">🥅 Marchés buts (Poisson)</div>
                 <div style="display:flex;gap:8px;flex-wrap:wrap;">
                   ${chipHtml(mk.ou, 'rgba(139,92,246,.08)', 'rgba(139,92,246,.25)', '#a78bfa', '⚽')}
                   ${chipHtml(mk.btts, 'rgba(236,72,153,.08)', 'rgba(236,72,153,.25)', '#f472b6', '🔄')}
@@ -8313,7 +8313,7 @@
       const timeColor = p.isLive ? 'var(--accent)' : 'var(--text-dim)';
       return `<div class="agent-pos-row agent-pos-grid" data-match-id="${esc(String(p.m.id||''))}" style="display:grid;grid-template-columns:56px 1fr 80px 72px 80px 90px;gap:12px;padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-radius:8px;align-items:center;cursor:pointer;font-variant-numeric:tabular-nums;font-size:12.5px;transition:background .12s;">
         <div style="color:${confColor};font-weight:700;font-size:11.5px;">${Math.round(p.rel*100)}%</div>
-        <div style="color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(pickLabel)}${marketTag}</div>
+        <div class="text-trunc-x">${esc(pickLabel)}${marketTag}</div>
         <div style="color:var(--text-dim);">@${p.odd.toFixed(2)}</div>
         <div style="color:var(--brand);font-weight:700;">${p.stake.toFixed(2)}€</div>
         <div style="color:var(--accent);">+${p.gain.toFixed(2)}€</div>
@@ -8796,7 +8796,7 @@
                     const confCol = legProb >= 70 ? 'var(--accent)' : legProb >= 55 ? '#fbbf24' : 'var(--text-dim)';
                     return `<div style="display:grid;grid-template-columns:44px 1fr auto auto;gap:8px;align-items:baseline;font-variant-numeric:tabular-nums;">
                       <span style="color:${confCol};font-weight:700;font-size:11.5px;">${Math.round(legProb)}%</span>
-                      <span style="color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><span style="color:var(--text-dim);">${esc(matchName)}</span> — <b>${esc(pickLabel)}</b></span>
+                      <span class="text-trunc-x"><span style="color:var(--text-dim);">${esc(matchName)}</span> — <b>${esc(pickLabel)}</b></span>
                       <span style="color:var(--text-dim2,#7b8693);font-size:11px;">${esc(legTime)}</span>
                       <span style="color:#a78bfa;font-weight:600;">@${(l.odd||0).toFixed(2)}</span>
                     </div>`;
@@ -8823,7 +8823,7 @@
               const tLbl = (typeof fmtTime === 'function') ? fmtTime(b.m.date) : new Date(b.m.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
               return `<div class="agent-pos-row" data-match-id="${esc(String(b.m.id||''))}" style="display:grid;grid-template-columns:56px 1fr 1fr 60px;gap:12px;padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-radius:8px;align-items:center;cursor:pointer;font-variant-numeric:tabular-nums;font-size:12.5px;">
                 <div style="color:var(--brand);font-weight:700;font-size:11.5px;">${pb}%</div>
-                <div style="color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(hLbl)} vs ${esc(aLbl)}</div>
+                <div class="text-trunc-x">${esc(hLbl)} vs ${esc(aLbl)}</div>
                 <div style="color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(b.pick.label)}</div>
                 <div style="color:var(--text-dim);font-size:11px;text-align:right;">${esc(tLbl)}</div>
               </div>`;
@@ -8845,7 +8845,7 @@
               const oddLbl = s.impliedOdd ? '@' + s.impliedOdd.toFixed(2) : '—';
               return `<div class="agent-pos-row" data-match-id="${esc(String(s.mId || ''))}" style="display:grid;grid-template-columns:56px 1fr auto auto auto;gap:12px;padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-radius:8px;align-items:center;cursor:pointer;font-variant-numeric:tabular-nums;font-size:12.5px;">
                 <div style="color:var(--accent);font-weight:700;font-size:11.5px;">${pb}%</div>
-                <div style="color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                <div class="text-trunc-x">
                   <strong>${esc(s.name)}${s.captain ? ' ©' : ''}</strong>
                   <span style="color:var(--text-dim);opacity:.75;font-size:11px;margin-left:4px;">${esc(s.teamName)}${s.pos ? ' · ' + esc(s.pos) : ''}</span>
                 </div>
@@ -9587,7 +9587,7 @@
     if (countEl) countEl.textContent = String(alerts.length);
 
     wrap.innerHTML = `
-      <div style="max-width:1280px;margin:0 auto;padding:4px 0 0;font-variant-numeric:tabular-nums;">
+      <div class="page-wrap">
         <div style="margin-bottom:24px;padding:32px 0 20px;border-bottom:1px solid var(--border);position:relative;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;">
           <div style="position:absolute;top:0;left:0;width:40px;height:3px;background:var(--warn);border-radius:0 0 2px 2px;"></div>
           <div>
@@ -10173,7 +10173,7 @@
         </div>
 
         <section style="margin-top:28px;">
-          <h2 style="font-size:18px;margin:0 0 12px;color:var(--text);letter-spacing:-.3px;">📊 Performance vérifiable</h2>
+          <h2 class="page-h2">📊 Performance vérifiable</h2>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;">
             <div style="padding:18px;background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:0 10px 10px 0;">
               <div style="font-size:11px;color:var(--text-dim);letter-spacing:.5px;text-transform:uppercase;font-weight:700;">ROI</div>
@@ -10195,7 +10195,7 @@
         </section>
 
         <section style="margin-top:32px;">
-          <h2 style="font-size:18px;margin:0 0 12px;color:var(--text);letter-spacing:-.3px;">🧮 Comment le modèle décide</h2>
+          <h2 class="page-h2">🧮 Comment le modèle décide</h2>
           <div style="padding:18px;background:var(--panel);border:1px solid var(--border);border-radius:12px;line-height:1.6;font-size:13.5px;color:var(--text-2);">
             Le modèle combine <b>5 sources de signal</b> indépendantes, puis les confronte pour trouver les paris où <b>notre estimation est plus optimiste que la cote du bookmaker</b>. C'est ça, la valeur :
             <ul style="margin:10px 0 0;padding-left:20px;color:var(--text);">
@@ -10211,14 +10211,14 @@
         </section>
 
         <section style="margin-top:32px;">
-          <h2 style="font-size:18px;margin:0 0 12px;color:var(--text);letter-spacing:-.3px;">🛡️ Gestion de cagnotte</h2>
+          <h2 class="page-h2">🛡️ Gestion de cagnotte</h2>
           <div style="padding:18px;background:var(--panel);border:1px solid var(--border);border-radius:12px;line-height:1.6;font-size:13.5px;color:var(--text-2);">
             Les mises proposées utilisent <b>Kelly fractionnaire ×0.25</b>, plafonné à 10% de ta cagnotte par pari. C'est la méthode que les pros utilisent : maximise la croissance long-terme tout en évitant la ruine en cas de mauvaise série. Aucune mise ne dépasse 10% même si le modèle est très confiant — un pari à 80% peut perdre 1 fois sur 5, et 3 pertes d'affilée te coûteraient trop cher si tu misais gros.
           </div>
         </section>
 
         <section style="margin-top:32px;">
-          <h2 style="font-size:18px;margin:0 0 12px;color:var(--text);letter-spacing:-.3px;">📊 Performance par segment</h2>
+          <h2 class="page-h2">📊 Performance par segment</h2>
           ${(() => {
             const rep = window.__backtestReportV2;
             if (!rep) return '<div style="padding:18px;background:var(--panel);border:1px solid var(--border);border-radius:12px;color:var(--text-dim);font-size:13px;">Rapport backtest pas encore chargé.</div>';
@@ -10284,7 +10284,7 @@
         </section>
 
         <section style="margin-top:32px;">
-          <h2 style="font-size:18px;margin:0 0 12px;color:var(--text);letter-spacing:-.3px;">🎯 Calibration du modèle</h2>
+          <h2 class="page-h2">🎯 Calibration du modèle</h2>
           <div style="padding:18px;background:var(--panel);border:1px solid var(--border);border-radius:12px;line-height:1.55;font-size:13.5px;color:var(--text-2);margin-bottom:14px;">
             Le test ultime d'un modèle de probabilité : <b>quand je dis "70% de chance", est-ce que 70% de ces prédictions gagnent vraiment ?</b> Si oui, le modèle est calibré (honnête). Si non, ses pourcentages sont du bruit.
           </div>
@@ -10312,7 +10312,7 @@
         </section>
 
         <section style="margin-top:32px;">
-          <h2 style="font-size:18px;margin:0 0 12px;color:var(--text);letter-spacing:-.3px;">⚠️ Ce que je ne promets pas</h2>
+          <h2 class="page-h2">⚠️ Ce que je ne promets pas</h2>
           <div style="padding:18px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2);border-left:3px solid #fca5a5;border-radius:0 10px 10px 0;line-height:1.6;font-size:13.5px;color:var(--text-2);">
             Pas de gains garantis. Pas de "système miracle". Pas de doublement de mise après une perte. Les paris sportifs restent <b>risqués et aléatoires sur chaque match pris individuellement</b> — la valeur n'apparaît que sur le long terme (500+ paris). Si tu n'es pas prêt à perdre ta mise, ne parie pas. Le site existe pour <b>t'aider à prendre des décisions informées</b>, pas pour te faire croire à l'argent facile.
           </div>
@@ -10559,7 +10559,7 @@
         <div style="margin-bottom:28px;padding:32px 0 20px;border-bottom:1px solid var(--border);position:relative;">
           <div style="position:absolute;top:0;left:0;width:40px;height:3px;background:var(--accent);border-radius:0 0 2px 2px;"></div>
           <div style="font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Prono buts · Football</div>
-          <h1 style="margin:0 0 6px;font-size:40px;font-weight:800;letter-spacing:-1.4px;color:var(--text);line-height:1.1;">Buteurs</h1>
+          <h1 class="page-h1">Buteurs</h1>
           <div style="font-size:15px;color:var(--text-dim);max-width:640px;">Deux pronos pour chaque match de foot : les <b>chances de buts</b> (+ de 2,5 buts / les 2 équipes marquent) ET les <b>joueurs les plus susceptibles de marquer</b>.</div>
         </div>
 
@@ -10598,10 +10598,10 @@
   function renderBacktestPage(wrap) {
     wrap.innerHTML = `
       <div style="max-width:1100px;margin:0 auto;padding:16px 8px 24px;">
-        <div style="margin-bottom:24px;padding:32px 0 20px;border-bottom:1px solid var(--border);position:relative;">
+        <div class="page-header">
           <div style="position:absolute;top:0;left:0;width:40px;height:3px;background:var(--brand);border-radius:0 0 2px 2px;"></div>
           <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Performance modèle · cron hebdo</div>
-          <h1 style="margin:0 0 6px;font-size:40px;font-weight:800;letter-spacing:-1.4px;color:var(--text);line-height:1.1;">Performance</h1>
+          <h1 class="page-h1">Performance</h1>
           <div style="font-size:15px;color:var(--text-dim);max-width:640px;">Backtest réel de <code>predictMatch</code> sur l'archive des matchs réglés. Cron <code>backtest.yml</code> rejoue tous les picks chaque dimanche, ROI/WR/Brier/calibration ci-dessous.</div>
         </div>
 
@@ -10951,7 +10951,7 @@
         const insights = buildSanteInsights();
         if (insights && insights.lines) {
           santeHtml = `
-            <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;">
+            <div class="card-base">
               <h3 style="margin:0 0 10px;font-size:16px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;">🩺 Santé technique</h3>
               <div style="font-size:13px;color:var(--text);line-height:1.6;">${insights.lines.map(l => `<div style="margin:4px 0;">${l}</div>`).join('')}</div>
             </div>`;
@@ -10960,7 +10960,7 @@
     } catch (e) {}
 
     wrap.innerHTML = `
-      <div style="max-width:1280px;margin:0 auto;padding:4px 0 0;font-variant-numeric:tabular-nums;">
+      <div class="page-wrap">
         <div style="margin-bottom:24px;padding:32px 0 20px;border-bottom:1px solid var(--border);position:relative;display:flex;align-items:center;gap:18px;flex-wrap:wrap;">
           <div style="position:absolute;top:0;left:0;width:40px;height:3px;background:var(--brand);border-radius:0 0 2px 2px;"></div>
           <div style="width:56px;height:56px;border-radius:50%;background:var(--panel-2);border:1px solid var(--border-2);display:grid;place-items:center;font-size:22px;color:var(--text);font-weight:800;flex-shrink:0;">T</div>
@@ -10973,8 +10973,8 @@
 
         <div style="display:grid;gap:14px;max-width:900px;">
 
-          <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;">
-            <h3 style="margin:0 0 12px;font-size:16px;font-weight:700;color:var(--text);">🎨 Apparence</h3>
+          <div class="card-base">
+            <h3 class="section-h3">🎨 Apparence</h3>
             <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">Choisis la couleur du site.</div>
             <div class="pref-pill-group">
               <button class="theme-pill ${currentTheme==='dark'?'active':''}" data-theme-btn="dark">🌙 Sombre</button>
@@ -11000,8 +11000,8 @@
             <div style="font-size:11px;color:var(--text-dim);margin-top:8px;">Astuce : appuie sur <b>Maj + T</b> pour basculer sombre/clair.</div>
           </div>
 
-          <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;">
-            <h3 style="margin:0 0 12px;font-size:16px;font-weight:700;color:var(--text);">🎯 Mon niveau</h3>
+          <div class="card-base">
+            <h3 class="section-h3">🎯 Mon niveau</h3>
             <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">On adapte le site à ton niveau.</div>
             <div class="pref-pill-group">
               <button class="theme-pill ${currentLevel==='debutant'?'active':''}" data-level-btn="debutant">🌱 Débutant</button>
@@ -11011,23 +11011,23 @@
             <div style="font-size:11px;color:var(--text-dim);margin-top:8px;">Débutant = explications + sécurité. Pro = chiffres bruts.</div>
           </div>
 
-          <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;">
-            <h3 style="margin:0 0 12px;font-size:16px;font-weight:700;color:var(--text);">💰 Cagnotte ${(typeof helpDot === 'function') ? helpDot('Le total que tu consacres aux paris. <b>Conseil : commence avec un montant que tu peux perdre.</b> Le site calcule tes mises conseillées en % de ce total pour que tu tiennes long terme.') : ''}</h3>
+          <div class="card-base">
+            <h3 class="section-h3">💰 Cagnotte ${(typeof helpDot === 'function') ? helpDot('Le total que tu consacres aux paris. <b>Conseil : commence avec un montant que tu peux perdre.</b> Le site calcule tes mises conseillées en % de ce total pour que tu tiennes long terme.') : ''}</h3>
             <label style="display:block;font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:600;margin-bottom:4px;">Cagnotte de départ (€)</label>
             <input id="pref-bankroll" type="number" min="1" step="1" value="${bankrollStart}" style="width:150px;padding:10px 12px;font-size:15px;font-weight:700;background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);"/>
             <div style="font-size:12px;color:var(--text-dim);margin-top:6px;">Sert à calculer la cagnotte simulée sur la page Bilan + tes mises conseillées.</div>
           </div>
 
-          <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;">
-            <h3 style="margin:0 0 12px;font-size:16px;font-weight:700;color:var(--text);">🔒 Seuil "pari sûr" ${(typeof helpDot === 'function') ? helpDot('À partir de quelle confiance un pari est-il étiqueté "sûr" ?<br><br><b>70% (défaut)</b> : plus de paris mais certains perdent<br><b>75%+</b> : moins de paris mais très fiables<br><b>65% ou moins</b> : beaucoup de paris, risqué') : ''}</h3>
+          <div class="card-base">
+            <h3 class="section-h3">🔒 Seuil "pari sûr" ${(typeof helpDot === 'function') ? helpDot('À partir de quelle confiance un pari est-il étiqueté "sûr" ?<br><br><b>70% (défaut)</b> : plus de paris mais certains perdent<br><b>75%+</b> : moins de paris mais très fiables<br><b>65% ou moins</b> : beaucoup de paris, risqué') : ''}</h3>
             <label style="display:block;font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:600;margin-bottom:4px;">Confiance minimum pour qu'un pari soit noté "sûr"</label>
             <input id="pref-lock-threshold" type="range" min="0.55" max="0.90" step="0.01" value="${lockThreshold}" style="width:100%;accent-color:var(--brand);"/>
             <div style="font-size:14px;font-weight:700;color:var(--brand);margin-top:4px;" id="pref-lock-label">${(lockThreshold*100).toFixed(0)}%</div>
             <div style="font-size:12px;color:var(--text-dim);margin-top:2px;">Par défaut 70%. Au-delà de 75% tu auras moins de paris mais plus sûrs.</div>
           </div>
 
-          <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;">
-            <h3 style="margin:0 0 12px;font-size:16px;font-weight:700;color:var(--text);">🛡️ Anti-panique</h3>
+          <div class="card-base">
+            <h3 class="section-h3">🛡️ Anti-panique</h3>
             <label style="display:inline-flex;align-items:center;gap:10px;cursor:pointer;">
               <input id="pref-tilt" type="checkbox" ${tiltGuard?'checked':''} style="width:18px;height:18px;accent-color:var(--brand);"/>
               <span style="font-size:14px;color:var(--text);">Me prévenir après 3 défaites d'affilée</span>
@@ -11035,8 +11035,8 @@
             <div style="font-size:12px;color:var(--text-dim);margin-top:6px;">T'évite de doubler la mise sur un coup de tête.</div>
           </div>
 
-          <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;">
-            <h3 style="margin:0 0 12px;font-size:16px;font-weight:700;color:var(--text);">🎯 Mode focus</h3>
+          <div class="card-base">
+            <h3 class="section-h3">🎯 Mode focus</h3>
             <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;line-height:1.5;">Sur le Dashboard, masque toutes les sections sauf le top pick du jour. Idéal pour décider rapidement.</div>
             <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;">
               <input id="pref-focus-mode" type="checkbox" ${prefs.focusMode === true ? 'checked' : ''} style="width:16px;height:16px;accent-color:var(--brand);"/>
@@ -11044,8 +11044,8 @@
             </label>
           </div>
 
-          <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;">
-            <h3 style="margin:0 0 12px;font-size:16px;font-weight:700;color:var(--text);">⚽ Sports favoris</h3>
+          <div class="card-base">
+            <h3 class="section-h3">⚽ Sports favoris</h3>
             <div style="display:flex;flex-wrap:wrap;gap:8px;">${sportsBtns}</div>
             <div style="font-size:12px;color:var(--text-dim);margin-top:8px;">Les sports favoris seront priorisés dans le feed Accueil.</div>
           </div>
@@ -11054,7 +11054,7 @@
             let lessons = [];
             try { lessons = (typeof loadUserLessons === 'function') ? loadUserLessons() : []; } catch(e){}
             if (!lessons.length) return `
-              <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;">
+              <div class="card-base">
                 <h3 style="margin:0 0 8px;font-size:16px;font-weight:700;color:var(--text);">💡 Ce que tu as appris</h3>
                 <div style="font-size:12.5px;color:var(--text-dim);">Les leçons apparaîtront ici dès que tu marques des paris comme gagnés/perdus. L'IA extrait une leçon par pari réglé.</div>
               </div>`;
@@ -11073,7 +11073,7 @@
                 </div>`;
             }).join('');
             return `
-              <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;">
+              <div class="card-base">
                 <h3 style="margin:0 0 10px;font-size:16px;font-weight:700;color:var(--text);">💡 Ce que tu as appris <span style="font-size:11px;color:var(--text-dim);font-weight:500;">(${lessons.length} leçons)</span></h3>
                 <div>${items}</div>
                 ${lessons.length > 10 ? `<div style="margin-top:6px;font-size:11px;color:var(--text-dim);text-align:center;">Seules les 10 plus récentes sont affichées.</div>` : ''}
@@ -11118,7 +11118,7 @@
             let sessions = [];
             try { sessions = JSON.parse(localStorage.getItem('paris_sportif_web_vitals_v1') || '[]'); } catch(e){}
             if (!Array.isArray(sessions) || sessions.length < 3) return `
-              <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;">
+              <div class="card-base">
                 <h3 style="margin:0 0 8px;font-size:16px;font-weight:700;color:var(--text);">⚡ Performance navigateur</h3>
                 <div style="font-size:12.5px;color:var(--text-dim);">Pas encore assez de sessions enregistrées (${sessions.length}/3 minimum). Reviens après quelques visites pour voir tes Web Vitals.</div>
               </div>`;
@@ -11153,7 +11153,7 @@
                 <div style="font-size:10.5px;color:${colorTier(tk)};font-weight:700;margin-top:2px;">${lblTier(tk)} · ${hint}</div>
               </div>`;
             return `
-              <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;">
+              <div class="card-base">
                 <h3 style="margin:0 0 4px;font-size:16px;font-weight:700;color:var(--text);">⚡ Performance navigateur</h3>
                 <div style="font-size:12px;color:var(--text-dim);margin-bottom:14px;">Médianes des ${recent.length} dernières sessions sur ce navigateur. Aucune donnée n'est envoyée sur internet.</div>
                 <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));gap:10px;">
@@ -11169,14 +11169,14 @@
               </div>`;
           })()}
 
-          <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;">
-            <h3 style="margin:0 0 12px;font-size:16px;font-weight:700;color:var(--text);">📤 Exports</h3>
+          <div class="card-base">
+            <h3 class="section-h3">📤 Exports</h3>
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
               <button id="export-json-prefs" style="background:var(--panel-2);color:var(--text);border:1px solid var(--border);border-radius:var(--r);padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;">Exporter réglages (JSON)</button>
             </div>
           </div>
 
-          <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;">
+          <div class="card-base">
             <h3 style="margin:0 0 6px;font-size:15px;font-weight:700;color:var(--text);">🔄 Astuces</h3>
             <div style="font-size:12.5px;color:var(--text-dim);margin-bottom:10px;">Actions rapides sans tout supprimer.</div>
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -11907,18 +11907,18 @@
           <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle, var(--brand) 0%, transparent 60%);opacity:.10;pointer-events:none;"></div>
           <div style="display:grid;grid-template-columns:1fr auto 1fr 1fr;gap:18px;align-items:center;">
             <div>
-              <div style="font-size:11px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">Mise initiale</div>
+              <div class="lbl-tiny">Mise initiale</div>
               <div style="font-size:32px;font-weight:800;color:var(--text);letter-spacing:-.6px;font-variant-numeric:tabular-nums;line-height:1;margin-top:4px;">${initialStake.toFixed(2)}€</div>
               <div style="font-size:11px;color:var(--text-dim);margin-top:4px;">Étape 1</div>
             </div>
             <div style="font-size:24px;color:var(--brand);">→</div>
             <div>
-              <div style="font-size:11px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">Gain potentiel final</div>
+              <div class="lbl-tiny">Gain potentiel final</div>
               <div style="font-size:32px;font-weight:800;color:var(--accent);letter-spacing:-.6px;font-variant-numeric:tabular-nums;line-height:1;margin-top:4px;">${finalPayout.toFixed(2)}€</div>
               <div style="font-size:11.5px;color:var(--accent);margin-top:4px;font-weight:600;">+${totalNetGain.toFixed(2)}€ net (×${(finalPayout/initialStake).toFixed(2)})</div>
             </div>
             <div>
-              <div style="font-size:11px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">Probabilité de tout réussir</div>
+              <div class="lbl-tiny">Probabilité de tout réussir</div>
               <div style="font-size:30px;font-weight:800;color:${riskColor};letter-spacing:-.6px;font-variant-numeric:tabular-nums;line-height:1;margin-top:4px;">${(totalProb*100).toFixed(1)}%</div>
               <div style="display:inline-block;font-size:10.5px;color:${riskColor};background:${riskBg};padding:2px 8px;border-radius:999px;margin-top:5px;font-weight:700;">${riskLabel}</div>
             </div>
@@ -13098,7 +13098,7 @@
         <div style="margin-bottom:28px;padding:32px 0 20px;border-bottom:1px solid var(--border);position:relative;">
           <div style="position:absolute;top:0;left:0;width:40px;height:3px;background:var(--gold);border-radius:0 0 2px 2px;"></div>
           <div style="font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Sélection haute confiance</div>
-          <h1 style="margin:0 0 6px;font-size:40px;font-weight:800;letter-spacing:-1.4px;color:var(--text);line-height:1.1;">Paris sûrs</h1>
+          <h1 class="page-h1">Paris sûrs</h1>
           <div style="font-size:15px;color:var(--text-dim);max-width:640px;">Confiance ≥ 70% · Validés par plusieurs indicateurs indépendants · tous sports Winamax confondus.</div>
         </div>
         ${heroHtml}
@@ -13478,8 +13478,8 @@
     const patternsHtml = '';
 
     wrap.innerHTML = `
-      <div style="max-width:1280px;margin:0 auto;padding:4px 0 0;font-variant-numeric:tabular-nums;">
-        <div style="margin-bottom:24px;padding:32px 0 20px;border-bottom:1px solid var(--border);position:relative;">
+      <div class="page-wrap">
+        <div class="page-header">
           <div style="position:absolute;top:0;left:0;width:40px;height:3px;background:var(--info);border-radius:0 0 2px 2px;"></div>
           <div style="font-size:11px;color:var(--info);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Archives du modèle</div>
           <h1 style="margin:0 0 6px;font-size:40px;font-weight:800;letter-spacing:-1.4px;color:var(--text);line-height:1;">Historique</h1>
@@ -14090,20 +14090,20 @@
 
         <div style="margin-top:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;">
           <div style="background:linear-gradient(135deg,${globalColor}22,transparent);border:1px solid var(--border);border-radius:10px;padding:16px;">
-            <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Statut global</div>
+            <div class="lbl-mini">Statut global</div>
             <div style="font-size:22px;font-weight:700;color:${globalColor};">${globalEmoji} ${globalLabel}</div>
             <div style="font-size:12px;color:var(--text-dim);margin-top:4px;">${okCount}/${total} checks verts (${score.toFixed(0)}%)</div>
           </div>
           <div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:16px;">
-            <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Matchs Winamax (today)</div>
+            <div class="lbl-mini">Matchs Winamax (today)</div>
             <div style="font-size:22px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;">${meta.totalRemaining} <span style="font-size:13px;color:var(--text-dim);font-weight:500;">restants / ${meta.todayWinCount} au total</span></div>
           </div>
           <div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:16px;">
-            <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Paris sûrs actifs</div>
+            <div class="lbl-mini">Paris sûrs actifs</div>
             <div style="font-size:22px;font-weight:700;color:#eab308;font-variant-numeric:tabular-nums;">${meta.lockCount}</div>
           </div>
           <div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:16px;">
-            <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">LocalStorage</div>
+            <div class="lbl-mini">LocalStorage</div>
             <div style="font-size:22px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;">${meta.lsMb >= 0 ? meta.lsMb.toFixed(2) + ' MB' : '—'}</div>
           </div>
         </div>
@@ -14998,7 +14998,7 @@
 
       return `<div class="compare-col" style="flex:1;min-width:0;">
         <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:12px;">
-          <div style="font-size:11px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">${esc(label)}</div>
+          <div class="lbl-tiny">${esc(label)}</div>
           <select class="compare-date-select" data-col="${esc(label)}" aria-label="Date ${esc(label)}" style="background:var(--panel);border:1px solid var(--border);color:var(--text);padding:4px 8px;border-radius:6px;font-size:12px;">
             ${optionsHtml.replace(`value="${dateIso}"`, `value="${dateIso}" selected`)}
           </select>
@@ -16086,12 +16086,12 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
           <h3>📚 Glossaire express</h3>
         </div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:8px;font-size:12.5px;line-height:1.5;color:var(--text-dim);">
-          <div style="padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-radius:8px;"><strong style="color:var(--text);">ROI flat 1u</strong> : profit/perte si on mise 1 unité fixe sur chaque pari du modèle. Pas de Kelly, pas de progressive — juste 1u sec.</div>
-          <div style="padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-radius:8px;"><strong style="color:var(--text);">Brier score</strong> : moyenne du carré des écarts entre proba prédite et résultat (0 ou 1). Plus c'est bas, mieux c'est. <em>0.18 = bon, 0.25 = moyen, 0.30+ = à revoir.</em></div>
-          <div style="padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-radius:8px;"><strong style="color:var(--text);">Edge</strong> : différence entre notre probabilité et la probabilité implicite de la cote. >5pt = value bet potentielle, &lt;0 = on est plus pessimiste que le marché → skip.</div>
-          <div style="padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-radius:8px;"><strong style="color:var(--text);">Kelly fractionné (¼)</strong> : formule de mise optimale qui maximise la croissance long-terme sans ruiner sur les bad runs. On utilise ¼ Kelly + cap à 10% de la cagnotte = sécurité supplémentaire.</div>
-          <div style="padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-radius:8px;"><strong style="color:var(--text);">Lock</strong> : pari à fiabilité ≥70%, censé tomber ≥80% des fois (cible). C'est là que la mise est la plus grosse en Kelly.</div>
-          <div style="padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-radius:8px;"><strong style="color:var(--text);">Skip</strong> : pari avec moins de 2 signaux non-marché OU fiabilité &lt;45%. On ne le surface pas.</div>
+          <div class="card-info"><strong style="color:var(--text);">ROI flat 1u</strong> : profit/perte si on mise 1 unité fixe sur chaque pari du modèle. Pas de Kelly, pas de progressive — juste 1u sec.</div>
+          <div class="card-info"><strong style="color:var(--text);">Brier score</strong> : moyenne du carré des écarts entre proba prédite et résultat (0 ou 1). Plus c'est bas, mieux c'est. <em>0.18 = bon, 0.25 = moyen, 0.30+ = à revoir.</em></div>
+          <div class="card-info"><strong style="color:var(--text);">Edge</strong> : différence entre notre probabilité et la probabilité implicite de la cote. >5pt = value bet potentielle, &lt;0 = on est plus pessimiste que le marché → skip.</div>
+          <div class="card-info"><strong style="color:var(--text);">Kelly fractionné (¼)</strong> : formule de mise optimale qui maximise la croissance long-terme sans ruiner sur les bad runs. On utilise ¼ Kelly + cap à 10% de la cagnotte = sécurité supplémentaire.</div>
+          <div class="card-info"><strong style="color:var(--text);">Lock</strong> : pari à fiabilité ≥70%, censé tomber ≥80% des fois (cible). C'est là que la mise est la plus grosse en Kelly.</div>
+          <div class="card-info"><strong style="color:var(--text);">Skip</strong> : pari avec moins de 2 signaux non-marché OU fiabilité &lt;45%. On ne le surface pas.</div>
         </div>
       </section>`;
     // v30 — Epoch banner. On 2026-04-26 we shipped the Winamax 1n2
@@ -16117,8 +16117,8 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       </div>
     ` : '';
     wrap.innerHTML = `
-      <div style="max-width:1280px;margin:0 auto;padding:4px 0 0;font-variant-numeric:tabular-nums;">
-        <div style="margin-bottom:24px;padding:32px 0 20px;border-bottom:1px solid var(--border);position:relative;">
+      <div class="page-wrap">
+        <div class="page-header">
           <div style="position:absolute;top:0;left:0;width:40px;height:3px;background:${_modelRoi == null ? 'var(--text-dim)' : _modelRoi >= 0 ? 'var(--accent)' : 'var(--danger)'};border-radius:0 0 2px 2px;"></div>
           <div style="font-size:11px;color:${_modelRoi == null ? 'var(--text-dim)' : _modelRoi >= 0 ? 'var(--accent)' : 'var(--danger)'};text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Performance du modèle · ${model.bets || 0} pari${(model.bets||0)>1?'s':''}</div>
           <h1 style="margin:0 0 6px;font-size:40px;font-weight:800;letter-spacing:-1.4px;color:var(--text);line-height:1;">Bilan${_bilanSport ? ` · <span style="font-size:18px;font-weight:600;color:var(--brand);letter-spacing:-.3px;">${sportIcon(_bilanSport)} ${esc(sportLabel(_bilanSport))}</span>` : ''}</h1>
