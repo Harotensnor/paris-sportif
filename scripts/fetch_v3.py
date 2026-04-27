@@ -133,19 +133,39 @@ TENNIS_LEAGUES = [('atp', 'ATP'), ('wta', 'WTA')]
 # ---------------------------------------------------------------------------
 # HTTP
 # ---------------------------------------------------------------------------
-def fetch_json(url, timeout=20):
-    try:
-        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req, timeout=timeout) as r:
-            return json.loads(r.read().decode('utf-8'))
-    except urllib.error.HTTPError as e:
-        if e.code == 429:
-            print(f'  [rate-limit] ESPN 429 on {url}', flush=True, file=sys.stderr)
-        else:
-            print(f'  HTTP {e.code} on {url}: {e.reason}', flush=True, file=sys.stderr)
-        return {'_err': f'HTTP {e.code}', '_status': e.code}
-    except Exception as e:
-        return {'_err': str(e)}
+def fetch_json(url, timeout=20, max_retries=3):
+    """Fetch JSON avec retry exponentiel sur 429/503 (v31.7.49).
+
+    Audit chantier 7.2 : avant un seul essai → si ESPN renvoie 503/429,
+    on perdait la donnée jusqu'au prochain cron (5 min). Maintenant
+    backoff 0.5s, 1s, 2s entre les retries (jusqu'à 3 tentatives total).
+    User-Agent identifié pour limiter les rate-limits agressifs.
+    """
+    last_err = None
+    for attempt in range(max_retries + 1):
+        try:
+            req = urllib.request.Request(url, headers={
+                'User-Agent': 'paris-sportif/1.0 (+https://github.com/Harotensnor/paris-sportif)'
+            })
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                return json.loads(r.read().decode('utf-8'))
+        except urllib.error.HTTPError as e:
+            last_err = e
+            if e.code in (429, 503) and attempt < max_retries:
+                backoff = 0.5 * (2 ** attempt)
+                print(f'  [retry {attempt+1}/{max_retries}] HTTP {e.code} on {url}, sleep {backoff}s',
+                      flush=True, file=sys.stderr)
+                time.sleep(backoff)
+                continue
+            if e.code == 429:
+                print(f'  [rate-limit] ESPN 429 on {url} (max retries reached)', flush=True, file=sys.stderr)
+            else:
+                print(f'  HTTP {e.code} on {url}: {e.reason}', flush=True, file=sys.stderr)
+            return {'_err': f'HTTP {e.code}', '_status': e.code}
+        except Exception as e:
+            last_err = e
+            return {'_err': str(e)}
+    return {'_err': str(last_err)}
 
 
 def safe_get(d, *keys, default=None):

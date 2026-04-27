@@ -26,7 +26,9 @@ inline LITE dans pronostics.html (utilisé par finalize_inline.py).
 """
 from __future__ import annotations
 import json
+import os
 import re
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -60,13 +62,30 @@ def load_data_js(path: Path | None = None) -> dict:
 
 
 def save_data_js(data: dict, path: Path | None = None) -> int:
-    """Écrit data.js. Renvoie la taille en bytes.
+    """Écrit data.js de manière atomique. Renvoie la taille en bytes.
+
+    v31.7.49 — Audit chantier 7.1 : écriture atomique via tempfile +
+    os.replace. Avant : write_text direct → si un patch script crash en
+    cours d'écriture, data.js peut être corrompu pour les readers concurrents
+    (auto_refresh tournant en parallèle, GitHub Pages servant le fichier).
+    Maintenant : on écrit dans un .tmp dans le même dir (même volume → rename
+    atomique), puis os.replace() qui est atomique sur POSIX et Windows.
     Format compact (separators sans espaces) pour minimiser la taille.
     """
     p = path or DATA_JS_PATH
     payload = json.dumps(data, ensure_ascii=False, separators=(',', ':'))
     out = f'window.PRONOSTICS_DATA = {payload};\n'
-    p.write_text(out, encoding='utf-8')
+    fd, tmp_path = tempfile.mkstemp(prefix='.data.js.', suffix='.tmp', dir=str(p.parent))
+    try:
+        with os.fdopen(fd, 'w', encoding='utf-8') as f:
+            f.write(out)
+        os.replace(tmp_path, str(p))
+    except Exception:
+        try:
+            os.unlink(tmp_path)
+        except OSError:
+            pass
+        raise
     return p.stat().st_size
 
 
