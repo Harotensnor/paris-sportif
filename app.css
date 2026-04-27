@@ -263,6 +263,38 @@
     --border-2: var(--border-3);
   }
 
+  /* v31.7.61 — Theme accent alternatif "lime" (audit V2 #12).
+     Variante visuelle pour ceux qui préfèrent une identité plus
+     sportive/dynamique. Active via data-accent="lime" sur <html>.
+     Brand violet est conservé (signature), seul --accent change. */
+  html[data-accent="lime"] {
+    --accent: #b6ff3c;
+    --accent-2: #84cc16;
+    --accent-soft: rgba(182,255,60,.12);
+    --sport-football: #b6ff3c;
+  }
+  html[data-accent="lime"][data-theme="light"] {
+    --accent: #65a30d;
+    --accent-2: #4d7c0f;
+    --accent-soft: rgba(101,163,13,.12);
+    --sport-football: #65a30d;
+  }
+
+  /* v31.7.61 — Theme accent alternatif "ambre".
+     Plus chaud, évoque l'or des réussites (lock badges sont déjà gold). */
+  html[data-accent="amber"] {
+    --accent: #f59e0b;
+    --accent-2: #d97706;
+    --accent-soft: rgba(245,158,11,.13);
+    --sport-football: #f59e0b;
+  }
+  html[data-accent="amber"][data-theme="light"] {
+    --accent: #d97706;
+    --accent-2: #b45309;
+    --accent-soft: rgba(217,119,6,.12);
+    --sport-football: #b45309;
+  }
+
   /* Mode lecture (accessibilité) */
   html[data-reader="on"] { font-size: 16px; }
   html[data-reader="on"] body { line-height: 1.7; }

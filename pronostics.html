@@ -190,6 +190,9 @@
       if (effectiveTheme === 'light') root.setAttribute('data-theme', 'light');
       if (contrast === 'high') root.setAttribute('data-contrast', 'high');
       if (reader === 'on') root.setAttribute('data-reader', 'on');
+      // v31.7.61 — Accent variant (audit V2 #12) : default | lime | amber
+      var accent = prefs.accent || 'default';
+      if (accent === 'lime' || accent === 'amber') root.setAttribute('data-accent', accent);
       root.setAttribute('data-level', level);   // v23.4 — pour adapter le contenu au niveau user
       var meta = document.getElementById('theme-color-meta');
       if (meta) meta.setAttribute('content', effectiveTheme === 'light' ? '#f5f5f7' : '#08080a');
