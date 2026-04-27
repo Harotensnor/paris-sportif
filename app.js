@@ -186,17 +186,34 @@
   function _hideTooltip() {
     if (__ttPopover) __ttPopover.classList.remove('visible');
   }
-  // Wire global delegation (mouseenter via mouseover bubble + focus)
+  // Wire global delegation (mouseenter via mouseover bubble + focus).
+  // Sprint 20 #8 — Aussi accepte `title=""` natifs comme tooltips gérés
+  // par notre système (plus joli, plus rapide, a11y propre). On dégrade
+  // le `title` en data-tooltip à la première interaction (one-shot par
+  // élément). Évite la migration manuelle des 50+ title="" du codebase.
+  function _resolveTooltipTarget(el) {
+    if (!el || !el.closest) return null;
+    const dt = el.closest('[data-tooltip]');
+    if (dt) return { el: dt, text: dt.dataset.tooltip };
+    const tt = el.closest('[title]');
+    if (tt && tt.title) {
+      // Migrate title → data-tooltip (one-shot pour ne pas double-fire)
+      tt.dataset.tooltip = tt.title;
+      tt.removeAttribute('title');
+      return { el: tt, text: tt.dataset.tooltip };
+    }
+    return null;
+  }
   document.addEventListener('mouseover', (e) => {
-    const t = e.target.closest && e.target.closest('[data-tooltip]');
-    if (t) _showTooltip(t, t.dataset.tooltip);
+    const r = _resolveTooltipTarget(e.target);
+    if (r) _showTooltip(r.el, r.text);
   });
   document.addEventListener('mouseout', (e) => {
     if (e.target.closest && e.target.closest('[data-tooltip]')) _hideTooltip();
   });
   document.addEventListener('focusin', (e) => {
-    const t = e.target.closest && e.target.closest('[data-tooltip]');
-    if (t) _showTooltip(t, t.dataset.tooltip);
+    const r = _resolveTooltipTarget(e.target);
+    if (r) _showTooltip(r.el, r.text);
   });
   document.addEventListener('focusout', (e) => {
     if (e.target.closest && e.target.closest('[data-tooltip]')) _hideTooltip();
@@ -10741,14 +10758,19 @@
     // vider les filtres au lieu de juste afficher "Aucun match".
     // v31.7.82 — Ajout du raccourci Calendrier 7j : si l'user spam "Voir
     // demain" il vaut mieux qu'il aille sur la vue 7-jours d'un coup.
+    // AUDIT-2026-04-27 (Sprint 20 #9) — Adoption .empty-state-v2 standard.
+    // Refonte du empty state Tous avec class commune .empty-state-v2 +
+    // illustration 64px + title + body + actions, pour cohérence avec
+    // Locks (déjà migré Sprint 18 #27).
     const _emptyState = (msg, withTomorrow) => `
-      <div style="padding:48px 24px;text-align:center;color:var(--text-dim);">
-        <div style="font-size:32px;margin-bottom:10px;line-height:1;opacity:.5;">📅</div>
-        <div style="font-size:14px;margin-bottom:14px;">${msg}</div>
-        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
-          ${filtersActive ? '<button data-tous-reset style="padding:8px 14px;font-size:12px;background:transparent;color:var(--text);border:1px solid var(--border-2);border-radius:8px;cursor:pointer;font-weight:600;">↻ Vider les filtres</button>' : ''}
-          ${withTomorrow ? '<button data-go-tomorrow style="padding:8px 14px;font-size:12px;background:var(--brand);color:#08080a;border:none;border-radius:8px;cursor:pointer;font-weight:700;">Voir demain →</button>' : ''}
-          ${withTomorrow ? '<button class="page-btn" data-page="calendrier" style="padding:8px 14px;font-size:12px;background:transparent;color:var(--brand);border:1px solid var(--brand-border);border-radius:8px;cursor:pointer;font-weight:600;">📅 Calendrier 7j</button>' : ''}
+      <div class="empty-state-v2">
+        <div class="es-illustration">📅</div>
+        <div class="es-title-v2">${esc(msg)}</div>
+        <div class="es-body-v2">${withTomorrow ? "Le calendrier des prochains jours peut t'intéresser, ou attends quelques heures que les matchs du jour soient confirmés." : "Reviens plus tard quand de nouveaux pronos seront disponibles."}</div>
+        <div class="es-actions-v2">
+          ${filtersActive ? '<button data-tous-reset style="padding:10px 16px;font-size:13px;background:transparent;color:var(--text);border:1px solid var(--border-2);border-radius:var(--r-sm);cursor:pointer;font-weight:600;">↻ Vider les filtres</button>' : ''}
+          ${withTomorrow ? '<button data-go-tomorrow style="padding:10px 18px;font-size:13px;background:var(--brand);color:#08080a;border:none;border-radius:var(--r-sm);cursor:pointer;font-weight:700;">Voir demain →</button>' : ''}
+          ${withTomorrow ? '<button class="page-btn" data-page="calendrier" style="padding:10px 16px;font-size:13px;background:transparent;color:var(--brand);border:1px solid var(--brand-border);border-radius:var(--r-sm);cursor:pointer;font-weight:600;">📅 Calendrier 7j</button>' : ''}
         </div>
       </div>`;
     const pendingHtml = pending.length
@@ -12912,6 +12934,28 @@
         _main.classList.add('page-fade-in');
       }
     } catch(e){}
+    // AUDIT-2026-04-27 (Sprint 20 #6) — Scan auto des [data-anim-count]
+    // après chaque page change. Chaque element animé compte de 0 à
+    // data-anim-to en 300ms. Idempotent via flag data-anim-done.
+    try {
+      setTimeout(() => {
+        document.querySelectorAll('[data-anim-count]:not([data-anim-done])').forEach(el => {
+          const to = parseFloat(el.dataset.animTo);
+          if (!isFinite(to)) return;
+          const suffix = el.dataset.animSuffix || '';
+          const showSign = el.dataset.animSign === '1';
+          const decimals = (el.dataset.animTo.split('.')[1] || '').length;
+          const fmt = (v) => {
+            const sign = showSign && v >= 0 ? '+' : '';
+            return sign + v.toFixed(decimals) + suffix;
+          };
+          if (typeof window._animateCounter === 'function') {
+            window._animateCounter(el, { from: 0, to, duration: 350, format: fmt });
+          }
+          el.dataset.animDone = '1';
+        });
+      }, 50);
+    } catch(e){}
     const isSimples = currentPage === 'simples';
     const isCombines = currentPage === 'combines';
     const isValue = false;  // v31.7.6 — page 'value' retirée (cf. cleanup)
@@ -14212,7 +14256,7 @@
       const relColor = p.rel >= 0.70 ? 'var(--accent)' : p.rel >= 0.60 ? 'var(--warn)' : 'var(--text-dim)';
       const lg = p.m.league_name || p.m.league || '';
       return `
-        <div class="cal-pick-row" data-match-id="${esc(String(p.m.id || ''))}" role="button" tabindex="0" style="display:grid;grid-template-columns:60px 1fr auto auto;gap:10px;padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${p.isLock ? 'var(--tier-lock)' : 'var(--accent)'};border-radius:0 8px 8px 0;align-items:center;cursor:pointer;font-variant-numeric:tabular-nums;margin-bottom:4px;">
+        <div class="cal-pick-row interactive" data-match-id="${esc(String(p.m.id || ''))}" role="button" tabindex="0" style="display:grid;grid-template-columns:60px 1fr auto auto;gap:10px;padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${p.isLock ? 'var(--tier-lock)' : 'var(--accent)'};border-radius:0 8px 8px 0;align-items:center;font-variant-numeric:tabular-nums;margin-bottom:4px;">
           <div style="font-size:12px;color:var(--text-dim);font-weight:600;">${esc(tLbl)}</div>
           <div style="min-width:0;">
             <div style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--text);">
@@ -14710,17 +14754,17 @@
       <div class="bilan-kpis" style="margin-top:4px;">
         <div class="bilan-kpi brand">
           <div class="kpi-label">Picks réglés</div>
-          <div class="kpi-value">${totN}</div>
+          <div class="kpi-value" data-anim-count data-anim-to="${totN}">${totN}</div>
           <div class="kpi-sub">sur ${days.length} jour${days.length > 1 ? 's' : ''}</div>
         </div>
         <div class="bilan-kpi">
           <div class="kpi-label">Taux de réussite</div>
-          <div class="kpi-value" style="color:${wrCol};">${wr != null ? wr.toFixed(1) + '%' : '—'}</div>
+          <div class="kpi-value" style="color:${wrCol};" data-anim-count data-anim-to="${wr != null ? wr.toFixed(1) : 0}" data-anim-suffix="%">${wr != null ? wr.toFixed(1) + '%' : '—'}</div>
           <div class="kpi-sub">${totW}W · ${totL}L</div>
         </div>
         <div class="bilan-kpi">
           <div class="kpi-label">Rentabilité moyenne</div>
-          <div class="kpi-value" style="color:${roiCol};">${roi != null ? (roi >= 0 ? '+' : '') + roi.toFixed(1) + '%' : '—'}</div>
+          <div class="kpi-value" style="color:${roiCol};" data-anim-count data-anim-to="${roi != null ? roi.toFixed(1) : 0}" data-anim-suffix="%" data-anim-sign="1">${roi != null ? (roi >= 0 ? '+' : '') + roi.toFixed(1) + '%' : '—'}</div>
           <div class="kpi-sub">${totPL >= 0 ? '+' : ''}${totPL.toFixed(2)}u cumulés</div>
         </div>
         <div class="bilan-kpi">
@@ -17782,6 +17826,30 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         try { if (typeof toast === 'function') toast('✓ CSV téléchargé', 'success'); } catch(e){}
       });
     }
+
+    // AUDIT-2026-04-27 (Sprint 20 #7) — Confetti sur win streak ≥3.
+    // Détecte les 3 derniers picks réglés et si tous wins → spawn confetti
+    // sur la card P&L cumulé. Triggered une fois par session via flag.
+    try {
+      const sessionFlag = 'confettiShownToday';
+      const today = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+      if (sessionStorage.getItem(sessionFlag) === today) return;
+      // Reuse rows already calculated above (captured by closure)
+      if (typeof rows !== 'undefined' && Array.isArray(rows) && rows.length >= 3) {
+        const sorted = rows.slice().sort((a, b) => new Date(b.m.date) - new Date(a.m.date));
+        const last3 = sorted.slice(0, 3);
+        if (last3.length === 3 && last3.every(r => r.res === 'won')) {
+          // Trouve la card P&L pour cible
+          const target = wrap.querySelector('.bilan-section') || wrap.querySelector('.bilan-kpis');
+          if (target && typeof window._spawnConfetti === 'function') {
+            setTimeout(() => {
+              window._spawnConfetti(target, 14);
+              try { sessionStorage.setItem(sessionFlag, today); } catch(e){}
+            }, 600);
+          }
+        }
+      }
+    } catch (e) { /* fail-safe */ }
   }
   // Pagination state for bilan history (persists across re-renders during session)
   let _bilanHistLimits = { perso: 40, modele: 40 };
