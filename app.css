@@ -2195,6 +2195,52 @@
     body.sidebar-open .refresh-indicator.topbar-refresh { display: none !important; }
   }
 
+  /* AUDIT-2026-04-27 (Sprint 10 #17) — Utility classes V3 sweep.
+     Top patterns inline détectés via grep des templates JS :
+       39× style="color:var(--text)"        → .u-text
+       27× style="color:var(--text-dim)"    → .u-text-dim
+       16× style="color:var(--accent)"      → .u-text-accent
+       11× style="color:var(--brand)"       → .u-text-brand
+       10× style="color:var(--text-dim2)"   → .u-text-dim2
+       17× style="text-align:right"         → .u-text-right
+        8× style="margin-top:18px"          → .u-mt-18
+     ~130 occurrences inline migrables. Cette PR ajoute les classes,
+     migration progressive sur les futures touches. */
+  .u-text       { color: var(--text); }
+  .u-text-dim   { color: var(--text-dim); }
+  .u-text-dim2  { color: var(--text-dim2); }
+  .u-text-accent{ color: var(--accent); }
+  .u-text-brand { color: var(--brand); }
+  .u-text-warn  { color: var(--warn); }
+  .u-text-danger{ color: var(--danger); }
+  .u-text-info  { color: var(--info); }
+  .u-text-right { text-align: right; }
+  .u-text-left  { text-align: left; }
+  .u-text-center{ text-align: center; }
+  .u-mt-0  { margin-top: 0; }
+  .u-mt-4  { margin-top: 4px; }
+  .u-mt-8  { margin-top: 8px; }
+  .u-mt-12 { margin-top: 12px; }
+  .u-mt-18 { margin-top: 18px; }
+  .u-mt-24 { margin-top: 24px; }
+  .u-mb-4  { margin-bottom: 4px; }
+  .u-mb-8  { margin-bottom: 8px; }
+  .u-mb-12 { margin-bottom: 12px; }
+  .u-mb-18 { margin-bottom: 18px; }
+  .u-tabular { font-variant-numeric: tabular-nums; }
+  .u-truncate {
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .u-flex { display: flex; }
+  .u-flex-col { display: flex; flex-direction: column; }
+  .u-flex-wrap { flex-wrap: wrap; }
+  .u-items-center { align-items: center; }
+  .u-justify-between { justify-content: space-between; }
+  .u-gap-4  { gap: 4px; }
+  .u-gap-8  { gap: 8px; }
+  .u-gap-10 { gap: 10px; }
+  .u-gap-14 { gap: 14px; }
+
   /* AUDIT-2026-04-27 (Sprint 3 #15) — Skeleton loaders réutilisables.
      Avant : seul le boot avait un skeleton (no-data-banner).
      Maintenant les pages qui font un async _ensureFullData peuvent
