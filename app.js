@@ -4638,7 +4638,7 @@
             <div style="padding:16px 18px;border-bottom:1px solid var(--border);">
               <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;flex-wrap:wrap;">
                 <div style="font-size:14px;font-weight:700;color:var(--text);">⚽ Combiné Buteurs du jour</div>
-                <span style="font-size:10px;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-weight:700;letter-spacing:.4px;text-transform:uppercase;">v24</span>
+                <span style="font-size:10px;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-weight:700;letter-spacing:.4px;text-transform:uppercase;">v31</span>
               </div>
               <div style="font-size:12px;color:var(--text-dim);">${legs.length} joueurs différents avec les meilleures chances de marquer ce soir.</div>
             </div>
@@ -8515,7 +8515,7 @@
               <span class="ed-hero__pill">⭐ Top pick du jour</span>
               <span class="ed-hero__refresh" aria-live="polite">
                 <span class="ed-hero__dot" aria-hidden="true"></span>
-                MAJ ${_dataAgeMin < 10 ? "à l'instant" : _dataAgeMin < 60 ? `il y a ${_dataAgeMin}min` : `il y a ${Math.floor(_dataAgeMin/60)}h`}
+                MAJ ${_dataAgeMin < 2 ? "à l'instant" : _dataAgeMin < 60 ? `il y a ${_dataAgeMin}min` : `il y a ${Math.floor(_dataAgeMin/60)}h`}
               </span>
             </header>
             <h1 class="ed-hero__match">${esc(heroPick.homeName)} <span class="ed-hero__vs">vs</span> ${esc(heroPick.awayName)}</h1>
