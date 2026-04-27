@@ -221,6 +221,63 @@ def render_calibration(cal: list[dict]) -> str:
     return render_table(['Bin probabilité', 'N', 'Prob moyenne', 'WR observé', 'Gap'], rows)
 
 
+def _sparkline_svg(picks: list, kind: str = 'best') -> str:
+    """v31.7.55 — Sparkline cumulative SVG depuis une liste de picks
+    triés (best_picks ou worst_picks). Affiche la courbe cumul P&L
+    flat au-dessus des tableaux pour un visuel direct.
+
+    Pour best_picks : courbe ascendante (+pnl à chaque pick) en vert.
+    Pour worst_picks : courbe descendante (-1 à chaque pick) en rouge.
+    """
+    if not picks:
+        return ''
+    deltas = []
+    for p in picks:
+        if kind == 'best':
+            deltas.append(float(p.get('pnl') or 0))
+        else:
+            deltas.append(-1.0)
+    cum = []
+    s = 0
+    for d in deltas:
+        s += d
+        cum.append(s)
+    if not cum:
+        return ''
+    w, h = 480, 60
+    pad = 4
+    max_y = max(cum)
+    min_y = min(cum)
+    if max_y == min_y:
+        max_y += 0.1
+        min_y -= 0.1
+    n = len(cum)
+    points = []
+    for i, v in enumerate(cum):
+        x = pad + (w - 2 * pad) * (i / max(1, n - 1))
+        y = h - pad - (h - 2 * pad) * ((v - min_y) / (max_y - min_y))
+        points.append(f'{x:.1f},{y:.1f}')
+    color = '#34d399' if kind == 'best' else '#f87171'
+    fill = '34d39922' if kind == 'best' else 'f8717122'
+    final = cum[-1]
+    final_lbl = f'{"+" if final >= 0 else ""}{final:.2f}u'
+    poly = ' '.join(points)
+    area = (
+        f'M {pad} {h-pad} L '
+        + ' L '.join(points)
+        + f' L {w-pad} {h-pad} Z'
+    )
+    return f'''
+    <div style="margin:0 0 14px;padding:8px 12px;background:rgba(255,255,255,.02);border:1px solid var(--border, rgba(255,255,255,.08));border-radius:8px;display:flex;align-items:center;gap:12px;">
+      <span style="font-size:10.5px;color:#a3a3aa;text-transform:uppercase;letter-spacing:.5px;font-weight:700;">Cumul</span>
+      <svg viewBox="0 0 {w} {h}" style="flex:1;height:{h}px;display:block;" xmlns="http://www.w3.org/2000/svg" aria-label="Cumul P&amp;L flat sur les {n} picks">
+        <path d="{area}" fill="#{fill}" stroke="none"/>
+        <polyline points="{poly}" fill="none" stroke="{color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+      </svg>
+      <span style="font-size:14px;font-weight:800;color:{color};font-variant-numeric:tabular-nums;">{final_lbl}</span>
+    </div>'''
+
+
 def render_worst_picks(worst_picks: list) -> str:
     """v31.7.19 — 10 pires picks (modèle très confiant qui a perdu).
     Affiche en transparence pour montrer ou le modele se trompe le plus.
@@ -264,6 +321,7 @@ def render_worst_picks(worst_picks: list) -> str:
     return f'''<p style="font-size:13px;color:#a3a3aa;margin:0 0 12px;">
       Les <b>10 picks les plus douloureux</b> : modèle très confiant (prob ≥65%) qui a perdu. On les publie pour que tu voies <b>où le modèle se trompe le plus</b>. Conseil de modeste : pas de modèle parfait, ces erreurs font partie de la variance — l'objectif est qu'elles restent <b>moins fréquentes</b> que la prob suggère.
     </p>
+    {_sparkline_svg(worst_picks, 'worst')}
     <table>
       <thead>
         <tr>
@@ -330,6 +388,7 @@ def render_best_picks(best_picks: list) -> str:
       On publie aussi les succès pour <b>balancer la transparence</b> : si on publie nos pires erreurs (ci-dessous),
       on doit aussi publier nos plus beaux coups, sinon le framing biaise négatif.
     </p>
+    {_sparkline_svg(best_picks, 'best')}
     <table>
       <thead>
         <tr>
