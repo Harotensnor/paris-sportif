@@ -106,26 +106,103 @@
   }
   // Minimalist toast. Stacks up to 3, auto-dismisses. Used for validation
   // errors + "pari ajouté" feedback + any action confirmation.
+  // AUDIT-2026-04-27 (Sprint 16 #19) — Tooltip system unifié.
+  // [data-tooltip="..."] sur n'importe quel élément (focus + hover).
+  // Évite les title="" natifs (laids, lents, pas a11y).
+  let __ttPopover = null;
+  function _ensureTooltipPopover() {
+    if (__ttPopover) return __ttPopover;
+    __ttPopover = document.createElement('div');
+    __ttPopover.className = 'u-tooltip-popover';
+    __ttPopover.setAttribute('role', 'tooltip');
+    document.body.appendChild(__ttPopover);
+    return __ttPopover;
+  }
+  function _showTooltip(target, text) {
+    const pop = _ensureTooltipPopover();
+    pop.textContent = text;
+    pop.classList.add('visible');
+    const rect = target.getBoundingClientRect();
+    const popH = pop.offsetHeight;
+    const popW = pop.offsetWidth;
+    let top = rect.top - popH - 8;
+    if (top < 8) top = rect.bottom + 8;  // flip si pas la place au-dessus
+    let left = rect.left + rect.width / 2 - popW / 2;
+    if (left < 8) left = 8;
+    if (left + popW > window.innerWidth - 8) left = window.innerWidth - popW - 8;
+    pop.style.top = `${top}px`;
+    pop.style.left = `${left}px`;
+  }
+  function _hideTooltip() {
+    if (__ttPopover) __ttPopover.classList.remove('visible');
+  }
+  // Wire global delegation (mouseenter via mouseover bubble + focus)
+  document.addEventListener('mouseover', (e) => {
+    const t = e.target.closest && e.target.closest('[data-tooltip]');
+    if (t) _showTooltip(t, t.dataset.tooltip);
+  });
+  document.addEventListener('mouseout', (e) => {
+    if (e.target.closest && e.target.closest('[data-tooltip]')) _hideTooltip();
+  });
+  document.addEventListener('focusin', (e) => {
+    const t = e.target.closest && e.target.closest('[data-tooltip]');
+    if (t) _showTooltip(t, t.dataset.tooltip);
+  });
+  document.addEventListener('focusout', (e) => {
+    if (e.target.closest && e.target.closest('[data-tooltip]')) _hideTooltip();
+  });
+  // Hide on scroll (positions become stale)
+  document.addEventListener('scroll', _hideTooltip, { passive: true, capture: true });
+
+  // AUDIT-2026-04-27 (Sprint 16 #17) — Animated counter.
+  // animateCounter(el, {to: 12, duration: 300, format: v => Math.round(v)})
+  // Compte de 0 à `to` avec easeOut. Idéal pour les KPIs page Bilan/Locks.
+  // Respecte prefers-reduced-motion (saute direct à la valeur finale).
+  window._animateCounter = function animateCounter(el, opts = {}) {
+    if (!el) return;
+    const to = Number(opts.to ?? 0);
+    const from = Number(opts.from ?? 0);
+    const duration = Math.max(50, Number(opts.duration ?? 300));
+    const format = typeof opts.format === 'function' ? opts.format : (v) => Math.round(v);
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      el.textContent = String(format(to));
+      return;
+    }
+    const start = performance.now();
+    const ease = (t) => 1 - Math.pow(1 - t, 3);  // easeOutCubic
+    const tick = (now) => {
+      const elapsed = now - start;
+      const progress = Math.min(1, elapsed / duration);
+      const eased = ease(progress);
+      const v = from + (to - from) * eased;
+      el.textContent = String(format(v));
+      if (progress < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  };
+
   function toast(msg, kind = 'info') {
+    // AUDIT-2026-04-27 (Sprint 16 #18) — Refactor vers .toast-stack moderne.
+    // Garde la fonction `toast()` API stable mais utilise le nouveau host.
     let host = document.getElementById('toast-host');
     if (!host) {
       host = document.createElement('div');
       host.id = 'toast-host';
+      host.className = 'toast-stack';
       host.setAttribute('role', 'status');
       host.setAttribute('aria-live', 'polite');
       document.body.appendChild(host);
     }
     const el = document.createElement('div');
-    el.className = `toast ${kind}`;
+    el.className = `toast-item ${kind}`;
     el.textContent = msg;
     host.appendChild(el);
-    // Keep at most 3 toasts
+    // Keep at most 3 toasts (FIFO)
     while (host.children.length > 3) host.removeChild(host.firstChild);
-    requestAnimationFrame(() => el.classList.add('show'));
     setTimeout(() => {
-      el.classList.remove('show');
-      setTimeout(() => el.remove(), 250);
-    }, 2800);
+      el.classList.add('dismissing');
+      setTimeout(() => el.remove(), 220);
+    }, 4000);
   }
 
   // ======= Personal bets storage (client-only, localStorage) =======

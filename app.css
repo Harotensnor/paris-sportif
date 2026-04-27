@@ -2409,6 +2409,109 @@
   .card-md { padding: var(--space-4); border-radius: var(--r-md); }
   .card-lg { padding: var(--space-5) var(--space-6); border-radius: var(--r); }
 
+  /* AUDIT-2026-04-27 (Sprint 16 #18) — Toast stack en bas-droit.
+     Empile jusqu'à 3 toasts, chaque toast s'auto-dismiss après 4s.
+     Slide-in depuis la droite, slide-out vers la droite + fade. */
+  .toast-stack {
+    position: fixed;
+    bottom: 16px; right: 16px;
+    z-index: 300;
+    display: flex; flex-direction: column-reverse; gap: 8px;
+    pointer-events: none;
+  }
+  .toast-stack .toast-item {
+    pointer-events: auto;
+    background: var(--panel-2);
+    border: 1px solid var(--border-2);
+    border-left: 3px solid var(--brand);
+    border-radius: var(--r-sm);
+    padding: 10px 14px;
+    min-width: 240px; max-width: 360px;
+    font-size: var(--fs-sm);
+    color: var(--text);
+    box-shadow: var(--shadow-md);
+    animation: toast-in 240ms cubic-bezier(.32,.72,0,1);
+  }
+  .toast-stack .toast-item.success { border-left-color: var(--accent); }
+  .toast-stack .toast-item.warn    { border-left-color: var(--warn); }
+  .toast-stack .toast-item.error   { border-left-color: var(--danger); }
+  .toast-stack .toast-item.dismissing {
+    animation: toast-out 200ms ease-in forwards;
+  }
+  @keyframes toast-in {
+    from { transform: translateX(100%) scale(0.95); opacity: 0; }
+    to   { transform: translateX(0) scale(1); opacity: 1; }
+  }
+  @keyframes toast-out {
+    to { transform: translateX(120%) scale(0.95); opacity: 0; }
+  }
+  @media (max-width: 720px) {
+    .toast-stack {
+      bottom: calc(76px + env(safe-area-inset-bottom, 0px));  /* au-dessus bottom-nav */
+      left: 16px; right: 16px;
+    }
+    .toast-stack .toast-item { min-width: 0; max-width: 100%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .toast-stack .toast-item { animation: none; }
+  }
+
+  /* AUDIT-2026-04-27 (Sprint 16 #19) — Tooltip system unifié.
+     [data-tooltip="..."] sur n'importe quel élément. JS injecte un
+     popover stylisé sur hover/focus. Voir _initTooltips() côté JS. */
+  .u-tooltip-popover {
+    position: fixed;
+    background: var(--bg-3);
+    color: var(--text);
+    border: 1px solid var(--border-2);
+    border-radius: var(--r-xs);
+    padding: 6px 10px;
+    font-size: var(--fs-xs);
+    line-height: var(--lh-snug);
+    max-width: 240px;
+    box-shadow: var(--shadow-md);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 100ms;
+    z-index: 400;
+  }
+  .u-tooltip-popover.visible { opacity: 1; }
+
+  /* AUDIT-2026-04-27 (Sprint 16 #20) — Loading micro-states. */
+  .btn-loading {
+    position: relative;
+    color: transparent !important;
+    pointer-events: none;
+  }
+  .btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 14px; height: 14px;
+    top: 50%; left: 50%;
+    margin: -7px 0 0 -7px;
+    border: 2px solid currentColor;
+    border-color: var(--text) var(--text) transparent transparent;
+    border-radius: 50%;
+    animation: spin 700ms linear infinite;
+    color: var(--text);
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  .row-loading {
+    background: linear-gradient(90deg,
+      transparent 0%, var(--panel-2) 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: row-shimmer 1.4s infinite linear;
+  }
+  @keyframes row-shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .btn-loading::after, .row-loading { animation: none; }
+  }
+
   /* AUDIT-2026-04-27 (Sprint 15 #11) — Touch targets ≥44px sur mobile.
      WCAG 2.5.5 demande 44×44px min pour les éléments cliquables.
      Sur mobile, on bump les boutons trop petits via min-height. */
