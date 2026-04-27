@@ -2055,14 +2055,26 @@
     // Voir scripts/patch_team_stats.py pour le vrai fix backend.
     const _formStatsValidForSport = (fs, sport) => {
       if (!fs) return false;
-      if (sport === 'football') {
-        const gf = fs.avg_gf5 || 0, ga = fs.avg_ga5 || 0;
-        if (gf > 5 || ga > 5) return false;
-        // Vérifie aussi last5 — un seul score >15 trahit la contamination
-        const l5 = fs.last5 || home.last5 || [];
-        for (const m of l5) {
-          if ((m?.gf || 0) > 15 || (m?.ga || 0) > 15) return false;
-        }
+      // AUDIT-2026-04-27 (Sprint 44 #19) — Étendu pour tous les sports.
+      // Seuils par sport pour détecter contamination cross-sport.
+      // Foot/tennis : avg_gf5 > 5 ou last5 score > 15 = NBA/hockey injecté
+      // NBA : avg_gf5/ga5 > 200 (impossible NBA réel ~110) = autre sport
+      // Tennis : avg_gf5/ga5 > 4 (sets gagnés, max 3 par match BO5)
+      // NHL : avg_gf5/ga5 > 8 (NHL ~3 buts/match)
+      const caps = {
+        football: { avgMax: 5, scoreMax: 15 },
+        tennis:   { avgMax: 4, scoreMax: 6 },
+        basketball: { avgMax: 200, scoreMax: 250 },
+        hockey:   { avgMax: 8, scoreMax: 15 },
+        baseball: { avgMax: 15, scoreMax: 30 },
+      };
+      const c = caps[sport];
+      if (!c) return true;  // sports non-mappés : pas de garde
+      const gf = fs.avg_gf5 || 0, ga = fs.avg_ga5 || 0;
+      if (gf > c.avgMax || ga > c.avgMax) return false;
+      const l5 = fs.last5 || home.last5 || [];
+      for (const m of l5) {
+        if ((m?.gf || 0) > c.scoreMax || (m?.ga || 0) > c.scoreMax) return false;
       }
       return true;
     };
