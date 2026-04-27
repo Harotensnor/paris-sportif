@@ -106,6 +106,25 @@
   }
   // Minimalist toast. Stacks up to 3, auto-dismisses. Used for validation
   // errors + "pari ajouté" feedback + any action confirmation.
+  // AUDIT-2026-04-27 (Sprint 17 #25) — Cmd/Ctrl-K focus search.
+  // Raccourci clavier global qui focus la search bar de la topbar.
+  // Évite à l'user de chercher l'input à la souris.
+  try {
+    document.addEventListener('keydown', (e) => {
+      const isCmdK = (e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K');
+      if (!isCmdK) return;
+      // Skip si on est déjà dans un input/textarea (pour ne pas voler le focus)
+      const tag = (e.target && e.target.tagName) || '';
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+      e.preventDefault();
+      const input = document.getElementById('search');
+      if (input) {
+        input.focus();
+        input.select && input.select();
+      }
+    });
+  } catch (e) {}
+
   // AUDIT-2026-04-27 (Sprint 16 #19) — Tooltip system unifié.
   // [data-tooltip="..."] sur n'importe quel élément (focus + hover).
   // Évite les title="" natifs (laids, lents, pas a11y).
@@ -7074,6 +7093,32 @@
     const modal = document.getElementById('detail-modal');
     modal.classList.add('open');
     modal.setAttribute('aria-hidden', 'false');
+
+    // AUDIT-2026-04-27 (Sprint 17 #24) — Modal scroll progress.
+    // Barre 3px en haut qui tracke le scroll du modal-body.
+    try {
+      const modalEl = modal.querySelector('.modal');
+      const bodyEl = modal.querySelector('#detail-body');
+      if (modalEl && bodyEl) {
+        let progressBar = modalEl.querySelector('.modal-progress');
+        if (!progressBar) {
+          progressBar = document.createElement('div');
+          progressBar.className = 'modal-progress';
+          progressBar.setAttribute('aria-hidden', 'true');
+          modalEl.style.position = modalEl.style.position || 'relative';
+          modalEl.insertBefore(progressBar, modalEl.firstChild);
+        }
+        const updateProgress = () => {
+          const max = bodyEl.scrollHeight - bodyEl.clientHeight;
+          if (max <= 0) { progressBar.style.width = '0%'; return; }
+          const pct = Math.min(100, Math.max(0, (bodyEl.scrollTop / max) * 100));
+          progressBar.style.width = pct + '%';
+        };
+        bodyEl.addEventListener('scroll', updateProgress, { passive: true });
+        updateProgress();
+      }
+    } catch (e) { /* fail-safe */ }
+
     // Move focus to the close button so keyboard users can dismiss via Enter/Space
     const closeBtn = document.getElementById('close-detail');
     if (closeBtn) closeBtn.focus({ preventScroll: true });
@@ -14228,9 +14273,21 @@
     }
     // Détail d'une ligue
     const stats = bt?.by_league?.[lc];
+    // AUDIT-2026-04-27 (Sprint 17 #21) — Breadcrumbs
+    const breadcrumbsHtml = `
+      <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <button data-page="dashboard" class="page-btn">🏠 Accueil</button>
+        <span class="sep">›</span>
+        <button data-page="backtest" class="page-btn">Performance</button>
+        <span class="sep">›</span>
+        <button onclick="history.replaceState(null,'',location.pathname+'#league'); if(typeof renderLeaguePage==='function')renderLeaguePage(this.closest('#league-wrap'));">Ligues</button>
+        <span class="sep">›</span>
+        <span class="current">${esc(lc)}</span>
+      </nav>`;
     if (!stats) {
       wrap.innerHTML = `
         <div class="page-wrap">
+          ${breadcrumbsHtml}
           <div class="page-header">
             <div class="lbl-tiny" style="color:var(--brand);">Performance · ${esc(lc)}</div>
             <h1 class="page-h1">${esc(lc)}</h1>
@@ -14248,6 +14305,7 @@
     const roiCol = roi > 5 ? 'var(--accent)' : roi > 0 ? 'var(--warn)' : 'var(--danger)';
     wrap.innerHTML = `
       <div class="page-wrap">
+        ${breadcrumbsHtml}
         <div class="page-header">
           <div class="lbl-tiny" style="color:var(--brand);">Performance · ligue</div>
           <h1 class="page-h1">📊 ${esc(lc)}</h1>
