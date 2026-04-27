@@ -359,6 +359,69 @@
     </dl>
   </section>
 
+  <!-- v31.7.57 — Section sport-aware (backlog V2 #5).
+       Termes spécifiques par sport pour aider à comprendre les analyses
+       quand un signal sport-spécifique est cité. -->
+  <h2 id="sports">🏆 Termes par sport</h2>
+  <section class="card">
+    <dl>
+      <div>
+        <dt>⚽ xG (foot — expected goals)</dt>
+        <dd>
+          <p>Pour chaque tir, probabilité estimée de marquer (basée sur position, angle, type de passe). Un match avec xG 2.4 vs 1.1 indique que l'équipe à 2.4 méritait davantage que ses buts effectifs. Plus stable que les buts réels sur petits échantillons.</p>
+        </dd>
+      </div>
+      <div>
+        <dt>⚽ Dixon-Coles τ (correction τ)</dt>
+        <dd>
+          <p>Correction du Poisson naïf qui sous-estime systématiquement les scores 0-0, 1-0, 0-1, 1-1 (corrélation négative empirique en foot). Paramètre ρ ∈ [-0.30, +0.10]. Notre modèle mesure ρ par ligue via likelihood max (eng.1 ≈ -0.07, ita.1 ≈ -0.18).</p>
+        </dd>
+      </div>
+      <div>
+        <dt>🎾 Elo surface (tennis)</dt>
+        <dd>
+          <p>Elo séparé par surface (Hard / Clay / Grass / Indoor). Nadal sur terre battue ≠ Nadal sur gazon — la généralisation perd un signal majeur. Source : Jeff Sackmann CSV. Différence ≥ 200pts = signal très fort.</p>
+        </dd>
+      </div>
+      <div>
+        <dt>🎾 BO3 / BO5</dt>
+        <dd>
+          <p>Best-of-3 (Masters 1000, ATP 500/250, WTA Premier) ou Best-of-5 (Grand Slam masculin). Le format change radicalement la dérivation des probas de set : sur BO5, l'effet de variance court-terme est lissé.</p>
+        </dd>
+      </div>
+      <div>
+        <dt>🏀 Pace (NBA)</dt>
+        <dd>
+          <p>Possessions par 48min. Une équipe à 105 (Spurs) joue 12 possessions de plus qu'une équipe à 93 (Heat). Affecte directement le total de points (over/under) sans changer le winner. Différentiel ≥ 4 = signal flagged.</p>
+        </dd>
+      </div>
+      <div>
+        <dt>🏀 ORtg / DRtg (offensive/defensive rating)</dt>
+        <dd>
+          <p>Points marqués/encaissés par 100 possessions. Indépendant du pace. ORtg 115 vs DRtg 110 = +5 points expected sur 100 poss → écart projeté du match. Notre source ESPN team_form donne PPG (points per game), proxy moins précis mais publiquement dispo.</p>
+        </dd>
+      </div>
+      <div>
+        <dt>🏒 SV% / GAA (goalie NHL)</dt>
+        <dd>
+          <p>Save percentage : % de tirs arrêtés par le gardien titulaire. Élite ≥ 0.92 (Vezina-tier). Faible ≤ 0.89. GAA = goals against average per 60min. SV% est un signal direct : un goalie titulaire à 0.94 réduit l'expected goals adverse de ~12%.</p>
+        </dd>
+      </div>
+      <div>
+        <dt>⚾ ERA / WHIP (pitcher MLB)</dt>
+        <dd>
+          <p>Earned Run Average = points encaissés par 9 manches. Élite ≤ 3.0. Médian ≈ 4.0. WHIP = walks + hits per inning pitched (efficacité, ≤ 1.10 = élite). Différentiel ERA ≥ 0.5 entre les 2 starters = signal majeur baseball.</p>
+        </dd>
+      </div>
+      <div>
+        <dt>🏆 Home advantage (multi-sport)</dt>
+        <dd>
+          <p>Avantage du terrain. NBA ≈ 2.5 pts. NHL ≈ 5% en proba. Foot top-5 ≈ 0.35 buts. Calculé empiriquement par sport et par ligue. En baisse depuis COVID (publics moins influents).</p>
+        </dd>
+      </div>
+    </dl>
+  </section>
+
   <p class="contrib-prompt">
     📐 Pour le détail mathématique de la composition modèle (poids des composants, seuils des tiers, formules exactes), voir <a href="methodologie.html">la page Méthodologie</a>. Pour la performance vérifiée du modèle, voir <a href="backtest.html">la page Backtest</a>. Pour le code, voir <a href="https://github.com/Harotensnor/paris-sportif" target="_blank" rel="noopener">le repo GitHub</a>.
   </p>
