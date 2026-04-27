@@ -1793,6 +1793,21 @@
     let weatherStats = null;
     if (poi && match.sport === 'football' && match.weather) {
       const w = match.weather;
+      // AUDIT-2026-04-27 (P3) — Skip weather adjustment if source is low-
+      // confidence. fetch_weather.py v31.7.85 ne géocode plus par nom
+      // d'équipe (qui retournait Tarma → Ada, Stockholm → Aiken). Mais
+      // les anciennes entrées du cache geo et les fallbacks éventuels
+      // peuvent encore tagger une source douteuse. On accepte uniquement
+      // les sources fiables : event_city, event_venue, static_team.
+      // (legacy: pas de champ source = pre-v31.7.85, on conserve par
+      // compat. Quand le cache aura roulé, ce sera plus strict.)
+      const wSource = w.source;
+      const _trustedSources = new Set(['event_city', 'event_venue', 'static_team']);
+      const _isTrusted = !wSource || _trustedSources.has(wSource);
+      if (!_isTrusted) {
+        // Météo low-conf, on ne l'utilise pas pour predictMatch
+        // (mais elle reste affichable dans la modal en informationnel).
+      } else {
       let rainPenalty = 0, windPenalty = 0, coldPenalty = 0;
       if (typeof w.precip_mm === 'number' && w.precip_mm > 1) {
         rainPenalty = Math.min(0.25, (w.precip_mm - 1) * 0.04);
@@ -1829,6 +1844,7 @@
           city: w.city,
         };
       }
+      } // end if (_isTrusted)
     }
     // Referee adjustment — strict refs → slightly fewer goals (more
     // stoppages), lenient refs → slightly more (flow). Typical range is
@@ -5026,16 +5042,33 @@
       const { home: oH, draw: oD, away: oA } = pred.odds;
       const fmt = (n) => n != null ? n.toFixed(2) : '—';
       const isPick = (lbl) => pred.pick?.key === lbl;
+      // AUDIT-2026-04-27 (P2 Ticket 2) — Source de cote affichée pour
+      // que l'user sache si la cote vient bien de Winamax (cf.
+      // helper isWinamaxBookable + getMatchOdds priorité Winamax).
+      // - _fromWinamax : cote Winamax exacte (bookable)
+      // - _fromSnapshot : cote externe figée (DraftKings, etc.)
+      // - _fromHistory : cote historique post-match (bilan)
+      // - aucun flag : cote ESPN live (rare en pré-match)
+      let oddsSrcBadge = '';
+      if (pred.odds._fromWinamax) {
+        oddsSrcBadge = `<span class="odds-src wnx" title="Cote Winamax exacte">Winamax</span>`;
+      } else if (pred.odds._fromSnapshot) {
+        oddsSrcBadge = `<span class="odds-src ext" title="Cote externe figée — pas Winamax exact">externe</span>`;
+      } else if (pred.odds._fromHistory) {
+        oddsSrcBadge = `<span class="odds-src hist" title="Cote historique (post-match, pour le bilan)">archive</span>`;
+      }
       if (pred.hasDraw) {
         oddsHtml = `<div class="odds-row three">
           <div class="odd ${isPick('1') ? 'pick' : ''} ${oH && oH < 2 ? 'fav' : ''}"><div class="lbl">1</div><div class="val">${fmt(oH)}</div></div>
           <div class="odd ${isPick('X') ? 'pick' : ''}"><div class="lbl">N</div><div class="val">${fmt(oD)}</div></div>
           <div class="odd ${isPick('2') ? 'pick' : ''} ${oA && oA < 2 ? 'fav' : ''}"><div class="lbl">2</div><div class="val">${fmt(oA)}</div></div>
+          ${oddsSrcBadge}
         </div>`;
       } else {
         oddsHtml = `<div class="odds-row two">
           <div class="odd ${isPick('1') ? 'pick' : ''} ${oH && oH < 2 ? 'fav' : ''}"><div class="lbl">1 ${esc(home?.abbr || '')}</div><div class="val">${fmt(oH)}</div></div>
           <div class="odd ${isPick('2') ? 'pick' : ''} ${oA && oA < 2 ? 'fav' : ''}"><div class="lbl">2 ${esc(away?.abbr || '')}</div><div class="val">${fmt(oA)}</div></div>
+          ${oddsSrcBadge}
         </div>`;
       }
     }
@@ -6645,6 +6678,58 @@
     `;
 
     // v30 — Handler "J'ai parié" retiré : Théo n'enregistre pas ses paris.
+
+    // AUDIT-2026-04-27 (Ticket 5) — Sticky anchor nav en haut de la modal
+    // pour navigation rapide vers les sections. Approche non-invasive :
+    // les sections restent toutes visibles (pas de toggle qui casserait
+    // le print/screenshot), mais l'user peut sauter vers Synthèse /
+    // Signaux / Cotes / H2H / Stats sans scroll vertical interminable.
+    // Le mapping h4 emoji → catégorie est explicite ci-dessous.
+    (function injectModalNav() {
+      const sections = Array.from(body.querySelectorAll('.section'));
+      if (sections.length < 3) return;  // pas la peine pour 1-2 sections
+      // Catégorisation par mots-clés dans le h4
+      const cat = (txt) => {
+        const t = (txt || '').toLowerCase();
+        if (t.includes('pronostic') || t.includes('contexte') || t.includes('information')) return 'Synthèse';
+        if (t.includes('cote') || t.includes('probabilité') || t.includes('bookmaker')) return 'Cotes';
+        if (t.includes('face-à-face') || t.includes('face à face') || t.includes('h2h')) return 'H2H';
+        if (t.includes('classement') || t.includes('statistique') || t.includes('split') ||
+            t.includes('chiffres clés') || t.includes('joueurs clés') || t.includes('profil') ||
+            t.includes('5 derniers')) return 'Stats';
+        return 'Signaux';  // compositions, absents, tipsters, météo, arbitre, etc.
+      };
+      const tabs = ['Synthèse', 'Signaux', 'Cotes', 'H2H', 'Stats'];
+      const tabSections = Object.fromEntries(tabs.map(t => [t, []]));
+      let secCounter = 0;
+      sections.forEach(sec => {
+        const h4 = sec.querySelector('h4');
+        if (!h4) return;
+        const c = cat(h4.textContent || '');
+        const id = `mds-${secCounter++}`;
+        sec.id = id;
+        tabSections[c].push(id);
+      });
+      // Ne montrer les chips que pour les catégories non vides
+      const chipsHtml = tabs
+        .filter(t => tabSections[t].length > 0)
+        .map(t => `<button type="button" class="md-nav-chip" data-target="${tabSections[t][0]}">${t}</button>`)
+        .join('');
+      if (!chipsHtml) return;
+      const nav = document.createElement('div');
+      nav.className = 'md-nav';
+      nav.setAttribute('role', 'navigation');
+      nav.setAttribute('aria-label', 'Navigation rapide dans le détail');
+      nav.innerHTML = chipsHtml;
+      body.insertBefore(nav, body.firstChild);
+      // Wire scrollIntoView avec offset pour compenser le sticky header
+      nav.querySelectorAll('.md-nav-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          const target = body.querySelector('#' + chip.dataset.target);
+          if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      });
+    })();
 
     // v31.7.4 — Modal détail mobile : sections collapsibles pour réduire le
     // scroll vertical (qui faisait jusqu'à 5400px sur foot top-5). Sur ≤720px,
