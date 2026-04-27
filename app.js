@@ -5719,10 +5719,30 @@
               const edge = valueBetEdge(rel, pickOdd);
               const edgePct = edge != null ? Math.round(edge * 100) : null;
               const isValue = edge != null && edge >= 0.05;
+              // AUDIT-2026-04-27 (Sprint 2 #8) — Source cote en évidence.
+              // Plutôt qu'un mini-badge, encart explicite avec capture
+              // timestamp si disponible (snapshot.captured_at).
+              let oddsSrcLine = '';
+              const o = pred.odds;
+              if (o) {
+                if (o._fromWinamax) {
+                  oddsSrcLine = `<div style="margin-top:6px;font-size:11.5px;color:var(--text-dim);"><b style="color:var(--accent);">✓ Cote bookable Winamax</b> — placeable directement chez le bookmaker.</div>`;
+                } else if (o._fromSnapshot) {
+                  const snap = match.odds_snapshot || {};
+                  const cap = snap.captured_at ? (() => {
+                    try { return new Date(snap.captured_at).toLocaleString('fr-FR', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' }); }
+                    catch(e){ return ''; }
+                  })() : '';
+                  const prov = snap.provider || 'externe';
+                  oddsSrcLine = `<div style="margin-top:6px;font-size:11.5px;color:var(--warn);"><b>⚠ Cote ${esc(prov)}</b> capturée${cap?` le ${esc(cap)}`:''} — pas Winamax exact pour ce match.</div>`;
+                } else if (o._fromHistory) {
+                  oddsSrcLine = `<div style="margin-top:6px;font-size:11.5px;color:var(--info);"><b>📜 Cote archive</b> — historique post-match (bilan).</div>`;
+                }
+              }
               return `<div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;font-size:13px;">
                 <span style="padding:4px 10px;border-radius:6px;background:rgba(16,185,129,.12);color:var(--accent);font-weight:700;">Cote @ ${pickOdd.toFixed(2)}</span>
                 ${isValue ? `<span title="Le modèle estime ${(rel*100).toFixed(0)}% de chances alors que la cote n'en prévoit que ${((1/pickOdd)*100).toFixed(0)}%." style="padding:4px 10px;border-radius:6px;background:rgba(236,72,153,.14);color:#f472b6;font-weight:700;">💎 +${edgePct}pt d'avantage</span>` : (edge != null && edge > 0 && edge < 0.05 ? `<span title="Léger avantage (<5pt) — pas très intéressant." style="padding:4px 10px;border-radius:6px;background:rgba(255,255,255,.05);color:var(--text-dim2,#7b8693);font-weight:600;">+${edgePct}pt</span>` : '')}
-              </div>`;
+              </div>${oddsSrcLine}`;
             })() : ''}
             ${(() => {
               // v31.7 — "Pourquoi ce prono est fiable" : synthèse rédigée en
@@ -6683,56 +6703,99 @@
 
     // v30 — Handler "J'ai parié" retiré : Théo n'enregistre pas ses paris.
 
-    // AUDIT-2026-04-27 (Ticket 5) — Sticky anchor nav en haut de la modal
-    // pour navigation rapide vers les sections. Approche non-invasive :
-    // les sections restent toutes visibles (pas de toggle qui casserait
-    // le print/screenshot), mais l'user peut sauter vers Synthèse /
-    // Signaux / Cotes / H2H / Stats sans scroll vertical interminable.
-    // Le mapping h4 emoji → catégorie est explicite ci-dessous.
-    (function injectModalNav() {
+    // AUDIT-2026-04-27 (Sprint 2 #6) — Modal vrais tabs avec toggle visibility.
+    // Upgrade de la sticky anchor nav (v31.7.89) vers de vrais onglets qui
+    // masquent les sections non actives. Démarre sur "Synthèse" par défaut.
+    // Catégorisation par mots-clés dans le h4 (mapping ci-dessous).
+    // Sprint 2 #10 — Deep linking : ?tab=cotes dans l'URL ou hash
+    // #match/123/cotes ouvre directement le bon onglet (partage de lien).
+    (function injectModalTabs() {
       const sections = Array.from(body.querySelectorAll('.section'));
       if (sections.length < 3) return;  // pas la peine pour 1-2 sections
-      // Catégorisation par mots-clés dans le h4
       const cat = (txt) => {
         const t = (txt || '').toLowerCase();
-        if (t.includes('pronostic') || t.includes('contexte') || t.includes('information')) return 'Synthèse';
-        if (t.includes('cote') || t.includes('probabilité') || t.includes('bookmaker')) return 'Cotes';
-        if (t.includes('face-à-face') || t.includes('face à face') || t.includes('h2h')) return 'H2H';
+        if (t.includes('pronostic') || t.includes('contexte') || t.includes('information')) return 'synthese';
+        if (t.includes('cote') || t.includes('probabilité') || t.includes('bookmaker')) return 'cotes';
+        if (t.includes('face-à-face') || t.includes('face à face') || t.includes('h2h')) return 'h2h';
         if (t.includes('classement') || t.includes('statistique') || t.includes('split') ||
             t.includes('chiffres clés') || t.includes('joueurs clés') || t.includes('profil') ||
-            t.includes('5 derniers')) return 'Stats';
-        return 'Signaux';  // compositions, absents, tipsters, météo, arbitre, etc.
+            t.includes('5 derniers')) return 'stats';
+        return 'signaux';
       };
-      const tabs = ['Synthèse', 'Signaux', 'Cotes', 'H2H', 'Stats'];
-      const tabSections = Object.fromEntries(tabs.map(t => [t, []]));
-      let secCounter = 0;
+      const tabsOrder = [
+        ['synthese', '🎯 Synthèse'],
+        ['signaux', '📡 Signaux'],
+        ['cotes', '💰 Cotes'],
+        ['h2h', '⚔️ H2H'],
+        ['stats', '📊 Stats'],
+      ];
+      const tabSections = { synthese: [], signaux: [], cotes: [], h2h: [], stats: [] };
       sections.forEach(sec => {
         const h4 = sec.querySelector('h4');
-        if (!h4) return;
+        if (!h4) {
+          sec.setAttribute('data-mtab', 'synthese');
+          return;
+        }
         const c = cat(h4.textContent || '');
-        const id = `mds-${secCounter++}`;
-        sec.id = id;
-        tabSections[c].push(id);
+        sec.setAttribute('data-mtab', c);
+        tabSections[c].push(sec);
       });
+      // Header (teams-big) toujours visible (avant nav)
+      const header = body.querySelector('.teams-big');
+      if (header) header.setAttribute('data-mtab-always', 'true');
       // Ne montrer les chips que pour les catégories non vides
-      const chipsHtml = tabs
-        .filter(t => tabSections[t].length > 0)
-        .map(t => `<button type="button" class="md-nav-chip" data-target="${tabSections[t][0]}">${t}</button>`)
-        .join('');
-      if (!chipsHtml) return;
+      const visibleTabs = tabsOrder.filter(([k]) => tabSections[k].length > 0);
+      if (visibleTabs.length < 2) return;  // 1 seul onglet utile = pas la peine
+      // Détecter le tab initial depuis le hash : #match/123/cotes
+      const hashMatch = (location.hash || '').match(/^#match\/[^/]+\/(\w+)$/);
+      const initialTab = (hashMatch && tabSections[hashMatch[1]]?.length) ? hashMatch[1] : 'synthese';
+      const chipsHtml = visibleTabs
+        .map(([k, label]) =>
+          `<button type="button" class="md-tab" data-mtab-toggle="${k}" role="tab" aria-selected="${k === initialTab}" tabindex="${k === initialTab ? '0' : '-1'}">${label}</button>`
+        ).join('');
       const nav = document.createElement('div');
-      nav.className = 'md-nav';
-      nav.setAttribute('role', 'navigation');
-      nav.setAttribute('aria-label', 'Navigation rapide dans le détail');
+      nav.className = 'md-tabs';
+      nav.setAttribute('role', 'tablist');
+      nav.setAttribute('aria-label', 'Onglets du détail match');
       nav.innerHTML = chipsHtml;
       body.insertBefore(nav, body.firstChild);
-      // Wire scrollIntoView avec offset pour compenser le sticky header
-      nav.querySelectorAll('.md-nav-chip').forEach(chip => {
-        chip.addEventListener('click', () => {
-          const target = body.querySelector('#' + chip.dataset.target);
-          if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Toggle helper — masque toutes les sections sauf data-mtab=active
+      const setActive = (target) => {
+        nav.querySelectorAll('.md-tab').forEach(b => {
+          const on = b.dataset.mtabToggle === target;
+          b.classList.toggle('active', on);
+          b.setAttribute('aria-selected', String(on));
+          b.setAttribute('tabindex', on ? '0' : '-1');
+        });
+        body.querySelectorAll('[data-mtab]').forEach(s => {
+          s.style.display = (s.dataset.mtab === target) ? '' : 'none';
+        });
+        // Update hash for share/refresh persistence
+        try {
+          const matchId = (document.getElementById('detail-title') || {}).dataset?.matchId;
+          if (matchId) {
+            const newHash = `#match/${matchId}/${target}`;
+            if (location.hash !== newHash) {
+              history.replaceState(null, '', location.pathname + location.search + newHash);
+            }
+          }
+        } catch(e){}
+        // Scroll back to top of body (for long sections)
+        body.scrollTop = 0;
+      };
+      nav.querySelectorAll('.md-tab').forEach(b => {
+        b.addEventListener('click', () => setActive(b.dataset.mtabToggle));
+        b.addEventListener('keydown', (e) => {
+          // Arrow nav between tabs (a11y standard)
+          if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+          const tabs = Array.from(nav.querySelectorAll('.md-tab'));
+          const i = tabs.indexOf(b);
+          const next = e.key === 'ArrowRight' ? (i + 1) % tabs.length : (i - 1 + tabs.length) % tabs.length;
+          tabs[next].focus();
+          tabs[next].click();
         });
       });
+      setActive(initialTab);
     })();
 
     // v31.7.4 — Modal détail mobile : sections collapsibles pour réduire le

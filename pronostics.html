@@ -894,6 +894,13 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-27T18:20:33.345476Z","today":"
     var params = new URLSearchParams(window.location.search);
     var share = params.get('share');
     var matchParam = params.get('match');
+    // AUDIT-2026-04-27 (Sprint 2 #10) — Support hash #match/<id>/<tab>
+    // pour deep linking modal détail. Le ?match=<id> reste compatible
+    // pour les vieux liens partagés.
+    var hashMatch = (window.location.hash || '').match(/^#match\/([^/]+)(?:\/(\w+))?$/);
+    if (hashMatch && !matchParam) {
+      matchParam = hashMatch[1];
+    }
     // v30 — ?match=<id> ouvre la modale du match partagé après que data
     // soit chargée + render initial. Construit l'objet match en scannant
     // PRONOSTICS_DATA.days.
