@@ -631,3 +631,68 @@ dl > div:hover {
   section.card { padding: 16px !important; }
   .kpi-card { padding: 14px 16px !important; }
 }
+
+/* v31.7.43 — A11y : link-in-text-block (WCAG 1.4.1) — fix audit 2026-04-27.
+   Souligner les liens dans le corps de texte pour pallier le contraste
+   1.58:1 du violet d'accent. Liens "structurels" (CTA, breadcrumb, nav,
+   TOC, footer) restent sans souligné. */
+main p a,
+main li a,
+main td a,
+.lead a,
+.honesty a,
+.danger-banner a,
+.meta-banner a,
+.contrib-prompt a {
+  text-decoration: underline;
+  text-decoration-color: currentColor;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  transition: text-decoration-color .15s ease, text-decoration-thickness .15s ease;
+}
+main p a:hover,
+main li a:hover,
+main td a:hover,
+.lead a:hover,
+.contrib-prompt a:hover {
+  text-decoration-color: var(--brand);
+  text-decoration-thickness: 2px;
+}
+
+/* Liens "structurels" : exclus du soulignement par défaut */
+.cta-primary, .cta-secondary,
+.breadcrumb a, .toc a,
+header.topbar a, footer.site-footer a,
+.footer-link, .footer-anj-link,
+.anj-pill a, .source-card a,
+.feature-card h3 a,
+nav a {
+  text-decoration: none !important;
+}
+
+/* v31.7.43 — Block "Une question..." centralisé en classe.
+   Avant : <p style="...color:#6b6b73..."> 6× dupliqué sur 6 pages
+   et 3.69:1 contrast (insuffisant). Maintenant : couleur #9ba1ac
+   (5.05:1 ≥ 4.5 AA ✓). */
+.contrib-prompt {
+  margin-top: 32px;
+  padding: 14px 16px;
+  background: #0c0c0f;
+  border: 1px dashed rgba(255, 255, 255, .14);
+  border-radius: 8px;
+  font-size: 13px;
+  color: #9ba1ac;
+  text-align: center;
+  line-height: 1.55;
+}
+.contrib-prompt strong { color: #c5c5cc; }
+
+/* v31.7.43 — Breadcrumb sans inline color hardcodé */
+nav.breadcrumb a, .breadcrumb a {
+  color: #9ba1ac;
+  text-decoration: none;
+}
+nav.breadcrumb a:hover, .breadcrumb a:hover {
+  color: #f1f3f9;
+  text-decoration: underline;
+}
