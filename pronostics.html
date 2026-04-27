@@ -144,6 +144,13 @@
 <link rel="dns-prefetch" href="//a2.espncdn.com">
 <link rel="dns-prefetch" href="//a3.espncdn.com">
 <link rel="dns-prefetch" href="//a4.espncdn.com">
+<!-- v31.7.68 — Prefetch des pages éditoriales pour navigation instantanée
+     vers Backtest, Crédibilité et Comment lire un prono. Loaded en idle
+     priority, n'impacte pas le 1er paint mais accélère les nav suivantes. -->
+<link rel="prefetch" href="backtest.html" as="document">
+<link rel="prefetch" href="credibilite.html" as="document">
+<link rel="prefetch" href="comment-lire-un-prono.html" as="document">
+<link rel="prefetch" href="backtest_report_v2.json" as="fetch" crossorigin="anonymous">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Pronostics">
