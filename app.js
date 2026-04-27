@@ -10870,10 +10870,17 @@
             p.level = level;
             p.onboardingDone = true;
             localStorage.setItem('userPrefs', JSON.stringify(p));
+            // v31.7.45 — Marqueur additionnel pour audit cohérence
+            localStorage.setItem('paris_sportif_onboarded_v2', '1');
           } catch(e){}
           overlay.remove();
           try { if (typeof toast === 'function') toast('✓ Niveau défini : ' + level, 'success'); } catch(e){}
           try { if (typeof applyPageView === 'function') applyPageView(); } catch(e){}
+          // v31.7.45 — Show RGPD banner après onboarding (cascade ordonnée).
+          // Petit délai pour laisser l'overlay fade out + le toast finir.
+          setTimeout(() => {
+            try { if (typeof _initConsentBanner === 'function') _initConsentBanner(); } catch(e){}
+          }, 600);
         });
       });
       overlay.querySelector('[data-skip]').addEventListener('click', () => {
@@ -10881,8 +10888,13 @@
           const p = JSON.parse(localStorage.getItem('userPrefs') || '{}');
           p.onboardingDone = true;
           localStorage.setItem('userPrefs', JSON.stringify(p));
+          localStorage.setItem('paris_sportif_onboarded_v2', '1');
         } catch(e){}
         overlay.remove();
+        // v31.7.45 — Same cascade pour les utilisateurs qui skip
+        setTimeout(() => {
+          try { if (typeof _initConsentBanner === 'function') _initConsentBanner(); } catch(e){}
+        }, 600);
       });
     } catch(e) { /* noop */ }
   }
@@ -16253,6 +16265,19 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
   // v30 — Consent RGPD pour localStorage. Affichée tant que l'utilisateur
   // n'a pas explicitement répondu. Auto-accept silencieux si legacy data
   // détectée (compat utilisateurs existants qui avaient des prefs avant).
+  // v31.7.45 — Audit fix : ne montrer le banner RGPD qu'APRÈS l'onboarding.
+  // Avant : modal Bienvenue + banner RGPD apparaissaient simultanément →
+  // friction visuelle et 2 décisions à prendre en même temps.
+  function _shouldShowConsentBanner() {
+    let prefs = {};
+    try { prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}'); } catch(e){}
+    // Already decided
+    if (prefs.consentLocalStorage === 'accepted' || prefs.consentLocalStorage === 'declined') return false;
+    // Onboarding pas terminé → patienter
+    const onboarded = !!prefs.onboardingDone || !!prefs.level
+                   || localStorage.getItem('paris_sportif_onboarded_v2') === '1';
+    return onboarded;
+  }
   function _initConsentBanner() {
     let prefs = {};
     try { prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}'); } catch(e){}
@@ -16269,6 +16294,9 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       try { localStorage.setItem('userPrefs', JSON.stringify(prefs)); } catch(e){}
       return;
     }
+    // v31.7.45 — Skip si onboarding pas terminé. Le onLevelChosen (handler)
+    // ré-appelle _initConsentBanner après le choix de niveau → cascade propre.
+    if (!_shouldShowConsentBanner()) return;
     const banner = document.getElementById('consent-banner');
     if (!banner) return;
     banner.style.display = 'block';
