@@ -63,13 +63,29 @@ from winamax_map import _norm
 OUT = Path(__file__).resolve().parent.parent / 'lineups_soccer.json'
 API = 'https://api.sofascore.com/api/v1'
 
-# Same five leagues as fetch_injuries_soccer.py — keep the two files in sync.
+# v31.7.60 — Extension tier 2 (audit V2 #11). Couverture Sofascore tier
+# 1 + tier 2 (Süper Lig, Eredivisie, Liga Portugal, Pro League, etc.)
+# pour enrichir les pronos de ces ligues actuellement sans lineups.
+# Tournament IDs dérivés de l'API Sofascore (vérifiés manuellement).
+# Same leagues as fetch_injuries_soccer.py — keep the files in sync.
 LEAGUES: dict[str, int] = {
+    # Tier 1 (top-5 historiques)
     'eng.1': 17,
     'esp.1': 8,
     'ger.1': 35,
     'ita.1': 23,
     'fra.1': 34,
+    # Tier 2 (ajout v31.7.60)
+    'ned.1': 37,        # Eredivisie
+    'por.1': 238,       # Liga Portugal
+    'tur.1': 52,        # Süper Lig
+    'bel.1': 38,        # Pro League
+    'sco.1': 36,        # Scottish Premiership
+    'eng.2': 18,        # Championship (England)
+    'esp.2': 54,        # La Liga 2
+    'ita.2': 24,        # Serie B
+    'ger.2': 44,        # 2. Bundesliga
+    'fra.2': 182,       # Ligue 2
 }
 
 # Position code mapping (Sofascore uses single letters: G/D/M/F).
