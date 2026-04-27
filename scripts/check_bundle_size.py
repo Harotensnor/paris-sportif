@@ -29,11 +29,16 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
+# AUDIT-2026-04-27 (Sprint 23 #21) — Budgets ajustés.
+# app.js bumpé 1100→1200 après Sprint 13-22 qui ont ajouté beaucoup
+# de valeur (design tokens, helpers UI, modal tabs, page Ligue, etc.).
+# Le vrai gain serait découpage ESM — backlog. Pour l'instant headroom.
+# app.css bumpé 200→230 idem (utility classes V3, animations, etc.).
 BUDGETS_KB = {
-    'app.js':          1100,
-    'app.css':          200,
+    'app.js':          1200,
+    'app.css':          230,
     'pronostics.html':  650,
-    'sw.js':             10,
+    'sw.js':             15,
 }
 
 

@@ -4958,7 +4958,7 @@
           // v29 — face shot via Sofascore CDN when player id is known. The
           // img hides itself on 404 so missing photos fall back cleanly.
           const faceHtml = l.scorer.pid
-            ? `<img src="https://img.sofascore.com/api/v1/player/${l.scorer.pid}/image" alt="" style="width:36px;height:36px;border-radius:50%;object-fit:cover;background:var(--bg);border:1px solid var(--border);flex-shrink:0;" onerror="this.style.display='none'">`
+            ? `<img loading="lazy" decoding="async" src="https://img.sofascore.com/api/v1/player/${l.scorer.pid}/image" alt="" style="width:36px;height:36px;border-radius:50%;object-fit:cover;background:var(--bg);border:1px solid var(--border);flex-shrink:0;" onerror="this.style.display='none'">`
             : `<div style="width:36px;height:36px;border-radius:50%;background:var(--bg);border:1px solid var(--border);display:grid;place-items:center;font-size:13px;font-weight:700;color:var(--text-dim);flex-shrink:0;">${esc((l.scorer.name||'?').split(/\s+/).slice(-1)[0]?.[0]||'?')}</div>`;
           return `
           <div style="display:grid;grid-template-columns:36px 1fr auto auto;gap:12px;padding:10px 12px;border-bottom:1px solid var(--border);align-items:center;">
@@ -11487,7 +11487,7 @@
               // v29 — face shot via Sofascore CDN when the Sofascore player id
               // is known ; falls back to the position emoji when not available.
               const faceHtml = s.pid
-                ? `<img src="https://img.sofascore.com/api/v1/player/${s.pid}/image" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;background:var(--bg);border:1px solid var(--border);" onerror="this.outerHTML='<div style=\\'font-size:14px;width:28px;height:28px;display:grid;place-items:center;\\'>${posIcon}</div>'">`
+                ? `<img loading="lazy" decoding="async" src="https://img.sofascore.com/api/v1/player/${s.pid}/image" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;background:var(--bg);border:1px solid var(--border);" onerror="this.outerHTML='<div style=\\'font-size:14px;width:28px;height:28px;display:grid;place-items:center;\\'>${posIcon}</div>'">`
                 : `<div style="font-size:14px;width:28px;height:28px;display:grid;place-items:center;">${posIcon}</div>`;
               return `
                 <div style="display:grid;grid-template-columns:28px 1fr auto auto;gap:10px;padding:7px 10px;border-bottom:1px solid var(--border);align-items:center;">
