@@ -7708,6 +7708,69 @@
   // restoreShared vit dans un script tag différent (autre IIFE).
   window.openDetail = openDetail;
   window.closeDetailModal = closeDetailModal;
+
+  // AUDIT-2026-04-27 (Sprint 28 #18) — Recently viewed matches.
+  // À chaque openDetail, on track le match dans localStorage.
+  // Persiste les 10 derniers, FIFO. Affichable plus tard sur Dashboard.
+  const _trackRecentMatch = (match) => {
+    if (!match || !match.id) return;
+    try {
+      const raw = localStorage.getItem('paris_sportif_recent_matches') || '[]';
+      let arr = JSON.parse(raw);
+      if (!Array.isArray(arr)) arr = [];
+      // Dedup + push en tête
+      arr = arr.filter(x => x.id !== String(match.id));
+      arr.unshift({
+        id: String(match.id),
+        name: match.name || '?',
+        sport: match.sport || '?',
+        league: match.league_name || match.league_code || '',
+        date: match.date || null,
+        viewedAt: Date.now(),
+      });
+      arr = arr.slice(0, 10);
+      localStorage.setItem('paris_sportif_recent_matches', JSON.stringify(arr));
+    } catch (e) {}
+  };
+  // Wrap openDetail pour tracker automatique
+  const _origOpenDetail = openDetail;
+  window.openDetail = function trackedOpenDetail(match) {
+    try { _trackRecentMatch(match); } catch (e) {}
+    return _origOpenDetail(match);
+  };
+
+  // AUDIT-2026-04-27 (Sprint 28 #20) — Bookmark picks (favoris).
+  // Helpers pour persister/lire les match IDs marqués comme favoris.
+  // À adopter dans l'UI via un bouton ⭐ sur les cards picks.
+  window._toggleBookmark = function toggleBookmark(matchId) {
+    if (!matchId) return false;
+    try {
+      const raw = localStorage.getItem('paris_sportif_bookmarks') || '[]';
+      let arr = JSON.parse(raw);
+      if (!Array.isArray(arr)) arr = [];
+      const idStr = String(matchId);
+      const exists = arr.includes(idStr);
+      if (exists) arr = arr.filter(x => x !== idStr);
+      else arr.push(idStr);
+      arr = arr.slice(-50);  // cap 50
+      localStorage.setItem('paris_sportif_bookmarks', JSON.stringify(arr));
+      return !exists;  // returns new state
+    } catch (e) { return false; }
+  };
+  window._isBookmarked = function isBookmarked(matchId) {
+    try {
+      const raw = localStorage.getItem('paris_sportif_bookmarks') || '[]';
+      const arr = JSON.parse(raw);
+      return Array.isArray(arr) && arr.includes(String(matchId));
+    } catch (e) { return false; }
+  };
+  window._loadBookmarks = function loadBookmarks() {
+    try {
+      const raw = localStorage.getItem('paris_sportif_bookmarks') || '[]';
+      const arr = JSON.parse(raw);
+      return Array.isArray(arr) ? arr : [];
+    } catch (e) { return []; }
+  };
   document.getElementById('close-detail').addEventListener('click', closeDetailModal);
   document.getElementById('detail-modal').addEventListener('click', (e) => { if (e.target.id === 'detail-modal') closeDetailModal(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDetailModal(); });
