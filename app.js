@@ -8580,6 +8580,7 @@
             <footer class="ed-hero__cta">
               <button type="button" class="ed-hero__cta-btn page-btn" data-page="tous">📋 Voir tous les matchs</button>
               <button type="button" class="ed-hero__secondary page-btn" data-page="locks">🔒 Locks à venir</button>
+              <button type="button" class="ed-hero__secondary page-btn" data-page="calendrier">📅 Calendrier 7j</button>
               <button type="button" class="ed-hero__secondary page-btn" data-page="backtest">📈 Backtest</button>
             </footer>
           </article>
@@ -10063,6 +10064,8 @@
 
     // v30 — Empty state UX : on aide l'utilisateur à passer à demain ou
     // vider les filtres au lieu de juste afficher "Aucun match".
+    // v31.7.82 — Ajout du raccourci Calendrier 7j : si l'user spam "Voir
+    // demain" il vaut mieux qu'il aille sur la vue 7-jours d'un coup.
     const _emptyState = (msg, withTomorrow) => `
       <div style="padding:48px 24px;text-align:center;color:var(--text-dim);">
         <div style="font-size:32px;margin-bottom:10px;line-height:1;opacity:.5;">📅</div>
@@ -10070,6 +10073,7 @@
         <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
           ${filtersActive ? '<button data-tous-reset style="padding:8px 14px;font-size:12px;background:transparent;color:var(--text);border:1px solid var(--border-2);border-radius:8px;cursor:pointer;font-weight:600;">↻ Vider les filtres</button>' : ''}
           ${withTomorrow ? '<button data-go-tomorrow style="padding:8px 14px;font-size:12px;background:var(--brand);color:#08080a;border:none;border-radius:8px;cursor:pointer;font-weight:700;">Voir demain →</button>' : ''}
+          ${withTomorrow ? '<button class="page-btn" data-page="calendrier" style="padding:8px 14px;font-size:12px;background:transparent;color:var(--brand);border:1px solid var(--brand-border);border-radius:8px;cursor:pointer;font-weight:600;">📅 Calendrier 7j</button>' : ''}
         </div>
       </div>`;
     const pendingHtml = pending.length
