@@ -1623,13 +1623,35 @@
       };
     }
 
+    // AUDIT-2026-04-27 (P1) — Garde-fou défensif côté frontend.
+    // Si jamais le backend laisse passer des form_stats contaminés
+    // (NBA stats sur un club de foot via tid partagé), le frontend
+    // refuse de s'appuyer dessus pour calculer gdNudge / cleanSheet.
+    // Symptôme: avg_gf5/ga5 >5 sur du foot = impossible physiquement.
+    // Voir scripts/patch_team_stats.py pour le vrai fix backend.
+    const _formStatsValidForSport = (fs, sport) => {
+      if (!fs) return false;
+      if (sport === 'football') {
+        const gf = fs.avg_gf5 || 0, ga = fs.avg_ga5 || 0;
+        if (gf > 5 || ga > 5) return false;
+        // Vérifie aussi last5 — un seul score >15 trahit la contamination
+        const l5 = fs.last5 || home.last5 || [];
+        for (const m of l5) {
+          if ((m?.gf || 0) > 15 || (m?.ga || 0) > 15) return false;
+        }
+      }
+      return true;
+    };
+
     // Goal-differential nudge (last 5): complements form letters with actual
     // margin. Team scoring 2.5 GF/G and conceding 0.8 is much more dangerous
     // than one that scraped 5 wins 1-0. Only kicks in when both teams have
     // ≥3 samples, to avoid noise.
     let gdNudge = null;
     const hs = home.form_stats, as_ = away.form_stats;
-    if (hs && as_ && hs.played5 >= 3 && as_.played5 >= 3) {
+    const hsOk = _formStatsValidForSport(hs, match.sport);
+    const asOk = _formStatsValidForSport(as_, match.sport);
+    if (hs && as_ && hsOk && asOk && hs.played5 >= 3 && as_.played5 >= 3) {
       const gdH = (hs.avg_gf5 || 0) - (hs.avg_ga5 || 0);
       const gdA = (as_.avg_gf5 || 0) - (as_.avg_ga5 || 0);
       // Typical football gd range is ≈ [-2, +2]. Cap shift at ±4%.
@@ -1693,7 +1715,11 @@
     let cleanSheetStats = null;
     if (poi && match.sport === 'football') {
       const hs = home.form_stats, as_ = away.form_stats;
-      if (hs && as_ && hs.played5 >= 3 && as_.played5 >= 3) {
+      // AUDIT-2026-04-27 (P1) — réutilise le garde-fou défini plus haut
+      // pour éviter d'injecter du clean-sheet calculé sur du basket.
+      const hsOk2 = _formStatsValidForSport(hs, match.sport);
+      const asOk2 = _formStatsValidForSport(as_, match.sport);
+      if (hs && as_ && hsOk2 && asOk2 && hs.played5 >= 3 && as_.played5 >= 3) {
         const hCleanRate  = (hs.cleans5         || 0) / hs.played5;
         const aCleanRate  = (as_.cleans5        || 0) / as_.played5;
         const hFailRate   = (hs.failed_to_score5 || 0) / hs.played5;

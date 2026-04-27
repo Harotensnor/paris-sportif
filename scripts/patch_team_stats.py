@@ -47,6 +47,41 @@ def save_data(d: dict) -> None:
     )
 
 
+# AUDIT-2026-04-27 (P1) — Garde-fou défensif : seuils impossibles par sport.
+# Football : un club marque/encaisse rarement >5 buts/match en moyenne L5.
+# Si une stat dépasse ce seuil, c'est qu'on lit du basket/hockey contaminé
+# (ESPN partage des team_ids entre sports → tid=20 = Boston Celtics ET
+# Unión Santa Fe). On rejette plutôt que de patcher faux.
+_SPORT_GF_GA_MAX = {
+    'football': 5.0,   # foot : très exceptionnellement ≥5 (Bayern écrase)
+    'soccer':   5.0,   # alias possible selon ev.sport
+    # autres sports : pas de garde-fou (le contaminant ne peut pas venir
+    # d'un sport plus offensif → si NBA contamine NBA c'est un autre bug).
+}
+
+
+def _stats_look_invalid_for_sport(sport: str, s: dict) -> bool:
+    """Retourne True si les stats agrégées dépassent les seuils plausibles
+    du sport — typique d'une contamination inter-sports (NBA stats sur
+    un club de foot, par ex.). Vérifie aussi last5 pour des scores
+    aberrants comme 100-108 (foot impossible)."""
+    cap = _SPORT_GF_GA_MAX.get(sport)
+    if cap is None:
+        return False
+    avg_gf5 = s.get('avg_gf5') or 0
+    avg_ga5 = s.get('avg_ga5') or 0
+    if avg_gf5 > cap or avg_ga5 > cap:
+        return True
+    # Vérifie aussi les scores individuels (un seul match 100-108 trahit la
+    # contamination même si la moyenne n'a pas encore passé le seuil).
+    for m in s.get('last5') or []:
+        gf = m.get('gf') or 0
+        ga = m.get('ga') or 0
+        if gf > 15 or ga > 15:
+            return True
+    return False
+
+
 def main() -> int:
     if not STATS_PATH.exists():
         print(f'[patch_team_stats] {STATS_PATH.name} missing — run fetch_team_stats.py first')
@@ -58,20 +93,76 @@ def main() -> int:
         print('[patch_team_stats] empty stats — nothing to patch')
         return 0
 
+    # AUDIT-2026-04-27 (P1) — détecte le format de clé : v2 = `lc:tid`,
+    # v1 (legacy) = `tid` seul. v1 reste accepté en fallback le temps
+    # que le cron rebuilde via fetch_team_stats.py mis à jour, mais on
+    # essaie toujours v2 d'abord si dispo.
+    schema_v2 = stats.get('schema_version') == 2 or any(':' in k for k in teams)
+
     d = load_data()
     patched_events = 0
     patched_competitors = 0
     total_competitors = 0
+    skipped_sport_mismatch = 0
+    skipped_invalid_stats = 0
+    cleaned_existing_contamination = 0
     for day_key, evs in (d.get('days') or {}).items():
         for ev in evs:
             if ev.get('completed'):
                 continue
+            ev_sport = ev.get('sport') or ''
+            ev_lc = ev.get('league_code') or ''
             ev_changed = False
             for c in ev.get('competitors') or []:
                 total_competitors += 1
                 tid = str(c.get('id') or '')
-                s = teams.get(tid)
+                if not tid:
+                    continue
+                # AUDIT-2026-04-27 (P1) — Cleanup proactif : si l'event
+                # a déjà des form_stats contaminés (NBA→foot) hérités de
+                # l'ancienne pipeline, on les purge avant d'essayer de
+                # patcher avec les nouvelles données. Sans ça la
+                # contamination persiste si le nouveau patch ne trouve
+                # pas de remplacement (skip cross-sport ou invalid).
+                existing_fs = c.get('form_stats') or {}
+                existing_l5 = c.get('last5') or []
+                if existing_fs or existing_l5:
+                    fake_s = {
+                        'avg_gf5': existing_fs.get('avg_gf5') or 0,
+                        'avg_ga5': existing_fs.get('avg_ga5') or 0,
+                        'last5': existing_l5,
+                    }
+                    if _stats_look_invalid_for_sport(ev_sport, fake_s):
+                        c.pop('form_stats', None)
+                        c.pop('last5', None)
+                        cleaned_existing_contamination += 1
+                        ev_changed = True
+                # Lookup composite key d'abord, fallback v1 si pas trouvé.
+                s = None
+                if schema_v2 and ev_lc:
+                    s = teams.get(f'{ev_lc}:{tid}')
+                if s is None:
+                    s = teams.get(tid)  # legacy v1 fallback
                 if not s or s.get('played5', 0) == 0:
+                    continue
+                # Garde-fou cross-sport : si la stat porte un `sport`
+                # explicite et ne matche pas le sport de l'event, on
+                # skip. Couvre le cas où legacy v1 est utilisé et un
+                # tid partagé entre sports passe à travers la cle
+                # composite. ESPN 'soccer' === frontend 'football'.
+                stats_sport = s.get('sport') or ''
+                if stats_sport and ev_sport:
+                    matches = (
+                        stats_sport == ev_sport
+                        or (stats_sport == 'soccer' and ev_sport == 'football')
+                        or (stats_sport == 'football' and ev_sport == 'american-football')
+                    )
+                    if not matches:
+                        skipped_sport_mismatch += 1
+                        continue
+                # Garde-fou stats absurdes : foot avec stats NBA-level → skip
+                if _stats_look_invalid_for_sport(ev_sport, s):
+                    skipped_invalid_stats += 1
                     continue
                 c['form_stats'] = {
                     'played5': s['played5'],
@@ -87,8 +178,15 @@ def main() -> int:
                 patched_events += 1
 
     save_data(d)
-    print(f'[patch_team_stats] patched {patched_competitors}/{total_competitors} competitors '
-          f'across {patched_events} events')
+    msg = (f'[patch_team_stats] patched {patched_competitors}/{total_competitors} competitors '
+           f'across {patched_events} events')
+    if cleaned_existing_contamination:
+        msg += f' · cleaned {cleaned_existing_contamination} pre-existing contaminations'
+    if skipped_sport_mismatch:
+        msg += f' · skipped {skipped_sport_mismatch} sport-mismatch'
+    if skipped_invalid_stats:
+        msg += f' · skipped {skipped_invalid_stats} invalid-stats (likely cross-sport contamination)'
+    print(msg)
     return 0
 
 
