@@ -85,6 +85,98 @@
     --text-muted: var(--text-dim);
   }
 
+  /* v31.7.50 — Chantier 8 audit : utility classes pour migrer progressivement
+     les 1338 inline styles vers du CSS maintenable. Patterns les plus
+     répétés extraits ici. La migration est progressive : nouveau code
+     doit utiliser ces classes, ancien code à migrer au fur et à mesure. */
+
+  /* Info banner : padding+border+radius left, 4 variantes (brand, accent, danger, warn).
+     Apparaît dans 80+ endroits (renderDashboardPage, modal détail, alertes...). */
+  .info-banner {
+    padding: 14px 16px;
+    border-radius: 0 12px 12px 0;
+    font-size: 13px;
+    color: var(--text-dim);
+    border: 1px solid;
+    border-left-width: 3px;
+    line-height: 1.55;
+  }
+  .info-banner--brand {
+    background: rgba(167, 139, 250, .08);
+    border-color: rgba(167, 139, 250, .25);
+    border-left-color: var(--brand);
+  }
+  .info-banner--accent {
+    background: rgba(45, 212, 168, .08);
+    border-color: rgba(45, 212, 168, .25);
+    border-left-color: var(--accent);
+  }
+  .info-banner--danger {
+    background: rgba(248, 113, 113, .08);
+    border-color: rgba(248, 113, 113, .25);
+    border-left-color: var(--danger);
+  }
+  .info-banner--warn {
+    background: rgba(251, 191, 36, .08);
+    border-color: rgba(251, 191, 36, .25);
+    border-left-color: var(--warn);
+  }
+  .info-banner--gold {
+    background: rgba(245, 158, 11, .08);
+    border-color: rgba(245, 158, 11, .25);
+    border-left-color: var(--gold, #f59e0b);
+  }
+  .info-banner__title {
+    font-size: 11px;
+    color: inherit;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  /* KPI tile : carte avec label + valeur + sub. Apparaît dans 50+ endroits. */
+  .kpi-tile {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .kpi-tile__label {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .kpi-tile__value {
+    font-size: 24px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+    letter-spacing: -.5px;
+    line-height: 1.1;
+  }
+  .kpi-tile__value--pos { color: var(--accent); }
+  .kpi-tile__value--neg { color: var(--danger); }
+  .kpi-tile__value--brand { color: var(--brand); }
+  .kpi-tile__value--warn { color: var(--warn); }
+  .kpi-tile__value--gold { color: var(--gold, #f59e0b); }
+  .kpi-tile__sub {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+
+  /* Color tokens (utilities) — éviter les rgba() inline répétés */
+  .text-dim { color: var(--text-dim); }
+  .text-dim2 { color: var(--text-dim2); }
+  .text-brand { color: var(--brand); }
+  .text-accent { color: var(--accent); }
+  .text-danger { color: var(--danger); }
+  .text-warn { color: var(--warn); }
+
   /* v31.7.42 — A11y utility : visually-hidden mais accessible aux SR.
      Utilisé pour les labels des inputs sans texte visible (bankroll, etc.). */
   .sr-only {
