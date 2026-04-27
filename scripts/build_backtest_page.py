@@ -134,6 +134,8 @@ def render_table(headers: list[str], rows: list[list], caption: str = '') -> str
 
 
 def render_by_tier(by_tier: dict) -> str:
+    """v31.7.62 — Ajout colonne CLV moyen par tier (audit suite).
+    CLV = (notre cote / closing cote - 1) × 100. Indicateur d'edge."""
     rows = []
     tier_label = {'lock': '🔒 Lock', 'standard': '✅ Standard', 'lowconf': '⚠️ Low conf', 'skip': '🚫 Skip'}
     tier_order = ['lock', 'standard', 'lowconf', 'skip']
@@ -143,6 +145,12 @@ def render_by_tier(by_tier: dict) -> str:
             continue
         wr = d.get('win_rate')
         roi = d.get('flat_roi_pct')
+        clv = d.get('avg_clv_pct')
+        n_clv = d.get('n_with_clv', 0)
+        clv_cell = '—'
+        if clv is not None and n_clv > 0:
+            clv_color = 'pos' if clv > 0 else 'neg' if clv < 0 else ''
+            clv_cell = f'<span class="{clv_color}" title="{n_clv} picks avec closing odds">{fmt_signed(clv, 2, "%")}</span>'
         rows.append([
             f'<b>{tier_label.get(tier, tier)}</b>',
             d.get('n', 0),
@@ -151,8 +159,9 @@ def render_by_tier(by_tier: dict) -> str:
             fmt_signed(d.get('flat_pnl'), 2, 'u'),
             fmt_signed(d.get('kelly_pnl'), 2, 'u'),
             fmt_num(d.get('brier'), 3),
+            clv_cell,
         ])
-    return render_table(['Tier', 'N', 'WR', 'ROI flat', 'P&L flat', 'P&L Kelly', 'Brier'], rows)
+    return render_table(['Tier', 'N', 'WR', 'ROI flat', 'P&L flat', 'P&L Kelly', 'Brier', 'CLV moy.'], rows)
 
 
 def render_by_sport(by_sport: dict) -> str:
