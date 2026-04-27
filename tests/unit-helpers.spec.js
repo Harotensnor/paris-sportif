@@ -350,4 +350,106 @@ test.describe('Helpers purs (window.__testAPI)', () => {
     expect(results.from_winamax).toBeFalsy();
   });
 
+  // AUDIT-2026-04-27 (Sprint 1 #5) — Tests pollution data : un match foot
+  // avec stats NBA-level injectées doit déclencher le garde-fou défensif
+  // dans _formStatsValidForSport (côté predictMatch). Sans ce garde-fou,
+  // gdNudge et cleanSheetStats appliqueraient des effets aberrants.
+  test('predictMatch : refuse stats NBA-level sur match foot (anti-contamination)', async ({ page }) => {
+    await page.goto(URL);
+    const results = await page.evaluate(() => {
+      const fn = window.__testAPI.predictMatch;
+      if (!fn) return { skip: true };
+      // Fixture : match foot Argentine avec form_stats contaminés NBA-level
+      // (avg_gf5=100, last5 contre Lakers/Celtics → 91-123).
+      const contaminatedMatch = {
+        id: 'test-contam',
+        sport: 'football',
+        league_code: 'arg.1',
+        league_name: 'Liga Profesional',
+        date: new Date(Date.now() + 3 * 86400000).toISOString(),
+        completed: false,
+        status: 'STATUS_SCHEDULED',
+        winamax: {
+          available: true,
+          match_id: 'wnx-1',
+          markets: { '1n2': { home: 1.85, draw: 3.40, away: 4.50 } },
+        },
+        competitors: [
+          {
+            id: '20', home_away: 'home',
+            name: 'Unión (Santa Fe)', short: 'UNI',
+            // Stats NBA contaminées
+            form_stats: {
+              played5: 5, wins5: 3, draws5: 0, losses5: 2,
+              gf5: 502, ga5: 547,
+              avg_gf5: 100.40, avg_ga5: 109.40,
+              cleans5: 0, failed_to_score5: 0,
+            },
+            last5: [
+              { date: '2026-04-25', ha: 'home', opp: 'Boston Celtics', gf: 91, ga: 123, result: 'L' },
+              { date: '2026-04-22', ha: 'away', opp: 'Boston Celtics', gf: 100, ga: 108, result: 'L' },
+              { date: '2026-04-19', ha: 'home', opp: 'Boston Celtics', gf: 111, ga: 97, result: 'W' },
+            ],
+          },
+          {
+            id: '21', home_away: 'away',
+            name: 'Vélez Sarsfield', short: 'VEL',
+            // Stats foot normales
+            form_stats: {
+              played5: 5, wins5: 2, draws5: 1, losses5: 2,
+              gf5: 6, ga5: 7,
+              avg_gf5: 1.20, avg_ga5: 1.40,
+              cleans5: 1, failed_to_score5: 1,
+            },
+          },
+        ],
+      };
+      let pred = null;
+      let didThrow = false;
+      try { pred = fn(contaminatedMatch); } catch(e) { didThrow = true; }
+      return {
+        didThrow,
+        hasPick: !!(pred && pred.pick),
+        // Si le garde-fou marche, gdNudge a été skip → pred.gd ou
+        // pred.explain n'a pas de "Différentiel buts favorable" pour Unión.
+        // Le pick reste calculable via les autres signaux (Elo, market).
+        reasonsTexts: (pred && pred.explain && pred.explain.reasons || [])
+          .map(r => r && r.text || '').filter(Boolean),
+      };
+    });
+    if (results.skip) return;
+    expect(results.didThrow).toBe(false);
+    expect(results.hasPick).toBe(true);
+    // Le garde-fou doit empêcher d'injecter une "forme +99 buts/m"
+    // (typique NBA) dans les reasons foot. Si une reason mentionne
+    // un goal differential aberrant pour Unión, le garde-fou a failli.
+    const hasAberrantGd = results.reasonsTexts.some(t =>
+      /Différentiel.*Unión.*\+9\d/.test(t) || /\+\d{3}/.test(t)
+    );
+    expect(hasAberrantGd).toBe(false);
+  });
+
+  test('isWinamaxBookable : edge cases pollution data', async ({ page }) => {
+    await page.goto(URL);
+    const results = await page.evaluate(() => {
+      const fn = window.__testAPI.isWinamaxBookable;
+      return {
+        // markets['1n2'] avec home=1 (cote impossible, donnée corrompue)
+        cote_one: fn({ winamax: { available: true, match_id: 1, markets: { '1n2': { home: 1, away: 2.5 } } } }),
+        // Cotes négatives (trahit un bug de conversion ml→decimal)
+        cote_negative: fn({ winamax: { available: true, match_id: 1, markets: { '1n2': { home: -1.5, away: 2.5 } } } }),
+        // String au lieu de number
+        cote_string: fn({ winamax: { available: true, match_id: 1, markets: { '1n2': { home: '1.5', away: '2.5' } } } }),
+        // Cote très haute (proche retrait du marché)
+        cote_extreme: fn({ winamax: { available: true, match_id: 1, markets: { '1n2': { home: 50.0, away: 1.02 } } } }),
+      };
+    });
+    expect(results.cote_one).toBe(false);   // home=1 rejeté (pas > 1)
+    expect(results.cote_negative).toBe(false);
+    // String numbers : Number() les coerce, donc '1.5' → 1.5 → bookable
+    expect(results.cote_string).toBe(true);
+    // Cote extreme reste bookable (juste un fav énorme), c'est valide
+    expect(results.cote_extreme).toBe(true);
+  });
+
 });

@@ -4447,9 +4447,13 @@
     const boldTarget = opts.boldTarget ?? 3;
 
     const now = Date.now();
+    // AUDIT-2026-04-27 (Sprint 1 #2) — Combinés : exiger Winamax bookable
+    // pour chaque jambe (sinon on combine des matchs non-placeable, le
+    // user ne peut pas suivre la suggestion intégralement chez Winamax).
     // Enrich with prediction, odds, time-to-kickoff
     const pool = matches
       .filter(m => !m.completed && m.status !== 'STATUS_IN_PROGRESS')
+      .filter(m => isWinamaxBookable(m))
       .map(m => {
         const pred = predictMatch(m);
         const odd = pickOddFor(pred);
@@ -7525,6 +7529,8 @@
       evaluateModelPick,
       kellyFraction: typeof kellyFraction === 'function' ? kellyFraction : null,
       getMatchOdds,
+      // Sprint 1 #5 — tests data pollution
+      predictMatch: typeof predictMatch === 'function' ? predictMatch : null,
     };
   } catch(e){}
 
@@ -10801,7 +10807,11 @@
       ((data && data.days && data.days[iso]) || []).forEach(m => {
         if (m.sport !== 'football') return;
         if (m.completed) return;
-        if (!(m.winamax && m.winamax.available === true)) return;
+        // AUDIT-2026-04-27 (Sprint 1 #2) — Buteurs : exiger Winamax bookable
+        // strict (match_id + markets) pas juste "available". Avant : on
+        // pouvait afficher des suggestions buteurs sur des matchs Liga 2
+        // tournament-only où l'user ne pouvait pas placer le pari.
+        if (!isWinamaxBookable(m)) return;
         try {
           const pred = predictMatch(m);
           if (!pred || !pred.markets || !pred.markets.ou || !pred.markets.btts) return;
@@ -12126,6 +12136,9 @@
       for (const m of events) {
         if (m.live || m.completed) continue;
         if (m.status === 'STATUS_FINAL' || m.status === 'STATUS_IN_PROGRESS') continue;
+        // AUDIT-2026-04-27 (Sprint 1 #2) — Montantes : Winamax bookable
+        // strict, sinon l'user ne peut pas placer toute la séquence.
+        if (!isWinamaxBookable(m)) continue;
         const ts = new Date(m.date).getTime();
         if (!isFinite(ts)) continue;
         // Skip matchs déjà commencés (pas de mise possible)
