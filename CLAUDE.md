@@ -45,6 +45,20 @@ régénéré en continu.
   (avant : page changeait visuellement mais URL restait sur
   l'ancienne page → partage de lien / refresh / back-forward
   cassés). Pas de récursion avec hashchange handler.
+- **v31.7.89** Modal anchor nav (sticky chips Synthèse / Signaux /
+  Cotes / H2H / Stats avec scrollIntoView smooth) + badge source
+  cote dans la card (`Winamax` / `externe` / `archive`) pour que
+  l'user voit immédiatement la nature de la cote affichée +
+  predictMatch ignore weather si `source` n'est pas dans la
+  liste blanche (event_city / event_venue / static_team).
+- **v31.7.90** Service worker dedup variants : helpers
+  `pathEndsWith` + `networkFirst` factorisent les 4 blocs
+  network-first identiques (data.js, data_today.json, manifest,
+  odds_history.jsonl, health.json). +6 tests fixtures dans
+  `tests/unit-helpers.spec.js` pour les helpers exposés sur
+  `__testAPI` (isWinamaxBookable 10 cases, evaluateModelPick
+  VOID 8 cases + branches, kellyFraction, getMatchOdds Winamax-
+  prio).
 
 ## Architecture v31.7.7x (mise à jour 2026-04-27 — sweep visuel)
 
