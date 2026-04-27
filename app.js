@@ -3464,27 +3464,32 @@
       if (btn) btn.classList.toggle('hidden', n === 0);
     });
 
-    // === Locks counter in sidebar nav (live+upcoming, all days, all sports) ===
-    // Kept on every render so the badge stays fresh even when the user is on
-    // another page. Scans all stored days so tomorrow's locks count too.
+    // === Locks counter in sidebar nav ===
+    // v31.7.72 — BUG FIX (audit user "Locks 46 vs 6 LOCKS dans stats strip
+    // contradictoire") : avant on comptait sur TOUS les jours data.js → 46
+    // pour 14 jours × 3 sports. Le stats strip dashboard, lui, comptait
+    // les locks du JOUR (6). Incohérence visuelle. Maintenant on aligne sur
+    // les locks du JOUR seulement (live+upcoming aujourd'hui) pour cohérence
+    // avec le stats strip et la page Locks (renderLocksPage line 13023).
     const locksCountEl = document.getElementById('count-locks');
     if (locksCountEl) {
       const nowMs = Date.now();
+      const todayIsoKey = todayISO();
+      const todayEvents = (data.days && data.days[todayIsoKey]) || [];
       let n = 0, nNew = 0;
-      Object.values(data.days || {}).forEach(arr => (arr || []).forEach(m => {
+      todayEvents.forEach(m => {
         if (winamaxOnly && !(m.winamax && m.winamax.available === true)) return;
         if (m.completed || m.status === 'STATUS_FINAL' || m.status === 'STATUS_FULL_TIME') return;
         if (!m.date) return;
         const ko = new Date(m.date).getTime();
         if (isNaN(ko)) return;
-        // Include live + upcoming (kicked off < 15 min ago still actionable-ish)
         if (ko < nowMs - 15 * 60 * 1000) return;
         const p = predictMatch(m);
         if (p && p.pick && !p.skip && p.isLock) {
           n++;
           if (isNewLock(m.id)) nNew++;
         }
-      }));
+      });
       // Chantier Q — affiche "N" ou "N · K🆕" quand certains locks sont nouveaux.
       // Cas particulier : si tous les locks sont nouveaux (nNew === n) on évite
       // la redondance visuelle "6 · 6🆕" et on affiche "N 🆕".
