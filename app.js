@@ -5276,12 +5276,28 @@
         // Forme courte : 3 derniers W/L/D par équipe via derivedForm
         const formH = derivedForm(home);
         const formA = derivedForm(away);
+        // v31.7.46 — Bug fix audit : derivedForm retourne une STRING ("WWLDW"),
+        // mais fmtForm3 attendait un objet {results:[...]}. Résultat : la
+        // section "FORME (3 derniers)" affichait "indisponible" alors que
+        // les badges V/D/N étaient visibles ailleurs (cohérence interne cassée).
+        // Fix : accepter une string (split chars), array ou objet {results}.
         const fmtForm3 = (f) => {
-          if (!f || !Array.isArray(f.results) || !f.results.length) return null;
-          const last3 = f.results.slice(-3);
+          let arr = null;
+          if (typeof f === 'string' && f.length) {
+            arr = f.split('').map(c => c.toUpperCase());
+          } else if (Array.isArray(f)) {
+            arr = f;
+          } else if (f && Array.isArray(f.results)) {
+            arr = f.results;
+          }
+          if (!arr || !arr.length) return null;
+          const last3 = arr.slice(-3);
           return last3.map(r => {
-            const ch = r === 'W' ? '✓' : r === 'L' ? '✗' : '·';
-            const col = r === 'W' ? '#34d399' : r === 'L' ? '#fca5a5' : 'var(--text-dim2)';
+            const v = (r || '').toUpperCase();
+            // Map T (tie NBA/NHL) → D (draw foot) pour cohérence visuelle
+            const norm = v === 'T' ? 'D' : v;
+            const ch = norm === 'W' ? '✓' : norm === 'L' ? '✗' : '·';
+            const col = norm === 'W' ? '#34d399' : norm === 'L' ? '#fca5a5' : 'var(--text-dim2)';
             return `<span style="display:inline-block;width:18px;height:18px;line-height:18px;text-align:center;border-radius:50%;background:${col}22;color:${col};font-weight:700;font-size:11px;margin-right:2px;">${ch}</span>`;
           }).join('');
         };
