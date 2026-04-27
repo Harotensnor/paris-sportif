@@ -101,7 +101,16 @@ def http_get_json(url: str, timeout: int = 15) -> dict | None:
 
 def load_upcoming_teams() -> list[tuple[str, str, str, str]]:
     """Return list of (team_id, team_name, league_code, sport_path) for
-    every team that has at least one upcoming (non-completed) event."""
+    every team that has at least one upcoming (non-completed) event.
+
+    AUDIT-2026-04-27 (P1) — Bug contamination inter-sports : ESPN reuse
+    les team_id entre sports (ex: tid=20 = Boston Celtics côté NBA + Unión
+    Santa Fe côté arg.1 soccer). L'ancienne dedup `if tid in seen` faisait
+    passer le PREMIER sport rencontré et ignorait les suivants → la stat
+    NBA finissait sur un club argentin. Fix : dedup composite `lc:tid`
+    pour que chaque (league, team) ait son propre slot. league_code seul
+    suffit (chaque lc est mono-sport, pas besoin d'inclure le sport).
+    """
     txt = DATA_JS.read_text(encoding='utf-8')
     m = re.search(r'=\s*(\{.*\})\s*;?\s*$', txt, re.DOTALL)
     if not m:
@@ -119,9 +128,12 @@ def load_upcoming_teams() -> list[tuple[str, str, str, str]]:
                 continue
             for c in ev.get('competitors') or []:
                 tid = str(c.get('id') or '')
-                if not tid or tid in seen:
+                if not tid:
                     continue
-                seen[tid] = (tid, c.get('name') or c.get('abbr') or tid, lc, path)
+                key = f'{lc}:{tid}'
+                if key in seen:
+                    continue
+                seen[key] = (tid, c.get('name') or c.get('abbr') or tid, lc, path)
     return list(seen.values())
 
 
@@ -224,8 +236,14 @@ def main() -> int:
             continue
         last5 = extract_last5(tid, sched, lc)
         agg = aggregate(last5)
-        out[tid] = {
+        # AUDIT-2026-04-27 (P1) — clé composite `lc:tid` au lieu de `tid`
+        # seul, sinon les ID ESPN partagés entre sports (NBA tid=20 vs
+        # arg.1 tid=20) écrasent / contaminent. patch_team_stats.py
+        # reconstruit la même clé côté event.
+        key = f'{lc}:{tid}'
+        out[key] = {
             'name': name,
+            'team_id': tid,
             'league_code': lc,
             'sport': path.split('/')[0],
             **agg,
@@ -236,8 +254,13 @@ def main() -> int:
         time.sleep(0.15)
 
     elapsed = time.time() - t0
+    # AUDIT-2026-04-27 (P1) — schema_version=2 : clé composite `lc:tid`.
+    # Le patcher gère le legacy v1 (clé `tid` seul) en fallback safe le
+    # temps que le cron rebuilde la cache.
     OUT.write_text(json.dumps({
         'generated_at': datetime.now(timezone.utc).isoformat(),
+        'schema_version': 2,
+        'key_format': 'league_code:team_id',
         'teams': out,
     }, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
     print(f'[{datetime.now():%H:%M:%S}] Done in {elapsed:.1f}s · '
