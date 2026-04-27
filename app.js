@@ -41,7 +41,7 @@
   // n'était plus dans aucun sous-menu visible. Le code render reste safe
   // (silent fall-through si quelqu'un set currentPage='simples' via hash
   // legacy) mais aucun lien ne pointe plus vers cette valeur.
-  const VALID_PAGES = ['dashboard','tous','locks','buteurs','combines','top','historique','bilan','backtest','academie','credibilite','alertes','profil','sante','legal','methodologie','montante-jour','montante-weekend','montante-semaine'];
+  const VALID_PAGES = ['dashboard','tous','locks','buteurs','combines','top','historique','bilan','backtest','academie','credibilite','alertes','profil','sante','legal','methodologie','montante-jour','montante-weekend','montante-semaine','compare'];
   // v30 — 'mesparis' retiré : Théo n'enregistre pas ses paris sur le site.
   // v31 — 'legal' + 'methodologie' ajoutés (transparence + dictionnaire des
   // métriques, en réponse à l'audit ChatGPT 2026-04-26).
@@ -12045,6 +12045,22 @@
       }
     }
 
+    // v31.7.58 — Compare page (backlog V2 #4)
+    const isCompare = currentPage === 'compare';
+    let compareWrap = document.getElementById('compare-wrap');
+    if (!compareWrap) {
+      compareWrap = document.createElement('div');
+      compareWrap.id = 'compare-wrap';
+      (document.querySelector('main') || document.body).appendChild(compareWrap);
+    }
+    compareWrap.style.display = isCompare ? '' : 'none';
+    if (isCompare) {
+      renderComparePage(compareWrap);
+      if (window.PRONOSTICS_DATA && window.PRONOSTICS_DATA._lite && typeof window._ensureFullData === 'function') {
+        window._ensureFullData().then(() => { try { renderComparePage(compareWrap); } catch(e){} }).catch(()=>{});
+      }
+    }
+
     // v31.7.6 — Value Finder page retiree (cleanup), plus de wrap a maintenir.
 
     // Bilan page: render dedicated view in #bilan-wrap
@@ -14718,6 +14734,158 @@
   // v30 — renderMesParis + _renderWinamaxImportSetup + _renderWinamaxImported
   // + _showDatePrompt + handler set-model-start-btn : tous retirés.
   // Théo n'enregistre pas ses paris sur le site (ni manuel, ni import).
+
+  // v31.7.58 — Comparateur 2 dates côte à côte (backlog V2 #4).
+  // Permet de regarder les pronos de 2 jours différents en parallèle pour
+  // détecter les patterns ("comment le modèle s'est comporté entre samedi
+  // et dimanche", "quelle est la différence entre hier et aujourd'hui").
+  function renderComparePage(wrap) {
+    const data = window.PRONOSTICS_DATA;
+    if (!data || !data.days) {
+      wrap.innerHTML = '<div style="padding:60px;text-align:center;color:var(--text-dim);">Pas de données.</div>';
+      return;
+    }
+    const todayIso = todayISO();
+    const yesterdayIso = (() => {
+      const d = new Date(todayIso + 'T00:00:00Z');
+      d.setUTCDate(d.getUTCDate() - 1);
+      return d.toISOString().slice(0, 10);
+    })();
+    // State persisté en localStorage
+    let dateA = '', dateB = '';
+    try {
+      dateA = localStorage.getItem('compare_date_a') || yesterdayIso;
+      dateB = localStorage.getItem('compare_date_b') || todayIso;
+    } catch(e) { dateA = yesterdayIso; dateB = todayIso; }
+
+    // Liste des jours dispo dans data.js
+    const availableDays = Object.keys(data.days).sort();
+    if (!availableDays.length) {
+      wrap.innerHTML = '<div style="padding:60px;text-align:center;color:var(--text-dim);">Aucun jour avec données.</div>';
+      return;
+    }
+
+    const optionsHtml = availableDays.map(d => {
+      const dateLabel = (() => {
+        try {
+          const dt = new Date(d + 'T12:00:00Z');
+          return dt.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'short' });
+        } catch(e) { return d; }
+      })();
+      return `<option value="${esc(d)}">${esc(dateLabel)}</option>`;
+    }).join('');
+
+    // Aggregate stats per date
+    const computeStats = (dateIso) => {
+      const evs = data.days[dateIso] || [];
+      let nMatchs = 0, nPicks = 0, nLocks = 0, nLive = 0, nCompleted = 0, totWon = 0, totLost = 0, plFlat = 0;
+      const sportCounts = {};
+      const topPicks = [];
+      evs.forEach(m => {
+        nMatchs++;
+        sportCounts[m.sport] = (sportCounts[m.sport] || 0) + 1;
+        if (m.live || m.status === 'STATUS_IN_PROGRESS') nLive++;
+        if (m.completed) nCompleted++;
+        const pp = predictMatch(m);
+        if (pp && !pp.skip) {
+          nPicks++;
+          if (pp.isLock) nLocks++;
+          // Result tracking si match complété
+          if (m.completed) {
+            const r = evaluateModelPick(m, pp);
+            const odd = pp.odds && (pp.pick.key === '1' ? pp.odds.home : pp.pick.key === '2' ? pp.odds.away : pp.odds.draw);
+            if (r === 'won' && odd) { totWon++; plFlat += (odd - 1); }
+            else if (r === 'lost') { totLost++; plFlat -= 1; }
+          }
+          // Top picks ≥70% conf
+          if ((pp.reliability || pp.pick?.prob) >= 0.70 && !m.completed) {
+            const odd = pp.odds && (pp.pick.key === '1' ? pp.odds.home : pp.pick.key === '2' ? pp.odds.away : pp.odds.draw);
+            topPicks.push({ m, pred: pp, odd, rel: pp.reliability || pp.pick?.prob });
+          }
+        }
+      });
+      topPicks.sort((a, b) => b.rel - a.rel);
+      const wr = (totWon + totLost) > 0 ? (totWon / (totWon + totLost)) * 100 : null;
+      return {
+        nMatchs, nPicks, nLocks, nLive, nCompleted,
+        totWon, totLost, plFlat, wr,
+        sportCounts, topPicks: topPicks.slice(0, 5),
+      };
+    };
+
+    const statsA = computeStats(dateA);
+    const statsB = computeStats(dateB);
+
+    const renderColumn = (label, dateIso, stats) => {
+      const wrLbl = stats.wr != null ? `${stats.wr.toFixed(0)}%` : '—';
+      const plColor = stats.plFlat > 0 ? '#34d399' : stats.plFlat < 0 ? '#f87171' : 'var(--text-dim)';
+      const plLbl = stats.plFlat !== 0 ? `${stats.plFlat >= 0 ? '+' : ''}${stats.plFlat.toFixed(2)}u` : '0u';
+      const sportPills = Object.entries(stats.sportCounts).sort((a,b) => b[1]-a[1]).slice(0, 6).map(([sp, n]) =>
+        `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;background:var(--panel-2);border:1px solid var(--border);font-size:11px;color:var(--text-dim);">${sportIcon(sp)} ${esc(sportLabel(sp))} ${n}</span>`
+      ).join(' ');
+      const topPicksHtml = stats.topPicks.length ? stats.topPicks.map(tp => {
+        const { home, away } = (typeof getSides === 'function') ? getSides(tp.m) : { home: {}, away: {} };
+        const pickLbl = (tp.pred.pick && tp.pred.pick.label) || 'Pick';
+        return `<div style="padding:8px 10px;border-left:2px solid var(--brand);background:rgba(167,139,250,.04);border-radius:0 6px 6px 0;margin-bottom:4px;font-size:12px;">
+          <div style="font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(home?.name||'?')} vs ${esc(away?.name||'?')}</div>
+          <div style="color:var(--text-dim);font-size:11px;margin-top:2px;">${esc(pickLbl)} · <b style="color:var(--brand);">${Math.round(tp.rel * 100)}%</b>${tp.odd ? ` · @${tp.odd.toFixed(2)}` : ''}</div>
+        </div>`;
+      }).join('') : '<div style="font-size:12px;color:var(--text-dim2);padding:8px 0;">Aucun top pick ce jour.</div>';
+
+      return `<div class="compare-col" style="flex:1;min-width:0;">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:12px;">
+          <div style="font-size:11px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">${esc(label)}</div>
+          <select class="compare-date-select" data-col="${esc(label)}" aria-label="Date ${esc(label)}" style="background:var(--panel);border:1px solid var(--border);color:var(--text);padding:4px 8px;border-radius:6px;font-size:12px;">
+            ${optionsHtml.replace(`value="${dateIso}"`, `value="${dateIso}" selected`)}
+          </select>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
+          <div class="kpi-tile"><div class="kpi-tile__label">Pronos</div><div class="kpi-tile__value">${stats.nPicks}</div><div class="kpi-tile__sub">${stats.nLocks} locks</div></div>
+          <div class="kpi-tile"><div class="kpi-tile__label">Matchs</div><div class="kpi-tile__value">${stats.nMatchs}</div><div class="kpi-tile__sub">${stats.nLive ? stats.nLive + ' en direct' : 'aucun live'}</div></div>
+          <div class="kpi-tile"><div class="kpi-tile__label">Réglés</div><div class="kpi-tile__value">${stats.nCompleted}</div><div class="kpi-tile__sub">${stats.totWon}V / ${stats.totLost}D</div></div>
+          <div class="kpi-tile"><div class="kpi-tile__label">P&L flat</div><div class="kpi-tile__value" style="color:${plColor};">${plLbl}</div><div class="kpi-tile__sub">WR ${wrLbl}</div></div>
+        </div>
+        <div style="margin-bottom:12px;">
+          <div style="font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:6px;">Sports</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">${sportPills || '<span style="font-size:12px;color:var(--text-dim2);">Aucun</span>'}</div>
+        </div>
+        <div>
+          <div style="font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:6px;">Top picks</div>
+          ${topPicksHtml}
+        </div>
+      </div>`;
+    };
+
+    wrap.innerHTML = `
+      <div style="max-width:1100px;margin:0 auto;padding:0 20px;">
+        <div style="margin-bottom:24px;">
+          <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:4px;">🔁 Comparateur</div>
+          <h1 style="margin:0 0 6px;font-size:30px;font-weight:800;letter-spacing:-1.0px;color:var(--text);">Comparer 2 jours côte à côte</h1>
+          <p style="font-size:13.5px;color:var(--text-dim);margin:0;max-width:680px;">Sélectionne 2 dates pour comparer le volume, les locks, et les top picks. Utile pour voir comment l'agenda du jour change la couleur des pronos disponibles.</p>
+        </div>
+        <div style="display:flex;gap:18px;align-items:flex-start;">
+          ${renderColumn('JOUR A', dateA, statsA)}
+          <div style="width:1px;background:var(--border);align-self:stretch;flex:none;margin:24px 0;"></div>
+          ${renderColumn('JOUR B', dateB, statsB)}
+        </div>
+        <div style="margin-top:24px;padding:14px 16px;background:rgba(167,139,250,.04);border:1px dashed rgba(167,139,250,.20);border-radius:8px;font-size:12.5px;color:var(--text-dim);">
+          💡 Astuce : compare un weekend chargé vs un mercredi creux pour voir la couverture du modèle. Les locks ne tombent que sur les matchs avec assez de signaux.
+        </div>
+      </div>
+    `;
+
+    // Wire selects → re-render avec nouvelles dates
+    wrap.querySelectorAll('.compare-date-select').forEach(sel => {
+      sel.addEventListener('change', () => {
+        const col = sel.dataset.col;
+        try {
+          if (col === 'JOUR A') localStorage.setItem('compare_date_a', sel.value);
+          else if (col === 'JOUR B') localStorage.setItem('compare_date_b', sel.value);
+        } catch(e){}
+        renderComparePage(wrap);
+      });
+    });
+  }
 
     // Aggregate bilan view: overall ROI, per-sport ROI, recent results, top completed picks
   function renderBilanPage(wrap) {
