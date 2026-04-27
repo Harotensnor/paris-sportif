@@ -508,6 +508,28 @@
   // {fraction, stake10, stake100} a été supprimée — elle entrait en conflit
   // avec celle du Chantier BB (ligne 2320) qui renvoie un nombre. Les seuls
   // call sites (hero top-picks, détail match) attendent bien un nombre.
+
+  // AUDIT-2026-04-27 (P2) — `winamax.available === true` n'est PAS un
+  // synonyme de "match exact bookable sur Winamax". Le patcher a un
+  // fallback qui set `available=true` pour les events où on a juste
+  // détecté que la ligue/sport est dispo sur Winamax (mapping statique
+  // par tournament). Sur la data live actuelle : 268/601 events (45%)
+  // sont "tournament-only" — pas de match_id, pas de markets exacts.
+  //
+  // Pour les recommandations actionnables (top picks, locks, dashboard),
+  // exiger `match_id + markets['1n2']` qui garantissent une cote bookable
+  // chez Winamax. Sinon le user clique "Voir cote" et atterrit sur la
+  // page tournoi sans son match → promesse "Winamax-only" cassée.
+  function isWinamaxBookable(match) {
+    const w = match && match.winamax;
+    if (!w || w.available !== true) return false;
+    if (!w.match_id) return false;
+    const mk = w.markets;
+    if (!mk || !mk['1n2']) return false;
+    const m = mk['1n2'];
+    return Number(m.home) > 1 || Number(m.away) > 1;
+  }
+
   // ======= Competitor helpers =======
   function getSides(match) {
     const comps = match.competitors || [];
@@ -3999,7 +4021,9 @@
     const pushIfFresh = (m) => {
       if (!m || !m.id || seen.has(m.id)) return;
       if (m.completed || m.status === 'STATUS_IN_PROGRESS') return;
-      if (winamaxOnly && !(m.winamax && m.winamax.available === true)) return;
+      // AUDIT-2026-04-27 (P2) — Top picks doivent être bookable Winamax
+      // (match_id + markets), pas seulement "tournament-only available".
+      if (winamaxOnly && !isWinamaxBookable(m)) return;
       if (!m.date) return;
       const d = new Date(m.date);
       if (isNaN(d)) return;
@@ -13201,11 +13225,20 @@
       allMatches.push(m);
     }));
 
-    // Keep only Winamax-available matches with a lock pick (fiab ≥ 0.70).
+    // Keep only Winamax-bookable matches with a lock pick (fiab ≥ 0.70).
     // predictMatch handles skip / lowConf / odds fallback already.
+    // AUDIT-2026-04-27 (P2) — exiger match_id + markets, pas juste
+    // "available" (qui peut être tournament-only sans cote bookable).
+    // Filter exception: matchs SETTLED (completed) restent éligibles
+    // même si la cote Winamax exacte a été perdue après match.
     const lockMatches = [];
     for (const m of allMatches) {
-      if (winamaxOnly && !(m.winamax && m.winamax.available === true)) continue;
+      const isSettled = m.completed || m.status === 'STATUS_FINAL'
+                     || m.status === 'STATUS_FULL_TIME';
+      if (winamaxOnly && !isSettled && !isWinamaxBookable(m)) continue;
+      // Garde l'ancien filtre pour les settled (cote Winamax effacée
+      // post-match : on tolère juste available=true pour le bilan).
+      if (winamaxOnly && isSettled && !(m.winamax && m.winamax.available === true)) continue;
       const pred = predictMatch(m);
       if (!pred || !pred.pick || pred.skip || !pred.isLock) continue;
       lockMatches.push({ m, pred });
@@ -13450,9 +13483,12 @@
       days.push(d.toISOString().slice(0, 10));
     }
 
-    // Pour chaque jour, collecter les picks Winamax avec pred valide
+    // Pour chaque jour, collecter les picks Winamax bookable avec pred valide.
+    // AUDIT-2026-04-27 (P2) — `winamax.available` peut être tournament-only ;
+    // on exige `isWinamaxBookable` (match_id + markets['1n2']) pour ne pas
+    // afficher des picks que l'user ne pourra pas placer chez Winamax.
     const dayBuckets = days.map(iso => {
-      const evs = (data.days[iso] || []).filter(m => m.winamax && m.winamax.available === true);
+      const evs = (data.days[iso] || []).filter(m => isWinamaxBookable(m));
       const picks = [];
       evs.forEach(m => {
         if (m.completed) return;
