@@ -15988,6 +15988,28 @@
                 <div style="font-size:24px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;">${q.total_events || 0}</div>
                 <div style="font-size:11px;color:var(--text-dim);margin-top:4px;line-height:1.4;">${q.upcoming_events || 0} à venir · ${q.winamax_tournament_only || 0} tournoi-only</div>
               </div>
+              ${(() => {
+                // AUDIT-2026-04-27 (Sprint 35 #13) — Drift detector visible.
+                // Lit quality_checks.model_drift_ks (Sprint 7 #3 +
+                // Sprint 32 #38 alert seuil). KS > 0.15 = warning, > 0.25
+                // = critique.
+                const ks = q.model_drift_ks;
+                if (ks == null) return '';
+                const ksNum = parseFloat(ks);
+                if (!isFinite(ksNum)) return '';
+                const driftCol = ksNum < 0.10 ? '#34d399' : ksNum < 0.15 ? '#eab308' : '#f87171';
+                const driftLbl = ksNum < 0.10 ? 'stable'
+                               : ksNum < 0.15 ? 'léger'
+                               : 'DRIFT détecté';
+                const nRecent = q.model_drift_n_recent || 0;
+                const nHist = q.model_drift_n_historical || 0;
+                return `<div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;border-left:4px solid ${driftCol};">
+                  <div class="lbl-mini">🌀 Drift modèle (KS)</div>
+                  <div style="font-size:24px;font-weight:800;color:${driftCol};font-variant-numeric:tabular-nums;">${ksNum.toFixed(3)}</div>
+                  <div style="font-size:11px;color:${driftCol};margin-top:4px;font-weight:600;">${driftLbl}</div>
+                  <div style="font-size:10.5px;color:var(--text-dim);margin-top:3px;line-height:1.4;">recent=${nRecent} vs hist=${nHist}</div>
+                </div>`;
+              })()}
             </div>
           </div>`;
         })()}
