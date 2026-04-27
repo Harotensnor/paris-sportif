@@ -12261,6 +12261,126 @@
   // Build an inline SVG line chart of the cumulative P&L curve.
   // Takes rows: [{ date: 'YYYY-MM-DD', delta: +0.85 | -1.00 }]. Assumes flat 1u
   // bets, so the Y axis is units (one lost bet = -1). Groups by day, accumulates.
+  // v31.7.54 — Profit calendar GitHub-style.
+  // Heatmap 365 jours (53 cols × 7 rows) avec couleur par P&L quotidien :
+  //   gris : pas de pari
+  //   vert clair → vert foncé : P&L positif (intensité = montant)
+  //   rouge clair → rouge foncé : P&L négatif (intensité = montant)
+  // Cliquable : ouvre tooltip simple avec date + détail bets du jour.
+  function renderProfitCalendar(rows, opts = {}) {
+    if (!rows || !rows.length) return '';
+    // Aggrégation par jour
+    const byDay = new Map();
+    rows.forEach(r => {
+      const d = isoDate(r.m?.date || r.date);
+      if (!d) return;
+      const pl = r.res === 'won' ? (r.odd - 1) : r.res === 'lost' ? -1 : 0;
+      const cur = byDay.get(d) || { pl: 0, n: 0 };
+      cur.pl += pl;
+      cur.n += 1;
+      byDay.set(d, cur);
+    });
+    if (!byDay.size) return '';
+
+    // Range : du plus ancien jour ↑ aujourd'hui
+    const sortedDays = [...byDay.keys()].sort();
+    const startDate = new Date(sortedDays[0] + 'T00:00:00Z');
+    const endDate = new Date();
+    endDate.setUTCHours(0, 0, 0, 0);
+    // Snap startDate au lundi précédent (week starts on Monday)
+    const startDow = startDate.getUTCDay();
+    const offsetToMonday = (startDow + 6) % 7;
+    startDate.setUTCDate(startDate.getUTCDate() - offsetToMonday);
+
+    const totalDays = Math.floor((endDate - startDate) / 86400000) + 1;
+    const totalWeeks = Math.ceil(totalDays / 7);
+
+    // Color scale based on max abs PL
+    const maxAbsPl = Math.max(...[...byDay.values()].map(v => Math.abs(v.pl)), 1);
+    const colorFor = (pl) => {
+      if (pl === 0) return 'rgba(255,255,255,.04)';
+      const intensity = Math.min(1, Math.abs(pl) / maxAbsPl);
+      // 4 buckets discrets pour lisibilité (à la GitHub)
+      const bucket = intensity <= 0.25 ? 0.25 : intensity <= 0.5 ? 0.5 : intensity <= 0.75 ? 0.75 : 1.0;
+      return pl > 0
+        ? `rgba(45,212,168,${0.18 + bucket * 0.5})`
+        : `rgba(248,113,113,${0.18 + bucket * 0.5})`;
+    };
+
+    const cellSize = 11, cellGap = 2;
+    const labelW = 22;
+    const monthLabelH = 14;
+    const width = labelW + totalWeeks * (cellSize + cellGap) + 8;
+    const height = monthLabelH + 7 * (cellSize + cellGap) + 4;
+
+    const cells = [];
+    const monthLabels = [];
+    const monthsShown = new Set();
+    const cur = new Date(startDate);
+    let weekIdx = 0;
+    let dayInWeek = 0;
+    while (cur <= endDate) {
+      const iso = cur.toISOString().slice(0, 10);
+      const data = byDay.get(iso) || { pl: 0, n: 0 };
+      const x = labelW + weekIdx * (cellSize + cellGap);
+      const y = monthLabelH + dayInWeek * (cellSize + cellGap);
+      const fill = colorFor(data.pl);
+      const tooltip = data.n > 0
+        ? `${iso} : ${data.pl >= 0 ? '+' : ''}${data.pl.toFixed(2)}u (${data.n} pari${data.n > 1 ? 's' : ''})`
+        : `${iso} : aucun pari`;
+      cells.push(`<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" rx="2" fill="${fill}"><title>${tooltip}</title></rect>`);
+
+      // Month label en haut de chaque 1ère semaine du mois
+      if (cur.getUTCDate() <= 7 && dayInWeek === 0) {
+        const monthKey = `${cur.getUTCFullYear()}-${cur.getUTCMonth()}`;
+        if (!monthsShown.has(monthKey)) {
+          monthsShown.add(monthKey);
+          const monthName = ['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Août','Sep','Oct','Nov','Déc'][cur.getUTCMonth()];
+          monthLabels.push(`<text x="${x}" y="${monthLabelH - 3}" fill="var(--text-dim2)" font-size="9" font-family="sans-serif">${monthName}</text>`);
+        }
+      }
+
+      // Advance day
+      cur.setUTCDate(cur.getUTCDate() + 1);
+      dayInWeek = (dayInWeek + 1) % 7;
+      if (dayInWeek === 0) weekIdx++;
+    }
+
+    // Day-of-week labels (Lun, Mer, Ven)
+    const dowLabels = [
+      `<text x="2" y="${monthLabelH + cellSize}" fill="var(--text-dim2)" font-size="9" font-family="sans-serif">Lun</text>`,
+      `<text x="2" y="${monthLabelH + (cellSize + cellGap) * 2 + cellSize}" fill="var(--text-dim2)" font-size="9" font-family="sans-serif">Mer</text>`,
+      `<text x="2" y="${monthLabelH + (cellSize + cellGap) * 4 + cellSize}" fill="var(--text-dim2)" font-size="9" font-family="sans-serif">Ven</text>`,
+    ];
+
+    // Légende sous le calendrier
+    const legendBuckets = [-maxAbsPl, -maxAbsPl * 0.5, 0, maxAbsPl * 0.5, maxAbsPl];
+    const legendCells = legendBuckets.map((v, i) => {
+      const fill = colorFor(v);
+      const x = i * 16;
+      return `<rect x="${x}" y="0" width="12" height="12" rx="2" fill="${fill}"/>`;
+    }).join('');
+
+    return `
+      <div class="profit-calendar" style="background:var(--surface,#11131a);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:24px;">
+        <div style="font-size:13px;color:var(--text-dim);margin-bottom:8px;font-weight:600;">📅 Calendrier des profits — ${byDay.size} jours actifs</div>
+        <div style="overflow-x:auto;">
+          <svg viewBox="0 0 ${width} ${height}" style="display:block;min-width:${width}px;" xmlns="http://www.w3.org/2000/svg">
+            ${monthLabels.join('')}
+            ${dowLabels.join('')}
+            ${cells.join('')}
+          </svg>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:8px;font-size:10.5px;color:var(--text-dim2);">
+          <span>Moins</span>
+          <svg width="80" height="14" xmlns="http://www.w3.org/2000/svg">${legendCells}</svg>
+          <span>Plus</span>
+          <span style="margin-left:auto;">📅 1 case = 1 jour, vert = gain, rouge = perte</span>
+        </div>
+      </div>
+    `;
+  }
+
   function renderRoiChart(rows, { width = 560, height = 160, title, unit = 'u' } = {}) {
     if (!rows || !rows.length) return '';
     // Group by day
@@ -14722,6 +14842,9 @@
         || `<div class="bilan-empty">Pas encore assez de paris pour tracer une courbe.</div>`;
     }
 
+    // v31.7.54 — Profit calendar GitHub-style (heatmap 365j P&L quotidien)
+    const profitCalendarHtml = renderProfitCalendar(rows);
+
     // ========= PORTEFEUILLE SIMULÉ — Chantier JJ (backtest what-if) =========
     // Chantier EE (2026-04-21) a introduit le choix du stake mode.
     // Chantier JJ (2026-04-22) ajoute les paramètres de démarrage :
@@ -15714,6 +15837,7 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
           <div class="meta">${model.bets} paris évalués</div>
         </div>
         ${modelChartHtml}
+        ${profitCalendarHtml}
       </div>
 
       <!-- PORTEFEUILLE SIMULÉ 10€ -->
