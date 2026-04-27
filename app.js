@@ -11076,6 +11076,35 @@
           ${santeHtml}
 
           ${(() => {
+            // v31.7.59 — Discord webhook (backlog V2 #5).
+            // Permet à l'user de recevoir les top picks dans son Discord
+            // perso. Webhook URL stocké en localStorage uniquement
+            // (privacy-first, jamais envoyé serveur). Boutons :
+            // - Tester : envoie un message "✓ paris-sportif connected"
+            // - Envoyer top picks du jour : envoie les ≥80% conf
+            // L'user reste en contrôle (pas d'auto-envoi).
+            const wh = '';
+            try { /* lecture init pour pré-remplir */ } catch(e){}
+            return `
+            <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;margin-top:14px;">
+              <h3 style="margin:0 0 6px;font-size:16px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;">💬 Notifications Discord (optionnel)</h3>
+              <p style="margin:0 0 12px;font-size:12.5px;color:var(--text-dim);line-height:1.5;">
+                Crée un webhook dans ton Discord (Paramètres serveur → Intégrations → Webhooks → Nouveau) et colle l'URL ici. Les top picks ≥80% confiance peuvent être envoyés à la demande. <strong>Aucun serveur intermédiaire</strong> : l'envoi se fait directement de ton navigateur vers Discord.
+              </p>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+                <input type="url" id="discord-webhook-url" placeholder="https://discord.com/api/webhooks/..." style="flex:1;min-width:200px;padding:8px 12px;background:var(--panel-2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:12.5px;font-family:monospace;" autocomplete="off" spellcheck="false">
+                <button type="button" id="discord-save-btn" style="padding:8px 14px;background:var(--brand);color:#08080a;border:none;border-radius:6px;font-weight:700;font-size:12px;cursor:pointer;">Enregistrer</button>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
+                <button type="button" id="discord-test-btn" style="padding:7px 12px;background:var(--panel-2);color:var(--text);border:1px solid var(--border);border-radius:6px;font-size:12px;cursor:pointer;">🔌 Tester la connexion</button>
+                <button type="button" id="discord-send-btn" style="padding:7px 12px;background:var(--accent);color:#08080a;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">📤 Envoyer top picks du jour</button>
+                <button type="button" id="discord-clear-btn" style="padding:7px 12px;background:transparent;color:var(--text-dim);border:1px solid var(--border);border-radius:6px;font-size:12px;cursor:pointer;">🗑 Oublier</button>
+              </div>
+              <div id="discord-status" style="margin-top:10px;font-size:12px;color:var(--text-dim);" aria-live="polite"></div>
+            </div>`;
+          })()}
+
+          ${(() => {
             // v31.7.6 — Web Vitals dashboard local. Lit les data du tracker
             // installé en pre-app.js (paris_sportif_web_vitals_v1).
             // Affiche : médianes des 20 dernieres sessions LCP/FCP/CLS/INP/TTFB.
@@ -11234,6 +11263,122 @@
         renderProfilPage(wrap);
       });
     });
+
+    // v31.7.59 — Discord webhook handlers (backlog V2 #5).
+    // Webhook URL stocké en localStorage uniquement (privacy).
+    const _discordInput = wrap.querySelector('#discord-webhook-url');
+    const _discordStatus = wrap.querySelector('#discord-status');
+    const _discordSetStatus = (msg, kind) => {
+      if (!_discordStatus) return;
+      const color = kind === 'ok' ? '#34d399' : kind === 'err' ? '#f87171' : 'var(--text-dim)';
+      _discordStatus.style.color = color;
+      _discordStatus.textContent = msg;
+    };
+    if (_discordInput) {
+      try { _discordInput.value = localStorage.getItem('discord_webhook_url') || ''; } catch(e){}
+      const _isValidWebhook = (u) => /^https:\/\/(?:discord(?:app)?\.com|ptb\.discord\.com|canary\.discord\.com)\/api\/webhooks\/\d+\/[\w-]+$/.test(u || '');
+      const _saveBtn = wrap.querySelector('#discord-save-btn');
+      if (_saveBtn) _saveBtn.addEventListener('click', () => {
+        const v = (_discordInput.value || '').trim();
+        if (!v) {
+          _discordSetStatus('URL vide.', 'err'); return;
+        }
+        if (!_isValidWebhook(v)) {
+          _discordSetStatus('⚠️ URL invalide. Format attendu : https://discord.com/api/webhooks/.../...', 'err'); return;
+        }
+        try { localStorage.setItem('discord_webhook_url', v); } catch(e){}
+        _discordSetStatus('✓ URL enregistrée localement.', 'ok');
+      });
+      const _testBtn = wrap.querySelector('#discord-test-btn');
+      if (_testBtn) _testBtn.addEventListener('click', async () => {
+        const url = (_discordInput.value || '').trim() || (function(){ try { return localStorage.getItem('discord_webhook_url') || ''; } catch(e){ return ''; }})();
+        if (!_isValidWebhook(url)) {
+          _discordSetStatus('⚠️ Enregistre d\'abord une URL valide.', 'err'); return;
+        }
+        _discordSetStatus('… envoi du test', 'info');
+        try {
+          const r = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              username: 'paris-sportif',
+              content: '✅ **Connexion testée avec succès** · paris-sportif est connecté à ton Discord. Tu peux maintenant utiliser le bouton "Envoyer top picks" pour recevoir les pronos ≥80% confiance.',
+            }),
+          });
+          if (r.ok) _discordSetStatus('✅ Test réussi — vérifie ton Discord.', 'ok');
+          else _discordSetStatus(`❌ Discord a répondu HTTP ${r.status}`, 'err');
+        } catch(e) {
+          _discordSetStatus(`❌ Échec : ${e.message}`, 'err');
+        }
+      });
+      const _sendBtn = wrap.querySelector('#discord-send-btn');
+      if (_sendBtn) _sendBtn.addEventListener('click', async () => {
+        const url = (_discordInput.value || '').trim() || (function(){ try { return localStorage.getItem('discord_webhook_url') || ''; } catch(e){ return ''; }})();
+        if (!_isValidWebhook(url)) {
+          _discordSetStatus('⚠️ Enregistre d\'abord une URL valide.', 'err'); return;
+        }
+        // Récupère les top picks ≥80% conf du jour
+        const data = window.PRONOSTICS_DATA;
+        const evs = (data && data.days && data.days[todayISO()]) || [];
+        const topPicks = [];
+        evs.forEach(m => {
+          if (m.completed || m.live) return;
+          const pp = predictMatch(m);
+          if (!pp || pp.skip) return;
+          const rel = pp.reliability ?? pp.pick?.prob ?? 0;
+          if (rel < 0.80) return;
+          const odd = pp.odds && (pp.pick.key === '1' ? pp.odds.home : pp.pick.key === '2' ? pp.odds.away : pp.odds.draw);
+          const sides = (typeof getSides === 'function') ? getSides(m) : { home: {}, away: {} };
+          topPicks.push({
+            title: `${sides.home?.name || '?'} vs ${sides.away?.name || '?'}`,
+            league: m.league_name || '',
+            pick: (pp.pick && pp.pick.label) || '?',
+            rel,
+            odd,
+            kickoff: m.date,
+            sport: m.sport,
+          });
+        });
+        if (!topPicks.length) {
+          _discordSetStatus('Aucun pick ≥80% conf à envoyer aujourd\'hui.', 'info');
+          return;
+        }
+        _discordSetStatus(`… envoi de ${topPicks.length} pick${topPicks.length>1?'s':''}`, 'info');
+        const sportEmoji = { football:'⚽', tennis:'🎾', basketball:'🏀', hockey:'🏒', baseball:'⚾' };
+        const embeds = topPicks.slice(0, 10).map(tp => ({
+          title: `${sportEmoji[tp.sport] || '🎯'} ${tp.title}`,
+          description: `**${tp.pick}**${tp.odd ? ` @ ${tp.odd.toFixed(2)}` : ''}\n_${tp.league}_`,
+          color: tp.rel >= 0.85 ? 0x2dd4a8 : 0xb6a0ff,
+          fields: [
+            { name: 'Confiance', value: `${Math.round(tp.rel * 100)}%`, inline: true },
+            { name: 'Coup d\'envoi', value: tp.kickoff ? new Date(tp.kickoff).toLocaleString('fr-FR') : '—', inline: true },
+          ],
+          footer: { text: 'paris-sportif · Site éducatif · 18+' },
+        }));
+        try {
+          const r = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              username: 'paris-sportif',
+              content: `📊 **${topPicks.length} top pick${topPicks.length>1?'s':''} du jour** (≥80% conf)`,
+              embeds,
+            }),
+          });
+          if (r.ok) _discordSetStatus(`✅ ${topPicks.length} picks envoyés à Discord.`, 'ok');
+          else _discordSetStatus(`❌ Discord a répondu HTTP ${r.status}`, 'err');
+        } catch(e) {
+          _discordSetStatus(`❌ Échec : ${e.message}`, 'err');
+        }
+      });
+      const _clearBtn = wrap.querySelector('#discord-clear-btn');
+      if (_clearBtn) _clearBtn.addEventListener('click', () => {
+        try { localStorage.removeItem('discord_webhook_url'); } catch(e){}
+        if (_discordInput) _discordInput.value = '';
+        _discordSetStatus('✓ Webhook oublié (localStorage cleared).', 'info');
+      });
+    }
+
     // v30 — Bouton Export CSV "Mes paris" retiré (la page elle-même est partie).
     const exportJson = wrap.querySelector('#export-json-prefs');
     if (exportJson) exportJson.addEventListener('click', () => {
