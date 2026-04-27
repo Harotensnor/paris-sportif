@@ -243,7 +243,15 @@ def render_worst_picks(worst_picks: list) -> str:
         pick_lbl = '1 (Domicile)' if pick == '1' else '2 (Extérieur)' if pick == '2' else 'X (Nul)'
         prob = p.get('pick_prob') or 0
         cote = p.get('cote') or 0
-        tier_lbl = {'lock': '🔒 Lock', 'standard': '📋 Standard'}.get(p.get('tier'), '—')
+        # v31.7.52 — Audit reported 6.4 : la colonne TIER affichait "—"
+        # systématiquement parce que best_picks contient surtout des
+        # 'skip'/'lowconf' (outsiders qui gagnent). Mapping complet maintenant.
+        tier_lbl = {
+            'lock': '🔒 Lock',
+            'standard': '📋 Standard',
+            'lowconf': '⚠️ Low conf.',
+            'skip': '🤔 Skip',
+        }.get(p.get('tier'), '—')
         rows.append(f'''<tr>
       <td><span style="font-size:14px;">{em}</span> <b>{escape(name)}</b></td>
       <td style="text-align:right;font-size:11px;color:#a3a3aa;">{date}</td>
@@ -298,7 +306,15 @@ def render_best_picks(best_picks: list) -> str:
         prob = p.get('pick_prob') or 0
         cote = p.get('cote') or 0
         pnl = p.get('pnl') or 0
-        tier_lbl = {'lock': '🔒 Lock', 'standard': '📋 Standard'}.get(p.get('tier'), '—')
+        # v31.7.52 — Audit reported 6.4 : la colonne TIER affichait "—"
+        # systématiquement parce que best_picks contient surtout des
+        # 'skip'/'lowconf' (outsiders qui gagnent). Mapping complet maintenant.
+        tier_lbl = {
+            'lock': '🔒 Lock',
+            'standard': '📋 Standard',
+            'lowconf': '⚠️ Low conf.',
+            'skip': '🤔 Skip',
+        }.get(p.get('tier'), '—')
         rows.append(f'''<tr>
       <td><span style="font-size:14px;">{em}</span> <b>{escape(name)}</b></td>
       <td style="text-align:right;font-size:11px;color:#a3a3aa;">{date}</td>
