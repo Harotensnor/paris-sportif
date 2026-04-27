@@ -5586,8 +5586,9 @@
               // futures du modèle (logique apprenante).
               const pm = (typeof buildLossPostMortem === 'function') ? buildLossPostMortem(match, pred) : null;
               if (!pm) return '';
-              return `<div style="margin-top:14px;padding:14px 16px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.20);border-left:3px solid var(--danger);border-radius:0 8px 8px 0;font-size:13.5px;line-height:1.6;color:var(--text);">
-                <div style="font-size:11px;color:var(--danger);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:8px;">🔍 Post-mortem — pourquoi le modèle s'est trompé</div>
+              // v31.7.53 — Migration inline → .info-banner--danger (chantier 8 V1)
+              return `<div class="info-banner info-banner--danger" style="margin-top:14px;font-size:13.5px;color:var(--text);">
+                <div class="info-banner__title text-danger">🔍 Post-mortem — pourquoi le modèle s'est trompé</div>
                 ${pm.headline ? `<div style="font-weight:600;margin-bottom:8px;">${esc(pm.headline)}</div>` : ''}
                 ${pm.factors.length ? `
                   <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px;">
@@ -8601,11 +8602,12 @@
         })()}
 
         <!-- v28.7 — Warning data obsolète : PRIORITAIRE sur tout le reste -->
+        <!-- v31.7.53 — Migration inline → .info-banner--danger (chantier 8 V1) -->
         ${_dataIsStale ? `
-        <div style="padding:24px;margin:24px 0;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.3);border-left:3px solid var(--danger);border-radius:0 10px 10px 0;">
-          <div style="font-size:11px;color:var(--danger);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">⚠ Recommandations en pause</div>
+        <div class="info-banner info-banner--danger" style="padding:24px;margin:24px 0;">
+          <div class="info-banner__title text-danger">⚠ Recommandations en pause</div>
           <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px;">Données obsolètes — je ne te donne pas de picks</div>
-          <div style="font-size:13px;color:var(--text-dim);line-height:1.5;">La dernière mise à jour date de <strong>${_dataAgeMin < 120 ? _dataAgeMin+' min' : Math.floor(_dataAgeMin/60)+'h'}</strong>. Les matchs affichés pourraient être faux ou déjà joués. <strong>Clique sur "🔄 forcer refresh"</strong> dans le banner rouge en haut pour recharger les vraies données du jour.</div>
+          <div style="font-size:13px;line-height:1.5;">La dernière mise à jour date de <strong>${_dataAgeMin < 120 ? _dataAgeMin+' min' : Math.floor(_dataAgeMin/60)+'h'}</strong>. Les matchs affichés pourraient être faux ou déjà joués. <strong>Clique sur "🔄 forcer refresh"</strong> dans le banner rouge en haut pour recharger les vraies données du jour.</div>
         </div>` : ''}
 
         <!-- v28.6 — "À PARIER AUJOURD'HUI" : reco perso pour Théo avec sa bankroll -->
