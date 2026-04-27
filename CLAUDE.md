@@ -6,6 +6,47 @@ des pronostics simples/combinés/montantes séquentielles, et une vue bilan.
 Déployé sur GitHub Pages. Client = navigateur ; données = fichier `data.js`
 régénéré en continu.
 
+## Architecture v31.7.9x (mise à jour 2026-04-27 — 6 sprints post-audit)
+
+**6 sprints post-audit Codex 2026-04-27** (30 points exécutés). Voir
+v31.7.93 → v31.7.98 dans le commit log.
+
+- **Sprint 1 — Data integrity (v31.7.93)** : snapshot_odds fallback Winamax
+  markets, isWinamaxBookable étendu Buteurs/Combinés/Montantes, garde-fou
+  patch_winamax_markets cotes absurdes, CI bloquante quality_checks,
+  tests fixtures pollution data.
+- **Sprint 2 — Modal détail rework (v31.7.94)** : vrais tabs Synthèse/
+  Signaux/Cotes/H2H/Stats, source cote en évidence, print stylesheet,
+  deep linking #match/<id>/<tab>.
+- **Sprint 3 — UX mobile + PWA (v31.7.95)** : refresh-indicator au-dessus
+  bottom-nav, drawer/bottom-nav exclusif, PWA install signal d'engagement,
+  offline UX banner, skeleton loaders.
+- **Sprint 4 — Tests & monitoring (v31.7.96)** : backtest auto sur PR
+  (regression catch -2pt ROI), visual regression étendu 5 pages, Discord
+  webhook health warnings, helper logs structurés JSON, page Santé
+  quality_checks visibles.
+- **Sprint 5 — Modèle & analytics (v31.7.97)** : Wilson + Bootstrap CI sur
+  ROI/WR, baselines always-fav/dog/draw/random, page Ligues drill-down
+  (#league/eng.1), Brier per-sport breakdown.
+- **Sprint 6 — Dette technique partielle (v31.7.98)** : bundle size budget
+  CI (app.js < 1100KB, app.css < 200KB, etc.).
+
+### Backlog dette technique restante
+
+Ce qui reste non traité du Sprint 6 (à attaquer un sprint dédié) :
+- Découper app.js (~1MB) en modules ESM. Trop gros refactor pour un
+  sprint single-shot, garde la convention "no build step" mais nécessite
+  d'identifier des frontières propres (core/pages/model/utils).
+- Migration inline → utility V3 : ~250 occurrences `style="color:var(--text)"`
+  encore inline. Patterns top : `color:var(--text)` (×39), `color:var(--text-dim)` (×27),
+  `text-align:right` (×17). Un sweep ferait gagner ~10KB sur app.js.
+- Audit `!important` CSS : 107 occurrences, dont 27 légitimes en
+  media-query (override inline styles), 11 hides légitimes, 7 theme
+  overrides, 60 "autres" à reviewer.
+- Lazy-load pages secondaires : Académie / Méthodologie / Légal sont
+  pré-cachées par le SW alors qu'elles sont rarement visitées. Pourrait
+  passer en lazy-fetch on demand.
+
 ## Architecture v31.7.8x (mise à jour 2026-04-27 — pack audit Codex)
 
 **Pack audit Codex 2026-04-27** (`AUDIT_CLAUDE_PACK_2026-04-27/`) :
