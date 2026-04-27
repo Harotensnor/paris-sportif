@@ -30,6 +30,21 @@ régénéré en continu.
   Ada", "Stockholm → Aiken", "Glasgow → Rangersdorf". Ajoute
   `weather.source` pour traçabilité (event_city / event_venue /
   static_team).
+- **v31.7.86** VOID explicite des matchs RETIRED/WALKOVER/POSTPONED
+  dans `evaluateModelPick` (frontend) et `resolve_outcome` (backend
+  `backtest_v2.py`). Avant : ESPN met `winner=true` sur RETIRED/
+  WALKOVER → le backtest les comptait comme wins/losses normaux,
+  alors que les bookmakers Winamax les VOID (mise refundée).
+- **v31.7.87** Helper `isWinamaxBookable(m)` qui exige `match_id +
+  markets['1n2']`, pas juste `available === true`. Appliqué à
+  Top picks, Locks, Calendrier 7j (paths actionnables). 268/601
+  events de la data live étaient "tournament-only" sans cote
+  bookable — l'user pouvait voir des picks non placeable chez
+  Winamax. Page Tous reste plus permissive (exploration).
+- **v31.7.88** Sync `location.hash` sur nav SPA via `replaceState`
+  (avant : page changeait visuellement mais URL restait sur
+  l'ancienne page → partage de lien / refresh / back-forward
+  cassés). Pas de récursion avec hashchange handler.
 
 ## Architecture v31.7.7x (mise à jour 2026-04-27 — sweep visuel)
 
