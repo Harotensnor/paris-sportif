@@ -10007,13 +10007,26 @@
     const today = (data && data.days && data.days[todayIso]) || [];
     const winaToday = today.filter(m => m.winamax && m.winamax.available === true);
 
+    // AUDIT-2026-04-27 — Comptage transparent des matchs terminés non-trackables.
+    // Beaucoup de matchs (typiquement qualifs WTA/Challenger tennis) ont
+    // winamax.available=true en fallback tournoi, mais aucune cote captée
+    // ailleurs (match.odds vide + odds_snapshot null + pas dans odds_history).
+    // Ils étaient filtrés silencieusement à `if (!odd) return null;` ce qui
+    // donnait "0 fini" alors que l'user voyait 24 matchs joués.
+    // On compte séparément les complétés sans cote pour le contextualiser.
+    let _completedNoOdds = 0;
+    let _completedFiltered = 0;  // sport filter active
+
     const allPicks = winaToday.map(m => {
       try {
         const pred = predictMatch(m);
         if (!pred || !pred.pick || pred.skip) return null;
         const pk = pred.pick.key;
         const odd = pred.odds && (pk==='1'?pred.odds.home:pk==='2'?pred.odds.away:pred.odds.draw);
-        if (!odd) return null;
+        if (!odd) {
+          if (m.completed) _completedNoOdds++;
+          return null;
+        }
         const rel = pred.reliability ?? pred.pick.prob;
         const edge = rel - 1/odd;
         const { home, away } = getSides(m);
@@ -10279,16 +10292,23 @@
     const inProgressHtml = inProgress.length
       ? inProgress.map(p => renderRow(p, false)).join('')
       : _emptyState("Aucun match en cours.", false);
+    // AUDIT-2026-04-27 — Empty state finished est trompeur quand des matchs
+    // sont VRAIMENT terminés mais sans cote capturée (cas très commun pour
+    // les WTA/Challenger qualifiers où Winamax map juste la ligue). On
+    // distingue l'empty state.
+    const finishedEmptyMsg = _completedNoOdds > 0
+      ? `0 prono trackable terminé · mais ${_completedNoOdds} match${_completedNoOdds>1?'s':''} terminé${_completedNoOdds>1?'s':''} sans cote captée (qualifs / matchs sans bookmaker exact). Le bilan ne peut pas les évaluer.`
+      : "Aucun match terminé aujourd'hui.";
     const finishedHtml = finished.length
       ? finished.map(p => renderRow(p, true)).join('')
-      : _emptyState("Aucun match terminé aujourd'hui.", false);
+      : _emptyState(finishedEmptyMsg, false);
 
     wrap.innerHTML = `
       <div style="max-width:1100px;margin:0 auto;padding:16px 8px 24px;font-variant-numeric:tabular-nums;">
         <div style="padding:40px 0 20px;border-bottom:1px solid var(--border);">
           <div style="font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Aujourd'hui · Winamax</div>
           <h1 style="margin:0 0 6px;font-size:32px;font-weight:800;letter-spacing:-1.1px;color:var(--text);line-height:1.1;">Tous les pronos du jour</h1>
-          <div style="font-size:14px;color:var(--text-dim);">${pending.length + inProgress.length} prono${(pending.length + inProgress.length)>1?'s':''} value · ${pending.length} à venir · ${inProgress.length} en cours · ${finished.length} fini${finished.length>1?'s':''}${settledCount ? ` (<b style="color:${wrPct>=60?'#34d399':'var(--text-dim)'};">${wrPct}% réussite</b> sur ${settledCount})` : ''}${filtersActive ? `&nbsp;·&nbsp;<span style="color:var(--brand);font-weight:600;">filtres actifs</span>` : ''}<div style="font-size:11px;color:var(--text-dim2);margin-top:3px;">↳ paris à venir/en cours = edge ≥ -2pt (bad value filtré). Finis = tous les picks pour tracker la perf modèle.</div></div>
+          <div style="font-size:14px;color:var(--text-dim);">${pending.length + inProgress.length} prono${(pending.length + inProgress.length)>1?'s':''} value · ${pending.length} à venir · ${inProgress.length} en cours · ${finished.length} fini${finished.length>1?'s':''}${_completedNoOdds > 0 ? ` <span style="color:var(--text-dim2);" title="${_completedNoOdds} match${_completedNoOdds>1?'s':''} terminé${_completedNoOdds>1?'s':''} mais sans cote capturée (qualifs WTA/Challenger, etc.) → le modèle ne peut pas les évaluer dans le bilan.">(+${_completedNoOdds} non-trackables)</span>` : ''}${settledCount ? ` (<b style="color:${wrPct>=60?'#34d399':'var(--text-dim)'};">${wrPct}% réussite</b> sur ${settledCount})` : ''}${filtersActive ? `&nbsp;·&nbsp;<span style="color:var(--brand);font-weight:600;">filtres actifs</span>` : ''}<div style="font-size:11px;color:var(--text-dim2);margin-top:3px;">↳ paris à venir/en cours = edge ≥ -2pt (bad value filtré). Finis = picks avec cote capturée pour tracker la perf modèle.</div></div>
         </div>
 
         <!-- v30 Sprint 4 — Filter bar (sticky on scroll, slides under topbar at top:56px) -->
@@ -10347,7 +10367,7 @@
         <div style="display:flex;gap:8px;margin:0 0 14px;flex-wrap:wrap;">
           <button data-tous-tab="pending" style="padding:10px 18px;border-radius:8px;border:1px solid ${activeTab==='pending'?'var(--brand)':'var(--border-2)'};background:${activeTab==='pending'?'rgba(167,139,250,.15)':'var(--panel)'};color:${activeTab==='pending'?'var(--brand)':'var(--text-2)'};font-weight:700;font-size:13px;cursor:pointer;">⏱️ À venir <span style="opacity:.7;">(${pending.length})</span></button>
           <button data-tous-tab="inprogress" style="padding:10px 18px;border-radius:8px;border:1px solid ${activeTab==='inprogress'?'var(--brand)':'var(--border-2)'};background:${activeTab==='inprogress'?'rgba(167,139,250,.15)':'var(--panel)'};color:${activeTab==='inprogress'?'var(--brand)':'var(--text-2)'};font-weight:700;font-size:13px;cursor:pointer;">🔴 En cours <span style="opacity:.7;">(${inProgress.length})</span></button>
-          <button data-tous-tab="finished" style="padding:10px 18px;border-radius:8px;border:1px solid ${activeTab==='finished'?'var(--brand)':'var(--border-2)'};background:${activeTab==='finished'?'rgba(167,139,250,.15)':'var(--panel)'};color:${activeTab==='finished'?'var(--brand)':'var(--text-2)'};font-weight:700;font-size:13px;cursor:pointer;">✅ Finis <span style="opacity:.7;">(${finished.length})</span></button>
+          <button data-tous-tab="finished" title="${_completedNoOdds > 0 ? `+${_completedNoOdds} match${_completedNoOdds>1?'s':''} terminé${_completedNoOdds>1?'s':''} sans cote capturée (non-trackable)` : ''}" style="padding:10px 18px;border-radius:8px;border:1px solid ${activeTab==='finished'?'var(--brand)':'var(--border-2)'};background:${activeTab==='finished'?'rgba(167,139,250,.15)':'var(--panel)'};color:${activeTab==='finished'?'var(--brand)':'var(--text-2)'};font-weight:700;font-size:13px;cursor:pointer;">✅ Finis <span style="opacity:.7;">(${finished.length}${_completedNoOdds > 0 ? `<span style="opacity:.6;font-size:10px;font-weight:500;">+${_completedNoOdds}</span>` : ''})</span></button>
         </div>
         <div style="display:flex;flex-direction:column;gap:8px;">
           ${activeTab === 'pending' ? pendingHtml : activeTab === 'inprogress' ? inProgressHtml : finishedHtml}
