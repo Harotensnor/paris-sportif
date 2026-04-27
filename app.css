@@ -958,12 +958,12 @@
     border-radius: 999px; background: var(--panel-3);
   }
 
-  /* v31.7.35 — Stats hero strip : 4 KPIs cliquables sous le hero du
-     dashboard. Format pills horizontales, scroll horizontal sur mobile.
+  /* v31.7.35 → v31.7.75 — Stats hero strip : 5 KPIs cliquables (locks /
+     pronos / combinés / buteurs / live). Format pills horizontales.
      Donne la vue d'ensemble du jour en 2s. */
   .dash-stats-strip {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 8px;
     margin: 16px 0 18px;
   }
@@ -999,12 +999,19 @@
   }
   @media (max-width: 720px) {
     .dash-stats-strip {
-      grid-template-columns: repeat(4, 1fr); gap: 6px;
+      grid-template-columns: repeat(5, 1fr); gap: 4px;
     }
-    .dash-stat-item { padding: 10px 6px; min-height: 64px; }
-    .dash-stat-val { font-size: 18px; }
-    .dash-stat-lbl { font-size: 9.5px; letter-spacing: .4px; }
-    .dash-stat-icon { font-size: 14px; margin-bottom: 2px; }
+    .dash-stat-item { padding: 8px 4px; min-height: 60px; }
+    .dash-stat-val { font-size: 16px; }
+    .dash-stat-lbl { font-size: 9px; letter-spacing: .3px; }
+    .dash-stat-icon { font-size: 13px; margin-bottom: 2px; }
+  }
+  /* v31.7.75 — Mobile très étroit : 5 KPIs trop serrés en 1 ligne, on
+     wrap en 2 lignes (3+2). */
+  @media (max-width: 420px) {
+    .dash-stats-strip {
+      grid-template-columns: repeat(3, 1fr); gap: 4px;
+    }
   }
 
   /* v31.7.32 — CTA fidélisation. Petit banner en fin de dashboard avec
