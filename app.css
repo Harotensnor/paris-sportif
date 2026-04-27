@@ -1510,6 +1510,9 @@
     border: 1px solid var(--border-2); border-radius: var(--r-xl);
     width: 100%; max-width: 920px; margin: auto;
     box-shadow: var(--shadow-lg); overflow: hidden;
+    /* Sprint 19 #4 — position relative pour que .modal-progress (absolute)
+       se positionne par rapport au modal et pas au backdrop. */
+    position: relative;
   }
   /* AUDIT-2026-04-27 (Sprint 15 #13) — Bottom sheet sur mobile.
      Slide-up depuis le bas avec drag handle visible, dismissable
@@ -1538,7 +1541,12 @@
     }
     .modal-head {
       padding-top: 12px;  /* compact, le handle prend la place */
+      /* Sprint 19 #5 — Empêche le scroll body pendant drag-to-dismiss
+         en réservant le geste vertical pour le drag du sheet. */
+      touch-action: none;
+      cursor: grab;
     }
+    .modal-head:active { cursor: grabbing; }
   }
   @keyframes modal-slide-up {
     from { transform: translateY(100%); }
@@ -2357,49 +2365,42 @@
   .u-py-3 { padding-top: var(--space-3); padding-bottom: var(--space-3); }
   .u-py-4 { padding-top: var(--space-4); padding-bottom: var(--space-4); }
 
-  /* AUDIT-2026-04-27 (Sprint 14 #6) — Hover states génériques.
-     Applique un léger lift + shadow elevation aux cards cliquables. */
+  /* AUDIT-2026-04-27 (Sprint 14 #6 + Sprint 19 #2) — Hover states.
+     Sprint 19 fix : :hover sur mobile reste sticky après tap (pas de
+     mouseleave natif sur touch). Wrap dans @media (hover: hover) pour
+     ne s'appliquer QUE sur devices avec vraie souris. */
   .interactive,
   .clickable {
     transition: transform 150ms ease-out, box-shadow 150ms ease-out, border-color 120ms;
     cursor: pointer;
   }
-  .interactive:hover,
-  .clickable:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-sm);
-    border-color: var(--border-2);
+  @media (hover: hover) and (pointer: fine) {
+    .interactive:hover,
+    .clickable:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+      border-color: var(--border-2);
+    }
   }
   .interactive:active,
   .clickable:active {
-    /* Sprint 14 #8 — Active feedback mobile : tap qui se sent vrai */
+    /* Sprint 14 #8 — Active feedback : tap mobile + mouse down desktop */
     transform: scale(0.98);
     transition: transform 80ms;
   }
 
-  /* AUDIT-2026-04-27 (Sprint 14 #7) — Focus rings cohérents WCAG 2.1.
-     Visible par tous les utilisateurs au clavier, pas-mouse only. */
-  *:focus-visible {
-    outline: none;
-    box-shadow:
-      0 0 0 3px var(--accent-soft),
-      0 0 0 1px var(--accent);
-    border-radius: var(--r-xs);
-  }
-  /* Override pour les inputs déjà stylisés (qui ont leur propre focus) */
+  /* AUDIT-2026-04-27 (Sprint 19 #1) — Fix focus rings duplication.
+     Le bloc Sprint 14 #7 entrait en conflit avec le bloc v30 plus haut
+     (line 2094) qui définissait *:focus-visible avec `outline: 2px brand`.
+     Les deux s'appliquaient en cascade → double-ring + outline visuel
+     incohérent. Fix : on supprime le sur-doublon (le bloc v30 reste,
+     plus simple et déjà éprouvé). On garde juste les overrides ciblés
+     pour les contrôles spécifiques. */
+  /* Override ciblé pour inputs : border-color au lieu d'outline */
   input:focus-visible,
   select:focus-visible,
   textarea:focus-visible {
-    outline: none;
-    border-color: var(--accent) !important;
-    box-shadow: 0 0 0 3px var(--accent-soft) !important;
-  }
-  /* Boutons avec brand color au focus */
-  .page-btn:focus-visible,
-  button.page-btn:focus-visible {
-    box-shadow:
-      0 0 0 3px rgba(167,139,250,.25),
-      0 0 0 1px var(--brand);
+    outline-color: var(--accent);
   }
 
   /* AUDIT-2026-04-27 (Sprint 14 #9) — Card padding ladder.
