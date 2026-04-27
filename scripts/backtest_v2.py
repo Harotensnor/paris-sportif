@@ -171,8 +171,32 @@ def load_results_archive() -> list[dict]:
     return out
 
 
+# AUDIT-2026-04-27 (P3) — Statuts ESPN qui doivent être VOID selon les
+# règles bookmaker Winamax (mise remboursée). Les inclure dans le
+# backtest fausserait le ROI / Brier / log-loss puisque le 1N2 n'est
+# pas réglé en réalité. resolve_outcome retourne None pour ces statuts
+# afin que la boucle backtest les saute.
+_VOID_STATUSES = frozenset({
+    'STATUS_RETIRED',     # tennis : abandon en cours de match
+    'STATUS_WALKOVER',    # tennis/foot : forfait avant match
+    'STATUS_FORFEIT',     # générique forfait
+    'STATUS_POSTPONED',   # reporté (typiquement completed=false mais defense)
+    'STATUS_CANCELED',
+    'STATUS_CANCELLED',
+    'STATUS_ABANDONED',   # match abandonné en cours
+})
+
+
 def resolve_outcome(ev: dict) -> str | None:
-    """Renvoie 'home' | 'away' | 'draw' ou None si impossible à résoudre."""
+    """Renvoie 'home' | 'away' | 'draw' ou None si impossible à résoudre.
+
+    AUDIT-2026-04-27 (P3) — Skip explicite des statuts VOID (RETIRED /
+    WALKOVER / etc.). ESPN renseigne `winner=true/false` sur ces matchs
+    même si le résultat est voidé bookmaker, donc sans ce check le
+    backtest les comptait comme des wins/losses normaux.
+    """
+    if (ev.get('status') or '') in _VOID_STATUSES:
+        return None
     comps = ev.get('competitors') or []
     if len(comps) < 2:
         return None

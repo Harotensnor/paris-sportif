@@ -3156,6 +3156,29 @@
   // For completed matches, returns 'won' | 'lost' | 'void' | null
   function evaluateModelPick(match, pred) {
     if (!match?.completed || !pred) return null;
+    // AUDIT-2026-04-27 (P3) — Cas spéciaux qui doivent être VOID selon
+    // les règles bookmaker Winamax (mise remboursée, ni won ni lost) :
+    //   - STATUS_RETIRED : un joueur abandonne en cours de match (tennis).
+    //     Winamax règle : 1N2 voidé sauf si Set 1 + Set 2 complétés ET
+    //     un set en cours du Set 3, là c'est l'abandonneur qui perd.
+    //     Sans signal explicite, on void par défaut (sécurité).
+    //   - STATUS_WALKOVER : forfait avant match. Toujours voidé.
+    //   - STATUS_POSTPONED : reporté. completed=false normalement, mais
+    //     défense en cas d'incohérence ESPN.
+    //   - STATUS_CANCELED : annulé. Voidé.
+    // Retourne null = ne compte pas dans le bilan, comme s'il n'avait
+    // jamais existé. Le score peut être null ou partiel — on ne l'utilise
+    // pas dans ces statuts.
+    const status = match.status || '';
+    if (status === 'STATUS_RETIRED'
+        || status === 'STATUS_WALKOVER'
+        || status === 'STATUS_FORFEIT'
+        || status === 'STATUS_POSTPONED'
+        || status === 'STATUS_CANCELED'
+        || status === 'STATUS_CANCELLED'
+        || status === 'STATUS_ABANDONED') {
+      return null;
+    }
     const { home, away } = getSides(match);
     const hs = parseInt(home?.score ?? '', 10);
     const as = parseInt(away?.score ?? '', 10);
