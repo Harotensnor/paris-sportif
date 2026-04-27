@@ -25,3 +25,11 @@ winamax_v20_admin.log
 # winamax_my_bets.json + winamax_settings.json sont VOLONTAIREMENT
 # commités — Theo a explicitement autorisé ("j'ai rien a cacher"),
 # le bilan est ainsi visible sur GitHub Pages.
+
+# AUDIT-2026-04-27 (Sprint 45 #24) — Archives backup data.js.
+# Rolling 30j × ~250KB compressé = 7.5MB cumulés. Committer ces
+# fichiers gonflerait le repo inutilement. backup_data_snapshot.py
+# garde un rolling local; pour recovery passée, `git checkout` sur
+# un commit historique de data.js est largement suffisant.
+# Si backup explicit voulu, push manuellement avec git add -f.
+archives/

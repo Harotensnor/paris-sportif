@@ -108,6 +108,15 @@ def main() -> int:
         # Pas configuré côté repo → silencieux, exit OK.
         return 0
 
+    # AUDIT-2026-04-27 (Sprint 45 #23) — Validation URL Discord.
+    # Si DISCORD_HEALTH_WEBHOOK contient une URL malformée (typo, copy-paste
+    # foiré), le POST crashait silencieusement. Validation early.
+    if not webhook.startswith('https://discord.com/api/webhooks/') and \
+       not webhook.startswith('https://discordapp.com/api/webhooks/'):
+        print(f'WARN: DISCORD_HEALTH_WEBHOOK ne semble pas être un webhook Discord valide '
+              f'(prefix attendu: https://discord.com/api/webhooks/). Skip.', file=sys.stderr)
+        return 0
+
     h = _load_health()
     if not h:
         print('no health.json or unreadable, skip', file=sys.stderr)
