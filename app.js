@@ -43,7 +43,7 @@
   // legacy) mais aucun lien ne pointe plus vers cette valeur.
   // v31.7.77 — 'calendrier' ajouté pour vue 7 jours groupée (user feedback
   // "je veux voir au moins une semaine de pronos jour par jour").
-  const VALID_PAGES = ['dashboard','tous','locks','buteurs','combines','top','historique','bilan','backtest','academie','credibilite','alertes','profil','sante','legal','methodologie','montante-jour','montante-weekend','montante-semaine','compare','calendrier','league'];
+  const VALID_PAGES = ['dashboard','tous','locks','buteurs','combines','top','historique','bilan','backtest','academie','credibilite','alertes','profil','sante','legal','methodologie','montante-jour','montante-weekend','montante-semaine','compare','calendrier','league','favoris'];
   // v30 — 'mesparis' retiré : Théo n'enregistre pas ses paris sur le site.
   // v31 — 'legal' + 'methodologie' ajoutés (transparence + dictionnaire des
   // métriques, en réponse à l'audit ChatGPT 2026-04-26).
@@ -13330,6 +13330,8 @@
     const isCalendrier = currentPage === 'calendrier';
     // AUDIT-2026-04-27 (Sprint 5 #24) — League deep-dive page
     const isLeague = currentPage === 'league';
+    // AUDIT-2026-04-27 (Sprint 33 #2) — Favoris page
+    const isFavoris = currentPage === 'favoris';
 
     // v23 — Sous-nav "Mon suivi" (historique/bilan/backtest).
     // v30 — "Mes paris" retiré : Théo n'enregistre pas ses paris sur le
@@ -13436,7 +13438,7 @@
 
     // Summary bar: shown for simples + bilan + top, hidden for combines/value/locks/historique/sante + nouvelles pages
     const sum = document.getElementById('summary-bar');
-    if (sum) sum.style.display = (isCombines || isValue || isLocks || isHistorique || isSante || isDashboard || isAlertes || isAcademie || isBacktest || isProfil || isButeurs || isTous || isCredibilite || isMontante || isCalendrier || isLeague) ? 'none' : '';
+    if (sum) sum.style.display = (isCombines || isValue || isLocks || isHistorique || isSante || isDashboard || isAlertes || isAcademie || isBacktest || isProfil || isButeurs || isTous || isCredibilite || isMontante || isCalendrier || isLeague || isFavoris) ? 'none' : '';
 
     // Chantier IIII — Simples quick-take IA (visible only on Simples)
     const iaSimples = document.getElementById('ia-simples-wrap');
@@ -13555,6 +13557,18 @@
     leagueWrap.style.display = isLeague ? '' : 'none';
     if (isLeague) {
       try { renderLeaguePage(leagueWrap); } catch(e) { console.warn('renderLeaguePage failed', e); }
+    }
+
+    // AUDIT-2026-04-27 (Sprint 33 #2) — Favoris page
+    let favorisWrap = document.getElementById('favoris-wrap');
+    if (!favorisWrap) {
+      favorisWrap = document.createElement('div');
+      favorisWrap.id = 'favoris-wrap';
+      (document.querySelector('main') || document.body).appendChild(favorisWrap);
+    }
+    favorisWrap.style.display = isFavoris ? '' : 'none';
+    if (isFavoris) {
+      try { renderFavorisPage(favorisWrap); } catch(e) { console.warn('renderFavorisPage failed', e); }
     }
 
     calendrierWrap.style.display = isCalendrier ? '' : 'none';
@@ -14677,6 +14691,114 @@
       });
     });
   }
+
+  // AUDIT-2026-04-27 (Sprint 33 #2) — Page Favoris (bookmarks).
+  function renderFavorisPage(wrap) {
+    const data = window.PRONOSTICS_DATA;
+    const ids = (typeof window._loadBookmarks === 'function') ? window._loadBookmarks() : [];
+    if (!ids.length) {
+      wrap.innerHTML = `
+        <div class="page-wrap">
+          <div class="page-header">
+            <div class="lbl-tiny" style="color:var(--brand);">Mes favoris</div>
+            <h1 class="page-h1">⭐ Favoris</h1>
+          </div>
+          <div class="empty-state-v2">
+            <div class="es-illustration">⭐</div>
+            <div class="es-title-v2">Aucun favori pour le moment</div>
+            <div class="es-body-v2">Tape sur l'étoile en haut à droite d'une carte match pour la sauvegarder ici. Idéal pour suivre des matchs spécifiques.</div>
+            <div class="es-actions-v2">
+              <button class="page-btn" data-page="tous" style="padding:10px 18px;font-size:13px;background:var(--brand);color:#08080a;border:none;border-radius:var(--r-sm);cursor:pointer;font-weight:700;">📋 Voir les pronos</button>
+            </div>
+          </div>
+        </div>`;
+      return;
+    }
+    // Trouve les matches correspondants
+    const matchById = new Map();
+    Object.values(data?.days || {}).forEach(arr => (arr || []).forEach(m => {
+      if (m.id && ids.includes(String(m.id))) matchById.set(String(m.id), m);
+    }));
+    const found = ids.map(id => matchById.get(id)).filter(Boolean);
+    const missing = ids.length - found.length;
+    if (!found.length) {
+      wrap.innerHTML = `
+        <div class="page-wrap">
+          <div class="page-header">
+            <div class="lbl-tiny" style="color:var(--brand);">Mes favoris</div>
+            <h1 class="page-h1">⭐ Favoris</h1>
+          </div>
+          <div class="empty-state-v2">
+            <div class="es-illustration">⏳</div>
+            <div class="es-title-v2">Tes favoris ne sont plus dans la fenêtre</div>
+            <div class="es-body-v2">${ids.length} match${ids.length>1?'s':''} sauvegardé${ids.length>1?'s':''} mais hors de la fenêtre rolling 14 jours. Ils sont peut-être déjà joués (consulte le Bilan) ou trop loin dans le futur.</div>
+          </div>
+        </div>`;
+      return;
+    }
+    const rows = found.map(m => {
+      const sides = (typeof getSides === 'function') ? getSides(m) : { home: {}, away: {} };
+      const hN = sides.home?.short || sides.home?.name || '?';
+      const aN = sides.away?.short || sides.away?.name || '?';
+      const tLbl = (typeof fmtTime === 'function') ? fmtTime(m.date) : '';
+      const sportEm = (typeof sportEmoji === 'function') ? sportEmoji(m.sport) : '🎯';
+      const lg = m.league_name || m.league_code || '';
+      let pred = null;
+      try { pred = (typeof predictMatch === 'function') ? predictMatch(m) : null; } catch(e){}
+      const conf = pred?.reliability ?? pred?.pick?.prob ?? null;
+      const pickLbl = pred?.pick?.label || '—';
+      const isLock = pred?.isLock;
+      const isSettled = m.completed;
+      const res = isSettled && pred ? evaluateModelPick(m, pred) : null;
+      let resBadge = '';
+      if (res === 'won') resBadge = '<span style="color:var(--accent);font-weight:700;">✓ gagné</span>';
+      else if (res === 'lost') resBadge = '<span style="color:var(--danger);font-weight:700;">✗ perdu</span>';
+      return `
+        <div class="cal-pick-row interactive" data-match-id="${esc(String(m.id || ''))}" role="button" tabindex="0" style="display:grid;grid-template-columns:60px 1fr auto auto auto;gap:10px;padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${isLock ? 'var(--tier-lock)' : 'var(--accent)'};border-radius:0 8px 8px 0;align-items:center;font-variant-numeric:tabular-nums;margin-bottom:4px;">
+          <div style="font-size:12px;color:var(--text-dim);font-weight:600;">${esc(tLbl)}</div>
+          <div style="min-width:0;">
+            <div style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--text);">
+              <span style="font-size:13px;">${sportEm}</span>
+              <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(hN)} <span style="color:var(--text-dim2);font-weight:400;">vs</span> ${esc(aN)}</span>
+            </div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(lg.slice(0, 40))} · <b style="color:var(--brand);">→ ${esc(pickLbl)}</b></div>
+          </div>
+          <div style="font-size:13px;font-weight:700;color:${conf >= 0.70 ? 'var(--accent)' : 'var(--text-dim)'};">${conf != null ? Math.round(conf * 100) + '%' : '—'}</div>
+          <div>${resBadge}</div>
+          <button class="bookmark-btn" data-bookmark-toggle="${esc(String(m.id))}" aria-label="Retirer des favoris" data-tooltip="Retirer des favoris" style="background:transparent;border:none;color:var(--warn);font-size:18px;cursor:pointer;padding:4px 6px;line-height:1;">★</button>
+        </div>`;
+    }).join('');
+    wrap.innerHTML = `
+      <div class="page-wrap">
+        <div class="page-header">
+          <div class="lbl-tiny" style="color:var(--brand);">Mes favoris · ${found.length}</div>
+          <h1 class="page-h1">⭐ Favoris</h1>
+          <div style="font-size:14px;color:var(--text-dim);">${found.length} match${found.length>1?'s':''} sauvegardé${found.length>1?'s':''}${missing>0?` (${missing} hors fenêtre rolling)`:''}.</div>
+        </div>
+        <div style="margin-top:16px;">${rows}</div>
+      </div>`;
+    // Wire bookmark removal
+    wrap.querySelectorAll('[data-bookmark-toggle]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = btn.dataset.bookmarkToggle;
+        if (id && typeof window._toggleBookmark === 'function') {
+          window._toggleBookmark(id);
+          renderFavorisPage(wrap);
+        }
+      });
+    });
+    // Click row → openDetail
+    wrap.querySelectorAll('.cal-pick-row[data-match-id]').forEach(row => {
+      row.addEventListener('click', () => {
+        const id = row.dataset.matchId;
+        if (!id) return;
+        const m = matchById.get(id);
+        if (m && typeof openDetail === 'function') openDetail(m);
+      });
+    });
+  }
+  try { window.renderFavorisPage = renderFavorisPage; } catch(e){}
 
   // AUDIT-2026-04-27 (Sprint 22 #18) — Expose pour CSP-safe delegation.
   // window.renderLeaguePage défini explicitement après la définition.
