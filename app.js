@@ -37,7 +37,11 @@
   // ex pronostics.html#locks → on lit location.hash pour set la bonne page.
   // Sans ce guard, le manifest shortcuts (#locks #bilan #combines) ne
   // marchaient pas — l'utilisateur arrivait toujours sur dashboard.
-  const VALID_PAGES = ['dashboard','tous','locks','buteurs','combines','simples','top','historique','bilan','backtest','academie','credibilite','alertes','profil','sante','legal','methodologie','montante-jour','montante-weekend','montante-semaine'];
+  // v31.7.51 — 'simples' retiré (audit cleanup) : la page existait mais
+  // n'était plus dans aucun sous-menu visible. Le code render reste safe
+  // (silent fall-through si quelqu'un set currentPage='simples' via hash
+  // legacy) mais aucun lien ne pointe plus vers cette valeur.
+  const VALID_PAGES = ['dashboard','tous','locks','buteurs','combines','top','historique','bilan','backtest','academie','credibilite','alertes','profil','sante','legal','methodologie','montante-jour','montante-weekend','montante-semaine'];
   // v30 — 'mesparis' retiré : Théo n'enregistre pas ses paris sur le site.
   // v31 — 'legal' + 'methodologie' ajoutés (transparence + dictionnaire des
   // métriques, en réponse à l'audit ChatGPT 2026-04-26).
