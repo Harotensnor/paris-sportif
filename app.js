@@ -5718,7 +5718,47 @@
           if (liveSt === 'tied')    return ` <span style="background:rgba(251,191,36,.18);border:1px solid rgba(251,191,36,.4);color:var(--warn);padding:3px 9px;border-radius:11px;font-size:12px;font-weight:700;letter-spacing:.3px;">🔴 LIVE · En cours</span>`;
           return ` <span style="background:rgba(252,165,165,.18);border:1px solid rgba(252,165,165,.4);color:#fca5a5;padding:3px 9px;border-radius:11px;font-size:12px;font-weight:700;letter-spacing:.3px;">🔴 LIVE · Perdant</span>`;
         })() : '';
+        // AUDIT-2026-04-27 (Sprint 9 #15) — Verdict synthétique enrichi.
+        // Génère 1 paragraphe de 1-2 phrases qui résume la prédiction
+        // avec : (1) le pick + edge, (2) top 3 raisons "pour", (3) 1 risque
+        // principal (disagreement signal ou data quality faible).
+        const verdictHtml = (() => {
+          const reasonsAll = (pred.explain?.reasons || []).filter(r => r && r.text);
+          const positives = reasonsAll.filter(r => r.type !== 'disagreement' && r.type !== 'tennis_caveat');
+          const risk = reasonsAll.find(r => r.type === 'disagreement' || r.type === 'tennis_caveat');
+          const top3 = positives.slice(0, 3).map(r => r.text);
+          const dq = (typeof computeDataQuality === 'function') ? computeDataQuality(match) : null;
+          const dqWeak = dq && dq.score <= 2;
+          if (!top3.length && !risk && !dqWeak) return '';
+          const rel = pred.reliability ?? pred.pick.prob;
+          const edge = pickOdd ? valueBetEdge(rel, pickOdd) : null;
+          const edgePct = edge != null ? Math.round(edge * 100) : null;
+          const isValue = edge != null && edge >= 0.05;
+          let lead = '';
+          if (isValue) {
+            lead = `<b style="color:var(--accent);">${esc(pred.pick.label)}</b> avec <b>${edgePct >= 0 ? '+' : ''}${edgePct}pt d'avantage marché</b>.`;
+          } else if (rel >= 0.70) {
+            lead = `<b style="color:var(--accent);">${esc(pred.pick.label)}</b>, pari sûr (${(rel*100).toFixed(0)}% conf.).`;
+          } else {
+            lead = `<b style="color:var(--text);">${esc(pred.pick.label)}</b> recommandé (${(rel*100).toFixed(0)}% conf.).`;
+          }
+          let detail = '';
+          if (top3.length) {
+            detail = ` Signaux principaux : ${top3.map(t => esc(t.replace(/^[^\w\s]+\s*/, ''))).slice(0, 3).join(' · ')}.`;
+          }
+          let warn = '';
+          if (risk) {
+            warn = ` <span style="color:var(--warn);">⚠ ${esc(risk.text)}</span>`;
+          } else if (dqWeak) {
+            warn = ` <span style="color:var(--warn);">⚠ Qualité data faible (${dq.score}/${dq.max}) — ${dq.items.filter(i => !i.ok).slice(0,2).map(i => i.label).join(', ')}.</span>`;
+          }
+          return `<div style="background:linear-gradient(135deg, rgba(167,139,250,.08), rgba(52,211,153,.05));border:1px solid rgba(167,139,250,.20);border-left:3px solid var(--brand);padding:14px 18px;border-radius:0 10px 10px 0;font-size:14px;line-height:1.55;color:var(--text);margin-bottom:14px;">
+            <div style="font-size:10.5px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;">⚡ Verdict en 1 ligne</div>
+            ${lead}${detail}${warn}
+          </div>`;
+        })();
         return `
+        ${verdictHtml}
         <div class="section">
           <div class="pred-panel">
             <h4>🎯 Notre pronostic ${modelRes ? resultBadgeHtml(modelRes, modelRes === 'won' && pred.odds ? pickOdd : null) : liveBadgeDetail}</h4>
@@ -6355,9 +6395,76 @@
           else if (mt.winner === 'home') histH ? hw++ : aw++;
           else if (mt.winner === 'away') histH ? aw++ : hw++;
         });
+        // AUDIT-2026-04-27 (Sprint 9 #11) — Side-by-side comparaison rapide.
+        // Avant les meetings H2H, table 4-6 lignes qui compare
+        // forme L5 / xG/m / clean sheets % / Elo / classement entre les
+        // 2 équipes. Permet de voir d'un coup d'œil "qui est le mieux"
+        // sans scroller toutes les sections.
+        const sideCompareHtml = (() => {
+          const hFs = home?.form_stats || {};
+          const aFs = away?.form_stats || {};
+          const hElo = (home?.clubelo?.elo) || (home?.elo) || null;
+          const aElo = (away?.clubelo?.elo) || (away?.elo) || null;
+          const stdH = getStandingsEntry(match, home);
+          const stdA = getStandingsEntry(match, away);
+          const rowOf = (label, hVal, aVal, fmt = (x) => x) => {
+            if (hVal == null && aVal == null) return null;
+            const hStr = hVal == null ? '—' : fmt(hVal);
+            const aStr = aVal == null ? '—' : fmt(aVal);
+            // Highlight lequel est meilleur (numerical only)
+            let hCls = '', aCls = '';
+            if (typeof hVal === 'number' && typeof aVal === 'number' && hVal !== aVal) {
+              if (hVal > aVal) hCls = 'style="color:var(--accent);font-weight:700;"';
+              else aCls = 'style="color:var(--accent);font-weight:700;"';
+            }
+            return `<div style="display:grid;grid-template-columns:1fr 110px 1fr;gap:10px;padding:6px 4px;border-bottom:1px solid var(--border);font-size:12.5px;align-items:center;">
+              <div style="text-align:right;color:var(--text);" ${hCls}>${esc(hStr)}</div>
+              <div style="text-align:center;color:var(--text-dim2);font-size:11px;letter-spacing:.3px;text-transform:uppercase;">${esc(label)}</div>
+              <div style="color:var(--text);" ${aCls}>${esc(aStr)}</div>
+            </div>`;
+          };
+          const rows = [];
+          if (hFs.played5 || aFs.played5) {
+            rows.push(rowOf('Forme L5 (V-N-D)',
+              hFs.played5 ? `${hFs.wins5}-${hFs.draws5}-${hFs.losses5}` : null,
+              aFs.played5 ? `${aFs.wins5}-${aFs.draws5}-${aFs.losses5}` : null));
+            rows.push(rowOf('xG marqués/m',
+              hFs.avg_gf5, aFs.avg_gf5,
+              v => v.toFixed(2)));
+            rows.push(rowOf('xG encaissés/m',
+              hFs.avg_ga5, aFs.avg_ga5,
+              v => v.toFixed(2)));
+            if (hFs.played5 >= 3 && aFs.played5 >= 3) {
+              rows.push(rowOf('Clean sheets %',
+                100 * (hFs.cleans5 || 0) / hFs.played5,
+                100 * (aFs.cleans5 || 0) / aFs.played5,
+                v => v.toFixed(0) + '%'));
+            }
+          }
+          if (hElo || aElo) {
+            rows.push(rowOf('Force (Elo)', hElo, aElo, v => Math.round(v)));
+          }
+          if (stdH || stdA) {
+            rows.push(rowOf('Classement',
+              stdH?.rank ? `#${stdH.rank}` : null,
+              stdA?.rank ? `#${stdA.rank}` : null));
+            rows.push(rowOf('Points', stdH?.points, stdA?.points));
+          }
+          const validRows = rows.filter(r => r);
+          if (!validRows.length) return '';
+          return `<div style="margin-bottom:14px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;padding:10px 14px;">
+            <div style="display:grid;grid-template-columns:1fr 110px 1fr;gap:10px;padding:6px 4px;border-bottom:1px solid var(--border-2);font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;font-weight:700;align-items:center;">
+              <div style="text-align:right;">${esc(home?.short || home?.name || 'Dom.')}</div>
+              <div style="text-align:center;color:var(--brand);">↔ Comparaison</div>
+              <div>${esc(away?.short || away?.name || 'Ext.')}</div>
+            </div>
+            ${validRows.join('')}
+          </div>`;
+        })();
         return `
         <div class="section">
           <h4>⚔️ Face-à-face récents</h4>
+          ${sideCompareHtml}
           <div style="display:flex;gap:10px;margin-bottom:10px;font-size:12.5px;flex-wrap:wrap;">
             <span style="padding:4px 10px;border-radius:6px;background:rgba(16,185,129,.12);color:var(--accent);font-weight:700;">${esc(home?.short||home?.name)}: ${hw}V</span>
             ${dr ? `<span style="padding:4px 10px;border-radius:6px;background:rgba(255,255,255,.06);color:var(--text-dim,#b4bcc7);font-weight:700;">Nuls: ${dr}</span>` : ''}
