@@ -137,9 +137,9 @@ Workflow CI `.github/workflows/e2e.yml` tourne :
 
 ## Documentation détaillée
 
-- **`ARCHITECTURE.md`** : vue d'ensemble système, conventions, schémas data
-- **`DECISIONS.md`** : ADR records (pourquoi `lc:tid`, pourquoi Wilson CI, etc.)
-- **`CLAUDE.md`** : guide complet pour Claude Code (sprints, choix produit)
+- [`ARCHITECTURE.md`](ARCHITECTURE.md) : vue d'ensemble système, conventions, schémas data
+- [`DECISIONS.md`](DECISIONS.md) : ADR records (pourquoi `lc:tid`, pourquoi Wilson CI, etc.)
+- [`CLAUDE.md`](CLAUDE.md) : guide complet pour Claude Code (sprints, choix produit)
 
 ## Roadmap
 

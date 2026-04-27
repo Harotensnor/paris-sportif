@@ -122,6 +122,14 @@
   window._spawnConfetti = function spawnConfetti(targetEl, n = 12) {
     if (!targetEl) return;
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    // AUDIT-2026-04-27 (Sprint 46 #26) — Confetti perf adaptive.
+    // Sur low-end devices (deviceMemory < 4GB ou hardware concurrency
+    // < 4 cores), réduit à 6 particules pour éviter les frame drops.
+    try {
+      const lowMem = navigator.deviceMemory && navigator.deviceMemory < 4;
+      const lowCpu = navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4;
+      if (lowMem || lowCpu) n = Math.min(n, 6);
+    } catch (e) {}
     targetEl.classList.add('has-confetti');
     const colors = ['var(--accent)', 'var(--brand)', 'var(--warn)', '#f472b6', '#60a5fa'];
     for (let i = 0; i < n; i++) {
@@ -14911,6 +14919,10 @@
     const found = ids.map(id => matchById.get(id)).filter(Boolean);
     const missing = ids.length - found.length;
     if (!found.length) {
+      // AUDIT-2026-04-27 (Sprint 46 #27) — Distinguer "data pas encore
+      // chargé" (LITE blob) vs "match passé hors fenêtre". Évite de
+      // dire "déjà joués" alors que l'user vient de sauvegarder.
+      const isLite = !!(data && data._lite);
       wrap.innerHTML = `
         <div class="page-wrap">
           <div class="page-header">
@@ -14918,9 +14930,12 @@
             <h1 class="page-h1">⭐ Favoris</h1>
           </div>
           <div class="empty-state-v2">
-            <div class="es-illustration">⏳</div>
-            <div class="es-title-v2">Tes favoris ne sont plus dans la fenêtre</div>
-            <div class="es-body-v2">${ids.length} match${ids.length>1?'s':''} sauvegardé${ids.length>1?'s':''} mais hors de la fenêtre rolling 14 jours. Ils sont peut-être déjà joués (consulte le Bilan) ou trop loin dans le futur.</div>
+            <div class="es-illustration">${isLite ? '⏳' : '📅'}</div>
+            <div class="es-title-v2">${isLite ? 'Chargement de l\'archive complète…' : 'Favoris hors fenêtre'}</div>
+            <div class="es-body-v2">${isLite
+              ? 'Le site charge les 14 derniers jours en arrière-plan. Reviens dans quelques secondes.'
+              : `${ids.length} match${ids.length>1?'s':''} sauvegardé${ids.length>1?'s':''} mais hors fenêtre rolling 14 jours (déjà joués → page <button class="page-btn" data-page="bilan" style="background:transparent;border:none;color:var(--brand);text-decoration:underline;cursor:pointer;font-weight:700;padding:0;">Bilan</button>) ou trop futurs (page Calendrier 7j).`
+            }</div>
           </div>
         </div>`;
       return;
