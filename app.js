@@ -2008,14 +2008,22 @@
       if (!isNaN(matchTime)) {
         const hCnt = congestionCount(home?.name, matchTime, 7);
         const aCnt = congestionCount(away?.name, matchTime, 7);
+        // AUDIT-2026-04-27 (Sprint 29 #24) — Fenêtre courte 3 jours
+        // pour proxy fatigue Champions League / Europa League. Si une
+        // équipe a joué dans les 3 derniers jours (= probable midweek
+        // euro pour les top clubs), pénalité supplémentaire.
+        const hCnt3 = congestionCount(home?.name, matchTime, 3);
+        const aCnt3 = congestionCount(away?.name, matchTime, 3);
         if (hCnt >= 2 || aCnt >= 2) {
           // Only count "fatigue" above a 1-match baseline (1 game in 7 days
           // is perfectly normal league cadence — no penalty). Then 1.5%
           // per extra game, capped at ±4% total differential.
-          const hPen = Math.max(0, hCnt - 1) * 0.015;
-          const aPen = Math.max(0, aCnt - 1) * 0.015;
+          // Sprint 29 #24 — bonus pénalité 1% par match dans les 3
+          // derniers jours (= rotation effective probable).
+          const hPen = Math.max(0, hCnt - 1) * 0.015 + hCnt3 * 0.010;
+          const aPen = Math.max(0, aCnt - 1) * 0.015 + aCnt3 * 0.010;
           congestionNudge = Math.max(-0.04, Math.min(0.04, aPen - hPen));
-          congestionStats = { home: hCnt, away: aCnt };
+          congestionStats = { home: hCnt, away: aCnt, home_3d: hCnt3, away_3d: aCnt3 };
         }
 
         // v31.7.6 — Signal repos minimum. Pénalise les équipes ayant joué
