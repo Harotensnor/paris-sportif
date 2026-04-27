@@ -6,6 +6,46 @@ des pronostics simples/combinés/montantes séquentielles, et une vue bilan.
 Déployé sur GitHub Pages. Client = navigateur ; données = fichier `data.js`
 régénéré en continu.
 
+## Architecture v31.7.10-12x (mise à jour 2026-04-27 — sprints 13-40 polish & extension)
+
+**Sprints 13-40 (140 points)** — phase polish + extensions modèle.
+
+### Sprints 13-18 — Visual & UX (v31.7.104-108)
+- **Sprint 13** Design tokens (typo modular scale, spacing 4px, radius/shadow ladder, tracking)
+- **Sprint 14** Cards & components (.interactive hover-lift, focus rings WCAG, active scale)
+- **Sprint 15** Mobile UX (touch ≥44px, bottom sheet modal, drag-to-dismiss)
+- **Sprint 16** Micro-interactions (animated counter, toast stack, tooltip system, loading)
+- **Sprint 17** Nav & wayfinding (breadcrumbs, modal scroll progress, Cmd-K search)
+- **Sprint 18** Onboarding (smart suggestion banner, badge "Nouveau", confetti, empty state v2)
+
+### Sprints 19-24 — Bugs corrigés + cohérence (v31.7.109-114)
+- **Sprint 19** Bugs régression (focus rings, hover sticky mobile, modal progress)
+- **Sprint 20** Adoption helpers (counter Bilan, confetti win streak, tooltip migration)
+- **Sprint 21** Sweep design tokens (223 valeurs px → var(--space-*) et var(--r-*))
+- **Sprint 22** Tests fixtures + CSP migration (4 inline onclick → delegation)
+- **Sprint 23** Bundle budget + cleanup (preconnect Sofascore, lazy images, dup CSS)
+- **Sprint 24** Mobile polish (touch targets, modal tabs scroll, reduced-motion safety)
+
+### Sprints 25-32 — Modèle V3 + DevOps (v31.7.115-122)
+- **Sprint 25** Bugs résiduels (modal progress hide, smart suggest UTC, MutationObserver)
+- **Sprint 26** Mobile UX completion (pull-to-refresh, keyboard avoidance, haptic helper)
+- **Sprint 27** Search & filter (URL deep-link filters, saved presets helpers)
+- **Sprint 28** Onboarding (recently viewed tracking, bookmark picks helpers)
+- **Sprint 29** Modèle foot (fenêtre congestion 3j proxy fatigue européenne)
+- **Sprint 30** Modèle US sports (NBA/NHL back-to-back fatigue)
+- **Sprint 31** Framework analytique (A/B test Wilcoxon, CV backtest rolling-origin)
+- **Sprint 32** DevOps wired (auto-rollback, backup quotidien, Discord alerts, structured logs)
+
+### Sprints 33-40 — Adoption + finitions (v31.7.123-129)
+- **Sprint 33** Adoption UI (page Favoris #favoris, helpers bookmark visibles)
+- **Sprint 34** Profile/Settings (export/import settings JSON helpers)
+- **Sprint 35** Framework UI (drift detector visible Santé)
+- **Sprint 36** Modèle backlog documenté (CLV, multi-bkmk, form decay, per-league)
+- **Sprint 37** SEO (sitemap dynamique build_sitemap.py)
+- **Sprint 38** A11y avancée (keyboard shortcut overlay `?`, ARIA live region)
+- **Sprint 39** Production monitoring tier 2 (LCP per-page CI, structured logs ×2)
+- **Sprint 40** Polish final (docs consolidées, ARCHITECTURE.md, DECISIONS.md)
+
 ## Architecture v31.7.9x (mise à jour 2026-04-27 — 6 sprints post-audit)
 
 **6 sprints post-audit Codex 2026-04-27** (30 points exécutés). Voir
