@@ -37,19 +37,36 @@ def _load_health():
 
 
 def _detect_alerts(h: dict) -> list[str]:
+    """AUDIT-2026-04-27 (Sprint 32 #38) — Seuils tunables via env vars.
+    Évite de hardcoder les thresholds, permet à Théo de calibrer depuis
+    le settings GitHub repo sans toucher au code.
+    Defaults restent identiques pour backward-compat."""
+    fb_max = int(os.environ.get('HEALTH_FOOTBALL_INVALID_MAX', '0'))
+    ext_max = int(os.environ.get('HEALTH_EXTERNAL_ODDS_MAX', '50'))
+    wnx_min = float(os.environ.get('HEALTH_WNX_RATIO_MIN', '0.30'))
+    drift_max = float(os.environ.get('HEALTH_DRIFT_KS_MAX', '0.15'))
+
     alerts = []
     q = h.get('quality_checks') or {}
     fb_inv = int(q.get('football_invalid_form') or 0)
-    if fb_inv > 0:
-        alerts.append(f'⚠ {fb_inv} foot competitor(s) avec stats NBA-level')
+    if fb_inv > fb_max:
+        alerts.append(f'⚠ {fb_inv} foot competitor(s) avec stats NBA-level (seuil {fb_max})')
     ext_odds = int(q.get('actionable_external_odds') or 0)
-    if ext_odds > 50:
-        alerts.append(f'⚠ {ext_odds} events Winamax exact + odds_snapshot externe')
+    if ext_odds > ext_max:
+        alerts.append(f'⚠ {ext_odds} events Winamax exact + odds_snapshot externe (seuil {ext_max})')
     ratio = q.get('winamax_exact_ratio')
     if ratio is not None:
         try:
-            if float(ratio) < 0.30:
-                alerts.append(f'⚠ Winamax exact ratio bas : {float(ratio):.0%}')
+            if float(ratio) < wnx_min:
+                alerts.append(f'⚠ Winamax exact ratio bas : {float(ratio):.0%} (seuil {wnx_min:.0%})')
+        except (TypeError, ValueError):
+            pass
+    # Sprint 7 #3 — model drift KS
+    drift_ks = q.get('model_drift_ks')
+    if drift_ks is not None:
+        try:
+            if float(drift_ks) > drift_max:
+                alerts.append(f'⚠ Model drift KS={float(drift_ks):.3f} > {drift_max} (predictMatch a probablement changé)')
         except (TypeError, ValueError):
             pass
     return alerts

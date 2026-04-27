@@ -207,6 +207,34 @@ jobs:
           BUILD_ID=$(date -u +'%Y%m%d-%H%M%S')
           sed -i "s|^const CACHE_VERSION = .*|const CACHE_VERSION = 'paris-sportif-${BUILD_ID}';|" sw.js
 
+      # AUDIT-2026-04-27 (Sprint 32 #37) — Auto-rollback wired.
+      # Si data.js a perdu >50% events vs HEAD~1, refuse de commit.
+      - name: Check data integrity (auto-rollback if -50%)
+        run: python3 scripts/check_data_integrity.py || {
+          echo "::warning::data.js integrity check failed — reverting"
+          git checkout -- data.js pronostics.html
+          exit 0
+        }
+        continue-on-error: true
+
+      # AUDIT-2026-04-27 (Sprint 32 #39) — Backup snapshot quotidien.
+      # Cadence : 1 fois par jour à 23:55 UTC environ (cron tick le plus
+      # proche). Détection via heure 23 + minute >= 50.
+      - name: Daily data.js backup snapshot
+        run: |
+          HOUR=$(date -u +%H)
+          MIN=$(date -u +%M)
+          if [ "$HOUR" = "23" ] && [ "$MIN" -ge "50" ]; then
+            python3 scripts/backup_data_snapshot.py || true
+          fi
+
+      # AUDIT-2026-04-27 (Sprint 32 #38) — Health alerts via Discord.
+      # Optional : tourne seulement si DISCORD_HEALTH_WEBHOOK secret set.
+      - name: Notify health warnings (Discord opt-in)
+        env:
+          DISCORD_HEALTH_WEBHOOK: ${{ secrets.DISCORD_HEALTH_WEBHOOK }}
+        run: python3 scripts/notify_health_warnings.py || true
+
       - name: Commit data updates
         run: |
           git config user.name "github-actions[bot]"
@@ -220,7 +248,8 @@ jobs:
                   mlb_pitchers.json nhl_stats.json backtest.html feed.xml \
                   credibilite.html stadiums.json dixon_coles_rho.json index.html \
                   nba_team_stats.json team_strengths.json team_strengths_mle.json \
-                  og-default.png og-backtest.png og-credibilite.png og-methodologie.png 2>/dev/null || true
+                  og-default.png og-backtest.png og-credibilite.png og-methodologie.png \
+                  archives/ 2>/dev/null || true
           # Only stamp sw.js if we have real content changes — otherwise
           # discard the version bump to avoid 288 empty commits/day.
           if git diff --cached --quiet; then
