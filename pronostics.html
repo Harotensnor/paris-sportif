@@ -21,6 +21,12 @@
      cloudflareinsights pour analytics opt-in. -->
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://plausible.io https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://a.espncdn.com https://a1.espncdn.com https://a2.espncdn.com https://a3.espncdn.com https://a4.espncdn.com https://www.gstatic.com; connect-src 'self' https://api.clubelo.com https://sports.core.api.espn.com https://site.api.espn.com https://plausible.io https://cloudflareinsights.com; font-src 'self' data:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; media-src 'none'; worker-src 'self'; manifest-src 'self'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
+<!-- AUDIT-2026-04-27 (Sprint 12 #29) — Sécurité headers via meta tags.
+     GH Pages ne permet pas de custom HTTP headers, mais ces meta http-equiv
+     équivalent du point de vue user agent. -->
+<meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=(), usb=(), serial=(), bluetooth=(), accelerometer=(), gyroscope=(), magnetometer=(), midi=(), display-capture=()">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="X-Frame-Options" content="DENY">
 <!-- v30 — Open Graph + Twitter Card pour le partage social. URL canonique
      vers https://harotensnor.github.io/paris-sportif/. Image dérivée de
      l'icon 512x512 PWA. Hash routes (#locks, #bilan…) gardent la même

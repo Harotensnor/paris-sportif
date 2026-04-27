@@ -87,18 +87,19 @@ jobs:
             console.log("Unused JS        :", m("unused-javascript"));
             console.log("");
 
-            // v31 — Seuils d alerte (issue audit ChatGPT 2026-04-26).
-            // Volontairement permissifs au démarrage : on capte les vraies
-            // régressions (drop > 10pp) sans bloquer la CI sur un site
-            // monolithique connu pour son poids JS. Resserrer après refactor.
+            // AUDIT-2026-04-27 (Sprint 12 #27) — Seuils durcis.
+            // Après les optimisations (lazy-load editorial pages,
+            // bundle size budget, etc.), on serre la perf budget pour
+            // catch les régressions plus tôt.
             const thresholds = {
-              "Accessibility": { score: num(cats.accessibility), min: 90 },
-              "Best practices": { score: num(cats["best-practices"]), min: 85 },
-              "SEO":             { score: num(cats.seo),             min: 90 },
-              "Performance":     { score: num(cats.performance),     min: 30 }, // pragmatic for monolith
-              "LCP (ms)":        { score: ms("largest-contentful-paint"), max: 6000 },
-              "TBT (ms)":        { score: ms("total-blocking-time"),     max: 3500 },
+              "Accessibility": { score: num(cats.accessibility), min: 92 },
+              "Best practices": { score: num(cats["best-practices"]), min: 90 },
+              "SEO":             { score: num(cats.seo),             min: 92 },
+              "Performance":     { score: num(cats.performance),     min: 40 }, // monolith, mais plus tolérant
+              "LCP (ms)":        { score: ms("largest-contentful-paint"), max: 5000 },
+              "TBT (ms)":        { score: ms("total-blocking-time"),     max: 3000 },
               "CLS":             { score: cls,                            max: 0.1 },
+              "FCP (ms)":        { score: ms("first-contentful-paint"),   max: 3000 },
             };
             console.log("=== Thresholds check ===");
             let failed = 0;
