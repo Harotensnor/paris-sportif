@@ -106,6 +106,37 @@
   }
   // Minimalist toast. Stacks up to 3, auto-dismisses. Used for validation
   // errors + "pari ajouté" feedback + any action confirmation.
+  // AUDIT-2026-04-27 (Sprint 18 #29) — Auto-purge des badges "Nouveau" expirés.
+  // [data-new-until="YYYY-MM-DD"] sur les badges. Si la date est passée,
+  // le badge disparaît silencieusement. Évite la maintenance manuelle.
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    document.querySelectorAll('.nav-new-badge[data-new-until]').forEach(b => {
+      if (b.dataset.newUntil && b.dataset.newUntil < today) b.remove();
+    });
+  } catch (e) {}
+
+  // AUDIT-2026-04-27 (Sprint 18 #28) — Confetti lors d'un win streak.
+  // Spawn 12 particules sur l'élément cible, durée 2s. Animation CSS pure
+  // déclenchée par class .has-confetti + spans .confetti-piece.
+  window._spawnConfetti = function spawnConfetti(targetEl, n = 12) {
+    if (!targetEl) return;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    targetEl.classList.add('has-confetti');
+    const colors = ['var(--accent)', 'var(--brand)', 'var(--warn)', '#f472b6', '#60a5fa'];
+    for (let i = 0; i < n; i++) {
+      const piece = document.createElement('span');
+      piece.className = 'confetti-piece';
+      piece.style.left = `${5 + Math.random() * 90}%`;
+      piece.style.background = colors[i % colors.length];
+      piece.style.animationDelay = `${Math.random() * 400}ms`;
+      piece.style.transform = `rotate(${Math.random() * 360}deg)`;
+      targetEl.appendChild(piece);
+      setTimeout(() => piece.remove(), 2400);
+    }
+    setTimeout(() => targetEl.classList.remove('has-confetti'), 2400);
+  };
+
   // AUDIT-2026-04-27 (Sprint 17 #25) — Cmd/Ctrl-K focus search.
   // Raccourci clavier global qui focus la search bar de la topbar.
   // Évite à l'user de chercher l'input à la souris.
@@ -9080,8 +9111,45 @@
       }
     }
     const bestLeague = heroPick ? (heroPick.m.league_name || '') : '';
+    // AUDIT-2026-04-27 (Sprint 18 #30) — Smart suggestion selon l'heure.
+    // Petit nudge contextuel en haut du dashboard. Ne s'affiche pas si
+    // l'user a déjà cliqué dessus aujourd'hui (localStorage).
+    const _hourSuggestion = (() => {
+      try {
+        const dismissedToday = localStorage.getItem('smartSuggestionDismissed');
+        const todayIsoCheck = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+        if (dismissedToday === todayIsoCheck) return '';
+        const hour = parseInt(
+          new Date().toLocaleTimeString('fr-FR', { timeZone: 'Europe/Paris', hour: '2-digit', hour12: false }),
+          10
+        );
+        let icon, text, page, cta;
+        if (hour >= 6 && hour < 11) {
+          icon = '☀️'; text = 'Bonjour ! Découvre les matchs des 7 prochains jours.';
+          page = 'calendrier'; cta = 'Calendrier 7j';
+        } else if (hour >= 11 && hour < 18) {
+          icon = '🎯'; text = 'Top picks du jour à actualiser, les cotes pré-match arrivent.';
+          page = 'top'; cta = 'Top du jour';
+        } else if (hour >= 18 && hour < 23) {
+          icon = '🔒'; text = 'Locks imminents — c\'est le moment d\'agir.';
+          page = 'locks'; cta = 'Locks';
+        } else {
+          icon = '📊'; text = 'Bilan de la journée : voir comment le modèle s\'en est sorti.';
+          page = 'bilan'; cta = 'Voir bilan';
+        }
+        return `<div id="smart-suggest-banner" style="margin:0 0 16px;padding:10px 16px;background:linear-gradient(90deg, rgba(167,139,250,.10), rgba(52,211,153,.05));border:1px solid rgba(167,139,250,.20);border-left:3px solid var(--brand);border-radius:0 var(--r-sm) var(--r-sm) 0;display:flex;align-items:center;gap:12px;font-size:13.5px;color:var(--text-2);">
+          <span style="font-size:20px;line-height:1;">${icon}</span>
+          <span style="flex:1;">${esc(text)}</span>
+          <button class="page-btn" data-page="${esc(page)}" style="padding:6px 12px;background:var(--brand);color:#08080a;border:none;border-radius:var(--r-xs);cursor:pointer;font-size:12px;font-weight:700;white-space:nowrap;">${esc(cta)} →</button>
+          <button id="smart-suggest-dismiss" onclick="try { localStorage.setItem('smartSuggestionDismissed', new Date().toLocaleDateString('fr-CA',{timeZone:'Europe/Paris'})); var b=document.getElementById('smart-suggest-banner'); if(b) b.style.display='none'; } catch(e) {}" style="background:transparent;border:none;color:var(--text-dim2);font-size:18px;cursor:pointer;padding:0 4px;line-height:1;" aria-label="Masquer la suggestion" data-tooltip="Masquer pour aujourd'hui">×</button>
+        </div>`;
+      } catch (e) { return ''; }
+    })();
+
     wrap.innerHTML = `
       <div style="max-width:1100px;margin:0 auto;padding:0 20px;font-variant-numeric:tabular-nums;">
+
+        ${_hourSuggestion}
 
         <!-- v30 — Daily P&L chip retiré : Théo n'enregistre pas ses paris. -->
 
@@ -13977,10 +14045,16 @@
         </div>
       </div>`;
 
+    // AUDIT-2026-04-27 (Sprint 18 #27) — Empty state v2 amélioré.
     const emptyState = (!live.length && !upcoming.length && !settled.length)
-      ? `<div class="bilan-empty" style="margin-top:16px;">
-           Aucun lock actif. Le modèle est en mode ultra-sélectif (fiab ≥ 70% + ≥ 2 signaux purs).
-           Reviens dans quelques heures — les locks apparaissent dès qu'un match coche toutes les cases.
+      ? `<div class="empty-state-v2">
+           <div class="es-illustration">🔒</div>
+           <div class="es-title-v2">Le modèle prend sa journée</div>
+           <div class="es-body-v2">Aucun lock à 70%+ de confiance pour le moment. C'est <b style="color:var(--text);">normal</b> : le modèle préfère ne rien recommander plutôt que sortir des picks faibles. Reviens en début de soirée quand les cotes pré-match arrivent.</div>
+           <div class="es-actions-v2">
+             <button class="page-btn" data-page="tous" style="padding:10px 18px;background:var(--brand);color:#08080a;border:none;border-radius:var(--r-sm);cursor:pointer;font-weight:700;font-size:13px;">📋 Voir tous les pronos</button>
+             <button class="page-btn" data-page="calendrier" style="padding:10px 18px;background:transparent;color:var(--brand);border:1px solid var(--brand-border);border-radius:var(--r-sm);cursor:pointer;font-weight:600;font-size:13px;">📅 Calendrier 7j</button>
+           </div>
          </div>`
       : '';
 
