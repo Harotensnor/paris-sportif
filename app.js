@@ -144,8 +144,8 @@
     // Smart suggestion banner dismiss
     if (e.target.closest && e.target.closest('[data-smart-dismiss]')) {
       try {
-        const today = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
-        localStorage.setItem('smartSuggestionDismissed', today);
+        // Sprint 25 #2 — timestamp UTC pour fenêtre 18h glissante
+        localStorage.setItem('smartSuggestionDismissedTs', String(Date.now()));
         const b = document.getElementById('smart-suggest-banner');
         if (b) b.style.display = 'none';
       } catch (err) { /* swallow */ }
@@ -253,8 +253,18 @@
   document.addEventListener('focusout', (e) => {
     if (e.target.closest && e.target.closest('[data-tooltip]')) _hideTooltip();
   });
-  // Hide on scroll (positions become stale)
-  document.addEventListener('scroll', _hideTooltip, { passive: true, capture: true });
+  // Hide on scroll (positions become stale).
+  // Sprint 25 #4 — Throttle via rAF pour éviter le flicker quand l'user
+  // hover pendant qu'il scroll lentement (le hide+show ping-pong-ait).
+  let _ttScrollScheduled = false;
+  document.addEventListener('scroll', () => {
+    if (_ttScrollScheduled) return;
+    _ttScrollScheduled = true;
+    requestAnimationFrame(() => {
+      _hideTooltip();
+      _ttScrollScheduled = false;
+    });
+  }, { passive: true, capture: true });
 
   // AUDIT-2026-04-27 (Sprint 16 #17) — Animated counter.
   // animateCounter(el, {to: 12, duration: 300, format: v => Math.round(v)})
@@ -299,8 +309,11 @@
     el.className = `toast-item ${kind}`;
     el.textContent = msg;
     host.appendChild(el);
-    // Keep at most 3 toasts (FIFO)
-    while (host.children.length > 3) host.removeChild(host.firstChild);
+    // AUDIT-2026-04-27 (Sprint 25 #5) — Cap dynamique : 2 toasts sur
+    // mobile étroit (peut overflow), 3 sur desktop.
+    const isNarrow = window.innerWidth < 380;
+    const cap = isNarrow ? 2 : 3;
+    while (host.children.length > cap) host.removeChild(host.firstChild);
     setTimeout(() => {
       el.classList.add('dismissing');
       setTimeout(() => el.remove(), 220);
@@ -7192,8 +7205,15 @@
           modalEl.insertBefore(progressBar, modalEl.firstChild);
         }
         const updateProgress = () => {
+          // AUDIT-2026-04-27 (Sprint 25 #1) — Hide totally si pas de
+          // contenu scrollable (max ≤ 0). Avant : barre restait à 0%
+          // visible mais inutile.
           const max = bodyEl.scrollHeight - bodyEl.clientHeight;
-          if (max <= 0) { progressBar.style.width = '0%'; return; }
+          if (max <= 0) {
+            progressBar.style.display = 'none';
+            return;
+          }
+          progressBar.style.display = '';
           const pct = Math.min(100, Math.max(0, (bodyEl.scrollTop / max) * 100));
           progressBar.style.width = pct + '%';
         };
@@ -9168,9 +9188,12 @@
     // l'user a déjà cliqué dessus aujourd'hui (localStorage).
     const _hourSuggestion = (() => {
       try {
-        const dismissedToday = localStorage.getItem('smartSuggestionDismissed');
-        const todayIsoCheck = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
-        if (dismissedToday === todayIsoCheck) return '';
+        // AUDIT-2026-04-27 (Sprint 25 #2) — Comparaison timestamp UTC
+        // au lieu de date locale Paris. Avant : si l'user voyage entre
+        // fuseaux ou si la date Paris change pendant la session (00:00),
+        // le banner réapparaissait. Maintenant : dismissed pour 18h glissantes.
+        const dismissedTs = parseInt(localStorage.getItem('smartSuggestionDismissedTs') || '0', 10);
+        if (isFinite(dismissedTs) && (Date.now() - dismissedTs) < 18 * 3600 * 1000) return '';
         const hour = parseInt(
           new Date().toLocaleTimeString('fr-FR', { timeZone: 'Europe/Paris', hour: '2-digit', hour12: false }),
           10
@@ -12972,11 +12995,13 @@
         _main.classList.add('page-fade-in');
       }
     } catch(e){}
-    // AUDIT-2026-04-27 (Sprint 20 #6) — Scan auto des [data-anim-count]
-    // après chaque page change. Chaque element animé compte de 0 à
-    // data-anim-to en 300ms. Idempotent via flag data-anim-done.
+    // AUDIT-2026-04-27 (Sprint 20 #6 + Sprint 25 #3) — Scan auto des
+    // [data-anim-count]. Pour gérer le cas LITE→FULL re-render
+    // (lazy data charge après applyPageView et déclenche un nouveau
+    // render), on scan IMMÉDIATEMENT puis on observe les futures
+    // mutations DOM pour 3 secondes.
     try {
-      setTimeout(() => {
+      const scanAndAnimate = () => {
         document.querySelectorAll('[data-anim-count]:not([data-anim-done])').forEach(el => {
           const to = parseFloat(el.dataset.animTo);
           if (!isFinite(to)) return;
@@ -12992,7 +13017,16 @@
           }
           el.dataset.animDone = '1';
         });
-      }, 50);
+      };
+      setTimeout(scanAndAnimate, 50);
+      // Observe les rendus async (LITE → FULL) pendant 3s pour catch
+      // les nouveaux KPIs introduits par re-render après _ensureFullData.
+      const _main = document.querySelector('main');
+      if (_main && typeof MutationObserver === 'function') {
+        const obs = new MutationObserver(() => scanAndAnimate());
+        obs.observe(_main, { childList: true, subtree: true });
+        setTimeout(() => obs.disconnect(), 3000);
+      }
     } catch(e){}
     const isSimples = currentPage === 'simples';
     const isCombines = currentPage === 'combines';
