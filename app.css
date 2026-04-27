@@ -2177,6 +2177,74 @@
     max-width: calc(100vw - 100px);
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
+  /* AUDIT-2026-04-27 (Sprint 3 #11) — Sur mobile, la pilule était à
+     bottom:16px ET la mobile-bottom-nav fait ~60px → la pilule était
+     CACHÉE par la nav (z:50 < nav z:80). Remontée au-dessus de la nav. */
+  @media (max-width: 720px) {
+    .refresh-indicator.topbar-refresh {
+      bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+      left: 8px;
+      font-size: 10px;
+      padding: 4px 10px;
+      max-width: calc(100vw - 16px);
+    }
+    /* AUDIT-2026-04-27 (Sprint 3 #12) — Drawer ouvert masque la
+       bottom-nav. Évite le chevauchement visuel + double-input
+       lors de l'ouverture du drawer hamburger en mode mobile. */
+    body.sidebar-open .mobile-bottom-nav { display: none !important; }
+    body.sidebar-open .refresh-indicator.topbar-refresh { display: none !important; }
+  }
+
+  /* AUDIT-2026-04-27 (Sprint 3 #15) — Skeleton loaders réutilisables.
+     Avant : seul le boot avait un skeleton (no-data-banner).
+     Maintenant les pages qui font un async _ensureFullData peuvent
+     rendre `<div class="skeleton-card"></div>` en placeholder. */
+  .skeleton-card {
+    background: linear-gradient(90deg,
+      var(--panel) 0%, var(--panel-2) 50%, var(--panel) 100%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.4s infinite linear;
+    border-radius: var(--r);
+    height: 80px;
+    margin-bottom: 10px;
+  }
+  .skeleton-card.tall { height: 160px; }
+  .skeleton-card.short { height: 40px; }
+  .skeleton-text {
+    background: linear-gradient(90deg,
+      var(--panel) 0%, var(--panel-2) 50%, var(--panel) 100%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.4s infinite linear;
+    height: 12px; border-radius: 4px;
+    margin: 4px 0;
+  }
+  .skeleton-text.w-50 { width: 50%; }
+  .skeleton-text.w-70 { width: 70%; }
+  .skeleton-text.w-100 { width: 100%; }
+  @keyframes skeleton-shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .skeleton-card, .skeleton-text { animation: none; }
+  }
+
+  /* AUDIT-2026-04-27 (Sprint 3 #14) — Mode offline UX banner.
+     Visible quand window.navigator.onLine = false. Préfère
+     informer plutôt que laisser l'user devant un site qui semble
+     cassé sans raison. */
+  .offline-banner {
+    position: fixed; top: 56px; left: 0; right: 0; z-index: 90;
+    padding: 8px 16px;
+    background: rgba(251,191,36,.95);
+    color: #08080a;
+    font-size: 12.5px; font-weight: 600;
+    text-align: center;
+    border-bottom: 1px solid rgba(0,0,0,.15);
+    display: none;
+  }
+  .offline-banner.visible { display: block; }
+  body.has-offline-banner main { padding-top: 36px; }
   @media (max-width: 420px) {
     .refresh-indicator.topbar-refresh { bottom: 86px; }
   }
