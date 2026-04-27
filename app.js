@@ -9110,6 +9110,24 @@
       if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
 
+    // v31.7.44 — Mask cagnotte pill quand le footer est visible (audit
+    // 2026-04-27). Avant : la pill chevauchait "Pronos mis à jour..." en
+    // bas. Maintenant : fade out 80px avant l'arrivée du footer.
+    if (cagPill && 'IntersectionObserver' in window) {
+      const footer = document.querySelector('footer.site-footer');
+      if (footer && !cagPill._footerObserved) {
+        cagPill._footerObserved = true;
+        cagPill.style.transition = 'opacity .25s ease';
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach(e => {
+            cagPill.style.opacity = e.isIntersecting ? '0' : '1';
+            cagPill.style.pointerEvents = e.isIntersecting ? 'none' : 'auto';
+          });
+        }, { rootMargin: '0px 0px 80px 0px' });
+        io.observe(footer);
+      }
+    }
+
     // v30 — Sprint 3 : toggle analyse complète + ajusteur de mise inline
     wrap.querySelectorAll('.dpc-toggle').forEach(btn => {
       btn.addEventListener('click', (e) => {
@@ -10915,7 +10933,7 @@
           <div style="min-width:0;flex:1;">
             <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:4px;">Compte</div>
             <h1 style="margin:0 0 4px;font-size:36px;font-weight:800;letter-spacing:-1.2px;color:var(--text);line-height:1;">Théo</h1>
-            <div style="font-size:13px;color:var(--text-dim);">theoboulnois@gmail.com</div>
+            <div style="font-size:13px;color:var(--text-dim);">Compte personnel · contact via <a href="legal.html" style="color:var(--brand);">mentions légales</a></div>
           </div>
         </div>
 

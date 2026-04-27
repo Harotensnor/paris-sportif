@@ -1438,9 +1438,12 @@
     .dash-cag-pill .dcp-bal { font-size: 14px; }
   }
 
-  /* v28.4 — Mobile responsive Accueil agent (sous 640px, card stack au lieu de table 7 cols) */
+  /* v28.4 — Mobile responsive Accueil agent (sous 640px, card stack au lieu de table 7 cols)
+     v31.7.44 — Audit fix : padding-bottom 80→132px pour réserver zone
+     bottom-nav (60px) + cagnotte pill (52px) + safety (20px). Avant la
+     cagnotte pill chevauchait "Pronos mis à jour..." en bas de page. */
   @media (max-width: 640px) {
-    body.agent-home main { padding: 12px 8px 80px !important; }
+    body.agent-home main { padding: 12px 8px 132px !important; }
     /* Hero cagnotte : taille réduite */
     #dashboard-wrap > div > div:first-child > div:nth-child(2) { font-size: 42px !important; }
     /* Positions du jour : ligne plus compacte */
