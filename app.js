@@ -16955,18 +16955,59 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         if (window.matchMedia('(display-mode: standalone)').matches) return;
       } catch(e){}
       if (_pwaIsSnoozed()) return;
-      // v31.2 — UX audit : compter les visites (engagement signal). Ne montrer
-      // l'install banner qu'à partir de la 2e visite, pour ne pas saturer le
-      // premier écran d'un nouveau visiteur. Premier touch = découverte du site,
-      // 2e+ touch = intent réel.
+      // v31.2 — UX audit : compter les visites (engagement signal).
+      // v31.7.56 — Smarter prompt : exiger ≥3 pages distinctes visitées
+      // (pas juste 2 chargements). Un visiteur qui scroll sans naviguer
+      // n'est pas engagé. Tracking via pwaPagesSeen Set persisté.
       let visitCount = 0;
       try { visitCount = parseInt(localStorage.getItem('pwaVisitCount') || '0', 10); } catch(e){}
       visitCount = (isFinite(visitCount) ? visitCount : 0) + 1;
       try { localStorage.setItem('pwaVisitCount', String(visitCount)); } catch(e){}
       if (visitCount < 2) return;  // 1ère visite = pas de prompt
-      // Délais étendu à 60s (audit UX : laisser l'utilisateur explorer avant de proposer)
+
+      // v31.7.56 — Pages distinctes visitées (set persisté). On ajoute la
+      // page courante puis on vérifie le total ≥3.
+      let pagesSeen = [];
+      try {
+        const raw = localStorage.getItem('pwaPagesSeen') || '[]';
+        pagesSeen = JSON.parse(raw);
+        if (!Array.isArray(pagesSeen)) pagesSeen = [];
+      } catch(e){}
+      const curPage = (typeof currentPage !== 'undefined' && currentPage) || location.hash.replace(/^#/, '') || 'dashboard';
+      if (curPage && !pagesSeen.includes(curPage)) {
+        pagesSeen.push(curPage);
+        try { localStorage.setItem('pwaPagesSeen', JSON.stringify(pagesSeen.slice(-10))); } catch(e){}
+      }
+      if (pagesSeen.length < 3) return;  // pas assez de pages explorées
+
+      // Délais 60s — laisse l'user explorer encore avant le prompt
       setTimeout(_pwaShowBanner, 60000);
     });
+
+    // v31.7.56 — Track page changes pour cumuler pwaPagesSeen au fil
+    // de la session (sans attendre beforeinstallprompt).
+    function _pwaTrackPage(pageName) {
+      if (!pageName) return;
+      try {
+        const raw = localStorage.getItem('pwaPagesSeen') || '[]';
+        let seen = JSON.parse(raw);
+        if (!Array.isArray(seen)) seen = [];
+        if (!seen.includes(pageName)) {
+          seen.push(pageName);
+          localStorage.setItem('pwaPagesSeen', JSON.stringify(seen.slice(-10)));
+        }
+      } catch(e){}
+    }
+    // Hook hashchange pour tracker la nav SPA
+    window.addEventListener('hashchange', () => {
+      const p = location.hash.replace(/^#/, '');
+      if (p) _pwaTrackPage(p);
+    });
+    // Track la page initiale au load
+    setTimeout(() => {
+      const p = (typeof currentPage !== 'undefined' && currentPage) || location.hash.replace(/^#/, '') || 'dashboard';
+      _pwaTrackPage(p);
+    }, 1000);
     window.addEventListener('appinstalled', () => {
       _pwaHideBanner();
       _pwaSnooze(365); // une fois installé, plus jamais demander
