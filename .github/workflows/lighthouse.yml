@@ -52,7 +52,7 @@ jobs:
             if curl -fsS http://localhost:8765/pronostics.html -o /dev/null; then break; fi
           done
 
-      - name: Run Lighthouse
+      - name: Run Lighthouse (pronostics dashboard)
         run: |
           npx lighthouse http://localhost:8765/pronostics.html \
             --output=json --output=html \
@@ -60,6 +60,37 @@ jobs:
             --chrome-flags="--headless --no-sandbox --disable-gpu" \
             --only-categories=performance,accessibility,best-practices,seo \
             --quiet
+
+      # AUDIT-2026-04-27 (Sprint 39 #33) — LCP per-page : aussi test
+      # landing page (index.html) qui doit être beaucoup plus rapide
+      # (pas de SPA, pas de LITE blob, juste HTML statique ~25KB).
+      - name: Run Lighthouse (landing index.html)
+        run: |
+          npx lighthouse http://localhost:8765/index.html \
+            --output=json \
+            --output-path=./lighthouse-index \
+            --chrome-flags="--headless --no-sandbox --disable-gpu" \
+            --only-categories=performance,accessibility,best-practices,seo \
+            --quiet
+          node -e '
+            const r = require("./lighthouse-index.report.json");
+            const lcp = Math.round((r.audits["largest-contentful-paint"] || {}).numericValue || 0);
+            const fcp = Math.round((r.audits["first-contentful-paint"] || {}).numericValue || 0);
+            const perf = Math.round(((r.categories.performance || {}).score || 0) * 100);
+            console.log("Landing index.html scores:");
+            console.log("  Performance :", perf, "/ 100");
+            console.log("  LCP         :", lcp, "ms (target ≤ 2500)");
+            console.log("  FCP         :", fcp, "ms (target ≤ 1500)");
+            const fails = [];
+            if (perf < 75) fails.push("Performance " + perf + " < 75");
+            if (lcp > 2500) fails.push("LCP " + lcp + "ms > 2500");
+            if (fcp > 1500) fails.push("FCP " + fcp + "ms > 1500");
+            if (fails.length) {
+              console.log("FAIL :", fails.join(", "));
+              process.exit(1);
+            }
+            console.log("OK : landing dans les seuils stricts.");
+          '
 
       - name: Print scores + fail on threshold regressions
         run: |
