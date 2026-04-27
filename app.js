@@ -7369,6 +7369,9 @@
     } catch(e){}
     let errCount = 0;
     try { errCount = (JSON.parse(localStorage.getItem('paris_sportif_js_errors_v1') || '[]') || []).length; } catch(e){}
+    // v31.7.69 — Audit : compter les inline styles app.js (proxy santé refacto)
+    let pwaPagesSeen = [];
+    try { pwaPagesSeen = JSON.parse(localStorage.getItem('pwaPagesSeen') || '[]'); } catch(e){}
     const out = {
       data: {
         generated_at: d?.generated_at || '?',
@@ -7382,8 +7385,11 @@
         currentPage: localStorage.getItem('currentPage') || '?',
         bankroll: parseFloat(localStorage.getItem('userBankroll') || '0') || 0,
         theme: prefs.theme || 'dark',
+        accent: prefs.accent || 'default',
+        level: prefs.level || 'confirme',
         notifsEnabled: !!prefs.pushNotifs,
         trackedBetsCount: trackedCount,
+        pwaPagesSeen: pwaPagesSeen.length,
       },
       health: {
         sw_supported: 'serviceWorker' in navigator,
@@ -7392,13 +7398,25 @@
         js_errors_logged: errCount,
         backtest_loaded: !!window.__backtestReportV2,
         calibration_loaded: !!window.__modelCalibration,
+        dixon_coles_rho_loaded: !!__dcRhoMeasured,
+        stadiums_loaded: !!__stadiumsCache,
+      },
+      features: {
+        // v31.7.69 — Liste des features récemment ajoutées (audit run)
+        focus_trap_modal: typeof _trapFocus === 'function',
+        post_mortem_lost_picks: typeof buildLossPostMortem === 'function',
+        compare_2_dates: typeof renderComparePage === 'function',
+        profit_calendar: typeof renderProfitCalendar === 'function',
+        roi_chart_multi: typeof renderRoiChartMulti === 'function',
+        test_api: !!window.__testAPI,
       },
       cache_version: typeof CACHE_VERSION !== 'undefined' ? CACHE_VERSION : '?',
     };
-    console.log('%c🔍 Paris-Sportif diag', 'color:#a78bfa;font-weight:700;font-size:14px;');
+    console.log('%c🔍 Paris-Sportif diag', 'color:#b6a0ff;font-weight:700;font-size:14px;');
     console.table(out.data);
     console.table(out.user);
     console.table(out.health);
+    console.table(out.features);
     return out;
   };
 
