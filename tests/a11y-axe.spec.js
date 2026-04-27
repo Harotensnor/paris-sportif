@@ -28,6 +28,14 @@ const PAGES = [
   { name: 'credibilite', path: '/credibilite.html' },
   { name: 'comment-lire', path: '/comment-lire-un-prono.html' },
   { name: 'legal', path: '/legal.html' },
+  // AUDIT-2026-04-27 (Sprint 12 #28) — Étendu aux pages SPA dynamiques
+  // qui ont le plus de DOM custom. Test visite via hash navigation.
+  { name: 'spa-tous', path: '/pronostics.html#tous' },
+  { name: 'spa-locks', path: '/pronostics.html#locks' },
+  { name: 'spa-calendrier', path: '/pronostics.html#calendrier' },
+  { name: 'spa-bilan', path: '/pronostics.html#bilan' },
+  { name: 'spa-profil', path: '/pronostics.html#profil' },
+  { name: 'spa-alertes', path: '/pronostics.html#alertes' },
 ];
 
 test.beforeEach(async ({ context }) => {
@@ -44,10 +52,10 @@ test.beforeEach(async ({ context }) => {
 for (const page of PAGES) {
   test(`a11y · ${page.name} (WCAG 2.1 AA)`, async ({ page: p }) => {
     await p.goto(page.path);
-    // Wait for hydration on the dashboard (dynamic content)
-    if (page.name === 'dashboard') {
+    // Wait for hydration sur les pages SPA dynamiques (dashboard + #spa-*)
+    if (page.name === 'dashboard' || page.name.startsWith('spa-')) {
       await p.waitForFunction(() => window.PRONOSTICS_DATA != null, { timeout: 10000 }).catch(() => {});
-      await p.waitForTimeout(1000);  // let render finish
+      await p.waitForTimeout(1500);  // let SPA page render finish (dynamic content)
     }
 
     const results = await new AxeBuilder({ page: p })
