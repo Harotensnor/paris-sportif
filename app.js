@@ -1123,6 +1123,108 @@
   }
   try { window.selectBestMarket = selectBestMarket; } catch(e){}
 
+  // Sprint 71 (v31.7.159 — audit ChatGPT 2026-04-28 P1) — Combinés multi-types
+  // + corrélation. Réponse à l'audit "Bon concept anti-corrélation, trop 1N2-
+  // centric. Indiquer corrélation entre matchs sélectionnés."
+  //
+  // Score corrélation [0..1] entre 2 picks. 1 = très corrélés (même sport +
+  // même ligue + horaire chevauchant + matchs sur même championnat avec
+  // équipes liées). 0 = totalement indépendants.
+  // Critères :
+  //   * même match (m.id) → 1.0 (rejet : on combine pas un match avec lui-même)
+  //   * même ligue ET kickoff < 2h d'écart → +0.4 (matchs serrés en compétition partagée)
+  //   * même équipe impliquée → +0.5 (très rare mais bloquant : si on parie home + draw
+  //                                   sur le même match c'est un "système" pas un combiné)
+  //   * même sport → +0.15 (faible corrélation marché)
+  //   * markets corrélés (ex : Over 2.5 + BTTS yes → +0.3, 1X2 home + Score H gagnant +0.5)
+  function combinationCorrelation(p1, p2) {
+    if (!p1 || !p2 || !p1.match || !p2.match) return 0;
+    const m1 = p1.match;
+    const m2 = p2.match;
+    if (String(m1.id) === String(m2.id)) {
+      // Même match : on accepte certaines combinaisons (1X2 + OU ≠ same outcome)
+      // mais on flag à 0.6 (corrélé) pour avertir l'user.
+      const market1 = p1.market || '1n2';
+      const market2 = p2.market || '1n2';
+      if (market1 === market2) return 1.0;
+      // Combinaisons interdites (mêmes outcome) :
+      if ((market1 === '1n2' && market2 === 'doubleChance') ||
+          (market1 === 'doubleChance' && market2 === '1n2')) return 0.95;
+      // Combinaisons compatibles intra-match (1X2 + OU/BTTS) — moyenne corrélation
+      return 0.6;
+    }
+    let corr = 0;
+    if (m1.sport === m2.sport) corr += 0.15;
+    if (m1.league_code && m1.league_code === m2.league_code) corr += 0.10;
+    // Kickoff chevauchement
+    const t1 = new Date(m1.date).getTime();
+    const t2 = new Date(m2.date).getTime();
+    const delta = Math.abs(t1 - t2) / (3600 * 1000);  // heures
+    if (delta < 0.5) corr += 0.20;
+    else if (delta < 2) corr += 0.10;
+    // Équipes liées (rare mais possible : Bayern joue 2x dans la fenêtre)
+    try {
+      const sides1 = (typeof getSides === 'function') ? getSides(m1) : null;
+      const sides2 = (typeof getSides === 'function') ? getSides(m2) : null;
+      if (sides1 && sides2) {
+        const teams1 = [sides1.home?.name, sides1.away?.name].filter(Boolean);
+        const teams2 = [sides2.home?.name, sides2.away?.name].filter(Boolean);
+        if (teams1.some(t => teams2.includes(t))) corr += 0.50;
+      }
+    } catch(e) {}
+    return Math.min(1, corr);
+  }
+  try { window.combinationCorrelation = combinationCorrelation; } catch(e){}
+
+  // Génère plusieurs types de combinés à partir d'une liste de picks
+  // candidates. 4 types : safe (uniquement Locks), best-edge (top edge), buts
+  // (uniquement marchés OU/BTTS), tomorrow (matchs J+1).
+  // Retourne { safe: [...], bestEdge: [...], buts: [...], tomorrow: [...] }.
+  // Chaque combiné = { picks: [pick, pick, pick], corrAvg, totalOdd }.
+  function buildComboVariants(picks, opts) {
+    opts = opts || {};
+    const minCorr = 0.4;  // skip combos avec haute corrélation
+    const maxLegs = opts.maxLegs || 3;
+    const lowCorrCombo = (filtered) => {
+      // Glouton : prend le 1er, puis chaque suivant qui a corr < minCorr avec TOUS les déjà choisis.
+      const sel = [];
+      for (const p of filtered) {
+        if (sel.length >= maxLegs) break;
+        const ok = sel.every(s => combinationCorrelation(s, p) < minCorr);
+        if (ok) sel.push(p);
+      }
+      if (sel.length < 2) return null;
+      const corrAvg = sel.length > 1
+        ? (sel.reduce((acc, s, i) => i === 0 ? acc : acc + combinationCorrelation(sel[0], s), 0) / (sel.length - 1))
+        : 0;
+      const totalOdd = sel.reduce((acc, p) => acc * (p.odd || 1), 1);
+      return { picks: sel, corrAvg, totalOdd, n: sel.length };
+    };
+    // 1) Safe : uniquement locks (isLock = true)
+    const safe = picks.filter(p => p.isLock).sort((a,b) => (b.prob || 0) - (a.prob || 0));
+    // 2) Best edge : edge décroissant
+    const bestEdge = [...picks].sort((a,b) => (b.edge || 0) - (a.edge || 0));
+    // 3) Buts : marchés OU et BTTS
+    const buts = picks.filter(p => p.market === 'ou25' || p.market === 'ou15' || p.market === 'ou35' || p.market === 'btts')
+                       .sort((a,b) => (b.prob || 0) - (a.prob || 0));
+    // 4) Tomorrow : matchs J+1
+    const tomorrow = (() => {
+      const tom = new Date(); tom.setDate(tom.getDate() + 1);
+      const tomIso = tom.toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+      return picks.filter(p => {
+        try { return new Date(p.match.date).toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' }) === tomIso; }
+        catch(e) { return false; }
+      }).sort((a,b) => (b.prob || 0) - (a.prob || 0));
+    })();
+    return {
+      safe: lowCorrCombo(safe),
+      bestEdge: lowCorrCombo(bestEdge),
+      buts: lowCorrCombo(buts),
+      tomorrow: lowCorrCombo(tomorrow),
+    };
+  }
+  try { window.buildComboVariants = buildComboVariants; } catch(e){}
+
   // ======= Sprint 47 (v31.7.136) — matchImportance + getMatchStatus =======
   // matchImportance(m) : score 0..100 reflétant l'enjeu d'un match.
   // Sert à surfacer les "gros matchs" (PSG-Bayern CL, Clasico, Finale, etc.)
@@ -6564,6 +6666,55 @@
       </div>
 
       ${(() => {
+        // Sprint 69 (v31.7.157 — audit ChatGPT 2026-04-28 P1) — "Fiche de décision".
+        // Strip de KPIs séparés (Confiance / Edge / Kelly / Qualité / Actionability)
+        // au lieu d'un score unique. Réponse à l'audit qui demande de séparer ces
+        // dimensions pour que l'user voit ce qui pousse / freine sa mise.
+        if (!pred || !pred.pick || isFinal) return '';
+        const best = (typeof selectBestMarket === 'function') ? selectBestMarket(match, pred) : null;
+        const conf = Number(pred.reliability ?? pred.pick.prob) || 0;
+        const edge = best ? best.edge : 0;
+        const kelly = best ? best.kelly : 0;
+        const dq = (typeof computeDataQuality === 'function') ? computeDataQuality(match) : { score: 0, max: 4 };
+        // Actionability = score composite [0..100] :
+        //   30 * conf + 25 * (edge × 5, capé) + 20 * (Kelly × 10, capé) + 15 * (dq/max) + 10 * winamax_exact
+        const wxExact = !!(match.winamax && match.winamax.match_id && match.winamax.markets && match.winamax.markets['1n2']);
+        const action = Math.round(
+          30 * Math.min(1, conf) +
+          25 * Math.min(1, Math.max(0, edge * 5)) +
+          20 * Math.min(1, kelly * 10) +
+          15 * (dq.max ? dq.score / dq.max : 0) +
+          10 * (wxExact ? 1 : 0)
+        );
+        const confColor = conf >= 0.65 ? 'var(--accent, #22c55e)' : conf >= 0.55 ? 'var(--warn, #c79b00)' : 'var(--text-dim)';
+        const edgeColor = edge >= 0.05 ? 'var(--accent)' : edge >= 0.02 ? 'var(--warn)' : edge < -0.02 ? 'var(--danger)' : 'var(--text-dim)';
+        const kellyColor = kelly >= 0.03 ? 'var(--accent)' : kelly >= 0.01 ? 'var(--warn)' : 'var(--text-dim)';
+        const dqColor = dq.score >= 3 ? 'var(--accent)' : dq.score >= 2 ? 'var(--warn)' : 'var(--text-dim)';
+        const actionColor = action >= 65 ? 'var(--accent)' : action >= 45 ? 'var(--warn)' : 'var(--text-dim)';
+        const tile = (label, value, sub, color) => `
+          <div style="flex:1;min-width:90px;padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
+            <div style="font-size:9.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">${esc(label)}</div>
+            <div style="font-size:22px;font-weight:800;color:${color};margin-top:2px;font-variant-numeric:tabular-nums;line-height:1;">${esc(String(value))}</div>
+            ${sub ? `<div style="font-size:10px;color:var(--text-dim2);margin-top:3px;">${esc(sub)}</div>` : ''}
+          </div>`;
+        return `
+          <div class="section" style="margin-top:14px;">
+            <h4>📊 Fiche de décision</h4>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              ${tile('Confiance', `${Math.round(conf * 100)}%`, conf >= 0.65 ? 'Solide' : conf >= 0.55 ? 'Correcte' : 'Limite', confColor)}
+              ${tile('Edge', `${edge >= 0 ? '+' : ''}${(edge * 100).toFixed(1)}pt`, edge >= 0.05 ? 'Value forte' : edge >= 0.02 ? 'Value' : edge >= 0 ? 'Neutre' : 'Négatif', edgeColor)}
+              ${tile('Kelly', `${(kelly * 100).toFixed(1)}%`, kelly >= 0.03 ? 'Mise franche' : kelly >= 0.01 ? 'Mise modérée' : 'Skip', kellyColor)}
+              ${tile('Qualité', `${dq.score}/${dq.max}`, dq.score >= 3 ? 'Riche' : dq.score >= 2 ? 'Correcte' : 'Pauvre', dqColor)}
+              ${tile('Actionability', `${action}/100`, action >= 65 ? 'À jouer' : action >= 45 ? 'À surveiller' : 'À éviter', actionColor)}
+            </div>
+            <div style="margin-top:8px;font-size:10.5px;color:var(--text-dim2);line-height:1.4;">
+              <b style="color:var(--text-dim);">Actionability</b> = composite (Confiance ×30 + Edge ×25 + Kelly ×20 + Qualité ×15 + Winamax exact ×10).
+              Sépare les 5 dimensions au lieu d'un score unique pour que tu voies ce qui pousse ou freine la mise.
+            </div>
+          </div>`;
+      })()}
+
+      ${(() => {
         // v31.7 — Section "Contexte du match" : toujours visible, donne le
         // décor avant les chiffres (enjeu, forme courte, conditions).
         // Réponse au retour user : "ajoute un texte qui explique le contexte
@@ -8733,6 +8884,97 @@
       return Array.isArray(arr) ? arr : [];
     } catch (e) { return []; }
   };
+
+  // Sprint 70 (v31.7.158 — audit ChatGPT 2026-04-28 P1) — Favoris multi-niveaux.
+  // Suit l'audit "Favoris doit être enrichi : multi-niveaux (match, équipe,
+  // ligue, sport, marché) + alertes paramétrables".
+  // Schema : localStorage.paris_sportif_watchlist = {
+  //   teams: ['PSG', 'Bayern Munich'],
+  //   leagues: ['uefa.champions', 'eng.1'],
+  //   sports: ['football'],
+  //   markets: ['1n2', 'btts'],
+  // }
+  // Et localStorage.paris_sportif_alert_rules = [
+  //   { id, type: 'edge_min'|'lock_imminent'|'lineup_published', threshold, scope: { sport?, league? } },
+  //   ...
+  // ]
+  const WATCHLIST_KEY = 'paris_sportif_watchlist';
+  const ALERT_RULES_KEY = 'paris_sportif_alert_rules';
+  function _loadWatchlist() {
+    try {
+      const raw = localStorage.getItem(WATCHLIST_KEY);
+      if (!raw) return { teams: [], leagues: [], sports: [], markets: [] };
+      const obj = JSON.parse(raw);
+      return {
+        teams: Array.isArray(obj.teams) ? obj.teams : [],
+        leagues: Array.isArray(obj.leagues) ? obj.leagues : [],
+        sports: Array.isArray(obj.sports) ? obj.sports : [],
+        markets: Array.isArray(obj.markets) ? obj.markets : [],
+      };
+    } catch(e) { return { teams: [], leagues: [], sports: [], markets: [] }; }
+  }
+  function _saveWatchlist(wl) {
+    try { localStorage.setItem(WATCHLIST_KEY, JSON.stringify(wl)); } catch(e){}
+  }
+  window._toggleWatchlistEntry = function(category, value) {
+    if (!['teams','leagues','sports','markets'].includes(category)) return false;
+    const wl = _loadWatchlist();
+    const arr = wl[category];
+    const idx = arr.indexOf(value);
+    if (idx >= 0) arr.splice(idx, 1);
+    else arr.push(value);
+    // Cap each list to 30 to avoid runaway storage
+    wl[category] = arr.slice(-30);
+    _saveWatchlist(wl);
+    return idx < 0;  // true if newly added
+  };
+  window._loadWatchlist = _loadWatchlist;
+  window._isOnWatchlist = function(category, value) {
+    const wl = _loadWatchlist();
+    return Array.isArray(wl[category]) && wl[category].includes(value);
+  };
+  // Vérifie si un match est "watché" (un de ses team/league/sport est dans la watchlist)
+  window._matchIsWatched = function(match) {
+    if (!match) return false;
+    const wl = _loadWatchlist();
+    if (wl.sports.includes(match.sport)) return true;
+    if (wl.leagues.includes(match.league_code)) return true;
+    try {
+      const sides = (typeof getSides === 'function') ? getSides(match) : null;
+      if (sides) {
+        if (wl.teams.includes(sides.home?.name)) return true;
+        if (wl.teams.includes(sides.away?.name)) return true;
+      }
+    } catch(e) {}
+    return false;
+  };
+  // Alertes paramétrables
+  function _loadAlertRules() {
+    try {
+      const raw = localStorage.getItem(ALERT_RULES_KEY);
+      if (!raw) return [];
+      const arr = JSON.parse(raw);
+      return Array.isArray(arr) ? arr : [];
+    } catch(e) { return []; }
+  }
+  window._loadAlertRules = _loadAlertRules;
+  window._addAlertRule = function(type, threshold, scope) {
+    const rules = _loadAlertRules();
+    const rule = {
+      id: 'alert_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+      type: String(type || 'edge_min'),
+      threshold: Number(threshold) || 0.05,
+      scope: scope || {},
+      created_at: new Date().toISOString(),
+    };
+    rules.push(rule);
+    try { localStorage.setItem(ALERT_RULES_KEY, JSON.stringify(rules.slice(-20))); } catch(e){}
+    return rule.id;
+  };
+  window._removeAlertRule = function(id) {
+    const rules = _loadAlertRules().filter(r => r.id !== id);
+    try { localStorage.setItem(ALERT_RULES_KEY, JSON.stringify(rules)); } catch(e){}
+  };
   document.getElementById('close-detail').addEventListener('click', closeDetailModal);
   document.getElementById('detail-modal').addEventListener('click', (e) => { if (e.target.id === 'detail-modal') closeDetailModal(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDetailModal(); });
@@ -10121,36 +10363,29 @@
     // voit PSG-Bayern même quand le modèle hésite (cotes 2.20/4.00/2.60).
     // Chaque match a un statusBadge {code, label, hint, color} pour que
     // l'user comprenne pourquoi il y a / n'y a pas de prono fort.
+    // Sprint 68 (v31.7.156 — refactor) — Utilise getScopedEvents('7d') au lieu
+    // de la boucle inline. Cohérence garantie avec Calendrier 7j et Matchs
+    // détectés (qui passent par les mêmes filtres). Sans changement de comportement.
     const topImportantMatches = _dataIsStale ? [] : (() => {
-      const horizonDays = 7;
-      const dayKeys = [];
-      const todayDt = new Date(todayIso + 'T00:00:00Z');
-      for (let i = 0; i <= horizonDays; i++) {
-        const d = new Date(todayDt);
-        d.setUTCDate(d.getUTCDate() + i);
-        dayKeys.push(d.toISOString().slice(0, 10));
-      }
+      const evs7d = (typeof getScopedEvents === 'function')
+        ? getScopedEvents('7d', { data })
+        : [];
       const arr = [];
       const seenIds = new Set();
-      dayKeys.forEach(iso => {
-        const evs = data.days[iso] || [];
-        evs.forEach(m => {
-          if (!m || m.completed || m.live) return;
-          if (seenIds.has(m.id)) return;
-          const ts = new Date(m.date).getTime();
-          if (!isFinite(ts) || ts < nowMs) return;
-          // On exige a minima un match_id Winamax pour pouvoir lier vers le book.
-          // Tournament-only (pas de match_id) on skip — l'user ne pourra rien faire.
-          if (!(m.winamax && m.winamax.match_id)) return;
-          let importance = 0;
-          try { importance = matchImportance(m); } catch(e) {}
-          if (importance < 30) return;  // seuil "gros match"
-          let pred = null;
-          try { pred = predictMatch(m); } catch(e) {}
-          const status = getMatchStatus(m, pred);
-          arr.push({ m, pred, status, importance, ts });
-          seenIds.add(m.id);
-        });
+      evs7d.forEach(m => {
+        if (!m || m.live) return;
+        if (seenIds.has(m.id)) return;
+        // On exige a minima un match_id Winamax pour pouvoir lier vers le book.
+        if (!(m.winamax && m.winamax.match_id)) return;
+        let importance = 0;
+        try { importance = matchImportance(m); } catch(e) {}
+        if (importance < 30) return;  // seuil "gros match"
+        let pred = null;
+        try { pred = predictMatch(m); } catch(e) {}
+        const status = getMatchStatus(m, pred);
+        const ts = new Date(m.date).getTime();
+        arr.push({ m, pred, status, importance, ts });
+        seenIds.add(m.id);
       });
       // Tri : importance desc, puis kickoff asc (les plus proches d'abord à importance égale)
       arr.sort((a, b) => {
