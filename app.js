@@ -1365,12 +1365,46 @@
     const margin = projH - projA;
     const baseCap = `Projection lissée sur les ${Math.min(h.sample, a.sample)} derniers matchs`;
     const extras = captionExtras.length ? ` + ${captionExtras.join(', ')}` : '';
+    // Sprint 56 (v31.7.145) — Multi-marchés basket. Lignes Winamax courantes :
+    // total points 215.5/220.5/225.5 (NBA), handicap -3.5/-5.5/-7.5. Approx
+    // Gaussienne σ ≈ 12 (NBA), σ ≈ 18 (NCAA / EuroLeague — plus volatil).
+    // Le marché attend une marge entière → on offset la moyenne par 0.5 pour
+    // éviter les pushes (matchs nuls).
+    const sigmaTotal = 12;       // empirique NBA
+    const sigmaMargin = 10;      // empirique NBA
+    const phiCdf = (z) => 1 / (1 + Math.exp(-1.702 * z));  // approx normale
+    const totalLines = [205.5, 215.5, 220.5, 225.5];
+    const totalsMarkets = totalLines.map(line => {
+      const z = (total - line) / sigmaTotal;
+      const pOver = phiCdf(z);
+      return {
+        line,
+        label: `Plus de ${line} pts`,
+        pOver, pUnder: 1 - pOver,
+      };
+    });
+    const handicapLines = margin >= 0 ? [3.5, 5.5, 7.5, 9.5] : [-3.5, -5.5, -7.5, -9.5];
+    const handicaps = handicapLines.map(spread => {
+      // P(marge_home > spread) = P((projH - projA) > spread)
+      const z = (margin - spread) / sigmaMargin;
+      const pCover = phiCdf(z);
+      const favSide = spread > 0 ? 'home' : 'away';
+      const sideName = spread > 0 ? (home?.short || home?.name || 'Dom.') : (away?.short || away?.name || 'Ext.');
+      return {
+        spread,
+        label: `${sideName} ${spread > 0 ? '-' : '+'}${Math.abs(spread)}`,
+        pCover, pAgainst: 1 - pCover,
+        favSide,
+      };
+    });
     return {
       kind: 'basket',
       items: [{ home: projH, away: projA, prob: 1, label: `${projH}-${projA}` }],
       total,
       margin,
       caption: `${baseCap}${extras} (± ~8 pts par équipe en NBA).`,
+      // Sprint 56 (v31.7.145 — Phase 3 basket)
+      markets: { totals: totalsMarkets, handicaps, sigmaTotal, sigmaMargin },
     };
   }
 
@@ -4020,6 +4054,80 @@
     if (key === 'X') return hs === as ? 'won' : 'lost';
     return null;
   }
+
+  // Sprint 60 (v31.7.149) — Per-market evaluation. Étend evaluateModelPick
+  // pour les marchés secondaires (OU, BTTS, DC, score exact, mi-temps,
+  // total points basket, handicap basket). Retourne 'won' / 'lost' / null
+  // (VOID si on ne peut pas évaluer).
+  // Utilisé par backtest_v2.py via model_loader.py V8 embedded.
+  // Frontend l'utilise pour annoter les paris dans Performance > Marché.
+  function evaluateMarketPick(match, marketKey, pickValue) {
+    if (!match?.completed) return null;
+    const status = match.status || '';
+    if (status === 'STATUS_RETIRED' || status === 'STATUS_WALKOVER'
+        || status === 'STATUS_FORFEIT' || status === 'STATUS_POSTPONED'
+        || status === 'STATUS_CANCELED' || status === 'STATUS_CANCELLED'
+        || status === 'STATUS_ABANDONED') {
+      return null;
+    }
+    const { home, away } = getSides(match);
+    const hs = parseInt(home?.score ?? '', 10);
+    const as = parseInt(away?.score ?? '', 10);
+    if (isNaN(hs) || isNaN(as)) return null;
+    const total = hs + as;
+    const margin = hs - as;
+    switch (marketKey) {
+      case '1n2':
+        if (pickValue === '1') return hs > as ? 'won' : 'lost';
+        if (pickValue === '2') return as > hs ? 'won' : 'lost';
+        if (pickValue === 'X') return hs === as ? 'won' : 'lost';
+        return null;
+      case 'ou25':
+        if (pickValue === 'O2.5') return total > 2.5 ? 'won' : 'lost';
+        if (pickValue === 'U2.5') return total < 2.5 ? 'won' : 'lost';
+        return null;
+      case 'ou15':
+        if (pickValue === 'O1.5') return total > 1.5 ? 'won' : 'lost';
+        if (pickValue === 'U1.5') return total < 1.5 ? 'won' : 'lost';
+        return null;
+      case 'ou35':
+        if (pickValue === 'O3.5') return total > 3.5 ? 'won' : 'lost';
+        if (pickValue === 'U3.5') return total < 3.5 ? 'won' : 'lost';
+        return null;
+      case 'btts':
+        if (pickValue === 'BTTS_Y') return (hs >= 1 && as >= 1) ? 'won' : 'lost';
+        if (pickValue === 'BTTS_N') return (hs === 0 || as === 0) ? 'won' : 'lost';
+        return null;
+      case 'doubleChance':
+        if (pickValue === '1X') return hs >= as ? 'won' : 'lost';
+        if (pickValue === 'X2') return as >= hs ? 'won' : 'lost';
+        if (pickValue === '12') return hs !== as ? 'won' : 'lost';
+        return null;
+      case 'exactScore':
+        // pickValue format "h-a"
+        const parts = String(pickValue).split('-').map(x => parseInt(x, 10));
+        if (parts.length !== 2 || isNaN(parts[0]) || isNaN(parts[1])) return null;
+        return (hs === parts[0] && as === parts[1]) ? 'won' : 'lost';
+      case 'basketTotal':
+        // pickValue format "O215.5" ou "U220.5"
+        const m = /^([OU])(\d+(?:\.\d+)?)$/.exec(String(pickValue));
+        if (!m) return null;
+        const line = parseFloat(m[2]);
+        const isOver = m[1] === 'O';
+        return isOver ? (total > line ? 'won' : 'lost') : (total < line ? 'won' : 'lost');
+      case 'basketHandicap':
+        // pickValue : { side: 'home'|'away', spread: number }
+        if (!pickValue || typeof pickValue !== 'object') return null;
+        const adjusted = pickValue.side === 'home'
+          ? hs + (pickValue.spread || 0)
+          : as + (pickValue.spread || 0);
+        const opp = pickValue.side === 'home' ? as : hs;
+        return adjusted > opp ? 'won' : 'lost';
+      default:
+        return null;
+    }
+  }
+  try { window.evaluateMarketPick = evaluateMarketPick; } catch(e){}
 
   // v31.7.36 — Post-mortem auto sur les pronos perdus.
   // Utilité : quand un match est perdu, le modèle explique POURQUOI sa
@@ -6833,6 +6941,39 @@
                     <span style="color:var(--text-dim2,#7b8693);font-weight:500;font-size:12px;">${(s.prob*100).toFixed(1)}%</span>
                   </span>`).join('');
               }
+              // Sprint 56 (v31.7.145) — Basket : section "Total points + Handicap"
+              // si sc.markets dispo (calculé par basketScoreProjection).
+              let basketMarketsHtml = '';
+              if (kind === 'basket' && sc.markets) {
+                const totalsTop = (sc.markets.totals || []).slice(0, 3).map(g => {
+                  const pPick = g.pOver >= g.pUnder ? g.pOver : g.pUnder;
+                  const sideLbl = g.pOver >= g.pUnder ? `Plus de ${g.line}` : `Moins de ${g.line}`;
+                  const strong = pPick >= 0.65;
+                  return `<span style="padding:8px 14px;border-radius:8px;background:${strong?'rgba(16,185,129,.12)':'rgba(255,255,255,.04)'};border:1px solid ${strong?'rgba(16,185,129,.3)':'rgba(255,255,255,.06)'};font-variant-numeric:tabular-nums;font-weight:${strong?700:600};color:${strong?'#10b981':'var(--text,#e6ebf2)'};display:inline-flex;flex-direction:column;align-items:flex-start;gap:2px;">
+                    <span style="font-size:13px;">${esc(sideLbl)}${strong ? ' ⭐' : ''}</span>
+                    <span style="color:var(--text-dim2,#7b8693);font-weight:500;font-size:11px;">${(pPick*100).toFixed(0)}%</span>
+                  </span>`;
+                }).join('');
+                const handiTop = (sc.markets.handicaps || []).slice(0, 3).map(g => {
+                  const pPick = g.pCover >= g.pAgainst ? g.pCover : g.pAgainst;
+                  const sideLbl = g.pCover >= g.pAgainst ? esc(g.label) + ' ✓' : esc(g.label) + ' ✗';
+                  const strong = pPick >= 0.60;
+                  return `<span style="padding:8px 14px;border-radius:8px;background:${strong?'rgba(167,139,250,.12)':'rgba(255,255,255,.04)'};border:1px solid ${strong?'rgba(167,139,250,.3)':'rgba(255,255,255,.06)'};font-variant-numeric:tabular-nums;font-weight:${strong?700:600};color:${strong?'#a78bfa':'var(--text,#e6ebf2)'};display:inline-flex;flex-direction:column;align-items:flex-start;gap:2px;">
+                    <span style="font-size:13px;">${sideLbl}${strong ? ' ⭐' : ''}</span>
+                    <span style="color:var(--text-dim2,#7b8693);font-weight:500;font-size:11px;">${(pPick*100).toFixed(0)}%</span>
+                  </span>`;
+                }).join('');
+                basketMarketsHtml = `
+                  ${totalsTop ? `<div style="margin-top:12px;">
+                    <div class="lbl-tiny-mb">🏀 Total points</div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">${totalsTop}</div>
+                  </div>` : ''}
+                  ${handiTop ? `<div style="margin-top:12px;">
+                    <div class="lbl-tiny-mb">🎯 Handicap</div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">${handiTop}</div>
+                  </div>` : ''}
+                  <div style="margin-top:4px;font-size:10.5px;color:var(--text-dim2,#7b8693);line-height:1.3;">Approx. Gaussienne (NBA σ_total≈12, σ_marge≈10). Lignes Winamax courantes.</div>`;
+              }
               // Sprint 53 (v31.7.142) — Tennis : section "Total jeux" séparée
               // si `sc.games` est présent (calculé par tennisScorePrediction).
               let tennisGamesHtml = '';
@@ -6863,6 +7004,7 @@
                 <div style="display:flex;gap:8px;flex-wrap:wrap;">${chipsHtml}</div>
                 ${caption ? `<div style="margin-top:6px;font-size:10.5px;color:var(--text-dim2,#7b8693);line-height:1.3;">${esc(caption)}</div>` : ''}
                 ${tennisGamesHtml}
+                ${basketMarketsHtml}
               </div>`;
             })()}
             ${(() => {
@@ -6980,7 +7122,45 @@
           if (c >= 1 && c <= 3) return '⛅';
           return '☀️';
         };
-        return `
+        // Sprint 58 (v31.7.147) — "Risques" tab : flag des facteurs négatifs
+        // qui doivent inviter à la prudence. Lecture rapide pour l'user qui
+        // veut voir d'un coup pourquoi NE PAS suivre un prono.
+        const riskFlags = (() => {
+          const flags = [];
+          const rel = Number(pred?.reliability ?? pred?.pick?.prob) || 0;
+          if (rel < 0.55 && rel >= 0.50) flags.push({ icon: '⚠️', label: 'Confiance limite', txt: `Modèle à ${Math.round(rel*100)}% — proche du seuil de skip.` });
+          // Météo
+          if (w && (w.precip_mm > 5 || w.wind_kmh > 30)) flags.push({ icon: '🌧️', label: 'Météo défavorable', txt: `${w.precip_mm > 5 ? `Précip. ${w.precip_mm.toFixed(1)}mm/h` : ''}${w.precip_mm > 5 && w.wind_kmh > 30 ? ' + ' : ''}${w.wind_kmh > 30 ? `vent ${Math.round(w.wind_kmh)}km/h` : ''} — affecte le scoring.` });
+          // Congestion
+          if (congH >= 3) flags.push({ icon: '😴', label: `Fatigue dom. (${congH} matchs/7j)`, txt: `${esc(home?.short || 'Dom.')} a joué ${congH} matchs en 7 jours.` });
+          if (congA >= 3) flags.push({ icon: '😴', label: `Fatigue ext. (${congA} matchs/7j)`, txt: `${esc(away?.short || 'Ext.')} a joué ${congA} matchs en 7 jours.` });
+          // Blessures clés (si match.injuries)
+          if (match.injuries && Array.isArray(match.injuries)) {
+            const keyOut = match.injuries.filter(i => /(out|absent|blessé|suspendu)/i.test(i.status || '')).length;
+            if (keyOut >= 3) flags.push({ icon: '🚑', label: 'Effectif diminué', txt: `${keyOut} joueur${keyOut>1?'s':''} indisponible${keyOut>1?'s':''}.` });
+          }
+          // Cote très basse (vrai favori, peu d'edge)
+          const pickOdd = pred?.odds && (pred.pick?.key === '1' ? pred.odds.home : pred.pick?.key === '2' ? pred.odds.away : pred.odds.draw);
+          if (pickOdd && pickOdd < 1.30) flags.push({ icon: '💸', label: `Cote très basse @${pickOdd.toFixed(2)}`, txt: 'Risque/récompense défavorable, edge probable < 5%.' });
+          // Faiblesse data quality
+          const dq = computeDataQuality && computeDataQuality(match);
+          if (dq && dq.score <= 1 && dq.max >= 3) flags.push({ icon: '📉', label: 'Données pauvres', txt: `Seulement ${dq.score}/${dq.max} sources d'enrichissement disponibles.` });
+          return flags;
+        })();
+        const risksHtml = riskFlags.length ? `
+          <div class="section">
+            <h4>⚠️ Risques à connaître</h4>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              ${riskFlags.map(f => `
+                <div style="padding:10px 12px;background:rgba(199,155,0,.06);border:1px solid rgba(199,155,0,.2);border-left:3px solid var(--warn,#c79b00);border-radius:0 var(--r-sm) var(--r-sm) 0;">
+                  <div style="display:flex;align-items:center;gap:8px;font-weight:700;color:var(--warn);font-size:13px;">${f.icon} ${esc(f.label)}</div>
+                  <div style="margin-top:3px;font-size:12px;color:var(--text-dim);line-height:1.4;">${esc(f.txt)}</div>
+                </div>`).join('')}
+            </div>
+            <div style="margin-top:8px;font-size:10.5px;color:var(--text-dim2);font-style:italic;">${riskFlags.length} facteur${riskFlags.length>1?'s':''} qui justifient une mise plus prudente, voire de skip.</div>
+          </div>
+        ` : '';
+        return risksHtml + `
         <div class="section">
           <h4>🌐 Contexte extérieur</h4>
           <div class="two-cols">
@@ -7715,6 +7895,7 @@
       if (sections.length < 3) return;  // pas la peine pour 1-2 sections
       const cat = (txt) => {
         const t = (txt || '').toLowerCase();
+        if (t.includes('risque')) return 'risques';
         if (t.includes('pronostic') || t.includes('contexte') || t.includes('information')) return 'synthese';
         if (t.includes('cote') || t.includes('probabilité') || t.includes('bookmaker')) return 'cotes';
         if (t.includes('face-à-face') || t.includes('face à face') || t.includes('h2h')) return 'h2h';
@@ -7723,14 +7904,16 @@
             t.includes('5 derniers')) return 'stats';
         return 'signaux';
       };
+      // Sprint 58 (v31.7.147) — Onglet "Risques" ajouté
       const tabsOrder = [
         ['synthese', '🎯 Synthèse'],
         ['signaux', '📡 Signaux'],
         ['cotes', '💰 Cotes'],
+        ['risques', '⚠️ Risques'],
         ['h2h', '⚔️ H2H'],
         ['stats', '📊 Stats'],
       ];
-      const tabSections = { synthese: [], signaux: [], cotes: [], h2h: [], stats: [] };
+      const tabSections = { synthese: [], signaux: [], cotes: [], risques: [], h2h: [], stats: [] };
       sections.forEach(sec => {
         const h4 = sec.querySelector('h4');
         if (!h4) {
@@ -15990,6 +16173,15 @@
   // Brier, calibration drift) avec liens vers les onglets détaillés.
   // Le but : Théo voit en 5 secondes si le modèle se porte bien, sans avoir
   // à naviguer entre Bilan, Backtest, Crédibilité.
+  // Sprint 57 (v31.7.146) — Performance sub-tabs : Vue globale / Période /
+  // Confiance / Marché. État dans localStorage.perfTab pour persistance.
+  const PERF_TAB_KEY = 'perfTab';
+  function _getPerfTab() {
+    try { return localStorage.getItem(PERF_TAB_KEY) || 'global'; } catch(e) { return 'global'; }
+  }
+  function _setPerfTab(t) {
+    try { localStorage.setItem(PERF_TAB_KEY, t); } catch(e){}
+  }
   function renderPerformancePage(wrap) {
     const bt = window.__backtestReportV2 || window.__backtestReport;
     if (!bt) {
@@ -16045,51 +16237,76 @@
         const order = { lock: 0, premium: 1, value: 2, standard: 3, low: 4 };
         return (order[a[0]] ?? 5) - (order[b[0]] ?? 5);
       });
+    // Sprint 57 (v31.7.146) — Sub-tabs internes
+    const currentTab = _getPerfTab();
+    const tabs = [
+      { k: 'global',    lbl: '🎯 Vue globale' },
+      { k: 'periode',   lbl: '📆 Par période' },
+      { k: 'confiance', lbl: '🎚️ Par confiance' },
+      { k: 'marche',    lbl: '🏷️ Par marché' },
+      { k: 'sport',     lbl: '🏆 Par sport' },
+    ];
+    const subTabsHtml = `
+      <div style="margin-top:14px;display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:8px;">
+        ${tabs.map(t => `
+          <button data-perf-tab="${t.k}" style="padding:7px 14px;border-radius:var(--r-sm);border:1px solid ${currentTab === t.k ? 'var(--brand)' : 'transparent'};background:${currentTab === t.k ? 'var(--brand-soft)' : 'transparent'};color:${currentTab === t.k ? 'var(--brand)' : 'var(--text-2)'};font-weight:600;font-size:13px;cursor:pointer;">${esc(t.lbl)}</button>
+        `).join('')}
+      </div>`;
+    // Per-période breakdown
+    const byPeriod = bt.by_period || bt.byPeriod || {};
+    // Per-cote-bucket
+    const byCote = bt.by_cote_bucket || bt.byCote || {};
     wrap.innerHTML = `
       <div class="page-wrap">
         <div class="page-header">
-          <div class="lbl-tiny" style="color:var(--brand);">Performance · Vue globale</div>
+          <div class="lbl-tiny" style="color:var(--brand);">Performance · ${esc(tabs.find(t => t.k === currentTab)?.lbl || 'Vue globale')}</div>
           <h1 class="page-h1">🎯 Performance</h1>
           <div style="font-size:14px;color:var(--text-dim);">Synthèse du modèle sur ${n} pari${n > 1 ? 's' : ''} simulé${n > 1 ? 's' : ''}. Drill-down dans les onglets : Historique, Bilan, Backtest.</div>
         </div>
 
+        ${subTabsHtml}
+
+        ${currentTab !== 'global' ? '' : `
         <!-- KPIs principaux -->
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:18px;">
           ${kpiTile('Win Rate', fmtPct(wr), `${n} pari${n > 1 ? 's' : ''}`, 'var(--text)')}
           ${kpiTile('ROI cumul', fmtSign(roi), stake ? `mise totale ${Number(stake).toFixed(0)}€` : '', roiColor)}
           ${kpiTile('Brier score', brier == null ? '—' : Number(brier).toFixed(3), brier == null ? '' : Number(brier) <= 0.18 ? 'Calibration excellente' : Number(brier) <= 0.22 ? 'Calibration correcte' : 'Calibration médiocre', brierColor)}
           ${profit != null ? kpiTile('Profit cumul', `${Number(profit) >= 0 ? '+' : ''}${Number(profit).toFixed(2)}€`, '', Number(profit) >= 0 ? 'var(--accent)' : 'var(--danger)') : ''}
-        </div>
+        </div>`}
 
-        <!-- Per-sport breakdown -->
-        ${sportCards.length ? `
-        <div style="margin-top:24px;">
-          <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px;">Par sport</div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;">
-            ${sportCards.map(([sport, s]) => {
-              const sN = s.n || 0;
-              const sWr = s.win_rate ?? s.winRate ?? null;
-              const sRoi = s.roi ?? null;
-              const sRoiColor = sRoi == null ? 'var(--text)' : Number(sRoi) >= 0.02 ? 'var(--accent)' : Number(sRoi) >= -0.02 ? 'var(--warn)' : 'var(--danger)';
-              return `
-              <div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-                  <span style="font-size:14px;font-weight:700;color:var(--text);">${sportEmojis[sport] || '🎯'} ${esc(sport)}</span>
-                  <span style="font-size:11px;color:var(--text-dim);">${sN} pari${sN > 1 ? 's' : ''}</span>
-                </div>
-                <div style="display:flex;gap:14px;font-size:12px;font-variant-numeric:tabular-nums;">
-                  <span style="color:var(--text-dim);">WR <b style="color:var(--text);">${fmtPct(sWr)}</b></span>
-                  <span style="color:var(--text-dim);">ROI <b style="color:${sRoiColor};">${fmtSign(sRoi)}</b></span>
-                </div>
-              </div>`;
-            }).join('')}
-          </div>
+        ${currentTab === 'periode' && Object.keys(byPeriod).length ? `
+        <div style="margin-top:18px;">
+          <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px;">Performance par période</div>
+          <table style="width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:13px;">
+            <thead>
+              <tr style="border-bottom:1px solid var(--border);">
+                <th style="text-align:left;padding:8px 12px;color:var(--text-dim);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;">Période</th>
+                <th style="text-align:right;padding:8px 12px;color:var(--text-dim);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;">N paris</th>
+                <th style="text-align:right;padding:8px 12px;color:var(--text-dim);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;">Win Rate</th>
+                <th style="text-align:right;padding:8px 12px;color:var(--text-dim);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;">ROI</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${Object.entries(byPeriod).sort().map(([p, v]) => `
+              <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:8px 12px;color:var(--text);font-weight:600;">${esc(p)}</td>
+                <td style="padding:8px 12px;text-align:right;color:var(--text-dim);">${v.n || 0}</td>
+                <td style="padding:8px 12px;text-align:right;color:var(--text);">${fmtPct(v.win_rate ?? v.winRate)}</td>
+                <td style="padding:8px 12px;text-align:right;color:${(v.roi ?? 0) >= 0.02 ? 'var(--accent)' : (v.roi ?? 0) >= -0.02 ? 'var(--warn)' : 'var(--danger)'};font-weight:700;">${fmtSign(v.roi)}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>` : currentTab === 'periode' ? `
+        <div class="empty-state-v2" style="margin-top:18px;">
+          <div class="es-illustration">📆</div>
+          <div class="es-title-v2">Pas de breakdown par période</div>
+          <div class="es-body-v2">Le rapport backtest n'inclut pas encore <code>by_period</code>. Sera disponible au prochain run.</div>
         </div>` : ''}
 
-        <!-- Per-tier breakdown -->
-        ${tierRows.length ? `
-        <div style="margin-top:24px;">
-          <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px;">Par confiance (tier)</div>
+        ${currentTab === 'confiance' && tierRows.length ? `
+        <div style="margin-top:18px;">
+          <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px;">Performance par tier de confiance</div>
           <div style="overflow-x:auto;">
             <table style="width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:13px;">
               <thead>
@@ -16119,6 +16336,44 @@
           </div>
         </div>` : ''}
 
+        ${currentTab === 'marche' ? `
+        <div style="margin-top:18px;padding:16px 18px;background:var(--panel);border:1px dashed var(--border-2);border-radius:var(--r-sm);">
+          <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;">🏷️ Backtest par marché</div>
+          <div style="font-size:12px;color:var(--text-dim);line-height:1.5;">
+            Le backtest actuel suit uniquement les picks 1X2 principaux. Les marchés étendus (OU 2.5, BTTS, Score exact, Double chance, Mi-temps, Total points basket, Handicap basket, Total jeux tennis) sont calculés en temps réel depuis le modèle Poisson/Gaussien mais leurs gagnants/perdants ne sont pas encore tracés dans <code>backtest_report_v2.json</code>.
+            <br><br>
+            <b>Sprint 60 prévu</b> : étendre <code>evaluateModelPick</code> + backtest_v2.py pour calibrer chaque marché séparément. WR / ROI / Brier per-marché disponibles ici dans la prochaine version.
+          </div>
+        </div>` : ''}
+
+        ${currentTab === 'sport' && sportCards.length ? `
+        <div style="margin-top:18px;">
+          <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px;">Performance par sport</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;">
+            ${sportCards.map(([sport, s]) => {
+              const sN = s.n || 0;
+              const sWr = s.win_rate ?? s.winRate ?? null;
+              const sRoi = s.roi ?? null;
+              const sRoiColor = sRoi == null ? 'var(--text)' : Number(sRoi) >= 0.02 ? 'var(--accent)' : Number(sRoi) >= -0.02 ? 'var(--warn)' : 'var(--danger)';
+              return `
+              <div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                  <span style="font-size:14px;font-weight:700;color:var(--text);">${sportEmojis[sport] || '🎯'} ${esc(sport)}</span>
+                  <span style="font-size:11px;color:var(--text-dim);">${sN} pari${sN > 1 ? 's' : ''}</span>
+                </div>
+                <div style="display:flex;gap:14px;font-size:12px;font-variant-numeric:tabular-nums;">
+                  <span style="color:var(--text-dim);">WR <b style="color:var(--text);">${fmtPct(sWr)}</b></span>
+                  <span style="color:var(--text-dim);">ROI <b style="color:${sRoiColor};">${fmtSign(sRoi)}</b></span>
+                </div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>` : ''}
+
+        <!-- Sprint 57 (v31.7.146) — Anciens blocs per-sport / per-tier déplacés
+             dans les onglets ci-dessus. Ne plus dupliquer ici. -->
+        ${''}
+
         <!-- Liens vers les onglets détaillés -->
         <div style="margin-top:32px;padding:18px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
           <div style="font-size:13px;color:var(--text-dim);margin-bottom:10px;">Drill-down détaillé :</div>
@@ -16131,6 +16386,14 @@
           <div style="margin-top:8px;font-size:11px;color:var(--text-dim2);">Source : <code style="color:var(--brand);">backtest_report_v2.json</code> · regénéré chaque dimanche par cron.</div>
         </div>
       </div>`;
+    // Sprint 57 (v31.7.146) — Tab click handler
+    wrap.querySelectorAll('[data-perf-tab]').forEach(b => {
+      b.addEventListener('click', () => {
+        const t = b.dataset.perfTab;
+        _setPerfTab(t);
+        renderPerformancePage(wrap);
+      });
+    });
   }
   try { window.renderPerformancePage = renderPerformancePage; } catch(e){}
 

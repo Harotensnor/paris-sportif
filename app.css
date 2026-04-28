@@ -4975,3 +4975,70 @@
     }
   }
 
+  /* ====== Sprint 59 (v31.7.148) — Mobile polish ====== */
+
+  /* Sous-nav onglets : scroll horizontal smooth sur mobile */
+  #suivi-subnav, #pronos-subnav {
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+  @media (max-width: 720px) {
+    #suivi-subnav, #pronos-subnav {
+      flex-wrap: nowrap !important;
+      overflow-x: auto;
+      padding: 8px 12px 4px !important;
+      gap: 6px !important;
+      mask-image: linear-gradient(to right, black calc(100% - 24px), transparent);
+    }
+    #suivi-subnav button, #pronos-subnav button {
+      flex-shrink: 0;
+      scroll-snap-align: start;
+      min-width: max-content;
+    }
+  }
+
+  /* Heatmap mobile : cellules plus petites + label réduit */
+  @media (max-width: 480px) {
+    .cal-heatmap-cell {
+      font-size: 8px !important;
+    }
+  }
+
+  /* Status badges : meilleur wrap mobile */
+  @media (max-width: 480px) {
+    .interactive [data-mtab] {
+      max-width: 100%;
+    }
+  }
+
+  /* Page transitions plus fluides */
+  main.page-fade-in {
+    animation: pageFadeInSmooth .35s ease-out;
+  }
+  @keyframes pageFadeInSmooth {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Touch feedback : ripple-like sur les cards interactives mobile */
+  @media (hover: none) {
+    .interactive:active {
+      transform: scale(0.98);
+      transition: transform .12s cubic-bezier(.2, .8, .2, 1);
+    }
+  }
+
+  /* Status badges : color-mix fallback pour navigateurs anciens */
+  @supports not (background: color-mix(in srgb, red 50%, transparent)) {
+    span[style*="color-mix"] {
+      background: rgba(167, 139, 250, .12) !important;
+    }
+  }
+
+  /* Reduced motion : désactive l'animation page-fade-in */
+  @media (prefers-reduced-motion: reduce) {
+    main.page-fade-in {
+      animation: none !important;
+    }
+  }
+
