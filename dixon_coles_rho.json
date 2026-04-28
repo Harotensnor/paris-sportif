@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-27T19:43:01Z",
+  "generated_at": "2026-04-28T20:58:02Z",
   "method": "Dixon-Coles MLE grid search (ρ ∈ [-0.30, 0.10] step 0.005), λ_h, λ_a fixés à moyenne empirique par ligue. CI 95% via LR test.",
   "min_matches": 40,
   "default_rho": -0.13,
@@ -15,12 +15,12 @@
       "reason": "n=1 < 40"
     },
     "arg.1": {
-      "n": 4,
+      "n": 6,
       "rho_measured": null,
       "rho_literature": -0.15,
       "rho_used": -0.15,
       "source": "literature_fallback",
-      "reason": "n=4 < 40"
+      "reason": "n=6 < 40"
     },
     "aus.1": {
       "n": 6,
@@ -47,12 +47,12 @@
       "reason": "n=7 < 40"
     },
     "bra.1": {
-      "n": 8,
+      "n": 10,
       "rho_measured": null,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=8 < 40"
+      "reason": "n=10 < 40"
     },
     "chi.1": {
       "n": 8,
@@ -71,6 +71,14 @@
       "reason": "n=8 < 40"
     },
     "col.1": {
+      "n": 10,
+      "rho_measured": null,
+      "rho_literature": -0.13,
+      "rho_used": -0.13,
+      "source": "literature_fallback",
+      "reason": "n=10 < 40"
+    },
+    "ecu.1": {
       "n": 8,
       "rho_measured": null,
       "rho_literature": -0.13,
@@ -78,37 +86,29 @@
       "source": "literature_fallback",
       "reason": "n=8 < 40"
     },
-    "ecu.1": {
-      "n": 6,
-      "rho_measured": null,
-      "rho_literature": -0.13,
-      "rho_used": -0.13,
-      "source": "literature_fallback",
-      "reason": "n=6 < 40"
-    },
     "eng.1": {
-      "n": 6,
+      "n": 7,
       "rho_measured": null,
       "rho_literature": -0.07,
       "rho_used": -0.07,
       "source": "literature_fallback",
-      "reason": "n=6 < 40"
+      "reason": "n=7 < 40"
     },
     "eng.2": {
-      "n": 10,
+      "n": 11,
       "rho_measured": null,
       "rho_literature": -0.1,
       "rho_used": -0.1,
       "source": "literature_fallback",
-      "reason": "n=10 < 40"
+      "reason": "n=11 < 40"
     },
     "eng.3": {
-      "n": 12,
+      "n": 15,
       "rho_measured": null,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=12 < 40"
+      "reason": "n=15 < 40"
     },
     "eng.4": {
       "n": 12,
@@ -127,20 +127,20 @@
       "reason": "n=2 < 40"
     },
     "esp.1": {
-      "n": 9,
+      "n": 10,
       "rho_measured": null,
       "rho_literature": -0.1,
       "rho_used": -0.1,
       "source": "literature_fallback",
-      "reason": "n=9 < 40"
+      "reason": "n=10 < 40"
     },
     "esp.2": {
-      "n": 9,
+      "n": 10,
       "rho_measured": null,
       "rho_literature": -0.12,
       "rho_used": -0.12,
       "source": "literature_fallback",
-      "reason": "n=9 < 40"
+      "reason": "n=10 < 40"
     },
     "fra.1": {
       "n": 9,
@@ -151,12 +151,12 @@
       "reason": "n=9 < 40"
     },
     "fra.2": {
-      "n": 8,
+      "n": 9,
       "rho_measured": null,
       "rho_literature": -0.14,
       "rho_used": -0.14,
       "source": "literature_fallback",
-      "reason": "n=8 < 40"
+      "reason": "n=9 < 40"
     },
     "ger.1": {
       "n": 9,
@@ -191,6 +191,14 @@
       "reason": "n=3 < 40"
     },
     "idn.1": {
+      "n": 6,
+      "rho_measured": null,
+      "rho_literature": -0.13,
+      "rho_used": -0.13,
+      "source": "literature_fallback",
+      "reason": "n=6 < 40"
+    },
+    "ind.1": {
       "n": 4,
       "rho_measured": null,
       "rho_literature": -0.13,
@@ -198,21 +206,13 @@
       "source": "literature_fallback",
       "reason": "n=4 < 40"
     },
-    "ind.1": {
-      "n": 3,
-      "rho_measured": null,
-      "rho_literature": -0.13,
-      "rho_used": -0.13,
-      "source": "literature_fallback",
-      "reason": "n=3 < 40"
-    },
     "ita.1": {
-      "n": 9,
+      "n": 10,
       "rho_measured": null,
       "rho_literature": -0.18,
       "rho_used": -0.18,
       "source": "literature_fallback",
-      "reason": "n=9 < 40"
+      "reason": "n=10 < 40"
     },
     "ita.2": {
       "n": 8,
@@ -255,28 +255,28 @@
       "reason": "n=8 < 40"
     },
     "par.1": {
-      "n": 5,
+      "n": 6,
       "rho_measured": null,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=5 < 40"
+      "reason": "n=6 < 40"
     },
     "per.1": {
-      "n": 7,
+      "n": 9,
       "rho_measured": null,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=7 < 40"
+      "reason": "n=9 < 40"
     },
     "por.1": {
-      "n": 7,
+      "n": 8,
       "rho_measured": null,
       "rho_literature": -0.14,
       "rho_used": -0.14,
       "source": "literature_fallback",
-      "reason": "n=7 < 40"
+      "reason": "n=8 < 40"
     },
     "rus.1": {
       "n": 11,
@@ -319,12 +319,12 @@
       "reason": "n=8 < 40"
     },
     "uru.1": {
-      "n": 6,
+      "n": 7,
       "rho_measured": null,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=6 < 40"
+      "reason": "n=7 < 40"
     },
     "usa.1": {
       "n": 4,
