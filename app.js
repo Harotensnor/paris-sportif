@@ -22,15 +22,18 @@
         league: raw.league || '',                   // league_code or ''
         valueOnly: !!raw.valueOnly,                  // Sprint 77 — n'afficher que edge > 0
         evMin: parseFloat(raw.evMin) || 0,           // Sprint 77 — EV minimum (e.g. 0.03 = +3%)
+        marketType: raw.marketType || '',            // Sprint 89 — '' | '1n2' | 'ou25' | 'btts' | 'doubleChance' | 'exactScore' | 'dnb' | 'ah' | 'basketTotal' | ...
+        dataQualityMin: parseInt(raw.dataQualityMin) || 0,  // Sprint 89 — 0..4 (computeDataQuality.score min)
       };
-    } catch (e) { return { kellyMin: 0, oddMin: 0, oddMax: 0, league: '', valueOnly: false, evMin: 0 }; }
+    } catch (e) { return { kellyMin: 0, oddMin: 0, oddMax: 0, league: '', valueOnly: false, evMin: 0, marketType: '', dataQualityMin: 0 }; }
   })();
   function saveAdvFilters() {
     try { localStorage.setItem(ADV_FILTER_KEY, JSON.stringify(advFilters)); } catch (e) {}
   }
   function advFiltersActive() {
     return advFilters.kellyMin > 0 || advFilters.oddMin > 0 || advFilters.oddMax > 0
-        || !!advFilters.league || !!advFilters.valueOnly || advFilters.evMin > 0;
+        || !!advFilters.league || !!advFilters.valueOnly || advFilters.evMin > 0
+        || !!advFilters.marketType || advFilters.dataQualityMin > 0;
   }
   // Sprint 77 — Helper utilisé par les pages pour vérifier si un pick passe
   // les filtres value (edge > 0 si valueOnly, EV ≥ evMin sinon).
@@ -1052,6 +1055,76 @@
   }
   try { window.expectedValue = expectedValue; } catch(e){}
 
+  // Sprint 83 (v31.7.170 — audit Part 7) — Score Qualité dédié.
+  // Synthétise 4 dimensions en un score 0..100 + label "high/medium/low" :
+  //   * edge (40 pts) : value forte +5pt+ → 40, +2pt → 20, 0 → 10
+  //   * data quality (25 pts) : computeDataQuality.score / max
+  //   * stabilité cote (20 pts) : odds_snapshot proche de cote actuelle
+  //     (line movement faible = pari plus stable)
+  //   * historique ligue (15 pts) : backtest_v2 WR de la ligue ≥ baseline
+  // Affiché en chip sur les cards + dans la fiche de décision (Sprint 69).
+  // Réponse au brief Part 7 "élevé/moyen/faible".
+  function qualityScore(match, pred, best) {
+    if (!match || !pred) return { score: 0, label: 'low', reasons: [] };
+    let score = 0;
+    const reasons = [];
+    // 1. Edge — 40 pts max
+    const edge = best ? best.edge : 0;
+    if (edge >= 0.10) { score += 40; reasons.push({ icon: '💎', text: `Edge fort (+${(edge*100).toFixed(0)}pt)` }); }
+    else if (edge >= 0.05) { score += 30; reasons.push({ icon: '✓', text: `Edge value (+${(edge*100).toFixed(0)}pt)` }); }
+    else if (edge >= 0.02) { score += 20; reasons.push({ icon: '~', text: `Edge léger (+${(edge*100).toFixed(0)}pt)` }); }
+    else if (edge >= 0) { score += 10; }
+    else { reasons.push({ icon: '⚠', text: `Edge négatif (${(edge*100).toFixed(0)}pt)` }); }
+    // 2. Data quality — 25 pts max
+    let dq = null;
+    try { dq = (typeof computeDataQuality === 'function') ? computeDataQuality(match) : null; } catch(e) {}
+    if (dq && dq.max > 0) {
+      const ratio = dq.score / dq.max;
+      score += Math.round(25 * ratio);
+      if (ratio >= 0.75) reasons.push({ icon: '📊', text: `Données riches (${dq.score}/${dq.max})` });
+      else if (ratio < 0.5) reasons.push({ icon: '📉', text: `Données pauvres (${dq.score}/${dq.max})` });
+    }
+    // 3. Stabilité cote — 20 pts max. Compare odds_snapshot vs cote actuelle.
+    // Si la cote n'a pas bougé de plus de 5%, c'est stable. Si line a beaucoup
+    // bougé contre nous (cote a baissé alors qu'on l'a price haute), on perd.
+    const snap = match.odds_snapshot;
+    const currentOdd = best ? best.odd : null;
+    if (snap && currentOdd && best && best.market === '1n2') {
+      const pickKey = best.key;
+      const snapOdd = pickKey === '1' ? snap.home : pickKey === '2' ? snap.away : snap.draw;
+      if (snapOdd && Math.abs(snapOdd - currentOdd) / Math.max(snapOdd, currentOdd) <= 0.05) {
+        score += 20;
+        reasons.push({ icon: '🎯', text: 'Cote stable depuis snapshot' });
+      } else if (snapOdd && currentOdd > snapOdd * 1.05) {
+        score += 15;
+        reasons.push({ icon: '📈', text: `Cote a monté (+${((currentOdd/snapOdd - 1)*100).toFixed(0)}%)` });
+      } else {
+        score += 5;
+        reasons.push({ icon: '📉', text: 'Cote a baissé depuis snapshot' });
+      }
+    } else {
+      score += 10;  // neutre si pas de snapshot
+    }
+    // 4. Historique ligue — 15 pts max
+    const lc = match.league_code;
+    const bt = window.__backtestReportV2;
+    if (bt && bt.by_league && lc && bt.by_league[lc]) {
+      const lg = bt.by_league[lc];
+      const wr = lg.win_rate ?? lg.winRate;
+      const n = lg.n || 0;
+      if (n >= 30 && wr != null) {
+        if (wr >= 0.55) { score += 15; reasons.push({ icon: '📈', text: `Modèle fort sur ${lc} (WR ${(wr*100).toFixed(0)}%, n=${n})` }); }
+        else if (wr >= 0.50) score += 10;
+        else if (wr >= 0.45) score += 5;
+        else reasons.push({ icon: '⚠', text: `Modèle faible sur ${lc} (WR ${(wr*100).toFixed(0)}%, n=${n})` });
+      }
+    }
+    score = Math.max(0, Math.min(100, score));
+    const label = score >= 70 ? 'high' : score >= 45 ? 'medium' : 'low';
+    return { score, label, reasons };
+  }
+  try { window.qualityScore = qualityScore; } catch(e){}
+
   // Retourne { market, key, label, prob, odd, edge, kelly, ev } ou null.
   function selectBestMarket(match, pred, opts) {
     opts = opts || {};
@@ -1191,6 +1264,81 @@
         }
       });
     }
+    // Sprint 82 — Markets hockey + baseball
+    if (pred.scores && pred.scores.markets) {
+      const sp = match.sport;
+      if (sp === 'hockey') {
+        (pred.scores.markets.totals || []).forEach(t => {
+          const winnerSide = t.pOver >= t.pUnder ? 'over' : 'under';
+          const prob = Math.max(t.pOver, t.pUnder);
+          if (prob >= 0.62) {
+            candidates.push({
+              market: 'hockeyTotal', key: `${winnerSide === 'over' ? 'O' : 'U'}${t.line}`,
+              label: `${winnerSide === 'over' ? 'Plus' : 'Moins'} de ${t.line} buts`,
+              prob, odd: 1 / prob, edge: 0, source: 'estimated',
+            });
+          }
+        });
+        const pl = pred.scores.markets.puckLine || {};
+        const plPicks = [
+          { key: 'PL_H_-1.5', label: 'Puck line Home -1.5', prob: pl.home_minus_15 },
+          { key: 'PL_H_+1.5', label: 'Puck line Home +1.5', prob: pl.home_plus_15 },
+          { key: 'PL_A_-1.5', label: 'Puck line Away -1.5', prob: pl.away_minus_15 },
+          { key: 'PL_A_+1.5', label: 'Puck line Away +1.5', prob: pl.away_plus_15 },
+        ].filter(x => x.prob >= 0.62 && x.prob <= 0.85)
+         .sort((a, b) => b.prob - a.prob);
+        if (plPicks[0]) {
+          candidates.push({
+            market: 'puckLine', key: plPicks[0].key, label: plPicks[0].label,
+            prob: plPicks[0].prob, odd: 1 / plPicks[0].prob, edge: 0, source: 'estimated',
+          });
+        }
+      }
+      if (sp === 'baseball') {
+        (pred.scores.markets.totals || []).forEach(t => {
+          const winnerSide = t.pOver >= t.pUnder ? 'over' : 'under';
+          const prob = Math.max(t.pOver, t.pUnder);
+          if (prob >= 0.62) {
+            candidates.push({
+              market: 'baseballTotal', key: `${winnerSide === 'over' ? 'O' : 'U'}${t.line}`,
+              label: `${winnerSide === 'over' ? 'Plus' : 'Moins'} de ${t.line} runs`,
+              prob, odd: 1 / prob, edge: 0, source: 'estimated',
+            });
+          }
+        });
+        const rl = pred.scores.markets.runLine || {};
+        const rlPicks = [
+          { key: 'RL_H_-1.5', label: 'Run line Home -1.5', prob: rl.home_minus_15 },
+          { key: 'RL_H_+1.5', label: 'Run line Home +1.5', prob: rl.home_plus_15 },
+          { key: 'RL_A_-1.5', label: 'Run line Away -1.5', prob: rl.away_minus_15 },
+          { key: 'RL_A_+1.5', label: 'Run line Away +1.5', prob: rl.away_plus_15 },
+        ].filter(x => x.prob >= 0.62 && x.prob <= 0.85)
+         .sort((a, b) => b.prob - a.prob);
+        if (rlPicks[0]) {
+          candidates.push({
+            market: 'runLine', key: rlPicks[0].key, label: rlPicks[0].label,
+            prob: rlPicks[0].prob, odd: 1 / rlPicks[0].prob, edge: 0, source: 'estimated',
+          });
+        }
+      }
+    }
+    // Sprint 82 — Foot team totals
+    if (match.sport === 'football' && pred.markets && pred.markets.extended && pred.markets.extended.raw && pred.markets.extended.raw.teamTotals) {
+      const tt = pred.markets.extended.raw.teamTotals;
+      const ttCands = [
+        { key: 'H_O_0.5', label: 'Home marque ≥ 1', prob: tt.home_over_05 },
+        { key: 'H_O_1.5', label: 'Home marque ≥ 2', prob: tt.home_over_15 },
+        { key: 'A_O_0.5', label: 'Away marque ≥ 1', prob: tt.away_over_05 },
+        { key: 'A_O_1.5', label: 'Away marque ≥ 2', prob: tt.away_over_15 },
+      ].filter(x => x.prob >= 0.65 && x.prob <= 0.92)
+       .sort((a, b) => b.prob - a.prob);
+      if (ttCands[0]) {
+        candidates.push({
+          market: 'teamTotal', key: ttCands[0].key, label: ttCands[0].label,
+          prob: ttCands[0].prob, odd: 1 / ttCands[0].prob, edge: 0, source: 'estimated',
+        });
+      }
+    }
     if (!candidates.length) return null;
     // Tri : edge desc puis prob desc
     candidates.sort((a, b) => {
@@ -1198,6 +1346,9 @@
       return b.prob - a.prob;
     });
     const best = candidates[0];
+    // Sprint 84 (v31.7.171 — audit Part 10) — Expose tous les candidats pour
+    // que la modal puisse afficher "Marchés alternatifs" + "Marchés refusés".
+    best.allCandidates = candidates;
     // Kelly fractionnel (demi-Kelly) cap 5% pour markets dérivés, 10% pour 1X2
     const b = best.odd - 1;
     const k = b > 0 ? Math.max(0, (b * best.prob - (1 - best.prob)) / b) : 0;
@@ -1260,6 +1411,105 @@
     return Math.min(1, corr);
   }
   try { window.combinationCorrelation = combinationCorrelation; } catch(e){}
+
+  // Sprint 87 (v31.7.174 — audit Part 9) — Gestion risque user.
+  // 4 garde-fous configurables par l'user :
+  //   * Max paris / jour (default 5) — au-delà, alerte
+  //   * Max stake / jour (% bankroll, default 25%) — alerte si dépassé
+  //   * Max stake / pari (% bankroll, default 10%) — alerte sur cap Kelly
+  //   * Alerte corrélation (default: warn si 2+ paris avec corr ≥ 0.4)
+  // Settings persistés localStorage.riskLimits. Helpers exposés sur window.
+  const RISK_LIMITS_KEY = 'riskLimits';
+  function _loadRiskLimits() {
+    try {
+      const raw = localStorage.getItem(RISK_LIMITS_KEY);
+      if (!raw) return { maxBetsPerDay: 5, maxStakePctDay: 0.25, maxStakePctBet: 0.10, corrThreshold: 0.4 };
+      const obj = JSON.parse(raw);
+      return {
+        maxBetsPerDay: Number(obj.maxBetsPerDay) || 5,
+        maxStakePctDay: Number(obj.maxStakePctDay) || 0.25,
+        maxStakePctBet: Number(obj.maxStakePctBet) || 0.10,
+        corrThreshold: Number(obj.corrThreshold) || 0.4,
+      };
+    } catch(e) {
+      return { maxBetsPerDay: 5, maxStakePctDay: 0.25, maxStakePctBet: 0.10, corrThreshold: 0.4 };
+    }
+  }
+  function _saveRiskLimits(rl) {
+    try { localStorage.setItem(RISK_LIMITS_KEY, JSON.stringify(rl)); } catch(e){}
+  }
+  window._loadRiskLimits = _loadRiskLimits;
+  window._saveRiskLimits = _saveRiskLimits;
+  // Vérifie si une liste de picks (pour la journée) viole les limites de risque.
+  // Retourne { violations: [...], warnings: [...], ok: bool }
+  window._checkRiskLimits = function(picks, bankroll) {
+    const rl = _loadRiskLimits();
+    const violations = [];
+    const warnings = [];
+    if (!Array.isArray(picks)) picks = [];
+    bankroll = Number(bankroll) || 50;
+    // Limit 1 : nombre paris / jour
+    if (picks.length > rl.maxBetsPerDay) {
+      violations.push({
+        type: 'too_many_bets',
+        msg: `${picks.length} paris suggérés mais limite = ${rl.maxBetsPerDay}/jour. Discipline : ne pas tout jouer.`,
+      });
+    }
+    // Limit 2 : stake total / jour
+    const totalStake = picks.reduce((acc, p) => acc + (Number(p.stake) || 0), 0);
+    const stakePctDay = bankroll > 0 ? totalStake / bankroll : 0;
+    if (stakePctDay > rl.maxStakePctDay) {
+      violations.push({
+        type: 'overbet_day',
+        msg: `Stake total ${totalStake.toFixed(0)}€ = ${(stakePctDay*100).toFixed(0)}% de la bankroll (limite ${(rl.maxStakePctDay*100).toFixed(0)}%). Réduis les mises.`,
+      });
+    } else if (stakePctDay > rl.maxStakePctDay * 0.8) {
+      warnings.push({
+        type: 'near_overbet_day',
+        msg: `Stake total ${(stakePctDay*100).toFixed(0)}% bankroll, proche de la limite ${(rl.maxStakePctDay*100).toFixed(0)}%.`,
+      });
+    }
+    // Limit 3 : stake / pari
+    picks.forEach((p, i) => {
+      const stakePctBet = bankroll > 0 ? (Number(p.stake) || 0) / bankroll : 0;
+      if (stakePctBet > rl.maxStakePctBet) {
+        violations.push({
+          type: 'overbet_single',
+          msg: `Pari #${i+1} (${p.label || p.matchLabel || ''}) à ${(stakePctBet*100).toFixed(0)}% bankroll, limite ${(rl.maxStakePctBet*100).toFixed(0)}%.`,
+        });
+      }
+    });
+    // Limit 4 : corrélation entre paris
+    if (picks.length >= 2 && typeof combinationCorrelation === 'function') {
+      for (let i = 0; i < picks.length; i++) {
+        for (let j = i + 1; j < picks.length; j++) {
+          const corr = combinationCorrelation(picks[i], picks[j]);
+          if (corr >= rl.corrThreshold) {
+            warnings.push({
+              type: 'correlated_bets',
+              msg: `Paris ${i+1} et ${j+1} corrélés à ${(corr*100).toFixed(0)}% (seuil ${(rl.corrThreshold*100).toFixed(0)}%). Si tu joues les 2, c'est presque le même pari amplifié.`,
+            });
+          }
+        }
+      }
+    }
+    return {
+      violations,
+      warnings,
+      ok: violations.length === 0,
+      summary: { totalStake, stakePctDay, count: picks.length, limits: rl },
+    };
+  };
+  // Helper pour update une limite spécifique (UI page Profil/Santé future).
+  window._updateRiskLimit = function(key, value) {
+    const rl = _loadRiskLimits();
+    if (key in rl) {
+      rl[key] = Number(value);
+      _saveRiskLimits(rl);
+      return true;
+    }
+    return false;
+  };
 
   // Génère plusieurs types de combinés à partir d'une liste de picks
   // candidates. 4 types : safe (uniquement Locks), best-edge (top edge), buts
@@ -1719,10 +1969,119 @@
     if (!top.length) return null;
     const baseCap = `Calculé à partir des buts marqués / encaissés sur les ${Math.min(h.sample, a.sample)} derniers matchs`;
     const extras = captionExtras.length ? ` + ${captionExtras.join(', ')}` : '';
+    // Sprint 82 (v31.7.169 — audit Part 1) — Multi-marchés hockey.
+    // Lignes Winamax NHL : total buts 5.5/6.5/7.5, puck line ±1.5, team totals.
+    // Calculs via Poisson (même base que les top scores ci-dessus).
+    const _poissonOver = (lam, N) => {
+      let cdf = 0;
+      for (let k = 0; k <= N; k++) cdf += poissonPmf(k, lam);
+      return Math.max(0, 1 - cdf);
+    };
+    // Total buts = lamH + lamA (Poisson somme)
+    const lamTotal = lamH + lamA;
+    const totals = [4.5, 5.5, 6.5, 7.5].map(line => {
+      const cutoff = Math.floor(line);
+      let pUnder = 0;
+      for (let h = 0; h <= 12; h++) {
+        for (let a = 0; a <= 12; a++) {
+          if (h + a <= cutoff) pUnder += poissonPmf(h, lamH) * poissonPmf(a, lamA);
+        }
+      }
+      pUnder = Math.min(1, Math.max(0, pUnder));
+      return { line, pOver: 1 - pUnder, pUnder, label: `Plus de ${line} buts` };
+    });
+    // Puck line ±1.5 (équivalent foot AH ±1.5)
+    let pH_win_2plus = 0, pA_win_2plus = 0, pH_win_strict = 0, pA_win_strict = 0;
+    for (let h = 0; h <= 12; h++) {
+      for (let a = 0; a <= 12; a++) {
+        const p = poissonPmf(h, lamH) * poissonPmf(a, lamA);
+        const diff = h - a;
+        if (diff >= 2) pH_win_2plus += p;
+        if (diff >= 1) pH_win_strict += p;
+        if (diff <= -2) pA_win_2plus += p;
+        if (diff <= -1) pA_win_strict += p;
+      }
+    }
+    const puckLine = {
+      home_minus_15: pH_win_2plus,            // home gagne par 2+
+      home_plus_15: 1 - pA_win_2plus,         // home ne perd pas par 2+
+      away_minus_15: pA_win_2plus,
+      away_plus_15: 1 - pH_win_2plus,
+    };
+    // Team totals
+    const teamTotals = {
+      home_over_25: _poissonOver(lamH, 2),
+      home_over_35: _poissonOver(lamH, 3),
+      away_over_25: _poissonOver(lamA, 2),
+      away_over_35: _poissonOver(lamA, 3),
+    };
     return {
       kind: 'exact',
       items: top.map(s => ({ home: s.home, away: s.away, prob: s.prob, label: `${s.home}-${s.away}` })),
       caption: `${baseCap}${extras} (modèle statistique).`,
+      // Sprint 82 — Marchés hockey étendus
+      markets: { totals, puckLine, teamTotals, lamH, lamA },
+    };
+  }
+
+  // Sprint 82 (v31.7.169 — audit Part 1) — Baseball score projection + marchés.
+  // Marchés Winamax MLB : ML 9 innings, run line ±1.5, total runs 7.5/8.5/9.5,
+  // first 5 innings ML/RL/total. On utilise pitcherStats (ERA-based) + last5
+  // pour estimer le run total attendu.
+  function baseballScoreProjection(match) {
+    if (match.sport !== 'baseball') return null;
+    const { home, away } = getSides(match);
+    const h = last5Rates(home), a = last5Rates(away);
+    if (!h || !a) return null;
+    // ERA = earned runs allowed per 9 innings. ERA bas = pitcher fort.
+    // Si pitcherStats dispo, on intègre dans le projection. Sinon last5.
+    const HOME_ADV = 0.15;  // ~0.15 run d'home advantage MLB
+    let hScored = h.scored, aScored = a.scored;
+    let captionExtras = [];
+    const hPitcher = match.mlb_pitchers?.home;
+    const aPitcher = match.mlb_pitchers?.away;
+    // Si on a les pitchers : run total ≈ (era_opponent + run_avg_team) / 2
+    if (hPitcher && hPitcher.era != null && aPitcher && aPitcher.era != null) {
+      // pitcher ERA prédit les runs encaissés par son équipe
+      hScored = (h.scored + Number(aPitcher.era)) / 2;  // home offense vs away pitcher ERA
+      aScored = (a.scored + Number(hPitcher.era)) / 2;
+      captionExtras.push('ERA pitchers titulaires intégrée');
+    }
+    const projH = (hScored + a.conceded) / 2 + HOME_ADV;
+    const projA = (aScored + h.conceded) / 2;
+    const total = projH + projA;
+    const margin = projH - projA;
+    // Variance MLB ~2.0 par équipe (élevée). Gaussienne approx.
+    const sigmaTotal = 2.5;
+    const sigmaMargin = 2.2;
+    const phiCdf = (z) => 1 / (1 + Math.exp(-1.702 * z));
+    const totals = [6.5, 7.5, 8.5, 9.5, 10.5].map(line => {
+      const z = (total - line) / sigmaTotal;
+      return { line, pOver: phiCdf(z), pUnder: 1 - phiCdf(z), label: `Plus de ${line} runs` };
+    });
+    const runLine = {
+      home_minus_15: phiCdf((margin - 1.5) / sigmaMargin),
+      home_plus_15: 1 - phiCdf((margin - (-1.5)) / sigmaMargin),
+      away_minus_15: phiCdf((-margin - 1.5) / sigmaMargin),
+      away_plus_15: 1 - phiCdf((-margin - (-1.5)) / sigmaMargin),
+    };
+    // First 5 innings : ~5/9 du run total (≈55%)
+    const total_F5 = total * 5 / 9;
+    const margin_F5 = margin * 5 / 9;
+    const sigmaTotalF5 = sigmaTotal * Math.sqrt(5/9);
+    const totalsF5 = [4.5, 5.5].map(line => {
+      const z = (total_F5 - line) / sigmaTotalF5;
+      return { line, pOver: phiCdf(z), pUnder: 1 - phiCdf(z), label: `F5 plus de ${line} runs` };
+    });
+    const baseCap = `Projection MLB sur ${Math.min(h.sample, a.sample)} derniers matchs`;
+    const extras = captionExtras.length ? ` + ${captionExtras.join(', ')}` : '';
+    return {
+      kind: 'baseball',
+      items: [{ home: Math.round(projH), away: Math.round(projA), prob: 1, label: `${Math.round(projH)}-${Math.round(projA)}` }],
+      total: Math.round(total * 10) / 10,
+      margin: Math.round(margin * 10) / 10,
+      caption: `${baseCap}${extras} (Gaussienne approx σ_total≈${sigmaTotal}).`,
+      markets: { totals, runLine, totalsF5, sigmaTotal, sigmaMargin },
     };
   }
 
@@ -2021,12 +2380,33 @@
       home_minus_025: (p1 + pH_strict) / 2,    // moitié 0, moitié -0.5
       home_minus_075: (pH_strict + pH_2plus) / 2, // moitié -0.5, moitié -1
     };
+    // Sprint 82 (v31.7.169 — audit Part 1) — Team Totals foot.
+    // Probabilité que home/away marque > N buts. Marché courant Winamax :
+    //   "Home over 0.5", "Home over 1.5", "Away over 0.5", etc.
+    // Calcul direct via Poisson individuel (pas la grille jointe — chaque équipe
+    // est indépendante dans cette approximation).
+    const _poissonOver = (lam, N) => {
+      // P(X > N) = 1 - sum_{k=0}^{N} P(X = k)
+      let cdf = 0;
+      for (let k = 0; k <= N; k++) cdf += poissonPmf(k, lam);
+      return Math.max(0, 1 - cdf);
+    };
+    const teamTotals = {
+      home_over_05: _poissonOver(lamH, 0),  // home marque ≥ 1
+      home_over_15: _poissonOver(lamH, 1),  // home marque ≥ 2
+      home_over_25: _poissonOver(lamH, 2),
+      away_over_05: _poissonOver(lamA, 0),
+      away_over_15: _poissonOver(lamA, 1),
+      away_over_25: _poissonOver(lamA, 2),
+    };
     return {
       p1, pX, p2,
       doubleChance: { p1X, pX2, p12 },
       // Sprint 79 — DNB + AH
       dnb,
       ah,
+      // Sprint 82 — Team totals
+      teamTotals,
       topScores,
       ou15, ou25, ou35,
       ht: { p1: pH_HT, pX: pD_HT, p2: pA_HT },
@@ -4268,6 +4648,7 @@
         if (poi) return poissonTopScores(poi.lamH, poi.lamA, 10, 6, match.league_code);
         if (match.sport === 'hockey') return hockeyScorePrediction(match);
         if (match.sport === 'basketball') return basketScoreProjection(match);
+        if (match.sport === 'baseball') return baseballScoreProjection(match);
         if (match.sport === 'tennis') {
           // pick.prob = proba de victoire du pick ; pMatchHome selon la key
           const ph = best_pick[2] === '1' ? best_pick[1] : (1 - best_pick[1]);
@@ -4829,6 +5210,16 @@
       if (!best) return false;  // pas de market exploitable → on cache si filtre value actif
       if (!passesValueFilter(best)) return false;
     }
+    // Sprint 89 (v31.7.176) — Filtre par type de marché du best pick
+    if (advFilters.marketType && pred?.pick) {
+      const best = (typeof selectBestMarket === 'function') ? selectBestMarket(m, pred) : null;
+      if (!best || best.market !== advFilters.marketType) return false;
+    }
+    // Sprint 89 — Filtre qualité data minimum
+    if (advFilters.dataQualityMin > 0) {
+      const dq = (typeof computeDataQuality === 'function') ? computeDataQuality(m) : null;
+      if (!dq || (dq.score || 0) < advFilters.dataQualityMin) return false;
+    }
     if (filter === 'lock') return !!pred?.isLock;
     if (filter === 'live') return m.status === 'STATUS_IN_PROGRESS';
     if (filter === 'upcoming') {
@@ -5382,6 +5773,40 @@
           <input type="number" id="adv-ev-min" value="${advFilters.evMin ? (advFilters.evMin * 100).toFixed(1) : ''}" placeholder="0%" step="1" min="0" max="50" style="width:54px;padding:4px 6px;background:var(--panel-2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;"/>
           <span style="color:var(--text-muted);">%</span>
         </div>
+        <!-- Sprint 89 (audit Part 14) — Filtre marché + qualité data -->
+        <div style="display:inline-flex;align-items:center;gap:6px;" title="Filtre par type de marché du best pick.">
+          <span style="color:var(--text-muted);">Marché</span>
+          <select id="adv-market-type" style="padding:4px 8px;background:var(--panel-2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;">
+            <option value="">Tous</option>
+            <option value="1n2" ${advFilters.marketType === '1n2' ? 'selected' : ''}>1X2</option>
+            <option value="ou25" ${advFilters.marketType === 'ou25' ? 'selected' : ''}>OU 2.5</option>
+            <option value="ou15" ${advFilters.marketType === 'ou15' ? 'selected' : ''}>OU 1.5</option>
+            <option value="ou35" ${advFilters.marketType === 'ou35' ? 'selected' : ''}>OU 3.5</option>
+            <option value="btts" ${advFilters.marketType === 'btts' ? 'selected' : ''}>BTTS</option>
+            <option value="doubleChance" ${advFilters.marketType === 'doubleChance' ? 'selected' : ''}>Double chance</option>
+            <option value="dnb" ${advFilters.marketType === 'dnb' ? 'selected' : ''}>DNB</option>
+            <option value="ah" ${advFilters.marketType === 'ah' ? 'selected' : ''}>Asian Handicap</option>
+            <option value="exactScore" ${advFilters.marketType === 'exactScore' ? 'selected' : ''}>Score exact</option>
+            <option value="basketTotal" ${advFilters.marketType === 'basketTotal' ? 'selected' : ''}>Basket total</option>
+            <option value="basketHandicap" ${advFilters.marketType === 'basketHandicap' ? 'selected' : ''}>Basket handicap</option>
+            <option value="hockeyTotal" ${advFilters.marketType === 'hockeyTotal' ? 'selected' : ''}>Hockey total</option>
+            <option value="puckLine" ${advFilters.marketType === 'puckLine' ? 'selected' : ''}>Puck line</option>
+            <option value="baseballTotal" ${advFilters.marketType === 'baseballTotal' ? 'selected' : ''}>Baseball total</option>
+            <option value="runLine" ${advFilters.marketType === 'runLine' ? 'selected' : ''}>Run line</option>
+            <option value="tennisGames" ${advFilters.marketType === 'tennisGames' ? 'selected' : ''}>Tennis jeux</option>
+            <option value="teamTotal" ${advFilters.marketType === 'teamTotal' ? 'selected' : ''}>Team total</option>
+          </select>
+        </div>
+        <div style="display:inline-flex;align-items:center;gap:6px;" title="Qualité data minimum (sources renseignées). 0 = pas de filtre, 3 = au moins 3 sources sur 4.">
+          <span style="color:var(--text-muted);">Qualité ≥</span>
+          <select id="adv-dq-min" style="padding:4px 8px;background:var(--panel-2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;">
+            <option value="0" ${advFilters.dataQualityMin === 0 ? 'selected' : ''}>0/4</option>
+            <option value="1" ${advFilters.dataQualityMin === 1 ? 'selected' : ''}>1/4</option>
+            <option value="2" ${advFilters.dataQualityMin === 2 ? 'selected' : ''}>2/4</option>
+            <option value="3" ${advFilters.dataQualityMin === 3 ? 'selected' : ''}>3/4</option>
+            <option value="4" ${advFilters.dataQualityMin === 4 ? 'selected' : ''}>4/4</option>
+          </select>
+        </div>
         ${advFiltersActive() ? `<button id="adv-reset" style="margin-left:auto;padding:5px 10px;background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.3);color:var(--danger);border-radius:6px;cursor:pointer;font-size:12px;">↺ Réinitialiser</button>` : ''}
       </div>` : '';
     const el = document.getElementById('filters');
@@ -5419,7 +5844,18 @@
       onAdvChange();
     });
     if (byId('adv-reset')) byId('adv-reset').addEventListener('click', () => {
-      advFilters = { kellyMin: 0, oddMin: 0, oddMax: 0, league: '', valueOnly: false, evMin: 0 };
+      advFilters = { kellyMin: 0, oddMin: 0, oddMax: 0, league: '', valueOnly: false, evMin: 0, marketType: '', dataQualityMin: 0 };
+      try { window.advFilters = advFilters; } catch(err){}
+      onAdvChange();
+    });
+    // Sprint 89 — Wire filtre marché + qualité data
+    if (byId('adv-market-type')) byId('adv-market-type').addEventListener('change', (e) => {
+      advFilters.marketType = e.target.value || '';
+      try { window.advFilters = advFilters; } catch(err){}
+      onAdvChange();
+    });
+    if (byId('adv-dq-min')) byId('adv-dq-min').addEventListener('change', (e) => {
+      advFilters.dataQualityMin = parseInt(e.target.value, 10) || 0;
       try { window.advFilters = advFilters; } catch(err){}
       onAdvChange();
     });
@@ -7065,12 +7501,20 @@
               ${tile('Edge', `${edge >= 0 ? '+' : ''}${(edge * 100).toFixed(1)}pt`, edge >= 0.05 ? 'Value forte' : edge >= 0.02 ? 'Value' : edge >= 0 ? 'Neutre' : 'Négatif', edgeColor)}
               ${tile('EV', `${ev >= 0 ? '+' : ''}${(ev * 100).toFixed(1)}%`, ev >= 0.10 ? 'EV+ fort' : ev >= 0.03 ? 'EV+' : ev >= 0 ? 'Break-even' : 'EV-', evColor)}
               ${tile('Kelly', `${(kelly * 100).toFixed(1)}%`, kelly >= 0.03 ? 'Mise franche' : kelly >= 0.01 ? 'Mise modérée' : 'Skip', kellyColor)}
-              ${tile('Qualité', `${dq.score}/${dq.max}`, dq.score >= 3 ? 'Riche' : dq.score >= 2 ? 'Correcte' : 'Pauvre', dqColor)}
+              ${tile('Qualité data', `${dq.score}/${dq.max}`, dq.score >= 3 ? 'Riche' : dq.score >= 2 ? 'Correcte' : 'Pauvre', dqColor)}
+              ${(() => {
+                // Sprint 83 (v31.7.170 — audit Part 7) — Score Qualité dédié.
+                const qs = (typeof qualityScore === 'function') ? qualityScore(match, pred, best) : { score: 0, label: 'low' };
+                const qsColor = qs.label === 'high' ? 'var(--accent)' : qs.label === 'medium' ? 'var(--warn)' : 'var(--text-dim)';
+                const qsLbl = qs.label === 'high' ? 'Élevé' : qs.label === 'medium' ? 'Moyen' : 'Faible';
+                return tile('Score Qualité', `${qs.score}/100`, qsLbl, qsColor);
+              })()}
               ${tile('Actionability', `${action}/100`, action >= 65 ? 'À jouer' : action >= 45 ? 'À surveiller' : 'À éviter', actionColor)}
             </div>
             <div style="margin-top:8px;font-size:10.5px;color:var(--text-dim2);line-height:1.4;">
               <b style="color:var(--text-dim);">Edge</b> = proba modèle - 1/cote (en points de proba).
               <b style="color:var(--text-dim);">EV</b> = proba × cote - 1 (retour attendu par mise unitaire).
+              <b style="color:var(--text-dim);">Score Qualité</b> = composite (edge ×40 + data ×25 + stabilité cote ×20 + historique ligue ×15).
               <b style="color:var(--text-dim);">Actionability</b> = composite (Confiance ×30 + Edge ×25 + Kelly ×20 + Qualité ×15 + Winamax exact ×10).
             </div>
           </div>`;
@@ -7989,7 +8433,72 @@
             </div>
           `;
         })();
-        return risksHtml + transparenceHtml + `
+        // Sprint 84 (v31.7.171 — audit Part 10) — Section "Marchés alternatifs + refusés".
+        // Liste tous les marchés candidats évalués par selectBestMarket (avec leur edge,
+        // proba, EV) et indique pourquoi certains ont été rejetés. Permet à l'user de
+        // décider de prendre un marché alternatif au lieu du best.
+        const alternativesHtml = (() => {
+          const best = (typeof selectBestMarket === 'function') ? selectBestMarket(match, pred) : null;
+          if (!best || !best.allCandidates) return '';
+          const cands = best.allCandidates;
+          if (cands.length < 2) return '';
+          const marketEmoji = { '1n2': '🏆', 'ou25': '⚽', 'ou15': '⚽', 'ou35': '⚽', 'btts': '🔄', 'doubleChance': '🎯', 'exactScore': '🎯', 'dnb': '🎯', 'ah': '⚖️', 'teamTotal': '⚽', 'basketTotal': '🏀', 'basketHandicap': '🏀', 'hockeyTotal': '🏒', 'puckLine': '🏒', 'baseballTotal': '⚾', 'runLine': '⚾', 'tennisGames': '🎾' };
+          const evMin = (typeof window.advFilters !== 'undefined' && window.advFilters.evMin) || 0;
+          const valueOnly = (typeof window.advFilters !== 'undefined' && window.advFilters.valueOnly) || false;
+          // Categorize : selected / acceptable / rejected
+          const rows = cands.map((c, i) => {
+            const ev = (typeof expectedValue === 'function') ? expectedValue(c.prob, c.odd) : (c.prob * c.odd - 1);
+            let status, statusColor, reason;
+            if (i === 0) {
+              status = '✓ Sélectionné'; statusColor = 'var(--accent)';
+              reason = 'Meilleur edge (premier dans le tri)';
+            } else if (c.edge >= 0.05) {
+              status = '✓ Alternative'; statusColor = 'var(--accent)';
+              reason = `Edge value (${(c.edge*100).toFixed(0)}pt) — viable`;
+            } else if (c.edge >= 0.02) {
+              status = '~ Acceptable'; statusColor = 'var(--warn)';
+              reason = `Edge léger (${(c.edge*100).toFixed(1)}pt) — limite`;
+            } else if (valueOnly && c.edge <= 0) {
+              status = '✗ Refusé'; statusColor = 'var(--danger)';
+              reason = `Edge négatif (filtre EV+ actif)`;
+            } else if (evMin > 0 && ev < evMin) {
+              status = '✗ Refusé'; statusColor = 'var(--danger)';
+              reason = `EV ${(ev*100).toFixed(1)}% < seuil ${(evMin*100).toFixed(0)}%`;
+            } else if (c.edge < 0) {
+              status = '~ Faible'; statusColor = 'var(--text-dim)';
+              reason = `Edge négatif — pas de value`;
+            } else {
+              status = '~ Neutre'; statusColor = 'var(--text-dim)';
+              reason = `Edge ≈ 0`;
+            }
+            return { c, ev, status, statusColor, reason, i };
+          });
+          return `
+            <div class="section">
+              <h4>🏷️ Marchés évalués (${cands.length})</h4>
+              <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">${marketEmoji[best.market] || '🎯'} <b style="color:var(--accent);">${esc(best.label)}</b> sélectionné comme meilleur pari. Voici les alternatives évaluées et celles refusées avec raison.</div>
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                ${rows.map(r => `
+                  <div style="padding:9px 12px;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${r.statusColor};border-radius:0 var(--r-sm) var(--r-sm) 0;display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;font-size:12.5px;">
+                    <span style="font-size:14px;">${marketEmoji[r.c.market] || '🎯'}</span>
+                    <div>
+                      <div style="font-weight:600;color:var(--text);">${esc(r.c.label)}</div>
+                      <div style="font-size:10.5px;color:var(--text-dim);margin-top:1px;">${esc(r.reason)}</div>
+                    </div>
+                    <div style="font-variant-numeric:tabular-nums;font-size:11.5px;color:var(--text-dim);">
+                      <div>p=${(r.c.prob*100).toFixed(0)}% · @${r.c.odd.toFixed(2)}</div>
+                      <div>edge ${r.c.edge >= 0 ? '+' : ''}${(r.c.edge*100).toFixed(1)}pt · EV ${r.ev >= 0 ? '+' : ''}${(r.ev*100).toFixed(1)}%</div>
+                    </div>
+                    <span style="color:${r.statusColor};font-weight:700;font-size:11px;white-space:nowrap;">${esc(r.status)}</span>
+                  </div>`).join('')}
+              </div>
+              <div style="margin-top:8px;font-size:10.5px;color:var(--text-dim2);font-style:italic;line-height:1.4;">
+                Tous les marchés ci-dessus ont été calculés depuis le modèle Poisson/Gaussien. Le tri est par edge décroissant.
+              </div>
+            </div>
+          `;
+        })();
+        return risksHtml + transparenceHtml + alternativesHtml + `
         <div class="section">
           <h4>🌐 Contexte extérieur</h4>
           <div class="two-cols">
@@ -8726,6 +9235,8 @@
         const t = (txt || '').toLowerCase();
         if (t.includes('transparence') || t.includes('source des donn')) return 'transparence';
         if (t.includes('risque')) return 'risques';
+        // Sprint 84 — section "Marchés évalués" → tab cotes (logique marché/cote)
+        if (t.includes('marché') || t.includes('marches')) return 'cotes';
         if (t.includes('pronostic') || t.includes('contexte') || t.includes('information')) return 'synthese';
         if (t.includes('cote') || t.includes('probabilité') || t.includes('bookmaker')) return 'cotes';
         if (t.includes('face-à-face') || t.includes('face à face') || t.includes('h2h')) return 'h2h';
@@ -11067,6 +11578,50 @@
         return { ...xx, stake, gain, homeName: home?.name || '?', awayName: away?.name || '?', homeLogo: home?.logo || '', awayLogo: away?.logo || '' };
       });
 
+    // Sprint 85 (v31.7.172 — audit Part 4) — Structure 3+3+2 sur dashboard.
+    // Best edge = topPicks (déjà calculé). Manquent :
+    //   * Prudents : confiance ≥70% (locks) + cote modérée (1.40-1.85) + edge ≥2%
+    //   * Agressifs : edge ≥8% + cote élevée (≥2.50) — high risk / high reward
+    // Pas d'overlap avec topPicks (filter par id non-inclus).
+    const topIds = new Set(topPicks.map(x => x.m.id));
+    const prudentPicks = _dataIsStale ? [] : allTodayRaw
+      .filter(x => !topIds.has(x.m.id))
+      .filter(x => !x.m.live && !x.m.completed && _notStarted(x.m))
+      .filter(x => x.rel >= 0.70 && x.odd >= 1.40 && x.odd <= 1.85 && x.edge >= 0.02)
+      .sort((a, b) => b.rel - a.rel)
+      .slice(0, 3);
+    const aggressivePicks = _dataIsStale ? [] : allTodayRaw
+      .filter(x => !topIds.has(x.m.id))
+      .filter(x => !x.m.live && !x.m.completed && _notStarted(x.m))
+      .filter(x => x.edge >= 0.08 && x.odd >= 2.50 && x.rel >= 0.40)
+      .sort((a, b) => b.edge - a.edge)
+      .slice(0, 2);
+    // Compute Kelly + stake pour chacun (même logique que topPicks)
+    const _enrichPick = (x) => {
+      const xx = x.best ? { ...x, odd: x.best.odd, rel: x.best.rel, edge: x.best.edge } : x;
+      const k = (typeof kellyFraction === 'function') ? kellyFraction(xx.rel, xx.odd, 0.25) : 0;
+      let stake = userBankroll * k;
+      const capAbs = userBankroll * 0.10;
+      if (stake > capAbs) stake = capAbs;
+      stake = Math.max(1, Math.round(stake));
+      const gain = stake * (xx.odd - 1);
+      const { home, away } = (typeof getSides === 'function') ? getSides(xx.m) : { home: {}, away: {} };
+      return { ...xx, stake, gain, homeName: home?.name || '?', awayName: away?.name || '?', homeLogo: home?.logo || '', awayLogo: away?.logo || '' };
+    };
+    const prudentPicksEnriched = prudentPicks.map(_enrichPick);
+    const aggressivePicksEnriched = aggressivePicks.map(_enrichPick);
+    // "Autres opportunités" = tous les autres picks valides (edge > 0, conf ≥ 0.55, non-déjà-affichés)
+    const shownIds = new Set([
+      ...topPicks.map(x => x.m.id),
+      ...prudentPicksEnriched.map(x => x.m.id),
+      ...aggressivePicksEnriched.map(x => x.m.id),
+    ]);
+    const otherOpportunities = _dataIsStale ? [] : allTodayRaw
+      .filter(x => !shownIds.has(x.m.id))
+      .filter(x => !x.m.live && !x.m.completed && _notStarted(x.m))
+      .filter(x => x.edge > 0 && x.rel >= 0.55)
+      .sort((a, b) => b.edge - a.edge);
+
     // v29 — Hero hook : show today's headline pick as the featured banner.
     // First-choice : best-edge topPick. Fallback : highest-confidence upcoming
     // pick so the banner is never empty when there IS something to play.
@@ -11361,8 +11916,27 @@
         })() : ''}
 
         <!-- v28.6 — "À PARIER AUJOURD'HUI" : reco perso pour Théo avec sa bankroll -->
-        ${topPicks.length ? `
+        ${topPicks.length ? (() => {
+          // Sprint 87 (v31.7.174 — audit Part 9) — Alerte risque agrégé
+          // sur l'ensemble des picks affichés (top + prudents + agressifs).
+          const allShown = [
+            ...topPicks.map(p => ({ stake: p.stake, label: `${p.homeName} vs ${p.awayName}`, match: p.m, pred: p.pred })),
+            ...prudentPicksEnriched.map(p => ({ stake: p.stake, label: `${p.homeName} vs ${p.awayName}`, match: p.m, pred: p.pred })),
+            ...aggressivePicksEnriched.map(p => ({ stake: p.stake, label: `${p.homeName} vs ${p.awayName}`, match: p.m, pred: p.pred })),
+          ];
+          const riskCheck = (typeof window._checkRiskLimits === 'function')
+            ? window._checkRiskLimits(allShown, userBankroll)
+            : { violations: [], warnings: [], ok: true };
+          const riskBannerHtml = (riskCheck.violations.length || riskCheck.warnings.length) ? `
+            <div style="padding:10px 14px;margin-bottom:12px;background:${riskCheck.violations.length ? 'rgba(239,68,68,.08)' : 'rgba(199,155,0,.08)'};border:1px solid ${riskCheck.violations.length ? 'rgba(239,68,68,.3)' : 'rgba(199,155,0,.3)'};border-left:3px solid ${riskCheck.violations.length ? 'var(--danger)' : 'var(--warn)'};border-radius:0 var(--r-sm) var(--r-sm) 0;font-size:12px;">
+              <div style="font-weight:700;color:${riskCheck.violations.length ? 'var(--danger)' : 'var(--warn)'};margin-bottom:4px;">⚠️ Gestion du risque (${allShown.length} paris affichés)</div>
+              ${riskCheck.violations.map(v => `<div style="color:var(--text);line-height:1.4;">⛔ ${esc(v.msg)}</div>`).join('')}
+              ${riskCheck.warnings.map(w => `<div style="color:var(--text-dim);line-height:1.4;">⚠ ${esc(w.msg)}</div>`).join('')}
+              <div style="margin-top:4px;font-size:10.5px;color:var(--text-dim2);">Configurable via <code>window._updateRiskLimit('maxBetsPerDay', N)</code>. Défaut : 5 paris/j, 25% stake/jour, 10% stake/pari.</div>
+            </div>` : '';
+          return `
         <div style="padding:36px 0 24px;border-bottom:1px solid var(--border);">
+          ${riskBannerHtml}
           <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;margin-bottom:16px;">
             <div>
               <div style="font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:4px;">Pour toi · À parier sur Winamax</div>
@@ -11458,7 +12032,8 @@
               </div>`;
             }).join('')}
           </div>
-        </div>` : (_dataIsStale ? '' : `
+        </div>`;
+        })() : (_dataIsStale ? '' : `
         <!-- v30 — Empty state actionnable quand 0 prono passe les filtres prudents -->
         <div style="padding:36px 0 24px;border-bottom:1px solid var(--border);">
           <div style="margin-bottom:14px;">
@@ -11482,6 +12057,87 @@
             </div>
           </div>
         </div>`)}
+
+        <!-- Sprint 85 (v31.7.172 — audit Part 4) — Sections Prudents / Agressifs / Autres -->
+        ${(prudentPicksEnriched.length || aggressivePicksEnriched.length) ? `
+        <div style="padding:24px 0;border-top:1px solid var(--border);">
+          <div style="margin-bottom:14px;">
+            <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;">Profils de mise · structure 3+3+2</div>
+            <div style="font-size:18px;font-weight:800;color:var(--text);letter-spacing:-.3px;margin-top:2px;">🎯 Sélection complète</div>
+            <div style="font-size:12px;color:var(--text-dim);margin-top:3px;">Best edge (≥5%) · Prudents (locks ≥70%, cote 1.40-1.85) · Agressifs (edge ≥8%, cote ≥2.50)</div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;">
+            ${prudentPicksEnriched.length ? `
+            <div>
+              <div style="font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:6px;">🛡️ Prudents (${prudentPicksEnriched.length}/3)</div>
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                ${prudentPicksEnriched.map(p => {
+                  const sides = (typeof getSides === 'function') ? getSides(p.m) : { home:{}, away:{} };
+                  const hN = sides.home?.short || sides.home?.name || '?';
+                  const aN = sides.away?.short || sides.away?.name || '?';
+                  const lg = p.m.league_name || p.m.league_code || '';
+                  const tLbl = (typeof fmtTime === 'function') ? fmtTime(p.m.date) : '';
+                  const pickLbl = (p.best && p.best.label) || (p.pred.pick && p.pred.pick.label) || 'Pick';
+                  return `
+                    <div class="interactive" data-match-id="${esc(String(p.m.id))}" role="button" tabindex="0" style="padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;cursor:pointer;">
+                      <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:3px;">
+                        <span style="font-size:10px;color:var(--text-dim);font-weight:600;">${esc(tLbl)}</span>
+                        <span style="font-size:11px;color:var(--accent);font-weight:700;">${Math.round(p.rel*100)}%</span>
+                      </div>
+                      <div style="font-size:13px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(hN)} vs ${esc(aN)}</div>
+                      <div style="font-size:11px;color:var(--text-dim);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(String(lg).slice(0,28))} · <b style="color:var(--brand);">${esc(pickLbl)}</b> @${p.odd.toFixed(2)}</div>
+                      <div style="font-size:10.5px;color:var(--text-dim2);margin-top:2px;">Mise sugg. <b style="color:var(--text);">${p.stake}€</b> · gain pot. ${p.gain.toFixed(0)}€</div>
+                    </div>`;
+                }).join('')}
+              </div>
+            </div>` : ''}
+            ${aggressivePicksEnriched.length ? `
+            <div>
+              <div style="font-size:11px;color:var(--warn);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:6px;">🔥 Agressifs (${aggressivePicksEnriched.length}/2)</div>
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                ${aggressivePicksEnriched.map(p => {
+                  const sides = (typeof getSides === 'function') ? getSides(p.m) : { home:{}, away:{} };
+                  const hN = sides.home?.short || sides.home?.name || '?';
+                  const aN = sides.away?.short || sides.away?.name || '?';
+                  const lg = p.m.league_name || p.m.league_code || '';
+                  const tLbl = (typeof fmtTime === 'function') ? fmtTime(p.m.date) : '';
+                  const pickLbl = (p.best && p.best.label) || (p.pred.pick && p.pred.pick.label) || 'Pick';
+                  return `
+                    <div class="interactive" data-match-id="${esc(String(p.m.id))}" role="button" tabindex="0" style="padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--warn);border-radius:0 8px 8px 0;cursor:pointer;">
+                      <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:3px;">
+                        <span style="font-size:10px;color:var(--text-dim);font-weight:600;">${esc(tLbl)}</span>
+                        <span style="font-size:11px;color:var(--warn);font-weight:700;">edge +${(p.edge*100).toFixed(0)}pt</span>
+                      </div>
+                      <div style="font-size:13px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(hN)} vs ${esc(aN)}</div>
+                      <div style="font-size:11px;color:var(--text-dim);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(String(lg).slice(0,28))} · <b style="color:var(--brand);">${esc(pickLbl)}</b> @${p.odd.toFixed(2)}</div>
+                      <div style="font-size:10.5px;color:var(--text-dim2);margin-top:2px;">Mise sugg. <b style="color:var(--text);">${p.stake}€</b> · gain pot. ${p.gain.toFixed(0)}€ · risque ↑</div>
+                    </div>`;
+                }).join('')}
+              </div>
+            </div>` : ''}
+          </div>
+          ${otherOpportunities.length ? `
+          <details style="margin-top:14px;padding:12px 16px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
+            <summary style="cursor:pointer;font-size:13px;font-weight:600;color:var(--text);user-select:none;">📋 ${otherOpportunities.length} autre${otherOpportunities.length>1?'s':''} opportunité${otherOpportunities.length>1?'s':''} (clique pour développer)</summary>
+            <div style="margin-top:10px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:6px;font-size:12px;">
+              ${otherOpportunities.slice(0, 12).map(p => {
+                const sides = (typeof getSides === 'function') ? getSides(p.m) : { home:{}, away:{} };
+                const hN = sides.home?.short || sides.home?.name || '?';
+                const aN = sides.away?.short || sides.away?.name || '?';
+                const tLbl = (typeof fmtTime === 'function') ? fmtTime(p.m.date) : '';
+                return `
+                  <div class="interactive" data-match-id="${esc(String(p.m.id))}" role="button" tabindex="0" style="padding:7px 10px;background:var(--panel-2,rgba(255,255,255,.03));border:1px solid var(--border);border-radius:var(--r-sm);cursor:pointer;">
+                    <div style="font-size:11.5px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(hN)} vs ${esc(aN)}</div>
+                    <div style="font-size:10.5px;color:var(--text-dim);margin-top:1px;display:flex;justify-content:space-between;align-items:center;gap:6px;">
+                      <span>${esc(tLbl)} · ${Math.round(p.rel*100)}%</span>
+                      <span style="color:${p.edge>=0.05?'var(--accent)':p.edge>=0.02?'var(--warn)':'var(--text-dim)'};font-weight:700;">edge +${(p.edge*100).toFixed(1)}pt</span>
+                    </div>
+                  </div>`;
+              }).join('')}
+            </div>
+            ${otherOpportunities.length > 12 ? `<div style="margin-top:6px;font-size:10.5px;color:var(--text-dim2);text-align:center;">+ ${otherOpportunities.length - 12} autre${otherOpportunities.length - 12 > 1 ? 's' : ''} dans la page <button class="page-btn" data-page="tous" style="background:transparent;border:none;color:var(--brand);text-decoration:underline;cursor:pointer;font-size:inherit;font-family:inherit;padding:0;font-weight:700;">Tous les pronostics</button></div>` : ''}
+          </details>` : ''}
+        </div>` : ''}
 
         <!-- Sprint 47 (v31.7.136) — Prochains gros matchs (importance + statut) -->
         ${topImportantMatches.length ? `
@@ -17427,6 +18083,12 @@
     const brier = overall.brier ?? null;
     const profit = overall.profit ?? null;
     const stake = overall.total_stake ?? overall.stake ?? null;
+    // Sprint 86 (v31.7.173 — audit Part 8) — ROI Kelly + edge moyen + CLV séparés.
+    // Si le backtest expose ces champs (added in scripts/backtest_v2.py), les KPIs
+    // affichent ROI flat ET ROI Kelly distinct. Sinon fallback sur estimation.
+    const roiKelly = overall.roi_kelly ?? overall.roiKelly ?? null;
+    const edgeAvg = overall.edge_avg ?? overall.edgeAvg ?? null;
+    const clvAvg = overall.clv_avg ?? overall.clvAvg ?? null;
     // Per-sport breakdown
     const perSport = bt.by_sport || bt.perSport || {};
     const sportCards = Object.entries(perSport)
@@ -17490,9 +18152,19 @@
         <!-- KPIs principaux -->
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:18px;">
           ${kpiTile('Win Rate', fmtPct(wr), `${n} pari${n > 1 ? 's' : ''}`, 'var(--text)')}
-          ${kpiTile('ROI cumul', fmtSign(roi), stake ? `mise totale ${Number(stake).toFixed(0)}€` : '', roiColor)}
+          ${kpiTile('ROI flat', fmtSign(roi), stake ? `mise totale ${Number(stake).toFixed(0)}€` : 'mise constante', roiColor)}
+          ${(() => {
+            // Sprint 86 — ROI Kelly distinct ROI flat
+            if (roiKelly != null) {
+              const c = Number(roiKelly) >= 0.02 ? 'var(--accent)' : Number(roiKelly) >= -0.02 ? 'var(--warn)' : 'var(--danger)';
+              return kpiTile('ROI Kelly', fmtSign(roiKelly), 'mise pondérée Kelly 0.25', c);
+            }
+            return kpiTile('ROI Kelly', '—', 'pas encore calculé', 'var(--text-dim)');
+          })()}
           ${kpiTile('Brier score', brier == null ? '—' : Number(brier).toFixed(3), brier == null ? '' : Number(brier) <= 0.18 ? 'Calibration excellente' : Number(brier) <= 0.22 ? 'Calibration correcte' : 'Calibration médiocre', brierColor)}
           ${profit != null ? kpiTile('Profit cumul', `${Number(profit) >= 0 ? '+' : ''}${Number(profit).toFixed(2)}€`, '', Number(profit) >= 0 ? 'var(--accent)' : 'var(--danger)') : ''}
+          ${edgeAvg != null ? kpiTile('Edge moyen', `${Number(edgeAvg) >= 0 ? '+' : ''}${(Number(edgeAvg)*100).toFixed(1)}pt`, 'sur paris pris', Number(edgeAvg) >= 0.03 ? 'var(--accent)' : 'var(--text-dim)') : ''}
+          ${clvAvg != null ? kpiTile('CLV moyen', `${Number(clvAvg) >= 0 ? '+' : ''}${(Number(clvAvg)*100).toFixed(1)}%`, 'closing line value', Number(clvAvg) >= 0 ? 'var(--accent)' : 'var(--danger)') : ''}
         </div>`}
 
         ${currentTab === 'periode' && Object.keys(byPeriod).length ? `
@@ -17631,6 +18303,61 @@
               <div style="margin-top:8px;font-size:10.5px;color:var(--text-dim2);font-style:italic;">
                 ROI calculé sur la colonne <b>w/Odds</b> uniquement (matchs avec cote book per-marché snapshotée Sprint 67). Plus le snapshot s'enrichit, plus le ROI devient fiable.
               </div>
+
+              ${(() => {
+                // Sprint 88 (v31.7.175) — Segmentations supplémentaires : par ligue, par période, par edge-bucket
+                const sectByDim = (title, emoji, dim, fmtKey) => {
+                  if (!dim) return '';
+                  const ents = Object.entries(dim).filter(([k, v]) => (v.n || 0) >= 3).sort((a, b) => (b[1].n || 0) - (a[1].n || 0)).slice(0, 12);
+                  if (!ents.length) return '';
+                  return `
+                    <div style="margin-top:18px;">
+                      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;">${emoji} ${esc(title)}</div>
+                      <div style="overflow-x:auto;">
+                        <table style="width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:12px;">
+                          <thead>
+                            <tr style="border-bottom:1px solid var(--border);">
+                              <th style="text-align:left;padding:6px 10px;color:var(--text-dim);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.6px;">Segment</th>
+                              <th style="text-align:right;padding:6px 10px;color:var(--text-dim);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.6px;">N</th>
+                              <th style="text-align:right;padding:6px 10px;color:var(--text-dim);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.6px;">WR</th>
+                              <th style="text-align:right;padding:6px 10px;color:var(--text-dim);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.6px;">IC 95%</th>
+                              <th style="text-align:right;padding:6px 10px;color:var(--text-dim);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.6px;">ROI</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            ${ents.map(([k, v]) => {
+                              const wr = v.win_rate;
+                              const wrPct = wr != null ? `${(wr * 100).toFixed(1)}%` : '—';
+                              const wrCol = wr != null && wr >= 0.55 ? 'var(--accent)' : wr != null && wr >= 0.50 ? 'var(--warn)' : 'var(--text-dim)';
+                              const ci = (v.wr_ci_lo != null && v.wr_ci_hi != null) ? `${(v.wr_ci_lo*100).toFixed(0)}-${(v.wr_ci_hi*100).toFixed(0)}%` : '—';
+                              const roi = v.roi;
+                              const roiPct = roi != null ? `${roi >= 0 ? '+' : ''}${(roi * 100).toFixed(1)}%` : '—';
+                              const roiCol = roi != null && roi >= 0.02 ? 'var(--accent)' : roi != null && roi >= -0.02 ? 'var(--warn)' : roi != null ? 'var(--danger)' : 'var(--text-dim2)';
+                              return `<tr style="border-bottom:1px solid var(--border);">
+                                <td style="padding:6px 10px;color:var(--text);">${esc(fmtKey ? fmtKey(k) : k)}</td>
+                                <td style="padding:6px 10px;text-align:right;color:var(--text-dim);">${v.n || 0}</td>
+                                <td style="padding:6px 10px;text-align:right;color:${wrCol};font-weight:700;">${wrPct}</td>
+                                <td style="padding:6px 10px;text-align:right;color:var(--text-dim2);font-size:11px;">${ci}</td>
+                                <td style="padding:6px 10px;text-align:right;color:${roiCol};font-weight:700;">${roiPct}</td>
+                              </tr>`;
+                            }).join('')}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>`;
+                };
+                const fmtEdgeBucket = (k) => ({
+                  'edge_10plus': 'Edge ≥ 10pt',
+                  'edge_5_10': 'Edge 5-10pt',
+                  'edge_2_5': 'Edge 2-5pt',
+                  'edge_0_2': 'Edge 0-2pt',
+                  'edge_negative': 'Edge négatif',
+                  'unknown': 'Edge inconnu',
+                }[k] || k);
+                return (sectByDim('Performance par ligue', '🏆', mktRep.by_league)
+                  + sectByDim('Performance par période (mois)', '📆', mktRep.by_period)
+                  + sectByDim('Performance par bucket d\'edge', '📊', mktRep.by_edge_bucket, fmtEdgeBucket));
+              })()}
             </div>`;
         })() : ''}
 

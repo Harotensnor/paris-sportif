@@ -115,6 +115,45 @@ def evaluate_market_pure_python(match: dict, market_key: str, pick_value):
     return None
 
 
+def _wilson_ci(wins: int, n: int, z: float = 1.96):
+    """Sprint 88 (v31.7.175 — audit Part 15) — Wilson score interval.
+
+    Plus robuste que l'intervalle normal pour les petits échantillons (n < 30).
+    Retourne (lo, hi) pour le win rate. z=1.96 = IC 95%.
+    """
+    if n <= 0:
+        return (None, None)
+    p = wins / n
+    denom = 1 + z * z / n
+    center = (p + z * z / (2 * n)) / denom
+    margin = z * (((p * (1 - p) + z * z / (4 * n)) / n) ** 0.5) / denom
+    lo = max(0.0, center - margin)
+    hi = min(1.0, center + margin)
+    return (lo, hi)
+
+
+def _edge_bucket(edge):
+    """Sprint 88 — Bucket d'edge pour segmentation."""
+    if edge is None:
+        return 'unknown'
+    if edge >= 0.10:
+        return 'edge_10plus'
+    if edge >= 0.05:
+        return 'edge_5_10'
+    if edge >= 0.02:
+        return 'edge_2_5'
+    if edge >= 0:
+        return 'edge_0_2'
+    return 'edge_negative'
+
+
+def _period_key(date_str):
+    """Sprint 88 — Période = mois ISO YYYY-MM (assez de granularité, assez d'échantillon)."""
+    if not date_str:
+        return 'unknown'
+    return date_str[:7] if len(date_str) >= 7 else 'unknown'
+
+
 def _get_secondary_odd(ev: dict, market_key: str, pick_value: str):
     """Sprint 76 (v31.7.163) — Récupère la cote book per-marché secondaire
     depuis odds_snapshot.markets (Sprint 67) ou winamax.markets (live).
@@ -162,6 +201,21 @@ def main():
         'n': 0, 'wins': 0, 'losses': 0, 'voids': 0,
         'with_odds': 0, 'stake': 0.0, 'profit': 0.0,
     })
+    # Sprint 88 (v31.7.175 — audit Part 15) — Segmentations supplémentaires.
+    # Toutes les dimensions trackent (n, wins, losses, with_odds, stake, profit)
+    # comme by_market, pour pouvoir calculer WR et ROI partout.
+    by_league = defaultdict(lambda: {
+        'n': 0, 'wins': 0, 'losses': 0, 'voids': 0,
+        'with_odds': 0, 'stake': 0.0, 'profit': 0.0,
+    })
+    by_period = defaultdict(lambda: {
+        'n': 0, 'wins': 0, 'losses': 0, 'voids': 0,
+        'with_odds': 0, 'stake': 0.0, 'profit': 0.0,
+    })
+    by_edge_bucket = defaultdict(lambda: {
+        'n': 0, 'wins': 0, 'losses': 0, 'voids': 0,
+        'with_odds': 0, 'stake': 0.0, 'profit': 0.0,
+    })
 
     for day_iso, evs in sorted(days.items()):
         for ev in evs or []:
@@ -172,28 +226,70 @@ def main():
                 break
             sport = ev.get('sport')
             if sport == 'football':
+                # Sprint 88 — métadata d'évent pour segmentations
+                ev_league = ev.get('league_code') or 'unknown'
+                ev_period = _period_key(ev.get('date'))
                 def _track(market_key, pv):
                     res = evaluate_market_pure_python(ev, market_key, pv)
                     bucket = by_market[f'{market_key}:{pv}']
+                    league_bucket = by_league[ev_league]
+                    period_bucket = by_period[ev_period]
                     if res is None:
                         bucket['voids'] += 1
+                        league_bucket['voids'] += 1
+                        period_bucket['voids'] += 1
                         return
                     bucket['n'] += 1
+                    league_bucket['n'] += 1
+                    period_bucket['n'] += 1
                     odd = _get_secondary_odd(ev, market_key, pv)
+                    edge = None  # On a pas la proba modèle ici (pas de mini-racer V8)
+                    # Edge bucket fallback sur la cote implicite : si cote favorable (>1.5)
+                    # on assume edge "moyen" ; sinon edge "faible". Approximation grossière.
+                    if odd:
+                        edge = 0.05 if odd > 2.0 else 0.02 if odd > 1.5 else 0
+                    eb_key = _edge_bucket(edge)
+                    eb = by_edge_bucket[eb_key]
+                    eb['n'] += 1
                     if odd and odd > 1:
                         bucket['with_odds'] += 1
+                        league_bucket['with_odds'] += 1
+                        period_bucket['with_odds'] += 1
+                        eb['with_odds'] += 1
                         bucket['stake'] += 1.0
+                        league_bucket['stake'] += 1.0
+                        period_bucket['stake'] += 1.0
+                        eb['stake'] += 1.0
                         if res == 'won':
                             bucket['wins'] += 1
-                            bucket['profit'] += float(odd) - 1.0
+                            league_bucket['wins'] += 1
+                            period_bucket['wins'] += 1
+                            eb['wins'] += 1
+                            profit = float(odd) - 1.0
+                            bucket['profit'] += profit
+                            league_bucket['profit'] += profit
+                            period_bucket['profit'] += profit
+                            eb['profit'] += profit
                         elif res == 'lost':
                             bucket['losses'] += 1
+                            league_bucket['losses'] += 1
+                            period_bucket['losses'] += 1
+                            eb['losses'] += 1
                             bucket['profit'] -= 1.0
+                            league_bucket['profit'] -= 1.0
+                            period_bucket['profit'] -= 1.0
+                            eb['profit'] -= 1.0
                     else:
                         if res == 'won':
                             bucket['wins'] += 1
+                            league_bucket['wins'] += 1
+                            period_bucket['wins'] += 1
+                            eb['wins'] += 1
                         elif res == 'lost':
                             bucket['losses'] += 1
+                            league_bucket['losses'] += 1
+                            period_bucket['losses'] += 1
+                            eb['losses'] += 1
                 # OU 1.5 / 2.5 / 3.5
                 for pv in ['O2.5', 'U2.5']:
                     _track('ou25', pv)
@@ -211,34 +307,47 @@ def main():
             break
 
     # Synthèse
-    summary = {}
-    for k, v in by_market.items():
+    def _summarize_bucket(v):
+        """Sprint 88 — Helper qui calcule WR + ROI + Wilson CI à partir d'un bucket."""
         n = v['n']
         wr = v['wins'] / n if n > 0 else None
         roi = (v['profit'] / v['stake']) if v['stake'] > 0 else None
-        summary[k] = {
+        ci_lo, ci_hi = _wilson_ci(v['wins'], n)
+        return {
             'n': n,
             'wins': v['wins'],
             'losses': v['losses'],
             'voids': v['voids'],
             'win_rate': wr,
-            # Sprint 76 — ROI computé quand cote book dispo
+            # Sprint 88 — Wilson 95% CI sur win_rate
+            'wr_ci_lo': round(ci_lo, 4) if ci_lo is not None else None,
+            'wr_ci_hi': round(ci_hi, 4) if ci_hi is not None else None,
             'with_odds': v['with_odds'],
             'stake': round(v['stake'], 2),
             'profit': round(v['profit'], 2),
             'roi': round(roi, 4) if roi is not None else None,
         }
 
+    summary = {k: _summarize_bucket(v) for k, v in by_market.items()}
+    summary_league = {k: _summarize_bucket(v) for k, v in by_league.items()}
+    summary_period = {k: _summarize_bucket(v) for k, v in by_period.items()}
+    summary_edge_bucket = {k: _summarize_bucket(v) for k, v in by_edge_bucket.items()}
+
     report = {
         'generated_at': datetime.now(timezone.utc).isoformat(),
         'description': (
-            "Backtest par marché — Sprint 76 (v31.7.163). "
-            "WR sample-base sur tous les pairs (marché, pick). "
-            "ROI calculé sur les paires où une cote book est snapshotée "
-            "via odds_snapshot.markets (Sprint 67) — 1€ flat stake."
+            "Backtest par marché — Sprint 88 (v31.7.175). "
+            "WR + Wilson 95% CI sur tous les pairs (marché, pick). "
+            "Segmentations supplémentaires : par ligue, par mois (période), "
+            "par bucket d'edge. ROI calculé sur les paires où une cote book "
+            "est snapshotée via odds_snapshot.markets (Sprint 67) — 1€ flat stake."
         ),
         'completed_evaluated': completed_count,
         'by_market_pick': summary,
+        # Sprint 88 — Segmentations supplémentaires
+        'by_league': summary_league,
+        'by_period': summary_period,
+        'by_edge_bucket': summary_edge_bucket,
     }
     REPORT_JSON.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')
     n_with_roi = sum(1 for v in summary.values() if v.get('roi') is not None)
