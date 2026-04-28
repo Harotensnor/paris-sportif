@@ -6,6 +6,29 @@ des pronostics simples/combinés/montantes séquentielles, et une vue bilan.
 Déployé sur GitHub Pages. Client = navigateur ; données = fichier `data.js`
 régénéré en continu.
 
+## Architecture v31.7.144 (mise à jour 2026-04-28 — Sprints 53-55 tennis + nav + heatmap)
+
+**Sprint 53 (Phase 3 — v31.7.142)** — Multi-marchés tennis. `tennisScorePrediction`
+expose maintenant `games: { avgGames, lines: [{line, pOver, pUnder}], sigma }`
+calculé via approximation Gaussienne sur le total jeux d'un match. Lignes
+courantes Winamax : BO3 = 21.5/22.5/23.5, BO5 (Slams) = 37.5/38.5. Le
+modal détail tennis affiche une section "🎾 Total jeux" avec chips par
+ligne (Plus de 22.5 jeux ⭐ 64% · proj. 22).
+
+**Sprint 54 (Phase 6 — v31.7.143)** — Navigation 6 hubs (vs 7 avant) :
+- Accueil (solo)
+- Pronostics (Top + Locks + Tous + Combinés + Buteurs + 3 Montantes)
+- Explorer (Matchs détectés + Calendrier + Favoris + Comparer)
+- Performance (Vue globale + Bilan + Historique + Backtest + Crédibilité)
+- Apprendre (Comment lire un prono + Méthodologie + Académie)
+- Compte (Profil + Alertes)
+
+**Sprint 55 (Phase 7 — v31.7.144)** — Heatmap calendrier 30 jours. La
+page `#calendrier` ajoute en tête une grille 5×6 (J-14 → J+15) avec
+cellules colorées par densité de picks (style GitHub heatmap, 5 niveaux
+de vert). Clic sur une cellule → navigue vers Tous filtré sur ce jour.
+Aujourd'hui boxed avec border var(--brand) + soft shadow.
+
 ## Architecture v31.7.141 (mise à jour 2026-04-28 — Sprints 50-52 edge + V2 + Performance)
 
 **Sprint 50 (Phase 3 — v31.7.139)** — Edge + Kelly per-marché OU 2.5 / BTTS.
