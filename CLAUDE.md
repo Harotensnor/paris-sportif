@@ -6,6 +6,42 @@ des pronostics simples/combinés/montantes séquentielles, et une vue bilan.
 Déployé sur GitHub Pages. Client = navigateur ; données = fichier `data.js`
 régénéré en continu.
 
+## Architecture v31.7.136 (mise à jour 2026-04-28 — Sprint 47 visibilité gros matchs)
+
+**Sprint 47 (Phase 1 — overhaul user-driven 2026-04-28)** — répond au feedback
+"je ne vois pas PSG-Bayern alors qu'il est demain". Le modèle skipait le match
+parce que les cotes sont serrées (2.20/4.00/2.60 → reliability < 0.55) ; le
+filtre `pred.skip || pred.lowConf` cachait le match au lieu de le surfacer
+avec un statut clair. Pivot produit : montrer **tous** les matchs détectés,
+chacun avec son statut human-readable.
+
+- **`matchImportance(match)`** (app.js ~L942) — score 0..100 reflétant l'enjeu.
+  Composantes : compétition (UEFA Champions/Europa = 35/25, top-5 = 20),
+  phase (finale +25, demi +18, quart +12, knockout +8), Elo équipes (>1900 = +20),
+  records NBA/NHL/MLB (>30W = +12), sport (foot +5).
+- **`getMatchStatus(match, pred?)`** (app.js ~L1004) — 5 codes :
+  - `strong` : Prono fort (Winamax bookable + reliability ≥ 0.55)
+  - `uncertain` : Match incertain (pred OK mais reliability < 0.55)
+  - `no_data` : Données insuffisantes (pred.skip ou pas assez de signaux)
+  - `no_odds` : Cotes en attente (match_id Winamax mais markets vides)
+  - `no_winamax` : Marchés Winamax non disponibles (tournament-only)
+- **Section dashboard "🏆 Prochains gros matchs · 7 jours"** — surfacée
+  AU-DESSUS de "Prochaines opportunités". Top 8 matchs filtrés par
+  `matchImportance ≥ 30`, classés par enjeu desc puis kickoff asc. Chaque
+  card affiche le badge statut, donc PSG-Bayern apparaît avec
+  "⚠ Match incertain" au lieu d'être caché.
+- **Calendrier 7j relâché** — avant : `if (pred.skip || pred.lowConf) return`.
+  Maintenant : on garde **tous** les matchs Winamax-bookable + les "gros
+  matchs" non-bookable (importance ≥ 35). Tri : locks → strong → autres
+  par importance. `renderPickRow` rend un badge statut quand non-strong.
+
+Suit le pivot produit : "Winamax-only-strict" → "show-all-with-status".
+Reste à traiter dans les sprints suivants (24 sections du brief Théo
+2026-04-28) : per-market predictions, Performance fusion Bilan/Historique,
+Tous les matchs détectés (vue séparée), match importance score V2, alerts/
+favorites enhancement, navigation 6 sections, comprehensive match detail
+tabs, etc. Voir backlog dans le brief original.
+
 ## Architecture v31.7.10-12x (mise à jour 2026-04-27 — sprints 13-40 polish & extension)
 
 **Sprints 13-40 (140 points)** — phase polish + extensions modèle.
