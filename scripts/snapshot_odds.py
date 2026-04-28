@@ -130,13 +130,44 @@ def snapshot(event, now_iso):
             h, d, a, prov = wh, wd, wa, 'winamax'
     if not h and not a:
         return False
-    event['odds_snapshot'] = {
+    snap = {
         'captured_at': now_iso,
         'home': round(float(h), 3) if h else None,
         'draw': round(float(d), 3) if d else None,
         'away': round(float(a), 3) if a else None,
         'provider': prov,
     }
+    # Sprint 67 (v31.7.155 — audit ChatGPT 2026-04-28 P0) — Snapshot per-marché
+    # secondaire pour ROI per-marché. Lit Winamax markets (OU 2.5 + BTTS) et
+    # les freeze dans odds_snapshot.markets pour que backtest_v2 puisse calculer
+    # ROI par marché secondaire (avant : seul 1X2 était snapshoté).
+    wnx = event.get('winamax') or {}
+    mks = wnx.get('markets') or {}
+    secondary = {}
+    ou25 = mks.get('ou25') or {}
+    if ou25.get('over') or ou25.get('under'):
+        secondary['ou25'] = {
+            'over': round(float(ou25['over']), 3) if ou25.get('over') else None,
+            'under': round(float(ou25['under']), 3) if ou25.get('under') else None,
+        }
+    btts = mks.get('btts') or {}
+    if btts.get('yes') or btts.get('no'):
+        secondary['btts'] = {
+            'yes': round(float(btts['yes']), 3) if btts.get('yes') else None,
+            'no': round(float(btts['no']), 3) if btts.get('no') else None,
+        }
+    # OU 1.5, OU 3.5 si dispo (formats variables sur Winamax)
+    for line in ['1.5', '3.5']:
+        ou = mks.get(f'ou{line.replace(".", "")}') or {}
+        if ou.get('over') or ou.get('under'):
+            key = f'ou{line.replace(".", "")}'
+            secondary[key] = {
+                'over': round(float(ou['over']), 3) if ou.get('over') else None,
+                'under': round(float(ou['under']), 3) if ou.get('under') else None,
+            }
+    if secondary:
+        snap['markets'] = secondary
+    event['odds_snapshot'] = snap
     return True
 
 

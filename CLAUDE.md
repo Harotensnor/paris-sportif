@@ -6,6 +6,41 @@ des pronostics simples/combinés/montantes séquentielles, et une vue bilan.
 Déployé sur GitHub Pages. Client = navigateur ; données = fichier `data.js`
 régénéré en continu.
 
+## Architecture v31.7.159 (mise à jour 2026-04-28 — Sprints 67-71 polish post-audit)
+
+**Sprint 67 (P0 — v31.7.155)** — `snapshot_odds.py` étendu pour capturer les
+cotes Winamax per-marché secondaire (OU 2.5, BTTS, OU 1.5, OU 3.5) dans
+`event.odds_snapshot.markets`. Permet de calculer ROI per-marché historique
+au prochain run de `backtest_v2.py` (Sprint 66 ne calculait que le WR).
+
+**Sprint 68 (refactor — v31.7.156)** — `topImportantMatches` (dashboard
+"Prochains gros matchs") utilise désormais `getScopedEvents('7d')` au
+lieu de la boucle inline. Cohérence garantie avec Calendrier 7j et page
+Matchs détectés.
+
+**Sprint 69 (P1 — v31.7.157)** — Modal détail "📊 Fiche de décision".
+Strip de 5 KPIs séparés au-dessus de la modal (sous le teams-big) :
+- **Confiance** (% modèle, vert ≥65%, jaune ≥55%)
+- **Edge** (proba modèle - 1/cote_book, vert ≥+5pt)
+- **Kelly** (mise fractionnelle suggérée, % bankroll)
+- **Qualité** (data quality score `dq.score / dq.max`)
+- **Actionability** (composite 0..100, "À jouer / À surveiller / À éviter")
+Réponse à l'audit qui demandait de séparer les dimensions de scoring.
+
+**Sprint 70 (P1 — v31.7.158)** — Favoris multi-niveaux. Nouvelle clé
+localStorage `paris_sportif_watchlist = { teams, leagues, sports, markets }`
++ `paris_sportif_alert_rules = [{ id, type, threshold, scope }]`. Helpers
+exposés sur window : `_toggleWatchlistEntry`, `_isOnWatchlist`,
+`_matchIsWatched`, `_loadAlertRules`, `_addAlertRule`, `_removeAlertRule`.
+Backbone pour la page Favoris & alertes — UI à câbler dans un sprint UI dédié.
+
+**Sprint 71 (P1 — v31.7.159)** — Combinés multi-types + `combinationCorrelation`.
+Score corrélation [0..1] entre 2 picks (même match → 1.0, même ligue + horaire
+proche → +0.4, équipe partagée → +0.5). `buildComboVariants(picks)` retourne
+4 variantes : safe (uniquement locks) / bestEdge / buts (OU+BTTS) / tomorrow.
+Chaque variante glouton sélectionne max 3 jambes avec corr < 0.4 entre elles.
+Backbone pour rendre les combinés moins 1X2-centric.
+
 ## Architecture v31.7.154 (mise à jour 2026-04-28 — Sprints 61-66 audit ChatGPT)
 
 **Audit ChatGPT 2026-04-28** (`Audit ultra approfondi du site Paris-Sportif.pdf`)
