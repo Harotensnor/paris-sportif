@@ -6,6 +6,36 @@ des pronostics simples/combinés/montantes séquentielles, et une vue bilan.
 Déployé sur GitHub Pages. Client = navigateur ; données = fichier `data.js`
 régénéré en continu.
 
+## Architecture v31.7.138 (mise à jour 2026-04-28 — Sprint 49 marchés étendus foot)
+
+**Sprint 49 (Phase 3 — overhaul user-driven 2026-04-28)** — réponse à
+"je veux plus de types de paris (score exact, mi-temps, double chance,
+handicap)". Phase 1 ne touche QUE le foot (Poisson xG dispo). Tennis/
+basket/hockey/baseball arrivent dans phases suivantes.
+
+- **`poissonMarketsExtended(lamH, lamA)`** (app.js ~L1395) — dérive du
+  même Poisson xG : grille jointe complète + 1X2 sanity, Double chance
+  (1X/X2/12), Score exact top 5, Over/Under 1.5/2.5/3.5, mi-temps
+  (lambda × 0.45 pour HT). Pas de scraping additionnel.
+- **`pred.markets.extended`** dans predictMatch — `{ doubleChance,
+  doubleChanceAll, exactScores, ou15, ou35, halfTime, halfTimeAll }`.
+  Chaque sélection = `{ key, label, prob }`. `raw` garde la structure
+  brute pour debug.
+- **Modal détail** — section "🥅 Marchés buts (Poisson)" étendue : ajoute
+  des chips conditionnels pour Double chance (≥0.65), Score exact (top
+  ≥0.10), Mi-temps (≥0.50), OU 1.5 (≥0.70), OU 3.5 (≥0.55). Seuils
+  choisis pour ne montrer que des picks lisibles.
+
+Limites assumées (Phase 4+ ouvert) :
+- Indépendance Poisson home/away (Dixon-Coles τ corrige légèrement
+  les nuls bas mais pas dans extended).
+- Mi-temps via 0.45 × λ — empirique, pas par-ligue calibré.
+- Pas encore de comparaison cote bookmaker / proba modèle pour edge
+  per-marché (à venir Sprint 50 — wire pred.markets.extended dans
+  evaluateModelPick + tracking backtest).
+- Tennis/basket/hockey/MLB pas encore couverts (handicap / total
+  jeux / quart-temps / strikeouts).
+
 ## Architecture v31.7.137 (mise à jour 2026-04-28 — Sprint 48 page Matchs détectés)
 
 **Sprint 48 (Phase 2 — overhaul user-driven 2026-04-28)** — réponse à

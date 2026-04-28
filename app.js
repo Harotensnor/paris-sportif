@@ -1392,6 +1392,80 @@
     return { line, pOver, pUnder, pBTTSyes, pBTTSno };
   }
 
+  // Sprint 49 (v31.7.138 — Phase 3) : marchés étendus dérivés du même
+  // Poisson xG (lamH, lamA). Ne nécessite pas de scraping additionnel ;
+  // utilise les expected goals déjà calculés. On expose : Over/Under
+  // 1.5/3.5, Double Chance (1X / X2 / 12), Score exact (top 2),
+  // Half-Time / Full-Time résultat probable.
+  // Tous les calculs supposent indépendance Poisson home/away — c'est
+  // une approximation (Dixon-Coles τ corrige légèrement les nuls bas)
+  // mais industry-standard et suffit largement pour des reads.
+  function poissonMarketsExtended(lamH, lamA, maxGoals = 10) {
+    if (!(lamH > 0) || !(lamA > 0)) return null;
+    // Grille jointe complète
+    const grid = [];
+    let pH = 0, pD = 0, pA = 0;
+    for (let h = 0; h <= maxGoals; h++) {
+      grid[h] = [];
+      for (let a = 0; a <= maxGoals; a++) {
+        const p = poissonPmf(h, lamH) * poissonPmf(a, lamA);
+        grid[h][a] = p;
+        if (h > a) pH += p;
+        else if (h < a) pA += p;
+        else pD += p;
+      }
+    }
+    // 1X2 (sanity check)
+    const p1 = pH, pX = pD, p2 = pA;
+    // Double chance
+    const p1X = p1 + pX;
+    const pX2 = pX + p2;
+    const p12 = p1 + p2;
+    // Score exact : top 5 scores
+    const scores = [];
+    for (let h = 0; h <= maxGoals; h++) {
+      for (let a = 0; a <= maxGoals; a++) {
+        if (grid[h][a] > 0.005) scores.push({ h, a, p: grid[h][a] });
+      }
+    }
+    scores.sort((x, y) => y.p - x.p);
+    const topScores = scores.slice(0, 5);
+    // Over/Under multi-lignes (1.5, 2.5, 3.5)
+    const cumulOver = (line) => {
+      const cutoff = Math.floor(line);
+      let under = 0;
+      for (let h = 0; h <= maxGoals; h++) {
+        for (let a = 0; a <= maxGoals; a++) {
+          if (h + a <= cutoff) under += grid[h][a];
+        }
+      }
+      return { over: 1 - under, under };
+    };
+    const ou15 = cumulOver(1.5);
+    const ou25 = cumulOver(2.5);
+    const ou35 = cumulOver(3.5);
+    // Mi-temps (HT) : approximation 45% du lambda full-time
+    const lamH_HT = lamH * 0.45;
+    const lamA_HT = lamA * 0.45;
+    let pH_HT = 0, pD_HT = 0, pA_HT = 0;
+    for (let h = 0; h <= maxGoals; h++) {
+      for (let a = 0; a <= maxGoals; a++) {
+        const p = poissonPmf(h, lamH_HT) * poissonPmf(a, lamA_HT);
+        if (h > a) pH_HT += p;
+        else if (h < a) pA_HT += p;
+        else pD_HT += p;
+      }
+    }
+    return {
+      p1, pX, p2,
+      doubleChance: { p1X, pX2, p12 },
+      topScores,
+      ou15, ou25, ou35,
+      ht: { p1: pH_HT, pX: pD_HT, p2: pA_HT },
+    };
+  }
+  try { window.poissonMarketsExtended = poissonMarketsExtended; } catch(e){}
+
   // Derive expected goals from standings stats: per-game scoring & conceding rates
   function standingsXG(match, side, league) {
     const s = getStandingsEntry(match, side);
@@ -3625,6 +3699,8 @@
       // Secondary markets derived from the same Poisson xG.
       // Only populated when the Poisson component exists (i.e. football + usable
       // standings). Gives Théo O/U 2.5 and BTTS reads with no extra scraping.
+      // Sprint 49 (v31.7.138) — Étendu : Double Chance (1X/X2/12), score exact
+      // top 2, OU 1.5/3.5, mi-temps. Tous dérivés du même Poisson xG.
       markets: poi ? (() => {
         const mk = poissonMarkets(poi.lamH, poi.lamA, 2.5);
         if (!mk) return null;
@@ -3634,7 +3710,47 @@
         const bttsPick = mk.pBTTSyes >= mk.pBTTSno
           ? { side: 'yes', label: 'BTTS: Oui',  prob: mk.pBTTSyes, key: 'BTTS_Y' }
           : { side: 'no',  label: 'BTTS: Non',  prob: mk.pBTTSno,  key: 'BTTS_N' };
-        return { ou: ouPick, btts: bttsPick, raw: mk };
+        // Sprint 49 — marchés étendus dérivés du même λ
+        let extended = null;
+        try {
+          const ext = poissonMarketsExtended(poi.lamH, poi.lamA);
+          if (ext) {
+            // Double chance : meilleure des 3 options
+            const dcOpts = [
+              { key: '1X', label: '1 ou Nul', prob: ext.doubleChance.p1X },
+              { key: 'X2', label: 'Nul ou 2', prob: ext.doubleChance.pX2 },
+              { key: '12', label: '1 ou 2',   prob: ext.doubleChance.p12 },
+            ].sort((a,b) => b.prob - a.prob);
+            // Score exact top 2
+            const exactScores = ext.topScores.slice(0, 2).map(s => ({
+              key: `${s.h}-${s.a}`, label: `${s.h}-${s.a}`, prob: s.p,
+            }));
+            // OU 1.5 / 3.5 : retourne le côté le plus probable
+            const ou15Pick = ext.ou15.over >= ext.ou15.under
+              ? { side: 'over', label: 'Plus de 1.5 buts', prob: ext.ou15.over, key: 'O1.5' }
+              : { side: 'under', label: 'Moins de 1.5 buts', prob: ext.ou15.under, key: 'U1.5' };
+            const ou35Pick = ext.ou35.over >= ext.ou35.under
+              ? { side: 'over', label: 'Plus de 3.5 buts', prob: ext.ou35.over, key: 'O3.5' }
+              : { side: 'under', label: 'Moins de 3.5 buts', prob: ext.ou35.under, key: 'U3.5' };
+            // Mi-temps : le résultat le plus probable à HT
+            const htOpts = [
+              { key: '1', label: '1 (HT)', prob: ext.ht.p1 },
+              { key: 'X', label: 'Nul (HT)', prob: ext.ht.pX },
+              { key: '2', label: '2 (HT)', prob: ext.ht.p2 },
+            ].sort((a,b) => b.prob - a.prob);
+            extended = {
+              doubleChance: dcOpts[0],
+              doubleChanceAll: dcOpts,
+              exactScores,
+              ou15: ou15Pick,
+              ou35: ou35Pick,
+              halfTime: htOpts[0],
+              halfTimeAll: htOpts,
+              raw: ext,
+            };
+          }
+        } catch(e) {}
+        return { ou: ouPick, btts: bttsPick, raw: mk, extended };
       })() : null,
       components: components.map(c => ({ w: c.w, name: c.name, icon: c.icon, isMarket: !!c.isMarket })),
       // Chantier U — contributions chiffrées par signal. Pour chaque composant
@@ -6649,13 +6765,38 @@
                   </div>
                 </div>`;
               };
+              // Sprint 49 (v31.7.138 — Phase 3) : exposition des marchés étendus
+              // dérivés du même Poisson (Double Chance, Score exact, OU 1.5/3.5,
+              // mi-temps). Ne les affiche que s'ils sont actionnables (proba ≥ 0.55).
+              const ext = mk.extended;
+              const extChip = (label, prob, icon, bg, border, color) => {
+                const probPct = (prob * 100).toFixed(0);
+                const impliedOdd = prob > 0.02 ? (1 / prob).toFixed(2) : '—';
+                const strong = prob >= 0.65;
+                return `<div style="flex:1;min-width:130px;padding:10px 12px;border-radius:8px;background:${bg};border:1px solid ${border};">
+                  <div style="font-size:10px;letter-spacing:.5px;text-transform:uppercase;color:var(--text-dim2,#7b8693);margin-bottom:3px;">${icon}</div>
+                  <div style="font-size:14px;font-weight:700;color:${color};">${esc(label)}${strong ? ' ⭐' : ''}</div>
+                  <div style="display:flex;gap:10px;font-size:12px;font-variant-numeric:tabular-nums;color:var(--text-dim,#b4bcc7);margin-top:4px;">
+                    <span><b style="color:var(--text,#e6ebf2);">${probPct}%</b> proba</span>
+                    <span>cote impl. <b style="color:var(--text,#e6ebf2);">${impliedOdd}</b></span>
+                  </div>
+                </div>`;
+              };
+              const extChips = ext ? [
+                ext.doubleChance.prob >= 0.65 ? extChip(`Double chance ${ext.doubleChance.label}`, ext.doubleChance.prob, '🎯 Double chance', 'rgba(34,197,94,.08)', 'rgba(34,197,94,.25)', '#86efac') : '',
+                (ext.exactScores[0] && ext.exactScores[0].prob >= 0.10) ? extChip(`Score exact ${ext.exactScores[0].label}`, ext.exactScores[0].prob, '🎯 Score exact', 'rgba(251,191,36,.08)', 'rgba(251,191,36,.25)', '#fbbf24') : '',
+                (ext.halfTime && ext.halfTime.prob >= 0.50) ? extChip(`Mi-temps : ${ext.halfTime.label}`, ext.halfTime.prob, '⏱️ Mi-temps', 'rgba(56,189,248,.08)', 'rgba(56,189,248,.25)', '#7dd3fc') : '',
+                (ext.ou15.prob >= 0.70) ? extChip(ext.ou15.label, ext.ou15.prob, '⚽ O/U 1.5', 'rgba(139,92,246,.08)', 'rgba(139,92,246,.25)', '#a78bfa') : '',
+                (ext.ou35.prob >= 0.55) ? extChip(ext.ou35.label, ext.ou35.prob, '⚽ O/U 3.5', 'rgba(139,92,246,.08)', 'rgba(139,92,246,.25)', '#a78bfa') : '',
+              ].filter(Boolean).join('') : '';
               return `<div style="margin-top:14px;">
                 <div class="lbl-tiny-mb">🥅 Marchés buts (Poisson)</div>
                 <div style="display:flex;gap:8px;flex-wrap:wrap;">
                   ${chipHtml(mk.ou, 'rgba(139,92,246,.08)', 'rgba(139,92,246,.25)', '#a78bfa', '⚽')}
                   ${chipHtml(mk.btts, 'rgba(236,72,153,.08)', 'rgba(236,72,153,.25)', '#f472b6', '🔄')}
+                  ${extChips}
                 </div>
-                <div style="margin-top:6px;font-size:10.5px;color:var(--text-dim2,#7b8693);line-height:1.3;">Picks alternatifs dérivés des buts attendus (${pred.poisson ? `xG ${pred.poisson.xgH.toFixed(2)}–${pred.poisson.xgA.toFixed(2)}` : 'modèle Poisson'}). ⭐ = ≥65%.</div>
+                <div style="margin-top:6px;font-size:10.5px;color:var(--text-dim2,#7b8693);line-height:1.3;">Picks alternatifs dérivés des buts attendus (${pred.poisson ? `xG ${pred.poisson.xgH.toFixed(2)}–${pred.poisson.xgA.toFixed(2)}` : 'modèle Poisson'}). ⭐ = ≥65%.${ext ? ' Marchés étendus : double chance, score exact, mi-temps.' : ''}</div>
               </div>`;
             })()}
             <!-- v30 — Bouton Parier sur Winamax retiré de la modal détail. -->
