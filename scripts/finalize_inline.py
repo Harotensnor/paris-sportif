@@ -33,6 +33,14 @@ DATA_JS = ROOT / 'data.js'
 HTML = ROOT / 'pronostics.html'
 DATA_TODAY = ROOT / 'data_today.json'
 DATA_MANIFEST = ROOT / 'data_manifest.json'
+# Sprint 61 (v31.7.150 — audit ChatGPT 2026-04-28 P0) — Payload LITE 72h.
+# Avant : LITE blob inline avait UNIQUEMENT today → premier paint montrait
+# 0 match pour demain (PSG-Bayern caché jusqu'au _ensureFullData()).
+# Après : LITE blob = today + J+1 + J+2, tooltips/Calendrier/Top Demain
+# instantanés. Coût : ~600 KB inline au lieu de 200 KB (acceptable, le
+# data.js full reste asynchrone pour l'archive complète 14j+).
+DATA_LITE_72H = ROOT / 'data_lite_72h.json'
+LITE_HORIZON_DAYS = 3  # today + tomorrow + J+2
 
 
 def main():
@@ -51,9 +59,32 @@ def main():
     days = data.get('days') or {}
     today_events = days.get(today, [])
 
+    # Sprint 61 — Calcul du scope LITE 72h (today + tomorrow + J+2).
+    try:
+        today_dt = datetime.fromisoformat(today)
+    except (TypeError, ValueError):
+        today_dt = datetime.utcnow()
+    scope_72h_keys = [
+        (today_dt + timedelta(days=i)).strftime('%Y-%m-%d')
+        for i in range(LITE_HORIZON_DAYS)
+    ]
+    lite_72h_days = {k: days.get(k, []) for k in scope_72h_keys if k in days}
+
     # 1. data_today.json — just today's events array (~200-300 KB)
     DATA_TODAY.write_text(
         json.dumps(today_events, ensure_ascii=False, separators=(',', ':')),
+        encoding='utf-8',
+    )
+
+    # Sprint 61 — data_lite_72h.json : flat list of events on today/J+1/J+2.
+    # Permet aux clients de fetch un payload moyen (~600 KB) au lieu du
+    # data.js complet (1.4 MB) pour les vues 72h sans frapper l'archive
+    # complète 14j+. Utilisé en backup si le LITE inline est insuffisant.
+    lite_72h_events = []
+    for k in scope_72h_keys:
+        lite_72h_events.extend(days.get(k, []))
+    DATA_LITE_72H.write_text(
+        json.dumps(lite_72h_events, ensure_ascii=False, separators=(',', ':')),
         encoding='utf-8',
     )
 
@@ -63,18 +94,21 @@ def main():
         'today': today,
         'days': sorted(days.keys()),
         'event_counts': {d: len(evs) for d, evs in days.items()},
+        # Sprint 61 — Métadonnées du scope LITE pour traçabilité côté client.
+        'lite_scope': scope_72h_keys,
+        'event_counts_lite_72h': {k: len(days.get(k, [])) for k in scope_72h_keys},
     }
     DATA_MANIFEST.write_text(
         json.dumps(manifest, ensure_ascii=False, separators=(',', ':')),
         encoding='utf-8',
     )
 
-    # 3. Inline LITE blob — today only. Le user landing dashboard voit son
-    # contenu instantanément ; pour Bilan/Backtest/Historique, les autres
-    # jours arrivent via _ensureFullData() (lancé idle 500ms après load).
-    lite_days = {}
-    if today in days:
-        lite_days[today] = days[today]
+    # 3. Inline LITE blob — Sprint 61 (v31.7.150) ÉTENDU 72h.
+    # Avant : seulement today (PSG-Bayern J+1 caché au premier paint).
+    # Après : today + J+1 + J+2 inline. Le user qui ouvre le site voit
+    # immédiatement les "Prochains gros matchs" (Sprint 47) sans attendre
+    # _ensureFullData(). Bilan/Backtest/Historique restent async (14j+).
+    lite_days = lite_72h_days
 
     lite = {
         'generated_at': manifest['generated_at'],
@@ -105,11 +139,15 @@ def main():
 
     full_size_kb = DATA_JS.stat().st_size / 1024
     today_size_kb = DATA_TODAY.stat().st_size / 1024
+    lite_72h_size_kb = DATA_LITE_72H.stat().st_size / 1024
     inline_kb = len(payload) / 1024
+    n_lite_events = sum(len(v) for v in lite_72h_days.values())
     print(
-        f'[finalize_inline] today={today} | full data.js={full_size_kb:.0f} KB '
-        f'| today.json={today_size_kb:.0f} KB | inline={inline_kb:.0f} KB '
-        f'| days available={len(manifest["days"])}',
+        f'[finalize_inline] today={today} scope={scope_72h_keys[0]}..{scope_72h_keys[-1]} '
+        f'| full={full_size_kb:.0f} KB | today.json={today_size_kb:.0f} KB '
+        f'| 72h.json={lite_72h_size_kb:.0f} KB | inline={inline_kb:.0f} KB '
+        f'| inline events={n_lite_events} on {len(lite_72h_days)}/3 days '
+        f'| total days={len(manifest["days"])}',
         flush=True,
     )
 

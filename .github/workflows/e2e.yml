@@ -72,8 +72,12 @@ jobs:
           npm ci || npm install
           npx playwright install --with-deps chromium
 
-      - name: Run Playwright tests
-        run: npx playwright test --project=chromium-desktop
+      - name: Run Playwright tests (desktop + mobile)
+        # Sprint 65 (v31.7.153 — audit ChatGPT 2026-04-28 P1) — CI mobile activée.
+        # Avant : seul chromium-desktop tournait. Or 60% du trafic est mobile.
+        # Après : les 2 projets en parallèle, mobile catch les régressions
+        # bottom-nav / drawer / modal / sub-nav scroll.
+        run: npx playwright test --project=chromium-desktop --project=mobile-chromium
 
       - name: Upload Playwright report on failure
         if: failure()

@@ -918,6 +918,211 @@
     return Number(m.home) > 1 || Number(m.away) > 1;
   }
 
+  // Sprint 62 (v31.7.151 — audit ChatGPT 2026-04-28 P0) — VIEW_SCOPES.
+  // Réponse à "Uniformiser scopes temporels" : actuellement chaque page
+  // recalcule son propre filtre (renderDashboard utilise today, Calendrier
+  // utilise 7d, Tous utilise currentDate). Centralise dans une seule
+  // source de vérité.
+  // Usage : `getScopedEvents('72h', { requireExact: true })` → array filtré.
+  const VIEW_SCOPES = ['now', 'today', 'tomorrow', '72h', '7d', 'all'];
+  try { window.VIEW_SCOPES = VIEW_SCOPES; } catch(e){}
+  function _scopeIsToday(date) {
+    try {
+      const iso = new Date(date).toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+      const todayIso = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+      return iso === todayIso;
+    } catch(e) { return false; }
+  }
+  function _scopeIsTomorrow(date) {
+    try {
+      const iso = new Date(date).toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+      const tom = new Date(); tom.setDate(tom.getDate() + 1);
+      const tomIso = tom.toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+      return iso === tomIso;
+    } catch(e) { return false; }
+  }
+  function getScopedEvents(scope, opts) {
+    opts = opts || {};
+    const data = (opts.data || window.PRONOSTICS_DATA) || {};
+    const now = Date.now();
+    const requireExact = !!opts.requireExact;
+    const requireWinamax = !!opts.requireWinamax;
+    const sport = opts.sport || null;
+    const includeCompleted = !!opts.includeCompleted;
+    const events = [];
+    const days = data.days || {};
+    Object.values(days).forEach(arr => (arr || []).forEach(ev => events.push(ev)));
+    return events.filter(ev => {
+      if (!ev) return false;
+      if (!includeCompleted && ev.completed) return false;
+      const ts = new Date(ev.date).getTime();
+      if (!isFinite(ts)) return false;
+      // Bookmaker filters
+      if (requireWinamax && !(ev.winamax && ev.winamax.available)) return false;
+      if (requireExact && !(ev.winamax && ev.winamax.match_id && ev.winamax.markets && ev.winamax.markets['1n2'])) return false;
+      // Sport filter
+      if (sport && ev.sport !== sport) return false;
+      // Scope temporel
+      switch (scope) {
+        case 'now':      return ts >= now && ts <= now + 4 * 3600 * 1000;
+        case 'today':    return _scopeIsToday(ev.date);
+        case 'tomorrow': return _scopeIsTomorrow(ev.date);
+        case '72h':      return ts >= now && ts <= now + 72 * 3600 * 1000;
+        case '7d':       return ts >= now && ts <= now + 7 * 24 * 3600 * 1000;
+        case 'all':      return true;
+        default:         return true;
+      }
+    }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  }
+  try { window.getScopedEvents = getScopedEvents; } catch(e){}
+
+  // Sprint 63 (v31.7.152 — audit ChatGPT 2026-04-28 P0) — selectBestMarket.
+  // Réponse à "Unifier la logique meilleur marché" : actuellement plusieurs
+  // endroits choisissent le pick (renderDashboard, _agentBestPick, modal
+  // détail, page Tous, calendrier, montantes…) et les conventions diffèrent.
+  // Cette fonction unifie la sélection entre 1X2, OU 2.5, BTTS, score exact,
+  // double chance, total points basket, handicap basket, total jeux tennis.
+  //
+  // Critère : tri par edge décroissant (proba_modèle - 1/cote_book), avec
+  // fallback proba pure si pas de cote book. requireExact : exige la cote
+  // Winamax pour ce marché précis.
+  //
+  // Retourne { market, key, label, prob, odd, edge, kelly } ou null.
+  function selectBestMarket(match, pred, opts) {
+    opts = opts || {};
+    const requireExact = !!opts.requireExact;
+    if (!match || !pred || !pred.pick) return null;
+    const wxMk = (match.winamax && match.winamax.markets) || {};
+    const candidates = [];
+    // === 1X2 (toujours dispo) ===
+    const pickKey = pred.pick.key;
+    const mainOdd = pred.odds && (pickKey === '1' ? pred.odds.home : pickKey === '2' ? pred.odds.away : pred.odds.draw);
+    if (mainOdd > 1) {
+      const wx1n2 = wxMk['1n2'];
+      const wxOdd = wx1n2 ? Number(pickKey === '1' ? wx1n2.home : pickKey === '2' ? wx1n2.away : wx1n2.draw) : null;
+      const isExact = !!wxOdd;
+      if (!requireExact || isExact) {
+        const odd = wxOdd || mainOdd;
+        const prob = pred.reliability ?? pred.pick.prob;
+        candidates.push({
+          market: '1n2',
+          key: pickKey,
+          label: pred.pick.label || pickKey,
+          prob, odd,
+          edge: prob - 1 / odd,
+          source: isExact ? 'winamax_exact' : 'estimated',
+        });
+      }
+    }
+    // === Markets foot dérivés ===
+    const mk = pred.markets;
+    if (mk && match.sport === 'football') {
+      // OU 2.5
+      if (mk.ou && wxMk.ou25) {
+        const ouSide = mk.ou.side;
+        const wxOuOdd = Number(ouSide === 'over' ? wxMk.ou25.over : wxMk.ou25.under);
+        if (wxOuOdd > 1) {
+          candidates.push({
+            market: 'ou25', key: mk.ou.key, label: mk.ou.label,
+            prob: mk.ou.prob, odd: wxOuOdd,
+            edge: mk.ou.prob - 1 / wxOuOdd,
+            source: 'winamax_exact',
+          });
+        }
+      }
+      // BTTS
+      if (mk.btts && wxMk.btts) {
+        const bttsSide = mk.btts.side;
+        const wxBttsOdd = Number(bttsSide === 'yes' ? wxMk.btts.yes : wxMk.btts.no);
+        if (wxBttsOdd > 1) {
+          candidates.push({
+            market: 'btts', key: mk.btts.key, label: mk.btts.label,
+            prob: mk.btts.prob, odd: wxBttsOdd,
+            edge: mk.btts.prob - 1 / wxBttsOdd,
+            source: 'winamax_exact',
+          });
+        }
+      }
+      // Extended : double chance, score exact (si pas de cote Winamax pour
+      // ces marchés, on n'utilise QUE proba pure → exclu si requireExact).
+      if (mk.extended && !requireExact) {
+        const ext = mk.extended;
+        if (ext.doubleChance && ext.doubleChance.prob >= 0.65) {
+          const odd = 1 / ext.doubleChance.prob;
+          candidates.push({
+            market: 'doubleChance', key: ext.doubleChance.key, label: ext.doubleChance.label,
+            prob: ext.doubleChance.prob, odd,
+            edge: 0,  // pas de cote book pour comparer
+            source: 'estimated',
+          });
+        }
+        if (ext.exactScores && ext.exactScores[0] && ext.exactScores[0].prob >= 0.15) {
+          const s = ext.exactScores[0];
+          const odd = 1 / s.prob;
+          candidates.push({
+            market: 'exactScore', key: s.key, label: `Score ${s.label}`,
+            prob: s.prob, odd,
+            edge: 0,
+            source: 'estimated',
+          });
+        }
+      }
+    }
+    // === Markets tennis ===
+    if (pred.scores && pred.scores.kind === 'tennis' && pred.scores.games) {
+      pred.scores.games.lines.forEach(g => {
+        const winnerSide = g.pOver >= g.pUnder ? 'over' : 'under';
+        const prob = Math.max(g.pOver, g.pUnder);
+        if (prob >= 0.65) {
+          const odd = 1 / prob;
+          candidates.push({
+            market: 'tennisGames', key: `${winnerSide === 'over' ? 'O' : 'U'}${g.line}`,
+            label: `${winnerSide === 'over' ? 'Plus' : 'Moins'} de ${g.line} jeux`,
+            prob, odd, edge: 0, source: 'estimated',
+          });
+        }
+      });
+    }
+    // === Markets basket ===
+    if (pred.scores && pred.scores.kind === 'basket' && pred.scores.markets) {
+      (pred.scores.markets.totals || []).forEach(t => {
+        const winnerSide = t.pOver >= t.pUnder ? 'over' : 'under';
+        const prob = Math.max(t.pOver, t.pUnder);
+        if (prob >= 0.65) {
+          const odd = 1 / prob;
+          candidates.push({
+            market: 'basketTotal', key: `${winnerSide === 'over' ? 'O' : 'U'}${t.line}`,
+            label: `${winnerSide === 'over' ? 'Plus' : 'Moins'} de ${t.line} pts`,
+            prob, odd, edge: 0, source: 'estimated',
+          });
+        }
+      });
+      (pred.scores.markets.handicaps || []).forEach(h => {
+        const prob = Math.max(h.pCover, h.pAgainst);
+        if (prob >= 0.65) {
+          const odd = 1 / prob;
+          candidates.push({
+            market: 'basketHandicap', key: h.label, label: h.label,
+            prob, odd, edge: 0, source: 'estimated',
+          });
+        }
+      });
+    }
+    if (!candidates.length) return null;
+    // Tri : edge desc puis prob desc
+    candidates.sort((a, b) => {
+      if (Math.abs(b.edge - a.edge) > 0.01) return b.edge - a.edge;
+      return b.prob - a.prob;
+    });
+    const best = candidates[0];
+    // Kelly fractionnel (demi-Kelly) cap 5% pour markets dérivés, 10% pour 1X2
+    const b = best.odd - 1;
+    const k = b > 0 ? Math.max(0, (b * best.prob - (1 - best.prob)) / b) : 0;
+    best.kelly = Math.min(best.market === '1n2' ? 0.10 : 0.05, k * 0.5);
+    return best;
+  }
+  try { window.selectBestMarket = selectBestMarket; } catch(e){}
+
   // ======= Sprint 47 (v31.7.136) — matchImportance + getMatchStatus =======
   // matchImportance(m) : score 0..100 reflétant l'enjeu d'un match.
   // Sert à surfacer les "gros matchs" (PSG-Bayern CL, Clasico, Finale, etc.)
@@ -14228,10 +14433,10 @@
         (document.querySelector('main') || document.body).insertBefore(pronosNav, (document.querySelector('main') || document.body).firstChild);
       }
       const tabs = [
-        { k:'tous',     emoji:'📋', label:'Tous pronos' },
+        { k:'tous',     emoji:'📋', label:'Tous pronostics' },
         { k:'matchs',   emoji:'🔍', label:'Matchs détectés' },
         { k:'locks',    emoji:'🔒', label:'Paris sûrs' },
-        { k:'buteurs',  emoji:'⚽', label:'Buteurs' },
+        { k:'buteurs',  emoji:'⚽', label:'Buts & joueurs' },
         { k:'combines', emoji:'🔗', label:'Combinés' },
         { k:'simples',  emoji:'🎯', label:'Par sport' },
         { k:'top',      emoji:'⭐', label:'Top du jour' },
