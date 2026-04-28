@@ -6,6 +6,55 @@ des pronostics simples/combinés/montantes séquentielles, et une vue bilan.
 Déployé sur GitHub Pages. Client = navigateur ; données = fichier `data.js`
 régénéré en continu.
 
+## Architecture v31.7.168 (mise à jour 2026-04-28 — Sprints 78-81 audit P0/P1 manquants)
+
+Réponse au feedback "ta casi rien fait de l'audit" — focus sur les items P0/P1
+du PDF audit ChatGPT que les sprints précédents avaient loupés.
+
+**Sprint 78 (audit P0 — v31.7.165)** — 3 additions dashboard :
+- 78a : `bookmakerMode` 3-state (`'all'` / `'catalog'` / `'exact'`) avec
+  helper `isBookableInMode(match, mode)` exposé sur `window`.
+  Toggle visible dans la barre de filtres avancés (3 chips). Persisté
+  `localStorage.bookmakerMode`. Default = 'exact' (= comportement
+  précédent, backward-compat garanti).
+- 78b : Strip compteurs en tête de dashboard : "N matchs ingérés ·
+  X Winamax exact (Y%) · Z tournament-only · W hors catalogue · Mode
+  actif: ...". Visibilité immédiate de la couverture.
+- 78c : Section "👁️ Grands matchs sans pick" dérivée de
+  `topImportantMatches` filtrée sur `status.code !== 'strong'`. Surface
+  les gros matchs où le modèle ne recommande RIEN, séparée de "Prochains
+  gros matchs" qui contient tout. L'user voit ce qui est ignoré.
+
+**Sprint 79 (audit P0 wave 1 — v31.7.166)** — Marchés foot étendus
+DNB + AH dans `poissonMarketsExtended()`:
+- DNB (Draw No Bet) : `dnb = { home, away }` calculé `pH/(pH+pA)` &
+  `pA/(pH+pA)` (le nul est exclu, push si nul).
+- AH (Asian Handicap) : `ah = { home_minus_05, home_minus_1, home_plus_05,
+  home_plus_1, away_*, home_minus_025 (quart), home_minus_075 }` avec
+  comptage des différences de score (pH_strict, pH_2plus).
+- `pred.markets.extended.dnb` et `.asianHandicap` exposés.
+- `selectBestMarket` les inclut comme candidats (proba ≥ 0.60 / 0.62).
+- Modal détail ajoute 2 chips conditionnels "🎯 DNB" et "⚖️ Asian Handicap".
+
+**Sprint 80 (audit P1 — v31.7.167)** — Onglet "🔍 Transparence" dans
+modal détail (à côté de Risques). Liste 9 sources de données avec
+status `exact` / `tournament` / `fallback` / `ok` / `missing` :
+Cote Winamax, Snapshot pre-match, Cotes per-marché (OU/BTTS),
+Météo, Arbitre (foot top-5), Compositions, Classement, H2H, ELO ClubElo.
+Détail textuel pour chaque source + bandeau récap "X/9 sources dispo".
+Réponse à l'audit qui demandait "transparence des données" pour que
+l'user juge la richesse des inputs.
+
+**Sprint 81 (audit P1 — v31.7.168)** — Top variants + Near Locks :
+- 81a : Section "🎯 Near Locks (X)" en bas de page Locks. Matchs avec
+  `rel ∈ [0.65, 0.70)` qui ne passent pas le seuil mais frôlent. Triés
+  par confiance desc, max 12 visibles. L'user décide lui-même.
+- 81b : Sub-nav 3 modes en tête de page Top du jour :
+  `confidence` (défaut, fiabilité × time-bonus = comportement précédent),
+  `edge` (proba modèle - 1/cote desc), `kelly` (fraction Kelly desc).
+  Persisté `localStorage.topMode`. Sous-titre + hint mis à jour selon
+  mode. Backward-compat : default = 'confidence'.
+
 ## Architecture v31.7.164 (mise à jour 2026-04-28 — Sprint 77 EV + filtre value + no-bet diagnostic)
 
 **Sprint 77 (3-en-1 — v31.7.164)** — Réponse au feedback "améliorer sans casser" :
