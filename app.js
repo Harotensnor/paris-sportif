@@ -54,6 +54,38 @@
   // Always on: non-Winamax events are stripped at the pipeline level (scripts/patch_winamax.py)
   // so the toggle is moot. Kept as a constant so existing filter gates stay readable.
   const winamaxOnly = true;
+
+  // Sprint 78 (v31.7.165 — audit ChatGPT P0) — Bookmaker mode 3-state.
+  // L'audit demande un toggle visible : "all" (tous les matchs détectés),
+  // "catalog" (Winamax tournament-only inclus), "exact" (Winamax exact only).
+  // Persisté dans localStorage pour rester sur la préférence user.
+  // Helper isBookableInMode() utilisé par les pages qui affichent des cards.
+  const BOOKMAKER_MODE_KEY = 'bookmakerMode';
+  let bookmakerMode = (() => {
+    try {
+      const raw = localStorage.getItem(BOOKMAKER_MODE_KEY);
+      if (raw === 'all' || raw === 'catalog' || raw === 'exact') return raw;
+    } catch(e) {}
+    return 'exact';  // default = mode strict (= état précédent du site)
+  })();
+  function setBookmakerMode(mode) {
+    if (!['all', 'catalog', 'exact'].includes(mode)) return;
+    bookmakerMode = mode;
+    try { localStorage.setItem(BOOKMAKER_MODE_KEY, mode); } catch(e){}
+    try { window.bookmakerMode = mode; } catch(e){}
+  }
+  function isBookableInMode(match, mode) {
+    mode = mode || bookmakerMode;
+    if (!match) return false;
+    if (mode === 'all') return true;
+    const w = match.winamax || {};
+    if (mode === 'catalog') return w.available === true;  // tournament-only OK
+    // exact : exige match_id ET markets['1n2']
+    return w.available === true && !!w.match_id
+        && w.markets && w.markets['1n2']
+        && (Number(w.markets['1n2'].home) > 1 || Number(w.markets['1n2'].away) > 1);
+  }
+  try { window.bookmakerMode = bookmakerMode; window.setBookmakerMode = setBookmakerMode; window.isBookableInMode = isBookableInMode; } catch(e){}
   // Current page view: simples (default) | combines | bilan
   // v30 fix Bug 1 : si l'utilisateur arrive via PWA shortcut (manifest)
   // ex pronostics.html#locks → on lit location.hash pour set la bonne page.
@@ -1076,8 +1108,8 @@
           });
         }
       }
-      // Extended : double chance, score exact (si pas de cote Winamax pour
-      // ces marchés, on n'utilise QUE proba pure → exclu si requireExact).
+      // Extended : double chance, score exact, DNB, AH
+      // (si pas de cote Winamax pour ces marchés, on n'utilise QUE proba pure → exclu si requireExact).
       if (mk.extended && !requireExact) {
         const ext = mk.extended;
         if (ext.doubleChance && ext.doubleChance.prob >= 0.65) {
@@ -1095,6 +1127,24 @@
           candidates.push({
             market: 'exactScore', key: s.key, label: `Score ${s.label}`,
             prob: s.prob, odd,
+            edge: 0,
+            source: 'estimated',
+          });
+        }
+        // Sprint 79 — DNB
+        if (ext.dnb && ext.dnb.prob >= 0.60) {
+          candidates.push({
+            market: 'dnb', key: ext.dnb.key, label: ext.dnb.label,
+            prob: ext.dnb.prob, odd: 1 / ext.dnb.prob,
+            edge: 0,
+            source: 'estimated',
+          });
+        }
+        // Sprint 79 — Asian Handicap
+        if (ext.asianHandicap && ext.asianHandicap.prob >= 0.62) {
+          candidates.push({
+            market: 'ah', key: ext.asianHandicap.key, label: ext.asianHandicap.label,
+            prob: ext.asianHandicap.prob, odd: 1 / ext.asianHandicap.prob,
             edge: 0,
             source: 'estimated',
           });
@@ -1927,9 +1977,56 @@
         else pD_HT += p;
       }
     }
+    // Sprint 79 (v31.7.166 — audit P0 wave 1) — Marchés foot étendus :
+    // Draw No Bet (DNB) + Asian Handicap (AH).
+    // DNB : 1X2 sans le nul, mise remboursée si nul.
+    //   pHomeDNB = pH / (pH + pA)
+    //   pAwayDNB = pA / (pH + pA)
+    //   (le nul est exclu de la base, push)
+    const totalNonDraw = p1 + p2;
+    const dnb = totalNonDraw > 0 ? {
+      home: p1 / totalNonDraw,
+      away: p2 / totalNonDraw,
+    } : { home: 0.5, away: 0.5 };
+    // AH ±0.5, ±1, ±0.25 (quart-handicap = moyenne entre deux entiers/halves).
+    // P(home gagne avec handicap +0.5) = P(home OU draw) = p1 + pX
+    // P(home gagne avec handicap -0.5) = P(home avec ≥1 but d'avance) = P(score H > score A + 0.5) ≈ pH-strict
+    // Pour AH ±1.0 il faut sommer probabilités de différences de score :
+    //   AH home -1 : home gagne par ≥2 buts
+    //   AH home +1 : home ne perd pas par 1+ but (incluant nul)
+    let pH_strict = 0, pH_2plus = 0, pA_strict = 0, pA_2plus = 0;
+    for (let h = 0; h <= maxGoals; h++) {
+      for (let a = 0; a <= maxGoals; a++) {
+        const p = grid[h][a];
+        const diff = h - a;
+        if (diff >= 1) pH_strict += p;
+        if (diff >= 2) pH_2plus += p;
+        if (diff <= -1) pA_strict += p;
+        if (diff <= -2) pA_2plus += p;
+      }
+    }
+    const ah = {
+      // AH ±0.5 (= DC mathématiquement)
+      home_plus_05: p1 + pX,        // home ne perd pas
+      home_minus_05: pH_strict,      // home gagne strict
+      away_plus_05: p2 + pX,
+      away_minus_05: pA_strict,
+      // AH ±1.0 (push si exactement 1 but d'écart)
+      home_plus_1: p1 + pX,                   // home ne perd pas par 1+
+      home_minus_1: pH_2plus,                  // home gagne par 2+
+      away_plus_1: p2 + pX,
+      away_minus_1: pA_2plus,
+      // Quart-handicaps (±0.25, ±0.75) — moyenne entre les deux lignes adjacentes
+      // (Asian Handicap moitié push moitié win/loss). Implémentation simple : moyenne des proba.
+      home_minus_025: (p1 + pH_strict) / 2,    // moitié 0, moitié -0.5
+      home_minus_075: (pH_strict + pH_2plus) / 2, // moitié -0.5, moitié -1
+    };
     return {
       p1, pX, p2,
       doubleChance: { p1X, pX2, p12 },
+      // Sprint 79 — DNB + AH
+      dnb,
+      ah,
       topScores,
       ou15, ou25, ou35,
       ht: { p1: pH_HT, pX: pD_HT, p2: pA_HT },
@@ -4220,6 +4317,21 @@
               { key: 'X', label: 'Nul (HT)', prob: ext.ht.pX },
               { key: '2', label: '2 (HT)', prob: ext.ht.p2 },
             ].sort((a,b) => b.prob - a.prob);
+            // Sprint 79 (v31.7.166) — DNB + AH picks
+            const dnbPick = ext.dnb && ext.dnb.home >= ext.dnb.away
+              ? { side: 'home', label: 'DNB Home (1)', prob: ext.dnb.home, key: 'DNB_1' }
+              : ext.dnb ? { side: 'away', label: 'DNB Away (2)', prob: ext.dnb.away, key: 'DNB_2' } : null;
+            // AH : meilleure ligne par valeur de proba autour de 0.55-0.75 (sweet spot Asian Handicap)
+            const ahCandidates = ext.ah ? [
+              { key: 'AH_H_-0.5', label: 'AH Home -0.5', prob: ext.ah.home_minus_05 },
+              { key: 'AH_H_-1', label: 'AH Home -1', prob: ext.ah.home_minus_1 },
+              { key: 'AH_H_+0.5', label: 'AH Home +0.5', prob: ext.ah.home_plus_05 },
+              { key: 'AH_H_+1', label: 'AH Home +1', prob: ext.ah.home_plus_1 },
+              { key: 'AH_A_-0.5', label: 'AH Away -0.5', prob: ext.ah.away_minus_05 },
+              { key: 'AH_A_+0.5', label: 'AH Away +0.5', prob: ext.ah.away_plus_05 },
+            ].filter(x => x.prob >= 0.55 && x.prob <= 0.85)
+             .sort((a, b) => b.prob - a.prob) : [];
+            const ahPick = ahCandidates[0] || null;
             extended = {
               doubleChance: dcOpts[0],
               doubleChanceAll: dcOpts,
@@ -4228,6 +4340,11 @@
               ou35: ou35Pick,
               halfTime: htOpts[0],
               halfTimeAll: htOpts,
+              // Sprint 79 — DNB + AH
+              dnb: dnbPick,
+              dnbRaw: ext.dnb,
+              asianHandicap: ahPick,
+              asianHandicapAll: ahCandidates,
               raw: ext,
             };
           }
@@ -5234,6 +5351,15 @@
       .sort((a, b) => a.name.localeCompare(b.name, 'fr'));
     const advHtml = advFiltersOpen ? `
       <div class="adv-filters" style="margin-top:10px;padding:12px;background:var(--surface,#111827);border:1px solid var(--border,#2a3744);border-radius:10px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;font-size:13px;">
+        <!-- Sprint 78 (audit P0) — Toggle Bookmaker 3-state -->
+        <div style="display:inline-flex;align-items:center;gap:4px;" title="Bookmaker : All = tous matchs détectés. Catalog = Winamax tournament-only inclus. Exact = Winamax exact only (cote actionnable).">
+          <span style="color:var(--text-muted);">📊</span>
+          ${['exact', 'catalog', 'all'].map(m => {
+            const lbl = { exact: 'Wx exact', catalog: 'Wx catalog', all: 'Tous' }[m];
+            const on = bookmakerMode === m;
+            return `<button data-bookmaker-mode="${m}" style="padding:4px 9px;border-radius:6px;border:1px solid ${on ? 'var(--brand)' : 'var(--border-2)'};background:${on ? 'var(--brand-soft)' : 'var(--panel-2)'};color:${on ? 'var(--brand)' : 'var(--text-dim)'};font-size:11px;font-weight:600;cursor:pointer;">${lbl}</button>`;
+          }).join('')}
+        </div>
         <div style="display:inline-flex;align-items:center;gap:6px;">
           <span style="color:var(--text-muted);">Cote</span>
           <input type="number" id="adv-odd-min" value="${advFilters.oddMin || ''}" placeholder="min" step="0.1" min="1" style="width:58px;padding:4px 6px;background:var(--panel-2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;"/>
@@ -5297,6 +5423,11 @@
       try { window.advFilters = advFilters; } catch(err){}
       onAdvChange();
     });
+    // Sprint 78 — Bookmaker mode toggle
+    el.querySelectorAll('[data-bookmaker-mode]').forEach(b => b.addEventListener('click', () => {
+      setBookmakerMode(b.dataset.bookmakerMode);
+      render();
+    }));
   }
 
   function renderTopPicks(visible) {
@@ -5362,14 +5493,32 @@
     // Ranking pur-modèle : fiabilité uniquement (cote exclue du classement).
     // La cote reste affichée à l'utilisateur mais n'influence pas la sélection.
     // Time-bonus léger pour les matchs imminents (actionnables tout de suite).
+    // Sprint 81 (v31.7.168 — audit P1) — Mode de tri configurable :
+    //   'confidence' (défaut) : rel + timeBonus (= comportement précédent, backward-compat)
+    //   'edge' : tri par edge (proba - 1/cote) décroissant
+    //   'kelly' : tri par fraction Kelly décroissante
+    // Persisté localStorage.topMode. Sub-nav rendu en tête de la page Top.
+    const topMode = (() => {
+      try {
+        const m = localStorage.getItem('topMode');
+        return ['confidence', 'edge', 'kelly'].includes(m) ? m : 'confidence';
+      } catch(e) { return 'confidence'; }
+    })();
     const scored = pool
       .map(x => {
         const rel = x.pred.reliability ?? x.pred.pick.prob;
         const timeBonus = x.startIn < 60 ? 0.02 : x.startIn < 360 ? 0.02 * (1 - (x.startIn - 60) / 300) : 0;
         const score = rel + timeBonus;
-        return { ...x, score };
+        // Edge et Kelly pour les modes alternatifs
+        const edge = (typeof valueBetEdge === 'function') ? (valueBetEdge(rel, x.pickOdd) || 0) : (rel - 1/x.pickOdd);
+        const kFrac = (typeof kellyFraction === 'function') ? kellyFraction(rel, x.pickOdd, 0.25) : 0;
+        return { ...x, score, edge, kFrac };
       })
-      .sort((a, b) => b.score - a.score);
+      .sort((a, b) => {
+        if (topMode === 'edge') return b.edge - a.edge;
+        if (topMode === 'kelly') return b.kFrac - a.kFrac;
+        return b.score - a.score;  // 'confidence' (default)
+      });
 
     // Ne garder que les picks fiables (≥ lowConf threshold) — exclus les coinflips.
     const top5 = scored.filter(x => !x.pred.lowConf && !x.pred.skip).slice(0, 5);
@@ -5463,12 +5612,30 @@
     const futureTop = futureScored.filter(x => !x.pred.lowConf && !x.pred.skip).slice(0, 5);
 
     const wrap = document.getElementById('top-picks-wrap');
+    // Sprint 81 (v31.7.168) — Sub-nav modes "Top" : confidence / edge / kelly
+    const topModeSubNav = `
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 14px;padding:6px 0;border-bottom:1px solid var(--border);" role="tablist" aria-label="Mode de tri du Top du jour">
+        ${[
+          { k: 'confidence', lbl: '🎯 Confiance', desc: 'Tri par fiabilité du modèle (défaut)' },
+          { k: 'edge', lbl: '💎 Top Edge', desc: 'Tri par edge décroissant (proba modèle - 1/cote)' },
+          { k: 'kelly', lbl: '💰 Top Kelly', desc: 'Tri par fraction Kelly (= mise optimale)' },
+        ].map(t => {
+          const on = topMode === t.k;
+          return `<button data-top-mode="${t.k}" role="tab" aria-selected="${on}" title="${esc(t.desc)}" style="padding:7px 14px;border-radius:var(--r-sm,8px);border:1px solid ${on ? 'var(--brand)' : 'var(--border-2)'};background:${on ? 'var(--brand-soft)' : 'var(--panel-2)'};color:${on ? 'var(--brand)' : 'var(--text-2)'};font-weight:600;font-size:13px;cursor:pointer;">${t.lbl}</button>`;
+        }).join('')}
+      </div>`;
     if (!top5.length && !others.length && !futureTop.length) {
       wrap.innerHTML = `
         <div class="section-header top-picks">
           <h2><span class="ico">⭐</span>Top pronostics du jour</h2>
           <div class="hint">Tous les top-pronos du jour sont joués. Les prochains apparaîtront ici automatiquement.</div>
-        </div>`;
+        </div>
+        ${topModeSubNav}`;
+      // Wire sub-nav
+      wrap.querySelectorAll('[data-top-mode]').forEach(b => b.addEventListener('click', () => {
+        try { localStorage.setItem('topMode', b.dataset.topMode); } catch(e){}
+        if (typeof render === 'function') render();
+      }));
       return;
     }
 
@@ -5642,13 +5809,19 @@
     // v30 — Coach IA top-pronos narrative retirée.
     const topNarrativeHtml = '';
 
+    // Sprint 81 — Label sub-titre selon mode actif
+    const topModeLabel = topMode === 'edge' ? 'classés par edge' : topMode === 'kelly' ? 'classés par fraction Kelly' : 'classés par fiabilité';
+    const topModeHint = topMode === 'edge' ? 'Classement par edge (proba modèle - 1/cote). Surface les value bets en priorité.' :
+                       topMode === 'kelly' ? 'Classement par fraction Kelly (= mise optimale). Surface les paris à fort retour relatif.' :
+                       'Classement pur-modèle : fiabilité (consensus multi-sources). Les matchs joués glissent en dehors automatiquement.';
     wrap.innerHTML = `
+      ${topModeSubNav}
       ${pdjBannerHtml}
       ${topNarrativeHtml}
       ${top5.length ? `
         <div class="section-header top-picks">
-          <h2><span class="ico">🏆</span>Top 5 pronos du jour <span style="font-size:12px;color:var(--text-dim2,#7b8693);font-weight:500;letter-spacing:0;">· classés par fiabilité</span></h2>
-          <div class="hint">Classement pur-modèle : fiabilité (consensus multi-sources). Les matchs joués glissent en dehors automatiquement.</div>
+          <h2><span class="ico">🏆</span>Top 5 pronos du jour <span style="font-size:12px;color:var(--text-dim2,#7b8693);font-weight:500;letter-spacing:0;">· ${topModeLabel}</span></h2>
+          <div class="hint">${topModeHint}</div>
         </div>
         <div class="top-hero-wrap" style="position:relative;">
           ${heroPdjRibbon}
@@ -5705,6 +5878,11 @@
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(e); }
       });
     });
+    // Sprint 81 (v31.7.168) — Wire sub-nav modes Top
+    wrap.querySelectorAll('[data-top-mode]').forEach(b => b.addEventListener('click', () => {
+      try { localStorage.setItem('topMode', b.dataset.topMode); } catch(e){}
+      if (typeof render === 'function') render();
+    }));
     // v30 — Handler "J'ai parié" (.tp-mybet) retiré : tracking utilisateur désactivé.
   }
 
@@ -7623,6 +7801,9 @@
                 (ext.halfTime && ext.halfTime.prob >= 0.50) ? extChip(`Mi-temps : ${ext.halfTime.label}`, ext.halfTime.prob, '⏱️ Mi-temps', 'rgba(56,189,248,.08)', 'rgba(56,189,248,.25)', '#7dd3fc') : '',
                 (ext.ou15.prob >= 0.70) ? extChip(ext.ou15.label, ext.ou15.prob, '⚽ O/U 1.5', 'rgba(139,92,246,.08)', 'rgba(139,92,246,.25)', '#a78bfa') : '',
                 (ext.ou35.prob >= 0.55) ? extChip(ext.ou35.label, ext.ou35.prob, '⚽ O/U 3.5', 'rgba(139,92,246,.08)', 'rgba(139,92,246,.25)', '#a78bfa') : '',
+                // Sprint 79 — DNB + AH chips
+                (ext.dnb && ext.dnb.prob >= 0.60) ? extChip(ext.dnb.label, ext.dnb.prob, '🎯 DNB (Draw No Bet)', 'rgba(251,146,60,.08)', 'rgba(251,146,60,.25)', '#fb923c') : '',
+                (ext.asianHandicap && ext.asianHandicap.prob >= 0.62) ? extChip(ext.asianHandicap.label, ext.asianHandicap.prob, '⚖️ Asian Handicap', 'rgba(34,211,238,.08)', 'rgba(34,211,238,.25)', '#22d3ee') : '',
               ].filter(Boolean).join('') : '';
               return `<div style="margin-top:14px;">
                 <div class="lbl-tiny-mb">🥅 Marchés buts (Poisson)</div>
@@ -7700,7 +7881,115 @@
             <div style="margin-top:8px;font-size:10.5px;color:var(--text-dim2);font-style:italic;">${riskFlags.length} facteur${riskFlags.length>1?'s':''} qui justifient une mise plus prudente, voire de skip.</div>
           </div>
         ` : '';
-        return risksHtml + `
+        // Sprint 80 (v31.7.167 — audit P1) — Section "Transparence des données".
+        // Liste explicitement les sources : Winamax (exact/tournoi), lineups,
+        // météo, arbitre, stats forme, ELO. Permet à l'user de juger la
+        // crédibilité du pick selon la richesse des inputs.
+        const transparenceHtml = (() => {
+          const wnx = match.winamax || {};
+          const isExact = !!(wnx.match_id && wnx.markets && wnx.markets['1n2']);
+          const isTournament = !!(wnx.available && !wnx.match_id);
+          const dataSources = [
+            {
+              icon: '💰',
+              label: 'Cote Winamax',
+              status: isExact ? 'exact' : isTournament ? 'tournament' : 'fallback',
+              detail: isExact ? `Match exact bookable (match_id ${wnx.match_id})` :
+                      isTournament ? 'Tournoi listé chez Winamax mais cote pas encore publiée' :
+                      'Hors catalogue Winamax (cote externe)',
+            },
+            {
+              icon: '📸',
+              label: 'Snapshot pre-match',
+              status: match.odds_snapshot ? 'ok' : 'missing',
+              detail: match.odds_snapshot
+                ? `Cote freeze ${match.odds_snapshot.captured_at?.slice(0,10) || ''} via ${match.odds_snapshot.provider || 'Winamax'}`
+                : 'Pas encore de snapshot pré-match',
+            },
+            {
+              icon: '🥅',
+              label: 'Cotes per-marché (OU/BTTS)',
+              status: match.odds_snapshot && match.odds_snapshot.markets ? 'ok' : 'missing',
+              detail: match.odds_snapshot && match.odds_snapshot.markets
+                ? `${Object.keys(match.odds_snapshot.markets).join(', ')}`
+                : 'Pas de cote book per-marché historique (Sprint 67)',
+            },
+            {
+              icon: '🌤️',
+              label: 'Météo',
+              status: match.weather && (match.weather.precip_mm != null || match.weather.wind_kmh != null) ? 'ok' : 'missing',
+              detail: match.weather && match.weather.city
+                ? `${match.weather.city}${match.weather.temp_c != null ? ` ${Math.round(match.weather.temp_c)}°C` : ''}`
+                : match.sport === 'football' ? 'Open-Meteo non récupéré' : 'N/A pour ce sport',
+            },
+            {
+              icon: '🟨',
+              label: 'Arbitre (foot top-5)',
+              status: match.referee && match.referee.name ? 'ok' : 'missing',
+              detail: match.referee && match.referee.name
+                ? `${match.referee.name} (${match.referee.games || '?'} matchs)`
+                : match.sport === 'football' ? 'Sofascore non récupéré' : 'N/A pour ce sport',
+            },
+            {
+              icon: '🎽',
+              label: 'Compositions',
+              status: match.lineups || (match.competitors && match.competitors.some(c => Array.isArray(c.lineup))) ? 'ok' : 'missing',
+              detail: match.lineups ? 'Lineups Sofascore disponibles' : 'Compositions pas encore publiées',
+            },
+            {
+              icon: '🏆',
+              label: 'Classement (standings)',
+              status: !!(window.PRONOSTICS_DATA?.standings?.[match.league_code]?.length) ? 'ok' : 'missing',
+              detail: window.PRONOSTICS_DATA?.standings?.[match.league_code]?.length
+                ? `${window.PRONOSTICS_DATA.standings[match.league_code].length} équipes` : 'Pas de classement (compétition à élimination)',
+            },
+            {
+              icon: '⚔️',
+              label: 'Confrontations directes (H2H)',
+              status: match.h2h && Array.isArray(match.h2h) && match.h2h.length ? 'ok' : 'missing',
+              detail: match.h2h && Array.isArray(match.h2h) && match.h2h.length
+                ? `${match.h2h.length} dernières rencontres` : 'Pas de H2H récents',
+            },
+            {
+              icon: '🔥',
+              label: 'ELO ClubElo',
+              status: match.clubelo ? 'ok' : 'missing',
+              detail: match.clubelo
+                ? `Home ${Math.round(match.clubelo.home_elo || 0)} · Away ${Math.round(match.clubelo.away_elo || 0)}`
+                : match.sport === 'football' ? 'ClubElo CSV non récupéré' : 'N/A pour ce sport',
+            },
+          ];
+          const statusColors = {
+            exact: 'var(--accent, #22c55e)',
+            tournament: 'var(--warn, #c79b00)',
+            fallback: 'var(--danger, #ef4444)',
+            ok: 'var(--accent, #22c55e)',
+            missing: 'var(--text-dim2, #7b8693)',
+          };
+          const statusEmoji = { exact: '✓', tournament: '~', fallback: '✗', ok: '✓', missing: '⊘' };
+          const okCount = dataSources.filter(s => s.status === 'exact' || s.status === 'ok').length;
+          return `
+            <div class="section">
+              <h4>🔍 Transparence des données</h4>
+              <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">${okCount}/${dataSources.length} sources disponibles pour ce match. Plus c'est élevé, plus la prédiction est fiable.</div>
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                ${dataSources.map(s => `
+                  <div style="display:grid;grid-template-columns:24px 1fr auto;gap:10px;align-items:center;padding:8px 10px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
+                    <div style="font-size:14px;">${s.icon}</div>
+                    <div>
+                      <div style="font-size:12.5px;font-weight:600;color:var(--text);">${esc(s.label)}</div>
+                      <div style="font-size:10.5px;color:var(--text-dim);margin-top:1px;">${esc(s.detail)}</div>
+                    </div>
+                    <span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;background:color-mix(in srgb, ${statusColors[s.status]} 14%, transparent);color:${statusColors[s.status]};font-size:11px;font-weight:700;">${statusEmoji[s.status]} ${esc(s.status)}</span>
+                  </div>`).join('')}
+              </div>
+              <div style="margin-top:8px;font-size:10.5px;color:var(--text-dim2);font-style:italic;line-height:1.4;">
+                Sources via ESPN, Sofascore, Open-Meteo, ClubElo. La pipeline regen ces signaux toutes les 5 minutes (cron GitHub Actions).
+              </div>
+            </div>
+          `;
+        })();
+        return risksHtml + transparenceHtml + `
         <div class="section">
           <h4>🌐 Contexte extérieur</h4>
           <div class="two-cols">
@@ -8435,6 +8724,7 @@
       if (sections.length < 3) return;  // pas la peine pour 1-2 sections
       const cat = (txt) => {
         const t = (txt || '').toLowerCase();
+        if (t.includes('transparence') || t.includes('source des donn')) return 'transparence';
         if (t.includes('risque')) return 'risques';
         if (t.includes('pronostic') || t.includes('contexte') || t.includes('information')) return 'synthese';
         if (t.includes('cote') || t.includes('probabilité') || t.includes('bookmaker')) return 'cotes';
@@ -8445,15 +8735,17 @@
         return 'signaux';
       };
       // Sprint 58 (v31.7.147) — Onglet "Risques" ajouté
+      // Sprint 80 (v31.7.167 — audit P1) — Onglet "Transparence" ajouté
       const tabsOrder = [
         ['synthese', '🎯 Synthèse'],
         ['signaux', '📡 Signaux'],
         ['cotes', '💰 Cotes'],
         ['risques', '⚠️ Risques'],
+        ['transparence', '🔍 Transparence'],
         ['h2h', '⚔️ H2H'],
         ['stats', '📊 Stats'],
       ];
-      const tabSections = { synthese: [], signaux: [], cotes: [], risques: [], h2h: [], stats: [] };
+      const tabSections = { synthese: [], signaux: [], cotes: [], risques: [], transparence: [], h2h: [], stats: [] };
       sections.forEach(sec => {
         const h4 = sec.querySelector('h4');
         if (!h4) {
@@ -10590,6 +10882,15 @@
       return arr.slice(0, 8);
     })();
 
+    // === Sprint 78 (v31.7.165 — audit P0) — "Grands matchs SANS pick" ===
+    // Distinct de "Prochains gros matchs" qui affiche tout. Cette section ne
+    // garde QUE les gros matchs où le modèle n'a PAS de prono fort (status
+    // != 'strong'). Réponse à l'audit qui demande de surfacer ces matchs
+    // pour que l'user voie ce qui est ignoré et pourquoi.
+    const orphanBigMatches = (topImportantMatches || []).filter(item =>
+      item.status && item.status.code !== 'strong'
+    ).slice(0, 6);
+
     // === Joueurs buteurs probables (prochaine 24h) ===
     // Utilise predictLikelyScorers (Poisson × position × lineup, exclut les blessés).
     const scorersToday = _dataIsStale ? [] : (() => {
@@ -11041,6 +11342,24 @@
           <div style="font-size:13px;line-height:1.5;">La dernière mise à jour date de <strong>${_dataAgeMin < 120 ? _dataAgeMin+' min' : Math.floor(_dataAgeMin/60)+'h'}</strong>. Les matchs affichés pourraient être faux ou déjà joués. <strong>Clique sur "🔄 forcer refresh"</strong> dans le banner rouge en haut pour recharger les vraies données du jour.</div>
         </div>` : ''}
 
+        <!-- Sprint 78 (v31.7.165 — audit ChatGPT P0) — Compteurs ingérés / exacts / fallback -->
+        ${!_dataIsStale && today.length ? (() => {
+          const total = today.length;
+          const exact = today.filter(m => m.winamax && m.winamax.match_id && m.winamax.markets && m.winamax.markets['1n2']).length;
+          const tournamentOnly = today.filter(m => m.winamax && m.winamax.available && !m.winamax.match_id).length;
+          const fallback = total - exact - tournamentOnly;
+          const exactPct = total > 0 ? Math.round(exact * 100 / total) : 0;
+          return `
+          <div style="margin:18px 0 0;padding:12px 16px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);display:flex;flex-wrap:wrap;gap:14px;align-items:center;font-size:12px;">
+            <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">📊 Aujourd'hui</div>
+            <span><b style="color:var(--text);font-size:14px;">${total}</b> match${total>1?'s':''} ingéré${total>1?'s':''}</span>
+            <span style="color:var(--accent);">✓ <b>${exact}</b> Winamax exact (${exactPct}%)</span>
+            ${tournamentOnly > 0 ? `<span style="color:var(--warn);">~ <b>${tournamentOnly}</b> tournament-only</span>` : ''}
+            ${fallback > 0 ? `<span style="color:var(--text-dim2);">⊘ <b>${fallback}</b> hors catalogue Winamax</span>` : ''}
+            <span style="margin-left:auto;color:var(--text-dim2);font-size:11px;">Mode actif : <b style="color:${bookmakerMode==='exact'?'var(--accent)':bookmakerMode==='catalog'?'var(--warn)':'var(--text)'};">${bookmakerMode === 'exact' ? 'Wx exact' : bookmakerMode === 'catalog' ? 'Wx catalog' : 'Tous'}</b></span>
+          </div>` ;
+        })() : ''}
+
         <!-- v28.6 — "À PARIER AUJOURD'HUI" : reco perso pour Théo avec sa bankroll -->
         ${topPicks.length ? `
         <div style="padding:36px 0 24px;border-bottom:1px solid var(--border);">
@@ -11223,6 +11542,52 @@
                 </div>
                 <div style="font-size:11px;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(lg.slice(0, 50))}${item.importance >= 50 ? ` · 🔥 enjeu ${item.importance}/100` : ''}</div>
                 ${pickLine}
+              </div>`;
+            }).join('')}
+          </div>
+        </div>` : ''}
+
+        <!-- Sprint 78 (v31.7.165 — audit P0) — Grands matchs SANS pick fort -->
+        ${orphanBigMatches.length ? `
+        <div style="padding:24px 0;border-top:1px solid var(--border);">
+          <div style="margin-bottom:14px;">
+            <div style="font-size:11px;color:var(--warn);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;">⚠ À surveiller · pas de prono fort</div>
+            <div style="font-size:18px;font-weight:800;color:var(--text);letter-spacing:-.5px;margin-top:2px;">👁️ Grands matchs sans pick</div>
+            <div style="font-size:12px;color:var(--text-dim);margin-top:4px;">${orphanBigMatches.length} match${orphanBigMatches.length>1?'s':''} à fort enjeu où le modèle ne recommande RIEN. Visibles ici pour que tu décides en connaissance de cause.</div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:8px;">
+            ${orphanBigMatches.map(item => {
+              const m = item.m;
+              const sides = (typeof getSides === 'function') ? getSides(m) : { home:{}, away:{} };
+              const hN = sides.home?.short || sides.home?.name || '?';
+              const aN = sides.away?.short || sides.away?.name || '?';
+              const sportEm = (typeof sportEmoji === 'function') ? sportEmoji(m.sport) : '🎯';
+              const lg = m.league_name || m.league || '';
+              const tLbl = (typeof fmtTime === 'function') ? fmtTime(m.date) : '';
+              const dLbl = (() => {
+                try {
+                  const d = new Date(m.date);
+                  const iso = d.toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+                  if (iso === todayIso) return "Auj.";
+                  const tom = new Date(); tom.setDate(tom.getDate() + 1);
+                  const tomIso = tom.toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+                  if (iso === tomIso) return 'Demain';
+                  const dow = ['Dim.','Lun.','Mar.','Mer.','Jeu.','Ven.','Sam.'][d.getDay()];
+                  return `${dow} ${d.getDate()}/${d.getMonth()+1}`;
+                } catch(e) { return ''; }
+              })();
+              const st = item.status;
+              return `
+              <div class="interactive" data-match-id="${esc(String(m.id || ''))}" role="button" tabindex="0" style="padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${st.color};border-radius:0 8px 8px 0;cursor:pointer;">
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:4px;">
+                  <div style="font-size:10px;color:var(--text-dim);font-weight:600;">${esc(dLbl)} · ${esc(tLbl)}</div>
+                  <span style="display:inline-flex;align-items:center;padding:2px 7px;border-radius:4px;background:color-mix(in srgb, ${st.color} 14%, transparent);color:${st.color};font-size:9px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;white-space:nowrap;" title="${esc(st.hint||'')}">${esc(st.label)}</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;color:var(--text);">
+                  <span>${sportEm}</span>
+                  <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">${esc(hN)} <span style="color:var(--text-dim2);font-weight:400;">vs</span> ${esc(aN)}</span>
+                </div>
+                <div style="font-size:10.5px;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px;">${esc(String(lg).slice(0, 38))}${item.importance >= 50 ? ` · 🔥 ${item.importance}/100` : ''}</div>
               </div>`;
             }).join('')}
           </div>
@@ -15891,6 +16256,24 @@
     upcoming.sort((a, b) => new Date(a.m.date) - new Date(b.m.date));
     settled.sort((a, b) => new Date(b.m.date) - new Date(a.m.date));
 
+    // Sprint 81 (v31.7.168 — audit P1) — "Near Locks" : matchs avec rel ∈ [0.65, 0.70)
+    // qui ne passent pas le seuil lock mais sont à 1-5pt près. Permet à l'user
+    // de voir les "presque-locks" pour décider lui-même s'il veut prendre le risque.
+    const nearLocks = [];
+    for (const m of allMatches) {
+      if (m.completed) continue;
+      if (winamaxOnly && !isWinamaxBookable(m)) continue;
+      const ko = m.date ? new Date(m.date).getTime() : NaN;
+      if (isNaN(ko) || ko < now - 15 * 60 * 1000) continue;  // skip les déjà commencés
+      const pred = predictMatch(m);
+      if (!pred || !pred.pick || pred.skip || pred.isLock) continue;
+      const rel = Number(pred.reliability ?? pred.pick.prob) || 0;
+      if (rel >= 0.65 && rel < 0.70) {
+        nearLocks.push({ m, pred, rel });
+      }
+    }
+    nearLocks.sort((a, b) => b.rel - a.rel);
+
     // Sidebar counter: upcoming + live locks (actionable)
     const counterEl = document.getElementById('count-locks');
     if (counterEl) counterEl.textContent = String(upcoming.length + live.length);
@@ -16036,6 +16419,43 @@
       } catch (e) { console.warn('[HHHH] locks narrative failed', e); return ''; }
     })();
 
+    // Sprint 81 (v31.7.168) — Near Locks rendu (matchs ~70% confiance qui frôlent le seuil)
+    const nearLocksHtml = nearLocks.length ? `
+      <div style="margin-top:32px;padding:18px 16px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r);">
+        <div style="margin-bottom:12px;">
+          <div style="font-size:11px;color:var(--warn);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;">Presque locks · 65% à 70%</div>
+          <div style="font-size:18px;font-weight:800;color:var(--text);margin-top:2px;">🎯 Near Locks (${nearLocks.length})</div>
+          <div style="font-size:12px;color:var(--text-dim);margin-top:3px;">Le modèle est confiant mais sous le seuil 70%. À toi de juger si tu prends le risque.</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:8px;">
+          ${nearLocks.slice(0, 12).map(item => {
+            const m = item.m;
+            const sides = (typeof getSides === 'function') ? getSides(m) : { home:{}, away:{} };
+            const hN = sides.home?.short || sides.home?.name || '?';
+            const aN = sides.away?.short || sides.away?.name || '?';
+            const sportEm = (typeof sportEmoji === 'function') ? sportEmoji(m.sport) : '🎯';
+            const tLbl = (typeof fmtTime === 'function') ? fmtTime(m.date) : '';
+            const lg = m.league_name || m.league_code || '';
+            const pickLbl = item.pred.pick.label || '';
+            const pk = item.pred.pick.key;
+            const odd = item.pred.odds && (pk === '1' ? item.pred.odds.home : pk === '2' ? item.pred.odds.away : item.pred.odds.draw);
+            return `
+              <div class="interactive" data-near-lock-id="${esc(String(m.id))}" role="button" tabindex="0" style="padding:10px 12px;background:var(--panel-2,rgba(255,255,255,.03));border:1px solid var(--border);border-left:3px solid var(--warn);border-radius:0 8px 8px 0;cursor:pointer;">
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:4px;">
+                  <div style="font-size:10px;color:var(--text-dim);font-weight:600;">${esc(tLbl)}</div>
+                  <div style="font-size:13px;font-weight:700;color:var(--warn);font-variant-numeric:tabular-nums;">${Math.round(item.rel * 100)}%</div>
+                </div>
+                <div style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;color:var(--text);">
+                  <span>${sportEm}</span>
+                  <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">${esc(hN)} <span style="color:var(--text-dim2);font-weight:400;">vs</span> ${esc(aN)}</span>
+                </div>
+                <div style="font-size:11px;color:var(--text-dim);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(String(lg).slice(0,32))} · <b style="color:var(--brand);">→ ${esc(pickLbl)}</b>${odd ? ` @${Number(odd).toFixed(2)}` : ''}</div>
+              </div>`;
+          }).join('')}
+        </div>
+        ${nearLocks.length > 12 ? `<div style="margin-top:6px;font-size:11px;color:var(--text-dim2);text-align:center;">+ ${nearLocks.length - 12} autre${nearLocks.length - 12 > 1 ? 's' : ''} near lock${nearLocks.length - 12 > 1 ? 's' : ''}</div>` : ''}
+      </div>` : '';
+
     wrap.innerHTML = `
       <div style="max-width:1200px;margin:0 auto;padding:16px 8px 24px;">
         <div style="margin-bottom:28px;padding:32px 0 20px;border-bottom:1px solid var(--border);position:relative;">
@@ -16051,7 +16471,16 @@
         ${sectionHtml('🔴 En cours', 'Locks dont le match est déjà lancé', live, true)}
         ${sectionHtml('⏭️ À venir', 'Triés par heure de coup d\'envoi', upcoming, true)}
         ${sectionHtml('✅ Settled récents', 'Locks réglés dans les 48 dernières heures', settled, false)}
+        ${nearLocksHtml}
       </div>`;
+    // Sprint 81 — wire near-locks click → openDetail
+    wrap.querySelectorAll('[data-near-lock-id]').forEach(card => {
+      card.addEventListener('click', () => {
+        const id = card.dataset.nearLockId;
+        const item = nearLocks.find(x => String(x.m.id) === String(id));
+        if (item) openDetail(item.m);
+      });
+    });
 
     // Wire up card clicks → openDetail + mark as seen (Chantier Q)
     wrap.querySelectorAll('.match').forEach(card => {
