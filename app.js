@@ -1420,11 +1420,47 @@
       ];
     }
     items.sort((a, b) => b.prob - a.prob);
+    // Sprint 53 (v31.7.142 — Phase 3 tennis) : expected games + Over/Under.
+    // Approximation : un set tight (pSet proche de 0.5) ≈ 10-11 games avec TB,
+    // un set one-sided (pSet > 0.75) ≈ 6-8 games. Formule empirique :
+    //   gamesPerSet(pSet) = 8 + 5 * (1 - |pSet - 0.5| * 2)
+    // → 13 si tight (0.5), 8 si one-sided (1.0).
+    const gamesPerSet = (p) => {
+      const tightness = 1 - Math.abs(p - 0.5) * 2;  // [0, 1]
+      return 8 + 5 * tightness;  // [8, 13]
+    };
+    const avgGames = items.reduce((acc, it) => {
+      const totalSets = it.home + it.away;
+      // pSet local pour CE score : si home gagne (home > away) → pSetH; sinon pSetA = q.
+      const winnerP = it.home > it.away ? pSetH : q;
+      // Sets gagnés par le winner et perdus : on prend une moyenne entre tight et dominant
+      const gPerSet = gamesPerSet(winnerP);
+      return acc + it.prob * (totalSets * gPerSet);
+    }, 0);
+    // Lines courantes Winamax tennis
+    const lines = bestOf === 3 ? [21.5, 22.5, 23.5] : [37.5, 38.5];
+    // Approximation Gaussienne : variance ~25 (BO3), ~50 (BO5)
+    const variance = bestOf === 3 ? 25 : 50;
+    const sigma = Math.sqrt(variance);
+    // Approx P(games > line) avec normale standard
+    const pNormGreater = (line) => {
+      const z = (avgGames - line) / sigma;
+      // CDF approximé : Φ(z) ≈ 1 / (1 + exp(-1.702 * z))
+      return 1 / (1 + Math.exp(-1.702 * z));
+    };
+    const games = lines.map(line => ({
+      line,
+      label: `Plus de ${line} jeux`,
+      pOver: pNormGreater(line),
+      pUnder: 1 - pNormGreater(line),
+    }));
     return {
       kind: 'tennis',
       bestOf,
       items: items.slice(0, bestOf === 3 ? 3 : 4),
       caption: `Probabilités par nombre de sets (best-of-${bestOf}) dérivées de la proba de victoire.`,
+      // Sprint 53 — total jeux (Phase 3 tennis)
+      games: { avgGames, lines: games, sigma },
     };
   }
 
@@ -6797,11 +6833,36 @@
                     <span style="color:var(--text-dim2,#7b8693);font-weight:500;font-size:12px;">${(s.prob*100).toFixed(1)}%</span>
                   </span>`).join('');
               }
+              // Sprint 53 (v31.7.142) — Tennis : section "Total jeux" séparée
+              // si `sc.games` est présent (calculé par tennisScorePrediction).
+              let tennisGamesHtml = '';
+              if (kind === 'tennis' && sc.games && sc.games.lines && sc.games.lines.length) {
+                const avgGames = Math.round(sc.games.avgGames);
+                const gameLines = sc.games.lines.map(g => {
+                  const pPick = g.pOver >= g.pUnder ? g.pOver : g.pUnder;
+                  const sidePick = g.pOver >= g.pUnder ? `+${g.line}` : `−${g.line}`;
+                  const sideLbl = g.pOver >= g.pUnder ? `Plus de ${g.line}` : `Moins de ${g.line}`;
+                  const strong = pPick >= 0.65;
+                  const color = strong ? '#10b981' : 'var(--text)';
+                  return `
+                    <span style="padding:8px 14px;border-radius:8px;background:${strong?'rgba(16,185,129,.12)':'rgba(255,255,255,.04)'};border:1px solid ${strong?'rgba(16,185,129,.3)':'rgba(255,255,255,.06)'};font-variant-numeric:tabular-nums;font-weight:${strong?700:600};color:${color};display:inline-flex;flex-direction:column;align-items:flex-start;gap:2px;">
+                      <span style="font-size:13px;">${esc(sideLbl)} jeux${strong ? ' ⭐' : ''}</span>
+                      <span style="color:var(--text-dim2,#7b8693);font-weight:500;font-size:11px;">${(pPick*100).toFixed(0)}% · proj. ${avgGames} jeux</span>
+                    </span>`;
+                }).join('');
+                tennisGamesHtml = `
+                  <div style="margin-top:12px;">
+                    <div class="lbl-tiny-mb">🎾 Total jeux (Phase 3)</div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">${gameLines}</div>
+                    <div style="margin-top:4px;font-size:10.5px;color:var(--text-dim2,#7b8693);line-height:1.3;">Approx. Gaussienne basée sur ${sc.bestOf===5?'BO5 σ≈√50':'BO3 σ≈√25'}. Plus le match est tight, plus le total est élevé.</div>
+                  </div>`;
+              }
               return `
               <div style="margin-top:14px;">
                 <div class="lbl-tiny-mb">${heading}</div>
                 <div style="display:flex;gap:8px;flex-wrap:wrap;">${chipsHtml}</div>
                 ${caption ? `<div style="margin-top:6px;font-size:10.5px;color:var(--text-dim2,#7b8693);line-height:1.3;">${esc(caption)}</div>` : ''}
+                ${tennisGamesHtml}
               </div>`;
             })()}
             ${(() => {
@@ -15347,6 +15408,75 @@
     const totalPicks = dayBuckets.reduce((s, b) => s + b.picks.length, 0);
     const totalLocks = dayBuckets.reduce((s, b) => s + b.nLocks, 0);
 
+    // Sprint 55 (v31.7.144) — Heatmap 30 jours. Rolling window past 14j +
+    // future 16j (=30j total) avec mini-cellules colorées par densité de
+    // picks. Cliquer un jour navigue vers Tous filtré sur ce jour. Vraie
+    // alternative à un calendrier mensuel (qui ferait 14-25 KB de markup).
+    const heatmapData = (() => {
+      const cells = [];
+      const now = new Date(todayIso + 'T00:00:00Z');
+      const past = new Date(now); past.setUTCDate(past.getUTCDate() - 14);
+      const future = new Date(now); future.setUTCDate(future.getUTCDate() + 15);
+      const cur = new Date(past);
+      let maxN = 0;
+      while (cur <= future) {
+        const iso = cur.toISOString().slice(0, 10);
+        const evs = data.days[iso] || [];
+        let nPicks = 0, nLocks = 0;
+        evs.forEach(m => {
+          if (m.completed) return;
+          if (!isWinamaxBookable(m)) return;
+          try {
+            const pred = predictMatch(m);
+            if (!pred || !pred.pick || pred.skip || pred.lowConf) return;
+            nPicks++;
+            if (pred.isLock) nLocks++;
+          } catch(e) {}
+        });
+        if (nPicks > maxN) maxN = nPicks;
+        cells.push({ iso, nPicks, nLocks, isToday: iso === todayIso });
+        cur.setUTCDate(cur.getUTCDate() + 1);
+      }
+      return { cells, maxN };
+    })();
+    const heatColor = (n, max) => {
+      if (n === 0) return 'var(--panel)';
+      const ratio = max > 0 ? Math.min(1, n / Math.max(max, 4)) : 0;
+      // Vert progressif comme GitHub heatmap
+      if (ratio < 0.25) return 'rgba(34,197,94,.15)';
+      if (ratio < 0.5) return 'rgba(34,197,94,.3)';
+      if (ratio < 0.75) return 'rgba(34,197,94,.5)';
+      return 'rgba(34,197,94,.85)';
+    };
+    const heatmapHtml = `
+      <div style="margin-top:24px;padding:16px 18px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r);">
+        <div style="display:flex;justify-content:space-between;align-items:end;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+          <div>
+            <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">Heatmap 30 jours</div>
+            <div style="font-size:14px;font-weight:700;color:var(--text);margin-top:2px;">📅 Vue mensuelle (J-14 → J+15)</div>
+          </div>
+          <div style="font-size:10px;color:var(--text-dim);display:flex;align-items:center;gap:6px;">
+            <span>Moins</span>
+            <span style="display:inline-block;width:11px;height:11px;border-radius:2px;background:var(--panel);border:1px solid var(--border);"></span>
+            <span style="display:inline-block;width:11px;height:11px;border-radius:2px;background:rgba(34,197,94,.15);"></span>
+            <span style="display:inline-block;width:11px;height:11px;border-radius:2px;background:rgba(34,197,94,.3);"></span>
+            <span style="display:inline-block;width:11px;height:11px;border-radius:2px;background:rgba(34,197,94,.5);"></span>
+            <span style="display:inline-block;width:11px;height:11px;border-radius:2px;background:rgba(34,197,94,.85);"></span>
+            <span>Plus</span>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(15,1fr);gap:3px;">
+          ${heatmapData.cells.map(c => {
+            const dt = new Date(c.iso + 'T12:00:00Z');
+            const dayN = dt.getUTCDate();
+            const tooltipTxt = `${c.iso} : ${c.nPicks} prono${c.nPicks>1?'s':''}${c.nLocks ? `, ${c.nLocks} lock${c.nLocks>1?'s':''} 🔒`:''}`;
+            return `
+              <button class="cal-heatmap-cell" data-cal-iso="${esc(c.iso)}" title="${esc(tooltipTxt)}" style="aspect-ratio:1;border-radius:3px;border:1px solid ${c.isToday ? 'var(--brand)' : 'var(--border)'};background:${heatColor(c.nPicks, heatmapData.maxN)};font-size:9px;font-weight:600;color:${c.nPicks > 0 ? 'var(--text)' : 'var(--text-dim2)'};cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;font-family:inherit;${c.isToday ? 'box-shadow:0 0 0 2px var(--brand-soft);' : ''}">${dayN}</button>`;
+          }).join('')}
+        </div>
+        <div style="margin-top:6px;font-size:10.5px;color:var(--text-dim2);">Clique un jour pour voir ses pronos. Aujourd'hui = ${todayIso}.</div>
+      </div>`;
+
     wrap.innerHTML = `
       <div class="page-wrap" style="padding:0 8px 24px;">
         <div class="page-header">
@@ -15355,13 +15485,24 @@
           <h1 class="page-h1">📅 Calendrier des pronos</h1>
           <div style="font-size:14px;color:var(--text-dim);">Vue d'ensemble sur 7 jours forward — <b style="color:var(--text);">${totalPicks} pronostics</b> dont <b style="color:var(--tier-lock);">${totalLocks} locks 🔒</b>. Toggle vers Tous pour les filtres avancés.</div>
         </div>
-        <div style="margin-top:16px;">
+        ${heatmapHtml}
+        <div style="margin-top:24px;">
           ${dayBuckets.map(renderDaySection).join('')}
         </div>
         <div style="margin-top:24px;padding:14px 16px;background:rgba(167,139,250,.04);border:1px dashed var(--brand-border);border-radius:8px;font-size:12.5px;color:var(--text-dim);">
           💡 Astuce : clique un match pour voir le détail. Pour la vue détaillée d'un seul jour avec filtres sport / edge / confiance, va sur <button class="page-btn" data-page="tous" style="background:transparent;border:none;color:var(--brand);text-decoration:underline;cursor:pointer;font-size:inherit;font-family:inherit;padding:0;font-weight:700;">Tous les matchs</button>.
         </div>
       </div>`;
+    // Wire heatmap cells → navigate to Tous filtered on that day
+    wrap.querySelectorAll('.cal-heatmap-cell[data-cal-iso]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const iso = btn.dataset.calIso;
+        try { localStorage.setItem('currentDate', iso); } catch(e){}
+        try { window.currentDate = iso; } catch(e){}
+        const tousBtn = document.querySelector('.page-btn[data-page="tous"]');
+        if (tousBtn) tousBtn.click();
+      });
+    });
 
     // Wire click → openDetail (réutilise pattern Tous)
     wrap.querySelectorAll('.cal-pick-row[data-match-id]').forEach(row => {

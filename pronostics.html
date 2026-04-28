@@ -459,43 +459,44 @@
      `position: fixed` (le sidebar serait positionné relativement au
      header, pas au viewport). Meme problème que `refresh-indicator`
      ci-dessous. -->
+<!-- Sprint 54 (v31.7.143) — Navigation 6 hubs (Phase 6 brief Théo).
+     Avant : 7 hubs (Accueil/Pronos/Montantes/Ma perf/Transparence/Apprendre/Compte).
+     Après : 6 hubs (Accueil/Pronostics/Explorer/Performance/Compte/Apprendre).
+     "Pronostics" = picks actionnables (Top + Locks + Tous + Combinés + Buteurs + Montantes).
+     "Explorer" = browse data sans décision (Matchs détectés + Calendrier + Favoris + Comparer).
+     "Performance" = tout le suivi (Vue globale + Bilan + Historique + Backtest + Crédibilité). -->
 <nav class="topbar-nav" id="page-nav" aria-label="Navigation principale">
   <button class="page-btn hub-solo active" data-page="dashboard">🏠 Accueil</button>
   <div class="hub" data-hub="pronos">
-    <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">🏆 Pronos <span class="chev">▾</span></button>
-    <div class="hub-menu" role="menu" aria-label="Sous-menu Pronos">
+    <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">🏆 Pronostics <span class="chev">▾</span></button>
+    <div class="hub-menu" role="menu" aria-label="Sous-menu Pronostics">
       <button class="page-btn" role="menuitem" data-page="top">⭐ Top du jour</button>
       <button class="page-btn" role="menuitem" data-page="locks">🔒 Locks <span class="count" id="count-locks">0</span></button>
       <button class="page-btn" role="menuitem" data-page="tous">📋 Tous les pronos</button>
+      <button class="page-btn" role="menuitem" data-page="combines">🔗 Combinés</button>
+      <button class="page-btn" role="menuitem" data-page="buteurs">⚽ Buteurs</button>
+      <button class="page-btn" role="menuitem" data-page="montante-jour">🎯 Montante du jour</button>
+      <button class="page-btn" role="menuitem" data-page="montante-weekend">🗓️ Montante weekend</button>
+      <button class="page-btn" role="menuitem" data-page="montante-semaine">📆 Montante semaine</button>
+    </div>
+  </div>
+  <div class="hub" data-hub="explorer">
+    <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">🔍 Explorer <span class="chev">▾</span></button>
+    <div class="hub-menu" role="menu" aria-label="Sous-menu Explorer">
       <button class="page-btn" role="menuitem" data-page="matchs">🔍 Matchs détectés<span class="nav-new-badge" data-new-until="2026-05-30">Nouveau</span></button>
       <button class="page-btn" role="menuitem" data-page="calendrier">📅 Calendrier 7 jours</button>
       <button class="page-btn" role="menuitem" data-page="favoris">⭐ Favoris</button>
-      <button class="page-btn" role="menuitem" data-page="combines">🔗 Combinés</button>
-      <button class="page-btn" role="menuitem" data-page="buteurs">⚽ Buteurs</button>
-    </div>
-  </div>
-  <div class="hub" data-hub="montantes">
-    <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">🎯 Montantes <span class="chev">▾</span></button>
-    <div class="hub-menu" role="menu" aria-label="Sous-menu Montantes">
-      <button class="page-btn" role="menuitem" data-page="montante-jour">📅 Du jour</button>
-      <button class="page-btn" role="menuitem" data-page="montante-weekend">🗓️ Du weekend</button>
-      <button class="page-btn" role="menuitem" data-page="montante-semaine">📆 De la semaine</button>
+      <button class="page-btn" role="menuitem" data-page="compare">🔁 Comparer 2 jours</button>
     </div>
   </div>
   <div class="hub" data-hub="perf">
-    <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">📊 Ma perf <span class="chev">▾</span></button>
-    <div class="hub-menu" role="menu" aria-label="Sous-menu Ma perf">
+    <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">📊 Performance <span class="chev">▾</span></button>
+    <div class="hub-menu" role="menu" aria-label="Sous-menu Performance">
       <button class="page-btn" role="menuitem" data-page="performance">🎯 Vue globale<span class="nav-new-badge" data-new-until="2026-05-30">Nouveau</span></button>
       <button class="page-btn" role="menuitem" data-page="bilan">💰 Bilan</button>
       <button class="page-btn" role="menuitem" data-page="historique">📜 Historique</button>
-    </div>
-  </div>
-  <div class="hub" data-hub="transparence">
-    <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">🔍 Transparence <span class="chev">▾</span></button>
-    <div class="hub-menu" role="menu" aria-label="Sous-menu Transparence">
-      <button class="page-btn" role="menuitem" data-page="backtest">📈 Backtest</button>
-      <button class="page-btn" role="menuitem" data-page="credibilite">📐 Crédibilité</button>
-      <button class="page-btn" role="menuitem" data-page="compare">🔁 Comparer 2 jours</button>
+      <button class="page-btn" role="menuitem" data-page="backtest">📈 Backtest méthodologie</button>
+      <button class="page-btn" role="menuitem" data-page="credibilite">📐 Crédibilité (calibration)</button>
     </div>
   </div>
   <div class="hub" data-hub="apprendre">
