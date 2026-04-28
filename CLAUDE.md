@@ -6,6 +6,58 @@ des pronostics simples/combinés/montantes séquentielles, et une vue bilan.
 Déployé sur GitHub Pages. Client = navigateur ; données = fichier `data.js`
 régénéré en continu.
 
+## Architecture v31.7.154 (mise à jour 2026-04-28 — Sprints 61-66 audit ChatGPT)
+
+**Audit ChatGPT 2026-04-28** (`Audit ultra approfondi du site Paris-Sportif.pdf`)
+identifie les root causes que mes sprints précédents avaient seulement
+masqués. Ces sprints traitent les P0 / P1 manquants.
+
+**Sprint 61 (P0 — v31.7.150)** — Payload LITE 72h. `scripts/finalize_inline.py`
+écrit maintenant un blob inline contenant `today + J+1 + J+2` (au lieu
+de today only). Conséquence : PSG-Bayern (J+1) visible au PREMIER PAINT,
+sans attendre `_ensureFullData()`. Coût : ~600 KB inline (vs 200 KB
+avant) — acceptable pour les pages "Prochains gros matchs" (Sprint 47)
+et Calendrier 7j qui devenaient utilisables seulement après le fetch.
+Aussi : `data_lite_72h.json` standalone fichier + `manifest.lite_scope`
+métadata pour traçabilité.
+
+**Sprint 62 (P0 — v31.7.151)** — `VIEW_SCOPES` + `getScopedEvents`. Ancré
+sur l'audit "Uniformiser scopes temporels". `VIEW_SCOPES = ['now',
+'today', 'tomorrow', '72h', '7d', 'all']` + helper `getScopedEvents(scope,
+{ requireExact, requireWinamax, sport, ... })`. Exposé sur `window`
+pour ré-utilisation par les pages individuelles.
+
+**Sprint 63 (P0 — v31.7.152)** — `selectBestMarket` unifié. Centralise
+la sélection du meilleur marché à travers 1X2 / OU 2.5 / BTTS / Score
+exact / Double chance / Mi-temps / Total points basket / Handicap basket
+/ Total jeux tennis. Critère : tri par edge desc puis prob. Calcule
+Kelly fractionnel (cap 10% pour 1X2, 5% pour markets dérivés). `requireExact`
+exige la cote Winamax pour ce marché précis. Exposé `window.selectBestMarket`.
+
+**Sprint 64 (P1 — v31.7.152)** — Renaming pages (audit) :
+- "Tous les matchs" → "Tous les pronostics" (clarifie : cette page est
+  pour les picks actionnables ; "Matchs détectés" est l'index complet).
+- "Buteurs" → "Buts & joueurs" (audit signale l'ambiguïté).
+- "Favoris" → "Favoris & alertes".
+- Cmd-K palette + sub-nav onglets mis à jour.
+
+**Sprint 65 (P1 — v31.7.153)** — CI mobile. `.github/workflows/e2e.yml`
+exécute maintenant `--project=chromium-desktop --project=mobile-chromium`
+en parallèle. Avant : seul desktop tournait, mobile catch les régressions
+bottom-nav / drawer / modal / sub-nav scroll qu'on n'aurait jamais
+détectées. Aussi : `tests/audit-p0-flows.spec.js` couvre :
+- matchImportance / getMatchStatus / VIEW_SCOPES / getScopedEvents /
+  selectBestMarket / evaluateMarketPick exposés et fonctionnels.
+- Pages #matchs et #performance navigables.
+- Renaming "Tous les pronostics" / "Buts & joueurs" / "Favoris & alertes"
+  visible dans le HTML.
+
+**Sprint 66 (P0 — v31.7.154)** — Backtests segmentés Python. Nouveau
+`scripts/backtest_by_market.py` qui produit `backtest_report_markets.json`
+(WR per-marché-pick : OU 1.5/2.5/3.5, BTTS Y/N, Double chance 1X/X2/12).
+Sample-base sans ROI pour l'instant (cote book per-marché historique pas
+encore snapshotée — Sprint 67 prévu).
+
 ## Architecture v31.7.149 (mise à jour 2026-04-28 — Sprints 56-60 polish overhaul)
 
 **Sprint 56 (Phase 3 — v31.7.145)** — Multi-marchés basket. `basketScoreProjection`
