@@ -6,6 +6,36 @@ des pronostics simples/combinés/montantes séquentielles, et une vue bilan.
 Déployé sur GitHub Pages. Client = navigateur ; données = fichier `data.js`
 régénéré en continu.
 
+## Architecture v31.7.164 (mise à jour 2026-04-28 — Sprint 77 EV + filtre value + no-bet diagnostic)
+
+**Sprint 77 (3-en-1 — v31.7.164)** — Réponse au feedback "améliorer sans casser" :
+plus de visibilité de la value, filtrage plus strict, et "no bet" explicite.
+
+- **77a — `expectedValue(prob, odd) = prob × odd - 1`** exposé sur `window`.
+  La fiche de décision (Sprint 69) affiche maintenant 6 KPIs au lieu de 5 :
+  Confiance / Edge (en pt) / **EV (en %)** / Kelly / Qualité / Actionability.
+  Edge et EV sont mathématiquement équivalents mais EV est plus parlant pour
+  un bettor (EV +5% = "+5% par euro misé en moyenne").
+  `selectBestMarket` retourne désormais `{ ..., ev }` automatiquement.
+
+- **77b — Toggle "EV+ uniquement" + champ "EV min %"** dans la barre de
+  filtres avancés. Ajoute 2 clés à `localStorage.advFilters` :
+  `valueOnly` (bool) et `evMin` (number). Helper `passesValueFilter(pick)`
+  exposé. Intégré dans le filter chain principal (`passesFilters` de la
+  page Tous) : un pick est rejeté si `valueOnly && edge ≤ 0` ou
+  `evMin > 0 && ev < evMin`. **Backward-compat garanti** : par défaut les
+  flags sont à false/0, donc aucun changement de comportement pour les
+  users existants tant qu'ils n'activent pas le toggle.
+
+- **77c — "No bet today" enrichi avec diagnostic.** Le bloc "Aucun prono
+  ne franchit nos filtres prudents" affiche maintenant 4 chips de
+  diagnostic : <b>X</b> rejetés par règle / <b>Y</b> sous le seuil de
+  confiance / <b>Z</b> sans value (edge ≤ 0) / <b>W</b> sans cote
+  exploitable. Calcul via le compteur `todayStats` qui distingue chaque
+  raison de rejet. L'user comprend POURQUOI il n'y a rien à parier
+  aujourd'hui plutôt que de voir un écran vide. Bouton supplémentaire
+  vers "🔍 Tous les matchs détectés" pour explorer manuellement.
+
 ## Architecture v31.7.163 (mise à jour 2026-04-28 — Sprints 72-76 câblage UI + ROI per-marché)
 
 **Sprint 72 (UI — v31.7.160)** — Page `#favoris` refait en multi-onglets :

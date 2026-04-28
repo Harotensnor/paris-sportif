@@ -9,6 +9,8 @@
   let activeFilter = 'all';
   // Advanced filters — persisted across sessions. Applied on top of activeFilter.
   // kellyMin=0 disables. oddMax=0 disables. league=''|code filters by ESPN league_code.
+  // Sprint 77 (v31.7.164) — `valueOnly` filtre les picks edge ≤ 0 (no value).
+  // Réponse au feedback "trop de paris faibles affichés".
   const ADV_FILTER_KEY = 'advFilters';
   let advFilters = (() => {
     try {
@@ -18,15 +20,35 @@
         oddMin: parseFloat(raw.oddMin) || 0,        // min decimal odd
         oddMax: parseFloat(raw.oddMax) || 0,        // max decimal odd (0 = no cap)
         league: raw.league || '',                   // league_code or ''
+        valueOnly: !!raw.valueOnly,                  // Sprint 77 — n'afficher que edge > 0
+        evMin: parseFloat(raw.evMin) || 0,           // Sprint 77 — EV minimum (e.g. 0.03 = +3%)
       };
-    } catch (e) { return { kellyMin: 0, oddMin: 0, oddMax: 0, league: '' }; }
+    } catch (e) { return { kellyMin: 0, oddMin: 0, oddMax: 0, league: '', valueOnly: false, evMin: 0 }; }
   })();
   function saveAdvFilters() {
     try { localStorage.setItem(ADV_FILTER_KEY, JSON.stringify(advFilters)); } catch (e) {}
   }
   function advFiltersActive() {
-    return advFilters.kellyMin > 0 || advFilters.oddMin > 0 || advFilters.oddMax > 0 || !!advFilters.league;
+    return advFilters.kellyMin > 0 || advFilters.oddMin > 0 || advFilters.oddMax > 0
+        || !!advFilters.league || !!advFilters.valueOnly || advFilters.evMin > 0;
   }
+  // Sprint 77 — Helper utilisé par les pages pour vérifier si un pick passe
+  // les filtres value (edge > 0 si valueOnly, EV ≥ evMin sinon).
+  // Volontairement non-destructif : retourne true par défaut quand les
+  // filtres sont neutres, donc backward-compat avec tous les call sites.
+  function passesValueFilter(pick) {
+    if (!advFilters.valueOnly && !(advFilters.evMin > 0)) return true;
+    if (!pick) return false;
+    const prob = Number(pick.prob ?? pick.rel ?? pick.reliability) || 0;
+    const odd = Number(pick.odd ?? pick.odds) || 0;
+    if (!(prob > 0) || !(odd > 1)) return false;
+    const edge = pick.edge != null ? Number(pick.edge) : (prob - 1 / odd);
+    const ev = pick.ev != null ? Number(pick.ev) : (prob * odd - 1);
+    if (advFilters.valueOnly && edge <= 0) return false;
+    if (advFilters.evMin > 0 && ev < advFilters.evMin) return false;
+    return true;
+  }
+  try { window.passesValueFilter = passesValueFilter; window.advFilters = advFilters; } catch(e){}
   let advFiltersOpen = advFiltersActive();
   // Théo only bets on Winamax, so hide everything else by default.
   // Always on: non-Winamax events are stripped at the pipeline level (scripts/patch_winamax.py)
@@ -987,7 +1009,18 @@
   // fallback proba pure si pas de cote book. requireExact : exige la cote
   // Winamax pour ce marché précis.
   //
-  // Retourne { market, key, label, prob, odd, edge, kelly } ou null.
+  // Sprint 77 (v31.7.164) — expectedValue helper.
+  // EV = proba × cote - 1 (retour attendu par mise unitaire).
+  // Lien avec edge : edge = proba - 1/cote, EV = edge × cote.
+  // Pour un bettor, EV est plus parlant : EV +5% = "+5% par euro misé en moyenne".
+  // edge +5pt sur cote @2.0 ↔ EV +10%. Les 2 sont équivalents mathématiquement.
+  function expectedValue(prob, odd) {
+    if (!(prob > 0) || !(odd > 1)) return 0;
+    return prob * odd - 1;
+  }
+  try { window.expectedValue = expectedValue; } catch(e){}
+
+  // Retourne { market, key, label, prob, odd, edge, kelly, ev } ou null.
   function selectBestMarket(match, pred, opts) {
     opts = opts || {};
     const requireExact = !!opts.requireExact;
@@ -1119,6 +1152,8 @@
     const b = best.odd - 1;
     const k = b > 0 ? Math.max(0, (b * best.prob - (1 - best.prob)) / b) : 0;
     best.kelly = Math.min(best.market === '1n2' ? 0.10 : 0.05, k * 0.5);
+    // Sprint 77 (v31.7.164) — EV explicite dans le retour.
+    best.ev = expectedValue(best.prob, best.odd);
     return best;
   }
   try { window.selectBestMarket = selectBestMarket; } catch(e){}
@@ -4669,6 +4704,14 @@
       if (advFilters.oddMin > 0 && o < advFilters.oddMin) return false;
       if (advFilters.oddMax > 0 && o > advFilters.oddMax) return false;
     }
+    // Sprint 77 (v31.7.164) — Filtre EV+ uniquement / EV min.
+    // On évalue via selectBestMarket (le meilleur marché) plutôt que le pick
+    // 1X2 brut, parce que le user voit la carte avec ce best market.
+    if ((advFilters.valueOnly || advFilters.evMin > 0) && pred?.pick) {
+      const best = (typeof selectBestMarket === 'function') ? selectBestMarket(m, pred) : null;
+      if (!best) return false;  // pas de market exploitable → on cache si filtre value actif
+      if (!passesValueFilter(best)) return false;
+    }
     if (filter === 'lock') return !!pred?.isLock;
     if (filter === 'live') return m.status === 'STATUS_IN_PROGRESS';
     if (filter === 'upcoming') {
@@ -5204,6 +5247,15 @@
             ${leagueOpts.map(l => `<option value="${esc(l.code)}" ${advFilters.league === l.code ? 'selected' : ''}>${esc(l.name)}</option>`).join('')}
           </select>
         </div>
+        <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;" title="Cache les paris dont le modèle ne voit pas d'avantage vs cote (edge ≤ 0).">
+          <input type="checkbox" id="adv-value-only" ${advFilters.valueOnly ? 'checked' : ''} style="cursor:pointer;"/>
+          <span style="color:var(--text-muted);">EV+ uniquement</span>
+        </label>
+        <div style="display:inline-flex;align-items:center;gap:6px;" title="EV minimum (proba × cote - 1). 3% = pari intéressant, 10%+ = très bon.">
+          <span style="color:var(--text-muted);">EV min</span>
+          <input type="number" id="adv-ev-min" value="${advFilters.evMin ? (advFilters.evMin * 100).toFixed(1) : ''}" placeholder="0%" step="1" min="0" max="50" style="width:54px;padding:4px 6px;background:var(--panel-2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;"/>
+          <span style="color:var(--text-muted);">%</span>
+        </div>
         ${advFiltersActive() ? `<button id="adv-reset" style="margin-left:auto;padding:5px 10px;background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.3);color:var(--danger);border-radius:6px;cursor:pointer;font-size:12px;">↺ Réinitialiser</button>` : ''}
       </div>` : '';
     const el = document.getElementById('filters');
@@ -5228,8 +5280,22 @@
     if (byId('adv-league')) byId('adv-league').addEventListener('change', (e) => {
       advFilters.league = e.target.value || ''; onAdvChange();
     });
+    // Sprint 77 — Toggle EV+ uniquement & EV min input
+    if (byId('adv-value-only')) byId('adv-value-only').addEventListener('change', (e) => {
+      advFilters.valueOnly = !!e.target.checked;
+      try { window.advFilters = advFilters; } catch(err){}
+      onAdvChange();
+    });
+    if (byId('adv-ev-min')) byId('adv-ev-min').addEventListener('change', (e) => {
+      const pct = parseFloat(e.target.value);
+      advFilters.evMin = isFinite(pct) && pct > 0 ? pct / 100 : 0;
+      try { window.advFilters = advFilters; } catch(err){}
+      onAdvChange();
+    });
     if (byId('adv-reset')) byId('adv-reset').addEventListener('click', () => {
-      advFilters = { kellyMin: 0, oddMin: 0, oddMax: 0, league: '' }; onAdvChange();
+      advFilters = { kellyMin: 0, oddMin: 0, oddMax: 0, league: '', valueOnly: false, evMin: 0 };
+      try { window.advFilters = advFilters; } catch(err){}
+      onAdvChange();
     });
   }
 
@@ -6799,6 +6865,14 @@
         const kellyColor = kelly >= 0.03 ? 'var(--accent)' : kelly >= 0.01 ? 'var(--warn)' : 'var(--text-dim)';
         const dqColor = dq.score >= 3 ? 'var(--accent)' : dq.score >= 2 ? 'var(--warn)' : 'var(--text-dim)';
         const actionColor = action >= 65 ? 'var(--accent)' : action >= 45 ? 'var(--warn)' : 'var(--text-dim)';
+        // Sprint 77 (v31.7.164) — EV explicite à côté de Edge.
+        // EV = proba × cote - 1 (= retour attendu par mise unitaire).
+        // Différent de edge qui exprime la même chose en points de proba (proba - 1/cote).
+        // Les 2 sont équivalents mais EV est plus parlant pour les bettors :
+        // EV +5% = "tu gagnes 5% par euro misé en moyenne".
+        const bestOdd = best ? best.odd : (pred.odds && (pred.pick.key === '1' ? pred.odds.home : pred.pick.key === '2' ? pred.odds.away : pred.odds.draw)) || 1;
+        const ev = (typeof expectedValue === 'function') ? expectedValue(conf, bestOdd) : (conf * bestOdd - 1);
+        const evColor = ev >= 0.10 ? 'var(--accent)' : ev >= 0.03 ? 'var(--warn)' : ev < -0.03 ? 'var(--danger)' : 'var(--text-dim)';
         const tile = (label, value, sub, color) => `
           <div style="flex:1;min-width:90px;padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
             <div style="font-size:9.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">${esc(label)}</div>
@@ -6811,13 +6885,15 @@
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
               ${tile('Confiance', `${Math.round(conf * 100)}%`, conf >= 0.65 ? 'Solide' : conf >= 0.55 ? 'Correcte' : 'Limite', confColor)}
               ${tile('Edge', `${edge >= 0 ? '+' : ''}${(edge * 100).toFixed(1)}pt`, edge >= 0.05 ? 'Value forte' : edge >= 0.02 ? 'Value' : edge >= 0 ? 'Neutre' : 'Négatif', edgeColor)}
+              ${tile('EV', `${ev >= 0 ? '+' : ''}${(ev * 100).toFixed(1)}%`, ev >= 0.10 ? 'EV+ fort' : ev >= 0.03 ? 'EV+' : ev >= 0 ? 'Break-even' : 'EV-', evColor)}
               ${tile('Kelly', `${(kelly * 100).toFixed(1)}%`, kelly >= 0.03 ? 'Mise franche' : kelly >= 0.01 ? 'Mise modérée' : 'Skip', kellyColor)}
               ${tile('Qualité', `${dq.score}/${dq.max}`, dq.score >= 3 ? 'Riche' : dq.score >= 2 ? 'Correcte' : 'Pauvre', dqColor)}
               ${tile('Actionability', `${action}/100`, action >= 65 ? 'À jouer' : action >= 45 ? 'À surveiller' : 'À éviter', actionColor)}
             </div>
             <div style="margin-top:8px;font-size:10.5px;color:var(--text-dim2);line-height:1.4;">
+              <b style="color:var(--text-dim);">Edge</b> = proba modèle - 1/cote (en points de proba).
+              <b style="color:var(--text-dim);">EV</b> = proba × cote - 1 (retour attendu par mise unitaire).
               <b style="color:var(--text-dim);">Actionability</b> = composite (Confiance ×30 + Edge ×25 + Kelly ×20 + Qualité ×15 + Winamax exact ×10).
-              Sépare les 5 dimensions au lieu d'un score unique pour que tu voies ce qui pousse ou freine la mise.
             </div>
           </div>`;
       })()}
@@ -10368,16 +10444,27 @@
     const fSortBy = _agentFilter.sortBy || 'rel';
     const fSortDir = _agentFilter.sortDir === 'asc' ? 1 : -1;
     // v28.9 — Vide si data obsolète (pas d'affichage de matchs fantômes)
+    // Sprint 77 (v31.7.164) — Compteur de diagnostic pour "No bet" enrichi.
+    // Distingue : analysés / skip (pred.skip) / lowConf (rel < 0.55) /
+    // noEdge (edge ≤ 0) / noOdds / pas de pred. Affiché dans le bloc
+    // "Aucun prono ne franchit nos filtres" pour que l'user comprenne
+    // POURQUOI il n'y a rien plutôt que de voir un écran vide.
+    const todayStats = { total: 0, skip: 0, lowConf: 0, noEdge: 0, noOdds: 0, ok: 0 };
     const allTodayRaw = _dataIsStale ? [] : today.filter(m => !m.completed).map(m => {
       try {
+        todayStats.total++;
         const pred = predictMatch(m);
-        if (!pred || !pred.pick || pred.skip) return null;
+        if (!pred || !pred.pick) { todayStats.noOdds++; return null; }
+        if (pred.skip) { todayStats.skip++; return null; }
         const best = _agentBestPick(m, pred);
         const pk = pred.pick.key;
         const odd = pred.odds && (pk==='1'?pred.odds.home:pk==='2'?pred.odds.away:pred.odds.draw);
-        if (!odd) return null;
+        if (!odd) { todayStats.noOdds++; return null; }
         const rel = pred.reliability ?? pred.pick.prob;
         const edge = best ? best.edge : (rel - 1/odd);
+        if (rel < 0.55) { todayStats.lowConf++; return null; }
+        if (edge <= 0) { todayStats.noEdge++; return null; }
+        todayStats.ok++;
         const inPositions = positions.some(p => p.m.id === m.id);
         return { m, pred, best, odd, rel, edge, inPositions, ts: new Date(m.date).getTime() };
       } catch(e) { return null; }
@@ -11060,9 +11147,18 @@
             <div style="font-size:24px;font-weight:800;letter-spacing:-0.6px;color:var(--text);line-height:1.15;">Aucun prono ne franchit nos filtres prudents</div>
           </div>
           <div style="padding:18px 20px;background:rgba(148,163,184,.06);border:1px dashed var(--border-2);border-radius:12px;">
-            <div style="font-size:13px;color:var(--text);line-height:1.55;">Le modèle exige <b>edge ≥ 5 %</b> et <b>confiance ≥ 55 %</b> pour recommander un pari. ${allTodayRaw.length ? `Aujourd'hui ${allTodayRaw.length} match${allTodayRaw.length>1?'s sont analysés':' est analysé'} mais aucun ne passe ces deux seuils — c'est <b>normal</b> certains jours, et c'est ce qui protège ta cagnotte.` : `Aucun match disponible aujourd'hui — les pronos repartiront automatiquement dès que des matchs entrent dans la fenêtre Winamax.`}</div>
+            <div style="font-size:13px;color:var(--text);line-height:1.55;">Le modèle exige <b>edge ≥ 5 %</b> et <b>confiance ≥ 55 %</b> pour recommander un pari. ${todayStats.total ? `Aujourd'hui <b>${todayStats.total} match${todayStats.total>1?'s ont été analysés':' a été analysé'}</b> mais aucun ne passe ces seuils — c'est <b>normal</b> certains jours, et c'est ce qui protège ta cagnotte.` : `Aucun match disponible aujourd'hui — les pronos repartiront automatiquement dès que des matchs entrent dans la fenêtre Winamax.`}</div>
+            ${todayStats.total ? `
+            <!-- Sprint 77 (v31.7.164) — Diagnostic "No bet today" : breakdown des raisons de rejet. -->
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;font-size:12px;">
+              ${todayStats.skip > 0 ? `<span style="padding:4px 10px;background:rgba(148,163,184,.10);border:1px solid rgba(148,163,184,.25);border-radius:999px;color:var(--text-dim);"><b>${todayStats.skip}</b> rejeté${todayStats.skip>1?'s':''} par règle (cote close, ranks proches, ...)</span>` : ''}
+              ${todayStats.lowConf > 0 ? `<span style="padding:4px 10px;background:rgba(199,155,0,.10);border:1px solid rgba(199,155,0,.25);border-radius:999px;color:var(--warn);"><b>${todayStats.lowConf}</b> sous le seuil de confiance (&lt; 55%)</span>` : ''}
+              ${todayStats.noEdge > 0 ? `<span style="padding:4px 10px;background:rgba(239,68,68,.10);border:1px solid rgba(239,68,68,.25);border-radius:999px;color:var(--danger);"><b>${todayStats.noEdge}</b> sans value (edge ≤ 0)</span>` : ''}
+              ${todayStats.noOdds > 0 ? `<span style="padding:4px 10px;background:rgba(148,163,184,.10);border:1px solid rgba(148,163,184,.25);border-radius:999px;color:var(--text-dim);"><b>${todayStats.noOdds}</b> sans cote exploitable</span>` : ''}
+            </div>` : ''}
             <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;">
               <button class="page-btn" data-page="tous" style="padding:9px 14px;background:var(--brand);color:#08080a;border:none;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;box-shadow:0 4px 12px rgba(139,92,246,.3);">Voir tous les pronos →</button>
+              <button class="page-btn" data-page="matchs" style="padding:9px 14px;background:transparent;color:var(--text);border:1px solid var(--border-2);border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">🔍 Tous les matchs détectés</button>
               <button class="page-btn" data-page="credibilite" style="padding:9px 14px;background:transparent;color:var(--text);border:1px solid var(--border-2);border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">Pourquoi ces filtres ?</button>
             </div>
           </div>
