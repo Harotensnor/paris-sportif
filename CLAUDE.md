@@ -6,6 +6,46 @@ des pronostics simples/combinés/montantes séquentielles, et une vue bilan.
 Déployé sur GitHub Pages. Client = navigateur ; données = fichier `data.js`
 régénéré en continu.
 
+## Architecture v31.7.149 (mise à jour 2026-04-28 — Sprints 56-60 polish overhaul)
+
+**Sprint 56 (Phase 3 — v31.7.145)** — Multi-marchés basket. `basketScoreProjection`
+expose maintenant `markets: { totals, handicaps, sigmaTotal, sigmaMargin }` :
+- Total points (lignes 205.5/215.5/220.5/225.5, σ=12 NBA) via Gaussienne approx.
+- Handicap (auto-pick fav side : 3.5/5.5/7.5/9.5, σ=10) avec label "TeamName -3.5".
+Modal détail basket : sections "🏀 Total points" et "🎯 Handicap" avec chips ⭐ ≥65%.
+
+**Sprint 57 (Phase 4 — v31.7.146)** — Performance sub-tabs. Page `#performance`
+introduit 5 onglets internes persistés (`localStorage.perfTab`) :
+- Vue globale : KPIs + tier breakdown
+- Période : breakdown par month/year (si `bt.by_period`)
+- Confiance : table tier (lock/premium/value/standard/low)
+- Marché : placeholder explicatif (Sprint 60 complète le backtest per-marché)
+- Sport : breakdown par sport (auparavant statique)
+
+**Sprint 58 (Phase 5 — v31.7.147)** — Modal détail "⚠️ Risques" tab.
+Nouveau bloc `riskFlags` qui détecte automatiquement les facteurs négatifs :
+confiance limite (<55%), météo défavorable (precip>5mm OR vent>30km/h),
+fatigue (3+ matchs/7j), effectif diminué (3+ blessés), cote très basse (<1.30),
+data quality pauvre (≤1/4). Onglet visible quand au moins 1 flag présent.
+
+**Sprint 59 (Phase 7 — v31.7.148)** — Mobile polish & transitions.
+- Sub-nav onglets : scroll horizontal smooth + scroll-snap mobile + mask gradient.
+- Heatmap calendrier : font-size réduit en <480px.
+- `pageFadeInSmooth` : nouvelle animation 350ms ease-out (transform+opacity).
+- Touch feedback : active scale .98 sur `(hover: none)`.
+- color-mix fallback : background fixe pour navigateurs <2023.
+- prefers-reduced-motion : désactive l'animation.
+
+**Sprint 60 (Phase 3 backbone — v31.7.149)** — Per-market backtest hooks.
+Nouvelle fonction `evaluateMarketPick(match, marketKey, pickValue)` qui
+évalue le résultat d'un pari pour un marché donné :
+- 1n2 / ou25 / ou15 / ou35 / btts / doubleChance / exactScore /
+  basketTotal / basketHandicap.
+- Tous les statuts VOID (RETIRED/WALKOVER/POSTPONED) gérés.
+- Exposée `window.evaluateMarketPick` pour usage par scripts/backtest_v2.py
+  (via mini-racer V8 embedded). Permet la calibration per-marché (sera
+  branché dans backtest_v2.py au prochain run cron).
+
 ## Architecture v31.7.144 (mise à jour 2026-04-28 — Sprints 53-55 tennis + nav + heatmap)
 
 **Sprint 53 (Phase 3 — v31.7.142)** — Multi-marchés tennis. `tennisScorePrediction`
