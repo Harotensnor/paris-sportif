@@ -918,6 +918,114 @@
     return Number(m.home) > 1 || Number(m.away) > 1;
   }
 
+  // ======= Sprint 47 (v31.7.136) — matchImportance + getMatchStatus =======
+  // matchImportance(m) : score 0..100 reflétant l'enjeu d'un match.
+  // Sert à surfacer les "gros matchs" (PSG-Bayern CL, Clasico, Finale, etc.)
+  // dans la section "Prochains gros matchs" du dashboard, MÊME si predictMatch
+  // skip/lowConf le match (ex: cotes serrées 2.20/4.00/2.60). L'user voit le
+  // match avec un statut clair au lieu de croire que le site l'a "raté".
+  // Composantes :
+  //   * Compétition (UEFA Champions/Europa = 30, top-5 ligues = 20, autre = 10)
+  //   * Phase (finale/demi/quart : +25/15/10, knockout +5)
+  //   * Importance équipes (rang Elo / standings) +20 max
+  //   * Derby/rivalité +10
+  //   * Buzz Winamax (markets disponibles, popularité event) +10
+  // Volontairement simple — un raffinement V2 utilisera ESPN team rank +
+  // h2h history + fanbase. Pour l'instant priorité = visibilité.
+  const _topLeagues = new Set([
+    'eng.1', 'esp.1', 'ita.1', 'ger.1', 'fra.1',  // Top-5 EU
+    'uefa.champions', 'uefa.europa', 'uefa.conference',
+    'uefa.nations', 'fifa.world', 'uefa.euro', 'conmebol.america',
+    'usa.1', 'mex.1',  // ligues nord-américaines majeures
+  ]);
+  const _knockoutHints = /(final|finale|semi|demi|quarter|quart|round of 16|huiti|knockout|playoff|elimina)/i;
+  function matchImportance(match) {
+    if (!match || !match.competitors) return 0;
+    let score = 0;
+    const lc = String(match.league_code || '').toLowerCase();
+    // Compétition
+    if (lc.startsWith('uefa.champions') || lc === 'fifa.world' || lc === 'uefa.euro') {
+      score += 35;
+    } else if (lc.startsWith('uefa.europa') || lc.startsWith('uefa.conference') ||
+               lc === 'conmebol.libertadores' || lc === 'conmebol.america' ||
+               lc === 'uefa.nations' || lc === 'concacaf.gold') {
+      score += 25;
+    } else if (_topLeagues.has(lc)) {
+      score += 20;
+    } else if (lc.startsWith('uefa.') || lc.startsWith('fifa.') || lc.startsWith('conmebol.')) {
+      score += 18;
+    } else {
+      score += 8;
+    }
+    // Phase / season_type
+    const note = String(match.note || match.season_type || match.round_name || '').toLowerCase();
+    if (/(final|finale)\b/.test(note) && !/semi|demi|quart/.test(note)) score += 25;
+    else if (/(semi|demi)/.test(note)) score += 18;
+    else if (/(quart|quarter)/.test(note)) score += 12;
+    else if (_knockoutHints.test(note)) score += 8;
+    // Importance équipes via clubelo (foot)
+    try {
+      const clubelo = match.clubelo;
+      if (clubelo) {
+        const eloMax = Math.max(Number(clubelo.home_elo) || 0, Number(clubelo.away_elo) || 0);
+        if (eloMax > 1900) score += 20;
+        else if (eloMax > 1800) score += 15;
+        else if (eloMax > 1700) score += 10;
+        else if (eloMax > 1600) score += 5;
+      }
+    } catch(e) {}
+    // Records (NBA/NHL/MLB) — équipes en haut de tableau
+    try {
+      const sides = getSides(match);
+      const recH = getRecord(sides.home) || '';
+      const recA = getRecord(sides.away) || '';
+      const wH = parseInt(String(recH).split('-')[0], 10) || 0;
+      const wA = parseInt(String(recA).split('-')[0], 10) || 0;
+      if (wH > 30 || wA > 30) score += 12;
+      else if (wH > 20 || wA > 20) score += 8;
+    } catch(e) {}
+    // Sport multiplier
+    if (match.sport === 'football') score += 5;
+    // Cap 100
+    return Math.min(100, Math.max(0, score));
+  }
+  try { window.matchImportance = matchImportance; } catch(e){}
+
+  // getMatchStatus(match, pred?) : retourne un statut human-readable + un code
+  // pour styler la card. Cinq états :
+  //   * 'strong'    : Prono fort (modèle confiant + Winamax bookable)
+  //   * 'uncertain' : Match incertain (pred OK mais reliability < 0.55)
+  //   * 'no_data'   : Données insuffisantes (skip / pas de form_stats / pas de cotes)
+  //   * 'no_odds'   : Cotes en attente (event détecté mais pas de markets)
+  //   * 'no_winamax': Marchés Winamax non disponibles (tournament-only ou autre book)
+  //
+  // L'objet retourné { code, label, hint, color } est utilisé directement par
+  // les renderers pour afficher un badge clair au lieu de cacher le match.
+  function getMatchStatus(match, pred) {
+    if (!match) return { code: 'no_data', label: 'Données insuffisantes', hint: 'Match introuvable', color: 'var(--text-dim)' };
+    const w = match.winamax || {};
+    const hasMatchId = !!w.match_id;
+    const hasMarkets = !!(w.markets && w.markets['1n2']);
+    if (!hasMatchId && !hasMarkets) {
+      return { code: 'no_winamax', label: 'Marchés Winamax non disponibles', hint: 'Match détecté mais pas listé chez Winamax', color: 'var(--text-dim2, #888)' };
+    }
+    if (hasMatchId && !hasMarkets) {
+      return { code: 'no_odds', label: 'Cotes en attente', hint: 'Listé chez Winamax, cotes pas encore publiées', color: 'var(--warn, #c79b00)' };
+    }
+    if (!pred) {
+      try { pred = predictMatch(match); } catch(e) { pred = null; }
+    }
+    if (!pred || pred.skip) {
+      return { code: 'no_data', label: 'Données insuffisantes', hint: 'Pas assez de signaux pour un prono fiable', color: 'var(--text-dim)' };
+    }
+    const rel = Number(pred.reliability ?? (pred.pick && pred.pick.prob)) || 0;
+    if (pred.lowConf || rel < 0.55) {
+      return { code: 'uncertain', label: 'Match incertain', hint: 'Modèle hésite — cotes serrées ou signaux contradictoires', color: 'var(--warn, #c79b00)' };
+    }
+    return { code: 'strong', label: 'Prono fort', hint: 'Signaux convergents, mise recommandée', color: 'var(--accent, #22c55e)' };
+  }
+  try { window.getMatchStatus = getMatchStatus; } catch(e){}
+
   // ======= Competitor helpers =======
   function getSides(match) {
     const comps = match.competitors || [];
@@ -9325,6 +9433,51 @@
     const topNext12h = _topInWin(4, 12);
     const topNext24h = _topInWin(12, 24);
 
+    // === Sprint 47 (v31.7.136) — Prochains gros matchs ===
+    // Surfaces les matchs à fort enjeu (CL, top-5 ligues, finales) sur
+    // les 7 prochains jours, MÊME si predictMatch skip/lowConf. L'user
+    // voit PSG-Bayern même quand le modèle hésite (cotes 2.20/4.00/2.60).
+    // Chaque match a un statusBadge {code, label, hint, color} pour que
+    // l'user comprenne pourquoi il y a / n'y a pas de prono fort.
+    const topImportantMatches = _dataIsStale ? [] : (() => {
+      const horizonDays = 7;
+      const dayKeys = [];
+      const todayDt = new Date(todayIso + 'T00:00:00Z');
+      for (let i = 0; i <= horizonDays; i++) {
+        const d = new Date(todayDt);
+        d.setUTCDate(d.getUTCDate() + i);
+        dayKeys.push(d.toISOString().slice(0, 10));
+      }
+      const arr = [];
+      const seenIds = new Set();
+      dayKeys.forEach(iso => {
+        const evs = data.days[iso] || [];
+        evs.forEach(m => {
+          if (!m || m.completed || m.live) return;
+          if (seenIds.has(m.id)) return;
+          const ts = new Date(m.date).getTime();
+          if (!isFinite(ts) || ts < nowMs) return;
+          // On exige a minima un match_id Winamax pour pouvoir lier vers le book.
+          // Tournament-only (pas de match_id) on skip — l'user ne pourra rien faire.
+          if (!(m.winamax && m.winamax.match_id)) return;
+          let importance = 0;
+          try { importance = matchImportance(m); } catch(e) {}
+          if (importance < 30) return;  // seuil "gros match"
+          let pred = null;
+          try { pred = predictMatch(m); } catch(e) {}
+          const status = getMatchStatus(m, pred);
+          arr.push({ m, pred, status, importance, ts });
+          seenIds.add(m.id);
+        });
+      });
+      // Tri : importance desc, puis kickoff asc (les plus proches d'abord à importance égale)
+      arr.sort((a, b) => {
+        if (b.importance !== a.importance) return b.importance - a.importance;
+        return a.ts - b.ts;
+      });
+      return arr.slice(0, 8);
+    })();
+
     // === Joueurs buteurs probables (prochaine 24h) ===
     // Utilise predictLikelyScorers (Poisson × position × lineup, exclut les blessés).
     const scorersToday = _dataIsStale ? [] : (() => {
@@ -9889,6 +10042,70 @@
             </div>
           </div>
         </div>`)}
+
+        <!-- Sprint 47 (v31.7.136) — Prochains gros matchs (importance + statut) -->
+        ${topImportantMatches.length ? `
+        <div style="padding:36px 0 24px;border-top:1px solid var(--border);">
+          <div style="margin-bottom:14px;display:flex;align-items:end;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+            <div>
+              <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;">À ne pas rater · 7 jours</div>
+              <div style="font-size:20px;font-weight:800;color:var(--text);letter-spacing:-.5px;margin-top:2px;">🏆 Prochains gros matchs</div>
+              <div style="font-size:12px;color:var(--text-dim);margin-top:4px;">CL, top-5 ligues, finales · classés par enjeu, prono ou pas</div>
+            </div>
+            <button class="page-btn" data-page="calendrier" style="padding:8px 12px;background:transparent;color:var(--text);border:1px solid var(--border-2);border-radius:8px;font-weight:600;font-size:12px;cursor:pointer;">Calendrier 7j →</button>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;">
+            ${topImportantMatches.map(item => {
+              const m = item.m;
+              const sides = (typeof getSides === 'function') ? getSides(m) : { home: {}, away: {} };
+              const hN = sides.home?.short || sides.home?.name || '?';
+              const aN = sides.away?.short || sides.away?.name || '?';
+              const sportEm = (typeof sportEmoji === 'function') ? sportEmoji(m.sport) : '🎯';
+              const lg = m.league_name || m.league || '';
+              const tLbl = (typeof fmtTime === 'function') ? fmtTime(m.date) : '';
+              const dayLbl = (() => {
+                try {
+                  const d = new Date(m.date);
+                  const iso = d.toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+                  if (iso === todayIso) return "Aujourd'hui";
+                  const tom = new Date(); tom.setDate(tom.getDate() + 1);
+                  const tomIso = tom.toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+                  if (iso === tomIso) return 'Demain';
+                  const dow = ['Dim.','Lun.','Mar.','Mer.','Jeu.','Ven.','Sam.'][d.getDay()];
+                  return `${dow} ${d.getDate()}/${d.getMonth()+1}`;
+                } catch(e) { return ''; }
+              })();
+              const st = item.status;
+              const stBadge = `<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:4px;background:color-mix(in srgb, ${st.color} 14%, transparent);color:${st.color};font-size:10px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;white-space:nowrap;" title="${esc(st.hint)}">${esc(st.label)}</span>`;
+              // Pick label si dispo
+              let pickLine = '';
+              if (item.pred && item.pred.pick && st.code !== 'no_data') {
+                const pickLbl = item.pred.pick.label || 'Pick';
+                const rel = Number(item.pred.reliability ?? item.pred.pick.prob) || 0;
+                const pk = item.pred.pick.key;
+                const odd = item.pred.odds && (pk === '1' ? item.pred.odds.home : pk === '2' ? item.pred.odds.away : item.pred.odds.draw);
+                pickLine = `<div style="font-size:12px;color:var(--text-dim);margin-top:4px;">→ <b style="color:var(--brand);">${esc(pickLbl)}</b>${odd ? ` @${Number(odd).toFixed(2)}` : ''} · ${Math.round(rel*100)}% confiance</div>`;
+              } else if (st.code === 'no_winamax' || st.code === 'no_odds') {
+                pickLine = `<div style="font-size:12px;color:var(--text-dim);margin-top:4px;font-style:italic;">${esc(st.hint)}</div>`;
+              } else {
+                pickLine = `<div style="font-size:12px;color:var(--text-dim);margin-top:4px;font-style:italic;">Match suivi — pas de prono fort recommandé</div>`;
+              }
+              return `
+              <div class="interactive" data-match-id="${esc(String(m.id || ''))}" role="button" tabindex="0" style="padding:14px;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${st.color};border-radius:0 10px 10px 0;cursor:pointer;">
+                <div style="display:flex;justify-content:space-between;align-items:start;gap:8px;margin-bottom:8px;">
+                  <div style="font-size:11px;color:var(--text-dim);font-weight:600;">${esc(dayLbl)} · ${esc(tLbl)}</div>
+                  ${stBadge}
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px;">
+                  <span style="font-size:14px;">${sportEm}</span>
+                  <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">${esc(hN)} <span style="color:var(--text-dim2);font-weight:400;">vs</span> ${esc(aN)}</span>
+                </div>
+                <div style="font-size:11px;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(lg.slice(0, 50))}${item.importance >= 50 ? ` · 🔥 enjeu ${item.importance}/100` : ''}</div>
+                ${pickLine}
+              </div>`;
+            }).join('')}
+          </div>
+        </div>` : ''}
 
         <!-- Prochaines opportunités par fenêtre (4h / 12h / 24h) -->
         ${(topNext4h.length + topNext12h.length + topNext24h.length) ? `
@@ -14706,28 +14923,46 @@
       days.push(d.toISOString().slice(0, 10));
     }
 
-    // Pour chaque jour, collecter les picks Winamax bookable avec pred valide.
-    // AUDIT-2026-04-27 (P2) — `winamax.available` peut être tournament-only ;
-    // on exige `isWinamaxBookable` (match_id + markets['1n2']) pour ne pas
-    // afficher des picks que l'user ne pourra pas placer chez Winamax.
+    // Pour chaque jour, collecter les picks Winamax bookable.
+    // Sprint 47 (v31.7.136) — On garde TOUS les matchs Winamax-bookable, plus
+    // les "gros matchs" même sans bookable (visibilité). Avant on filtrait
+    // skip+lowConf → user ne voyait pas PSG-Bayern (cotes serrées). Désormais
+    // on rend chaque match avec son `getMatchStatus` ; le tri remonte les
+    // pronos forts en haut, le reste suit avec son badge.
     const dayBuckets = days.map(iso => {
-      const evs = (data.days[iso] || []).filter(m => isWinamaxBookable(m));
+      const evsAll = (data.days[iso] || []).filter(m => !m.completed);
       const picks = [];
-      evs.forEach(m => {
-        if (m.completed) return;
+      evsAll.forEach(m => {
+        const bookable = isWinamaxBookable(m);
+        // On accepte aussi les "gros matchs" non bookable (importance >= 35)
+        // pour que l'user voit PSG-Bayern même si markets pas encore poussés.
+        let importance = 0;
+        try { importance = matchImportance(m); } catch(e) {}
+        if (!bookable && importance < 35) return;
         try {
           const pred = predictMatch(m);
-          if (!pred || !pred.pick || pred.skip || pred.lowConf) return;
-          const odd = pred.odds && (pred.pick.key === '1' ? pred.odds.home : pred.pick.key === '2' ? pred.odds.away : pred.odds.draw);
-          if (!odd) return;
-          const rel = pred.reliability ?? pred.pick.prob;
-          picks.push({ m, pred, odd, rel, isLock: pred.isLock });
+          const status = getMatchStatus(m, pred);
+          // Pour le tri : si pred est un prono fort on extrait odd/rel,
+          // sinon on garde quand même la card avec status badge.
+          let odd = null, rel = 0, isLock = false;
+          if (pred && pred.pick && status.code === 'strong') {
+            odd = pred.odds && (pred.pick.key === '1' ? pred.odds.home : pred.pick.key === '2' ? pred.odds.away : pred.odds.draw);
+            rel = pred.reliability ?? pred.pick.prob;
+            isLock = !!pred.isLock;
+          }
+          picks.push({ m, pred, odd, rel, isLock, status, importance });
         } catch(e) {}
       });
-      // Tri : locks d'abord, puis confiance descendante
+      // Tri : locks d'abord, puis pronos forts (par confiance), puis incertains/no_data triés par importance
       picks.sort((a, b) => {
         if (a.isLock !== b.isLock) return a.isLock ? -1 : 1;
-        return b.rel - a.rel;
+        const aStrong = a.status.code === 'strong';
+        const bStrong = b.status.code === 'strong';
+        if (aStrong !== bStrong) return aStrong ? -1 : 1;
+        if (aStrong && bStrong) return b.rel - a.rel;
+        // Reste : par importance desc puis kickoff asc
+        if (b.importance !== a.importance) return b.importance - a.importance;
+        return new Date(a.m.date).getTime() - new Date(b.m.date).getTime();
       });
       return { iso, picks, nLocks: picks.filter(p => p.isLock).length };
     });
@@ -14746,29 +14981,38 @@
     };
 
     // Render une carte pick compacte
+    // Sprint 47 (v31.7.136) — Supporte les statuts non-strong (uncertain, no_data,
+    // no_odds, no_winamax). On affiche un badge à la place du %/cote dans ces cas.
     const renderPickRow = (p) => {
       const { home, away } = (typeof getSides === 'function') ? getSides(p.m) : { home: {}, away: {} };
       const hN = home?.short || home?.name || '?';
       const aN = away?.short || away?.name || '?';
       const tLbl = (typeof fmtTime === 'function') ? fmtTime(p.m.date) : '';
-      const lockBadge = p.isLock ? `<span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;background:var(--tier-lock-soft);color:var(--tier-lock);font-size:10px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;">🔒 LOCK</span>` : '';
       const sportEm = (typeof sportEmoji === 'function') ? sportEmoji(p.m.sport) : '🎯';
-      const pickLbl = (p.pred.pick && p.pred.pick.label) || 'Pick';
-      const relColor = p.rel >= 0.70 ? 'var(--accent)' : p.rel >= 0.60 ? 'var(--warn)' : 'var(--text-dim)';
       const lg = p.m.league_name || p.m.league || '';
+      const st = p.status || (typeof getMatchStatus === 'function' ? getMatchStatus(p.m, p.pred) : { code: 'strong', label: '', color: 'var(--accent)' });
+      const isStrong = st.code === 'strong';
+      const lockBadge = p.isLock ? `<span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;background:var(--tier-lock-soft);color:var(--tier-lock);font-size:10px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;">🔒 LOCK</span>` : '';
+      const statusBadge = !isStrong ? `<span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;background:color-mix(in srgb, ${st.color} 14%, transparent);color:${st.color};font-size:10px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;white-space:nowrap;" title="${esc(st.hint || '')}">${esc(st.label)}</span>` : '';
+      const pickLbl = isStrong && p.pred && p.pred.pick && p.pred.pick.label ? p.pred.pick.label : '';
+      const relColor = p.rel >= 0.70 ? 'var(--accent)' : p.rel >= 0.60 ? 'var(--warn)' : 'var(--text-dim)';
+      const borderColor = p.isLock ? 'var(--tier-lock)' : st.color;
+      const rightCol = isStrong && p.odd ? `
+          <div style="font-size:13px;font-weight:700;color:${relColor};">${Math.round((p.rel||0) * 100)}%</div>
+          <div style="font-size:13px;color:var(--text);">@${Number(p.odd).toFixed(2)}</div>` : `
+          <div style="grid-column:span 2;font-size:11px;color:var(--text-dim);font-style:italic;text-align:right;">${esc(st.hint || '')}</div>`;
       return `
-        <div class="cal-pick-row interactive" data-match-id="${esc(String(p.m.id || ''))}" role="button" tabindex="0" style="display:grid;grid-template-columns:60px 1fr auto auto;gap:10px;padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${p.isLock ? 'var(--tier-lock)' : 'var(--accent)'};border-radius:0 8px 8px 0;align-items:center;font-variant-numeric:tabular-nums;margin-bottom:4px;">
+        <div class="cal-pick-row interactive" data-match-id="${esc(String(p.m.id || ''))}" role="button" tabindex="0" style="display:grid;grid-template-columns:60px 1fr auto auto;gap:10px;padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${borderColor};border-radius:0 8px 8px 0;align-items:center;font-variant-numeric:tabular-nums;margin-bottom:4px;">
           <div style="font-size:12px;color:var(--text-dim);font-weight:600;">${esc(tLbl)}</div>
           <div style="min-width:0;">
-            <div style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--text);">
+            <div style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--text);flex-wrap:wrap;">
               <span style="font-size:13px;">${sportEm}</span>
-              <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(hN)} <span style="color:var(--text-dim2);font-weight:400;">vs</span> ${esc(aN)}</span>
-              ${lockBadge}
+              <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">${esc(hN)} <span style="color:var(--text-dim2);font-weight:400;">vs</span> ${esc(aN)}</span>
+              ${lockBadge}${statusBadge}
             </div>
-            <div style="font-size:11px;color:var(--text-dim);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(lg.slice(0, 40))} · <b style="color:var(--brand);">→ ${esc(pickLbl)}</b></div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(lg.slice(0, 40))}${pickLbl ? ` · <b style="color:var(--brand);">→ ${esc(pickLbl)}</b>` : ''}</div>
           </div>
-          <div style="font-size:13px;font-weight:700;color:${relColor};">${Math.round(p.rel * 100)}%</div>
-          <div style="font-size:13px;color:var(--text);">@${p.odd.toFixed(2)}</div>
+          ${rightCol}
         </div>`;
     };
 
