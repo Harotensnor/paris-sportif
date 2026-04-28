@@ -193,3 +193,264 @@ test.describe('Audit P0 — Backtest helpers exposés', () => {
     expect(res).toBeNull();
   });
 });
+
+// Sprint 90 (v31.7.177 — audit Part 16) — Tests cohérence EV / Kelly / Edge.
+// Vérifie que les formules sont mathématiquement consistantes :
+//   * EV = proba × cote - 1
+//   * edge = proba - 1/cote
+//   * EV = edge × cote (relation fondamentale)
+//   * Kelly = (b·p - q) / b avec b = cote - 1, q = 1 - p
+test.describe('Audit Part 16 — Cohérence formules EV / Kelly / Edge', () => {
+  test('expectedValue() respecte la formule p×odd - 1', async ({ page }) => {
+    await page.goto(URL);
+    await page.waitForLoadState('networkidle');
+    const result = await page.evaluate(() => {
+      const fn = window.expectedValue;
+      if (typeof fn !== 'function') return { error: 'expectedValue not exposed' };
+      // Cas 1 : break-even (p=0.5, odd=2.0) → EV=0
+      const ev1 = fn(0.5, 2.0);
+      // Cas 2 : value (p=0.55, odd=2.0) → EV=0.10
+      const ev2 = fn(0.55, 2.0);
+      // Cas 3 : -EV (p=0.4, odd=2.0) → EV=-0.20
+      const ev3 = fn(0.40, 2.0);
+      // Cas 4 : edge case input invalide
+      const ev4 = fn(0, 2.0);
+      const ev5 = fn(0.5, 1.0);
+      return { ev1, ev2, ev3, ev4, ev5 };
+    });
+    expect(result.error).toBeUndefined();
+    expect(Math.abs(result.ev1)).toBeLessThan(0.001);     // ~0
+    expect(Math.abs(result.ev2 - 0.10)).toBeLessThan(0.001);
+    expect(Math.abs(result.ev3 - (-0.20))).toBeLessThan(0.001);
+    expect(result.ev4).toBe(0);                             // input invalide
+    expect(result.ev5).toBe(0);
+  });
+
+  test('edge × cote = EV (relation fondamentale)', async ({ page }) => {
+    await page.goto(URL);
+    await page.waitForLoadState('networkidle');
+    const result = await page.evaluate(() => {
+      const ev = window.expectedValue;
+      if (typeof ev !== 'function') return { error: 'no helper' };
+      const tests = [
+        { p: 0.55, o: 2.0 },
+        { p: 0.65, o: 1.65 },
+        { p: 0.45, o: 2.30 },
+        { p: 0.70, o: 1.50 },
+      ];
+      const results = tests.map(t => {
+        const edge = t.p - 1 / t.o;
+        const evComputed = ev(t.p, t.o);
+        const evFromEdge = edge * t.o;
+        return { ...t, edge, evComputed, evFromEdge, diff: Math.abs(evComputed - evFromEdge) };
+      });
+      return { results };
+    });
+    expect(result.error).toBeUndefined();
+    // Tous les diff doivent être < 1e-9 (relation algébrique exacte)
+    for (const r of result.results) {
+      expect(r.diff).toBeLessThan(1e-9);
+    }
+  });
+
+  test('selectBestMarket retourne {edge, ev, kelly} cohérents', async ({ page }) => {
+    await page.goto(URL);
+    await page.waitForLoadState('networkidle');
+    const result = await page.evaluate(() => {
+      // Récupère un match foot avec winamax markets via les pages dispo
+      const data = window.PRONOSTICS_DATA || {};
+      const days = data.days || {};
+      let foundMatch = null;
+      for (const dayKey of Object.keys(days)) {
+        for (const m of (days[dayKey] || [])) {
+          if (!m.completed && m.sport === 'football' && m.winamax && m.winamax.match_id && m.winamax.markets && m.winamax.markets['1n2']) {
+            foundMatch = m;
+            break;
+          }
+        }
+        if (foundMatch) break;
+      }
+      if (!foundMatch) return { skip: true };
+      const pred = window.predictMatch ? window.predictMatch(foundMatch) : null;
+      if (!pred || !pred.pick) return { skip: true, reason: 'no pred' };
+      const best = window.selectBestMarket ? window.selectBestMarket(foundMatch, pred) : null;
+      if (!best) return { skip: true, reason: 'no best' };
+      // Vérifications de cohérence :
+      // 1. ev === prob × odd - 1
+      const evRecalc = best.prob * best.odd - 1;
+      const evDiff = Math.abs((best.ev || 0) - evRecalc);
+      // 2. kelly ≥ 0
+      const kellyOk = (best.kelly || 0) >= 0;
+      // 3. kelly ≤ cap (10% pour 1n2, 5% pour autres)
+      const cap = best.market === '1n2' ? 0.10 : 0.05;
+      const kellyCapOk = (best.kelly || 0) <= cap + 1e-9;
+      // 4. allCandidates est un array
+      const candArrOk = Array.isArray(best.allCandidates);
+      return { evDiff, kellyOk, kellyCapOk, candArrOk, market: best.market, ev: best.ev, kelly: best.kelly };
+    });
+    if (result.skip) {
+      test.skip(true, result.reason || 'No suitable football match in data');
+      return;
+    }
+    expect(result.evDiff).toBeLessThan(1e-6);
+    expect(result.kellyOk).toBe(true);
+    expect(result.kellyCapOk).toBe(true);
+    expect(result.candArrOk).toBe(true);
+  });
+
+  test('passesValueFilter rejette edge ≤ 0 quand valueOnly actif', async ({ page }) => {
+    await page.goto(URL);
+    await page.waitForLoadState('networkidle');
+    const result = await page.evaluate(() => {
+      // Force valueOnly = true (sans casser les vraies prefs user)
+      const orig = window.advFilters || {};
+      const saved = JSON.stringify(orig);
+      try {
+        window.advFilters = { ...orig, valueOnly: true, evMin: 0 };
+        const fn = window.passesValueFilter;
+        if (typeof fn !== 'function') return { error: 'no helper' };
+        // edge négatif → false
+        const r1 = fn({ prob: 0.40, odd: 2.0 });  // edge = -0.10
+        // edge nul → false
+        const r2 = fn({ prob: 0.50, odd: 2.0 });  // edge = 0
+        // edge positif → true
+        const r3 = fn({ prob: 0.55, odd: 2.0 });  // edge = +0.05
+        // input invalide → false
+        const r4 = fn({ prob: 0, odd: 2.0 });
+        return { r1, r2, r3, r4 };
+      } finally {
+        try { window.advFilters = JSON.parse(saved); } catch(e) {}
+      }
+    });
+    expect(result.error).toBeUndefined();
+    expect(result.r1).toBe(false);
+    expect(result.r2).toBe(false);
+    expect(result.r3).toBe(true);
+    expect(result.r4).toBe(false);
+  });
+
+  test('qualityScore retourne label valide selon score', async ({ page }) => {
+    await page.goto(URL);
+    await page.waitForLoadState('networkidle');
+    const result = await page.evaluate(() => {
+      const fn = window.qualityScore;
+      if (typeof fn !== 'function') return { error: 'no helper' };
+      // Mock minimal
+      const r1 = fn({ winamax: {}, league_code: 'eng.1' }, { pick: { prob: 0.6 }, reliability: 0.6 }, { edge: 0.10, odd: 2.0, prob: 0.6, market: '1n2' });
+      const r2 = fn({ winamax: {} }, { pick: { prob: 0.5 } }, { edge: 0, odd: 2.0, prob: 0.5, market: '1n2' });
+      const r3 = fn({ winamax: {} }, { pick: { prob: 0.45 } }, { edge: -0.05, odd: 2.0, prob: 0.45, market: '1n2' });
+      const labels = ['high', 'medium', 'low'];
+      return { r1, r2, r3, validLabels: [r1, r2, r3].every(r => labels.includes(r.label)) };
+    });
+    expect(result.error).toBeUndefined();
+    expect(result.validLabels).toBe(true);
+    // r1 (edge fort) doit avoir un meilleur score que r3 (edge négatif)
+    expect(result.r1.score).toBeGreaterThan(result.r3.score);
+  });
+
+  test('checkRiskLimits flag overbet correctement', async ({ page }) => {
+    await page.goto(URL);
+    await page.waitForLoadState('networkidle');
+    const result = await page.evaluate(() => {
+      const fn = window._checkRiskLimits;
+      if (typeof fn !== 'function') return { error: 'no helper' };
+      // 6 paris à 5€ chacun = 30€ sur bankroll 50€ = 60% → overbet (limite 25%)
+      const picks = Array.from({ length: 6 }, (_, i) => ({
+        stake: 5,
+        label: `Match ${i+1}`,
+        match: { id: `m${i}`, sport: 'football', league_code: 'eng.1', date: new Date().toISOString(), competitors: [{ home_away: 'home', name: `Home${i}` }, { home_away: 'away', name: `Away${i}` }] },
+        pred: { pick: { key: '1' } },
+      }));
+      const check = fn(picks, 50);
+      return { ok: check.ok, vCount: check.violations.length, wCount: check.warnings.length };
+    });
+    expect(result.error).toBeUndefined();
+    expect(result.ok).toBe(false);  // doit flagger
+    expect(result.vCount).toBeGreaterThan(0);  // au moins une violation
+  });
+});
+
+// Sprint 90 (v31.7.177) — Non-régression sur fonctionnalités clés des sprints précédents
+test.describe('Non-régression sprints 47-89', () => {
+  test('matchImportance distingue PSG-Bayern d\'un match standard', async ({ page }) => {
+    await page.goto(URL);
+    await page.waitForLoadState('networkidle');
+    const result = await page.evaluate(() => {
+      const fn = window.matchImportance;
+      if (typeof fn !== 'function') return { error: 'no helper' };
+      // Match CL avec 2 grands clubs
+      const psgBayern = {
+        sport: 'football',
+        league_code: 'uefa.champions',
+        competitors: [
+          { home_away: 'home', name: 'Paris Saint-Germain', records: [{ summary: '12-2-3' }] },
+          { home_away: 'away', name: 'Bayern Munich', records: [{ summary: '14-2-1' }] },
+        ],
+      };
+      // Match standard (championship anglais)
+      const standardMatch = {
+        sport: 'football',
+        league_code: 'eng.2',
+        competitors: [
+          { home_away: 'home', name: 'Hull City', records: [{ summary: '5-3-7' }] },
+          { home_away: 'away', name: 'Reading', records: [{ summary: '4-4-7' }] },
+        ],
+      };
+      return { psg: fn(psgBayern), std: fn(standardMatch) };
+    });
+    expect(result.error).toBeUndefined();
+    expect(result.psg).toBeGreaterThan(result.std);
+    expect(result.psg).toBeGreaterThanOrEqual(35);  // CL boost
+  });
+
+  test('bookmakerMode helpers exposés et fonctionnels', async ({ page }) => {
+    await page.goto(URL);
+    await page.waitForLoadState('networkidle');
+    const result = await page.evaluate(() => {
+      const okFn = typeof window.isBookableInMode === 'function' && typeof window.setBookmakerMode === 'function';
+      if (!okFn) return { error: 'helpers missing' };
+      // Test isBookableInMode avec match exact
+      const exactMatch = { winamax: { available: true, match_id: 12345, markets: { '1n2': { home: 2.1, away: 2.5 } } } };
+      const tournamentOnly = { winamax: { available: true } };
+      const noWinamax = {};
+      return {
+        exactPasses: window.isBookableInMode(exactMatch, 'exact'),
+        catalogPassesExact: window.isBookableInMode(exactMatch, 'catalog'),
+        catalogPassesTournament: window.isBookableInMode(tournamentOnly, 'catalog'),
+        exactRejectsTournament: !window.isBookableInMode(tournamentOnly, 'exact'),
+        allPassesAll: window.isBookableInMode(noWinamax, 'all'),
+        exactRejectsAll: !window.isBookableInMode(noWinamax, 'exact'),
+      };
+    });
+    expect(result.error).toBeUndefined();
+    expect(result.exactPasses).toBe(true);
+    expect(result.catalogPassesExact).toBe(true);
+    expect(result.catalogPassesTournament).toBe(true);
+    expect(result.exactRejectsTournament).toBe(true);
+    expect(result.allPassesAll).toBe(true);
+    expect(result.exactRejectsAll).toBe(true);
+  });
+
+  test('combinationCorrelation détecte mêmes-match', async ({ page }) => {
+    await page.goto(URL);
+    await page.waitForLoadState('networkidle');
+    const result = await page.evaluate(() => {
+      const fn = window.combinationCorrelation;
+      if (typeof fn !== 'function') return { error: 'no helper' };
+      const m1 = { id: 'A', sport: 'football', league_code: 'eng.1', date: new Date().toISOString(), competitors: [{ home_away: 'home', name: 'Arsenal' }, { home_away: 'away', name: 'Chelsea' }] };
+      const m2 = { id: 'B', sport: 'football', league_code: 'eng.1', date: new Date(Date.now() + 24*3600*1000).toISOString(), competitors: [{ home_away: 'home', name: 'Liverpool' }, { home_away: 'away', name: 'Arsenal' }] };  // Arsenal réutilisé
+      const m3 = { id: 'C', sport: 'tennis', league_code: 'atp.tour', date: new Date(Date.now() + 48*3600*1000).toISOString(), competitors: [{ home_away: 'home', name: 'Player A' }, { home_away: 'away', name: 'Player B' }] };
+      // Same match → 1.0
+      const sameMatch = fn({ match: m1, market: '1n2' }, { match: m1, market: '1n2' });
+      // Same team between matches → ≥ 0.5
+      const sharedTeam = fn({ match: m1 }, { match: m2 });
+      // Indépendants
+      const independent = fn({ match: m1 }, { match: m3 });
+      return { sameMatch, sharedTeam, independent };
+    });
+    expect(result.error).toBeUndefined();
+    expect(result.sameMatch).toBeGreaterThanOrEqual(0.95);
+    expect(result.sharedTeam).toBeGreaterThanOrEqual(0.5);
+    expect(result.independent).toBeLessThan(0.5);
+  });
+});

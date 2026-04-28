@@ -6,6 +6,61 @@ des pronostics simples/combinés/montantes séquentielles, et une vue bilan.
 Déployé sur GitHub Pages. Client = navigateur ; données = fichier `data.js`
 régénéré en continu.
 
+## Architecture v31.7.177 (mise à jour 2026-04-28 — Sprints 82-90 brief 16-parties complet)
+
+Réponse au brief "fait tout sans exception" — couverture des 16 parties.
+
+**Sprint 82 (Part 1 — v31.7.169)** — Multi-marchés multi-sports :
+- **Foot** : `teamTotals` ajouté à `poissonMarketsExtended` (home/away over 0.5/1.5/2.5 via Poisson individuel). `selectBestMarket` route maintenant 'teamTotal' (proba ≥ 0.65).
+- **Hockey** : `hockeyScorePrediction` retourne `markets: { totals (4.5/5.5/6.5/7.5), puckLine (±1.5), teamTotals }` via Poisson joint sur lamH+lamA.
+- **Baseball** : nouveau `baseballScoreProjection` qui consomme pitcherStats (ERA blend) + last5 → `markets: { totals (6.5/7.5/8.5/9.5/10.5), runLine (±1.5), totalsF5 }` via Gaussienne σ=2.5.
+- `selectBestMarket` étendu : route 'hockeyTotal' / 'puckLine' / 'baseballTotal' / 'runLine' / 'teamTotal'.
+
+**Sprint 83 (Part 7 — v31.7.170)** — Score Qualité dédié.
+- `qualityScore(match, pred, best)` retourne `{ score 0-100, label 'high'/'medium'/'low', reasons[] }`.
+- Composantes : edge ×40, data quality ×25, stabilité cote (snapshot vs current) ×20, historique ligue (backtest WR) ×15.
+- 6e tile dans la fiche de décision modal (à côté de Confiance/Edge/EV/Kelly/Qualité-data/Actionability).
+- Exposé `window.qualityScore`.
+
+**Sprint 84 (Part 10 — v31.7.171)** — Modal section "🏷️ Marchés évalués".
+- `selectBestMarket().allCandidates` expose maintenant la liste complète triée.
+- Nouvelle section dans modal détail (catégorisée 'cotes') : tous les marchés évalués avec status `✓ Sélectionné` / `✓ Alternative` / `~ Acceptable` / `✗ Refusé` + raison textuelle.
+- Affiche prob, cote, edge, EV pour chaque candidat.
+
+**Sprint 85 (Part 4 — v31.7.172)** — Dashboard structure 3+3+2.
+- `topPicks` (3 best edge, déjà existant) reste la sélection principale.
+- Nouveau `prudentPicks` (3 max) : confiance ≥70%, cote 1.40-1.85, edge ≥2%.
+- Nouveau `aggressivePicks` (2 max) : edge ≥8%, cote ≥2.50.
+- Nouveau `otherOpportunities` : tous les autres edge>0+conf≥55% non-déjà-affichés.
+- Section "🎯 Sélection complète" avec colonnes Prudents/Agressifs + `<details>` expansible "Autres opportunités" (12 cartes max + lien vers Tous).
+
+**Sprint 86 (Part 8 — v31.7.173)** — Performance ROI Kelly + edge moyen + CLV.
+- KPIs Vue globale étendus : ROI flat (existait), **ROI Kelly** distinct (lit `overall.roi_kelly` du backtest), **Edge moyen** (lit `overall.edge_avg`), **CLV moyen** (lit `overall.clv_avg`).
+- Backward-compat : si les champs ne sont pas dans le report, affiche "—".
+
+**Sprint 87 (Part 9 — v31.7.174)** — Gestion risque user.
+- `_loadRiskLimits()` + `_saveRiskLimits()` — défauts : 5 paris/jour, 25% stake/jour, 10% stake/pari, corr ≥ 0.4 alerte.
+- `window._checkRiskLimits(picks, bankroll)` retourne `{ violations, warnings, ok, summary }`.
+- Bandeau d'alerte rouge/orange dans le dashboard si paris affichés violent les limites (overbet, trop de paris, paris corrélés).
+- `window._updateRiskLimit(key, value)` pour ajustement console (UI Profil dédiée à venir).
+
+**Sprint 88 (Part 15 — v31.7.175)** — Backtest segmenté + Wilson CI.
+- `backtest_by_market.py` étendu : `_wilson_ci(wins, n)` calcule Wilson 95% CI sur le win rate (plus robuste que normal CI pour petits n).
+- Tracking par dimensions supplémentaires : **by_league**, **by_period** (mois YYYY-MM), **by_edge_bucket** (5 buckets : <0, 0-2pt, 2-5pt, 5-10pt, ≥10pt).
+- Chaque entry contient `{ n, wins, losses, voids, win_rate, wr_ci_lo, wr_ci_hi, with_odds, stake, profit, roi }`.
+- Page Performance onglet Marché affiche 3 nouvelles tables : par ligue / par mois / par bucket d'edge avec colonnes WR + IC 95% + ROI.
+
+**Sprint 89 (Part 14 — v31.7.176)** — Filtres avancés étendus.
+- `advFilters` étend `marketType` (1n2/ou25/btts/dc/exactScore/dnb/ah/basketTotal/...) et `dataQualityMin` (0..4).
+- 2 nouveaux selects dans la barre de filtres avancés.
+- Intégrés dans `passesFilters` du chain principal de la page Tous.
+- `advFiltersActive()` / reset incluent les nouveaux flags.
+
+**Sprint 90 (Part 16 — v31.7.177)** — Tests cohérence + non-régression.
+- `tests/audit-p0-flows.spec.js` étendu avec :
+  - **Cohérence formules** : `expectedValue` respecte p×odd-1, edge × cote = EV (relation algébrique exacte avec diff < 1e-9), `selectBestMarket` retourne ev/kelly cohérents avec cap, `passesValueFilter` rejette edge ≤ 0 quand valueOnly actif, `qualityScore` retourne label valide, `_checkRiskLimits` flag overbet.
+  - **Non-régression sprints 47-89** : `matchImportance` distingue PSG-Bayern d'un match standard (CL boost), `bookmakerMode` helpers (3 états), `combinationCorrelation` détecte same-match et shared-team.
+
 ## Architecture v31.7.168 (mise à jour 2026-04-28 — Sprints 78-81 audit P0/P1 manquants)
 
 Réponse au feedback "ta casi rien fait de l'audit" — focus sur les items P0/P1
