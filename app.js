@@ -2361,8 +2361,19 @@
       _populateTrustStrip(rep);
     } catch (e) { /* calibration optional, ignore */ }
   }
+  // Sprint 74 (v31.7.162 — câblage Sprint 66/76 backtest per-marché).
+  // Charge backtest_report_markets.json pour la page Performance onglet Marché.
+  async function _loadMarketBacktest() {
+    try {
+      const r = await fetch('backtest_report_markets.json?t=' + Date.now(), { cache: 'no-store' });
+      if (!r.ok) return;
+      const rep = await r.json();
+      window.__backtestReportMarkets = rep;
+    } catch(e) { /* optional, ignore */ }
+  }
   // Fire once; safe to call before DOM is ready (fetch is async)
   _loadModelCalibration();
+  _loadMarketBacktest();
 
   // v31.7.32 — Trust strip helper. Lit __backtestReportV2 et patch les 4
   // KPIs visibles (locks WR / ROI flat / Brier / n picks). Respecte le
@@ -5989,6 +6000,92 @@
       } catch(e) { return ''; }
     })();
 
+    // Sprint 73 (v31.7.161 — câblage UI buildComboVariants Sprint 71) — 4 variantes
+    // de combinés exposées : Safe (locks only), Best Edge, Buts (OU/BTTS),
+    // Tomorrow (J+1). Chaque carte montre les jambes, cote totale, corrélation avg.
+    const variantsHtml = (() => {
+      if (typeof buildComboVariants !== 'function') return '';
+      const picksAll = [];
+      filteredEvents.forEach(m => {
+        if (m.completed || m.live) return;
+        try {
+          const pred = predictMatch(m);
+          if (!pred || !pred.pick || pred.skip) return;
+          const best = (typeof selectBestMarket === 'function') ? selectBestMarket(m, pred) : null;
+          if (!best || !best.odd) return;
+          picksAll.push({
+            match: m, pred, isLock: pred.isLock,
+            market: best.market, key: best.key, label: best.label,
+            prob: best.prob, odd: best.odd, edge: best.edge, kelly: best.kelly,
+          });
+        } catch(e){}
+      });
+      if (!picksAll.length) return '';
+      const variants = buildComboVariants(picksAll);
+      const variantConfigs = [
+        { k: 'safe', emoji: '🔒', label: 'Combiné Safe', desc: 'Uniquement des locks (≥70% confiance)', color: 'var(--tier-lock, #fbbf24)' },
+        { k: 'bestEdge', emoji: '💎', label: 'Combiné Best Edge', desc: 'Tri par edge décroissant', color: 'var(--accent, #22c55e)' },
+        { k: 'buts', emoji: '⚽', label: 'Combiné Buts', desc: 'Marchés OU 2.5 / BTTS uniquement', color: 'var(--brand, #a78bfa)' },
+        { k: 'tomorrow', emoji: '📅', label: 'Combiné Demain', desc: 'Matchs J+1 uniquement', color: 'var(--warn, #c79b00)' },
+      ];
+      const cards = variantConfigs.map(cfg => {
+        const v = variants[cfg.k];
+        if (!v || !v.picks || v.picks.length < 2) {
+          return `<div style="padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r);opacity:.55;">
+            <div style="font-size:11px;color:${cfg.color};text-transform:uppercase;letter-spacing:.6px;font-weight:700;">${cfg.emoji} ${esc(cfg.label)}</div>
+            <div style="font-size:12px;color:var(--text-dim);margin-top:8px;font-style:italic;">Pas assez de picks indépendants disponibles dans cette catégorie.</div>
+          </div>`;
+        }
+        const corrPct = (v.corrAvg * 100).toFixed(0);
+        const corrColor = v.corrAvg < 0.2 ? 'var(--accent)' : v.corrAvg < 0.4 ? 'var(--warn)' : 'var(--danger)';
+        const ret10 = (v.totalOdd * 10).toFixed(2);
+        const legsHtml = v.picks.map(p => {
+          const sides = (typeof getSides === 'function') ? getSides(p.match) : { home:{}, away:{} };
+          const hN = sides.home?.short || sides.home?.name || '?';
+          const aN = sides.away?.short || sides.away?.name || '?';
+          const lg = p.match.league_name || p.match.league_code || '';
+          return `
+            <div data-combo-leg-id="${esc(String(p.match.id))}" style="display:flex;flex-direction:column;gap:3px;padding:10px 12px;background:var(--panel-2,rgba(255,255,255,.03));border-radius:var(--r-sm);border:1px solid var(--border);cursor:pointer;">
+              <div style="font-size:13px;font-weight:600;color:var(--text);">${esc(hN)} <span style="color:var(--text-dim2);font-weight:400;">vs</span> ${esc(aN)}</div>
+              <div style="font-size:11px;color:var(--text-dim);">${esc(String(lg).slice(0, 32))}</div>
+              <div style="display:flex;align-items:center;gap:6px;margin-top:3px;flex-wrap:wrap;">
+                <span style="font-size:12px;color:var(--brand);font-weight:600;">→ ${esc(p.label)}</span>
+                <span style="font-size:11px;color:var(--text-dim);">${Math.round(p.prob*100)}%</span>
+                <span style="margin-left:auto;font-size:13px;font-weight:700;color:var(--text);">@${p.odd.toFixed(2)}</span>
+              </div>
+            </div>`;
+        }).join('');
+        return `
+          <div style="padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${cfg.color};border-radius:0 var(--r) var(--r) 0;">
+            <div style="display:flex;justify-content:space-between;align-items:start;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+              <div>
+                <div style="font-size:11px;color:${cfg.color};text-transform:uppercase;letter-spacing:.6px;font-weight:700;">${cfg.emoji} ${esc(cfg.label)}</div>
+                <div style="font-size:12px;color:var(--text-dim);margin-top:2px;">${esc(cfg.desc)}</div>
+              </div>
+              <div style="font-size:11px;color:${corrColor};font-weight:700;" title="Corrélation moyenne entre les jambes (plus c'est bas, plus le combiné est sain)">corr ${corrPct}%</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px;">
+              ${legsHtml}
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--text-dim);">
+              <span>${v.n} jambes · cote × <b style="color:${cfg.color};font-size:15px;font-variant-numeric:tabular-nums;">${v.totalOdd.toFixed(2)}</b></span>
+              <span>10€ → <b style="color:var(--text);font-variant-numeric:tabular-nums;">${ret10}€</b></span>
+            </div>
+          </div>`;
+      }).join('');
+      return `
+        <div style="margin:18px 0 24px;">
+          <div style="margin-bottom:12px;">
+            <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;">Sprint 73 · 4 variantes</div>
+            <div style="font-size:18px;font-weight:800;color:var(--text);margin-top:2px;">🎲 Combinés multi-types</div>
+            <div style="font-size:12px;color:var(--text-dim);margin-top:3px;">Anti-corrélation : chaque variante sélectionne max 3 jambes avec corr &lt; 40% entre elles.</div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;">
+            ${cards}
+          </div>
+        </div>`;
+    })();
+
     wrap.innerHTML = `
       <div style="max-width:1280px;margin:0 auto;padding:4px 0 0;">
         <div class="page-header">
@@ -5997,11 +6094,22 @@
           <h1 class="page-h1">Combinés</h1>
           <div style="font-size:14px;color:var(--text-dim);max-width:640px;">Paris combinés générés automatiquement, anti-corrélés, recalculés en continu. À utiliser avec modération.</div>
         </div>
+        ${variantsHtml}
         ${iaCombineHtml}
         ${buteurCombineHtml}
         <div class="combine-section">${sections}</div>
       </div>
     `;
+    // Wire les clicks sur les jambes des nouvelles variantes Sprint 73
+    wrap.querySelectorAll('[data-combo-leg-id]').forEach(el => {
+      el.addEventListener('click', () => {
+        const id = el.dataset.comboLegId;
+        for (const day of Object.keys(window.PRONOSTICS_DATA.days || {})) {
+          const match = (window.PRONOSTICS_DATA.days[day] || []).find(m => String(m.id) === String(id));
+          if (match) { openDetail(match); return; }
+        }
+      });
+    });
     wrap.querySelectorAll('.combine-leg').forEach(el => {
       if (!el.hasAttribute('role')) el.setAttribute('role', 'button');
       if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '0');
@@ -16202,25 +16310,72 @@
   };
 
   // AUDIT-2026-04-27 (Sprint 33 #2) — Page Favoris (bookmarks).
+  // Sprint 72 (v31.7.160 — câblage UI watchlist) — état local du tab favoris.
+  const FAVORIS_TAB_KEY = 'favorisTab';
+  function _getFavorisTab() {
+    try { return localStorage.getItem(FAVORIS_TAB_KEY) || 'matches'; } catch(e) { return 'matches'; }
+  }
+  function _setFavorisTab(t) {
+    try { localStorage.setItem(FAVORIS_TAB_KEY, t); } catch(e){}
+  }
   function renderFavorisPage(wrap) {
     const data = window.PRONOSTICS_DATA;
     const ids = (typeof window._loadBookmarks === 'function') ? window._loadBookmarks() : [];
-    if (!ids.length) {
+    // Sprint 72 — Watchlist multi-niveaux (Sprint 70 backbone)
+    const wl = (typeof window._loadWatchlist === 'function') ? window._loadWatchlist() : { teams: [], leagues: [], sports: [], markets: [] };
+    const rules = (typeof window._loadAlertRules === 'function') ? window._loadAlertRules() : [];
+    const totalEntries = ids.length + wl.teams.length + wl.leagues.length + wl.sports.length + wl.markets.length + rules.length;
+    if (!totalEntries) {
       wrap.innerHTML = `
         <div class="page-wrap">
           <div class="page-header">
-            <div class="lbl-tiny" style="color:var(--brand);">Mes favoris</div>
-            <h1 class="page-h1">⭐ Favoris</h1>
+            <div class="lbl-tiny" style="color:var(--brand);">Mes favoris &amp; alertes</div>
+            <h1 class="page-h1">⭐ Favoris &amp; alertes</h1>
           </div>
           <div class="empty-state-v2">
             <div class="es-illustration">⭐</div>
-            <div class="es-title-v2">Aucun favori pour le moment</div>
-            <div class="es-body-v2">Tape sur l'étoile en haut à droite d'une carte match pour la sauvegarder ici. Idéal pour suivre des matchs spécifiques.</div>
+            <div class="es-title-v2">Aucun favori ni alerte pour le moment</div>
+            <div class="es-body-v2">Tape sur l'étoile en haut à droite d'une carte match pour suivre un match spécifique, ou ajoute un suivi par équipe / ligue / sport / marché.</div>
             <div class="es-actions-v2">
               <button class="page-btn" data-page="tous" style="padding:10px 18px;font-size:13px;background:var(--brand);color:#08080a;border:none;border-radius:var(--r-sm);cursor:pointer;font-weight:700;">📋 Voir les pronos</button>
+              <button class="page-btn" data-page="matchs" style="padding:10px 18px;font-size:13px;background:transparent;color:var(--text);border:1px solid var(--border-2);border-radius:var(--r-sm);cursor:pointer;font-weight:700;">🔍 Matchs détectés</button>
             </div>
           </div>
         </div>`;
+      return;
+    }
+    const currentTab = _getFavorisTab();
+    const tabs = [
+      { k: 'matches', emoji: '⭐', label: `Matchs (${ids.length})` },
+      { k: 'teams',   emoji: '🛡️', label: `Équipes (${wl.teams.length})` },
+      { k: 'leagues', emoji: '🏆', label: `Ligues (${wl.leagues.length})` },
+      { k: 'sports',  emoji: '🎯', label: `Sports (${wl.sports.length})` },
+      { k: 'markets', emoji: '🏷️', label: `Marchés (${wl.markets.length})` },
+      { k: 'alerts',  emoji: '🔔', label: `Alertes (${rules.length})` },
+    ];
+    const subTabsHtml = `
+      <div style="margin-top:14px;display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:8px;">
+        ${tabs.map(t => `
+          <button data-favoris-tab="${t.k}" style="padding:7px 14px;border-radius:var(--r-sm);border:1px solid ${currentTab === t.k ? 'var(--brand)' : 'transparent'};background:${currentTab === t.k ? 'var(--brand-soft)' : 'transparent'};color:${currentTab === t.k ? 'var(--brand)' : 'var(--text-2)'};font-weight:600;font-size:13px;cursor:pointer;">${esc(t.emoji)} ${esc(t.label)}</button>
+        `).join('')}
+      </div>`;
+    if (!ids.length && currentTab === 'matches') {
+      const mainHtml = `
+        <div class="page-wrap">
+          <div class="page-header">
+            <div class="lbl-tiny" style="color:var(--brand);">Mes favoris &amp; alertes</div>
+            <h1 class="page-h1">⭐ Favoris &amp; alertes</h1>
+            <div style="font-size:14px;color:var(--text-dim);">${totalEntries} entrée${totalEntries > 1 ? 's' : ''} suivie${totalEntries > 1 ? 's' : ''}.</div>
+          </div>
+          ${subTabsHtml}
+          <div class="empty-state-v2" style="margin-top:18px;">
+            <div class="es-illustration">⭐</div>
+            <div class="es-title-v2">Aucun match favori</div>
+            <div class="es-body-v2">Clique sur l'étoile à côté d'un match pour le sauvegarder ici. Tu peux aussi suivre des équipes / ligues / sports / marchés via les autres onglets.</div>
+          </div>
+        </div>`;
+      wrap.innerHTML = mainHtml;
+      wrap.querySelectorAll('[data-favoris-tab]').forEach(b => b.addEventListener('click', () => { _setFavorisTab(b.dataset.favorisTab); renderFavorisPage(wrap); }));
       return;
     }
     // Trouve les matches correspondants
@@ -16284,15 +16439,115 @@
           <button class="bookmark-btn" data-bookmark-toggle="${esc(String(m.id))}" aria-label="Retirer des favoris" data-tooltip="Retirer des favoris" style="background:transparent;border:none;color:var(--warn);font-size:18px;cursor:pointer;padding:4px 6px;line-height:1;">★</button>
         </div>`;
     }).join('');
+    // Sprint 72 — Section watchlist multi-niveaux selon currentTab
+    let mainContent = '';
+    if (currentTab === 'matches') {
+      mainContent = `<div style="margin-top:16px;">${rows}</div>`;
+    } else if (currentTab === 'teams') {
+      mainContent = wl.teams.length ? `
+        <div style="margin-top:14px;display:flex;flex-direction:column;gap:6px;">
+          ${wl.teams.map(t => `
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
+              <span style="font-size:14px;font-weight:600;color:var(--text);">🛡️ ${esc(t)}</span>
+              <button data-watchlist-remove="teams:${esc(t)}" style="background:transparent;border:none;color:var(--danger,#ef4444);font-size:14px;cursor:pointer;font-weight:600;">Retirer</button>
+            </div>`).join('')}
+        </div>` : `<div class="empty-state-v2" style="margin-top:18px;"><div class="es-illustration">🛡️</div><div class="es-title-v2">Aucune équipe suivie</div><div class="es-body-v2">Va sur le détail d'un match et clique sur l'équipe pour la suivre.</div></div>`;
+    } else if (currentTab === 'leagues') {
+      mainContent = wl.leagues.length ? `
+        <div style="margin-top:14px;display:flex;flex-direction:column;gap:6px;">
+          ${wl.leagues.map(l => `
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
+              <span style="font-size:14px;font-weight:600;color:var(--text);">🏆 ${esc(l)}</span>
+              <button data-watchlist-remove="leagues:${esc(l)}" style="background:transparent;border:none;color:var(--danger,#ef4444);font-size:14px;cursor:pointer;font-weight:600;">Retirer</button>
+            </div>`).join('')}
+        </div>` : `<div class="empty-state-v2" style="margin-top:18px;"><div class="es-illustration">🏆</div><div class="es-title-v2">Aucune ligue suivie</div><div class="es-body-v2">Suis une ligue depuis le détail d'un match.</div></div>`;
+    } else if (currentTab === 'sports') {
+      const allSports = ['football','tennis','basketball','hockey','baseball'];
+      mainContent = `
+        <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">
+          ${allSports.map(s => {
+            const on = wl.sports.includes(s);
+            const emoji = { football:'⚽', tennis:'🎾', basketball:'🏀', hockey:'🏒', baseball:'⚾' }[s] || '🎯';
+            return `<button data-watchlist-toggle="sports:${esc(s)}" style="padding:10px 16px;border-radius:var(--r-sm);border:1px solid ${on ? 'var(--brand)' : 'var(--border-2)'};background:${on ? 'var(--brand-soft)' : 'var(--panel)'};color:${on ? 'var(--brand)' : 'var(--text-2)'};font-weight:600;font-size:14px;cursor:pointer;">${emoji} ${esc(s)}${on ? ' ✓' : ''}</button>`;
+          }).join('')}
+        </div>
+        <div style="margin-top:8px;font-size:11px;color:var(--text-dim);">Active un sport pour recevoir les pronos forts de ce sport en priorité dans tes notifications.</div>`;
+    } else if (currentTab === 'markets') {
+      const allMarkets = [
+        { k: '1n2', lbl: '1X2 / Vainqueur' },
+        { k: 'ou25', lbl: 'Plus / Moins 2.5 buts' },
+        { k: 'btts', lbl: 'Les 2 équipes marquent' },
+        { k: 'doubleChance', lbl: 'Double chance' },
+        { k: 'exactScore', lbl: 'Score exact' },
+        { k: 'basketTotal', lbl: 'Total points basket' },
+        { k: 'basketHandicap', lbl: 'Handicap basket' },
+        { k: 'tennisGames', lbl: 'Total jeux tennis' },
+      ];
+      mainContent = `
+        <div style="margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;">
+          ${allMarkets.map(m => {
+            const on = wl.markets.includes(m.k);
+            return `<button data-watchlist-toggle="markets:${esc(m.k)}" style="padding:10px 14px;border-radius:var(--r-sm);border:1px solid ${on ? 'var(--brand)' : 'var(--border-2)'};background:${on ? 'var(--brand-soft)' : 'var(--panel)'};color:${on ? 'var(--brand)' : 'var(--text-2)'};font-weight:600;font-size:13px;cursor:pointer;text-align:left;">${esc(m.lbl)}${on ? ' ✓' : ''}</button>`;
+          }).join('')}
+        </div>
+        <div style="margin-top:8px;font-size:11px;color:var(--text-dim);">Marque les marchés que tu joues souvent — les futures alertes filtreront sur ces marchés en priorité.</div>`;
+    } else if (currentTab === 'alerts') {
+      mainContent = rules.length ? `
+        <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px;">
+          ${rules.map(r => {
+            const typeLbl = { edge_min: 'Edge minimum', lock_imminent: 'Lock imminent', lineup_published: 'Lineup publié' }[r.type] || r.type;
+            const thr = r.type === 'edge_min' ? `${(r.threshold * 100).toFixed(1)}pt` : `${r.threshold}min`;
+            const scopeLbl = r.scope?.sport ? `${r.scope.sport}${r.scope?.league ? ` / ${r.scope.league}` : ''}` : 'tous';
+            return `
+              <div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <div style="font-size:14px;font-weight:600;color:var(--text);">🔔 ${esc(typeLbl)} ≥ ${esc(thr)}</div>
+                  <button data-alert-remove="${esc(r.id)}" style="background:transparent;border:none;color:var(--danger);font-size:12px;cursor:pointer;font-weight:600;">Supprimer</button>
+                </div>
+                <div style="font-size:11px;color:var(--text-dim);margin-top:3px;">Scope : ${esc(scopeLbl)} · créée ${new Date(r.created_at).toLocaleDateString('fr-FR')}</div>
+              </div>`;
+          }).join('')}
+        </div>
+        <div style="margin-top:14px;padding:14px 16px;background:var(--panel);border:1px dashed var(--border-2);border-radius:var(--r-sm);font-size:12px;color:var(--text-dim);line-height:1.5;">
+          Tu peux ajouter des alertes paramétrables via la console : <code style="color:var(--brand);">window._addAlertRule('edge_min', 0.05, { sport: 'football' })</code>. UI builder dédiée arrive dans un prochain sprint.
+        </div>` : `<div class="empty-state-v2" style="margin-top:18px;"><div class="es-illustration">🔔</div><div class="es-title-v2">Aucune alerte paramétrée</div><div class="es-body-v2">Les alertes te préviennent quand un pick atteint un certain edge ou qu'un lock est imminent. Ajoute-les via la console pour l'instant.</div></div>`;
+    }
     wrap.innerHTML = `
       <div class="page-wrap">
         <div class="page-header">
-          <div class="lbl-tiny" style="color:var(--brand);">Mes favoris · ${found.length}</div>
-          <h1 class="page-h1">⭐ Favoris</h1>
-          <div style="font-size:14px;color:var(--text-dim);">${found.length} match${found.length>1?'s':''} sauvegardé${found.length>1?'s':''}${missing>0?` (${missing} hors fenêtre rolling)`:''}.</div>
+          <div class="lbl-tiny" style="color:var(--brand);">Mes favoris &amp; alertes</div>
+          <h1 class="page-h1">⭐ Favoris &amp; alertes</h1>
+          <div style="font-size:14px;color:var(--text-dim);">${found.length} match${found.length>1?'s':''} · ${wl.teams.length} équipe${wl.teams.length>1?'s':''} · ${wl.leagues.length} ligue${wl.leagues.length>1?'s':''} · ${wl.sports.length} sport${wl.sports.length>1?'s':''} · ${wl.markets.length} marché${wl.markets.length>1?'s':''} · ${rules.length} alerte${rules.length>1?'s':''}${missing>0?` · (${missing} hors fenêtre rolling)`:''}.</div>
         </div>
-        <div style="margin-top:16px;">${rows}</div>
+        ${subTabsHtml}
+        ${mainContent}
       </div>`;
+    // Wire tabs
+    wrap.querySelectorAll('[data-favoris-tab]').forEach(b => b.addEventListener('click', () => {
+      _setFavorisTab(b.dataset.favorisTab);
+      renderFavorisPage(wrap);
+    }));
+    // Wire watchlist remove + toggle
+    wrap.querySelectorAll('[data-watchlist-remove]').forEach(b => b.addEventListener('click', () => {
+      const [cat, val] = b.dataset.watchlistRemove.split(':');
+      if (typeof window._toggleWatchlistEntry === 'function') {
+        window._toggleWatchlistEntry(cat, val);
+        renderFavorisPage(wrap);
+      }
+    }));
+    wrap.querySelectorAll('[data-watchlist-toggle]').forEach(b => b.addEventListener('click', () => {
+      const [cat, val] = b.dataset.watchlistToggle.split(':');
+      if (typeof window._toggleWatchlistEntry === 'function') {
+        window._toggleWatchlistEntry(cat, val);
+        renderFavorisPage(wrap);
+      }
+    }));
+    wrap.querySelectorAll('[data-alert-remove]').forEach(b => b.addEventListener('click', () => {
+      if (typeof window._removeAlertRule === 'function') {
+        window._removeAlertRule(b.dataset.alertRemove);
+        renderFavorisPage(wrap);
+      }
+    }));
     // Wire bookmark removal
     wrap.querySelectorAll('[data-bookmark-toggle]').forEach(btn => {
       btn.addEventListener('click', (e) => {
@@ -16776,15 +17031,83 @@
           </div>
         </div>` : ''}
 
-        ${currentTab === 'marche' ? `
-        <div style="margin-top:18px;padding:16px 18px;background:var(--panel);border:1px dashed var(--border-2);border-radius:var(--r-sm);">
-          <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;">🏷️ Backtest par marché</div>
-          <div style="font-size:12px;color:var(--text-dim);line-height:1.5;">
-            Le backtest actuel suit uniquement les picks 1X2 principaux. Les marchés étendus (OU 2.5, BTTS, Score exact, Double chance, Mi-temps, Total points basket, Handicap basket, Total jeux tennis) sont calculés en temps réel depuis le modèle Poisson/Gaussien mais leurs gagnants/perdants ne sont pas encore tracés dans <code>backtest_report_v2.json</code>.
-            <br><br>
-            <b>Sprint 60 prévu</b> : étendre <code>evaluateModelPick</code> + backtest_v2.py pour calibrer chaque marché séparément. WR / ROI / Brier per-marché disponibles ici dans la prochaine version.
-          </div>
-        </div>` : ''}
+        ${currentTab === 'marche' ? (() => {
+          // Sprint 74 (v31.7.162) — Branche backtest_report_markets.json (Sprint 66+76).
+          // Affiche WR per-(marché, pick) avec tri par WR desc, et ROI quand dispo.
+          const mktRep = window.__backtestReportMarkets;
+          if (!mktRep || !mktRep.by_market_pick) {
+            return `
+            <div style="margin-top:18px;padding:16px 18px;background:var(--panel);border:1px dashed var(--border-2);border-radius:var(--r-sm);">
+              <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;">🏷️ Backtest par marché</div>
+              <div style="font-size:12px;color:var(--text-dim);line-height:1.5;">
+                Rapport <code>backtest_report_markets.json</code> pas encore disponible. Lance <code>python scripts/backtest_by_market.py</code> pour le générer (cron auto chaque tick après prochain déploiement).
+              </div>
+            </div>`;
+          }
+          const entries = Object.entries(mktRep.by_market_pick || {})
+            .filter(([k, v]) => (v.n || 0) >= 5)
+            .sort((a, b) => {
+              const wrA = a[1].win_rate ?? 0;
+              const wrB = b[1].win_rate ?? 0;
+              if (Math.abs(wrB - wrA) > 0.01) return wrB - wrA;
+              return (b[1].n || 0) - (a[1].n || 0);
+            });
+          if (!entries.length) {
+            return `
+            <div style="margin-top:18px;padding:16px 18px;background:var(--panel);border:1px dashed var(--border-2);border-radius:var(--r-sm);">
+              <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;">🏷️ Backtest par marché</div>
+              <div style="font-size:12px;color:var(--text-dim);line-height:1.5;">
+                Échantillon trop faible (&lt; 5 paris par combinaison marché × pick). Le backtest devient fiable après 30+ matchs par combo.
+              </div>
+            </div>`;
+          }
+          const marketLabels = { ou25: 'OU 2.5', ou15: 'OU 1.5', ou35: 'OU 3.5', btts: 'BTTS', doubleChance: 'Double chance', exactScore: 'Score exact', basketTotal: 'Total points basket', basketHandicap: 'Handicap basket' };
+          const rows = entries.slice(0, 30).map(([k, v]) => {
+            const [marketKey, pickValue] = k.split(':');
+            const wrPct = v.win_rate != null ? `${(v.win_rate * 100).toFixed(1)}%` : '—';
+            const wrColor = v.win_rate >= 0.55 ? 'var(--accent)' : v.win_rate >= 0.50 ? 'var(--warn)' : 'var(--text-dim)';
+            const marketLbl = marketLabels[marketKey] || marketKey;
+            const roiPct = v.roi != null ? `${(v.roi * 100 >= 0 ? '+' : '')}${(v.roi * 100).toFixed(1)}%` : '—';
+            const roiColor = v.roi == null ? 'var(--text-dim2)' : v.roi >= 0.02 ? 'var(--accent)' : v.roi >= -0.02 ? 'var(--warn)' : 'var(--danger)';
+            return `
+              <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:8px 12px;color:var(--text);font-weight:600;">${esc(marketLbl)}</td>
+                <td style="padding:8px 12px;color:var(--text-dim);font-family:var(--font-mono, monospace);font-size:12px;">${esc(pickValue)}</td>
+                <td style="padding:8px 12px;text-align:right;color:var(--text-dim);">${v.n || 0}</td>
+                <td style="padding:8px 12px;text-align:right;color:${wrColor};font-weight:700;">${wrPct}</td>
+                <td style="padding:8px 12px;text-align:right;color:${roiColor};font-weight:700;">${roiPct}</td>
+                <td style="padding:8px 12px;text-align:right;color:var(--accent);">${v.wins || 0}</td>
+                <td style="padding:8px 12px;text-align:right;color:var(--danger);">${v.losses || 0}</td>
+                <td style="padding:8px 12px;text-align:right;color:var(--text-dim2);">${v.with_odds || 0}</td>
+              </tr>`;
+          }).join('');
+          const nWithRoi = entries.filter(([, v]) => v.roi != null).length;
+          return `
+            <div style="margin-top:18px;">
+              <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">🏷️ Performance par marché</div>
+              <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">${mktRep.completed_evaluated || 0} matchs completed évalués · ${entries.length} (marché, pick) combinaisons avec n ≥ 5${nWithRoi > 0 ? `, ${nWithRoi} avec ROI calculé` : ''}.</div>
+              <div style="overflow-x:auto;">
+                <table style="width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:13px;">
+                  <thead>
+                    <tr style="border-bottom:1px solid var(--border);">
+                      <th style="text-align:left;padding:8px 12px;color:var(--text-dim);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;">Marché</th>
+                      <th style="text-align:left;padding:8px 12px;color:var(--text-dim);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;">Pick</th>
+                      <th style="text-align:right;padding:8px 12px;color:var(--text-dim);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;">N</th>
+                      <th style="text-align:right;padding:8px 12px;color:var(--text-dim);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;">Win Rate</th>
+                      <th style="text-align:right;padding:8px 12px;color:var(--text-dim);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;">ROI</th>
+                      <th style="text-align:right;padding:8px 12px;color:var(--text-dim);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;">Wins</th>
+                      <th style="text-align:right;padding:8px 12px;color:var(--text-dim);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;">Loss</th>
+                      <th style="text-align:right;padding:8px 12px;color:var(--text-dim);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;">w/Odds</th>
+                    </tr>
+                  </thead>
+                  <tbody>${rows}</tbody>
+                </table>
+              </div>
+              <div style="margin-top:8px;font-size:10.5px;color:var(--text-dim2);font-style:italic;">
+                ROI calculé sur la colonne <b>w/Odds</b> uniquement (matchs avec cote book per-marché snapshotée Sprint 67). Plus le snapshot s'enrichit, plus le ROI devient fiable.
+              </div>
+            </div>`;
+        })() : ''}
 
         ${currentTab === 'sport' && sportCards.length ? `
         <div style="margin-top:18px;">
