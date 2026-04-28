@@ -54,9 +54,11 @@
   try { window.passesValueFilter = passesValueFilter; window.advFilters = advFilters; } catch(e){}
   let advFiltersOpen = advFiltersActive();
   // Théo only bets on Winamax, so hide everything else by default.
-  // Always on: non-Winamax events are stripped at the pipeline level (scripts/patch_winamax.py)
-  // so the toggle is moot. Kept as a constant so existing filter gates stay readable.
-  const winamaxOnly = true;
+  // Sprint 78 (v31.7.165) — Devenu `let` pour respecter `bookmakerMode` (3 états).
+  // Sync via _syncWinamaxOnlyFromMode() ci-dessous quand le toggle change.
+  // - mode='exact' / 'catalog' : winamaxOnly=true (= ancien comportement)
+  // - mode='all' : winamaxOnly=false (montre tous les matchs détectés)
+  let winamaxOnly = true;
 
   // Sprint 78 (v31.7.165 — audit ChatGPT P0) — Bookmaker mode 3-state.
   // L'audit demande un toggle visible : "all" (tous les matchs détectés),
@@ -74,9 +76,14 @@
   function setBookmakerMode(mode) {
     if (!['all', 'catalog', 'exact'].includes(mode)) return;
     bookmakerMode = mode;
+    // Sprint 78 — Sync winamaxOnly avec le mode courant. 'all' = no filter,
+    // 'catalog' / 'exact' = filtre actif (l'ancien comportement par défaut).
+    winamaxOnly = mode !== 'all';
     try { localStorage.setItem(BOOKMAKER_MODE_KEY, mode); } catch(e){}
     try { window.bookmakerMode = mode; } catch(e){}
   }
+  // Sync initial : si l'user avait persisté 'all', il faut désactiver winamaxOnly maintenant
+  if (bookmakerMode === 'all') winamaxOnly = false;
   function isBookableInMode(match, mode) {
     mode = mode || bookmakerMode;
     if (!match) return false;
@@ -8276,7 +8283,11 @@
         const hasWeather = w && (typeof w.precip_mm === 'number' || typeof w.wind_kmh === 'number' || typeof w.temp_c === 'number');
         const hasRef = ref && ref.name;
         const hasCong = congH >= 2 || congA >= 2;
-        if (!hasWeather && !hasRef && !hasCong) return '';
+        // FIX live test (Sprints 58, 80, 84) — supprimé l'early return qui
+        // bloquait Risques/Transparence/Marchés évalués pour les matchs sans
+        // météo/arbitre/congestion (= la plupart des tennis/basket/MLB/NHL).
+        // La section "Contexte extérieur" devient conditionnelle plus bas.
+        const hasContextSection = hasWeather || hasRef || hasCong;
         const wcodeIcon = (c) => {
           if (c == null) return '🌡️';
           if (c >= 95) return '⛈️';
@@ -8498,7 +8509,9 @@
             </div>
           `;
         })();
-        return risksHtml + transparenceHtml + alternativesHtml + `
+        // FIX live test : la section Contexte extérieur reste conditionnelle
+        // mais les autres (Risques, Transparence, Marchés évalués) passent toujours.
+        return risksHtml + transparenceHtml + alternativesHtml + (hasContextSection ? `
         <div class="section">
           <h4>🌐 Contexte extérieur</h4>
           <div class="two-cols">
@@ -8526,7 +8539,7 @@
                 ${(congH >= 3 || congA >= 3) ? `<div style="margin-top:6px;font-size:11px;color:var(--text-dim2,#7b8693);line-height:1.3;">L'équipe la plus chargée subit un léger malus (fatigue cumulée).</div>` : ''}
               </div>` : ''}
           </div>
-        </div>`;
+        </div>` : '');
       })()}
 
       ${((home?.lineup?.starters?.length || 0) + (away?.lineup?.starters?.length || 0) > 0) ? (() => {
@@ -17566,26 +17579,39 @@
     }));
     const found = ids.map(id => matchById.get(id)).filter(Boolean);
     const missing = ids.length - found.length;
-    if (!found.length) {
+    // Sprint 72 fix (test live MCP) — quand ids.length > 0 mais found.length === 0
+    // (matchs hors fenêtre rolling), on continuait à return l'empty state SANS
+    // les sub-tabs Équipes/Ligues/Sports/Marchés/Alertes. Bug d'UX : l'user ne
+    // pouvait pas accéder aux autres onglets.
+    // Fix : si l'utilisateur a d'autres entrées dans la watchlist (teams, leagues,
+    // sports, markets, alerts), on rend la page complète avec un placeholder dans
+    // l'onglet Matchs au lieu de bloquer toute la page.
+    const hasOtherEntries = wl.teams.length || wl.leagues.length || wl.sports.length || wl.markets.length || rules.length;
+    if (!found.length && !hasOtherEntries) {
       // AUDIT-2026-04-27 (Sprint 46 #27) — Distinguer "data pas encore
-      // chargé" (LITE blob) vs "match passé hors fenêtre". Évite de
-      // dire "déjà joués" alors que l'user vient de sauvegarder.
+      // chargé" (LITE blob) vs "match passé hors fenêtre".
       const isLite = !!(data && data._lite);
       wrap.innerHTML = `
         <div class="page-wrap">
           <div class="page-header">
-            <div class="lbl-tiny" style="color:var(--brand);">Mes favoris</div>
-            <h1 class="page-h1">⭐ Favoris</h1>
+            <div class="lbl-tiny" style="color:var(--brand);">Mes favoris &amp; alertes</div>
+            <h1 class="page-h1">⭐ Favoris &amp; alertes</h1>
           </div>
-          <div class="empty-state-v2">
+          ${subTabsHtml}
+          <div class="empty-state-v2" style="margin-top:18px;">
             <div class="es-illustration">${isLite ? '⏳' : '📅'}</div>
-            <div class="es-title-v2">${isLite ? 'Chargement de l\'archive complète…' : 'Favoris hors fenêtre'}</div>
+            <div class="es-title-v2">${isLite ? 'Chargement de l\'archive complète…' : 'Favoris matchs hors fenêtre'}</div>
             <div class="es-body-v2">${isLite
               ? 'Le site charge les 14 derniers jours en arrière-plan. Reviens dans quelques secondes.'
-              : `${ids.length} match${ids.length>1?'s':''} sauvegardé${ids.length>1?'s':''} mais hors fenêtre rolling 14 jours (déjà joués → page <button class="page-btn" data-page="bilan" style="background:transparent;border:none;color:var(--brand);text-decoration:underline;cursor:pointer;font-weight:700;padding:0;">Bilan</button>) ou trop futurs (page Calendrier 7j).`
+              : `${ids.length} match${ids.length>1?'s':''} sauvegardé${ids.length>1?'s':''} mais hors fenêtre rolling 14 jours. Tu peux toujours suivre des équipes / ligues / sports / marchés via les autres onglets.`
             }</div>
           </div>
         </div>`;
+      // Wire les onglets qu'on vient de rendre
+      wrap.querySelectorAll('[data-favoris-tab]').forEach(b => b.addEventListener('click', () => {
+        _setFavorisTab(b.dataset.favorisTab);
+        renderFavorisPage(wrap);
+      }));
       return;
     }
     const rows = found.map(m => {
