@@ -43,7 +43,7 @@
   // legacy) mais aucun lien ne pointe plus vers cette valeur.
   // v31.7.77 — 'calendrier' ajouté pour vue 7 jours groupée (user feedback
   // "je veux voir au moins une semaine de pronos jour par jour").
-  const VALID_PAGES = ['dashboard','tous','locks','buteurs','combines','top','historique','bilan','backtest','academie','credibilite','alertes','profil','sante','legal','methodologie','montante-jour','montante-weekend','montante-semaine','compare','calendrier','league','favoris','matchs'];
+  const VALID_PAGES = ['dashboard','tous','locks','buteurs','combines','top','historique','bilan','backtest','academie','credibilite','alertes','profil','sante','legal','methodologie','montante-jour','montante-weekend','montante-semaine','compare','calendrier','league','favoris','matchs','performance'];
   // v30 — 'mesparis' retiré : Théo n'enregistre pas ses paris sur le site.
   // v31 — 'legal' + 'methodologie' ajoutés (transparence + dictionnaire des
   // métriques, en réponse à l'audit ChatGPT 2026-04-26).
@@ -939,6 +939,44 @@
     'usa.1', 'mex.1',  // ligues nord-américaines majeures
   ]);
   const _knockoutHints = /(final|finale|semi|demi|quarter|quart|round of 16|huiti|knockout|playoff|elimina)/i;
+  // Sprint 51 (v31.7.140) — Derby detection. Liste empirique des grands
+  // derbies/clasicos qui doivent toujours être surfacés même sans CL/finale.
+  // Format : ensemble de paires triées alphabétiquement (séparées par '|')
+  // pour éviter les ambiguïtés home/away.
+  const _bigDerbies = new Set([
+    // Foot
+    'arsenal|tottenham', 'liverpool|manchester united', 'liverpool|manchester city',
+    'manchester city|manchester united', 'chelsea|tottenham', 'arsenal|chelsea',
+    'real madrid|barcelona', 'atletico madrid|real madrid', 'barcelona|atletico madrid',
+    'bayern munich|borussia dortmund', 'milan|inter milan', 'inter milan|juventus',
+    'milan|juventus', 'as roma|lazio', 'napoli|juventus',
+    'paris saint-germain|marseille', 'olympique lyon|saint etienne', 'olympique lyon|olympique marseille',
+    'celtic|rangers', 'galatasaray|fenerbahce', 'fenerbahce|besiktas', 'galatasaray|besiktas',
+    'boca juniors|river plate', 'flamengo|fluminense', 'corinthians|palmeiras',
+    'olympiakos|panathinaikos',
+    // Tennis (rivalries iconiques)
+    'rafael nadal|novak djokovic', 'roger federer|rafael nadal', 'novak djokovic|roger federer',
+    'carlos alcaraz|jannik sinner', 'iga swiatek|aryna sabalenka',
+    // NBA
+    'lakers|celtics', 'lakers|warriors', 'celtics|76ers', 'celtics|knicks',
+    'warriors|cavaliers', 'heat|celtics',
+  ]);
+  function _isDerby(match) {
+    try {
+      const sides = getSides(match);
+      const hN = String(sides.home?.name || '').toLowerCase();
+      const aN = String(sides.away?.name || '').toLowerCase();
+      if (!hN || !aN) return false;
+      const pair = [hN, aN].sort().join('|');
+      if (_bigDerbies.has(pair)) return true;
+      // Match partiel (substring de team name dans la liste)
+      for (const d of _bigDerbies) {
+        const [t1, t2] = d.split('|');
+        if ((hN.includes(t1) && aN.includes(t2)) || (hN.includes(t2) && aN.includes(t1))) return true;
+      }
+      return false;
+    } catch(e) { return false; }
+  }
   function matchImportance(match) {
     if (!match || !match.competitors) return 0;
     let score = 0;
@@ -986,6 +1024,27 @@
     } catch(e) {}
     // Sport multiplier
     if (match.sport === 'football') score += 5;
+    // Sprint 51 (v31.7.140) — Derby detection (+15)
+    if (_isDerby(match)) score += 15;
+    // Sprint 51 — ESPN team rank/standings position boost.
+    // Si une des équipes est dans le top 3 du classement, +10.
+    // Si les deux sont top 5, +15 (gros choc de haut de tableau).
+    try {
+      const sides = getSides(match);
+      const getRank = (comp) => {
+        if (!comp || !comp.rank) return null;
+        const r = parseInt(comp.rank, 10);
+        return isFinite(r) ? r : null;
+      };
+      const rH = getRank(sides.home);
+      const rA = getRank(sides.away);
+      if (rH != null && rA != null) {
+        if (rH <= 3 && rA <= 3) score += 18;        // top-3 vs top-3 = choc
+        else if (rH <= 5 && rA <= 5) score += 12;   // top-5 vs top-5
+        else if (rH <= 3 || rA <= 3) score += 8;    // un top-3
+        else if (rH <= 5 || rA <= 5) score += 4;
+      }
+    } catch(e) {}
     // Cap 100
     return Math.min(100, Math.max(0, score));
   }
@@ -6752,10 +6811,33 @@
               // (>2.8), Over 2.5 est souvent le pick le plus fiable.
               const mk = pred.markets;
               if (!mk || match.sport !== 'football') return '';
-              const chipHtml = (pick, bgColor, borderColor, textColor, icon) => {
+              // Sprint 50 (v31.7.139) — Edge + Kelly per-marché. Récupère les
+              // cotes Winamax pour OU 2.5 et BTTS et calcule edge = proba modèle
+              // - 1/cote_book. Si edge > 3% → affichage colorisé (vert) + Kelly
+              // fractionnel (cap à 5% pour markets dérivés, plus prudent que
+              // les pick principaux 1X2 qui sont au cap 10%).
+              const wxMk = match.winamax && match.winamax.markets;
+              const computeEdgeBlock = (modelProb, bookOdd) => {
+                if (!(bookOdd > 1) || !(modelProb > 0)) return null;
+                const impliedProb = 1 / bookOdd;
+                const edge = modelProb - impliedProb;
+                // Kelly fractionnel : (b*p - q) / b, b = bookOdd - 1
+                const b = bookOdd - 1;
+                const kelly = b > 0 ? Math.max(0, (b * modelProb - (1 - modelProb)) / b) : 0;
+                const kellyFractional = Math.min(0.05, kelly * 0.5);  // demi-Kelly cap 5%
+                return { edge, kelly: kellyFractional, bookOdd, impliedProb };
+              };
+              const chipHtml = (pick, bgColor, borderColor, textColor, icon, bookOdd) => {
                 const probPct = (pick.prob * 100).toFixed(0);
                 const impliedOdd = pick.prob > 0.02 ? (1 / pick.prob).toFixed(2) : '—';
                 const strong = pick.prob >= 0.65;
+                const eb = bookOdd ? computeEdgeBlock(pick.prob, bookOdd) : null;
+                const edgeBadge = eb ? `
+                  <div style="margin-top:6px;padding-top:6px;border-top:1px solid ${borderColor};display:flex;gap:10px;font-size:11px;font-variant-numeric:tabular-nums;">
+                    <span style="color:var(--text-dim,#b4bcc7);">cote Wx <b style="color:var(--text,#e6ebf2);">@${bookOdd.toFixed(2)}</b></span>
+                    <span style="color:${eb.edge >= 0.03 ? 'var(--accent,#22c55e)' : eb.edge <= -0.05 ? 'var(--danger,#ef4444)' : 'var(--text-dim2,#7b8693)'};font-weight:700;">edge ${eb.edge >= 0 ? '+' : ''}${(eb.edge * 100).toFixed(1)}pt</span>
+                    ${eb.kelly > 0.005 ? `<span style="color:var(--brand,#a78bfa);">Kelly ${(eb.kelly * 100).toFixed(1)}%</span>` : ''}
+                  </div>` : '';
                 return `<div style="flex:1;min-width:140px;padding:10px 12px;border-radius:8px;background:${bgColor};border:1px solid ${borderColor};">
                   <div style="font-size:10px;letter-spacing:.5px;text-transform:uppercase;color:var(--text-dim2,#7b8693);margin-bottom:3px;">${icon} ${pick === mk.ou ? 'Plus/Moins 2.5' : 'Les deux marquent'}</div>
                   <div style="font-size:14px;font-weight:700;color:${textColor};">${esc(pick.label)}${strong ? ' ⭐' : ''}</div>
@@ -6763,8 +6845,18 @@
                     <span><b style="color:var(--text,#e6ebf2);">${probPct}%</b> proba</span>
                     <span>cote impl. <b style="color:var(--text,#e6ebf2);">${impliedOdd}</b></span>
                   </div>
+                  ${edgeBadge}
                 </div>`;
               };
+              // Récupère les cotes book pour les marchés dérivés
+              const ouBookOdd = (() => {
+                if (!wxMk || !wxMk.ou25) return null;
+                return mk.ou.side === 'over' ? Number(wxMk.ou25.over) : Number(wxMk.ou25.under);
+              })();
+              const bttsBookOdd = (() => {
+                if (!wxMk || !wxMk.btts) return null;
+                return mk.btts.side === 'yes' ? Number(wxMk.btts.yes) : Number(wxMk.btts.no);
+              })();
               // Sprint 49 (v31.7.138 — Phase 3) : exposition des marchés étendus
               // dérivés du même Poisson (Double Chance, Score exact, OU 1.5/3.5,
               // mi-temps). Ne les affiche que s'ils sont actionnables (proba ≥ 0.55).
@@ -6792,8 +6884,8 @@
               return `<div style="margin-top:14px;">
                 <div class="lbl-tiny-mb">🥅 Marchés buts (Poisson)</div>
                 <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                  ${chipHtml(mk.ou, 'rgba(139,92,246,.08)', 'rgba(139,92,246,.25)', '#a78bfa', '⚽')}
-                  ${chipHtml(mk.btts, 'rgba(236,72,153,.08)', 'rgba(236,72,153,.25)', '#f472b6', '🔄')}
+                  ${chipHtml(mk.ou, 'rgba(139,92,246,.08)', 'rgba(139,92,246,.25)', '#a78bfa', '⚽', ouBookOdd)}
+                  ${chipHtml(mk.btts, 'rgba(236,72,153,.08)', 'rgba(236,72,153,.25)', '#f472b6', '🔄', bttsBookOdd)}
                   ${extChips}
                 </div>
                 <div style="margin-top:6px;font-size:10.5px;color:var(--text-dim2,#7b8693);line-height:1.3;">Picks alternatifs dérivés des buts attendus (${pred.poisson ? `xG ${pred.poisson.xgH.toFixed(2)}–${pred.poisson.xgA.toFixed(2)}` : 'modèle Poisson'}). ⭐ = ≥65%.${ext ? ' Marchés étendus : double chance, score exact, mi-temps.' : ''}</div>
@@ -13838,12 +13930,16 @@
     const isFavoris = currentPage === 'favoris';
     // Sprint 48 (v31.7.137) — Matchs détectés page (Phase 2 brief Théo)
     const isMatchs = currentPage === 'matchs';
+    // Sprint 52 (v31.7.141) — Performance page : hub unifié Bilan + Historique + Backtest + Crédibilité
+    const isPerformance = currentPage === 'performance';
 
     // v23 — Sous-nav "Mon suivi" (historique/bilan/backtest).
     // v30 — "Mes paris" retiré : Théo n'enregistre pas ses paris sur le
     // site (ni manuel, ni import Winamax). Tout le tracking utilisateur
     // a été désactivé.
-    const suiviPages = ['historique', 'bilan', 'backtest'];
+    // Sprint 52 (v31.7.141) — Onglet "Performance" est le hub global, regroupe
+    // tous les autres comme onglets internes (cf. renderPerformancePage).
+    const suiviPages = ['performance', 'historique', 'bilan', 'backtest'];
     const isSuivi = suiviPages.includes(currentPage);
     let suiviNav = document.getElementById('suivi-subnav');
     if (isSuivi) {
@@ -13854,9 +13950,10 @@
         (document.querySelector('main') || document.body).insertBefore(suiviNav, (document.querySelector('main') || document.body).firstChild);
       }
       const tabs = [
-        { k:'historique', emoji:'📜', label:'Historique' },
-        { k:'bilan',      emoji:'📊', label:'Bilan' },
-        { k:'backtest',   emoji:'📈', label:'Performance' },
+        { k:'performance', emoji:'🎯', label:'Vue globale' },
+        { k:'historique',  emoji:'📜', label:'Historique' },
+        { k:'bilan',       emoji:'📊', label:'Bilan' },
+        { k:'backtest',    emoji:'📈', label:'Backtest' },
       ];
       suiviNav.innerHTML = tabs.map(t => `
         <button data-suivi-page="${t.k}" style="padding:8px 14px;border-radius:var(--r);border:1px solid ${currentPage===t.k?'var(--brand)':'var(--border-2)'};background:${currentPage===t.k?'var(--brand-soft)':'var(--panel)'};color:${currentPage===t.k?'var(--brand)':'var(--text-2)'};font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;">${t.emoji} ${t.label}</button>
@@ -14076,6 +14173,36 @@
     favorisWrap.style.display = isFavoris ? '' : 'none';
     if (isFavoris) {
       try { renderFavorisPage(favorisWrap); } catch(e) { console.warn('renderFavorisPage failed', e); }
+    }
+
+    // Sprint 52 (v31.7.141) — Performance : page hub qui groupe Vue globale,
+    // Historique, Bilan, Backtest, Calibration. KPIs synthétiques en tête,
+    // sub-nav pour switcher. Réponse au feedback "fusionner Bilan/Historique
+    // dans une seule Performance avec onglets".
+    let perfWrap = document.getElementById('performance-wrap');
+    if (!perfWrap) {
+      perfWrap = document.createElement('div');
+      perfWrap.id = 'performance-wrap';
+      (document.querySelector('main') || document.body).appendChild(perfWrap);
+    }
+    perfWrap.style.display = isPerformance ? '' : 'none';
+    if (isPerformance) {
+      if (window.PRONOSTICS_DATA && window.PRONOSTICS_DATA._lite && typeof window._ensureFullData === 'function') {
+        perfWrap.innerHTML = `
+          <div class="page-wrap">
+            <div class="page-header">
+              <div class="lbl-tiny" style="color:var(--brand);">Performance · Vue globale</div>
+              <h1 class="page-h1">🎯 Performance</h1>
+              <div class="skeleton-text w-70"></div>
+            </div>
+            <div style="margin-top:16px;">${'<div class="skeleton-card"></div>'.repeat(3)}</div>
+          </div>`;
+        window._ensureFullData().then(() => { try { renderPerformancePage(perfWrap); } catch(e) { console.warn('renderPerformancePage failed', e); } }).catch(() => {
+          try { renderPerformancePage(perfWrap); } catch(e) { console.warn('renderPerformancePage failed', e); }
+        });
+      } else {
+        try { renderPerformancePage(perfWrap); } catch(e) { console.warn('renderPerformancePage failed', e); }
+      }
     }
 
     // Sprint 48 (v31.7.137) — "Tous les matchs détectés" : vue exhaustive
@@ -15716,6 +15843,155 @@
     });
   }
   try { window.renderMatchsPage = renderMatchsPage; } catch(e){}
+
+  // ======= Sprint 52 (v31.7.141) — renderPerformancePage =======
+  // Vue globale "Performance" qui agrège les KPIs clés (ROI cumul, Win Rate,
+  // Brier, calibration drift) avec liens vers les onglets détaillés.
+  // Le but : Théo voit en 5 secondes si le modèle se porte bien, sans avoir
+  // à naviguer entre Bilan, Backtest, Crédibilité.
+  function renderPerformancePage(wrap) {
+    const bt = window.__backtestReportV2 || window.__backtestReport;
+    if (!bt) {
+      wrap.innerHTML = `
+        <div class="page-wrap">
+          <div class="page-header">
+            <div class="lbl-tiny" style="color:var(--brand);">Performance · Vue globale</div>
+            <h1 class="page-h1">🎯 Performance</h1>
+          </div>
+          <div class="empty-state-v2">
+            <div class="es-illustration">📊</div>
+            <div class="es-title-v2">Backtest pas encore chargé</div>
+            <div class="es-body-v2">Le rapport est en cours de chargement. Reviens dans quelques secondes.</div>
+          </div>
+        </div>`;
+      return;
+    }
+    // KPIs globaux (depuis backtest_report_v2)
+    const overall = bt.overall || bt.global || {};
+    const n = overall.n || 0;
+    const wr = overall.win_rate ?? overall.winRate ?? null;
+    const roi = overall.roi ?? null;
+    const brier = overall.brier ?? null;
+    const profit = overall.profit ?? null;
+    const stake = overall.total_stake ?? overall.stake ?? null;
+    // Per-sport breakdown
+    const perSport = bt.by_sport || bt.perSport || {};
+    const sportCards = Object.entries(perSport)
+      .filter(([k, v]) => v && (v.n || 0) > 0)
+      .sort((a, b) => (b[1].n || 0) - (a[1].n || 0))
+      .slice(0, 8);
+    const fmtPct = (v) => v == null ? '—' : `${(Number(v) * 100).toFixed(1)}%`;
+    const fmtSign = (v) => {
+      if (v == null) return '—';
+      const num = Number(v);
+      const sign = num >= 0 ? '+' : '';
+      return `${sign}${(num * 100).toFixed(1)}%`;
+    };
+    const sportEmojis = { football: '⚽', tennis: '🎾', basketball: '🏀', hockey: '🏒', baseball: '⚾' };
+    const kpiTile = (label, value, sub, color) => `
+      <div class="kpi-tile" style="padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
+        <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">${esc(label)}</div>
+        <div style="font-size:28px;font-weight:800;color:${color || 'var(--text)'};margin-top:4px;font-variant-numeric:tabular-nums;">${esc(String(value))}</div>
+        ${sub ? `<div style="font-size:11px;color:var(--text-dim);margin-top:2px;">${esc(sub)}</div>` : ''}
+      </div>`;
+    const roiColor = roi == null ? 'var(--text)' : Number(roi) >= 0.02 ? 'var(--accent, #22c55e)' : Number(roi) >= -0.02 ? 'var(--warn, #c79b00)' : 'var(--danger, #ef4444)';
+    const brierColor = brier == null ? 'var(--text)' : Number(brier) <= 0.18 ? 'var(--accent, #22c55e)' : Number(brier) <= 0.22 ? 'var(--warn, #c79b00)' : 'var(--danger, #ef4444)';
+    // Tier breakdown
+    const perTier = bt.by_tier || {};
+    const tierRows = Object.entries(perTier)
+      .filter(([k, v]) => v && (v.n || 0) > 0)
+      .sort((a, b) => {
+        const order = { lock: 0, premium: 1, value: 2, standard: 3, low: 4 };
+        return (order[a[0]] ?? 5) - (order[b[0]] ?? 5);
+      });
+    wrap.innerHTML = `
+      <div class="page-wrap">
+        <div class="page-header">
+          <div class="lbl-tiny" style="color:var(--brand);">Performance · Vue globale</div>
+          <h1 class="page-h1">🎯 Performance</h1>
+          <div style="font-size:14px;color:var(--text-dim);">Synthèse du modèle sur ${n} pari${n > 1 ? 's' : ''} simulé${n > 1 ? 's' : ''}. Drill-down dans les onglets : Historique, Bilan, Backtest.</div>
+        </div>
+
+        <!-- KPIs principaux -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:18px;">
+          ${kpiTile('Win Rate', fmtPct(wr), `${n} pari${n > 1 ? 's' : ''}`, 'var(--text)')}
+          ${kpiTile('ROI cumul', fmtSign(roi), stake ? `mise totale ${Number(stake).toFixed(0)}€` : '', roiColor)}
+          ${kpiTile('Brier score', brier == null ? '—' : Number(brier).toFixed(3), brier == null ? '' : Number(brier) <= 0.18 ? 'Calibration excellente' : Number(brier) <= 0.22 ? 'Calibration correcte' : 'Calibration médiocre', brierColor)}
+          ${profit != null ? kpiTile('Profit cumul', `${Number(profit) >= 0 ? '+' : ''}${Number(profit).toFixed(2)}€`, '', Number(profit) >= 0 ? 'var(--accent)' : 'var(--danger)') : ''}
+        </div>
+
+        <!-- Per-sport breakdown -->
+        ${sportCards.length ? `
+        <div style="margin-top:24px;">
+          <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px;">Par sport</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;">
+            ${sportCards.map(([sport, s]) => {
+              const sN = s.n || 0;
+              const sWr = s.win_rate ?? s.winRate ?? null;
+              const sRoi = s.roi ?? null;
+              const sRoiColor = sRoi == null ? 'var(--text)' : Number(sRoi) >= 0.02 ? 'var(--accent)' : Number(sRoi) >= -0.02 ? 'var(--warn)' : 'var(--danger)';
+              return `
+              <div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                  <span style="font-size:14px;font-weight:700;color:var(--text);">${sportEmojis[sport] || '🎯'} ${esc(sport)}</span>
+                  <span style="font-size:11px;color:var(--text-dim);">${sN} pari${sN > 1 ? 's' : ''}</span>
+                </div>
+                <div style="display:flex;gap:14px;font-size:12px;font-variant-numeric:tabular-nums;">
+                  <span style="color:var(--text-dim);">WR <b style="color:var(--text);">${fmtPct(sWr)}</b></span>
+                  <span style="color:var(--text-dim);">ROI <b style="color:${sRoiColor};">${fmtSign(sRoi)}</b></span>
+                </div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>` : ''}
+
+        <!-- Per-tier breakdown -->
+        ${tierRows.length ? `
+        <div style="margin-top:24px;">
+          <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px;">Par confiance (tier)</div>
+          <div style="overflow-x:auto;">
+            <table style="width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:13px;">
+              <thead>
+                <tr style="border-bottom:1px solid var(--border);">
+                  <th style="text-align:left;padding:8px 12px;color:var(--text-dim);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;">Tier</th>
+                  <th style="text-align:right;padding:8px 12px;color:var(--text-dim);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;">N paris</th>
+                  <th style="text-align:right;padding:8px 12px;color:var(--text-dim);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;">Win Rate</th>
+                  <th style="text-align:right;padding:8px 12px;color:var(--text-dim);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;">ROI</th>
+                  <th style="text-align:right;padding:8px 12px;color:var(--text-dim);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;">Brier</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${tierRows.map(([tier, t]) => {
+                  const tRoi = t.roi ?? null;
+                  const tColor = tRoi == null ? 'var(--text)' : Number(tRoi) >= 0.02 ? 'var(--accent)' : Number(tRoi) >= -0.02 ? 'var(--warn)' : 'var(--danger)';
+                  return `
+                  <tr style="border-bottom:1px solid var(--border);">
+                    <td style="padding:8px 12px;color:var(--text);font-weight:600;text-transform:capitalize;">${esc(tier)}</td>
+                    <td style="padding:8px 12px;text-align:right;color:var(--text-dim);">${t.n || 0}</td>
+                    <td style="padding:8px 12px;text-align:right;color:var(--text);">${fmtPct(t.win_rate ?? t.winRate)}</td>
+                    <td style="padding:8px 12px;text-align:right;color:${tColor};font-weight:700;">${fmtSign(tRoi)}</td>
+                    <td style="padding:8px 12px;text-align:right;color:var(--text-dim);">${t.brier != null ? Number(t.brier).toFixed(3) : '—'}</td>
+                  </tr>`;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>` : ''}
+
+        <!-- Liens vers les onglets détaillés -->
+        <div style="margin-top:32px;padding:18px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
+          <div style="font-size:13px;color:var(--text-dim);margin-bottom:10px;">Drill-down détaillé :</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="page-btn" data-page="historique" style="padding:8px 14px;background:transparent;color:var(--text);border:1px solid var(--border-2);border-radius:var(--r-sm);font-weight:600;font-size:13px;cursor:pointer;">📜 Historique complet</button>
+            <button class="page-btn" data-page="bilan" style="padding:8px 14px;background:transparent;color:var(--text);border:1px solid var(--border-2);border-radius:var(--r-sm);font-weight:600;font-size:13px;cursor:pointer;">📊 Bilan détaillé</button>
+            <button class="page-btn" data-page="backtest" style="padding:8px 14px;background:transparent;color:var(--text);border:1px solid var(--border-2);border-radius:var(--r-sm);font-weight:600;font-size:13px;cursor:pointer;">📈 Backtest méthodologie</button>
+            <button class="page-btn" data-page="credibilite" style="padding:8px 14px;background:transparent;color:var(--text);border:1px solid var(--border-2);border-radius:var(--r-sm);font-weight:600;font-size:13px;cursor:pointer;">🎯 Calibration</button>
+          </div>
+          <div style="margin-top:8px;font-size:11px;color:var(--text-dim2);">Source : <code style="color:var(--brand);">backtest_report_v2.json</code> · regénéré chaque dimanche par cron.</div>
+        </div>
+      </div>`;
+  }
+  try { window.renderPerformancePage = renderPerformancePage; } catch(e){}
 
   // AUDIT-2026-04-27 (Sprint 22 #18) — Expose pour CSP-safe delegation.
   // window.renderLeaguePage défini explicitement après la définition.
