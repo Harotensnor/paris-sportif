@@ -6,6 +6,27 @@ des pronostics simples/combinés/montantes séquentielles, et une vue bilan.
 Déployé sur GitHub Pages. Client = navigateur ; données = fichier `data.js`
 régénéré en continu.
 
+## Architecture v31.7.141 (mise à jour 2026-04-28 — Sprints 50-52 edge + V2 + Performance)
+
+**Sprint 50 (Phase 3 — v31.7.139)** — Edge + Kelly per-marché OU 2.5 / BTTS.
+La modal détail expose maintenant la cote Winamax ET l'edge (proba modèle
+- 1/cote_book) avec couleur (vert ≥ 3pt, rouge ≤ -5pt) + Kelly fractionnel
+demi-Kelly cap 5% (plus prudent que 1X2 cap 10%).
+
+**Sprint 51 (Phase 7 — v31.7.140)** — `matchImportance V2`. Ajout :
+- Derby detection (`_isDerby` + `_bigDerbies` set ~30 paires foot/tennis/NBA :
+  Clasico, Manchester derby, Bayern-Dortmund, Boca-River, Lakers-Celtics…).
+- ESPN team rank boost (+18 si top-3 vs top-3, +12 si top-5 vs top-5).
+
+**Sprint 52 (Phase 4 — v31.7.141)** — Page `#performance` "Vue globale".
+Hub unifié qui agrège les KPIs clés (Win Rate, ROI cumul, Brier, Profit)
++ breakdown per-sport et per-tier (lock/premium/value/standard) + liens
+vers Historique/Bilan/Backtest/Crédibilité. Lit `__backtestReportV2`.
+- VALID_PAGES étendu (`'performance'`).
+- suiviPages étendu : Performance / Historique / Bilan / Backtest.
+- Nav menu : "🎯 Vue globale" sous "Ma perf", badge "Nouveau".
+- Cmd-K palette : entrée "Aller à Performance (Vue globale)".
+
 ## Architecture v31.7.138 (mise à jour 2026-04-28 — Sprint 49 marchés étendus foot)
 
 **Sprint 49 (Phase 3 — overhaul user-driven 2026-04-28)** — réponse à

@@ -485,6 +485,7 @@
   <div class="hub" data-hub="perf">
     <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">📊 Ma perf <span class="chev">▾</span></button>
     <div class="hub-menu" role="menu" aria-label="Sous-menu Ma perf">
+      <button class="page-btn" role="menuitem" data-page="performance">🎯 Vue globale<span class="nav-new-badge" data-new-until="2026-05-30">Nouveau</span></button>
       <button class="page-btn" role="menuitem" data-page="bilan">💰 Bilan</button>
       <button class="page-btn" role="menuitem" data-page="historique">📜 Historique</button>
     </div>
@@ -982,7 +983,8 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-27T19:40:06.549094Z","today":"
     {label:'Aller à Buteurs', icon:'⚽', keywords:'buteurs buts over under btts', action: function(){ var b=document.querySelector('.page-btn[data-page="buteurs"]'); if(b) b.click(); }},
     {label:'Aller à Combinés', icon:'🔗', keywords:'combines combos', action: function(){ var b=document.querySelector('.page-btn[data-page="combines"]'); if(b) b.click(); }},
     // v30 — Entrée "Mes paris" retirée du command palette (page supprimée).
-    {label:'Aller à Performance (Backtest)', icon:'📈', keywords:'backtest performance courbe', action: function(){ var b=document.querySelector('.page-btn[data-page="backtest"]'); if(b) b.click(); }},
+    {label:'Aller à Performance (Vue globale)', icon:'🎯', keywords:'performance vue globale kpi roi brier synth', action: function(){ var b=document.querySelector('.page-btn[data-page="performance"]'); if(b) b.click(); }},
+    {label:'Aller à Backtest méthodologie', icon:'📈', keywords:'backtest performance courbe methode', action: function(){ var b=document.querySelector('.page-btn[data-page="backtest"]'); if(b) b.click(); }},
     {label:'Aller à Historique', icon:'📜', keywords:'historique passe ancien', action: function(){ var b=document.querySelector('.page-btn[data-page="historique"]'); if(b) b.click(); }},
     {label:'Aller à Bilan', icon:'📊', keywords:'bilan stats resume', action: function(){ var b=document.querySelector('.page-btn[data-page="bilan"]'); if(b) b.click(); }},
     {label:'Aller à Top Pronos', icon:'⭐', keywords:'top pronos best meilleurs', action: function(){ var b=document.querySelector('.page-btn[data-page="top"]'); if(b) b.click(); }},
