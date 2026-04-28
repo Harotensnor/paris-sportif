@@ -6,6 +6,36 @@ des pronostics simples/combinés/montantes séquentielles, et une vue bilan.
 Déployé sur GitHub Pages. Client = navigateur ; données = fichier `data.js`
 régénéré en continu.
 
+## Architecture v31.7.163 (mise à jour 2026-04-28 — Sprints 72-76 câblage UI + ROI per-marché)
+
+**Sprint 72 (UI — v31.7.160)** — Page `#favoris` refait en multi-onglets :
+Matchs / Équipes / Ligues / Sports / Marchés / Alertes. Tab persisté
+(`localStorage.favorisTab`). Câble les helpers Sprint 70 (`_loadWatchlist`,
+`_toggleWatchlistEntry`, `_loadAlertRules`, `_removeAlertRule`). Boutons
+toggle pour sports/marchés (5 + 8 chips), liste cliquable pour teams/
+leagues, table d'alertes avec suppression. Empty state riche.
+
+**Sprint 73 (UI — v31.7.161)** — Page `#combines` ajoute "🎲 Combinés
+multi-types" en tête : 4 cartes (Safe, Best Edge, Buts, Demain) qui
+appellent `buildComboVariants(picksAll)` (Sprint 71). Chaque carte
+affiche jambes cliquables (→ openDetail), cote totale, retour 10€,
+corrélation moyenne (vert <20%, jaune <40%, rouge ≥40%). Empty state
+si pas assez de picks indépendants.
+
+**Sprint 74 (UI — v31.7.162)** — Page `#performance` onglet "Marché"
+branche `backtest_report_markets.json` (Sprint 66+76). Lecture via
+`window.__backtestReportMarkets` chargé au boot par `_loadMarketBacktest()`.
+Table : Marché × Pick × N × Win Rate × ROI × Wins × Loss × w/Odds.
+
+**Sprint 75 (skip)** — Top Demain déjà couvert par Sprint 47 (section
+"🏆 Prochains gros matchs · 7j" sur le dashboard).
+
+**Sprint 76 (data — v31.7.163)** — `scripts/backtest_by_market.py`
+calcule maintenant le ROI per (marché, pick) en plus du WR. Lit la cote
+book via `_get_secondary_odd()` (`odds_snapshot.markets` Sprint 67 +
+fallback `winamax.markets` live). 1€ flat stake. Report inclut désormais
+`with_odds`, `stake`, `profit`, `roi` per combinaison.
+
 ## Architecture v31.7.159 (mise à jour 2026-04-28 — Sprints 67-71 polish post-audit)
 
 **Sprint 67 (P0 — v31.7.155)** — `snapshot_odds.py` étendu pour capturer les

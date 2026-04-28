@@ -115,6 +115,33 @@ def evaluate_market_pure_python(match: dict, market_key: str, pick_value):
     return None
 
 
+def _get_secondary_odd(ev: dict, market_key: str, pick_value: str):
+    """Sprint 76 (v31.7.163) — Récupère la cote book per-marché secondaire
+    depuis odds_snapshot.markets (Sprint 67) ou winamax.markets (live).
+
+    Retourne la cote (float > 1) ou None.
+    """
+    snap_mk = (ev.get('odds_snapshot') or {}).get('markets') or {}
+    wnx_mk = (ev.get('winamax') or {}).get('markets') or {}
+    if market_key in ('ou25', 'ou15', 'ou35'):
+        bucket = snap_mk.get(market_key) or wnx_mk.get(market_key) or {}
+        if pick_value.startswith('O'):
+            v = bucket.get('over')
+            return float(v) if v else None
+        if pick_value.startswith('U'):
+            v = bucket.get('under')
+            return float(v) if v else None
+    elif market_key == 'btts':
+        bucket = snap_mk.get('btts') or wnx_mk.get('btts') or {}
+        if pick_value == 'BTTS_Y':
+            v = bucket.get('yes')
+            return float(v) if v else None
+        if pick_value == 'BTTS_N':
+            v = bucket.get('no')
+            return float(v) if v else None
+    return None
+
+
 def main():
     ap = argparse.ArgumentParser(description='Backtests par marché secondaire.')
     ap.add_argument('--limit', type=int, default=None,
@@ -128,7 +155,13 @@ def main():
 
     days = data.get('days') or {}
     completed_count = 0
-    by_market = defaultdict(lambda: {'n': 0, 'wins': 0, 'losses': 0, 'voids': 0, 'samples': []})
+    # Sprint 76 (v31.7.163) — Track WR + ROI per (market, pick).
+    # ROI utilisable seulement pour les combinaisons où une cote book est
+    # disponible (snapshot Sprint 67). Sinon on ne peut que compter WR.
+    by_market = defaultdict(lambda: {
+        'n': 0, 'wins': 0, 'losses': 0, 'voids': 0,
+        'with_odds': 0, 'stake': 0.0, 'profit': 0.0,
+    })
 
     for day_iso, evs in sorted(days.items()):
         for ev in evs or []:
@@ -137,48 +170,43 @@ def main():
             completed_count += 1
             if args.limit and completed_count > args.limit:
                 break
-            # Pour chaque marché, simuler le pick "side le plus probable"
-            # (Over si pOver >= 0.5 sinon Under, etc.). On n'a pas accès à
-            # predictMatch ici sans V8, donc on évalue tous les sides
-            # observables. Une vraie évaluation per-marché nécessite de
-            # rejouer predictMatch — voir TODO.
             sport = ev.get('sport')
             if sport == 'football':
-                # OU 2.5 — on évalue les 2 côtés
-                for pv in ['O2.5', 'U2.5', 'O1.5', 'U1.5', 'O3.5', 'U3.5']:
-                    market = pv[0] + '2.5' if '2.5' in pv else pv[0] + '1.5' if '1.5' in pv else pv[0] + '3.5'
-                    market_key = 'ou25' if '2.5' in pv else 'ou15' if '1.5' in pv else 'ou35'
+                def _track(market_key, pv):
                     res = evaluate_market_pure_python(ev, market_key, pv)
+                    bucket = by_market[f'{market_key}:{pv}']
                     if res is None:
-                        by_market[f'{market_key}:{pv}']['voids'] += 1
-                    else:
-                        by_market[f'{market_key}:{pv}']['n'] += 1
+                        bucket['voids'] += 1
+                        return
+                    bucket['n'] += 1
+                    odd = _get_secondary_odd(ev, market_key, pv)
+                    if odd and odd > 1:
+                        bucket['with_odds'] += 1
+                        bucket['stake'] += 1.0
                         if res == 'won':
-                            by_market[f'{market_key}:{pv}']['wins'] += 1
+                            bucket['wins'] += 1
+                            bucket['profit'] += float(odd) - 1.0
                         elif res == 'lost':
-                            by_market[f'{market_key}:{pv}']['losses'] += 1
+                            bucket['losses'] += 1
+                            bucket['profit'] -= 1.0
+                    else:
+                        if res == 'won':
+                            bucket['wins'] += 1
+                        elif res == 'lost':
+                            bucket['losses'] += 1
+                # OU 1.5 / 2.5 / 3.5
+                for pv in ['O2.5', 'U2.5']:
+                    _track('ou25', pv)
+                for pv in ['O1.5', 'U1.5']:
+                    _track('ou15', pv)
+                for pv in ['O3.5', 'U3.5']:
+                    _track('ou35', pv)
                 # BTTS
                 for pv in ['BTTS_Y', 'BTTS_N']:
-                    res = evaluate_market_pure_python(ev, 'btts', pv)
-                    if res is None:
-                        by_market[f'btts:{pv}']['voids'] += 1
-                    else:
-                        by_market[f'btts:{pv}']['n'] += 1
-                        if res == 'won':
-                            by_market[f'btts:{pv}']['wins'] += 1
-                        elif res == 'lost':
-                            by_market[f'btts:{pv}']['losses'] += 1
-                # Double Chance
+                    _track('btts', pv)
+                # Double Chance — pas de cote book per-marché en snapshot, juste WR
                 for pv in ['1X', 'X2', '12']:
-                    res = evaluate_market_pure_python(ev, 'doubleChance', pv)
-                    if res is None:
-                        by_market[f'doubleChance:{pv}']['voids'] += 1
-                    else:
-                        by_market[f'doubleChance:{pv}']['n'] += 1
-                        if res == 'won':
-                            by_market[f'doubleChance:{pv}']['wins'] += 1
-                        elif res == 'lost':
-                            by_market[f'doubleChance:{pv}']['losses'] += 1
+                    _track('doubleChance', pv)
         if args.limit and completed_count > args.limit:
             break
 
@@ -187,32 +215,36 @@ def main():
     for k, v in by_market.items():
         n = v['n']
         wr = v['wins'] / n if n > 0 else None
-        # Sample-base — pas de notion de mise/cote ici (ce script évalue la
-        # frontière "le pick gagne ou pas"), donc pas de ROI calculé tant
-        # qu'on n'a pas une cote book associée.
+        roi = (v['profit'] / v['stake']) if v['stake'] > 0 else None
         summary[k] = {
             'n': n,
             'wins': v['wins'],
             'losses': v['losses'],
             'voids': v['voids'],
             'win_rate': wr,
+            # Sprint 76 — ROI computé quand cote book dispo
+            'with_odds': v['with_odds'],
+            'stake': round(v['stake'], 2),
+            'profit': round(v['profit'], 2),
+            'roi': round(roi, 4) if roi is not None else None,
         }
 
     report = {
         'generated_at': datetime.now(timezone.utc).isoformat(),
         'description': (
-            "Backtest par marché — sample-base. Évalue uniquement la "
-            "frontière 'pick gagne / perd', sans ROI car pas de cote book "
-            "associée à l'historique. Pour ROI/edge per-marché, voir "
-            "Sprint 67 (qui rejouera predictMatch via V8 avec cotes "
-            "snapshotées)."
+            "Backtest par marché — Sprint 76 (v31.7.163). "
+            "WR sample-base sur tous les pairs (marché, pick). "
+            "ROI calculé sur les paires où une cote book est snapshotée "
+            "via odds_snapshot.markets (Sprint 67) — 1€ flat stake."
         ),
         'completed_evaluated': completed_count,
         'by_market_pick': summary,
     }
     REPORT_JSON.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')
+    n_with_roi = sum(1 for v in summary.values() if v.get('roi') is not None)
     print(f'[backtest_by_market] wrote {REPORT_JSON.name} : '
-          f'{completed_count} matchs completed, {len(summary)} (market, pick) combos')
+          f'{completed_count} matchs completed, {len(summary)} (market, pick) combos, '
+          f'{n_with_roi} avec ROI calculé')
     return 0
 
 
