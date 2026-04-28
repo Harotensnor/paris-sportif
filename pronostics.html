@@ -466,9 +466,10 @@
     <div class="hub-menu" role="menu" aria-label="Sous-menu Pronos">
       <button class="page-btn" role="menuitem" data-page="top">⭐ Top du jour</button>
       <button class="page-btn" role="menuitem" data-page="locks">🔒 Locks <span class="count" id="count-locks">0</span></button>
-      <button class="page-btn" role="menuitem" data-page="tous">📋 Tous les matchs</button>
-      <button class="page-btn" role="menuitem" data-page="calendrier">📅 Calendrier 7 jours<span class="nav-new-badge" data-new-until="2026-05-12">Nouveau</span></button>
-      <button class="page-btn" role="menuitem" data-page="favoris">⭐ Favoris<span class="nav-new-badge" data-new-until="2026-05-15">Nouveau</span></button>
+      <button class="page-btn" role="menuitem" data-page="tous">📋 Tous les pronos</button>
+      <button class="page-btn" role="menuitem" data-page="matchs">🔍 Matchs détectés<span class="nav-new-badge" data-new-until="2026-05-30">Nouveau</span></button>
+      <button class="page-btn" role="menuitem" data-page="calendrier">📅 Calendrier 7 jours</button>
+      <button class="page-btn" role="menuitem" data-page="favoris">⭐ Favoris</button>
       <button class="page-btn" role="menuitem" data-page="combines">🔗 Combinés</button>
       <button class="page-btn" role="menuitem" data-page="buteurs">⚽ Buteurs</button>
     </div>
@@ -976,7 +977,8 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-27T19:40:06.549094Z","today":"
     {label:'Aller à Accueil', icon:'🎯', keywords:'accueil home dashboard aujourd hui', action: function(){ var b=document.querySelector('.page-btn[data-page="dashboard"]'); if(b) b.click(); }},
     {label:'Aller à Top du jour', icon:'⭐', keywords:'top meilleurs picks jour', action: function(){ var b=document.querySelector('.page-btn[data-page="top"]'); if(b) b.click(); }},
     {label:'Aller à Locks', icon:'🔒', keywords:'paris surs locks meilleurs haute confiance', action: function(){ var b=document.querySelector('.page-btn[data-page="locks"]'); if(b) b.click(); }},
-    {label:'Aller à Tous les matchs', icon:'📋', keywords:'tous matchs simples liste paris du jour', action: function(){ var b=document.querySelector('.page-btn[data-page="tous"]'); if(b) b.click(); }},
+    {label:'Aller à Tous les pronos', icon:'📋', keywords:'tous pronos simples liste paris du jour', action: function(){ var b=document.querySelector('.page-btn[data-page="tous"]'); if(b) b.click(); }},
+    {label:'Aller à Matchs détectés', icon:'🔍', keywords:'matchs detectes tous explore browse exhaustif filtres statut', action: function(){ var b=document.querySelector('.page-btn[data-page="matchs"]'); if(b) b.click(); }},
     {label:'Aller à Buteurs', icon:'⚽', keywords:'buteurs buts over under btts', action: function(){ var b=document.querySelector('.page-btn[data-page="buteurs"]'); if(b) b.click(); }},
     {label:'Aller à Combinés', icon:'🔗', keywords:'combines combos', action: function(){ var b=document.querySelector('.page-btn[data-page="combines"]'); if(b) b.click(); }},
     // v30 — Entrée "Mes paris" retirée du command palette (page supprimée).

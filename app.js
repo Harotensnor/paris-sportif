@@ -43,7 +43,7 @@
   // legacy) mais aucun lien ne pointe plus vers cette valeur.
   // v31.7.77 — 'calendrier' ajouté pour vue 7 jours groupée (user feedback
   // "je veux voir au moins une semaine de pronos jour par jour").
-  const VALID_PAGES = ['dashboard','tous','locks','buteurs','combines','top','historique','bilan','backtest','academie','credibilite','alertes','profil','sante','legal','methodologie','montante-jour','montante-weekend','montante-semaine','compare','calendrier','league','favoris'];
+  const VALID_PAGES = ['dashboard','tous','locks','buteurs','combines','top','historique','bilan','backtest','academie','credibilite','alertes','profil','sante','legal','methodologie','montante-jour','montante-weekend','montante-semaine','compare','calendrier','league','favoris','matchs'];
   // v30 — 'mesparis' retiré : Théo n'enregistre pas ses paris sur le site.
   // v31 — 'legal' + 'methodologie' ajoutés (transparence + dictionnaire des
   // métriques, en réponse à l'audit ChatGPT 2026-04-26).
@@ -13695,6 +13695,8 @@
     const isLeague = currentPage === 'league';
     // AUDIT-2026-04-27 (Sprint 33 #2) — Favoris page
     const isFavoris = currentPage === 'favoris';
+    // Sprint 48 (v31.7.137) — Matchs détectés page (Phase 2 brief Théo)
+    const isMatchs = currentPage === 'matchs';
 
     // v23 — Sous-nav "Mon suivi" (historique/bilan/backtest).
     // v30 — "Mes paris" retiré : Théo n'enregistre pas ses paris sur le
@@ -13733,7 +13735,7 @@
     // v30 — Sous-nav "Pronos" (tous/locks/buteurs/combines/simples/top).
     // Mêmes onglets que le dropdown Pronos, mais rendus en ligne au-dessus
     // de la page pour que l'user switche sans rouvrir le menu.
-    const pronosPages = ['tous', 'locks', 'buteurs', 'combines', 'simples', 'top'];
+    const pronosPages = ['tous', 'matchs', 'locks', 'buteurs', 'combines', 'simples', 'top'];
     const isPronos = pronosPages.includes(currentPage);
     let pronosNav = document.getElementById('pronos-subnav');
     if (isPronos) {
@@ -13744,7 +13746,8 @@
         (document.querySelector('main') || document.body).insertBefore(pronosNav, (document.querySelector('main') || document.body).firstChild);
       }
       const tabs = [
-        { k:'tous',     emoji:'📋', label:'Tous' },
+        { k:'tous',     emoji:'📋', label:'Tous pronos' },
+        { k:'matchs',   emoji:'🔍', label:'Matchs détectés' },
         { k:'locks',    emoji:'🔒', label:'Paris sûrs' },
         { k:'buteurs',  emoji:'⚽', label:'Buteurs' },
         { k:'combines', emoji:'🔗', label:'Combinés' },
@@ -13932,6 +13935,39 @@
     favorisWrap.style.display = isFavoris ? '' : 'none';
     if (isFavoris) {
       try { renderFavorisPage(favorisWrap); } catch(e) { console.warn('renderFavorisPage failed', e); }
+    }
+
+    // Sprint 48 (v31.7.137) — "Tous les matchs détectés" : vue exhaustive
+    // qui montre TOUS les matchs (pas juste ceux avec prono fort), filtrés
+    // par sport/ligue/jour/statut. Réponse au feedback "je veux voir tous
+    // les matchs même sans pronostic" du brief Théo 2026-04-28.
+    let matchsWrap = document.getElementById('matchs-wrap');
+    if (!matchsWrap) {
+      matchsWrap = document.createElement('div');
+      matchsWrap.id = 'matchs-wrap';
+      (document.querySelector('main') || document.body).appendChild(matchsWrap);
+    }
+    matchsWrap.style.display = isMatchs ? '' : 'none';
+    if (isMatchs) {
+      // Skeleton pendant _ensureFullData (LITE n'a que today)
+      if (window.PRONOSTICS_DATA && window.PRONOSTICS_DATA._lite && typeof window._ensureFullData === 'function') {
+        matchsWrap.innerHTML = `
+          <div class="page-wrap" style="padding:0 8px 24px;">
+            <div class="page-header">
+              <div class="lbl-tiny" style="color:var(--brand);">Explorer · Tous les matchs</div>
+              <h1 class="page-h1">🔍 Matchs détectés</h1>
+              <div class="skeleton-text w-70"></div>
+            </div>
+            <div style="margin-top:16px;">
+              ${'<div class="skeleton-card"></div>'.repeat(6)}
+            </div>
+          </div>`;
+        window._ensureFullData().then(() => { try { renderMatchsPage(matchsWrap); } catch(e){ console.warn('renderMatchsPage failed', e); } }).catch(() => {
+          try { renderMatchsPage(matchsWrap); } catch(e) { console.warn('renderMatchsPage failed', e); }
+        });
+      } else {
+        try { renderMatchsPage(matchsWrap); } catch(e) { console.warn('renderMatchsPage failed', e); }
+      }
     }
 
     calendrierWrap.style.display = isCalendrier ? '' : 'none';
@@ -15253,6 +15289,292 @@
     });
   }
   try { window.renderFavorisPage = renderFavorisPage; } catch(e){}
+
+  // ======= Sprint 48 (v31.7.137) — renderMatchsPage =======
+  // "Tous les matchs détectés" : vue exhaustive demandée par Théo dans le
+  // brief 2026-04-28. Diffère de la page Tous (qui ne montre QUE les pronos
+  // actionnables Winamax) en ce qu'elle affiche TOUS les matchs détectés
+  // dans data.js, peu importe leur statut. Filtres : jour / sport / ligue /
+  // statut. Le but : Théo peut voir PSG-Bayern, comprendre POURQUOI il n'y
+  // a pas de prono fort (badge "Match incertain"), et tracker l'event quand
+  // même.
+  const MATCHS_FILTERS_KEY = 'matchsFilters';
+  function _loadMatchsFilters() {
+    try {
+      const raw = localStorage.getItem(MATCHS_FILTERS_KEY);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch(e) { return null; }
+  }
+  function _saveMatchsFilters(f) {
+    try { localStorage.setItem(MATCHS_FILTERS_KEY, JSON.stringify(f)); } catch(e){}
+  }
+  function renderMatchsPage(wrap) {
+    const data = window.PRONOSTICS_DATA;
+    if (!data || !data.days) {
+      wrap.innerHTML = '<div class="page-wrap"><div class="bilan-empty">Pas de données disponibles.</div></div>';
+      return;
+    }
+    // État filtres : chargé depuis localStorage, défaut = 7d / all / all / all / ''
+    const saved = _loadMatchsFilters() || {};
+    const state = {
+      day:    saved.day    || '7d',     // today / 3d / 7d / all
+      sport:  saved.sport  || 'all',    // all / football / tennis / basketball / hockey / baseball
+      league: saved.league || 'all',    // all / <league_code>
+      status: saved.status || 'all',    // all / strong / uncertain / no_data / no_odds / no_winamax
+      sort:   saved.sort   || 'time',   // time / importance / status
+      q:      saved.q      || '',       // recherche libre nom équipe
+    };
+    // Construit la liste des matchs candidats (en respectant day filter)
+    const todayIso = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+    const todayDt = new Date(todayIso + 'T00:00:00Z');
+    const dayKeys = (() => {
+      if (state.day === 'all') return Object.keys(data.days || {}).sort();
+      const horizon = state.day === 'today' ? 1 : state.day === '3d' ? 3 : 7;
+      const out = [];
+      for (let i = 0; i < horizon; i++) {
+        const d = new Date(todayDt);
+        d.setUTCDate(d.getUTCDate() + i);
+        out.push(d.toISOString().slice(0, 10));
+      }
+      return out;
+    })();
+    const allMatches = [];
+    dayKeys.forEach(iso => {
+      (data.days[iso] || []).forEach(m => {
+        if (!m || m.completed) return;
+        allMatches.push({ m, iso });
+      });
+    });
+    // Calcule pred + status pour chaque match
+    const enriched = allMatches.map(({ m, iso }) => {
+      let pred = null;
+      try { pred = predictMatch(m); } catch(e) {}
+      const status = (typeof getMatchStatus === 'function') ? getMatchStatus(m, pred) : { code: 'strong', label: '', color: 'var(--text)' };
+      let importance = 0;
+      try { importance = (typeof matchImportance === 'function') ? matchImportance(m) : 0; } catch(e) {}
+      return { m, iso, pred, status, importance };
+    });
+    // Recense les ligues présentes (pour le dropdown)
+    const leagueCounts = new Map();
+    enriched.forEach(item => {
+      const lc = item.m.league_code || '';
+      if (lc) leagueCounts.set(lc, (leagueCounts.get(lc) || 0) + 1);
+    });
+    const leagueOptions = [...leagueCounts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .map(([lc, n]) => ({ lc, n }));
+    // Application des filtres
+    let filtered = enriched.filter(item => {
+      if (state.sport !== 'all' && item.m.sport !== state.sport) return false;
+      if (state.league !== 'all' && item.m.league_code !== state.league) return false;
+      if (state.status !== 'all' && item.status.code !== state.status) return false;
+      if (state.q) {
+        const q = state.q.toLowerCase();
+        const sides = (typeof getSides === 'function') ? getSides(item.m) : { home: {}, away: {} };
+        const hN = (sides.home?.name || '').toLowerCase();
+        const aN = (sides.away?.name || '').toLowerCase();
+        if (!hN.includes(q) && !aN.includes(q)) return false;
+      }
+      return true;
+    });
+    // Tri
+    filtered.sort((a, b) => {
+      if (state.sort === 'importance') {
+        if (b.importance !== a.importance) return b.importance - a.importance;
+        return new Date(a.m.date).getTime() - new Date(b.m.date).getTime();
+      }
+      if (state.sort === 'status') {
+        // strong → uncertain → no_data/no_odds/no_winamax
+        const order = { strong: 0, uncertain: 1, no_data: 2, no_odds: 3, no_winamax: 4 };
+        const aO = order[a.status.code] ?? 5;
+        const bO = order[b.status.code] ?? 5;
+        if (aO !== bO) return aO - bO;
+      }
+      // par défaut : par date asc
+      return new Date(a.m.date).getTime() - new Date(b.m.date).getTime();
+    });
+    // Counters par statut (sur tout enriched, pas filtered, pour les pills)
+    const counts = { all: enriched.length, strong: 0, uncertain: 0, no_data: 0, no_odds: 0, no_winamax: 0 };
+    enriched.forEach(item => { counts[item.status.code] = (counts[item.status.code] || 0) + 1; });
+    // === Render ===
+    const dayPills = [
+      { k: 'today', lbl: "Aujourd'hui" },
+      { k: '3d', lbl: '3 jours' },
+      { k: '7d', lbl: '7 jours' },
+      { k: 'all', lbl: 'Tous' },
+    ];
+    const sportPills = [
+      { k: 'all', lbl: 'Tous' },
+      { k: 'football', lbl: '⚽ Foot' },
+      { k: 'tennis', lbl: '🎾 Tennis' },
+      { k: 'basketball', lbl: '🏀 Basket' },
+      { k: 'hockey', lbl: '🏒 Hockey' },
+      { k: 'baseball', lbl: '⚾ Baseball' },
+    ];
+    const statusPills = [
+      { k: 'all', lbl: `Tous (${counts.all})`, color: 'var(--text)' },
+      { k: 'strong', lbl: `✓ Pronos forts (${counts.strong || 0})`, color: 'var(--accent, #22c55e)' },
+      { k: 'uncertain', lbl: `⚠ Incertains (${counts.uncertain || 0})`, color: 'var(--warn, #c79b00)' },
+      { k: 'no_data', lbl: `Données insuffisantes (${counts.no_data || 0})`, color: 'var(--text-dim)' },
+      { k: 'no_odds', lbl: `Cotes en attente (${counts.no_odds || 0})`, color: 'var(--warn, #c79b00)' },
+      { k: 'no_winamax', lbl: `Hors Winamax (${counts.no_winamax || 0})`, color: 'var(--text-dim2, #888)' },
+    ];
+    const renderPills = (pills, current, dataAttr) => pills.map(p => `
+      <button data-${dataAttr}="${esc(p.k)}" style="padding:6px 12px;border-radius:999px;border:1px solid ${current === p.k ? 'var(--brand)' : 'var(--border-2)'};background:${current === p.k ? 'var(--brand-soft)' : 'var(--panel)'};color:${current === p.k ? (p.color || 'var(--brand)') : 'var(--text-2)'};font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;">${esc(p.lbl)}</button>
+    `).join('');
+    const renderCard = (item) => {
+      const m = item.m;
+      const sides = (typeof getSides === 'function') ? getSides(m) : { home: {}, away: {} };
+      const hN = sides.home?.short || sides.home?.name || '?';
+      const aN = sides.away?.short || sides.away?.name || '?';
+      const sportEm = (typeof sportEmoji === 'function') ? sportEmoji(m.sport) : '🎯';
+      const lg = m.league_name || m.league_code || '';
+      const tLbl = (typeof fmtTime === 'function') ? fmtTime(m.date) : '';
+      const dayLbl = (() => {
+        try {
+          const d = new Date(m.date);
+          const iso = d.toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+          if (iso === todayIso) return "Aujourd'hui";
+          const tom = new Date(); tom.setDate(tom.getDate() + 1);
+          const tomIso = tom.toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+          if (iso === tomIso) return 'Demain';
+          const dow = ['Dim.','Lun.','Mar.','Mer.','Jeu.','Ven.','Sam.'][d.getDay()];
+          return `${dow} ${d.getDate()}/${d.getMonth()+1}`;
+        } catch(e) { return ''; }
+      })();
+      const st = item.status;
+      const stBadge = `<span style="display:inline-flex;align-items:center;padding:3px 8px;border-radius:4px;background:color-mix(in srgb, ${st.color} 14%, transparent);color:${st.color};font-size:10px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;white-space:nowrap;" title="${esc(st.hint || '')}">${esc(st.label)}</span>`;
+      let pickLine = '';
+      if (item.pred && item.pred.pick && (st.code === 'strong' || st.code === 'uncertain')) {
+        const pickLbl = item.pred.pick.label || 'Pick';
+        const rel = Number(item.pred.reliability ?? item.pred.pick.prob) || 0;
+        const pk = item.pred.pick.key;
+        const odd = item.pred.odds && (pk === '1' ? item.pred.odds.home : pk === '2' ? item.pred.odds.away : item.pred.odds.draw);
+        pickLine = `<div style="font-size:12px;color:var(--text-dim);margin-top:5px;">→ <b style="color:var(--brand);">${esc(pickLbl)}</b>${odd ? ` @${Number(odd).toFixed(2)}` : ''} · ${Math.round(rel*100)}% conf.</div>`;
+      }
+      const impBadge = item.importance >= 50 ? `<span style="font-size:10px;color:var(--warn);font-weight:700;">🔥 ${item.importance}</span>` : '';
+      return `
+        <div class="interactive" data-match-id="${esc(String(m.id || ''))}" role="button" tabindex="0" style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${st.color};border-radius:0 10px 10px 0;cursor:pointer;">
+          <div style="display:flex;justify-content:space-between;align-items:start;gap:6px;margin-bottom:6px;">
+            <div style="font-size:11px;color:var(--text-dim);font-weight:600;">${esc(dayLbl)} · ${esc(tLbl)}</div>
+            <div style="display:flex;align-items:center;gap:6px;">${impBadge}${stBadge}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px;">
+            <span style="font-size:14px;">${sportEm}</span>
+            <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">${esc(hN)} <span style="color:var(--text-dim2);font-weight:400;">vs</span> ${esc(aN)}</span>
+          </div>
+          <div style="font-size:11px;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(String(lg).slice(0, 50))}</div>
+          ${pickLine}
+        </div>`;
+    };
+    // Limite affichage : 100 cards max pour ne pas exploser le DOM
+    const MAX_RENDER = 100;
+    const visible = filtered.slice(0, MAX_RENDER);
+    const overflow = Math.max(0, filtered.length - MAX_RENDER);
+    wrap.innerHTML = `
+      <div class="page-wrap" style="padding:0 8px 24px;">
+        <div class="page-header">
+          <div class="lbl-tiny" style="color:var(--brand);">Explorer · Tous les matchs</div>
+          <h1 class="page-h1">🔍 Matchs détectés</h1>
+          <div style="font-size:14px;color:var(--text-dim);">${enriched.length} match${enriched.length>1?'s':''} sur ${dayKeys.length} jour${dayKeys.length>1?'s':''} · classés par statut, voir tous même sans pronostic</div>
+        </div>
+
+        <!-- Filtre recherche -->
+        <div style="margin-top:14px;">
+          <input id="matchs-search" type="text" placeholder="🔎 Rechercher par équipe / joueur…" value="${esc(state.q)}" style="width:100%;padding:10px 14px;background:var(--panel);border:1px solid var(--border-2);border-radius:var(--r);color:var(--text);font-size:14px;font-family:inherit;" />
+        </div>
+
+        <!-- Filtre Jour -->
+        <div style="margin-top:14px;">
+          <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:6px;">Période</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">${renderPills(dayPills, state.day, 'matchs-day')}</div>
+        </div>
+
+        <!-- Filtre Sport -->
+        <div style="margin-top:12px;">
+          <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:6px;">Sport</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">${renderPills(sportPills, state.sport, 'matchs-sport')}</div>
+        </div>
+
+        <!-- Filtre Statut -->
+        <div style="margin-top:12px;">
+          <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:6px;">Statut</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">${renderPills(statusPills, state.status, 'matchs-status')}</div>
+        </div>
+
+        <!-- Filtre Ligue (dropdown si > 8 ligues) -->
+        ${leagueOptions.length > 0 ? `
+        <div style="margin-top:12px;">
+          <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:6px;">Ligue / compétition</div>
+          <select id="matchs-league" style="width:100%;max-width:340px;padding:8px 12px;background:var(--panel);border:1px solid var(--border-2);border-radius:var(--r-sm);color:var(--text);font-size:13px;font-family:inherit;">
+            <option value="all">Toutes (${enriched.length})</option>
+            ${leagueOptions.map(l => `<option value="${esc(l.lc)}"${state.league === l.lc ? ' selected' : ''}>${esc(l.lc)} (${l.n})</option>`).join('')}
+          </select>
+        </div>` : ''}
+
+        <!-- Tri -->
+        <div style="margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <span style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">Tri</span>
+          ${renderPills([{k:'time',lbl:'Date'},{k:'importance',lbl:'Enjeu'},{k:'status',lbl:'Statut'}], state.sort, 'matchs-sort')}
+        </div>
+
+        <!-- Stats bar -->
+        <div style="margin-top:18px;padding:10px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);font-size:12px;color:var(--text-dim);">
+          <b style="color:var(--text);">${filtered.length}</b> match${filtered.length>1?'s':''} affiché${filtered.length>1?'s':''}${state.q?` pour « ${esc(state.q)} »`:''} · ${counts.strong || 0} prono${(counts.strong||0)>1?'s':''} fort${(counts.strong||0)>1?'s':''}, ${counts.uncertain || 0} incertain${(counts.uncertain||0)>1?'s':''}, ${(counts.no_data||0)+(counts.no_odds||0)+(counts.no_winamax||0)} sans prono
+        </div>
+
+        <!-- Grid de matchs -->
+        ${visible.length ? `
+        <div style="margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:8px;">
+          ${visible.map(renderCard).join('')}
+        </div>
+        ${overflow > 0 ? `<div style="margin-top:12px;font-size:12px;color:var(--text-dim2);text-align:center;">+ ${overflow} autre${overflow>1?'s':''} match${overflow>1?'s':''} (réduis la fenêtre ou filtre)</div>` : ''}` : `
+        <div class="empty-state-v2" style="margin-top:18px;">
+          <div class="es-illustration">🔍</div>
+          <div class="es-title-v2">Aucun match avec ces filtres</div>
+          <div class="es-body-v2">Essaie de relâcher la période, le sport ou le statut.</div>
+          <div class="es-actions-v2">
+            <button id="matchs-reset" style="padding:10px 18px;font-size:13px;background:var(--brand);color:#08080a;border:none;border-radius:var(--r-sm);cursor:pointer;font-weight:700;">Réinitialiser les filtres</button>
+          </div>
+        </div>`}
+      </div>`;
+    // Wire interactions
+    const persistAndRerender = () => {
+      _saveMatchsFilters(state);
+      renderMatchsPage(wrap);
+    };
+    wrap.querySelectorAll('[data-matchs-day]').forEach(b => b.addEventListener('click', () => { state.day = b.dataset.matchsDay; persistAndRerender(); }));
+    wrap.querySelectorAll('[data-matchs-sport]').forEach(b => b.addEventListener('click', () => { state.sport = b.dataset.matchsSport; persistAndRerender(); }));
+    wrap.querySelectorAll('[data-matchs-status]').forEach(b => b.addEventListener('click', () => { state.status = b.dataset.matchsStatus; persistAndRerender(); }));
+    wrap.querySelectorAll('[data-matchs-sort]').forEach(b => b.addEventListener('click', () => { state.sort = b.dataset.matchsSort; persistAndRerender(); }));
+    const lgSel = wrap.querySelector('#matchs-league');
+    if (lgSel) lgSel.addEventListener('change', () => { state.league = lgSel.value; persistAndRerender(); });
+    const searchInp = wrap.querySelector('#matchs-search');
+    if (searchInp) {
+      let t = null;
+      searchInp.addEventListener('input', () => {
+        clearTimeout(t);
+        t = setTimeout(() => { state.q = searchInp.value.trim(); persistAndRerender(); }, 250);
+      });
+    }
+    const resetBtn = wrap.querySelector('#matchs-reset');
+    if (resetBtn) resetBtn.addEventListener('click', () => {
+      state.day = '7d'; state.sport = 'all'; state.league = 'all'; state.status = 'all'; state.sort = 'time'; state.q = '';
+      persistAndRerender();
+    });
+    // Click card → openDetail
+    const matchById = new Map();
+    enriched.forEach(item => { if (item.m.id) matchById.set(String(item.m.id), item.m); });
+    wrap.querySelectorAll('[data-match-id]').forEach(card => {
+      card.addEventListener('click', () => {
+        const id = card.dataset.matchId;
+        const m = matchById.get(id);
+        if (m && typeof openDetail === 'function') openDetail(m);
+      });
+    });
+  }
+  try { window.renderMatchsPage = renderMatchsPage; } catch(e){}
 
   // AUDIT-2026-04-27 (Sprint 22 #18) — Expose pour CSP-safe delegation.
   // window.renderLeaguePage défini explicitement après la définition.

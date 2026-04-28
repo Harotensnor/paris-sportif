@@ -6,6 +6,30 @@ des pronostics simples/combinés/montantes séquentielles, et une vue bilan.
 Déployé sur GitHub Pages. Client = navigateur ; données = fichier `data.js`
 régénéré en continu.
 
+## Architecture v31.7.137 (mise à jour 2026-04-28 — Sprint 48 page Matchs détectés)
+
+**Sprint 48 (Phase 2 — overhaul user-driven 2026-04-28)** — réponse à
+"je veux voir TOUS les matchs détectés, pas juste ceux avec un prono fort".
+
+- **Page `#matchs` "Matchs détectés"** (app.js `renderMatchsPage` ~L15291)
+  — vue exhaustive complémentaire à `#tous`. Tous les matchs des 7
+  prochains jours avec leur badge statut (5 codes Sprint 47), filtres
+  jour / sport / ligue / statut / tri (date / enjeu / statut) +
+  recherche libre. Filtres persistés via `localStorage.matchsFilters`.
+- Stats bar : "147 matchs · 23 pronos forts · 38 incertains · 86 sans
+  données". L'user voit clairement la distribution.
+- Limite 100 cards à la fois (DOM safety) avec compteur "+ N autres
+  matchs (réduis la fenêtre ou filtre)".
+- Ajouté à `pronos-subnav` (sous-nav onglets) + nav menu desktop +
+  Cmd-K palette ("Aller à Matchs détectés").
+- VALID_PAGES étendu, applyPageView gère le wrap avec skeleton pendant
+  `_ensureFullData()`.
+
+Différence avec Tous pronos (`#tous`) : `#tous` filtre Winamax-bookable
++ pred actionnable (l'user prend une décision rapide). `#matchs` ne
+filtre rien — c'est l'index complet pour explorer/comprendre, et c'est
+là que tu retrouves PSG-Bayern même quand le modèle hésite.
+
 ## Architecture v31.7.136 (mise à jour 2026-04-28 — Sprint 47 visibilité gros matchs)
 
 **Sprint 47 (Phase 1 — overhaul user-driven 2026-04-28)** — répond au feedback
