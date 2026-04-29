@@ -5345,6 +5345,54 @@
     }
   }
 
+  /* Sprint 128 (v31.7.191) — Light theme polish.
+     Hardcoded rgba() patterns dans Sprint 105-127 ne s'adaptent pas au light
+     mode. Cette section override les éléments concernés pour un meilleur
+     contraste / lisibilité en thème clair. */
+  html[data-theme="light"] .action-focus {
+    background: linear-gradient(135deg, rgba(94,92,230,.06) 0%, rgba(48,209,88,.04) 100%) !important;
+    border-color: rgba(94,92,230,.18) !important;
+  }
+  html[data-theme="light"] .gloss-popover {
+    box-shadow: 0 8px 24px rgba(0,0,0,.12);
+  }
+  html[data-theme="light"] .skel {
+    background: linear-gradient(90deg,
+      rgba(0,0,0,.04) 0%,
+      rgba(0,0,0,.08) 40%,
+      rgba(0,0,0,.04) 80%);
+    background-size: 1000px 100%;
+  }
+  html[data-theme="light"] .scroll-top-fab {
+    box-shadow: 0 4px 14px rgba(94,92,230,.30);
+  }
+  html[data-theme="light"] .toast-action {
+    background: rgba(0,0,0,.08) !important;
+    color: var(--text) !important;
+    border-color: rgba(0,0,0,.12) !important;
+  }
+  /* tbl-scroll : scroll-shadow gradients adaptés au light theme */
+  html[data-theme="light"] .tbl-scroll {
+    background:
+      linear-gradient(to right, var(--panel) 30%, rgba(255,255,255,0)) left center/40px 100% no-repeat,
+      linear-gradient(to left, var(--panel) 30%, rgba(255,255,255,0)) right center/40px 100% no-repeat,
+      radial-gradient(farthest-side at 0 50%, rgba(0,0,0,.10), rgba(0,0,0,0)) left center/14px 100% no-repeat,
+      radial-gradient(farthest-side at 100% 50%, rgba(0,0,0,.10), rgba(0,0,0,0)) right center/14px 100% no-repeat;
+    background-attachment: local, local, scroll, scroll;
+  }
+  /* Risk gauge bg adapter pour light */
+  html[data-theme="light"] .action-focus [style*="background:var(--panel)"] {
+    background: rgba(0,0,0,.04) !important;
+  }
+  /* Mobile bottom-nav badges : ring shadow adapter au light */
+  html[data-theme="light"] .mbn-badge {
+    box-shadow: 0 0 0 2px var(--bg);
+  }
+  /* Onboarding wizard progress bar visible sur light */
+  html[data-theme="light"] .onboard-card {
+    box-shadow: 0 12px 36px rgba(0,0,0,.16), 0 4px 12px rgba(0,0,0,.08);
+  }
+
   /* Sprint 123 (v31.7.191) — Data freshness chip pulse. */
   @keyframes fresh-pulse {
     0%, 100% { opacity: 1; transform: scale(1); }
