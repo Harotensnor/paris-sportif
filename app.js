@@ -6489,6 +6489,14 @@
       .sort((a, b) => a.name.localeCompare(b.name, 'fr'));
     const advHtml = advFiltersOpen ? `
       <div class="adv-filters" style="margin-top:10px;padding:12px;background:var(--surface,#111827);border:1px solid var(--border,#2a3744);border-radius:10px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;font-size:13px;">
+        <!-- Sprint 119 (v31.7.191) — Presets de filtres rapides -->
+        <div style="display:inline-flex;align-items:center;gap:4px;border-right:1px solid var(--border-2);padding-right:10px;margin-right:4px;flex-wrap:wrap;" title="Presets de filtrage rapide">
+          <span style="color:var(--text-muted);font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;">Presets</span>
+          <button data-preset="conservateur" style="padding:4px 9px;border-radius:6px;border:1px solid var(--border-2);background:var(--panel-2);color:var(--text-dim);font-size:11px;font-weight:600;cursor:pointer;" title="Conservateur : cotes 1.40-1.85, EV+ obligatoire, qualité ≥2/4">🛡️ Sûr</button>
+          <button data-preset="equilibre" style="padding:4px 9px;border-radius:6px;border:1px solid var(--border-2);background:var(--panel-2);color:var(--text-dim);font-size:11px;font-weight:600;cursor:pointer;" title="Équilibré : EV ≥3%, qualité ≥1/4, tous marchés">⚖️ Équilibré</button>
+          <button data-preset="agressif" style="padding:4px 9px;border-radius:6px;border:1px solid var(--border-2);background:var(--panel-2);color:var(--text-dim);font-size:11px;font-weight:600;cursor:pointer;" title="Aggressif : cote ≥2.0, EV ≥5%, edge max">🚀 Aggressif</button>
+          <button data-preset="foot1n2" style="padding:4px 9px;border-radius:6px;border:1px solid var(--border-2);background:var(--panel-2);color:var(--text-dim);font-size:11px;font-weight:600;cursor:pointer;" title="Foot 1X2 uniquement, EV+ obligatoire">⚽ Foot 1X2</button>
+        </div>
         <!-- Sprint 78 (audit P0) — Toggle Bookmaker 3-state -->
         <div style="display:inline-flex;align-items:center;gap:4px;" title="Bookmaker : All = tous matchs détectés. Catalog = Winamax tournament-only inclus. Exact = Winamax exact only (cote actionnable).">
           <span style="color:var(--text-muted);">📊</span>
@@ -6609,6 +6617,24 @@
     // Sprint 78 — Bookmaker mode toggle
     el.querySelectorAll('[data-bookmaker-mode]').forEach(b => b.addEventListener('click', () => {
       setBookmakerMode(b.dataset.bookmakerMode);
+      render();
+    }));
+    // Sprint 119 (v31.7.191) — Preset filters one-click. Configure plusieurs
+    // filtres en cohérence pour des profils typiques (sûr / équilibré / aggressif / foot).
+    el.querySelectorAll('[data-preset]').forEach(b => b.addEventListener('click', () => {
+      const preset = b.dataset.preset;
+      const presets = {
+        conservateur: { kellyMin: 0.02, oddMin: 1.40, oddMax: 1.85, league: '', valueOnly: true, evMin: 0.02, marketType: '', dataQualityMin: 2 },
+        equilibre:    { kellyMin: 0,    oddMin: 0,    oddMax: 0,    league: '', valueOnly: true, evMin: 0.03, marketType: '', dataQualityMin: 1 },
+        agressif:     { kellyMin: 0.05, oddMin: 2.0,  oddMax: 0,    league: '', valueOnly: true, evMin: 0.05, marketType: '', dataQualityMin: 0 },
+        foot1n2:      { kellyMin: 0,    oddMin: 0,    oddMax: 0,    league: '', valueOnly: true, evMin: 0.03, marketType: '1n2', dataQualityMin: 1 },
+      };
+      const p = presets[preset];
+      if (!p) return;
+      Object.assign(advFilters, p);
+      try { window.advFilters = advFilters; } catch(err){}
+      saveAdvFilters();
+      if (typeof toast === 'function') toast(`✓ Preset ${preset} appliqué`, 'success');
       render();
     }));
   }
