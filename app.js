@@ -12217,8 +12217,85 @@
       } catch (e) { return ''; }
     })();
 
+    // Sprint 106 (v31.7.190) — "Ce que tu dois faire MAINTENANT" :
+    // hero d'action prioritaire qui résume en un coup d'œil la décision principale.
+    // Précède le smart-suggestion + le heroPick existant. Affiche : top pick avec
+    // mise calculée pour la bankroll user, total stake suggéré (cumul Kelly), avert
+    // anti-tilt si streak loss en cours, et 2 CTA vers Plan de mise et Top du jour.
+    // Si data stale ou 0 picks → panel masqué (les autres sections gèrent l'info).
+    const _actionFocus = (() => {
+      if (_dataIsStale) return '';
+      if (!topPicksEnriched.length && !heroPick) return '';
+      // Calculs synthèse : N picks edge≥5%, mise totale recommandée, gain potentiel total
+      const nPicks = topPicksEnriched.length;
+      const totalStake = topPicksEnriched.reduce((s, x) => s + (x.stake || 0), 0);
+      const totalGain = topPicksEnriched.reduce((s, x) => s + (x.gain || 0), 0);
+      const riskPct = userBankroll > 0 ? (totalStake / userBankroll * 100) : 0;
+      // Streak alert : si on a un streakLosses ≥3 c'est PRIORITAIRE (avant action)
+      let streakBanner = '';
+      try {
+        const sk = (typeof detectStreaks === 'function') ? detectStreaks() : { alert: null };
+        if (sk && sk.alert) {
+          const bgColor = sk.alert.level === 'danger' ? 'rgba(252,165,165,.10)' : 'rgba(252,191,128,.10)';
+          const borderColor = sk.alert.level === 'danger' ? 'var(--danger)' : 'var(--warn)';
+          streakBanner = `
+          <div role="alert" style="margin-bottom:14px;padding:12px 16px;background:${bgColor};border:1px solid ${borderColor};border-left:3px solid ${borderColor};border-radius:var(--r-sm);font-size:13px;color:var(--text);line-height:1.5;">
+            ${esc(sk.alert.msg)}
+          </div>`;
+        }
+      } catch(e) {}
+      // Top pick : reprendre topPicksEnriched[0] si dispo, sinon heroPick
+      const top = topPicksEnriched[0] || heroPick;
+      if (!top) return streakBanner;
+      const topStake = top.stake || 0;
+      const topGain = top.gain || (topStake * ((top.odd || 1) - 1));
+      const topPickLabel = (top.best && top.best.label) || (top.pred && top.pred.pick && top.pred.pick.label) || 'Pick';
+      const topMatchLabel = `${esc(top.homeName || '?')} vs ${esc(top.awayName || '?')}`;
+      const isEmpty = nPicks === 0;
+      const headline = isEmpty
+        ? `<span style="color:var(--warn);">Aucun pari edge ≥5% aujourd'hui</span> · garde ta bankroll au calme`
+        : `<strong style="color:var(--accent);">${nPicks} pari${nPicks>1?'s':''} value disponible${nPicks>1?'s':''}</strong> · mise totale ${totalStake.toFixed(0)}€ · gain potentiel ${totalGain.toFixed(0)}€`;
+      const riskLabel = riskPct > 0
+        ? `<span style="color:${riskPct > 25 ? 'var(--warn)' : 'var(--text-dim)'};">Risque ${riskPct.toFixed(0)}% bankroll · Kelly 0.25</span>`
+        : '';
+      return `
+      ${streakBanner}
+      <section class="action-focus" role="region" aria-label="Ce que tu dois faire maintenant" style="margin:0 0 20px;padding:18px 20px;background:linear-gradient(135deg, rgba(167,139,250,.10) 0%, rgba(52,211,153,.06) 100%);border:1px solid var(--brand-soft);border-left:4px solid var(--brand);border-radius:var(--r-md);box-shadow:var(--shadow-sm);">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+          <span style="font-size:11px;font-weight:800;color:var(--brand);text-transform:uppercase;letter-spacing:.08em;">🎯 Ce que tu dois faire maintenant</span>
+          <span style="font-size:10.5px;color:var(--text-dim2);background:var(--panel);padding:2px 8px;border-radius:10px;">Bankroll ${userBankroll.toFixed(0)}€</span>
+        </div>
+        <div style="font-size:14px;color:var(--text-2);line-height:1.5;margin-bottom:${riskLabel ? '4px' : '12px'};">
+          ${headline}
+        </div>
+        ${riskLabel ? `<div style="font-size:11.5px;color:var(--text-dim);margin-bottom:12px;">${riskLabel}</div>` : ''}
+        ${!isEmpty && top ? `
+        <div class="action-focus-top" data-match-id="${esc(String(top.m && top.m.id || ''))}" style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:12px;cursor:pointer;transition:border-color .15s, transform .12s;" role="button" tabindex="0" aria-label="Détail du top pick">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+            <div style="flex:1 1 200px;min-width:0;">
+              <div style="font-size:10px;font-weight:700;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px;">⭐ TOP PRIORITÉ</div>
+              <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${topMatchLabel}</div>
+              <div style="font-size:12px;color:var(--text-dim);">${esc(topPickLabel)} · @${(top.odd || 0).toFixed(2)} · <span style="color:var(--accent);font-weight:700;">+${Math.round((top.edge || 0)*100)}pt edge</span></div>
+            </div>
+            <div style="text-align:right;flex-shrink:0;">
+              <div style="font-size:10px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.4px;">Mise</div>
+              <div style="font-size:20px;font-weight:800;color:var(--brand);font-variant-numeric:tabular-nums;">${topStake.toFixed(0)}€</div>
+              <div style="font-size:10.5px;color:var(--accent);font-weight:600;">→ +${topGain.toFixed(0)}€</div>
+            </div>
+          </div>
+        </div>` : ''}
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          ${!isEmpty ? `<button type="button" class="page-btn" data-page="plan-mise" style="flex:1;min-width:140px;padding:10px 14px;background:var(--brand);color:#08080a;border:none;border-radius:var(--r-sm);cursor:pointer;font-size:13px;font-weight:700;">📋 Plan de mise complet →</button>` : ''}
+          <button type="button" class="page-btn" data-page="${isEmpty ? 'calendrier' : 'top'}" style="flex:1;min-width:140px;padding:10px 14px;background:var(--panel);color:var(--text);border:1px solid var(--border-2);border-radius:var(--r-sm);cursor:pointer;font-size:13px;font-weight:600;">${isEmpty ? '📅 Calendrier 7j' : '⭐ Top du jour'}</button>
+          <button type="button" class="page-btn" data-page="valeur" style="padding:10px 14px;background:transparent;color:var(--text-dim);border:1px solid var(--border);border-radius:var(--r-sm);cursor:pointer;font-size:13px;font-weight:600;">💎 Marché se trompe</button>
+        </div>
+      </section>`;
+    })();
+
     wrap.innerHTML = `
       <div style="max-width:1100px;margin:0 auto;padding:0 20px;font-variant-numeric:tabular-nums;">
+
+        ${_actionFocus}
 
         ${_hourSuggestion}
 
@@ -13463,7 +13540,10 @@
         if (m && typeof openDetail === 'function') openDetail(m);
       });
     });
-    wrap.querySelectorAll('.ed-hero[data-match-id], .dash-hero-pick, .dash-pick-card').forEach(card => {
+    // Sprint 106 (v31.7.190) — .action-focus-top ajouté au selector pour ouvrir
+    // le détail au click sur la card du top pick dans le hero "Ce que tu dois
+    // faire MAINTENANT" (au-dessus de _hourSuggestion).
+    wrap.querySelectorAll('.ed-hero[data-match-id], .dash-hero-pick, .dash-pick-card, .action-focus-top[data-match-id]').forEach(card => {
       card.addEventListener('click', (e) => {
         if (_isInteractiveTarget(e.target)) return;
         _openCardMatch(card);

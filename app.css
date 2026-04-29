@@ -1644,6 +1644,23 @@
   .odds-table td.best { color: var(--accent); font-weight: 600; }
   .odds-table tr:hover td { background: var(--panel-2); }
 
+  /* Sprint 106 (v31.7.190) — Hero "Ce que tu dois faire MAINTENANT".
+     Card du top pick : hover lift + border accent. */
+  .action-focus-top:hover {
+    border-color: var(--brand) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(167,139,250,.15);
+  }
+  .action-focus-top:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+  }
+  @media (max-width: 720px) {
+    .action-focus { padding: 14px 16px !important; }
+    .action-focus-top > div { flex-direction: column; align-items: flex-start !important; }
+    .action-focus-top > div > div:last-child { text-align: left !important; }
+  }
+
   /* Sprint 105 (v31.7.190) — Utility responsive scroll wrapper for tables.
      Use around any <table> that may overflow on mobile (typically tables with
      ≥4 columns). Provides:
