@@ -3386,18 +3386,34 @@
     } catch (e) { return null; }
   }
 
-  // Chantier 4 — Calibration probabilités via backtest_v2
-  //   Quand `backtest_report_v2.json` est disponible et contient au moins 20
-  //   picks (seuil anti-bruit), on ajuste la `rel` du modèle en ajoutant le
-  //   `gap` du décile correspondant (cap ±5pt pour éviter overcorrection sur
-  //   petits échantillons). Noop si le rapport est absent ou trop maigre.
-  //   Invalidation du cache predictMatch quand la calib arrive.
-  window.__modelCalibration = null; // { bins: [...], total_n: number }
-  function _calibrateProb(rawProb) {
+  // Chantier 4 + Sprint 109 — Calibration probabilités via backtest_v2,
+  // per-sport quand disponible (foot, tennis, basket, hockey, baseball ont
+  // des distributions de marché distinctes → calibration globale lisse les
+  // erreurs spécifiques à chaque sport). Sprint 109 (v31.7.190) :
+  //   * Lookup bins par sport via __modelCalibration.bySport[sport]
+  //   * Fallback global si sport-specific absent ou n<10 par bin
+  //   * Sport passé en argument optionnel par _applyCalibration
+  // Format attendu côté Python (backtest_report_v2.json) :
+  //   { calibration: [...], by_sport_calibration: { football: [...], tennis: [...], ... } }
+  // Si la clé `by_sport_calibration` est absente, comportement identique à avant.
+  window.__modelCalibration = null; // { bins, bySport, total_n, total_n_by_sport }
+  function _calibrateProb(rawProb, sport) {
     const cal = window.__modelCalibration;
     if (!cal || !cal.bins || !cal.total_n || cal.total_n < 20) return rawProb;
     if (!isFinite(rawProb) || rawProb <= 0 || rawProb >= 1) return rawProb;
-    for (const bin of cal.bins) {
+    // Sprint 109 — Tentative per-sport d'abord. On exige ≥30 obs sur le sport
+    // entier pour appliquer ses bins (sinon trop bruité).
+    let bins = cal.bins;
+    let usedSportBins = false;
+    if (sport && cal.bySport && cal.bySport[sport]) {
+      const sportBins = cal.bySport[sport];
+      const sportN = (cal.totalNBySport && cal.totalNBySport[sport]) || 0;
+      if (Array.isArray(sportBins) && sportBins.length >= 3 && sportN >= 30) {
+        bins = sportBins;
+        usedSportBins = true;
+      }
+    }
+    for (const bin of bins) {
       if (bin.n >= 3 && bin.gap != null && rawProb >= bin.lo && rawProb < bin.hi) {
         // Sprint 100 (v31.7.185) — Cap d'ajustement passé de ±5pt à ±8pt.
         // Justification : Brier 0.224 = "calibration médiocre" actuel. Sur les
@@ -3408,11 +3424,15 @@
         // Effet attendu : Brier 0.224 → ~0.20 (mesurable au prochain backtest).
         // Conditionné par bin.n ≥ 8 (au lieu de 3) pour ne pas amplifier
         // les bins anémiques où le gap n'est que du bruit échantillonnage.
-        if (bin.n >= 8) {
+        // Sprint 109 — Per-sport bins ont besoin de plus d'obs pour être fiables :
+        // le seuil n≥8 → n≥12 quand on est sur des bins par-sport (échantillon
+        // plus petit, donc plus de bruit relatif).
+        const minNStrong = usedSportBins ? 12 : 8;
+        if (bin.n >= minNStrong) {
           const adj = Math.max(-0.08, Math.min(0.08, bin.gap));
           return Math.max(0.01, Math.min(0.99, rawProb + adj));
         }
-        // Bins faibles (3-7 obs) : garde le cap conservateur ±5pt pour limiter
+        // Bins faibles : garde le cap conservateur ±5pt pour limiter
         // le risque d'overfit sur du bruit.
         const adj = Math.max(-0.05, Math.min(0.05, bin.gap));
         return Math.max(0.01, Math.min(0.99, rawProb + adj));
@@ -3425,9 +3445,21 @@
       const r = await fetch('backtest_report_v2.json?t=' + Date.now(), { cache: 'no-store' });
       if (!r.ok) return;
       const rep = await r.json();
+      // Sprint 109 — Charge bySport si disponible. Format attendu :
+      // by_sport_calibration: { football: [bins], tennis: [bins], ... }
+      // by_sport: { football: { n: 234, ... }, ... } (déjà existant pour KPIs)
+      const bySport = rep.by_sport_calibration || null;
+      const totalNBySport = {};
+      if (rep.by_sport && typeof rep.by_sport === 'object') {
+        for (const [sport, stats] of Object.entries(rep.by_sport)) {
+          if (stats && typeof stats === 'object') totalNBySport[sport] = stats.n || 0;
+        }
+      }
       window.__modelCalibration = {
         bins: rep.calibration || [],
+        bySport: bySport,
         total_n: (rep.overall && rep.overall.n) || 0,
+        totalNBySport: totalNBySport,
       };
       // v30 — Expose le rapport complet pour la page Crédibilité (by_sport,
       // by_cote_bucket, by_tier, overall — ROI / brier / logloss).
@@ -3657,21 +3689,26 @@
   function predictMatch(match) {
     const cur = window.PRONOSTICS_DATA;
     if (__predCacheRef !== cur) { __predCache = new Map(); __predCacheRef = cur; }
-    if (!match || !match.id) return _applyCalibration(_predictMatchImpl(match));
+    if (!match || !match.id) return _applyCalibration(_predictMatchImpl(match), match);
     const cached = __predCache.get(match.id);
     if (cached !== undefined) return cached;
-    const p = _applyCalibration(_predictMatchImpl(match));
+    // Sprint 109 — Passe `match` au _applyCalibration pour qu'il puisse lire
+    // match.sport et appliquer la calibration per-sport si disponible.
+    const p = _applyCalibration(_predictMatchImpl(match), match);
     __predCache.set(match.id, p);
     return p;
   }
-  function _applyCalibration(p) {
+  function _applyCalibration(p, match) {
     // FIX audit Simples #3 : champ pred = `reliability` (pas `rel`).
     // Avant : isFinite(p.rel) → false → return inchangé → fonction no-op.
     // Pas de symptôme visible (la calibration est déjà appliquée inline
     // dans _predictMatchImpl), mais code mort qui prêtait à confusion.
     // On le rend correct au cas où un caller bypass _predictMatchImpl.
+    // Sprint 109 (v31.7.190) — Passe match.sport au _calibrateProb pour
+    // bénéficier de la calibration per-sport quand disponible.
     if (!p || !isFinite(p.reliability) || p.calibrated) return p;
-    const adjusted = _calibrateProb(p.reliability);
+    const sport = match && match.sport ? match.sport : null;
+    const adjusted = _calibrateProb(p.reliability, sport);
     if (adjusted === p.reliability) return p;
     // Return a shallow clone to avoid mutating the original pred across callers
     return { ...p, reliability: adjusted, reliability_raw: p.reliability, calibrated: true };
