@@ -419,15 +419,15 @@
 
     <div class="topbar-utils">
       <div class="search-wrap" style="position:relative;">
-        <input type="search" id="search" class="search" placeholder="Équipe, tournoi, ville…" autocomplete="off">
-        <div id="search-suggest" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--panel);border:1px solid var(--border-2);border-radius:10px;max-height:360px;overflow:auto;z-index:60;box-shadow:var(--shadow-lg);"></div>
+        <input type="search" id="search" class="search" placeholder="Équipe, tournoi, ville…" autocomplete="off" aria-label="Rechercher une équipe, un tournoi ou une ville">
+        <div id="search-suggest" role="listbox" aria-label="Suggestions de recherche" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--panel);border:1px solid var(--border-2);border-radius:10px;max-height:360px;overflow:auto;z-index:60;box-shadow:var(--shadow-lg);"></div>
       </div>
       <div class="date-nav">
         <button id="prev-day" type="button" title="Jour précédent" aria-label="Aller au jour précédent">◀</button>
         <button id="today-btn" class="today-btn" title="Aujourd'hui">Aujourd'hui</button>
         <button id="next-day" type="button" title="Jour suivant" aria-label="Aller au jour suivant">▶</button>
       </div>
-      <input type="date" id="date" class="date-picker">
+      <input type="date" id="date" class="date-picker" aria-label="Sélectionner une date">
       <!-- v31 — Niveau (débutant/confirmé/pro) toggle visible.
            Click cycle : 🌱 Débutant → 🎯 Confirmé → 📊 Pro → 🌱.
            Persisté dans userPrefs.level + écho data-level sur <html>. -->
