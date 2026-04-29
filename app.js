@@ -3677,9 +3677,33 @@
         strip.classList.add('hidden');
         // v31.7.71 — Reset --trust-h à 0 (sidebar/rail remontent)
         document.documentElement.style.setProperty('--trust-h', '0px');
+        // Sprint 144 (v31.7.194) — Toast qui informe comment ré-afficher (via __diag)
+        try {
+          if (typeof toast === 'function') {
+            toast('Trust strip masqué pour 30j', 'info', {
+              action: {
+                label: 'Annuler',
+                onClick: () => {
+                  try { localStorage.removeItem('trustStripHiddenUntil'); } catch(e){}
+                  strip.classList.remove('hidden');
+                  // Re-populate
+                  try { _populateTrustStrip(window.__backtestReportV2); } catch(e){}
+                },
+              },
+            });
+          }
+        } catch(e){}
       });
     }
   }
+  // Sprint 144 (v31.7.194) — Helper public pour réinitialiser le trust strip
+  // Accessible via console : window._resetTrustStrip()
+  window._resetTrustStrip = function() {
+    try { localStorage.removeItem('trustStripHiddenUntil'); } catch(e){}
+    const strip = document.getElementById('trust-strip');
+    if (strip) strip.classList.remove('hidden');
+    try { _populateTrustStrip(window.__backtestReportV2); } catch(e){}
+  };
 
   // v31.7.71 — Mesure dynamique de la hauteur du trust-strip et set en
   // CSS var pour que les éléments position:fixed (sidebar, right-rail)
@@ -19250,7 +19274,38 @@
         </div>
         <div style="margin-top:8px;font-size:11px;color:var(--text-dim);">Marque les marchés que tu joues souvent — les futures alertes filtreront sur ces marchés en priorité.</div>`;
     } else if (currentTab === 'alerts') {
-      mainContent = rules.length ? `
+      // Sprint 143 (v31.7.194) — UI builder inline pour alertes (avant : console only).
+      const alertBuilderHtml = `
+        <details style="margin-top:14px;padding:12px 14px;background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-sm);">
+          <summary style="cursor:pointer;font-size:13px;font-weight:700;color:var(--brand);">+ Créer une alerte</summary>
+          <div style="margin-top:12px;display:grid;gap:10px;font-size:13px;">
+            <label style="display:flex;flex-direction:column;gap:4px;">
+              <span style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;font-weight:700;">Type</span>
+              <select id="alert-builder-type" style="padding:8px 10px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-xs);color:var(--text);">
+                <option value="edge_min">Edge minimum (en %)</option>
+                <option value="lock_imminent">Lock imminent (minutes avant kickoff)</option>
+                <option value="lineup_published">Lineup publié (minutes avant kickoff)</option>
+              </select>
+            </label>
+            <label style="display:flex;flex-direction:column;gap:4px;">
+              <span style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;font-weight:700;">Seuil</span>
+              <input id="alert-builder-threshold" type="number" step="0.1" min="0" placeholder="Ex: 5 (pour 5%)" style="padding:8px 10px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-xs);color:var(--text);">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:4px;">
+              <span style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;font-weight:700;">Scope (optionnel)</span>
+              <select id="alert-builder-sport" style="padding:8px 10px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-xs);color:var(--text);">
+                <option value="">Tous les sports</option>
+                <option value="football">⚽ Football</option>
+                <option value="tennis">🎾 Tennis</option>
+                <option value="basketball">🏀 Basketball</option>
+                <option value="hockey">🏒 Hockey</option>
+                <option value="baseball">⚾ Baseball</option>
+              </select>
+            </label>
+            <button id="alert-builder-create" type="button" class="btn-primary" style="margin-top:6px;">Créer l'alerte</button>
+          </div>
+        </details>`;
+      mainContent = (rules.length ? `
         <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px;">
           ${rules.map(r => {
             const typeLbl = { edge_min: 'Edge minimum', lock_imminent: 'Lock imminent', lineup_published: 'Lineup publié' }[r.type] || r.type;
@@ -19266,9 +19321,11 @@
               </div>`;
           }).join('')}
         </div>
-        <div style="margin-top:14px;padding:14px 16px;background:var(--panel);border:1px dashed var(--border-2);border-radius:var(--r-sm);font-size:12px;color:var(--text-dim);line-height:1.5;">
-          Tu peux ajouter des alertes paramétrables via la console : <code style="color:var(--brand);">window._addAlertRule('edge_min', 0.05, { sport: 'football' })</code>. UI builder dédiée arrive dans un prochain sprint.
-        </div>` : `<div class="empty-state-v2" style="margin-top:18px;"><div class="es-illustration">🔔</div><div class="es-title-v2">Aucune alerte paramétrée</div><div class="es-body-v2">Les alertes te préviennent quand un pick atteint un certain edge ou qu'un lock est imminent. Ajoute-les via la console pour l'instant.</div></div>`;
+        ${alertBuilderHtml}` : `${_emptyState({
+          icon: '🔔',
+          title: 'Aucune alerte paramétrée',
+          body: 'Les alertes te préviennent quand un pick atteint un certain edge ou qu\'un lock est imminent. Crée-en une ci-dessous.',
+        })}${alertBuilderHtml}`);
     }
     wrap.innerHTML = `
       <div class="page-wrap">
@@ -19303,9 +19360,36 @@
     wrap.querySelectorAll('[data-alert-remove]').forEach(b => b.addEventListener('click', () => {
       if (typeof window._removeAlertRule === 'function') {
         window._removeAlertRule(b.dataset.alertRemove);
+        if (typeof window.toast === 'function') window.toast('🗑 Alerte supprimée', 'info');
         renderFavorisPage(wrap);
       }
     }));
+    // Sprint 143 (v31.7.194) — Wire alert builder (UI inline pour créer une alerte)
+    const builderBtn = wrap.querySelector('#alert-builder-create');
+    if (builderBtn) {
+      builderBtn.addEventListener('click', () => {
+        const type = wrap.querySelector('#alert-builder-type')?.value;
+        const thresholdRaw = wrap.querySelector('#alert-builder-threshold')?.value;
+        const sport = wrap.querySelector('#alert-builder-sport')?.value;
+        if (!type || !thresholdRaw) {
+          if (typeof window.toast === 'function') window.toast('⚠ Type et seuil requis', 'warn');
+          return;
+        }
+        const thresholdNum = parseFloat(thresholdRaw);
+        if (!isFinite(thresholdNum) || thresholdNum <= 0) {
+          if (typeof window.toast === 'function') window.toast('⚠ Seuil invalide', 'warn');
+          return;
+        }
+        // Pour edge_min : convertit le % entré en ratio (5 → 0.05)
+        const threshold = type === 'edge_min' ? thresholdNum / 100 : thresholdNum;
+        const scope = sport ? { sport } : {};
+        if (typeof window._addAlertRule === 'function') {
+          window._addAlertRule(type, threshold, scope);
+          if (typeof window.toast === 'function') window.toast('✓ Alerte créée', 'success');
+          renderFavorisPage(wrap);
+        }
+      });
+    }
     // Wire bookmark removal
     wrap.querySelectorAll('[data-bookmark-toggle]').forEach(btn => {
       btn.addEventListener('click', (e) => {

@@ -160,6 +160,21 @@
     table tbody td { display: block; padding: 4px 0; border: none; }
     table tbody tr { border-bottom: 1px solid rgba(255,255,255,.06); padding: 8px 0; display: block; }
   }
+  /* Sprint 142 (v31.7.194) — Print stylesheet */
+  @media print {
+    .topbar, footer.site-footer, .toc { display: none !important; }
+    body { background: white !important; color: black !important; padding: 0 !important; max-width: 100% !important; }
+    section.card { background: white !important; border: 1px solid #ccc !important; color: black !important; box-shadow: none !important; page-break-inside: avoid; }
+    h1 { font-size: 22pt !important; color: black !important; }
+    h2, h3 { color: black !important; page-break-after: avoid; }
+    code, pre { background: #f5f5f5 !important; color: #000 !important; border: 1px solid #ddd; }
+    table { border-collapse: collapse; }
+    table th, table td { border: 1px solid #ccc !important; padding: 4px 8px; }
+    table thead { display: table-header-group !important; background: #eee !important; color: black !important; }
+    table tbody tr { border: none !important; padding: 0 !important; display: table-row; }
+    table tbody td { display: table-cell !important; padding: 4px 8px !important; }
+    a[href^="http"]:after { content: " (" attr(href) ")"; font-size: 0.85em; color: #666; }
+  }
 </style>
 <link rel="stylesheet" href="static-page.css">
 </head>

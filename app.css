@@ -5433,6 +5433,36 @@
     outline: 2px solid var(--accent) !important;
   }
 
+  /* Sprint 140 (v31.7.194) — Color tokens étendus pour réduire les hex codes répétés.
+     Audit a montré : #7b8693 (68×), #34d399 (63×), #f87171 (58×), #fbbf24 (41×)
+     hardcodés dans inline styles. On les expose comme custom props pour les
+     futurs refactors et on documente leur sémantique. */
+  :root {
+    /* Tones spécifiques utilisés par les Sprint 90+ pour edge/CLV/risk */
+    --c-emerald-300: #34d399;   /* accent vif (Sprint 90+ KPIs) */
+    --c-emerald-500: #10b981;   /* accent base */
+    --c-red-300: #fca5a5;       /* danger soft */
+    --c-red-400: #f87171;       /* danger base */
+    --c-amber-300: #fbbf24;     /* warn / streaks */
+    --c-amber-500: #eab308;     /* warn intense */
+    --c-violet-400: #a78bfa;    /* brand alt */
+    --c-slate-500: #7b8693;     /* text muted neutre */
+    --c-slate-700: #2a3744;     /* border-2 alt */
+    --c-text-on-brand: #08080a; /* texte sur fond brand (contraste) */
+  }
+  html[data-theme="light"] {
+    /* Mêmes tones, ajustés pour fond clair */
+    --c-emerald-300: #059669;
+    --c-emerald-500: #047857;
+    --c-red-300: #dc2626;
+    --c-red-400: #b91c1c;
+    --c-amber-300: #d97706;
+    --c-amber-500: #b45309;
+    --c-violet-400: #6d28d9;
+    --c-slate-500: #4b5563;
+    --c-slate-700: #d1d5db;
+  }
+
   /* Sprint 134 (v31.7.193) — Utility classes pour cohérence visuelle.
      Factorise les patterns inline les plus répétés dans app.js. */
 
