@@ -107,7 +107,7 @@
   // legacy) mais aucun lien ne pointe plus vers cette valeur.
   // v31.7.77 — 'calendrier' ajouté pour vue 7 jours groupée (user feedback
   // "je veux voir au moins une semaine de pronos jour par jour").
-  const VALID_PAGES = ['dashboard','tous','locks','buteurs','combines','top','historique','bilan','backtest','academie','credibilite','alertes','profil','sante','legal','methodologie','montante-jour','montante-weekend','montante-semaine','compare','calendrier','league','favoris','matchs','performance','plan-mise'];
+  const VALID_PAGES = ['dashboard','tous','locks','buteurs','combines','top','historique','bilan','backtest','academie','credibilite','alertes','profil','sante','legal','methodologie','montante-jour','montante-weekend','montante-semaine','compare','calendrier','league','favoris','matchs','performance','plan-mise','valeur'];
   // v30 — 'mesparis' retiré : Théo n'enregistre pas ses paris sur le site.
   // v31 — 'legal' + 'methodologie' ajoutés (transparence + dictionnaire des
   // métriques, en réponse à l'audit ChatGPT 2026-04-26).
@@ -1418,6 +1418,129 @@
     return Math.min(1, corr);
   }
   try { window.combinationCorrelation = combinationCorrelation; } catch(e){}
+
+  // Sprint 98 (v31.7.183) — Sharpe ratio, max drawdown, streak max.
+  // Métriques pro pour évaluer la rentabilité ajustée au risque.
+  // Sharpe = (ROI moyen - taux sans risque) / écart-type des résultats.
+  // Plus c'est haut, plus le profil rendement/risque est bon.
+  // Max drawdown = perte max consécutive depuis un sommet local du PnL cumulé.
+  // Streak max = plus longue série gagnante / perdante historique.
+  function computeAdvancedMetrics() {
+    const data = window.PRONOSTICS_DATA;
+    if (!data || !data.days) return null;
+    const settled = [];
+    Object.values(data.days || {}).forEach(arr => (arr || []).forEach(m => {
+      if (!m.completed) return;
+      try {
+        const pred = predictMatch(m);
+        if (!pred || !pred.pick) return;
+        const res = (typeof evaluateModelPick === 'function') ? evaluateModelPick(m, pred) : null;
+        if (res !== 'won' && res !== 'lost') return;
+        const pickKey = pred.pick.key;
+        const odd = pred.odds && (pickKey === '1' ? pred.odds.home : pickKey === '2' ? pred.odds.away : pred.odds.draw);
+        if (!(odd > 1)) return;
+        const pnl = res === 'won' ? (Number(odd) - 1) : -1;  // 1u flat stake
+        settled.push({ ts: new Date(m.date).getTime(), result: res, pnl });
+      } catch(e){}
+    }));
+    if (!settled.length) return null;
+    settled.sort((a, b) => a.ts - b.ts);  // chrono ascending
+    // PnL cumulé + running max + drawdown
+    let cumPnL = 0, peak = 0, maxDD = 0, curDD = 0;
+    settled.forEach(s => {
+      cumPnL += s.pnl;
+      if (cumPnL > peak) peak = cumPnL;
+      curDD = peak - cumPnL;
+      if (curDD > maxDD) maxDD = curDD;
+    });
+    // Streaks max
+    let curWinStreak = 0, maxWinStreak = 0, curLossStreak = 0, maxLossStreak = 0;
+    settled.forEach(s => {
+      if (s.result === 'won') {
+        curWinStreak++; curLossStreak = 0;
+        if (curWinStreak > maxWinStreak) maxWinStreak = curWinStreak;
+      } else {
+        curLossStreak++; curWinStreak = 0;
+        if (curLossStreak > maxLossStreak) maxLossStreak = curLossStreak;
+      }
+    });
+    // Sharpe ratio (annualisé non — juste sur l'échantillon)
+    const n = settled.length;
+    const meanPnL = settled.reduce((a, s) => a + s.pnl, 0) / n;
+    const variance = settled.reduce((a, s) => a + Math.pow(s.pnl - meanPnL, 2), 0) / n;
+    const stdev = Math.sqrt(variance);
+    const sharpe = stdev > 0 ? meanPnL / stdev : null;
+    return {
+      n, finalPnL: cumPnL, maxDrawdown: maxDD, maxDDPct: peak > 0 ? maxDD / peak : null,
+      maxWinStreak, maxLossStreak,
+      sharpe, meanPnL, stdev,
+    };
+  }
+  try { window.computeAdvancedMetrics = computeAdvancedMetrics; } catch(e){}
+
+  // Sprint 97 (v31.7.182) — Anti-tilt protection : détection streaks.
+  // Calcule la séquence des N derniers paris réglés (ordre chronologique du
+  // bilan modèle, pas de tracking user perso). Retourne :
+  //   { streakWins, streakLosses, currentSide, recentResults, alert }
+  // alert = { level: 'warn'|'danger'|null, msg: string }
+  // Niveaux :
+  //   - 5+ paris perdants d'affilée → DANGER (stop, attendre)
+  //   - 3-4 paris perdants → WARN (réduit les mises Kelly)
+  //   - 7+ paris gagnants → WARN (gambler's fallacy, garde discipline)
+  function detectStreaks() {
+    const data = window.PRONOSTICS_DATA;
+    if (!data || !data.days) return { streakWins: 0, streakLosses: 0, alert: null };
+    // Collecte tous les completed avec pred et résultat connu, triés par date desc
+    const settled = [];
+    Object.values(data.days || {}).forEach(arr => (arr || []).forEach(m => {
+      if (!m.completed) return;
+      try {
+        const pred = predictMatch(m);
+        if (!pred || !pred.pick) return;
+        const res = (typeof evaluateModelPick === 'function') ? evaluateModelPick(m, pred) : null;
+        if (res !== 'won' && res !== 'lost') return;
+        settled.push({ ts: new Date(m.date).getTime(), result: res, name: m.name });
+      } catch(e){}
+    }));
+    settled.sort((a, b) => b.ts - a.ts);
+    if (!settled.length) return { streakWins: 0, streakLosses: 0, alert: null };
+    // Compte streak en cours (mêmes résultats consécutifs depuis le plus récent)
+    const currentSide = settled[0].result;
+    let streak = 0;
+    for (const s of settled) {
+      if (s.result === currentSide) streak++;
+      else break;
+    }
+    const streakWins = currentSide === 'won' ? streak : 0;
+    const streakLosses = currentSide === 'lost' ? streak : 0;
+    // 10 derniers
+    const last10 = settled.slice(0, 10);
+    const last10Wins = last10.filter(s => s.result === 'won').length;
+    let alert = null;
+    if (streakLosses >= 5) {
+      alert = {
+        level: 'danger',
+        msg: `⛔ ${streakLosses} paris perdants d'affilée. Le modèle traverse une variance négative — STOP recommandé pendant 24h, ou réduis Kelly à 0.10 max.`,
+      };
+    } else if (streakLosses >= 3) {
+      alert = {
+        level: 'warn',
+        msg: `⚠ ${streakLosses} paris perdants récents. Respecte le Kelly fractionné — ne mise pas plus pour "te refaire". C'est ainsi que tu casses ta bankroll.`,
+      };
+    } else if (streakWins >= 7) {
+      alert = {
+        level: 'warn',
+        msg: `🏆 ${streakWins} paris gagnants d'affilée — bravo. Mais attention au gambler's fallacy : ne pousse PAS Kelly au-delà du suggéré, la variance va finir par te rattraper.`,
+      };
+    } else if (last10.length >= 8 && last10Wins / last10.length < 0.3) {
+      alert = {
+        level: 'warn',
+        msg: `📉 Seulement ${last10Wins}/${last10.length} gagnants sur les 10 derniers. Recalibre tes filtres : essaie EV+ ≥ 5% ou désactive les ligues mineures.`,
+      };
+    }
+    return { streakWins, streakLosses, currentSide, settledCount: settled.length, last10Wins, alert };
+  }
+  try { window.detectStreaks = detectStreaks; } catch(e){}
 
   // Sprint 87 (v31.7.174 — audit Part 9) — Gestion risque user.
   // 4 garde-fous configurables par l'user :
@@ -11953,6 +12076,34 @@
           <div style="font-size:13px;line-height:1.5;">La dernière mise à jour date de <strong>${_dataAgeMin < 120 ? _dataAgeMin+' min' : Math.floor(_dataAgeMin/60)+'h'}</strong>. Les matchs affichés pourraient être faux ou déjà joués. <strong>Clique sur "🔄 forcer refresh"</strong> dans le banner rouge en haut pour recharger les vraies données du jour.</div>
         </div>` : ''}
 
+        <!-- Sprint 99 (v31.7.184) — Quick presets actions rapides 1-click -->
+        ${!_dataIsStale ? `
+        <div style="margin:14px 0 0;display:flex;flex-wrap:wrap;gap:6px;">
+          <button class="page-btn" data-page="valeur" style="padding:7px 12px;background:var(--brand);color:#08080a;border:none;border-radius:999px;font-weight:700;font-size:12px;cursor:pointer;">💎 Top edges 7j</button>
+          <button class="page-btn" data-page="plan-mise" style="padding:7px 12px;background:var(--accent);color:#08080a;border:none;border-radius:999px;font-weight:700;font-size:12px;cursor:pointer;">🎯 Mon plan de mise</button>
+          <button class="page-btn" data-page="locks" style="padding:7px 12px;background:transparent;color:var(--text);border:1px solid var(--border-2);border-radius:999px;font-weight:600;font-size:12px;cursor:pointer;">🔒 Locks</button>
+          <button class="page-btn" data-page="top" style="padding:7px 12px;background:transparent;color:var(--text);border:1px solid var(--border-2);border-radius:999px;font-weight:600;font-size:12px;cursor:pointer;">⭐ Top du jour</button>
+          <button class="page-btn" data-page="combines" style="padding:7px 12px;background:transparent;color:var(--text);border:1px solid var(--border-2);border-radius:999px;font-weight:600;font-size:12px;cursor:pointer;">🔗 Combinés</button>
+          <button class="page-btn" data-page="matchs" style="padding:7px 12px;background:transparent;color:var(--text);border:1px solid var(--border-2);border-radius:999px;font-weight:600;font-size:12px;cursor:pointer;">🔍 Tous les matchs</button>
+          <button class="page-btn" data-page="performance" style="padding:7px 12px;background:transparent;color:var(--text-dim);border:1px solid var(--border-2);border-radius:999px;font-weight:600;font-size:12px;cursor:pointer;margin-left:auto;">📊 Performance</button>
+        </div>` : ''}
+
+        <!-- Sprint 97 (v31.7.182) — Anti-tilt protection bandeau streaks -->
+        ${!_dataIsStale ? (() => {
+          const sk = (typeof detectStreaks === 'function') ? detectStreaks() : { alert: null };
+          if (!sk.alert) return '';
+          const isDanger = sk.alert.level === 'danger';
+          const bg = isDanger ? 'rgba(239,68,68,.10)' : 'rgba(199,155,0,.10)';
+          const border = isDanger ? 'rgba(239,68,68,.32)' : 'rgba(199,155,0,.32)';
+          const accentColor = isDanger ? 'var(--danger,#ef4444)' : 'var(--warn,#c79b00)';
+          return `
+          <div style="margin:14px 0 0;padding:14px 16px;background:${bg};border:1px solid ${border};border-left:3px solid ${accentColor};border-radius:0 var(--r-sm) var(--r-sm) 0;font-size:13px;color:var(--text);line-height:1.5;">
+            <div style="font-weight:700;color:${accentColor};margin-bottom:3px;">🛡️ Discipline · alerte streak</div>
+            <div>${esc(sk.alert.msg)}</div>
+            <div style="margin-top:6px;font-size:11px;color:var(--text-dim2);">Basé sur les ${sk.settledCount} derniers paris du modèle (${sk.last10Wins||0}/${Math.min(sk.settledCount,10)} récents gagnants).</div>
+          </div>` ;
+        })() : ''}
+
         <!-- Sprint 78 (v31.7.165 — audit ChatGPT P0) — Compteurs ingérés / exacts / fallback -->
         ${!_dataIsStale && today.length ? (() => {
           const total = today.length;
@@ -15897,6 +16048,8 @@
     const isMatchs = currentPage === 'matchs';
     // Sprint 92 (v31.7.179) — Page Plan de mise du jour (ticket Kelly auto-calculé)
     const isPlanMise = currentPage === 'plan-mise';
+    // Sprint 95 (v31.7.181) — Page "💎 Le marché se trompe ici" : top mismatches edge sur 7j
+    const isValeur = currentPage === 'valeur';
     // Sprint 52 (v31.7.141) — Performance page : hub unifié Bilan + Historique + Backtest + Crédibilité
     const isPerformance = currentPage === 'performance';
 
@@ -16215,6 +16368,18 @@
     planMiseWrap.style.display = isPlanMise ? '' : 'none';
     if (isPlanMise) {
       try { renderPlanMisePage(planMiseWrap); } catch(e) { console.warn('renderPlanMisePage failed', e); }
+    }
+
+    // Sprint 95 (v31.7.181) — Page "💎 Le marché se trompe ici" : top edges 7j
+    let valeurWrap = document.getElementById('valeur-wrap');
+    if (!valeurWrap) {
+      valeurWrap = document.createElement('div');
+      valeurWrap.id = 'valeur-wrap';
+      (document.querySelector('main') || document.body).appendChild(valeurWrap);
+    }
+    valeurWrap.style.display = isValeur ? '' : 'none';
+    if (isValeur) {
+      try { renderValeurPage(valeurWrap); } catch(e) { console.warn('renderValeurPage failed', e); }
     }
 
     calendrierWrap.style.display = isCalendrier ? '' : 'none';
@@ -18338,6 +18503,190 @@
   }
   try { window.renderPlanMisePage = renderPlanMisePage; } catch(e){}
 
+  // ======= Sprint 95 (v31.7.181) — renderValeurPage =======
+  // Page "💎 Le marché se trompe ici" : surface les MEILLEURS écarts entre la
+  // proba modèle et la proba implicite Winamax sur 7 jours.
+  // C'est LA page ROI : 5 minutes de scroll par jour pour identifier les
+  // opportunités systémiques où la cote bookmaker sous-estime le résultat.
+  // Tri par EV potentiel (proba × cote − 1 = retour attendu par mise unitaire).
+  // Affiche : nom match, marché, proba modèle vs proba book, edge, EV, mise
+  // Kelly suggérée, gain potentiel.
+  function renderValeurPage(wrap) {
+    const data = window.PRONOSTICS_DATA;
+    if (!data || !data.days) {
+      wrap.innerHTML = '<div class="page-wrap"><div class="bilan-empty">Pas de données disponibles.</div></div>';
+      return;
+    }
+    let bankroll = 50;
+    try {
+      const v = parseFloat(localStorage.getItem('userBankroll'));
+      if (isFinite(v) && v > 0) bankroll = v;
+    } catch(e) {}
+    // Construit la liste des candidats sur 7 jours
+    const todayDt = new Date(); todayDt.setHours(0,0,0,0);
+    const candidates = [];
+    Object.entries(data.days || {}).forEach(([iso, evs]) => {
+      const dDt = new Date(iso + 'T00:00:00Z');
+      const daysFromToday = Math.round((dDt - todayDt) / (24 * 3600 * 1000));
+      if (daysFromToday < -1 || daysFromToday > 7) return;
+      (evs || []).forEach(m => {
+        if (m.completed || m.live) return;
+        if (!(m.winamax && m.winamax.match_id && m.winamax.markets && m.winamax.markets['1n2'])) return;
+        try {
+          const pred = predictMatch(m);
+          if (!pred || !pred.pick || pred.skip) return;
+          const best = (typeof selectBestMarket === 'function') ? selectBestMarket(m, pred) : null;
+          if (!best || !best.odd || best.odd < 1.10) return;
+          if (best.edge < 0.05) return;  // seuil minimum 5pt edge
+          const conf = Number(pred.reliability ?? pred.pick.prob) || 0;
+          if (conf < 0.50) return;
+          const impliedProb = 1 / best.odd;
+          const probGap = best.prob - impliedProb;  // = edge en pt
+          const ev = best.ev || (best.prob * best.odd - 1);
+          const kFrac = best.kelly || 0;
+          let stake = bankroll * Math.min(kFrac, 0.05);
+          stake = Math.max(0.50, Math.round(stake * 10) / 10);
+          const potentialGain = stake * (best.odd - 1);
+          // EV potentiel en € (= stake × ev) : pour le tri primaire
+          const evEur = stake * ev;
+          candidates.push({
+            match: m, pred, best,
+            label: best.label, prob: best.prob, impliedProb, odd: best.odd,
+            edge: best.edge, ev, kelly: kFrac, stake, potentialGain, evEur,
+            ts: new Date(m.date).getTime(), iso, daysFromToday,
+          });
+        } catch(e){}
+      });
+    });
+    // Tri par EV potentiel desc
+    candidates.sort((a, b) => b.evEur - a.evEur);
+    const top20 = candidates.slice(0, 20);
+    if (!top20.length) {
+      wrap.innerHTML = `
+        <div class="page-wrap">
+          <div class="page-header">
+            <div class="lbl-tiny" style="color:var(--brand);">Parier · Edge maximum</div>
+            <h1 class="page-h1">💎 Le marché se trompe ici</h1>
+          </div>
+          <div class="empty-state-v2" style="margin-top:18px;">
+            <div class="es-illustration">🛡️</div>
+            <div class="es-title-v2">Aucun mismatch significatif détecté</div>
+            <div class="es-body-v2">Le marché Winamax est cohérent avec notre modèle sur les 7 prochains jours (edge < 5pt). C'est rare mais ça arrive : le marché peut s'ajuster vite. Reviens dans quelques heures.</div>
+          </div>
+        </div>`;
+      return;
+    }
+    // Stats globales
+    const totalEvEur = top20.reduce((acc, c) => acc + c.evEur, 0);
+    const totalStake = top20.reduce((acc, c) => acc + c.stake, 0);
+    const avgEdge = top20.reduce((acc, c) => acc + c.edge, 0) / top20.length;
+    const avgEv = top20.reduce((acc, c) => acc + c.ev, 0) / top20.length;
+    const renderRow = (c, idx) => {
+      const sides = (typeof getSides === 'function') ? getSides(c.match) : { home:{}, away:{} };
+      const hN = sides.home?.short || sides.home?.name || '?';
+      const aN = sides.away?.short || sides.away?.name || '?';
+      const sportEm = (typeof sportEmoji === 'function') ? sportEmoji(c.match.sport) : '🎯';
+      const tLbl = (typeof fmtTime === 'function') ? fmtTime(c.match.date) : '';
+      const dayLbl = c.daysFromToday === 0 ? "Aujourd'hui"
+                   : c.daysFromToday === 1 ? 'Demain'
+                   : c.daysFromToday === -1 ? 'Hier'
+                   : `J+${c.daysFromToday}`;
+      const lg = c.match.league_name || c.match.league_code || '';
+      const evColor = c.ev >= 0.15 ? 'var(--accent)' : c.ev >= 0.08 ? 'var(--brand)' : 'var(--warn)';
+      const edgeColor = c.edge >= 0.10 ? 'var(--accent)' : c.edge >= 0.07 ? 'var(--brand)' : 'var(--warn)';
+      const rankBadge = idx < 3 ? `<span style="display:inline-block;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#08080a;font-weight:800;font-size:11px;text-align:center;line-height:22px;margin-right:6px;">${idx+1}</span>` : `<span style="color:var(--text-dim);font-weight:600;font-size:12px;margin-right:6px;">#${idx+1}</span>`;
+      return `
+        <tr class="interactive" data-match-id="${esc(String(c.match.id))}" role="button" tabindex="0" style="border-bottom:1px solid var(--border);cursor:pointer;font-variant-numeric:tabular-nums;">
+          <td style="padding:10px 12px;width:32px;">${rankBadge}</td>
+          <td style="padding:10px 12px;">
+            <div style="font-size:11px;color:var(--text-dim);font-weight:600;">${esc(dayLbl)} · ${esc(tLbl)}</div>
+            <div style="font-size:13px;font-weight:700;color:var(--text);margin-top:1px;">${sportEm} ${esc(hN)} <span style="color:var(--text-dim2);font-weight:400;">vs</span> ${esc(aN)}</div>
+            <div style="font-size:10.5px;color:var(--text-dim);margin-top:1px;">${esc(String(lg).slice(0, 28))}</div>
+          </td>
+          <td style="padding:10px 12px;">
+            <div style="font-size:13px;font-weight:700;color:var(--brand);">${esc(c.label)}</div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:1px;">@${c.odd.toFixed(2)}</div>
+          </td>
+          <td style="padding:10px 12px;text-align:right;">
+            <div style="font-size:11px;color:var(--text-dim);">modèle</div>
+            <div style="font-size:13px;color:var(--text);font-weight:700;">${(c.prob*100).toFixed(0)}%</div>
+          </td>
+          <td style="padding:10px 12px;text-align:right;">
+            <div style="font-size:11px;color:var(--text-dim);">marché</div>
+            <div style="font-size:13px;color:var(--text-dim);font-weight:600;">${(c.impliedProb*100).toFixed(0)}%</div>
+          </td>
+          <td style="padding:10px 12px;text-align:right;color:${edgeColor};font-weight:800;font-size:14px;">+${(c.edge*100).toFixed(1)}pt</td>
+          <td style="padding:10px 12px;text-align:right;color:${evColor};font-weight:800;font-size:14px;">+${(c.ev*100).toFixed(1)}%</td>
+          <td style="padding:10px 12px;text-align:right;color:var(--text);font-weight:700;font-size:13px;">${c.stake.toFixed(2)}€</td>
+          <td style="padding:10px 12px;text-align:right;color:var(--accent);font-weight:700;font-size:13px;">+${c.evEur.toFixed(2)}€</td>
+        </tr>`;
+    };
+    wrap.innerHTML = `
+      <div class="page-wrap">
+        <div class="page-header">
+          <div class="lbl-tiny" style="color:var(--brand);">Parier · Edge maximum 7 jours</div>
+          <h1 class="page-h1">💎 Le marché se trompe ici</h1>
+          <div style="font-size:14px;color:var(--text-dim);">${top20.length} opportunité${top20.length>1?'s':''} où le modèle voit plus que le bookmaker · Bankroll <b style="color:var(--text);">${bankroll.toFixed(0)}€</b></div>
+        </div>
+        <!-- KPIs récap -->
+        <div style="margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;">
+          <div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
+            <div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">EV cumul</div>
+            <div style="font-size:22px;font-weight:800;color:var(--accent);margin-top:2px;font-variant-numeric:tabular-nums;">+${totalEvEur.toFixed(2)}€</div>
+            <div style="font-size:10.5px;color:var(--text-dim);margin-top:2px;">si tout joué</div>
+          </div>
+          <div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
+            <div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">Mise totale</div>
+            <div style="font-size:22px;font-weight:800;color:var(--text);margin-top:2px;font-variant-numeric:tabular-nums;">${totalStake.toFixed(2)}€</div>
+            <div style="font-size:10.5px;color:var(--text-dim);margin-top:2px;">${(totalStake/bankroll*100).toFixed(0)}% bankroll</div>
+          </div>
+          <div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
+            <div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">Edge moyen</div>
+            <div style="font-size:22px;font-weight:800;color:var(--brand);margin-top:2px;font-variant-numeric:tabular-nums;">+${(avgEdge*100).toFixed(1)}pt</div>
+            <div style="font-size:10.5px;color:var(--text-dim);margin-top:2px;">par pari</div>
+          </div>
+          <div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
+            <div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">EV moyen</div>
+            <div style="font-size:22px;font-weight:800;color:var(--accent);margin-top:2px;font-variant-numeric:tabular-nums;">+${(avgEv*100).toFixed(1)}%</div>
+            <div style="font-size:10.5px;color:var(--text-dim);margin-top:2px;">retour attendu</div>
+          </div>
+        </div>
+        <!-- Table mismatches -->
+        <div style="margin-top:18px;overflow-x:auto;border:1px solid var(--border);border-radius:var(--r-sm);">
+          <table style="width:100%;border-collapse:collapse;font-size:13px;">
+            <thead>
+              <tr style="background:var(--panel);border-bottom:1px solid var(--border);">
+                <th style="padding:10px 12px;color:var(--text-dim);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.6px;">#</th>
+                <th style="text-align:left;padding:10px 12px;color:var(--text-dim);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.6px;">Match</th>
+                <th style="text-align:left;padding:10px 12px;color:var(--text-dim);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.6px;">Pari</th>
+                <th style="text-align:right;padding:10px 12px;color:var(--text-dim);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.6px;">Modèle</th>
+                <th style="text-align:right;padding:10px 12px;color:var(--text-dim);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.6px;">Marché</th>
+                <th style="text-align:right;padding:10px 12px;color:var(--text-dim);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.6px;">Edge</th>
+                <th style="text-align:right;padding:10px 12px;color:var(--text-dim);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.6px;">EV</th>
+                <th style="text-align:right;padding:10px 12px;color:var(--text-dim);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.6px;">Mise</th>
+                <th style="text-align:right;padding:10px 12px;color:var(--text-dim);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.6px;">EV €</th>
+              </tr>
+            </thead>
+            <tbody>${top20.map(renderRow).join('')}</tbody>
+          </table>
+        </div>
+        <!-- Méthode -->
+        <div style="margin-top:14px;padding:14px 16px;background:var(--panel);border:1px dashed var(--border-2);border-radius:var(--r-sm);font-size:12px;color:var(--text-dim);line-height:1.5;">
+          <b style="color:var(--text);">💡 Comment lire</b> : on liste les paris où le modèle pense avoir une probabilité <b>significativement supérieure</b> à celle implicite par la cote Winamax (edge ≥ 5pt). Tri par <b>EV potentiel en €</b> = la valeur attendue (proba modèle × cote − 1) × mise Kelly. Plus le chiffre est haut, plus c'est rentable de jouer ce pari.
+          <br><br>
+          <b style="color:var(--text);">Avertissement</b> : edge ≠ certitude de gagner. C'est juste que sur 100 paris à edge +10pt, tu gagneras +10€ par 100€ misés en moyenne (sur le long terme). Court terme, la variance peut être brutale. Joue toujours avec ta bankroll Kelly suggérée, jamais plus.
+        </div>
+      </div>`;
+    wrap.querySelectorAll('[data-match-id]').forEach(row => {
+      row.addEventListener('click', () => {
+        const id = row.dataset.matchId;
+        const c = top20.find(x => String(x.match.id) === String(id));
+        if (c && typeof openDetail === 'function') openDetail(c.match);
+      });
+    });
+  }
+  try { window.renderValeurPage = renderValeurPage; } catch(e){}
+
   // ======= Sprint 52 (v31.7.141) — renderPerformancePage =======
   // Vue globale "Performance" qui agrège les KPIs clés (ROI cumul, Win Rate,
   // Brier, calibration drift) avec liens vers les onglets détaillés.
@@ -18481,6 +18830,19 @@
           ${profit != null ? kpiTile('Profit cumul', `${Number(profit) >= 0 ? '+' : ''}${Number(profit).toFixed(2)}€`, '', Number(profit) >= 0 ? 'var(--accent)' : 'var(--danger)') : ''}
           ${edgeAvg != null ? kpiTile('Edge moyen', `${Number(edgeAvg) >= 0 ? '+' : ''}${(Number(edgeAvg)*100).toFixed(1)}pt`, 'sur paris pris', Number(edgeAvg) >= 0.03 ? 'var(--accent)' : 'var(--text-dim)') : ''}
           ${clvAvg != null ? kpiTile('CLV moyen', `${Number(clvAvg) >= 0 ? '+' : ''}${(Number(clvAvg)*100).toFixed(1)}%`, 'closing line value', Number(clvAvg) >= 0 ? 'var(--accent)' : 'var(--danger)') : ''}
+          ${(() => {
+            // Sprint 98 (v31.7.183) — Sharpe ratio + drawdown + streaks max
+            const adv = (typeof computeAdvancedMetrics === 'function') ? computeAdvancedMetrics() : null;
+            if (!adv || !adv.n) return '';
+            const sharpeColor = adv.sharpe == null ? 'var(--text-dim)' : adv.sharpe >= 0.20 ? 'var(--accent)' : adv.sharpe >= 0 ? 'var(--warn)' : 'var(--danger)';
+            const ddColor = adv.maxDrawdown <= 5 ? 'var(--accent)' : adv.maxDrawdown <= 15 ? 'var(--warn)' : 'var(--danger)';
+            return [
+              kpiTile('Sharpe ratio', adv.sharpe == null ? '—' : adv.sharpe.toFixed(3), adv.sharpe >= 0.20 ? 'Excellent' : adv.sharpe >= 0.10 ? 'Bon' : adv.sharpe >= 0 ? 'Faible' : 'Négatif', sharpeColor),
+              kpiTile('Max drawdown', `−${adv.maxDrawdown.toFixed(1)}u`, adv.maxDDPct != null ? `(${(adv.maxDDPct*100).toFixed(0)}% du peak)` : '', ddColor),
+              kpiTile('Streak max gain', `${adv.maxWinStreak}`, 'paris gagnants d\'affilée', 'var(--accent)'),
+              kpiTile('Streak max perte', `${adv.maxLossStreak}`, 'paris perdants d\'affilée', 'var(--danger)'),
+            ].join('');
+          })()}
         </div>`}
 
         ${currentTab === 'periode' && Object.keys(byPeriod).length ? `

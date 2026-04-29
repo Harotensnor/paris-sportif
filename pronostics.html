@@ -478,9 +478,10 @@
   <div class="hub" data-hub="parier">
     <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">💰 Parier <span class="chev">▾</span></button>
     <div class="hub-menu" role="menu" aria-label="Sous-menu Parier">
+      <button class="page-btn" role="menuitem" data-page="valeur">💎 Le marché se trompe ici<span class="nav-new-badge" data-new-until="2026-06-30">Nouveau</span></button>
+      <button class="page-btn" role="menuitem" data-page="plan-mise">🎯 Plan de mise du jour</button>
       <button class="page-btn" role="menuitem" data-page="top">⭐ Top du jour</button>
       <button class="page-btn" role="menuitem" data-page="locks">🔒 Locks <span class="count" id="count-locks">0</span></button>
-      <button class="page-btn" role="menuitem" data-page="plan-mise">🎯 Plan de mise du jour<span class="nav-new-badge" data-new-until="2026-06-30">Nouveau</span></button>
       <button class="page-btn" role="menuitem" data-page="combines">🔗 Combinés value</button>
       <button class="page-btn" role="menuitem" data-page="montante-jour">📈 Montante du jour</button>
       <button class="page-btn" role="menuitem" data-page="montante-weekend">🗓️ Montante weekend</button>
@@ -988,6 +989,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-29T15:20:32.863033Z","today":"
   var commands = [
     {label:'🏠 Accueil', icon:'🏠', keywords:'accueil home dashboard aujourd hui parier maintenant', action: function(){ var b=document.querySelector('.page-btn[data-page="dashboard"]'); if(b) b.click(); }},
     // 💰 Parier
+    {label:'💎 Le marché se trompe ici (NOUVEAU)', icon:'💎', keywords:'valeur edge mismatch top marche bookmaker erreur opportunite gros argent', action: function(){ var b=document.querySelector('.page-btn[data-page="valeur"]'); if(b) b.click(); }},
     {label:'💰 Plan de mise du jour (NOUVEAU)', icon:'🎯', keywords:'plan mise ticket kelly auto optimise calcul argent', action: function(){ var b=document.querySelector('.page-btn[data-page="plan-mise"]'); if(b) b.click(); }},
     {label:'💰 Top du jour', icon:'⭐', keywords:'top meilleurs picks jour parier confiance edge kelly', action: function(){ var b=document.querySelector('.page-btn[data-page="top"]'); if(b) b.click(); }},
     {label:'💰 Locks (haute confiance)', icon:'🔒', keywords:'paris surs locks meilleurs haute confiance ≥70', action: function(){ var b=document.querySelector('.page-btn[data-page="locks"]'); if(b) b.click(); }},
