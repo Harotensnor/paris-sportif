@@ -12489,9 +12489,27 @@
       return `
       ${streakBanner}
       <section class="action-focus" role="region" aria-label="Ce que tu dois faire maintenant" style="margin:0 0 20px;padding:18px 20px;background:linear-gradient(135deg, rgba(167,139,250,.10) 0%, rgba(52,211,153,.06) 100%);border:1px solid var(--brand-soft);border-left:4px solid var(--brand);border-radius:var(--r-md);box-shadow:var(--shadow-sm);">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap;">
           <span style="font-size:11px;font-weight:800;color:var(--brand);text-transform:uppercase;letter-spacing:.08em;">🎯 Ce que tu dois faire maintenant</span>
           <span style="font-size:10.5px;color:var(--text-dim2);background:var(--panel);padding:2px 8px;border-radius:10px;">Bankroll ${userBankroll.toFixed(0)}€</span>
+          ${(() => {
+            // Sprint 113 (v31.7.190) — Risk gauge mini : barre horizontale qui montre
+            // % bankroll utilisé vs limite quotidienne. Vert <50%, orange 50-80%, rouge >80%.
+            // Passé une lecture rapide en 1s : "où en suis-je sur la discipline ?"
+            const rl = (typeof _loadRiskLimits === 'function') ? _loadRiskLimits() : { maxStakePctDay: 0.25 };
+            const limit = rl.maxStakePctDay || 0.25;
+            const usage = userBankroll > 0 ? totalStake / (userBankroll * limit) : 0;
+            const usagePct = Math.min(100, usage * 100);
+            const color = usage >= 1 ? 'var(--danger)' : usage >= 0.8 ? 'var(--warn)' : 'var(--accent)';
+            return `
+              <div style="display:inline-flex;align-items:center;gap:6px;font-size:10px;color:var(--text-dim);" data-tooltip="Discipline du jour : ${(usage*100).toFixed(0)}% de la limite ${(limit*100).toFixed(0)}% bankroll/jour">
+                <span style="text-transform:uppercase;letter-spacing:.4px;font-weight:700;">Risque</span>
+                <span style="display:inline-block;width:60px;height:6px;background:var(--panel);border-radius:3px;overflow:hidden;">
+                  <span style="display:block;width:${usagePct}%;height:100%;background:${color};transition:width .3s;"></span>
+                </span>
+                <span style="color:${color};font-weight:700;font-variant-numeric:tabular-nums;">${(usage*100).toFixed(0)}%</span>
+              </div>`;
+          })()}
         </div>
         <div style="font-size:14px;color:var(--text-2);line-height:1.5;margin-bottom:${riskLabel ? '4px' : '12px'};">
           ${headline}
