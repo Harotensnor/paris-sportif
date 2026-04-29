@@ -10576,8 +10576,60 @@
       renderSearchSuggest(searchTerm);
     }, 150);
   });
+  // Sprint 132 (v31.7.193) — Recent searches : on garde les 5 dernières
+  // recherches au-delà de 2 chars dans localStorage. Affiche au focus si input vide.
+  const RECENT_SEARCHES_KEY = 'recentSearches';
+  function _saveRecentSearch(q) {
+    if (!q || q.length < 2) return;
+    try {
+      const arr = JSON.parse(localStorage.getItem(RECENT_SEARCHES_KEY) || '[]');
+      const filtered = arr.filter(x => x.toLowerCase() !== q.toLowerCase());
+      filtered.unshift(q);
+      localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(filtered.slice(0, 5)));
+    } catch(e){}
+  }
+  function _loadRecentSearches() {
+    try { return JSON.parse(localStorage.getItem(RECENT_SEARCHES_KEY) || '[]') || []; }
+    catch(e) { return []; }
+  }
+  function _renderRecentSearches() {
+    const box = document.getElementById('search-suggest');
+    if (!box) return;
+    const recents = _loadRecentSearches();
+    if (!recents.length) { box.style.display = 'none'; return; }
+    box.innerHTML = `
+      <div style="padding:8px 14px;font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.5px;font-weight:700;border-bottom:1px solid var(--border);">
+        Recherches récentes
+        <button type="button" id="search-recent-clear" style="float:right;background:transparent;border:none;color:var(--text-dim2);font-size:10px;cursor:pointer;text-transform:none;letter-spacing:0;text-decoration:underline;">Effacer</button>
+      </div>
+      ${recents.map(q => `
+        <div class="search-suggest-item" data-recent-q="${esc(q)}" style="display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;">
+          <span style="color:var(--text-dim2);">🕐</span>
+          <span style="color:var(--text);flex:1;">${esc(q)}</span>
+        </div>
+      `).join('')}`;
+    box.style.display = 'block';
+    box.querySelectorAll('[data-recent-q]').forEach(el => {
+      el.addEventListener('click', () => {
+        const q = el.dataset.recentQ;
+        const inp = document.getElementById('search');
+        if (inp) { inp.value = q; inp.dispatchEvent(new Event('input', { bubbles: true })); }
+      });
+    });
+    const clearBtn = box.querySelector('#search-recent-clear');
+    if (clearBtn) clearBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      try { localStorage.removeItem(RECENT_SEARCHES_KEY); } catch(e){}
+      box.style.display = 'none';
+    });
+  }
   bind('search', 'focus', (e) => {
-    renderSearchSuggest(e.target.value);
+    const q = (e.target.value || '').trim();
+    if (q.length === 0) {
+      _renderRecentSearches();
+    } else {
+      renderSearchSuggest(q);
+    }
   });
   // FIX bug #15 : clear le timer pendant qu'on quitte la page pour éviter
   // un re-render parasite si un setTimeout(150ms) tire entre user-typed et
@@ -10736,6 +10788,8 @@
         const input = document.getElementById('search');
         input.value = label;
         searchTerm = label;
+        // Sprint 132 (v31.7.193) — Save to recent searches
+        try { _saveRecentSearch(label); } catch(e){}
         render();
         box.style.display = 'none';
         // Si équipe et prochain match identifié, ouvre directement la fiche.
@@ -11530,6 +11584,25 @@
       return today.some(m => m && m.status === 'STATUS_IN_PROGRESS' && !m.completed);
     } catch(e) { return false; }
   }
+  // Sprint 136 (v31.7.193) — Détecte les matchs imminents (<15 min avant kickoff).
+  // Quand un match va bientôt commencer, on poll plus souvent pour capter le
+  // dernier mouvement de cote / dernière compo.
+  function _hasImminentMatch() {
+    try {
+      const d = window.PRONOSTICS_DATA;
+      if (!d || !d.days) return false;
+      const todayIso = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+      const today = d.days[todayIso] || [];
+      const nowMs = Date.now();
+      return today.some(m => {
+        if (!m || m.completed || m.live) return false;
+        const ts = m.date ? new Date(m.date).getTime() : 0;
+        if (!ts) return false;
+        const diffMin = (ts - nowMs) / 60000;
+        return diffMin > 0 && diffMin < 15;  // imminent : 0-15min avant kickoff
+      });
+    } catch(e) { return false; }
+  }
   function startAutoRefresh() {
     if (__refreshTimer) clearInterval(__refreshTimer);
     const tickMs = 15 * 1000;
@@ -11576,12 +11649,15 @@
     __refreshTimer = setInterval(() => {
       const now = Date.now();
       const tabHidden = document.visibilityState === 'hidden';
-      // v30 #4 — Polling adaptive : 30s si match LIVE en cours, 60s sinon.
-      // Réévalué à chaque tick (une nouvelle rencontre peut passer en LIVE
-      // entre deux ticks). Cap à 30s pour éviter de marteler le serveur
-      // (le cron côté serveur ne génère pas plus vite que 5min en pratique
-      // mais snapshot_odds + fetch_live peuvent être plus fréquents).
-      const pollEveryMs = _hasLiveMatch() ? 30 * 1000 : 60 * 1000;
+      // v30 #4 + Sprint 136 — Polling adaptive 3 niveaux :
+      // - 15s si match imminent (<15min avant kickoff) : on veut la dernière cote
+      // - 30s si match LIVE en cours : updates en cours
+      // - 60s sinon : économie réseau
+      // Réévalué à chaque tick (une nouvelle rencontre peut passer en imminent ou
+      // LIVE entre deux ticks).
+      const pollEveryMs = _hasImminentMatch() ? 15 * 1000
+                        : _hasLiveMatch()    ? 30 * 1000
+                        :                      60 * 1000;
       // When tab is hidden, don't burn CPU with rendering. Poll stays (cheap).
       // Data poll (every 60 s, ou 30s en mode live) — fires render() on success via the fresh data
       if (now - lastPoll >= pollEveryMs && !__refreshInFlight) {
