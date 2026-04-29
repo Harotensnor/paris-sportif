@@ -7846,42 +7846,44 @@
 
     // All odds table
     const oddsTableHtml = (match.odds && match.odds.length) ? `
-      <table class="odds-table">
-        <thead>
-          <tr>
-            <th>Site de paris</th>
-            <th>1 (${esc(home?.abbr || 'Dom')})</th>
-            ${hasDraw ? '<th>N</th>' : ''}
-            <th>2 (${esc(away?.abbr || 'Ext')})</th>
-            ${hasDraw ? '<th>Spread</th><th>O/U</th>' : '<th>Spread</th><th>Total</th>'}
-          </tr>
-        </thead>
-        <tbody>
-          ${(() => {
-            // Compute best per column
-            let bestH = null, bestD = null, bestA = null;
-            match.odds.forEach(o => {
-              const h = mlToDecimal(o.homeML), d = hasDraw ? mlToDecimal(o.drawML) : null, a = mlToDecimal(o.awayML);
-              if (h && (bestH == null || h > bestH)) bestH = h;
-              if (d && (bestD == null || d > bestD)) bestD = d;
-              if (a && (bestA == null || a > bestA)) bestA = a;
-            });
-            return match.odds.map(o => {
-              const h = mlToDecimal(o.homeML), d = hasDraw ? mlToDecimal(o.drawML) : null, a = mlToDecimal(o.awayML);
-              return `
-                <tr>
-                  <td>${esc(o.provider || '—')}</td>
-                  <td class="${h === bestH && h != null ? 'best' : ''}">${h ? h.toFixed(2) : '—'}</td>
-                  ${hasDraw ? `<td class="${d === bestD && d != null ? 'best' : ''}">${d ? d.toFixed(2) : '—'}</td>` : ''}
-                  <td class="${a === bestA && a != null ? 'best' : ''}">${a ? a.toFixed(2) : '—'}</td>
-                  <td>${o.spread != null ? o.spread : '—'}</td>
-                  <td>${o.overUnder != null ? o.overUnder : '—'}</td>
-                </tr>
-              `;
-            }).join('');
-          })()}
-        </tbody>
-      </table>
+      <div class="tbl-scroll">
+        <table class="odds-table">
+          <thead>
+            <tr>
+              <th>Site de paris</th>
+              <th>1 (${esc(home?.abbr || 'Dom')})</th>
+              ${hasDraw ? '<th>N</th>' : ''}
+              <th>2 (${esc(away?.abbr || 'Ext')})</th>
+              ${hasDraw ? '<th>Spread</th><th>O/U</th>' : '<th>Spread</th><th>Total</th>'}
+            </tr>
+          </thead>
+          <tbody>
+            ${(() => {
+              // Compute best per column
+              let bestH = null, bestD = null, bestA = null;
+              match.odds.forEach(o => {
+                const h = mlToDecimal(o.homeML), d = hasDraw ? mlToDecimal(o.drawML) : null, a = mlToDecimal(o.awayML);
+                if (h && (bestH == null || h > bestH)) bestH = h;
+                if (d && (bestD == null || d > bestD)) bestD = d;
+                if (a && (bestA == null || a > bestA)) bestA = a;
+              });
+              return match.odds.map(o => {
+                const h = mlToDecimal(o.homeML), d = hasDraw ? mlToDecimal(o.drawML) : null, a = mlToDecimal(o.awayML);
+                return `
+                  <tr>
+                    <td>${esc(o.provider || '—')}</td>
+                    <td class="${h === bestH && h != null ? 'best' : ''}">${h ? h.toFixed(2) : '—'}</td>
+                    ${hasDraw ? `<td class="${d === bestD && d != null ? 'best' : ''}">${d ? d.toFixed(2) : '—'}</td>` : ''}
+                    <td class="${a === bestA && a != null ? 'best' : ''}">${a ? a.toFixed(2) : '—'}</td>
+                    <td>${o.spread != null ? o.spread : '—'}</td>
+                    <td>${o.overUnder != null ? o.overUnder : '—'}</td>
+                  </tr>
+                `;
+              }).join('');
+            })()}
+          </tbody>
+        </table>
+      </div>
     ` : '<div style="color:var(--text-dim2); font-size:13px;">Aucune cote disponible pour ce match.</div>';
 
     // Leaders (basketball)
@@ -14996,16 +14998,18 @@
     const table = (title, rows) => rows.length ? `
       <div style="margin-top:18px;">
         <div style="font-size:10px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;font-weight:700;margin-bottom:6px;">${esc2(title)}</div>
-        <table style="width:100%;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums;">
-          <thead><tr style="color:var(--text-dim);font-weight:600;border-bottom:1px solid var(--border);">
-            <th style="padding:6px 10px;text-align:left;">Clé</th>
-            <th style="padding:6px 10px;text-align:right;">N</th>
-            <th style="padding:6px 10px;text-align:right;">WR</th>
-            <th style="padding:6px 10px;text-align:right;">ROI</th>
-            <th style="padding:6px 10px;text-align:right;">Brier</th>
-          </tr></thead>
-          <tbody>${rows.join('')}</tbody>
-        </table>
+        <div class="tbl-scroll">
+          <table style="width:100%;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums;">
+            <thead><tr style="color:var(--text-dim);font-weight:600;border-bottom:1px solid var(--border);">
+              <th style="padding:6px 10px;text-align:left;">Clé</th>
+              <th style="padding:6px 10px;text-align:right;">N</th>
+              <th style="padding:6px 10px;text-align:right;">WR</th>
+              <th style="padding:6px 10px;text-align:right;">ROI</th>
+              <th style="padding:6px 10px;text-align:right;">Brier</th>
+            </tr></thead>
+            <tbody>${rows.join('')}</tbody>
+          </table>
+        </div>
       </div>` : '';
 
     const bySport = Object.entries(rep.by_sport || {}).sort((a,b) => b[1].n - a[1].n).map(([k,s]) => tableRow(k, s));
@@ -19423,25 +19427,27 @@
         ${currentTab === 'periode' && Object.keys(byPeriod).length ? `
         <div style="margin-top:18px;">
           <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px;">Performance par période</div>
-          <table style="width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:13px;">
-            <thead>
-              <tr style="border-bottom:1px solid var(--border);">
-                <th style="text-align:left;padding:8px 12px;color:var(--text-dim);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;">Période</th>
-                <th style="text-align:right;padding:8px 12px;color:var(--text-dim);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;">N paris</th>
-                <th style="text-align:right;padding:8px 12px;color:var(--text-dim);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;">Win Rate</th>
-                <th style="text-align:right;padding:8px 12px;color:var(--text-dim);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;">ROI</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${Object.entries(byPeriod).sort().map(([p, v]) => `
-              <tr style="border-bottom:1px solid var(--border);">
-                <td style="padding:8px 12px;color:var(--text);font-weight:600;">${esc(p)}</td>
-                <td style="padding:8px 12px;text-align:right;color:var(--text-dim);">${v.n || 0}</td>
-                <td style="padding:8px 12px;text-align:right;color:var(--text);">${fmtPct(v.win_rate ?? v.winRate)}</td>
-                <td style="padding:8px 12px;text-align:right;color:${(v.roi ?? 0) >= 0.02 ? 'var(--accent)' : (v.roi ?? 0) >= -0.02 ? 'var(--warn)' : 'var(--danger)'};font-weight:700;">${fmtSign(v.roi)}</td>
-              </tr>`).join('')}
-            </tbody>
-          </table>
+          <div class="tbl-scroll">
+            <table style="width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:13px;">
+              <thead>
+                <tr style="border-bottom:1px solid var(--border);">
+                  <th style="text-align:left;padding:8px 12px;color:var(--text-dim);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;">Période</th>
+                  <th style="text-align:right;padding:8px 12px;color:var(--text-dim);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;">N paris</th>
+                  <th style="text-align:right;padding:8px 12px;color:var(--text-dim);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;">Win Rate</th>
+                  <th style="text-align:right;padding:8px 12px;color:var(--text-dim);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;">ROI</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${Object.entries(byPeriod).sort().map(([p, v]) => `
+                <tr style="border-bottom:1px solid var(--border);">
+                  <td style="padding:8px 12px;color:var(--text);font-weight:600;">${esc(p)}</td>
+                  <td style="padding:8px 12px;text-align:right;color:var(--text-dim);">${v.n || 0}</td>
+                  <td style="padding:8px 12px;text-align:right;color:var(--text);">${fmtPct(v.win_rate ?? v.winRate)}</td>
+                  <td style="padding:8px 12px;text-align:right;color:${(v.roi ?? 0) >= 0.02 ? 'var(--accent)' : (v.roi ?? 0) >= -0.02 ? 'var(--warn)' : 'var(--danger)'};font-weight:700;">${fmtSign(v.roi)}</td>
+                </tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
         </div>` : currentTab === 'periode' ? `
         <div class="empty-state-v2" style="margin-top:18px;">
           <div class="es-illustration">📆</div>
@@ -22996,7 +23002,7 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
           <div class="meta">${rows.length} pari${rows.length>1?'s':''}</div>
         </div>
         ${modelRowsHtml ? `
-          <div style="overflow-x:auto;">
+          <div class="tbl-scroll tbl-sticky">
             <table class="bilan-table">
               <thead><tr>
                 <th>Date</th><th>Match</th><th>Sport</th><th>Pick</th>
@@ -23689,10 +23695,11 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch(e) {}
     });
 
-    // v30 — Hub dropdowns : toggle au clic, ferme au clic extérieur, un seul
-    // ouvert à la fois. Sur mobile (drawer ouvert) les .hub-btn sont
-    // pointer-events:none → ce handler ne s'exécute pas, les menus sont
-    // dépliés en permanence comme sections.
+    // v30 + Sprint 105 (v31.7.190) — Hub dropdowns : toggle au clic, ferme au
+    // clic extérieur, un seul ouvert à la fois. Comportement unifié desktop +
+    // mobile drawer : tap sur hub-btn déplie/replie. Avant Sprint 105 le drawer
+    // mobile gardait tous les hubs ouverts (drawer trop long). Maintenant un
+    // seul hub ouvert à la fois côté drawer aussi.
     document.querySelectorAll('nav.topbar-nav .hub .hub-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -24014,10 +24021,32 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       if (burger) burger.setAttribute('aria-expanded', String(open));
       if (overlay) overlay.setAttribute('aria-hidden', String(!open));
     };
+    // Sprint 105 (v31.7.190) — Quand le drawer mobile s'ouvre, auto-expand
+    // le hub contenant la page active pour que l'utilisateur voie son contexte.
+    const _expandActiveHubInDrawer = () => {
+      if (!window.matchMedia('(max-width: 960px)').matches) return;
+      const activeBtn = document.querySelector('nav.topbar-nav .page-btn.active');
+      if (!activeBtn) return;
+      const parentHub = activeBtn.closest('.hub');
+      if (!parentHub) return;
+      // Ferme les autres hubs ouverts
+      document.querySelectorAll('nav.topbar-nav .hub.open').forEach(h => {
+        if (h !== parentHub) {
+          h.classList.remove('open');
+          const b = h.querySelector('.hub-btn');
+          if (b) b.setAttribute('aria-expanded', 'false');
+        }
+      });
+      parentHub.classList.add('open');
+      const hb = parentHub.querySelector('.hub-btn');
+      if (hb) hb.setAttribute('aria-expanded', 'true');
+    };
     if (burger) {
       burger.addEventListener('click', () => {
+        const wasOpen = document.body.classList.contains('sidebar-open');
         document.body.classList.toggle('sidebar-open');
         syncSidebarAria();
+        if (!wasOpen) _expandActiveHubInDrawer();
       });
     }
     if (overlay) {
@@ -24030,8 +24059,10 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     const mbnMenu = document.getElementById('mbn-menu-btn');
     if (mbnMenu) {
       mbnMenu.addEventListener('click', () => {
+        const wasOpen = document.body.classList.contains('sidebar-open');
         document.body.classList.toggle('sidebar-open');
         syncSidebarAria();
+        if (!wasOpen) _expandActiveHubInDrawer();
       });
     }
     syncSidebarAria();
