@@ -6206,9 +6206,13 @@
     // Affiche un badge "n picks à parier maintenant" sur le bouton Accueil
     // de la nav. Compte les picks edge≥5% conf≥55% du jour. Update quand pollData
     // refresh, pulse à chaque changement.
+    // Sprint 131 (v31.7.193) — Buffer 5min avant kickoff : Winamax retire la
+    // cote pre-match ~5min avant, donc on ne compte plus ces matchs comme
+    // "à parier maintenant" (faux positifs).
     const dashboardCountEl = document.getElementById('count-dashboard-actions');
     if (dashboardCountEl) {
       const nowMs = Date.now();
+      const PRE_KICKOFF_BUFFER = 5 * 60 * 1000;  // 5 min de marge
       const todayIsoKey = todayISO();
       const todayEvents = (data.days && data.days[todayIsoKey]) || [];
       let nActions = 0;
@@ -6217,7 +6221,7 @@
         if (m.completed || m.live) return;
         if (!m.date) return;
         const ko = new Date(m.date).getTime();
-        if (isNaN(ko) || ko < nowMs) return;
+        if (isNaN(ko) || ko < nowMs + PRE_KICKOFF_BUFFER) return;
         try {
           const p = predictMatch(m);
           if (!p || !p.pick || p.skip) return;
@@ -12500,7 +12504,7 @@
       if (!isFinite(ageMin) || ageMin > 30) {
         try {
           sessionStorage.setItem('autoRefreshDoneAt', String(Date.now()));
-          console.log('[agent] Data >2h obsolète ('+_dataAgeMin+'min) → auto force-refresh');
+          // Sprint 131 (v31.7.193) — console.log retiré (residual debug)
           (async () => {
             try {
               if ('serviceWorker' in navigator) {
@@ -14154,16 +14158,27 @@
           el.style.animation = '';
         }
       };
-      const intervalId = setInterval(updateCountdown, 60000);
+      const intervalId = setInterval(() => {
+        // Sprint 131 (v31.7.193) — Auto-cleanup si la card n'existe plus dans le DOM,
+        // OU si plus de 12h écoulées (safety belt contre les leaks).
+        if (!document.body.contains(_countdownEl) || (Date.now() - intervalStartTs) > 12 * 3600 * 1000) {
+          clearInterval(intervalId);
+          if (obsRef) try { obsRef.disconnect(); } catch(e){}
+          return;
+        }
+        updateCountdown();
+      }, 60000);
+      const intervalStartTs = Date.now();
       // Cleanup au prochain re-render via MutationObserver léger
+      let obsRef = null;
       try {
-        const obs = new MutationObserver(() => {
+        obsRef = new MutationObserver(() => {
           if (!document.body.contains(_countdownEl)) {
             clearInterval(intervalId);
-            obs.disconnect();
+            obsRef.disconnect();
           }
         });
-        obs.observe(wrap, { childList: true, subtree: true });
+        obsRef.observe(wrap, { childList: true, subtree: true });
       } catch(e) { /* old browser */ }
     }
     // Sprint 118 (v31.7.191) — Click handler "J'ai parié" → ajoute le pari
@@ -24380,7 +24395,7 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       s.src = 'https://plausible.io/js/script.js';
       document.head.appendChild(s);
       _analyticsLoaded = true;
-      console.log('[analytics] Plausible loaded for', window.ANALYTICS_PLAUSIBLE_DOMAIN);
+      // Sprint 131 (v31.7.193) — console.log retiré (production)
     } else if (window.ANALYTICS_CLOUDFLARE_TOKEN) {
       const s = document.createElement('script');
       s.defer = true;
@@ -24388,7 +24403,7 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       s.dataset.cfBeacon = JSON.stringify({ token: window.ANALYTICS_CLOUDFLARE_TOKEN });
       document.head.appendChild(s);
       _analyticsLoaded = true;
-      console.log('[analytics] Cloudflare Web Analytics loaded');
+      // Sprint 131 — console.log retiré
     }
     // Sinon : aucun analytics configuré, on no-op silencieusement.
   }
