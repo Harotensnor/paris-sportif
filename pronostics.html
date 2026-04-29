@@ -1536,7 +1536,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-29T20:50:35.363116Z","today":"
     if (!best) {
       overlay.innerHTML = `
         <div class="qb-card">
-          <button class="close" data-close>×</button>
+          <button class="close" data-close aria-label="Fermer">×</button>
           <h2>🎯 Que parier maintenant ?</h2>
           <div class="empty">
             <div style="font-size:40px;margin-bottom:10px;">🤷</div>
@@ -1570,7 +1570,7 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-29T20:50:35.363116Z","today":"
     // confiance + la raison, et ferme.
     overlay.innerHTML = `
       <div class="qb-card">
-        <button class="close" data-close>×</button>
+        <button class="close" data-close aria-label="Fermer">×</button>
         <h2>🎯 Meilleur pari maintenant</h2>
         <div class="team">${esc(homeName)} vs ${esc(awayName)}</div>
         <div class="meta">${hour ? hour + ' · ' : ''}${esc(m.league_name || m.league_code || '')} · cote @${odd.toFixed(2)}</div>

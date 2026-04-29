@@ -680,12 +680,35 @@
   // ============================================================
 
   // Sprint A1 — Better DOM helpers
+  /**
+   * Wrapper around document.querySelector for shorter calls.
+   * @param {string} selector - CSS selector
+   * @param {ParentNode} [root=document] - Root element to search within
+   * @returns {Element|null}
+   */
   function _qs(selector, root = document) {
     return root.querySelector(selector);
   }
+  /**
+   * Wrapper around document.querySelectorAll that returns an Array (not NodeList).
+   * Allows .map/.filter/.forEach without conversion.
+   * @param {string} selector - CSS selector
+   * @param {ParentNode} [root=document] - Root element to search within
+   * @returns {Element[]}
+   */
   function _qsa(selector, root = document) {
     return Array.from(root.querySelectorAll(selector));
   }
+  /**
+   * Create DOM element with attributes and children.
+   * Supports {style: {color: 'red'}}, {dataset: {id: '1'}}, {onClick: fn}, plain attrs.
+   * Children can be strings (auto text nodes) or DOM nodes.
+   * @param {string} tag - Element tag name
+   * @param {Object} [attrs={}] - Attributes/props/event listeners
+   * @param {...(string|Node)} children - Child nodes
+   * @returns {HTMLElement}
+   * @example _ce('button', { class: 'btn', onClick: handleClick }, 'Click me')
+   */
   function _ce(tag, attrs = {}, ...children) {
     const el = document.createElement(tag);
     for (const [k, v] of Object.entries(attrs)) {
@@ -704,6 +727,16 @@
   try { window._qs = _qs; window._qsa = _qsa; window._ce = _ce; } catch(e){}
 
   // Sprint A2 — Event delegation helper
+  /**
+   * Event delegation : attach a listener on parent, dispatched only when target
+   * matches the selector. Allows attaching once on a static parent for many
+   * dynamic children, and survives DOM updates.
+   * @param {Element} parent - Parent element to attach listener on
+   * @param {string} eventType - 'click', 'input', etc.
+   * @param {string} selector - CSS selector for target match
+   * @param {Function} handler - (event, matchedTarget) => void
+   * @example _on(wrap, 'click', '[data-bookmark]', (e, btn) => toggle(btn.dataset.bookmark))
+   */
   function _on(parent, eventType, selector, handler) {
     if (!parent || !parent.addEventListener) return;
     parent.addEventListener(eventType, (e) => {
@@ -714,6 +747,13 @@
   try { window._on = _on; } catch(e){}
 
   // Sprint A3 — Async wrapper with error toast
+  /**
+   * Wraps an async function with try/catch + user-facing toast on error.
+   * Logs to console.warn but never throws to caller. Returns null on error.
+   * @param {Function} fn - Async function to execute
+   * @param {string} [errorMsg] - User-facing error message
+   * @returns {Promise<*|null>} Result of fn() or null on error
+   */
   async function _safeAsync(fn, errorMsg = 'Une erreur est survenue') {
     try { return await fn(); }
     catch(e) {
@@ -725,6 +765,12 @@
   try { window._safeAsync = _safeAsync; } catch(e){}
 
   // Sprint A4 — Copy to clipboard helper avec fallback
+  /**
+   * Copy text to clipboard. Uses Clipboard API in secure contexts,
+   * falls back to execCommand('copy') on older browsers / non-HTTPS.
+   * @param {string} text - Text to copy
+   * @returns {Promise<boolean>} true on success
+   */
   async function _copyToClipboard(text) {
     if (!text) return false;
     try {
@@ -747,6 +793,13 @@
   try { window._copyToClipboard = _copyToClipboard; } catch(e){}
 
   // Sprint A5 — Format relative time (étendu vs _fmt.age)
+  /**
+   * Human-friendly relative time (FR locale).
+   * Past : "à l'instant", "il y a 5 min", "il y a 3 jours", "il y a 2 ans"
+   * Future : "dans 10 min", "dans 2 jours"
+   * @param {number} ts - Unix timestamp (ms)
+   * @returns {string}
+   */
   function _fmtRelativeTime(ts) {
     if (!ts || !isFinite(ts)) return '';
     const diffMs = Date.now() - ts;
@@ -775,6 +828,17 @@
   try { window._fmtNumber = _fmtNumber; } catch(e){}
 
   // Sprint A7 — Smart confirm with custom UI (vs native confirm)
+  /**
+   * Custom-styled confirm modal (replacement for native confirm()).
+   * Better UX, themable, keyboard-accessible (Esc=cancel, Enter=confirm).
+   * @param {Object} opts
+   * @param {string} [opts.title='Confirmer']
+   * @param {string} [opts.body='']
+   * @param {string} [opts.confirmLabel='Confirmer']
+   * @param {string} [opts.cancelLabel='Annuler']
+   * @param {boolean} [opts.danger=false]
+   * @returns {Promise<boolean>} true if user confirmed, false otherwise
+   */
   function _showConfirm(opts) {
     return new Promise(resolve => {
       const overlay = document.createElement('div');
@@ -816,6 +880,10 @@
   try { window._showConfirm = _showConfirm; } catch(e){}
 
   // Sprint A8 — Haptic feedback (si dispo)
+  /**
+   * Trigger haptic vibration on mobile (no-op if unsupported).
+   * @param {'light'|'medium'|'heavy'|'double'} [type='light']
+   */
   function _haptic(type = 'light') {
     if (!navigator.vibrate) return;
     const patterns = { light: 8, medium: 18, heavy: 30, double: [10, 50, 10] };
@@ -935,8 +1003,16 @@
   };
 
   // Sprint H (v31.7.197) — Bottom sheet helper
-  // Usage : window._showBottomSheet({ title, body, actions, onClose })
-  // body peut être string HTML ou DOM node ; actions = [{label, onClick, primary}]
+  /**
+   * Mobile-first bottom sheet modal (slide-up on mobile, center modal on desktop).
+   * Includes drag handle (mobile), close button, Esc + outside-click handlers.
+   * @param {Object} opts
+   * @param {string} [opts.title=''] - Sheet title
+   * @param {string|Node} [opts.body=''] - Body (HTML string or DOM node)
+   * @param {Array<{label: string, onClick: Function, primary?: boolean}>} [opts.actions=[]]
+   * @param {Function} [opts.onClose] - Called when sheet closes
+   * @returns {{close: Function}} API to programmatically close
+   */
   function _showBottomSheet(opts) {
     const { title = '', body = '', actions = [], onClose = null } = opts || {};
     const overlay = document.createElement('div');
@@ -13439,11 +13515,34 @@
         const pnlSign = stats.totalPnL >= 0 ? '+' : '';
         const adherence = (typeof window._computeAdherence === 'function') ? window._computeAdherence() : null;
         const adherencePct = adherence && adherence.adherence != null ? Math.round(adherence.adherence * 100) : null;
+        // Plan 1000 phase 3 — Streak indicator (Sprint A advanced stats)
+        let streakBadge = '';
+        if (stats.currentStreak && stats.currentStreak >= 2) {
+          const isWin = stats.currentStreakSide === 'won';
+          const emoji = isWin ? '🔥' : '⛔';
+          const color = isWin ? 'var(--accent)' : 'var(--danger)';
+          streakBadge = `<span style="font-size:11.5px;color:${color};font-weight:700;">${emoji} ${stats.currentStreak}× ${isWin ? 'wins' : 'pertes'}</span>`;
+        }
+        // Plan 1000 phase 3 — "If you had followed" comparison
+        let modelComparison = '';
+        try {
+          const ifFollowed = (typeof window._computeIfYouHadFollowed === 'function') ? window._computeIfYouHadFollowed() : null;
+          if (ifFollowed && ifFollowed.n >= 5) {
+            const modelROIPct = (ifFollowed.modelROI * 100).toFixed(1);
+            const userROIPct = (stats.roi * 100).toFixed(1);
+            const diff = (ifFollowed.modelROI - stats.roi) * 100;
+            const diffSign = diff >= 0 ? '+' : '';
+            const diffColor = diff > 1 ? 'var(--accent)' : diff < -1 ? 'var(--danger)' : 'var(--text-dim2)';
+            modelComparison = `<span style="font-size:11px;color:var(--text-dim2);" data-tooltip="Si tu avais suivi tous les locks, ton ROI serait à ${modelROIPct}% (vs tes ${userROIPct}% actuels)">📈 Modèle : <strong style="color:${diffColor};">${diffSign}${diff.toFixed(1)}pt</strong></span>`;
+          }
+        } catch(e){}
         return `
           <section class="user-bilan-mini" role="region" aria-label="Mon bilan personnel" style="margin:0 0 16px;padding:12px 16px;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${roiColor};border-radius:var(--r-sm);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-variant-numeric:tabular-nums;">
             <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
               <span style="font-size:11px;font-weight:700;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.6px;">📊 Ton bilan perso</span>
               <span style="font-size:13px;color:var(--text);"><strong style="color:${roiColor};">${pnlSign}${stats.totalPnL.toFixed(2)}€</strong> sur ${stats.n} paris · ${(stats.winRate*100).toFixed(0)}% WR · <span style="color:${roiColor};">${pnlSign}${(stats.roi*100).toFixed(1)}% <span class="gloss-term" data-gloss="roi">ROI</span></span></span>
+              ${streakBadge}
+              ${modelComparison}
               ${adherencePct != null ? `<span style="font-size:11.5px;color:var(--text-dim);">Adhérence modèle <strong style="color:var(--text);">${adherencePct}%</strong></span>` : ''}
             </div>
             <button type="button" class="page-btn" data-page="bilan" style="padding:6px 10px;background:transparent;color:var(--brand);border:1px solid var(--brand-soft);border-radius:var(--r-xs);cursor:pointer;font-size:11.5px;font-weight:600;">Voir détail →</button>
@@ -17128,6 +17227,8 @@
               <button id="show-howto-btn" style="background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:var(--r);padding:8px 12px;font-size:12px;cursor:pointer;">📖 Comment lire un prono</button>
               <button id="restore-trust-btn" style="background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:var(--r);padding:8px 12px;font-size:12px;cursor:pointer;">📊 Réafficher trust strip</button>
               <button id="clear-recent-searches" style="background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:var(--r);padding:8px 12px;font-size:12px;cursor:pointer;">🕐 Effacer recherches récentes</button>
+              <button id="export-data-btn" style="background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:var(--r);padding:8px 12px;font-size:12px;cursor:pointer;">📦 Exporter mes données (RGPD)</button>
+              <button id="show-keyboard-shortcuts" style="background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:var(--r);padding:8px 12px;font-size:12px;cursor:pointer;">⌨️ Raccourcis clavier</button>
             </div>
           </div>
 
@@ -17450,6 +17551,24 @@
     if (clearSearchesBtn) clearSearchesBtn.addEventListener('click', () => {
       try { localStorage.removeItem('recentSearches'); } catch(e){}
       if (typeof toast === 'function') toast('✓ Recherches récentes effacées', 'success');
+    });
+    // Plan 1000 phase 3 — Export RGPD
+    const exportBtn = wrap.querySelector('#export-data-btn');
+    if (exportBtn) exportBtn.addEventListener('click', () => {
+      if (typeof window._exportAllUserData === 'function') {
+        window._exportAllUserData();
+        if (typeof toast === 'function') toast('✓ Données exportées en JSON', 'success');
+      }
+    });
+    // Plan 1000 phase 3 — Show keyboard shortcuts modal
+    const shortcutsBtn = wrap.querySelector('#show-keyboard-shortcuts');
+    if (shortcutsBtn) shortcutsBtn.addEventListener('click', () => {
+      if (typeof window.showShortcutsHelp === 'function') {
+        window.showShortcutsHelp();
+      } else {
+        // Fallback : trigger '?' key event
+        document.dispatchEvent(new KeyboardEvent('keydown', { key: '?', bubbles: true }));
+      }
     });
   }
 
