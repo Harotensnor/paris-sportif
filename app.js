@@ -24239,6 +24239,49 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     else document.addEventListener('DOMContentLoaded', updateBanner, { once: true });
   })();
 
+  // Sprint 120 (v31.7.191) — Scroll-to-top FAB. S'affiche après scroll >800px,
+  // smooth scroll au click. Throttled via requestAnimationFrame pour pas
+  // saturer le scroll handler (60fps cap).
+  (function _initScrollTopFab() {
+    const fab = document.getElementById('scroll-top-fab');
+    if (!fab) return;
+    let ticking = false;
+    const SCROLL_THRESHOLD = 800;
+    const updateVisibility = () => {
+      const scrollY = window.scrollY || document.documentElement.scrollTop;
+      const shouldShow = scrollY > SCROLL_THRESHOLD;
+      const isVisible = fab.classList.contains('visible');
+      if (shouldShow && !isVisible) {
+        fab.removeAttribute('hidden');
+        // Force reflow puis ajoute la class pour trigger l'animation
+        // (sinon le browser coalesce et l'animation ne joue pas).
+        void fab.offsetWidth;
+        fab.classList.add('visible');
+      } else if (!shouldShow && isVisible) {
+        fab.classList.remove('visible');
+        // Retire hidden après animation pour pas perdre l'a11y/focus
+        setTimeout(() => {
+          if (!fab.classList.contains('visible')) fab.setAttribute('hidden', '');
+        }, 250);
+      }
+      ticking = false;
+    };
+    const onScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(updateVisibility);
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    fab.addEventListener('click', () => {
+      try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch(e) {
+        window.scrollTo(0, 0);
+      }
+    });
+    // Initial check (au cas où la page soit chargée déjà scrollée)
+    updateVisibility();
+  })();
+
   window.addEventListener('DOMContentLoaded', () => {
     const data = window.PRONOSTICS_DATA;
     if (!data) {

@@ -535,6 +535,12 @@
 <!-- Overlay pour le menu mobile -->
 <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
 
+<!-- Sprint 120 (v31.7.191) — Scroll-to-top FAB. Apparaît après scroll >800px,
+     position fixe bottom-right, smooth scroll au click. Hidden par défaut. -->
+<button id="scroll-top-fab" class="scroll-top-fab" type="button" aria-label="Retour en haut" data-tooltip="Retour en haut" hidden>
+  <span aria-hidden="true">↑</span>
+</button>
+
 <!-- v31.7.32 — Trust strip dynamique. Affiché 1× par session pour les
      visiteurs anonymes, persiste hidden après dismiss (localStorage).
      Populé au boot par window.__backtestReportV2. Fournit en 3s la preuve
