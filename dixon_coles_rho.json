@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-04-29T09:57:41Z",
+  "generated_at": "2026-04-29T10:04:17Z",
   "method": "Dixon-Coles MLE grid search (ρ ∈ [-0.30, 0.10] step 0.005), λ_h, λ_a fixés à moyenne empirique par ligue. CI 95% via LR test.",
   "min_matches": 40,
   "default_rho": -0.13,
-  "n_leagues": 44,
+  "n_leagues": 45,
   "n_measured": 0,
   "leagues": {
     "afc.champions": {
@@ -78,13 +78,21 @@
       "source": "literature_fallback",
       "reason": "n=10 < 40"
     },
-    "conmebol.sudamericana": {
-      "n": 1,
+    "conmebol.libertadores": {
+      "n": 6,
       "rho_measured": null,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=1 < 40"
+      "reason": "n=6 < 40"
+    },
+    "conmebol.sudamericana": {
+      "n": 6,
+      "rho_measured": null,
+      "rho_literature": -0.13,
+      "rho_used": -0.13,
+      "source": "literature_fallback",
+      "reason": "n=6 < 40"
     },
     "ecu.1": {
       "n": 9,
