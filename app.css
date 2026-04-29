@@ -4353,8 +4353,30 @@
   }
   .mbn-btn:hover, .mbn-btn:focus-visible { color: var(--text); background: rgba(255,255,255,.04); }
   .mbn-btn.active { color: var(--brand); background: rgba(167,139,250,.12); }
-  .mbn-icon { font-size: 18px; line-height: 1; }
+  .mbn-icon { font-size: 18px; line-height: 1; position: relative; }
   .mbn-label { font-size: 10.5px; }
+  /* Sprint 127 (v31.7.191) — Badge count sur boutons mobile bottom-nav.
+     Petit badge rouge à droite de l'icon pour indiquer un nombre (locks, picks).
+     Pulse animation à chaque update via .count-pulse class. */
+  .mbn-btn { position: relative; }
+  .mbn-badge {
+    position: absolute;
+    top: 4px;
+    right: calc(50% - 18px);
+    min-width: 16px; height: 16px;
+    background: var(--brand);
+    color: #08080a;
+    font-size: 9.5px;
+    font-weight: 800;
+    line-height: 16px;
+    text-align: center;
+    border-radius: 8px;
+    padding: 0 4px;
+    box-shadow: 0 0 0 2px var(--bg);
+    pointer-events: none;
+  }
+  .mbn-badge[hidden] { display: none; }
+  .mbn-btn.active .mbn-badge { background: var(--accent); }
   @media (max-width: 720px) {
     .mobile-bottom-nav { display: flex; }
     /* Spacer en bas du body pour ne pas que le contenu se cache derrière la nav */
