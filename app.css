@@ -5323,6 +5323,28 @@
     }
   }
 
+  /* Sprint 123 (v31.7.191) — Data freshness chip pulse. */
+  @keyframes fresh-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: .55; transform: scale(0.85); }
+  }
+
+  /* Sprint 122 (v31.7.191) — Search highlight mark.
+     Met en évidence le terme cherché dans les suggestions search. Utilise
+     <mark class="search-mark"> au lieu du <mark> natif (qui jaune fluo
+     incompatible avec le dark mode). */
+  .search-mark {
+    background: rgba(167, 139, 250, .25);
+    color: var(--brand);
+    font-weight: 700;
+    border-radius: 2px;
+    padding: 0 2px;
+  }
+  html[data-theme="light"] .search-mark {
+    background: rgba(124, 58, 237, .15);
+    color: #6d28d9;
+  }
+
   /* Sprint 120 (v31.7.191) — Scroll-to-top FAB.
      Bouton flottant bottom-right qui apparaît dès qu'on scroll >800px sur
      n'importe quelle page. Click → smooth scroll au top. Animation fade-in
