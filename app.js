@@ -15264,7 +15264,13 @@
     } catch(e) { return ''; }
   }
 
-  // ====== v22 — Onboarding modal ======
+  // ====== v22 + Sprint 107 (v31.7.190) — Onboarding wizard 4 étapes ======
+  // Avant : 1 étape level. Après : 4 étapes guidées pour expliquer le site, fixer
+  // bankroll, démontrer comment lire un pick, et terminer sur Dashboard.
+  // Étape 1 : Welcome / promesse (ROI value vs marché Winamax)
+  // Étape 2 : Niveau (existant — adapte la densité d'info)
+  // Étape 3 : Bankroll (input numérique → userBankroll localStorage)
+  // Étape 4 : Tutoriel "comment lire un pick" (mini-card explicative)
   function showOnboardingModal() {
     try {
       const prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}');
@@ -15275,60 +15281,156 @@
       overlay.className = 'onboard-overlay';
       overlay.setAttribute('role', 'dialog');
       overlay.setAttribute('aria-modal', 'true');
-      overlay.innerHTML = `
-        <div class="onboard-card">
-          <h2>👋 Bienvenue</h2>
-          <div class="sub">Dis-moi ton niveau, j'adapte le site à toi.</div>
-          <button class="onboard-opt" data-level="debutant">
-            <b>🌱 Débutant</b>
-            <div class="descr">Je découvre les paris — je veux des conseils simples et un max de sécurité.</div>
-          </button>
-          <button class="onboard-opt" data-level="confirme">
-            <b>🎯 Confirmé</b>
-            <div class="descr">Je parie régulièrement — je veux les stats importantes sans me noyer.</div>
-          </button>
-          <button class="onboard-opt" data-level="pro">
-            <b>📊 Pro</b>
-            <div class="descr">Je veux tous les chiffres : cotes, Elo, rentabilité, brut — pas de filtres.</div>
-          </button>
-          <button class="skip" data-skip="1">Ignorer (je verrai plus tard)</button>
-        </div>`;
-      document.body.appendChild(overlay);
+      overlay.setAttribute('aria-labelledby', 'onb-title');
 
-      overlay.querySelectorAll('[data-level]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const level = btn.dataset.level;
-          try {
-            const p = JSON.parse(localStorage.getItem('userPrefs') || '{}');
-            p.level = level;
-            p.onboardingDone = true;
-            localStorage.setItem('userPrefs', JSON.stringify(p));
-            // v31.7.45 — Marqueur additionnel pour audit cohérence
-            localStorage.setItem('paris_sportif_onboarded_v2', '1');
-          } catch(e){}
-          overlay.remove();
-          try { if (typeof toast === 'function') toast('✓ Niveau défini : ' + level, 'success'); } catch(e){}
-          try { if (typeof applyPageView === 'function') applyPageView(); } catch(e){}
-          // v31.7.45 — Show RGPD banner après onboarding (cascade ordonnée).
-          // Petit délai pour laisser l'overlay fade out + le toast finir.
-          setTimeout(() => {
-            try { if (typeof _initConsentBanner === 'function') _initConsentBanner(); } catch(e){}
-          }, 600);
+      // État interne du wizard
+      const state = { step: 1, level: prefs.level || 'confirme', bankroll: 50 };
+      const totalSteps = 4;
+
+      const renderStep = () => {
+        const progressPct = (state.step / totalSteps) * 100;
+        let body = '';
+        if (state.step === 1) {
+          body = `
+            <h2 id="onb-title">👋 Bienvenue sur Paris-Sportif</h2>
+            <div class="sub">Site indépendant, modèle Poisson + Dixon-Coles + calibration isotonique. <strong>Objectif : te faire gagner de l'argent</strong> en repérant les matchs où Winamax se trompe.</div>
+            <div style="background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px 16px;margin:14px 0;line-height:1.6;font-size:13.5px;color:var(--text-2);">
+              <div style="margin-bottom:8px;"><strong style="color:var(--accent);">✓ Ce que tu trouves ici :</strong></div>
+              <div>• Picks value (edge ≥5% calculé vs cotes Winamax temps réel)</div>
+              <div>• Mises calculées (Kelly fractionné, cap 10% bankroll)</div>
+              <div>• Backtest transparent (toutes les perfs tracées)</div>
+              <div>• 100% Winamax, zéro affiliation, zéro promesse</div>
+            </div>
+            <div style="background:rgba(252,165,165,.08);border:1px solid var(--danger);border-left:3px solid var(--danger);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:14px;font-size:12.5px;color:var(--text-dim);line-height:1.5;">
+              <strong style="color:var(--danger);">⚠ Honnêteté :</strong> 3-5 pertes consécutives sont <strong>normales</strong>. ~60% de réussite long-terme. Pas de garantie. Joue responsable.
+            </div>
+          `;
+        } else if (state.step === 2) {
+          body = `
+            <h2 id="onb-title">🎯 Quel est ton niveau ?</h2>
+            <div class="sub">J'adapte la densité d'info affichée. Tu pourras changer plus tard.</div>
+            <button class="onboard-opt${state.level==='debutant'?' selected':''}" data-level="debutant">
+              <b>🌱 Débutant</b>
+              <div class="descr">Je découvre — je veux des conseils simples, sécurité max.</div>
+            </button>
+            <button class="onboard-opt${state.level==='confirme'?' selected':''}" data-level="confirme">
+              <b>🎯 Confirmé</b>
+              <div class="descr">Je parie régulièrement — stats importantes sans me noyer.</div>
+            </button>
+            <button class="onboard-opt${state.level==='pro'?' selected':''}" data-level="pro">
+              <b>📊 Pro</b>
+              <div class="descr">Tous les chiffres : cotes, Elo, rentabilité, brut.</div>
+            </button>
+          `;
+        } else if (state.step === 3) {
+          body = `
+            <h2 id="onb-title">💰 Quelle est ta bankroll ?</h2>
+            <div class="sub">Le montant total que tu acceptes de risquer sur les paris. Toutes les mises seront calibrées par rapport à ça (Kelly fractionné, cap 10% par pari).</div>
+            <div style="margin:18px 0;">
+              <label for="onb-bankroll" style="display:block;font-size:11px;font-weight:700;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;">Bankroll (€)</label>
+              <input type="number" id="onb-bankroll" value="${state.bankroll}" min="10" max="10000" step="10" style="width:100%;padding:14px 16px;background:var(--panel-2);border:1px solid var(--border-2);border-radius:var(--r-sm);font-size:18px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;">
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
+              ${[20, 50, 100, 200, 500].map(v => `
+                <button type="button" class="onb-bankroll-preset" data-val="${v}" style="flex:1;min-width:60px;padding:8px 12px;background:${v===state.bankroll?'var(--brand)':'var(--panel-2)'};color:${v===state.bankroll?'#08080a':'var(--text)'};border:1px solid ${v===state.bankroll?'var(--brand)':'var(--border)'};border-radius:var(--r-sm);cursor:pointer;font-size:12px;font-weight:700;">${v}€</button>
+              `).join('')}
+            </div>
+            <div style="font-size:11.5px;color:var(--text-dim2);line-height:1.5;">
+              💡 <strong>Conseil :</strong> commence avec une somme que tu peux perdre intégralement sans impact. Tu peux modifier dans Profil &amp; bankroll à tout moment.
+            </div>
+          `;
+        } else if (state.step === 4) {
+          body = `
+            <h2 id="onb-title">📖 Comment lire un pick</h2>
+            <div class="sub">Exemple concret pour que tu sois autonome dès le 1er match.</div>
+            <div style="background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--r-sm);padding:14px 16px;margin:14px 0;font-size:13px;line-height:1.7;">
+              <div style="font-weight:700;color:var(--text);font-size:14px;margin-bottom:8px;">PSG vs Marseille · Pick: <strong style="color:var(--accent);">PSG (1)</strong></div>
+              <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-variant-numeric:tabular-nums;font-size:12.5px;color:var(--text-dim);">
+                <span>Cote: <strong style="color:var(--text);">@1.85</strong></span>
+                <span>Confiance: <strong style="color:var(--text);">62%</strong></span>
+                <span>Edge: <strong style="color:var(--accent);">+8pt</strong></span>
+                <span>Mise: <strong style="color:var(--brand);">5€</strong></span>
+              </div>
+            </div>
+            <div style="font-size:13px;line-height:1.7;color:var(--text-2);">
+              <div><strong style="color:var(--accent);">Cote 1.85</strong> = pour 1€ misé tu gagnes 0.85€ si PSG gagne</div>
+              <div><strong style="color:var(--accent);">Confiance 62%</strong> = le modèle estime à 62% la victoire de PSG</div>
+              <div><strong style="color:var(--accent);">Edge +8pt</strong> = l'avantage value vs la cote (le marché donne ~54% à PSG, on dit 62%)</div>
+              <div><strong style="color:var(--accent);">Mise 5€</strong> = Kelly fractionné × bankroll, plafonné 10%</div>
+            </div>
+            <div style="margin-top:14px;padding:10px 14px;background:rgba(167,139,250,.08);border:1px solid var(--brand-soft);border-radius:var(--r-sm);font-size:12px;color:var(--text-2);line-height:1.5;">
+              💡 Tu vois <strong>+8pt edge</strong> sur un pick ? C'est value. <strong>Edge ≤ 0 ?</strong> Le modèle skip — pas de pari forcé.
+            </div>
+          `;
+        }
+        overlay.innerHTML = `
+          <div class="onboard-card" style="max-width:540px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+              <div style="font-size:11px;color:var(--text-dim2);font-weight:600;">ÉTAPE ${state.step} / ${totalSteps}</div>
+              <button type="button" class="skip" data-skip="1" style="background:none;border:none;color:var(--text-dim);cursor:pointer;text-decoration:underline;font-size:11px;">Passer le tutoriel</button>
+            </div>
+            <div style="height:3px;background:var(--border);border-radius:2px;margin-bottom:18px;overflow:hidden;">
+              <div style="height:100%;width:${progressPct}%;background:linear-gradient(90deg, var(--brand), var(--accent));transition:width .25s;"></div>
+            </div>
+            ${body}
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:20px;">
+              <button type="button" class="onb-prev" ${state.step===1?'disabled':''} style="padding:10px 18px;background:var(--panel-2);color:${state.step===1?'var(--text-dim2)':'var(--text)'};border:1px solid var(--border);border-radius:var(--r-sm);cursor:${state.step===1?'not-allowed':'pointer'};font-size:13px;font-weight:600;${state.step===1?'opacity:.5;':''}">← Précédent</button>
+              <button type="button" class="onb-next" style="padding:10px 22px;background:var(--brand);color:#08080a;border:none;border-radius:var(--r-sm);cursor:pointer;font-size:13px;font-weight:700;">${state.step===totalSteps?'C\\'est parti ! →':'Suivant →'}</button>
+            </div>
+          </div>`;
+        // Wire handlers (must re-bind après chaque renderStep car innerHTML reset)
+        overlay.querySelectorAll('[data-level]').forEach(btn => {
+          btn.addEventListener('click', () => { state.level = btn.dataset.level; renderStep(); });
         });
-      });
-      overlay.querySelector('[data-skip]').addEventListener('click', () => {
+        overlay.querySelectorAll('.onb-bankroll-preset').forEach(btn => {
+          btn.addEventListener('click', () => {
+            state.bankroll = parseFloat(btn.dataset.val);
+            const inp = overlay.querySelector('#onb-bankroll');
+            if (inp) inp.value = state.bankroll;
+            renderStep();
+          });
+        });
+        const bankrollInput = overlay.querySelector('#onb-bankroll');
+        if (bankrollInput) {
+          bankrollInput.addEventListener('input', (e) => {
+            const v = parseFloat(e.target.value);
+            if (isFinite(v) && v > 0) state.bankroll = v;
+          });
+        }
+        const skipBtn = overlay.querySelector('[data-skip]');
+        if (skipBtn) skipBtn.addEventListener('click', () => finish(true));
+        const prevBtn = overlay.querySelector('.onb-prev');
+        if (prevBtn) prevBtn.addEventListener('click', () => {
+          if (state.step > 1) { state.step--; renderStep(); }
+        });
+        const nextBtn = overlay.querySelector('.onb-next');
+        if (nextBtn) nextBtn.addEventListener('click', () => {
+          if (state.step < totalSteps) { state.step++; renderStep(); }
+          else finish(false);
+        });
+      };
+
+      const finish = (skipped) => {
         try {
           const p = JSON.parse(localStorage.getItem('userPrefs') || '{}');
+          p.level = state.level;
           p.onboardingDone = true;
           localStorage.setItem('userPrefs', JSON.stringify(p));
           localStorage.setItem('paris_sportif_onboarded_v2', '1');
+          if (!skipped && state.bankroll > 0) {
+            localStorage.setItem('userBankroll', String(state.bankroll));
+          }
         } catch(e){}
         overlay.remove();
-        // v31.7.45 — Same cascade pour les utilisateurs qui skip
+        try { if (typeof toast === 'function') toast(skipped ? '✓ Tutoriel ignoré' : `✓ Setup terminé · niveau ${state.level} · bankroll ${state.bankroll}€`, 'success'); } catch(e){}
+        try { if (typeof applyPageView === 'function') applyPageView(); } catch(e){}
         setTimeout(() => {
           try { if (typeof _initConsentBanner === 'function') _initConsentBanner(); } catch(e){}
         }, 600);
-      });
+      };
+
+      document.body.appendChild(overlay);
+      renderStep();
     } catch(e) { /* noop */ }
   }
 
