@@ -4926,6 +4926,8 @@
     if (key === 'X') return hs === as ? 'won' : 'lost';
     return null;
   }
+  // FIX 2026-04-29 — Expose evaluateModelPick pour debug console + tests live.
+  try { window.evaluateModelPick = evaluateModelPick; } catch(e){}
 
   // Sprint 60 (v31.7.149) — Per-market evaluation. Étend evaluateModelPick
   // pour les marchés secondaires (OU, BTTS, DC, score exact, mi-temps,
@@ -18143,19 +18145,36 @@
       return;
     }
     // KPIs globaux (depuis backtest_report_v2)
+    // FIX 2026-04-29 — alignement avec les vrais noms de champs du rapport :
+    //   * flat_roi_pct (pourcentage déjà ×100, pas ratio)
+    //   * flat_pnl (€), kelly_pnl (€)
+    //   * avg_clv_pct (en %, déjà ×100), n_with_clv
+    //   * avg_pick_prob, avg_cote → on calcule edge moyen par dérivation
     const overall = bt.overall || bt.global || {};
     const n = overall.n || 0;
     const wr = overall.win_rate ?? overall.winRate ?? null;
-    const roi = overall.roi ?? null;
+    // ROI flat : flat_roi_pct est en % déjà → diviser par 100 pour retomber en ratio
+    const roi = (overall.flat_roi_pct != null) ? overall.flat_roi_pct / 100
+              : (overall.roi ?? null);
     const brier = overall.brier ?? null;
-    const profit = overall.profit ?? null;
+    // Profit cumul : flat_pnl est en € (signed)
+    const profit = overall.flat_pnl ?? overall.profit ?? null;
     const stake = overall.total_stake ?? overall.stake ?? null;
-    // Sprint 86 (v31.7.173 — audit Part 8) — ROI Kelly + edge moyen + CLV séparés.
-    // Si le backtest expose ces champs (added in scripts/backtest_v2.py), les KPIs
-    // affichent ROI flat ET ROI Kelly distinct. Sinon fallback sur estimation.
-    const roiKelly = overall.roi_kelly ?? overall.roiKelly ?? null;
-    const edgeAvg = overall.edge_avg ?? overall.edgeAvg ?? null;
-    const clvAvg = overall.clv_avg ?? overall.clvAvg ?? null;
+    // Sprint 86 + FIX 2026-04-29 — ROI Kelly via kelly_pnl (€). Pas un ratio mais un montant
+    // absolu — le report ne donne pas la mise totale Kelly, donc on affiche le PnL
+    // directement (en €). Si on veut un %, on peut diviser par n × stake_unit, mais
+    // c'est moins fiable.
+    const roiKelly = (overall.kelly_pnl != null) ? overall.kelly_pnl
+                   : (overall.roi_kelly ?? overall.roiKelly ?? null);
+    const roiKellyIsAmount = (overall.kelly_pnl != null);  // True = afficher en €
+    // Edge moyen : pas direct. Dérivé de avg_pick_prob - 1/avg_cote
+    const edgeAvg = (overall.avg_pick_prob != null && overall.avg_cote > 1)
+                    ? (overall.avg_pick_prob - 1 / overall.avg_cote)
+                    : (overall.edge_avg ?? overall.edgeAvg ?? null);
+    // CLV : avg_clv_pct est en % (×100) déjà. n_with_clv = 0 → null
+    const clvAvg = (overall.n_with_clv > 0 && overall.avg_clv_pct != null)
+                  ? overall.avg_clv_pct / 100
+                  : (overall.clv_avg ?? overall.clvAvg ?? null);
     // Per-sport breakdown
     const perSport = bt.by_sport || bt.perSport || {};
     const sportCards = Object.entries(perSport)
@@ -18221,12 +18240,17 @@
           ${kpiTile('Win Rate', fmtPct(wr), `${n} pari${n > 1 ? 's' : ''}`, 'var(--text)')}
           ${kpiTile('ROI flat', fmtSign(roi), stake ? `mise totale ${Number(stake).toFixed(0)}€` : 'mise constante', roiColor)}
           ${(() => {
-            // Sprint 86 — ROI Kelly distinct ROI flat
+            // Sprint 86 + FIX 2026-04-29 — ROI Kelly. Le report donne kelly_pnl
+            // en € (montant absolu), pas un ratio. On affiche le PnL en €.
             if (roiKelly != null) {
-              const c = Number(roiKelly) >= 0.02 ? 'var(--accent)' : Number(roiKelly) >= -0.02 ? 'var(--warn)' : 'var(--danger)';
-              return kpiTile('ROI Kelly', fmtSign(roiKelly), 'mise pondérée Kelly 0.25', c);
+              const num = Number(roiKelly);
+              const c = num > 0 ? 'var(--accent)' : num < 0 ? 'var(--danger)' : 'var(--text-dim)';
+              const display = roiKellyIsAmount
+                ? `${num >= 0 ? '+' : ''}${num.toFixed(2)}€`
+                : fmtSign(roiKelly);
+              return kpiTile('PnL Kelly', display, 'mise pondérée Kelly 0.25', c);
             }
-            return kpiTile('ROI Kelly', '—', 'pas encore calculé', 'var(--text-dim)');
+            return kpiTile('PnL Kelly', '—', 'pas encore calculé', 'var(--text-dim)');
           })()}
           ${kpiTile('Brier score', brier == null ? '—' : Number(brier).toFixed(3), brier == null ? '' : Number(brier) <= 0.18 ? 'Calibration excellente' : Number(brier) <= 0.22 ? 'Calibration correcte' : 'Calibration médiocre', brierColor)}
           ${profit != null ? kpiTile('Profit cumul', `${Number(profit) >= 0 ? '+' : ''}${Number(profit).toFixed(2)}€`, '', Number(profit) >= 0 ? 'var(--accent)' : 'var(--danger)') : ''}
