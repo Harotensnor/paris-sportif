@@ -19174,27 +19174,27 @@
           <div style="font-size:14px;color:var(--text-dim);">${enriched.length} pari${enriched.length>1?'s':''} EV+ sélectionné${enriched.length>1?'s':''} · Bankroll : <b style="color:var(--text);">${bankroll.toFixed(0)}€</b> · <button id="plan-mise-edit-bk" style="background:transparent;border:none;color:var(--brand);text-decoration:underline;cursor:pointer;font-weight:600;padding:0;font-size:13px;">modifier</button></div>
         </div>
         ${riskBannerHtml}
-        <!-- KPIs récap -->
+        <!-- KPIs récap (Sprint 111 — refacto avec .kpi-tile harmonisé) -->
         <div style="margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;">
-          <div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
-            <div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">Mise totale</div>
-            <div style="font-size:22px;font-weight:800;color:var(--text);margin-top:2px;font-variant-numeric:tabular-nums;">${totalStake.toFixed(2)}€</div>
-            <div style="font-size:10.5px;color:var(--text-dim);margin-top:2px;">${(stakePctBankroll*100).toFixed(0)}% <span class="gloss-term" data-gloss="bankroll">bankroll</span></div>
+          <div class="kpi-tile">
+            <div class="kpi-tile-label">Mise totale</div>
+            <div class="kpi-tile-value">${totalStake.toFixed(2)}€</div>
+            <div class="kpi-tile-sub">${(stakePctBankroll*100).toFixed(0)}% <span class="gloss-term" data-gloss="bankroll">bankroll</span></div>
           </div>
-          <div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
-            <div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">Gain potentiel</div>
-            <div style="font-size:22px;font-weight:800;color:var(--accent);margin-top:2px;font-variant-numeric:tabular-nums;">+${totalPotentialGain.toFixed(2)}€</div>
-            <div style="font-size:10.5px;color:var(--text-dim);margin-top:2px;">si tous gagnent</div>
+          <div class="kpi-tile">
+            <div class="kpi-tile-label">Gain potentiel</div>
+            <div class="kpi-tile-value positive">+${totalPotentialGain.toFixed(2)}€</div>
+            <div class="kpi-tile-sub">si tous gagnent</div>
           </div>
-          <div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
-            <div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;"><span class="gloss-term" data-gloss="edge">Edge</span> moyen</div>
-            <div style="font-size:22px;font-weight:800;color:var(--brand);margin-top:2px;font-variant-numeric:tabular-nums;">+${(enriched.reduce((a,c) => a + c.edge, 0) / enriched.length * 100).toFixed(1)}pt</div>
-            <div style="font-size:10.5px;color:var(--text-dim);margin-top:2px;">value par pari</div>
+          <div class="kpi-tile">
+            <div class="kpi-tile-label"><span class="gloss-term" data-gloss="edge">Edge</span> moyen</div>
+            <div class="kpi-tile-value brand">+${(enriched.reduce((a,c) => a + c.edge, 0) / enriched.length * 100).toFixed(1)}pt</div>
+            <div class="kpi-tile-sub">value par pari</div>
           </div>
-          <div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
-            <div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;"><span class="gloss-term" data-gloss="ev">EV</span> cumul</div>
-            <div style="font-size:22px;font-weight:800;color:var(--brand);margin-top:2px;font-variant-numeric:tabular-nums;">+${enriched.reduce((a,c) => a + c.stake * c.ev, 0).toFixed(2)}€</div>
-            <div style="font-size:10.5px;color:var(--text-dim);margin-top:2px;">attendu math.</div>
+          <div class="kpi-tile">
+            <div class="kpi-tile-label"><span class="gloss-term" data-gloss="ev">EV</span> cumul</div>
+            <div class="kpi-tile-value brand">+${enriched.reduce((a,c) => a + c.stake * c.ev, 0).toFixed(2)}€</div>
+            <div class="kpi-tile-sub">attendu math.</div>
           </div>
         </div>
         <!-- Table des paris -->
@@ -19678,18 +19678,36 @@
     }
     const bt = window.__backtestReportV2 || window.__backtestReport;
     if (!bt) {
+      // Sprint 111 (v31.7.190) — Skeleton loader au lieu du message statique.
+      // L'utilisateur perçoit que ça charge, pas que c'est cassé. Auto-retry
+      // via setTimeout : le fetch eager _loadModelCalibration() peut prendre
+      // 100-500ms après le DOM ready, ce skeleton couvre ce gap perceptif.
       wrap.innerHTML = `
         <div class="page-wrap">
           <div class="page-header">
             <div class="lbl-tiny" style="color:var(--brand);">Performance · Vue globale</div>
             <h1 class="page-h1">🎯 Performance</h1>
+            <div style="font-size:13px;color:var(--text-dim);">Chargement du backtest…</div>
           </div>
-          <div class="empty-state-v2">
-            <div class="es-illustration">📊</div>
-            <div class="es-title-v2">Backtest pas encore chargé</div>
-            <div class="es-body-v2">Le rapport est en cours de chargement. Reviens dans quelques secondes.</div>
+          <div style="margin-top:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;">
+            <div class="skel skel-kpi"></div>
+            <div class="skel skel-kpi"></div>
+            <div class="skel skel-kpi"></div>
+            <div class="skel skel-kpi"></div>
+          </div>
+          <div style="margin-top:18px;">
+            <div class="skel skel-line medium"></div>
+            <div class="skel skel-card"></div>
+            <div class="skel skel-card"></div>
           </div>
         </div>`;
+      // Auto-retry après un petit délai : si le fetch eager finit pendant ce temps,
+      // on re-render avec les vraies données sans intervention user.
+      setTimeout(() => {
+        if (document.body.contains(wrap) && (window.__backtestReportV2 || window.__backtestReport)) {
+          renderPerformancePage(wrap);
+        }
+      }, 800);
       return;
     }
     // KPIs globaux (depuis backtest_report_v2)
