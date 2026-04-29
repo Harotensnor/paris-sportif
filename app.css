@@ -5345,6 +5345,154 @@
     }
   }
 
+  /* Sprint 137 (v31.7.193) — Print stylesheet pour impression Plan de mise.
+     L'utilisateur peut imprimer son ticket Kelly pour le saisir chez Winamax. */
+  @media print {
+    /* Hide non-essential UI */
+    header.topbar,
+    nav.topbar-nav,
+    .mobile-bottom-nav,
+    .scroll-top-fab,
+    .toast-stack,
+    .trust-strip,
+    #refresh-indicator,
+    .ed-hero__cta,
+    .action-focus button,
+    .bilan-tabs button[aria-selected="false"],
+    .smart-suggest-banner,
+    .empty-state-v2 .es-actions-v2 {
+      display: none !important;
+    }
+    /* Print-friendly colors */
+    body {
+      background: white !important;
+      color: black !important;
+    }
+    .panel, .kpi-tile, .action-focus, table, .bilan-table {
+      background: white !important;
+      border-color: #ccc !important;
+      color: black !important;
+      box-shadow: none !important;
+    }
+    .kpi-tile-value,
+    .kpi-tile-value.positive,
+    .kpi-tile-value.negative,
+    .kpi-tile-value.brand,
+    .kpi-tile-value.warn,
+    h1, h2, h3 {
+      color: black !important;
+    }
+    /* Show URLs after links for context */
+    a[href^="http"]:after {
+      content: " (" attr(href) ")";
+      font-size: 0.85em;
+      color: #666;
+    }
+    /* Page break helpers */
+    .page-wrap { page-break-after: auto; }
+    table { page-break-inside: avoid; }
+    tr { page-break-inside: avoid; }
+    /* Tighter print margins */
+    main { padding: 0 !important; max-width: 100% !important; }
+    .page-h1 { font-size: 18pt !important; }
+    .kpi-tile-value { font-size: 14pt !important; }
+  }
+
+  /* Sprint 135 (v31.7.193) — A11y polish.
+     Tap targets sur les pills/badges trop petits (<32px) deviennent ≥44px en mobile,
+     focus states améliorés, contraste accent text amélioré. */
+  @media (max-width: 720px) {
+    .trust-strip-stat,
+    .trust-strip-link {
+      min-height: 36px;
+    }
+    /* Search input mobile : agrandi pour éviter zoom auto-iOS sur focus */
+    .search { font-size: 16px !important; }
+  }
+  /* Focus states améliorés universels */
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  [role="button"]:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+    border-radius: var(--r-xs);
+  }
+  /* Skip-link plus visible quand focus */
+  .skip-to-content:focus {
+    top: 8px !important;
+    left: 8px !important;
+    background: var(--brand) !important;
+    color: #08080a !important;
+    padding: 10px 18px !important;
+    border-radius: var(--r-sm) !important;
+    font-weight: 700 !important;
+    z-index: 9999 !important;
+    outline: 2px solid var(--accent) !important;
+  }
+
+  /* Sprint 134 (v31.7.193) — Utility classes pour cohérence visuelle.
+     Factorise les patterns inline les plus répétés dans app.js. */
+
+  /* CTA buttons harmonisés - utilisable directement via class */
+  .btn-primary {
+    padding: 10px 18px;
+    background: var(--brand);
+    color: #08080a;
+    border: none;
+    border-radius: var(--r-sm);
+    cursor: pointer;
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    transition: background .15s, transform .12s;
+    font-family: inherit;
+  }
+  .btn-primary:hover { background: var(--brand-2, #b89cff); }
+  .btn-primary:active { transform: scale(0.97); }
+  .btn-secondary {
+    padding: 10px 18px;
+    background: var(--panel);
+    color: var(--text);
+    border: 1px solid var(--border-2);
+    border-radius: var(--r-sm);
+    cursor: pointer;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    transition: background .15s, border-color .15s, transform .12s;
+    font-family: inherit;
+  }
+  .btn-secondary:hover { background: var(--panel-2); border-color: var(--text-dim2); }
+  .btn-secondary:active { transform: scale(0.97); }
+  .btn-ghost {
+    padding: 10px 18px;
+    background: transparent;
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    cursor: pointer;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    transition: color .15s, border-color .15s, transform .12s;
+    font-family: inherit;
+  }
+  .btn-ghost:hover { color: var(--text); border-color: var(--border-2); }
+  .btn-ghost:active { transform: scale(0.97); }
+  .btn-danger {
+    padding: 10px 18px;
+    background: rgba(248,113,113,.12);
+    color: var(--danger);
+    border: 1px solid rgba(248,113,113,.3);
+    border-radius: var(--r-sm);
+    cursor: pointer;
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    transition: background .15s;
+    font-family: inherit;
+  }
+  .btn-danger:hover { background: rgba(248,113,113,.18); }
+
   /* Sprint 128 (v31.7.191) — Light theme polish.
      Hardcoded rgba() patterns dans Sprint 105-127 ne s'adaptent pas au light
      mode. Cette section override les éléments concernés pour un meilleur
