@@ -3970,9 +3970,15 @@
   .onboard-card .sub { color:var(--text-dim); margin-bottom:20px; font-size:13px; }
   .onboard-opt { display:block; width:100%; text-align:left; padding:14px 16px; border-radius:var(--r); border:1px solid var(--border-2); background:var(--panel-2); color:var(--text); cursor:pointer; margin-bottom:10px; transition:all .15s; font-family:inherit; }
   .onboard-opt:hover { border-color:var(--brand); background:var(--panel-3); }
+  .onboard-opt.selected { border-color:var(--brand); background:rgba(167,139,250,.10); box-shadow:0 0 0 2px rgba(167,139,250,.25); }
   .onboard-opt b { display:block; margin-bottom:4px; }
   .onboard-opt .descr { color:var(--text-dim); font-size:12px; font-weight:normal; }
   .onboard-card .skip { background:none; border:none; color:var(--text-dim); cursor:pointer; text-decoration:underline; font-size:12px; margin-top:6px; font-family:inherit; }
+  /* Sprint 107 (v31.7.190) — Wizard onboarding 4 étapes : focus state + animations */
+  .onb-next:hover, .onb-next:focus-visible { background:var(--brand-2, #b89cff) !important; }
+  .onb-prev:not([disabled]):hover { border-color: var(--border-2) !important; background: var(--panel-3, var(--panel-2)) !important; }
+  .onb-bankroll-preset:hover { border-color: var(--brand) !important; }
+  #onb-bankroll:focus { border-color: var(--brand) !important; outline: none; box-shadow: 0 0 0 3px rgba(167,139,250,.18); }
 
   /* v31.3 — Hero éditorial dashboard (audit UX dashboard éditorial mobile-first).
      UNE SEULE promesse métier au-dessus du fold = TOP PICK card claire avec
