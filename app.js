@@ -441,6 +441,33 @@
     });
   } catch (e) {}
 
+  // Sprint 175 (v31.7.195) — Long-press support pour tooltips sur mobile.
+  // Mobile n'a pas de hover, donc data-tooltip était invisible. Cette extension
+  // détecte un appui long (>500ms) et déclenche le popover. Tap court : action normale.
+  let _lpTimer = null;
+  let _lpTarget = null;
+  document.addEventListener('touchstart', (e) => {
+    const target = e.target.closest && e.target.closest('[data-tooltip]');
+    if (!target) return;
+    _lpTarget = target;
+    _lpTimer = setTimeout(() => {
+      if (typeof _resolveTooltipTarget === 'function') {
+        const r = _resolveTooltipTarget(_lpTarget);
+        if (r && typeof _showTooltip === 'function') _showTooltip(r.el, r.text);
+      }
+    }, 500);
+  }, { passive: true });
+  document.addEventListener('touchend', () => {
+    if (_lpTimer) { clearTimeout(_lpTimer); _lpTimer = null; }
+    setTimeout(() => {
+      if (typeof _hideTooltip === 'function') _hideTooltip();
+    }, 1500);
+    _lpTarget = null;
+  }, { passive: true });
+  document.addEventListener('touchmove', () => {
+    if (_lpTimer) { clearTimeout(_lpTimer); _lpTimer = null; }
+  }, { passive: true });
+
   // AUDIT-2026-04-27 (Sprint 16 #19) — Tooltip system unifié.
   // [data-tooltip="..."] sur n'importe quel élément (focus + hover).
   // Évite les title="" natifs (laids, lents, pas a11y).
@@ -601,6 +628,123 @@
     });
   }
   try { window._showHowToReadTutorial = _showHowToReadTutorial; } catch(e){}
+
+  // Sprint 161 (v31.7.195) — Plan 200 : safe localStorage wrapper.
+  // localStorage peut throw QuotaExceededError, SecurityError (private mode),
+  // ou retourner null. Ce wrapper gère tout proprement et expose l'API.
+  const _safeStorage = {
+    get(key, fallback = null) {
+      try {
+        const v = localStorage.getItem(key);
+        return v === null ? fallback : v;
+      } catch(e) { return fallback; }
+    },
+    getJSON(key, fallback = null) {
+      try {
+        const v = localStorage.getItem(key);
+        if (v === null) return fallback;
+        return JSON.parse(v);
+      } catch(e) { return fallback; }
+    },
+    set(key, value) {
+      try {
+        localStorage.setItem(key, value);
+        return true;
+      } catch(e) {
+        // QuotaExceededError → tente de free quelques anciennes clés
+        if (e.name === 'QuotaExceededError' || e.code === 22) {
+          try {
+            // Drop oldest entries (heuristic : recent searches, oddsHistory)
+            ['recentSearches', '__oddsHistoryByMatch'].forEach(k => {
+              try { localStorage.removeItem(k); } catch(e){}
+            });
+            localStorage.setItem(key, value);
+            return true;
+          } catch(e2) {}
+        }
+        return false;
+      }
+    },
+    setJSON(key, value) {
+      return _safeStorage.set(key, JSON.stringify(value));
+    },
+    remove(key) {
+      try { localStorage.removeItem(key); return true; } catch(e) { return false; }
+    },
+  };
+  try { window._safeStorage = _safeStorage; } catch(e){}
+
+  // Sprint 162 (v31.7.195) — debounce/throttle utilities (souvent réinventées).
+  function _debounce(fn, wait) {
+    let t = null;
+    return function(...args) {
+      clearTimeout(t);
+      t = setTimeout(() => fn.apply(this, args), wait);
+    };
+  }
+  function _throttle(fn, wait) {
+    let last = 0;
+    let pending = null;
+    return function(...args) {
+      const now = Date.now();
+      const remaining = wait - (now - last);
+      if (remaining <= 0) {
+        last = now;
+        fn.apply(this, args);
+      } else if (!pending) {
+        pending = setTimeout(() => {
+          last = Date.now();
+          pending = null;
+          fn.apply(this, args);
+        }, remaining);
+      }
+    };
+  }
+  try { window._debounce = _debounce; window._throttle = _throttle; } catch(e){}
+
+  // Sprint 163 (v31.7.195) — Format helpers centralisés.
+  // Avant : pct/euros/temps formattés inline avec différentes précisions.
+  // Maintenant : un seul endroit pour modifier les conventions.
+  const _fmt = {
+    pct(v, decimals = 1) {
+      if (!isFinite(v)) return '—';
+      const sign = v >= 0 ? '+' : '';
+      return `${sign}${(v * 100).toFixed(decimals)}%`;
+    },
+    pct0(v) { return _fmt.pct(v, 0); },
+    pctSimple(v, decimals = 0) {
+      if (!isFinite(v)) return '—';
+      return `${(v * 100).toFixed(decimals)}%`;
+    },
+    money(v, decimals = 2) {
+      if (!isFinite(v)) return '—';
+      const sign = v >= 0 ? '+' : '';
+      return `${sign}${v.toFixed(decimals)}€`;
+    },
+    moneyAbs(v, decimals = 2) {
+      if (!isFinite(v)) return '—';
+      return `${v.toFixed(decimals)}€`;
+    },
+    odd(v) {
+      if (!isFinite(v) || v <= 0) return '—';
+      return `@${v.toFixed(2)}`;
+    },
+    edge(v) {
+      if (!isFinite(v)) return '—';
+      const sign = v >= 0 ? '+' : '';
+      return `${sign}${(v * 100).toFixed(1)}pt`;
+    },
+    age(ts) {
+      if (!ts) return '—';
+      const min = Math.floor((Date.now() - ts) / 60000);
+      if (min < 1) return "à l'instant";
+      if (min < 60) return `${min}min`;
+      const h = Math.floor(min / 60);
+      if (h < 24) return `${h}h`;
+      return `${Math.floor(h / 24)}j`;
+    },
+  };
+  try { window._fmt = _fmt; } catch(e){}
 
   // Sprint 112 (v31.7.190) — Empty state factory unifiée.
   // Au lieu de 36 inline templates `.empty-state-v2`, un helper qui produit
@@ -3703,6 +3847,38 @@
     const strip = document.getElementById('trust-strip');
     if (strip) strip.classList.remove('hidden');
     try { _populateTrustStrip(window.__backtestReportV2); } catch(e){}
+  };
+  // Sprint 165 (v31.7.195) — Reset all dismissed tutorials/banners.
+  // Permet à l'user de revoir tous les tutoriels et banners cachés.
+  // Accessible via Profil > Réinitialiser tutoriels.
+  window._resetAllTutorials = function() {
+    const keys = [
+      'trustStripHiddenUntil',
+      'smartSuggestionDismissedTs',
+      'howToReadDismissedTs',
+      'autoRefreshDoneAt',
+    ];
+    let n = 0;
+    keys.forEach(k => {
+      try {
+        if (localStorage.getItem(k) !== null) {
+          localStorage.removeItem(k);
+          n++;
+        }
+      } catch(e){}
+    });
+    // Aussi réinitialiser onboarding (avec confirm)
+    try {
+      const prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}');
+      delete prefs.onboardingDone;
+      delete prefs.howToShownTimes;
+      localStorage.setItem('userPrefs', JSON.stringify(prefs));
+      n++;
+    } catch(e){}
+    if (typeof window.toast === 'function') {
+      window.toast(`✓ ${n} tutoriels/banners réinitialisés. Recharge la page pour les revoir.`, 'success');
+    }
+    return n;
   };
 
   // v31.7.71 — Mesure dynamique de la hauteur du trust-strip et set en
@@ -11027,8 +11203,13 @@
     const rules = _loadAlertRules().filter(r => r.id !== id);
     try { localStorage.setItem(ALERT_RULES_KEY, JSON.stringify(rules)); } catch(e){}
   };
-  document.getElementById('close-detail').addEventListener('click', closeDetailModal);
-  document.getElementById('detail-modal').addEventListener('click', (e) => { if (e.target.id === 'detail-modal') closeDetailModal(); });
+  // Sprint 191 (v31.7.195) — Defensive null check : si les éléments DOM
+  // n'existent pas (ex: test isolé, fragment inclusion), on no-op silencieusement
+  // au lieu de crasher l'IIFE entière. Évite "Cannot read properties of null".
+  const _closeDetailBtn = document.getElementById('close-detail');
+  if (_closeDetailBtn) _closeDetailBtn.addEventListener('click', closeDetailModal);
+  const _detailModal = document.getElementById('detail-modal');
+  if (_detailModal) _detailModal.addEventListener('click', (e) => { if (e.target.id === 'detail-modal') closeDetailModal(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDetailModal(); });
   // v30 — Share button sur la modale match. Construit un share URL avec
   // ?match=<id> qui pourrait être restauré au boot (futur), partage via
