@@ -465,53 +465,60 @@
      "Pronostics" = picks actionnables (Top + Locks + Tous + Combinés + Buteurs + Montantes).
      "Explorer" = browse data sans décision (Matchs détectés + Calendrier + Favoris + Comparer).
      "Performance" = tout le suivi (Vue globale + Bilan + Historique + Backtest + Crédibilité). -->
+<!-- Sprint 91 (v31.7.178) — Refonte nav 5 hubs orientée ROI / "gagner de l'argent".
+     Verbes d'action au lieu de noms passifs :
+     - PARIER = ce qui te fait gagner de l'argent direct (Top, Locks, Plan de mise, Combinés, Montantes)
+     - EXPLORER = surveiller / futurs paris (Tous, Matchs détectés, Calendrier, Buts&joueurs)
+     - PERFORMANCE = mesurer la rentabilité (Vue globale, Bilan, Historique, Backtest, Crédibilité)
+     - DISCIPLINE = gestion risque + apprentissage (Favoris/alertes, Limites, Profil, Méthodo)
+-->
 <nav class="topbar-nav" id="page-nav" aria-label="Navigation principale">
   <button class="page-btn hub-solo active" data-page="dashboard">🏠 Accueil</button>
-  <div class="hub" data-hub="pronos">
-    <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">🏆 Pronostics <span class="chev">▾</span></button>
-    <div class="hub-menu" role="menu" aria-label="Sous-menu Pronostics">
+
+  <div class="hub" data-hub="parier">
+    <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">💰 Parier <span class="chev">▾</span></button>
+    <div class="hub-menu" role="menu" aria-label="Sous-menu Parier">
       <button class="page-btn" role="menuitem" data-page="top">⭐ Top du jour</button>
       <button class="page-btn" role="menuitem" data-page="locks">🔒 Locks <span class="count" id="count-locks">0</span></button>
-      <button class="page-btn" role="menuitem" data-page="tous">📋 Tous les pronostics</button>
-      <button class="page-btn" role="menuitem" data-page="combines">🔗 Combinés</button>
-      <button class="page-btn" role="menuitem" data-page="buteurs">⚽ Buts &amp; joueurs</button>
-      <button class="page-btn" role="menuitem" data-page="montante-jour">🎯 Montante du jour</button>
+      <button class="page-btn" role="menuitem" data-page="plan-mise">🎯 Plan de mise du jour<span class="nav-new-badge" data-new-until="2026-06-30">Nouveau</span></button>
+      <button class="page-btn" role="menuitem" data-page="combines">🔗 Combinés value</button>
+      <button class="page-btn" role="menuitem" data-page="montante-jour">📈 Montante du jour</button>
       <button class="page-btn" role="menuitem" data-page="montante-weekend">🗓️ Montante weekend</button>
       <button class="page-btn" role="menuitem" data-page="montante-semaine">📆 Montante semaine</button>
     </div>
   </div>
+
   <div class="hub" data-hub="explorer">
     <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">🔍 Explorer <span class="chev">▾</span></button>
     <div class="hub-menu" role="menu" aria-label="Sous-menu Explorer">
-      <button class="page-btn" role="menuitem" data-page="matchs">🔍 Matchs détectés<span class="nav-new-badge" data-new-until="2026-05-30">Nouveau</span></button>
+      <button class="page-btn" role="menuitem" data-page="tous">📋 Tous les pronos</button>
+      <button class="page-btn" role="menuitem" data-page="matchs">🔍 Matchs détectés</button>
       <button class="page-btn" role="menuitem" data-page="calendrier">📅 Calendrier 7 jours</button>
-      <button class="page-btn" role="menuitem" data-page="favoris">⭐ Favoris &amp; alertes</button>
+      <button class="page-btn" role="menuitem" data-page="buteurs">⚽ Buts &amp; joueurs</button>
       <button class="page-btn" role="menuitem" data-page="compare">🔁 Comparer 2 jours</button>
     </div>
   </div>
+
   <div class="hub" data-hub="perf">
     <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">📊 Performance <span class="chev">▾</span></button>
     <div class="hub-menu" role="menu" aria-label="Sous-menu Performance">
-      <button class="page-btn" role="menuitem" data-page="performance">🎯 Vue globale<span class="nav-new-badge" data-new-until="2026-05-30">Nouveau</span></button>
+      <button class="page-btn" role="menuitem" data-page="performance">🎯 Vue globale</button>
       <button class="page-btn" role="menuitem" data-page="bilan">💰 Bilan</button>
       <button class="page-btn" role="menuitem" data-page="historique">📜 Historique</button>
-      <button class="page-btn" role="menuitem" data-page="backtest">📈 Backtest méthodologie</button>
-      <button class="page-btn" role="menuitem" data-page="credibilite">📐 Crédibilité (calibration)</button>
+      <button class="page-btn" role="menuitem" data-page="backtest">📈 Backtest</button>
+      <button class="page-btn" role="menuitem" data-page="credibilite">📐 Crédibilité</button>
     </div>
   </div>
-  <div class="hub" data-hub="apprendre">
-    <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">📚 Apprendre <span class="chev">▾</span></button>
-    <div class="hub-menu" role="menu" aria-label="Sous-menu Apprendre">
-      <a class="page-btn" role="menuitem" href="comment-lire-un-prono.html">📖 Comment lire un prono</a>
-      <a class="page-btn" role="menuitem" href="methodologie.html">📐 Méthodologie</a>
-      <a class="page-btn" role="menuitem" href="academie.html">📚 Académie (lexique)</a>
-    </div>
-  </div>
-  <div class="hub" data-hub="compte">
-    <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">⚙️ Compte <span class="chev">▾</span></button>
-    <div class="hub-menu" role="menu" aria-label="Sous-menu Compte">
-      <button class="page-btn" role="menuitem" data-page="profil">👤 Profil &amp; Santé <span class="count" id="count-sante-alerts">0</span></button>
+
+  <div class="hub" data-hub="discipline">
+    <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">🛡️ Discipline <span class="chev">▾</span></button>
+    <div class="hub-menu" role="menu" aria-label="Sous-menu Discipline">
+      <button class="page-btn" role="menuitem" data-page="favoris">⭐ Favoris &amp; alertes</button>
       <button class="page-btn" role="menuitem" data-page="alertes">🔔 Alertes <span class="count" id="count-alertes">0</span></button>
+      <button class="page-btn" role="menuitem" data-page="profil">👤 Profil &amp; bankroll <span class="count" id="count-sante-alerts">0</span></button>
+      <a class="page-btn" role="menuitem" href="methodologie.html">📐 Méthodologie</a>
+      <a class="page-btn" role="menuitem" href="comment-lire-un-prono.html">📖 Comment lire un prono</a>
+      <a class="page-btn" role="menuitem" href="academie.html">📚 Académie (lexique)</a>
     </div>
   </div>
 </nav>
@@ -975,27 +982,40 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-29T15:05:26.166085Z","today":"
   window.__getFavLeagues = getFavs;
 
   // ========== CHANTIER JJJ — Command palette + shortcuts ==========
+  // Sprint 93 (v31.7.180) — Cmd-K palette aligné avec la nouvelle nav 5 hubs.
+  // Ordre : Accueil → Parier (action immédiate) → Explorer → Performance → Discipline.
+  // Verbes d'action en priorité ("Parier maintenant", "Plan de mise du jour").
   var commands = [
-    {label:'Aller à Accueil', icon:'🎯', keywords:'accueil home dashboard aujourd hui', action: function(){ var b=document.querySelector('.page-btn[data-page="dashboard"]'); if(b) b.click(); }},
-    {label:'Aller à Top du jour', icon:'⭐', keywords:'top meilleurs picks jour', action: function(){ var b=document.querySelector('.page-btn[data-page="top"]'); if(b) b.click(); }},
-    {label:'Aller à Locks', icon:'🔒', keywords:'paris surs locks meilleurs haute confiance', action: function(){ var b=document.querySelector('.page-btn[data-page="locks"]'); if(b) b.click(); }},
-    {label:'Aller à Tous les pronostics', icon:'📋', keywords:'tous pronostics simples liste paris du jour', action: function(){ var b=document.querySelector('.page-btn[data-page="tous"]'); if(b) b.click(); }},
-    {label:'Aller à Matchs détectés', icon:'🔍', keywords:'matchs detectes tous explore browse exhaustif filtres statut', action: function(){ var b=document.querySelector('.page-btn[data-page="matchs"]'); if(b) b.click(); }},
-    {label:'Aller à Buts & joueurs', icon:'⚽', keywords:'buteurs buts over under btts buts joueurs scorers', action: function(){ var b=document.querySelector('.page-btn[data-page="buteurs"]'); if(b) b.click(); }},
-    {label:'Aller à Combinés', icon:'🔗', keywords:'combines combos', action: function(){ var b=document.querySelector('.page-btn[data-page="combines"]'); if(b) b.click(); }},
-    // v30 — Entrée "Mes paris" retirée du command palette (page supprimée).
-    {label:'Aller à Performance (Vue globale)', icon:'🎯', keywords:'performance vue globale kpi roi brier synth', action: function(){ var b=document.querySelector('.page-btn[data-page="performance"]'); if(b) b.click(); }},
-    {label:'Aller à Backtest méthodologie', icon:'📈', keywords:'backtest performance courbe methode', action: function(){ var b=document.querySelector('.page-btn[data-page="backtest"]'); if(b) b.click(); }},
-    {label:'Aller à Historique', icon:'📜', keywords:'historique passe ancien', action: function(){ var b=document.querySelector('.page-btn[data-page="historique"]'); if(b) b.click(); }},
-    {label:'Aller à Bilan', icon:'📊', keywords:'bilan stats resume', action: function(){ var b=document.querySelector('.page-btn[data-page="bilan"]'); if(b) b.click(); }},
-    {label:'Aller à Top Pronos', icon:'⭐', keywords:'top pronos best meilleurs', action: function(){ var b=document.querySelector('.page-btn[data-page="top"]'); if(b) b.click(); }},
-    {label:'Aller à Alertes', icon:'🔔', keywords:'alertes notifications warnings', action: function(){ var b=document.querySelector('.page-btn[data-page="alertes"]'); if(b) b.click(); }},
-    {label:'Aller au Guide', icon:'📚', keywords:'guide academie help aide', action: function(){ var b=document.querySelector('.page-btn[data-page="academie"]'); if(b) b.click(); }},
-    {label:'Aller au Profil / Santé', icon:'👤', keywords:'profil reglages parametres sante', action: function(){ var b=document.querySelector('.page-btn[data-page="profil"]'); if(b) b.click(); }},
-    // v30 — Entrée "Exporter mes paris CSV" retirée du command palette.
-    {label:'Copier lien de partage', icon:'🔗', keywords:'share lien partager copier', action: function(){ window.__copyShareLink(); }},
-    {label:'Afficher les raccourcis clavier', icon:'⌨️', keywords:'shortcuts raccourcis clavier help aide', action: function(){ showShortcutsHelp(); }},
-    {label:'Forcer refresh données (hard reload)', icon:'🔄', keywords:'reload refresh actualiser', action: function(){ _hardReload(); }}
+    {label:'🏠 Accueil', icon:'🏠', keywords:'accueil home dashboard aujourd hui parier maintenant', action: function(){ var b=document.querySelector('.page-btn[data-page="dashboard"]'); if(b) b.click(); }},
+    // 💰 Parier
+    {label:'💰 Plan de mise du jour (NOUVEAU)', icon:'🎯', keywords:'plan mise ticket kelly auto optimise calcul argent', action: function(){ var b=document.querySelector('.page-btn[data-page="plan-mise"]'); if(b) b.click(); }},
+    {label:'💰 Top du jour', icon:'⭐', keywords:'top meilleurs picks jour parier confiance edge kelly', action: function(){ var b=document.querySelector('.page-btn[data-page="top"]'); if(b) b.click(); }},
+    {label:'💰 Locks (haute confiance)', icon:'🔒', keywords:'paris surs locks meilleurs haute confiance ≥70', action: function(){ var b=document.querySelector('.page-btn[data-page="locks"]'); if(b) b.click(); }},
+    {label:'💰 Combinés value', icon:'🔗', keywords:'combines combos anti correle value', action: function(){ var b=document.querySelector('.page-btn[data-page="combines"]'); if(b) b.click(); }},
+    {label:'💰 Montante du jour', icon:'📈', keywords:'montante jour quotidien', action: function(){ var b=document.querySelector('.page-btn[data-page="montante-jour"]'); if(b) b.click(); }},
+    {label:'💰 Montante weekend', icon:'🗓️', keywords:'montante weekend samedi dimanche', action: function(){ var b=document.querySelector('.page-btn[data-page="montante-weekend"]'); if(b) b.click(); }},
+    {label:'💰 Montante semaine', icon:'📆', keywords:'montante semaine hebdomadaire', action: function(){ var b=document.querySelector('.page-btn[data-page="montante-semaine"]'); if(b) b.click(); }},
+    // 🔍 Explorer
+    {label:'🔍 Tous les pronos', icon:'📋', keywords:'tous pronos pronostics simples liste paris du jour explorer', action: function(){ var b=document.querySelector('.page-btn[data-page="tous"]'); if(b) b.click(); }},
+    {label:'🔍 Matchs détectés (catalogue complet)', icon:'🔍', keywords:'matchs detectes tous explore browse exhaustif filtres statut catalogue', action: function(){ var b=document.querySelector('.page-btn[data-page="matchs"]'); if(b) b.click(); }},
+    {label:'🔍 Calendrier 7 jours', icon:'📅', keywords:'calendrier 7 jours futur prochains heatmap', action: function(){ var b=document.querySelector('.page-btn[data-page="calendrier"]'); if(b) b.click(); }},
+    {label:'🔍 Buts & joueurs', icon:'⚽', keywords:'buteurs buts over under btts buts joueurs scorers', action: function(){ var b=document.querySelector('.page-btn[data-page="buteurs"]'); if(b) b.click(); }},
+    {label:'🔍 Comparer 2 jours', icon:'🔁', keywords:'comparer comparison deux jours', action: function(){ var b=document.querySelector('.page-btn[data-page="compare"]'); if(b) b.click(); }},
+    // 📊 Performance
+    {label:'📊 Performance (Vue globale)', icon:'🎯', keywords:'performance vue globale kpi roi brier synthese rentabilite', action: function(){ var b=document.querySelector('.page-btn[data-page="performance"]'); if(b) b.click(); }},
+    {label:'📊 Bilan', icon:'💰', keywords:'bilan stats resume bilan', action: function(){ var b=document.querySelector('.page-btn[data-page="bilan"]'); if(b) b.click(); }},
+    {label:'📊 Historique', icon:'📜', keywords:'historique passe ancien archives', action: function(){ var b=document.querySelector('.page-btn[data-page="historique"]'); if(b) b.click(); }},
+    {label:'📊 Backtest méthodologie', icon:'📈', keywords:'backtest performance courbe methode rapport', action: function(){ var b=document.querySelector('.page-btn[data-page="backtest"]'); if(b) b.click(); }},
+    {label:'📊 Crédibilité (calibration)', icon:'📐', keywords:'credibilite calibration brier transparence', action: function(){ var b=document.querySelector('.page-btn[data-page="credibilite"]'); if(b) b.click(); }},
+    // 🛡️ Discipline
+    {label:'🛡️ Favoris & alertes', icon:'⭐', keywords:'favoris alertes equipes ligues sports marches watchlist', action: function(){ var b=document.querySelector('.page-btn[data-page="favoris"]'); if(b) b.click(); }},
+    {label:'🛡️ Alertes', icon:'🔔', keywords:'alertes notifications warnings', action: function(){ var b=document.querySelector('.page-btn[data-page="alertes"]'); if(b) b.click(); }},
+    {label:'🛡️ Profil & bankroll', icon:'👤', keywords:'profil reglages parametres sante bankroll cagnotte limites risque', action: function(){ var b=document.querySelector('.page-btn[data-page="profil"]'); if(b) b.click(); }},
+    {label:'🛡️ Académie (lexique)', icon:'📚', keywords:'guide academie help aide lexique', action: function(){ var b=document.querySelector('.page-btn[data-page="academie"]'); if(b) b.click(); }},
+    // Utilitaires
+    {label:'🔗 Copier lien de partage', icon:'🔗', keywords:'share lien partager copier', action: function(){ window.__copyShareLink(); }},
+    {label:'⌨️ Afficher les raccourcis clavier', icon:'⌨️', keywords:'shortcuts raccourcis clavier help aide', action: function(){ showShortcutsHelp(); }},
+    {label:'🔄 Forcer refresh données', icon:'🔄', keywords:'reload refresh actualiser', action: function(){ _hardReload(); }}
   ];
   var cmdModal, cmdInput, cmdResults, cmdSelectedIdx = 0, cmdItems = [];
   function initCommandPalette(){

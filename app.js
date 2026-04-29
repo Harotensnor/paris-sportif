@@ -107,7 +107,7 @@
   // legacy) mais aucun lien ne pointe plus vers cette valeur.
   // v31.7.77 — 'calendrier' ajouté pour vue 7 jours groupée (user feedback
   // "je veux voir au moins une semaine de pronos jour par jour").
-  const VALID_PAGES = ['dashboard','tous','locks','buteurs','combines','top','historique','bilan','backtest','academie','credibilite','alertes','profil','sante','legal','methodologie','montante-jour','montante-weekend','montante-semaine','compare','calendrier','league','favoris','matchs','performance'];
+  const VALID_PAGES = ['dashboard','tous','locks','buteurs','combines','top','historique','bilan','backtest','academie','credibilite','alertes','profil','sante','legal','methodologie','montante-jour','montante-weekend','montante-semaine','compare','calendrier','league','favoris','matchs','performance','plan-mise'];
   // v30 — 'mesparis' retiré : Théo n'enregistre pas ses paris sur le site.
   // v31 — 'legal' + 'methodologie' ajoutés (transparence + dictionnaire des
   // métriques, en réponse à l'audit ChatGPT 2026-04-26).
@@ -15895,6 +15895,8 @@
     const isFavoris = currentPage === 'favoris';
     // Sprint 48 (v31.7.137) — Matchs détectés page (Phase 2 brief Théo)
     const isMatchs = currentPage === 'matchs';
+    // Sprint 92 (v31.7.179) — Page Plan de mise du jour (ticket Kelly auto-calculé)
+    const isPlanMise = currentPage === 'plan-mise';
     // Sprint 52 (v31.7.141) — Performance page : hub unifié Bilan + Historique + Backtest + Crédibilité
     const isPerformance = currentPage === 'performance';
 
@@ -16201,6 +16203,18 @@
       } else {
         try { renderMatchsPage(matchsWrap); } catch(e) { console.warn('renderMatchsPage failed', e); }
       }
+    }
+
+    // Sprint 92 (v31.7.179) — Page "Plan de mise du jour" : ticket Kelly auto-calculé
+    let planMiseWrap = document.getElementById('plan-mise-wrap');
+    if (!planMiseWrap) {
+      planMiseWrap = document.createElement('div');
+      planMiseWrap.id = 'plan-mise-wrap';
+      (document.querySelector('main') || document.body).appendChild(planMiseWrap);
+    }
+    planMiseWrap.style.display = isPlanMise ? '' : 'none';
+    if (isPlanMise) {
+      try { renderPlanMisePage(planMiseWrap); } catch(e) { console.warn('renderPlanMisePage failed', e); }
     }
 
     calendrierWrap.style.display = isCalendrier ? '' : 'none';
@@ -18112,6 +18126,217 @@
     });
   }
   try { window.renderMatchsPage = renderMatchsPage; } catch(e){}
+
+  // ======= Sprint 92 (v31.7.179) — renderPlanMisePage =======
+  // Page "🎯 Plan de mise du jour" : ticket Kelly auto-calculé.
+  // Réponse au brief "objectif = me faire gagner de l'argent" :
+  //   * Sélectionne les meilleurs paris EV+ du jour (top 5 par edge)
+  //   * Calcule la mise Kelly fractionnée par jambe (cap 5% bankroll/pari)
+  //   * Vérifie les limites de risque (Sprint 87) — alerte si overbet
+  //   * Affiche un récap "Si tout passe → +X€" pour transparence
+  //   * Bouton "Copier le ticket" pour collage rapide chez Winamax
+  function renderPlanMisePage(wrap) {
+    const data = window.PRONOSTICS_DATA;
+    if (!data || !data.days) {
+      wrap.innerHTML = '<div class="page-wrap"><div class="bilan-empty">Pas de données disponibles.</div></div>';
+      return;
+    }
+    // Bankroll user (réutilise userBankroll global ou localStorage)
+    let bankroll = 50;
+    try {
+      const v = parseFloat(localStorage.getItem('userBankroll'));
+      if (isFinite(v) && v > 0) bankroll = v;
+    } catch(e) {}
+    // Construit la liste des candidats : matchs upcoming today/tomorrow avec
+    // best market EV+ et confiance ≥ 55%
+    const todayIso = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+    const tomDt = new Date(); tomDt.setDate(tomDt.getDate() + 1);
+    const tomIso = tomDt.toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+    const candidates = [];
+    [todayIso, tomIso].forEach(iso => {
+      (data.days[iso] || []).forEach(m => {
+        if (m.completed || m.live) return;
+        if (!(m.winamax && m.winamax.match_id && m.winamax.markets && m.winamax.markets['1n2'])) return;
+        try {
+          const pred = predictMatch(m);
+          if (!pred || !pred.pick || pred.skip) return;
+          const best = (typeof selectBestMarket === 'function') ? selectBestMarket(m, pred) : null;
+          if (!best || !best.odd || best.odd < 1.10) return;
+          const conf = Number(pred.reliability ?? pred.pick.prob) || 0;
+          if (conf < 0.55) return;
+          if (best.edge < 0.03) return;  // EV+ obligatoire (≥ 3pt edge)
+          candidates.push({
+            match: m, pred, best,
+            label: best.label, prob: best.prob, odd: best.odd,
+            edge: best.edge, ev: best.ev, kelly: best.kelly,
+            ts: new Date(m.date).getTime(),
+            isToday: iso === todayIso,
+          });
+        } catch(e){}
+      });
+    });
+    // Tri par edge desc, max 5
+    candidates.sort((a, b) => b.edge - a.edge);
+    const top5 = candidates.slice(0, 5);
+    // Calcule la mise Kelly fractionnée pour chacun (cap 5% bankroll/pari)
+    const enriched = top5.map(c => {
+      const kFrac = c.kelly || 0;
+      let stake = bankroll * Math.min(kFrac, 0.05);
+      stake = Math.max(0.50, Math.round(stake * 10) / 10);  // arrondi à 0.10€, plancher 0.50€
+      const potentialReturn = stake * c.odd;
+      const potentialGain = potentialReturn - stake;
+      return { ...c, stake, potentialReturn, potentialGain };
+    });
+    // Total stake + gain potentiel
+    const totalStake = enriched.reduce((acc, c) => acc + c.stake, 0);
+    const totalPotentialGain = enriched.reduce((acc, c) => acc + c.potentialGain, 0);
+    const stakePctBankroll = bankroll > 0 ? totalStake / bankroll : 0;
+    // Vérification limites de risque (Sprint 87)
+    const riskCheck = (typeof window._checkRiskLimits === 'function')
+      ? window._checkRiskLimits(enriched.map(c => ({
+          stake: c.stake, label: `${c.match.name}`, match: c.match, pred: c.pred, market: c.best.market,
+        })), bankroll)
+      : { violations: [], warnings: [], ok: true };
+    const renderPickRow = (c) => {
+      const sides = (typeof getSides === 'function') ? getSides(c.match) : { home:{}, away:{} };
+      const hN = sides.home?.short || sides.home?.name || '?';
+      const aN = sides.away?.short || sides.away?.name || '?';
+      const sportEm = (typeof sportEmoji === 'function') ? sportEmoji(c.match.sport) : '🎯';
+      const tLbl = (typeof fmtTime === 'function') ? fmtTime(c.match.date) : '';
+      const dayLbl = c.isToday ? 'Aujourd\'hui' : 'Demain';
+      const lg = c.match.league_name || c.match.league_code || '';
+      return `
+        <tr class="interactive" data-match-id="${esc(String(c.match.id))}" role="button" tabindex="0" style="border-bottom:1px solid var(--border);cursor:pointer;font-variant-numeric:tabular-nums;">
+          <td style="padding:10px 12px;">
+            <div style="font-size:11px;color:var(--text-dim);font-weight:600;">${esc(dayLbl)} · ${esc(tLbl)}</div>
+            <div style="font-size:13px;font-weight:700;color:var(--text);margin-top:1px;">${sportEm} ${esc(hN)} <span style="color:var(--text-dim2);font-weight:400;">vs</span> ${esc(aN)}</div>
+            <div style="font-size:10.5px;color:var(--text-dim);margin-top:1px;">${esc(String(lg).slice(0, 32))}</div>
+          </td>
+          <td style="padding:10px 12px;text-align:left;">
+            <div style="font-size:13px;font-weight:700;color:var(--brand);">${esc(c.label)}</div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:1px;">${Math.round(c.prob*100)}% conf · @${c.odd.toFixed(2)}</div>
+          </td>
+          <td style="padding:10px 12px;text-align:right;color:var(--accent);font-weight:700;font-size:13px;">+${(c.edge*100).toFixed(1)}pt</td>
+          <td style="padding:10px 12px;text-align:right;color:var(--brand);font-weight:700;font-size:13px;">+${(c.ev*100).toFixed(1)}%</td>
+          <td style="padding:10px 12px;text-align:right;color:var(--text);font-weight:800;font-size:15px;">${c.stake.toFixed(2)}€</td>
+          <td style="padding:10px 12px;text-align:right;color:var(--accent);font-weight:700;font-size:13px;">+${c.potentialGain.toFixed(2)}€</td>
+        </tr>`;
+    };
+    if (!enriched.length) {
+      wrap.innerHTML = `
+        <div class="page-wrap">
+          <div class="page-header">
+            <div class="lbl-tiny" style="color:var(--brand);">Parier · Plan optimisé</div>
+            <h1 class="page-h1">🎯 Plan de mise du jour</h1>
+            <div style="font-size:14px;color:var(--text-dim);">Bankroll : <b>${bankroll.toFixed(0)}€</b></div>
+          </div>
+          <div class="empty-state-v2" style="margin-top:18px;">
+            <div class="es-illustration">🛡️</div>
+            <div class="es-title-v2">Aucun pari EV+ aujourd'hui ou demain</div>
+            <div class="es-body-v2">Le modèle exige <b>edge ≥ 3pt</b> et <b>confiance ≥ 55%</b> pour entrer dans ton plan de mise. C'est la discipline qui te fait gagner sur la durée — certains jours il vaut mieux ne pas parier.</div>
+            <div class="es-actions-v2">
+              <button class="page-btn" data-page="matchs" style="padding:10px 18px;font-size:13px;background:var(--brand);color:#08080a;border:none;border-radius:var(--r-sm);cursor:pointer;font-weight:700;">🔍 Explorer les matchs</button>
+              <button class="page-btn" data-page="performance" style="padding:10px 18px;font-size:13px;background:transparent;color:var(--text);border:1px solid var(--border-2);border-radius:var(--r-sm);cursor:pointer;font-weight:700;">📊 Voir performance</button>
+            </div>
+          </div>
+        </div>`;
+      return;
+    }
+    const riskBannerHtml = (riskCheck.violations.length || riskCheck.warnings.length) ? `
+      <div style="margin-top:14px;padding:12px 14px;background:${riskCheck.violations.length ? 'rgba(239,68,68,.08)' : 'rgba(199,155,0,.08)'};border:1px solid ${riskCheck.violations.length ? 'rgba(239,68,68,.3)' : 'rgba(199,155,0,.3)'};border-left:3px solid ${riskCheck.violations.length ? 'var(--danger)' : 'var(--warn)'};border-radius:0 var(--r-sm) var(--r-sm) 0;font-size:12.5px;">
+        <div style="font-weight:700;color:${riskCheck.violations.length ? 'var(--danger)' : 'var(--warn)'};margin-bottom:4px;">⚠️ Gestion du risque</div>
+        ${riskCheck.violations.map(v => `<div style="color:var(--text);line-height:1.5;">⛔ ${esc(v.msg)}</div>`).join('')}
+        ${riskCheck.warnings.map(w => `<div style="color:var(--text-dim);line-height:1.5;">⚠ ${esc(w.msg)}</div>`).join('')}
+      </div>` : '';
+    // Texte ticket à copier
+    const ticketText = enriched.map(c => {
+      const sides = (typeof getSides === 'function') ? getSides(c.match) : { home:{}, away:{} };
+      const hN = sides.home?.short || sides.home?.name || '?';
+      const aN = sides.away?.short || sides.away?.name || '?';
+      return `${hN} vs ${aN} · ${c.label} @${c.odd.toFixed(2)} · ${c.stake.toFixed(2)}€`;
+    }).join('\n');
+    wrap.innerHTML = `
+      <div class="page-wrap">
+        <div class="page-header">
+          <div class="lbl-tiny" style="color:var(--brand);">Parier · Plan optimisé</div>
+          <h1 class="page-h1">🎯 Plan de mise du jour</h1>
+          <div style="font-size:14px;color:var(--text-dim);">${enriched.length} pari${enriched.length>1?'s':''} EV+ sélectionné${enriched.length>1?'s':''} · Bankroll : <b style="color:var(--text);">${bankroll.toFixed(0)}€</b> · <button id="plan-mise-edit-bk" style="background:transparent;border:none;color:var(--brand);text-decoration:underline;cursor:pointer;font-weight:600;padding:0;font-size:13px;">modifier</button></div>
+        </div>
+        ${riskBannerHtml}
+        <!-- KPIs récap -->
+        <div style="margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;">
+          <div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
+            <div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">Mise totale</div>
+            <div style="font-size:22px;font-weight:800;color:var(--text);margin-top:2px;font-variant-numeric:tabular-nums;">${totalStake.toFixed(2)}€</div>
+            <div style="font-size:10.5px;color:var(--text-dim);margin-top:2px;">${(stakePctBankroll*100).toFixed(0)}% bankroll</div>
+          </div>
+          <div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
+            <div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">Gain potentiel</div>
+            <div style="font-size:22px;font-weight:800;color:var(--accent);margin-top:2px;font-variant-numeric:tabular-nums;">+${totalPotentialGain.toFixed(2)}€</div>
+            <div style="font-size:10.5px;color:var(--text-dim);margin-top:2px;">si tous gagnent</div>
+          </div>
+          <div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
+            <div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">Edge moyen</div>
+            <div style="font-size:22px;font-weight:800;color:var(--brand);margin-top:2px;font-variant-numeric:tabular-nums;">+${(enriched.reduce((a,c) => a + c.edge, 0) / enriched.length * 100).toFixed(1)}pt</div>
+            <div style="font-size:10.5px;color:var(--text-dim);margin-top:2px;">value par pari</div>
+          </div>
+          <div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
+            <div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">EV cumul</div>
+            <div style="font-size:22px;font-weight:800;color:var(--brand);margin-top:2px;font-variant-numeric:tabular-nums;">+${enriched.reduce((a,c) => a + c.stake * c.ev, 0).toFixed(2)}€</div>
+            <div style="font-size:10.5px;color:var(--text-dim);margin-top:2px;">attendu math.</div>
+          </div>
+        </div>
+        <!-- Table des paris -->
+        <div style="margin-top:18px;overflow-x:auto;border:1px solid var(--border);border-radius:var(--r-sm);">
+          <table style="width:100%;border-collapse:collapse;font-size:13px;">
+            <thead>
+              <tr style="background:var(--panel);border-bottom:1px solid var(--border);">
+                <th style="text-align:left;padding:10px 12px;color:var(--text-dim);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;">Match</th>
+                <th style="text-align:left;padding:10px 12px;color:var(--text-dim);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;">Pari</th>
+                <th style="text-align:right;padding:10px 12px;color:var(--text-dim);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;">Edge</th>
+                <th style="text-align:right;padding:10px 12px;color:var(--text-dim);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;">EV</th>
+                <th style="text-align:right;padding:10px 12px;color:var(--text-dim);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;">Mise</th>
+                <th style="text-align:right;padding:10px 12px;color:var(--text-dim);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.6px;">Gain pot.</th>
+              </tr>
+            </thead>
+            <tbody>${enriched.map(renderPickRow).join('')}</tbody>
+          </table>
+        </div>
+        <!-- Actions -->
+        <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">
+          <button id="plan-mise-copy" style="padding:10px 16px;background:var(--brand);color:#08080a;border:none;border-radius:var(--r-sm);font-weight:700;font-size:13px;cursor:pointer;">📋 Copier le ticket</button>
+          <button class="page-btn" data-page="dashboard" style="padding:10px 16px;background:transparent;color:var(--text);border:1px solid var(--border-2);border-radius:var(--r-sm);font-weight:600;font-size:13px;cursor:pointer;">← Retour Accueil</button>
+        </div>
+        <!-- Méthode -->
+        <div style="margin-top:18px;padding:14px 16px;background:var(--panel);border:1px dashed var(--border-2);border-radius:var(--r-sm);font-size:12px;color:var(--text-dim);line-height:1.5;">
+          <b style="color:var(--text);">Méthode</b> : sélection des paris du jour avec edge ≥ 3pt et confiance ≥ 55%, tri par edge desc, top 5 max. Mise = Kelly demi-fractionnaire cap 5% bankroll par pari. Plancher 0.50€, arrondi à 0.10€. Le filtre EV+ et les limites de risque s'appliquent ici comme partout.
+        </div>
+      </div>`;
+    // Wire interactions
+    wrap.querySelector('#plan-mise-copy')?.addEventListener('click', () => {
+      try {
+        navigator.clipboard.writeText(ticketText);
+        const btn = wrap.querySelector('#plan-mise-copy');
+        if (btn) { btn.textContent = '✓ Copié !'; setTimeout(() => { btn.textContent = '📋 Copier le ticket'; }, 1500); }
+      } catch(e) {}
+    });
+    wrap.querySelector('#plan-mise-edit-bk')?.addEventListener('click', () => {
+      const v = prompt('Nouvelle bankroll (€) :', String(bankroll));
+      const n = parseFloat(v);
+      if (isFinite(n) && n > 0) {
+        try { localStorage.setItem('userBankroll', String(n)); } catch(e){}
+        renderPlanMisePage(wrap);
+      }
+    });
+    wrap.querySelectorAll('[data-match-id]').forEach(row => {
+      row.addEventListener('click', () => {
+        const id = row.dataset.matchId;
+        const c = enriched.find(x => String(x.match.id) === String(id));
+        if (c && typeof openDetail === 'function') openDetail(c.match);
+      });
+    });
+  }
+  try { window.renderPlanMisePage = renderPlanMisePage; } catch(e){}
 
   // ======= Sprint 52 (v31.7.141) — renderPerformancePage =======
   // Vue globale "Performance" qui agrège les KPIs clés (ROI cumul, Win Rate,
