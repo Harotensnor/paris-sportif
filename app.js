@@ -3472,17 +3472,32 @@
   }
   // Sprint 74 (v31.7.162 — câblage Sprint 66/76 backtest per-marché).
   // Charge backtest_report_markets.json pour la page Performance onglet Marché.
+  // Sprint 110 (v31.7.190) — Lazy load : ce report n'est utilisé QUE sur la
+  // page Performance > onglet Marché. Avant : fetch eager au boot pour tout
+  // le monde (60-200KB selon historique). Après : fetch on-demand quand
+  // l'utilisateur ouvre la page Performance, via requestIdleCallback (priorité
+  // basse pour ne pas concurrencer le render du dashboard).
+  let __marketBacktestLoaded = false;
+  let __marketBacktestPromise = null;
   async function _loadMarketBacktest() {
-    try {
-      const r = await fetch('backtest_report_markets.json?t=' + Date.now(), { cache: 'no-store' });
-      if (!r.ok) return;
-      const rep = await r.json();
-      window.__backtestReportMarkets = rep;
-    } catch(e) { /* optional, ignore */ }
+    if (__marketBacktestLoaded || __marketBacktestPromise) return __marketBacktestPromise;
+    __marketBacktestPromise = (async () => {
+      try {
+        const r = await fetch('backtest_report_markets.json?t=' + Date.now(), { cache: 'no-store' });
+        if (!r.ok) { __marketBacktestLoaded = true; return; }
+        const rep = await r.json();
+        window.__backtestReportMarkets = rep;
+        __marketBacktestLoaded = true;
+      } catch(e) {
+        __marketBacktestLoaded = true;
+      }
+    })();
+    return __marketBacktestPromise;
   }
-  // Fire once; safe to call before DOM is ready (fetch is async)
+  try { window._loadMarketBacktest = _loadMarketBacktest; } catch(e){}
+  // Fire calibration eagerly (utilisé partout), market deferred (utilisé seulement
+  // sur Performance > Marché — chargé quand l'user y va).
   _loadModelCalibration();
-  _loadMarketBacktest();
 
   // v31.7.32 — Trust strip helper. Lit __backtestReportV2 et patch les 4
   // KPIs visibles (locks WR / ROI flat / Brier / n picks). Respecte le
@@ -19643,6 +19658,24 @@
     try { localStorage.setItem(PERF_TAB_KEY, t); } catch(e){}
   }
   function renderPerformancePage(wrap) {
+    // Sprint 110 (v31.7.190) — Lazy-load du backtest per-marché lors du 1er
+    // affichage de Performance. Si déjà chargé : noop. Si en cours : poll
+    // après resolution. Si idle : fetch + re-render quand prêt (l'onglet
+    // "Marché" affichera ses données dès le chargement complet).
+    if (typeof window._loadMarketBacktest === 'function' && !window.__backtestReportMarkets) {
+      const reschedule = () => {
+        window._loadMarketBacktest().then(() => {
+          // Re-render uniquement si l'utilisateur est toujours sur la page
+          if (document.body.contains(wrap)) renderPerformancePage(wrap);
+        });
+      };
+      // requestIdleCallback préféré (priorité basse), fallback setTimeout 50ms
+      if (typeof requestIdleCallback === 'function') {
+        requestIdleCallback(reschedule, { timeout: 1500 });
+      } else {
+        setTimeout(reschedule, 50);
+      }
+    }
     const bt = window.__backtestReportV2 || window.__backtestReport;
     if (!bt) {
       wrap.innerHTML = `
