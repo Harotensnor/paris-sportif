@@ -526,6 +526,39 @@
     });
   }, { passive: true, capture: true });
 
+  // Sprint 112 (v31.7.190) — Empty state factory unifiée.
+  // Au lieu de 36 inline templates `.empty-state-v2`, un helper qui produit
+  // le markup canonique. Inclut illustration emoji, titre, body, et actions
+  // optionnelles (boutons CTA orientés "que faire maintenant").
+  // Usage : _emptyState({ icon: '📊', title: '...', body: '...', actions: [{label, page, primary}] })
+  function _emptyState(opts) {
+    const { icon = 'ℹ️', title = 'Rien ici', body = '', actions = [] } = opts || {};
+    const actHtml = actions && actions.length
+      ? `<div class="es-actions-v2">${actions.map(a => {
+          const isPrimary = !!a.primary;
+          const styles = isPrimary
+            ? 'padding:10px 18px;background:var(--brand);color:#08080a;border:none;border-radius:var(--r-sm);cursor:pointer;font-size:13px;font-weight:700;'
+            : 'padding:10px 18px;background:var(--panel);color:var(--text);border:1px solid var(--border-2);border-radius:var(--r-sm);cursor:pointer;font-size:13px;font-weight:600;';
+          if (a.page) {
+            return `<button type="button" class="page-btn" data-page="${esc(a.page)}" style="${styles}">${esc(a.label)}</button>`;
+          } else if (a.href) {
+            return `<a href="${esc(a.href)}" style="${styles};text-decoration:none;display:inline-block;">${esc(a.label)}</a>`;
+          } else if (a.click) {
+            return `<button type="button" data-es-action="${esc(a.click)}" style="${styles}">${esc(a.label)}</button>`;
+          }
+          return '';
+        }).join('')}</div>`
+      : '';
+    return `
+      <div class="empty-state-v2">
+        <div class="es-illustration">${icon}</div>
+        <div class="es-title-v2">${title}</div>
+        <div class="es-body-v2">${body}</div>
+        ${actHtml}
+      </div>`;
+  }
+  try { window._emptyState = _emptyState; } catch(e){}
+
   // Sprint 108 (v31.7.190) — Glossaire inline pour termes techniques.
   // Usage : <span class="gloss-term" data-gloss="kelly">Kelly</span>
   // Au click → popover avec définition courte + lien académie pour le détail.
@@ -18530,11 +18563,15 @@
             <div style="font-size:14px;color:var(--text-dim);">${totalEntries} entrée${totalEntries > 1 ? 's' : ''} suivie${totalEntries > 1 ? 's' : ''}.</div>
           </div>
           ${subTabsHtml}
-          <div class="empty-state-v2" style="margin-top:18px;">
-            <div class="es-illustration">⭐</div>
-            <div class="es-title-v2">Aucun match favori</div>
-            <div class="es-body-v2">Clique sur l'étoile à côté d'un match pour le sauvegarder ici. Tu peux aussi suivre des équipes / ligues / sports / marchés via les autres onglets.</div>
-          </div>
+          ${_emptyState({
+            icon: '⭐',
+            title: 'Aucun match favori',
+            body: 'Clique sur l\'étoile à côté d\'un match pour le sauvegarder ici. Tu peux aussi suivre des équipes / ligues / sports / marchés via les autres onglets.',
+            actions: [
+              { label: '⭐ Top du jour', page: 'top', primary: true },
+              { label: '📋 Tous les matchs', page: 'tous' },
+            ],
+          })}
         </div>`;
       wrap.innerHTML = mainHtml;
       wrap.querySelectorAll('[data-favoris-tab]').forEach(b => b.addEventListener('click', () => { _setFavorisTab(b.dataset.favorisTab); renderFavorisPage(wrap); }));
