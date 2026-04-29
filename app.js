@@ -10567,6 +10567,18 @@
       box.style.display = 'block';
       return;
     }
+    // Sprint 122 (v31.7.191) — Highlight le match dans le label avec <mark>.
+    // Trouve la 1ère occurrence (case-insensitive) de q dans le label, wrap.
+    const _highlightMatch = (label, query) => {
+      if (!query) return esc(label);
+      const lc = label.toLowerCase();
+      const idx = lc.indexOf(query.toLowerCase());
+      if (idx < 0) return esc(label);
+      const before = label.slice(0, idx);
+      const match = label.slice(idx, idx + query.length);
+      const after = label.slice(idx + query.length);
+      return `${esc(before)}<mark class="search-mark">${esc(match)}</mark>${esc(after)}`;
+    };
     box.innerHTML = hits.map((h, i) => {
       const it = h.it;
       const ico = it.kind === 'team' && it.logo
@@ -10574,7 +10586,7 @@
         : `<span>${kindIcon(it.kind)}</span>`;
       return `<div class="search-suggest-item" data-idx="${i}" data-kind="${esc(it.kind)}" data-label="${esc(it.label)}" ${it.matchId ? `data-match-id="${esc(it.matchId)}"` : ''} style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;">
         ${ico}
-        <span style="flex:1;color:var(--text,#e6ebf2);font-weight:500;">${esc(it.label)}</span>
+        <span style="flex:1;color:var(--text,#e6ebf2);font-weight:500;">${_highlightMatch(it.label, q)}</span>
         <span style="color:var(--text-dim2,#7b8693);font-size:11px;">${sportIconAA(it.sub)} ${it.kind === 'team' ? 'équipe' : it.kind === 'league' ? 'tournoi' : 'ville'}</span>
       </div>`;
     }).join('');
@@ -12596,6 +12608,17 @@
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap;">
           <span style="font-size:11px;font-weight:800;color:var(--brand);text-transform:uppercase;letter-spacing:.08em;">🎯 Ce que tu dois faire maintenant</span>
           <span style="font-size:10.5px;color:var(--text-dim2);background:var(--panel);padding:2px 8px;border-radius:10px;">Bankroll ${userBankroll.toFixed(0)}€</span>
+          ${(() => {
+            // Sprint 123 (v31.7.191) — Data freshness chip. Vert <30min, jaune 30-120min, rouge ≥120min.
+            // Permet à l'utilisateur de savoir d'un coup d'œil que les cotes/picks sont à jour.
+            const ageMin = _dataAgeMin;
+            const color = ageMin < 30 ? 'var(--accent)' : ageMin < 120 ? 'var(--warn)' : 'var(--danger)';
+            const lbl = ageMin < 2 ? "à l'instant" : ageMin < 60 ? `${ageMin}min` : `${Math.floor(ageMin/60)}h${String(ageMin%60).padStart(2,'0')}`;
+            return `<span style="display:inline-flex;align-items:center;gap:5px;font-size:10.5px;color:${color};background:var(--panel);padding:2px 8px;border-radius:10px;border:1px solid ${color};" data-tooltip="Cotes mises à jour il y a ${lbl}. Cron toutes les 5min.">
+              <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${color};${ageMin < 30 ? 'animation:fresh-pulse 2s ease-in-out infinite;' : ''}"></span>
+              MAJ ${lbl}
+            </span>`;
+          })()}
           ${(() => {
             // Sprint 113 (v31.7.190) — Risk gauge mini : barre horizontale qui montre
             // % bankroll utilisé vs limite quotidienne. Vert <50%, orange 50-80%, rouge >80%.
