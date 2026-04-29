@@ -68,7 +68,8 @@
   body { min-height: 100vh; }
   a { color: #a78bfa; text-decoration: none; }
   a:hover, a:focus { text-decoration: underline; }
-  code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: .92em; background: rgba(167,139,250,.1); padding: 1px 5px; border-radius: 4px; }
+  /* Plan 1000 fix : code inline meilleur contraste */
+  code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: .92em; background: rgba(167,139,250,.15); color: #c4b5fd; padding: 2px 6px; border-radius: 4px; font-weight: 500; }
   header.topbar {
     position: sticky; top: 0; z-index: 50;
     background: rgba(8,8,10,.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
@@ -127,16 +128,19 @@
   thead th {
     position: sticky;
     top: 60px;
+    /* Plan 1000 fix : background opaque solide. Avant : gradient .03 alpha qui
+       laissait transparaître les lignes dessous → header tronquait visuellement
+       la 1ère ligne. Maintenant : couleur unie + z-index 5 (au-dessus tbody). */
     background: #161823;
-    background-image: linear-gradient(rgba(255,255,255,.03), rgba(255,255,255,.03));
     color: #a3a3aa; font-size: 11px; font-weight: 700;
     text-transform: uppercase; letter-spacing: .6px;
     text-align: left; padding: 10px 12px;
     border-bottom: 1px solid rgba(255,255,255,.08);
-    z-index: 1;
+    z-index: 5;
+    box-shadow: 0 1px 0 rgba(255,255,255,.06);
   }
   @media (prefers-color-scheme: light) {
-    thead th { background: #fafafa; background-image: linear-gradient(rgba(0,0,0,.02), rgba(0,0,0,.02)); }
+    thead th { background: #fafafa; box-shadow: 0 1px 0 rgba(0,0,0,.06); }
   }
   tbody td {
     padding: 10px 12px;
