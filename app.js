@@ -729,9 +729,12 @@
     requestAnimationFrame(tick);
   };
 
-  function toast(msg, kind = 'info') {
+  function toast(msg, kind = 'info', opts = {}) {
     // AUDIT-2026-04-27 (Sprint 16 #18) — Refactor vers .toast-stack moderne.
     // Garde la fonction `toast()` API stable mais utilise le nouveau host.
+    // Sprint 125 (v31.7.191) — Actions optionnelles : opts.action = { label, onClick }
+    // Crée un bouton dans le toast qui, au click, exécute onClick puis dismiss.
+    // Useful pour "Undo", "Voir détail", "Réessayer"… toast actionnable.
     let host = document.getElementById('toast-host');
     if (!host) {
       host = document.createElement('div');
@@ -743,17 +746,42 @@
     }
     const el = document.createElement('div');
     el.className = `toast-item ${kind}`;
-    el.textContent = msg;
+    if (opts.action && typeof opts.action.onClick === 'function') {
+      // Toast avec action button : layout en flex pour espacer message + bouton
+      el.style.display = 'flex';
+      el.style.alignItems = 'center';
+      el.style.gap = '12px';
+      const msgSpan = document.createElement('span');
+      msgSpan.style.flex = '1';
+      msgSpan.textContent = msg;
+      el.appendChild(msgSpan);
+      const actBtn = document.createElement('button');
+      actBtn.type = 'button';
+      actBtn.className = 'toast-action';
+      actBtn.textContent = opts.action.label || 'Action';
+      actBtn.style.cssText = 'background:rgba(255,255,255,.15);color:inherit;border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:4px 10px;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0;';
+      actBtn.addEventListener('click', () => {
+        try { opts.action.onClick(); } catch(e) {}
+        el.classList.add('dismissing');
+        setTimeout(() => el.remove(), 220);
+      });
+      el.appendChild(actBtn);
+    } else {
+      el.textContent = msg;
+    }
     host.appendChild(el);
     // AUDIT-2026-04-27 (Sprint 25 #5 + Sprint 42 #6) — Cap dynamique
     // qui re-évalue à chaque toast (donc react au resize entre 2
     // toasts sans listener supplémentaire).
     const cap = window.innerWidth < 380 ? 2 : 3;
     while (host.children.length > cap) host.removeChild(host.firstChild);
+    // Toast avec action persistent plus longtemps (6s vs 4s) car l'user a
+    // besoin de temps pour décider d'agir.
+    const duration = opts.action ? 6000 : (opts.duration || 4000);
     setTimeout(() => {
       el.classList.add('dismissing');
       setTimeout(() => el.remove(), 220);
-    }, 4000);
+    }, duration);
   }
 
   // ======= Personal bets storage (client-only, localStorage) =======
@@ -13964,8 +13992,24 @@
             return;
           }
           if (typeof window._addUserBet === 'function') {
-            window._addUserBet(matchId, market, pickKey, pickLabel, odd, stake);
-            if (typeof toast === 'function') toast(`✓ Pari ${stake.toFixed(0)}€ @${odd.toFixed(2)} enregistré dans ton bilan`, 'success');
+            const betId = window._addUserBet(matchId, market, pickKey, pickLabel, odd, stake);
+            // Sprint 125 (v31.7.191) — Toast actionnable avec Annuler.
+            // Donne 6s à l'user pour annuler avant que le pari soit définitivement
+            // tracké. Useful si click accidentel sur petit écran mobile.
+            if (typeof toast === 'function') {
+              toast(`✓ Pari ${stake.toFixed(0)}€ @${odd.toFixed(2)} enregistré`, 'success', {
+                action: {
+                  label: 'Annuler',
+                  onClick: () => {
+                    if (typeof window._removeUserBet === 'function' && betId) {
+                      window._removeUserBet(betId);
+                      toast('Pari annulé', 'info');
+                      setTimeout(() => renderDashboardPage(wrap), 100);
+                    }
+                  },
+                },
+              });
+            }
             // Re-render dashboard pour afficher le badge ✓
             setTimeout(() => renderDashboardPage(wrap), 100);
           }
