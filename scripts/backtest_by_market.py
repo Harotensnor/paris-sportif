@@ -76,12 +76,31 @@ def evaluate_market_pure_python(match: dict, market_key: str, pick_value):
     competitors = match.get('competitors', [])
     home = next((c for c in competitors if c.get('home_away') == 'home'), None)
     away = next((c for c in competitors if c.get('home_away') == 'away'), None)
+    # Tennis : ESPN ne retourne pas home_away → fallback sur ordre [0]/[1]
+    if not home and competitors:
+        home = competitors[0] if len(competitors) > 0 else None
+    if not away and competitors:
+        away = competitors[1] if len(competitors) > 1 else None
     if not home or not away:
         return None
     try:
         hs = int(home.get('score', ''))
         ass = int(away.get('score', ''))
     except (ValueError, TypeError):
+        # FIX 2026-04-29 — Tennis : score null mais winner field présent
+        home_winner = home.get('winner') is True
+        away_winner = away.get('winner') is True
+        if not (home_winner or away_winner):
+            return None
+        # Marchés évaluables avec juste winner
+        if market_key == '1n2':
+            if pick_value == '1': return 'won' if home_winner else 'lost'
+            if pick_value == '2': return 'won' if away_winner else 'lost'
+            if pick_value == 'X': return None
+        elif market_key == 'doubleChance':
+            if pick_value == '1X': return 'won' if home_winner else 'lost'
+            if pick_value == 'X2': return 'won' if away_winner else 'lost'
+            if pick_value == '12': return 'won' if (home_winner or away_winner) else 'lost'
         return None
     total = hs + ass
     margin = hs - ass

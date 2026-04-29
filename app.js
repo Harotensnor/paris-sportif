@@ -4905,8 +4905,22 @@
     const { home, away } = getSides(match);
     const hs = parseInt(home?.score ?? '', 10);
     const as = parseInt(away?.score ?? '', 10);
-    if (isNaN(hs) || isNaN(as)) return null;
     const key = pred.pick.key;
+    // FIX live test (2026-04-29) — Tennis ESPN ne fournit pas de score numérique
+    // (linescores par sets uniquement) mais expose `competitors[].winner: true|false`.
+    // Avant : 235/269 completed = tennis avec score null → evaluateModelPick retournait
+    // VOID → bilan/historique perdaient ces résultats. Fix : fallback sur le winner field
+    // pour les picks 1n2 (tennis n'a pas de nul, donc X retourne null comme avant).
+    if (isNaN(hs) || isNaN(as)) {
+      const homeWinner = home?.winner === true;
+      const awayWinner = away?.winner === true;
+      if (homeWinner || awayWinner) {
+        if (key === '1') return homeWinner ? 'won' : 'lost';
+        if (key === '2') return awayWinner ? 'won' : 'lost';
+        if (key === 'X') return null;  // pas de signal nul si on n'a que winner
+      }
+      return null;
+    }
     if (key === '1') return hs > as ? 'won' : 'lost';
     if (key === '2') return as > hs ? 'won' : 'lost';
     if (key === 'X') return hs === as ? 'won' : 'lost';
@@ -4931,7 +4945,34 @@
     const { home, away } = getSides(match);
     const hs = parseInt(home?.score ?? '', 10);
     const as = parseInt(away?.score ?? '', 10);
-    if (isNaN(hs) || isNaN(as)) return null;
+    // FIX live test (2026-04-29) — Score numérique manquant : fallback sur winner.
+    // Pour les marchés "résultat" (1n2, doubleChance, dnb), on peut évaluer avec
+    // juste competitors[].winner. Pour les marchés "score" (OU/BTTS/exactScore/
+    // basketTotal/runLine), on a besoin du score numérique → return null si manquant.
+    if (isNaN(hs) || isNaN(as)) {
+      const homeWinner = home?.winner === true;
+      const awayWinner = away?.winner === true;
+      if (!(homeWinner || awayWinner)) return null;
+      // Marchés évaluables avec juste winner (résultat seulement)
+      switch (marketKey) {
+        case '1n2':
+          if (pickValue === '1') return homeWinner ? 'won' : 'lost';
+          if (pickValue === '2') return awayWinner ? 'won' : 'lost';
+          if (pickValue === 'X') return null;  // pas de signal nul
+          return null;
+        case 'doubleChance':
+          if (pickValue === '1X') return homeWinner ? 'won' : 'lost';
+          if (pickValue === 'X2') return awayWinner ? 'won' : 'lost';
+          if (pickValue === '12') return (homeWinner || awayWinner) ? 'won' : 'lost';
+          return null;
+        case 'dnb':
+          if (pickValue === 'DNB_1') return homeWinner ? 'won' : 'lost';
+          if (pickValue === 'DNB_2') return awayWinner ? 'won' : 'lost';
+          return null;
+        default:
+          return null;  // OU/BTTS/exactScore non évaluables sans score numérique
+      }
+    }
     const total = hs + as;
     const margin = hs - as;
     switch (marketKey) {
