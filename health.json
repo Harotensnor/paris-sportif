@@ -1,54 +1,53 @@
 {
-  "generated_at": "2026-04-29T00:58:19Z",
+  "generated_at": "2026-04-29T01:04:04Z",
   "data_age_min": 0,
   "sources": {
     "winamax_catalog": {
-      "age_min": 2,
+      "age_min": 1,
       "tournaments": 111,
       "matches": 732
     },
     "winamax_markets": {
-      "age_min": 2,
-      "matches_with_odds": 730
+      "age_min": 1,
+      "matches_with_odds": 733
     },
     "injuries_soccer": {
-      "age_min": 2,
+      "age_min": 3,
       "teams": 93,
       "players": 321
     },
     "lineups_soccer": {
-      "age_min": 2,
+      "age_min": 3,
       "events": 39
     },
     "team_stats": {
-      "age_min": 2,
+      "age_min": 3,
       "teams": 371
     },
     "clubelo": {
-      "age_min": 2,
+      "age_min": 3,
       "clubs": 630
     },
     "weather": {
       "age_min": 0,
-      "events": 106
+      "events": 107
     },
     "referees_soccer": {
-      "age_min": 2,
+      "age_min": 3,
       "events": 28
     }
   },
   "warnings": [
-    "actionable_external_odds: 193 events ont odds_snapshot externe alors que Winamax exact existe",
-    "winamax_exact_ratio bas: 38% (295/770)"
+    "winamax_exact_ratio bas: 39% (324/823)"
   ],
   "quality_checks": {
-    "total_events": 1056,
-    "upcoming_events": 770,
-    "winamax_available": 770,
-    "winamax_exact": 295,
-    "winamax_tournament_only": 475,
-    "winamax_exact_ratio": 0.383,
-    "actionable_external_odds": 193,
+    "total_events": 1078,
+    "upcoming_events": 823,
+    "winamax_available": 823,
+    "winamax_exact": 324,
+    "winamax_tournament_only": 499,
+    "winamax_exact_ratio": 0.394,
+    "actionable_external_odds": 0,
     "football_invalid_form": 0
   }
 }
