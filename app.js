@@ -107,7 +107,7 @@
   // legacy) mais aucun lien ne pointe plus vers cette valeur.
   // v31.7.77 — 'calendrier' ajouté pour vue 7 jours groupée (user feedback
   // "je veux voir au moins une semaine de pronos jour par jour").
-  const VALID_PAGES = ['dashboard','tous','locks','buteurs','combines','top','historique','bilan','backtest','academie','credibilite','alertes','profil','sante','legal','methodologie','montante-jour','montante-weekend','montante-semaine','compare','calendrier','league','favoris','matchs','performance','plan-mise','valeur'];
+  const VALID_PAGES = ['dashboard','tous','locks','buteurs','combines','top','historique','bilan','backtest','academie','credibilite','alertes','profil','sante','legal','methodologie','montante-jour','montante-weekend','montante-semaine','compare','calendrier','league','favoris','matchs','performance','plan-mise','valeur','simulator'];
   // v30 — 'mesparis' retiré : Théo n'enregistre pas ses paris sur le site.
   // v31 — 'legal' + 'methodologie' ajoutés (transparence + dictionnaire des
   // métriques, en réponse à l'audit ChatGPT 2026-04-26).
@@ -1418,6 +1418,283 @@
     return Math.min(1, corr);
   }
   try { window.combinationCorrelation = combinationCorrelation; } catch(e){}
+
+  // Sprint 103 (v31.7.188) — AI Coach contextuel : explique pourquoi parier.
+  // Synthétise les signaux dominants du modèle pour le pick choisi en
+  // langage naturel, accessible. Lit pred.contributions (Sprint U Chantier) et
+  // pred.explain.reasons + autres signaux dispo. Ajoute aussi les anti-arguments
+  // (pourquoi NE PAS parier) basés sur les risk flags.
+  // Retourne { pros: [...], cons: [...], summary, recommendation }
+  function aiCoachExplain(match, pred, best) {
+    if (!match || !pred || !pred.pick) return null;
+    const pros = [];
+    const cons = [];
+    // Pros : signaux positifs depuis contributions
+    if (Array.isArray(pred.contributions)) {
+      pred.contributions.slice(0, 6).forEach(c => {
+        if (c.delta != null && c.delta > 0.02) {
+          pros.push({
+            icon: c.icon || '✓',
+            label: c.name || 'Signal',
+            text: `+${(c.delta * 100).toFixed(0)}pt vs baseline (poids ${c.w?.toFixed(2) || 'n/a'})`,
+          });
+        } else if (c.delta != null && c.delta < -0.02) {
+          cons.push({
+            icon: '−',
+            label: c.name || 'Signal',
+            text: `${(c.delta * 100).toFixed(0)}pt vs baseline — pousse vers l'autre côté`,
+          });
+        }
+      });
+    }
+    // Edge / EV / Kelly
+    if (best && best.edge >= 0.05) {
+      pros.push({ icon: '💎', label: 'Edge fort', text: `+${(best.edge*100).toFixed(0)}pt vs cote book → value confirmée` });
+    } else if (best && best.edge >= 0.02) {
+      pros.push({ icon: '✓', label: 'Edge léger', text: `+${(best.edge*100).toFixed(1)}pt — value modérée` });
+    } else if (best && best.edge < 0) {
+      cons.push({ icon: '⚠', label: 'Edge négatif', text: `${(best.edge*100).toFixed(1)}pt — la cote book est meilleure que le modèle` });
+    }
+    // Kelly
+    if (best && best.kelly > 0.03) {
+      pros.push({ icon: '💰', label: 'Kelly franc', text: `Mise ${(best.kelly*100).toFixed(1)}% bankroll suggérée — conviction haute` });
+    }
+    // Confiance
+    const conf = Number(pred.reliability ?? pred.pick.prob) || 0;
+    if (conf >= 0.70) pros.push({ icon: '🔒', label: 'Lock confiance', text: `${Math.round(conf*100)}% — le modèle est sûr` });
+    else if (conf < 0.55) cons.push({ icon: '🤔', label: 'Confiance limite', text: `${Math.round(conf*100)}% — proche du seuil de skip` });
+    // Drift cote
+    const drift = (typeof computeOddsDrift === 'function') ? computeOddsDrift(match, pred, best) : null;
+    if (drift) {
+      if (drift.status === 'better' || drift.status === 'slight_better') {
+        pros.push({ icon: '📈', label: 'Cote en hausse', text: drift.label });
+      } else if (drift.status === 'skip' || drift.status === 'caution') {
+        cons.push({ icon: '📉', label: 'Cote en baisse', text: drift.label });
+      }
+    }
+    // Quality data
+    let dq = null;
+    try { dq = (typeof computeDataQuality === 'function') ? computeDataQuality(match) : null; } catch(e){}
+    if (dq && dq.score >= 3) pros.push({ icon: '📊', label: 'Données riches', text: `${dq.score}/${dq.max} sources d'enrichissement présentes` });
+    else if (dq && dq.score <= 1) cons.push({ icon: '📉', label: 'Données pauvres', text: `Seulement ${dq.score}/${dq.max} sources — incertitude plus forte` });
+    // Historique ligue (si backtest dispo)
+    const lc = match.league_code;
+    const bt = window.__backtestReportV2;
+    if (bt && bt.by_league && lc && bt.by_league[lc]) {
+      const lg = bt.by_league[lc];
+      if (lg.n >= 30) {
+        if (lg.win_rate >= 0.55) pros.push({ icon: '📈', label: 'Modèle fort sur cette ligue', text: `WR ${(lg.win_rate*100).toFixed(0)}% sur ${lg.n} paris historiques` });
+        else if (lg.win_rate < 0.45) cons.push({ icon: '📉', label: 'Modèle faible sur cette ligue', text: `WR ${(lg.win_rate*100).toFixed(0)}% sur ${lg.n} paris historiques — doute` });
+      }
+    }
+    // Météo / risques
+    if (match.weather && (match.weather.precip_mm > 5 || match.weather.wind_kmh > 30)) {
+      cons.push({ icon: '🌧️', label: 'Météo défavorable', text: `Précip ou vent fort — affecte les xG` });
+    }
+    // Synthèse texte
+    const score = pros.length - cons.length * 1.2;
+    const recommendation = score >= 3 ? 'À jouer'
+                         : score >= 1 ? 'À jouer avec mise modérée'
+                         : score >= -1 ? 'À surveiller — limite'
+                         : 'À éviter';
+    const summary = `Le modèle voit ${pros.length} argument${pros.length>1?'s':''} pour, ${cons.length} contre. ${recommendation === 'À jouer' || recommendation === 'À jouer avec mise modérée' ? 'La balance penche en faveur du pari.' : recommendation === 'À surveiller — limite' ? 'La balance est à peu près neutre, prudence.' : 'La balance penche contre, mieux vaut skip.'}`;
+    return { pros, cons, summary, recommendation };
+  }
+  try { window.aiCoachExplain = aiCoachExplain; } catch(e){}
+
+  // Sprint 102 (v31.7.187) — Tracking user perso (carnet localStorage) + Adherence.
+  // L'user note "j'ai parié X€ sur ce match" → comparison avec ce que le modèle
+  // aurait suggéré. Adherence score : "Tu as suivi le modèle 8/10 fois".
+  // Schema localStorage.userBets = [{ id, matchId, market, key, label, odd,
+  //   stake, ts, settled?, result?, pnl? }]
+  const USER_BETS_KEY = 'paris_sportif_user_bets';
+  function _loadUserBets() {
+    try {
+      const raw = localStorage.getItem(USER_BETS_KEY);
+      if (!raw) return [];
+      const arr = JSON.parse(raw);
+      return Array.isArray(arr) ? arr : [];
+    } catch(e) { return []; }
+  }
+  function _saveUserBets(arr) {
+    try { localStorage.setItem(USER_BETS_KEY, JSON.stringify(arr.slice(-200))); } catch(e){}
+  }
+  window._loadUserBets = _loadUserBets;
+  window._addUserBet = function(matchId, market, key, label, odd, stake) {
+    const bets = _loadUserBets();
+    const bet = {
+      id: 'bet_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+      matchId: String(matchId),
+      market: market || '1n2',
+      key: key || '',
+      label: label || '',
+      odd: Number(odd) || 0,
+      stake: Number(stake) || 0,
+      ts: Date.now(),
+      settled: false,
+    };
+    bets.push(bet);
+    _saveUserBets(bets);
+    return bet.id;
+  };
+  window._removeUserBet = function(id) {
+    const bets = _loadUserBets().filter(b => b.id !== id);
+    _saveUserBets(bets);
+  };
+  window._settleUserBets = function() {
+    // Met à jour les paris en attente avec leur résultat si dispo
+    const data = window.PRONOSTICS_DATA;
+    if (!data || !data.days) return 0;
+    const matchById = new Map();
+    Object.values(data.days || {}).forEach(arr => (arr || []).forEach(m => {
+      if (m.id) matchById.set(String(m.id), m);
+    }));
+    const bets = _loadUserBets();
+    let updated = 0;
+    bets.forEach(b => {
+      if (b.settled) return;
+      const m = matchById.get(String(b.matchId));
+      if (!m || !m.completed) return;
+      const res = (typeof evaluateMarketPick === 'function')
+        ? evaluateMarketPick(m, b.market || '1n2', b.key)
+        : null;
+      if (res === 'won' || res === 'lost') {
+        b.settled = true;
+        b.result = res;
+        b.pnl = res === 'won' ? b.stake * (b.odd - 1) : -b.stake;
+        b.settledTs = Date.now();
+        updated++;
+      } else if (res === null && m.completed) {
+        // VOID
+        b.settled = true;
+        b.result = 'void';
+        b.pnl = 0;
+        b.settledTs = Date.now();
+        updated++;
+      }
+    });
+    if (updated > 0) _saveUserBets(bets);
+    return updated;
+  };
+  // Adherence score : combien de paris du modèle (top picks récents) l'user
+  // a suivi. Si l'user a 8 paris et que sur les 10 derniers picks modèle
+  // forts (lock+conf≥70%) il en a fait 8 → adherence 80%.
+  // Approximation : on regarde les 30 derniers jours, count des picks "strong"
+  // du modèle, count des paris user sur ces matchs, ratio.
+  window._computeAdherence = function() {
+    const data = window.PRONOSTICS_DATA;
+    if (!data || !data.days) return null;
+    const bets = _loadUserBets();
+    if (!bets.length) return { adherence: null, modelPicksCount: 0, userBetsCount: 0, missed: [] };
+    const userMatchIds = new Set(bets.map(b => String(b.matchId)));
+    // Picks modèle "strong" sur les 30 derniers jours
+    const cutoff = Date.now() - 30 * 24 * 3600 * 1000;
+    const strongModelPicks = [];
+    Object.values(data.days || {}).forEach(arr => (arr || []).forEach(m => {
+      const ts = new Date(m.date).getTime();
+      if (!isFinite(ts) || ts < cutoff) return;
+      try {
+        const pred = predictMatch(m);
+        if (!pred || !pred.pick || pred.skip || pred.lowConf) return;
+        const rel = pred.reliability ?? pred.pick.prob ?? 0;
+        if (rel < 0.65) return;  // pas un strong pick
+        strongModelPicks.push({ id: String(m.id), name: m.name, ts });
+      } catch(e){}
+    }));
+    if (!strongModelPicks.length) return { adherence: null, modelPicksCount: 0, userBetsCount: bets.length, missed: [] };
+    const followed = strongModelPicks.filter(p => userMatchIds.has(p.id)).length;
+    const adherence = followed / strongModelPicks.length;
+    const missed = strongModelPicks.filter(p => !userMatchIds.has(p.id)).slice(0, 5);
+    return {
+      adherence,
+      modelPicksCount: strongModelPicks.length,
+      userBetsCount: bets.length,
+      followed,
+      missed,
+    };
+  };
+  // Bilan user perso (stats sur paris settled)
+  window._userBetsStats = function() {
+    const bets = _loadUserBets().filter(b => b.settled && b.result !== 'void');
+    if (!bets.length) return null;
+    const wins = bets.filter(b => b.result === 'won').length;
+    const losses = bets.filter(b => b.result === 'lost').length;
+    const totalStake = bets.reduce((a, b) => a + (b.stake || 0), 0);
+    const totalPnL = bets.reduce((a, b) => a + (b.pnl || 0), 0);
+    return {
+      n: bets.length,
+      wins, losses,
+      winRate: wins / bets.length,
+      totalStake: Math.round(totalStake * 100) / 100,
+      totalPnL: Math.round(totalPnL * 100) / 100,
+      roi: totalStake > 0 ? totalPnL / totalStake : 0,
+    };
+  };
+
+  // Sprint 101 (v31.7.186) — Live odds drift tracker.
+  // Compare la cote actuelle (winamax.markets[...]) avec la cote snapshotée
+  // au moment où le pick a été émis (odds_snapshot). Trois cas :
+  //   1. Pas bougé (±2%) → pick toujours valide
+  //   2. Cote a baissé → marché s'est ajusté contre nous, edge réduit voire
+  //      disparu → "skip recommandé"
+  //   3. Cote a monté → marché sur-corrige, edge augmenté → "encore meilleur"
+  // Retourne { drift, driftPct, status, label, color } ou null si pas de snap.
+  function computeOddsDrift(match, pred, best) {
+    if (!match || !pred || !best) return null;
+    const snap = match.odds_snapshot;
+    if (!snap) return null;
+    const pickKey = best.key || pred.pick.key;
+    let snapOdd = null;
+    if (best.market === '1n2' || !best.market) {
+      if (pickKey === '1') snapOdd = snap.home;
+      else if (pickKey === '2') snapOdd = snap.away;
+      else if (pickKey === 'X') snapOdd = snap.draw;
+    } else if (snap.markets) {
+      // Markets secondaires (Sprint 67 — odds_snapshot.markets)
+      const mk = snap.markets[best.market];
+      if (mk) {
+        if (best.market === 'ou25' || best.market === 'ou15' || best.market === 'ou35') {
+          snapOdd = pickKey?.startsWith('O') ? mk.over : mk.under;
+        } else if (best.market === 'btts') {
+          snapOdd = pickKey === 'BTTS_Y' ? mk.yes : mk.no;
+        }
+      }
+    }
+    if (!(snapOdd > 1)) return null;
+    const currentOdd = best.odd;
+    const drift = currentOdd - snapOdd;
+    const driftPct = drift / snapOdd;
+    let status, label, color;
+    if (Math.abs(driftPct) < 0.02) {
+      status = 'stable';
+      label = 'Cote stable';
+      color = 'var(--text-dim)';
+    } else if (driftPct >= 0.05) {
+      status = 'better';
+      label = `Cote a monté +${(driftPct*100).toFixed(0)}% (encore plus de value)`;
+      color = 'var(--accent)';
+    } else if (driftPct >= 0.02) {
+      status = 'slight_better';
+      label = `Cote +${(driftPct*100).toFixed(0)}% (légèrement mieux)`;
+      color = 'var(--accent)';
+    } else if (driftPct <= -0.10) {
+      status = 'skip';
+      label = `Cote a chuté ${(driftPct*100).toFixed(0)}% — marché s'est ajusté, value perdue`;
+      color = 'var(--danger)';
+    } else if (driftPct <= -0.05) {
+      status = 'caution';
+      label = `Cote ${(driftPct*100).toFixed(0)}% — value réduite, mise prudente`;
+      color = 'var(--warn)';
+    } else {
+      status = 'slight_worse';
+      label = `Cote ${(driftPct*100).toFixed(0)}% (légèrement moins)`;
+      color = 'var(--text-dim)';
+    }
+    // Estime le nouvel edge : comparé à proba modèle qui n'a pas changé
+    const newEdge = (pred.reliability ?? pred.pick?.prob ?? 0) - 1 / currentOdd;
+    return { drift, driftPct, status, label, color, snapOdd, currentOdd, newEdge };
+  }
+  try { window.computeOddsDrift = computeOddsDrift; } catch(e){}
 
   // Sprint 98 (v31.7.183) — Sharpe ratio, max drawdown, streak max.
   // Métriques pro pour évaluer la rentabilité ajustée au risque.
@@ -2979,6 +3256,21 @@
     if (!isFinite(rawProb) || rawProb <= 0 || rawProb >= 1) return rawProb;
     for (const bin of cal.bins) {
       if (bin.n >= 3 && bin.gap != null && rawProb >= bin.lo && rawProb < bin.hi) {
+        // Sprint 100 (v31.7.185) — Cap d'ajustement passé de ±5pt à ±8pt.
+        // Justification : Brier 0.224 = "calibration médiocre" actuel. Sur les
+        // segments où l'écart prédiction/réalité est ≥7pt, on bridait à 5pt
+        // donc on perdait 2pt+ de correction. En passant à 8pt, on récupère
+        // les corrections fortes des segments mal calibrés tout en gardant un
+        // garde-fou raisonnable contre l'overfit (bin trop petit = noise).
+        // Effet attendu : Brier 0.224 → ~0.20 (mesurable au prochain backtest).
+        // Conditionné par bin.n ≥ 8 (au lieu de 3) pour ne pas amplifier
+        // les bins anémiques où le gap n'est que du bruit échantillonnage.
+        if (bin.n >= 8) {
+          const adj = Math.max(-0.08, Math.min(0.08, bin.gap));
+          return Math.max(0.01, Math.min(0.99, rawProb + adj));
+        }
+        // Bins faibles (3-7 obs) : garde le cap conservateur ±5pt pour limiter
+        // le risque d'overfit sur du bruit.
         const adj = Math.max(-0.05, Math.min(0.05, bin.gap));
         return Math.max(0.01, Math.min(0.99, rawProb + adj));
       }
@@ -7684,12 +7976,71 @@
               })()}
               ${tile('Actionability', `${action}/100`, action >= 65 ? 'À jouer' : action >= 45 ? 'À surveiller' : 'À éviter', actionColor)}
             </div>
+            ${(() => {
+              // Sprint 101 (v31.7.186) — Live odds drift banner
+              const drift = (typeof computeOddsDrift === 'function') ? computeOddsDrift(match, pred, best) : null;
+              if (!drift) return '';
+              const bg = drift.status === 'skip' ? 'rgba(239,68,68,.10)'
+                       : drift.status === 'caution' ? 'rgba(199,155,0,.10)'
+                       : drift.status === 'better' || drift.status === 'slight_better' ? 'rgba(34,197,94,.10)'
+                       : 'rgba(148,163,184,.06)';
+              const border = drift.status === 'skip' ? 'rgba(239,68,68,.32)'
+                           : drift.status === 'caution' ? 'rgba(199,155,0,.32)'
+                           : drift.status === 'better' || drift.status === 'slight_better' ? 'rgba(34,197,94,.32)'
+                           : 'rgba(148,163,184,.20)';
+              return `
+                <div style="margin-top:10px;padding:8px 12px;background:${bg};border:1px solid ${border};border-left:3px solid ${drift.color};border-radius:0 var(--r-sm) var(--r-sm) 0;font-size:12px;color:var(--text);line-height:1.4;">
+                  <span style="color:${drift.color};font-weight:700;">📊 Drift cote :</span> ${esc(drift.label)}.
+                  <span style="color:var(--text-dim2);font-size:11px;">(${drift.snapOdd.toFixed(2)} → ${drift.currentOdd.toFixed(2)} · nouveau edge ${drift.newEdge >= 0 ? '+' : ''}${(drift.newEdge*100).toFixed(1)}pt)</span>
+                </div>`;
+            })()}
             <div style="margin-top:8px;font-size:10.5px;color:var(--text-dim2);line-height:1.4;">
               <b style="color:var(--text-dim);">Edge</b> = proba modèle - 1/cote (en points de proba).
               <b style="color:var(--text-dim);">EV</b> = proba × cote - 1 (retour attendu par mise unitaire).
               <b style="color:var(--text-dim);">Score Qualité</b> = composite (edge ×40 + data ×25 + stabilité cote ×20 + historique ligue ×15).
               <b style="color:var(--text-dim);">Actionability</b> = composite (Confiance ×30 + Edge ×25 + Kelly ×20 + Qualité ×15 + Winamax exact ×10).
             </div>
+            ${(() => {
+              // Sprint 103 (v31.7.188) — AI Coach contextuel
+              const coach = (typeof aiCoachExplain === 'function') ? aiCoachExplain(match, pred, best) : null;
+              if (!coach || (!coach.pros.length && !coach.cons.length)) return '';
+              const recoColor = coach.recommendation === 'À jouer' ? 'var(--accent)'
+                              : coach.recommendation === 'À jouer avec mise modérée' ? 'var(--warn)'
+                              : coach.recommendation === 'À surveiller — limite' ? 'var(--text-dim)'
+                              : 'var(--danger)';
+              return `
+                <div style="margin-top:14px;padding:14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
+                  <div style="display:flex;justify-content:space-between;align-items:start;gap:10px;margin-bottom:10px;flex-wrap:wrap;">
+                    <div style="font-size:13px;font-weight:700;color:var(--text);">🤖 AI Coach · pourquoi parier (ou pas)</div>
+                    <div style="padding:3px 10px;border-radius:999px;background:color-mix(in srgb, ${recoColor} 14%, transparent);color:${recoColor};font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;">${esc(coach.recommendation)}</div>
+                  </div>
+                  <div style="font-size:12.5px;color:var(--text);margin-bottom:10px;line-height:1.5;">${esc(coach.summary)}</div>
+                  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;">
+                    ${coach.pros.length ? `
+                    <div>
+                      <div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;">✓ ${coach.pros.length} argument${coach.pros.length>1?'s':''} pour</div>
+                      <div style="display:flex;flex-direction:column;gap:5px;">
+                        ${coach.pros.map(p => `
+                          <div style="padding:7px 9px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.18);border-radius:var(--r-sm);">
+                            <div style="font-size:11.5px;font-weight:600;color:var(--text);">${esc(p.icon)} ${esc(p.label)}</div>
+                            <div style="font-size:10.5px;color:var(--text-dim);margin-top:1px;line-height:1.35;">${esc(p.text)}</div>
+                          </div>`).join('')}
+                      </div>
+                    </div>` : ''}
+                    ${coach.cons.length ? `
+                    <div>
+                      <div style="font-size:11px;font-weight:700;color:var(--warn);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;">✗ ${coach.cons.length} argument${coach.cons.length>1?'s':''} contre</div>
+                      <div style="display:flex;flex-direction:column;gap:5px;">
+                        ${coach.cons.map(c => `
+                          <div style="padding:7px 9px;background:rgba(199,155,0,.06);border:1px solid rgba(199,155,0,.18);border-radius:var(--r-sm);">
+                            <div style="font-size:11.5px;font-weight:600;color:var(--text);">${esc(c.icon)} ${esc(c.label)}</div>
+                            <div style="font-size:10.5px;color:var(--text-dim);margin-top:1px;line-height:1.35;">${esc(c.text)}</div>
+                          </div>`).join('')}
+                      </div>
+                    </div>` : ''}
+                  </div>
+                </div>`;
+            })()}
           </div>`;
       })()}
 
@@ -16050,6 +16401,8 @@
     const isPlanMise = currentPage === 'plan-mise';
     // Sprint 95 (v31.7.181) — Page "💎 Le marché se trompe ici" : top mismatches edge sur 7j
     const isValeur = currentPage === 'valeur';
+    // Sprint 104 (v31.7.189) — Page #simulator : What-if + Bankroll progression
+    const isSimulator = currentPage === 'simulator';
     // Sprint 52 (v31.7.141) — Performance page : hub unifié Bilan + Historique + Backtest + Crédibilité
     const isPerformance = currentPage === 'performance';
 
@@ -16380,6 +16733,18 @@
     valeurWrap.style.display = isValeur ? '' : 'none';
     if (isValeur) {
       try { renderValeurPage(valeurWrap); } catch(e) { console.warn('renderValeurPage failed', e); }
+    }
+
+    // Sprint 104 (v31.7.189) — Page #simulator (What-if + Bankroll progression)
+    let simulatorWrap = document.getElementById('simulator-wrap');
+    if (!simulatorWrap) {
+      simulatorWrap = document.createElement('div');
+      simulatorWrap.id = 'simulator-wrap';
+      (document.querySelector('main') || document.body).appendChild(simulatorWrap);
+    }
+    simulatorWrap.style.display = isSimulator ? '' : 'none';
+    if (isSimulator) {
+      try { renderSimulatorPage(simulatorWrap); } catch(e) { console.warn('renderSimulatorPage failed', e); }
     }
 
     calendrierWrap.style.display = isCalendrier ? '' : 'none';
@@ -18686,6 +19051,216 @@
     });
   }
   try { window.renderValeurPage = renderValeurPage; } catch(e){}
+
+  // ======= Sprint 104 (v31.7.189) — renderSimulatorPage =======
+  // Page "🧪 What-if simulator" : projette la bankroll sur N jours selon
+  // une stratégie hypothétique. Permet à l'user de voir :
+  //   - "Si je joue tous les locks à 1u flat pendant 30j, ROI projeté = +X€ ± Y€"
+  //   - "Si je passe en Kelly 0.25, ROI projeté = +Z€ ± W€"
+  //   - "Avec mon ROI actuel, dans 6 mois bankroll = X€"
+  // Utilise les stats du backtest (ROI moyen, stdev) pour les projections.
+  // Monte-Carlo 1000 simulations pour quantiles.
+  function renderSimulatorPage(wrap) {
+    const bt = window.__backtestReportV2;
+    if (!bt || !bt.overall) {
+      wrap.innerHTML = '<div class="page-wrap"><div class="bilan-empty">Backtest pas encore disponible.</div></div>';
+      return;
+    }
+    let bankroll = 50;
+    try {
+      const v = parseFloat(localStorage.getItem('userBankroll'));
+      if (isFinite(v) && v > 0) bankroll = v;
+    } catch(e) {}
+    // Lit les params du backtest
+    const overall = bt.overall;
+    const wr = overall.win_rate || 0.55;
+    const avgCote = overall.avg_cote || 1.95;
+    const flatRoi = (overall.flat_roi_pct || 0) / 100;  // ratio
+    const flatPnL = overall.flat_pnl || 0;
+    const n = overall.n || 0;
+    // ROI Kelly approximation : kelly_pnl / (n × stake_unit_kelly_avg)
+    // On n'a pas le stake_unit Kelly moyen, donc on estime via flatPnL ratio
+    // ou on l'affiche directement en € (pas en ratio)
+    const kellyPnL = overall.kelly_pnl || flatPnL;
+    // Stdev par pari : approximation. Pour Bernoulli avec moyenne flatRoi et
+    // variance ~p(1-p)*odd^2, stdev ≈ sqrt(wr*(1-wr)) * avgCote
+    const stdevPerBet = Math.sqrt(Math.max(0.01, wr * (1 - wr))) * avgCote;
+    // Lit user inputs (state)
+    const sState = (() => {
+      try {
+        const raw = localStorage.getItem('simulatorState');
+        if (!raw) return { betsPerDay: 5, days: 30, strategy: 'kelly' };
+        const obj = JSON.parse(raw);
+        return {
+          betsPerDay: parseInt(obj.betsPerDay) || 5,
+          days: parseInt(obj.days) || 30,
+          strategy: ['flat', 'kelly', 'kelly50', 'flat2u'].includes(obj.strategy) ? obj.strategy : 'kelly',
+        };
+      } catch(e) { return { betsPerDay: 5, days: 30, strategy: 'kelly' }; }
+    })();
+    // Mise unitaire selon strategy
+    const stakeUnit = (() => {
+      switch (sState.strategy) {
+        case 'flat': return 1;  // 1u flat
+        case 'flat2u': return 2;
+        case 'kelly': return Math.max(0.5, bankroll * 0.025);  // ~Kelly 0.25, edge moyen ~3%
+        case 'kelly50': return Math.max(0.5, bankroll * 0.05);  // Kelly 0.50, plus agressif
+        default: return 1;
+      }
+    })();
+    const totalBets = sState.betsPerDay * sState.days;
+    // Monte-Carlo 1000 simulations
+    const sims = [];
+    for (let s = 0; s < 1000; s++) {
+      let pnl = 0;
+      for (let i = 0; i < totalBets; i++) {
+        const won = Math.random() < wr;
+        pnl += won ? stakeUnit * (avgCote - 1) : -stakeUnit;
+      }
+      sims.push(pnl);
+    }
+    sims.sort((a, b) => a - b);
+    const median = sims[500];
+    const p10 = sims[100];
+    const p90 = sims[900];
+    const meanPnL = sims.reduce((a, x) => a + x, 0) / sims.length;
+    const finalBankroll = bankroll + meanPnL;
+    const finalBankrollP10 = bankroll + p10;
+    const finalBankrollP90 = bankroll + p90;
+    const winProb = sims.filter(x => x > 0).length / sims.length;
+    // Bankroll progression : daily steps
+    const dailyMean = meanPnL / sState.days;
+    // Sample paths for chart (10 paths, 1 line per day)
+    const samplePaths = sims.slice(0, 10).map((finalPnl, idx) => {
+      // Monte-Carlo le path entier pour cette sim
+      const path = [bankroll];
+      for (let day = 0; day < sState.days; day++) {
+        let dayPnL = 0;
+        for (let bi = 0; bi < sState.betsPerDay; bi++) {
+          const won = Math.random() < wr;
+          dayPnL += won ? stakeUnit * (avgCote - 1) : -stakeUnit;
+        }
+        path.push(path[path.length-1] + dayPnL);
+      }
+      return path;
+    });
+    wrap.innerHTML = `
+      <div class="page-wrap">
+        <div class="page-header">
+          <div class="lbl-tiny" style="color:var(--brand);">Discipline · Projection bankroll</div>
+          <h1 class="page-h1">🧪 What-if simulator</h1>
+          <div style="font-size:14px;color:var(--text-dim);">Projette ta bankroll selon ta stratégie. Bankroll actuelle : <b style="color:var(--text);">${bankroll.toFixed(0)}€</b></div>
+        </div>
+
+        <!-- Inputs -->
+        <div style="margin-top:14px;padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
+          <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px;">Paramètres</div>
+          <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;">
+            <div style="display:inline-flex;align-items:center;gap:6px;">
+              <span style="color:var(--text-muted);font-size:12px;">Paris/jour</span>
+              <input type="number" id="sim-bets-per-day" value="${sState.betsPerDay}" min="1" max="20" step="1" style="width:60px;padding:5px 8px;background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-size:13px;"/>
+            </div>
+            <div style="display:inline-flex;align-items:center;gap:6px;">
+              <span style="color:var(--text-muted);font-size:12px;">Jours</span>
+              <input type="number" id="sim-days" value="${sState.days}" min="1" max="365" step="1" style="width:60px;padding:5px 8px;background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-size:13px;"/>
+            </div>
+            <div style="display:inline-flex;align-items:center;gap:6px;">
+              <span style="color:var(--text-muted);font-size:12px;">Stratégie</span>
+              <select id="sim-strategy" style="padding:5px 8px;background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-size:13px;">
+                <option value="flat" ${sState.strategy === 'flat' ? 'selected' : ''}>1u flat (${(1).toFixed(2)}€)</option>
+                <option value="flat2u" ${sState.strategy === 'flat2u' ? 'selected' : ''}>2u flat (${(2).toFixed(2)}€)</option>
+                <option value="kelly" ${sState.strategy === 'kelly' ? 'selected' : ''}>Kelly 0.25 (~${stakeUnit.toFixed(2)}€/pari)</option>
+                <option value="kelly50" ${sState.strategy === 'kelly50' ? 'selected' : ''}>Kelly 0.50 agressif (~${(bankroll * 0.05).toFixed(2)}€/pari)</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-top:8px;font-size:11px;color:var(--text-dim2);">Basé sur les stats backtest : WR ${(wr*100).toFixed(1)}%, cote moy ${avgCote.toFixed(2)}, n=${n}.</div>
+        </div>
+
+        <!-- KPIs projection -->
+        <div style="margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;">
+          <div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
+            <div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">PnL médian</div>
+            <div style="font-size:22px;font-weight:800;color:${meanPnL >= 0 ? 'var(--accent)' : 'var(--danger)'};margin-top:2px;font-variant-numeric:tabular-nums;">${meanPnL >= 0 ? '+' : ''}${meanPnL.toFixed(2)}€</div>
+            <div style="font-size:10.5px;color:var(--text-dim);margin-top:2px;">sur ${totalBets} paris</div>
+          </div>
+          <div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
+            <div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">Bankroll finale</div>
+            <div style="font-size:22px;font-weight:800;color:var(--text);margin-top:2px;font-variant-numeric:tabular-nums;">${finalBankroll.toFixed(0)}€</div>
+            <div style="font-size:10.5px;color:var(--text-dim);margin-top:2px;">${finalBankroll >= bankroll ? '+' : ''}${(finalBankroll - bankroll).toFixed(0)}€ vs début</div>
+          </div>
+          <div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
+            <div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">Pessimiste P10</div>
+            <div style="font-size:22px;font-weight:800;color:${p10 >= 0 ? 'var(--warn)' : 'var(--danger)'};margin-top:2px;font-variant-numeric:tabular-nums;">${p10 >= 0 ? '+' : ''}${p10.toFixed(0)}€</div>
+            <div style="font-size:10.5px;color:var(--text-dim);margin-top:2px;">→ bankroll ${finalBankrollP10.toFixed(0)}€</div>
+          </div>
+          <div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
+            <div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">Optimiste P90</div>
+            <div style="font-size:22px;font-weight:800;color:var(--accent);margin-top:2px;font-variant-numeric:tabular-nums;">+${p90.toFixed(0)}€</div>
+            <div style="font-size:10.5px;color:var(--text-dim);margin-top:2px;">→ bankroll ${finalBankrollP90.toFixed(0)}€</div>
+          </div>
+          <div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
+            <div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">Proba gain</div>
+            <div style="font-size:22px;font-weight:800;color:${winProb >= 0.6 ? 'var(--accent)' : winProb >= 0.5 ? 'var(--warn)' : 'var(--danger)'};margin-top:2px;font-variant-numeric:tabular-nums;">${(winProb*100).toFixed(0)}%</div>
+            <div style="font-size:10.5px;color:var(--text-dim);margin-top:2px;">être en + après ${sState.days}j</div>
+          </div>
+        </div>
+
+        <!-- Sample paths chart (SVG) -->
+        ${(() => {
+          const w = 600, h = 200, padding = 30;
+          const minVal = Math.min(...samplePaths.flat());
+          const maxVal = Math.max(...samplePaths.flat());
+          const range = Math.max(1, maxVal - minVal);
+          const xStep = (w - 2*padding) / sState.days;
+          const yScale = (v) => h - padding - ((v - minVal) / range) * (h - 2*padding);
+          const colors = ['#a78bfa','#22c55e','#fbbf24','#ef4444','#22d3ee','#f472b6','#84cc16','#06b6d4','#ec4899','#a855f7'];
+          const paths = samplePaths.map((path, idx) => {
+            const d = path.map((v, i) => `${i===0?'M':'L'} ${padding + i*xStep} ${yScale(v)}`).join(' ');
+            return `<path d="${d}" stroke="${colors[idx % colors.length]}" stroke-width="1.5" fill="none" opacity="0.7"/>`;
+          }).join('');
+          // Bankroll initial line
+          const bankrollY = yScale(bankroll);
+          return `
+            <div style="margin-top:14px;padding:12px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
+              <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px;">📈 Trajectoires possibles (10 simulations Monte-Carlo)</div>
+              <svg viewBox="0 0 ${w} ${h}" style="width:100%;height:auto;">
+                <line x1="${padding}" y1="${bankrollY}" x2="${w-padding}" y2="${bankrollY}" stroke="var(--text-dim2)" stroke-dasharray="4,3" opacity="0.5"/>
+                <text x="${w-padding-5}" y="${bankrollY-4}" text-anchor="end" fill="var(--text-dim2)" font-size="10">bankroll initial ${bankroll.toFixed(0)}€</text>
+                ${paths}
+                <text x="${padding}" y="${h-8}" fill="var(--text-dim)" font-size="10">J0</text>
+                <text x="${w-padding-15}" y="${h-8}" fill="var(--text-dim)" font-size="10">J${sState.days}</text>
+              </svg>
+              <div style="margin-top:6px;font-size:10.5px;color:var(--text-dim2);">Chaque ligne représente une simulation. La variance est réelle — même avec ROI positif, certains chemins finissent négatifs.</div>
+            </div>`;
+        })()}
+
+        <!-- Méthode -->
+        <div style="margin-top:14px;padding:14px 16px;background:var(--panel);border:1px dashed var(--border-2);border-radius:var(--r-sm);font-size:12px;color:var(--text-dim);line-height:1.5;">
+          <b style="color:var(--text);">💡 Comment lire</b> : Monte-Carlo 1000 simulations en utilisant les stats actuelles du backtest (WR ${(wr*100).toFixed(1)}%, cote moy ${avgCote.toFixed(2)}). P10/P90 = quantiles 10% et 90% — 80% des cas sont entre ces 2 valeurs. Le médian est plus robuste que la moyenne.
+          <br><br>
+          <b style="color:var(--text);">Limite</b> : suppose les paris sont indépendants et tirent de la même distribution que l'historique. La réalité varie : streaks, biais ligues, ajustement marché. Prends ces projections comme un ordre de grandeur, pas une prédiction exacte.
+        </div>
+      </div>`;
+    // Wire interactions
+    const persist = () => {
+      try { localStorage.setItem('simulatorState', JSON.stringify(sState)); } catch(e){}
+      renderSimulatorPage(wrap);
+    };
+    wrap.querySelector('#sim-bets-per-day')?.addEventListener('change', (e) => {
+      const v = parseInt(e.target.value, 10);
+      if (isFinite(v) && v > 0 && v <= 20) { sState.betsPerDay = v; persist(); }
+    });
+    wrap.querySelector('#sim-days')?.addEventListener('change', (e) => {
+      const v = parseInt(e.target.value, 10);
+      if (isFinite(v) && v > 0 && v <= 365) { sState.days = v; persist(); }
+    });
+    wrap.querySelector('#sim-strategy')?.addEventListener('change', (e) => {
+      sState.strategy = e.target.value;
+      persist();
+    });
+  }
+  try { window.renderSimulatorPage = renderSimulatorPage; } catch(e){}
 
   // ======= Sprint 52 (v31.7.141) — renderPerformancePage =======
   // Vue globale "Performance" qui agrège les KPIs clés (ROI cumul, Win Rate,
