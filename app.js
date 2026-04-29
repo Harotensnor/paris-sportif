@@ -12499,6 +12499,30 @@
       } catch (e) { return ''; }
     })();
 
+    // Sprint 118 (v31.7.191) — Mini-bilan user perso : si l'utilisateur a
+    // ≥3 paris settled (won/lost), affiche un bandeau ROI personnel sur le
+    // dashboard. Settle automatique aussi pour tenir à jour les pnl.
+    const _userBetsBilan = (() => {
+      try {
+        if (typeof window._settleUserBets === 'function') window._settleUserBets();
+        const stats = (typeof window._userBetsStats === 'function') ? window._userBetsStats() : null;
+        if (!stats || !stats.n || stats.n < 3) return '';
+        const roiColor = stats.roi >= 0.05 ? 'var(--accent)' : stats.roi >= -0.02 ? 'var(--warn)' : 'var(--danger)';
+        const pnlSign = stats.totalPnL >= 0 ? '+' : '';
+        const adherence = (typeof window._computeAdherence === 'function') ? window._computeAdherence() : null;
+        const adherencePct = adherence && adherence.adherence != null ? Math.round(adherence.adherence * 100) : null;
+        return `
+          <section class="user-bilan-mini" role="region" aria-label="Mon bilan personnel" style="margin:0 0 16px;padding:12px 16px;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${roiColor};border-radius:var(--r-sm);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-variant-numeric:tabular-nums;">
+            <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+              <span style="font-size:11px;font-weight:700;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.6px;">📊 Ton bilan perso</span>
+              <span style="font-size:13px;color:var(--text);"><strong style="color:${roiColor};">${pnlSign}${stats.totalPnL.toFixed(2)}€</strong> sur ${stats.n} paris · ${(stats.winRate*100).toFixed(0)}% WR · <span style="color:${roiColor};">${pnlSign}${(stats.roi*100).toFixed(1)}% <span class="gloss-term" data-gloss="roi">ROI</span></span></span>
+              ${adherencePct != null ? `<span style="font-size:11.5px;color:var(--text-dim);">Adhérence modèle <strong style="color:var(--text);">${adherencePct}%</strong></span>` : ''}
+            </div>
+            <button type="button" class="page-btn" data-page="bilan" style="padding:6px 10px;background:transparent;color:var(--brand);border:1px solid var(--brand-soft);border-radius:var(--r-xs);cursor:pointer;font-size:11.5px;font-weight:600;">Voir détail →</button>
+          </section>`;
+      } catch(e) { return ''; }
+    })();
+
     // Sprint 106 (v31.7.190) — "Ce que tu dois faire MAINTENANT" :
     // hero d'action prioritaire qui résume en un coup d'œil la décision principale.
     // Précède le smart-suggestion + le heroPick existant. Affiche : top pick avec
@@ -12583,6 +12607,21 @@
               <div style="font-size:10.5px;color:var(--accent);font-weight:600;">→ +${topGain.toFixed(0)}€</div>
             </div>
           </div>
+          ${(() => {
+            // Sprint 118 (v31.7.191) — Bouton "J'ai parié" → enregistre dans userBets localStorage.
+            // Permet de tracker son ROI réel vs le modèle. Si déjà parié sur ce match, badge ✓.
+            try {
+              const matchId = String(top.m && top.m.id || '');
+              const bets = (typeof _loadUserBets === 'function') ? _loadUserBets() : [];
+              const already = bets.some(b => String(b.matchId) === matchId && !b.settled);
+              if (already) {
+                return `<div style="margin-top:10px;padding:6px 10px;background:rgba(52,211,153,.10);border:1px solid var(--accent);border-radius:var(--r-xs);font-size:11.5px;color:var(--accent);font-weight:600;text-align:center;">✓ Pari enregistré dans ton bilan perso</div>`;
+              }
+              const pickKey = (top.best && top.best.key) || (top.pred && top.pred.pick && top.pred.pick.key) || '';
+              const market = (top.best && top.best.market) || '1n2';
+              return `<button type="button" class="action-focus-trackbet" data-match-id="${esc(matchId)}" data-market="${esc(market)}" data-pick-key="${esc(pickKey)}" data-pick-label="${esc(topPickLabel)}" data-odd="${top.odd || 0}" data-stake="${topStake}" style="margin-top:10px;width:100%;padding:8px 12px;background:transparent;color:var(--brand);border:1px dashed var(--brand);border-radius:var(--r-xs);cursor:pointer;font-size:11.5px;font-weight:600;transition:background .15s, color .15s;">✏️ J'ai parié sur ce match</button>`;
+            } catch(e) { return ''; }
+          })()}
         </div>` : ''}
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
           ${!isEmpty ? `<button type="button" class="page-btn" data-page="plan-mise" style="flex:1;min-width:140px;padding:10px 14px;background:var(--brand);color:#08080a;border:none;border-radius:var(--r-sm);cursor:pointer;font-size:13px;font-weight:700;">📋 Plan de mise complet →</button>` : ''}
@@ -12596,6 +12635,8 @@
       <div style="max-width:1100px;margin:0 auto;padding:0 20px;font-variant-numeric:tabular-nums;">
 
         ${_actionFocus}
+
+        ${_userBetsBilan}
 
         ${_hourSuggestion}
 
@@ -13852,6 +13893,36 @@
         if ((e.key === 'Enter' || e.key === ' ') && e.target === card && card.getAttribute('role') === 'button') {
           e.preventDefault();
           _openCardMatch(card);
+        }
+      });
+    });
+    // Sprint 118 (v31.7.191) — Click handler "J'ai parié" → ajoute le pari
+    // dans userBets localStorage. Toast confirmation, refresh dashboard pour
+    // afficher le badge "✓ Pari enregistré".
+    wrap.querySelectorAll('.action-focus-trackbet').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        try {
+          const matchId = btn.dataset.matchId;
+          const market = btn.dataset.market;
+          const pickKey = btn.dataset.pickKey;
+          const pickLabel = btn.dataset.pickLabel;
+          const odd = parseFloat(btn.dataset.odd);
+          const stake = parseFloat(btn.dataset.stake);
+          if (!matchId || !pickKey || !(odd > 1) || !(stake >= 0)) {
+            if (typeof toast === 'function') toast('Données pari incomplètes', 'warn');
+            return;
+          }
+          if (typeof window._addUserBet === 'function') {
+            window._addUserBet(matchId, market, pickKey, pickLabel, odd, stake);
+            if (typeof toast === 'function') toast(`✓ Pari ${stake.toFixed(0)}€ @${odd.toFixed(2)} enregistré dans ton bilan`, 'success');
+            // Re-render dashboard pour afficher le badge ✓
+            setTimeout(() => renderDashboardPage(wrap), 100);
+          }
+        } catch(err) {
+          console.warn('Sprint 118 trackbet failed', err);
+          if (typeof toast === 'function') toast('Erreur enregistrement pari', 'error');
         }
       });
     });
