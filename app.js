@@ -6164,6 +6164,33 @@
       } else {
         dashboardCountEl.style.display = 'none';
       }
+      // Sprint 127 (v31.7.191) — Sync mobile bottom-nav badge avec count-dashboard-actions
+      const mbnBadgeDash = document.getElementById('mbn-badge-dashboard');
+      if (mbnBadgeDash) {
+        if (nActions > 0) {
+          mbnBadgeDash.textContent = newDashText;
+          mbnBadgeDash.removeAttribute('hidden');
+        } else {
+          mbnBadgeDash.setAttribute('hidden', '');
+        }
+      }
+    }
+    // Sprint 127 — Sync mobile bottom-nav badge locks (lit la valeur du desktop count)
+    const mbnBadgeLocks = document.getElementById('mbn-badge-locks');
+    if (mbnBadgeLocks) {
+      const locksEl = document.getElementById('count-locks');
+      if (locksEl && locksEl.textContent && locksEl.textContent !== '0') {
+        // Extraire la partie numérique (peut être "5" ou "5 🆕" ou "5 · 2🆕")
+        const match = locksEl.textContent.match(/(\d+)/);
+        if (match) {
+          mbnBadgeLocks.textContent = match[1];
+          mbnBadgeLocks.removeAttribute('hidden');
+        } else {
+          mbnBadgeLocks.setAttribute('hidden', '');
+        }
+      } else {
+        mbnBadgeLocks.setAttribute('hidden', '');
+      }
     }
 
     // === Filter current sport ===
@@ -17368,9 +17395,35 @@
       planMiseWrap.id = 'plan-mise-wrap';
       (document.querySelector('main') || document.body).appendChild(planMiseWrap);
     }
+    // Sprint 126 (v31.7.191) — Error boundary helper : si le render d'une page
+    // throw, affiche un fallback friendly avec retry + report au lieu d'écran
+    // vide muet. Préserve la UX en cas de bug ponctuel (data corrompue, edge case).
+    const _renderWithFallback = (wrap, fn, pageName) => {
+      try { fn(wrap); } catch(e) {
+        console.warn(`render ${pageName} failed`, e);
+        const errMsg = (e && e.message) || String(e);
+        wrap.innerHTML = `
+          <div class="page-wrap">
+            ${typeof window._emptyState === 'function' ? window._emptyState({
+              icon: '⚠️',
+              title: `Erreur de chargement (${pageName})`,
+              body: `Le rendu de cette page a échoué : <code style="background:var(--panel-2);padding:2px 6px;border-radius:3px;font-size:11.5px;">${esc(errMsg.slice(0, 120))}</code>. Essaie d'actualiser, ou repasse plus tard. Si le problème persiste, ouvre une issue GitHub.`,
+              actions: [
+                { label: '🔄 Réessayer', click: 'retry-render', primary: true },
+                { label: '🏠 Retour Accueil', page: 'dashboard' },
+              ],
+            }) : `<div style="padding:40px;text-align:center;color:var(--text-dim);">⚠️ Erreur de chargement (${pageName}) : ${esc(errMsg)}</div>`}
+          </div>`;
+        // Wire retry button
+        wrap.querySelectorAll('[data-es-action="retry-render"]').forEach(btn => {
+          btn.addEventListener('click', () => _renderWithFallback(wrap, fn, pageName));
+        });
+      }
+    };
+
     planMiseWrap.style.display = isPlanMise ? '' : 'none';
     if (isPlanMise) {
-      try { renderPlanMisePage(planMiseWrap); } catch(e) { console.warn('renderPlanMisePage failed', e); }
+      _renderWithFallback(planMiseWrap, renderPlanMisePage, 'Plan de mise');
     }
 
     // Sprint 95 (v31.7.181) — Page "💎 Le marché se trompe ici" : top edges 7j
@@ -17382,7 +17435,7 @@
     }
     valeurWrap.style.display = isValeur ? '' : 'none';
     if (isValeur) {
-      try { renderValeurPage(valeurWrap); } catch(e) { console.warn('renderValeurPage failed', e); }
+      _renderWithFallback(valeurWrap, renderValeurPage, 'Valeur');
     }
 
     // Sprint 104 (v31.7.189) — Page #simulator (What-if + Bankroll progression)
@@ -17394,7 +17447,7 @@
     }
     simulatorWrap.style.display = isSimulator ? '' : 'none';
     if (isSimulator) {
-      try { renderSimulatorPage(simulatorWrap); } catch(e) { console.warn('renderSimulatorPage failed', e); }
+      _renderWithFallback(simulatorWrap, renderSimulatorPage, 'Simulator');
     }
 
     calendrierWrap.style.display = isCalendrier ? '' : 'none';
