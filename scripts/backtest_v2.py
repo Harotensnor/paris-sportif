@@ -862,6 +862,16 @@ def main() -> int:
         # permettre un select dropdown cote front (granularite ajustable).
         'calibration_5': calibration_bins(rows, n_bins=5),
         'calibration_20': calibration_bins(rows, n_bins=20),
+        # Sprint 109 (v31.7.190) — Calibration per-sport. Cle = sport, valeur =
+        # bins (10) pour ce sport. Permet a app.js _calibrateProb de calibrer
+        # foot != tennis != basket separement (chaque sport a ses biais).
+        # Seuls les sports avec >=30 picks completes sont inclus (sinon trop
+        # bruite, fallback global suffit).
+        'by_sport_calibration': {
+            sport: calibration_bins([r for r in rows if r.get('sport') == sport], n_bins=10)
+            for sport in {r.get('sport') for r in rows if r.get('sport')}
+            if sum(1 for r in rows if r.get('sport') == sport) >= 30
+        },
         # v31.7.14 — Recalibration isotonic (PAV) precomputee. Le client lit
         # ces pairs directement, plus besoin de recompute le PAV en JS.
         'isotonic_pairs': isotonic_calibration_pairs(rows),
