@@ -5323,6 +5323,127 @@
     }
   }
 
+  /* Sprint 116 (v31.7.190) — Micro-interactions polish.
+     Améliorations subtiles d'interactivité ressentie :
+     - Stagger fade-in pour les listes (cards apparaissent une par une)
+     - Pulse sur les badges count quand ils changent
+     - Glow doux sur les tiles "important" (lock, top edge)
+     - Press feedback sur tous les boutons (scale 0.97) */
+
+  /* Stagger fade-in : déclenché par .stagger-list parent. Chaque enfant a un
+     delay incrémental basé sur --i (var CSS custom). Set par JS à la création. */
+  @keyframes stagger-fade-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .stagger-list > * {
+    animation: stagger-fade-in .35s cubic-bezier(.2, .8, .2, 1) backwards;
+    animation-delay: calc(var(--i, 0) * 50ms);
+  }
+  .stagger-list > *:nth-child(1) { --i: 0; }
+  .stagger-list > *:nth-child(2) { --i: 1; }
+  .stagger-list > *:nth-child(3) { --i: 2; }
+  .stagger-list > *:nth-child(4) { --i: 3; }
+  .stagger-list > *:nth-child(5) { --i: 4; }
+  .stagger-list > *:nth-child(6) { --i: 5; }
+  .stagger-list > *:nth-child(n+7) { --i: 6; }
+
+  /* Pulse animation pour les compteurs qui changent (count badges nav).
+     Déclenché par JS via .count-pulse class temporaire (300ms). */
+  @keyframes count-pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.18); background: var(--accent); color: #08080a; }
+    100% { transform: scale(1); }
+  }
+  .count.count-pulse,
+  span.count.count-pulse {
+    animation: count-pulse .35s ease-out;
+  }
+
+  /* Glow subtle sur tiles "important" — hero edges, locks haute conf */
+  @keyframes tile-glow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(167, 139, 250, 0); }
+    50% { box-shadow: 0 0 0 4px rgba(167, 139, 250, .15); }
+  }
+  .tile-glow {
+    animation: tile-glow 2.4s ease-in-out infinite;
+  }
+
+  /* Press feedback : scale léger au :active sur tous les boutons interactifs */
+  .page-btn:active,
+  .ed-hero__cta-btn:active,
+  .onb-next:active,
+  .onb-prev:not([disabled]):active,
+  .kpi-tile:active,
+  button.page-btn:active {
+    transform: scale(0.97);
+    transition: transform .08s cubic-bezier(.2, .8, .2, 1);
+  }
+
+  /* Smooth highlight quand un élément vient d'être ajouté à la sélection
+     (favoris, watchlist). Brief amber pulse pour confirmer l'ajout. */
+  @keyframes added-highlight {
+    0% { background: rgba(251, 191, 36, .25); }
+    100% { background: transparent; }
+  }
+  .just-added {
+    animation: added-highlight 1.2s ease-out;
+  }
+
+  /* Reduce motion respect global */
+  @media (prefers-reduced-motion: reduce) {
+    .stagger-list > * { animation: none; }
+    .count.count-pulse { animation: none; }
+    .tile-glow { animation: none; }
+    .just-added { animation: none; }
+  }
+
+  /* Sprint 115 (v31.7.190) — Mobile cards refacto compact.
+     Audit : sur viewports <390px (iPhone SE / petit Android), les cards
+     dash-pick-card ont des paddings 16px qui mangent ~40px d'espace utile.
+     On compacte tout : padding, font-size, gap, border-radius. Effets sur
+     SE 320px : +25% de contenu visible sans scroll. */
+  @media (max-width: 390px) {
+    .dash-pick-card {
+      padding: 12px 13px !important;
+      border-radius: 0 8px 8px 0 !important;
+    }
+    .dash-pick-card .dpc-toggle {
+      padding: 7px 9px !important;
+      font-size: 11px !important;
+    }
+    /* Action-focus : padding réduit, header en colonne (avant : flex-wrap qui
+       peut overflow), footer CTAs en grid 1 colonne pour boutons full-width. */
+    .action-focus {
+      padding: 14px 14px !important;
+      border-radius: var(--r-sm) !important;
+    }
+    .action-focus > div:first-child {
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      gap: 6px !important;
+    }
+    .action-focus > div:last-child {
+      grid-template-columns: 1fr !important;
+      display: grid !important;
+    }
+    .action-focus > div:last-child > button {
+      flex: none !important;
+      min-width: 0 !important;
+      width: 100% !important;
+    }
+    /* KPI tiles compact : font-size value 18px (vs 22px) pour caser dans
+       2 colonnes sur viewport 360px */
+    .kpi-tile { padding: 10px 12px !important; }
+    .kpi-tile-value { font-size: 18px !important; }
+    .kpi-tile-label { font-size: 9.5px !important; }
+    .kpi-tile-sub { font-size: 9.5px !important; }
+    /* Page-h1 plus petit pour ne pas wrap sur 2 lignes en mobile étroit */
+    .page-h1 { font-size: 22px !important; line-height: 1.15 !important; }
+    /* Padding main réduit pour gagner 8px de chaque côté */
+    .content main { padding: 14px 10px 70px !important; }
+  }
+
   /* Reduced motion : désactive l'animation page-fade-in */
   @media (prefers-reduced-motion: reduce) {
     main.page-fade-in {
