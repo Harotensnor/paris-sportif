@@ -526,6 +526,82 @@
     });
   }, { passive: true, capture: true });
 
+  // Sprint 129 (v31.7.191) — Inline tutorial "Comment lire un prono".
+  // Accessible via window._showHowToReadTutorial(). Affiche une modal légère
+  // expliquant les éléments d'une carte pick (cote, conf, edge, mise) avec
+  // exemple chiffré. Click outside ou Esc pour fermer. Persistant : 1×/30j
+  // sauf si user clique "Ne plus afficher".
+  function _showHowToReadTutorial() {
+    if (document.querySelector('.how-to-read-overlay')) return;
+    const overlay = document.createElement('div');
+    overlay.className = 'how-to-read-overlay';
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;';
+    overlay.innerHTML = `
+      <div class="how-to-read-card" style="max-width:540px;width:100%;background:var(--panel);border:1px solid var(--border-2);border-radius:var(--r-lg);padding:24px 26px;color:var(--text);max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+          <div>
+            <h2 style="margin:0 0 4px;font-size:18px;font-weight:800;letter-spacing:-.3px;">📖 Comment lire un prono ?</h2>
+            <div style="font-size:12px;color:var(--text-dim);">3 minutes pour devenir autonome</div>
+          </div>
+          <button type="button" class="how-to-read-close" aria-label="Fermer" style="background:transparent;border:none;color:var(--text-dim2);font-size:22px;cursor:pointer;padding:0 8px;line-height:1;">×</button>
+        </div>
+
+        <!-- Example card -->
+        <div style="background:var(--panel-2);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--r-sm);padding:14px 16px;margin:14px 0;font-size:13px;line-height:1.7;">
+          <div style="font-weight:700;color:var(--text);font-size:14px;margin-bottom:8px;">PSG vs Marseille · Pick: <strong style="color:var(--accent);">PSG (1)</strong></div>
+          <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-variant-numeric:tabular-nums;font-size:12.5px;color:var(--text-dim);">
+            <span data-tooltip="Multiplicateur de mise. @1.85 = pour 1€ misé tu gagnes 0.85€ net.">Cote: <strong style="color:var(--text);">@1.85</strong></span>
+            <span data-tooltip="Probabilité estimée par le modèle.">Confiance: <strong style="color:var(--text);">62%</strong></span>
+            <span data-tooltip="Avantage value vs cote du marché. >0 = value.">Edge: <strong style="color:var(--accent);">+8pt</strong></span>
+            <span data-tooltip="Mise calculée par Kelly fractionné.">Mise: <strong style="color:var(--brand);">5€</strong></span>
+          </div>
+        </div>
+
+        <!-- Explanations -->
+        <div style="font-size:13px;line-height:1.7;color:var(--text-2);margin-bottom:14px;">
+          <div style="margin-bottom:10px;">
+            <strong style="color:var(--accent);">⚡ Cote 1.85</strong> = pour <span class="gloss-term" data-gloss="cote">cote décimale</span> 1.85, 1€ misé donne 1.85€ retour (gain net 0.85€).
+          </div>
+          <div style="margin-bottom:10px;">
+            <strong style="color:var(--accent);">🎯 Confiance 62%</strong> = le modèle estime à 62% la victoire de PSG (basé sur Poisson, Elo, forme, blessures).
+          </div>
+          <div style="margin-bottom:10px;">
+            <strong style="color:var(--accent);">💎 Edge +8pt</strong> = écart entre le modèle (62%) et la <span class="gloss-term" data-gloss="edge">probabilité implicite</span> de la cote (54%). C'est le <strong>signal de value</strong>.
+          </div>
+          <div style="margin-bottom:10px;">
+            <strong style="color:var(--accent);">💰 Mise 5€</strong> = <span class="gloss-term" data-gloss="kelly">Kelly fractionné</span> 0.25× × bankroll, plafonné à 10% par pari (gestion du risque).
+          </div>
+        </div>
+
+        <div style="padding:10px 14px;background:rgba(167,139,250,.08);border:1px solid var(--brand-soft);border-radius:var(--r-sm);font-size:12px;color:var(--text-2);line-height:1.5;margin-bottom:14px;">
+          💡 <strong>La règle d'or :</strong> tu vois <strong>Edge >0</strong> ? C'est value, joue. <strong>Edge ≤0</strong> ? Le modèle skip — pas de pari forcé. Ne jamais miser plus que la suggestion Kelly.
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+          <a href="academie.html" style="font-size:12px;color:var(--brand);text-decoration:none;border-bottom:1px solid var(--brand-soft);">📚 Académie complète →</a>
+          <button type="button" class="how-to-read-ok" style="padding:8px 18px;background:var(--brand);color:#08080a;border:none;border-radius:var(--r-sm);cursor:pointer;font-size:13px;font-weight:700;">Compris !</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+    const close = () => {
+      overlay.remove();
+      document.removeEventListener('keydown', onKey);
+    };
+    const onKey = (e) => { if (e.key === 'Escape') close(); };
+    document.addEventListener('keydown', onKey);
+    overlay.querySelector('.how-to-read-close').addEventListener('click', close);
+    overlay.querySelector('.how-to-read-ok').addEventListener('click', () => {
+      try { localStorage.setItem('howToReadDismissedTs', String(Date.now())); } catch(e){}
+      close();
+    });
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) close();
+    });
+  }
+  try { window._showHowToReadTutorial = _showHowToReadTutorial; } catch(e){}
+
   // Sprint 112 (v31.7.190) — Empty state factory unifiée.
   // Au lieu de 36 inline templates `.empty-state-v2`, un helper qui produit
   // le markup canonique. Inclut illustration emoji, titre, body, et actions
@@ -12704,6 +12780,30 @@
               <div style="font-size:10px;font-weight:700;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px;">⭐ TOP PRIORITÉ</div>
               <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${topMatchLabel}</div>
               <div style="font-size:12px;color:var(--text-dim);">${esc(topPickLabel)} · @${(top.odd || 0).toFixed(2)} · <span style="color:var(--accent);font-weight:700;">+${Math.round((top.edge || 0)*100)}pt edge</span></div>
+              ${(() => {
+                // Sprint 130 (v31.7.191) — Countdown timer live jusqu'au coup d'envoi.
+                // Affiche "dans 2h32" / "dans 38min" / "dans 5min ⏰" pour matchs imminents.
+                const ts = top.m && top.m.date ? new Date(top.m.date).getTime() : 0;
+                if (!ts) return '';
+                const diffMs = ts - Date.now();
+                if (diffMs <= 0) return '<div style="font-size:11px;color:var(--danger);font-weight:600;margin-top:2px;">🔴 Match en cours / commencé</div>';
+                const minutes = Math.floor(diffMs / 60000);
+                const isImminent = minutes < 60;
+                const isVeryImminent = minutes < 15;
+                let label;
+                if (minutes < 60) label = `dans ${minutes}min`;
+                else if (minutes < 1440) {
+                  const h = Math.floor(minutes / 60);
+                  const m = minutes % 60;
+                  label = `dans ${h}h${m > 0 ? String(m).padStart(2, '0') : ''}`;
+                } else {
+                  const days = Math.floor(minutes / 1440);
+                  label = `dans ${days}j`;
+                }
+                const color = isVeryImminent ? 'var(--warn)' : isImminent ? 'var(--brand)' : 'var(--text-dim2)';
+                const icon = isVeryImminent ? '⏰ ' : '';
+                return `<div class="action-focus-countdown" data-kickoff="${ts}" style="font-size:11px;color:${color};font-weight:600;margin-top:3px;${isVeryImminent ? 'animation:fresh-pulse 1.8s ease-in-out infinite;' : ''}">${icon}Coup d'envoi ${label}</div>`;
+              })()}
             </div>
             <div style="text-align:right;flex-shrink:0;">
               <div style="font-size:10px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.4px;">Mise</div>
@@ -12731,6 +12831,10 @@
           ${!isEmpty ? `<button type="button" class="page-btn" data-page="plan-mise" style="flex:1;min-width:140px;padding:10px 14px;background:var(--brand);color:#08080a;border:none;border-radius:var(--r-sm);cursor:pointer;font-size:13px;font-weight:700;">📋 Plan de mise complet →</button>` : ''}
           <button type="button" class="page-btn" data-page="${isEmpty ? 'calendrier' : 'top'}" style="flex:1;min-width:140px;padding:10px 14px;background:var(--panel);color:var(--text);border:1px solid var(--border-2);border-radius:var(--r-sm);cursor:pointer;font-size:13px;font-weight:600;">${isEmpty ? '📅 Calendrier 7j' : '⭐ Top du jour'}</button>
           <button type="button" class="page-btn" data-page="valeur" style="padding:10px 14px;background:transparent;color:var(--text-dim);border:1px solid var(--border);border-radius:var(--r-sm);cursor:pointer;font-size:13px;font-weight:600;">💎 Marché se trompe</button>
+        </div>
+        <!-- Sprint 129 (v31.7.191) — Lien discret 'Comment lire un prono' pour newcomers -->
+        <div style="margin-top:10px;text-align:center;">
+          <button type="button" class="action-focus-howto" style="background:transparent;border:none;color:var(--text-dim2);font-size:11px;text-decoration:underline;cursor:pointer;padding:4px;">📖 Comment lire un prono ?</button>
         </div>
       </section>`;
     })();
@@ -14000,6 +14104,68 @@
         }
       });
     });
+    // Sprint 129 (v31.7.191) — Click handler "Comment lire un prono" → modal tutorial
+    wrap.querySelectorAll('.action-focus-howto').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        if (typeof window._showHowToReadTutorial === 'function') {
+          window._showHowToReadTutorial();
+        }
+      });
+    });
+    // Sprint 130 (v31.7.191) — Live countdown updates pour la card top pick.
+    // Update toutes les 60s (pas plus, pour pas saturer le main thread).
+    // Cleanup automatique : si la card disparaît du DOM (re-render), l'interval
+    // continue à tourner mais le querySelectorAll reviendra vide → noop.
+    const _countdownEl = wrap.querySelector('.action-focus-countdown');
+    if (_countdownEl) {
+      const updateCountdown = () => {
+        const el = wrap.querySelector('.action-focus-countdown');
+        if (!el || !document.body.contains(el)) return;
+        const ts = parseInt(el.dataset.kickoff || '0', 10);
+        if (!ts) return;
+        const diffMs = ts - Date.now();
+        if (diffMs <= 0) {
+          el.innerHTML = '🔴 Match en cours / commencé';
+          el.style.color = 'var(--danger)';
+          return;
+        }
+        const minutes = Math.floor(diffMs / 60000);
+        let label;
+        if (minutes < 60) label = `dans ${minutes}min`;
+        else if (minutes < 1440) {
+          const h = Math.floor(minutes / 60);
+          const m = minutes % 60;
+          label = `dans ${h}h${m > 0 ? String(m).padStart(2, '0') : ''}`;
+        } else {
+          const days = Math.floor(minutes / 1440);
+          label = `dans ${days}j`;
+        }
+        const isVeryImminent = minutes < 15;
+        const isImminent = minutes < 60;
+        const color = isVeryImminent ? 'var(--warn)' : isImminent ? 'var(--brand)' : 'var(--text-dim2)';
+        const icon = isVeryImminent ? '⏰ ' : '';
+        el.style.color = color;
+        el.innerHTML = `${icon}Coup d'envoi ${label}`;
+        if (isVeryImminent && !el.style.animation) {
+          el.style.animation = 'fresh-pulse 1.8s ease-in-out infinite';
+        } else if (!isVeryImminent && el.style.animation) {
+          el.style.animation = '';
+        }
+      };
+      const intervalId = setInterval(updateCountdown, 60000);
+      // Cleanup au prochain re-render via MutationObserver léger
+      try {
+        const obs = new MutationObserver(() => {
+          if (!document.body.contains(_countdownEl)) {
+            clearInterval(intervalId);
+            obs.disconnect();
+          }
+        });
+        obs.observe(wrap, { childList: true, subtree: true });
+      } catch(e) { /* old browser */ }
+    }
     // Sprint 118 (v31.7.191) — Click handler "J'ai parié" → ajoute le pari
     // dans userBets localStorage. Toast confirmation, refresh dashboard pour
     // afficher le badge "✓ Pari enregistré".
