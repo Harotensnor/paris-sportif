@@ -526,6 +526,149 @@
     });
   }, { passive: true, capture: true });
 
+  // Sprint 108 (v31.7.190) — Glossaire inline pour termes techniques.
+  // Usage : <span class="gloss-term" data-gloss="kelly">Kelly</span>
+  // Au click → popover avec définition courte + lien académie pour le détail.
+  // Les termes sont aussi accessibles via tooltips data-tooltip si besoin.
+  const _GLOSSARY = {
+    edge: {
+      t: 'Edge (avantage)',
+      d: 'Différence entre la probabilité que le modèle calcule et celle que le marché propose. Positif = le marché sous-estime → c\'est value.',
+      ex: 'Modèle dit 62%, cote @1.85 (= 54% implicite) → edge +8pt',
+    },
+    kelly: {
+      t: 'Kelly fractionnaire',
+      d: 'Formule mathématique qui calcule la mise optimale pour maximiser la croissance long terme. On utilise 0.25× Kelly cap 10% bankroll par défaut.',
+      ex: 'Kelly entier = volatil. 0.25× = stable, 80% du gain à 30% de la variance.',
+    },
+    ev: {
+      t: 'EV (Expected Value)',
+      d: 'Gain attendu math. par mise unitaire. EV = p × (cote-1) - (1-p). >0 = pari rentable en moyenne sur le long terme.',
+      ex: 'p=62%, cote=1.85 → EV = 0.62×0.85 - 0.38 = +0.15 (15%)',
+    },
+    roi: {
+      t: 'ROI flat',
+      d: 'Profit total / mises totales × 100. À mise constante. Mesure la rentabilité brute du modèle.',
+      ex: '+5% ROI sur 100 paris à 1€ = +5€ de gain',
+    },
+    brier: {
+      t: 'Brier score',
+      d: 'Mesure de calibration : "quand le modèle dit 60%, il a raison ~60% du temps ?". Plus bas = mieux. <0.20 = bon, <0.15 = excellent.',
+      ex: 'Brier 0.18 = modèle calibré, ses % sont fiables',
+    },
+    calibration: {
+      t: 'Calibration',
+      d: 'Le modèle est calibré quand ses probabilités sont fidèles. Quand il dit 60%, il gagne ~60 fois sur 100 (sur grand échantillon).',
+      ex: 'Modèle dit 70% → 68/100 paris gagnés = bien calibré',
+    },
+    cote: {
+      t: 'Cote décimale',
+      d: 'Multiplicateur de mise. Cote 1.85 = pour 1€ misé tu gagnes 1.85€ (gain net 0.85€) si tu remportes le pari.',
+      ex: '@2.50 sur 5€ → 12.50€ retour (7.50€ profit)',
+    },
+    bankroll: {
+      t: 'Bankroll (cagnotte)',
+      d: 'Argent total que tu acceptes de risquer sur les paris. À distinguer de tes économies. Toutes les mises sont % de la bankroll.',
+      ex: 'Bankroll 100€ → mise max 10€ (cap 10%)',
+    },
+    lock: {
+      t: 'Lock',
+      d: 'Pick haute confiance : modèle ≥70% ET edge positif. Mais pas une garantie — variance toujours présente.',
+      ex: 'Lock @1.50 conf 75% edge +8pt = mise pleine',
+    },
+    drawdown: {
+      t: 'Drawdown',
+      d: 'Perte cumulée vs pic historique. Mesure le risque court terme. Un drawdown -15% est normal, -30% nécessite revoir la méthode.',
+      ex: 'Bankroll passe de 100€ → 75€ → drawdown 25%',
+    },
+    sharpe: {
+      t: 'Sharpe ratio',
+      d: 'Rendement annualisé / volatilité. Mesure la qualité du rendement ajusté au risque. >1 = bon, >2 = excellent.',
+      ex: 'Sharpe 1.5 = retour stable, peu de variance',
+    },
+    clv: {
+      t: 'CLV (Closing Line Value)',
+      d: 'Différence entre la cote prise et la cote au coup d\'envoi. Positif = on a battu le marché final → indicateur prédictif clé.',
+      ex: 'Cote pris @2.10, ferme @1.90 → CLV +10%',
+    },
+    btts: {
+      t: 'BTTS (Both Teams To Score)',
+      d: 'Marché "les deux équipes marquent". Oui/Non. Bon proxy quand on a une opinion sur la solidité défensive de chaque équipe.',
+      ex: 'BTTS Oui @1.65 si attaques fortes des 2 côtés',
+    },
+    ou25: {
+      t: 'Over/Under 2.5',
+      d: 'Total de buts > ou < 2.5. Marché alternatif au 1N2 quand le résultat exact est incertain mais le scénario buts est clair.',
+      ex: 'Over 2.5 @1.80 si attaques rapides + défenses faibles',
+    },
+    poisson: {
+      t: 'Distribution de Poisson',
+      d: 'Modèle mathématique qui prédit le nombre de buts par équipe en partant de leur xG (expected goals). Base du modèle football.',
+      ex: 'PSG xG=2.1, OM xG=1.0 → distribution scores possibles',
+    },
+    elo: {
+      t: 'Elo (rating)',
+      d: 'Classement dynamique des équipes basé sur les résultats passés. Mis à jour après chaque match. Source : ClubElo (foot), ATP/WTA (tennis).',
+      ex: 'PSG Elo 1900 vs Lille Elo 1750 → 70/30',
+    },
+  };
+  // Popover global pour glossaire (réutilise le tooltip popover ?
+  // Non, on veut un popover plus large + lien académie)
+  let __glossPopover = null;
+  function _ensureGlossPopover() {
+    if (__glossPopover) return __glossPopover;
+    __glossPopover = document.createElement('div');
+    __glossPopover.className = 'gloss-popover';
+    __glossPopover.setAttribute('role', 'tooltip');
+    document.body.appendChild(__glossPopover);
+    return __glossPopover;
+  }
+  function _showGlossPopover(target, key) {
+    const def = _GLOSSARY[key];
+    if (!def) return;
+    const pop = _ensureGlossPopover();
+    pop.innerHTML = `
+      <div class="gloss-pop-title">${def.t}</div>
+      <div class="gloss-pop-desc">${def.d}</div>
+      ${def.ex ? `<div class="gloss-pop-ex"><strong>Ex.</strong> ${def.ex}</div>` : ''}
+      <a class="gloss-pop-link" href="academie.html#${key}">Voir académie complète →</a>
+      <button class="gloss-pop-close" type="button" aria-label="Fermer">×</button>
+    `;
+    pop.classList.add('visible');
+    const rect = target.getBoundingClientRect();
+    const popH = pop.offsetHeight;
+    const popW = pop.offsetWidth;
+    let top = rect.bottom + 8;
+    if (top + popH > window.innerHeight - 16) top = rect.top - popH - 8;
+    let left = rect.left + rect.width / 2 - popW / 2;
+    if (left < 8) left = 8;
+    if (left + popW > window.innerWidth - 8) left = window.innerWidth - popW - 8;
+    pop.style.top = `${top}px`;
+    pop.style.left = `${left}px`;
+    pop.querySelector('.gloss-pop-close').addEventListener('click', _hideGlossPopover);
+  }
+  function _hideGlossPopover() {
+    if (__glossPopover) __glossPopover.classList.remove('visible');
+  }
+  document.addEventListener('click', (e) => {
+    const term = e.target.closest && e.target.closest('.gloss-term[data-gloss]');
+    if (term) {
+      e.preventDefault();
+      e.stopPropagation();
+      _showGlossPopover(term, term.dataset.gloss);
+      return;
+    }
+    // Click outside the popover → close
+    if (__glossPopover && __glossPopover.classList.contains('visible')) {
+      if (!e.target.closest('.gloss-popover')) _hideGlossPopover();
+    }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') _hideGlossPopover();
+  });
+  // Expose le glossaire pour que les autres modules puissent l'utiliser
+  try { window._GLOSSARY = _GLOSSARY; window._showGlossPopover = _showGlossPopover; } catch(e){}
+
   // AUDIT-2026-04-27 (Sprint 16 #17) — Animated counter.
   // animateCounter(el, {to: 12, duration: 300, format: v => Math.round(v)})
   // Compte de 0 à `to` avec easeOut. Idéal pour les KPIs page Bilan/Locks.
@@ -12253,10 +12396,10 @@
       const topMatchLabel = `${esc(top.homeName || '?')} vs ${esc(top.awayName || '?')}`;
       const isEmpty = nPicks === 0;
       const headline = isEmpty
-        ? `<span style="color:var(--warn);">Aucun pari edge ≥5% aujourd'hui</span> · garde ta bankroll au calme`
-        : `<strong style="color:var(--accent);">${nPicks} pari${nPicks>1?'s':''} value disponible${nPicks>1?'s':''}</strong> · mise totale ${totalStake.toFixed(0)}€ · gain potentiel ${totalGain.toFixed(0)}€`;
+        ? `<span style="color:var(--warn);">Aucun pari <span class="gloss-term" data-gloss="edge">edge</span> ≥5% aujourd'hui</span> · garde ta <span class="gloss-term" data-gloss="bankroll">bankroll</span> au calme`
+        : `<strong style="color:var(--accent);">${nPicks} pari${nPicks>1?'s':''} <span class="gloss-term" data-gloss="edge">value</span> disponible${nPicks>1?'s':''}</strong> · mise totale ${totalStake.toFixed(0)}€ · gain potentiel ${totalGain.toFixed(0)}€`;
       const riskLabel = riskPct > 0
-        ? `<span style="color:${riskPct > 25 ? 'var(--warn)' : 'var(--text-dim)'};">Risque ${riskPct.toFixed(0)}% bankroll · Kelly 0.25</span>`
+        ? `<span style="color:${riskPct > 25 ? 'var(--warn)' : 'var(--text-dim)'};">Risque ${riskPct.toFixed(0)}% <span class="gloss-term" data-gloss="bankroll">bankroll</span> · <span class="gloss-term" data-gloss="kelly">Kelly</span> 0.25</span>`
         : '';
       return `
       ${streakBanner}
@@ -18984,7 +19127,7 @@
           <div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
             <div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">Mise totale</div>
             <div style="font-size:22px;font-weight:800;color:var(--text);margin-top:2px;font-variant-numeric:tabular-nums;">${totalStake.toFixed(2)}€</div>
-            <div style="font-size:10.5px;color:var(--text-dim);margin-top:2px;">${(stakePctBankroll*100).toFixed(0)}% bankroll</div>
+            <div style="font-size:10.5px;color:var(--text-dim);margin-top:2px;">${(stakePctBankroll*100).toFixed(0)}% <span class="gloss-term" data-gloss="bankroll">bankroll</span></div>
           </div>
           <div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
             <div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">Gain potentiel</div>
@@ -18992,18 +19135,18 @@
             <div style="font-size:10.5px;color:var(--text-dim);margin-top:2px;">si tous gagnent</div>
           </div>
           <div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
-            <div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">Edge moyen</div>
+            <div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;"><span class="gloss-term" data-gloss="edge">Edge</span> moyen</div>
             <div style="font-size:22px;font-weight:800;color:var(--brand);margin-top:2px;font-variant-numeric:tabular-nums;">+${(enriched.reduce((a,c) => a + c.edge, 0) / enriched.length * 100).toFixed(1)}pt</div>
             <div style="font-size:10.5px;color:var(--text-dim);margin-top:2px;">value par pari</div>
           </div>
           <div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
-            <div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">EV cumul</div>
+            <div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;"><span class="gloss-term" data-gloss="ev">EV</span> cumul</div>
             <div style="font-size:22px;font-weight:800;color:var(--brand);margin-top:2px;font-variant-numeric:tabular-nums;">+${enriched.reduce((a,c) => a + c.stake * c.ev, 0).toFixed(2)}€</div>
             <div style="font-size:10.5px;color:var(--text-dim);margin-top:2px;">attendu math.</div>
           </div>
         </div>
         <!-- Table des paris -->
-        <div style="margin-top:18px;overflow-x:auto;border:1px solid var(--border);border-radius:var(--r-sm);">
+        <div class="tbl-scroll" style="margin-top:18px;border:1px solid var(--border);border-radius:var(--r-sm);">
           <table style="width:100%;border-collapse:collapse;font-size:13px;">
             <thead>
               <tr style="background:var(--panel);border-bottom:1px solid var(--border);">
