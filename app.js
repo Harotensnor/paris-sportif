@@ -6039,7 +6039,15 @@
     SPORTS.forEach(s => {
       const n = allForCounts.filter(m => m.sport === s).length;
       const el = document.getElementById('count-' + s);
-      if (el) el.textContent = n;
+      if (el) {
+        // Sprint 116 (v31.7.190) — Pulse animation quand le count change.
+        const previous = el.textContent;
+        if (previous && String(previous) !== String(n)) {
+          el.classList.add('count-pulse');
+          setTimeout(() => el.classList.remove('count-pulse'), 400);
+        }
+        el.textContent = n;
+      }
       // Hide the tab entirely if zero events today
       const btn = document.querySelector(`[data-tab="${s}"]`);
       if (btn) btn.classList.toggle('hidden', n === 0);
@@ -6078,10 +6086,56 @@
       // se faisait tronquer en "37 · 35" sans l'emoji. Quand nNew est >50% de n,
       // on simplifie en "N 🆕" (badge groupé). Sinon "N" simple si pas de
       // nouveaux ou "N · K🆕" comme avant si signal pertinent (qq nouveaux).
-      locksCountEl.textContent = nNew === 0 ? String(n)
-                               : (nNew === n || nNew > n * 0.5) ? `${n} 🆕`
-                                                                  : `${n} · ${nNew}🆕`;
+      const newText = nNew === 0 ? String(n)
+                    : (nNew === n || nNew > n * 0.5) ? `${n} 🆕`
+                                                     : `${n} · ${nNew}🆕`;
+      // Sprint 116 (v31.7.190) — Pulse si le count change
+      if (locksCountEl.textContent && locksCountEl.textContent !== newText) {
+        locksCountEl.classList.add('count-pulse');
+        setTimeout(() => locksCountEl.classList.remove('count-pulse'), 400);
+      }
+      locksCountEl.textContent = newText;
       if (nNew > 0) locksCountEl.classList.add('has-new'); else locksCountEl.classList.remove('has-new');
+    }
+
+    // === Sprint 117 (v31.7.190) — Dashboard actions badge ===
+    // Affiche un badge "n picks à parier maintenant" sur le bouton Accueil
+    // de la nav. Compte les picks edge≥5% conf≥55% du jour. Update quand pollData
+    // refresh, pulse à chaque changement.
+    const dashboardCountEl = document.getElementById('count-dashboard-actions');
+    if (dashboardCountEl) {
+      const nowMs = Date.now();
+      const todayIsoKey = todayISO();
+      const todayEvents = (data.days && data.days[todayIsoKey]) || [];
+      let nActions = 0;
+      todayEvents.forEach(m => {
+        if (winamaxOnly && !(m.winamax && m.winamax.available === true)) return;
+        if (m.completed || m.live) return;
+        if (!m.date) return;
+        const ko = new Date(m.date).getTime();
+        if (isNaN(ko) || ko < nowMs) return;
+        try {
+          const p = predictMatch(m);
+          if (!p || !p.pick || p.skip) return;
+          const odd = p.odds && (p.pick.key === '1' ? p.odds.home : p.pick.key === '2' ? p.odds.away : p.odds.draw);
+          if (!odd || odd <= 1) return;
+          const rel = p.reliability ?? p.pick.prob;
+          if (rel < 0.55) return;
+          const edge = rel - 1 / odd;
+          if (edge >= 0.05) nActions++;
+        } catch(e) {}
+      });
+      const newDashText = String(nActions);
+      if (dashboardCountEl.textContent && dashboardCountEl.textContent !== newDashText && nActions > 0) {
+        dashboardCountEl.classList.add('count-pulse');
+        setTimeout(() => dashboardCountEl.classList.remove('count-pulse'), 400);
+      }
+      if (nActions > 0) {
+        dashboardCountEl.textContent = newDashText;
+        dashboardCountEl.style.display = '';
+      } else {
+        dashboardCountEl.style.display = 'none';
+      }
     }
 
     // === Filter current sport ===
@@ -12453,11 +12507,11 @@
     // Si data stale ou 0 picks → panel masqué (les autres sections gèrent l'info).
     const _actionFocus = (() => {
       if (_dataIsStale) return '';
-      if (!topPicksEnriched.length && !heroPick) return '';
+      if (!topPicks.length && !heroPick) return '';
       // Calculs synthèse : N picks edge≥5%, mise totale recommandée, gain potentiel total
-      const nPicks = topPicksEnriched.length;
-      const totalStake = topPicksEnriched.reduce((s, x) => s + (x.stake || 0), 0);
-      const totalGain = topPicksEnriched.reduce((s, x) => s + (x.gain || 0), 0);
+      const nPicks = topPicks.length;
+      const totalStake = topPicks.reduce((s, x) => s + (x.stake || 0), 0);
+      const totalGain = topPicks.reduce((s, x) => s + (x.gain || 0), 0);
       const riskPct = userBankroll > 0 ? (totalStake / userBankroll * 100) : 0;
       // Streak alert : si on a un streakLosses ≥3 c'est PRIORITAIRE (avant action)
       let streakBanner = '';
@@ -12472,8 +12526,8 @@
           </div>`;
         }
       } catch(e) {}
-      // Top pick : reprendre topPicksEnriched[0] si dispo, sinon heroPick
-      const top = topPicksEnriched[0] || heroPick;
+      // Top pick : reprendre topPicks[0] si dispo, sinon heroPick
+      const top = topPicks[0] || heroPick;
       if (!top) return streakBanner;
       const topStake = top.stake || 0;
       const topGain = top.gain || (topStake * ((top.odd || 1) - 1));
