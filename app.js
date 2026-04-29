@@ -674,6 +674,175 @@
   };
   try { window._safeStorage = _safeStorage; } catch(e){}
 
+  // ============================================================
+  // PLAN 1000 — JS HELPERS COMPLETS (v31.7.196)
+  // Mass implementation : utilities + features publiques
+  // ============================================================
+
+  // Sprint A1 — Better DOM helpers
+  function _qs(selector, root = document) {
+    return root.querySelector(selector);
+  }
+  function _qsa(selector, root = document) {
+    return Array.from(root.querySelectorAll(selector));
+  }
+  function _ce(tag, attrs = {}, ...children) {
+    const el = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) {
+      if (k === 'style' && typeof v === 'object') Object.assign(el.style, v);
+      else if (k === 'dataset' && typeof v === 'object') Object.assign(el.dataset, v);
+      else if (k.startsWith('on') && typeof v === 'function') el.addEventListener(k.slice(2).toLowerCase(), v);
+      else if (v != null) el.setAttribute(k, v);
+    }
+    children.forEach(c => {
+      if (c == null) return;
+      if (typeof c === 'string') el.appendChild(document.createTextNode(c));
+      else el.appendChild(c);
+    });
+    return el;
+  }
+  try { window._qs = _qs; window._qsa = _qsa; window._ce = _ce; } catch(e){}
+
+  // Sprint A2 — Event delegation helper
+  function _on(parent, eventType, selector, handler) {
+    if (!parent || !parent.addEventListener) return;
+    parent.addEventListener(eventType, (e) => {
+      const target = e.target.closest && e.target.closest(selector);
+      if (target && parent.contains(target)) handler.call(target, e, target);
+    });
+  }
+  try { window._on = _on; } catch(e){}
+
+  // Sprint A3 — Async wrapper with error toast
+  async function _safeAsync(fn, errorMsg = 'Une erreur est survenue') {
+    try { return await fn(); }
+    catch(e) {
+      console.warn('[_safeAsync]', errorMsg, e);
+      try { if (typeof toast === 'function') toast('⚠ ' + errorMsg, 'warn'); } catch(_){}
+      return null;
+    }
+  }
+  try { window._safeAsync = _safeAsync; } catch(e){}
+
+  // Sprint A4 — Copy to clipboard helper avec fallback
+  async function _copyToClipboard(text) {
+    if (!text) return false;
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+      // Fallback : textarea + execCommand
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      const ok = document.execCommand('copy');
+      ta.remove();
+      return ok;
+    } catch(e) { return false; }
+  }
+  try { window._copyToClipboard = _copyToClipboard; } catch(e){}
+
+  // Sprint A5 — Format relative time (étendu vs _fmt.age)
+  function _fmtRelativeTime(ts) {
+    if (!ts || !isFinite(ts)) return '';
+    const diffMs = Date.now() - ts;
+    const absDiff = Math.abs(diffMs);
+    const isPast = diffMs >= 0;
+    const sec = Math.floor(absDiff / 1000);
+    const min = Math.floor(sec / 60);
+    const hour = Math.floor(min / 60);
+    const day = Math.floor(hour / 24);
+    let unit, n;
+    if (sec < 30) return isPast ? "à l'instant" : 'dans qq sec';
+    if (min < 60) { unit = min === 1 ? 'min' : 'min'; n = min; }
+    else if (hour < 24) { unit = 'h'; n = hour; }
+    else if (day < 30) { unit = day === 1 ? 'jour' : 'jours'; n = day; }
+    else if (day < 365) { const m = Math.floor(day / 30); unit = m === 1 ? 'mois' : 'mois'; n = m; }
+    else { const y = Math.floor(day / 365); unit = y === 1 ? 'an' : 'ans'; n = y; }
+    return isPast ? `il y a ${n} ${unit}` : `dans ${n} ${unit}`;
+  }
+  try { window._fmtRelativeTime = _fmtRelativeTime; } catch(e){}
+
+  // Sprint A6 — Number formatting avec séparateurs FR
+  function _fmtNumber(n, decimals = 0) {
+    if (!isFinite(n)) return '—';
+    return n.toLocaleString('fr-FR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+  }
+  try { window._fmtNumber = _fmtNumber; } catch(e){}
+
+  // Sprint A7 — Smart confirm with custom UI (vs native confirm)
+  function _showConfirm(opts) {
+    return new Promise(resolve => {
+      const overlay = document.createElement('div');
+      overlay.className = 'u-confirm-overlay';
+      overlay.setAttribute('role', 'dialog');
+      overlay.setAttribute('aria-modal', 'true');
+      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;';
+      overlay.innerHTML = `
+        <div class="u-card-elev" style="max-width:420px;width:100%;animation:u-pop-in .25s cubic-bezier(.2,.8,.2,1);">
+          <h3 style="margin:0 0 8px;font-size:17px;font-weight:800;color:var(--text);">${(opts.title||'Confirmer').replace(/[<>]/g,'')}</h3>
+          <p style="margin:0 0 18px;font-size:13.5px;color:var(--text-dim);line-height:1.5;">${(opts.body||'').replace(/[<>]/g,'')}</p>
+          <div class="u-flex u-gap-2" style="justify-content:flex-end;">
+            <button class="btn-secondary" data-confirm="0">${(opts.cancelLabel||'Annuler').replace(/[<>]/g,'')}</button>
+            <button class="btn-primary" data-confirm="1">${(opts.confirmLabel||'Confirmer').replace(/[<>]/g,'')}</button>
+          </div>
+        </div>`;
+      const close = (val) => {
+        overlay.remove();
+        document.removeEventListener('keydown', onKey);
+        resolve(!!val);
+      };
+      const onKey = (e) => {
+        if (e.key === 'Escape') close(false);
+        else if (e.key === 'Enter') close(true);
+      };
+      document.addEventListener('keydown', onKey);
+      overlay.querySelectorAll('[data-confirm]').forEach(b => {
+        b.addEventListener('click', () => close(b.dataset.confirm === '1'));
+      });
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) close(false); });
+      document.body.appendChild(overlay);
+      // Auto-focus the confirm button
+      setTimeout(() => {
+        const btn = overlay.querySelector('[data-confirm="1"]');
+        if (btn) btn.focus();
+      }, 50);
+    });
+  }
+  try { window._showConfirm = _showConfirm; } catch(e){}
+
+  // Sprint A8 — Haptic feedback (si dispo)
+  function _haptic(type = 'light') {
+    if (!navigator.vibrate) return;
+    const patterns = { light: 8, medium: 18, heavy: 30, double: [10, 50, 10] };
+    try { navigator.vibrate(patterns[type] || 10); } catch(e){}
+  }
+  try { window._haptic = _haptic; } catch(e){}
+
+  // Sprint A9 — Detect connection type (network awareness)
+  function _getConnectionType() {
+    const c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    if (!c) return 'unknown';
+    if (c.saveData) return 'save-data';
+    return c.effectiveType || 'unknown';  // '4g', '3g', '2g', 'slow-2g'
+  }
+  try { window._getConnectionType = _getConnectionType; } catch(e){}
+
+  // Sprint A10 — Page visibility change handler manager
+  const __visListeners = [];
+  function _onVisibilityChange(handler) {
+    __visListeners.push(handler);
+  }
+  document.addEventListener('visibilitychange', () => {
+    const isVisible = document.visibilityState === 'visible';
+    __visListeners.forEach(h => { try { h(isVisible); } catch(e){} });
+  });
+  try { window._onVisibilityChange = _onVisibilityChange; } catch(e){}
+
   // Sprint 162 (v31.7.195) — debounce/throttle utilities (souvent réinventées).
   function _debounce(fn, wait) {
     let t = null;
@@ -16650,6 +16819,10 @@
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
               <button id="replay-beginner-banner" style="background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:var(--r);padding:8px 12px;font-size:12px;cursor:pointer;">🌱 Réafficher bannière débutant</button>
               <button id="clear-user-lessons" style="background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:var(--r);padding:8px 12px;font-size:12px;cursor:pointer;">💡 Effacer mes leçons</button>
+              <button id="reset-tutorials-btn" style="background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:var(--r);padding:8px 12px;font-size:12px;cursor:pointer;">🔄 Réafficher tous les tutoriels</button>
+              <button id="show-howto-btn" style="background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:var(--r);padding:8px 12px;font-size:12px;cursor:pointer;">📖 Comment lire un prono</button>
+              <button id="restore-trust-btn" style="background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:var(--r);padding:8px 12px;font-size:12px;cursor:pointer;">📊 Réafficher trust strip</button>
+              <button id="clear-recent-searches" style="background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:var(--r);padding:8px 12px;font-size:12px;cursor:pointer;">🕐 Effacer recherches récentes</button>
             </div>
           </div>
 
@@ -16944,6 +17117,34 @@
         if (typeof toast === 'function') toast('✓ Leçons effacées', 'success');
         renderProfilPage(wrap);
       } catch(e){}
+    });
+    // Sprint A11 (v31.7.196) — Reset tutoriels button
+    const resetTutsBtn = wrap.querySelector('#reset-tutorials-btn');
+    if (resetTutsBtn) resetTutsBtn.addEventListener('click', () => {
+      if (typeof window._resetAllTutorials === 'function') {
+        window._resetAllTutorials();
+      }
+    });
+    // Sprint A12 — Show "Comment lire un prono" tutorial
+    const showHowToBtn = wrap.querySelector('#show-howto-btn');
+    if (showHowToBtn) showHowToBtn.addEventListener('click', () => {
+      if (typeof window._showHowToReadTutorial === 'function') {
+        window._showHowToReadTutorial();
+      }
+    });
+    // Sprint A13 — Restore trust strip
+    const restoreTrustBtn = wrap.querySelector('#restore-trust-btn');
+    if (restoreTrustBtn) restoreTrustBtn.addEventListener('click', () => {
+      if (typeof window._resetTrustStrip === 'function') {
+        window._resetTrustStrip();
+        if (typeof toast === 'function') toast('✓ Trust strip réaffichée', 'success');
+      }
+    });
+    // Sprint A14 — Clear recent searches
+    const clearSearchesBtn = wrap.querySelector('#clear-recent-searches');
+    if (clearSearchesBtn) clearSearchesBtn.addEventListener('click', () => {
+      try { localStorage.removeItem('recentSearches'); } catch(e){}
+      if (typeof toast === 'function') toast('✓ Recherches récentes effacées', 'success');
     });
   }
 
