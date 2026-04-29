@@ -5869,6 +5869,138 @@
     clip: rect(0,0,0,0);
   }
 
+  /* ===========================================================
+     Sprint H (v31.7.197) — Mobile bottom sheet pattern.
+     Modal qui slide depuis le bas en mobile, center modal en desktop.
+     Usage : <div class="u-bottom-sheet"><div class="u-bottom-sheet-inner">...</div></div>
+     =========================================================== */
+  .u-bottom-sheet {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.65);
+    backdrop-filter: blur(6px);
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    animation: u-fade-in .2s ease-out;
+  }
+  @media (min-width: 720px) {
+    .u-bottom-sheet { align-items: center; padding: 20px; }
+  }
+  .u-bottom-sheet-inner {
+    width: 100%;
+    max-width: 520px;
+    max-height: 88vh;
+    background: var(--panel);
+    border: 1px solid var(--border-2);
+    border-radius: 16px 16px 0 0;
+    padding: 18px 20px 28px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    box-shadow: var(--shadow-lg);
+    animation: u-slide-up .25s cubic-bezier(.2,.8,.2,1);
+    padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+  }
+  @media (min-width: 720px) {
+    .u-bottom-sheet-inner {
+      border-radius: var(--r-md);
+      max-height: 85vh;
+    }
+  }
+  @keyframes u-slide-up {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  .u-bottom-sheet-handle {
+    width: 36px;
+    height: 4px;
+    background: var(--border-2);
+    border-radius: 2px;
+    margin: 0 auto 14px;
+  }
+  @media (min-width: 720px) {
+    .u-bottom-sheet-handle { display: none; }
+  }
+  .u-bottom-sheet-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text);
+    margin: 0 0 12px;
+    letter-spacing: -.2px;
+  }
+  .u-bottom-sheet-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: none;
+    color: var(--text-dim2);
+    font-size: 22px;
+    cursor: pointer;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+  .u-bottom-sheet-close:hover { background: var(--panel-2); color: var(--text); }
+
+  /* Sprint H — Sticky bottom CTA pour mobile (toujours accessible) */
+  .u-mobile-cta {
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+    z-index: 45;
+    background: var(--brand);
+    color: #08080a;
+    border: none;
+    border-radius: var(--r-md);
+    padding: 14px 18px;
+    font-size: 14px;
+    font-weight: 800;
+    box-shadow: var(--shadow-lg);
+    cursor: pointer;
+    display: none;
+  }
+  @media (max-width: 720px) {
+    .u-mobile-cta.visible { display: block; }
+  }
+
+  /* Sprint H — Swipeable card support (touch-friendly) */
+  .u-swipeable {
+    touch-action: pan-y;
+  }
+  .u-swipeable.swiping-left {
+    transform: translateX(-30px);
+    transition: transform .15s ease-out;
+  }
+  .u-swipeable.swiping-right {
+    transform: translateX(30px);
+    transition: transform .15s ease-out;
+  }
+
+  /* Sprint H — Sticky compress header on scroll */
+  .u-sticky-header {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 12px;
+    transition: padding .15s, font-size .15s;
+  }
+  .u-sticky-header.compressed {
+    padding: 4px 12px;
+  }
+  .u-sticky-header.compressed h1,
+  .u-sticky-header.compressed h2 {
+    font-size: 14px;
+  }
+
   /* Sprint 180 (v31.7.195) — Polish des cards / hover sur tactile.
      Sur device tactile (no hover), les hover lifts deviennent active states. */
   @media (hover: none) {

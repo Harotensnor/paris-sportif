@@ -843,6 +843,164 @@
   });
   try { window._onVisibilityChange = _onVisibilityChange; } catch(e){}
 
+  // Sprint J (v31.7.197) — Lightweight obfuscation pour données sensibles localStorage.
+  // Note : ce N'EST PAS du chiffrement fort (XOR avec clé fixe). Mais rend les
+  // données illisibles à l'œil nu (utile pour valeurs Kelly, bankroll si paranoia).
+  // Pour vraies données sensibles, ne pas stocker côté client — ce site ne stocke
+  // d'ailleurs aucun PII (pas d'email, pas de password, pas d'argent réel).
+  const _OBF_KEY = 'paris-sportif-2026';
+  function _obfuscate(plaintext) {
+    if (!plaintext) return '';
+    try {
+      let result = '';
+      for (let i = 0; i < plaintext.length; i++) {
+        result += String.fromCharCode(plaintext.charCodeAt(i) ^ _OBF_KEY.charCodeAt(i % _OBF_KEY.length));
+      }
+      return btoa(result);
+    } catch(e) { return plaintext; }
+  }
+  function _deobfuscate(ciphertext) {
+    if (!ciphertext) return '';
+    try {
+      const decoded = atob(ciphertext);
+      let result = '';
+      for (let i = 0; i < decoded.length; i++) {
+        result += String.fromCharCode(decoded.charCodeAt(i) ^ _OBF_KEY.charCodeAt(i % _OBF_KEY.length));
+      }
+      return result;
+    } catch(e) { return ciphertext; }
+  }
+  try { window._obfuscate = _obfuscate; window._deobfuscate = _deobfuscate; } catch(e){}
+
+  // Sprint J — Privacy-respecting export of all user data (RGPD requirement)
+  // L'utilisateur peut télécharger toutes ses données localStorage en JSON.
+  window._exportAllUserData = function() {
+    const data = {};
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (!key) continue;
+        // Skip ephemeral / cache keys
+        if (key.startsWith('autoRefresh') || key.startsWith('__')) continue;
+        const value = localStorage.getItem(key);
+        try {
+          data[key] = JSON.parse(value);
+        } catch(e) {
+          data[key] = value;
+        }
+      }
+    } catch(e) {}
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `paris-sportif-data-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    return data;
+  };
+
+  // Sprint J — Wipe all user data (RGPD right to be forgotten)
+  window._wipeAllUserData = async function() {
+    const confirm = (typeof window._showConfirm === 'function')
+      ? await window._showConfirm({
+          title: '⚠ Effacer toutes vos données',
+          body: 'Toutes vos préférences, paris, leçons, recherches récentes seront supprimées définitivement. Cette action est irréversible.',
+          confirmLabel: 'Effacer tout',
+          cancelLabel: 'Annuler',
+          danger: true,
+        })
+      : window.confirm('Effacer toutes vos données ?');
+    if (!confirm) return false;
+    try {
+      // Keep only critical session data
+      const keep = ['theme'];
+      const keepValues = {};
+      keep.forEach(k => { try { keepValues[k] = localStorage.getItem(k); } catch(e){} });
+      localStorage.clear();
+      Object.entries(keepValues).forEach(([k, v]) => {
+        if (v != null) try { localStorage.setItem(k, v); } catch(e){}
+      });
+      try { sessionStorage.clear(); } catch(e){}
+      if (typeof window.toast === 'function') window.toast('✓ Toutes les données effacées', 'success');
+      // Reload to reset all state
+      setTimeout(() => location.reload(), 800);
+      return true;
+    } catch(e) {
+      if (typeof window.toast === 'function') window.toast('⚠ Erreur lors de l\'effacement', 'warn');
+      return false;
+    }
+  };
+
+  // Sprint H (v31.7.197) — Bottom sheet helper
+  // Usage : window._showBottomSheet({ title, body, actions, onClose })
+  // body peut être string HTML ou DOM node ; actions = [{label, onClick, primary}]
+  function _showBottomSheet(opts) {
+    const { title = '', body = '', actions = [], onClose = null } = opts || {};
+    const overlay = document.createElement('div');
+    overlay.className = 'u-bottom-sheet';
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    if (title) overlay.setAttribute('aria-label', title);
+    const inner = document.createElement('div');
+    inner.className = 'u-bottom-sheet-inner u-relative';
+    const handle = document.createElement('div');
+    handle.className = 'u-bottom-sheet-handle';
+    handle.setAttribute('aria-hidden', 'true');
+    inner.appendChild(handle);
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.className = 'u-bottom-sheet-close';
+    closeBtn.setAttribute('aria-label', 'Fermer');
+    closeBtn.textContent = '×';
+    inner.appendChild(closeBtn);
+    if (title) {
+      const h = document.createElement('h3');
+      h.className = 'u-bottom-sheet-title';
+      h.textContent = title;
+      inner.appendChild(h);
+    }
+    const bodyDiv = document.createElement('div');
+    if (typeof body === 'string') bodyDiv.innerHTML = body;
+    else if (body instanceof Node) bodyDiv.appendChild(body);
+    inner.appendChild(bodyDiv);
+    if (actions && actions.length) {
+      const actDiv = document.createElement('div');
+      actDiv.className = 'u-flex u-gap-2 u-mt-4';
+      actDiv.style.justifyContent = 'flex-end';
+      actions.forEach(a => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = a.primary ? 'btn-primary' : 'btn-secondary';
+        btn.textContent = a.label || 'OK';
+        btn.addEventListener('click', () => {
+          try { if (typeof a.onClick === 'function') a.onClick(); } catch(e){}
+          close();
+        });
+        actDiv.appendChild(btn);
+      });
+      inner.appendChild(actDiv);
+    }
+    overlay.appendChild(inner);
+    const close = () => {
+      overlay.style.opacity = '0';
+      setTimeout(() => {
+        overlay.remove();
+        document.removeEventListener('keydown', onKey);
+        if (typeof onClose === 'function') try { onClose(); } catch(e){}
+      }, 150);
+    };
+    const onKey = (e) => { if (e.key === 'Escape') close(); };
+    document.addEventListener('keydown', onKey);
+    closeBtn.addEventListener('click', close);
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+    document.body.appendChild(overlay);
+    return { close };
+  }
+  try { window._showBottomSheet = _showBottomSheet; } catch(e){}
+
   // Sprint 162 (v31.7.195) — debounce/throttle utilities (souvent réinventées).
   function _debounce(fn, wait) {
     let t = null;
@@ -2214,6 +2372,62 @@
     const losses = bets.filter(b => b.result === 'lost').length;
     const totalStake = bets.reduce((a, b) => a + (b.stake || 0), 0);
     const totalPnL = bets.reduce((a, b) => a + (b.pnl || 0), 0);
+    // Sprint A — Stats avancées : streak max win/lose, par sport, par marché
+    let curStreak = 0, lastResult = null;
+    let maxWinStreak = 0, maxLossStreak = 0;
+    let curWin = 0, curLoss = 0;
+    const sortedByTs = bets.slice().sort((a, b) => (a.settledTs || 0) - (b.settledTs || 0));
+    sortedByTs.forEach(b => {
+      if (b.result === 'won') {
+        curWin++;
+        curLoss = 0;
+        maxWinStreak = Math.max(maxWinStreak, curWin);
+      } else if (b.result === 'lost') {
+        curLoss++;
+        curWin = 0;
+        maxLossStreak = Math.max(maxLossStreak, curLoss);
+      }
+    });
+    // Streak en cours (à partir du plus récent)
+    const recent = sortedByTs.slice().reverse();
+    if (recent.length) {
+      const cur = recent[0].result;
+      curStreak = 1;
+      for (let i = 1; i < recent.length; i++) {
+        if (recent[i].result === cur) curStreak++;
+        else break;
+      }
+      lastResult = cur;
+    }
+    // Par sport
+    const bySport = {};
+    bets.forEach(b => {
+      const sp = b.sport || 'unknown';
+      if (!bySport[sp]) bySport[sp] = { n: 0, wins: 0, stake: 0, pnl: 0 };
+      bySport[sp].n++;
+      if (b.result === 'won') bySport[sp].wins++;
+      bySport[sp].stake += (b.stake || 0);
+      bySport[sp].pnl += (b.pnl || 0);
+    });
+    // Par marché
+    const byMarket = {};
+    bets.forEach(b => {
+      const mk = b.market || '1n2';
+      if (!byMarket[mk]) byMarket[mk] = { n: 0, wins: 0, stake: 0, pnl: 0 };
+      byMarket[mk].n++;
+      if (b.result === 'won') byMarket[mk].wins++;
+      byMarket[mk].stake += (b.stake || 0);
+      byMarket[mk].pnl += (b.pnl || 0);
+    });
+    // Compute ROI per segment
+    Object.values(bySport).forEach(s => {
+      s.winRate = s.n > 0 ? s.wins / s.n : 0;
+      s.roi = s.stake > 0 ? s.pnl / s.stake : 0;
+    });
+    Object.values(byMarket).forEach(s => {
+      s.winRate = s.n > 0 ? s.wins / s.n : 0;
+      s.roi = s.stake > 0 ? s.pnl / s.stake : 0;
+    });
     return {
       n: bets.length,
       wins, losses,
@@ -2221,7 +2435,78 @@
       totalStake: Math.round(totalStake * 100) / 100,
       totalPnL: Math.round(totalPnL * 100) / 100,
       roi: totalStake > 0 ? totalPnL / totalStake : 0,
+      // Sprint A — Stats avancées
+      maxWinStreak,
+      maxLossStreak,
+      currentStreak: curStreak,
+      currentStreakSide: lastResult,
+      bySport,
+      byMarket,
+      // Sprint A — Smart staking: average stake vs Kelly suggestion ratio
+      avgStake: bets.length > 0 ? totalStake / bets.length : 0,
+      avgPnL: bets.length > 0 ? totalPnL / bets.length : 0,
     };
+  };
+  // Sprint A1-A10 — ROI Tracker helpers
+  // Compute "what if you followed all picks" comparison with user's actual results
+  window._computeIfYouHadFollowed = function() {
+    const data = window.PRONOSTICS_DATA;
+    if (!data || !data.days) return null;
+    const userBets = _loadUserBets();
+    const userBetIds = new Set(userBets.map(b => String(b.matchId)));
+    let n = 0, modelWins = 0, modelStakeTotal = 0, modelPnL = 0, missedWins = 0, missedPnL = 0;
+    Object.values(data.days || {}).forEach(arr => (arr || []).forEach(m => {
+      if (!m.completed) return;
+      try {
+        const pred = predictMatch(m);
+        if (!pred || !pred.pick || pred.skip || !pred.isLock) return;  // strong picks only
+        const res = evaluateModelPick(m, pred);
+        if (res !== 'won' && res !== 'lost') return;
+        const odd = pred.odds && (pred.pick.key === '1' ? pred.odds.home : pred.pick.key === '2' ? pred.odds.away : pred.odds.draw);
+        if (!odd) return;
+        const stake = 1;  // unit stake
+        const pnl = res === 'won' ? stake * (odd - 1) : -stake;
+        n++;
+        modelStakeTotal += stake;
+        modelPnL += pnl;
+        if (res === 'won') modelWins++;
+        // Did user miss this pick?
+        if (!userBetIds.has(String(m.id))) {
+          if (res === 'won') {
+            missedWins++;
+            missedPnL += stake * (odd - 1);
+          } else {
+            missedPnL -= stake;
+          }
+        }
+      } catch(e){}
+    }));
+    return {
+      n,
+      modelWinRate: n > 0 ? modelWins / n : 0,
+      modelROI: modelStakeTotal > 0 ? modelPnL / modelStakeTotal : 0,
+      modelPnL: Math.round(modelPnL * 100) / 100,
+      missedWins,
+      missedPnL: Math.round(missedPnL * 100) / 100,
+    };
+  };
+  // Sprint A — Smart staking : Kelly modulé par confiance
+  window._smartKelly = function(rel, odd, bankroll = 50) {
+    if (!isFinite(rel) || !isFinite(odd) || odd <= 1 || rel <= 0 || rel >= 1) return 0;
+    // Base Kelly fraction
+    const baseKelly = (rel * odd - 1) / (odd - 1);
+    if (baseKelly <= 0) return 0;
+    // Sprint A — Module by confidence:
+    // - Lock (rel ≥ 0.70) : 0.50× Kelly (haute conviction)
+    // - Standard (0.55-0.70) : 0.25× Kelly (default)
+    // - Lowconf (<0.55) : 0.10× Kelly (skip habituellement)
+    let multiplier = 0.25;
+    if (rel >= 0.70) multiplier = 0.50;
+    else if (rel < 0.55) multiplier = 0.10;
+    const stake = bankroll * baseKelly * multiplier;
+    // Cap 10% per bet
+    const cap = bankroll * 0.10;
+    return Math.max(0.10, Math.min(stake, cap));
   };
 
   // Sprint 101 (v31.7.186) — Live odds drift tracker.
@@ -12445,11 +12730,26 @@
     return out;
   }
 
+  // Sprint G — Memoization _agentReplay (très couteux, appelé 5+ fois par render)
+  // Cache invalidate quand PRONOSTICS_DATA ref change ou agentResetTs modifié.
+  let __agentReplayCache = null;
+  let __agentReplayDataRef = null;
+  let __agentReplayResetTs = null;
   function _agentReplay() {
     const data = window.PRONOSTICS_DATA;
     const AGENT_START = 10, KELLY_FRAC = 0.25, CAP_PCT = 0.10, MIN_STAKE = 0.10;
     const resetTs = parseInt(localStorage.getItem('agentResetTs') || '0', 10) || 0;
-    if (!data || !data.days) return { nav: AGENT_START, series: [], scorable: [], scorableRaw: [], ydayStats: null, perSport7d: {}, start: AGENT_START };
+    // Sprint G — Cache hit : data ref + resetTs identiques
+    if (__agentReplayCache && __agentReplayDataRef === data && __agentReplayResetTs === resetTs) {
+      return __agentReplayCache;
+    }
+    if (!data || !data.days) {
+      const empty = { nav: AGENT_START, series: [], scorable: [], scorableRaw: [], ydayStats: null, perSport7d: {}, start: AGENT_START };
+      __agentReplayCache = empty;
+      __agentReplayDataRef = data;
+      __agentReplayResetTs = resetTs;
+      return empty;
+    }
     const scorable = [];
     Object.entries(data.days).forEach(([dayIso, arr]) => {
       (arr || []).forEach(m => {
@@ -12532,11 +12832,16 @@
       for (const p of series) { if (p.t > cut7) break; v = p.nav; }
       return v;
     })();
-    return {
+    const result = {
       nav, series, scorable, scorableRaw, start: AGENT_START, perSport7d,
       delta7: nav - navPrev7, deltaPct7: navPrev7 > 0 ? (nav - navPrev7) / navPrev7 * 100 : 0,
       ydayStats: ydayTotal > 0 ? { pl: ydayPl, wins: ydayWins, losses: ydayLosses, total: ydayTotal, highTotal: ydayHighTotal, highWins: ydayHighWins, lowLoss: ydayLowLoss } : null,
     };
+    // Sprint G — Memoize for next call
+    __agentReplayCache = result;
+    __agentReplayDataRef = data;
+    __agentReplayResetTs = resetTs;
+    return result;
   }
 
   function _agentLesson(ys) {
