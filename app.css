@@ -2753,6 +2753,96 @@
   }
   .u-tooltip-popover.visible { opacity: 1; }
 
+  /* Sprint 108 (v31.7.190) — Glossaire inline. Termes techniques cliquables
+     dans n'importe quelle page → popover avec définition + exemple + lien académie.
+     Style : underline pointillé brand-soft pour indiquer l'interactivité sans casser
+     la lecture (vs underline plein qui ressemble trop à un lien externe). */
+  .gloss-term {
+    border-bottom: 1px dashed var(--brand-soft);
+    cursor: help;
+    color: var(--text);
+    transition: border-color .15s, color .15s;
+  }
+  .gloss-term:hover, .gloss-term:focus-visible {
+    border-bottom-color: var(--brand);
+    color: var(--brand);
+    outline: none;
+  }
+  .gloss-popover {
+    position: fixed;
+    background: var(--panel);
+    color: var(--text);
+    border: 1px solid var(--border-2);
+    border-left: 3px solid var(--brand);
+    border-radius: var(--r-sm);
+    padding: 14px 16px 12px;
+    font-size: 13px;
+    line-height: 1.55;
+    max-width: 340px;
+    width: max-content;
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity .15s, transform .15s;
+    z-index: 401;
+    pointer-events: none;
+  }
+  .gloss-popover.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  .gloss-pop-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--brand);
+    margin-bottom: 6px;
+    padding-right: 24px;
+  }
+  .gloss-pop-desc {
+    color: var(--text-2);
+    margin-bottom: 8px;
+  }
+  .gloss-pop-ex {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r-xs);
+    padding: 6px 10px;
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+    font-style: italic;
+  }
+  .gloss-pop-ex strong {
+    color: var(--accent);
+    font-style: normal;
+    margin-right: 4px;
+  }
+  .gloss-pop-link {
+    display: inline-block;
+    font-size: 11.5px;
+    color: var(--brand);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color .15s;
+  }
+  .gloss-pop-link:hover { border-bottom-color: var(--brand); }
+  .gloss-pop-close {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 22px; height: 22px;
+    background: transparent;
+    border: none;
+    color: var(--text-dim2);
+    font-size: 18px;
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    line-height: 1;
+  }
+  .gloss-pop-close:hover { background: var(--panel-2); color: var(--text); }
+
   /* AUDIT-2026-04-27 (Sprint 16 #20) — Loading micro-states. */
   .btn-loading {
     position: relative;
