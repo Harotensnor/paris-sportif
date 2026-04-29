@@ -16032,7 +16032,7 @@
             ${body}
             <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:20px;">
               <button type="button" class="onb-prev" ${state.step===1?'disabled':''} style="padding:10px 18px;background:var(--panel-2);color:${state.step===1?'var(--text-dim2)':'var(--text)'};border:1px solid var(--border);border-radius:var(--r-sm);cursor:${state.step===1?'not-allowed':'pointer'};font-size:13px;font-weight:600;${state.step===1?'opacity:.5;':''}">← Précédent</button>
-              <button type="button" class="onb-next" style="padding:10px 22px;background:var(--brand);color:#08080a;border:none;border-radius:var(--r-sm);cursor:pointer;font-size:13px;font-weight:700;">${state.step===totalSteps?'C\\'est parti ! →':'Suivant →'}</button>
+              <button type="button" class="onb-next" style="padding:10px 22px;background:var(--brand);color:#08080a;border:none;border-radius:var(--r-sm);cursor:pointer;font-size:13px;font-weight:700;">${state.step===totalSteps?"C'est parti ! →":"Suivant →"}</button>
             </div>
           </div>`;
         // Wire handlers (must re-bind après chaque renderStep car innerHTML reset)
