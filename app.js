@@ -1002,6 +1002,109 @@
     }
   };
 
+  // v31.7.201 — Page-tabs helper : génère un mini-tabs bar pour pages liées
+  // Usage : _pageTabsHTML('top', [
+  //   { page: 'top', label: '⭐ Highlights' },
+  //   { page: 'plan-mise', label: '🎯 Plan de mise' },
+  //   { page: 'locks', label: '🔒 Locks' }
+  // ])
+  // Renvoie HTML string à injecter en haut de la page.
+  /**
+   * Generate sister pages tabs bar HTML.
+   * @param {string} currentPage - data-page of the current page (highlighted active)
+   * @param {Array<{page: string, label: string}>} tabs - Sister pages
+   * @returns {string} HTML to inject
+   */
+  function _pageTabsHTML(currentPage, tabs) {
+    if (!Array.isArray(tabs) || tabs.length < 2) return '';
+    return `
+      <div class="page-tabs" role="tablist" aria-label="Sections liées">
+        ${tabs.map(t => `
+          <button type="button"
+            role="tab"
+            aria-selected="${t.page === currentPage ? 'true' : 'false'}"
+            class="page-tabs-btn page-btn ${t.page === currentPage ? 'active' : ''}"
+            data-page="${esc(t.page)}">
+            ${esc(t.label)}
+          </button>
+        `).join('')}
+      </div>`;
+  }
+  try { window._pageTabsHTML = _pageTabsHTML; } catch(e){}
+
+  // Tabs definitions par page-group (réutilisé partout)
+  const _PAGE_TAB_GROUPS = {
+    picks: [
+      { page: 'top', label: '⭐ Top du jour' },
+      { page: 'plan-mise', label: '🎯 Plan de mise' },
+      { page: 'locks', label: '🔒 Locks' },
+    ],
+    perf: [
+      { page: 'performance', label: '🎯 Performance modèle' },
+      { page: 'credibilite', label: '📐 Crédibilité' },
+      { page: 'backtest', label: '📈 Backtest' },
+    ],
+    bilan: [
+      { page: 'bilan', label: '💰 Mes paris' },
+      { page: 'historique', label: '📜 Historique' },
+    ],
+    montantes: [
+      { page: 'montante-jour', label: '📈 Jour' },
+      { page: 'montante-weekend', label: '🗓️ Weekend' },
+      { page: 'montante-semaine', label: '📆 Semaine' },
+    ],
+    favoris: [
+      { page: 'favoris', label: '⭐ Favoris' },
+      { page: 'alertes', label: '🔔 Alertes' },
+    ],
+  };
+  // Reverse lookup : page → group
+  const _PAGE_TO_GROUP = {};
+  for (const [groupKey, tabs] of Object.entries(_PAGE_TAB_GROUPS)) {
+    tabs.forEach(t => { _PAGE_TO_GROUP[t.page] = groupKey; });
+  }
+  /**
+   * Auto-inject page-tabs in the active page wrap if it belongs to a group.
+   * Idempotent : skip si déjà présent. Cherche le wrap actif dans <main>.
+   * @param {string} currentPage - data-page actif
+   */
+  function _injectPageTabsAuto(currentPage) {
+    const groupKey = _PAGE_TO_GROUP[currentPage];
+    if (!groupKey) return;
+    // Find the visible page wrap (the one with display !== 'none')
+    const main = document.querySelector('main');
+    if (!main) return;
+    const visibleWrap = Array.from(main.querySelectorAll('[id$="-wrap"]')).find(el => {
+      return el.style.display !== 'none' && getComputedStyle(el).display !== 'none';
+    });
+    if (!visibleWrap) return;
+    // Check if page-tabs already injected at the top
+    const firstChild = visibleWrap.querySelector('.page-wrap > :first-child, > :first-child');
+    if (firstChild && firstChild.classList && firstChild.classList.contains('page-tabs')) return;
+    // Build tabs HTML
+    const tabsHtml = _pageTabsForGroup(groupKey, currentPage);
+    if (!tabsHtml) return;
+    // Inject at the top of the .page-wrap (or first div)
+    const target = visibleWrap.querySelector('.page-wrap') || visibleWrap.firstElementChild;
+    if (!target) return;
+    const tabsContainer = document.createElement('div');
+    tabsContainer.innerHTML = tabsHtml;
+    target.insertBefore(tabsContainer.firstElementChild, target.firstChild);
+  }
+  try { window._injectPageTabsAuto = _injectPageTabsAuto; } catch(e){}
+  /**
+   * Get tabs HTML for a known group, automatically highlighting current page.
+   * @param {string} groupKey - 'picks' | 'perf' | 'bilan' | 'montantes' | 'favoris'
+   * @param {string} currentPage - active page-id
+   * @returns {string} HTML or '' if group unknown
+   */
+  function _pageTabsForGroup(groupKey, currentPage) {
+    const tabs = _PAGE_TAB_GROUPS[groupKey];
+    if (!tabs) return '';
+    return _pageTabsHTML(currentPage, tabs);
+  }
+  try { window._pageTabsForGroup = _pageTabsForGroup; } catch(e){}
+
   // Sprint H (v31.7.197) — Bottom sheet helper
   /**
    * Mobile-first bottom sheet modal (slide-up on mobile, center modal on desktop).
@@ -18722,12 +18825,13 @@
     document.querySelectorAll('.page-btn').forEach(b => {
       b.classList.toggle('active', b.dataset.page === currentPage);
     });
-    // v30 — Highlight active hub (Pronos/Ma perf/Plus) when current page
+    // v31.7.200 — Highlight active hub (Picks/Agenda/Performance/Compte) when current page
     // is one of its children. Dashboard stays as a solo button.
     const HUB_PAGES = {
-      pronos: ['tous', 'locks', 'buteurs', 'combines', 'simples', 'top', 'value'],
-      perf:   ['historique', 'bilan', 'backtest'],
-      plus:   ['academie', 'credibilite', 'alertes', 'profil', 'sante'],
+      picks:       ['top', 'valeur', 'plan-mise', 'locks', 'combines', 'buteurs'],
+      agenda:      ['tous', 'calendrier', 'montante-jour', 'montante-weekend', 'montante-semaine', 'matchs', 'compare'],
+      performance: ['performance', 'bilan', 'historique', 'simulator', 'credibilite', 'backtest'],
+      account:     ['profil', 'favoris', 'alertes'],
     };
     document.querySelectorAll('nav.topbar-nav .hub').forEach(h => {
       const k = h.dataset.hub;
@@ -18735,6 +18839,13 @@
       const btn = h.querySelector('.hub-btn');
       if (btn) btn.classList.toggle('active', pages.includes(currentPage));
     });
+    // v31.7.201 — Auto-inject page-tabs (Top/Plan/Locks etc.) sur pages liées
+    // Délai léger pour laisser le rendering du wrap se finir
+    try {
+      setTimeout(() => {
+        if (typeof _injectPageTabsAuto === 'function') _injectPageTabsAuto(currentPage);
+      }, 50);
+    } catch(e){}
   }
 
   // ======= Personal-bets bilan (from localStorage) =======
