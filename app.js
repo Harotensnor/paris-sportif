@@ -15814,20 +15814,31 @@
         if (!pred || !pred.pick || pred.skip) return null;
         const pk = pred.pick.key;
         const odd = pred.odds && (pk==='1'?pred.odds.home:pk==='2'?pred.odds.away:pred.odds.draw);
+        const { home, away } = getSides(m);
+        const settled = m.completed;
+        const live = m.status === 'STATUS_IN_PROGRESS';
+        const ko = new Date(m.date).getTime();
+        const startedAndNotSettled = !settled && isFinite(ko) && ko < Date.now() - 60000;
+        // v32.8 — Si pas de cote captée :
+        //   - Match settled (terminé) : on l'INCLUT quand même avec
+        //     nonTrackable=true pour que l'user puisse VOIR le résultat
+        //     dans le tab Finis. Avant ils étaient juste comptés en
+        //     +N non-trackables sans qu'on puisse les voir.
+        //   - Match non-settled : on skip (pas actionnable).
         if (!odd) {
-          if (m.completed) _completedNoOdds++;
+          if (settled) {
+            _completedNoOdds++;
+            const rel = pred.reliability ?? pred.pick.prob;
+            const res = evaluateModelPick(m, pred);  // on a quand même la prédiction
+            return { m, pred, odd: null, rel, edge: 0,
+                     home, away, settled: true, live: false,
+                     startedAndNotSettled: false, res, ts: ko,
+                     sport: m.sport || 'other', nonTrackable: true };
+          }
           return null;
         }
         const rel = pred.reliability ?? pred.pick.prob;
         const edge = rel - 1/odd;
-        const { home, away } = getSides(m);
-        const settled = m.completed;
-        const live = m.status === 'STATUS_IN_PROGRESS';
-        // v30 — événement déjà commencé mais pas encore complété : ce n'est plus
-        // un pari "à venir" actionnable (cotes pré-match figées). On le marque
-        // pour le filtrer hors du compteur "À venir".
-        const ko = new Date(m.date).getTime();
-        const startedAndNotSettled = !settled && isFinite(ko) && ko < Date.now() - 60000;
         const res = settled ? evaluateModelPick(m, pred) : null;
         return { m, pred, odd, rel, edge, home, away, settled, live, startedAndNotSettled, res, ts: ko, sport: m.sport || 'other' };
       } catch(e) { return null; }
@@ -15938,8 +15949,13 @@
     // Apply filters
     const passesFilters = (p) => {
       if (tousFilters.sports.length && !tousFilters.sports.includes(p.sport)) return false;
-      if (tousFilters.minEdge > 0 && p.edge < tousFilters.minEdge) return false;
-      if (tousFilters.minConf > 0 && p.rel < tousFilters.minConf) return false;
+      // v32.8 — Non-trackable picks (settled, no odds) skip edge/conf filters
+      // car edge=0 par défaut et rel sans contexte. Ils restent visibles dans
+      // le tab Finis pour transparence sur les matchs joués.
+      if (!p.nonTrackable) {
+        if (tousFilters.minEdge > 0 && p.edge < tousFilters.minEdge) return false;
+        if (tousFilters.minConf > 0 && p.rel < tousFilters.minConf) return false;
+      }
       return true;
     };
     // v30 — Floor implicite SUR LES PARIS ACTIONNABLES uniquement :
@@ -16123,11 +16139,12 @@
           <div style="font-size:12px;color:var(--brand);font-weight:600;margin-top:3px;">→ ${esc(pickLabel)}</div>
         </div>
         <div style="display:flex;flex-direction:column;gap:2px;font-size:11px;">
-          <div><span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Confiance du modèle : probabilité estimée que ce pari gagne. ≥70 % = très fiable.">Conf</span> <b style="color:${confColor};">${Math.round(p.rel*100)}%</b> · <span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Cote décimale. La source (Winamax / externe / archive) est indiquée à côté.">Cote</span> <b style="color:var(--text);">@${p.odd.toFixed(2)}</b> ${_coteSrc}</div>
-          <div><span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Edge = notre probabilité − probabilité implicite de la cote. > 0 = on est plus optimiste que le bookmaker (=valeur).">Edge</span> <b style="color:${edgeColor};">${p.edge>=0?'+':''}${Math.round(p.edge*100)}pt</b></div>
+          <div><span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Confiance du modèle : probabilité estimée que ce pari gagne. ≥70 % = très fiable.">Conf</span> <b style="color:${confColor};">${Math.round(p.rel*100)}%</b> · <span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Cote décimale. La source (Winamax / externe / archive) est indiquée à côté.">Cote</span> <b style="color:var(--text);">${p.odd ? '@' + p.odd.toFixed(2) : '<span style=\"color:var(--text-dim2);font-weight:400;\">non-trackable</span>'}</b> ${_coteSrc}</div>
+          <div><span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Edge = notre probabilité − probabilité implicite de la cote. > 0 = on est plus optimiste que le bookmaker (=valeur).">Edge</span> <b style="color:${edgeColor};">${p.nonTrackable ? '<span style=\"color:var(--text-dim2);font-weight:400;\">—</span>' : (p.edge>=0?'+':'') + Math.round(p.edge*100) + 'pt'}</b></div>
         </div>
         <div style="text-align:right;">
           ${isFini ? resBadge : ''}
+          ${p.nonTrackable ? '<div style="margin-top:4px;font-size:9.5px;color:var(--text-dim2);font-style:italic;" title="Match terminé sans cote pre-match captée — résultat visible mais hors bilan ROI">📋 non-trackable</div>' : ''}
         </div>
         ${_footDetailsHtml}
       </div>`;
@@ -16233,7 +16250,7 @@
         <div style="display:flex;gap:8px;margin:0 0 14px;flex-wrap:wrap;">
           <button data-tous-tab="pending" style="padding:10px 18px;border-radius:8px;border:1px solid ${activeTab==='pending'?'var(--brand)':'var(--border-2)'};background:${activeTab==='pending'?'rgba(167,139,250,.15)':'var(--panel)'};color:${activeTab==='pending'?'var(--brand)':'var(--text-2)'};font-weight:700;font-size:13px;cursor:pointer;">⏱️ À venir <span style="opacity:.7;">(${pending.length})</span></button>
           <button data-tous-tab="inprogress" style="padding:10px 18px;border-radius:8px;border:1px solid ${activeTab==='inprogress'?'var(--brand)':'var(--border-2)'};background:${activeTab==='inprogress'?'rgba(167,139,250,.15)':'var(--panel)'};color:${activeTab==='inprogress'?'var(--brand)':'var(--text-2)'};font-weight:700;font-size:13px;cursor:pointer;">🔴 En cours <span style="opacity:.7;">(${inProgress.length})</span></button>
-          <button data-tous-tab="finished" title="${_completedNoOdds > 0 ? `+${_completedNoOdds} match${_completedNoOdds>1?'s':''} terminé${_completedNoOdds>1?'s':''} sans cote capturée (non-trackable)` : ''}" style="padding:10px 18px;border-radius:8px;border:1px solid ${activeTab==='finished'?'var(--brand)':'var(--border-2)'};background:${activeTab==='finished'?'rgba(167,139,250,.15)':'var(--panel)'};color:${activeTab==='finished'?'var(--brand)':'var(--text-2)'};font-weight:700;font-size:13px;cursor:pointer;">✅ Finis <span style="opacity:.7;">(${finished.length}${_completedNoOdds > 0 ? `<span style="opacity:.6;font-size:10px;font-weight:500;">+${_completedNoOdds}</span>` : ''})</span></button>
+          <button data-tous-tab="finished" title="${_completedNoOdds > 0 ? `Dont ${_completedNoOdds} non-trackable${_completedNoOdds>1?'s':''} (sans cote capturée pre-match → bilan ROI ne peut pas les évaluer mais le résultat est visible)` : ''}" style="padding:10px 18px;border-radius:8px;border:1px solid ${activeTab==='finished'?'var(--brand)':'var(--border-2)'};background:${activeTab==='finished'?'rgba(167,139,250,.15)':'var(--panel)'};color:${activeTab==='finished'?'var(--brand)':'var(--text-2)'};font-weight:700;font-size:13px;cursor:pointer;">✅ Finis <span style="opacity:.7;">(${finished.length})</span></button>
         </div>
         <div style="display:flex;flex-direction:column;gap:8px;">
           ${activeTab === 'pending' ? pendingHtml : activeTab === 'inprogress' ? inProgressHtml : finishedHtml}
