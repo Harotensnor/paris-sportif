@@ -13982,6 +13982,17 @@
             } catch(e) { return ''; }
           })()}
         </div>` : ''}
+        ${!isEmpty && top && top.m ? (() => {
+          // v32.0 (Phase 2) — CTA Winamax direct sur le top pick action-focus.
+          // Bouton orange en TÊTE des CTAs pour rendre l'action principale
+          // (parier) visible au premier coup d'œil.
+          const _wxUrl = (top.m.winamax && top.m.winamax.url) ? top.m.winamax.url : 'https://www.winamax.fr/paris-sportifs';
+          return `<a href="${esc(_wxUrl)}" target="_blank" rel="noopener noreferrer" data-no-detail="1" style="display:flex;align-items:center;justify-content:center;gap:10px;padding:13px 16px;margin-bottom:8px;background:linear-gradient(135deg,#fbbf24 0%,#f59e0b 100%);color:#0c0a0a;border:none;border-radius:var(--r-sm);font-size:14.5px;font-weight:800;text-decoration:none;cursor:pointer;box-shadow:0 6px 18px rgba(251,191,36,.30);transition:transform .12s,box-shadow .12s;letter-spacing:.2px;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 8px 22px rgba(251,191,36,.40)';" onmouseout="this.style.transform='';this.style.boxShadow='0 6px 18px rgba(251,191,36,.30)';" onclick="event.stopPropagation();" aria-label="Parier ce match sur Winamax (ouvre dans un nouvel onglet)">
+            <span style="font-size:16px;">💰</span>
+            <span>Parier sur Winamax</span>
+            <span style="opacity:.7;font-size:12px;">↗</span>
+          </a>`;
+        })() : ''}
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
           ${!isEmpty ? `<button type="button" class="page-btn" data-page="plan-mise" style="flex:1;min-width:140px;padding:10px 14px;background:var(--brand);color:#08080a;border:none;border-radius:var(--r-sm);cursor:pointer;font-size:13px;font-weight:700;">📋 Plan de mise complet →</button>` : ''}
           <button type="button" class="page-btn" data-page="${isEmpty ? 'calendrier' : 'top'}" style="flex:1;min-width:140px;padding:10px 14px;background:var(--panel);color:var(--text);border:1px solid var(--border-2);border-radius:var(--r-sm);cursor:pointer;font-size:13px;font-weight:600;">${isEmpty ? '📅 Calendrier 7j' : '⭐ Top du jour'}</button>
@@ -14356,9 +14367,17 @@
                   <div><span style="color:var(--text-dim);border-bottom:1px dotted var(--text-dim);cursor:help;" title="Confiance du modèle : probabilité estimée que ce pari gagne. ≥70 % = très fiable.">Conf</span> <strong style="color:var(--text);">${Math.round(p.rel*100)}%</strong></div>
                   <div><span style="color:var(--text-dim);border-bottom:1px dotted var(--text-dim);cursor:help;" title="Edge = notre probabilité − probabilité implicite de la cote. > 0 = on est plus optimiste que le bookmaker (=valeur).">Edge</span> <strong style="color:${edgeColor};">+${Math.round(p.edge*100)}pt</strong></div>
                 </div>
-                <!-- v30 — Mise conseillée + ajusteur Kelly + bouton Winamax
-                     retirés (user n'enregistre pas ses paris, ne mise pas
-                     ici). Reste : signaux du modèle (toggle expand). -->
+                <!-- v32.0 (Phase 2) — CTA Winamax explicit. La variable url
+                     existait mais n'était pas utilisée. Maintenant un bouton
+                     direct ouvre la page match Winamax (deeplink si présent,
+                     sinon homepage paris-sportifs). target=_blank pour ne pas
+                     perdre le contexte du dashboard. rel="noopener noreferrer"
+                     pour sécurité (pas de window.opener). -->
+                <a href="${esc(url)}" target="_blank" rel="noopener noreferrer" data-no-detail="1" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;margin-top:8px;background:linear-gradient(135deg,#fbbf24 0%,#f59e0b 100%);color:#0c0a0a;border:none;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;cursor:pointer;box-shadow:0 4px 12px rgba(251,191,36,.25);transition:transform .12s,box-shadow .12s;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 16px rgba(251,191,36,.35)';" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 12px rgba(251,191,36,.25)';" onclick="event.stopPropagation();" aria-label="Parier ce match sur Winamax (ouvre dans un nouvel onglet)">
+                  <span style="font-size:14px;">💰</span>
+                  <span>Parier sur Winamax</span>
+                  <span style="opacity:.6;font-size:11px;">↗</span>
+                </a>
                 ${allReasons.length ? `
                 <button type="button" class="dpc-toggle" data-toggle-card="${cardId}" data-card="${cardId}" data-match-id="${esc(String(p.m.id || ''))}" data-pick-key="${esc(p.pred.pick.key || '')}" aria-expanded="false" style="width:100%;padding:8px 10px;margin-top:6px;margin-bottom:8px;background:transparent;border:1px dashed var(--border-2);color:var(--text-dim);border-radius:6px;font-size:11.5px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-weight:600;">
                   <span>🔍 Voir l'analyse complète · ${allReasons.length} raison${allReasons.length>1?'s':''}</span>
