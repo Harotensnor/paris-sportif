@@ -758,6 +758,116 @@ def simulate_bet(
     }
 
 
+@mcp.tool()
+def get_recent_results(days: int = 7, sport: str | None = None) -> dict:
+    """Renvoie les résultats récents (matchs settled) sur les N derniers jours.
+
+    Lit results_archive.jsonl pour montrer la perf RÉCENTE — utile quand
+    Théo veut savoir "comment ça se passe ces derniers jours ?".
+
+    Args:
+        days: nombre de jours à inclure (default 7)
+        sport: filtre optionnel (football, tennis, baseball, etc.)
+    """
+    archive_path = PROJECT_ROOT / "results_archive.jsonl"
+    if not archive_path.exists():
+        return {"_error": "results_archive.jsonl absent"}
+    cutoff_ts = (datetime.now(timezone.utc).timestamp() - days * 86400)
+    matches = []
+    try:
+        with open(archive_path, encoding="utf-8") as f:
+            for line in f:
+                try:
+                    rec = json.loads(line)
+                except Exception:
+                    continue
+                arch_at = rec.get("archived_at") or rec.get("date") or ""
+                try:
+                    ts = datetime.fromisoformat(arch_at.replace("Z", "+00:00")).timestamp()
+                except Exception:
+                    continue
+                if ts < cutoff_ts:
+                    continue
+                if sport and rec.get("sport") != sport:
+                    continue
+                matches.append(rec)
+    except Exception as e:
+        return {"_error": f"Read error: {e}"}
+    by_sport: dict[str, int] = {}
+    by_league: dict[str, int] = {}
+    for m in matches:
+        s = m.get("sport") or "unknown"
+        l = m.get("league_code") or m.get("league_name") or "unknown"
+        by_sport[s] = by_sport.get(s, 0) + 1
+        by_league[l] = by_league.get(l, 0) + 1
+    return {
+        "window_days": days,
+        "sport_filter": sport,
+        "n_matches": len(matches),
+        "by_sport": dict(sorted(by_sport.items(), key=lambda x: -x[1])),
+        "top_leagues": dict(sorted(by_league.items(), key=lambda x: -x[1])[:10]),
+        "sample": [
+            {
+                "sport": m.get("sport"),
+                "league": m.get("league_code"),
+                "name": m.get("name"),
+                "date": m.get("date"),
+            }
+            for m in matches[-10:]
+        ],
+    }
+
+
+@mcp.tool()
+def get_drawdown_status(start_bankroll: float = 10.0) -> dict:
+    """Calcule le drawdown courant de l'agent autonome.
+
+    Lit le bankroll history (backtest report) et compute :
+    - NAV courant (final)
+    - Peak NAV historique
+    - Drawdown courant (peak vs current, en %)
+    - Tier de Kelly multiplier appliqué (selon v31.7.210)
+    - Streak (si dispo)
+
+    Args:
+        start_bankroll: NAV initial (default 10€ — agent autonome).
+    """
+    rep = _load_json(BACKTEST_V2)
+    if "_error" in rep:
+        return rep
+    final_nav = rep.get("bankroll_final_kelly") or start_bankroll
+    # Le report ne stocke pas la série complète. On approxime avec final.
+    # Pour un vrai peak tracking, lire la timeline de _agentReplay (côté JS).
+    drawdown_ratio = final_nav / start_bankroll if start_bankroll > 0 else 1.0
+    # Mirror v31.7.210 Kelly tiers
+    if drawdown_ratio < 0.40:
+        kelly_mult, tier = 0.08, "capital_preservation"
+    elif drawdown_ratio < 0.60:
+        kelly_mult, tier = 0.13, "deep_drawdown"
+    elif drawdown_ratio < 0.80:
+        kelly_mult, tier = 0.18, "real_drawdown"
+    elif drawdown_ratio < 1.00:
+        kelly_mult, tier = 0.22, "early_caution"
+    else:
+        kelly_mult, tier = 0.25, "full_sizing"
+    return {
+        "start_bankroll": start_bankroll,
+        "current_nav": round(final_nav, 2),
+        "drawdown_ratio": round(drawdown_ratio, 4),
+        "drawdown_pct": round((drawdown_ratio - 1) * 100, 2),
+        "kelly_multiplier": kelly_mult,
+        "tier": tier,
+        "tier_explanation": {
+            "full_sizing": "NAV ≥ 100% start — Kelly 0.25× (default).",
+            "early_caution": "NAV 80-100% — Kelly 0.22× (-12% sizing).",
+            "real_drawdown": "NAV 60-80% — Kelly 0.18× (-28%).",
+            "deep_drawdown": "NAV 40-60% — Kelly 0.13× (-48%).",
+            "capital_preservation": "NAV < 40% — Kelly 0.08× (-68%, preserve capital).",
+        }.get(tier, ""),
+        "note": "Backtest_v2 final est une approximation — pour le replay vivant, voir le dashboard JS.",
+    }
+
+
 # === Main entry ===
 
 if __name__ == "__main__":
