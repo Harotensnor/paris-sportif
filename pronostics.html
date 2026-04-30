@@ -387,7 +387,7 @@
 <!-- v26.1 — TOPBAR : nav horizontale en haut (plus de sidebar) -->
 <header class="topbar" id="sidebar">
   <div class="topbar-inner">
-    <a class="topbar-brand" data-page-link="dashboard" role="button" tabindex="0" aria-label="Accueil">
+    <a class="topbar-brand" href="#dashboard" data-page-link="dashboard" role="button" tabindex="0" aria-label="Accueil">
       <!-- v31.7.34 — Logo SVG inline (pas de fetch supplémentaire, scalable,
            gradient brand→accent qui rappelle l'identité visuelle).
            Représente une courbe ROI ascendante avec data points. -->
@@ -798,13 +798,12 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-30T16:35:57.955315Z","today":"
   };
 
   // ========== CHANTIER DDD — Mode offline robuste ==========
+  // v32.6 — Fusionné avec setupOfflineBanner (app.js). Garde uniquement le
+  // CSS qui désactive les CTAs externes en mode offline. Le banner visuel
+  // est rendu par app.js (#offline-banner), avec timestamp dynamique. Avant
+  // ce fix, 2 banners coexistaient (#__offline-banner ici + #offline-banner
+  // app.js) → duplication visuelle quand offline.
   function initOffline(){
-    var banner = document.createElement('div');
-    banner.id = '__offline-banner';
-    banner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#f87171;color:#0b0b10;' +
-      'text-align:center;padding:8px;font-size:13px;z-index:99998;display:none;font-weight:600;';
-    banner.innerHTML = '⚠️ Mode hors-ligne · Données figées — actions désactivées';
-    document.body.appendChild(banner);
     var style = document.createElement('style');
     style.textContent =
       'body.__offline a[href*="winamax"], body.__offline .wina-btn, body.__offline .winamax-btn, ' +
@@ -813,11 +812,10 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-30T16:35:57.955315Z","today":"
     document.head.appendChild(style);
     function update(){
       var online = navigator.onLine;
-      banner.style.display = online ? 'none' : 'block';
       document.body.classList.toggle('__offline', !online);
     }
-    window.addEventListener('online', function(){ update(); window.__toast('✅ Connexion rétablie', 'success'); });
-    window.addEventListener('offline', function(){ update(); window.__toast('⚠️ Connexion perdue', 'warn'); });
+    window.addEventListener('online', function(){ update(); window.__toast && window.__toast('✅ Connexion rétablie', 'success'); });
+    window.addEventListener('offline', function(){ update(); window.__toast && window.__toast('⚠️ Connexion perdue', 'warn'); });
     update();
   }
 
