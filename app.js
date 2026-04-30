@@ -6334,14 +6334,21 @@
       // sur ranks proches (|log gap| < 0.30) où le rank seul est unreliable.
       // v31.7.213 — Skip threshold bumped 0.45 → 0.50 d'après backtest_v2
       // sur 411 picks : tier `lowconf` (rel ∈ [0.45, 0.60]) ROI flat -59%.
-      // Le bump retire ~5-10 picks/jour borderline qui détruisent le ROI
-      // sans sacrifier les standards (rel ≥ 0.60, ROI +10%) ni les locks.
+      // v31.7.217 — Heavy fav surconfiance fix : pickedOdd ≤ 1.5 + rel < 0.75
+      // = skip. Backtest 411 picks : heavy_fav (cote ≤ 1.5) WR 69% mais
+      // avg_rel 71.7% → modèle sur-confiant ~3pt → ROI flat -7.7%. En relevant
+      // le seuil à 0.75 spécifiquement pour les heavy_fav, on retire les
+      // picks border-line où l'edge perçu est largement un mirage de bruit.
       skip: reliability < 0.50
         || pureCompCount < (match.sport === 'tennis' ? 1 : 2)
         || (match.sport === 'tennis'
             && !match.tennis_features
             && home?.rank && away?.rank
-            && Math.abs(Math.log(Number(away.rank)) - Math.log(Number(home.rank))) < 0.30),
+            && Math.abs(Math.log(Number(away.rank)) - Math.log(Number(home.rank))) < 0.30)
+        || (best && reliability < 0.75 && (() => {
+            const _po = best_pick[2] === '1' ? best.home : best_pick[2] === '2' ? best.away : best.draw;
+            return typeof _po === 'number' && _po > 0 && _po <= 1.5;
+          })()),
       // v30 — Sports with thin backtest history (basketball/hockey n<10 in
       // backtest_v2) get a stricter lock threshold: 0.75 instead of 0.70.
       // Avoids over-confident "lock" labels on tiny samples.
