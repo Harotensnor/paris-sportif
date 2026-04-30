@@ -13816,11 +13816,12 @@
         <!-- v30 — Daily P&L chip retiré : Théo n'enregistre pas ses paris. -->
 
         <!-- v31.3 — Hero éditorial mobile-first (audit UX dashboard éditorial).
-             Avant : H1 marketing + subtitle verbeux + heroPick card en colonne droite.
-             Après : UNE SEULE promesse au-dessus du fold = TOP PICK clair, sans
-             bruit visuel concurrent. Le visiteur sait en 3s : quel match, quelle
-             cote, quelle confiance, 2 raisons, CTA Voir détail. -->
-        ${heroPick ? (() => {
+             v31.7.206 — REDONDANCE FIX : ed-hero affiche le top pick. Mais
+             action-focus juste au-dessus l'affiche AUSSI dans .action-focus-top.
+             → ed-hero ne s'affiche maintenant que SI action-focus est en empty
+             state (topPicks.length === 0). Sinon redondance triple sur le même
+             match. Économie ~500px d'espace dashboard. -->
+        ${(heroPick && topPicks.length === 0) ? (() => {
           const _reasons = heroPick.pred?.explain?.reasons || [];
           // Top 2 raisons non-marché pour donner du contexte sans saturer
           const _topReasons = _reasons.filter(r => r && r.type !== 'market').slice(0, 2);
