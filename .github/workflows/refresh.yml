@@ -261,10 +261,24 @@ jobs:
           # 30j conservé hors versionning (cf .gitignore).
           # Only stamp sw.js if we have real content changes — otherwise
           # discard the version bump to avoid 288 empty commits/day.
+          # v31.7.216 — Heartbeat safeguard. Si aucun diff staged ET le dernier
+          # auto-refresh > 30 min, on touch ci_heartbeat.txt pour FORCER un
+          # commit + push + sw.js bump. Évite le scénario "data.js stuck"
+          # observé le 30/04 (16:37 UTC → 19:43 UTC = 3h sans push malgré
+          # 30+ ticks success). Cap : 1 commit forcé / 30 min = 48/jour max.
           if git diff --cached --quiet; then
-            git checkout -- sw.js
-            echo "No content changes — sw.js stamp reverted."
-            exit 0
+            LAST_REFRESH=$(git log -1 --grep "data: auto-refresh" --format=%ct origin/main 2>/dev/null || echo "0")
+            NOW=$(date +%s)
+            STALENESS=$((NOW - LAST_REFRESH))
+            if [ "$LAST_REFRESH" -gt 0 ] && [ $STALENESS -gt 1800 ]; then
+              echo "Heartbeat trigger — last auto-refresh ${STALENESS}s ago (>1800s)."
+              echo "{\"tick\":$NOW,\"reason\":\"heartbeat-no-content-diff\"}" > ci_heartbeat.json
+              git add ci_heartbeat.json
+            else
+              git checkout -- sw.js
+              echo "No content changes (last auto-refresh ${STALENESS}s ago) — sw.js stamp reverted."
+              exit 0
+            fi
           fi
           git add sw.js
           git commit -m "data: auto-refresh $(date -u +'%Y-%m-%d %H:%M UTC')"
