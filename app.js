@@ -14143,6 +14143,7 @@
             <header class="ed-hero__top">
               <span class="ed-hero__pill">⭐ Top pick du jour</span>
             </header>
+            <h1 class="ed-hero__match" style="font-size:22px;letter-spacing:-.5px;margin:8px 0 6px;">Aucun pari recommandé</h1>
             <p class="ed-hero__empty">
               <strong>Pas de match avec edge ≥ 5% et confiance ≥ 55%</strong> disponible aujourd'hui.
               <br><br>
@@ -16914,8 +16915,8 @@
       <div style="max-width:1100px;margin:0 auto;padding:16px 8px 24px;">
         <div class="page-header">
           <div style="position:absolute;top:0;left:0;width:40px;height:3px;background:var(--brand);border-radius:0 0 2px 2px;"></div>
-          <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Performance modèle · cron hebdo</div>
-          <h1 class="page-h1">Performance</h1>
+          <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Backtest historique · cron hebdo</div>
+          <h1 class="page-h1">🧪 Backtest</h1>
           <div style="font-size:15px;color:var(--text-dim);max-width:640px;">Backtest réel de <code>predictMatch</code> sur l'archive des matchs réglés. Cron <code>backtest.yml</code> rejoue tous les picks chaque dimanche, ROI/WR/Brier/calibration ci-dessous.</div>
         </div>
 
@@ -17383,9 +17384,9 @@
           <div style="position:absolute;top:0;left:0;width:40px;height:3px;background:var(--brand);border-radius:0 0 2px 2px;"></div>
           <div style="width:56px;height:56px;border-radius:50%;background:var(--panel-2);border:1px solid var(--border-2);display:grid;place-items:center;font-size:22px;color:var(--text);font-weight:800;flex-shrink:0;">T</div>
           <div style="min-width:0;flex:1;">
-            <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:4px;">Compte</div>
-            <h1 style="margin:0 0 4px;font-size:36px;font-weight:800;letter-spacing:-1.2px;color:var(--text);line-height:1;">Théo</h1>
-            <div style="font-size:13px;color:var(--text-dim);">Compte personnel · contact via <a href="legal.html" style="color:var(--brand);">mentions légales</a></div>
+            <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:4px;">Profil &amp; bankroll</div>
+            <h1 style="margin:0 0 4px;font-size:36px;font-weight:800;letter-spacing:-1.2px;color:var(--text);line-height:1;">👤 Théo</h1>
+            <div style="font-size:13px;color:var(--text-dim);">Préférences personnelles · bankroll, seuil lock, cagnotte initiale.</div>
           </div>
         </div>
 
