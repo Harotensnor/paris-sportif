@@ -82,6 +82,9 @@ jobs:
           # ClubElo: single-call CSV fetch, self-throttles to 1 call / 20h so
           # safe to invoke on every tick. Cheap (<100 KB, <1s).
           python3 fetch_clubelo.py || true
+          # v31.7.206 — fbref xG : Expected Goals stats per team for top-6
+          # European leagues. Self-throttles 6h. ~5s typical run.
+          python3 fetch_fbref_xg.py || true
           # Weather (Open-Meteo): free, no key. Script self-throttles — skips
           # if forecast <30min old OR kickoff >6h away. Typical run: <5s.
           python3 fetch_weather.py || true
@@ -107,6 +110,9 @@ jobs:
           python3 patch_lineups_soccer.py || true
           # Patch ClubElo ratings last (survives all prior rewrites). ~0.1s.
           python3 patch_clubelo.py || true
+          # v31.7.206 — Patch fbref xG : enrichit chaque foot competitor avec
+          # xg_for_avg, xg_against_avg, matches_played. ~0.1s. Idempotent.
+          python3 patch_fbref_xg.py || true
           # Patch weather (survives all prior rewrites). Adds ev.weather to
           # football events with a fresh forecast. ~0.1s.
           python3 patch_weather.py || true
