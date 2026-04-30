@@ -1032,28 +1032,32 @@
   }
   try { window._pageTabsHTML = _pageTabsHTML; } catch(e){}
 
-  // Tabs definitions par page-group (réutilisé partout)
+  // v32.0 — Tabs alignés avec la nouvelle nav 3 hubs.
+  // Sister pages share a sub-tabs row pour ne pas perdre le contexte.
   const _PAGE_TAB_GROUPS = {
+    // Hub NOW : picks à parier
     picks: [
       { page: 'top', label: '⭐ Top du jour' },
+      { page: 'valeur', label: '💎 Mismatches' },
       { page: 'plan-mise', label: '🎯 Plan de mise' },
       { page: 'locks', label: '🔒 Locks' },
     ],
-    perf: [
-      { page: 'performance', label: '🎯 Performance modèle' },
-      { page: 'credibilite', label: '📐 Crédibilité' },
-      { page: 'backtest', label: '📈 Backtest' },
-    ],
-    bilan: [
-      { page: 'bilan', label: '💰 Mes paris' },
+    // Hub AGENT : cagnotte + history + perf
+    agent: [
+      { page: 'bilan', label: '💰 Cagnotte' },
       { page: 'historique', label: '📜 Historique' },
+      { page: 'performance', label: '🎯 Performance modèle' },
     ],
-    montantes: [
-      { page: 'montante-jour', label: '📈 Jour' },
-      { page: 'montante-weekend', label: '🗓️ Weekend' },
-      { page: 'montante-semaine', label: '📆 Semaine' },
+    // Hub STATS : analytics deep-dive
+    stats: [
+      { page: 'tous', label: '📋 Tous les matchs' },
+      { page: 'calendrier', label: '📅 Calendrier 7j' },
+      { page: 'credibilite', label: '📊 Crédibilité' },
+      { page: 'backtest', label: '🧪 Backtest' },
     ],
-    favoris: [
+    // Settings (icône)
+    settings: [
+      { page: 'profil', label: '👤 Profil' },
       { page: 'favoris', label: '⭐ Favoris' },
       { page: 'alertes', label: '🔔 Alertes' },
     ],
@@ -19016,13 +19020,18 @@
     document.querySelectorAll('.page-btn').forEach(b => {
       b.classList.toggle('active', b.dataset.page === currentPage);
     });
-    // v31.7.200 — Highlight active hub (Picks/Agenda/Performance/Compte) when current page
-    // is one of its children. Dashboard stays as a solo button.
+    // v32.0 — Refonte navigation 3 hubs orientés intent.
+    // - now    : urgence du moment, ce qu'on parie maintenant
+    // - agent  : la cagnotte autonome 10€ (NAV, history, performance modèle)
+    // - stats  : analytics deep-dive + tous matchs/calendrier + diagnostiques
+    // - account : settings (icône isolée)
+    // Pages legacy (combines, buteurs, montantes, simulator, compare, matchs)
+    // restent navigables via leur data-page mais retirées de la nav principale.
     const HUB_PAGES = {
-      picks:       ['top', 'valeur', 'plan-mise', 'locks', 'combines', 'buteurs'],
-      agenda:      ['tous', 'calendrier', 'montante-jour', 'montante-weekend', 'montante-semaine', 'matchs', 'compare'],
-      performance: ['performance', 'bilan', 'historique', 'simulator', 'credibilite', 'backtest'],
-      account:     ['profil', 'favoris', 'alertes'],
+      now:     ['top', 'valeur', 'plan-mise', 'locks'],
+      agent:   ['bilan', 'historique', 'performance'],
+      stats:   ['tous', 'calendrier', 'credibilite', 'backtest'],
+      account: ['profil', 'favoris', 'alertes'],
     };
     document.querySelectorAll('nav.topbar-nav .hub').forEach(h => {
       const k = h.dataset.hub;
