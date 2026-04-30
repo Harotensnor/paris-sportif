@@ -642,6 +642,122 @@ def get_market_calibration_summary() -> dict:
     }
 
 
+@mcp.tool()
+def get_league_performance(
+    sport: str | None = None,
+    min_picks: int = 5,
+    sort_by: str = "kelly_pnl",
+    limit: int = 20,
+) -> dict:
+    """Renvoie les ligues triées par performance backtest (Kelly cumul, ROI, WR).
+
+    Permet à Théo de demander : 'Quelles ligues le modèle aime le plus ?'
+    Sortie utile pour cibler les paris : ligues avec Kelly cumul > 0 = signal
+    fort que le modèle bat le marché.
+
+    Args:
+        sport: filtre optionnel par sport (football, tennis, mlb, nba, etc.)
+        min_picks: seuil sample-size minimum (default 5)
+        sort_by: 'kelly_pnl' | 'flat_roi_pct' | 'win_rate' | 'n'
+        limit: nombre max de ligues à retourner (default 20)
+
+    Use case : 'Top 10 des ligues les plus rentables.'
+    """
+    rep = _load_json(BACKTEST_V2)
+    if "_error" in rep:
+        return rep
+    by_league = rep.get("by_league") or {}
+    SPORT_PREFIXES = {
+        "football": ("eng.", "esp.", "ger.", "ita.", "fra.", "ned.", "por.",
+                     "tur.", "bel.", "sco.", "bra.", "arg.", "uru.", "chi.",
+                     "col.", "ecu.", "per.", "mex.", "jpn.", "kor.", "chn.",
+                     "tha.", "idn.", "nor.", "swe.", "den.", "uefa.", "fifa.",
+                     "world.", "concacaf.", "conmebol."),
+        "tennis": ("atp", "wta",),
+        "basketball": ("nba", "wnba",),
+        "hockey": ("nhl",),
+        "baseball": ("mlb",),
+    }
+    out = []
+    for code, st in by_league.items():
+        n = st.get("n") or 0
+        if n < min_picks:
+            continue
+        if sport:
+            prefixes = SPORT_PREFIXES.get(sport.lower())
+            if not prefixes:
+                continue
+            if not any(code.startswith(p) for p in prefixes) and code not in prefixes:
+                continue
+        out.append({
+            "league": code,
+            "n": n,
+            "win_rate": round(st.get("win_rate") or 0, 4),
+            "flat_roi_pct": round(st.get("flat_roi_pct") or 0, 2),
+            "kelly_pnl": round(st.get("kelly_pnl") or 0, 2),
+            "brier": round(st.get("brier") or 0, 4) if st.get("brier") else None,
+            "avg_cote": round(st.get("avg_cote") or 0, 2) if st.get("avg_cote") else None,
+        })
+    valid_keys = {"kelly_pnl", "flat_roi_pct", "win_rate", "n"}
+    sk = sort_by if sort_by in valid_keys else "kelly_pnl"
+    out.sort(key=lambda x: -(x.get(sk) or 0))
+    return {
+        "generated_at": rep.get("generated_at"),
+        "filter": {"sport": sport, "min_picks": min_picks, "sort_by": sk},
+        "n_leagues": len(out[:limit]),
+        "leagues": out[:limit],
+    }
+
+
+@mcp.tool()
+def simulate_bet(
+    stake: float,
+    decimal_odd: float,
+    bankroll: float = 10.0,
+) -> dict:
+    """Simule un pari : NAV après win/lose + impact %.
+
+    Calculs purement utilitaires — pas de prediction. Utile pour Théo qui veut
+    visualiser l'impact d'un sizing avant de cliquer.
+
+    Args:
+        stake: montant à miser (€)
+        decimal_odd: cote décimale (ex: 1.85)
+        bankroll: NAV courant (€) — default 10€ (NAV agent init)
+
+    Returns:
+        scenarios win/lose : NAV after, delta_pct, gain.
+    """
+    if stake <= 0 or decimal_odd <= 1.0 or bankroll <= 0:
+        return {"_error": "Invalid params: stake>0, decimal_odd>1.0, bankroll>0"}
+    if stake > bankroll:
+        return {"_error": f"Stake {stake}€ exceeds bankroll {bankroll}€"}
+    gain_if_win = stake * (decimal_odd - 1)
+    nav_if_win = bankroll + gain_if_win
+    nav_if_lose = bankroll - stake
+    pct_of_bankroll = (stake / bankroll) * 100
+    return {
+        "input": {"stake": stake, "decimal_odd": decimal_odd, "bankroll": bankroll},
+        "stake_pct_of_bankroll": round(pct_of_bankroll, 2),
+        "if_win": {
+            "gain": round(gain_if_win, 2),
+            "nav_after": round(nav_if_win, 2),
+            "delta_pct": round((nav_if_win - bankroll) / bankroll * 100, 2),
+        },
+        "if_lose": {
+            "loss": round(-stake, 2),
+            "nav_after": round(nav_if_lose, 2),
+            "delta_pct": round((nav_if_lose - bankroll) / bankroll * 100, 2),
+        },
+        "implied_break_even_wr": round(1 / decimal_odd, 4),
+        "note": (
+            f"Pour rentable long-terme @{decimal_odd}, WR doit dépasser "
+            f"{round(100/decimal_odd, 1)}%. Vérifie reliability du pick avant "
+            f"de miser."
+        ),
+    }
+
+
 # === Main entry ===
 
 if __name__ == "__main__":
