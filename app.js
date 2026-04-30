@@ -25076,6 +25076,78 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         <strong style="color:var(--text);">⚠️ Epoch ${ALIGNMENT_EPOCH_ISO}</strong> — Avant cette date, l'alignement des cotes Winamax 1n2 inversait home/away sur ~65 events (tennis, basket, hockey, foot). Les paris pris avant le ${ALIGNMENT_EPOCH_ISO} ont une part de phantom edge dans le bilan rétro. À partir de ce jour, c'est propre. <a href="#credibilite" style="color:var(--accent);">Détails →</a>
       </div>
     ` : '';
+    // v32.0 (Phase 3) — Widget "État Agent autonome" en hero du Bilan.
+    // Lit _agentReplay() pour exposer : NAV courant, drawdown tier, streak,
+    // pause status. Theo voit en 1 coup d'œil l'état de sa cagnotte +
+    // les protections actives (drawdown protection v31.7.210 + tilt v31.7.218).
+    const _agentWidget = (() => {
+      try {
+        const a = (typeof _agentReplay === 'function') ? _agentReplay() : null;
+        if (!a) return '';
+        const nav = a.nav || 0;
+        const start = a.start || 10;
+        const ratio = start > 0 ? nav / start : 0;
+        const navColor = ratio >= 1.0 ? 'var(--accent)' : ratio >= 0.8 ? 'var(--warn,#fbbf24)' : 'var(--danger)';
+        const navSign = nav >= start ? '+' : '';
+        const deltaPct = ((ratio - 1) * 100);
+        // Tier drawdown (v31.7.210)
+        let tier, tierLabel, kelly, tierColor;
+        if (ratio < 0.40)      { tier = 'capital_preservation'; tierLabel = 'Préservation'; kelly = 0.08; tierColor = 'var(--danger)'; }
+        else if (ratio < 0.60) { tier = 'deep_drawdown';        tierLabel = 'Drawdown profond'; kelly = 0.13; tierColor = 'var(--danger)'; }
+        else if (ratio < 0.80) { tier = 'real_drawdown';        tierLabel = 'Drawdown'; kelly = 0.18; tierColor = 'var(--warn,#fbbf24)'; }
+        else if (ratio < 1.00) { tier = 'early_caution';        tierLabel = 'Vigilance'; kelly = 0.22; tierColor = 'var(--warn,#fbbf24)'; }
+        else                    { tier = 'full_sizing';          tierLabel = 'Pleine puissance'; kelly = 0.25; tierColor = 'var(--accent)'; }
+        // Streak / pause (v31.7.218)
+        const streakCount = a.currentLossStreak || 0;
+        const pauseCount = a.streakPauseCount || 0;
+        const currentlyPausedUntil = a.currentlyPausedUntil || null;
+        const isPaused = currentlyPausedUntil && currentlyPausedUntil > Date.now();
+        const pausedRemainingMs = isPaused ? (currentlyPausedUntil - Date.now()) : 0;
+        const pausedHours = Math.ceil(pausedRemainingMs / 3600000);
+        // Build the widget
+        return `
+          <div style="max-width:1280px;margin:18px auto 12px;padding:18px 22px;background:linear-gradient(135deg,var(--panel) 0%, var(--panel-2) 100%);border:1px solid var(--border-2);border-left:4px solid ${navColor};border-radius:var(--r-md);box-shadow:var(--shadow-sm);font-variant-numeric:tabular-nums;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;">
+              <div style="flex:1;min-width:240px;">
+                <div style="font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:4px;">🤖 Agent autonome · cagnotte 10€ J1</div>
+                <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;">
+                  <span style="font-size:34px;font-weight:800;color:${navColor};letter-spacing:-1.2px;line-height:1;">${nav.toFixed(2)}€</span>
+                  <span style="font-size:14px;color:${navColor};font-weight:700;">${navSign}${deltaPct.toFixed(1)}%</span>
+                  <span style="font-size:12px;color:var(--text-dim);">vs ${start}€ init</span>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+                <div style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:rgba(${tier === 'full_sizing' ? '52,211,153' : tier === 'early_caution' || tier === 'real_drawdown' ? '251,191,36' : '252,165,165'},.12);border:1px solid ${tierColor};border-radius:999px;font-size:11.5px;font-weight:700;color:${tierColor};">
+                  ${tier === 'full_sizing' ? '🟢' : tier === 'early_caution' || tier === 'real_drawdown' ? '🟡' : '🔴'} ${tierLabel}
+                </div>
+                <div style="font-size:10.5px;color:var(--text-dim);">Kelly multiplier ×${kelly.toFixed(2)}</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:18px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border);flex-wrap:wrap;font-size:12px;">
+              <div>
+                <span style="color:var(--text-dim2);">Pertes consécutives</span>
+                <strong style="color:${streakCount >= 3 ? 'var(--warn,#fbbf24)' : 'var(--text)'};margin-left:6px;">${streakCount}</strong>
+                ${streakCount >= 5 ? `<span style="color:var(--danger);font-size:10.5px;margin-left:4px;">⚠ pause imminente</span>` : ''}
+              </div>
+              <div>
+                <span style="color:var(--text-dim2);">Pauses tilt déclenchées</span>
+                <strong style="color:var(--text);margin-left:6px;">${pauseCount}</strong>
+                <span style="color:var(--text-dim2);font-size:10.5px;margin-left:4px;">(seuil 5 perdants)</span>
+              </div>
+              ${isPaused ? `
+                <div style="padding:4px 10px;background:rgba(252,165,165,.10);border:1px solid var(--danger);border-radius:6px;color:var(--danger);font-weight:700;">
+                  ⏸ Pause active · reprise dans ${pausedHours}h
+                </div>
+              ` : `
+                <div style="color:var(--text-dim);font-size:11.5px;">
+                  ✓ Aucune pause active
+                </div>
+              `}
+            </div>
+          </div>`;
+      } catch (e) { return ''; }
+    })();
+
     wrap.innerHTML = `
       <div class="page-wrap">
         <div class="page-header">
@@ -25085,6 +25157,7 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
           <div style="font-size:14px;color:var(--text-dim);max-width:700px;">${_bilanSport ? `Drill-down <strong style="color:var(--text);">${esc(sportLabel(_bilanSport))}</strong> — toutes les stats ci-dessous sont filtrées sur ce sport uniquement.` : `Le modèle gagne-t-il de l'argent en mise fixe ? Courbe, rentabilité, risque et comparaison sport par sport.`}</div>
         </div>
       </div>
+      ${_agentWidget}
       ${epochBannerHtml}
 
       <!-- v26.5 — SPORT FILTER PILLS (drill-down) -->
