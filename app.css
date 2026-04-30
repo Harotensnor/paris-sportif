@@ -5870,6 +5870,59 @@
   }
 
   /* ===========================================================
+     v31.7.201 — Page-tabs (sister pages navigation)
+     Mini-tabs bar en haut des pages liées (Top/Plan/Locks etc.)
+     =========================================================== */
+  .page-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 6px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    margin: 0 0 16px;
+    font-size: 12.5px;
+  }
+  .page-tabs-btn {
+    flex: 1 1 auto;
+    min-width: max-content;
+    padding: 8px 14px;
+    background: transparent;
+    color: var(--text-dim);
+    border: none;
+    border-radius: var(--r-sm);
+    cursor: pointer;
+    font-size: 12.5px;
+    font-weight: 600;
+    font-family: inherit;
+    text-align: center;
+    transition: background .15s, color .15s;
+    white-space: nowrap;
+  }
+  .page-tabs-btn:hover {
+    background: var(--panel-2);
+    color: var(--text);
+  }
+  .page-tabs-btn.active {
+    background: var(--brand);
+    color: #08080a;
+  }
+  .page-tabs-btn:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+  }
+  @media (max-width: 520px) {
+    .page-tabs {
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      scrollbar-width: none;
+    }
+    .page-tabs::-webkit-scrollbar { display: none; }
+    .page-tabs-btn { flex: 0 0 auto; }
+  }
+
+  /* ===========================================================
      v31.7.200 — Refacto NAV : 4 hubs + footer + icon button
      =========================================================== */
 
