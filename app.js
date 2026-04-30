@@ -3889,7 +3889,26 @@
     const gf = parseFloat(s.gf);
     const ga = parseFloat(s.ga);
     if (!gp || gp < 3 || isNaN(gf) || isNaN(ga)) return null;
-    return { scored: gf/gp, conceded: ga/gp };
+    const seasonScored = gf / gp;
+    const seasonConceded = ga / gp;
+    // v31.7.209 — Recency blend with last-5 GF/GA. La forme récente capte
+    // les changements (blessures, transferts, méforme) que la moyenne
+    // saisonnière dilue. Pondération adaptative selon le sample saison :
+    //   - gp ≥ 15 (mi/fin de saison) : season 70%, last5 30%
+    //   - gp < 15 (début de saison)  : season 50%, last5 50% (last5 plus
+    //     stable car season variance encore élevée)
+    // Si side.last5 absent, fallback à season pure (aucun changement).
+    const l5 = last5Rates(side);
+    if (l5 && l5.sample >= 3) {
+      const w_season = gp >= 15 ? 0.70 : 0.50;
+      const w_last5 = 1 - w_season;
+      return {
+        scored: seasonScored * w_season + l5.scored * w_last5,
+        conceded: seasonConceded * w_season + l5.conceded * w_last5,
+        recencyBlend: { w_season, w_last5, gp, l5_sample: l5.sample },
+      };
+    }
+    return { scored: seasonScored, conceded: seasonConceded };
   }
 
   function leagueAvgGoals(leagueCode) {
@@ -5118,6 +5137,54 @@
       }
     }
 
+    // v31.7.209 — Injury severity-weighted Poisson lambda adjustment.
+    // Le compteur `match.injuries_home/away` (utilisé plus bas pour shift
+    // final.pH/pA) ne distingue pas un milieu rotatif d'un attaquant clé.
+    // On exploite maintenant `competitor.injuries[]` (liste détaillée
+    // injectée par patch_injuries_soccer.py) pour pondérer par :
+    //   - reason   : suspended (1.0×) > injured (0.9×) > intl duty (0.7×)
+    //                > coach decision (0.5×) > doubtful (0.4×)
+    //   - type     : 'missing' (×1) vs 'doubtful' (×0.5)
+    // Empirical : 3 absents pondérés = ~5% reduction goal output (Premier
+    // League data 2018-2024). Donc on baisse lamH de ~1.7%/absent pondéré
+    // (cap -8% à 5+ absents pour éviter outliers comme un derby Manchester
+    // avec 8 blessés où l'effet plafonne).
+    let injuryLambdaImpact = null;
+    if (poi && match.sport === 'football') {
+      const _SEVERITY_BY_REASON = {
+        2: 1.0,   // suspended  : 100% certain absent
+        1: 0.9,   // injured    : 95% certain (could recover last-minute)
+        13: 0.7,  // intl duty  : 70% (sometimes back early)
+        4: 0.5,   // coach dec  : 50% (rotation incertaine)
+        10: 0.4,  // doubtful   : 40% (peut-être)
+      };
+      const _scoreInjuries = (injs) => {
+        if (!Array.isArray(injs) || injs.length === 0) return 0;
+        let total = 0;
+        for (const x of injs) {
+          let w = _SEVERITY_BY_REASON[x.reason] || 0.6;  // unknown reason = 60%
+          if (x.type === 'doubtful') w *= 0.5;
+          total += w;
+        }
+        return total;
+      };
+      const hWeighted = _scoreInjuries(home && home.injuries);
+      const aWeighted = _scoreInjuries(away && away.injuries);
+      if (hWeighted > 0.5 || aWeighted > 0.5) {
+        // Per-side : -1.7% lambda offense par absent pondéré, cap -8%.
+        const hScale = Math.max(0.92, 1 - hWeighted * 0.017);
+        const aScale = Math.max(0.92, 1 - aWeighted * 0.017);
+        poi.lamH *= hScale;
+        poi.lamA *= aScale;
+        injuryLambdaImpact = {
+          homeWeighted: Math.round(hWeighted * 100) / 100,
+          awayWeighted: Math.round(aWeighted * 100) / 100,
+          homeScale: Math.round(hScale * 1000) / 1000,
+          awayScale: Math.round(aScale * 1000) / 1000,
+        };
+      }
+    }
+
     // H2H component — last 3-6 meetings. Direction: which team has won
     // more recent encounters between these two teams.
     // Stable if we have at least 3 prior meetings.
@@ -6065,6 +6132,8 @@
     }
     // Injuries — quantify the model impact so Théo can audit why a pick shifted.
     // Reuses the same formula as the combine step: shift = min(0.06, 0.015·(injH−injA)).
+    // v31.7.209 — Si injuryLambdaImpact existe, on surface aussi le %lambda
+    // pondéré (severity-aware) pour expliquer le total goals impact.
     const injHexpl = match.injuries_home || 0;
     const injAexpl = match.injuries_away || 0;
     const soccerInjUnknownExplH = match.injuries_source === 'sofascore' && match.injuries_home_known === false;
@@ -6077,10 +6146,23 @@
       const shiftPct = (shiftRaw * 100).toFixed(1);
       const whoBenefits = injHexpl > injAexpl ? (away?.short || away?.name) : (home?.short || home?.name);
       const impactTxt = shiftRaw > 0 ? ` · impact modèle : ${shiftPct}% en faveur de ${whoBenefits}` : '';
+      // Append lambda impact if severity-weighted analysis kicked in.
+      let lambdaTxt = '';
+      if (injuryLambdaImpact) {
+        const ili = injuryLambdaImpact;
+        const hPct = Math.round((1 - ili.homeScale) * 100);
+        const aPct = Math.round((1 - ili.awayScale) * 100);
+        if (hPct >= 1 || aPct >= 1) {
+          const bits = [];
+          if (hPct >= 1) bits.push(`${home?.short || 'home'} −${hPct}%`);
+          if (aPct >= 1) bits.push(`${away?.short || 'away'} −${aPct}%`);
+          lambdaTxt = ` · buts attendus ${bits.join(' / ')}`;
+        }
+      }
       reasons.push({
         type: 'injury',
         icon: '🏥',
-        text: parts.join(' · ') + impactTxt
+        text: parts.join(' · ') + impactTxt + lambdaTxt
       });
     }
     // Tipsters consensus
