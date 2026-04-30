@@ -262,26 +262,30 @@ jobs:
           # 30j conservé hors versionning (cf .gitignore).
           # Only stamp sw.js if we have real content changes — otherwise
           # discard the version bump to avoid 288 empty commits/day.
-          # v31.7.221 — Heartbeat safeguard (fix v31.7.216 qui ne marchait pas
-          # sur fetch-depth=1). On regarde maintenant le mtime du fichier
-          # ci_heartbeat.json au lieu de scanner l'historique git. Si > 30 min,
-          # on bump le heartbeat → forced commit. Garantit max 30 min sans
-          # push même si tous les fetch scripts skip.
+          # v31.7.222 — Heartbeat safeguard (fix v31.7.221 qui utilisait `stat
+          # -c %Y` = mtime fichier, lequel est mis à NOW à chaque `git checkout`
+          # sur GHA → STALENESS toujours ~0 → heartbeat ne déclenche jamais).
+          # Maintenant on lit le `tick` field DANS le JSON pour avoir le vrai
+          # timestamp du dernier write réel.
           if git diff --cached --quiet; then
             NOW=$(date +%s)
             HEARTBEAT_FILE="ci_heartbeat.json"
             STALENESS=99999
             if [ -f "$HEARTBEAT_FILE" ]; then
-              LAST_HB=$(stat -c %Y "$HEARTBEAT_FILE" 2>/dev/null || echo "0")
-              STALENESS=$((NOW - LAST_HB))
+              # Extract `tick` field from JSON (number, no quotes around it).
+              # Falls back to 0 if missing or unparseable → triggers heartbeat.
+              LAST_HB=$(grep -oE '"tick":\s*[0-9]+' "$HEARTBEAT_FILE" 2>/dev/null | grep -oE '[0-9]+' | head -1)
+              if [ -n "$LAST_HB" ]; then
+                STALENESS=$((NOW - LAST_HB))
+              fi
             fi
             if [ $STALENESS -gt 1800 ]; then
-              echo "Heartbeat trigger — last $HEARTBEAT_FILE write ${STALENESS}s ago (>1800s)."
+              echo "Heartbeat trigger — last tick was ${STALENESS}s ago (>1800s threshold)."
               echo "{\"tick\":$NOW,\"reason\":\"heartbeat-no-content-diff\",\"date\":\"$(date -u +'%Y-%m-%dT%H:%M:%SZ')\"}" > "$HEARTBEAT_FILE"
               git add "$HEARTBEAT_FILE"
             else
               git checkout -- sw.js
-              echo "No content changes (last heartbeat ${STALENESS}s ago) — sw.js stamp reverted."
+              echo "No content changes (last heartbeat tick ${STALENESS}s ago) — sw.js stamp reverted."
               exit 0
             fi
           fi
