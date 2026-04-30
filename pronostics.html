@@ -479,43 +479,49 @@
      comparer, matchs détectés) restent accessibles via leur data-page mais
      ne sont plus dans la nav principale (accès via dashboard liens / URL directe).
 -->
-<nav class="topbar-nav" id="page-nav" aria-label="Navigation principale">
-  <button class="page-btn hub-solo active" data-page="dashboard">🏠 Accueil <span class="count" id="count-dashboard-actions" style="display:none;"></span></button>
+<!-- v32.0 — Refonte navigation : 3 hubs orientés intent (Now/Agent/Stats).
+     Réduit 25+ destinations → 11 (-58%). Voir REDESIGN-V32.md.
 
-  <div class="hub" data-hub="picks">
-    <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">💰 Picks <span class="chev">▾</span></button>
+     - NOW   : urgence du moment. Dashboard + tous les pages "à parier".
+     - AGENT : la cagnotte autonome 10€ + bilan personnel.
+     - STATS : analytics + tous matchs/calendrier + settings (icône à part).
+
+     Pages legacy (combines, buteurs, montantes, simulator, compare, matchs)
+     restent accessibles via leur data-page et URL directe (deeplinks et
+     bookmarks préservés), mais retirées de la nav principale. -->
+<nav class="topbar-nav" id="page-nav" aria-label="Navigation principale">
+  <button class="page-btn hub-solo active" data-page="dashboard">⚡ Now <span class="count" id="count-dashboard-actions" style="display:none;"></span></button>
+
+  <div class="hub" data-hub="now">
+    <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">🎯 Picks <span class="chev">▾</span></button>
     <div class="hub-menu" role="menu" aria-label="Sous-menu Picks">
       <button class="page-btn" role="menuitem" data-page="top">⭐ Top du jour</button>
-      <button class="page-btn" role="menuitem" data-page="valeur">💎 Mismatches marché<span class="nav-new-badge" data-new-until="2026-06-30">Nouveau</span></button>
+      <button class="page-btn" role="menuitem" data-page="valeur">💎 Mismatches marché</button>
       <button class="page-btn" role="menuitem" data-page="plan-mise">🎯 Plan de mise</button>
       <button class="page-btn" role="menuitem" data-page="locks">🔒 Locks <span class="count" id="count-locks">0</span></button>
-      <button class="page-btn" role="menuitem" data-page="combines">🔗 Combinés</button>
-      <button class="page-btn" role="menuitem" data-page="buteurs">⚽ Buteurs</button>
     </div>
   </div>
 
-  <div class="hub" data-hub="agenda">
-    <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">🗓️ Agenda <span class="chev">▾</span></button>
-    <div class="hub-menu" role="menu" aria-label="Sous-menu Agenda">
+  <div class="hub" data-hub="agent">
+    <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">🤖 Agent <span class="chev">▾</span></button>
+    <div class="hub-menu" role="menu" aria-label="Sous-menu Agent">
+      <button class="page-btn" role="menuitem" data-page="bilan">💰 Cagnotte autonome</button>
+      <button class="page-btn" role="menuitem" data-page="historique">📜 Historique paris</button>
+      <button class="page-btn" role="menuitem" data-page="performance">🎯 Performance modèle</button>
+    </div>
+  </div>
+
+  <div class="hub" data-hub="stats">
+    <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">📊 Stats <span class="chev">▾</span></button>
+    <div class="hub-menu" role="menu" aria-label="Sous-menu Stats">
       <button class="page-btn" role="menuitem" data-page="tous">📋 Tous les matchs</button>
       <button class="page-btn" role="menuitem" data-page="calendrier">📅 Calendrier 7j</button>
-      <button class="page-btn" role="menuitem" data-page="montante-jour">📈 Montante jour</button>
-      <button class="page-btn" role="menuitem" data-page="montante-weekend">🗓️ Montante weekend</button>
-      <button class="page-btn" role="menuitem" data-page="montante-semaine">📆 Montante semaine</button>
+      <button class="page-btn" role="menuitem" data-page="credibilite">📊 Crédibilité</button>
+      <button class="page-btn" role="menuitem" data-page="backtest">🧪 Backtest</button>
     </div>
   </div>
 
-  <div class="hub" data-hub="performance">
-    <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">📊 Performance <span class="chev">▾</span></button>
-    <div class="hub-menu" role="menu" aria-label="Sous-menu Performance">
-      <button class="page-btn" role="menuitem" data-page="performance">🎯 Performance modèle</button>
-      <button class="page-btn" role="menuitem" data-page="bilan">💰 Mes paris</button>
-      <button class="page-btn" role="menuitem" data-page="historique">📜 Historique</button>
-      <button class="page-btn" role="menuitem" data-page="simulator">🧪 Simulator<span class="nav-new-badge" data-new-until="2026-06-30">Nouveau</span></button>
-    </div>
-  </div>
-
-  <!-- v31.7.200 — Bouton settings séparé (icône) : profil + favoris + alertes -->
+  <!-- Settings : icône isolée (profil/favoris/alertes/santé pipeline) -->
   <div class="hub" data-hub="account">
     <button class="hub-btn hub-btn-icon" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Compte &amp; paramètres" title="Compte & paramètres">⚙️ <span class="chev">▾</span></button>
     <div class="hub-menu" role="menu" aria-label="Sous-menu Compte">
@@ -683,31 +689,30 @@
      3 entrées principales pour les tâches les plus fréquentes : Accueil
      (vue value picks), Tous les matchs, Mes locks. Réduit la dépendance aux
      hubs à chevrons en topbar pour la navigation principale mobile. -->
-<!-- v31.7.200 — Bottom nav refacto : 4 items alignés avec les 4 hubs desktop. -->
+<!-- v32.0 — Bottom nav refacto : 4 items orientés intent (Now/Agent/Stats + Menu). -->
 <nav id="mobile-bottom-nav" class="mobile-bottom-nav" role="navigation" aria-label="Navigation mobile principale">
-  <button type="button" class="mbn-btn page-btn" data-page="dashboard" aria-label="Accueil">
-    <span class="mbn-icon" aria-hidden="true">🏠</span>
-    <span class="mbn-label">Accueil</span>
+  <button type="button" class="mbn-btn page-btn" data-page="dashboard" aria-label="Now — picks à parier maintenant">
+    <span class="mbn-icon" aria-hidden="true">⚡</span>
+    <span class="mbn-label">Now</span>
     <span class="mbn-badge" id="mbn-badge-dashboard" hidden></span>
   </button>
-  <button type="button" class="mbn-btn page-btn" data-page="top" aria-label="Picks à parier">
-    <span class="mbn-icon" aria-hidden="true">⭐</span>
+  <button type="button" class="mbn-btn page-btn" data-page="top" aria-label="Top picks">
+    <span class="mbn-icon" aria-hidden="true">🎯</span>
     <span class="mbn-label">Picks</span>
     <span class="mbn-badge" id="mbn-badge-locks" hidden></span>
   </button>
-  <button type="button" class="mbn-btn page-btn" data-page="tous" aria-label="Agenda &amp; calendrier">
-    <span class="mbn-icon" aria-hidden="true">🗓️</span>
-    <span class="mbn-label">Agenda</span>
+  <button type="button" class="mbn-btn page-btn" data-page="bilan" aria-label="Agent — cagnotte autonome">
+    <span class="mbn-icon" aria-hidden="true">🤖</span>
+    <span class="mbn-label">Agent</span>
   </button>
-  <button type="button" class="mbn-btn page-btn" data-page="performance" aria-label="Performance &amp; bilan">
+  <button type="button" class="mbn-btn page-btn" data-page="performance" aria-label="Stats — performance modèle">
     <span class="mbn-icon" aria-hidden="true">📊</span>
-    <span class="mbn-label">Perf</span>
+    <span class="mbn-label">Stats</span>
   </button>
-  <!-- v31.5 — 5e item : ouvre la sidebar drawer (toutes les autres catégories).
-       Réutilise le hamburger existant via dispatchEvent. -->
+  <!-- Bouton menu : tous les autres pages + settings -->
   <button type="button" class="mbn-btn" id="mbn-menu-btn" aria-label="Plus d'options" aria-controls="page-nav">
     <span class="mbn-icon" aria-hidden="true">☰</span>
-    <span class="mbn-label">Menu</span>
+    <span class="mbn-label">Plus</span>
   </button>
 </nav>
 
