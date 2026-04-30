@@ -234,13 +234,32 @@ def main() -> int:
     tournaments = catalog.get('tournaments') or []
     if not tournaments:
         print('WARN: catalog has no tournaments — nothing to scrape.')
-        OUT.write_text(json.dumps({'generated_at': datetime.utcnow().isoformat() + 'Z', 'matches': {}}), encoding='utf-8')
+        # v31.7.211 — Ne PAS écraser un markets.json existant qui contiendrait
+        # les 1N2 du catalog. Sortir cleanly.
         return 0
+
+    # v31.7.211 — BUG FIX : depuis le refactor SPA Winamax (~Q4 2025), les
+    # pages tournoi servent un PRELOADED_STATE squelettique sans bet titles
+    # ni oddIds peuplés. Ce script extrait donc 0 OU/BTTS sur >99% des
+    # tournois. AVANT ce fix il ÉCRASAIT le markets.json (qui contient les
+    # 1N2 produits par fetch_winamax_catalog.py) avec un dict vide → l'agent
+    # se retrouvait sans cotes 1N2 du tout. MAINTENANT on MERGE : on lit
+    # l'existant, on n'écrase une entrée existante que si la nouvelle
+    # contient strictement plus de markets (pas juste un 1N2 redondant).
+    existing: dict[str, dict] = {}
+    if OUT.exists():
+        try:
+            existing_data = json.loads(OUT.read_text(encoding='utf-8'))
+            existing = existing_data.get('matches') or {}
+        except Exception as e:
+            print(f'  WARN: failed to read existing {OUT.name}: {e}', flush=True)
+            existing = {}
+    print(f'  preserving {len(existing)} existing matches with markets (from catalog 1N2)', flush=True)
 
     t0 = time.time()
     print(f'[{datetime.now():%H:%M:%S}] fetch_winamax_markets: {len(tournaments)} tournaments', flush=True)
 
-    all_matches: dict[str, dict] = {}
+    extracted_matches: dict[str, dict] = {}
     for i, t in enumerate(tournaments):
         if t.get('match_count', 0) == 0:
             continue
@@ -252,18 +271,46 @@ def main() -> int:
             continue
         extracted = extract_markets_from_state(state)
         for mid, mk in extracted.items():
-            all_matches[mid] = mk
+            extracted_matches[mid] = mk
         if (i + 1) % 10 == 0:
-            print(f'  [{i+1}/{len(tournaments)}] processed, running total: {len(all_matches)} matches with markets', flush=True)
+            print(f'  [{i+1}/{len(tournaments)}] processed, running total: {len(extracted_matches)} matches with markets', flush=True)
         time.sleep(0.4)  # politesse
 
     elapsed = time.time() - t0
-    print(f'[{datetime.now():%H:%M:%S}] Done: {len(all_matches)} matches with markets ({elapsed:.1f}s)', flush=True)
+    print(f'[{datetime.now():%H:%M:%S}] Scraped: {len(extracted_matches)} matches with extracted markets ({elapsed:.1f}s)', flush=True)
+
+    # v31.7.211 — Merge strategy : start with existing (catalog 1N2),
+    # overlay extracted (which may add ou25/btts to a match's odds dict).
+    merged: dict[str, dict] = {}
+    n_added_ou25 = n_added_btts = n_kept = 0
+    for mid, mk in existing.items():
+        merged[mid] = mk
+        n_kept += 1
+    for mid, ext_mk in extracted_matches.items():
+        ext_odds = ext_mk.get('odds') or {}
+        if mid in merged:
+            # Merge odds dicts : keep existing keys, add new ones.
+            cur_odds = merged[mid].setdefault('odds', {})
+            for k, v in ext_odds.items():
+                if k not in cur_odds:
+                    cur_odds[k] = v
+                    if k == 'ou25': n_added_ou25 += 1
+                    elif k == 'btts': n_added_btts += 1
+            merged[mid]['fetched_at'] = ext_mk.get('fetched_at') or merged[mid].get('fetched_at')
+        else:
+            # Brand new match — but only persist if it actually has odds.
+            if ext_odds:
+                merged[mid] = ext_mk
+                if 'ou25' in ext_odds: n_added_ou25 += 1
+                if 'btts' in ext_odds: n_added_btts += 1
+
+    print(f'  merge complete : {len(merged)} total matches '
+          f'(+{n_added_ou25} ou25, +{n_added_btts} btts added to existing)', flush=True)
 
     OUT.write_text(
         json.dumps({
             'generated_at': datetime.utcnow().isoformat() + 'Z',
-            'matches': all_matches,
+            'matches': merged,
         }, ensure_ascii=False, separators=(',', ':')),
         encoding='utf-8',
     )
