@@ -526,23 +526,6 @@
   </div>
 </nav>
 
-<!-- v31.7.200 — Footer doc/legal site-wide (visible scroll bottom) -->
-<footer id="site-footer-spa" class="site-footer-spa" role="contentinfo" aria-label="Pied de page documentation">
-  <div class="site-footer-inner">
-    <span class="site-footer-section">📚 Apprendre :</span>
-    <a href="methodologie.html">📐 Méthodologie</a>
-    <a href="academie.html">📚 Académie</a>
-    <a href="comment-lire-un-prono.html">📖 Comment lire un prono</a>
-    <span class="site-footer-sep" aria-hidden="true">·</span>
-    <span class="site-footer-section">🔍 Transparence :</span>
-    <a href="backtest.html">📈 Backtest</a>
-    <a href="legal.html">⚖ Légal</a>
-    <a href="https://github.com/Harotensnor/paris-sportif" target="_blank" rel="noopener noreferrer">🐙 GitHub</a>
-    <span class="site-footer-sep" aria-hidden="true">·</span>
-    <span class="site-footer-disclaimer">18+ · Jouer comporte des risques · <a href="https://www.joueurs-info-service.fr/" target="_blank" rel="noopener">Joueurs Info Service</a></span>
-  </div>
-</footer>
-
 <!-- Refresh indicator flottant — hors du header car backdrop-filter du header
      crée un nouveau containing block qui piège les position:fixed descendants -->
 <div id="refresh-indicator" class="refresh-indicator topbar-refresh" aria-live="polite">
@@ -1639,5 +1622,24 @@ window.PRONOSTICS_DATA = {"generated_at":"2026-04-30T15:25:25.551698Z","today":"
   });
 })();
 </script>
+
+<!-- v31.7.203 — Footer doc/legal site-wide (DÉPLACÉ EN FIN DE BODY).
+     Avant : footer juste après nav → s'affichait en haut du viewport.
+     Maintenant : avant </body> → vraiment en bas du document, après main. -->
+<footer id="site-footer-spa" class="site-footer-spa" role="contentinfo" aria-label="Pied de page documentation">
+  <div class="site-footer-inner">
+    <span class="site-footer-section">📚 Apprendre :</span>
+    <a href="methodologie.html">📐 Méthodologie</a>
+    <a href="academie.html">📚 Académie</a>
+    <a href="comment-lire-un-prono.html">📖 Comment lire un prono</a>
+    <span class="site-footer-sep" aria-hidden="true">·</span>
+    <span class="site-footer-section">🔍 Transparence :</span>
+    <a href="backtest.html">📈 Backtest</a>
+    <a href="legal.html">⚖ Légal</a>
+    <a href="https://github.com/Harotensnor/paris-sportif" target="_blank" rel="noopener noreferrer">🐙 GitHub</a>
+    <span class="site-footer-sep" aria-hidden="true">·</span>
+    <span class="site-footer-disclaimer">18+ · Jouer comporte des risques · <a href="https://www.joueurs-info-service.fr/" target="_blank" rel="noopener">Joueurs Info Service</a></span>
+  </div>
+</footer>
 </body>
 </html>
