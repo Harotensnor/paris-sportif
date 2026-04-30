@@ -6756,3 +6756,66 @@
     }
   }
 
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     v32.6 — BIG PATCH : a11y + UX consolidation
+     ═══════════════════════════════════════════════════════════════════════
+
+     Trois fixes consolidés dans un seul block :
+
+     1. **Focus-visible globalement** : audit a détecté 167 éléments
+        focusables sans outline visible au focus clavier. Les browsers
+        modernes (>2021) supportent :focus-visible (focus seulement quand
+        navigation clavier, pas au click souris). On surface un outline
+        violet brand 2px qui ne perturbe pas le hover souris.
+
+     2. **Count badges vides** : .count:empty cachés. Avant, "🔒 Locks 0"
+        et "🔔 Alertes 0" affichaient un badge "0" inutile. Le code JS qui
+        peuple ces badges sera mis à jour pour set textContent='' au lieu
+        de '0' (cf. v32.6 dans app.js).
+
+     3. **Touch target ≥ 44px** : règle minimale pour les boutons icônes
+        de la topbar (🌱 ● 🔕 🌙 ✕). Audit avait flagué 32×32px = trop
+        petit pour mobile. Padding ajusté à min-height: 36px (compromis
+        entre tap target et density desktop).
+  */
+
+  /* 1. Focus-visible : outline violet 2px sur navigation clavier seulement */
+  :focus-visible {
+    outline: 2px solid var(--brand, #a78bfa);
+    outline-offset: 2px;
+    border-radius: var(--r-xs, 4px);
+  }
+  /* Boutons existants ont déjà leur focus state ; on ne dérange pas */
+  button:focus-visible,
+  a:focus-visible,
+  [role="button"]:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 2px solid var(--brand, #a78bfa);
+    outline-offset: 2px;
+  }
+  /* Inputs : focus-visible plus discret (border highlight) */
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: 2px solid var(--brand, #a78bfa);
+    outline-offset: 0;
+  }
+
+  /* 2. Count badges vides cachés */
+  .count:empty {
+    display: none !important;
+  }
+  /* Aussi pour les badges qui ont juste un espace (edge case) */
+  .count[data-empty="1"] {
+    display: none !important;
+  }
+
+  /* 3. Touch targets boutons icônes topbar (>= 36px hauteur effective).
+     Le padding est layout-friendly desktop (compact) tout en assurant
+     un click area suffisant. */
+  header.topbar button.icon-btn,
+  header.topbar [aria-label][title]:not(.topbar-brand):not(.topbar-link) {
+    min-height: 36px;
+    min-width: 36px;
+  }

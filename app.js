@@ -7162,7 +7162,10 @@
       // se faisait tronquer en "37 · 35" sans l'emoji. Quand nNew est >50% de n,
       // on simplifie en "N 🆕" (badge groupé). Sinon "N" simple si pas de
       // nouveaux ou "N · K🆕" comme avant si signal pertinent (qq nouveaux).
-      const newText = nNew === 0 ? String(n)
+      // v32.6 — Si n=0, set textContent='' pour que .count:empty (CSS)
+      // cache le badge. Avant : badge "0" toujours visible = UX confus.
+      const newText = n === 0 ? ''
+                    : nNew === 0 ? String(n)
                     : (nNew === n || nNew > n * 0.5) ? `${n} 🆕`
                                                      : `${n} · ${nNew}🆕`;
       // Sprint 116 (v31.7.190) — Pulse si le count change
@@ -15736,8 +15739,10 @@
         </div>`;
 
     // Update nav badge count
+    // v32.6 — Si 0 alertes, set textContent='' pour que .count:empty (CSS)
+    // cache le badge. Avant : badge "0" toujours visible = UX confus.
     const countEl = document.getElementById('count-alertes');
-    if (countEl) countEl.textContent = String(alerts.length);
+    if (countEl) countEl.textContent = alerts.length === 0 ? '' : String(alerts.length);
 
     wrap.innerHTML = `
       <div class="page-wrap">
