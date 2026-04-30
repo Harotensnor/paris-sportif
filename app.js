@@ -19493,8 +19493,12 @@
       } catch (e) { return iso; }
     }
 
-    function sectionHtml(title, hint, entries, sortAsc) {
+    function sectionHtml(title, hint, entries, sortAsc, opts) {
       if (!entries.length) return '';
+      // v31.7.205 — Pagination support : opts.collapsedByDefault + opts.initialLimit
+      // Pour 'Settled récents' : collapse par défaut si >5 entries (page Locks était 10212px).
+      const collapsible = opts && opts.collapsedByDefault;
+      const initialLimit = (opts && opts.initialLimit) || entries.length;
       const byDay = groupByDay(entries);
       const dayKeys = [...byDay.keys()].sort((a, b) => sortAsc ? a.localeCompare(b) : b.localeCompare(a));
       const blocks = dayKeys.map(k => {
@@ -19509,6 +19513,22 @@
             <div class="match-grid">${group.map(e => renderCard(e.m)).join('')}</div>
           </div>`;
       }).join('');
+      // v31.7.205 — Si collapsible, wrap dans <details> natif
+      if (collapsible && entries.length > 5) {
+        return `
+          <div class="locks-section" style="margin-top:18px;">
+            <details>
+              <summary style="cursor:pointer;list-style:none;padding:6px 0;display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                <div class="section-header top-picks" style="margin:0;flex:1;">
+                  <h2 style="display:inline-flex;align-items:center;gap:8px;"><span class="ico">🔒</span>${title} <span style="font-size:13px;color:var(--text-dim);font-weight:600;">(${entries.length})</span></h2>
+                  <div class="hint" style="margin:2px 0 0;">${hint} · clic pour déplier</div>
+                </div>
+                <span style="color:var(--brand);font-size:12px;font-weight:600;">▾ Afficher</span>
+              </summary>
+              <div style="margin-top:12px;">${blocks}</div>
+            </details>
+          </div>`;
+      }
       return `
         <div class="locks-section" style="margin-top:18px;">
           <div class="section-header top-picks" style="margin-top:6px;">
@@ -19631,7 +19651,7 @@
         ${emptyState}
         ${sectionHtml('🔴 En cours', 'Locks dont le match est déjà lancé', live, true)}
         ${sectionHtml('⏭️ À venir', 'Triés par heure de coup d\'envoi', upcoming, true)}
-        ${sectionHtml('✅ Settled récents', 'Locks réglés dans les 48 dernières heures', settled, false)}
+        ${sectionHtml('✅ Settled récents', 'Locks réglés dans les 48 dernières heures', settled, false, { collapsedByDefault: true })}
         ${nearLocksHtml}
       </div>`;
     // Sprint 81 — wire near-locks click → openDetail
