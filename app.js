@@ -17432,14 +17432,14 @@
           <div class="card-base">
             <h3 class="section-h3">💰 Cagnotte ${(typeof helpDot === 'function') ? helpDot('Le total que tu consacres aux paris. <b>Conseil : commence avec un montant que tu peux perdre.</b> Le site calcule tes mises conseillées en % de ce total pour que tu tiennes long terme.') : ''}</h3>
             <label style="display:block;font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:600;margin-bottom:4px;">Cagnotte de départ (€)</label>
-            <input id="pref-bankroll" type="number" min="1" step="1" value="${bankrollStart}" style="width:150px;padding:10px 12px;font-size:15px;font-weight:700;background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);"/>
+            <input id="pref-bankroll" type="number" min="1" step="1" value="${bankrollStart}" aria-label="Bankroll de départ en euros" style="width:150px;padding:10px 12px;font-size:15px;font-weight:700;background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);"/>
             <div style="font-size:12px;color:var(--text-dim);margin-top:6px;">Sert à calculer la cagnotte simulée sur la page Bilan + tes mises conseillées.</div>
           </div>
 
           <div class="card-base">
             <h3 class="section-h3">🔒 Seuil "pari sûr" ${(typeof helpDot === 'function') ? helpDot('À partir de quelle confiance un pari est-il étiqueté "sûr" ?<br><br><b>70% (défaut)</b> : plus de paris mais certains perdent<br><b>75%+</b> : moins de paris mais très fiables<br><b>65% ou moins</b> : beaucoup de paris, risqué') : ''}</h3>
             <label style="display:block;font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:600;margin-bottom:4px;">Confiance minimum pour qu'un pari soit noté "sûr"</label>
-            <input id="pref-lock-threshold" type="range" min="0.55" max="0.90" step="0.01" value="${lockThreshold}" style="width:100%;accent-color:var(--brand);"/>
+            <input id="pref-lock-threshold" type="range" min="0.55" max="0.90" step="0.01" value="${lockThreshold}" aria-label="Seuil de fiabilité minimum pour qu'un pick soit considéré 'lock'" aria-valuetext="${(lockThreshold*100).toFixed(0)} pourcent" style="width:100%;accent-color:var(--brand);"/>
             <div style="font-size:14px;font-weight:700;color:var(--brand);margin-top:4px;" id="pref-lock-label">${(lockThreshold*100).toFixed(0)}%</div>
             <div style="font-size:12px;color:var(--text-dim);margin-top:2px;">Par défaut 70%. Au-delà de 75% tu auras moins de paris mais plus sûrs.</div>
           </div>
@@ -17517,7 +17517,7 @@
                 Crée un webhook dans ton Discord (Paramètres serveur → Intégrations → Webhooks → Nouveau) et colle l'URL ici. Les top picks ≥80% confiance peuvent être envoyés à la demande. <strong>Aucun serveur intermédiaire</strong> : l'envoi se fait directement de ton navigateur vers Discord.
               </p>
               <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-                <input type="url" id="discord-webhook-url" placeholder="https://discord.com/api/webhooks/..." style="flex:1;min-width:200px;padding:8px 12px;background:var(--panel-2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:12.5px;font-family:monospace;" autocomplete="off" spellcheck="false">
+                <input type="url" id="discord-webhook-url" placeholder="https://discord.com/api/webhooks/..." aria-label="URL du webhook Discord pour recevoir les alertes pipeline" style="flex:1;min-width:200px;padding:8px 12px;background:var(--panel-2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:12.5px;font-family:monospace;" autocomplete="off" spellcheck="false">
                 <button type="button" id="discord-save-btn" style="padding:8px 14px;background:var(--brand);color:#08080a;border:none;border-radius:6px;font-weight:700;font-size:12px;cursor:pointer;">Enregistrer</button>
               </div>
               <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
@@ -24453,7 +24453,7 @@
         <div style="display:flex;align-items:center;gap:8px;margin-top:14px;margin-bottom:8px;flex-wrap:wrap;">
           <span style="font-size:11.5px;color:var(--text-dim2);font-weight:600;text-transform:uppercase;letter-spacing:.4px;">Affichage table :</span>
           ${[[7,'7j'],[30,'30j'],[0,'Tout']].map(([v,lbl]) =>
-            `<button class="wallet-tbl-btn${_walletTableWindow===v?' active':''}" data-wtw="${v}" style="background:${_walletTableWindow===v?'var(--brand,#a78bfa)':'var(--bg-3,#0f1823)'};color:${_walletTableWindow===v?'#0a0e17':'var(--text)'};border:1px solid ${_walletTableWindow===v?'var(--brand,#a78bfa)':'var(--border,#2a3744)'};padding:4px 11px;font-size:12px;font-weight:600;border-radius:6px;cursor:pointer;">${lbl}</button>`).join('')}
+            `<button class="wallet-tbl-btn${_walletTableWindow===v?' active':''}" data-wtw="${v}" aria-label="Filtrer la table sur les ${v} derniers jours" aria-pressed="${_walletTableWindow===v}" style="background:${_walletTableWindow===v?'var(--brand,#a78bfa)':'var(--bg-3,#0f1823)'};color:${_walletTableWindow===v?'#0a0e17':'var(--text)'};border:1px solid ${_walletTableWindow===v?'var(--brand,#a78bfa)':'var(--border,#2a3744)'};padding:4px 11px;font-size:12px;font-weight:600;border-radius:6px;cursor:pointer;">${lbl}</button>`).join('')}
           <span style="font-size:11px;color:var(--text-dim2);">${walletDaysVisible.length}/${walletDays.length} jour${walletDays.length>1?'s':''}</span>
         </div>`
       : '';
