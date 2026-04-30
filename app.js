@@ -1078,15 +1078,18 @@
       return el.style.display !== 'none' && getComputedStyle(el).display !== 'none';
     });
     if (!visibleWrap) return;
-    // Check if page-tabs already injected at the top
-    const firstChild = visibleWrap.querySelector('.page-wrap > :first-child, > :first-child');
+    // v31.7.204 FIX : selector '.page-wrap > :first-child, > :first-child' était
+    // invalide (le > sans parent throw SyntaxError silencieux dans applyPageView).
+    // Approche correct : on récupère le target d'injection puis on regarde
+    // son premier enfant directement via firstElementChild.
+    const target = visibleWrap.querySelector('.page-wrap') || visibleWrap.firstElementChild;
+    if (!target) return;
+    // Idempotent : si page-tabs déjà présent en première position, on skip
+    const firstChild = target.firstElementChild;
     if (firstChild && firstChild.classList && firstChild.classList.contains('page-tabs')) return;
     // Build tabs HTML
     const tabsHtml = _pageTabsForGroup(groupKey, currentPage);
     if (!tabsHtml) return;
-    // Inject at the top of the .page-wrap (or first div)
-    const target = visibleWrap.querySelector('.page-wrap') || visibleWrap.firstElementChild;
-    if (!target) return;
     const tabsContainer = document.createElement('div');
     tabsContainer.innerHTML = tabsHtml;
     target.insertBefore(tabsContainer.firstElementChild, target.firstChild);
@@ -13713,16 +13716,17 @@
           })()}
           ${(() => {
             // Sprint 113 (v31.7.190) — Risk gauge mini : barre horizontale qui montre
-            // % bankroll utilisé vs limite quotidienne. Vert <50%, orange 50-80%, rouge >80%.
-            // Passé une lecture rapide en 1s : "où en suis-je sur la discipline ?"
+            // % de la limite quotidienne consommée. Vert <80%, orange 80-100%, rouge >100%.
+            // v31.7.204 FIX label : "Limite jour" au lieu de "Risque" pour éviter la
+            // confusion avec le riskLabel "Risque X% bankroll" en sous-titre.
             const rl = (typeof _loadRiskLimits === 'function') ? _loadRiskLimits() : { maxStakePctDay: 0.25 };
             const limit = rl.maxStakePctDay || 0.25;
             const usage = userBankroll > 0 ? totalStake / (userBankroll * limit) : 0;
             const usagePct = Math.min(100, usage * 100);
             const color = usage >= 1 ? 'var(--danger)' : usage >= 0.8 ? 'var(--warn)' : 'var(--accent)';
             return `
-              <div style="display:inline-flex;align-items:center;gap:6px;font-size:10px;color:var(--text-dim);" data-tooltip="Discipline du jour : ${(usage*100).toFixed(0)}% de la limite ${(limit*100).toFixed(0)}% bankroll/jour">
-                <span style="text-transform:uppercase;letter-spacing:.4px;font-weight:700;">Risque</span>
+              <div style="display:inline-flex;align-items:center;gap:6px;font-size:10px;color:var(--text-dim);" data-tooltip="Discipline du jour : ${(usage*100).toFixed(0)}% de la limite quotidienne (${(limit*100).toFixed(0)}% bankroll/jour)">
+                <span style="text-transform:uppercase;letter-spacing:.4px;font-weight:700;">Limite jour</span>
                 <span style="display:inline-block;width:60px;height:6px;background:var(--panel);border-radius:3px;overflow:hidden;">
                   <span style="display:block;width:${usagePct}%;height:100%;background:${color};transition:width .3s;"></span>
                 </span>
