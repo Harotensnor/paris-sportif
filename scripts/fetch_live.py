@@ -183,30 +183,70 @@ def main():
     today = datetime.now().date()
     print(f'[{datetime.now():%H:%M:%S}] Live refresh for {today}', flush=True)
 
+    # v32.1 — Robust mode : si un des fetch ESPN plante (network, timeout, ban),
+    # on ne casse plus le pipeline. Avant : exception → script die → data.js
+    # JAMAIS réécrit → generated_at stuck → SW ne se bumpe pas → users servent
+    # ancien code via cache. Maintenant : on capture chaque fetch
+    # individuellement, on garde les events qui ont marché, et on bumpe quand
+    # même le `generated_at` (signale activité au pipeline + heartbeat) même
+    # si tous les fetch plantent. Les events de la veille restent valides en
+    # data.js[days][yesterday], donc la dégradation est gracieuse.
     events = []
-    events.extend(v3.fetch_soccer_day(today))
-    events.extend(v3.fetch_basket_day(today))
-    events.extend(v3.fetch_other_day(today))
-    events.extend(v3.fetch_tennis_day(today))
-    n_en = v3.enrich_odds_batch(events)
-    print(f'  {len(events)} events, {n_en} enriched', flush=True)
+    fetch_errors = []
+    for fetcher_name in ('fetch_soccer_day', 'fetch_basket_day', 'fetch_other_day', 'fetch_tennis_day'):
+        try:
+            fn = getattr(v3, fetcher_name)
+            evs = fn(today) or []
+            events.extend(evs)
+        except Exception as e:
+            fetch_errors.append(f'{fetcher_name}: {type(e).__name__}: {str(e)[:80]}')
+            print(f'  WARN {fetcher_name} failed: {e}', flush=True)
+
+    n_en = 0
+    try:
+        n_en = v3.enrich_odds_batch(events)
+    except Exception as e:
+        fetch_errors.append(f'enrich_odds_batch: {type(e).__name__}: {str(e)[:80]}')
+        print(f'  WARN enrich_odds_batch failed: {e}', flush=True)
+
+    print(f'  {len(events)} events, {n_en} enriched, {len(fetch_errors)} fetcher error(s)', flush=True)
 
     # Strip helper field
     for ev in events:
         ev.pop('_sport_path', None)
 
-    # Archive pre-match odds (first time we see ML for a not-yet-started match).
-    # This lets us compute real retrospective ROI later since ESPN drops odds post-kickoff.
-    archive_pre_match_odds(events)
-    # Keep the jsonl archive from growing forever. 180-day window + 20k-row cap.
-    rotate_odds_history()
+    # Archive pre-match odds + rotate (each in its own try)
+    try:
+        archive_pre_match_odds(events)
+    except Exception as e:
+        print(f'  WARN archive_pre_match_odds failed: {e}', flush=True)
+    try:
+        rotate_odds_history()
+    except Exception as e:
+        print(f'  WARN rotate_odds_history failed: {e}', flush=True)
 
-    # Merge into existing data.js
-    text = DATA_JS.read_text(encoding='utf-8')
-    data = json.loads(re.search(r'=\s*(\{.*\})\s*;?\s*$', text, re.DOTALL).group(1))
+    # Merge into existing data.js — even if fetch failed, we always bump
+    # generated_at to signal activity. The yesterday events are preserved.
+    try:
+        text = DATA_JS.read_text(encoding='utf-8')
+        data = json.loads(re.search(r'=\s*(\{.*\})\s*;?\s*$', text, re.DOTALL).group(1))
+    except Exception as e:
+        print(f'  ERROR cannot parse existing data.js: {e}', flush=True)
+        return  # vraiment fatal, abort
+
     key = today.strftime('%Y-%m-%d')
-    data['days'][key] = events
-    data['today'] = key
+    if events:
+        # Got at least some events → replace today's bucket
+        data['days'][key] = events
+        data['today'] = key
+    elif fetch_errors:
+        # Tous les fetch ont planté. On garde l'ancien data['days'][key] s'il
+        # existe (pas pire qu'avant) mais on log un sentinel dans le manifest.
+        print(f'  All fetchers failed — keeping previous data[days][{key}]', flush=True)
+        # Mark this attempt in a sentinel field for diagnostics
+        data['last_fetch_error_at'] = datetime.utcnow().isoformat() + 'Z'
+        data['last_fetch_errors'] = fetch_errors[:5]
+    # ALWAYS bump generated_at to signal activity (allows SW + heartbeat to track)
     data['generated_at'] = datetime.utcnow().isoformat() + 'Z'
 
     # Save
@@ -214,14 +254,18 @@ def main():
     DATA_JS.write_text(f'window.PRONOSTICS_DATA = {payload};\n', encoding='utf-8')
 
     # Re-inline into html (so file:// still works)
-    html_text = HTML.read_text(encoding='utf-8')
-    new_block = f'<script>\nwindow.PRONOSTICS_DATA = {payload};\n</script>'
-    html_text = re.sub(r'<script>\s*window\.PRONOSTICS_DATA\s*=.*?;?\s*</script>',
-                       new_block, html_text, count=1, flags=re.DOTALL)
-    HTML.write_text(html_text, encoding='utf-8')
+    try:
+        html_text = HTML.read_text(encoding='utf-8')
+        new_block = f'<script>\nwindow.PRONOSTICS_DATA = {payload};\n</script>'
+        html_text = re.sub(r'<script>\s*window\.PRONOSTICS_DATA\s*=.*?;?\s*</script>',
+                           new_block, html_text, count=1, flags=re.DOTALL)
+        HTML.write_text(html_text, encoding='utf-8')
+    except Exception as e:
+        print(f'  WARN re-inline pronostics.html failed: {e}', flush=True)
 
     elapsed = time.time() - t0
-    print(f'[{datetime.now():%H:%M:%S}] Done in {elapsed:.1f}s · data.js={DATA_JS.stat().st_size/1024:.0f}KB', flush=True)
+    status = 'OK' if not fetch_errors else f'PARTIAL ({len(fetch_errors)} fetcher fails)' if events else 'KEPT-PREVIOUS'
+    print(f'[{datetime.now():%H:%M:%S}] Done in {elapsed:.1f}s · data.js={DATA_JS.stat().st_size/1024:.0f}KB · status={status}', flush=True)
 
 
 if __name__ == '__main__':
