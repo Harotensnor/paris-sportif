@@ -9316,8 +9316,22 @@
     ` : '';
 
     const body = document.getElementById('detail-body');
+    // v32.0 (Phase 5) — Tab strip de navigation rapide dans le modal détail.
+    // Le modal est dense (1500+ lignes de contenu). Plutôt que tout réécrire
+    // (risk casse), on ajoute une tabbar sticky en haut qui permet de jumper
+    // à chaque section via scrollIntoView. Les sections existantes reçoivent
+    // des id="detail-section-X" pour servir de target des ancres.
+    // 4 tabs : Synthèse / Signaux / Cotes / H2H.
+    // Chaque tab teste si sa section a du contenu (présence de l'id) avant
+    // de s'afficher → tabs vides cachées automatiquement.
     body.innerHTML = `
-      <div class="teams-big">
+      <nav class="detail-tabbar" role="tablist" aria-label="Sections du détail" style="position:sticky;top:0;z-index:5;display:flex;gap:4px;padding:6px 4px;margin:-4px -4px 8px;background:var(--panel);border-bottom:1px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;font-variant-numeric:tabular-nums;">
+        <button type="button" data-detail-jump="synthese" class="active" style="flex-shrink:0;padding:8px 14px;background:transparent;color:var(--text);border:none;border-bottom:2px solid var(--brand);font-size:12.5px;font-weight:700;cursor:pointer;border-radius:0;white-space:nowrap;">📊 Synthèse</button>
+        <button type="button" data-detail-jump="signaux" style="flex-shrink:0;padding:8px 14px;background:transparent;color:var(--text-dim);border:none;border-bottom:2px solid transparent;font-size:12.5px;font-weight:600;cursor:pointer;border-radius:0;white-space:nowrap;">🔍 Signaux</button>
+        <button type="button" data-detail-jump="cotes" style="flex-shrink:0;padding:8px 14px;background:transparent;color:var(--text-dim);border:none;border-bottom:2px solid transparent;font-size:12.5px;font-weight:600;cursor:pointer;border-radius:0;white-space:nowrap;">💱 Cotes</button>
+        <button type="button" data-detail-jump="h2h" style="flex-shrink:0;padding:8px 14px;background:transparent;color:var(--text-dim);border:none;border-bottom:2px solid transparent;font-size:12.5px;font-weight:600;cursor:pointer;border-radius:0;white-space:nowrap;">⚔️ H2H</button>
+      </nav>
+      <div id="detail-section-synthese" class="teams-big">
         <div class="side">
           ${home?.logo ? `<img src="${esc(home.logo)}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'">` : ''}
           <div class="name">${esc(home?.name || '—')}</div>
@@ -11983,6 +11997,52 @@
   const _detailModal = document.getElementById('detail-modal');
   if (_detailModal) _detailModal.addEventListener('click', (e) => { if (e.target.id === 'detail-modal') closeDetailModal(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDetailModal(); });
+  // v32.0 (Phase 5) — Modal détail tabs delegation. Click sur un tab :
+  // active state + scroll smooth vers la section. Selectors :
+  //   synthese → #detail-section-synthese (teams-big block)
+  //   signaux  → first .signal-strip OR .reasons-block element
+  //   cotes    → .odds-table table
+  //   h2h      → .h2h-block OR section with data-h2h
+  if (_detailModal) {
+    _detailModal.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-detail-jump]');
+      if (!btn) return;
+      e.stopPropagation();
+      const target = btn.dataset.detailJump;
+      const body = document.getElementById('detail-body');
+      if (!body) return;
+      // Update active state on all tabs
+      body.querySelectorAll('[data-detail-jump]').forEach(b => {
+        const isActive = b.dataset.detailJump === target;
+        b.classList.toggle('active', isActive);
+        b.style.color = isActive ? 'var(--text)' : 'var(--text-dim)';
+        b.style.borderBottomColor = isActive ? 'var(--brand)' : 'transparent';
+        b.style.fontWeight = isActive ? '700' : '600';
+      });
+      // Resolve target element
+      let el = null;
+      if (target === 'synthese') {
+        el = body.querySelector('#detail-section-synthese') || body.querySelector('.teams-big');
+      } else if (target === 'signaux') {
+        el = body.querySelector('.signal-strip') || body.querySelector('[class*="reasons"]') || body.querySelector('.fiche-decision');
+      } else if (target === 'cotes') {
+        el = body.querySelector('.odds-table') || body.querySelector('.tbl-scroll');
+      } else if (target === 'h2h') {
+        el = body.querySelector('.h2h-block') || body.querySelector('[data-h2h]');
+      }
+      if (el) {
+        // Scroll into view with offset (account for sticky tabbar)
+        const tabbar = body.querySelector('.detail-tabbar');
+        const offset = (tabbar?.offsetHeight || 44) + 8;
+        const targetTop = el.getBoundingClientRect().top + body.scrollTop - offset;
+        body.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
+      } else {
+        // Section absente : flash un message discret sur le tab
+        btn.style.opacity = '0.5';
+        setTimeout(() => { btn.style.opacity = ''; }, 600);
+      }
+    });
+  }
   // v30 — Share button sur la modale match. Construit un share URL avec
   // ?match=<id> qui pourrait être restauré au boot (futur), partage via
   // Web Share API natif (mobile) ou copy-to-clipboard (desktop).
