@@ -73,7 +73,8 @@ LEAGUES: dict[str, int] = {
 
 def _get(url: str) -> dict | None:
     try:
-        r = cr.get(url, impersonate='chrome110', timeout=15)
+        # v31.7.208 — bump chrome110 → chrome131.
+        r = cr.get(url, impersonate='chrome131', timeout=15)
     except Exception as e:
         print(f'  ERR {url}: {e}', flush=True)
         return None
@@ -113,8 +114,15 @@ def current_season_id(tournament_id: int) -> int | None:
     return seasons[0].get('id') if seasons else None
 
 
-def upcoming_fixtures(tournament_id: int, season_id: int, pages: int = 2) -> list[dict]:
+def upcoming_fixtures(tournament_id: int, season_id: int, pages: int = 2,
+                      hours_ahead: int = 72) -> list[dict]:
+    """v31.7.208 — Filter cutoff. Referees are assigned ~24-72h before
+    kickoff. Beyond that the field is null on Sofascore. Cutting at 72h
+    halves the per-league fixture count, ensures the run fits in GHA's
+    10min timeout."""
+    import time as _t
     out: list[dict] = []
+    cutoff_ts = _t.time() + hours_ahead * 3600 if hours_ahead > 0 else None
     for p in range(pages):
         d = _get(f'{API}/unique-tournament/{tournament_id}/season/{season_id}/events/next/{p}')
         if not d:
@@ -122,10 +130,12 @@ def upcoming_fixtures(tournament_id: int, season_id: int, pages: int = 2) -> lis
         evs = d.get('events') or []
         if not evs:
             break
+        if cutoff_ts is not None:
+            evs = [ev for ev in evs if (ev.get('startTimestamp') or 0) <= cutoff_ts]
         out.extend(evs)
-        if not d.get('hasNextPage'):
+        if not d.get('hasNextPage') or len(evs) == 0:
             break
-        time.sleep(0.3)
+        time.sleep(0.2)
     return out
 
 
@@ -181,7 +191,8 @@ def collect() -> dict:
             ref = referee_for_event(eid)
             if not ref:
                 totals['misses'] += 1
-                time.sleep(0.25)
+                # v31.7.208 — sleep réduit pour tenir le timeout GHA 10min.
+                time.sleep(0.10)
                 continue
             key = f'{_norm(home_name)}|{_norm(away_name)}'
             events[key] = {
@@ -190,7 +201,7 @@ def collect() -> dict:
                 'sofa_event_id': eid,
             }
             totals['with_ref'] += 1
-            time.sleep(0.3)
+            time.sleep(0.15)
 
     elapsed = time.time() - t0
     print(f'[{datetime.now():%H:%M:%S}] Done: {totals["leagues"]} leagues, '

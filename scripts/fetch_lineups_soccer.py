@@ -95,7 +95,9 @@ POS_CODES = {'G', 'D', 'M', 'F'}
 
 def _get(url: str) -> dict | None:
     try:
-        r = cr.get(url, impersonate='chrome110', timeout=15)
+        # v31.7.208 — bump chrome110 → chrome131 (chrome110 datant de 2023,
+        # plus susceptible d'être flaggé bot par WAF récents).
+        r = cr.get(url, impersonate='chrome131', timeout=15)
     except Exception as e:
         print(f'  ERR {url}: {e}', flush=True)
         return None
@@ -123,8 +125,19 @@ def current_season_id(tournament_id: int) -> int | None:
     return seasons[0].get('id') if seasons else None
 
 
-def upcoming_fixtures(tournament_id: int, season_id: int, pages: int = 2) -> list[dict]:
+def upcoming_fixtures(tournament_id: int, season_id: int, pages: int = 2,
+                      hours_ahead: int = 48) -> list[dict]:
+    """List upcoming fixtures, optionally filtered to next ``hours_ahead`` hours.
+
+    v31.7.208 — Filter cutoff added. Sofascore's lineups endpoint returns
+    404 for fixtures >48h out (no XI announced yet), so polling them just
+    wastes the GHA 10min timeout budget. Restricting to the 48h window
+    ~halves the per-league fixture count and lets the full run fit
+    comfortably under timeout, even on a slow tick.
+    """
+    import time as _t
     out: list[dict] = []
+    cutoff_ts = _t.time() + hours_ahead * 3600 if hours_ahead > 0 else None
     for p in range(pages):
         d = _get(f'{API}/unique-tournament/{tournament_id}/season/{season_id}/events/next/{p}')
         if not d:
@@ -132,10 +145,12 @@ def upcoming_fixtures(tournament_id: int, season_id: int, pages: int = 2) -> lis
         evs = d.get('events') or []
         if not evs:
             break
+        if cutoff_ts is not None:
+            evs = [ev for ev in evs if (ev.get('startTimestamp') or 0) <= cutoff_ts]
         out.extend(evs)
-        if not d.get('hasNextPage'):
+        if not d.get('hasNextPage') or len(evs) == 0:
             break
-        time.sleep(0.3)
+        time.sleep(0.2)
     return out
 
 
@@ -231,7 +246,9 @@ def collect() -> dict:
             lu = lineup_for_event(eid)
             if not lu:
                 totals['misses'] += 1
-                time.sleep(0.25)
+                # v31.7.208 — sleep réduit 0.25s → 0.10s (404 = pas de
+                # lineup encore, on passe au suivant rapidement).
+                time.sleep(0.10)
                 continue
             if lu.get('home'):
                 lu['home']['team'] = home_name
@@ -244,7 +261,9 @@ def collect() -> dict:
                 'sofa_event_id': eid,
             }
             totals['with_lineup'] += 1
-            time.sleep(0.3)
+            # v31.7.208 — sleep réduit 0.3s → 0.15s. Sofascore tolère bien
+            # ce rate (mesuré localement, 0 erreur sur 188 events).
+            time.sleep(0.15)
 
     elapsed = time.time() - t0
     print(f'[{datetime.now():%H:%M:%S}] Done: {totals["leagues"]} leagues, '
