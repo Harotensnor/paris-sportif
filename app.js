@@ -21613,7 +21613,49 @@
     const byPeriod = bt.by_period || bt.byPeriod || {};
     // Per-cote-bucket
     const byCote = bt.by_cote_bucket || bt.byCote || {};
+    // v32.0 (Phase 4) — Widget Health Pipeline en hero. Lit window.__healthData
+    // (population par _refreshHealthIndicator). Surface visuellement quelles
+    // sources data tournent et leur fraîcheur. Avant : info enfouie dans un
+    // tooltip survolant l'icône topbar — invisible pour la plupart des users.
+    const _healthWidget = (() => {
+      try {
+        const h = window.__healthData;
+        if (!h || !h.sources) return '';
+        const ageMin = isFinite(h.data_age_min) ? h.data_age_min : 999;
+        const overallColor = ageMin < 30 ? 'var(--accent)' : ageMin < 120 ? 'var(--warn,#fbbf24)' : 'var(--danger)';
+        const overallLabel = ageMin < 30 ? '✓ Pipeline sain' : ageMin < 120 ? '⚠ Ralenti' : '✗ En retard';
+        // Top sources triées par fraîcheur
+        const srcEntries = Object.entries(h.sources)
+          .filter(([_, v]) => v && v.age_min != null)
+          .sort((a, b) => (a[1].age_min || 999) - (b[1].age_min || 999))
+          .slice(0, 8);
+        if (!srcEntries.length) return '';
+        const dot = (mins) => mins < 30 ? '🟢' : mins < 120 ? '🟡' : '🔴';
+        const fmtAge = (mins) => mins < 60 ? `${mins}m` : `${(mins/60).toFixed(1)}h`;
+        return `
+          <div style="max-width:1280px;margin:14px auto 8px;padding:14px 18px;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${overallColor};border-radius:var(--r-md);font-variant-numeric:tabular-nums;">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
+              <div>
+                <span style="font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;">📡 Pipeline data</span>
+                <span style="font-size:13px;color:${overallColor};font-weight:700;margin-left:8px;">${overallLabel}</span>
+                <span style="font-size:11.5px;color:var(--text-dim);margin-left:6px;">data.js : ${fmtAge(ageMin)}</span>
+              </div>
+              ${h.warnings && h.warnings.length ? `<span style="font-size:11.5px;color:var(--warn,#fbbf24);">⚠ ${h.warnings.length} warning${h.warnings.length>1?'s':''}</span>` : ''}
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;font-size:11.5px;">
+              ${srcEntries.map(([name, v]) => `
+                <span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:var(--panel-2);border:1px solid var(--border);border-radius:999px;color:var(--text-dim);">
+                  <span>${dot(v.age_min)}</span>
+                  <span style="color:var(--text);font-weight:600;">${esc(name)}</span>
+                  <span style="color:var(--text-dim2);">${fmtAge(v.age_min)}</span>
+                </span>
+              `).join('')}
+            </div>
+          </div>`;
+      } catch(e) { return ''; }
+    })();
     wrap.innerHTML = `
+      ${_healthWidget}
       <div class="page-wrap">
         <div class="page-header">
           <div class="lbl-tiny" style="color:var(--brand);">Performance · ${esc(tabs.find(t => t.k === currentTab)?.lbl || 'Vue globale')}</div>
