@@ -3958,11 +3958,42 @@
     const aAtt = aX.scored / lgAvg;
     const hDef = hX.conceded / lgAvg;
     const aDef = aX.conceded / lgAvg;
-    const lamH = Math.max(0.2, hAtt * aDef * lgAvg * HOME_ADV);
-    const lamA = Math.max(0.2, aAtt * hDef * lgAvg / HOME_ADV);
+    let lamH = Math.max(0.2, hAtt * aDef * lgAvg * HOME_ADV);
+    let lamA = Math.max(0.2, aAtt * hDef * lgAvg / HOME_ADV);
+    // v31.7.207 — fbref empirical xG blend.
+    // Si les deux équipes ont fbref_xg (top-6 leagues UEFA injectées par
+    // patch_fbref_xg.py), on blend le lambda model-based avec l'estimation
+    // empirique fbref. Formule standard :
+    //   E[goals_home] = avg(home.xg_for, away.xg_against)
+    // xG capte la qualité des occasions plutôt que les buts effectifs (~0.65
+    // corr next-game points), donc lisse la variance scoring que notre
+    // modèle Poisson dérivé du goal-rate historique ne voit qu'avec lag.
+    // Poids dépend du sample size (cap à 50% pour ne pas écraser le model) :
+    //   <10 matchs joués → 20% (early season)
+    //   10-19            → 40%
+    //   20+              → 50%
+    let fbrefBlend = null;
+    const hXG = home.fbref_xg;
+    const aXG = away.fbref_xg;
+    if (hXG && aXG && typeof hXG.xg_for_avg === 'number' && typeof aXG.xg_for_avg === 'number') {
+      const lamH_emp = ((hXG.xg_for_avg + aXG.xg_against_avg) / 2) * HOME_ADV;
+      const lamA_emp = ((aXG.xg_for_avg + hXG.xg_against_avg) / 2) / HOME_ADV;
+      const minMP = Math.min(hXG.matches_played || 0, aXG.matches_played || 0);
+      const w = minMP < 10 ? 0.2 : minMP < 20 ? 0.4 : 0.5;
+      fbrefBlend = {
+        weight: w,
+        minMatchesPlayed: minMP,
+        lamH_model: Math.round(lamH * 1000) / 1000,
+        lamA_model: Math.round(lamA * 1000) / 1000,
+        lamH_emp: Math.round(lamH_emp * 1000) / 1000,
+        lamA_emp: Math.round(lamA_emp * 1000) / 1000,
+      };
+      lamH = Math.max(0.2, (1 - w) * lamH + w * lamH_emp);
+      lamA = Math.max(0.2, (1 - w) * lamA + w * lamA_emp);
+    }
     const probs = poissonProbs(lamH, lamA);
     if (!probs) return null;
-    return { ...probs, lamH, lamA };
+    return { ...probs, lamH, lamA, fbrefBlend };
   }
 
   // ======= Fixture congestion (Chantier 10) =======
@@ -5795,11 +5826,19 @@
     }
     // Buts attendus (modèle statistique football) — Chantier L : renommé
     // pour éviter le jargon "Poisson" côté UI.
+    // v31.7.207 — Si fbref xG empirique a contribué au lambda, on surface
+    // l'info au user (% poids + n matchs source). Renforce la confiance
+    // pour les pronos où la data sample est solide.
     if (poi) {
+      let xgText = `Buts attendus : ${poi.lamH.toFixed(2)} – ${poi.lamA.toFixed(2)}`;
+      if (poi.fbrefBlend) {
+        const wPct = Math.round(poi.fbrefBlend.weight * 100);
+        xgText += ` (xG fbref ${wPct}% · ${poi.fbrefBlend.minMatchesPlayed} matchs)`;
+      }
       reasons.push({
         type: 'xg',
         icon: '⚽',
-        text: `Buts attendus : ${poi.lamH.toFixed(2)} – ${poi.lamA.toFixed(2)}`
+        text: xgText
       });
     }
     // Puissance d'équipe (signal ELO, Chantier 9) — Chantier L : libellé
@@ -6221,7 +6260,7 @@
       // backtest_v2) get a stricter lock threshold: 0.75 instead of 0.70.
       // Avoids over-confident "lock" labels on tiny samples.
       isLockStrict: reliability >= 0.75,
-      poisson: poi ? { xgH: poi.lamH, xgA: poi.lamA } : null,
+      poisson: poi ? { xgH: poi.lamH, xgA: poi.lamA, fbrefBlend: poi.fbrefBlend || null } : null,
       // Scores probables — shape varie selon le sport (Chantier 6 + K) :
       //   foot   : array[{home, away, prob}] (legacy, kind 'exact' implicite)
       //   hockey : {kind:'exact', items:[{home,away,prob,label}], caption}
