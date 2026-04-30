@@ -2,7 +2,9 @@
   :root {
     /* REFONTE v22 — Theme sombre par défaut (2026-04-23)
        v31.7.34 — Identité visuelle "betting pro" : contraste boosté, couleurs
-       sport-aware, tier color hierarchy distinctive. */
+       sport-aware, tier color hierarchy distinctive.
+       v31.7.215 — Force pipeline refresh (data.js stuck at 16:37 UTC despite
+       30+ successful cron ticks — likely no-diff edge case in commit step). */
     --bg: #06070a;
     --bg-2: #0a0b10;
     --bg-3: #0e1016;
