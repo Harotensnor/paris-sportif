@@ -90,7 +90,8 @@ REASON_LABELS = {
 
 def _get(url: str) -> dict | None:
     try:
-        r = cr.get(url, impersonate='chrome110', timeout=15)
+        # v31.7.208 — bump chrome110 → chrome131.
+        r = cr.get(url, impersonate='chrome131', timeout=15)
     except Exception as e:
         print(f'  ERR {url}: {e}', flush=True)
         return None
@@ -116,10 +117,15 @@ def current_season_id(tournament_id: int) -> int | None:
     return seasons[0].get('id') if seasons else None
 
 
-def upcoming_fixtures(tournament_id: int, season_id: int, pages: int = 2) -> list[dict]:
-    """Next ``pages`` pages of upcoming events. 30 per page is plenty —
-    injuries decay fast, no point fetching lineups for matches weeks out."""
+def upcoming_fixtures(tournament_id: int, season_id: int, pages: int = 2,
+                      hours_ahead: int = 72) -> list[dict]:
+    """Next ``pages`` pages of upcoming events.
+    v31.7.208 — Filter cutoff. Injuries decay fast, no point fetching
+    lineups for matches >72h out. Halves the per-league fixture count
+    and ensures GHA 10min timeout is respected."""
+    import time as _t
     out: list[dict] = []
+    cutoff_ts = _t.time() + hours_ahead * 3600 if hours_ahead > 0 else None
     for p in range(pages):
         d = _get(f'{API}/unique-tournament/{tournament_id}/season/{season_id}/events/next/{p}')
         if not d:
@@ -127,10 +133,12 @@ def upcoming_fixtures(tournament_id: int, season_id: int, pages: int = 2) -> lis
         evs = d.get('events') or []
         if not evs:
             break
+        if cutoff_ts is not None:
+            evs = [ev for ev in evs if (ev.get('startTimestamp') or 0) <= cutoff_ts]
         out.extend(evs)
-        if not d.get('hasNextPage'):
+        if not d.get('hasNextPage') or len(evs) == 0:
             break
-        time.sleep(0.3)
+        time.sleep(0.2)
     return out
 
 
@@ -185,7 +193,8 @@ def collect() -> dict:
             miss = missing_for_event(eid)
             if not miss:
                 totals['lineup_misses'] += 1
-                time.sleep(0.25)
+                # v31.7.208 — sleep réduit pour tenir GHA 10min timeout.
+                time.sleep(0.10)
                 continue
             # We got a lineups response — both teams are "scanned", even if
             # their missingPlayers lists are empty.
@@ -201,7 +210,8 @@ def collect() -> dict:
                     rec = {**mp, 'league_code': code, 'team': side_name}
                     teams.setdefault(key, []).append(rec)
                     totals['players'] += 1
-            time.sleep(0.3)
+            # v31.7.208 — sleep réduit 0.3s → 0.15s pour rentrer dans budget GHA.
+            time.sleep(0.15)
 
     # Dedupe per team — a player can appear on multiple upcoming fixtures.
     for key, lst in teams.items():
