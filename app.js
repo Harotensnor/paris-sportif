@@ -13097,7 +13097,28 @@
     // qu'une mauvaise journée tue la cagnotte quand il y a 20+ picks simultanés.
     const DAILY_CAP_PCT = 0.20;
     const dailyStakeAcc = {}; // ISO day → cumul des mises déjà placées ce jour-là
+    // v31.7.218 — Tilt protection (streak adaptation).
+    // Backtest 411 picks : longest losing streak = 10 (top run lose). Une
+    // série de 10 perdants enfile sa propre logique psychologique mais aussi
+    // statistique : si nos picks ratent 10 fois d'affilée alors qu'on les
+    // estimait à WR ~55%, le modèle est très probablement décalibré sur
+    // cette fenêtre (data-drift, signaux corrompus, contexte exceptionnel).
+    // Pause 24h après 5 perdants consécutifs pour laisser passer le
+    // shake-out — on ne FERME pas la position, on attend que le data-drift
+    // se reset (ex: nouvelle journée = nouveaux matchs / nouveaux signaux).
+    let _consecutiveLosses = 0;
+    let _pausedUntilTs = 0;
+    let _streakPauseCount = 0;
     scorable.forEach(s => {
+      // v31.7.218 — Skip toute mise pendant la pause (mais on continue à
+      // tracker le résultat pour les stats du replay).
+      if (_pausedUntilTs > 0 && s.ts < _pausedUntilTs) {
+        // On NE bet PAS, mais on reset le compteur sur un win observé pour
+        // pouvoir reprendre dès qu'on revoit du momentum positif sur une
+        // série hypothétique.
+        if (s.res === 'won') _consecutiveLosses = 0;
+        return;
+      }
       // v27.2 — Appliquer les règles auto-tuning actives avant tout
       if (_applyAgentRules(s)) { return; }
       // v31.7.210 — Drawdown protection. Quand le NAV courant chute sous
@@ -13142,6 +13163,17 @@
       dailyStakeAcc[s.dayIso] = (dailyStakeAcc[s.dayIso] || 0) + stake;
       const pl = s.res === 'won' ? stake * (s.odd - 1) : -stake;
       nav += pl;
+      // v31.7.218 — Tilt protection : tracker la streak après le bet.
+      if (s.res === 'won') {
+        _consecutiveLosses = 0;
+      } else {
+        _consecutiveLosses++;
+        if (_consecutiveLosses >= 5) {
+          _pausedUntilTs = s.ts + 24 * 3600 * 1000;  // pause 24h
+          _streakPauseCount++;
+          _consecutiveLosses = 0; // reset au déclenchement de la pause
+        }
+      }
       series.push({ t: s.ts, nav, pl, stake, res: s.res, sport: s.m.sport, dayIso: s.dayIso, rel: s.rel, odd: s.odd, matchId: s.m.id });
       if (s.ts >= cut7) {
         const sb = perSport7d[s.m.sport] = perSport7d[s.m.sport] || { bets:0, w:0, l:0, pl:0, invested:0 };
@@ -13168,6 +13200,10 @@
       nav, series, scorable, scorableRaw, start: AGENT_START, perSport7d,
       delta7: nav - navPrev7, deltaPct7: navPrev7 > 0 ? (nav - navPrev7) / navPrev7 * 100 : 0,
       ydayStats: ydayTotal > 0 ? { pl: ydayPl, wins: ydayWins, losses: ydayLosses, total: ydayTotal, highTotal: ydayHighTotal, highWins: ydayHighWins, lowLoss: ydayLowLoss } : null,
+      // v31.7.218 — Tilt protection metadata
+      streakPauseCount: _streakPauseCount,
+      currentLossStreak: _consecutiveLosses,
+      currentlyPausedUntil: _pausedUntilTs > Date.now() ? _pausedUntilTs : null,
     };
     // Sprint G — Memoize for next call
     __agentReplayCache = result;
