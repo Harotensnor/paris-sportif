@@ -6332,7 +6332,11 @@
       // non-marché et plus seulement le rank. Si on est rank-only (joueur
       // hors-base Sackmann, challenger / qualifier), on garde le skip strict
       // sur ranks proches (|log gap| < 0.30) où le rank seul est unreliable.
-      skip: reliability < 0.45
+      // v31.7.213 — Skip threshold bumped 0.45 → 0.50 d'après backtest_v2
+      // sur 411 picks : tier `lowconf` (rel ∈ [0.45, 0.60]) ROI flat -59%.
+      // Le bump retire ~5-10 picks/jour borderline qui détruisent le ROI
+      // sans sacrifier les standards (rel ≥ 0.60, ROI +10%) ni les locks.
+      skip: reliability < 0.50
         || pureCompCount < (match.sport === 'tennis' ? 1 : 2)
         || (match.sport === 'tennis'
             && !match.tennis_features
