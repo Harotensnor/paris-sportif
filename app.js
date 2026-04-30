@@ -13089,9 +13089,27 @@
     scorable.forEach(s => {
       // v27.2 — Appliquer les règles auto-tuning actives avant tout
       if (_applyAgentRules(s)) { return; }
+      // v31.7.210 — Drawdown protection. Quand le NAV courant chute sous
+      // 80% de l'init, on réduit progressivement le Kelly multiplier pour
+      // éviter la spirale de pertes. Pratique pro standard : "scale down
+      // when losing" (Thorp, MacLean). On continue à parier (vs full pause)
+      // pour conserver la chance de remonter, mais avec sizing prudent.
+      // Tiers cumulatifs (chaque tier = +20% drawdown) :
+      //   nav ≥ 100% start  → Kelly 0.25× (default, full sizing)
+      //   nav 80-100%       → Kelly 0.22× (early caution)
+      //   nav 60-80%        → Kelly 0.18× (real drawdown, -28% sizing)
+      //   nav 40-60%        → Kelly 0.13× (deep, -48%)
+      //   nav < 40%         → Kelly 0.08× (capital preservation, -68%)
+      const _ddRatio = nav / AGENT_START;
+      let _kellyMult;
+      if (_ddRatio < 0.40)      _kellyMult = 0.08;
+      else if (_ddRatio < 0.60) _kellyMult = 0.13;
+      else if (_ddRatio < 0.80) _kellyMult = 0.18;
+      else if (_ddRatio < 1.00) _kellyMult = 0.22;
+      else                       _kellyMult = KELLY_FRAC;
       // v27.1 FIX : si Kelly négatif/nul, on NE MISE PAS. Pas de plancher forcé.
       //          (ex: Thunder @1.05 vs rel 76% → implicite 95% → edge -19pt → skip).
-      const k = (typeof kellyFraction === 'function') ? kellyFraction(s.rel, s.odd, KELLY_FRAC) : Math.max(0, ((s.rel * s.odd - 1) / Math.max(0.01, s.odd - 1)) * KELLY_FRAC);
+      const k = (typeof kellyFraction === 'function') ? kellyFraction(s.rel, s.odd, _kellyMult) : Math.max(0, ((s.rel * s.odd - 1) / Math.max(0.01, s.odd - 1)) * _kellyMult);
       if (k <= 0) { return; } // pas d'edge → pas de mise
       // v27.3 — Divergence amplifiée : mise plus agressive quand l'edge est fort
       //         (le modèle diverge franchement du marché = vraie opportunité)
