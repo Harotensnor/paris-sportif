@@ -24575,11 +24575,11 @@
             ${optionsHtml.replace(`value="${dateIso}"`, `value="${dateIso}" selected`)}
           </select>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
-          <div class="kpi-tile"><div class="kpi-tile__label">Pronos</div><div class="kpi-tile__value">${stats.nPicks}</div><div class="kpi-tile__sub">${stats.nLocks} locks</div></div>
-          <div class="kpi-tile"><div class="kpi-tile__label">Matchs</div><div class="kpi-tile__value">${stats.nMatchs}</div><div class="kpi-tile__sub">${stats.nLive ? stats.nLive + ' en direct' : 'aucun live'}</div></div>
-          <div class="kpi-tile"><div class="kpi-tile__label">Réglés</div><div class="kpi-tile__value">${stats.nCompleted}</div><div class="kpi-tile__sub">${stats.totWon}V / ${stats.totLost}D</div></div>
-          <div class="kpi-tile"><div class="kpi-tile__label">P&L flat</div><div class="kpi-tile__value" style="color:${plColor};">${plLbl}</div><div class="kpi-tile__sub">WR ${wrLbl}</div></div>
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;margin-bottom:14px;">
+          <div class="kpi-tile" style="min-width:0;"><div class="kpi-tile__label">Pronos</div><div class="kpi-tile__value">${stats.nPicks}</div><div class="kpi-tile__sub">${stats.nLocks} locks</div></div>
+          <div class="kpi-tile" style="min-width:0;"><div class="kpi-tile__label">Matchs</div><div class="kpi-tile__value">${stats.nMatchs}</div><div class="kpi-tile__sub">${stats.nLive ? stats.nLive + ' en direct' : 'aucun live'}</div></div>
+          <div class="kpi-tile" style="min-width:0;"><div class="kpi-tile__label">Réglés</div><div class="kpi-tile__value">${stats.nCompleted}</div><div class="kpi-tile__sub">${stats.totWon}V / ${stats.totLost}D</div></div>
+          <div class="kpi-tile" style="min-width:0;"><div class="kpi-tile__label">P&L flat</div><div class="kpi-tile__value" style="color:${plColor};">${plLbl}</div><div class="kpi-tile__sub">WR ${wrLbl}</div></div>
         </div>
         <div style="margin-bottom:12px;">
           <div style="font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:6px;">Sports</div>
