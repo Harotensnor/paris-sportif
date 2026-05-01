@@ -20,6 +20,11 @@ import re
 import sys
 from pathlib import Path
 
+try:
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+except Exception:
+    pass
+
 ROOT = Path(__file__).resolve().parent.parent
 AUTO_REFRESH = ROOT / 'auto_refresh.py'
 REFRESH_YML = ROOT / '.github' / 'workflows' / 'refresh.yml'

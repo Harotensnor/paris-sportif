@@ -138,6 +138,16 @@ FAST_PIPELINE_SOURCES = {
     'sofascore_events',
 }
 
+PIPELINE_DRIFT_EXCLUDED = {
+    'model_loader.py',
+    'winamax_map.py',
+    '_data_io.py',
+    'backtest_v2.py',
+    'backtest_baselines.py',
+    'check_pipeline_drift.py',
+    'check_no_conflict_markers.py',
+}
+
 
 def _age_min(path: Path) -> int | None:
     if not path.exists():
@@ -145,6 +155,50 @@ def _age_min(path: Path) -> int | None:
     mtime = path.stat().st_mtime
     now = datetime.now(timezone.utc).timestamp()
     return max(0, int((now - mtime) / 60))
+
+
+def _extract_pipeline_scripts(path: Path, pattern: str) -> set[str]:
+    import re
+    if not path.exists():
+        return set()
+    try:
+        text = path.read_text(encoding='utf-8')
+    except Exception:
+        return set()
+    return set(re.findall(pattern, text))
+
+
+def _scan_pipeline_drift() -> dict:
+    scripts_dir = ROOT / 'scripts'
+    on_disk = {
+        p.name for p in scripts_dir.iterdir()
+        if p.suffix == '.py'
+    } - PIPELINE_DRIFT_EXCLUDED if scripts_dir.exists() else set()
+    in_local = _extract_pipeline_scripts(
+        ROOT / 'auto_refresh.py',
+        r"\(\s*'([\w_]+\.py)'",
+    )
+    in_prod = _extract_pipeline_scripts(
+        ROOT / '.github' / 'workflows' / 'refresh.yml',
+        r'python3?\s+([\w_]+\.py)',
+    )
+    only_local = sorted((in_local - in_prod) - PIPELINE_DRIFT_EXCLUDED)
+    only_prod = sorted((in_prod - in_local) - PIPELINE_DRIFT_EXCLUDED)
+    missing_from_disk = sorted(((in_local | in_prod) - on_disk) - PIPELINE_DRIFT_EXCLUDED)
+    unused = sorted((on_disk - in_local - in_prod) - PIPELINE_DRIFT_EXCLUDED)
+    drift_count = len(only_local) + len(only_prod) + len(missing_from_disk)
+    return {
+        'status': 'ok' if drift_count == 0 else 'warn',
+        'drift_count': drift_count,
+        'scripts_on_disk': len(on_disk),
+        'auto_refresh_count': len(in_local),
+        'refresh_yml_count': len(in_prod),
+        'only_local': only_local,
+        'only_prod': only_prod,
+        'missing_from_disk': missing_from_disk,
+        'unused_count': len(unused),
+        'unused_sample': unused[:12],
+    }
 
 
 # AUDIT-2026-04-27 (P2) — Health sémantique : ne pas se contenter de
@@ -272,6 +326,7 @@ def main() -> int:
         'data_age_min': _age_min(ROOT / 'data.js'),
         'sources': {},
         'pipeline_lag_per_script': {},
+        'pipeline_drift': {},
         'warnings': [],
         # Bug-hunt 2026-05-02 : avant `overall` n'était jamais set, JSON output
         # avait `overall: null` → MCP get_pipeline_status / front-end santé indicator
@@ -327,6 +382,12 @@ def main() -> int:
             'fast_red_min': 30 if key in FAST_PIPELINE_SOURCES else None,
             'status': status,
         }
+
+    out['pipeline_drift'] = _scan_pipeline_drift()
+    if out['pipeline_drift'].get('status') != 'ok':
+        out['warnings'].append(
+            f'pipeline_drift: {out["pipeline_drift"].get("drift_count", 0)} divergence(s) auto_refresh/refresh.yml'
+        )
 
     if out['data_age_min'] is None:
         out['warnings'].insert(0, 'data.js is missing — pipeline broken')

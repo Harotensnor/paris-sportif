@@ -25029,6 +25029,34 @@
         </div>`;
     })();
 
+    const pipelineDriftHtml = (() => {
+      const h = window.__healthData;
+      const d = h && h.pipeline_drift;
+      if (!d || typeof d !== 'object') return '';
+      const driftCount = Number(d.drift_count || 0);
+      const ok = d.status === 'ok' && driftCount === 0;
+      const col = ok ? '#34d399' : '#f87171';
+      const sample = []
+        .concat((d.only_local || []).map(x => `local seul: ${x}`))
+        .concat((d.only_prod || []).map(x => `cron seul: ${x}`))
+        .concat((d.missing_from_disk || []).map(x => `absent disque: ${x}`))
+        .slice(0, 8);
+      return `
+        <div style="margin-top:22px;">
+          <div style="font-size:13px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;">🧭 Drift pipeline local/cron</div>
+          <div style="background:linear-gradient(135deg,${col}18,transparent);border:1px solid var(--border);border-left:4px solid ${col};border-radius:10px;padding:14px;">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+              <div>
+                <div style="font-size:20px;font-weight:800;color:${col};font-variant-numeric:tabular-nums;">${ok ? 'Aligné' : `${driftCount} divergence(s)`}</div>
+                <div style="font-size:11px;color:var(--text-dim);margin-top:4px;line-height:1.45;">scripts=${d.scripts_on_disk || 0} · auto_refresh=${d.auto_refresh_count || 0} · refresh.yml=${d.refresh_yml_count || 0} · inutilisés=${d.unused_count || 0}</div>
+              </div>
+              ${statusPill(ok ? 'ok' : 'crit')}
+            </div>
+            ${sample.length ? `<div style="margin-top:10px;color:var(--text-dim);font-size:11px;line-height:1.5;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">${sample.map(esc).join('<br>')}</div>` : '<div style="margin-top:10px;color:var(--text-dim);font-size:11px;">Aucun écart bloquant entre la pipeline locale et le cron GitHub.</div>'}
+          </div>
+        </div>`;
+    })();
+
     wrap.innerHTML = `
       <div style="max-width:1200px;margin:0 auto;padding:16px 20px 24px;">
         <div class="section-header top-picks" style="margin-top:8px;">
@@ -25131,6 +25159,8 @@
         })()}
 
         ${pipelineLagHtml}
+
+        ${pipelineDriftHtml}
 
         <div style="margin-top:22px;">
           <div style="font-size:13px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;">🎯 Matchs restants par sport</div>
