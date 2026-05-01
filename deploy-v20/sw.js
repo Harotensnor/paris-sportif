@@ -1,0 +1,104 @@
+// Chantier S (révisé 2026-04-22 nuit) — Service Worker pour Paris-Sportif.
+//
+// Stratégie :
+//   * pronostics.html : NETWORK-FIRST (cache = fallback offline).
+//   * data.js et JSON  : NETWORK-FIRST.
+//   * odds_history.jsonl : NETWORK-FIRST (Chantier PP).
+//   * icônes / manifest : cache-first (change rarement).
+//   * tout le reste    : passthrough réseau.
+
+const CACHE_VERSION = 'paris-sportif-v57-2026-04-23-v28.10-perf-stale-plus-undo-reset';
+const SHELL_CACHE = `${CACHE_VERSION}-shell`;
+const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
+
+const SHELL_ASSETS = [
+  'manifest.webmanifest',
+  'icon.svg',
+  'icon-192.png',
+  'icon-512.png',
+];
+
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(SHELL_CACHE)
+      .then(cache => cache.addAll(SHELL_ASSETS).catch(() => { /* pas bloquant */ }))
+      .then(() => self.skipWaiting())
+  );
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys()
+      .then(keys => Promise.all(
+        keys.filter(k => !k.startsWith(CACHE_VERSION)).map(k => caches.delete(k))
+      ))
+      .then(() => self.clients.claim())
+  );
+});
+
+self.addEventListener('fetch', (event) => {
+  const req = event.request;
+  if (req.method !== 'GET') return;
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return;
+
+  // pronostics.html : NETWORK-FIRST, fallback cache.
+  const isHtml = url.pathname.endsWith('/pronostics.html')
+              || url.pathname.endsWith('pronostics.html')
+              || url.pathname === '/'
+              || url.pathname.endsWith('/');
+  if (isHtml) {
+    event.respondWith(
+      fetch(req)
+        .then(resp => {
+          const respClone = resp.clone();
+          caches.open(RUNTIME_CACHE).then(c => c.put(req, respClone));
+          return resp;
+        })
+        .catch(() => caches.match(req).then(hit => hit || caches.match('pronostics.html')))
+    );
+    return;
+  }
+
+  // data.js : NETWORK-FIRST.
+  if (url.pathname.endsWith('/data.js') || url.pathname.endsWith('data.js')) {
+    event.respondWith(
+      fetch(req)
+        .then(resp => {
+          const respClone = resp.clone();
+          caches.open(RUNTIME_CACHE).then(c => c.put(req, respClone));
+          return resp;
+        })
+        .catch(() => caches.match(req))
+    );
+    return;
+  }
+
+  // odds_history.jsonl : NETWORK-FIRST (Chantier PP).
+  if (url.pathname.endsWith('/odds_history.jsonl') || url.pathname.endsWith('odds_history.jsonl')) {
+    event.respondWith(
+      fetch(req)
+        .then(resp => {
+          const respClone = resp.clone();
+          caches.open(RUNTIME_CACHE).then(c => c.put(req, respClone));
+          return resp;
+        })
+        .catch(() => caches.match(req))
+    );
+    return;
+  }
+
+  // Icônes / manifest : cache-first.
+  if (SHELL_ASSETS.some(a => url.pathname.endsWith('/' + a) || url.pathname.endsWith(a))) {
+    event.respondWith(
+      caches.match(req).then(hit => hit || fetch(req).then(resp => {
+        const respClone = resp.clone();
+        caches.open(SHELL_CACHE).then(c => c.put(req, respClone));
+        return resp;
+      }))
+    );
+    return;
+  }
+
+  // Reste : passthrough.
+});

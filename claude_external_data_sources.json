@@ -1,0 +1,165 @@
+{
+  "purpose": "External sports data sources to improve Paris-Sportif predictions",
+  "top_priority": [
+    "multi_book_odds_consensus",
+    "closing_line_value",
+    "sport_specific_advanced_stats",
+    "injuries_lineups_starters",
+    "data_quality_score"
+  ],
+  "sources": [
+    {
+      "name": "The Odds API",
+      "sports": ["football", "tennis", "basketball", "hockey", "baseball", "mma", "golf", "racing"],
+      "type": "odds_api",
+      "url": "https://the-odds-api.com/liveapi/guides/v4/",
+      "cost": "free_limited_paid_for_history",
+      "value": "multi-book odds, market consensus, historical odds snapshots, CLV",
+      "features": ["market_no_vig_prob", "book_count", "line_movement", "closing_line_value", "winamax_vs_consensus_edge"]
+    },
+    {
+      "name": "Football-Data.co.uk",
+      "sports": ["football"],
+      "type": "csv_results_odds",
+      "url": "https://www.football-data.co.uk/data",
+      "cost": "free",
+      "value": "historical soccer results, match stats and odds",
+      "features": ["league_calibration", "rolling_form", "home_away_split", "ou25_history", "btts_history", "historical_odds"]
+    },
+    {
+      "name": "soccerdata",
+      "sports": ["football"],
+      "type": "python_package_scrapers",
+      "url": "https://soccerdata.readthedocs.io/",
+      "cost": "free_scraping",
+      "value": "ClubElo, ESPN, FBref, Football-Data, Sofascore, Understat, WhoScored connectors",
+      "features": ["xg", "xga", "lineups", "elo", "team_stats", "match_history"]
+    },
+    {
+      "name": "Understat",
+      "sports": ["football"],
+      "type": "xg_scrape",
+      "url": "https://github.com/ktconnolly/understat-xg",
+      "cost": "free_scraping",
+      "value": "xG and shot data for major soccer leagues",
+      "features": ["xg_for_rolling", "xg_against_rolling", "shot_quality", "finishing_overperformance"]
+    },
+    {
+      "name": "Tennis-Data.co.uk",
+      "sports": ["tennis"],
+      "type": "csv_results_odds",
+      "url": "https://www.tennis-data.co.uk/alldata.php",
+      "cost": "free",
+      "value": "ATP/WTA match results and betting odds",
+      "features": ["surface_calibration", "historical_odds", "closing_odds", "h2h", "tournament_form"]
+    },
+    {
+      "name": "Jeff Sackmann tennis_atp/tennis_wta",
+      "sports": ["tennis"],
+      "type": "github_csv",
+      "url": "https://github.com/JeffSackmann/tennis_atp",
+      "cost": "free_non_commercial_cc_by_nc_sa",
+      "value": "rankings, results, stats, surface history",
+      "features": ["surface_elo", "global_elo", "fatigue_14d", "recent_form_10", "ranking_delta"]
+    },
+    {
+      "name": "nba_api",
+      "sports": ["basketball"],
+      "type": "python_package_nba_stats",
+      "url": "https://github.com/swar/nba_api",
+      "cost": "free_cloud_block_risk",
+      "value": "NBA.com stats endpoints",
+      "features": ["pace", "off_rating", "def_rating", "net_rating", "lineups", "player_usage", "rest_days"]
+    },
+    {
+      "name": "Balldontlie",
+      "sports": ["basketball", "baseball", "hockey", "football", "mma", "tennis", "golf", "racing"],
+      "type": "sports_api",
+      "url": "https://docs.balldontlie.io/",
+      "cost": "api_key_free_paid_tiers",
+      "value": "games, stats, standings, odds, injuries, props depending on sport/plan",
+      "features": ["injuries", "odds", "player_props", "standings", "player_stats"]
+    },
+    {
+      "name": "MoneyPuck",
+      "sports": ["hockey"],
+      "type": "csv_zip_advanced_stats",
+      "url": "https://www.moneypuck.com/data.htm",
+      "cost": "free_attribution",
+      "value": "NHL xG, shot, player, goalie and team metrics from 2007 onwards",
+      "features": ["xgf60", "xga60", "xg_pct", "goalie_gsax", "shot_quality", "special_teams"]
+    },
+    {
+      "name": "NHL API",
+      "sports": ["hockey"],
+      "type": "json_api",
+      "url": "https://github.com/Zmalski/NHL-API-Reference",
+      "cost": "free_unofficial_reference",
+      "value": "NHL schedule, rosters, boxscores, gamecenter",
+      "features": ["schedule", "roster", "starting_goalie_candidate", "rest_days", "boxscore"]
+    },
+    {
+      "name": "MLB Stats API",
+      "sports": ["baseball"],
+      "type": "json_api",
+      "url": "https://github.com/toddrob99/MLB-StatsAPI/wiki/Endpoints",
+      "cost": "free_unofficial_reference",
+      "value": "MLB schedules, probable pitchers, rosters, boxscores",
+      "features": ["probable_pitcher", "pitcher_rest", "lineup", "roster", "bullpen_usage"]
+    },
+    {
+      "name": "Baseball Savant Statcast",
+      "sports": ["baseball"],
+      "type": "csv_statcast",
+      "url": "https://baseballsavant.mlb.com/csv-docs",
+      "cost": "free",
+      "value": "pitch-by-pitch Statcast, xwOBA, xBA, barrel/hard-hit metrics",
+      "features": ["starter_xera", "xwoba", "barrel_rate", "hard_hit_rate", "platoon_advantage"]
+    },
+    {
+      "name": "UFCStats",
+      "sports": ["mma"],
+      "type": "scrape",
+      "url": "http://ufcstats.com/",
+      "cost": "free_scraping",
+      "value": "UFC fighter and fight statistics",
+      "features": ["reach_advantage", "stance_matchup", "sig_strikes_per_min", "td_accuracy", "td_defense", "layoff_days"]
+    },
+    {
+      "name": "DataGolf",
+      "sports": ["golf"],
+      "type": "paid_api",
+      "url": "https://datagolf.com/api-access",
+      "cost": "paid",
+      "value": "strokes gained, player skill ratings, matchup odds, historical raw data and odds",
+      "features": ["sg_ott", "sg_app", "sg_arg", "sg_putt", "course_fit", "tee_time_wave_weather", "matchup_fair_odds"]
+    },
+    {
+      "name": "OpenF1",
+      "sports": ["racing"],
+      "type": "json_csv_api",
+      "url": "https://openf1.org/docs",
+      "cost": "free",
+      "value": "F1 sessions, laps, stints, pit, position and weather data",
+      "features": ["qualifying_pace", "practice_long_run_pace", "tyre_degradation", "pit_delta", "track_temperature", "rainfall"]
+    },
+    {
+      "name": "FastF1",
+      "sports": ["racing"],
+      "type": "python_package",
+      "url": "https://docs.fastf1.dev/",
+      "cost": "free",
+      "value": "F1 timing, telemetry, weather and race results",
+      "features": ["telemetry", "lap_times", "sector_times", "weather", "tyre_stints"]
+    },
+    {
+      "name": "Open-Meteo",
+      "sports": ["football", "baseball", "tennis", "golf", "racing"],
+      "type": "weather_api",
+      "url": "https://open-meteo.com/",
+      "cost": "free_non_commercial_friendly",
+      "value": "forecast and historical weather",
+      "features": ["rain", "wind", "temperature", "humidity", "pressure"]
+    }
+  ]
+}
