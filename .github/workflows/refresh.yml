@@ -135,8 +135,8 @@ jobs:
             python3 fetch_mlb_pitchers.py || true
             python3 fetch_nhl_stats.py || true
             python3 fetch_nba_team_stats.py || true
-            # 2026-05-01 — Markets étendus Winamax (HT, OU multi-lignes,
-            # score exact, DNB) sur 60 matches top-priorité. ~30-50s.
+            # v35 — Markets étendus Winamax multi-sports (foot, tennis,
+            # basket, baseball, hockey, MMA) sur le pool exact priorisé.
             # Tourne toutes les 15 min, après que patch_winamax_markets a
             # mis match_id sur les events ESPN.
             python3 fetch_winamax_match_details.py || true

@@ -140,9 +140,12 @@ def _scan_data_quality():
     upcoming_events = 0
     winamax_available = 0  # winamax.available=true (peut être tournoi only)
     winamax_exact = 0      # winamax.match_id + markets['1n2'] présents
+    winamax_detailed = 0   # match exact + au moins un marché détaillé hors 1N2
     winamax_tournament_only = 0
     actionable_external_odds = 0  # exact existe MAIS snapshot externe
     football_invalid_form = 0  # avg_gf5 ou avg_ga5 > 5 = NBA-level
+    by_sport: dict[str, dict] = {}
+    reason_counts: dict[str, int] = {}
 
     for evs in (data.get('days') or {}).values():
         for ev in (evs or []):
@@ -152,17 +155,33 @@ def _scan_data_quality():
             upcoming_events += 1
 
             wnx = ev.get('winamax') or {}
+            sport = ev.get('sport') or 'unknown'
+            sb = by_sport.setdefault(sport, {'upcoming': 0, 'available': 0, 'exact': 0, 'detailed': 0, 'tournament_only': 0, 'missing': 0})
+            sb['upcoming'] += 1
             avail = wnx.get('available') is True
             mid = wnx.get('match_id')
             mks = wnx.get('markets') or {}
             has_1n2 = isinstance(mks.get('1n2'), dict) and mks['1n2'].get('home') is not None
+            has_detail = has_1n2 and any(k != '1n2' for k in mks.keys())
             is_exact = bool(avail and mid and has_1n2)
             if avail:
                 winamax_available += 1
+                sb['available'] += 1
                 if is_exact:
                     winamax_exact += 1
+                    sb['exact'] += 1
+                    if has_detail:
+                        winamax_detailed += 1
+                        sb['detailed'] += 1
                 else:
                     winamax_tournament_only += 1
+                    sb['tournament_only'] += 1
+                    note = wnx.get('note') or 'tournament_only_unknown'
+                    reason_counts[note] = reason_counts.get(note, 0) + 1
+            else:
+                sb['missing'] += 1
+                note = wnx.get('note') or 'not_available'
+                reason_counts[note] = reason_counts.get(note, 0) + 1
 
             # Snapshot externe alors qu'un match exact Winamax existe :
             # le frontend prioritise odds/snapshot avant winamax.markets
@@ -196,10 +215,16 @@ def _scan_data_quality():
         'upcoming_events': upcoming_events,
         'winamax_available': winamax_available,
         'winamax_exact': winamax_exact,
+        'winamax_detailed': winamax_detailed,
         'winamax_tournament_only': winamax_tournament_only,
         'winamax_exact_ratio': winamax_exact_ratio,
+        'winamax_detailed_ratio': round(winamax_detailed / winamax_exact, 3) if winamax_exact else None,
         'actionable_external_odds': actionable_external_odds,
         'football_invalid_form': football_invalid_form,
+        'winamax_coverage': {
+            'by_sport': by_sport,
+            'reasons': dict(sorted(reason_counts.items(), key=lambda kv: kv[1], reverse=True)[:12]),
+        },
     }
 
 
@@ -227,6 +252,12 @@ def main() -> int:
             d = json.loads(path.read_text(encoding='utf-8'))
             counts = counter(d) or {}
             entry.update(counts)
+            if key == 'team_form' and counts.get('teams') == 0:
+                out['warnings'].append('team_form: source vide — signal forme L10 désactivé')
+            if key == 'footballdata' and counts.get('rows') == 0:
+                out['warnings'].append('footballdata: source vide — historique ligues foot désactivé')
+            if key == 'sofascore_events' and counts.get('total') == 0:
+                out['warnings'].append('sofascore_events: source vide — matching Sofascore indisponible')
         except Exception as e:
             entry['parse_error'] = str(e)[:120]
             out['warnings'].append(f'{key}: parse error')
@@ -259,6 +290,12 @@ def main() -> int:
             out['warnings'].append(
                 f'winamax_exact_ratio bas: {ratio:.0%} '
                 f'({q["winamax_exact"]}/{q["winamax_available"]})'
+            )
+        detailed_ratio = q.get('winamax_detailed_ratio')
+        if detailed_ratio is not None and detailed_ratio < 0.35:
+            out['warnings'].append(
+                f'winamax_detailed_ratio bas: {detailed_ratio:.0%} '
+                f'({q["winamax_detailed"]}/{q["winamax_exact"]})'
             )
 
     # Bug-hunt 2026-05-02 : compute `overall` selon les warnings + data freshness
