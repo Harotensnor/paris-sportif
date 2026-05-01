@@ -45,5 +45,13 @@
 - Avant: 0/1038 events avec `team_form_l10`; 365 matchs foot avaient seulement une forme L5 native; `team_form.json` contenait 57 équipes et le patch rapide cron ne lisait pas ses clés `sport:league:id`
 - Après: collecte ESPN schedule élargie à 696 équipes vues, 641 formes foot ajoutées, cache total 698 équipes; `data.js` expose 373 events avec `team_form_l10`, dont 320 foot, 48 baseball, 4 basket, 1 hockey; 735 compétiteurs ont `form10`
 - Impact: le modèle lit une forme 10 matchs stable (`form10`/`team_form_l10`) au lieu de s'appuyer uniquement sur L5 ou rien; le cron patchera maintenant le vrai format du cache
+- Commit: 27ffefc9
+- Status: ✅ DONE
+
+## Sprint v35.07 (2026-05-02 02:09 UTC)
+- Chantier: P1 baseball pitcherStats blend
+- Avant: rapport baseline `backtest_report_v2.json` baseball 5/13, WR 38.5%, ROI flat -36.68%, Brier 0.2561; projection MLB diluait l'ERA starter à environ 25% après double moyenne
+- Après: projection baseball = 60% runs L5 attaque + 40% ERA pitcher adverse, variance resserrée si écart ERA starters >=2.0; backtest recalculé 45 picks baseball, WR 57.8%, ROI flat -0.92%, Brier 0.2456
+- Impact: drawdown baseball quasi neutralisé dans le rapport mesuré (+35.76 pts ROI vs baseline publié) avec une formule plus lisible et moins bruitée
 - Commit: pending
 - Status: ✅ DONE
