@@ -12109,16 +12109,18 @@
       }
     }
     // v30 #4 — Si au moins un match est LIVE, indiquer le mode polling
-    // accéléré (30s au lieu de 60s). Petit badge à droite, non intrusif.
+    // accéléré (10s en v33.7). Petit badge à droite, non intrusif.
+    // v33.8 — Compteur LIVE explicit "🔴 LIVE 5 · poll 10s" pour que
+    // l'user sache combien de matchs sont en cours sans naviguer.
     try {
-      const hasLive = (function(){
+      const liveCount = (function(){
         const d = window.PRONOSTICS_DATA;
-        if (!d || !d.days) return false;
+        if (!d || !d.days) return 0;
         const todayIso = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
-        return (d.days[todayIso] || []).some(m => m && m.status === 'STATUS_IN_PROGRESS' && !m.completed);
+        return (d.days[todayIso] || []).filter(m => m && m.status === 'STATUS_IN_PROGRESS' && !m.completed).length;
       })();
-      if (hasLive && txtEl && !txtEl.innerHTML.includes('data-live-badge')) {
-        const badge = ' · <span data-live-badge style="background:rgba(239,68,68,.18);color:#fca5a5;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.4px;">🔴 LIVE · poll 10s</span>';
+      if (liveCount > 0 && txtEl && !txtEl.innerHTML.includes('data-live-badge')) {
+        const badge = ` · <span data-live-badge style="background:rgba(239,68,68,.18);color:#fca5a5;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.4px;animation:rfrPulse 2s ease-in-out infinite;">🔴 LIVE ${liveCount} · poll 10s</span>`;
         txtEl.innerHTML = txtEl.innerHTML + badge;
       }
     } catch(e){}
