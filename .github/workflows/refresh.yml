@@ -7,8 +7,8 @@ name: refresh-data
 # Client-side 60s poll + visibilitychange refresh keep the UX fresh.
 on:
   schedule:
-    - cron: '*/5 10-23 * * *'    # day: every 5 min
-    - cron: '*/30 0-9 * * *'     # night: every 30 min
+    - cron: '*/5 10-23 * * *'    # day: every 5 min (limite GitHub Actions)
+    - cron: '*/15 0-9 * * *'     # night: every 15 min (was 30 — v33.7, mode plus 'live')
   workflow_dispatch: {}
 
 permissions:

@@ -12118,7 +12118,7 @@
         return (d.days[todayIso] || []).some(m => m && m.status === 'STATUS_IN_PROGRESS' && !m.completed);
       })();
       if (hasLive && txtEl && !txtEl.innerHTML.includes('data-live-badge')) {
-        const badge = ' · <span data-live-badge style="background:rgba(239,68,68,.18);color:#fca5a5;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.4px;">🔴 LIVE · poll 30s</span>';
+        const badge = ' · <span data-live-badge style="background:rgba(239,68,68,.18);color:#fca5a5;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.4px;">🔴 LIVE · poll 10s</span>';
         txtEl.innerHTML = txtEl.innerHTML + badge;
       }
     } catch(e){}
@@ -12653,15 +12653,18 @@
     __refreshTimer = setInterval(() => {
       const now = Date.now();
       const tabHidden = document.visibilityState === 'hidden';
-      // v30 #4 + Sprint 136 — Polling adaptive 3 niveaux :
-      // - 15s si match imminent (<15min avant kickoff) : on veut la dernière cote
-      // - 30s si match LIVE en cours : updates en cours
-      // - 60s sinon : économie réseau
-      // Réévalué à chaque tick (une nouvelle rencontre peut passer en imminent ou
-      // LIVE entre deux ticks).
-      const pollEveryMs = _hasImminentMatch() ? 15 * 1000
-                        : _hasLiveMatch()    ? 30 * 1000
-                        :                      60 * 1000;
+      // v33.7 — Polling adaptive plus agressif pour mode "live" :
+      // - 10s si match LIVE en cours (était 30s)
+      // - 12s si match imminent <15min (était 15s)
+      // - 30s sinon (était 60s)
+      // Justification : poll fetch data_today.json (~280 KB lite, pas
+      // data.js full 2.5 MB), donc 30s = ~9 KB/min en moyenne — négligeable.
+      // Le user a demandé "rafraîchissement plus rapide" pour direct/live.
+      // Réévalué à chaque tick (une nouvelle rencontre peut passer en imminent
+      // ou LIVE entre deux ticks).
+      const pollEveryMs = _hasLiveMatch()    ? 10 * 1000
+                        : _hasImminentMatch() ? 12 * 1000
+                        :                      30 * 1000;
       // When tab is hidden, don't burn CPU with rendering. Poll stays (cheap).
       // Data poll (every 60 s, ou 30s en mode live) — fires render() on success via the fresh data
       if (now - lastPoll >= pollEveryMs && !__refreshInFlight) {
