@@ -40,6 +40,11 @@ import unicodedata
 from datetime import datetime, timezone
 from pathlib import Path
 
+try:
+    from patch_clubelo import lookup as _clubelo_lookup
+except Exception:
+    _clubelo_lookup = None
+
 ROOT = Path(__file__).resolve().parent.parent
 DATA_JS = ROOT / 'data.js'
 
@@ -277,8 +282,8 @@ def patch_clubelo(data: dict) -> int:
     elo = _load_json(ROOT / 'clubelo.json')
     if not elo:
         return 0
-    by_team = elo.get('by_team') or elo
-    if not by_team or not isinstance(by_team, dict):
+    clubs = elo.get('clubs') or elo.get('by_team') or elo
+    if not clubs or not isinstance(clubs, dict):
         return 0
     n = 0
     for evs in (data.get('days') or {}).values():
@@ -287,20 +292,35 @@ def patch_clubelo(data: dict) -> int:
                 continue
             home_elo = away_elo = None
             for c in (ev.get('competitors') or []):
-                team_name = _norm(c.get('name') or '')
-                e = by_team.get(team_name)
+                team_name = c.get('name') or ''
+                key = _norm(team_name)
+                e = (_clubelo_lookup(clubs, team_name) if _clubelo_lookup else None) or clubs.get(key)
                 if not e:
                     continue
                 rating = e if isinstance(e, (int, float)) else (e.get('elo') if isinstance(e, dict) else None)
                 if rating is None:
                     continue
+                c_elo = {
+                    'value': rating,
+                    'rank': e.get('rank') if isinstance(e, dict) else None,
+                    'country': e.get('country') if isinstance(e, dict) else None,
+                    'level': e.get('level') if isinstance(e, dict) else None,
+                }
+                c['elo'] = c_elo
                 c['clubelo'] = {'elo': rating}
                 if c.get('home_away') == 'home':
-                    home_elo = rating
+                    home_elo = c_elo
                 elif c.get('home_away') == 'away':
-                    away_elo = rating
+                    away_elo = c_elo
             if home_elo and away_elo:
-                ev['clubelo'] = {'home_elo': home_elo, 'away_elo': away_elo}
+                ev['clubelo'] = {
+                    'home_elo': home_elo['value'],
+                    'away_elo': away_elo['value'],
+                    'diff': round(float(home_elo['value']) - float(away_elo['value']), 1),
+                    'home_rank': home_elo.get('rank'),
+                    'away_rank': away_elo.get('rank'),
+                    'source': 'clubelo',
+                }
                 n += 1
     return n
 

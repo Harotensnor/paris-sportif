@@ -61,5 +61,13 @@
 - Avant: après cron, `data.js` avait 0/1038 events avec marchés Winamax détaillés (`len(markets)>1`); `patch_winamax_markets.py` rejetait 166 vraies lignes à cause d'un seuil marge 1N2 >12%
 - Après: seuil de sanity 1N2 ajusté à 22%, fetch détail 138 matchs, patch 316 events avec markets, 198 events avec marchés détaillés: football 123, baseball 48, basket 16, hockey 9, tennis 2
 - Impact: le scanner value récupère enfin les marchés exacts O/U, DNB, double chance, handicaps/runline/totals au lieu de rester bloqué sur 1N2
+- Commit: fbc1d2e4
+- Status: ✅ DONE
+
+## Sprint v35.09 (2026-05-02 02:42 UTC)
+- Chantier: P7 ClubElo dans patch rapide cron
+- Avant: `data.js` restait à 0 events avec `event.clubelo` après cron; `patch_all_quick.py` lisait mal `clubelo.json` (`clubs`) et n'utilisait pas les aliases du patch spécialisé
+- Après: `patch_all_quick.py` réutilise le lookup ClubElo robuste; mesure locale 111 events avec `clubelo`, 162 events avec au moins une équipe Elo, 273 compétiteurs enrichis
+- Impact: le signal Elo devient persistant à chaque refresh, pas seulement après exécution manuelle du patch spécialisé
 - Commit: pending
 - Status: ✅ DONE
