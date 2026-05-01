@@ -4551,6 +4551,402 @@
   .onb-bankroll-preset:hover { border-color: var(--brand) !important; }
   #onb-bankroll:focus { border-color: var(--brand) !important; outline: none; box-shadow: 0 0 0 3px rgba(167,139,250,.18); }
 
+  /* v34.34 — Dashboard command center. Above the fold, decision-first:
+     mission status, primary pick, bankroll plan, model health, fast routes. */
+  .dash-cockpit {
+    margin: 0 0 18px;
+    padding: 18px;
+    background:
+      linear-gradient(135deg, rgba(18, 24, 38, .96), rgba(10, 13, 20, .96)),
+      var(--panel);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--brand);
+    border-radius: 8px;
+    box-shadow: 0 12px 34px rgba(0,0,0,.24);
+    color: var(--text);
+    letter-spacing: 0;
+  }
+  .dash-cockpit--go { border-left-color: var(--accent); }
+  .dash-cockpit--watch { border-left-color: var(--warn); }
+  .dash-cockpit--calm { border-left-color: var(--text-dim); }
+  .dash-cockpit--danger { border-left-color: var(--danger); }
+  .dash-cockpit__top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .dash-cockpit__kicker,
+  .dash-cockpit__eyebrow,
+  .dash-cockpit__mini-title {
+    display: inline-flex;
+    align-items: center;
+    color: var(--text-dim2);
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0;
+  }
+  .dash-cockpit__top h1 {
+    margin: 4px 0 5px;
+    color: var(--text);
+    font-size: clamp(26px, 3vw, 42px);
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: 0;
+  }
+  .dash-cockpit__top p {
+    margin: 0;
+    max-width: 720px;
+    color: var(--text-dim);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .dash-cockpit__status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-width: 190px;
+    color: var(--text-dim2);
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .dash-cockpit__status-pill {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border-2);
+    background: rgba(255,255,255,.04);
+    color: var(--text);
+  }
+  .dash-cockpit__status-pill--ok { border-color: rgba(16,185,129,.36); color: var(--accent); background: rgba(16,185,129,.10); }
+  .dash-cockpit__status-pill--warn { border-color: rgba(251,191,36,.36); color: var(--warn); background: rgba(251,191,36,.10); }
+  .dash-cockpit__status-pill--danger { border-color: rgba(252,165,165,.42); color: var(--danger); background: rgba(252,165,165,.10); }
+  .dash-cockpit__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.28fr) minmax(320px, .72fr);
+    gap: 14px;
+    align-items: stretch;
+  }
+  .dash-cockpit__pick,
+  .dash-cockpit__panel,
+  .dash-cockpit__tile {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: rgba(255,255,255,.035);
+  }
+  .dash-cockpit__pick {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 100%;
+    padding: 16px;
+    cursor: pointer;
+    transition: transform .18s ease, border-color .18s ease, background .18s ease;
+  }
+  .dash-cockpit__pick:hover,
+  .dash-cockpit__pick:focus-visible {
+    transform: translateY(-1px);
+    border-color: rgba(16,185,129,.44);
+    background: rgba(16,185,129,.055);
+    outline: none;
+  }
+  .dash-cockpit__pick--empty {
+    cursor: default;
+    border-style: dashed;
+  }
+  .dash-cockpit__pick--empty:hover {
+    transform: none;
+    border-color: var(--border);
+    background: rgba(255,255,255,.035);
+  }
+  .dash-cockpit__pick-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .dash-cockpit__countdown {
+    color: var(--warn);
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+  .dash-cockpit__match {
+    margin: 0;
+    color: var(--text);
+    font-size: clamp(24px, 3vw, 38px);
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: 0;
+    overflow-wrap: anywhere;
+  }
+  .dash-cockpit__match span {
+    color: var(--text-dim2);
+    font-weight: 500;
+  }
+  .dash-cockpit__league {
+    color: var(--text-dim);
+    font-size: 13px;
+    min-height: 20px;
+  }
+  .dash-cockpit__betline,
+  .dash-cockpit__metrics {
+    display: grid;
+    gap: 8px;
+  }
+  .dash-cockpit__betline {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .dash-cockpit__betline > div,
+  .dash-cockpit__metrics > div,
+  .dash-cockpit__lane {
+    min-width: 0;
+    padding: 10px;
+    background: rgba(0,0,0,.18);
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: 8px;
+  }
+  .dash-cockpit__betline span,
+  .dash-cockpit__metrics span,
+  .dash-cockpit__lane span,
+  .dash-cockpit__stake span {
+    display: block;
+    color: var(--text-dim2);
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0;
+  }
+  .dash-cockpit__betline strong,
+  .dash-cockpit__metrics strong,
+  .dash-cockpit__lane strong,
+  .dash-cockpit__stake strong {
+    display: block;
+    margin-top: 2px;
+    color: var(--text);
+    font-size: 18px;
+    line-height: 1.1;
+    font-weight: 900;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .dash-cockpit__betline strong.is-good { color: var(--accent); }
+  .dash-cockpit__betline strong.is-bad { color: var(--danger); }
+  .dash-cockpit__stake {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 160px;
+    gap: 12px;
+    align-items: center;
+    padding: 12px;
+    background: rgba(167,139,250,.07);
+    border: 1px solid rgba(167,139,250,.20);
+    border-radius: 8px;
+  }
+  .dash-cockpit__stake em,
+  .dash-cockpit__metrics em,
+  .dash-cockpit__lane em,
+  .dash-cockpit__tile em {
+    display: block;
+    margin-top: 3px;
+    color: var(--text-dim);
+    font-size: 11px;
+    font-style: normal;
+    line-height: 1.35;
+  }
+  .dash-cockpit__riskbar {
+    width: 100%;
+    height: 10px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(255,255,255,.08);
+  }
+  .dash-cockpit__riskbar span {
+    display: block;
+    height: 100%;
+    min-width: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--warn));
+  }
+  .dash-cockpit__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: auto;
+  }
+  .dash-cockpit__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border-2);
+    background: rgba(255,255,255,.03);
+    color: var(--text);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 800;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .dash-cockpit__btn--primary {
+    border-color: transparent;
+    background: var(--brand);
+    color: #08080a;
+  }
+  .dash-cockpit__btn--book {
+    border-color: rgba(251,191,36,.45);
+    background: #f59e0b;
+    color: #120b03;
+  }
+  .dash-cockpit__panel {
+    padding: 14px;
+  }
+  .dash-cockpit__metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 10px;
+  }
+  .dash-cockpit__lanes {
+    display: grid;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .dash-cockpit__lane {
+    display: grid;
+    grid-template-columns: 90px 56px minmax(0, 1fr);
+    align-items: center;
+    gap: 8px;
+  }
+  .dash-cockpit__lane strong {
+    margin-top: 0;
+    text-align: right;
+  }
+  .dash-cockpit__lane em {
+    margin-top: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .dash-cockpit__lane--go { border-color: rgba(16,185,129,.18); }
+  .dash-cockpit__lane--watch { border-color: rgba(251,191,36,.18); }
+  .dash-cockpit__lane--calm { border-color: rgba(148,163,184,.18); }
+  .dash-cockpit__quick {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(176px, 1fr));
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .dash-cockpit__tile {
+    display: block;
+    width: 100%;
+    min-height: 88px;
+    padding: 12px;
+    color: var(--text);
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+    transition: transform .18s ease, border-color .18s ease, background .18s ease;
+  }
+  .dash-cockpit__tile:hover,
+  .dash-cockpit__tile:focus-visible {
+    transform: translateY(-1px);
+    border-color: rgba(167,139,250,.42);
+    background: rgba(167,139,250,.07);
+    outline: none;
+  }
+  .dash-cockpit__tile span {
+    display: block;
+    color: var(--text-dim2);
+    font-size: 11px;
+    font-weight: 800;
+  }
+  .dash-cockpit__tile strong {
+    display: block;
+    margin-top: 5px;
+    color: var(--text);
+    font-size: 16px;
+    line-height: 1.15;
+  }
+  .dash-cockpit__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,.07);
+    color: var(--text-dim2);
+    font-size: 12px;
+  }
+  .dash-cockpit__link {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--brand);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  @media (max-width: 980px) {
+    .dash-cockpit__top {
+      flex-direction: column;
+    }
+    .dash-cockpit__status {
+      justify-content: flex-start;
+      min-width: 0;
+    }
+    .dash-cockpit__grid {
+      grid-template-columns: 1fr;
+    }
+    .dash-cockpit__quick {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 640px) {
+    .dash-cockpit {
+      margin: 0 -4px 14px;
+      padding: 14px;
+      border-radius: 8px;
+    }
+    .dash-cockpit__top h1,
+    .dash-cockpit__match {
+      font-size: 26px;
+    }
+    .dash-cockpit__betline,
+    .dash-cockpit__metrics,
+    .dash-cockpit__quick {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .dash-cockpit__stake {
+      grid-template-columns: 1fr;
+    }
+    .dash-cockpit__lane {
+      grid-template-columns: 76px 46px minmax(0, 1fr);
+    }
+    .dash-cockpit__btn {
+      flex: 1 1 132px;
+    }
+  }
+  @media (max-width: 390px) {
+    .dash-cockpit__betline,
+    .dash-cockpit__quick {
+      grid-template-columns: 1fr;
+    }
+    .dash-cockpit__metrics {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
   /* v31.3 — Hero éditorial dashboard (audit UX dashboard éditorial mobile-first).
      UNE SEULE promesse métier au-dessus du fold = TOP PICK card claire avec
      match, marché, cote, confiance, 2 raisons, CTA. Pas de H1 marketing
