@@ -15113,6 +15113,51 @@
                     <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(aN)}</span>
                   </div>
                   <div style="font-size:13px;color:var(--brand);font-weight:700;margin-bottom:10px;">→ ${esc(pickLbl)}</div>
+                  ${(() => {
+                    // 2026-05-01 — Forme L5 home/away en mini-badges + streak
+                    // si l'équipe pickée est en série de victoires/défaites.
+                    const competitors = p.m.competitors || [];
+                    const home = competitors.find(c => c.home_away === 'home') || competitors[0];
+                    const away = competitors.find(c => c.home_away === 'away') || competitors[1];
+                    const renderForm5 = (formStr) => {
+                      if (!formStr || typeof formStr !== 'string') return '';
+                      const chars = formStr.slice(0, 5).split('');
+                      return chars.map(c => {
+                        const v = c.toUpperCase();
+                        const norm = v === 'T' ? 'D' : v;
+                        const ch = norm === 'W' ? 'V' : norm === 'L' ? 'D' : 'N';
+                        const col = norm === 'W' ? 'var(--accent)' : norm === 'L' ? 'var(--danger)' : 'var(--text-dim2)';
+                        const bg = norm === 'W' ? 'rgba(52,211,153,.15)' : norm === 'L' ? 'rgba(248,113,113,.15)' : 'rgba(255,255,255,.05)';
+                        return `<span style="display:inline-block;width:14px;height:14px;line-height:14px;text-align:center;border-radius:3px;background:${bg};color:${col};font-size:9px;font-weight:700;">${ch}</span>`;
+                      }).join('');
+                    };
+                    // Streak detection : compter consecutives victoires/défaites
+                    // sur l'équipe pickée (ou le pick X = match nul).
+                    const pickKey = (p.best && p.best.key) || (p.pred.pick && p.pred.pick.key) || '';
+                    let streakTeam = null;
+                    if (pickKey === '1') streakTeam = home;
+                    else if (pickKey === '2') streakTeam = away;
+                    let streakHtml = '';
+                    if (streakTeam && typeof streakTeam.form === 'string' && streakTeam.form.length >= 3) {
+                      const f = streakTeam.form;
+                      let count = 1; const first = f[0];
+                      for (let i = 1; i < f.length; i++) { if (f[i] === first) count++; else break; }
+                      if (count >= 3) {
+                        const fc = first.toUpperCase();
+                        if (fc === 'W') streakHtml = `<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 6px;background:rgba(251,191,36,.18);color:var(--warn);border-radius:999px;font-size:10px;font-weight:700;" title="${esc(streakTeam.name||'')} sur une série de ${count} victoires d'affilée">🔥 ${count}V</span>`;
+                        else if (fc === 'L') streakHtml = `<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 6px;background:rgba(248,113,113,.18);color:var(--danger);border-radius:999px;font-size:10px;font-weight:700;" title="${esc(streakTeam.name||'')} sur une série de ${count} défaites d'affilée">❄️ ${count}D</span>`;
+                      }
+                    }
+                    const formH = renderForm5(home?.form);
+                    const formA = renderForm5(away?.form);
+                    if (!formH && !formA && !streakHtml) return '';
+                    return `<div style="margin-bottom:10px;padding:8px 10px;background:rgba(255,255,255,.03);border-radius:6px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:10.5px;color:var(--text-dim);">
+                      <span style="font-weight:600;text-transform:uppercase;letter-spacing:.4px;font-size:9.5px;">Forme L5</span>
+                      ${formH ? `<span style="display:inline-flex;align-items:center;gap:4px;"><span style="color:var(--text-dim2);font-size:10px;">${esc((home?.short || '?').slice(0,8))}</span> ${formH}</span>` : ''}
+                      ${formA ? `<span style="display:inline-flex;align-items:center;gap:4px;"><span style="color:var(--text-dim2);font-size:10px;">${esc((away?.short || '?').slice(0,8))}</span> ${formA}</span>` : ''}
+                      ${streakHtml}
+                    </div>`;
+                  })()}
                   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:11px;">
                     <div style="background:rgba(255,255,255,.03);padding:6px 8px;border-radius:6px;">
                       <div style="color:var(--text-dim);text-transform:uppercase;font-size:9.5px;letter-spacing:.5px;">Confiance</div>
