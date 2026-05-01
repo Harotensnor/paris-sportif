@@ -36,78 +36,88 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache: 'pip'
+
+      # v33.27 — pip cache file pour `actions/setup-python` cache: pip
+      - name: Setup pip cache key
+        run: echo "curl_cffi pillow" > pip-requirements.txt
 
       - name: Install deps
-        run: pip install curl_cffi pillow --break-system-packages
+        run: pip install -r pip-requirements.txt --break-system-packages
 
-      - name: Run fetch pipeline
+      # v33.27 — PARALLÈLE : les fetchers indépendants tournent simultanément.
+      # Avant : ~3min en séquentiel. Après : ~30-45s (limité par le plus lent).
+      # Tous écrivent leur propre JSON, pas de race-condition possible.
+      # Les patches restent séquentiels (eux écrivent tous data.js).
+      - name: Fetch pipeline (parallèle)
         run: |
-          set -e
           cd scripts
-          python3 fetch_live.py || true      # today only, ~15s
-          python3 patch_odds.py || true      # normalize ESPN odds
-          python3 fetch_tennis_odds.py || true
-          python3 fetch_rus_odds.py || true
-          python3 fetch_injuries.py || true  # ESPN: US sports (NBA/NHL/NFL/MLB)
-          python3 fetch_h2h.py || true       # head-to-head histories
-          python3 snapshot_odds.py || true   # freeze pre-match odds (persist post-match for bilan)
-          python3 snapshot_results.py || true # archive completed matches into results_archive.jsonl (long backtest window)
-          python3 fetch_forebet.py || true   # cheap: single HTML page, 40+ preds over 3 days
-          # Every 3rd tick (= 15 min), also refresh RdJ tipsters (10 HTTP reqs, respectful cadence)
+          # Group A : fetchers heavy en parallèle (background avec &)
+          (python3 fetch_live.py || true) > /tmp/fetch_live.log 2>&1 &
+          PID_LIVE=$!
+          (python3 fetch_sofascore_events.py || true) > /tmp/fetch_sofa.log 2>&1 &
+          PID_SOFA=$!
+          (python3 fetch_winamax_catalog.py || true) > /tmp/fetch_wnx.log 2>&1 &
+          PID_WNX=$!
+          (python3 fetch_h2h.py || true) > /tmp/fetch_h2h.log 2>&1 &
+          PID_H2H=$!
+          (python3 fetch_forebet.py || true) > /tmp/fetch_forebet.log 2>&1 &
+          PID_FOREBET=$!
+          (python3 fetch_tennis_odds.py || true) > /tmp/fetch_tennis.log 2>&1 &
+          PID_TENNIS=$!
+          (python3 fetch_rus_odds.py || true) > /tmp/fetch_rus.log 2>&1 &
+          PID_RUS=$!
+          (python3 fetch_injuries.py || true) > /tmp/fetch_inj.log 2>&1 &
+          PID_INJ=$!
+          (python3 fetch_clubelo.py || true) > /tmp/fetch_clubelo.log 2>&1 &
+          PID_ELO=$!
+          (python3 fetch_fbref_xg.py || true) > /tmp/fetch_xg.log 2>&1 &
+          PID_XG=$!
+          # Wait pour TOUS et imprime les logs (mêmes timeouts implicites = pas de limite ici)
+          wait $PID_LIVE $PID_SOFA $PID_WNX $PID_H2H $PID_FOREBET $PID_TENNIS $PID_RUS $PID_INJ $PID_ELO $PID_XG
+          echo "=== fetch_live ==="; cat /tmp/fetch_live.log | tail -3
+          echo "=== fetch_sofascore ==="; cat /tmp/fetch_sofa.log | tail -3
+          echo "=== fetch_winamax_catalog ==="; cat /tmp/fetch_wnx.log | tail -3
+          echo "=== fetch_h2h ==="; cat /tmp/fetch_h2h.log | tail -2
+          echo "=== fetch_clubelo ==="; cat /tmp/fetch_clubelo.log | tail -2
+          # Snapshot odds + results (rapides, séquentiels après les fetchers)
+          python3 patch_odds.py || true
+          python3 snapshot_odds.py || true
+          python3 snapshot_results.py || true
+          # v33.27 — Group B : fetchers conditionnels en parallèle (cadences variables)
           MIN_MOD15=$(( $(date +%M) % 15 ))
-          if [ $MIN_MOD15 -lt 5 ]; then
-            python3 fetch_tips.py || true
-          fi
-          # v31.7.2 — Sofascore soccer injuries + lineups : avant la condition
-          # `HOUR_MOD2 == 0 && MIN_MOD15 < 5` ne firait que 4×/jour aux minutes
-          # 0/15/30/45 des heures paires, et data restait stale 36h+ quand un
-          # tick ratait. Maintenant : fire toutes les 30min, le script lui-même
-          # auto-throttle si Sofascore renvoie 429/erreur récente.
           MIN_MOD30=$(( $(date +%M) % 30 ))
-          if [ $MIN_MOD30 -lt 5 ]; then
-            python3 fetch_injuries_soccer.py || true
-            python3 fetch_lineups_soccer.py || true
-          fi
-          # Every 12th tick (= 1h), also run full ESPN sweep + Winamax catalog
-          # so tomorrow+ stays fresh. Catalog scrape is slow (~1min) so it's
-          # also on the hourly cadence.
-          # v28 — Winamax index scrape : en une seule requete, produit a la fois
-          # winamax_catalog.json (tournois + matchs) ET winamax_markets.json
-          # (1N2 odds par match). Tres rapide (~2s) donc on le lance a chaque tick.
-          python3 fetch_winamax_catalog.py || true
-          if [ $(( $(date +%M) % 60 )) -lt 5 ]; then
-            python3 fetch_v3.py || true
-          fi
-          # Team-stats (last-5 goal/form enrichies): slow (~4min for 334 teams),
-          # run on 4h cadence. Team form changes at most once per match day so
-          # this is plenty fresh.
+          MIN_MOD60=$(( $(date +%M) % 60 ))
           HOUR_MOD4=$(( $(date +%H) % 4 ))
+          # fetch_tips: every 15min
+          if [ $MIN_MOD15 -lt 5 ]; then
+            (python3 fetch_tips.py || true) > /tmp/fetch_tips.log 2>&1 &
+          fi
+          # fetch_injuries_soccer + fetch_lineups_soccer: every 30min
+          if [ $MIN_MOD30 -lt 5 ]; then
+            (python3 fetch_injuries_soccer.py || true) > /tmp/fetch_inj_soc.log 2>&1 &
+            (python3 fetch_lineups_soccer.py || true) > /tmp/fetch_lineups.log 2>&1 &
+          fi
+          # fetch_v3: every hour (full ESPN sweep)
+          if [ $MIN_MOD60 -lt 5 ]; then
+            (python3 fetch_v3.py || true) > /tmp/fetch_v3.log 2>&1 &
+          fi
+          # fetch_team_stats: every 4h (slow ~4min)
           if [ $HOUR_MOD4 -eq 0 ] && [ $MIN_MOD15 -lt 5 ]; then
-            python3 fetch_team_stats.py || true
+            (python3 fetch_team_stats.py || true) > /tmp/fetch_ts.log 2>&1 &
           fi
-          # ClubElo: single-call CSV fetch, self-throttles to 1 call / 20h so
-          # safe to invoke on every tick. Cheap (<100 KB, <1s).
-          python3 fetch_clubelo.py || true
-          # v31.7.206 — fbref xG : Expected Goals stats per team for top-6
-          # European leagues. Self-throttles 6h. ~5s typical run.
-          python3 fetch_fbref_xg.py || true
-          # v33.0 — Sofascore events MULTI-SPORT (foot/tennis/basket/hockey/
-          # baseball). Source de couverture massive (~1700 events/jour vs
-          # ~500 ESPN actuellement). Comble le gap quand ESPN ban GHA et
-          # ajoute beaucoup de matchs supplémentaires (qualifs WTA tennis,
-          # ligues exotiques, etc.). ~5-10s typique.
-          python3 fetch_sofascore_events.py || true
-          # Weather (Open-Meteo): free, no key. Script self-throttles — skips
-          # if forecast <30min old OR kickoff >6h away. Typical run: <5s.
-          python3 fetch_weather.py || true
-          # Soccer referees (Sofascore): self-throttles to 1 call / 6h.
-          # Per-fixture event lookup, respectful cadence (0.3s between).
-          python3 fetch_referees_soccer.py || true
-          # v30 — Recent W/L form for NBA/WNBA/NHL/MLB/NFL (ESPN doesnt
-          # ship .form for these sports natively). Self-throttled 6h.
-          if [ $(( $(date +%M) % 30 )) -lt 5 ]; then
-            python3 fetch_team_form.py || true
+          # fetch_team_form: every 30min
+          if [ $MIN_MOD30 -lt 5 ]; then
+            (python3 fetch_team_form.py || true) > /tmp/fetch_tf.log 2>&1 &
           fi
+          # fetch_weather + fetch_referees + fetch_clubelo + fetch_fbref_xg : self-throttled, parallèle
+          (python3 fetch_weather.py || true) > /tmp/fetch_weather.log 2>&1 &
+          (python3 fetch_referees_soccer.py || true) > /tmp/fetch_refs.log 2>&1 &
+          # Wait pour TOUS les jobs background lancés
+          wait
+          echo "=== fetch_weather ==="; cat /tmp/fetch_weather.log 2>/dev/null | tail -2 || true
+          echo "=== fetch_referees ==="; cat /tmp/fetch_refs.log 2>/dev/null | tail -2 || true
+          # Patches : SÉQUENTIELS (tous écrivent data.js → race-condition si parallèle)
           python3 patch_winamax.py || true
           # v33.0 — Merge Sofascore events dans data.js (dedup par home|away|day).
           # Doit tourner APRÈS patch_winamax pour préserver la cohérence
