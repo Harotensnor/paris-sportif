@@ -11,7 +11,7 @@
 // The "Stamp sw.js" step replaces this entire line with the current UTC timestamp,
 // so every deploy invalidates all caches → users see the new pronostics.html
 // without needing Ctrl+Shift+R. Manual edits stay valid for local dev.
-const CACHE_VERSION = 'paris-sportif-20260501-121500-v33.17';
+const CACHE_VERSION = 'paris-sportif-20260501-123000-v33.18';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -48,6 +48,11 @@ const LAZY_CACHE_FIRST = [
   'academie.html',
   'comment-lire-un-prono.html',
   'legal.html',
+  // v33.18 — Pages additionnelles présentes dans le repo mais oubliées de
+  // la liste cache-first. Couvrent les liens depuis index.html / footer.
+  'backtest.html',
+  'credibilite.html',
+  '404.html',
 ];
 
 const SHELL_ASSETS = [...PRECACHE_ASSETS, ...LAZY_CACHE_FIRST];
