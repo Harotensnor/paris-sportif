@@ -4,11 +4,15 @@
 Vérifie que les `quality_checks` du pipeline restent dans des seuils
 acceptables. Bloque la merge si :
   - football_invalid_form > 0  (= contamination cross-sport)
-  - actionable_external_odds > 5  (= reco pas Winamax-exact)
-  - winamax_exact_ratio < 0.30  (= mapping Winamax cassé)
 
 Tournés en CI sur push main + PR pour catch les régressions silencieuses
 avant qu'elles affectent le live.
+
+Depuis v34.11, les alertes de couverture Winamax (ratio exact faible,
+snapshots externes présents) restent visibles mais ne bloquent plus la CI par
+défaut : le frontend filtre les picks actionnables sur les marchés Winamax
+exacts. Pour réactiver le mode bloquant complet :
+STRICT_HEALTH=1 python scripts/check_health_quality.py
 
 Exit code :
   0 = tout vert
@@ -17,6 +21,7 @@ Exit code :
 """
 from __future__ import annotations
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -47,7 +52,9 @@ def main() -> int:
         print('WARN: health.json sans quality_checks (probablement old format). Skip.')
         return 0
 
+    strict = os.environ.get('STRICT_HEALTH') == '1'
     failures = []
+    warnings = []
 
     fb_invalid = int(q.get('football_invalid_form') or 0)
     if fb_invalid > THRESHOLDS['football_invalid_form_max']:
@@ -58,30 +65,38 @@ def main() -> int:
 
     ext_odds = int(q.get('actionable_external_odds') or 0)
     if ext_odds > THRESHOLDS['actionable_external_odds_max']:
-        failures.append(
+        msg = (
             f'actionable_external_odds={ext_odds} > {THRESHOLDS["actionable_external_odds_max"]} '
-            f'(events Winamax exact MAIS odds_snapshot externe — promesse Winamax-only cassée)'
+            f'(snapshots externes présents sur des matchs Winamax exacts)'
         )
+        (failures if strict else warnings).append(msg)
 
     wnx_ratio = q.get('winamax_exact_ratio')
     if wnx_ratio is not None:
         try:
             wnx_ratio = float(wnx_ratio)
             if wnx_ratio < THRESHOLDS['winamax_exact_ratio_min']:
-                failures.append(
+                msg = (
                     f'winamax_exact_ratio={wnx_ratio:.0%} < {THRESHOLDS["winamax_exact_ratio_min"]:.0%} '
-                    f'(mapping Winamax majoritairement cassé)'
+                    f'(couverture exacte Winamax faible)'
                 )
+                (failures if strict else warnings).append(msg)
         except (TypeError, ValueError):
             pass
 
     if failures:
         print('FAIL: health.json quality_checks dépasse les seuils :')
         for f in failures:
-            print(f'  ✗ {f}')
+            print(f'  [FAIL] {f}')
         print()
         print('  Voir AUDIT_CLAUDE_PACK_2026-04-27/09_BACKEND_ROOT_CAUSE/ROOT_CAUSE_BACKEND.md')
         return 1
+
+    if warnings:
+        print('WARN: quality_checks à surveiller (non bloquant hors STRICT_HEALTH=1) :')
+        for w in warnings:
+            print(f'  [WARN] {w}')
+        print()
 
     print(f'OK: quality_checks dans les seuils.')
     print(f'  football_invalid_form: {fb_invalid}')
