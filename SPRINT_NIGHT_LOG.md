@@ -93,5 +93,13 @@
 - Avant: `python scripts/check_pipeline_drift.py --report` crashait sous Windows sur `UnicodeEncodeError`; `health.json` n'avait aucun champ `pipeline_drift`
 - Après: le rapport drift s'imprime sans crash; `health.json.pipeline_drift` expose `status=ok`, `drift_count=0`, `auto_refresh_count=43`, `refresh_yml_count=43`; page Santé affiche le bloc local/cron
 - Impact: les divergences pipeline deviennent visibles côté site et le diagnostic CLI reste utilisable sur la machine de Théo
+- Commit: 7bfc8886
+- Status: ✅ DONE
+
+## Sprint v35.13 (2026-05-02 03:27 UTC)
+- Chantier: P20 sitemap dynamique
+- Avant: `sitemap.xml` contenait 15 URLs, `build_sitemap.py` utilisait le mtime local, et `build_sitemap.py` n'était ni dans `auto_refresh.py` ni dans `refresh.yml`
+- Après: sitemap régénéré avec 33 URLs dont routes `#performance`, `#valeur`, `#matchs`, `#sante`; lastmod basé sur `git log` fallback mtime; pipeline local/cron alignée à 44 scripts
+- Impact: les pages/catégories clés du cockpit sont discoverables et le sitemap reste frais à chaque refresh sans drift
 - Commit: pending
 - Status: ✅ DONE
