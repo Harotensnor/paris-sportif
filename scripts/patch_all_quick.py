@@ -52,6 +52,47 @@ def _norm(name: str) -> str:
     return ''.join(c for c in n.lower() if c.isalnum())
 
 
+def _name_tokens(name: str) -> set[str]:
+    toks = {_norm(name)}
+    for part in re.split(r'[\s\-.&]+', name or ''):
+        token = _norm(part)
+        if len(token) >= 3:
+            toks.add(token)
+    toks.discard('')
+    return toks
+
+
+def _name_match(a: str, b: str) -> bool:
+    na = _norm(a)
+    nb = _norm(b)
+    if not na or not nb:
+        return False
+    if na == nb:
+        return True
+    if min(len(na), len(nb)) >= 5 and (na in nb or nb in na):
+        return True
+    return bool(_name_tokens(a) & _name_tokens(b))
+
+
+def _side_name(ev: dict, side: str) -> str:
+    for c in ev.get('competitors') or []:
+        if c.get('home_away') == side:
+            return c.get('name') or c.get('displayName') or c.get('shortDisplayName') or ''
+    return ''
+
+
+def _lineup_payload(side: dict | None) -> dict:
+    side = side or {}
+    return {
+        'team': side.get('team') or '',
+        'formation': side.get('formation') or '',
+        'confirmed': bool(side.get('confirmed')),
+        'coach': side.get('coach') or '',
+        'starters': side.get('starters') or [],
+        'subs': side.get('subs') or [],
+    }
+
+
 def _load_data() -> dict | None:
     if not DATA_JS.exists():
         print('[patch_all_quick] data.js missing', file=sys.stderr)
@@ -171,15 +212,39 @@ def patch_lineups(data: dict) -> int:
                 continue
             if ev.get('completed'):
                 continue
-            ev_name = ev.get('name') or ''
-            if ' at ' not in ev_name:
-                continue
-            away_name, home_name = ev_name.split(' at ', 1)
+            home_name = _side_name(ev, 'home')
+            away_name = _side_name(ev, 'away')
+            if not (home_name and away_name):
+                ev_name = ev.get('name') or ''
+                if ' at ' not in ev_name:
+                    continue
+                away_name, home_name = ev_name.split(' at ', 1)
             key = f'{_norm(home_name.strip())}|{_norm(away_name.strip())}'
             entry = events_idx.get(key)
             if not entry:
+                entry = next((
+                    candidate for idx_key, candidate in events_idx.items()
+                    if (not candidate.get('league_code') or candidate.get('league_code') == ev.get('league_code'))
+                    and _name_match(home_name, (candidate.get('home') or {}).get('team') or idx_key.split('|', 1)[0])
+                    and _name_match(away_name, (candidate.get('away') or {}).get('team') or idx_key.split('|', 1)[-1])
+                ), None)
+            if not entry:
                 continue
-            ev['lineups'] = entry.get('lineups') or entry
+            home_lineup = _lineup_payload(entry.get('home'))
+            away_lineup = _lineup_payload(entry.get('away'))
+            ev['lineups'] = {
+                'home': home_lineup,
+                'away': away_lineup,
+                'league_code': entry.get('league_code') or ev.get('league_code') or '',
+                'sofa_event_id': entry.get('sofa_event_id') or '',
+                'source': 'sofascore',
+            }
+            for c in ev.get('competitors') or []:
+                ha = c.get('home_away')
+                if ha == 'home':
+                    c['lineup'] = home_lineup
+                elif ha == 'away':
+                    c['lineup'] = away_lineup
             n += 1
     return n
 
@@ -241,7 +306,7 @@ def patch_clubelo(data: dict) -> int:
 
 
 def patch_team_form(data: dict) -> int:
-    """Inject team_form.json into competitor.form (NBA/NHL/MLB/NFL)."""
+    """Inject team_form.json into competitor form/L10 fields."""
     tf = _load_json(ROOT / 'team_form.json')
     if not tf:
         return 0
@@ -251,16 +316,29 @@ def patch_team_form(data: dict) -> int:
     n = 0
     for evs in (data.get('days') or {}).values():
         for ev in (evs or []):
-            if ev.get('sport') not in ('basketball', 'hockey', 'baseball', 'football-american'):
-                continue
+            sport = ev.get('sport')
+            code = ev.get('league_code')
             for c in (ev.get('competitors') or []):
-                key = _norm(c.get('name') or '')
+                tid = str(c.get('id') or '')
+                key = f'{sport}:{code}:{tid}' if tid else _norm(c.get('name') or '')
                 form = by_team.get(key)
                 if form:
                     f = form if isinstance(form, str) else form.get('form')
                     if f and not c.get('form'):
                         c['form'] = f
                         n += 1
+                    if isinstance(form, dict):
+                        if form.get('form') and len(str(form.get('form'))) >= 6:
+                            if c.get('form10') != form.get('form') or c.get('team_form_l10') != form.get('form'):
+                                n += 1
+                            c['form10'] = form.get('form')
+                            c['team_form_l10'] = form.get('form')
+                        if form.get('form5'):
+                            c['team_form_l5'] = form.get('form5')
+                        if form.get('last10') and not c.get('last10'):
+                            c['last10'] = form.get('last10')
+                        if form.get('last5') and not c.get('last5'):
+                            c['last5'] = form.get('last5')
     return n
 
 

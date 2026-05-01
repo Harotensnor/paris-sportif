@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Fetch recent W/L form for non-football team sports (basket/hockey/baseball).
+"""Fetch recent W/L form for team sports (football/basket/hockey/baseball).
 
 ESPN's scoreboard endpoint omits the `form` field for these sports —
-football events ship a 5-game string ("WLWWL") natively but the others
+football events often ship only a 5-game string ("WLWWL") while the others
 have `form: null`. This script visits each team's `schedule` endpoint
-once per cron run, extracts the last 5 completed results, and writes
+once per cron run, extracts the last 10 completed results, and writes
 them to a JSON sidecar that `patch_team_form.py` injects back into
 each upcoming event.
 
@@ -38,7 +38,9 @@ OUT = ROOT / 'team_form.json'
 
 RECAPTURE_HOURS = 6.0  # team form changes ~daily, no need to spam ESPN
 
-# ESPN team-schedule endpoint base URLs by (sport, league_code)
+# ESPN team-schedule endpoint base URLs by (sport, league_code).
+# Football/soccer is handled generically because ESPN league codes are already
+# present in data.js (eng.1, esp.1, jpn.1, etc.).
 SCHEDULE_URLS = {
     ('basketball', 'nba'): 'https://site.web.api.espn.com/apis/site/v2/sports/basketball/nba/teams/{tid}/schedule',
     ('basketball', 'wnba'): 'https://site.web.api.espn.com/apis/site/v2/sports/basketball/wnba/teams/{tid}/schedule',
@@ -47,6 +49,13 @@ SCHEDULE_URLS = {
     ('baseball', 'mlb'): 'https://site.web.api.espn.com/apis/site/v2/sports/baseball/mlb/teams/{tid}/schedule',
     ('american-football', 'nfl'): 'https://site.web.api.espn.com/apis/site/v2/sports/football/nfl/teams/{tid}/schedule',
 }
+
+
+def _schedule_url(sport: str, code: str, tid: str) -> str | None:
+    if sport == 'football' and code:
+        return f'https://site.web.api.espn.com/apis/site/v2/sports/soccer/{code}/teams/{tid}/schedule'
+    url_tpl = SCHEDULE_URLS.get((sport, code))
+    return url_tpl.format(tid=tid) if url_tpl else None
 
 
 def _fetch_json(url: str) -> dict | None:
@@ -68,7 +77,7 @@ def _fetch_json(url: str) -> dict | None:
 
 
 def _team_form_from_schedule(payload: dict, team_id: str) -> dict | None:
-    """Extract a 5-game form string + record from ESPN's schedule payload."""
+    """Extract a 10-game form string + record from ESPN's schedule payload."""
     if not isinstance(payload, dict):
         return None
     events = payload.get('events') or []
@@ -131,8 +140,7 @@ def _collect_teams(data: dict) -> list[tuple[str, str, str]]:
         for ev in evs or []:
             sport = ev.get('sport')
             code = ev.get('league_code')
-            key = (sport, code)
-            if key not in SCHEDULE_URLS:
+            if not _schedule_url(str(sport or ''), str(code or ''), '{tid}'):
                 continue
             for c in ev.get('competitors') or []:
                 tid = c.get('id')
@@ -181,10 +189,9 @@ def main():
 
     def work(item):
         sport, code, tid, key = item
-        url_tpl = SCHEDULE_URLS.get((sport, code))
-        if not url_tpl:
+        url = _schedule_url(sport, code, tid)
+        if not url:
             return key, None
-        url = url_tpl.format(tid=tid)
         payload = _fetch_json(url)
         return key, _team_form_from_schedule(payload, tid)
 

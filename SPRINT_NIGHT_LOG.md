@@ -37,5 +37,13 @@
 - Avant: `data.js` exposait 6 events avec `lineups`, 0 compétiteur avec `lineup`; `lineups_soccer.json` contenait 17 matchs disponibles
 - Après: `patch_lineups_soccer.py` patche 12/46 matchs top-5 scannés; `data.js` expose 12 events avec `lineups`, 24 compétiteurs avec XI/subs et 12 matchs avec starters exploitables
 - Impact: les compositions deviennent visibles au niveau match + équipe; le frontend et la santé data peuvent enfin mesurer ce signal sans parcourir un format fantôme
+- Commit: 45483831
+- Status: ✅ DONE
+
+## Sprint v35.06 (2026-05-02 01:57 UTC)
+- Chantier: P4/P2 forme L10 football + team sports
+- Avant: 0/1038 events avec `team_form_l10`; 365 matchs foot avaient seulement une forme L5 native; `team_form.json` contenait 57 équipes et le patch rapide cron ne lisait pas ses clés `sport:league:id`
+- Après: collecte ESPN schedule élargie à 696 équipes vues, 641 formes foot ajoutées, cache total 698 équipes; `data.js` expose 373 events avec `team_form_l10`, dont 320 foot, 48 baseball, 4 basket, 1 hockey; 735 compétiteurs ont `form10`
+- Impact: le modèle lit une forme 10 matchs stable (`form10`/`team_form_l10`) au lieu de s'appuyer uniquement sur L5 ou rien; le cron patchera maintenant le vrai format du cache
 - Commit: pending
 - Status: ✅ DONE

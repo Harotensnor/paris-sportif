@@ -5338,8 +5338,8 @@
     // patché récemment), on calcule formScore sur 10 matchs au lieu de 5.
     // Plus de stabilité, moins de bruit (1 streak récent qui dérive).
     // Pour le foot ESPN, la string fait 5 chars donc on garde slice(0,5).
-    const formExtH = home.form10 || home.form;
-    const formExtA = away.form10 || away.form;
+    const formExtH = home.form10 || home.team_form_l10 || home.form;
+    const formExtA = away.form10 || away.team_form_l10 || away.form;
     const fH = formScore(formExtH);
     const fA = formScore(formExtA);
     let formNudge = null;
