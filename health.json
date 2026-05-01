@@ -1,39 +1,39 @@
 {
-  "generated_at": "2026-05-01T14:48:42Z",
+  "generated_at": "2026-05-01T15:02:24Z",
   "data_age_min": 0,
   "sources": {
     "winamax_catalog": {
-      "age_min": 10,
+      "age_min": 4,
       "tournaments": 116,
-      "matches": 746
+      "matches": 745
     },
     "winamax_markets": {
-      "age_min": 10,
+      "age_min": 4,
       "matches_with_odds": 751
     },
     "injuries_soccer": {
-      "age_min": 10,
+      "age_min": 4,
       "teams": 131,
       "players": 475
     },
     "lineups_soccer": {
-      "age_min": 10,
+      "age_min": 4,
       "events": 17
     },
     "team_stats": {
-      "age_min": 10,
+      "age_min": 4,
       "teams": 430
     },
     "clubelo": {
-      "age_min": 10,
+      "age_min": 4,
       "clubs": 630
     },
     "weather": {
       "age_min": 0,
-      "events": 275
+      "events": 279
     },
     "referees_soccer": {
-      "age_min": 10,
+      "age_min": 4,
       "events": 46
     },
     "fbref_xg": {
@@ -41,11 +41,11 @@
       "present": false
     },
     "sofascore_events": {
-      "age_min": 10,
+      "age_min": 4,
       "total": 0
     },
     "team_form": {
-      "age_min": 10,
+      "age_min": 1,
       "teams": 0
     },
     "footballdata": {
@@ -55,18 +55,17 @@
   },
   "warnings": [
     "fbref_xg: file missing (fbref_xg.json)",
-    "actionable_external_odds: 71 events ont odds_snapshot externe alors que Winamax exact existe",
-    "winamax_exact_ratio bas: 9% (112/1274)"
+    "winamax_exact_ratio bas: 19% (139/742)"
   ],
   "overall": "warning",
   "quality_checks": {
-    "total_events": 1897,
-    "upcoming_events": 1274,
-    "winamax_available": 1274,
-    "winamax_exact": 112,
-    "winamax_tournament_only": 1162,
-    "winamax_exact_ratio": 0.088,
-    "actionable_external_odds": 71,
+    "total_events": 1053,
+    "upcoming_events": 742,
+    "winamax_available": 742,
+    "winamax_exact": 139,
+    "winamax_tournament_only": 603,
+    "winamax_exact_ratio": 0.187,
+    "actionable_external_odds": 0,
     "football_invalid_form": 0
   }
 }
