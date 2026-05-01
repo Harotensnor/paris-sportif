@@ -34,6 +34,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          # Scheduled runs keep the SHA they were queued with. With a 5min cron
+          # and data commits every run, that stale SHA can be behind main by the
+          # time the job actually starts. Always checkout the live branch head.
+          ref: main
           fetch-depth: 1
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -297,16 +301,17 @@ jobs:
           git commit -m "data: auto-refresh $(date -u +'%Y-%m-%d %H:%M UTC')"
           # Retry on race conditions: when a manual push or another cron run
           # advances main between checkout and push, naive `git push` hits
-          # non-fast-forward. Pull --rebase the autostash and retry up to 3x.
-          # `git pull` works with fetch-depth: 1 because we only need to
-          # rebase a handful of commits ahead.
+          # non-fast-forward. Rebase with the generated snapshot winning
+          # conflicts; otherwise two successive data commits conflict on every
+          # one-line JSON file and leave the workflow red even though the data
+          # was refreshed correctly.
           for attempt in 1 2 3; do
             if git push; then
               echo "Push succeeded on attempt $attempt."
               exit 0
             fi
             echo "Push rejected (attempt $attempt) — pulling --rebase and retrying."
-            git pull --rebase --autostash origin main
+            git pull --rebase --autostash -X theirs origin main
           done
           echo "Push still failing after 3 retries — surfacing as a job failure."
           exit 1
