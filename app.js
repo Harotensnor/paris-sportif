@@ -21680,6 +21680,7 @@
       { k: 'confiance', lbl: '🎚️ Par confiance' },
       { k: 'marche',    lbl: '🏷️ Par marché' },
       { k: 'sport',     lbl: '🏆 Par sport' },
+      { k: 'ligue',     lbl: '⚽ Par ligue' },  // v33.10 — drill-down par ligue
     ];
     const subTabsHtml = `
       <div style="margin-top:14px;display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:8px;">
@@ -21999,6 +22000,66 @@
             }).join('')}
           </div>
         </div>` : ''}
+
+        ${currentTab === 'ligue' ? (() => {
+          // v33.10 — Onglet "Par ligue" : table triable ROI/WR/Kelly par ligue.
+          // Lit bt.by_league qui contient stats détaillées (n, win_rate,
+          // flat_roi_pct, kelly_pnl, brier, avg_cote) pour 40+ ligues.
+          const byLeague = bt.by_league || {};
+          const rows = Object.entries(byLeague)
+            .filter(([k, v]) => v && (v.n || 0) >= 3)  // min 3 paris pour signal
+            .map(([code, v]) => ({
+              code,
+              n: v.n || 0,
+              wr: v.win_rate ?? null,
+              roi_pct: v.flat_roi_pct ?? null,
+              kelly: v.kelly_pnl ?? null,
+              brier: v.brier ?? null,
+              avg_cote: v.avg_cote ?? null,
+            }))
+            .sort((a, b) => (b.kelly ?? -999) - (a.kelly ?? -999));
+          if (!rows.length) {
+            return `<div style="margin-top:18px;padding:24px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);text-align:center;color:var(--text-dim);">Pas encore assez de paris pour afficher des stats par ligue (min 3 par ligue).</div>`;
+          }
+          // Top 5 / bottom 5 highlighted
+          return `
+            <div style="margin-top:18px;">
+              <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">⚽ Performance par ligue</div>
+              <div style="font-size:12px;color:var(--text-dim);margin-bottom:14px;">Triées par Kelly cumul (les ligues où le modèle bat le marché). Min 3 paris.</div>
+              <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;font-variant-numeric:tabular-nums;">
+                <div style="display:grid;grid-template-columns:minmax(0,1.2fr) 60px 70px 80px 90px 70px;gap:8px;padding:9px 14px;background:var(--panel-2);border-bottom:1px solid var(--border);font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.5px;font-weight:700;">
+                  <div>Ligue</div>
+                  <div style="text-align:right;">Paris</div>
+                  <div style="text-align:right;">WR</div>
+                  <div style="text-align:right;">ROI flat</div>
+                  <div style="text-align:right;">Kelly cumul</div>
+                  <div style="text-align:right;">Brier</div>
+                </div>
+                ${rows.slice(0, 30).map((r, idx) => {
+                  const wrPct = r.wr != null ? (r.wr * 100).toFixed(0) + '%' : '—';
+                  const roiC = r.roi_pct != null ? r.roi_pct >= 5 ? 'var(--accent)' : r.roi_pct >= -2 ? 'var(--warn,#fbbf24)' : 'var(--danger)' : 'var(--text-dim)';
+                  const roiTxt = r.roi_pct != null ? (r.roi_pct >= 0 ? '+' : '') + r.roi_pct.toFixed(1) + '%' : '—';
+                  const kelC = r.kelly != null ? r.kelly > 0 ? 'var(--accent)' : r.kelly < -2 ? 'var(--danger)' : 'var(--text)' : 'var(--text-dim)';
+                  const kelTxt = r.kelly != null ? (r.kelly >= 0 ? '+' : '') + r.kelly.toFixed(1) + 'u' : '—';
+                  const brierTxt = r.brier != null ? r.brier.toFixed(3) : '—';
+                  const isTop3 = idx < 3;
+                  return `
+                    <div style="display:grid;grid-template-columns:minmax(0,1.2fr) 60px 70px 80px 90px 70px;gap:8px;padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;${isTop3 ? 'background:rgba(52,211,153,.04);' : ''}">
+                      <div style="color:var(--text);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${isTop3 ? '<span style="color:var(--accent);margin-right:4px;">★</span>' : ''}${esc(r.code)}</div>
+                      <div style="text-align:right;color:var(--text-dim);">${r.n}</div>
+                      <div style="text-align:right;color:var(--text);">${wrPct}</div>
+                      <div style="text-align:right;color:${roiC};font-weight:700;">${roiTxt}</div>
+                      <div style="text-align:right;color:${kelC};font-weight:700;">${kelTxt}</div>
+                      <div style="text-align:right;color:var(--text-dim);font-size:11.5px;">${brierTxt}</div>
+                    </div>`;
+                }).join('')}
+              </div>
+              ${rows.length > 30 ? `<div style="margin-top:8px;font-size:11px;color:var(--text-dim2);text-align:center;">+ ${rows.length - 30} ligues supplémentaires non affichées (volume insuffisant pour signal fiable)</div>` : ''}
+              <div style="margin-top:14px;padding:10px 14px;background:rgba(167,139,250,.06);border:1px solid var(--brand-soft);border-radius:var(--r-sm);font-size:12px;color:var(--text-dim);line-height:1.5;">
+                <b style="color:var(--brand);">💡 Comment lire :</b> ★ = top 3 par Kelly cumul. <b style="color:var(--accent);">Kelly +Xu</b> = profit total que tu aurais fait en pariant 1u Kelly sur cette ligue. <b style="color:var(--danger);">Kelly négatif</b> = à éviter sur cette ligue (modèle pas calibré). Brier <0.20 = excellent, &gt;0.25 = mauvais.
+              </div>
+            </div>`;
+        })() : ''}
 
         <!-- Sprint 57 (v31.7.146) — Anciens blocs per-sport / per-tier déplacés
              dans les onglets ci-dessus. Ne plus dupliquer ici. -->
