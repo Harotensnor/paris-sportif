@@ -53,5 +53,13 @@
 - Avant: rapport baseline `backtest_report_v2.json` baseball 5/13, WR 38.5%, ROI flat -36.68%, Brier 0.2561; projection MLB diluait l'ERA starter à environ 25% après double moyenne
 - Après: projection baseball = 60% runs L5 attaque + 40% ERA pitcher adverse, variance resserrée si écart ERA starters >=2.0; backtest recalculé 45 picks baseball, WR 57.8%, ROI flat -0.92%, Brier 0.2456
 - Impact: drawdown baseball quasi neutralisé dans le rapport mesuré (+35.76 pts ROI vs baseline publié) avec une formule plus lisible et moins bruitée
+- Commit: 3e6046d8
+- Status: ✅ DONE
+
+## Sprint v35.08 (2026-05-02 02:32 UTC)
+- Chantier: P5 Winamax detailed markets attach
+- Avant: après cron, `data.js` avait 0/1038 events avec marchés Winamax détaillés (`len(markets)>1`); `patch_winamax_markets.py` rejetait 166 vraies lignes à cause d'un seuil marge 1N2 >12%
+- Après: seuil de sanity 1N2 ajusté à 22%, fetch détail 138 matchs, patch 316 events avec markets, 198 events avec marchés détaillés: football 123, baseball 48, basket 16, hockey 9, tennis 2
+- Impact: le scanner value récupère enfin les marchés exacts O/U, DNB, double chance, handicaps/runline/totals au lieu de rester bloqué sur 1N2
 - Commit: pending
 - Status: ✅ DONE
