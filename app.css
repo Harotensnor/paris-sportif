@@ -1124,25 +1124,40 @@
   /* v31.7.32 — Trust strip : barre fine au-dessus du dashboard avec les 4
      KPIs du backtest (locks WR / ROI / Brier / n). Donne en 3s la preuve
      sociale "ce site marche" pour un newcomer. Dismiss persisté 30j. */
+  /* Phase 3 #3 (audit final) : bloc complet recommandé brief */
   .trust-strip {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: var(--space-3); padding: var(--space-2) 16px;
-    background: linear-gradient(90deg, rgba(167,139,250,.06) 0%, rgba(52,211,153,.06) 100%);
-    border-bottom: 1px solid var(--border);
-    font-size: 12.5px; font-variant-numeric: tabular-nums;
-    /* P0-5 (audit 2026-05-01) : avant la strip prenait 2318px sur viewport
-       1568px (overflow horizontal masquait 4 stats sur 6). Maintenant
-       contrainte au viewport visible et flex-wrap pour s'adapter. */
-    max-width: 100%;
-    overflow-x: hidden;
+    display: flex;
     flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1rem;
+    max-width: 100%;
+    overflow: visible;
+    padding: 0.5rem 1rem;
+    font-size: 13px;
+    line-height: 1.2;
+    background: linear-gradient(90deg, rgba(182,160,255,.06) 0%, rgba(45,212,168,.06) 100%);
+    border-bottom: 1px solid var(--border-soft, var(--border));
+    font-variant-numeric: tabular-nums;
   }
   .trust-strip-link { min-width: 0; }
-  /* Compresser à <1280px pour mobile/laptop : moins de padding, font plus petit */
+  .trust-strip-stat {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.35rem;
+    white-space: nowrap;
+  }
+  .trust-strip-sep {
+    color: var(--text-dim, rgba(255,255,255,0.3));
+    margin: 0 0.25rem;
+  }
   @media (max-width: 1280px) {
-    .trust-strip { padding: var(--space-1) 12px; font-size: 11.5px; gap: 8px; }
+    .trust-strip { font-size: 12px; gap: 0.5rem; }
+    .trust-strip-sep { display: none; }
     .trust-strip-val { font-size: 13px; }
     .trust-strip-lbl { font-size: 10.5px; }
+  }
+  @media (max-width: 768px) {
+    .trust-strip { padding: 0.4rem 0.6rem; }
   }
   .trust-strip.hidden { display: none; }
   .trust-strip-link {
