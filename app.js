@@ -12407,7 +12407,7 @@
       // v30 #3 — Lazy-load : poll fetch SEULEMENT data_today.json (~280 KB)
       // au lieu de data.js full (1.4 MB). 5× moins de bande passante par tick,
       // surtout en mode LIVE 30s où ça compte. data.js full reste fetched
-      // une fois via _ensureFullData() (idle après boot ou avant Bilan/Backtest/Historique).
+      // à la demande via _ensureFullData() avant Bilan/Backtest/Historique.
       // Fallback : si data_today.json indisponible (404 = ancien deploy), on
       // bascule sur data.js full pour ne pas casser la prod.
       let fresh = null;
@@ -12663,10 +12663,12 @@
   }
   try { window._ensureFullData = _ensureFullData; } catch(e){}
 
-  // Auto-preload : 800ms après le 1er paint (idle), on charge le full data
-  // en arrière-plan pour que la navigation Bilan/Backtest/Historique soit
-  // instantanée. Si requestIdleCallback dispo on l'utilise (priorité basse).
+  // v34.10 — Pas de preload full-data au boot. L'accueil vit sur le blob LITE
+  // + data_today.json ; charger data.js complet dès l'ouverture ajoutait ~1.7 MB
+  // et un re-render avant le LCP. Les pages qui ont vraiment besoin de
+  // l'historique appellent déjà _ensureFullData() à l'ouverture.
   function _scheduleFullPreload() {
+    if (window.__ENABLE_FULL_DATA_PRELOAD !== true) return;
     const fire = () => { _ensureFullData().catch(() => {}); };
     if ('requestIdleCallback' in window) {
       window.requestIdleCallback(fire, { timeout: 3000 });
@@ -12804,17 +12806,17 @@
     const __bootTime = Date.now();
     // v30 #4 — Polling adaptive : 30s en mode live, 60s sinon.
     // Variable au lieu de const car ré-évaluée à chaque tick.
-    // v30 — IMMEDIATE first poll at boot. Avant : la 1ère pollData ne
-    // tirait qu'à T+60s, donc le user voyait la version cachée inline
-    // (potentiellement plusieurs heures stale via SW cache) pendant 1
-    // minute avant que les vraies fresh data arrivent. Maintenant on
-    // poll dès le boot pour minimiser la fenêtre "version stale visible".
+    // v34.10 — Le premier poll au boot est conditionnel : si le blob inline
+    // est frais, on évite 2 fetch + 1 render avant le premier écran. Si le SW
+    // sert une vieille version, on synchronise immédiatement comme avant.
     let lastPoll = Date.now();
+    let shouldPollAtBoot = false;
     // Si data inline détectée stale (>30min) au boot, afficher une
     // bannière visible "Synchronisation…" qui disparaît au refresh OK.
     try {
       const d = window.PRONOSTICS_DATA;
-      const ageMs = d?.generated_at ? (Date.now() - new Date(d.generated_at).getTime()) : 0;
+      const ageMs = d?.generated_at ? (Date.now() - new Date(d.generated_at).getTime()) : Infinity;
+      shouldPollAtBoot = !d?.generated_at || !Number.isFinite(ageMs) || ageMs > 30 * 60000;
       if (ageMs > 30 * 60000) {
         const banner = document.createElement('div');
         banner.id = '__boot-sync-banner';
@@ -12837,8 +12839,11 @@
         // la bannière reste indéfiniment si le serveur est down)
         setTimeout(() => banner.remove(), 30000);
       }
-    } catch(e){}
-    pollData();
+    } catch(e){ shouldPollAtBoot = true; }
+    if (shouldPollAtBoot) {
+      lastPoll = Date.now();
+      pollData();
+    }
     __refreshTimer = setInterval(() => {
       const now = Date.now();
       const tabHidden = document.visibilityState === 'hidden';
@@ -26371,6 +26376,33 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       return false;
     }
   }
+  let __scoringOddsHistoryPromise = null;
+  let __scoringOddsHistoryReady = false;
+  function _pageNeedsScoringOddsHistory(page) {
+    return page === 'bilan' || page === 'historique' || page === 'performance';
+  }
+  function _ensureScoringOddsHistoryForPage(page) {
+    if (!_pageNeedsScoringOddsHistory(page) || __scoringOddsHistoryReady) return;
+    if (!__scoringOddsHistoryPromise) {
+      __scoringOddsHistoryPromise = loadOddsHistory().then(loaded => {
+        if (loaded) {
+          __scoringOddsHistoryReady = true;
+          try { __predCacheClear(); } catch (e) {}
+        } else {
+          __scoringOddsHistoryPromise = null;
+        }
+        return loaded;
+      }).catch(() => {
+        __scoringOddsHistoryPromise = null;
+        return false;
+      });
+    }
+    __scoringOddsHistoryPromise.then(loaded => {
+      if (loaded && _pageNeedsScoringOddsHistory(currentPage)) {
+        try { render(); } catch (e) {}
+      }
+    });
+  }
 
   // v30 — Inject up to 5 SportsEvent JSON-LD schemas for today's top matches
   // so Google can index them as rich snippets (sport, teams, kickoff, venue).
@@ -26802,6 +26834,7 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         }
       } catch (e) {}
       applyPageView();
+      _ensureScoringOddsHistoryForPage(currentPage);
       // v30 — ferme le dropdown hub contenant ce page-btn si besoin
       const parentHub = btn.closest('.hub');
       if (parentHub) {
@@ -27613,16 +27646,10 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
 
     render();
     startAutoRefresh();
-
-    // Chantier PP — charge l'historique de cotes en parallèle puis re-render
-    // pour que le bilan montre les picks évalués sur matchs complétés.
-    // On invalide aussi le cache de prédictions pour que predictMatch re-calcule
-    // avec les cotes historiques nouvellement disponibles.
-    loadOddsHistory().then(loaded => {
-      if (!loaded) return;
-      try { __predCacheClear(); } catch (e) {}
-      render();
-    });
+    // v34.10 — Historique des cotes chargé seulement sur les pages de scoring.
+    // Avant, odds_history.jsonl (~1.2 MB) partait sur l'accueil et relançait
+    // un render complet avant le LCP.
+    _ensureScoringOddsHistoryForPage(currentPage);
   });
 
   // v23 — Expose les fonctions de l'IIFE à window pour que les scripts externes (FAB Que parier, chatbot, tooltips) puissent y accéder.
