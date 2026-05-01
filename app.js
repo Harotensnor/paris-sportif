@@ -5063,6 +5063,12 @@
     // AUDIT-2026-04-27 (Sprint 4 #20) — expose health pour la page Santé
     // qui peut lire window.__healthData et afficher quality_checks.
     try { window.__healthData = h; } catch(e){}
+    try {
+      if (currentPage === 'sante') {
+        const wrap = document.getElementById('sante-wrap');
+        if (wrap) setTimeout(() => renderSantePage(wrap), 0);
+      }
+    } catch(e){}
     const ageMin = isFinite(h.data_age_min) ? h.data_age_min : 999;
     const warnings = Array.isArray(h.warnings) ? h.warnings : [];
     let color, label;
@@ -24976,6 +24982,42 @@
         </div>
       </div>` : '';
 
+    const pipelineLagHtml = (() => {
+      const h = window.__healthData;
+      const lag = h && h.pipeline_lag_per_script;
+      if (!lag || typeof lag !== 'object') return '';
+      const rows = Object.entries(lag)
+        .map(([key, v]) => ({ key, ...(v || {}) }))
+        .sort((a, b) => {
+          const rank = { crit: 0, warn: 1, missing: 2, ok: 3 };
+          const ar = rank[a.status] ?? 4;
+          const br = rank[b.status] ?? 4;
+          if (ar !== br) return ar - br;
+          return (b.age_min ?? -1) - (a.age_min ?? -1);
+        });
+      const pill = (s) => statusPill(s === 'missing' ? 'crit' : s);
+      const ageTxt = (n) => n == null ? 'absent' : `${Number(n).toFixed(0)} min`;
+      return `
+        <div style="margin-top:22px;">
+          <div style="font-size:13px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;">⏱ Pipeline lag par script</div>
+          <div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+            ${rows.map(r => {
+              const col = r.status === 'crit' ? '#f87171' : r.status === 'warn' ? '#eab308' : '#34d399';
+              const fast = r.fast_red_min ? ` · rouge > ${r.fast_red_min} min` : '';
+              return `<div style="display:grid;grid-template-columns:minmax(150px,1.2fr) minmax(110px,.7fr) minmax(120px,.8fr) auto;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;">
+                <div style="min-width:0;">
+                  <div style="font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(r.key)}</div>
+                  <div style="color:var(--text-dim2);font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(r.script || '')}</div>
+                </div>
+                <div style="color:${col};font-weight:800;font-variant-numeric:tabular-nums;">${esc(ageTxt(r.age_min))}</div>
+                <div style="color:var(--text-dim);font-variant-numeric:tabular-nums;">max ${esc(ageTxt(r.threshold_min))}${fast}</div>
+                <div>${pill(r.status)}</div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>`;
+    })();
+
     wrap.innerHTML = `
       <div style="max-width:1200px;margin:0 auto;padding:16px 20px 24px;">
         <div class="section-header top-picks" style="margin-top:8px;">
@@ -25076,6 +25118,8 @@
             </div>
           </div>`;
         })()}
+
+        ${pipelineLagHtml}
 
         <div style="margin-top:22px;">
           <div style="font-size:13px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;">🎯 Matchs restants par sport</div>

@@ -101,6 +101,28 @@ STALE_AFTER_MIN = {
     'footballdata':    24*60,  # daily fetch
 }
 
+SOURCE_SCRIPT = {
+    'winamax_catalog': 'scripts/fetch_winamax_catalog.py',
+    'winamax_markets': 'scripts/fetch_winamax_match_details.py',
+    'injuries_soccer': 'scripts/fetch_injuries_soccer.py',
+    'lineups_soccer': 'scripts/fetch_lineups_soccer.py',
+    'team_stats': 'scripts/fetch_team_stats.py',
+    'clubelo': 'scripts/fetch_clubelo.py',
+    'weather': 'scripts/fetch_weather.py',
+    'referees_soccer': 'scripts/fetch_referees_soccer.py',
+    'fbref_xg': 'scripts/fetch_understat_xg.py',
+    'sofascore_events': 'scripts/fetch_sofascore_events.py',
+    'team_form': 'scripts/fetch_form_l10_soccer.py',
+    'footballdata': 'scripts/fetch_footballdata.py',
+}
+
+FAST_PIPELINE_SOURCES = {
+    'winamax_catalog',
+    'winamax_markets',
+    'weather',
+    'sofascore_events',
+}
+
 
 def _age_min(path: Path) -> int | None:
     if not path.exists():
@@ -234,6 +256,7 @@ def main() -> int:
         'generated_at': now.strftime('%Y-%m-%dT%H:%M:%SZ'),
         'data_age_min': _age_min(ROOT / 'data.js'),
         'sources': {},
+        'pipeline_lag_per_script': {},
         'warnings': [],
         # Bug-hunt 2026-05-02 : avant `overall` n'était jamais set, JSON output
         # avait `overall: null` → MCP get_pipeline_status / front-end santé indicator
@@ -245,6 +268,14 @@ def main() -> int:
         age = _age_min(path)
         if age is None:
             out['sources'][key] = {'age_min': None, 'present': False}
+            out['pipeline_lag_per_script'][key] = {
+                'script': SOURCE_SCRIPT.get(key, f'{key}.json'),
+                'output': fname,
+                'age_min': None,
+                'threshold_min': STALE_AFTER_MIN.get(key, 60),
+                'fast_red_min': 30 if key in FAST_PIPELINE_SOURCES else None,
+                'status': 'crit',
+            }
             out['warnings'].append(f'{key}: file missing ({fname})')
             continue
         entry: dict = {'age_min': age}
@@ -265,6 +296,22 @@ def main() -> int:
         if age > threshold:
             out['warnings'].append(f'{key}: stale ({age}min > {threshold}min threshold)')
         out['sources'][key] = entry
+        status = 'missing' if age is None else 'ok'
+        if age is None:
+            status = 'crit'
+        elif key in FAST_PIPELINE_SOURCES and age > 30:
+            status = 'crit'
+            out['warnings'].append(f'{key}: lag pipeline rouge ({age}min > 30min)')
+        elif age > threshold:
+            status = 'warn'
+        out['pipeline_lag_per_script'][key] = {
+            'script': SOURCE_SCRIPT.get(key, f'{key}.json'),
+            'output': fname,
+            'age_min': age,
+            'threshold_min': threshold,
+            'fast_red_min': 30 if key in FAST_PIPELINE_SOURCES else None,
+            'status': status,
+        }
 
     if out['data_age_min'] is None:
         out['warnings'].insert(0, 'data.js is missing — pipeline broken')
