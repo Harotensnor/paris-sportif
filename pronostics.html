@@ -133,11 +133,9 @@
 <!-- Chantier S — PWA -->
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="alternate" type="application/rss+xml" href="feed.xml" title="Paris-Sportif — Top picks du jour (RSS)">
-<!-- v31.1 — Hints perf. CSS/JS restent critiques en preload. Les fichiers data
-     et pages éditoriales ne sont pas prefetch au boot : depuis la refonte
-     inline/lite, cela ajoute du poids réseau sans aider le premier paint. -->
+<!-- v34.13 — Seul le CSS est préchargé au boot. Le gros app.js reste en defer
+     plus bas dans le body pour laisser le squelette critique peindre d'abord. -->
 <link rel="preload" href="app.css?v=13ba80c0" as="style" onload="this.onload=null;this.rel='stylesheet'">
-<link rel="preload" href="app.js?v=025f4579" as="script">
 <!-- v31.1 — DNS-prefetch pour les CDN tiers utilisés sur la page (logos ESPN).
      v31.7.24 — Ajout `preconnect` pour a.espncdn.com (le plus utilisé) :
      le browser fait DNS + TLS handshake en parallèle du parse HTML, ce qui
