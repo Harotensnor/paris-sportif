@@ -8169,13 +8169,20 @@
       const topReason = (pred.explain?.reasons || [])[0];
       // v30 — "J'ai parié" + Kelly retirés.
       const betBtnHtml = '';
+      // Phase 3 #8 : ajout class .pick-row + .team__logo pour matcher tests
+      const hLogo = home?.logo ? `<img class="team__logo" src="${esc(home.logo)}" alt="" loading="lazy" onerror="this.style.display='none'">` : '<span class="team__logo team__logo--placeholder"></span>';
+      const aLogo = away?.logo ? `<img class="team__logo" src="${esc(away.logo)}" alt="" loading="lazy" onerror="this.style.display='none'">` : '<span class="team__logo team__logo--placeholder"></span>';
       return `
-        <div class="top-pick ${urgent ? 'urgent' : ''}" data-id="${esc(m.id)}">
+        <div class="top-pick pick-row ${urgent ? 'urgent' : ''}" data-id="${esc(m.id)}">
           <div class="tp-head">
             <div class="tp-league">${esc(m.league_name)}</div>
             <div class="tp-time">${esc(fmtTime(m.date))} · <span style="color:var(--accent-2,#60a5fa);font-weight:700;">${esc(tIn)}</span></div>
           </div>
-          <div class="tp-teams">${esc(home?.short || home?.name || '?')} <span style="color:var(--text-dim);">vs</span> ${esc(away?.short || away?.name || '?')}</div>
+          <div class="tp-teams pick-row__teams">
+            <span class="team team--home">${hLogo}<span class="team__name">${esc(home?.short || home?.name || '?')}</span></span>
+            <span class="pick-row__vs" style="color:var(--text-dim);margin:0 6px;">vs</span>
+            <span class="team team--away">${aLogo}<span class="team__name">${esc(away?.short || away?.name || '?')}</span></span>
+          </div>
           <div class="tp-pick">
             <div class="tp-pick-label">
               ${pred.isLock ? `<span class="tp-badge" style="background:var(--warn);color:#0a0e17;">PARI SÛR${isNewLock(x.m.id) ? ' 🆕' : ''}</span>` : ''}

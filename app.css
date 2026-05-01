@@ -158,6 +158,14 @@
     --border-medium: rgba(255, 255, 255, 0.10);
   }
 
+  /* Phase 3 #8 : pick-row + team__logo (tests Playwright) */
+  .pick-row__teams { display: inline-flex; align-items: center; gap: 4px; min-width: 0; }
+  .team { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+  .team__logo { width: 22px; height: 22px; object-fit: contain; border-radius: 4px; flex-shrink: 0; background: rgba(255,255,255,.04); padding: 1px; }
+  .team__logo--placeholder { background: var(--surface-3, var(--panel-3)); display: inline-block; }
+  .team__name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
+  .pick-row__vs { color: var(--text-mute, var(--text-dim2)); font-size: 12px; }
+
   /* Phase 3 #7 : decision-strip 6 tiles harmonisés (modal détail) */
   .decision-strip {
     display: grid;
