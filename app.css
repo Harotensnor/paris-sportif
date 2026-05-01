@@ -158,6 +158,44 @@
     --border-medium: rgba(255, 255, 255, 0.10);
   }
 
+  /* QA "marche partout" (2026-05-01) : fixes a11y + responsive + cross-browser */
+  /* a11y : focus-visible obligatoire pour clavier nav */
+  *:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  button:focus-visible, a:focus-visible, input:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+  }
+  /* Mobile : prévenir le zoom auto iOS sur les inputs (font-size < 16px) */
+  @media (max-width: 768px) {
+    input[type="text"], input[type="search"], input[type="email"], input[type="number"], input[type="date"], select, textarea {
+      font-size: 16px;  /* iOS Safari zoom prevention */
+    }
+  }
+  /* Empty states : padding minimum pour ne pas avoir un blanc disgracieux */
+  .empty-state, .bilan-empty, [class*="empty"] {
+    min-height: 120px;
+  }
+  /* Mobile <380px (small phones) : compresser tout, retirer paddings inutiles */
+  @media (max-width: 380px) {
+    main { padding: 12px 8px; }
+    .bilan-kpis { gap: 6px; }
+    .bilan-kpi { padding: 10px 12px; }
+    .bilan-kpi .kpi-value { font-size: 24px; }  /* down from 34 */
+    .topbar-mainnav { display: none; }  /* sidebar uniquement */
+    .decision-strip { grid-template-columns: repeat(2, 1fr); }  /* 2 cols at very small */
+  }
+  /* QA : prevent overflow-x sur tout body */
+  html, body { overflow-x: hidden; }
+  /* QA : long words break instead of overflowing */
+  .pick-row__teams, .team__name, .ed-hero__match {
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+
   /* Phase 3 #11 : warning-chip (edges anormaux flaggés) */
   .warning-chip {
     display: inline-flex;

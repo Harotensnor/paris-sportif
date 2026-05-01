@@ -875,6 +875,13 @@ def main() -> int:
         # v31.7.14 — Recalibration isotonic (PAV) precomputee. Le client lit
         # ces pairs directement, plus besoin de recompute le PAV en JS.
         'isotonic_pairs': isotonic_calibration_pairs(rows),
+        # Tier 1 #2 (2026-05-01) : isotonic_pairs PER-SPORT. Active per-sport
+        # remapping si >=50 picks par sport. Sinon fallback global isotonic.
+        'isotonic_pairs_by_sport': {
+            sport: isotonic_calibration_pairs([r for r in rows if r.get('sport') == sport])
+            for sport in {r.get('sport') for r in rows if r.get('sport')}
+            if sum(1 for r in rows if r.get('sport') == sport) >= 50
+        },
         # v31.7.21 — Streaks publics (transparence). On expose les longest
         # win/lose streaks ainsi que la streak courante (signed).
         'streaks': compute_streaks(rows),

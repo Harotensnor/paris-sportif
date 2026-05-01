@@ -4485,6 +4485,9 @@
         bySport: bySport,
         total_n: (rep.overall && rep.overall.n) || 0,
         totalNBySport: totalNBySport,
+        // Tier 1 #2 (2026-05-01) : isotonic pairs per-sport pour remap PAV
+        // plus fin que les bins. Actif si >=50 picks par sport.
+        isotonicPairsBySport: rep.isotonic_pairs_by_sport || null,
       };
       // v30 — Expose le rapport complet pour la page Crédibilité (by_sport,
       // by_cote_bucket, by_tier, overall — ROI / brier / logloss).
@@ -12526,6 +12529,10 @@
           if (typeof window._maybeNotifyKickoffImminent === 'function') {
             window._maybeNotifyKickoffImminent();
           }
+          // Side (2026-05-01) — Discord webhook push locks ≥75%
+          if (typeof window._maybeDiscordPushLocks === 'function') {
+            window._maybeDiscordPushLocks();
+          }
         } catch(e) { console.warn('[notif] failed:', e); }
       }
     } catch (err) {
@@ -12573,6 +12580,10 @@
       getMatchOdds,
       // Sprint 1 #5 — tests data pollution
       predictMatch: typeof predictMatch === 'function' ? predictMatch : null,
+      // Tier 2 #3 (2026-05-01) : expose _agentReplay pour tests fixtures
+      _agentReplay: typeof _agentReplay === 'function' ? _agentReplay : null,
+      _agentBestPick: typeof _agentBestPick === 'function' ? _agentBestPick : null,
+      selectBestMarket: typeof selectBestMarket === 'function' ? selectBestMarket : null,
     };
   } catch(e){}
 
@@ -26898,6 +26909,76 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       });
       try { localStorage.setItem('notifiedKickoffIds', JSON.stringify([...seen].slice(-200))); } catch(e) {}
     };
+
+    // Side feature (2026-05-01) : Discord webhook pour les locks ≥75%.
+    // Auto-push 1× par nouveau lock détecté (dedup via discordPushedLockIds).
+    // Cible : seulement les picks haute confiance pour ne pas spam.
+    window._maybeDiscordPushLocks = function _maybeDiscordPushLocks() {
+      let webhookUrl;
+      try { webhookUrl = localStorage.getItem('discord_webhook_url') || ''; } catch(e) { return; }
+      if (!webhookUrl) return;
+      if (!/^https:\/\/(?:discord(?:app)?\.com|ptb\.discord\.com|canary\.discord\.com)\/api\/webhooks\//.test(webhookUrl)) return;
+      const data = window.PRONOSTICS_DATA;
+      if (!data || !data.days) return;
+      const todayIso = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+      const today = data.days[todayIso] || [];
+      const seen = new Set();
+      try { (JSON.parse(localStorage.getItem('discordPushedLockIds') || '[]') || []).forEach(id => seen.add(id)); } catch(e) {}
+      const now = Date.now();
+      const fresh = [];
+      for (const m of today) {
+        if (!m || !m.id || seen.has(String(m.id))) continue;
+        if (m.completed || m.live) continue;
+        const ko = new Date(m.date).getTime();
+        if (!isFinite(ko) || ko < now) continue;
+        // Skip si kickoff > 6h (reste du temps pour parier, on peut attendre)
+        const minToKickoff = (ko - now) / 60000;
+        if (minToKickoff > 360) continue;
+        if (!(m.winamax && m.winamax.available === true)) continue;
+        let pred;
+        try { pred = predictMatch(m); } catch(e) { continue; }
+        if (!pred || !pred.pick || pred.skip) continue;
+        const rel = pred.reliability ?? pred.pick.prob;
+        if (rel < 0.75) continue;  // seuil lock ≥75%
+        const pk = pred.pick.key;
+        const odd = pred.odds && (pk==='1'?pred.odds.home:pk==='2'?pred.odds.away:pred.odds.draw);
+        if (!odd) continue;
+        const { home, away } = (typeof getSides === 'function') ? getSides(m) : { home: {}, away: {} };
+        fresh.push({
+          id: String(m.id),
+          home: (home && home.name) || '?',
+          away: (away && away.name) || '?',
+          rel, odd,
+          label: pred.pick.label || 'Pick',
+          minToKickoff: Math.round(minToKickoff),
+          wnxUrl: m.winamax && m.winamax.url,
+          league: m.league_name || m.league_code || '',
+        });
+      }
+      if (!fresh.length) return;
+      // Cap : 3 par batch pour ne pas spam
+      fresh.slice(0, 3).forEach(p => {
+        const body = {
+          content: null,
+          embeds: [{
+            title: `🔒 LOCK ${Math.round(p.rel * 100)}% : ${p.home} vs ${p.away}`,
+            description: `**${p.label}** @${p.odd.toFixed(2)} · ${p.league} · kickoff dans ${p.minToKickoff}min`,
+            url: p.wnxUrl || 'https://harotensnor.github.io/paris-sportif/',
+            color: 0xfbbf24,  // gold (tier-lock)
+            timestamp: new Date().toISOString(),
+          }],
+        };
+        fetch(webhookUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+          mode: 'cors',
+        }).then(() => seen.add(p.id))
+          .catch((err) => console.warn('[discord webhook] failed:', err));
+      });
+      try { localStorage.setItem('discordPushedLockIds', JSON.stringify([...seen].slice(-200))); } catch(e) {}
+    };
+
     // FIX bug #4 : retiré `document.addEventListener('DOMContentLoaded', ...)`
     // — on est DÉJÀ dans le callback DOMContentLoaded ici, l'event a déjà tiré.
     // L'appel direct _notifSyncBtn() ci-dessous suffit pour init le bouton.
