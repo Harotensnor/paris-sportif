@@ -1113,6 +1113,10 @@
       { page: 'valeur', label: '💎 Mismatches' },
       { page: 'plan-mise', label: '💼 Mises du jour' },
       { page: 'locks', label: '🔒 Locks' },
+      { page: 'combines', label: '🔗 Combinés' },
+      { page: 'montante-jour', label: '📈 Montante jour' },
+      { page: 'montante-weekend', label: '🗓️ Weekend' },
+      { page: 'montante-semaine', label: '📆 Semaine' },
     ],
     // Hub AGENT : cagnotte + history + perf
     agent: [
@@ -1124,8 +1128,12 @@
     stats: [
       { page: 'tous', label: '📋 Tous les matchs' },
       { page: 'calendrier', label: '📅 Calendrier 7j' },
+      { page: 'matchs', label: '🔍 Matchs détectés' },
+      { page: 'buteurs', label: '⚽ Buteurs' },
+      { page: 'compare', label: '↔️ Comparer' },
       { page: 'credibilite', label: '📊 Crédibilité' },
       { page: 'backtest', label: '🧪 Backtest' },
+      { page: 'simulator', label: '🧪 What-if' },
     ],
     // Settings (icône)
     settings: [
@@ -9164,7 +9172,8 @@
   function sportIcon(s) {
     return {
       football: '⚽', tennis: '🎾', basketball: '🏀', hockey: '🏒',
-      'american-football': '🏈', mma: '🥊', golf: '⛳', racing: '🏎️',
+      baseball: '⚾', 'american-football': '🏈', 'football-american': '🏈',
+      mma: '🥊', golf: '⛳', racing: '🏎️',
     }[s] || '🏅';
   }
 
@@ -9213,7 +9222,9 @@
     } else if (sport === 'hockey' && code === 'nhl') {
       url = `https://a.espncdn.com/i/leaguelogos/hockey/500/${code}.png`;
     } else if (sport === 'baseball' && code === 'mlb') {
-      url = `https://a.espncdn.com/i/leaguelogos/baseball/500/${code}.png`;
+      // ESPN's current MLB league-logo URL returns 404; keep the sport
+      // fallback to avoid noisy console errors on Locks/Top cards.
+      url = null;
     } else if (sport === 'mma' && code === 'ufc') {
       url = `https://a.espncdn.com/i/leaguelogos/mma/500/${code}.png`;
     }
@@ -20068,17 +20079,15 @@
     document.querySelectorAll('.page-btn').forEach(b => {
       b.classList.toggle('active', b.dataset.page === currentPage);
     });
-    // v32.0 — Refonte navigation 3 hubs orientés intent.
-    // - now    : urgence du moment, ce qu'on parie maintenant
-    // - agent  : la cagnotte autonome 10€ (NAV, history, performance modèle)
-    // - stats  : analytics deep-dive + tous matchs/calendrier + diagnostiques
-    // - account : settings (icône isolée)
-    // Pages legacy (combines, buteurs, montantes, simulator, compare, matchs)
-    // restent navigables via leur data-page mais retirées de la nav principale.
+    // v34.32 — Navigation complète : les pages avancées restent deep-linkables
+    // mais sont maintenant rattachées à un hub visible pour éviter les vues
+    // "orphelines" (montantes, matchs détectés, simulateur).
     const HUB_PAGES = {
-      now:     ['top', 'valeur', 'plan-mise', 'locks'],
-      agent:   ['bilan', 'historique', 'performance'],
-      stats:   ['tous', 'calendrier', 'credibilite', 'backtest'],
+      now: ['top', 'valeur', 'plan-mise', 'locks', 'combines', 'montante-jour', 'montante-weekend', 'montante-semaine'],
+      agent: ['bilan', 'historique', 'performance'],
+      explore: ['tous', 'calendrier', 'matchs', 'buteurs', 'compare'],
+      performance: ['performance', 'credibilite', 'backtest', 'simulator'],
+      learn: ['academie', 'methodologie', 'legal'],
       account: ['profil', 'favoris', 'alertes'],
     };
     document.querySelectorAll('nav.topbar-nav .hub').forEach(h => {

@@ -1833,6 +1833,9 @@
     border: 1px solid var(--border-2); border-radius: var(--r-xl);
     width: 100%; max-width: 920px; margin: auto;
     box-shadow: var(--shadow-lg); overflow: hidden;
+    max-height: calc(100vh - 40px);
+    display: flex;
+    flex-direction: column;
     /* Sprint 19 #4 — position relative pour que .modal-progress (absolute)
        se positionne par rapport au modal et pas au backdrop. */
     position: relative;
@@ -1882,6 +1885,7 @@
     position: sticky; top: 0; background: var(--panel);
     padding: 18px 22px; border-bottom: 1px solid var(--border);
     display: flex; justify-content: space-between; align-items: center; z-index: 2;
+    flex: 0 0 auto;
   }
   .modal-head h3 { margin: 0; font-size: 17px; font-weight: 600; letter-spacing: -.3px; }
   .modal-head .league { color: var(--text-dim); font-size: 12px; margin-top: 3px; font-weight: 500; }
@@ -1891,7 +1895,12 @@
     font-weight: 500; transition: all .12s;
   }
   .modal-close:hover { background: var(--danger-soft); color: var(--danger); border-color: rgba(248,113,113,.3); }
-  .modal-body { padding: 20px 24px; }
+  .modal-body {
+    padding: 20px 24px;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
 
   .teams-big {
     display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
@@ -4763,7 +4772,7 @@
   .mbn-badge[hidden] { display: none; }
   .mbn-btn.active .mbn-badge { background: var(--accent); }
   @media (max-width: 720px) {
-    .mobile-bottom-nav { display: flex; }
+    .mobile-bottom-nav { display: flex !important; }
     /* Spacer en bas du body pour ne pas que le contenu se cache derrière la nav */
     body { padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px)); }
   }
