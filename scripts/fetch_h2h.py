@@ -79,8 +79,6 @@ def fetch_h2h(event):
     except Exception:
         return None
     h2h_blocks = d.get('headToHeadGames') or []
-    if not h2h_blocks:
-        return None
     # Normalize into a compact shape: list of past meetings
     # { date, scoreHome, scoreAway, homeTeam, awayTeam, winner, league }
     meetings = []
@@ -133,7 +131,10 @@ def fetch_h2h(event):
                 'winner': winner,
                 'for': team_name,
                 'league': league,
+                'source': 'headToHeadGames',
             })
+    if not meetings:
+        meetings = parse_seasonseries(d)
     # Sort most recent first (date may be ISO string or None)
     def _k(m):
         try:
@@ -143,6 +144,63 @@ def fetch_h2h(event):
     meetings.sort(key=_k, reverse=True)
     return meetings[:6]
 
+
+def parse_seasonseries(summary):
+    """Fallback ESPN pour NBA/MLB/NHL.
+
+    Ces sports n'exposent souvent pas `headToHeadGames`, mais leur summary
+    contient `seasonseries.events` avec les confrontations déjà jouées.
+    """
+    meetings = []
+    seen = set()
+    for series in summary.get('seasonseries') or []:
+        series_label = series.get('seriesLabel') or series.get('title') or series.get('description') or ''
+        for comp in series.get('events') or []:
+            status = comp.get('statusType') or comp.get('status') or {}
+            completed = bool(status.get('completed')) if isinstance(status, dict) else str(status).lower() == 'post'
+            if not completed:
+                continue
+            competitors = comp.get('competitors') or []
+            home = next((c for c in competitors if c.get('homeAway') == 'home'), None)
+            away = next((c for c in competitors if c.get('homeAway') == 'away'), None)
+            if not home or not away:
+                continue
+            home_team = (home.get('team') or {}).get('displayName') or ''
+            away_team = (away.get('team') or {}).get('displayName') or ''
+            if not home_team or not away_team:
+                continue
+            hs = str(home.get('score') or '').strip()
+            aw = str(away.get('score') or '').strip()
+            score = f'{hs}-{aw}' if hs and aw else ''
+            winner = ''
+            if home.get('winner') is True:
+                winner = 'home'
+            elif away.get('winner') is True:
+                winner = 'away'
+            else:
+                try:
+                    if float(hs) == float(aw):
+                        winner = 'draw'
+                except Exception:
+                    pass
+            date = comp.get('date') or ''
+            key = (comp.get('id') or date, home_team, away_team, score)
+            if key in seen:
+                continue
+            seen.add(key)
+            meetings.append({
+                'date': date,
+                'home': home_team,
+                'away': away_team,
+                'score': score,
+                'result': '',
+                'winner': winner,
+                'for': '',
+                'league': series_label,
+                'source': 'seasonseries',
+            })
+    return meetings
+
 def should_refetch(event, now):
     h = event.get('h2h')
     if not h or not isinstance(h, dict):
@@ -151,6 +209,8 @@ def should_refetch(event, now):
     # to upgrade them to the new schema.
     meetings = h.get('meetings') or []
     if meetings and 'winner' not in (meetings[0] or {}):
+        return True
+    if not meetings and event.get('sport') in ('baseball', 'basketball', 'hockey') and h.get('schema_version') != 2:
         return True
     fetched_at = h.get('fetched_at')
     if not fetched_at:
@@ -194,6 +254,8 @@ def main():
             wm = ev.get('winamax') or {}
             if wm.get('available') is False:
                 continue
+            if not league_espn_path(ev):
+                continue
             checked += 1
             if checked > 280:    # cap per run (~140s at 2 req/s)
                 break
@@ -204,6 +266,8 @@ def main():
                 errors += 1
             ev['h2h'] = {
                 'fetched_at': now_utc.isoformat(),
+                'schema_version': 2,
+                'source': (meetings and meetings[0].get('source')) or 'espn_summary_empty',
                 'meetings': meetings or [],
             }
             if meetings:
