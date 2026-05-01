@@ -109,5 +109,13 @@
 - Avant: `clv_history.json` avait seulement un résumé global (501 matchs, 1372 observations, mean -0.11%, positive 37.1%) et la page Santé n'affichait aucun signal CLV
 - Après: CLV enrichi avec `by_sport`, `by_side`, `by_league`, extrêmes best/worst; `health.json.sources.clv_history` expose 501 matchs / 1372 observations; smoke #sante confirme le badge CLV + drift visibles
 - Impact: le site peut suivre si les prises de cote battent le marché, pas seulement si un pari gagne après coup
+- Commit: 627f4998
+- Status: ✅ DONE
+
+## Sprint v35.15 (2026-05-02 04:05 UTC)
+- Chantier: P9 H2H seasonseries ESPN
+- Avant: 286/1038 events avaient des meetings H2H utiles, tous en football; NBA/MLB/NHL avaient `seasonseries` ESPN mais le fetcher ne lisait que `headToHeadGames`
+- Après: fallback `seasonseries` normalisé; run local post-rebase `checked=60 enriched=46`; H2H utile passe à 328 events: football 288, baseball 27, basketball 7, hockey 6
+- Impact: +40 matchs US gagnent un historique exploitable dans les fiches match et signaux, sans dépendre de Sofascore vide
 - Commit: pending
 - Status: ✅ DONE
