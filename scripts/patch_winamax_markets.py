@@ -123,18 +123,17 @@ def main() -> int:
             if v is not None and (v < 1.01 or v > 1000):
                 return False, f'{label} cote hors plage [1.01, 1000] : {v}'
         # Marge bookmaker = somme des prob implicites - 1.0.
-        # Bug-hunt 2026-05-02 : seuil resserré 25% → 12%. Winamax pratique
-        # 4-7%, max observé honnête 9-10% sur ligues exotiques. Au-delà de
-        # 12% c'est forcément un mismatch de mapping (cotes piochées dans
-        # le mauvais slot du PRELOADED_STATE). 165 events ont eu margin
-        # 15-25% sur la prod du jour → ces cotes sont POURRIES, mieux les
-        # rejeter et laisser le frontend fallback sur odds_snapshot externe.
+        # v35.08 — le seuil 12% etait trop agressif: Winamax monte souvent
+        # a 13-18% sur 1N2 de ligues secondaires, alors que les markets
+        # detailles restent exploitables et exacts. On garde le garde-fou
+        # contre les vrais mismatches, mais on rejette seulement au-dela de
+        # 22% (valeur quasi impossible pour un 1N2 sain).
         implied = 0.0
         for v in (h, d, a):
             if v is not None and v > 1:
                 implied += 1.0 / v
-        if implied > 1.12:
-            return False, f'marge bookmaker > 12% (implied={implied:.2%}) — mapping suspect'
+        if implied > 1.22:
+            return False, f'marge bookmaker > 22% (implied={implied:.2%}) — mapping suspect'
         # Coté unique <= 1.01 trahit un fav énorme post-match (cote retirée
         # juste avant le coup d'envoi, valeur stale).
         return True, ''
