@@ -13529,6 +13529,14 @@
     today.forEach(m => {
       try {
         if (m.completed) return;
+        // Bug-hunt 2026-05-02 (screen Théo) : POSITIONS DU JOUR listait des
+        // matchs zombies (kickoff >6h passé sans completed=true) ou en cours.
+        // Henan Songshan @1.69 13:00 apparaissait à 17h+. Maintenant : skip.
+        if (typeof _isMatchEffectivelyDone === 'function' && _isMatchEffectivelyDone(m)) return;
+        if (m.live || m.status === 'STATUS_IN_PROGRESS') return;
+        // Skip aussi si kickoff dans le passé > 5min (match en cours sans status update)
+        const koMs = m.date ? new Date(m.date).getTime() : 0;
+        if (isFinite(koMs) && koMs > 0 && (Date.now() - koMs) > 5*60*1000) return;
         const pred = predictMatch(m);
         if (!pred || !pred.pick || pred.skip) return;
         // v28 — meilleur marché selon edge
@@ -14382,7 +14390,14 @@
           const _allToday = (data?.days?.[todayISO()] || []);
           _allToday.forEach(m => {
             _nMatchs++;
-            if (m.live || m.status === 'STATUS_IN_PROGRESS') _nLive++;
+            // Bug-hunt 2026-05-02 (screen Théo) : strip affichait "9 EN DIRECT"
+            // alors que tooltip topbar disait "Aucun match en direct".
+            // Cause : m.status='STATUS_IN_PROGRESS' jamais updaté quand match
+            // fini → compté comme live alors qu'il est fini depuis 6h+.
+            // Fix : exclure les zombies du comptage live.
+            const _isLive = (m.live || m.status === 'STATUS_IN_PROGRESS') &&
+                            !(typeof _isMatchEffectivelyDone === 'function' && _isMatchEffectivelyDone(m));
+            if (_isLive) _nLive++;
             if (m.completed) return;
             const pp = predictMatch(m);
             if (pp && !pp.skip) {
@@ -14775,18 +14790,23 @@
         </div>` : ''}
 
         <!-- Sprint 47 (v31.7.136) — Prochains gros matchs (importance + statut) -->
-        ${topImportantMatches.length ? `
+        <!-- Bug-hunt 2026-05-02 (screen Théo) : avant la section affichait
+             TOUS les gros matchs (avec et sans prono), créant un doublon avec
+             "Grands matchs sans pick" qui montrait les mêmes en bas. Maintenant :
+             cette section = SEULEMENT ceux avec prono fort. La 2e section reste
+             pour les sans-pick. Plus de doublon visuel. -->
+        ${(() => { const _strongOnly = (topImportantMatches || []).filter(item => item.status && item.status.code === 'strong'); return _strongOnly.length ? `
         <div style="padding:36px 0 24px;border-top:1px solid var(--border);">
           <div style="margin-bottom:14px;display:flex;align-items:end;justify-content:space-between;flex-wrap:wrap;gap:8px;">
             <div>
               <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;">À ne pas rater · 7 jours</div>
               <div style="font-size:20px;font-weight:800;color:var(--text);letter-spacing:-.5px;margin-top:2px;">🏆 Prochains gros matchs</div>
-              <div style="font-size:12px;color:var(--text-dim);margin-top:4px;">CL, top-5 ligues, finales · classés par enjeu, prono ou pas</div>
+              <div style="font-size:12px;color:var(--text-dim);margin-top:4px;">CL, top-5 ligues, finales · uniquement avec prono fort</div>
             </div>
             <button class="page-btn" data-page="calendrier" style="padding:8px 12px;background:transparent;color:var(--text);border:1px solid var(--border-2);border-radius:8px;font-weight:600;font-size:12px;cursor:pointer;">Calendrier 7j →</button>
           </div>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;">
-            ${topImportantMatches.map(item => {
+            ${_strongOnly.map(item => {
               const m = item.m;
               const sides = (typeof getSides === 'function') ? getSides(m) : { home: {}, away: {} };
               const hN = sides.home?.short || sides.home?.name || '?';
@@ -14836,7 +14856,7 @@
               </div>`;
             }).join('')}
           </div>
-        </div>` : ''}
+        </div>` : ''; })()}
 
         <!-- Sprint 78 (v31.7.165 — audit P0) — Grands matchs SANS pick fort -->
         ${orphanBigMatches.length ? `
@@ -15143,11 +15163,16 @@
             ${psArr.slice(0, 4).map(([sp, s]) => {
               const wr = s.bets ? Math.round(100 * s.w / s.bets) : 0;
               const roi = s.invested ? (s.pl / s.invested * 100) : 0;
-              const roiColor = roi >= 0 ? 'var(--accent)' : 'var(--danger)';
-              return `<div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:10px;">
+              // Bug-hunt 2026-05-02 (screen Théo) : avant "-100% 1 paris" rouge
+              // alarmant. Maintenant : si <5 paris, neutralise l'alarme visuelle
+              // et affiche disclaimer.
+              const tooSmall = s.bets < 5;
+              const roiColor = tooSmall ? 'var(--text-dim)' : (roi >= 0 ? 'var(--accent)' : 'var(--danger)');
+              const roiDisplay = tooSmall ? '—' : `${roi>=0?'+':''}${roi.toFixed(0)}%`;
+              return `<div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:10px;" ${tooSmall ? 'title="Échantillon trop petit (<5 paris) — chiffres pas représentatifs"' : ''}>
                 <div style="font-size:11px;color:var(--text-dim);margin-bottom:3px;">${esc(sportLabel(sp))}</div>
-                <div style="font-size:20px;font-weight:700;color:${roiColor};letter-spacing:-.4px;">${roi>=0?'+':''}${roi.toFixed(0)}%</div>
-                <div style="font-size:11px;color:var(--text-dim);">${s.bets} paris · ${wr}% WR</div>
+                <div style="font-size:20px;font-weight:700;color:${roiColor};letter-spacing:-.4px;">${roiDisplay}</div>
+                <div style="font-size:11px;color:var(--text-dim);">${s.bets} paris${tooSmall ? ' (échantillon trop petit)' : ''} · ${wr}% WR</div>
               </div>`;
             }).join('')}
           </div>
@@ -15186,7 +15211,16 @@
         // Purpose : surface live + upcoming picks + cagnotte on wide screens so
         // the dashboard feels less mobile on desktop.
         if (_dataIsStale) return '';
-        const liveNow = today.filter(m => m.live).slice(0, 2);
+        // Bug-hunt 2026-05-02 (screen Théo) : avant filter sur m.live uniquement,
+        // mais le strip stat utilise m.live || m.status==='STATUS_IN_PROGRESS' →
+        // strip disait "9 EN DIRECT" mais tooltip "Aucun match en direct".
+        // Maintenant : même filter (+ exclude zombies pour cohérence avec strip fix).
+        const liveNow = today.filter(m => {
+          const isLive = m.live || m.status === 'STATUS_IN_PROGRESS';
+          if (!isLive) return false;
+          if (typeof _isMatchEffectivelyDone === 'function' && _isMatchEffectivelyDone(m)) return false;
+          return true;
+        }).slice(0, 2);
         // v31.7 — Avant : on prenait les 3 PROCHAINS coups d'envoi quels qu'ils
         // soient (incluant des picks low-conf risqués). Le user trouvait ça
         // confusant — il pensait que c'etait des recommandations alors que
