@@ -29,5 +29,13 @@
 - Avant: `clubelo.json` contenait 630 clubs mais `event.clubelo` restait à 0; le patcher écrivait seulement `competitor.elo`
 - Après: `patch_clubelo.py` écrit aussi `event.clubelo` quand les deux équipes sont matchées; data.js mesure 111 events avec `clubelo`, 162 events avec au moins un compétiteur Elo, 273 compétiteurs Elo
 - Impact: le signal Elo devient mesurable côté santé/UI et exploitable par les blocs match-level; +111 events enrichis vs baseline 0
+- Commit: 9c5487d2
+- Status: ✅ DONE
+
+## Sprint v35.05 (2026-05-02 01:40 UTC)
+- Chantier: P6 lineups event-level patch
+- Avant: `data.js` exposait 6 events avec `lineups`, 0 compétiteur avec `lineup`; `lineups_soccer.json` contenait 17 matchs disponibles
+- Après: `patch_lineups_soccer.py` patche 12/46 matchs top-5 scannés; `data.js` expose 12 events avec `lineups`, 24 compétiteurs avec XI/subs et 12 matchs avec starters exploitables
+- Impact: les compositions deviennent visibles au niveau match + équipe; le frontend et la santé data peuvent enfin mesurer ce signal sans parcourir un format fantôme
 - Commit: pending
 - Status: ✅ DONE

@@ -3,8 +3,8 @@
 
 For each upcoming top-5 league match, match the ESPN event's team names
 against the keys in ``lineups_soccer.json`` (which are
-``home_norm|away_norm``) and copy the starting XI + subs into the
-competitor records.
+``home_norm|away_norm``) and copy the starting XI + subs into the event
+and competitor records.
 
 Adds to each matched competitor::
 
@@ -15,6 +15,10 @@ Adds to each matched competitor::
         'starters': [{'name', 'pos', 'shirt', 'rating', 'captain'}, ...],
         'subs':     [{'name', 'pos', 'shirt', 'rating', 'captain'}, ...],
     }
+
+Also adds ``event.lineups = {home, away, league_code, sofa_event_id}`` so
+frontend/data-health code can detect lineup availability without walking the
+competitor array.
 
 Matching strategy: exact normalized-name match on both sides. Lineups are
 ordered pairs (home+away) so we need both teams to match — this avoids
@@ -32,6 +36,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from winamax_map import _norm
+from winamax_map import _name_tokens
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA_JS = ROOT / 'data.js'
@@ -49,6 +54,51 @@ def parse_names(ev_name: str) -> tuple[str, str]:
     if len(parts) != 2:
         return ('', '')
     return (parts[0].strip(), parts[1].strip())
+
+
+def _side_name(ev: dict, side: str) -> str:
+    for c in ev.get('competitors') or []:
+        if c.get('home_away') == side:
+            return c.get('name') or c.get('displayName') or c.get('shortDisplayName') or ''
+    return ''
+
+
+def _lineup_payload(side: dict | None) -> dict:
+    side = side or {}
+    return {
+        'team': side.get('team') or '',
+        'formation': side.get('formation') or '',
+        'confirmed': bool(side.get('confirmed')),
+        'coach': side.get('coach') or '',
+        'starters': side.get('starters') or [],
+        'subs': side.get('subs') or [],
+    }
+
+
+def _find_entry(
+    events_idx: dict[str, dict],
+    league_code: str,
+    home_name: str,
+    away_name: str,
+) -> dict | None:
+    key = f'{_norm(home_name)}|{_norm(away_name)}'
+    entry = events_idx.get(key)
+    if entry:
+        return entry
+
+    home_tokens = _name_tokens(home_name)
+    away_tokens = _name_tokens(away_name)
+    if not home_tokens or not away_tokens:
+        return None
+
+    for idx_key, candidate in events_idx.items():
+        if candidate.get('league_code') and candidate.get('league_code') != league_code:
+            continue
+        h_name = (candidate.get('home') or {}).get('team') or idx_key.split('|', 1)[0]
+        a_name = (candidate.get('away') or {}).get('team') or idx_key.split('|', 1)[-1]
+        if (home_tokens & _name_tokens(h_name)) and (away_tokens & _name_tokens(a_name)):
+            return candidate
+    return None
 
 
 def main() -> int:
@@ -73,6 +123,8 @@ def main() -> int:
     data = json.loads(m.group(1))
 
     patched = 0
+    event_level_patched = 0
+    competitor_lineups = 0
     scanned = 0
     for day, evs in (data.get('days') or {}).items():
         for ev in evs:
@@ -80,27 +132,34 @@ def main() -> int:
                 continue
             if ev.get('completed'):
                 continue
-            away_name, home_name = parse_names(ev.get('name') or '')
+            home_name = _side_name(ev, 'home')
+            away_name = _side_name(ev, 'away')
+            if not (home_name and away_name):
+                away_name, home_name = parse_names(ev.get('name') or '')
             if not (home_name and away_name):
                 continue
             scanned += 1
-            key = f'{_norm(home_name)}|{_norm(away_name)}'
-            entry = events_idx.get(key)
+            entry = _find_entry(events_idx, ev.get('league_code') or '', home_name, away_name)
             if not entry:
                 continue
+            home_lineup = _lineup_payload(entry.get('home'))
+            away_lineup = _lineup_payload(entry.get('away'))
+            ev['lineups'] = {
+                'home': home_lineup,
+                'away': away_lineup,
+                'league_code': entry.get('league_code') or ev.get('league_code') or '',
+                'sofa_event_id': entry.get('sofa_event_id') or '',
+                'source': 'sofascore',
+            }
+            event_level_patched += 1
             # Attach per-side lineup to the matching competitor.
             for c in ev.get('competitors') or []:
                 ha = c.get('home_away')
-                side = entry.get(ha)  # 'home' or 'away'
+                side = home_lineup if ha == 'home' else away_lineup if ha == 'away' else None
                 if not side:
                     continue
-                c['lineup'] = {
-                    'formation': side.get('formation') or '',
-                    'confirmed': bool(side.get('confirmed')),
-                    'coach': side.get('coach') or '',
-                    'starters': side.get('starters') or [],
-                    'subs': side.get('subs') or [],
-                }
+                c['lineup'] = side
+                competitor_lineups += 1
             patched += 1
 
     payload = json.dumps(data, ensure_ascii=False, separators=(',', ':'))
@@ -109,7 +168,8 @@ def main() -> int:
     # v33.28 — HTML rewrite déplacé dans scripts/inject_data_in_html.py
     # (1 seul appel à la fin du pipeline plutôt que 12 regex sur ~13500 lignes)
     print(f'[patch_lineups] patched {patched}/{scanned} soccer events w/ lineups '
-          f'({len(events_idx)} available)')
+          f'({len(events_idx)} available, event_level={event_level_patched}, '
+          f'competitors={competitor_lineups})')
     return 0
 
 
