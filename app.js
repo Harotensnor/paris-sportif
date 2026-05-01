@@ -14028,10 +14028,17 @@
     // v29 — Hero hook : show today's headline pick as the featured banner.
     // First-choice : best-edge topPick. Fallback : highest-confidence upcoming
     // pick so the banner is never empty when there IS something to play.
+    // BUG FIX 2026-05-01 — Le fallback respecte maintenant _losingSports :
+    // sans ce filtre, un sport en grosse perte (ex baseball ROI -36%) était
+    // exclu de topPicks mais ressurgissait en heroPick → contradiction
+    // visible : "TOP PICK DU JOUR Cubs @1.60 conf 68%" + "Aucun pari edge
+    // ≥5%" affichés en même temps. Si tout est filtré → empty hero (cohérent
+    // avec action-focus).
     let heroPick = topPicks[0] || null;
     if (!heroPick && !_dataIsStale) {
       const fallback = allTodayRaw
-        .filter(x => !x.m.live && !x.m.completed && _notStarted(x.m) && x.rel >= 0.55)
+        .filter(x => !x.m.live && !x.m.completed && _notStarted(x.m)
+                  && x.rel >= 0.55 && !_losingSports.has(x.m.sport))
         .sort((a, b) => b.rel - a.rel)[0];
       if (fallback) {
         // v30 — promouvoir best comme dans topPicks pour cohérence d'affichage
@@ -20574,7 +20581,7 @@
             <span>Plus</span>
           </div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(15,1fr);gap:3px;">
+        <div style="display:grid;grid-template-columns:repeat(15,minmax(0,1fr));gap:3px;">
           ${heatmapData.cells.map(c => {
             const dt = new Date(c.iso + 'T12:00:00Z');
             const dayN = dt.getUTCDate();
@@ -24890,7 +24897,7 @@
           const deltaCol = d.delta > 0 ? '#34d399' : d.delta < 0 ? '#f87171' : 'var(--text-dim)';
           const dateLabel = new Date(d.day + 'T12:00:00').toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', weekday: 'short' });
           return `
-            <div style="display:grid;grid-template-columns:110px 1fr 80px 90px 90px;gap:10px;align-items:center;padding:9px 12px;border-top:1px solid var(--border,#2a3744);font-size:13px;">
+            <div style="display:grid;grid-template-columns:110px minmax(120px,1fr) 80px 90px 90px;gap:10px;align-items:center;padding:9px 12px;border-top:1px solid var(--border,#2a3744);font-size:13px;min-width:480px;">
               <div style="color:var(--text-dim,#b4bcc7);font-weight:600;">${dateLabel}</div>
               <div style="color:var(--text-muted);">${d.picks.length} lock${d.picks.length>1?'s':''} · ${d.w}W · ${d.l}L</div>
               <div style="color:var(--text-muted);text-align:right;font-variant-numeric:tabular-nums;">${d.openBalance.toFixed(2)}€</div>
@@ -25040,8 +25047,8 @@
         ${walletChartHtml}
         ${walletTableToolbarHtml}
         ${walletRowsHtml ? `
-          <div style="background:var(--surface,#111827);border:1px solid var(--border,#2a3744);border-radius:10px;overflow:hidden;">
-            <div style="display:grid;grid-template-columns:110px 1fr 80px 90px 90px;gap:10px;padding:10px 12px;font-size:11.5px;color:var(--text-dim2,#7b8693);font-weight:600;text-transform:uppercase;letter-spacing:.5px;">
+          <div style="background:var(--surface,#111827);border:1px solid var(--border,#2a3744);border-radius:10px;overflow-x:auto;-webkit-overflow-scrolling:touch;">
+            <div style="display:grid;grid-template-columns:110px minmax(120px,1fr) 80px 90px 90px;gap:10px;padding:10px 12px;font-size:11.5px;color:var(--text-dim2,#7b8693);font-weight:600;text-transform:uppercase;letter-spacing:.5px;min-width:480px;">
               <div>Jour</div>
               <div>Picks</div>
               <div style="text-align:right;">Ouverture</div>
@@ -25275,7 +25282,7 @@
       const insufficientDataMsg = !bestCell ? `<div style="padding:9px 12px;font-size:11px;color:var(--text-dim);border-top:1px solid var(--border,#2a3744);background:var(--bg-3,#0f1823);margin-top:10px;border-radius:8px;">⚠️ Données insuffisantes pour un classement fiable (besoin ≥10 paris/créneau)</div>` : '';
 
       const headerH = `
-        <div style="display:grid;grid-template-columns:140px repeat(7, 1fr);gap:4px;padding:0 2px;margin-bottom:4px;">
+        <div style="display:grid;grid-template-columns:110px repeat(7, minmax(0,1fr));gap:4px;padding:0 2px;margin-bottom:4px;">
           <div></div>
           ${DAY_NAMES.map(d => `<div style="text-align:center;font-size:11px;color:var(--text-dim2);font-weight:600;text-transform:uppercase;letter-spacing:.4px;padding:4px 0;">${d}</div>`).join('')}
         </div>`;
@@ -25313,7 +25320,7 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
           return `<div title="${tip.replace(/"/g,'&quot;')}" style="background:${col.bg};border:1px solid ${col.border};border-radius:6px;padding:8px 4px;text-align:center;font-variant-numeric:tabular-nums;${cellOpacity}">${label}</div>`;
         }).join('');
         return `
-          <div style="display:grid;grid-template-columns:140px repeat(7, 1fr);gap:4px;padding:2px;align-items:stretch;">
+          <div style="display:grid;grid-template-columns:110px repeat(7, minmax(0,1fr));gap:4px;padding:2px;align-items:stretch;">
             <div style="display:flex;align-items:center;gap:6px;padding:0 4px;font-size:12.5px;color:var(--text);font-weight:600;">
               <span style="font-size:14px;">${sportIcon(sp)}</span>
               <span>${esc(sportLabel(sp))}</span>

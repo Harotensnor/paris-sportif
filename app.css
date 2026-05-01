@@ -5068,13 +5068,20 @@
 
   /* v31.7.2 — Page Tous : grid responsive (avant 72px 1fr 200px 110px fixe
      => overflow horizontal sur mobile <520px). Maintenant flexbox-like avec
-     grid-template-columns dynamiques selon viewport. */
+     grid-template-columns dynamiques selon viewport.
+     BUG FIX 2026-05-01 — Utilisation de minmax(0,1fr) au lieu de 1fr car
+     `1fr` est equivalent à `minmax(auto,1fr)` qui ne shrinkée PAS en dessous
+     de la largeur min-content du contenu. Conséquence : noms d'équipes longs
+     (ex "Arizona Diamondbacks") forçaient la colonne à 295px sur viewport
+     375px → débordement de 136px. Combiné avec min-width:0 sur les enfants
+     pour que `overflow:hidden + text-overflow:ellipsis` fonctionnent. */
   .tous-row {
-    grid-template-columns: 72px 1fr 200px 110px;
+    grid-template-columns: 72px minmax(0,1fr) 200px 110px;
   }
+  .tous-row > div { min-width: 0; }
   @media (max-width: 720px) {
     .tous-row {
-      grid-template-columns: 64px 1fr 100px;
+      grid-template-columns: 64px minmax(0,1fr) 100px;
       gap: 10px !important;
       padding: var(--space-3) 12px !important;
     }
@@ -5086,11 +5093,20 @@
   }
   @media (max-width: 480px) {
     .tous-row {
-      grid-template-columns: 56px 1fr 88px;
+      grid-template-columns: 56px minmax(0,1fr) 88px;
       font-size: 12px;
     }
     .tous-row > div:nth-child(2) > div:first-child {
       font-size: 12.5px !important;
+    }
+    /* BUG FIX 2026-05-01 — Force ellipsis sur les noms d'équipes pour
+       éviter le débordement quand "Arizona Diamondbacks" + logo
+       dépasse la largeur de la colonne 1fr. Sans ça l'inline-flex
+       gardait sa min-content. */
+    .tous-row > div:nth-child(2) span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
   }
 
