@@ -15040,6 +15040,26 @@
                 ${allReasons.length ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin:6px 0 10px;">
                   ${allReasons.slice(0, 3).map(r => `<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:999px;font-size:10.5px;color:var(--text-dim);line-height:1.3;" title="${esc(r.text||'')}">${esc(r.icon||'')} ${esc((r.text||'').slice(0,42))}${(r.text||'').length>42?'…':''}</span>`).join('')}
                 </div>` : ''}
+                ${(() => {
+                  // 2026-05-01 — Forme L5 + streak sur Top picks dashboard.
+                  // Réutilise les helpers exposés sur window v34.29.
+                  // (p n'a pas de sides défini, on les récupère depuis m.competitors)
+                  const _sides = (typeof getSides === 'function') ? getSides(p.m) : null;
+                  const home = _sides?.home; const away = _sides?.away;
+                  if (!home && !away) return '';
+                  const formH = (typeof renderForm5Compact === 'function') ? renderForm5Compact(home?.form) : '';
+                  const formA = (typeof renderForm5Compact === 'function') ? renderForm5Compact(away?.form) : '';
+                  const pickKey = (p.best && p.best.key) || (p.pred.pick && p.pred.pick.key) || '';
+                  const streakTeam = pickKey === '1' ? home : pickKey === '2' ? away : null;
+                  const streakHtml = streakTeam && (typeof renderStreakBadge === 'function') ? renderStreakBadge(streakTeam) : '';
+                  if (!formH && !formA && !streakHtml) return '';
+                  return `<div style="margin:8px 0;padding:8px 10px;background:rgba(255,255,255,.03);border-radius:6px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:10.5px;color:var(--text-dim);">
+                    <span style="font-weight:600;text-transform:uppercase;letter-spacing:.4px;font-size:9.5px;">Forme L5</span>
+                    ${formH ? `<span style="display:inline-flex;align-items:center;gap:4px;"><span style="color:var(--text-dim2);font-size:10px;">${esc((home?.short || home?.name || '?').slice(0,8))}</span> ${formH}</span>` : ''}
+                    ${formA ? `<span style="display:inline-flex;align-items:center;gap:4px;"><span style="color:var(--text-dim2);font-size:10px;">${esc((away?.short || away?.name || '?').slice(0,8))}</span> ${formA}</span>` : ''}
+                    ${streakHtml}
+                  </div>`;
+                })()}
                 <div style="display:flex;justify-content:space-between;align-items:baseline;margin:10px 0;font-size:12px;">
                   <div><span style="color:var(--text-dim);">Cote</span> <strong style="color:var(--text);">@${p.odd.toFixed(2)}</strong></div>
                   <div><span style="color:var(--text-dim);border-bottom:1px dotted var(--text-dim);cursor:help;" title="Confiance du modèle : probabilité estimée que ce pari gagne. ≥70 % = très fiable.">Conf</span> <strong style="color:var(--text);">${Math.round(p.rel*100)}%</strong></div>
