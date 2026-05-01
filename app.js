@@ -25205,6 +25205,11 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         const navColor = ratio >= 1.0 ? 'var(--accent)' : ratio >= 0.8 ? 'var(--warn,#fbbf24)' : 'var(--danger)';
         const navSign = nav >= start ? '+' : '';
         const deltaPct = ((ratio - 1) * 100);
+        // v33.5 — Détection "agent dormant" : NAV exactement = start ET 0 paris
+        // joués (series.length === 0). Cas typique au boot ou si data stale
+        // depuis longtemps. Distinguer visuellement de "agent rentable à
+        // exactement 0%" qui est différent.
+        const isDormant = (a.series && a.series.length === 0) && Math.abs(nav - start) < 0.01;
         // Tier drawdown (v31.7.210)
         let tier, tierLabel, kelly, tierColor;
         if (ratio < 0.40)      { tier = 'capital_preservation'; tierLabel = 'Préservation'; kelly = 0.08; tierColor = 'var(--danger)'; }
@@ -25227,10 +25232,10 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
                 <div style="font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:4px;" title="L'agent autonome est une simulation : il parie virtuellement chaque pick value avec Kelly fractionné (0.25×, cap 10%/pari, cap 20%/jour). Démarré à 10€ — son seul but est de tester la rentabilité du modèle sans toucher à ta vraie bankroll.">🤖 Agent autonome · cagnotte simulée 10€ depuis J1</div>
                 <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;">
                   <span style="font-size:34px;font-weight:800;color:${navColor};letter-spacing:-1.2px;line-height:1;">${nav.toFixed(2)}€</span>
-                  <span style="font-size:14px;color:${navColor};font-weight:700;">${navSign}${deltaPct.toFixed(1)}%</span>
-                  <span style="font-size:12px;color:var(--text-dim);">vs ${start}€ init</span>
+                  ${isDormant ? `<span style="font-size:12px;color:var(--text-dim2);font-weight:600;font-style:italic;">⏳ en attente du 1er pari</span>` : `<span style="font-size:14px;color:${navColor};font-weight:700;">${navSign}${deltaPct.toFixed(1)}%</span>
+                  <span style="font-size:12px;color:var(--text-dim);">vs ${start}€ init</span>`}
                 </div>
-                <div style="font-size:11px;color:var(--text-dim);margin-top:6px;line-height:1.4;">L'agent parie automatiquement chaque pick value (edge ≥ 5pt + confiance ≥ 55%) avec mise Kelly fractionnée. Indépendant de ta bankroll perso.</div>
+                <div style="font-size:11px;color:var(--text-dim);margin-top:6px;line-height:1.4;">${isDormant ? `Aucun pari réglé encore. L'agent parie automatiquement les picks value (edge ≥ 5pt + conf ≥ 55%) dès qu'un match est terminé. Reviens demain pour voir l'évolution.` : `L'agent parie automatiquement chaque pick value (edge ≥ 5pt + confiance ≥ 55%) avec mise Kelly fractionnée. Indépendant de ta bankroll perso.`}</div>
               </div>
               <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
                 <div style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:rgba(${tier === 'full_sizing' ? '52,211,153' : tier === 'early_caution' || tier === 'real_drawdown' ? '251,191,36' : '252,165,165'},.12);border:1px solid ${tierColor};border-radius:999px;font-size:11.5px;font-weight:700;color:${tierColor};">
