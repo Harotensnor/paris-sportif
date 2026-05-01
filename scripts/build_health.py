@@ -48,7 +48,12 @@ def _count_winamax_catalog(d):
 
 def _count_winamax_markets(d):
     if not isinstance(d, dict): return None
-    return {'matches_with_odds': len(d.get('matches') or {})}
+    matches = d.get('matches') or {}
+    detailed = sum(
+        1 for v in matches.values()
+        if isinstance(v, dict) and len(v.get('odds') or {}) > 1
+    )
+    return {'matches_with_odds': len(matches), 'matches_detailed': detailed}
 
 def _count_events(d):
     if not isinstance(d, dict): return None
@@ -79,7 +84,17 @@ SOURCES = [
     # v33.6 — Sources ajoutées pour visibility complète du pipeline.
     ('fbref_xg',        'fbref_xg.json',        lambda d: {'leagues': len(d.get('leagues') or {}) if isinstance(d, dict) else 0}),
     ('sofascore_events', 'sofascore_events.json', lambda d: {'total': d.get('total') or sum(len(v) for v in (d.get('events') or {}).values()) if isinstance(d, dict) else 0}),
-    ('team_form',       'team_form.json',       lambda d: {'teams': len(d.get('teams') or {}) if isinstance(d, dict) else 0}),
+    ('team_form',       'team_form.json',       lambda d: {
+        'teams': (
+            len(d.get('teams') or {})
+            if isinstance(d, dict) and isinstance(d.get('teams'), dict)
+            else len(d) if isinstance(d, dict) else 0
+        ),
+        'football_teams': (
+            sum(1 for k in d.keys() if str(k).startswith('football:'))
+            if isinstance(d, dict) else 0
+        ),
+    }),
     ('footballdata',    'footballdata.json',    lambda d: {'rows': len(d.get('rows') or []) if isinstance(d, dict) else 0}),
 ]
 
@@ -112,7 +127,7 @@ SOURCE_SCRIPT = {
     'referees_soccer': 'scripts/fetch_referees_soccer.py',
     'fbref_xg': 'scripts/fetch_understat_xg.py',
     'sofascore_events': 'scripts/fetch_sofascore_events.py',
-    'team_form': 'scripts/fetch_form_l10_soccer.py',
+    'team_form': 'scripts/fetch_team_form.py',
     'footballdata': 'scripts/fetch_footballdata.py',
 }
 

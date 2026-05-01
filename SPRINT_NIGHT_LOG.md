@@ -69,5 +69,13 @@
 - Avant: `data.js` restait à 0 events avec `event.clubelo` après cron; `patch_all_quick.py` lisait mal `clubelo.json` (`clubs`) et n'utilisait pas les aliases du patch spécialisé
 - Après: `patch_all_quick.py` réutilise le lookup ClubElo robuste; mesure locale 111 events avec `clubelo`, 162 events avec au moins une équipe Elo, 273 compétiteurs enrichis
 - Impact: le signal Elo devient persistant à chaque refresh, pas seulement après exécution manuelle du patch spécialisé
+- Commit: f4f7a47f
+- Status: ✅ DONE
+
+## Sprint v35.10 (2026-05-02 02:50 UTC)
+- Chantier: P17/P19 Santé data couverture Winamax + forme L10
+- Avant: `health.json.sources.team_form.teams` restait à 0 malgré 698 équipes en cache; `winamax_markets` ne distinguait pas 1N2 simple vs marchés détaillés; `pipeline_lag_per_script.team_form.script` pointait vers un script inexistant
+- Après: `team_form` expose 698 équipes dont 641 foot; `winamax_markets` expose 751 matchs avec cotes et 148 matchs détaillés; `quality_checks` mesure 302 exacts, 189 détaillés, ratio détaillé 62.6%
+- Impact: la page Santé peut diagnostiquer en prod si le scanner multi-marchés et la forme L10 fonctionnent vraiment, au lieu d'afficher un faux vide
 - Commit: pending
 - Status: ✅ DONE

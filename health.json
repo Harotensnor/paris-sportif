@@ -1,31 +1,32 @@
 {
-  "generated_at": "2026-05-01T23:36:16Z",
+  "generated_at": "2026-05-01T23:38:00Z",
   "data_age_min": 0,
   "sources": {
     "winamax_catalog": {
-      "age_min": 1,
+      "age_min": 24,
       "tournaments": 116,
       "matches": 750
     },
     "winamax_markets": {
-      "age_min": 1,
-      "matches_with_odds": 751
+      "age_min": 4,
+      "matches_with_odds": 751,
+      "matches_detailed": 148
     },
     "injuries_soccer": {
-      "age_min": 1,
+      "age_min": 940,
       "teams": 131,
       "players": 475
     },
     "lineups_soccer": {
-      "age_min": 1,
+      "age_min": 940,
       "events": 17
     },
     "team_stats": {
-      "age_min": 1,
+      "age_min": 167,
       "teams": 421
     },
     "clubelo": {
-      "age_min": 1,
+      "age_min": 526,
       "clubs": 630
     },
     "weather": {
@@ -33,7 +34,7 @@
       "events": 292
     },
     "referees_soccer": {
-      "age_min": 1,
+      "age_min": 940,
       "events": 46
     },
     "fbref_xg": {
@@ -45,8 +46,9 @@
       "total": 0
     },
     "team_form": {
-      "age_min": 1,
-      "teams": 0
+      "age_min": 10,
+      "teams": 698,
+      "football_teams": 641
     },
     "footballdata": {
       "age_min": 0,
@@ -57,15 +59,15 @@
     "winamax_catalog": {
       "script": "scripts/fetch_winamax_catalog.py",
       "output": "winamax_catalog.json",
-      "age_min": 1,
+      "age_min": 24,
       "threshold_min": 15,
       "fast_red_min": 30,
-      "status": "ok"
+      "status": "warn"
     },
     "winamax_markets": {
       "script": "scripts/fetch_winamax_match_details.py",
       "output": "winamax_markets.json",
-      "age_min": 1,
+      "age_min": 4,
       "threshold_min": 15,
       "fast_red_min": 30,
       "status": "ok"
@@ -73,23 +75,23 @@
     "injuries_soccer": {
       "script": "scripts/fetch_injuries_soccer.py",
       "output": "injuries_soccer.json",
-      "age_min": 1,
+      "age_min": 940,
       "threshold_min": 180,
       "fast_red_min": null,
-      "status": "ok"
+      "status": "warn"
     },
     "lineups_soccer": {
       "script": "scripts/fetch_lineups_soccer.py",
       "output": "lineups_soccer.json",
-      "age_min": 1,
+      "age_min": 940,
       "threshold_min": 180,
       "fast_red_min": null,
-      "status": "ok"
+      "status": "warn"
     },
     "team_stats": {
       "script": "scripts/fetch_team_stats.py",
       "output": "team_stats.json",
-      "age_min": 1,
+      "age_min": 167,
       "threshold_min": 300,
       "fast_red_min": null,
       "status": "ok"
@@ -97,7 +99,7 @@
     "clubelo": {
       "script": "scripts/fetch_clubelo.py",
       "output": "clubelo.json",
-      "age_min": 1,
+      "age_min": 526,
       "threshold_min": 1440,
       "fast_red_min": null,
       "status": "ok"
@@ -113,10 +115,10 @@
     "referees_soccer": {
       "script": "scripts/fetch_referees_soccer.py",
       "output": "referees_soccer.json",
-      "age_min": 1,
+      "age_min": 940,
       "threshold_min": 480,
       "fast_red_min": null,
-      "status": "ok"
+      "status": "warn"
     },
     "fbref_xg": {
       "script": "scripts/fetch_understat_xg.py",
@@ -135,9 +137,9 @@
       "status": "ok"
     },
     "team_form": {
-      "script": "scripts/fetch_form_l10_soccer.py",
+      "script": "scripts/fetch_team_form.py",
       "output": "team_form.json",
-      "age_min": 1,
+      "age_min": 10,
       "threshold_min": 360,
       "fast_red_min": null,
       "status": "ok"
@@ -152,9 +154,12 @@
     }
   },
   "warnings": [
+    "winamax_catalog: stale (24min > 15min threshold)",
+    "injuries_soccer: stale (940min > 180min threshold)",
+    "lineups_soccer: stale (940min > 180min threshold)",
+    "referees_soccer: stale (940min > 480min threshold)",
     "fbref_xg: file missing (fbref_xg.json)",
     "sofascore_events: source vide — matching Sofascore indisponible",
-    "team_form: source vide — signal forme L10 désactivé",
     "footballdata: source vide — historique ligues foot désactivé",
     "winamax_exact_ratio bas: 42% (302/727)"
   ],
