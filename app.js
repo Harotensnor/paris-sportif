@@ -143,6 +143,28 @@
   } catch(e){}
   // Sync hash → currentPage quand le user revient via back/forward navigation
   window.addEventListener('hashchange', () => {
+    // R1 (audit phase 2) : deep link modal #match/123/synthese.
+    // Avant : ce hash format ne déclenchait rien → modal ne s'ouvrait pas.
+    const matchHashMatch = (location.hash || '').match(/^#match\/([^/]+)(?:\/(\w+))?$/);
+    if (matchHashMatch) {
+      const targetId = matchHashMatch[1];
+      try {
+        const data = window.PRONOSTICS_DATA;
+        if (data && data.days) {
+          for (const arr of Object.values(data.days)) {
+            for (const m of (arr || [])) {
+              if (String(m.id) === String(targetId)) {
+                if (typeof openDetail === 'function') {
+                  openDetail(m);
+                  return;
+                }
+              }
+            }
+          }
+        }
+      } catch(e) { /* swallow */ }
+      return;
+    }
     const p = _pageFromHash();
     if (p && p !== currentPage) {
       currentPage = p;
@@ -3226,7 +3248,7 @@
 
   // ======= Competitor helpers =======
   function getSides(match) {
-    const comps = match.competitors || [];
+    const comps = (match.competitors || []).filter(c => c && c.name);  // P0-4 : skip null competitors
     let home, away;
     for (const c of comps) {
       if (c.home_away === 'home') home = c;
@@ -8640,6 +8662,12 @@
       const picksAll = [];
       filteredEvents.forEach(m => {
         if (m.completed || m.live) return;
+        // R4 (audit phase 2) : filter matchs avec TBD vs TBD ou competitors null
+        // (tirages tournoi pas encore faits). Avant : "TBD vs TBD" remontait dans
+        // les combinés affichés en UI.
+        const comps = m.competitors || [];
+        const hasNullCompetitor = comps.some(c => !c || !c.name || /^TBD$|à déterminer/i.test(c.name));
+        if (hasNullCompetitor || comps.length < 2) return;
         try {
           const pred = predictMatch(m);
           if (!pred || !pred.pick || pred.skip) return;
@@ -14162,7 +14190,7 @@
     })();
 
     wrap.innerHTML = `
-      <div style="max-width:1100px;margin:0 auto;padding:0 20px;font-variant-numeric:tabular-nums;">
+      <div style="max-width:1280px;margin:0 auto;padding:0 20px;font-variant-numeric:tabular-nums;">
 
         ${_actionFocus}
 
@@ -16316,7 +16344,7 @@
     })();
 
     wrap.innerHTML = `
-      <div style="max-width:1100px;margin:0 auto;padding:16px 8px 24px;font-variant-numeric:tabular-nums;">
+      <div style="max-width:1280px;margin:0 auto;padding:16px 8px 24px;font-variant-numeric:tabular-nums;">
         <div style="padding:40px 0 20px;border-bottom:1px solid var(--border);">
           <div style="font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Aujourd'hui · Winamax</div>
           <h1 style="margin:0 0 6px;font-size:32px;font-weight:800;letter-spacing:-1.1px;color:var(--text);line-height:1.1;">Tous les pronos du jour</h1>
@@ -16841,7 +16869,7 @@
       </div>`).join('');
 
     wrap.innerHTML = `
-      <div style="max-width:1100px;margin:0 auto;padding:16px 8px 24px;">
+      <div style="max-width:1280px;margin:0 auto;padding:16px 8px 24px;">
         <div style="margin-bottom:32px;padding:40px 0 24px;border-bottom:1px solid var(--border);">
           <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Pédagogie</div>
           <h1 style="margin:0 0 8px;font-size:40px;font-weight:800;letter-spacing:-1.4px;color:var(--text);line-height:1.1;">Guide</h1>
@@ -17030,7 +17058,7 @@
     const nTotal = matches.length;
 
     wrap.innerHTML = `
-      <div style="max-width:1100px;margin:0 auto;padding:16px 8px 24px;">
+      <div style="max-width:1280px;margin:0 auto;padding:16px 8px 24px;">
         <div style="margin-bottom:28px;padding:32px 0 20px;border-bottom:1px solid var(--border);position:relative;">
           <div style="position:absolute;top:0;left:0;width:40px;height:3px;background:var(--accent);border-radius:0 0 2px 2px;"></div>
           <div style="font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Prono buts · Football</div>
@@ -17072,7 +17100,7 @@
   // Théo n'enregistre pas ses paris sur le site → tout ce bloc retiré.
   function renderBacktestPage(wrap) {
     wrap.innerHTML = `
-      <div style="max-width:1100px;margin:0 auto;padding:16px 8px 24px;">
+      <div style="max-width:1280px;margin:0 auto;padding:16px 8px 24px;">
         <div class="page-header">
           <div style="position:absolute;top:0;left:0;width:40px;height:3px;background:var(--brand);border-radius:0 0 2px 2px;"></div>
           <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Backtest historique · cron hebdo</div>
@@ -18729,7 +18757,7 @@
       if (!suiviNav) {
         suiviNav = document.createElement('div');
         suiviNav.id = 'suivi-subnav';
-        suiviNav.style.cssText = 'max-width:1100px;margin:0 auto;padding:12px 8px 4px;display:flex;gap:6px;flex-wrap:wrap;';
+        suiviNav.style.cssText = 'max-width:1280px;margin:0 auto;padding:12px 8px 4px;display:flex;gap:6px;flex-wrap:wrap;';
         (document.querySelector('main') || document.body).insertBefore(suiviNav, (document.querySelector('main') || document.body).firstChild);
       }
       const tabs = [
@@ -18763,7 +18791,7 @@
       if (!pronosNav) {
         pronosNav = document.createElement('div');
         pronosNav.id = 'pronos-subnav';
-        pronosNav.style.cssText = 'max-width:1100px;margin:0 auto;padding:12px 8px 4px;display:flex;gap:6px;flex-wrap:wrap;';
+        pronosNav.style.cssText = 'max-width:1280px;margin:0 auto;padding:12px 8px 4px;display:flex;gap:6px;flex-wrap:wrap;';
         (document.querySelector('main') || document.body).insertBefore(pronosNav, (document.querySelector('main') || document.body).firstChild);
       }
       const tabs = [
@@ -18802,7 +18830,7 @@
       if (!topH1) {
         topH1 = document.createElement('div');
         topH1.id = 'top-page-h1';
-        topH1.style.cssText = 'max-width:1100px;margin:0 auto;padding:8px 8px 0;';
+        topH1.style.cssText = 'max-width:1280px;margin:0 auto;padding:8px 8px 0;';
         topH1.innerHTML = '<span class="section-eyebrow">Sélection du modèle</span><h1 class="section-title-v2" style="margin-bottom:6px;">⭐ Top du jour</h1><p class="section-subtitle-v2" style="margin-bottom:18px;">Les picks les plus solides selon le modèle, classés par valeur (edge × confiance).</p>';
         tp.parentElement.insertBefore(topH1, tp);
       }
@@ -24362,7 +24390,7 @@
     };
 
     wrap.innerHTML = `
-      <div style="max-width:1100px;margin:0 auto;padding:0 20px;">
+      <div style="max-width:1280px;margin:0 auto;padding:0 20px;">
         <div style="margin-bottom:24px;">
           <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:4px;">🔁 Comparateur</div>
           <h1 style="margin:0 0 6px;font-size:30px;font-weight:800;letter-spacing:-1.0px;color:var(--text);">Comparer 2 jours côte à côte</h1>
@@ -25592,6 +25620,11 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
           <div class="kpi-sub">sur ${completed.length} matchs terminés</div>
         </div>
       </div>
+      ${model.bets > 0 && model.bets < 30 ? `
+      <!-- V9 (audit phase 2) : disclaimer si échantillon trop petit -->
+      <div style="margin:8px 0 12px;padding:10px 14px;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-left:3px solid #fbbf24;border-radius:0 8px 8px 0;font-size:12.5px;color:var(--text-dim);line-height:1.5;">
+        <b style="color:#fbbf24;">⚠ Échantillon insuffisant (${model.bets} pari${model.bets>1?'s':''}) :</b> les chiffres ci-dessus sont <b>indicatifs</b>. Pour des conclusions statistiquement fiables, il faut au moins <b>30 paris réglés</b>. Avant ce seuil, le ROI peut osciller violemment (ex : -100% sur 1 perte unique).
+      </div>` : ''}
 
       ${(() => {
         // v33.31 — Stats avancées : Sharpe, Max DD, streaks, ROI rolling 7j.
@@ -27371,5 +27404,26 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     window.sportLabel = sportLabel;
     window.applyPageView = applyPageView;
   } catch (e) {}
+
+  // R1 (audit phase 2) : si le hash initial est #match/X/Y, déclencher
+  // openDetail au boot (deep link refresh ou partage URL). Sans ça, le hash
+  // restait dans la barre mais la modal ne s'ouvrait pas.
+  setTimeout(() => {
+    try {
+      const initMatchHash = (location.hash || '').match(/^#match\/([^/]+)/);
+      if (!initMatchHash) return;
+      const targetId = initMatchHash[1];
+      const data = window.PRONOSTICS_DATA;
+      if (!data || !data.days) return;
+      for (const arr of Object.values(data.days)) {
+        for (const m of (arr || [])) {
+          if (String(m.id) === String(targetId)) {
+            if (typeof openDetail === 'function') openDetail(m);
+            return;
+          }
+        }
+      }
+    } catch(_){}
+  }, 300);
 
 })();

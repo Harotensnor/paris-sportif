@@ -1,21 +1,29 @@
 
   :root {
     /* REFONTE v22 — Theme sombre par défaut (2026-04-23)
-       v31.7.34 — Identité visuelle "betting pro" : contraste boosté, couleurs
-       sport-aware, tier color hierarchy distinctive.
-       v31.7.215 — Force pipeline refresh (data.js stuck at 16:37 UTC despite
-       30+ successful cron ticks — likely no-diff edge case in commit step). */
-    --bg: #06070a;
-    --bg-2: #0a0b10;
-    --bg-3: #0e1016;
-    --panel: #11131a;
-    --panel-2: #161823;
-    --panel-3: #1c1f2c;
-    --panel-4: #232636;
+       v31.7.34 — Identité visuelle "betting pro" : contraste boosté.
+       v33.40 — Audit phase 2 V4 : 3 niveaux de surfaces tier explicites,
+       bordures plus visibles, hiérarchie plus claire. Bumpé bg-1 de #06070a
+       (noir quasi pur) à #0a0c11 (légèrement plus chaud, mieux différencié). */
+    --bg: #0a0c11;
+    --bg-2: #0e1117;
+    --bg-3: #11141b;
+    --panel: #11141b;
+    --panel-2: #1a1f2a;
+    --panel-3: #21262d;
+    --panel-4: #2a3040;
 
-    --border: rgba(255,255,255,.06);
-    --border-2: rgba(255,255,255,.10);
-    --border-3: rgba(255,255,255,.16);
+    /* V4 (audit phase 2) : aliases sémantiques pour les 3 tiers */
+    --surface-0: #0a0c11;
+    --surface-1: #11141b;
+    --surface-2: #1a1f2a;
+    --surface-hover: #21262d;
+    --border-soft: rgba(255,255,255,.06);
+    --border-strong: rgba(255,255,255,.12);
+
+    --border: rgba(255,255,255,.08);
+    --border-2: rgba(255,255,255,.12);
+    --border-3: rgba(255,255,255,.18);
 
     --text: #f1f3f9;
     --text-2: #c8ccd8;
@@ -519,10 +527,15 @@
     margin: 0; padding: 0;
     background: var(--bg); color: var(--text);
     font-family: "Inter", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, sans-serif;
-    font-size: 14px; line-height: 1.5;
+    /* V3 (audit phase 2) : body 14px → 15px pour meilleure lisibilité dashboard
+       data-dense. Reco UX : 15-16px en réf. */
+    font-size: 15px; line-height: 1.5;
     -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
     font-feature-settings: "cv11", "ss01";
   }
+  /* V3 : H2 contrasté pour break visuel net entre titres et corps */
+  h2 { font-size: 22px; font-weight: 700; letter-spacing: -.3px; }
+  h3 { font-size: 18px; font-weight: 600; letter-spacing: -.2px; }
   body {
     background:
       radial-gradient(1200px 600px at 80% -10%, var(--body-grad-1), transparent 60%),
@@ -1491,14 +1504,18 @@
     color: var(--text-dim); font-size: 13px; font-weight: 600;
     cursor: pointer; white-space: nowrap;
     border-bottom: 2px solid transparent;
-    transition: color .12s, border-color .12s;
+    transition: color .12s, border-color .12s, background .12s;
   }
+  /* V10 (audit phase 2) : hover/focus contraste + active sur fond visible */
   .md-tab:hover, .md-tab:focus-visible {
     color: var(--text); outline: none;
+    background: var(--surface-2);
   }
   .md-tab.active {
     color: var(--accent);
     border-bottom-color: var(--accent);
+    background: rgba(45, 212, 168, .08);
+    font-weight: 700;
   }
   /* Backward-compat avec ancien sélecteur si encore référencé */
   .md-nav { display: none; }
