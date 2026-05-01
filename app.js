@@ -14492,6 +14492,15 @@
               <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${topMatchLabel}</div>
               <div style="font-size:12px;color:var(--text-dim);">${esc(topPickLabel)} · @${(top.odd || 0).toFixed(2)} · <span style="color:var(--accent);font-weight:700;">+${Math.round((top.edge || 0)*100)}pt edge</span></div>
               ${(() => {
+                // 2026-05-01 — Étoiles valueRating sur action-focus-top
+                if (typeof valueRating !== 'function') return '';
+                const dq = (typeof computeDataQuality === 'function') ? computeDataQuality(top.m) : null;
+                const vr = valueRating(top.rel, top.odd, dq);
+                if (!vr || vr.stars === 0) return '';
+                const col = vr.stars >= 4 ? 'var(--accent)' : vr.stars >= 3 ? 'var(--warn)' : 'var(--text-dim)';
+                return `<div style="font-size:12px;margin-top:3px;display:flex;align-items:center;gap:6px;"><span style="color:${col};letter-spacing:1px;font-weight:700;" title="Note ${vr.score}/100">${(typeof renderStars === 'function') ? renderStars(vr.stars) : '★'.repeat(vr.stars)}</span><span style="color:${col};font-weight:600;font-size:11px;">${esc(vr.label)}</span></div>`;
+              })()}
+              ${(() => {
                 // Sprint 130 (v31.7.191) — Countdown timer live jusqu'au coup d'envoi.
                 // Affiche "dans 2h32" / "dans 38min" / "dans 5min ⏰" pour matchs imminents.
                 const ts = top.m && top.m.date ? new Date(top.m.date).getTime() : 0;
@@ -14636,6 +14645,39 @@
                 <strong class="ed-hero__edge" title="Expected Value : retour attendu par euro misé">${(heroPick.ev * 100) >= 0 ? '+' : ''}${Math.round(heroPick.ev*100)}%</strong>
               </div>`}
             </div>
+            ${(() => {
+              // 2026-05-01 — Étoiles valueRating sur ed-hero principal
+              if (heroPick._noEdge || typeof valueRating !== 'function') return '';
+              const dq = (typeof computeDataQuality === 'function') ? computeDataQuality(heroPick.m) : null;
+              const vr = valueRating(heroPick.rel, heroPick.odd, dq);
+              if (!vr || vr.stars === 0) return '';
+              const col = vr.stars >= 4 ? 'var(--accent)' : vr.stars >= 3 ? 'var(--warn)' : 'var(--text-dim)';
+              return `<div class="ed-hero__rating" style="margin-top:10px;display:flex;align-items:center;gap:10px;font-size:14px;">
+                <span style="color:${col};letter-spacing:2px;font-weight:700;" title="Score composite ${vr.score}/100 — combinaison edge/EV/confiance/qualité data">${(typeof renderStars === 'function') ? renderStars(vr.stars) : '★'.repeat(vr.stars)}</span>
+                <span style="color:${col};font-weight:700;text-transform:uppercase;font-size:12px;letter-spacing:.5px;">${esc(vr.label)}</span>
+                <span style="color:var(--text-dim2);font-size:11px;margin-left:auto;">${vr.score}/100</span>
+              </div>`;
+            })()}
+            ${(() => {
+              // 2026-05-01 — Explication intuitive en langage naturel.
+              // L'user n'a pas envie de calculer les % à la main.
+              if (heroPick._noEdge) return '';
+              const relPct = Math.round(heroPick.rel * 100);
+              const impPct = Math.round((1 / heroPick.odd) * 100);
+              const edgePts = Math.round(heroPick.edge * 100);
+              const ret10 = (10 * heroPick.odd).toFixed(2);
+              let intuit;
+              if (edgePts >= 8) {
+                intuit = `Le bookmaker estime cette issue à <b>${impPct}%</b> alors qu'on calcule <b style="color:var(--accent);">${relPct}%</b> — gros écart en notre faveur (<b style="color:var(--warn);">+${edgePts}pt</b>). Si tu mises 10€ tu peux gagner <b>${ret10}€</b>.`;
+              } else if (edgePts >= 4) {
+                intuit = `On voit cette issue à <b>${relPct}%</b>, le marché à <b>${impPct}%</b> — petit écart positif (<b>+${edgePts}pt</b>). 10€ misés rapportent <b>${ret10}€</b> en cas de victoire.`;
+              } else if (edgePts >= 0) {
+                intuit = `Pick à <b>${relPct}%</b> de réussite estimée, cote @${heroPick.odd.toFixed(2)}. Marge fine — à jouer petit. Gain : 10€ → <b>${ret10}€</b>.`;
+              } else {
+                intuit = `Pick à <b>${relPct}%</b> mais cote @${heroPick.odd.toFixed(2)} = marché à ${impPct}%. <b style="color:var(--danger);">Edge négatif</b> — à éviter.`;
+              }
+              return `<div class="ed-hero__intuit" style="margin-top:12px;padding:10px 12px;background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.18);border-left:3px solid var(--brand);border-radius:0 8px 8px 0;font-size:13px;color:var(--text-2);line-height:1.5;">💡 ${intuit}</div>`;
+            })()}
             ${_topReasons.length ? `
               <div class="ed-hero__reasons" aria-label="Pourquoi ce pick">
                 <div class="ed-hero__reasons-title">Pourquoi ce pick :</div>
