@@ -61,6 +61,26 @@ _Généré depuis backtest_report_v2.json — 2026-04-26T21:20:06Z_
 | dog | 17 | 24% | -27.4% | 🔴 Filtrer |
 | heavy_dog | 1 | 0% | -100.0% | 🔴 Filtrer |
 
+## 🎯 Marchés secondaires (calibration model)
+
+_n_completed_evaluated : 284_
+
+| Marché | N | WR (95% CI) | Verdict |
+|---|--:|--:|---|
+| btts:BTTS_Y | 51 | 53% [40-66] | — Bruit |
+| btts:BTTS_N | 51 | 47% [34-60] | — Bruit |
+| doubleChance:12 | 51 | 76% [63-86] | ✓ Edge significatif |
+| doubleChance:1X | 51 | 69% [55-80] | 🟡 Edge faible |
+| doubleChance:X2 | 51 | 55% [41-68] | — Bruit |
+| ou15:O1.5 | 51 | 69% [55-80] | 🟡 Edge faible |
+| ou15:U1.5 | 51 | 31% [20-45] | 🔴 Anti-edge (à inverser ?) |
+| ou25:O2.5 | 51 | 57% [43-70] | — Bruit |
+| ou25:U2.5 | 51 | 43% [30-57] | — Bruit |
+| ou35:U3.5 | 51 | 71% [57-81] | ✓ Edge significatif |
+| ou35:O3.5 | 51 | 29% [19-43] | 🔴 Anti-edge (à inverser ?) |
+
+_Note : Brier non calculé — pas de proba modèle stockée par marché. Verdict basé sur l'intervalle de confiance Wilson 95%._
+
 ---
 
 _Tuning manuel : modifier les poids dans `app.js` (search "components.push") en s'inspirant des observations ci-dessus._
