@@ -21,5 +21,13 @@
 - Avant: `health.json` exposait `sources` + warnings mais aucun contrat `pipeline_lag_per_script`; page Santé ne montrait pas quel script/fichier était en retard
 - Après: `health.json.pipeline_lag_per_script` suit 12 sorties avec script, output, âge, seuil et statut; page Santé affiche la matrice lag; état mesuré: 12 scripts, 1 critique, 3 warnings; smoke local #sante OK avec bloc visible
 - Impact: diagnostic pipeline lisible en 5 secondes; les fetchers vides/lents ne peuvent plus rester silencieux
+- Commit: 19b0234f
+- Status: ✅ DONE
+
+## Sprint v35.04 (2026-05-02 01:29 UTC)
+- Chantier: P7 ClubElo patch match-level
+- Avant: `clubelo.json` contenait 630 clubs mais `event.clubelo` restait à 0; le patcher écrivait seulement `competitor.elo`
+- Après: `patch_clubelo.py` écrit aussi `event.clubelo` quand les deux équipes sont matchées; data.js mesure 111 events avec `clubelo`, 162 events avec au moins un compétiteur Elo, 273 compétiteurs Elo
+- Impact: le signal Elo devient mesurable côté santé/UI et exploitable par les blocs match-level; +111 events enrichis vs baseline 0
 - Commit: pending
 - Status: ✅ DONE
