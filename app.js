@@ -16134,6 +16134,23 @@
       ? finished.map(p => renderRow(p, true)).join('')
       : _emptyState(finishedEmptyMsg, false);
 
+    // v33.1 — Compute data sources for transparency widget.
+    // Sofascore events ont l'id préfixé "sofa_". ESPN events ont id numérique.
+    // On compte les events visibles aujourd'hui pour signaler à l'user la
+    // multi-source (résilience pipeline).
+    const _sourcesStats = (() => {
+      try {
+        const allTodayEvents = (data?.days?.[todayIso] || []);
+        let espn = 0, sofa = 0, winamax = 0;
+        allTodayEvents.forEach(ev => {
+          if (String(ev.id || '').startsWith('sofa_')) sofa++;
+          else espn++;
+          if (ev.winamax && ev.winamax.available === true) winamax++;
+        });
+        return { espn, sofa, winamax, total: allTodayEvents.length };
+      } catch(e) { return null; }
+    })();
+
     wrap.innerHTML = `
       <div style="max-width:1100px;margin:0 auto;padding:16px 8px 24px;font-variant-numeric:tabular-nums;">
         <div style="padding:40px 0 20px;border-bottom:1px solid var(--border);">
@@ -16141,6 +16158,15 @@
           <h1 style="margin:0 0 6px;font-size:32px;font-weight:800;letter-spacing:-1.1px;color:var(--text);line-height:1.1;">Tous les pronos du jour</h1>
           <div style="font-size:14px;color:var(--text-dim);">${pending.length + inProgress.length} prono${(pending.length + inProgress.length)>1?'s':''} value · ${pending.length} à venir · ${inProgress.length} en cours · ${finished.length} fini${finished.length>1?'s':''}${_completedNoOdds > 0 ? ` <span style="color:var(--text-dim2);" title="${_completedNoOdds} match${_completedNoOdds>1?'s':''} terminé${_completedNoOdds>1?'s':''} mais sans cote capturée (qualifs WTA/Challenger, etc.) → le modèle ne peut pas les évaluer dans le bilan.">(+${_completedNoOdds} non-trackables)</span>` : ''}${settledCount ? ` (<b style="color:${wrPct>=60?'#34d399':'var(--text-dim)'};">${wrPct}% réussite</b> sur ${settledCount})` : ''}${filtersActive ? `&nbsp;·&nbsp;<span style="color:var(--brand);font-weight:600;">filtres actifs</span>` : ''}<div style="font-size:11px;color:var(--text-dim2);margin-top:3px;">↳ paris à venir/en cours = edge ≥ -2pt (bad value filtré). Finis = picks avec cote capturée pour tracker la perf modèle.</div></div>
         </div>
+        ${_sourcesStats && _sourcesStats.total > 0 ? `
+          <!-- v33.1 — Widget Sources data : transparency sur d'où vient la couverture. -->
+          <div style="margin:14px 0 4px;padding:10px 14px;background:var(--panel);border:1px solid var(--border);border-radius:8px;font-size:11.5px;color:var(--text-dim);display:flex;flex-wrap:wrap;gap:14px;align-items:center;font-variant-numeric:tabular-nums;" title="Sources de la couverture events. Plus de sources = pipeline résilient (si une source ban, les autres comblent).">
+            <span style="color:var(--text-dim2);text-transform:uppercase;letter-spacing:.8px;font-weight:700;font-size:10px;">📡 Sources</span>
+            ${_sourcesStats.espn > 0 ? `<span><b style="color:var(--text);">ESPN</b> ${_sourcesStats.espn} events</span>` : ''}
+            ${_sourcesStats.sofa > 0 ? `<span><b style="color:var(--text);">Sofascore</b> ${_sourcesStats.sofa} events <span style="opacity:.6;font-size:10px;">(couverture étendue)</span></span>` : ''}
+            ${_sourcesStats.winamax > 0 ? `<span><b style="color:var(--accent);">Winamax</b> ${_sourcesStats.winamax} cotes 1N2 trackables</span>` : ''}
+          </div>
+        ` : ''}
 
         <!-- v30 Sprint 4 — Filter bar (sticky on scroll, slides under topbar at top:56px) -->
         <div class="tous-filter-bar" style="position:sticky;top:56px;z-index:20;margin:18px 0 10px;padding:14px;background:var(--panel);border:1px solid var(--border);border-radius:10px;display:flex;flex-direction:column;gap:12px;backdrop-filter:saturate(140%) blur(8px);-webkit-backdrop-filter:saturate(140%) blur(8px);">
