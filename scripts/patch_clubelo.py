@@ -406,31 +406,50 @@ def main() -> int:
 
     d = load_data()
     patched = 0
+    events_patched = 0
     total = 0
     missed: dict[str, int] = {}
     for day_key, evs in (d.get('days') or {}).items():
         for ev in evs:
             if ev.get('sport') != 'football':
                 continue
+            home_elo = None
+            away_elo = None
             for c in ev.get('competitors') or []:
                 total += 1
                 name = c.get('name') or ''
                 entry = lookup(clubs, name)
                 if entry:
-                    c['elo'] = {
+                    c_elo = {
                         'value': entry['elo'],
                         'rank': entry.get('rank'),
                         'country': entry.get('country'),
                         'level': entry.get('level'),
                     }
+                    c['elo'] = c_elo
+                    if c.get('home_away') == 'home':
+                        home_elo = c_elo
+                    elif c.get('home_away') == 'away':
+                        away_elo = c_elo
                     patched += 1
                 else:
                     missed[name] = missed.get(name, 0) + 1
+            if home_elo and away_elo:
+                ev['clubelo'] = {
+                    'home_elo': home_elo['value'],
+                    'away_elo': away_elo['value'],
+                    'diff': round(float(home_elo['value']) - float(away_elo['value']), 1),
+                    'home_rank': home_elo.get('rank'),
+                    'away_rank': away_elo.get('rank'),
+                    'source': 'clubelo',
+                }
+                events_patched += 1
 
     save_data(d)
     coverage = 100 * patched / total if total else 0
     print(f'[patch_clubelo] patched {patched}/{total} football competitors '
           f'({coverage:.0f}% coverage)')
+    print(f'[patch_clubelo] event clubelo summaries: {events_patched}')
     if missed:
         top_miss = sorted(missed.items(), key=lambda kv: -kv[1])[:8]
         print(f'[patch_clubelo] top unmatched: {top_miss}')
