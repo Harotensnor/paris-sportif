@@ -868,6 +868,108 @@ def get_drawdown_status(start_bankroll: float = 10.0) -> dict:
     }
 
 
+@mcp.tool()
+def get_today_top_picks(min_edge: float = 0.05, min_conf: float = 0.55, limit: int = 10) -> dict:
+    """Renvoie les top picks value du jour avec edge ≥ X et confiance ≥ Y.
+
+    Calcul proxy en lisant data.js + winamax_markets — pas le vrai
+    predictMatch JS, donc edge approximatif. Utile pour Théo qui veut
+    une vue rapide depuis Claude Desktop sans ouvrir le site.
+
+    Args:
+        min_edge: edge minimum (default 0.05 = 5pt)
+        min_conf: confiance minimum (default 0.55 = 55%)
+        limit: nombre max de picks à retourner (default 10)
+
+    Use case : "Donne-moi les meilleurs paris value du jour."
+    """
+    data = _load_data_js()
+    if "_error" in data:
+        return data
+    today = _today_iso()
+    matches = (data.get("days") or {}).get(today) or []
+    picks = []
+    for m in matches:
+        if m.get("completed"):
+            continue
+        if not _is_winamax_bookable(m):
+            continue
+        edge_info = _edge_estimate(m)
+        if not edge_info:
+            continue
+        if (edge_info.get("edge") or 0) < min_edge:
+            continue
+        if (edge_info.get("our_prob") or 0) < min_conf:
+            continue
+        comps = m.get("competitors") or []
+        home = next((c for c in comps if c.get("home_away") == "home"), {})
+        away = next((c for c in comps if c.get("home_away") == "away"), {})
+        picks.append({
+            "match": m.get("name") or f'{home.get("name","?")} vs {away.get("name","?")}',
+            "league": m.get("league_name") or m.get("league_code"),
+            "sport": m.get("sport"),
+            "kickoff": m.get("date"),
+            "pick": edge_info.get("pick_label"),
+            "odd": edge_info.get("odd"),
+            "implied_prob": edge_info.get("implied_prob"),
+            "our_prob": edge_info.get("our_prob"),
+            "edge_pct": round((edge_info.get("edge") or 0) * 100, 2),
+            "winamax_url": (m.get("winamax") or {}).get("url"),
+        })
+    picks.sort(key=lambda p: -(p.get("edge_pct") or 0))
+    return {
+        "today": today,
+        "filters": {"min_edge": min_edge, "min_conf": min_conf},
+        "n_picks": len(picks[:limit]),
+        "picks": picks[:limit],
+        "warning": (
+            "Edge calculé sur proxy (implied prob from cote, pas le vrai "
+            "predictMatch). Pour valeur précise, vérifie sur le site."
+        ),
+    }
+
+
+@mcp.tool()
+def get_pipeline_status() -> dict:
+    """Renvoie l'état détaillé de chaque source de data + leur fraîcheur.
+
+    Combine health.json (status global) + data.js (events count par sport)
+    + sofascore_events.json (couverture multi-source).
+
+    Use case : "Le pipeline est-il sain ? Combien d'events fetched ?"
+    """
+    health = _load_json(HEALTH_JSON)
+    data = _load_data_js()
+    sofa_path = PROJECT_ROOT / "sofascore_events.json"
+    sofa = _load_json(sofa_path) if sofa_path.exists() else {}
+
+    today = data.get("today") if not "_error" in data else None
+    today_events = (data.get("days") or {}).get(today, []) if today else []
+
+    # Count by source
+    espn_count = sum(1 for ev in today_events if not str(ev.get("id", "")).startswith("sofa_"))
+    sofa_count = sum(1 for ev in today_events if str(ev.get("id", "")).startswith("sofa_"))
+    winamax_count = sum(1 for ev in today_events if (ev.get("winamax") or {}).get("available"))
+
+    return {
+        "today": today,
+        "data_age_min": health.get("data_age_min") if not "_error" in health else None,
+        "overall_status": health.get("overall") if not "_error" in health else "unknown",
+        "events_today": {
+            "total": len(today_events),
+            "from_espn": espn_count,
+            "from_sofascore": sofa_count,
+            "winamax_bookable": winamax_count,
+        },
+        "sofascore_total_all_sports": sofa.get("total") if sofa else None,
+        "warnings": health.get("warnings", [])[:5] if not "_error" in health else [],
+        "sources": {
+            k: {"age_min": v.get("age_min"), "fresh": v.get("age_min", 999) < 60}
+            for k, v in (health.get("sources") or {}).items()
+        } if not "_error" in health else {},
+    }
+
+
 # === Main entry ===
 
 if __name__ == "__main__":
