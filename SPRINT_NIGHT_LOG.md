@@ -5,5 +5,13 @@
 - Avant: aucun log de nuit; repo sync avant mesure = `main@3bbe1514`; data generated_at = 2026-05-01T22:56:13Z
 - Après: baseline mesurée localement: 1038 events; marchés détaillés 24/1038 (2.3%); form L10 0; H2H 543/1038 (52.3%); lineups 6; clubelo 0; weather 162; injuries 0; referee 9; bundles app.js 1,711,026 B, app.css 286,898 B, pronostics.html 1,097,056 B, sw.js 6,129 B; Playwright npm indisponible (`npx` absent)
 - Impact: trace numérique initialisée; priorité recalibrée sur Winamax markets, L10, ClubElo, lineups et observabilité; H2H déjà proche cible mais à sécuriser
-- Commit: pending
+- Commit: eaf049b4
+- Status: ✅ DONE
+
+## Sprint v35.02 (2026-05-02 01:08 UTC)
+- Chantier: P5 Winamax markets + garde-fou bundle
+- Avant: marchés détaillés data.js 24/1038 (2.3%); fetcher sans `--limit/--debug`; `pronostics.html` baseline 1,097,056 B et aurait gonflé à 3,019,834 B après inline markets
+- Après: rebase sur cron frais puis fetch détail large 137/137 enrichis; patch data.js 153 events avec marchés Winamax, 134/1050 avec marchés détaillés (12.8%); HTML externalise `data.js?v=6d3cd921` et reste à 104,967 B; smoke Chromium OK (1038+ events, Terminal Value visible, overflow 0)
+- Impact: +110 events détaillés dans le site (+10.5 pts de couverture) sans exploser le shell HTML; pipeline prêt pour monter le cap sans tuer GitHub Pages
+- Commit: b3dd1f94 (pré-rebase; hash final porté par Git après rebase)
 - Status: ✅ DONE

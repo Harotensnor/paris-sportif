@@ -27,6 +27,7 @@ import re
 import sys
 import time
 import os
+import argparse
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
@@ -40,9 +41,10 @@ ROOT = Path(__file__).resolve().parent.parent
 MARKETS = ROOT / 'winamax_markets.json'
 DATA_JS = ROOT / 'data.js'
 
-CACHE_TTL_HOURS = float(os.environ.get('WINAMAX_DETAILS_TTL_HOURS', '4'))
-GLOBAL_CAP = int(os.environ.get('WINAMAX_DETAILS_CAP', '180'))
+CACHE_TTL_HOURS = float(os.environ.get('WINAMAX_DETAILS_TTL_HOURS', '1'))
+GLOBAL_CAP = int(os.environ.get('WINAMAX_DETAILS_CAP', '220'))
 SLEEP_SECONDS = float(os.environ.get('WINAMAX_DETAILS_SLEEP', '0.25'))
+DEBUG = False
 
 SPORT_QUOTAS = {
     'football': 110,
@@ -68,16 +70,24 @@ SPORT_PRIORITY = {
 def _fetch_state(url: str) -> dict | None:
     try:
         r = cr.get(url, impersonate='chrome110', timeout=15)
-    except Exception:
+    except Exception as exc:
+        if DEBUG:
+            print(f'  [debug] fetch failed {url}: {exc}', file=sys.stderr)
         return None
     if r.status_code != 200:
+        if DEBUG:
+            print(f'  [debug] HTTP {r.status_code} {url}', file=sys.stderr)
         return None
     m = re.search(r'var PRELOADED_STATE = (\{.*?\});\s*\n', r.text, re.DOTALL)
     if not m:
+        if DEBUG:
+            print(f'  [debug] PRELOADED_STATE absent {url}', file=sys.stderr)
         return None
     try:
         return json.loads(m.group(1))
-    except json.JSONDecodeError:
+    except json.JSONDecodeError as exc:
+        if DEBUG:
+            print(f'  [debug] state JSON invalid {url}: {exc}', file=sys.stderr)
         return None
 
 
@@ -177,15 +187,23 @@ def _extract_match_markets(state: dict, match_id: str) -> dict:
     for bid, bet in bets.items():
         if not isinstance(bet, dict): continue
         if str(bet.get('matchId')) != str(match_id): continue
-        title = (bet.get('betTypeName') or bet.get('betTitle') or '').lower()
-        outcome_ids = bet.get('outcomes') or []
+        title_raw = bet.get('betTypeName') or bet.get('betTitle') or bet.get('title') or bet.get('name') or ''
+        title = str(title_raw).lower()
+        outcome_ids = bet.get('outcomes') or bet.get('oddIds') or bet.get('outcomeIds') or []
 
         # Build [(label, odd)] resolved
         oitems: list[tuple[str, float]] = []
-        for oid in outcome_ids:
-            o = outcomes_state.get(str(oid)) or {}
+        for item in outcome_ids:
+            oid = item.get('id') if isinstance(item, dict) else item
+            o = item if isinstance(item, dict) else (outcomes_state.get(str(oid)) or {})
             label = (o.get('label') or '').strip()
             od = _odd_value(odds, str(oid))
+            if od is None and isinstance(item, dict):
+                od = item.get('odd') or item.get('odds')
+                try:
+                    od = float(od)
+                except (TypeError, ValueError):
+                    od = None
             if od is not None and od > 0 and label:
                 oitems.append((label, od))
         if not oitems:
@@ -454,7 +472,23 @@ def _select_priority_matches(existing_markets: dict, data_js_data: dict) -> list
     return selected
 
 
+def _parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description='Fetch detailed per-match Winamax markets.')
+    parser.add_argument('--limit', type=int, default=GLOBAL_CAP, help='Maximum matches to scrape this run.')
+    parser.add_argument('--ttl-hours', type=float, default=CACHE_TTL_HOURS, help='Fresh-cache TTL before re-scraping a match.')
+    parser.add_argument('--sleep', type=float, default=SLEEP_SECONDS, help='Delay between match page requests.')
+    parser.add_argument('--debug', action='store_true', help='Print per-match extraction diagnostics.')
+    return parser.parse_args()
+
+
 def main() -> int:
+    global CACHE_TTL_HOURS, GLOBAL_CAP, SLEEP_SECONDS, DEBUG
+    args = _parse_args()
+    CACHE_TTL_HOURS = args.ttl_hours
+    GLOBAL_CAP = max(1, args.limit)
+    SLEEP_SECONDS = max(0.0, args.sleep)
+    DEBUG = bool(args.debug)
+
     if not MARKETS.exists():
         print(f'WARN: {MARKETS} absent — run fetch_winamax_markets.py first')
         return 0
@@ -474,7 +508,8 @@ def main() -> int:
     data = json.loads(m.group(1))
 
     targets = _select_priority_matches(matches_dict, data)
-    print(f'[fetch_winamax_match_details] {len(targets)} matches to scrape')
+    print(f'[fetch_winamax_match_details] {len(targets)} matches to scrape '
+          f'(limit={GLOBAL_CAP}, ttl={CACHE_TTL_HOURS:g}h)')
 
     t0 = time.time()
     n_enriched = 0
@@ -488,7 +523,11 @@ def main() -> int:
             continue
         markets = _extract_match_markets(state, mid)
         if not markets:
+            if DEBUG:
+                print(f'  [debug] mid={mid} extracted no supported market')
             continue
+        if DEBUG:
+            print(f'  [debug] mid={mid} sport={_meta.get("sport")} keys={sorted(markets.keys())}')
         # Merge dans existing
         if mid not in matches_dict:
             matches_dict[mid] = {
