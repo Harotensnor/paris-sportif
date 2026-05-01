@@ -59,6 +59,24 @@ def implied_prob(decimal_odd: float | None) -> float | None:
     return 1 / decimal_odd
 
 
+def summarize_clv(values: list[float]) -> dict:
+    n = len(values)
+    if not n:
+        return {'n': 0, 'mean_clv_pct': 0, 'positive_clv_rate': 0, 'median_clv_pct': 0}
+    vals = sorted(values)
+    mid = n // 2
+    median = vals[mid] if n % 2 else (vals[mid - 1] + vals[mid]) / 2
+    positive = sum(1 for v in values if v > 0)
+    return {
+        'n': n,
+        'mean_clv_pct': round(sum(values) / n, 2),
+        'positive_clv_rate': round(100 * positive / n, 1),
+        'median_clv_pct': round(median, 2),
+        'p10_clv_pct': round(vals[max(0, int(n * 0.10) - 1)], 2),
+        'p90_clv_pct': round(vals[min(n - 1, int(n * 0.90))], 2),
+    }
+
+
 def main() -> int:
     if not ODDS_HISTORY.exists():
         print(f'[clv] {ODDS_HISTORY.name} missing — nothing to compute')
@@ -148,29 +166,55 @@ def main() -> int:
             'sides': sides_data,
         })
 
-    # 3. Summary stats : moyenne CLV par side, count records, etc.
-    if records:
-        all_clv = []
-        for r in records:
-            for side, d in r['sides'].items():
-                all_clv.append(d['clv_pct'])
-        n = len(all_clv)
-        mean = sum(all_clv) / n if n else 0
-        positive = sum(1 for v in all_clv if v > 0)
-        summary = {
-            'n_matches': len(records),
-            'n_clv_observations': n,
-            'mean_clv_pct': round(mean, 2),
-            'positive_clv_rate': round(100 * positive / n, 1) if n else 0,
+    # 3. Summary stats : moyenne CLV par side/sport/league.
+    observations = []
+    for r in records:
+        for side, d in r['sides'].items():
+            observations.append({
+                'id': r['id'],
+                'name': r.get('name'),
+                'sport': r.get('sport') or 'unknown',
+                'league_code': r.get('league_code') or 'unknown',
+                'side': side,
+                'clv_pct': d['clv_pct'],
+                'opening_odd': d['opening_odd'],
+                'closing_odd': d['closing_odd'],
+            })
+    all_clv = [o['clv_pct'] for o in observations]
+    summary = summarize_clv(all_clv)
+    summary.update({
+        'n_matches': len(records),
+        'n_clv_observations': len(observations),
+        'sample_status': 'validated' if len(observations) >= 500 else 'learning',
+    })
+
+    def grouped(key: str, min_n: int = 1) -> dict:
+        buckets: dict[str, list[float]] = defaultdict(list)
+        for o in observations:
+            buckets[str(o.get(key) or 'unknown')].append(o['clv_pct'])
+        return {
+            k: v for k, vals in sorted(buckets.items(), key=lambda kv: len(kv[1]), reverse=True)
+            if (v := summarize_clv(vals))['n'] >= min_n
         }
-    else:
-        summary = {'n_matches': 0, 'n_clv_observations': 0, 'mean_clv_pct': 0, 'positive_clv_rate': 0}
+
+    by_sport = grouped('sport')
+    by_side = grouped('side')
+    by_league = grouped('league_code', min_n=8)
+    movers = sorted(observations, key=lambda o: o['clv_pct'])
+    extremes = {
+        'worst': movers[:10],
+        'best': list(reversed(movers[-10:])),
+    }
 
     OUT.write_text(json.dumps({
         'generated_at': datetime.now(timezone.utc).isoformat(),
         'parsed_lines': n_lines,
         'skipped_lines': n_skipped,
         'summary': summary,
+        'by_sport': by_sport,
+        'by_side': by_side,
+        'by_league': by_league,
+        'extremes': extremes,
         'records': records,
     }, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
     print(f'[clv] {len(records)} matches with CLV computed, mean={summary["mean_clv_pct"]:+.2f}%, positive_rate={summary["positive_clv_rate"]}% ({OUT.stat().st_size//1024}KB)')
