@@ -4701,7 +4701,7 @@
     gap: 8px;
   }
   .dash-cockpit__betline {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(6, minmax(0, 1fr));
   }
   .dash-cockpit__betline > div,
   .dash-cockpit__metrics > div,
@@ -4738,7 +4738,39 @@
     white-space: nowrap;
   }
   .dash-cockpit__betline strong.is-good { color: var(--accent); }
+  .dash-cockpit__betline strong.is-warn { color: var(--warn); }
   .dash-cockpit__betline strong.is-bad { color: var(--danger); }
+  .dash-cockpit__logos {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 48px;
+  }
+  .dash-cockpit__logos img,
+  .dash-cockpit__logos span {
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    border-radius: 8px;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.08);
+    object-fit: contain;
+    padding: 4px;
+  }
+  .dash-cockpit__logos b {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 26px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(167,139,250,.12);
+    border: 1px solid rgba(167,139,250,.26);
+    color: var(--brand);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0;
+  }
   .dash-cockpit__stake {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 160px;
@@ -4772,6 +4804,55 @@
     height: 100%;
     min-width: 4px;
     background: linear-gradient(90deg, var(--accent), var(--warn));
+  }
+  .dash-cockpit__intel {
+    display: grid;
+    gap: 8px;
+    padding: 10px;
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 8px;
+    background: rgba(0,0,0,.14);
+  }
+  .dash-cockpit__chips,
+  .dash-cockpit__reasons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .dash-cockpit__chip,
+  .dash-cockpit__reasons span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.08);
+    background: rgba(255,255,255,.04);
+    color: var(--text-dim);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+  .dash-cockpit__reasons span {
+    border-radius: 8px;
+    color: var(--text-dim2);
+    font-weight: 600;
+  }
+  .dash-cockpit__chip--ok {
+    border-color: rgba(16,185,129,.28);
+    background: rgba(16,185,129,.10);
+    color: var(--accent);
+  }
+  .dash-cockpit__chip--warn,
+  .dash-cockpit__chip--watch {
+    border-color: rgba(251,191,36,.30);
+    background: rgba(251,191,36,.10);
+    color: var(--warn);
+  }
+  .dash-cockpit__chip--danger {
+    border-color: rgba(252,165,165,.34);
+    background: rgba(252,165,165,.10);
+    color: var(--danger);
   }
   .dash-cockpit__actions {
     display: flex;
@@ -4836,6 +4917,52 @@
   .dash-cockpit__lane--go { border-color: rgba(16,185,129,.18); }
   .dash-cockpit__lane--watch { border-color: rgba(251,191,36,.18); }
   .dash-cockpit__lane--calm { border-color: rgba(148,163,184,.18); }
+  .dash-cockpit__signal {
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 8px;
+    background: rgba(0,0,0,.15);
+  }
+  .dash-cockpit__signal > span {
+    display: block;
+    color: var(--text-dim2);
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+  .dash-cockpit__signal > strong {
+    display: block;
+    margin: 2px 0 8px;
+    color: var(--text);
+    font-size: 18px;
+    font-weight: 900;
+  }
+  .dash-cockpit__signal > div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .dash-cockpit__signal .is-ok,
+  .dash-cockpit__signal .is-miss {
+    display: inline-flex;
+    align-items: center;
+    min-height: 22px;
+    padding: 3px 7px;
+    border-radius: 999px;
+    font-size: 10.5px;
+    font-weight: 800;
+  }
+  .dash-cockpit__signal .is-ok {
+    color: var(--accent);
+    background: rgba(16,185,129,.10);
+    border: 1px solid rgba(16,185,129,.22);
+  }
+  .dash-cockpit__signal .is-miss {
+    color: var(--text-dim2);
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.07);
+  }
   .dash-cockpit__quick {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(176px, 1fr));
