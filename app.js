@@ -340,6 +340,12 @@
       e.stopPropagation();
       return;
     }
+    // P2-8 (audit 2026-05-01) : si l'user clique sur le CTA du banner welcome
+    // (ex: "Calendrier 7j →"), considérer le banner comme dismissed (il a
+    // accompli son but). Avant : le banner réapparaissait à chaque reload.
+    if (e.target.closest && e.target.closest('#smart-suggest-banner .page-btn')) {
+      try { localStorage.setItem('smartSuggestionDismissedTs', String(Date.now())); } catch(_){}
+    }
     // League back button (data-league-back="list")
     const leagueBack = e.target.closest && e.target.closest('[data-league-back="list"]');
     if (leagueBack) {
@@ -2827,8 +2833,12 @@
     const variance = settled.reduce((a, s) => a + Math.pow(s.pnl - meanPnL, 2), 0) / n;
     const stdev = Math.sqrt(variance);
     const sharpe = stdev > 0 ? meanPnL / stdev : null;
+    // P1-1 (audit 2026-05-01) : avant maxDDPct = maxDD/peak donnait des
+    // valeurs > 100% quand peak < maxDD (cumPnL démarré négatif). Clamp à 1.
+    // Et n'afficher que si peak >= 1u (sinon ratio sans sens).
+    const maxDDPct = peak >= 1 ? Math.min(1, maxDD / peak) : null;
     return {
-      n, finalPnL: cumPnL, maxDrawdown: maxDD, maxDDPct: peak > 0 ? maxDD / peak : null,
+      n, finalPnL: cumPnL, maxDrawdown: maxDD, maxDDPct,
       maxWinStreak, maxLossStreak,
       sharpe, meanPnL, stdev,
     };
@@ -4774,17 +4784,34 @@
   function _applyCalibration(p, match) {
     // FIX audit Simples #3 : champ pred = `reliability` (pas `rel`).
     // Avant : isFinite(p.rel) → false → return inchangé → fonction no-op.
-    // Pas de symptôme visible (la calibration est déjà appliquée inline
-    // dans _predictMatchImpl), mais code mort qui prêtait à confusion.
-    // On le rend correct au cas où un caller bypass _predictMatchImpl.
-    // Sprint 109 (v31.7.190) — Passe match.sport au _calibrateProb pour
-    // bénéficier de la calibration per-sport quand disponible.
-    if (!p || !isFinite(p.reliability) || p.calibrated) return p;
+    if (!p || !isFinite(p.reliability) || p.calibrated) {
+      return _markSuspectIfHugeEdge(p, match);
+    }
     const sport = match && match.sport ? match.sport : null;
     const adjusted = _calibrateProb(p.reliability, sport);
-    if (adjusted === p.reliability) return p;
-    // Return a shallow clone to avoid mutating the original pred across callers
-    return { ...p, reliability: adjusted, reliability_raw: p.reliability, calibrated: true };
+    const out = adjusted === p.reliability
+      ? p
+      : { ...p, reliability: adjusted, reliability_raw: p.reliability, calibrated: true };
+    return _markSuspectIfHugeEdge(out, match);
+  }
+  // P3-1 (audit 2026-05-01) : marque les picks suspects (edge >15pt vs cote
+  // marché). Sur les marchés liquides, +15pt = rarement vrai edge, plutôt bug
+  // de signal (team_stats stale, odds mal mappés, etc.). Le pick reste mais
+  // est flagué pour que l'UI puisse l'écarter ou afficher un warning.
+  function _markSuspectIfHugeEdge(p, match) {
+    if (!p || !p.pick || !p.odds) return p;
+    const k = p.pick.key;
+    const odd = k === '1' ? p.odds.home : k === '2' ? p.odds.away : p.odds.draw;
+    if (!odd || odd <= 1) return p;
+    const implied = 1 / odd;
+    const rel = p.reliability ?? p.pick.prob;
+    if (!isFinite(rel)) return p;
+    const edge = rel - implied;
+    if (edge > 0.15) {
+      // Edge > 15pt : flag suspect, ne JAMAIS surfacer en top pick.
+      return { ...p, suspect: true, suspect_reason: 'huge_edge_>15pt', skip: true };
+    }
+    return p;
   }
   function _predictMatchImpl(match) {
     const { home, away } = getSides(match);
@@ -4801,12 +4828,23 @@
     }
 
     // Record-based component
+    // P3-2 (audit 2026-05-01) : shrinkage bayésien pour saisons < 10 matches.
+    // Avant : 5-0-1 vs 1-2-3 donnait ~85% home (extrapolation foireuse).
+    // Maintenant : on tire la WR vers la moyenne 0.5 (ou 0.4 pour away) selon
+    // la taille d'échantillon. Formule : wr_shrunk = (wins + α·μ) / (games + α)
+    // où μ=0.5 (prior centré), α=10 (équivalent 10 matches "neutres" injectés).
+    // Pour 6 matches : on a wins=5 → wr_brut=0.83 → wr_shrunk=(5+5)/(6+10)=0.625.
     const recH = parseRecord(getRecord(home));
     const recA = parseRecord(getRecord(away));
     let recScore = null;
     if (recH && recA && recH.games > 3 && recA.games > 3) {
-      const wr = (r) => (r.w + r.d*0.5) / Math.max(r.games, 1);
-      const hRate = wr(recH), aRate = wr(recA);
+      const SHRINKAGE_ALPHA = 10;       // équiv. 10 matches "neutres"
+      const SHRINKAGE_PRIOR_MU = 0.5;   // WR prior = 50% (neutre)
+      const wrShrunk = (r) => {
+        const wins = r.w + r.d * 0.5;
+        return (wins + SHRINKAGE_ALPHA * SHRINKAGE_PRIOR_MU) / (r.games + SHRINKAGE_ALPHA);
+      };
+      const hRate = wrShrunk(recH), aRate = wrShrunk(recA);
       const sum = hRate + aRate;
       if (sum > 0) {
         if (hasDraw) {
@@ -7526,8 +7564,8 @@
         </div>
         <div class="sub">${tipWinRate.toFixed(0)}% réussite · ROI ${tipRoiSign}${tipRoi.toFixed(1)}%</div>
       </div>` : ''}
-      <div class="summary-card warn">
-        <div class="lbl">🔒 Pronos forts</div>
+      <div class="summary-card warn" title="Compte les picks lock du jour (Winamax-bookable). Pour le total 7 jours voir Calendrier.">
+        <div class="lbl">🔒 Pronos forts <span style="opacity:.5;font-size:9px;">aujourd'hui</span></div>
         <div class="val">${lockAll}</div>
         <div class="sub">fiabilité ≥ 72%</div>
       </div>
@@ -9256,7 +9294,10 @@
     // v30 — Stocke aussi match.id sur le title pour permettre au bouton
     // partager de construire un share URL ciblé sur ce match.
     const _titleEl = document.getElementById('detail-title');
-    _titleEl.textContent = match.name || `${home?.name} vs ${away?.name}`;
+    // P2-2 (audit 2026-05-01) : prefer "Home vs Away" (FR cohérent avec cards)
+    // au lieu du brut "Away at Home" (anglais ESPN). On reconstruit toujours
+    // depuis getSides() pour garantir l'ordre home-first.
+    _titleEl.textContent = (home?.name && away?.name) ? `${home.name} vs ${away.name}` : (match.name || '');
     _titleEl.dataset.matchId = String(match.id || '');
     document.getElementById('detail-league').textContent = `${match.league_name}${match.round ? ' · ' + match.round : ''} · ${fmtFullDate(currentDate)} · ${fmtTime(match.date)}${match.venue ? ' · ' + match.venue : ''}`;
 
@@ -13661,8 +13702,8 @@
         </div>
         ${showWaitingMsg ? `
           <div style="padding:14px 16px;background:rgba(167,139,250,.05);border:1px dashed var(--brand-soft);border-radius:8px;font-size:12.5px;color:var(--text-dim);line-height:1.55;">
-            <div style="color:var(--brand);font-weight:700;margin-bottom:4px;">⏳ ${nScorable} pari${nScorable>1?'s':''} score${nScorable>1?'s':''} — pas encore assez par bucket</div>
-            L'auto-tuning analyse les paris regroupés par sport, ligue, et tranche de cote. Il propose une règle dès qu'un bucket atteint 10 paris ROI &lt;-15%. Continue de laisser tourner — les premières règles apparaîtront dans les prochains jours.
+            <div style="color:var(--brand);font-weight:700;margin-bottom:4px;">⏳ ${nScorable} / 10 paris collectés (bucket le + actif)</div>
+            L'auto-tuning analyse les paris regroupés par sport, ligue, et tranche de cote. Il propose une règle dès qu'un bucket atteint <b>10 paris</b> avec ROI &lt;-15%. Continue de laisser tourner — les premières règles apparaîtront quand le seuil est atteint.
           </div>
         ` : ''}
         ${activeRules.length ? `
@@ -14946,7 +14987,7 @@
           <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:6px;flex-wrap:wrap;">
             <div style="font-size:40px;font-weight:800;letter-spacing:-1.5px;line-height:1;color:var(--text);">${nav.toFixed(2)}€</div>
             ${agent.series.length ? `<div style="font-size:18px;color:${deltaColor};font-weight:700;">${deltaSign}${agent.deltaPct7.toFixed(1)}%</div>
-            <div style="font-size:13px;color:var(--text-dim);">sur 7 jours</div>` : ''}
+            <div style="font-size:13px;color:var(--text-dim);">${daysSinceStart < 7 ? `sur ${daysSinceStart} jour${daysSinceStart>1?'s':''}` : 'sur 7 jours'}</div>` : ''}
           </div>
           <div style="font-size:13px;color:var(--text-dim);margin-bottom:18px;max-width:620px;line-height:1.5;">
             ${agent.series.length
@@ -16574,7 +16615,7 @@
         <section style="margin-top:32px;">
           <h2 class="page-h2">🧮 Comment le modèle décide</h2>
           <div style="padding:18px;background:var(--panel);border:1px solid var(--border);border-radius:12px;line-height:1.6;font-size:13.5px;color:var(--text-2);">
-            Le modèle combine <b>5 sources de signal</b> indépendantes, puis les confronte pour trouver les paris où <b>notre estimation est plus optimiste que la cote du bookmaker</b>. C'est ça, la valeur :
+            Le modèle combine <b>6 sources de signal</b> indépendantes, puis les confronte pour trouver les paris où <b>notre estimation est plus optimiste que la cote du bookmaker</b>. C'est ça, la valeur :
             <ul style="margin:10px 0 0;padding-left:20px;color:var(--text);">
               <li><b>Cote du marché</b> — prior bayésien, reflète ce que sait le bookmaker</li>
               <li><b>Buts attendus (xG/Poisson)</b> — force d'attaque × défense × domicile</li>
@@ -17047,14 +17088,22 @@
   async function _renderBacktestV2(host) {
     if (!host) return;
     let rep = null;
+    // P1-4 (audit 2026-05-01) : avant la page restait stuck "Chargement…"
+    // si le fetch hangait. Maintenant timeout 5s + message d'erreur explicite.
+    const ctrl = new AbortController();
+    const timeoutId = setTimeout(() => ctrl.abort(), 5000);
     try {
-      const r = await fetch('backtest_report_v2.json?t=' + Date.now(), { cache: 'no-store' });
+      const r = await fetch('backtest_report_v2.json?t=' + Date.now(), { cache: 'no-store', signal: ctrl.signal });
+      clearTimeout(timeoutId);
       if (!r.ok) throw new Error('http ' + r.status);
       rep = await r.json();
     } catch (e) {
+      clearTimeout(timeoutId);
+      const isTimeout = e.name === 'AbortError';
       host.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-dim);font-size:13px;">
-        <div style="color:var(--warn);font-weight:600;margin-bottom:4px;">Rapport backtest indisponible</div>
-        <div>Le cron hebdomadaire n'a pas encore produit <code>backtest_report_v2.json</code>. Il tourne chaque dimanche 03:00 UTC.</div>
+        <div style="color:var(--warn);font-weight:600;margin-bottom:4px;">${isTimeout ? '⏱️ Timeout (>5s)' : 'Rapport backtest indisponible'}</div>
+        <div>${isTimeout ? 'Le fichier <code>backtest_report_v2.json</code> n\'a pas répondu en 5s — vérifie ta connexion ou réessaye.' : 'Le cron hebdomadaire n\'a pas encore produit <code>backtest_report_v2.json</code>. Il tourne chaque dimanche 03:00 UTC.'}</div>
+        <button onclick="location.reload()" style="margin-top:12px;padding:6px 14px;background:var(--brand);color:#08080a;border:none;border-radius:6px;font-weight:700;cursor:pointer;">🔄 Réessayer</button>
       </div>`;
       return;
     }
