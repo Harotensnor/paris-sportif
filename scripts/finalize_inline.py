@@ -43,6 +43,19 @@ DATA_LITE_72H = ROOT / 'data_lite_72h.json'
 LITE_HORIZON_DAYS = 3  # today + tomorrow + J+2
 
 
+ALLOWED_SPORTS = {'football', 'tennis', 'basketball', 'hockey', 'baseball', 'football-american'}
+
+
+def filter_event(ev):
+    """Phase 3 #2 : whitelist sports + drop si tous competitors null."""
+    if ev.get('sport') not in ALLOWED_SPORTS:
+        return False
+    comps = ev.get('competitors') or []
+    if comps and all(c is None or (isinstance(c, dict) and not c.get('name')) for c in comps):
+        return False
+    return True
+
+
 def main():
     if not DATA_JS.exists():
         print('[finalize_inline] data.js missing, skipping.', flush=True)
@@ -54,6 +67,20 @@ def main():
         print('[finalize_inline] could not parse data.js, skipping.', flush=True)
         return
     data = json.loads(m.group(1))
+
+    # Phase 3 #2 : filter golf et events sans competitors valides AVANT
+    # de produire les sidecar JSONs et de réinjecter dans pronostics.html.
+    days_in = data.get('days') or {}
+    n_dropped = 0
+    for k, evs in list(days_in.items()):
+        before = len(evs)
+        days_in[k] = [e for e in evs if filter_event(e)]
+        n_dropped += before - len(days_in[k])
+    if n_dropped:
+        print(f'[finalize_inline] dropped {n_dropped} events (golf/cricket/etc. ou competitors null)', flush=True)
+        # Réécriture data.js avec events filtrés
+        new_text = re.sub(r'=\s*\{.*\}\s*;?\s*$', '= ' + json.dumps(data, ensure_ascii=False, separators=(',', ':')) + ';\n', txt, count=1, flags=re.DOTALL)
+        DATA_JS.write_text(new_text, encoding='utf-8')
 
     today = data.get('today') or datetime.utcnow().strftime('%Y-%m-%d')
     days = data.get('days') or {}
