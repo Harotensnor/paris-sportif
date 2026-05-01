@@ -1005,7 +1005,7 @@
   // v31.7.201 — Page-tabs helper : génère un mini-tabs bar pour pages liées
   // Usage : _pageTabsHTML('top', [
   //   { page: 'top', label: '⭐ Highlights' },
-  //   { page: 'plan-mise', label: '🎯 Plan de mise' },
+  //   { page: 'plan-mise', label: '💼 Mises du jour' },
   //   { page: 'locks', label: '🔒 Locks' }
   // ])
   // Renvoie HTML string à injecter en haut de la page.
@@ -1039,7 +1039,7 @@
     picks: [
       { page: 'top', label: '⭐ Top du jour' },
       { page: 'valeur', label: '💎 Mismatches' },
-      { page: 'plan-mise', label: '🎯 Plan de mise' },
+      { page: 'plan-mise', label: '💼 Mises du jour' },
       { page: 'locks', label: '🔒 Locks' },
     ],
     // Hub AGENT : cagnotte + history + perf
@@ -9319,22 +9319,11 @@
     ` : '';
 
     const body = document.getElementById('detail-body');
-    // v32.0 (Phase 5) — Tab strip de navigation rapide dans le modal détail.
-    // Le modal est dense (1500+ lignes de contenu). Plutôt que tout réécrire
-    // (risk casse), on ajoute une tabbar sticky en haut qui permet de jumper
-    // à chaque section via scrollIntoView. Les sections existantes reçoivent
-    // des id="detail-section-X" pour servir de target des ancres.
-    // 4 tabs : Synthèse / Signaux / Cotes / H2H.
-    // Chaque tab teste si sa section a du contenu (présence de l'id) avant
-    // de s'afficher → tabs vides cachées automatiquement.
+    // v32.9 — Tab strip retirée (doublon avec md-tabs existant qui filtre
+    // les sections). Le système .md-tab (data-mtab-toggle) en aval gère
+    // déjà : Synthèse / Cotes / Risques / Transparence / Stats / H2H.
     body.innerHTML = `
-      <nav class="detail-tabbar" role="tablist" aria-label="Sections du détail" style="position:sticky;top:0;z-index:5;display:flex;gap:4px;padding:6px 4px;margin:-4px -4px 8px;background:var(--panel);border-bottom:1px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;font-variant-numeric:tabular-nums;">
-        <button type="button" data-detail-jump="synthese" class="active" style="flex-shrink:0;padding:8px 14px;background:transparent;color:var(--text);border:none;border-bottom:2px solid var(--brand);font-size:12.5px;font-weight:700;cursor:pointer;border-radius:0;white-space:nowrap;">📊 Synthèse</button>
-        <button type="button" data-detail-jump="signaux" style="flex-shrink:0;padding:8px 14px;background:transparent;color:var(--text-dim);border:none;border-bottom:2px solid transparent;font-size:12.5px;font-weight:600;cursor:pointer;border-radius:0;white-space:nowrap;">🔍 Signaux</button>
-        <button type="button" data-detail-jump="cotes" style="flex-shrink:0;padding:8px 14px;background:transparent;color:var(--text-dim);border:none;border-bottom:2px solid transparent;font-size:12.5px;font-weight:600;cursor:pointer;border-radius:0;white-space:nowrap;">💱 Cotes</button>
-        <button type="button" data-detail-jump="h2h" style="flex-shrink:0;padding:8px 14px;background:transparent;color:var(--text-dim);border:none;border-bottom:2px solid transparent;font-size:12.5px;font-weight:600;cursor:pointer;border-radius:0;white-space:nowrap;">⚔️ H2H</button>
-      </nav>
-      <div id="detail-section-synthese" class="teams-big">
+      <div class="teams-big">
         <div class="side">
           ${home?.logo ? `<img src="${esc(home.logo)}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'">` : ''}
           <div class="name">${esc(home?.name || '—')}</div>
@@ -12000,52 +11989,9 @@
   const _detailModal = document.getElementById('detail-modal');
   if (_detailModal) _detailModal.addEventListener('click', (e) => { if (e.target.id === 'detail-modal') closeDetailModal(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDetailModal(); });
-  // v32.0 (Phase 5) — Modal détail tabs delegation. Click sur un tab :
-  // active state + scroll smooth vers la section. Selectors :
-  //   synthese → #detail-section-synthese (teams-big block)
-  //   signaux  → first .signal-strip OR .reasons-block element
-  //   cotes    → .odds-table table
-  //   h2h      → .h2h-block OR section with data-h2h
-  if (_detailModal) {
-    _detailModal.addEventListener('click', (e) => {
-      const btn = e.target.closest('[data-detail-jump]');
-      if (!btn) return;
-      e.stopPropagation();
-      const target = btn.dataset.detailJump;
-      const body = document.getElementById('detail-body');
-      if (!body) return;
-      // Update active state on all tabs
-      body.querySelectorAll('[data-detail-jump]').forEach(b => {
-        const isActive = b.dataset.detailJump === target;
-        b.classList.toggle('active', isActive);
-        b.style.color = isActive ? 'var(--text)' : 'var(--text-dim)';
-        b.style.borderBottomColor = isActive ? 'var(--brand)' : 'transparent';
-        b.style.fontWeight = isActive ? '700' : '600';
-      });
-      // Resolve target element
-      let el = null;
-      if (target === 'synthese') {
-        el = body.querySelector('#detail-section-synthese') || body.querySelector('.teams-big');
-      } else if (target === 'signaux') {
-        el = body.querySelector('.signal-strip') || body.querySelector('[class*="reasons"]') || body.querySelector('.fiche-decision');
-      } else if (target === 'cotes') {
-        el = body.querySelector('.odds-table') || body.querySelector('.tbl-scroll');
-      } else if (target === 'h2h') {
-        el = body.querySelector('.h2h-block') || body.querySelector('[data-h2h]');
-      }
-      if (el) {
-        // Scroll into view with offset (account for sticky tabbar)
-        const tabbar = body.querySelector('.detail-tabbar');
-        const offset = (tabbar?.offsetHeight || 44) + 8;
-        const targetTop = el.getBoundingClientRect().top + body.scrollTop - offset;
-        body.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
-      } else {
-        // Section absente : flash un message discret sur le tab
-        btn.style.opacity = '0.5';
-        setTimeout(() => { btn.style.opacity = ''; }, 600);
-      }
-    });
-  }
+  // v32.9 — Phase 5 detail-jump handler retiré : doublon avec le système
+  // .md-tab existant qui filtre déjà les sections (display:none) selon le
+  // tab actif. Garder les 2 systèmes créait confusion utilisateur.
   // v30 — Share button sur la modale match. Construit un share URL avec
   // ?match=<id> qui pourrait être restauré au boot (futur), partage via
   // Web Share API natif (mobile) ou copy-to-clipboard (desktop).
@@ -12117,11 +12063,13 @@
     } else {
       // Seuil rouge "obsolète" relevé de 25min à 60min — éviter l'alarmisme.
       ind.classList.add('very-stale');
-      const label = ageMin < 120 ? `${ageMin} min` : `${Math.floor(ageMin/60)}h${String(ageMin%60).padStart(2,'0')}`;
+      const label = ageMin < 120 ? `${ageMin}min` : `${Math.floor(ageMin/60)}h${String(ageMin%60).padStart(2,'0')}`;
       if (txtEl) {
-        // v28.5 — bouton "forcer refresh" (unregister SW + clear caches + reload)
-        //   souvent c'est juste le cache local qui ment, pas le cron
-        txtEl.innerHTML = `🔴 Données obsolètes · ${label} · <a href="#" data-agent-force-refresh style="color:inherit;text-decoration:underline;margin-right:8px;">🔄 forcer refresh</a> · <a href="https://github.com/Harotensnor/paris-sportif/actions" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">cron</a>`;
+        // v32.9 — Bandeau réduit : juste l'icône + temps + 1 lien refresh.
+        // Avant : "🔴 Données obsolètes · 5h04 · forcer refresh · cron · LIVE · poll 30s"
+        // (super verbeux, prend toute la largeur en bas).
+        // Après : "🔴 5h04 · 🔄" (compact, juste l'essentiel).
+        txtEl.innerHTML = `🔴 ${label} <a href="#" data-agent-force-refresh title="Forcer le refresh (vide cache + recharge)" style="color:inherit;text-decoration:none;margin-left:6px;">🔄</a>`;
         // Wire du bouton (idempotent)
         const btn = txtEl.querySelector('[data-agent-force-refresh]');
         if (btn && !btn._wired) {
@@ -14057,7 +14005,7 @@
           </a>`;
         })() : ''}
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          ${!isEmpty ? `<button type="button" class="page-btn" data-page="plan-mise" style="flex:1;min-width:140px;padding:10px 14px;background:var(--brand);color:#08080a;border:none;border-radius:var(--r-sm);cursor:pointer;font-size:13px;font-weight:700;">📋 Plan de mise complet →</button>` : ''}
+          ${!isEmpty ? `<button type="button" class="page-btn" data-page="plan-mise" style="flex:1;min-width:140px;padding:10px 14px;background:var(--brand);color:#08080a;border:none;border-radius:var(--r-sm);cursor:pointer;font-size:13px;font-weight:700;">💼 Voir mes mises du jour →</button>` : ''}
           <button type="button" class="page-btn" data-page="${isEmpty ? 'calendrier' : 'top'}" style="flex:1;min-width:140px;padding:10px 14px;background:var(--panel);color:var(--text);border:1px solid var(--border-2);border-radius:var(--r-sm);cursor:pointer;font-size:13px;font-weight:600;">${isEmpty ? '📅 Calendrier 7j' : '⭐ Top du jour'}</button>
           <button type="button" class="page-btn" data-page="valeur" style="padding:10px 14px;background:transparent;color:var(--text-dim);border:1px solid var(--border);border-radius:var(--r-sm);cursor:pointer;font-size:13px;font-weight:600;">💎 Marché se trompe</button>
         </div>
@@ -20945,7 +20893,7 @@
   try { window.renderMatchsPage = renderMatchsPage; } catch(e){}
 
   // ======= Sprint 92 (v31.7.179) — renderPlanMisePage =======
-  // Page "🎯 Plan de mise du jour" : ticket Kelly auto-calculé.
+  // Page "💼 Mes mises du jour" : ticket Kelly auto-calculé.
   // Réponse au brief "objectif = me faire gagner de l'argent" :
   //   * Sélectionne les meilleurs paris EV+ du jour (top 5 par edge)
   //   * Calcule la mise Kelly fractionnée par jambe (cap 5% bankroll/pari)
@@ -21043,14 +20991,14 @@
       wrap.innerHTML = `
         <div class="page-wrap">
           <div class="page-header">
-            <div class="lbl-tiny" style="color:var(--brand);">Parier · Plan optimisé</div>
-            <h1 class="page-h1">🎯 Plan de mise du jour</h1>
-            <div style="font-size:14px;color:var(--text-dim);">Bankroll : <b>${bankroll.toFixed(0)}€</b></div>
+            <div class="lbl-tiny" style="color:var(--brand);">Combien parier sur quoi · Calcul Kelly</div>
+            <h1 class="page-h1">💼 Mes mises du jour</h1>
+            <div style="font-size:14px;color:var(--text-dim);max-width:700px;line-height:1.45;">Pour chaque pick value (edge ≥ 3pt + confiance ≥ 55%), je te dis <b>combien miser</b> en fonction de ta bankroll <b>${bankroll.toFixed(0)}€</b>. Calcul automatique avec le critère Kelly fractionné (0.25×, cap 5%/pari) — la mise optimale qui maximise ton ROI à long terme sans risquer la cagnotte.</div>
           </div>
           <div class="empty-state-v2" style="margin-top:18px;">
             <div class="es-illustration">🛡️</div>
             <div class="es-title-v2">Aucun pari EV+ aujourd'hui ou demain</div>
-            <div class="es-body-v2">Le modèle exige <b>edge ≥ 3pt</b> et <b>confiance ≥ 55%</b> pour entrer dans ton plan de mise. C'est la discipline qui te fait gagner sur la durée — certains jours il vaut mieux ne pas parier.</div>
+            <div class="es-body-v2">Le modèle exige <b>edge ≥ 3pt</b> et <b>confiance ≥ 55%</b> pour entrer dans tes mises du jour. C'est la discipline qui te fait gagner sur la durée — certains jours il vaut mieux ne pas parier.</div>
             <div class="es-actions-v2">
               <button class="page-btn" data-page="matchs" style="padding:10px 18px;font-size:13px;background:var(--brand);color:#08080a;border:none;border-radius:var(--r-sm);cursor:pointer;font-weight:700;">🔍 Explorer les matchs</button>
               <button class="page-btn" data-page="performance" style="padding:10px 18px;font-size:13px;background:transparent;color:var(--text);border:1px solid var(--border-2);border-radius:var(--r-sm);cursor:pointer;font-weight:700;">📊 Voir performance</button>
@@ -21075,9 +21023,9 @@
     wrap.innerHTML = `
       <div class="page-wrap">
         <div class="page-header">
-          <div class="lbl-tiny" style="color:var(--brand);">Parier · Plan optimisé</div>
-          <h1 class="page-h1">🎯 Plan de mise du jour</h1>
-          <div style="font-size:14px;color:var(--text-dim);">${enriched.length} pari${enriched.length>1?'s':''} EV+ sélectionné${enriched.length>1?'s':''} · Bankroll : <b style="color:var(--text);">${bankroll.toFixed(0)}€</b> · <button id="plan-mise-edit-bk" style="background:transparent;border:none;color:var(--brand);text-decoration:underline;cursor:pointer;font-weight:600;padding:0;font-size:13px;">modifier</button></div>
+          <div class="lbl-tiny" style="color:var(--brand);">Combien parier sur quoi · Calcul Kelly</div>
+          <h1 class="page-h1">💼 Mes mises du jour</h1>
+          <div style="font-size:14px;color:var(--text-dim);">${enriched.length} pari${enriched.length>1?'s':''} avec edge positif · mise calculée automatiquement par le critère Kelly fractionné (0.25×, cap 5%/pari) sur ta bankroll <b style="color:var(--text);">${bankroll.toFixed(0)}€</b> · <button id="plan-mise-edit-bk" style="background:transparent;border:none;color:var(--brand);text-decoration:underline;cursor:pointer;font-weight:600;padding:0;font-size:13px;">modifier</button></div>
         </div>
         ${riskBannerHtml}
         <!-- KPIs récap (Sprint 111 — refacto avec .kpi-tile harmonisé) -->
