@@ -105,13 +105,19 @@ def _team_form_from_schedule(payload: dict, team_id: str) -> dict | None:
     if not completed:
         return None
     completed.sort(key=lambda r: r.get('date') or '')
+    # Extension 2026-05-01 — Théo a demandé "forme sur 10 derniers matchs".
+    # On capture last10 mais on garde last5 dans la sortie pour backward
+    # compat (frontend lit l'un ou l'autre). Le `form` string passe à 10 chars.
+    last10 = completed[-10:]
     last5 = completed[-5:]
-    form = ''.join('W' if r['won'] else 'L' for r in last5)
+    form10 = ''.join('W' if r['won'] else 'L' for r in last10)
+    form5 = ''.join('W' if r['won'] else 'L' for r in last5)
     # Padding inversion (most recent first like ESPN football "WLWWL"
     # which is also "most recent first" — see derivedForm in pronostics.html).
-    form_recent_first = form[::-1]
     return {
-        'form': form_recent_first,
+        'form': form10[::-1],          # 10 chars, most recent first
+        'form5': form5[::-1],          # 5 chars (backward compat)
+        'last10': last10,
         'last5': last5,
         'updated_at': datetime.utcnow().isoformat() + 'Z',
     }

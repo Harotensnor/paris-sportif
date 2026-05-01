@@ -13960,8 +13960,18 @@
         .filter(([s, d]) => d && d.n >= 3 && d.flat_roi_pct < -10)
         .map(([s]) => s));
     })();
+    // BUG FIX 2026-05-01 (Théo strategic insight) — Filtre EV>=+2%.
+    // Théo a observé qu'une cote @1.10 confiance 87% est plus risquée
+    // qu'une cote @2.00 conf 60% car le gain est minime. Math :
+    //   cote 1.10, conf 87% → EV = 0.87×1.10-1 = -4.3% (PERDANT long-terme)
+    //   cote 2.00, conf 60% → EV = 0.60×2.00-1 = +20%
+    // Pour break-even @1.10 il faut conf ≥ 91% — modèle ne dépasse jamais
+    // 95% sur matchs réels. Donc picks @1.10-1.30 sont presque tous EV-
+    // même avec confiance haute. Ajout filtre `rel*odd > 1.02` pour skip
+    // les pseudo-locks à cote ridicule (2pt buffer above breakeven).
+    const _hasEV = (x) => (x.rel * x.odd - 1) >= 0.02;
     const topPicks = _dataIsStale ? [] : allTodayRaw
-      .filter(x => !x.m.live && !x.m.completed && _notStarted(x.m) && x.edge > 0.05 && x.rel >= 0.55 && !_losingSports.has(x.m.sport))
+      .filter(x => !x.m.live && !x.m.completed && _notStarted(x.m) && x.edge > 0.05 && x.rel >= 0.55 && _hasEV(x) && !_losingSports.has(x.m.sport))
       .sort((a, b) => b.edge - a.edge)
       .slice(0, 3)
       .map(x => {
@@ -13977,8 +13987,9 @@
         if (stake > capAbs) stake = capAbs;
         stake = Math.max(1, Math.round(stake)); // arrondi à l'euro entier — no centimes
         const gain = stake * (xx.odd - 1);
+        const ev = (xx.rel > 0 && xx.odd > 1) ? (xx.rel * xx.odd - 1) : 0;
         const { home, away } = (typeof getSides === 'function') ? getSides(xx.m) : { home: {}, away: {} };
-        return { ...xx, stake, gain, homeName: home?.name || '?', awayName: away?.name || '?', homeLogo: home?.logo || '', awayLogo: away?.logo || '' };
+        return { ...xx, stake, gain, ev, homeName: home?.name || '?', awayName: away?.name || '?', homeLogo: home?.logo || '', awayLogo: away?.logo || '' };
       });
 
     // Sprint 85 (v31.7.172 — audit Part 4) — Structure 3+3+2 sur dashboard.
@@ -14000,6 +14011,8 @@
       .sort((a, b) => b.edge - a.edge)
       .slice(0, 2);
     // Compute Kelly + stake pour chacun (même logique que topPicks)
+    // 2026-05-01 — Ajout `ev` (Expected Value) pour affichage cohérent
+    // avec edge sur toutes les cards. EV = rel × odd - 1.
     const _enrichPick = (x) => {
       const xx = x.best ? { ...x, odd: x.best.odd, rel: x.best.rel, edge: x.best.edge } : x;
       const k = (typeof kellyFraction === 'function') ? kellyFraction(xx.rel, xx.odd, 0.25) : 0;
@@ -14008,8 +14021,9 @@
       if (stake > capAbs) stake = capAbs;
       stake = Math.max(1, Math.round(stake));
       const gain = stake * (xx.odd - 1);
+      const ev = (xx.rel > 0 && xx.odd > 1) ? (xx.rel * xx.odd - 1) : 0;
       const { home, away } = (typeof getSides === 'function') ? getSides(xx.m) : { home: {}, away: {} };
-      return { ...xx, stake, gain, homeName: home?.name || '?', awayName: away?.name || '?', homeLogo: home?.logo || '', awayLogo: away?.logo || '' };
+      return { ...xx, stake, gain, ev, homeName: home?.name || '?', awayName: away?.name || '?', homeLogo: home?.logo || '', awayLogo: away?.logo || '' };
     };
     const prudentPicksEnriched = prudentPicks.map(_enrichPick);
     const aggressivePicksEnriched = aggressivePicks.map(_enrichPick);
@@ -14370,6 +14384,10 @@
               ${heroPick._noEdge ? '' : `<div class="ed-hero__stat ed-hero__stat--edge">
                 <span class="ed-hero__label">Edge</span>
                 <strong class="ed-hero__edge">+${Math.round(heroPick.edge*100)}pt</strong>
+              </div>
+              <div class="ed-hero__stat ed-hero__stat--ev">
+                <span class="ed-hero__label">EV</span>
+                <strong class="ed-hero__edge" title="Expected Value : retour attendu par euro misé">${(heroPick.ev * 100) >= 0 ? '+' : ''}${Math.round(heroPick.ev*100)}%</strong>
               </div>`}
             </div>
             ${_topReasons.length ? `
@@ -14792,7 +14810,7 @@
             </div>` : ''}
             ${aggressivePicksEnriched.length ? `
             <div>
-              <div style="font-size:11px;color:var(--warn);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:6px;">🔥 Agressifs (${aggressivePicksEnriched.length}/2)</div>
+              <div style="font-size:11px;color:var(--warn);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:6px;">💰 Gros coups du jour (${aggressivePicksEnriched.length}/2)</div>
               <div style="display:flex;flex-direction:column;gap:6px;">
                 ${aggressivePicksEnriched.map(p => {
                   const sides = (typeof getSides === 'function') ? getSides(p.m) : { home:{}, away:{} };
@@ -14801,15 +14819,19 @@
                   const lg = p.m.league_name || p.m.league_code || '';
                   const tLbl = (typeof fmtTime === 'function') ? fmtTime(p.m.date) : '';
                   const pickLbl = (p.best && p.best.label) || (p.pred.pick && p.pred.pick.label) || 'Pick';
+                  // 2026-05-01 — Affichage EV à côté de l'edge sur les gros coups.
+                  // EV = retour attendu par euro misé. C'est le critère qui rend
+                  // visible la rentabilité long-terme (cf insight Théo cote @1.10).
+                  const evPct = (p.ev || 0) * 100;
                   return `
-                    <div class="interactive" data-match-id="${esc(String(p.m.id))}" role="button" tabindex="0" style="padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--warn);border-radius:0 8px 8px 0;cursor:pointer;">
+                    <div class="interactive" data-match-id="${esc(String(p.m.id))}" role="button" tabindex="0" style="padding:10px 12px;background:linear-gradient(135deg, rgba(251,191,36,.08), transparent);border:1px solid rgba(251,191,36,.2);border-left:3px solid var(--warn);border-radius:0 8px 8px 0;cursor:pointer;">
                       <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:3px;">
                         <span style="font-size:10px;color:var(--text-dim);font-weight:600;">${esc(tLbl)}</span>
-                        <span style="font-size:11px;color:var(--warn);font-weight:700;">edge +${(p.edge*100).toFixed(0)}pt</span>
+                        <span style="font-size:11px;color:var(--warn);font-weight:700;" title="Edge ${(p.edge*100).toFixed(0)}pt · EV ${evPct>=0?'+':''}${evPct.toFixed(0)}%">+${(p.edge*100).toFixed(0)}pt · EV ${evPct>=0?'+':''}${evPct.toFixed(0)}%</span>
                       </div>
                       <div style="font-size:13px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(hN)} vs ${esc(aN)}</div>
                       <div style="font-size:11px;color:var(--text-dim);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(String(lg).slice(0,28))} · <b style="color:var(--brand);">${esc(pickLbl)}</b> @${p.odd.toFixed(2)}</div>
-                      <div style="font-size:10.5px;color:var(--text-dim2);margin-top:2px;">Mise sugg. <b style="color:var(--text);">${p.stake}€</b> · gain pot. ${p.gain.toFixed(0)}€ · risque ↑</div>
+                      <div style="font-size:10.5px;color:var(--text-dim2);margin-top:2px;">Mise sugg. <b style="color:var(--text);">${p.stake}€</b> · gain pot. <b style="color:var(--accent);">${p.gain.toFixed(0)}€</b> · risque ↑</div>
                     </div>`;
                 }).join('')}
               </div>
@@ -16445,7 +16467,16 @@
         </div>
         <div style="display:flex;flex-direction:column;gap:2px;font-size:11px;">
           <div><span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Confiance du modèle : probabilité estimée que ce pari gagne. ≥70 % = très fiable.">Conf</span> <b style="color:${confColor};">${Math.round(p.rel*100)}%</b> · <span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Cote décimale. La source (Winamax / externe / archive) est indiquée à côté.">Cote</span> <b style="color:var(--text);">${p.odd ? '@' + p.odd.toFixed(2) : '<span style=\"color:var(--text-dim2);font-weight:400;\">cote pré-match perdue</span>'}</b> ${_coteSrc}</div>
-          <div><span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Edge = notre probabilité − probabilité implicite de la cote. > 0 = on est plus optimiste que le bookmaker (=valeur).">Edge</span> <b style="color:${edgeColor};">${p.nonTrackable ? '<span style=\"color:var(--text-dim2);font-weight:400;\">—</span>' : (p.edge>=0?'+':'') + Math.round(p.edge*100) + 'pt'}</b></div>
+          <div><span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Edge = notre probabilité − probabilité implicite de la cote. > 0 = on est plus optimiste que le bookmaker (=valeur).">Edge</span> <b style="color:${edgeColor};">${p.nonTrackable ? '<span style=\"color:var(--text-dim2);font-weight:400;\">—</span>' : (p.edge>=0?'+':'') + Math.round(p.edge*100) + 'pt'}</b>${p.nonTrackable || !(p.odd > 1) ? '' : (() => {
+            // 2026-05-01 — Affichage EV (Expected Value) à côté de l'Edge.
+            // EV = rel × cote − 1. C'est le retour attendu par euro misé.
+            // Théo : "cote 1.10 c'est limite plus risqué que cote 2 car gain
+            // faible". L'EV rend visible cette nuance : un edge +5pt à @1.10
+            // donne EV +5% (peu rentable) vs même edge à @3 → EV +15%.
+            const ev = p.rel * p.odd - 1;
+            const evCol = ev >= 0.10 ? 'var(--accent)' : ev >= 0.02 ? '#fbbf24' : ev < 0 ? 'var(--danger)' : 'var(--text-dim)';
+            return ` · <span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Expected Value : retour attendu par euro misé sur le long terme. = proba × cote - 1. ≥ +2% = pari mathématiquement gagnant.">EV</span> <b style="color:${evCol};">${ev>=0?'+':''}${Math.round(ev*100)}%</b>`;
+          })()}</div>
         </div>
         <div style="text-align:right;">
           ${isFini ? resBadge : ''}

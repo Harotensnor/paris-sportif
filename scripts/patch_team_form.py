@@ -46,9 +46,17 @@ def main():
                 if not c.get('form'):
                     c['form'] = info.get('form')
                     patched += 1
+                # Extension 2026-05-01 — Théo a demandé "forme sur 10 derniers
+                # matchs". On expose `form10` (10 chars) en plus du `form5`
+                # (5 chars) pour le frontend qui peut afficher l'un ou l'autre.
+                # Si form (string) >= 6 chars c'est déjà le L10, on copy aussi.
+                if info.get('form') and len(str(info['form'])) >= 6:
+                    c['form10'] = info['form']
                 # Also stash detail for tooltip / page detail.
                 if not c.get('last5'):
                     c['last5'] = info.get('last5')
+                if info.get('last10') and not c.get('last10'):
+                    c['last10'] = info.get('last10')
 
     payload = json.dumps(data, ensure_ascii=False, separators=(',', ':'))
     DATA_JS.write_text(f'window.PRONOSTICS_DATA = {payload};\n', encoding='utf-8')
