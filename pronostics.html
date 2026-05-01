@@ -18,15 +18,15 @@
      (relative) + les fetch ESPN core pour l'enrichissement des cotes.
      v31 ajoute : object-src 'none', media-src 'none', worker-src 'self',
      manifest-src 'self', upgrade-insecure-requests, plausible.io et
-     cloudflareinsights pour analytics opt-in. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://plausible.io https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://a.espncdn.com https://a1.espncdn.com https://a2.espncdn.com https://a3.espncdn.com https://a4.espncdn.com https://www.gstatic.com; connect-src 'self' https://api.clubelo.com https://sports.core.api.espn.com https://site.api.espn.com https://plausible.io https://cloudflareinsights.com; font-src 'self' data:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; media-src 'none'; worker-src 'self'; manifest-src 'self'; upgrade-insecure-requests">
+     cloudflareinsights pour analytics opt-in. `frame-ancestors` ne marche pas
+     en meta CSP (header HTTP only), donc on ne le met pas ici. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://plausible.io https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://a.espncdn.com https://a1.espncdn.com https://a2.espncdn.com https://a3.espncdn.com https://a4.espncdn.com https://www.gstatic.com; connect-src 'self' https://api.clubelo.com https://sports.core.api.espn.com https://site.api.espn.com https://plausible.io https://cloudflareinsights.com; font-src 'self' data:; base-uri 'self'; form-action 'self'; object-src 'none'; media-src 'none'; worker-src 'self'; manifest-src 'self'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<!-- AUDIT-2026-04-27 (Sprint 12 #29) — Sécurité headers via meta tags.
-     GH Pages ne permet pas de custom HTTP headers, mais ces meta http-equiv
-     équivalent du point de vue user agent. -->
+<!-- AUDIT-2026-04-27 (Sprint 12 #29) — Sécurité possible via meta tags.
+     GH Pages ne permet pas de custom HTTP headers ; on garde uniquement les
+     directives effectivement supportées en meta pour éviter les faux diagnostics. -->
 <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=(), usb=(), serial=(), bluetooth=(), accelerometer=(), gyroscope=(), magnetometer=(), midi=(), display-capture=()">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
-<meta http-equiv="X-Frame-Options" content="DENY">
 <!-- v30 — Open Graph + Twitter Card pour le partage social. URL canonique
      vers https://harotensnor.github.io/paris-sportif/. Image dérivée de
      l'icon 512x512 PWA. Hash routes (#locks, #bilan…) gardent la même
@@ -133,13 +133,13 @@
 <!-- Chantier S — PWA -->
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="alternate" type="application/rss+xml" href="feed.xml" title="Paris-Sportif — Top picks du jour (RSS)">
-<!-- v31.1 — Preload hints. Dit au browser "ces fichiers sont critiques, fetch-les en parallèle
-     avec le HTML parse". Le browser commence le download dès la lecture du <head>, sans attendre
-     que les <link>/<script> arrivent dans le body. Gain mesurable sur LCP / FCP. -->
+<!-- v31.1 — Hints perf. CSS/JS restent critiques en preload ; les gros fichiers
+     data sont seulement anticipés en prefetch depuis la refonte inline/lite,
+     sinon Chrome logge "preload not used" sur le premier paint. -->
 <link rel="preload" href="app.css?v=ae8b522b" as="style">
 <link rel="preload" href="app.js?v=2a254fd6" as="script">
-<link rel="preload" href="data.js" as="script">
-<link rel="preload" href="data_today.json" as="fetch" type="application/json" crossorigin="anonymous">
+<link rel="prefetch" href="data.js" as="script">
+<link rel="prefetch" href="data_today.json" as="fetch" type="application/json" crossorigin="anonymous">
 <!-- v31.1 — DNS-prefetch pour les CDN tiers utilisés sur la page (logos ESPN).
      v31.7.24 — Ajout `preconnect` pour a.espncdn.com (le plus utilisé) :
      le browser fait DNS + TLS handshake en parallèle du parse HTML, ce qui
@@ -162,6 +162,7 @@
 <link rel="prefetch" href="credibilite.html" as="document">
 <link rel="prefetch" href="comment-lire-un-prono.html" as="document">
 <link rel="prefetch" href="backtest_report_v2.json" as="fetch" crossorigin="anonymous">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Pronostics">
