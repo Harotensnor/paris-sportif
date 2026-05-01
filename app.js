@@ -130,14 +130,41 @@
     } catch(e) { return null; }
   }
   try { window.PAGE_ALIASES = PAGE_ALIASES; } catch(e){}
-  let currentPage = _pageFromHash() || localStorage.getItem('currentPage') || 'dashboard';
+  // BUG FIX 2026-05-01 — 'legal' et 'methodologie' sont des pages HTML
+  // statiques séparées ; quand on les "visite" via la SPA, applyPageView
+  // fait location.replace() vers le fichier statique. Si on persiste cette
+  // valeur dans localStorage, alors au prochain boot de pronostics.html
+  // (clic 'Voir les pronos' depuis index.html par exemple), currentPage
+  // = 'legal' lu depuis localStorage, applyPageView redirige IMMÉDIATEMENT
+  // vers legal.html → l'user est piégé et n'a plus accès au dashboard.
+  // Solution : ne JAMAIS restaurer ces valeurs depuis localStorage. Le hash
+  // explicite (#legal) reste respecté car c'est une intention user claire.
+  const STATIC_REDIRECT_PAGES = new Set(['legal', 'methodologie']);
+  let currentPage = (() => {
+    const fromHash = _pageFromHash();
+    if (fromHash) return fromHash;
+    const stored = localStorage.getItem('currentPage');
+    if (stored && !STATIC_REDIRECT_PAGES.has(stored)) return stored;
+    // Cleanup proactif : si la valeur cachée est une static-redirect page
+    // (héritée d'une précédente session), on la purge pour éviter qu'elle
+    // ne ressurgisse via un autre chemin de lecture.
+    if (stored && STATIC_REDIRECT_PAGES.has(stored)) {
+      try { localStorage.removeItem('currentPage'); } catch(e){}
+    }
+    return 'dashboard';
+  })();
   // PWA shortcuts arrive via #hash (no hashchange event fires), so sync the
   // hash-derived page to localStorage at boot. Without this, opening
   // /pronostics.html#locks lands on Locks but `currentPage` in localStorage
   // still points to wherever the user was last (or 'dashboard'), so any tab
   // restored from session after the shortcut would jump back.
   try {
-    if (_pageFromHash() && localStorage.getItem('currentPage') !== currentPage) {
+    // BUG FIX 2026-05-01 — Même un hash '#legal' ne doit pas être persisté
+    // (cf. L133). Si l'user partage un lien #legal, on respecte l'intention
+    // pour la session courante (currentPage='legal' utilisé par applyPageView)
+    // mais on ne pollue pas localStorage pour les futurs reload.
+    if (_pageFromHash() && !STATIC_REDIRECT_PAGES.has(currentPage)
+        && localStorage.getItem('currentPage') !== currentPage) {
       localStorage.setItem('currentPage', currentPage);
     }
   } catch(e){}
@@ -168,7 +195,11 @@
     const p = _pageFromHash();
     if (p && p !== currentPage) {
       currentPage = p;
-      try { localStorage.setItem('currentPage', currentPage); } catch(e){}
+      // BUG FIX 2026-05-01 — Même filtre qu'au boot : ne pas persister
+      // 'legal'/'methodologie' (cause une boucle de redirect au reload).
+      if (!STATIC_REDIRECT_PAGES.has(currentPage)) {
+        try { localStorage.setItem('currentPage', currentPage); } catch(e){}
+      }
       if (typeof applyPageView === 'function') applyPageView();
     }
   });
@@ -26832,7 +26863,14 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       const btn = ev.target && ev.target.closest && ev.target.closest('.page-btn');
       if (!btn || !btn.dataset || !btn.dataset.page) return;
       currentPage = btn.dataset.page;
-      try { localStorage.setItem('currentPage', currentPage); } catch (e) {}
+      // BUG FIX 2026-05-01 — Ne pas persister 'legal'/'methodologie'.
+      // applyPageView fait location.replace() vers la page statique HTML,
+      // donc on quitte pronostics.html. Persister cette valeur cause une
+      // boucle de redirect au prochain reload. Voir L133 pour le filtre
+      // symétrique côté lecture.
+      if (!STATIC_REDIRECT_PAGES.has(currentPage)) {
+        try { localStorage.setItem('currentPage', currentPage); } catch (e) {}
+      }
       // AUDIT-2026-04-27 — Sync URL hash sur la nav SPA. Avant : la
       // page changeait visuellement et `currentPage` bougeait, mais
       // `location.hash` restait sur l'ancienne page. Casse partage
