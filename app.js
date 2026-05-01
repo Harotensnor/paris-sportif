@@ -9491,29 +9491,25 @@
         const bestOdd = best ? best.odd : (pred.odds && (pred.pick.key === '1' ? pred.odds.home : pred.pick.key === '2' ? pred.odds.away : pred.odds.draw)) || 1;
         const ev = (typeof expectedValue === 'function') ? expectedValue(conf, bestOdd) : (conf * bestOdd - 1);
         const evColor = ev >= 0.10 ? 'var(--accent)' : ev >= 0.03 ? 'var(--warn)' : ev < -0.03 ? 'var(--danger)' : 'var(--text-dim)';
-        const tile = (label, value, sub, color) => `
-          <div style="flex:1;min-width:90px;padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
-            <div style="font-size:9.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">${esc(label)}</div>
-            <div style="font-size:22px;font-weight:800;color:${color};margin-top:2px;font-variant-numeric:tabular-nums;line-height:1;">${esc(String(value))}</div>
-            ${sub ? `<div style="font-size:10px;color:var(--text-dim2);margin-top:3px;">${esc(sub)}</div>` : ''}
+        // Phase 3 #7 : decision-strip avec EXACTEMENT 6 tiles (Confiance/Edge/EV/Kelly/Qualité/Action.)
+        // Tiles harmonisés avec class .decision-tile pour les tests Playwright.
+        const tile = (label, value, sub, kind) => `
+          <div class="decision-tile decision-tile--${kind}">
+            <div class="decision-tile__val">${esc(String(value))}</div>
+            <div class="decision-tile__label">${esc(label)}</div>
+            ${sub ? `<div class="decision-tile__sub">${esc(sub)}</div>` : ''}
           </div>`;
+        const kindOf = (val, goodMin, midMin) => val >= goodMin ? 'good' : val >= midMin ? 'mid' : 'bad';
         return `
           <div class="section" style="margin-top:14px;">
             <h4>📊 Fiche de décision</h4>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;">
-              ${tile('Confiance', `${Math.round(conf * 100)}%`, conf >= 0.65 ? 'Solide' : conf >= 0.55 ? 'Correcte' : 'Limite', confColor)}
-              ${tile('Edge', `${edge >= 0 ? '+' : ''}${(edge * 100).toFixed(1)}pt`, edge >= 0.05 ? 'Value forte' : edge >= 0.02 ? 'Value' : edge >= 0 ? 'Neutre' : 'Négatif', edgeColor)}
-              ${tile('EV', `${ev >= 0 ? '+' : ''}${(ev * 100).toFixed(1)}%`, ev >= 0.10 ? 'EV+ fort' : ev >= 0.03 ? 'EV+' : ev >= 0 ? 'Break-even' : 'EV-', evColor)}
-              ${tile('Kelly', `${(kelly * 100).toFixed(1)}%`, kelly >= 0.03 ? 'Mise franche' : kelly >= 0.01 ? 'Mise modérée' : 'Skip', kellyColor)}
-              ${tile('Qualité data', `${dq.score}/${dq.max}`, dq.score >= 3 ? 'Riche' : dq.score >= 2 ? 'Correcte' : 'Pauvre', dqColor)}
-              ${(() => {
-                // Sprint 83 (v31.7.170 — audit Part 7) — Score Qualité dédié.
-                const qs = (typeof qualityScore === 'function') ? qualityScore(match, pred, best) : { score: 0, label: 'low' };
-                const qsColor = qs.label === 'high' ? 'var(--accent)' : qs.label === 'medium' ? 'var(--warn)' : 'var(--text-dim)';
-                const qsLbl = qs.label === 'high' ? 'Élevé' : qs.label === 'medium' ? 'Moyen' : 'Faible';
-                return tile('Score Qualité', `${qs.score}/100`, qsLbl, qsColor);
-              })()}
-              ${tile('Actionability', `${action}/100`, action >= 65 ? 'À jouer' : action >= 45 ? 'À surveiller' : 'À éviter', actionColor)}
+            <div class="decision-strip">
+              ${tile('Confiance', `${Math.round(conf * 100)}%`, conf >= 0.65 ? 'Solide' : conf >= 0.55 ? 'Correcte' : 'Limite', kindOf(conf, 0.65, 0.55))}
+              ${tile('Edge', `${edge >= 0 ? '+' : ''}${(edge * 100).toFixed(1)}pt`, edge >= 0.05 ? 'Value forte' : edge >= 0.02 ? 'Value' : edge >= 0 ? 'Neutre' : 'Négatif', kindOf(edge, 0.05, 0.02))}
+              ${tile('EV', `${ev >= 0 ? '+' : ''}${(ev * 100).toFixed(1)}%`, ev >= 0.10 ? 'EV+ fort' : ev >= 0.03 ? 'EV+' : ev >= 0 ? 'Break-even' : 'EV-', kindOf(ev, 0.05, 0))}
+              ${tile('Kelly', `${(kelly * 100).toFixed(1)}%`, kelly >= 0.03 ? 'Mise franche' : kelly >= 0.01 ? 'Mise modérée' : 'Skip', kindOf(kelly, 0.03, 0.01))}
+              ${tile('Qualité', `${dq.score}/${dq.max}`, dq.score >= 3 ? 'Riche' : dq.score >= 2 ? 'Correcte' : 'Pauvre', kindOf(dq.max ? dq.score / dq.max : 0, 0.66, 0.33))}
+              ${tile('Action.', `${action}/100`, action >= 65 ? 'À jouer' : action >= 45 ? 'À surveiller' : 'À éviter', kindOf(action, 65, 45))}
             </div>
             ${(() => {
               // Sprint 101 (v31.7.186) — Live odds drift banner
