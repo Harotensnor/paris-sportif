@@ -13,5 +13,13 @@
 - Avant: marchés détaillés data.js 24/1038 (2.3%); fetcher sans `--limit/--debug`; `pronostics.html` baseline 1,097,056 B et aurait gonflé à 3,019,834 B après inline markets
 - Après: rebase sur cron frais puis fetch détail large 137/137 enrichis; patch data.js 153 events avec marchés Winamax, 134/1050 avec marchés détaillés (12.8%); HTML externalise `data.js?v=6d3cd921` et reste à 104,967 B; smoke Chromium OK (1038+ events, Terminal Value visible, overflow 0)
 - Impact: +110 events détaillés dans le site (+10.5 pts de couverture) sans exploser le shell HTML; pipeline prêt pour monter le cap sans tuer GitHub Pages
-- Commit: b3dd1f94 (pré-rebase; hash final porté par Git après rebase)
+- Commit: ba8486b7
+- Status: ✅ DONE
+
+## Sprint v35.03 (2026-05-02 01:19 UTC)
+- Chantier: P17/P19 health pipeline lag visible
+- Avant: `health.json` exposait `sources` + warnings mais aucun contrat `pipeline_lag_per_script`; page Santé ne montrait pas quel script/fichier était en retard
+- Après: `health.json.pipeline_lag_per_script` suit 12 sorties avec script, output, âge, seuil et statut; page Santé affiche la matrice lag; état mesuré: 12 scripts, 1 critique, 3 warnings; smoke local #sante OK avec bloc visible
+- Impact: diagnostic pipeline lisible en 5 secondes; les fetchers vides/lents ne peuvent plus rester silencieux
+- Commit: pending
 - Status: ✅ DONE
