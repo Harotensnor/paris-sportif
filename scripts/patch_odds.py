@@ -110,14 +110,8 @@ def main():
     print(f'data.js size: {DATA_JS.stat().st_size/1024:.1f} KB')
 
     # Re-inline into HTML
-    html = HTML.read_text(encoding='utf-8')
-    new_block = f'<script>\nwindow.PRONOSTICS_DATA = {payload};\n</script>'
-    if '<script src="data.js"></script>' in html:
-        html = html.replace('<script src="data.js"></script>', new_block, 1)
-    else:
-        html = re.sub(r'<script>\s*window\.PRONOSTICS_DATA\s*=.*?;?\s*</script>',
-                      new_block, html, count=1, flags=re.DOTALL)
-    HTML.write_text(html, encoding='utf-8')
+    # v33.28 — HTML rewrite déplacé dans scripts/inject_data_in_html.py
+    # (1 seul appel à la fin du pipeline plutôt que 12 regex sur ~13500 lignes)
     print(f'pronostics.html size: {HTML.stat().st_size/1024:.1f} KB')
 
 if __name__ == '__main__':

@@ -169,13 +169,8 @@ def main() -> int:
     DATA_JS.write_text(f'window.PRONOSTICS_DATA = {payload};\n', encoding='utf-8')
 
     # Also inline into pronostics.html (same pattern as patch_winamax.py)
-    if HTML.exists():
-        html_text = HTML.read_text(encoding='utf-8')
-        new_block = f'<script>\nwindow.PRONOSTICS_DATA = {payload};\n</script>'
-        html_text = re.sub(r'<script>\s*window\.PRONOSTICS_DATA\s*=.*?;?\s*</script>',
-                           new_block, html_text, count=1, flags=re.DOTALL)
-        HTML.write_text(html_text, encoding='utf-8')
-
+    # v33.28 — HTML rewrite déplacé dans scripts/inject_data_in_html.py
+    # (1 seul appel à la fin du pipeline plutôt que 12 regex sur ~13500 lignes)
     msg = (f'[{datetime.now():%H:%M:%S}] patch_winamax_markets: '
            f'{stats["matched"]}/{stats["events"]} events enriched with Winamax markets')
     if stats.get('rejected_insane'):

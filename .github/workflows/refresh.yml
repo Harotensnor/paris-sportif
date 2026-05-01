@@ -175,6 +175,10 @@ jobs:
             python3 fetch_nba_team_stats.py || true
           fi
           python3 patch_nba_team_stats.py || true
+          # v33.28 — Inject data.js (window.PRONOSTICS_DATA = {...}) dans
+          # pronostics.html UNE SEULE FOIS à la fin. Avant : 11 patches faisaient
+          # ce regex sur 13500 lignes à chaque fois (~6-12s gaspillées par run).
+          python3 inject_data_in_html.py || true
           # Build health.json — compact pipeline status snapshot. Visible at
           # https://harotensnor.github.io/paris-sportif/health.json so we can
           # spot stale/missing sources without scraping the workflow logs.

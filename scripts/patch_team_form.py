@@ -53,16 +53,8 @@ def main():
     payload = json.dumps(data, ensure_ascii=False, separators=(',', ':'))
     DATA_JS.write_text(f'window.PRONOSTICS_DATA = {payload};\n', encoding='utf-8')
     # Re-inline into html so that file:// fallback (offline / first paint) sees it.
-    if HTML.exists():
-        html_text = HTML.read_text(encoding='utf-8')
-        new_block = f'<script>\nwindow.PRONOSTICS_DATA = {payload};\n</script>'
-        new_html, n = re.subn(
-            r'<script>\s*window\.PRONOSTICS_DATA\s*=.*?;?\s*</script>',
-            new_block, html_text, count=1, flags=re.DOTALL,
-        )
-        if n:
-            HTML.write_text(new_html, encoding='utf-8')
-
+    # v33.28 — HTML rewrite déplacé dans scripts/inject_data_in_html.py
+    # (1 seul appel à la fin du pipeline plutôt que 12 regex sur ~13500 lignes)
     print(f'[patch_team_form] patched {patched} competitor.form entries', flush=True)
 
 
