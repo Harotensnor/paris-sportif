@@ -201,10 +201,68 @@ def build_outputs(state: dict) -> tuple[dict, dict]:
                 'home_name': vals[0][0], 'away_name': vals[1][0],
             }
         if not mkt_1n2: continue
+        # Tier 1 #1 (2026-05-01) : tentative d'extraire OU 2.5 + BTTS depuis
+        # PRELOADED_STATE. RÉSULTAT : 0 markets trouvés (PRELOADED_STATE de la
+        # page /sports/{sid} n'expose QUE le mainBet par match, soit 1N2 ou
+        # Vainqueur ou Score exact). Pour OU/BTTS il faut un fetch per-match
+        # qui touche /paris-sportifs/match/{id} — explicitement banni par
+        # CLAUDE.md "Ne pas revenir à l'ancien scraper multi-requêtes".
+        # Code conservé pour usage futur si on implémente fetch per-match
+        # respectueux (cache 6h, top picks only, max 30 req/run).
+        mkt_ou25 = None  # {'over': odd, 'under': odd}
+        mkt_btts = None  # {'yes': odd, 'no': odd}
+        for bid_str, b2 in bets.items():
+            if not isinstance(b2, dict):
+                continue
+            if str(b2.get('matchId')) != str(mid):
+                continue
+            btn2 = (b2.get('betTypeName') or '').lower()
+            oids2 = b2.get('outcomes') or []
+            if len(oids2) != 2:
+                continue
+            outcomes_data = []
+            for oid2 in oids2:
+                o2 = outcomes.get(str(oid2)) or {}
+                od2 = odds.get(str(oid2))
+                try:
+                    od2 = float(od2) if od2 is not None else None
+                except (TypeError, ValueError):
+                    od2 = None
+                outcomes_data.append((o2.get('label') or '', od2))
+            # OU 2.5 detection : "Total" ou "Plus/Moins" + label contient "2.5" ou "2,5"
+            if not mkt_ou25:
+                if (('plus' in btn2 and 'moins' in btn2) or 'total' in btn2 or 'over' in btn2) and any('2.5' in lbl or '2,5' in lbl for lbl, _ in outcomes_data):
+                    over_odd = under_odd = None
+                    for lbl, od in outcomes_data:
+                        ll = lbl.lower()
+                        if 'plus' in ll or 'over' in ll or '+' in lbl or '> 2' in ll:
+                            over_odd = od
+                        elif 'moins' in ll or 'under' in ll or '-' in lbl or '< 2' in ll:
+                            under_odd = od
+                    if over_odd and under_odd and over_odd > 1.0 and under_odd > 1.0:
+                        mkt_ou25 = {'over': over_odd, 'under': under_odd}
+            # BTTS detection : "Les deux équipes marquent" / "Both teams to score"
+            if not mkt_btts:
+                if 'deux' in btn2 and ('marqu' in btn2 or 'équipe' in btn2) or 'both teams' in btn2 or 'btts' in btn2:
+                    yes_odd = no_odd = None
+                    for lbl, od in outcomes_data:
+                        ll = lbl.lower()
+                        if 'oui' in ll or 'yes' in ll:
+                            yes_odd = od
+                        elif 'non' in ll or 'no' in ll:
+                            no_odd = od
+                    if yes_odd and no_odd and yes_odd > 1.0 and no_odd > 1.0:
+                        mkt_btts = {'yes': yes_odd, 'no': no_odd}
+        # Build odds dict avec tous les markets disponibles
+        odds_dict = {'1n2': mkt_1n2}
+        if mkt_ou25:
+            odds_dict['ou25'] = mkt_ou25
+        if mkt_btts:
+            odds_dict['btts'] = mkt_btts
         markets_by_mid[str(mid)] = {
             'tournament_id': mm.get('tournamentId'),
             'title': mm.get('title'),
-            'odds': {'1n2': mkt_1n2},
+            'odds': odds_dict,
             'fetched_at': datetime.utcnow().isoformat() + 'Z',
         }
 
