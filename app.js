@@ -4791,6 +4791,20 @@
   const SUPPORTED_SPORTS = new Set([
     'football', 'tennis', 'basketball', 'hockey', 'baseball', 'football-american',
   ]);
+  // Bug-hunt 2026-05-02 : helper "match zombie" — kickoff > 6h ago sans completed.
+  // Cause : Sofascore n'a pas updaté ou scraper a raté le résultat. Ces matches
+  // pollueraient la page "À venir" alors qu'ils sont déjà joués depuis longtemps.
+  // Ce helper est utilisé en filter pour les masquer des listes actionnables.
+  function _isMatchEffectivelyDone(m) {
+    if (!m) return false;
+    if (m.completed) return true;
+    const d = m.date ? new Date(m.date).getTime() : 0;
+    if (!isFinite(d) || d === 0) return false;
+    const ageH = (Date.now() - d) / 3600000;
+    // 6h+ après kickoff sans completed=true → considère done (orphan/data-stale)
+    return ageH > 6;
+  }
+  try { window._isMatchEffectivelyDone = _isMatchEffectivelyDone; } catch(e){}
   function predictMatch(match) {
     const cur = window.PRONOSTICS_DATA;
     if (__predCacheRef !== cur) { __predCache = new Map(); __predCacheRef = cur; }
@@ -7294,7 +7308,7 @@
       let nActions = 0;
       todayEvents.forEach(m => {
         if (winamaxOnly && !(m.winamax && m.winamax.available === true)) return;
-        if (m.completed || m.live) return;
+        if (m.completed || m.live || _isMatchEffectivelyDone(m)) return;
         if (!m.date) return;
         const ko = new Date(m.date).getTime();
         if (isNaN(ko) || ko < nowMs + PRE_KICKOFF_BUFFER) return;
@@ -8683,7 +8697,7 @@
       if (typeof buildComboVariants !== 'function') return '';
       const picksAll = [];
       filteredEvents.forEach(m => {
-        if (m.completed || m.live) return;
+        if (m.completed || m.live || _isMatchEffectivelyDone(m)) return;
         // R4 (audit phase 2) : filter matchs avec TBD vs TBD ou competitors null
         // (tirages tournoi pas encore faits). Avant : "TBD vs TBD" remontait dans
         // les combinés affichés en UI.
@@ -15826,7 +15840,7 @@
     try {
       const today = ((data && data.days && data.days[todayIso]) || []).filter(m => m.winamax && m.winamax.available === true);
       today.forEach(m => {
-        if (m.completed || m.live) return;
+        if (m.completed || m.live || _isMatchEffectivelyDone(m)) return;
         if (!m.date) return;
         const ko = new Date(m.date).getTime();
         const minToKickoff = (ko - now) / 60000;
@@ -15850,7 +15864,7 @@
     try {
       const today = ((data && data.days && data.days[todayIso]) || []).filter(m => m.winamax && m.winamax.available === true);
       today.forEach(m => {
-        if (m.completed || m.live) return;
+        if (m.completed || m.live || _isMatchEffectivelyDone(m)) return;
         try {
           const pred = predictMatch(m);
           if (!pred || !pred.pick || pred.skip) return;
@@ -16020,7 +16034,9 @@
         const pk = pred.pick.key;
         const odd = pred.odds && (pk==='1'?pred.odds.home:pk==='2'?pred.odds.away:pred.odds.draw);
         const { home, away } = getSides(m);
-        const settled = m.completed;
+        // Bug-hunt 2026-05-02 : un match passé depuis >6h sans completed est
+        // considéré "settled effectif" pour ne pas polluer "À venir / En cours".
+        const settled = m.completed || _isMatchEffectivelyDone(m);
         const live = m.status === 'STATUS_IN_PROGRESS';
         const ko = new Date(m.date).getTime();
         const startedAndNotSettled = !settled && isFinite(ko) && ko < Date.now() - 60000;
@@ -18066,7 +18082,7 @@
         const evs = (data && data.days && data.days[todayISO()]) || [];
         const topPicks = [];
         evs.forEach(m => {
-          if (m.completed || m.live) return;
+          if (m.completed || m.live || _isMatchEffectivelyDone(m)) return;
           const pp = predictMatch(m);
           if (!pp || pp.skip) return;
           const rel = pp.reliability ?? pp.pick?.prob ?? 0;
@@ -21254,7 +21270,7 @@
     const candidates = [];
     [todayIso, tomIso].forEach(iso => {
       (data.days[iso] || []).forEach(m => {
-        if (m.completed || m.live) return;
+        if (m.completed || m.live || _isMatchEffectivelyDone(m)) return;
         if (!(m.winamax && m.winamax.match_id && m.winamax.markets && m.winamax.markets['1n2'])) return;
         try {
           const pred = predictMatch(m);
@@ -21464,7 +21480,7 @@
       const daysFromToday = Math.round((dDt - todayDt) / (24 * 3600 * 1000));
       if (daysFromToday < -1 || daysFromToday > 7) return;
       (evs || []).forEach(m => {
-        if (m.completed || m.live) return;
+        if (m.completed || m.live || _isMatchEffectivelyDone(m)) return;
         if (!(m.winamax && m.winamax.match_id && m.winamax.markets && m.winamax.markets['1n2'])) return;
         try {
           const pred = predictMatch(m);

@@ -210,6 +210,10 @@ def main() -> int:
         'data_age_min': _age_min(ROOT / 'data.js'),
         'sources': {},
         'warnings': [],
+        # Bug-hunt 2026-05-02 : avant `overall` n'était jamais set, JSON output
+        # avait `overall: null` → MCP get_pipeline_status / front-end santé indicator
+        # voyaient "?". Maintenant calculé en bout de fonction selon nb warnings.
+        'overall': 'unknown',
     }
     for key, fname, counter in SOURCES:
         path = ROOT / fname
@@ -258,10 +262,21 @@ def main() -> int:
                 f'({q["winamax_exact"]}/{q["winamax_available"]})'
             )
 
+    # Bug-hunt 2026-05-02 : compute `overall` selon les warnings + data freshness
+    n_warnings = len(out['warnings'])
+    data_age = out.get('data_age_min')
+    if data_age is None or data_age > 240:
+        out['overall'] = 'error'   # data > 4h = critique
+    elif n_warnings >= 5 or (data_age and data_age > 60):
+        out['overall'] = 'warning'
+    elif n_warnings == 0 and data_age is not None and data_age <= 30:
+        out['overall'] = 'ok'
+    else:
+        out['overall'] = 'warning'
+
     OUT.write_text(json.dumps(out, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     n_sources = len(out['sources'])
-    n_warnings = len(out['warnings'])
-    print(f'  health.json : {n_sources} sources, {n_warnings} warnings, data {out["data_age_min"]}min old')
+    print(f'  health.json : overall={out["overall"]}, {n_sources} sources, {n_warnings} warnings, data {out["data_age_min"]}min old')
     return 0
 
 
