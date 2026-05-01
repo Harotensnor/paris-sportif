@@ -1,32 +1,32 @@
 {
-  "generated_at": "2026-05-01T23:54:32Z",
+  "generated_at": "2026-05-01T23:56:23Z",
   "data_age_min": 0,
   "sources": {
     "winamax_catalog": {
-      "age_min": 0,
+      "age_min": 1,
       "tournaments": 116,
       "matches": 749
     },
     "winamax_markets": {
-      "age_min": 0,
+      "age_min": 1,
       "matches_with_odds": 749,
       "matches_detailed": 0
     },
     "injuries_soccer": {
-      "age_min": 957,
+      "age_min": 1,
       "teams": 131,
       "players": 475
     },
     "lineups_soccer": {
-      "age_min": 957,
+      "age_min": 1,
       "events": 17
     },
     "team_stats": {
-      "age_min": 184,
+      "age_min": 1,
       "teams": 421
     },
     "clubelo": {
-      "age_min": 542,
+      "age_min": 1,
       "clubs": 630
     },
     "weather": {
@@ -34,7 +34,7 @@
       "events": 292
     },
     "referees_soccer": {
-      "age_min": 957,
+      "age_min": 1,
       "events": 46
     },
     "fbref_xg": {
@@ -46,7 +46,7 @@
       "total": 0
     },
     "team_form": {
-      "age_min": 27,
+      "age_min": 1,
       "teams": 698,
       "football_teams": 641
     },
@@ -55,7 +55,7 @@
       "rows": 0
     },
     "clv_history": {
-      "age_min": 0,
+      "age_min": 1,
       "matches": 501,
       "observations": 1372,
       "mean_clv_pct": -0.11,
@@ -67,7 +67,7 @@
     "winamax_catalog": {
       "script": "scripts/fetch_winamax_catalog.py",
       "output": "winamax_catalog.json",
-      "age_min": 0,
+      "age_min": 1,
       "threshold_min": 15,
       "fast_red_min": 30,
       "status": "ok"
@@ -75,7 +75,7 @@
     "winamax_markets": {
       "script": "scripts/fetch_winamax_match_details.py",
       "output": "winamax_markets.json",
-      "age_min": 0,
+      "age_min": 1,
       "threshold_min": 15,
       "fast_red_min": 30,
       "status": "ok"
@@ -83,23 +83,23 @@
     "injuries_soccer": {
       "script": "scripts/fetch_injuries_soccer.py",
       "output": "injuries_soccer.json",
-      "age_min": 957,
+      "age_min": 1,
       "threshold_min": 180,
       "fast_red_min": null,
-      "status": "warn"
+      "status": "ok"
     },
     "lineups_soccer": {
       "script": "scripts/fetch_lineups_soccer.py",
       "output": "lineups_soccer.json",
-      "age_min": 957,
+      "age_min": 1,
       "threshold_min": 180,
       "fast_red_min": null,
-      "status": "warn"
+      "status": "ok"
     },
     "team_stats": {
       "script": "scripts/fetch_team_stats.py",
       "output": "team_stats.json",
-      "age_min": 184,
+      "age_min": 1,
       "threshold_min": 300,
       "fast_red_min": null,
       "status": "ok"
@@ -107,7 +107,7 @@
     "clubelo": {
       "script": "scripts/fetch_clubelo.py",
       "output": "clubelo.json",
-      "age_min": 542,
+      "age_min": 1,
       "threshold_min": 1440,
       "fast_red_min": null,
       "status": "ok"
@@ -123,10 +123,10 @@
     "referees_soccer": {
       "script": "scripts/fetch_referees_soccer.py",
       "output": "referees_soccer.json",
-      "age_min": 957,
+      "age_min": 1,
       "threshold_min": 480,
       "fast_red_min": null,
-      "status": "warn"
+      "status": "ok"
     },
     "fbref_xg": {
       "script": "scripts/fetch_understat_xg.py",
@@ -147,7 +147,7 @@
     "team_form": {
       "script": "scripts/fetch_team_form.py",
       "output": "team_form.json",
-      "age_min": 27,
+      "age_min": 1,
       "threshold_min": 360,
       "fast_red_min": null,
       "status": "ok"
@@ -163,7 +163,7 @@
     "clv_history": {
       "script": "scripts/compute_clv.py",
       "output": "clv_history.json",
-      "age_min": 0,
+      "age_min": 1,
       "threshold_min": 60,
       "fast_red_min": null,
       "status": "ok"
@@ -195,9 +195,6 @@
     ]
   },
   "warnings": [
-    "injuries_soccer: stale (957min > 180min threshold)",
-    "lineups_soccer: stale (957min > 180min threshold)",
-    "referees_soccer: stale (957min > 480min threshold)",
     "fbref_xg: file missing (fbref_xg.json)",
     "sofascore_events: source vide — matching Sofascore indisponible",
     "footballdata: source vide — historique ligues foot désactivé",
