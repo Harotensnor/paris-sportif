@@ -13585,11 +13585,24 @@
     const proposedRules = _proposedRules(agent.scorableRaw || []);
     const activeRules = _loadAgentRules();
     const ignoredCount = _loadAgentIgnored().length;
-    const tuningBlockHtml = (proposedRules.length || activeRules.length) ? `
+    // v33.16 — Si pas encore de proposition mais l'agent a déjà des paris,
+    // afficher un message "en attente de sample" plutôt que masquer le bloc.
+    // L'auto-tuning a besoin de ≥10 paris par bucket (sport/league/odd-range)
+    // pour proposer une règle. Sans ce message, l'utilisateur ne sait pas
+    // que la fonctionnalité existe.
+    const nScorable = (agent.scorableRaw || []).length;
+    const showWaitingMsg = !proposedRules.length && !activeRules.length && nScorable > 0;
+    const tuningBlockHtml = (proposedRules.length || activeRules.length || showWaitingMsg) ? `
       <div style="padding:28px 0;border-top:1px solid var(--border);">
         <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:14px;">
-          Auto-tuning du modèle${activeRules.length?` · ${activeRules.length} règle${activeRules.length>1?'s':''} active${activeRules.length>1?'s':''}`:''}${proposedRules.length?` · ${proposedRules.length} proposée${proposedRules.length>1?'s':''}`:''}
+          Auto-tuning du modèle${activeRules.length?` · ${activeRules.length} règle${activeRules.length>1?'s':''} active${activeRules.length>1?'s':''}`:''}${proposedRules.length?` · ${proposedRules.length} proposée${proposedRules.length>1?'s':''}`:''}${showWaitingMsg?` · en attente de sample`:''}
         </div>
+        ${showWaitingMsg ? `
+          <div style="padding:14px 16px;background:rgba(167,139,250,.05);border:1px dashed var(--brand-soft);border-radius:8px;font-size:12.5px;color:var(--text-dim);line-height:1.55;">
+            <div style="color:var(--brand);font-weight:700;margin-bottom:4px;">⏳ ${nScorable} pari${nScorable>1?'s':''} score${nScorable>1?'s':''} — pas encore assez par bucket</div>
+            L'auto-tuning analyse les paris regroupés par sport, ligue, et tranche de cote. Il propose une règle dès qu'un bucket atteint 10 paris ROI &lt;-15%. Continue de laisser tourner — les premières règles apparaîtront dans les prochains jours.
+          </div>
+        ` : ''}
         ${activeRules.length ? `
           <div style="margin-bottom:${proposedRules.length?14:0}px;">
             ${activeRules.map(r => `
