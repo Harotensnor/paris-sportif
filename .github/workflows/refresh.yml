@@ -17,7 +17,11 @@ permissions:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    # v33.29 — Bumped 10→15 min : avec la pipeline élargie (Sofa multi-sport,
+    # 18 patches, fbref/MLB/NHL fetches), des runs touchaient le cap 10 min
+    # → cancelled au timeout. 15 min laisse de la marge sans risquer 5x runs
+    # qui s'accumulent (cron tick = 5 min, chaque run finit avant 2 ticks).
+    timeout-minutes: 15
     # v33.26 — CRITICAL FIX : avant cancel-in-progress=true tuait chaque
     # run au tick suivant (car la pipeline complete prend ~6-8 min > cron 5min).
     # Résultat : 100% des runs étaient `cancelled`, data figée 14h+.
