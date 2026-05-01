@@ -242,18 +242,26 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data.js pronostics.html app.css app.js odds_history.jsonl \
-                  injuries_soccer.json winamax_catalog.json winamax_markets.json team_stats.json \
-                  lineups_soccer.json clubelo.json weather.json fbref_xg.json \
-                  weather_geo_cache.json referees_soccer.json health.json \
-                  data_today.json data_manifest.json team_form.json \
-                  results_archive.jsonl tennis_ratings.json footballdata.json \
-                  mlb_pitchers.json nhl_stats.json backtest.html feed.xml \
-                  credibilite.html stadiums.json dixon_coles_rho.json index.html \
-                  nba_team_stats.json team_strengths.json team_strengths_mle.json \
-                  ci_heartbeat.json sofascore_events.json clv_history.json \
-                  og-default.png og-backtest.png og-credibilite.png og-methodologie.png \
-                  2>/dev/null || true
+          # Add only files that exist. A missing optional sidecar (ex: fbref_xg.json)
+          # used to make the whole `git add ... || true` no-op, so data.js stayed
+          # fresh in the runner but never reached main.
+          for path in \
+            data.js pronostics.html app.css app.js odds_history.jsonl \
+            injuries_soccer.json winamax_catalog.json winamax_markets.json team_stats.json \
+            lineups_soccer.json clubelo.json weather.json fbref_xg.json \
+            weather_geo_cache.json referees_soccer.json health.json \
+            data_today.json data_manifest.json team_form.json \
+            results_archive.jsonl tennis_ratings.json footballdata.json \
+            mlb_pitchers.json nhl_stats.json backtest.html feed.xml \
+            credibilite.html stadiums.json dixon_coles_rho.json index.html \
+            nba_team_stats.json team_strengths.json team_strengths_mle.json \
+            ci_heartbeat.json sofascore_events.json clv_history.json \
+            og-default.png og-backtest.png og-credibilite.png og-methodologie.png
+          do
+            if [ -e "$path" ]; then
+              git add "$path"
+            fi
+          done
           # Sprint 45 #24 — archives/ retiré du git add : rolling local
           # 30j conservé hors versionning (cf .gitignore).
           # Only stamp sw.js if we have real content changes — otherwise
