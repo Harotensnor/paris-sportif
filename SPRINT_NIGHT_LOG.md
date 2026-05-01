@@ -77,5 +77,13 @@
 - Avant: `health.json.sources.team_form.teams` restait à 0 malgré 698 équipes en cache; `winamax_markets` ne distinguait pas 1N2 simple vs marchés détaillés; `pipeline_lag_per_script.team_form.script` pointait vers un script inexistant
 - Après: `team_form` expose 698 équipes dont 641 foot; `winamax_markets` expose 751 matchs avec cotes et 148 matchs détaillés; `quality_checks` mesure 302 exacts, 189 détaillés, ratio détaillé 62.6%
 - Impact: la page Santé peut diagnostiquer en prod si le scanner multi-marchés et la forme L10 fonctionnent vraiment, au lieu d'afficher un faux vide
+- Commit: 44825ffc
+- Status: ✅ DONE
+
+## Sprint v35.11 (2026-05-02 03:02 UTC)
+- Chantier: P16 smoke navigateur desktop/mobile + CSP images
+- Avant: smoke Chromium local desktop/mobile rendait 1038 events et 198 marchés détaillés, mais 4 erreurs console CSP bloquaient les images joueurs Sofascore (`img.sofascore.com`)
+- Après: CSP `img-src` autorise `https://img.sofascore.com`; smoke desktop 1440x900 et mobile 390x844 sans erreur bloquante, 0 overflow horizontal, 66 cards rendues, footer v35.11
+- Impact: page non blanche vérifiée sur desktop/mobile; les assets Sofascore utiles aux cartes/modales ne déclenchent plus d'erreurs console
 - Commit: pending
 - Status: ✅ DONE
