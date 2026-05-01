@@ -85,6 +85,12 @@ jobs:
           # v31.7.206 — fbref xG : Expected Goals stats per team for top-6
           # European leagues. Self-throttles 6h. ~5s typical run.
           python3 fetch_fbref_xg.py || true
+          # v33.0 — Sofascore events MULTI-SPORT (foot/tennis/basket/hockey/
+          # baseball). Source de couverture massive (~1700 events/jour vs
+          # ~500 ESPN actuellement). Comble le gap quand ESPN ban GHA et
+          # ajoute beaucoup de matchs supplémentaires (qualifs WTA tennis,
+          # ligues exotiques, etc.). ~5-10s typique.
+          python3 fetch_sofascore_events.py || true
           # Weather (Open-Meteo): free, no key. Script self-throttles — skips
           # if forecast <30min old OR kickoff >6h away. Typical run: <5s.
           python3 fetch_weather.py || true
@@ -97,6 +103,11 @@ jobs:
             python3 fetch_team_form.py || true
           fi
           python3 patch_winamax.py || true
+          # v33.0 — Merge Sofascore events dans data.js (dedup par home|away|day).
+          # Doit tourner APRÈS patch_winamax pour préserver la cohérence
+          # ESPN events (qui restent prioritaires). Ajoute ~1500 events/jour
+          # supplémentaires couvrant plus de ligues + qualifs.
+          python3 patch_sofascore_events.py || true
           # v28 — Patch multi-market odds (uses ev.winamax.match_id from patch_winamax).
           # Must run AFTER patch_winamax, BEFORE other patches that rewrite data.js.
           python3 patch_winamax_markets.py || true
@@ -255,7 +266,7 @@ jobs:
                   mlb_pitchers.json nhl_stats.json backtest.html feed.xml \
                   credibilite.html stadiums.json dixon_coles_rho.json index.html \
                   nba_team_stats.json team_strengths.json team_strengths_mle.json \
-                  ci_heartbeat.json \
+                  ci_heartbeat.json sofascore_events.json \
                   og-default.png og-backtest.png og-credibilite.png og-methodologie.png \
                   2>/dev/null || true
           # Sprint 45 #24 — archives/ retiré du git add : rolling local
