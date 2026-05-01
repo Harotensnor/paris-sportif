@@ -2142,6 +2142,40 @@
   }
   try { window.renderStars = renderStars; } catch(e){}
 
+  // 2026-05-01 — Helper réutilisable forme L5 visuelle (5 mini-badges).
+  // Usage : renderForm5Compact(competitor.form) → string HTML.
+  function renderForm5Compact(formStr, opts) {
+    if (!formStr || typeof formStr !== 'string') return '';
+    const size = (opts && opts.size) || 14;
+    const fontSize = (opts && opts.fontSize) || 9;
+    const chars = formStr.slice(0, 5).split('');
+    return chars.map(c => {
+      const v = c.toUpperCase();
+      const norm = v === 'T' ? 'D' : v;
+      const ch = norm === 'W' ? 'V' : norm === 'L' ? 'D' : 'N';
+      const col = norm === 'W' ? 'var(--accent)' : norm === 'L' ? 'var(--danger)' : 'var(--text-dim2)';
+      const bg = norm === 'W' ? 'rgba(52,211,153,.15)' : norm === 'L' ? 'rgba(248,113,113,.15)' : 'rgba(255,255,255,.05)';
+      return `<span style="display:inline-block;width:${size}px;height:${size}px;line-height:${size}px;text-align:center;border-radius:3px;background:${bg};color:${col};font-size:${fontSize}px;font-weight:700;">${ch}</span>`;
+    }).join('');
+  }
+  try { window.renderForm5Compact = renderForm5Compact; } catch(e){}
+
+  // 2026-05-01 — Helper streak detection : retourne HTML badge si série 3+
+  // sur l'équipe pickée, sinon string vide.
+  function renderStreakBadge(competitor) {
+    if (!competitor || typeof competitor.form !== 'string' || competitor.form.length < 3) return '';
+    const f = competitor.form;
+    let count = 1; const first = f[0];
+    for (let i = 1; i < f.length; i++) { if (f[i] === first) count++; else break; }
+    if (count < 3) return '';
+    const fc = first.toUpperCase();
+    const name = String(competitor.name || '').replace(/"/g, '&quot;');
+    if (fc === 'W') return `<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 6px;background:rgba(251,191,36,.18);color:var(--warn);border-radius:999px;font-size:10px;font-weight:700;" title="${name} sur une série de ${count} victoires d'affilée">🔥 ${count}V</span>`;
+    if (fc === 'L') return `<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 6px;background:rgba(248,113,113,.18);color:var(--danger);border-radius:999px;font-size:10px;font-weight:700;" title="${name} sur une série de ${count} défaites d'affilée">❄️ ${count}D</span>`;
+    return '';
+  }
+  try { window.renderStreakBadge = renderStreakBadge; } catch(e){}
+
   // Sprint 83 (v31.7.170 — audit Part 7) — Score Qualité dédié.
   // Synthétise 4 dimensions en un score 0..100 + label "high/medium/low" :
   //   * edge (40 pts) : value forte +5pt+ → 40, +2pt → 20, 0 → 10
@@ -15200,11 +15234,15 @@
                   const lg = p.m.league_name || p.m.league_code || '';
                   const tLbl = (typeof fmtTime === 'function') ? fmtTime(p.m.date) : '';
                   const pickLbl = (p.best && p.best.label) || (p.pred.pick && p.pred.pick.label) || 'Pick';
+                  // 2026-05-01 — Streak indicator sur l'équipe pickée
+                  const pickKey = (p.best && p.best.key) || (p.pred.pick && p.pred.pick.key) || '';
+                  const streakTeam = pickKey === '1' ? sides.home : pickKey === '2' ? sides.away : null;
+                  const streakHtml = streakTeam && (typeof renderStreakBadge === 'function') ? renderStreakBadge(streakTeam) : '';
                   return `
                     <div class="interactive" data-match-id="${esc(String(p.m.id))}" role="button" tabindex="0" style="padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;cursor:pointer;">
                       <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:3px;">
                         <span style="font-size:10px;color:var(--text-dim);font-weight:600;">${esc(tLbl)}</span>
-                        <span style="font-size:11px;color:var(--accent);font-weight:700;">${Math.round(p.rel*100)}%</span>
+                        <div style="display:flex;align-items:center;gap:6px;">${streakHtml}<span style="font-size:11px;color:var(--accent);font-weight:700;">${Math.round(p.rel*100)}%</span></div>
                       </div>
                       <div style="font-size:13px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(hN)} vs ${esc(aN)}</div>
                       <div style="font-size:11px;color:var(--text-dim);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(String(lg).slice(0,28))} · <b style="color:var(--brand);">${esc(pickLbl)}</b> @${p.odd.toFixed(2)}</div>
@@ -15318,6 +15356,17 @@
               } else {
                 pickLine = `<div style="font-size:12px;color:var(--text-dim);margin-top:4px;font-style:italic;">Match suivi — pas de prono fort recommandé</div>`;
               }
+              // 2026-05-01 — Forme L5 + streak sur prochains gros matchs
+              const formH = (typeof renderForm5Compact === 'function') ? renderForm5Compact(sides.home?.form) : '';
+              const formA = (typeof renderForm5Compact === 'function') ? renderForm5Compact(sides.away?.form) : '';
+              const pickKey = item.pred?.pick?.key || '';
+              const streakTeam = pickKey === '1' ? sides.home : pickKey === '2' ? sides.away : null;
+              const streakHtml = streakTeam && (typeof renderStreakBadge === 'function') ? renderStreakBadge(streakTeam) : '';
+              const formBlock = (formH || formA) ? `<div style="margin-top:6px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:9.5px;color:var(--text-dim2);">
+                ${formH ? `<span style="display:inline-flex;align-items:center;gap:3px;"><span style="font-weight:600;">${esc((sides.home?.short || '?').slice(0,8))}</span> ${formH}</span>` : ''}
+                ${formA ? `<span style="display:inline-flex;align-items:center;gap:3px;"><span style="font-weight:600;">${esc((sides.away?.short || '?').slice(0,8))}</span> ${formA}</span>` : ''}
+                ${streakHtml}
+              </div>` : '';
               return `
               <div class="interactive" data-match-id="${esc(String(m.id || ''))}" role="button" tabindex="0" style="padding:14px;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${st.color};border-radius:0 10px 10px 0;cursor:pointer;">
                 <div style="display:flex;justify-content:space-between;align-items:start;gap:8px;margin-bottom:8px;">
@@ -15330,6 +15379,7 @@
                 </div>
                 <div style="font-size:11px;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(lg.slice(0, 50))}${item.importance >= 50 ? ` · 🔥 enjeu ${item.importance}/100` : ''}</div>
                 ${pickLine}
+                ${formBlock}
               </div>`;
             }).join('')}
           </div>
