@@ -119,66 +119,26 @@ jobs:
           echo "=== fetch_weather ==="; cat /tmp/fetch_weather.log 2>/dev/null | tail -2 || true
           echo "=== fetch_referees ==="; cat /tmp/fetch_refs.log 2>/dev/null | tail -2 || true
           # Patches : SÉQUENTIELS (tous écrivent data.js → race-condition si parallèle)
+          # v33.30 — Patches "lourds" qui ont une logique spécifique (dedup,
+          # multi-market lookup, merge events). Restent en scripts séparés.
           python3 patch_winamax.py || true
-          # v33.0 — Merge Sofascore events dans data.js (dedup par home|away|day).
-          # Doit tourner APRÈS patch_winamax pour préserver la cohérence
-          # ESPN events (qui restent prioritaires). Ajoute ~1500 events/jour
-          # supplémentaires couvrant plus de ligues + qualifs.
           python3 patch_sofascore_events.py || true
-          # v28 — Patch multi-market odds (uses ev.winamax.match_id from patch_winamax).
-          # Must run AFTER patch_winamax, BEFORE other patches that rewrite data.js.
           python3 patch_winamax_markets.py || true
-          # Patch soccer injuries AFTER patch_winamax so they survive the
-          # dedup/bucketing rewrite. Idempotent, ~0.1s.
-          python3 patch_injuries_soccer.py || true
-          # Patch team-stats AFTER patch_winamax for same reason (survives
-          # competitor dedup). ~0.3s.
-          python3 patch_team_stats.py || true
-          # Patch lineups AFTER patch_winamax for same reason. ~0.1s.
-          python3 patch_lineups_soccer.py || true
-          # Patch ClubElo ratings last (survives all prior rewrites). ~0.1s.
-          python3 patch_clubelo.py || true
-          # v31.7.206 — Patch fbref xG : enrichit chaque foot competitor avec
-          # xg_for_avg, xg_against_avg, matches_played. ~0.1s. Idempotent.
-          python3 patch_fbref_xg.py || true
-          # Patch weather (survives all prior rewrites). Adds ev.weather to
-          # football events with a fresh forecast. ~0.1s.
-          python3 patch_weather.py || true
-          # Patch referees last (survives all prior rewrites). Adds
-          # ev.referee to each top-5 soccer event. ~0.1s.
-          python3 patch_referees_soccer.py || true
-          # v30 — Inject team_form.json (last 5 W/L) into competitor.form
-          # for NBA/NHL/MLB/NFL events. Idempotent, ~0.1s.
-          python3 patch_team_form.py || true
-          # v30 — Tennis Sackmann (ATP/WTA Elo + surface + fatigue). 24h
-          # cache on the upstream CSVs ; safe to call every tick (typical
-          # run < 1s when cache is warm).
+          # v33.30 — Fetchers pour données qu'on patchera ensuite via patch_all_quick.
           python3 fetch_tennis_sackmann.py || true
-          python3 patch_tennis_features.py || true
-          # v30 — Football-Data.co.uk (closing odds + league calibration).
-          # 6h cache on the source CSVs.
           python3 fetch_footballdata.py || true
-          python3 patch_footballdata.py || true
-          # v30 — MLB probable pitchers (statsapi.mlb.com, no key, free).
-          # Single biggest non-market signal in baseball : starting
-          # pitcher ERA differential. 6h cache per pitcher.
           if [ $MIN_MOD15 -lt 5 ]; then
             python3 fetch_mlb_pitchers.py || true
-          fi
-          python3 patch_mlb_pitchers.py || true
-          # v30 — NHL official API (api-web.nhle.com, no key, free).
-          # Replaces MoneyPuck (Cloudflare-blocked). Team pace + starting
-          # goalie SV%. 10min cache.
-          if [ $MIN_MOD15 -lt 5 ]; then
             python3 fetch_nhl_stats.py || true
-          fi
-          python3 patch_nhl_stats.py || true
-          # v31.7.37 — NBA team stats via ESPN public endpoint (PPG / pace
-          # proxy / record / last10). 30min cache. Enrichit basketScoreProjection.
-          if [ $MIN_MOD15 -lt 5 ]; then
             python3 fetch_nba_team_stats.py || true
           fi
-          python3 patch_nba_team_stats.py || true
+          # v33.30 — MEGA-PATCHER : applique 13 enrichissements légers en
+          # 1 seule lecture/écriture data.js. Avant : 13 invocations Python
+          # × ~2-3s chacune = ~30s. Maintenant : 1 invocation × ~0.5s.
+          # (weather, referees, lineups, injuries, clubelo, team_form,
+          #  fbref_xg, team_stats, footballdata, mlb_pitchers, nhl_stats,
+          #  nba_team_stats, tennis_features)
+          python3 patch_all_quick.py || true
           # v33.28 — Inject data.js (window.PRONOSTICS_DATA = {...}) dans
           # pronostics.html UNE SEULE FOIS à la fin. Avant : 11 patches faisaient
           # ce regex sur 13500 lignes à chaque fois (~6-12s gaspillées par run).
