@@ -14535,6 +14535,16 @@
                 return `<div style="font-size:12px;margin-top:3px;display:flex;align-items:center;gap:6px;"><span style="color:${col};letter-spacing:1px;font-weight:700;" title="Note ${vr.score}/100">${(typeof renderStars === 'function') ? renderStars(vr.stars) : '★'.repeat(vr.stars)}</span><span style="color:${col};font-weight:600;font-size:11px;">${esc(vr.label)}</span></div>`;
               })()}
               ${(() => {
+                // 2026-05-01 — Streak indicator action-focus-top : badge 🔥/❄️ si série
+                if (typeof renderStreakBadge !== 'function') return '';
+                const _sides = (typeof getSides === 'function') ? getSides(top.m) : null;
+                if (!_sides) return '';
+                const pickKey = (top.best && top.best.key) || (top.pred?.pick && top.pred.pick.key) || '';
+                const streakTeam = pickKey === '1' ? _sides.home : pickKey === '2' ? _sides.away : null;
+                const sb = streakTeam ? renderStreakBadge(streakTeam) : '';
+                return sb ? `<div style="margin-top:5px;">${sb}</div>` : '';
+              })()}
+              ${(() => {
                 // Sprint 130 (v31.7.191) — Countdown timer live jusqu'au coup d'envoi.
                 // Affiche "dans 2h32" / "dans 38min" / "dans 5min ⏰" pour matchs imminents.
                 const ts = top.m && top.m.date ? new Date(top.m.date).getTime() : 0;
@@ -14711,6 +14721,25 @@
                 intuit = `Pick à <b>${relPct}%</b> mais cote @${heroPick.odd.toFixed(2)} = marché à ${impPct}%. <b style="color:var(--danger);">Edge négatif</b> — à éviter.`;
               }
               return `<div class="ed-hero__intuit" style="margin-top:12px;padding:10px 12px;background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.18);border-left:3px solid var(--brand);border-radius:0 8px 8px 0;font-size:13px;color:var(--text-2);line-height:1.5;">💡 ${intuit}</div>`;
+            })()}
+            ${(() => {
+              // 2026-05-01 — Forme L5 + streak sur ed-hero principal
+              if (heroPick._noEdge) return '';
+              const _sides = (typeof getSides === 'function') ? getSides(heroPick.m) : null;
+              if (!_sides) return '';
+              const home = _sides.home; const away = _sides.away;
+              const formH = (typeof renderForm5Compact === 'function') ? renderForm5Compact(home?.form, { size: 16, fontSize: 10 }) : '';
+              const formA = (typeof renderForm5Compact === 'function') ? renderForm5Compact(away?.form, { size: 16, fontSize: 10 }) : '';
+              const pickKey = (heroPick.best && heroPick.best.key) || heroPick.pred?.pick?.key || '';
+              const streakTeam = pickKey === '1' ? home : pickKey === '2' ? away : null;
+              const sb = streakTeam && (typeof renderStreakBadge === 'function') ? renderStreakBadge(streakTeam) : '';
+              if (!formH && !formA && !sb) return '';
+              return `<div class="ed-hero__form" style="margin-top:12px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--text-dim);">
+                <span style="font-weight:700;text-transform:uppercase;letter-spacing:.5px;font-size:10px;">Forme L5</span>
+                ${formH ? `<span style="display:inline-flex;align-items:center;gap:5px;"><span style="font-weight:600;color:var(--text-2);">${esc((home?.short || home?.name || '?').slice(0,12))}</span> ${formH}</span>` : ''}
+                ${formA ? `<span style="display:inline-flex;align-items:center;gap:5px;"><span style="font-weight:600;color:var(--text-2);">${esc((away?.short || away?.name || '?').slice(0,12))}</span> ${formA}</span>` : ''}
+                ${sb}
+              </div>`;
             })()}
             ${_topReasons.length ? `
               <div class="ed-hero__reasons" aria-label="Pourquoi ce pick">
@@ -16963,7 +16992,16 @@
           <div style="display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--text);font-weight:600;">
             ${teamLogo(hLogo)}<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(hn)}</span><span style="color:var(--text-dim);font-weight:400;">vs</span>${teamLogo(aLogo)}<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(an)}</span>
           </div>
-          <div style="font-size:12px;color:var(--brand);font-weight:600;margin-top:3px;">→ ${esc(pickLabel)}</div>
+          <div style="font-size:12px;color:var(--brand);font-weight:600;margin-top:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">→ ${esc(pickLabel)}${(() => {
+            // 2026-05-01 — Streak indicator inline sur tous-row (pages Tous/Locks/Matchs)
+            if (typeof renderStreakBadge !== 'function') return '';
+            const _comps = p.m.competitors || [];
+            const _home = _comps.find(c => c.home_away === 'home') || _comps[0];
+            const _away = _comps.find(c => c.home_away === 'away') || _comps[1];
+            const _pickKey = (p.best && p.best.key) || (p.pred?.pick && p.pred.pick.key) || '';
+            const _streakTeam = _pickKey === '1' ? _home : _pickKey === '2' ? _away : null;
+            return _streakTeam ? renderStreakBadge(_streakTeam) : '';
+          })()}</div>
         </div>
         <div style="display:flex;flex-direction:column;gap:2px;font-size:11px;">
           <div><span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Confiance du modèle : probabilité estimée que ce pari gagne. ≥70 % = très fiable.">Conf</span> <b style="color:${confColor};">${Math.round(p.rel*100)}%</b> · <span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Cote décimale. La source (Winamax / externe / archive) est indiquée à côté.">Cote</span> <b style="color:var(--text);">${p.odd ? '@' + p.odd.toFixed(2) : '<span style=\"color:var(--text-dim2);font-weight:400;\">cote pré-match perdue</span>'}</b> ${_coteSrc}</div>
