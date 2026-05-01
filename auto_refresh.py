@@ -53,56 +53,47 @@ def ts():
 FETCH_STAGES = [
     # (script, ticks, timeout)
     ('fetch_live.py',              1,   60),
+    ('fetch_sofascore_events.py',   1,   90),
+    ('fetch_winamax_catalog.py',    1,   60),   # <2s typical
+    ('fetch_h2h.py',               15,   60),
+    ('fetch_forebet.py',            5,   60),
     ('fetch_tennis_odds.py',       5,   60),
     ('fetch_rus_odds.py',          5,   30),
     ('fetch_injuries.py',         10,   60),   # ESPN: NBA/NHL/NFL/MLB
-    ('fetch_h2h.py',              15,   60),
+    ('fetch_clubelo.py',            1,   30),   # self-throttled 1/20h
+    ('fetch_fbref_xg.py',         240,  120),   # self-throttled / slow-ish
     ('snapshot_odds.py',           1,   30),   # freeze pre-match odds
     ('snapshot_results.py',        1,   30),   # archive completed matches (long backtest window)
-    ('fetch_tennis_sackmann.py',   1,   60),   # ATP/WTA Elo + surface + fatigue, 24h cache
-    ('patch_tennis_features.py',   1,   30),
-    ('fetch_footballdata.py',      1,   60),   # closing odds + league calibration, 6h cache
-    ('patch_footballdata.py',      1,   30),
-    ('fetch_mlb_pitchers.py',      5,   60),   # MLB Stats API probable pitchers, 6h cache
-    ('patch_mlb_pitchers.py',      1,   15),
-    ('fetch_nhl_stats.py',        10,   60),   # NHL official API team stats + starting goalie, 10min cache
-    ('patch_nhl_stats.py',         1,   15),
-    ('fetch_forebet.py',           5,   60),
     ('fetch_tips.py',             15,  120),   # RdJ, respectful cadence
     ('fetch_injuries_soccer.py',  30,  180),   # Sofascore, every 30min (self-throttle interne)
     ('fetch_lineups_soccer.py',   30,  180),   # Sofascore, every 30min (self-throttle interne)
-    ('fetch_winamax_catalog.py',   1,   60),   # <2s typical
-    ('fetch_v3.py',               15,  300),   # full sweep
+    ('fetch_v3.py',               60,  300),   # full ESPN sweep, prod hourly
     ('fetch_team_stats.py',      240,  300),   # ~4min, 4h cadence
-    ('fetch_clubelo.py',           1,   30),   # self-throttled 1/20h
     ('fetch_weather.py',           1,   30),   # self-throttled
     ('fetch_referees_soccer.py',   1,   30),   # self-throttled 1/6h
     # v30 — Recent W/L form for NBA/WNBA/NHL/MLB/NFL teams (ESPN ne fournit
     # pas .form sur ces sports, contrairement au foot). Self-throttled 6h.
     ('fetch_team_form.py',        15,  120),
+    ('fetch_tennis_sackmann.py',   1,   60),   # ATP/WTA Elo + surface + fatigue, 24h cache
+    ('fetch_footballdata.py',      1,   60),   # closing odds + league calibration, 6h cache
+    ('fetch_mlb_pitchers.py',      5,   60),   # MLB Stats API probable pitchers, 6h cache
+    ('fetch_nhl_stats.py',        10,   60),   # NHL official API team stats + starting goalie, 10min cache
+    ('fetch_nba_team_stats.py',    5,   30),
 ]
 
-# Patches always run after fetches (idempotent, ~0.1-1s each).
-# Order matters: patch_winamax first (establishes winamax.match_id),
-# then markets, then enrichers that must survive dedup/bucketing.
+# Patches always run after fetches. Keep this list aligned with
+# .github/workflows/refresh.yml: the cron now uses patch_all_quick.py for the
+# light enrichments instead of 12 separate patch_* invocations.
 PATCH_STAGES = [
     ('patch_odds.py',               1,   60),
     ('patch_winamax.py',            1,   30),
+    ('patch_sofascore_events.py',   1,   30),
     ('patch_winamax_markets.py',    1,   30),
-    ('patch_injuries_soccer.py',    1,   30),
-    ('patch_team_stats.py',         1,   30),
-    ('patch_lineups_soccer.py',     1,   30),
-    ('patch_clubelo.py',            1,   30),
-    ('patch_weather.py',            1,   30),
-    ('patch_referees_soccer.py',    1,   30),
-    # v30 — Inject ESPN team_form.json (last 5 W/L) into competitor.form
-    # for NBA/NHL/MLB/NFL events.
-    ('patch_team_form.py',          1,   15),
-    # v31.7.37 — NBA team season stats (PPG/pace/record/last10).
-    ('fetch_nba_team_stats.py',     5,   30),
-    ('patch_nba_team_stats.py',     1,   15),
+    ('patch_all_quick.py',          1,   30),
+    ('inject_data_in_html.py',      1,   15),
     # Pipeline status snapshot (health.json) — runs every tick, cheap.
     ('build_health.py',             1,   15),
+    ('compute_clv.py',              1,   30),
     # v31.7.23 — Dixon-Coles ρ par ligue mesuré en CI (likelihood max).
     # Lent (~2-5s pour 40 ligues) ; cadence 240 ticks (~4h) en local.
     # En prod la cadence est 1×/jour (cron H=00:00 UTC) — voir refresh.yml.

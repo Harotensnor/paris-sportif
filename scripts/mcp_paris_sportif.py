@@ -975,6 +975,9 @@ def get_pipeline_status() -> dict:
     espn_count = len(today_events) - sofa_count
     winamax_count = sum(1 for ev in today_events if (ev.get("winamax") or {}).get("available"))
 
+    def _fresh(age_min) -> bool:
+        return isinstance(age_min, (int, float)) and age_min < 60
+
     return {
         "today": today,
         "data_age_min": health.get("data_age_min") if not "_error" in health else None,
@@ -988,7 +991,7 @@ def get_pipeline_status() -> dict:
         "sofascore_total_all_sports": sofa.get("total") if sofa else None,
         "warnings": health.get("warnings", [])[:5] if not "_error" in health else [],
         "sources": {
-            k: {"age_min": v.get("age_min"), "fresh": v.get("age_min", 999) < 60}
+            k: {"age_min": v.get("age_min"), "fresh": _fresh(v.get("age_min"))}
             for k, v in (health.get("sources") or {}).items()
         } if not "_error" in health else {},
     }

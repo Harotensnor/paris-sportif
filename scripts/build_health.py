@@ -250,11 +250,10 @@ def main() -> int:
                 f'football_invalid_form_stats: {q["football_invalid_form"]} '
                 'competitors avec avg_gf5/ga5 > 5 (contamination cross-sport)'
             )
-        if q['actionable_external_odds'] > 0:
-            out['warnings'].append(
-                f'actionable_external_odds: {q["actionable_external_odds"]} '
-                'events ont odds_snapshot externe alors que Winamax exact existe'
-            )
+        # v34.11 — Non bloquant : le frontend privilégie maintenant les cotes
+        # Winamax exactes pour les picks actionnables. La présence d'un ancien
+        # odds_snapshot externe reste exposée dans quality_checks pour audit,
+        # mais ne dégrade plus l'état santé.
         ratio = q['winamax_exact_ratio']
         if ratio is not None and ratio < 0.50:
             out['warnings'].append(

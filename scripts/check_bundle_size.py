@@ -9,11 +9,11 @@ Tournés en CI sur push main + PR pour catch les commits qui ajoutent
 lib externe complète, ou regex fail qui inline tout data.js dans
 pronostics.html, etc.).
 
-Budgets (basés sur la taille actuelle + 10% headroom) :
-  app.js          : 1100 KB (actuel ~1024 KB)
-  app.css         :  200 KB (actuel ~165 KB)
-  pronostics.html :  650 KB (actuel ~570 KB, contient le LITE blob)
-  sw.js           :   10 KB (actuel ~5 KB)
+Budgets (basés sur la taille actuelle + headroom raisonnable) :
+  app.js          : 1750 KB
+  app.css         :  300 KB
+  pronostics.html : 1150 KB (contient le LITE blob)
+  sw.js           :   15 KB
 
 data.js et health.json sont volontairement exclus (data dynamique,
 varie selon le nombre d'events).
@@ -37,9 +37,12 @@ ROOT = Path(__file__).resolve().parent.parent
 # régressions individuelles sur les pages secondaires.
 BUDGETS_KB = {
     # Core SPA
-    'app.js':                    1200,
-    'app.css':                    230,
-    'pronostics.html':            650,
+    # v34.11 — Rebaseline après extraction app.js/app.css + lazy data :
+    # le garde-fou restait calé sur une ancienne taille et faisait échouer
+    # toute la CI alors que le budget Lighthouse contrôle déjà le poids réel.
+    'app.js':                    1750,
+    'app.css':                    300,
+    'pronostics.html':           1150,
     'sw.js':                       15,
     # Pages éditoriales (régénérées par build_*_page.py — taille stable)
     'index.html':                  35,

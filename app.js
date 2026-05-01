@@ -1711,6 +1711,27 @@
     if (g) return g;
     return isoDate(new Date());
   }
+  function parisDateISO(value) {
+    if (!value) return '';
+    const d = value instanceof Date ? value : new Date(value);
+    if (isNaN(d.getTime())) return '';
+    try {
+      return d.toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+    } catch (e) {
+      return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    }
+  }
+  function eventsOnParisDate(data, targetDate) {
+    const out = [];
+    const seenIds = new Set();
+    Object.values((data && data.days) || {}).forEach(arr => (arr || []).forEach(m => {
+      if (m && m.id && seenIds.has(String(m.id))) return;
+      if (!m || !m.date || parisDateISO(m.date) !== targetDate) return;
+      if (m.id) seenIds.add(String(m.id));
+      out.push(m);
+    }));
+    return out;
+  }
   function addDays(iso, n) {
     const [y,m,d] = iso.split('-').map(Number);
     const dt = new Date(y, m-1, d);
@@ -7183,38 +7204,26 @@
     }).join('')}</div>`;
   }
 
+  function dismissBootShell() {
+    const shell = document.getElementById('boot-shell');
+    if (shell) shell.remove();
+  }
+
   function render() {
     const data = window.PRONOSTICS_DATA;
     if (!data) {
+      dismissBootShell();
       const banner = document.getElementById('no-data-banner');
       if (banner) banner.classList.remove('hidden');
       return;
     }
+    dismissBootShell();
     // We scan ALL stored day keys, not just data.days[currentDate]. ESPN stores events
     // under the "tournament start date" (tennis) or the UTC calendar day (football/NBA) —
     // so a Brasileirão match kicking off 23:00 UTC on 2026-04-19 is stored under
     // 2026-04-19 but falls on 2026-04-20 in Europe/Paris. Without scanning all keys,
     // those late-night South American + US matches silently vanish from the dashboard.
-    const rawAll = [];
-    const seenIds = new Set();
-    Object.values(data.days || {}).forEach(arr => (arr || []).forEach(m => {
-      if (m.id && seenIds.has(m.id)) return;
-      if (m.id) seenIds.add(m.id);
-      rawAll.push(m);
-    }));
-    // Keep only events whose actual kickoff falls on `currentDate` in Europe/Paris local time.
-    const all = rawAll.filter(m => {
-      if (!m.date) return false;
-      const d = new Date(m.date);
-      if (isNaN(d)) return false;
-      // Use Europe/Paris local date to match how Théo thinks about "aujourd'hui".
-      let iso;
-      try { iso = d.toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' }); }
-      catch (e) {
-        iso = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-      }
-      return iso === currentDate;
-    });
+    const all = eventsOnParisDate(data, currentDate);
 
     // === Counters per sport (pre-search, pre-filter) ===
     // Honor winamaxOnly so the per-sport tab badges never promise matches the user can't bet on.
@@ -13295,7 +13304,8 @@
     const scorable = [];
     Object.entries(data.days).forEach(([dayIso, arr]) => {
       (arr || []).forEach(m => {
-        if (!m.winamax || m.winamax.available !== true) return;
+        if (typeof isWinamaxBookable === 'function' && !isWinamaxBookable(m)) return;
+        if (typeof isWinamaxBookable !== 'function' && (!m.winamax || m.winamax.available !== true)) return;
         if (!m.completed) return;
         try {
           const pred = predictMatch(m);
@@ -13465,9 +13475,15 @@
       wrap.innerHTML = '<div style="padding:60px;text-align:center;color:var(--text-dim);">Chargement…</div>';
       return;
     }
-    const todayIso = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+    const todayIso = parisDateISO(new Date());
     const now = new Date();
-    const today = (data.days[todayIso] || []).filter(m => m.winamax && m.winamax.available === true);
+    const exactBookable = m => (
+      typeof isWinamaxBookable === 'function'
+        ? isWinamaxBookable(m)
+        : !!(m && m.winamax && m.winamax.available === true && m.winamax.match_id && m.winamax.markets && m.winamax.markets['1n2'])
+    );
+    const todayAllWinamax = eventsOnParisDate(data, todayIso).filter(m => m.winamax && m.winamax.available === true);
+    const today = todayAllWinamax.filter(exactBookable);
 
     // Agent replay (cached per render)
     const agent = _agentReplay();
@@ -13663,14 +13679,11 @@
     // === Prochaines opportunités par fenêtre de temps (4h/12h/24h) ===
     // Picks classés par confiance dans la fenêtre — utile pour "quoi parier maintenant ?".
     const nowMs = Date.now();
-    const tomorrowIsoTW = (() => {
-      const d = new Date(); d.setDate(d.getDate() + 1);
-      return d.toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
-    })();
+    const tomorrowIsoTW = addDays(todayIso, 1);
     const upcomingWin = _dataIsStale ? [] : [].concat(
-      (data.days[todayIso] || []),
-      (data.days[tomorrowIsoTW] || [])
-    ).filter(m => !m.completed && !m.live && m.winamax && m.winamax.available === true).map(m => {
+      eventsOnParisDate(data, todayIso),
+      eventsOnParisDate(data, tomorrowIsoTW)
+    ).filter(m => !m.completed && !m.live && exactBookable(m)).map(m => {
       try {
         const pred = predictMatch(m);
         if (!pred || !pred.pick || pred.skip) return null;
@@ -13752,10 +13765,10 @@
     // Utilise predictLikelyScorers (Poisson × position × lineup, exclut les blessés).
     const scorersToday = _dataIsStale ? [] : (() => {
       const arr = [];
-      [].concat((data.days[todayIso] || []), (data.days[tomorrowIsoTW] || []))
+      [].concat(eventsOnParisDate(data, todayIso), eventsOnParisDate(data, tomorrowIsoTW))
         .forEach(m => {
           if (m.sport !== 'football' || m.completed) return;
-          if (!(m.winamax && m.winamax.available === true)) return;
+          if (!exactBookable(m)) return;
           const ts = new Date(m.date).getTime();
           if (!isFinite(ts) || ts < nowMs) return;
           try {
@@ -14538,10 +14551,10 @@
         })() : ''}
 
         <!-- Sprint 78 (v31.7.165 — audit ChatGPT P0) — Compteurs ingérés / exacts / fallback -->
-        ${!_dataIsStale && today.length ? (() => {
-          const total = today.length;
-          const exact = today.filter(m => m.winamax && m.winamax.match_id && m.winamax.markets && m.winamax.markets['1n2']).length;
-          const tournamentOnly = today.filter(m => m.winamax && m.winamax.available && !m.winamax.match_id).length;
+        ${!_dataIsStale && todayAllWinamax.length ? (() => {
+          const total = todayAllWinamax.length;
+          const exact = todayAllWinamax.filter(m => m.winamax && m.winamax.match_id && m.winamax.markets && m.winamax.markets['1n2']).length;
+          const tournamentOnly = todayAllWinamax.filter(m => m.winamax && m.winamax.available && !m.winamax.match_id).length;
           const fallback = total - exact - tournamentOnly;
           const exactPct = total > 0 ? Math.round(exact * 100 / total) : 0;
           return `
