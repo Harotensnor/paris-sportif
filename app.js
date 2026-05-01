@@ -14178,12 +14178,37 @@
       .filter(x => x.rel >= 0.70 && x.odd >= 1.40 && x.odd <= 1.85 && x.edge >= 0.02)
       .sort((a, b) => b.rel - a.rel)
       .slice(0, 3);
-    const aggressivePicks = _dataIsStale ? [] : allTodayRaw
+    // Gros coups du jour (Théo : "je voie pas les gros coup enfaite") :
+    // critères relâchés + scope étendu 7 jours (au lieu de today seulement).
+    // Avant : edge≥8pt ET cote≥2.50 ET aujourd'hui = 0 quasi tous les jours.
+    // Maintenant : edge ≥ 5pt OU EV ≥ +12% sur cote ≥ 2.00, fenêtre 7j.
+    const _scopeAggressive = (typeof getScopedEvents === 'function')
+      ? getScopedEvents('7d', { requireExact: false })
+      : (today || []);
+    const aggressivePicks = _dataIsStale ? [] : _scopeAggressive
+      .filter(m => !m.live && !m.completed)
+      .map(m => {
+        try {
+          const pred = predictMatch(m);
+          if (!pred || !pred.pick || pred.skip) return null;
+          const best = _agentBestPick(m, pred);
+          const odd = best ? best.odd : (pred.odds && (pred.pick.key === '1' ? pred.odds.home : pred.pick.key === '2' ? pred.odds.away : pred.odds.draw));
+          if (!odd || odd <= 1.01) return null;
+          const rel = best ? best.rel : (pred.reliability ?? pred.pick.prob);
+          if (!rel || rel <= 0) return null;
+          const edge = rel - 1/odd;
+          return { m, pred, odd, rel, edge, best };
+        } catch(e) { return null; }
+      })
+      .filter(Boolean)
       .filter(x => !topIds.has(x.m.id))
-      .filter(x => !x.m.live && !x.m.completed && _notStarted(x.m))
-      .filter(x => x.edge >= 0.08 && x.odd >= 2.50 && x.rel >= 0.40)
-      .sort((a, b) => b.edge - a.edge)
-      .slice(0, 2);
+      .filter(x => _notStarted(x.m))
+      .filter(x => x.odd >= 2.00 && x.rel >= 0.35
+                && (x.edge >= 0.05 || (x.rel * x.odd - 1) >= 0.12))
+      .filter(x => !_losingSports.has(x.m.sport))
+      .filter((x, i, arr) => arr.findIndex(y => y.m.id === x.m.id) === i)  // dédup
+      .sort((a, b) => (b.rel * b.odd - 1) - (a.rel * a.odd - 1))  // tri par EV
+      .slice(0, 6);
     // Compute Kelly + stake pour chacun (même logique que topPicks)
     // 2026-05-01 — Ajout `ev` (Expected Value) pour affichage cohérent
     // avec edge sur toutes les cards. EV = rel × odd - 1.
@@ -14949,6 +14974,67 @@
           </div>
         </div>`)}
 
+        <!-- 2026-05-01 (Théo : "je voie pas les gros coup") — Section dédiée
+             "💰 Gros coups du jour" séparée et placée HAUT pour visibilité.
+             Doublon avec la grille 3+3+2 d'en-bas, mais ici en gros et coloré
+             pour que l'user la voie au scroll. -->
+        ${aggressivePicksEnriched.length ? `
+        <section style="padding:24px 0 12px;border-top:1px solid var(--border);">
+          <div style="display:flex;align-items:end;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px;">
+            <div>
+              <div style="font-size:11px;color:var(--warn);text-transform:uppercase;letter-spacing:1.4px;font-weight:800;">💎 High-risk / High-reward</div>
+              <h2 style="font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.5px;margin:2px 0 4px;">💰 Gros coups du jour</h2>
+              <div style="font-size:13px;color:var(--text-dim);">Cotes ≥ 2.00 avec edge significatif — gros gain potentiel pour 1€ misé. <b>Mise prudente</b> : 1-2% de bankroll max.</div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;">
+            ${aggressivePicksEnriched.map(p => {
+              const sides = (typeof getSides === 'function') ? getSides(p.m) : { home:{}, away:{} };
+              const hN = sides.home?.short || sides.home?.name || '?';
+              const aN = sides.away?.short || sides.away?.name || '?';
+              const hLogo = sides.home?.logo || '';
+              const aLogo = sides.away?.logo || '';
+              const lg = p.m.league_name || p.m.league_code || '';
+              const tLbl = (typeof fmtTime === 'function') ? fmtTime(p.m.date) : '';
+              const pickLbl = (p.best && p.best.label) || (p.pred.pick && p.pred.pick.label) || 'Pick';
+              const evPct = (p.ev || 0) * 100;
+              const gainTxt = p.gain >= 1 ? `+${p.gain.toFixed(0)}€` : `+${p.gain.toFixed(2)}€`;
+              return `
+                <article class="interactive" data-match-id="${esc(String(p.m.id))}" role="button" tabindex="0" style="padding:14px 16px;background:linear-gradient(135deg, rgba(251,191,36,.12), rgba(248,113,113,.06));border:1px solid rgba(251,191,36,.3);border-radius:12px;cursor:pointer;transition:transform .15s, border-color .15s;">
+                  <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;font-size:11px;color:var(--text-dim);font-weight:600;">
+                    <span>${esc(tLbl)} · ${esc(String(lg).slice(0,24))}</span>
+                    <span style="background:rgba(251,191,36,.18);color:var(--warn);padding:2px 8px;border-radius:999px;font-weight:800;">@${p.odd.toFixed(2)}</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">
+                    ${hLogo ? `<img src="${esc(hLogo)}" alt="" style="width:24px;height:24px;object-fit:contain;border-radius:4px;background:rgba(255,255,255,.04);padding:1px;">` : ''}
+                    <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(hN)}</span>
+                    <span style="color:var(--text-dim);font-weight:400;">vs</span>
+                    ${aLogo ? `<img src="${esc(aLogo)}" alt="" style="width:24px;height:24px;object-fit:contain;border-radius:4px;background:rgba(255,255,255,.04);padding:1px;">` : ''}
+                    <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(aN)}</span>
+                  </div>
+                  <div style="font-size:13px;color:var(--brand);font-weight:700;margin-bottom:10px;">→ ${esc(pickLbl)}</div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:11px;">
+                    <div style="background:rgba(255,255,255,.03);padding:6px 8px;border-radius:6px;">
+                      <div style="color:var(--text-dim);text-transform:uppercase;font-size:9.5px;letter-spacing:.5px;">Confiance</div>
+                      <div style="font-size:14px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;">${Math.round(p.rel*100)}%</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,.03);padding:6px 8px;border-radius:6px;">
+                      <div style="color:var(--text-dim);text-transform:uppercase;font-size:9.5px;letter-spacing:.5px;">Edge</div>
+                      <div style="font-size:14px;font-weight:700;color:var(--warn);font-variant-numeric:tabular-nums;">+${(p.edge*100).toFixed(0)}pt</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,.03);padding:6px 8px;border-radius:6px;">
+                      <div style="color:var(--text-dim);text-transform:uppercase;font-size:9.5px;letter-spacing:.5px;">EV</div>
+                      <div style="font-size:14px;font-weight:700;color:${evPct>=15?'var(--accent)':'var(--warn)'};font-variant-numeric:tabular-nums;">+${evPct.toFixed(0)}%</div>
+                    </div>
+                  </div>
+                  <div style="margin-top:10px;padding-top:8px;border-top:1px dashed rgba(255,255,255,.08);font-size:11.5px;color:var(--text-dim);">
+                    💸 <b style="color:var(--text);">${p.stake}€</b> misé → gain potentiel <b style="color:var(--accent);">${gainTxt}</b>
+                  </div>
+                </article>`;
+            }).join('')}
+          </div>
+        </section>` : ''}
+
         <!-- Sprint 85 (v31.7.172 — audit Part 4) — Sections Prudents / Agressifs / Autres -->
         ${(prudentPicksEnriched.length || aggressivePicksEnriched.length) ? `
         <div style="padding:24px 0;border-top:1px solid var(--border);">
@@ -14984,7 +15070,8 @@
             </div>` : ''}
             ${aggressivePicksEnriched.length ? `
             <div>
-              <div style="font-size:11px;color:var(--warn);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:6px;">💰 Gros coups du jour (${aggressivePicksEnriched.length}/2)</div>
+              <div style="font-size:13px;color:var(--warn);text-transform:uppercase;letter-spacing:.6px;font-weight:800;margin-bottom:8px;">💰 Gros coups du jour <span style="background:rgba(251,191,36,.15);color:var(--warn);padding:2px 8px;border-radius:999px;font-size:11px;margin-left:6px;">${aggressivePicksEnriched.length} dispo</span></div>
+              <div style="font-size:11px;color:var(--text-dim);margin-bottom:8px;font-weight:400;text-transform:none;letter-spacing:0;">Cote ≥ 2.00 · edge ≥ +5pt OU EV ≥ +12%. Risque ↑ mais gros gains potentiels.</div>
               <div style="display:flex;flex-direction:column;gap:6px;">
                 ${aggressivePicksEnriched.map(p => {
                   const sides = (typeof getSides === 'function') ? getSides(p.m) : { home:{}, away:{} };
