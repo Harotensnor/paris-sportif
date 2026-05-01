@@ -104,31 +104,30 @@ test.describe('Audit P0 — selectBestMarket unifié', () => {
   });
 });
 
-test.describe('Audit P1 — Renaming pages', () => {
-  test('menu desktop affiche "Tous les pronostics"', async ({ page, isMobile }) => {
+test.describe('Audit P1 — Navigation labels', () => {
+  test('menu desktop affiche "Tous les matchs"', async ({ page, isMobile }) => {
     test.skip(isMobile, 'Menu desktop, skip sur mobile');
     await page.goto(URL);
     await page.waitForLoadState('networkidle');
-    // Le menu Pronostics est un dropdown, vérifier que le label texte est correct
+    // Le hub Explorer contient la vue exhaustive des matchs.
     const html = await page.content();
-    expect(html).toContain('Tous les pronostics');
+    expect(html).toContain('Tous les matchs');
   });
 
-  test('menu desktop affiche "Buts &amp; joueurs" (pas "Buteurs")', async ({ page, isMobile }) => {
+  test('menu desktop affiche "Buteurs"', async ({ page, isMobile }) => {
     test.skip(isMobile, 'Menu desktop, skip sur mobile');
     await page.goto(URL);
     await page.waitForLoadState('networkidle');
     const html = await page.content();
-    // Either "Buts & joueurs" (decoded) or "Buts &amp; joueurs" (raw HTML)
-    expect(html.includes('Buts & joueurs') || html.includes('Buts &amp; joueurs')).toBe(true);
+    expect(html).toContain('Buteurs');
   });
 
-  test('menu desktop affiche "Favoris &amp; alertes"', async ({ page, isMobile }) => {
+  test('menu desktop affiche "Favoris"', async ({ page, isMobile }) => {
     test.skip(isMobile, 'Menu desktop, skip sur mobile');
     await page.goto(URL);
     await page.waitForLoadState('networkidle');
     const html = await page.content();
-    expect(html.includes('Favoris & alertes') || html.includes('Favoris &amp; alertes')).toBe(true);
+    expect(html).toContain('Favoris');
   });
 });
 
