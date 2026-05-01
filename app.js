@@ -7172,7 +7172,8 @@
   function render() {
     const data = window.PRONOSTICS_DATA;
     if (!data) {
-      document.getElementById('no-data-banner').classList.remove('hidden');
+      const banner = document.getElementById('no-data-banner');
+      if (banner) banner.classList.remove('hidden');
       return;
     }
     // We scan ALL stored day keys, not just data.days[currentDate]. ESPN stores events
@@ -7611,7 +7612,8 @@
         <div class="sub">18 compétitions foot · NBA/WNBA/NCAA · ATP/WTA</div>
       </div>
     `;
-    document.getElementById('summary-bar').innerHTML = html;
+    const summaryBar = document.getElementById('summary-bar');
+    if (summaryBar) summaryBar.innerHTML = html;
   }
 
   function renderFilters(sportEvents) {
@@ -8447,7 +8449,11 @@
     const wrap = document.getElementById('combines-wrap');
     if (!wrap) return;
     const data = window.PRONOSTICS_DATA;
-    if (!data || !data.days) { wrap.innerHTML = ''; return; }
+    // QA bug-hunt (2026-05-02) : empty state explicite au lieu d'un blanc
+    if (!data || !data.days) {
+      wrap.innerHTML = '<div class="empty-state" style="padding:40px 20px;text-align:center;color:var(--text-dim);font-size:14px;">⏳ Chargement des combinés…</div>';
+      return;
+    }
 
     // Flatten all upcoming events across all days — we'll slice by time window.
     // This makes combinés time-driven, not day-driven: the legs shown depend
@@ -26662,10 +26668,16 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       const future = keys.filter(k => k >= localToday);
       currentDate = future.length ? future[0] : keys[keys.length - 1];
     }
-    document.getElementById('date').value = currentDate;
-    if (keys.length) {
-      document.getElementById('date').min = keys[0];
-      document.getElementById('date').max = keys[keys.length - 1];
+    // QA bug-hunt (2026-05-02) : guards null sur input#date (peut être absent
+    // selon layout / mode focus / mobile drawer). Avant : crash silencieux si
+    // input retiré du DOM.
+    const dateInput = document.getElementById('date');
+    if (dateInput) {
+      dateInput.value = currentDate;
+      if (keys.length) {
+        dateInput.min = keys[0];
+        dateInput.max = keys[keys.length - 1];
+      }
     }
     // P1-7 (audit 2026-05-01) : peuple le sub-titre topbar dynamiquement
     // selon les sports actifs aujourd'hui. Avant : hardcoded "Foot · Tennis · NBA · NHL · MLB"
