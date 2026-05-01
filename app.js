@@ -14625,10 +14625,197 @@
       </section>`;
     })();
 
+    // v34.34 — Cockpit d'accueil : le dashboard devient un poste de décision,
+    // pas une pile de sections. Il reprend les signaux déjà calculés ci-dessus
+    // et donne en un écran : quoi faire, combien miser, quoi surveiller.
+    const _dashboardCockpit = (() => {
+      const ageLabel = _dataAgeMin < 2 ? "à l'instant" : (_dataAgeMin < 60 ? `${_dataAgeMin} min` : `${Math.floor(_dataAgeMin / 60)}h${String(_dataAgeMin % 60).padStart(2, '0')}`);
+      const ageTone = _dataIsStale ? 'danger' : (_dataAgeMin < 30 ? 'ok' : (_dataAgeMin < 120 ? 'warn' : 'danger'));
+      const primary = topPicks[0] || heroPick || null;
+      const playableCount = topPicks.length + prudentPicksEnriched.length + aggressivePicksEnriched.length;
+      const watchCount = orphanBigMatches.length || topImportantMatches.filter(x => x.status && x.status.code !== 'strong').length;
+      const totalStakePlan = topPicks.reduce((s, x) => s + (Number(x.stake) || 0), 0);
+      const totalGainPlan = topPicks.reduce((s, x) => s + (Number(x.gain) || 0), 0);
+      const budgetPct = userBankroll > 0 ? totalStakePlan / userBankroll * 100 : 0;
+      const nextBucket = topNext4h.length ? ['0-4h', topNext4h.length] : (topNext12h.length ? ['4-12h', topNext12h.length] : (topNext24h.length ? ['12-24h', topNext24h.length] : ['24h', 0]));
+      const exactCount = todayAllWinamax.filter(m => exactBookable(m)).length;
+      const scanCount = todayStats.total || today.length || todayAllWinamax.length;
+      const missionTone = _dataIsStale ? 'danger' : (topPicks.length ? 'go' : (allTodayRaw.length ? 'watch' : 'calm'));
+      const missionLabel = _dataIsStale
+        ? 'Pause data'
+        : (topPicks.length ? 'Action'
+          : (allTodayRaw.length ? 'Surveillance' : 'Patience'));
+      const missionCopy = _dataIsStale
+        ? 'Les données sont trop anciennes, aucun pari actionnable.'
+        : (topPicks.length
+          ? `${topPicks.length} value bet${topPicks.length > 1 ? 's' : ''} passe${topPicks.length > 1 ? 'nt' : ''} les filtres edge + EV.`
+          : (allTodayRaw.length
+            ? "Des matchs existent, mais aucun ne mérite une mise forte pour l'instant."
+            : "Le modèle ne force rien aujourd'hui. C'est une décision, pas un bug."));
+
+      const fmtPct = (v, digits = 0) => `${(Number(v) * 100).toFixed(digits)}%`;
+      const fmtSigned = (v, unit = '') => `${Number(v) >= 0 ? '+' : ''}${Number(v).toFixed(2)}${unit}`;
+      const formatCountdown = (match) => {
+        const ts = match && match.date ? new Date(match.date).getTime() : 0;
+        if (!isFinite(ts) || ts <= 0) return '';
+        const diffMs = ts - Date.now();
+        if (diffMs <= 0) return 'Match commence';
+        const min = Math.floor(diffMs / 60000);
+        if (min < 60) return `dans ${min} min`;
+        if (min < 1440) {
+          const h = Math.floor(min / 60);
+          const m = min % 60;
+          return `dans ${h}h${m ? String(m).padStart(2, '0') : ''}`;
+        }
+        return `dans ${Math.floor(min / 1440)}j`;
+      };
+      const miniMatch = (x) => {
+        if (!x || !x.m) return '';
+        const { home, away } = (typeof getSides === 'function') ? getSides(x.m) : { home: {}, away: {} };
+        const h = home?.short || home?.name || '?';
+        const a = away?.short || away?.name || '?';
+        const pick = (x.best && x.best.label) || (x.pred && x.pred.pick && x.pred.pick.label) || 'Pick';
+        return `${h} vs ${a} · ${pick}`;
+      };
+      const primaryHtml = primary ? (() => {
+        const pickLabel = (primary.best && primary.best.label) || (primary.pred && primary.pred.pick && primary.pred.pick.label) || 'Pick';
+        const edge = Number(primary.edge) || 0;
+        const ev = (primary.ev != null) ? Number(primary.ev) : ((Number(primary.rel) || 0) * (Number(primary.odd) || 0) - 1);
+        const stake = Number(primary.stake) || 0;
+        const gain = Number(primary.gain) || (stake * ((Number(primary.odd) || 1) - 1));
+        const hasAction = topPicks.length > 0 && !_dataIsStale && stake > 0;
+        const wxUrl = (primary.m && primary.m.winamax && primary.m.winamax.url) ? primary.m.winamax.url : 'https://www.winamax.fr/paris-sportifs';
+        const matchId = String(primary.m && primary.m.id || '');
+        const market = (primary.best && primary.best.market) || '1n2';
+        const pickKey = (primary.best && primary.best.key) || (primary.pred && primary.pred.pick && primary.pred.pick.key) || '';
+        return `
+          <article class="dash-cockpit__pick interactive" data-match-id="${esc(matchId)}" role="button" tabindex="0">
+            <div class="dash-cockpit__pick-head">
+              <span class="dash-cockpit__eyebrow">${hasAction ? 'Priorité de mise' : 'Match à surveiller'}</span>
+              <span class="dash-cockpit__countdown action-focus-countdown" data-kickoff="${primary.m && primary.m.date ? new Date(primary.m.date).getTime() : 0}">${esc(formatCountdown(primary.m))}</span>
+            </div>
+            <h1 class="dash-cockpit__match">${esc(primary.homeName || '?')} <span>vs</span> ${esc(primary.awayName || '?')}</h1>
+            <div class="dash-cockpit__league">${esc((primary.m && (primary.m.league_name || primary.m.league)) || '')}</div>
+            <div class="dash-cockpit__betline">
+              <div>
+                <span>Pick</span>
+                <strong>${esc(pickLabel)}</strong>
+              </div>
+              <div>
+                <span>Cote</span>
+                <strong>@${Number(primary.odd || 0).toFixed(2)}</strong>
+              </div>
+              <div>
+                <span>Conf.</span>
+                <strong>${fmtPct(primary.rel || 0)}</strong>
+              </div>
+              <div>
+                <span>Edge</span>
+                <strong class="${edge >= 0 ? 'is-good' : 'is-bad'}">${edge >= 0 ? '+' : ''}${Math.round(edge * 100)}pt</strong>
+              </div>
+            </div>
+            <div class="dash-cockpit__stake">
+              <div>
+                <span>Mise conseillée</span>
+                <strong>${hasAction ? `${stake.toFixed(0)}€` : '0€'}</strong>
+                <em>${hasAction ? `Gain potentiel +${gain.toFixed(0)}€` : `EV ${ev >= 0 ? '+' : ''}${Math.round(ev * 100)}% · pas de mise forcee`}</em>
+              </div>
+              <div class="dash-cockpit__riskbar" aria-label="Part de bankroll recommandée">
+                <span style="width:${Math.min(100, Math.max(0, budgetPct)).toFixed(0)}%"></span>
+              </div>
+            </div>
+            <div class="dash-cockpit__actions">
+              <button type="button" class="dash-cockpit__btn dash-cockpit__btn--primary ed-hero__primary" data-match-id="${esc(matchId)}">Détail match</button>
+              ${hasAction ? `<a class="dash-cockpit__btn dash-cockpit__btn--book" href="${esc(wxUrl)}" target="_blank" rel="noopener noreferrer" data-no-detail="1">Winamax</a>` : ''}
+              ${hasAction ? `<button type="button" class="dash-cockpit__btn action-focus-trackbet" data-match-id="${esc(matchId)}" data-market="${esc(market)}" data-pick-key="${esc(pickKey)}" data-pick-label="${esc(pickLabel)}" data-odd="${Number(primary.odd || 0)}" data-stake="${stake}">J'ai parié</button>` : `<button type="button" class="dash-cockpit__btn page-btn" data-page="matchs">Voir le scan</button>`}
+            </div>
+          </article>`;
+      })() : `
+          <article class="dash-cockpit__pick dash-cockpit__pick--empty">
+            <span class="dash-cockpit__eyebrow">Mode patience</span>
+            <h1 class="dash-cockpit__match">Aucune mise forte maintenant</h1>
+            <p>Le scan a écarté les picks faibles : ${todayStats.lowConf || 0} confiance basse, ${todayStats.noEdge || 0} sans edge, ${todayStats.skip || 0} skips modèle.</p>
+            <div class="dash-cockpit__actions">
+              <button type="button" class="dash-cockpit__btn dash-cockpit__btn--primary page-btn" data-page="calendrier">Calendrier 7j</button>
+              <button type="button" class="dash-cockpit__btn page-btn" data-page="matchs">Explorer les matchs</button>
+              <button type="button" class="dash-cockpit__btn page-btn" data-page="performance">Performance</button>
+            </div>
+          </article>`;
+
+      const quickTiles = [
+        ['valeur', 'Edges 7j', `${aggressivePicksEnriched.length || otherOpportunities.length} pistes`, 'Marchés qui sous-cotent le modèle'],
+        ['plan-mise', 'Plan de mise', totalStakePlan > 0 ? `${totalStakePlan.toFixed(0)}€ proposes` : 'Rien a forcer', 'Ticket bankroll propre'],
+        ['locks', 'Locks', `${positions.length} position${positions.length > 1 ? 's' : ''}`, 'Picks les plus stables'],
+        ['calendrier', 'Calendrier', `${exactCount}/${todayAllWinamax.length || today.length} exacts`, 'Vue 7 jours Winamax'],
+        ['performance', 'Performance', `${fmtSigned(agent.delta7, '€')} 7j`, 'Voir si le modèle tient'],
+        ['simulator', 'Simulateur', 'What-if', 'Tester bankroll et variance'],
+      ].map(([page, title, value, hint]) => `
+        <button type="button" class="dash-cockpit__tile page-btn" data-page="${esc(page)}">
+          <span>${esc(title)}</span>
+          <strong>${esc(value)}</strong>
+          <em>${esc(hint)}</em>
+        </button>`).join('');
+
+      return `
+        <section class="dash-cockpit dash-cockpit--${missionTone}" role="region" aria-label="Cockpit du jour">
+          <div class="dash-cockpit__top">
+            <div>
+              <span class="dash-cockpit__kicker">Cockpit Paris-Sportif</span>
+              <h1>Mission du jour</h1>
+              <p>${esc(missionCopy)}</p>
+            </div>
+            <div class="dash-cockpit__status">
+              <span class="dash-cockpit__status-pill dash-cockpit__status-pill--${ageTone}">${esc(missionLabel)}</span>
+              <span>MAJ ${esc(ageLabel)}</span>
+            </div>
+          </div>
+
+          <div class="dash-cockpit__grid">
+            ${primaryHtml}
+            <aside class="dash-cockpit__panel" aria-label="Synthèse modèle">
+              <div class="dash-cockpit__mini-title">Tableau de bord</div>
+              <div class="dash-cockpit__metrics">
+                <div><span>Scan</span><strong>${scanCount}</strong><em>matchs analysés</em></div>
+                <div><span>Value</span><strong>${playableCount}</strong><em>picks qualifiés</em></div>
+                <div><span>Bankroll</span><strong>${userBankroll.toFixed(0)}€</strong><em>${budgetPct.toFixed(0)}% engagés</em></div>
+                <div><span>Agent</span><strong style="color:${deltaColor};">${nav.toFixed(2)}€</strong><em>${deltaSign}${agent.delta7.toFixed(2)}€ sur 7j</em></div>
+              </div>
+              <div class="dash-cockpit__lanes">
+                <div class="dash-cockpit__lane dash-cockpit__lane--go">
+                  <span>À jouer</span>
+                  <strong>${topPicks.length}</strong>
+                  <em>${topPicks[0] ? esc(miniMatch(topPicks[0]).slice(0, 64)) : 'Aucun bet value strict'}</em>
+                </div>
+                <div class="dash-cockpit__lane dash-cockpit__lane--watch">
+                  <span>À surveiller</span>
+                  <strong>${watchCount}</strong>
+                  <em>${orphanBigMatches[0] ? esc(miniMatch({ m: orphanBigMatches[0].m, pred: orphanBigMatches[0].pred }).slice(0, 64)) : `${nextBucket[1]} pick${nextBucket[1] > 1 ? 's' : ''} dans ${nextBucket[0]}`}</em>
+                </div>
+                <div class="dash-cockpit__lane dash-cockpit__lane--calm">
+                  <span>Discipline</span>
+                  <strong>${_dataIsStale ? 'Pause' : (totalStakePlan > 0 ? `${totalGainPlan.toFixed(0)}€` : '0€')}</strong>
+                  <em>${_dataIsStale ? 'Refresh requis' : (totalStakePlan > 0 ? 'gain potentiel top 3' : 'bankroll préservée')}</em>
+                </div>
+              </div>
+            </aside>
+          </div>
+
+          <div class="dash-cockpit__quick" aria-label="Actions rapides">
+            ${quickTiles}
+          </div>
+
+          <div class="dash-cockpit__footer">
+            <button type="button" class="dash-cockpit__link action-focus-howto">Comment lire un prono</button>
+            <span>${todayStats.ok || 0} picks OK après filtres · ${todayStats.lowConf || 0} low conf · ${todayStats.noEdge || 0} no edge · ${todayStats.noOdds || 0} sans cote</span>
+            ${_dataIsStale ? '<button type="button" class="dash-cockpit__link" data-agent-force-refresh>Forcer le refresh</button>' : '<button type="button" class="dash-cockpit__link page-btn" data-page="sante">Santé data</button>'}
+          </div>
+        </section>`;
+    })();
+
     wrap.innerHTML = `
       <div style="max-width:1280px;margin:0 auto;padding:0 20px;font-variant-numeric:tabular-nums;">
 
-        ${_actionFocus}
+        ${_dashboardCockpit}
 
         ${_userBetsBilan}
 
@@ -14636,13 +14823,10 @@
 
         <!-- v30 — Daily P&L chip retiré : Théo n'enregistre pas ses paris. -->
 
-        <!-- v31.3 — Hero éditorial mobile-first (audit UX dashboard éditorial).
-             v31.7.206 — REDONDANCE FIX : ed-hero affiche le top pick. Mais
-             action-focus juste au-dessus l'affiche AUSSI dans .action-focus-top.
-             → ed-hero ne s'affiche maintenant que SI action-focus est en empty
-             state (topPicks.length === 0). Sinon redondance triple sur le même
-             match. Économie ~500px d'espace dashboard. -->
-        ${(heroPick && topPicks.length === 0) ? (() => {
+        <!-- v34.34 — Legacy ed-hero désactivé : le cockpit couvre maintenant
+             l'action principale ET l'état vide sans doublon visuel. Bloc gardé
+             une version comme rollback rapide pendant la stabilisation. -->
+        ${false ? (topPicks.length ? '' : ((heroPick && topPicks.length === 0) ? (() => {
           const _reasons = heroPick.pred?.explain?.reasons || [];
           // Top 2 raisons non-marché pour donner du contexte sans saturer
           const _topReasons = _reasons.filter(r => r && r.type !== 'market').slice(0, 2);
@@ -14805,7 +14989,7 @@
             </footer>
           </article>
         `;
-        })()}
+        })())) : ''}
 
         ${(() => {
           // v31.7.35 → v31.7.75 : Stats hero strip enrichi à 5 KPIs cliquables
@@ -28165,29 +28349,20 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     if (_pwaLaterBtn) _pwaLaterBtn.addEventListener('click', () => { _pwaSnooze(7); _pwaHideBanner(); });
     if (_pwaDismissBtn) _pwaDismissBtn.addEventListener('click', () => { _pwaSnooze(30); _pwaHideBanner(); });
 
-    // v30 — Click sur badge version footer → modal récap nouveautés
+    // v34.34 — Click sur badge version footer → modal récap nouveautés
     const versionBadge = document.getElementById('footer-version');
     if (versionBadge) {
       const _showWhatsNew = () => {
         const features = [
-          '🎯 Calibration plot — preuve d\'honnêteté du modèle (page Crédibilité)',
-          '📊 Performance par sport / cote / tier (page Crédibilité)',
-          '⏱️ Match countdown timer "dans X min" + pulse imminent <30min',
-          '💰 Daily P&L chip prominent (dashboard)',
-          '🔥 Streak banner (≥2 paris consécutifs)',
-          '📋 Activité récente (5 derniers paris) sur dashboard',
-          '⚡ Quick stake presets (1/2/5/10€/Kelly) sur cards expand',
-          '🟢 Health indicator pipeline topbar',
-          '⌨️ Search keyboard nav (↑↓ Enter Esc)',
-          '📤 Bouton partager match (URL ?match=ID)',
-          '🌓 Thème 3-state (dark / light / auto système)',
-          '📱 PWA install prompt + 4 shortcuts manifest',
-          '🦶 Footer + tooltips info Edge/Conf/Cote',
-          '❓ Help modal raccourcis (touche ?)',
+          '🎛️ Cockpit d\'accueil : mission du jour, statut data, bankroll, agent et plan d\'action en un écran',
+          '🎯 Pick principal redesigné avec mise conseillée, edge, EV, countdown et lien Winamax',
+          '🧭 Raccourcis rapides vers edges 7j, plan de mise, locks, calendrier, performance et simulateur',
+          '🛡️ Mode patience plus clair quand aucun pari ne mérite d\'être forcé',
+          '📱 Layout cockpit revu desktop + mobile, sans doublon ancien "aucun pari recommandé"',
         ];
         const html = '<div style="text-align:left;padding:8px 0;">' +
-          '<h3 style="margin:0 0 12px;font-size:18px;color:var(--text);">🎉 Nouveautés v30</h3>' +
-          '<div style="font-size:11px;color:var(--text-dim);margin-bottom:14px;">Cliquer sur l\'icône Calibration en bas à gauche du Crédibilité pour voir notre meilleur écart vs prédictions.</div>' +
+          '<h3 style="margin:0 0 12px;font-size:18px;color:var(--text);">🎉 Nouveautés v34.34</h3>' +
+          '<div style="font-size:11px;color:var(--text-dim);margin-bottom:14px;">Le premier écran devient un vrai cockpit de décision : quoi faire, quoi éviter, et où aller ensuite.</div>' +
           '<ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:7px;font-size:13px;color:var(--text-2);line-height:1.5;">' +
           features.map(f => `<li>${f}</li>`).join('') + '</ul></div>';
         // Réutiliser le pattern showShortcutsHelp si dispo
