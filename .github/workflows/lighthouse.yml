@@ -68,7 +68,7 @@ jobs:
         run: |
           npx lighthouse http://localhost:8765/index.html \
             --output=json \
-            --output-path=./lighthouse-index \
+            --output-path=./lighthouse-index.report.json \
             --chrome-flags="--headless --no-sandbox --disable-gpu" \
             --only-categories=performance,accessibility,best-practices,seo \
             --quiet
