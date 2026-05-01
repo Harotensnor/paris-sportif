@@ -21895,10 +21895,42 @@
               </tr>`;
           }).join('');
           const nWithRoi = entries.filter(([, v]) => v.roi != null).length;
+          // v33.15 — Insights auto basé sur CI Wilson 95% (mirror analyze_calibration.py)
+          // Pour chaque (marché, pick) avec n ≥ 10, on classe :
+          //   ✓ Edge significatif : ci_lo ≥ 0.55
+          //   🟡 Edge faible       : ci_lo ≥ 0.50
+          //   🔴 Anti-edge        : ci_hi ≤ 0.50 (le pick opposé serait gagnant)
+          //   — Bruit             : sinon
+          const insights = { strong: [], weak: [], anti: [], noise: [] };
+          const marketLabels2 = { ou25: 'OU 2.5', ou15: 'OU 1.5', ou35: 'OU 3.5', btts: 'BTTS', doubleChance: 'Double chance', exactScore: 'Score exact', basketTotal: 'Total points basket', basketHandicap: 'Handicap basket' };
+          for (const [k, v] of entries) {
+            if ((v.n || 0) < 10) continue;
+            const lo = v.wr_ci_lo;
+            const hi = v.wr_ci_hi;
+            if (lo == null || hi == null) continue;
+            const [mk, pv] = k.split(':');
+            const lbl = `${marketLabels2[mk] || mk} → ${pv}`;
+            if (lo >= 0.55) insights.strong.push({ k: lbl, n: v.n, wr: v.win_rate });
+            else if (lo >= 0.50) insights.weak.push({ k: lbl, n: v.n, wr: v.win_rate });
+            else if (hi <= 0.50) insights.anti.push({ k: lbl, n: v.n, wr: v.win_rate });
+            else insights.noise.push({ k: lbl, n: v.n, wr: v.win_rate });
+          }
+          const nTotalInsights = insights.strong.length + insights.weak.length + insights.anti.length + insights.noise.length;
+          const insightBanner = nTotalInsights === 0 ? '' : `
+            <div style="margin-bottom:14px;padding:14px 16px;background:linear-gradient(135deg,rgba(167,139,250,.08),rgba(16,185,129,.04));border:1px solid var(--brand-soft);border-radius:var(--r-sm);">
+              <div style="font-size:13px;font-weight:700;color:var(--brand);margin-bottom:8px;">💡 Insights auto (CI Wilson 95%, n ≥ 10)</div>
+              <div style="display:grid;gap:6px;font-size:12px;line-height:1.5;color:var(--text);">
+                ${insights.strong.length ? `<div><b style="color:var(--accent);">✓ Edge significatif (${insights.strong.length}) :</b> <span style="color:var(--text-dim);">${insights.strong.slice(0,3).map(i => `${esc(i.k)} (${(i.wr*100).toFixed(0)}%, n=${i.n})`).join(' · ')}${insights.strong.length > 3 ? ` … +${insights.strong.length-3}` : ''}</span></div>` : ''}
+                ${insights.weak.length ? `<div><b style="color:var(--warn,#fbbf24);">🟡 Edge faible (${insights.weak.length}) :</b> <span style="color:var(--text-dim);">${insights.weak.slice(0,3).map(i => `${esc(i.k)} (${(i.wr*100).toFixed(0)}%, n=${i.n})`).join(' · ')}${insights.weak.length > 3 ? ` … +${insights.weak.length-3}` : ''}</span></div>` : ''}
+                ${insights.anti.length ? `<div><b style="color:var(--danger);">🔴 Anti-edge (${insights.anti.length}) :</b> <span style="color:var(--text-dim);">${insights.anti.slice(0,3).map(i => `${esc(i.k)} (${(i.wr*100).toFixed(0)}%, n=${i.n})`).join(' · ')}${insights.anti.length > 3 ? ` … +${insights.anti.length-3}` : ''}</span> <span style="color:var(--text-dim2);font-style:italic;">— picks opposés profitables</span></div>` : ''}
+                ${insights.noise.length ? `<div><b style="color:var(--text-dim);">— Bruit (${insights.noise.length}) :</b> <span style="color:var(--text-dim2);">CI inclut 50%, modèle non distinguable du hasard.</span></div>` : ''}
+              </div>
+            </div>`;
           return `
             <div style="margin-top:18px;">
               <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">🏷️ Performance par marché</div>
               <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">${mktRep.completed_evaluated || 0} matchs completed évalués · ${entries.length} (marché, pick) combinaisons avec n ≥ 5${nWithRoi > 0 ? `, ${nWithRoi} avec ROI calculé` : ''}.</div>
+              ${insightBanner}
               <div style="overflow-x:auto;">
                 <table style="width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:13px;">
                   <thead>
