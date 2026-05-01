@@ -76,6 +76,11 @@ SOURCES = [
     ('clubelo',         'clubelo.json',         _count_clubelo),
     ('weather',         'weather.json',         lambda d: {'events': len(d.get('matches') or d.get('forecasts') or {}) if isinstance(d, dict) else 0}),
     ('referees_soccer', 'referees_soccer.json', _count_events),
+    # v33.6 — Sources ajoutées pour visibility complète du pipeline.
+    ('fbref_xg',        'fbref_xg.json',        lambda d: {'leagues': len(d.get('leagues') or {}) if isinstance(d, dict) else 0}),
+    ('sofascore_events', 'sofascore_events.json', lambda d: {'total': d.get('total') or sum(len(v) for v in (d.get('events') or {}).values()) if isinstance(d, dict) else 0}),
+    ('team_form',       'team_form.json',       lambda d: {'teams': len(d.get('teams') or {}) if isinstance(d, dict) else 0}),
+    ('footballdata',    'footballdata.json',    lambda d: {'rows': len(d.get('rows') or []) if isinstance(d, dict) else 0}),
 ]
 
 # Soft thresholds (minutes) above which a source is flagged stale. These
@@ -90,6 +95,10 @@ STALE_AFTER_MIN = {
     'clubelo':         24*60,  # daily cadence
     'weather':         60,
     'referees_soccer': 8*60,   # 6h cadence
+    'fbref_xg':        6*60,   # 6h self-throttle
+    'sofascore_events': 30,    # cron tick chaque 5min, max 30min stale
+    'team_form':       6*60,   # 6h self-throttle
+    'footballdata':    24*60,  # daily fetch
 }
 
 
