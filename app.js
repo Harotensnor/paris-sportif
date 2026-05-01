@@ -15788,7 +15788,11 @@
     const _isInteractiveTarget = (el) => {
       if (!el) return false;
       // Walk up to the card root and stop if we hit a form-ish element first.
-      while (el && !el.matches?.('.dash-pick-card, .dash-hero-pick')) {
+      // BUG FIX 2026-05-01 — Ajout `.interactive, .ed-hero, .action-focus-top`
+      // au stop-set pour que la fonction termine correctement quand le clic
+      // arrive sur ces cards (avant la fonction parcourait tout vers le top
+      // jusqu'à ne pas trouver un .dash-pick-card et retournait false bizarrement).
+      while (el && !el.matches?.('.dash-pick-card, .dash-hero-pick, .interactive, .ed-hero, .action-focus-top')) {
         if (el.matches?.('button, a, input, select, textarea, [data-toggle-card], [data-stake-preset], .dpc-stake-adj, .dpc-stake-input')) return true;
         el = el.parentElement;
       }
@@ -15827,6 +15831,26 @@
       });
       card.addEventListener('keydown', (e) => {
         if ((e.key === 'Enter' || e.key === ' ') && e.target === card && card.getAttribute('role') === 'button') {
+          e.preventDefault();
+          _openCardMatch(card);
+        }
+      });
+    });
+    // BUG FIX 2026-05-01 (Théo) — "Sur la page Now quand je clique sur les
+    // pronos sa marche pas, sa m'affiche pas la feuille de match".
+    // Cause : les cards .interactive[data-match-id] dans les sections
+    // "Prudents", "Gros coups du jour", "Autres opportunités" et
+    // "Prochains gros matchs" sont rendues avec role=button mais aucun
+    // handler ne tournait. Le user pouvait voir les cards mais le clic
+    // ne faisait rien.
+    // Fix : handler dédié pour toutes les .interactive[data-match-id].
+    wrap.querySelectorAll('.interactive[data-match-id]').forEach(card => {
+      card.addEventListener('click', (e) => {
+        if (_isInteractiveTarget(e.target)) return;
+        _openCardMatch(card);
+      });
+      card.addEventListener('keydown', (e) => {
+        if ((e.key === 'Enter' || e.key === ' ') && e.target === card) {
           e.preventDefault();
           _openCardMatch(card);
         }
