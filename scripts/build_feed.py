@@ -172,8 +172,9 @@ def render_item(p: dict) -> str:
         narrative = f'Match équilibré, léger avantage marché.'
     else:
         narrative = f'Outsider, value bet potentielle.'
+    kickoff_note = f" · coup d'envoi {kickoff_local}" if kickoff_local else ''
     desc = (
-        f'<b>{league}</b>{f" · coup d\'envoi {kickoff_local}" if kickoff_local else ""}.<br>'
+        f'<b>{league}</b>{kickoff_note}.<br>'
         f'Favori marché : <b>{pick_label}</b> @ <b>{odd:.2f}</b> '
         f'(probabilité implicite <b>{implied_pct}%</b>). {narrative}<br>'
         f'<a href="{DASH_URL}#match-{ev.get("id", "")}">Voir le pick calibré sur le dashboard →</a>'
