@@ -12404,6 +12404,10 @@
           if (typeof window._maybeNotifyHighEdgePicks === 'function') {
             window._maybeNotifyHighEdgePicks();
           }
+          // v33.33 — Notification kickoff imminent (15 min avant top picks)
+          if (typeof window._maybeNotifyKickoffImminent === 'function') {
+            window._maybeNotifyKickoffImminent();
+          }
         } catch(e) { console.warn('[notif] failed:', e); }
       }
     } catch (err) {
@@ -26591,6 +26595,76 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         } catch(e) { console.warn('[notif] failed:', e); }
       });
       try { localStorage.setItem('notifiedPickIds', JSON.stringify([...seen].slice(-200))); } catch(e) {}
+    };
+
+    // v33.33 — Round 7 P : Notification "kickoff imminent" (15 min avant).
+    // Différent du système edge≥10% : ici on alerte juste avant le coup d'envoi
+    // pour les TOP picks (edge ≥5% + conf ≥55%) afin que l'user ne rate pas
+    // l'occasion de parier. Tag séparé pour ne pas écraser les notifs edge.
+    window._maybeNotifyKickoffImminent = function _maybeNotifyKickoffImminent() {
+      if (!('Notification' in window) || Notification.permission !== 'granted') return;
+      let prefs;
+      try { prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}'); } catch(e) { return; }
+      if (!prefs.pushNotifs) return;
+      const data = window.PRONOSTICS_DATA;
+      if (!data || !data.days) return;
+      const todayIso = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+      const today = data.days[todayIso] || [];
+      const seen = new Set();
+      try { (JSON.parse(localStorage.getItem('notifiedKickoffIds') || '[]') || []).forEach(id => seen.add(id)); } catch(e) {}
+      const fresh = [];
+      const now = Date.now();
+      const WINDOW_MIN = 10;  // notifier si kickoff dans [10..20] min
+      const WINDOW_MAX = 20;
+      for (const m of today) {
+        if (!m || !m.id || seen.has(String(m.id))) continue;
+        if (m.completed || m.live) continue;
+        const ko = new Date(m.date).getTime();
+        if (!isFinite(ko)) continue;
+        const minToKickoff = (ko - now) / 60000;
+        if (minToKickoff < WINDOW_MIN || minToKickoff > WINDOW_MAX) continue;
+        if (!(m.winamax && m.winamax.available === true)) continue;
+        let pred;
+        try { pred = predictMatch(m); } catch(e) { continue; }
+        if (!pred || !pred.pick || pred.skip) continue;
+        const pk = pred.pick.key;
+        const odd = pred.odds && (pk==='1'?pred.odds.home:pk==='2'?pred.odds.away:pred.odds.draw);
+        if (!odd) continue;
+        const rel = pred.reliability ?? pred.pick.prob;
+        const edge = rel - 1/odd;
+        // Threshold plus souple que les notifs edge : on notifie même les picks
+        // moyens si on s'apprête à les rater (rel ≥0.55 et edge ≥0.03).
+        if (edge < 0.03 || rel < 0.55) continue;
+        const { home, away } = (typeof getSides === 'function') ? getSides(m) : { home: {}, away: {} };
+        fresh.push({
+          id: String(m.id),
+          home: (home && home.name) || '?',
+          away: (away && away.name) || '?',
+          edge, rel, odd,
+          label: pred.pick.label || 'Pick',
+          minToKickoff: Math.round(minToKickoff),
+          wnxUrl: m.winamax && m.winamax.url,
+        });
+      }
+      if (!fresh.length) return;
+      fresh.slice(0, 3).forEach(p => {
+        try {
+          const n = new Notification(`⏱️ Kickoff dans ${p.minToKickoff} min : ${p.home} vs ${p.away}`, {
+            body: `Pick : ${p.label} @${p.odd.toFixed(2)} · edge +${Math.round(p.edge*100)}pt · conf ${Math.round(p.rel*100)}%`,
+            icon: 'icon-192.png',
+            badge: 'icon.svg',
+            tag: 'paris-sportif-kickoff-' + p.id,
+            requireInteraction: false,
+          });
+          n.onclick = () => {
+            window.focus();
+            if (p.wnxUrl) window.open(p.wnxUrl, '_blank', 'noopener');
+            n.close();
+          };
+          seen.add(p.id);
+        } catch(e) { console.warn('[notif kickoff] failed:', e); }
+      });
+      try { localStorage.setItem('notifiedKickoffIds', JSON.stringify([...seen].slice(-200))); } catch(e) {}
     };
     // FIX bug #4 : retiré `document.addEventListener('DOMContentLoaded', ...)`
     // — on est DÉJÀ dans le callback DOMContentLoaded ici, l'event a déjà tiré.
