@@ -2343,6 +2343,12 @@
     best.kelly = Math.min(best.market === '1n2' ? 0.10 : 0.05, k * 0.5);
     // Sprint 77 (v31.7.164) — EV explicite dans le retour.
     best.ev = expectedValue(best.prob, best.odd);
+    // Phase 3 #11 : flag edge anormal (>15pt = phantom edge probable)
+    const EDGE_ANOMALY_CAP = 0.15;  // 15pt = 0.15 en proba
+    if (best.edge > EDGE_ANOMALY_CAP) {
+      best.suspect = true;
+      best.suspectReason = `edge ${(best.edge*100).toFixed(1)}pt > 15pt — probable phantom edge`;
+    }
     return best;
   }
   try { window.selectBestMarket = selectBestMarket; } catch(e){}
@@ -9510,6 +9516,7 @@
         return `
           <div class="section" style="margin-top:14px;">
             <h4>📊 Fiche de décision</h4>
+            ${best && best.suspect ? `<div class="warning-chip">⚠ Écart anormal — ${esc(best.suspectReason || 'edge > 15pt')}</div>` : ''}
             <div class="decision-strip">
               ${tile('Confiance', `${Math.round(conf * 100)}%`, conf >= 0.65 ? 'Solide' : conf >= 0.55 ? 'Correcte' : 'Limite', kindOf(conf, 0.65, 0.55))}
               ${tile('Edge', `${edge >= 0 ? '+' : ''}${(edge * 100).toFixed(1)}pt`, edge >= 0.05 ? 'Value forte' : edge >= 0.02 ? 'Value' : edge >= 0 ? 'Neutre' : 'Négatif', kindOf(edge, 0.05, 0.02))}
