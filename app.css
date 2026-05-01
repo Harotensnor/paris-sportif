@@ -2559,10 +2559,21 @@
     .theme-toggle { width: 30px; height: 30px; font-size: 13px; }
   }
 
-  /* v30 Sprint 5 — Page fade-in transition (à chaque applyPageView) */
+  /* v30 Sprint 5 — Page fade-in transition (à chaque applyPageView)
+     2026-05-01 BUG ROOT FIX : avant utilisait `transform: translateY(...)`
+     dans le keyframe. Conséquence catastrophique : le browser maintient
+     `transform: matrix(1,0,0,1,0,0)` sur main même après animation, ce qui
+     crée un nouveau "containing block" pour position:fixed enfants. Le
+     `.v29-dash-aside` (fixed; right:0) était alors positionné par rapport
+     au MAIN (724px) au lieu du VIEWPORT (1366px) → aside chevauchait le
+     contenu central, donnant l'impression que le contenu était compressé
+     à 150-200px à gauche (alors qu'il faisait bien 724px mais l'aside
+     fixed le couvrait).
+     Fix : keyframe sans transform, opacity seule. Visuellement quasi
+     équivalent (perte du léger glissement vertical de 4px). */
   @keyframes v30-page-fade-in {
-    from { opacity: 0; transform: translateY(4px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; }
+    to   { opacity: 1; }
   }
   main.page-fade-in {
     animation: v30-page-fade-in 180ms ease-out;
@@ -5282,7 +5293,12 @@
     .skeleton { animation: none; background: var(--panel-2); }
   }
 
-  /* --- Page transition : fade-in subtle --- */
+  /* --- Page transition : fade-in subtle ---
+     2026-05-01 BUG FIX (même cause que main.page-fade-in) : transform
+     translateY sur tous les enfants direct cassait position:fixed des
+     enfants imbriqués. Aside .v29-dash-aside enfant direct du
+     dashboard-wrap (lui-même enfant de main) était fixed par rapport
+     au dashboard-wrap au lieu du viewport. Fix : opacity seul. */
   main.page-fade-in > * {
     animation: pageFadeIn .35s ease both;
   }
@@ -5291,8 +5307,8 @@
   main.page-fade-in > *:nth-child(3) { animation-delay: .08s; }
   main.page-fade-in > *:nth-child(4) { animation-delay: .12s; }
   @keyframes pageFadeIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; }
+    to   { opacity: 1; }
   }
   @media (prefers-reduced-motion: reduce) {
     main.page-fade-in > * { animation: none !important; }
