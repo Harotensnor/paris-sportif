@@ -27265,24 +27265,35 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     // quelque part (page-btn, lien, etc.) avant que le timer expire — on
     // intercepterait sinon son geste avec une modale, bug confirmé en
     // e2e (Playwright a dû addInitScript onboardingDone=true pour passer).
-    // Idle callback + flag reduit la fenêtre sans casser la 1re visite.
+    // v34.12 — Ne plus afficher la modale pendant le premier rendu :
+    // Lighthouse la comptait comme LCP et, surtout, un nouvel utilisateur
+    // voyait une modale avant même d'avoir vu le dashboard. On laisse le
+    // tableau de bord respirer, puis on propose l'aide seulement si aucune
+    // interaction n'a eu lieu.
     try {
       let _userInteracted = false;
       const _markInteract = () => { _userInteracted = true; };
       document.addEventListener('click', _markInteract, { once: true, capture: true });
       document.addEventListener('keydown', _markInteract, { once: true, capture: true });
+      document.addEventListener('pointerdown', _markInteract, { once: true, capture: true });
+      document.addEventListener('touchstart', _markInteract, { once: true, capture: true, passive: true });
+      window.addEventListener('scroll', _markInteract, { once: true, passive: true });
       const _runOnboarding = () => {
         document.removeEventListener('click', _markInteract, true);
         document.removeEventListener('keydown', _markInteract, true);
+        document.removeEventListener('pointerdown', _markInteract, true);
+        document.removeEventListener('touchstart', _markInteract, true);
+        window.removeEventListener('scroll', _markInteract);
         if (_userInteracted) return;  // user is doing something, don't interrupt
         // Don't open if any modal is already on screen (lock unlock, help, etc.)
         if (document.querySelector('.modal.show, .modal[open], #share-modal.show')) return;
         try { if (typeof showOnboardingModal === 'function') showOnboardingModal(); } catch(e){}
       };
+      const _delayOnboarding = () => setTimeout(_runOnboarding, 12000);
       if (typeof requestIdleCallback === 'function') {
-        requestIdleCallback(_runOnboarding, { timeout: 1500 });
+        requestIdleCallback(_delayOnboarding, { timeout: 3000 });
       } else {
-        setTimeout(_runOnboarding, 800);
+        _delayOnboarding();
       }
     } catch(e){}
 
