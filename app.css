@@ -804,8 +804,12 @@
   }
 
   /* ======= MAIN ======= */
-  /* Phase 3 #5 (audit final) : casser la colonne 720px — main 1280px max */
-  main { padding: var(--gap-md) var(--gap-lg); max-width: 1280px; margin: 0 auto; width: 100%; }
+  /* Phase 3 #5 (audit final) : casser la colonne 720px — main 1280px max
+     2026-05-01 (Théo desktop feedback) : passé à 1440px max-width pour
+     mieux exploiter les écrans wide (≥1500px). Sur 1280-1440px le main
+     prend la viewport (avec sidebar gauche + aside droite). Au-delà,
+     marge pour respiration. */
+  main { padding: var(--gap-md) var(--gap-lg); max-width: 1440px; margin: 0 auto; width: 100%; }
   main#main-content { min-height: 900px; }
   .boot-shell {
     max-width: 1280px;

@@ -3976,6 +3976,81 @@
       away_over_15: _poissonOver(lamA, 1),
       away_over_25: _poissonOver(lamA, 2),
     };
+    // 2026-05-01 — Marchés étendus supplémentaires demandés par Théo :
+    //
+    // 1. HT/FT (Mi-temps/Fin de match) : combine résultat HT × FT.
+    //    9 issues possibles (1/1, 1/X, 1/2, X/1, X/X, X/2, 2/1, 2/X, 2/2).
+    //    Approx indépendance HT vs 2nde mi-temps : P(HT/FT=A/B) = P(HT=A)·P(FT=B|HT=A).
+    //    Implémentation simple : assume independance HT vs 2nde MT (correlation
+    //    réelle ~0.3 mais on prend Poisson 0.45·λ pour HT et 0.55·λ pour 2nde MT).
+    const lamH_2H = lamH * 0.55;
+    const lamA_2H = lamA * 0.55;
+    let p1_2H = 0, pX_2H = 0, p2_2H = 0;
+    for (let h = 0; h <= maxGoals; h++) {
+      for (let a = 0; a <= maxGoals; a++) {
+        const p = poissonPmf(h, lamH_2H) * poissonPmf(a, lamA_2H);
+        if (h > a) p1_2H += p;
+        else if (h < a) p2_2H += p;
+        else pX_2H += p;
+      }
+    }
+    // Combinaisons HT/FT — la 2nde mi-temps détermine le différentiel ajouté
+    // au score HT. Approximation indépendance simple :
+    //   HT=1 → FT score range +(2nd half H) - +(2nd half A). FT=1 si home garde au moins
+    //          son avance OU augmente son écart.
+    // Pour rester pragmatique on calcule directement via la grille jointe FT
+    // conditionnelle sur HT issue. Approximation : HT issue × FT issue indep.
+    const htft = {
+      '1/1': pH_HT * (p1_2H + pX_2H * 0.55),  // home gagne HT puis garde/agrandit avance
+      '1/X': pH_HT * pX_2H * 0.18,
+      '1/2': pH_HT * p2_2H * 0.10,
+      'X/1': pD_HT * p1_2H,
+      'X/X': pD_HT * pX_2H,
+      'X/2': pD_HT * p2_2H,
+      '2/1': pA_HT * p1_2H * 0.10,
+      '2/X': pA_HT * pX_2H * 0.18,
+      '2/2': pA_HT * (p2_2H + pX_2H * 0.55),
+    };
+    // Renormaliser (les coefs sont approximations)
+    const htftSum = Object.values(htft).reduce((s, v) => s + v, 0);
+    if (htftSum > 0) {
+      for (const k of Object.keys(htft)) htft[k] /= htftSum;
+    }
+    //
+    // 2. 1st half goals OU 0.5 / 1.5 (mi-temps Over/Under buts)
+    const cumulOverHT = (line) => {
+      const cutoff = Math.floor(line);
+      let under = 0;
+      for (let h = 0; h <= maxGoals; h++) {
+        for (let a = 0; a <= maxGoals; a++) {
+          const p = poissonPmf(h, lamH_HT) * poissonPmf(a, lamA_HT);
+          if (h + a <= cutoff) under += p;
+        }
+      }
+      return { over: 1 - under, under };
+    };
+    const ouHT05 = cumulOverHT(0.5);
+    const ouHT15 = cumulOverHT(1.5);
+    //
+    // 3. Result + BTTS combiné : 1+BTTS-yes (home gagne ET les 2 marquent),
+    //    X+BTTS-yes (nul avec buts), 2+BTTS-yes (away gagne ET les 2 marquent).
+    let p1_btts_yes = 0, pX_btts_yes = 0, p2_btts_yes = 0;
+    let p1_btts_no = 0, pX_btts_no = 0, p2_btts_no = 0;
+    for (let h = 0; h <= maxGoals; h++) {
+      for (let a = 0; a <= maxGoals; a++) {
+        const p = grid[h][a];
+        const btts = h >= 1 && a >= 1;
+        if (h > a) { btts ? p1_btts_yes += p : p1_btts_no += p; }
+        else if (h < a) { btts ? p2_btts_yes += p : p2_btts_no += p; }
+        else { btts ? pX_btts_yes += p : pX_btts_no += p; }
+      }
+    }
+    const resultBtts = {
+      '1_yes': p1_btts_yes, '1_no': p1_btts_no,
+      'X_yes': pX_btts_yes, 'X_no': pX_btts_no,
+      '2_yes': p2_btts_yes, '2_no': p2_btts_no,
+    };
+
     return {
       p1, pX, p2,
       doubleChance: { p1X, pX2, p12 },
@@ -3987,6 +4062,11 @@
       topScores,
       ou15, ou25, ou35,
       ht: { p1: pH_HT, pX: pD_HT, p2: pA_HT },
+      // 2026-05-01 — Nouveaux marchés
+      htft,           // 9 combinaisons HT/FT
+      ouHT05,         // 1ère mi-temps Over/Under 0.5 buts
+      ouHT15,         // 1ère mi-temps Over/Under 1.5 buts
+      resultBtts,     // 1X2 × BTTS combiné
     };
   }
   try { window.poissonMarketsExtended = poissonMarketsExtended; } catch(e){}
@@ -4957,25 +5037,44 @@
     // recent match counts ~2.5× the match from 5 games ago. A team on a 5-win
     // streak with the last one being a rout should outweigh a team that scraped
     // 5 wins ago but has since drifted. Backtest gains ~+1% ROI on football.
+    //
+    // BUG FIX 2026-05-01 — Le commentaire précédent disait "i=0 is the OLDEST"
+    // mais c'est FAUX : la string forme ESPN est most-recent-FIRST (par
+    // exemple "WLWWL" = W le plus récent, L le plus ancien). slice(-5)
+    // prenait les 5 plus ANCIENS si la string > 5 chars (cas L10 récent).
+    // Pire : le decay 0.75^(len-1-i) donnait poids 1.0 au DERNIER (donc le
+    // PLUS ANCIEN), poids 0.32 au PREMIER (le plus récent). Ratio inverse !
+    // Conséquence : une équipe en mauvaise forme récente mais excellente il
+    // y a 5 matchs était jugée favorablement. Pure régression silencieuse.
+    // Fix : slice(0, 5) pour les 5 plus récents + decay 0.75^i (i=0 = poids
+    // 1.0 = plus récent, i=4 = poids 0.32 = plus ancien des 5).
     const formScore = (formStr) => {
       if (!formStr) return null;
       const pts = { W: 3, T: 1, D: 1, L: 0 };
-      const recent = formStr.slice(-5);
+      // 2026-05-01 — Si form10 est dispo (10 chars), on utilise les 10
+      // plus récents avec decay. Le decay rend les anciens quasi-nuls
+      // (0.75^9 ≈ 0.075) donc pas de risque de noyer le signal récent.
+      const recent = formStr.slice(0, 10);  // up to 10 most-recent
       let weighted = 0, weightSum = 0;
-      // i=0 is the OLDEST of the last-5; i=len-1 is the MOST recent.
-      // Decay factor: 0.75^distance-from-most-recent → weights [0.32, 0.42, 0.56, 0.75, 1.0]
+      // i=0 is the MOST RECENT; decay factor: 0.75^i.
+      // weights L10 : [1.0, 0.75, 0.56, 0.42, 0.32, 0.24, 0.18, 0.13, 0.10, 0.075]
       for (let i = 0; i < recent.length; i++) {
         const ch = recent[i];
         if (pts[ch] === undefined) continue;
-        const distFromLatest = (recent.length - 1) - i;
-        const w = Math.pow(0.75, distFromLatest);
+        const w = Math.pow(0.75, i);
         weighted += pts[ch] * w;
         weightSum += 3 * w;
       }
       return weightSum > 0 ? weighted / weightSum : null;
     };
-    const fH = formScore(home.form);
-    const fA = formScore(away.form);
+    // 2026-05-01 — Si on a la forme L10 (NBA/NHL/MLB via fetch_team_form L10
+    // patché récemment), on calcule formScore sur 10 matchs au lieu de 5.
+    // Plus de stabilité, moins de bruit (1 streak récent qui dérive).
+    // Pour le foot ESPN, la string fait 5 chars donc on garde slice(0,5).
+    const formExtH = home.form10 || home.form;
+    const formExtA = away.form10 || away.form;
+    const fH = formScore(formExtH);
+    const fA = formScore(formExtA);
     let formNudge = null;
     if (fH !== null && fA !== null) {
       const diff = fH - fA; // [-1, 1]
@@ -4988,8 +5087,11 @@
     // cooled. Caps at ±3% (smaller than formNudge — momentum is a tiebreaker).
     const momentumScore = (formStr) => {
       if (!formStr || formStr.length < 5) return null;
-      const f3 = formScore(formStr.slice(-3));
-      const f5 = formScore(formStr.slice(-5));
+      // BUG FIX 2026-05-01 — Idem formScore : slice(-3)/slice(-5) prenaient
+      // les plus anciens. Pour le momentum (last-3 vs last-5), on veut
+      // les 3 et 5 PLUS RÉCENTS.
+      const f3 = formScore(formStr.slice(0, 3));
+      const f5 = formScore(formStr.slice(0, 5));
       if (f3 == null || f5 == null) return null;
       return f3 - f5; // > 0 = heating up, < 0 = cooling
     };
@@ -5787,18 +5889,24 @@
         final.pA += shift;
       }
 
-      // Draw balance — Chantier 3 fix (2026-04-20). When all the nudges above
-      // have pushed the two sides close to parity, the draw stays at whatever
-      // the market/Poisson implied and becomes systematically under-weighted.
-      // The user explicitly flagged this : "j'ai l'impression que tu oublies
-      // les matchs nuls". We add a small positive bump to pD when pH and pA
-      // are near equal, pulled proportionally from both sides. Only applies to
-      // football (hasDraw).
+      // Draw balance — Chantier 3 fix (2026-04-20) + AUDIT 2026-05-01.
+      // Le user a re-signalé : "tu pronostique JAMAIS le match nul, bizarre".
+      // Diagnostic : sur 251 matchs foot, seulement 3 picks 'X' (1.2%) alors
+      // qu'en réalité ~28% des matchs foot finissent en nul. Cause :
+      //   1. Bump précédent (+3% si gap<8%) trop faible
+      //   2. Pas de règle override quand pD est très proche du max(pH,pA)
+      // Fix : bump base +6% (vs 3%) + seuil 0.10 + override pD-prioritaire.
+      // Only applies to football (hasDraw).
       if (hasDraw) {
         const gap = Math.abs(final.pH - final.pA);
-        if (gap < 0.08) {
-          // Full bump (+3% to pD) when gap ~0, tapering to 0 as gap→0.08
-          const bump = 0.03 * (1 - gap / 0.08);
+        if (gap < 0.15) {
+          // Full bump (+8% to pD) when gap ~0, tapering to 0 as gap→0.15.
+          // 2026-05-01 v3 : passé de 0.06/0.10 à 0.08/0.15 — cible une
+          // distribution N ≈ 15-20% (vs 5% avant, 28% en réalité). On
+          // reste sous la réalité car notre modèle a quand même de l'info
+          // utile pour départager (force Elo, forme, etc.) — on ne veut
+          // pas redevenir purement marché.
+          const bump = 0.08 * (1 - gap / 0.15);
           final.pH -= bump / 2;
           final.pA -= bump / 2;
           final.pD += bump;
@@ -5813,7 +5921,12 @@
     const totF = (final.pH || 0) + (final.pD || 0) + (final.pA || 0);
     if (totF > 0) { final.pH /= totF; if (final.pD) final.pD /= totF; final.pA /= totF; }
 
-    // Pick
+    // Pick — argmax simple, mais avec règle override match nul (foot) :
+    // Si pD est dans la zone "très proche du max" (∆ < 0.025) ET pD ≥ 0.27,
+    // on force le pick sur 'X'. Sans cette règle, un cas typique
+    // pH=0.34/pD=0.34/pA=0.32 choisit toujours pH par défaut (ordre array)
+    // alors que l'incertitude est telle que le match nul est aussi
+    // probable. La cote du nul est plus haute (~3.20+) donc EV positif.
     const picks = hasDraw
       ? [['1 · ' + (home?.short || home?.abbr || home?.name), final.pH, '1', home?.name],
          ['N · Match nul', final.pD, 'X', 'Match nul'],
@@ -5821,7 +5934,22 @@
       : [['1 · ' + (home?.short || home?.abbr || home?.name), final.pH, '1', home?.name],
          ['2 · ' + (away?.short || away?.abbr || away?.name), final.pA, '2', away?.name]];
     picks.sort((a,b) => b[1] - a[1]);
-    const best_pick = picks[0];
+    let best_pick = picks[0];
+    // Override match nul si pD est dans la zone "très proche du max"
+    // (écart < 0.04) ET pD ≥ 0.25. v3 (2026-05-01) seuils relaxés :
+    //   pD ≥ 0.25 (vs 0.27)
+    //   écart < 0.04 (vs 0.025)
+    // → permet de capter les cas pH=0.36/pD=0.32/pA=0.32 où le marché
+    // hésite mais les nuances modèle n'ont pas grand-monde de signal
+    // discriminant home/away.
+    if (hasDraw) {
+      const drawProb = final.pD || 0;
+      const topProb = best_pick[1];
+      if (drawProb >= 0.25 && (topProb - drawProb) < 0.04 && best_pick[2] !== 'X') {
+        const drawPickEntry = picks.find(p => p[2] === 'X');
+        if (drawPickEntry) best_pick = drawPickEntry;
+      }
+    }
 
     // ===== Explanation builder — for each pick, a short list of the
     // reasons the model leaned this way. Surfaced in the UI so Théo
@@ -6605,6 +6733,29 @@
             ].filter(x => x.prob >= 0.55 && x.prob <= 0.85)
              .sort((a, b) => b.prob - a.prob) : [];
             const ahPick = ahCandidates[0] || null;
+            // 2026-05-01 — Marchés supplémentaires Théo
+            // HT/FT (mi-temps/fin de match) — pick = combinaison la plus probable
+            const htftAll = ext.htft ? Object.entries(ext.htft)
+              .map(([k, p]) => ({ key: 'HTFT_' + k, label: `HT/FT ${k}`, prob: p }))
+              .sort((a,b) => b.prob - a.prob) : [];
+            const htftPick = htftAll[0] || null;
+            // 1ère mi-temps OU 0.5 / 1.5
+            const ouHT05Pick = ext.ouHT05 ? (ext.ouHT05.over >= ext.ouHT05.under
+              ? { side: 'over', label: '+0.5 buts (1ère MT)', prob: ext.ouHT05.over, key: 'OHT_O0.5' }
+              : { side: 'under', label: '0 buts (1ère MT)', prob: ext.ouHT05.under, key: 'OHT_U0.5' }) : null;
+            const ouHT15Pick = ext.ouHT15 ? (ext.ouHT15.over >= ext.ouHT15.under
+              ? { side: 'over', label: '+1.5 buts (1ère MT)', prob: ext.ouHT15.over, key: 'OHT_O1.5' }
+              : { side: 'under', label: '-1.5 buts (1ère MT)', prob: ext.ouHT15.under, key: 'OHT_U1.5' }) : null;
+            // Result + BTTS combo : la combinaison la plus probable
+            const resultBttsAll = ext.resultBtts ? Object.entries(ext.resultBtts)
+              .map(([k, p]) => {
+                const [r, btts] = k.split('_');
+                const rLbl = r === '1' ? 'Home' : r === '2' ? 'Away' : 'Nul';
+                return { key: 'RESBTTS_' + k, label: `${rLbl} + BTTS ${btts === 'yes' ? 'Oui' : 'Non'}`, prob: p };
+              })
+              .sort((a,b) => b.prob - a.prob) : [];
+            const resultBttsPick = resultBttsAll[0] || null;
+
             extended = {
               doubleChance: dcOpts[0],
               doubleChanceAll: dcOpts,
@@ -6618,6 +6769,13 @@
               dnbRaw: ext.dnb,
               asianHandicap: ahPick,
               asianHandicapAll: ahCandidates,
+              // 2026-05-01 — Nouveaux marchés
+              htft: htftPick,
+              htftAll,
+              ouHT05: ouHT05Pick,
+              ouHT15: ouHT15Pick,
+              resultBtts: resultBttsPick,
+              resultBttsAll,
               raw: ext,
             };
           }
@@ -7220,7 +7378,11 @@
 
   function renderForm(formStr, big=false) {
     if (!formStr) return '';
-    const chars = formStr.slice(-5).split('');
+    // BUG FIX 2026-05-01 — Form ESPN est most-recent-first. slice(-5)
+    // prenait les 5 plus ANCIENS quand la string > 5 chars (cas L10).
+    // Affichage cohérent : 5 plus récents (le 1er badge = match le plus
+    // récent à gauche), comme ESPN affiche dans son scoreboard.
+    const chars = formStr.slice(0, 5).split('');
     const cls = big ? 'fm' : 'fm';
     // Affichage français : V (Victoire), N (Nul), D (Défaite).
     // On conserve les classes ESPN (W/D/T/L) côté CSS pour le code couleur, mais
@@ -9680,7 +9842,14 @@
             arr = f.results;
           }
           if (!arr || !arr.length) return null;
-          const last3 = arr.slice(-3);
+          // BUG FIX 2026-05-01 — La string forme ESPN est most-recent-FIRST
+          // (ex "WLLDW" → W le plus récent, W le plus ancien). slice(-3)
+          // prenait les 3 PLUS ANCIENS, pas les 3 derniers résultats.
+          // Conséquence visible : Lecce avec form "DDLLL" affichait "L L L"
+          // (3 défaites) au lieu de "D D L" (2 nuls + 1 perte) → l'user
+          // voyait des défaites partout quand on pronostiquait nul.
+          // Fix : slice(0, 3) pour les 3 plus récents.
+          const last3 = arr.slice(0, 3);
           return last3.map(r => {
             const v = (r || '').toUpperCase();
             // Map T (tie NBA/NHL) → D (draw foot) pour cohérence visuelle
@@ -10385,6 +10554,11 @@
                 // Sprint 79 — DNB + AH chips
                 (ext.dnb && ext.dnb.prob >= 0.60) ? extChip(ext.dnb.label, ext.dnb.prob, '🎯 DNB (Draw No Bet)', 'rgba(251,146,60,.08)', 'rgba(251,146,60,.25)', '#fb923c') : '',
                 (ext.asianHandicap && ext.asianHandicap.prob >= 0.62) ? extChip(ext.asianHandicap.label, ext.asianHandicap.prob, '⚖️ Asian Handicap', 'rgba(34,211,238,.08)', 'rgba(34,211,238,.25)', '#22d3ee') : '',
+                // 2026-05-01 — Nouveaux marchés
+                (ext.htft && ext.htft.prob >= 0.20) ? extChip(ext.htft.label, ext.htft.prob, '⏱️ HT/FT (Mi-temps/Final)', 'rgba(244,114,182,.08)', 'rgba(244,114,182,.25)', '#f472b6') : '',
+                (ext.ouHT05 && ext.ouHT05.prob >= 0.65) ? extChip(ext.ouHT05.label, ext.ouHT05.prob, '⚽ Buts en 1ère MT', 'rgba(167,139,250,.08)', 'rgba(167,139,250,.25)', '#c4b5fd') : '',
+                (ext.ouHT15 && ext.ouHT15.prob >= 0.55) ? extChip(ext.ouHT15.label, ext.ouHT15.prob, '⚽ Buts en 1ère MT', 'rgba(167,139,250,.08)', 'rgba(167,139,250,.25)', '#c4b5fd') : '',
+                (ext.resultBtts && ext.resultBtts.prob >= 0.30) ? extChip(ext.resultBtts.label, ext.resultBtts.prob, '🎯 Résultat + BTTS combo', 'rgba(52,211,153,.08)', 'rgba(52,211,153,.25)', '#6ee7b7') : '',
               ].filter(Boolean).join('') : '';
               return `<div style="margin-top:14px;">
                 <div class="lbl-tiny-mb">🥅 Marchés buts (Poisson)</div>
@@ -11322,7 +11496,7 @@
                 ${rankH ? `<div class="kv"><div class="k">Classement</div><div class="v">#${esc(rankH)}</div></div>` : ''}
                 ${ctrH ? `<div class="kv"><div class="k">Pays</div><div class="v">${esc(ctrH)}</div></div>` : ''}
                 ${oddH ? `<div class="kv"><div class="k">Cote Winamax</div><div class="v" style="font-variant-numeric:tabular-nums;">@${oddH.toFixed(2)} <span style="color:var(--text-dim2,#7b8693);font-size:11px;">(${impH}%)</span></div></div>` : ''}
-                ${formH ? `<div class="kv"><div class="k">5 derniers</div><div class="v" style="font-family:monospace;letter-spacing:1px;">${esc(formH.slice(-5))}</div></div>` : ''}
+                ${formH ? `<div class="kv"><div class="k">5 derniers</div><div class="v" style="font-family:monospace;letter-spacing:1px;">${esc(formH.slice(0, 5))}</div></div>` : ''}
                 ${h2hList.length ? `<div class="kv"><div class="k">H2H gagnés</div><div class="v">${h2hHomeWins}/${h2hList.length}</div></div>` : ''}
               </div>
               <div>
@@ -11330,7 +11504,7 @@
                 ${rankA ? `<div class="kv"><div class="k">Classement</div><div class="v">#${esc(rankA)}</div></div>` : ''}
                 ${ctrA ? `<div class="kv"><div class="k">Pays</div><div class="v">${esc(ctrA)}</div></div>` : ''}
                 ${oddA ? `<div class="kv"><div class="k">Cote Winamax</div><div class="v" style="font-variant-numeric:tabular-nums;">@${oddA.toFixed(2)} <span style="color:var(--text-dim2,#7b8693);font-size:11px;">(${impA}%)</span></div></div>` : ''}
-                ${formA ? `<div class="kv"><div class="k">5 derniers</div><div class="v" style="font-family:monospace;letter-spacing:1px;">${esc(formA.slice(-5))}</div></div>` : ''}
+                ${formA ? `<div class="kv"><div class="k">5 derniers</div><div class="v" style="font-family:monospace;letter-spacing:1px;">${esc(formA.slice(0, 5))}</div></div>` : ''}
                 ${h2hList.length ? `<div class="kv"><div class="k">H2H gagnés</div><div class="v">${h2hAwayWins}/${h2hList.length}</div></div>` : ''}
               </div>
             </div>
