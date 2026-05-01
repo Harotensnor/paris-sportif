@@ -2095,6 +2095,53 @@
   }
   try { window.expectedValue = expectedValue; } catch(e){}
 
+  // 2026-05-01 (Théo : "rend le site + intelligent et vivant et plus complet") —
+  // Système de notation visuelle 0-5 étoiles pour qu'un pick soit lisible
+  // d'un seul coup d'œil sans avoir à comparer edge / EV / confiance soi-même.
+  //
+  // Score composite normalisé sur 0-100 puis converti en 0-5 étoiles :
+  //   - 30% Edge (proba modèle - implicite cote)
+  //   - 30% EV (proba × cote - 1) — récompense les cotes élevées avec edge
+  //   - 25% Confiance brute (rel) — un pick à edge 5pt confiance 75% > 5pt 55%
+  //   - 15% Qualité data (dq.score / dq.max) — sources d'info fiables
+  //
+  // Mapping étoiles (subjectif mais calibré sur backtest) :
+  //   ≥80 = 5★ (excellent : à parier sans hésiter, confiance ↑)
+  //   ≥65 = 4★ (très bon : à considérer)
+  //   ≥50 = 3★ (correct : avec prudence)
+  //   ≥35 = 2★ (limite : pas obligatoire)
+  //   <35 = 1★ ou 0★ (à éviter)
+  //
+  // Exposé window.valueRating pour usage par cards / modal.
+  function valueRating(rel, odd, dq) {
+    if (!(rel > 0) || !(odd > 1)) return { score: 0, stars: 0, label: '—' };
+    const edge = rel - 1/odd;
+    const ev = rel * odd - 1;
+    // Composantes normalisées 0-100
+    const edgeComp = Math.max(0, Math.min(100, edge * 500));   // edge +20pt → 100
+    const evComp = Math.max(0, Math.min(100, ev * 250));        // EV +40% → 100
+    const confComp = Math.max(0, Math.min(100, (rel - 0.40) * 300));  // 40% → 0, 73% → 100
+    const dqRatio = (dq && dq.max > 0) ? dq.score / dq.max : 0.5;
+    const dqComp = dqRatio * 100;
+    const score = 0.30 * edgeComp + 0.30 * evComp + 0.25 * confComp + 0.15 * dqComp;
+    let stars, label;
+    if (score >= 80) { stars = 5; label = 'Excellent'; }
+    else if (score >= 65) { stars = 4; label = 'Très bon'; }
+    else if (score >= 50) { stars = 3; label = 'Correct'; }
+    else if (score >= 35) { stars = 2; label = 'Limite'; }
+    else if (score >= 20) { stars = 1; label = 'Faible'; }
+    else { stars = 0; label = 'À éviter'; }
+    return { score: Math.round(score), stars, label, edge, ev };
+  }
+  try { window.valueRating = valueRating; } catch(e){}
+
+  // Helper pour rendre les étoiles en HTML simple
+  function renderStars(stars) {
+    const filled = Math.max(0, Math.min(5, stars));
+    return '★'.repeat(filled) + '☆'.repeat(5 - filled);
+  }
+  try { window.renderStars = renderStars; } catch(e){}
+
   // Sprint 83 (v31.7.170 — audit Part 7) — Score Qualité dédié.
   // Synthétise 4 dimensions en un score 0..100 + label "high/medium/low" :
   //   * edge (40 pts) : value forte +5pt+ → 40, +2pt → 20, 0 → 10
@@ -15001,10 +15048,21 @@
               const gainTxt = p.gain >= 1 ? `+${p.gain.toFixed(0)}€` : `+${p.gain.toFixed(2)}€`;
               return `
                 <article class="interactive" data-match-id="${esc(String(p.m.id))}" role="button" tabindex="0" style="padding:14px 16px;background:linear-gradient(135deg, rgba(251,191,36,.12), rgba(248,113,113,.06));border:1px solid rgba(251,191,36,.3);border-radius:12px;cursor:pointer;transition:transform .15s, border-color .15s;">
-                  <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;font-size:11px;color:var(--text-dim);font-weight:600;">
+                  <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px;font-size:11px;color:var(--text-dim);font-weight:600;">
                     <span>${esc(tLbl)} · ${esc(String(lg).slice(0,24))}</span>
                     <span style="background:rgba(251,191,36,.18);color:var(--warn);padding:2px 8px;border-radius:999px;font-weight:800;">@${p.odd.toFixed(2)}</span>
                   </div>
+                  ${(() => {
+                    // 2026-05-01 — Étoiles valueRating pour lecture instantanée
+                    const dq = (typeof computeDataQuality === 'function') ? computeDataQuality(p.m) : null;
+                    const vr = (typeof valueRating === 'function') ? valueRating(p.rel, p.odd, dq) : null;
+                    if (!vr) return '';
+                    const starsCol = vr.stars >= 4 ? 'var(--accent)' : vr.stars >= 3 ? 'var(--warn)' : 'var(--text-dim)';
+                    return `<div style="margin-bottom:8px;display:flex;align-items:center;gap:8px;font-size:13px;">
+                      <span style="letter-spacing:1.5px;color:${starsCol};font-weight:700;" title="Score ${vr.score}/100 · ${vr.label}">${(typeof renderStars === 'function') ? renderStars(vr.stars) : '★'.repeat(vr.stars)}</span>
+                      <span style="font-size:11px;color:${starsCol};font-weight:600;">${esc(vr.label)}</span>
+                    </div>`;
+                  })()}
                   <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">
                     ${hLogo ? `<img src="${esc(hLogo)}" alt="" style="width:24px;height:24px;object-fit:contain;border-radius:4px;background:rgba(255,255,255,.04);padding:1px;">` : ''}
                     <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(hN)}</span>
