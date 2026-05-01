@@ -2103,6 +2103,123 @@
   }
   try { window.expectedValue = expectedValue; } catch(e){}
 
+  // v34.35 — Capital engine.
+  // A pick is not "good" only because confidence is high. A very low odd
+  // needs a huge probability edge to be worth the capital it locks; a very
+  // high odd needs a stronger EV buffer because variance explodes. These
+  // helpers turn that into one investment score used by the dashboard and
+  // by the autonomous agent.
+  function oddsDisciplineProfile(odd) {
+    const o = Number(odd);
+    if (!(o > 1)) {
+      return {
+        zone: 'none', label: 'Sans cote', tone: 'danger',
+        multiplier: 0, minEv: 0.99, minEdge: 0.99, capPct: 0,
+        text: 'Impossible de juger sans cote exploitable.'
+      };
+    }
+    if (o < 1.25) {
+      return {
+        zone: 'micro', label: 'Micro-gain', tone: 'danger',
+        multiplier: 0.36, minEv: 0.10, minEdge: 0.075, capPct: 0.025,
+        text: 'Gain trop maigre : il faut un edge énorme pour bloquer du capital.'
+      };
+    }
+    if (o < 1.45) {
+      return {
+        zone: 'thin', label: 'Cote fine', tone: 'warn',
+        multiplier: 0.68, minEv: 0.065, minEdge: 0.050, capPct: 0.045,
+        text: 'Cote basse : acceptable seulement si le marché sous-estime clairement.'
+      };
+    }
+    if (o <= 2.20) {
+      return {
+        zone: 'sweet', label: 'Zone rentable', tone: 'ok',
+        multiplier: 1.12, minEv: 0.030, minEdge: 0.025, capPct: 0.10,
+        text: 'Bon compromis proba/gain : zone prioritaire pour Kelly fractionné.'
+      };
+    }
+    if (o <= 3.50) {
+      return {
+        zone: 'punch', label: 'Gros rendement', tone: 'watch',
+        multiplier: 0.92, minEv: 0.080, minEdge: 0.035, capPct: 0.065,
+        text: 'Rendement intéressant, mais variance plus forte : edge demandé plus haut.'
+      };
+    }
+    return {
+      zone: 'variance', label: 'Variance haute', tone: 'danger',
+      multiplier: 0.58, minEv: 0.145, minEdge: 0.045, capPct: 0.035,
+      text: 'Cote longue : petite mise seulement, même si le gain potentiel fait envie.'
+    };
+  }
+  try { window.oddsDisciplineProfile = oddsDisciplineProfile; } catch(e){}
+
+  function investmentScore(rel, odd, dq, opts) {
+    opts = opts || {};
+    const p = Number(rel);
+    const o = Number(odd);
+    const profile = oddsDisciplineProfile(o);
+    const implied = o > 1 ? 1 / o : 0;
+    const edge = p - implied;
+    const ev = expectedValue(p, o);
+    const kelly = (typeof kellyFraction === 'function') ? kellyFraction(p, o, 0.25) : 0;
+    const dqRatio = (dq && dq.max > 0) ? Math.max(0, Math.min(1, dq.score / dq.max)) : 0.50;
+    const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+    const edgeComp = clamp(edge / 0.16, 0, 1) * 100;
+    const evComp = clamp(ev / 0.35, 0, 1) * 100;
+    const kellyComp = clamp(kelly / 0.055, 0, 1) * 100;
+    const confComp = clamp((p - 0.45) / 0.35, 0, 1) * 100;
+    const dataComp = dqRatio * 100;
+    let score = (0.28 * evComp + 0.24 * edgeComp + 0.20 * kellyComp + 0.16 * dataComp + 0.12 * confComp) * profile.multiplier;
+
+    const reasons = [];
+    if (ev >= profile.minEv) reasons.push(`EV ${(ev * 100).toFixed(0)}% >= minimum ${(profile.minEv * 100).toFixed(0)}%`);
+    else reasons.push(`EV ${(ev * 100).toFixed(0)}% trop juste pour cette cote`);
+    if (edge >= profile.minEdge) reasons.push(`Edge +${(edge * 100).toFixed(1)}pt`);
+    else reasons.push(`Edge +${(edge * 100).toFixed(1)}pt sous le seuil`);
+    reasons.push(profile.text);
+    if (dqRatio >= 0.75) reasons.push('Data riche');
+    else if (dqRatio < 0.50) reasons.push('Data encore légère');
+
+    let action = 'bet';
+    let label = 'Investir';
+    if (!(p > 0) || !(o > 1) || ev <= 0 || kelly <= 0) {
+      action = 'skip';
+      label = 'Refuser';
+      score = Math.min(score, 18);
+    } else if (ev < profile.minEv || edge < profile.minEdge || dqRatio < 0.45) {
+      action = 'watch';
+      label = 'Surveiller';
+      score = Math.min(score, 58);
+    }
+    if (profile.zone === 'micro' && (ev < profile.minEv + 0.04 || p < 0.86)) {
+      action = 'skip';
+      label = 'Refuser';
+      score = Math.min(score, 35);
+    }
+    if (profile.zone === 'variance' && ev < profile.minEv + 0.03) {
+      action = action === 'bet' ? 'watch' : action;
+      label = action === 'watch' ? 'Surveiller' : label;
+      score = Math.min(score, 62);
+    }
+
+    const cappedKelly = Math.min(profile.capPct || 0.10, kelly);
+    return {
+      score: Math.round(clamp(score, 0, 100)),
+      action, label,
+      profile,
+      edge, ev, implied,
+      kelly,
+      cappedKelly,
+      dataRatio: dqRatio,
+      reasons,
+      market: opts.market || '',
+      source: opts.source || ''
+    };
+  }
+  try { window.investmentScore = investmentScore; } catch(e){}
+
   // 2026-05-01 (Théo : "rend le site + intelligent et vivant et plus complet") —
   // Système de notation visuelle 0-5 étoiles pour qu'un pick soit lisible
   // d'un seul coup d'œil sans avoir à comparer edge / EV / confiance soi-même.
@@ -2469,6 +2586,18 @@
       }
     }
     if (!candidates.length) return null;
+    const dqForInvestment = (() => {
+      try { return (typeof computeDataQuality === 'function') ? computeDataQuality(match) : null; }
+      catch(e) { return null; }
+    })();
+    candidates.forEach(c => {
+      c.ev = expectedValue(c.prob, c.odd);
+      c.discipline = oddsDisciplineProfile(c.odd);
+      c.investment = investmentScore(c.prob, c.odd, dqForInvestment, {
+        market: c.market,
+        source: c.source
+      });
+    });
     // Tri : edge desc puis prob desc
     candidates.sort((a, b) => {
       if (Math.abs(b.edge - a.edge) > 0.01) return b.edge - a.edge;
@@ -2484,6 +2613,11 @@
     best.kelly = Math.min(best.market === '1n2' ? 0.10 : 0.05, k * 0.5);
     // Sprint 77 (v31.7.164) — EV explicite dans le retour.
     best.ev = expectedValue(best.prob, best.odd);
+    best.discipline = best.discipline || oddsDisciplineProfile(best.odd);
+    best.investment = best.investment || investmentScore(best.prob, best.odd, dqForInvestment, {
+      market: best.market,
+      source: best.source
+    });
     // Phase 3 #11 : flag edge anormal (>15pt = phantom edge probable)
     const EDGE_ANOMALY_CAP = 0.15;  // 15pt = 0.15 en proba
     if (best.edge > EDGE_ANOMALY_CAP) {
@@ -12896,6 +13030,9 @@
       isWinamaxBookable,
       evaluateModelPick,
       kellyFraction: typeof kellyFraction === 'function' ? kellyFraction : null,
+      expectedValue: typeof expectedValue === 'function' ? expectedValue : null,
+      oddsDisciplineProfile: typeof oddsDisciplineProfile === 'function' ? oddsDisciplineProfile : null,
+      investmentScore: typeof investmentScore === 'function' ? investmentScore : null,
       getMatchOdds,
       // Sprint 1 #5 — tests data pollution
       predictMatch: typeof predictMatch === 'function' ? predictMatch : null,
@@ -13422,7 +13559,7 @@
         // Si Winamax markets.1n2 existe, on prend leur cote (plus fiable que la moyenne ESPN)
         const wxOdd = wxMk && wxMk['1n2'] ? (pk==='1'?wxMk['1n2'].home : pk==='2'?wxMk['1n2'].away : wxMk['1n2'].draw) : null;
         const odd = wxOdd || odd1n2;
-        candidates.push({ market: '1n2', pickKey: pk, side: null, rel: rel1n2, odd, edge: rel1n2 - 1/odd, label: pred.pick.label });
+        candidates.push({ market: '1n2', key: pk, pickKey: pk, side: null, rel: rel1n2, odd, edge: rel1n2 - 1/odd, label: pred.pick.label });
       }
     }
     // O/U 2.5 — uniquement foot avec pred.markets.ou + wx.markets.ou25
@@ -13431,7 +13568,7 @@
       const odd = pick.side === 'over' ? wxMk.ou25.over : wxMk.ou25.under;
       const rel = pick.prob;
       if (odd && odd > 1.01 && rel > 0) {
-        candidates.push({ market: 'ou25', pickKey: pick.key, side: pick.side, rel, odd, edge: rel - 1/odd, label: pick.label });
+        candidates.push({ market: 'ou25', key: pick.key, pickKey: pick.key, side: pick.side, rel, odd, edge: rel - 1/odd, label: pick.label });
       }
     }
     // BTTS — uniquement foot avec pred.markets.btts + wx.markets.btts
@@ -13440,12 +13577,34 @@
       const odd = pick.side === 'yes' ? wxMk.btts.yes : wxMk.btts.no;
       const rel = pick.prob;
       if (odd && odd > 1.01 && rel > 0) {
-        candidates.push({ market: 'btts', pickKey: pick.key, side: pick.side, rel, odd, edge: rel - 1/odd, label: pick.label });
+        candidates.push({ market: 'btts', key: pick.key, pickKey: pick.key, side: pick.side, rel, odd, edge: rel - 1/odd, label: pick.label });
       }
     }
     if (!candidates.length) return null;
-    candidates.sort((a,b) => b.edge - a.edge);
-    return candidates[0];
+    const dqForInvestment = (() => {
+      try { return (typeof computeDataQuality === 'function') ? computeDataQuality(m) : null; }
+      catch(e) { return null; }
+    })();
+    candidates.forEach(c => {
+      c.ev = expectedValue(c.rel, c.odd);
+      c.discipline = oddsDisciplineProfile(c.odd);
+      c.investment = investmentScore(c.rel, c.odd, dqForInvestment, {
+        market: c.market,
+        source: wxMk ? 'winamax_exact' : 'estimated'
+      });
+    });
+    const investable = candidates.filter(c =>
+      c.investment && c.investment.action !== 'skip' && c.ev > 0 && c.edge > 0
+    );
+    const pool = investable.length ? investable : candidates;
+    pool.sort((a,b) => {
+      const as = a.investment ? a.investment.score : 0;
+      const bs = b.investment ? b.investment.score : 0;
+      if (bs !== as) return bs - as;
+      if (Math.abs((b.ev || 0) - (a.ev || 0)) > 0.01) return (b.ev || 0) - (a.ev || 0);
+      return b.edge - a.edge;
+    });
+    return pool[0];
   }
 
   // v28 — Évaluateur multi-marché (pour le replay historique)
@@ -13676,7 +13835,11 @@
       else                       _kellyMult = KELLY_FRAC;
       // v27.1 FIX : si Kelly négatif/nul, on NE MISE PAS. Pas de plancher forcé.
       //          (ex: Thunder @1.05 vs rel 76% → implicite 95% → edge -19pt → skip).
-      const k = (typeof kellyFraction === 'function') ? kellyFraction(s.rel, s.odd, _kellyMult) : Math.max(0, ((s.rel * s.odd - 1) / Math.max(0.01, s.odd - 1)) * _kellyMult);
+      if (s.best && s.best.investment && s.best.investment.action === 'skip') { return; }
+      const kRaw = (typeof kellyFraction === 'function') ? kellyFraction(s.rel, s.odd, _kellyMult) : Math.max(0, ((s.rel * s.odd - 1) / Math.max(0.01, s.odd - 1)) * _kellyMult);
+      const k = s.best && s.best.investment && isFinite(s.best.investment.cappedKelly)
+        ? Math.min(kRaw, s.best.investment.cappedKelly)
+        : kRaw;
       if (k <= 0) { return; } // pas d'edge → pas de mise
       // v27.3 — Divergence amplifiée : mise plus agressive quand l'edge est fort
       //         (le modèle diverge franchement du marché = vraie opportunité)
@@ -13685,6 +13848,8 @@
       if (_edgeAbs > 0.20) _ampl = 1.6;
       else if (_edgeAbs > 0.15) _ampl = 1.4;
       else if (_edgeAbs > 0.10) _ampl = 1.2;
+      const _zone = s.best && s.best.investment && s.best.investment.profile && s.best.investment.profile.zone;
+      if (_zone === 'micro' || _zone === 'variance') _ampl = Math.min(_ampl, 1.05);
       let stake = nav * k * _ampl;
       const capAbs = nav * CAP_PCT;
       if (stake > capAbs) stake = capAbs;
@@ -13853,11 +14018,15 @@
         // v28 — meilleur marché selon edge
         const best = _agentBestPick(m, pred);
         if (!best) return;
+        if (best.investment && best.investment.action === 'skip') return;
         const rel = best.rel;
         const odd = best.odd;
         // v27.2 — appliquer les règles auto-tuning actives
         if (_applyAgentRules({ m, rel, odd })) return;
-        const k = (typeof kellyFraction === 'function') ? kellyFraction(rel, odd, KELLY_FRAC) : Math.max(0, ((rel*odd-1)/Math.max(0.01, odd-1)) * KELLY_FRAC);
+        const kRaw = (typeof kellyFraction === 'function') ? kellyFraction(rel, odd, KELLY_FRAC) : Math.max(0, ((rel*odd-1)/Math.max(0.01, odd-1)) * KELLY_FRAC);
+        const k = best.investment && isFinite(best.investment.cappedKelly)
+          ? Math.min(kRaw, best.investment.cappedKelly)
+          : kRaw;
         if (k <= 0) return; // v27.1 — pas d'edge → pas de pari
         // v27.3 — Divergence amplifiée
         const _edgeLive = rel - 1/odd;
@@ -13865,6 +14034,8 @@
         if (_edgeLive > 0.20) _amplLive = 1.6;
         else if (_edgeLive > 0.15) _amplLive = 1.4;
         else if (_edgeLive > 0.10) _amplLive = 1.2;
+        const _zoneLive = best.investment && best.investment.profile && best.investment.profile.zone;
+        if (_zoneLive === 'micro' || _zoneLive === 'variance') _amplLive = Math.min(_amplLive, 1.05);
         let stake = nav * k * _amplLive;
         const capAbs = nav * CAP_PCT;
         if (stake > capAbs) stake = capAbs;
@@ -13875,7 +14046,12 @@
       } catch(e) {}
     });
     // v27.1 — Daily cap : tri par conf décroissant puis on rogne tant qu'on dépasse 20% de nav
-    rawCandidates.sort((a,b) => b.rel - a.rel);
+    rawCandidates.sort((a,b) => {
+      const bs = b.best && b.best.investment ? b.best.investment.score : 0;
+      const as = a.best && a.best.investment ? a.best.investment.score : 0;
+      if (bs !== as) return bs - as;
+      return b.rel - a.rel;
+    });
     const dailyBudget = nav * DAILY_CAP_PCT;
     const positions = [];
     let usedBudget = 0;
@@ -13911,7 +14087,7 @@
     // noEdge (edge ≤ 0) / noOdds / pas de pred. Affiché dans le bloc
     // "Aucun prono ne franchit nos filtres" pour que l'user comprenne
     // POURQUOI il n'y a rien plutôt que de voir un écran vide.
-    const todayStats = { total: 0, skip: 0, lowConf: 0, noEdge: 0, noOdds: 0, ok: 0 };
+    const todayStats = { total: 0, skip: 0, lowConf: 0, noEdge: 0, noOdds: 0, capitalSkip: 0, ok: 0 };
     const allTodayRaw = _dataIsStale ? [] : today.filter(m => !m.completed).map(m => {
       try {
         todayStats.total++;
@@ -13926,9 +14102,15 @@
         const edge = best ? best.edge : (rel - 1/odd);
         if (rel < 0.55) { todayStats.lowConf++; return null; }
         if (edge <= 0) { todayStats.noEdge++; return null; }
+        const investment = (best && best.investment) || investmentScore(rel, odd, (() => {
+          try { return (typeof computeDataQuality === 'function') ? computeDataQuality(m) : null; }
+          catch(e) { return null; }
+        })(), { market: best ? best.market : '1n2' });
+        if (investment && investment.action === 'skip') { todayStats.capitalSkip++; return null; }
         todayStats.ok++;
         const inPositions = positions.some(p => p.m.id === m.id);
-        return { m, pred, best, odd, rel, edge, inPositions, ts: new Date(m.date).getTime() };
+        const ev = investment && isFinite(investment.ev) ? investment.ev : expectedValue(rel, odd);
+        return { m, pred, best, odd, rel, edge, ev, investment, inPositions, ts: new Date(m.date).getTime() };
       } catch(e) { return null; }
     }).filter(Boolean);
     const sportsPresent = [...new Set(allTodayRaw.map(x => x.m.sport))];
@@ -14236,9 +14418,19 @@
     // même avec confiance haute. Ajout filtre `rel*odd > 1.02` pour skip
     // les pseudo-locks à cote ridicule (2pt buffer above breakeven).
     const _hasEV = (x) => (x.rel * x.odd - 1) >= 0.02;
+    const _investmentGrade = (x, minScore) => {
+      const inv = x && x.investment;
+      if (!inv) return false;
+      return inv.action === 'bet' && inv.score >= (minScore || 58);
+    };
     const topPicks = _dataIsStale ? [] : allTodayRaw
-      .filter(x => !x.m.live && !x.m.completed && _notStarted(x.m) && x.edge > 0.05 && x.rel >= 0.55 && _hasEV(x) && !_losingSports.has(x.m.sport))
-      .sort((a, b) => b.edge - a.edge)
+      .filter(x => !x.m.live && !x.m.completed && _notStarted(x.m) && x.edge > 0.035 && x.rel >= 0.55 && _hasEV(x) && _investmentGrade(x, 60) && !_losingSports.has(x.m.sport))
+      .sort((a, b) => {
+        const bs = b.investment ? b.investment.score : 0;
+        const as = a.investment ? a.investment.score : 0;
+        if (bs !== as) return bs - as;
+        return (b.ev || 0) - (a.ev || 0);
+      })
       .slice(0, 3)
       .map(x => {
         // v30 — Aligner odd/rel sur best (1n2 Winamax / OU / BTTS) pour que la
@@ -14246,8 +14438,13 @@
         // MÊME pari. Sinon edge=best mais odd=pred.odds (ESPN 1n2) → tooltip
         // "Edge = rel − 1/odd" devient mensonger.
         const xx = x.best ? { ...x, odd: x.best.odd, rel: x.best.rel, edge: x.best.edge } : x;
+        const investment = xx.investment || investmentScore(xx.rel, xx.odd, (() => {
+          try { return (typeof computeDataQuality === 'function') ? computeDataQuality(xx.m) : null; }
+          catch(e) { return null; }
+        })(), { market: xx.best ? xx.best.market : '1n2' });
         // Kelly pour le bankroll perso : Kelly 0.25 cap 10% plancher 1€
-        const k = (typeof kellyFraction === 'function') ? kellyFraction(xx.rel, xx.odd, 0.25) : Math.max(0, ((xx.rel*xx.odd-1)/Math.max(0.01, xx.odd-1)) * 0.25);
+        const kRaw = (typeof kellyFraction === 'function') ? kellyFraction(xx.rel, xx.odd, 0.25) : Math.max(0, ((xx.rel*xx.odd-1)/Math.max(0.01, xx.odd-1)) * 0.25);
+        const k = investment && isFinite(investment.cappedKelly) ? Math.min(kRaw, investment.cappedKelly) : kRaw;
         let stake = userBankroll * k;
         const capAbs = userBankroll * 0.10;
         if (stake > capAbs) stake = capAbs;
@@ -14255,7 +14452,7 @@
         const gain = stake * (xx.odd - 1);
         const ev = (xx.rel > 0 && xx.odd > 1) ? (xx.rel * xx.odd - 1) : 0;
         const { home, away } = (typeof getSides === 'function') ? getSides(xx.m) : { home: {}, away: {} };
-        return { ...xx, stake, gain, ev, homeName: home?.name || '?', awayName: away?.name || '?', homeLogo: home?.logo || '', awayLogo: away?.logo || '' };
+        return { ...xx, stake, gain, ev, investment, homeName: home?.name || '?', awayName: away?.name || '?', homeLogo: home?.logo || '', awayLogo: away?.logo || '' };
       });
 
     // Sprint 85 (v31.7.172 — audit Part 4) — Structure 3+3+2 sur dashboard.
@@ -14267,8 +14464,12 @@
     const prudentPicks = _dataIsStale ? [] : allTodayRaw
       .filter(x => !topIds.has(x.m.id))
       .filter(x => !x.m.live && !x.m.completed && _notStarted(x.m))
-      .filter(x => x.rel >= 0.70 && x.odd >= 1.40 && x.odd <= 1.85 && x.edge >= 0.02)
-      .sort((a, b) => b.rel - a.rel)
+      .filter(x => x.rel >= 0.70 && x.odd >= 1.40 && x.odd <= 1.85 && x.edge >= 0.02 && x.investment && x.investment.action !== 'skip')
+      .sort((a, b) => {
+        const bs = b.investment ? b.investment.score : 0;
+        const as = a.investment ? a.investment.score : 0;
+        return bs !== as ? bs - as : b.rel - a.rel;
+      })
       .slice(0, 3);
     // Gros coups du jour (Théo : "je voie pas les gros coup enfaite") :
     // critères relâchés + scope étendu 7 jours (au lieu de today seulement).
@@ -14289,7 +14490,11 @@
           const rel = best ? best.rel : (pred.reliability ?? pred.pick.prob);
           if (!rel || rel <= 0) return null;
           const edge = rel - 1/odd;
-          return { m, pred, odd, rel, edge, best };
+          const investment = (best && best.investment) || investmentScore(rel, odd, (() => {
+            try { return (typeof computeDataQuality === 'function') ? computeDataQuality(m) : null; }
+            catch(e) { return null; }
+          })(), { market: best ? best.market : '1n2' });
+          return { m, pred, odd, rel, edge, ev: expectedValue(rel, odd), investment, best };
         } catch(e) { return null; }
       })
       .filter(Boolean)
@@ -14297,16 +14502,27 @@
       .filter(x => _notStarted(x.m))
       .filter(x => x.odd >= 2.00 && x.rel >= 0.35
                 && (x.edge >= 0.05 || (x.rel * x.odd - 1) >= 0.12))
+      .filter(x => x.investment && x.investment.action !== 'skip' && x.investment.score >= 50)
       .filter(x => !_losingSports.has(x.m.sport))
       .filter((x, i, arr) => arr.findIndex(y => y.m.id === x.m.id) === i)  // dédup
-      .sort((a, b) => (b.rel * b.odd - 1) - (a.rel * a.odd - 1))  // tri par EV
+      .sort((a, b) => {
+        const bs = b.investment ? b.investment.score : 0;
+        const as = a.investment ? a.investment.score : 0;
+        if (bs !== as) return bs - as;
+        return (b.rel * b.odd - 1) - (a.rel * a.odd - 1);
+      })
       .slice(0, 6);
     // Compute Kelly + stake pour chacun (même logique que topPicks)
     // 2026-05-01 — Ajout `ev` (Expected Value) pour affichage cohérent
     // avec edge sur toutes les cards. EV = rel × odd - 1.
     const _enrichPick = (x) => {
       const xx = x.best ? { ...x, odd: x.best.odd, rel: x.best.rel, edge: x.best.edge } : x;
-      const k = (typeof kellyFraction === 'function') ? kellyFraction(xx.rel, xx.odd, 0.25) : 0;
+      const investment = xx.investment || investmentScore(xx.rel, xx.odd, (() => {
+        try { return (typeof computeDataQuality === 'function') ? computeDataQuality(xx.m) : null; }
+        catch(e) { return null; }
+      })(), { market: xx.best ? xx.best.market : '1n2' });
+      const kRaw = (typeof kellyFraction === 'function') ? kellyFraction(xx.rel, xx.odd, 0.25) : 0;
+      const k = investment && isFinite(investment.cappedKelly) ? Math.min(kRaw, investment.cappedKelly) : kRaw;
       let stake = userBankroll * k;
       const capAbs = userBankroll * 0.10;
       if (stake > capAbs) stake = capAbs;
@@ -14314,7 +14530,7 @@
       const gain = stake * (xx.odd - 1);
       const ev = (xx.rel > 0 && xx.odd > 1) ? (xx.rel * xx.odd - 1) : 0;
       const { home, away } = (typeof getSides === 'function') ? getSides(xx.m) : { home: {}, away: {} };
-      return { ...xx, stake, gain, ev, homeName: home?.name || '?', awayName: away?.name || '?', homeLogo: home?.logo || '', awayLogo: away?.logo || '' };
+      return { ...xx, stake, gain, ev, investment, homeName: home?.name || '?', awayName: away?.name || '?', homeLogo: home?.logo || '', awayLogo: away?.logo || '' };
     };
     const prudentPicksEnriched = prudentPicks.map(_enrichPick);
     const aggressivePicksEnriched = aggressivePicks.map(_enrichPick);
@@ -14327,8 +14543,13 @@
     const otherOpportunities = _dataIsStale ? [] : allTodayRaw
       .filter(x => !shownIds.has(x.m.id))
       .filter(x => !x.m.live && !x.m.completed && _notStarted(x.m))
-      .filter(x => x.edge > 0 && x.rel >= 0.55)
-      .sort((a, b) => b.edge - a.edge);
+      .filter(x => x.edge > 0 && x.rel >= 0.55 && (!x.investment || x.investment.action !== 'skip'))
+      .sort((a, b) => {
+        const bs = b.investment ? b.investment.score : 0;
+        const as = a.investment ? a.investment.score : 0;
+        if (bs !== as) return bs - as;
+        return b.edge - a.edge;
+      });
 
     // v29 — Hero hook : show today's headline pick as the featured banner.
     // First-choice : best-edge topPick. Fallback : highest-confidence upcoming
@@ -14343,13 +14564,22 @@
     if (!heroPick && !_dataIsStale) {
       const fallback = allTodayRaw
         .filter(x => !x.m.live && !x.m.completed && _notStarted(x.m)
-                  && x.rel >= 0.55 && !_losingSports.has(x.m.sport))
-        .sort((a, b) => b.rel - a.rel)[0];
+                  && x.rel >= 0.55 && (!x.investment || x.investment.action !== 'skip') && !_losingSports.has(x.m.sport))
+        .sort((a, b) => {
+          const bs = b.investment ? b.investment.score : 0;
+          const as = a.investment ? a.investment.score : 0;
+          if (bs !== as) return bs - as;
+          return b.rel - a.rel;
+        })[0];
       if (fallback) {
         // v30 — promouvoir best comme dans topPicks pour cohérence d'affichage
         const ff = fallback.best ? { ...fallback, odd: fallback.best.odd, rel: fallback.best.rel, edge: fallback.best.edge } : fallback;
         const { home, away } = (typeof getSides === 'function') ? getSides(ff.m) : { home: {}, away: {} };
-        heroPick = { ...ff, homeName: home?.name || '?', awayName: away?.name || '?', homeLogo: home?.logo || '', awayLogo: away?.logo || '', _noEdge: true };
+        const investment = ff.investment || investmentScore(ff.rel, ff.odd, (() => {
+          try { return (typeof computeDataQuality === 'function') ? computeDataQuality(ff.m) : null; }
+          catch(e) { return null; }
+        })(), { market: ff.best ? ff.best.market : '1n2' });
+        heroPick = { ...ff, investment, homeName: home?.name || '?', awayName: away?.name || '?', homeLogo: home?.logo || '', awayLogo: away?.logo || '', _noEdge: true };
       }
     }
     const bestLeague = heroPick ? (heroPick.m.league_name || '') : '';
@@ -14625,7 +14855,7 @@
       </section>`;
     })();
 
-    // v34.34 — Cockpit d'accueil : le dashboard devient un poste de décision,
+    // v34.35 — Cockpit d'accueil : le dashboard devient un poste de décision,
     // pas une pile de sections. Il reprend les signaux déjà calculés ci-dessus
     // et donne en un écran : quoi faire, combien miser, quoi surveiller.
     const _dashboardCockpit = (() => {
@@ -14677,10 +14907,23 @@
         const pick = (x.best && x.best.label) || (x.pred && x.pred.pick && x.pred.pick.label) || 'Pick';
         return `${h} vs ${a} · ${pick}`;
       };
+      const primaryDq = primary ? (() => {
+        try { return (typeof computeDataQuality === 'function') ? computeDataQuality(primary.m) : null; }
+        catch(e) { return null; }
+      })() : null;
+      const signalStackHtml = primaryDq && primaryDq.items ? primaryDq.items.map(it => `
+        <span class="${it.ok ? 'is-ok' : 'is-miss'}">${esc(it.label)}</span>
+      `).join('') : '';
       const primaryHtml = primary ? (() => {
         const pickLabel = (primary.best && primary.best.label) || (primary.pred && primary.pred.pick && primary.pred.pick.label) || 'Pick';
         const edge = Number(primary.edge) || 0;
         const ev = (primary.ev != null) ? Number(primary.ev) : ((Number(primary.rel) || 0) * (Number(primary.odd) || 0) - 1);
+        const investment = primary.investment || investmentScore(primary.rel, primary.odd, primaryDq, {
+          market: primary.best ? primary.best.market : '1n2'
+        });
+        const profile = investment.profile || oddsDisciplineProfile(primary.odd);
+        const investClass = investment.action === 'bet' ? 'is-good' : (investment.action === 'watch' ? 'is-warn' : 'is-bad');
+        const reasonHtml = (investment.reasons || []).slice(0, 3).map(r => `<span>${esc(r)}</span>`).join('');
         const stake = Number(primary.stake) || 0;
         const gain = Number(primary.gain) || (stake * ((Number(primary.odd) || 1) - 1));
         const hasAction = topPicks.length > 0 && !_dataIsStale && stake > 0;
@@ -14688,11 +14931,18 @@
         const matchId = String(primary.m && primary.m.id || '');
         const market = (primary.best && primary.best.market) || '1n2';
         const pickKey = (primary.best && primary.best.key) || (primary.pred && primary.pred.pick && primary.pred.pick.key) || '';
+        const logoHome = primary.homeLogo ? `<img src="${esc(primary.homeLogo)}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'">` : '<span></span>';
+        const logoAway = primary.awayLogo ? `<img src="${esc(primary.awayLogo)}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'">` : '<span></span>';
         return `
           <article class="dash-cockpit__pick interactive" data-match-id="${esc(matchId)}" role="button" tabindex="0">
             <div class="dash-cockpit__pick-head">
               <span class="dash-cockpit__eyebrow">${hasAction ? 'Priorité de mise' : 'Match à surveiller'}</span>
               <span class="dash-cockpit__countdown action-focus-countdown" data-kickoff="${primary.m && primary.m.date ? new Date(primary.m.date).getTime() : 0}">${esc(formatCountdown(primary.m))}</span>
+            </div>
+            <div class="dash-cockpit__logos" aria-hidden="true">
+              ${logoHome}
+              <b>${esc((primary.best && primary.best.market ? primary.best.market.toUpperCase() : 'VALUE'))}</b>
+              ${logoAway}
             </div>
             <h1 class="dash-cockpit__match">${esc(primary.homeName || '?')} <span>vs</span> ${esc(primary.awayName || '?')}</h1>
             <div class="dash-cockpit__league">${esc((primary.m && (primary.m.league_name || primary.m.league)) || '')}</div>
@@ -14713,6 +14963,14 @@
                 <span>Edge</span>
                 <strong class="${edge >= 0 ? 'is-good' : 'is-bad'}">${edge >= 0 ? '+' : ''}${Math.round(edge * 100)}pt</strong>
               </div>
+              <div>
+                <span>EV</span>
+                <strong class="${ev >= 0 ? 'is-good' : 'is-bad'}">${ev >= 0 ? '+' : ''}${Math.round(ev * 100)}%</strong>
+              </div>
+              <div>
+                <span>Invest</span>
+                <strong class="${investClass}">${investment.score}/100</strong>
+              </div>
             </div>
             <div class="dash-cockpit__stake">
               <div>
@@ -14723,6 +14981,15 @@
               <div class="dash-cockpit__riskbar" aria-label="Part de bankroll recommandée">
                 <span style="width:${Math.min(100, Math.max(0, budgetPct)).toFixed(0)}%"></span>
               </div>
+            </div>
+            <div class="dash-cockpit__intel">
+              <div class="dash-cockpit__chips">
+                <span class="dash-cockpit__chip dash-cockpit__chip--${esc(profile.tone)}">Zone cote : ${esc(profile.label)}</span>
+                <span class="dash-cockpit__chip">EV min ${(profile.minEv * 100).toFixed(0)}%</span>
+                <span class="dash-cockpit__chip">Kelly cap ${(investment.cappedKelly * 100).toFixed(1)}%</span>
+                <span class="dash-cockpit__chip dash-cockpit__chip--${investment.action === 'bet' ? 'ok' : investment.action === 'watch' ? 'warn' : 'danger'}">${esc(investment.label)}</span>
+              </div>
+              ${reasonHtml ? `<div class="dash-cockpit__reasons">${reasonHtml}</div>` : ''}
             </div>
             <div class="dash-cockpit__actions">
               <button type="button" class="dash-cockpit__btn dash-cockpit__btn--primary ed-hero__primary" data-match-id="${esc(matchId)}">Détail match</button>
@@ -14797,6 +15064,11 @@
                   <em>${_dataIsStale ? 'Refresh requis' : (totalStakePlan > 0 ? 'gain potentiel top 3' : 'bankroll préservée')}</em>
                 </div>
               </div>
+              <div class="dash-cockpit__signal">
+                <span>Signaux utilisés</span>
+                <strong>${primaryDq ? `${primaryDq.score}/${primaryDq.max}` : '—'}</strong>
+                <div>${signalStackHtml || '<span class="is-miss">Aucun pick principal</span>'}</div>
+              </div>
             </aside>
           </div>
 
@@ -14806,7 +15078,7 @@
 
           <div class="dash-cockpit__footer">
             <button type="button" class="dash-cockpit__link action-focus-howto">Comment lire un prono</button>
-            <span>${todayStats.ok || 0} picks OK après filtres · ${todayStats.lowConf || 0} low conf · ${todayStats.noEdge || 0} no edge · ${todayStats.noOdds || 0} sans cote</span>
+            <span>${todayStats.ok || 0} picks OK après filtres · ${todayStats.lowConf || 0} low conf · ${todayStats.noEdge || 0} no edge · ${todayStats.capitalSkip || 0} rejet capital · ${todayStats.noOdds || 0} sans cote</span>
             ${_dataIsStale ? '<button type="button" class="dash-cockpit__link" data-agent-force-refresh>Forcer le refresh</button>' : '<button type="button" class="dash-cockpit__link page-btn" data-page="sante">Santé data</button>'}
           </div>
         </section>`;
@@ -14823,7 +15095,7 @@
 
         <!-- v30 — Daily P&L chip retiré : Théo n'enregistre pas ses paris. -->
 
-        <!-- v34.34 — Legacy ed-hero désactivé : le cockpit couvre maintenant
+        <!-- v34.35 — Legacy ed-hero désactivé : le cockpit couvre maintenant
              l'action principale ET l'état vide sans doublon visuel. Bloc gardé
              une version comme rollback rapide pendant la stabilisation. -->
         ${false ? (topPicks.length ? '' : ((heroPick && topPicks.length === 0) ? (() => {
@@ -28349,20 +28621,20 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     if (_pwaLaterBtn) _pwaLaterBtn.addEventListener('click', () => { _pwaSnooze(7); _pwaHideBanner(); });
     if (_pwaDismissBtn) _pwaDismissBtn.addEventListener('click', () => { _pwaSnooze(30); _pwaHideBanner(); });
 
-    // v34.34 — Click sur badge version footer → modal récap nouveautés
+    // v34.35 — Click sur badge version footer → modal récap nouveautés
     const versionBadge = document.getElementById('footer-version');
     if (versionBadge) {
       const _showWhatsNew = () => {
         const features = [
-          '🎛️ Cockpit d\'accueil : mission du jour, statut data, bankroll, agent et plan d\'action en un écran',
-          '🎯 Pick principal redesigné avec mise conseillée, edge, EV, countdown et lien Winamax',
-          '🧭 Raccourcis rapides vers edges 7j, plan de mise, locks, calendrier, performance et simulateur',
-          '🛡️ Mode patience plus clair quand aucun pari ne mérite d\'être forcé',
-          '📱 Layout cockpit revu desktop + mobile, sans doublon ancien "aucun pari recommandé"',
+          'Capital engine : les cotes trop basses sont pénalisées si l\'EV ne compense pas le faible gain',
+          'Score Invest 0-100 : mélange EV, edge, Kelly, qualité data et zone de cote',
+          'Cockpit enrichi : logos, zone cote, EV minimum, Kelly cap et raisons lisibles',
+          'Agent autonome plus strict : cap spécial micro-cotes / longues cotes et tri rendement-risque',
+          'Tests Playwright ajoutés sur les règles cote basse, zone rentable et variance haute',
         ];
         const html = '<div style="text-align:left;padding:8px 0;">' +
-          '<h3 style="margin:0 0 12px;font-size:18px;color:var(--text);">🎉 Nouveautés v34.34</h3>' +
-          '<div style="font-size:11px;color:var(--text-dim);margin-bottom:14px;">Le premier écran devient un vrai cockpit de décision : quoi faire, quoi éviter, et où aller ensuite.</div>' +
+          '<h3 style="margin:0 0 12px;font-size:18px;color:var(--text);">Nouveautés v34.35</h3>' +
+          '<div style="font-size:11px;color:var(--text-dim);margin-bottom:14px;">Le site raisonne maintenant comme un portefeuille : proba, gain, risque et qualité data avant toute mise.</div>' +
           '<ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:7px;font-size:13px;color:var(--text-2);line-height:1.5;">' +
           features.map(f => `<li>${f}</li>`).join('') + '</ul></div>';
         // Réutiliser le pattern showShortcutsHelp si dispo
