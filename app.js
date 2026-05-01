@@ -17610,8 +17610,9 @@
             <h3 class="section-h3">🎨 Apparence</h3>
             <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">Choisis la couleur du site.</div>
             <div class="pref-pill-group">
-              <button class="theme-pill ${currentTheme==='dark'?'active':''}" data-theme-btn="dark">🌙 Sombre</button>
-              <button class="theme-pill ${currentTheme==='light'?'active':''}" data-theme-btn="light">☀️ Clair</button>
+              <button class="theme-pill theme-chip ${currentTheme==='dark'?'active':''}" data-theme="dark" data-theme-btn="dark">🌙 Sombre</button>
+              <button class="theme-pill theme-chip ${currentTheme==='light'?'active':''}" data-theme="light" data-theme-btn="light">☀️ Clair</button>
+              <button class="theme-pill theme-chip ${currentTheme==='auto'?'active':''}" data-theme="auto" data-theme-btn="auto">🔄 Auto</button>
             </div>
             <!-- v31.7.61 — Accent variant picker (audit V2 #12) -->
             <div style="font-size:12px;color:var(--text-dim);margin:14px 0 6px;">Accent (couleur des éléments WIN/positifs).</div>
@@ -17838,18 +17839,42 @@
       localStorage.setItem('userPrefs', JSON.stringify({ ...cur, ...partial }));
     }
     // v22 — apparence + accessibilité
+    // Phase 3 #9 : ajout 3-state dark/light/auto via prefers-color-scheme
     wrap.querySelectorAll('[data-theme-btn]').forEach(btn => {
       btn.addEventListener('click', () => {
         const theme = btn.dataset.themeBtn;
         savePrefs({ theme });
         const root = document.documentElement;
-        if (theme === 'light') root.setAttribute('data-theme', 'light');
-        else root.removeAttribute('data-theme');
+        if (theme === 'auto') {
+          // 'auto' suit prefers-color-scheme — pas de data-theme, le browser choisit
+          const sys = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+          if (sys === 'light') root.setAttribute('data-theme', 'light');
+          else root.removeAttribute('data-theme');
+        } else if (theme === 'light') {
+          root.setAttribute('data-theme', 'light');
+        } else {
+          root.removeAttribute('data-theme');
+        }
         const meta = document.getElementById('theme-color-meta');
         if (meta) meta.setAttribute('content', theme === 'light' ? '#f5f5f7' : '#08080a');
         renderProfilPage(wrap);
       });
     });
+    // Phase 3 #9 : listener prefers-color-scheme pour mode auto
+    try {
+      const mql = window.matchMedia('(prefers-color-scheme: light)');
+      if (mql && !mql._wired) {
+        mql._wired = true;
+        mql.addEventListener('change', () => {
+          let p; try { p = JSON.parse(localStorage.getItem('userPrefs') || '{}'); } catch(e) { p = {}; }
+          if ((p.theme || 'dark') === 'auto') {
+            const root = document.documentElement;
+            if (mql.matches) root.setAttribute('data-theme', 'light');
+            else root.removeAttribute('data-theme');
+          }
+        });
+      }
+    } catch(e){}
     // v31.7.61 — Accent variant picker
     wrap.querySelectorAll('[data-accent-btn]').forEach(btn => {
       btn.addEventListener('click', () => {
