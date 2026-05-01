@@ -2415,30 +2415,34 @@
   nav.topbar-sports button.active { color: var(--text); background: var(--panel-3); font-weight: 600; }
   nav.topbar-sports button .count { font-size: 10px; color: var(--text-dim2); margin-left: 2px; }
 
-  /* --- Refresh indicator au-dessus du footer (petit pilule discret) --- */
+  /* --- Refresh indicator (v32.9 — repositionné en haut à droite,
+         compact, peu invasif). Avant : bottom-left flottant qui chevauchait
+         le contenu. Maintenant : top-right discret, hidden quand fresh
+         (.refresh-indicator sans .stale ni .very-stale = invisible). --- */
   .refresh-indicator.topbar-refresh {
-    position: fixed; bottom: 16px; left: 16px; z-index: 50;
-    margin: 0; padding: 5px 12px; font-size: 10.5px;
+    position: fixed; top: 70px; right: 12px; z-index: 50;
+    margin: 0; padding: 4px 10px; font-size: 10.5px;
     background: var(--panel); border: 1px solid var(--border);
     border-radius: var(--r-pill);
-    /* Sur écrans étroits, ne pas chevaucher le FAB chatbot (coin bas-droit) */
     max-width: calc(100vw - 100px);
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    transition: opacity .2s;
+    opacity: .85;
   }
-  /* AUDIT-2026-04-27 (Sprint 3 #11) — Sur mobile, la pilule était à
-     bottom:16px ET la mobile-bottom-nav fait ~60px → la pilule était
-     CACHÉE par la nav (z:50 < nav z:80). Remontée au-dessus de la nav. */
+  .refresh-indicator.topbar-refresh:hover { opacity: 1; }
+  /* Caché tant que la data est fresh (pas de .stale ni .very-stale) */
+  .refresh-indicator.topbar-refresh:not(.stale):not(.very-stale):not(.refreshing) {
+    opacity: 0; pointer-events: none;
+  }
   @media (max-width: 720px) {
     .refresh-indicator.topbar-refresh {
+      top: auto;
       bottom: calc(72px + env(safe-area-inset-bottom, 0px));
-      left: 8px;
+      right: 8px;
       font-size: 10px;
       padding: 4px 10px;
       max-width: calc(100vw - 16px);
     }
-    /* AUDIT-2026-04-27 (Sprint 3 #12) — Drawer ouvert masque la
-       bottom-nav. Évite le chevauchement visuel + double-input
-       lors de l'ouverture du drawer hamburger en mode mobile. */
     body.sidebar-open .mobile-bottom-nav { display: none !important; }
     body.sidebar-open .refresh-indicator.topbar-refresh { display: none !important; }
   }
@@ -3826,35 +3830,49 @@
   }
 
   .hist-day-body { padding: 0 4px 4px; }
+  /* v32.10 — Historique row plus aéré + noms de match en 2 lignes au lieu
+     d'ellipsis brutal. Avant : "Manchester Uni..." illisible. Après :
+     "Manchester United\nvs Liverpool" sur 2 lignes max. */
   .hist-pick-head, .hist-pick-row {
     display: grid;
-    grid-template-columns: 34px minmax(0,1fr) 120px 60px 60px 50px 80px;
-    gap: 10px; align-items: center; padding: 9px 12px;
-    font-size: 12.5px;
+    grid-template-columns: 34px minmax(0,1.4fr) 110px 60px 60px 50px 80px;
+    gap: 10px; align-items: center; padding: 12px 14px;
+    font-size: 13px;
   }
   .hist-pick-head {
     font-size: 10.5px; color: var(--text-dim2);
     font-weight: 600; text-transform: uppercase; letter-spacing: .5px;
     border-bottom: 1px solid var(--border);
+    padding: 9px 14px;
   }
-  .hist-pick-row { border-bottom: 1px solid rgba(255,255,255,.02); cursor: pointer; transition: background .12s; }
+  .hist-pick-row { border-bottom: 1px solid rgba(255,255,255,.04); cursor: pointer; transition: background .12s; }
   .hist-pick-row:last-child { border-bottom: none; }
-  .hist-pick-row:hover { background: rgba(255,255,255,.03); }
-  .hist-pick-sport { font-size: 18px; text-align: center; }
+  .hist-pick-row:hover { background: rgba(167,139,250,.06); }
+  .hist-pick-sport { font-size: 19px; text-align: center; }
   .hist-pick-title {
     color: var(--text); font-weight: 600;
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    /* v32.10 : 2 lignes max au lieu de tronquer une ligne. Permet de
+       voir l'équipe entière même sur les longs noms (clubs européens). */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.3;
+    word-break: break-word;
   }
   .hist-pick-sub {
-    color: var(--text-dim2); font-size: 11px; margin-top: 1px;
+    color: var(--text-dim2); font-size: 11px; margin-top: 3px;
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
   .hist-pick-cell {
-    color: var(--text-dim); font-variant-numeric: tabular-nums;
+    color: var(--text); font-variant-numeric: tabular-nums;
+    font-weight: 500;
   }
   @media (max-width: 680px) {
     .hist-pick-head, .hist-pick-row {
-      grid-template-columns: 28px minmax(0,1fr) 70px 50px 40px 70px;
+      grid-template-columns: 28px minmax(0,1fr) 70px 48px 40px 70px;
+      gap: 8px; padding: 10px 10px;
+      font-size: 12.5px;
     }
     .hist-pick-head > div:nth-child(5),
     .hist-pick-row > div:nth-child(5) { display: none; }
