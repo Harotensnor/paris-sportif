@@ -693,7 +693,12 @@
   }
 
   /* ======= MAIN ======= */
-  main { padding: 28px; max-width: 1400px; margin: 0 auto; }
+  /* Phase 3 #5 (audit final) : casser la colonne 720px — main 1280px max */
+  main { padding: var(--gap-md) var(--gap-lg); max-width: 1280px; margin: 0 auto; width: 100%; }
+  .page-content { max-width: 1280px; width: 100%; margin: 0 auto; padding: var(--gap-md) var(--gap-lg); }
+  @media (max-width: 1100px) {
+    .sidebar { display: none; }
+  }
 
   /* ======= PAGE NAV (Simples/Combinés/Bilan) ======= */
   .page-nav {
