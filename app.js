@@ -11635,6 +11635,32 @@
       if (box) box.style.display = 'none';
     }
   });
+  // v33.25 — Délégué global pour [data-agent-force-refresh] : permet à
+  // n'importe quel bouton/lien dans la page (banner stale, footer, etc.)
+  // de déclencher le force-refresh sans nécessiter de listener local.
+  // Avant : seul le bouton dans txtEl avait un listener (cf. ligne ~12090),
+  // donc les autres références au "🔄 forcer refresh" pointaient dans le vide.
+  document.addEventListener('click', async (e) => {
+    const btn = e.target.closest('[data-agent-force-refresh]');
+    if (!btn) return;
+    e.preventDefault();
+    if (btn._refreshing) return;
+    btn._refreshing = true;
+    const origHtml = btn.innerHTML;
+    btn.innerHTML = '⏳ refresh en cours...';
+    try {
+      if ('serviceWorker' in navigator) {
+        const rs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(rs.map(r => r.unregister()));
+      }
+      if ('caches' in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map(k => caches.delete(k)));
+      }
+    } catch(err) { console.warn('force refresh failed:', err); }
+    if (typeof _hardReload === 'function') _hardReload();
+    else location.reload();
+  });
   // v30 — Navigation clavier dans search-suggest : ↑/↓ pour naviguer,
   // Enter pour activer l'item highlighted, Esc pour fermer. Avant : seul
   // le clic souris fonctionnait, la page était inutilisable au clavier.
@@ -14124,25 +14150,43 @@
               Le modèle vise <strong>~60% de réussite</strong> sur le long terme (mesuré sur backtest). Sur le court terme, <strong>3 à 5 pertes consécutives sont normales</strong> et n'indiquent pas un dysfonctionnement. Reste sur Kelly fractionné, ne double pas la mise après une perte, accepte la variance. Les performances passées ne garantissent pas les futures. Ce site est un outil d'aide, pas une garantie. <a href="legal.html">Détails légaux</a> · <a href="methodologie.html#biais">Biais &amp; limites</a>
             </div>
           </details>` ;
-        })() : `
+        })() : (() => {
+          // v33.25 — Empty state contextualisé : compte les matchs upcoming
+          // vs en cours pour distinguer "journée vide" vs "journée trop avancée"
+          // (cas Théo screen 4 : 0 à venir mais 8 en cours → orienter sur demain).
+          const _allTodayE = (data?.days?.[todayISO()] || []);
+          const _nowMs = Date.now();
+          let _nUpcoming = 0, _nLiveE = 0, _nDoneE = 0;
+          for (const m of _allTodayE) {
+            if (!(m.winamax && m.winamax.available)) continue;
+            if (m.completed) { _nDoneE++; continue; }
+            const _ko = m.date ? new Date(m.date).getTime() : 0;
+            if (_ko > _nowMs) _nUpcoming++;
+            else _nLiveE++;
+          }
+          const _ctxMsg = _nUpcoming === 0 && _nLiveE > 0
+            ? `Tous les matchs Winamax du jour ont déjà commencé (<strong>${_nLiveE} en cours</strong>${_nDoneE>0?`, ${_nDoneE} fini${_nDoneE>1?'s':''}`:''}). Le modèle ne recommande pas de pari sur match en cours — regarde les matchs de demain.`
+            : _nUpcoming === 0
+            ? `Aucun match Winamax prévu pour aujourd'hui — soit la journée est terminée, soit le calendrier ne charge rien. Regarde la semaine.`
+            : `<strong>Pas de match avec edge ≥ 5% et confiance ≥ 55%</strong> sur les ${_nUpcoming} matchs à venir. Le modèle préfère ne rien recommander plutôt que de surfacer du bruit. C'est <em>normal</em> certains jours.`;
+          const _ctaPrimary = _nUpcoming === 0 ? 'calendrier' : 'tous';
+          const _ctaPrimaryLbl = _nUpcoming === 0 ? '📅 Voir le calendrier 7j' : '📋 Voir tous les matchs';
+          return `
           <article class="ed-hero ed-hero--empty">
             <header class="ed-hero__top">
               <span class="ed-hero__pill">⭐ Top pick du jour</span>
             </header>
             <h1 class="ed-hero__match" style="font-size:22px;letter-spacing:-.5px;margin:8px 0 6px;">Aucun pari recommandé</h1>
-            <p class="ed-hero__empty">
-              <strong>Pas de match avec edge ≥ 5% et confiance ≥ 55%</strong> disponible aujourd'hui.
-              <br><br>
-              Le modèle préfère ne rien recommander plutôt que de surfacer du bruit. C'est <em>normal</em> certains jours — les conditions de marché ne sont pas toujours favorables.
-            </p>
+            <p class="ed-hero__empty">${_ctxMsg}</p>
             <footer class="ed-hero__cta">
-              <button type="button" class="ed-hero__cta-btn page-btn" data-page="tous">📋 Voir tous les matchs</button>
+              <button type="button" class="ed-hero__cta-btn page-btn" data-page="${_ctaPrimary}">${_ctaPrimaryLbl}</button>
               <button type="button" class="ed-hero__secondary page-btn" data-page="locks">🔒 Locks à venir</button>
-              <button type="button" class="ed-hero__secondary page-btn" data-page="calendrier">📅 Calendrier 7j</button>
+              ${_nUpcoming > 0 ? `<button type="button" class="ed-hero__secondary page-btn" data-page="calendrier">📅 Calendrier 7j</button>` : ''}
               <button type="button" class="ed-hero__secondary page-btn" data-page="backtest">📈 Backtest</button>
             </footer>
           </article>
-        `}
+        `;
+        })()}
 
         ${(() => {
           // v31.7.35 → v31.7.75 : Stats hero strip enrichi à 5 KPIs cliquables
@@ -14266,7 +14310,8 @@
         <div class="info-banner info-banner--danger" style="padding:24px;margin:24px 0;">
           <div class="info-banner__title text-danger">⚠ Recommandations en pause</div>
           <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px;">Données obsolètes — je ne te donne pas de picks</div>
-          <div style="font-size:13px;line-height:1.5;">La dernière mise à jour date de <strong>${_dataAgeMin < 120 ? _dataAgeMin+' min' : Math.floor(_dataAgeMin/60)+'h'}</strong>. Les matchs affichés pourraient être faux ou déjà joués. <strong>Clique sur "🔄 forcer refresh"</strong> dans le banner rouge en haut pour recharger les vraies données du jour.</div>
+          <div style="font-size:13px;line-height:1.5;">La dernière mise à jour date de <strong>${_dataAgeMin < 120 ? _dataAgeMin+' min' : Math.floor(_dataAgeMin/60)+'h'}</strong>. Les matchs affichés pourraient être faux ou déjà joués.</div>
+          <a href="#" data-agent-force-refresh style="display:inline-block;margin-top:10px;background:#fca5a5;color:#1a0a0a;padding:8px 16px;border-radius:6px;font-weight:700;font-size:13px;text-decoration:none;cursor:pointer;">🔄 Forcer le refresh maintenant</a>
         </div>` : ''}
 
         <!-- Sprint 99 (v31.7.184) — Quick presets actions rapides 1-click -->
@@ -16191,7 +16236,7 @@
         <div style="padding:40px 0 20px;border-bottom:1px solid var(--border);">
           <div style="font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Aujourd'hui · Winamax</div>
           <h1 style="margin:0 0 6px;font-size:32px;font-weight:800;letter-spacing:-1.1px;color:var(--text);line-height:1.1;">Tous les pronos du jour</h1>
-          <div style="font-size:14px;color:var(--text-dim);">${pending.length + inProgress.length} prono${(pending.length + inProgress.length)>1?'s':''} value · ${pending.length} à venir · ${inProgress.length} en cours · ${finished.length} fini${finished.length>1?'s':''}${_completedNoOdds > 0 ? ` <span style="color:var(--text-dim2);" title="${_completedNoOdds} match${_completedNoOdds>1?'s':''} terminé${_completedNoOdds>1?'s':''} mais sans cote capturée (qualifs WTA/Challenger, etc.) → le modèle ne peut pas les évaluer dans le bilan.">(+${_completedNoOdds} non-trackables)</span>` : ''}${settledCount ? ` (<b style="color:${wrPct>=60?'#34d399':'var(--text-dim)'};">${wrPct}% réussite</b> sur ${settledCount})` : ''}${filtersActive ? `&nbsp;·&nbsp;<span style="color:var(--brand);font-weight:600;">filtres actifs</span>` : ''}<div style="font-size:11px;color:var(--text-dim2);margin-top:3px;">↳ paris à venir/en cours = edge ≥ -2pt (bad value filtré). Finis = picks avec cote capturée pour tracker la perf modèle.</div></div>
+          <div style="font-size:14px;color:var(--text-dim);">${pending.length + inProgress.length} prono${(pending.length + inProgress.length)>1?'s':''} value · ${pending.length} à venir · ${inProgress.length} en cours · ${finished.length} fini${finished.length>1?'s':''}${_completedNoOdds > 0 ? ` <span style="color:var(--text-dim2);" title="${_completedNoOdds} match${_completedNoOdds>1?'s':''} terminé${_completedNoOdds>1?'s':''} sans cote pré-match capturée (qualifs WTA/Challenger, etc.) → résultat visible mais pas dans le bilan ROI.">(+${_completedNoOdds} sans cote pré-match)</span>` : ''}${settledCount ? ` (<b style="color:${wrPct>=60?'#34d399':'var(--text-dim)'};">${wrPct}% réussite</b> sur ${settledCount})` : ''}${filtersActive ? `&nbsp;·&nbsp;<span style="color:var(--brand);font-weight:600;">filtres actifs</span>` : ''}<div style="font-size:11px;color:var(--text-dim2);margin-top:3px;">↳ paris à venir/en cours = edge ≥ -2pt (bad value filtré). Finis = picks avec cote capturée pour tracker la perf modèle.</div></div>
         </div>
         ${_sourcesStats && _sourcesStats.total > 0 ? `
           <!-- v33.1 — Widget Sources data : transparency sur d'où vient la couverture. -->
@@ -16259,7 +16304,7 @@
         <div style="display:flex;gap:8px;margin:0 0 14px;flex-wrap:wrap;">
           <button data-tous-tab="pending" style="padding:10px 18px;border-radius:8px;border:1px solid ${activeTab==='pending'?'var(--brand)':'var(--border-2)'};background:${activeTab==='pending'?'rgba(167,139,250,.15)':'var(--panel)'};color:${activeTab==='pending'?'var(--brand)':'var(--text-2)'};font-weight:700;font-size:13px;cursor:pointer;">⏱️ À venir <span style="opacity:.7;">(${pending.length})</span></button>
           <button data-tous-tab="inprogress" style="padding:10px 18px;border-radius:8px;border:1px solid ${activeTab==='inprogress'?'var(--brand)':'var(--border-2)'};background:${activeTab==='inprogress'?'rgba(167,139,250,.15)':'var(--panel)'};color:${activeTab==='inprogress'?'var(--brand)':'var(--text-2)'};font-weight:700;font-size:13px;cursor:pointer;">🔴 En cours <span style="opacity:.7;">(${inProgress.length})</span></button>
-          <button data-tous-tab="finished" title="${_completedNoOdds > 0 ? `Dont ${_completedNoOdds} non-trackable${_completedNoOdds>1?'s':''} (sans cote capturée pre-match → bilan ROI ne peut pas les évaluer mais le résultat est visible)` : ''}" style="padding:10px 18px;border-radius:8px;border:1px solid ${activeTab==='finished'?'var(--brand)':'var(--border-2)'};background:${activeTab==='finished'?'rgba(167,139,250,.15)':'var(--panel)'};color:${activeTab==='finished'?'var(--brand)':'var(--text-2)'};font-weight:700;font-size:13px;cursor:pointer;">✅ Finis <span style="opacity:.7;">(${finished.length})</span></button>
+          <button data-tous-tab="finished" title="${_completedNoOdds > 0 ? `Dont ${_completedNoOdds} sans cote pré-match capturée (qualifs WTA/Challenger, etc.) — résultat visible mais pas dans le bilan ROI` : ''}" style="padding:10px 18px;border-radius:8px;border:1px solid ${activeTab==='finished'?'var(--brand)':'var(--border-2)'};background:${activeTab==='finished'?'rgba(167,139,250,.15)':'var(--panel)'};color:${activeTab==='finished'?'var(--brand)':'var(--text-2)'};font-weight:700;font-size:13px;cursor:pointer;">✅ Finis <span style="opacity:.7;">(${finished.length})</span></button>
         </div>
         <div style="display:flex;flex-direction:column;gap:8px;">
           ${activeTab === 'pending' ? pendingHtml : activeTab === 'inprogress' ? inProgressHtml : finishedHtml}
@@ -22347,6 +22392,12 @@
       if (bestDay == null || d.pl > bestDay.pl) bestDay = d;
       if (worstDay == null || d.pl < worstDay.pl) worstDay = d;
     });
+    // v33.25 — Fix bug screen Théo : si 1 seul jour, bestDay === worstDay et
+    // affichait deux fois la même ligne (vert ET rouge). Forcer null sur
+    // worstDay quand on a moins de 2 jours distincts → KPI affiche "—".
+    if (days.length < 2 || (bestDay && worstDay && bestDay.key === worstDay.key)) {
+      worstDay = null;
+    }
 
     // 5. Sport breakdown
     const perSport = {};
