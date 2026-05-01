@@ -869,19 +869,20 @@ def get_drawdown_status(start_bankroll: float = 10.0) -> dict:
 
 
 @mcp.tool()
-def get_today_top_picks(min_edge: float = 0.05, min_conf: float = 0.55, limit: int = 10) -> dict:
-    """Renvoie les top picks value du jour avec edge ≥ X et confiance ≥ Y.
+def get_today_high_confidence(min_conf_pct: float = 60.0, sport: str = None, limit: int = 10) -> dict:
+    """Renvoie les picks du jour les + confiants (proba implicite ≥ min_conf_pct).
 
-    Calcul proxy en lisant data.js + winamax_markets — pas le vrai
-    predictMatch JS, donc edge approximatif. Utile pour Théo qui veut
-    une vue rapide depuis Claude Desktop sans ouvrir le site.
+    Diffère de get_top_value_picks (qui optimise edge book-margin) :
+    ici on ne filtre PAS par marge bookmaker, on retourne les matchs où le
+    favori a une cote très basse (≥60% implicite par défaut). Utile pour
+    "pari de sécurité" plutôt que "pari value".
 
     Args:
-        min_edge: edge minimum (default 0.05 = 5pt)
-        min_conf: confiance minimum (default 0.55 = 55%)
+        min_conf_pct: probabilité implicite minimum en pourcentage (default 60)
+        sport: filtre optionnel (football, tennis, basketball, etc.)
         limit: nombre max de picks à retourner (default 10)
 
-    Use case : "Donne-moi les meilleurs paris value du jour."
+    Use case : "Quels favoris solides aujourd'hui ?"
     """
     data = _load_data_js()
     if "_error" in data:
@@ -890,16 +891,31 @@ def get_today_top_picks(min_edge: float = 0.05, min_conf: float = 0.55, limit: i
     matches = (data.get("days") or {}).get(today) or []
     picks = []
     for m in matches:
-        if m.get("completed"):
+        if m.get("completed") or m.get("live"):
+            continue
+        if sport and m.get("sport") != sport:
             continue
         if not _is_winamax_bookable(m):
             continue
-        edge_info = _edge_estimate(m)
-        if not edge_info:
-            continue
-        if (edge_info.get("edge") or 0) < min_edge:
-            continue
-        if (edge_info.get("our_prob") or 0) < min_conf:
+        edge = _edge_estimate(m)
+        ph = edge.get("p_home_implied") or 0
+        pa = edge.get("p_away_implied") or 0
+        pd = edge.get("p_draw_implied") or 0
+        # Trouver le côté avec la plus haute proba implicite
+        best_side = None
+        best_p = 0
+        best_odd = None
+        for side, p, o in [
+            ("1", ph, edge.get("home_odd")),
+            ("2", pa, edge.get("away_odd")),
+            ("X", pd, edge.get("draw_odd")),
+        ]:
+            if p and p > best_p:
+                best_p = p
+                best_side = side
+                best_odd = o
+        # Filtre confiance
+        if best_p * 100 < min_conf_pct:
             continue
         comps = m.get("competitors") or []
         home = next((c for c in comps if c.get("home_away") == "home"), {})
@@ -909,22 +925,20 @@ def get_today_top_picks(min_edge: float = 0.05, min_conf: float = 0.55, limit: i
             "league": m.get("league_name") or m.get("league_code"),
             "sport": m.get("sport"),
             "kickoff": m.get("date"),
-            "pick": edge_info.get("pick_label"),
-            "odd": edge_info.get("odd"),
-            "implied_prob": edge_info.get("implied_prob"),
-            "our_prob": edge_info.get("our_prob"),
-            "edge_pct": round((edge_info.get("edge") or 0) * 100, 2),
+            "best_side": best_side,
+            "best_odd": best_odd,
+            "implied_prob_pct": round(best_p * 100, 1),
             "winamax_url": (m.get("winamax") or {}).get("url"),
         })
-    picks.sort(key=lambda p: -(p.get("edge_pct") or 0))
+    picks.sort(key=lambda p: -(p.get("implied_prob_pct") or 0))
     return {
         "today": today,
-        "filters": {"min_edge": min_edge, "min_conf": min_conf},
+        "min_conf_pct": min_conf_pct,
         "n_picks": len(picks[:limit]),
         "picks": picks[:limit],
-        "warning": (
-            "Edge calculé sur proxy (implied prob from cote, pas le vrai "
-            "predictMatch). Pour valeur précise, vérifie sur le site."
+        "note": (
+            "Probabilité implicite from cote Winamax (pas le vrai predictMatch JS). "
+            "Pour décision finale, croiser avec get_top_value_picks (edge)."
         ),
     }
 
@@ -946,9 +960,14 @@ def get_pipeline_status() -> dict:
     today = data.get("today") if not "_error" in data else None
     today_events = (data.get("days") or {}).get(today, []) if today else []
 
-    # Count by source
-    espn_count = sum(1 for ev in today_events if not str(ev.get("id", "")).startswith("sofa_"))
-    sofa_count = sum(1 for ev in today_events if str(ev.get("id", "")).startswith("sofa_"))
+    # Count by source — heuristic : ESPN ids commencent par "4" (9 chars),
+    # Sofascore ids sont plus courts (6-7 chars). Pas parfait mais suffisant
+    # pour un overview pipeline.
+    def _looks_espn(eid: str) -> bool:
+        return eid.startswith("4") and len(eid) >= 8
+
+    espn_count = sum(1 for ev in today_events if _looks_espn(str(ev.get("id", ""))))
+    sofa_count = sum(1 for ev in today_events if not _looks_espn(str(ev.get("id", ""))))
     winamax_count = sum(1 for ev in today_events if (ev.get("winamax") or {}).get("available"))
 
     return {
