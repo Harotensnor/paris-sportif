@@ -12635,6 +12635,20 @@
       } catch (err) {
         // En cas d'échec, débloquer les futurs appels (retry possible).
         __fullDataPromise = null;
+        // QA bug-hunt (2026-05-02) : log + toast user-friendly au lieu de throw silencieux.
+        // Cas typiques : offline (TypeError NetworkError), 404 (HTTP 404),
+        // parse failure (data.js corrompu côté CDN). Avant : throw, page restait
+        // sur état lite ou blanc. Maintenant : toast + log + return null pour
+        // que les callers fallback gracieusement.
+        try {
+          const msg = err && err.message ? err.message : 'inconnue';
+          console.warn('[_ensureFullData] failed:', msg);
+          if (typeof toast === 'function' && !navigator.onLine) {
+            toast('📡 Hors-ligne — données limitées au mode lite. Reconnexion auto.', 'warn', { duration: 4000 });
+          } else if (typeof toast === 'function') {
+            toast('⚠ Erreur chargement données complètes — réessayer dans 30s', 'warn', { duration: 4000 });
+          }
+        } catch(_) {}
         throw err;
       }
     })();
