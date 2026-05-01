@@ -8885,11 +8885,10 @@
     }[s] || '🏅';
   }
 
-  // v30 — League logo URL using ESPN's stable CDN format.
-  // ESPN serves league logos at /i/leaguelogos/<sport>/500/<slug>.png — the
-  // slug usually matches league_code (nba, nhl, mlb, ufc, atp, wta…) or the
-  // league_code's part after the dot (eng.1 → eng_1, esp.1 → esp_1, etc.).
-  // Returns null if we can't form a likely URL — caller falls back gracefully.
+  // v30 — League logo URL using ESPN's CDN when the code is known to be stable.
+  // Avoid guessing football/tennis slugs: ESPN returns 404 for many live codes
+  // (ger_1, atp, bel_1, sco_1...), which pollutes the console and wastes time.
+  // Callers already show the sport emoji fallback, so unknown logos stay clean.
   // v30 — Cache localStorage des URLs 404 connues : ESPN renvoie 404 pour ~27
   // codes ligue (esp_1, ger_1, eng_fa, bel_1, sco_1…). Plutôt que de relancer
   // ces requêtes à chaque page, on les note et on retourne null au prochain
@@ -8925,20 +8924,14 @@
     const code = String(match.league_code);
     const sport = match.sport;
     let url = null;
-    // Football: ESPN uses dot-separated codes mapped to numeric IDs in their
-    // CDN, but the slug form (eng_1, esp_1, fra_1) also works for many.
-    if (sport === 'football') {
-      const slug = code.replace(/\./g, '_');
-      url = `https://a.espncdn.com/i/leaguelogos/soccer/500/${slug}.png`;
-    } else if (sport === 'basketball') {
+    // Only request URLs we know are reliable; everything else keeps emoji.
+    if (sport === 'basketball' && ['nba', 'wnba'].includes(code)) {
       url = `https://a.espncdn.com/i/leaguelogos/basketball/500/${code}.png`;
-    } else if (sport === 'hockey') {
+    } else if (sport === 'hockey' && code === 'nhl') {
       url = `https://a.espncdn.com/i/leaguelogos/hockey/500/${code}.png`;
-    } else if (sport === 'baseball') {
+    } else if (sport === 'baseball' && code === 'mlb') {
       url = `https://a.espncdn.com/i/leaguelogos/baseball/500/${code}.png`;
-    } else if (sport === 'tennis') {
-      url = `https://a.espncdn.com/i/leaguelogos/tennis/500/${code}.png`;
-    } else if (sport === 'mma') {
+    } else if (sport === 'mma' && code === 'ufc') {
       url = `https://a.espncdn.com/i/leaguelogos/mma/500/${code}.png`;
     }
     // Skip URLs marquées 404 dans la session précédente — saves ~150ms FCP.
