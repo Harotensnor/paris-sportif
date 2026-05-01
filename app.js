@@ -21927,8 +21927,15 @@
             if (!adv || !adv.n) return '';
             const sharpeColor = adv.sharpe == null ? 'var(--text-dim)' : adv.sharpe >= 0.20 ? 'var(--accent)' : adv.sharpe >= 0 ? 'var(--warn)' : 'var(--danger)';
             const ddColor = adv.maxDrawdown <= 5 ? 'var(--accent)' : adv.maxDrawdown <= 15 ? 'var(--warn)' : 'var(--danger)';
+            // P1-2 (audit 2026-05-01) : ajouter explication "Sharpe peut être
+            // négatif même avec ROI cumul positif" — distribution skewed avec
+            // gros wins masquant beaucoup de petits losses, Sharpe est calculé
+            // sur retours par-pari (pas cumul).
+            const sharpeNote = adv.sharpe != null && adv.sharpe < 0 && adv.finalPnL > 0
+              ? ' · ⚠ ROI+ mais variance élevée'
+              : '';
             return [
-              kpiTile('Sharpe ratio', adv.sharpe == null ? '—' : adv.sharpe.toFixed(3), adv.sharpe >= 0.20 ? 'Excellent' : adv.sharpe >= 0.10 ? 'Bon' : adv.sharpe >= 0 ? 'Faible' : 'Négatif', sharpeColor),
+              kpiTile('Sharpe ratio', adv.sharpe == null ? '—' : adv.sharpe.toFixed(3), (adv.sharpe >= 0.20 ? 'Excellent' : adv.sharpe >= 0.10 ? 'Bon' : adv.sharpe >= 0 ? 'Faible' : 'Négatif') + sharpeNote, sharpeColor),
               kpiTile('Max drawdown', `−${adv.maxDrawdown.toFixed(1)}u`, adv.maxDDPct != null ? `(${(adv.maxDDPct*100).toFixed(0)}% du peak)` : '', ddColor),
               kpiTile('Streak max gain', `${adv.maxWinStreak}`, 'paris gagnants d\'affilée', 'var(--accent)'),
               kpiTile('Streak max perte', `${adv.maxLossStreak}`, 'paris perdants d\'affilée', 'var(--danger)'),
@@ -25559,6 +25566,14 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       <!-- CCCC : COACH IA NARRATIVE -->
       ${narrativeHtml}
 
+      <!-- P2-11 (audit 2026-05-01) : note distinguant cagnotte agent vs backtest -->
+      <div style="margin:8px 0 16px;padding:10px 14px;background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.2);border-left:3px solid #38bdf8;border-radius:0 8px 8px 0;font-size:12px;color:var(--text-dim);line-height:1.5;">
+        <b style="color:#38bdf8;">ℹ️ À savoir :</b> cette page agrège <b>2 sources distinctes</b> :
+        (1) la <b>cagnotte agent</b> (10€ démarrée à J+1, paris simulés temps réel) et
+        (2) le <b>backtest historique</b> (264 picks rejoués sur archive, cron hebdo).
+        Les compteurs de cette page reflètent l'<b>agent</b> ; pour le backtest complet voir <button class="page-btn" data-page="backtest" style="background:none;border:none;color:#38bdf8;text-decoration:underline;cursor:pointer;font:inherit;padding:0;">📈 Backtest</button>.
+      </div>
+
       <!-- KPI STRIP : modèle uniquement -->
       <div class="bilan-kpis">
         <div class="bilan-kpi brand">
@@ -26546,6 +26561,27 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       document.getElementById('date').min = keys[0];
       document.getElementById('date').max = keys[keys.length - 1];
     }
+    // P1-7 (audit 2026-05-01) : peuple le sub-titre topbar dynamiquement
+    // selon les sports actifs aujourd'hui. Avant : hardcoded "Foot · Tennis · NBA · NHL · MLB"
+    // même quand 0 NBA / 0 NHL.
+    try {
+      const subEl = document.getElementById('sub');
+      if (subEl) {
+        const todayEvs = (data.days?.[localToday] || []);
+        const sportLabels = { football:'Foot', tennis:'Tennis', basketball:'NBA', hockey:'NHL', baseball:'MLB', 'football-american':'NFL' };
+        const sportsToday = new Set();
+        for (const ev of todayEvs) {
+          if (ev.sport && sportLabels[ev.sport] && !ev.completed) {
+            sportsToday.add(sportLabels[ev.sport]);
+          }
+        }
+        if (sportsToday.size > 0) {
+          subEl.textContent = [...sportsToday].join(' · ') + ' aujourd\'hui';
+        } else {
+          subEl.textContent = 'Foot · Tennis · NBA · NHL · MLB';
+        }
+      }
+    } catch(e){}
     // Wire up page-nav buttons via delegation so that .page-btn elements
     // rendered later (inside dashboard/list views, e.g. "Voir tous les
     // combinés →" CTA) also navigate. The topbar buttons rely on this too.

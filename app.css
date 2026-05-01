@@ -5355,12 +5355,19 @@
   }
 
   /* Page transitions plus fluides */
+  /* P1-5 (audit 2026-05-01) : avant si .page-fade-in n'était pas ajoutée
+     ET que l'animation tournait avec opacity:0 initial → flash blanc 3-5s.
+     Maintenant : main par défaut visible, animation purement décorative. */
+  main { opacity: 1; }
   main.page-fade-in {
-    animation: pageFadeInSmooth .35s ease-out;
+    animation: pageFadeInSmooth .35s ease-out forwards;
   }
   @keyframes pageFadeInSmooth {
-    from { opacity: 0; transform: translateY(6px); }
+    from { opacity: 0.7; transform: translateY(4px); }
     to { opacity: 1; transform: translateY(0); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    main.page-fade-in { animation: none; }
   }
 
   /* Touch feedback : ripple-like sur les cards interactives mobile */
