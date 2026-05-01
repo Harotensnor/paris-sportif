@@ -139,6 +139,39 @@
 
     --surface: var(--panel);
     --text-muted: var(--text-dim);
+
+    /* Phase 3 #4 (audit final) : aliases sémantiques recommandés brief */
+    --text-mute: rgba(241, 243, 249, 0.42);
+    --success: #34d399;
+    --warning: #fbbf24;
+    --fs-base: 15px;
+    --fs-sm: 13px;
+    --fs-xs: 11px;
+    --fs-h2: 22px;
+    --fs-h3: 17px;
+    --gap-xs: 0.25rem;
+    --gap-sm: 0.5rem;
+    --gap-md: 1rem;
+    --gap-lg: 1.5rem;
+    --gap-xl: 2rem;
+    --surface-3: #232936;
+    --border-medium: rgba(255, 255, 255, 0.10);
+  }
+
+  /* Phase 3 #4 : cards harmonisées avec hover surface-2 */
+  .card,
+  .kpi-tile,
+  .modal-section,
+  .pick-card {
+    background: var(--surface-1);
+    border: 1px solid var(--border-soft);
+    border-radius: 12px;
+    transition: background 120ms ease, border-color 120ms ease;
+  }
+  .card:hover,
+  .pick-card:hover {
+    background: var(--surface-2);
+    border-color: var(--border-medium);
   }
 
   /* v31.7.50 — Chantier 8 audit : utility classes pour migrer progressivement
