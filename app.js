@@ -25576,6 +25576,11 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
               <div style="font-size:24px;font-weight:800;color:${roi7dCol};margin-top:4px;">${roi7d == null ? '—' : (roi7d >= 0 ? '+' : '') + roi7d.toFixed(1) + '%'}</div>
               <div style="font-size:11px;color:var(--text-dim);margin-top:3px;">${recent.length} pari${recent.length > 1 ? 's' : ''} récent${recent.length > 1 ? 's' : ''}</div>
             </div>
+            <div id="bilan-clv-tile" style="padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-radius:10px;">
+              <div style="font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;">CLV moyen</div>
+              <div style="font-size:24px;font-weight:800;color:var(--text-dim);margin-top:4px;" id="clv-mean">—</div>
+              <div style="font-size:11px;color:var(--text-dim);margin-top:3px;" id="clv-rate">Closing Line Value · chargement…</div>
+            </div>
           </div>
           <div style="margin-top:14px;padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-radius:10px;">
             <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;">
@@ -25841,6 +25846,30 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         row.classList.toggle('expanded');
       });
     });
+    // v33.32 — Fetch CLV asynchrone et remplit le tile dans Stats avancées.
+    // Cheap (~1KB summary). Cache HTTP 5min côté SW.
+    (function _loadCLV() {
+      const tile = wrap.querySelector('#bilan-clv-tile');
+      if (!tile) return;
+      fetch('clv_history.json?t=' + Math.floor(Date.now() / 60000), { cache: 'default' })
+        .then(r => r.ok ? r.json() : null)
+        .then(j => {
+          if (!j || !j.summary) return;
+          const s = j.summary;
+          const meanEl = tile.querySelector('#clv-mean');
+          const rateEl = tile.querySelector('#clv-rate');
+          if (meanEl) {
+            const m = s.mean_clv_pct || 0;
+            const col = m > 1 ? '#34d399' : m > 0 ? '#fbbf24' : m < -1 ? '#f87171' : 'var(--text)';
+            meanEl.style.color = col;
+            meanEl.textContent = (m >= 0 ? '+' : '') + m.toFixed(2) + 'pt';
+          }
+          if (rateEl) {
+            rateEl.innerHTML = `<b style="color:var(--text);">${s.positive_clv_rate || 0}%</b> des paris battent le marché · ${s.n_matches || 0} matchs trackés`;
+          }
+        })
+        .catch(() => {/* silent */});
+    })();
     // v26.5 — Sport filter pills (drill-down)
     wrap.querySelectorAll('.bilan-sport-btn').forEach(btn => btn.addEventListener('click', () => {
       const sp = btn.dataset.sport || null;
