@@ -9905,8 +9905,16 @@
               const rsCount = (pred.explain?.reasons || []).length;
               const dq = computeDataQuality(match);
               // Confiance label
+              // P1-9 (audit 2026-05-01) : downgrade si peu de signaux (≤2) ET
+              // consensus faible (<30%). Avant : "Très haute confiance 82%"
+              // était affiché même quand 2 signaux divergeaient à 100% — l'user
+              // voit "very high" alors que le pick est en réalité incertain.
+              const nComp = rm.n_components ?? rm.nComponents ?? null;
+              const consensus = rm.consensus ?? null;
+              const lowSignals = (nComp != null && nComp <= 2) && (consensus != null && consensus < 0.30);
               let confLbl;
-              if (rel >= 0.78) confLbl = 'très haute confiance';
+              if (lowSignals && rel >= 0.65) confLbl = 'confiance modérée (peu de signaux divergents)';
+              else if (rel >= 0.78) confLbl = 'très haute confiance';
               else if (rel >= 0.70) confLbl = 'haute confiance';
               else if (rel >= 0.60) confLbl = 'confiance modérée';
               else if (rel >= 0.50) confLbl = 'confiance limite';
@@ -20287,7 +20295,11 @@
     // alternative à un calendrier mensuel (qui ferait 14-25 KB de markup).
     const heatmapData = (() => {
       const cells = [];
-      const now = new Date(todayIso + 'T00:00:00Z');
+      // P2-6 (audit 2026-05-01) : avant `now` était basé sur todayIso (data.today)
+      // qui peut être stale → heatmap finissait à J+15 sur date stale, ratait des
+      // events futurs présents dans data.days. Maintenant : date locale.
+      const localTodayISO = (typeof todayISO === 'function') ? todayISO() : todayIso;
+      const now = new Date(localTodayISO + 'T00:00:00Z');
       const past = new Date(now); past.setUTCDate(past.getUTCDate() - 14);
       const future = new Date(now); future.setUTCDate(future.getUTCDate() + 15);
       const cur = new Date(past);
