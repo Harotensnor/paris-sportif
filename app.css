@@ -1936,6 +1936,31 @@
      "brand à gauche / utils à droite" qui était assuré avant par flex:1 sur
      la nav. Sans ça, brand + utils sont collés à gauche après le retrait. */
   .topbar-utils { margin-left: auto; }
+  /* V11 (audit phase 2) : nav horizontale topbar */
+  .topbar-mainnav {
+    display: flex; align-items: center; gap: 4px;
+    margin-left: 16px;
+  }
+  .topbar-mainnav__link {
+    padding: 7px 12px;
+    background: transparent;
+    color: var(--text-2);
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background .12s, color .12s, border-color .12s;
+  }
+  .topbar-mainnav__link:hover {
+    background: var(--surface-2, var(--panel-2));
+    color: var(--text);
+    border-color: var(--border-strong, var(--border-2));
+  }
+  @media (max-width: 1100px) {
+    .topbar-mainnav { display: none; }  /* sidebar prend le relais sur mobile/tablet */
+  }
 
   /* --- Brand (compact à gauche) --- */
   .topbar-brand {
@@ -3727,26 +3752,35 @@
   /* KPI strip */
   .bilan-kpis {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    /* V5 (audit phase 2) : minmax 170→200 pour tiles plus larges desktop */
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: var(--space-3);
   }
   .bilan-kpi {
-    background: var(--panel);
-    border: 1px solid var(--border);
+    background: var(--surface-1, var(--panel));
+    border: 1px solid var(--border-soft, var(--border));
     border-radius: var(--r-md);
-    padding: var(--space-4) 18px;
+    padding: 20px 22px;  /* V5 : padding bumpé */
     position: relative; overflow: hidden;
+    transition: border-color .12s, background .12s;
+  }
+  .bilan-kpi:hover {
+    background: var(--surface-2, var(--panel-2));
+    border-color: var(--border-strong, var(--border-2));
   }
   .bilan-kpi .kpi-label {
-    font-size: 10.5px; color: var(--text-dim2);
-    letter-spacing: .6px; text-transform: uppercase;
+    /* V5 : label 10.5→11px + letter-spacing renforcé */
+    font-size: 11px; color: var(--text-dim2);
+    letter-spacing: .8px; text-transform: uppercase;
     font-weight: 700;
   }
   .bilan-kpi .kpi-value {
-    font-size: 26px; font-weight: 800;
-    letter-spacing: -.5px;
-    margin-top: 4px; font-variant-numeric: tabular-nums;
+    /* V5 (audit phase 2) : numérique 26→34px pour hiérarchie data-dense */
+    font-size: 34px; font-weight: 800;
+    letter-spacing: -.8px;
+    margin-top: 6px; font-variant-numeric: tabular-nums;
     color: var(--text);
+    line-height: 1.1;
   }
   .bilan-kpi .kpi-value.pos { color: #34d399; }
   .bilan-kpi .kpi-value.neg { color: #f87171; }

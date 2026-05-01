@@ -6,6 +6,24 @@ des pronostics simples/combinés/montantes séquentielles, et une vue bilan.
 Déployé sur GitHub Pages. Client = navigateur ; données = fichier `data.js`
 régénéré en continu.
 
+## ⚠️ Cache busting (à savoir)
+
+Le `pronostics.html` contient `app.js?v=<hash8>` et `app.css?v=<hash8>`. Ces
+hashes sont stampés par le step `Stamp asset versions` du workflow
+`refresh.yml` (cron 5min). **Si tu push manuellement app.js / app.css**, ce
+step ne tourne pas → pronostics.html garde l'ancien hash → les browsers
+servent le cache stale au lieu du nouveau code.
+
+**Fix** : avant chaque push manuel d'app.js/app.css, restampe :
+```bash
+APP_CSS_HASH=$(git hash-object app.css | head -c 8)
+APP_JS_HASH=$(git hash-object app.js | head -c 8)
+sed -i -E "s|app\.css(\?v=[a-f0-9]+)?|app.css?v=${APP_CSS_HASH}|g" pronostics.html
+sed -i -E "s|app\.js(\?v=[a-f0-9]+)?|app.js?v=${APP_JS_HASH}|g" pronostics.html
+```
+
+Bumper aussi `sw.js` CACHE_VERSION dans la même commande.
+
 ## Architecture v31.7.177 (mise à jour 2026-04-28 — Sprints 82-90 brief 16-parties complet)
 
 Réponse au brief "fait tout sans exception" — couverture des 16 parties.

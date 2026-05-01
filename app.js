@@ -14225,7 +14225,22 @@
                 MAJ ${_dataAgeMin < 2 ? "à l'instant" : _dataAgeMin < 60 ? `il y a ${_dataAgeMin}min` : `il y a ${Math.floor(_dataAgeMin/60)}h`}
               </span>
             </header>
-            <h1 class="ed-hero__match">${esc(heroPick.homeName)} <span class="ed-hero__vs">vs</span> ${esc(heroPick.awayName)}</h1>
+            <h1 class="ed-hero__match">
+              ${(() => {
+                // V6 (audit phase 2) : logos équipes intégrés dans le titre hero.
+                // heroPick.m.competitors[i].logo est dispo via ESPN.
+                try {
+                  const sides = (typeof getSides === 'function') ? getSides(heroPick.m) : { home: null, away: null };
+                  const hL = sides.home?.logo;
+                  const aL = sides.away?.logo;
+                  const hImg = hL ? `<img src="${esc(hL)}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'" style="width:36px;height:36px;border-radius:6px;background:rgba(255,255,255,.04);padding:2px;vertical-align:middle;margin-right:8px;">` : '';
+                  const aImg = aL ? `<img src="${esc(aL)}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'" style="width:36px;height:36px;border-radius:6px;background:rgba(255,255,255,.04);padding:2px;vertical-align:middle;margin-left:8px;">` : '';
+                  return `${hImg}${esc(heroPick.homeName)}<span class="ed-hero__vs"> vs </span>${esc(heroPick.awayName)}${aImg}`;
+                } catch(e) {
+                  return `${esc(heroPick.homeName)} <span class="ed-hero__vs">vs</span> ${esc(heroPick.awayName)}`;
+                }
+              })()}
+            </h1>
             <p class="ed-hero__meta">${esc(bestLeague.slice(0,40))}${_kickoffLabel ? ` · <b>${esc(_kickoffLabel)}</b>` : ''}</p>
             <div class="ed-hero__stats" aria-label="Statistiques principales">
               <div class="ed-hero__stat">
