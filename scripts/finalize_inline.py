@@ -8,7 +8,7 @@ pronostics.html. Le navigateur devait parser 1.4 MB de JSON inline avant
 le 1er paint, et chaque poll re-téléchargeait 1.4 MB.
 
 Après : ce script tourne en DERNIER (après tous les patches), et :
-  1. Lit data.js (source de vérité, on n'y touche pas).
+  1. Lit data.js (source de vérité) et bumpe generated_at.
   2. Écrit data_today.json — events du jour uniquement (~200-300 KB).
      Utilisé par pollData() pour le rafraîchissement live (cher × 30s en
      mode LIVE).
@@ -67,6 +67,7 @@ def main():
         print('[finalize_inline] could not parse data.js, skipping.', flush=True)
         return
     data = json.loads(m.group(1))
+    data['generated_at'] = datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'
 
     # Phase 3 #2 : filter golf et events sans competitors valides AVANT
     # de produire les sidecar JSONs et de réinjecter dans pronostics.html.
@@ -78,9 +79,18 @@ def main():
         n_dropped += before - len(days_in[k])
     if n_dropped:
         print(f'[finalize_inline] dropped {n_dropped} events (golf/cricket/etc. ou competitors null)', flush=True)
-        # Réécriture data.js avec events filtrés
-        new_text = re.sub(r'=\s*\{.*\}\s*;?\s*$', '= ' + json.dumps(data, ensure_ascii=False, separators=(',', ':')) + ';\n', txt, count=1, flags=re.DOTALL)
-        DATA_JS.write_text(new_text, encoding='utf-8')
+
+    # Réécriture data.js avec generated_at frais (+ events filtrés si besoin).
+    # Sans ça, health.json pouvait annoncer data 0min tandis que le frontend
+    # gardait un top-level generated_at stale et affichait un faux stale state.
+    new_text = re.sub(
+        r'=\s*\{.*\}\s*;?\s*$',
+        '= ' + json.dumps(data, ensure_ascii=False, separators=(',', ':')) + ';\n',
+        txt,
+        count=1,
+        flags=re.DOTALL,
+    )
+    DATA_JS.write_text(new_text, encoding='utf-8')
 
     today = data.get('today') or datetime.utcnow().strftime('%Y-%m-%d')
     days = data.get('days') or {}
