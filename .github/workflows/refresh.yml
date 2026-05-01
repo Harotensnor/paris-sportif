@@ -37,10 +37,7 @@ jobs:
         with:
           python-version: '3.11'
           cache: 'pip'
-
-      # v33.27 — pip cache file pour `actions/setup-python` cache: pip
-      - name: Setup pip cache key
-        run: echo "curl_cffi pillow" > pip-requirements.txt
+          cache-dependency-path: pip-requirements.txt
 
       - name: Install deps
         run: pip install -r pip-requirements.txt --break-system-packages
