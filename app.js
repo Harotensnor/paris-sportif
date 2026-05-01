@@ -15992,7 +15992,16 @@
       ? currentDate
       : new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
     const today = (data && data.days && data.days[todayIso]) || [];
-    const winaToday = today.filter(m => m.winamax && m.winamax.available === true);
+    // Bug-hunt 2026-05-02 : avant le filter winamax.available=true masquait
+    // 87% des matchs (~840 Sofa events → ~66 Winamax bookable → ~12 affichés).
+    // Ajout toggle 'Tous matchs / Winamax only' (default Winamax pour ne pas
+    // afficher des picks qu'on ne peut pas parier, mais possibilité d'élargir).
+    const _tousMode = (() => {
+      try { return localStorage.getItem('tousFilterMode') || 'winamax'; } catch(e) { return 'winamax'; }
+    })();
+    const winaToday = _tousMode === 'all'
+      ? today.slice()  // tous les matchs
+      : today.filter(m => m.winamax && m.winamax.available === true);
 
     // AUDIT-2026-04-27 — Comptage transparent des matchs terminés non-trackables.
     // Beaucoup de matchs (typiquement qualifs WTA/Challenger tennis) ont
@@ -16208,7 +16217,8 @@
       const aLogo = (p.away && p.away.logo) || '';
       const tLbl = fmtTime(p.m.date);
       const confColor = p.rel >= 0.70 ? 'var(--accent)' : p.rel >= 0.60 ? '#fbbf24' : 'var(--text-dim)';
-      const edgeColor = p.edge > 0.10 ? 'var(--accent)' : p.edge > 0.05 ? '#fbbf24' : 'var(--text-dim)';
+      // Bug-hunt 2026-05-02 : edge color signalé négatif (rouge) au lieu de gris neutre
+      const edgeColor = p.edge > 0.10 ? 'var(--accent)' : p.edge > 0.05 ? '#fbbf24' : p.edge < 0 ? 'var(--danger)' : 'var(--text-dim)';
       const pickLabel = p.pred.pick.label || 'Pick';
       // AUDIT-2026-04-27 (Ticket 2 — suite) — Source de cote dans la liste
       // Tous. Le tooltip "Cote décimale Winamax" ment pour les events
@@ -16437,6 +16447,13 @@
             }).join('')}
           </div>` : ''}
           <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+            <label style="display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-dim);" title="Bug-hunt 2026-05-02 : par défaut Winamax-only (matches bookables). Toggle 'Tous' pour voir les ~840 events Sofa (non bookables sans cote propre).">
+              Source
+              <select data-tous-mode style="padding:5px 8px;font-size:12px;background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:6px;cursor:pointer;">
+                <option value="winamax" ${_tousMode==='winamax'?'selected':''}>🎯 Winamax bookable</option>
+                <option value="all" ${_tousMode==='all'?'selected':''}>📡 Tous les matchs</option>
+              </select>
+            </label>
             <label style="display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-dim);">
               Edge min
               <select data-tous-edge style="padding:5px 8px;font-size:12px;background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:6px;cursor:pointer;">
@@ -16526,6 +16543,12 @@
     if (confSel) confSel.addEventListener('change', () => {
       tousFilters.minConf = parseFloat(confSel.value) || 0;
       _saveFilters();
+      renderTousPage(wrap);
+    });
+    // Bug-hunt 2026-05-02 : toggle source winamax/all
+    const modeSel = wrap.querySelector('[data-tous-mode]');
+    if (modeSel) modeSel.addEventListener('change', () => {
+      try { localStorage.setItem('tousFilterMode', modeSel.value); } catch(e) {}
       renderTousPage(wrap);
     });
     // Sort dropdown
