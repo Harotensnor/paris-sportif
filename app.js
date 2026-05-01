@@ -12460,7 +12460,8 @@
           ...curNow,
           days: mergedDays,
           _lite: false,
-          _available_days: full.days ? Object.keys(full.days).sort() : [],
+          // v33.17 — Filtre les jours vides pour éviter clutter dans les sélecteurs.
+          _available_days: full.days ? Object.entries(full.days).filter(([, v]) => Array.isArray(v) && v.length).map(([k]) => k).sort() : [],
         };
         // Une page d'historique ouverte attend peut-être ces données.
         // Re-render si la page courante en bénéficie.
@@ -24105,8 +24106,11 @@
       dateB = localStorage.getItem('compare_date_b') || todayIso;
     } catch(e) { dateA = yesterdayIso; dateB = todayIso; }
 
-    // Liste des jours dispo dans data.js
-    const availableDays = Object.keys(data.days).sort();
+    // Liste des jours dispo dans data.js (v33.17 — filter empty/missing arrays)
+    const availableDays = Object.entries(data.days)
+      .filter(([k, v]) => Array.isArray(v) && v.length > 0)
+      .map(([k]) => k)
+      .sort();
     if (!availableDays.length) {
       wrap.innerHTML = '<div style="padding:60px;text-align:center;color:var(--text-dim);">Aucun jour avec données.</div>';
       return;
