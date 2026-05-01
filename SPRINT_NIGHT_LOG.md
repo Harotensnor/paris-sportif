@@ -85,5 +85,13 @@
 - Avant: smoke Chromium local desktop/mobile rendait 1038 events et 198 marchés détaillés, mais 4 erreurs console CSP bloquaient les images joueurs Sofascore (`img.sofascore.com`)
 - Après: CSP `img-src` autorise `https://img.sofascore.com`; smoke desktop 1440x900 et mobile 390x844 sans erreur bloquante, 0 overflow horizontal, 66 cards rendues, footer v35.11
 - Impact: page non blanche vérifiée sur desktop/mobile; les assets Sofascore utiles aux cartes/modales ne déclenchent plus d'erreurs console
+- Commit: 51c2c4ac
+- Status: ✅ DONE
+
+## Sprint v35.12 (2026-05-02 03:14 UTC)
+- Chantier: P18 drift pipeline visible
+- Avant: `python scripts/check_pipeline_drift.py --report` crashait sous Windows sur `UnicodeEncodeError`; `health.json` n'avait aucun champ `pipeline_drift`
+- Après: le rapport drift s'imprime sans crash; `health.json.pipeline_drift` expose `status=ok`, `drift_count=0`, `auto_refresh_count=43`, `refresh_yml_count=43`; page Santé affiche le bloc local/cron
+- Impact: les divergences pipeline deviennent visibles côté site et le diagnostic CLI reste utilisable sur la machine de Théo
 - Commit: pending
 - Status: ✅ DONE
