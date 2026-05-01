@@ -5,6 +5,39 @@ Toutes les modifications notables sont documentées ici.
 Le format est inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 les versions suivent [Semantic Versioning](https://semver.org/lang/fr/).
 
+## [v33.13–v33.34] — 2026-05-01 — Sprint cron + Round 7 OPR + UX fixes
+
+### Ajouté
+- **MCP server enrichi** : 3 nouveaux tools (`get_today_high_confidence`,
+  `get_pipeline_status`, `list_data_gaps`), smoke test, doc à jour
+- **Stats avancées Bilan** (Round 7 R) : 5 KPIs (Sharpe annualisé, Max DD,
+  Win/Loss streaks, ROI 7j) + courbe NAV cumulative SVG
+- **CLV tracking** (Round 7 O) : `scripts/compute_clv.py` parse `odds_history.jsonl`,
+  calcule CLV par match. Tile dans Bilan : CLV moyen + % paris battant le marché
+- **Notifications kickoff imminent** (Round 7 P) : `_maybeNotifyKickoffImminent()`
+  alerte 15-20min avant top picks, tag séparé des notifs edge≥10%
+- **Insights marchés** (Performance) : banner classifiant Edge significatif/
+  faible/Anti-edge/Bruit (CI Wilson 95%). Révèle BTTS+OU2.5 = bruit
+- **Tests fixture-based** : `kellyFraction` (8 cas) + `evaluateModelPick` (9 cas)
+
+### Performance pipeline cron (~10min → ~3-4min)
+- `cancel-in-progress: false` (fix critique runs qui s'annulaient)
+- `pip cache` + 18 fetchers parallélisés (Group A + B)
+- `scripts/inject_data_in_html.py` : 1 seul HTML rewrite à la fin (avant: 11)
+- `scripts/patch_all_quick.py` : mega-patcher fusionnant 13 patches légers
+  en 1 lecture/écriture data.js (0.3s vs ~30s)
+- `timeout-minutes: 15` (filet)
+
+### Corrigé
+- Message "⏳ en attente de sample" auto-tuning (CLAUDE.md gap #10)
+- Filter empty day arrays dans sélecteurs (CLAUDE.md gap #5)
+- SW LAZY_CACHE_FIRST : ajout backtest/credibilite/404.html
+- 4 bugs visibles screens utilisateur (v33.25) :
+  - "Meilleur / Pire jour" affiche 2 valeurs identiques quand 1 seul jour
+  - Banner stale référence un "banner rouge" inexistant
+  - Wording "+N non-trackables" → "+N sans cote pré-match"
+  - Empty state "Aucun pari recommandé" contextualisé (matchs en cours)
+
 ## [v31.7.197] — 2026-04-29 — Plan 1000 phase 2 (Sprint A/E/F/G/H)
 
 ### Ajouté
