@@ -25482,6 +25482,116 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         </div>
       </div>
 
+      ${(() => {
+        // v33.31 — Stats avancées : Sharpe, Max DD, streaks, ROI rolling 7j.
+        // Utile pour évaluer la consistance du modèle au-delà du simple ROI %.
+        if (!rows.length || rows.length < 5) return '';
+        // Tri par date pour calculer correctement les streaks et le cum
+        const sortedRows = [...rows].sort((a, b) => {
+          const da = new Date(a.m.date || 0).getTime();
+          const db = new Date(b.m.date || 0).getTime();
+          return da - db;
+        });
+        // Returns par pari (en unités flat)
+        const returns = sortedRows.map(p => p.res === 'won' ? (p.odd - 1) : -1);
+        const mean = returns.reduce((s, r) => s + r, 0) / returns.length;
+        const variance = returns.reduce((s, r) => s + (r - mean) ** 2, 0) / Math.max(1, returns.length - 1);
+        const stddev = Math.sqrt(variance);
+        // Sharpe (sans risk-free rate, par pari, annualisé en supposant ~5 paris/jour × 365)
+        const sharpePerBet = stddev > 0 ? mean / stddev : 0;
+        const sharpeAnnualized = sharpePerBet * Math.sqrt(365 * 5);
+        // Cumulé + max drawdown
+        let cum = 0, peak = 0, maxDD = 0;
+        for (const r of returns) {
+          cum += r;
+          if (cum > peak) peak = cum;
+          const dd = peak - cum;
+          if (dd > maxDD) maxDD = dd;
+        }
+        // Streaks consécutifs
+        let curW = 0, curL = 0, maxW = 0, maxL = 0;
+        for (const p of sortedRows) {
+          if (p.res === 'won') { curW++; curL = 0; if (curW > maxW) maxW = curW; }
+          else if (p.res === 'lost') { curL++; curW = 0; if (curL > maxL) maxL = curL; }
+        }
+        // ROI rolling 7 derniers jours
+        const cutoff7d = Date.now() - 7 * 86400 * 1000;
+        const recent = sortedRows.filter(p => {
+          const t = new Date(p.m.date || 0).getTime();
+          return t >= cutoff7d;
+        });
+        const roi7d = recent.length
+          ? 100 * recent.reduce((s, p) => s + (p.res === 'won' ? (p.odd - 1) : -1), 0) / recent.length
+          : null;
+        // SVG sparkline NAV cumulative (last 60 paris)
+        const last60 = sortedRows.slice(-60);
+        let cumS = 0;
+        const navPts = last60.map(p => {
+          cumS += p.res === 'won' ? (p.odd - 1) : -1;
+          return cumS;
+        });
+        const minV = Math.min(0, ...navPts);
+        const maxV = Math.max(0, ...navPts);
+        const denom = Math.max(0.01, maxV - minV);
+        const W = 600, H = 60, pad = 4;
+        const svgPts = navPts.map((v, i) => {
+          const x = pad + (W - 2 * pad) * (i / Math.max(1, navPts.length - 1));
+          const y = H - pad - (H - 2 * pad) * ((v - minV) / denom);
+          return `${x.toFixed(1)},${y.toFixed(1)}`;
+        }).join(' L');
+        const navColor = navPts[navPts.length - 1] >= 0 ? '#34d399' : '#f87171';
+        // Sharpe color (>1 = excellent, 0-1 = OK, <0 = mauvais)
+        const sharpeCol = sharpeAnnualized > 1 ? '#34d399' : sharpeAnnualized > 0 ? '#fbbf24' : '#f87171';
+        const ddCol = maxDD < 5 ? '#34d399' : maxDD < 15 ? '#fbbf24' : '#f87171';
+        const roi7dCol = roi7d == null ? 'var(--text-dim)' : roi7d > 5 ? '#34d399' : roi7d > -5 ? '#fbbf24' : '#f87171';
+        return `
+        <div class="bilan-section" style="margin-top:18px;">
+          <div class="bilan-section-head" style="margin-bottom:14px;">
+            <h3>📈 Stats avancées</h3>
+            <div class="meta">Métriques de qualité au-delà du ROI brut</div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;font-variant-numeric:tabular-nums;">
+            <div style="padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-radius:10px;">
+              <div style="font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;">Sharpe annualisé</div>
+              <div style="font-size:24px;font-weight:800;color:${sharpeCol};margin-top:4px;">${sharpeAnnualized.toFixed(2)}</div>
+              <div style="font-size:11px;color:var(--text-dim);margin-top:3px;">${sharpeAnnualized > 1 ? '✓ Excellent' : sharpeAnnualized > 0 ? 'Acceptable' : '🔴 Mauvais'}</div>
+            </div>
+            <div style="padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-radius:10px;">
+              <div style="font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;">Max drawdown</div>
+              <div style="font-size:24px;font-weight:800;color:${ddCol};margin-top:4px;">−${maxDD.toFixed(1)}u</div>
+              <div style="font-size:11px;color:var(--text-dim);margin-top:3px;">Pire chute consécutive</div>
+            </div>
+            <div style="padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-radius:10px;">
+              <div style="font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;">Win streak</div>
+              <div style="font-size:24px;font-weight:800;color:#34d399;margin-top:4px;">${maxW}</div>
+              <div style="font-size:11px;color:var(--text-dim);margin-top:3px;">Plus longue série gagnante</div>
+            </div>
+            <div style="padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-radius:10px;">
+              <div style="font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;">Loss streak</div>
+              <div style="font-size:24px;font-weight:800;color:#f87171;margin-top:4px;">${maxL}</div>
+              <div style="font-size:11px;color:var(--text-dim);margin-top:3px;">Plus longue série perdante</div>
+            </div>
+            <div style="padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-radius:10px;">
+              <div style="font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;">ROI 7 jours</div>
+              <div style="font-size:24px;font-weight:800;color:${roi7dCol};margin-top:4px;">${roi7d == null ? '—' : (roi7d >= 0 ? '+' : '') + roi7d.toFixed(1) + '%'}</div>
+              <div style="font-size:11px;color:var(--text-dim);margin-top:3px;">${recent.length} pari${recent.length > 1 ? 's' : ''} récent${recent.length > 1 ? 's' : ''}</div>
+            </div>
+          </div>
+          <div style="margin-top:14px;padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-radius:10px;">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;">
+              <div style="font-size:11px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;">Courbe NAV cumulative · ${last60.length} derniers paris</div>
+              <div style="font-size:13px;color:${navColor};font-weight:700;">${navPts[navPts.length-1] >= 0 ? '+' : ''}${(navPts[navPts.length-1] || 0).toFixed(2)}u</div>
+            </div>
+            <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:60px;display:block;" preserveAspectRatio="none">
+              <line x1="${pad}" y1="${H - pad - (H - 2*pad) * ((-minV) / denom)}" x2="${W - pad}" y2="${H - pad - (H - 2*pad) * ((-minV) / denom)}" stroke="rgba(255,255,255,.10)" stroke-width="1" stroke-dasharray="2,2"/>
+              <path d="M${svgPts}" fill="none" stroke="${navColor}" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+            </svg>
+            <div style="margin-top:6px;font-size:10.5px;color:var(--text-dim2);">↳ Mise unitaire flat sur chaque pari · ligne pointillée = breakeven (0u)</div>
+          </div>
+        </div>
+        `;
+      })()}
+
       <!-- MODEL P&L CHART -->
       <div class="bilan-section">
         <div class="bilan-section-head">
