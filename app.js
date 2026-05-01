@@ -25370,6 +25370,18 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     // Chantier CCCC — Bilan narratif IA (coach direct)
     const narrativeHtml = (() => {
       try {
+        // Phase 3 #10 : Coach IA neutralisé si n<5 (échantillon trop petit)
+        const nBets = (rows || []).length;
+        if (nBets < 5) {
+          return `
+          <div class="bilan-coach-card banner banner--info" style="margin-top:12px;padding:16px 18px;background:rgba(182,160,255,.08);border:1px solid rgba(182,160,255,.25);border-left:3px solid var(--brand);border-radius:12px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+              <span style="font-size:18px;">🤖</span>
+              <h3 style="margin:0;font-size:14px;letter-spacing:.4px;text-transform:uppercase;color:var(--text-dim);font-weight:700;">Coach IA — en attente</h3>
+            </div>
+            <div style="font-size:13.5px;line-height:1.55;color:var(--text,#e6ebf2);">On a besoin d'au moins <b>5 paris réglés</b> avant de pouvoir tirer des leçons. Pour l'instant : <b>${nBets} pari${nBets > 1 ? 's' : ''}</b>, on attend.</div>
+          </div>`;
+        }
         const body = buildBilanNarrative(rows, perSport, { start: WALLET_START, cur: walletNow });
         if (!body) return '';
         return `

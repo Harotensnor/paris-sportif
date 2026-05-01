@@ -158,6 +158,26 @@
     --border-medium: rgba(255, 255, 255, 0.10);
   }
 
+  /* Phase 3 #10 : banner générique pour disclaimer/info */
+  .banner {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin-bottom: var(--gap-md, 12px);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .banner--info {
+    background: rgba(182, 160, 255, 0.08);
+    border: 1px solid rgba(182, 160, 255, 0.25);
+    color: var(--text);
+  }
+  .banner--warn {
+    background: rgba(251, 191, 36, 0.08);
+    border: 1px solid rgba(251, 191, 36, 0.25);
+    color: var(--text);
+  }
+
   /* Phase 3 #8 : pick-row + team__logo (tests Playwright) */
   .pick-row__teams { display: inline-flex; align-items: center; gap: 4px; min-width: 0; }
   .team { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
