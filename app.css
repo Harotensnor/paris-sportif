@@ -3329,11 +3329,15 @@
     /* Hide the hamburger on desktop, sidebar is always visible */
     .topbar-menu { display: none !important; }
     /* Hub-solo button (Aujourd'hui) : full width, bigger */
+    /* Phase 3 #6 : compresser le bouton Now pour libérer la sidebar */
     nav.topbar-nav .page-btn.hub-solo {
       width: 100%; justify-content: flex-start;
-      padding: 11px 14px; font-size: 14px; font-weight: 700;
-      margin-bottom: var(--space-2);
+      padding: 8px 14px; font-size: 13px; font-weight: 700;
+      margin-bottom: var(--gap-xs, 4px);
     }
+    /* Now-block hidden si vide (no live + no upcoming) */
+    .now-block:empty { display: none !important; }
+    .now-block { padding: 8px 14px; font-size: 12px; color: var(--text-dim); }
     /* Each .hub becomes a section : header (uppercase label) + always-expanded menu */
     nav.topbar-nav .hub {
       display: flex; flex-direction: column; width: 100%;
