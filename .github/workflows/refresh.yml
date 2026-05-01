@@ -18,9 +18,15 @@ jobs:
   refresh:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    # v33.26 — CRITICAL FIX : avant cancel-in-progress=true tuait chaque
+    # run au tick suivant (car la pipeline complete prend ~6-8 min > cron 5min).
+    # Résultat : 100% des runs étaient `cancelled`, data figée 14h+.
+    # Maintenant cancel-in-progress=false → runs s'enfilent en queue.
+    # Si la queue gonfle, augmenter le cron interval ; pour l'instant
+    # GHA gère la queue OK avec le timeout-minutes:10 par run.
     concurrency:
       group: refresh-data
-      cancel-in-progress: true
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
         with:
