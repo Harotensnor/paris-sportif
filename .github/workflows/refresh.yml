@@ -191,6 +191,8 @@ jobs:
           python3 build_credibilite_page.py || true
           # v31.7.4 — OG images (1200x630 PNG) pour pages statiques. Cheap (~3s).
           python3 build_og_images.py || true
+          # v35.13 — Sitemap dynamique depuis git log + routes SPA principales.
+          python3 build_sitemap.py || true
           # Chantier #3 lazy-load — DOIT tourner en DERNIER. Lit data.js (full),
           # écrit data_today.json + data_manifest.json + ré-inline LITE blob
           # dans pronostics.html. Réduit le 1er paint de ~1.4 MB à ~0.4 MB.
@@ -266,7 +268,7 @@ jobs:
             credibilite.html stadiums.json dixon_coles_rho.json index.html \
             nba_team_stats.json team_strengths.json team_strengths_mle.json \
             ci_heartbeat.json sofascore_events.json clv_history.json \
-            og-default.png og-backtest.png og-credibilite.png og-methodologie.png
+            og-default.png og-backtest.png og-credibilite.png og-methodologie.png sitemap.xml
           do
             if [ -e "$path" ]; then
               git add "$path"

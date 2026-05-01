@@ -120,6 +120,8 @@ PATCH_STAGES = [
     ('build_credibilite_page.py',   1,   15),
     # v31.7.4 — OG images (1200x630 PNG) pour pages statiques. ~3s.
     ('build_og_images.py',          5,   30),
+    # v35.13 — Sitemap dynamique (git lastmod + routes SPA).
+    ('build_sitemap.py',            1,   15),
     # Chantier #3 lazy-load — DOIT tourner en DERNIER. Lit data.js (full),
     # écrit data_today.json + data_manifest.json + ré-inline LITE blob dans
     # pronostics.html. Sans ça, le client tomberait toujours sur le fallback
