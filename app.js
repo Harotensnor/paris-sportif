@@ -1118,14 +1118,14 @@
       { page: 'montante-weekend', label: '🗓️ Weekend' },
       { page: 'montante-semaine', label: '📆 Semaine' },
     ],
-    // Hub AGENT : cagnotte + history + perf
+    // Hub AGENT : cagnotte + historique des positions.
     agent: [
       { page: 'bilan', label: '💰 Cagnotte' },
       { page: 'historique', label: '📜 Historique' },
-      { page: 'performance', label: '🎯 Performance modèle' },
     ],
-    // Hub STATS : analytics deep-dive
+    // Hub STATS : exploration + analytics deep-dive.
     stats: [
+      { page: 'performance', label: '🎯 Performance modèle' },
       { page: 'tous', label: '📋 Tous les matchs' },
       { page: 'calendrier', label: '📅 Calendrier 7j' },
       { page: 'matchs', label: '🔍 Matchs détectés' },
@@ -20075,16 +20075,21 @@
     credWrap.style.display = isCredibilite ? '' : 'none';
     if (isCredibilite) renderCredibilitePage(credWrap);
 
-    // Highlight active nav button — CSS handles styling via .active class
+    // Highlight active nav button — CSS handles styling via .active class.
+    // aria-current reste réservé à la destination exacte ; les groupes mobile
+    // ajoutent ensuite un état actif visuel sans prétendre être la page courante.
     document.querySelectorAll('.page-btn').forEach(b => {
-      b.classList.toggle('active', b.dataset.page === currentPage);
+      const isActive = b.dataset.page === currentPage;
+      b.classList.toggle('active', isActive);
+      if (isActive) b.setAttribute('aria-current', 'page');
+      else b.removeAttribute('aria-current');
     });
     // v34.32 — Navigation complète : les pages avancées restent deep-linkables
     // mais sont maintenant rattachées à un hub visible pour éviter les vues
     // "orphelines" (montantes, matchs détectés, simulateur).
     const HUB_PAGES = {
       now: ['top', 'valeur', 'plan-mise', 'locks', 'combines', 'montante-jour', 'montante-weekend', 'montante-semaine'],
-      agent: ['bilan', 'historique', 'performance'],
+      agent: ['bilan', 'historique'],
       explore: ['tous', 'calendrier', 'matchs', 'buteurs', 'compare'],
       performance: ['performance', 'credibilite', 'backtest', 'simulator'],
       learn: ['academie', 'methodologie', 'legal'],
@@ -20095,6 +20100,23 @@
       const pages = HUB_PAGES[k] || [];
       const btn = h.querySelector('.hub-btn');
       if (btn) btn.classList.toggle('active', pages.includes(currentPage));
+    });
+    // v34.33 — Bottom-nav mobile en mode "intent". Avant, seul le bouton dont
+    // data-page correspondait exactement était actif : #locks ou #simulator
+    // n'avaient donc aucun repère dans la nav du bas. On garde le hash exact,
+    // mais le bouton d'intention reste allumé.
+    const MOBILE_BOTTOM_INTENTS = {
+      dashboard: ['dashboard'],
+      top: HUB_PAGES.now,
+      bilan: HUB_PAGES.agent,
+      performance: [...HUB_PAGES.explore, ...HUB_PAGES.performance],
+      menu: [...HUB_PAGES.learn, ...HUB_PAGES.account],
+    };
+    document.querySelectorAll('#mobile-bottom-nav .mbn-btn').forEach(btn => {
+      const key = btn.id === 'mbn-menu-btn' ? 'menu' : btn.dataset.page;
+      const on = !!(key && (MOBILE_BOTTOM_INTENTS[key] || []).includes(currentPage));
+      btn.classList.toggle('active', on);
+      if (btn.id === 'mbn-menu-btn') btn.setAttribute('aria-pressed', String(on));
     });
     // v31.7.201 — Auto-inject page-tabs (Top/Plan/Locks etc.) sur pages liées
     // Délai léger pour laisser le rendering du wrap se finir

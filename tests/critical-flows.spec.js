@@ -56,16 +56,16 @@ test.describe('Boot', () => {
 });
 
 test.describe('Hub navigation', () => {
-  test('Pronos hub opens dropdown and item navigates to "Tous"', async ({ page }) => {
+  test('Explorer hub opens dropdown and item navigates to "Tous"', async ({ page }) => {
     await page.goto(URL);
-    const hubBtn = page.locator('nav.topbar-nav .hub .hub-btn').filter({ hasText: /Pronos/i }).first();
+    const hubBtn = page.locator('nav.topbar-nav .hub .hub-btn').filter({ hasText: /Explorer/i }).first();
     // Desktop only — on mobile the drawer takes a different path
     const isVisible = await hubBtn.isVisible().catch(() => false);
     test.skip(!isVisible, 'Hub-btn not visible on this viewport (mobile uses drawer)');
     await hubBtn.click();
     const dropdown = hubBtn.locator('xpath=ancestor::div[contains(@class,"hub")]/div[contains(@class,"hub-menu")]');
     await expect(dropdown).toBeVisible();
-    // Click "Tous les pronos"
+    // Click "Tous les matchs"
     await dropdown.locator('button[data-page="tous"]').click();
     // Should navigate to Tous page (filter bar appears)
     await expect(page.locator('[data-tous-sort]')).toBeVisible();
@@ -559,26 +559,25 @@ test.describe('Modal détail enrichie', () => {
 });
 
 test.describe('Sidebar 5 catégories (desktop)', () => {
-  test('Sidebar contient 5 hubs nommés', async ({ page, viewport }) => {
+  test('Sidebar contient les hubs actuels', async ({ page, viewport }) => {
     test.skip(viewport && viewport.width < 1100, 'Desktop sidebar mode requires >=1100px');
     await page.goto(URL);
     const hubs = await page.locator('nav.topbar-nav .hub').evaluateAll(els =>
       els.map(el => el.dataset.hub)
     );
-    expect(hubs).toEqual(expect.arrayContaining(['pronos', 'perf', 'transparence', 'apprendre', 'compte']));
-    expect(hubs.includes('montantes')).toBe(true);
+    expect(hubs).toEqual(expect.arrayContaining(['now', 'agent', 'explore', 'performance', 'learn', 'account']));
   });
 });
 
 test.describe('Mobile bottom nav 5 items', () => {
-  test('Bottom nav affiche 5 items dont Top et Menu', async ({ page, viewport }) => {
+  test('Bottom nav affiche les 5 intentions principales', async ({ page, viewport }) => {
     test.skip(viewport && viewport.width > 720, 'Mobile-only test');
     await page.goto(URL);
     const items = await page.locator('#mobile-bottom-nav .mbn-btn').evaluateAll(els =>
       els.map(el => (el.querySelector('.mbn-label') || {}).textContent || '')
     );
     expect(items.length).toBe(5);
-    expect(items).toEqual(expect.arrayContaining(['Accueil', 'Top', 'Locks', 'Bilan', 'Menu']));
+    expect(items).toEqual(expect.arrayContaining(['Now', 'Picks', 'Agent', 'Stats', 'Plus']));
   });
 
   test('Bouton Menu mobile ouvre la sidebar drawer', async ({ page, viewport }) => {
