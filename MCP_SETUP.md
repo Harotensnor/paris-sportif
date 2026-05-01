@@ -73,14 +73,23 @@ des tools MCP (icône 🔌 selon la version).
 | `get_data_freshness` | Âge des données (Y a-t-il un refresh récent ?) | "Les cotes sont-elles à jour ?" |
 | `get_today_matches` | Liste les matchs du jour (filtres : sport, bookable_only) | "Quels matchs ce soir en foot ?" |
 | `get_top_value_picks` | Top picks value (proxy d'edge basé sur margin Winamax) | "5 picks edge ≥5% en foot" |
+| `get_today_high_confidence` ⭐ | Picks avec proba implicite ≥ X% (favoris solides) | "Quels favoris solides aujourd'hui ?" |
 | `get_model_performance` | KPIs globaux + par sport + par tier | "Comment performe le modèle ?" |
 | `get_calibration` | Courbe de calibration 10 bins | "Le modèle est bien calibré ?" |
+| `get_recent_results` | Derniers picks réglés (W/L/Pending) | "Comment ça s'est passé hier ?" |
+| `get_drawdown_status` | État de la cagnotte agent (drawdown/pause) | "L'agent est en pause ?" |
+| `get_league_performance` | Top/flop ligues par ROI | "Quelles ligues éviter ?" |
 | `search_match` | Recherche par équipe/ligue/ville | "Prochain match du PSG" |
 | `evaluate_match_signals` | Tous les signaux d'un match (cotes, blessures, lineup, météo) | "Pour PSG-OM, montre-moi tout" |
 | `compute_kelly_stake` | Mise Kelly fractionnée pour un pari | "50€ proba 60% cote 1.85 = ?" |
+| `simulate_bet` | Simule l'EV d'un pari donné | "Simule pari sur PSG @1.85" |
 | `get_health_status` | État du pipeline (sources OK/dégradées/KO) | "Le pipeline tourne ?" |
+| `get_pipeline_status` ⭐ | Détail sources + events ESPN/Sofa/Winamax | "Combien d'events fetched ?" |
+| `list_data_gaps` ⭐ | Matchs avec signaux manquants (clubelo/h2h/weather/etc.) | "Pourquoi tel match a peu de confiance ?" |
 | `list_sports_available` | Stats sports avec matchs aujourd'hui | "Quels sports aujourd'hui ?" |
 | `get_market_calibration_summary` | Perfo par type de marché (1N2/OU/BTTS) | "Quel marché est le plus rentable ?" |
+
+⭐ = ajouté en v33.13-v33.20.
 
 ## ⚠️ Limites importantes
 
@@ -121,6 +130,18 @@ Tools possibles à ajouter (dans `mcp_paris_sportif.py`) :
 
 Pour ajouter un tool, copy-paste un `@mcp.tool()` existant dans le fichier
 et redémarre Claude Desktop.
+
+## 🧪 Test smoke (v33.22)
+
+Avant de commit des changements à `mcp_paris_sportif.py`, lance le smoke test :
+
+```bash
+python scripts/test_mcp_smoke.py
+```
+
+Il appelle automatiquement les 14 tools default-callable et signale toute
+régression silencieuse (helpers renommés, clés inexistantes, etc.). Tourne
+en quelques secondes.
 
 ## 🐛 Troubleshooting
 
