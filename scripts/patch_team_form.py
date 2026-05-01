@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
-"""Inject team_form.json (last 5 W/L) into competitors[].form for non-football
-sports. Cheap (~50ms), idempotent, runs on every cron tick after patch_winamax."""
+"""Inject team_form.json (last 10 W/L) into competitors.
+
+Cheap (~50ms), idempotent, runs on every cron tick after patch_winamax.
+Football keeps its ESPN-native L5 in ``form`` when present, but gains the
+stable L10 fields used by the model and health checks.
+"""
 import json
 import re
 from pathlib import Path
@@ -30,8 +34,6 @@ def main():
     for day, evs in (data.get('days') or {}).items():
         for ev in evs or []:
             sport = ev.get('sport')
-            if sport == 'football':  # already shipped natively by ESPN
-                continue
             code = ev.get('league_code')
             for c in ev.get('competitors') or []:
                 tid = str(c.get('id') or '')
@@ -44,7 +46,7 @@ def main():
                 # Only overwrite if currently empty/null — preserve any future
                 # ESPN-native form payload that might appear.
                 if not c.get('form'):
-                    c['form'] = info.get('form')
+                    c['form'] = info.get('form') or info.get('form5')
                     patched += 1
                 # Extension 2026-05-01 — Théo a demandé "forme sur 10 derniers
                 # matchs". On expose `form10` (10 chars) en plus du `form5`
@@ -52,6 +54,9 @@ def main():
                 # Si form (string) >= 6 chars c'est déjà le L10, on copy aussi.
                 if info.get('form') and len(str(info['form'])) >= 6:
                     c['form10'] = info['form']
+                    c['team_form_l10'] = info['form']
+                if info.get('form5'):
+                    c['team_form_l5'] = info['form5']
                 # Also stash detail for tooltip / page detail.
                 if not c.get('last5'):
                     c['last5'] = info.get('last5')
