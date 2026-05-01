@@ -960,14 +960,19 @@ def get_pipeline_status() -> dict:
     today = data.get("today") if not "_error" in data else None
     today_events = (data.get("days") or {}).get(today, []) if today else []
 
-    # Count by source — heuristic : ESPN ids commencent par "4" (9 chars),
-    # Sofascore ids sont plus courts (6-7 chars). Pas parfait mais suffisant
-    # pour un overview pipeline.
-    def _looks_espn(eid: str) -> bool:
-        return eid.startswith("4") and len(eid) >= 8
+    # Count by source — Sofascore events have id="sofa_<n>" + source="sofascore"
+    # (cf. patch_sofascore_events.py / fetch_sofascore_events.py). ESPN events
+    # have raw numeric IDs without prefix and no `source` field.
+    def _is_sofa(ev: dict) -> bool:
+        eid = str(ev.get("id") or "")
+        if eid.startswith("sofa_"):
+            return True
+        if ev.get("source") == "sofascore":
+            return True
+        return False
 
-    espn_count = sum(1 for ev in today_events if _looks_espn(str(ev.get("id", ""))))
-    sofa_count = sum(1 for ev in today_events if not _looks_espn(str(ev.get("id", ""))))
+    sofa_count = sum(1 for ev in today_events if _is_sofa(ev))
+    espn_count = len(today_events) - sofa_count
     winamax_count = sum(1 for ev in today_events if (ev.get("winamax") or {}).get("available"))
 
     return {
