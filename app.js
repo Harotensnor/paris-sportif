@@ -16108,12 +16108,12 @@
           <div style="font-size:12px;color:var(--brand);font-weight:600;margin-top:3px;">→ ${esc(pickLabel)}</div>
         </div>
         <div style="display:flex;flex-direction:column;gap:2px;font-size:11px;">
-          <div><span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Confiance du modèle : probabilité estimée que ce pari gagne. ≥70 % = très fiable.">Conf</span> <b style="color:${confColor};">${Math.round(p.rel*100)}%</b> · <span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Cote décimale. La source (Winamax / externe / archive) est indiquée à côté.">Cote</span> <b style="color:var(--text);">${p.odd ? '@' + p.odd.toFixed(2) : '<span style=\"color:var(--text-dim2);font-weight:400;\">non-trackable</span>'}</b> ${_coteSrc}</div>
+          <div><span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Confiance du modèle : probabilité estimée que ce pari gagne. ≥70 % = très fiable.">Conf</span> <b style="color:${confColor};">${Math.round(p.rel*100)}%</b> · <span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Cote décimale. La source (Winamax / externe / archive) est indiquée à côté.">Cote</span> <b style="color:var(--text);">${p.odd ? '@' + p.odd.toFixed(2) : '<span style=\"color:var(--text-dim2);font-weight:400;\">cote pré-match perdue</span>'}</b> ${_coteSrc}</div>
           <div><span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Edge = notre probabilité − probabilité implicite de la cote. > 0 = on est plus optimiste que le bookmaker (=valeur).">Edge</span> <b style="color:${edgeColor};">${p.nonTrackable ? '<span style=\"color:var(--text-dim2);font-weight:400;\">—</span>' : (p.edge>=0?'+':'') + Math.round(p.edge*100) + 'pt'}</b></div>
         </div>
         <div style="text-align:right;">
           ${isFini ? resBadge : ''}
-          ${p.nonTrackable ? '<div style="margin-top:4px;font-size:9.5px;color:var(--text-dim2);font-style:italic;" title="Match terminé sans cote pre-match captée — résultat visible mais hors bilan ROI">📋 non-trackable</div>' : ''}
+          ${p.nonTrackable ? '<div style="margin-top:4px;font-size:9.5px;color:var(--text-dim2);font-style:italic;" title="Match terminé sans cote pré-match captée — résultat visible mais hors bilan ROI">📋 résultat seul</div>' : ''}
         </div>
         ${_footDetailsHtml}
       </div>`;
