@@ -121,11 +121,12 @@ OTHER_LEAGUES = [
     ('baseball', 'milb', 'MiLB', 'États-Unis', 1),
     ('football', 'nfl', 'NFL', 'États-Unis', 5),
     ('football', 'college-football', 'NCAAF', 'États-Unis', 3),
-    ('mma', 'ufc', 'UFC', 'International', 4),
-    ('racing', 'f1', 'Formule 1', 'International', 4),
-    ('golf', 'pga', 'PGA Tour', 'International', 3),
-    ('golf', 'lpga', 'LPGA Tour', 'International', 2),
-    ('lacrosse', 'pll', 'PLL', 'États-Unis', 1),
+    # Phase 3 #2 : sports retirés du sweep ESPN (hors scope du site)
+    # ('mma', 'ufc', 'UFC', 'International', 4),
+    # ('racing', 'f1', 'Formule 1', 'International', 4),
+    # ('golf', 'pga', 'PGA Tour', 'International', 3),
+    # ('golf', 'lpga', 'LPGA Tour', 'International', 2),
+    # ('lacrosse', 'pll', 'PLL', 'États-Unis', 1),
 ]
 
 TENNIS_LEAGUES = [('atp', 'ATP'), ('wta', 'WTA')]
