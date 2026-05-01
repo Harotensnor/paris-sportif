@@ -78,6 +78,27 @@ MARKET_KEYWORDS_BTTS = [
     'marqueront', 'btts',
 ]
 
+# 2026-05-01 — Marchés étendus Winamax (extension Théo "obtenir + de
+# données par winamax"). Ces marchés sont déjà dans PRELOADED_STATE,
+# on les filtrait juste en sortie.
+MARKET_KEYWORDS_DC = [
+    'double chance', 'double opportunité', 'double opportunite',
+]
+MARKET_KEYWORDS_HT_1N2 = [
+    'résultat à la mi-temps', 'mi-temps : résultat',
+    'résultat 1ère mi-temps', 'résultat 1ere mi-temps',
+    'half-time result', '1st half result',
+    'résultat (mi-temps)', 'résultat 1ère période',
+]
+MARKET_KEYWORDS_OU_GENERIC = [
+    'plus/moins', 'plus / moins', 'over/under',
+    'plus de buts', 'moins de buts',
+    'total de buts', 'nombre de buts', 'nombre total de buts',
+]
+MARKET_KEYWORDS_EXACT_SCORE = [
+    'score exact', 'exact score', 'résultat exact',
+]
+
 
 def fetch_state(url: str) -> dict | None:
     """Hit a Winamax page, extract PRELOADED_STATE as a dict."""
@@ -106,18 +127,29 @@ def _match_keyword(title: str, keywords: list[str]) -> bool:
 def extract_markets_from_state(state: dict) -> dict[str, dict]:
     """Walk the PRELOADED_STATE and extract 1N2/OU25/BTTS odds per match.
 
-    Winamax structure (as of 2026-04) :
+    Winamax structure (post 2026-04 redesign — schema changed) :
       state['matches']  : { match_id: { title, tournamentId, mainBetId, betIds: [...] } }
-      state['bets']     : { bet_id: { title, oddIds: [...], marketId, typeId, matchId } }
-      state['odds']     : { odd_id: { title, odds: 1.65, betId, selectionId } }
+      state['bets']     : { bet_id: { betTypeName, betTitle, template, matchId, outcomes: [outcomeId, ...] } }
+      state['outcomes'] : { outcome_id: { betId, label, available, competitorId, percentDistribution } }
+      state['odds']     : { outcome_id: 1.65 }   ← decimal odd direct (number, plus dict)
 
-    Returns : { str(match_id): { '1n2': {...}, 'ou25': {...}, 'btts': {...} } }
+    Returns : { str(match_id): { '1n2': {...}, 'ou25': {...}, 'btts': {...}, 'dc': {...}, 'ht_1n2': {...}, 'exact_scores': {...}, 'ou15': {...}, 'ou35': {...} } }
     """
     matches = state.get('matches') or {}
     bets    = state.get('bets')    or {}
+    outcomes_state = state.get('outcomes') or {}
     odds    = state.get('odds')    or {}
 
     out: dict[str, dict] = {}
+
+    # Build matchId → list of betIds inversion (since matches.betIds was the old
+    # field name; new schema may not expose it). We walk bets and group by matchId.
+    bets_by_match: dict[str, list[str]] = {}
+    for bid, bet in bets.items():
+        if not isinstance(bet, dict): continue
+        mid = bet.get('matchId')
+        if mid is None: continue
+        bets_by_match.setdefault(str(mid), []).append(str(bid))
 
     for mid, mobj in matches.items():
         if not isinstance(mobj, dict):
@@ -126,7 +158,10 @@ def extract_markets_from_state(state: dict) -> dict[str, dict]:
         if not bet_ids:
             main_id = mobj.get('mainBetId')
             if main_id:
-                bet_ids = [main_id]
+                bet_ids = [str(main_id)]
+        if not bet_ids:
+            # Fallback : utilise l'inversion bets_by_match (nouveau schema)
+            bet_ids = bets_by_match.get(str(mid), [])
         if not bet_ids:
             continue
 
@@ -136,18 +171,27 @@ def extract_markets_from_state(state: dict) -> dict[str, dict]:
             bet = bets.get(str(bid))
             if not isinstance(bet, dict):
                 continue
-            btitle = bet.get('title') or bet.get('name') or ''
-            odd_ids = bet.get('oddIds') or []
-            # Build ordered list of (title, decimal_odd)
+            # 2026-05-01 — nouveau schema : betTypeName + betTitle. Fallback ancien.
+            btitle = bet.get('betTypeName') or bet.get('betTitle') or bet.get('title') or bet.get('name') or ''
+            # outcomes : nouveau schema = liste d'IDs vers state.outcomes / state.odds
+            outcome_ids = bet.get('outcomes') or bet.get('oddIds') or []
+            # Build ordered list of (label, decimal_odd)
             oitems: list[tuple[str, float]] = []
-            for oid in odd_ids:
-                o = odds.get(str(oid))
-                if not isinstance(o, dict):
-                    continue
-                ot = o.get('title') or o.get('label') or ''
-                od = o.get('odds')
+            for oid in outcome_ids:
+                # Resolve label from state.outcomes
+                outcome_obj = outcomes_state.get(str(oid))
+                if isinstance(outcome_obj, dict):
+                    ot = outcome_obj.get('label') or outcome_obj.get('title') or ''
+                else:
+                    # Fallback ancien schema : odds[oid] est un dict avec title
+                    o = odds.get(str(oid))
+                    ot = (o.get('title') or o.get('label') or '') if isinstance(o, dict) else ''
+                # Resolve odd
+                odd_val = odds.get(str(oid))
+                if isinstance(odd_val, dict):
+                    odd_val = odd_val.get('odds')
                 try:
-                    od = float(od)
+                    od = float(odd_val)
                 except (TypeError, ValueError):
                     continue
                 if od > 0:
@@ -205,6 +249,61 @@ def extract_markets_from_state(state: dict) -> dict[str, dict]:
                         no_val = od
                 if yes_val and no_val:
                     markets['btts'] = {'yes': yes_val, 'no': no_val}
+
+            # 2026-05-01 — Extension Théo : Double Chance (1X, X2, 12).
+            # 3 sélections : "1 ou N", "N ou 2", "1 ou 2" (parfois "Pas de match nul").
+            if _match_keyword(btitle, MARKET_KEYWORDS_DC) and 'dc' not in markets:
+                p1x = px2 = p12 = None
+                for ot, od in oitems:
+                    otl = ot.lower().strip()
+                    # "1 ou N", "N ou 2", "1 ou 2" (FR), also "1X", "X2", "12"
+                    if ('1' in otl and 'n' in otl) or ('1' in otl and 'x' in otl):
+                        # "1 ou N" or "1X" → 1X
+                        if '2' not in otl: p1x = od
+                        else: p12 = od  # "1 ou 2"
+                    elif ('n' in otl and '2' in otl) or ('x' in otl and '2' in otl):
+                        if '1' not in otl: px2 = od
+                if p1x and px2 and p12:
+                    markets['dc'] = {'p1x': p1x, 'px2': px2, 'p12': p12}
+
+            # 2026-05-01 — Mi-temps 1N2 (résultat 1ère mi-temps)
+            if _match_keyword(btitle, MARKET_KEYWORDS_HT_1N2) and 'ht_1n2' not in markets:
+                if len(oitems) == 3:
+                    markets['ht_1n2'] = {
+                        'home': oitems[0][1], 'draw': oitems[1][1], 'away': oitems[2][1]
+                    }
+
+            # 2026-05-01 — Score exact (top sélections avec proba > 0)
+            if _match_keyword(btitle, MARKET_KEYWORDS_EXACT_SCORE) and 'exact_scores' not in markets:
+                scores = {}
+                for ot, od in oitems:
+                    # Pattern : "1-0", "2 - 1", "0:0", etc.
+                    sm = re.search(r'(\d+)\s*[-:]\s*(\d+)', ot)
+                    if sm:
+                        h, a = int(sm.group(1)), int(sm.group(2))
+                        if h <= 5 and a <= 5:  # garde les scores raisonnables
+                            scores[f'{h}-{a}'] = od
+                if scores:
+                    markets['exact_scores'] = scores
+
+            # 2026-05-01 — OU 1.5 et OU 3.5 buts (en plus du 2.5)
+            if _match_keyword(btitle, MARKET_KEYWORDS_OU_GENERIC):
+                for line_val, key in [(1.5, 'ou15'), (3.5, 'ou35')]:
+                    if key in markets: continue
+                    line_str = str(line_val).replace('.', ',')
+                    line_str_dot = str(line_val)
+                    over_v = under_v = None
+                    for ot, od in oitems:
+                        otl = ot.lower()
+                        has_line = (line_str in otl or line_str_dot in otl)
+                        is_over = ('plus' in otl or 'over' in otl or 'more' in otl
+                                   or otl.startswith('+') or '≥' in otl)
+                        is_under = ('moins' in otl or 'under' in otl or 'less' in otl
+                                    or otl.startswith('-'))
+                        if has_line and is_over: over_v = od
+                        elif has_line and is_under: under_v = od
+                    if over_v and under_v:
+                        markets[key] = {'over': over_v, 'under': under_v, 'line': line_val}
 
             # Debug: log unmatched bet titles so future drift can be diagnosed
             # from a single CI run. Set WX_MARKETS_DEBUG=1 in the workflow env
