@@ -111,12 +111,25 @@
   // v30 — 'mesparis' retiré : Théo n'enregistre pas ses paris sur le site.
   // v31 — 'legal' + 'methodologie' ajoutés (transparence + dictionnaire des
   // métriques, en réponse à l'audit ChatGPT 2026-04-26).
+  // P0-2 (audit 2026-05-01) : alias pour les variantes pluriel/singulier que
+  // l'utilisateur peut avoir bookmarké. Avant : #montantes-jour fallback sur
+  // dashboard silencieusement.
+  const PAGE_ALIASES = {
+    'montantes-jour': 'montante-jour',
+    'montantes-weekend': 'montante-weekend',
+    'montantes-semaine': 'montante-semaine',
+    'vue-globale': 'performance',  // alias raccourci page Perf
+    'cagnotte': 'bilan',           // alias historique
+    'agent': 'bilan',              // alias 'page Mon agent'
+  };
   function _pageFromHash() {
     try {
-      const h = (location.hash || '').replace(/^#/, '').trim();
+      let h = (location.hash || '').replace(/^#/, '').trim();
+      if (PAGE_ALIASES[h]) h = PAGE_ALIASES[h];
       return VALID_PAGES.includes(h) ? h : null;
     } catch(e) { return null; }
   }
+  try { window.PAGE_ALIASES = PAGE_ALIASES; } catch(e){}
   let currentPage = _pageFromHash() || localStorage.getItem('currentPage') || 'dashboard';
   // PWA shortcuts arrive via #hash (no hashchange event fires), so sync the
   // hash-derived page to localStorage at boot. Without this, opening
@@ -1918,6 +1931,9 @@
     const m = mk['1n2'];
     return Number(m.home) > 1 || Number(m.away) > 1;
   }
+  // P0-3 (audit 2026-05-01) : expose sur window pour debug console + tests Playwright.
+  // Avant : seulement dans __testAPI → call sites externes crashaient.
+  try { window.isWinamaxBookable = isWinamaxBookable; } catch(e){}
 
   // Sprint 62 (v31.7.151 — audit ChatGPT 2026-04-28 P0) — VIEW_SCOPES.
   // Réponse à "Uniformiser scopes temporels" : actuellement chaque page
@@ -4728,10 +4744,23 @@
   setInterval(_refreshCountdowns, 60 * 1000);   // every minute
   window._refreshCountdowns = _refreshCountdowns;
 
+  // P0-4 (audit 2026-05-01) : sports whitelist — bloque golf/cricket/etc.
+  // qui slip dans data.js depuis ESPN (PGA Tour avec 72 competitors null).
+  // Topbar promet "Foot · Tennis · NBA · NHL · MLB" donc on aligne ici.
+  const SUPPORTED_SPORTS = new Set([
+    'football', 'tennis', 'basketball', 'hockey', 'baseball', 'football-american',
+  ]);
   function predictMatch(match) {
     const cur = window.PRONOSTICS_DATA;
     if (__predCacheRef !== cur) { __predCache = new Map(); __predCacheRef = cur; }
     if (!match || !match.id) return _applyCalibration(_predictMatchImpl(match), match);
+    // P0-4 : skip silently les sports hors scope (évite divisions par zéro et
+    // fait disparaître les events polluants comme PGA Tour 72-competitors-null).
+    if (match.sport && !SUPPORTED_SPORTS.has(match.sport)) {
+      const skipped = { skip: true, reason: 'sport_unsupported', pick: null, reliability: 0 };
+      __predCache.set(match.id, skipped);
+      return skipped;
+    }
     const cached = __predCache.get(match.id);
     if (cached !== undefined) return cached;
     // Sprint 109 — Passe `match` au _applyCalibration pour qu'il puisse lire
@@ -4740,6 +4769,8 @@
     __predCache.set(match.id, p);
     return p;
   }
+  // Expose pour debug + filtrage côté pages
+  try { window.SUPPORTED_SPORTS = SUPPORTED_SPORTS; } catch(e){}
   function _applyCalibration(p, match) {
     // FIX audit Simples #3 : champ pred = `reliability` (pas `rel`).
     // Avant : isFinite(p.rel) → false → return inchangé → fonction no-op.
@@ -26435,11 +26466,20 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         setTimeout(_registerSW, 2000);
       }
     }
+    // P0-10 (audit 2026-05-01) : init currentDate sur la VRAIE date locale,
+    // pas data.today (qui peut être stale). Avant : si data.today=2026-04-30
+    // alors qu'on est le 2026-05-01, le selector affichait 30/04 comme "aujourd'hui".
+    // Maintenant : currentDate = today_local toujours, on cherche dans data.days
+    // la clé la plus proche s'il manque.
     currentDate = todayISO();
-    // v30 — Maintenant que currentDate est set, refresh le label "today-btn".
+    const localToday = currentDate;
     if (typeof _refreshDateNavLabel === 'function') _refreshDateNavLabel();
     const keys = Object.keys(data.days || {}).sort();
-    if (!keys.includes(currentDate) && keys.length) currentDate = keys[0];
+    if (!keys.includes(currentDate) && keys.length) {
+      // Préfère le plus proche futur > plus proche passé > premier dispo
+      const future = keys.filter(k => k >= localToday);
+      currentDate = future.length ? future[0] : keys[keys.length - 1];
+    }
     document.getElementById('date').value = currentDate;
     if (keys.length) {
       document.getElementById('date').min = keys[0];
