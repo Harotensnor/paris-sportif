@@ -1117,6 +1117,19 @@
     background: linear-gradient(90deg, rgba(167,139,250,.06) 0%, rgba(52,211,153,.06) 100%);
     border-bottom: 1px solid var(--border);
     font-size: 12.5px; font-variant-numeric: tabular-nums;
+    /* P0-5 (audit 2026-05-01) : avant la strip prenait 2318px sur viewport
+       1568px (overflow horizontal masquait 4 stats sur 6). Maintenant
+       contrainte au viewport visible et flex-wrap pour s'adapter. */
+    max-width: 100%;
+    overflow-x: hidden;
+    flex-wrap: wrap;
+  }
+  .trust-strip-link { min-width: 0; }
+  /* Compresser à <1280px pour mobile/laptop : moins de padding, font plus petit */
+  @media (max-width: 1280px) {
+    .trust-strip { padding: var(--space-1) 12px; font-size: 11.5px; gap: 8px; }
+    .trust-strip-val { font-size: 13px; }
+    .trust-strip-lbl { font-size: 10.5px; }
   }
   .trust-strip.hidden { display: none; }
   .trust-strip-link {
