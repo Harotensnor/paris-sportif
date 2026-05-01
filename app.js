@@ -2371,259 +2371,297 @@
   }
   try { window.qualityScore = qualityScore; } catch(e){}
 
-  // Retourne { market, key, label, prob, odd, edge, kelly, ev } ou null.
-  function selectBestMarket(match, pred, opts) {
+  function _v35Rows(block) {
+    return Array.isArray(block) ? block.filter(Boolean) : [];
+  }
+
+  function _v35Prob(value) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return null;
+    if (n > 1 && n <= 100) return n / 100;
+    return n;
+  }
+
+  function _v35ModelTotalProb(pred, market, line, side) {
+    if (!pred || !(line > 0) || !side) return null;
+    const choose = side === 'over' ? 'pOver' : 'pUnder';
+    if (market === 'football_ou') {
+      const raw = pred.markets?.extended?.raw || {};
+      const key = Math.abs(line - 1.5) < 0.01 ? 'ou15'
+        : Math.abs(line - 2.5) < 0.01 ? 'ou25'
+        : Math.abs(line - 3.5) < 0.01 ? 'ou35'
+        : null;
+      const obj = key ? raw[key] : null;
+      return obj ? (side === 'over' ? obj.over : obj.under) : null;
+    }
+    const totals = pred.scores?.markets?.totals || pred.scores?.games?.lines || [];
+    const row = totals.find(t => Math.abs(Number(t.line) - Number(line)) < 0.11);
+    if (!row) return null;
+    return Number(row[choose]);
+  }
+
+  function _v35ModelTeamTotalProb(pred, team, line, side) {
+    const tt = pred?.markets?.extended?.raw?.teamTotals;
+    if (!tt || !(line >= 0)) return null;
+    const prefix = team === 'home' ? 'home' : 'away';
+    const suffix = Math.abs(line - 0.5) < 0.01 ? '05'
+      : Math.abs(line - 1.5) < 0.01 ? '15'
+      : Math.abs(line - 2.5) < 0.01 ? '25'
+      : null;
+    if (!suffix) return null;
+    const over = Number(tt[`${prefix}_over_${suffix}`]);
+    if (!isFinite(over)) return null;
+    return side === 'over' ? over : 1 - over;
+  }
+
+  function _v35ModelHandicapProb(pred, market, side, line) {
+    const sp = market;
+    if (!(line || line === 0) || !side) return null;
+    if (sp === 'football') {
+      const ah = pred?.markets?.extended?.raw?.ah;
+      if (!ah) return null;
+      const l = Number(line);
+      const key = side === 'home'
+        ? (Math.abs(l + 0.5) < 0.01 ? 'home_minus_05'
+          : Math.abs(l - 0.5) < 0.01 ? 'home_plus_05'
+          : Math.abs(l + 1) < 0.01 ? 'home_minus_1'
+          : Math.abs(l - 1) < 0.01 ? 'home_plus_1'
+          : null)
+        : (Math.abs(l + 0.5) < 0.01 ? 'away_minus_05'
+          : Math.abs(l - 0.5) < 0.01 ? 'away_plus_05'
+          : Math.abs(l + 1) < 0.01 ? 'away_minus_1'
+          : Math.abs(l - 1) < 0.01 ? 'away_plus_1'
+          : null);
+      return key ? Number(ah[key]) : null;
+    }
+    const mk = pred?.scores?.markets || {};
+    const pack = sp === 'baseball' ? mk.runLine : sp === 'hockey' ? mk.puckLine : null;
+    if (pack && Math.abs(Math.abs(Number(line)) - 1.5) < 0.01) {
+      const sign = Number(line) < 0 ? 'minus_15' : 'plus_15';
+      return Number(pack[`${side}_${sign}`]);
+    }
+    return null;
+  }
+
+  function _v35AddCandidate(out, row, prob, market, key, label, extra) {
+    const odd = Number(row?.odd);
+    const p = _v35Prob(prob);
+    if (!(odd > 1.01) || !(p > 0) || !(p < 1)) return;
+    out.push({
+      market,
+      key,
+      pickKey: key,
+      side: row?.side || extra?.side || null,
+      line: row?.line ?? extra?.line ?? null,
+      rel: p,
+      prob: p,
+      odd,
+      edge: p - 1 / odd,
+      label: label || row?.label || key,
+      bookLabel: row?.label || '',
+      source: 'winamax_exact',
+      exact: true,
+      raw: row,
+      ...(extra || {}),
+    });
+  }
+
+  function buildMarketCandidates(match, pred, opts) {
     opts = opts || {};
-    const requireExact = !!opts.requireExact;
-    if (!match || !pred || !pred.pick) return null;
+    if (!match || !pred) return [];
     const wxMk = (match.winamax && match.winamax.markets) || {};
-    const candidates = [];
-    // === 1X2 (toujours dispo) ===
-    const pickKey = pred.pick.key;
-    const mainOdd = pred.odds && (pickKey === '1' ? pred.odds.home : pickKey === '2' ? pred.odds.away : pred.odds.draw);
-    if (mainOdd > 1) {
-      const wx1n2 = wxMk['1n2'];
-      const wxOdd = wx1n2 ? Number(pickKey === '1' ? wx1n2.home : pickKey === '2' ? wx1n2.away : wx1n2.draw) : null;
-      const isExact = !!wxOdd;
-      if (!requireExact || isExact) {
-        const odd = wxOdd || mainOdd;
-        const prob = pred.reliability ?? pred.pick.prob;
-        candidates.push({
-          market: '1n2',
-          key: pickKey,
-          label: pred.pick.label || pickKey,
-          prob, odd,
-          edge: prob - 1 / odd,
-          source: isExact ? 'winamax_exact' : 'estimated',
-        });
-      }
+    const out = [];
+
+    if (pred.pick && wxMk['1n2']) {
+      const pk = pred.pick.key;
+      const odd = pk === '1' ? wxMk['1n2'].home : pk === '2' ? wxMk['1n2'].away : wxMk['1n2'].draw;
+      const rel = _v35Prob(pred.pick?.prob ?? pred.reliability);
+      const label = pred.pick.label || (pk === '1' ? 'Victoire domicile' : pk === '2' ? 'Victoire extérieur' : 'Match nul');
+      _v35AddCandidate(out, { odd, side: pk === '1' ? 'home' : pk === '2' ? 'away' : 'draw', label }, rel, '1n2', pk, label);
     }
-    // === Markets foot dérivés ===
-    const mk = pred.markets;
-    if (mk && match.sport === 'football') {
-      // OU 2.5
-      if (mk.ou && wxMk.ou25) {
-        const ouSide = mk.ou.side;
-        const wxOuOdd = Number(ouSide === 'over' ? wxMk.ou25.over : wxMk.ou25.under);
-        if (wxOuOdd > 1) {
-          candidates.push({
-            market: 'ou25', key: mk.ou.key, label: mk.ou.label,
-            prob: mk.ou.prob, odd: wxOuOdd,
-            edge: mk.ou.prob - 1 / wxOuOdd,
-            source: 'winamax_exact',
-          });
-        }
-      }
-      // BTTS
-      if (mk.btts && wxMk.btts) {
-        const bttsSide = mk.btts.side;
-        const wxBttsOdd = Number(bttsSide === 'yes' ? wxMk.btts.yes : wxMk.btts.no);
-        if (wxBttsOdd > 1) {
-          candidates.push({
-            market: 'btts', key: mk.btts.key, label: mk.btts.label,
-            prob: mk.btts.prob, odd: wxBttsOdd,
-            edge: mk.btts.prob - 1 / wxBttsOdd,
-            source: 'winamax_exact',
-          });
-        }
-      }
-      // Extended : double chance, score exact, DNB, AH
-      // (si pas de cote Winamax pour ces marchés, on n'utilise QUE proba pure → exclu si requireExact).
-      if (mk.extended && !requireExact) {
-        const ext = mk.extended;
-        if (ext.doubleChance && ext.doubleChance.prob >= 0.65) {
-          const odd = 1 / ext.doubleChance.prob;
-          candidates.push({
-            market: 'doubleChance', key: ext.doubleChance.key, label: ext.doubleChance.label,
-            prob: ext.doubleChance.prob, odd,
-            edge: 0,  // pas de cote book pour comparer
-            source: 'estimated',
-          });
-        }
-        if (ext.exactScores && ext.exactScores[0] && ext.exactScores[0].prob >= 0.15) {
-          const s = ext.exactScores[0];
-          const odd = 1 / s.prob;
-          candidates.push({
-            market: 'exactScore', key: s.key, label: `Score ${s.label}`,
-            prob: s.prob, odd,
-            edge: 0,
-            source: 'estimated',
-          });
-        }
-        // Sprint 79 — DNB
-        if (ext.dnb && ext.dnb.prob >= 0.60) {
-          candidates.push({
-            market: 'dnb', key: ext.dnb.key, label: ext.dnb.label,
-            prob: ext.dnb.prob, odd: 1 / ext.dnb.prob,
-            edge: 0,
-            source: 'estimated',
-          });
-        }
-        // Sprint 79 — Asian Handicap
-        if (ext.asianHandicap && ext.asianHandicap.prob >= 0.62) {
-          candidates.push({
-            market: 'ah', key: ext.asianHandicap.key, label: ext.asianHandicap.label,
-            prob: ext.asianHandicap.prob, odd: 1 / ext.asianHandicap.prob,
-            edge: 0,
-            source: 'estimated',
-          });
-        }
-      }
+
+    const ext = pred.markets?.extended || {};
+    const raw = ext.raw || {};
+    for (const row of _v35Rows(wxMk.ou)) {
+      const isHockeyOu = match.sport === 'hockey';
+      if (match.sport && match.sport !== 'football' && !isHockeyOu) continue;
+      const prob = _v35ModelTotalProb(pred, isHockeyOu ? 'hockey_total' : 'football_ou', row.line, row.side);
+      const key = `${row.side === 'over' ? 'O' : 'U'}${row.line}`;
+      const mk = isHockeyOu ? 'hockeyTotal' : Math.abs(Number(row.line) - 1.5) < 0.01 ? 'ou15'
+        : Math.abs(Number(row.line) - 2.5) < 0.01 ? 'ou25'
+        : Math.abs(Number(row.line) - 3.5) < 0.01 ? 'ou35'
+        : 'ou';
+      _v35AddCandidate(out, row, prob, mk, key, `${row.side === 'over' ? 'Plus' : 'Moins'} de ${row.line} ${isHockeyOu ? 'buts hockey' : 'buts'}`);
     }
-    // === Markets tennis ===
-    if (pred.scores && pred.scores.kind === 'tennis' && pred.scores.games) {
-      pred.scores.games.lines.forEach(g => {
-        const winnerSide = g.pOver >= g.pUnder ? 'over' : 'under';
-        const prob = Math.max(g.pOver, g.pUnder);
-        if (prob >= 0.65) {
-          const odd = 1 / prob;
-          candidates.push({
-            market: 'tennisGames', key: `${winnerSide === 'over' ? 'O' : 'U'}${g.line}`,
-            label: `${winnerSide === 'over' ? 'Plus' : 'Moins'} de ${g.line} jeux`,
-            prob, odd, edge: 0, source: 'estimated',
-          });
-        }
+    // Legacy fallback if only ou25/btts were patched.
+    [['ou15', 1.5], ['ou25', 2.5], ['ou35', 3.5]].forEach(([mk, line]) => {
+      const block = wxMk[mk];
+      if (!block) return;
+      ['over', 'under'].forEach(side => {
+        const prob = _v35ModelTotalProb(pred, 'football_ou', line, side);
+        const odd = Number(block[side]);
+        _v35AddCandidate(out, { odd, side, line, label: `${side === 'over' ? 'Plus' : 'Moins'} de ${line}` }, prob, mk, `${side === 'over' ? 'O' : 'U'}${line}`, `${side === 'over' ? 'Plus' : 'Moins'} de ${line} buts`);
       });
+    });
+
+    for (const row of _v35Rows(wxMk.btts_rows)) {
+      const prob = row.side === 'yes' ? pred.markets?.btts?.prob : pred.markets?.btts ? 1 - pred.markets.btts.prob : null;
+      _v35AddCandidate(out, row, prob, 'btts', row.side === 'yes' ? 'BTTS_Y' : 'BTTS_N', `BTTS ${row.side === 'yes' ? 'Oui' : 'Non'}`);
     }
-    // === Markets basket ===
-    if (pred.scores && pred.scores.kind === 'basket' && pred.scores.markets) {
-      (pred.scores.markets.totals || []).forEach(t => {
-        const winnerSide = t.pOver >= t.pUnder ? 'over' : 'under';
-        const prob = Math.max(t.pOver, t.pUnder);
-        if (prob >= 0.65) {
-          const odd = 1 / prob;
-          candidates.push({
-            market: 'basketTotal', key: `${winnerSide === 'over' ? 'O' : 'U'}${t.line}`,
-            label: `${winnerSide === 'over' ? 'Plus' : 'Moins'} de ${t.line} pts`,
-            prob, odd, edge: 0, source: 'estimated',
-          });
-        }
-      });
-      (pred.scores.markets.handicaps || []).forEach(h => {
-        const prob = Math.max(h.pCover, h.pAgainst);
-        if (prob >= 0.65) {
-          const odd = 1 / prob;
-          candidates.push({
-            market: 'basketHandicap', key: h.label, label: h.label,
-            prob, odd, edge: 0, source: 'estimated',
-          });
-        }
-      });
+    if (wxMk.btts && pred.markets?.btts) {
+      const pYes = pred.markets.btts.side === 'yes' ? pred.markets.btts.prob : 1 - pred.markets.btts.prob;
+      const pNo = 1 - pYes;
+      _v35AddCandidate(out, { odd: wxMk.btts.yes, side: 'yes', label: 'Oui' }, pYes, 'btts', 'BTTS_Y', 'BTTS Oui');
+      _v35AddCandidate(out, { odd: wxMk.btts.no, side: 'no', label: 'Non' }, pNo, 'btts', 'BTTS_N', 'BTTS Non');
     }
-    // Sprint 82 — Markets hockey + baseball
-    if (pred.scores && pred.scores.markets) {
-      const sp = match.sport;
-      if (sp === 'hockey') {
-        (pred.scores.markets.totals || []).forEach(t => {
-          const winnerSide = t.pOver >= t.pUnder ? 'over' : 'under';
-          const prob = Math.max(t.pOver, t.pUnder);
-          if (prob >= 0.62) {
-            candidates.push({
-              market: 'hockeyTotal', key: `${winnerSide === 'over' ? 'O' : 'U'}${t.line}`,
-              label: `${winnerSide === 'over' ? 'Plus' : 'Moins'} de ${t.line} buts`,
-              prob, odd: 1 / prob, edge: 0, source: 'estimated',
-            });
-          }
-        });
-        const pl = pred.scores.markets.puckLine || {};
-        const plPicks = [
-          { key: 'PL_H_-1.5', label: 'Puck line Home -1.5', prob: pl.home_minus_15 },
-          { key: 'PL_H_+1.5', label: 'Puck line Home +1.5', prob: pl.home_plus_15 },
-          { key: 'PL_A_-1.5', label: 'Puck line Away -1.5', prob: pl.away_minus_15 },
-          { key: 'PL_A_+1.5', label: 'Puck line Away +1.5', prob: pl.away_plus_15 },
-        ].filter(x => x.prob >= 0.62 && x.prob <= 0.85)
-         .sort((a, b) => b.prob - a.prob);
-        if (plPicks[0]) {
-          candidates.push({
-            market: 'puckLine', key: plPicks[0].key, label: plPicks[0].label,
-            prob: plPicks[0].prob, odd: 1 / plPicks[0].prob, edge: 0, source: 'estimated',
-          });
-        }
-      }
-      if (sp === 'baseball') {
-        (pred.scores.markets.totals || []).forEach(t => {
-          const winnerSide = t.pOver >= t.pUnder ? 'over' : 'under';
-          const prob = Math.max(t.pOver, t.pUnder);
-          if (prob >= 0.62) {
-            candidates.push({
-              market: 'baseballTotal', key: `${winnerSide === 'over' ? 'O' : 'U'}${t.line}`,
-              label: `${winnerSide === 'over' ? 'Plus' : 'Moins'} de ${t.line} runs`,
-              prob, odd: 1 / prob, edge: 0, source: 'estimated',
-            });
-          }
-        });
-        const rl = pred.scores.markets.runLine || {};
-        const rlPicks = [
-          { key: 'RL_H_-1.5', label: 'Run line Home -1.5', prob: rl.home_minus_15 },
-          { key: 'RL_H_+1.5', label: 'Run line Home +1.5', prob: rl.home_plus_15 },
-          { key: 'RL_A_-1.5', label: 'Run line Away -1.5', prob: rl.away_minus_15 },
-          { key: 'RL_A_+1.5', label: 'Run line Away +1.5', prob: rl.away_plus_15 },
-        ].filter(x => x.prob >= 0.62 && x.prob <= 0.85)
-         .sort((a, b) => b.prob - a.prob);
-        if (rlPicks[0]) {
-          candidates.push({
-            market: 'runLine', key: rlPicks[0].key, label: rlPicks[0].label,
-            prob: rlPicks[0].prob, odd: 1 / rlPicks[0].prob, edge: 0, source: 'estimated',
-          });
-        }
+
+    for (const row of _v35Rows(wxMk.double_chance)) {
+      const p = row.side === '1X' ? raw.doubleChance?.p1X : row.side === 'X2' ? raw.doubleChance?.pX2 : raw.doubleChance?.p12;
+      _v35AddCandidate(out, row, p, 'doubleChance', row.side, `Double chance ${row.side}`);
+    }
+    for (const row of _v35Rows(wxMk.dnb_rows)) {
+      const p = row.side === 'home' ? raw.dnb?.home : raw.dnb?.away;
+      const key = row.side === 'home' ? 'DNB_1' : 'DNB_2';
+      _v35AddCandidate(out, row, p, 'dnb', key, `DNB ${row.side === 'home' ? '1' : '2'}`);
+    }
+    if (wxMk.dnb && raw.dnb) {
+      _v35AddCandidate(out, { odd: wxMk.dnb.home, side: 'home', label: 'Home' }, raw.dnb.home, 'dnb', 'DNB_1', 'DNB 1');
+      _v35AddCandidate(out, { odd: wxMk.dnb.away, side: 'away', label: 'Away' }, raw.dnb.away, 'dnb', 'DNB_2', 'DNB 2');
+    }
+
+    for (const row of _v35Rows(wxMk.team_total)) {
+      const p = _v35ModelTeamTotalProb(pred, row.team, row.line, row.side);
+      const key = `${row.team}:${row.side === 'over' ? 'O' : 'U'}${row.line}`;
+      _v35AddCandidate(out, row, p, 'teamTotal', key, `${row.team === 'home' ? 'Domicile' : 'Extérieur'} ${row.side === 'over' ? '+' : '-'}${row.line} but`);
+    }
+    for (const row of _v35Rows(wxMk.exact_score_rows)) {
+      const hit = (ext.exactScores || []).find(x => x.key === row.score || x.label === row.score);
+      _v35AddCandidate(out, row, hit?.prob, 'exactScore', row.score, `Score exact ${row.score}`);
+    }
+    for (const row of _v35Rows(wxMk.ht_1n2_rows)) {
+      const p = row.side === 'home' ? raw.ht?.p1 : row.side === 'away' ? raw.ht?.p2 : raw.ht?.pX;
+      const key = row.side === 'home' ? 'HT_1' : row.side === 'away' ? 'HT_2' : 'HT_X';
+      _v35AddCandidate(out, row, p, 'ht_1n2', key, `Mi-temps ${row.side === 'draw' ? 'N' : row.side === 'home' ? '1' : '2'}`);
+    }
+    for (const row of _v35Rows(wxMk.result_btts)) {
+      const mapKey = `${row.result === 'home' ? '1' : row.result === 'away' ? '2' : 'X'}_${row.btts}`;
+      _v35AddCandidate(out, row, raw.resultBtts?.[mapKey], 'resultBtts', `RESBTTS_${mapKey}`, row.label || mapKey);
+    }
+    for (const row of _v35Rows(wxMk.handicap)) {
+      const p = _v35ModelHandicapProb(pred, 'football', row.side, row.line);
+      _v35AddCandidate(out, row, p, 'handicap', `${row.side}:${row.line}`, row.label || `Handicap ${row.side} ${row.line}`);
+    }
+
+    for (const row of _v35Rows(wxMk.tennis_games)) {
+      const p = _v35ModelTotalProb(pred, 'tennis_games', row.line, row.side);
+      _v35AddCandidate(out, row, p, 'tennisGames', `${row.side === 'over' ? 'O' : 'U'}${row.line}`, `${row.side === 'over' ? 'Plus' : 'Moins'} de ${row.line} jeux`);
+    }
+    for (const row of _v35Rows(wxMk.basket_total)) {
+      const p = _v35ModelTotalProb(pred, 'basket_total', row.line, row.side);
+      _v35AddCandidate(out, row, p, 'basketTotal', `${row.side === 'over' ? 'O' : 'U'}${row.line}`, `${row.side === 'over' ? 'Plus' : 'Moins'} de ${row.line} pts`);
+    }
+    for (const row of _v35Rows(wxMk.baseball_total)) {
+      const p = _v35ModelTotalProb(pred, 'baseball_total', row.line, row.side);
+      _v35AddCandidate(out, row, p, 'baseballTotal', `${row.side === 'over' ? 'O' : 'U'}${row.line}`, `${row.side === 'over' ? 'Plus' : 'Moins'} de ${row.line} runs`);
+    }
+    for (const row of _v35Rows(wxMk.hockey_total)) {
+      const p = _v35ModelTotalProb(pred, 'hockey_total', row.line, row.side);
+      _v35AddCandidate(out, row, p, 'hockeyTotal', `${row.side === 'over' ? 'O' : 'U'}${row.line}`, `${row.side === 'over' ? 'Plus' : 'Moins'} de ${row.line} buts`);
+    }
+    for (const [key, market, sport] of [['run_line', 'runLine', 'baseball'], ['puck_line', 'puckLine', 'hockey'], ['basket_handicap', 'basketHandicap', 'basketball']]) {
+      for (const row of _v35Rows(wxMk[key])) {
+        const p = _v35ModelHandicapProb(pred, sport, row.side, row.line);
+        _v35AddCandidate(out, row, p, market, `${row.side}:${row.line}`, row.label || `${market} ${row.line}`);
       }
     }
-    // Sprint 82 — Foot team totals
-    if (match.sport === 'football' && pred.markets && pred.markets.extended && pred.markets.extended.raw && pred.markets.extended.raw.teamTotals) {
-      const tt = pred.markets.extended.raw.teamTotals;
-      const ttCands = [
-        { key: 'H_O_0.5', label: 'Home marque ≥ 1', prob: tt.home_over_05 },
-        { key: 'H_O_1.5', label: 'Home marque ≥ 2', prob: tt.home_over_15 },
-        { key: 'A_O_0.5', label: 'Away marque ≥ 1', prob: tt.away_over_05 },
-        { key: 'A_O_1.5', label: 'Away marque ≥ 2', prob: tt.away_over_15 },
-      ].filter(x => x.prob >= 0.65 && x.prob <= 0.92)
-       .sort((a, b) => b.prob - a.prob);
-      if (ttCands[0]) {
-        candidates.push({
-          market: 'teamTotal', key: ttCands[0].key, label: ttCands[0].label,
-          prob: ttCands[0].prob, odd: 1 / ttCands[0].prob, edge: 0, source: 'estimated',
-        });
-      }
-    }
-    if (!candidates.length) return null;
-    const dqForInvestment = (() => {
+
+    const scored = out.map(c => scoreMarketCandidate(c, match, pred)).filter(Boolean);
+    scored.sort((a, b) => {
+      const ai = a.investment?.score || 0, bi = b.investment?.score || 0;
+      if (bi !== ai) return bi - ai;
+      if (Math.abs((b.ev || 0) - (a.ev || 0)) > 0.005) return (b.ev || 0) - (a.ev || 0);
+      if (Math.abs((b.edge || 0) - (a.edge || 0)) > 0.005) return (b.edge || 0) - (a.edge || 0);
+      return (b.prob || b.rel || 0) - (a.prob || a.rel || 0);
+    });
+    return scored;
+  }
+  try { window.buildMarketCandidates = buildMarketCandidates; } catch(e){}
+
+  function scoreMarketCandidate(candidate, match, pred) {
+    if (!candidate) return null;
+    const prob = _v35Prob(candidate.prob ?? candidate.rel);
+    const odd = Number(candidate.odd);
+    if (!(prob > 0) || !(odd > 1.01)) return null;
+    const dq = (() => {
       try { return (typeof computeDataQuality === 'function') ? computeDataQuality(match) : null; }
       catch(e) { return null; }
     })();
-    candidates.forEach(c => {
-      c.ev = expectedValue(c.prob, c.odd);
-      c.discipline = oddsDisciplineProfile(c.odd);
-      c.investment = investmentScore(c.prob, c.odd, dqForInvestment, {
-        market: c.market,
-        source: c.source
-      });
+    const out = { ...candidate, prob, rel: prob, odd };
+    out.edge = prob - 1 / odd;
+    out.ev = expectedValue(prob, odd);
+    out.discipline = oddsDisciplineProfile(odd);
+    out.investment = investmentScore(prob, odd, dq, {
+      market: out.market,
+      source: out.source || 'winamax_exact'
     });
-    // Tri : edge desc puis prob desc
-    candidates.sort((a, b) => {
-      if (Math.abs(b.edge - a.edge) > 0.01) return b.edge - a.edge;
-      return b.prob - a.prob;
-    });
-    const best = candidates[0];
-    // Sprint 84 (v31.7.171 — audit Part 10) — Expose tous les candidats pour
-    // que la modal puisse afficher "Marchés alternatifs" + "Marchés refusés".
-    best.allCandidates = candidates;
-    // Kelly fractionnel (demi-Kelly) cap 5% pour markets dérivés, 10% pour 1X2
-    const b = best.odd - 1;
-    const k = b > 0 ? Math.max(0, (b * best.prob - (1 - best.prob)) / b) : 0;
-    best.kelly = Math.min(best.market === '1n2' ? 0.10 : 0.05, k * 0.5);
-    // Sprint 77 (v31.7.164) — EV explicite dans le retour.
-    best.ev = expectedValue(best.prob, best.odd);
-    best.discipline = best.discipline || oddsDisciplineProfile(best.odd);
-    best.investment = best.investment || investmentScore(best.prob, best.odd, dqForInvestment, {
-      market: best.market,
-      source: best.source
-    });
-    // Phase 3 #11 : flag edge anormal (>15pt = phantom edge probable)
-    const EDGE_ANOMALY_CAP = 0.15;  // 15pt = 0.15 en proba
-    if (best.edge > EDGE_ANOMALY_CAP) {
-      best.suspect = true;
-      best.suspectReason = `edge ${(best.edge*100).toFixed(1)}pt > 15pt — probable phantom edge`;
+    out.history = marketHistoryConfidence(out.market, match?.sport);
+    if (out.history && out.history.penalty) {
+      out.investment = {
+        ...out.investment,
+        score: Math.max(0, (out.investment?.score || 0) - out.history.penalty),
+        reasons: [...(out.investment?.reasons || []), out.history.label]
+      };
     }
+    const b = odd - 1;
+    const rawKelly = b > 0 ? Math.max(0, (b * prob - (1 - prob)) / b) : 0;
+    const cap = out.investment?.profile?.capPct ?? (out.market === '1n2' ? 0.10 : 0.05);
+    out.kelly = Math.min(cap, rawKelly * 0.25);
+    if (out.edge > 0.18 && out.market !== 'exactScore') {
+      out.suspect = true;
+      out.suspectReason = `edge ${(out.edge*100).toFixed(1)}pt > 18pt — vérifier mapping`;
+      out.investment = {
+        ...out.investment,
+        action: 'watch',
+        score: Math.min(out.investment?.score || 0, 58),
+        label: 'Vérifier'
+      };
+    }
+    return out;
+  }
+  try { window.scoreMarketCandidate = scoreMarketCandidate; } catch(e){}
+
+  function marketHistoryConfidence(market, sport) {
+    const hist = window.__marketHistoryStats || null;
+    const bucket = hist && (hist[`${sport || ''}|${market}`] || hist[`*|${market}`]);
+    if (!bucket || bucket.n < 8) return { tier: 'learning', label: 'Historique marché en apprentissage', penalty: 3, n: bucket?.n || 0 };
+    const roi = bucket.roi || 0;
+    if (bucket.n >= 30 && roi > 0.03) return { tier: 'validated', label: `Marché validé (${bucket.n} picks)`, penalty: 0, n: bucket.n };
+    if (bucket.n >= 15 && roi < -0.08) return { tier: 'cold', label: `Marché froid (${bucket.n} picks, ROI ${Math.round(roi*100)}%)`, penalty: 12, n: bucket.n };
+    return { tier: 'neutral', label: `Historique marché neutre (${bucket.n} picks)`, penalty: 0, n: bucket.n };
+  }
+  try { window.marketHistoryConfidence = marketHistoryConfidence; } catch(e){}
+
+  // Retourne { market, key, label, prob, odd, edge, kelly, ev } ou null.
+  function selectBestMarket(match, pred, opts) {
+    opts = opts || {};
+    const candidates = buildMarketCandidates(match, pred, { requireExact: true });
+    if (!candidates.length) return null;
+    const pool = candidates.filter(c =>
+      c.source === 'winamax_exact'
+      && c.investment
+      && c.investment.action !== 'skip'
+      && c.ev > 0
+      && c.edge > 0
+    );
+    const sorted = (pool.length ? pool : candidates).slice();
+    sorted.sort((a, b) => {
+      const ai = a.investment?.score || 0, bi = b.investment?.score || 0;
+      if (bi !== ai) return bi - ai;
+      if (Math.abs((b.ev || 0) - (a.ev || 0)) > 0.005) return (b.ev || 0) - (a.ev || 0);
+      return (b.edge || 0) - (a.edge || 0);
+    });
+    const best = sorted[0];
+    best.allCandidates = candidates;
     return best;
   }
   try { window.selectBestMarket = selectBestMarket; } catch(e){}
@@ -7261,6 +7299,17 @@
         if (pickValue === 'O3.5') return total > 3.5 ? 'won' : 'lost';
         if (pickValue === 'U3.5') return total < 3.5 ? 'won' : 'lost';
         return null;
+      case 'ou':
+      case 'hockeyTotal':
+      case 'baseballTotal':
+      case 'tennisGames':
+        {
+          const mm = /^([OU])(\d+(?:\.\d+)?)$/.exec(String(pickValue));
+          if (!mm) return null;
+          const line = parseFloat(mm[2]);
+          const isOver = mm[1] === 'O';
+          return isOver ? (total > line ? 'won' : 'lost') : (total < line ? 'won' : 'lost');
+        }
       case 'btts':
         if (pickValue === 'BTTS_Y') return (hs >= 1 && as >= 1) ? 'won' : 'lost';
         if (pickValue === 'BTTS_N') return (hs === 0 || as === 0) ? 'won' : 'lost';
@@ -7275,6 +7324,24 @@
         const parts = String(pickValue).split('-').map(x => parseInt(x, 10));
         if (parts.length !== 2 || isNaN(parts[0]) || isNaN(parts[1])) return null;
         return (hs === parts[0] && as === parts[1]) ? 'won' : 'lost';
+      case 'teamTotal':
+        {
+          const tm = /^(home|away):([OU])(\d+(?:\.\d+)?)$/.exec(String(pickValue));
+          if (!tm) return null;
+          const goals = tm[1] === 'home' ? hs : as;
+          const line = parseFloat(tm[3]);
+          return tm[2] === 'O' ? (goals > line ? 'won' : 'lost') : (goals < line ? 'won' : 'lost');
+        }
+      case 'ht_1n2':
+        return null; // halftime score is not stored reliably in ESPN final payload
+      case 'resultBtts':
+        {
+          const rm = /^RESBTTS_(1|X|2)_(yes|no)$/.exec(String(pickValue));
+          if (!rm) return null;
+          const resultOk = rm[1] === '1' ? hs > as : rm[1] === '2' ? as > hs : hs === as;
+          const bttsOk = rm[2] === 'yes' ? (hs >= 1 && as >= 1) : (hs === 0 || as === 0);
+          return (resultOk && bttsOk) ? 'won' : 'lost';
+        }
       case 'basketTotal':
         // pickValue format "O215.5" ou "U220.5"
         const m = /^([OU])(\d+(?:\.\d+)?)$/.exec(String(pickValue));
@@ -7284,12 +7351,26 @@
         return isOver ? (total > line ? 'won' : 'lost') : (total < line ? 'won' : 'lost');
       case 'basketHandicap':
         // pickValue : { side: 'home'|'away', spread: number }
-        if (!pickValue || typeof pickValue !== 'object') return null;
-        const adjusted = pickValue.side === 'home'
-          ? hs + (pickValue.spread || 0)
-          : as + (pickValue.spread || 0);
-        const opp = pickValue.side === 'home' ? as : hs;
-        return adjusted > opp ? 'won' : 'lost';
+      case 'handicap':
+      case 'runLine':
+      case 'puckLine':
+        {
+          let side = null, spread = null;
+          if (pickValue && typeof pickValue === 'object') {
+            side = pickValue.side;
+            spread = pickValue.spread;
+          } else {
+            const hm = /^(home|away):([+-]?\d+(?:\.\d+)?)$/.exec(String(pickValue));
+            if (hm) {
+              side = hm[1];
+              spread = parseFloat(hm[2]);
+            }
+          }
+          if (!side || !isFinite(spread)) return null;
+          const adjusted = side === 'home' ? hs + spread : as + spread;
+          const opp = side === 'home' ? as : hs;
+          return adjusted > opp ? 'won' : 'lost';
+        }
       default:
         return null;
     }
@@ -13040,6 +13121,8 @@
       _agentReplay: typeof _agentReplay === 'function' ? _agentReplay : null,
       _agentBestPick: typeof _agentBestPick === 'function' ? _agentBestPick : null,
       selectBestMarket: typeof selectBestMarket === 'function' ? selectBestMarket : null,
+      buildMarketCandidates: typeof buildMarketCandidates === 'function' ? buildMarketCandidates : null,
+      scoreMarketCandidate: typeof scoreMarketCandidate === 'function' ? scoreMarketCandidate : null,
     };
   } catch(e){}
 
@@ -13548,6 +13631,29 @@
   //       Si absent → fallback sur 1N2 classique (backward-compatible).
   function _agentBestPick(m, pred) {
     if (!m || !pred) return null;
+    // v35 — terminal value scanner: exact Winamax markets only. This replaces
+    // the old 1N2/OU25/BTTS-only pool when the new helper is available.
+    if (typeof buildMarketCandidates === 'function') {
+      const candidates = buildMarketCandidates(m, pred, { requireExact: true });
+      if (!candidates.length) return null;
+      const investable = candidates.filter(c =>
+        c.source === 'winamax_exact'
+        && c.investment
+        && c.investment.action !== 'skip'
+        && c.ev > 0
+        && c.edge > 0
+      );
+      const pool = investable.length ? investable : candidates;
+      pool.sort((a,b) => {
+        const as = a.investment ? a.investment.score : 0;
+        const bs = b.investment ? b.investment.score : 0;
+        if (bs !== as) return bs - as;
+        if (Math.abs((b.ev || 0) - (a.ev || 0)) > 0.005) return (b.ev || 0) - (a.ev || 0);
+        return (b.edge || 0) - (a.edge || 0);
+      });
+      pool[0].allCandidates = candidates;
+      return pool[0];
+    }
     const wxMk = (m.winamax && m.winamax.markets) || null;
     const candidates = [];
     // 1N2 — canal principal, toujours disponible quand pred.pick + pred.odds
@@ -13610,6 +13716,10 @@
   // v28 — Évaluateur multi-marché (pour le replay historique)
   function _evaluateBestPick(m, best) {
     if (!m || !best || !m.completed) return null;
+    if (typeof evaluateMarketPick === 'function') {
+      const res = evaluateMarketPick(m, best.market, best.pickKey || best.key);
+      if (res === 'won' || res === 'lost') return res;
+    }
     if (best.market === '1n2') {
       // Délégué à evaluateModelPick qui a déjà la logique 1N2 propre
       return evaluateModelPick(m, { pick: { key: best.pickKey }, isLock: false });
@@ -13737,6 +13847,39 @@
     return out;
   }
 
+  function _buildMarketHistoryStats(scorableRaw) {
+    const stats = {};
+    const add = (key, p) => {
+      if (!key) return;
+      const b = stats[key] || (stats[key] = { n: 0, wins: 0, losses: 0, pl: 0, avgOdd: 0, avgEv: 0 });
+      b.n += 1;
+      if (p.res === 'won') b.wins += 1;
+      else b.losses += 1;
+      b.pl += p.res === 'won' ? ((p.odd || 1) - 1) : -1;
+      b.avgOdd += Number(p.odd || 0);
+      b.avgEv += Number(p.best?.ev || 0);
+    };
+    (scorableRaw || []).forEach(p => {
+      const market = p.best?.market || '1n2';
+      const sport = p.m?.sport || '';
+      add(`*|${market}`, p);
+      add(`${sport}|${market}`, p);
+    });
+    Object.values(stats).forEach(b => {
+      b.wr = b.n ? b.wins / b.n : 0;
+      b.roi = b.n ? b.pl / b.n : 0;
+      b.avgOdd = b.n ? b.avgOdd / b.n : 0;
+      b.avgEv = b.n ? b.avgEv / b.n : 0;
+      b.tier = b.n >= 30 && b.roi > 0.03 ? 'validated'
+        : b.n >= 15 && b.roi < -0.08 ? 'cold'
+        : b.n >= 8 ? 'neutral'
+        : 'learning';
+    });
+    try { window.__marketHistoryStats = stats; } catch(e) {}
+    return stats;
+  }
+  try { window._buildMarketHistoryStats = _buildMarketHistoryStats; } catch(e){}
+
   // Sprint G — Memoization _agentReplay (très couteux, appelé 5+ fois par render)
   // Cache invalidate quand PRONOSTICS_DATA ref change ou agentResetTs modifié.
   let __agentReplayCache = null;
@@ -13751,7 +13894,7 @@
       return __agentReplayCache;
     }
     if (!data || !data.days) {
-      const empty = { nav: AGENT_START, series: [], scorable: [], scorableRaw: [], ydayStats: null, perSport7d: {}, start: AGENT_START };
+      const empty = { nav: AGENT_START, series: [], scorable: [], scorableRaw: [], ydayStats: null, perSport7d: {}, marketHistoryStats: {}, start: AGENT_START };
       __agentReplayCache = empty;
       __agentReplayDataRef = data;
       __agentReplayResetTs = resetTs;
@@ -13780,6 +13923,7 @@
     scorable.sort((a,b) => a.ts - b.ts);
     // v27.2 — Conserver le scorable brut (avant règles) pour analyse auto-tuning
     const scorableRaw = scorable.slice();
+    const marketHistoryStats = _buildMarketHistoryStats(scorableRaw);
     let nav = AGENT_START;
     const series = [];
     const now = Date.now();
@@ -13897,7 +14041,7 @@
       return v;
     })();
     const result = {
-      nav, series, scorable, scorableRaw, start: AGENT_START, perSport7d,
+      nav, series, scorable, scorableRaw, start: AGENT_START, perSport7d, marketHistoryStats,
       delta7: nav - navPrev7, deltaPct7: navPrev7 > 0 ? (nav - navPrev7) / navPrev7 * 100 : 0,
       ydayStats: ydayTotal > 0 ? { pl: ydayPl, wins: ydayWins, losses: ydayLosses, total: ydayTotal, highTotal: ydayHighTotal, highWins: ydayHighWins, lowLoss: ydayLowLoss } : null,
       // v31.7.218 — Tilt protection metadata
@@ -15084,10 +15228,100 @@
         </section>`;
     })();
 
+    const _terminalMarketPanel = (() => {
+      if (_dataIsStale) {
+        return `
+          <section class="terminal-market terminal-market--stale">
+            <header>
+              <div>
+                <span>Terminal Value v35</span>
+                <h2>Scanner multi-marchés Winamax exacts</h2>
+              </div>
+              <p>Données verrouillées : refresh requis avant tout pari actionnable.</p>
+            </header>
+            <div class="terminal-market__strip">
+              <span><b>Protection</b>aucune cote stale n'est transformée en conseil</span>
+              <span><b>Winamax</b>exact only</span>
+              <span><b>EV</b>en attente de données fraîches</span>
+            </div>
+          </section>`;
+      }
+      const rows = [];
+      let exactMatches = 0, detailedMatches = 0, candidateCount = 0;
+      today.filter(m => !m.completed && !m.live).slice(0, 180).forEach(m => {
+        try {
+          const pred = predictMatch(m);
+          if (!pred || !pred.pick || pred.skip) return;
+          if (m.winamax?.match_id) exactMatches++;
+          const markets = m.winamax?.markets || {};
+          if (markets && Object.keys(markets).some(k => k !== '1n2')) detailedMatches++;
+          const cands = (typeof buildMarketCandidates === 'function') ? buildMarketCandidates(m, pred, { requireExact: true }) : [];
+          candidateCount += cands.length;
+          cands.forEach(c => rows.push({ m, pred, c }));
+        } catch(e) {}
+      });
+      const valueRows = rows
+        .filter(x => x.c && x.c.source === 'winamax_exact' && x.c.ev > 0 && x.c.edge > 0 && x.c.investment?.action !== 'skip')
+        .sort((a,b) => (b.c.investment?.score || 0) - (a.c.investment?.score || 0) || (b.c.ev || 0) - (a.c.ev || 0));
+      const main = valueRows.find(x => x.c.odd >= 1.45 && x.c.odd <= 3.50 && (x.c.investment?.score || 0) >= 60) || valueRows[0];
+      const attack = valueRows
+        .filter(x => x.c.odd >= 2.20 && x.c.odd <= 8.00 && x.c.ev >= 0.08)
+        .sort((a,b) => (b.c.ev || 0) - (a.c.ev || 0) || (b.c.odd || 0) - (a.c.odd || 0))[0];
+      const marketBuckets = {};
+      rows.forEach(x => {
+        const key = x.c.market || 'unknown';
+        const b = marketBuckets[key] || (marketBuckets[key] = { n: 0, best: null });
+        b.n++;
+        if (!b.best || (x.c.investment?.score || 0) > (b.best.c.investment?.score || 0)) b.best = x;
+      });
+      const marketHtml = Object.entries(marketBuckets)
+        .sort((a,b) => b[1].n - a[1].n)
+        .slice(0, 8)
+        .map(([k, b]) => `<span><b>${esc(k)}</b>${b.n}</span>`)
+        .join('');
+      const ticket = (x, type) => {
+        if (!x) return `<div class="terminal-ticket terminal-ticket--empty"><span>${esc(type)}</span><strong>Aucun ticket</strong><em>Le moteur refuse de forcer.</em></div>`;
+        const { home, away } = getSides(x.m);
+        const cls = type === 'Ticket attaque' ? 'terminal-ticket--attack' : 'terminal-ticket--main';
+        const stake = type === 'Ticket attaque'
+          ? Math.max(0.10, Math.min(userBankroll * 0.01, userBankroll * (x.c.kelly || 0)))
+          : Math.max(0.10, Math.min(userBankroll * 0.05, userBankroll * (x.c.kelly || 0)));
+        return `
+          <div class="terminal-ticket ${cls}" data-match-id="${esc(String(x.m.id || ''))}">
+            <span>${esc(type)}</span>
+            <strong>${esc((home?.short || home?.name || '?') + ' vs ' + (away?.short || away?.name || '?'))}</strong>
+            <em>${esc(x.c.label)} · @${Number(x.c.odd).toFixed(2)} · EV ${x.c.ev >= 0 ? '+' : ''}${Math.round(x.c.ev * 100)}%</em>
+            <div>
+              <b>${Math.round((x.c.prob || 0) * 100)}%</b>
+              <b>${x.c.edge >= 0 ? '+' : ''}${Math.round(x.c.edge * 100)}pt</b>
+              <b>${x.c.investment?.score || 0}/100</b>
+              <b>${stake.toFixed(2)}€</b>
+            </div>
+          </div>`;
+      };
+      return `
+        <section class="terminal-market">
+          <header>
+            <div>
+              <span>Terminal Value v35</span>
+              <h2>Scanner multi-marchés Winamax exacts</h2>
+            </div>
+            <p>${candidateCount} marchés scorés · ${exactMatches} matchs exacts · ${detailedMatches} détaillés</p>
+          </header>
+          <div class="terminal-market__tickets">
+            ${ticket(main, 'Ticket principal')}
+            ${ticket(attack, 'Ticket attaque')}
+          </div>
+          <div class="terminal-market__strip">${marketHtml || '<span><b>1n2</b>en attente</span>'}</div>
+        </section>`;
+    })();
+
     wrap.innerHTML = `
       <div style="max-width:1280px;margin:0 auto;padding:0 20px;font-variant-numeric:tabular-nums;">
 
         ${_dashboardCockpit}
+
+        ${_terminalMarketPanel}
 
         ${_userBetsBilan}
 
@@ -21431,6 +21665,7 @@
     sport: 'all',       // all | football | basketball | hockey | tennis
     fiab: 'all',        // all | locks (≥70%) | hi (60-70%) | mid (50-60%) | low (<50%)
     pickType: 'all',    // all | 1 | N | 2
+    market: 'all',      // all | 1n2 | ou25 | btts | handicap | ...
     bookmaker: 'winamax', // winamax | all
   };
   let _histDayLimit = 20;
@@ -23703,6 +23938,37 @@
       return;
     }
 
+    const histMarketLabel = (market) => ({
+      '1n2': '1N2',
+      ou: 'O/U buts',
+      ou15: 'O/U 1.5',
+      ou25: 'O/U 2.5',
+      ou35: 'O/U 3.5',
+      btts: 'BTTS',
+      doubleChance: 'Double chance',
+      dnb: 'DNB',
+      teamTotal: 'Team total',
+      exactScore: 'Score exact',
+      resultBtts: 'Résultat + BTTS',
+      handicap: 'Handicap foot',
+      basketTotal: 'Total basket',
+      basketHandicap: 'Handicap basket',
+      baseballTotal: 'Runs baseball',
+      runLine: 'Run line',
+      hockeyTotal: 'Total hockey',
+      puckLine: 'Puck line',
+      tennisGames: 'Jeux tennis',
+      ht_1n2: 'Mi-temps',
+    }[market] || market || 'Marché');
+
+    const histPickFamily = (p) => {
+      const k = String(p.pickKey || p.best?.pickKey || p.best?.key || p.pred?.pick?.key || '');
+      if (k === '1' || k === 'DNB_1' || k === 'HT_1' || k.includes('_1') || k.startsWith('home:')) return '1';
+      if (k === '2' || k === 'DNB_2' || k === 'HT_2' || k.includes('_2') || k.startsWith('away:')) return '2';
+      if (k === 'X' || k === 'HT_X' || k.includes('_X')) return 'X';
+      return k;
+    };
+
     // 1. Collecte des picks réglés (dedup par id, bookmaker pré-filtré)
     const seen = new Set();
     const picks = [];
@@ -23716,17 +23982,26 @@
       if (!winaOk) return;
       const pred = predictMatch(m);
       if (!pred || !pred.pick || pred.skip) return;
-      const res = evaluateModelPick(m, pred);
+      const best = (typeof _agentBestPick === 'function') ? _agentBestPick(m, pred) : null;
+      if (!best) return;
+      const res = (typeof _evaluateBestPick === 'function') ? _evaluateBestPick(m, best) : evaluateModelPick(m, pred);
       if (res == null) return;
-      const odd = pred.odds && (pred.pick.key === '1' ? pred.odds.home : pred.pick.key === '2' ? pred.odds.away : pred.odds.draw);
-      if (!odd) return;
-      picks.push({ m, pred, res, odd });
+      const odd = Number(best.odd || (pred.odds && (pred.pick.key === '1' ? pred.odds.home : pred.pick.key === '2' ? pred.odds.away : pred.odds.draw)));
+      if (!(odd > 1.01)) return;
+      const rel = Number(best.rel ?? best.prob ?? pred.reliability ?? pred.pick.prob);
+      picks.push({
+        m, pred, best, res, odd, rel,
+        market: best.market || '1n2',
+        pickKey: best.pickKey || best.key || pred.pick.key,
+        ev: Number(best.ev || 0),
+        edge: Number(best.edge || 0),
+      });
     }));
 
     // 2. Filtres en page (sport / fiab / pickType)
     const passFilter = (p) => {
       if (_histFilters.sport !== 'all' && p.m.sport !== _histFilters.sport) return false;
-      const fiab = p.pred.reliability ?? p.pred.pick.prob;
+      const fiab = p.rel ?? p.best?.rel ?? p.pred.reliability ?? p.pred.pick.prob;
       // FIX audit Histo #7 : exclure les picks avec fiab null/NaN AVANT
       // les filtres bucket — sinon ils passent en "low" et affichent
       // "NaN%" plus loin dans la liste.
@@ -23735,8 +24010,9 @@
       if (_histFilters.fiab === 'hi' && (fiab < 0.60 || fiab >= 0.70)) return false;
       if (_histFilters.fiab === 'mid' && (fiab < 0.50 || fiab >= 0.60)) return false;
       if (_histFilters.fiab === 'low' && fiab >= 0.50) return false;
+      if (_histFilters.market !== 'all' && p.market !== _histFilters.market) return false;
       if (_histFilters.pickType !== 'all') {
-        const pk = p.pred.pick.key;
+        const pk = histPickFamily(p);
         const want = _histFilters.pickType === 'N' ? 'X' : _histFilters.pickType;
         if (pk !== want) return false;
       }
@@ -23801,6 +24077,27 @@
     });
     const sportRows = Object.values(perSport).sort((a, b) => b.n - a.n);
 
+    const perMarket = {};
+    filtered.forEach(p => {
+      const s = p.market || '1n2';
+      if (!perMarket[s]) perMarket[s] = { market: s, n: 0, w: 0, l: 0, pl: 0, ev: 0, edge: 0 };
+      const r = perMarket[s];
+      r.n++;
+      r.ev += Number(p.ev || 0);
+      r.edge += Number(p.edge || 0);
+      if (p.res === 'won') { r.w++; r.pl += (p.odd - 1); }
+      else if (p.res === 'lost') { r.l++; r.pl -= 1; }
+    });
+    const marketRows = Object.values(perMarket).sort((a, b) => b.n - a.n);
+    marketRows.forEach(r => {
+      r.avgEv = r.n ? r.ev / r.n : 0;
+      r.avgEdge = r.n ? r.edge / r.n : 0;
+      r.tier = r.n >= 30 && r.pl / Math.max(1, r.n) > 0.03 ? 'validé'
+        : r.n >= 15 && r.pl / Math.max(1, r.n) < -0.08 ? 'à refroidir'
+        : r.n >= 8 ? 'neutre'
+        : 'apprentissage';
+    });
+
     // 6. P&L cumulé chart (réutilise renderRoiChart)
     const chartRows = filtered
       .slice()
@@ -23836,6 +24133,12 @@
     const filterChipsHtml = (group, current, options) => options.map(o => `
       <button class="hist-chip ${current === o.v ? 'active' : ''}" data-fgroup="${group}" data-fval="${esc(o.v)}">${esc(o.label)}${o.hint ? `<span style="opacity:.6;margin-left:4px;font-size:10.5px;">${esc(o.hint)}</span>` : ''}</button>
     `).join('');
+    const marketOrder = ['1n2','ou25','ou15','ou35','btts','doubleChance','dnb','teamTotal','handicap','basketTotal','basketHandicap','baseballTotal','runLine','hockeyTotal','puckLine','tennisGames','exactScore','resultBtts','ht_1n2'];
+    const presentMarkets = [...new Set(picks.map(p => p.market || '1n2'))];
+    const orderedMarkets = marketOrder.filter(mk => presentMarkets.includes(mk))
+      .concat(presentMarkets.filter(mk => !marketOrder.includes(mk)).sort());
+    const marketFilterOptions = [{ v: 'all', label: 'Tous' }]
+      .concat(orderedMarkets.map(mk => ({ v: mk, label: histMarketLabel(mk) })));
 
     const filterBarHtml = `
       <div class="hist-filter-bar">
@@ -23867,6 +24170,10 @@
             { v: 'N', label: 'N · Nul' },
             { v: '2', label: '2 · Ext.' },
           ])}</div>
+        </div>
+        <div class="hist-filter-row">
+          <div class="hist-filter-label">Marché</div>
+          <div class="hist-chips">${filterChipsHtml('market', _histFilters.market, marketFilterOptions)}</div>
         </div>
         <div class="hist-filter-row">
           <div class="hist-filter-label">Site de paris</div>
@@ -23902,29 +24209,33 @@
         .sort((a, b) => new Date(b.m.date) - new Date(a.m.date))
         .map(p => {
           const sportEm = p.m.sport === 'football' ? '⚽' : p.m.sport === 'basketball' ? '🏀' : p.m.sport === 'hockey' ? '🏒' : p.m.sport === 'tennis' ? '🎾' : '🎯';
-          const pickLbl = p.pred.pick.key === 'X'
+          const pickLbl = p.best?.label || (p.pred.pick.key === 'X'
             ? 'N · Match nul'
             : p.pred.pick.key === '1'
               ? (p.m.competitors?.[0]?.short || p.m.competitors?.[0]?.name || '1')
-              : (p.m.competitors?.[1]?.short || p.m.competitors?.[1]?.name || '2');
+              : (p.m.competitors?.[1]?.short || p.m.competitors?.[1]?.name || '2'));
           const resIco = p.res === 'won'
             ? '<span style="color:var(--accent);font-weight:800;">✓</span>'
             : '<span style="color:var(--danger);font-weight:800;">✗</span>';
           const delta = p.res === 'won' ? `+${(p.odd - 1).toFixed(2)}u` : '−1u';
           const deltaCol = p.res === 'won' ? '#34d399' : '#f87171';
-          const fiab = p.pred.reliability ?? p.pred.pick.prob;
+          const fiab = p.rel ?? p.best?.rel ?? p.pred.reliability ?? p.pred.pick.prob;
           const fiabPct = Math.round(fiab * 100);
           const matchName = esc(p.m.shortName || p.m.name || '—');
+          const marketTxt = histMarketLabel(p.market);
+          const evTxt = isFinite(p.ev) ? `EV ${(p.ev * 100).toFixed(1)}%` : '';
+          const edgeTxt = isFinite(p.edge) ? ` · edge ${(p.edge * 100).toFixed(1)}pt` : '';
           return `
             <div class="hist-pick-row" data-match-id="${esc(p.m.id || '')}">
               <div class="hist-pick-sport">${sportEm}</div>
               <div class="hist-pick-match">
                 <div class="hist-pick-title">${matchName}</div>
-                <div class="hist-pick-sub">${esc(p.m.leagueShort || p.m.league || '')}${p.pred.isLock ? ' · 🔒 Lock' : ''}</div>
+                <div class="hist-pick-sub">${esc(p.m.leagueShort || p.m.league || '')}${p.pred.isLock ? ' · 🔒 Lock' : ''}${evTxt ? ' · ' + esc(evTxt + edgeTxt) : ''}</div>
               </div>
-              <div class="hist-pick-cell">${esc(pickLbl)}</div>
+              <div class="hist-pick-cell hist-pick-market"><span>${esc(marketTxt)}</span></div>
+              <div class="hist-pick-cell hist-pick-pick">${esc(pickLbl)}</div>
               <div class="hist-pick-cell">${p.odd.toFixed(2)}</div>
-              <div class="hist-pick-cell" style="color:${fiabPct >= 70 ? '#34d399' : fiabPct >= 55 ? '#eab308' : '#f87171'};font-weight:700;">${fiabPct}%</div>
+              <div class="hist-pick-cell hist-pick-conf" style="color:${fiabPct >= 70 ? '#34d399' : fiabPct >= 55 ? '#eab308' : '#f87171'};font-weight:700;">${fiabPct}%</div>
               <div class="hist-pick-cell" style="text-align:center;">${resIco}</div>
               <div class="hist-pick-cell" style="color:${deltaCol};font-weight:700;text-align:right;">${delta}</div>
             </div>`;
@@ -23943,9 +24254,10 @@
             <div class="hist-pick-head">
               <div></div>
               <div>Match</div>
-              <div>Pick</div>
+              <div>Marché</div>
+              <div class="hist-pick-pick">Pick</div>
               <div>Cote</div>
-              <div>Fiab</div>
+              <div class="hist-pick-conf">Fiab</div>
               <div style="text-align:center;">Rés.</div>
               <div style="text-align:right;">Δ</div>
             </div>
@@ -23980,6 +24292,29 @@
               <div class="hist-sport-stat">${r.n}</div>
               <div class="hist-sport-stat">${rWR.toFixed(0)}%</div>
               <div class="hist-sport-stat" style="color:${plCol};font-weight:700;">${rROI >= 0 ? '+' : ''}${rROI.toFixed(1)}%</div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    ` : '';
+
+    const maxMarketN = Math.max(1, ...marketRows.map(r => r.n));
+    const marketChartHtml = marketRows.length ? `
+      <div class="hist-sport-card">
+        <div class="hist-card-title">Historique marchés</div>
+        ${marketRows.map(r => {
+          const rWR = r.n ? (100 * r.w / r.n) : 0;
+          const rROI = r.n ? (100 * r.pl / r.n) : 0;
+          const barPct = Math.round(100 * r.n / maxMarketN);
+          const plCol = r.pl > 0 ? '#34d399' : r.pl < 0 ? '#f87171' : '#94a3b8';
+          return `
+            <div class="hist-sport-row hist-market-row">
+              <div class="hist-sport-label">${esc(histMarketLabel(r.market))}</div>
+              <div class="hist-sport-bar"><div class="hist-sport-bar-fill" style="width:${barPct}%;background:${plCol};"></div></div>
+              <div class="hist-sport-stat">${r.n}</div>
+              <div class="hist-sport-stat">${rWR.toFixed(0)}%</div>
+              <div class="hist-sport-stat" style="color:${plCol};font-weight:700;">${rROI >= 0 ? '+' : ''}${rROI.toFixed(1)}%</div>
+              <div class="hist-market-note">${esc(r.tier)} · EV ${(r.avgEv*100).toFixed(1)}%</div>
             </div>
           `;
         }).join('')}
@@ -24034,7 +24369,7 @@
           <div style="position:absolute;top:0;left:0;width:40px;height:3px;background:var(--info);border-radius:0 0 2px 2px;"></div>
           <div style="font-size:11px;color:var(--info);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Archives du modèle</div>
           <h1 style="margin:0 0 6px;font-size:40px;font-weight:800;letter-spacing:-1.4px;color:var(--text);line-height:1;">Historique</h1>
-          <div style="font-size:14px;color:var(--text-dim);max-width:700px;">Tous les pronostics réglés, groupés par jour. Filtre par sport, confiance, type ou site de paris, puis exporte en CSV.</div>
+          <div style="font-size:14px;color:var(--text-dim);max-width:760px;">Tous les pronostics réglés par marché exact Winamax, groupés par jour. Filtre par sport, confiance, type, marché ou site de paris, puis exporte en CSV.</div>
           <!-- v31.7.78 — Note rolling window data.js (~14 jours) + lien backtest -->
           <div style="margin-top:14px;padding:10px 14px;background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.20);border-left:3px solid var(--info);border-radius:0 8px 8px 0;font-size:12.5px;color:var(--text-dim);max-width:700px;line-height:1.5;">
             ℹ️ Cette page affiche l'historique présent dans <code style="background:var(--panel-3);padding:1px 5px;border-radius:3px;">data.js</code> (fenêtre rolling ~14 jours).
@@ -24057,6 +24392,7 @@
             </div>
           </div>
           ${sportChartHtml}
+          ${marketChartHtml}
           <div class="hist-day-list">
             ${dayBlocksHtml}
           </div>
@@ -24077,7 +24413,7 @@
     });
     const resetBtn = wrap.querySelector('#hist-reset');
     if (resetBtn) resetBtn.addEventListener('click', () => {
-      _histFilters = { sport: 'all', fiab: 'all', pickType: 'all', bookmaker: 'winamax' };
+      _histFilters = { sport: 'all', fiab: 'all', pickType: 'all', market: 'all', bookmaker: 'winamax' };
       _histDayLimit = 20;
       renderHistoriquePage(wrap);
     });
@@ -24148,23 +24484,26 @@
   // CSV export with UTF-8 BOM so Excel/Numbers don't mangle accents.
   function exportHistoriqueCsv(rows) {
     if (!rows || !rows.length) return;
-    const header = ['date', 'sport', 'league', 'match', 'pick', 'cote', 'fiabilite_pct', 'resultat', 'delta_u'];
+    const header = ['date', 'sport', 'league', 'match', 'marche', 'pick', 'cote', 'proba_pct', 'ev_pct', 'edge_pct', 'resultat', 'delta_u'];
     const csvRows = [header.join(',')];
     const q = s => `"${String(s ?? '').replace(/"/g, '""')}"`;
     rows.slice()
       .sort((a, b) => new Date(a.m.date) - new Date(b.m.date))
       .forEach(p => {
-        const fiab = Math.round((p.pred.reliability ?? p.pred.pick.prob) * 100);
-        const pickLbl = p.pred.pick.key === 'X' ? 'N' : p.pred.pick.key;
+        const fiab = Math.round((p.rel ?? p.best?.rel ?? p.pred.reliability ?? p.pred.pick.prob) * 100);
+        const pickLbl = p.best?.label || (p.pred.pick.key === 'X' ? 'N' : p.pred.pick.key);
         const delta = p.res === 'won' ? (p.odd - 1).toFixed(2) : '-1.00';
         csvRows.push([
           q(isoDate(p.m.date)),
           q(p.m.sport || ''),
           q(p.m.league || p.m.leagueShort || ''),
           q(p.m.shortName || p.m.name || ''),
+          q(p.market || '1n2'),
           q(pickLbl),
           q(p.odd.toFixed(2)),
           q(fiab),
+          q(isFinite(p.ev) ? (p.ev * 100).toFixed(2) : ''),
+          q(isFinite(p.edge) ? (p.edge * 100).toFixed(2) : ''),
           q(p.res === 'won' ? 'gagne' : 'perdu'),
           q(delta),
         ].join(','));
@@ -28621,20 +28960,20 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     if (_pwaLaterBtn) _pwaLaterBtn.addEventListener('click', () => { _pwaSnooze(7); _pwaHideBanner(); });
     if (_pwaDismissBtn) _pwaDismissBtn.addEventListener('click', () => { _pwaSnooze(30); _pwaHideBanner(); });
 
-    // v34.35 — Click sur badge version footer → modal récap nouveautés
+    // v35.0 — Click sur badge version footer → modal récap nouveautés
     const versionBadge = document.getElementById('footer-version');
     if (versionBadge) {
       const _showWhatsNew = () => {
         const features = [
-          'Capital engine : les cotes trop basses sont pénalisées si l\'EV ne compense pas le faible gain',
-          'Score Invest 0-100 : mélange EV, edge, Kelly, qualité data et zone de cote',
-          'Cockpit enrichi : logos, zone cote, EV minimum, Kelly cap et raisons lisibles',
-          'Agent autonome plus strict : cap spécial micro-cotes / longues cotes et tri rendement-risque',
-          'Tests Playwright ajoutés sur les règles cote basse, zone rentable et variance haute',
+          'Terminal Value : scanner exact Winamax sur 1N2, O/U, BTTS, DNB, handicaps, totals et marchés sport',
+          'Deux tickets : principal value bankroll et attaque cote haute crédible, avec EV et Kelly capés',
+          'Historique marchés : filtre par type de pari, proba, EV, edge, résultat et export CSV enrichi',
+          'Coverage Winamax : le backend priorise tous les matchs exacts à 48h puis 7 jours avec cache et quotas',
+          'Santé data : warnings sources vides et ratio de marchés détaillés visibles pour éviter les faux signaux',
         ];
         const html = '<div style="text-align:left;padding:8px 0;">' +
-          '<h3 style="margin:0 0 12px;font-size:18px;color:var(--text);">Nouveautés v34.35</h3>' +
-          '<div style="font-size:11px;color:var(--text-dim);margin-bottom:14px;">Le site raisonne maintenant comme un portefeuille : proba, gain, risque et qualité data avant toute mise.</div>' +
+          '<h3 style="margin:0 0 12px;font-size:18px;color:var(--text);">Nouveautés v35.0</h3>' +
+          '<div style="font-size:11px;color:var(--text-dim);margin-bottom:14px;">Le site passe en mode value bankroll : une cote n\'est jouable que si la probabilité modèle bat la cote exacte Winamax.</div>' +
           '<ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:7px;font-size:13px;color:var(--text-2);line-height:1.5;">' +
           features.map(f => `<li>${f}</li>`).join('') + '</ul></div>';
         // Réutiliser le pattern showShortcutsHelp si dispo
