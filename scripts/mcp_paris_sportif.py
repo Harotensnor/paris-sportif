@@ -994,6 +994,88 @@ def get_pipeline_status() -> dict:
     }
 
 
+@mcp.tool()
+def list_data_gaps(sport: str = None, limit: int = 20) -> dict:
+    """Liste les matchs du jour avec des données manquantes (clubelo, h2h, weather, etc.).
+
+    Aide à comprendre pourquoi certains picks ont une faible confiance ou
+    pourquoi le modèle skip certains matchs. Retourne pour chaque match
+    quelles signaux sont absents.
+
+    Args:
+        sport: filtre optionnel (football, tennis, basketball, etc.)
+        limit: nombre max de matchs à retourner (default 20)
+
+    Use case : "Pourquoi tel match n'a pas de prédiction confiante ?"
+    """
+    data = _load_data_js()
+    if "_error" in data:
+        return data
+    today = _today_iso()
+    matches = (data.get("days") or {}).get(today) or []
+    gaps = []
+    for m in matches:
+        if m.get("completed") or m.get("live"):
+            continue
+        if sport and m.get("sport") != sport:
+            continue
+        if not _is_winamax_bookable(m):
+            continue
+        missing = []
+        sport_kind = m.get("sport")
+        # Signaux universels
+        if not (m.get("h2h") or {}).get("matches"):
+            missing.append("h2h")
+        if not (m.get("odds_snapshot") or {}).get("home"):
+            missing.append("odds_snapshot")
+        # Foot-spécifiques
+        if sport_kind == "football":
+            if not m.get("clubelo"):
+                missing.append("clubelo")
+            if not m.get("weather"):
+                missing.append("weather")
+            comps = m.get("competitors") or []
+            home = next((c for c in comps if c.get("home_away") == "home"), {})
+            away = next((c for c in comps if c.get("home_away") == "away"), {})
+            if not home.get("injuries") and not away.get("injuries"):
+                missing.append("injuries")
+            if not (m.get("referee") or {}).get("name"):
+                missing.append("referee")
+            if not m.get("lineups") and not any(c.get("lineup") for c in comps):
+                missing.append("lineups")
+            if not home.get("team_stats") and not away.get("team_stats"):
+                missing.append("team_stats")
+        # Tennis-spécifiques
+        elif sport_kind == "tennis":
+            if not m.get("tennis_features"):
+                missing.append("tennis_features")
+        if not missing:
+            continue
+        comps = m.get("competitors") or []
+        home = next((c for c in comps if c.get("home_away") == "home"), {})
+        away = next((c for c in comps if c.get("home_away") == "away"), {})
+        gaps.append({
+            "match": m.get("name") or f'{home.get("name","?")} vs {away.get("name","?")}',
+            "league": m.get("league_name") or m.get("league_code"),
+            "sport": sport_kind,
+            "kickoff": m.get("date"),
+            "missing_count": len(missing),
+            "missing": missing,
+        })
+    gaps.sort(key=lambda g: -g.get("missing_count", 0))
+    return {
+        "today": today,
+        "n_matches_with_gaps": len(gaps),
+        "filter_sport": sport,
+        "matches": gaps[:limit],
+        "note": (
+            "Plus la liste 'missing' est longue, plus le pick sera incertain. "
+            "Si beaucoup de matchs manquent les MÊMES signaux, c'est probablement "
+            "un fetcher en panne — voir get_pipeline_status."
+        ),
+    }
+
+
 # === Main entry ===
 
 if __name__ == "__main__":
