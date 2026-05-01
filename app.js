@@ -9229,6 +9229,22 @@
     _titleEl.dataset.matchId = String(match.id || '');
     document.getElementById('detail-league').textContent = `${match.league_name}${match.round ? ' · ' + match.round : ''} · ${fmtFullDate(currentDate)} · ${fmtTime(match.date)}${match.venue ? ' · ' + match.venue : ''}`;
 
+    // v33.3 — CTA Winamax dans header modal. Visible uniquement si
+    // match.winamax.url disponible. Sinon hidden (pas de lien factice).
+    try {
+      const _wxBtn = document.getElementById('detail-winamax-cta');
+      if (_wxBtn) {
+        const _wxUrl = (match.winamax && match.winamax.url) || '';
+        if (_wxUrl) {
+          _wxBtn.href = _wxUrl;
+          _wxBtn.style.display = 'inline-flex';
+        } else {
+          _wxBtn.removeAttribute('href');
+          _wxBtn.style.display = 'none';
+        }
+      }
+    } catch(e) {}
+
     const recH = parseRecord(getRecord(home));
     const recA = parseRecord(getRecord(away));
     const stdH = getStandingsEntry(match, home);

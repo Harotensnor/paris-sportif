@@ -723,7 +723,14 @@
         <h3 id="detail-title">Match</h3>
         <div class="league" id="detail-league"></div>
       </div>
-      <div style="display:flex;gap:8px;flex-shrink:0;align-items:center;">
+      <div style="display:flex;gap:8px;flex-shrink:0;align-items:center;flex-wrap:wrap;">
+        <!-- v33.3 — CTA Winamax dans header modal (rempli dynamiquement par
+             openDetail si match.winamax.url existe). Hidden par défaut. -->
+        <a id="detail-winamax-cta" href="#" target="_blank" rel="noopener noreferrer" style="display:none;align-items:center;gap:6px;padding:7px 14px;background:linear-gradient(135deg,#fbbf24 0%,#f59e0b 100%);color:#0c0a0a;border:none;border-radius:6px;font-size:13px;font-weight:700;text-decoration:none;cursor:pointer;box-shadow:0 3px 10px rgba(251,191,36,.25);" aria-label="Parier ce match sur Winamax (nouvel onglet)">
+          <span style="font-size:15px;">💰</span>
+          <span>Parier sur Winamax</span>
+          <span style="opacity:.65;font-size:11px;">↗</span>
+        </a>
         <button id="share-detail" type="button" class="modal-close" aria-label="Partager ce match" title="Partager — copie un lien vers ce match" style="padding:6px 10px;font-size:13px;">📤 Partager</button>
         <button class="modal-close" id="close-detail" aria-label="Fermer la fenêtre de détails">Fermer ✕</button>
       </div>
