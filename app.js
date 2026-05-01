@@ -3878,20 +3878,31 @@
     let captionExtras = [];
     const hPitcher = match.mlb_pitchers?.home;
     const aPitcher = match.mlb_pitchers?.away;
-    // Si on a les pitchers : run total ≈ (era_opponent + run_avg_team) / 2
+    const pitcherEra = (p) => {
+      const era = Number(p?.era);
+      return Number.isFinite(era) && era > 0 ? Math.max(1.75, Math.min(8.25, era)) : null;
+    };
+    const hPitcherEra = pitcherEra(hPitcher);
+    const aPitcherEra = pitcherEra(aPitcher);
+    // Si on a les pitchers : 60% attaque L5 + 40% ERA du pitcher adverse.
+    // Avant, l'ERA etait re-moyennee ensuite avec runs encaisses adverses,
+    // ce qui la reduisait a ~25% du signal et surpondérait les L5 bruyants.
     if (hPitcher && hPitcher.era != null && aPitcher && aPitcher.era != null) {
-      // pitcher ERA prédit les runs encaissés par son équipe
-      hScored = (h.scored + Number(aPitcher.era)) / 2;  // home offense vs away pitcher ERA
-      aScored = (a.scored + Number(hPitcher.era)) / 2;
-      captionExtras.push('ERA pitchers titulaires intégrée');
+      // pitcher ERA prédit les runs encaissés par son équipe.
+      hScored = hPitcherEra != null ? (0.6 * h.scored + 0.4 * aPitcherEra) : h.scored;
+      aScored = aPitcherEra != null ? (0.6 * a.scored + 0.4 * hPitcherEra) : a.scored;
+      captionExtras.push('ERA pitchers titulaires blend 60/40');
     }
-    const projH = (hScored + a.conceded) / 2 + HOME_ADV;
-    const projA = (aScored + h.conceded) / 2;
+    const hasPitcherBlend = hPitcherEra != null && aPitcherEra != null;
+    const projH = hasPitcherBlend ? (hScored + HOME_ADV) : ((hScored + a.conceded) / 2 + HOME_ADV);
+    const projA = hasPitcherBlend ? aScored : ((aScored + h.conceded) / 2);
     const total = projH + projA;
     const margin = projH - projA;
-    // Variance MLB ~2.0 par équipe (élevée). Gaussienne approx.
-    const sigmaTotal = 2.5;
-    const sigmaMargin = 2.2;
+    // Variance MLB élevée. Si l'écart de starters est massif, on resserre un
+    // peu la gaussienne: le marché total/runline devient moins bruité.
+    const pitcherEdge = hasPitcherBlend ? Math.abs(hPitcherEra - aPitcherEra) : 0;
+    const sigmaTotal = pitcherEdge >= 2.0 ? 2.2 : 2.5;
+    const sigmaMargin = pitcherEdge >= 2.0 ? 2.0 : 2.2;
     const phiCdf = (z) => 1 / (1 + Math.exp(-1.702 * z));
     const totals = [6.5, 7.5, 8.5, 9.5, 10.5].map(line => {
       const z = (total - line) / sigmaTotal;
