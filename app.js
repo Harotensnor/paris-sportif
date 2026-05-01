@@ -25108,6 +25108,13 @@
           const fbColor = fbInv === 0 ? '#34d399' : '#f87171';
           const ext = Number(q.actionable_external_odds || 0);
           const extColor = ext === 0 ? '#34d399' : ext < 50 ? '#eab308' : '#f87171';
+          const clv = h && h.sources && h.sources.clv_history;
+          const clvMean = clv ? Number(clv.mean_clv_pct || 0) : null;
+          const clvRate = clv ? Number(clv.positive_clv_rate || 0) : null;
+          const clvColor = clvMean == null ? 'var(--text-dim)'
+                         : clvMean >= 0.25 ? '#34d399'
+                         : clvMean >= -0.50 ? '#eab308'
+                                           : '#f87171';
           return `
           <div style="margin-top:22px;">
             <div style="font-size:13px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;">📊 Quality checks data (sémantique)</div>
@@ -25132,6 +25139,11 @@
                 <div style="font-size:24px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;">${q.total_events || 0}</div>
                 <div style="font-size:11px;color:var(--text-dim);margin-top:4px;line-height:1.4;">${q.upcoming_events || 0} à venir · ${q.winamax_tournament_only || 0} tournoi-only</div>
               </div>
+              ${clv ? `<div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;border-left:4px solid ${clvColor};">
+                <div class="lbl-mini">CLV marché</div>
+                <div style="font-size:24px;font-weight:800;color:${clvColor};font-variant-numeric:tabular-nums;">${clvMean >= 0 ? '+' : ''}${clvMean.toFixed(2)}%</div>
+                <div style="font-size:11px;color:var(--text-dim);margin-top:4px;line-height:1.4;">${clv.observations || 0} observations · ${isFinite(clvRate) ? clvRate.toFixed(1) : '0.0'}% positives · ${esc(clv.sample_status || 'learning')}</div>
+              </div>` : ''}
               ${(() => {
                 // AUDIT-2026-04-27 (Sprint 35 #13) — Drift detector visible.
                 // Lit quality_checks.model_drift_ks (Sprint 7 #3 +

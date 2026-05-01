@@ -72,6 +72,19 @@ def _count_clubelo(d):
     if not isinstance(d, dict): return None
     return {'clubs': len(d.get('ratings') or d.get('clubs') or d)}
 
+
+def _count_clv(d):
+    if not isinstance(d, dict):
+        return None
+    s = d.get('summary') or {}
+    return {
+        'matches': s.get('n_matches') or 0,
+        'observations': s.get('n_clv_observations') or s.get('n') or 0,
+        'mean_clv_pct': s.get('mean_clv_pct') or 0,
+        'positive_clv_rate': s.get('positive_clv_rate') or 0,
+        'sample_status': s.get('sample_status') or 'learning',
+    }
+
 SOURCES = [
     ('winamax_catalog', 'winamax_catalog.json', _count_winamax_catalog),
     ('winamax_markets', 'winamax_markets.json', _count_winamax_markets),
@@ -96,6 +109,7 @@ SOURCES = [
         ),
     }),
     ('footballdata',    'footballdata.json',    lambda d: {'rows': len(d.get('rows') or []) if isinstance(d, dict) else 0}),
+    ('clv_history',     'clv_history.json',     _count_clv),
 ]
 
 # Soft thresholds (minutes) above which a source is flagged stale. These
@@ -114,6 +128,7 @@ STALE_AFTER_MIN = {
     'sofascore_events': 30,    # cron tick chaque 5min, max 30min stale
     'team_form':       6*60,   # 6h self-throttle
     'footballdata':    24*60,  # daily fetch
+    'clv_history':     60,
 }
 
 SOURCE_SCRIPT = {
@@ -129,6 +144,7 @@ SOURCE_SCRIPT = {
     'sofascore_events': 'scripts/fetch_sofascore_events.py',
     'team_form': 'scripts/fetch_team_form.py',
     'footballdata': 'scripts/fetch_footballdata.py',
+    'clv_history': 'scripts/compute_clv.py',
 }
 
 FAST_PIPELINE_SOURCES = {

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-01T23:51:09Z",
+  "generated_at": "2026-05-01T23:54:32Z",
   "data_age_min": 0,
   "sources": {
     "winamax_catalog": {
@@ -13,20 +13,20 @@
       "matches_detailed": 0
     },
     "injuries_soccer": {
-      "age_min": 0,
+      "age_min": 957,
       "teams": 131,
       "players": 475
     },
     "lineups_soccer": {
-      "age_min": 0,
+      "age_min": 957,
       "events": 17
     },
     "team_stats": {
-      "age_min": 0,
+      "age_min": 184,
       "teams": 421
     },
     "clubelo": {
-      "age_min": 0,
+      "age_min": 542,
       "clubs": 630
     },
     "weather": {
@@ -34,7 +34,7 @@
       "events": 292
     },
     "referees_soccer": {
-      "age_min": 0,
+      "age_min": 957,
       "events": 46
     },
     "fbref_xg": {
@@ -46,13 +46,21 @@
       "total": 0
     },
     "team_form": {
-      "age_min": 0,
+      "age_min": 27,
       "teams": 698,
       "football_teams": 641
     },
     "footballdata": {
       "age_min": 0,
       "rows": 0
+    },
+    "clv_history": {
+      "age_min": 0,
+      "matches": 501,
+      "observations": 1372,
+      "mean_clv_pct": -0.11,
+      "positive_clv_rate": 37.1,
+      "sample_status": "validated"
     }
   },
   "pipeline_lag_per_script": {
@@ -75,23 +83,23 @@
     "injuries_soccer": {
       "script": "scripts/fetch_injuries_soccer.py",
       "output": "injuries_soccer.json",
-      "age_min": 0,
+      "age_min": 957,
       "threshold_min": 180,
       "fast_red_min": null,
-      "status": "ok"
+      "status": "warn"
     },
     "lineups_soccer": {
       "script": "scripts/fetch_lineups_soccer.py",
       "output": "lineups_soccer.json",
-      "age_min": 0,
+      "age_min": 957,
       "threshold_min": 180,
       "fast_red_min": null,
-      "status": "ok"
+      "status": "warn"
     },
     "team_stats": {
       "script": "scripts/fetch_team_stats.py",
       "output": "team_stats.json",
-      "age_min": 0,
+      "age_min": 184,
       "threshold_min": 300,
       "fast_red_min": null,
       "status": "ok"
@@ -99,7 +107,7 @@
     "clubelo": {
       "script": "scripts/fetch_clubelo.py",
       "output": "clubelo.json",
-      "age_min": 0,
+      "age_min": 542,
       "threshold_min": 1440,
       "fast_red_min": null,
       "status": "ok"
@@ -115,10 +123,10 @@
     "referees_soccer": {
       "script": "scripts/fetch_referees_soccer.py",
       "output": "referees_soccer.json",
-      "age_min": 0,
+      "age_min": 957,
       "threshold_min": 480,
       "fast_red_min": null,
-      "status": "ok"
+      "status": "warn"
     },
     "fbref_xg": {
       "script": "scripts/fetch_understat_xg.py",
@@ -139,7 +147,7 @@
     "team_form": {
       "script": "scripts/fetch_team_form.py",
       "output": "team_form.json",
-      "age_min": 0,
+      "age_min": 27,
       "threshold_min": 360,
       "fast_red_min": null,
       "status": "ok"
@@ -149,6 +157,14 @@
       "output": "footballdata.json",
       "age_min": 0,
       "threshold_min": 1440,
+      "fast_red_min": null,
+      "status": "ok"
+    },
+    "clv_history": {
+      "script": "scripts/compute_clv.py",
+      "output": "clv_history.json",
+      "age_min": 0,
+      "threshold_min": 60,
       "fast_red_min": null,
       "status": "ok"
     }
@@ -179,6 +195,9 @@
     ]
   },
   "warnings": [
+    "injuries_soccer: stale (957min > 180min threshold)",
+    "lineups_soccer: stale (957min > 180min threshold)",
+    "referees_soccer: stale (957min > 480min threshold)",
     "fbref_xg: file missing (fbref_xg.json)",
     "sofascore_events: source vide — matching Sofascore indisponible",
     "footballdata: source vide — historique ligues foot désactivé",

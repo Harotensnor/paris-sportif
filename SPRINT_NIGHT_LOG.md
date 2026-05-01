@@ -101,5 +101,13 @@
 - Avant: `sitemap.xml` contenait 15 URLs, `build_sitemap.py` utilisait le mtime local, et `build_sitemap.py` n'était ni dans `auto_refresh.py` ni dans `refresh.yml`
 - Après: sitemap régénéré avec 33 URLs dont routes `#performance`, `#valeur`, `#matchs`, `#sante`; lastmod basé sur `git log` fallback mtime; pipeline local/cron alignée à 44 scripts
 - Impact: les pages/catégories clés du cockpit sont discoverables et le sitemap reste frais à chaque refresh sans drift
+- Commit: 65bc682c
+- Status: ✅ DONE
+
+## Sprint v35.14 (2026-05-02 03:48 UTC)
+- Chantier: P10 CLV tracking exploitable
+- Avant: `clv_history.json` avait seulement un résumé global (501 matchs, 1372 observations, mean -0.11%, positive 37.1%) et la page Santé n'affichait aucun signal CLV
+- Après: CLV enrichi avec `by_sport`, `by_side`, `by_league`, extrêmes best/worst; `health.json.sources.clv_history` expose 501 matchs / 1372 observations; smoke #sante confirme le badge CLV + drift visibles
+- Impact: le site peut suivre si les prises de cote battent le marché, pas seulement si un pari gagne après coup
 - Commit: pending
 - Status: ✅ DONE
