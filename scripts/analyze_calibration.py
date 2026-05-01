@@ -16,6 +16,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 BT_PATH = ROOT / 'backtest_report_v2.json'
+BT_MARKETS_PATH = ROOT / 'backtest_report_markets.json'
 OUT = ROOT / 'analyze_calibration.md'
 
 
@@ -111,6 +112,54 @@ def main() -> int:
             advice = '✓ Conserver' if roi > 0 else '⚠ Surveiller' if roi > -5 else '🔴 Filtrer'
             lines.append(f'| {b} | {v.get("n",0)} | {v.get("win_rate",0)*100:.0f}% | {roi:+.1f}% | {advice} |')
         lines.append('')
+
+    # v33.14 — Section marchés secondaires (lit backtest_report_markets.json)
+    if BT_MARKETS_PATH.exists():
+        try:
+            mrep = json.loads(BT_MARKETS_PATH.read_text(encoding='utf-8'))
+            bmp = mrep.get('by_market_pick') or {}
+            if bmp:
+                lines.append('## 🎯 Marchés secondaires (calibration model)')
+                lines.append('')
+                lines.append(f'_n_completed_evaluated : {mrep.get("completed_evaluated", "?")}_')
+                lines.append('')
+                # Group rows by market family
+                fam_groups = {}
+                for k, v in bmp.items():
+                    if v.get('n', 0) < 10:  # bruit en dessous de 10
+                        continue
+                    fam = k.split(':')[0]
+                    fam_groups.setdefault(fam, []).append((k, v))
+                if not fam_groups:
+                    lines.append('_Pas assez d\'échantillon (≥10 picks) sur les marchés secondaires._')
+                    lines.append('')
+                else:
+                    lines.append('| Marché | N | WR (95% CI) | Verdict |')
+                    lines.append('|---|--:|--:|---|')
+                    for fam in sorted(fam_groups.keys()):
+                        for k, v in sorted(fam_groups[fam], key=lambda x: -(x[1].get('win_rate') or 0)):
+                            wr = v.get('win_rate', 0)
+                            lo = v.get('wr_ci_lo', 0)
+                            hi = v.get('wr_ci_hi', 0)
+                            # Verdict basé sur WR vs 50% (chance) et CI :
+                            #   CI lower ≥ 55% → strong edge (model bat la chance)
+                            #   CI lower ≥ 50% → léger edge probable
+                            #   sinon : pas significatif
+                            if lo >= 0.55:
+                                verd = '✓ Edge significatif'
+                            elif lo >= 0.50:
+                                verd = '🟡 Edge faible'
+                            elif hi <= 0.50:
+                                verd = '🔴 Anti-edge (à inverser ?)'
+                            else:
+                                verd = '— Bruit'
+                            lines.append(f'| {k} | {v.get("n",0)} | {wr*100:.0f}% [{lo*100:.0f}-{hi*100:.0f}] | {verd} |')
+                    lines.append('')
+                    lines.append('_Note : Brier non calculé — pas de proba modèle stockée par marché. Verdict basé sur l\'intervalle de confiance Wilson 95%._')
+                    lines.append('')
+        except Exception as e:
+            lines.append(f'_Erreur lecture backtest_report_markets.json : {e}_')
+            lines.append('')
 
     lines.append('---')
     lines.append('')
