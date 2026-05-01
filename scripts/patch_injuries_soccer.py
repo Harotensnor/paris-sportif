@@ -198,12 +198,8 @@ def main() -> int:
     payload = json.dumps(data, ensure_ascii=False, separators=(',', ':'))
     DATA_JS.write_text(f'window.PRONOSTICS_DATA = {payload};\n', encoding='utf-8')
 
-    html_text = HTML.read_text(encoding='utf-8')
-    new_block = f'<script>\nwindow.PRONOSTICS_DATA = {payload};\n</script>'
-    html_text = re.sub(r'<script>\s*window\.PRONOSTICS_DATA\s*=.*?;?\s*</script>',
-                       new_block, html_text, count=1, flags=re.DOTALL)
-    HTML.write_text(html_text, encoding='utf-8')
-
+    # v33.28 — HTML rewrite déplacé dans scripts/inject_data_in_html.py
+    # (1 seul appel à la fin du pipeline plutôt que 12 regex sur ~13500 lignes)
     print(f'[{datetime.now():%H:%M:%S}] soccer injuries attached in {time.time()-t0:.1f}s · '
           f'{stats["events_scanned"]} events scanned, {stats["events_tagged"]} with ≥1 injury · '
           f'coverage: home_known={stats["home_known"]}/{stats["events_scanned"]}, '
