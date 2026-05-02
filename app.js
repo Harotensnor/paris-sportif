@@ -21084,6 +21084,19 @@
         });
       }
     };
+    const _renderPageSkeleton = (wrap, label, title, count = 4) => {
+      if (!wrap || wrap.dataset.skeletonSeen === currentPage) return;
+      wrap.dataset.skeletonSeen = currentPage;
+      wrap.innerHTML = `
+        <div class="page-wrap">
+          <div class="page-header">
+            <div class="lbl-tiny u-text-brand">${esc(label)}</div>
+            <h1 class="page-h1">${esc(title)}</h1>
+            <div class="skeleton-text w-70"></div>
+          </div>
+          <div class="u-mt-4">${'<div class="skeleton-card"></div>'.repeat(count)}</div>
+        </div>`;
+    };
 
     planMiseWrap.style.display = isPlanMise ? '' : 'none';
     if (isPlanMise) {
@@ -21168,7 +21181,10 @@
       (document.querySelector('main') || document.body).appendChild(santeWrap);
     }
     santeWrap.style.display = (currentPage === 'sante') ? '' : 'none';
-    if (currentPage === 'sante') renderSantePage(santeWrap);
+    if (currentPage === 'sante') {
+      _renderPageSkeleton(santeWrap, 'Santé', 'Santé data');
+      requestAnimationFrame(() => renderSantePage(santeWrap));
+    }
 
     // Refonte v21 — Dashboard home
     let dashWrap = document.getElementById('dashboard-wrap');
@@ -21221,7 +21237,10 @@
       (document.querySelector('main') || document.body).appendChild(academieWrap);
     }
     academieWrap.style.display = isAcademie ? '' : 'none';
-    if (isAcademie) renderAcademiePage(academieWrap);
+    if (isAcademie) {
+      _renderPageSkeleton(academieWrap, 'Méthode', 'Méthode & académie', 3);
+      requestAnimationFrame(() => renderAcademiePage(academieWrap));
+    }
 
     // Refonte v22 — Backtest + Attribution (remplace What-if)
     let backtestWrap = document.getElementById('backtest-wrap');
@@ -21246,7 +21265,10 @@
       (document.querySelector('main') || document.body).appendChild(profilWrap);
     }
     profilWrap.style.display = isProfil ? '' : 'none';
-    if (isProfil) renderProfilPage(profilWrap);
+    if (isProfil) {
+      _renderPageSkeleton(profilWrap, 'Profil', 'Profil & bankroll', 3);
+      requestAnimationFrame(() => renderProfilPage(profilWrap));
+    }
 
     // v31.7 — Montantes (consts isMontante* declared at top of function for TDZ)
     let montanteWrap = document.getElementById('montante-wrap');
@@ -21257,6 +21279,7 @@
     }
     montanteWrap.style.display = isMontante ? '' : 'none';
     if (isMontante) {
+      _renderPageSkeleton(montanteWrap, 'Montantes', 'Montantes séquentielles', 3);
       let type = 'jour';
       try {
         const saved = localStorage.getItem('montanteType') || '';

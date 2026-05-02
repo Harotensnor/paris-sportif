@@ -509,3 +509,11 @@
 - Impact: les absences deviennent des décisions produit; visual diff `9.11%` attendu sur Performance dynamique
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.65 (2026-05-02 09:13 UTC)
+- Chantier: P-4.23 skeleton loaders
+- Avant: Académie/Profil/Santé/Montantes rendaient sans placeholder commun
+- Après: helper skeleton page + feedback avant rendu sur les hubs secondaires
+- Impact: 0 hub secondaire sans feedback; smoke E2E vert, drift OK
+- Commit: pending
+- Status: ✅ DONE
