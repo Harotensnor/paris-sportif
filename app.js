@@ -15733,15 +15733,19 @@
         const minutes = Math.round((bbfSafeTs(p.m) - bbfNowMs) / 60000);
         const timeLabel = minutes > 0 && minutes < 120 ? `dans ${minutes} min` : (typeof fmtTime === 'function' ? fmtTime(p.m.date) : '');
         const logo = (team) => team?.logo ? `<img src="${esc(team.logo)}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'">` : '<span></span>';
+        const backdropLogo = (team) => team?.logo ? `<img src="${esc(team.logo)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : '';
+        const heroBackdrop = mode === 'hero' ? `<div class="bbf-card__backdrop" aria-hidden="true">${backdropLogo(home)}${backdropLogo(away)}</div>` : '';
+        const centerTime = mode === 'hero' && typeof fmtTime === 'function' ? fmtTime(p.m.date) : 'vs';
         return `
           <article class="bbf-card ${mode === 'hero' ? 'bbf-card--hero' : 'bbf-card--compact'} ${minutes > 0 && minutes < 120 ? 'bbf-card--soon' : ''}" data-match-id="${esc(String(p.m.id || ''))}">
+            ${heroBackdrop}
             <header class="bbf-card__top">
               <span>${esc(sportLabel(p.m.sport))} · ${esc((p.m.league_name || '').slice(0, 42))}</span>
               <b>${esc(timeLabel)}</b>
             </header>
             <div class="bbf-card__teams">
               <div>${logo(home)}<strong>${esc(bbfTeamName(home))}</strong></div>
-              <em>vs</em>
+              <em>${esc(centerTime)}</em>
               <div>${logo(away)}<strong>${esc(bbfTeamName(away))}</strong></div>
             </div>
             <div class="bbf-card__bet">

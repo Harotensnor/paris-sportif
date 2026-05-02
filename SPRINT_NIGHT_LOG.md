@@ -549,3 +549,11 @@
 - Impact: 10 paris affichables et gros gains surfacés; visual diff `18.72%` attendu par nouvelle section
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.70 (2026-05-02 10:53 UTC)
+- Chantier: P-5.3 hero cards Big Bet
+- Avant: cartes hero plates, heure seulement en coin, peu d'effet bookmaker
+- Après: logos en arrière-plan, overlay sombre, heure centrale XXL sur les Big Bets
+- Impact: Accueil plus immersif et scan match immédiat; visual diff `18.75%` attendu par refonte hero
+- Commit: pending
+- Status: ✅ DONE
