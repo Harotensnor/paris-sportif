@@ -501,3 +501,11 @@
 - Impact: première visite centrée sur les gros coups; visual diff `10.14%` attendu sur Performance dynamique
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.64 (2026-05-02 09:04 UTC)
+- Chantier: P-4.17 empty states amicaux
+- Avant: états vides fonctionnels mais froids (`Pas de gros coup`, tracking perso peu direct)
+- Après: no Big Bet = patience/ROI, offline cache explicite, tracking perso “premier pari”
+- Impact: les absences deviennent des décisions produit; visual diff `9.11%` attendu sur Performance dynamique
+- Commit: pending
+- Status: ✅ DONE

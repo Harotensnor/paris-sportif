@@ -15765,11 +15765,15 @@
           </button>`;
       };
       const bbfEmpty = `
-        <section class="bbf-empty">
-          <strong>Pas de gros coup propre maintenant.</strong>
-          <span>Le modèle ne force pas : pas de value claire, pas de pari. La patience protège la bankroll.</span>
+        <section class="bbf-empty bbf-empty--friendly">
+          <div class="es-illustration" aria-hidden="true">🧘</div>
+          <strong>Pas de gros coup aujourd'hui — patience = ROI.</strong>
+          <span>Le modèle ne force pas : si la cote ne paie pas assez le risque, on garde la bankroll au chaud.</span>
           <button type="button" class="page-btn" data-page="tous">Voir tous les matchs</button>
         </section>`;
+      const bbfOffline = (typeof navigator !== 'undefined' && navigator.onLine === false)
+        ? `<section class="bbf-empty bbf-empty--small" style="margin:10px 0 0;border-color:rgba(245,158,11,.35);background:rgba(245,158,11,.08);"><strong>📡 Hors ligne — derniers paris en cache.</strong><span>Vérifie les cotes Winamax avant toute mise réelle.</span></section>`
+        : '';
       const bbfClickCount = (() => {
         try { return Number(JSON.parse(localStorage.getItem('paris_sportif_winamax_clicks_v1') || '{}').count || 0); }
         catch(e) { return 0; }
@@ -15780,6 +15784,7 @@
             <strong>${bbfBigBets[0] ? `Prochain gros pari : ${esc(bbfMarketLabel(bbfBigBets[0]))} @${Number(bbfBigBets[0].odd).toFixed(2)}` : 'Pas de pari urgent'}</strong>
             <span>${_dataIsStale ? `Données trop anciennes (${_dataAgeMin} min) : refresh avant d'agir.` : `${bbfPool.length} paris value analysés · bankroll ${userBankroll.toFixed(0)}€ · ${bbfClickCount} clic${bbfClickCount > 1 ? 's' : ''} Winamax suivis`}</span>
           </section>
+          ${bbfOffline}
 
           <section class="bbf-hero" aria-labelledby="bbf-title">
             <div class="bbf-hero__head">
@@ -26098,7 +26103,7 @@
         // page Historique en haut affiche "16 picks réglés". Confusion :
         // les 16 sont les picks du MODÈLE (auto-trackés). Ces patterns
         // analysent les paris que TU as suivis manuellement (Mes paris).
-        insights: [{ icon: 'ℹ️', text: `Pas encore assez de paris suivis manuellement (${settledBets ? settledBets.length : 0}/10) — utilise « Mes paris » pour tracker tes propres bets et l'IA fera ressortir TES patterns (jour de semaine, type de pari, sport…).`, tone: 'info' }],
+        insights: [{ icon: 'ℹ️', text: `Track ton premier pari pour voir ton ROI perso. Échantillon actuel : ${settledBets ? settledBets.length : 0}/10 paris suivis manuellement — ensuite l'IA fera ressortir TES patterns (jour, type de pari, sport).`, tone: 'info' }],
         meta: { n: settledBets ? settledBets.length : 0 }
       };
     }
