@@ -200,6 +200,14 @@
 - Commit: pending
 - Status: ✅ DONE
 
+## Sprint v35.111 (2026-05-02 13:51 UTC)
+- Chantier: P-8.15 révision page Legal
+- Avant: legal pouvait passer en thème clair et header mobile se chevauchait
+- Après: dark PWA permanent, logo compact, nav mobile scrollable, banderole prévention
+- Impact: page légale alignée avec le site principal et plus robuste mobile
+- Commit: pending
+- Status: ✅ DONE
+
 ## Sprint v35.110 (2026-05-02 13:42 UTC)
 - Chantier: P-8.11 révision page Performance
 - Avant: le diagnostic pipeline s’affichait avant le titre Performance
