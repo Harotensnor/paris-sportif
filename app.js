@@ -20683,6 +20683,26 @@
               <div style="padding:12px;border:1px solid rgba(251,191,36,.25);border-radius:var(--r);background:rgba(251,191,36,.08);color:var(--text-dim);font-size:12px;line-height:1.45;">
                 <b style="color:#fbbf24;">Rappel risque</b><br>Une montante transforme 10€ en gros gain seulement si toutes les étapes passent. Une seule défaite remet le retour à 0€.
               </div>
+              <div style="grid-column:1/-1;padding:14px;border:1px solid var(--border);border-radius:var(--r);background:rgba(255,255,255,.025);">
+                <div style="font-size:11px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.5px;font-weight:800;margin-bottom:10px;">Exemple pédagogique</div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;">
+                  <div style="padding:10px;border-radius:10px;background:rgba(230,0,0,.10);border:1px solid rgba(230,0,0,.20);">
+                    <div style="font-size:11px;color:var(--text-dim);">Étape 1</div>
+                    <div style="font-size:16px;font-weight:900;color:var(--text);">10€ × 2.10</div>
+                    <div style="font-size:12px;color:var(--accent);font-weight:800;">→ 21€</div>
+                  </div>
+                  <div style="padding:10px;border-radius:10px;background:rgba(255,255,255,.035);border:1px solid var(--border);">
+                    <div style="font-size:11px;color:var(--text-dim);">Étape 2</div>
+                    <div style="font-size:16px;font-weight:900;color:var(--text);">21€ × 2.20</div>
+                    <div style="font-size:12px;color:var(--accent);font-weight:800;">→ 46€</div>
+                  </div>
+                  <div style="padding:10px;border-radius:10px;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.20);">
+                    <div style="font-size:11px;color:var(--text-dim);">Étape 3</div>
+                    <div style="font-size:16px;font-weight:900;color:var(--text);">46€ × 2.30</div>
+                    <div style="font-size:12px;color:#fbbf24;font-weight:900;">→ 106€</div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>`;
@@ -20707,6 +20727,18 @@
     const finalPayout = steps[steps.length - 1].payout;
     const totalNetGain = finalPayout - initialStake;
     const totalProb = picked.reduce((p, c) => p * c.rel, 1);
+    const maxPayout = Math.max(finalPayout, ...steps.map(s => s.payout), initialStake);
+    const ladderHtml = steps.map((s, i) => {
+      const pct = Math.max(8, Math.min(100, (s.payout / maxPayout) * 100));
+      return `
+        <div style="display:grid;grid-template-columns:82px 1fr 82px;gap:10px;align-items:center;">
+          <div style="font-size:12px;color:var(--text-dim);font-weight:800;">Étape ${i+1}</div>
+          <div style="height:12px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden;border:1px solid var(--border);">
+            <div style="width:${pct.toFixed(1)}%;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--c-accent),#fbbf24);"></div>
+          </div>
+          <div style="font-size:13px;color:var(--text);font-weight:900;text-align:right;font-variant-numeric:tabular-nums;">${s.payout.toFixed(2)}€</div>
+        </div>`;
+    }).join('');
 
     // Risk label (basé sur la prob TOTALE de réussir la chaîne)
     let riskLabel, riskColor, riskBg;
@@ -20794,6 +20826,17 @@
               <div style="display:inline-block;font-size:10.5px;color:${riskColor};background:${riskBg};padding:2px 8px;border-radius:999px;margin-top:5px;font-weight:700;">${riskLabel}</div>
             </div>
           </div>
+        </div>
+
+        <div style="margin:0 0 18px;padding:16px;border:1px solid var(--border);border-radius:var(--r);background:rgba(255,255,255,.025);">
+          <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-end;margin-bottom:12px;flex-wrap:wrap;">
+            <div>
+              <div class="lbl-tiny">Progression visuelle</div>
+              <div style="font-size:17px;font-weight:900;color:var(--text);">Chaque barre devient la mise de l'étape suivante</div>
+            </div>
+            <div style="font-size:12px;color:var(--text-dim);font-weight:700;">Départ ${initialStake.toFixed(2)}€ · objectif ${finalPayout.toFixed(2)}€</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;">${ladderHtml}</div>
         </div>
 
         <!-- Disclaimer fort -->

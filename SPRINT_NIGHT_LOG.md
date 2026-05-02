@@ -1152,3 +1152,10 @@
 - Impact: Profil plus scannable, smoke OK, app.js 1704.1 KB sous cap
 - Commit: pending
 - Status: ✅ DONE
+## Sprint v35.146 (16:20 UTC)
+- Chantier: P-9.12
+- Avant: Montantes avec timeline/empty state mais peu de lecture visuelle du parcours
+- Après: progression de mise en barres + exemple pédagogique dans l'état vide
+- Impact: page Montantes plus claire sans ajout CSS, bundle toujours sous cap
+- Commit: pending
+- Status: ✅ DONE
