@@ -1447,3 +1447,9 @@
 - Après: docs/components.md documente Button, BetCard, Modal, Tabs, Drawer, Toast, Skeleton, Bankroll.
 - Impact: futurs sprints UI plus cohérents sans gonfler le runtime.
 - Vérif: doc ajoutée, bundle OK, diff check OK.
+
+## Sprint v35.194 — Phase 10 P-10.46 Night metrics refresh (22:22 UTC)
+- Avant: night_metrics.json datait de 13:56 UTC.
+- Après: métriques régénérées à 22:11 UTC, 332 events, Winamax exact 100%, marchés détaillés 250.
+- Impact: rapport Phase 10 basé sur les données fraîches du cron.
+- Vérif: scripts/measure_night_metrics.py OK.
