@@ -145,7 +145,7 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Preuve : `manifest.json` hauteur `7337px`
 - Constat : la page dépasse largement l'objectif "3 viewports max" avec buteurs, solides, outsiders, stats et double footer.
 - Action : transformer les sections secondaires en accordéons ou carrousels compactés.
-- Statut : PARTIAL v35.122 — sections secondaires (buteurs, outsiders, stats, outils) masquées sur mobile; hauteur dashboard mobile `7201px → 5175px`, reste à compacter sous 4500px.
+- Statut : FIXED v35.156 — revalidation mobile 375x667 : hauteur Accueil `2626px`, overflow horizontal `0`, sections secondaires masquées hors priorité Big Bets. Preuve : `phase10_dashboard_mobile_compact_audit.json`.
 
 ### P6-VIS-014 — Page statique Legal incohérente avec le thème PWA
 

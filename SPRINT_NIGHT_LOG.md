@@ -1219,3 +1219,9 @@
 - Après: rails horizontaux scroll-snap avec fade, onglets 44px, contrôles scrollables.
 - Impact: page Tous mobile plus compacte et lisible sans seconde rangée cassée.
 - Vérif: phase10_tous_subnav_audit.json + syntax/bundle PASS.
+
+## Sprint v35.156 — Phase 10 P-10.4 Accueil mobile final (18:18 UTC)
+- Avant: P6-VIS-013 PARTIAL, objectif mobile < 3800px à revalider.
+- Après: Accueil mobile 375x667 = 2626px, overflow horizontal = 0.
+- Impact: issue marquée FIXED, Big Bets/Solides restent prioritaires sur mobile.
+- Vérif: phase10_dashboard_mobile_compact_audit.json PASS.
