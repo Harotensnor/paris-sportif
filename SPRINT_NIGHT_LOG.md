@@ -1093,3 +1093,11 @@
 - Impact: prochain fix clair = éviter data.js complet au boot de Performance
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.138 (2026-05-02 15:37 UTC)
+- Chantier: P-9.5 Performance sans data.js initial
+- Avant: Performance chargeait data.js complet au boot; perf mobile 47, desktop 37
+- Après: Performance rend depuis data_lite puis diffère data.js; mobile 100, desktop 67
+- Impact: page Performance lisible immédiatement et transfert initial allégé
+- Commit: pending
+- Status: ✅ DONE
