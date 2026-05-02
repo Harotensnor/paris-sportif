@@ -1085,3 +1085,11 @@
 - Impact: priorité perf confirmée sur parsing/DOM plutôt que transfert réseau pur
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.137 (2026-05-02 15:33 UTC)
+- Chantier: P-9.8 Lighthouse-compatible re-run
+- Avant: baseline Phase 8 perf mobile min 68
+- Après: dashboard/tous mobile 78, academie 100, performance mobile 47; min desktop 37
+- Impact: prochain fix clair = éviter data.js complet au boot de Performance
+- Commit: pending
+- Status: ✅ DONE
