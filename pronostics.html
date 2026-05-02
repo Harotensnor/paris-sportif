@@ -190,8 +190,15 @@
     display:block; padding:0; border-bottom:1px solid var(--border); background:var(--header-bg);
   }
   .topbar-inner { max-width:1400px; margin:0 auto; display:flex; align-items:center; gap:18px; padding:10px 24px; min-height:56px; box-sizing:border-box; }
-  .topbar-brand { display:flex; align-items:center; gap:10px; min-width:0; color:var(--text); text-decoration:none; }
+  .topbar-brand { display:flex; align-items:center; gap:10px; min-width:0; flex-shrink:0; color:var(--text); text-decoration:none; padding:4px 18px 4px 0; border-right:1px solid var(--border); box-sizing:border-box; }
   .tb-brand-main { display:block; font-weight:800; font-size:15px; line-height:1.1; }
+  .topbar-mainnav { display:flex; align-items:center; gap:4px; margin-left:16px; }
+  .topbar-mainnav__link {
+    min-height:40px; padding:7px 12px; box-sizing:border-box; border:1px solid transparent;
+    border-radius:8px; background:transparent; color:var(--text-dim); font-size:13px;
+    font-weight:600; white-space:nowrap; cursor:pointer;
+  }
+  .topbar-menu { display:none; }
   .tb-brand-sub, .topbar-utils, nav.topbar-nav, nav.topbar-sports, .sidebar, .mobile-bottom-nav { display:none; }
   .refresh-indicator.topbar-refresh { position:fixed; top:70px; right:12px; z-index:50; opacity:0; pointer-events:none; }
   .trust-strip.hidden { display:flex!important; visibility:hidden; pointer-events:none; min-height:42px; }
@@ -220,12 +227,48 @@
   .boot-shell__card strong { width:76%; height:30px; margin-bottom:16px; }
   .boot-shell__card i { width:58%; height:12px; }
   .boot-shell__card--wide strong { width:88%; height:38px; }
+  @media (min-width:960px) {
+    .topbar-brand { width:224px; }
+    body.agent-inside nav.topbar-nav {
+      display:flex!important; flex-direction:column; gap:4px;
+      position:fixed; left:0; top:calc(56px + var(--rg-height)); bottom:0;
+      width:240px; box-sizing:border-box; padding:14px 10px 28px;
+      overflow:auto; z-index:40; background:var(--panel); border-right:1px solid var(--border);
+    }
+    body.agent-inside .content main { padding-left:264px!important; max-width:none; }
+    body.agent-inside nav.topbar-nav .page-btn,
+    body.agent-inside nav.topbar-nav .hub-btn { min-height:40px; }
+    body.agent-inside nav.topbar-nav .page-btn.hub-solo {
+      width:100%; justify-content:flex-start; padding:8px 14px; font-size:13px; font-weight:700;
+    }
+    body.agent-inside nav.topbar-nav .hub {
+      display:flex; flex-direction:column; width:100%; border-top:1px solid var(--border);
+      padding-top:10px; margin-top:6px;
+    }
+    body.agent-inside nav.topbar-nav .hub-btn {
+      justify-content:flex-start; width:100%; padding:6px 14px 4px; font-size:11px;
+      color:var(--text-dim2); text-transform:uppercase; letter-spacing:0; cursor:default;
+    }
+    body.agent-inside nav.topbar-nav .hub-btn .chev { display:none; }
+    body.agent-inside nav.topbar-nav .hub-menu {
+      display:flex!important; flex-direction:column; position:static; min-width:0; gap:2px; padding:0;
+      background:none; border:0; box-shadow:none;
+    }
+    body.agent-inside nav.topbar-nav .hub-menu .page-btn {
+      width:100%; justify-content:flex-start; padding:9px 14px; font-size:13.5px;
+    }
+  }
+  @media (min-width:1440px) {
+    body.agent-home nav.topbar-nav { display:none!important; }
+    body.agent-home main#main-content { padding-left:18px!important; padding-right:18px!important; max-width:1900px; }
+  }
   @media (max-width:720px) {
     :root { --rg-height:28px; }
     .rg-risk-bar { min-height:28px; max-height:28px; gap:4px; flex-wrap:nowrap; overflow:hidden; padding:0 8px; font-size:8px; line-height:1.05; }
     .rg-risk-bar span { display:none; }
     .rg-risk-bar a { max-width:178px; overflow:hidden; text-overflow:ellipsis; }
     .topbar-inner { padding:8px 12px; gap:10px; min-height:52px; }
+    .topbar-mainnav { display:none; }
     main#main-content { min-height:760px; padding:12px 10px; }
     .boot-shell { padding:18px 16px; border-radius:var(--r-sm); }
     .boot-shell__top { display:block; }
@@ -403,6 +446,14 @@
 </script>
 </head>
 <body>
+<script>
+  // v35.197 — Réserve le layout desktop avant le chargement CSS complet pour éviter le saut sidebar/main.
+  try {
+    const _phase11Page = (location.hash || '#dashboard').slice(1).split('?')[0] || 'dashboard';
+    document.body.classList.toggle('agent-home', _phase11Page === 'dashboard');
+    document.body.classList.toggle('agent-inside', _phase11Page !== 'dashboard');
+  } catch (err) {}
+</script>
 
 <!-- v31.4 — Fallback noscript : si JavaScript est désactivé/bloqué, on
      affiche un panneau qui pointe vers les pages éditoriales statiques
@@ -603,6 +654,14 @@
     </div>
   </div>
 </nav>
+<script>
+  // v35.197 — Aligne l'item actif avant le routeur principal pour éviter un CLS sur pages internes.
+  try {
+    const _phase11PageActive = (location.hash || '#dashboard').slice(1).split('?')[0] || 'dashboard';
+    document.querySelectorAll('.page-btn.active').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll(`.page-btn[data-page="${CSS.escape(_phase11PageActive)}"]`).forEach(btn => btn.classList.add('active'));
+  } catch (err) {}
+</script>
 
 <!-- Refresh indicator flottant — hors du header car backdrop-filter du header
      crée un nouveau containing block qui piège les position:fixed descendants -->
@@ -753,7 +812,7 @@
       <div class="footer-brand">
         <span class="footer-logo">🎯</span>
         <span class="footer-text">Paris-Sportif</span>
-        <span class="footer-version" id="footer-version" role="button" tabindex="0" style="cursor:pointer;" title="Voir les nouveautés v35.196">v35.196</span>
+        <span class="footer-version" id="footer-version" role="button" tabindex="0" style="cursor:pointer;" title="Voir les nouveautés v35.197">v35.197</span>
       </div>
       <nav class="footer-links" aria-label="Liens du site">
         <a href="https://github.com/Harotensnor/paris-sportif" target="_blank" rel="noopener" class="footer-link" title="Code source sur GitHub">

@@ -371,7 +371,7 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Preuve : `.cache/lighthouse-reports/summary.json`
 - Constat : CLS desktop `0.081` dashboard et `0.086` sur tous/performance/academie au baseline; après la correction target-size v35.196, CLS mesuré `0.151-0.157`, cible Phase 11 `<0.05`.
 - Action : réserver la hauteur des strips/header/sticky rails et stabiliser les blocs injectés après le chargement.
-- Statut : OPEN — sprint P-11.3.
+- Statut : FIXED v35.197 — classe de page appliquée dès le `<body>`, sidebar/topbar critique réservée avant `app.css`, active nav synchronisée avant le routeur. CLS desktop final : dashboard `0.018`, pages internes `0.047` (cible `<0.05`).
 
 ### P11-LH-003 — Performance desktop plafonne à 85
 
@@ -380,4 +380,4 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Constat : performance desktop `85` au baseline puis `72-73` après v35.196; mobile reste `100`.
 - Détails : transfert local `2.75MB`, `app.js 1.79MB`, `data_lite.js 497KB`, `app-enhancements.js 37KB`.
 - Action : réduire le JS initial desktop ou charger encore plus tard les modules secondaires.
-- Statut : OPEN — sprint P-11.4.
+- Statut : FIXED v35.197 — la correction CLS supprime la pénalité principale. Performance desktop : dashboard `97`, tous/performance/academie `92`; mobile reste `100`.
