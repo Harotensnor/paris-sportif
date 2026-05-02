@@ -25644,6 +25644,69 @@
       return '<span style="background:rgba(255,255,255,.06);color:var(--text-dim);padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;letter-spacing:.4px;">INFO</span>';
     };
     const sideColor = (s) => s === 'ok' ? '#34d399' : s === 'warn' ? '#eab308' : s === 'crit' ? '#f87171' : '#a78bfa';
+    const healthData = window.__healthData || {};
+    const healthSources = healthData.sources || {};
+    const healthLag = healthData.pipeline_lag_per_script || {};
+    const lagAlerts = Object.values(healthLag).filter(v => v && ['warn', 'crit', 'missing'].includes(v.status)).length;
+    const sourceMetric = (key, field, fallback = '—') => {
+      const v = healthSources[key] && healthSources[key][field];
+      return (v === 0 || v) ? v : fallback;
+    };
+    const quickHealthCards = [
+      {
+        label: 'Fraîcheur data',
+        value: `${Number(healthData.data_age_min || 0)} min`,
+        detail: `généré ${healthData.generated_at ? new Date(healthData.generated_at).toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' }) : '—'}`,
+        color: Number(healthData.data_age_min || 0) > 30 ? '#eab308' : '#34d399'
+      },
+      {
+        label: 'Marchés détaillés',
+        value: String(sourceMetric('winamax_markets', 'matches_detailed', 0)),
+        detail: `${sourceMetric('winamax_markets', 'matches_with_odds', 0)} matchs cotés Winamax`,
+        color: Number(sourceMetric('winamax_markets', 'matches_detailed', 0)) >= 250 ? '#34d399' : '#eab308'
+      },
+      {
+        label: 'Blessures',
+        value: String(sourceMetric('injuries_soccer', 'players', 0)),
+        detail: `${sourceMetric('injuries_soccer', 'teams', 0)} équipes couvertes`,
+        color: Number(sourceMetric('injuries_soccer', 'players', 0)) >= 100 ? '#34d399' : '#eab308'
+      },
+      {
+        label: 'Lineups',
+        value: String(sourceMetric('lineups_soccer', 'events', 0)),
+        detail: 'compositions football',
+        color: Number(sourceMetric('lineups_soccer', 'events', 0)) >= 40 ? '#34d399' : '#eab308'
+      },
+      {
+        label: 'xG top ligues',
+        value: String(sourceMetric('xg_team_stats', 'teams', 0)),
+        detail: `${sourceMetric('xg_team_stats', 'leagues', 0)} ligues`,
+        color: Number(sourceMetric('xg_team_stats', 'teams', 0)) >= 90 ? '#34d399' : '#eab308'
+      },
+      {
+        label: 'Alertes pipeline',
+        value: String(lagAlerts),
+        detail: lagAlerts ? 'scripts à surveiller' : 'cron aligné',
+        color: lagAlerts ? '#f87171' : '#34d399'
+      }
+    ];
+    const quickHealthHtml = `
+      <div style="margin-top:18px;">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
+          <div>
+            <div style="font-size:13px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;">Cockpit data</div>
+            <div style="font-size:13px;color:var(--text-dim);margin-top:3px;">Les signaux qui alimentent directement les pronos et la page Big Bets.</div>
+          </div>
+          <a href="https://github.com/Harotensnor/paris-sportif/actions" target="_blank" rel="noopener" style="min-height:44px;display:inline-flex;align-items:center;color:var(--brand);font-size:12px;font-weight:800;text-decoration:underline;">Ouvrir le cron GitHub →</a>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;">
+          ${quickHealthCards.map(c => `<div style="background:var(--panel);border:1px solid var(--border);border-left:4px solid ${c.color};border-radius:10px;padding:13px 14px;">
+            <div style="font-size:10px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.45px;font-weight:900;">${esc(c.label)}</div>
+            <div style="margin-top:5px;font-size:24px;line-height:1;font-weight:950;color:${c.color};font-variant-numeric:tabular-nums;">${esc(String(c.value))}</div>
+            <div style="margin-top:5px;font-size:11px;line-height:1.35;color:var(--text-dim);">${esc(String(c.detail))}</div>
+          </div>`).join('')}
+        </div>
+      </div>`;
 
     const checkRow = (c, idx) => {
       const actionBtn = c.action ? `<button class="sante-action-btn" data-action-idx="${idx}" style="background:rgba(167,139,250,.15);color:var(--brand);border:1px solid rgba(167,139,250,.3);border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;">${esc(c.action.label)}</button>` : '';
@@ -25881,6 +25944,8 @@
             <div style="font-size:22px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;">${meta.lsMb >= 0 ? meta.lsMb.toFixed(2) + ' MB' : '—'}</div>
           </div>
         </div>
+
+        ${quickHealthHtml}
 
         <div style="margin-top:22px;">
           <div style="font-size:13px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;">🧠 Recommandations</div>

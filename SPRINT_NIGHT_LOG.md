@@ -1159,3 +1159,10 @@
 - Impact: page Montantes plus claire sans ajout CSS, bundle toujours sous cap
 - Commit: pending
 - Status: ✅ DONE
+## Sprint v35.147 (16:22 UTC)
+- Chantier: P-9.11
+- Avant: Santé riche mais signaux data clés enfouis plus bas
+- Après: cockpit data immédiat: fraîcheur, marchés, blessures, lineups, xG, pipeline
+- Impact: diagnostic plus scannable, smoke OK, bundle sous cap
+- Commit: pending
+- Status: ✅ DONE
