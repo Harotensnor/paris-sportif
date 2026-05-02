@@ -1029,3 +1029,11 @@
 - Impact: -497px de fin de page; moins de répétition sans perdre ANJ/helpline
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.130 (2026-05-02 15:42 UTC)
+- Chantier: P-9.58 fix P9-VIS-008 Montantes empty state
+- Avant: Montantes desktop affichait surtout un grand état vide sans alternative concrète
+- Après: état vide enrichi avec CTA Big Bets, Tous les pronos et rappel risque
+- Impact: la page Montantes devient utile même sans séquence propre disponible
+- Commit: pending
+- Status: ✅ DONE

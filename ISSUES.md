@@ -348,4 +348,4 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Preuve : `.cache/phase4-phase9-current/montantes-desktop.png` et `montantes-wide.png`
 - Constat : la page affiche surtout un empty state central et peu de pédagogie/action alternative.
 - Action : ajouter alternatives vers Sécurité / Tous les pronos + mini-explication risque de montante.
-- Statut : OPEN
+- Statut : FIXED v35.130 — empty state enrichi avec retour Big Bets, tous les pronos et rappel risque; Montantes n'est plus une impasse quand aucun enchaînement n'est propre.
