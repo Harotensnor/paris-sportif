@@ -15965,6 +15965,7 @@
         .slice(0, 80);
       const bbfVisibleCount = bbfBigBets.length + bbfGoodBets.length + bbfBigOddsBets.length + bbfOutsiderBets.length + bbfRestRows.length;
       const bbfMarketCount = bbfPool.reduce((sum, p) => sum + Math.max(1, Number(p.best?.allCandidates?.length || 0)), 0);
+      const bbfGain100 = bbfBigBets.length ? bbfBigBets.reduce((s, p) => s + Number(p.ev || 0), 0) / bbfBigBets.length * 100 : 0;
       const bbfStrength = getBetStrengthMeta;
       const bbfMarketLabel = (p) => {
         const label = p.best?.label || p.pred?.pick?.label || 'Pari conseillé';
@@ -16236,9 +16237,9 @@
 
           <section class="bbf-stats">
             <div><span>ROI modèle</span><strong>${agent.delta7 >= 0 ? '+' : ''}${Math.round((agent.deltaPct7 || 0) * 10) / 10}%</strong><em>${daysSinceStart < 7 ? `depuis ${daysSinceStart}j` : 'sur 7j'}</em></div>
+            <div><span>Gain moyen Big Bets</span><strong>${bbfBigBets.length ? `${bbfGain100 >= 0 ? '+' : ''}${bbfGain100.toFixed(0)}€` : '—'}</strong><em>par 100€ misés · EV moyenne</em></div>
             <div><span>Paris filtrés</span><strong>${todayStats.ok || bbfPool.length}</strong><em>${todayStats.noEdge || 0} sans value · ${todayStats.lowConf || 0} confiance basse</em></div>
             <div><span>Cagnotte modèle</span><strong>${nav.toFixed(2)}€</strong><em>départ 10€ · Kelly protégé</em></div>
-            <div><span>Winamax</span><strong>${bbfClickCount}</strong><em>clics suivis localement</em></div>
           </section>
           <nav class="bbf-tools" aria-label="Outils secondaires">
             <button type="button" class="page-btn" data-page="tous">Tous les paris</button>
