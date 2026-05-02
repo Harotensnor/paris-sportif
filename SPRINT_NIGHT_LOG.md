@@ -797,3 +797,11 @@
 - Impact: les grands écrans respirent moins “mobile stretched” sans casser mobile/tablette
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.101 (2026-05-02 12:50 UTC)
+- Chantier: P-8.5 grille Big Bets desktop
+- Avant: la grille restait bridée à 752px utiles sur 1920px, à cause du main critique et du padding hérité
+- Après: zone Big Bets 1308px utiles sur 1920px; opportunités compactes en 4 colonnes; dashboard wide 3750px
+- Impact: l’accueil commence enfin à exploiter un écran PC large au lieu de se comporter comme une colonne mobile
+- Commit: pending
+- Status: ✅ DONE
