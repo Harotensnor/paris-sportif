@@ -821,3 +821,11 @@
 - Impact: l’accueil 1920px passe en vraie composition 3 zones sans donner une impression mobile-only
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.104 (2026-05-02 13:03 UTC)
+- Chantier: P-8.4 layout 3 colonnes desktop
+- Avant: la vraie sidebar gauche n’apparaissait qu’en ultra-wide ≥1600px
+- Après: bascule 3 colonnes dès 1440px; 1399px reste en 2 colonnes; overflow 0
+- Impact: les PC classiques profitent aussi du layout desktop complet
+- Commit: pending
+- Status: ✅ DONE
