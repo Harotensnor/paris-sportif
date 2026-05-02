@@ -5,7 +5,7 @@
        v33.40 — Audit phase 2 V4 : 3 niveaux de surfaces tier explicites,
        bordures plus visibles, hiérarchie plus claire. Bumpé bg-1 de #06070a
        (noir quasi pur) à #0a0c11 (légèrement plus chaud, mieux différencié). */
-    --bg: #0a0c11;
+    --bg: #0a0a0a;
     --rg-height: 32px;
     --bg-2: #0e1117;
     --bg-3: #11141b;
@@ -15,7 +15,7 @@
     --panel-4: #2a3040;
 
     /* V4 (audit phase 2) : aliases sémantiques pour les 3 tiers */
-    --surface-0: #0a0c11;
+    --surface-0: #0a0a0a;
     --surface-1: #11141b;
     --surface-2: #1a1f2a;
     --surface-hover: #21262d;
@@ -59,6 +59,8 @@
     --c-good: #65a30d;
     --c-warn: #f59e0b;
     --c-bad: #dc2626;
+    --c-accent: #e60000;
+    --winamax-red: var(--c-accent);
 
     /* v31.7.34 — Tier hierarchy. Couleurs distinctes pour les badges
        Lock/Standard/Lowconf, qui apparaissent dans 100+ endroits. */

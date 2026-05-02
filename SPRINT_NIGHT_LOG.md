@@ -661,3 +661,11 @@
 - Impact: navigation Winamax-style plus rapide sans ajouter de page
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.84 (2026-05-02 13:02 UTC)
+- Chantier: P-6.13 palette Winamax-style
+- Avant: fond principal légèrement bleuté et pas de token rouge bookmaker
+- Après: fond noir plus profond + token `--c-accent/#e60000` réutilisable
+- Impact: base visuelle plus premium sans croissance bundle notable; captures v35-84 OK
+- Commit: pending
+- Status: ✅ DONE
