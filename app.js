@@ -15561,7 +15561,7 @@
       const bbfGoodBets = bbfPool
         .filter(p => !bbfBigIds.has(String(p.m.id || '')))
         .filter(p => p.odd >= 2.00 && p.odd < 2.50 && p.edge >= 0.04 && p.rel >= 0.55)
-        .slice(0, 12);
+        .slice(0, 5);
       const bbfGoodIds = new Set(bbfGoodBets.map(p => String(p.m.id || '')));
       const bbfBigOddsBets = bbfPool
         .filter(p => !bbfBigIds.has(String(p.m.id || '')) && !bbfGoodIds.has(String(p.m.id || '')))
@@ -15825,21 +15825,10 @@
             ${_dataIsStale ? bbfEmpty : (bbfBigBets.length ? `<div class="bbf-grid bbf-grid--hero">${bbfBigBets.map(p => bbfCard(p, 'hero')).join('')}</div>` : bbfEmpty)}
           </section>
 
-          ${scorersToday.length ? `<section class="bbf-section bbf-scorers-section">
-            <div class="bbf-section__head">
-              <div>
-                <span>Top buteurs · Winamax à vérifier</span>
-                <h2>Joueurs chauds</h2>
-              </div>
-              <button type="button" class="page-btn" data-page="tous">Voir les matchs →</button>
-            </div>
-            <div class="bbf-scorers">${scorersToday.slice(0, 6).map(bbfScorerCard).join('')}</div>
-          </section>` : ''}
-
           <section class="bbf-section">
             <div class="bbf-section__head">
               <div>
-                <span>Solides · cote 2.00-2.50 · edge ≥ 4% · confiance ≥ 55%</span>
+                <span>Section 1 · Solides · 3-5 picks max · cote 2.00-2.50</span>
                 <h2>Bonnes opportunités</h2>
               </div>
               <button type="button" class="page-btn" data-page="tous">Voir tout →</button>
@@ -15888,6 +15877,16 @@
             </summary>
             <div class="bbf-more__rows">${bbfRestRows.length ? bbfRestRows.map(bbfRow).join('') : '<p>Aucun match exploitable dans la fenêtre actuelle.</p>'}</div>
           </details>
+
+          ${scorersToday.length ? `<details class="bbf-more bbf-scorers-section">
+            <summary>
+              <span>Top buteurs du jour</span>
+              <b>${scorersToday.length} joueurs · secondaire</b>
+            </summary>
+            <div style="padding:0 12px 12px;">
+              <div class="bbf-scorers">${scorersToday.slice(0, 6).map(bbfScorerCard).join('')}</div>
+            </div>
+          </details>` : ''}
 
           <section class="bbf-stats">
             <div><span>ROI modèle</span><strong>${agent.delta7 >= 0 ? '+' : ''}${Math.round((agent.deltaPct7 || 0) * 10) / 10}%</strong><em>${daysSinceStart < 7 ? `depuis ${daysSinceStart}j` : 'sur 7j'}</em></div>
