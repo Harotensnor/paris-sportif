@@ -1351,3 +1351,9 @@
 - Après: abstain explicite si confiance <50%, edge <2pt, divergence modèle forte ou data quality <2/4.
 - Impact: moins de paris, meilleure discipline high-odds et raisons de skip auditables.
 - Vérif: phase10_abstain_audit.json, 59 prédictions, 12 actionnables, 0 erreur console.
+
+## Sprint v35.178 — Phase 10 P-10.25 IC95 probabilité modèle (21:31 UTC)
+- Avant: la modale affichait une fiabilité ponctuelle sans fourchette d'incertitude par pick.
+- Après: pred.prob_ci expose un IC95 Wilson et la modale affiche la fourchette.
+- Impact: Théo voit quand une proba est serrée ou large avant de miser.
+- Vérif: phase10_probability_ci_audit.json, IC95 visible en modale, 0 erreur console.
