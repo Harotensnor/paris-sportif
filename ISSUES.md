@@ -155,7 +155,7 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Preuve : `.cache/phase4-phase6-baseline/legal-mobile.png`
 - Constat : la page légale reste en thème clair, sans la barre prévention top, alors que la PWA est dark/Winamax-inspired.
 - Action : harmoniser `legal.html`/`static-page.css` ou ajouter au moins la barre prévention et un header mobile fiable.
-- Statut : OPEN
+- Statut : FIXED v35.150 — l'ancien bloc Combinés caché passe en H2; audit navigateur 8 pages = 1 H1 par page.
 
 ## Checks chiffrés
 
