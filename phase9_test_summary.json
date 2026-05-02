@@ -1,0 +1,47 @@
+{
+  "generated_at": "2026-05-02T15:57:05.338492+00:00",
+  "phase": "phase9_finale",
+  "sprint": "v35.140",
+  "smoke_e2e": {
+    "status": "passed",
+    "note": "dashboard/performance/favoris/sante/academie/profil/backtest/alertes/historique terminal-value and mobile overflow all green"
+  },
+  "click_audit": {
+    "status": "passed",
+    "clicks": 164,
+    "failures": 0
+  },
+  "modal_tabs": {
+    "status": "passed",
+    "sports_tested": 5,
+    "failures": 0
+  },
+  "market_consistency": {
+    "status": "passed",
+    "cases": 50,
+    "failures": 0
+  },
+  "user_flow": {
+    "status": "passed",
+    "steps": 3,
+    "failures": 0,
+    "steps_detail": [
+      {
+        "step": "modal_opened",
+        "title": "Como vs Napoli"
+      },
+      {
+        "step": "winamax_cta",
+        "clicked": true,
+        "href": "https://www.winamax.fr/paris-sportifs/match/61061629",
+        "before": 0,
+        "after": 1
+      },
+      {
+        "step": "track_bet",
+        "before": 0,
+        "after": 1
+      }
+    ]
+  }
+}
