@@ -1077,3 +1077,11 @@
 - Impact: chemin principal de conversion vérifié de bout en bout
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.136 (2026-05-02 15:31 UTC)
+- Chantier: P-9.7 mesure compression data.js
+- Avant: poids brut data.js 6.55 MB et data_lite.js 2.19 MB sans preuve headers live
+- Après: GitHub Pages sert gzip; bundle shell local 10.91 MB brut → 1.29 MB gzip
+- Impact: priorité perf confirmée sur parsing/DOM plutôt que transfert réseau pur
+- Commit: pending
+- Status: ✅ DONE
