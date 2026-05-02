@@ -55,7 +55,7 @@ FETCH_STAGES = [
     ('fetch_live.py',              1,   60),
     ('fetch_sofascore_events.py',   1,   90),
     ('fetch_winamax_catalog.py',    1,   60),   # <2s typical
-    ('fetch_winamax_match_details.py', 5,  90),  # 2026-05-01 : markets étendus (HT, OU multi-lignes, score exact, DNB) sur 60 matches top-priorité, ~30-50s
+    ('fetch_winamax_match_details.py', 5, 120),  # v35.26 : markets étendus multi-sports, TTL 1h + quotas, patchés à chaque tick
     ('fetch_h2h.py',               15,   60),
     ('fetch_forebet.py',            5,   60),
     ('fetch_tennis_odds.py',       5,   60),

@@ -66,6 +66,18 @@ def _markets_more_than_1n2(ev: dict) -> bool:
     return False
 
 
+def _detail_market_keys(markets: dict | list | None) -> list[str]:
+    if isinstance(markets, dict):
+        return sorted(str(k) for k in markets.keys() if k and k != "1n2")
+    if isinstance(markets, list):
+        return sorted({
+            str(m.get("market") or m.get("family"))
+            for m in markets
+            if isinstance(m, dict) and (m.get("market") or m.get("family"))
+        })
+    return []
+
+
 def main() -> int:
     data = _load_data()
     events = _events(data)
@@ -82,6 +94,26 @@ def main() -> int:
         1 for v in wm_matches.values()
         if isinstance(v, dict) and len(v.get("odds") or {}) > 1
     )
+    detailed_by_sport: dict[str, dict] = {}
+    market_family_counts: dict[str, int] = {}
+    for ev in events:
+        if ev.get("completed"):
+            continue
+        sport = ev.get("sport") or "unknown"
+        wnx = ev.get("winamax") or {}
+        detail_keys = _detail_market_keys(wnx.get("markets"))
+        row = detailed_by_sport.setdefault(sport, {"exact": 0, "detailed": 0, "families": {}})
+        if wnx.get("match_id"):
+            row["exact"] += 1
+        if detail_keys:
+            row["detailed"] += 1
+            for key in detail_keys:
+                row["families"][key] = row["families"].get(key, 0) + 1
+                market_family_counts[key] = market_family_counts.get(key, 0) + 1
+    for row in detailed_by_sport.values():
+        row["detailed_ratio"] = round(row["detailed"] / row["exact"], 4) if row["exact"] else 0
+        row["families"] = dict(sorted(row["families"].items(), key=lambda kv: kv[1], reverse=True)[:12])
+    detailed_ratio_vs_exact = round(detailed_market_matches / exact, 4) if exact else 0
 
     metrics = {
         "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z"),
@@ -103,6 +135,11 @@ def main() -> int:
         "winamax_markets": {
             "matches": len(wm_matches),
             "detailed_market_matches": detailed_market_matches,
+            "detailed_ratio_vs_exact": detailed_ratio_vs_exact,
+            "gap_to_50pct_exact": round(max(0, 0.50 - detailed_ratio_vs_exact), 4),
+            "recommended_detail_fetch_cap": 160 if detailed_ratio_vs_exact < 0.25 else 90 if detailed_ratio_vs_exact < 0.50 else 45,
+            "detail_by_sport": dict(sorted(detailed_by_sport.items())),
+            "market_family_counts": dict(sorted(market_family_counts.items(), key=lambda kv: kv[1], reverse=True)[:20]),
         },
         "backtest": {
             "overall_roi_pct": (bt.get("overall") or {}).get("flat_roi_pct"),

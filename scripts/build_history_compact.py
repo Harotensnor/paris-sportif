@@ -26,6 +26,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 RESULTS_JSONL = ROOT / 'results_archive.jsonl'
 ODDS_JSONL = ROOT / 'odds_history.jsonl'
+BACKTEST_MARKETS = ROOT / 'backtest_report_markets.json'
 OUT = ROOT / 'history_compact.json'
 
 # Limites
@@ -69,6 +70,15 @@ def _load_odds_snapshot() -> dict[str, dict]:
     return by_id
 
 
+def _load_market_backtest() -> dict:
+    if not BACKTEST_MARKETS.exists():
+        return {}
+    try:
+        return json.loads(BACKTEST_MARKETS.read_text(encoding='utf-8'))
+    except Exception:
+        return {}
+
+
 def _date_key(iso: str | None) -> str:
     """ISO date → 'YYYY-MM-DD' (UTC)."""
     if not iso: return ''
@@ -77,6 +87,125 @@ def _date_key(iso: str | None) -> str:
         return d.strftime('%Y-%m-%d')
     except Exception:
         return ''
+
+
+def _market_from_snapshot(snap: dict | None, pick_key: str | None) -> str:
+    """Normalise le type de marché stocké dans les snapshots.
+
+    Les anciens odds_history n'ont que le 1N2 implicite. Les prochains
+    snapshots multi-marchés peuvent écrire `market`, `market_key` ou `bet_type`.
+    """
+    if not snap:
+        return '1n2'
+    raw = (
+        snap.get('market')
+        or snap.get('market_key')
+        or snap.get('bet_type')
+        or snap.get('type')
+        or ''
+    )
+    key = str(raw or '').strip().lower()
+    if not key:
+        return '1n2'
+    aliases = {
+        'moneyline': '1n2',
+        'match_winner': '1n2',
+        'winner': '1n2',
+        'over_under': 'ou',
+        'total': 'ou',
+        'totals': 'ou',
+        'double chance': 'double_chance',
+        'draw no bet': 'dnb',
+    }
+    key = aliases.get(key, key)
+    return key.replace(' ', '_').replace('-', '_')
+
+
+def _market_label(market: str) -> str:
+    labels = {
+        '1n2': '1N2 / vainqueur',
+        'ou': 'Over/Under',
+        'ou15': 'Over/Under 1.5',
+        'ou25': 'Over/Under 2.5',
+        'ou35': 'Over/Under 3.5',
+        'btts': 'BTTS',
+        'dnb': 'Draw no bet',
+        'double_chance': 'Double chance',
+        'handicap': 'Handicap',
+        'team_total': 'Team total',
+        'exact_scores': 'Score exact',
+    }
+    return labels.get(market, market.replace('_', ' ').upper())
+
+
+def _confidence_tier(n: int, roi: float, wr: float) -> str:
+    if n < 8:
+        return 'learning'
+    if n >= 20 and roi > 3 and wr >= 50:
+        return 'validated'
+    if n >= 12 and roi < -5:
+        return 'cooldown'
+    return 'neutral'
+
+
+def _compact_market_backtest(report: dict) -> dict:
+    raw = report.get('by_market_pick') or {}
+    if not isinstance(raw, dict):
+        return {'by_market': [], 'by_market_pick': []}
+    by_market: dict[str, dict] = {}
+    pick_rows = []
+    for key, stats in raw.items():
+        if not isinstance(stats, dict):
+            continue
+        market, _, selection = str(key).partition(':')
+        market = market or 'unknown'
+        n = int(stats.get('n') or 0)
+        wins = int(stats.get('wins') or 0)
+        losses = int(stats.get('losses') or 0)
+        roi_raw = stats.get('roi')
+        roi_pct = None if roi_raw is None else round(float(roi_raw) * 100, 2)
+        wr = round(100 * float(stats.get('win_rate') or 0), 1)
+        row = {
+            'market': market,
+            'label': _market_label(market),
+            'selection': selection or key,
+            'n': n,
+            'wins': wins,
+            'losses': losses,
+            'win_rate': wr,
+            'wr_ci_lo': round(100 * float(stats.get('wr_ci_lo') or 0), 1),
+            'wr_ci_hi': round(100 * float(stats.get('wr_ci_hi') or 0), 1),
+            'with_odds': int(stats.get('with_odds') or 0),
+            'roi': roi_pct,
+            'profit': round(float(stats.get('profit') or 0), 2),
+            'confidence': _confidence_tier(n, roi_pct or 0, wr),
+        }
+        pick_rows.append(row)
+        agg = by_market.setdefault(market, {
+            'market': market,
+            'label': _market_label(market),
+            'n': 0,
+            'wins': 0,
+            'losses': 0,
+            'with_odds': 0,
+            'profit': 0.0,
+        })
+        agg['n'] += n
+        agg['wins'] += wins
+        agg['losses'] += losses
+        agg['with_odds'] += int(stats.get('with_odds') or 0)
+        agg['profit'] += float(stats.get('profit') or 0)
+    for agg in by_market.values():
+        agg['win_rate'] = round(100 * agg['wins'] / agg['n'], 1) if agg['n'] else 0
+        agg['roi'] = round(100 * agg['profit'] / agg['with_odds'], 2) if agg['with_odds'] else None
+        agg['profit'] = round(agg['profit'], 2)
+        agg['confidence'] = _confidence_tier(agg['n'], agg['roi'] or 0, agg['win_rate'])
+    return {
+        'generated_at': report.get('generated_at'),
+        'completed_evaluated': report.get('completed_evaluated'),
+        'by_market': sorted(by_market.values(), key=lambda x: (-x['n'], x['market'])),
+        'by_market_pick': sorted(pick_rows, key=lambda x: (-x['n'], x['market'], x['selection']))[:160],
+    }
 
 
 def _evaluate_pick(event: dict, snap: dict | None) -> dict | None:
@@ -95,6 +224,7 @@ def _evaluate_pick(event: dict, snap: dict | None) -> dict | None:
     odd = snap.get('odd') or snap.get('pick_odd') or snap.get('odd_pick')
     if not pick_key or not (odd and odd > 1):
         return None
+    market = _market_from_snapshot(snap, pick_key)
     # Détermine le winner réel
     competitors = event.get('competitors') or []
     home = next((c for c in competitors if c.get('home_away') == 'home'), competitors[0] if competitors else None)
@@ -128,8 +258,15 @@ def _evaluate_pick(event: dict, snap: dict | None) -> dict | None:
         'league': event.get('league_name') or event.get('league_code', ''),
         'home': home_name,
         'away': away_name,
+        'market': market,
+        'market_label': _market_label(market),
         'pick_key': pick_key,
+        'pick_label': snap.get('pick_label') or snap.get('selection') or pick_key,
         'odd': round(float(odd), 2),
+        'prob': snap.get('prob') or snap.get('reliability') or snap.get('model_prob'),
+        'ev': snap.get('ev') or snap.get('expected_value'),
+        'stake': snap.get('stake') or snap.get('stake_eur') or snap.get('stake_unit'),
+        'clv': snap.get('clv') or snap.get('clv_pct'),
         'won': won,
         'pl': round(float(pl), 3),
         'h_score': h_score,
@@ -143,6 +280,9 @@ def main() -> int:
     print(f'  loaded {len(results)} events from results_archive.jsonl', flush=True)
     odds = _load_odds_snapshot()
     print(f'  loaded {len(odds)} snapshots from odds_history.jsonl', flush=True)
+    market_backtest = _compact_market_backtest(_load_market_backtest())
+    if market_backtest.get('by_market'):
+        print(f'  loaded {len(market_backtest["by_market"])} market backtest groups', flush=True)
 
     # Évalue chaque event
     picks = []
@@ -203,6 +343,57 @@ def main() -> int:
         s['roi'] = round(100 * s['pl'] / s['n'], 2) if s['n'] else 0
         s['pl'] = round(s['pl'], 2)
 
+    # By market — base de la vue "Historique marchés" long terme.
+    by_market: dict[str, dict] = {}
+    by_market_sport: dict[str, dict] = {}
+    for p in win_picks:
+        mk = p.get('market') or '1n2'
+        if mk not in by_market:
+            by_market[mk] = {
+                'market': mk,
+                'label': _market_label(mk),
+                'n': 0,
+                'w': 0,
+                'l': 0,
+                'pl': 0.0,
+                'avg_odd_sum': 0.0,
+            }
+        d = by_market[mk]
+        d['n'] += 1
+        if p['won']: d['w'] += 1
+        else: d['l'] += 1
+        d['pl'] += p['pl']
+        d['avg_odd_sum'] += float(p.get('odd') or 0)
+
+        mks = f'{mk}:{p.get("sport") or "other"}'
+        if mks not in by_market_sport:
+            by_market_sport[mks] = {
+                'market': mk,
+                'label': _market_label(mk),
+                'sport': p.get('sport') or 'other',
+                'n': 0,
+                'w': 0,
+                'l': 0,
+                'pl': 0.0,
+            }
+        sd = by_market_sport[mks]
+        sd['n'] += 1
+        if p['won']: sd['w'] += 1
+        else: sd['l'] += 1
+        sd['pl'] += p['pl']
+
+    for d in by_market.values():
+        d['wr'] = round(100 * d['w'] / d['n'], 1) if d['n'] else 0
+        d['roi'] = round(100 * d['pl'] / d['n'], 2) if d['n'] else 0
+        d['avg_odd'] = round(d.pop('avg_odd_sum') / d['n'], 2) if d['n'] else 0
+        d['pl'] = round(d['pl'], 2)
+        d['confidence'] = _confidence_tier(d['n'], d['roi'], d['wr'])
+    for d in by_market_sport.values():
+        d['wr'] = round(100 * d['w'] / d['n'], 1) if d['n'] else 0
+        d['roi'] = round(100 * d['pl'] / d['n'], 2) if d['n'] else 0
+        d['pl'] = round(d['pl'], 2)
+        d['confidence'] = _confidence_tier(d['n'], d['roi'], d['wr'])
+
     # Détail des picks récents (30 derniers jours)
     recent_picks = [p for p in picks if (_date_key(p.get('date')) or '') >= cut_details][:300]
 
@@ -227,6 +418,9 @@ def main() -> int:
         },
         'by_day': days_sorted,
         'by_sport': sorted(by_sport.values(), key=lambda x: -x['n']),
+        'by_market': sorted(by_market.values(), key=lambda x: (-x['n'], x['market'])),
+        'by_market_sport': sorted(by_market_sport.values(), key=lambda x: (-x['n'], x['market'], x['sport'])),
+        'market_backtest': market_backtest,
         'recent_picks': recent_picks,
         'top_wins': top_wins,
         'worst_losses': worst_losses,
