@@ -249,3 +249,11 @@
 - Impact: signal arbitre multiplié x5.2 (`9 → 47`), warning stale supprimé, Santé descend à 2 warnings; smoke E2E vert avec `1364` marchés scorés sur 48h
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.33 (2026-05-02 05:38 UTC)
+- Chantier: P-A3 garde anti-écrasement Sofascore
+- Avant: `sofascore_events.json.total=0`, Santé affichait `sofascore_events: source vide`
+- Après: refresh manuel collecte `2429` events multi-sports; fetcher refuse désormais d'écraser un bon snapshot par une collecte basse (`<100`) ou vide
+- Impact: warning Sofascore supprimé, source fiable pour fallback/matching; Santé descend à `1` warning restant, smoke E2E vert
+- Commit: pending
+- Status: ✅ DONE
