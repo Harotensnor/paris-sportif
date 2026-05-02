@@ -29944,11 +29944,13 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     // sur son OS → l'app suit sans reload).
     const _systemPrefersLight = () => window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
     const _resolveTheme = (storedTheme) => storedTheme === 'auto' ? (_systemPrefersLight() ? 'light' : 'dark') : storedTheme;
+    const _nightRead = () => { const h = new Date().getHours(); return h >= 20 || h < 7; };
     const _applyTheme = (storedTheme) => {
-      const effective = _resolveTheme(storedTheme);
+      const effective = _nightRead() ? 'dark' : _resolveTheme(storedTheme);
       const root = document.documentElement;
       if (effective === 'light') root.setAttribute('data-theme', 'light');
       else root.removeAttribute('data-theme');
+      root.style.filter = _nightRead() ? 'sepia(.06) saturate(.92)' : '';
       const meta = document.getElementById('theme-color-meta');
       if (meta) meta.setAttribute('content', effective === 'light' ? '#f5f5f7' : '#08080a');
       const tt = document.getElementById('theme-toggle');
@@ -29967,6 +29969,7 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       _currentTheme = ['dark', 'light', 'auto'].includes(initPrefs.theme) ? initPrefs.theme : 'dark';
       _applyTheme(_currentTheme);
     } catch(e) { _applyTheme('dark'); }
+    try { setInterval(() => _applyTheme(_currentTheme), 600000); } catch(e){}
     // En mode auto, suivre les changements de système en live
     try {
       const mql = window.matchMedia('(prefers-color-scheme: light)');
