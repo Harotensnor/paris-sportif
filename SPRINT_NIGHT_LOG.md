@@ -265,3 +265,11 @@
 - Impact: plus de fausses disponibilités Winamax sans cote exploitable; Terminal Value reste vert (`1364` marchés scorés / `55` matchs exacts 48h) avec un univers de paris nettement plus propre
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.35 (2026-05-02 05:43 UTC)
+- Chantier: P-A8 Winamax details cap 80
+- Avant: top-up cron rapide limité à `45` pages match; `242` matchs détaillés / ratio `78.3%`
+- Après: palier cron `45 → 80`; backfill local `80` pages en `21.9s`, `0` échec; ratio reste `78.3%` car les matchs restants n'exposent encore que le marché principal ou sont trop loin
+- Impact: marge CI OK (<60s), top-up plus agressif à chaque refresh sans warning Santé; prochaine amélioration utile = détecter explicitement les pages “1N2 only”
+- Commit: pending
+- Status: ✅ DONE
