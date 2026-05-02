@@ -15687,11 +15687,19 @@
       const bbfBigIds = new Set(bbfBigBets.map(p => String(p.m.id || '')));
       const bbfGoodBets = bbfPool
         .filter(p => !bbfBigIds.has(String(p.m.id || '')))
-        .filter(p => p.edge >= 0.035 && p.rel >= 0.55)
-        .slice(0, 8);
+        .filter(p => p.edge >= 0.04 && p.rel >= 0.60)
+        .slice(0, 12);
+      const bbfGoodIds = new Set(bbfGoodBets.map(p => String(p.m.id || '')));
+      const bbfOutsiderBets = bbfPool
+        .filter(p => !bbfBigIds.has(String(p.m.id || '')) && !bbfGoodIds.has(String(p.m.id || '')))
+        .filter(p => p.odd >= 2.50 && p.odd <= 8 && p.edge >= 0.05 && p.rel >= 0.45)
+        .slice(0, 6);
+      const bbfOutsiderIds = new Set(bbfOutsiderBets.map(p => String(p.m.id || '')));
       const bbfRestRows = bbfPool
-        .filter(p => !bbfBigIds.has(String(p.m.id || '')))
-        .slice(0, 60);
+        .filter(p => !bbfBigIds.has(String(p.m.id || '')) && !bbfGoodIds.has(String(p.m.id || '')) && !bbfOutsiderIds.has(String(p.m.id || '')))
+        .filter(p => p.edge >= 0.02)
+        .slice(0, 80);
+      const bbfVisibleCount = bbfBigBets.length + bbfGoodBets.length + bbfOutsiderBets.length + bbfRestRows.length;
       const bbfMarketCount = bbfPool.reduce((sum, p) => sum + Math.max(1, Number(p.best?.allCandidates?.length || 0)), 0);
       const bbfStrength = getBetStrengthMeta;
       const bbfMarketLabel = (p) => {
@@ -15800,7 +15808,7 @@
         <div class="bbf-shell" data-phase="big-bets-first">
           <section class="bbf-command" aria-live="polite">
             <strong>${bbfBigBets[0] ? `Prochain gros pari : ${esc(bbfMarketLabel(bbfBigBets[0]))} @${Number(bbfBigBets[0].odd).toFixed(2)}` : 'Pas de pari urgent'}</strong>
-            <span>${_dataIsStale ? `Données trop anciennes (${_dataAgeMin} min) : refresh avant d'agir.` : `${bbfPool.length} paris value analysés · bankroll ${userBankroll.toFixed(0)}€ · ${bbfClickCount} clic${bbfClickCount > 1 ? 's' : ''} Winamax suivis`}</span>
+            <span>${_dataIsStale ? `Données trop anciennes (${_dataAgeMin} min) : refresh avant d'agir.` : `${bbfVisibleCount} paris affichables · ${bbfPool.length} analysés · bankroll ${userBankroll.toFixed(0)}€ · ${bbfClickCount} clic${bbfClickCount > 1 ? 's' : ''} Winamax`}</span>
           </section>
           ${bbfOffline}
           ${bbfCategoryChips}
@@ -15817,7 +15825,7 @@
           <section class="bbf-section">
             <div class="bbf-section__head">
               <div>
-                <span>Tier 2</span>
+                <span>Solides · edge ≥ 4% · confiance ≥ 60%</span>
                 <h2>Bonnes opportunités</h2>
               </div>
               <button type="button" class="page-btn" data-page="tous">Voir tout →</button>
@@ -15829,10 +15837,25 @@
               </div>`}
           </section>
 
+          <section class="bbf-section bbf-section--outsiders">
+            <div class="bbf-section__head">
+              <div>
+                <span>Outsiders crédibles · cote ≥ 2.50</span>
+                <h2>Gros gains, petite mise</h2>
+              </div>
+              <button type="button" class="page-btn" data-page="tous">Explorer →</button>
+            </div>
+            ${bbfOutsiderBets.length ? `<div class="bbf-grid bbf-grid--compact">${bbfOutsiderBets.map(p => bbfCard(p, 'compact')).join('')}</div>` : `
+              <div class="bbf-empty bbf-empty--small">
+                <strong>Pas d'outsider crédible aujourd'hui.</strong>
+                <span>Une grosse cote sans edge clair reste une loterie : on attend le bon spot.</span>
+              </div>`}
+          </section>
+
           <details class="bbf-more terminal-market">
             <summary>
-              <span>Voir ${Math.max(terminalScanPool.length, bbfRestRows.length)}+ matchs analysés</span>
-              <b>${bbfMarketCount} marchés scorés · ${terminalScanPool.length} matchs exacts sur 48h</b>
+              <span>Voir toutes les opportunités restantes</span>
+              <b>${bbfRestRows.length} avec edge ≥ 2% · ${bbfMarketCount} marchés scorés · ${terminalScanPool.length} matchs exacts sur 48h</b>
             </summary>
             <div class="bbf-more__rows">${bbfRestRows.length ? bbfRestRows.map(bbfRow).join('') : '<p>Aucun match exploitable dans la fenêtre actuelle.</p>'}</div>
           </details>
