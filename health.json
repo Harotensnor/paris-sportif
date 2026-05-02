@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-05-02T05:04:03Z",
+  "generated_at": "2026-05-02T05:09:56Z",
   "data_age_min": 0,
   "sources": {
     "winamax_catalog": {
-      "age_min": 3,
+      "age_min": 4,
       "tournaments": 118,
       "matches": 733
     },
@@ -13,28 +13,28 @@
       "matches_detailed": 242
     },
     "injuries_soccer": {
-      "age_min": 3,
+      "age_min": 4,
       "teams": 131,
       "players": 475
     },
     "lineups_soccer": {
-      "age_min": 3,
+      "age_min": 4,
       "events": 17
     },
     "team_stats": {
-      "age_min": 3,
+      "age_min": 4,
       "teams": 424
     },
     "clubelo": {
-      "age_min": 3,
+      "age_min": 4,
       "clubs": 630
     },
     "weather": {
-      "age_min": 1,
+      "age_min": 0,
       "events": 349
     },
     "referees_soccer": {
-      "age_min": 3,
+      "age_min": 4,
       "events": 46
     },
     "fbref_xg": {
@@ -42,11 +42,11 @@
       "present": false
     },
     "sofascore_events": {
-      "age_min": 3,
+      "age_min": 4,
       "total": 0
     },
     "team_form": {
-      "age_min": 1,
+      "age_min": 4,
       "teams": 735,
       "football_teams": 673
     },
@@ -55,7 +55,7 @@
       "rows": 0
     },
     "clv_history": {
-      "age_min": 3,
+      "age_min": 4,
       "matches": 672,
       "observations": 1869,
       "mean_clv_pct": -0.09,
@@ -67,7 +67,7 @@
     "winamax_catalog": {
       "script": "scripts/fetch_winamax_catalog.py",
       "output": "winamax_catalog.json",
-      "age_min": 3,
+      "age_min": 4,
       "threshold_min": 15,
       "fast_red_min": 30,
       "status": "ok"
@@ -83,7 +83,7 @@
     "injuries_soccer": {
       "script": "scripts/fetch_injuries_soccer.py",
       "output": "injuries_soccer.json",
-      "age_min": 3,
+      "age_min": 4,
       "threshold_min": 180,
       "fast_red_min": null,
       "status": "ok"
@@ -91,7 +91,7 @@
     "lineups_soccer": {
       "script": "scripts/fetch_lineups_soccer.py",
       "output": "lineups_soccer.json",
-      "age_min": 3,
+      "age_min": 4,
       "threshold_min": 180,
       "fast_red_min": null,
       "status": "ok"
@@ -99,7 +99,7 @@
     "team_stats": {
       "script": "scripts/fetch_team_stats.py",
       "output": "team_stats.json",
-      "age_min": 3,
+      "age_min": 4,
       "threshold_min": 300,
       "fast_red_min": null,
       "status": "ok"
@@ -107,7 +107,7 @@
     "clubelo": {
       "script": "scripts/fetch_clubelo.py",
       "output": "clubelo.json",
-      "age_min": 3,
+      "age_min": 4,
       "threshold_min": 1440,
       "fast_red_min": null,
       "status": "ok"
@@ -115,7 +115,7 @@
     "weather": {
       "script": "scripts/fetch_weather.py",
       "output": "weather.json",
-      "age_min": 1,
+      "age_min": 0,
       "threshold_min": 60,
       "fast_red_min": 30,
       "status": "ok"
@@ -123,7 +123,7 @@
     "referees_soccer": {
       "script": "scripts/fetch_referees_soccer.py",
       "output": "referees_soccer.json",
-      "age_min": 3,
+      "age_min": 4,
       "threshold_min": 480,
       "fast_red_min": null,
       "status": "ok"
@@ -139,7 +139,7 @@
     "sofascore_events": {
       "script": "scripts/fetch_sofascore_events.py",
       "output": "sofascore_events.json",
-      "age_min": 3,
+      "age_min": 4,
       "threshold_min": 30,
       "fast_red_min": 30,
       "status": "ok"
@@ -147,7 +147,7 @@
     "team_form": {
       "script": "scripts/fetch_team_form.py",
       "output": "team_form.json",
-      "age_min": 1,
+      "age_min": 4,
       "threshold_min": 360,
       "fast_red_min": null,
       "status": "ok"
@@ -163,7 +163,7 @@
     "clv_history": {
       "script": "scripts/compute_clv.py",
       "output": "clv_history.json",
-      "age_min": 3,
+      "age_min": 4,
       "threshold_min": 60,
       "fast_red_min": null,
       "status": "ok"
@@ -213,7 +213,7 @@
     "winamax_detail_gap_to_target": 0,
     "winamax_detail_fetch_cap_reco": 45,
     "winamax_detail_status": "ok",
-    "actionable_external_odds": 0,
+    "actionable_external_odds": 250,
     "football_invalid_form": 0,
     "winamax_coverage": {
       "by_sport": {
