@@ -16112,6 +16112,39 @@
           .join('');
         return chips ? `<nav class="bbf-chips" aria-label="Top compétitions">${chips}</nav>` : '';
       })();
+      const bbfLeftRailHtml = (() => {
+        const sportLinks = bbfChipOrder
+          .filter(sp => Number(bbfSportCounts[sp] || 0) > 0)
+          .slice(0, 8)
+          .map(sp => `<a href="#tous?sport=${encodeURIComponent(sp)}"><span>${sportIcon(sp)}</span><b>${esc(sportLabel(sp))}</b><em>${bbfSportCounts[sp]}</em></a>`)
+          .join('');
+        const leagues = (_dataIsStale ? [] : todayAllWinamax)
+          .filter(m => m && !m.completed)
+          .reduce((acc, m) => {
+            const label = String(m.league_name || m.league || m.league_code || '').trim();
+            if (label) acc[label] = (acc[label] || 0) + 1;
+            return acc;
+          }, {});
+        const leagueLinks = Object.entries(leagues)
+          .sort((a, b) => Number(b[1]) - Number(a[1]))
+          .slice(0, 7)
+          .map(([name, count]) => `<a href="#tous?league=${encodeURIComponent(name)}"><span>${bbfLeagueIcon(name)}</span><b>${esc(name.length > 18 ? name.slice(0, 17) + '…' : name)}</b><em>${count}</em></a>`)
+          .join('');
+        const upcoming = (_dataIsStale ? [] : todayAllWinamax)
+          .filter(m => m && !m.completed && new Date(m.date).getTime() > Date.now())
+          .sort((a, b) => new Date(a.date) - new Date(b.date))
+          .slice(0, 5)
+          .map(m => {
+            const { home, away } = getSides(m);
+            return `<button type="button" data-big-detail="${esc(String(m.id || ''))}"><span>${esc(fmtTime(m.date))}</span><b>${esc(bbfTeamName(home))} - ${esc(bbfTeamName(away))}</b></button>`;
+          }).join('');
+        return `<aside class="bbf-left-rail" aria-label="Navigation paris desktop">
+          <label><span>Recherche</span><input id="bbf-left-search" type="search" placeholder="PSG, tennis, Ligue 1…" autocomplete="off"></label>
+          <section><strong>Sports</strong><nav>${sportLinks || '<em>Aucun sport actif</em>'}</nav></section>
+          <section><strong>Top compétitions</strong><nav>${leagueLinks || '<em>Aucune compétition</em>'}</nav></section>
+          <section><strong>Matchs à venir</strong><div>${upcoming || '<em>Rien à venir</em>'}</div></section>
+        </aside>`;
+      })();
       const bbfClickCount = (() => {
         try { return Number(JSON.parse(localStorage.getItem('paris_sportif_winamax_clicks_v1') || '{}').count || 0); }
         catch(e) { return 0; }
@@ -16160,6 +16193,7 @@
           ${bbfCategoryChips}
           ${bbfCompetitionChips}
           <div class="bbf-layout">
+            ${bbfLeftRailHtml}
             <main class="bbf-main">
 
           <section class="bbf-hero" aria-labelledby="bbf-title">
@@ -16253,6 +16287,12 @@
         </div>`;
 
       wrap.innerHTML = bbfMainHtml;
+      const bbfLeftSearch = wrap.querySelector('#bbf-left-search');
+      if (bbfLeftSearch) bbfLeftSearch.addEventListener('keydown', (ev) => {
+        if (ev.key !== 'Enter') return;
+        const q = String(bbfLeftSearch.value || '').trim();
+        if (q) location.hash = `#tous?search=${encodeURIComponent(q)}`;
+      });
       const bbfMatchById = (id) => {
         let found = null;
         Object.values(data.days || {}).forEach(arr => (arr || []).forEach(m => { if (String(m.id) === String(id)) found = m; }));
