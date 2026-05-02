@@ -14107,6 +14107,20 @@
     );
     const todayAllWinamax = eventsOnParisDate(data, todayIso).filter(m => m.winamax && m.winamax.available === true);
     const today = todayAllWinamax.filter(exactBookable);
+    const terminalScanPool = (() => {
+      const start = now.getTime() - 2 * 3600000;
+      const end = now.getTime() + 48 * 3600000;
+      const arr = [];
+      Object.values(data.days || {}).forEach(dayArr => (dayArr || []).forEach(m => {
+        const ts = new Date(m?.date || 0).getTime();
+        if (!Number.isFinite(ts) || ts < start || ts > end) return;
+        if (m.completed || m.live) return;
+        if (!exactBookable(m)) return;
+        arr.push(m);
+      }));
+      arr.sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
+      return arr;
+    })();
 
     // Agent replay (cached per render)
     const agent = _agentReplay();
@@ -15265,7 +15279,7 @@
       }
       const rows = [];
       let exactMatches = 0, detailedMatches = 0, candidateCount = 0;
-      today.filter(m => !m.completed && !m.live).slice(0, 180).forEach(m => {
+      terminalScanPool.slice(0, 260).forEach(m => {
         try {
           const pred = predictMatch(m);
           if (!pred || !pred.pick || pred.skip) return;
@@ -15323,7 +15337,7 @@
               <span>Terminal Value v35</span>
               <h2>Scanner multi-marchés Winamax exacts</h2>
             </div>
-            <p>${candidateCount} marchés scorés · ${exactMatches} matchs exacts · ${detailedMatches} détaillés</p>
+            <p>${candidateCount} marchés scorés · ${exactMatches} matchs exacts sur 48h · ${detailedMatches} détaillés</p>
           </header>
           <div class="terminal-market__tickets">
             ${ticket(main, 'Ticket principal')}

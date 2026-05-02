@@ -125,5 +125,13 @@
 - Avant: `computeDataQuality` ne considérait pas le baseball comme source H2H; la carte détail testait `Array.isArray(match.h2h)` alors que `h2h` est un objet `{meetings}`
 - Après: baseball inclus dans les sports H2H; la carte détail lit `match.h2h.meetings.length`; app hash `32516710`, footer/SW v35.16
 - Impact: les 27 matchs baseball enrichis au sprint précédent ne sont plus marqués à tort comme H2H manquant, et les fiches match affichent le bon statut
+- Commit: ed245102
+- Status: ✅ DONE
+
+## Sprint v35.17 (2026-05-02 04:31 UTC)
+- Chantier: P5/P15 Terminal Value horizon 48h
+- Avant: Terminal Value scannait seulement aujourd'hui; mesure locale `today_exact=0`, `next48_exact=217`, donc le cockpit pouvait afficher vide malgré des opportunités bookables demain
+- Après: scanner cockpit passe sur les matchs exacts à venir <48h; smoke navigateur local confirme `77 marchés scorés · 77 matchs exacts sur 48h`, aucun ticket vide forcé, 0 erreur console
+- Impact: le site ne rate plus les paris value de demain quand la journée courante est creuse ou terminée
 - Commit: pending
 - Status: ✅ DONE
