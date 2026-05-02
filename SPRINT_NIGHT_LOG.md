@@ -1243,3 +1243,9 @@
 - Après: carte Stratégie du jour avec marché lisible, sport dominant, exposition max et diversification.
 - Impact: Théo voit quoi jouer, combien exposer et où éviter la concentration avant de scroller.
 - Vérif: phase10_strategy_audit.json mobile/desktop, overflow horizontal = 0.
+
+## Sprint v35.160 — Phase 10 P-10.8 Quick actions accueil (18:33 UTC)
+- Avant: les raccourcis #tous avec query étaient fragiles et ne filtraient pas la cote minimum.
+- Après: 4 chips Cotes 2.50+, Foot top, Tennis jour, Big Odds + routeur query-aware + filtre odd.
+- Impact: accès direct aux vues utiles high-odds sans chercher dans Tous.
+- Vérif: phase10_quick_actions_audit.json, 4/4 raccourcis ouvrent #tous filtré.

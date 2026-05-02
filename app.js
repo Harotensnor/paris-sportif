@@ -162,6 +162,7 @@
   function _pageFromHash() {
     try {
       let h = (location.hash || '').replace(/^#/, '').trim();
+      h = h.split('?')[0];
       if (PAGE_ALIASES[h]) {
         h = PAGE_ALIASES[h];
         try { history.replaceState(null, '', location.pathname + location.search + '#' + h); } catch(e) {}
@@ -15750,6 +15751,13 @@
       const bbfCategoryChips = (bbfHotCount || bbfSportChips)
         ? `<nav class="bbf-chips" aria-label="Catégories de paris">${bbfHotCount ? `<a class="bbf-chip bbf-chip--hot" href="#tous?edge=8" aria-label="Voir les paris HOT"><span>🔥</span><b>HOT</b><em>${bbfHotCount}</em></a>` : ''}${bbfSportChips}</nav>`
         : '';
+      const bbfQuickActions = `
+        <nav class="bbf-chips" aria-label="Raccourcis Big Bets">
+          <a class="bbf-chip bbf-chip--hot" href="#tous?odd=2.5&edge=5&sort=odd"><span>🔥</span><b>Cotes 2.50+</b><em>value</em></a>
+          <a class="bbf-chip bbf-chip--football" href="#tous?sport=football&edge=4&conf=55"><span>⚽</span><b>Foot top</b><em>solide</em></a>
+          <a class="bbf-chip bbf-chip--tennis" href="#tous?sport=tennis&edge=3"><span>🎾</span><b>Tennis jour</b><em>rapide</em></a>
+          <a class="bbf-chip bbf-chip--hot" href="#tous?odd=4&edge=10&sort=odd"><span>🚀</span><b>Big Odds</b><em>4.00+</em></a>
+        </nav>`;
       const bbfLeagueIcon = (name) => {
         const n = String(name || '').toLowerCase();
         if (/premier|ligue|liga|serie|bundes|champions|europa/.test(n)) return '⚽';
@@ -15853,6 +15861,7 @@
             <span>${_dataIsStale ? `Données trop anciennes (${_dataAgeMin} min) : refresh avant d'agir.` : `${bbfVisibleCount} paris affichables · cote min ${userOddMin.toFixed(2)} · bankroll ${userBankroll.toFixed(0)}€ · ${bbfClickCount} clic${bbfClickCount > 1 ? 's' : ''} Winamax`}</span>
           </section>
           ${bbfOffline}
+          ${bbfQuickActions}
           ${bbfCategoryChips}
           ${bbfCompetitionChips}
           <div class="bbf-layout">
@@ -18034,7 +18043,7 @@
       } catch(e) { return null; }
     }).filter(Boolean);
 
-    // Format : `#tous?sport=football&sport=tennis&edge=0.05&conf=0.65`
+    // Format : `#tous?sport=football&sport=tennis&edge=0.05&conf=0.65&odd=2.5`
     // Permet le partage de URL avec filtres préselectionnés.
     const _readUrlFilters = () => {
       try {
@@ -18042,14 +18051,17 @@
         const qIdx = hash.indexOf('?');
         if (qIdx < 0) return null;
         const params = new URLSearchParams(hash.slice(qIdx + 1));
+        const normalPct = (v) => isFinite(v) ? (v > 1 ? v / 100 : v) : 0;
         const sports = params.getAll('sport');
         const edge = parseFloat(params.get('edge') || '0');
         const conf = parseFloat(params.get('conf') || '0');
-        if (sports.length === 0 && !edge && !conf) return null;
+        const odd = parseFloat(params.get('odd') || '0');
+        if (sports.length === 0 && !edge && !conf && !odd) return null;
         return {
           sports: sports.filter(Boolean),
-          minEdge: isFinite(edge) ? edge : 0,
-          minConf: isFinite(conf) ? conf : 0,
+          minEdge: normalPct(edge),
+          minConf: normalPct(conf),
+          minOdd: isFinite(odd) ? odd : 0,
         };
       } catch (e) { return null; }
     };
@@ -18065,13 +18077,22 @@
             sports: Array.isArray(p.sports) ? p.sports : [],
             minEdge: typeof p.minEdge === 'number' ? p.minEdge : 0,
             minConf: typeof p.minConf === 'number' ? p.minConf : 0,
+            minOdd: typeof p.minOdd === 'number' ? p.minOdd : 0,
           };
         }
       } catch(e) {}
-      return { sports: [], minEdge: 0, minConf: 0 };
+      return { sports: [], minEdge: 0, minConf: 0, minOdd: 0 };
     };
     const tousFilters = _readFilters();
     const _readSort = () => {
+      try {
+        const hash = location.hash || '';
+        const qIdx = hash.indexOf('?');
+        if (qIdx >= 0) {
+          const qs = new URLSearchParams(hash.slice(qIdx + 1)).get('sort');
+          if (['kickoff', 'edge', 'conf', 'odd'].includes(qs)) return qs;
+        }
+      } catch(e) {}
       try {
         const s = localStorage.getItem('tousSort');
         if (['kickoff', 'edge', 'conf', 'odd'].includes(s)) return s;
@@ -18087,6 +18108,8 @@
         tousFilters.sports.forEach(s => params.append('sport', s));
         if (tousFilters.minEdge > 0) params.set('edge', tousFilters.minEdge);
         if (tousFilters.minConf > 0) params.set('conf', tousFilters.minConf);
+        if (tousFilters.minOdd > 0) params.set('odd', tousFilters.minOdd);
+        if (tousSort !== 'kickoff') params.set('sort', tousSort);
         const q = params.toString();
         const newHash = q ? `${hash}?${q}` : hash;
         if (location.hash !== newHash) {
@@ -18140,6 +18163,7 @@
       if (!p.nonTrackable) {
         if (tousFilters.minEdge > 0 && p.edge < tousFilters.minEdge) return false;
         if (tousFilters.minConf > 0 && p.rel < tousFilters.minConf) return false;
+        if (tousFilters.minOdd > 0 && p.odd < tousFilters.minOdd) return false;
       }
       return true;
     };
@@ -18155,7 +18179,7 @@
       switch (tousSort) {
         case 'edge':    return b.edge - a.edge;
         case 'conf':    return b.rel - a.rel;
-        case 'odd':     return a.odd - b.odd;
+        case 'odd':     return b.odd - a.odd;
         case 'kickoff':
         default:        return a.ts - b.ts;
       }
@@ -18170,7 +18194,7 @@
     const totalLost = finished.filter(p => p.res === 'lost').length;
     const settledCount = totalWon + totalLost;
     const wrPct = settledCount > 0 ? Math.round(100 * totalWon / settledCount) : 0;
-    const filtersActive = tousFilters.sports.length > 0 || tousFilters.minEdge > 0 || tousFilters.minConf > 0 || tousSort !== 'kickoff';
+    const filtersActive = tousFilters.sports.length > 0 || tousFilters.minEdge > 0 || tousFilters.minConf > 0 || tousFilters.minOdd > 0 || tousSort !== 'kickoff';
 
     // intelligemment vers un onglet rempli (à venir > en cours > finis) pour
     // ne pas montrer un écran "Aucun match" alors que d'autres onglets ont
@@ -18468,7 +18492,7 @@
                 <option value="kickoff" ${tousSort==='kickoff'?'selected':''}>⏱️ Heure du match</option>
                 <option value="edge" ${tousSort==='edge'?'selected':''}>📈 Meilleur edge</option>
                 <option value="conf" ${tousSort==='conf'?'selected':''}>🎯 Plus haute confiance</option>
-                <option value="odd" ${tousSort==='odd'?'selected':''}>💰 Cote la plus basse</option>
+                <option value="odd" ${tousSort==='odd'?'selected':''}>💰 Cote la plus haute</option>
               </select>
             </label>
           </div>
