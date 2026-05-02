@@ -321,3 +321,11 @@
 - Impact: premier signal marché exploitable hors cote brute, Santé `0` warning; `night_metrics.events.smart_money=10`; backtest frais `492` picks, ROI `+0.76%`, Brier `0.2292`
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.42 (2026-05-02 06:23 UTC)
+- Chantier: P-E4 sitemap dynamique matchs
+- Avant: `sitemap.xml=33` URLs, uniquement hubs/pages SPA, aucun deep-link match individuel
+- Après: `build_sitemap.py` lit `data.js` et ajoute `408` routes `#match/{id}/synthese`; `sitemap.xml=441` URLs, lastmod basé sur `generated_at`
+- Impact: structure SEO/partage plus complète pour les matchs exacts Winamax; génération cron déjà branchée, donc les routes suivent chaque refresh
+- Commit: pending
+- Status: ✅ DONE
