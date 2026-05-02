@@ -9077,6 +9077,7 @@
       return { ...c, totalOdd, avgProb, combinedProb, nextKickoff };
     });
   }
+  try { window.buildCombines = buildCombines; } catch(e){}
 
   // Human-friendly "in 2h 30" label from a duration in minutes
   function fmtIn(mins) {
