@@ -1345,3 +1345,9 @@
 - Après: backtest_v2 produit les buckets sport/ligue/marché et app.js les lit avant le fallback sport/ligue.
 - Impact: base prête pour calibrer 1N2, O/U, BTTS et marchés étendus séparément.
 - Vérif: phase10_market_calibration_audit.json, correction ciblée +7pt sur football:top5|1n2.
+
+## Sprint v35.177 — Phase 10 P-10.24 Abstain renforcé (21:26 UTC)
+- Avant: un pick pouvait rester actionnable avec edge faible ou data trop légère.
+- Après: abstain explicite si confiance <50%, edge <2pt, divergence modèle forte ou data quality <2/4.
+- Impact: moins de paris, meilleure discipline high-odds et raisons de skip auditables.
+- Vérif: phase10_abstain_audit.json, 59 prédictions, 12 actionnables, 0 erreur console.
