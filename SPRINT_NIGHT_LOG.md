@@ -189,5 +189,13 @@
 - Avant: après v35.23, le site conservait 3 matchs détaillés / 4 events >1N2 et le smoke voyait 101 marchés scorés sur 48h
 - Après: fetch détail `--limit=25 --ttl-hours=0`, catalogue merge préserve 28 matchs détaillés, `data.js` injecte 29 events >1N2, smoke Terminal Value monte à `369 marchés scorés · 56 matchs exacts sur 48h`
 - Impact: couverture multi-marchés réellement exploitable multipliée sans attendre le prochain cron détail
+- Commit: 04c2c8a6
+- Status: ✅ DONE
+
+## Sprint v35.25 (2026-05-02 06:18 UTC)
+- Chantier: Rapport final nuit
+- Avant: les sprints étaient poussés mais la synthèse réveil manquait; `night_metrics.json` venait d'être recalculé après le seed Winamax
+- Après: `SPRINT_NIGHT_REPORT.md` résume les gains, métriques avant/après, tests verts et priorités restantes; `night_metrics.json` final capture 1040 events, 314 exacts, 26 events >1N2, 25 matchs détaillés, 282 marchés scorés en smoke
+- Impact: Théo peut ouvrir un seul rapport et comprendre ce qui a bougé, ce qui est mesuré et ce qu'il faut attaquer ensuite
 - Commit: pending
 - Status: ✅ DONE
