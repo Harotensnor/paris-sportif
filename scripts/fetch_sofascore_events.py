@@ -48,8 +48,9 @@ Ce fetcher est SAFE en cas d'échec : retourne {} si Sofascore ban.
 from __future__ import annotations
 import json
 import sys
+import argparse
 import unicodedata
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 try:
@@ -197,6 +198,9 @@ def _to_espn_event(sofa_evt: dict, sport: str) -> dict | None:
         return None
 
 
+DEBUG = False
+
+
 def fetch_sport(sport: str, today: str) -> list[dict]:
     """Fetch les events scheduled pour un sport et un jour."""
     url = f'{API}/sport/{sport}/scheduled-events/{today}'
@@ -204,6 +208,8 @@ def fetch_sport(sport: str, today: str) -> list[dict]:
     if not data:
         return []
     events = data.get('events') or []
+    if DEBUG:
+        print(f'    [debug] raw {sport} {today}: {len(events)} events', flush=True)
     out = []
     for ev in events:
         e = _to_espn_event(ev, sport)
@@ -213,22 +219,42 @@ def fetch_sport(sport: str, today: str) -> list[dict]:
 
 
 def main() -> int:
-    today = datetime.now(timezone.utc).strftime('%Y-%m-%d')
-    print(f'[{datetime.now():%H:%M:%S}] fetch_sofascore_events for {today}', flush=True)
+    global DEBUG
+    ap = argparse.ArgumentParser(description='Fetch Sofascore scheduled events.')
+    ap.add_argument('--debug', action='store_true')
+    ap.add_argument('--date', default='', help='YYYY-MM-DD UTC date; default today')
+    ap.add_argument('--days', type=int, default=1, help='number of UTC days to fetch from --date')
+    ap.add_argument('--sports', default='football,tennis,basketball,ice-hockey,baseball')
+    args = ap.parse_args()
+    DEBUG = bool(args.debug)
+    start = args.date or datetime.now(timezone.utc).strftime('%Y-%m-%d')
+    try:
+        start_dt = datetime.strptime(start, '%Y-%m-%d').replace(tzinfo=timezone.utc)
+    except ValueError:
+        print(f'Invalid --date {start!r}, expected YYYY-MM-DD', file=sys.stderr)
+        return 2
+    days = max(1, min(7, int(args.days or 1)))
+    sports = [s.strip() for s in args.sports.split(',') if s.strip()]
+    print(f'[{datetime.now():%H:%M:%S}] fetch_sofascore_events from {start_dt:%Y-%m-%d} days={days}', flush=True)
 
     out = {
         'generated_at': datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
         'events': {},
     }
     total = 0
-    for sofa_sport in ('football', 'tennis', 'basketball', 'ice-hockey', 'baseball'):
-        evs = fetch_sport(sofa_sport, today)
-        espn_sport = SPORT_MAPPING.get(sofa_sport, sofa_sport)
-        out['events'][espn_sport] = evs
-        total += len(evs)
-        print(f'  {sofa_sport} ({espn_sport}): {len(evs)} events', flush=True)
+    for day_offset in range(days):
+        day = (start_dt + timedelta(days=day_offset)).strftime('%Y-%m-%d')
+        for sofa_sport in sports:
+            evs = fetch_sport(sofa_sport, day)
+            espn_sport = SPORT_MAPPING.get(sofa_sport, sofa_sport)
+            out['events'].setdefault(espn_sport, []).extend(evs)
+            total += len(evs)
+            print(f'  {day} {sofa_sport} ({espn_sport}): {len(evs)} events', flush=True)
 
     out['total'] = total
+    if total == 0 and OUT.exists():
+        print('  no events collected — preserving previous sofascore_events.json', flush=True)
+        return 1
     OUT.write_text(json.dumps(out, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
     print(f'  wrote {OUT.name} : {total} events ({OUT.stat().st_size/1024:.1f}KB)', flush=True)
     return 0
