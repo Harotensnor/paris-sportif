@@ -1021,3 +1021,11 @@
 - Impact: premier viewport mobile plus respirable sans retirer les accès principaux
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.129 (2026-05-02 15:32 UTC)
+- Chantier: P-9.57 fix P9-VIS-007 footer mobile
+- Avant: dashboard mobile 4093px, footer + second footer doc redondants
+- Après: dashboard mobile 3596px, footer mobile compact et disclaimer conservé
+- Impact: -497px de fin de page; moins de répétition sans perdre ANJ/helpline
+- Commit: pending
+- Status: ✅ DONE
