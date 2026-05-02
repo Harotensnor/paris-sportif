@@ -11321,7 +11321,7 @@
           const cands = best.allCandidates;
           const contradictedCands = Array.isArray(best.contradictedCandidates) ? best.contradictedCandidates : [];
           if (cands.length < 2 && !contradictedCands.length) return '';
-          const marketEmoji = { '1n2': '🏆', 'ou25': '⚽', 'ou15': '⚽', 'ou35': '⚽', 'btts': '🔄', 'doubleChance': '🎯', 'exactScore': '🎯', 'dnb': '🎯', 'ah': '⚖️', 'teamTotal': '⚽', 'basketTotal': '🏀', 'basketHandicap': '🏀', 'hockeyTotal': '🏒', 'puckLine': '🏒', 'baseballTotal': '⚾', 'runLine': '⚾', 'tennisGames': '🎾' };
+          const marketEmoji = { '1n2': '🏆', 'ou25': '⚽', 'ou15': '⚽', 'ou35': '⚽', 'btts': '🔄', 'doubleChance': '🎯', 'exactScore': '🎯', 'dnb': '🎯', 'teamTotal': '⚽', 'ht_1n2': '⏱️', 'resultBtts': '🎯', 'ah': '⚖️', 'basketTotal': '🏀', 'basketHandicap': '🏀', 'hockeyTotal': '🏒', 'puckLine': '🏒', 'baseballTotal': '⚾', 'runLine': '⚾', 'tennisGames': '🎾' };
           const evMin = (typeof window.advFilters !== 'undefined' && window.advFilters.evMin) || 0;
           const valueOnly = (typeof window.advFilters !== 'undefined' && window.advFilters.valueOnly) || false;
           const rows = cands.map((c, i) => {
@@ -11374,6 +11374,23 @@
           });
           const visibleRows = rows.filter(r => !isBlockedHandicapMarket(r.c));
           const handicapRows = rows.filter(r => isBlockedHandicapMarket(r.c));
+          const footExtMarkets = new Set(['ht_1n2','exactScore','teamTotal','resultBtts','ou15','ou35','btts','doubleChance','dnb']);
+          const footExtendedRows = match.sport === 'football'
+            ? visibleRows.filter(r => footExtMarkets.has(r.c.market) && !r.c.lowOddBlocked).slice(0, 6)
+            : [];
+          const footExtendedHtml = footExtendedRows.length ? `
+              <div style="margin:0 0 10px;padding:10px 12px;border:1px solid rgba(52,211,153,.24);border-radius:var(--r-sm);background:linear-gradient(135deg,rgba(52,211,153,.10),rgba(15,23,42,.18));">
+                <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:8px;">
+                  <b style="font-size:12.5px;color:var(--text);">Marchés foot étendus visibles</b>
+                  <span style="font-size:10.5px;color:var(--text-dim);">sans handicap · cohérents</span>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:6px;">
+                  ${footExtendedRows.map(r => `<div style="padding:8px 9px;border:1px solid var(--border);border-radius:var(--r-xs);background:rgba(255,255,255,.03);">
+                    <div style="font-weight:700;font-size:11.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${marketEmoji[r.c.market] || '🎯'} ${esc(r.c.label)}</div>
+                    <div style="margin-top:3px;font-size:10.5px;color:var(--text-dim);font-variant-numeric:tabular-nums;">@${r.c.odd.toFixed(2)} · edge ${r.c.edge >= 0 ? '+' : ''}${(r.c.edge*100).toFixed(1)}pt</div>
+                  </div>`).join('')}
+                </div>
+              </div>` : '';
           const rowHtml = (r) => `
                   <div style="padding:9px 12px;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${r.statusColor};border-radius:0 var(--r-sm) var(--r-sm) 0;display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;font-size:12.5px;">
                     <span class="u-text-md">${marketEmoji[r.c.market] || '🎯'}</span>
@@ -11391,6 +11408,7 @@
             <div class="section">
               <h4>🏷️ Marchés évalués (${cands.length}${contradictedRows.length ? ` + ${contradictedRows.length} écarté${contradictedRows.length > 1 ? 's' : ''}` : ''})</h4>
               <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">${marketEmoji[best.market] || '🎯'} <b class="u-text-accent">${esc(best.label)}</b> sélectionné comme meilleur pari. Les alternatives affichées restent cohérentes avec ce pick; les contradictions logiques sont cachées par défaut.</div>
+              ${footExtendedHtml}
               <div style="display:flex;flex-direction:column;gap:6px;">
                 ${visibleRows.map(rowHtml).join('')}
                 ${handicapRows.length ? `<details style="margin-top:4px;"><summary style="cursor:pointer;color:var(--text-dim);font-size:11.5px;">Voir ${handicapRows.length} handicap${handicapRows.length > 1 ? 's' : ''} masqué${handicapRows.length > 1 ? 's' : ''}</summary><div style="display:flex;flex-direction:column;gap:6px;margin-top:6px;">${handicapRows.map(rowHtml).join('')}</div></details>` : ''}
