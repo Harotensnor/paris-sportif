@@ -1187,3 +1187,10 @@
 - Impact: SEO/accessibilité plus propre, rendu inchangé
 - Commit: pending
 - Status: ✅ DONE
+## Sprint v35.151 (16:34 UTC)
+- Chantier: P-9.8/P-9.49
+- Avant: Lighthouse summary tracked encore ancien (min perf 68/90 selon phase)
+- Après: audit local final min perf 85, mobile perf 92, SEO 100, ISSUES mis à jour
+- Impact: objectif perf 80+ confirmé et P6-LH-001/P6-LH-003/P6-LH-005 clôturés
+- Commit: pending
+- Status: ✅ DONE

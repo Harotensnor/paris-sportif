@@ -188,7 +188,7 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Pages : `dashboard`, `tous`, `performance`, `academie`
 - Viewports : mobile 375px + desktop 1440px
 - Note : le runtime local n'a pas `npx/lighthouse`; le script mesure les signaux navigateur équivalents et écrit des JSON Lighthouse-shaped.
-- Scores min : Performance `46`, Accessibilité `86`, Best Practices `100`, SEO `83` après v35.81.
+- Scores min : Performance `85`, Accessibilité `69`, Best Practices `100`, SEO `100` après v35.151.
 
 ### P6-LH-001 — JS/data initial trop lourd
 
@@ -196,7 +196,7 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Preuve : `.cache/lighthouse-reports/summary.json`
 - Constat : `8636KB` JS/data initial en local, dont `data.js` ~`6919KB` et `app.js` ~`1716KB`.
 - Action : découper ou lazy-load les données/pages secondaires, compresser la data embarquée, éviter le double chargement inutile.
-- Statut : OPEN
+- Statut : FIXED v35.151 — boot data_lite + performance page sans data.js complet; audit local final min perf `85`.
 
 ### P6-LH-002 — Images/logos sans texte alternatif
 
@@ -212,7 +212,7 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Preuve : `.cache/lighthouse-reports/summary.json`
 - Constat : `23` à `68` éléments interactifs sous `40px`.
 - Action : appliquer une taille minimale 44px aux boutons/chips/menus mobiles, surtout footer et chips sport.
-- Statut : FIXED v35.143 — règle mobile globale sur boutons/liens/summary + static pages; a11y moderate `143 → 20`, 0 critical/serious.
+- Statut : FIXED v35.148 — règle mobile globale + footer/help/static legal; a11y fallback `20 → 0` moderate, 0 critical/serious.
 
 ### P6-LH-004 — Layout shift au chargement
 
@@ -228,7 +228,7 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Preuve : `.cache/lighthouse-reports/summary.json`
 - Constat : `2` H1 détectés sur les pages SPA.
 - Action : garder un seul H1 principal et convertir le logo/titre décoratif en `div`/`span` ou `h2`.
-- Statut : OPEN
+- Statut : FIXED v35.150 — l'ancien bloc Combinés caché passe en H2; audit navigateur 8 pages = 1 H1 par page.
 
 ## A11y audit P-6.5
 
