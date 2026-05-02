@@ -533,3 +533,11 @@
 - Impact: scan plus bookmaker, filtres en 1 clic; visual diff `19.52%` attendu car bandeau restauré + chips
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.68 (2026-05-02 10:25 UTC)
+- Chantier: P-5.27 CGU Winamax
+- Avant: aucune synthèse conformité dédiée dans le repo
+- Après: `cgu_winamax_summary.md` avec sources officielles, limites robot, indépendance et disclaimers
+- Impact: cadre légal clair avant CTA/outsiders/live; HTML direct 403, fallback PDF officiel Winamax
+- Commit: pending
+- Status: ✅ DONE
