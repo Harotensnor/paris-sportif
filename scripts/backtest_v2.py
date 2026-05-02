@@ -48,6 +48,7 @@ RESULTS_ARCHIVE = ROOT / 'results_archive.jsonl'
 REPORT_JSON = ROOT / 'backtest_report_v2.json'
 REPORT_MD = ROOT / 'backtest_report_v2.md'
 CALIBRATION_SEGMENTS_JSON = ROOT / 'calibration_per_sport_league.json'
+CALIBRATION_MARKETS_JSON = ROOT / 'calibration_per_sport_league_market.json'
 BANKROLL_SIM_JSON = ROOT / 'bankroll_simulation.json'
 
 COTE_BUCKETS = [
@@ -393,6 +394,7 @@ def run_backtest(opts) -> dict:
             'date': ev.get('date'),
             'sport': ev.get('sport'),
             'league_code': ev.get('league_code'),
+            'market': '1n2',
             'pick': pick_key,
             'pick_side': pick_side,
             'pick_prob': pick_prob,
@@ -520,6 +522,11 @@ def calibration_group_key(row: dict) -> str:
     else:
         tier = 'all'
     return f'{sport}:{tier}'
+
+
+def calibration_market_group_key(row: dict) -> str:
+    market = str(row.get('market') or '1n2')
+    return f'{calibration_group_key(row)}|{market}'
 
 
 def compute_streaks(rows: list[dict]) -> dict:
@@ -1012,6 +1019,7 @@ def main() -> int:
         return 1
     for row in rows:
         row['calibration_group'] = calibration_group_key(row)
+        row['calibration_market_group'] = calibration_market_group_key(row)
 
     dates = sorted(r['date'] for r in rows if r.get('date'))
     by_tier = bucket_by(rows, 'tier')
@@ -1055,6 +1063,7 @@ def main() -> int:
         'by_sport': bucket_by(rows, 'sport'),
         'by_league': bucket_by(rows, 'league_code'),
         'by_calibration_group': bucket_by(rows, 'calibration_group'),
+        'by_calibration_market_group': bucket_by(rows, 'calibration_market_group'),
         'by_cote_bucket': bucket_by(rows, 'cote_bucket'),
         'by_tier': by_tier,
         'calibration_by_tier': {
@@ -1086,6 +1095,11 @@ def main() -> int:
             for group in {r.get('calibration_group') for r in rows if r.get('calibration_group')}
             if sum(1 for r in rows if r.get('calibration_group') == group) >= 30
         },
+        'calibration_by_sport_league_market': {
+            group: calibration_bins([r for r in rows if r.get('calibration_market_group') == group], n_bins=10)
+            for group in {r.get('calibration_market_group') for r in rows if r.get('calibration_market_group')}
+            if sum(1 for r in rows if r.get('calibration_market_group') == group) >= 30
+        },
         # v31.7.14 — Recalibration isotonic (PAV) precomputee. Le client lit
         # ces pairs directement, plus besoin de recompute le PAV en JS.
         'isotonic_pairs': isotonic_calibration_pairs(rows),
@@ -1100,6 +1114,11 @@ def main() -> int:
             group: isotonic_calibration_pairs([r for r in rows if r.get('calibration_group') == group])
             for group in {r.get('calibration_group') for r in rows if r.get('calibration_group')}
             if sum(1 for r in rows if r.get('calibration_group') == group) >= 50
+        },
+        'isotonic_pairs_by_sport_league_market': {
+            group: isotonic_calibration_pairs([r for r in rows if r.get('calibration_market_group') == group])
+            for group in {r.get('calibration_market_group') for r in rows if r.get('calibration_market_group')}
+            if sum(1 for r in rows if r.get('calibration_market_group') == group) >= 50
         },
         # v31.7.21 — Streaks publics (transparence). On expose les longest
         # win/lose streaks ainsi que la streak courante (signed).
@@ -1178,6 +1197,16 @@ def main() -> int:
     }
     CALIBRATION_SEGMENTS_JSON.write_text(
         json.dumps(calibration_segments, ensure_ascii=False, indent=2), encoding='utf-8')
+    calibration_market_segments = {
+        'generated_at': report['generated_at'],
+        'schema': 'calibration_per_sport_league_market_v1',
+        'top5_leagues': sorted(FOOTBALL_TOP5_LEAGUES),
+        'groups': report.get('by_calibration_market_group', {}),
+        'calibration_by_sport_league_market': report.get('calibration_by_sport_league_market', {}),
+        'isotonic_pairs_by_sport_league_market': report.get('isotonic_pairs_by_sport_league_market', {}),
+    }
+    CALIBRATION_MARKETS_JSON.write_text(
+        json.dumps(calibration_market_segments, ensure_ascii=False, indent=2), encoding='utf-8')
     BANKROLL_SIM_JSON.write_text(
         json.dumps({
             'generated_at': report['generated_at'],

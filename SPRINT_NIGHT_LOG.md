@@ -1339,3 +1339,9 @@
 - Après: pred.ensemble expose sous-modèles, types, variance d'accord et proba finale.
 - Impact: base prête pour calibration per-market, abstain renforcé et explications par facteurs.
 - Vérif: phase10_ensemble_model_audit.json, 3 sous-modèles actifs, variance 0.0083, erreurs console 0.
+
+## Sprint v35.176 — Phase 10 P-10.23 Calibration sport/ligue/marché (21:25 UTC)
+- Avant: la calibration distinguait sport/ligue, mais pas le marché évalué.
+- Après: backtest_v2 produit les buckets sport/ligue/marché et app.js les lit avant le fallback sport/ligue.
+- Impact: base prête pour calibrer 1N2, O/U, BTTS et marchés étendus séparément.
+- Vérif: phase10_market_calibration_audit.json, correction ciblée +7pt sur football:top5|1n2.

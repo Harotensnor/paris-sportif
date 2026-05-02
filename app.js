@@ -4961,15 +4961,27 @@
     }
     return `${s}:all`;
   }
-  function _calibrateProb(rawProb, sport, leagueCode) {
+  function _calibrationMarketKey(sport, leagueCode, market) {
+    return `${_calibrationGroupKey(sport, leagueCode)}|${market || '1n2'}`;
+  }
+  function _calibrateProb(rawProb, sport, leagueCode, market) {
     const cal = window.__modelCalibration;
     if (!cal || !cal.bins || !cal.total_n || cal.total_n < 20) return rawProb;
     if (!isFinite(rawProb) || rawProb <= 0 || rawProb >= 1) return rawProb;
     // est calibré à part du foot secondaire; autres sports restent sport:all.
     let bins = cal.bins;
     let usedSportBins = false;
+    const marketKey = _calibrationMarketKey(sport, leagueCode, market || '1n2');
+    if (marketKey && cal.bySportLeagueMarket && cal.bySportLeagueMarket[marketKey]) {
+      const marketBins = cal.bySportLeagueMarket[marketKey];
+      const marketN = (cal.totalNBySportLeagueMarket && cal.totalNBySportLeagueMarket[marketKey]) || 0;
+      if (Array.isArray(marketBins) && marketBins.length >= 3 && marketN >= 40) {
+        bins = marketBins;
+        usedSportBins = true;
+      }
+    }
     const groupKey = _calibrationGroupKey(sport, leagueCode);
-    if (groupKey && cal.bySportLeagueTier && cal.bySportLeagueTier[groupKey]) {
+    if (!usedSportBins && groupKey && cal.bySportLeagueTier && cal.bySportLeagueTier[groupKey]) {
       const groupBins = cal.bySportLeagueTier[groupKey];
       const groupN = (cal.totalNBySportLeagueTier && cal.totalNBySportLeagueTier[groupKey]) || 0;
       if (Array.isArray(groupBins) && groupBins.length >= 3 && groupN >= 40) {
@@ -5020,6 +5032,7 @@
       // by_sport: { football: { n: 234, ... }, ... } (déjà existant pour KPIs)
       const bySport = rep.by_sport_calibration || null;
       const bySportLeagueTier = rep.calibration_by_sport_league_tier || null;
+      const bySportLeagueMarket = rep.calibration_by_sport_league_market || null;
       const totalNBySport = {};
       if (rep.by_sport && typeof rep.by_sport === 'object') {
         for (const [sport, stats] of Object.entries(rep.by_sport)) {
@@ -5032,13 +5045,21 @@
           if (stats && typeof stats === 'object') totalNBySportLeagueTier[group] = stats.n || 0;
         }
       }
+      const totalNBySportLeagueMarket = {};
+      if (rep.by_calibration_market_group && typeof rep.by_calibration_market_group === 'object') {
+        for (const [group, stats] of Object.entries(rep.by_calibration_market_group)) {
+          if (stats && typeof stats === 'object') totalNBySportLeagueMarket[group] = stats.n || 0;
+        }
+      }
       window.__modelCalibration = {
         bins: rep.calibration || [],
         bySport: bySport,
         bySportLeagueTier: bySportLeagueTier,
+        bySportLeagueMarket: bySportLeagueMarket,
         total_n: (rep.overall && rep.overall.n) || 0,
         totalNBySport: totalNBySport,
         totalNBySportLeagueTier: totalNBySportLeagueTier,
+        totalNBySportLeagueMarket: totalNBySportLeagueMarket,
         // Tier 1 #2 (2026-05-01) : isotonic pairs per-sport pour remap PAV
         // plus fin que les bins. Actif si >=50 picks par sport.
         isotonicPairsBySport: rep.isotonic_pairs_by_sport || null,
@@ -5385,7 +5406,7 @@
     }
     const sport = match && match.sport ? match.sport : null;
     const leagueCode = match && match.league_code ? match.league_code : null;
-    const adjusted = _calibrateProb(p.reliability, sport, leagueCode);
+    const adjusted = _calibrateProb(p.reliability, sport, leagueCode, '1n2');
     const out = adjusted === p.reliability
       ? p
       : { ...p, reliability: adjusted, reliability_raw: p.reliability, calibrated: true };
