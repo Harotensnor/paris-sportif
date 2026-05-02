@@ -1333,3 +1333,9 @@
 - Après: buildCombines exposé pour QA; audit confirme le support Buts+BTTS, safe et value.
 - Impact: les combinés riches restent vérifiables sans gonfler l'UI quand le slate est vide.
 - Vérif: phase10_rich_combines_audit.json, codeFlags sameMatchGoalCombos/Over+BTTS OK.
+
+## Sprint v35.175 — Phase 10 P-10.22 Ensemble model metadata (21:21 UTC)
+- Avant: predictMatch mélangeait plusieurs signaux mais ne renvoyait pas l'ensemble de façon exploitable.
+- Après: pred.ensemble expose sous-modèles, types, variance d'accord et proba finale.
+- Impact: base prête pour calibration per-market, abstain renforcé et explications par facteurs.
+- Vérif: phase10_ensemble_model_audit.json, 3 sous-modèles actifs, variance 0.0083, erreurs console 0.

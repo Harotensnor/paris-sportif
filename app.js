@@ -6893,6 +6893,7 @@
     // each other.
     let reliability = best_pick[1];
     let reliabilityMeta = null;
+    let ensembleMeta = null;
     // Market odds are skipped via the isMarket flag (they still shape `final`
     // above so the pick label exists, but they do NOT contribute to fiabilité).
     let pureCompCount = 0;
@@ -6919,6 +6920,36 @@
         // threshold where the combined estimate should be distrusted.
         agreement = Math.max(0, Math.min(1, 1 - sd / 0.15));
       }
+      const variance = compProbs.length >= 2
+        ? compProbs.reduce((a,b) => {
+            const mean = compProbs.reduce((x,y) => x+y, 0) / compProbs.length;
+            return a + (b - mean)*(b - mean);
+          }, 0) / compProbs.length
+        : 0;
+      const roundProb = v => Math.round((Number(v) || 0) * 1000) / 1000;
+      const modelKind = name => {
+        const n = String(name || '').toLowerCase();
+        if (n.includes('but') || n.includes('poisson')) return 'dixon_coles_xg';
+        if (n.includes('force') || n.includes('elo') || n.includes('classement')) return 'elo';
+        if (n.includes('forme') || n.includes('bilan') || n.includes('domicile') || n.includes('pace') || n.includes('goalie') || n.includes('pitcher')) return 'form';
+        if (n.includes('h2h') || n.includes('face')) return 'h2h';
+        return 'signal';
+      };
+      ensembleMeta = {
+        version: 'v35.175',
+        weights: { dixon_coles_xg: 0.40, elo: 0.25, form: 0.10, h2h: 0.05 },
+        sub_models: pureComponents.map(c => ({
+          name: c.name,
+          kind: modelKind(c.name),
+          weight: Math.round((Number(c.w) || 0) * 100) / 100,
+          pick_prob: roundProb(c[field]),
+          probs: { home: roundProb(c.pH), draw: roundProb(c.pD), away: roundProb(c.pA) }
+        })),
+        agreement_variance: Math.round(variance * 10000) / 10000,
+        final_prob: roundProb(best_pick[1]),
+        final_probs: { home: roundProb(final.pH), draw: roundProb(final.pD), away: roundProb(final.pA) },
+        pick_key: pickKey
+      };
       // Blend: agreement weighted 0.70, richness weighted 0.30. Boost factor
       // maps to [0.85, 1.08] so reliability can be modestly higher OR lower
       // than pickProb — never runaway.
@@ -6994,6 +7025,7 @@
       // Used by UI gauges and tier bucketing.
       reliability,
       reliabilityMeta,
+      ensemble: ensembleMeta,
       odds: best,
       hasDraw,
       //   isLock ≥ 0.70 — cible du 80%+ WR, aligné sur la calibration historique
