@@ -263,6 +263,14 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Action : `alt=""` décoratif pour les logos répétés, `alt="Logo équipe"` ou `alt="Photo joueur"` quand informatif.
 - Statut : FIXED v35.81
 
+### P6-VIS-015 — Panier de paris absent de l'accueil
+
+- Sévérité : MEDIUM
+- Preuve : audit Phase 5/6, aucune zone panier visible sur l'accueil Big Bets.
+- Constat : les paris suivis existaient en localStorage mais n'étaient pas résumés dans la page principale.
+- Action : ajouter un panier compact avec état vide, total mise, retour potentiel, export CSV et vidage protégé.
+- Statut : FIXED v35.82 — captures `.cache/phase4-v35-82-after-final/`, repli sous le flux pour éviter d'écraser les cartes sur desktop étroit.
+
 ## Prochains fixes recommandés
 
 1. P6-VIS-001 bottom nav overlay.

@@ -15856,6 +15856,40 @@
         try { return Number(JSON.parse(localStorage.getItem('paris_sportif_winamax_clicks_v1') || '{}').count || 0); }
         catch(e) { return 0; }
       })();
+      const bbfTrackedRows = (() => {
+        try {
+          const bets = loadTrackedBets();
+          return Object.entries(bets || {}).map(([key, bet]) => ({ key, ...(bet || {}) }));
+        } catch(e) { return []; }
+      })();
+      const bbfOpenTracked = bbfTrackedRows.filter(b => !/gagn|perdu|annul|lost|won/i.test(String(b.status || 'en cours')));
+      const bbfBasketStake = bbfOpenTracked.reduce((sum, b) => sum + (Number(b.stake) || 0), 0);
+      const bbfBasketReturn = bbfOpenTracked.reduce((sum, b) => sum + ((Number(b.stake) || 0) * (Number(b.odds || b.odd) || 0)), 0);
+      const bbfBasketHtml = `<aside class="bbf-basket bbf-empty bbf-empty--small" aria-label="Panier paris" style="position:sticky;top:132px;display:grid;gap:10px;align-self:start">
+        <span>Panier paris</span>
+        <strong>${bbfOpenTracked.length ? `${bbfOpenTracked.length} pari${bbfOpenTracked.length > 1 ? 's' : ''} suivi${bbfOpenTracked.length > 1 ? 's' : ''}` : 'Ton panier est vide'}</strong>
+        ${bbfOpenTracked.length ? `
+          <div style="display:grid;gap:8px">${bbfOpenTracked.slice(0, 4).map(b => {
+            const title = b.pick_label || b.pick || b.market_label || 'Pari suivi';
+            const teams = [b.home, b.away].filter(Boolean).join(' vs ');
+            return `<div style="display:grid;gap:2px;padding:9px;border:1px solid var(--border);border-radius:var(--r-card);background:rgba(255,255,255,.035)">
+              <b style="color:var(--text);font-size:12px">${esc(title)}</b>
+              <span style="font-size:11px;color:var(--text-dim)">${esc(teams || b.league || b.sport || 'Match suivi')}</span>
+              <em style="font-style:normal;color:var(--accent);font-weight:900">@${Number(b.odds || b.odd || 0).toFixed(2)} · ${(Number(b.stake) || 0).toFixed(2)}€</em>
+            </div>`;
+          }).join('')}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div><span>Mise</span><strong style="font-size:20px">${bbfBasketStake.toFixed(2)}€</strong></div>
+            <div><span>Retour pot.</span><strong style="font-size:20px">${bbfBasketReturn.toFixed(2)}€</strong></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <button type="button" data-basket-export>Exporter CSV</button>
+            <button type="button" data-basket-clear>Vider</button>
+          </div>` : `
+          <div aria-hidden="true" style="width:74px;height:74px;border-radius:22px;display:grid;place-items:center;background:linear-gradient(145deg,rgba(230,0,0,.18),rgba(255,255,255,.04));font-size:34px">🧾</div>
+          <span>Ajoute un pari depuis une fiche match pour suivre mise, cote et retour potentiel.</span>
+          <button type="button" class="page-btn" data-page="tous">Trouver un pari</button>`}
+      </aside>`;
       const bbfMainHtml = `
         <div class="bbf-shell" data-phase="big-bets-first">
           <section class="bbf-command" aria-live="polite">
@@ -15864,6 +15898,8 @@
           </section>
           ${bbfOffline}
           ${bbfCategoryChips}
+          <div class="bbf-layout">
+            <main class="bbf-main">
 
           <section class="bbf-hero" aria-labelledby="bbf-title">
             <div class="bbf-hero__head">
@@ -15935,6 +15971,9 @@
             <button type="button" class="page-btn" data-page="academie">Méthode</button>
             <button type="button" class="page-btn" data-page="sante">Santé data</button>
           </nav>
+            </main>
+            ${bbfBasketHtml}
+          </div>
         </div>`;
 
       wrap.innerHTML = bbfMainHtml;
@@ -15956,6 +15995,37 @@
           trackWinamaxClick(m, a.href);
         });
       });
+      const bbfExportBasket = wrap.querySelector('[data-basket-export]');
+      if (bbfExportBasket) {
+        bbfExportBasket.addEventListener('click', () => {
+          try {
+            const rows = bbfOpenTracked.map(b => [b.added_at || '', b.sport || '', b.league || '', b.home || '', b.away || '', b.pick_label || b.pick || '', b.odds || b.odd || '', b.stake || '', b.status || 'en cours']);
+            const csv = ['date,sport,league,home,away,pick,odd,stake,status'].concat(rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `panier-paris-${isoDate(new Date())}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+            if (typeof toast === 'function') toast('Panier exporté', 'success');
+          } catch(e) { if (typeof toast === 'function') toast('Export panier impossible', 'error'); }
+        });
+      }
+      const bbfClearBasket = wrap.querySelector('[data-basket-clear]');
+      if (bbfClearBasket) {
+        bbfClearBasket.addEventListener('click', async () => {
+          const ok = (typeof window._showConfirm === 'function')
+            ? await window._showConfirm({ title: 'Vider le panier ?', message: 'Les paris suivis en cours seront retirés de ce navigateur.', confirmText: 'Vider', cancelText: 'Annuler', kind: 'danger' })
+            : true;
+          if (!ok) return;
+          saveTrackedBets({});
+          if (typeof toast === 'function') toast('Panier vidé', 'success');
+          renderDashboardPage(wrap);
+        });
+      }
       return;
     }
 
