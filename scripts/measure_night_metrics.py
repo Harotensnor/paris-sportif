@@ -142,6 +142,7 @@ def main() -> int:
             "fd_calibration": sum(1 for ev in events if ev.get("fd_calibration")),
             "fd_closing_odds": sum(1 for ev in events if ev.get("fd_closing_odds")),
             "xg": sum(1 for ev in events if _has_xg(ev)),
+            "smart_money": sum(1 for ev in events if ev.get("smart_money")),
         },
         "winamax_markets": {
             "matches": len(wm_matches),

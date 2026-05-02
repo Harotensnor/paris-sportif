@@ -313,3 +313,11 @@
 - Impact: calibration plus fine sur `5` segments (`football:other=342`, `football:top5=48`, `baseball:all=58`, `basketball:all=24`, `hockey:all=20`); backtest courant `492` picks, Brier `0.2291`, ROI `-0.42%`
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.41 (2026-05-02 06:17 UTC)
+- Chantier: P-B6 smart money odds movement
+- Avant: aucun sidecar smart-money; les mouvements de cote existaient seulement en sparkline/détail, sans patch data ni nudge modèle
+- Après: `detect_smart_money.py` sort `100` signaux depuis `odds_history.jsonl`, `patch_smart_money.py` attache `10` events actifs; modèle applique un nudge capé, hero badge `Smart money`; pipeline local/prod synchronisée
+- Impact: premier signal marché exploitable hors cote brute, Santé `0` warning; `night_metrics.events.smart_money=10`; backtest frais `492` picks, ROI `+0.76%`, Brier `0.2292`
+- Commit: pending
+- Status: ✅ DONE
