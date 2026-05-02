@@ -1213,3 +1213,9 @@
 - Après: grille buteurs min 330px, colonne nom min 140px, noms sur 2 lignes.
 - Impact: dashboard desktop/wide = 4 cartes visibles, largeur nom 241-273px.
 - Vérif: scorer layout audit + bundle check PASS.
+
+## Sprint v35.155 — Phase 10 P-10.3 Tous mobile sub-nav (18:17 UTC)
+- Avant: P6-VIS-007 PARTIAL, filtres/onglets trop denses avant la liste.
+- Après: rails horizontaux scroll-snap avec fade, onglets 44px, contrôles scrollables.
+- Impact: page Tous mobile plus compacte et lisible sans seconde rangée cassée.
+- Vérif: phase10_tous_subnav_audit.json + syntax/bundle PASS.

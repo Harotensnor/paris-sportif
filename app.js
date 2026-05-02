@@ -18142,6 +18142,12 @@
       if (counts.finished > 0) return 'finished';
       return saved; // tout est vide → garder la préférence
     })();
+    const tousMobile = typeof matchMedia === 'function' && matchMedia('(max-width:720px)').matches;
+    const tousRailStyle = tousMobile
+      ? 'flex-wrap:nowrap;overflow-x:auto;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;mask-image:linear-gradient(90deg,#000 calc(100% - 32px),transparent);padding-bottom:4px;'
+      : 'flex-wrap:wrap;';
+    const tousRailItemStyle = tousMobile ? 'flex:0 0 auto;scroll-snap-align:start;min-height:44px;' : '';
+    const tousSelectStyle = tousMobile ? 'min-height:44px;' : '';
 
     const renderRow = (p, isFini) => {
       const hn = (p.home && p.home.name) || '?';
@@ -18351,10 +18357,10 @@
     })();
 
     wrap.innerHTML = `
-      <div style="max-width:1500px;margin:0 auto;padding:16px 8px 24px;font-variant-numeric:tabular-nums;">
-        <div style="padding:40px 0 20px;border-bottom:1px solid var(--border);">
+      <div style="max-width:1500px;margin:0 auto;padding:${tousMobile ? '10px 6px 18px' : '16px 8px 24px'};font-variant-numeric:tabular-nums;">
+        <div style="padding:${tousMobile ? '14px 2px 12px' : '40px 0 20px'};border-bottom:1px solid var(--border);">
           <div style="font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Aujourd'hui · Winamax</div>
-          <h1 style="margin:0 0 6px;font-size:32px;font-weight:800;letter-spacing:-1.1px;color:var(--text);line-height:1.1;">Tous les pronos du jour</h1>
+          <h1 style="margin:0 0 6px;font-size:${tousMobile ? '25px' : '32px'};font-weight:800;letter-spacing:-1.1px;color:var(--text);line-height:1.1;">Tous les pronos du jour</h1>
           <div class="u-text-md u-text-dim">${pending.length + inProgress.length} prono${(pending.length + inProgress.length)>1?'s':''} value · ${pending.length} à venir · ${inProgress.length} en cours · ${finished.length} fini${finished.length>1?'s':''}${_completedNoOdds > 0 ? ` <span class="u-text-dim2" title="${_completedNoOdds} match${_completedNoOdds>1?'s':''} terminé${_completedNoOdds>1?'s':''} sans cote pré-match capturée (qualifs WTA/Challenger, etc.) → résultat visible mais pas dans le bilan ROI.">(+${_completedNoOdds} sans cote pré-match)</span>` : ''}${settledCount ? ` (<b style="color:${wrPct>=60?'#34d399':'var(--text-dim)'};">${wrPct}% réussite</b> sur ${settledCount})` : ''}${filtersActive ? `&nbsp;·&nbsp;<span style="color:var(--brand);font-weight:600;">filtres actifs</span>` : ''}<div style="font-size:11px;color:var(--text-dim2);margin-top:3px;">↳ paris à venir/en cours = edge ≥ -2pt (bad value filtré). Finis = picks avec cote capturée pour tracker la perf modèle.</div></div>
         </div>
         ${_sourcesStats && _sourcesStats.total > 0 ? `
@@ -18366,7 +18372,7 @@
           </div>
         ` : ''}
 
-        <div class="tous-filter-bar" style="position:sticky;top:56px;z-index:20;margin:18px 0 10px;padding:14px;background:var(--panel);border:1px solid var(--border);border-radius:10px;display:flex;flex-direction:column;gap:12px;backdrop-filter:saturate(140%) blur(8px);-webkit-backdrop-filter:saturate(140%) blur(8px);">
+        <div class="tous-filter-bar" style="position:sticky;top:56px;z-index:20;margin:${tousMobile ? '12px 0 8px' : '18px 0 10px'};padding:${tousMobile ? '10px' : '14px'};background:var(--panel);border:1px solid var(--border);border-radius:10px;display:flex;flex-direction:column;gap:${tousMobile ? '8px' : '12px'};backdrop-filter:saturate(140%) blur(8px);-webkit-backdrop-filter:saturate(140%) blur(8px);">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
             <div style="display:flex;align-items:center;gap:10px;">
               <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.8px;font-weight:700;">🎛️ Filtrer &amp; trier</div>
@@ -18376,25 +18382,25 @@
             ${filtersActive ? '<button data-tous-reset style="padding:5px 10px;font-size:11px;background:transparent;color:var(--text-dim);border:1px solid var(--border-2);border-radius:6px;cursor:pointer;font-weight:600;">↻ Réinitialiser</button>' : ''}
           </div>
           ${sportsAvailable.length > 1 ? `
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-            <span style="font-size:11.5px;color:var(--text-dim);min-width:42px;">Sport</span>
+          <div style="display:flex;align-items:center;gap:8px;${tousRailStyle}">
+            <span style="font-size:11.5px;color:var(--text-dim);min-width:42px;${tousMobile ? 'display:none;' : ''}">Sport</span>
             ${sportsAvailable.map(s => {
               const isOn = tousFilters.sports.includes(s);
               const lbl = sportLabelMap[s] || (s.charAt(0).toUpperCase() + s.slice(1));
-              return `<button data-tous-sport="${esc(s)}" style="padding:6px 11px;font-size:12px;border-radius:999px;cursor:pointer;font-weight:600;border:1px solid ${isOn?'var(--brand)':'var(--border-2)'};background:${isOn?'rgba(167,139,250,.18)':'transparent'};color:${isOn?'var(--brand)':'var(--text-2)'};">${esc(lbl)}</button>`;
+              return `<button data-tous-sport="${esc(s)}" style="${tousRailItemStyle}padding:6px 11px;font-size:12px;border-radius:999px;cursor:pointer;font-weight:600;border:1px solid ${isOn?'var(--brand)':'var(--border-2)'};background:${isOn?'rgba(167,139,250,.18)':'transparent'};color:${isOn?'var(--brand)':'var(--text-2)'};">${esc(lbl)}</button>`;
             }).join('')}
           </div>` : ''}
-          <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
-            <label style="display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-dim);" title="Bug-hunt 2026-05-02 : par défaut Winamax-only (matches bookables). Toggle 'Tous' pour voir les ~840 events Sofa (non bookables sans cote propre).">
+          <div style="display:flex;align-items:center;gap:${tousMobile ? '8px' : '14px'};${tousRailStyle}">
+            <label style="${tousRailItemStyle}display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-dim);" title="Bug-hunt 2026-05-02 : par défaut Winamax-only (matches bookables). Toggle 'Tous' pour voir les ~840 events Sofa (non bookables sans cote propre).">
               Source
-              <select data-tous-mode style="padding:5px 8px;font-size:12px;background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:6px;cursor:pointer;">
+              <select data-tous-mode style="${tousSelectStyle}padding:5px 8px;font-size:12px;background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:6px;cursor:pointer;">
                 <option value="winamax" ${_tousMode==='winamax'?'selected':''}>🎯 Winamax bookable</option>
                 <option value="all" ${_tousMode==='all'?'selected':''}>📡 Tous les matchs</option>
               </select>
             </label>
-            <label style="display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-dim);">
+            <label style="${tousRailItemStyle}display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-dim);">
               Edge min
-              <select data-tous-edge style="padding:5px 8px;font-size:12px;background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:6px;cursor:pointer;">
+              <select data-tous-edge style="${tousSelectStyle}padding:5px 8px;font-size:12px;background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:6px;cursor:pointer;">
                 <option value="0" ${tousFilters.minEdge===0?'selected':''}>—</option>
                 <option value="0.03" ${tousFilters.minEdge===0.03?'selected':''}>+3%</option>
                 <option value="0.05" ${tousFilters.minEdge===0.05?'selected':''}>+5%</option>
@@ -18402,9 +18408,9 @@
                 <option value="0.10" ${tousFilters.minEdge===0.10?'selected':''}>+10%</option>
               </select>
             </label>
-            <label style="display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-dim);">
+            <label style="${tousRailItemStyle}display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-dim);">
               Confiance min
-              <select data-tous-conf style="padding:5px 8px;font-size:12px;background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:6px;cursor:pointer;">
+              <select data-tous-conf style="${tousSelectStyle}padding:5px 8px;font-size:12px;background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:6px;cursor:pointer;">
                 <option value="0" ${tousFilters.minConf===0?'selected':''}>—</option>
                 <option value="0.50" ${tousFilters.minConf===0.50?'selected':''}>50%</option>
                 <option value="0.60" ${tousFilters.minConf===0.60?'selected':''}>60%</option>
@@ -18412,9 +18418,9 @@
                 <option value="0.80" ${tousFilters.minConf===0.80?'selected':''}>80%</option>
               </select>
             </label>
-            <label style="display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-dim);margin-left:auto;">
+            <label style="${tousRailItemStyle}display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-dim);margin-left:${tousMobile ? '0' : 'auto'};">
               Trier par
-              <select data-tous-sort style="padding:5px 8px;font-size:12px;background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:6px;cursor:pointer;">
+              <select data-tous-sort style="${tousSelectStyle}padding:5px 8px;font-size:12px;background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:6px;cursor:pointer;">
                 <option value="kickoff" ${tousSort==='kickoff'?'selected':''}>⏱️ Heure du match</option>
                 <option value="edge" ${tousSort==='edge'?'selected':''}>📈 Meilleur edge</option>
                 <option value="conf" ${tousSort==='conf'?'selected':''}>🎯 Plus haute confiance</option>
@@ -18424,10 +18430,10 @@
           </div>
         </div>
 
-        <div style="display:flex;gap:8px;margin:0 0 14px;flex-wrap:wrap;">
-          <button data-tous-tab="pending" style="padding:10px 18px;border-radius:8px;border:1px solid ${activeTab==='pending'?'var(--brand)':'var(--border-2)'};background:${activeTab==='pending'?'rgba(167,139,250,.15)':'var(--panel)'};color:${activeTab==='pending'?'var(--brand)':'var(--text-2)'};font-weight:700;font-size:13px;cursor:pointer;">⏱️ À venir <span style="opacity:.7;">(${pending.length})</span></button>
-          <button data-tous-tab="inprogress" style="padding:10px 18px;border-radius:8px;border:1px solid ${activeTab==='inprogress'?'var(--brand)':'var(--border-2)'};background:${activeTab==='inprogress'?'rgba(167,139,250,.15)':'var(--panel)'};color:${activeTab==='inprogress'?'var(--brand)':'var(--text-2)'};font-weight:700;font-size:13px;cursor:pointer;">🔴 En cours <span style="opacity:.7;">(${inProgress.length})</span></button>
-          <button data-tous-tab="finished" title="${_completedNoOdds > 0 ? `Dont ${_completedNoOdds} sans cote pré-match capturée (qualifs WTA/Challenger, etc.) — résultat visible mais pas dans le bilan ROI` : ''}" style="padding:10px 18px;border-radius:8px;border:1px solid ${activeTab==='finished'?'var(--brand)':'var(--border-2)'};background:${activeTab==='finished'?'rgba(167,139,250,.15)':'var(--panel)'};color:${activeTab==='finished'?'var(--brand)':'var(--text-2)'};font-weight:700;font-size:13px;cursor:pointer;">✅ Finis <span style="opacity:.7;">(${finished.length})</span></button>
+        <div style="display:flex;gap:8px;margin:0 0 14px;${tousRailStyle}">
+          <button data-tous-tab="pending" style="${tousRailItemStyle}padding:10px 18px;border-radius:8px;border:1px solid ${activeTab==='pending'?'var(--brand)':'var(--border-2)'};background:${activeTab==='pending'?'rgba(167,139,250,.15)':'var(--panel)'};color:${activeTab==='pending'?'var(--brand)':'var(--text-2)'};font-weight:700;font-size:13px;cursor:pointer;">⏱️ À venir <span style="opacity:.7;">(${pending.length})</span></button>
+          <button data-tous-tab="inprogress" style="${tousRailItemStyle}padding:10px 18px;border-radius:8px;border:1px solid ${activeTab==='inprogress'?'var(--brand)':'var(--border-2)'};background:${activeTab==='inprogress'?'rgba(167,139,250,.15)':'var(--panel)'};color:${activeTab==='inprogress'?'var(--brand)':'var(--text-2)'};font-weight:700;font-size:13px;cursor:pointer;">🔴 En cours <span style="opacity:.7;">(${inProgress.length})</span></button>
+          <button data-tous-tab="finished" title="${_completedNoOdds > 0 ? `Dont ${_completedNoOdds} sans cote pré-match capturée (qualifs WTA/Challenger, etc.) — résultat visible mais pas dans le bilan ROI` : ''}" style="${tousRailItemStyle}padding:10px 18px;border-radius:8px;border:1px solid ${activeTab==='finished'?'var(--brand)':'var(--border-2)'};background:${activeTab==='finished'?'rgba(167,139,250,.15)':'var(--panel)'};color:${activeTab==='finished'?'var(--brand)':'var(--text-2)'};font-weight:700;font-size:13px;cursor:pointer;">✅ Finis <span style="opacity:.7;">(${finished.length})</span></button>
         </div>
         <div style="display:flex;flex-direction:column;gap:8px;">
           ${activeTab === 'pending' ? pendingHtml : activeTab === 'inprogress' ? inProgressHtml : finishedHtml}
