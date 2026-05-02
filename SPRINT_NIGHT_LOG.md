@@ -829,3 +829,11 @@
 - Impact: les PC classiques profitent aussi du layout desktop complet
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.105 (2026-05-02 13:07 UTC)
+- Chantier: P-8.6 compaction desktop
+- Avant: dashboard desktop 4452px, hero trop vertical sur 1440px
+- Après: desktop 3964px, wide 3606px, layout 240/796/300 à 1440px sans overflow
+- Impact: plus de paris visibles par écran PC, sans abandonner les rails desktop
+- Commit: pending
+- Status: ✅ DONE
