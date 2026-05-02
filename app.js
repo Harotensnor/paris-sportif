@@ -15725,6 +15725,7 @@
       const bbfTeamName = (team) => team?.short || team?.displayName || team?.name || '?';
       const bbfCard = (p, mode) => {
         const { home, away } = getSides(p.m);
+        const matchId = String(p.m.id || '');
         const strength = bbfStrength(p);
         const stake = bbfStake(p, mode === 'hero' ? 0.06 : 0.035);
         const gain = stake * (p.odd - 1);
@@ -15736,9 +15737,14 @@
         const backdropLogo = (team) => team?.logo ? `<img src="${esc(team.logo)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : '';
         const heroBackdrop = mode === 'hero' ? `<div class="bbf-card__backdrop" aria-hidden="true">${backdropLogo(home)}${backdropLogo(away)}</div>` : '';
         const centerTime = mode === 'hero' && typeof fmtTime === 'function' ? fmtTime(p.m.date) : 'vs';
+        const sm = p.m?.smart_money;
+        const smartBadge = sm && Number(sm.confidence || 0) >= 0.45
+          ? `<button type="button" class="bbf-smart" data-big-detail="${esc(matchId)}" title="Cote ${Number(sm.odd_open || 0).toFixed(2)} → ${Number(sm.odd_latest || 0).toFixed(2)} · confiance ${Math.round(Number(sm.confidence || 0) * 100)}%">💰 -${Number(sm.odd_drop_pct || 0).toFixed(1)}% ▲</button>`
+          : '';
         return `
-          <article class="bbf-card ${mode === 'hero' ? 'bbf-card--hero' : 'bbf-card--compact'} ${minutes > 0 && minutes < 120 ? 'bbf-card--soon' : ''}" data-match-id="${esc(String(p.m.id || ''))}">
+          <article class="bbf-card ${mode === 'hero' ? 'bbf-card--hero' : 'bbf-card--compact'} ${minutes > 0 && minutes < 120 ? 'bbf-card--soon' : ''}" data-match-id="${esc(matchId)}">
             ${heroBackdrop}
+            ${smartBadge}
             <header class="bbf-card__top">
               <span>${esc(sportLabel(p.m.sport))} · ${esc((p.m.league_name || '').slice(0, 42))}</span>
               <b>${esc(timeLabel)}</b>
@@ -15757,9 +15763,9 @@
               ${bbfReasons(p).map(r => `<li>${esc(r)}</li>`).join('')}
             </ul>
             <footer class="bbf-card__actions">
-              <button type="button" data-big-detail="${esc(String(p.m.id || ''))}">Voir pourquoi</button>
+              <button type="button" data-big-detail="${esc(matchId)}">Voir pourquoi</button>
               ${hasDeepLink
-                ? `<a href="${esc(href)}" target="_blank" rel="noopener" data-winamax-click data-match-id="${esc(String(p.m.id || ''))}">Placer chez Winamax →</a>`
+                ? `<a href="${esc(href)}" target="_blank" rel="noopener" data-winamax-click data-match-id="${esc(matchId)}">Placer chez Winamax →</a>`
                 : `<span class="bbf-card__disabled">Cote non liée</span>`}
             </footer>
           </article>`;
