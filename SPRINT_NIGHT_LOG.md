@@ -133,5 +133,13 @@
 - Avant: Terminal Value scannait seulement aujourd'hui; mesure locale `today_exact=0`, `next48_exact=217`, donc le cockpit pouvait afficher vide malgré des opportunités bookables demain
 - Après: scanner cockpit passe sur les matchs exacts à venir <48h; smoke navigateur local confirme `77 marchés scorés · 77 matchs exacts sur 48h`, aucun ticket vide forcé, 0 erreur console
 - Impact: le site ne rate plus les paris value de demain quand la journée courante est creuse ou terminée
+- Commit: 11e16cd6
+- Status: ✅ DONE
+
+## Sprint v35.18 (2026-05-02 04:44 UTC)
+- Chantier: P5 Ticket attaque score dédié
+- Avant: `Ticket attaque` triait surtout par EV brute; smoke: FC Tokyo -1 @4.30, EV +166%, prob 62%, score 49/100
+- Après: score attaque dédié EV + cote haute + confiance + proba minimale; garde-fous prob >=18%, score >=42; smoke navigateur conserve FC Tokyo -1 @4.30 sans erreur
+- Impact: le ticket haute cote suit explicitement l'objectif “grosse cote crédible”, sans choisir une cote longue seulement parce que l'EV brute explose
 - Commit: pending
 - Status: ✅ DONE
