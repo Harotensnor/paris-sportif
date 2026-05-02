@@ -55,7 +55,7 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Preuve : `.cache/phase4-phase6-baseline/dashboard-desktop.png`
 - Constat : les cards joueurs affichent `Ollie...`, `Derr...`, `Luca...` même en desktop, ce qui rend la section peu exploitable.
 - Action : revoir le layout `bbf-scorer`, réserver une vraie colonne nom, passer en deux lignes lisibles.
-- Statut : PARTIAL v35.79 — grille buteur passée à 4 colonnes + CTA pleine largeur; noms moins cassés mais encore ellipsés sur cards étroites.
+- Statut : FIXED v35.154 — grille buteurs élargie, colonne nom min 140px, noms autorisés sur 2 lignes et preuve layout `phase10_scorer_layout_audit.json` (4 cartes dashboard visibles, largeur nom 241-273px desktop/wide).
 
 ### P6-VIS-005 — Photos/logos manquants affichés comme carrés vides
 
