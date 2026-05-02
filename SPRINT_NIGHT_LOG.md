@@ -1255,3 +1255,9 @@
 - Après: toggle persistant Focus ON, garde Big Bets/Solides/Outsiders et cache panier, raccourcis, stats, buteurs.
 - Impact: accueil desktop 2987px → 1998px en focus, mobile 3223px → 2732px.
 - Vérif: phase10_focus_mode_audit.json, overflow horizontal = 0.
+
+## Sprint v35.162 — Phase 10 P-10.10 Préférences stratégie (18:40 UTC)
+- Avant: Profil avait cote min/sports favoris mais pas de réglages stratégie appliqués au feed.
+- Après: sliders risque/diversification/confiance + ligues exclues, lus par l'Accueil avant le tri Big Bets.
+- Impact: Théo peut durcir ou relâcher son style high-odds sans changer le code.
+- Vérif: phase10_strategy_prefs_audit.json + syntax/bundle PASS.
