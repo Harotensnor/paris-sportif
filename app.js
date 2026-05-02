@@ -11086,6 +11086,23 @@
                     <div style="margin-top:4px;font-size:10.5px;color:var(--text-dim2,#7b8693);line-height:1.3;">Poisson NHL depuis forme récente, goalie et pace. Totaux uniquement, sans handicap.</div>
                   </div>`;
               }
+              let baseballMarketsHtml = '';
+              if (match.sport === 'baseball' && sc.markets) {
+                const bbChip = (g, prefix = '') => {
+                  const pPick = g.pOver >= g.pUnder ? g.pOver : g.pUnder;
+                  const sideLbl = g.pOver >= g.pUnder ? `Plus de ${g.line}` : `Moins de ${g.line}`;
+                  return `<span style="padding:8px 12px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);font-size:12px;font-weight:650;color:var(--text);font-variant-numeric:tabular-nums;">${esc(prefix ? `${prefix} ${sideLbl}` : sideLbl)} runs · ${(pPick*100).toFixed(0)}%</span>`;
+                };
+                const totalsTop = (sc.markets.totals || []).map(g => bbChip(g)).join('');
+                const f5Top = (sc.markets.totalsF5 || []).map(g => bbChip(g, 'F5')).join('');
+                baseballMarketsHtml = `
+                  <div class="u-mt-3">
+                    <div class="lbl-tiny-mb">⚾ Total runs baseball</div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">${totalsTop}</div>
+                    ${f5Top ? `<div class="lbl-tiny-mb u-mt-3">⚾ F5 totals</div><div style="display:flex;gap:8px;flex-wrap:wrap;">${f5Top}</div>` : ''}
+                    <div style="margin-top:4px;font-size:10.5px;color:var(--text-dim2,#7b8693);line-height:1.3;">Projection MLB depuis forme récente et pitchers. Totaux uniquement, sans handicap.</div>
+                  </div>`;
+              }
               return `
               <div style="margin-top:14px;">
                 <div class="lbl-tiny-mb">${heading}</div>
@@ -11094,6 +11111,7 @@
                 ${tennisGamesHtml}
                 ${basketMarketsHtml}
                 ${hockeyMarketsHtml}
+                ${baseballMarketsHtml}
               </div>`;
             })()}
             ${(() => {

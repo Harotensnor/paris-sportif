@@ -1303,3 +1303,9 @@
 - Après: bloc dédié Total buts hockey + Team totals, sans handicap visible.
 - Impact: NHL plus exploitable sur marchés O/U et team totals, aligné avec préférence anti-handicap.
 - Vérif: phase10_hockey_extended_markets_audit.json, 4 lignes total + 4 team totals, 0 puck line promu.
+
+## Sprint v35.170 — Phase 10 P-10.18 Marchés baseball étendus visibles (21:07 UTC)
+- Avant: la modale MLB montrait le score projeté mais pas les lignes runs/F5.
+- Après: Total runs 6.5-10.5 + F5 totals visibles, sans handicap.
+- Impact: plus de marchés baseball exploitables malgré l'exclusion des handicaps.
+- Vérif: phase10_baseball_extended_markets_audit.json, 5 totals + 2 F5, 0 handicap promu.
