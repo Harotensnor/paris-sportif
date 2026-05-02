@@ -26097,8 +26097,9 @@
     const globalEmoji = critCount > 0 ? '🔴' : warnCount > 0 ? '🟠' : '🟢';
     const globalLabel = critCount > 0 ? 'Problème critique' : warnCount > 0 ? 'Alertes mineures' : 'Tout est vert';
     const globalColor = critCount > 0 ? '#f87171' : warnCount > 0 ? '#eab308' : '#34d399';
+    const santeMobile = typeof matchMedia === 'function' && matchMedia('(max-width:760px)').matches;
+    const santeFold = (title, html) => !html ? '' : (santeMobile ? `<details class="sante-fold"><summary>${title}</summary><div>${html}</div></details>` : html);
 
-    // Badge compteur d'alertes dans la nav
     const navBadge = document.getElementById('count-sante-alerts');
     if (navBadge) {
       const n = warnCount + critCount;
@@ -26134,7 +26135,6 @@
         </div>`;
     };
 
-    // Recommandations synthèse
     const recos = [];
     checks.forEach(c => {
       if (c.status === 'crit') recos.push({ sev: 'crit', text: `<b>${esc(c.label)}</b> — ${esc(c.detail)}${c.action ? ` <i>(clique « ${esc(c.action.label)} » à droite)</i>` : ''}` });
@@ -26148,7 +26148,6 @@
         `).join('')
       : '<div style="padding:10px 14px;background:rgba(52,211,153,.08);border-left:3px solid #34d399;border-radius:8px;color:var(--text);font-size:13px;">🟢 Aucune action requise — site en bonne santé.</div>';
 
-    // Matrice sports compacte
     const sportMatrix = (() => {
       const emo = { football:'⚽', tennis:'🎾', basketball:'🏀', hockey:'🏒', 'american-football':'🏈', mma:'🥊', golf:'⛳', racing:'🏎️' };
       const SPORTS = Object.keys(emo);
@@ -26166,7 +26165,6 @@
         </div>`;
     })();
 
-    // Erreurs récentes (si présentes, détails + export)
     const errCheck = checks.find(c => c.key === 'js-errors');
     const errList = errCheck && errCheck.extras && errCheck.extras.recent ? errCheck.extras.recent : [];
     const errBurstHtml = errList.length > 10 ? `
@@ -26320,6 +26318,14 @@
           </div>
         </div>`;
     })();
+    const allChecksHtml = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div style="font-size:13px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;">📋 Tous les checks</div>
+        <button id="sante-rerun-btn" style="background:rgba(167,139,250,.15);color:var(--brand);border:1px solid rgba(167,139,250,.3);border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;">🔁 Re-vérifier</button>
+      </div>
+      <div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+        ${checks.map((c, i) => checkRow(c, i)).join('')}
+      </div>`;
 
     wrap.innerHTML = `
       <div style="max-width:1200px;margin:0 auto;padding:16px 20px 24px;">
@@ -26450,30 +26456,22 @@
           </div>`;
         })()}
 
-        ${pipelineLagHtml}
+        ${santeFold('⏱ Pipeline lag par script', pipelineLagHtml)}
 
-        ${pipelineDriftHtml}
+        ${santeFold('🧭 Drift pipeline local/cron', pipelineDriftHtml)}
 
-        ${sportRoiGuardHtml}
+        ${santeFold('🛡 Garde-fou ROI sport', sportRoiGuardHtml)}
 
         <div style="margin-top:22px;">
           <div style="font-size:13px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;">🎯 Matchs restants par sport</div>
           ${sportMatrix}
         </div>
 
-        <div style="margin-top:22px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-            <div style="font-size:13px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;">📋 Tous les checks</div>
-            <button id="sante-rerun-btn" style="background:rgba(167,139,250,.15);color:var(--brand);border:1px solid rgba(167,139,250,.3);border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;">🔁 Re-vérifier</button>
-          </div>
-          <div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;overflow:hidden;">
-            ${checks.map((c, i) => checkRow(c, i)).join('')}
-          </div>
-        </div>
+        ${santeFold('📋 Tous les checks détaillés', allChecksHtml)}
 
         ${errBurstHtml}
 
-        ${errListHtml}
+        ${santeFold('🐞 Dernières erreurs JS', errListHtml)}
 
         <div style="margin-top:24px;font-size:11px;color:var(--text-dim);font-style:italic;line-height:1.6;">
           💡 Les checks sont recalculés à chaque visite de cette page. Les actions (🔁 Forcer refresh, 🔄 Re-register SW, 🧹 Nettoyer caches) sont manuelles et réversibles.

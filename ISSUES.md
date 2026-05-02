@@ -300,7 +300,7 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Preuve : `.cache/phase4-phase9-current/sante-mobile.png` (`375x6447`)
 - Constat : la page Santé empile trop de tables techniques; la lecture mobile devient un long tunnel.
 - Action : transformer pipeline lag / erreurs JS / checks détaillés en accordéons fermés par défaut.
-- Statut : OPEN
+- Statut : FIXED v35.124 — pipeline lag, drift, ROI guard, checks détaillés et erreurs JS repliés sur mobile; hauteur `6447px → 3626px`.
 
 ### P9-VIS-003 — Profil desktop reste trop mono-colonne
 

@@ -981,3 +981,11 @@
 - Impact: accueil mobile plus direct; Big Bets + 3 Solides visibles, panier déplacé hors flux mobile
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.124 (2026-05-02 14:41 UTC)
+- Chantier: P-9.52 fix P9-VIS-002 Santé mobile
+- Avant: santé mobile 6447px avec tables techniques en continu
+- Après: santé mobile 3626px, détails lourds repliés en accordéons
+- Impact: lecture mobile divisée par 44%; KPI et alertes restent visibles sans tunnel technique
+- Commit: pending
+- Status: ✅ DONE
