@@ -1297,3 +1297,9 @@
 - Après: total jeux match, total jeux par set et score exact sets rendus visibles.
 - Impact: plus de marchés tennis lisibles sans nouvelle source data ni fetch externe.
 - Vérif: phase10_tennis_extended_markets_audit.json, BO5, 2 lignes match + 3 lignes set + scores exacts.
+
+## Sprint v35.169 — Phase 10 P-10.17 Marchés hockey étendus visibles (21:04 UTC)
+- Avant: les totaux hockey restaient noyés dans le score projeté ou les marchés évalués.
+- Après: bloc dédié Total buts hockey + Team totals, sans handicap visible.
+- Impact: NHL plus exploitable sur marchés O/U et team totals, aligné avec préférence anti-handicap.
+- Vérif: phase10_hockey_extended_markets_audit.json, 4 lignes total + 4 team totals, 0 puck line promu.
