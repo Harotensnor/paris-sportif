@@ -1435,3 +1435,9 @@
 - Après: g+h/t/m/e/p, j/k, Enter et B=mode Big Bets sont actifs.
 - Impact: navigation clavier plus rapide, avec 1.4KB regagnés en commentaires legacy.
 - Vérif: node --check app.js, bundle OK, diff check OK.
+
+## Sprint v35.192 — Phase 10 P-10.40 Print stylesheet (22:17 UTC)
+- Avant: imprimer une fiche match gardait header, nav et styles écran.
+- Après: print.css dédié masque l'UI, stabilise modals/cards et ajoute les URLs.
+- Impact: fiche match partageable en PDF sans alourdir app.css.
+- Vérif: bundle OK, diff check OK.
