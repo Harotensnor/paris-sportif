@@ -305,3 +305,11 @@
 - Impact: debugging navigateur réel beaucoup plus rapide; Théo peut exporter un crash sans ouvrir la console; bundle reste sous budget
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.40 (2026-05-02 06:10 UTC)
+- Chantier: P-B1 calibration sport + tier ligue
+- Avant: calibration client par sport seulement; le foot top-5 et le foot secondaire étaient mélangés dans le même biais
+- Après: `calibration_group` généré (`football:top5`, `football:other`, `baseball:all`, etc.), sidecar `calibration_per_sport_league.json`, frontend priorise les bins sport+ligue si `n>=40`
+- Impact: calibration plus fine sur `5` segments (`football:other=342`, `football:top5=48`, `baseball:all=58`, `basketball:all=24`, `hockey:all=20`); backtest courant `492` picks, Brier `0.2291`, ROI `-0.42%`
+- Commit: pending
+- Status: ✅ DONE

@@ -4826,15 +4826,34 @@
   //   { calibration: [...], by_sport_calibration: { football: [...], tennis: [...], ... } }
   // Si la clé `by_sport_calibration` est absente, comportement identique à avant.
   window.__modelCalibration = null; // { bins, bySport, total_n, total_n_by_sport }
-  function _calibrateProb(rawProb, sport) {
+  function _calibrationGroupKey(sport, leagueCode) {
+    const s = String(sport || 'unknown');
+    const l = String(leagueCode || '');
+    if (s === 'football') {
+      return `football:${['eng.1','esp.1','ita.1','ger.1','fra.1'].includes(l) ? 'top5' : 'other'}`;
+    }
+    return `${s}:all`;
+  }
+  function _calibrateProb(rawProb, sport, leagueCode) {
     const cal = window.__modelCalibration;
     if (!cal || !cal.bins || !cal.total_n || cal.total_n < 20) return rawProb;
     if (!isFinite(rawProb) || rawProb <= 0 || rawProb >= 1) return rawProb;
-    // Sprint 109 — Tentative per-sport d'abord. On exige ≥30 obs sur le sport
-    // entier pour appliquer ses bins (sinon trop bruité).
+    // v35.40 — Tentative per sport+league tier d'abord. Le foot top-5
+    // est calibré à part du foot secondaire; autres sports restent sport:all.
     let bins = cal.bins;
     let usedSportBins = false;
-    if (sport && cal.bySport && cal.bySport[sport]) {
+    const groupKey = _calibrationGroupKey(sport, leagueCode);
+    if (groupKey && cal.bySportLeagueTier && cal.bySportLeagueTier[groupKey]) {
+      const groupBins = cal.bySportLeagueTier[groupKey];
+      const groupN = (cal.totalNBySportLeagueTier && cal.totalNBySportLeagueTier[groupKey]) || 0;
+      if (Array.isArray(groupBins) && groupBins.length >= 3 && groupN >= 40) {
+        bins = groupBins;
+        usedSportBins = true;
+      }
+    }
+    // Sprint 109 — Fallback per-sport. On exige ≥30 obs sur le sport entier
+    // pour appliquer ses bins (sinon trop bruité).
+    if (!usedSportBins && sport && cal.bySport && cal.bySport[sport]) {
       const sportBins = cal.bySport[sport];
       const sportN = (cal.totalNBySport && cal.totalNBySport[sport]) || 0;
       if (Array.isArray(sportBins) && sportBins.length >= 3 && sportN >= 30) {
@@ -4878,17 +4897,26 @@
       // by_sport_calibration: { football: [bins], tennis: [bins], ... }
       // by_sport: { football: { n: 234, ... }, ... } (déjà existant pour KPIs)
       const bySport = rep.by_sport_calibration || null;
+      const bySportLeagueTier = rep.calibration_by_sport_league_tier || null;
       const totalNBySport = {};
       if (rep.by_sport && typeof rep.by_sport === 'object') {
         for (const [sport, stats] of Object.entries(rep.by_sport)) {
           if (stats && typeof stats === 'object') totalNBySport[sport] = stats.n || 0;
         }
       }
+      const totalNBySportLeagueTier = {};
+      if (rep.by_calibration_group && typeof rep.by_calibration_group === 'object') {
+        for (const [group, stats] of Object.entries(rep.by_calibration_group)) {
+          if (stats && typeof stats === 'object') totalNBySportLeagueTier[group] = stats.n || 0;
+        }
+      }
       window.__modelCalibration = {
         bins: rep.calibration || [],
         bySport: bySport,
+        bySportLeagueTier: bySportLeagueTier,
         total_n: (rep.overall && rep.overall.n) || 0,
         totalNBySport: totalNBySport,
+        totalNBySportLeagueTier: totalNBySportLeagueTier,
         // Tier 1 #2 (2026-05-01) : isotonic pairs per-sport pour remap PAV
         // plus fin que les bins. Actif si >=50 picks par sport.
         isotonicPairsBySport: rep.isotonic_pairs_by_sport || null,
@@ -5246,7 +5274,8 @@
       return _markSuspectIfHugeEdge(p, match);
     }
     const sport = match && match.sport ? match.sport : null;
-    const adjusted = _calibrateProb(p.reliability, sport);
+    const leagueCode = match && match.league_code ? match.league_code : null;
+    const adjusted = _calibrateProb(p.reliability, sport, leagueCode);
     const out = adjusted === p.reliability
       ? p
       : { ...p, reliability: adjusted, reliability_raw: p.reliability, calibrated: true };
