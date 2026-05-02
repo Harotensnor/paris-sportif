@@ -741,3 +741,11 @@
 - Impact: Théo voit immédiatement quand réduire la mise ou sécuriser les gains
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.94 (2026-05-02 13:42 UTC)
+- Chantier: P-7.1 anti-handicap
+- Avant: marchés handicap/runline/puckline/spread pouvaient remonter dans le meilleur marché
+- Après: 0 handicap bloqué sélectionné; 43/48 candidats handicap masqués, 5 exceptions edge >15pt + cote >=2.50
+- Impact: les Big Bets/Solides/Outsiders privilégient 1N2, O/U, BTTS et totals sans imposer les -1/+1
+- Commit: pending
+- Status: ✅ DONE
