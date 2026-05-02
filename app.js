@@ -15591,6 +15591,15 @@
         const pct = Math.max(0, Math.min(capPct || 0.05, capped || 0));
         return Math.max(1, Math.round(userBankroll * pct));
       };
+      const bbfTopBucket = (items, getter) => {
+        const buckets = new Map();
+        items.forEach((item) => {
+          const key = String(getter(item) || '').trim();
+          if (!key) return;
+          buckets.set(key, (buckets.get(key) || 0) + 1);
+        });
+        return [...buckets.entries()].sort((a, b) => b[1] - a[1])[0] || null;
+      };
       const bbfReasons = (p) => {
         const reasons = [];
         const implied = p.odd > 1 ? 1 / p.odd : 0;
@@ -15601,6 +15610,40 @@
         if (p.investment?.score) reasons.push(`Qualité du signal : ${Math.round(p.investment.score)}/100.`);
         return reasons.slice(0, 3);
       };
+      const bbfStrategyPool = [...bbfBigBets, ...bbfGoodBets, ...bbfOutsiderBets, ...bbfBigOddsBets].filter(Boolean);
+      const bbfStrategySport = bbfTopBucket(bbfStrategyPool, p => p.m?.sport);
+      const bbfStrategyLeague = bbfTopBucket(bbfStrategyPool, p => p.m?.league_name || p.m?.league || p.m?.league_code);
+      const bbfStrategyMarket = bbfTopBucket(bbfStrategyPool, p => (p.best?.market || p.best?.key || bbfMarketLabel(p)).split(':')[0]);
+      const bbfStrategyMarketName = (raw) => {
+        const key = String(raw || '').toLowerCase();
+        if (key.includes('btts')) return 'Les deux équipes marquent';
+        if (key.includes('ou') || key.includes('total')) return 'Plus / moins de buts';
+        if (key.includes('exact')) return 'Score exact';
+        if (key.includes('1n2')) return 'Résultat du match';
+        return raw || 'Aucun';
+      };
+      const bbfStrategyOdd = bbfStrategyPool.length ? bbfStrategyPool.reduce((s, p) => s + Number(p.odd || 0), 0) / bbfStrategyPool.length : 0;
+      const bbfStrategyExposure = Math.min(5, Math.max(0, bbfStrategyPool.slice(0, 6).reduce((s, p) => s + bbfStake(p, 0.02), 0) / Math.max(1, userBankroll) * 100));
+      const bbfStrategyMain = bbfBigBets.length
+        ? `Priorité aux Big Bets: ${bbfBigBets.length} pari${bbfBigBets.length > 1 ? 's' : ''} entre 2.20 et 3.50.`
+        : bbfGoodBets.length
+          ? `Pas de Big Bet strict: jouer léger sur ${bbfGoodBets.length} Solide${bbfGoodBets.length > 1 ? 's' : ''}.`
+          : bbfOutsiderBets.length
+            ? `Journée outsiders: petite mise, cote moyenne ${bbfStrategyOdd.toFixed(2)}.`
+            : `Pas de pari prioritaire: mieux vaut attendre une cote plus nette.`;
+      const bbfStrategyHtml = `
+        <section class="bbf-section" aria-label="Stratégie du jour">
+          <div class="bbf-empty" style="max-width:none;background:linear-gradient(135deg,rgba(230,0,0,.13),rgba(255,255,255,.035));">
+            <span>Stratégie du jour</span>
+            <strong>${esc(bbfStrategyMain)}</strong>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;">
+              <div><span>Marché à privilégier</span><strong style="font-size:18px;">${esc(bbfStrategyMarketName(bbfStrategyMarket ? bbfStrategyMarket[0] : 'Aucun'))}</strong><em>${bbfStrategyMarket ? `${bbfStrategyMarket[1]} signal${bbfStrategyMarket[1] > 1 ? 's' : ''}` : 'patience'}</em></div>
+              <div><span>Sport dominant</span><strong style="font-size:18px;">${esc(bbfStrategySport ? sportLabel(bbfStrategySport[0]) : 'Aucun')}</strong><em>${bbfStrategySport ? `${bbfStrategySport[1]} opportunité${bbfStrategySport[1] > 1 ? 's' : ''}` : 'pas de concentration'}</em></div>
+              <div><span>Exposition max</span><strong style="font-size:18px;">${bbfStrategyExposure ? `${bbfStrategyExposure.toFixed(1)}% bankroll` : '0%'}</strong><em>plafond recommandé aujourd'hui</em></div>
+              <div><span>Diversification</span><strong style="font-size:18px;">Max 3 même ligue</strong><em>${bbfStrategyLeague ? `${esc(bbfStrategyLeague[0])}: ${bbfStrategyLeague[1]}` : 'aucun cluster'}</em></div>
+            </div>
+          </div>
+        </section>`;
       const bbfTeamName = (team) => team?.short || team?.displayName || team?.name || '?';
       const bbfCard = (p, mode) => {
         const { home, away } = getSides(p.m);
@@ -15824,6 +15867,8 @@
             </div>
             ${_dataIsStale ? bbfEmpty : (bbfBigBets.length ? `<div class="bbf-grid bbf-grid--hero">${bbfBigBets.map(p => bbfCard(p, 'hero')).join('')}</div>` : bbfEmpty)}
           </section>
+
+          ${bbfStrategyHtml}
 
           <section class="bbf-section">
             <div class="bbf-section__head">
