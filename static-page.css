@@ -696,3 +696,71 @@ nav.breadcrumb a:hover, .breadcrumb a:hover {
   color: #f1f3f9;
   text-decoration: underline;
 }
+
+/* Phase 6 a11y pass — static pages keep dark contrast even when legacy
+   inline styles or gradient text are present. */
+html,
+body {
+  color-scheme: dark !important;
+  color: var(--sp-text) !important;
+  background: var(--sp-bg) !important;
+}
+h1,
+.sp-hero h1 {
+  color: #f8fafc !important;
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+  -webkit-text-fill-color: #f8fafc !important;
+}
+a { color: #d8b4fe !important; }
+a:hover,
+a:focus { color: #f5f3ff !important; }
+.lead,
+.sp-hero p.sp-lede,
+section.card,
+.sp-card p,
+footer.site-footer,
+.grid-meta > div:nth-child(odd) {
+  color: #cbd5e1 !important;
+}
+section.card,
+.sp-card,
+table,
+tbody td {
+  background: var(--sp-panel) !important;
+  border-color: var(--sp-border) !important;
+}
+section.card.purple {
+  background: rgba(167,139,250,.08) !important;
+  border-color: rgba(167,139,250,.30) !important;
+}
+section.card.danger {
+  background: rgba(248,113,113,.08) !important;
+  border-color: rgba(248,113,113,.32) !important;
+}
+section.card.purple p,
+section.card.danger p,
+section.card p,
+section.card.purple li,
+section.card.danger li,
+section.card li {
+  color: #f1f5f9 !important;
+}
+footer.site-footer {
+  background: var(--sp-bg) !important;
+  border-color: var(--sp-border) !important;
+}
+.uppercase-pill,
+.sp-eyebrow { color: #e9d5ff !important; }
+code,
+.sp-chip {
+  color: #ede9fe !important;
+  background: rgba(167,139,250,.22) !important;
+  border-color: rgba(216,180,254,.32) !important;
+}
+.anj-pill {
+  color: #fecaca !important;
+  background: rgba(248,113,113,.13) !important;
+  border-color: rgba(254,202,202,.34) !important;
+}
