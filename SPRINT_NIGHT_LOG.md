@@ -965,3 +965,11 @@
 - Impact: les prochains sprints peuvent fixer les vrais points visibles plutôt que deviner
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.122 (2026-05-02 14:25 UTC)
+- Chantier: P-9.15 compacter accueil mobile
+- Avant: dashboard mobile 7201px dans la baseline Phase 9
+- Après: dashboard mobile 5175px après masquage mobile des sections secondaires
+- Impact: -28% de longueur mobile; les Big Bets et Solides restent prioritaires
+- Commit: pending
+- Status: ⚠️ PARTIEL

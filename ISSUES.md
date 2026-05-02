@@ -145,7 +145,7 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Preuve : `manifest.json` hauteur `7337px`
 - Constat : la page dépasse largement l'objectif "3 viewports max" avec buteurs, solides, outsiders, stats et double footer.
 - Action : transformer les sections secondaires en accordéons ou carrousels compactés.
-- Statut : OPEN
+- Statut : PARTIAL v35.122 — sections secondaires (buteurs, outsiders, stats, outils) masquées sur mobile; hauteur dashboard mobile `7201px → 5175px`, reste à compacter sous 4500px.
 
 ### P6-VIS-014 — Page statique Legal incohérente avec le thème PWA
 
@@ -292,7 +292,7 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Preuve : `.cache/phase4-phase9-current/dashboard-mobile.png` (`375x7201`)
 - Constat : la page principale dépasse 7200px; les sections secondaires noient les Big Bets sur mobile.
 - Action : replier Top buteurs / stats / gros gains par défaut sur mobile et garder Big Bets + Solides visibles en priorité.
-- Statut : OPEN
+- Statut : PARTIAL v35.122 — sections secondaires masquées sur mobile; hauteur dashboard mobile `7201px → 5175px`, reste à compacter sous 4500px.
 
 ### P9-VIS-002 — Santé mobile trop dense
 
