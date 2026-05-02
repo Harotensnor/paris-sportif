@@ -4221,6 +4221,8 @@
       const gPerSet = gamesPerSet(winnerP);
       return acc + it.prob * (totalSets * gPerSet);
     }, 0);
+    const avgSets = items.reduce((acc, it) => acc + it.prob * (it.home + it.away), 0);
+    const avgGamesPerSet = avgSets > 0 ? avgGames / avgSets : 10;
     // Lines courantes Winamax tennis
     const lines = bestOf === 3 ? [21.5, 22.5, 23.5] : [37.5, 38.5];
     // Approximation Gaussienne : variance ~25 (BO3), ~50 (BO5)
@@ -4238,12 +4240,18 @@
       pOver: pNormGreater(line),
       pUnder: 1 - pNormGreater(line),
     }));
+    const setMid = Math.round(avgGamesPerSet) + 0.5;
+    const setLines = [setMid - 1, setMid, setMid + 1].filter(v => v >= 7.5 && v <= 13.5).map(line => {
+      const z = (avgGamesPerSet - line) / 2.1;
+      const pOver = 1 / (1 + Math.exp(-1.702 * z));
+      return { line, label: `Plus de ${line} jeux/set`, pOver, pUnder: 1 - pOver };
+    });
     return {
       kind: 'tennis',
       bestOf,
       items: items.slice(0, bestOf === 3 ? 3 : 4),
       caption: `Probabilités par nombre de sets (best-of-${bestOf}) dérivées de la proba de victoire.`,
-      games: { avgGames, lines: games, sigma },
+      games: { avgGames, avgSets, avgGamesPerSet, lines: games, setLines, sigma },
     };
   }
 
@@ -11040,10 +11048,18 @@
                       <span style="color:var(--text-dim2,#7b8693);font-weight:500;font-size:11px;">${(pPick*100).toFixed(0)}% · proj. ${avgGames} jeux</span>
                     </span>`;
                 }).join('');
+                const setLines = (sc.games.setLines || []).map(g => {
+                  const pPick = g.pOver >= g.pUnder ? g.pOver : g.pUnder;
+                  const sideLbl = g.pOver >= g.pUnder ? `Plus de ${g.line}` : `Moins de ${g.line}`;
+                  return `<span style="padding:7px 11px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);font-size:12px;font-weight:650;color:var(--text);font-variant-numeric:tabular-nums;">${esc(sideLbl)} / set · ${(pPick*100).toFixed(0)}%</span>`;
+                }).join('');
+                const setExact = (sc.items || []).slice(0, sc.bestOf === 5 ? 4 : 3).map(s => `<span style="padding:7px 11px;border-radius:8px;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.18);font-size:12px;font-weight:650;color:var(--text);font-variant-numeric:tabular-nums;">Sets ${esc(s.label)} · ${(s.prob*100).toFixed(0)}%</span>`).join('');
                 tennisGamesHtml = `
                   <div class="u-mt-3">
                     <div class="lbl-tiny-mb">🎾 Total jeux (Phase 3)</div>
                     <div style="display:flex;gap:8px;flex-wrap:wrap;">${gameLines}</div>
+                    ${setLines ? `<div class="lbl-tiny-mb u-mt-3">🎾 Total jeux par set</div><div style="display:flex;gap:8px;flex-wrap:wrap;">${setLines}</div>` : ''}
+                    ${setExact ? `<div class="lbl-tiny-mb u-mt-3">🎾 Score exact sets</div><div style="display:flex;gap:8px;flex-wrap:wrap;">${setExact}</div>` : ''}
                     <div style="margin-top:4px;font-size:10.5px;color:var(--text-dim2,#7b8693);line-height:1.3;">Approx. Gaussienne basée sur ${sc.bestOf===5?'BO5 σ≈√50':'BO3 σ≈√25'}. Plus le match est tight, plus le total est élevé.</div>
                   </div>`;
               }
