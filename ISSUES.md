@@ -230,6 +230,39 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Action : garder un seul H1 principal et convertir le logo/titre décoratif en `div`/`span` ou `h2`.
 - Statut : OPEN
 
+## A11y audit P-6.5
+
+- Script : `scripts/a11y_audit.js`
+- Rapport : `a11y-report.json`
+- Pages : `dashboard`, `tous`, `performance`, `academie`, `profil`, `sante`, `montantes`, `legal`
+- Viewport : mobile 375px
+- Note : le runtime local n'a pas `@axe-core/cli`; le script applique les règles axe principales localement et classe les impacts.
+- Totaux : `0` critical, `75` serious, `278` moderate.
+
+### P6-A11Y-001 — Contrastes sérieux insuffisants
+
+- Sévérité : HIGH
+- Preuve : `a11y-report.json`
+- Constat : `75` violations `color-contrast`, surtout chips sport, boutons actifs, badges santé, page legal statique.
+- Action : augmenter contraste des textes sur fonds colorés et harmoniser `legal.html` avec le thème dark.
+- Statut : OPEN
+
+### P6-A11Y-002 — Cibles tactiles sous 40px
+
+- Sévérité : MEDIUM
+- Preuve : `a11y-report.json`
+- Constat : nombreuses violations `target-size`, notamment hamburger, scroll-top, chips, trust strip et liens légaux.
+- Action : appliquer min-height/min-width 44px aux contrôles mobile ou agrandir les zones cliquables.
+- Statut : OPEN
+
+### P6-A11Y-003 — Images visibles sans alt
+
+- Sévérité : MEDIUM
+- Preuve : `a11y-report.json`
+- Constat : beaucoup de logos joueurs/équipes sans `alt`.
+- Action : `alt=""` décoratif pour les logos répétés, `alt="Logo équipe"` ou `alt="Photo joueur"` quand informatif.
+- Statut : OPEN
+
 ## Prochains fixes recommandés
 
 1. P6-VIS-001 bottom nav overlay.
