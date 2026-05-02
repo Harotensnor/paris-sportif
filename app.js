@@ -4566,10 +4566,9 @@
     const aDef = aX.conceded / lgAvg;
     let lamH = Math.max(0.2, hAtt * aDef * lgAvg * HOME_ADV);
     let lamA = Math.max(0.2, aAtt * hDef * lgAvg / HOME_ADV);
-    // v31.7.207 — fbref empirical xG blend.
-    // Si les deux équipes ont fbref_xg (top-6 leagues UEFA injectées par
-    // patch_fbref_xg.py), on blend le lambda model-based avec l'estimation
-    // empirique fbref. Formule standard :
+    // v31.7.207 / v35.91 — empirical xG blend.
+    // Si les deux équipes ont fbref_xg OU xg_stats Understat, on blend le
+    // lambda model-based avec l'estimation empirique. Formule standard :
     //   E[goals_home] = avg(home.xg_for, away.xg_against)
     // xG capte la qualité des occasions plutôt que les buts effectifs (~0.65
     // corr next-game points), donc lisse la variance scoring que notre
@@ -4579,8 +4578,21 @@
     //   10-19            → 40%
     //   20+              → 50%
     let fbrefBlend = null;
-    const hXG = home.fbref_xg;
-    const aXG = away.fbref_xg;
+    const readEmpXG = (side) => {
+      const x = side?.xg_stats || side?.fbref_xg || null;
+      if (!x) return null;
+      const xgFor = Number(x.xg_for_avg ?? x.xg_l10);
+      const xgAgainst = Number(x.xg_against_avg ?? x.xga_l10);
+      if (!Number.isFinite(xgFor) || !Number.isFinite(xgAgainst)) return null;
+      return {
+        xg_for_avg: xgFor,
+        xg_against_avg: xgAgainst,
+        matches_played: Number(x.matches_played || x.n || x.sample || 10) || 10,
+        source: side?.xg_stats ? 'Understat' : 'fbref',
+      };
+    };
+    const hXG = readEmpXG(home);
+    const aXG = readEmpXG(away);
     if (hXG && aXG && typeof hXG.xg_for_avg === 'number' && typeof aXG.xg_for_avg === 'number') {
       const lamH_emp = ((hXG.xg_for_avg + aXG.xg_against_avg) / 2) * HOME_ADV;
       const lamA_emp = ((aXG.xg_for_avg + hXG.xg_against_avg) / 2) / HOME_ADV;
@@ -4593,6 +4605,7 @@
         lamA_model: Math.round(lamA * 1000) / 1000,
         lamH_emp: Math.round(lamH_emp * 1000) / 1000,
         lamA_emp: Math.round(lamA_emp * 1000) / 1000,
+        source: hXG.source === aXG.source ? hXG.source : 'xG',
       };
       lamH = Math.max(0.2, (1 - w) * lamH + w * lamH_emp);
       lamA = Math.max(0.2, (1 - w) * lamA + w * lamA_emp);
@@ -6668,7 +6681,7 @@
       let xgText = `Buts attendus : ${poi.lamH.toFixed(2)} – ${poi.lamA.toFixed(2)}`;
       if (poi.fbrefBlend) {
         const wPct = Math.round(poi.fbrefBlend.weight * 100);
-        xgText += ` (xG fbref ${wPct}% · ${poi.fbrefBlend.minMatchesPlayed} matchs)`;
+        xgText += ` (xG ${poi.fbrefBlend.source || 'empirique'} ${wPct}% · ${poi.fbrefBlend.minMatchesPlayed} matchs)`;
       }
       reasons.push({
         type: 'xg',

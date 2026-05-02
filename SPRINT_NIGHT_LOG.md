@@ -717,3 +717,11 @@
 - Impact: décision plus lisible en 10 secondes avant d’ouvrir les sections longues
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.91 (2026-05-02 11:25 UTC)
+- Chantier: P-6.20 xG Understat dans le modèle
+- Avant: poissonComponent blendait seulement fbref_xg quand dispo
+- Après: xg_stats Understat alimente aussi le lambda empirique prudent
+- Impact: les matchs top-5 avec xG Understat utilisent enfin ce signal prédictif
+- Commit: pending
+- Status: ✅ DONE
