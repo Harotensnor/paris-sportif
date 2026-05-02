@@ -453,7 +453,7 @@
           ].map(([k, desc]) => `
             <div style="display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;padding:6px 0;">
               <kbd style="background:var(--panel-2);border:1px solid var(--border-2);border-radius:var(--r-xs);padding:3px 8px;font-family:monospace;font-size:11px;font-weight:600;min-width:80px;text-align:center;color:var(--text);">${esc(k)}</kbd>
-              <span style="color:var(--text-dim);">${esc(desc)}</span>
+              <span class="u-text-dim">${esc(desc)}</span>
             </div>
           `).join('')}
         </div>
@@ -649,28 +649,28 @@
 
         <!-- Example card -->
         <div style="background:var(--panel-2);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--r-sm);padding:14px 16px;margin:14px 0;font-size:13px;line-height:1.7;">
-          <div style="font-weight:700;color:var(--text);font-size:14px;margin-bottom:8px;">PSG vs Marseille · Pick: <strong style="color:var(--accent);">PSG (1)</strong></div>
+          <div style="font-weight:700;color:var(--text);font-size:14px;margin-bottom:8px;">PSG vs Marseille · Pick: <strong class="u-text-accent">PSG (1)</strong></div>
           <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-variant-numeric:tabular-nums;font-size:12.5px;color:var(--text-dim);">
-            <span data-tooltip="Multiplicateur de mise. @1.85 = pour 1€ misé tu gagnes 0.85€ net.">Cote: <strong style="color:var(--text);">@1.85</strong></span>
-            <span data-tooltip="Probabilité estimée par le modèle.">Confiance: <strong style="color:var(--text);">62%</strong></span>
-            <span data-tooltip="Avantage value vs cote du marché. >0 = value.">Edge: <strong style="color:var(--accent);">+8pt</strong></span>
-            <span data-tooltip="Mise calculée par Kelly fractionné.">Mise: <strong style="color:var(--brand);">5€</strong></span>
+            <span data-tooltip="Multiplicateur de mise. @1.85 = pour 1€ misé tu gagnes 0.85€ net.">Cote: <strong class="u-text">@1.85</strong></span>
+            <span data-tooltip="Probabilité estimée par le modèle.">Confiance: <strong class="u-text">62%</strong></span>
+            <span data-tooltip="Avantage value vs cote du marché. >0 = value.">Edge: <strong class="u-text-accent">+8pt</strong></span>
+            <span data-tooltip="Mise calculée par Kelly fractionné.">Mise: <strong class="u-text-brand">5€</strong></span>
           </div>
         </div>
 
         <!-- Explanations -->
         <div style="font-size:13px;line-height:1.7;color:var(--text-2);margin-bottom:14px;">
           <div style="margin-bottom:10px;">
-            <strong style="color:var(--accent);">⚡ Cote 1.85</strong> = pour <span class="gloss-term" data-gloss="cote">cote décimale</span> 1.85, 1€ misé donne 1.85€ retour (gain net 0.85€).
+            <strong class="u-text-accent">⚡ Cote 1.85</strong> = pour <span class="gloss-term" data-gloss="cote">cote décimale</span> 1.85, 1€ misé donne 1.85€ retour (gain net 0.85€).
           </div>
           <div style="margin-bottom:10px;">
-            <strong style="color:var(--accent);">🎯 Confiance 62%</strong> = le modèle estime à 62% la victoire de PSG (basé sur Poisson, Elo, forme, blessures).
+            <strong class="u-text-accent">🎯 Confiance 62%</strong> = le modèle estime à 62% la victoire de PSG (basé sur Poisson, Elo, forme, blessures).
           </div>
           <div style="margin-bottom:10px;">
-            <strong style="color:var(--accent);">💎 Edge +8pt</strong> = écart entre le modèle (62%) et la <span class="gloss-term" data-gloss="edge">probabilité implicite</span> de la cote (54%). C'est le <strong>signal de value</strong>.
+            <strong class="u-text-accent">💎 Edge +8pt</strong> = écart entre le modèle (62%) et la <span class="gloss-term" data-gloss="edge">probabilité implicite</span> de la cote (54%). C'est le <strong>signal de value</strong>.
           </div>
           <div style="margin-bottom:10px;">
-            <strong style="color:var(--accent);">💰 Mise 5€</strong> = <span class="gloss-term" data-gloss="kelly">Kelly fractionné</span> 0.25× × bankroll, plafonné à 10% par pari (gestion du risque).
+            <strong class="u-text-accent">💰 Mise 5€</strong> = <span class="gloss-term" data-gloss="kelly">Kelly fractionné</span> 0.25× × bankroll, plafonné à 10% par pari (gestion du risque).
           </div>
         </div>
 
@@ -8007,7 +8007,7 @@
             <div class="name">${esc(group[0].league_name || '—')}</div>
             <div class="country">${esc(group[0].league_country || '')}</div>
             <div class="stats">
-              ${liveCount ? `<span class="pill" style="color:var(--danger);">🔴 ${liveCount} live</span>` : ''}
+              ${liveCount ? `<span class="pill u-text-danger">🔴 ${liveCount} live</span>` : ''}
               <span class="pill">${group.length} match${group.length > 1 ? 's' : ''}</span>
             </div>
           </div>
@@ -8747,7 +8747,7 @@
               ${pred.isLock ? `<span class="tp-badge" style="background:var(--warn);color:#0a0e17;">PARI SÛR${isNewLock(x.m.id) ? ' 🆕' : ''}</span>` : ''}
               🎯 ${esc(pred.pick.label)}
             </div>
-            <div class="tp-pick-conf">Confiance ${((pred.reliability ?? pred.pick.prob)*100).toFixed(0)}% · <span style="color:var(--accent);">@${pickOdd.toFixed(2)}</span></div>
+            <div class="tp-pick-conf">Confiance ${((pred.reliability ?? pred.pick.prob)*100).toFixed(0)}% · <span class="u-text-accent">@${pickOdd.toFixed(2)}</span></div>
           </div>
           ${topReason ? `<div class="tp-note" title="${esc(topReason.text)}"><span>${topReason.icon}</span><span>${esc(topReason.text)}</span></div>` : ''}
           ${betBtnHtml}
@@ -8810,7 +8810,7 @@
         </div>
       ` : ''}
       ${others.length ? `
-        <div class="section-header top-picks" style="margin-top:18px;">
+        <div class="section-header top-picks u-mt-18">
           <h2><span class="ico">⭐</span>Autres pronos du jour</h2>
           <div class="hint">Pronostics fiables mais moins prioritaires que le top 5</div>
         </div>
@@ -8825,7 +8825,7 @@
         </div>
       ` : ''}
       ${futureTop.length ? `
-        <div class="section-header top-picks" style="margin-top:18px;">
+        <div class="section-header top-picks u-mt-18">
           <h2><span class="ico">🌅</span>${esc(futureLabel)}</h2>
           <div class="hint">Pronostics fiables pour la journée suivante — anticipation</div>
         </div>
@@ -9044,7 +9044,7 @@
                 const tIn = fmtIn(l.startIn);
                 return `
                   <div class="combine-leg" data-id="${esc(l.m.id)}">
-                    <div class="leg-match">${esc(home?.short || home?.name || '?')} <span style="color:var(--text-dim2);">vs</span> ${esc(away?.short || away?.name || '?')} · ${esc(league)} · <span class="leg-time">${esc(fmtTime(l.m.date))} · ${esc(tIn)}</span></div>
+                    <div class="leg-match">${esc(home?.short || home?.name || '?')} <span class="u-text-dim2">vs</span> ${esc(away?.short || away?.name || '?')} · ${esc(league)} · <span class="leg-time">${esc(fmtTime(l.m.date))} · ${esc(tIn)}</span></div>
                     <div class="leg-pick">🎯 ${esc(l.pred.pick.label)} <span style="color:var(--text-dim);font-weight:500;">(${Math.round(l.pred.pick.prob*100)}%)</span></div>
                     <div class="leg-odd">@${l.odd.toFixed(2)}</div>
                   </div>
@@ -9073,11 +9073,11 @@
                       <button class="combine-copy-btn" data-copy="${esc(copyText)}" title="Copier le combiné (texte)" aria-label="Copier le combiné">📋</button>
                     </div>
                   </div>
-                  <div class="combine-desc" style="font-size:11px;color:var(--text-dim);">${esc(c.desc)} · 1er match <b style="color:var(--text);">${esc(lockIn)}</b></div>
+                  <div class="combine-desc u-text-xs u-text-dim">${esc(c.desc)} · 1er match <b class="u-text">${esc(lockIn)}</b></div>
                   <div class="combine-legs">${legsHtml}</div>
                   <div class="combine-footer">
                     <div class="combine-stat">Côte totale <b>${c.totalOdd.toFixed(2)}</b> · prob. combinée <b>${Math.round(c.combinedProb*100)}%</b></div>
-                    <div style="text-align:right;">
+                    <div class="u-text-right">
                       <div class="combine-odd">×${c.totalOdd.toFixed(2)}</div>
                       <div class="combine-return">10€ → ${stakeRet}€</div>
                     </div>
@@ -9092,7 +9092,7 @@
 
     if (!sections) {
       wrap.innerHTML = `
-        <div class="section-header top-picks" style="margin-top:16px;">
+        <div class="section-header top-picks u-mt-4">
           <h2><span class="ico">🎯</span>Combinés suggérés</h2>
           <div class="hint">Aucun combiné disponible — aucun match avec cotes dans la fenêtre pré-match.</div>
         </div>`;
@@ -9118,7 +9118,7 @@
           const lg = l.m.league_name || sportLabel(l.m.sport);
           const when = fmtTime(l.m.date);
           return `<div class="combine-leg" data-id="${esc(l.m.id)}" style="display:flex;flex-direction:column;gap:3px;padding:10px 12px;background:rgba(255,255,255,.03);border-radius:8px;border:1px solid rgba(255,255,255,.05);">
-            <div style="font-size:13px;font-weight:600;">${esc(home?.short || home?.name || '?')} <span style="color:var(--text-dim2);">vs</span> ${esc(away?.short || away?.name || '?')}</div>
+            <div style="font-size:13px;font-weight:600;">${esc(home?.short || home?.name || '?')} <span class="u-text-dim2">vs</span> ${esc(away?.short || away?.name || '?')}</div>
             <div style="font-size:11px;color:var(--text-dim,#b4bcc7);">${esc(lg)} · ${esc(when)}</div>
             <div style="margin-top:4px;display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-weight:600;font-size:13px;">🎯 ${esc(l.pred.pick.label)}</span><span style="color:var(--text-dim);font-size:11px;">(${Math.round((l.rel||0)*100)}%)</span><span style="margin-left:auto;color:var(--brand);font-weight:700;font-size:13px;">@${l.odd.toFixed(2)}</span></div>
           </div>`;
@@ -9194,7 +9194,7 @@
             ${faceHtml}
             <div style="min-width:0;">
               <div style="font-size:13.5px;font-weight:600;color:var(--text);">${esc(l.scorer.name)}${l.scorer.captain ? ' ©' : ''} <span style="color:var(--text-dim);font-weight:500;">marque</span></div>
-              <div style="font-size:11px;color:var(--text-dim);">${esc(hName)} vs ${esc(aName)} · ${esc(l.m.league_name || l.m.league_code || '')}</div>
+              <div class="u-text-xs u-text-dim">${esc(hName)} vs ${esc(aName)} · ${esc(l.m.league_name || l.m.league_code || '')}</div>
             </div>
             <div style="font-size:12px;color:var(--text-dim);font-variant-numeric:tabular-nums;">${l.scorer.impliedOdd ? '@' + l.scorer.impliedOdd.toFixed(2) : '—'}</div>
             <div style="font-size:14px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;">${(l.scorer.prob*100).toFixed(0)}%</div>
@@ -9213,9 +9213,9 @@
               ${legsHtml}
             </div>
             <div style="padding:14px 18px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
-              <div><span style="font-size:11px;color:var(--text-dim);">Cote totale</span> <b style="color:var(--brand);font-size:18px;margin-left:6px;font-variant-numeric:tabular-nums;">×${combOdd.toFixed(2)}</b></div>
-              <div><span style="font-size:11px;color:var(--text-dim);">Probabilité</span> <b style="margin-left:6px;font-variant-numeric:tabular-nums;">${(combProb*100).toFixed(0)}%</b></div>
-              <div style="margin-left:auto;font-size:13px;"><span style="color:var(--text-dim);">10€ →</span> <b style="color:var(--accent);font-size:16px;font-variant-numeric:tabular-nums;">${return10}€</b></div>
+              <div><span class="u-text-xs u-text-dim">Cote totale</span> <b style="color:var(--brand);font-size:18px;margin-left:6px;font-variant-numeric:tabular-nums;">×${combOdd.toFixed(2)}</b></div>
+              <div><span class="u-text-xs u-text-dim">Probabilité</span> <b style="margin-left:6px;font-variant-numeric:tabular-nums;">${(combProb*100).toFixed(0)}%</b></div>
+              <div style="margin-left:auto;font-size:13px;"><span class="u-text-dim">10€ →</span> <b style="color:var(--accent);font-size:16px;font-variant-numeric:tabular-nums;">${return10}€</b></div>
             </div>
             <div style="padding:10px 18px;background:var(--panel-2);font-size:11px;color:var(--text-dim);line-height:1.5;border-top:1px solid var(--border);">
               ⚠️ Risque élevé : un combiné de 3 buteurs a ~${(combProb*100).toFixed(0)}% de chance de réussir. Mise 0,5-1€ max, pas plus.
@@ -9276,11 +9276,11 @@
           const lg = p.match.league_name || p.match.league_code || '';
           return `
             <div data-combo-leg-id="${esc(String(p.match.id))}" style="display:flex;flex-direction:column;gap:3px;padding:10px 12px;background:var(--panel-2,rgba(255,255,255,.03));border-radius:var(--r-sm);border:1px solid var(--border);cursor:pointer;">
-              <div style="font-size:13px;font-weight:600;color:var(--text);">${esc(hN)} <span style="color:var(--text-dim2);font-weight:400;">vs</span> ${esc(aN)}</div>
-              <div style="font-size:11px;color:var(--text-dim);">${esc(String(lg).slice(0, 32))}</div>
+              <div style="font-size:13px;font-weight:600;color:var(--text);">${esc(hN)} <span class="u-text-dim2 u-font-normal">vs</span> ${esc(aN)}</div>
+              <div class="u-text-xs u-text-dim">${esc(String(lg).slice(0, 32))}</div>
               <div style="display:flex;align-items:center;gap:6px;margin-top:3px;flex-wrap:wrap;">
                 <span style="font-size:12px;color:var(--brand);font-weight:600;">→ ${esc(p.label)}</span>
-                <span style="font-size:11px;color:var(--text-dim);">${Math.round(p.prob*100)}%</span>
+                <span class="u-text-xs u-text-dim">${Math.round(p.prob*100)}%</span>
                 <span style="margin-left:auto;font-size:13px;font-weight:700;color:var(--text);">@${p.odd.toFixed(2)}</span>
               </div>
             </div>`;
@@ -9486,7 +9486,7 @@
     if (sport === 'tennis') {
       // Round (e.g. "Round of 64", "Quarterfinals"), draw (singles/doubles),
       // surface (Hard/Clay/Grass). All are static info, no model needed.
-      if (m.round) bits.push(`<span style="color:var(--text-dim);">🎾 ${esc(m.round)}</span>`);
+      if (m.round) bits.push(`<span class="u-text-dim">🎾 ${esc(m.round)}</span>`);
       if (m.draw) {
         const drawLabel = {
           'mens-singles': 'Simple H',
@@ -9495,7 +9495,7 @@
           'womens-doubles': 'Double F',
           'mixed-doubles': 'Double mixte',
         }[m.draw] || m.draw.replace(/-/g,' ');
-        bits.push(`<span style="color:var(--text-dim);">${esc(drawLabel)}</span>`);
+        bits.push(`<span class="u-text-dim">${esc(drawLabel)}</span>`);
       }
       if (m.surface) {
         const sfc = String(m.surface).toLowerCase();
@@ -9511,7 +9511,7 @@
         const diff = Math.abs(sH - sA);
         if (diff >= 8) {
           const fav = sH < sA ? home?.short || home?.name : away?.short || away?.name;
-          bits.push(`<span style="color:var(--text);"><b>${esc(fav)}</b> tête de série favorisée (#${Math.min(sH,sA)} vs #${Math.max(sH,sA)})</span>`);
+          bits.push(`<span class="u-text"><b>${esc(fav)}</b> tête de série favorisée (#${Math.min(sH,sA)} vs #${Math.max(sH,sA)})</span>`);
         }
       }
     } else if (sport === 'basketball' || sport === 'hockey' || sport === 'baseball') {
@@ -9527,9 +9527,9 @@
           const favName = wpH > wpA ? (home?.short || home?.name || 'Dom.') : (away?.short || away?.name || 'Ext.');
           const favWp = Math.round(Math.max(wpH, wpA) * 100);
           const dogWp = Math.round(Math.min(wpH, wpA) * 100);
-          bits.push(`<span style="color:var(--text);">📊 <b>${esc(favName)}</b> meilleur bilan saison (${favWp}% vs ${dogWp}%)</span>`);
+          bits.push(`<span class="u-text">📊 <b>${esc(favName)}</b> meilleur bilan saison (${favWp}% vs ${dogWp}%)</span>`);
         } else {
-          bits.push(`<span style="color:var(--text-dim);">📊 Bilans saison équilibrés (${Math.round(wpH*100)}% / ${Math.round(wpA*100)}%)</span>`);
+          bits.push(`<span class="u-text-dim">📊 Bilans saison équilibrés (${Math.round(wpH*100)}% / ${Math.round(wpA*100)}%)</span>`);
         }
       }
       // Leaders : rendre le top scorer si ESPN a peuplé le stat (rare mais utile)
@@ -9547,15 +9547,15 @@
         const segs = [];
         if (tlH) segs.push(`<span><b>${esc(home?.abbr||'H')}</b>: ${esc(tlH.player)} ${esc(String(tlH.stat))}</span>`);
         if (tlA) segs.push(`<span><b>${esc(away?.abbr||'A')}</b>: ${esc(tlA.player)} ${esc(String(tlA.stat))}</span>`);
-        bits.push(`<span style="color:var(--text-dim);">⭐ ${segs.join(' · ')}</span>`);
+        bits.push(`<span class="u-text-dim">⭐ ${segs.join(' · ')}</span>`);
       }
     } else if (sport === 'mma') {
       // MMA est packagé en "fight night" event, on ajoute juste le venue
-      if (m.venue) bits.push(`<span style="color:var(--text-dim);">📍 ${esc(m.venue)}</span>`);
+      if (m.venue) bits.push(`<span class="u-text-dim">📍 ${esc(m.venue)}</span>`);
     }
     if (!bits.length) return '';
     return `<div style="display:flex;flex-wrap:wrap;gap:10px;padding:6px 12px;font-size:11.5px;line-height:1.5;color:var(--text);background:var(--panel-2);border-radius:var(--r-sm);margin-top:4px;">
-      ${bits.join('<span style="color:var(--text-dim2);">·</span>')}
+      ${bits.join('<span class="u-text-dim2">·</span>')}
     </div>`;
   }
 
@@ -9803,11 +9803,11 @@
             if (absDiff >= 30) {
               const favName = diff > 0 ? (home?.short || home?.name || 'Dom.') : (away?.short || away?.name || 'Ext.');
               const lvl = absDiff >= 200 ? 'nettement plus fort' : absDiff >= 100 ? 'plus fort' : 'légèrement plus fort';
-              eloLine = `<span style="display:inline-flex;align-items:center;gap:6px;"><span style="color:var(--text-dim);">Force :</span><b style="color:var(--text);">${esc(favName)}</b><span style="color:var(--text-dim);">${lvl}</span><span style="padding:1px 7px;border-radius:10px;background:var(--panel-3);font-size:10px;font-variant-numeric:tabular-nums;">+${absDiff} pts</span></span>`;
+              eloLine = `<span style="display:inline-flex;align-items:center;gap:6px;"><span class="u-text-dim">Force :</span><b class="u-text">${esc(favName)}</b><span class="u-text-dim">${lvl}</span><span style="padding:1px 7px;border-radius:10px;background:var(--panel-3);font-size:10px;font-variant-numeric:tabular-nums;">+${absDiff} pts</span></span>`;
             } else if (absDiff >= 10) {
-              eloLine = `<span style="color:var(--text-dim);">Force : <b style="color:var(--text);">équipes proches</b> (+${absDiff} pts)</span>`;
+              eloLine = `<span class="u-text-dim">Force : <b class="u-text">équipes proches</b> (+${absDiff} pts)</span>`;
             } else {
-              eloLine = `<span style="color:var(--text-dim);">Force : <b style="color:var(--text);">équipes équivalentes</b></span>`;
+              eloLine = `<span class="u-text-dim">Force : <b class="u-text">équipes équivalentes</b></span>`;
             }
           }
           // Marché vs modèle : cote implicite vs notre confiance
@@ -9820,11 +9820,11 @@
               const implied = 1 / pickOdd;
               const edgePts = Math.round((rel - implied) * 100);
               if (edgePts >= 5) {
-                marketLine = `<span style="color:var(--accent);">Cote marché dit <b>${Math.round(implied*100)}%</b> · nous estimons <b>${Math.round(rel*100)}%</b> · <b>+${edgePts} pts d'avantage</b></span>`;
+                marketLine = `<span class="u-text-accent">Cote marché dit <b>${Math.round(implied*100)}%</b> · nous estimons <b>${Math.round(rel*100)}%</b> · <b>+${edgePts} pts d'avantage</b></span>`;
               } else if (edgePts >= -2) {
-                marketLine = `<span style="color:var(--text-dim);">Cote alignée avec notre estimation (${Math.round(rel*100)}%)</span>`;
+                marketLine = `<span class="u-text-dim">Cote alignée avec notre estimation (${Math.round(rel*100)}%)</span>`;
               } else {
-                marketLine = `<span style="color:var(--warn);">Cote plus prudente que nous (${Math.round(implied*100)}% vs ${Math.round(rel*100)}%) — méfiance</span>`;
+                marketLine = `<span class="u-text-warn">Cote plus prudente que nous (${Math.round(implied*100)}% vs ${Math.round(rel*100)}%) — méfiance</span>`;
               }
             }
           }
@@ -10097,10 +10097,10 @@
                 </div>`;
             })()}
             <div style="margin-top:8px;font-size:10.5px;color:var(--text-dim2);line-height:1.4;">
-              <b style="color:var(--text-dim);">Edge</b> = proba modèle - 1/cote (en points de proba).
-              <b style="color:var(--text-dim);">EV</b> = proba × cote - 1 (retour attendu par mise unitaire).
-              <b style="color:var(--text-dim);">Score Qualité</b> = composite (edge ×40 + data ×25 + stabilité cote ×20 + historique ligue ×15).
-              <b style="color:var(--text-dim);">Actionability</b> = composite (Confiance ×30 + Edge ×25 + Kelly ×20 + Qualité ×15 + Winamax exact ×10).
+              <b class="u-text-dim">Edge</b> = proba modèle - 1/cote (en points de proba).
+              <b class="u-text-dim">EV</b> = proba × cote - 1 (retour attendu par mise unitaire).
+              <b class="u-text-dim">Score Qualité</b> = composite (edge ×40 + data ×25 + stabilité cote ×20 + historique ligue ×15).
+              <b class="u-text-dim">Actionability</b> = composite (Confiance ×30 + Edge ×25 + Kelly ×20 + Qualité ×15 + Winamax exact ×10).
             </div>
             ${(() => {
               // Sprint 103 (v31.7.188) — AI Coach contextuel
@@ -10337,7 +10337,7 @@
         }
 
         return `
-        <div class="section" style="margin-top:18px;">
+        <div class="section u-mt-18">
           <h4 style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
             <span style="font-size:20px;">📍</span>
             <span>Contexte du match</span>
@@ -10353,7 +10353,7 @@
               <div style="font-size:13px;color:var(--text-2);line-height:1.6;">
                 ${formHtml ? `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span style="font-weight:600;color:var(--text);min-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(home?.short || home?.name || '?')}</span><span>${formHtml}</span></div>` : ''}
                 ${formAHtml ? `<div style="display:flex;align-items:center;gap:8px;"><span style="font-weight:600;color:var(--text);min-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(away?.short || away?.name || '?')}</span><span>${formAHtml}</span></div>` : ''}
-                ${(!formHtml && !formAHtml) ? '<span style="color:var(--text-dim2);">Forme indisponible pour ce match.</span>' : ''}
+                ${(!formHtml && !formAHtml) ? '<span class="u-text-dim2">Forme indisponible pour ce match.</span>' : ''}
               </div>
             </div>
             <div class="card-soft">
@@ -10362,7 +10362,7 @@
                 ${weather ? `🌡️ ${weather.temp_c != null ? Math.round(weather.temp_c) + '°C' : '—'}${weather.condition ? ' · ' + esc(weather.condition) : ''}${weather.wind_kmh != null ? ' · 💨 ' + Math.round(weather.wind_kmh) + ' km/h' : ''}<br>` : ''}
                 ${ref ? `👤 Arbitre : <b>${esc(ref.name)}</b>${ref.cards_per_match != null ? ` · ${(+ref.cards_per_match).toFixed(1)} cartons/match` : ''}<br>` : ''}
                 ${meetingsCount ? `⚔️ ${meetingsCount} confrontation${meetingsCount>1?'s':''} récente${meetingsCount>1?'s':''} (voir plus bas)<br>` : ''}
-                ${(!weather && !ref && !meetingsCount) ? '<span style="color:var(--text-dim2);">Pas de conditions externes notables détectées.</span>' : ''}
+                ${(!weather && !ref && !meetingsCount) ? '<span class="u-text-dim2">Pas de conditions externes notables détectées.</span>' : ''}
               </div>
             </div>
           </div>
@@ -10397,11 +10397,11 @@
           const isValue = edge != null && edge >= 0.05;
           let lead = '';
           if (isValue) {
-            lead = `<b style="color:var(--accent);">${esc(pred.pick.label)}</b> avec <b>${edgePct >= 0 ? '+' : ''}${edgePct}pt d'avantage marché</b>.`;
+            lead = `<b class="u-text-accent">${esc(pred.pick.label)}</b> avec <b>${edgePct >= 0 ? '+' : ''}${edgePct}pt d'avantage marché</b>.`;
           } else if (rel >= 0.70) {
-            lead = `<b style="color:var(--accent);">${esc(pred.pick.label)}</b>, pari sûr (${(rel*100).toFixed(0)}% conf.).`;
+            lead = `<b class="u-text-accent">${esc(pred.pick.label)}</b>, pari sûr (${(rel*100).toFixed(0)}% conf.).`;
           } else {
-            lead = `<b style="color:var(--text);">${esc(pred.pick.label)}</b> recommandé (${(rel*100).toFixed(0)}% conf.).`;
+            lead = `<b class="u-text">${esc(pred.pick.label)}</b> recommandé (${(rel*100).toFixed(0)}% conf.).`;
           }
           let detail = '';
           if (top3.length) {
@@ -10409,9 +10409,9 @@
           }
           let warn = '';
           if (risk) {
-            warn = ` <span style="color:var(--warn);">⚠ ${esc(risk.text)}</span>`;
+            warn = ` <span class="u-text-warn">⚠ ${esc(risk.text)}</span>`;
           } else if (dqWeak) {
-            warn = ` <span style="color:var(--warn);">⚠ Qualité data faible (${dq.score}/${dq.max}) — ${dq.items.filter(i => !i.ok).slice(0,2).map(i => i.label).join(', ')}.</span>`;
+            warn = ` <span class="u-text-warn">⚠ Qualité data faible (${dq.score}/${dq.max}) — ${dq.items.filter(i => !i.ok).slice(0,2).map(i => i.label).join(', ')}.</span>`;
           }
           return `<div style="background:linear-gradient(135deg, rgba(167,139,250,.08), rgba(52,211,153,.05));border:1px solid rgba(167,139,250,.20);border-left:3px solid var(--brand);padding:14px 18px;border-radius:0 10px 10px 0;font-size:14px;line-height:1.55;color:var(--text);margin-bottom:14px;">
             <div style="font-size:10.5px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;">⚡ Verdict en 1 ligne</div>
@@ -10476,7 +10476,7 @@
               const o = pred.odds;
               if (o) {
                 if (o._fromWinamax) {
-                  oddsSrcLine = `<div style="margin-top:6px;font-size:11.5px;color:var(--text-dim);"><b style="color:var(--accent);">✓ Cote bookable Winamax</b> — placeable directement chez le bookmaker.</div>`;
+                  oddsSrcLine = `<div style="margin-top:6px;font-size:11.5px;color:var(--text-dim);"><b class="u-text-accent">✓ Cote bookable Winamax</b> — placeable directement chez le bookmaker.</div>`;
                 } else if (o._fromSnapshot) {
                   const snap = match.odds_snapshot || {};
                   const cap = snap.captured_at ? (() => {
@@ -10563,7 +10563,7 @@
                 ${pm.headline ? `<div style="font-weight:600;margin-bottom:8px;">${esc(pm.headline)}</div>` : ''}
                 ${pm.factors.length ? `
                   <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px;">
-                    ${pm.factors.map(f => `<li style="display:flex;gap:10px;font-size:12.5px;line-height:1.45;"><span aria-hidden="true">${f.icon}</span><span style="color:var(--text-dim);">${esc(f.text)}</span></li>`).join('')}
+                    ${pm.factors.map(f => `<li style="display:flex;gap:10px;font-size:12.5px;line-height:1.45;"><span aria-hidden="true">${f.icon}</span><span class="u-text-dim">${esc(f.text)}</span></li>`).join('')}
                   </ul>` : ''}
                 <div style="margin-top:8px;font-size:11px;color:var(--text-dim2);font-style:italic;">
                   💡 Cette analyse est automatique — le modèle apprend de ses erreurs en intégrant les patterns d'échec dans le backtest hebdomadaire (recalibration ρ Dixon-Coles + ajustement priors par ligue).
@@ -10571,7 +10571,7 @@
               </div>`;
             })()}
             ${reasons.length ? `
-            <div style="margin-top:12px;">
+            <div class="u-mt-3">
               <div class="lbl-tiny-mb">Pourquoi ce pronostic</div>
               <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px;">
                 ${reasons.map(r => `<li style="display:flex;gap:10px;padding:8px 10px;background:rgba(255,255,255,.02);border-radius:6px;font-size:13px;line-height:1.4;"><span style="font-size:15px;">${r.icon}</span><span style="color:var(--text,#e6ebf2);">${esc(r.text)}</span></li>`).join('')}
@@ -10627,9 +10627,9 @@
                       if (name.includes('Forme')) shortName = 'forme';
                       if (name.includes('H2H')) shortName = 'H2H';
                       if (name.includes('Blessure') || name.includes('blessure')) shortName = 'blessures';
-                      return `<span style="color:var(--text-dim,#b4bcc7);"><span style="color:var(--text);">${shortName}</span> <b>${pct.toFixed(0)}%</b></span>`;
+                      return `<span style="color:var(--text-dim,#b4bcc7);"><span class="u-text">${shortName}</span> <b>${pct.toFixed(0)}%</b></span>`;
                     }).join(' · ')}
-                    <span style="color:var(--text-dim2);">calibration −3%</span>
+                    <span class="u-text-dim2">calibration −3%</span>
                   </div>
                 </div>`;
               }
@@ -10692,7 +10692,7 @@
                     const bg = deltaPct >= 0 ? 'rgba(16,185,129,.10)' : 'rgba(252,165,165,.10)';
                     const border = deltaPct >= 0 ? 'rgba(16,185,129,.25)' : 'rgba(252,165,165,.25)';
                     return `<span style="padding:6px 10px;border-radius:6px;background:${bg};border:1px solid ${border};font-size:12px;font-variant-numeric:tabular-nums;display:inline-flex;align-items:center;gap:6px;">
-                      <span style="font-size:14px;">${c.icon}</span>
+                      <span class="u-text-md">${c.icon}</span>
                       <span style="color:var(--text,#e6ebf2);font-weight:600;">${esc(c.name)}</span>
                       <span style="color:${color};font-weight:700;">${sign}${deltaPct}pt</span>
                     </span>`;
@@ -10767,11 +10767,11 @@
                   </span>`;
                 }).join('');
                 basketMarketsHtml = `
-                  ${totalsTop ? `<div style="margin-top:12px;">
+                  ${totalsTop ? `<div class="u-mt-3">
                     <div class="lbl-tiny-mb">🏀 Total points</div>
                     <div style="display:flex;gap:8px;flex-wrap:wrap;">${totalsTop}</div>
                   </div>` : ''}
-                  ${handiTop ? `<div style="margin-top:12px;">
+                  ${handiTop ? `<div class="u-mt-3">
                     <div class="lbl-tiny-mb">🎯 Handicap</div>
                     <div style="display:flex;gap:8px;flex-wrap:wrap;">${handiTop}</div>
                   </div>` : ''}
@@ -10795,7 +10795,7 @@
                     </span>`;
                 }).join('');
                 tennisGamesHtml = `
-                  <div style="margin-top:12px;">
+                  <div class="u-mt-3">
                     <div class="lbl-tiny-mb">🎾 Total jeux (Phase 3)</div>
                     <div style="display:flex;gap:8px;flex-wrap:wrap;">${gameLines}</div>
                     <div style="margin-top:4px;font-size:10.5px;color:var(--text-dim2,#7b8693);line-height:1.3;">Approx. Gaussienne basée sur ${sc.bestOf===5?'BO5 σ≈√50':'BO3 σ≈√25'}. Plus le match est tight, plus le total est élevé.</div>
@@ -11069,7 +11069,7 @@
               <div style="display:flex;flex-direction:column;gap:6px;">
                 ${dataSources.map(s => `
                   <div style="display:grid;grid-template-columns:24px 1fr auto;gap:10px;align-items:center;padding:8px 10px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
-                    <div style="font-size:14px;">${s.icon}</div>
+                    <div class="u-text-md">${s.icon}</div>
                     <div>
                       <div style="font-size:12.5px;font-weight:600;color:var(--text);">${esc(s.label)}</div>
                       <div style="font-size:10.5px;color:var(--text-dim);margin-top:1px;">${esc(s.detail)}</div>
@@ -11126,11 +11126,11 @@
           return `
             <div class="section">
               <h4>🏷️ Marchés évalués (${cands.length})</h4>
-              <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">${marketEmoji[best.market] || '🎯'} <b style="color:var(--accent);">${esc(best.label)}</b> sélectionné comme meilleur pari. Voici les alternatives évaluées et celles refusées avec raison.</div>
+              <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">${marketEmoji[best.market] || '🎯'} <b class="u-text-accent">${esc(best.label)}</b> sélectionné comme meilleur pari. Voici les alternatives évaluées et celles refusées avec raison.</div>
               <div style="display:flex;flex-direction:column;gap:6px;">
                 ${rows.map(r => `
                   <div style="padding:9px 12px;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${r.statusColor};border-radius:0 var(--r-sm) var(--r-sm) 0;display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;font-size:12.5px;">
-                    <span style="font-size:14px;">${marketEmoji[r.c.market] || '🎯'}</span>
+                    <span class="u-text-md">${marketEmoji[r.c.market] || '🎯'}</span>
                     <div>
                       <div style="font-weight:600;color:var(--text);">${esc(r.c.label)}</div>
                       <div style="font-size:10.5px;color:var(--text-dim);margin-top:1px;">${esc(r.reason)}</div>
@@ -11156,7 +11156,7 @@
           <div class="two-cols">
             ${hasWeather ? `
               <div>
-                <h4 style="margin-top:0;font-size:11px;color:var(--text-dim);">${wcodeIcon(w.weather_code)} Météo ${w.city ? '· ' + esc(w.city) : ''}</h4>
+                <h4 class="u-mt-0 u-text-xs u-text-dim">${wcodeIcon(w.weather_code)} Météo ${w.city ? '· ' + esc(w.city) : ''}</h4>
                 ${typeof w.temp_c === 'number' ? `<div class="kv"><div class="k">Température</div><div class="v">${w.temp_c.toFixed(0)}°C</div></div>` : ''}
                 ${typeof w.precip_mm === 'number' ? `<div class="kv"><div class="k">Précipitations</div><div class="v ${w.precip_mm > 3 ? 'accent' : ''}">${w.precip_mm.toFixed(1)} mm/h${w.precip_mm > 3 ? ' 🌧️' : ''}</div></div>` : ''}
                 ${typeof w.wind_kmh === 'number' ? `<div class="kv"><div class="k">Vent</div><div class="v ${w.wind_kmh > 25 ? 'accent' : ''}">${Math.round(w.wind_kmh)} km/h${w.wind_kmh > 25 ? ' 💨' : ''}</div></div>` : ''}
@@ -11164,7 +11164,7 @@
               </div>` : ''}
             ${hasRef ? `
               <div>
-                <h4 style="margin-top:0;font-size:11px;color:var(--text-dim);">🟨 Arbitre</h4>
+                <h4 class="u-mt-0 u-text-xs u-text-dim">🟨 Arbitre</h4>
                 <div class="kv"><div class="k">Nom</div><div class="v">${esc(ref.name)}</div></div>
                 ${typeof ref.yellowPerGame === 'number' ? `<div class="kv"><div class="k">Jaunes/match</div><div class="v ${ref.yellowPerGame >= 4.5 ? 'accent' : ''}">${ref.yellowPerGame.toFixed(2)}${ref.yellowPerGame >= 4.5 ? ' (strict)' : ref.yellowPerGame <= 3.0 ? ' (tolérant)' : ''}</div></div>` : ''}
                 ${typeof ref.redPerGame === 'number' ? `<div class="kv"><div class="k">Rouges/match</div><div class="v">${ref.redPerGame.toFixed(2)}</div></div>` : ''}
@@ -11172,7 +11172,7 @@
               </div>` : ''}
             ${hasCong ? `
               <div>
-                <h4 style="margin-top:0;font-size:11px;color:var(--text-dim);">🟠 Charge matchs (7j)</h4>
+                <h4 class="u-mt-0 u-text-xs u-text-dim">🟠 Charge matchs (7j)</h4>
                 <div class="kv"><div class="k">${esc(home?.short || home?.name)}</div><div class="v ${congH >= 3 ? 'accent' : ''}">${congH} match${congH > 1 ? 's' : ''}${congH >= 3 ? ' 😵' : ''}</div></div>
                 <div class="kv"><div class="k">${esc(away?.short || away?.name)}</div><div class="v ${congA >= 3 ? 'accent' : ''}">${congA} match${congA > 1 ? 's' : ''}${congA >= 3 ? ' 😵' : ''}</div></div>
                 ${(congH >= 3 || congA >= 3) ? `<div style="margin-top:6px;font-size:11px;color:var(--text-dim2,#7b8693);line-height:1.3;">L'équipe la plus chargée subit un léger malus (fatigue cumulée).</div>` : ''}
@@ -11187,7 +11187,7 @@
           if (!side?.lineup?.starters?.length) {
             return `
               <div>
-                <h4 style="margin-top:0;font-size:11px;color:var(--text-dim);">${esc(label)}</h4>
+                <h4 class="u-mt-0 u-text-xs u-text-dim">${esc(label)}</h4>
                 <div style="color:var(--text-dim2,#7b8693);font-size:12px;">Composition non disponible.</div>
               </div>`;
           }
@@ -11201,7 +11201,7 @@
             </div>`).join('');
           return `
             <div>
-              <h4 style="margin-top:0;font-size:11px;color:var(--text-dim);">${esc(label)} · ${esc(lu.formation || '—')}${conf}</h4>
+              <h4 class="u-mt-0 u-text-xs u-text-dim">${esc(label)} · ${esc(lu.formation || '—')}${conf}</h4>
               ${lu.coach ? `<div style="font-size:11.5px;color:var(--text-dim2,#7b8693);margin-bottom:6px;">Coach : ${esc(lu.coach)}</div>` : ''}
               <div style="display:flex;flex-direction:column;gap:3px;">${starters}</div>
             </div>`;
@@ -11228,7 +11228,7 @@
           const posIcon = s.pos === 'F' ? '⚔️' : s.pos === 'M' ? '🎯' : s.pos === 'D' ? '🛡️' : '🧤';
           return `
             <div style="display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;padding:8px 4px;border-bottom:1px solid var(--border);align-items:center;">
-              <div style="font-size:14px;">${posIcon}</div>
+              <div class="u-text-md">${posIcon}</div>
               <div style="min-width:0;">
                 <div style="font-size:13px;font-weight:600;color:var(--text);">${esc(s.name)}${s.captain ? ' <span style="color:var(--gold);font-size:10px;" title="Capitaine">©</span>' : ''}</div>
                 <div style="font-size:10.5px;color:var(--text-dim);">${esc(s.teamShort)} · ${s.pos === 'F' ? 'Attaquant' : s.pos === 'M' ? 'Milieu' : s.pos === 'D' ? 'Défenseur' : 'Gardien'}</div>
@@ -11288,12 +11288,12 @@
           const injs = side?.injuries || [];
           if (!injs.length) return `
             <div>
-              <h4 style="margin-top:0;font-size:11px;color:var(--text-dim);">${esc(label)}</h4>
+              <h4 class="u-mt-0 u-text-xs u-text-dim">${esc(label)}</h4>
               <div style="color:var(--text-dim2,#7b8693);font-size:12px;">Aucun absent signalé.</div>
             </div>`;
           return `
             <div>
-              <h4 style="margin-top:0;font-size:11px;color:var(--text-dim);">${esc(label)} · ${injs.length} absent${injs.length > 1 ? 's' : ''}</h4>
+              <h4 class="u-mt-0 u-text-xs u-text-dim">${esc(label)} · ${injs.length} absent${injs.length > 1 ? 's' : ''}</h4>
               <div style="display:flex;flex-direction:column;gap:4px;">
                 ${injs.map(inj => {
                   const lbl = reasonLabel(inj);
@@ -11323,12 +11323,12 @@
           const rows = side?.last5 || [];
           if (!rows.length) return `
             <div>
-              <h4 style="margin-top:0;font-size:11px;color:var(--text-dim);">${esc(label)}</h4>
+              <h4 class="u-mt-0 u-text-xs u-text-dim">${esc(label)}</h4>
               <div style="color:var(--text-dim2,#7b8693);font-size:12px;">Pas d'historique récent.</div>
             </div>`;
           return `
             <div>
-              <h4 style="margin-top:0;font-size:11px;color:var(--text-dim);">${esc(label)}</h4>
+              <h4 class="u-mt-0 u-text-xs u-text-dim">${esc(label)}</h4>
               <div style="display:flex;flex-direction:column;gap:3px;">
                 ${rows.map(r => {
                   const resCol = r.result === 'W' ? '#10b981' : r.result === 'L' ? '#fca5a5' : '#b4bcc7';
@@ -11374,7 +11374,7 @@
                 </span>
               </div>
               ${t.pick ? `<div class="main-pick" style="${tRes === 'lost' ? 'text-decoration:line-through; opacity:.7;' : ''}">🎯 ${esc(t.pick)}</div>` : ''}
-              ${t.odds ? `<div class="main-odds">Cote recommandée : <b style="color:var(--text);">${t.odds.toFixed(2)}</b></div>` : ''}
+              ${t.odds ? `<div class="main-odds">Cote recommandée : <b class="u-text">${t.odds.toFixed(2)}</b></div>` : ''}
               ${t.analysis ? `<div class="analysis">"${esc(t.analysis)}"</div>` : ''}
               ${(t.all_picks && t.all_picks.length > 1) ? `
                 <div class="alt-picks">
@@ -11431,7 +11431,7 @@
             return `<div style="display:grid;grid-template-columns:1fr 110px 1fr;gap:10px;padding:6px 4px;border-bottom:1px solid var(--border);font-size:12.5px;align-items:center;">
               <div style="text-align:right;color:var(--text);" ${hCls}>${esc(hStr)}</div>
               <div style="text-align:center;color:var(--text-dim2);font-size:11px;letter-spacing:.3px;text-transform:uppercase;">${esc(label)}</div>
-              <div style="color:var(--text);" ${aCls}>${esc(aStr)}</div>
+              <div class="u-text" ${aCls}>${esc(aStr)}</div>
             </div>`;
           };
           const rows = [];
@@ -11469,7 +11469,7 @@
           if (validRows.length < 2) return '';
           return `<div style="margin-bottom:14px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;padding:10px 14px;">
             <div style="display:grid;grid-template-columns:1fr 110px 1fr;gap:10px;padding:6px 4px;border-bottom:1px solid var(--border-2);font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;font-weight:700;align-items:center;">
-              <div style="text-align:right;">${esc(home?.short || home?.name || 'Dom.')}</div>
+              <div class="u-text-right">${esc(home?.short || home?.name || 'Dom.')}</div>
               <div style="text-align:center;color:var(--brand);">↔ Comparaison</div>
               <div>${esc(away?.short || away?.name || 'Ext.')}</div>
             </div>
@@ -11600,12 +11600,12 @@
           }
           const calRow = cal ? `<div style="margin-top:14px;padding:12px 14px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;font-size:12.5px;color:var(--text-dim);line-height:1.7;">
             <div style="font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.4px;font-weight:700;margin-bottom:6px;">Calibration ligue (${cal.n} matchs historiques)</div>
-            <span style="color:var(--text);">⚽ ${fmtN(cal.avg_goals, 2)}</span> buts/match ·
-            <span style="color:var(--text);">🏠 ${fmtPct(cal.home_wr)}</span> dom. ·
-            <span style="color:var(--text);">⚖️ ${fmtPct(cal.draw_rate)}</span> nul ·
-            <span style="color:var(--text);">✈️ ${fmtPct(cal.away_wr)}</span> ext. ·
-            <span style="color:var(--text);">📈 +2.5 ${fmtPct(cal.over25_rate)}</span> ·
-            <span style="color:var(--text);">🎯 BTTS ${fmtPct(cal.btts_rate)}</span>
+            <span class="u-text">⚽ ${fmtN(cal.avg_goals, 2)}</span> buts/match ·
+            <span class="u-text">🏠 ${fmtPct(cal.home_wr)}</span> dom. ·
+            <span class="u-text">⚖️ ${fmtPct(cal.draw_rate)}</span> nul ·
+            <span class="u-text">✈️ ${fmtPct(cal.away_wr)}</span> ext. ·
+            <span class="u-text">📈 +2.5 ${fmtPct(cal.over25_rate)}</span> ·
+            <span class="u-text">🎯 BTTS ${fmtPct(cal.btts_rate)}</span>
           </div>` : '';
           return `<div class="section">
             <h4>📊 Chiffres clés foot</h4>
@@ -11777,13 +11777,13 @@
             <h4>📊 Splits domicile / extérieur</h4>
             <div class="two-cols">
               <div>
-                <h4 style="margin-top:0;font-size:11px;color:var(--text-dim);">${esc(home?.name || 'Dom.')}</h4>
+                <h4 class="u-mt-0 u-text-xs u-text-dim">${esc(home?.name || 'Dom.')}</h4>
                 ${hS.overall ? `<div class="kv"><div class="k">Bilan global</div><div class="v">${esc(hS.overall)}</div></div>` : ''}
                 ${hS.home ? `<div class="kv"><div class="k">${labelHome}</div><div class="v">${esc(hS.home)}</div></div>` : ''}
                 ${hS.road ? `<div class="kv"><div class="k">${labelRoad}</div><div class="v">${esc(hS.road)}</div></div>` : ''}
               </div>
               <div>
-                <h4 style="margin-top:0;font-size:11px;color:var(--text-dim);">${esc(away?.name || 'Ext.')}</h4>
+                <h4 class="u-mt-0 u-text-xs u-text-dim">${esc(away?.name || 'Ext.')}</h4>
                 ${aS.overall ? `<div class="kv"><div class="k">Bilan global</div><div class="v">${esc(aS.overall)}</div></div>` : ''}
                 ${aS.home ? `<div class="kv"><div class="k">${labelHome}</div><div class="v">${esc(aS.home)}</div></div>` : ''}
                 ${aS.road ? `<div class="kv"><div class="k">${labelRoad}</div><div class="v">${esc(aS.road)}</div></div>` : ''}
@@ -11827,7 +11827,7 @@
             <h4>🎾 Profil joueurs</h4>
             <div class="two-cols">
               <div>
-                <h4 style="margin-top:0;font-size:11px;color:var(--text-dim);">${esc(home?.name || '—')}</h4>
+                <h4 class="u-mt-0 u-text-xs u-text-dim">${esc(home?.name || '—')}</h4>
                 ${rankH ? `<div class="kv"><div class="k">Classement</div><div class="v">#${esc(rankH)}</div></div>` : ''}
                 ${ctrH ? `<div class="kv"><div class="k">Pays</div><div class="v">${esc(ctrH)}</div></div>` : ''}
                 ${oddH ? `<div class="kv"><div class="k">Cote Winamax</div><div class="v" style="font-variant-numeric:tabular-nums;">@${oddH.toFixed(2)} <span style="color:var(--text-dim2,#7b8693);font-size:11px;">(${impH}%)</span></div></div>` : ''}
@@ -11835,7 +11835,7 @@
                 ${h2hList.length ? `<div class="kv"><div class="k">H2H gagnés</div><div class="v">${h2hHomeWins}/${h2hList.length}</div></div>` : ''}
               </div>
               <div>
-                <h4 style="margin-top:0;font-size:11px;color:var(--text-dim);">${esc(away?.name || '—')}</h4>
+                <h4 class="u-mt-0 u-text-xs u-text-dim">${esc(away?.name || '—')}</h4>
                 ${rankA ? `<div class="kv"><div class="k">Classement</div><div class="v">#${esc(rankA)}</div></div>` : ''}
                 ${ctrA ? `<div class="kv"><div class="k">Pays</div><div class="v">${esc(ctrA)}</div></div>` : ''}
                 ${oddA ? `<div class="kv"><div class="k">Cote Winamax</div><div class="v" style="font-variant-numeric:tabular-nums;">@${oddA.toFixed(2)} <span style="color:var(--text-dim2,#7b8693);font-size:11px;">(${impA}%)</span></div></div>` : ''}
@@ -12281,7 +12281,7 @@
       </div>
       ${recents.map(q => `
         <div class="search-suggest-item" data-recent-q="${esc(q)}" style="display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;">
-          <span style="color:var(--text-dim2);">🕐</span>
+          <span class="u-text-dim2">🕐</span>
           <span style="color:var(--text);flex:1;">${esc(q)}</span>
         </div>
       `).join('')}`;
@@ -14532,7 +14532,7 @@
             <div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:8px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
               <div style="flex:1;min-width:220px;">
                 <div style="font-size:13px;color:var(--text);font-weight:600;">${esc(r.label)}</div>
-                <div style="font-size:11px;color:var(--text-dim);margin-top:3px;font-variant-numeric:tabular-nums;">${r.sample} paris · WR ${r.wr}% · ROI <span style="color:var(--danger);">${r.roi.toFixed(0)}%</span> · P&L ${r.pl.toFixed(2)}u</div>
+                <div style="font-size:11px;color:var(--text-dim);margin-top:3px;font-variant-numeric:tabular-nums;">${r.sample} paris · WR ${r.wr}% · ROI <span class="u-text-danger">${r.roi.toFixed(0)}%</span> · P&L ${r.pl.toFixed(2)}u</div>
               </div>
               <div style="display:flex;gap:6px;">
                 <button data-rule-activate="${esc(r.id)}" style="padding:6px 14px;background:var(--brand);color:#08080a;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">Activer</button>
@@ -14558,9 +14558,9 @@
       return `<div class="agent-pos-row agent-pos-grid" data-match-id="${esc(String(p.m.id||''))}" style="display:grid;grid-template-columns:56px 1fr 80px 72px 80px 90px;gap:12px;padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-radius:8px;align-items:center;cursor:pointer;font-variant-numeric:tabular-nums;font-size:12.5px;transition:background .12s;">
         <div style="color:${confColor};font-weight:700;font-size:11.5px;">${Math.round(p.rel*100)}%</div>
         <div class="text-trunc-x">${esc(pickLabel)}${marketTag}</div>
-        <div style="color:var(--text-dim);">@${p.odd.toFixed(2)}</div>
+        <div class="u-text-dim">@${p.odd.toFixed(2)}</div>
         <div style="color:var(--brand);font-weight:700;">${p.stake.toFixed(2)}€</div>
-        <div style="color:var(--accent);">+${p.gain.toFixed(2)}€</div>
+        <div class="u-text-accent">+${p.gain.toFixed(2)}€</div>
         <div><span style="padding:2px 7px;background:${timeBg};color:${timeColor};border-radius:3px;font-size:10px;font-weight:700;letter-spacing:.4px;">${esc(timeLbl)}</span></div>
       </div>`;
     };
@@ -14888,7 +14888,7 @@
               <span style="font-size:13px;color:var(--text);"><strong style="color:${roiColor};">${pnlSign}${stats.totalPnL.toFixed(2)}€</strong> sur ${stats.n} paris · ${(stats.winRate*100).toFixed(0)}% WR · <span style="color:${roiColor};">${pnlSign}${(stats.roi*100).toFixed(1)}% <span class="gloss-term" data-gloss="roi">ROI</span></span></span>
               ${streakBadge}
               ${modelComparison}
-              ${adherencePct != null ? `<span style="font-size:11.5px;color:var(--text-dim);">Adhérence modèle <strong style="color:var(--text);">${adherencePct}%</strong></span>` : ''}
+              ${adherencePct != null ? `<span style="font-size:11.5px;color:var(--text-dim);">Adhérence modèle <strong class="u-text">${adherencePct}%</strong></span>` : ''}
             </div>
             <button type="button" class="page-btn" data-page="bilan" style="padding:6px 10px;background:transparent;color:var(--brand);border:1px solid var(--brand-soft);border-radius:var(--r-xs);cursor:pointer;font-size:11.5px;font-weight:600;">Voir détail →</button>
           </section>`;
@@ -14931,8 +14931,8 @@
       const topMatchLabel = `${esc(top.homeName || '?')} vs ${esc(top.awayName || '?')}`;
       const isEmpty = nPicks === 0;
       const headline = isEmpty
-        ? `<span style="color:var(--warn);">Aucun pari <span class="gloss-term" data-gloss="edge">edge</span> ≥5% aujourd'hui</span> · garde ta <span class="gloss-term" data-gloss="bankroll">bankroll</span> au calme`
-        : `<strong style="color:var(--accent);">${nPicks} pari${nPicks>1?'s':''} <span class="gloss-term" data-gloss="edge">value</span> disponible${nPicks>1?'s':''}</strong> · mise totale ${totalStake.toFixed(0)}€ · gain potentiel ${totalGain.toFixed(0)}€`;
+        ? `<span class="u-text-warn">Aucun pari <span class="gloss-term" data-gloss="edge">edge</span> ≥5% aujourd'hui</span> · garde ta <span class="gloss-term" data-gloss="bankroll">bankroll</span> au calme`
+        : `<strong class="u-text-accent">${nPicks} pari${nPicks>1?'s':''} <span class="gloss-term" data-gloss="edge">value</span> disponible${nPicks>1?'s':''}</strong> · mise totale ${totalStake.toFixed(0)}€ · gain potentiel ${totalGain.toFixed(0)}€`;
       const riskLabel = riskPct > 0
         ? `<span style="color:${riskPct > 25 ? 'var(--warn)' : 'var(--text-dim)'};">Risque ${riskPct.toFixed(0)}% <span class="gloss-term" data-gloss="bankroll">bankroll</span> · <span class="gloss-term" data-gloss="kelly">Kelly</span> 0.25</span>`
         : '';
@@ -15495,13 +15495,13 @@
               const ret10 = (10 * heroPick.odd).toFixed(2);
               let intuit;
               if (edgePts >= 8) {
-                intuit = `Le bookmaker estime cette issue à <b>${impPct}%</b> alors qu'on calcule <b style="color:var(--accent);">${relPct}%</b> — gros écart en notre faveur (<b style="color:var(--warn);">+${edgePts}pt</b>). Si tu mises 10€ tu peux gagner <b>${ret10}€</b>.`;
+                intuit = `Le bookmaker estime cette issue à <b>${impPct}%</b> alors qu'on calcule <b class="u-text-accent">${relPct}%</b> — gros écart en notre faveur (<b class="u-text-warn">+${edgePts}pt</b>). Si tu mises 10€ tu peux gagner <b>${ret10}€</b>.`;
               } else if (edgePts >= 4) {
                 intuit = `On voit cette issue à <b>${relPct}%</b>, le marché à <b>${impPct}%</b> — petit écart positif (<b>+${edgePts}pt</b>). 10€ misés rapportent <b>${ret10}€</b> en cas de victoire.`;
               } else if (edgePts >= 0) {
                 intuit = `Pick à <b>${relPct}%</b> de réussite estimée, cote @${heroPick.odd.toFixed(2)}. Marge fine — à jouer petit. Gain : 10€ → <b>${ret10}€</b>.`;
               } else {
-                intuit = `Pick à <b>${relPct}%</b> mais cote @${heroPick.odd.toFixed(2)} = marché à ${impPct}%. <b style="color:var(--danger);">Edge négatif</b> — à éviter.`;
+                intuit = `Pick à <b>${relPct}%</b> mais cote @${heroPick.odd.toFixed(2)} = marché à ${impPct}%. <b class="u-text-danger">Edge négatif</b> — à éviter.`;
               }
               return `<div class="ed-hero__intuit" style="margin-top:12px;padding:10px 12px;background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.18);border-left:3px solid var(--brand);border-radius:0 8px 8px 0;font-size:13px;color:var(--text-2);line-height:1.5;">💡 ${intuit}</div>`;
             })()}
@@ -15628,17 +15628,17 @@
               <span class="dash-stat-lbl">Locks</span>
             </button>
             <button type="button" class="dash-stat-item page-btn" data-page="tous" aria-label="${_nPicks} pronostics disponibles">
-              <span class="dash-stat-icon" style="color:var(--accent);">🎯</span>
+              <span class="dash-stat-icon u-text-accent">🎯</span>
               <span class="dash-stat-val">${_nPicks}</span>
               <span class="dash-stat-lbl">Pronos</span>
             </button>
             <button type="button" class="dash-stat-item page-btn" data-page="combines" aria-label="${_nCombines} combinés disponibles">
-              <span class="dash-stat-icon" style="color:var(--brand);">🔗</span>
+              <span class="dash-stat-icon u-text-brand">🔗</span>
               <span class="dash-stat-val">${_nCombines}</span>
               <span class="dash-stat-lbl">Combinés</span>
             </button>
             <button type="button" class="dash-stat-item page-btn" data-page="buteurs" aria-label="${_nButeursMatch} matchs avec buteurs probables">
-              <span class="dash-stat-icon" style="color:var(--warn);">⚽</span>
+              <span class="dash-stat-icon u-text-warn">⚽</span>
               <span class="dash-stat-val">${_nButeursMatch}</span>
               <span class="dash-stat-lbl">Buteurs</span>
             </button>
@@ -15687,7 +15687,7 @@
               <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:${col}22;color:${col};font-weight:700;font-size:12px;flex-shrink:0;">${ico}</span>
               <div style="flex:1;min-width:0;line-height:1.3;">
                 <div style="color:var(--text);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(teams)}</div>
-                <div style="font-size:11px;color:var(--text-dim);">${pickLabel ? esc(pickLabel) + ' @ ' + s.odd.toFixed(2) + ' · ' : ''}${esc(fmtRel(s.ts))}</div>
+                <div class="u-text-xs u-text-dim">${pickLabel ? esc(pickLabel) + ' @ ' + s.odd.toFixed(2) + ' · ' : ''}${esc(fmtRel(s.ts))}</div>
               </div>
               <div style="color:${col};font-weight:700;font-variant-numeric:tabular-nums;flex-shrink:0;">${pl >= 0 ? '+' : ''}${pl.toFixed(2)}u</div>
             </div>`;
@@ -15751,9 +15751,9 @@
           <div style="margin:18px 0 0;padding:12px 16px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);display:flex;flex-wrap:wrap;gap:14px;align-items:center;font-size:12px;">
             <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">📊 Aujourd'hui</div>
             <span><b style="color:var(--text);font-size:14px;">${total}</b> match${total>1?'s':''} ingéré${total>1?'s':''}</span>
-            <span style="color:var(--accent);">✓ <b>${exact}</b> Winamax exact (${exactPct}%)</span>
-            ${tournamentOnly > 0 ? `<span style="color:var(--warn);">~ <b>${tournamentOnly}</b> tournament-only</span>` : ''}
-            ${fallback > 0 ? `<span style="color:var(--text-dim2);">⊘ <b>${fallback}</b> hors catalogue Winamax</span>` : ''}
+            <span class="u-text-accent">✓ <b>${exact}</b> Winamax exact (${exactPct}%)</span>
+            ${tournamentOnly > 0 ? `<span class="u-text-warn">~ <b>${tournamentOnly}</b> tournament-only</span>` : ''}
+            ${fallback > 0 ? `<span class="u-text-dim2">⊘ <b>${fallback}</b> hors catalogue Winamax</span>` : ''}
             <span style="margin-left:auto;color:var(--text-dim2);font-size:11px;">Mode actif : <b style="color:${bookmakerMode==='exact'?'var(--accent)':bookmakerMode==='catalog'?'var(--warn)':'var(--text)'};">${bookmakerMode === 'exact' ? 'Wx exact' : bookmakerMode === 'catalog' ? 'Wx catalog' : 'Tous'}</b></span>
           </div>` ;
         })() : ''}
@@ -15832,7 +15832,7 @@
                   <div style="font-size:10px;color:var(--text-dim);letter-spacing:.5px;text-transform:uppercase;">${sIco} ${esc((typeof sportLabel==='function')?sportLabel(p.m.sport):p.m.sport)}</div>
                   <div style="display:flex;gap:6px;align-items:baseline;font-size:10px;">
                     <span class="dpc-countdown" style="padding:2px 7px;border-radius:999px;color:${_countdownColor};background:${_countdownBg};border:${_countdownBorder};font-weight:600;letter-spacing:.2px;">${esc(_countdownLabel)}</span>
-                    <span style="color:var(--text-dim);">${esc(tLbl)}</span>
+                    <span class="u-text-dim">${esc(tLbl)}</span>
                   </div>
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px;line-height:1.25;">
@@ -15873,8 +15873,8 @@
                   </div>`;
                 })()}
                 <div style="display:flex;justify-content:space-between;align-items:baseline;margin:10px 0;font-size:12px;">
-                  <div><span style="color:var(--text-dim);">Cote</span> <strong style="color:var(--text);">@${p.odd.toFixed(2)}</strong></div>
-                  <div><span style="color:var(--text-dim);border-bottom:1px dotted var(--text-dim);cursor:help;" title="Confiance du modèle : probabilité estimée que ce pari gagne. ≥70 % = très fiable.">Conf</span> <strong style="color:var(--text);">${Math.round(p.rel*100)}%</strong></div>
+                  <div><span class="u-text-dim">Cote</span> <strong class="u-text">@${p.odd.toFixed(2)}</strong></div>
+                  <div><span style="color:var(--text-dim);border-bottom:1px dotted var(--text-dim);cursor:help;" title="Confiance du modèle : probabilité estimée que ce pari gagne. ≥70 % = très fiable.">Conf</span> <strong class="u-text">${Math.round(p.rel*100)}%</strong></div>
                   <div><span style="color:var(--text-dim);border-bottom:1px dotted var(--text-dim);cursor:help;" title="Edge = notre probabilité − probabilité implicite de la cote. > 0 = on est plus optimiste que le bookmaker (=valeur).">Edge</span> <strong style="color:${edgeColor};">+${Math.round(p.edge*100)}pt</strong></div>
                 </div>
                 <!-- v32.0 (Phase 2) — CTA Winamax explicit. La variable url
@@ -15884,7 +15884,7 @@
                      perdre le contexte du dashboard. rel="noopener noreferrer"
                      pour sécurité (pas de window.opener). -->
                 <a href="${esc(url)}" target="_blank" rel="noopener noreferrer" data-no-detail="1" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;margin-top:8px;background:linear-gradient(135deg,#fbbf24 0%,#f59e0b 100%);color:#0c0a0a;border:none;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;cursor:pointer;box-shadow:0 4px 12px rgba(251,191,36,.25);transition:transform .12s,box-shadow .12s;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 16px rgba(251,191,36,.35)';" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 12px rgba(251,191,36,.25)';" onclick="event.stopPropagation();" aria-label="Parier ce match sur Winamax (ouvre dans un nouvel onglet)">
-                  <span style="font-size:14px;">💰</span>
+                  <span class="u-text-md">💰</span>
                   <span>Parier sur Winamax</span>
                   <span style="opacity:.6;font-size:11px;">↗</span>
                 </a>
@@ -16039,7 +16039,7 @@
                     </div>
                   </div>
                   <div style="margin-top:10px;padding-top:8px;border-top:1px dashed rgba(255,255,255,.08);font-size:11.5px;color:var(--text-dim);">
-                    💸 <b style="color:var(--text);">${p.stake}€</b> misé → gain potentiel <b style="color:var(--accent);">${gainTxt}</b>
+                    💸 <b class="u-text">${p.stake}€</b> misé → gain potentiel <b class="u-text-accent">${gainTxt}</b>
                   </div>
                 </article>`;
             }).join('')}
@@ -16077,8 +16077,8 @@
                         <div style="display:flex;align-items:center;gap:6px;">${streakHtml}<span style="font-size:11px;color:var(--accent);font-weight:700;">${Math.round(p.rel*100)}%</span></div>
                       </div>
                       <div style="font-size:13px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(hN)} vs ${esc(aN)}</div>
-                      <div style="font-size:11px;color:var(--text-dim);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(String(lg).slice(0,28))} · <b style="color:var(--brand);">${esc(pickLbl)}</b> @${p.odd.toFixed(2)}</div>
-                      <div style="font-size:10.5px;color:var(--text-dim2);margin-top:2px;">Mise sugg. <b style="color:var(--text);">${p.stake}€</b> · gain pot. ${p.gain.toFixed(0)}€</div>
+                      <div style="font-size:11px;color:var(--text-dim);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(String(lg).slice(0,28))} · <b class="u-text-brand">${esc(pickLbl)}</b> @${p.odd.toFixed(2)}</div>
+                      <div style="font-size:10.5px;color:var(--text-dim2);margin-top:2px;">Mise sugg. <b class="u-text">${p.stake}€</b> · gain pot. ${p.gain.toFixed(0)}€</div>
                     </div>`;
                 }).join('')}
               </div>
@@ -16106,8 +16106,8 @@
                         <span style="font-size:11px;color:var(--warn);font-weight:700;" title="Edge ${(p.edge*100).toFixed(0)}pt · EV ${evPct>=0?'+':''}${evPct.toFixed(0)}%">+${(p.edge*100).toFixed(0)}pt · EV ${evPct>=0?'+':''}${evPct.toFixed(0)}%</span>
                       </div>
                       <div style="font-size:13px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(hN)} vs ${esc(aN)}</div>
-                      <div style="font-size:11px;color:var(--text-dim);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(String(lg).slice(0,28))} · <b style="color:var(--brand);">${esc(pickLbl)}</b> @${p.odd.toFixed(2)}</div>
-                      <div style="font-size:10.5px;color:var(--text-dim2);margin-top:2px;">Mise sugg. <b style="color:var(--text);">${p.stake}€</b> · gain pot. <b style="color:var(--accent);">${p.gain.toFixed(0)}€</b> · risque ↑</div>
+                      <div style="font-size:11px;color:var(--text-dim);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(String(lg).slice(0,28))} · <b class="u-text-brand">${esc(pickLbl)}</b> @${p.odd.toFixed(2)}</div>
+                      <div style="font-size:10.5px;color:var(--text-dim2);margin-top:2px;">Mise sugg. <b class="u-text">${p.stake}€</b> · gain pot. <b class="u-text-accent">${p.gain.toFixed(0)}€</b> · risque ↑</div>
                     </div>`;
                 }).join('')}
               </div>
@@ -16182,7 +16182,7 @@
                 const rel = Number(item.pred.reliability ?? item.pred.pick.prob) || 0;
                 const pk = item.pred.pick.key;
                 const odd = item.pred.odds && (pk === '1' ? item.pred.odds.home : pk === '2' ? item.pred.odds.away : item.pred.odds.draw);
-                pickLine = `<div style="font-size:12px;color:var(--text-dim);margin-top:4px;">→ <b style="color:var(--brand);">${esc(pickLbl)}</b>${odd ? ` @${Number(odd).toFixed(2)}` : ''} · ${Math.round(rel*100)}% confiance</div>`;
+                pickLine = `<div style="font-size:12px;color:var(--text-dim);margin-top:4px;">→ <b class="u-text-brand">${esc(pickLbl)}</b>${odd ? ` @${Number(odd).toFixed(2)}` : ''} · ${Math.round(rel*100)}% confiance</div>`;
               } else if (st.code === 'no_winamax' || st.code === 'no_odds') {
                 pickLine = `<div style="font-size:12px;color:var(--text-dim);margin-top:4px;font-style:italic;">${esc(st.hint)}</div>`;
               } else {
@@ -16206,8 +16206,8 @@
                   ${stBadge}
                 </div>
                 <div style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px;">
-                  <span style="font-size:14px;">${sportEm}</span>
-                  <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">${esc(hN)} <span style="color:var(--text-dim2);font-weight:400;">vs</span> ${esc(aN)}</span>
+                  <span class="u-text-md">${sportEm}</span>
+                  <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">${esc(hN)} <span class="u-text-dim2 u-font-normal">vs</span> ${esc(aN)}</span>
                 </div>
                 <div style="font-size:11px;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(lg.slice(0, 50))}${item.importance >= 50 ? ` · 🔥 enjeu ${item.importance}/100` : ''}</div>
                 ${pickLine}
@@ -16255,7 +16255,7 @@
                 </div>
                 <div style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;color:var(--text);">
                   <span>${sportEm}</span>
-                  <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">${esc(hN)} <span style="color:var(--text-dim2);font-weight:400;">vs</span> ${esc(aN)}</span>
+                  <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">${esc(hN)} <span class="u-text-dim2 u-font-normal">vs</span> ${esc(aN)}</span>
                 </div>
                 <div style="font-size:10.5px;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px;">${esc(String(lg).slice(0, 38))}${item.importance >= 50 ? ` · 🔥 ${item.importance}/100` : ''}</div>
               </div>`;
@@ -16337,13 +16337,13 @@
                     const confCol = legProb >= 70 ? 'var(--accent)' : legProb >= 55 ? '#fbbf24' : 'var(--text-dim)';
                     return `<div style="display:grid;grid-template-columns:44px 1fr auto auto;gap:8px;align-items:baseline;font-variant-numeric:tabular-nums;">
                       <span style="color:${confCol};font-weight:700;font-size:11.5px;">${Math.round(legProb)}%</span>
-                      <span class="text-trunc-x"><span style="color:var(--text-dim);">${esc(matchName)}</span> — <b>${esc(pickLabel)}</b></span>
+                      <span class="text-trunc-x"><span class="u-text-dim">${esc(matchName)}</span> — <b>${esc(pickLabel)}</b></span>
                       <span style="color:var(--text-dim2,#7b8693);font-size:11px;">${esc(legTime)}</span>
                       <span style="color:var(--brand);font-weight:600;">@${(l.odd||0).toFixed(2)}</span>
                     </div>`;
                   }).join('')}
                 </div>
-                <div style="margin-top:10px;font-size:11px;color:var(--text-dim);">Proba combinée <b style="color:var(--text);">${(totalProb*100).toFixed(1)}%</b> · 10€ → <strong style="color:var(--accent);">${(totalOdd*10).toFixed(2)}€</strong> de gain potentiel</div>
+                <div style="margin-top:10px;font-size:11px;color:var(--text-dim);">Proba combinée <b class="u-text">${(totalProb*100).toFixed(1)}%</b> · 10€ → <strong class="u-text-accent">${(totalOdd*10).toFixed(2)}€</strong> de gain potentiel</div>
               </div>`;
             }).join('')}
           </div>
@@ -16450,7 +16450,7 @@
               return `<div class="agent-pos-row" data-match-id="${esc(String(x.m.id||''))}" style="display:grid;grid-template-columns:20px 24px 1fr 110px 60px 70px 50px;gap:8px;padding:6px 10px;background:transparent;border:1px solid transparent;border-radius:6px;align-items:center;cursor:pointer;color:var(--text);">
                 <div>${betMarker}</div>
                 <div style="color:var(--text-dim);font-size:13px;">${sportIco}</div>
-                <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(hn)} <span style="color:var(--text-dim);">vs</span> ${esc(an)}</div>
+                <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(hn)} <span class="u-text-dim">vs</span> ${esc(an)}</div>
                 <div style="color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(x.pred.pick.label)}</div>
                 <div style="color:${confColor};font-weight:700;">${(x.rel*100).toFixed(0)}%</div>
                 <div style="color:${edgeColor};">${x.edge>=0?'+':''}${edgePct}pt</div>
@@ -16476,7 +16476,7 @@
           </div>
           <div style="font-size:13px;color:var(--text-dim);margin-bottom:18px;max-width:620px;line-height:1.5;">
             ${agent.series.length
-              ? `Parti de <strong style="color:var(--text);">${start.toFixed(0)}€ le ${esc(startDateStr)}</strong> — multipliée par <strong style="color:${multiplier>=1?'var(--accent)':'var(--danger)'};">${multiplier.toFixed(2)}×</strong> en ${daysSinceStart} jours. <strong style="color:var(--text);">${agent.series.length}</strong> paris joués · Kelly 0.25× · cap 10% · plancher 0.10€.`
+              ? `Parti de <strong class="u-text">${start.toFixed(0)}€ le ${esc(startDateStr)}</strong> — multipliée par <strong style="color:${multiplier>=1?'var(--accent)':'var(--danger)'};">${multiplier.toFixed(2)}×</strong> en ${daysSinceStart} jours. <strong class="u-text">${agent.series.length}</strong> paris joués · Kelly 0.25× · cap 10% · plancher 0.10€.`
               : `En attente des premiers matchs réglés pour démarrer.`}
           </div>
           ${sparkPath ? `<div style="height:64px;background:var(--panel);border-radius:8px;border:1px solid var(--border);padding:8px 12px;">
@@ -16496,7 +16496,7 @@
               <div>Conf.</div><div>Pari</div><div>Cote</div><div>Mise</div><div>Gain pot.</div><div>Statut</div>
             </div>
             <div style="display:flex;flex-direction:column;gap:4px;">${positions.slice(0,10).map(positionRow).join('')}</div>
-            ${positions.length > 10 ? `<div style="padding:10px;text-align:center;color:var(--text-dim);font-size:11px;cursor:pointer;" data-scroll-to="allmatches">+ ${positions.length-10} autres positions · <span style="color:var(--brand);">voir plus bas</span></div>` : ''}
+            ${positions.length > 10 ? `<div style="padding:10px;text-align:center;color:var(--text-dim);font-size:11px;cursor:pointer;" data-scroll-to="allmatches">+ ${positions.length-10} autres positions · <span class="u-text-brand">voir plus bas</span></div>` : ''}
           ` : `<div style="padding:24px;text-align:center;color:var(--text-dim);font-size:13px;">Aucun match Winamax sélectionné aujourd'hui.</div>`}
         </div>
 
@@ -16531,7 +16531,7 @@
               return `<div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:10px;" ${tooSmall ? 'title="Échantillon trop petit (<5 paris) — chiffres pas représentatifs"' : ''}>
                 <div style="font-size:11px;color:var(--text-dim);margin-bottom:3px;">${esc(sportLabel(sp))}</div>
                 <div style="font-size:20px;font-weight:700;color:${roiColor};letter-spacing:-.4px;">${roiDisplay}</div>
-                <div style="font-size:11px;color:var(--text-dim);">${s.bets} paris${tooSmall ? ' (échantillon trop petit)' : ''} · ${wr}% WR</div>
+                <div class="u-text-xs u-text-dim">${s.bets} paris${tooSmall ? ' (échantillon trop petit)' : ''} · ${wr}% WR</div>
               </div>`;
             }).join('')}
           </div>
@@ -16607,8 +16607,8 @@
           // tabindex+role+aria-label pour accessibilité clavier
           return `<div class="aside-live-row" data-match-id="${esc(String(m.id||''))}" role="button" tabindex="0" aria-label="Match en direct ${esc(home?.name||'?')} vs ${esc(away?.name||'?')}" style="padding:8px 10px;background:rgba(248,113,113,.06);border-left:2px solid var(--danger);border-radius:0 6px 6px 0;margin-bottom:6px;cursor:pointer;transition:background .15s;" onmouseover="this.style.background='rgba(248,113,113,.12)';" onmouseout="this.style.background='rgba(248,113,113,.06)';">
             <div style="font-size:10px;color:var(--danger);font-weight:700;letter-spacing:.3px;">🔴 LIVE · ${esc(league)}</div>
-            <div style="font-size:12.5px;color:var(--text);font-weight:600;margin-top:2px;line-height:1.3;">${esc(home?.name||'?')} <b style="color:var(--accent);">${esc(String(hs))}</b></div>
-            <div style="font-size:12.5px;color:var(--text);font-weight:600;line-height:1.3;">${esc(away?.name||'?')} <b style="color:var(--accent);">${esc(String(as))}</b></div>
+            <div style="font-size:12.5px;color:var(--text);font-weight:600;margin-top:2px;line-height:1.3;">${esc(home?.name||'?')} <b class="u-text-accent">${esc(String(hs))}</b></div>
+            <div style="font-size:12.5px;color:var(--text);font-weight:600;line-height:1.3;">${esc(away?.name||'?')} <b class="u-text-accent">${esc(String(as))}</b></div>
           </div>`;
         }).join('') : `<div style="font-size:12px;color:var(--text-dim);padding:8px 0;">Aucun match en direct.</div>`;
         const upcomingHtml = upcoming.length ? upcoming.map(x => {
@@ -17378,7 +17378,7 @@
           <div>
             <div style="font-size:11px;color:var(--warn);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Notifications · ${alerts.length}</div>
             <h1 style="margin:0 0 6px;font-size:40px;font-weight:800;letter-spacing:-1.4px;color:var(--text);line-height:1;">Alertes</h1>
-            <div style="font-size:14px;color:var(--text-dim);">Mouvements importants de la journée : nouveaux paris sûrs, séries, alertes anti-panique.</div>
+            <div class="u-text-md u-text-dim">Mouvements importants de la journée : nouveaux paris sûrs, séries, alertes anti-panique.</div>
           </div>
           ${alerts.length ? `<button id="clear-alerts" style="background:var(--panel);border:1px solid var(--border);color:var(--text-dim);border-radius:var(--r);padding:8px 14px;font-size:12px;cursor:pointer;">Tout marquer comme lu</button>` : ''}
         </div>
@@ -17759,10 +17759,10 @@
               ${hasRealScore ? `<span style="color:var(--text-dim2);margin:0 4px;">→ réel</span><b style="color:${scoreCorrect ? '#34d399' : 'var(--text-dim)'};font-size:13px;">${realHome}-${realAway}</b><span style="font-size:11px;margin-left:3px;">${scoreCorrect ? '✓' : '✗'}</span>` : ''}
             </div>` : ''}
           ${(predScorers.length || realScorers.length) ? `
-            <div style="color:var(--text-dim);">
+            <div class="u-text-dim">
               <span style="font-size:10px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.5px;font-weight:700;display:block;margin-bottom:3px;">⚽ Buteurs</span>
-              ${predScorers.length ? `<div><span style="opacity:.75;">Probables :</span> <b style="color:var(--text);">${predScorers.map(s => `${esc(s.name)} <span style="color:var(--text-dim2);font-weight:400;">(${Math.round(s.prob*100)}%)</span>`).join(', ')}</b></div>` : ''}
-              ${realScorers.length ? `<div style="margin-top:${predScorers.length?'2':'0'}px;"><span style="opacity:.75;">Réels :</span> <b style="color:${predScorerHit ? '#34d399' : 'var(--text)'};">${realScorers.map(s => `${esc(s.name)}${s.minute ? ` <span style="color:var(--text-dim2);font-weight:400;">${esc(s.minute)}</span>` : ''}`).join(', ')}</b>${predScorerHit ? ' <span style="color:var(--accent);font-weight:600;">✓ pick touché</span>' : ''}</div>` : ''}
+              ${predScorers.length ? `<div><span style="opacity:.75;">Probables :</span> <b class="u-text">${predScorers.map(s => `${esc(s.name)} <span class="u-text-dim2 u-font-normal">(${Math.round(s.prob*100)}%)</span>`).join(', ')}</b></div>` : ''}
+              ${realScorers.length ? `<div style="margin-top:${predScorers.length?'2':'0'}px;"><span style="opacity:.75;">Réels :</span> <b style="color:${predScorerHit ? '#34d399' : 'var(--text)'};">${realScorers.map(s => `${esc(s.name)}${s.minute ? ` <span class="u-text-dim2 u-font-normal">${esc(s.minute)}</span>` : ''}`).join(', ')}</b>${predScorerHit ? ' <span style="color:var(--accent);font-weight:600;">✓ pick touché</span>' : ''}</div>` : ''}
             </div>` : ''}
         </div>` : '';
       return `<div class="tous-row" data-match-id="${esc(String(p.m.id || ''))}" data-match-date="${esc(String(p.m.date || ''))}" style="display:grid;gap:14px;padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${isFini ? (p.res==='won'?'#34d399':p.res==='lost'?'#fca5a5':'var(--text-dim)') : (p.rel>=0.70 ? 'var(--accent)' : 'var(--brand)')};border-radius:0 10px 10px 0;align-items:center;cursor:pointer;font-variant-numeric:tabular-nums;">
@@ -17787,7 +17787,7 @@
           })()}</div>
         </div>
         <div style="display:flex;flex-direction:column;gap:2px;font-size:11px;">
-          <div><span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Confiance du modèle : probabilité estimée que ce pari gagne. ≥70 % = très fiable.">Conf</span> <b style="color:${confColor};">${Math.round(p.rel*100)}%</b> · <span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Cote décimale. La source (Winamax / externe / archive) est indiquée à côté.">Cote</span> <b style="color:var(--text);">${p.odd ? '@' + p.odd.toFixed(2) : '<span style=\"color:var(--text-dim2);font-weight:400;\">cote pré-match perdue</span>'}</b> ${_coteSrc}</div>
+          <div><span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Confiance du modèle : probabilité estimée que ce pari gagne. ≥70 % = très fiable.">Conf</span> <b style="color:${confColor};">${Math.round(p.rel*100)}%</b> · <span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Cote décimale. La source (Winamax / externe / archive) est indiquée à côté.">Cote</span> <b class="u-text">${p.odd ? '@' + p.odd.toFixed(2) : '<span style=\"color:var(--text-dim2);font-weight:400;\">cote pré-match perdue</span>'}</b> ${_coteSrc}</div>
           <div><span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Edge = notre probabilité − probabilité implicite de la cote. > 0 = on est plus optimiste que le bookmaker (=valeur).">Edge</span> <b style="color:${edgeColor};">${p.nonTrackable ? '<span style=\"color:var(--text-dim2);font-weight:400;\">—</span>' : (p.edge>=0?'+':'') + Math.round(p.edge*100) + 'pt'}</b>${p.nonTrackable || !(p.odd > 1) ? '' : (() => {
             // 2026-05-01 — Affichage EV (Expected Value) à côté de l'Edge.
             // EV = rel × cote − 1. C'est le retour attendu par euro misé.
@@ -17799,7 +17799,7 @@
             return ` · <span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Expected Value : retour attendu par euro misé sur le long terme. = proba × cote - 1. ≥ +2% = pari mathématiquement gagnant.">EV</span> <b style="color:${evCol};">${ev>=0?'+':''}${Math.round(ev*100)}%</b>`;
           })()}</div>
         </div>
-        <div style="text-align:right;">
+        <div class="u-text-right">
           ${isFini ? resBadge : ''}
           ${p.nonTrackable ? '<div style="margin-top:4px;font-size:9.5px;color:var(--text-dim2);font-style:italic;" title="Match terminé sans cote pré-match captée — résultat visible mais hors bilan ROI">📋 résultat seul</div>' : ''}
         </div>
@@ -17865,15 +17865,15 @@
         <div style="padding:40px 0 20px;border-bottom:1px solid var(--border);">
           <div style="font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Aujourd'hui · Winamax</div>
           <h1 style="margin:0 0 6px;font-size:32px;font-weight:800;letter-spacing:-1.1px;color:var(--text);line-height:1.1;">Tous les pronos du jour</h1>
-          <div style="font-size:14px;color:var(--text-dim);">${pending.length + inProgress.length} prono${(pending.length + inProgress.length)>1?'s':''} value · ${pending.length} à venir · ${inProgress.length} en cours · ${finished.length} fini${finished.length>1?'s':''}${_completedNoOdds > 0 ? ` <span style="color:var(--text-dim2);" title="${_completedNoOdds} match${_completedNoOdds>1?'s':''} terminé${_completedNoOdds>1?'s':''} sans cote pré-match capturée (qualifs WTA/Challenger, etc.) → résultat visible mais pas dans le bilan ROI.">(+${_completedNoOdds} sans cote pré-match)</span>` : ''}${settledCount ? ` (<b style="color:${wrPct>=60?'#34d399':'var(--text-dim)'};">${wrPct}% réussite</b> sur ${settledCount})` : ''}${filtersActive ? `&nbsp;·&nbsp;<span style="color:var(--brand);font-weight:600;">filtres actifs</span>` : ''}<div style="font-size:11px;color:var(--text-dim2);margin-top:3px;">↳ paris à venir/en cours = edge ≥ -2pt (bad value filtré). Finis = picks avec cote capturée pour tracker la perf modèle.</div></div>
+          <div class="u-text-md u-text-dim">${pending.length + inProgress.length} prono${(pending.length + inProgress.length)>1?'s':''} value · ${pending.length} à venir · ${inProgress.length} en cours · ${finished.length} fini${finished.length>1?'s':''}${_completedNoOdds > 0 ? ` <span class="u-text-dim2" title="${_completedNoOdds} match${_completedNoOdds>1?'s':''} terminé${_completedNoOdds>1?'s':''} sans cote pré-match capturée (qualifs WTA/Challenger, etc.) → résultat visible mais pas dans le bilan ROI.">(+${_completedNoOdds} sans cote pré-match)</span>` : ''}${settledCount ? ` (<b style="color:${wrPct>=60?'#34d399':'var(--text-dim)'};">${wrPct}% réussite</b> sur ${settledCount})` : ''}${filtersActive ? `&nbsp;·&nbsp;<span style="color:var(--brand);font-weight:600;">filtres actifs</span>` : ''}<div style="font-size:11px;color:var(--text-dim2);margin-top:3px;">↳ paris à venir/en cours = edge ≥ -2pt (bad value filtré). Finis = picks avec cote capturée pour tracker la perf modèle.</div></div>
         </div>
         ${_sourcesStats && _sourcesStats.total > 0 ? `
           <!-- v33.1 — Widget Sources data : transparency sur d'où vient la couverture. -->
           <div style="margin:14px 0 4px;padding:10px 14px;background:var(--panel);border:1px solid var(--border);border-radius:8px;font-size:11.5px;color:var(--text-dim);display:flex;flex-wrap:wrap;gap:14px;align-items:center;font-variant-numeric:tabular-nums;" title="Sources de la couverture events. Plus de sources = pipeline résilient (si une source ban, les autres comblent).">
             <span style="color:var(--text-dim2);text-transform:uppercase;letter-spacing:.8px;font-weight:700;font-size:10px;">📡 Sources</span>
-            ${_sourcesStats.espn > 0 ? `<span><b style="color:var(--text);">ESPN</b> ${_sourcesStats.espn} events</span>` : ''}
-            ${_sourcesStats.sofa > 0 ? `<span><b style="color:var(--text);">Sofascore</b> ${_sourcesStats.sofa} events <span style="opacity:.6;font-size:10px;">(couverture étendue)</span></span>` : ''}
-            ${_sourcesStats.winamax > 0 ? `<span><b style="color:var(--accent);">Winamax</b> ${_sourcesStats.winamax} cotes 1N2 trackables</span>` : ''}
+            ${_sourcesStats.espn > 0 ? `<span><b class="u-text">ESPN</b> ${_sourcesStats.espn} events</span>` : ''}
+            ${_sourcesStats.sofa > 0 ? `<span><b class="u-text">Sofascore</b> ${_sourcesStats.sofa} events <span style="opacity:.6;font-size:10px;">(couverture étendue)</span></span>` : ''}
+            ${_sourcesStats.winamax > 0 ? `<span><b class="u-text-accent">Winamax</b> ${_sourcesStats.winamax} cotes 1N2 trackables</span>` : ''}
           </div>
         ` : ''}
 
@@ -18144,7 +18144,7 @@
           </div>
           <div style="font-size:13px;color:var(--text-2);text-align:center;line-height:1.5;max-width:480px;">
             <b style="color:${eceColor};">Calibration ${eceLabel}</b> · écart moyen pondéré <b>${(ece*100).toFixed(1)} pt</b> sur ${totalN} paris.
-            <span style="color:var(--text-dim);">Un modèle bien calibré place ses points sur la diagonale.</span>
+            <span class="u-text-dim">Un modèle bien calibré place ses points sur la diagonale.</span>
           </div>
         </div>`;
     }
@@ -18190,7 +18190,7 @@
               <li><b>Force d'équipe (ELO)</b> — rating indépendant du championnat, mis à jour match après match</li>
               <li><b>Face-à-face H2H</b> — historique direct entre les deux équipes</li>
             </ul>
-            <div style="margin-top:12px;">Chaque composante donne sa propre probabilité de victoire. On les blende, on calcule le <b>désaccord entre sources</b> (fiabilité) et on <b>calibre le résultat</b> contre l'historique réel. Si moins de 2 composantes sont disponibles ou si la fiabilité calibrée est sous 45%, <b>le pari n'est pas proposé</b>.</div>
+            <div class="u-mt-3">Chaque composante donne sa propre probabilité de victoire. On les blende, on calcule le <b>désaccord entre sources</b> (fiabilité) et on <b>calibre le résultat</b> contre l'historique réel. Si moins de 2 composantes sont disponibles ou si la fiabilité calibrée est sous 45%, <b>le pari n'est pas proposé</b>.</div>
           </div>
         </section>
 
@@ -18219,7 +18219,7 @@
               const brier = d.brier;
               const colB = colorBrier(brier);
               return `<div style="display:grid;grid-template-columns:1fr 50px 70px 70px 60px;gap:8px;padding:9px 12px;border-bottom:1px solid var(--border);align-items:center;font-size:12.5px;">
-                <div><b style="color:var(--text);">${esc(label)}</b>${sub?` <span style="color:var(--text-dim2);font-size:11px;">${esc(sub)}</span>`:''}</div>
+                <div><b class="u-text">${esc(label)}</b>${sub?` <span style="color:var(--text-dim2);font-size:11px;">${esc(sub)}</span>`:''}</div>
                 <div style="color:var(--text-dim);text-align:right;font-variant-numeric:tabular-nums;">${d.n} pari${d.n>1?'s':''}</div>
                 <div style="color:var(--text-2);text-align:right;font-variant-numeric:tabular-nums;">${fmtWr(d.win_rate)} WR</div>
                 <div style="color:${col};font-weight:700;text-align:right;font-variant-numeric:tabular-nums;">${fmtRoi(roi)}</div>
@@ -18227,7 +18227,7 @@
               </div>`;
             };
             const headerOf = (lbl) => `<div style="display:grid;grid-template-columns:1fr 50px 70px 70px 60px;gap:8px;padding:8px 12px;font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;font-weight:700;border-bottom:1px solid var(--border-2);background:var(--panel-2,rgba(255,255,255,.02));">
-              <div>${esc(lbl)}</div><div style="text-align:right;">N</div><div style="text-align:right;">Réussite</div><div style="text-align:right;">ROI</div><div style="text-align:right;" title="Brier score : qualité calibration des probas">Brier</div>
+              <div>${esc(lbl)}</div><div class="u-text-right">N</div><div class="u-text-right">Réussite</div><div class="u-text-right">ROI</div><div class="u-text-right" title="Brier score : qualité calibration des probas">Brier</div>
             </div>`;
             // by_sport
             const bySport = Object.entries(rep.by_sport || {}).sort((a,b) => (b[1].n||0) - (a[1].n||0));
@@ -18279,7 +18279,7 @@
             if (!bt || !bt.calibration_5 || !bt.calibration_20) return '';
             return `
             <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin:0 4px 8px;font-size:12px;">
-              <span style="color:var(--text-dim);">Granularité</span>
+              <span class="u-text-dim">Granularité</span>
               <select id="cred-bins-select" style="background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:6px;padding:5px 8px;font-size:12px;cursor:pointer;font-family:inherit;">
                 <option value="5">5 bins (gros tableaux)</option>
                 <option value="10" selected>10 bins (défaut)</option>
@@ -18326,9 +18326,9 @@
                     <span style="margin-left:auto;font-size:10px;color:var(--text-dim);">n=${s.n}</span>
                   </div>
                   <div style="display:flex;gap:14px;font-size:12.5px;align-items:baseline;">
-                    <div><span style="color:var(--text-dim);">Brier</span> <b style="color:${col};">${brier.toFixed(3)}</b></div>
-                    <div><span style="color:var(--text-dim);">WR</span> <b style="color:var(--text);">${(s.win_rate*100).toFixed(0)}%</b></div>
-                    <div><span style="color:var(--text-dim);">ROI</span> <b style="color:${roiCol};">${roi >= 0 ? '+' : ''}${roi.toFixed(1)}%</b></div>
+                    <div><span class="u-text-dim">Brier</span> <b style="color:${col};">${brier.toFixed(3)}</b></div>
+                    <div><span class="u-text-dim">WR</span> <b class="u-text">${(s.win_rate*100).toFixed(0)}%</b></div>
+                    <div><span class="u-text-dim">ROI</span> <b style="color:${roiCol};">${roi >= 0 ? '+' : ''}${roi.toFixed(1)}%</b></div>
                   </div>
                   <div style="font-size:11px;color:${col};margin-top:6px;font-weight:600;">${lbl}</div>
                 </div>`;
@@ -18500,8 +18500,8 @@
               </div>
               <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px;">${esc(ou.label)}</div>
               <div style="display:flex;gap:14px;font-size:12px;color:var(--text-2);font-variant-numeric:tabular-nums;">
-                <span><b style="color:var(--text);">${(ou.prob*100).toFixed(0)}%</b> de chances</span>
-                ${ouImplied ? `<span>cote ~<b style="color:var(--text);">${ouImplied.toFixed(2)}</b></span>` : ''}
+                <span><b class="u-text">${(ou.prob*100).toFixed(0)}%</b> de chances</span>
+                ${ouImplied ? `<span>cote ~<b class="u-text">${ouImplied.toFixed(2)}</b></span>` : ''}
               </div>
             </div>
 
@@ -18512,8 +18512,8 @@
               </div>
               <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px;">${esc(btts.label)}</div>
               <div style="display:flex;gap:14px;font-size:12px;color:var(--text-2);font-variant-numeric:tabular-nums;">
-                <span><b style="color:var(--text);">${(btts.prob*100).toFixed(0)}%</b> de chances</span>
-                ${bttsImplied ? `<span>cote ~<b style="color:var(--text);">${bttsImplied.toFixed(2)}</b></span>` : ''}
+                <span><b class="u-text">${(btts.prob*100).toFixed(0)}%</b> de chances</span>
+                ${bttsImplied ? `<span>cote ~<b class="u-text">${bttsImplied.toFixed(2)}</b></span>` : ''}
               </div>
             </div>
           </div>
@@ -18706,7 +18706,7 @@
       </tr>`;
     };
     const table = (title, rows) => rows.length ? `
-      <div style="margin-top:18px;">
+      <div class="u-mt-18">
         <div style="font-size:10px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;font-weight:700;margin-bottom:6px;">${esc2(title)}</div>
         <div class="tbl-scroll">
           <table style="width:100%;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums;">
@@ -18730,7 +18730,7 @@
     // Calibration bars
     const calib = (rep.calibration || []).filter(b => b.n > 0);
     const calibHtml = calib.length ? `
-      <div style="margin-top:18px;">
+      <div class="u-mt-18">
         <div style="font-size:10px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;font-weight:700;margin-bottom:10px;">Calibration · fiabilité des probas</div>
         <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;font-variant-numeric:tabular-nums;">
           ${calib.map(b => {
@@ -18740,7 +18740,7 @@
             const gapColor = Math.abs(gap) < 0.1 ? 'var(--accent)' : Math.abs(gap) < 0.2 ? '#fbbf24' : 'var(--danger)';
             const barW = Math.max(pm, wr);
             return `<div style="display:grid;grid-template-columns:80px 1fr 70px;gap:12px;align-items:center;">
-              <div style="color:var(--text-dim);">${(b.lo*100).toFixed(0)}–${(b.hi*100).toFixed(0)}% <span style="opacity:.6;">(${b.n})</span></div>
+              <div class="u-text-dim">${(b.lo*100).toFixed(0)}–${(b.hi*100).toFixed(0)}% <span style="opacity:.6;">(${b.n})</span></div>
               <div style="position:relative;height:18px;">
                 <div style="position:absolute;left:0;top:0;height:8px;width:${pm}%;background:var(--brand);opacity:.5;border-radius:2px;" title="Proba moyenne ${pm}%"></div>
                 <div style="position:absolute;left:0;bottom:0;height:8px;width:${wr}%;background:var(--accent);border-radius:2px;" title="Win rate réel ${wr}%"></div>
@@ -18750,7 +18750,7 @@
           }).join('')}
         </div>
         <div style="margin-top:8px;font-size:10px;color:var(--text-dim);">
-          Barres : <span style="color:var(--brand);">proba dite par le modèle</span> vs <span style="color:var(--accent);">win rate réel</span>. Gap = écart.
+          Barres : <span class="u-text-brand">proba dite par le modèle</span> vs <span class="u-text-accent">win rate réel</span>. Gap = écart.
         </div>
       </div>` : '';
 
@@ -18760,7 +18760,7 @@
           <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;">Performance du modèle</div>
           <div style="font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.6px;margin-top:2px;">Backtest du vrai predictMatch</div>
         </div>
-        <div style="font-size:11px;color:var(--text-dim);">Généré ${esc2(gen)}${rep.n_events != null ? ` · ${rep.n_events} picks` : ''}</div>
+        <div class="u-text-xs u-text-dim">Généré ${esc2(gen)}${rep.n_events != null ? ` · ${rep.n_events} picks` : ''}</div>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;">
         <div style="padding:12px;background:var(--panel-2);border-radius:8px;">
@@ -18925,14 +18925,14 @@
             <h2 id="onb-title">👋 Bienvenue sur Paris-Sportif</h2>
             <div class="sub">Site indépendant, modèle Poisson + Dixon-Coles + calibration isotonique. <strong>Objectif : te faire gagner de l'argent</strong> en repérant les matchs où Winamax se trompe.</div>
             <div style="background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px 16px;margin:14px 0;line-height:1.6;font-size:13.5px;color:var(--text-2);">
-              <div style="margin-bottom:8px;"><strong style="color:var(--accent);">✓ Ce que tu trouves ici :</strong></div>
+              <div style="margin-bottom:8px;"><strong class="u-text-accent">✓ Ce que tu trouves ici :</strong></div>
               <div>• Picks value (edge ≥5% calculé vs cotes Winamax temps réel)</div>
               <div>• Mises calculées (Kelly fractionné, cap 10% bankroll)</div>
               <div>• Backtest transparent (toutes les perfs tracées)</div>
               <div>• 100% Winamax, zéro affiliation, zéro promesse</div>
             </div>
             <div style="background:rgba(252,165,165,.08);border:1px solid var(--danger);border-left:3px solid var(--danger);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:14px;font-size:12.5px;color:var(--text-dim);line-height:1.5;">
-              <strong style="color:var(--danger);">⚠ Honnêteté :</strong> 3-5 pertes consécutives sont <strong>normales</strong>. ~60% de réussite long-terme. Pas de garantie. Joue responsable.
+              <strong class="u-text-danger">⚠ Honnêteté :</strong> 3-5 pertes consécutives sont <strong>normales</strong>. ~60% de réussite long-terme. Pas de garantie. Joue responsable.
             </div>
           `;
         } else if (state.step === 2) {
@@ -18974,19 +18974,19 @@
             <h2 id="onb-title">📖 Comment lire un pick</h2>
             <div class="sub">Exemple concret pour que tu sois autonome dès le 1er match.</div>
             <div style="background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--r-sm);padding:14px 16px;margin:14px 0;font-size:13px;line-height:1.7;">
-              <div style="font-weight:700;color:var(--text);font-size:14px;margin-bottom:8px;">PSG vs Marseille · Pick: <strong style="color:var(--accent);">PSG (1)</strong></div>
+              <div style="font-weight:700;color:var(--text);font-size:14px;margin-bottom:8px;">PSG vs Marseille · Pick: <strong class="u-text-accent">PSG (1)</strong></div>
               <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-variant-numeric:tabular-nums;font-size:12.5px;color:var(--text-dim);">
-                <span>Cote: <strong style="color:var(--text);">@1.85</strong></span>
-                <span>Confiance: <strong style="color:var(--text);">62%</strong></span>
-                <span>Edge: <strong style="color:var(--accent);">+8pt</strong></span>
-                <span>Mise: <strong style="color:var(--brand);">5€</strong></span>
+                <span>Cote: <strong class="u-text">@1.85</strong></span>
+                <span>Confiance: <strong class="u-text">62%</strong></span>
+                <span>Edge: <strong class="u-text-accent">+8pt</strong></span>
+                <span>Mise: <strong class="u-text-brand">5€</strong></span>
               </div>
             </div>
             <div style="font-size:13px;line-height:1.7;color:var(--text-2);">
-              <div><strong style="color:var(--accent);">Cote 1.85</strong> = pour 1€ misé tu gagnes 0.85€ si PSG gagne</div>
-              <div><strong style="color:var(--accent);">Confiance 62%</strong> = le modèle estime à 62% la victoire de PSG</div>
-              <div><strong style="color:var(--accent);">Edge +8pt</strong> = l'avantage value vs la cote (le marché donne ~54% à PSG, on dit 62%)</div>
-              <div><strong style="color:var(--accent);">Mise 5€</strong> = Kelly fractionné × bankroll, plafonné 10%</div>
+              <div><strong class="u-text-accent">Cote 1.85</strong> = pour 1€ misé tu gagnes 0.85€ si PSG gagne</div>
+              <div><strong class="u-text-accent">Confiance 62%</strong> = le modèle estime à 62% la victoire de PSG</div>
+              <div><strong class="u-text-accent">Edge +8pt</strong> = l'avantage value vs la cote (le marché donne ~54% à PSG, on dit 62%)</div>
+              <div><strong class="u-text-accent">Mise 5€</strong> = Kelly fractionné × bankroll, plafonné 10%</div>
             </div>
             <div style="margin-top:14px;padding:10px 14px;background:rgba(167,139,250,.08);border:1px solid var(--brand-soft);border-radius:var(--r-sm);font-size:12px;color:var(--text-2);line-height:1.5;">
               💡 Tu vois <strong>+8pt edge</strong> sur un pick ? C'est value. <strong>Edge ≤ 0 ?</strong> Le modèle skip — pas de pari forcé.
@@ -19213,7 +19213,7 @@
                 <div style="padding:12px 14px;background:${bgKind};border-left:3px solid ${brdKind};border-radius:6px;margin-bottom:8px;">
                   <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
                     <span style="font-size:16px;">${l.emoji}</span>
-                    <span style="font-size:11px;color:var(--text-dim);">${date} · ${esc(l.matchLabel || '')}</span>
+                    <span class="u-text-xs u-text-dim">${date} · ${esc(l.matchLabel || '')}</span>
                   </div>
                   <div style="font-size:13px;color:var(--text-2);line-height:1.5;">${esc(l.text)}</div>
                 </div>`;
@@ -19839,7 +19839,7 @@
             <circle cx="${xy[xy.length-1][0].toFixed(1)}" cy="${xy[xy.length-1][1].toFixed(1)}" r="2.5" fill="${movColor}"/>
           </svg>
           <div style="font-size:11.5px;line-height:1.4;color:var(--text);font-variant-numeric:tabular-nums;">
-            <div><b>${first.toFixed(2)}</b> <span style="color:var(--text-dim);">→</span> <b>${last.toFixed(2)}</b></div>
+            <div><b>${first.toFixed(2)}</b> <span class="u-text-dim">→</span> <b>${last.toFixed(2)}</b></div>
             <div style="color:${movColor};font-weight:600;font-size:11px;">${moveArrow} ${esc(moveLbl)}</div>
             <div style="color:var(--text-dim);font-size:10.5px;margin-top:1px;">${esc(fmtT(t0))} → ${esc(fmtT(t1))} · ${pts.length} pts</div>
           </div>
@@ -20039,7 +20039,7 @@
               ${candidates.length ? `<b>${candidates.length}</b> candidat${candidates.length>1?'s':''} haute confiance dans la fenêtre, mais trop proches temporellement ou tous dans le même sport/ligue.` : 'Aucun candidat haute confiance dans la fenêtre temporelle.'}<br><br>
               ${fallbackHint}
             </div>
-            <button class="page-btn es-cta" data-page="locks" style="margin-top:16px;">🔒 Voir les Locks individuels</button>
+            <button class="page-btn es-cta u-mt-4" data-page="locks">🔒 Voir les Locks individuels</button>
           </div>
         </div>`;
       return;
@@ -20557,11 +20557,11 @@
         perfWrap.innerHTML = `
           <div class="page-wrap">
             <div class="page-header">
-              <div class="lbl-tiny" style="color:var(--brand);">Performance · Vue globale</div>
+              <div class="lbl-tiny u-text-brand">Performance · Vue globale</div>
               <h1 class="page-h1">🎯 Performance</h1>
               <div class="skeleton-text w-70"></div>
             </div>
-            <div style="margin-top:16px;">${'<div class="skeleton-card"></div>'.repeat(3)}</div>
+            <div class="u-mt-4">${'<div class="skeleton-card"></div>'.repeat(3)}</div>
           </div>`;
         window._ensureFullData().then(() => { try { renderPerformancePage(perfWrap); } catch(e) { console.warn('renderPerformancePage failed', e); } }).catch(() => {
           try { renderPerformancePage(perfWrap); } catch(e) { console.warn('renderPerformancePage failed', e); }
@@ -20588,11 +20588,11 @@
         matchsWrap.innerHTML = `
           <div class="page-wrap" style="padding:0 8px 24px;">
             <div class="page-header">
-              <div class="lbl-tiny" style="color:var(--brand);">Explorer · Tous les matchs</div>
+              <div class="lbl-tiny u-text-brand">Explorer · Tous les matchs</div>
               <h1 class="page-h1">🔍 Matchs détectés</h1>
               <div class="skeleton-text w-70"></div>
             </div>
-            <div style="margin-top:16px;">
+            <div class="u-mt-4">
               ${'<div class="skeleton-card"></div>'.repeat(6)}
             </div>
           </div>`;
@@ -20676,11 +20676,11 @@
         calendrierWrap.innerHTML = `
           <div class="page-wrap" style="padding:0 8px 24px;">
             <div class="page-header">
-              <div class="lbl-tiny" style="color:var(--brand);">Pronos · 7 jours</div>
+              <div class="lbl-tiny u-text-brand">Pronos · 7 jours</div>
               <h1 class="page-h1">📅 Calendrier des pronos</h1>
               <div class="skeleton-text w-70"></div>
             </div>
-            <div style="margin-top:16px;">
+            <div class="u-mt-4">
               ${'<div class="skeleton-card tall"></div>'.repeat(3)}
             </div>
           </div>`;
@@ -21563,7 +21563,7 @@
       // v31.7.205 — Si collapsible, wrap dans <details> natif
       if (collapsible && entries.length > 5) {
         return `
-          <div class="locks-section" style="margin-top:18px;">
+          <div class="locks-section u-mt-18">
             <details>
               <summary style="cursor:pointer;list-style:none;padding:6px 0;display:flex;align-items:center;justify-content:space-between;gap:10px;">
                 <div class="section-header top-picks" style="margin:0;flex:1;">
@@ -21572,12 +21572,12 @@
                 </div>
                 <span style="color:var(--brand);font-size:12px;font-weight:600;">▾ Afficher</span>
               </summary>
-              <div style="margin-top:12px;">${blocks}</div>
+              <div class="u-mt-3">${blocks}</div>
             </details>
           </div>`;
       }
       return `
-        <div class="locks-section" style="margin-top:18px;">
+        <div class="locks-section u-mt-18">
           <div class="section-header top-picks" style="margin-top:6px;">
             <h2><span class="ico">🔒</span>${title}</h2>
             <div class="hint">${hint}</div>
@@ -21615,7 +21615,7 @@
       ? `<div class="empty-state-v2">
            <div class="es-illustration">🔒</div>
            <div class="es-title-v2">Le modèle prend sa journée</div>
-           <div class="es-body-v2">Aucun lock à 70%+ de confiance pour le moment. C'est <b style="color:var(--text);">normal</b> : le modèle préfère ne rien recommander plutôt que sortir des picks faibles. Reviens en début de soirée quand les cotes pré-match arrivent.</div>
+           <div class="es-body-v2">Aucun lock à 70%+ de confiance pour le moment. C'est <b class="u-text">normal</b> : le modèle préfère ne rien recommander plutôt que sortir des picks faibles. Reviens en début de soirée quand les cotes pré-match arrivent.</div>
            <div class="es-actions-v2">
              <button class="page-btn" data-page="tous" style="padding:10px 18px;background:var(--brand);color:#08080a;border:none;border-radius:var(--r-sm);cursor:pointer;font-weight:700;font-size:13px;">📋 Voir tous les pronos</button>
              <button class="page-btn" data-page="calendrier" style="padding:10px 18px;background:transparent;color:var(--brand);border:1px solid var(--brand-border);border-radius:var(--r-sm);cursor:pointer;font-weight:600;font-size:13px;">📅 Calendrier 7j</button>
@@ -21675,9 +21675,9 @@
                 </div>
                 <div style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;color:var(--text);">
                   <span>${sportEm}</span>
-                  <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">${esc(hN)} <span style="color:var(--text-dim2);font-weight:400;">vs</span> ${esc(aN)}</span>
+                  <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">${esc(hN)} <span class="u-text-dim2 u-font-normal">vs</span> ${esc(aN)}</span>
                 </div>
-                <div style="font-size:11px;color:var(--text-dim);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(String(lg).slice(0,32))} · <b style="color:var(--brand);">→ ${esc(pickLbl)}</b>${odd ? ` @${Number(odd).toFixed(2)}` : ''}</div>
+                <div style="font-size:11px;color:var(--text-dim);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(String(lg).slice(0,32))} · <b class="u-text-brand">→ ${esc(pickLbl)}</b>${odd ? ` @${Number(odd).toFixed(2)}` : ''}</div>
               </div>`;
           }).join('')}
         </div>
@@ -21857,10 +21857,10 @@
           <div style="min-width:0;">
             <div style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--text);flex-wrap:wrap;">
               <span style="font-size:13px;">${sportEm}</span>
-              <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">${esc(hN)} <span style="color:var(--text-dim2);font-weight:400;">vs</span> ${esc(aN)}</span>
+              <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">${esc(hN)} <span class="u-text-dim2 u-font-normal">vs</span> ${esc(aN)}</span>
               ${lockBadge}${statusBadge}
             </div>
-            <div style="font-size:11px;color:var(--text-dim);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(lg.slice(0, 40))}${pickLbl ? ` · <b style="color:var(--brand);">→ ${esc(pickLbl)}</b>` : ''}</div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(lg.slice(0, 40))}${pickLbl ? ` · <b class="u-text-brand">→ ${esc(pickLbl)}</b>` : ''}</div>
           </div>
           ${rightCol}
         </div>`;
@@ -21970,9 +21970,9 @@
       <div class="page-wrap" style="padding:0 8px 24px;">
         <div class="page-header">
           <div style="position:absolute;top:0;left:0;width:40px;height:3px;background:var(--brand);border-radius:0 0 2px 2px;"></div>
-          <div class="lbl-tiny" style="color:var(--brand);">Pronos · 7 jours</div>
+          <div class="lbl-tiny u-text-brand">Pronos · 7 jours</div>
           <h1 class="page-h1">📅 Calendrier des pronos</h1>
-          <div style="font-size:14px;color:var(--text-dim);">Vue d'ensemble sur 7 jours forward — <b style="color:var(--text);">${totalPicks} pronostics</b> dont <b style="color:var(--tier-lock);">${totalLocks} locks 🔒</b>. Toggle vers Tous pour les filtres avancés.</div>
+          <div class="u-text-md u-text-dim">Vue d'ensemble sur 7 jours forward — <b class="u-text">${totalPicks} pronostics</b> dont <b style="color:var(--tier-lock);">${totalLocks} locks 🔒</b>. Toggle vers Tous pour les filtres avancés.</div>
         </div>
         ${heatmapHtml}
         <div style="margin-top:24px;">
@@ -22087,7 +22087,7 @@
       wrap.innerHTML = `
         <div class="page-wrap">
           <div class="page-header">
-            <div class="lbl-tiny" style="color:var(--brand);">Mes favoris &amp; alertes</div>
+            <div class="lbl-tiny u-text-brand">Mes favoris &amp; alertes</div>
             <h1 class="page-h1">⭐ Favoris &amp; alertes</h1>
           </div>
           <div class="empty-state-v2">
@@ -22121,9 +22121,9 @@
       const mainHtml = `
         <div class="page-wrap">
           <div class="page-header">
-            <div class="lbl-tiny" style="color:var(--brand);">Mes favoris &amp; alertes</div>
+            <div class="lbl-tiny u-text-brand">Mes favoris &amp; alertes</div>
             <h1 class="page-h1">⭐ Favoris &amp; alertes</h1>
-            <div style="font-size:14px;color:var(--text-dim);">${totalEntries} entrée${totalEntries > 1 ? 's' : ''} suivie${totalEntries > 1 ? 's' : ''}.</div>
+            <div class="u-text-md u-text-dim">${totalEntries} entrée${totalEntries > 1 ? 's' : ''} suivie${totalEntries > 1 ? 's' : ''}.</div>
           </div>
           ${subTabsHtml}
           ${_emptyState({
@@ -22162,11 +22162,11 @@
       wrap.innerHTML = `
         <div class="page-wrap">
           <div class="page-header">
-            <div class="lbl-tiny" style="color:var(--brand);">Mes favoris &amp; alertes</div>
+            <div class="lbl-tiny u-text-brand">Mes favoris &amp; alertes</div>
             <h1 class="page-h1">⭐ Favoris &amp; alertes</h1>
           </div>
           ${subTabsHtml}
-          <div class="empty-state-v2" style="margin-top:18px;">
+          <div class="empty-state-v2 u-mt-18">
             <div class="es-illustration">${isLite ? '⏳' : '📅'}</div>
             <div class="es-title-v2">${isLite ? 'Chargement de l\'archive complète…' : 'Favoris matchs hors fenêtre'}</div>
             <div class="es-body-v2">${isLite
@@ -22205,9 +22205,9 @@
           <div style="min-width:0;">
             <div style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--text);">
               <span style="font-size:13px;">${sportEm}</span>
-              <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(hN)} <span style="color:var(--text-dim2);font-weight:400;">vs</span> ${esc(aN)}</span>
+              <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(hN)} <span class="u-text-dim2 u-font-normal">vs</span> ${esc(aN)}</span>
             </div>
-            <div style="font-size:11px;color:var(--text-dim);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(lg.slice(0, 40))} · <b style="color:var(--brand);">→ ${esc(pickLbl)}</b></div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(lg.slice(0, 40))} · <b class="u-text-brand">→ ${esc(pickLbl)}</b></div>
           </div>
           <div style="font-size:13px;font-weight:700;color:${conf >= 0.70 ? 'var(--accent)' : 'var(--text-dim)'};">${conf != null ? Math.round(conf * 100) + '%' : '—'}</div>
           <div>${resBadge}</div>
@@ -22217,7 +22217,7 @@
     // Sprint 72 — Section watchlist multi-niveaux selon currentTab
     let mainContent = '';
     if (currentTab === 'matches') {
-      mainContent = `<div style="margin-top:16px;">${rows}</div>`;
+      mainContent = `<div class="u-mt-4">${rows}</div>`;
     } else if (currentTab === 'teams') {
       mainContent = wl.teams.length ? `
         <div style="margin-top:14px;display:flex;flex-direction:column;gap:6px;">
@@ -22226,7 +22226,7 @@
               <span style="font-size:14px;font-weight:600;color:var(--text);">🛡️ ${esc(t)}</span>
               <button data-watchlist-remove="teams:${esc(t)}" style="background:transparent;border:none;color:var(--danger,#ef4444);font-size:14px;cursor:pointer;font-weight:600;">Retirer</button>
             </div>`).join('')}
-        </div>` : `<div class="empty-state-v2" style="margin-top:18px;"><div class="es-illustration">🛡️</div><div class="es-title-v2">Aucune équipe suivie</div><div class="es-body-v2">Va sur le détail d'un match et clique sur l'équipe pour la suivre.</div></div>`;
+        </div>` : `<div class="empty-state-v2 u-mt-18"><div class="es-illustration">🛡️</div><div class="es-title-v2">Aucune équipe suivie</div><div class="es-body-v2">Va sur le détail d'un match et clique sur l'équipe pour la suivre.</div></div>`;
     } else if (currentTab === 'leagues') {
       mainContent = wl.leagues.length ? `
         <div style="margin-top:14px;display:flex;flex-direction:column;gap:6px;">
@@ -22235,7 +22235,7 @@
               <span style="font-size:14px;font-weight:600;color:var(--text);">🏆 ${esc(l)}</span>
               <button data-watchlist-remove="leagues:${esc(l)}" style="background:transparent;border:none;color:var(--danger,#ef4444);font-size:14px;cursor:pointer;font-weight:600;">Retirer</button>
             </div>`).join('')}
-        </div>` : `<div class="empty-state-v2" style="margin-top:18px;"><div class="es-illustration">🏆</div><div class="es-title-v2">Aucune ligue suivie</div><div class="es-body-v2">Suis une ligue depuis le détail d'un match.</div></div>`;
+        </div>` : `<div class="empty-state-v2 u-mt-18"><div class="es-illustration">🏆</div><div class="es-title-v2">Aucune ligue suivie</div><div class="es-body-v2">Suis une ligue depuis le détail d'un match.</div></div>`;
     } else if (currentTab === 'sports') {
       const allSports = ['football','tennis','basketball','hockey','baseball'];
       mainContent = `
@@ -22323,9 +22323,9 @@
     wrap.innerHTML = `
       <div class="page-wrap">
         <div class="page-header">
-          <div class="lbl-tiny" style="color:var(--brand);">Mes favoris &amp; alertes</div>
+          <div class="lbl-tiny u-text-brand">Mes favoris &amp; alertes</div>
           <h1 class="page-h1">⭐ Favoris &amp; alertes</h1>
-          <div style="font-size:14px;color:var(--text-dim);">${found.length} match${found.length>1?'s':''} · ${wl.teams.length} équipe${wl.teams.length>1?'s':''} · ${wl.leagues.length} ligue${wl.leagues.length>1?'s':''} · ${wl.sports.length} sport${wl.sports.length>1?'s':''} · ${wl.markets.length} marché${wl.markets.length>1?'s':''} · ${rules.length} alerte${rules.length>1?'s':''}${missing>0?` · (${missing} hors fenêtre rolling)`:''}.</div>
+          <div class="u-text-md u-text-dim">${found.length} match${found.length>1?'s':''} · ${wl.teams.length} équipe${wl.teams.length>1?'s':''} · ${wl.leagues.length} ligue${wl.leagues.length>1?'s':''} · ${wl.sports.length} sport${wl.sports.length>1?'s':''} · ${wl.markets.length} marché${wl.markets.length>1?'s':''} · ${rules.length} alerte${rules.length>1?'s':''}${missing>0?` · (${missing} hors fenêtre rolling)`:''}.</div>
         </div>
         ${subTabsHtml}
         ${mainContent}
@@ -22573,7 +22573,7 @@
         const rel = Number(item.pred.reliability ?? item.pred.pick.prob) || 0;
         const pk = item.pred.pick.key;
         const odd = item.pred.odds && (pk === '1' ? item.pred.odds.home : pk === '2' ? item.pred.odds.away : item.pred.odds.draw);
-        pickLine = `<div style="font-size:12px;color:var(--text-dim);margin-top:5px;">→ <b style="color:var(--brand);">${esc(pickLbl)}</b>${odd ? ` @${Number(odd).toFixed(2)}` : ''} · ${Math.round(rel*100)}% conf.</div>`;
+        pickLine = `<div style="font-size:12px;color:var(--text-dim);margin-top:5px;">→ <b class="u-text-brand">${esc(pickLbl)}</b>${odd ? ` @${Number(odd).toFixed(2)}` : ''} · ${Math.round(rel*100)}% conf.</div>`;
       }
       const impBadge = item.importance >= 50 ? `<span style="font-size:10px;color:var(--warn);font-weight:700;">🔥 ${item.importance}</span>` : '';
       return `
@@ -22583,8 +22583,8 @@
             <div style="display:flex;align-items:center;gap:6px;">${impBadge}${stBadge}</div>
           </div>
           <div style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px;">
-            <span style="font-size:14px;">${sportEm}</span>
-            <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">${esc(hN)} <span style="color:var(--text-dim2);font-weight:400;">vs</span> ${esc(aN)}</span>
+            <span class="u-text-md">${sportEm}</span>
+            <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">${esc(hN)} <span class="u-text-dim2 u-font-normal">vs</span> ${esc(aN)}</span>
           </div>
           <div style="font-size:11px;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(String(lg).slice(0, 50))}</div>
           ${pickLine}
@@ -22597,9 +22597,9 @@
     wrap.innerHTML = `
       <div class="page-wrap" style="padding:0 8px 24px;">
         <div class="page-header">
-          <div class="lbl-tiny" style="color:var(--brand);">Explorer · Tous les matchs</div>
+          <div class="lbl-tiny u-text-brand">Explorer · Tous les matchs</div>
           <h1 class="page-h1">🔍 Matchs détectés</h1>
-          <div style="font-size:14px;color:var(--text-dim);">${enriched.length} match${enriched.length>1?'s':''} sur ${dayKeys.length} jour${dayKeys.length>1?'s':''} · classés par statut, voir tous même sans pronostic</div>
+          <div class="u-text-md u-text-dim">${enriched.length} match${enriched.length>1?'s':''} sur ${dayKeys.length} jour${dayKeys.length>1?'s':''} · classés par statut, voir tous même sans pronostic</div>
         </div>
 
         <!-- Filtre recherche -->
@@ -22614,20 +22614,20 @@
         </div>
 
         <!-- Filtre Sport -->
-        <div style="margin-top:12px;">
+        <div class="u-mt-3">
           <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:6px;">Sport</div>
           <div style="display:flex;gap:6px;flex-wrap:wrap;">${renderPills(sportPills, state.sport, 'matchs-sport')}</div>
         </div>
 
         <!-- Filtre Statut -->
-        <div style="margin-top:12px;">
+        <div class="u-mt-3">
           <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:6px;">Statut</div>
           <div style="display:flex;gap:6px;flex-wrap:wrap;">${renderPills(statusPills, state.status, 'matchs-status')}</div>
         </div>
 
         <!-- Filtre Ligue (dropdown si > 8 ligues) -->
         ${leagueOptions.length > 0 ? `
-        <div style="margin-top:12px;">
+        <div class="u-mt-3">
           <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:6px;">Ligue / compétition</div>
           <select id="matchs-league" style="width:100%;max-width:340px;padding:8px 12px;background:var(--panel);border:1px solid var(--border-2);border-radius:var(--r-sm);color:var(--text);font-size:13px;font-family:inherit;">
             <option value="all">Toutes (${enriched.length})</option>
@@ -22643,7 +22643,7 @@
 
         <!-- Stats bar -->
         <div style="margin-top:18px;padding:10px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);font-size:12px;color:var(--text-dim);">
-          <b style="color:var(--text);">${filtered.length}</b> match${filtered.length>1?'s':''} affiché${filtered.length>1?'s':''}${state.q?` pour « ${esc(state.q)} »`:''} · ${counts.strong || 0} prono${(counts.strong||0)>1?'s':''} fort${(counts.strong||0)>1?'s':''}, ${counts.uncertain || 0} incertain${(counts.uncertain||0)>1?'s':''}, ${(counts.no_data||0)+(counts.no_odds||0)+(counts.no_winamax||0)} sans prono
+          <b class="u-text">${filtered.length}</b> match${filtered.length>1?'s':''} affiché${filtered.length>1?'s':''}${state.q?` pour « ${esc(state.q)} »`:''} · ${counts.strong || 0} prono${(counts.strong||0)>1?'s':''} fort${(counts.strong||0)>1?'s':''}, ${counts.uncertain || 0} incertain${(counts.uncertain||0)>1?'s':''}, ${(counts.no_data||0)+(counts.no_odds||0)+(counts.no_winamax||0)} sans prono
         </div>
 
         <!-- Grid de matchs -->
@@ -22652,7 +22652,7 @@
           ${visible.map(renderCard).join('')}
         </div>
         ${overflow > 0 ? `<div style="margin-top:12px;font-size:12px;color:var(--text-dim2);text-align:center;">+ ${overflow} autre${overflow>1?'s':''} match${overflow>1?'s':''} (réduis la fenêtre ou filtre)</div>` : ''}` : `
-        <div class="empty-state-v2" style="margin-top:18px;">
+        <div class="empty-state-v2 u-mt-18">
           <div class="es-illustration">🔍</div>
           <div class="es-title-v2">Aucun match avec ces filtres</div>
           <div class="es-body-v2">Essaie de relâcher la période, le sport ou le statut.</div>
@@ -22780,7 +22780,7 @@
         <tr class="interactive" data-match-id="${esc(String(c.match.id))}" role="button" tabindex="0" style="border-bottom:1px solid var(--border);cursor:pointer;font-variant-numeric:tabular-nums;">
           <td style="padding:10px 12px;">
             <div style="font-size:11px;color:var(--text-dim);font-weight:600;">${esc(dayLbl)} · ${esc(tLbl)}</div>
-            <div style="font-size:13px;font-weight:700;color:var(--text);margin-top:1px;">${sportEm} ${esc(hN)} <span style="color:var(--text-dim2);font-weight:400;">vs</span> ${esc(aN)}</div>
+            <div style="font-size:13px;font-weight:700;color:var(--text);margin-top:1px;">${sportEm} ${esc(hN)} <span class="u-text-dim2 u-font-normal">vs</span> ${esc(aN)}</div>
             <div style="font-size:10.5px;color:var(--text-dim);margin-top:1px;">${esc(String(lg).slice(0, 32))}</div>
           </td>
           <td style="padding:10px 12px;text-align:left;">
@@ -22797,11 +22797,11 @@
       wrap.innerHTML = `
         <div class="page-wrap">
           <div class="page-header">
-            <div class="lbl-tiny" style="color:var(--brand);">Combien parier sur quoi · Calcul Kelly</div>
+            <div class="lbl-tiny u-text-brand">Combien parier sur quoi · Calcul Kelly</div>
             <h1 class="page-h1">💼 Mes mises du jour</h1>
             <div style="font-size:14px;color:var(--text-dim);max-width:700px;line-height:1.45;">Pour chaque pick value (edge ≥ 3pt + confiance ≥ 55%), je te dis <b>combien miser</b> en fonction de ta bankroll <b>${bankroll.toFixed(0)}€</b>. Calcul automatique avec le critère Kelly fractionné (0.25×, cap 5%/pari) — la mise optimale qui maximise ton ROI à long terme sans risquer la cagnotte.</div>
           </div>
-          <div class="empty-state-v2" style="margin-top:18px;">
+          <div class="empty-state-v2 u-mt-18">
             <div class="es-illustration">🛡️</div>
             <div class="es-title-v2">Aucun pari EV+ aujourd'hui ou demain</div>
             <div class="es-body-v2">Le modèle exige <b>edge ≥ 3pt</b> et <b>confiance ≥ 55%</b> pour entrer dans tes mises du jour. C'est la discipline qui te fait gagner sur la durée — certains jours il vaut mieux ne pas parier.</div>
@@ -22829,9 +22829,9 @@
     wrap.innerHTML = `
       <div class="page-wrap">
         <div class="page-header">
-          <div class="lbl-tiny" style="color:var(--brand);">Combien parier sur quoi · Calcul Kelly</div>
+          <div class="lbl-tiny u-text-brand">Combien parier sur quoi · Calcul Kelly</div>
           <h1 class="page-h1">💼 Mes mises du jour</h1>
-          <div style="font-size:14px;color:var(--text-dim);">${enriched.length} pari${enriched.length>1?'s':''} avec edge positif · mise calculée automatiquement par le critère Kelly fractionné (0.25×, cap 5%/pari) sur ta bankroll <b style="color:var(--text);">${bankroll.toFixed(0)}€</b> · <button id="plan-mise-edit-bk" style="background:transparent;border:none;color:var(--brand);text-decoration:underline;cursor:pointer;font-weight:600;padding:0;font-size:13px;">modifier</button></div>
+          <div class="u-text-md u-text-dim">${enriched.length} pari${enriched.length>1?'s':''} avec edge positif · mise calculée automatiquement par le critère Kelly fractionné (0.25×, cap 5%/pari) sur ta bankroll <b class="u-text">${bankroll.toFixed(0)}€</b> · <button id="plan-mise-edit-bk" style="background:transparent;border:none;color:var(--brand);text-decoration:underline;cursor:pointer;font-weight:600;padding:0;font-size:13px;">modifier</button></div>
         </div>
         ${riskBannerHtml}
         <!-- KPIs récap (Sprint 111 — refacto avec .kpi-tile harmonisé) -->
@@ -22880,7 +22880,7 @@
         </div>
         <!-- Méthode -->
         <div style="margin-top:18px;padding:14px 16px;background:var(--panel);border:1px dashed var(--border-2);border-radius:var(--r-sm);font-size:12px;color:var(--text-dim);line-height:1.5;">
-          <b style="color:var(--text);">Méthode</b> : sélection des paris du jour avec edge ≥ 3pt et confiance ≥ 55%, tri par edge desc, top 5 max. Mise = Kelly demi-fractionnaire cap 5% bankroll par pari. Plancher 0.50€, arrondi à 0.10€. Le filtre EV+ et les limites de risque s'appliquent ici comme partout.
+          <b class="u-text">Méthode</b> : sélection des paris du jour avec edge ≥ 3pt et confiance ≥ 55%, tri par edge desc, top 5 max. Mise = Kelly demi-fractionnaire cap 5% bankroll par pari. Plancher 0.50€, arrondi à 0.10€. Le filtre EV+ et les limites de risque s'appliquent ici comme partout.
         </div>
       </div>`;
     // Wire interactions
@@ -22971,10 +22971,10 @@
       wrap.innerHTML = `
         <div class="page-wrap">
           <div class="page-header">
-            <div class="lbl-tiny" style="color:var(--brand);">Parier · Edge maximum</div>
+            <div class="lbl-tiny u-text-brand">Parier · Edge maximum</div>
             <h1 class="page-h1">💎 Le marché se trompe ici</h1>
           </div>
-          <div class="empty-state-v2" style="margin-top:18px;">
+          <div class="empty-state-v2 u-mt-18">
             <div class="es-illustration">🛡️</div>
             <div class="es-title-v2">Aucun mismatch significatif détecté</div>
             <div class="es-body-v2">Le marché Winamax est cohérent avec notre modèle sur les 7 prochains jours (edge < 5pt). C'est rare mais ça arrive : le marché peut s'ajuster vite. Reviens dans quelques heures.</div>
@@ -23006,7 +23006,7 @@
           <td style="padding:10px 12px;width:32px;">${rankBadge}</td>
           <td style="padding:10px 12px;">
             <div style="font-size:11px;color:var(--text-dim);font-weight:600;">${esc(dayLbl)} · ${esc(tLbl)}</div>
-            <div style="font-size:13px;font-weight:700;color:var(--text);margin-top:1px;">${sportEm} ${esc(hN)} <span style="color:var(--text-dim2);font-weight:400;">vs</span> ${esc(aN)}</div>
+            <div style="font-size:13px;font-weight:700;color:var(--text);margin-top:1px;">${sportEm} ${esc(hN)} <span class="u-text-dim2 u-font-normal">vs</span> ${esc(aN)}</div>
             <div style="font-size:10.5px;color:var(--text-dim);margin-top:1px;">${esc(String(lg).slice(0, 28))}</div>
           </td>
           <td style="padding:10px 12px;">
@@ -23014,11 +23014,11 @@
             <div style="font-size:11px;color:var(--text-dim);margin-top:1px;">@${c.odd.toFixed(2)}</div>
           </td>
           <td style="padding:10px 12px;text-align:right;">
-            <div style="font-size:11px;color:var(--text-dim);">modèle</div>
+            <div class="u-text-xs u-text-dim">modèle</div>
             <div style="font-size:13px;color:var(--text);font-weight:700;">${(c.prob*100).toFixed(0)}%</div>
           </td>
           <td style="padding:10px 12px;text-align:right;">
-            <div style="font-size:11px;color:var(--text-dim);">marché</div>
+            <div class="u-text-xs u-text-dim">marché</div>
             <div style="font-size:13px;color:var(--text-dim);font-weight:600;">${(c.impliedProb*100).toFixed(0)}%</div>
           </td>
           <td style="padding:10px 12px;text-align:right;color:${edgeColor};font-weight:800;font-size:14px;">+${(c.edge*100).toFixed(1)}pt</td>
@@ -23030,9 +23030,9 @@
     wrap.innerHTML = `
       <div class="page-wrap">
         <div class="page-header">
-          <div class="lbl-tiny" style="color:var(--brand);">Parier · Edge maximum 7 jours</div>
+          <div class="lbl-tiny u-text-brand">Parier · Edge maximum 7 jours</div>
           <h1 class="page-h1">💎 Le marché se trompe ici</h1>
-          <div style="font-size:14px;color:var(--text-dim);">${top20.length} opportunité${top20.length>1?'s':''} où le modèle voit plus que le bookmaker · Bankroll <b style="color:var(--text);">${bankroll.toFixed(0)}€</b></div>
+          <div class="u-text-md u-text-dim">${top20.length} opportunité${top20.length>1?'s':''} où le modèle voit plus que le bookmaker · Bankroll <b class="u-text">${bankroll.toFixed(0)}€</b></div>
         </div>
         <!-- KPIs récap -->
         <div style="margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;">
@@ -23078,9 +23078,9 @@
         </div>
         <!-- Méthode -->
         <div style="margin-top:14px;padding:14px 16px;background:var(--panel);border:1px dashed var(--border-2);border-radius:var(--r-sm);font-size:12px;color:var(--text-dim);line-height:1.5;">
-          <b style="color:var(--text);">💡 Comment lire</b> : on liste les paris où le modèle pense avoir une probabilité <b>significativement supérieure</b> à celle implicite par la cote Winamax (edge ≥ 5pt). Tri par <b>EV potentiel en €</b> = la valeur attendue (proba modèle × cote − 1) × mise Kelly. Plus le chiffre est haut, plus c'est rentable de jouer ce pari.
+          <b class="u-text">💡 Comment lire</b> : on liste les paris où le modèle pense avoir une probabilité <b>significativement supérieure</b> à celle implicite par la cote Winamax (edge ≥ 5pt). Tri par <b>EV potentiel en €</b> = la valeur attendue (proba modèle × cote − 1) × mise Kelly. Plus le chiffre est haut, plus c'est rentable de jouer ce pari.
           <br><br>
-          <b style="color:var(--text);">Avertissement</b> : edge ≠ certitude de gagner. C'est juste que sur 100 paris à edge +10pt, tu gagneras +10€ par 100€ misés en moyenne (sur le long terme). Court terme, la variance peut être brutale. Joue toujours avec ta bankroll Kelly suggérée, jamais plus.
+          <b class="u-text">Avertissement</b> : edge ≠ certitude de gagner. C'est juste que sur 100 paris à edge +10pt, tu gagneras +10€ par 100€ misés en moyenne (sur le long terme). Court terme, la variance peut être brutale. Joue toujours avec ta bankroll Kelly suggérée, jamais plus.
         </div>
       </div>`;
     wrap.querySelectorAll('[data-match-id]').forEach(row => {
@@ -23188,9 +23188,9 @@
     wrap.innerHTML = `
       <div class="page-wrap">
         <div class="page-header">
-          <div class="lbl-tiny" style="color:var(--brand);">Discipline · Projection bankroll</div>
+          <div class="lbl-tiny u-text-brand">Discipline · Projection bankroll</div>
           <h1 class="page-h1">🧪 What-if simulator</h1>
-          <div style="font-size:14px;color:var(--text-dim);">Projette ta bankroll selon ta stratégie. Bankroll actuelle : <b style="color:var(--text);">${bankroll.toFixed(0)}€</b></div>
+          <div class="u-text-md u-text-dim">Projette ta bankroll selon ta stratégie. Bankroll actuelle : <b class="u-text">${bankroll.toFixed(0)}€</b></div>
         </div>
 
         <!-- Inputs -->
@@ -23278,9 +23278,9 @@
 
         <!-- Méthode -->
         <div style="margin-top:14px;padding:14px 16px;background:var(--panel);border:1px dashed var(--border-2);border-radius:var(--r-sm);font-size:12px;color:var(--text-dim);line-height:1.5;">
-          <b style="color:var(--text);">💡 Comment lire</b> : Monte-Carlo 1000 simulations en utilisant les stats actuelles du backtest (WR ${(wr*100).toFixed(1)}%, cote moy ${avgCote.toFixed(2)}). P10/P90 = quantiles 10% et 90% — 80% des cas sont entre ces 2 valeurs. Le médian est plus robuste que la moyenne.
+          <b class="u-text">💡 Comment lire</b> : Monte-Carlo 1000 simulations en utilisant les stats actuelles du backtest (WR ${(wr*100).toFixed(1)}%, cote moy ${avgCote.toFixed(2)}). P10/P90 = quantiles 10% et 90% — 80% des cas sont entre ces 2 valeurs. Le médian est plus robuste que la moyenne.
           <br><br>
-          <b style="color:var(--text);">Limite</b> : suppose les paris sont indépendants et tirent de la même distribution que l'historique. La réalité varie : streaks, biais ligues, ajustement marché. Prends ces projections comme un ordre de grandeur, pas une prédiction exacte.
+          <b class="u-text">Limite</b> : suppose les paris sont indépendants et tirent de la même distribution que l'historique. La réalité varie : streaks, biais ligues, ajustement marché. Prends ces projections comme un ordre de grandeur, pas une prédiction exacte.
         </div>
       </div>`;
     // Wire interactions
@@ -23345,7 +23345,7 @@
       wrap.innerHTML = `
         <div class="page-wrap">
           <div class="page-header">
-            <div class="lbl-tiny" style="color:var(--brand);">Performance · Vue globale</div>
+            <div class="lbl-tiny u-text-brand">Performance · Vue globale</div>
             <h1 class="page-h1">🎯 Performance</h1>
             <div style="font-size:13px;color:var(--text-dim);">Chargement du backtest…</div>
           </div>
@@ -23355,7 +23355,7 @@
             <div class="skel skel-kpi"></div>
             <div class="skel skel-kpi"></div>
           </div>
-          <div style="margin-top:18px;">
+          <div class="u-mt-18">
             <div class="skel skel-line medium"></div>
             <div class="skel skel-card"></div>
             <div class="skel skel-card"></div>
@@ -23485,7 +23485,7 @@
                 <span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:var(--panel-2);border:1px solid var(--border);border-radius:999px;color:var(--text-dim);">
                   <span>${dot(v.age_min)}</span>
                   <span style="color:var(--text);font-weight:600;">${esc(name)}</span>
-                  <span style="color:var(--text-dim2);">${fmtAge(v.age_min)}</span>
+                  <span class="u-text-dim2">${fmtAge(v.age_min)}</span>
                 </span>
               `).join('')}
             </div>
@@ -23496,9 +23496,9 @@
       ${_healthWidget}
       <div class="page-wrap">
         <div class="page-header">
-          <div class="lbl-tiny" style="color:var(--brand);">Performance · ${esc(tabs.find(t => t.k === currentTab)?.lbl || 'Vue globale')}</div>
+          <div class="lbl-tiny u-text-brand">Performance · ${esc(tabs.find(t => t.k === currentTab)?.lbl || 'Vue globale')}</div>
           <h1 class="page-h1">🎯 Performance</h1>
-          <div style="font-size:14px;color:var(--text-dim);">Synthèse du modèle sur ${n} pari${n > 1 ? 's' : ''} simulé${n > 1 ? 's' : ''}. Drill-down dans les onglets : Historique, Bilan, Backtest.</div>
+          <div class="u-text-md u-text-dim">Synthèse du modèle sur ${n} pari${n > 1 ? 's' : ''} simulé${n > 1 ? 's' : ''}. Drill-down dans les onglets : Historique, Bilan, Backtest.</div>
         </div>
 
         ${subTabsHtml}
@@ -23548,7 +23548,7 @@
         </div>`}
 
         ${currentTab === 'periode' && Object.keys(byPeriod).length ? `
-        <div style="margin-top:18px;">
+        <div class="u-mt-18">
           <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px;">Performance par période</div>
           <div class="tbl-scroll">
             <table style="width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:13px;">
@@ -23572,14 +23572,14 @@
             </table>
           </div>
         </div>` : currentTab === 'periode' ? `
-        <div class="empty-state-v2" style="margin-top:18px;">
+        <div class="empty-state-v2 u-mt-18">
           <div class="es-illustration">📆</div>
           <div class="es-title-v2">Pas de breakdown par période</div>
           <div class="es-body-v2">Le rapport backtest n'inclut pas encore <code>by_period</code>. Sera disponible au prochain run.</div>
         </div>` : ''}
 
         ${currentTab === 'confiance' && tierRows.length ? `
-        <div style="margin-top:18px;">
+        <div class="u-mt-18">
           <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px;">Performance par tier de confiance</div>
           <div style="overflow-x:auto;">
             <table style="width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:13px;">
@@ -23686,14 +23686,14 @@
             <div style="margin-bottom:14px;padding:14px 16px;background:linear-gradient(135deg,rgba(167,139,250,.08),rgba(16,185,129,.04));border:1px solid var(--brand-soft);border-radius:var(--r-sm);">
               <div style="font-size:13px;font-weight:700;color:var(--brand);margin-bottom:8px;">💡 Insights auto (CI Wilson 95%, n ≥ 10)</div>
               <div style="display:grid;gap:6px;font-size:12px;line-height:1.5;color:var(--text);">
-                ${insights.strong.length ? `<div><b style="color:var(--accent);">✓ Edge significatif (${insights.strong.length}) :</b> <span style="color:var(--text-dim);">${insights.strong.slice(0,3).map(i => `${esc(i.k)} (${(i.wr*100).toFixed(0)}%, n=${i.n})`).join(' · ')}${insights.strong.length > 3 ? ` … +${insights.strong.length-3}` : ''}</span></div>` : ''}
-                ${insights.weak.length ? `<div><b style="color:var(--warn,#fbbf24);">🟡 Edge faible (${insights.weak.length}) :</b> <span style="color:var(--text-dim);">${insights.weak.slice(0,3).map(i => `${esc(i.k)} (${(i.wr*100).toFixed(0)}%, n=${i.n})`).join(' · ')}${insights.weak.length > 3 ? ` … +${insights.weak.length-3}` : ''}</span></div>` : ''}
-                ${insights.anti.length ? `<div><b style="color:var(--danger);">🔴 Anti-edge (${insights.anti.length}) :</b> <span style="color:var(--text-dim);">${insights.anti.slice(0,3).map(i => `${esc(i.k)} (${(i.wr*100).toFixed(0)}%, n=${i.n})`).join(' · ')}${insights.anti.length > 3 ? ` … +${insights.anti.length-3}` : ''}</span> <span style="color:var(--text-dim2);font-style:italic;">— picks opposés profitables</span></div>` : ''}
-                ${insights.noise.length ? `<div><b style="color:var(--text-dim);">— Bruit (${insights.noise.length}) :</b> <span style="color:var(--text-dim2);">CI inclut 50%, modèle non distinguable du hasard.</span></div>` : ''}
+                ${insights.strong.length ? `<div><b class="u-text-accent">✓ Edge significatif (${insights.strong.length}) :</b> <span class="u-text-dim">${insights.strong.slice(0,3).map(i => `${esc(i.k)} (${(i.wr*100).toFixed(0)}%, n=${i.n})`).join(' · ')}${insights.strong.length > 3 ? ` … +${insights.strong.length-3}` : ''}</span></div>` : ''}
+                ${insights.weak.length ? `<div><b style="color:var(--warn,#fbbf24);">🟡 Edge faible (${insights.weak.length}) :</b> <span class="u-text-dim">${insights.weak.slice(0,3).map(i => `${esc(i.k)} (${(i.wr*100).toFixed(0)}%, n=${i.n})`).join(' · ')}${insights.weak.length > 3 ? ` … +${insights.weak.length-3}` : ''}</span></div>` : ''}
+                ${insights.anti.length ? `<div><b class="u-text-danger">🔴 Anti-edge (${insights.anti.length}) :</b> <span class="u-text-dim">${insights.anti.slice(0,3).map(i => `${esc(i.k)} (${(i.wr*100).toFixed(0)}%, n=${i.n})`).join(' · ')}${insights.anti.length > 3 ? ` … +${insights.anti.length-3}` : ''}</span> <span style="color:var(--text-dim2);font-style:italic;">— picks opposés profitables</span></div>` : ''}
+                ${insights.noise.length ? `<div><b class="u-text-dim">— Bruit (${insights.noise.length}) :</b> <span class="u-text-dim2">CI inclut 50%, modèle non distinguable du hasard.</span></div>` : ''}
               </div>
             </div>`;
           return `
-            <div style="margin-top:18px;">
+            <div class="u-mt-18">
               <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">🏷️ Performance par marché</div>
               <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">${mktRep.completed_evaluated || 0} matchs completed évalués · ${entries.length} (marché, pick) combinaisons avec n ≥ 5${nWithRoi > 0 ? `, ${nWithRoi} avec ROI calculé` : ''}.</div>
               ${insightBanner}
@@ -23725,7 +23725,7 @@
                   const ents = Object.entries(dim).filter(([k, v]) => (v.n || 0) >= 3).sort((a, b) => (b[1].n || 0) - (a[1].n || 0)).slice(0, 12);
                   if (!ents.length) return '';
                   return `
-                    <div style="margin-top:18px;">
+                    <div class="u-mt-18">
                       <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;">${emoji} ${esc(title)}</div>
                       <div style="overflow-x:auto;">
                         <table style="width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:12px;">
@@ -23776,7 +23776,7 @@
         })() : ''}
 
         ${currentTab === 'sport' && sportCards.length ? `
-        <div style="margin-top:18px;">
+        <div class="u-mt-18">
           <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px;">Performance par sport</div>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;">
             ${sportCards.map(([sport, s]) => {
@@ -23788,11 +23788,11 @@
               <div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
                   <span style="font-size:14px;font-weight:700;color:var(--text);">${sportEmojis[sport] || '🎯'} ${esc(sport)}</span>
-                  <span style="font-size:11px;color:var(--text-dim);">${sN} pari${sN > 1 ? 's' : ''}</span>
+                  <span class="u-text-xs u-text-dim">${sN} pari${sN > 1 ? 's' : ''}</span>
                 </div>
                 <div style="display:flex;gap:14px;font-size:12px;font-variant-numeric:tabular-nums;">
-                  <span style="color:var(--text-dim);">WR <b style="color:var(--text);">${fmtPct(sWr)}</b></span>
-                  <span style="color:var(--text-dim);">ROI <b style="color:${sRoiColor};">${fmtSign(sRoi)}</b></span>
+                  <span class="u-text-dim">WR <b class="u-text">${fmtPct(sWr)}</b></span>
+                  <span class="u-text-dim">ROI <b style="color:${sRoiColor};">${fmtSign(sRoi)}</b></span>
                 </div>
               </div>`;
             }).join('')}
@@ -23821,17 +23821,17 @@
           }
           // Top 5 / bottom 5 highlighted
           return `
-            <div style="margin-top:18px;">
+            <div class="u-mt-18">
               <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">⚽ Performance par ligue</div>
               <div style="font-size:12px;color:var(--text-dim);margin-bottom:14px;">Triées par Kelly cumul (les ligues où le modèle bat le marché). Min 3 paris.</div>
               <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;font-variant-numeric:tabular-nums;">
                 <div style="display:grid;grid-template-columns:minmax(0,1.2fr) 60px 70px 80px 90px 70px;gap:8px;padding:9px 14px;background:var(--panel-2);border-bottom:1px solid var(--border);font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.5px;font-weight:700;">
                   <div>Ligue</div>
-                  <div style="text-align:right;">Paris</div>
-                  <div style="text-align:right;">WR</div>
-                  <div style="text-align:right;">ROI flat</div>
-                  <div style="text-align:right;">Kelly cumul</div>
-                  <div style="text-align:right;">Brier</div>
+                  <div class="u-text-right">Paris</div>
+                  <div class="u-text-right">WR</div>
+                  <div class="u-text-right">ROI flat</div>
+                  <div class="u-text-right">Kelly cumul</div>
+                  <div class="u-text-right">Brier</div>
                 </div>
                 ${rows.slice(0, 30).map((r, idx) => {
                   const wrPct = r.wr != null ? (r.wr * 100).toFixed(0) + '%' : '—';
@@ -23854,7 +23854,7 @@
               </div>
               ${rows.length > 30 ? `<div style="margin-top:8px;font-size:11px;color:var(--text-dim2);text-align:center;">+ ${rows.length - 30} ligues supplémentaires non affichées (volume insuffisant pour signal fiable)</div>` : ''}
               <div style="margin-top:14px;padding:10px 14px;background:rgba(167,139,250,.06);border:1px solid var(--brand-soft);border-radius:var(--r-sm);font-size:12px;color:var(--text-dim);line-height:1.5;">
-                <b style="color:var(--brand);">💡 Comment lire :</b> ★ = top 3 par Kelly cumul. <b style="color:var(--accent);">Kelly +Xu</b> = profit total que tu aurais fait en pariant 1u Kelly sur cette ligue. <b style="color:var(--danger);">Kelly négatif</b> = à éviter sur cette ligue (modèle pas calibré). Brier <0.20 = excellent, &gt;0.25 = mauvais.
+                <b class="u-text-brand">💡 Comment lire :</b> ★ = top 3 par Kelly cumul. <b class="u-text-accent">Kelly +Xu</b> = profit total que tu aurais fait en pariant 1u Kelly sur cette ligue. <b class="u-text-danger">Kelly négatif</b> = à éviter sur cette ligue (modèle pas calibré). Brier <0.20 = excellent, &gt;0.25 = mauvais.
               </div>
             </div>`;
         })() : ''}
@@ -23872,7 +23872,7 @@
             <button class="page-btn" data-page="backtest" style="padding:8px 14px;background:transparent;color:var(--text);border:1px solid var(--border-2);border-radius:var(--r-sm);font-weight:600;font-size:13px;cursor:pointer;">📈 Backtest méthodologie</button>
             <button class="page-btn" data-page="credibilite" style="padding:8px 14px;background:transparent;color:var(--text);border:1px solid var(--border-2);border-radius:var(--r-sm);font-weight:600;font-size:13px;cursor:pointer;">🎯 Calibration</button>
           </div>
-          <div style="margin-top:8px;font-size:11px;color:var(--text-dim2);">Source : <code style="color:var(--brand);">backtest_report_v2.json</code> · regénéré chaque dimanche par cron.</div>
+          <div style="margin-top:8px;font-size:11px;color:var(--text-dim2);">Source : <code class="u-text-brand">backtest_report_v2.json</code> · regénéré chaque dimanche par cron.</div>
         </div>
       </div>`;
     // Sprint 57 (v31.7.146) — Tab click handler
@@ -23906,9 +23906,9 @@
       wrap.innerHTML = `
         <div class="page-wrap">
           <div class="page-header">
-            <div class="lbl-tiny" style="color:var(--brand);">Performance · par ligue</div>
+            <div class="lbl-tiny u-text-brand">Performance · par ligue</div>
             <h1 class="page-h1">📊 Ligues</h1>
-            <div style="font-size:14px;color:var(--text-dim);">Drill-down ROI/WR/Brier par ligue. Clique pour voir le détail.</div>
+            <div class="u-text-md u-text-dim">Drill-down ROI/WR/Brier par ligue. Clique pour voir le détail.</div>
           </div>
           ${sorted.length === 0 ? `<div class="bilan-empty">Pas assez de données par ligue (minimum 5 picks). Le backtest hebdo enrichit ce panneau au fil du temps.</div>` :
             `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;margin-top:16px;">
@@ -23918,8 +23918,8 @@
                 return `<button class="page-btn" data-page="league" data-league-code="${esc(key)}" style="text-align:left;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;font-family:inherit;color:var(--text);">
                   <div style="font-size:13px;font-weight:700;margin-bottom:4px;">${esc(key)}</div>
                   <div style="display:flex;gap:14px;font-size:12px;color:var(--text-dim);">
-                    <span><b style="color:var(--text);">${v.n}</b> picks</span>
-                    <span><b style="color:var(--text);">${(v.win_rate*100).toFixed(0)}%</b> WR</span>
+                    <span><b class="u-text">${v.n}</b> picks</span>
+                    <span><b class="u-text">${(v.win_rate*100).toFixed(0)}%</b> WR</span>
                     <span style="color:${roiCol};font-weight:700;">${roi >= 0 ? '+' : ''}${roi.toFixed(1)}% ROI</span>
                   </div>
                 </button>`;
@@ -23958,11 +23958,11 @@
         <div class="page-wrap">
           ${breadcrumbsHtml}
           <div class="page-header">
-            <div class="lbl-tiny" style="color:var(--brand);">Performance · ${esc(lc)}</div>
+            <div class="lbl-tiny u-text-brand">Performance · ${esc(lc)}</div>
             <h1 class="page-h1">${esc(lc)}</h1>
-            <div style="font-size:14px;color:var(--text-dim);">Pas de données backtest pour cette ligue.</div>
+            <div class="u-text-md u-text-dim">Pas de données backtest pour cette ligue.</div>
           </div>
-          <div style="margin-top:16px;">
+          <div class="u-mt-4">
             <button class="page-btn" data-page="league" data-league-back="list" style="background:var(--panel);border:1px solid var(--border);color:var(--text);padding:8px 14px;border-radius:var(--r-sm);cursor:pointer;">← Toutes les ligues</button>
           </div>
         </div>`;
@@ -23976,9 +23976,9 @@
       <div class="page-wrap">
         ${breadcrumbsHtml}
         <div class="page-header">
-          <div class="lbl-tiny" style="color:var(--brand);">Performance · ligue</div>
+          <div class="lbl-tiny u-text-brand">Performance · ligue</div>
           <h1 class="page-h1">📊 ${esc(lc)}</h1>
-          <div style="font-size:14px;color:var(--text-dim);">Backtest sur ${stats.n} picks réglés.</div>
+          <div class="u-text-md u-text-dim">Backtest sur ${stats.n} picks réglés.</div>
         </div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px;">
           <div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;">
@@ -24005,7 +24005,7 @@
         <div style="margin-top:18px;font-size:12.5px;color:var(--text-dim);background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.18);border-radius:8px;padding:12px 14px;line-height:1.5;">
           ℹ️ Données backtest hebdomadaire (cron dimanche). Pour la perf en cours de semaine, voir page <button class="page-btn" data-page="bilan" style="background:transparent;border:none;color:var(--info);text-decoration:underline;cursor:pointer;font-size:inherit;font-weight:700;padding:0;">Bilan</button>.
         </div>
-        <div style="margin-top:16px;">
+        <div class="u-mt-4">
           <button class="page-btn" data-page="league" data-league-back="list" style="background:var(--panel);border:1px solid var(--border);color:var(--text);padding:8px 14px;border-radius:var(--r-sm);cursor:pointer;">← Toutes les ligues</button>
         </div>
       </div>`;
@@ -24341,7 +24341,7 @@
               <div>Cote</div>
               <div class="hist-pick-conf">Fiab</div>
               <div style="text-align:center;">Rés.</div>
-              <div style="text-align:right;">Δ</div>
+              <div class="u-text-right">Δ</div>
             </div>
             ${rowsHtml}
           </div>
@@ -24429,15 +24429,15 @@
         <div class="bilan-kpi">
           <div class="kpi-label">Meilleur / pire jour</div>
           <div class="kpi-value" style="font-size:14px;line-height:1.35;">
-            <div style="color:var(--accent);">${bestTxt}</div>
-            <div style="color:var(--danger);">${worstTxt}</div>
+            <div class="u-text-accent">${bestTxt}</div>
+            <div class="u-text-danger">${worstTxt}</div>
           </div>
           <div class="kpi-sub">en unités flat</div>
         </div>
       </div>`;
 
     const emptyStateHtml = filtered.length === 0
-      ? `<div class="bilan-empty" style="margin-top:18px;">Aucun pick ne correspond aux filtres actuels. Essaye "Réinitialiser" pour tout afficher.</div>`
+      ? `<div class="bilan-empty u-mt-18">Aucun pick ne correspond aux filtres actuels. Essaye "Réinitialiser" pour tout afficher.</div>`
       : '';
 
     // v30 — Coach IA patterns détectés retiré : il agrégeait les paris
@@ -25034,7 +25034,7 @@
     const errCheck = checks.find(c => c.key === 'js-errors');
     const errList = errCheck && errCheck.extras && errCheck.extras.recent ? errCheck.extras.recent : [];
     const errListHtml = errList.length ? `
-      <div style="margin-top:18px;">
+      <div class="u-mt-18">
         <div style="font-size:12px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;font-weight:600;margin-bottom:8px;">🐞 Dernières erreurs JS</div>
         <div style="background:rgba(248,113,113,.04);border:1px solid rgba(248,113,113,.2);border-radius:8px;overflow:hidden;">
           ${errList.slice(-10).reverse().map(e => {
@@ -25051,7 +25051,7 @@
             const _msg = (e && e.msg) || '(message vide)';
             const _page = (e && e.page) || '—';
             return `<div style="padding:8px 12px;border-bottom:1px solid var(--border);font-size:11px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--text-dim);">
-              <div style="color:var(--text);"><b>[${esc(_type)}]</b> ${esc(_msg)}</div>
+              <div class="u-text"><b>[${esc(_type)}]</b> ${esc(_msg)}</div>
               <div style="margin-top:2px;">${esc(when)} · page=${esc(_page)}</div>
             </div>`;
           }).join('')}
@@ -25405,11 +25405,11 @@
     // Construire le paragraphe — tone coach direct
     const lines = [];
     // Ouverture : état de forme
-    if (roi >= 15) lines.push(`🔥 <b style="color:var(--accent);">+${roi.toFixed(1)}% de rentabilité</b> sur ${tot} paris — le modèle est en pleine forme.`);
-    else if (roi >= 5) lines.push(`✅ <b style="color:var(--accent);">+${roi.toFixed(1)}% de rentabilité</b> sur ${tot} paris — rentable, tiens la ligne.`);
+    if (roi >= 15) lines.push(`🔥 <b class="u-text-accent">+${roi.toFixed(1)}% de rentabilité</b> sur ${tot} paris — le modèle est en pleine forme.`);
+    else if (roi >= 5) lines.push(`✅ <b class="u-text-accent">+${roi.toFixed(1)}% de rentabilité</b> sur ${tot} paris — rentable, tiens la ligne.`);
     else if (roi >= -5) lines.push(`⚖️ <b>${roi >= 0 ? '+' : ''}${roi.toFixed(1)}% de rentabilité</b> sur ${tot} paris — à l'équilibre, patience.`);
-    else if (roi >= -15) lines.push(`⚠️ <b style="color:var(--warn);">${roi.toFixed(1)}% de rentabilité</b> sur ${tot} paris — passage à vide, vérifie si tu suis bien les paris sûrs.`);
-    else lines.push(`🧊 <b style="color:var(--danger);">${roi.toFixed(1)}% de rentabilité</b> sur ${tot} paris — glissade sérieuse, relis tes paris des 2 dernières semaines.`);
+    else if (roi >= -15) lines.push(`⚠️ <b class="u-text-warn">${roi.toFixed(1)}% de rentabilité</b> sur ${tot} paris — passage à vide, vérifie si tu suis bien les paris sûrs.`);
+    else lines.push(`🧊 <b class="u-text-danger">${roi.toFixed(1)}% de rentabilité</b> sur ${tot} paris — glissade sérieuse, relis tes paris des 2 dernières semaines.`);
 
     // Tendance 7j vs 30j
     if (roi7 != null && roi30 != null && r7.length >= 5 && r30.length >= 10) {
@@ -26188,7 +26188,7 @@
         const pickLbl = (tp.pred.pick && tp.pred.pick.label) || 'Pick';
         return `<div style="padding:8px 10px;border-left:2px solid var(--brand);background:rgba(167,139,250,.04);border-radius:0 6px 6px 0;margin-bottom:4px;font-size:12px;">
           <div style="font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(home?.name||'?')} vs ${esc(away?.name||'?')}</div>
-          <div style="color:var(--text-dim);font-size:11px;margin-top:2px;">${esc(pickLbl)} · <b style="color:var(--brand);">${Math.round(tp.rel * 100)}%</b>${tp.odd ? ` · @${tp.odd.toFixed(2)}` : ''}</div>
+          <div style="color:var(--text-dim);font-size:11px;margin-top:2px;">${esc(pickLbl)} · <b class="u-text-brand">${Math.round(tp.rel * 100)}%</b>${tp.odd ? ` · @${tp.odd.toFixed(2)}` : ''}</div>
         </div>`;
       }).join('') : '<div style="font-size:12px;color:var(--text-dim2);padding:8px 0;">Aucun top pick ce jour.</div>';
 
@@ -26551,31 +26551,31 @@
           <div style="font-size:12px;color:var(--text-dim2);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">🛡️ Métriques de risque</div>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;">
             <div title="Plus grande chute depuis un sommet. Indique le pire passage qu'il faut être prêt à encaisser.">
-              <div style="font-size:11px;color:var(--text-dim);">Drawdown max</div>
+              <div class="u-text-xs u-text-dim">Drawdown max</div>
               <div style="font-size:16px;font-weight:700;color:var(--danger);font-variant-numeric:tabular-nums;">${ddLbl}<span style="font-size:11px;font-weight:500;color:var(--text-dim2);">${ddPctLbl}</span></div>
             </div>
             <div title="Plus longue série de picks consécutifs perdants depuis le démarrage.">
-              <div style="font-size:11px;color:var(--text-dim);">Pire série L</div>
+              <div class="u-text-xs u-text-dim">Pire série L</div>
               <div style="font-size:16px;font-weight:700;color:var(--danger);font-variant-numeric:tabular-nums;">${maxLossStreak} pick${maxLossStreak>1?'s':''}</div>
             </div>
             <div title="Plus longue série de picks consécutifs gagnants.">
-              <div style="font-size:11px;color:var(--text-dim);">Meilleure série W</div>
+              <div class="u-text-xs u-text-dim">Meilleure série W</div>
               <div style="font-size:16px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;">${maxWinStreak} pick${maxWinStreak>1?'s':''}</div>
             </div>
             <div title="Pourcentage de jours où le solde a progressé.">
-              <div style="font-size:11px;color:var(--text-dim);">Jours verts</div>
+              <div class="u-text-xs u-text-dim">Jours verts</div>
               <div style="font-size:16px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;">${greenPct}%<span style="font-size:11px;font-weight:500;color:var(--text-dim2);"> (${greenDays}/${totalDays})</span></div>
             </div>
             <div title="Écart-type du P&L journalier. Plus c'est haut, plus la variance entre jours est marquée.">
-              <div style="font-size:11px;color:var(--text-dim);">Volatilité</div>
+              <div class="u-text-xs u-text-dim">Volatilité</div>
               <div style="font-size:16px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;">±${stdev.toFixed(2)}€</div>
             </div>
             <div title="Meilleur jour depuis J1">
-              <div style="font-size:11px;color:var(--text-dim);">Meilleur jour</div>
+              <div class="u-text-xs u-text-dim">Meilleur jour</div>
               <div style="font-size:16px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;">${bestDay ? (bestDay.delta >= 0 ? '+' : '')+bestDay.delta.toFixed(2)+'€' : '—'}<span style="font-size:11px;font-weight:500;color:var(--text-dim2);"> · ${bestDayDate}</span></div>
             </div>
             <div title="Pire jour depuis J1">
-              <div style="font-size:11px;color:var(--text-dim);">Pire jour</div>
+              <div class="u-text-xs u-text-dim">Pire jour</div>
               <div style="font-size:16px;font-weight:700;color:var(--danger);font-variant-numeric:tabular-nums;">${worstDay ? worstDay.delta.toFixed(2)+'€' : '—'}<span style="font-size:11px;font-weight:500;color:var(--text-dim2);"> · ${worstDayDate}</span></div>
             </div>
           </div>
@@ -26621,7 +26621,7 @@
         <label style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text-dim);">
           Départ
           <input type="number" class="wallet-bt-start" min="10" max="10000" step="10" value="${_walletBacktestStart}" style="width:78px;background:var(--bg-3,#0f1823);color:var(--text);border:1px solid var(--border,#2a3744);border-radius:6px;padding:3px 6px;font-size:12px;font-variant-numeric:tabular-nums;" />
-          <span style="color:var(--text-dim2);">€</span>
+          <span class="u-text-dim2">€</span>
         </label>
         <label style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text-dim);">
           depuis
@@ -26675,9 +26675,9 @@
             <div style="display:grid;grid-template-columns:110px minmax(120px,1fr) 80px 90px 90px;gap:10px;padding:10px 12px;font-size:11.5px;color:var(--text-dim2,#7b8693);font-weight:600;text-transform:uppercase;letter-spacing:.5px;min-width:480px;">
               <div>Jour</div>
               <div>Picks</div>
-              <div style="text-align:right;">Ouverture</div>
-              <div style="text-align:right;">P&amp;L jour</div>
-              <div style="text-align:right;">Clôture</div>
+              <div class="u-text-right">Ouverture</div>
+              <div class="u-text-right">P&amp;L jour</div>
+              <div class="u-text-right">Clôture</div>
             </div>
             ${walletRowsHtml}
           </div>` : ''}
@@ -26732,7 +26732,7 @@
             <circle cx="${xAt(vals.length - 1).toFixed(1)}" cy="${yAt(last.mae).toFixed(1)}" r="2.5" fill="${stroke}"/>
           </svg>
           <span style="color:${stroke};font-weight:600;font-variant-numeric:tabular-nums;">${deltaLbl}</span>
-          <span style="color:var(--text-dim2);">${delta <= 0 ? 'calibration qui s\'améliore' : 'calibration qui se dégrade'}</span>
+          <span class="u-text-dim2">${delta <= 0 ? 'calibration qui s\'améliore' : 'calibration qui se dégrade'}</span>
         </div>
       `;
     };
@@ -26819,14 +26819,14 @@
           return `
             <div class="bilan-league-table">
               <div class="bilan-league-head">
-                <div></div><div>Ligue</div><div>Paris</div><div>% Gagnés</div><div style="text-align:right;">Gains/Pertes</div><div style="text-align:right;">Rentab.</div>
+                <div></div><div>Ligue</div><div>Paris</div><div>% Gagnés</div><div class="u-text-right">Gains/Pertes</div><div class="u-text-right">Rentab.</div>
               </div>
               ${rowsH}
               ${moreCount ? `<div style="padding:8px 12px;font-size:11px;color:var(--text-dim2);border-top:1px solid var(--border,#2a3744);">+ ${moreCount} ligue${moreCount>1?'s':''} avec moins de volume</div>` : ''}
               ${leagueEntries.length >= 2 ? `
                 <div style="padding:9px 12px;font-size:11px;color:var(--text-dim2);border-top:1px solid var(--border,#2a3744);background:var(--bg-3,#0f1823);">
-                  <span style="color:var(--accent);">💡 Meilleure ligue</span> : ${esc(leagueEntries[0].name)} (ROI ${bestROI>=0?'+':''}${bestROI.toFixed(0)}%)
-                  · <span style="color:var(--danger);">⚠️ Pire</span> : ${esc(leagueEntries[leagueEntries.length-1].name)} (${worstROI>=0?'+':''}${worstROI.toFixed(0)}%)
+                  <span class="u-text-accent">💡 Meilleure ligue</span> : ${esc(leagueEntries[0].name)} (ROI ${bestROI>=0?'+':''}${bestROI.toFixed(0)}%)
+                  · <span class="u-text-danger">⚠️ Pire</span> : ${esc(leagueEntries[leagueEntries.length-1].name)} (${worstROI>=0?'+':''}${worstROI.toFixed(0)}%)
                 </div>` : ''}
             </div>`;
         })()
@@ -26946,7 +26946,7 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         return `
           <div style="display:grid;grid-template-columns:110px repeat(7, minmax(0,1fr));gap:4px;padding:2px;align-items:stretch;">
             <div style="display:flex;align-items:center;gap:6px;padding:0 4px;font-size:12.5px;color:var(--text);font-weight:600;">
-              <span style="font-size:14px;">${sportIcon(sp)}</span>
+              <span class="u-text-md">${sportIcon(sp)}</span>
               <span>${esc(sportLabel(sp))}</span>
             </div>
             ${rowCells}
@@ -26955,8 +26955,8 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
 
       const footerH = (bestCell && worstCell && bestCell !== worstCell) ? `
         <div style="padding:9px 12px;font-size:11px;color:var(--text-dim2);border-top:1px solid var(--border,#2a3744);background:var(--bg-3,#0f1823);margin-top:10px;border-radius:8px;">
-          <span style="color:var(--accent);">🔥 Meilleur créneau</span> : ${esc(sportLabel(bestCell.sport))} le ${DAY_NAMES[bestCell.dow].toLowerCase()} (ROI ${bestROI>=0?'+':''}${bestROI.toFixed(0)}% · ${bestCell.bets} paris)
-          · <span style="color:var(--danger);">❄️ Pire</span> : ${esc(sportLabel(worstCell.sport))} le ${DAY_NAMES[worstCell.dow].toLowerCase()} (${worstROI>=0?'+':''}${worstROI.toFixed(0)}% · ${worstCell.bets} paris)
+          <span class="u-text-accent">🔥 Meilleur créneau</span> : ${esc(sportLabel(bestCell.sport))} le ${DAY_NAMES[bestCell.dow].toLowerCase()} (ROI ${bestROI>=0?'+':''}${bestROI.toFixed(0)}% · ${bestCell.bets} paris)
+          · <span class="u-text-danger">❄️ Pire</span> : ${esc(sportLabel(worstCell.sport))} le ${DAY_NAMES[worstCell.dow].toLowerCase()} (${worstROI>=0?'+':''}${worstROI.toFixed(0)}% · ${worstCell.bets} paris)
         </div>` : insufficientDataMsg;
 
       return `
@@ -27042,15 +27042,15 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
             <div style="text-align:center;">#</div>
             <div>Pronostiqueur</div>
             <div>Paris</div>
-            <div style="text-align:right;">% Gagnés</div>
-            <div style="text-align:right;">Gains/Pertes</div>
-            <div style="text-align:right;">Rentab.</div>
+            <div class="u-text-right">% Gagnés</div>
+            <div class="u-text-right">Gains/Pertes</div>
+            <div class="u-text-right">Rentab.</div>
           </div>
           ${rowsH}
           <div style="padding:9px 12px;font-size:11px;color:var(--text-dim2);border-top:1px solid var(--border,#2a3744);background:var(--bg-3,#0f1823);">
             ${tipsterEntries.length >= 2 ? `<span style="color:${winnerROI>0?'#34d399':'var(--text-dim)'};">🏆 Meilleur</span> : ${esc(tipsterEntries[0].name)} (${winnerROI>=0?'+':''}${winnerROI.toFixed(0)}%)` : ''}
-            ${tipsterEntries.length >= 3 && loserROI <= -3 ? ` · <span style="color:var(--danger);">⚠️ Fuir</span> : ${esc(tipsterEntries[tipsterEntries.length-1].name)} (${loserROI.toFixed(0)}%)` : ''}
-            ${model.bets >= 10 ? ` · <span style="color:var(--text-dim);">vs modèle (${modelROI>=0?'+':''}${modelROI.toFixed(0)}%)</span> : <b style="color:${beatModel>0?'#fbbf24':'var(--text-dim)'};">${beatModel}</b>/${tipsterEntries.length} tipster${tipsterEntries.length>1?'s':''} font mieux` : ''}
+            ${tipsterEntries.length >= 3 && loserROI <= -3 ? ` · <span class="u-text-danger">⚠️ Fuir</span> : ${esc(tipsterEntries[tipsterEntries.length-1].name)} (${loserROI.toFixed(0)}%)` : ''}
+            ${model.bets >= 10 ? ` · <span class="u-text-dim">vs modèle (${modelROI>=0?'+':''}${modelROI.toFixed(0)}%)</span> : <b style="color:${beatModel>0?'#fbbf24':'var(--text-dim)'};">${beatModel}</b>/${tipsterEntries.length} tipster${tipsterEntries.length>1?'s':''} font mieux` : ''}
           </div>
         </div>`;
     })() : '';
@@ -27076,7 +27076,7 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       const cls = r.res === 'won' ? 'style="color:var(--accent);font-weight:600;"' : 'style="color:var(--danger);"';
       return `<tr>
         <td style="color:var(--text-dim);font-size:12px;">${esc(fmtDate(isoDate(r.m.date)))}</td>
-        <td>${esc((home?.short||home?.name||''))} <span style="color:var(--text-dim2);">vs</span> ${esc((away?.short||away?.name||''))}</td>
+        <td>${esc((home?.short||home?.name||''))} <span class="u-text-dim2">vs</span> ${esc((away?.short||away?.name||''))}</td>
         <td style="color:var(--text-dim);font-size:12px;"><span aria-hidden="true" style="margin-right:4px;">${sportIcon(r.m.sport)}</span>${esc(sportLabel(r.m.sport))}</td>
         <td ${cls}>${esc(r.pred.pick.label)}</td>
         <td style="text-align:right;font-variant-numeric:tabular-nums;">@${r.odd.toFixed(2)}</td>
@@ -27130,7 +27130,7 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       const ciText = b.bets >= 3
         ? `<div style="font-size:10px;color:var(--text-dim2);margin-top:4px;font-weight:500;">
              IC 95% WR: ${(ci.low*100).toFixed(0)}–${(ci.high*100).toFixed(0)}%
-             ${tooNarrow ? ' <span style="color:var(--warn);">⚠️ peu fiable</span>' : ''}
+             ${tooNarrow ? ' <span class="u-text-warn">⚠️ peu fiable</span>' : ''}
            </div>`
         : '';
       return `<div class="bilan-sport-card" style="border-color:${color}55;">
@@ -27297,12 +27297,12 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
           <h3>📚 Glossaire express</h3>
         </div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:8px;font-size:12.5px;line-height:1.5;color:var(--text-dim);">
-          <div class="card-info"><strong style="color:var(--text);">ROI flat 1u</strong> : profit/perte si on mise 1 unité fixe sur chaque pari du modèle. Pas de Kelly, pas de progressive — juste 1u sec.</div>
-          <div class="card-info"><strong style="color:var(--text);">Brier score</strong> : moyenne du carré des écarts entre proba prédite et résultat (0 ou 1). Plus c'est bas, mieux c'est. <em>0.18 = bon, 0.25 = moyen, 0.30+ = à revoir.</em></div>
-          <div class="card-info"><strong style="color:var(--text);">Edge</strong> : différence entre notre probabilité et la probabilité implicite de la cote. >5pt = value bet potentielle, &lt;0 = on est plus pessimiste que le marché → skip.</div>
-          <div class="card-info"><strong style="color:var(--text);">Kelly fractionné (¼)</strong> : formule de mise optimale qui maximise la croissance long-terme sans ruiner sur les bad runs. On utilise ¼ Kelly + cap à 10% de la cagnotte = sécurité supplémentaire.</div>
-          <div class="card-info"><strong style="color:var(--text);">Lock</strong> : pari à fiabilité ≥70%, censé tomber ≥80% des fois (cible). C'est là que la mise est la plus grosse en Kelly.</div>
-          <div class="card-info"><strong style="color:var(--text);">Skip</strong> : pari avec moins de 2 signaux non-marché OU fiabilité &lt;45%. On ne le surface pas.</div>
+          <div class="card-info"><strong class="u-text">ROI flat 1u</strong> : profit/perte si on mise 1 unité fixe sur chaque pari du modèle. Pas de Kelly, pas de progressive — juste 1u sec.</div>
+          <div class="card-info"><strong class="u-text">Brier score</strong> : moyenne du carré des écarts entre proba prédite et résultat (0 ou 1). Plus c'est bas, mieux c'est. <em>0.18 = bon, 0.25 = moyen, 0.30+ = à revoir.</em></div>
+          <div class="card-info"><strong class="u-text">Edge</strong> : différence entre notre probabilité et la probabilité implicite de la cote. >5pt = value bet potentielle, &lt;0 = on est plus pessimiste que le marché → skip.</div>
+          <div class="card-info"><strong class="u-text">Kelly fractionné (¼)</strong> : formule de mise optimale qui maximise la croissance long-terme sans ruiner sur les bad runs. On utilise ¼ Kelly + cap à 10% de la cagnotte = sécurité supplémentaire.</div>
+          <div class="card-info"><strong class="u-text">Lock</strong> : pari à fiabilité ≥70%, censé tomber ≥80% des fois (cible). C'est là que la mise est la plus grosse en Kelly.</div>
+          <div class="card-info"><strong class="u-text">Skip</strong> : pari avec moins de 2 signaux non-marché OU fiabilité &lt;45%. On ne le surface pas.</div>
         </div>
       </section>`;
     // v30 — Epoch banner. On 2026-04-26 we shipped the Winamax 1n2
@@ -27324,7 +27324,7 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     } catch (e) {}
     const epochBannerHtml = preEpochCount > 0 ? `
       <div style="margin:12px auto 18px;padding:10px 14px;max-width:1280px;background:rgba(234,179,8,.08);border:1px solid rgba(234,179,8,.25);border-left:3px solid var(--warn,#eab308);border-radius:0 8px 8px 0;font-size:12.5px;color:var(--text-dim);line-height:1.45;">
-        <strong style="color:var(--text);">⚠️ Epoch ${ALIGNMENT_EPOCH_ISO}</strong> — Avant cette date, l'alignement des cotes Winamax 1n2 inversait home/away sur ~65 events (tennis, basket, hockey, foot). Les paris pris avant le ${ALIGNMENT_EPOCH_ISO} ont une part de phantom edge dans le bilan rétro. À partir de ce jour, c'est propre. <a href="#credibilite" style="color:var(--accent);">Détails →</a>
+        <strong class="u-text">⚠️ Epoch ${ALIGNMENT_EPOCH_ISO}</strong> — Avant cette date, l'alignement des cotes Winamax 1n2 inversait home/away sur ~65 events (tennis, basket, hockey, foot). Les paris pris avant le ${ALIGNMENT_EPOCH_ISO} ont une part de phantom edge dans le bilan rétro. À partir de ce jour, c'est propre. <a href="#credibilite" class="u-text-accent">Détails →</a>
       </div>
     ` : '';
     // v32.0 (Phase 3) — Widget "État Agent autonome" en hero du Bilan.
@@ -27382,12 +27382,12 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
             </div>
             <div style="display:flex;gap:18px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border);flex-wrap:wrap;font-size:12px;">
               <div>
-                <span style="color:var(--text-dim2);">Pertes consécutives</span>
+                <span class="u-text-dim2">Pertes consécutives</span>
                 <strong style="color:${streakCount >= 3 ? 'var(--warn,#fbbf24)' : 'var(--text)'};margin-left:6px;">${streakCount}</strong>
                 ${streakCount >= 5 ? `<span style="color:var(--danger);font-size:10.5px;margin-left:4px;">⚠ pause imminente</span>` : ''}
               </div>
               <div>
-                <span style="color:var(--text-dim2);">Pauses tilt déclenchées</span>
+                <span class="u-text-dim2">Pauses tilt déclenchées</span>
                 <strong style="color:var(--text);margin-left:6px;">${pauseCount}</strong>
                 <span style="color:var(--text-dim2);font-size:10.5px;margin-left:4px;">(seuil 5 perdants)</span>
               </div>
@@ -27411,7 +27411,7 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
           <div style="position:absolute;top:0;left:0;width:40px;height:3px;background:${_modelRoi == null ? 'var(--text-dim)' : _modelRoi >= 0 ? 'var(--accent)' : 'var(--danger)'};border-radius:0 0 2px 2px;"></div>
           <div style="font-size:11px;color:${_modelRoi == null ? 'var(--text-dim)' : _modelRoi >= 0 ? 'var(--accent)' : 'var(--danger)'};text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Performance du modèle · ${model.bets || 0} pari${(model.bets||0)>1?'s':''}</div>
           <h1 style="margin:0 0 6px;font-size:40px;font-weight:800;letter-spacing:-1.4px;color:var(--text);line-height:1;">Bilan${_bilanSport ? ` · <span style="font-size:18px;font-weight:600;color:var(--brand);letter-spacing:-.3px;">${sportIcon(_bilanSport)} ${esc(sportLabel(_bilanSport))}</span>` : ''}</h1>
-          <div style="font-size:14px;color:var(--text-dim);max-width:700px;">${_bilanSport ? `Drill-down <strong style="color:var(--text);">${esc(sportLabel(_bilanSport))}</strong> — toutes les stats ci-dessous sont filtrées sur ce sport uniquement.` : `Le modèle gagne-t-il de l'argent en mise fixe ? Courbe, rentabilité, risque et comparaison sport par sport.`}</div>
+          <div style="font-size:14px;color:var(--text-dim);max-width:700px;">${_bilanSport ? `Drill-down <strong class="u-text">${esc(sportLabel(_bilanSport))}</strong> — toutes les stats ci-dessous sont filtrées sur ce sport uniquement.` : `Le modèle gagne-t-il de l'argent en mise fixe ? Courbe, rentabilité, risque et comparaison sport par sport.`}</div>
         </div>
       </div>
       ${_agentWidget}
@@ -27528,7 +27528,7 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         const ddCol = maxDD < 5 ? '#34d399' : maxDD < 15 ? '#fbbf24' : '#f87171';
         const roi7dCol = roi7d == null ? 'var(--text-dim)' : roi7d > 5 ? '#34d399' : roi7d > -5 ? '#fbbf24' : '#f87171';
         return `
-        <div class="bilan-section" style="margin-top:18px;">
+        <div class="bilan-section u-mt-18">
           <div class="bilan-section-head" style="margin-bottom:14px;">
             <h3>📈 Stats avancées</h3>
             <div class="meta">Métriques de qualité au-delà du ROI brut</div>
@@ -27606,12 +27606,12 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
           vLbl = '✅ Modèle rentable';
           vColor = '#34d399';
           vBg = 'rgba(52,211,153,.10)';
-          vDesc = `Sur ${model.bets} picks, le modèle a généré <strong style="color:var(--accent);">+${model.pl.toFixed(2)}u</strong>. Tu peux suivre ses recommandations, surtout les High confiance.`;
+          vDesc = `Sur ${model.bets} picks, le modèle a généré <strong class="u-text-accent">+${model.pl.toFixed(2)}u</strong>. Tu peux suivre ses recommandations, surtout les High confiance.`;
         } else if (model.pl < 0 && roi < -3) {
           vLbl = '❌ Modèle perdant';
           vColor = '#f87171';
           vBg = 'rgba(248,113,113,.10)';
-          vDesc = `Sur ${model.bets} picks, le modèle a perdu <strong style="color:var(--danger);">${model.pl.toFixed(2)}u</strong>. À ce stade, éviter de le suivre aveuglément.`;
+          vDesc = `Sur ${model.bets} picks, le modèle a perdu <strong class="u-text-danger">${model.pl.toFixed(2)}u</strong>. À ce stade, éviter de le suivre aveuglément.`;
         } else {
           vLbl = '⚖️ Proche du break-even';
           vColor = '#a78bfa';
@@ -27700,8 +27700,8 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
             <table class="bilan-table">
               <thead><tr>
                 <th>Date</th><th>Match</th><th>Sport</th><th>Pick</th>
-                <th style="text-align:right;">Cote</th>
-                <th style="text-align:right;">Résultat</th>
+                <th class="u-text-right">Cote</th>
+                <th class="u-text-right">Résultat</th>
               </tr></thead>
               <tbody>${modelRowsHtml}</tbody>
             </table>
@@ -27848,7 +27848,7 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
             meanEl.textContent = (m >= 0 ? '+' : '') + m.toFixed(2) + 'pt';
           }
           if (rateEl) {
-            rateEl.innerHTML = `<b style="color:var(--text);">${s.positive_clv_rate || 0}%</b> des paris battent le marché · ${s.n_matches || 0} matchs trackés`;
+            rateEl.innerHTML = `<b class="u-text">${s.positive_clv_rate || 0}%</b> des paris battent le marché · ${s.n_matches || 0} matchs trackés`;
           }
         })
         .catch(() => {/* silent */});

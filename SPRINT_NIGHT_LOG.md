@@ -289,3 +289,11 @@
 - Impact: calendrier rapide moins surpondéré, signal forme plus frais pour basket/baseball/tennis; smoke E2E vert après rebase cron (`1252` marchés scorés / `44` matchs exacts 48h)
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.38 (2026-05-02 06:00 UTC)
+- Chantier: P-C1 refactor inline styles sweep 1
+- Avant: `app.js=2599` styles inline, `pronostics.html=88`, `app.js=1685.0KB` proche budget
+- Après: `342` styles exacts migrés vers utilities existantes (`u-text-*`, `u-mt-*`, `u-text-right`); `app.js=2259`, `pronostics.html=86`, `app.js=1681.1KB`
+- Impact: `-342` styles inline et `-3.9KB` sur le bundle JS sans changer le design; base plus saine pour les prochaines refontes
+- Commit: pending
+- Status: ✅ DONE
