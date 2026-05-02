@@ -207,11 +207,24 @@
 
   <nav class="toc" aria-label="Sommaire">
     <a href="#sources">📚 Sources</a>
+    <a href="#cotes-hautes">🎯 Cotes hautes</a>
     <a href="#pipeline">⚙️ Pipeline</a>
     <a href="#metriques">📏 Dictionnaire des métriques</a>
     <a href="#backtest">🔬 Protocole backtest</a>
     <a href="#biais">⚠️ Biais &amp; limites</a>
   </nav>
+
+  <h2 id="cotes-hautes">🎯 Pourquoi privilégier les cotes hautes ?</h2>
+  <section class="card">
+    <p><strong>Le site ne cherche plus la cote la plus sûre, il cherche le meilleur couple probabilité × gain.</strong> Une cote à 1.20 peut passer souvent, mais le profit réel est minuscule : il faut gagner presque tout le temps pour compenser une seule erreur.</p>
+    <p>Exemple simple pour 100€ misés :</p>
+    <ul>
+      <li><strong>Cote 1.20</strong> : gain net 20€. Une défaite efface cinq victoires.</li>
+      <li><strong>Cote 2.50</strong> : gain net 150€. Avec une vraie probabilité proche de 45-50%, le rendement devient intéressant.</li>
+      <li><strong>Cote 4.00+</strong> : gain très fort, mais variance élevée. Le site exige donc un edge plus haut et une mise plus petite.</li>
+    </ul>
+    <p>La règle Phase 7 est donc volontaire : <strong>minimum @2.00 par défaut</strong>, sweet spot Big Bets autour de <strong>@2.20 à @3.50</strong>, et handicaps masqués sauf anomalie énorme. Moins de tickets, plus de discipline.</p>
+  </section>
 
   <h2 id="sources">📚 Sources de données</h2>
   <section class="card">

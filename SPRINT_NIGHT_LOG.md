@@ -765,3 +765,11 @@
 - Impact: accueil trié par cote descendante et 0 carte visible sous @2.00 en test local
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.97 (2026-05-02 14:06 UTC)
+- Chantier: P-7.4 pédagogie cotes hautes
+- Avant: la stratégie “moins de paris, cotes plus hautes” n’était pas expliquée dans Méthode
+- Après: section dédiée avec maths simples @1.20 vs @2.50 vs @4.00+ et lien depuis l’accueil
+- Impact: Théo comprend pourquoi le site refuse les micro-cotes même quand elles paraissent sûres
+- Commit: pending
+- Status: ✅ DONE
