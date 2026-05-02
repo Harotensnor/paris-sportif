@@ -200,6 +200,14 @@
 - Commit: pending
 - Status: ✅ DONE
 
+## Sprint v35.109 (2026-05-02 13:33 UTC)
+- Chantier: P-8.10 révision page Tous
+- Avant: lignes mobiles compressées en 3 colonnes, noms/picks trop serrés
+- Après: mobile en carte verticale; desktop garde la table dense
+- Impact: la liste des pronos devient lisible sur téléphone sans perdre le mode PC
+- Commit: pending
+- Status: ✅ DONE
+
 ## Sprint v35.108 (2026-05-02 13:24 UTC)
 - Chantier: P-8.9 révision dashboard
 - Avant: chips mobiles coupés sans signal; logos/photos 404 vides sur Accueil
