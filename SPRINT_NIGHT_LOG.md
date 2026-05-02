@@ -1363,3 +1363,9 @@
 - Après: pred.sharp_money expose côté, drop, nudge et alignement avec le pick; raison dédiée.
 - Impact: Théo voit si la baisse de cote soutient vraiment le pari proposé.
 - Vérif: phase10_sharp_money_nudge_audit.json, +2.1pt sur home, raison smart_money OK.
+
+## Sprint v35.180 — Phase 10 P-10.27 Top contributeurs modèle (21:36 UTC)
+- Avant: les contributions existaient mais l'affichage restait en chips peu hiérarchisés.
+- Après: la modale montre les 3 contributeurs majeurs avec barres et delta en points.
+- Impact: Théo comprend vite ce qui pousse réellement le pick.
+- Vérif: phase10_feature_importance_audit.json, 3 barres rendues, 0 erreur console.
