@@ -15842,6 +15842,18 @@
         catch(e) { return 0; }
       })();
       const bbfFocusButton = `<button type="button" data-bbf-focus-toggle aria-pressed="${bbfFocusOnly ? 'true' : 'false'}" style="min-height:40px;border:1px solid ${bbfFocusOnly ? 'var(--c-strong)' : 'var(--border)'};border-radius:var(--r-pill);background:${bbfFocusOnly ? 'rgba(22,163,74,.20)' : 'rgba(255,255,255,.04)'};color:var(--text);padding:0 12px;font-size:12px;font-weight:900;cursor:pointer;">${bbfFocusOnly ? 'Focus ON' : 'Mode Big Bets'}</button>`;
+      const bbfInternalAlertKey = `paris_sportif_internal_alert_seen_${todayIso}_v1`;
+      const bbfInternalAlertSeen = (() => { try { return localStorage.getItem(bbfInternalAlertKey) === '1'; } catch(e) { return false; } })();
+      const bbfAlertPicks = [...bbfBigBets, ...bbfGoodBets, ...bbfOutsiderBets, ...bbfBigOddsBets]
+        .filter(p => {
+          const t = bbfSafeTs(p.m);
+          return Number.isFinite(t) && t > bbfNowMs && t < bbfNowMs + 24 * 3600000;
+        });
+      const bbfAlertHtml = (!bbfInternalAlertSeen && !_dataIsStale) ? `<section data-internal-alert style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 0;padding:10px 12px;border:1px solid rgba(230,0,0,.32);border-radius:var(--r-lg);background:linear-gradient(90deg,rgba(230,0,0,.16),rgba(255,255,255,.035));">
+        <strong style="color:var(--text);font-size:13px;">${bbfBigBets.length ? `🔥 ${bbfBigBets.length} Big Bet${bbfBigBets.length > 1 ? 's' : ''} à surveiller` : bbfAlertPicks.length ? `🎯 ${bbfAlertPicks.length} spot${bbfAlertPicks.length > 1 ? 's' : ''} high-odds aujourd'hui` : '🧘 Rien d’urgent aujourd’hui'}</strong>
+        <span style="color:var(--text-dim);font-size:12px;">${bbfAlertPicks[0] ? `${esc(bbfMarketLabel(bbfAlertPicks[0]))} @${Number(bbfAlertPicks[0].odd || 0).toFixed(2)} · ${esc(fmtTime(bbfAlertPicks[0].m.date))}` : 'Le modèle préfère attendre une vraie value.'}</span>
+        <button type="button" data-internal-alert-dismiss style="margin-left:auto;min-height:34px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,.04);color:var(--text-dim);padding:5px 10px;font-size:11px;font-weight:800;cursor:pointer;">Vu</button>
+      </section>` : '';
       const bbfTrackedRows = (() => {
         try {
           const bets = loadTrackedBets();
@@ -15884,6 +15896,7 @@
             ${bbfFocusButton}
           </section>
           ${bbfOffline}
+          ${bbfFocusOnly ? '' : bbfAlertHtml}
           ${bbfFocusOnly ? '' : bbfQuickActions}
           ${bbfFocusOnly ? '' : bbfCategoryChips}
           ${bbfFocusOnly ? '' : bbfCompetitionChips}
@@ -15986,6 +15999,11 @@
       const bbfFocusToggle = wrap.querySelector('[data-bbf-focus-toggle]');
       if (bbfFocusToggle) bbfFocusToggle.addEventListener('click', () => {
         try { localStorage.setItem(bbfFocusKey, bbfFocusOnly ? '0' : '1'); } catch(e) {}
+        renderDashboardPage(wrap);
+      });
+      const bbfAlertDismiss = wrap.querySelector('[data-internal-alert-dismiss]');
+      if (bbfAlertDismiss) bbfAlertDismiss.addEventListener('click', () => {
+        try { localStorage.setItem(bbfInternalAlertKey, '1'); } catch(e) {}
         renderDashboardPage(wrap);
       });
       const bbfLeftSearch = wrap.querySelector('#bbf-left-search');
