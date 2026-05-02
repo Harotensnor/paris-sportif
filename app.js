@@ -1045,23 +1045,34 @@
   }
   try { window._obfuscate = _obfuscate; window._deobfuscate = _deobfuscate; } catch(e){}
 
-  // L'utilisateur peut télécharger toutes ses données localStorage en JSON.
   window._exportAllUserData = function() {
-    const data = {};
+    const raw = {};
     try {
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
         if (!key) continue;
-        // Skip ephemeral / cache keys
         if (key.startsWith('autoRefresh') || key.startsWith('__')) continue;
         const value = localStorage.getItem(key);
         try {
-          data[key] = JSON.parse(value);
+          raw[key] = JSON.parse(value);
         } catch(e) {
-          data[key] = value;
+          raw[key] = value;
         }
       }
     } catch(e) {}
+    const tracked = raw.paris_sportif_tracked_bets || {};
+    const data = {
+      exported_at: new Date().toISOString(),
+      version: 2,
+      paris_trackes: tracked,
+      settings: raw.userPrefs || {},
+      bankroll: raw.userBankroll || raw.bankroll || null,
+      stats: {
+        tracked_count: tracked && typeof tracked === 'object' ? Object.keys(tracked).length : 0,
+        has_agent_reset: !!raw.agentResetTs,
+      },
+      raw_localStorage: raw,
+    };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
