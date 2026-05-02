@@ -1124,3 +1124,10 @@
 - Impact: -26237 bytes JS, bundle back to 1723.9 KB under cap
 - Commit: pending
 - Status: ✅ DONE
+## Sprint v35.142 (16:06 UTC)
+- Chantier: P-9.9
+- Avant: Académie 15 cartes statiques, pas de recherche ni sommaire
+- Après: Académie 55 termes filtrables + 5 articles méthode + sommaire desktop
+- Impact: page méthode plus utile, smoke OK, app.js 1731.0 KB sous cap
+- Commit: pending
+- Status: ✅ DONE

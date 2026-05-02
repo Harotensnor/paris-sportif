@@ -18850,43 +18850,164 @@
   }
 
   function renderAcademiePage(wrap) {
-    const cards = [
-      { icon: '🔒', title: 'Pari sûr', desc: `Un "pari sûr" c'est un match où notre calcul donne au moins 70% de chances de gagner. On n'appose cette étiquette que si plusieurs signaux disent la même chose : cote du bookmaker, puissance des équipes, forme récente, face-à-face. C'est là qu'il faut concentrer tes mises.`, color: '#ffd60a' },
-      { icon: '💎', title: 'Pari avec avantage', desc: `Un pari "avec avantage" c'est quand on pense que l'équipe a plus de chances de gagner que ce que dit la cote. Le bookmaker sous-estime l'équipe — donc il y a de la valeur. Au-delà de +5% d'avantage, ça devient intéressant.`, color: '#bf5af2' },
-      { icon: '📊', title: 'Mise recommandée', desc: `On te propose une mise qui grandit quand l'avantage grandit — mais qui reste toujours entre 2 et 5% de ta cagnotte. Ça maximise ta croissance long terme sans te faire sauter sur une mauvaise série.`, color: '#30d158' },
-      { icon: '🧩', title: 'Combinés malins', desc: `Dans les combinés automatiques, on évite de mettre ensemble plusieurs matchs de la même ligue le même jour. Pourquoi ? Parce que si une surprise frappe une ligue (arbitre, météo, dynamique), elle peut plomber plusieurs matchs d'un coup.`, color: '#5e5ce6' },
-      { icon: '⚠️', title: 'Mode panique', desc: `Si tu augmentes tes mises après 3 défaites d'affilée, une alerte apparaît. C'est le réflexe classique du parieur qui veut "se refaire" — et la cause numéro 1 de grosses pertes. On te freine avant que ça parte en vrille.`, color: '#ff3b30' },
-      { icon: '🔥', title: 'Série en cours', desc: `Une série c'est un enchaînement de victoires ou de défaites. Même un bon système peut donner 3-4 défaites d'affilée. À l'inverse, 5 victoires ne veulent pas dire que tu es invincible. Garde la tête froide, la moyenne finit toujours par revenir.`, color: '#ff9f0a' },
-      { icon: '🎯', title: 'Qualité des données', desc: `On note la fraîcheur des infos avant chaque prono : cotes à jour ? forme récente connue ? face-à-face dispo ? Si on n'a pas assez d'infos fiables, on saute le match plutôt que de deviner.`, color: '#0a84ff' },
-      { icon: '💰', title: 'Cagnotte simulée', desc: `Le Bilan affiche une cagnotte théorique qui démarre à 10€ et mise 1€ sur chaque pari sûr. Ça te dit honnêtement ce que la stratégie aurait rapporté si tu l'avais suivie depuis le début.`, color: '#30d158' },
-      { icon: '📈', title: 'Rentabilité (ROI)', desc: `Sur 100€ misés, combien tu gagnes net ? +15% veut dire 15€ de bonus. Au-delà de +5% sur 100 paris et plus, tu bats sérieusement le bookmaker — ta stratégie crée de la valeur.`, color: '#5e5ce6' },
-      { icon: '📊', title: 'Ce que dit la cote', desc: `La cote reflète la probabilité vue par le bookmaker. Cote 2,00 = 50% selon lui. Cote 1,50 = 66%. Cote 3,00 = 33%. Il rajoute une marge au passage — c'est sa commission.`, color: '#bf5af2' },
-      { icon: '🏦', title: 'Gestion de cagnotte', desc: `Règle d'or : jamais plus de 2 à 5% de ta cagnotte sur un seul pari. Même un pari sûr à 70% peut perdre — et la poisse peut t'enchaîner 5 défaites. Si tu mises 10%, une mauvaise série te met à sec.`, color: '#ffd60a' },
-      { icon: '🤖', title: 'Ton coach IA', desc: `L'IA du site ne contacte aucun serveur : elle lit tes paris, ton historique, tes résultats, et commente en direct depuis ton téléphone. Tout reste chez toi.`, color: '#5e5ce6' },
-      { icon: '🎯', title: 'Calibration du modèle', desc: `C'est le test ultime d'honnêteté d'un modèle de proba : quand on dit "70% de chance", est-ce que 70% de ces prédictions gagnent vraiment ? Sur la page Crédibilité, tu vois un graphique qui place les vraies fréquences contre les probas annoncées. Plus c'est proche de la diagonale, plus le modèle ne ment pas.`, color: '#34d399' },
-      { icon: '💎', title: 'Edge en points', desc: `L'edge mesure de combien notre proba dépasse celle implicite dans la cote du bookmaker. +5pt = on est 5% plus optimiste. À long terme c'est ce qui crée la valeur — sans edge positif récurrent, tu ne battras jamais le bookmaker.`, color: '#a78bfa' },
-      { icon: '⚡', title: 'Match imminent', desc: `Sur le dashboard, un pari qui commence dans moins de 30 minutes est mis en évidence avec un bord ambre pulsant. Visuel d'urgence : c'est maintenant ou jamais — soit tu paries, soit tu skip ce match.`, color: '#fbbf24' },
+    const glossary = [
+      ['bases','1N2','Résultat sec : 1 domicile, N nul, 2 extérieur.'],
+      ['bases','Cote','Multiplicateur de gain. @2.50 veut dire 150€ de profit pour 100€ misés.'],
+      ['bases','Probabilité implicite','Ce que la cote raconte : @2.00 = environ 50%, @3.00 = environ 33%.'],
+      ['bases','Marge bookmaker','Petite commission intégrée dans les cotes, donc toutes les cotes ne paient pas leur vraie proba.'],
+      ['bases','Value bet','Pari où notre proba estimée est supérieure à la proba implicite du marché.'],
+      ['bases','Edge','Écart entre notre proba et celle du marché. +6% signifie “mieux payé que prévu”.'],
+      ['bases','Confiance','Qualité du signal global : données fraîches, modèles alignés, marché cohérent.'],
+      ['bases','Big Bet','Cote haute mais crédible : le site le met devant quand risque et gain sont bien équilibrés.'],
+      ['bases','Solide','Opportunité propre, souvent moins explosive qu’un Big Bet mais encore rentable.'],
+      ['bases','Outsider crédible','Cote élevée avec raisons tangibles : forme, xG, lineups ou prix de marché.'],
+      ['marches','Over / Under','Pari sur un total : plus ou moins de buts, points, jeux ou manches.'],
+      ['marches','BTTS','Both Teams To Score : les deux équipes marquent au moins une fois.'],
+      ['marches','Double chance','Deux résultats couverts : 1X, X2 ou 12. Plus prudent, souvent moins payé.'],
+      ['marches','Draw No Bet','Remboursé si nul. Utile pour réduire le risque sur une équipe.'],
+      ['marches','Score exact','Résultat précis, très volatil. À confronter aux autres marchés pour éviter les contradictions.'],
+      ['marches','Mi-temps','Marché limité à la première période. Moins stable que le match complet.'],
+      ['marches','Corners','Nombre de corners en football. Dépend beaucoup du style et du scénario.'],
+      ['marches','Cartons','Nombre de cartons. Arbitre, derby et enjeu changent énormément le risque.'],
+      ['marches','Buteur','Joueur qui marque. Attendre les compositions réduit les paris fantômes.'],
+      ['marches','Combiné','Plusieurs paris liés dans un ticket. Gain plus haut, variance beaucoup plus forte.'],
+      ['risque','Bankroll','Argent réservé aux paris. Si elle disparaît, la session s’arrête.'],
+      ['risque','Kelly','Formule qui adapte la mise à l’avantage. Ici elle est fractionnée pour rester prudente.'],
+      ['risque','Drawdown','Baisse depuis le plus haut de bankroll. Un bon système en subit forcément.'],
+      ['risque','Variance','Le bruit naturel : un bon pari peut perdre, un mauvais pari peut gagner.'],
+      ['risque','Stop-loss','Limite de perte qui évite de continuer sous émotion.'],
+      ['risque','Tilt','Réaction après pertes : augmenter les mises, forcer des paris, sortir du plan.'],
+      ['risque','Corrélation','Deux paris dépendants du même scénario. Exemple : Over buts + BTTS Oui.'],
+      ['risque','Abstain','Le modèle renonce : pas assez de valeur, données faibles ou signaux contradictoires.'],
+      ['risque','Cote minimale','Préférence actuelle : ne pas afficher les paris trop bas sous @2.00.'],
+      ['risque','Responsable','Parier doit rester un loisir. Aucun pari ne mérite de l’argent nécessaire.'],
+      ['modele','xG','Expected goals : qualité des occasions, plus stable que les buts bruts.'],
+      ['modele','Forme L10','Dix derniers matchs, pondérés pour donner plus de poids aux plus récents.'],
+      ['modele','H2H','Historique face-à-face. Utile en contexte, jamais seul.'],
+      ['modele','Elo','Force relative d’une équipe ou d’un joueur, mise à jour après les résultats.'],
+      ['modele','Dixon-Coles','Modèle de score football qui ajuste les scores rares type 0-0, 1-0, 1-1.'],
+      ['modele','Poisson','Distribution utilisée pour estimer des scores et totals à partir des buts attendus.'],
+      ['modele','Calibration','Si le modèle dit 60%, environ 60 paris sur 100 doivent gagner.'],
+      ['modele','Brier','Score d’erreur des probabilités. Plus bas = mieux calibré.'],
+      ['modele','CLV','Closing Line Value : cote prise meilleure que celle de clôture.'],
+      ['modele','Sharp money','Mouvement de cote qui suggère une pression de parieurs informés.'],
+      ['data','Lineups','Compositions. Un titulaire absent peut changer l’attaque ou la défense.'],
+      ['data','Blessures','Joueurs absents ou incertains. Important seulement si le rôle est majeur.'],
+      ['data','Arbitre','Style de cartons/fautes. Sert surtout aux marchés cartons et rythme.'],
+      ['data','Météo','Pluie, vent ou froid peuvent réduire le rythme et les buts.'],
+      ['data','Winamax exact','Match relié précisément au catalogue Winamax, donc lien et cote exploitables.'],
+      ['data','Donnée fraîche','Une donnée vieille peut être pire que pas de donnée. Le site bloque si elle dépasse le seuil.'],
+      ['data','Lite data','Version légère chargée d’abord pour afficher vite, puis historique complet en fond.'],
+      ['data','Audit visuel','Captures automatiques mobile/tablette/desktop pour détecter les écrans cassés.'],
+      ['data','Test click','Robot qui clique les boutons pour vérifier qu’ils répondent sans erreur.'],
+      ['data','Service worker','Cache PWA. Il accélère, mais doit être bumpé à chaque livraison.'],
     ];
-    const cardsHtml = cards.map(c => `
-      <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;transition:all .2s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='var(--shadow)';this.style.borderColor='${c.color}44';" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='var(--border)';">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
-          <div style="width:40px;height:40px;border-radius:10px;background:${c.color}18;display:grid;place-items:center;font-size:20px;">${c.icon}</div>
-          <h3 style="margin:0;font-size:16px;font-weight:700;color:var(--text);letter-spacing:-.3px;">${esc(c.title)}</h3>
+    const cats = [
+      ['all','Tout'],
+      ['bases','Bases'],
+      ['marches','Marchés'],
+      ['risque','Risque'],
+      ['modele','Modèle'],
+      ['data','Data'],
+    ];
+    const articles = [
+      ['high-odds','Pourquoi viser les cotes hautes','Théo ne veut plus de cotes à 1.20 : le gain est trop faible pour l’énergie mentale. Le site privilégie désormais @2.00 minimum, avec une zone idéale @2.20-3.50. La variance augmente, donc il faut parier moins souvent, mais chaque bon ticket a un vrai potentiel.'],
+      ['value','Comment reconnaître la value','Une cote haute n’est pas automatiquement bonne. Il faut que le modèle voie plus de chances que le marché. Exemple simple : si Winamax paie @2.80 (36% implicite) et que le modèle estime 45%, l’avantage est réel. Si la cote est haute mais la proba trop faible, on passe.'],
+      ['bankroll','Bankroll et mise','Le but n’est pas de tout miser sur un gros coup. La mise doit rester petite, régulière, et liée à l’avantage. Une série de pertes normale ne doit pas détruire la bankroll. Si la variance secoue, on réduit la mise ou on s’abstient.'],
+      ['coherence','Cohérence entre marchés','Le site filtre les contradictions : un score exact 1-0 ne peut plus cohabiter avec BTTS Oui, et 0-0 ne peut pas cohabiter avec Over 2.5. Les marchés écartés restent auditables, mais ils ne guident plus la décision.'],
+      ['responsable','Règle de survie','Un pari reste incertain. Si aucune opportunité propre ne sort, le meilleur pari est de ne rien jouer. Le site doit aider à décider, pas pousser à l’action permanente.'],
+    ];
+    const catButtons = cats.map(([key,label]) => `
+      <button type="button" data-academy-cat="${key}" style="min-height:40px;padding:9px 13px;border-radius:999px;border:1px solid ${key === 'all' ? 'var(--brand)' : 'var(--border)'};background:${key === 'all' ? 'var(--brand-soft)' : 'var(--panel-2)'};color:${key === 'all' ? 'var(--brand)' : 'var(--text-2)'};font-size:12px;font-weight:800;cursor:pointer;">${esc(label)}</button>
+    `).join('');
+    const glossaryHtml = glossary.map(([cat,title,desc]) => `
+      <article data-glossary-item data-cat="${esc(cat)}" data-text="${esc((title + ' ' + desc).toLowerCase())}" style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-md);padding:14px;min-height:118px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;">
+          <h3 style="margin:0;font-size:15px;font-weight:900;color:var(--text);">${esc(title)}</h3>
+          <span style="font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-dim);">${esc(cat)}</span>
         </div>
-        <div style="font-size:13.5px;color:var(--text-2);line-height:1.55;">${esc(c.desc)}</div>
-      </div>`).join('');
+        <p style="margin:0;font-size:12.8px;line-height:1.55;color:var(--text-2);">${esc(desc)}</p>
+      </article>
+    `).join('');
+    const articleHtml = articles.map(([id,title,body]) => `
+      <section id="academy-${id}" style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px;margin-bottom:12px;">
+        <h2 style="margin:0 0 8px;font-size:20px;color:var(--text);">${esc(title)}</h2>
+        <p style="margin:0;font-size:14px;line-height:1.7;color:var(--text-2);">${esc(body)}</p>
+      </section>
+    `).join('');
+    const wideAcademy = (() => { try { return window.matchMedia('(min-width: 900px)').matches; } catch(e) { return true; } })();
+    const academyLayoutStyle = wideAcademy
+      ? 'display:grid;grid-template-columns:minmax(230px,280px) minmax(0,1fr);gap:18px;align-items:start;'
+      : 'display:grid;grid-template-columns:1fr;gap:14px;align-items:start;';
+    const academyAsideStyle = wideAcademy
+      ? 'position:sticky;top:112px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px;'
+      : 'position:static;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px;';
 
     wrap.innerHTML = `
-      <div style="max-width:1500px;margin:0 auto;padding:16px 8px 24px;">
-        <div style="margin-bottom:32px;padding:40px 0 24px;border-bottom:1px solid var(--border);">
-          <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Pédagogie</div>
-          <h1 style="margin:0 0 8px;font-size:40px;font-weight:800;letter-spacing:-1.4px;color:var(--text);line-height:1.1;">Guide</h1>
-          <div style="font-size:15px;color:var(--text-dim);max-width:560px;">Les notions importantes derrière chaque page. Lis ça une fois, reviens quand tu doutes.</div>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;">
-          ${cardsHtml}
+      <div style="max-width:1500px;margin:0 auto;padding:16px 8px 28px;">
+        <header style="display:block;padding:22px 0 18px;border-bottom:1px solid var(--border);margin-bottom:18px;">
+          <div style="font-size:11px;color:var(--c-accent);text-transform:uppercase;letter-spacing:1.4px;font-weight:900;margin-bottom:6px;">Méthode</div>
+          <h1 style="margin:0 0 8px;font-size:clamp(30px,4vw,48px);font-weight:950;color:var(--text);line-height:1.04;">Comprendre les bons paris</h1>
+          <p style="margin:0;font-size:15px;color:var(--text-dim);max-width:760px;line-height:1.6;">Glossaire, méthode et stratégie cotes hautes. La page est pensée pour trouver vite un terme, puis revenir au pari sans se perdre.</p>
+        </header>
+
+        <div style="${academyLayoutStyle}">
+          <aside style="${academyAsideStyle}">
+            <label for="academy-search" style="display:block;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.7px;color:var(--text-dim);margin-bottom:6px;">Recherche</label>
+            <input id="academy-search" type="search" placeholder="edge, Kelly, BTTS…" style="width:100%;min-height:44px;border-radius:var(--r-md);border:1px solid var(--border);background:var(--panel-2);color:var(--text);padding:0 12px;font-size:14px;">
+            <div style="display:flex;flex-wrap:wrap;gap:7px;margin-top:12px;">${catButtons}</div>
+            <nav aria-label="Sommaire méthode" style="display:grid;gap:6px;margin-top:14px;border-top:1px solid var(--border);padding-top:12px;">
+              ${articles.map(([id,title]) => `<a href="#academy-${id}" style="min-height:36px;display:flex;align-items:center;color:var(--text-2);text-decoration:none;font-size:12.5px;font-weight:700;">${esc(title)}</a>`).join('')}
+            </nav>
+          </aside>
+
+          <main style="min-width:0;">
+            <section style="margin-bottom:20px;">
+              <div style="display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:10px;flex-wrap:wrap;">
+                <div>
+                  <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.7px;font-weight:900;">Glossaire</div>
+                  <h2 style="margin:2px 0 0;font-size:24px;color:var(--text);">50 termes à connaître</h2>
+                </div>
+                <div id="academy-count" style="font-size:12px;color:var(--text-dim);font-variant-numeric:tabular-nums;">${glossary.length} termes</div>
+              </div>
+              <div id="academy-glossary-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;">${glossaryHtml}</div>
+            </section>
+
+            <section aria-label="Articles méthode">
+              ${articleHtml}
+            </section>
+          </main>
         </div>
       </div>`;
+
+    const search = wrap.querySelector('#academy-search');
+    const count = wrap.querySelector('#academy-count');
+    let activeCat = 'all';
+    const applyFilter = () => {
+      const q = (search?.value || '').trim().toLowerCase();
+      let shown = 0;
+      wrap.querySelectorAll('[data-glossary-item]').forEach(el => {
+        const okCat = activeCat === 'all' || el.dataset.cat === activeCat;
+        const okText = !q || (el.dataset.text || '').includes(q);
+        const show = okCat && okText;
+        el.style.display = show ? '' : 'none';
+        if (show) shown++;
+      });
+      if (count) count.textContent = `${shown}/${glossary.length} termes`;
+    };
+    if (search) search.addEventListener('input', applyFilter);
+    wrap.querySelectorAll('[data-academy-cat]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeCat = btn.dataset.academyCat || 'all';
+        wrap.querySelectorAll('[data-academy-cat]').forEach(b => {
+          const on = b === btn;
+          b.style.borderColor = on ? 'var(--brand)' : 'var(--border)';
+          b.style.background = on ? 'var(--brand-soft)' : 'var(--panel-2)';
+          b.style.color = on ? 'var(--brand)' : 'var(--text-2)';
+        });
+        applyFilter();
+      });
+    });
   }
 
   // ====== v23 — Page Buteurs (prono buts/BTTS foot) ======
