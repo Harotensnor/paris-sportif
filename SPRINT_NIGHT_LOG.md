@@ -701,3 +701,11 @@
 - Impact: couverture détaillée doit grimper plus vite vers 400+ events
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.89 (2026-05-02 11:19 UTC)
+- Chantier: P-6.18 combinés multi-marchés
+- Avant: combinés construits surtout sur le pick 1N2 principal
+- Après: sélection du meilleur marché exact Winamax + tickets Over 2.5/BTTS même match
+- Impact: plus de tickets buts/value et moins de combinés monotones
+- Commit: pending
+- Status: ✅ DONE

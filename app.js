@@ -9057,7 +9057,8 @@
     return o && o > 1 ? o : null;
   }
 
-  // Build 3 combinés (safe / balanced / value) from the pool of UPCOMING matches
+  // Build combinés (safe / balanced / value + exact same-match scenarios)
+  // from the pool of UPCOMING matches
   // within a given time window. maxMinutes: -1 means "no upper cap".
   // Each leg includes a `startIn` (minutes until kickoff) — negative means
   // already past (filtered out).
@@ -9077,12 +9078,30 @@
       .filter(m => !m.completed && m.status !== 'STATUS_IN_PROGRESS')
       .filter(m => isWinamaxBookable(m))
       .map(m => {
-        const pred = predictMatch(m);
-        const odd = pickOddFor(pred);
+        const rawPred = predictMatch(m);
+        let marketPick = null;
+        try {
+          marketPick = (typeof selectBestMarket === 'function') ? selectBestMarket(m, rawPred) : null;
+        } catch(e) { marketPick = null; }
+        const usableMarket = marketPick
+          && marketPick.source === 'winamax_exact'
+          && marketPick.investment?.action !== 'skip'
+          && marketPick.ev > 0
+          && marketPick.edge > 0;
+        const pred = usableMarket ? {
+          ...rawPred,
+          pick: {
+            ...(rawPred?.pick || {}),
+            key: marketPick.key,
+            label: marketPick.label,
+            prob: marketPick.prob,
+          }
+        } : rawPred;
+        const odd = usableMarket ? Number(marketPick.odd) : pickOddFor(pred);
         const d = m.date ? new Date(m.date) : null;
         const startIn = d && !isNaN(d) ? Math.round((d.getTime() - now) / 60000) : null;
-        const rel = pred ? (pred.reliability ?? pred.pick?.prob) : null;
-        return { m, pred, odd, startIn, rel };
+        const rel = usableMarket ? marketPick.prob : pred ? (pred.reliability ?? pred.pick?.prob) : null;
+        return { m, pred, rawPred, odd, startIn, rel, marketPick: usableMarket ? marketPick : null };
       })
       .filter(x => x.pred && x.pred.pick && x.odd && !x.pred.skip)
       // Skip anything already started (odds no longer bookable on Winamax
@@ -9145,6 +9164,51 @@
           .sort((a, b) => b.rel - a.rel)
     ).slice(0, 3);
 
+    const makeMarketLeg = (base, candidate) => ({
+      ...base,
+      odd: Number(candidate.odd),
+      rel: candidate.prob,
+      marketPick: candidate,
+      pred: {
+        ...(base.rawPred || base.pred),
+        pick: {
+          ...((base.rawPred || base.pred)?.pick || {}),
+          key: candidate.key,
+          label: candidate.label,
+          prob: candidate.prob,
+        }
+      }
+    });
+
+    const sameMatchGoalCombos = pool
+      .filter(x => x.m?.sport === 'football' && x.startIn !== null && x.startIn >= minMinutes && (maxMinutes < 0 || x.startIn <= maxMinutes))
+      .map(x => {
+        let candidates = [];
+        try { candidates = buildMarketCandidates(x.m, x.rawPred || x.pred, { requireExact: true }); }
+        catch(e) { candidates = []; }
+        const ok = c => c
+          && c.source === 'winamax_exact'
+          && c.investment?.action !== 'skip'
+          && Number(c.odd) > 1.20
+          && Number(c.prob) > 0.42
+          && Number(c.edge) > 0.015;
+        const over25 = candidates.find(c => ok(c) && c.market === 'ou25' && /^O2\.5$/.test(String(c.key || '')))
+          || candidates.find(c => ok(c) && c.market === 'ou25' && /plus/i.test(String(c.label || '')));
+        const bttsYes = candidates.find(c => ok(c) && c.market === 'btts' && String(c.key || '') === 'BTTS_Y')
+          || candidates.find(c => ok(c) && c.market === 'btts' && /oui/i.test(String(c.label || '')));
+        if (!over25 || !bttsYes) return null;
+        const legs = [makeMarketLeg(x, over25), makeMarketLeg(x, bttsYes)];
+        const totalOdd = legs.reduce((acc, l) => acc * l.odd, 1);
+        return {
+          legs,
+          score: (over25.edge + bttsYes.edge) * 100 + Math.min(totalOdd, 5),
+          totalOdd,
+        };
+      })
+      .filter(Boolean)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 2);
+
     // Sort each combiné's legs by kickoff time (earliest first)
     [safe, balanced, bold, lockCombo].forEach(arr => arr.sort((a, b) => a.startIn - b.startIn));
 
@@ -9153,6 +9217,12 @@
     if (lockCombo.length >= 2) combines.push({ type: 'locks', title: '🔒 Lock Combo', desc: 'Que des locks (fiab ≥ 70%) · anti-corrélation', legs: lockCombo });
     if (safe.length >= 2) combines.push({ type: 'safe', title: '🛡️ Sécurisé', desc: 'Pronostics fiables (haute conf.)', legs: safe });
     if (balanced.length >= 3) combines.push({ type: 'balanced', title: '⚖️ Équilibré', desc: 'Bon rapport risque/gain', legs: balanced });
+    sameMatchGoalCombos.forEach((combo, idx) => combines.push({
+      type: 'goals-builder',
+      title: idx === 0 ? '⚽ Buts + BTTS' : '⚽ Scénario buts',
+      desc: 'Même match · Over 2.5 + les deux équipes marquent · cotes exactes Winamax',
+      legs: combo.legs,
+    }));
     if (bold.length >= 2) combines.push({ type: 'bold', title: '🎯 Audacieux', desc: 'Fiabilité correcte sur cotes plus hautes', legs: bold });
 
     return combines.map(c => {
