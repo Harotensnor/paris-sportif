@@ -209,3 +209,11 @@
 - Impact: couverture lineups x3.9 sur le site (11 → 43), source fraîche, pipeline drift OK; la cible 200+ dépendra des lineups réellement publiées par Sofascore dans la fenêtre
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.28 (2026-05-02 05:16 UTC)
+- Chantier: P-A2 blessures Sofascore
+- Avant: `night_metrics.injuries=0` malgré `injuries_soccer.json` avec 131 équipes / 475 joueurs; patch écrivait seulement `injuries_home/away`, pas le contrat `event.injuries`
+- Après: fetcher blessures supporte `--debug`, `--top-leagues`, fenêtre 72h et pagination; source fraîche: 150 équipes / 545 entrées joueurs; patch écrit `event.injuries` + severe counts et couvre top-5 + tier2
+- Impact: `data.js` passe à `144` events avec blessures, warnings Santé 6 → 5, et le signal devient visible/actionnable côté modèle/UI
+- Commit: pending
+- Status: ✅ DONE

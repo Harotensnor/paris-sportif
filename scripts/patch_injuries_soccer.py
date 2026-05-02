@@ -40,7 +40,11 @@ INJ = Path(__file__).resolve().parent.parent / 'injuries_soccer.json'
 
 # Only soccer leagues covered by the Sofascore scraper. Avoid touching
 # events from other leagues — fetch_injuries.py (ESPN) handles those.
-SOCCER_LEAGUES = {'eng.1', 'esp.1', 'ger.1', 'ita.1', 'fra.1'}
+SOCCER_LEAGUES = {
+    'eng.1', 'esp.1', 'ger.1', 'ita.1', 'fra.1',
+    'ned.1', 'por.1', 'tur.1', 'bel.1', 'sco.1',
+    'eng.2', 'esp.2', 'ita.2', 'ger.2', 'fra.2',
+}
 
 # Reason codes that count as "severe" for the injuries_{home,away} tally.
 # Excludes international duty (13), coach decision (4), unknown (0).
@@ -63,6 +67,13 @@ def parse_names(ev_name: str) -> tuple[str, str]:
     if len(parts) != 2:
         return ('', '')
     return (parts[0].strip(), parts[1].strip())
+
+
+def _side_name(ev: dict, side: str) -> str:
+    for c in ev.get('competitors') or []:
+        if c.get('home_away') == side:
+            return c.get('name') or c.get('displayName') or c.get('shortDisplayName') or ''
+    return ''
 
 
 def build_token_index(teams: dict) -> dict[frozenset, list[dict]]:
@@ -155,17 +166,28 @@ def main() -> int:
              'home_with_inj': 0, 'away_with_inj': 0}
     for day, events in (data.get('days') or {}).items():
         for ev in events:
+            if ev.get('sport') != 'football':
+                continue
             if ev.get('league_code') not in SOCCER_LEAGUES:
                 continue
             if ev.get('completed'):
                 continue
             stats['events_scanned'] += 1
-            away_name, home_name = parse_names(ev.get('name') or '')
+            home_name = _side_name(ev, 'home')
+            away_name = _side_name(ev, 'away')
+            if not (home_name and away_name):
+                away_name, home_name = parse_names(ev.get('name') or '')
             if not (home_name and away_name):
                 continue
 
             home_inj, home_known = resolve_key(home_name, teams, token_idx, scanned)
             away_inj, away_known = resolve_key(away_name, teams, token_idx, scanned)
+            home_severe = sum(
+                1 for x in home_inj if x.get('reason') in SEVERE_REASONS
+            )
+            away_severe = sum(
+                1 for x in away_inj if x.get('reason') in SEVERE_REASONS
+            )
 
             # Attach per-competitor
             for c in ev.get('competitors') or []:
@@ -175,12 +197,17 @@ def main() -> int:
                 elif ha == 'away':
                     c['injuries'] = away_inj
 
-            ev['injuries_home'] = sum(
-                1 for x in home_inj if x.get('reason') in SEVERE_REASONS
-            )
-            ev['injuries_away'] = sum(
-                1 for x in away_inj if x.get('reason') in SEVERE_REASONS
-            )
+            ev['injuries'] = {
+                'home': home_inj,
+                'away': away_inj,
+                'home_known': home_known,
+                'away_known': away_known,
+                'home_severe': home_severe,
+                'away_severe': away_severe,
+                'source': 'sofascore',
+            }
+            ev['injuries_home'] = home_severe
+            ev['injuries_away'] = away_severe
             ev['injuries_home_known'] = home_known
             ev['injuries_away_known'] = away_known
             ev['injuries_source'] = 'sofascore'
@@ -200,10 +227,10 @@ def main() -> int:
 
     # v33.28 — HTML rewrite déplacé dans scripts/inject_data_in_html.py
     # (1 seul appel à la fin du pipeline plutôt que 12 regex sur ~13500 lignes)
-    print(f'[{datetime.now():%H:%M:%S}] soccer injuries attached in {time.time()-t0:.1f}s · '
-          f'{stats["events_scanned"]} events scanned, {stats["events_tagged"]} with ≥1 injury · '
+    print(f'[{datetime.now():%H:%M:%S}] soccer injuries attached in {time.time()-t0:.1f}s - '
+          f'{stats["events_scanned"]} events scanned, {stats["events_tagged"]} with >=1 injury - '
           f'coverage: home_known={stats["home_known"]}/{stats["events_scanned"]}, '
-          f'away_known={stats["away_known"]}/{stats["events_scanned"]} · '
+          f'away_known={stats["away_known"]}/{stats["events_scanned"]} - '
           f'home_with_inj={stats["home_with_inj"]}, away_with_inj={stats["away_with_inj"]}',
           flush=True)
     return 0
