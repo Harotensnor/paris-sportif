@@ -1166,3 +1166,10 @@
 - Impact: diagnostic plus scannable, smoke OK, bundle sous cap
 - Commit: pending
 - Status: ✅ DONE
+## Sprint v35.148 (16:25 UTC)
+- Chantier: P-9.47/P-9.66
+- Avant: a11y 0 critical / 0 serious / 20 moderate, touch targets résiduelles
+- Après: a11y 0 critical / 0 serious / 0 moderate sur 8 pages
+- Impact: audit local propre, footer/version/help/legal targets corrigés, bundle sous cap
+- Commit: pending
+- Status: ✅ DONE
