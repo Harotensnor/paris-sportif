@@ -123,6 +123,39 @@
     border-left: 3px solid #f87171;
     border-radius: 0 12px 12px 0;
   }
+  .legal-fold {
+    margin: 24px 0 16px;
+  }
+  .legal-fold summary {
+    min-height: 58px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 0 16px;
+    background: #121215;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 12px;
+    color: #e6ebf2;
+    font-size: 20px; font-weight: 800;
+    cursor: pointer;
+  }
+  .legal-fold summary::-webkit-details-marker { display: none; }
+  .legal-fold summary::after {
+    content: "+";
+    display: grid; place-items: center; flex: 0 0 30px; height: 30px;
+    border-radius: 999px;
+    background: rgba(167,139,250,.12);
+    color: #c4b5fd;
+    font-size: 18px;
+  }
+  .legal-fold[open] summary {
+    border-radius: 12px 12px 0 0;
+    border-bottom-color: transparent;
+  }
+  .legal-fold[open] summary::after { content: "−"; }
+  .legal-fold > section.card {
+    margin: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
   .grid-meta {
     display: grid;
     grid-template-columns: 180px 1fr;
@@ -227,7 +260,8 @@
     </div>
   </section>
 
-  <h2>🔒 Politique de confidentialité</h2>
+  <details class="legal-fold">
+  <summary>🔒 Politique de confidentialité</summary>
   <section class="card">
     <h3>Ce qu'on stocke</h3>
     <p>Le site utilise <strong>uniquement</strong> le <code>localStorage</code> de ton navigateur pour conserver tes préférences (thème, page active, banque par défaut, alertes vues). <strong>Rien n'est envoyé à un serveur tiers.</strong> Pas d'analytics, pas de Google Analytics, pas de Meta Pixel, pas de Tag Manager, pas de Hotjar, pas de cookies tiers.</p>
@@ -249,8 +283,10 @@
     <h3>Tes droits RGPD</h3>
     <p>Comme le site ne collecte aucune donnée personnelle côté serveur, les droits d'accès / rectification / effacement / portabilité s'exercent directement dans ton navigateur (localStorage). Pour toute question : passe par une <a href="https://github.com/Harotensnor/paris-sportif/issues" target="_blank" rel="noopener">issue GitHub</a>.</p>
   </section>
+  </details>
 
-  <h2>🎰 Relation avec Winamax</h2>
+  <details class="legal-fold">
+  <summary>🎰 Relation avec Winamax</summary>
   <section class="card purple">
     <p><strong>Aucune affiliation. Aucune rémunération. Aucun accord commercial.</strong></p>
     <p>Le site cite <strong>Winamax</strong> comme bookmaker de référence pour deux raisons concrètes :</p>
@@ -261,8 +297,10 @@
     <p>Les liens <em>"Voir sur Winamax"</em> sont de simples liens vers la page publique du match. <strong>Pas d'identifiant d'affiliation, pas de tag de tracking, pas de redirection commerciale</strong> — vérifiable dans le code source de cette page (cherche <code>winamax.fr</code>).</p>
     <p>Si à l'avenir une relation commerciale était mise en place, ce serait <strong>déclaré explicitement ici et à côté de chaque lien</strong>, avant toute mise en production. Cet engagement est pris en clair pour qu'il puisse être contesté si non respecté.</p>
   </section>
+  </details>
 
-  <h2>⚠️ Avertissement jeu responsable</h2>
+  <details class="legal-fold">
+  <summary>⚠️ Avertissement jeu responsable</summary>
   <section class="card danger">
     <p><strong>Le site n'est pas un conseil financier.</strong> Le modèle vise ~60% de réussite sur le long terme (mesuré sur backtest), mais 3 à 5 défaites consécutives sont normales et n'indiquent pas un dysfonctionnement.</p>
     <p><strong>Réservé aux 18+.</strong> Les paris sportifs créent un risque réel d'isolement, d'endettement et de dépendance. La place du hasard est irréductible.</p>
@@ -272,14 +310,17 @@
       <span class="anj-pill"><a href="https://www.joueurs-info-service.fr/" target="_blank" rel="noopener" style="color:inherit;">🔗 joueurs-info-service.fr</a></span>
     </p>
   </section>
+  </details>
 
-  <h2>📜 Journal des changements</h2>
+  <details class="legal-fold">
+  <summary>📜 Journal des changements</summary>
   <section class="card">
     <p style="color:#6b6b73;">Ce site est versionné dans Git. L'historique complet (commit + diff) est public sur GitHub.</p>
     <p><strong>v31 (2026-04-26)</strong> — Audit ChatGPT : pages Légal + Méthodologie ajoutées comme HTML statiques indexables, JSON-LD Organization enrichi, disclosure Winamax explicite, accessibilité WCAG 2.2 (target sizes + alts).</p>
     <p><strong>v30 (2026-04-25)</strong> — Suppression de la page "Mes paris" (manuel + import Winamax). Intégration sources externes (Sackmann tennis Elo+H2H+L10, Football-Data closing, MLB pitchers, NHL API). Fix alignement Winamax 1n2 (65 events corrigés).</p>
     <p style="margin:0;"><strong>v29 et avant</strong> — Voir <a href="https://github.com/Harotensnor/paris-sportif/commits/main" target="_blank" rel="noopener">historique Git complet</a>.</p>
   </section>
+  </details>
 
   <p class="contrib-prompt">
     📄 Cette page est <strong>volontairement statique</strong> et indexable. Aucun JS dynamique, aucune ressource lourde — pour qu'un crawler puisse la lire et qu'un visiteur sceptique puisse vérifier en 30 secondes.
