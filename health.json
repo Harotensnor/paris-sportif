@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-02T01:11:49Z",
+  "generated_at": "2026-05-02T01:16:25Z",
   "data_age_min": 0,
   "sources": {
     "winamax_catalog": {
@@ -8,7 +8,7 @@
       "matches": 748
     },
     "winamax_markets": {
-      "age_min": 1,
+      "age_min": 0,
       "matches_with_odds": 748,
       "matches_detailed": 163
     },
@@ -42,7 +42,7 @@
       "present": false
     },
     "sofascore_events": {
-      "age_min": 1,
+      "age_min": 0,
       "total": 0
     },
     "team_form": {
@@ -75,7 +75,7 @@
     "winamax_markets": {
       "script": "scripts/fetch_winamax_match_details.py",
       "output": "winamax_markets.json",
-      "age_min": 1,
+      "age_min": 0,
       "threshold_min": 15,
       "fast_red_min": 30,
       "status": "ok"
@@ -139,7 +139,7 @@
     "sofascore_events": {
       "script": "scripts/fetch_sofascore_events.py",
       "output": "sofascore_events.json",
-      "age_min": 1,
+      "age_min": 0,
       "threshold_min": 30,
       "fast_red_min": 30,
       "status": "ok"
@@ -198,52 +198,28 @@
     "fbref_xg: file missing (fbref_xg.json)",
     "sofascore_events: source vide — matching Sofascore indisponible",
     "footballdata: source vide — historique ligues foot désactivé",
-    "winamax_exact_ratio bas: 42% (322/766)"
+    "winamax_exact_ratio bas: 41% (302/744)"
   ],
   "overall": "warning",
   "quality_checks": {
-    "total_events": 1064,
-    "upcoming_events": 766,
-    "winamax_available": 766,
-    "winamax_exact": 322,
-    "winamax_detailed": 203,
-    "winamax_tournament_only": 444,
-    "winamax_exact_ratio": 0.42,
-    "winamax_detailed_ratio": 0.63,
-    "actionable_external_odds": 251,
+    "total_events": 1040,
+    "upcoming_events": 744,
+    "winamax_available": 744,
+    "winamax_exact": 302,
+    "winamax_detailed": 184,
+    "winamax_tournament_only": 442,
+    "winamax_exact_ratio": 0.406,
+    "winamax_detailed_ratio": 0.609,
+    "actionable_external_odds": 247,
     "football_invalid_form": 0,
     "winamax_coverage": {
       "by_sport": {
-        "baseball": {
-          "upcoming": 46,
-          "available": 46,
-          "exact": 43,
-          "detailed": 43,
-          "tournament_only": 3,
-          "missing": 0
-        },
-        "basketball": {
-          "upcoming": 17,
-          "available": 17,
-          "exact": 17,
-          "detailed": 13,
-          "tournament_only": 0,
-          "missing": 0
-        },
-        "hockey": {
-          "upcoming": 7,
-          "available": 7,
-          "exact": 7,
-          "detailed": 7,
-          "tournament_only": 0,
-          "missing": 0
-        },
         "football": {
-          "upcoming": 369,
-          "available": 369,
-          "exact": 253,
+          "upcoming": 367,
+          "available": 367,
+          "exact": 252,
           "detailed": 138,
-          "tournament_only": 116,
+          "tournament_only": 115,
           "missing": 0
         },
         "tennis": {
@@ -253,10 +229,34 @@
           "detailed": 2,
           "tournament_only": 325,
           "missing": 0
+        },
+        "baseball": {
+          "upcoming": 32,
+          "available": 32,
+          "exact": 30,
+          "detailed": 30,
+          "tournament_only": 2,
+          "missing": 0
+        },
+        "basketball": {
+          "upcoming": 14,
+          "available": 14,
+          "exact": 14,
+          "detailed": 10,
+          "tournament_only": 0,
+          "missing": 0
+        },
+        "hockey": {
+          "upcoming": 4,
+          "available": 4,
+          "exact": 4,
+          "detailed": 4,
+          "tournament_only": 0,
+          "missing": 0
         }
       },
       "reasons": {
-        "tournament_only_unknown": 444
+        "tournament_only_unknown": 442
       }
     }
   }
