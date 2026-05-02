@@ -933,3 +933,11 @@
 - Impact: base logique prête pour bloquer 1-0 + BTTS Oui et autres impossibilités
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.118 (2026-05-02 14:15 UTC)
+- Chantier: P-9.0b filtre cohérence dans sélection
+- Avant: selectBestMarket exposait tous les candidats, y compris contradictions logiques
+- Après: best.allCandidates contient seulement les marchés cohérents; contradictions repliées dans la modal
+- Impact: un score exact ne peut plus cohabiter visiblement avec BTTS/O-U/1N2/DC impossible
+- Commit: pending
+- Status: ✅ DONE

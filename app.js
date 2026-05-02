@@ -2864,11 +2864,15 @@
     }
     return { consistent, contradicted };
   }
+  function _v35AttachConsistency(best, candidates) {
+    const r = (typeof validateMarketConsistency === 'function') ? validateMarketConsistency(candidates, { anchor: best }) : { consistent: candidates, contradicted: [] };
+    best.allCandidates = r.consistent;
+    best.contradictedCandidates = r.contradicted;
+    best.consistencyFilteredCount = r.contradicted.length;
+    return best;
+  }
 
   try {
-    window.scoreToImpliedMarkets = scoreToImpliedMarkets;
-    window.isPickConsistentWithScore = isPickConsistentWithScore;
-    window.isPairConsistent = isPairConsistent;
     window.validateMarketConsistency = validateMarketConsistency;
   } catch(e){}
 
@@ -2905,9 +2909,7 @@
       if (Math.abs((b.ev || 0) - (a.ev || 0)) > 0.005) return (b.ev || 0) - (a.ev || 0);
       return (b.edge || 0) - (a.edge || 0);
     });
-    const best = sorted[0];
-    best.allCandidates = candidates;
-    return best;
+    return _v35AttachConsistency(sorted[0], candidates);
   }
   try { window.selectBestMarket = selectBestMarket; } catch(e){}
 
@@ -11599,19 +11601,16 @@
             </div>
           `;
         })();
-        // Sprint 84 (v31.7.171 — audit Part 10) — Section "Marchés alternatifs + refusés".
-        // Liste tous les marchés candidats évalués par selectBestMarket (avec leur edge,
-        // proba, EV) et indique pourquoi certains ont été rejetés. Permet à l'user de
-        // décider de prendre un marché alternatif au lieu du best.
+        // Alternative markets, filtered for logical consistency.
         const alternativesHtml = (() => {
           const best = (typeof selectBestMarket === 'function') ? selectBestMarket(match, pred) : null;
           if (!best || !best.allCandidates) return '';
           const cands = best.allCandidates;
-          if (cands.length < 2) return '';
+          const contradictedCands = Array.isArray(best.contradictedCandidates) ? best.contradictedCandidates : [];
+          if (cands.length < 2 && !contradictedCands.length) return '';
           const marketEmoji = { '1n2': '🏆', 'ou25': '⚽', 'ou15': '⚽', 'ou35': '⚽', 'btts': '🔄', 'doubleChance': '🎯', 'exactScore': '🎯', 'dnb': '🎯', 'ah': '⚖️', 'teamTotal': '⚽', 'basketTotal': '🏀', 'basketHandicap': '🏀', 'hockeyTotal': '🏒', 'puckLine': '🏒', 'baseballTotal': '⚾', 'runLine': '⚾', 'tennisGames': '🎾' };
           const evMin = (typeof window.advFilters !== 'undefined' && window.advFilters.evMin) || 0;
           const valueOnly = (typeof window.advFilters !== 'undefined' && window.advFilters.valueOnly) || false;
-          // Categorize : selected / acceptable / rejected
           const rows = cands.map((c, i) => {
             const ev = (typeof expectedValue === 'function') ? expectedValue(c.prob, c.odd) : (c.prob * c.odd - 1);
             const isSelected = c === best || (c.market === best.market && c.key === best.key && Math.abs(Number(c.odd) - Number(best.odd)) < 0.001);
@@ -11649,6 +11648,17 @@
             }
             return { c, ev, status, statusColor, reason, i };
           });
+          const contradictedRows = contradictedCands.map((c, i) => {
+            const ev = (typeof expectedValue === 'function') ? expectedValue(c.prob, c.odd) : (c.prob * c.odd - 1);
+            return {
+              c,
+              ev,
+              status: '✗ Contradictoire',
+              statusColor: 'var(--danger)',
+              reason: c.consistencyConflict?.reason || 'Marché incompatible avec la sélection principale',
+              i
+            };
+          });
           const visibleRows = rows.filter(r => !isBlockedHandicapMarket(r.c));
           const handicapRows = rows.filter(r => isBlockedHandicapMarket(r.c));
           const rowHtml = (r) => `
@@ -11666,14 +11676,15 @@
                   </div>`;
           return `
             <div class="section">
-              <h4>🏷️ Marchés évalués (${cands.length})</h4>
-              <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">${marketEmoji[best.market] || '🎯'} <b class="u-text-accent">${esc(best.label)}</b> sélectionné comme meilleur pari. Voici les alternatives évaluées et celles refusées avec raison.</div>
+              <h4>🏷️ Marchés évalués (${cands.length}${contradictedRows.length ? ` + ${contradictedRows.length} écarté${contradictedRows.length > 1 ? 's' : ''}` : ''})</h4>
+              <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">${marketEmoji[best.market] || '🎯'} <b class="u-text-accent">${esc(best.label)}</b> sélectionné comme meilleur pari. Les alternatives affichées restent cohérentes avec ce pick; les contradictions logiques sont cachées par défaut.</div>
               <div style="display:flex;flex-direction:column;gap:6px;">
                 ${visibleRows.map(rowHtml).join('')}
                 ${handicapRows.length ? `<details style="margin-top:4px;"><summary style="cursor:pointer;color:var(--text-dim);font-size:11.5px;">Voir ${handicapRows.length} handicap${handicapRows.length > 1 ? 's' : ''} masqué${handicapRows.length > 1 ? 's' : ''}</summary><div style="display:flex;flex-direction:column;gap:6px;margin-top:6px;">${handicapRows.map(rowHtml).join('')}</div></details>` : ''}
+                ${contradictedRows.length ? `<details style="margin-top:4px;"><summary style="cursor:pointer;color:var(--danger);font-size:11.5px;">Voir ${contradictedRows.length} marché${contradictedRows.length > 1 ? 's' : ''} écarté${contradictedRows.length > 1 ? 's' : ''} pour contradiction</summary><div style="display:flex;flex-direction:column;gap:6px;margin-top:6px;">${contradictedRows.map(rowHtml).join('')}</div></details>` : ''}
               </div>
               <div style="margin-top:8px;font-size:10.5px;color:var(--text-dim2);font-style:italic;line-height:1.4;">
-                Tous les marchés ci-dessus ont été calculés depuis le modèle Poisson/Gaussien. Les handicaps sont masqués par défaut, sauf edge > 15pt avec cote >= 2.50.
+                Tous les marchés ci-dessus ont été calculés depuis le modèle Poisson/Gaussien. Les handicaps sont masqués par défaut, et un score exact incompatible avec BTTS/O-U/1N2/DC est écarté.
               </div>
             </div>
           `;
@@ -14193,14 +14204,9 @@
   }
 
   // ====== Page Dashboard (nouvelle home) ======
-  // v28 — Multi-marché Winamax : pour chaque match, évalue 1N2 + O/U 2.5 + BTTS
-  //       et choisit le marché avec le meilleur edge. Nécessite
-  //       ev.winamax.markets (backend fetch_winamax_markets.py + patch_winamax_markets.py).
-  //       Si absent → fallback sur 1N2 classique (backward-compatible).
+  // Multi-market Winamax best pick.
   function _agentBestPick(m, pred) {
     if (!m || !pred) return null;
-    // v35 — terminal value scanner: exact Winamax markets only. This replaces
-    // the old 1N2/OU25/BTTS-only pool when the new helper is available.
     if (typeof buildMarketCandidates === 'function') {
       const candidates = buildMarketCandidates(m, pred, { requireExact: true });
       if (!candidates.length) return null;
@@ -14219,24 +14225,20 @@
         if (Math.abs((b.ev || 0) - (a.ev || 0)) > 0.005) return (b.ev || 0) - (a.ev || 0);
         return (b.edge || 0) - (a.edge || 0);
       });
-      pool[0].allCandidates = candidates;
-      return pool[0];
+      return _v35AttachConsistency(pool[0], candidates);
     }
     const wxMk = (m.winamax && m.winamax.markets) || null;
     const candidates = [];
-    // 1N2 — canal principal, toujours disponible quand pred.pick + pred.odds
     if (pred.pick && pred.odds) {
       const pk = pred.pick.key;
       const odd1n2 = pk==='1'?pred.odds.home : pk==='2'?pred.odds.away : pred.odds.draw;
       const rel1n2 = pred.reliability ?? pred.pick.prob;
       if (odd1n2 && odd1n2 > 1.01 && rel1n2 > 0) {
-        // Si Winamax markets.1n2 existe, on prend leur cote (plus fiable que la moyenne ESPN)
         const wxOdd = wxMk && wxMk['1n2'] ? (pk==='1'?wxMk['1n2'].home : pk==='2'?wxMk['1n2'].away : wxMk['1n2'].draw) : null;
         const odd = wxOdd || odd1n2;
         candidates.push({ market: '1n2', key: pk, pickKey: pk, side: null, rel: rel1n2, odd, edge: rel1n2 - 1/odd, label: pred.pick.label });
       }
     }
-    // O/U 2.5 — uniquement foot avec pred.markets.ou + wx.markets.ou25
     if (pred.markets && pred.markets.ou && wxMk && wxMk.ou25) {
       const pick = pred.markets.ou;
       const odd = pick.side === 'over' ? wxMk.ou25.over : wxMk.ou25.under;
@@ -14245,7 +14247,6 @@
         candidates.push({ market: 'ou25', key: pick.key, pickKey: pick.key, side: pick.side, rel, odd, edge: rel - 1/odd, label: pick.label });
       }
     }
-    // BTTS — uniquement foot avec pred.markets.btts + wx.markets.btts
     if (pred.markets && pred.markets.btts && wxMk && wxMk.btts) {
       const pick = pred.markets.btts;
       const odd = pick.side === 'yes' ? wxMk.btts.yes : wxMk.btts.no;
@@ -14278,10 +14279,9 @@
       if (Math.abs((b.ev || 0) - (a.ev || 0)) > 0.01) return (b.ev || 0) - (a.ev || 0);
       return b.edge - a.edge;
     });
-    return pool[0];
+    return _v35AttachConsistency(pool[0], candidates);
   }
 
-  // v28 — Évaluateur multi-marché (pour le replay historique)
   function _evaluateBestPick(m, best) {
     if (!m || !best || !m.completed) return null;
     if (typeof evaluateMarketPick === 'function') {
@@ -14289,10 +14289,8 @@
       if (res === 'won' || res === 'lost') return res;
     }
     if (best.market === '1n2') {
-      // Délégué à evaluateModelPick qui a déjà la logique 1N2 propre
       return evaluateModelPick(m, { pick: { key: best.pickKey }, isLock: false });
     }
-    // Pour O/U + BTTS : lire les scores finaux depuis les competitors
     const sides = (typeof getSides === 'function') ? getSides(m) : null;
     if (!sides || !sides.home || !sides.away) return null;
     const hs = parseInt(sides.home.score, 10);
