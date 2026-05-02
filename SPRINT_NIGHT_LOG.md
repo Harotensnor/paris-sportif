@@ -329,3 +329,11 @@
 - Impact: structure SEO/partage plus complète pour les matchs exacts Winamax; génération cron déjà branchée, donc les routes suivent chaque refresh
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.43 (2026-05-02 06:28 UTC)
+- Chantier: P-C9 lazy/decode images
+- Avant: `app.js` contenait `19` balises `<img>`, dont `2` sans `loading` et `7` sans `decoding`
+- Après: `19/19` images ont `loading="lazy"` et `decoding="async"` quand applicable
+- Impact: décodage image non bloquant sur cartes/logos et moins de risque de micro-jank mobile; zéro changement visuel attendu
+- Commit: pending
+- Status: ✅ DONE

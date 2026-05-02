@@ -8782,8 +8782,8 @@
       // v30 — "J'ai parié" + Kelly retirés.
       const betBtnHtml = '';
       // Phase 3 #8 : ajout class .pick-row + .team__logo pour matcher tests
-      const hLogo = home?.logo ? `<img class="team__logo" src="${esc(home.logo)}" alt="" loading="lazy" onerror="this.style.display='none'">` : '<span class="team__logo team__logo--placeholder"></span>';
-      const aLogo = away?.logo ? `<img class="team__logo" src="${esc(away.logo)}" alt="" loading="lazy" onerror="this.style.display='none'">` : '<span class="team__logo team__logo--placeholder"></span>';
+      const hLogo = home?.logo ? `<img class="team__logo" src="${esc(home.logo)}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'">` : '<span class="team__logo team__logo--placeholder"></span>';
+      const aLogo = away?.logo ? `<img class="team__logo" src="${esc(away.logo)}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'">` : '<span class="team__logo team__logo--placeholder"></span>';
       return `
         <div class="top-pick pick-row ${urgent ? 'urgent' : ''}" data-id="${esc(m.id)}">
           <div class="tp-head">
@@ -15889,10 +15889,10 @@
                   </div>
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px;line-height:1.25;">
-                  ${p.homeLogo ? `<img src="${esc(p.homeLogo)}" alt="" style="width:22px;height:22px;object-fit:contain;flex-shrink:0;" loading="lazy">` : ''}
+              ${p.homeLogo ? `<img src="${esc(p.homeLogo)}" alt="" style="width:22px;height:22px;object-fit:contain;flex-shrink:0;" loading="lazy" decoding="async">` : ''}
                   <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(p.homeName)}</span>
                   <span style="color:var(--text-dim);font-weight:400;">vs</span>
-                  ${p.awayLogo ? `<img src="${esc(p.awayLogo)}" alt="" style="width:22px;height:22px;object-fit:contain;flex-shrink:0;" loading="lazy">` : ''}
+              ${p.awayLogo ? `<img src="${esc(p.awayLogo)}" alt="" style="width:22px;height:22px;object-fit:contain;flex-shrink:0;" loading="lazy" decoding="async">` : ''}
                   <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(p.awayName)}</span>
                 </div>
                 <div style="font-size:16px;color:var(--brand);font-weight:700;margin:10px 0 4px;">→ ${esc(pickLabel)}</div>
@@ -16025,10 +16025,10 @@
                     </div>`;
                   })()}
                   <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">
-                    ${hLogo ? `<img src="${esc(hLogo)}" alt="" style="width:24px;height:24px;object-fit:contain;border-radius:4px;background:rgba(255,255,255,.04);padding:1px;">` : ''}
+            ${hLogo ? `<img src="${esc(hLogo)}" alt="" loading="lazy" decoding="async" style="width:24px;height:24px;object-fit:contain;border-radius:4px;background:rgba(255,255,255,.04);padding:1px;">` : ''}
                     <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(hN)}</span>
                     <span style="color:var(--text-dim);font-weight:400;">vs</span>
-                    ${aLogo ? `<img src="${esc(aLogo)}" alt="" style="width:24px;height:24px;object-fit:contain;border-radius:4px;background:rgba(255,255,255,.04);padding:1px;">` : ''}
+            ${aLogo ? `<img src="${esc(aLogo)}" alt="" loading="lazy" decoding="async" style="width:24px;height:24px;object-fit:contain;border-radius:4px;background:rgba(255,255,255,.04);padding:1px;">` : ''}
                     <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(aN)}</span>
                   </div>
                   <div style="font-size:13px;color:var(--brand);font-weight:700;margin-bottom:10px;">→ ${esc(pickLbl)}</div>
@@ -17776,7 +17776,7 @@
       const league = p.m.league_name || '';
       const url = (p.m.winamax && p.m.winamax.url) || 'https://www.winamax.fr/paris-sportifs';
       const resBadge = isFini ? (p.res === 'won' ? '<span style="padding:3px 10px;background:rgba(52,211,153,.15);color:var(--accent);font-weight:700;font-size:11px;border-radius:999px;">✓ GAGNÉ</span>' : p.res === 'lost' ? '<span style="padding:3px 10px;background:rgba(248,113,113,.15);color:#fca5a5;font-weight:700;font-size:11px;border-radius:999px;">✗ PERDU</span>' : '<span style="padding:3px 10px;background:rgba(148,163,184,.15);color:#94a3b8;font-weight:600;font-size:11px;border-radius:999px;">? n/a</span>') : '';
-      const teamLogo = (src) => src ? `<img src="${esc(src)}" alt="" style="width:22px;height:22px;object-fit:contain;border-radius:3px;" loading="lazy">` : '<span style="display:inline-block;width:22px;height:22px;"></span>';
+    const teamLogo = (src) => src ? `<img src="${esc(src)}" alt="" style="width:22px;height:22px;object-fit:contain;border-radius:3px;" loading="lazy" decoding="async">` : '<span style="display:inline-block;width:22px;height:22px;"></span>';
       // v30 — Countdown intégré sous l'heure : "dans 9h57" / "dans 25 min"
       const _cntLabel = (() => {
         const ko = new Date(p.m.date).getTime();
