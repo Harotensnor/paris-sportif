@@ -1273,3 +1273,9 @@
 - Après: simulateur bankroll/cote moyenne/win rate/nombre de paris avec courbe SVG et EV/Kelly prudent.
 - Impact: Théo voit vite si une approche grosses cotes tient mathématiquement.
 - Vérif: phase10_bankroll_sim_audit.json, projection interactive + overflow = 0.
+
+## Sprint v35.165 — Phase 10 P-10.13 Alertes internes dashboard (18:48 UTC)
+- Avant: pas de rappel interne lisible sur les opportunités high-odds du jour.
+- Après: bandeau dismissible "spots high-odds aujourd'hui" avec prochain pari et mémorisation locale.
+- Impact: Théo voit l'urgence du jour sans notifications externes ni bruit permanent.
+- Vérif: phase10_internal_alerts_audit.json, dismiss OK, overflow = 0.
