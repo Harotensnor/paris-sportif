@@ -199,3 +199,13 @@
 - Impact: Théo peut ouvrir un seul rapport et comprendre ce qui a bougé, ce qui est mesuré et ce qu'il faut attaquer ensuite
 - Commit: pending
 - Status: ✅ DONE
+
+## Phase 2
+
+## Sprint v35.27 (2026-05-02 05:12 UTC)
+- Chantier: P-A1 lineups Sofascore
+- Avant: `night_metrics.lineups=11`, `health.sources.lineups_soccer.events=17`, fetcher sans `--debug/--top-leagues`, patch limité aux top-5 ligues
+- Après: fetcher supporte `--debug`, `--top-leagues`, `--hours-ahead=72`, `--pages=3`; patch couvre top-5 + tier2; run local collecte 47 lineups et patche `43` events dans `data.js`
+- Impact: couverture lineups x3.9 sur le site (11 → 43), source fraîche, pipeline drift OK; la cible 200+ dépendra des lineups réellement publiées par Sofascore dans la fenêtre
+- Commit: pending
+- Status: ✅ DONE

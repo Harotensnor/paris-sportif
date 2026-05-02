@@ -43,7 +43,11 @@ DATA_JS = ROOT / 'data.js'
 HTML = ROOT / 'pronostics.html'
 LINEUPS = ROOT / 'lineups_soccer.json'
 
-SOCCER_LEAGUES = {'eng.1', 'esp.1', 'ger.1', 'ita.1', 'fra.1'}
+SOCCER_LEAGUES = {
+    'eng.1', 'esp.1', 'ger.1', 'ita.1', 'fra.1',
+    'ned.1', 'por.1', 'tur.1', 'bel.1', 'sco.1',
+    'eng.2', 'esp.2', 'ita.2', 'ger.2', 'fra.2',
+}
 
 
 def parse_names(ev_name: str) -> tuple[str, str]:
@@ -128,6 +132,8 @@ def main() -> int:
     scanned = 0
     for day, evs in (data.get('days') or {}).items():
         for ev in evs:
+            if ev.get('sport') != 'football':
+                continue
             if ev.get('league_code') not in SOCCER_LEAGUES:
                 continue
             if ev.get('completed'):

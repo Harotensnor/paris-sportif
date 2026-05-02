@@ -47,7 +47,8 @@ from __future__ import annotations
 import json
 import sys
 import time
-from datetime import datetime
+import argparse
+from datetime import datetime, timezone
 from pathlib import Path
 
 try:
@@ -93,6 +94,9 @@ LEAGUES: dict[str, int] = {
 POS_CODES = {'G', 'D', 'M', 'F'}
 
 
+DEBUG = False
+
+
 def _get(url: str) -> dict | None:
     try:
         # v31.7.208 — bump chrome110 → chrome131 (chrome110 datant de 2023,
@@ -106,6 +110,8 @@ def _get(url: str) -> dict | None:
         return None
     if r.status_code == 404:
         # Expected for matches too far out — no lineup yet.
+        if DEBUG:
+            print(f'  [debug] 404 no lineup yet: {url}', flush=True)
         return None
     if r.status_code != 200:
         print(f'  HTTP {r.status_code} on {url}', flush=True)
@@ -221,18 +227,21 @@ def lineup_for_event(event_id: int) -> dict | None:
     return {'home': home, 'away': away}
 
 
-def collect() -> dict:
+def collect(selected_leagues: set[str] | None = None, pages: int = 3,
+            hours_ahead: int = 72) -> dict:
     t0 = time.time()
     print(f'[{datetime.now():%H:%M:%S}] Sofascore soccer lineups scrape', flush=True)
     events: dict[str, dict] = {}
     totals = {'leagues': 0, 'fixtures': 0, 'with_lineup': 0, 'misses': 0}
 
     for code, tid in LEAGUES.items():
+        if selected_leagues and code not in selected_leagues:
+            continue
         season_id = current_season_id(tid)
         if not season_id:
             print(f'  {code}: no season found, skipping', flush=True)
             continue
-        fixtures = upcoming_fixtures(tid, season_id, pages=2)
+        fixtures = upcoming_fixtures(tid, season_id, pages=pages, hours_ahead=hours_ahead)
         print(f'  {code} (tid={tid}, season={season_id}): {len(fixtures)} upcoming', flush=True)
         totals['leagues'] += 1
         totals['fixtures'] += len(fixtures)
@@ -270,13 +279,23 @@ def collect() -> dict:
           f'{totals["fixtures"]} fixtures, {totals["with_lineup"]} w/ lineup '
           f'({totals["misses"]} misses, {elapsed:.1f}s)', flush=True)
     return {
-        'generated_at': datetime.utcnow().isoformat() + 'Z',
+        'generated_at': datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace('+00:00', 'Z'),
         'events': events,
     }
 
 
 def main() -> int:
-    data = collect()
+    global DEBUG
+    ap = argparse.ArgumentParser(description='Fetch Sofascore soccer lineups.')
+    ap.add_argument('--debug', action='store_true', help='log expected 404/no-lineup misses')
+    ap.add_argument('--top-leagues', default='', help='comma-separated league codes to fetch')
+    ap.add_argument('--hours-ahead', type=int, default=72, help='upcoming window; lineups often appear <72h')
+    ap.add_argument('--pages', type=int, default=3, help='Sofascore pagination depth per league')
+    args = ap.parse_args()
+    DEBUG = bool(args.debug)
+    selected = {x.strip() for x in args.top_leagues.split(',') if x.strip()} or None
+    data = collect(selected_leagues=selected, pages=max(1, args.pages),
+                   hours_ahead=max(1, args.hours_ahead))
     if not data.get('events'):
         print('  no lineups collected — not overwriting existing file')
         return 1
