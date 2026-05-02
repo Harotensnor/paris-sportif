@@ -47,6 +47,7 @@ ODDS_HISTORY = ROOT / 'odds_history.jsonl'
 RESULTS_ARCHIVE = ROOT / 'results_archive.jsonl'
 REPORT_JSON = ROOT / 'backtest_report_v2.json'
 REPORT_MD = ROOT / 'backtest_report_v2.md'
+CALIBRATION_SEGMENTS_JSON = ROOT / 'calibration_per_sport_league.json'
 
 COTE_BUCKETS = [
     ('heavy_fav',   0.0, 1.50),
@@ -480,6 +481,24 @@ def bucket_by(rows: list[dict], key: str) -> dict[str, dict]:
     return {k: summarize(v) for k, v in sorted(groups.items())}
 
 
+FOOTBALL_TOP5_LEAGUES = {'eng.1', 'esp.1', 'ita.1', 'ger.1', 'fra.1'}
+
+
+def calibration_group_key(row: dict) -> str:
+    """Sport-aware calibration segment.
+
+    Football top-5 leagues behave differently from secondary leagues, while
+    other sports currently keep a sport-level bucket until sample sizes grow.
+    """
+    sport = str(row.get('sport') or 'unknown')
+    league = str(row.get('league_code') or '')
+    if sport == 'football':
+        tier = 'top5' if league in FOOTBALL_TOP5_LEAGUES else 'other'
+    else:
+        tier = 'all'
+    return f'{sport}:{tier}'
+
+
 def compute_streaks(rows: list[dict]) -> dict:
     """v31.7.21 — Streaks publics. Calcule longest win/lose streak + courant.
 
@@ -716,6 +735,17 @@ def render_markdown(report: dict) -> str:
                          f"{s['kelly_pnl']:+.2f}u | {s['brier']} |")
         lines.append('')
 
+    if report.get('by_calibration_group'):
+        lines.append('## Calibration par segment sport/ligue')
+        lines.append('')
+        lines.append('| Segment | N | WR | ROI flat | Brier |')
+        lines.append('|---|---:|---:|---:|---:|')
+        for group, s in sorted(report['by_calibration_group'].items(), key=lambda x: -x[1]['n'])[:10]:
+            e = '🟢' if s['flat_roi_pct'] > 5 else '🟡' if s['flat_roi_pct'] > 0 else '🔴'
+            lines.append(f"| `{group}` | {s['n']} | {s['win_rate']*100:.0f}% | "
+                         f"{e} {s['flat_roi_pct']:+.1f}% | {s['brier']} |")
+        lines.append('')
+
     # Par cote bucket
     if report.get('by_cote_bucket'):
         lines.append('## Par range de cote')
@@ -843,6 +873,8 @@ def main() -> int:
     if not rows:
         print('Aucun résultat à agréger — vérifier data.js + odds_history.jsonl.')
         return 1
+    for row in rows:
+        row['calibration_group'] = calibration_group_key(row)
 
     dates = sorted(r['date'] for r in rows if r.get('date'))
     report = {
@@ -855,6 +887,7 @@ def main() -> int:
         'overall': summarize(rows),
         'by_sport': bucket_by(rows, 'sport'),
         'by_league': bucket_by(rows, 'league_code'),
+        'by_calibration_group': bucket_by(rows, 'calibration_group'),
         'by_cote_bucket': bucket_by(rows, 'cote_bucket'),
         'by_tier': bucket_by(rows, 'tier'),
         'calibration': calibration_bins(rows, n_bins=10),
@@ -872,6 +905,14 @@ def main() -> int:
             for sport in {r.get('sport') for r in rows if r.get('sport')}
             if sum(1 for r in rows if r.get('sport') == sport) >= 30
         },
+        # v35.40 — Calibration per sport + league tier. Football top-5 is
+        # separated from other leagues; other sports remain sport-level until
+        # enough data exists for league-level splits.
+        'calibration_by_sport_league_tier': {
+            group: calibration_bins([r for r in rows if r.get('calibration_group') == group], n_bins=10)
+            for group in {r.get('calibration_group') for r in rows if r.get('calibration_group')}
+            if sum(1 for r in rows if r.get('calibration_group') == group) >= 30
+        },
         # v31.7.14 — Recalibration isotonic (PAV) precomputee. Le client lit
         # ces pairs directement, plus besoin de recompute le PAV en JS.
         'isotonic_pairs': isotonic_calibration_pairs(rows),
@@ -881,6 +922,11 @@ def main() -> int:
             sport: isotonic_calibration_pairs([r for r in rows if r.get('sport') == sport])
             for sport in {r.get('sport') for r in rows if r.get('sport')}
             if sum(1 for r in rows if r.get('sport') == sport) >= 50
+        },
+        'isotonic_pairs_by_sport_league_tier': {
+            group: isotonic_calibration_pairs([r for r in rows if r.get('calibration_group') == group])
+            for group in {r.get('calibration_group') for r in rows if r.get('calibration_group')}
+            if sum(1 for r in rows if r.get('calibration_group') == group) >= 50
         },
         # v31.7.21 — Streaks publics (transparence). On expose les longest
         # win/lose streaks ainsi que la streak courante (signed).
@@ -945,6 +991,17 @@ def main() -> int:
         # que backtest_report_v2.json ne gonfle (déjà 500+ events en archive).
         # Si besoin d'inspection pick-par-pick, relancer avec --limit + print.
     }
+
+    calibration_segments = {
+        'generated_at': report['generated_at'],
+        'schema': 'calibration_per_sport_league_v1',
+        'top5_leagues': sorted(FOOTBALL_TOP5_LEAGUES),
+        'groups': report.get('by_calibration_group', {}),
+        'calibration_by_sport_league_tier': report.get('calibration_by_sport_league_tier', {}),
+        'isotonic_pairs_by_sport_league_tier': report.get('isotonic_pairs_by_sport_league_tier', {}),
+    }
+    CALIBRATION_SEGMENTS_JSON.write_text(
+        json.dumps(calibration_segments, ensure_ascii=False, indent=2), encoding='utf-8')
 
     REPORT_JSON.write_text(
         json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')
