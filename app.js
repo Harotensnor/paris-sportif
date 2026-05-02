@@ -107,7 +107,7 @@
   // legacy) mais aucun lien ne pointe plus vers cette valeur.
   // v31.7.77 — 'calendrier' ajouté pour vue 7 jours groupée (user feedback
   // "je veux voir au moins une semaine de pronos jour par jour").
-  const VALID_PAGES = ['dashboard','tous','locks','buteurs','combines','top','historique','bilan','backtest','academie','credibilite','alertes','profil','sante','legal','methodologie','montante-jour','montante-weekend','montante-semaine','compare','calendrier','league','favoris','matchs','performance','plan-mise','valeur','simulator'];
+  const VALID_PAGES = ['dashboard','tous','buteurs','combines','historique','bilan','backtest','academie','credibilite','alertes','profil','sante','legal','methodologie','montante-jour','montante-weekend','montante-semaine','compare','calendrier','league','favoris','performance','plan-mise','valeur','simulator'];
   // v30 — 'mesparis' retiré : Théo n'enregistre pas ses paris sur le site.
   // v31 — 'legal' + 'methodologie' ajoutés (transparence + dictionnaire des
   // métriques, en réponse à l'audit ChatGPT 2026-04-26).
@@ -115,6 +115,10 @@
   // l'utilisateur peut avoir bookmarké. Avant : #montantes-jour fallback sur
   // dashboard silencieusement.
   const PAGE_ALIASES = {
+    'top': 'dashboard',
+    'locks': 'dashboard',
+    'matchs': 'dashboard',
+    'matchs-detectes': 'dashboard',
     'montantes-jour': 'montante-jour',
     'montantes-weekend': 'montante-weekend',
     'montantes-semaine': 'montante-semaine',
@@ -125,7 +129,10 @@
   function _pageFromHash() {
     try {
       let h = (location.hash || '').replace(/^#/, '').trim();
-      if (PAGE_ALIASES[h]) h = PAGE_ALIASES[h];
+      if (PAGE_ALIASES[h]) {
+        h = PAGE_ALIASES[h];
+        try { history.replaceState(null, '', location.pathname + location.search + '#' + h); } catch(e) {}
+      }
       return VALID_PAGES.includes(h) ? h : null;
     } catch(e) { return null; }
   }
@@ -143,8 +150,9 @@
   let currentPage = (() => {
     const fromHash = _pageFromHash();
     if (fromHash) return fromHash;
-    const stored = localStorage.getItem('currentPage');
-    if (stored && !STATIC_REDIRECT_PAGES.has(stored)) return stored;
+    let stored = localStorage.getItem('currentPage');
+    if (stored && PAGE_ALIASES[stored]) stored = PAGE_ALIASES[stored];
+    if (stored && VALID_PAGES.includes(stored) && !STATIC_REDIRECT_PAGES.has(stored)) return stored;
     // Cleanup proactif : si la valeur cachée est une static-redirect page
     // (héritée d'une précédente session), on la purge pour éviter qu'elle
     // ne ressurgisse via un autre chemin de lecture.
@@ -20685,7 +20693,7 @@
       `).join('');
       suiviNav.querySelectorAll('[data-suivi-page]').forEach(b => {
         b.addEventListener('click', () => {
-          currentPage = b.dataset.suiviPage;
+        currentPage = PAGE_ALIASES[b.dataset.suiviPage] || b.dataset.suiviPage;
           try { localStorage.setItem('currentPage', currentPage); } catch(e){}
           applyPageView();
         });
@@ -20722,7 +20730,7 @@
       `).join('');
       pronosNav.querySelectorAll('[data-pronos-page]').forEach(b => {
         b.addEventListener('click', () => {
-          currentPage = b.dataset.pronosPage;
+        currentPage = PAGE_ALIASES[b.dataset.pronosPage] || b.dataset.pronosPage;
           try { localStorage.setItem('currentPage', currentPage); } catch(e){}
           applyPageView();
         });
@@ -28905,7 +28913,7 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     document.addEventListener('click', (ev) => {
       const btn = ev.target && ev.target.closest && ev.target.closest('.page-btn');
       if (!btn || !btn.dataset || !btn.dataset.page) return;
-      currentPage = btn.dataset.page;
+      currentPage = PAGE_ALIASES[btn.dataset.page] || btn.dataset.page;
       // BUG FIX 2026-05-01 — Ne pas persister 'legal'/'methodologie'.
       // applyPageView fait location.replace() vers la page statique HTML,
       // donc on quitte pronostics.html. Persister cette valeur cause une

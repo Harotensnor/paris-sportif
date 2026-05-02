@@ -355,3 +355,11 @@
 - Impact: compréhension en `10s` avant les détails; test modal local vert (`whyVisible=true`, `winamaxCta=true`, `0` erreur JS), smoke E2E vert
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.46 (2026-05-02 07:26 UTC)
+- Chantier: P-3.5 redirection Top/Locks/Matchs vers Accueil
+- Avant: `VALID_PAGES=28`, avec `top`, `locks`, `matchs` comme pages séparées redondantes
+- Après: `VALID_PAGES=25`; `#top`, `#locks`, `#matchs` et les boutons legacy redirigent vers `#dashboard` Big Bets First
+- Impact: 3 chemins confus supprimés sans casser les anciens liens; test hash legacy vert (`top/locks/matchs → #dashboard`), smoke E2E vert
+- Commit: pending
+- Status: ✅ DONE
