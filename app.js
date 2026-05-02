@@ -13759,6 +13759,34 @@
     return null;
   }
 
+  function _sportRoiGuard(m, best) {
+    const sport = m && m.sport;
+    const rep = window.__backtestReportV2;
+    const stats = sport && rep && rep.by_sport ? rep.by_sport[sport] : null;
+    if (!stats) return null;
+    const sample = Number(stats.n || 0);
+    const roiPct = Number(stats.flat_roi_pct || 0);
+    if (!isFinite(sample) || !isFinite(roiPct) || sample < 10 || roiPct >= -10) return null;
+    const rel = Number(best && best.rel || 0);
+    const odd = Number(best && best.odd || 0);
+    const ev = isFinite(Number(best && best.ev)) ? Number(best.ev) : (rel && odd ? rel * odd - 1 : 0);
+    const edge = odd > 1 ? rel - 1 / odd : 0;
+    const score = Number(best && best.investment && best.investment.score || 0);
+    const exceptional = rel >= 0.68 && ev >= 0.12 && edge >= 0.08 && score >= 72 && odd <= 4.50;
+    const label = typeof sportLabel === 'function' ? sportLabel(sport) : sport;
+    return {
+      blocked: !exceptional,
+      exceptional,
+      reason: 'sport_roi_cold',
+      sport,
+      label,
+      sample,
+      roiPct,
+      note: `${label}: ROI backtest ${roiPct.toFixed(1)}% sur ${sample} picks`
+    };
+  }
+  try { window._sportRoiGuard = _sportRoiGuard; } catch(e) {}
+
   // v27 — AGENT AUTONOME : le modèle parie sur tous ses picks Winamax non-skip
   //       avec Kelly 0.25× (cap 10% · plancher 0.10€), bankroll 10€ depuis J1.
   //       Le user observe, n'intervient pas. Remplace l'ancien dashboard user-centric.
@@ -13976,6 +14004,8 @@
       }
       // v27.2 — Appliquer les règles auto-tuning actives avant tout
       if (_applyAgentRules(s)) { return; }
+      const _sportGuard = _sportRoiGuard(s.m, s.best);
+      if (_sportGuard && _sportGuard.blocked) { return; }
       // v31.7.210 — Drawdown protection. Quand le NAV courant chute sous
       // 80% de l'init, on réduit progressivement le Kelly multiplier pour
       // éviter la spirale de pertes. Pratique pro standard : "scale down
@@ -14194,6 +14224,8 @@
         const best = _agentBestPick(m, pred);
         if (!best) return;
         if (best.investment && best.investment.action === 'skip') return;
+        const sportGuard = _sportRoiGuard(m, best);
+        if (sportGuard && sportGuard.blocked) return;
         const rel = best.rel;
         const odd = best.odd;
         // v27.2 — appliquer les règles auto-tuning actives

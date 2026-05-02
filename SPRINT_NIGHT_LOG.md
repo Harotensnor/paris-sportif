@@ -149,5 +149,13 @@
 - Avant: `node scripts/smoke_e2e.js` crashait si le port 8765 était déjà occupé et ne vérifiait pas que Terminal Value 48h contenait des matchs exacts
 - Après: serveur smoke sur port dynamique, fallback Chrome Windows, 15 pages SPA OK, Terminal Value 48h confirmé à `69 marchés scorés · 69 matchs exacts`, overflow mobile 0
 - Impact: la QA locale peut être relancée même si un serveur tourne déjà, et le risque de cockpit “Terminal vide” est couvert automatiquement
+- Commit: 6ffe30b7
+- Status: ✅ DONE
+
+## Sprint v35.20 (2026-05-02 05:15 UTC)
+- Chantier: P3/P16 garde-fou ROI sport
+- Avant: `backtest_report_v2.json` marquait hockey à -15.76% ROI sur 19 picks; le filtre sport froid protégeait surtout les top picks utilisateur, pas l'agent ni le smoke E2E
+- Après: `_sportRoiGuard` bloque les sports ROI<-10% avec n>=10 sauf edge exceptionnel; replay agent et positions du jour l'appliquent; smoke confirme `sport ROI guard = hockey blocked`
+- Impact: moins d'exposition automatique aux sports historiquement froids, avec exception conservée pour les vraies value bets à edge fort
 - Commit: pending
 - Status: ✅ DONE
