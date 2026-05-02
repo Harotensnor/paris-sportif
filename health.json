@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-02T16:33:51Z",
+  "generated_at": "2026-05-02T16:38:49Z",
   "data_age_min": 0,
   "sources": {
     "winamax_catalog": {
@@ -22,7 +22,7 @@
       "events": 47
     },
     "team_stats": {
-      "age_min": 0,
+      "age_min": 3,
       "teams": 354
     },
     "clubelo": {
@@ -30,7 +30,7 @@
       "clubs": 630
     },
     "weather": {
-      "age_min": 2,
+      "age_min": 0,
       "events": 380
     },
     "referees_soccer": {
@@ -69,8 +69,8 @@
       "age_min": 3,
       "matches": 674,
       "observations": 1874,
-      "mean_clv_pct": -0.1,
-      "positive_clv_rate": 36.3,
+      "mean_clv_pct": -0.11,
+      "positive_clv_rate": 36.5,
       "sample_status": "validated"
     }
   },
@@ -110,7 +110,7 @@
     "team_stats": {
       "script": "scripts/fetch_team_stats.py",
       "output": "team_stats.json",
-      "age_min": 0,
+      "age_min": 3,
       "threshold_min": 300,
       "fast_red_min": null,
       "status": "ok"
@@ -126,7 +126,7 @@
     "weather": {
       "script": "scripts/fetch_weather.py",
       "output": "weather.json",
-      "age_min": 2,
+      "age_min": 0,
       "threshold_min": 60,
       "fast_red_min": 30,
       "status": "ok"
@@ -216,11 +216,11 @@
   "warnings": [],
   "overall": "ok",
   "quality_checks": {
-    "total_events": 374,
-    "upcoming_events": 342,
-    "winamax_available": 342,
-    "winamax_exact": 331,
-    "winamax_detailed": 324,
+    "total_events": 376,
+    "upcoming_events": 343,
+    "winamax_available": 343,
+    "winamax_exact": 332,
+    "winamax_detailed": 325,
     "winamax_tournament_only": 11,
     "winamax_exact_ratio": 0.968,
     "winamax_detailed_ratio": 0.979,
@@ -233,10 +233,10 @@
     "winamax_coverage": {
       "by_sport": {
         "football": {
-          "upcoming": 282,
-          "available": 282,
-          "exact": 274,
-          "detailed": 270,
+          "upcoming": 283,
+          "available": 283,
+          "exact": 275,
+          "detailed": 271,
           "tournament_only": 8,
           "missing": 0,
           "exact_ratio": 0.972,
