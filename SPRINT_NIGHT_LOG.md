@@ -1249,3 +1249,9 @@
 - Après: 4 chips Cotes 2.50+, Foot top, Tennis jour, Big Odds + routeur query-aware + filtre odd.
 - Impact: accès direct aux vues utiles high-odds sans chercher dans Tous.
 - Vérif: phase10_quick_actions_audit.json, 4/4 raccourcis ouvrent #tous filtré.
+
+## Sprint v35.161 — Phase 10 P-10.9 Mode Focus Big Bets (18:35 UTC)
+- Avant: impossible de masquer le contenu secondaire quand Théo veut décider vite.
+- Après: toggle persistant Focus ON, garde Big Bets/Solides/Outsiders et cache panier, raccourcis, stats, buteurs.
+- Impact: accueil desktop 2987px → 1998px en focus, mobile 3223px → 2732px.
+- Vérif: phase10_focus_mode_audit.json, overflow horizontal = 0.
