@@ -66,6 +66,14 @@ def _markets_more_than_1n2(ev: dict) -> bool:
     return False
 
 
+def _has_xg(ev: dict) -> bool:
+    return any(
+        c.get("xg_stats") or c.get("fbref_xg") or c.get("xg_for_avg") is not None
+        for c in (ev.get("competitors") or [])
+        if isinstance(c, dict)
+    )
+
+
 def _detail_market_keys(markets: dict | list | None) -> list[str]:
     if isinstance(markets, dict):
         return sorted(str(k) for k in markets.keys() if k and k != "1n2")
@@ -133,6 +141,7 @@ def main() -> int:
             "referee": sum(1 for ev in events if ev.get("referee")),
             "fd_calibration": sum(1 for ev in events if ev.get("fd_calibration")),
             "fd_closing_odds": sum(1 for ev in events if ev.get("fd_closing_odds")),
+            "xg": sum(1 for ev in events if _has_xg(ev)),
         },
         "winamax_markets": {
             "matches": len(wm_matches),

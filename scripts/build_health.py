@@ -105,6 +105,19 @@ def _count_footballdata(d):
         'seasons': len(seasons) if isinstance(seasons, list) else 0,
     }
 
+
+def _count_xg(d):
+    if not isinstance(d, dict):
+        return None
+    by_team = d.get('by_team') or {}
+    leagues = d.get('leagues') or {}
+    teams = d.get('teams')
+    return {
+        'teams': len(by_team) if isinstance(by_team, dict) else teams or 0,
+        'leagues': len(leagues) if isinstance(leagues, dict) else 0,
+        'source': d.get('source') or 'unknown',
+    }
+
 SOURCES = [
     ('winamax_catalog', 'winamax_catalog.json', _count_winamax_catalog),
     ('winamax_markets', 'winamax_markets.json', _count_winamax_markets),
@@ -115,7 +128,8 @@ SOURCES = [
     ('weather',         'weather.json',         lambda d: {'events': len(d.get('matches') or d.get('forecasts') or {}) if isinstance(d, dict) else 0}),
     ('referees_soccer', 'referees_soccer.json', _count_events),
     # v33.6 — Sources ajoutées pour visibility complète du pipeline.
-    ('fbref_xg',        'fbref_xg.json',        lambda d: {'leagues': len(d.get('leagues') or {}) if isinstance(d, dict) else 0}),
+    ('xg_team_stats',   'xg_team_stats.json',   _count_xg),
+    ('fbref_xg',        'fbref_xg.json',        _count_xg),
     ('sofascore_events', 'sofascore_events.json', lambda d: {'total': d.get('total') or sum(len(v) for v in (d.get('events') or {}).values()) if isinstance(d, dict) else 0}),
     ('team_form',       'team_form.json',       lambda d: {
         'teams': (
@@ -144,7 +158,8 @@ STALE_AFTER_MIN = {
     'clubelo':         24*60,  # daily cadence
     'weather':         60,
     'referees_soccer': 8*60,   # 6h cadence
-    'fbref_xg':        6*60,   # 6h self-throttle
+    'xg_team_stats':   6*60,   # 6h self-throttle
+    'fbref_xg':        6*60,   # 6h self-throttle / compatibility mirror
     'sofascore_events': 30,    # cron tick chaque 5min, max 30min stale
     'team_form':       6*60,   # 6h self-throttle
     'footballdata':    24*60,  # daily fetch
@@ -160,6 +175,7 @@ SOURCE_SCRIPT = {
     'clubelo': 'scripts/fetch_clubelo.py',
     'weather': 'scripts/fetch_weather.py',
     'referees_soccer': 'scripts/fetch_referees_soccer.py',
+    'xg_team_stats': 'scripts/fetch_understat_xg.py',
     'fbref_xg': 'scripts/fetch_understat_xg.py',
     'sofascore_events': 'scripts/fetch_sofascore_events.py',
     'team_form': 'scripts/fetch_team_form.py',
@@ -271,6 +287,7 @@ def _scan_data_quality():
     winamax_tournament_only = 0
     actionable_external_odds = 0  # exact existe MAIS snapshot externe
     football_invalid_form = 0  # avg_gf5 ou avg_ga5 > 5 = NBA-level
+    events_with_xg = 0
     by_sport: dict[str, dict] = {}
     reason_counts: dict[str, int] = {}
 
@@ -322,7 +339,10 @@ def _scan_data_quality():
             # Football : stats avg_gf5 ou avg_ga5 > 5 = contamination
             # cross-sport (NBA/hockey via team_id partagé).
             if ev.get('sport') == 'football':
+                ev_has_xg = False
                 for c in (ev.get('competitors') or []):
+                    if c.get('xg_stats') or c.get('fbref_xg') or c.get('xg_for_avg') is not None:
+                        ev_has_xg = True
                     fs = c.get('form_stats') or {}
                     if (fs.get('avg_gf5') or 0) > 5 or (fs.get('avg_ga5') or 0) > 5:
                         football_invalid_form += 1
@@ -332,6 +352,8 @@ def _scan_data_quality():
                         if (l5.get('gf') or 0) > 15 or (l5.get('ga') or 0) > 15:
                             football_invalid_form += 1
                             break
+                if ev_has_xg:
+                    events_with_xg += 1
 
     winamax_exact_ratio = (
         round(winamax_exact / winamax_available, 3)
@@ -355,6 +377,7 @@ def _scan_data_quality():
         'winamax_detail_status': 'ok' if (winamax_detailed_ratio or 0) >= 0.50 else 'topup' if (winamax_detailed_ratio or 0) >= 0.25 else 'urgent',
         'actionable_external_odds': actionable_external_odds,
         'football_invalid_form': football_invalid_form,
+        'events_with_xg': events_with_xg,
         'winamax_coverage': {
             'by_sport': by_sport,
             'reasons': dict(sorted(reason_counts.items(), key=lambda kv: kv[1], reverse=True)[:12]),
