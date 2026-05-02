@@ -421,3 +421,11 @@
 - Impact: abstention Big Bet mesurée au lieu d'être cachée; backtest `495` picks, ROI flat `+0.53%`, Brier `0.229`; visual diff `16.35%` attendu (KPI/report refresh global), layout OK
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.54 (2026-05-02 07:40 UTC)
+- Chantier: P-4.2 calibration par tier
+- Avant: `calibration_by_tier=false`, `ece_by_tier=false`, aucun warning calibration Big Bet
+- Après: `calibration_by_tier=true`, `ece_by_tier=true`; `skip ECE=0.0356` validé; `big_bet` en apprentissage car `n=0`; warning explicite dans `backtest_report_v2.json/md`
+- Impact: les gros paris ont maintenant une mesure de calibration dédiée au lieu d'hériter du Brier global; visual diff final `11.49%` attendu sur Performance (section calibration + footer v35.54), layout OK
+- Commit: pending
+- Status: ✅ DONE

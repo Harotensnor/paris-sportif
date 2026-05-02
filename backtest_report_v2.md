@@ -1,6 +1,6 @@
 # Backtest ROI — VRAI modèle (v2)
 
-Généré : 2026-05-02T07:28:39Z
+Généré : 2026-05-02T07:38:37Z
 Source modèle : `pronostics.html` via `scripts/model_loader.py` (V8 embarqué, zéro duplication)
 Univers : 495 picks sur 2026-04-23T18:45Z → 2026-05-02T05:00Z
 Bankroll simulée (Kelly 0.25× cap 10%) : **100u → 280.25u**
@@ -33,6 +33,18 @@ Bankroll simulée (Kelly 0.25× cap 10%) : **100u → 280.25u**
 | `standard` | 2 | 100% | 34–100% | 🟢 +70.5% | +4.53u | 0.1406 | +3.3pt |
 | `lowconf` | 0 | 0% | 0–0% | ⚪ +0.0% | +0.00u | 0.0 | +0.0pt |
 | `skip` | 493 | 54% | 50–58% | 🟢 +0.2% | +175.72u | 0.2294 | -1.1pt |
+
+## Calibration par tier
+
+| Tier | N | ECE | Gap max | Statut |
+|---|---:|---:|---:|---|
+| `big_bet` | 0 | — | — | en apprentissage |
+| `lock` | 0 | — | — | en apprentissage |
+| `standard` | 2 | 0.375 | 0.375 | en apprentissage |
+| `lowconf` | 0 | — | — | en apprentissage |
+| `skip` | 493 | 0.0356 | 0.41 | validé |
+
+> ⚠️ Big Bets en apprentissage : pas assez de paris réglés pour valider la calibration.
 
 ## Par sport
 
