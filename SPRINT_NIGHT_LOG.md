@@ -1453,3 +1453,9 @@
 - Après: métriques régénérées à 22:11 UTC, 332 events, Winamax exact 100%, marchés détaillés 250.
 - Impact: rapport Phase 10 basé sur les données fraîches du cron.
 - Vérif: scripts/measure_night_metrics.py OK.
+
+## Sprint v35.195 — Phase 11 P-11.1 Régression a11y desktop (22:48 UTC)
+- Avant: anomalie annoncée a11y desktop `71/100` sans cause documentée.
+- Après: audit local relancé; desktop `dashboard 74`, `tous 46`, `performance 60`, `academie 59`, mobile `99-100`.
+- Impact: régression isolée aux cibles desktop sous `40px`, pas aux contrastes/alt/H1.
+- Vérif: `scripts/lighthouse_audit.js`, `scripts/a11y_audit.js`, `ISSUES.md` section Phase 11.

@@ -349,3 +349,35 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Constat : la page affiche surtout un empty state central et peu de pédagogie/action alternative.
 - Action : ajouter alternatives vers Sécurité / Tous les pronos + mini-explication risque de montante.
 - Statut : FIXED v35.130 — empty state enrichi avec retour Big Bets, tous les pronos et rappel risque; Montantes n'est plus une impasse quand aucun enchaînement n'est propre.
+
+## Phase 11 régressions
+
+- Source : `scripts/lighthouse_audit.js` lancé le 2026-05-02 22:47 UTC
+- Rapports : `.cache/lighthouse-reports/summary.json`
+- Réconciliation : `scripts/a11y_audit.js` ne couvre que le viewport mobile 375px; il remonte désormais `0` critical, `0` serious, `1` moderate (`button "Vu"` à `37x44px`). La régression Lighthouse vient du profil desktop.
+
+### P11-LH-001 — Cibles interactives desktop sous 40px
+
+- Sévérité : HIGH
+- Preuve : `.cache/lighthouse-reports/summary.json`
+- Constat : score accessibilité desktop `dashboard 74`, `tous 46`, `performance 60`, `academie 59`; les seules pénalités sont les cibles interactives desktop sous `40px` (`30`, `66`, `53`, `45` selon la page).
+- Détails : bandeau aide `259x13`, top nav `33px` de haut, trust strip `22px`, close trust `26x26`, quick chips `34px`, tabs secondaires `33-36px`, footer links `18-25px`.
+- Action : augmenter les zones cliquables desktop sans casser la densité visuelle : min-height des nav/tabs/chips/footer, close trust, liens aide; corriger aussi le bouton `Vu` mobile.
+- Statut : OPEN — sprint P-11.2.
+
+### P11-LH-002 — CLS desktop encore au-dessus de la cible
+
+- Sévérité : MEDIUM
+- Preuve : `.cache/lighthouse-reports/summary.json`
+- Constat : CLS desktop `0.081` dashboard et `0.086` sur tous/performance/academie, cible Phase 11 `<0.05`.
+- Action : réserver la hauteur des strips/header/sticky rails et stabiliser les blocs injectés après le chargement.
+- Statut : OPEN — sprint P-11.3.
+
+### P11-LH-003 — Performance desktop plafonne à 85
+
+- Sévérité : MEDIUM
+- Preuve : `.cache/lighthouse-reports/summary.json`
+- Constat : performance desktop `85` sur les 4 pages auditées; mobile reste `100`.
+- Détails : transfert local `2.75MB`, `app.js 1.79MB`, `data_lite.js 497KB`, `app-enhancements.js 37KB`.
+- Action : réduire le JS initial desktop ou charger encore plus tard les modules secondaires.
+- Statut : OPEN — sprint P-11.4.
