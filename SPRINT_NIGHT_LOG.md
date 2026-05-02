@@ -1201,3 +1201,9 @@
 - Impact: livrable final prêt pour revue Théo, 40 sprints Phase 9 documentés
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.153 — Phase 10 P-10.1 bottom nav mobile (18:11 UTC)
+- Avant: P6-VIS-001 PARTIAL, aucune preuve viewport finale sur 8 pages.
+- Après: audit 375x667 = 8/8 pages PASS, overlap bottom nav = 0.
+- Impact: issue marquée FIXED, rapport phase10_bottom_nav_audit.json ajouté.
+- Vérif: mobile_bottom_nav_audit PASS.

@@ -25919,7 +25919,7 @@
       </div>`;
 
     wrap.innerHTML = `
-      <div style="max-width:1200px;margin:0 auto;padding:16px 20px 24px;">
+      <div style="max-width:1200px;margin:0 auto;padding:16px 20px calc(var(--mobile-bottom-gap, 90px) + 24px);">
         <div class="section-header top-picks" style="margin-top:8px;">
           <h1 class="page-h1"><span class="ico">⚙️</span>Santé du site</h1>
           <div class="hint">État technique en temps réel · fraîcheur des données, couverture, SW, erreurs, stockage</div>
