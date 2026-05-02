@@ -15937,26 +15937,26 @@
       aggressivePicksEnriched.forEach(bbfPush);
       prudentPicksEnriched.forEach(bbfPush);
       otherOpportunities.slice(0, 80).map(_enrichPick).forEach(bbfPush);
-      bbfPool.sort((a, b) => bbfScore(b) - bbfScore(a));
+      const bbfHighOddSort = (a, b) => (Number(b.odd || 0) - Number(a.odd || 0)) || (bbfScore(b) - bbfScore(a));
+      bbfPool.sort(bbfHighOddSort);
 
       let bbfBigBets = bbfPool
-        .filter(p => (p.pred?.isLock || (p.edge >= 0.08 && p.rel >= 0.65)) && p.odd >= 1.45 && p.odd <= 8)
+        .filter(p => p.odd >= 2.20 && p.odd <= 3.50 && p.edge >= 0.07 && p.rel >= 0.60)
         .slice(0, 3);
-      if (!bbfBigBets.length) bbfBigBets = bbfPool.slice(0, 3);
       const bbfBigIds = new Set(bbfBigBets.map(p => String(p.m.id || '')));
       const bbfGoodBets = bbfPool
         .filter(p => !bbfBigIds.has(String(p.m.id || '')))
-        .filter(p => p.edge >= 0.04 && p.rel >= 0.60)
+        .filter(p => p.odd >= 2.00 && p.odd < 2.50 && p.edge >= 0.04 && p.rel >= 0.55)
         .slice(0, 12);
       const bbfGoodIds = new Set(bbfGoodBets.map(p => String(p.m.id || '')));
       const bbfBigOddsBets = bbfPool
         .filter(p => !bbfBigIds.has(String(p.m.id || '')) && !bbfGoodIds.has(String(p.m.id || '')))
-        .filter(p => p.odd >= 3.00 && p.odd <= 8 && p.edge >= 0.07 && p.rel >= 0.38)
+        .filter(p => p.odd >= 4.00 && p.edge >= 0.10)
         .slice(0, 4);
       const bbfBigOddsIds = new Set(bbfBigOddsBets.map(p => String(p.m.id || '')));
       const bbfOutsiderBets = bbfPool
         .filter(p => !bbfBigIds.has(String(p.m.id || '')) && !bbfGoodIds.has(String(p.m.id || '')) && !bbfBigOddsIds.has(String(p.m.id || '')))
-        .filter(p => p.odd >= 2.50 && p.odd <= 8 && p.edge >= 0.05 && p.rel >= 0.45)
+        .filter(p => p.odd >= 2.50 && p.odd <= 4.00 && p.edge >= 0.05 && p.rel >= 0.45)
         .slice(0, 6);
       const bbfOutsiderIds = new Set(bbfOutsiderBets.map(p => String(p.m.id || '')));
       const bbfRestRows = bbfPool
@@ -16075,7 +16075,7 @@
           acc[sp] = (acc[sp] || 0) + 1;
           return acc;
         }, {});
-      const bbfHotCount = bbfPool.filter(p => p.pred?.isLock || (p.edge >= 0.08 && p.rel >= 0.65)).length;
+      const bbfHotCount = bbfPool.filter(p => p.odd >= 2.20 && p.odd <= 3.50 && p.edge >= 0.07 && p.rel >= 0.60).length;
       const bbfChipOrder = ['football', 'tennis', 'basketball', 'hockey', 'baseball', 'american-football', 'mma', 'golf', 'racing'];
       const bbfSportChips = bbfChipOrder
         .filter(sp => Number(bbfSportCounts[sp] || 0) > 0)
@@ -16163,7 +16163,7 @@
 
           <section class="bbf-hero" aria-labelledby="bbf-title">
             <div class="bbf-hero__head">
-              <span>Big Bets First</span>
+              <span>Big Bets First · cote 2.20-3.50 · edge ≥ 7%</span>
               <h1 id="bbf-title">Les paris à regarder en premier aujourd'hui</h1>
               <p>On cherche le meilleur couple chance / cote / gain. Une cote trop basse peut être refusée même si elle paraît sûre.</p>
             </div>
@@ -16184,7 +16184,7 @@
           <section class="bbf-section">
             <div class="bbf-section__head">
               <div>
-                <span>Solides · edge ≥ 4% · confiance ≥ 60%</span>
+                <span>Solides · cote 2.00-2.50 · edge ≥ 4% · confiance ≥ 55%</span>
                 <h2>Bonnes opportunités</h2>
               </div>
               <button type="button" class="page-btn" data-page="tous">Voir tout →</button>
@@ -16199,7 +16199,7 @@
           <section class="bbf-section bbf-section--outsiders">
             <div class="bbf-section__head">
               <div>
-                <span>Big Odds Boost · cote ≥ 3.00 · edge ≥ 7%</span>
+                <span>Big Odds Boost · cote ≥ 4.00 · edge ≥ 10%</span>
                 <h2>Si ça passe, gros gain</h2>
               </div>
               <button type="button" class="page-btn" data-page="tous">Voir les grosses cotes →</button>
@@ -16214,7 +16214,7 @@
           <section class="bbf-section bbf-section--outsiders">
             <div class="bbf-section__head">
               <div>
-                <span>Outsiders crédibles · cote ≥ 2.50</span>
+                <span>Outsiders crédibles · cote 2.50-4.00 · edge ≥ 5%</span>
                 <h2>Gros gains, petite mise</h2>
               </div>
               <button type="button" class="page-btn" data-page="tous">Explorer →</button>
