@@ -1053,3 +1053,11 @@
 - Impact: couverture de clics élargie aux accordéons/liens internes sans faux positifs legacy
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.133 (2026-05-02 16:09 UTC)
+- Chantier: P-9.61 modal détail tabs validation
+- Avant: modales non revalidées après polish visuel et compactage mobile
+- Après: audit modal 5 sports testés, 0 skipped, 0 failure
+- Impact: les onglets Synthèse/Signaux/Cotes/H2H/Stats restent navigables après refonte
+- Commit: pending
+- Status: ✅ DONE
