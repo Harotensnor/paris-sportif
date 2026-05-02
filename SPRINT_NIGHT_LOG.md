@@ -813,3 +813,11 @@
 - Impact: l’accueil prend une vraie structure PC avec zone actionnelle permanente à droite
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.103 (2026-05-02 12:59 UTC)
+- Chantier: P-8.3 sidebar gauche desktop
+- Avant: sur ultra-wide, la navigation gauche utile restait l’ancienne sidebar menu et pas un rail sport/compétition
+- Après: sidebar Big Bets 280px avec recherche, sports, compétitions et matchs à venir; overflow 0 sur mobile/desktop/wide
+- Impact: l’accueil 1920px passe en vraie composition 3 zones sans donner une impression mobile-only
+- Commit: pending
+- Status: ✅ DONE

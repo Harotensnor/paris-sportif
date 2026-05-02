@@ -3577,26 +3577,7 @@
     body.sidebar-open .sidebar-overlay { display: block; }
   }
 
-  /* v31.5 — DESKTOP SIDEBAR MODE (≥960px) — la nav passe en sidebar verticale
-     gauche FIXE et toujours visible. Les hubs s'expandent en sections (titre +
-     items vertical), comme le drawer mobile mais sans hamburger. La topbar reste
-     en haut pour brand + search + date-nav + theme. Le contenu prend
-     `margin-left: 240px`.
-
-     v34.20 (2026-05-01) — Breakpoint baissé 1100 → 960px suite au feedback
-     Théo : "adapte mieux l'affichage pour le zoom jusqu'à 200%". À zoom 125%
-     PC sur 1366px, le viewport effectif tombe à 1093px et la sidebar
-     disparaissait. Maintenant elle reste visible jusqu'à zoom ~140% (956px).
-     Sous 960px (zoom 150%+) on tombe quand même en mode mobile, ce qui est
-     OK car le contenu est trop étriqué pour un sidebar 240px.
-
-     Mobile/tablette < 960px : reste en drawer hamburger comme avant.
-  */
   @media (min-width: 960px) {
-    /* Sidebar : fixed-left, full height below topbar.
-       v31.7.71 — top calculé avec --trust-h (var CSS set par JS quand
-       le trust-strip est visible) pour que "Aujourd'hui" ne soit pas
-       caché derrière la barre de stats backtest. */
     nav.topbar-nav {
       display: flex !important; flex-direction: column;
       position: fixed; left: 0;
@@ -3609,14 +3590,9 @@
       z-index: 40; gap: var(--space-1);
       flex: none;
     }
-    /* Brand stays in topbar but constrained to width: 240px so it visually
-       aligns with the sidebar column underneath */
     header.topbar .topbar-inner { padding-left: 16px; padding-right: 18px; }
     .topbar-brand { width: 224px; }
-    /* Hide the hamburger on desktop, sidebar is always visible */
     .topbar-menu { display: none !important; }
-    /* Hub-solo button (Aujourd'hui) : full width, bigger */
-    /* Phase 3 #6 : compresser le bouton Now pour libérer la sidebar */
     nav.topbar-nav .page-btn.hub-solo {
       width: 100%; justify-content: flex-start;
       padding: var(--space-2) 14px; font-size: var(--t-sm); font-weight: 700;
@@ -3625,7 +3601,6 @@
     /* Now-block hidden si vide (no live + no upcoming) */
     .now-block:empty { display: none !important; }
     .now-block { padding: var(--space-2) 14px; font-size: 12px; color: var(--text-dim); }
-    /* Each .hub becomes a section : header (uppercase label) + always-expanded menu */
     nav.topbar-nav .hub {
       display: flex; flex-direction: column; width: 100%;
       border-top: 1px solid var(--border);
@@ -8001,6 +7976,7 @@
 @media (prefers-reduced-motion:no-preference){@keyframes bbf-soon-pulse{0%,100%{box-shadow:0 18px 48px rgba(0,0,0,.28)}50%{box-shadow:0 18px 56px rgba(22,163,74,.22)}}}
 @media (max-width:760px){.bbf-shell{padding:0 12px 88px}.bbf-command{position:static;display:grid}.bbf-chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}.bbf-chip{flex:0 0 auto;min-height:44px}.bbf-hero{min-height:auto;padding-top:10px}.bbf-card--hero{min-height:0;padding: var(--space-4)}.bbf-card__teams{grid-template-columns:1fr}.bbf-card__teams div:last-child{justify-content:flex-start;text-align:left}.bbf-card__teams em{display:none}.bbf-card__actions{display:grid}.bbf-section__head{align-items:flex-start;flex-direction:column}.bbf-row{grid-template-columns:52px 1fr 58px}.bbf-row em,.bbf-row i{display:none}.bbf-stats{grid-template-columns:1fr 1fr}.bbf-basket{position:static!important;margin-bottom:16px}}
 @media (min-width:1280px){body.agent-home main#main-content{padding-right:18px!important}.agent-home .v29-dash-aside{display:none!important}.bbf-layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;align-items:start}.bbf-basket{position:sticky;top:calc(96px + var(--trust-h,0px));max-height:calc(100vh - 116px - var(--trust-h,0px));overflow:auto;margin-top:0}.bbf-basket.bbf-empty{padding:16px}}@media (min-width:1600px){.bbf-layout{grid-template-columns:minmax(0,1fr) 340px;gap:20px}}
+.bbf-left-rail{display:none}@media (min-width:1600px){body.agent-home nav.topbar-nav{display:none!important}body.agent-home main#main-content{padding-left:18px!important}.bbf-layout{grid-template-columns:280px minmax(0,1fr) 340px}.bbf-left-rail{position:sticky;top:calc(96px + var(--trust-h,0px));display:grid;gap:12px;align-self:start;max-height:calc(100vh - 116px - var(--trust-h,0px));overflow:auto}.bbf-left-rail label,.bbf-left-rail section{display:grid;gap:8px;border:1px solid var(--border);border-radius:var(--r-card);background:var(--panel);padding:12px}.bbf-left-rail input{min-height:42px;border:1px solid var(--border);border-radius:var(--r-card);background:rgba(255,255,255,.04);color:var(--text);padding:0 12px}.bbf-left-rail strong,.bbf-left-rail label span{color:var(--text);font-size:12px;text-transform:uppercase;letter-spacing:.8px}.bbf-left-rail nav,.bbf-left-rail section>div{display:grid;gap:6px}.bbf-left-rail a,.bbf-left-rail button{min-height:38px;display:grid;grid-template-columns:24px minmax(0,1fr) auto;align-items:center;gap:8px;border:0;border-radius:9px;background:rgba(255,255,255,.035);color:var(--text);padding:0 8px;text-align:left;text-decoration:none;cursor:pointer}.bbf-left-rail b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}.bbf-left-rail em,.bbf-left-rail span{color:var(--text-dim);font-size:11px;font-style:normal}}
 
 .health-lag-panel{background:var(--panel);border:1px solid var(--border);border-radius:10px;overflow:hidden}
 .health-lag-row{display:grid;grid-template-columns:minmax(150px,1.2fr) minmax(110px,.7fr) minmax(120px,.8fr) auto;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px}
