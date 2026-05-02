@@ -25,7 +25,7 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Preuve : `.cache/phase4-phase6-baseline/dashboard-mobile.png`, `profil-mobile.png`, `academie-mobile.png`, `performance-mobile.png`, `sante-mobile.png`
 - Constat : la barre mobile fixe apparaît au milieu des premières sections dans les captures full-page et masque des cartes ou contrôles.
 - Action : ajouter un offset/padding mobile cohérent ou rendre les zones critiques non masquables par la bottom nav.
-- Statut : PARTIAL v35.79 — padding mobile augmenté; la nav fixe reste visible par design dans les captures full-page, à revalider sur vrai device.
+- Statut : FIXED v35.153 — audit viewport mobile 375x667 sur 8 pages, 0 élément visible/actionnable recouvert par la bottom nav. Preuve : `phase10_bottom_nav_audit.json` + captures locales `.cache/phase10-bottomnav-v35-153-final/`.
 
 ### P6-VIS-002 — Chips sport Accueil coupés sans affordance claire
 
