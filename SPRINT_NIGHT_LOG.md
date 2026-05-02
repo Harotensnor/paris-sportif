@@ -1405,3 +1405,9 @@
 - Après: météo activée sur baseball outdoor et tennis outdoor, en excluant les stades MLB couverts/roofed.
 - Impact: 403 matchs météo au total, dont 22 baseball et 1 tennis dans le data courant.
 - Vérif: fetch_weather.py + build_health.py + check_pipeline_drift OK.
+
+## Sprint v35.187 — Phase 10 P-10.34 Sources publiques (21:56 UTC)
+- Avant: les sources publiques candidates étaient dispersées et non qualifiées.
+- Après: data_sources.md documente TheSportsDB et OpenLigaDB avec endpoints, limites, risques et cadence.
+- Impact: backlog data clair sans activer de scraping risqué ni toucher au modèle.
+- Vérif: docs officielles consultées, check_bundle_size OK.

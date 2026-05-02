@@ -1,0 +1,75 @@
+# Data Sources Backlog
+
+Verified: 2026-05-02
+
+This file lists public/free data sources that can enrich the Paris-Sportif
+pipeline without changing the Winamax-only product rule. These sources must
+never be used for odds placement or bookmaker affiliation; they are candidates
+only for metadata, schedules, lineups, results, and quality cross-checks.
+
+## Candidate 1 — TheSportsDB
+
+Official docs: https://www.thesportsdb.com/documentation
+
+Fit:
+- Multi-sport metadata: teams, players, venues, leagues, event details.
+- Useful fallback for venue lookup, team badges, historical event metadata,
+  and occasional lineup/timeline enrichment.
+- Has a free V1 key (`123`) with explicit free-tier limits; premium unlocks
+  larger limits and live-score features.
+
+Endpoints worth testing:
+- `searchteams.php?t={team}` for team identity + artwork fallback.
+- `lookupevent.php?id={event}` for event metadata cross-checks.
+- `lookuplineup.php?id={event}` and `lookuptimeline.php?id={event}` for
+  richer match detail when available.
+- `eventsday.php?d={YYYY-MM-DD}&s={sport}` for secondary schedule sanity checks.
+
+Risk / constraints:
+- Crowd-sourced data: treat as supplementary, not authoritative.
+- Free-tier limits are low for several endpoints. Add 1h+ cache TTL and cap
+  requests per run.
+- Requires fuzzy mapping from ESPN/Winamax event names to TheSportsDB IDs.
+
+Suggested implementation:
+- `scripts/fetch_thesportsdb_metadata.py`
+- Output: `thesportsdb_metadata.json`
+- Cadence: 6h, cache by normalized team/event key.
+- Health metric: teams matched, events matched, lineup/timeline hits.
+
+## Candidate 2 — OpenLigaDB
+
+Official site/docs: https://www.openligadb.de/
+
+Fit:
+- German/European football schedules, tables, and results.
+- Useful as a public cross-check for Bundesliga / 2. Bundesliga / 3. Liga
+  kickoff/result freshness when ESPN status lags.
+- The official site states JSON API access requires no authentication and data
+  is available under ODbL.
+
+Endpoints worth testing:
+- `https://api.openligadb.de/getavailableleagues`
+- `https://api.openligadb.de/getmatchdata/{league}/{season}/{matchday}`
+- `https://api.openligadb.de/getbltable/{league}/{season}`
+
+Risk / constraints:
+- Coverage is strongest for German leagues; do not treat as global football.
+- ODbL attribution/share-alike implications must be respected if we copy and
+  republish substantial derived datasets.
+- Community-maintained data: use as validation/fallback, not sole source.
+
+Suggested implementation:
+- `scripts/fetch_openligadb.py`
+- Output: `openligadb_matches.json`
+- Cadence: 12h, plus matchday refresh on German football days.
+- Health metric: matched German events, result freshness deltas.
+
+## Guardrails
+
+- Keep current primary sources: ESPN, Sofascore, Open-Meteo, ClubElo,
+  Understat, MLB/NHL official APIs.
+- Respect robots/terms, add a clear User-Agent, and cache every response.
+- No live scraping loop. No odds scraping from these sources.
+- Every new source needs a sidecar JSON, `build_health.py` visibility, and
+  `refresh.yml` commit coverage before it can affect UI or model decisions.
