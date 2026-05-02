@@ -14,12 +14,13 @@ Output: attaches ev.competitors[i].injuries = [{name, pos, status}] and
 
 Usage: python3 fetch_injuries.py
 """
-import json, re, time, ssl, urllib.request, urllib.error
+import json, re, sys, time, ssl, urllib.request, urllib.error
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
 
 DATA_JS = Path(__file__).resolve().parent.parent / 'data.js'
 HTML = Path(__file__).resolve().parent.parent / 'pronostics.html'
+INJ_OUT = Path(__file__).resolve().parent.parent / 'injuries_multisport.json'
 
 UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)'
 CTX = ssl.create_default_context()
@@ -117,6 +118,42 @@ def attach(events, league_code, inj_by_team):
     return touched
 
 
+def write_sidecar(by_league):
+    teams = {}
+    by_sport = {}
+    for league_code, inj_by_team in sorted((by_league or {}).items()):
+        sport = {
+            'nba': 'basketball', 'wnba': 'basketball',
+            'nhl': 'hockey', 'nfl': 'american-football', 'mlb': 'baseball',
+        }.get(league_code, league_code)
+        bucket = by_sport.setdefault(sport, {'teams': 0, 'injuries': 0, 'leagues': {}})
+        bucket['leagues'].setdefault(league_code, {'teams': 0, 'injuries': 0})
+        for team_id, injuries in (inj_by_team or {}).items():
+            key = f'{league_code}:{team_id}'
+            severe = [x for x in injuries if (x.get('status') or '').lower() in ('out', 'suspended', 'doubtful')]
+            teams[key] = {
+                'sport': sport,
+                'league_code': league_code,
+                'team_id': team_id,
+                'injuries': injuries,
+                'injuries_count': len(injuries),
+                'severe_count': len(severe),
+            }
+            bucket['teams'] += 1
+            bucket['injuries'] += len(injuries)
+            bucket['leagues'][league_code]['teams'] += 1
+            bucket['leagues'][league_code]['injuries'] += len(injuries)
+    payload = {
+        'generated_at': datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z'),
+        'source': 'ESPN public injuries endpoints',
+        'teams_total': len(teams),
+        'sports_total': len(by_sport),
+        'by_sport': by_sport,
+        'teams': teams,
+    }
+    INJ_OUT.write_text(json.dumps(payload, ensure_ascii=False, separators=(',', ':')) + '\n', encoding='utf-8')
+
+
 def main():
     t0 = time.time()
     print(f'[{datetime.now():%H:%M:%S}] injuries refresh')
@@ -124,12 +161,21 @@ def main():
     data = json.loads(re.search(r'=\s*(\{.*\})\s*;?\s*$', text, re.DOTALL).group(1))
 
     total_touched = 0
+    by_league = {}
     for league_code, espn_path in ESPN_INJURY_PATHS:
         inj_by_team = fetch_injuries_for(league_code, espn_path)
+        by_league[league_code] = inj_by_team
         if not inj_by_team:
+            continue
+        if '--sidecar-only' in sys.argv:
             continue
         for day, events in data.get('days', {}).items():
             total_touched += attach(events, league_code, inj_by_team)
+
+    write_sidecar(by_league)
+    if '--sidecar-only' in sys.argv:
+        print(f'[{datetime.now():%H:%M:%S}] sidecar only · wrote {INJ_OUT.name}')
+        return
 
     payload = json.dumps(data, ensure_ascii=False, separators=(',', ':'))
     DATA_JS.write_text(f'window.PRONOSTICS_DATA = {payload};\n', encoding='utf-8')

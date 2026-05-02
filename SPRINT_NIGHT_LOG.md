@@ -1393,3 +1393,9 @@
 - Après: h2h_extended.json résume 150 events / 4 sports, avec source headToHeadGames ou seasonseries.
 - Impact: H2H NBA/NHL/MLB devient mesurable et tennis est tenté/caché proprement si ESPN ne sert rien.
 - Vérif: fetch_h2h.py --summary-only + build_health.py + check_pipeline_drift OK.
+
+## Sprint v35.185 — Phase 10 P-10.32 Blessures multi-sports (21:52 UTC)
+- Avant: les blessures ESPN US étaient injectées mais pas publiées comme source auditable.
+- Après: injuries_multisport.json expose 131 équipes / 4 sports / 679 blessures NBA-WNBA-NHL-NFL-MLB.
+- Impact: le modèle et la Santé peuvent suivre les absences multi-sports sans dépendre du gros data.js.
+- Vérif: fetch_injuries.py --sidecar-only + build_health.py + check_pipeline_drift OK.
