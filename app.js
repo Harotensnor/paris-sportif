@@ -20012,6 +20012,26 @@
 
           ${bankrollSmartHtml}
 
+          <div class="card-base" id="profile-bankroll-simulator">
+            <h3 class="section-h3">📈 Simuler une progression</h3>
+            <div style="font-size:12px;color:var(--text-dim);line-height:1.5;margin-bottom:12px;">Teste une stratégie simple : bankroll initiale, cote moyenne, réussite visée et nombre de paris. Le graphe montre l'effet long terme, pas une promesse.</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;">
+              <label style="display:block;font-size:11px;color:var(--text-dim);font-weight:800;text-transform:uppercase;letter-spacing:.5px;">Bankroll
+                <input id="sim-bankroll" type="number" min="10" step="10" value="${bankrollStart || 50}" style="margin-top:5px;width:100%;padding:9px 10px;background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-weight:800;">
+              </label>
+              <label style="display:block;font-size:11px;color:var(--text-dim);font-weight:800;text-transform:uppercase;letter-spacing:.5px;">Cote moyenne
+                <input id="sim-odd" type="number" min="1.5" max="6" step="0.05" value="2.50" style="margin-top:5px;width:100%;padding:9px 10px;background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-weight:800;">
+              </label>
+              <label style="display:block;font-size:11px;color:var(--text-dim);font-weight:800;text-transform:uppercase;letter-spacing:.5px;">Win rate %
+                <input id="sim-wr" type="number" min="20" max="90" step="1" value="50" style="margin-top:5px;width:100%;padding:9px 10px;background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-weight:800;">
+              </label>
+              <label style="display:block;font-size:11px;color:var(--text-dim);font-weight:800;text-transform:uppercase;letter-spacing:.5px;">Paris
+                <input id="sim-bets" type="number" min="10" max="300" step="10" value="90" style="margin-top:5px;width:100%;padding:9px 10px;background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-weight:800;">
+              </label>
+            </div>
+            <div id="bankroll-sim-output" aria-live="polite" style="margin-top:12px;"></div>
+          </div>
+
           <div class="card-base" id="profile-odds">
             <h3 class="section-h3">🎯 Cote minimum</h3>
             <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;">
@@ -20328,6 +20348,47 @@
       const safe = isFinite(v) && v >= 1 && v <= 10000 ? v : 10;
       savePrefs({ bankrollStart: safe });
     });
+    const simOutput = wrap.querySelector('#bankroll-sim-output');
+    const simInputs = ['#sim-bankroll', '#sim-odd', '#sim-wr', '#sim-bets'].map(sel => wrap.querySelector(sel)).filter(Boolean);
+    const renderBankrollSim = () => {
+      if (!simOutput || simInputs.length < 4) return;
+      const readNum = (sel, fallback) => {
+        const el = wrap.querySelector(sel);
+        const v = Number(el ? el.value : fallback);
+        return Number.isFinite(v) ? v : fallback;
+      };
+      const startSim = Math.max(1, readNum('#sim-bankroll', 50));
+      const oddSim = Math.max(1.20, Math.min(10, readNum('#sim-odd', 2.50)));
+      const wrSim = Math.max(0.01, Math.min(0.95, readNum('#sim-wr', 50) / 100));
+      const betsSim = Math.max(1, Math.min(500, Math.round(readNum('#sim-bets', 90))));
+      const ev = wrSim * oddSim - 1;
+      const kelly = ev > 0 ? Math.min(0.05, Math.max(0.005, (ev / Math.max(0.01, oddSim - 1)) * 0.25)) : 0.005;
+      let bank = startSim;
+      const vals = [bank];
+      for (let i = 0; i < betsSim; i++) {
+        bank += bank * kelly * ev;
+        if ((i + 1) % Math.max(1, Math.floor(betsSim / 24)) === 0 || i === betsSim - 1) vals.push(bank);
+      }
+      const minV = Math.min(...vals);
+      const maxV = Math.max(...vals);
+      const denom = Math.max(0.01, maxV - minV);
+      const pts = vals.map((v, i) => `${(i / Math.max(1, vals.length - 1) * 280).toFixed(1)},${(74 - ((v - minV) / denom) * 64).toFixed(1)}`).join(' ');
+      const color = ev >= 0 ? 'var(--c-strong)' : 'var(--c-bad)';
+      const delta = bank - startSim;
+      simOutput.innerHTML = `
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) 170px;gap:12px;align-items:center;">
+          <svg viewBox="0 0 280 80" role="img" aria-label="Projection bankroll" style="width:100%;height:92px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;">
+            <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>
+          </svg>
+          <div style="font-variant-numeric:tabular-nums;">
+            <div style="font-size:11px;color:var(--text-dim);font-weight:850;text-transform:uppercase;letter-spacing:.5px;">Projection</div>
+            <div style="font-size:24px;font-weight:900;color:${color};">${bank.toFixed(0)}€</div>
+            <div style="font-size:12px;color:var(--text-dim);">${delta >= 0 ? '+' : ''}${delta.toFixed(0)}€ · EV ${(ev*100).toFixed(1)}% · mise ${(kelly*100).toFixed(1)}%</div>
+          </div>
+        </div>`;
+    };
+    simInputs.forEach(el => el.addEventListener('input', renderBankrollSim));
+    renderBankrollSim();
     const lockProfitBtn = wrap.querySelector('[data-bankroll-lock-profits]');
     if (lockProfitBtn) lockProfitBtn.addEventListener('click', () => {
       const profit = Number(lockProfitBtn.dataset.lockProfit || 0) || 0;

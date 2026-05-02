@@ -1267,3 +1267,9 @@
 - Après: sélection de 2 picks + bottom-sheet côte-à-côte avec cote, confiance, avance, gain moyen et Kelly.
 - Impact: décision plus rapide entre deux grosses cotes sans perdre le fil de la page.
 - Vérif: phase10_pick_compare_audit.json, 2 picks sélectionnés, modal ouverte, overflow = 0.
+
+## Sprint v35.164 — Phase 10 P-10.12 Simulateur progression bankroll (18:46 UTC)
+- Avant: Profil affichait la bankroll mais ne projetait pas une stratégie sur 30/60/90+ paris.
+- Après: simulateur bankroll/cote moyenne/win rate/nombre de paris avec courbe SVG et EV/Kelly prudent.
+- Impact: Théo voit vite si une approche grosses cotes tient mathématiquement.
+- Vérif: phase10_bankroll_sim_audit.json, projection interactive + overflow = 0.
