@@ -14723,6 +14723,16 @@
       try { return localStorage.getItem(bbfFocusKey) === '1'; }
       catch(e) { return false; }
     })();
+    const bbfUserPrefs = (() => {
+      try { return JSON.parse(localStorage.getItem('userPrefs') || '{}') || {}; }
+      catch(e) { return {}; }
+    })();
+    const bbfStrategyPrefs = (bbfUserPrefs.strategy && typeof bbfUserPrefs.strategy === 'object') ? bbfUserPrefs.strategy : {};
+    const bbfStrategyHasPrefs = Object.keys(bbfStrategyPrefs).length > 0;
+    const bbfFavSportsPrefs = Array.isArray(bbfUserPrefs.favSports) ? bbfUserPrefs.favSports : [];
+    const bbfExcludedLeagues = new Set(Array.isArray(bbfStrategyPrefs.excludedLeagues) ? bbfStrategyPrefs.excludedLeagues.map(String) : []);
+    const bbfMinRelPref = bbfStrategyHasPrefs ? Math.max(0.50, Math.min(0.90, Number(bbfStrategyPrefs.minConfidence || 55) / 100)) : 0;
+    const bbfRiskEdgePref = bbfStrategyHasPrefs ? ({ 1: 0.08, 2: 0.06, 3: 0.04, 4: 0.03, 5: 0.02 }[Math.max(1, Math.min(5, Number(bbfStrategyPrefs.riskTolerance || 3)))] || 0.04) : 0;
     // Le flag autoRefreshDone est maintenant timestamped → re-tente après
     // 30min (avant : bloqué pour toute la session, donc le user qui ouvre
     // la page avec data 10h stale reste bloqué si la 1ère tentative a
@@ -15544,10 +15554,16 @@
         if (typeof _notStarted === 'function' && !_notStarted(p.m)) return;
         const id = String(p.m.id || '');
         if (!id || bbfSeen.has(id)) return;
+        const sport = String(p.m.sport || '');
+        if (bbfFavSportsPrefs.length && (!sport || !bbfFavSportsPrefs.includes(sport))) return;
+        const leagueKey = String(p.m.league_name || p.m.league || p.m.league_code || '').trim();
+        if (leagueKey && bbfExcludedLeagues.has(leagueKey)) return;
         const odd = Number(p.odd || p.best?.odd || 0);
         const rel = Number(p.rel || p.best?.rel || 0);
         const edge = Number(p.edge ?? p.best?.edge ?? (odd > 1 ? rel - 1 / odd : 0));
         if (!odd || odd <= 1.01 || odd < userOddMin || !rel || edge <= 0) return;
+        if (bbfMinRelPref && rel < bbfMinRelPref) return;
+        if (bbfRiskEdgePref && edge < bbfRiskEdgePref) return;
         const investment = p.investment || p.best?.investment || null;
         if (investment && investment.action === 'skip') return;
         bbfSeen.add(id);
@@ -19747,17 +19763,43 @@
     const currentOddMin = (typeof getUserOddMin === 'function') ? getUserOddMin() : 2.00;
     const currentOddIdx = Math.max(0, ODD_MIN_CHOICES.findIndex(v => Math.abs(v - currentOddMin) < 0.01));
     const currentAccent = prefs.accent || 'default';
+    const strategyPrefs = (prefs.strategy && typeof prefs.strategy === 'object') ? prefs.strategy : {};
+    const riskTolerance = Math.max(1, Math.min(5, Number(strategyPrefs.riskTolerance || 3)));
+    const diversification = Math.max(1, Math.min(5, Number(strategyPrefs.diversification || 3)));
+    const minConfidence = Math.max(50, Math.min(90, Number(strategyPrefs.minConfidence || 55)));
+    const excludedLeagues = Array.isArray(strategyPrefs.excludedLeagues) ? strategyPrefs.excludedLeagues : [];
 
     const availableSports = ['football', 'tennis', 'basketball', 'hockey', 'baseball', 'rugby', 'mma'];
+    const availableLeagues = (() => {
+      const counts = new Map();
+      try {
+        Object.values(window.PRONOSTICS_DATA?.days || {}).forEach(arr => (arr || []).forEach(m => {
+          const name = String(m?.league_name || m?.league || m?.league_code || '').trim();
+          if (!name) return;
+          counts.set(name, (counts.get(name) || 0) + 1);
+        }));
+      } catch(e) {}
+      return [...counts.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10)
+        .map(([name, count]) => ({ name, count }));
+    })();
     const favSportsLabel = favSports.length
       ? favSports.slice(0, 4).map(s => `${sportEmoji(s)} ${s}`).join(' · ') + (favSports.length > 4 ? ` · +${favSports.length - 4}` : '')
       : 'Aucun favori';
     const themeLabel = currentTheme === 'light' ? 'Clair' : currentTheme === 'auto' ? 'Auto' : 'Sombre';
+    const riskLabels = { 1: 'Très prudent', 2: 'Prudent', 3: 'Équilibré', 4: 'Offensif', 5: 'Très offensif' };
+    const divLabels = { 1: 'Très concentré', 2: 'Concentré', 3: 'Équilibré', 4: 'Diversifié', 5: 'Très diversifié' };
+    const leagueButtons = availableLeagues.length ? availableLeagues.map(l => {
+      const active = excludedLeagues.includes(l.name);
+      return `<button type="button" data-exclude-league="${esc(l.name)}" style="min-height:34px;border:1px solid ${active ? 'var(--c-warn)' : 'var(--border)'};border-radius:999px;background:${active ? 'rgba(245,158,11,.16)' : 'var(--panel)'};color:${active ? 'var(--c-warn)' : 'var(--text)'};padding:6px 12px;font-size:12px;font-weight:750;cursor:pointer;">${active ? 'Masquée · ' : ''}${esc(l.name)} <span style="opacity:.72;">${l.count}</span></button>`;
+    }).join('') : '<span style="font-size:12px;color:var(--text-dim);">Les ligues apparaîtront dès que les données sont chargées.</span>';
     const profileSummaryHtml = `
       <section aria-label="Réglages actifs" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin:0 0 16px;">
         ${[
           ['profile-bankroll', 'Bankroll', `${bankrollStart}€`, 'Base des mises suggérées'],
           ['profile-odds', 'Cote min', `@${currentOddMin.toFixed(2)}`, 'Filtre par défaut'],
+          ['profile-strategy', 'Stratégie', `${riskLabels[riskTolerance]} · ${minConfidence}%`, 'Appliqué à l’accueil'],
           ['profile-appearance', 'Thème', themeLabel, 'Affichage actuel'],
           ['profile-sports', 'Sports', favSportsLabel, 'Priorité accueil'],
           ['profile-data', 'Données', 'Export / reset', 'Contrôle local'],
@@ -19906,6 +19948,29 @@
             <input id="pref-odd-min" type="range" min="0" max="4" step="1" value="${currentOddIdx}" aria-label="Cote minimum affichée" aria-valuetext="${currentOddMin.toFixed(2)}" style="width:100%;accent-color:var(--c-accent);"/>
             <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-top:7px;font-size:10.5px;color:var(--text-dim);text-align:center;font-variant-numeric:tabular-nums;">
               ${ODD_MIN_CHOICES.map(v => `<span>@${v.toFixed(2)}</span>`).join('')}
+            </div>
+          </div>
+
+          <div class="card-base" id="profile-strategy">
+            <h3 class="section-h3">🎯 Préférences stratégie</h3>
+            <div style="font-size:12px;color:var(--text-dim);line-height:1.5;margin-bottom:12px;">Ces réglages filtrent l’Accueil et les listes : moins de bruit, plus de paris alignés avec ta façon de jouer les grosses cotes.</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;">
+              <label style="display:block;">
+                <span style="display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;color:var(--text-dim);font-weight:800;text-transform:uppercase;letter-spacing:.5px;">Tolérance risque <b id="pref-risk-label" style="color:var(--text);text-transform:none;letter-spacing:0;">${riskLabels[riskTolerance]}</b></span>
+                <input id="pref-risk-tolerance" type="range" min="1" max="5" step="1" value="${riskTolerance}" aria-label="Tolérance au risque" style="width:100%;margin-top:8px;accent-color:var(--c-accent);"/>
+              </label>
+              <label style="display:block;">
+                <span style="display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;color:var(--text-dim);font-weight:800;text-transform:uppercase;letter-spacing:.5px;">Diversification <b id="pref-div-label" style="color:var(--text);text-transform:none;letter-spacing:0;">${divLabels[diversification]}</b></span>
+                <input id="pref-diversification" type="range" min="1" max="5" step="1" value="${diversification}" aria-label="Niveau de diversification" style="width:100%;margin-top:8px;accent-color:var(--c-accent);"/>
+              </label>
+              <label style="display:block;">
+                <span style="display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;color:var(--text-dim);font-weight:800;text-transform:uppercase;letter-spacing:.5px;">Confiance min <b id="pref-min-confidence-label" style="color:var(--text);font-variant-numeric:tabular-nums;">${minConfidence}%</b></span>
+                <input id="pref-min-confidence" type="range" min="50" max="90" step="5" value="${minConfidence}" aria-label="Confiance minimale des picks affichés" style="width:100%;margin-top:8px;accent-color:var(--c-accent);"/>
+              </label>
+            </div>
+            <div style="margin-top:14px;">
+              <div style="font-size:12px;color:var(--text-dim);font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Ligues à exclure</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">${leagueButtons}</div>
             </div>
           </div>
 
@@ -20093,6 +20158,11 @@
       const cur = (function(){ try { return JSON.parse(localStorage.getItem('userPrefs') || '{}') || {}; } catch(e) { return {}; } })();
       localStorage.setItem('userPrefs', JSON.stringify({ ...cur, ...partial }));
     }
+    function saveStrategyPrefs(partial) {
+      const cur = (function(){ try { return JSON.parse(localStorage.getItem('userPrefs') || '{}') || {}; } catch(e) { return {}; } })();
+      const strategy = (cur.strategy && typeof cur.strategy === 'object') ? cur.strategy : {};
+      localStorage.setItem('userPrefs', JSON.stringify({ ...cur, strategy: { ...strategy, ...partial } }));
+    }
     wrap.querySelectorAll('[data-profile-jump]').forEach(btn => {
       btn.addEventListener('click', () => {
         const target = wrap.querySelector(btn.dataset.profileJump || '');
@@ -20173,6 +20243,7 @@
     if (focusModeEl) focusModeEl.addEventListener('change', (e) => {
       const on = e.target.checked;
       savePrefs({ focusMode: on });
+      try { localStorage.setItem('paris_sportif_focus_big_bets_v1', on ? '1' : '0'); } catch(err) {}
       if (on) document.body.classList.add('focus-mode');
       else document.body.classList.remove('focus-mode');
     });
@@ -20200,6 +20271,27 @@
       e.target.setAttribute('aria-valuetext', v.toFixed(2));
       try { if (typeof toast === 'function') toast(`Cote minimum: @${v.toFixed(2)}`, 'success'); } catch(err){}
     });
+    const riskEl = wrap.querySelector('#pref-risk-tolerance');
+    const riskLbl = wrap.querySelector('#pref-risk-label');
+    if (riskEl && riskLbl) riskEl.addEventListener('input', (e) => {
+      const v = Math.max(1, Math.min(5, parseInt(e.target.value, 10) || 3));
+      riskLbl.textContent = riskLabels[v] || 'Équilibré';
+      saveStrategyPrefs({ riskTolerance: v });
+    });
+    const divEl = wrap.querySelector('#pref-diversification');
+    const divLbl = wrap.querySelector('#pref-div-label');
+    if (divEl && divLbl) divEl.addEventListener('input', (e) => {
+      const v = Math.max(1, Math.min(5, parseInt(e.target.value, 10) || 3));
+      divLbl.textContent = divLabels[v] || 'Équilibré';
+      saveStrategyPrefs({ diversification: v });
+    });
+    const minConfEl = wrap.querySelector('#pref-min-confidence');
+    const minConfLbl = wrap.querySelector('#pref-min-confidence-label');
+    if (minConfEl && minConfLbl) minConfEl.addEventListener('input', (e) => {
+      const v = Math.max(50, Math.min(90, parseInt(e.target.value, 10) || 55));
+      minConfLbl.textContent = v + '%';
+      saveStrategyPrefs({ minConfidence: v });
+    });
     const lockEl = wrap.querySelector('#pref-lock-threshold');
     const lockLbl = wrap.querySelector('#pref-lock-label');
     if (lockEl && lockLbl) lockEl.addEventListener('input', (e) => {
@@ -20217,6 +20309,18 @@
         const idx = favs.indexOf(s);
         if (idx >= 0) favs.splice(idx, 1); else favs.push(s);
         savePrefs({ favSports: favs });
+        renderProfilPage(wrap);
+      });
+    });
+    wrap.querySelectorAll('[data-exclude-league]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const league = btn.dataset.excludeLeague || '';
+        const cur = (function(){ try { return JSON.parse(localStorage.getItem('userPrefs') || '{}') || {}; } catch(e) { return {}; } })();
+        const strategy = (cur.strategy && typeof cur.strategy === 'object') ? cur.strategy : {};
+        const leagues = Array.isArray(strategy.excludedLeagues) ? [...strategy.excludedLeagues] : [];
+        const idx = leagues.indexOf(league);
+        if (idx >= 0) leagues.splice(idx, 1); else leagues.push(league);
+        saveStrategyPrefs({ excludedLeagues: leagues });
         renderProfilPage(wrap);
       });
     });
