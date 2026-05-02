@@ -164,6 +164,14 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - `dashboard-desktop` : `1440x3504`, overflow `0`
 - `legal-mobile` : hash vide attendu, page statique chargée correctement
 
+## Click audit P-6.2
+
+- Script : `scripts/click_audit.js`
+- Spec CI : `tests/click-everything.spec.js`
+- Rapport local : `.cache/click-audit-report.json`
+- Résultat : 98 clics, 0 failure.
+- Note : le lien d'évitement `#main-content` est exclu du click audit souris car il est volontairement hors viewport tant qu'il n'a pas le focus clavier.
+
 ## Prochains fixes recommandés
 
 1. P6-VIS-001 bottom nav overlay.

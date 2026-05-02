@@ -589,3 +589,11 @@
 - Impact: zéro overflow/runtime, mais 6 HIGH à corriger en priorité
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.75 (2026-05-02 11:57 UTC)
+- Chantier: P-6.2 click test automatisé
+- Avant: aucun click audit global Phase 6
+- Après: spec CI + script local autonome, 98 clics testés, 0 failure
+- Impact: interactions principales sans erreur JS; rapport `.cache/click-audit-report.json`
+- Commit: pending
+- Status: ✅ DONE
