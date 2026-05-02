@@ -15829,6 +15829,10 @@
             <i class="${strength.cls}">${strength.heat} +${(p.edge * 100).toFixed(1)}%</i>
           </button>`;
       };
+      const bbfSportDay = ['football','tennis','basketball','hockey','baseball'].map(sp => {
+        const a = bbfPool.filter(p => p.m?.sport === sp).slice(0, 3);
+        return a.length ? `<article class="bbf-empty bbf-empty--small" style="align-items:stretch"><strong>${sportIcon(sp)} ${esc(sportLabel(sp))}</strong>${a.map(bbfRow).join('')}</article>` : '';
+      }).join('');
       const bbfScorerCard = (s) => {
         const imgFallback = esc(String(s.name || '?').split(/\s+/).filter(Boolean).slice(0,2).map(w => w[0]).join('').toUpperCase() || '•');
         const img = s.pid ? `<img src="https://img.sofascore.com/api/v1/player/${esc(String(s.pid))}/image" alt="" loading="lazy" decoding="async" onerror="this.outerHTML='<span>${imgFallback}</span>'">` : `<span>${imgFallback}</span>`;
@@ -16071,6 +16075,11 @@
                 <strong>Pas de grosse cote secondaire cohérente.</strong>
                 <span>Score exact, BTTS et totaux restent cachés si la value n'est pas assez nette.</span>
               </div>`}
+          </section>`}
+
+          ${bbfFocusOnly ? '' : `<section class="bbf-section">
+            <div class="bbf-section__head"><div><span>Top 3 par sport · tri cote haute</span><h2>Paris du jour par sport</h2></div><button type="button" class="page-btn" data-page="tous">Tous les sports →</button></div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;">${bbfSportDay || '<div class="bbf-empty bbf-empty--small"><strong>Aucun pick sport aujourd’hui.</strong><span>Le modèle attend une meilleure value.</span></div>'}</div>
           </section>`}
 
           ${bbfFocusOnly ? '' : `<details class="bbf-more terminal-market">

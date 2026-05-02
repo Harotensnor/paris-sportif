@@ -1315,3 +1315,9 @@
 - Après: section dédiée O/U, BTTS, score exact et totals à cote ≥2.50 + edge ≥6%.
 - Impact: les value secondaires ressortent sans forcer un pick si le slate est vide.
 - Vérif: phase10_multi_market_outsiders_audit.json, section présente, 0 overflow, empty state prudent.
+
+## Sprint v35.172 — Phase 10 P-10.20 Paris du jour par sport (21:12 UTC)
+- Avant: l'accueil ne regroupait pas les meilleurs picks par sport après les sections high-odds.
+- Après: bloc Top 3 par sport avec état vide explicite si aucun pick ne passe les seuils.
+- Impact: lecture plus rapide foot/tennis/basket/hockey/baseball sans dupliquer la page Tous.
+- Vérif: phase10_sport_daily_picks_audit.json, section présente, 0 overflow, empty state OK.
