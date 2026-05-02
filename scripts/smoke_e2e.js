@@ -122,6 +122,23 @@ function startServer() {
   }
   console.log(`[${terminalMatch ? 'ok' : 'FAIL'}] terminal value 48h = ${terminalMatch ? terminalMatch[0] : 'missing'}`);
 
+  await page.waitForFunction(() => !!window.__backtestReportV2, null, { timeout: 5000 }).catch(() => {});
+  const sportGuard = await page.evaluate(() => {
+    const cold = Object.entries(window.__backtestReportV2?.by_sport || {})
+      .find(([, d]) => d && d.n >= 10 && d.flat_roi_pct < -10);
+    if (!cold) return { checked: false };
+    const [sport] = cold;
+    const guard = window._sportRoiGuard?.(
+      { sport },
+      { rel: 0.55, odd: 2.00, ev: 0.10, investment: { score: 60 } }
+    );
+    return { checked: true, sport, blocked: !!guard?.blocked, note: guard?.note || '' };
+  });
+  if (sportGuard.checked && !sportGuard.blocked) {
+    failures.push({ phase: 'sport-roi-guard', msg: `Cold sport ${sportGuard.sport} was not blocked` });
+  }
+  console.log(`[${!sportGuard.checked || sportGuard.blocked ? 'ok' : 'FAIL'}] sport ROI guard = ${sportGuard.checked ? `${sportGuard.sport} blocked` : 'no cold sport'}`);
+
   // Responsive smoke at 375×812
   await page.setViewportSize({ width: 375, height: 812 });
   await page.waitForTimeout(200);
