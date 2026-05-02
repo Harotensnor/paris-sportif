@@ -146,6 +146,10 @@ SOURCES = [
         'teams': len(d.get('teams') or {}) if isinstance(d, dict) else 0,
         'sports': len(d.get('by_sport') or {}) if isinstance(d, dict) else 0,
     }),
+    ('h2h_extended', 'h2h_extended.json', lambda d: {
+        'events': len(d.get('events') or {}) if isinstance(d, dict) else 0,
+        'sports': len(d.get('by_sport') or {}) if isinstance(d, dict) else 0,
+    }),
     ('footballdata',    'footballdata.json',    _count_footballdata),
     ('clv_history',     'clv_history.json',     _count_clv),
 ]
