@@ -21044,7 +21044,7 @@
         <div style="max-width:960px;margin:0 auto;padding:0 8px;">
           <div style="margin:24px 0 18px;">
             <span class="section-eyebrow">Montante séquentielle</span>
-            <h1 class="section-title-v2">${titleByType[type]}</h1>
+            <h2 class="section-title-v2">${titleByType[type]}</h2>
             <p class="section-subtitle-v2">Le modèle n'a pas trouvé assez de picks séquentiels respectant les critères.</p>
           </div>
           <div class="empty-state">
@@ -21141,7 +21141,7 @@
       <div style="max-width:960px;margin:0 auto;padding:0 8px;">
         <div style="margin:24px 0 18px;">
           <span class="section-eyebrow">Montante séquentielle</span>
-          <h1 class="section-title-v2">${titleByType[type]}</h1>
+          <h2 class="section-title-v2">${titleByType[type]}</h2>
           <p class="section-subtitle-v2">${subByType[type]}</p>
         </div>
 
@@ -26289,7 +26289,7 @@
     wrap.innerHTML = `
       <div style="max-width:1200px;margin:0 auto;padding:16px 20px 24px;">
         <div class="section-header top-picks" style="margin-top:8px;">
-          <h2><span class="ico">⚙️</span>Santé du site</h2>
+          <h1 class="page-h1"><span class="ico">⚙️</span>Santé du site</h1>
           <div class="hint">État technique en temps réel · fraîcheur des données, couverture, SW, erreurs, stockage</div>
         </div>
 

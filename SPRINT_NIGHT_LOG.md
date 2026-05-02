@@ -224,6 +224,14 @@
 - Commit: pending
 - Status: ✅ DONE
 
+## Sprint v35.115 (2026-05-02 13:54 UTC)
+- Chantier: P-9.17 H1 unique
+- Avant: Santé sans H1 visible et Montantes avec deux H1 visibles
+- Après: 8 pages contrôlées, chacune expose exactement 1 H1 visible
+- Impact: hiérarchie Lighthouse/SEO nettoyée page par page
+- Commit: pending
+- Status: ✅ DONE
+
 ## Sprint v35.111 (2026-05-02 13:51 UTC)
 - Chantier: P-8.15 révision page Legal
 - Avant: legal pouvait passer en thème clair et header mobile se chevauchait
