@@ -725,3 +725,11 @@
 - Impact: les matchs top-5 avec xG Understat utilisent enfin ce signal prédictif
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.92 (2026-05-02 11:28 UTC)
+- Chantier: P-6.21 Discord webhook alerts
+- Avant: aucun canal externe pour Big Bet imminent
+- Après: notify_discord.py no-op sans secret, dédup, cap 3 alertes/2h, cron + local alignés
+- Impact: alertes Discord prêtes sans casser la pipeline si le webhook manque
+- Commit: pending
+- Status: ✅ DONE
