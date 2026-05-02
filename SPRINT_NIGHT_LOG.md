@@ -645,3 +645,11 @@
 - Impact: top opportunité accessibilité corrigée; restent touch targets/H1/poids data
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.82 (2026-05-02 12:48 UTC)
+- Chantier: P-6.11 panier paris Accueil
+- Avant: paris suivis invisibles sur l'accueil Big Bets
+- Après: panier compact avec état vide, totals, export CSV et vidage protégé
+- Impact: suivi local exploitable sans quitter la page principale; 32 captures after-final OK
+- Commit: pending
+- Status: ✅ DONE
