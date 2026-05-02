@@ -172,6 +172,15 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Résultat : 98 clics, 0 failure.
 - Note : le lien d'évitement `#main-content` est exclu du click audit souris car il est volontairement hors viewport tant qu'il n'a pas le focus clavier.
 
+## Modal tabs audit P-6.3
+
+- Script : `scripts/modal_tabs_audit.js`
+- Spec CI : `tests/modal-tabs.spec.js`
+- Rapport local : `.cache/modal-tabs-audit-report.json`
+- Sports testés : football, tennis, basketball, baseball, hockey.
+- Résultat : 5 fiches match ouvertes, tous les onglets disponibles cliqués, 0 failure.
+- Note : aucun artefact `manual-modal-tab-*-fail.png` généré sur cette passe.
+
 ## Prochains fixes recommandés
 
 1. P6-VIS-001 bottom nav overlay.
