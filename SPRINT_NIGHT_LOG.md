@@ -613,3 +613,11 @@
 - Impact: top 5 opportunités listées dans `ISSUES.md` pour piloter les fixes
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.78 (2026-05-02 12:12 UTC)
+- Chantier: P-6.5 a11y audit 8 pages
+- Avant: aucun rapport accessibilité Phase 6 consolidé
+- Après: `a11y-report.json`, 0 critical, 75 serious, 278 moderate
+- Impact: familles contrastes/touch targets/alt taguées dans `ISSUES.md`
+- Commit: pending
+- Status: ✅ DONE
