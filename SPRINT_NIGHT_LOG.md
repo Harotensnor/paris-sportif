@@ -371,3 +371,11 @@
 - Impact: parcours utilisateur plus évident, mobile bottom-nav alignée sur les 5 hubs; smoke E2E vert, top-level nav mesurée `2` solos + `3` hubs
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.48 (2026-05-02 07:43 UTC)
+- Chantier: P-3.6 fusion Bilan/Historique/Backtest/Crédibilité vers Mes paris
+- Avant: `VALID_PAGES=25`, avec `bilan`, `historique`, `backtest`, `credibilite` comme pages SPA concurrentes
+- Après: `VALID_PAGES=21`; `#bilan`, `#historique`, `#backtest`, `#credibilite`, `#mes-paris` redirigent vers `#performance`
+- Impact: la performance devient le hub unique “Mes paris” sans casser les anciens liens; test legacy hashes vert, smoke E2E vert
+- Commit: pending
+- Status: ✅ DONE
