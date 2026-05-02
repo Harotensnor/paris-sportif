@@ -1459,3 +1459,9 @@
 - Après: audit local relancé; desktop `dashboard 74`, `tous 46`, `performance 60`, `academie 59`, mobile `99-100`.
 - Impact: régression isolée aux cibles desktop sous `40px`, pas aux contrastes/alt/H1.
 - Vérif: `scripts/lighthouse_audit.js`, `scripts/a11y_audit.js`, `ISSUES.md` section Phase 11.
+
+## Sprint v35.196 — Phase 11 P-11.2 Cibles desktop a11y (22:52 UTC)
+- Avant: Lighthouse-compatible desktop min a11y `46`, avec 30-66 cibles sous 40px selon page.
+- Après: min a11y desktop `97`; dashboard/tous/academie `100`, performance `97`, mobile `100`.
+- Impact: nav, trust strip, tabs, footer, chips et liens méthode ont des zones cliquables ≥40px.
+- Vérif: `scripts/lighthouse_audit.js`, `scripts/a11y_audit.js`, bundle OK; CLS/perf restent ouverts P-11.3/P-11.4.
