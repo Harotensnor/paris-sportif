@@ -128,6 +128,12 @@ jobs:
           python3 patch_winamax.py || true
           python3 patch_sofascore_events.py || true
           python3 patch_winamax_markets.py || true
+          # v35.26 — Top-up léger des pages match Winamax à CHAQUE refresh.
+          # Le catalog tournament garde le 1N2, puis ce passage remplit
+          # progressivement O/U, handicaps, BTTS, score exact, totals, etc.
+          # TTL 1h = pas de re-hit inutile des matchs déjà détaillés.
+          WINAMAX_DETAILS_CAP=45 WINAMAX_DETAILS_SLEEP=0.12 python3 fetch_winamax_match_details.py --limit 45 --ttl-hours 1 || true
+          python3 patch_winamax_markets.py || true
           # v33.30 — Fetchers pour données qu'on patchera ensuite via patch_all_quick.
           python3 fetch_tennis_sackmann.py || true
           python3 fetch_footballdata.py || true
@@ -139,7 +145,7 @@ jobs:
             # basket, baseball, hockey, MMA) sur le pool exact priorisé.
             # Tourne toutes les 15 min, après que patch_winamax_markets a
             # mis match_id sur les events ESPN.
-            python3 fetch_winamax_match_details.py || true
+            WINAMAX_DETAILS_CAP=160 WINAMAX_DETAILS_SLEEP=0.16 python3 fetch_winamax_match_details.py --limit 160 --ttl-hours 1 || true
             python3 patch_winamax_markets.py || true   # re-patch pour appliquer les nouveaux markets
           fi
           # v33.30 — MEGA-PATCHER : applique 13 enrichissements légers en

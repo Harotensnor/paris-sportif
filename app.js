@@ -25210,6 +25210,14 @@
                            : ratioPct >= 70 ? '#34d399'
                            : ratioPct >= 50 ? '#eab308'
                                             : '#f87171';
+          const detailRatio = q.winamax_detailed_ratio;
+          const detailPct = (detailRatio != null && isFinite(detailRatio)) ? Math.round(detailRatio * 100) : null;
+          const detailStatus = q.winamax_detail_status || (detailPct == null ? 'unknown' : detailPct >= 50 ? 'ok' : detailPct >= 25 ? 'topup' : 'urgent');
+          const detailColor = detailPct == null ? 'var(--text-dim)'
+                            : detailPct >= 50 ? '#34d399'
+                            : detailPct >= 25 ? '#eab308'
+                                              : '#f87171';
+          const detailReco = Number(q.winamax_detail_fetch_cap_reco || 0);
           const fbInv = Number(q.football_invalid_form || 0);
           const fbColor = fbInv === 0 ? '#34d399' : '#f87171';
           const ext = Number(q.actionable_external_odds || 0);
@@ -25229,6 +25237,14 @@
                 <div class="lbl-mini">Winamax exact ratio</div>
                 <div style="font-size:24px;font-weight:800;color:${ratioColor};font-variant-numeric:tabular-nums;">${ratioPct == null ? '—' : ratioPct + '%'}</div>
                 <div style="font-size:11px;color:var(--text-dim);margin-top:4px;line-height:1.4;">${q.winamax_exact || 0} / ${q.winamax_available || 0} events ont match_id + markets bookable.</div>
+              </div>
+              <div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;border-left:4px solid ${detailColor};">
+                <div class="lbl-mini">Marchés détaillés</div>
+                <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">
+                  <div style="font-size:24px;font-weight:800;color:${detailColor};font-variant-numeric:tabular-nums;">${detailPct == null ? '—' : detailPct + '%'}</div>
+                  <div style="font-size:10px;font-weight:800;letter-spacing:.5px;color:${detailColor};background:${detailColor}18;border:1px solid ${detailColor}33;border-radius:999px;padding:2px 7px;text-transform:uppercase;">${esc(detailStatus)}</div>
+                </div>
+                <div style="font-size:11px;color:var(--text-dim);margin-top:4px;line-height:1.4;">${q.winamax_detailed || 0} / ${q.winamax_exact || 0} matchs exacts ont O/U, BTTS, handicap, totals ou scores. ${detailReco ? `Top-up conseillé: ${detailReco}/run.` : ''}</div>
               </div>
               <div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;border-left:4px solid ${fbColor};">
                 <div class="lbl-mini">Stats foot invalides</div>

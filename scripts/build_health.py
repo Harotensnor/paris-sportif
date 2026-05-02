@@ -317,6 +317,10 @@ def _scan_data_quality():
         round(winamax_exact / winamax_available, 3)
         if winamax_available else None
     )
+    winamax_detailed_ratio = round(winamax_detailed / winamax_exact, 3) if winamax_exact else None
+    for sb in by_sport.values():
+        sb['exact_ratio'] = round(sb['exact'] / sb['available'], 3) if sb['available'] else None
+        sb['detailed_ratio'] = round(sb['detailed'] / sb['exact'], 3) if sb['exact'] else None
     return {
         'total_events': total_events,
         'upcoming_events': upcoming_events,
@@ -325,7 +329,10 @@ def _scan_data_quality():
         'winamax_detailed': winamax_detailed,
         'winamax_tournament_only': winamax_tournament_only,
         'winamax_exact_ratio': winamax_exact_ratio,
-        'winamax_detailed_ratio': round(winamax_detailed / winamax_exact, 3) if winamax_exact else None,
+        'winamax_detailed_ratio': winamax_detailed_ratio,
+        'winamax_detail_gap_to_target': round(max(0, 0.50 - (winamax_detailed_ratio or 0)), 3),
+        'winamax_detail_fetch_cap_reco': 160 if (winamax_detailed_ratio or 0) < 0.25 else 90 if (winamax_detailed_ratio or 0) < 0.50 else 45,
+        'winamax_detail_status': 'ok' if (winamax_detailed_ratio or 0) >= 0.50 else 'topup' if (winamax_detailed_ratio or 0) >= 0.25 else 'urgent',
         'actionable_external_odds': actionable_external_odds,
         'football_invalid_form': football_invalid_form,
         'winamax_coverage': {
@@ -434,7 +441,8 @@ def main() -> int:
         if detailed_ratio is not None and detailed_ratio < 0.35:
             out['warnings'].append(
                 f'winamax_detailed_ratio bas: {detailed_ratio:.0%} '
-                f'({q["winamax_detailed"]}/{q["winamax_exact"]})'
+                f'({q["winamax_detailed"]}/{q["winamax_exact"]}) — '
+                f'top-up détails recommandé cap={q.get("winamax_detail_fetch_cap_reco", 90)}'
             )
 
     # Bug-hunt 2026-05-02 : compute `overall` selon les warnings + data freshness
