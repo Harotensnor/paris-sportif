@@ -525,3 +525,11 @@
 - Impact: conformité plus visible, style inspiré bookmaker; visual diff `16.38%` attendu par ajout top-bar
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.67 (2026-05-02 10:12 UTC)
+- Chantier: P-5.2 chips catégories Winamax-style
+- Avant: aucun accès rapide HOT/sport sur l'Accueil
+- Après: chips HOT + Football/Tennis/Basket/Hockey/Baseball avec compteurs et liens #tous
+- Impact: scan plus bookmaker, filtres en 1 clic; visual diff `19.52%` attendu car bandeau restauré + chips
+- Commit: pending
+- Status: ✅ DONE
