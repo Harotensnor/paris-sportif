@@ -1109,3 +1109,11 @@
 - Impact: objectif Perf 80+ atteint sur l'audit local, layout beaucoup plus stable
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.140 (2026-05-02 15:57 UTC)
+- Chantier: P-9.59/P-9.60/P-9.61/P-9.62/P-9.63 tests site
+- Avant: suite complète non relancée après perf/CLS
+- Après: smoke OK, click 164/164, modales 5 sports OK, cohérence 50/50, flow Big Bet OK
+- Impact: chemin principal et interactions globales validés sans erreur
+- Commit: pending
+- Status: ✅ DONE
