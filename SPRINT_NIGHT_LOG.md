@@ -1321,3 +1321,9 @@
 - Après: bloc Top 3 par sport avec état vide explicite si aucun pick ne passe les seuils.
 - Impact: lecture plus rapide foot/tennis/basket/hockey/baseball sans dupliquer la page Tous.
 - Vérif: phase10_sport_daily_picks_audit.json, section présente, 0 overflow, empty state OK.
+
+## Sprint v35.173 — Phase 10 P-10.44 Nettoyage commentaires legacy (21:14 UTC)
+- Avant: app.js frôlait le plafond bundle à 1749.9 KB / 1750 KB.
+- Après: 149 lignes de commentaires de jalons legacy supprimées, comportement inchangé.
+- Impact: marge regagnée pour les prochains marchés/modèles sans relever le budget.
+- Vérif: syntax OK, bundle app.js 1741.0 KB / 1750 KB.
