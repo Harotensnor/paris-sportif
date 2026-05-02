@@ -85,7 +85,7 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Preuve : `.cache/phase4-phase6-baseline/tous-mobile.png`
 - Constat : les deux rangées de tabs/chips et le retour accueil prennent beaucoup de place avant la liste utile.
 - Action : compacter en segmented control horizontal avec scroll/fade ou menu secondaire.
-- Statut : OPEN
+- Statut : PARTIAL v35.109 — table desktop conservée, mobile passé en carte verticale; sub-nav à densifier encore.
 
 ### P6-VIS-008 — Page Tous mobile : lignes match trop serrées
 
@@ -95,7 +95,7 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Preuve : `.cache/phase4-phase6-baseline/tous-mobile.png`
 - Constat : noms équipes, pick, score prédit, cote et edge sont trop comprimés, plusieurs libellés deviennent presque illisibles.
 - Action : passer la carte mobile en layout vertical clair : équipes, pick, cote/edge, raisons.
-- Statut : OPEN
+- Statut : FIXED v35.109 — cartes mobiles en une colonne, match/pick/cote respirent.
 
 ### P6-VIS-009 — Santé mobile : table pipeline lag tronquée
 
