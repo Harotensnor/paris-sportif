@@ -337,3 +337,13 @@
 - Impact: décodage image non bloquant sur cartes/logos et moins de risque de micro-jank mobile; zéro changement visuel attendu
 - Commit: pending
 - Status: ✅ DONE
+
+## Phase 3 BIG BETS FIRST
+
+## Sprint v35.44 (2026-05-02 07:03 UTC)
+- Chantier: P-3.1 + P-3.2 + P-3.3 architecture Accueil Big Bets
+- Avant: accueil desktop `26` blocs/cards détectés, hauteur `7875px` (`8.75` viewports), message principal noyé derrière la nav et les anciennes sections
+- Après: accueil Big Bets First actif avec `3` cards XXL, `8` bonnes opportunités, scanner replié; `5` zones visibles, hauteur `3438px` (`3.8` viewports), overflow mobile `0px`
+- Impact: l'accueil dit immédiatement quoi regarder et pourquoi; CTA Winamax deep-link + tracking local `paris_sportif_winamax_clicks_v1`; smoke E2E vert (`456` marchés scorés / `289` matchs exacts 48h)
+- Commit: pending
+- Status: ✅ DONE
