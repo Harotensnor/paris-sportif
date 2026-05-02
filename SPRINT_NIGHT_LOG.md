@@ -445,3 +445,11 @@
 - Impact: échelle typo Phase 4 posée sans changer le rendu; visual diff `10.14%` attendu sur Performance dynamique, layout OK
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.57 (2026-05-02 08:05 UTC)
+- Chantier: P-4.27 spacing scale
+- Avant: `109` déclarations simples padding/margin/gap en px direct
+- Après: `0` déclarations simples `4/8/12/16/20/24/32/40/48/64px`; tout passe par `--space-*`
+- Impact: rythme CSS stabilisé sans changement visuel; visual diff `0.02%`, `0/32` échec
+- Commit: pending
+- Status: ✅ DONE
