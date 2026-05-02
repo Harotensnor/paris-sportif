@@ -107,7 +107,7 @@
   // legacy) mais aucun lien ne pointe plus vers cette valeur.
   // v31.7.77 — 'calendrier' ajouté pour vue 7 jours groupée (user feedback
   // "je veux voir au moins une semaine de pronos jour par jour").
-  const VALID_PAGES = ['dashboard','tous','buteurs','combines','academie','alertes','profil','sante','legal','montantes','compare','calendrier','league','favoris','performance','plan-mise','valeur','simulator'];
+  const VALID_PAGES = ['dashboard','tous','performance','academie','profil','sante','legal','montantes'];
   // v30 — 'mesparis' retiré : Théo n'enregistre pas ses paris sur le site.
   // v31 — 'legal' + 'methodologie' ajoutés (transparence + dictionnaire des
   // métriques, en réponse à l'audit ChatGPT 2026-04-26).
@@ -128,6 +128,16 @@
     'methodologie': 'academie',
     'comment-lire': 'academie',
     'comment-lire-un-prono': 'academie',
+    'buteurs': 'tous',
+    'combines': 'tous',
+    'calendrier': 'tous',
+    'compare': 'tous',
+    'league': 'tous',
+    'valeur': 'tous',
+    'plan-mise': 'tous',
+    'favoris': 'profil',
+    'alertes': 'profil',
+    'simulator': 'performance',
     'montante-jour': 'montantes',
     'montante-weekend': 'montantes',
     'montante-semaine': 'montantes',
@@ -21269,11 +21279,11 @@
     // "orphelines" (montantes, matchs détectés, simulateur).
     const HUB_PAGES = {
       now: ['dashboard'],
-      agent: ['performance', 'bilan', 'historique', 'backtest'],
-      explore: ['tous', 'calendrier', 'buteurs', 'combines', 'compare', 'valeur', 'plan-mise', 'montantes'],
-      performance: ['performance', 'bilan', 'historique', 'backtest', 'credibilite', 'simulator'],
+      agent: ['performance'],
+      explore: ['tous', 'montantes'],
+      performance: ['performance'],
       learn: ['academie'],
-      account: ['profil', 'sante', 'favoris', 'alertes', 'legal'],
+      account: ['profil', 'sante', 'legal'],
     };
     document.querySelectorAll('nav.topbar-nav .hub').forEach(h => {
       const k = h.dataset.hub;
