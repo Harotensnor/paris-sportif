@@ -62,6 +62,7 @@ except ImportError:
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / 'sofascore_events.json'
 API = 'https://api.sofascore.com/api/v1'
+MIN_TOTAL_TO_OVERWRITE = 100
 
 # Mapping Sofascore sport → ESPN sport name (pour cohérence data.js)
 SPORT_MAPPING = {
@@ -201,6 +202,23 @@ def _to_espn_event(sofa_evt: dict, sport: str) -> dict | None:
 DEBUG = False
 
 
+def _previous_total() -> int:
+    if not OUT.exists():
+        return 0
+    try:
+        previous = json.loads(OUT.read_text(encoding='utf-8'))
+    except Exception:
+        return 0
+    if isinstance(previous, dict):
+        total = previous.get('total')
+        if isinstance(total, int):
+            return total
+        events = previous.get('events') or {}
+        if isinstance(events, dict):
+            return sum(len(v or []) for v in events.values())
+    return 0
+
+
 def fetch_sport(sport: str, today: str) -> list[dict]:
     """Fetch les events scheduled pour un sport et un jour."""
     url = f'{API}/sport/{sport}/scheduled-events/{today}'
@@ -252,8 +270,16 @@ def main() -> int:
             print(f'  {day} {sofa_sport} ({espn_sport}): {len(evs)} events', flush=True)
 
     out['total'] = total
+    previous_total = _previous_total()
     if total == 0 and OUT.exists():
         print('  no events collected — preserving previous sofascore_events.json', flush=True)
+        return 1
+    if total < MIN_TOTAL_TO_OVERWRITE and previous_total > total:
+        print(
+            f'  low coverage ({total} < {MIN_TOTAL_TO_OVERWRITE}) — preserving previous '
+            f'snapshot ({previous_total} events)',
+            flush=True,
+        )
         return 1
     OUT.write_text(json.dumps(out, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
     print(f'  wrote {OUT.name} : {total} events ({OUT.stat().st_size/1024:.1f}KB)', flush=True)
