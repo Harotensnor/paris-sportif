@@ -133,7 +133,7 @@
 <!-- Chantier S — PWA -->
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="alternate" type="application/rss+xml" href="feed.xml" title="Paris-Sportif — Top picks du jour (RSS)">
-<!-- v35.07 — Seul le CSS est préchargé au boot. Le gros app.js?v=a625be08 reste en defer
+<!-- v35.07 — Seul le CSS est préchargé au boot. Le gros app.js?v=bc1c5b95 reste en defer
      plus bas dans le body pour laisser le squelette critique peindre d'abord. -->
 <link rel="preload" href="app.css?v=cec688c0" as="style" onload="this.onload=null;this.rel='stylesheet'">
 <link rel="stylesheet" href="print.css?v=313105b5" media="print">
@@ -338,7 +338,7 @@
   // pour debug console. AUCUN envoi réseau — l'utilisateur peut consulter
   // ou exporter ses données, et c'est tout.
   //
-// Pourquoi inline pré-app.js?v=a625be08 ? Il faut s'enregistrer AVANT le LCP/FCP
+// Pourquoi inline pré-app.js?v=bc1c5b95 ? Il faut s'enregistrer AVANT le LCP/FCP
   // pour les capter. Le bundle web-vitals officiel pèse 5 KB ; ici on
   // tombe à ~1.5 KB grâce à l'usage direct de PerformanceObserver.
   //
@@ -812,7 +812,7 @@
       <div class="footer-brand">
         <span class="footer-logo">🎯</span>
         <span class="footer-text">Paris-Sportif</span>
-        <span class="footer-version" id="footer-version" role="button" tabindex="0" style="cursor:pointer;" title="Voir les nouveautés v35.197">v35.197</span>
+        <span class="footer-version" id="footer-version" role="button" tabindex="0" style="cursor:pointer;" title="Voir les nouveautés v35.198">v35.198</span>
       </div>
       <nav class="footer-links" aria-label="Liens du site">
         <a href="https://github.com/Harotensnor/paris-sportif" target="_blank" rel="noopener" class="footer-link" title="Code source sur GitHub">
@@ -898,7 +898,7 @@
 <div class="toast" id="toast"></div>
 
 <script src="data_lite.js?v=be78adc6"></script>
-<script src="app.js?v=a625be08" defer></script>
+<script src="app.js?v=bc1c5b95" defer></script>
 
 <!-- enhancements v20 -->
 <script src="app-enhancements.js?v=232799b3" defer></script>

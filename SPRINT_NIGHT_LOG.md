@@ -1471,3 +1471,9 @@
 - Apres: CSS critique reserve le layout sidebar/topbar; CLS desktop dashboard 0.018, pages internes 0.047.
 - Impact: Lighthouse desktop repasse a perf 97/92/92/92 et la page ne saute plus au chargement.
 - Verif: scripts/lighthouse_audit.js OK; min perf 92, min a11y 97, min SEO 100.
+
+## Sprint v35.198 — Phase 11 P-11.5 Render orphelines (23:06 UTC)
+- Avant: 8 renderers legacy restaient appelables malgre VALID_PAGES=8; app.js 1748.5KB.
+- Apres: dispatchs morts + bloc locks/calendrier/favoris/matchs/plan/valeur/simulator/league supprimes; app.js 1617.3KB.
+- Impact: -131KB de JS initial, routes legacy gardees par aliases vers les hubs modernes.
+- Verif: node --check app.js OK, grep renderers legacy 0, bundle OK, Lighthouse min perf 92/a11y 100/SEO 100.
