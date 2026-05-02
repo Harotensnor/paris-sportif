@@ -403,3 +403,13 @@
 - Impact: objectif Phase 3 “8 pages max” atteint côté routeur sans casser les bookmarks; test legacy hashes vert, smoke E2E vert
 - Commit: pending
 - Status: ✅ DONE
+
+## Phase 4+ BIG BETS PERFECT + DESIGN OVERHAUL
+
+## Sprint v35.52 (2026-05-02 07:20 UTC)
+- Chantier: P-4.62 visual QA baseline
+- Avant: aucun outil standard pour capturer les 8 hubs sur 4 viewports avant/après, donc les régressions visuelles restaient manuelles
+- Après: `scripts/visual_capture.js` capture `32/32` écrans (`dashboard`, `tous`, `performance`, `academie`, `profil`, `sante`, `montantes`, `legal` × mobile/tablet/desktop/wide); `scripts/visual_diff.js` compare les PNG avec seuil `5%`
+- Impact: baseline Phase 4 stockée dans `.cache/phase4-baseline-v35.51`; self-check diff `0.00%`, smoke E2E vert, drift pipeline OK, bundles OK
+- Commit: pending
+- Status: ✅ DONE
