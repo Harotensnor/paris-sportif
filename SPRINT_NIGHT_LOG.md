@@ -1037,3 +1037,11 @@
 - Impact: la page Montantes devient utile même sans séquence propre disponible
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.131 (2026-05-02 15:50 UTC)
+- Chantier: P-9.59 re-run tests site
+- Avant: tests post-polish non relancés après les 8 fixes P9-VIS
+- Après: smoke E2E vert, click audit 98/98, modal tabs 5 sports OK, syntaxe 20 specs OK
+- Impact: navigation, clics principaux, modales et specs restent cohérents après polish
+- Commit: pending
+- Status: ✅ DONE
