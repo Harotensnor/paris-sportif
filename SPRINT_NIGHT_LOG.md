@@ -949,3 +949,11 @@
 - Impact: la contradiction signalée par Théo devient une régression bloquante en CI
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.120 (2026-05-02 14:20 UTC)
+- Chantier: P-9.0d capture baseline visuelle
+- Avant: aucune baseline Phase 9 suite pour comparer toutes les pages
+- Après: 32 captures générées dans .cache/phase4-phase9-current (8 pages × 4 viewports)
+- Impact: base visuelle prête pour inspection manuelle et correction page par page
+- Commit: pending
+- Status: ✅ DONE
