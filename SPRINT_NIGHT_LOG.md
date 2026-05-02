@@ -1231,3 +1231,9 @@
 - Après: mobile 4 pages = 100, desktop 4 pages = 85, SEO = 100 partout.
 - Impact: perf 80+ maintenue, cible 90+ desktop documentée pour sprint perf ultérieur.
 - Vérif: scripts/lighthouse_audit.js PASS.
+
+## Sprint v35.158 — Phase 10 P-10.6 Accueil Pro Bettor (18:22 UTC)
+- Avant: les buteurs coupaient le flux entre Big Bets et Solides; Solides pouvait monter à 12 picks.
+- Après: Big Bets puis 3-5 Solides, Odds/Outsiders, reste en accordéon; buteurs repliés en section secondaire.
+- Impact: accueil plus aligné sur l'objectif Théo: cotes hautes et décisions d'abord, contenu bonus ensuite.
+- Vérif: phase10_dashboard_probettor_audit.json + syntax/bundle PASS.
