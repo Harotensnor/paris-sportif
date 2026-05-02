@@ -208,6 +208,9 @@ jobs:
           # écrit data_today.json + data_manifest.json + ré-inline LITE blob
           # dans pronostics.html. Réduit le 1er paint de ~1.4 MB à ~0.4 MB.
           python3 finalize_inline.py || true
+          # v35.92 — Alertes Discord Big Bets imminents. No-op sans secret
+          # DISCORD_WEBHOOK_URL, dédup et cap 3 alertes/2h côté script.
+          python3 notify_discord.py || true
 
       - name: Stamp asset versions in pronostics.html
         # v31.3 — Cache-busting basé sur le hash du contenu : `?v=<hash8>` pour

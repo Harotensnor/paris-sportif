@@ -130,6 +130,8 @@ PATCH_STAGES = [
     # pronostics.html. Sans ça, le client tomberait toujours sur le fallback
     # data.js et perdrait le bénéfice du lazy-load.
     ('finalize_inline.py',          1,   15),
+    # v35.92 — No-op sans DISCORD_WEBHOOK_URL ; garde le drift CI/local aligné.
+    ('notify_discord.py',           1,   20),
 ]
 
 
