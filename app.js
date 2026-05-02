@@ -15852,6 +15852,31 @@
       const bbfCategoryChips = (bbfHotCount || bbfSportChips)
         ? `<nav class="bbf-chips" aria-label="Catégories de paris">${bbfHotCount ? `<a class="bbf-chip bbf-chip--hot" href="#tous?edge=8" aria-label="Voir les paris HOT"><span>🔥</span><b>HOT</b><em>${bbfHotCount}</em></a>` : ''}${bbfSportChips}</nav>`
         : '';
+      const bbfLeagueIcon = (name) => {
+        const n = String(name || '').toLowerCase();
+        if (/premier|ligue|liga|serie|bundes|champions|europa/.test(n)) return '⚽';
+        if (/nba|basket/.test(n)) return '🏀';
+        if (/nhl|hockey/.test(n)) return '🏒';
+        if (/mlb|baseball/.test(n)) return '⚾';
+        if (/atp|wta|tennis|madrid|rome|roland/.test(n)) return '🎾';
+        return '🏆';
+      };
+      const bbfCompetitionChips = (() => {
+        const counts = (_dataIsStale ? [] : todayAllWinamax)
+          .filter(m => m && !m.completed)
+          .reduce((acc, m) => {
+            const label = String(m.league_name || m.league || m.league_code || '').trim();
+            if (!label) return acc;
+            acc[label] = (acc[label] || 0) + 1;
+            return acc;
+          }, {});
+        const chips = Object.entries(counts)
+          .sort((a, b) => Number(b[1]) - Number(a[1]))
+          .slice(0, 8)
+          .map(([name, count]) => `<a class="bbf-chip" href="#tous?league=${encodeURIComponent(name)}" aria-label="Voir ${esc(name)}"><span>${bbfLeagueIcon(name)}</span><b>${esc(name.length > 24 ? name.slice(0, 23) + '…' : name)}</b><em>${count}</em></a>`)
+          .join('');
+        return chips ? `<nav class="bbf-chips" aria-label="Top compétitions">${chips}</nav>` : '';
+      })();
       const bbfClickCount = (() => {
         try { return Number(JSON.parse(localStorage.getItem('paris_sportif_winamax_clicks_v1') || '{}').count || 0); }
         catch(e) { return 0; }
@@ -15898,6 +15923,7 @@
           </section>
           ${bbfOffline}
           ${bbfCategoryChips}
+          ${bbfCompetitionChips}
           <div class="bbf-layout">
             <main class="bbf-main">
 

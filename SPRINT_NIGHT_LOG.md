@@ -653,3 +653,11 @@
 - Impact: suivi local exploitable sans quitter la page principale; 32 captures after-final OK
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.83 (2026-05-02 12:55 UTC)
+- Chantier: P-6.12 raccourcis compétitions/sports
+- Avant: seuls les sports étaient filtrables depuis l'accueil
+- Après: top compétitions dynamiques sous les chips sports, lien direct vers Tous filtré ligue
+- Impact: navigation Winamax-style plus rapide sans ajouter de page
+- Commit: pending
+- Status: ✅ DONE
