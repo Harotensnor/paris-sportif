@@ -15998,7 +15998,8 @@
         const hasDeepLink = !!(p.m?.winamax?.match_id);
         const minutes = Math.round((bbfSafeTs(p.m) - bbfNowMs) / 60000);
         const timeLabel = minutes > 0 && minutes < 120 ? `dans ${minutes} min` : (typeof fmtTime === 'function' ? fmtTime(p.m.date) : '');
-        const logo = (team) => team?.logo ? `<img src="${esc(team.logo)}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'">` : '<span></span>';
+        const initials = (team) => String(bbfTeamName(team)).split(/\s+/).filter(Boolean).slice(0,2).map(w => w[0]).join('').toUpperCase() || '•';
+        const logo = (team) => team?.logo ? `<img src="${esc(team.logo)}" alt="" loading="lazy" decoding="async" onerror="this.outerHTML='<span>${esc(initials(team))}</span>'">` : `<span>${esc(initials(team))}</span>`;
         const backdropLogo = (team) => team?.logo ? `<img src="${esc(team.logo)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : '';
         const heroBackdrop = mode === 'hero' ? `<div class="bbf-card__backdrop" aria-hidden="true">${backdropLogo(home)}${backdropLogo(away)}</div>` : '';
         const centerTime = mode === 'hero' && typeof fmtTime === 'function' ? fmtTime(p.m.date) : 'vs';
@@ -16048,7 +16049,8 @@
           </button>`;
       };
       const bbfScorerCard = (s) => {
-        const img = s.pid ? `<img src="https://img.sofascore.com/api/v1/player/${esc(String(s.pid))}/image" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'">` : '<span></span>';
+        const imgFallback = esc(String(s.name || '?').split(/\s+/).filter(Boolean).slice(0,2).map(w => w[0]).join('').toUpperCase() || '•');
+        const img = s.pid ? `<img src="https://img.sofascore.com/api/v1/player/${esc(String(s.pid))}/image" alt="" loading="lazy" decoding="async" onerror="this.outerHTML='<span>${imgFallback}</span>'">` : `<span>${imgFallback}</span>`;
         const odd = s.impliedOdd ? `@${Number(s.impliedOdd).toFixed(2)}` : 'cote à vérifier';
         const href = s.url ? (/^https?:/i.test(String(s.url)) ? String(s.url) : `https://www.winamax.fr${String(s.url)}`) : '';
         return `<article class="bbf-scorer" data-match-id="${esc(String(s.mId || ''))}">
