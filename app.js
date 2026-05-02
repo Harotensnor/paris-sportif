@@ -475,8 +475,6 @@
     }
   });
 
-  // Press `?` ouvre un modal listant les raccourcis disponibles.
-  // Press Esc ferme. Pattern Linear/GitHub.
   function _showShortcutsOverlay() {
     let overlay = document.getElementById('keyboard-shortcuts-overlay');
     if (overlay) {
@@ -499,21 +497,17 @@
           ${[
             ['?', 'Afficher cette aide'],
             ['Esc', 'Fermer modal/overlay'],
-            ['Cmd/Ctrl+K', 'Focus la barre de recherche'],
             ['Maj+T', 'Cycle thème (sombre/clair/auto)'],
-            ['Tab', 'Naviguer entre les contrôles'],
-            ['Shift+Tab', 'Naviguer en arrière'],
-            ['Enter / Space', 'Activer un bouton focusé'],
-            ['Arrow Left / Right', 'Naviguer entre les onglets modal'],
+            ['g+h/t/m/e/p', 'Accueil / Tous / Mes paris / Méthode / Profil'],
+            ['j / k', 'Carte suivante / précédente'],
+            ['B', 'Mode Big Bets seulement'],
+            ['← / →', 'Jour précédent / suivant'],
           ].map(([k, desc]) => `
             <div style="display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;padding:6px 0;">
               <kbd style="background:var(--panel-2);border:1px solid var(--border-2);border-radius:var(--r-xs);padding:3px 8px;font-family:monospace;font-size:11px;font-weight:600;min-width:80px;text-align:center;color:var(--text);">${esc(k)}</kbd>
               <span class="u-text-dim">${esc(desc)}</span>
             </div>
           `).join('')}
-        </div>
-        <div style="margin-top:var(--space-4);padding-top:var(--space-4);border-top:1px solid var(--border);font-size:11px;color:var(--text-dim2);text-align:center;">
-          Press <kbd style="background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-xs);padding:1px 5px;font-family:monospace;font-size:10px;">?</kbd> any time to show this overlay.
         </div>
       </div>`;
     document.body.appendChild(overlay);
@@ -30396,22 +30390,15 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     setInterval(_updateFooterLastUpdate, 60 * 1000);   // refresh label every min
     window._updateFooterLastUpdate = _updateFooterLastUpdate;
 
-    // Keyboard shortcuts: /, ←/→, 1-9, B
+    let _gSeq = false;
     document.addEventListener('keydown', (e) => {
-      const target = e.target;
-      const typing = target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable);
-      // "/" focuses search — allowed only when not typing
-      if (e.key === '/' && !typing) {
-        const searchInput = document.getElementById('search');
-        if (searchInput) { e.preventDefault(); searchInput.focus(); searchInput.select(); }
-        return;
-      }
-      // Escape closes sidebar drawer on mobile
-      if (e.key === 'Escape' && document.body.classList.contains('sidebar-open')) {
-        document.body.classList.remove('sidebar-open'); return;
-      }
+      const t = e.target, typing = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable);
+      const go = p => { const b = document.querySelector(`.page-btn[data-page="${p}"]`); if (b) { e.preventDefault(); b.click(); } };
+      if (e.key === '/' && !typing) { const s = document.getElementById('search'); if (s) { e.preventDefault(); s.focus(); s.select(); } return; }
+      if (e.key === 'Escape' && document.body.classList.contains('sidebar-open')) { document.body.classList.remove('sidebar-open'); return; }
       if (typing) return;
-      // Arrows: navigate day
+      if (e.key === 'g') { _gSeq = true; setTimeout(() => { _gSeq = false; }, 900); return; }
+      if (_gSeq) { _gSeq = false; const m = {h:'dashboard',t:'tous',m:'performance',e:'academie',p:'profil'}[String(e.key).toLowerCase()]; if (m) return go(m); }
       if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
         const keys = Object.keys((window.PRONOSTICS_DATA || {}).days || {}).sort();
         if (!keys.length) return;
@@ -30425,12 +30412,26 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         if (dateInput) dateInput.value = currentDate;
         render();
       }
-      // B — jump to Bilan page
       if ((e.key === 'b' || e.key === 'B')) {
-        const btn = document.querySelector('.page-btn[data-page="bilan"]');
-        if (btn) { e.preventDefault(); btn.click(); }
+        e.preventDefault();
+        const key = 'paris_sportif_focus_big_bets_v1';
+        const on = localStorage.getItem(key) !== '1';
+        try { localStorage.setItem(key, on ? '1' : '0'); } catch(_) {}
+        go('dashboard');
       }
-      // 1-9 — switch to league tab
+      if (e.key === 'j' || e.key === 'k') {
+        const cards = [...document.querySelectorAll('.bbf-card,.tous-row,.hist-pick-row,[data-match-id]')].filter(x => x.offsetParent);
+        if (cards.length) {
+          e.preventDefault();
+          let i = cards.indexOf(document.activeElement);
+          i = Math.max(0, Math.min(cards.length - 1, i + (e.key === 'j' ? 1 : -1)));
+          if (!cards[i].hasAttribute('tabindex')) cards[i].tabIndex = 0;
+          cards[i].focus({ preventScroll: true }); cards[i].scrollIntoView({ block: 'center', behavior: 'smooth' });
+        }
+      }
+      if (e.key === 'Enter' && document.activeElement?.matches?.('.bbf-card,.tous-row,.hist-pick-row,[data-match-id]')) {
+        e.preventDefault(); document.activeElement.click();
+      }
       if (e.key >= '1' && e.key <= '9') {
         const tabs = document.querySelectorAll('nav.tabs button');
         const idx = parseInt(e.key, 10) - 1;
