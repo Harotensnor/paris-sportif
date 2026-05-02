@@ -581,3 +581,11 @@
 - Impact: conformité et transparence visibles sur toutes les pages PWA
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.74 (2026-05-02 11:42 UTC)
+- Chantier: P-6.1 audit visuel total
+- Avant: aucun registre Phase 6 des bugs visuels
+- Après: 32 captures baseline + `ISSUES.md` avec 14 bugs classés
+- Impact: zéro overflow/runtime, mais 6 HIGH à corriger en priorité
+- Commit: pending
+- Status: ✅ DONE
