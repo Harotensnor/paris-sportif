@@ -85,6 +85,26 @@ def _count_clv(d):
         'sample_status': s.get('sample_status') or 'learning',
     }
 
+def _count_footballdata(d):
+    if not isinstance(d, dict):
+        return None
+    matches = d.get('matches')
+    rows = d.get('rows')
+    league_calibration = d.get('league_calibration') or {}
+    seasons = d.get('seasons_loaded') or []
+    if isinstance(matches, dict):
+        row_count = len(matches)
+    elif isinstance(rows, list):
+        row_count = len(rows)
+    else:
+        row_count = 0
+    return {
+        'rows': row_count,
+        'matches': len(matches) if isinstance(matches, dict) else 0,
+        'leagues': len(league_calibration) if isinstance(league_calibration, dict) else 0,
+        'seasons': len(seasons) if isinstance(seasons, list) else 0,
+    }
+
 SOURCES = [
     ('winamax_catalog', 'winamax_catalog.json', _count_winamax_catalog),
     ('winamax_markets', 'winamax_markets.json', _count_winamax_markets),
@@ -108,7 +128,7 @@ SOURCES = [
             if isinstance(d, dict) else 0
         ),
     }),
-    ('footballdata',    'footballdata.json',    lambda d: {'rows': len(d.get('rows') or []) if isinstance(d, dict) else 0}),
+    ('footballdata',    'footballdata.json',    _count_footballdata),
     ('clv_history',     'clv_history.json',     _count_clv),
 ]
 
