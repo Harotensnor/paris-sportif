@@ -273,6 +273,47 @@ def build_outputs(state: dict) -> tuple[dict, dict]:
     return catalog, markets
 
 
+def merge_existing_detailed_markets(markets: dict) -> tuple[dict, int]:
+    """Preserve per-match detailed markets when refreshing the catalog.
+
+    The catalog endpoint is cheap and runs every tick, but it only exposes the
+    main market (1N2 / winner). The per-match detail fetcher runs less often.
+    Without this merge, every catalog refresh erases the detailed markets until
+    the next detail cadence, which makes the live site oscillate between rich
+    and 1N2-only coverage.
+    """
+    if not OUT_MARKETS.exists():
+        return markets, 0
+    try:
+        previous = json.loads(OUT_MARKETS.read_text(encoding='utf-8'))
+    except Exception:
+        return markets, 0
+    previous_matches = previous.get('matches') or {}
+    current_matches = markets.get('matches') or {}
+    preserved = 0
+    for mid, current in current_matches.items():
+        prev = previous_matches.get(str(mid))
+        if not isinstance(prev, dict) or not isinstance(current, dict):
+            continue
+        prev_odds = prev.get('odds') or {}
+        cur_odds = current.setdefault('odds', {})
+        if not isinstance(prev_odds, dict) or not isinstance(cur_odds, dict):
+            continue
+        copied = 0
+        for key, value in prev_odds.items():
+            if key == '1n2' or key in cur_odds:
+                continue
+            cur_odds[key] = value
+            copied += 1
+        if copied:
+            preserved += 1
+            if prev.get('details_fetched_at'):
+                current['details_fetched_at'] = prev.get('details_fetched_at')
+            if prev.get('details_source'):
+                current['details_source'] = prev.get('details_source')
+    return markets, preserved
+
+
 def main() -> int:
     # AUDIT-2026-04-27 (Sprint 39 #31) — Adoption logger structuré.
     try:
@@ -286,6 +327,7 @@ def main() -> int:
         log('fetch_winamax_catalog', 'error', 'no matches retrieved, keeping previous files unchanged')
         return 1
     catalog, markets = build_outputs(state)
+    markets, preserved_details = merge_existing_detailed_markets(markets)
     n_tourns = len(catalog['tournaments'])
     n_matches = sum(len(t['matches']) for t in catalog['tournaments'])
     n_markets = len(markets['matches'])
@@ -297,6 +339,8 @@ def main() -> int:
     print(f'  catalog: {n_tourns} tournaments, {n_matches} matches', flush=True)
     print(f'  by sport: {by_sport}', flush=True)
     print(f'  markets: {n_markets} matches with 1N2 odds', flush=True)
+    if preserved_details:
+        print(f'  preserved detailed markets: {preserved_details} matches', flush=True)
     # Sanity guard : Winamax sometimes returns 200 with a partial PRELOADED_STATE
     # (Cloudflare soft-block, preloader not yet hydrated). The result is a
     # valid but near-empty catalog that, when written, erases a healthy one
