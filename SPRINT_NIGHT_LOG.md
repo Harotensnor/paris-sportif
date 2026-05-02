@@ -216,6 +216,14 @@
 - Commit: pending
 - Status: ✅ DONE
 
+## Sprint v35.114 (2026-05-02 13:49 UTC)
+- Chantier: P-9.16 touch targets
+- Avant: plusieurs contrôles mobiles restaient sous 44px
+- Après: nav, chips, footer, filtres et CTA mobiles ont une cible minimale 44x44
+- Impact: a11y/tap UX renforcées sans densifier le desktop
+- Commit: pending
+- Status: ✅ DONE
+
 ## Sprint v35.111 (2026-05-02 13:51 UTC)
 - Chantier: P-8.15 révision page Legal
 - Avant: legal pouvait passer en thème clair et header mobile se chevauchait

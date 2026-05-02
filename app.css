@@ -5491,6 +5491,34 @@
     .site-footer {
       margin-bottom: var(--mobile-bottom-nav-h);
     }
+    /* P-9.16 — Touch targets mobiles.
+       Lighthouse signalait encore des boutons/liens sous 44px. On cible les
+       vrais contrôles d'interface, en évitant les mini-liens inline `padding:0`
+       intégrés dans des paragraphes. */
+    .mbn-btn,
+    .topbar-menu,
+    .scroll-top-fab,
+    .trust-strip-close,
+    .trust-strip-link,
+    .footer-link,
+    .footer-anj-link,
+    .footer-anj-pill-link,
+    .bbf-chip,
+    [data-tous-sport],
+    [data-tous-sort],
+    [data-tous-edge],
+    [data-tous-conf],
+    .page-btn:not(.hub-btn):not([style*="padding:0"]):not([style*="padding: 0"]) {
+      min-width: 44px;
+      min-height: 44px;
+    }
+    .footer-link,
+    .footer-anj-link,
+    .footer-anj-pill-link,
+    .trust-strip-link {
+      display: inline-flex;
+      align-items: center;
+    }
   }
 
   /* v31.2 — Audit UX accessibilité dynamique : respecter prefers-reduced-motion
