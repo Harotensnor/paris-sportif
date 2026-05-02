@@ -19663,6 +19663,26 @@
     const currentAccent = prefs.accent || 'default';
 
     const availableSports = ['football', 'tennis', 'basketball', 'hockey', 'baseball', 'rugby', 'mma'];
+    const favSportsLabel = favSports.length
+      ? favSports.slice(0, 4).map(s => `${sportEmoji(s)} ${s}`).join(' · ') + (favSports.length > 4 ? ` · +${favSports.length - 4}` : '')
+      : 'Aucun favori';
+    const themeLabel = currentTheme === 'light' ? 'Clair' : currentTheme === 'auto' ? 'Auto' : 'Sombre';
+    const profileSummaryHtml = `
+      <section aria-label="Réglages actifs" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin:0 0 16px;">
+        ${[
+          ['profile-bankroll', 'Bankroll', `${bankrollStart}€`, 'Base des mises suggérées'],
+          ['profile-odds', 'Cote min', `@${currentOddMin.toFixed(2)}`, 'Filtre par défaut'],
+          ['profile-appearance', 'Thème', themeLabel, 'Affichage actuel'],
+          ['profile-sports', 'Sports', favSportsLabel, 'Priorité accueil'],
+          ['profile-data', 'Données', 'Export / reset', 'Contrôle local'],
+        ].map(([id,label,value,hint]) => `
+          <button type="button" data-profile-jump="#${id}" style="min-height:64px;text-align:left;border:1px solid var(--border);border-radius:var(--r-lg);background:var(--panel);color:var(--text);padding:10px 12px;cursor:pointer;">
+            <span style="display:block;font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:900;">${esc(label)}</span>
+            <strong style="display:block;margin:2px 0;font-size:18px;color:var(--text);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(value)}</strong>
+            <em style="display:block;font-size:11px;color:var(--text-dim2);font-style:normal;">${esc(hint)}</em>
+          </button>
+        `).join('')}
+      </section>`;
 
     const sportsBtns = availableSports.map(s => {
       const active = favSports.includes(s);
@@ -19740,9 +19760,11 @@
           </div>
         </div>
 
+        ${profileSummaryHtml}
+
         <div class="profil-grid">
 
-          <div class="card-base">
+          <div class="card-base" id="profile-appearance">
             <h3 class="section-h3">🎨 Apparence</h3>
             <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">Choisis la couleur du site.</div>
             <div class="pref-pill-group">
@@ -19780,7 +19802,7 @@
             <div style="font-size:11px;color:var(--text-dim);margin-top:8px;">Débutant = explications + sécurité. Pro = chiffres bruts.</div>
           </div>
 
-          <div class="card-base">
+          <div class="card-base" id="profile-bankroll">
             <h3 class="section-h3">💰 Cagnotte ${(typeof helpDot === 'function') ? helpDot('Le total que tu consacres aux paris. <b>Conseil : commence avec un montant que tu peux perdre.</b> Le site calcule tes mises conseillées en % de ce total pour que tu tiennes long terme.') : ''}</h3>
             <label style="display:block;font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:600;margin-bottom:4px;">Cagnotte de départ (€)</label>
             <input id="pref-bankroll" type="number" min="1" step="1" value="${bankrollStart}" aria-label="Bankroll de départ en euros" style="width:150px;padding:10px 12px;font-size:15px;font-weight:700;background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);"/>
@@ -19789,7 +19811,7 @@
 
           ${bankrollSmartHtml}
 
-          <div class="card-base">
+          <div class="card-base" id="profile-odds">
             <h3 class="section-h3">🎯 Cote minimum</h3>
             <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;">
               <div style="font-size:12px;color:var(--text-dim);line-height:1.45;">Par défaut, l'accueil et les filtres cachent les micro-cotes. Objectif : moins de paris, mais plus de rendement.</div>
@@ -19827,7 +19849,7 @@
             </label>
           </div>
 
-          <div class="card-base">
+          <div class="card-base" id="profile-sports">
             <h3 class="section-h3">⚽ Sports favoris</h3>
             <div style="display:flex;flex-wrap:wrap;gap:8px;">${sportsBtns}</div>
             <div style="font-size:12px;color:var(--text-dim);margin-top:8px;">Les sports favoris seront priorisés dans le feed Accueil.</div>
@@ -19950,7 +19972,7 @@
               </div>`;
           })()}
 
-          <div class="card-base">
+          <div class="card-base" id="profile-data">
             <h3 class="section-h3">📤 Exports</h3>
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
               <button id="export-json-prefs" style="background:var(--panel-2);color:var(--text);border:1px solid var(--border);border-radius:var(--r);padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;">Exporter réglages (JSON)</button>
@@ -19985,6 +20007,12 @@
       const cur = (function(){ try { return JSON.parse(localStorage.getItem('userPrefs') || '{}') || {}; } catch(e) { return {}; } })();
       localStorage.setItem('userPrefs', JSON.stringify({ ...cur, ...partial }));
     }
+    wrap.querySelectorAll('[data-profile-jump]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = wrap.querySelector(btn.dataset.profileJump || '');
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
     // Phase 3 #9 : ajout 3-state dark/light/auto via prefers-color-scheme
     wrap.querySelectorAll('[data-theme-btn]').forEach(btn => {
       btn.addEventListener('click', () => {
