@@ -573,3 +573,11 @@
 - Impact: marché joueur mieux surfacé sans mélanger avec Big Bets principaux
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.73 (2026-05-02 11:22 UTC)
+- Chantier: P-5.29 footer disclosure
+- Avant: footer jeu responsable présent, indépendance Winamax moins explicite
+- Après: footer “indépendant · non affilié Winamax” + cotes indicatives + aucun auto-pari
+- Impact: conformité et transparence visibles sur toutes les pages PWA
+- Commit: pending
+- Status: ✅ DONE
