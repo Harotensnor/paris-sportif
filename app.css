@@ -6,6 +6,7 @@
        bordures plus visibles, hiérarchie plus claire. Bumpé bg-1 de #06070a
        (noir quasi pur) à #0a0c11 (légèrement plus chaud, mieux différencié). */
     --bg: #0a0c11;
+    --rg-height: 32px;
     --bg-2: #0e1117;
     --bg-3: #11141b;
     --panel: #11141b;
@@ -2235,12 +2236,29 @@
   body::before { content: none; }
 
   /* --- Topbar container --- */
+  .rg-risk-bar {
+    position: sticky; top: 0; z-index: 90;
+    min-height: var(--rg-height);
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 0 16px; box-sizing: border-box;
+    background: #030303; color: #fff; border-bottom: 1px solid #1f1f1f;
+    font-size: 11px; font-weight: 900; letter-spacing: .35px; line-height: 1.2;
+    text-align: center; text-transform: uppercase;
+  }
+  .rg-risk-bar a {
+    color: #fff; text-decoration: underline; text-underline-offset: 2px;
+    white-space: nowrap;
+  }
   header.topbar {
-    position: sticky; top: 0; z-index: 60;
+    position: sticky; top: var(--rg-height); z-index: 60;
     background: var(--header-bg);
     backdrop-filter: saturate(180%) blur(20px);
     -webkit-backdrop-filter: saturate(180%) blur(20px);
     border-bottom: 1px solid var(--border);
+  }
+  @media (max-width: 720px) {
+    :root { --rg-height: 38px; }
+    .rg-risk-bar { gap: 6px; padding: 4px 10px; font-size: 9px; flex-wrap: wrap; }
   }
   .topbar-inner {
     max-width: 1400px; margin: 0 auto;

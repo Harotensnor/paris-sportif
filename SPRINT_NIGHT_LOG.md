@@ -517,3 +517,11 @@
 - Impact: 0 hub secondaire sans feedback; smoke E2E vert, drift OK
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.66 (2026-05-02 09:24 UTC)
+- Chantier: P-5.1 banderole jeu responsable
+- Avant: prévention surtout en footer, pas de bandeau bookmaker visible au premier écran
+- Après: banderole sticky 32/38px “Jouer comporte des risques” + lien téléphone 09-74-75-13-13
+- Impact: conformité plus visible, style inspiré bookmaker; visual diff `16.38%` attendu par ajout top-bar
+- Commit: pending
+- Status: ✅ DONE
