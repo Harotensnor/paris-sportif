@@ -1207,3 +1207,9 @@
 - Après: audit 375x667 = 8/8 pages PASS, overlap bottom nav = 0.
 - Impact: issue marquée FIXED, rapport phase10_bottom_nav_audit.json ajouté.
 - Vérif: mobile_bottom_nav_audit PASS.
+
+## Sprint v35.154 — Phase 10 P-10.2 buteurs lisibles (18:15 UTC)
+- Avant: P6-VIS-004 PARTIAL, noms joueurs encore ellipsés sur cartes étroites.
+- Après: grille buteurs min 330px, colonne nom min 140px, noms sur 2 lignes.
+- Impact: dashboard desktop/wide = 4 cartes visibles, largeur nom 241-273px.
+- Vérif: scorer layout audit + bundle check PASS.
