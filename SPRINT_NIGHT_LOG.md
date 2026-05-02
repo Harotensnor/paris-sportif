@@ -1369,3 +1369,9 @@
 - Après: la modale montre les 3 contributeurs majeurs avec barres et delta en points.
 - Impact: Théo comprend vite ce qui pousse réellement le pick.
 - Vérif: phase10_feature_importance_audit.json, 3 barres rendues, 0 erreur console.
+
+## Sprint v35.181 — Phase 10 P-10.28 Biais ligue Brier (21:38 UTC)
+- Avant: une ligue historiquement mal calibrée pouvait encore sortir en pick fort.
+- Après: si Brier ligue > 0.25 avec n≥20, fiabilité pénalisée et raison visible.
+- Impact: les Big Bets sont automatiquement dépriorisés sur ligues peu fiables.
+- Vérif: phase10_league_bias_audit.json, Brier 0.32 → fiabilité -4.8pt, raison OK.
