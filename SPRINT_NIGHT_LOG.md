@@ -565,3 +565,11 @@
 - Impact: 12 events smart_money détectés dans data.js; signal fort visible dès le scan
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.72 (2026-05-02 11:15 UTC)
+- Chantier: P-5.5 top buteurs Accueil
+- Avant: données buteurs probables peu visibles dans le flux Big Bets
+- Après: section cartes “Joueurs chauds” avec photo Sofascore, proba et lien Winamax
+- Impact: marché joueur mieux surfacé sans mélanger avec Big Bets principaux
+- Commit: pending
+- Status: ✅ DONE

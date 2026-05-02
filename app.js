@@ -14727,6 +14727,7 @@
               arr.push({
                 name: s.name, captain: !!s.captain, pos: s.pos || '',
                 prob: s.prob, impliedOdd: s.impliedOdd, teamName: s.teamName,
+                pid: s.pid || null,
                 homeName: homeC.name || '?', awayName: awayC.name || '?',
                 ts, mId: m.id,
                 url: m.winamax && m.winamax.url || null,
@@ -15782,6 +15783,18 @@
             <i class="${strength.cls}">${strength.heat} +${(p.edge * 100).toFixed(1)}%</i>
           </button>`;
       };
+      const bbfScorerCard = (s) => {
+        const img = s.pid ? `<img src="https://img.sofascore.com/api/v1/player/${esc(String(s.pid))}/image" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'">` : '<span></span>';
+        const odd = s.impliedOdd ? `@${Number(s.impliedOdd).toFixed(2)}` : 'cote à vérifier';
+        const href = s.url ? (/^https?:/i.test(String(s.url)) ? String(s.url) : `https://www.winamax.fr${String(s.url)}`) : '';
+        return `<article class="bbf-scorer" data-match-id="${esc(String(s.mId || ''))}">
+          ${img}
+          <div><strong>${esc(s.name)}${s.captain ? ' ©' : ''}</strong><span>${esc(s.teamName || '')} · ${esc(s.pos || 'Attaque')}</span></div>
+          <b>${Math.round(Number(s.prob || 0) * 100)}%</b>
+          <em>${esc(odd)}</em>
+          ${href ? `<a href="${esc(href)}" target="_blank" rel="noopener">Winamax →</a>` : `<button type="button" data-big-detail="${esc(String(s.mId || ''))}">Détail</button>`}
+        </article>`;
+      };
       const bbfEmpty = `
         <section class="bbf-empty bbf-empty--friendly">
           <div class="es-illustration" aria-hidden="true">🧘</div>
@@ -15831,6 +15844,17 @@
             </div>
             ${_dataIsStale ? bbfEmpty : (bbfBigBets.length ? `<div class="bbf-grid bbf-grid--hero">${bbfBigBets.map(p => bbfCard(p, 'hero')).join('')}</div>` : bbfEmpty)}
           </section>
+
+          ${scorersToday.length ? `<section class="bbf-section bbf-scorers-section">
+            <div class="bbf-section__head">
+              <div>
+                <span>Top buteurs · Winamax à vérifier</span>
+                <h2>Joueurs chauds</h2>
+              </div>
+              <button type="button" class="page-btn" data-page="tous">Voir les matchs →</button>
+            </div>
+            <div class="bbf-scorers">${scorersToday.slice(0, 6).map(bbfScorerCard).join('')}</div>
+          </section>` : ''}
 
           <section class="bbf-section">
             <div class="bbf-section__head">
