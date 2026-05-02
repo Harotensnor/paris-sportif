@@ -10080,10 +10080,67 @@
     ` : '';
 
     const body = document.getElementById('detail-body');
+    const whyBest = (() => {
+      try { return (typeof _agentBestPick === 'function') ? _agentBestPick(match, pred) : null; }
+      catch(e) { return null; }
+    })();
+    const whyOdd = Number(whyBest?.odd || (pred?.odds && pred?.pick ? (pred.pick.key === '1' ? pred.odds.home : pred.pick.key === '2' ? pred.odds.away : pred.odds.draw) : 0) || 0);
+    const whyRel = Number(whyBest?.rel || pred?.reliability || pred?.pick?.prob || 0);
+    const whyEdge = whyOdd > 1 ? whyRel - 1 / whyOdd : 0;
+    const whyEv = whyRel && whyOdd ? whyRel * whyOdd - 1 : 0;
+    const whyLabel = whyBest?.label || pred?.pick?.label || 'Pari conseillé';
+    const whyStake = (() => {
+      try {
+        const bankroll = Number(localStorage.getItem('userBankroll') || 50) || 50;
+        const kRaw = (typeof kellyFraction === 'function') ? kellyFraction(whyRel, whyOdd, 0.25) : 0;
+        const capped = whyBest?.investment && isFinite(whyBest.investment.cappedKelly) ? Math.min(kRaw, whyBest.investment.cappedKelly) : kRaw;
+        return Math.max(1, Math.round(bankroll * Math.max(0, Math.min(0.06, capped || 0))));
+      } catch(e) { return 1; }
+    })();
+    const whyReasons = (() => {
+      const arr = [];
+      if (whyOdd > 1 && whyRel > 0) {
+        arr.push(`Le marché demande ${Math.round((1 / whyOdd) * 100)}% de réussite, notre modèle voit ${Math.round(whyRel * 100)}%.`);
+      }
+      if (whyEdge > 0) {
+        arr.push(`La cote est ${whyEdge >= 0.08 ? 'nettement' : 'légèrement'} au-dessus de notre prix juste : +${(whyEdge * 100).toFixed(1)}% mieux que le marché.`);
+      }
+      (pred?.explain?.reasons || [])
+        .filter(r => r && r.text)
+        .slice(0, 3)
+        .forEach(r => arr.push(String(r.text)));
+      if (whyBest?.investment?.score) arr.push(`Qualité du signal : ${Math.round(whyBest.investment.score)}/100.`);
+      return arr.slice(0, 5);
+    })();
+    const whyWinamaxHref = buildWinamaxLink(match);
+    const whyWinamaxCta = match?.winamax?.match_id
+      ? `<a class="why-bet__winamax" href="${esc(whyWinamaxHref)}" target="_blank" rel="noopener" data-modal-winamax-click>Placer chez Winamax →</a>`
+      : '<span class="why-bet__disabled">Cote non liée Winamax</span>';
+    const whyHtml = `
+      <section class="why-bet" aria-labelledby="why-bet-title">
+        <div class="why-bet__eyebrow">Pourquoi ce pari ?</div>
+        <div class="why-bet__grid">
+          <div>
+            <h3 id="why-bet-title">${esc(whyLabel)} ${whyOdd ? `<span>@${whyOdd.toFixed(2)}</span>` : ''}</h3>
+            <p>${whyEdge > 0 ? `+${(whyEdge * 100).toFixed(1)}% mieux que le marché` : 'Pas assez de value claire'} · ${whyEv >= 0 ? '+' : ''}${Math.round(whyEv * 100)}% attendu par euro misé.</p>
+          </div>
+          <div class="why-bet__stake">
+            <span>Mise suggérée</span>
+            <strong>${whyStake}€</strong>
+            <em>Kelly protégé</em>
+          </div>
+        </div>
+        ${whyReasons.length ? `<ol>${whyReasons.map(r => `<li>${esc(r)}</li>`).join('')}</ol>` : '<p class="why-bet__muted">Le modèle conseille d’ouvrir les détails techniques avant de décider.</p>'}
+        <footer>
+          ${whyWinamaxCta}
+          <button type="button" class="why-bet__tech" data-why-tech-toggle>Voir les détails techniques</button>
+        </footer>
+      </section>`;
     // v32.9 — Tab strip retirée (doublon avec md-tabs existant qui filtre
     // les sections). Le système .md-tab (data-mtab-toggle) en aval gère
     // déjà : Synthèse / Cotes / Risques / Transparence / Stats / H2H.
     body.innerHTML = `
+      ${whyHtml}
       <div class="teams-big">
         <div class="side">
           ${home?.logo ? `<img src="${esc(home.logo)}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'">` : ''}
@@ -11957,6 +12014,17 @@
     // Upgrade de la sticky anchor nav (v31.7.89) vers de vrais onglets qui
     // masquent les sections non actives. Démarre sur "Synthèse" par défaut.
     // Catégorisation par mots-clés dans le h4 (mapping ci-dessous).
+    body.querySelectorAll('[data-modal-winamax-click]').forEach(a => {
+      a.addEventListener('click', () => trackWinamaxClick(match, a.href));
+    });
+    const whyTechBtn = body.querySelector('[data-why-tech-toggle]');
+    if (whyTechBtn) {
+      whyTechBtn.addEventListener('click', () => {
+        const tabs = body.querySelector('.md-tabs');
+        if (tabs) tabs.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+
     // Sprint 2 #10 — Deep linking : ?tab=cotes dans l'URL ou hash
     // #match/123/cotes ouvre directement le bon onglet (partage de lien).
     (function injectModalTabs() {
@@ -11999,6 +12067,8 @@
         tabSections[c].push(sec);
       });
       // Header (teams-big) toujours visible (avant nav)
+      const whyBlock = body.querySelector('.why-bet');
+      if (whyBlock) whyBlock.setAttribute('data-mtab-always', 'true');
       const header = body.querySelector('.teams-big');
       if (header) header.setAttribute('data-mtab-always', 'true');
       // Ne montrer les chips que pour les catégories non vides
@@ -12016,7 +12086,7 @@
       nav.setAttribute('role', 'tablist');
       nav.setAttribute('aria-label', 'Onglets du détail match');
       nav.innerHTML = chipsHtml;
-      body.insertBefore(nav, body.firstChild);
+      body.insertBefore(nav, whyBlock ? whyBlock.nextSibling : body.firstChild);
       // Toggle helper — masque toutes les sections sauf data-mtab=active
       const setActive = (target) => {
         nav.querySelectorAll('.md-tab').forEach(b => {
