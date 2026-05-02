@@ -87,8 +87,8 @@ FETCH_STAGES = [
 # light enrichments instead of 12 separate patch_* invocations.
 PATCH_STAGES = [
     ('patch_odds.py',               1,   60),
-    ('patch_winamax.py',            1,   30),
     ('patch_sofascore_events.py',   1,   30),
+    ('patch_winamax.py',            1,   30),
     ('patch_winamax_markets.py',    1,   30),
     ('patch_all_quick.py',          1,   30),
     ('patch_understat_xg.py',       1,   30),

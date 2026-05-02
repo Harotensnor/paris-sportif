@@ -273,3 +273,11 @@
 - Impact: marge CI OK (<60s), top-up plus agressif à chaque refresh sans warning Santé; prochaine amélioration utile = détecter explicitement les pages “1N2 only”
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.36 (2026-05-02 05:46 UTC)
+- Chantier: P-A7 ordre pipeline Winamax exact
+- Avant: le cron réintroduisait Sofascore après `patch_winamax.py`, ce qui ramenait `3234` events et `winamax_exact_ratio=29.9%`
+- Après: ordre local/prod corrigé (`patch_sofascore_events.py` puis `patch_winamax.py`); dataset final `408/408` exacts, `340` events >1N2, Santé `0` warning
+- Impact: le contrat “aucun pari sans cote Winamax exacte” tient aussi après cron; smoke E2E vert (`1303` marchés scorés / `48` matchs exacts 48h)
+- Commit: pending
+- Status: ✅ DONE
