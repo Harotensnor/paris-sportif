@@ -1069,3 +1069,11 @@
 - Impact: garde-fou renforcé contre les contradictions inter-marchés
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.135 (2026-05-02 15:29 UTC)
+- Chantier: P-9.63 flow Big Bet → modal → Winamax → track
+- Avant: aucun audit E2E conversion; cards Big Bets non câblées pour "J'ai parié"
+- Après: audit navigateur 3 étapes, 0 failure; CTA Winamax tracké et pari user stocké
+- Impact: chemin principal de conversion vérifié de bout en bout
+- Commit: pending
+- Status: ✅ DONE
