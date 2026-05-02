@@ -241,3 +241,11 @@
 - Impact: le modèle foot récupère enfin un signal xG pré-match exploitable (`0 → 95` events enrichis), avec compatibilité `fbref_xg.json` pour les patchers existants
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.32 (2026-05-02 05:36 UTC)
+- Chantier: P-A6 arbitres Sofascore
+- Avant: `night_metrics.events.referee=9`, `health.sources.referees_soccer.age_min=1296`, patch limité aux top-5 ligues
+- Après: fetcher force/debug/pagination 96h, ligues top-5 + tier2 + coupes UEFA; collecte `101` matchs avec arbitre; patch couvre `47` events dans `data.js`
+- Impact: signal arbitre multiplié x5.2 (`9 → 47`), warning stale supprimé, Santé descend à 2 warnings; smoke E2E vert avec `1364` marchés scorés sur 48h
+- Commit: pending
+- Status: ✅ DONE

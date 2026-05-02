@@ -32,7 +32,12 @@ DATA_JS = ROOT / 'data.js'
 HTML = ROOT / 'pronostics.html'
 REFS = ROOT / 'referees_soccer.json'
 
-SOCCER_LEAGUES = {'eng.1', 'esp.1', 'ger.1', 'ita.1', 'fra.1'}
+SOCCER_LEAGUES = {
+    'eng.1', 'esp.1', 'ger.1', 'ita.1', 'fra.1',
+    'ned.1', 'por.1', 'tur.1', 'bel.1', 'sco.1',
+    'eng.2', 'esp.2', 'ita.2', 'ger.2', 'fra.2',
+    'uefa.champions', 'uefa.europa', 'uefa.europa.conf',
+}
 
 
 def parse_names(ev_name: str) -> tuple[str, str]:
@@ -43,6 +48,13 @@ def parse_names(ev_name: str) -> tuple[str, str]:
     if len(parts) != 2:
         return ('', '')
     return (parts[0].strip(), parts[1].strip())
+
+
+def _side_name(ev: dict, side: str) -> str:
+    for c in ev.get('competitors') or []:
+        if c.get('home_away') == side:
+            return c.get('name') or c.get('displayName') or c.get('shortDisplayName') or ''
+    return ''
 
 
 def main() -> int:
@@ -74,7 +86,10 @@ def main() -> int:
                 continue
             if ev.get('completed'):
                 continue
-            away_name, home_name = parse_names(ev.get('name') or '')
+            home_name = _side_name(ev, 'home')
+            away_name = _side_name(ev, 'away')
+            if not (home_name and away_name):
+                away_name, home_name = parse_names(ev.get('name') or '')
             if not (home_name and away_name):
                 continue
             scanned += 1
@@ -87,9 +102,13 @@ def main() -> int:
                 continue
             ev['referee'] = {
                 'name': ref.get('name'),
+                'country': ref.get('country'),
                 'yellowPerGame': ref.get('yellowPerGame'),
                 'redPerGame': ref.get('redPerGame'),
+                'cardsPerGame': ref.get('cardsPerGame') or ref.get('yellowPerGame'),
                 'games': ref.get('games'),
+                'league_code': entry.get('league_code'),
+                'sofa_event_id': entry.get('sofa_event_id'),
             }
             patched += 1
 

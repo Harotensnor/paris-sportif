@@ -31,6 +31,7 @@ from __future__ import annotations
 import json
 import sys
 import time
+import argparse
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
@@ -47,6 +48,7 @@ from winamax_map import _norm
 OUT = Path(__file__).resolve().parent.parent / 'referees_soccer.json'
 API = 'https://api.sofascore.com/api/v1'
 STALE_H = 2  # v31.7.2 : 2h (avant 6h — coverage referee 8% trop faible)
+DEBUG = False
 
 # v31.7.60 — Extension tier 2 (audit V2 #11), aligné avec
 # fetch_injuries_soccer + fetch_lineups_soccer.
@@ -68,6 +70,10 @@ LEAGUES: dict[str, int] = {
     'ita.2': 24,
     'ger.2': 44,
     'fra.2': 182,
+    # Europe cups. Referee assignments are often published earlier here.
+    'uefa.champions': 7,
+    'uefa.europa': 679,
+    'uefa.europa.conf': 17015,
 }
 
 
@@ -82,6 +88,8 @@ def _get(url: str) -> dict | None:
         print(f'  [rate-limit] Sofascore 429 on {url}', flush=True)
         return None
     if r.status_code in (404, 403):
+        if DEBUG:
+            print(f'  [debug] HTTP {r.status_code} on {url}', flush=True)
         return None
     if r.status_code != 200:
         print(f'  HTTP {r.status_code} on {url}', flush=True)
@@ -148,36 +156,45 @@ def referee_for_event(event_id: int) -> dict | None:
     ref = ev.get('referee')
     if not ref or not ref.get('name'):
         return None
+    country = ref.get('country') or {}
     games = ref.get('games') or 0
     if games <= 0:
         return {
             'name': ref.get('name'),
+            'country': country.get('name'),
             'yellowPerGame': None,
             'redPerGame': None,
+            'cardsPerGame': None,
             'games': 0,
         }
     yellow = (ref.get('yellowCards') or 0) + (ref.get('yellowRedCards') or 0)
     red = ref.get('redCards') or 0
+    cards = yellow + red
     return {
         'name': ref.get('name'),
+        'country': country.get('name'),
         'yellowPerGame': round(yellow / games, 2),
         'redPerGame': round(red / games, 3),
+        'cardsPerGame': round(cards / games, 2),
         'games': games,
     }
 
 
-def collect() -> dict:
+def collect(selected_leagues: set[str] | None = None, pages: int = 3,
+            hours_ahead: int = 96) -> dict:
     t0 = time.time()
     print(f'[{datetime.now():%H:%M:%S}] Sofascore soccer referees scrape', flush=True)
     events: dict[str, dict] = {}
     totals = {'leagues': 0, 'fixtures': 0, 'with_ref': 0, 'misses': 0}
 
     for code, tid in LEAGUES.items():
+        if selected_leagues and code not in selected_leagues:
+            continue
         season_id = current_season_id(tid)
         if not season_id:
             print(f'  {code}: no season found, skipping', flush=True)
             continue
-        fixtures = upcoming_fixtures(tid, season_id, pages=2)
+        fixtures = upcoming_fixtures(tid, season_id, pages=pages, hours_ahead=hours_ahead)
         print(f'  {code} (tid={tid}): {len(fixtures)} upcoming', flush=True)
         totals['leagues'] += 1
         totals['fixtures'] += len(fixtures)
@@ -208,16 +225,28 @@ def collect() -> dict:
           f'{totals["fixtures"]} fixtures, {totals["with_ref"]} w/ referee '
           f'({totals["misses"]} misses, {elapsed:.1f}s)', flush=True)
     return {
-        'generated_at': datetime.now(timezone.utc).isoformat(),
+        'generated_at': datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace('+00:00', 'Z'),
         'events': events,
+        'stats': totals,
     }
 
 
 def main() -> int:
-    if is_fresh(OUT):
+    global DEBUG
+    ap = argparse.ArgumentParser(description='Fetch Sofascore soccer referees.')
+    ap.add_argument('--debug', action='store_true')
+    ap.add_argument('--force', action='store_true')
+    ap.add_argument('--top-leagues', default='', help='comma-separated league codes to fetch')
+    ap.add_argument('--hours-ahead', type=int, default=96, help='upcoming window')
+    ap.add_argument('--pages', type=int, default=3, help='Sofascore pagination depth per league')
+    args = ap.parse_args()
+    DEBUG = bool(args.debug)
+    if not args.force and is_fresh(OUT):
         print(f'[fetch_referees] {OUT.name} is fresh (<{STALE_H}h), skipping')
         return 0
-    data = collect()
+    selected = {x.strip() for x in args.top_leagues.split(',') if x.strip()} or None
+    data = collect(selected_leagues=selected, pages=max(1, args.pages),
+                   hours_ahead=max(1, args.hours_ahead))
     if not data.get('events'):
         print('[fetch_referees] no referees collected — not overwriting existing file')
         return 1
