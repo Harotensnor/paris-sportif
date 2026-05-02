@@ -14,7 +14,7 @@ script complète en hittant les pages match top-priorité (foot top-5
 ligues européennes + Ligue 1/2 + UEFA + ~15 ligues clés).
 
 Cap : per-sport quotas + global cap to stay inside GitHub Actions. Matches
-inside 48h are scraped first, then the rest of the 7-day horizon.
+inside 72h are scraped first, then the rest of the 7-day horizon.
 
 Output : merge dans winamax_markets.json (ne touche pas aux 1N2 déjà
 captés par fetch_winamax_markets.py, ajoute juste les markets étendus).
@@ -42,18 +42,18 @@ MARKETS = ROOT / 'winamax_markets.json'
 DATA_JS = ROOT / 'data.js'
 
 CACHE_TTL_HOURS = float(os.environ.get('WINAMAX_DETAILS_TTL_HOURS', '1'))
-GLOBAL_CAP = int(os.environ.get('WINAMAX_DETAILS_CAP', '220'))
+GLOBAL_CAP = int(os.environ.get('WINAMAX_DETAILS_CAP', '260'))
 SLEEP_SECONDS = float(os.environ.get('WINAMAX_DETAILS_SLEEP', '0.25'))
 DEBUG = False
 
 SPORT_QUOTAS = {
-    'football': 110,
-    'tennis': 40,
-    'basketball': 35,
-    'baseball': 25,
-    'hockey': 20,
-    'mma': 10,
-    'americanfootball': 5,
+    'football': 150,
+    'tennis': 55,
+    'basketball': 45,
+    'baseball': 35,
+    'hockey': 30,
+    'mma': 15,
+    'americanfootball': 10,
 }
 
 SPORT_PRIORITY = {
@@ -405,11 +405,11 @@ def _select_priority_matches(existing_markets: dict, data_js_data: dict) -> list
     - Match exact Winamax dans un sport supporté
     - Cache < 4h → skip
     - Match upcoming (kick-off > now)
-    - Horizon 7j, priorité <48h
+    - Horizon 7j, priorité <72h
     """
     now_utc = datetime.now(timezone.utc)
     cutoff = now_utc - timedelta(hours=CACHE_TTL_HOURS)
-    hot_horizon = now_utc + timedelta(hours=48)
+    hot_horizon = now_utc + timedelta(hours=72)
     horizon = now_utc + timedelta(days=7)
 
     quotas = dict(SPORT_QUOTAS)

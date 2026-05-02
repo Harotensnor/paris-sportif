@@ -693,3 +693,11 @@
 - Impact: focus “gros gain mais value” plus clair; captures v35-87 OK
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.88 (2026-05-02 13:31 UTC)
+- Chantier: P-6.17 marchés détaillés Winamax
+- Avant: top-up standard cap 80, cadence 15min cap 160, priorité <48h
+- Après: top-up cap 150, cadence 15min cap 220, quotas sport élargis, priorité <72h
+- Impact: couverture détaillée doit grimper plus vite vers 400+ events
+- Commit: pending
+- Status: ✅ DONE

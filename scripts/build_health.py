@@ -373,7 +373,7 @@ def _scan_data_quality():
         'winamax_exact_ratio': winamax_exact_ratio,
         'winamax_detailed_ratio': winamax_detailed_ratio,
         'winamax_detail_gap_to_target': round(max(0, 0.50 - (winamax_detailed_ratio or 0)), 3),
-        'winamax_detail_fetch_cap_reco': 160 if (winamax_detailed_ratio or 0) < 0.25 else 90 if (winamax_detailed_ratio or 0) < 0.50 else 45,
+        'winamax_detail_fetch_cap_reco': 220 if (winamax_detailed_ratio or 0) < 0.25 else 150 if (winamax_detailed_ratio or 0) < 0.50 else 90,
         'winamax_detail_status': 'ok' if (winamax_detailed_ratio or 0) >= 0.50 else 'topup' if (winamax_detailed_ratio or 0) >= 0.25 else 'urgent',
         'actionable_external_odds': actionable_external_odds,
         'football_invalid_form': football_invalid_form,

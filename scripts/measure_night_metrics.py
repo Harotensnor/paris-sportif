@@ -149,7 +149,7 @@ def main() -> int:
             "detailed_market_matches": detailed_market_matches,
             "detailed_ratio_vs_exact": detailed_ratio_vs_exact,
             "gap_to_50pct_exact": round(max(0, 0.50 - detailed_ratio_vs_exact), 4),
-            "recommended_detail_fetch_cap": 160 if detailed_ratio_vs_exact < 0.25 else 90 if detailed_ratio_vs_exact < 0.50 else 45,
+            "recommended_detail_fetch_cap": 220 if detailed_ratio_vs_exact < 0.25 else 150 if detailed_ratio_vs_exact < 0.50 else 90,
             "detail_by_sport": dict(sorted(detailed_by_sport.items())),
             "market_family_counts": dict(sorted(market_family_counts.items(), key=lambda kv: kv[1], reverse=True)[:20]),
         },
