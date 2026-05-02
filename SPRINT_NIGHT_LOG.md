@@ -281,3 +281,11 @@
 - Impact: le contrat “aucun pari sans cote Winamax exacte” tient aussi après cron; smoke E2E vert (`1303` marchés scorés / `48` matchs exacts 48h)
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.37 (2026-05-02 05:53 UTC)
+- Chantier: P-B2 decay forme par sport
+- Avant: `formScore()` appliquait un decay fixe `0.75` à tous les sports, donc une L10 NBA/MLB était traitée comme une fenêtre foot
+- Après: decay sport-aware (`football=.75`, `basketball=.65`, `baseball=.55`, `hockey=.70`, `tennis=.50`) sur forme et momentum; backtest courant `491` picks, Brier `0.2291`, ROI flat `+0.96%`
+- Impact: calendrier rapide moins surpondéré, signal forme plus frais pour basket/baseball/tennis; smoke E2E vert après rebase cron (`1252` marchés scorés / `44` matchs exacts 48h)
+- Commit: pending
+- Status: ✅ DONE
