@@ -566,25 +566,18 @@ def lookup(event):
     # Try catalog first. It returns None if no data available for this sport.
     cat_res = lookup_catalog(event)
     if cat_res is not None:
-        # v30 — Catalog gave a definitive answer? trust it. Catalog said
-        # available=True OR catalog said available=False with a STRONG signal
-        # ("match_not_in_listed_tournament" = explicit ESPN→Winamax tid mapping
-        # exists, tournament IS in catalog, this exact match isn't booked).
-        # In all other "weak" failure modes ("no_catalog_tournament_match",
-        # "tournament_in_catalog_but_match_not_listed") the catalog might just
-        # be partial — fall back to legacy heuristics (broad coverage so
-        # Théo doesn't lose betable matches that the scraper missed).
-        weak_notes = {'no_catalog_tournament_match',
-                      'tournament_in_catalog_but_match_not_listed'}
-        if cat_res['available'] or cat_res.get('note') not in weak_notes:
-            return {
-                'available': cat_res['available'],
-                'url': cat_res['url'],
-                'note': cat_res['note'],
-                'match_id': cat_res.get('match_id'),
-                'tournament': cat_res.get('tournament'),
-            }
-        # else: weak miss → fall through to legacy heuristics below.
+        # v35.34 — Value-bankroll contract: when the live catalog exists, a
+        # match is "available" only with an exact Winamax match_id. The legacy
+        # static fallback was useful for navigation, but it inflated coverage
+        # with tournament-only URLs and no actionable odd. Keep that fallback
+        # only for cold starts where the catalog is entirely unavailable.
+        return {
+            'available': cat_res['available'],
+            'url': cat_res['url'],
+            'note': cat_res['note'],
+            'match_id': cat_res.get('match_id'),
+            'tournament': cat_res.get('tournament'),
+        }
 
     sport = event.get('sport') or ''
     code = event.get('league_code') or ''

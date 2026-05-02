@@ -92,7 +92,7 @@ def main():
     # Also inline into pronostics.html
     # v33.28 — HTML rewrite déplacé dans scripts/inject_data_in_html.py
     # (1 seul appel à la fin du pipeline plutôt que 12 regex sur ~13500 lignes)
-    print(f'[{t0:%H:%M:%S}] winamax filter → {stats["tagged"]} events scanned, '
+    print(f'[{t0:%H:%M:%S}] winamax filter -> {stats["tagged"]} events scanned, '
           f'{stats["available"]} kept on Winamax ({100*stats["available"]//max(1,stats["tagged"])}%), '
           f'{stats["dropped"]} dropped, {stats["dedup_saved"]} cross-day duplicates collapsed')
 
