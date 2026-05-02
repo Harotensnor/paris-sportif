@@ -957,3 +957,11 @@
 - Impact: base visuelle prête pour inspection manuelle et correction page par page
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.121 (2026-05-02 14:22 UTC)
+- Chantier: P-9.0e audit visuel manuel
+- Avant: 32 captures non triées, aucun nouveau bug Phase 9 listé
+- Après: ISSUES.md ajoute 8 bugs/améliorations P9-VIS-001 à P9-VIS-008
+- Impact: les prochains sprints peuvent fixer les vrais points visibles plutôt que deviner
+- Commit: pending
+- Status: ✅ DONE
