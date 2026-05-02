@@ -21597,21 +21597,16 @@
     }
     perfWrap.style.display = isPerformance ? '' : 'none';
     if (isPerformance) {
-      if (window.PRONOSTICS_DATA && window.PRONOSTICS_DATA._lite && typeof window._ensureFullData === 'function') {
-        perfWrap.innerHTML = `
-          <div class="page-wrap">
-            <div class="page-header">
-              <div class="lbl-tiny u-text-brand">Performance · Vue globale</div>
-              <h1 class="page-h1">🎯 Performance</h1>
-              <div class="skeleton-text w-70"></div>
-            </div>
-            <div class="u-mt-4">${'<div class="skeleton-card"></div>'.repeat(3)}</div>
-          </div>`;
-        window._ensureFullData().then(() => { try { renderPerformancePage(perfWrap); } catch(e) { console.warn('renderPerformancePage failed', e); } }).catch(() => {
-          try { renderPerformancePage(perfWrap); } catch(e) { console.warn('renderPerformancePage failed', e); }
-        });
-      } else {
-        try { renderPerformancePage(perfWrap); } catch(e) { console.warn('renderPerformancePage failed', e); }
+      try { renderPerformancePage(perfWrap); } catch(e) { console.warn('renderPerformancePage failed', e); }
+      if (window.PRONOSTICS_DATA && window.PRONOSTICS_DATA._lite && typeof window._ensureFullData === 'function' && perfWrap.dataset.fullDataQueued !== '1') {
+        perfWrap.dataset.fullDataQueued = '1';
+        setTimeout(() => {
+          if (!document.body.contains(perfWrap) || perfWrap.style.display === 'none') { delete perfWrap.dataset.fullDataQueued; return; }
+          window._ensureFullData().then(() => {
+            delete perfWrap.dataset.fullDataQueued;
+            if (perfWrap.style.display !== 'none') { try { renderPerformancePage(perfWrap); } catch(e) { console.warn('renderPerformancePage failed', e); } }
+          }).catch(() => { delete perfWrap.dataset.fullDataQueued; });
+        }, 12000);
       }
     }
 
