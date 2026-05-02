@@ -623,6 +623,28 @@ def calibration_bins(rows: list[dict], n_bins: int = 10) -> list[dict]:
     return out
 
 
+def expected_calibration_error(rows: list[dict], n_bins: int = 10) -> dict:
+    """Expected Calibration Error pondérée par le nombre de picks par bin."""
+    if not rows:
+        return {'n': 0, 'ece': None, 'max_gap': None, 'bins': calibration_bins([], n_bins)}
+    bins = calibration_bins(rows, n_bins)
+    total = sum(b['n'] for b in bins)
+    weighted_gap = 0.0
+    max_gap = 0.0
+    for b in bins:
+        if not b['n'] or b['gap'] is None:
+            continue
+        gap = abs(float(b['gap']))
+        weighted_gap += (b['n'] / total) * gap
+        max_gap = max(max_gap, gap)
+    return {
+        'n': total,
+        'ece': round(weighted_gap, 4),
+        'max_gap': round(max_gap, 4),
+        'bins': bins,
+    }
+
+
 def isotonic_calibration_pairs(rows: list[dict], min_n_per_bucket: int = 8) -> list[dict]:
     """v31.7.14 — Recalibration isotonic via PAV (Pool Adjacent Violators).
     Avant : le PAV tournait dans app.js sur le client (slowdown au boot,
@@ -746,6 +768,32 @@ def render_markdown(report: dict) -> str:
                      f"{s['kelly_pnl']:+.2f}u | {s['brier']} | "
                      f"{s.get('avg_edge_pct', 0):+.1f}pt |")
     lines.append('')
+
+    if report.get('ece_by_tier'):
+        lines.append('## Calibration par tier')
+        lines.append('')
+        lines.append('| Tier | N | ECE | Gap max | Statut |')
+        lines.append('|---|---:|---:|---:|---|')
+        for tier in tier_order + extra_tiers:
+            ece = report['ece_by_tier'].get(tier)
+            if not ece:
+                continue
+            n = ece.get('n') or 0
+            ece_val = ece.get('ece')
+            max_gap = ece.get('max_gap')
+            if n < 30:
+                status = 'en apprentissage'
+            elif ece_val is not None and ece_val > 0.05:
+                status = 'à surveiller'
+            else:
+                status = 'validé'
+            lines.append(f"| `{tier}` | {n} | "
+                         f"{ece_val if ece_val is not None else '—'} | "
+                         f"{max_gap if max_gap is not None else '—'} | {status} |")
+        if report.get('big_bet_calibration_warning'):
+            lines.append('')
+            lines.append(f"> ⚠️ {report['big_bet_calibration_warning']['message']}")
+        lines.append('')
 
     # Par sport
     if report.get('by_sport'):
@@ -907,6 +955,26 @@ def main() -> int:
     by_tier = bucket_by(rows, 'tier')
     for tier_name in ['big_bet', 'lock', 'standard', 'lowconf', 'skip']:
         by_tier.setdefault(tier_name, summarize([]))
+    rows_by_tier = {
+        tier_name: [r for r in rows if r.get('tier') == tier_name]
+        for tier_name in by_tier
+    }
+    ece_by_tier = {
+        tier_name: expected_calibration_error(tier_rows, n_bins=10)
+        for tier_name, tier_rows in sorted(rows_by_tier.items())
+    }
+    big_bet_ece = ece_by_tier.get('big_bet') or {}
+    big_bet_warning = None
+    if (big_bet_ece.get('n') or 0) < 30:
+        big_bet_warning = {
+            'status': 'learning',
+            'message': 'Big Bets en apprentissage : pas assez de paris réglés pour valider la calibration.',
+        }
+    elif big_bet_ece.get('ece') is not None and big_bet_ece['ece'] > 0.05:
+        big_bet_warning = {
+            'status': 'warning',
+            'message': f"Big Bets à surveiller : ECE {big_bet_ece['ece']:.3f} > 0.050.",
+        }
     report = {
         'generated_at': datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
         'big_bet_definition': {
@@ -926,6 +994,12 @@ def main() -> int:
         'by_calibration_group': bucket_by(rows, 'calibration_group'),
         'by_cote_bucket': bucket_by(rows, 'cote_bucket'),
         'by_tier': by_tier,
+        'calibration_by_tier': {
+            tier_name: ece.get('bins', [])
+            for tier_name, ece in ece_by_tier.items()
+        },
+        'ece_by_tier': ece_by_tier,
+        'big_bet_calibration_warning': big_bet_warning,
         'calibration': calibration_bins(rows, n_bins=10),
         # v31.7.10 — Multi-binning : 5/10/20 bins servis simultanement pour
         # permettre un select dropdown cote front (granularite ajustable).
