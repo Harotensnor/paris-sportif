@@ -1145,3 +1145,10 @@
 - Impact: parcours critique et boutons validés après polish CSS/a11y
 - Commit: pending
 - Status: ✅ DONE
+## Sprint v35.145 (16:17 UTC)
+- Chantier: P-9.10
+- Avant: Profil 2 colonnes mais réglages clés dispersés
+- Après: bande réglages actifs + raccourcis Bankroll/Cote/Thème/Sports/Données
+- Impact: Profil plus scannable, smoke OK, app.js 1704.1 KB sous cap
+- Commit: pending
+- Status: ✅ DONE
