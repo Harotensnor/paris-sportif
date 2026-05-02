@@ -16153,6 +16153,7 @@
 
           ${bbfFocusOnly ? '' : `<section class="bbf-stats">
             <div><span>ROI modèle</span><strong>${agent.delta7 >= 0 ? '+' : ''}${Math.round((agent.deltaPct7 || 0) * 10) / 10}%</strong><em>${daysSinceStart < 7 ? `depuis ${daysSinceStart}j` : 'sur 7j'}</em></div>
+            <div><span>Hier</span><strong style="color:${ys ? yPlColor : 'var(--text-dim)'}">${ys ? `${ys.pl >= 0 ? '+' : ''}${ys.pl.toFixed(2)}€` : '—'}</strong><em>${ys ? `${ys.wins} gagnés · ${ys.losses} perdus · WR ${ysWr}%` : 'aucun pari réglé'}</em></div>
             <div><span>Gain moyen Big Bets</span><strong>${bbfBigBets.length ? `${bbfGain100 >= 0 ? '+' : ''}${bbfGain100.toFixed(0)}€` : '—'}</strong><em>par 100€ misés · EV moyenne</em></div>
             <div><span>Paris filtrés</span><strong>${todayStats.ok || bbfPool.length}</strong><em>${todayStats.noEdge || 0} sans value · ${todayStats.lowConf || 0} confiance basse</em></div>
             <div><span>Cagnotte modèle</span><strong>${nav.toFixed(2)}€</strong><em>départ 10€ · Kelly protégé</em></div>
@@ -17336,9 +17337,6 @@
             ${psArr.slice(0, 4).map(([sp, s]) => {
               const wr = s.bets ? Math.round(100 * s.w / s.bets) : 0;
               const roi = s.invested ? (s.pl / s.invested * 100) : 0;
-              // Bug-hunt 2026-05-02 (screen Théo) : avant "-100% 1 paris" rouge
-              // alarmant. Maintenant : si <5 paris, neutralise l'alarme visuelle
-              // et affiche disclaimer.
               const tooSmall = s.bets < 5;
               const roiColor = tooSmall ? 'var(--text-dim)' : (roi >= 0 ? 'var(--accent)' : 'var(--danger)');
               const roiDisplay = tooSmall ? '—' : `${roi>=0?'+':''}${roi.toFixed(0)}%`;
