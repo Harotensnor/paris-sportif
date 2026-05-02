@@ -621,3 +621,11 @@
 - Impact: familles contrastes/touch targets/alt taguées dans `ISSUES.md`
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.79 (2026-05-02 12:28 UTC)
+- Chantier: P-6.6 fixes visuels prioritaires
+- Avant: 6 HIGH visuels ouverts dans `ISSUES.md`
+- Après: teams Big Bet, buteurs, smart badge, bottom spacing et Santé pipeline corrigés/partiels
+- Impact: 3 issues fixées, 2 partiellement réduites, 32 captures after2 générées
+- Commit: pending
+- Status: ✅ DONE

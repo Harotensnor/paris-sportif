@@ -25,7 +25,7 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Preuve : `.cache/phase4-phase6-baseline/dashboard-mobile.png`, `profil-mobile.png`, `academie-mobile.png`, `performance-mobile.png`, `sante-mobile.png`
 - Constat : la barre mobile fixe apparaît au milieu des premières sections dans les captures full-page et masque des cartes ou contrôles.
 - Action : ajouter un offset/padding mobile cohérent ou rendre les zones critiques non masquables par la bottom nav.
-- Statut : OPEN
+- Statut : PARTIAL v35.79 — padding mobile augmenté; la nav fixe reste visible par design dans les captures full-page, à revalider sur vrai device.
 
 ### P6-VIS-002 — Chips sport Accueil coupés sans affordance claire
 
@@ -45,7 +45,7 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Preuve : `.cache/phase4-phase6-baseline/dashboard-desktop.png`, `dashboard-mobile.png`
 - Constat : `M. Andreeva` finit avec `a` isolé, `Kashima` / `Aalesund` / `Strasbourg` se coupent brutalement.
 - Action : revoir les grids équipes : minmax plus large, font-size adaptatif, ellipsis propre plutôt que wrap sauvage.
-- Statut : OPEN
+- Statut : FIXED v35.79 — suppression du wrapping sauvage `anywhere` sur teams Big Bet.
 
 ### P6-VIS-004 — Cartes buteurs trop tronquées
 
@@ -55,7 +55,7 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Preuve : `.cache/phase4-phase6-baseline/dashboard-desktop.png`
 - Constat : les cards joueurs affichent `Ollie...`, `Derr...`, `Luca...` même en desktop, ce qui rend la section peu exploitable.
 - Action : revoir le layout `bbf-scorer`, réserver une vraie colonne nom, passer en deux lignes lisibles.
-- Statut : OPEN
+- Statut : PARTIAL v35.79 — grille buteur passée à 4 colonnes + CTA pleine largeur; noms moins cassés mais encore ellipsés sur cards étroites.
 
 ### P6-VIS-005 — Photos/logos manquants affichés comme carrés vides
 
@@ -75,7 +75,7 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Preuve : `.cache/phase4-phase6-baseline/dashboard-desktop.png`
 - Constat : sur une carte compacte, le badge `-10.2% ▲` se présente comme une large pilule au-dessus du header, visuellement trop dominante.
 - Action : le limiter à un petit badge coin haut droit, sans modifier le rythme de la carte.
-- Statut : OPEN
+- Statut : FIXED v35.79 — badge limité en largeur, ellipsis et version compact card.
 
 ### P6-VIS-007 — Page Tous mobile : sous-navigation trop dense
 
@@ -105,7 +105,7 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Preuve : `.cache/phase4-phase6-baseline/sante-mobile.png`
 - Constat : la colonne droite de la table `Pipeline lag par script` est coupée (`max...` partiellement visible).
 - Action : transformer la table en cards empilées sur mobile.
-- Statut : OPEN
+- Statut : FIXED v35.79 — table remplacée par lignes `.health-lag-row` responsive avec threshold sur ligne dédiée en mobile.
 
 ### P6-VIS-010 — Page Legal mobile : header statique chevauché
 

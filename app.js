@@ -25697,18 +25697,18 @@
       return `
         <div style="margin-top:22px;">
           <div style="font-size:13px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;">⏱ Pipeline lag par script</div>
-          <div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+          <div class="health-lag-panel">
             ${rows.map(r => {
               const col = r.status === 'crit' ? '#f87171' : r.status === 'warn' ? '#eab308' : '#34d399';
               const fast = r.fast_red_min ? ` · rouge > ${r.fast_red_min} min` : '';
-              return `<div style="display:grid;grid-template-columns:minmax(150px,1.2fr) minmax(110px,.7fr) minmax(120px,.8fr) auto;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;">
-                <div style="min-width:0;">
-                  <div style="font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(r.key)}</div>
-                  <div style="color:var(--text-dim2);font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(r.script || '')}</div>
+              return `<div class="health-lag-row" style="--lag-color:${col};">
+                <div class="health-lag-name">
+                  <div class="health-lag-key">${esc(r.key)}</div>
+                  <div class="health-lag-script">${esc(r.script || '')}</div>
                 </div>
-                <div style="color:${col};font-weight:800;font-variant-numeric:tabular-nums;">${esc(ageTxt(r.age_min))}</div>
-                <div style="color:var(--text-dim);font-variant-numeric:tabular-nums;">max ${esc(ageTxt(r.threshold_min))}${fast}</div>
-                <div>${pill(r.status)}</div>
+                <div class="health-lag-age">${esc(ageTxt(r.age_min))}</div>
+                <div class="health-lag-threshold">max ${esc(ageTxt(r.threshold_min))}${fast}</div>
+                <div class="health-lag-status">${pill(r.status)}</div>
               </div>`;
             }).join('')}
           </div>
