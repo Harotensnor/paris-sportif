@@ -363,13 +363,13 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Constat : score accessibilité desktop `dashboard 74`, `tous 46`, `performance 60`, `academie 59`; les seules pénalités sont les cibles interactives desktop sous `40px` (`30`, `66`, `53`, `45` selon la page).
 - Détails : bandeau aide `259x13`, top nav `33px` de haut, trust strip `22px`, close trust `26x26`, quick chips `34px`, tabs secondaires `33-36px`, footer links `18-25px`.
 - Action : augmenter les zones cliquables desktop sans casser la densité visuelle : min-height des nav/tabs/chips/footer, close trust, liens aide; corriger aussi le bouton `Vu` mobile.
-- Statut : OPEN — sprint P-11.2.
+- Statut : FIXED v35.196 — min a11y desktop `46 → 97`; dashboard/tous/academie `100`, performance `97`, mobile `100`, `a11y-report.json` revient à `0` critical/serious/moderate.
 
 ### P11-LH-002 — CLS desktop encore au-dessus de la cible
 
 - Sévérité : MEDIUM
 - Preuve : `.cache/lighthouse-reports/summary.json`
-- Constat : CLS desktop `0.081` dashboard et `0.086` sur tous/performance/academie, cible Phase 11 `<0.05`.
+- Constat : CLS desktop `0.081` dashboard et `0.086` sur tous/performance/academie au baseline; après la correction target-size v35.196, CLS mesuré `0.151-0.157`, cible Phase 11 `<0.05`.
 - Action : réserver la hauteur des strips/header/sticky rails et stabiliser les blocs injectés après le chargement.
 - Statut : OPEN — sprint P-11.3.
 
@@ -377,7 +377,7 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 
 - Sévérité : MEDIUM
 - Preuve : `.cache/lighthouse-reports/summary.json`
-- Constat : performance desktop `85` sur les 4 pages auditées; mobile reste `100`.
+- Constat : performance desktop `85` au baseline puis `72-73` après v35.196; mobile reste `100`.
 - Détails : transfert local `2.75MB`, `app.js 1.79MB`, `data_lite.js 497KB`, `app-enhancements.js 37KB`.
 - Action : réduire le JS initial desktop ou charger encore plus tard les modules secondaires.
 - Statut : OPEN — sprint P-11.4.
