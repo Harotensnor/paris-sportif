@@ -1417,3 +1417,9 @@
 - Après: colonnes date,sport,league,home,away,pick,odd,result,pl,clv,brier + métriques utiles.
 - Impact: analyse Excel plus propre des picks historiques et du P&L.
 - Vérif: node --check app.js, bundle OK, diff check OK.
+
+## Sprint v35.189 — Phase 10 P-10.36 Export JSON agrégé (22:04 UTC)
+- Avant: l'export RGPD était un dump brut localStorage.
+- Après: JSON structuré avec paris_trackes, settings, bankroll, stats et raw_localStorage.
+- Impact: backup/migration plus lisible sans perdre la donnée brute.
+- Vérif: node --check app.js, bundle OK, diff check OK.
