@@ -1,10 +1,5 @@
 
   :root {
-    /* REFONTE v22 — Theme sombre par défaut (2026-04-23)
-       v31.7.34 — Identité visuelle "betting pro" : contraste boosté.
-       v33.40 — Audit phase 2 V4 : 3 niveaux de surfaces tier explicites,
-       bordures plus visibles, hiérarchie plus claire. Bumpé bg-1 de #06070a
-       (noir quasi pur) à #0a0c11 (légèrement plus chaud, mieux différencié). */
     --bg: #0a0a0a;
     --rg-height: 32px;
     --bg-2: #0e1117;
@@ -14,7 +9,6 @@
     --panel-3: #21262d;
     --panel-4: #2a3040;
 
-    /* V4 (audit phase 2) : aliases sémantiques pour les 3 tiers */
     --surface-0: #0a0a0a;
     --surface-1: #11141b;
     --surface-2: #1a1f2a;
@@ -31,15 +25,11 @@
     --text-dim: #8b8fa0;
     --text-dim2: #5c5f70;
 
-    /* v31.7.34 — Brand violet plus lumineux pour meilleur contraste sur le
-       fond très sombre (#06070a). #b6a0ff vs ancien #a78bfa : +8% lumin
-       sans perdre la teinte signature, AAA contraste sur bg. */
     --brand: #b6a0ff;
     --brand-2: #9d80f7;
     --brand-soft: rgba(182,160,255,.13);
     --brand-border: rgba(182,160,255,.30);
 
-    /* Accent emeraude un peu plus saturé pour le punch des indicateurs WIN */
     --accent: #2dd4a8;
     --accent-2: #10b981;
     --accent-soft: rgba(45,212,168,.12);
@@ -53,8 +43,6 @@
     --purple: #c084fc;
     --gold: var(--c-warn);
 
-    /* Phase 4+ v35.60 — semantic state colors.
-       Keep all win/value/warn/bad UI states on a predictable 4-color contract. */
     --c-strong: #16a34a;
     --c-good: #65a30d;
     --c-warn: #f59e0b;
@@ -62,43 +50,36 @@
     --c-accent: #e60000;
     --winamax-red: var(--c-accent);
 
-    /* v31.7.34 — Tier hierarchy. Couleurs distinctes pour les badges
-       Lock/Standard/Lowconf, qui apparaissent dans 100+ endroits. */
-    --tier-lock: var(--c-warn);        /* or — réussite vérifiée */
+    --tier-lock: var(--c-warn);
     --tier-lock-soft: rgba(245,158,11,.14);
-    --tier-standard: #b6a0ff;    /* brand */
+    --tier-standard: #b6a0ff;
     --tier-standard-soft: rgba(182,160,255,.13);
-    --tier-lowconf: #94a3b8;     /* slate */
+    --tier-lowconf: #94a3b8;
     --tier-lowconf-soft: rgba(148,163,184,.12);
 
-    /* v31.7.34 — Couleurs sport-aware. Permet de scanner visuellement
-       le sport d'un match en un coup d'œil. Utilisées dans les borders
-       gauche des cards et le badge sport. */
-    --sport-football: #2dd4a8;     /* vert (terrain) */
-    --sport-tennis: var(--c-warn);       /* or (terre battue / terrain) */
-    --sport-basketball: #fb7c33;   /* orange (ballon NBA) */
-    --sport-hockey: #38bdf8;       /* bleu glacier */
-    --sport-baseball: #f87171;     /* rouge (couture balle) */
-    --sport-american-football: #a78bfa; /* violet */
+    --sport-football: #2dd4a8;
+    --sport-tennis: var(--c-warn);
+    --sport-basketball: #fb7c33;
+    --sport-hockey: #38bdf8;
+    --sport-baseball: #f87171;
+    --sport-american-football: #a78bfa;
     --sport-mma: var(--c-bad);
     --sport-rugby: #84cc16;
-
-    /* v31.7.42 — A11y utility : visually-hidden mais accessible aux SR. */
 
     --shadow-xs: 0 1px 2px rgba(0,0,0,.25);
     --shadow-sm: 0 2px 8px rgba(0,0,0,.30);
     --shadow: 0 6px 20px rgba(0,0,0,.40);
-    --shadow-md: 0 6px 20px rgba(0,0,0,.40);  /* alias clair pour Sprint 13 */
+    --shadow-md: 0 6px 20px rgba(0,0,0,.40);
     --shadow-lg: 0 14px 44px rgba(0,0,0,.55);
-    --shadow-xl: 0 24px 64px rgba(0,0,0,.65);  /* Sprint 13 #4 — niveau modal */
+    --shadow-xl: 0 24px 64px rgba(0,0,0,.65);
     --shadow-2xl: 0 32px 80px rgba(0,0,0,.70);
     --shadow-focus: 0 0 0 3px var(--brand-soft);
     --shadow-focus-warn: 0 0 0 3px rgba(251,191,36,.22);
     --shadow-focus-danger: 0 0 0 3px rgba(248,113,113,.22);
     --shadow-inset-line: 0 1px 0 rgba(255,255,255,.04) inset, 0 -1px 0 var(--border) inset;
     --shadow-winamax: 0 4px 14px rgba(255,107,0,.30);
-    --r-2xs: 2px;    /* Phase 4+ v35.58 — precise hairline radius */
-    --r-xs: 4px;     /* Sprint 13 #3 — tokens border-radius */
+    --r-2xs: 2px;
+    --r-xs: 4px;
     --r-card: 8px;
     --r-sm: 10px;
     --r-md: 12px;
@@ -107,26 +88,20 @@
     --r-xl: 24px;
     --r-pill: 999px;
 
-    /* AUDIT-2026-04-27 (Sprint 13 #1) — Échelle typographique modulaire 1.25×.
-       Utilise via `font-size: var(--fs-md)` au lieu de pixels en dur.
-       Scale 1.25 (perfect fourth ratio) donne une progression élégante. */
-    --fs-xs:   12px;   /* badges, micro-labels uppercase */
-    --fs-sm:   14px;   /* texte secondaire, hint */
-    --fs-base: 15px;   /* corps de texte (entre sm et md pour densité) */
-    --fs-md:   16px;   /* corps confort, h4 */
-    --fs-lg:   20px;   /* h3, valeurs KPIs */
-    --fs-xl:   25px;   /* h2 sections importantes */
-    --fs-2xl:  32px;   /* h1 page */
-    --fs-3xl:  40px;   /* h1 page hero */
-    --fs-4xl:  50px;   /* hero headline */
+    --fs-xs:   12px;
+    --fs-sm:   14px;
+    --fs-base: 15px;
+    --fs-md:   16px;
+    --fs-lg:   20px;
+    --fs-xl:   25px;
+    --fs-2xl:  32px;
+    --fs-3xl:  40px;
+    --fs-4xl:  50px;
     --lh-tight: 1.1;
     --lh-snug:  1.3;
     --lh-base:  1.5;
     --lh-relaxed: 1.65;
 
-    /* AUDIT-2026-04-27 (Sprint 13 #2) — Spacing 4px-based.
-       Tous les padding/margin en hard-coded migrent vers ces vars
-       pour rythmer le site. */
     --space-0: 0;
     --space-1: 4px;
     --space-2: 8px;
@@ -139,9 +114,6 @@
     --space-12: 48px;
     --space-16: 64px;
 
-    /* AUDIT-2026-04-27 (Sprint 13 #5) — Letter-spacing par taille.
-       Petit texte uppercase = tracking large pour lisibilité.
-       Grand texte = tightening (-1px) pour modernité. */
     --tracking-tight:  -0.025em;
     --tracking-normal: 0;
     --tracking-wide:   0.025em;
@@ -8009,6 +7981,7 @@
 .health-lag-age{color:var(--lag-color,var(--text));font-weight:800;font-variant-numeric:tabular-nums}
 .health-lag-threshold{color:var(--text-dim);font-variant-numeric:tabular-nums}
 @media (max-width:760px){.health-lag-panel{border-radius:8px}.health-lag-row{grid-template-columns:minmax(0,1fr) auto;gap:6px 10px;padding:11px 12px}.health-lag-age{justify-self:end}.health-lag-threshold{grid-column:1/3;font-size:11px}.health-lag-status{justify-self:end}.health-lag-key,.health-lag-script{white-space:normal}}
+.sante-fold{margin-top:18px;border:1px solid var(--border);border-radius:10px;background:var(--panel);overflow:hidden}.sante-fold summary{min-height:50px;display:flex;align-items:center;padding:0 14px;color:var(--text);font-weight:850;cursor:pointer}.sante-fold>div{padding:0 12px 12px}.sante-fold>div>div:first-child{margin-top:0!important}
 
 /* Phase 3 — simple "Pourquoi ce pari" panel in match modal */
 .why-bet{margin:0 0 14px;padding:18px;border:1px solid rgba(22,163,74,.28);border-radius: var(--r-card);background:linear-gradient(145deg,color-mix(in srgb,var(--panel) 90%,var(--c-strong) 10%),var(--panel));box-shadow:0 16px 40px rgba(0,0,0,.22)}.why-bet__eyebrow{color:var(--accent);font-size: var(--t-xs);font-weight:900;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px}.why-bet__grid{display:grid;grid-template-columns:minmax(0,1fr) 132px;gap:14px;align-items:start}.why-bet h3{margin:0;color:var(--text);font-size:24px;line-height:1.08;letter-spacing:0}.why-bet h3 span{color:var(--accent)}.why-bet p{margin:6px 0 0;color:var(--text-dim);line-height:1.45}.why-bet__stake{display:grid;justify-items:end;gap:2px}.why-bet__stake span,.why-bet__stake em{color:var(--text-dim);font-size: var(--t-xs);font-style:normal;text-transform:uppercase;letter-spacing:.6px}.why-bet__stake strong{color:var(--text);font-size:30px}.why-bet ol{display:grid;gap: var(--space-2);margin:14px 0 0;padding:0;list-style:none;counter-reset:why}.why-bet li{counter-increment:why;position:relative;padding-left:34px;color:var(--text);font-size: var(--t-sm);line-height:1.45}.why-bet li::before{content:counter(why);position:absolute;left:0;top:-1px;width:22px;height:22px;border-radius: var(--r-pill);background:var(--c-strong);color:#fff;display:grid;place-items:center;font-size: var(--t-xs);font-weight:900}.why-bet footer{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.why-bet__winamax,.why-bet__tech,.why-bet__disabled{min-height:44px;display:inline-flex;align-items:center;justify-content:center;border-radius: var(--r-card);padding:0 14px;font-size: var(--t-sm);font-weight:900;text-decoration:none}.why-bet__winamax{background:var(--c-strong);color:#fff;border:1px solid var(--c-strong)}.why-bet__tech{background:rgba(255,255,255,.04);color:var(--text);border:1px solid var(--border);cursor:pointer}.why-bet__disabled{background:rgba(255,255,255,.04);color:var(--text-dim2);border:1px solid var(--border)}.why-bet__muted{color:var(--text-dim)!important}@media (max-width:720px){.why-bet{padding:14px}.why-bet__grid{grid-template-columns:1fr}.why-bet__stake{justify-items:start}.why-bet h3{font-size:21px}.why-bet footer{display:grid}.why-bet__winamax,.why-bet__tech,.why-bet__disabled{width:100%}}
