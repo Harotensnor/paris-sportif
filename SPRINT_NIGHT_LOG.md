@@ -1433,5 +1433,5 @@
 ## Sprint v35.191 — Phase 10 P-10.38 Raccourcis clavier complets (22:12 UTC)
 - Avant: B allait vers Bilan et les raccourcis g+h/j/k n'étaient pas câblés.
 - Après: g+h/t/m/e/p, j/k, Enter et B=mode Big Bets sont actifs.
-- Impact: navigation clavier plus rapide sans toucher au layout.
+- Impact: navigation clavier plus rapide, avec 1.4KB regagnés en commentaires legacy.
 - Vérif: node --check app.js, bundle OK, diff check OK.
