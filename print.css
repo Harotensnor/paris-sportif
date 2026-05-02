@@ -1,0 +1,14 @@
+@media print {
+  @page { margin: 12mm; }
+  html, body { background: #fff !important; color: #111 !important; filter: none !important; }
+  body { font: 12px/1.45 Arial, sans-serif !important; }
+  .risk-banner, .topbar, .winamax-subnav, .bottom-nav, .v29-dash-aside, .bbf-left-rail, .bbf-basket,
+  .bbf-command, .bbf-tools, .toast, .modal-close, button, [role="button"] { display: none !important; }
+  main, .page-content, .bbf-shell, .bbf-main { max-width: none !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
+  .modal-backdrop { position: static !important; display: block !important; background: #fff !important; padding: 0 !important; overflow: visible !important; }
+  .modal, .modal-content, .detail-modal, .card-base, .bbf-card { box-shadow: none !important; border: 1px solid #bbb !important; background: #fff !important; color: #111 !important; break-inside: avoid; }
+  .modal, .modal-content, .detail-modal { max-height: none !important; max-width: none !important; width: 100% !important; }
+  .bbf-card, .card-base { margin: 0 0 10px !important; padding: 10px !important; }
+  h1, h2, h3, strong { color: #000 !important; }
+  a[href]::after { content: " (" attr(href) ")"; font-size: 10px; color: #555; }
+}
