@@ -20902,32 +20902,7 @@
   }
 
 
-  // =========================================================================
-  // v31.7.1 — MONTANTES SÉQUENTIELLES (du jour / weekend / semaine)
-  // -------------------------------------------------------------------------
-  // Concept REEL d'une montante (corrigé par retour user) :
-  //   - Pari 1 (étape 1) : on mise 10€ sur le match X
-  //   - On ATTEND le résultat. Si on gagne → on récupère 10€ × cote_X
-  //   - Pari 2 (étape 2) : on remet TOUT (mise+gain) sur le match Y
-  //     (qui DOIT démarrer après la fin du match X)
-  //   - Et ainsi de suite jusqu'à étape N.
-  //   - Si UN seul pari tombe → tout est perdu.
-  //
-  // CONTRAINTE TEMPORELLE CRITIQUE : les matchs doivent être séquentiels
-  // (pas de chevauchement temporel). Buffer = durée match + 30min pour
-  // récupérer les gains et reposer la mise.
-  //
-  // Algo (greedy par kickoff ASC) :
-  //   1. Filtre candidates (haute conf, cote dans plage, pas live/done)
-  //   2. Sort par kickoff ASC
-  //   3. Greedy : prendre 1er candidat, puis chercher le plus tôt qui
-  //      démarre après earliest_next_ts = prev.ts + duree(prev.sport) + 30min
-  //   4. Continue jusqu'à atteindre targetN OU plus de candidats valides
-  //   5. Diversification : max 2 picks même sport, max 2 même ligue
-  //
-  // Affichage : timeline "étapes" claire, pour chaque étape la mise courante,
-  // la cote, le gain potentiel qui devient la mise de l'étape suivante.
-  // =========================================================================
+  // v31.7.1 — Montantes séquentielles : chaque match doit commencer après le règlement du précédent.
 
   // Durée moyenne d'un match par sport (en minutes) — buffer permettant de
   // garantir que le résultat est connu avant de remiser sur l'étape suivante.
@@ -21090,7 +21065,13 @@
               ${candidates.length ? `<b>${candidates.length}</b> candidat${candidates.length>1?'s':''} haute confiance dans la fenêtre, mais trop proches temporellement ou tous dans le même sport/ligue.` : 'Aucun candidat haute confiance dans la fenêtre temporelle.'}<br><br>
               ${fallbackHint}
             </div>
-            <button class="page-btn es-cta u-mt-4" data-page="locks">🔒 Voir les Locks individuels</button>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-top:18px;text-align:left;">
+              <button class="page-btn es-cta" data-page="dashboard" style="width:100%;justify-content:center;">🔥 Retour Big Bets</button>
+              <button class="page-btn es-cta" data-page="tous" style="width:100%;justify-content:center;background:var(--panel-2);color:var(--text);">🎯 Voir tous les pronos</button>
+              <div style="padding:12px;border:1px solid rgba(251,191,36,.25);border-radius:var(--r);background:rgba(251,191,36,.08);color:var(--text-dim);font-size:12px;line-height:1.45;">
+                <b style="color:#fbbf24;">Rappel risque</b><br>Une montante transforme 10€ en gros gain seulement si toutes les étapes passent. Une seule défaite remet le retour à 0€.
+              </div>
+            </div>
           </div>
         </div>`;
       return;
