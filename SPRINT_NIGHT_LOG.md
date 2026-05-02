@@ -789,3 +789,11 @@
 - Impact: moins de JS inline au parsing initial, smoke E2E toujours vert
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.100 (2026-05-02 14:31 UTC)
+- Chantier: P-8.1 conteneurs desktop élargis
+- Avant: bbf-shell 1180px, page-content 1280px, main 1440px; dashboard wide 6684px de haut
+- Après: bbf-shell 1500px, pages 1500px, main 1600px; dashboard wide 6074px, overflow 0
+- Impact: les grands écrans respirent moins “mobile stretched” sans casser mobile/tablette
+- Commit: pending
+- Status: ✅ DONE

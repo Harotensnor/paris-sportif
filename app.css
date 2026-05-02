@@ -494,9 +494,9 @@
     color: var(--text);
     line-height: 1.1;
   }
-  /* Page wrap container — max-width:1280, padding: var(--space-1), tabular */
+  /* Page wrap container — desktop élargi Phase 8 */
   .page-wrap {
-    max-width: 1280px;
+    max-width: 1500px;
     margin: 0 auto;
     padding: var(--space-1) 0 0;
     font-variant-numeric: tabular-nums;
@@ -832,14 +832,14 @@
 
   /* ======= MAIN ======= */
   /* Phase 3 #5 (audit final) : casser la colonne 720px — main 1280px max
-     2026-05-01 (Théo desktop feedback) : passé à 1440px max-width pour
+     2026-05-01 (Théo desktop feedback) : passé à 1600px max-width pour
      mieux exploiter les écrans wide (≥1500px). Sur 1280-1440px le main
      prend la viewport (avec sidebar gauche + aside droite). Au-delà,
      marge pour respiration. */
-  main { padding: var(--gap-md) var(--gap-lg); max-width: 1440px; margin: 0 auto; width: 100%; }
+  main { padding: var(--gap-md) var(--gap-lg); max-width: 1600px; margin: 0 auto; width: 100%; }
   main#main-content { min-height: 900px; }
   .boot-shell {
-    max-width: 1280px;
+    max-width: 1500px;
     margin: 0 auto 18px;
     padding: var(--space-6) 26px;
     border: 1px solid var(--border);
@@ -946,7 +946,7 @@
     .boot-shell__grid { grid-template-columns: 1fr; }
     .boot-shell__card { min-height: 92px; }
   }
-  .page-content { max-width: 1280px; width: 100%; margin: 0 auto; padding: var(--gap-md) var(--gap-lg); }
+  .page-content { max-width: 1500px; width: 100%; margin: 0 auto; padding: var(--gap-md) var(--gap-lg); }
   @media (max-width: 1100px) {
     .sidebar { display: none; }
   }
@@ -1368,7 +1368,7 @@
      prochaine MAJ + RSS + lien backtest. But : créer une routine
      quotidienne. Discret (~70px desktop, ~120px mobile). */
   .dash-return-cta {
-    margin: var(--space-6) auto 8px; max-width: 1100px;
+    margin: var(--space-6) auto 8px; max-width: 1400px;
   }
   .dash-return-cta-inner {
     display: flex; align-items: center; gap: 14px;
@@ -2698,7 +2698,7 @@
     color: var(--text-dim);
   }
   .footer-inner {
-    max-width: 1100px;
+    max-width: 1500px;
     margin: 0 auto;
     padding: 0 20px;
     display: flex;
@@ -7111,7 +7111,7 @@
     text-align: center;
   }
   .site-footer-inner {
-    max-width: 1100px;
+    max-width: 1500px;
     margin: 0 auto;
     display: flex;
     flex-wrap: wrap;
@@ -7981,7 +7981,7 @@
   }
 
 /* Phase 3 — Big Bets First homepage */
-.bbf-shell{max-width:1180px;margin:0 auto;padding:0 18px 32px;color:var(--text);font-variant-numeric:tabular-nums}
+.bbf-shell{max-width:1500px;margin:0 auto;padding:0 18px 32px;color:var(--text);font-variant-numeric:tabular-nums}
 .bbf-layout{display:block}.bbf-main{min-width:0}.bbf-basket{margin-top:18px}
 .bbf-command{position:sticky;top:72px;z-index:20;display:flex;justify-content:space-between;align-items:center;gap: var(--space-4);margin:0 0 18px;padding:10px 14px;border:1px solid rgba(22,163,74,.28);border-radius: var(--r-card);background:color-mix(in srgb,var(--panel) 92%,var(--c-strong) 8%);box-shadow:0 16px 36px rgba(0,0,0,.22)}
 .bbf-command strong{color:var(--text);font-size: var(--t-sm)}.bbf-command span{color:var(--text-dim);font-size:12px}
