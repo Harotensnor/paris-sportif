@@ -316,7 +316,7 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Preuve : `.cache/phase4-phase9-current/dashboard-wide.png`
 - Constat : malgré la refonte desktop, le flux central reste visuellement étroit sur 1920px quand il y a peu de Big Bets.
 - Action : autoriser 4 cartes / rail stats plus riche / section opportunités plus large sur ultra-wide.
-- Statut : OPEN
+- Statut : FIXED v35.126 — shell accueil élargi à 1840px, rails 300/360px sur ultra-wide et empty hero pleine largeur; dashboard wide `3338px → 3164px`.
 
 ### P9-VIS-005 — Legal mobile trop compact pour du texte légal
 

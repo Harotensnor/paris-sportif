@@ -997,3 +997,11 @@
 - Impact: la page Profil exploite enfin l'écran PC et réduit le scroll de 25%
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.126 (2026-05-02 15:02 UTC)
+- Chantier: P-9.54 fix P9-VIS-004 accueil wide
+- Avant: dashboard wide 3338px, flux central encore trop étroit sur 1920px
+- Après: dashboard wide 3164px, shell 1840px et rails ultra-wide élargis
+- Impact: l'accueil PC gaspille moins d'espace noir et les cartes respirent mieux
+- Commit: pending
+- Status: ✅ DONE
