@@ -107,7 +107,7 @@
   // legacy) mais aucun lien ne pointe plus vers cette valeur.
   // v31.7.77 — 'calendrier' ajouté pour vue 7 jours groupée (user feedback
   // "je veux voir au moins une semaine de pronos jour par jour").
-  const VALID_PAGES = ['dashboard','tous','buteurs','combines','academie','alertes','profil','sante','legal','montante-jour','montante-weekend','montante-semaine','compare','calendrier','league','favoris','performance','plan-mise','valeur','simulator'];
+  const VALID_PAGES = ['dashboard','tous','buteurs','combines','academie','alertes','profil','sante','legal','montantes','compare','calendrier','league','favoris','performance','plan-mise','valeur','simulator'];
   // v30 — 'mesparis' retiré : Théo n'enregistre pas ses paris sur le site.
   // v31 — 'legal' + 'methodologie' ajoutés (transparence + dictionnaire des
   // métriques, en réponse à l'audit ChatGPT 2026-04-26).
@@ -128,9 +128,12 @@
     'methodologie': 'academie',
     'comment-lire': 'academie',
     'comment-lire-un-prono': 'academie',
-    'montantes-jour': 'montante-jour',
-    'montantes-weekend': 'montante-weekend',
-    'montantes-semaine': 'montante-semaine',
+    'montante-jour': 'montantes',
+    'montante-weekend': 'montantes',
+    'montante-semaine': 'montantes',
+    'montantes-jour': 'montantes',
+    'montantes-weekend': 'montantes',
+    'montantes-semaine': 'montantes',
     'vue-globale': 'performance',  // alias raccourci page Perf
     'cagnotte': 'bilan',           // alias historique
     'agent': 'bilan',              // alias 'page Mon agent'
@@ -20654,10 +20657,11 @@
     // v29 — Crédibilité / méthode (ROI vérifiable + qui suis-je)
     const isCredibilite = currentPage === 'credibilite';
     // v31.7 — Montantes (declared early to avoid TDZ in summary-bar visibility check)
-    const isMontanteJour     = currentPage === 'montante-jour';
-    const isMontanteWeekend  = currentPage === 'montante-weekend';
-    const isMontanteSemaine  = currentPage === 'montante-semaine';
-    const isMontante = isMontanteJour || isMontanteWeekend || isMontanteSemaine;
+    const isMontantes = currentPage === 'montantes';
+    const isMontanteJour = false;
+    const isMontanteWeekend = false;
+    const isMontanteSemaine = false;
+    const isMontante = isMontantes;
     // v31.7.77 — Calendrier (declared early for the same TDZ reason)
     const isCalendrier = currentPage === 'calendrier';
     // AUDIT-2026-04-27 (Sprint 5 #24) — League deep-dive page
@@ -21185,8 +21189,36 @@
     }
     montanteWrap.style.display = isMontante ? '' : 'none';
     if (isMontante) {
-      const type = isMontanteJour ? 'jour' : isMontanteWeekend ? 'weekend' : 'semaine';
-      renderMontantePage(montanteWrap, type);
+      let type = 'jour';
+      try {
+        const saved = localStorage.getItem('montanteType') || '';
+        if (['jour', 'weekend', 'semaine'].includes(saved)) type = saved;
+      } catch(e) {}
+      montanteWrap.innerHTML = `
+        <div class="page-wrap">
+          <div class="page-header">
+            <div class="lbl-tiny u-text-brand">Montantes</div>
+            <h1 class="page-h1">Montantes séquentielles</h1>
+            <p class="page-sub">Une seule page, trois fenêtres. Commence par le jour, élargis seulement si le modèle manque de matchs propres.</p>
+          </div>
+          <div class="seg-tabs" style="display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px;">
+            ${[
+              ['jour', 'Jour'],
+              ['weekend', 'Weekend'],
+              ['semaine', 'Semaine'],
+            ].map(([k, label]) => `<button type="button" data-montante-type="${k}" class="${k === type ? 'active' : ''}" style="min-height:40px;padding:0 14px;border-radius:8px;border:1px solid ${k === type ? 'var(--brand)' : 'var(--border)'};background:${k === type ? 'var(--brand-soft)' : 'var(--panel)'};color:${k === type ? 'var(--brand)' : 'var(--text)'};font-weight:800;cursor:pointer;">${label}</button>`).join('')}
+          </div>
+          <div id="montante-inner"></div>
+        </div>`;
+      const inner = montanteWrap.querySelector('#montante-inner') || montanteWrap;
+      renderMontantePage(inner, type);
+      montanteWrap.querySelectorAll('[data-montante-type]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          try { localStorage.setItem('montanteType', btn.dataset.montanteType); } catch(e) {}
+          renderMontantePage(montanteWrap.querySelector('#montante-inner') || montanteWrap, btn.dataset.montanteType);
+          montanteWrap.querySelectorAll('[data-montante-type]').forEach(b => b.classList.toggle('active', b === btn));
+        });
+      });
     }
 
     // v31.1 — Hash routes #legal et #methodologie redirigent vers les pages
@@ -21238,7 +21270,7 @@
     const HUB_PAGES = {
       now: ['dashboard'],
       agent: ['performance', 'bilan', 'historique', 'backtest'],
-      explore: ['tous', 'calendrier', 'buteurs', 'combines', 'compare', 'valeur', 'plan-mise', 'montante-jour', 'montante-weekend', 'montante-semaine'],
+      explore: ['tous', 'calendrier', 'buteurs', 'combines', 'compare', 'valeur', 'plan-mise', 'montantes'],
       performance: ['performance', 'bilan', 'historique', 'backtest', 'credibilite', 'simulator'],
       learn: ['academie'],
       account: ['profil', 'sante', 'favoris', 'alertes', 'legal'],
