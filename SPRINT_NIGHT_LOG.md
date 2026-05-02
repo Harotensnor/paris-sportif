@@ -1261,3 +1261,9 @@
 - Après: sliders risque/diversification/confiance + ligues exclues, lus par l'Accueil avant le tri Big Bets.
 - Impact: Théo peut durcir ou relâcher son style high-odds sans changer le code.
 - Vérif: phase10_strategy_prefs_audit.json + syntax/bundle PASS.
+
+## Sprint v35.163 — Phase 10 P-10.11 Comparateur interne 2 picks (18:44 UTC)
+- Avant: Tous obligeait à comparer edge/cote/EV à l'œil ligne par ligne.
+- Après: sélection de 2 picks + bottom-sheet côte-à-côte avec cote, confiance, avance, gain moyen et Kelly.
+- Impact: décision plus rapide entre deux grosses cotes sans perdre le fil de la page.
+- Vérif: phase10_pick_compare_audit.json, 2 picks sélectionnés, modal ouverte, overflow = 0.
