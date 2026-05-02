@@ -2228,6 +2228,21 @@
   }
   try { window.expectedValue = expectedValue; } catch(e){}
 
+  const BLACKLIST_MARKETS = ['handicap','asianhandicap','runline','puckline','baskethandicap','spread','ah'];
+  function isHandicapMarket(market) {
+    return BLACKLIST_MARKETS.includes(String(market || '').toLowerCase());
+  }
+  function isAllowedStrongHandicap(c) {
+    return isHandicapMarket(c?.market) && Number(c?.edge) > 0.15 && Number(c?.odd) >= 2.50;
+  }
+  function isBlockedHandicapMarket(c) {
+    return isHandicapMarket(c?.market) && !isAllowedStrongHandicap(c);
+  }
+  try {
+    window.isHandicapMarket = isHandicapMarket;
+    window.isBlockedHandicapMarket = isBlockedHandicapMarket;
+  } catch(e){}
+
   // v34.35 — Capital engine.
   // A pick is not "good" only because confidence is high. A very low odd
   // needs a huge probability edge to be worth the capital it locks; a very
@@ -2729,6 +2744,23 @@
       market: out.market,
       source: out.source || 'winamax_exact'
     });
+    if (isHandicapMarket(out.market)) {
+      out.handicapRestricted = true;
+      out.handicapException = isAllowedStrongHandicap(out);
+      out.handicapPolicy = out.handicapException ? 'strong_exception' : 'blocked_by_user_pref';
+      out.investment = {
+        ...out.investment,
+        action: out.handicapException ? out.investment.action : 'skip',
+        label: out.handicapException ? 'Handicap fort' : 'Handicap masqué',
+        score: out.handicapException ? out.investment.score : Math.min(out.investment.score || 0, 12),
+        reasons: [
+          ...(out.investment?.reasons || []),
+          out.handicapException
+            ? 'Handicap autorisé seulement car edge > 15pt et cote >= 2.50.'
+            : 'Handicap ignoré par préférence utilisateur.'
+        ]
+      };
+    }
     out.history = marketHistoryConfidence(out.market, match?.sport);
     if (out.history && out.history.penalty) {
       out.investment = {
@@ -2771,14 +2803,16 @@
     opts = opts || {};
     const candidates = buildMarketCandidates(match, pred, { requireExact: true });
     if (!candidates.length) return null;
-    const pool = candidates.filter(c =>
+    const allowed = candidates.filter(c => !isBlockedHandicapMarket(c));
+    if (!allowed.length) return null;
+    const pool = allowed.filter(c =>
       c.source === 'winamax_exact'
       && c.investment
       && c.investment.action !== 'skip'
       && c.ev > 0
       && c.edge > 0
     );
-    const sorted = (pool.length ? pool : candidates).slice();
+    const sorted = (pool.length ? pool : allowed).slice();
     sorted.sort((a, b) => {
       const ai = a.investment?.score || 0, bi = b.investment?.score || 0;
       if (bi !== ai) return bi - ai;
@@ -11511,8 +11545,15 @@
           // Categorize : selected / acceptable / rejected
           const rows = cands.map((c, i) => {
             const ev = (typeof expectedValue === 'function') ? expectedValue(c.prob, c.odd) : (c.prob * c.odd - 1);
+            const isSelected = c === best || (c.market === best.market && c.key === best.key && Math.abs(Number(c.odd) - Number(best.odd)) < 0.001);
             let status, statusColor, reason;
-            if (i === 0) {
+            if (isBlockedHandicapMarket(c)) {
+              status = '✗ Masqué'; statusColor = 'var(--danger)';
+              reason = 'Handicap masqué par préférence utilisateur';
+            } else if (c.handicapException) {
+              status = '⚠ Handicap fort'; statusColor = 'var(--warn)';
+              reason = 'Exception edge > 15pt et cote >= 2.50';
+            } else if (isSelected) {
               status = '✓ Sélectionné'; statusColor = 'var(--accent)';
               reason = 'Meilleur edge (premier dans le tri)';
             } else if (c.edge >= 0.05) {
@@ -11536,12 +11577,9 @@
             }
             return { c, ev, status, statusColor, reason, i };
           });
-          return `
-            <div class="section">
-              <h4>🏷️ Marchés évalués (${cands.length})</h4>
-              <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">${marketEmoji[best.market] || '🎯'} <b class="u-text-accent">${esc(best.label)}</b> sélectionné comme meilleur pari. Voici les alternatives évaluées et celles refusées avec raison.</div>
-              <div style="display:flex;flex-direction:column;gap:6px;">
-                ${rows.map(r => `
+          const visibleRows = rows.filter(r => !isBlockedHandicapMarket(r.c));
+          const handicapRows = rows.filter(r => isBlockedHandicapMarket(r.c));
+          const rowHtml = (r) => `
                   <div style="padding:9px 12px;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${r.statusColor};border-radius:0 var(--r-sm) var(--r-sm) 0;display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;font-size:12.5px;">
                     <span class="u-text-md">${marketEmoji[r.c.market] || '🎯'}</span>
                     <div>
@@ -11553,10 +11591,17 @@
                       <div>edge ${r.c.edge >= 0 ? '+' : ''}${(r.c.edge*100).toFixed(1)}pt · EV ${r.ev >= 0 ? '+' : ''}${(r.ev*100).toFixed(1)}%</div>
                     </div>
                     <span style="color:${r.statusColor};font-weight:700;font-size:11px;white-space:nowrap;">${esc(r.status)}</span>
-                  </div>`).join('')}
+                  </div>`;
+          return `
+            <div class="section">
+              <h4>🏷️ Marchés évalués (${cands.length})</h4>
+              <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">${marketEmoji[best.market] || '🎯'} <b class="u-text-accent">${esc(best.label)}</b> sélectionné comme meilleur pari. Voici les alternatives évaluées et celles refusées avec raison.</div>
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                ${visibleRows.map(rowHtml).join('')}
+                ${handicapRows.length ? `<details style="margin-top:4px;"><summary style="cursor:pointer;color:var(--text-dim);font-size:11.5px;">Voir ${handicapRows.length} handicap${handicapRows.length > 1 ? 's' : ''} masqué${handicapRows.length > 1 ? 's' : ''}</summary><div style="display:flex;flex-direction:column;gap:6px;margin-top:6px;">${handicapRows.map(rowHtml).join('')}</div></details>` : ''}
               </div>
               <div style="margin-top:8px;font-size:10.5px;color:var(--text-dim2);font-style:italic;line-height:1.4;">
-                Tous les marchés ci-dessus ont été calculés depuis le modèle Poisson/Gaussien. Le tri est par edge décroissant.
+                Tous les marchés ci-dessus ont été calculés depuis le modèle Poisson/Gaussien. Les handicaps sont masqués par défaut, sauf edge > 15pt avec cote >= 2.50.
               </div>
             </div>
           `;
