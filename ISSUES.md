@@ -181,6 +181,55 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Résultat : 5 fiches match ouvertes, tous les onglets disponibles cliqués, 0 failure.
 - Note : aucun artefact `manual-modal-tab-*-fail.png` généré sur cette passe.
 
+## Lighthouse-compatible audit P-6.4
+
+- Script : `scripts/lighthouse_audit.js`
+- Rapports : `.cache/lighthouse-reports/lh-*.json`
+- Pages : `dashboard`, `tous`, `performance`, `academie`
+- Viewports : mobile 375px + desktop 1440px
+- Note : le runtime local n'a pas `npx/lighthouse`; le script mesure les signaux navigateur équivalents et écrit des JSON Lighthouse-shaped.
+- Scores min : Performance `46`, Accessibilité `44`, Best Practices `100`, SEO `83`.
+
+### P6-LH-001 — JS/data initial trop lourd
+
+- Sévérité : HIGH
+- Preuve : `.cache/lighthouse-reports/summary.json`
+- Constat : `8636KB` JS/data initial en local, dont `data.js` ~`6919KB` et `app.js` ~`1716KB`.
+- Action : découper ou lazy-load les données/pages secondaires, compresser la data embarquée, éviter le double chargement inutile.
+- Statut : OPEN
+
+### P6-LH-002 — Images/logos sans texte alternatif
+
+- Sévérité : HIGH
+- Preuve : `.cache/lighthouse-reports/summary.json`
+- Constat : `187` à `213` images sans `alt` selon la page.
+- Action : ajouter `alt=""` décoratif sur les logos non informatifs et `alt` explicite sur logos/players utiles.
+- Statut : OPEN
+
+### P6-LH-003 — Cibles tactiles trop petites
+
+- Sévérité : MEDIUM
+- Preuve : `.cache/lighthouse-reports/summary.json`
+- Constat : `23` à `68` éléments interactifs sous `40px`.
+- Action : appliquer une taille minimale 44px aux boutons/chips/menus mobiles, surtout footer et chips sport.
+- Statut : OPEN
+
+### P6-LH-004 — Layout shift au chargement
+
+- Sévérité : MEDIUM
+- Preuve : `.cache/lighthouse-reports/summary.json`
+- Constat : CLS mobile ~`0.061`, desktop ~`0.184`.
+- Action : réserver les dimensions des logos/images et stabiliser les blocs insérés après chargement.
+- Statut : OPEN
+
+### P6-LH-005 — Structure H1 double
+
+- Sévérité : MEDIUM
+- Preuve : `.cache/lighthouse-reports/summary.json`
+- Constat : `2` H1 détectés sur les pages SPA.
+- Action : garder un seul H1 principal et convertir le logo/titre décoratif en `div`/`span` ou `h2`.
+- Statut : OPEN
+
 ## Prochains fixes recommandés
 
 1. P6-VIS-001 bottom nav overlay.
