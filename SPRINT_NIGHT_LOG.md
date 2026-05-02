@@ -805,3 +805,11 @@
 - Impact: l’accueil commence enfin à exploiter un écran PC large au lieu de se comporter comme une colonne mobile
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.102 (2026-05-02 12:54 UTC)
+- Chantier: P-8.2 right rail desktop
+- Avant: le panier Big Bets retombait sous le feed, donc l’accueil restait mono-colonne sur PC
+- Après: layout desktop main + panier sticky 320/340px; dashboard wide 3378px, overflow 0
+- Impact: l’accueil prend une vraie structure PC avec zone actionnelle permanente à droite
+- Commit: pending
+- Status: ✅ DONE
