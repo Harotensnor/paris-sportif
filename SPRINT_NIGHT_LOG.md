@@ -257,3 +257,11 @@
 - Impact: warning Sofascore supprimé, source fiable pour fallback/matching; Santé descend à `1` warning restant, smoke E2E vert
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.34 (2026-05-02 05:40 UTC)
+- Chantier: P-A7 contrat Winamax exact
+- Avant: `winamax_exact_ratio=40.5%` (`299/739`) et `440` events étaient gardés via fallback statique/tournoi-only sans `match_id`
+- Après: si le catalogue Winamax live existe, seul un match exact avec `match_id` reste disponible; dataset actionnable `309/309` exacts, `272` events avec marchés >1N2, Santé `0` warning
+- Impact: plus de fausses disponibilités Winamax sans cote exploitable; Terminal Value reste vert (`1364` marchés scorés / `55` matchs exacts 48h) avec un univers de paris nettement plus propre
+- Commit: pending
+- Status: ✅ DONE
