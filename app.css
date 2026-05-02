@@ -5469,9 +5469,28 @@
   .mbn-badge[hidden] { display: none; }
   .mbn-btn.active .mbn-badge { background: var(--accent); }
   @media (max-width: 720px) {
+    :root {
+      --mobile-bottom-nav-h: calc(72px + env(safe-area-inset-bottom, 0px));
+      --mobile-bottom-gap: calc(var(--mobile-bottom-nav-h) + 18px);
+    }
     .mobile-bottom-nav { display: flex !important; }
-    /* Spacer en bas du body pour ne pas que le contenu se cache derrière la nav */
-    body { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
+    /* P-9.13 — Bottom nav safe-zone globale.
+       Certaines pages agent avaient leur propre padding-bottom en !important,
+       donc le body spacer seul ne suffisait pas : footer et derniers boutons
+       pouvaient passer sous la nav fixe. */
+    body { padding-bottom: var(--mobile-bottom-gap); }
+    main,
+    .content main,
+    body.agent-home main,
+    body.agent-inside main,
+    .bbf-shell,
+    .page-content {
+      padding-bottom: var(--mobile-bottom-gap) !important;
+    }
+    footer,
+    .site-footer {
+      margin-bottom: var(--mobile-bottom-nav-h);
+    }
   }
 
   /* v31.2 — Audit UX accessibilité dynamique : respecter prefers-reduced-motion
