@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-02T23:47:02Z",
+  "generated_at": "2026-05-02T23:51:23Z",
   "data_age_min": 0,
   "sources": {
     "winamax_catalog": {
@@ -38,13 +38,13 @@
       "events": 101
     },
     "xg_team_stats": {
-      "age_min": 1,
+      "age_min": 0,
       "teams": 112,
       "leagues": 6,
       "source": "understat"
     },
     "fbref_xg": {
-      "age_min": 1,
+      "age_min": 0,
       "teams": 112,
       "leagues": 6,
       "source": "understat_compat"
@@ -64,12 +64,12 @@
       "sports": 4
     },
     "h2h_extended": {
-      "age_min": 1,
+      "age_min": 0,
       "events": 171,
       "sports": 5
     },
     "injuries_multisport": {
-      "age_min": 1,
+      "age_min": 0,
       "teams": 130,
       "sports": 4
     },
@@ -157,7 +157,7 @@
     "xg_team_stats": {
       "script": "scripts/fetch_understat_xg.py",
       "output": "xg_team_stats.json",
-      "age_min": 1,
+      "age_min": 0,
       "threshold_min": 360,
       "fast_red_min": null,
       "status": "ok"
@@ -165,7 +165,7 @@
     "fbref_xg": {
       "script": "scripts/fetch_understat_xg.py",
       "output": "fbref_xg.json",
-      "age_min": 1,
+      "age_min": 0,
       "threshold_min": 360,
       "fast_red_min": null,
       "status": "ok"
@@ -197,7 +197,7 @@
     "h2h_extended": {
       "script": "h2h_extended.json",
       "output": "h2h_extended.json",
-      "age_min": 1,
+      "age_min": 0,
       "threshold_min": 60,
       "fast_red_min": null,
       "status": "ok"
@@ -205,7 +205,7 @@
     "injuries_multisport": {
       "script": "injuries_multisport.json",
       "output": "injuries_multisport.json",
-      "age_min": 1,
+      "age_min": 0,
       "threshold_min": 60,
       "fast_red_min": null,
       "status": "ok"
@@ -255,7 +255,7 @@
   "warnings": [],
   "overall": "ok",
   "quality_checks": {
-    "total_events": 325,
+    "total_events": 326,
     "upcoming_events": 278,
     "winamax_available": 278,
     "winamax_exact": 268,
