@@ -10336,6 +10336,68 @@
           <button type="button" class="why-bet__tech" data-why-tech-toggle>Voir les détails techniques</button>
         </footer>
       </section>`;
+    const advancedStatsHtml = (() => {
+      const formSeq = (side) => {
+        const src = side?.team_form_l10 || side?.form10 || side?.form_stats?.last10 || side?.form_stats?.results || side?.form || '';
+        const arr = typeof src === 'string' ? src.split('')
+          : Array.isArray(src) ? src.map(x => typeof x === 'string' ? x : (x.result || x.outcome || x.status || ''))
+          : src && Array.isArray(src.results) ? src.results : [];
+        return arr.map(x => String(x || '').slice(0, 1).toUpperCase()).filter(Boolean).slice(0, 10);
+      };
+      const formDots = (arr) => arr.length ? arr.map(r => {
+        const v = r === 'T' ? 'D' : r;
+        const label = v === 'W' ? 'V' : v === 'L' ? 'D' : 'N';
+        const color = v === 'W' ? 'var(--c-strong)' : v === 'L' ? 'var(--c-bad)' : 'var(--c-warn)';
+        return `<span title="${esc(label)}" style="display:inline-grid;place-items:center;width:19px;height:19px;border-radius:999px;background:color-mix(in srgb, ${color} 16%, transparent);border:1px solid color-mix(in srgb, ${color} 35%, transparent);color:${color};font-size:10px;font-weight:800;">${label}</span>`;
+      }).join('') : '<span class="u-text-dim2">—</span>';
+      const hForm = formSeq(home);
+      const aForm = formSeq(away);
+      const hxg = home?.xg_stats || home?.fbref_xg || null;
+      const axg = away?.xg_stats || away?.fbref_xg || null;
+      const num = (v) => Number.isFinite(Number(v)) ? Number(v) : null;
+      const fmt = (v, digits = 2) => {
+        const n = num(v);
+        return n == null ? '—' : n.toFixed(digits);
+      };
+      const starters = (side, key) => {
+        const direct = side?.lineup?.starters;
+        if (Array.isArray(direct)) return direct.length;
+        const root = match.lineups?.[key]?.starters || match.lineups?.[key]?.players;
+        if (Array.isArray(root)) return root.filter(p => p.substitute !== true).length;
+        return 0;
+      };
+      const hStarters = starters(home, 'home');
+      const aStarters = starters(away, 'away');
+      const w = match.weather || null;
+      const ref = match.referee || null;
+      const scorers = (match.sport === 'football' && pred && typeof predictLikelyScorers === 'function')
+        ? (predictLikelyScorers(match, pred) || []).slice(0, 3)
+        : [];
+      const tile = (label, value, sub) => `
+        <div style="padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);min-width:0;">
+          <div style="font-size:10px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.5px;font-weight:800;margin-bottom:4px;">${esc(label)}</div>
+          <div style="font-size:13px;color:var(--text);font-weight:750;line-height:1.35;">${value}</div>
+          ${sub ? `<div style="margin-top:3px;font-size:10.5px;color:var(--text-dim);line-height:1.35;">${sub}</div>` : ''}
+        </div>`;
+      const hasAny = hForm.length || aForm.length || hxg || axg || hStarters || aStarters || w || ref?.name || scorers.length;
+      if (!hasAny) return '';
+      const weatherValue = w
+        ? `${w.temp_c != null ? Math.round(w.temp_c) + '°C' : '—'}${w.wind_kmh != null ? ` · ${Math.round(w.wind_kmh)} km/h` : ''}`
+        : '—';
+      const refValue = ref?.name ? esc(ref.name) : '—';
+      return `
+        <details class="section" open>
+          <summary style="cursor:pointer;font-weight:800;color:var(--text);font-size:14px;margin-bottom:12px;">📌 Stats rapides avant pari</summary>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;">
+            ${tile('Forme L10', `<div style="display:flex;flex-direction:column;gap:6px;"><span>${esc(home?.short || home?.name || 'Dom.')} ${formDots(hForm)}</span><span>${esc(away?.short || away?.name || 'Ext.')} ${formDots(aForm)}</span></div>`, 'Les matchs les plus récents sont à gauche.')}
+            ${(hxg || axg) ? tile('xG / xGA L10', `${esc(home?.short || 'Dom.')} ${fmt(hxg?.xg_l10 ?? hxg?.xg_for_avg)} / ${fmt(hxg?.xga_l10 ?? hxg?.xg_against_avg)}<br>${esc(away?.short || 'Ext.')} ${fmt(axg?.xg_l10 ?? axg?.xg_for_avg)} / ${fmt(axg?.xga_l10 ?? axg?.xg_against_avg)}`, `PPDA ${esc(home?.short || 'D')}: ${fmt(hxg?.ppda, 1)} · ${esc(away?.short || 'E')}: ${fmt(axg?.ppda, 1)}`) : ''}
+            ${(hStarters || aStarters) ? tile('Compositions XI', `${esc(home?.short || 'Dom.')} ${hStarters || '—'}/11 · ${esc(away?.short || 'Ext.')} ${aStarters || '—'}/11`, 'Signal clé si les titulaires sont confirmés.') : ''}
+            ${scorers.length ? tile('Buteurs probables', scorers.map(s => `${esc(s.name)} <span class="u-text-dim">(${Math.round(s.prob*100)}%)</span>`).join('<br>'), 'À vérifier dans le marché buteur Winamax.') : ''}
+            ${w ? tile('Météo', esc(weatherValue), esc(w.city || w.condition || 'Open-Meteo')) : ''}
+            ${ref?.name ? tile('Arbitre', refValue, `${ref.cards_per_match != null ? `${Number(ref.cards_per_match).toFixed(1)} cartons/match` : ref.yellowPerGame != null ? `${Number(ref.yellowPerGame).toFixed(1)} jaunes/match` : 'Profil discipline disponible'}`) : ''}
+          </div>
+        </details>`;
+    })();
     // v32.9 — Tab strip retirée (doublon avec md-tabs existant qui filtre
     // les sections). Le système .md-tab (data-mtab-toggle) en aval gère
     // déjà : Synthèse / Cotes / Risques / Transparence / Stats / H2H.
@@ -10358,6 +10420,8 @@
           ${(() => { const f = derivedForm(away); return f ? renderForm(f, true) : ''; })()}
         </div>
       </div>
+
+      ${advancedStatsHtml}
 
       ${(() => {
         // Sprint 69 (v31.7.157 — audit ChatGPT 2026-04-28 P1) — "Fiche de décision".
