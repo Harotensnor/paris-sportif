@@ -14,8 +14,8 @@ Après : ce script tourne en DERNIER (après tous les patches), et :
      mode LIVE).
   3. Écrit data_manifest.json — {generated_at, today, days: [iso list]}.
      Permet au front de savoir quels jours sont disponibles avant fetch.
-  4. Réinjecte un blob inline LITE (today only) dans pronostics.html.
-     Premier paint instantané sur today, le reste arrive en async.
+  4. Écrit data_lite.js et le lie dans pronostics.html.
+     Premier paint instantané sur le scope lite, le reste arrive en async.
 
 Le data.js full reste écrit par fetch_v3 / fetch_live et sert de source
 canonique pour _ensureFullData() côté client (chargé idle après boot,
@@ -25,14 +25,16 @@ Idempotent : peut être lancé à chaque tick. ~50ms.
 """
 import json
 import re
+import hashlib
 from pathlib import Path
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA_JS = ROOT / 'data.js'
 HTML = ROOT / 'pronostics.html'
 DATA_TODAY = ROOT / 'data_today.json'
 DATA_MANIFEST = ROOT / 'data_manifest.json'
+DATA_LITE_JS = ROOT / 'data_lite.js'
 # Sprint 61 (v31.7.150 — audit ChatGPT 2026-04-28 P0) — Payload LITE 72h.
 # Avant : LITE blob inline avait UNIQUEMENT today → premier paint montrait
 # 0 match pour demain (PSG-Bayern caché jusqu'au _ensureFullData()).
@@ -67,7 +69,7 @@ def main():
         print('[finalize_inline] could not parse data.js, skipping.', flush=True)
         return
     data = json.loads(m.group(1))
-    data['generated_at'] = datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'
+    data['generated_at'] = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace('+00:00', 'Z')
 
     # Phase 3 #2 : filter golf et events sans competitors valides AVANT
     # de produire les sidecar JSONs et de réinjecter dans pronostics.html.
@@ -140,12 +142,10 @@ def main():
         encoding='utf-8',
     )
 
-    # 3. Inline LITE blob — Sprint 61 (v31.7.150) ÉTENDU 72h.
-    # Avant : seulement today (PSG-Bayern J+1 caché au premier paint).
-    # Après : today + J+1 + J+2 inline. Le user qui ouvre le site voit
-    # immédiatement les "Prochains gros matchs" (Sprint 47) sans attendre
-    # _ensureFullData(). Bilan/Backtest/Historique restent async (14j+).
-    lite_days = lite_72h_days
+    # 3. LITE boot blob — v35.112 : today only.
+    # Le sidecar data_lite_72h.json reste disponible pour un fetch futur, mais
+    # le premier chargement doit éviter le poids J+1/J+2 pour remonter Lighthouse.
+    lite_days = {today: today_events}
 
     lite = {
         'generated_at': manifest['generated_at'],
@@ -160,12 +160,17 @@ def main():
         'standings': data.get('standings') or [],
     }
     payload = json.dumps(lite, ensure_ascii=False, separators=(',', ':'))
+    DATA_LITE_JS.write_text(
+        'window.PRONOSTICS_DATA = ' + payload + ';\n',
+        encoding='utf-8',
+    )
 
     if HTML.exists():
         html_text = HTML.read_text(encoding='utf-8')
-        new_block = f'<script>\nwindow.PRONOSTICS_DATA = {payload};\n</script>'
+        data_lite_hash = hashlib.sha1(DATA_LITE_JS.read_bytes()).hexdigest()[:8]
+        new_block = f'<script src="data_lite.js?v={data_lite_hash}"></script>'
         new_html, n = re.subn(
-            r'<script>\s*window\.PRONOSTICS_DATA\s*=.*?;?\s*</script>',
+            r'<script>\s*window\.PRONOSTICS_DATA\s*=.*?;?\s*</script>|<script\s+src="data(?:_lite)?\.js(?:\?v=[^"]+)?"></script>',
             new_block,
             html_text,
             count=1,
@@ -177,13 +182,14 @@ def main():
     full_size_kb = DATA_JS.stat().st_size / 1024
     today_size_kb = DATA_TODAY.stat().st_size / 1024
     lite_72h_size_kb = DATA_LITE_72H.stat().st_size / 1024
-    inline_kb = len(payload) / 1024
-    n_lite_events = sum(len(v) for v in lite_72h_days.values())
+    lite_js_kb = DATA_LITE_JS.stat().st_size / 1024
+    n_boot_events = sum(len(v) for v in lite_days.values())
+    n_lite_72h_events = sum(len(v) for v in lite_72h_days.values())
     print(
         f'[finalize_inline] today={today} scope={scope_72h_keys[0]}..{scope_72h_keys[-1]} '
         f'| full={full_size_kb:.0f} KB | today.json={today_size_kb:.0f} KB '
-        f'| 72h.json={lite_72h_size_kb:.0f} KB | inline={inline_kb:.0f} KB '
-        f'| inline events={n_lite_events} on {len(lite_72h_days)}/3 days '
+        f'| 72h.json={lite_72h_size_kb:.0f} KB ({n_lite_72h_events} events) '
+        f'| data_lite.js={lite_js_kb:.0f} KB ({n_boot_events} boot events) '
         f'| total days={len(manifest["days"])}',
         flush=True,
     )

@@ -200,6 +200,14 @@
 - Commit: pending
 - Status: ✅ DONE
 
+## Sprint v35.112 (2026-05-02 13:58 UTC)
+- Chantier: P-9.3 data lite boot
+- Avant: boot chargeait data.js complet 6970 KB via pronostics.html
+- Après: boot charge data_lite.js 2761 KB; data.js complet reste lazy via _ensureFullData()
+- Impact: -4209 KB sur le payload data initial, pipeline cron génère le lite automatiquement
+- Commit: pending
+- Status: ✅ DONE
+
 ## Sprint v35.111 (2026-05-02 13:51 UTC)
 - Chantier: P-8.15 révision page Legal
 - Avant: legal pouvait passer en thème clair et header mobile se chevauchait

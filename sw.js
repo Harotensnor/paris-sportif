@@ -11,7 +11,7 @@
 // The "Stamp sw.js" step replaces this entire line with the current UTC timestamp,
 // so every deploy invalidates all caches → users see the new pronostics.html
 // without needing Ctrl+Shift+R. Manual edits stay valid for local dev.
-const CACHE_VERSION = 'paris-sportif-20260502-134601';
+const CACHE_VERSION = 'paris-sportif-20260502-v35-112-data-lite';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -126,6 +126,7 @@ self.addEventListener('fetch', (event) => {
   // Couvre data.js + sidecar JSON + odds_history.jsonl + manifest.
   const isDynamicData =
     pathEndsWith(url, 'data.js') ||
+    pathEndsWith(url, 'data_lite.js') ||
     pathEndsWith(url, 'data_today.json') ||
     pathEndsWith(url, 'data_manifest.json') ||
     pathEndsWith(url, 'odds_history.jsonl') ||

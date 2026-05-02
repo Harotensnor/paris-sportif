@@ -272,7 +272,7 @@ jobs:
           # used to make the whole `git add ... || true` no-op, so data.js stayed
           # fresh in the runner but never reached main.
           for path in \
-            data.js pronostics.html app.css app.js odds_history.jsonl \
+            data.js data_lite.js pronostics.html app.css app.js odds_history.jsonl \
             injuries_soccer.json winamax_catalog.json winamax_markets.json team_stats.json \
             lineups_soccer.json clubelo.json weather.json fbref_xg.json xg_team_stats.json \
             weather_geo_cache.json referees_soccer.json health.json \
