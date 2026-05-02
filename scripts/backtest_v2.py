@@ -57,12 +57,28 @@ COTE_BUCKETS = [
     ('heavy_dog',   4.50, 100.0),
 ]
 
+BIG_BET_MIN_EDGE = 0.08
+BIG_BET_MIN_RELIABILITY = 0.65
+
 
 def bucket_for(cote: float) -> str:
     for name, lo, hi in COTE_BUCKETS:
         if lo < cote <= hi or (lo == 0.0 and cote <= hi):
             return name
     return 'heavy_dog'
+
+
+def classify_tier(pred: dict, reliability: float, edge: float) -> str:
+    """Backtest tiering aligned with the Big Bets First product promise."""
+    if pred.get('skip'):
+        return 'skip'
+    if edge >= BIG_BET_MIN_EDGE and reliability >= BIG_BET_MIN_RELIABILITY:
+        return 'big_bet'
+    if pred.get('isLock'):
+        return 'lock'
+    if pred.get('lowConf'):
+        return 'lowconf'
+    return 'standard'
 
 
 # ═══ Chargement des sources ══════════════════════════════════════════
@@ -338,6 +354,9 @@ def run_backtest(opts) -> dict:
         cote = odds.get(side_key)
         if not cote or cote <= 1:
             continue
+        market_prob = 1.0 / cote
+        edge = pick_prob - market_prob
+        ev_pct = (pick_prob * cote) - 1.0
         # Proba du pick selon le modèle et proba marché pour Brier/logloss
         # (on évalue la qualité de la proba, pas juste de la décision)
         actual_side = outcome  # 'home' | 'away' | 'draw'
@@ -354,10 +373,7 @@ def run_backtest(opts) -> dict:
 
         # Fiabilité tier (même logique que dashboard)
         reliability = pred.get('reliability', 0.0)
-        tier = ('lock' if pred.get('isLock')
-                else 'skip' if pred.get('skip')
-                else 'lowconf' if pred.get('lowConf')
-                else 'standard')
+        tier = classify_tier(pred, reliability, edge)
 
         # v31.7.38 — CLV (Closing Line Value). Si on a le closing odd
         # (capturé par snapshot_odds.py 10min avant kickoff), on calcule
@@ -382,6 +398,9 @@ def run_backtest(opts) -> dict:
             'reliability': reliability,
             'tier': tier,
             'cote': cote,
+            'market_prob': market_prob,
+            'edge': edge,
+            'ev_pct': ev_pct,
             'closing_cote': closing_cote,
             'clv_pct': clv_pct,
             'cote_bucket': bucket_for(cote),
@@ -445,7 +464,8 @@ def summarize(rows: list[dict]) -> dict:
                 'flat_roi_pct': 0.0, 'flat_roi_ci_pct': [0.0, 0.0],
                 'kelly_pnl': 0.0,
                 'brier': 0.0, 'logloss': 0.0, 'avg_cote': 0.0,
-                'avg_pick_prob': 0.0, 'avg_clv_pct': None, 'n_with_clv': 0}
+                'avg_pick_prob': 0.0, 'avg_edge_pct': 0.0,
+                'avg_ev_pct': 0.0, 'avg_clv_pct': None, 'n_with_clv': 0}
     wins = sum(1 for r in rows if r['won'])
     flat_pnl = sum(r['flat_pnl'] for r in rows)
     kelly_pnl = sum(r['kelly_pnl'] for r in rows)
@@ -468,6 +488,8 @@ def summarize(rows: list[dict]) -> dict:
         'logloss': round(mean(r['logloss'] for r in rows), 4),
         'avg_cote': round(mean(r['cote'] for r in rows), 2),
         'avg_pick_prob': round(mean(r['pick_prob'] for r in rows), 3),
+        'avg_edge_pct': round(100 * mean(r.get('edge', 0.0) for r in rows), 2),
+        'avg_ev_pct': round(100 * mean(r.get('ev_pct', 0.0) for r in rows), 2),
         'avg_clv_pct': avg_clv,
         'n_with_clv': len(clv_rows),
     }
@@ -654,11 +676,11 @@ def isotonic_calibration_pairs(rows: list[dict], min_n_per_bucket: int = 8) -> l
 
 def render_markdown(report: dict) -> str:
     lines = ['# Backtest ROI — VRAI modèle (v2)', '']
-    lines.append(f"Généré : {report['generated_at']}  ")
+    lines.append(f"Généré : {report['generated_at']}")
     lines.append(f"Source modèle : `pronostics.html` via `scripts/model_loader.py` "
-                 f"(V8 embarqué, zéro duplication)  ")
+                 f"(V8 embarqué, zéro duplication)")
     lines.append(f"Univers : {report['n_events']} picks sur "
-                 f"{report['date_range']['start']} → {report['date_range']['end']}  ")
+                 f"{report['date_range']['start']} → {report['date_range']['end']}")
     lines.append(f"Bankroll simulée (Kelly 0.25× cap 10%) : "
                  f"**100u → {report['bankroll_final_kelly']}u**")
     lines.append('')
@@ -708,16 +730,21 @@ def render_markdown(report: dict) -> str:
     # Par tier
     lines.append('## Par tier de fiabilité')
     lines.append('')
-    lines.append('| Tier | N | WR | ROI flat | Kelly cumul | Brier |')
-    lines.append('|---|---:|---:|---:|---:|---:|')
-    for tier in ['lock', 'standard', 'lowconf', 'skip']:
+    lines.append('| Tier | N | WR | Wilson 95% | ROI flat | Kelly cumul | Brier | Edge moy. |')
+    lines.append('|---|---:|---:|---:|---:|---:|---:|---:|')
+    tier_order = ['big_bet', 'lock', 'standard', 'lowconf', 'skip']
+    extra_tiers = [t for t in sorted(report['by_tier']) if t not in tier_order]
+    for tier in tier_order + extra_tiers:
         s = report['by_tier'].get(tier)
-        if not s or s['n'] == 0:
+        if not s:
             continue
-        e = '🟢' if s['flat_roi_pct'] > 0 else '🔴' if s['flat_roi_pct'] < 0 else '⚪'
+        e = '⚪' if s['n'] == 0 else '🟢' if s['flat_roi_pct'] > 0 else '🔴' if s['flat_roi_pct'] < 0 else '⚪'
+        wr_ci = s.get('win_rate_ci') or [0, 0]
         lines.append(f"| `{tier}` | {s['n']} | {s['win_rate']*100:.0f}% | "
+                     f"{wr_ci[0]*100:.0f}–{wr_ci[1]*100:.0f}% | "
                      f"{e} {s['flat_roi_pct']:+.1f}% | "
-                     f"{s['kelly_pnl']:+.2f}u | {s['brier']} |")
+                     f"{s['kelly_pnl']:+.2f}u | {s['brier']} | "
+                     f"{s.get('avg_edge_pct', 0):+.1f}pt |")
     lines.append('')
 
     # Par sport
@@ -877,8 +904,17 @@ def main() -> int:
         row['calibration_group'] = calibration_group_key(row)
 
     dates = sorted(r['date'] for r in rows if r.get('date'))
+    by_tier = bucket_by(rows, 'tier')
+    for tier_name in ['big_bet', 'lock', 'standard', 'lowconf', 'skip']:
+        by_tier.setdefault(tier_name, summarize([]))
     report = {
         'generated_at': datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
+        'big_bet_definition': {
+            'min_edge': BIG_BET_MIN_EDGE,
+            'min_reliability': BIG_BET_MIN_RELIABILITY,
+            'requires_not_skip': True,
+            'label': 'edge >= 8pt et confiance >= 65%',
+        },
         'n_events': len(rows),
         'date_range': {
             'start': dates[0] if dates else None,
@@ -889,7 +925,7 @@ def main() -> int:
         'by_league': bucket_by(rows, 'league_code'),
         'by_calibration_group': bucket_by(rows, 'calibration_group'),
         'by_cote_bucket': bucket_by(rows, 'cote_bucket'),
-        'by_tier': bucket_by(rows, 'tier'),
+        'by_tier': by_tier,
         'calibration': calibration_bins(rows, n_bins=10),
         # v31.7.10 — Multi-binning : 5/10/20 bins servis simultanement pour
         # permettre un select dropdown cote front (granularite ajustable).

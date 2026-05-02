@@ -133,7 +133,7 @@
 <!-- Chantier S — PWA -->
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="alternate" type="application/rss+xml" href="feed.xml" title="Paris-Sportif — Top picks du jour (RSS)">
-<!-- v35.07 — Seul le CSS est préchargé au boot. Le gros app.js?v=00dff16b reste en defer
+<!-- v35.07 — Seul le CSS est préchargé au boot. Le gros app.js?v=1d300f38 reste en defer
      plus bas dans le body pour laisser le squelette critique peindre d'abord. -->
 <link rel="preload" href="app.css?v=97c7a584" as="style" onload="this.onload=null;this.rel='stylesheet'">
 <!-- v31.1 — DNS-prefetch pour les CDN tiers utilisés sur la page (logos ESPN).
@@ -277,7 +277,7 @@
   // pour debug console. AUCUN envoi réseau — l'utilisateur peut consulter
   // ou exporter ses données, et c'est tout.
   //
-  // Pourquoi inline pré-app.js?v=00dff16b ? Il faut s'enregistrer AVANT le LCP/FCP
+  // Pourquoi inline pré-app.js?v=1d300f38 ? Il faut s'enregistrer AVANT le LCP/FCP
   // pour les capter. Le bundle web-vitals officiel pèse 5 KB ; ici on
   // tombe à ~1.5 KB grâce à l'usage direct de PerformanceObserver.
   //
@@ -604,7 +604,7 @@
      - dismiss persiste 30j via localStorage trustStripHiddenUntil -->
 <div id="trust-strip" class="trust-strip hidden" role="region" aria-label="Performance du modèle">
   <a href="backtest.html" class="trust-strip-link" title="Voir le backtest complet" id="trust-strip-link">
-    <span class="trust-strip-stat" title="Win Rate sur les paris classés 'lock' (≥70% confiance) — pourcentage de paris gagnés"><span class="trust-strip-val" id="trust-locks-wr">—</span><span class="trust-strip-lbl">locks WR</span></span>
+    <span class="trust-strip-stat" title="Win Rate sur les Big Bets validés (edge ≥8pt et confiance ≥65%). 0 = aucun gros pari assez propre dans l'échantillon."><span class="trust-strip-val" id="trust-locks-wr">—</span><span class="trust-strip-lbl">Big Bets</span></span>
     <span class="trust-strip-sep" aria-hidden="true">·</span>
     <span class="trust-strip-stat" title="ROI Flat = profit / mises avec mise constante 1u par pari. Mesure la rentabilité brute hors stratégie de mise."><span class="trust-strip-val" id="trust-roi">—</span><span class="trust-strip-lbl">ROI flat</span></span>
     <span class="trust-strip-sep" aria-hidden="true">·</span>
@@ -646,7 +646,7 @@
         </div>
       </div>
     </section>
-    <!-- v31.2 — Friendly error state (audit UX). Avant : "Fichier data.js?v=776a0883
+    <!-- v31.2 — Friendly error state (audit UX). Avant : "Fichier data.js?v=35bc9b1d
          introuvable" brut, casse la confiance. Maintenant : message rassurant
          avec retry + dernier refresh + offline fallback explanation. -->
     <div id="no-data-banner" class="error-banner hidden" role="alert" aria-live="polite">
@@ -729,7 +729,7 @@
       <div class="footer-brand">
         <span class="footer-logo">🎯</span>
         <span class="footer-text">Paris-Sportif</span>
-        <span class="footer-version" id="footer-version" role="button" tabindex="0" style="cursor:pointer;" title="Voir les nouveautés v35.52">v35.52</span>
+        <span class="footer-version" id="footer-version" role="button" tabindex="0" style="cursor:pointer;" title="Voir les nouveautés v35.53">v35.53</span>
       </div>
       <nav class="footer-links" aria-label="Liens du site">
         <a href="https://github.com/Harotensnor/paris-sportif" target="_blank" rel="noopener" class="footer-link" title="Code source sur GitHub">
@@ -813,8 +813,8 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="data.js?v=be09df4b"></script>
-<script src="app.js?v=00dff16b" defer></script>
+<script src="data.js?v=35bc9b1d"></script>
+<script src="app.js?v=1d300f38" defer></script>
 
 <!-- enhancements v20 -->
 <script data-tag="__paris_sportif_enh_v20__">
@@ -875,11 +875,11 @@
   };
 
   // ========== CHANTIER DDD — Mode offline robuste ==========
-  // v32.6 — Fusionné avec setupOfflineBanner (app.js?v=00dff16b). Garde uniquement le
+  // v32.6 — Fusionné avec setupOfflineBanner (app.js?v=1d300f38). Garde uniquement le
   // CSS qui désactive les CTAs externes en mode offline. Le banner visuel
-  // est rendu par app.js?v=00dff16b (#offline-banner), avec timestamp dynamique. Avant
+  // est rendu par app.js?v=1d300f38 (#offline-banner), avec timestamp dynamique. Avant
   // ce fix, 2 banners coexistaient (#__offline-banner ici + #offline-banner
-  // app.js?v=00dff16b) → duplication visuelle quand offline.
+  // app.js?v=1d300f38) → duplication visuelle quand offline.
   function initOffline(){
     var style = document.createElement('style');
     style.textContent =
