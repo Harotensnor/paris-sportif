@@ -597,3 +597,11 @@
 - Impact: interactions principales sans erreur JS; rapport `.cache/click-audit-report.json`
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.76 (2026-05-02 12:03 UTC)
+- Chantier: P-6.3 modal détail tabs
+- Avant: aucun test multi-sport des onglets détail
+- Après: spec CI + script local autonome, 5 sports testés, 0 failure
+- Impact: fiches football/tennis/basket/baseball/hockey ouvrent et changent d'onglet sans erreur
+- Commit: pending
+- Status: ✅ DONE
