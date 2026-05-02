@@ -297,3 +297,11 @@
 - Impact: `-342` styles inline et `-3.9KB` sur le bundle JS sans changer le design; base plus saine pour les prochaines refontes
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.39 (2026-05-02 06:06 UTC)
+- Chantier: P-D5 Santé erreurs JS exportables
+- Avant: Santé affichait seulement `10` erreurs récentes sans URL complète, sans export dédié, ni bandeau critique exploitable
+- Après: journal JS enrichi (`url`, contexte cache/data/user-agent), vue Santé `20` dernières erreurs, stacks pliables, export JSON et alerte visible si `>10` erreurs/24h
+- Impact: debugging navigateur réel beaucoup plus rapide; Théo peut exporter un crash sans ouvrir la console; bundle reste sous budget
+- Commit: pending
+- Status: ✅ DONE

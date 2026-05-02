@@ -24715,6 +24715,37 @@
   function saveJsErrors(arr) {
     try { localStorage.setItem(JS_ERRORS_KEY, JSON.stringify(arr.slice(-JS_ERRORS_MAX))); } catch (e) {}
   }
+  function exportJsErrors() {
+    try {
+      const errors = loadJsErrors().slice(-JS_ERRORS_MAX).reverse();
+      const payload = {
+        exported_at: new Date().toISOString(),
+        version: 2,
+        count: errors.length,
+        context: {
+          page: (typeof currentPage !== 'undefined' && currentPage) || 'unknown',
+          data_generated_at: window.PRONOSTICS_DATA && window.PRONOSTICS_DATA.generated_at || null,
+          cache_version: typeof CACHE_VERSION !== 'undefined' ? CACHE_VERSION : null,
+          user_agent: (typeof navigator !== 'undefined' && navigator.userAgent) || '',
+          url: (typeof location !== 'undefined' && location.href) || ''
+        },
+        errors
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `paris-sportif-js-errors-${new Date().toISOString().slice(0,10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 500);
+      if (typeof toast === 'function') toast('Journal erreurs exporté', 'success');
+    } catch (e) {
+      if (typeof toast === 'function') toast('Export erreurs impossible', 'error');
+    }
+  }
+  try { window._exportJsErrors = exportJsErrors; } catch (e) {}
   function logJsError(type, msg, stack) {
     try {
       const arr = loadJsErrors();
@@ -24724,6 +24755,7 @@
         msg: String(msg || '').slice(0, 400),
         stack: String(stack || '').slice(0, 1200),
         page: (typeof currentPage !== 'undefined' && currentPage) || 'unknown',
+        url: (typeof location !== 'undefined' && location.href) || '',
       });
       saveJsErrors(arr);
     } catch (e) { /* swallow */ }
@@ -25030,14 +25062,21 @@
         </div>`;
     })();
 
-    // Erreurs récentes (si présentes, détails)
+    // Erreurs récentes (si présentes, détails + export)
     const errCheck = checks.find(c => c.key === 'js-errors');
     const errList = errCheck && errCheck.extras && errCheck.extras.recent ? errCheck.extras.recent : [];
+    const errBurstHtml = errList.length > 10 ? `
+      <div style="margin-top:18px;padding:12px 14px;background:rgba(248,113,113,.10);border:1px solid rgba(248,113,113,.32);border-left:4px solid #f87171;border-radius:10px;color:var(--text);font-size:13px;line-height:1.5;">
+        <b>🔴 Alerte stabilité navigateur</b> · ${errList.length} erreurs JS captées sur 24h. Exporte le journal avant de vider, puis regarde les stacks répétées.
+      </div>` : '';
     const errListHtml = errList.length ? `
       <div class="u-mt-18">
-        <div style="font-size:12px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;font-weight:600;margin-bottom:8px;">🐞 Dernières erreurs JS</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
+          <div style="font-size:12px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;font-weight:600;">🐞 Dernières erreurs JS</div>
+          <button id="sante-export-errors-btn" type="button" style="background:rgba(167,139,250,.15);color:var(--brand);border:1px solid rgba(167,139,250,.3);border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;">⬇ Export JSON (${errList.length})</button>
+        </div>
         <div style="background:rgba(248,113,113,.04);border:1px solid rgba(248,113,113,.2);border-radius:8px;overflow:hidden;">
-          ${errList.slice(-10).reverse().map(e => {
+          ${errList.slice(-20).reverse().map(e => {
             // FIX audit Santé #7 : guard new Date(e.t) qui peut produire
             // Invalid Date si e.t est corrompu, et e.page/e.type/e.msg
             // peuvent être undefined si l'entrée du ring buffer est
@@ -25050,9 +25089,16 @@
             const _type = (e && e.type) || '?';
             const _msg = (e && e.msg) || '(message vide)';
             const _page = (e && e.page) || '—';
+            const _stack = (e && e.stack) || '';
+            const _url = (e && e.url) || '';
             return `<div style="padding:8px 12px;border-bottom:1px solid var(--border);font-size:11px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--text-dim);">
               <div class="u-text"><b>[${esc(_type)}]</b> ${esc(_msg)}</div>
               <div style="margin-top:2px;">${esc(when)} · page=${esc(_page)}</div>
+              ${_url ? `<div style="margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">url=${esc(_url)}</div>` : ''}
+              ${_stack ? `<details style="margin-top:6px;">
+                <summary style="cursor:pointer;color:var(--brand);font-weight:700;">stack</summary>
+                <pre style="white-space:pre-wrap;word-break:break-word;margin:6px 0 0;padding:8px;border-radius:8px;background:rgba(0,0,0,.18);color:var(--text-dim);max-height:220px;overflow:auto;">${esc(_stack)}</pre>
+              </details>` : ''}
             </div>`;
           }).join('')}
         </div>
@@ -25321,6 +25367,8 @@
           </div>
         </div>
 
+        ${errBurstHtml}
+
         ${errListHtml}
 
         <div style="margin-top:24px;font-size:11px;color:var(--text-dim);font-style:italic;line-height:1.6;">
@@ -25339,6 +25387,11 @@
     }));
     const reBtn = wrap.querySelector('#sante-rerun-btn');
     if (reBtn) reBtn.addEventListener('click', (ev) => { ev.stopPropagation(); renderSantePage(wrap); });
+    const exportErrorsBtn = wrap.querySelector('#sante-export-errors-btn');
+    if (exportErrorsBtn) exportErrorsBtn.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      exportJsErrors();
+    });
   }
 
   // ======= Chantier ZZZZ — Coach IA personnalisé (Winamax) =======
