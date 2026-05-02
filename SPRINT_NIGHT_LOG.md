@@ -453,3 +453,11 @@
 - Impact: rythme CSS stabilisé sans changement visuel; visual diff `0.02%`, `0/32` échec
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.58 (2026-05-02 08:10 UTC)
+- Chantier: P-4.28 radius ladder
+- Avant: `74` border-radius directs ciblés
+- Après: tokens `--r-2xs`, `--r-card`, `--r-pill`; `0` radius directs ciblés
+- Impact: radius CSS unifié; visual diff `11.00%` attendu sur Performance dynamique, autres pages stables
+- Commit: pending
+- Status: ✅ DONE
