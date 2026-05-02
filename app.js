@@ -6939,6 +6939,7 @@
     let reliability = best_pick[1];
     let reliabilityMeta = null;
     let ensembleMeta = null;
+    let leagueBias = null;
     // Market odds are skipped via the isMarket flag (they still shape `final`
     // above so the pick label exists, but they do NOT contribute to fiabilité).
     let pureCompCount = 0;
@@ -7022,6 +7023,17 @@
         lineupBoost: lineupBoost ? Math.round(lineupBoost * 1000) / 1000 : 0,
       };
     }
+    try {
+      const lg = window.__backtestReportV2?.by_league?.[match.league_code];
+      const n = Number(lg?.n) || 0;
+      const brier = Number(lg?.brier);
+      if (n >= 20 && brier > 0.25) {
+        const penalty = Math.min(0.08, Math.max(0.02, (brier - 0.25) * 0.6));
+        reliability = Math.max(0.25, reliability - penalty);
+        leagueBias = { league: match.league_code, n, brier: Math.round(brier * 1000) / 1000, penalty: Math.round(penalty * 1000) / 1000 };
+        reasons.push({ type: 'league_bias', icon: '🧯', text: `Ligue dépriorisée : Brier ${leagueBias.brier} sur ${n} picks → fiabilité −${Math.round(penalty * 100)}pt.` });
+      }
+    } catch(e) {}
 
     // Generate a one-sentence headline summary
     let headline = '';
@@ -7091,6 +7103,7 @@
       prob_ci: probCi,
       confidence_interval: probCi,
       ensemble: ensembleMeta,
+      league_bias: leagueBias,
       odds: best,
       hasDraw,
       //   isLock ≥ 0.70 — cible du 80%+ WR, aligné sur la calibration historique
