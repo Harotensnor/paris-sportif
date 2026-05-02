@@ -1237,3 +1237,9 @@
 - Après: Big Bets puis 3-5 Solides, Odds/Outsiders, reste en accordéon; buteurs repliés en section secondaire.
 - Impact: accueil plus aligné sur l'objectif Théo: cotes hautes et décisions d'abord, contenu bonus ensuite.
 - Vérif: phase10_dashboard_probettor_audit.json + syntax/bundle PASS.
+
+## Sprint v35.159 — Phase 10 P-10.7 Stratégie du jour (18:30 UTC)
+- Avant: l'accueil listait les picks sans consigne d'exposition ni priorité de marché.
+- Après: carte Stratégie du jour avec marché lisible, sport dominant, exposition max et diversification.
+- Impact: Théo voit quoi jouer, combien exposer et où éviter la concentration avant de scroller.
+- Vérif: phase10_strategy_audit.json mobile/desktop, overflow horizontal = 0.
