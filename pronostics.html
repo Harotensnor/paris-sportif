@@ -133,7 +133,7 @@
 <!-- Chantier S — PWA -->
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="alternate" type="application/rss+xml" href="feed.xml" title="Paris-Sportif — Top picks du jour (RSS)">
-<!-- v35.07 — Seul le CSS est préchargé au boot. Le gros app.js?v=8547af84 reste en defer
+<!-- v35.07 — Seul le CSS est préchargé au boot. Le gros app.js?v=6591b577 reste en defer
      plus bas dans le body pour laisser le squelette critique peindre d'abord. -->
 <link rel="preload" href="app.css?v=97c7a584" as="style" onload="this.onload=null;this.rel='stylesheet'">
 <!-- v31.1 — DNS-prefetch pour les CDN tiers utilisés sur la page (logos ESPN).
@@ -277,7 +277,7 @@
   // pour debug console. AUCUN envoi réseau — l'utilisateur peut consulter
   // ou exporter ses données, et c'est tout.
   //
-  // Pourquoi inline pré-app.js?v=8547af84 ? Il faut s'enregistrer AVANT le LCP/FCP
+  // Pourquoi inline pré-app.js?v=6591b577 ? Il faut s'enregistrer AVANT le LCP/FCP
   // pour les capter. Le bundle web-vitals officiel pèse 5 KB ; ici on
   // tombe à ~1.5 KB grâce à l'usage direct de PerformanceObserver.
   //
@@ -466,11 +466,11 @@
          à côté du brand. Avant : aucun lien direct visible, l'user devait passer par
          la sidebar (cachée à gauche). Maintenant : accès 1-clic aux pages clés. -->
     <nav class="topbar-mainnav" aria-label="Navigation principale rapide">
-      <button class="page-btn topbar-mainnav__link" data-page="top" title="Top picks du jour">⭐ Top</button>
-      <button class="page-btn topbar-mainnav__link" data-page="locks" title="Pronos haute fiabilité ≥72%">🔒 Locks</button>
-      <button class="page-btn topbar-mainnav__link" data-page="combines" title="Combinés suggérés">🔗 Combinés</button>
-      <button class="page-btn topbar-mainnav__link" data-page="bilan" title="Bilan + cagnotte agent">💰 Bilan</button>
-      <button class="page-btn topbar-mainnav__link" data-page="backtest" title="Backtest historique">📈 Backtest</button>
+      <button class="page-btn topbar-mainnav__link" data-page="dashboard" title="Big Bets du jour">Accueil</button>
+      <button class="page-btn topbar-mainnav__link" data-page="tous" title="Tous les paris filtrables">Tous les paris</button>
+      <button class="page-btn topbar-mainnav__link" data-page="performance" title="Bilan, historique et performance">Mes paris</button>
+      <button class="page-btn topbar-mainnav__link" data-page="academie" title="Méthode et glossaire">Méthode</button>
+      <button class="page-btn topbar-mainnav__link" data-page="profil" title="Profil, santé et réglages">Profil</button>
     </nav>
 
     <div class="topbar-utils">
@@ -546,69 +546,36 @@
      + combinés côté Picks, matchs/compare côté Explorer, simulateur côté
      Performance. Les deeplinks/bookmarks restent préservés. -->
 <nav class="topbar-nav" id="page-nav" aria-label="Navigation principale">
-  <button class="page-btn hub-solo active" data-page="dashboard">⚡ Now <span class="count" id="count-dashboard-actions" style="display:none;"></span></button>
-
-  <div class="hub" data-hub="now">
-    <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">🎯 Picks <span class="chev">▾</span></button>
-    <div class="hub-menu" role="menu" aria-label="Sous-menu Picks">
-      <button class="page-btn" role="menuitem" data-page="top">⭐ Top du jour</button>
-      <button class="page-btn" role="menuitem" data-page="valeur">💎 Mismatches marché</button>
-      <button class="page-btn" role="menuitem" data-page="plan-mise">💼 Mises du jour</button>
-      <button class="page-btn" role="menuitem" data-page="locks">🔒 Locks <span class="count" id="count-locks"></span></button>
-      <button class="page-btn" role="menuitem" data-page="combines">🔗 Combinés</button>
-      <button class="page-btn" role="menuitem" data-page="montante-jour">📈 Montante jour</button>
-      <button class="page-btn" role="menuitem" data-page="montante-weekend">🗓️ Montante weekend</button>
-      <button class="page-btn" role="menuitem" data-page="montante-semaine">📆 Montante semaine</button>
-    </div>
-  </div>
+  <button class="page-btn hub-solo active" data-page="dashboard">Accueil <span class="count" id="count-dashboard-actions" style="display:none;"></span></button>
+  <button class="page-btn hub-solo" data-page="tous">Tous les paris</button>
 
   <div class="hub" data-hub="agent">
-    <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">🤖 Agent <span class="chev">▾</span></button>
-    <div class="hub-menu" role="menu" aria-label="Sous-menu Agent">
+    <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">Mes paris <span class="chev">▾</span></button>
+    <div class="hub-menu" role="menu" aria-label="Sous-menu Mes paris">
+      <button class="page-btn" role="menuitem" data-page="performance">🎯 Performance modèle</button>
       <button class="page-btn" role="menuitem" data-page="bilan">💰 Cagnotte autonome</button>
       <button class="page-btn" role="menuitem" data-page="historique">📜 Historique paris</button>
-    </div>
-  </div>
-
-  <!-- V12 (audit phase 2) : ajout hubs "Explorer" + "Apprendre" pour atteindre les 6 hubs promis Sprint 54
-       (Accueil / Picks / Explorer / Agent / Performance / Apprendre / Compte). -->
-  <div class="hub" data-hub="explore">
-    <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">🔍 Explorer <span class="chev">▾</span></button>
-    <div class="hub-menu" role="menu" aria-label="Sous-menu Explorer">
-      <button class="page-btn" role="menuitem" data-page="tous">📋 Tous les matchs</button>
-      <button class="page-btn" role="menuitem" data-page="calendrier">📅 Calendrier 7j</button>
-      <button class="page-btn" role="menuitem" data-page="matchs">🔍 Matchs détectés</button>
-      <button class="page-btn" role="menuitem" data-page="buteurs">⚽ Buteurs</button>
-      <button class="page-btn" role="menuitem" data-page="compare">↔️ Comparer 2 jours</button>
-    </div>
-  </div>
-
-  <div class="hub" data-hub="performance">
-    <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">📊 Performance <span class="chev">▾</span></button>
-    <div class="hub-menu" role="menu" aria-label="Sous-menu Performance">
-      <button class="page-btn" role="menuitem" data-page="performance">🎯 Performance modèle</button>
-      <button class="page-btn" role="menuitem" data-page="credibilite">✓ Crédibilité</button>
       <button class="page-btn" role="menuitem" data-page="backtest">🧪 Backtest</button>
-      <button class="page-btn" role="menuitem" data-page="simulator">🧪 What-if simulator</button>
     </div>
   </div>
 
   <div class="hub" data-hub="learn">
-    <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">🎓 Apprendre <span class="chev">▾</span></button>
-    <div class="hub-menu" role="menu" aria-label="Sous-menu Apprendre">
+    <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">Méthode <span class="chev">▾</span></button>
+    <div class="hub-menu" role="menu" aria-label="Sous-menu Méthode">
       <button class="page-btn" role="menuitem" data-page="academie">📚 Académie</button>
       <button class="page-btn" role="menuitem" data-page="methodologie">⚗️ Méthodologie</button>
-      <button class="page-btn" role="menuitem" data-page="legal">⚖️ Mentions légales</button>
+      <button class="page-btn" role="menuitem" data-page="credibilite">✓ Crédibilité</button>
     </div>
   </div>
 
-  <!-- Settings : icône isolée (profil/favoris/alertes/santé pipeline) -->
   <div class="hub" data-hub="account">
-    <button class="hub-btn hub-btn-icon" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Compte &amp; paramètres" title="Compte & paramètres">⚙️ <span class="chev">▾</span></button>
-    <div class="hub-menu" role="menu" aria-label="Sous-menu Compte">
+    <button class="hub-btn" type="button" aria-haspopup="true" aria-expanded="false">Profil <span class="chev">▾</span></button>
+    <div class="hub-menu" role="menu" aria-label="Sous-menu Profil">
       <button class="page-btn" role="menuitem" data-page="profil">👤 Profil &amp; bankroll <span class="count" id="count-sante-alerts"></span></button>
+      <button class="page-btn" role="menuitem" data-page="sante">🩺 Santé data</button>
       <button class="page-btn" role="menuitem" data-page="favoris">⭐ Favoris</button>
       <button class="page-btn" role="menuitem" data-page="alertes">🔔 Alertes <span class="count" id="count-alertes"></span></button>
+      <button class="page-btn" role="menuitem" data-page="legal">⚖️ Mentions légales</button>
     </div>
   </div>
 </nav>
@@ -679,7 +646,7 @@
         </div>
       </div>
     </section>
-    <!-- v31.2 — Friendly error state (audit UX). Avant : "Fichier data.js?v=f71829c0
+    <!-- v31.2 — Friendly error state (audit UX). Avant : "Fichier data.js?v=9d18abd1
          introuvable" brut, casse la confiance. Maintenant : message rassurant
          avec retry + dernier refresh + offline fallback explanation. -->
     <div id="no-data-banner" class="error-banner hidden" role="alert" aria-live="polite">
@@ -762,7 +729,7 @@
       <div class="footer-brand">
         <span class="footer-logo">🎯</span>
         <span class="footer-text">Paris-Sportif</span>
-        <span class="footer-version" id="footer-version" role="button" tabindex="0" style="cursor:pointer;" title="Voir les nouveautés v35.46">v35.46</span>
+        <span class="footer-version" id="footer-version" role="button" tabindex="0" style="cursor:pointer;" title="Voir les nouveautés v35.47">v35.47</span>
       </div>
       <nav class="footer-links" aria-label="Liens du site">
         <a href="https://github.com/Harotensnor/paris-sportif" target="_blank" rel="noopener" class="footer-link" title="Code source sur GitHub">
@@ -796,23 +763,23 @@
      hubs à chevrons en topbar pour la navigation principale mobile. -->
 <!-- v32.0 — Bottom nav refacto : 4 items orientés intent (Now/Agent/Stats + Menu). -->
 <nav id="mobile-bottom-nav" class="mobile-bottom-nav" role="navigation" aria-label="Navigation mobile principale">
-  <button type="button" class="mbn-btn page-btn" data-page="dashboard" aria-label="Now — picks à parier maintenant">
+  <button type="button" class="mbn-btn page-btn" data-page="dashboard" aria-label="Accueil — Big Bets du jour">
     <span class="mbn-icon" aria-hidden="true">⚡</span>
-    <span class="mbn-label">Now</span>
+    <span class="mbn-label">Accueil</span>
     <span class="mbn-badge" id="mbn-badge-dashboard" hidden></span>
   </button>
-  <button type="button" class="mbn-btn page-btn" data-page="top" aria-label="Top picks">
+  <button type="button" class="mbn-btn page-btn" data-page="tous" aria-label="Tous les paris">
     <span class="mbn-icon" aria-hidden="true">🎯</span>
-    <span class="mbn-label">Picks</span>
+    <span class="mbn-label">Tous</span>
     <span class="mbn-badge" id="mbn-badge-locks" hidden></span>
   </button>
-  <button type="button" class="mbn-btn page-btn" data-page="bilan" aria-label="Agent — cagnotte autonome">
+  <button type="button" class="mbn-btn page-btn" data-page="performance" aria-label="Mes paris — performance et historique">
     <span class="mbn-icon" aria-hidden="true">🤖</span>
-    <span class="mbn-label">Agent</span>
+    <span class="mbn-label">Mes paris</span>
   </button>
-  <button type="button" class="mbn-btn page-btn" data-page="performance" aria-label="Stats — performance modèle">
-    <span class="mbn-icon" aria-hidden="true">📊</span>
-    <span class="mbn-label">Stats</span>
+  <button type="button" class="mbn-btn page-btn" data-page="academie" aria-label="Méthode — comprendre les pronostics">
+    <span class="mbn-icon" aria-hidden="true">📚</span>
+    <span class="mbn-label">Méthode</span>
   </button>
   <!-- Bouton menu : tous les autres pages + settings -->
   <button type="button" class="mbn-btn" id="mbn-menu-btn" aria-label="Plus d'options" aria-controls="page-nav">
@@ -846,8 +813,8 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="data.js?v=57269cd4"></script>
-<script src="app.js?v=39ff233b" defer></script>
+<script src="data.js?v=9d18abd1"></script>
+<script src="app.js?v=6591b577" defer></script>
 
 <!-- enhancements v20 -->
 <script data-tag="__paris_sportif_enh_v20__">
@@ -908,11 +875,11 @@
   };
 
   // ========== CHANTIER DDD — Mode offline robuste ==========
-  // v32.6 — Fusionné avec setupOfflineBanner (app.js?v=8547af84). Garde uniquement le
+  // v32.6 — Fusionné avec setupOfflineBanner (app.js?v=6591b577). Garde uniquement le
   // CSS qui désactive les CTAs externes en mode offline. Le banner visuel
-  // est rendu par app.js?v=8547af84 (#offline-banner), avec timestamp dynamique. Avant
+  // est rendu par app.js?v=6591b577 (#offline-banner), avec timestamp dynamique. Avant
   // ce fix, 2 banners coexistaient (#__offline-banner ici + #offline-banner
-  // app.js?v=8547af84) → duplication visuelle quand offline.
+  // app.js?v=6591b577) → duplication visuelle quand offline.
   function initOffline(){
     var style = document.createElement('style');
     style.textContent =

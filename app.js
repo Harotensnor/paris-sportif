@@ -21227,12 +21227,12 @@
     // mais sont maintenant rattachées à un hub visible pour éviter les vues
     // "orphelines" (montantes, matchs détectés, simulateur).
     const HUB_PAGES = {
-      now: ['top', 'valeur', 'plan-mise', 'locks', 'combines', 'montante-jour', 'montante-weekend', 'montante-semaine'],
-      agent: ['bilan', 'historique'],
-      explore: ['tous', 'calendrier', 'matchs', 'buteurs', 'compare'],
-      performance: ['performance', 'credibilite', 'backtest', 'simulator'],
-      learn: ['academie', 'methodologie', 'legal'],
-      account: ['profil', 'favoris', 'alertes'],
+      now: ['dashboard'],
+      agent: ['performance', 'bilan', 'historique', 'backtest'],
+      explore: ['tous', 'calendrier', 'buteurs', 'combines', 'compare', 'valeur', 'plan-mise', 'montante-jour', 'montante-weekend', 'montante-semaine'],
+      performance: ['performance', 'bilan', 'historique', 'backtest', 'credibilite', 'simulator'],
+      learn: ['academie', 'methodologie', 'credibilite'],
+      account: ['profil', 'sante', 'favoris', 'alertes', 'legal'],
     };
     document.querySelectorAll('nav.topbar-nav .hub').forEach(h => {
       const k = h.dataset.hub;
@@ -21246,10 +21246,10 @@
     // mais le bouton d'intention reste allumé.
     const MOBILE_BOTTOM_INTENTS = {
       dashboard: ['dashboard'],
-      top: HUB_PAGES.now,
-      bilan: HUB_PAGES.agent,
-      performance: [...HUB_PAGES.explore, ...HUB_PAGES.performance],
-      menu: [...HUB_PAGES.learn, ...HUB_PAGES.account],
+      tous: HUB_PAGES.explore,
+      performance: HUB_PAGES.agent,
+      academie: HUB_PAGES.learn,
+      menu: HUB_PAGES.account,
     };
     document.querySelectorAll('#mobile-bottom-nav .mbn-btn').forEach(btn => {
       const key = btn.id === 'mbn-menu-btn' ? 'menu' : btn.dataset.page;

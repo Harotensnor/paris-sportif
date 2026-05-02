@@ -363,3 +363,11 @@
 - Impact: 3 chemins confus supprimés sans casser les anciens liens; test hash legacy vert (`top/locks/matchs → #dashboard`), smoke E2E vert
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.47 (2026-05-02 07:35 UTC)
+- Chantier: P-3.10 navigation 5 hubs
+- Avant: nav principale exposait encore Top/Locks/Explorer/Agent/Performance/Apprendre/Compte et des raccourcis redondants
+- Après: `5` entrées top-level nettes (`Accueil`, `Tous les paris`, `Mes paris`, `Méthode`, `Profil`), aucun `top/locks/matchs` dans la nav visible
+- Impact: parcours utilisateur plus évident, mobile bottom-nav alignée sur les 5 hubs; smoke E2E vert, top-level nav mesurée `2` solos + `3` hubs
+- Commit: pending
+- Status: ✅ DONE
