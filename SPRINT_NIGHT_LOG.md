@@ -1375,3 +1375,9 @@
 - Après: si Brier ligue > 0.25 avec n≥20, fiabilité pénalisée et raison visible.
 - Impact: les Big Bets sont automatiquement dépriorisés sur ligues peu fiables.
 - Vérif: phase10_league_bias_audit.json, Brier 0.32 → fiabilité -4.8pt, raison OK.
+
+## Sprint v35.182 — Phase 10 P-10.29 Daily P&L insight (21:44 UTC)
+- Avant: l'accueil Pro Bettor masquait le bilan quotidien quand aucun pick n'était réglé.
+- Après: la strip KPI affiche maintenant "Hier" avec P&L si scoré, ou "aucun pari réglé".
+- Impact: Théo comprend l'état du replay quotidien sans silence ambigu.
+- Vérif: phase10_daily_pnl_insight_audit.json, KPI visible, 0 erreur console.
