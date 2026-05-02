@@ -4900,6 +4900,9 @@
       if (typeof __predCache !== 'undefined') __predCache = new Map();
       // v31.7.32 — Trust strip : populer dès que le report est chargé.
       _populateTrustStrip(rep);
+      if (currentPage === 'sante' && typeof applyPageView === 'function') {
+        applyPageView();
+      }
     } catch (e) { /* calibration optional, ignore */ }
   }
   // Sprint 74 (v31.7.162 — câblage Sprint 66/76 backtest per-marché).
@@ -25111,6 +25114,55 @@
         </div>`;
     })();
 
+    const sportRoiGuardHtml = (() => {
+      const rep = window.__backtestReportV2;
+      const bySport = rep && rep.by_sport;
+      if (!bySport || typeof bySport !== 'object') return '';
+      const rows = Object.entries(bySport)
+        .filter(([, d]) => d && Number(d.n || 0) >= 10)
+        .map(([sport, d]) => ({
+          sport,
+          label: typeof sportLabel === 'function' ? sportLabel(sport) : sport,
+          n: Number(d.n || 0),
+          roi: Number(d.flat_roi_pct || 0),
+          wr: Number(d.win_rate || 0),
+          brier: Number(d.brier || 0)
+        }))
+        .sort((a, b) => a.roi - b.roi);
+      if (!rows.length) return '';
+      const cold = rows.filter(r => r.roi < -10);
+      const hot = rows.filter(r => r.roi >= 0).sort((a, b) => b.roi - a.roi).slice(0, 3);
+      const card = (r) => {
+        const blocked = r.roi < -10;
+        const col = blocked ? '#f87171' : r.roi >= 5 ? '#34d399' : '#eab308';
+        const status = blocked ? 'AUTO-BLOCK' : r.roi >= 0 ? 'OK' : 'WATCH';
+        return `<div style="background:var(--panel);border:1px solid var(--border);border-left:4px solid ${col};border-radius:10px;padding:12px 14px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+            <div style="font-weight:800;color:var(--text);">${esc(r.label)}</div>
+            <span style="font-size:9.5px;font-weight:800;letter-spacing:.6px;color:${col};background:${col}18;border:1px solid ${col}33;border-radius:999px;padding:2px 7px;">${status}</span>
+          </div>
+          <div style="margin-top:8px;font-size:20px;font-weight:900;color:${col};font-variant-numeric:tabular-nums;">${r.roi >= 0 ? '+' : ''}${r.roi.toFixed(1)}%</div>
+          <div style="margin-top:3px;font-size:11px;color:var(--text-dim);font-variant-numeric:tabular-nums;">${r.n} picks · WR ${(r.wr * 100).toFixed(0)}% · Brier ${r.brier.toFixed(3)}</div>
+        </div>`;
+      };
+      return `
+        <div style="margin-top:22px;">
+          <div style="font-size:13px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;">🛡 Garde-fou ROI sport</div>
+          <div style="background:linear-gradient(135deg,${cold.length ? '#f8717118' : '#34d39918'},transparent);border:1px solid var(--border);border-radius:10px;padding:14px;">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
+              <div>
+                <div style="font-size:18px;font-weight:900;color:${cold.length ? '#f87171' : '#34d399'};">${cold.length ? `${cold.length} sport(s) bloqué(s)` : 'Aucun sport bloqué'}</div>
+                <div style="font-size:11px;color:var(--text-dim);margin-top:4px;line-height:1.45;">Blocage automatique si ROI backtest &lt; -10% avec au moins 10 picks. Exception seulement si proba, edge et score value sont très forts.</div>
+              </div>
+              ${statusPill(cold.length ? 'warn' : 'ok')}
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;">
+              ${(cold.length ? cold : hot).map(card).join('')}
+            </div>
+          </div>
+        </div>`;
+    })();
+
     wrap.innerHTML = `
       <div style="max-width:1200px;margin:0 auto;padding:16px 20px 24px;">
         <div class="section-header top-picks" style="margin-top:8px;">
@@ -25227,6 +25279,8 @@
         ${pipelineLagHtml}
 
         ${pipelineDriftHtml}
+
+        ${sportRoiGuardHtml}
 
         <div style="margin-top:22px;">
           <div style="font-size:13px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;">🎯 Matchs restants par sport</div>
