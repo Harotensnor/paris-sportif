@@ -15295,9 +15295,17 @@
         .filter(x => x.c && x.c.source === 'winamax_exact' && x.c.ev > 0 && x.c.edge > 0 && x.c.investment?.action !== 'skip')
         .sort((a,b) => (b.c.investment?.score || 0) - (a.c.investment?.score || 0) || (b.c.ev || 0) - (a.c.ev || 0));
       const main = valueRows.find(x => x.c.odd >= 1.45 && x.c.odd <= 3.50 && (x.c.investment?.score || 0) >= 60) || valueRows[0];
+      const attackScore = (x) => {
+        const score = Number(x.c.investment?.score || 0);
+        const evScore = Math.max(0, Math.min(1, ((x.c.ev || 0) - 0.08) / 0.30)) * 34;
+        const oddScore = Math.max(0, Math.min(1, ((x.c.odd || 0) - 2.20) / 5.80)) * 30;
+        const trustScore = Math.max(0, Math.min(1, score / 100)) * 24;
+        const probScore = Math.max(0, Math.min(1, ((x.c.prob || 0) - 0.18) / 0.44)) * 12;
+        return evScore + oddScore + trustScore + probScore;
+      };
       const attack = valueRows
-        .filter(x => x.c.odd >= 2.20 && x.c.odd <= 8.00 && x.c.ev >= 0.08)
-        .sort((a,b) => (b.c.ev || 0) - (a.c.ev || 0) || (b.c.odd || 0) - (a.c.odd || 0))[0];
+        .filter(x => x.c.odd >= 2.20 && x.c.odd <= 8.00 && x.c.ev >= 0.08 && (x.c.prob || 0) >= 0.18 && (x.c.investment?.score || 0) >= 42)
+        .sort((a,b) => attackScore(b) - attackScore(a) || (b.c.odd || 0) - (a.c.odd || 0))[0];
       const marketBuckets = {};
       rows.forEach(x => {
         const key = x.c.market || 'unknown';
