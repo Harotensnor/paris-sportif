@@ -292,7 +292,7 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Preuve : `.cache/phase4-phase9-current/dashboard-mobile.png` (`375x7201`)
 - Constat : la page principale dépasse 7200px; les sections secondaires noient les Big Bets sur mobile.
 - Action : replier Top buteurs / stats / gros gains par défaut sur mobile et garder Big Bets + Solides visibles en priorité.
-- Statut : PARTIAL v35.122 — sections secondaires masquées sur mobile; hauteur dashboard mobile `7201px → 5175px`, reste à compacter sous 4500px.
+- Statut : FIXED v35.123 — sections secondaires + panier masqués sur mobile, cartes Solides limitées à 3; hauteur dashboard mobile `7201px → 4238px`, sous la cible 4500px.
 
 ### P9-VIS-002 — Santé mobile trop dense
 
