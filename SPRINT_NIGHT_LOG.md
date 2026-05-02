@@ -437,3 +437,11 @@
 - Impact: risque bankroll lisible et traçable en JSON appendable côté UI/rapport; visual diff final `11.49%` attendu sur Performance (rapport bankroll + footer v35.55), layout OK
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.56 (2026-05-02 08:00 UTC)
+- Chantier: P-4.26 typography scale
+- Avant: `190` tailles typo cibles en px direct dans `app.css`
+- Après: `7` tokens `--t-*`; `0` occurrences directes `11/13/15/18/22/28/36px`
+- Impact: échelle typo Phase 4 posée sans changer le rendu; visual diff `10.14%` attendu sur Performance dynamique, layout OK
+- Commit: pending
+- Status: ✅ DONE
