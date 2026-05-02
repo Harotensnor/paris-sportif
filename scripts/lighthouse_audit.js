@@ -102,7 +102,7 @@ async function collect(page) {
     const buttons = [...document.querySelectorAll('button,[role="button"]')];
     const jsonLd = [...document.querySelectorAll('script[type="application/ld+json"]')].length;
     const h1 = document.querySelectorAll('h1').length;
-    const missingAlt = imgs.filter(img => !img.getAttribute('alt')).length;
+    const missingAlt = imgs.filter(img => !img.hasAttribute('alt')).length;
     const unnamedButtons = buttons.filter(btn => !(btn.textContent || btn.getAttribute('aria-label') || btn.getAttribute('title') || '').trim()).length;
     const badLinks = links.filter(a => !(a.textContent || a.getAttribute('aria-label') || a.getAttribute('title') || '').trim()).length;
     const focusableTiny = [...document.querySelectorAll('button,a,[role="button"],input,select,textarea')]

@@ -188,7 +188,7 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Pages : `dashboard`, `tous`, `performance`, `academie`
 - Viewports : mobile 375px + desktop 1440px
 - Note : le runtime local n'a pas `npx/lighthouse`; le script mesure les signaux navigateur équivalents et écrit des JSON Lighthouse-shaped.
-- Scores min : Performance `46`, Accessibilité `44`, Best Practices `100`, SEO `83`.
+- Scores min : Performance `46`, Accessibilité `86`, Best Practices `100`, SEO `83` après v35.81.
 
 ### P6-LH-001 — JS/data initial trop lourd
 
@@ -202,9 +202,9 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 
 - Sévérité : HIGH
 - Preuve : `.cache/lighthouse-reports/summary.json`
-- Constat : `187` à `213` images sans `alt` selon la page.
+- Constat : `187` à `213` images sans `alt` au baseline Lighthouse-compatible, puis `0` après garde globale.
 - Action : ajouter `alt=""` décoratif sur les logos non informatifs et `alt` explicite sur logos/players utiles.
-- Statut : OPEN
+- Statut : FIXED v35.81 — `img:not([alt])` reçoit `alt=""` automatiquement, y compris les images injectées.
 
 ### P6-LH-003 — Cibles tactiles trop petites
 
@@ -259,9 +259,9 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 
 - Sévérité : MEDIUM
 - Preuve : `a11y-report.json`
-- Constat : beaucoup de logos joueurs/équipes sans `alt`.
+- Constat : beaucoup de logos joueurs/équipes sans `alt` au baseline, corrigé par garde globale.
 - Action : `alt=""` décoratif pour les logos répétés, `alt="Logo équipe"` ou `alt="Photo joueur"` quand informatif.
-- Statut : OPEN
+- Statut : FIXED v35.81
 
 ## Prochains fixes recommandés
 
