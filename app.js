@@ -20137,7 +20137,7 @@
           </div>
         </div>
 
-        <div style="display:grid;gap:14px;max-width:900px;">
+        <div class="profil-grid">
 
           <div class="card-base">
             <h3 class="section-h3">🎨 Apparence</h3>
