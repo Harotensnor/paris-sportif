@@ -16165,7 +16165,7 @@
             <div class="bbf-hero__head">
               <span>Big Bets First · cote 2.20-3.50 · edge ≥ 7%</span>
               <h1 id="bbf-title">Les paris à regarder en premier aujourd'hui</h1>
-              <p>On cherche le meilleur couple chance / cote / gain. Une cote trop basse peut être refusée même si elle paraît sûre.</p>
+              <p>On cherche le meilleur couple chance / cote / gain. Une cote trop basse peut être refusée même si elle paraît sûre. <a href="methodologie.html#cotes-hautes">Pourquoi cotes hautes ?</a></p>
             </div>
             ${_dataIsStale ? bbfEmpty : (bbfBigBets.length ? `<div class="bbf-grid bbf-grid--hero">${bbfBigBets.map(p => bbfCard(p, 'hero')).join('')}</div>` : bbfEmpty)}
           </section>
