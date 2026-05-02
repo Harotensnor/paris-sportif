@@ -25666,28 +25666,37 @@
   // CSV export with UTF-8 BOM so Excel/Numbers don't mangle accents.
   function exportHistoriqueCsv(rows) {
     if (!rows || !rows.length) return;
-    const header = ['date', 'sport', 'league', 'match', 'marche', 'pick', 'cote', 'proba_pct', 'ev_pct', 'edge_pct', 'resultat', 'delta_u'];
+    const header = ['date', 'sport', 'league', 'home', 'away', 'pick', 'odd', 'result', 'pl', 'clv', 'brier', 'market', 'prob_pct', 'ev_pct', 'edge_pct'];
     const csvRows = [header.join(',')];
     const q = s => `"${String(s ?? '').replace(/"/g, '""')}"`;
+    const f = (v, n = 4) => Number.isFinite(Number(v)) ? Number(v).toFixed(n) : '';
     rows.slice()
       .sort((a, b) => new Date(a.m.date) - new Date(b.m.date))
       .forEach(p => {
+        const sides = (typeof getSides === 'function') ? getSides(p.m) : {};
+        const home = sides.home?.name || sides.home?.displayName || sides.home?.short || '';
+        const away = sides.away?.name || sides.away?.displayName || sides.away?.short || '';
         const fiab = Math.round((p.rel ?? p.best?.rel ?? p.pred.reliability ?? p.pred.pick.prob) * 100);
         const pickLbl = p.best?.label || (p.pred.pick.key === 'X' ? 'N' : p.pred.pick.key);
         const delta = p.res === 'won' ? (p.odd - 1).toFixed(2) : '-1.00';
+        const clv = p.clv ?? p.best?.clv ?? p.m?.clv ?? '';
+        const brier = p.brier ?? p.pred?.brier ?? p.m?.brier ?? '';
         csvRows.push([
           q(isoDate(p.m.date)),
           q(p.m.sport || ''),
           q(p.m.league || p.m.leagueShort || ''),
-          q(p.m.shortName || p.m.name || ''),
-          q(p.market || '1n2'),
+          q(home),
+          q(away),
           q(pickLbl),
           q(p.odd.toFixed(2)),
+          q(p.res === 'won' ? 'gagne' : 'perdu'),
+          q(delta),
+          q(f(clv)),
+          q(f(brier)),
+          q(p.market || '1n2'),
           q(fiab),
           q(isFinite(p.ev) ? (p.ev * 100).toFixed(2) : ''),
           q(isFinite(p.edge) ? (p.edge * 100).toFixed(2) : ''),
-          q(p.res === 'won' ? 'gagne' : 'perdu'),
-          q(delta),
         ].join(','));
       });
     const csv = '\uFEFF' + csvRows.join('\n');
