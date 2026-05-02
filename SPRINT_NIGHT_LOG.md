@@ -541,3 +541,11 @@
 - Impact: cadre légal clair avant CTA/outsiders/live; HTML direct 403, fallback PDF officiel Winamax
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.69 (2026-05-02 10:39 UTC)
+- Chantier: P-5.11 plus de paris visibles
+- Avant: Accueil surtout Big Bets + Tier 2 serré, ~8 cartes visibles
+- Après: Solides 4%/60%, Outsiders 2.50+/5%/45%, accordéon edge ≥ 2%
+- Impact: 10 paris affichables et gros gains surfacés; visual diff `18.72%` attendu par nouvelle section
+- Commit: pending
+- Status: ✅ DONE

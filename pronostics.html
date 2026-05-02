@@ -133,9 +133,9 @@
 <!-- Chantier S — PWA -->
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="alternate" type="application/rss+xml" href="feed.xml" title="Paris-Sportif — Top picks du jour (RSS)">
-<!-- v35.07 — Seul le CSS est préchargé au boot. Le gros app.js?v=195553e0 reste en defer
+<!-- v35.07 — Seul le CSS est préchargé au boot. Le gros app.js?v=c768e85c reste en defer
      plus bas dans le body pour laisser le squelette critique peindre d'abord. -->
-<link rel="preload" href="app.css?v=8b411d1a" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<link rel="preload" href="app.css?v=cce699e7" as="style" onload="this.onload=null;this.rel='stylesheet'">
 <!-- v31.1 — DNS-prefetch pour les CDN tiers utilisés sur la page (logos ESPN).
      v31.7.24 — Ajout `preconnect` pour a.espncdn.com (le plus utilisé) :
      le browser fait DNS + TLS handshake en parallèle du parse HTML, ce qui
@@ -224,7 +224,7 @@
      n'est chargé QU'APRÈS consentement explicite (cf. _maybeEnableAnalytics).
      Pas de tracking par défaut. -->
 <script src="analytics.config.js" defer onerror="this.remove();"></script>
-<noscript><link rel="stylesheet" href="app.css?v=8b411d1a"></noscript>
+<noscript><link rel="stylesheet" href="app.css?v=cce699e7"></noscript>
 <script>
   // v22 — Init theme / contrast / reader BEFORE body render (évite le flash)
   (function() {
@@ -277,7 +277,7 @@
   // pour debug console. AUCUN envoi réseau — l'utilisateur peut consulter
   // ou exporter ses données, et c'est tout.
   //
-  // Pourquoi inline pré-app.js?v=195553e0 ? Il faut s'enregistrer AVANT le LCP/FCP
+  // Pourquoi inline pré-app.js?v=c768e85c ? Il faut s'enregistrer AVANT le LCP/FCP
   // pour les capter. Le bundle web-vitals officiel pèse 5 KB ; ici on
   // tombe à ~1.5 KB grâce à l'usage direct de PerformanceObserver.
   //
@@ -652,7 +652,7 @@
         </div>
       </div>
     </section>
-    <!-- v31.2 — Friendly error state (audit UX). Avant : "Fichier data.js?v=67207400
+    <!-- v31.2 — Friendly error state (audit UX). Avant : "Fichier data.js?v=1e153371
          introuvable" brut, casse la confiance. Maintenant : message rassurant
          avec retry + dernier refresh + offline fallback explanation. -->
     <div id="no-data-banner" class="error-banner hidden" role="alert" aria-live="polite">
@@ -735,7 +735,7 @@
       <div class="footer-brand">
         <span class="footer-logo">🎯</span>
         <span class="footer-text">Paris-Sportif</span>
-        <span class="footer-version" id="footer-version" role="button" tabindex="0" style="cursor:pointer;" title="Voir les nouveautés v35.68">v35.68</span>
+        <span class="footer-version" id="footer-version" role="button" tabindex="0" style="cursor:pointer;" title="Voir les nouveautés v35.69">v35.69</span>
       </div>
       <nav class="footer-links" aria-label="Liens du site">
         <a href="https://github.com/Harotensnor/paris-sportif" target="_blank" rel="noopener" class="footer-link" title="Code source sur GitHub">
@@ -819,8 +819,8 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="data.js?v=075924dc"></script>
-<script src="app.js?v=195553e0" defer></script>
+<script src="data.js?v=1e153371"></script>
+<script src="app.js?v=c768e85c" defer></script>
 
 <!-- enhancements v20 -->
 <script data-tag="__paris_sportif_enh_v20__">
@@ -881,11 +881,11 @@
   };
 
   // ========== CHANTIER DDD — Mode offline robuste ==========
-  // v32.6 — Fusionné avec setupOfflineBanner (app.js?v=195553e0). Garde uniquement le
+  // v32.6 — Fusionné avec setupOfflineBanner (app.js?v=c768e85c). Garde uniquement le
   // CSS qui désactive les CTAs externes en mode offline. Le banner visuel
-  // est rendu par app.js?v=195553e0 (#offline-banner), avec timestamp dynamique. Avant
+  // est rendu par app.js?v=c768e85c (#offline-banner), avec timestamp dynamique. Avant
   // ce fix, 2 banners coexistaient (#__offline-banner ici + #offline-banner
-  // app.js?v=195553e0) → duplication visuelle quand offline.
+  // app.js?v=c768e85c) → duplication visuelle quand offline.
   function initOffline(){
     var style = document.createElement('style');
     style.textContent =
