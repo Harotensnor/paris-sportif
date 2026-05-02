@@ -347,3 +347,11 @@
 - Impact: l'accueil dit immédiatement quoi regarder et pourquoi; CTA Winamax deep-link + tracking local `paris_sportif_winamax_clicks_v1`; smoke E2E vert (`456` marchés scorés / `289` matchs exacts 48h)
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.45 (2026-05-02 07:16 UTC)
+- Chantier: P-3.4 modal "Pourquoi ce pari"
+- Avant: clic Big Bet ouvrait directement la modale technique avec onglets et beaucoup de sections, sans résumé actionnable en tête
+- Après: bloc "Pourquoi ce pari ?" toujours visible avant les onglets, avec cote, écart marché, EV simple, mise suggérée Kelly, 5 raisons max et CTA Winamax tracké
+- Impact: compréhension en `10s` avant les détails; test modal local vert (`whyVisible=true`, `winamaxCta=true`, `0` erreur JS), smoke E2E vert
+- Commit: pending
+- Status: ✅ DONE
