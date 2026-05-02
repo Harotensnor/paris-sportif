@@ -181,5 +181,13 @@
 - Avant: le cron catalogue réécrivait `winamax_markets.json` avec du 1N2 seul entre deux runs détail; snapshot: 0 marché détaillé après cron, Terminal Value 55 marchés / 55 matchs exacts
 - Après: `fetch_winamax_catalog.py` préserve les marchés détaillés existants; run local conserve 3 matchs détaillés, `data.js` passe à 4 events avec marchés >1N2, smoke Terminal Value monte à `101 marchés scorés · 56 matchs exacts sur 48h`
 - Impact: les détails Winamax ne disparaissent plus au refresh catalogue; le scanner value voit plus de marchés exploitables immédiatement
+- Commit: 248d73c4
+- Status: ✅ DONE
+
+## Sprint v35.24 (2026-05-02 06:06 UTC)
+- Chantier: P5 seed marchés détaillés Winamax
+- Avant: après v35.23, le site conservait 3 matchs détaillés / 4 events >1N2 et le smoke voyait 101 marchés scorés sur 48h
+- Après: fetch détail `--limit=25 --ttl-hours=0`, catalogue merge préserve 28 matchs détaillés, `data.js` injecte 29 events >1N2, smoke Terminal Value monte à `369 marchés scorés · 56 matchs exacts sur 48h`
+- Impact: couverture multi-marchés réellement exploitable multipliée sans attendre le prochain cron détail
 - Commit: pending
 - Status: ✅ DONE
