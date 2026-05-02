@@ -237,7 +237,7 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Pages : `dashboard`, `tous`, `performance`, `academie`, `profil`, `sante`, `montantes`, `legal`
 - Viewport : mobile 375px
 - Note : le runtime local n'a pas `@axe-core/cli`; le script applique les règles axe principales localement et classe les impacts.
-- Totaux : `0` critical, `0` serious, `270` moderate après v35.80.
+- Totaux : `0` critical, `0` serious, `0` moderate après v35.148.
 
 ### P6-A11Y-001 — Contrastes sérieux insuffisants
 
@@ -253,7 +253,7 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Preuve : `a11y-report.json`
 - Constat : nombreuses violations `target-size`, notamment hamburger, scroll-top, chips, trust strip et liens légaux.
 - Action : appliquer min-height/min-width 44px aux contrôles mobile ou agrandir les zones cliquables.
-- Statut : FIXED v35.143 — mêmes touch targets globales; rapport `a11y-report.json` à 20 moderate restants.
+- Statut : FIXED v35.148 — cibles tactiles SPA + static legal validées; rapport `a11y-report.json` à 0 moderate restant.
 
 ### P6-A11Y-003 — Images visibles sans alt
 
