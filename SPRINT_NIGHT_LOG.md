@@ -1399,3 +1399,9 @@
 - Après: injuries_multisport.json expose 131 équipes / 4 sports / 679 blessures NBA-WNBA-NHL-NFL-MLB.
 - Impact: le modèle et la Santé peuvent suivre les absences multi-sports sans dépendre du gros data.js.
 - Vérif: fetch_injuries.py --sidecar-only + build_health.py + check_pipeline_drift OK.
+
+## Sprint v35.186 — Phase 10 P-10.33 Météo outdoor multi-sport (21:55 UTC)
+- Avant: fetch_weather ne couvrait que le football.
+- Après: météo activée sur baseball outdoor et tennis outdoor, en excluant les stades MLB couverts/roofed.
+- Impact: 403 matchs météo au total, dont 22 baseball et 1 tennis dans le data courant.
+- Vérif: fetch_weather.py + build_health.py + check_pipeline_drift OK.

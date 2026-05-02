@@ -202,6 +202,11 @@ CITIES: dict[str, tuple[str, float, float]] = {
 # Headless User-Agent for endpoints that need it
 HEADERS = {'User-Agent': 'Mozilla/5.0 (paris-sportif-dashboard)'}
 
+MLB_WEATHER_MUTED = {
+    # Domes / retractable roofs: weather can be irrelevant if roof is closed.
+    'ARI', 'HOU', 'MIA', 'MIL', 'SEA', 'TB', 'TEX', 'TOR'
+}
+
 
 def normalize(name: str) -> str:
     if not name:
@@ -326,8 +331,8 @@ def resolve_event_location(ev: dict, geo_cache: dict) -> tuple[str, float, float
 
     # 2) venue + country : utile pour Camp Nou, Old Trafford, etc.
     ev_venue = (ev.get('venue') or '').strip()
-    if ev_venue and ev_country:
-        loc = geocode(f'{ev_venue}, {ev_country}', geo_cache)
+    if ev_venue and (ev_country or ',' in ev_venue):
+        loc = geocode(f'{ev_venue}, {ev_country}' if ev_country else ev_venue, geo_cache)
         if loc:
             return (loc[0], loc[1], loc[2], 'event_venue')
 
@@ -351,6 +356,24 @@ def resolve_event_location(ev: dict, geo_cache: dict) -> tuple[str, float, float
     # 4) Pas de fallback géocodage par nom d'équipe : on retourne None.
     # Le caller logge un skip plutôt que d'injecter une météo douteuse.
     return None
+
+
+def is_weather_relevant(ev: dict) -> bool:
+    sport = ev.get('sport')
+    if sport == 'football':
+        return True
+    if sport == 'baseball' and ev.get('league_code') == 'mlb':
+        comps = ev.get('competitors') or []
+        home = next((c for c in comps if c.get('home_away') == 'home'), None) or {}
+        team = home.get('team') or {}
+        abbr = (team.get('abbreviation') or home.get('abbreviation') or '').upper()
+        return abbr not in MLB_WEATHER_MUTED
+    if sport == 'tennis':
+        label = ' '.join(str(ev.get(k) or '') for k in ('league_name', 'venue', 'city')).lower()
+        if 'indoor' in label:
+            return False
+        return bool(ev.get('venue') or ev.get('city') or ev.get('country'))
+    return False
 
 
 def fetch_forecast(lat: float, lon: float, kickoff_iso: str) -> dict | None:
@@ -439,7 +462,7 @@ def main() -> int:
 
     for _day, evs in days.items():
         for ev in (evs or []):
-            if ev.get('sport') != 'football':
+            if not is_weather_relevant(ev):
                 continue
             if ev.get('completed'):
                 continue
