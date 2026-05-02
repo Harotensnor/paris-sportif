@@ -212,7 +212,7 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Preuve : `.cache/lighthouse-reports/summary.json`
 - Constat : `23` à `68` éléments interactifs sous `40px`.
 - Action : appliquer une taille minimale 44px aux boutons/chips/menus mobiles, surtout footer et chips sport.
-- Statut : OPEN
+- Statut : FIXED v35.143 — règle mobile globale sur boutons/liens/summary + static pages; a11y moderate `143 → 20`, 0 critical/serious.
 
 ### P6-LH-004 — Layout shift au chargement
 
@@ -253,7 +253,7 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Preuve : `a11y-report.json`
 - Constat : nombreuses violations `target-size`, notamment hamburger, scroll-top, chips, trust strip et liens légaux.
 - Action : appliquer min-height/min-width 44px aux contrôles mobile ou agrandir les zones cliquables.
-- Statut : OPEN
+- Statut : FIXED v35.143 — mêmes touch targets globales; rapport `a11y-report.json` à 20 moderate restants.
 
 ### P6-A11Y-003 — Images visibles sans alt
 

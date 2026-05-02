@@ -1131,3 +1131,10 @@
 - Impact: page méthode plus utile, smoke OK, app.js 1731.0 KB sous cap
 - Commit: pending
 - Status: ✅ DONE
+## Sprint v35.143 (16:10 UTC)
+- Chantier: P-9.66
+- Avant: a11y 0 critical / 0 serious / 143 moderate, touch targets encore ouverts
+- Après: a11y 0 critical / 0 serious / 20 moderate, P6-LH-003 + P6-A11Y-002 fixés
+- Impact: -123 violations modérées, pages mobile beaucoup plus tappables
+- Commit: pending
+- Status: ✅ DONE
