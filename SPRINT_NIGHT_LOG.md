@@ -989,3 +989,11 @@
 - Impact: lecture mobile divisée par 44%; KPI et alertes restent visibles sans tunnel technique
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.125 (2026-05-02 14:49 UTC)
+- Chantier: P-9.53 fix P9-VIS-003 Profil desktop
+- Avant: profil desktop 3505px, contenu tassé en colonne étroite
+- Après: profil desktop 2638px avec grille 2 colonnes; wide 2506px
+- Impact: la page Profil exploite enfin l'écran PC et réduit le scroll de 25%
+- Commit: pending
+- Status: ✅ DONE

@@ -308,7 +308,7 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Preuve : `.cache/phase4-phase9-current/profil-desktop.png` et `profil-wide.png`
 - Constat : le contenu Profil occupe surtout la colonne gauche et laisse une grande zone vide à droite.
 - Action : passer Profil en deux colonnes desktop : Bankroll à gauche, préférences/notifications/données à droite.
-- Statut : OPEN
+- Statut : FIXED v35.125 — grille desktop 2 colonnes; profil desktop `3505px → 2638px`, wide `3472px → 2506px`.
 
 ### P9-VIS-004 — Accueil wide garde de grands espaces noirs
 
