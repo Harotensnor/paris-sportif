@@ -1465,3 +1465,9 @@
 - Après: min a11y desktop `97`; dashboard/tous/academie `100`, performance `97`, mobile `100`.
 - Impact: nav, trust strip, tabs, footer, chips et liens méthode ont des zones cliquables ≥40px.
 - Vérif: `scripts/lighthouse_audit.js`, `scripts/a11y_audit.js`, bundle OK; CLS/perf restent ouverts P-11.3/P-11.4.
+
+## Sprint v35.197 — Phase 11 P-11.3 CLS desktop (23:01 UTC)
+- Avant: CLS desktop montait a 0.151-0.157 apres le correctif target-size v35.196.
+- Apres: CSS critique reserve le layout sidebar/topbar; CLS desktop dashboard 0.018, pages internes 0.047.
+- Impact: Lighthouse desktop repasse a perf 97/92/92/92 et la page ne saute plus au chargement.
+- Verif: scripts/lighthouse_audit.js OK; min perf 92, min a11y 97, min SEO 100.
