@@ -1173,3 +1173,10 @@
 - Impact: audit local propre, footer/version/help/legal targets corrigés, bundle sous cap
 - Commit: pending
 - Status: ✅ DONE
+## Sprint v35.149 (16:29 UTC)
+- Chantier: P-9.48/P-9.59-P-9.63
+- Avant: derniers tests globaux à v35.144, avant a11y/page polish
+- Après: smoke OK, click 167/0, modales 5 sports/0, cohérence 50/0, flow Big Bet 3/0
+- Impact: régression post-polish exclue sur parcours critique et boutons
+- Commit: pending
+- Status: ✅ DONE
