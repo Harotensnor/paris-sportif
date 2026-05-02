@@ -485,3 +485,11 @@
 - Impact: force du pari lisible partout; visual diff `13.21%` attendu sur dashboard/Tous, smoke E2E vert
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.62 (2026-05-02 08:43 UTC)
+- Chantier: P-4.12 langage simplifié
+- Avant: `Edge/EV/Kelly/Brier/CLV` visibles en jargon
+- Après: helpers humains + Accueil/Tous/glossaire parlent “mieux que le marché”, “gain moyen”, “mise”
+- Impact: lecture débutant plus claire; visual diff `11.48%` attendu sur Performance dynamique
+- Commit: pending
+- Status: ✅ DONE
