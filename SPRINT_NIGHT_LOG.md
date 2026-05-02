@@ -1045,3 +1045,11 @@
 - Impact: navigation, clics principaux, modales et specs restent cohérents après polish
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.132 (2026-05-02 16:04 UTC)
+- Chantier: P-9.60 click test étendu
+- Avant: click audit limité à 98 clics utiles
+- Après: click audit 164 clics, 0 failure; specs alignées sur le même filtre
+- Impact: couverture de clics élargie aux accordéons/liens internes sans faux positifs legacy
+- Commit: pending
+- Status: ✅ DONE
