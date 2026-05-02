@@ -683,8 +683,8 @@
           <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-variant-numeric:tabular-nums;font-size:12.5px;color:var(--text-dim);">
             <span data-tooltip="Multiplicateur de mise. @1.85 = pour 1€ misé tu gagnes 0.85€ net.">Cote: <strong class="u-text">@1.85</strong></span>
             <span data-tooltip="Probabilité estimée par le modèle.">Confiance: <strong class="u-text">62%</strong></span>
-            <span data-tooltip="Avantage value vs cote du marché. >0 = value.">Edge: <strong class="u-text-accent">+8pt</strong></span>
-            <span data-tooltip="Mise calculée par Kelly fractionné.">Mise: <strong class="u-text-brand">5€</strong></span>
+            <span data-tooltip="Notre proba dépasse celle demandée par la cote.">Avance: <strong class="u-text-accent">+8% mieux</strong></span>
+            <span data-tooltip="Mise prudente ramenée à ta bankroll.">Mise: <strong class="u-text-brand">5€/100€</strong></span>
           </div>
         </div>
 
@@ -697,15 +697,15 @@
             <strong class="u-text-accent">🎯 Confiance 62%</strong> = le modèle estime à 62% la victoire de PSG (basé sur Poisson, Elo, forme, blessures).
           </div>
           <div style="margin-bottom:10px;">
-            <strong class="u-text-accent">💎 Edge +8pt</strong> = écart entre le modèle (62%) et la <span class="gloss-term" data-gloss="edge">probabilité implicite</span> de la cote (54%). C'est le <strong>signal de value</strong>.
+            <strong class="u-text-accent">💎 +8% mieux que le marché</strong> = écart entre le modèle (62%) et la <span class="gloss-term" data-gloss="edge">probabilité implicite</span> de la cote (54%). C'est le signal que la cote paie trop.
           </div>
           <div style="margin-bottom:10px;">
-            <strong class="u-text-accent">💰 Mise 5€</strong> = <span class="gloss-term" data-gloss="kelly">Kelly fractionné</span> 0.25× × bankroll, plafonné à 10% par pari (gestion du risque).
+            <strong class="u-text-accent">💰 Mise 5€/100€</strong> = mise conseillée prudente, plafonnée pour protéger la bankroll.
           </div>
         </div>
 
         <div style="padding:10px 14px;background:rgba(167,139,250,.08);border:1px solid var(--brand-soft);border-radius:var(--r-sm);font-size:12px;color:var(--text-2);line-height:1.5;margin-bottom:14px;">
-          💡 <strong>La règle d'or :</strong> tu vois <strong>Edge >0</strong> ? C'est value, joue. <strong>Edge ≤0</strong> ? Le modèle skip — pas de pari forcé. Ne jamais miser plus que la suggestion Kelly.
+          💡 <strong>La règle d'or :</strong> si le site affiche “mieux que le marché”, le pari peut valoir le coup. Sinon, le modèle skip — pas de pari forcé. Ne jamais miser plus que la mise conseillée.
         </div>
 
         <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
@@ -1408,19 +1408,19 @@
   // Les termes sont aussi accessibles via tooltips data-tooltip si besoin.
   const _GLOSSARY = {
     edge: {
-      t: 'Edge (avantage)',
-      d: 'Différence entre la probabilité que le modèle calcule et celle que le marché propose. Positif = le marché sous-estime → c\'est value.',
-      ex: 'Modèle dit 62%, cote @1.85 (= 54% implicite) → edge +8pt',
+      t: 'Avance sur le marché',
+      d: 'Différence entre notre proba et ce que la cote demande. Positif = la cote paie trop par rapport au risque estimé.',
+      ex: 'Modèle 62%, cote @1.85 (= 54% implicite) → +8% mieux que le marché',
     },
     kelly: {
-      t: 'Kelly fractionnaire',
-      d: 'Formule mathématique qui calcule la mise optimale pour maximiser la croissance long terme. On utilise 0.25× Kelly cap 10% bankroll par défaut.',
-      ex: 'Kelly entier = volatil. 0.25× = stable, 80% du gain à 30% de la variance.',
+      t: 'Mise conseillée',
+      d: 'Mise proportionnelle à la bankroll. Le site utilise une version prudente et plafonnée pour ne pas surexposer un seul pari.',
+      ex: 'Mise : 2.30€/100€ signifie 2.30€ si ta bankroll est 100€.',
     },
     ev: {
-      t: 'EV (Expected Value)',
-      d: 'Gain attendu math. par mise unitaire. EV = p × (cote-1) - (1-p). >0 = pari rentable en moyenne sur le long terme.',
-      ex: 'p=62%, cote=1.85 → EV = 0.62×0.85 - 0.38 = +0.15 (15%)',
+      t: 'Gain moyen attendu',
+      d: 'Ce que le pari rapporte en moyenne par euro misé si on rejoue ce type de spot longtemps.',
+      ex: 'p=62%, cote=1.85 → +15% gain moyen par euro misé',
     },
     roi: {
       t: 'ROI flat',
@@ -1428,9 +1428,9 @@
       ex: '+5% ROI sur 100 paris à 1€ = +5€ de gain',
     },
     brier: {
-      t: 'Brier score',
+      t: 'Calibration',
       d: 'Mesure de calibration : "quand le modèle dit 60%, il a raison ~60% du temps ?". Plus bas = mieux. <0.20 = bon, <0.15 = excellent.',
-      ex: 'Brier 0.18 = modèle calibré, ses % sont fiables',
+      ex: 'Calibration : excellente = les probabilités annoncées sont fiables',
     },
     calibration: {
       t: 'Calibration',
@@ -1463,9 +1463,9 @@
       ex: 'Sharpe 1.5 = retour stable, peu de variance',
     },
     clv: {
-      t: 'CLV (Closing Line Value)',
-      d: 'Différence entre la cote prise et la cote au coup d\'envoi. Positif = on a battu le marché final → indicateur prédictif clé.',
-      ex: 'Cote pris @2.10, ferme @1.90 → CLV +10%',
+      t: 'Qualité de cote',
+      d: 'Compare la cote prise avec la cote juste avant le match. Positif = tu as pris une meilleure cote que le marché final.',
+      ex: 'Cote prise @2.10, ferme @1.90 → tu prends de meilleures cotes que le marché',
     },
     btts: {
       t: 'BTTS (Both Teams To Score)',
@@ -1815,16 +1815,64 @@
     const edge = Number(p?.edge ?? p?.best?.edge ?? 0);
     const rel = Number(p?.rel ?? p?.best?.rel ?? p?.pred?.reliability ?? p?.pred?.pick?.prob ?? 0);
     const isLock = !!(p?.pred?.isLock || p?.isLock);
-    if (isLock || (edge >= 0.08 && rel >= 0.65)) return { cls: 'bbf-strength--big', label: 'BIG BET', heat: '🔥🔥🔥', title: 'Gros pari : edge élevé et confiance solide.' };
-    if (edge >= 0.04 && rel >= 0.55) return { cls: 'bbf-strength--strong', label: 'STRONG', heat: '🔥🔥', title: 'Bonne opportunité : value nette avec confiance correcte.' };
-    if (edge >= 0.02) return { cls: 'bbf-strength--standard', label: 'STANDARD', heat: '🔥', title: 'Pari value standard : positif, mais moins prioritaire.' };
+    if (isLock || (edge >= 0.08 && rel >= 0.65)) return { cls: 'bbf-strength--big', label: 'BIG BET', heat: '🔥🔥🔥', title: 'Gros pari : forte avance sur la cote et confiance solide.' };
+    if (edge >= 0.04 && rel >= 0.55) return { cls: 'bbf-strength--strong', label: 'STRONG', heat: '🔥🔥', title: 'Bonne opportunité : le modèle voit mieux que la cote.' };
+    if (edge >= 0.02) return { cls: 'bbf-strength--standard', label: 'STANDARD', heat: '🔥', title: 'Pari positif, mais moins prioritaire.' };
     return { cls: 'bbf-strength--risk', label: 'RISQUÉ', heat: '⚠️', title: 'Variance ou confiance insuffisante : prudence.' };
   }
   function BetStrengthBadge(p, extraClass = '') {
     const strength = getBetStrengthMeta(p);
     return `<span class="bbf-strength bet-strength-badge ${strength.cls}${extraClass ? ` ${esc(extraClass)}` : ''}" title="${esc(strength.title)}" aria-label="${esc(strength.label)}">${strength.heat} ${esc(strength.label)}</span>`;
   }
-  try { window.getBetStrengthMeta = getBetStrengthMeta; window.BetStrengthBadge = BetStrengthBadge; } catch(e) {}
+  function fmtMarketAdvantage(edge, decimals = 1) {
+    const n = Number(edge) * 100;
+    if (!isFinite(n)) return 'Avantage non mesuré';
+    return `${n >= 0 ? '+' : ''}${n.toFixed(decimals)}% mieux que le marché`;
+  }
+  function fmtMarketAdvantageShort(edge, decimals = 0) {
+    const n = Number(edge) * 100;
+    if (!isFinite(n)) return '—';
+    return `${n >= 0 ? '+' : ''}${n.toFixed(decimals)}%`;
+  }
+  function fmtEvHuman(ev, decimals = 0) {
+    const n = Number(ev) * 100;
+    if (!isFinite(n)) return 'Gain moyen non mesuré';
+    return `${n >= 0 ? '+' : ''}${n.toFixed(decimals)}% gain moyen par euro misé`;
+  }
+  function fmtEvShort(ev, decimals = 0) {
+    const n = Number(ev) * 100;
+    if (!isFinite(n)) return '—';
+    return `${n >= 0 ? '+' : ''}${n.toFixed(decimals)}%/€`;
+  }
+  function fmtKellyHuman(kelly) {
+    const n = Number(kelly) * 100;
+    if (!isFinite(n) || n <= 0) return 'Mise : 0€/100€';
+    return `Mise : ${n.toFixed(2)}€/100€`;
+  }
+  function fmtCalibrationHuman(brier) {
+    const n = Number(brier);
+    if (!isFinite(n)) return 'Calibration : en apprentissage';
+    const label = n <= 0.15 ? 'excellente' : n <= 0.20 ? 'bonne' : n <= 0.24 ? 'correcte' : 'à surveiller';
+    return `Calibration : ${label}`;
+  }
+  function fmtClvHuman(clv) {
+    const n = Number(clv) * 100;
+    if (!isFinite(n)) return 'Qualité de cote non mesurée';
+    return n >= 0
+      ? `Tu prends de meilleures cotes que le marché (+${n.toFixed(1)}%)`
+      : `Cote prise moins bonne que la fermeture (${n.toFixed(1)}%)`;
+  }
+  try {
+    window.getBetStrengthMeta = getBetStrengthMeta;
+    window.BetStrengthBadge = BetStrengthBadge;
+    window.fmtMarketAdvantage = fmtMarketAdvantage;
+    window.fmtMarketAdvantageShort = fmtMarketAdvantageShort;
+    window.fmtEvHuman = fmtEvHuman;
+    window.fmtEvShort = fmtEvShort;
+    window.fmtKellyHuman = fmtKellyHuman;
+    window.fmtCalibrationHuman = fmtCalibrationHuman;
+    window.fmtClvHuman = fmtClvHuman;
+  } catch(e) {}
   // Display money in whole euros — no centimes (user request). Keeps internals
   // (stake math, bilan totals) at full precision; only the UI rounds to €.
   // Accepts number or numeric-string; returns "12€" / "-3€" / "0€".
@@ -2218,10 +2266,10 @@
     let score = (0.28 * evComp + 0.24 * edgeComp + 0.20 * kellyComp + 0.16 * dataComp + 0.12 * confComp) * profile.multiplier;
 
     const reasons = [];
-    if (ev >= profile.minEv) reasons.push(`EV ${(ev * 100).toFixed(0)}% >= minimum ${(profile.minEv * 100).toFixed(0)}%`);
-    else reasons.push(`EV ${(ev * 100).toFixed(0)}% trop juste pour cette cote`);
-    if (edge >= profile.minEdge) reasons.push(`Edge +${(edge * 100).toFixed(1)}pt`);
-    else reasons.push(`Edge +${(edge * 100).toFixed(1)}pt sous le seuil`);
+    if (ev >= profile.minEv) reasons.push(`${fmtEvHuman(ev)} >= minimum ${(profile.minEv * 100).toFixed(0)}%`);
+    else reasons.push(`${fmtEvHuman(ev)} trop juste pour cette cote`);
+    if (edge >= profile.minEdge) reasons.push(fmtMarketAdvantage(edge));
+    else reasons.push(`${fmtMarketAdvantage(edge)} sous le seuil`);
     reasons.push(profile.text);
     if (dqRatio >= 0.75) reasons.push('Data riche');
     else if (dqRatio < 0.50) reasons.push('Data encore légère');
@@ -2360,11 +2408,11 @@
     const reasons = [];
     // 1. Edge — 40 pts max
     const edge = best ? best.edge : 0;
-    if (edge >= 0.10) { score += 40; reasons.push({ icon: '💎', text: `Edge fort (+${(edge*100).toFixed(0)}pt)` }); }
-    else if (edge >= 0.05) { score += 30; reasons.push({ icon: '✓', text: `Edge value (+${(edge*100).toFixed(0)}pt)` }); }
-    else if (edge >= 0.02) { score += 20; reasons.push({ icon: '~', text: `Edge léger (+${(edge*100).toFixed(0)}pt)` }); }
+    if (edge >= 0.10) { score += 40; reasons.push({ icon: '💎', text: `Forte avance (${fmtMarketAdvantage(edge, 0)})` }); }
+    else if (edge >= 0.05) { score += 30; reasons.push({ icon: '✓', text: `Avance value (${fmtMarketAdvantage(edge, 0)})` }); }
+    else if (edge >= 0.02) { score += 20; reasons.push({ icon: '~', text: `Petite avance (${fmtMarketAdvantage(edge, 0)})` }); }
     else if (edge >= 0) { score += 10; }
-    else { reasons.push({ icon: '⚠', text: `Edge négatif (${(edge*100).toFixed(0)}pt)` }); }
+    else { reasons.push({ icon: '⚠', text: `Moins bon que le marché (${(edge*100).toFixed(0)}%)` }); }
     // 2. Data quality — 25 pts max
     let dq = null;
     try { dq = (typeof computeDataQuality === 'function') ? computeDataQuality(match) : null; } catch(e) {}
@@ -2793,15 +2841,15 @@
     }
     // Edge / EV / Kelly
     if (best && best.edge >= 0.05) {
-      pros.push({ icon: '💎', label: 'Edge fort', text: `+${(best.edge*100).toFixed(0)}pt vs cote book → value confirmée` });
+      pros.push({ icon: '💎', label: 'Avance forte', text: `${fmtMarketAdvantage(best.edge, 0)} → value confirmée` });
     } else if (best && best.edge >= 0.02) {
-      pros.push({ icon: '✓', label: 'Edge léger', text: `+${(best.edge*100).toFixed(1)}pt — value modérée` });
+      pros.push({ icon: '✓', label: 'Petite avance', text: `${fmtMarketAdvantage(best.edge)} — value modérée` });
     } else if (best && best.edge < 0) {
-      cons.push({ icon: '⚠', label: 'Edge négatif', text: `${(best.edge*100).toFixed(1)}pt — la cote book est meilleure que le modèle` });
+      cons.push({ icon: '⚠', label: 'Pas assez de value', text: `${(best.edge*100).toFixed(1)}% — la cote demande plus que le modèle ne donne` });
     }
     // Kelly
     if (best && best.kelly > 0.03) {
-      pros.push({ icon: '💰', label: 'Kelly franc', text: `Mise ${(best.kelly*100).toFixed(1)}% bankroll suggérée — conviction haute` });
+      pros.push({ icon: '💰', label: 'Mise forte', text: `${fmtKellyHuman(best.kelly)} — conviction haute` });
     }
     // Confiance
     const conf = Number(pred.reliability ?? pred.pick.prob) || 0;
@@ -15691,7 +15739,7 @@
             <div class="bbf-card__bet">
               ${BetStrengthBadge(p)}
               <strong>${esc(bbfMarketLabel(p))} <b>@${Number(p.odd).toFixed(2)}</b></strong>
-              <small>+${(p.edge * 100).toFixed(1)}% mieux que le marché · gain possible ${gain.toFixed(2)}€ pour ${stake}€</small>
+              <small>${esc(fmtMarketAdvantage(p.edge))} · gain possible ${gain.toFixed(2)}€ pour ${stake}€</small>
             </div>
             <ul class="bbf-card__reasons">
               ${bbfReasons(p).map(r => `<li>${esc(r)}</li>`).join('')}
@@ -18192,7 +18240,7 @@
         </div>
         <div style="display:flex;flex-direction:column;gap:2px;font-size:11px;">
           <div><span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Confiance du modèle : probabilité estimée que ce pari gagne. ≥70 % = très fiable.">Conf</span> <b style="color:${confColor};">${Math.round(p.rel*100)}%</b> · <span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Cote décimale. La source (Winamax / externe / archive) est indiquée à côté.">Cote</span> <b class="u-text">${p.odd ? '@' + p.odd.toFixed(2) : '<span style=\"color:var(--text-dim2);font-weight:400;\">cote pré-match perdue</span>'}</b> ${_coteSrc}</div>
-          <div><span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Edge = notre probabilité − probabilité implicite de la cote. > 0 = on est plus optimiste que le bookmaker (=valeur).">Edge</span> <b style="color:${edgeColor};">${p.nonTrackable ? '<span style=\"color:var(--text-dim2);font-weight:400;\">—</span>' : (p.edge>=0?'+':'') + Math.round(p.edge*100) + 'pt'}</b>${p.nonTrackable || !(p.odd > 1) ? '' : (() => {
+          <div><span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Avance = notre proba moins la proba demandée par la cote. Positif = la cote paie trop. ${p.nonTrackable ? '' : esc(fmtMarketAdvantage(p.edge, 0))}">Av.</span> <b style="color:${edgeColor};">${p.nonTrackable ? '<span style=\"color:var(--text-dim2);font-weight:400;\">—</span>' : fmtMarketAdvantageShort(p.edge, 0)}</b>${p.nonTrackable || !(p.odd > 1) ? '' : (() => {
             // 2026-05-01 — Affichage EV (Expected Value) à côté de l'Edge.
             // EV = rel × cote − 1. C'est le retour attendu par euro misé.
             // Théo : "cote 1.10 c'est limite plus risqué que cote 2 car gain
@@ -18200,7 +18248,7 @@
             // donne EV +5% (peu rentable) vs même edge à @3 → EV +15%.
             const ev = p.rel * p.odd - 1;
             const evCol = ev >= 0.10 ? 'var(--accent)' : ev >= 0.02 ? '#fbbf24' : ev < 0 ? 'var(--danger)' : 'var(--text-dim)';
-            return ` · <span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="Expected Value : retour attendu par euro misé sur le long terme. = proba × cote - 1. ≥ +2% = pari mathématiquement gagnant.">EV</span> <b style="color:${evCol};">${ev>=0?'+':''}${Math.round(ev*100)}%</b>`;
+            return ` · <span style="color:var(--text-dim2);border-bottom:1px dotted var(--text-dim2);cursor:help;" title="${esc(fmtEvHuman(ev, 0))} si ce type de pari est rejoué longtemps.">Gain</span> <b style="color:${evCol};">${fmtEvShort(ev, 0)}</b>`;
           })()}</div>
         </div>
         <div class="u-text-right">
