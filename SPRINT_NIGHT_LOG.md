@@ -1327,3 +1327,9 @@
 - Après: 149 lignes de commentaires de jalons legacy supprimées, comportement inchangé.
 - Impact: marge regagnée pour les prochains marchés/modèles sans relever le budget.
 - Vérif: syntax OK, bundle app.js 1741.0 KB / 1750 KB.
+
+## Sprint v35.174 — Phase 10 P-10.21 Combinés multi-marchés riches (21:17 UTC)
+- Avant: le builder combinés existait mais n'était pas testable depuis l'audit navigateur.
+- Après: buildCombines exposé pour QA; audit confirme le support Buts+BTTS, safe et value.
+- Impact: les combinés riches restent vérifiables sans gonfler l'UI quand le slate est vide.
+- Vérif: phase10_rich_combines_audit.json, codeFlags sameMatchGoalCombos/Over+BTTS OK.
