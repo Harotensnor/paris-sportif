@@ -139,6 +139,17 @@ function startServer() {
   }
   console.log(`[${!sportGuard.checked || sportGuard.blocked ? 'ok' : 'FAIL'}] sport ROI guard = ${sportGuard.checked ? `${sportGuard.sport} blocked` : 'no cold sport'}`);
 
+  await page.evaluate(() => document.querySelector('.page-btn[data-page="sante"]')?.click());
+  await page.waitForTimeout(300);
+  const santeGuardVisible = await page.evaluate(() => {
+    const wrap = document.querySelector('#sante-wrap');
+    const txt = (wrap?.innerText || '').toLowerCase();
+    const html = wrap?.innerHTML || '';
+    return txt.includes('garde-fou roi sport') || html.includes('Garde-fou ROI sport');
+  });
+  if (!santeGuardVisible) failures.push({ phase: 'sante', msg: 'Sport ROI guard section missing on Sante page' });
+  console.log(`[${santeGuardVisible ? 'ok' : 'FAIL'}] sante sport ROI guard visible`);
+
   // Responsive smoke at 375×812
   await page.setViewportSize({ width: 375, height: 812 });
   await page.waitForTimeout(200);

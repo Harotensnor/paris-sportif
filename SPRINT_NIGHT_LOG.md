@@ -157,5 +157,13 @@
 - Avant: `backtest_report_v2.json` marquait hockey à -15.76% ROI sur 19 picks; le filtre sport froid protégeait surtout les top picks utilisateur, pas l'agent ni le smoke E2E
 - Après: `_sportRoiGuard` bloque les sports ROI<-10% avec n>=10 sauf edge exceptionnel; replay agent et positions du jour l'appliquent; smoke confirme `sport ROI guard = hockey blocked`
 - Impact: moins d'exposition automatique aux sports historiquement froids, avec exception conservée pour les vraies value bets à edge fort
+- Commit: 7bcb64e0
+- Status: ✅ DONE
+
+## Sprint v35.21 (2026-05-02 05:31 UTC)
+- Chantier: P19 visibilité garde-fou ROI
+- Avant: le hockey était bloqué par le nouveau guard, mais la page Santé n'affichait pas clairement quels sports étaient en AUTO-BLOCK; si le backtest arrivait après le rendu Santé, le bloc pouvait rester absent
+- Après: page Santé affiche `Garde-fou ROI sport` avec hockey AUTO-BLOCK, ROI -15.8%, sample 19, WR 47%, Brier 0.243; Santé se re-render quand `backtest_report_v2.json` arrive; smoke vérifie le bloc
+- Impact: diagnostic visible en prod en quelques secondes, plus de blocage invisible de l'agent
 - Commit: pending
 - Status: ✅ DONE
