@@ -9451,7 +9451,7 @@
         <div class="page-header">
           <div style="position:absolute;top:0;left:0;width:40px;height:3px;background:var(--purple);border-radius:0 0 2px 2px;"></div>
           <div style="font-size:11px;color:var(--purple);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Multi-paris</div>
-          <h1 class="page-h1">Combinés</h1>
+          <h2 class="page-h1">Combinés</h2>
           <div style="font-size:14px;color:var(--text-dim);max-width:640px;">Paris combinés générés automatiquement, anti-corrélés, recalculés en continu. À utiliser avec modération.</div>
         </div>
         ${variantsHtml}

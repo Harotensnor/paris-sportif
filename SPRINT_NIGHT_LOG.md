@@ -1180,3 +1180,10 @@
 - Impact: régression post-polish exclue sur parcours critique et boutons
 - Commit: pending
 - Status: ✅ DONE
+## Sprint v35.150 (16:32 UTC)
+- Chantier: P-9.68
+- Avant: 8 pages SPA avec 2 H1 détectés à cause du bloc Combinés caché
+- Après: 8/8 pages à 1 H1 unique; Combinés legacy rétrogradé en H2
+- Impact: SEO/accessibilité plus propre, rendu inchangé
+- Commit: pending
+- Status: ✅ DONE
