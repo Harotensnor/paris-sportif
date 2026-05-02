@@ -9,7 +9,6 @@
   let activeFilter = 'all';
   // Advanced filters — persisted across sessions. Applied on top of activeFilter.
   // kellyMin=0 disables. oddMax=0 disables. league=''|code filters by ESPN league_code.
-  // Sprint 77 (v31.7.164) — `valueOnly` filtre les picks edge ≤ 0 (no value).
   // Réponse au feedback "trop de paris faibles affichés".
   const ODD_MIN_USER_KEY = 'oddMinUser';
   const ODD_MIN_CHOICES = [1.50, 1.80, 2.00, 2.20, 2.50];
@@ -52,7 +51,6 @@
         || !!advFilters.league || !!advFilters.valueOnly || advFilters.evMin > 0
         || !!advFilters.marketType || advFilters.dataQualityMin > 0;
   }
-  // Sprint 77 — Helper utilisé par les pages pour vérifier si un pick passe
   // les filtres value (edge > 0 si valueOnly, EV ≥ evMin sinon).
   // Volontairement non-destructif : retourne true par défaut quand les
   // filtres sont neutres, donc backward-compat avec tous les call sites.
@@ -71,13 +69,11 @@
   try { window.passesValueFilter = passesValueFilter; window.advFilters = advFilters; window.getUserOddMin = getUserOddMin; } catch(e){}
   let advFiltersOpen = advFiltersActive();
   // Théo only bets on Winamax, so hide everything else by default.
-  // Sprint 78 (v31.7.165) — Devenu `let` pour respecter `bookmakerMode` (3 états).
   // Sync via _syncWinamaxOnlyFromMode() ci-dessous quand le toggle change.
   // - mode='exact' / 'catalog' : winamaxOnly=true (= ancien comportement)
   // - mode='all' : winamaxOnly=false (montre tous les matchs détectés)
   let winamaxOnly = true;
 
-  // Sprint 78 (v31.7.165 — audit ChatGPT P0) — Bookmaker mode 3-state.
   // L'audit demande un toggle visible : "all" (tous les matchs détectés),
   // "catalog" (Winamax tournament-only inclus), "exact" (Winamax exact only).
   // Persisté dans localStorage pour rester sur la préférence user.
@@ -93,7 +89,6 @@
   function setBookmakerMode(mode) {
     if (!['all', 'catalog', 'exact'].includes(mode)) return;
     bookmakerMode = mode;
-    // Sprint 78 — Sync winamaxOnly avec le mode courant. 'all' = no filter,
     // 'catalog' / 'exact' = filtre actif (l'ancien comportement par défaut).
     winamaxOnly = mode !== 'all';
     try { localStorage.setItem(BOOKMAKER_MODE_KEY, mode); } catch(e){}
@@ -114,19 +109,14 @@
   }
   try { window.bookmakerMode = bookmakerMode; window.setBookmakerMode = setBookmakerMode; window.isBookableInMode = isBookableInMode; } catch(e){}
   // Current page view: simples (default) | combines | bilan
-  // v30 fix Bug 1 : si l'utilisateur arrive via PWA shortcut (manifest)
   // ex pronostics.html#locks → on lit location.hash pour set la bonne page.
   // Sans ce guard, le manifest shortcuts (#locks #bilan #combines) ne
   // marchaient pas — l'utilisateur arrivait toujours sur dashboard.
-  // v31.7.51 — 'simples' retiré (audit cleanup) : la page existait mais
   // n'était plus dans aucun sous-menu visible. Le code render reste safe
   // (silent fall-through si quelqu'un set currentPage='simples' via hash
   // legacy) mais aucun lien ne pointe plus vers cette valeur.
-  // v31.7.77 — 'calendrier' ajouté pour vue 7 jours groupée (user feedback
   // "je veux voir au moins une semaine de pronos jour par jour").
   const VALID_PAGES = ['dashboard','tous','performance','academie','profil','sante','legal','montantes'];
-  // v30 — 'mesparis' retiré : Théo n'enregistre pas ses paris sur le site.
-  // v31 — 'legal' + 'methodologie' ajoutés (transparence + dictionnaire des
   // métriques, en réponse à l'audit ChatGPT 2026-04-26).
   // P0-2 (audit 2026-05-01) : alias pour les variantes pluriel/singulier que
   // l'utilisateur peut avoir bookmarké. Avant : #montantes-jour fallback sur
@@ -180,7 +170,6 @@
     } catch(e) { return null; }
   }
   try { window.PAGE_ALIASES = PAGE_ALIASES; } catch(e){}
-  // BUG FIX 2026-05-01 — 'legal' et 'methodologie' sont des pages HTML
   // statiques séparées ; quand on les "visite" via la SPA, applyPageView
   // fait location.replace() vers le fichier statique. Si on persiste cette
   // valeur dans localStorage, alors au prochain boot de pronostics.html
@@ -210,7 +199,6 @@
   // still points to wherever the user was last (or 'dashboard'), so any tab
   // restored from session after the shortcut would jump back.
   try {
-    // BUG FIX 2026-05-01 — Même un hash '#legal' ne doit pas être persisté
     // (cf. L133). Si l'user partage un lien #legal, on respecte l'intention
     // pour la session courante (currentPage='legal' utilisé par applyPageView)
     // mais on ne pollue pas localStorage pour les futurs reload.
@@ -246,7 +234,6 @@
     const p = _pageFromHash();
     if (p && p !== currentPage) {
       currentPage = p;
-      // BUG FIX 2026-05-01 — Même filtre qu'au boot : ne pas persister
       // 'legal'/'methodologie' (cause une boucle de redirect au reload).
       if (!STATIC_REDIRECT_PAGES.has(currentPage)) {
         try { localStorage.setItem('currentPage', currentPage); } catch(e){}
@@ -316,7 +303,6 @@
   }
   // Minimalist toast. Stacks up to 3, auto-dismisses. Used for validation
   // errors + "pari ajouté" feedback + any action confirmation.
-  // AUDIT-2026-04-27 (Sprint 18 #29) — Auto-purge des badges "Nouveau" expirés.
   // [data-new-until="YYYY-MM-DD"] sur les badges. Si la date est passée,
   // le badge disparaît silencieusement. Évite la maintenance manuelle.
   try {
@@ -326,13 +312,11 @@
     });
   } catch (e) {}
 
-  // AUDIT-2026-04-27 (Sprint 18 #28) — Confetti lors d'un win streak.
   // Spawn 12 particules sur l'élément cible, durée 2s. Animation CSS pure
   // déclenchée par class .has-confetti + spans .confetti-piece.
   window._spawnConfetti = function spawnConfetti(targetEl, n = 12) {
     if (!targetEl) return;
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    // AUDIT-2026-04-27 (Sprint 46 #26) — Confetti perf adaptive.
     // Sur low-end devices (deviceMemory < 4GB ou hardware concurrency
     // < 4 cores), réduit à 6 particules pour éviter les frame drops.
     try {
@@ -355,7 +339,6 @@
     setTimeout(() => targetEl.classList.remove('has-confetti'), 2400);
   };
 
-  // AUDIT-2026-04-27 (Sprint 26 #8) — Keyboard avoidance mobile.
   // Quand un input prend focus sur mobile, le keyboard pousse le
   // viewport. Si l'input est en bas (filtre, search), il peut être
   // caché. On scroll-into-view automatiquement avec 80px de marge.
@@ -374,7 +357,6 @@
     }, 300);  // attendre que le keyboard soit ouvert
   });
 
-  // AUDIT-2026-04-27 (Sprint 26 #10) — Haptic feedback helper.
   // Vibre brièvement (10ms) sur Android. iOS Safari ignore (pas de
   // vibrate API). Pour les events importants : new lock, win streak,
   // tap CTA primaire.
@@ -384,7 +366,6 @@
     } catch (e) {}
   };
 
-  // AUDIT-2026-04-27 (Sprint 26 #6) — Pull-to-refresh dashboard mobile.
   // Geste overscroll en haut du dashboard → indicator + fetch data.
   // Activé seulement sur mobile (max-width: 720px) et au top du scroll.
   (function setupPullToRefresh() {
@@ -413,7 +394,6 @@
       startY = e.touches[0].clientY;
       pulling = true;
     }, { passive: true });
-    // AUDIT-2026-04-27 (Sprint 41 #2) — passive: false pour pouvoir
     // preventDefault() et bloquer le bounce overscroll iOS Safari.
     document.addEventListener('touchmove', (e) => {
       if (!pulling) return;
@@ -458,14 +438,12 @@
     }, { passive: true });
   })();
 
-  // AUDIT-2026-04-27 (Sprint 22 #18) — Migration inline onclick → delegation
   // pour CSP friendlier (préparation à passer en CSP strict sans
   // 'unsafe-inline' un jour).
   document.addEventListener('click', (e) => {
     // Smart suggestion banner dismiss
     if (e.target.closest && e.target.closest('[data-smart-dismiss]')) {
       try {
-        // Sprint 25 #2 — timestamp UTC pour fenêtre 18h glissante
         localStorage.setItem('smartSuggestionDismissedTs', String(Date.now()));
         const b = document.getElementById('smart-suggest-banner');
         if (b) b.style.display = 'none';
@@ -499,7 +477,6 @@
     }
   });
 
-  // AUDIT-2026-04-27 (Sprint 38 #28) — Keyboard shortcut overlay.
   // Press `?` ouvre un modal listant les raccourcis disponibles.
   // Press Esc ferme. Pattern Linear/GitHub.
   function _showShortcutsOverlay() {
@@ -556,7 +533,6 @@
     _showShortcutsOverlay();
   });
 
-  // AUDIT-2026-04-27 (Sprint 38 #27) — ARIA live region pour data refresh.
   // Annonce "Données mises à jour" au lecteur d'écran quand pollData
   // termine (peu intrusif, role=status + aria-live polite).
   let __sraLive = null;
@@ -574,7 +550,6 @@
     } catch (e) {}
   };
 
-  // AUDIT-2026-04-27 (Sprint 17 #25) — Cmd/Ctrl-K focus search.
   // Raccourci clavier global qui focus la search bar de la topbar.
   // Évite à l'user de chercher l'input à la souris.
   try {
@@ -593,7 +568,6 @@
     });
   } catch (e) {}
 
-  // Sprint 175 (v31.7.195) — Long-press support pour tooltips sur mobile.
   // Mobile n'a pas de hover, donc data-tooltip était invisible. Cette extension
   // détecte un appui long (>500ms) et déclenche le popover. Tap court : action normale.
   let _lpTimer = null;
@@ -620,7 +594,6 @@
     if (_lpTimer) { clearTimeout(_lpTimer); _lpTimer = null; }
   }, { passive: true });
 
-  // AUDIT-2026-04-27 (Sprint 16 #19) — Tooltip system unifié.
   // [data-tooltip="..."] sur n'importe quel élément (focus + hover).
   // Évite les title="" natifs (laids, lents, pas a11y).
   let __ttPopover = null;
@@ -651,7 +624,6 @@
     if (__ttPopover) __ttPopover.classList.remove('visible');
   }
   // Wire global delegation (mouseenter via mouseover bubble + focus).
-  // Sprint 20 #8 — Aussi accepte `title=""` natifs comme tooltips gérés
   // par notre système (plus joli, plus rapide, a11y propre). On dégrade
   // le `title` en data-tooltip à la première interaction (one-shot par
   // élément). Évite la migration manuelle des 50+ title="" du codebase.
@@ -662,7 +634,6 @@
     const tt = el.closest('[title]');
     if (tt && tt.title) {
       // Migrate title → data-tooltip (one-shot pour ne pas double-fire).
-      // Sprint 42 #7 — Préserve l'accessible name : si l'élément n'a
       // ni aria-label ni text content, on copie title vers aria-label
       // avant de removeAttribute. Évite la perte d'a11y pour SR.
       const txt = tt.title;
@@ -693,7 +664,6 @@
     if (e.target.closest && e.target.closest('[data-tooltip]')) _hideTooltip();
   });
   // Hide on scroll (positions become stale).
-  // Sprint 25 #4 — Throttle via rAF pour éviter le flicker quand l'user
   // hover pendant qu'il scroll lentement (le hide+show ping-pong-ait).
   let _ttScrollScheduled = false;
   document.addEventListener('scroll', () => {
@@ -705,7 +675,6 @@
     });
   }, { passive: true, capture: true });
 
-  // Sprint 129 (v31.7.191) — Inline tutorial "Comment lire un prono".
   // Accessible via window._showHowToReadTutorial(). Affiche une modal légère
   // expliquant les éléments d'une carte pick (cote, conf, edge, mise) avec
   // exemple chiffré. Click outside ou Esc pour fermer. Persistant : 1×/30j
@@ -781,7 +750,6 @@
   }
   try { window._showHowToReadTutorial = _showHowToReadTutorial; } catch(e){}
 
-  // Sprint 161 (v31.7.195) — Plan 200 : safe localStorage wrapper.
   // localStorage peut throw QuotaExceededError, SecurityError (private mode),
   // ou retourner null. Ce wrapper gère tout proprement et expose l'API.
   const _safeStorage = {
@@ -831,7 +799,6 @@
   // Mass implementation : utilities + features publiques
   // ============================================================
 
-  // Sprint A1 — Better DOM helpers
   /**
    * Wrapper around document.querySelector for shorter calls.
    * @param {string} selector - CSS selector
@@ -878,7 +845,6 @@
   }
   try { window._qs = _qs; window._qsa = _qsa; window._ce = _ce; } catch(e){}
 
-  // Sprint A2 — Event delegation helper
   /**
    * Event delegation : attach a listener on parent, dispatched only when target
    * matches the selector. Allows attaching once on a static parent for many
@@ -898,7 +864,6 @@
   }
   try { window._on = _on; } catch(e){}
 
-  // Sprint A3 — Async wrapper with error toast
   /**
    * Wraps an async function with try/catch + user-facing toast on error.
    * Logs to console.warn but never throws to caller. Returns null on error.
@@ -916,7 +881,6 @@
   }
   try { window._safeAsync = _safeAsync; } catch(e){}
 
-  // Sprint A4 — Copy to clipboard helper avec fallback
   /**
    * Copy text to clipboard. Uses Clipboard API in secure contexts,
    * falls back to execCommand('copy') on older browsers / non-HTTPS.
@@ -944,7 +908,6 @@
   }
   try { window._copyToClipboard = _copyToClipboard; } catch(e){}
 
-  // Sprint A5 — Format relative time (étendu vs _fmt.age)
   /**
    * Human-friendly relative time (FR locale).
    * Past : "à l'instant", "il y a 5 min", "il y a 3 jours", "il y a 2 ans"
@@ -972,14 +935,12 @@
   }
   try { window._fmtRelativeTime = _fmtRelativeTime; } catch(e){}
 
-  // Sprint A6 — Number formatting avec séparateurs FR
   function _fmtNumber(n, decimals = 0) {
     if (!isFinite(n)) return '—';
     return n.toLocaleString('fr-FR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
   }
   try { window._fmtNumber = _fmtNumber; } catch(e){}
 
-  // Sprint A7 — Smart confirm with custom UI (vs native confirm)
   /**
    * Custom-styled confirm modal (replacement for native confirm()).
    * Better UX, themable, keyboard-accessible (Esc=cancel, Enter=confirm).
@@ -1031,7 +992,6 @@
   }
   try { window._showConfirm = _showConfirm; } catch(e){}
 
-  // Sprint A8 — Haptic feedback (si dispo)
   /**
    * Trigger haptic vibration on mobile (no-op if unsupported).
    * @param {'light'|'medium'|'heavy'|'double'} [type='light']
@@ -1043,7 +1003,6 @@
   }
   try { window._haptic = _haptic; } catch(e){}
 
-  // Sprint A9 — Detect connection type (network awareness)
   function _getConnectionType() {
     const c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
     if (!c) return 'unknown';
@@ -1052,7 +1011,6 @@
   }
   try { window._getConnectionType = _getConnectionType; } catch(e){}
 
-  // Sprint A10 — Page visibility change handler manager
   const __visListeners = [];
   function _onVisibilityChange(handler) {
     __visListeners.push(handler);
@@ -1063,7 +1021,6 @@
   });
   try { window._onVisibilityChange = _onVisibilityChange; } catch(e){}
 
-  // Sprint J (v31.7.197) — Lightweight obfuscation pour données sensibles localStorage.
   // Note : ce N'EST PAS du chiffrement fort (XOR avec clé fixe). Mais rend les
   // données illisibles à l'œil nu (utile pour valeurs Kelly, bankroll si paranoia).
   // Pour vraies données sensibles, ne pas stocker côté client — ce site ne stocke
@@ -1092,7 +1049,6 @@
   }
   try { window._obfuscate = _obfuscate; window._deobfuscate = _deobfuscate; } catch(e){}
 
-  // Sprint J — Privacy-respecting export of all user data (RGPD requirement)
   // L'utilisateur peut télécharger toutes ses données localStorage en JSON.
   window._exportAllUserData = function() {
     const data = {};
@@ -1122,7 +1078,6 @@
     return data;
   };
 
-  // Sprint J — Wipe all user data (RGPD right to be forgotten)
   window._wipeAllUserData = async function() {
     const confirm = (typeof window._showConfirm === 'function')
       ? await window._showConfirm({
@@ -1154,7 +1109,6 @@
     }
   };
 
-  // v31.7.201 — Page-tabs helper : génère un mini-tabs bar pour pages liées
   // Usage : _pageTabsHTML('top', [
   //   { page: 'top', label: '⭐ Highlights' },
   //   { page: 'plan-mise', label: '💼 Mises du jour' },
@@ -1184,7 +1138,6 @@
   }
   try { window._pageTabsHTML = _pageTabsHTML; } catch(e){}
 
-  // v32.0 — Tabs alignés avec la nouvelle nav 3 hubs.
   // Sister pages share a sub-tabs row pour ne pas perdre le contexte.
   const _PAGE_TAB_GROUPS = {
     // Hub NOW : picks à parier
@@ -1242,7 +1195,6 @@
       return el.style.display !== 'none' && getComputedStyle(el).display !== 'none';
     });
     if (!visibleWrap) return;
-    // v31.7.204 FIX : selector '.page-wrap > :first-child, > :first-child' était
     // invalide (le > sans parent throw SyntaxError silencieux dans applyPageView).
     // Approche correct : on récupère le target d'injection puis on regarde
     // son premier enfant directement via firstElementChild.
@@ -1272,7 +1224,6 @@
   }
   try { window._pageTabsForGroup = _pageTabsForGroup; } catch(e){}
 
-  // Sprint H (v31.7.197) — Bottom sheet helper
   /**
    * Mobile-first bottom sheet modal (slide-up on mobile, center modal on desktop).
    * Includes drag handle (mobile), close button, Esc + outside-click handlers.
@@ -1347,7 +1298,6 @@
   }
   try { window._showBottomSheet = _showBottomSheet; } catch(e){}
 
-  // Sprint 162 (v31.7.195) — debounce/throttle utilities (souvent réinventées).
   function _debounce(fn, wait) {
     let t = null;
     return function(...args) {
@@ -1375,7 +1325,6 @@
   }
   try { window._debounce = _debounce; window._throttle = _throttle; } catch(e){}
 
-  // Sprint 163 (v31.7.195) — Format helpers centralisés.
   // Avant : pct/euros/temps formattés inline avec différentes précisions.
   // Maintenant : un seul endroit pour modifier les conventions.
   const _fmt = {
@@ -1419,7 +1368,6 @@
   };
   try { window._fmt = _fmt; } catch(e){}
 
-  // Sprint 112 (v31.7.190) — Empty state factory unifiée.
   // Au lieu de 36 inline templates `.empty-state-v2`, un helper qui produit
   // le markup canonique. Inclut illustration emoji, titre, body, et actions
   // optionnelles (boutons CTA orientés "que faire maintenant").
@@ -1452,7 +1400,6 @@
   }
   try { window._emptyState = _emptyState; } catch(e){}
 
-  // Sprint 108 (v31.7.190) — Glossaire inline pour termes techniques.
   // Usage : <span class="gloss-term" data-gloss="kelly">Kelly</span>
   // Au click → popover avec définition courte + lien académie pour le détail.
   // Les termes sont aussi accessibles via tooltips data-tooltip si besoin.
@@ -1595,7 +1542,6 @@
   // Expose le glossaire pour que les autres modules puissent l'utiliser
   try { window._GLOSSARY = _GLOSSARY; window._showGlossPopover = _showGlossPopover; } catch(e){}
 
-  // AUDIT-2026-04-27 (Sprint 16 #17) — Animated counter.
   // animateCounter(el, {to: 12, duration: 300, format: v => Math.round(v)})
   // Compte de 0 à `to` avec easeOut. Idéal pour les KPIs page Bilan/Locks.
   // Respecte prefers-reduced-motion (saute direct à la valeur finale).
@@ -1623,9 +1569,7 @@
   };
 
   function toast(msg, kind = 'info', opts = {}) {
-    // AUDIT-2026-04-27 (Sprint 16 #18) — Refactor vers .toast-stack moderne.
     // Garde la fonction `toast()` API stable mais utilise le nouveau host.
-    // Sprint 125 (v31.7.191) — Actions optionnelles : opts.action = { label, onClick }
     // Crée un bouton dans le toast qui, au click, exécute onClick puis dismiss.
     // Useful pour "Undo", "Voir détail", "Réessayer"… toast actionnable.
     let host = document.getElementById('toast-host');
@@ -1663,7 +1607,6 @@
       el.textContent = msg;
     }
     host.appendChild(el);
-    // AUDIT-2026-04-27 (Sprint 25 #5 + Sprint 42 #6) — Cap dynamique
     // qui re-évalue à chaque toast (donc react au resize entre 2
     // toasts sans listener supplémentaire).
     const cap = window.innerWidth < 380 ? 2 : 3;
@@ -2077,7 +2020,6 @@
         _fromWinamax: true,
       };
     }
-    // Chantier PP — Historical odds fallback.
     // ESPN purges odds once a match is completed, leaving bilan entries without
     // prior data (observed 2026-04-22 : 88 finished matches, 0 with odds → bilan
     // vide). On charge odds_history.jsonl côté client et on indexe par matchId
@@ -2145,7 +2087,6 @@
   // Avant : seulement dans __testAPI → call sites externes crashaient.
   try { window.isWinamaxBookable = isWinamaxBookable; } catch(e){}
 
-  // Sprint 62 (v31.7.151 — audit ChatGPT 2026-04-28 P0) — VIEW_SCOPES.
   // Réponse à "Uniformiser scopes temporels" : actuellement chaque page
   // recalcule son propre filtre (renderDashboard utilise today, Calendrier
   // utilise 7d, Tous utilise currentDate). Centralise dans une seule
@@ -2203,7 +2144,6 @@
   }
   try { window.getScopedEvents = getScopedEvents; } catch(e){}
 
-  // Sprint 63 (v31.7.152 — audit ChatGPT 2026-04-28 P0) — selectBestMarket.
   // Réponse à "Unifier la logique meilleur marché" : actuellement plusieurs
   // endroits choisissent le pick (renderDashboard, _agentBestPick, modal
   // détail, page Tous, calendrier, montantes…) et les conventions diffèrent.
@@ -2214,7 +2154,6 @@
   // fallback proba pure si pas de cote book. requireExact : exige la cote
   // Winamax pour ce marché précis.
   //
-  // Sprint 77 (v31.7.164) — expectedValue helper.
   // EV = proba × cote - 1 (retour attendu par mise unitaire).
   // Lien avec edge : edge = proba - 1/cote, EV = edge × cote.
   // Pour un bettor, EV est plus parlant : EV +5% = "+5% par euro misé en moyenne".
@@ -2240,7 +2179,6 @@
     window.isBlockedHandicapMarket = isBlockedHandicapMarket;
   } catch(e){}
 
-  // v34.35 — Capital engine.
   // A pick is not "good" only because confidence is high. A very low odd
   // needs a huge probability edge to be worth the capital it locks; a very
   // high odd needs a stronger EV buffer because variance explodes. These
@@ -2438,7 +2376,6 @@
   }
   try { window.renderStreakBadge = renderStreakBadge; } catch(e){}
 
-  // Sprint 83 (v31.7.170 — audit Part 7) — Score Qualité dédié.
   // Synthétise 4 dimensions en un score 0..100 + label "high/medium/low" :
   //   * edge (40 pts) : value forte +5pt+ → 40, +2pt → 20, 0 → 10
   //   * data quality (25 pts) : computeDataQuality.score / max
@@ -2949,7 +2886,6 @@
   }
   try { window.combinationCorrelation = combinationCorrelation; } catch(e){}
 
-  // Sprint 103 (v31.7.188) — AI Coach contextuel : explique pourquoi parier.
   // Synthétise les signaux dominants du modèle pour le pick choisi en
   // langage naturel, accessible. Lit pred.contributions (Sprint U Chantier) et
   // pred.explain.reasons + autres signaux dispo. Ajoute aussi les anti-arguments
@@ -3032,7 +2968,6 @@
   }
   try { window.aiCoachExplain = aiCoachExplain; } catch(e){}
 
-  // Sprint 102 (v31.7.187) — Tracking user perso (carnet localStorage) + Adherence.
   // L'user note "j'ai parié X€ sur ce match" → comparison avec ce que le modèle
   // aurait suggéré. Adherence score : "Tu as suivi le modèle 8/10 fois".
   // Schema localStorage.userBets = [{ id, matchId, market, key, label, odd,
@@ -3151,7 +3086,6 @@
     const losses = bets.filter(b => b.result === 'lost').length;
     const totalStake = bets.reduce((a, b) => a + (b.stake || 0), 0);
     const totalPnL = bets.reduce((a, b) => a + (b.pnl || 0), 0);
-    // Sprint A — Stats avancées : streak max win/lose, par sport, par marché
     let curStreak = 0, lastResult = null;
     let maxWinStreak = 0, maxLossStreak = 0;
     let curWin = 0, curLoss = 0;
@@ -3214,19 +3148,16 @@
       totalStake: Math.round(totalStake * 100) / 100,
       totalPnL: Math.round(totalPnL * 100) / 100,
       roi: totalStake > 0 ? totalPnL / totalStake : 0,
-      // Sprint A — Stats avancées
       maxWinStreak,
       maxLossStreak,
       currentStreak: curStreak,
       currentStreakSide: lastResult,
       bySport,
       byMarket,
-      // Sprint A — Smart staking: average stake vs Kelly suggestion ratio
       avgStake: bets.length > 0 ? totalStake / bets.length : 0,
       avgPnL: bets.length > 0 ? totalPnL / bets.length : 0,
     };
   };
-  // Sprint A1-A10 — ROI Tracker helpers
   // Compute "what if you followed all picks" comparison with user's actual results
   window._computeIfYouHadFollowed = function() {
     const data = window.PRONOSTICS_DATA;
@@ -3269,13 +3200,11 @@
       missedPnL: Math.round(missedPnL * 100) / 100,
     };
   };
-  // Sprint A — Smart staking : Kelly modulé par confiance
   window._smartKelly = function(rel, odd, bankroll = 50) {
     if (!isFinite(rel) || !isFinite(odd) || odd <= 1 || rel <= 0 || rel >= 1) return 0;
     // Base Kelly fraction
     const baseKelly = (rel * odd - 1) / (odd - 1);
     if (baseKelly <= 0) return 0;
-    // Sprint A — Module by confidence:
     // - Lock (rel ≥ 0.70) : 0.50× Kelly (haute conviction)
     // - Standard (0.55-0.70) : 0.25× Kelly (default)
     // - Lowconf (<0.55) : 0.10× Kelly (skip habituellement)
@@ -3288,7 +3217,6 @@
     return Math.max(0.10, Math.min(stake, cap));
   };
 
-  // Sprint 101 (v31.7.186) — Live odds drift tracker.
   // Compare la cote actuelle (winamax.markets[...]) avec la cote snapshotée
   // au moment où le pick a été émis (odds_snapshot). Trois cas :
   //   1. Pas bougé (±2%) → pick toujours valide
@@ -3353,7 +3281,6 @@
   }
   try { window.computeOddsDrift = computeOddsDrift; } catch(e){}
 
-  // Sprint 98 (v31.7.183) — Sharpe ratio, max drawdown, streak max.
   // Métriques pro pour évaluer la rentabilité ajustée au risque.
   // Sharpe = (ROI moyen - taux sans risque) / écart-type des résultats.
   // Plus c'est haut, plus le profil rendement/risque est bon.
@@ -3416,7 +3343,6 @@
   }
   try { window.computeAdvancedMetrics = computeAdvancedMetrics; } catch(e){}
 
-  // Sprint 97 (v31.7.182) — Anti-tilt protection : détection streaks.
   // Calcule la séquence des N derniers paris réglés (ordre chronologique du
   // bilan modèle, pas de tracking user perso). Retourne :
   //   { streakWins, streakLosses, currentSide, recentResults, alert }
@@ -3480,7 +3406,6 @@
   }
   try { window.detectStreaks = detectStreaks; } catch(e){}
 
-  // Sprint 87 (v31.7.174 — audit Part 9) — Gestion risque user.
   // 4 garde-fous configurables par l'user :
   //   * Max paris / jour (default 5) — au-delà, alerte
   //   * Max stake / jour (% bankroll, default 25%) — alerte si dépassé
@@ -3649,7 +3574,6 @@
     'usa.1', 'mex.1',  // ligues nord-américaines majeures
   ]);
   const _knockoutHints = /(final|finale|semi|demi|quarter|quart|round of 16|huiti|knockout|playoff|elimina)/i;
-  // Sprint 51 (v31.7.140) — Derby detection. Liste empirique des grands
   // derbies/clasicos qui doivent toujours être surfacés même sans CL/finale.
   // Format : ensemble de paires triées alphabétiquement (séparées par '|')
   // pour éviter les ambiguïtés home/away.
@@ -3734,9 +3658,7 @@
     } catch(e) {}
     // Sport multiplier
     if (match.sport === 'football') score += 5;
-    // Sprint 51 (v31.7.140) — Derby detection (+15)
     if (_isDerby(match)) score += 15;
-    // Sprint 51 — ESPN team rank/standings position boost.
     // Si une des équipes est dans le top 3 du classement, +10.
     // Si les deux sont top 5, +15 (gros choc de haut de tableau).
     try {
@@ -3851,7 +3773,6 @@
     return t > 0 ? { pH: pH/t, pD: pD/t, pA: pA/t } : null;
   }
 
-  // v31.7.5 — Dixon-Coles correction τ pour les scores bas nuls/serres.
   // Le Poisson naif independant sous-estime systematiquement les scores
   // 0-0, 1-0, 0-1, 1-1 (corrélation negative empirique en foot).
   // Référence : Dixon & Coles (1997) "Modelling Association Football Scores".
@@ -3863,7 +3784,6 @@
     return 1;
   }
 
-  // v31.7.16 — ρ Dixon-Coles par ligue. Valeurs empiriques basees sur
   // recalibration sur saisons 2014-2024 (litterature : Constantinou & Fenton
   // 2017, Egidi & Torelli 2021 et al). Avant : ρ=-0.13 hardcoded (moyenne
   // top-5). Maintenant : table par league_code. Fallback -0.13 si ligue
@@ -3907,7 +3827,6 @@
     'eng.fa': -0.13,  // FA Cup — varie selon teams
   };
   const DC_RHO_DEFAULT = -0.13;
-  // v31.7.23 — Override par mesure CI (likelihood max). Quand
   // dixon_coles_rho.json a `source: 'measured'` pour une ligue, on l'utilise
   // au lieu du litterature value. Loader async, fallback gracieux.
   let __dcRhoMeasured = null;
@@ -3938,7 +3857,6 @@
   // Poisson(lamH) × Poisson(lamA) × τ(h,a,ρ).
   // Returns [{ home, away, prob }], sorted desc by prob.
   // Used for the "Score exact probable" widget — Chantier 6 + v31.7.5.
-  // v31.7.16 — accepte un argument optionnel `leagueCode` pour utiliser
   // ρ specifique. Backward-compatible : appel sans 5e arg utilise default.
   function poissonTopScores(lamH, lamA, k = 3, maxGoals = 6, leagueCode = null) {
     if (!(lamH > 0) || !(lamA > 0)) return [];
@@ -4000,7 +3918,6 @@
     let hScored = h.scored, hConceded = h.conceded;
     let aScored = a.scored, aConceded = a.conceded;
     let captionExtras = [];
-    // v31.7.25 — Sport-specific NHL : si nhl_stats dispo, blend last5 (form
     // récente, variance haute) avec season averages (signal stable) à 60/40.
     // Réduit la variance des prédictions sur les derniers matchs.
     if (match.nhl_stats && match.nhl_stats.home_pace != null && match.nhl_stats.away_pace != null) {
@@ -4013,7 +3930,6 @@
       aScored = 0.6 * a.scored + 0.4 * seasonAwayGf;
       captionExtras.push('moyenne saison NHL pondérée');
     }
-    // v31.7.25 — Goalie save_pct correction. Si goalie titulaire dispo et
     // sv% différent de la moyenne ligue (~0.905), corriger le lambda adverse.
     // Élite (sv% ≥ 0.92) : réduit lambda adverse de ~12%.
     // Faible (sv% ≤ 0.89) : augmente lambda adverse de ~10%.
@@ -4037,7 +3953,6 @@
     if (!top.length) return null;
     const baseCap = `Calculé à partir des buts marqués / encaissés sur les ${Math.min(h.sample, a.sample)} derniers matchs`;
     const extras = captionExtras.length ? ` + ${captionExtras.join(', ')}` : '';
-    // Sprint 82 (v31.7.169 — audit Part 1) — Multi-marchés hockey.
     // Lignes Winamax NHL : total buts 5.5/6.5/7.5, puck line ±1.5, team totals.
     // Calculs via Poisson (même base que les top scores ci-dessus).
     const _poissonOver = (lam, N) => {
@@ -4087,12 +4002,10 @@
       kind: 'exact',
       items: top.map(s => ({ home: s.home, away: s.away, prob: s.prob, label: `${s.home}-${s.away}` })),
       caption: `${baseCap}${extras} (modèle statistique).`,
-      // Sprint 82 — Marchés hockey étendus
       markets: { totals, puckLine, teamTotals, lamH, lamA },
     };
   }
 
-  // Sprint 82 (v31.7.169 — audit Part 1) — Baseball score projection + marchés.
   // Marchés Winamax MLB : ML 9 innings, run line ±1.5, total runs 7.5/8.5/9.5,
   // first 5 innings ML/RL/total. On utilise pitcherStats (ERA-based) + last5
   // pour estimer le run total attendu.
@@ -4177,7 +4090,6 @@
     let hScored = h.scored, hConceded = h.conceded;
     let aScored = a.scored, aConceded = a.conceded;
     let captionExtras = [];
-    // v31.7.37 — NBA-specific : si nba_stats dispo (saison), blend last5 avec
     // season averages 60/40 pour réduire la variance des projections.
     // Logique identique à NHL hockeyScorePrediction v31.7.25.
     const hStats = home?.nba_stats;
@@ -4195,7 +4107,6 @@
     const margin = projH - projA;
     const baseCap = `Projection lissée sur les ${Math.min(h.sample, a.sample)} derniers matchs`;
     const extras = captionExtras.length ? ` + ${captionExtras.join(', ')}` : '';
-    // Sprint 56 (v31.7.145) — Multi-marchés basket. Lignes Winamax courantes :
     // total points 215.5/220.5/225.5 (NBA), handicap -3.5/-5.5/-7.5. Approx
     // Gaussienne σ ≈ 12 (NBA), σ ≈ 18 (NCAA / EuroLeague — plus volatil).
     // Le marché attend une marge entière → on offset la moyenne par 0.5 pour
@@ -4233,7 +4144,6 @@
       total,
       margin,
       caption: `${baseCap}${extras} (± ~8 pts par équipe en NBA).`,
-      // Sprint 56 (v31.7.145 — Phase 3 basket)
       markets: { totals: totalsMarkets, handicaps, sigmaTotal, sigmaMargin },
     };
   }
@@ -4284,7 +4194,6 @@
       ];
     }
     items.sort((a, b) => b.prob - a.prob);
-    // Sprint 53 (v31.7.142 — Phase 3 tennis) : expected games + Over/Under.
     // Approximation : un set tight (pSet proche de 0.5) ≈ 10-11 games avec TB,
     // un set one-sided (pSet > 0.75) ≈ 6-8 games. Formule empirique :
     //   gamesPerSet(pSet) = 8 + 5 * (1 - |pSet - 0.5| * 2)
@@ -4323,7 +4232,6 @@
       bestOf,
       items: items.slice(0, bestOf === 3 ? 3 : 4),
       caption: `Probabilités par nombre de sets (best-of-${bestOf}) dérivées de la proba de victoire.`,
-      // Sprint 53 — total jeux (Phase 3 tennis)
       games: { avgGames, lines: games, sigma },
     };
   }
@@ -4351,7 +4259,6 @@
     return { line, pOver, pUnder, pBTTSyes, pBTTSno };
   }
 
-  // Sprint 49 (v31.7.138 — Phase 3) : marchés étendus dérivés du même
   // Poisson xG (lamH, lamA). Ne nécessite pas de scraping additionnel ;
   // utilise les expected goals déjà calculés. On expose : Over/Under
   // 1.5/3.5, Double Chance (1X / X2 / 12), Score exact (top 2),
@@ -4415,7 +4322,6 @@
         else pD_HT += p;
       }
     }
-    // Sprint 79 (v31.7.166 — audit P0 wave 1) — Marchés foot étendus :
     // Draw No Bet (DNB) + Asian Handicap (AH).
     // DNB : 1X2 sans le nul, mise remboursée si nul.
     //   pHomeDNB = pH / (pH + pA)
@@ -4459,7 +4365,6 @@
       home_minus_025: (p1 + pH_strict) / 2,    // moitié 0, moitié -0.5
       home_minus_075: (pH_strict + pH_2plus) / 2, // moitié -0.5, moitié -1
     };
-    // Sprint 82 (v31.7.169 — audit Part 1) — Team Totals foot.
     // Probabilité que home/away marque > N buts. Marché courant Winamax :
     //   "Home over 0.5", "Home over 1.5", "Away over 0.5", etc.
     // Calcul direct via Poisson individuel (pas la grille jointe — chaque équipe
@@ -4556,10 +4461,8 @@
     return {
       p1, pX, p2,
       doubleChance: { p1X, pX2, p12 },
-      // Sprint 79 — DNB + AH
       dnb,
       ah,
-      // Sprint 82 — Team totals
       teamTotals,
       topScores,
       ou15, ou25, ou35,
@@ -4583,7 +4486,6 @@
     if (!gp || gp < 3 || isNaN(gf) || isNaN(ga)) return null;
     const seasonScored = gf / gp;
     const seasonConceded = ga / gp;
-    // v31.7.209 — Recency blend with last-5 GF/GA. La forme récente capte
     // les changements (blessures, transferts, méforme) que la moyenne
     // saisonnière dilue. Pondération adaptative selon le sample saison :
     //   - gp ≥ 15 (mi/fin de saison) : season 70%, last5 30%
@@ -4671,7 +4573,6 @@
     const aDef = aX.conceded / lgAvg;
     let lamH = Math.max(0.2, hAtt * aDef * lgAvg * HOME_ADV);
     let lamA = Math.max(0.2, aAtt * hDef * lgAvg / HOME_ADV);
-    // v31.7.207 / v35.91 — empirical xG blend.
     // Si les deux équipes ont fbref_xg OU xg_stats Understat, on blend le
     // lambda model-based avec l'estimation empirique. Formule standard :
     //   E[goals_home] = avg(home.xg_for, away.xg_against)
@@ -4733,7 +4634,6 @@
   // capped at ±4% total differential.
   let __congestionCache = null;
   let __congestionCacheRef = null;
-  // v31.7.12 — Cache parallèle pour le tracking du VENUE par match. Permet
   // au signal voyage US sports de calculer la distance entre le venue
   // précédent d'une équipe et le venue courant. Format :
   //   Map<teamName, [{ ts, hostAbbr, sport }, ...]>
@@ -4775,7 +4675,6 @@
     }
     return __congestionCache;
   }
-  // v31.7.12 — Helper : renvoie l'entrée venue timeline la plus récente
   // STRICTEMENT AVANT matchTime (lookback ≤ 14j). null si rien.
   function lastVenueBeforeMatch(teamName, matchTime, lookbackDays = 14) {
     if (!teamName || !matchTime) return null;
@@ -4810,7 +4709,6 @@
     return n;
   }
 
-  // v31.7.11 — Voyage longue distance US sports (NBA/NHL/MLB).
   // Charge stadiums.json une fois au boot, expose `daysSinceTravel(team,
   // sport, abbr, currentVenueAbbr, time)` qui calcule la distance Haversine
   // entre le stade du match précédent et celui du match courant.
@@ -4852,7 +4750,6 @@
     return _haversineKm(a[0], a[1], b[0], b[1]);
   }
 
-  // v31.7.6 — Repos depuis le dernier match. Renvoie le nombre de jours
   // (float) entre `matchTime` et le match précédent de l'équipe.
   // - Si pas de match précédent dans la fenêtre 14j : null (data manquante).
   // - Si <2 jours = fatigue extrême (perf -3pt typique).
@@ -4901,7 +4798,6 @@
     if (__reliabilityCalMap === null) {
       __reliabilityCalComputing = true;
       try {
-        // v31.7.14 — Si le backtest expose des isotonic_pairs precomputees
         // (PAV deja applique en CI Python), on les utilise directement.
         // Avant : on faisait le PAV cote client a chaque boot.
         const rep = window.__backtestReportV2;
@@ -4921,7 +4817,6 @@
         let sorted = (solid.length >= 3)
           ? solid.slice().sort((a, b) => a.predicted - b.predicted)
           : [];
-        // v31.7.8 — Pool Adjacent Violators (PAV) pour isotonic regression.
         // Force la monotonicité ascendante des `actual` (si bucket k+1 a un
         // actual < bucket k, on les fusionne en moyenne pondérée par n).
         // Avant: interpolation linéaire pure → pouvait créer des inversions
@@ -4987,7 +4882,6 @@
   let __predCacheRef = null;
   function __predCacheClear() { __predCache = new Map(); __predCacheRef = window.PRONOSTICS_DATA; }
 
-  // v24 — Prono joueur buteur
   // Données dispo : lineups_soccer.json donne {name, pos, shirt, captain} pour chaque starter.
   // Heuristique : poids de position × xG équipe → proba (≥1 but) par joueur via Poisson.
   // Position weights (empirique, validé sur ~10 ligues pro) :
@@ -5036,7 +4930,6 @@
             name: p.name || '?',
             pos,
             captain: !!p.captain,
-            // v29 — Sofascore player id (when available) for face-shot rendering.
             pid: p.pid || null,
             teamName: side?.name || side?.short || '?',
             teamShort: side?.short || side?.name || '?',
@@ -5058,7 +4951,6 @@
     } catch (e) { return null; }
   }
 
-  // Chantier 4 + Sprint 109 — Calibration probabilités via backtest_v2,
   // per-sport quand disponible (foot, tennis, basket, hockey, baseball ont
   // des distributions de marché distinctes → calibration globale lisse les
   // erreurs spécifiques à chaque sport). Sprint 109 (v31.7.190) :
@@ -5081,7 +4973,6 @@
     const cal = window.__modelCalibration;
     if (!cal || !cal.bins || !cal.total_n || cal.total_n < 20) return rawProb;
     if (!isFinite(rawProb) || rawProb <= 0 || rawProb >= 1) return rawProb;
-    // v35.40 — Tentative per sport+league tier d'abord. Le foot top-5
     // est calibré à part du foot secondaire; autres sports restent sport:all.
     let bins = cal.bins;
     let usedSportBins = false;
@@ -5094,7 +4985,6 @@
         usedSportBins = true;
       }
     }
-    // Sprint 109 — Fallback per-sport. On exige ≥30 obs sur le sport entier
     // pour appliquer ses bins (sinon trop bruité).
     if (!usedSportBins && sport && cal.bySport && cal.bySport[sport]) {
       const sportBins = cal.bySport[sport];
@@ -5106,7 +4996,6 @@
     }
     for (const bin of bins) {
       if (bin.n >= 3 && bin.gap != null && rawProb >= bin.lo && rawProb < bin.hi) {
-        // Sprint 100 (v31.7.185) — Cap d'ajustement passé de ±5pt à ±8pt.
         // Justification : Brier 0.224 = "calibration médiocre" actuel. Sur les
         // segments où l'écart prédiction/réalité est ≥7pt, on bridait à 5pt
         // donc on perdait 2pt+ de correction. En passant à 8pt, on récupère
@@ -5115,7 +5004,6 @@
         // Effet attendu : Brier 0.224 → ~0.20 (mesurable au prochain backtest).
         // Conditionné par bin.n ≥ 8 (au lieu de 3) pour ne pas amplifier
         // les bins anémiques où le gap n'est que du bruit échantillonnage.
-        // Sprint 109 — Per-sport bins ont besoin de plus d'obs pour être fiables :
         // le seuil n≥8 → n≥12 quand on est sur des bins par-sport (échantillon
         // plus petit, donc plus de bruit relatif).
         const minNStrong = usedSportBins ? 12 : 8;
@@ -5136,7 +5024,6 @@
       const r = await fetch('backtest_report_v2.json?t=' + Date.now(), { cache: 'no-store' });
       if (!r.ok) return;
       const rep = await r.json();
-      // Sprint 109 — Charge bySport si disponible. Format attendu :
       // by_sport_calibration: { football: [bins], tennis: [bins], ... }
       // by_sport: { football: { n: 234, ... }, ... } (déjà existant pour KPIs)
       const bySport = rep.by_sport_calibration || null;
@@ -5164,21 +5051,17 @@
         // plus fin que les bins. Actif si >=50 picks par sport.
         isotonicPairsBySport: rep.isotonic_pairs_by_sport || null,
       };
-      // v30 — Expose le rapport complet pour la page Crédibilité (by_sport,
       // by_cote_bucket, by_tier, overall — ROI / brier / logloss).
       window.__backtestReportV2 = rep;
       // Invalidate memoized predictions so subsequent renders apply calibration
       if (typeof __predCache !== 'undefined') __predCache = new Map();
-      // v31.7.32 — Trust strip : populer dès que le report est chargé.
       _populateTrustStrip(rep);
       if (currentPage === 'sante' && typeof applyPageView === 'function') {
         applyPageView();
       }
     } catch (e) { /* calibration optional, ignore */ }
   }
-  // Sprint 74 (v31.7.162 — câblage Sprint 66/76 backtest per-marché).
   // Charge backtest_report_markets.json pour la page Performance onglet Marché.
-  // Sprint 110 (v31.7.190) — Lazy load : ce report n'est utilisé QUE sur la
   // page Performance > onglet Marché. Avant : fetch eager au boot pour tout
   // le monde (60-200KB selon historique). Après : fetch on-demand quand
   // l'utilisateur ouvre la page Performance, via requestIdleCallback (priorité
@@ -5205,7 +5088,6 @@
   // sur Performance > Marché — chargé quand l'user y va).
   _loadModelCalibration();
 
-  // v31.7.32 — Trust strip helper. Lit __backtestReportV2 et patch les 4
   // KPIs visibles (Big Bets / ROI flat / Brier / n picks). Respecte le
   // dismiss persisté en localStorage `trustStripHiddenUntil` (timestamp ms).
   function _populateTrustStrip(rep) {
@@ -5266,7 +5148,6 @@
       });
     }
   }
-  // Sprint 144 (v31.7.194) — Helper public pour réinitialiser le trust strip
   // Accessible via console : window._resetTrustStrip()
   window._resetTrustStrip = function() {
     try { localStorage.removeItem('trustStripHiddenUntil'); } catch(e){}
@@ -5274,7 +5155,6 @@
     if (strip) { delete strip.dataset.dismissed; strip.classList.remove('hidden'); }
     try { _populateTrustStrip(window.__backtestReportV2); } catch(e){}
   };
-  // Sprint 165 (v31.7.195) — Reset all dismissed tutorials/banners.
   // Permet à l'user de revoir tous les tutoriels et banners cachés.
   // Accessible via Profil > Réinitialiser tutoriels.
   window._resetAllTutorials = function() {
@@ -5307,7 +5187,6 @@
     return n;
   };
 
-  // v31.7.71 — Mesure dynamique de la hauteur du trust-strip et set en
   // CSS var pour que les éléments position:fixed (sidebar, right-rail)
   // soient correctement repoussés. Appelé quand le strip s'affiche +
   // au resize (responsive line-wrap peut changer la hauteur).
@@ -5326,7 +5205,6 @@
     });
   }
 
-  // v30 — Pipeline health indicator (topbar dot lit health.json publié toutes
   // les 5min par refresh.yml). Couleur :
   //   • vert : data <30min ET aucun warning
   //   • orange : data 30min-2h OU warnings non-bloquants
@@ -5346,7 +5224,6 @@
       btn.title = 'Santé pipeline : health.json indisponible';
       return;
     }
-    // AUDIT-2026-04-27 (Sprint 4 #20) — expose health pour la page Santé
     // qui peut lire window.__healthData et afficher quality_checks.
     try { window.__healthData = h; } catch(e){}
     try {
@@ -5384,7 +5261,6 @@
   setInterval(_refreshHealthIndicator, 2 * 60 * 1000);
   window._refreshHealthIndicator = _refreshHealthIndicator;
 
-  // v30 — Refresh countdown labels on top picks AND tous rows every 60s.
   // Lecture data-match-date sur .dash-pick-card et .tous-row,
   // recompute label en fonction du now.
   function _refreshCountdowns() {
@@ -5423,7 +5299,6 @@
         el.style.background = startingSoon ? 'rgba(251,191,36,.15)' : 'transparent';
         el.style.border = startingSoon ? '1px solid rgba(251,191,36,.4)' : '1px solid var(--border-2)';
       }
-      // v30 — Toggle imminent class for pulse animation
       card.classList.toggle('imminent', isImminent);
     });
     // Tous rows : version compacte "X min" sans "dans"
@@ -5503,7 +5378,6 @@
     }
     const cached = __predCache.get(match.id);
     if (cached !== undefined) return cached;
-    // Sprint 109 — Passe `match` au _applyCalibration pour qu'il puisse lire
     // match.sport et appliquer la calibration per-sport si disponible.
     const p = _applyCalibration(_predictMatchImpl(match), match);
     __predCache.set(match.id, p);
@@ -5593,7 +5467,6 @@
     // NBA 0.65, MLB 0.55, NHL 0.70, tennis 0.50. This avoids treating a dense
     // baseball/NBA L10 like a football month of form.
     //
-    // BUG FIX 2026-05-01 — Le commentaire précédent disait "i=0 is the OLDEST"
     // mais c'est FAUX : la string forme ESPN est most-recent-FIRST (par
     // exemple "WLWWL" = W le plus récent, L le plus ancien). slice(-5)
     // prenait les 5 plus ANCIENS si la string > 5 chars (cas L10 récent).
@@ -5643,13 +5516,11 @@
       formNudge = diff * 0.05; // max ±5% shift
     }
 
-    // v30 — Form momentum (last-3 vs last-5). Captures *direction* on top
     // of the formScore *level*. A team going 3W in their last 3 after a
     // mediocre L5 is heating up; a team WWWWW with 0W in the last 3 has
     // cooled. Caps at ±3% (smaller than formNudge — momentum is a tiebreaker).
     const momentumScore = (formStr) => {
       if (!formStr || formStr.length < 5) return null;
-      // BUG FIX 2026-05-01 — Idem formScore : slice(-3)/slice(-5) prenaient
       // les plus anciens. Pour le momentum (last-3 vs last-5), on veut
       // les 3 et 5 PLUS RÉCENTS.
       const f3 = formScore(formStr.slice(0, 3), sportKey);
@@ -5670,7 +5541,6 @@
       };
     }
 
-    // AUDIT-2026-04-27 (P1) — Garde-fou défensif côté frontend.
     // Si jamais le backend laisse passer des form_stats contaminés
     // (NBA stats sur un club de foot via tid partagé), le frontend
     // refuse de s'appuyer dessus pour calculer gdNudge / cleanSheet.
@@ -5678,7 +5548,6 @@
     // Voir scripts/patch_team_stats.py pour le vrai fix backend.
     const _formStatsValidForSport = (fs, sport) => {
       if (!fs) return false;
-      // AUDIT-2026-04-27 (Sprint 44 #19) — Étendu pour tous les sports.
       // Seuils par sport pour détecter contamination cross-sport.
       // Foot/tennis : avg_gf5 > 5 ou last5 score > 15 = NBA/hockey injecté
       // NBA : avg_gf5/ga5 > 200 (impossible NBA réel ~110) = autre sport
@@ -5732,7 +5601,6 @@
       if (!isNaN(matchTime)) {
         const hCnt = congestionCount(home?.name, matchTime, 7);
         const aCnt = congestionCount(away?.name, matchTime, 7);
-        // AUDIT-2026-04-27 (Sprint 29 #24) — Fenêtre courte 3 jours
         // pour proxy fatigue Champions League / Europa League. Si une
         // équipe a joué dans les 3 derniers jours (= probable midweek
         // euro pour les top clubs), pénalité supplémentaire.
@@ -5742,7 +5610,6 @@
           // Only count "fatigue" above a 1-match baseline (1 game in 7 days
           // is perfectly normal league cadence — no penalty). Then 1.5%
           // per extra game, capped at ±4% total differential.
-          // Sprint 29 #24 — bonus pénalité 1% par match dans les 3
           // derniers jours (= rotation effective probable).
           const hPen = Math.max(0, hCnt - 1) * 0.015 + hCnt3 * 0.010;
           const aPen = Math.max(0, aCnt - 1) * 0.015 + aCnt3 * 0.010;
@@ -5750,7 +5617,6 @@
           congestionStats = { home: hCnt, away: aCnt, home_3d: hCnt3, away_3d: aCnt3 };
         }
 
-        // v31.7.6 — Signal repos minimum. Pénalise les équipes ayant joué
         // <2 jours avant le match, et plus subtilement >10 jours (rouille).
         // Optimum 4-6 jours.
         const hDays = daysSinceLastMatch(home?.name, matchTime);
@@ -5772,7 +5638,6 @@
       }
     }
 
-    // AUDIT-2026-04-27 (Sprint 30 #28) — NBA back-to-back fatigue.
     // Une équipe NBA qui a joué hier (back-to-back) marque ~3pt de
     // moins en moyenne (étude NBA stats 2018-2023). Différentiel se
     // traduit en -2% prob de gagner. Étendu à NHL aussi (cadence
@@ -5803,7 +5668,6 @@
 
     // Poisson component (football only, needs standings with GF/GA)
     const poi = poissonComponent(match);
-    // v30 — Defensive quality / attacking drought adjustment.
     // Independent from form letters (which mix defense + attack) and from
     // weather. Strong defense (≥60% clean sheets last 5) suppresses the
     // opponent's xG; cold attack (≥60% failed_to_score last 5) suppresses
@@ -5811,7 +5675,6 @@
     let cleanSheetStats = null;
     if (poi && match.sport === 'football') {
       const hs = home.form_stats, as_ = away.form_stats;
-      // AUDIT-2026-04-27 (P1) — réutilise le garde-fou défini plus haut
       // pour éviter d'injecter du clean-sheet calculé sur du basket.
       const hsOk2 = _formStatsValidForSport(hs, match.sport);
       const asOk2 = _formStatsValidForSport(as_, match.sport);
@@ -5848,7 +5711,6 @@
     let weatherStats = null;
     if (poi && match.sport === 'football' && match.weather) {
       const w = match.weather;
-      // AUDIT-2026-04-27 (P3) — Skip weather adjustment if source is low-
       // confidence. fetch_weather.py v31.7.85 ne géocode plus par nom
       // d'équipe (qui retournait Tarma → Ada, Stockholm → Aiken). Mais
       // les anciennes entrées du cache geo et les fallbacks éventuels
@@ -5870,7 +5732,6 @@
       if (typeof w.wind_kmh === 'number' && w.wind_kmh > 20) {
         windPenalty = Math.min(0.15, (w.wind_kmh - 20) * 0.007);
       }
-      // v30 — cold weather: <5°C nudges xG down. Goals/game in winter
       // matches with sub-5°C kick-offs trail summer averages by ~7% in
       // top-5 league data. <0°C amplifies (pitch hardens, ball control
       // drops). Above 5°C no penalty (neutral / hot weather slightly
@@ -5906,7 +5767,6 @@
     // 2.5 – 5.5 yellows per game; we only nudge outside [3.0, 4.5].
     // Effect is small (±0.03 on each lam) but independent of our other
     // signals, and the reason is informative for the user.
-    // v30 — Add red-cards-per-game as a SECONDARY signal: refs who give
     // red cards regularly (>0.10 reds/game = ~1 red every 10 games)
     // truncate matches more often → fewer goals. Independent from yellows
     // and from rain/cold (so it stacks rather than overlaps).
@@ -5946,7 +5806,6 @@
     // Home/Road record split (non-football only: basket/hockey/etc.)
     const hrComp = homeRoadComponent(match);
 
-    // v30 — Lineup confirmation signal. Foot-only. Confirmed lineups land
     // ~30 min before kickoff and resolve a lot of ambiguity (rotated XI?
     // key player benched? formation shift?). When both sides confirmed,
     // reliability gets a small bump; when only predicted, a penalty.
@@ -5971,7 +5830,6 @@
       }
     }
 
-    // v31.7.209 — Injury severity-weighted Poisson lambda adjustment.
     // Le compteur `match.injuries_home/away` (utilisé plus bas pour shift
     // final.pH/pA) ne distingue pas un milieu rotatif d'un attaquant clé.
     // On exploite maintenant `competitor.injuries[]` (liste détaillée
@@ -6140,7 +5998,6 @@
         components.push({ w: 0.40, pH: pTennisHome, pD: 0, pA: 1 - pTennisHome, name: 'Classement ATP/WTA', icon: '🏆' });
       }
     }
-    // v30 — Tennis Sackmann components. Surface Elo from Jeff Sackmann's
     // tennis_atp/tennis_wta CSVs (CC BY-NC-SA, attribution in Académie).
     // Three independent signals when tennis_features is attached :
     //   1. Surface Elo : strength on this exact court type. Foot-equivalent
@@ -6224,7 +6081,6 @@
         }
       }
     }
-    // v30 — NHL official API stats + starting goalie. Two non-market
     // signals : team pace differential (GF - GA per game) and starting
     // goalie SV% advantage. SV% diff > 0.020 (elite vs replacement)
     // delivers ~6pp, capped at ±15pp. Pace diff > 2.0/game ~ 10pp.
@@ -6257,7 +6113,6 @@
         }
       }
     }
-    // v30 — MLB probable pitchers component. Single biggest non-market
     // signal in baseball : ERA differential between the two starters.
     // Shrinkage : starters with <30 IP this season have noisy ERA, so
     // we bayes-shrink toward the league mean (~4.10) with prior weight
@@ -6300,14 +6155,12 @@
         final.pH += formNudge * scale;
         final.pA -= formNudge * scale;
       }
-      // v30 — Momentum nudge (direction on top of level). Stacks with form
       // because they measure different things: form = avg of last 5,
       // momentum = trend within last 5.
       if (momentumNudge != null) {
         final.pH += momentumNudge;
         final.pA -= momentumNudge;
       }
-      // v30 — Tennis fatigue nudge (Sackmann 14j match count differential).
       // Independent from form/Elo — captures pure rest/recovery axis.
       if (tennisStats && typeof tennisStats.fatigue_nudge === 'number') {
         final.pH += tennisStats.fatigue_nudge;
@@ -6325,7 +6178,6 @@
         final.pH += congestionNudge;
         final.pA -= congestionNudge;
       }
-      // v31.7.6 — Rest-window nudge : applique un nudge supplementaire base
       // sur le repos mini (jours depuis dernier match). Indépendant de
       // congestion (qui mesure la charge cumulee 7j) — capture la fatigue
       // aigue (<48h) et la rouille (>10j). Plafonne a ±0.03.
@@ -6333,7 +6185,6 @@
         final.pH += restNudge;
         final.pA -= restNudge;
       }
-      // v31.7.10 — Motivation contexte fin de saison (foot top-5 europe).
       // Heuristique : entre avril et mai (mois 4-5), une équipe en zone
       // top 4 (visée Champion's League) ou bottom 3 (relégation) a un
       // surplus de motivation typiquement +1pt sur P(victoire).
@@ -6343,7 +6194,6 @@
       // "journées restantes" précise.
       let motiveNudge = 0;
       if (match.sport === 'football') {
-        // v31.7.10 fix : `stdH/stdA` sont des locals d'openDetail, pas
         // disponibles dans _predictMatchImpl. On lit le rang depuis
         // competitor.rank (champ ESPN standard) ou competitor.standings.rank.
         const matchDate = match.date ? new Date(match.date) : null;
@@ -6371,7 +6221,6 @@
         final.pA -= motiveNudge;
       }
 
-      // v31.7.12 — Voyage longue distance (NBA/NHL/MLB seulement).
       // Pénalise la team AWAY ayant parcouru >2000km depuis son dernier
       // match. Échelonné :
       //   <2000km   : aucune pénalité (déplacement courant)
@@ -6451,7 +6300,6 @@
         final.pA += shift;
       }
 
-      // v35.41 — Smart-money odds move. If odds_history shows a meaningful
       // pre-match price drop on one side, apply a small capped nudge toward
       // that side. This is intentionally weaker than team signals: market
       // steam can be news, sharp action, or noise.
@@ -6552,7 +6400,6 @@
       }
     }
     // Form
-    // v31.7.70 — Fix UX bug : avant le format était "favorable à X (home vs away)"
     // qui faisait croire à l'utilisateur que la 1ère valeur appartenait à X.
     // Maintenant on liste leader EN PREMIER avec son nom explicite + suiveur.
     // Ex : "Forme favorable à U. Católica (U. Católica WWWDW · Manta LLLLL)"
@@ -6583,7 +6430,6 @@
     }
     // Goal-differential reason — surfaces when the scoring margin gap is
     // meaningful (>=0.8 goal/match delta). Complements the W/L letters.
-    // v31.7.70 — Format clarifié avec nom équipe leader explicite.
     if (hs && as_ && hs.played5 >= 3 && as_.played5 >= 3) {
       const gdH = (hs.avg_gf5 || 0) - (hs.avg_ga5 || 0);
       const gdA = (as_.avg_gf5 || 0) - (as_.avg_ga5 || 0);
@@ -6599,7 +6445,6 @@
       }
     }
     // Records
-    // v31.7.70 — Fix UX bug : même problème d'ordre que la forme.
     // Format clarifié : "X 6-4-0 · Y 1-1-8" au lieu de l'ambiguë "(6-4-0 vs 1-1-8)".
     if (recH && recA && recH.games > 3 && recA.games > 3) {
       const wrH = (recH.w + recH.d*0.5) / Math.max(recH.games, 1);
@@ -6622,7 +6467,6 @@
     // Rankings
     const rankH2 = home?.rank, rankA2 = away?.rank;
     if (rankH2 && rankA2 && Math.abs(rankH2 - rankA2) >= 3) {
-      // v31.7.70 — Format clarifié : nom + classement par équipe pour zéro ambiguïté.
       const homeName = home?.short || home?.name || 'Home';
       const awayName = away?.short || away?.name || 'Away';
       const leader = rankH2 < rankA2 ? homeName : awayName;
@@ -6632,7 +6476,6 @@
         text: `Classement : ${homeName} #${rankH2} · ${awayName} #${rankA2} — avantage ${leader}`
       });
     }
-    // v30 — Tennis Sackmann reasons (when tennis_features attached).
     // Surface Elo, last-10 form, fatigue 14j, all surfaced as user-readable
     // sentences in "Pourquoi ce pronostic". Honesty caveat retained but
     // ONLY shown when no Sackmann data is available (challenger/qualifier).
@@ -6651,7 +6494,6 @@
         });
       }
       if (ts && ts.home_last10 && ts.away_last10) {
-        // v30 fix : prefer the pre-computed wins_last10 from the patcher
         // over re-counting characters here — tournament-walkover entries
         // can show as 'WW' / 'LL' in the string but already corrected in
         // wins_last10 by the upstream cleaner. Falls back to the regex
@@ -6659,7 +6501,6 @@
         const hW = (typeof ts.home_wins_last10 === 'number') ? ts.home_wins_last10 : (ts.home_last10.match(/W/g) || []).length;
         const aW = (typeof ts.away_wins_last10 === 'number') ? ts.away_wins_last10 : (ts.away_last10.match(/W/g) || []).length;
         if (Math.abs(hW - aW) >= 2) {
-          // v31.7.79 — UX clarté : éviter "X 7/10 vs 3/10" où le 2e chiffre
           // n'est rattaché à personne. On étiquette les 2 côtés explicitement
           // (cf. fix v31.7.70 sur la forme L5 foot).
           const leader = hW > aW ? (home?.short || home?.name) : (away?.short || away?.name);
@@ -6712,12 +6553,10 @@
         });
       }
     }
-    // v30 — NHL pace + goalie reasons. Pace gap ≥ 1.0/game = surface;
     // goalie SV% gap ≥ 0.015 = surface (replacement-level vs starter
     // territory).
     if (match.sport === 'hockey' && nhlStats) {
       if (Math.abs(nhlStats.pace_diff) >= 1.0) {
-        // v31.7.79 — UX clarté : éviter l'ambiguïté "X +0.50/m vs +0.30/m"
         // (lecteur ne sait pas lequel des 2 chiffres appartient à X). On
         // étiquette les 2 côtés explicitement, comme on l'a fait pour la
         // forme L5 (cf. v31.7.70).
@@ -6747,7 +6586,6 @@
         }
       }
     }
-    // v30 — MLB probable pitchers reason. ERA gap >= 0.50 = meaningful;
     // below that the pitchers are roughly equivalent and the reason adds
     // noise. K/9 + WHIP append when gap is sharp.
     if (match.sport === 'baseball' && pitcherStats) {
@@ -6775,7 +6613,6 @@
     }
     // Buts attendus (modèle statistique football) — Chantier L : renommé
     // pour éviter le jargon "Poisson" côté UI.
-    // v31.7.207 — Si fbref xG empirique a contribué au lambda, on surface
     // l'info au user (% poids + n matchs source). Renforce la confiance
     // pour les pronos où la data sample est solide.
     if (poi) {
@@ -6802,7 +6639,6 @@
         text: `Force : +${diffAbs} points d'écart — avantage ${leaderElo}`
       });
     }
-    // v30 — League calibration depuis Football-Data.co.uk (fd_calibration).
     // Surface uniquement quand la moyenne diffère franchement de 2.6 (baseline
     // européen) ou que le BTTS rate est extrême. Sert à contextualiser le
     // pari OU 2.5 / BTTS pour l'utilisateur.
@@ -6820,7 +6656,6 @@
         });
       }
     }
-    // v30 — Closing line value (fd_closing_odds, matchs déjà joués + foot
     // top-5 majeurs uniquement). Affiché en post-match pour montrer si le
     // pick a battu la closing line réelle.
     if (match.fd_closing_odds && match.completed && best) {
@@ -6853,7 +6688,6 @@
         text: `${tired.team} ${tired.cnt} matchs en 7j — fatigue possible`
       });
     }
-    // v31.7.6 — Repos / fatigue extreme. Affiche seulement les cas notables :
     // un cote a moins de 3j de repos (ou plus de 9j) et l'autre dans la fenetre
     // optimum.
     if (restStats && (restStats.home != null || restStats.away != null)) {
@@ -6878,7 +6712,6 @@
         });
       }
     }
-    // v31.7.12 — Voyage longue distance reason (US sports : NBA/NHL/MLB).
     if (travelStats && (travelStats.away_km != null || travelStats.home_km != null)) {
       const longSide = (travelStats.away_km != null && travelStats.away_km >= 2000)
         ? { team: away?.short || away?.name, km: travelStats.away_km, side: 'away' }
@@ -6904,7 +6737,6 @@
       if (refStats.tier === 'strict') label = 'Arbitre sévère';
       else if (refStats.tier === 'lenient') label = 'Arbitre laxiste';
       else label = 'Arbitre';
-      // v30 — flag the red-card axis if it dragged xG: redDelta < 0 means
       // the ref's red-card frequency cost ~lam goals on each side.
       const redFlag = refStats.redDelta && refStats.redDelta < 0
         ? ` — rouges fréquents → buts attendus ↓`
@@ -6969,7 +6801,6 @@
         text: `Split domicile/extérieur favorise ${hrComp.pH > hrComp.pA ? (home?.short || home?.name) : (away?.short || away?.name)}`
       });
     }
-    // v30 — Form momentum (last-3 vs last-5). Surface only when the trend
     // is meaningful (≥0.10 absolute delta) so we don't add noise.
     if (momentumStats && Math.abs(momentumStats.diff) >= 0.10) {
       const heating = momentumStats.diff > 0
@@ -6981,7 +6812,6 @@
         text: `Dynamique en hausse pour ${heating} (3 derniers > 5 derniers)`
       });
     }
-    // v30 — Defensive quality / attacking drought (cleans + failed_to_score).
     // Surface when one side's defense or one side's attack stands out
     // enough to actually scale lamH or lamA.
     if (cleanSheetStats) {
@@ -6998,7 +6828,6 @@
         });
       }
     }
-    // v30 — Lineup confirmation (foot only). Confirmé = signal frais,
     // predicted = doute, absent sur top-5 = pénalité subtile.
     if (lineupStats) {
       let txt = '';
@@ -7014,7 +6843,6 @@
     }
     // Injuries — quantify the model impact so Théo can audit why a pick shifted.
     // Reuses the same formula as the combine step: shift = min(0.06, 0.015·(injH−injA)).
-    // v31.7.209 — Si injuryLambdaImpact existe, on surface aussi le %lambda
     // pondéré (severity-aware) pour expliquer le total goals impact.
     const injHexpl = match.injuries_home || 0;
     const injAexpl = match.injuries_away || 0;
@@ -7078,7 +6906,6 @@
     // each other.
     let reliability = best_pick[1];
     let reliabilityMeta = null;
-    // Chantier F: only non-market components feed the reliability blend.
     // Market odds are skipped via the isMarket flag (they still shape `final`
     // above so the pick label exists, but they do NOT contribute to fiabilité).
     let pureCompCount = 0;
@@ -7112,14 +6939,12 @@
       const blend = 0.70 * agreement + 0.30 * richness;
       const boost = 0.85 + 0.23 * blend;
       let rawReliability = Math.max(0.25, Math.min(0.98, pickProbVal * boost));
-      // v30 — Apply lineup confirmation bump *before* calibration so the
       // calibration diagram sees a coherent reliability distribution
       // (otherwise we'd ship the boost downstream of the historic mapping
       // and overshoot at the high end).
       if (lineupBoost) {
         rawReliability = Math.max(0.25, Math.min(0.98, rawReliability + lineupBoost));
       }
-      // Chantier F calibration — remap raw reliability to historical observed
       // WR using the live reliability diagram. Prevents systematic over/under-
       // confidence. Returns raw value unchanged if calibration data is thin.
       const calibrated = applyReliabilityCalibration(rawReliability);
@@ -7144,7 +6969,6 @@
     else if (conf >= 0.50) headline = `Pari jouable — fiabilité ${(conf*100).toFixed(0)}%`;
     else headline = `Incertain — fiabilité ${(conf*100).toFixed(0)}%, préférer un autre match`;
 
-    // AUDIT-2026-04-27 (Sprint 7 #4) — Disagreement signal explicit.
     // Détecte les composants non-marché qui poussent dans des directions
     // OPPOSÉES sur le pick choisi. Ex : Elo dit "favori home +0.10" mais
     // forme L5 dit "favori away +0.08". Le modèle a fait son blend mais
@@ -7160,7 +6984,6 @@
       // Cherche 1 push positif + 1 push négatif sur le pick (au-delà du
       // bruit, seuil ±7pt). Les deux doivent avoir un poids significatif
       // (w >= 0.15) pour ne pas alerter sur des signaux marginaux.
-      // Sprint 43 #13 — bumpé ±5pt → ±7pt après feedback : trop sensible,
       // déclenchait sur des matchs équilibrés normaux.
       const pushPos = deltas.filter(d => d.delta >= 0.07 && d.w >= 0.15);
       const pushNeg = deltas.filter(d => d.delta <= -0.07 && d.w >= 0.15);
@@ -7187,13 +7010,11 @@
       reliabilityMeta,
       odds: best,
       hasDraw,
-      // Chantier F thresholds (2026-04-21, pur modèle + calibré) :
       //   isLock ≥ 0.70 — cible du 80%+ WR, aligné sur la calibration historique
       //   lowConf < 0.50 — downgrade visuel
       //   skip < 0.45 OR fewer than 2 pure-model components — ne surface pas
       // Le seuil isLock est descendu 0.72→0.70 car après calibration le modèle
       // est monotone : ce qu'on mesure à 70% correspond vraiment à ~70% de WR.
-      // v30 — Sports avec petit échantillon backtest (basket/hockey/baseball/
       // tennis : <10 picks réglés en historique calibration) → seuil isLock
       // remonté à 0.75 pour éviter de surfacer des locks sur-confiants quand
       // la calibration historique manque de signal.
@@ -7209,14 +7030,11 @@
       // spec (5-10 picks/j, 80%+ WR) demands real signal consensus.
       // Tennis exception: ATP/WTA rank alone is a strong non-market signal
       // (tennis outcomes correlate ~0.7 with rank diff), so 1 component suffices.
-      // v30 — Tennis skip relâché quand on a Sackmann tennis_features
       // (surface elo + form L10 + fatigue), car on a maintenant 4 signaux
       // non-marché et plus seulement le rank. Si on est rank-only (joueur
       // hors-base Sackmann, challenger / qualifier), on garde le skip strict
       // sur ranks proches (|log gap| < 0.30) où le rank seul est unreliable.
-      // v31.7.213 — Skip threshold bumped 0.45 → 0.50 d'après backtest_v2
       // sur 411 picks : tier `lowconf` (rel ∈ [0.45, 0.60]) ROI flat -59%.
-      // v31.7.217 — Heavy fav surconfiance fix : pickedOdd ≤ 1.5 + rel < 0.75
       // = skip. Backtest 411 picks : heavy_fav (cote ≤ 1.5) WR 69% mais
       // avg_rel 71.7% → modèle sur-confiant ~3pt → ROI flat -7.7%. En relevant
       // le seuil à 0.75 spécifiquement pour les heavy_fav, on retire les
@@ -7231,7 +7049,6 @@
             const _po = best_pick[2] === '1' ? best.home : best_pick[2] === '2' ? best.away : best.draw;
             return typeof _po === 'number' && _po > 0 && _po <= 1.5;
           })()),
-      // v30 — Sports with thin backtest history (basketball/hockey n<10 in
       // backtest_v2) get a stricter lock threshold: 0.75 instead of 0.70.
       // Avoids over-confident "lock" labels on tiny samples.
       isLockStrict: reliability >= 0.75,
@@ -7243,7 +7060,6 @@
       //   tennis : {kind:'tennis', bestOf, items:[{...}], caption}
       // Rendu sur le modal match (openDetail) avec un switch par `kind`.
       scores: (() => {
-        // v31.5 — k=10 (avant 3) pour que le filtre "score le plus probable
         // CONDITIONNEL au pick" trouve toujours un score cohérent. Ex : pick=1
         // mais top-3 globaux = [1-1, 0-0, 1-0] → l'affichage pickait 1-1
         // (incohérent visuellement avec un pick "home win"). Avec k=10 on
@@ -7263,7 +7079,6 @@
       // Secondary markets derived from the same Poisson xG.
       // Only populated when the Poisson component exists (i.e. football + usable
       // standings). Gives Théo O/U 2.5 and BTTS reads with no extra scraping.
-      // Sprint 49 (v31.7.138) — Étendu : Double Chance (1X/X2/12), score exact
       // top 2, OU 1.5/3.5, mi-temps. Tous dérivés du même Poisson xG.
       markets: poi ? (() => {
         const mk = poissonMarkets(poi.lamH, poi.lamA, 2.5);
@@ -7274,7 +7089,6 @@
         const bttsPick = mk.pBTTSyes >= mk.pBTTSno
           ? { side: 'yes', label: 'BTTS: Oui',  prob: mk.pBTTSyes, key: 'BTTS_Y' }
           : { side: 'no',  label: 'BTTS: Non',  prob: mk.pBTTSno,  key: 'BTTS_N' };
-        // Sprint 49 — marchés étendus dérivés du même λ
         let extended = null;
         try {
           const ext = poissonMarketsExtended(poi.lamH, poi.lamA);
@@ -7302,7 +7116,6 @@
               { key: 'X', label: 'Nul (HT)', prob: ext.ht.pX },
               { key: '2', label: '2 (HT)', prob: ext.ht.p2 },
             ].sort((a,b) => b.prob - a.prob);
-            // Sprint 79 (v31.7.166) — DNB + AH picks
             const dnbPick = ext.dnb && ext.dnb.home >= ext.dnb.away
               ? { side: 'home', label: 'DNB Home (1)', prob: ext.dnb.home, key: 'DNB_1' }
               : ext.dnb ? { side: 'away', label: 'DNB Away (2)', prob: ext.dnb.away, key: 'DNB_2' } : null;
@@ -7348,7 +7161,6 @@
               ou35: ou35Pick,
               halfTime: htOpts[0],
               halfTimeAll: htOpts,
-              // Sprint 79 — DNB + AH
               dnb: dnbPick,
               dnbRaw: ext.dnb,
               asianHandicap: ahPick,
@@ -7367,7 +7179,6 @@
         return { ou: ouPick, btts: bttsPick, raw: mk, extended };
       })() : null,
       components: components.map(c => ({ w: c.w, name: c.name, icon: c.icon, isMarket: !!c.isMarket })),
-      // Chantier U — contributions chiffrées par signal. Pour chaque composant
       // (non marché), on expose sa proba pour le pick + son "delta" vs la
       // baseline (1/nOutcomes). Ça permet au UI d'afficher "Puissance +18%",
       // "H2H +8%", etc. — Théo comprend d'un coup d'œil ce qui a poussé
@@ -7411,7 +7222,6 @@
   // de savoir si la prédiction est "riche" ou "light".
   function computeDataQuality(match) {
     if (!match) return { score: 0, max: 4, items: [] };
-    // v30 — Score 4/4 sport-aware. Les axes spécifiques à un sport
     // (Sofascore foot top-5 pour blessures/lineups/arbitre, weather
     // pour outdoor) auto-OK quand la source n'existe pas pour ce sport,
     // pour ne pas pénaliser. Les matchs completed auto-OK aussi sur les
@@ -7481,10 +7291,8 @@
     const score = items.filter(i => i.ok).length;
     return { score, max: 4, items };
   }
-  // v30 — Expose pour debugging (window.__diag + audit user).
   if (typeof window !== 'undefined') window.computeDataQuality = computeDataQuality;
 
-  // Chantier W — évalue la position du pick EN CE MOMENT sur un match live.
   // Retourne 'winning' | 'losing' | 'tied' | null (null si pas de score ou pas live).
   function evaluateLivePick(match, pred) {
     if (!match || !pred) return null;
@@ -7506,7 +7314,6 @@
   // For completed matches, returns 'won' | 'lost' | 'void' | null
   function evaluateModelPick(match, pred) {
     if (!match?.completed || !pred) return null;
-    // AUDIT-2026-04-27 (P3) — Cas spéciaux qui doivent être VOID selon
     // les règles bookmaker Winamax (mise remboursée, ni won ni lost) :
     //   - STATUS_RETIRED : un joueur abandonne en cours de match (tennis).
     //     Winamax règle : 1N2 voidé sauf si Set 1 + Set 2 complétés ET
@@ -7556,7 +7363,6 @@
   // FIX 2026-04-29 — Expose evaluateModelPick pour debug console + tests live.
   try { window.evaluateModelPick = evaluateModelPick; } catch(e){}
 
-  // Sprint 60 (v31.7.149) — Per-market evaluation. Étend evaluateModelPick
   // pour les marchés secondaires (OU, BTTS, DC, score exact, mi-temps,
   // total points basket, handicap basket). Retourne 'won' / 'lost' / null
   // (VOID si on ne peut pas évaluer).
@@ -7700,7 +7506,6 @@
   }
   try { window.evaluateMarketPick = evaluateMarketPick; } catch(e){}
 
-  // v31.7.36 — Post-mortem auto sur les pronos perdus.
   // Utilité : quand un match est perdu, le modèle explique POURQUOI sa
   // prédiction n'a pas tenu. Permet à l'utilisateur de comprendre la
   // variance et d'éviter le biais "le modèle est cassé après 1 défaite".
@@ -7922,7 +7727,6 @@
       if (advFilters.oddMin > 0 && o < advFilters.oddMin) return false;
       if (advFilters.oddMax > 0 && o > advFilters.oddMax) return false;
     }
-    // Sprint 77 (v31.7.164) — Filtre EV+ uniquement / EV min.
     // On évalue via selectBestMarket (le meilleur marché) plutôt que le pick
     // 1X2 brut, parce que le user voit la carte avec ce best market.
     if ((advFilters.valueOnly || advFilters.evMin > 0) && pred?.pick) {
@@ -7930,12 +7734,10 @@
       if (!best) return false;  // pas de market exploitable → on cache si filtre value actif
       if (!passesValueFilter(best)) return false;
     }
-    // Sprint 89 (v31.7.176) — Filtre par type de marché du best pick
     if (advFilters.marketType && pred?.pick) {
       const best = (typeof selectBestMarket === 'function') ? selectBestMarket(m, pred) : null;
       if (!best || best.market !== advFilters.marketType) return false;
     }
-    // Sprint 89 — Filtre qualité data minimum
     if (advFilters.dataQualityMin > 0) {
       const dq = (typeof computeDataQuality === 'function') ? computeDataQuality(m) : null;
       if (!dq || (dq.score || 0) < advFilters.dataQualityMin) return false;
@@ -8005,7 +7807,6 @@
 
   function renderForm(formStr, big=false) {
     if (!formStr) return '';
-    // BUG FIX 2026-05-01 — Form ESPN est most-recent-first. slice(-5)
     // prenait les 5 plus ANCIENS quand la string > 5 chars (cas L10).
     // Affichage cohérent : 5 plus récents (le 1er badge = match le plus
     // récent à gauche), comme ESPN affiche dans son scoreboard.
@@ -8047,7 +7848,6 @@
 
     // === Counters per sport (pre-search, pre-filter) ===
     // Honor winamaxOnly so the per-sport tab badges never promise matches the user can't bet on.
-    // Chantier 76 (2026-04-22) — on n'affiche QUE les matchs restants (non terminés).
     // Théo ne veut pas voir "Football 39" quand 19 sont déjà joués, il veut les
     // 20 qui restent. Les matchs live sont comptés comme "restants" (pas finis).
     const SPORTS = ['football','tennis','basketball','hockey','american-football','mma','golf','racing'];
@@ -8060,7 +7860,6 @@
       const n = allForCounts.filter(m => m.sport === s).length;
       const el = document.getElementById('count-' + s);
       if (el) {
-        // Sprint 116 (v31.7.190) — Pulse animation quand le count change.
         const previous = el.textContent;
         if (previous && String(previous) !== String(n)) {
           el.classList.add('count-pulse');
@@ -8074,7 +7873,6 @@
     });
 
     // === Locks counter in sidebar nav ===
-    // v31.7.72 — BUG FIX (audit user "Locks 46 vs 6 LOCKS dans stats strip
     // contradictoire") : avant on comptait sur TOUS les jours data.js → 46
     // pour 14 jours × 3 sports. Le stats strip dashboard, lui, comptait
     // les locks du JOUR (6). Incohérence visuelle. Maintenant on aligne sur
@@ -8099,20 +7897,16 @@
           if (isNewLock(m.id)) nNew++;
         }
       });
-      // Chantier Q — affiche "N" ou "N · K🆕" quand certains locks sont nouveaux.
       // Cas particulier : si tous les locks sont nouveaux (nNew === n) on évite
       // la redondance visuelle "6 · 6🆕" et on affiche "N 🆕".
-      // v31.7.10 fix : sur sidebar etroite (240px), le format "37 · 35🆕"
       // se faisait tronquer en "37 · 35" sans l'emoji. Quand nNew est >50% de n,
       // on simplifie en "N 🆕" (badge groupé). Sinon "N" simple si pas de
       // nouveaux ou "N · K🆕" comme avant si signal pertinent (qq nouveaux).
-      // v32.6 — Si n=0, set textContent='' pour que .count:empty (CSS)
       // cache le badge. Avant : badge "0" toujours visible = UX confus.
       const newText = n === 0 ? ''
                     : nNew === 0 ? String(n)
                     : (nNew === n || nNew > n * 0.5) ? `${n} 🆕`
                                                      : `${n} · ${nNew}🆕`;
-      // Sprint 116 (v31.7.190) — Pulse si le count change
       if (locksCountEl.textContent && locksCountEl.textContent !== newText) {
         locksCountEl.classList.add('count-pulse');
         setTimeout(() => locksCountEl.classList.remove('count-pulse'), 400);
@@ -8125,7 +7919,6 @@
     // Affiche un badge "n picks à parier maintenant" sur le bouton Accueil
     // de la nav. Compte les picks edge≥5% conf≥55% du jour. Update quand pollData
     // refresh, pulse à chaque changement.
-    // Sprint 131 (v31.7.193) — Buffer 5min avant kickoff : Winamax retire la
     // cote pre-match ~5min avant, donc on ne compte plus ces matchs comme
     // "à parier maintenant" (faux positifs).
     const dashboardCountEl = document.getElementById('count-dashboard-actions');
@@ -8163,7 +7956,6 @@
       } else {
         dashboardCountEl.style.display = 'none';
       }
-      // Sprint 127 (v31.7.191) — Sync mobile bottom-nav badge avec count-dashboard-actions
       const mbnBadgeDash = document.getElementById('mbn-badge-dashboard');
       if (mbnBadgeDash) {
         if (nActions > 0) {
@@ -8174,7 +7966,6 @@
         }
       }
     }
-    // Sprint 127 — Sync mobile bottom-nav badge locks (lit la valeur du desktop count)
     const mbnBadgeLocks = document.getElementById('mbn-badge-locks');
     if (mbnBadgeLocks) {
       const locksEl = document.getElementById('count-locks');
@@ -8217,7 +8008,6 @@
       if (panel) panel.classList.toggle('hidden', s !== currentSport);
     });
     const el = document.getElementById('content-' + currentSport);
-    // v31.7.41 — Bug fix : render() peut être appelé depuis pollData
     // alors qu'on est sur une page sans panel sport (bilan/locks/top/etc).
     // Le DOM #content-{sport} n'existe alors plus → el = null → innerHTML
     // crash. Guard tôt et silent skip si on n'est pas sur la vue panel.
@@ -8241,7 +8031,6 @@
       return (a.date || '').localeCompare(b.date || '');
     });
 
-    // Chantier XX — Value picks panel: picks with edge >= +5% vs market
     // Filter on !m.completed AND _notStarted to avoid emitting picks on
     // matches that have already finished or kicked off — predictMatch
     // doesn't gate on completion itself, so we'd otherwise show "value"
@@ -8311,7 +8100,6 @@
       `;
     }).join('');
 
-    // Chantier XX — Value picks click handlers
     el.querySelectorAll('.value-pick-row').forEach(row => {
       row.addEventListener('click', () => {
         const id = row.dataset.id;
@@ -8544,7 +8332,6 @@
       .sort((a, b) => a.name.localeCompare(b.name, 'fr'));
     const advHtml = advFiltersOpen ? `
       <div class="adv-filters" style="margin-top:10px;padding:12px;background:var(--surface,#111827);border:1px solid var(--border,#2a3744);border-radius:10px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;font-size:13px;">
-        <!-- Sprint 119 (v31.7.191) — Presets de filtres rapides -->
         <div style="display:inline-flex;align-items:center;gap:4px;border-right:1px solid var(--border-2);padding-right:10px;margin-right:4px;flex-wrap:wrap;" title="Presets de filtrage rapide">
           <span style="color:var(--text-muted);font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;">Presets</span>
           <button data-preset="conservateur" style="padding:4px 9px;border-radius:6px;border:1px solid var(--border-2);background:var(--panel-2);color:var(--text-dim);font-size:11px;font-weight:600;cursor:pointer;" title="Conservateur : cotes 1.40-1.85, EV+ obligatoire, qualité ≥2/4">🛡️ Sûr</button>
@@ -8552,7 +8339,6 @@
           <button data-preset="agressif" style="padding:4px 9px;border-radius:6px;border:1px solid var(--border-2);background:var(--panel-2);color:var(--text-dim);font-size:11px;font-weight:600;cursor:pointer;" title="Aggressif : cote ≥2.0, EV ≥5%, edge max">🚀 Aggressif</button>
           <button data-preset="foot1n2" style="padding:4px 9px;border-radius:6px;border:1px solid var(--border-2);background:var(--panel-2);color:var(--text-dim);font-size:11px;font-weight:600;cursor:pointer;" title="Foot 1X2 uniquement, EV+ obligatoire">⚽ Foot 1X2</button>
         </div>
-        <!-- Sprint 78 (audit P0) — Toggle Bookmaker 3-state -->
         <div style="display:inline-flex;align-items:center;gap:4px;" title="Bookmaker : All = tous matchs détectés. Catalog = Winamax tournament-only inclus. Exact = Winamax exact only (cote actionnable).">
           <span style="color:var(--text-muted);">📊</span>
           ${['exact', 'catalog', 'all'].map(m => {
@@ -8583,7 +8369,6 @@
           <input type="number" id="adv-ev-min" value="${advFilters.evMin ? (advFilters.evMin * 100).toFixed(1) : ''}" placeholder="0%" step="1" min="0" max="50" style="width:54px;padding:4px 6px;background:var(--panel-2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;"/>
           <span style="color:var(--text-muted);">%</span>
         </div>
-        <!-- Sprint 89 (audit Part 14) — Filtre marché + qualité data -->
         <div style="display:inline-flex;align-items:center;gap:6px;" title="Filtre par type de marché du best pick.">
           <span style="color:var(--text-muted);">Marché</span>
           <select id="adv-market-type" style="padding:4px 8px;background:var(--panel-2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;">
@@ -8641,7 +8426,6 @@
     if (byId('adv-league')) byId('adv-league').addEventListener('change', (e) => {
       advFilters.league = e.target.value || ''; onAdvChange();
     });
-    // Sprint 77 — Toggle EV+ uniquement & EV min input
     if (byId('adv-value-only')) byId('adv-value-only').addEventListener('change', (e) => {
       advFilters.valueOnly = !!e.target.checked;
       try { window.advFilters = advFilters; } catch(err){}
@@ -8658,7 +8442,6 @@
       try { window.advFilters = advFilters; } catch(err){}
       onAdvChange();
     });
-    // Sprint 89 — Wire filtre marché + qualité data
     if (byId('adv-market-type')) byId('adv-market-type').addEventListener('change', (e) => {
       advFilters.marketType = e.target.value || '';
       try { window.advFilters = advFilters; } catch(err){}
@@ -8669,12 +8452,10 @@
       try { window.advFilters = advFilters; } catch(err){}
       onAdvChange();
     });
-    // Sprint 78 — Bookmaker mode toggle
     el.querySelectorAll('[data-bookmaker-mode]').forEach(b => b.addEventListener('click', () => {
       setBookmakerMode(b.dataset.bookmakerMode);
       render();
     }));
-    // Sprint 119 (v31.7.191) — Preset filters one-click. Configure plusieurs
     // filtres en cohérence pour des profils typiques (sûr / équilibré / aggressif / foot).
     el.querySelectorAll('[data-preset]').forEach(b => b.addEventListener('click', () => {
       const preset = b.dataset.preset;
@@ -8717,7 +8498,6 @@
     const pushIfFresh = (m) => {
       if (!m || !m.id || seen.has(m.id)) return;
       if (m.completed || m.status === 'STATUS_IN_PROGRESS') return;
-      // AUDIT-2026-04-27 (P2) — Top picks doivent être bookable Winamax
       // (match_id + markets), pas seulement "tournament-only available".
       if (winamaxOnly && !isWinamaxBookable(m)) return;
       if (!m.date) return;
@@ -8757,7 +8537,6 @@
     // Ranking pur-modèle : fiabilité uniquement (cote exclue du classement).
     // La cote reste affichée à l'utilisateur mais n'influence pas la sélection.
     // Time-bonus léger pour les matchs imminents (actionnables tout de suite).
-    // Sprint 81 (v31.7.168 — audit P1) — Mode de tri configurable :
     //   'confidence' (défaut) : rel + timeBonus (= comportement précédent, backward-compat)
     //   'edge' : tri par edge (proba - 1/cote) décroissant
     //   'kelly' : tri par fraction Kelly décroissante
@@ -8876,7 +8655,6 @@
     const futureTop = futureScored.filter(x => !x.pred.lowConf && !x.pred.skip).slice(0, 5);
 
     const wrap = document.getElementById('top-picks-wrap');
-    // Sprint 81 (v31.7.168) — Sub-nav modes "Top" : confidence / edge / kelly
     const topModeSubNav = `
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 14px;padding:6px 0;border-bottom:1px solid var(--border);" role="tablist" aria-label="Mode de tri du Top du jour">
         ${[
@@ -8988,7 +8766,6 @@
       // implicite du model : market, form, H2H…). Garde 1 seule ligne pour
       // ne pas casser le grid 2×2 mini.
       const topReason = (pred.explain?.reasons || [])[0];
-      // v30 — bouton "J'ai parié" retiré.
       const betBtnHtml = '';
       return `
         <div class="top-mini top-pick" data-id="${esc(m.id)}">
@@ -9023,7 +8800,6 @@
       const urgent = startIn < 30;
       // Note : 1 raison compacte — explicite pourquoi ce pick plutôt qu'un autre
       const topReason = (pred.explain?.reasons || [])[0];
-      // v30 — "J'ai parié" + Kelly retirés.
       const betBtnHtml = '';
       // Phase 3 #8 : ajout class .pick-row + .team__logo pour matcher tests
       const hLogo = home?.logo ? `<img class="team__logo" src="${esc(home.logo)}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'">` : '<span class="team__logo team__logo--placeholder"></span>';
@@ -9069,7 +8845,6 @@
       }
     }
 
-    // Chantier DD — si Pari du jour = top1 hero, ne pas afficher la bannière
     // séparée (redondance). On laisse juste le hero normal dans ce cas.
     // Sinon, on affiche la bannière PDJ au-dessus.
     const pdjSameAsHero = pariDuJour && top5[0] && pariDuJour.m.id === top5[0].m.id;
@@ -9079,10 +8854,8 @@
       ? `<div style="position:absolute;top:0;right:0;padding:6px 14px;background:linear-gradient(135deg,#a78bfa,#f472b6);color:#fff;font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;border-bottom-left-radius:10px;z-index:2;">🏆 Pari du jour</div>`
       : '';
 
-    // v30 — Coach IA top-pronos narrative retirée.
     const topNarrativeHtml = '';
 
-    // Sprint 81 — Label sub-titre selon mode actif
     const topModeLabel = topMode === 'edge' ? 'classés par edge' : topMode === 'kelly' ? 'classés par fraction Kelly' : 'classés par fiabilité';
     const topModeHint = topMode === 'edge' ? 'Classement par edge (proba modèle - 1/cote). Surface les value bets en priorité.' :
                        topMode === 'kelly' ? 'Classement par fraction Kelly (= mise optimale). Surface les paris à fort retour relatif.' :
@@ -9151,12 +8924,10 @@
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(e); }
       });
     });
-    // Sprint 81 (v31.7.168) — Wire sub-nav modes Top
     wrap.querySelectorAll('[data-top-mode]').forEach(b => b.addEventListener('click', () => {
       try { localStorage.setItem('topMode', b.dataset.topMode); } catch(e){}
       if (typeof render === 'function') render();
     }));
-    // v30 — Handler "J'ai parié" (.tp-mybet) retiré : tracking utilisateur désactivé.
   }
 
   // ======= COMBINÉS (parlays) =======
@@ -9184,7 +8955,6 @@
     const boldTarget = opts.boldTarget ?? 3;
 
     const now = Date.now();
-    // AUDIT-2026-04-27 (Sprint 1 #2) — Combinés : exiger Winamax bookable
     // pour chaque jambe (sinon on combine des matchs non-placeable, le
     // user ne peut pas suivre la suggestion intégralement chez Winamax).
     // Enrich with prediction, odds, time-to-kickoff
@@ -9222,7 +8992,6 @@
       // pre-match market) or too far in the future.
       .filter(x => x.startIn !== null && x.startIn >= minMinutes && (maxMinutes < 0 || x.startIn <= maxMinutes));
 
-    // Chantier P — anti-corrélation.
     // Deux jambes sont corrélées si : (a) même league, (b) même équipe impliquée
     // (impossible en pratique car 1 match/jour/équipe mais au cas où), (c) kickoff
     // simultané ±10min dans la même ligue (derby / journée foot groupée). La
@@ -9270,7 +9039,6 @@
           .sort((a, b) => b.rel - a.rel)
     ).slice(0, boldTarget);
 
-    // Chantier P — combiné "Lock Combo" : uniquement des picks fiab ≥ 0.70,
     // 2 à 3 jambes max, sans corrélation ligue/équipe/horaire. C'est le
     // combiné "hautes convictions" demandé par Théo.
     const lockCombo = dedupCorrelated(
@@ -9466,7 +9234,6 @@
       return;
     }
 
-    // Chantier EEEE — builder Combiné IA : 1 combiné "optimal" anti-corrélé
     const iaCombineHtml = (() => {
       try {
         const size = (typeof _eeeeComboSize === 'number') ? _eeeeComboSize : 3;
@@ -9519,7 +9286,6 @@
       } catch (e) { console.warn('[EEEE] suggestCombineIA failed', e); return ''; }
     })();
 
-    // v24 — Combiné Buteurs : top 3 joueurs les plus probables sur 3 matchs différents
     const buteurCombineHtml = (() => {
       try {
         const todayIso = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
@@ -9546,12 +9312,10 @@
         const combOdd = legs.reduce((o, l) => o * (l.scorer.impliedOdd || 1 / l.scorer.prob), 1);
         const return10 = (combOdd * 10).toFixed(2);
         const legsHtml = legs.map(l => {
-          // v24.3 fix — noms équipes depuis competitors
           const hC = l.m.competitors && l.m.competitors.find(c => c.home_away === 'home') || {};
           const aC = l.m.competitors && l.m.competitors.find(c => c.home_away === 'away') || {};
           const hName = hC.name || hC.short || '?';
           const aName = aC.name || aC.short || '?';
-          // v29 — face shot via Sofascore CDN when player id is known. The
           // img hides itself on 404 so missing photos fall back cleanly.
           const faceHtml = l.scorer.pid
             ? `<img loading="lazy" decoding="async" src="https://img.sofascore.com/api/v1/player/${l.scorer.pid}/image" alt="" style="width:36px;height:36px;border-radius:50%;object-fit:cover;background:var(--bg);border:1px solid var(--border);flex-shrink:0;" onerror="this.style.display='none'">`
@@ -9591,7 +9355,6 @@
       } catch(e) { return ''; }
     })();
 
-    // Sprint 73 (v31.7.161 — câblage UI buildComboVariants Sprint 71) — 4 variantes
     // de combinés exposées : Safe (locks only), Best Edge, Buts (OU/BTTS),
     // Tomorrow (J+1). Chaque carte montre les jambes, cote totale, corrélation avg.
     const variantsHtml = (() => {
@@ -9742,7 +9505,6 @@
       }
     }));
 
-    // Chantier EEEE — Combiné IA : boutons taille + copie
     wrap.querySelectorAll('.eeee-size-btn').forEach(btn => btn.addEventListener('click', (ev) => {
       ev.stopPropagation();
       const n = parseInt(btn.dataset.size, 10);
@@ -9765,7 +9527,6 @@
       } catch (e) { toast('Impossible de copier', 'error'); }
     }));
   }
-  // Chantier EEEE — state taille combiné IA (2/3/4 legs)
   let _eeeeComboSize = 3;
 
   function sportLabel(s) {
@@ -9787,11 +9548,9 @@
     }[s] || '🏅';
   }
 
-  // v30 — League logo URL using ESPN's CDN when the code is known to be stable.
   // Avoid guessing football/tennis slugs: ESPN returns 404 for many live codes
   // (ger_1, atp, bel_1, sco_1...), which pollutes the console and wastes time.
   // Callers already show the sport emoji fallback, so unknown logos stay clean.
-  // v30 — Cache localStorage des URLs 404 connues : ESPN renvoie 404 pour ~27
   // codes ligue (esp_1, ger_1, eng_fa, bel_1, sco_1…). Plutôt que de relancer
   // ces requêtes à chaque page, on les note et on retourne null au prochain
   // appel. Le cache est nettoyé au-delà de 7 jours pour récupérer les ligues
@@ -9843,7 +9602,6 @@
     return url;
   }
 
-  // v30 — Sport-specific contextual info shown above the betting odds.
   // Helps the user assess the match without clicking through. Returns a
   // ready-to-insert HTML string or '' when no info is available.
   function sportSpecificInfo(m, home, away) {
@@ -9932,7 +9690,6 @@
     const status = m.status || '';
     const isLive = status === 'STATUS_IN_PROGRESS';
     const isFinal = m.completed || status === 'STATUS_FINAL' || status === 'STATUS_FULL_TIME';
-    // Chantier X — snapshot la fiabilité pour la timeline 12h (sauf matchs terminés).
     if (pred && !isFinal && m.id != null && Number.isFinite(pred.reliability)) {
       snapshotReliability(m.id, pred.reliability);
     }
@@ -9955,7 +9712,6 @@
       const { home: oH, draw: oD, away: oA } = pred.odds;
       const fmt = (n) => n != null ? n.toFixed(2) : '—';
       const isPick = (lbl) => pred.pick?.key === lbl;
-      // AUDIT-2026-04-27 (P2 Ticket 2) — Source de cote affichée pour
       // que l'user sache si la cote vient bien de Winamax (cf.
       // helper isWinamaxBookable + getMatchOdds priorité Winamax).
       // - _fromWinamax : cote Winamax exacte (bookable)
@@ -9986,13 +9742,11 @@
       }
     }
 
-    // v26.2 — Badges : uniquement les 3 décisifs (LIVE, Pari sûr, Top match)
     const badges = [];
     if (isLive) badges.push(`<span class="badge live">LIVE</span>`);
     if (pred?.isLock && !isFinal) badges.push(`<span class="badge lock">Pari sûr${isNewLock(m.id) ? ' <span style="background:#eab308;color:#0a0e17;padding:0 4px;border-radius:3px;font-size:9px;margin-left:2px;">NOUVEAU</span>' : ''}</span>`);
     if ((m.league_priority || 0) >= 5) badges.push(`<span class="badge big">Top match</span>`);
 
-    // v26.2 — Ligne contextuelle synthétique (météo + arbitre + congestion + absents clés) — plus discret qu'une collection de badges
     const ctxBits = [];
     if (!isLive && !isFinal) {
       const wx = m.weather;
@@ -10058,7 +9812,6 @@
       // Explanation section — pre-match, toujours montrer headline + raisons si dispo, sinon fallback forme
       const reasons = pred.explain?.reasons || [];
       const headline = pred.explain?.headline || '';
-      // v24.1 — Fallback universel : si pas de reasons, au moins une ligne de forme comparative
       const formLine = (() => {
         try {
           const fH = (home?.form || '').slice(-5);
@@ -10087,7 +9840,6 @@
           ${reasons.length ? `<ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:3px;">${reasons.slice(0,3).map(r => `<li style="font-size:11.5px;color:var(--text-dim2,#7b8693);display:flex;gap:6px;"><span>${r.icon}</span><span>${esc(r.text)}</span></li>`).join('')}</ul>` : (formLine || '')}
         </div>
       ` : '';
-      // Chantier W — indicateur live sur le pick (gagnant / en cours / perdant)
       const liveSt = isLive ? evaluateLivePick(m, pred) : null;
       const liveBadge = liveSt ? (() => {
         if (liveSt === 'winning') return `<span style="background:rgba(16,185,129,.18);border:1px solid rgba(16,185,129,.4);color:var(--accent);padding:2px 7px;border-radius:10px;font-size:10.5px;font-weight:700;letter-spacing:.3px;margin-left:6px;">✓ gagnant</span>`;
@@ -10117,7 +9869,6 @@
         <div class="head">
           <span class="time">${isLive ? '<span class="live-dot"></span>' : ''}${esc(statusText)}</span>
           ${(() => {
-            // v30 — League logo + name. Fallback gracefully if image fails
             // (onerror hides it). Sport icon emoji always shown so the card
             // stays scannable even without the logo.
             const lurl = leagueLogoUrl(m);
@@ -10159,7 +9910,6 @@
         ${sportSpecificInfo(m, home, away)}
         ${contextLine}
         ${(() => {
-          // v25 — Écart de force (Elo) en 1 ligne + cote marché vs modèle
           if (isFinal) return '';
           const eloH = home?.elo?.value;
           const eloA = away?.elo?.value;
@@ -10275,10 +10025,8 @@
     const { home, away } = getSides(match);
     const pred = predictMatch(match);
     const hasDraw = match.sport === 'football';
-    // Chantier Q — ouvrir un lock = le marquer comme vu
     if (pred && pred.isLock && match.id != null) markLockSeen(match.id);
 
-    // v30 — Stocke aussi match.id sur le title pour permettre au bouton
     // partager de construire un share URL ciblé sur ce match.
     const _titleEl = document.getElementById('detail-title');
     // P2-2 (audit 2026-05-01) : prefer "Home vs Away" (FR cohérent avec cards)
@@ -10510,7 +10258,6 @@
           </div>
         </details>`;
     })();
-    // v32.9 — Tab strip retirée (doublon avec md-tabs existant qui filtre
     // les sections). Le système .md-tab (data-mtab-toggle) en aval gère
     // déjà : Synthèse / Cotes / Risques / Transparence / Stats / H2H.
     body.innerHTML = `
@@ -10536,7 +10283,6 @@
       ${advancedStatsHtml}
 
       ${(() => {
-        // Sprint 69 (v31.7.157 — audit ChatGPT 2026-04-28 P1) — "Fiche de décision".
         // Strip de KPIs séparés (Confiance / Edge / Kelly / Qualité / Actionability)
         // au lieu d'un score unique. Réponse à l'audit qui demande de séparer ces
         // dimensions pour que l'user voit ce qui pousse / freine sa mise.
@@ -10561,7 +10307,6 @@
         const kellyColor = kelly >= 0.03 ? 'var(--accent)' : kelly >= 0.01 ? 'var(--warn)' : 'var(--text-dim)';
         const dqColor = dq.score >= 3 ? 'var(--accent)' : dq.score >= 2 ? 'var(--warn)' : 'var(--text-dim)';
         const actionColor = action >= 65 ? 'var(--accent)' : action >= 45 ? 'var(--warn)' : 'var(--text-dim)';
-        // Sprint 77 (v31.7.164) — EV explicite à côté de Edge.
         // EV = proba × cote - 1 (= retour attendu par mise unitaire).
         // Différent de edge qui exprime la même chose en points de proba (proba - 1/cote).
         // Les 2 sont équivalents mais EV est plus parlant pour les bettors :
@@ -10591,7 +10336,6 @@
               ${tile('Action.', `${action}/100`, action >= 65 ? 'À jouer' : action >= 45 ? 'À surveiller' : 'À éviter', kindOf(action, 65, 45))}
             </div>
             ${(() => {
-              // Sprint 101 (v31.7.186) — Live odds drift banner
               const drift = (typeof computeOddsDrift === 'function') ? computeOddsDrift(match, pred, best) : null;
               if (!drift) return '';
               const bg = drift.status === 'skip' ? 'rgba(239,68,68,.10)'
@@ -10615,7 +10359,6 @@
               <b class="u-text-dim">Actionability</b> = composite (Confiance ×30 + Edge ×25 + Kelly ×20 + Qualité ×15 + Winamax exact ×10).
             </div>
             ${(() => {
-              // Sprint 103 (v31.7.188) — AI Coach contextuel
               const coach = (typeof aiCoachExplain === 'function') ? aiCoachExplain(match, pred, best) : null;
               if (!coach || (!coach.pros.length && !coach.cons.length)) return '';
               const recoColor = coach.recommendation === 'À jouer' ? 'var(--accent)'
@@ -10659,7 +10402,6 @@
       })()}
 
       ${(() => {
-        // v31.7 — Section "Contexte du match" : toujours visible, donne le
         // décor avant les chiffres (enjeu, forme courte, conditions).
         // Réponse au retour user : "ajoute un texte qui explique le contexte
         // de la rencontre, enjeux et autre".
@@ -10674,7 +10416,6 @@
         // Forme courte : 3 derniers W/L/D par équipe via derivedForm
         const formH = derivedForm(home);
         const formA = derivedForm(away);
-        // v31.7.46 — Bug fix audit : derivedForm retourne une STRING ("WWLDW"),
         // mais fmtForm3 attendait un objet {results:[...]}. Résultat : la
         // section "FORME (3 derniers)" affichait "indisponible" alors que
         // les badges V/D/N étaient visibles ailleurs (cohérence interne cassée).
@@ -10689,7 +10430,6 @@
             arr = f.results;
           }
           if (!arr || !arr.length) return null;
-          // BUG FIX 2026-05-01 — La string forme ESPN est most-recent-FIRST
           // (ex "WLLDW" → W le plus récent, W le plus ancien). slice(-3)
           // prenait les 3 PLUS ANCIENS, pas les 3 derniers résultats.
           // Conséquence visible : Lecce avec form "DDLLL" affichait "L L L"
@@ -10720,7 +10460,6 @@
         if (venue) enjeuLines.push(`📍 ${venue}`);
         // Synthèse texte enjeu (si suffisamment de données)
         let enjeuText = '';
-        // v31.7.8 — Derby auto-detect : table de derbys connus (foot top-5).
         // Match si les deux équipes sont dans la table sous la même clé.
         // Priorité sur les autres patterns d'enjeu (un derby est plus saillant).
         const DERBYS = {
@@ -10891,7 +10630,6 @@
           if (liveSt === 'tied')    return ` <span style="background:rgba(251,191,36,.18);border:1px solid rgba(251,191,36,.4);color:var(--warn);padding:3px 9px;border-radius:11px;font-size:12px;font-weight:700;letter-spacing:.3px;">🔴 LIVE · En cours</span>`;
           return ` <span style="background:rgba(252,165,165,.18);border:1px solid rgba(252,165,165,.4);color:#fca5a5;padding:3px 9px;border-radius:11px;font-size:12px;font-weight:700;letter-spacing:.3px;">🔴 LIVE · Perdant</span>`;
         })() : '';
-        // AUDIT-2026-04-27 (Sprint 9 #15) — Verdict synthétique enrichi.
         // Génère 1 paragraphe de 1-2 phrases qui résume la prédiction
         // avec : (1) le pick + edge, (2) top 3 raisons "pour", (3) 1 risque
         // principal (disagreement signal ou data quality faible).
@@ -10939,7 +10677,6 @@
             <div class="big-conf">
               Fiabilité <b>${((pred.reliability ?? pred.pick.prob)*100).toFixed(0)}%</b> ${confLabel(pred.reliability ?? pred.pick.prob).lbl}
               ${(() => {
-                // AUDIT-2026-04-27 (Sprint 7 #5) — Honest uncertainty.
                 // Si le backtest publie un win_rate_ci pour ce sport,
                 // on affiche l'IC95 derrière la fiabilité. Évite la
                 // fausse précision : "65% [IC95 52-77%]" est plus
@@ -10954,7 +10691,6 @@
               })()}
               ${pred.isLock ? ` · <span class="badge lock">🔒 PARI SÛR</span>` : ''}
               ${(() => {
-                // Chantier V — Badge qualité des données. Couleur selon le score.
                 const dq = computeDataQuality(match);
                 const color = dq.score >= 4 ? '#10b981'
                             : dq.score === 3 ? '#a78bfa'
@@ -10973,7 +10709,6 @@
               })()}
             </div>
             ${pickOdd ? (() => {
-              // v30 — Mise conseillée Kelly + bouton "J'ai parié" + bouton
               // Winamax retirés (user n'enregistre pas ses paris ici). On
               // garde uniquement la cote affichée + l'edge si value, parce
               // que c'est de l'info modèle (pas une CTA d'engagement).
@@ -10981,7 +10716,6 @@
               const edge = valueBetEdge(rel, pickOdd);
               const edgePct = edge != null ? Math.round(edge * 100) : null;
               const isValue = edge != null && edge >= 0.05;
-              // AUDIT-2026-04-27 (Sprint 2 #8) — Source cote en évidence.
               // Plutôt qu'un mini-badge, encart explicite avec capture
               // timestamp si disponible (snapshot.captured_at).
               let oddsSrcLine = '';
@@ -11007,7 +10741,6 @@
               </div>${oddsSrcLine}`;
             })() : ''}
             ${(() => {
-              // v31.7 — "Pourquoi ce prono est fiable" : synthèse rédigée en
               // français, toujours présente (ne dépend pas d'une explain.headline
               // pré-générée). Utilise les signaux disponibles pour expliquer.
               const rel = pred.reliability ?? pred.pick.prob;
@@ -11063,13 +10796,11 @@
             })()}
             ${pred.explain?.headline ? `<div style="margin-top:10px;padding:12px 14px;background:rgba(255,255,255,.03);border-radius:8px;border-left:3px solid var(--accent,#10b981);font-size:13.5px;line-height:1.5;color:var(--text,#e6ebf2);">${esc(pred.explain.headline)}</div>` : ''}
             ${(() => {
-              // v31.7.36 — Post-mortem auto pour les pronos perdus.
               // Affiche pourquoi le modèle s'est trompé pour aider l'user
               // à comprendre la variance et déclencher des améliorations
               // futures du modèle (logique apprenante).
               const pm = (typeof buildLossPostMortem === 'function') ? buildLossPostMortem(match, pred) : null;
               if (!pm) return '';
-              // v31.7.53 — Migration inline → .info-banner--danger (chantier 8 V1)
               return `<div class="info-banner info-banner--danger" style="margin-top:14px;font-size:13.5px;color:var(--text);">
                 <div class="info-banner__title text-danger">🔍 Post-mortem — pourquoi le modèle s'est trompé</div>
                 ${pm.headline ? `<div style="font-weight:600;margin-bottom:8px;">${esc(pm.headline)}</div>` : ''}
@@ -11110,7 +10841,6 @@
               </div>`;
             })() : ''}
             ${(() => {
-              // Chantier VV — Décomposition des facteurs en poids estimés
               const contrib = pred.contributions || [];
               const factors = {};
 
@@ -11148,7 +10878,6 @@
               return '';
             })()}
             ${(() => {
-              // Chantier X — Timeline fiabilité 12h (sparkline SVG).
               // Chaque refresh ajoute un point dans localStorage ; on trace
               // l'évolution sur la fenêtre glissante 12h. Permet de voir si
               // la fiabilité grimpe ou chute (compos/blessures tombent).
@@ -11188,7 +10917,6 @@
               </div>`;
             })()}
             ${(() => {
-              // Chantier U — Pourquoi ce pick ? Top 3 signaux avec delta chiffré.
               // Affiche comment chaque signal non-marché a poussé (+) ou retenu (−)
               // la prédiction vs la baseline neutre (50% pour 2 issues, 33% pour 3).
               const contribs = pred.contributions || [];
@@ -11213,7 +10941,6 @@
               </div>`;
             })()}
             ${(() => {
-              // Chantier K — rendu sport-aware du bloc "scores probables".
               // Historique foot : pred.scores = array d'objets {home,away,prob}.
               // Nouveaux shapes : objet {kind, items, caption, total?, margin?, bestOf?}.
               const sc = pred.scores;
@@ -11256,7 +10983,6 @@
                     <span style="color:var(--text-dim2,#7b8693);font-weight:500;font-size:12px;">${(s.prob*100).toFixed(1)}%</span>
                   </span>`).join('');
               }
-              // Sprint 56 (v31.7.145) — Basket : section "Total points + Handicap"
               // si sc.markets dispo (calculé par basketScoreProjection).
               let basketMarketsHtml = '';
               if (kind === 'basket' && sc.markets) {
@@ -11289,7 +11015,6 @@
                   </div>` : ''}
                   <div style="margin-top:4px;font-size:10.5px;color:var(--text-dim2,#7b8693);line-height:1.3;">Approx. Gaussienne (NBA σ_total≈12, σ_marge≈10). Lignes Winamax courantes.</div>`;
               }
-              // Sprint 53 (v31.7.142) — Tennis : section "Total jeux" séparée
               // si `sc.games` est présent (calculé par tennisScorePrediction).
               let tennisGamesHtml = '';
               if (kind === 'tennis' && sc.games && sc.games.lines && sc.games.lines.length) {
@@ -11323,13 +11048,11 @@
               </div>`;
             })()}
             ${(() => {
-              // Chantier Y — Marchés buts foot (O/U 2.5 + BTTS) exposés comme
               // picks alternatifs, avec intensité et odds implicite. Dérivé du
               // même Poisson que le pick principal. Sur les matchs à xG élevé
               // (>2.8), Over 2.5 est souvent le pick le plus fiable.
               const mk = pred.markets;
               if (!mk || match.sport !== 'football') return '';
-              // Sprint 50 (v31.7.139) — Edge + Kelly per-marché. Récupère les
               // cotes Winamax pour OU 2.5 et BTTS et calcule edge = proba modèle
               // - 1/cote_book. Si edge > 3% → affichage colorisé (vert) + Kelly
               // fractionnel (cap à 5% pour markets dérivés, plus prudent que
@@ -11375,7 +11098,6 @@
                 if (!wxMk || !wxMk.btts) return null;
                 return mk.btts.side === 'yes' ? Number(wxMk.btts.yes) : Number(wxMk.btts.no);
               })();
-              // Sprint 49 (v31.7.138 — Phase 3) : exposition des marchés étendus
               // dérivés du même Poisson (Double Chance, Score exact, OU 1.5/3.5,
               // mi-temps). Ne les affiche que s'ils sont actionnables (proba ≥ 0.55).
               const ext = mk.extended;
@@ -11398,7 +11120,6 @@
                 (ext.halfTime && ext.halfTime.prob >= 0.50) ? extChip(`Mi-temps : ${ext.halfTime.label}`, ext.halfTime.prob, '⏱️ Mi-temps', 'rgba(56,189,248,.08)', 'rgba(56,189,248,.25)', '#7dd3fc') : '',
                 (ext.ou15.prob >= 0.70) ? extChip(ext.ou15.label, ext.ou15.prob, '⚽ O/U 1.5', 'rgba(139,92,246,.08)', 'rgba(139,92,246,.25)', '#a78bfa') : '',
                 (ext.ou35.prob >= 0.55) ? extChip(ext.ou35.label, ext.ou35.prob, '⚽ O/U 3.5', 'rgba(139,92,246,.08)', 'rgba(139,92,246,.25)', '#a78bfa') : '',
-                // Sprint 79 — DNB + AH chips
                 (ext.dnb && ext.dnb.prob >= 0.60) ? extChip(ext.dnb.label, ext.dnb.prob, '🎯 DNB (Draw No Bet)', 'rgba(251,146,60,.08)', 'rgba(251,146,60,.25)', '#fb923c') : '',
                 (ext.asianHandicap && ext.asianHandicap.prob >= 0.62) ? extChip(ext.asianHandicap.label, ext.asianHandicap.prob, '⚖️ Asian Handicap', 'rgba(34,211,238,.08)', 'rgba(34,211,238,.25)', '#22d3ee') : '',
                 // 2026-05-01 — Nouveaux marchés
@@ -11417,7 +11138,6 @@
                 <div style="margin-top:6px;font-size:10.5px;color:var(--text-dim2,#7b8693);line-height:1.3;">Picks alternatifs dérivés des buts attendus (${pred.poisson ? `xG ${pred.poisson.xgH.toFixed(2)}–${pred.poisson.xgA.toFixed(2)}` : 'modèle Poisson'}). ⭐ = ≥65%.${ext ? ' Marchés étendus : double chance, score exact, mi-temps.' : ''}</div>
               </div>`;
             })()}
-            <!-- v30 — Bouton Parier sur Winamax retiré de la modal détail. -->
           </div>
         </div>`;
       })() : ''}
@@ -11449,7 +11169,6 @@
           if (c >= 1 && c <= 3) return '⛅';
           return '☀️';
         };
-        // Sprint 58 (v31.7.147) — "Risques" tab : flag des facteurs négatifs
         // qui doivent inviter à la prudence. Lecture rapide pour l'user qui
         // veut voir d'un coup pourquoi NE PAS suivre un prono.
         const riskFlags = (() => {
@@ -11487,7 +11206,6 @@
             <div style="margin-top:8px;font-size:10.5px;color:var(--text-dim2);font-style:italic;">${riskFlags.length} facteur${riskFlags.length>1?'s':''} qui justifient une mise plus prudente, voire de skip.</div>
           </div>
         ` : '';
-        // Sprint 80 (v31.7.167 — audit P1) — Section "Transparence des données".
         // Liste explicitement les sources : Winamax (exact/tournoi), lineups,
         // météo, arbitre, stats forme, ELO. Permet à l'user de juger la
         // crédibilité du pick selon la richesse des inputs.
@@ -11752,7 +11470,6 @@
       })() : ''}
 
       ${(() => {
-        // v24 — Buteurs potentiels dans le modal détail
         if (match.sport !== 'football') return '';
         const scorers = predictLikelyScorers(match, pred);
         if (!scorers || !scorers.length) return '';
@@ -11784,7 +11501,6 @@
 
       ${((home?.injuries?.length || 0) + (away?.injuries?.length || 0) > 0) ? (() => {
         // ============== Blessés / absents nominatifs (Sofascore soccer + ESPN US sports) ==============
-        // v24.1 — Traduction FR systématique des labels Sofascore (qui sont en anglais)
         const translateRaw = (raw) => {
           if (!raw) return null;
           const r = String(raw).toLowerCase();
@@ -11941,7 +11657,6 @@
           else if (mt.winner === 'home') histH ? hw++ : aw++;
           else if (mt.winner === 'away') histH ? aw++ : hw++;
         });
-        // AUDIT-2026-04-27 (Sprint 9 #11) — Side-by-side comparaison rapide.
         // Avant les meetings H2H, table 4-6 lignes qui compare
         // forme L5 / xG/m / clean sheets % / Elo / classement entre les
         // 2 équipes. Permet de voir d'un coup d'œil "qui est le mieux"
@@ -11996,7 +11711,6 @@
               stdA?.rank ? `#${stdA.rank}` : null));
             rows.push(rowOf('Points', stdH?.points, stdA?.points));
           }
-          // AUDIT-2026-04-27 (Sprint 43 #11) — Hide entirely si pas
           // assez de rows valides (≥2 sur 7 possibles). Sur tennis
           // / NBA / NHL où form_stats foot manque, on évite une
           // table quasi-vide qui pollue le visuel.
@@ -12048,7 +11762,6 @@
       <div class="section">
         <h4>📊 Probabilités modélisées vs marché</h4>
         ${(() => {
-          // v30 — Comparaison côte-à-côte modèle vs marché. Les probas marché
           // sont extraites de pred.odds (Winamax priorisé) via 1/odd, puis
           // normalisées pour sommer à 1 (retire l'overround bookmaker).
           // Edge = pModel - pMarket. Positif = on est plus optimiste que le
@@ -12094,7 +11807,6 @@
       </div>
 
       ${(() => {
-        // v31.7.4 — Section "Chiffres clés" sport-aware. Affiche les stats les
         // plus actionables selon le sport, avec gracieux degrade si data manque.
         const sport = match.sport;
         const homeC = home || {};
@@ -12285,7 +11997,6 @@
       </div>` : ''}
 
       ${(() => {
-        // Chantier K — panneau "stats équipes" sport-aware.
         // Basket / hockey : home / road split depuis records (souvent dispo là où
         // les standings détaillés et la forme ne le sont pas).
         // Tennis : rank ATP/WTA + pays + surface.
@@ -12329,7 +12040,6 @@
         if (match.sport === 'tennis') {
           const rankH = home?.rank, rankA = away?.rank;
           const ctrH = home?.country, ctrA = away?.country;
-          // v30 — Winamax 1N2 quote alignment now reaches tennis (home_name
           // present in markets makes ESPN/Winamax order match), so we can
           // surface the bookmaker price next to the player profile.
           const wxN12 = match.winamax?.markets?.['1n2'];
@@ -12407,9 +12117,7 @@
       </div>
     `;
 
-    // v30 — Handler "J'ai parié" retiré : Théo n'enregistre pas ses paris.
 
-    // AUDIT-2026-04-27 (Sprint 2 #6) — Modal vrais tabs avec toggle visibility.
     // Upgrade de la sticky anchor nav (v31.7.89) vers de vrais onglets qui
     // masquent les sections non actives. Démarre sur "Synthèse" par défaut.
     // Catégorisation par mots-clés dans le h4 (mapping ci-dessous).
@@ -12424,7 +12132,6 @@
       });
     }
 
-    // Sprint 2 #10 — Deep linking : ?tab=cotes dans l'URL ou hash
     // #match/123/cotes ouvre directement le bon onglet (partage de lien).
     (function injectModalTabs() {
       const sections = Array.from(body.querySelectorAll('.section'));
@@ -12433,7 +12140,6 @@
         const t = (txt || '').toLowerCase();
         if (t.includes('transparence') || t.includes('source des donn')) return 'transparence';
         if (t.includes('risque')) return 'risques';
-        // Sprint 84 — section "Marchés évalués" → tab cotes (logique marché/cote)
         if (t.includes('marché') || t.includes('marches')) return 'cotes';
         if (t.includes('pronostic') || t.includes('contexte') || t.includes('information')) return 'synthese';
         if (t.includes('cote') || t.includes('probabilité') || t.includes('bookmaker')) return 'cotes';
@@ -12443,8 +12149,6 @@
             t.includes('5 derniers')) return 'stats';
         return 'signaux';
       };
-      // Sprint 58 (v31.7.147) — Onglet "Risques" ajouté
-      // Sprint 80 (v31.7.167 — audit P1) — Onglet "Transparence" ajouté
       const tabsOrder = [
         ['synthese', '🎯 Synthèse'],
         ['signaux', '📡 Signaux'],
@@ -12525,7 +12229,6 @@
       setActive(initialTab);
     })();
 
-    // v31.7.4 — Modal détail mobile : sections collapsibles pour réduire le
     // scroll vertical (qui faisait jusqu'à 5400px sur foot top-5). Sur ≤720px,
     // chaque .section devient cliquable au niveau du h4, le contenu est masqué
     // par défaut sauf la première section (Notre pronostic).
@@ -12569,7 +12272,6 @@
     modal.classList.add('open');
     modal.setAttribute('aria-hidden', 'false');
 
-    // AUDIT-2026-04-27 (Sprint 17 #24) — Modal scroll progress.
     // Barre 3px en haut qui tracke le scroll du modal-body.
     try {
       const modalEl = modal.querySelector('.modal');
@@ -12584,7 +12286,6 @@
           modalEl.insertBefore(progressBar, modalEl.firstChild);
         }
         const updateProgress = () => {
-          // AUDIT-2026-04-27 (Sprint 25 #1) — Hide totally si pas de
           // contenu scrollable (max ≤ 0). Avant : barre restait à 0%
           // visible mais inutile.
           const max = bodyEl.scrollHeight - bodyEl.clientHeight;
@@ -12605,7 +12306,6 @@
     const closeBtn = document.getElementById('close-detail');
     if (closeBtn) closeBtn.focus({ preventScroll: true });
 
-    // AUDIT-2026-04-27 (Sprint 15 #13) — Drag-to-dismiss bottom sheet mobile.
     // Touch-track la translation Y du modal, si swipe-down > 100px → close.
     // Activé seulement sur viewport étroit ; desktop reste centré.
     if (window.matchMedia('(max-width: 720px)').matches) {
@@ -12616,7 +12316,6 @@
         let currentY = 0;
         let dragging = false;
         const onStart = (e) => {
-          // AUDIT-2026-04-27 (Sprint 41 #4) — Skip drag si touch sur
           // le close button ou tout élément interactif dans le head.
           // Évite que le drag interfère avec le tap close.
           const target = e.target;
@@ -12661,7 +12360,6 @@
         sheet.dataset.dragWired = '1';
       }
     }
-    // v31.7.42 — Focus trap a11y. Sans ça, Tab dans la modal sort vers
     // le contenu derrière (anti-pattern critique pour clavier+SR).
     if (window._modalTrapRelease) window._modalTrapRelease();
     window._modalTrapRelease = _trapFocus(modal, () => {
@@ -12669,7 +12367,6 @@
     });
   }
 
-  // v31.7.42 — Focus trap utility pour la modal détail (audit 2026-04-27).
   // Cycle Tab/Shift+Tab dans la modal, intercepte Escape pour fermer.
   // Restitue le focus au déclencheur précédent à la fermeture.
   function _trapFocus(container, onEscape) {
@@ -12721,13 +12418,11 @@
     else console.warn(`[wiring] #${id} introuvable au boot — handler ${ev} ignoré`);
     return el;
   }
-  // v31.7.66 — Sport tabs handler retiré : #tabs n'existe plus dans le DOM
   // depuis le cleanup v31.7.51 (audit reported 4.2). Le bind helper aurait
   // émis un console.warn à chaque boot pour rien.
   // currentSport reste 'football' (default), modifiable via les filtres
   // inline des pages Tous/Top/Buteurs.
 
-  // v30 — Date nav : label "today-btn" devient contextuel (Hier / Aujourd'hui /
   // Demain / DD/MM) pour signaler clairement où on est. Click = retour à
   // aujourd'hui (utile quand on s'est éloigné de plusieurs jours).
   function _refreshDateNavLabel() {
@@ -12801,7 +12496,6 @@
       renderSearchSuggest(searchTerm);
     }, 150);
   });
-  // Sprint 132 (v31.7.193) — Recent searches : on garde les 5 dernières
   // recherches au-delà de 2 chars dans localStorage. Affiche au focus si input vide.
   const RECENT_SEARCHES_KEY = 'recentSearches';
   function _saveRecentSearch(q) {
@@ -12866,7 +12560,6 @@
       if (box) box.style.display = 'none';
     }
   });
-  // v33.25 — Délégué global pour [data-agent-force-refresh] : permet à
   // n'importe quel bouton/lien dans la page (banner stale, footer, etc.)
   // de déclencher le force-refresh sans nécessiter de listener local.
   // Avant : seul le bouton dans txtEl avait un listener (cf. ligne ~12090),
@@ -12892,7 +12585,6 @@
     if (typeof _hardReload === 'function') _hardReload();
     else location.reload();
   });
-  // v30 — Navigation clavier dans search-suggest : ↑/↓ pour naviguer,
   // Enter pour activer l'item highlighted, Esc pour fermer. Avant : seul
   // le clic souris fonctionnait, la page était inutilisable au clavier.
   (function _wireSearchKeyboard() {
@@ -12941,7 +12633,6 @@
     search.addEventListener('input', () => { cursorIdx = -1; });
   })();
 
-  // Chantier AA — Recherche globale avec autocomplete.
   // Indexe équipes, ligues, villes et pays depuis les matchs chargés.
   // Sur sélection, on filtre (render) ET on ouvre la fiche du match le plus
   // imminent si une équipe est cliquée.
@@ -13005,7 +12696,6 @@
       box.style.display = 'block';
       return;
     }
-    // Sprint 122 (v31.7.191) — Highlight le match dans le label avec <mark>.
     // Trouve la 1ère occurrence (case-insensitive) de q dans le label, wrap.
     const _highlightMatch = (label, query) => {
       if (!query) return esc(label);
@@ -13039,7 +12729,6 @@
         const input = document.getElementById('search');
         input.value = label;
         searchTerm = label;
-        // Sprint 132 (v31.7.193) — Save to recent searches
         try { _saveRecentSearch(label); } catch(e){}
         render();
         box.style.display = 'none';
@@ -13064,12 +12753,10 @@
     const m = document.getElementById('detail-modal');
     m.classList.remove('open');
     m.setAttribute('aria-hidden', 'true');
-    // v31.7.42 — Release focus trap (a11y).
     if (window._modalTrapRelease) {
       try { window._modalTrapRelease(); } catch(e){}
       window._modalTrapRelease = null;
     }
-    // v30 — Si l'URL contient ?match=<id> (modale ouverte via lien partagé),
     // on nettoie le param au close pour que l'URL reflète l'état actuel.
     // Évite que l'utilisateur partage une URL "stale" qui s'auto-ouvrira
     // une modale au refresh.
@@ -13081,14 +12768,12 @@
       }
     } catch(e) {}
   };
-  // v30 — Expose openDetail / closeDetailModal sur window pour permettre
   // aux scripts séparés (enhancements v20 / restoreShared) d'y accéder.
   // Sans ça, ?match=<id> dans l'URL ne pouvait pas ouvrir la modale car
   // restoreShared vit dans un script tag différent (autre IIFE).
   window.openDetail = openDetail;
   window.closeDetailModal = closeDetailModal;
 
-  // AUDIT-2026-04-27 (Sprint 28 #18) — Recently viewed matches.
   // À chaque openDetail, on track le match dans localStorage.
   // Persiste les 10 derniers, FIFO. Affichable plus tard sur Dashboard.
   const _trackRecentMatch = (match) => {
@@ -13111,7 +12796,6 @@
       try {
         localStorage.setItem('paris_sportif_recent_matches', JSON.stringify(arr));
       } catch (quotaErr) {
-        // AUDIT-2026-04-27 (Sprint 42 #9) — QuotaExceededError détecté.
         // Tente une purge des plus vieux puis retry. Si toujours fail,
         // on swallow silencieusement (tracking n'est pas critique).
         if (quotaErr && quotaErr.name === 'QuotaExceededError') {
@@ -13131,7 +12815,6 @@
     return _origOpenDetail(match);
   };
 
-  // AUDIT-2026-04-27 (Sprint 28 #20) — Bookmark picks (favoris).
   // Helpers pour persister/lire les match IDs marqués comme favoris.
   // À adopter dans l'UI via un bouton ⭐ sur les cards picks.
   window._toggleBookmark = function toggleBookmark(matchId) {
@@ -13164,7 +12847,6 @@
     } catch (e) { return []; }
   };
 
-  // Sprint 70 (v31.7.158 — audit ChatGPT 2026-04-28 P1) — Favoris multi-niveaux.
   // Suit l'audit "Favoris doit être enrichi : multi-niveaux (match, équipe,
   // ligue, sport, marché) + alertes paramétrables".
   // Schema : localStorage.paris_sportif_watchlist = {
@@ -13254,7 +12936,6 @@
     const rules = _loadAlertRules().filter(r => r.id !== id);
     try { localStorage.setItem(ALERT_RULES_KEY, JSON.stringify(rules)); } catch(e){}
   };
-  // Sprint 191 (v31.7.195) — Defensive null check : si les éléments DOM
   // n'existent pas (ex: test isolé, fragment inclusion), on no-op silencieusement
   // au lieu de crasher l'IIFE entière. Évite "Cannot read properties of null".
   const _closeDetailBtn = document.getElementById('close-detail');
@@ -13262,10 +12943,8 @@
   const _detailModal = document.getElementById('detail-modal');
   if (_detailModal) _detailModal.addEventListener('click', (e) => { if (e.target.id === 'detail-modal') closeDetailModal(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDetailModal(); });
-  // v32.9 — Phase 5 detail-jump handler retiré : doublon avec le système
   // .md-tab existant qui filtre déjà les sections (display:none) selon le
   // tab actif. Garder les 2 systèmes créait confusion utilisateur.
-  // v30 — Share button sur la modale match. Construit un share URL avec
   // ?match=<id> qui pourrait être restauré au boot (futur), partage via
   // Web Share API natif (mobile) ou copy-to-clipboard (desktop).
   const shareDetailBtn = document.getElementById('share-detail');
@@ -13328,7 +13007,6 @@
     } else if (ageMin < 15) {
       if (txtEl) txtEl.textContent = `🟢 À jour · ${hhmm} (il y a ${ageMin} min) · auto 5 min`;
     } else if (ageMin < 60) {
-      // v30 — Seuil orange relevé de 25 à 60min : le cron tourne toutes les
       // 5min mais ne commit que quand data CHANGE (pas si journée tranquille).
       // Donc 30-50min sans changement c'est totalement normal, pas alarmant.
       ind.classList.add('stale');
@@ -13338,7 +13016,6 @@
       ind.classList.add('very-stale');
       const label = ageMin < 120 ? `${ageMin}min` : `${Math.floor(ageMin/60)}h${String(ageMin%60).padStart(2,'0')}`;
       if (txtEl) {
-        // v32.9 — Bandeau réduit : juste l'icône + temps + 1 lien refresh.
         // Avant : "🔴 Données obsolètes · 5h04 · forcer refresh · cron · LIVE · poll 30s"
         // (super verbeux, prend toute la largeur en bas).
         // Après : "🔴 5h04 · 🔄" (compact, juste l'essentiel).
@@ -13365,9 +13042,7 @@
         }
       }
     }
-    // v30 #4 — Si au moins un match est LIVE, indiquer le mode polling
     // accéléré (10s en v33.7). Petit badge à droite, non intrusif.
-    // v33.8 — Compteur LIVE explicit "🔴 LIVE 5 · poll 10s" pour que
     // l'user sache combien de matchs sont en cours sans naviguer.
     try {
       const liveCount = (function(){
@@ -13389,7 +13064,6 @@
   // ignore le param, mais le navigateur traite l'URL comme nouvelle ressource
   // et refait le fetch. Combiné avec le SW cache déjà delete au préalable
   // (cf force-refresh), on a une vraie fresh charge.
-  // v30 — Modal custom pour saisie de mise (remplace prompt() qui ne
   // marche pas dans certains contextes : PWA installée, sandbox iframe,
   // browsers sécurisés). Async — retourne la valeur ou null si annulé.
   function _showStakePrompt(suggested = '1', label = 'Mise en € ?') {
@@ -13439,7 +13113,6 @@
   // Expose pour scripts séparés (enhancements v20 etc.)
   try { window._showStakePrompt = _showStakePrompt; } catch(e){}
 
-  // v30 — Modal custom pour confirmation (remplace confirm() qui ne
   // marche pas en PWA installée etc.). Async — retourne true / false.
   // opts : { title, body, confirmLabel, cancelLabel, danger? }
   function _showConfirm(opts = {}) {
@@ -13501,7 +13174,6 @@
     const ind = document.getElementById('refresh-indicator');
     if (ind) ind.classList.add('refreshing');
     try {
-      // v30 #3 — Lazy-load : poll fetch SEULEMENT data_today.json (~280 KB)
       // au lieu de data.js full (1.4 MB). 5× moins de bande passante par tick,
       // surtout en mode LIVE 30s où ça compte. data.js full reste fetched
       // à la demande via _ensureFullData() avant Bilan/Backtest/Historique.
@@ -13538,7 +13210,6 @@
         fresh._lite = false;
       }
       {
-        // v30 #4 — Snapshot des scores AVANT update pour détecter les
         // changements live. Stocké sur window pour que render() puisse
         // l'utiliser après mise à jour du DOM.
         const oldScores = {};
@@ -13582,7 +13253,6 @@
         } catch(e){}
         // Le render() ci-dessous regénère le DOM ; on flash juste après.
         window.__pendingScoreFlash = changedIds;
-        // v30 — Si la bannière "📡 Synchronisation…" est visible (boot
         // avec data stale), la retirer maintenant que fresh data arrive.
         const syncBanner = document.getElementById('__boot-sync-banner');
         if (syncBanner) {
@@ -13596,16 +13266,13 @@
         if (typeof window._invalidateOddsHistoryCache === 'function') {
           window._invalidateOddsHistoryCache();
         }
-        // v30 — Refresh health indicator après chaque data refresh (cohérence)
         if (typeof window._refreshHealthIndicator === 'function') {
           window._refreshHealthIndicator();
         }
-        // v30 — Refresh footer last-update label
         if (typeof window._updateFooterLastUpdate === 'function') {
           window._updateFooterLastUpdate();
         }
         render();
-        // v30 #4 — Applique le flash sur les scores qui viennent de changer.
         // Doit tourner APRÈS render() qui regénère les .match cards.
         try {
           const ids = window.__pendingScoreFlash;
@@ -13625,7 +13292,6 @@
           }
         } catch(e){}
         updateFreshness();
-        // v30 — Scan fresh data pour les picks edge ≥10% non encore notifiés.
         // Ne déclenche les notifs que si l'utilisateur a opt-in (Notification
         // permission accordée + toggle activé). Sans gesture utilisateur on ne
         // demande jamais — voir _maybeNotifyHighEdgePicks().
@@ -13635,7 +13301,6 @@
           if (typeof window._maybeNotifyHighEdgePicks === 'function') {
             window._maybeNotifyHighEdgePicks();
           }
-          // v33.33 — Notification kickoff imminent (15 min avant top picks)
           if (typeof window._maybeNotifyKickoffImminent === 'function') {
             window._maybeNotifyKickoffImminent();
           }
@@ -13646,7 +13311,6 @@
         } catch(e) { console.warn('[notif] failed:', e); }
       }
     } catch (err) {
-      // v28.9 — Visible error feedback au lieu de silencieux
       if (ind) ind.classList.add('offline');
       const txtEl = ind && ind.querySelector('.rfr-txt');
       if (txtEl && !txtEl.dataset.errShown) {
@@ -13661,7 +13325,6 @@
       if (ind) ind.classList.remove('refreshing');
     }
   }
-  // v30 — Expose pollData + predictMatch sur window pour le debug console
   // et pour permettre aux scripts séparés (enhancements v20) de les
   // utiliser. predictMatch est déjà appelé en plein de places, donc
   // sa visibilité explicite réduit la surface de bugs scope.
@@ -13699,7 +13362,6 @@
     };
   } catch(e){}
 
-  // v30 #3 — Lazy-load full history. PRONOSTICS_DATA inline n'a que today.
   // _ensureFullData() fetch data.js (1.4 MB) UNE SEULE FOIS et fusionne
   // tous les jours dans .days. Memoizé via une promise pour gérer les
   // appels concurrents (idle preload + click sur Bilan en même temps).
@@ -13731,7 +13393,6 @@
           ...curNow,
           days: mergedDays,
           _lite: false,
-          // v33.17 — Filtre les jours vides pour éviter clutter dans les sélecteurs.
           _available_days: full.days ? Object.entries(full.days).filter(([, v]) => Array.isArray(v) && v.length).map(([k]) => k).sort() : [],
         };
         // Une page d'historique ouverte attend peut-être ces données.
@@ -13762,7 +13423,6 @@
   }
   try { window._ensureFullData = _ensureFullData; } catch(e){}
 
-  // v34.10 — Pas de preload full-data au boot. L'accueil vit sur le blob LITE
   // + data_today.json ; charger data.js complet dès l'ouverture ajoutait ~1.7 MB
   // et un re-render avant le LCP. Les pages qui ont vraiment besoin de
   // l'historique appellent déjà _ensureFullData() à l'ouverture.
@@ -13780,7 +13440,6 @@
   } else {
     window.addEventListener('load', _scheduleFullPreload, { once: true });
   }
-  // v30 — Helper diagnostique pour la console.
   // Utilisation : window.__diag() — print state synthétique du site.
   // Utile pour debug rapide quand quelque chose semble bizarre.
   window.__diag = function() {
@@ -13803,7 +13462,6 @@
     } catch(e){}
     let errCount = 0;
     try { errCount = (JSON.parse(localStorage.getItem('paris_sportif_js_errors_v1') || '[]') || []).length; } catch(e){}
-    // v31.7.69 — Audit : compter les inline styles app.js (proxy santé refacto)
     let pwaPagesSeen = [];
     try { pwaPagesSeen = JSON.parse(localStorage.getItem('pwaPagesSeen') || '[]'); } catch(e){}
     const out = {
@@ -13836,7 +13494,6 @@
         stadiums_loaded: !!__stadiumsCache,
       },
       features: {
-        // v31.7.69 — Liste des features récemment ajoutées (audit run)
         focus_trap_modal: typeof _trapFocus === 'function',
         post_mortem_lost_picks: typeof buildLossPostMortem === 'function',
         compare_2_dates: typeof renderComparePage === 'function',
@@ -13865,7 +13522,6 @@
   ['mousemove','keydown','touchstart','click'].forEach(ev =>
     document.addEventListener(ev, () => { __lastUserInteraction = Date.now(); }, { passive: true })
   );
-  // v30 #4 — Détecte si un match LIVE est en cours dans data.js. Utilisé
   // pour adapter la cadence de polling : 30s au lieu de 60s quand au moins
   // un match est in-progress (le user veut voir les scores bouger), 60s
   // sinon (économie batterie / réseau).
@@ -13878,7 +13534,6 @@
       return today.some(m => m && m.status === 'STATUS_IN_PROGRESS' && !m.completed);
     } catch(e) { return false; }
   }
-  // Sprint 136 (v31.7.193) — Détecte les matchs imminents (<15 min avant kickoff).
   // Quand un match va bientôt commencer, on poll plus souvent pour capter le
   // dernier mouvement de cote / dernière compo.
   function _hasImminentMatch() {
@@ -13903,9 +13558,7 @@
     const reloadAfterMs = 60 * 60 * 1000;
     const idleAfterMs = 2 * 60 * 1000;
     const __bootTime = Date.now();
-    // v30 #4 — Polling adaptive : 30s en mode live, 60s sinon.
     // Variable au lieu de const car ré-évaluée à chaque tick.
-    // v34.10 — Le premier poll au boot est conditionnel : si le blob inline
     // est frais, on évite 2 fetch + 1 render avant le premier écran. Si le SW
     // sert une vieille version, on synchronise immédiatement comme avant.
     let lastPoll = Date.now();
@@ -13946,7 +13599,6 @@
     __refreshTimer = setInterval(() => {
       const now = Date.now();
       const tabHidden = document.visibilityState === 'hidden';
-      // v33.7 — Polling adaptive plus agressif pour mode "live" :
       // - 10s si match LIVE en cours (était 30s)
       // - 12s si match imminent <15min (était 15s)
       // - 30s sinon (était 60s)
@@ -13981,7 +13633,6 @@
           try { location.reload(); } catch (e) {}
         }
       }
-      // Chantier BBBB — rafraîchit le badge "alertes santé" dans la nav
       try { updateSanteBadge(); } catch (e) {}
     }, tickMs);
     // Paint freshness immediately on boot
@@ -13989,7 +13640,6 @@
     try { updateSanteBadge(); } catch (e) {}
   }
 
-  // Chantier 5 — Refresh silencieux quand l'onglet redevient actif (si data > 60s).
   //   Évite que l'utilisateur voie la pastille "stale" après un retour rapide.
   //   Si la data est fresh (< 60s), on ne poll pas (éviter bruit réseau inutile).
   document.addEventListener('visibilitychange', () => {
@@ -14017,7 +13667,6 @@
     badge.style.color = critN > 0 ? '#f87171' : '#eab308';
   }
 
-  // v31.7.6 — renderValueFinder + valueWrap dispatcher retires (audit cleanup).
   // La page #value n'avait plus aucun lien dans la nav depuis v25+ (chantier E)
   // et son stub etait du code mort. Les anciens bookmarks /?page=value
   // tombent maintenant sur dashboard via le fallback de _pageFromHash().
@@ -14144,7 +13793,6 @@
       }
     } catch (e) {}
 
-    // v30 — Streak user retiré : Théo n'enregistre pas ses paris.
     // La série du modèle (auto-trackée) reste affichée via _agentReplay().
 
     // 3. Top value du jour
@@ -14191,7 +13839,6 @@
       }
     } catch (e) {}
 
-    // v30 — Pattern tip + Bankroll snapshot retirés : ils dépendaient des
     // paris trackés par l'utilisateur, qu'on n'enregistre plus.
 
     return items.sort((a,b) => b.priority - a.priority);
@@ -14330,10 +13977,8 @@
   }
   try { window._sportRoiGuard = _sportRoiGuard; } catch(e) {}
 
-  // v27 — AGENT AUTONOME : le modèle parie sur tous ses picks Winamax non-skip
   //       avec Kelly 0.25× (cap 10% · plancher 0.10€), bankroll 10€ depuis J1.
   //       Le user observe, n'intervient pas. Remplace l'ancien dashboard user-centric.
-  // v27.2 — Auto-tuning : règles d'exclusion détectées auto depuis l'historique
   //         (seuil confiance, sport, ligue sous-performants). Proposition + activation
   //         manuelle par le user. Stockage localStorage.
   function _loadAgentRules() {
@@ -14355,7 +14000,6 @@
       if (r.type === 'conf' && pick.rel < r.threshold) return true;
       if (r.type === 'sport' && pick.m.sport === r.sport) return true;
       if (r.type === 'league' && pick.m.league_name === r.league && pick.m.sport === r.sport) return true;
-      // v28.3 — Règle cote extremes : si la cote est hors plage définie, skip
       if (r.type === 'odd-range' && (pick.odd < r.min || pick.odd > r.max)) return true;
     }
     return false;
@@ -14399,7 +14043,6 @@
       const w = hits.filter(h => h.res === 'won').length;
       out.push({ id, type: 'sport', sport, label: `Exclure le sport ${sportLabel(sport)}`, sample: hits.length, wr: Math.round(100*w/hits.length), roi: roi*100, pl });
     });
-    // v28.3 — Cote extremes : deux bucket pré-définis (cote trop basse / trop haute)
     [
       { id: 'odd-low', label: 'Exclure les cotes sous 1.20 (vig trop cher)', min: 1.20, max: 99, filter: p => p.odd < 1.20 },
       { id: 'odd-high', label: 'Exclure les cotes au-dessus de 5.00 (variance excessive)', min: 1.01, max: 5.00, filter: p => p.odd > 5.00 },
@@ -14468,7 +14111,6 @@
   }
   try { window._buildMarketHistoryStats = _buildMarketHistoryStats; } catch(e){}
 
-  // Sprint G — Memoization _agentReplay (très couteux, appelé 5+ fois par render)
   // Cache invalidate quand PRONOSTICS_DATA ref change ou agentResetTs modifié.
   let __agentReplayCache = null;
   let __agentReplayDataRef = null;
@@ -14477,7 +14119,6 @@
     const data = window.PRONOSTICS_DATA;
     const AGENT_START = 10, KELLY_FRAC = 0.25, CAP_PCT = 0.10, MIN_STAKE = 0.10;
     const resetTs = parseInt(localStorage.getItem('agentResetTs') || '0', 10) || 0;
-    // Sprint G — Cache hit : data ref + resetTs identiques
     if (__agentReplayCache && __agentReplayDataRef === data && __agentReplayResetTs === resetTs) {
       return __agentReplayCache;
     }
@@ -14497,7 +14138,6 @@
         try {
           const pred = predictMatch(m);
           if (!pred || !pred.pick || pred.skip) return;
-          // v28 — meilleur marché (1N2 / O/U 2.5 / BTTS) selon edge
           const best = _agentBestPick(m, pred);
           if (!best) return;
           const res = _evaluateBestPick(m, best);
@@ -14509,7 +14149,6 @@
       });
     });
     scorable.sort((a,b) => a.ts - b.ts);
-    // v27.2 — Conserver le scorable brut (avant règles) pour analyse auto-tuning
     const scorableRaw = scorable.slice();
     const marketHistoryStats = _buildMarketHistoryStats(scorableRaw);
     let nav = AGENT_START;
@@ -14519,11 +14158,9 @@
     const yIso = new Date(now - 86400000).toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
     const perSport7d = {};
     let ydayPl = 0, ydayWins = 0, ydayLosses = 0, ydayHighTotal = 0, ydayHighWins = 0, ydayLowLoss = 0, ydayTotal = 0;
-    // v27.1 — Daily aggregate cap : max 20% de nav engagé par jour pour éviter
     // qu'une mauvaise journée tue la cagnotte quand il y a 20+ picks simultanés.
     const DAILY_CAP_PCT = 0.20;
     const dailyStakeAcc = {}; // ISO day → cumul des mises déjà placées ce jour-là
-    // v31.7.218 — Tilt protection (streak adaptation).
     // Backtest 411 picks : longest losing streak = 10 (top run lose). Une
     // série de 10 perdants enfile sa propre logique psychologique mais aussi
     // statistique : si nos picks ratent 10 fois d'affilée alors qu'on les
@@ -14536,7 +14173,6 @@
     let _pausedUntilTs = 0;
     let _streakPauseCount = 0;
     scorable.forEach(s => {
-      // v31.7.218 — Skip toute mise pendant la pause (mais on continue à
       // tracker le résultat pour les stats du replay).
       if (_pausedUntilTs > 0 && s.ts < _pausedUntilTs) {
         // On NE bet PAS, mais on reset le compteur sur un win observé pour
@@ -14545,11 +14181,9 @@
         if (s.res === 'won') _consecutiveLosses = 0;
         return;
       }
-      // v27.2 — Appliquer les règles auto-tuning actives avant tout
       if (_applyAgentRules(s)) { return; }
       const _sportGuard = _sportRoiGuard(s.m, s.best);
       if (_sportGuard && _sportGuard.blocked) { return; }
-      // v31.7.210 — Drawdown protection. Quand le NAV courant chute sous
       // 80% de l'init, on réduit progressivement le Kelly multiplier pour
       // éviter la spirale de pertes. Pratique pro standard : "scale down
       // when losing" (Thorp, MacLean). On continue à parier (vs full pause)
@@ -14567,7 +14201,6 @@
       else if (_ddRatio < 0.80) _kellyMult = 0.18;
       else if (_ddRatio < 1.00) _kellyMult = 0.22;
       else                       _kellyMult = KELLY_FRAC;
-      // v27.1 FIX : si Kelly négatif/nul, on NE MISE PAS. Pas de plancher forcé.
       //          (ex: Thunder @1.05 vs rel 76% → implicite 95% → edge -19pt → skip).
       if (s.best && s.best.investment && s.best.investment.action === 'skip') { return; }
       const kRaw = (typeof kellyFraction === 'function') ? kellyFraction(s.rel, s.odd, _kellyMult) : Math.max(0, ((s.rel * s.odd - 1) / Math.max(0.01, s.odd - 1)) * _kellyMult);
@@ -14575,7 +14208,6 @@
         ? Math.min(kRaw, s.best.investment.cappedKelly)
         : kRaw;
       if (k <= 0) { return; } // pas d'edge → pas de mise
-      // v27.3 — Divergence amplifiée : mise plus agressive quand l'edge est fort
       //         (le modèle diverge franchement du marché = vraie opportunité)
       const _edgeAbs = s.rel - 1/s.odd;
       let _ampl = 1;
@@ -14588,7 +14220,6 @@
       const capAbs = nav * CAP_PCT;
       if (stake > capAbs) stake = capAbs;
       if (stake < MIN_STAKE) stake = MIN_STAKE;
-      // v27.1 Daily aggregate cap
       const remainingDaily = Math.max(0, nav * DAILY_CAP_PCT - (dailyStakeAcc[s.dayIso] || 0));
       if (remainingDaily <= 0) { return; }
       if (stake > remainingDaily) stake = remainingDaily;
@@ -14597,7 +14228,6 @@
       dailyStakeAcc[s.dayIso] = (dailyStakeAcc[s.dayIso] || 0) + stake;
       const pl = s.res === 'won' ? stake * (s.odd - 1) : -stake;
       nav += pl;
-      // v31.7.218 — Tilt protection : tracker la streak après le bet.
       if (s.res === 'won') {
         _consecutiveLosses = 0;
       } else {
@@ -14634,12 +14264,10 @@
       nav, series, scorable, scorableRaw, start: AGENT_START, perSport7d, marketHistoryStats,
       delta7: nav - navPrev7, deltaPct7: navPrev7 > 0 ? (nav - navPrev7) / navPrev7 * 100 : 0,
       ydayStats: ydayTotal > 0 ? { pl: ydayPl, wins: ydayWins, losses: ydayLosses, total: ydayTotal, highTotal: ydayHighTotal, highWins: ydayHighWins, lowLoss: ydayLowLoss } : null,
-      // v31.7.218 — Tilt protection metadata
       streakPauseCount: _streakPauseCount,
       currentLossStreak: _consecutiveLosses,
       currentlyPausedUntil: _pausedUntilTs > Date.now() ? _pausedUntilTs : null,
     };
-    // Sprint G — Memoize for next call
     __agentReplayCache = result;
     __agentReplayDataRef = data;
     __agentReplayResetTs = resetTs;
@@ -14735,16 +14363,13 @@
       sparkPath = `M${padS},${y} L${sparkW - padS},${y}`;
     }
 
-    // v28.7 — CRITIQUE : si la data est obsolète (>4h), on ne montre PAS de picks.
     //   Sinon le site suggère de parier sur des matchs qui n'existent plus / ont déjà joué.
     //   Déclaration hissée ici (utilisée par les blocs ci-dessous avant l'auto-refresh).
     const _dataAgeMin = data.generated_at ? Math.floor((Date.now() - new Date(data.generated_at).getTime())/60000) : 9999;
     const _dataIsStale = _dataAgeMin > 240; // 4h
 
-    // v27.1 — Positions du jour avec Kelly strict (skip si edge ≤0) + cap journalier 20%
     const KELLY_FRAC = 0.25, CAP_PCT = 0.10, MIN_STAKE = 0.10, DAILY_CAP_PCT = 0.20;
     const rawCandidates = [];
-    // v28.8 — Si data obsolète (>4h), skip la génération de positions (évite de
     // recommander des matchs déjà joués). Pause stop-loss/take-profit supprimée
     // (le modèle ne s'arrête jamais sur demande utilisateur).
     if (_dataIsStale) {
@@ -14763,7 +14388,6 @@
         if (isFinite(koMs) && koMs > 0 && (Date.now() - koMs) > 5*60*1000) return;
         const pred = predictMatch(m);
         if (!pred || !pred.pick || pred.skip) return;
-        // v28 — meilleur marché selon edge
         const best = _agentBestPick(m, pred);
         if (!best) return;
         if (best.investment && best.investment.action === 'skip') return;
@@ -14771,14 +14395,12 @@
         if (sportGuard && sportGuard.blocked) return;
         const rel = best.rel;
         const odd = best.odd;
-        // v27.2 — appliquer les règles auto-tuning actives
         if (_applyAgentRules({ m, rel, odd })) return;
         const kRaw = (typeof kellyFraction === 'function') ? kellyFraction(rel, odd, KELLY_FRAC) : Math.max(0, ((rel*odd-1)/Math.max(0.01, odd-1)) * KELLY_FRAC);
         const k = best.investment && isFinite(best.investment.cappedKelly)
           ? Math.min(kRaw, best.investment.cappedKelly)
           : kRaw;
         if (k <= 0) return; // v27.1 — pas d'edge → pas de pari
-        // v27.3 — Divergence amplifiée
         const _edgeLive = rel - 1/odd;
         let _amplLive = 1;
         if (_edgeLive > 0.20) _amplLive = 1.6;
@@ -14795,7 +14417,6 @@
         rawCandidates.push({ m, pred, best, odd, rel, stake, ts, isLive: !!m.live });
       } catch(e) {}
     });
-    // v27.1 — Daily cap : tri par conf décroissant puis on rogne tant qu'on dépasse 20% de nav
     rawCandidates.sort((a,b) => {
       const bs = b.best && b.best.investment ? b.best.investment.score : 0;
       const as = a.best && a.best.investment ? a.best.investment.score : 0;
@@ -14816,13 +14437,10 @@
     }
     const totalStaked = usedBudget;
 
-    // v28.10 — Vide si data stale (les perSport7d sont basés sur historique mais
     //   l'utilisateur pense voir des stats sur la semaine en cours. Mieux vaut rien.)
     const psArr = _dataIsStale ? [] : Object.entries(agent.perSport7d).sort((a,b) => b[1].bets - a[1].bets);
 
-    // v28.2 — Sections inline : tous matchs du jour, combinés, buteurs foot
     // All today's Winamax matches (not in positions yet) — compact view
-    // v28.3 — Filtres + tri : state dans localStorage
     const _agentFilter = (() => {
       try { return JSON.parse(localStorage.getItem('agentFilter') || '{}') || {}; } catch(e) { return {}; }
     })();
@@ -14831,8 +14449,6 @@
     const fEdge   = Number(_agentFilter.edge  || -100);
     const fSortBy = _agentFilter.sortBy || 'rel';
     const fSortDir = _agentFilter.sortDir === 'asc' ? 1 : -1;
-    // v28.9 — Vide si data obsolète (pas d'affichage de matchs fantômes)
-    // Sprint 77 (v31.7.164) — Compteur de diagnostic pour "No bet" enrichi.
     // Distingue : analysés / skip (pred.skip) / lowConf (rel < 0.55) /
     // noEdge (edge ≤ 0) / noOdds / pas de pred. Affiché dans le bloc
     // "Aucun prono ne franchit nos filtres" pour que l'user comprenne
@@ -14877,7 +14493,6 @@
       });
 
     // Combinés du jour : 3 combos selon buildCombines
-    // v28.9 — vide si data obsolète (pas de combinés fantômes)
     let combinesPicks = [];
     if (!_dataIsStale) try {
       if (typeof buildCombines === 'function') {
@@ -14889,7 +14504,6 @@
 
     // Buts du match : matches foot du jour avec OU 2.5 ou BTTS confiance élevée
     // (c'est un marché "total de buts" — pas "quel joueur marque").
-    // v28.8 — Vide si data obsolète
     const butsDuMatch = _dataIsStale ? [] : today.filter(m => !m.completed && m.sport === 'football').map(m => {
       try {
         const pred = predictMatch(m);
@@ -14927,7 +14541,6 @@
         return { m, pred, best, odd, rel, edge, ts };
       } catch (e) { return null; }
     }).filter(Boolean);
-    // v30 — Fenêtres mutuellement exclusives + filtre edge>0 pour éviter les
     // doublons d'un match dans 4h/12h/24h ET les picks no-value (Sabalenka @1.02
     // sortait en "Top promo" parce que le tri était par confiance pure, sans
     // tenir compte du fait qu'à @1.02 le marché est plus optimiste que nous).
@@ -14949,7 +14562,6 @@
     // voit PSG-Bayern même quand le modèle hésite (cotes 2.20/4.00/2.60).
     // Chaque match a un statusBadge {code, label, hint, color} pour que
     // l'user comprenne pourquoi il y a / n'y a pas de prono fort.
-    // Sprint 68 (v31.7.156 — refactor) — Utilise getScopedEvents('7d') au lieu
     // de la boucle inline. Cohérence garantie avec Calendrier 7j et Matchs
     // détectés (qui passent par les mêmes filtres). Sans changement de comportement.
     const topImportantMatches = _dataIsStale ? [] : (() => {
@@ -15024,11 +14636,9 @@
       return arr.sort((a, b) => b.prob - a.prob).slice(0, 8);
     })();
 
-    // v27.2 — Auto-tuning : règles proposées + actives
     const proposedRules = _proposedRules(agent.scorableRaw || []);
     const activeRules = _loadAgentRules();
     const ignoredCount = _loadAgentIgnored().length;
-    // v33.16 — Si pas encore de proposition mais l'agent a déjà des paris,
     // afficher un message "en attente de sample" plutôt que masquer le bloc.
     // L'auto-tuning a besoin de ≥10 paris par bucket (sport/league/odd-range)
     // pour proposer une règle. Sans ce message, l'utilisateur ne sait pas
@@ -15082,7 +14692,6 @@
 
     const positionRow = (p) => {
       const confColor = p.rel >= 0.70 ? 'var(--accent)' : p.rel >= 0.60 ? '#fbbf24' : '#fca5a5';
-      // v28 — Label = marché choisi (best) avec indicateur visuel si non-1N2
       const pickLabel = (p.best && p.best.label) || p.pred.pick.label || 'Pick';
       const marketTag = p.best && p.best.market !== '1n2' ? ` <span style="font-size:9px;color:var(--brand);background:rgba(167,139,250,.15);padding:1px 5px;border-radius:3px;margin-left:4px;letter-spacing:.5px;text-transform:uppercase;">${p.best.market === 'ou25' ? 'O/U' : 'BTTS'}</span>` : '';
       const timeLbl = p.isLive ? `LIVE ${p.m.clock || ''}` : (typeof fmtTime === 'function' ? fmtTime(p.m.date) : new Date(p.m.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}));
@@ -15103,13 +14712,11 @@
     const yPlColor = ys && ys.pl >= 0 ? 'var(--accent)' : 'var(--danger)';
     const ysWr = ys && ys.total ? Math.round(100 * ys.wins / ys.total) : 0;
 
-    // v28.6 — "À PARIER AUJOURD'HUI" : top 3 meilleurs edges pour toi (pas l'agent)
     const userBankroll = (() => {
       const v = parseFloat(localStorage.getItem('userBankroll'));
       return (isFinite(v) && v > 0) ? v : 50;
     })();
     const userOddMin = (typeof getUserOddMin === 'function') ? getUserOddMin() : 2.00;
-    // v30 — AUTO force-refresh si data >2h obsolète (avant : 6h, trop tard).
     // Le flag autoRefreshDone est maintenant timestamped → re-tente après
     // 30min (avant : bloqué pour toute la session, donc le user qui ouvre
     // la page avec data 10h stale reste bloqué si la 1ère tentative a
@@ -15120,7 +14727,6 @@
       if (!isFinite(ageMin) || ageMin > 30) {
         try {
           sessionStorage.setItem('autoRefreshDoneAt', String(Date.now()));
-          // Sprint 131 (v31.7.193) — console.log retiré (residual debug)
           (async () => {
             try {
               if ('serviceWorker' in navigator) {
@@ -15137,7 +14743,6 @@
         } catch(e) {}
       }
     }
-    // v29 — Kickoff guard : exclude matches whose start time has passed even
     // if the data source hasn't flipped them to "live"/"completed" yet.
     // Avoids recommending picks on games already in progress.
     const _nowMs = Date.now();
@@ -15146,7 +14751,6 @@
       const t = new Date(m.date).getTime();
       return isFinite(t) ? t > _nowMs : true;
     };
-    // v30 — Sports en perte sur backtest_v2 : exclure des top picks pour éviter
     // la contradiction avec le bandeau "Sports en perte · skip recommandé".
     // Mêmes seuils que le bandeau (n>=3, ROI<-10%) + opt-out via Profil.
     const _losingSports = (() => {
@@ -15160,7 +14764,6 @@
         .filter(([s, d]) => d && d.n >= 3 && d.flat_roi_pct < -10)
         .map(([s]) => s));
     })();
-    // BUG FIX 2026-05-01 (Théo strategic insight) — Filtre EV>=+2%.
     // Théo a observé qu'une cote @1.10 confiance 87% est plus risquée
     // qu'une cote @2.00 conf 60% car le gain est minime. Math :
     //   cote 1.10, conf 87% → EV = 0.87×1.10-1 = -4.3% (PERDANT long-terme)
@@ -15185,7 +14788,6 @@
       })
       .slice(0, 3)
       .map(x => {
-        // v30 — Aligner odd/rel sur best (1n2 Winamax / OU / BTTS) pour que la
         // card affiche un trio cohérent : Cote, Conf et Edge calculés sur le
         // MÊME pari. Sinon edge=best mais odd=pred.odds (ESPN 1n2) → tooltip
         // "Edge = rel − 1/odd" devient mensonger.
@@ -15207,7 +14809,6 @@
         return { ...xx, stake, gain, ev, investment, homeName: home?.name || '?', awayName: away?.name || '?', homeLogo: home?.logo || '', awayLogo: away?.logo || '' };
       });
 
-    // Sprint 85 (v31.7.172 — audit Part 4) — Structure 3+3+2 sur dashboard.
     // Best edge = topPicks (déjà calculé). Manquent :
     //   * Prudents : confiance ≥70% (locks) + cote modérée (1.40-1.85) + edge ≥2%
     //   * Agressifs : edge ≥8% + cote élevée (≥2.50) — high risk / high reward
@@ -15303,10 +14904,8 @@
         return b.edge - a.edge;
       });
 
-    // v29 — Hero hook : show today's headline pick as the featured banner.
     // First-choice : best-edge topPick. Fallback : highest-confidence upcoming
     // pick so the banner is never empty when there IS something to play.
-    // BUG FIX 2026-05-01 — Le fallback respecte maintenant _losingSports :
     // sans ce filtre, un sport en grosse perte (ex baseball ROI -36%) était
     // exclu de topPicks mais ressurgissait en heroPick → contradiction
     // visible : "TOP PICK DU JOUR Cubs @1.60 conf 68%" + "Aucun pari edge
@@ -15324,7 +14923,6 @@
           return b.rel - a.rel;
         })[0];
       if (fallback) {
-        // v30 — promouvoir best comme dans topPicks pour cohérence d'affichage
         const ff = fallback.best ? { ...fallback, odd: fallback.best.odd, rel: fallback.best.rel, edge: fallback.best.edge } : fallback;
         const { home, away } = (typeof getSides === 'function') ? getSides(ff.m) : { home: {}, away: {} };
         const investment = ff.investment || investmentScore(ff.rel, ff.odd, (() => {
@@ -15335,12 +14933,10 @@
       }
     }
     const bestLeague = heroPick ? (heroPick.m.league_name || '') : '';
-    // AUDIT-2026-04-27 (Sprint 18 #30) — Smart suggestion selon l'heure.
     // Petit nudge contextuel en haut du dashboard. Ne s'affiche pas si
     // l'user a déjà cliqué dessus aujourd'hui (localStorage).
     const _hourSuggestion = (() => {
       try {
-        // AUDIT-2026-04-27 (Sprint 25 #2 + Sprint 41 #5) — Dismiss UTC
         // 18h glissantes + protection clock skew. Si l'horloge système
         // est décalée >24h dans le futur (suspect), on ignore le dismiss
         // pour éviter qu'un user soit bloqué pour toujours.
@@ -15370,7 +14966,6 @@
           icon = '📊'; text = 'Bilan de la journée : voir comment le modèle s\'en est sorti.';
           page = 'bilan'; cta = 'Voir bilan';
         }
-        // AUDIT-2026-04-27 (Sprint 24 #26) — flex-wrap pour mobile
         // étroit. Sans wrap, le button CTA peut overflow le banner
         // sur viewport <360px et casser la mise en page.
         return `<div id="smart-suggest-banner" style="margin:0 0 16px;padding:10px 16px;background:linear-gradient(90deg, rgba(167,139,250,.10), rgba(52,211,153,.05));border:1px solid rgba(167,139,250,.20);border-left:3px solid var(--brand);border-radius:0 var(--r-sm) var(--r-sm) 0;display:flex;align-items:center;gap:12px;font-size:13.5px;color:var(--text-2);flex-wrap:wrap;">
@@ -15382,7 +14977,6 @@
       } catch (e) { return ''; }
     })();
 
-    // Sprint 118 (v31.7.191) — Mini-bilan user perso : si l'utilisateur a
     // ≥3 paris settled (won/lost), affiche un bandeau ROI personnel sur le
     // dashboard. Settle automatique aussi pour tenir à jour les pnl.
     const _userBetsBilan = (() => {
@@ -15429,7 +15023,6 @@
       } catch(e) { return ''; }
     })();
 
-    // Sprint 106 (v31.7.190) — "Ce que tu dois faire MAINTENANT" :
     // hero d'action prioritaire qui résume en un coup d'œil la décision principale.
     // Précède le smart-suggestion + le heroPick existant. Affiche : top pick avec
     // mise calculée pour la bankroll user, total stake suggéré (cumul Kelly), avert
@@ -15477,7 +15070,6 @@
           <span style="font-size:11px;font-weight:800;color:var(--brand);text-transform:uppercase;letter-spacing:.08em;">🎯 Ce que tu dois faire maintenant</span>
           <span style="font-size:10.5px;color:var(--text-dim2);background:var(--panel);padding:2px 8px;border-radius:10px;">Bankroll ${userBankroll.toFixed(0)}€</span>
           ${(() => {
-            // Sprint 123 (v31.7.191) — Data freshness chip. Vert <30min, jaune 30-120min, rouge ≥120min.
             // Permet à l'utilisateur de savoir d'un coup d'œil que les cotes/picks sont à jour.
             const ageMin = _dataAgeMin;
             const color = ageMin < 30 ? 'var(--accent)' : ageMin < 120 ? 'var(--warn)' : 'var(--danger)';
@@ -15488,9 +15080,7 @@
             </span>`;
           })()}
           ${(() => {
-            // Sprint 113 (v31.7.190) — Risk gauge mini : barre horizontale qui montre
             // % de la limite quotidienne consommée. Vert <80%, orange 80-100%, rouge >100%.
-            // v31.7.204 FIX label : "Limite jour" au lieu de "Risque" pour éviter la
             // confusion avec le riskLabel "Risque X% bankroll" en sous-titre.
             const rl = (typeof _loadRiskLimits === 'function') ? _loadRiskLimits() : { maxStakePctDay: 0.25 };
             const limit = rl.maxStakePctDay || 0.25;
@@ -15538,7 +15128,6 @@
                 return sb ? `<div style="margin-top:5px;">${sb}</div>` : '';
               })()}
               ${(() => {
-                // Sprint 130 (v31.7.191) — Countdown timer live jusqu'au coup d'envoi.
                 // Affiche "dans 2h32" / "dans 38min" / "dans 5min ⏰" pour matchs imminents.
                 const ts = top.m && top.m.date ? new Date(top.m.date).getTime() : 0;
                 if (!ts) return '';
@@ -15569,7 +15158,6 @@
             </div>
           </div>
           ${(() => {
-            // Sprint 118 (v31.7.191) — Bouton "J'ai parié" → enregistre dans userBets localStorage.
             // Permet de tracker son ROI réel vs le modèle. Si déjà parié sur ce match, badge ✓.
             try {
               const matchId = String(top.m && top.m.id || '');
@@ -15585,7 +15173,6 @@
           })()}
         </div>` : ''}
         ${!isEmpty && top && top.m ? (() => {
-          // v32.0 (Phase 2) — CTA Winamax direct sur le top pick action-focus.
           // Bouton orange en TÊTE des CTAs pour rendre l'action principale
           // (parier) visible au premier coup d'œil.
           const _wxUrl = (top.m.winamax && top.m.winamax.url) ? top.m.winamax.url : 'https://www.winamax.fr/paris-sportifs';
@@ -15600,14 +15187,12 @@
           <button type="button" class="page-btn" data-page="${isEmpty ? 'calendrier' : 'top'}" style="flex:1;min-width:140px;padding:10px 14px;background:var(--panel);color:var(--text);border:1px solid var(--border-2);border-radius:var(--r-sm);cursor:pointer;font-size:13px;font-weight:600;">${isEmpty ? '📅 Calendrier 7j' : '⭐ Top du jour'}</button>
           <button type="button" class="page-btn" data-page="valeur" style="padding:10px 14px;background:transparent;color:var(--text-dim);border:1px solid var(--border);border-radius:var(--r-sm);cursor:pointer;font-size:13px;font-weight:600;">💎 Marché se trompe</button>
         </div>
-        <!-- Sprint 129 (v31.7.191) — Lien discret 'Comment lire un prono' pour newcomers -->
         <div style="margin-top:10px;text-align:center;">
           <button type="button" class="action-focus-howto" style="background:transparent;border:none;color:var(--text-dim2);font-size:11px;text-decoration:underline;cursor:pointer;padding:4px;">📖 Comment lire un prono ?</button>
         </div>
       </section>`;
     })();
 
-    // v34.35 — Cockpit d'accueil : le dashboard devient un poste de décision,
     // pas une pile de sections. Il reprend les signaux déjà calculés ci-dessus
     // et donne en un écran : quoi faire, combien miser, quoi surveiller.
     const _dashboardCockpit = (() => {
@@ -16406,7 +15991,6 @@
 
         ${_hourSuggestion}
 
-        <!-- v30 — Daily P&L chip retiré : Théo n'enregistre pas ses paris. -->
 
         ${false ? (topPicks.length ? '' : ((heroPick && topPicks.length === 0) ? (() => {
           const _reasons = heroPick.pred?.explain?.reasons || [];
@@ -16536,7 +16120,6 @@
             </div>
           </details>` ;
         })() : (() => {
-          // v33.25 — Empty state contextualisé : compte les matchs upcoming
           // vs en cours pour distinguer "journée vide" vs "journée trop avancée"
           // (cas Théo screen 4 : 0 à venir mais 8 en cours → orienter sur demain).
           const _allTodayE = (data?.days?.[todayISO()] || []);
@@ -16574,7 +16157,6 @@
         })())) : ''}
 
         ${(() => {
-          // v31.7.35 → v31.7.75 : Stats hero strip enrichi à 5 KPIs cliquables
           // (locks · pronos · combinés · buteurs · live/matchs). Plus pertinent
           // que le précédent "matchs jour" qui doublonnait avec la page Tous.
           // Le compteur Combinés est maintenant calé sur la même heuristique
@@ -16644,17 +16226,14 @@
           </nav>`;
         })()}
 
-        <!-- v31.7 — Streak banner + ROI alerts retirées (page Aujourd'hui
              surchargée selon retour user). La streak du modèle reste visible
              dans Bilan / Crédibilité ; les sports en perte sont visibles
              dans Crédibilité aussi. Le dashboard se recentre sur ce qui est
              actionable maintenant : top picks + 5 derniers + warning data. -->
 
-        <!-- v30 — "Activité récente" retirée (dépendait des paris trackés
              que l'user n'enregistre pas). Le focus du dashboard est sur les
              pronos du modèle, pas sur le bilan personnel. -->
         ${(() => {
-          // v30 — "5 derniers picks du modèle" remplace l'activité perso :
           // on liste les 5 dernières évaluations de l'agent (won/lost) avec
           // le résultat, l'edge et le P&L flat 1u — pour que l'user voie ce
           // que le modèle aurait fait sans rien tracker.
@@ -16696,8 +16275,6 @@
             </div>`;
         })()}
 
-        <!-- v28.7 — Warning data obsolète : PRIORITAIRE sur tout le reste -->
-        <!-- v31.7.53 — Migration inline → .info-banner--danger (chantier 8 V1) -->
         ${_dataIsStale ? `
         <div class="info-banner info-banner--danger" style="padding:24px;margin:24px 0;">
           <div class="info-banner__title text-danger">⚠ Recommandations en pause</div>
@@ -16706,7 +16283,6 @@
           <a href="#" data-agent-force-refresh style="display:inline-block;margin-top:10px;background:#fca5a5;color:#1a0a0a;padding:8px 16px;border-radius:6px;font-weight:700;font-size:13px;text-decoration:none;cursor:pointer;">🔄 Forcer le refresh maintenant</a>
         </div>` : ''}
 
-        <!-- Sprint 99 (v31.7.184) — Quick presets actions rapides 1-click -->
         ${!_dataIsStale ? `
         <div style="margin:14px 0 0;display:flex;flex-wrap:wrap;gap:6px;">
           <button class="page-btn" data-page="valeur" style="padding:7px 12px;background:var(--brand);color:#08080a;border:none;border-radius:999px;font-weight:700;font-size:12px;cursor:pointer;">💎 Top edges 7j</button>
@@ -16718,7 +16294,6 @@
           <button class="page-btn" data-page="performance" style="padding:7px 12px;background:transparent;color:var(--text-dim);border:1px solid var(--border-2);border-radius:999px;font-weight:600;font-size:12px;cursor:pointer;margin-left:auto;">📊 Performance</button>
         </div>` : ''}
 
-        <!-- Sprint 97 (v31.7.182) — Anti-tilt protection bandeau streaks -->
         ${!_dataIsStale ? (() => {
           const sk = (typeof detectStreaks === 'function') ? detectStreaks() : { alert: null };
           if (!sk.alert) return '';
@@ -16734,7 +16309,6 @@
           </div>` ;
         })() : ''}
 
-        <!-- Sprint 78 (v31.7.165 — audit ChatGPT P0) — Compteurs ingérés / exacts / fallback -->
         ${!_dataIsStale && todayAllWinamax.length ? (() => {
           const total = todayAllWinamax.length;
           const exact = todayAllWinamax.filter(m => m.winamax && m.winamax.match_id && m.winamax.markets && m.winamax.markets['1n2']).length;
@@ -16752,9 +16326,7 @@
           </div>` ;
         })() : ''}
 
-        <!-- v28.6 — "À PARIER AUJOURD'HUI" : reco perso pour Théo avec sa bankroll -->
         ${topPicks.length ? (() => {
-          // Sprint 87 (v31.7.174 — audit Part 9) — Alerte risque agrégé
           // sur l'ensemble des picks affichés (top + prudents + agressifs).
           const allShown = [
             ...topPicks.map(p => ({ stake: p.stake, label: `${p.homeName} vs ${p.awayName}`, match: p.m, pred: p.pred })),
@@ -16793,7 +16365,6 @@
               const url = (p.m.winamax && p.m.winamax.url) ? p.m.winamax.url : 'https://www.winamax.fr/paris-sportifs';
               const allReasons = (p.pred && p.pred.explain && p.pred.explain.reasons) || [];
               const cardId = `dpc-${esc(String(p.m.id))}`;
-              // v30 — Match countdown : "dans X min" / "dans 2h" / "dans 1j 4h"
               const _countdownLabel = (() => {
                 const ko = new Date(p.m.date).getTime();
                 if (!isFinite(ko)) return '';
@@ -16813,7 +16384,6 @@
                 const ms = (new Date(p.m.date).getTime()) - Date.now();
                 return ms < 60 * 60000 && ms > -60000;   // <60min away
               };
-              // v30 — `imminent` (<30min) déclenche le pulse animation
               const _isImminent = (() => {
                 const ms = (new Date(p.m.date).getTime()) - Date.now();
                 return ms < 30 * 60000 && ms > -60000;
@@ -16838,7 +16408,6 @@
                 </div>
                 <div style="font-size:16px;color:var(--brand);font-weight:700;margin:10px 0 4px;">→ ${esc(pickLabel)}</div>
                 ${(() => {
-                  // v30 — Voix du modèle : 1 phrase courte, prend la 1ère reason
                   // non-marché (le modèle parle, pas le bookmaker).
                   const voice = (allReasons.find(r => r && r.type !== 'market') || {}).text;
                   return voice ? `<div style="margin:6px 0 8px;padding:6px 10px;background:rgba(167,139,250,.08);border-left:2px solid var(--brand);border-radius:0 4px 4px 0;font-size:11.5px;color:var(--text-dim);line-height:1.4;"><span style="color:var(--brand);font-weight:700;">🤖</span> ${esc(voice)}</div>` : '';
@@ -16871,7 +16440,6 @@
                   <div><span style="color:var(--text-dim);border-bottom:1px dotted var(--text-dim);cursor:help;" title="Confiance du modèle : probabilité estimée que ce pari gagne. ≥70 % = très fiable.">Conf</span> <strong class="u-text">${Math.round(p.rel*100)}%</strong></div>
                   <div><span style="color:var(--text-dim);border-bottom:1px dotted var(--text-dim);cursor:help;" title="Edge = notre probabilité − probabilité implicite de la cote. > 0 = on est plus optimiste que le bookmaker (=valeur).">Edge</span> <strong style="color:${edgeColor};">+${Math.round(p.edge*100)}pt</strong></div>
                 </div>
-                <!-- v32.0 (Phase 2) — CTA Winamax explicit. La variable url
                      existait mais n'était pas utilisée. Maintenant un bouton
                      direct ouvre la page match Winamax (deeplink si présent,
                      sinon homepage paris-sportifs). target=_blank pour ne pas
@@ -16899,7 +16467,6 @@
           </div>
         </div>`;
         })() : (_dataIsStale ? '' : `
-        <!-- v30 — Empty state actionnable quand 0 prono passe les filtres prudents -->
         <div style="padding:36px 0 24px;border-bottom:1px solid var(--border);">
           <div style="margin-bottom:14px;">
             <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:4px;">Pour toi · À parier sur Winamax</div>
@@ -16908,7 +16475,6 @@
           <div style="padding:18px 20px;background:rgba(148,163,184,.06);border:1px dashed var(--border-2);border-radius:12px;">
             <div style="font-size:13px;color:var(--text);line-height:1.55;">Le modèle exige <b>edge ≥ 5 %</b> et <b>confiance ≥ 55 %</b> pour recommander un pari. ${todayStats.total ? `Aujourd'hui <b>${todayStats.total} match${todayStats.total>1?'s ont été analysés':' a été analysé'}</b> mais aucun ne passe ces seuils — c'est <b>normal</b> certains jours, et c'est ce qui protège ta cagnotte.` : `Aucun match disponible aujourd'hui — les pronos repartiront automatiquement dès que des matchs entrent dans la fenêtre Winamax.`}</div>
             ${todayStats.total ? `
-            <!-- Sprint 77 (v31.7.164) — Diagnostic "No bet today" : breakdown des raisons de rejet. -->
             <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;font-size:12px;">
               ${todayStats.skip > 0 ? `<span style="padding:4px 10px;background:rgba(148,163,184,.10);border:1px solid rgba(148,163,184,.25);border-radius:999px;color:var(--text-dim);"><b>${todayStats.skip}</b> rejeté${todayStats.skip>1?'s':''} par règle (cote close, ranks proches, ...)</span>` : ''}
               ${todayStats.lowConf > 0 ? `<span style="padding:4px 10px;background:rgba(199,155,0,.10);border:1px solid rgba(199,155,0,.25);border-radius:999px;color:var(--warn);"><b>${todayStats.lowConf}</b> sous le seuil de confiance (&lt; 55%)</span>` : ''}
@@ -17040,7 +16606,6 @@
           </div>
         </section>` : ''}
 
-        <!-- Sprint 85 (v31.7.172 — audit Part 4) — Sections Prudents / Agressifs / Autres -->
         ${(prudentPicksEnriched.length || aggressivePicksEnriched.length) ? `
         <div style="padding:24px 0;border-top:1px solid var(--border);">
           <div style="margin-bottom:14px;">
@@ -17130,7 +16695,6 @@
           </details>` : ''}
         </div>` : ''}
 
-        <!-- Sprint 47 (v31.7.136) — Prochains gros matchs (importance + statut) -->
         <!-- Bug-hunt 2026-05-02 (screen Théo) : avant la section affichait
              TOUS les gros matchs (avec et sans prono), créant un doublon avec
              "Grands matchs sans pick" qui montrait les mêmes en bas. Maintenant :
@@ -17211,7 +16775,6 @@
           </div>
         </div>` : ''; })()}
 
-        <!-- Sprint 78 (v31.7.165 — audit P0) — Grands matchs SANS pick fort -->
         ${orphanBigMatches.length ? `
         <div style="padding:24px 0;border-top:1px solid var(--border);">
           <div style="margin-bottom:14px;">
@@ -17299,7 +16862,6 @@
           </div>
         </div>` : ''}
 
-        <!-- v28.2 — Section COMBINÉS inline (titre plus visible) -->
         ${combinesPicks.length ? `
         <div style="padding:28px 0;border-top:1px solid var(--border);">
           <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;margin-bottom:14px;">
@@ -17343,7 +16905,6 @@
           </div>
         </div>` : ''}
 
-        <!-- v28.2 — Section BUTEURS foot inline -->
         ${buteursFoot.length ? `
         <div style="padding:28px 0;border-top:1px solid var(--border);">
           <div style="margin-bottom:14px;">
@@ -17395,14 +16956,12 @@
           </div>
         </div>` : ''}
 
-        <!-- v28.2 — Section TOUS LES MATCHS WINAMAX du jour inline -->
         ${allTodayRaw.length ? `
         <div id="agent-all-matches" style="padding:28px 0;border-top:1px solid var(--border);">
           <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
             <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;">Tous les matchs Winamax du jour · ${allTodayMatches.length}${allTodayMatches.length !== allTodayRaw.length ? ` <span style="color:var(--text-dim);opacity:.6;">sur ${allTodayRaw.length}</span>` : ''}</div>
             ${(fSport || fConf > 0 || fEdge > -100) ? `<button data-agent-filter-reset style="background:transparent;border:1px solid var(--border);color:var(--text-dim);padding:3px 10px;border-radius:5px;font-size:11px;cursor:pointer;">× reset filtres</button>` : ''}
           </div>
-          <!-- v28.3 filter bar -->
           <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;font-size:11px;">
             <select data-agent-filter="sport" aria-label="Filtrer par sport" style="background:var(--panel);border:1px solid var(--border);color:var(--text);padding:4px 8px;border-radius:5px;font-size:11px;">
               <option value="" ${!fSport?'selected':''}>Tous sports</option>
@@ -17423,7 +16982,6 @@
               <option value="15" ${fEdge===15?'selected':''}>≥ 15pt</option>
             </select>
           </div>
-          <!-- v28.3 column headers (sortable) -->
           <div style="display:grid;grid-template-columns:20px 24px 1fr 110px 60px 70px 50px;gap:8px;padding:4px 10px;font-size:10px;letter-spacing:.8px;text-transform:uppercase;color:var(--text-dim);font-weight:700;">
             <div></div><div></div><div>Match</div><div>Pick</div>
             <div data-agent-sort="rel" style="cursor:pointer;${fSortBy==='rel'?'color:var(--brand);':''}">Conf${fSortBy==='rel'?(fSortDir>0?' ▾':' ▴'):''}</div>
@@ -17531,7 +17089,6 @@
           </div>
         </div>` : ''}
 
-        <!-- v28.2 — Accordion Bilan INLINE (pas de nav, affiche une mini-synthese) -->
         <div style="padding:8px 0 32px;border-top:1px solid var(--border);margin-top:20px;">
           <div class="agent-accordion" data-toggle-bilan style="display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-bottom:1px solid var(--border);cursor:pointer;">
             <div>
@@ -17541,7 +17098,6 @@
             <div style="color:var(--text-dim);font-size:18px;font-weight:300;" data-bilan-chevron>▾</div>
           </div>
           <div id="agent-bilan-inline" style="display:none;padding:16px 0;"></div>
-          <!-- v28.4 — Export CSV cagnotte historique -->
           <div class="agent-accordion" data-agent-export-csv style="display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-top:1px solid var(--border);cursor:pointer;">
             <div>
               <div style="font-size:13px;font-weight:600;color:var(--text);">Exporter l'historique ${agent.series.length?`· ${agent.series.length} paris`:''}</div>
@@ -17560,7 +17116,6 @@
       </div>
 
       ${(() => {
-        // v29 — Desktop sidebar widgets (hidden <1280px via CSS media query).
         // Purpose : surface live + upcoming picks + cagnotte on wide screens so
         // the dashboard feels less mobile on desktop.
         if (_dataIsStale) return '';
@@ -17574,7 +17129,6 @@
           if (typeof _isMatchEffectivelyDone === 'function' && _isMatchEffectivelyDone(m)) return false;
           return true;
         }).slice(0, 2);
-        // v31.7 — Avant : on prenait les 3 PROCHAINS coups d'envoi quels qu'ils
         // soient (incluant des picks low-conf risqués). Le user trouvait ça
         // confusant — il pensait que c'etait des recommandations alors que
         // c'etait juste des matchs à venir. Maintenant : on filtre sur
@@ -17597,7 +17151,6 @@
           const { home, away } = (typeof getSides === 'function') ? getSides(m) : { home: {}, away: {} };
           const hs = home?.score ?? '-', as = away?.score ?? '-';
           const league = (m.league_name || '').slice(0, 24);
-          // v30 — Cards live cliquables pour ouvrir la modale match
           // tabindex+role+aria-label pour accessibilité clavier
           return `<div class="aside-live-row" data-match-id="${esc(String(m.id||''))}" role="button" tabindex="0" aria-label="Match en direct ${esc(home?.name||'?')} vs ${esc(away?.name||'?')}" style="padding:8px 10px;background:rgba(248,113,113,.06);border-left:2px solid var(--danger);border-radius:0 6px 6px 0;margin-bottom:6px;cursor:pointer;transition:background .15s;" onmouseover="this.style.background='rgba(248,113,113,.12)';" onmouseout="this.style.background='rgba(248,113,113,.06)';">
             <div style="font-size:10px;color:var(--danger);font-weight:700;letter-spacing:.3px;">🔴 LIVE · ${esc(league)}</div>
@@ -17608,7 +17161,6 @@
         const upcomingHtml = upcoming.length ? upcoming.map(x => {
           const { home, away } = (typeof getSides === 'function') ? getSides(x.m) : { home: {}, away: {} };
           const pick = (x.best && x.best.label) || x.pred.pick.label || 'Pick';
-          // v30 — Cards upcoming cliquables pour ouvrir la modale match
           return `<div class="aside-upcoming-row" data-match-id="${esc(String(x.m.id||''))}" role="button" tabindex="0" aria-label="Pronostic à venir ${esc(home?.name||'?')} vs ${esc(away?.name||'?')}" style="padding:8px 10px;background:rgba(167,139,250,.04);border-left:2px solid var(--brand);border-radius:0 6px 6px 0;margin-bottom:6px;cursor:pointer;transition:background .15s;" onmouseover="this.style.background='rgba(167,139,250,.10)';" onmouseout="this.style.background='rgba(167,139,250,.04)';">
             <div style="display:flex;justify-content:space-between;align-items:baseline;gap:6px;">
               <div style="font-size:10px;color:var(--brand);font-weight:700;">${esc(fmtTime(x.m.date))} · ${esc(fmtCountdown(x.m))}</div>
@@ -17639,7 +17191,6 @@
       })()}
 
       ${_dataIsStale ? '' : `
-      <!-- v30 — Sprint 2 : Mobile cagnotte pill (shown <1280px where aside is hidden) -->
       <button type="button" class="dash-cag-pill" id="dash-cag-pill" data-scroll-to-cag aria-label="Aller à la cagnotte du modèle">
         <span class="dcp-icon">💰</span>
         <span class="dcp-bal">${nav.toFixed(2)}€</span>
@@ -17647,7 +17198,6 @@
       </button>`}
 
       ${_dataIsStale ? '' : (() => {
-        // v31.7.32 — CTA fidélisation. Routine quotidienne : pronostics
         // mis à jour 5min/30min selon l'heure. On indique la prochaine MAJ
         // + lien RSS + lien install PWA. Petit, discret, pas intrusif.
         const tomorrow = new Date();
@@ -17672,14 +17222,12 @@
       })()}
     `;
 
-    // v30 — Sprint 2 : Pill click scrolls to cagnotte header panel
     const cagPill = wrap.querySelector('#dash-cag-pill');
     if (cagPill) cagPill.addEventListener('click', () => {
       const target = wrap.querySelector('[data-agent-reset]') || wrap.querySelector('#agent-bilan-inline');
       if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
 
-    // v31.7.44 — Mask cagnotte pill quand le footer est visible (audit
     // 2026-04-27). Avant : la pill chevauchait "Pronos mis à jour..." en
     // bas. Maintenant : fade out 80px avant l'arrivée du footer.
     if (cagPill && 'IntersectionObserver' in window) {
@@ -17697,7 +17245,6 @@
       }
     }
 
-    // v30 — Sprint 3 : toggle analyse complète + ajusteur de mise inline
     wrap.querySelectorAll('.dpc-toggle').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -17713,7 +17260,6 @@
         expand.style.display = isOpen ? 'none' : 'block';
         btn.setAttribute('aria-expanded', String(!isOpen));
         if (chev) chev.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
-        // v30 — Lazy-render sparkline odds movement quand on déplie pour la
         // 1ère fois (économise du DOM si l'utilisateur n'expand jamais).
         const expandEl = document.getElementById(`${btn.dataset.card}-expand`);
         if (!isOpen && expandEl && !expandEl.dataset.sparkRendered) {
@@ -17750,7 +17296,6 @@
       const stake = Math.max(0.10, rawStake);
       const odd = rawOdd;
       const gain = stake * (odd - 1);
-      // v30 — Format cohérent avec le render initial : centimes si <1€,
       // arrondi sinon. Évite "+0.03€" en update et "+0€" en init pour le
       // même pari, et "+1.06€" en update vs "+1€" en init.
       const fmtMon = (n) => n < 1 ? `${n.toFixed(2)}€` : `${Math.round(n)}€`;
@@ -17770,7 +17315,6 @@
         _dpcRecalc(cardId);
       });
     });
-    // v30 — Presets de mise rapides (1€, 2€, 5€, 10€, ⚡ Kelly)
     wrap.querySelectorAll('.dpc-stake-preset').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -17805,7 +17349,6 @@
         if (btn) btn.click();
       });
     });
-    // v28.2 — scroll-to inline (remplace nav-to pour rester sur la page)
     wrap.querySelectorAll('[data-scroll-to]').forEach(el => {
       el.addEventListener('click', () => {
         const target = el.dataset.scrollTo === 'allmatches' ? '#agent-all-matches' : null;
@@ -17814,7 +17357,6 @@
         if (anchor) anchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
     });
-    // v28.3 — filtres + tri tableau tous matchs
     const _saveFilter = (patch) => {
       let f = {}; try { f = JSON.parse(localStorage.getItem('agentFilter') || '{}') || {}; } catch(e){}
       Object.assign(f, patch);
@@ -17846,7 +17388,6 @@
       try { localStorage.removeItem('agentFilter'); } catch(e){}
       renderDashboardPage(wrap);
     });
-    // v28.6 — User bankroll input : recompute mises suggérées à chaque change
     const bankrollInput = wrap.querySelector('#user-bankroll-input');
     if (bankrollInput) {
       bankrollInput.addEventListener('change', () => {
@@ -17866,7 +17407,6 @@
         if (found && typeof openDetail === 'function') openDetail(found);
       });
     });
-    // v30 — Aside live + upcoming cards cliquables → ouvre modale match
     // (handler unifié click + Enter/Space pour accessibilité clavier)
     const _asideRowOpen = (row) => {
       const id = row.dataset.matchId;
@@ -17884,7 +17424,6 @@
         }
       });
     });
-    // v30 — Hero pick + top opportunity cards cliquables → ouvre modale.
     // Guarde sur les controls internes (button, a, input) pour ne pas
     // intercepter les clics sur "Parier sur Winamax", l'ajusteur de mise,
     // les presets stake, le toggle "Voir l'analyse complète", etc.
@@ -17896,7 +17435,6 @@
     const _isInteractiveTarget = (el) => {
       if (!el) return false;
       // Walk up to the card root and stop if we hit a form-ish element first.
-      // BUG FIX 2026-05-01 — Ajout `.interactive, .ed-hero, .action-focus-top`
       // au stop-set pour que la fonction termine correctement quand le clic
       // arrive sur ces cards (avant la fonction parcourait tout vers le top
       // jusqu'à ne pas trouver un .dash-pick-card et retournait false bizarrement).
@@ -17912,11 +17450,9 @@
       const m = _matchById(id);
       if (m && typeof openDetail === 'function') openDetail(m);
     };
-    // v31.3 — .ed-hero ajouté au selector. C'est le nouveau hero éditorial
     // qui remplace .dash-hero-pick depuis l'audit UX dashboard. Même handler
     // (open match modal au click), mais nouveau markup. Ancien sélecteur
     // gardé en safety pour les caches transitoires.
-    // v31.7.42 — A11y fix nested-interactive : .ed-hero n'est plus role=button.
     // Au lieu, .ed-hero__primary (bouton CTA) ouvre le détail au click (clavier OK).
     // Le click sur le reste de .ed-hero reste fonctionnel (cliquabilité globale).
     wrap.querySelectorAll('.ed-hero__primary[data-match-id]').forEach(btn => {
@@ -17929,7 +17465,6 @@
         if (m && typeof openDetail === 'function') openDetail(m);
       });
     });
-    // Sprint 106 (v31.7.190) — .action-focus-top ajouté au selector pour ouvrir
     // le détail au click sur la card du top pick dans le hero "Ce que tu dois
     // faire MAINTENANT" (au-dessus de _hourSuggestion).
     wrap.querySelectorAll('.ed-hero[data-match-id], .dash-hero-pick, .dash-pick-card, .action-focus-top[data-match-id]').forEach(card => {
@@ -17944,7 +17479,6 @@
         }
       });
     });
-    // BUG FIX 2026-05-01 (Théo) — "Sur la page Now quand je clique sur les
     // pronos sa marche pas, sa m'affiche pas la feuille de match".
     // Cause : les cards .interactive[data-match-id] dans les sections
     // "Prudents", "Gros coups du jour", "Autres opportunités" et
@@ -17964,7 +17498,6 @@
         }
       });
     });
-    // Sprint 129 (v31.7.191) — Click handler "Comment lire un prono" → modal tutorial
     wrap.querySelectorAll('.action-focus-howto').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -17974,7 +17507,6 @@
         }
       });
     });
-    // Sprint 130 (v31.7.191) — Live countdown updates pour la card top pick.
     // Update toutes les 60s (pas plus, pour pas saturer le main thread).
     // Cleanup automatique : si la card disparaît du DOM (re-render), l'interval
     // continue à tourner mais le querySelectorAll reviendra vide → noop.
@@ -18015,7 +17547,6 @@
         }
       };
       const intervalId = setInterval(() => {
-        // Sprint 131 (v31.7.193) — Auto-cleanup si la card n'existe plus dans le DOM,
         // OU si plus de 12h écoulées (safety belt contre les leaks).
         if (!document.body.contains(_countdownEl) || (Date.now() - intervalStartTs) > 12 * 3600 * 1000) {
           clearInterval(intervalId);
@@ -18054,7 +17585,6 @@
           }
           if (typeof window._addUserBet === 'function') {
             const betId = window._addUserBet(matchId, market, pickKey, pickLabel, odd, stake);
-            // Sprint 125 (v31.7.191) — Toast actionnable avec Annuler.
             // Donne 6s à l'user pour annuler avant que le pari soit définitivement
             // tracké. Useful si click accidentel sur petit écran mobile.
             if (typeof toast === 'function') {
@@ -18082,7 +17612,6 @@
     });
     const reset = wrap.querySelector('[data-agent-reset]');
     if (reset) reset.addEventListener('click', async () => {
-      // v28.10 — Si un reset récent (<10 min) existe, c'est un clic d'annulation
       const prevReset = parseInt(localStorage.getItem('agentResetTs') || '0', 10);
       const _confirmFn = (opts) => (typeof window._showConfirm === 'function')
         ? window._showConfirm(opts)
@@ -18111,8 +17640,6 @@
       try { localStorage.setItem('agentResetTs', String(Date.now())); } catch(e){}
       renderDashboardPage(wrap);
     });
-    // v28.2 — Bilan inline accordion : render renderBilanPage dans le div caché
-    // v28.4 — Préserve la position de scroll et scroll doux vers le toggle après render
     const bilanToggle = wrap.querySelector('[data-toggle-bilan]');
     const bilanBox = wrap.querySelector('#agent-bilan-inline');
     const bilanChev = wrap.querySelector('[data-bilan-chevron]');
@@ -18138,7 +17665,6 @@
         }
       });
     }
-    // v28.4 — Export CSV cagnotte historique
     const exportBtn = wrap.querySelector('[data-agent-export-csv]');
     if (exportBtn) exportBtn.addEventListener('click', () => {
       try {
@@ -18161,7 +17687,6 @@
         setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
       } catch(e) { console.warn('CSV export failed:', e); alert('Erreur export CSV'); }
     });
-    // v27.2 — Auto-tuning : Activer une règle proposée
     wrap.querySelectorAll('[data-rule-activate]').forEach(btn => btn.addEventListener('click', () => {
       const id = btn.dataset.ruleActivate;
       const prop = proposedRules.find(r => r.id === id);
@@ -18225,7 +17750,6 @@
       });
     } catch (e) {}
 
-    // v30 — Tilt guard retiré : il s'appuyait sur les paris trackés
     // par l'utilisateur. La série du modèle remplace ce signal.
 
     // Matchs live
@@ -18244,7 +17768,6 @@
       });
     } catch (e) {}
 
-    // v31.7.76 — Imminent locks (kickoff < 30min) - alerte action immédiate
     try {
       const today = ((data && data.days && data.days[todayIso]) || []).filter(m => m.winamax && m.winamax.available === true);
       today.forEach(m => {
@@ -18268,7 +17791,6 @@
       });
     } catch (e) {}
 
-    // v31.7.76 — Edge alerts (≥15pt edge) - opportunités value bet
     try {
       const today = ((data && data.days && data.days[todayIso]) || []).filter(m => m.winamax && m.winamax.available === true);
       today.forEach(m => {
@@ -18293,7 +17815,6 @@
       });
     } catch (e) {}
 
-    // v31.7.76 — Streak modèle : si 3 wins ou 3 losses consécutifs sur les
     // derniers picks réglés du jour, l'utilisateur doit savoir.
     try {
       const settled = [];
@@ -18357,7 +17878,6 @@
         </div>`;
 
     // Update nav badge count
-    // v32.6 — Si 0 alertes, set textContent='' pour que .count:empty (CSS)
     // cache le badge. Avant : badge "0" toujours visible = UX confus.
     const countEl = document.getElementById('count-alertes');
     if (countEl) countEl.textContent = alerts.length === 0 ? '' : String(alerts.length);
@@ -18406,7 +17926,6 @@
   // retrouve sa vue à chaque retour sur la page.
   function renderTousPage(wrap) {
     const data = window.PRONOSTICS_DATA;
-    // v30 — Bug fix : on utilisait `new Date()` directement, donc la nav
     // prev-day/next-day n'avait aucun effet sur Tous. Utiliser currentDate
     // (variable globale IIFE-scopée mise à jour par les boutons ◀ ▶ et
     // l'input date de la topbar) pour respecter le jour navigué.
@@ -18425,7 +17944,6 @@
       ? today.slice()  // tous les matchs
       : today.filter(m => m.winamax && m.winamax.available === true);
 
-    // AUDIT-2026-04-27 — Comptage transparent des matchs terminés non-trackables.
     // Beaucoup de matchs (typiquement qualifs WTA/Challenger tennis) ont
     // winamax.available=true en fallback tournoi, mais aucune cote captée
     // ailleurs (match.odds vide + odds_snapshot null + pas dans odds_history).
@@ -18448,7 +17966,6 @@
         const live = m.status === 'STATUS_IN_PROGRESS';
         const ko = new Date(m.date).getTime();
         const startedAndNotSettled = !settled && isFinite(ko) && ko < Date.now() - 60000;
-        // v32.8 — Si pas de cote captée :
         //   - Match settled (terminé) : on l'INCLUT quand même avec
         //     nonTrackable=true pour que l'user puisse VOIR le résultat
         //     dans le tab Finis. Avant ils étaient juste comptés en
@@ -18473,8 +17990,6 @@
       } catch(e) { return null; }
     }).filter(Boolean);
 
-    // v30 Sprint 4 — load persistent filter + sort state.
-    // AUDIT-2026-04-27 (Sprint 27 #15) — Override par URL hash si présent.
     // Format : `#tous?sport=football&sport=tennis&edge=0.05&conf=0.65`
     // Permet le partage de URL avec filtres préselectionnés.
     const _readUrlFilters = () => {
@@ -18522,7 +18037,6 @@
     const tousSort = _readSort();
     const _saveFilters = () => {
       try { localStorage.setItem('tousFilters', JSON.stringify(tousFilters)); } catch(e) {}
-      // Sprint 27 #15 — Sync filters → URL hash pour partage facile
       try {
         const hash = '#tous';
         const params = new URLSearchParams();
@@ -18537,7 +18051,6 @@
       } catch (e) {}
     };
 
-    // AUDIT-2026-04-27 (Sprint 27 #14) — Saved filter presets.
     // Permet de save l'état des filtres actuels avec un nom et de
     // les recharger plus tard. Persisté en localStorage.
     window._loadSavedFilterPresets = () => {
@@ -18578,7 +18091,6 @@
     // Apply filters
     const passesFilters = (p) => {
       if (tousFilters.sports.length && !tousFilters.sports.includes(p.sport)) return false;
-      // v32.8 — Non-trackable picks (settled, no odds) skip edge/conf filters
       // car edge=0 par défaut et rel sans contexte. Ils restent visibles dans
       // le tab Finis pour transparence sur les matchs joués.
       if (!p.nonTrackable) {
@@ -18587,7 +18099,6 @@
       }
       return true;
     };
-    // v30 — Floor implicite SUR LES PARIS ACTIONNABLES uniquement :
     // edge < -2pt = le marché est nettement plus confiant que nous,
     // donc bad value. On filtre ces picks de "À venir" + "En cours"
     // mais on les GARDE dans "Finis" pour tracker la perf complète
@@ -18605,7 +18116,6 @@
         default:        return a.ts - b.ts;
       }
     };
-    // v30 — "À venir" = pari encore actionnable + edge >= -2pt. Les matchs
     // déjà démarrés (live ou en attente de scraper-update) ne sont plus
     // pariables — on les sort dans "En cours" plutôt que de les noyer dans
     // une liste où la plupart sont déjà commencés.
@@ -18618,7 +18128,6 @@
     const wrPct = settledCount > 0 ? Math.round(100 * totalWon / settledCount) : 0;
     const filtersActive = tousFilters.sports.length > 0 || tousFilters.minEdge > 0 || tousFilters.minConf > 0 || tousSort !== 'kickoff';
 
-    // v30 — Si l'onglet sauvegardé est vide pour le jour courant, on bascule
     // intelligemment vers un onglet rempli (à venir > en cours > finis) pour
     // ne pas montrer un écran "Aucun match" alors que d'autres onglets ont
     // du contenu. Évite la confusion "page vide" quand tabSelected=finished
@@ -18645,7 +18154,6 @@
       const edgeColor = p.edge > 0.10 ? 'var(--accent)' : p.edge > 0.05 ? '#fbbf24' : p.edge < 0 ? 'var(--danger)' : 'var(--text-dim)';
       const pickLabel = p.pred.pick.label || 'Pick';
       const strengthBadge = BetStrengthBadge(p, 'bet-strength-badge--tous');
-      // AUDIT-2026-04-27 (Ticket 2 — suite) — Source de cote dans la liste
       // Tous. Le tooltip "Cote décimale Winamax" ment pour les events
       // tournament-only où la cote vient d'un snapshot DraftKings/etc.
       // Mini-badge inline 1 char (W / E / A / —) pour ne pas surcharger.
@@ -18660,7 +18168,6 @@
           _coteSrc = `<span class="cote-src-mini hist" title="Cote historique (post-match, archive)">A</span>`;
         }
       }
-      // v30 — Score prédit + score réel (foot only).
       // Le top-1 de pred.scores est le score le plus probable selon Poisson;
       // m.competitors[].score est le score réel (string ESPN, parfois "—").
       const isFoot = p.m.sport === 'football';
@@ -18669,7 +18176,6 @@
         : (p.pred.scores && Array.isArray(p.pred.scores.items) && (p.pred.scores.kind === 'exact' || !p.pred.scores.kind))
           ? p.pred.scores.items
           : [];
-      // v31.5 — Score prédit COHÉRENT avec le pick (avant : on prenait le mode
       // global du Poisson, ce qui pouvait afficher "1-1" alors que le pick
       // était "1 · St. Étienne" — incohérence visuelle confusante).
       // Logique : si pick=1, on cherche dans predScores le score le plus
@@ -18694,7 +18200,6 @@
       const realAway = parseInt(_realAwayC.score || '', 10);
       const hasRealScore = isFini && Number.isFinite(realHome) && Number.isFinite(realAway);
       const scoreCorrect = (topScore && hasRealScore) ? (topScore.home === realHome && topScore.away === realAway) : false;
-      // v30 — Buteurs prédits (top-2) + buteurs réels (depuis m.scorers).
       // predictLikelyScorers exige les xG; ne tirera rien sans Poisson.
       let predScorers = [];
       try {
@@ -18716,7 +18221,6 @@
       const url = (p.m.winamax && p.m.winamax.url) || 'https://www.winamax.fr/paris-sportifs';
       const resBadge = isFini ? (p.res === 'won' ? '<span style="padding:3px 10px;background:rgba(52,211,153,.15);color:var(--accent);font-weight:700;font-size:11px;border-radius:999px;">✓ GAGNÉ</span>' : p.res === 'lost' ? '<span style="padding:3px 10px;background:rgba(248,113,113,.15);color:#fca5a5;font-weight:700;font-size:11px;border-radius:999px;">✗ PERDU</span>' : '<span style="padding:3px 10px;background:rgba(148,163,184,.15);color:#94a3b8;font-weight:600;font-size:11px;border-radius:999px;">? n/a</span>') : '';
     const teamLogo = (src) => src ? `<img src="${esc(src)}" alt="" style="width:22px;height:22px;object-fit:contain;border-radius:3px;" loading="lazy" decoding="async">` : '<span style="display:inline-block;width:22px;height:22px;"></span>';
-      // v30 — Countdown intégré sous l'heure : "dans 9h57" / "dans 25 min"
       const _cntLabel = (() => {
         const ko = new Date(p.m.date).getTime();
         if (!isFinite(ko)) return '';
@@ -18735,7 +18239,6 @@
         return diff < 60 * 60000 && diff > -60000;
       })();
       const _cntColor = isFini ? 'var(--text-dim2)' : _cntSoon ? '#fbbf24' : 'var(--text-dim2)';
-      // v31.7.33 — Foot details (score prédit + buteurs) DÉPLACÉS dans une
       // bande full-width SOUS le match. Avant : empilés dans la col 2 (1fr)
       // qui compressait tout, faisait brouillon. Maintenant : ligne dédiée
       // avec border-top discrète + 2 colonnes (score | buteurs) sur desktop,
@@ -18799,11 +18302,8 @@
       </div>`;
     };
 
-    // v30 — Empty state UX : on aide l'utilisateur à passer à demain ou
     // vider les filtres au lieu de juste afficher "Aucun match".
-    // v31.7.82 — Ajout du raccourci Calendrier 7j : si l'user spam "Voir
     // demain" il vaut mieux qu'il aille sur la vue 7-jours d'un coup.
-    // AUDIT-2026-04-27 (Sprint 20 #9) — Adoption .empty-state-v2 standard.
     // Refonte du empty state Tous avec class commune .empty-state-v2 +
     // illustration 64px + title + body + actions, pour cohérence avec
     // Locks (déjà migré Sprint 18 #27).
@@ -18824,7 +18324,6 @@
     const inProgressHtml = inProgress.length
       ? inProgress.map(p => renderRow(p, false)).join('')
       : _emptyState("Aucun match en cours.", false);
-    // AUDIT-2026-04-27 — Empty state finished est trompeur quand des matchs
     // sont VRAIMENT terminés mais sans cote capturée (cas très commun pour
     // les WTA/Challenger qualifiers où Winamax map juste la ligue). On
     // distingue l'empty state.
@@ -18835,7 +18334,6 @@
       ? finished.map(p => renderRow(p, true)).join('')
       : _emptyState(finishedEmptyMsg, false);
 
-    // v33.1 — Compute data sources for transparency widget.
     // Sofascore events ont l'id préfixé "sofa_". ESPN events ont id numérique.
     // On compte les events visibles aujourd'hui pour signaler à l'user la
     // multi-source (résilience pipeline).
@@ -18860,7 +18358,6 @@
           <div class="u-text-md u-text-dim">${pending.length + inProgress.length} prono${(pending.length + inProgress.length)>1?'s':''} value · ${pending.length} à venir · ${inProgress.length} en cours · ${finished.length} fini${finished.length>1?'s':''}${_completedNoOdds > 0 ? ` <span class="u-text-dim2" title="${_completedNoOdds} match${_completedNoOdds>1?'s':''} terminé${_completedNoOdds>1?'s':''} sans cote pré-match capturée (qualifs WTA/Challenger, etc.) → résultat visible mais pas dans le bilan ROI.">(+${_completedNoOdds} sans cote pré-match)</span>` : ''}${settledCount ? ` (<b style="color:${wrPct>=60?'#34d399':'var(--text-dim)'};">${wrPct}% réussite</b> sur ${settledCount})` : ''}${filtersActive ? `&nbsp;·&nbsp;<span style="color:var(--brand);font-weight:600;">filtres actifs</span>` : ''}<div style="font-size:11px;color:var(--text-dim2);margin-top:3px;">↳ paris à venir/en cours = edge ≥ -2pt (bad value filtré). Finis = picks avec cote capturée pour tracker la perf modèle.</div></div>
         </div>
         ${_sourcesStats && _sourcesStats.total > 0 ? `
-          <!-- v33.1 — Widget Sources data : transparency sur d'où vient la couverture. -->
           <div style="margin:14px 0 4px;padding:10px 14px;background:var(--panel);border:1px solid var(--border);border-radius:8px;font-size:11.5px;color:var(--text-dim);display:flex;flex-wrap:wrap;gap:14px;align-items:center;font-variant-numeric:tabular-nums;" title="Sources de la couverture events. Plus de sources = pipeline résilient (si une source ban, les autres comblent).">
             <span style="color:var(--text-dim2);text-transform:uppercase;letter-spacing:.8px;font-weight:700;font-size:10px;">📡 Sources</span>
             ${_sourcesStats.espn > 0 ? `<span><b class="u-text">ESPN</b> ${_sourcesStats.espn} events</span>` : ''}
@@ -18869,12 +18366,10 @@
           </div>
         ` : ''}
 
-        <!-- v30 Sprint 4 — Filter bar (sticky on scroll, slides under topbar at top:56px) -->
         <div class="tous-filter-bar" style="position:sticky;top:56px;z-index:20;margin:18px 0 10px;padding:14px;background:var(--panel);border:1px solid var(--border);border-radius:10px;display:flex;flex-direction:column;gap:12px;backdrop-filter:saturate(140%) blur(8px);-webkit-backdrop-filter:saturate(140%) blur(8px);">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
             <div style="display:flex;align-items:center;gap:10px;">
               <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.8px;font-weight:700;">🎛️ Filtrer &amp; trier</div>
-              <!-- v31.2 — Compteur résultats explicite (audit UX). Le visiteur voit
                    immédiatement combien de matchs passent les filtres actuels. -->
               <span aria-live="polite" style="display:inline-flex;align-items:center;padding:3px 9px;background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);border-radius:999px;font-size:11.5px;font-weight:700;color:var(--brand);font-variant-numeric:tabular-nums;">${pending.length + inProgress.length + finished.length} résultat${(pending.length + inProgress.length + finished.length)>1?'s':''}</span>
             </div>
@@ -18964,7 +18459,6 @@
         if (found) openDetail(found);
       });
     });
-    // v30 Sprint 4 — Sport pill toggle
     wrap.querySelectorAll('[data-tous-sport]').forEach(btn => {
       btn.addEventListener('click', () => {
         const s = btn.dataset.tousSport;
@@ -19011,7 +18505,6 @@
         renderTousPage(wrap);
       });
     });
-    // v30 — "Voir demain" depuis l'empty state (pas de match aujourd'hui).
     // Délégué au bouton existant #next-day de la topbar pour rester DRY ;
     // ce dernier déjà gère le reload de la liste via render().
     wrap.querySelectorAll('[data-go-tomorrow]').forEach(btn => {
@@ -19027,7 +18520,6 @@
   // the model's real ROI from backtest_report_v2 + explains the method +
   // bankroll discipline. No hype, no "gains garantis" — just honest numbers.
   function renderCredibilitePage(wrap) {
-    // v30 fix — Avant : on lisait __backtestReport (legacy v1, jamais
     // populé) au lieu de __backtestReportV2 (le vrai rapport généré
     // chaque semaine via backtest_v2.py). Résultat : ROI / WR affichaient
     // toujours "—" même quand le backtest existait.
@@ -19044,7 +18536,6 @@
       ? `du ${String(_drStart).slice(0,10)} au ${String(_drEnd).slice(0,10)}`
       : 'dernières semaines';
 
-    // v30 — Calibration plot : the gold standard test for a probability model.
     // Si je dis "70% de chance", est-ce que 70% des prédictions à 70% gagnent ?
     // Source : backtest_report_v2.calibration (10 buckets de 10pt, déjà chargé
     // au boot via _loadModelCalibration → window.__modelCalibration).
@@ -19202,7 +18693,6 @@
             const fmtWr = (n) => isFinite(n) ? `${(n*100).toFixed(0)}%` : '—';
             const fmtBrier = (n) => isFinite(n) ? n.toFixed(3) : '—';
             const colorOf = (roi) => !isFinite(roi) ? 'var(--text-dim)' : roi > 5 ? '#34d399' : roi < -5 ? '#f87171' : '#fbbf24';
-            // v31.7.17 — Brier color : <0.20 excellent, 0.20-0.25 OK, >0.25 weak.
             const colorBrier = (b) => !isFinite(b) ? 'var(--text-dim)' : b < 0.20 ? '#34d399' : b < 0.25 ? '#fbbf24' : '#f87171';
             const rowOf = (label, d, sub) => {
               if (!d || !d.n) return '';
@@ -19255,7 +18745,6 @@
           })()}
         </section>
 
-        <!-- v30 — Section CLV retirée : elle agrégeait les paris trackés (loadTrackedBets). -->
 
         </section>
 
@@ -19265,7 +18754,6 @@
             Le test ultime d'un modèle de probabilité : <b>quand je dis "70% de chance", est-ce que 70% de ces prédictions gagnent vraiment ?</b> Si oui, le modèle est calibré (honnête). Si non, ses pourcentages sont du bruit.
           </div>
           ${(() => {
-            // v31.7.13 — Dropdown granularité bins (5/10/20). Backend prêt
             // depuis v31.7.10 (calibration_5/10/20 dans backtest_report_v2).
             const bt = window.__backtestReportV2;
             if (!bt || !bt.calibration_5 || !bt.calibration_20) return '';
@@ -19288,7 +18776,6 @@
         </section>
 
         ${(() => {
-          // AUDIT-2026-04-27 (Sprint 5 #25) — Brier per-sport breakdown.
           // Surface où le modèle est calibré vs où il dérive. Brier <0.20
           // = bonne calibration, 0.20-0.25 = ok, >0.25 = à recalibrer.
           const bt2 = window.__backtestReportV2;
@@ -19340,7 +18827,6 @@
           Code source, pipeline de données et backtest publics. Questions, suggestions : ouvre une issue sur le repo GitHub.
         </section>
       </div>`;
-    // v31.7.13 — Wire dropdown granularité bins.
     const sel = wrap.querySelector('#cred-bins-select');
     const svgWrap = wrap.querySelector('#cred-calibration-svg');
     if (sel && svgWrap) {
@@ -19414,7 +18900,6 @@
       ((data && data.days && data.days[iso]) || []).forEach(m => {
         if (m.sport !== 'football') return;
         if (m.completed) return;
-        // AUDIT-2026-04-27 (Sprint 1 #2) — Buteurs : exiger Winamax bookable
         // strict (match_id + markets) pas juste "available". Avant : on
         // pouvait afficher des suggestions buteurs sur des matchs Liga 2
         // tournament-only où l'user ne pouvait pas placer le pari.
@@ -19427,7 +18912,6 @@
       });
     });
 
-    // v24.2 — Trier d'abord par disponibilité des compositions (prono buteur possible), puis par meilleur pari buts
     matches.forEach(entry => {
       const h = entry.m.competitors.find(c => c.home_away === 'home');
       const a = entry.m.competitors.find(c => c.home_away === 'away');
@@ -19446,7 +18930,6 @@
     });
 
     const fmtDate = (iso) => iso === todayIso ? "Aujourd'hui" : "Demain";
-    // v31.7.81 — Bug visible : `${color}22` avec une CSS var produit
     // `var(--accent)22`, invalide → le badge n'avait jamais de background.
     // On ajoute un champ `bg` qui pointe vers le soft variant du theme.
     const confLabel = (p) => p >= 0.72 ? { text: 'Très probable', color: 'var(--accent)', bg: 'var(--accent-soft)' } :
@@ -19456,7 +18939,6 @@
 
     const cardHtml = (entry) => {
       const { m, pred, dayIso } = entry;
-      // v24.3 fix — noms équipes depuis competitors (m.home/m.away n'existent pas)
       const homeC = m.competitors && m.competitors.find(c => c.home_away === 'home') || {};
       const awayC = m.competitors && m.competitors.find(c => c.home_away === 'away') || {};
       const homeName = homeC.name || homeC.short || '?';
@@ -19511,10 +18993,8 @@
           </div>
 
           ${(() => {
-            // v24 — Section "Joueurs qui peuvent marquer"
             const scorers = predictLikelyScorers(m, pred);
             if (!scorers || !scorers.length) {
-              // v24.2 — Calculer l'heure approximative de retour (1h avant kickoff)
               let returnTime = '';
               try {
                 const ko = new Date(m.date);
@@ -19533,7 +19013,6 @@
               const probPct = (s.prob * 100).toFixed(0);
               const confColor = s.prob >= 0.50 ? 'var(--accent)' : s.prob >= 0.35 ? 'var(--info)' : s.prob >= 0.22 ? 'var(--warn)' : 'var(--text-dim)';
               const posIcon = s.pos === 'F' ? '⚔️' : s.pos === 'M' ? '🎯' : s.pos === 'D' ? '🛡️' : '🧤';
-              // v29 — face shot via Sofascore CDN when the Sofascore player id
               // is known ; falls back to the position emoji when not available.
               const faceHtml = s.pid
                 ? `<img loading="lazy" decoding="async" src="https://img.sofascore.com/api/v1/player/${s.pid}/image" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;background:var(--bg);border:1px solid var(--border);" onerror="this.outerHTML='<div style=\\'font-size:14px;width:28px;height:28px;display:grid;place-items:center;\\'>${posIcon}</div>'">`
@@ -19575,7 +19054,6 @@
            <div style="font-size:12.5px;max-width:360px;margin:0 auto;">Les cotes Winamax pour les matchs d'aujourd'hui et demain ne sont pas encore ouvertes ou les matchs n'ont pas assez de données. Reviens en fin de matinée !</div>
          </div>`;
 
-    // v24.2 — Stats pour la bannière
     const nWithLineup = matches.filter(x => x.hasLineup).length;
     const nTotal = matches.length;
 
@@ -19616,7 +19094,6 @@
       </div>`;
   }
 
-  // v30 — renderBacktestPage simplifiée : ne rend QUE le rapport modèle
   // backtest_v2 (cron hebdo). Avant, cette page agrégeait aussi les paris
   // trackés par l'utilisateur (courbe 6 mois, attribution sport/signal).
   // Théo n'enregistre pas ses paris sur le site → tout ce bloc retiré.
@@ -19639,7 +19116,6 @@
   }
 
   // ============================================================
-  // Chantier 3 — Backtest v2 (vrai modèle predictMatch via mini-racer,
   // généré par scripts/backtest_v2.py, cron hebdo .github/workflows/backtest.yml).
   // Source : backtest_report_v2.json à la racine.
   // ============================================================
@@ -20063,7 +19539,6 @@
     const currentLevel = prefs.level || 'confirme';
     const currentOddMin = (typeof getUserOddMin === 'function') ? getUserOddMin() : 2.00;
     const currentOddIdx = Math.max(0, ODD_MIN_CHOICES.findIndex(v => Math.abs(v - currentOddMin) < 0.01));
-    // v31.7.61 — Theme accent variant : default | lime | amber
     const currentAccent = prefs.accent || 'default';
 
     const availableSports = ['football', 'tennis', 'basketball', 'hockey', 'baseball', 'rugby', 'mma'];
@@ -20154,7 +19629,6 @@
               <button class="theme-pill theme-chip ${currentTheme==='light'?'active':''}" data-theme="light" data-theme-btn="light">☀️ Clair</button>
               <button class="theme-pill theme-chip ${currentTheme==='auto'?'active':''}" data-theme="auto" data-theme-btn="auto">🔄 Auto</button>
             </div>
-            <!-- v31.7.61 — Accent variant picker (audit V2 #12) -->
             <div style="font-size:12px;color:var(--text-dim);margin:14px 0 6px;">Accent (couleur des éléments WIN/positifs).</div>
             <div class="pref-pill-group">
               <button class="theme-pill ${currentAccent==='default'?'active':''}" data-accent-btn="default">🟢 Émeraude (défaut)</button>
@@ -20271,7 +19745,6 @@
           ${santeHtml}
 
           ${(() => {
-            // v31.7.59 — Discord webhook (backlog V2 #5).
             // Permet à l'user de recevoir les top picks dans son Discord
             // perso. Webhook URL stocké en localStorage uniquement
             // (privacy-first, jamais envoyé serveur). Boutons :
@@ -20300,7 +19773,6 @@
           })()}
 
           ${(() => {
-            // v31.7.6 — Web Vitals dashboard local. Lit les data du tracker
             // installé en pre-app.js (paris_sportif_web_vitals_v1).
             // Affiche : médianes des 20 dernieres sessions LCP/FCP/CLS/INP/TTFB.
             let sessions = [];
@@ -20392,7 +19864,6 @@
       const cur = (function(){ try { return JSON.parse(localStorage.getItem('userPrefs') || '{}') || {}; } catch(e) { return {}; } })();
       localStorage.setItem('userPrefs', JSON.stringify({ ...cur, ...partial }));
     }
-    // v22 — apparence + accessibilité
     // Phase 3 #9 : ajout 3-state dark/light/auto via prefers-color-scheme
     wrap.querySelectorAll('[data-theme-btn]').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -20429,7 +19900,6 @@
         });
       }
     } catch(e){}
-    // v31.7.61 — Accent variant picker
     wrap.querySelectorAll('[data-accent-btn]').forEach(btn => {
       btn.addEventListener('click', () => {
         const accent = btn.dataset.accentBtn;
@@ -20464,7 +19934,6 @@
       if (on) document.documentElement.setAttribute('data-reader', 'on');
       else document.documentElement.removeAttribute('data-reader');
     });
-    // v31.7.11 — Mode focus dashboard
     const focusModeEl = wrap.querySelector('#pref-focus-mode');
     if (focusModeEl) focusModeEl.addEventListener('change', (e) => {
       const on = e.target.checked;
@@ -20517,7 +19986,6 @@
       });
     });
 
-    // v31.7.59 — Discord webhook handlers (backlog V2 #5).
     // Webhook URL stocké en localStorage uniquement (privacy).
     const _discordInput = wrap.querySelector('#discord-webhook-url');
     const _discordStatus = wrap.querySelector('#discord-status');
@@ -20632,7 +20100,6 @@
       });
     }
 
-    // v30 — Bouton Export CSV "Mes paris" retiré (la page elle-même est partie).
     const exportJson = wrap.querySelector('#export-json-prefs');
     if (exportJson) exportJson.addEventListener('click', () => {
       const payload = (function(){ try { return JSON.parse(localStorage.getItem('userPrefs') || '{}') || {}; } catch(e) { return {}; } })();
@@ -20680,7 +20147,6 @@
         renderProfilPage(wrap);
       } catch (e) {}
     });
-    // v23 — bouton "Réafficher bannière débutant"
     const replayBanner = wrap.querySelector('#replay-beginner-banner');
     if (replayBanner) replayBanner.addEventListener('click', () => {
       try {
@@ -20692,7 +20158,6 @@
         if (typeof toast === 'function') toast('✓ Bannière réactivée — visible sur Accueil', 'success');
       } catch(e){}
     });
-    // v23 — bouton "Effacer ce que j'ai appris"
     const clearLessons = wrap.querySelector('#clear-user-lessons');
     if (clearLessons) clearLessons.addEventListener('click', async () => {
       const ok = (typeof window._showConfirm === 'function')
@@ -20711,21 +20176,18 @@
         renderProfilPage(wrap);
       } catch(e){}
     });
-    // Sprint A11 (v31.7.196) — Reset tutoriels button
     const resetTutsBtn = wrap.querySelector('#reset-tutorials-btn');
     if (resetTutsBtn) resetTutsBtn.addEventListener('click', () => {
       if (typeof window._resetAllTutorials === 'function') {
         window._resetAllTutorials();
       }
     });
-    // Sprint A12 — Show "Comment lire un prono" tutorial
     const showHowToBtn = wrap.querySelector('#show-howto-btn');
     if (showHowToBtn) showHowToBtn.addEventListener('click', () => {
       if (typeof window._showHowToReadTutorial === 'function') {
         window._showHowToReadTutorial();
       }
     });
-    // Sprint A13 — Restore trust strip
     const restoreTrustBtn = wrap.querySelector('#restore-trust-btn');
     if (restoreTrustBtn) restoreTrustBtn.addEventListener('click', () => {
       if (typeof window._resetTrustStrip === 'function') {
@@ -20733,7 +20195,6 @@
         if (typeof toast === 'function') toast('✓ Trust strip réaffichée', 'success');
       }
     });
-    // Sprint A14 — Clear recent searches
     const clearSearchesBtn = wrap.querySelector('#clear-recent-searches');
     if (clearSearchesBtn) clearSearchesBtn.addEventListener('click', () => {
       try { localStorage.removeItem('recentSearches'); } catch(e){}
@@ -20765,13 +20226,11 @@
   // disclosure relation Winamax (=aucune affiliation, aucune rémunération).
   // Page rendue côté client comme les autres mais avec contenu en clair
   // (pas de données dynamiques) → indexable par crawl JS.
-  // v31.1 — renderLegalPage retirée (page statique legal.html à la place)
 
 
   // ======= v31 — Page Méthodologie formelle =======
   // Dictionnaire des métriques + protocole de backtest + sources de données
   // + section biais et limites. Réponse à l'audit ChatGPT 2026-04-26.
-  // v31.1 — renderMethodologiePage retirée (page statique methodologie.html à la place)
 
 
   function todayIsoName() {
@@ -20881,7 +20340,6 @@
       const first = pts[0].v, last = pts[pts.length-1].v;
       const moveDelta = last - first;
       const movePct = (moveDelta / first) * 100;
-      // v31.7.81 — Garde le color en hex pour SVG fill/stroke (les CSS vars
       // ne sont pas garanties dans presentation attributes).
       const movColor = Math.abs(movePct) < 1 ? '#9ca3af' : movePct > 0 ? '#34d399' : '#f87171';
       const moveSign = movePct >= 0 ? '+' : '';
@@ -20909,7 +20367,6 @@
   }
 
 
-  // v31.7.1 — Montantes séquentielles : chaque match doit commencer après le règlement du précédent.
 
   // Durée moyenne d'un match par sport (en minutes) — buffer permettant de
   // garantir que le résultat est connu avant de remiser sur l'étape suivante.
@@ -20973,7 +20430,6 @@
       for (const m of events) {
         if (m.live || m.completed) continue;
         if (m.status === 'STATUS_FINAL' || m.status === 'STATUS_IN_PROGRESS') continue;
-        // AUDIT-2026-04-27 (Sprint 1 #2) — Montantes : Winamax bookable
         // strict, sinon l'user ne peut pas placer toute la séquence.
         if (!isWinamaxBookable(m)) continue;
         const ts = new Date(m.date).getTime();
@@ -21244,7 +20700,6 @@
   // ======= Boot =======
   // Switch between the pages: simples / combines / value / bilan
   function applyPageView() {
-    // v30 Sprint 5 — Page transition : restart fade-in animation
     try {
       const _main = document.querySelector('main');
       if (_main) {
@@ -21254,7 +20709,6 @@
         _main.classList.add('page-fade-in');
       }
     } catch(e){}
-    // AUDIT-2026-04-27 (Sprint 41 #1) — Fix MutationObserver infinite loop.
     // Avant : MO observait main sans filter. _animateCounter modifie
     // textContent → MO refire → re-scan → potentielle boucle (les
     // animDone flag aidaient mais la MO continuait à scan inutilement).
@@ -21262,7 +20716,6 @@
     // LITE→FULL). Plus de MO. Si un nouveau KPI apparaît hors fenêtre,
     // pas grave (perte cosmétique uniquement).
     try {
-      // Sprint 42 #8 — Skip si data-anim-to manquant ou pas finite.
       // Évite "0%" affiché à la place du placeholder "—".
       const scanAndAnimate = () => {
         document.querySelectorAll('[data-anim-count]:not([data-anim-done])').forEach(el => {
@@ -21299,51 +20752,34 @@
     const isLocks = currentPage === 'locks';
     const isHistorique = currentPage === 'historique';
     const isSante = currentPage === 'sante' || currentPage === 'profil';
-    // Refonte v21 — Nouvelles pages
     const isDashboard = currentPage === 'dashboard';
     const isAlertes = currentPage === 'alertes';
     const isAcademie = currentPage === 'academie';
     const isBacktest = currentPage === 'backtest';
     const isProfil = currentPage === 'profil';
-    // Chantier QQ — page dédiée Top Pronos.
     // Sépare le hero + top 5 + autres + prochains de la liste Simples pour
     // que Théo ait une vue "actionnable du jour" sans scroller au milieu de
     // tous les matchs (utile sur mobile).
     const isTop = currentPage === 'top';
-    // v23 — nouvelle page Buteurs
     const isButeurs = currentPage === 'buteurs';
-    // v29 — Tous les pronos du jour (fini / pas fini tabs)
     const isTous = currentPage === 'tous';
-    // v29 — Crédibilité / méthode (ROI vérifiable + qui suis-je)
     const isCredibilite = currentPage === 'credibilite';
-    // v31.7 — Montantes (declared early to avoid TDZ in summary-bar visibility check)
     const isMontantes = currentPage === 'montantes';
     const isMontanteJour = false;
     const isMontanteWeekend = false;
     const isMontanteSemaine = false;
     const isMontante = isMontantes;
-    // v31.7.77 — Calendrier (declared early for the same TDZ reason)
     const isCalendrier = currentPage === 'calendrier';
-    // AUDIT-2026-04-27 (Sprint 5 #24) — League deep-dive page
     const isLeague = currentPage === 'league';
-    // AUDIT-2026-04-27 (Sprint 33 #2) — Favoris page
     const isFavoris = currentPage === 'favoris';
-    // Sprint 48 (v31.7.137) — Matchs détectés page (Phase 2 brief Théo)
     const isMatchs = currentPage === 'matchs';
-    // Sprint 92 (v31.7.179) — Page Plan de mise du jour (ticket Kelly auto-calculé)
     const isPlanMise = currentPage === 'plan-mise';
-    // Sprint 95 (v31.7.181) — Page "💎 Le marché se trompe ici" : top mismatches edge sur 7j
     const isValeur = currentPage === 'valeur';
-    // Sprint 104 (v31.7.189) — Page #simulator : What-if + Bankroll progression
     const isSimulator = currentPage === 'simulator';
-    // Sprint 52 (v31.7.141) — Performance page : hub unifié Bilan + Historique + Backtest + Crédibilité
     const isPerformance = currentPage === 'performance';
 
-    // v23 — Sous-nav "Mon suivi" (historique/bilan/backtest).
-    // v30 — "Mes paris" retiré : Théo n'enregistre pas ses paris sur le
     // site (ni manuel, ni import Winamax). Tout le tracking utilisateur
     // a été désactivé.
-    // Sprint 52 (v31.7.141) — Onglet "Performance" est le hub global, regroupe
     // tous les autres comme onglets internes (cf. renderPerformancePage).
     const suiviPages = ['performance', 'historique', 'bilan', 'backtest'];
     const isSuivi = suiviPages.includes(currentPage);
@@ -21376,7 +20812,6 @@
       suiviNav.style.display = 'none';
     }
 
-    // v30 — Sous-nav "Pronos" (tous/locks/buteurs/combines/simples/top).
     // Mêmes onglets que le dropdown Pronos, mais rendus en ligne au-dessus
     // de la page pour que l'user switche sans rouvrir le menu.
     const pronosPages = ['tous', 'matchs', 'locks', 'buteurs', 'combines', 'simples', 'top'];
@@ -21419,7 +20854,6 @@
     if (el) el.style.display = isSimples ? '' : 'none';
     const tp = document.getElementById('top-picks-wrap');
     if (tp) tp.style.display = isTop ? '' : 'none';
-    // v31.7.2 — Ajouter un h1 sur la page Top (audit a note l'absence)
     let topH1 = document.getElementById('top-page-h1');
     if (isTop && tp) {
       if (!topH1) {
@@ -21438,7 +20872,6 @@
       el.style.display = isSimples ? '' : 'none';
     });
     // Sport tab bar (only relevant for simples)
-    // v26.1 — topbar sports sub-nav : visible uniquement sur Paris du jour
     const sportTabs = document.getElementById('tabs');
     if (sportTabs) sportTabs.style.display = isSimples ? 'flex' : 'none';
 
@@ -21450,7 +20883,6 @@
     const sum = document.getElementById('summary-bar');
     if (sum) sum.style.display = (isCombines || isValue || isLocks || isHistorique || isSante || isDashboard || isAlertes || isAcademie || isBacktest || isProfil || isButeurs || isTous || isCredibilite || isMontante || isCalendrier || isLeague || isFavoris) ? 'none' : '';
 
-    // Chantier IIII — Simples quick-take IA (visible only on Simples)
     const iaSimples = document.getElementById('ia-simples-wrap');
     if (iaSimples) {
       iaSimples.style.display = isSimples ? '' : 'none';
@@ -21501,7 +20933,6 @@
             }
             return true;
           });
-          // v30 — Coach IA snapshot Simples retiré.
           iaSimples.innerHTML = '';
         } catch (e) { iaSimples.innerHTML = ''; }
       }
@@ -21526,7 +20957,6 @@
     }
     historiqueWrap.style.display = isHistorique ? '' : 'none';
     if (isHistorique) {
-      // v30 #3 — Historique a besoin du full dataset (tous les jours).
       // Si on est encore en mode lite, kicke le fetch et re-render dès dispo.
       renderHistoriquePage(historiqueWrap);
       if (window.PRONOSTICS_DATA && window.PRONOSTICS_DATA._lite && typeof window._ensureFullData === 'function') {
@@ -21534,7 +20964,6 @@
       }
     }
 
-    // v31.7.58 — Compare page (backlog V2 #4)
     const isCompare = currentPage === 'compare';
     let compareWrap = document.getElementById('compare-wrap');
     if (!compareWrap) {
@@ -21550,14 +20979,12 @@
       }
     }
 
-    // v31.7.77 — Calendrier 7 jours (isCalendrier déjà déclaré plus haut pour TDZ)
     let calendrierWrap = document.getElementById('calendrier-wrap');
     if (!calendrierWrap) {
       calendrierWrap = document.createElement('div');
       calendrierWrap.id = 'calendrier-wrap';
       (document.querySelector('main') || document.body).appendChild(calendrierWrap);
     }
-    // AUDIT-2026-04-27 (Sprint 5 #24) — League deep-dive
     let leagueWrap = document.getElementById('league-wrap');
     if (!leagueWrap) {
       leagueWrap = document.createElement('div');
@@ -21569,7 +20996,6 @@
       try { renderLeaguePage(leagueWrap); } catch(e) { console.warn('renderLeaguePage failed', e); }
     }
 
-    // AUDIT-2026-04-27 (Sprint 33 #2) — Favoris page
     let favorisWrap = document.getElementById('favoris-wrap');
     if (!favorisWrap) {
       favorisWrap = document.createElement('div');
@@ -21581,7 +21007,6 @@
       try { renderFavorisPage(favorisWrap); } catch(e) { console.warn('renderFavorisPage failed', e); }
     }
 
-    // Sprint 52 (v31.7.141) — Performance : page hub qui groupe Vue globale,
     // Historique, Bilan, Backtest, Calibration. KPIs synthétiques en tête,
     // sub-nav pour switcher. Réponse au feedback "fusionner Bilan/Historique
     // dans une seule Performance avec onglets".
@@ -21606,7 +21031,6 @@
       }
     }
 
-    // Sprint 48 (v31.7.137) — "Tous les matchs détectés" : vue exhaustive
     // qui montre TOUS les matchs (pas juste ceux avec prono fort), filtrés
     // par sport/ligue/jour/statut. Réponse au feedback "je veux voir tous
     // les matchs même sans pronostic" du brief Théo 2026-04-28.
@@ -21639,14 +21063,12 @@
       }
     }
 
-    // Sprint 92 (v31.7.179) — Page "Plan de mise du jour" : ticket Kelly auto-calculé
     let planMiseWrap = document.getElementById('plan-mise-wrap');
     if (!planMiseWrap) {
       planMiseWrap = document.createElement('div');
       planMiseWrap.id = 'plan-mise-wrap';
       (document.querySelector('main') || document.body).appendChild(planMiseWrap);
     }
-    // Sprint 126 (v31.7.191) — Error boundary helper : si le render d'une page
     // throw, affiche un fallback friendly avec retry + report au lieu d'écran
     // vide muet. Préserve la UX en cas de bug ponctuel (data corrompue, edge case).
     const _renderWithFallback = (wrap, fn, pageName) => {
@@ -21690,7 +21112,6 @@
       _renderWithFallback(planMiseWrap, renderPlanMisePage, 'Plan de mise');
     }
 
-    // Sprint 95 (v31.7.181) — Page "💎 Le marché se trompe ici" : top edges 7j
     let valeurWrap = document.getElementById('valeur-wrap');
     if (!valeurWrap) {
       valeurWrap = document.createElement('div');
@@ -21702,7 +21123,6 @@
       _renderWithFallback(valeurWrap, renderValeurPage, 'Valeur');
     }
 
-    // Sprint 104 (v31.7.189) — Page #simulator (What-if + Bankroll progression)
     let simulatorWrap = document.getElementById('simulator-wrap');
     if (!simulatorWrap) {
       simulatorWrap = document.createElement('div');
@@ -21716,7 +21136,6 @@
 
     calendrierWrap.style.display = isCalendrier ? '' : 'none';
     if (isCalendrier) {
-      // AUDIT-2026-04-27 (Sprint 3 #15) — Skeleton pendant _ensureFullData.
       // Le LITE blob n'a que today, donc renderCalendrierPage avec lite
       // affiche peu de jours. On préfère skeleton 7-rows que rendu
       // anémique qui flickerait au moment du fetch full.
@@ -21741,7 +21160,6 @@
       }
     }
 
-    // v31.7.6 — Value Finder page retiree (cleanup), plus de wrap a maintenir.
 
     // Bilan page: render dedicated view in #bilan-wrap
     let bilanWrap = document.getElementById('bilan-wrap');
@@ -21758,9 +21176,7 @@
       }
     }
 
-    // v30 — Mes paris : page retirée. Voir suiviPages plus haut.
 
-    // Chantier BBBB — Santé (Coach IA admin) — accessible via Profil
     let santeWrap = document.getElementById('sante-wrap');
     if (!santeWrap) {
       santeWrap = document.createElement('div');
@@ -21773,7 +21189,6 @@
       requestAnimationFrame(() => renderSantePage(santeWrap));
     }
 
-    // Refonte v21 — Dashboard home
     let dashWrap = document.getElementById('dashboard-wrap');
     if (!dashWrap) {
       dashWrap = document.createElement('div');
@@ -21782,10 +21197,8 @@
     }
     dashWrap.style.display = isDashboard ? '' : 'none';
     if (isDashboard) renderDashboardPage(dashWrap);
-    // v27 — One-feed Agent : toggle body class (CSS gère nav/FAB/search)
     document.body.classList.toggle('agent-home', isDashboard);
     document.body.classList.toggle('agent-inside', !isDashboard);
-    // v27 — Wire return-to-home button (once)
     const _rb = document.getElementById('agent-return-btn');
     if (_rb && !_rb._wired) {
       _rb._wired = true;
@@ -21796,7 +21209,6 @@
       });
     }
 
-    // Refonte v21 — Alertes
     let alertesWrap = document.getElementById('alertes-wrap');
     if (!alertesWrap) {
       alertesWrap = document.createElement('div');
@@ -21806,7 +21218,6 @@
     alertesWrap.style.display = isAlertes ? '' : 'none';
     if (isAlertes) renderAlertesPage(alertesWrap);
 
-    // v23 — Buteurs
     let buteursWrap = document.getElementById('buteurs-wrap');
     if (!buteursWrap) {
       buteursWrap = document.createElement('div');
@@ -21816,7 +21227,6 @@
     buteursWrap.style.display = isButeurs ? '' : 'none';
     if (isButeurs) renderButeursPage(buteursWrap);
 
-    // Refonte v21 — Académie
     let academieWrap = document.getElementById('academie-wrap');
     if (!academieWrap) {
       academieWrap = document.createElement('div');
@@ -21829,7 +21239,6 @@
       requestAnimationFrame(() => renderAcademiePage(academieWrap));
     }
 
-    // Refonte v22 — Backtest + Attribution (remplace What-if)
     let backtestWrap = document.getElementById('backtest-wrap');
     if (!backtestWrap) {
       backtestWrap = document.createElement('div');
@@ -21844,7 +21253,6 @@
       }
     }
 
-    // Refonte v21 — Profil
     let profilWrap = document.getElementById('profil-wrap');
     if (!profilWrap) {
       profilWrap = document.createElement('div');
@@ -21857,7 +21265,6 @@
       requestAnimationFrame(() => renderProfilPage(profilWrap));
     }
 
-    // v31.7 — Montantes (consts isMontante* declared at top of function for TDZ)
     let montanteWrap = document.getElementById('montante-wrap');
     if (!montanteWrap) {
       montanteWrap = document.createElement('div');
@@ -21899,7 +21306,6 @@
       });
     }
 
-    // v31.1 — Hash routes #legal et #methodologie redirigent vers les pages
     // statiques HTML (legal.html / methodologie.html). Économie : ~26 KB
     // de JS (renderLegalPage + renderMethodologiePage supprimés). Le contenu
     // vit maintenant dans UN SEUL endroit (le fichier statique), pas
@@ -21913,7 +21319,6 @@
       return;
     }
 
-    // v29 — Tous les pronos du jour (fini / pas fini tabs)
     let tousWrap = document.getElementById('tous-wrap');
     if (!tousWrap) {
       tousWrap = document.createElement('div');
@@ -21923,7 +21328,6 @@
     tousWrap.style.display = isTous ? '' : 'none';
     if (isTous) renderTousPage(tousWrap);
 
-    // v29 — Crédibilité / méthode
     let credWrap = document.getElementById('credibilite-wrap');
     if (!credWrap) {
       credWrap = document.createElement('div');
@@ -21942,7 +21346,6 @@
       if (isActive) b.setAttribute('aria-current', 'page');
       else b.removeAttribute('aria-current');
     });
-    // v34.32 — Navigation complète : les pages avancées restent deep-linkables
     // mais sont maintenant rattachées à un hub visible pour éviter les vues
     // "orphelines" (montantes, matchs détectés, simulateur).
     const HUB_PAGES = {
@@ -21959,7 +21362,6 @@
       const btn = h.querySelector('.hub-btn');
       if (btn) btn.classList.toggle('active', pages.includes(currentPage));
     });
-    // v34.33 — Bottom-nav mobile en mode "intent". Avant, seul le bouton dont
     // data-page correspondait exactement était actif : #locks ou #simulator
     // n'avaient donc aucun repère dans la nav du bas. On garde le hash exact,
     // mais le bouton d'intention reste allumé.
@@ -21976,7 +21378,6 @@
       btn.classList.toggle('active', on);
       if (btn.id === 'mbn-menu-btn') btn.setAttribute('aria-pressed', String(on));
     });
-    // v31.7.201 — Auto-inject page-tabs (Top/Plan/Locks etc.) sur pages liées
     // Délai léger pour laisser le rendering du wrap se finir
     try {
       setTimeout(() => {
@@ -22028,7 +21429,6 @@
   // Build an inline SVG line chart of the cumulative P&L curve.
   // Takes rows: [{ date: 'YYYY-MM-DD', delta: +0.85 | -1.00 }]. Assumes flat 1u
   // bets, so the Y axis is units (one lost bet = -1). Groups by day, accumulates.
-  // v31.7.54 — Profit calendar GitHub-style.
   // Heatmap 365 jours (53 cols × 7 rows) avec couleur par P&L quotidien :
   //   gris : pas de pari
   //   vert clair → vert foncé : P&L positif (intensité = montant)
@@ -22205,7 +21605,6 @@
     `;
   }
 
-  // v31.7.22 — Multi-series ROI chart : superpose plusieurs fenêtres sur
   // le même graphe. `seriesArray` = [{ label, color, rows }]. Chaque rows
   // est { date, delta }. L'axe X est l'union des dates triées ; chaque
   // série n'apparaît qu'à partir de sa première date présente. Aligné sur
@@ -22494,7 +21893,6 @@
 
   // ======= Page Locks =======
 
-  // Chantier I — vue dédiée aux picks isLock (fiab ≥ 0.70) tous sports
   // confondus, tous jours confondus. Split en trois sections : à venir,
   // en cours, settled récents. Hero compact avec compteurs + WR lifetime.
   function renderLocksPage(wrap) {
@@ -22512,7 +21910,6 @@
 
     // Keep only Winamax-bookable matches with a lock pick (fiab ≥ 0.70).
     // predictMatch handles skip / lowConf / odds fallback already.
-    // AUDIT-2026-04-27 (P2) — exiger match_id + markets, pas juste
     // "available" (qui peut être tournament-only sans cote bookable).
     // Filter exception: matchs SETTLED (completed) restent éligibles
     // même si la cote Winamax exacte a été perdue après match.
@@ -22550,7 +21947,6 @@
     upcoming.sort((a, b) => new Date(a.m.date) - new Date(b.m.date));
     settled.sort((a, b) => new Date(b.m.date) - new Date(a.m.date));
 
-    // Sprint 81 (v31.7.168 — audit P1) — "Near Locks" : matchs avec rel ∈ [0.65, 0.70)
     // qui ne passent pas le seuil lock mais sont à 1-5pt près. Permet à l'user
     // de voir les "presque-locks" pour décider lui-même s'il veut prendre le risque.
     const nearLocks = [];
@@ -22628,7 +22024,6 @@
 
     function sectionHtml(title, hint, entries, sortAsc, opts) {
       if (!entries.length) return '';
-      // v31.7.205 — Pagination support : opts.collapsedByDefault + opts.initialLimit
       // Pour 'Settled récents' : collapse par défaut si >5 entries (page Locks était 10212px).
       const collapsible = opts && opts.collapsedByDefault;
       const initialLimit = (opts && opts.initialLimit) || entries.length;
@@ -22646,7 +22041,6 @@
             <div class="match-grid">${group.map(e => renderCard(e.m)).join('')}</div>
           </div>`;
       }).join('');
-      // v31.7.205 — Si collapsible, wrap dans <details> natif
       if (collapsible && entries.length > 5) {
         return `
           <div class="locks-section u-mt-18">
@@ -22696,7 +22090,6 @@
         </div>
       </div>`;
 
-    // AUDIT-2026-04-27 (Sprint 18 #27) — Empty state v2 amélioré.
     const emptyState = (!live.length && !upcoming.length && !settled.length)
       ? `<div class="empty-state-v2">
            <div class="es-illustration">🔒</div>
@@ -22709,7 +22102,6 @@
          </div>`
       : '';
 
-    // Chantier Q — barre "nouveaux locks" avec bouton "tout marquer comme vu"
     const activeLockIds = [...live, ...upcoming].map(e => e.m.id).filter(Boolean);
     const newLockIds = activeLockIds.filter(id => isNewLock(id));
     const newLocksBannerHtml = newLockIds.length
@@ -22721,7 +22113,6 @@
          </div>`
       : '';
 
-    // Chantier HHHH — Locks narratif IA
     const locksNarrativeHtml = (() => {
       try {
         const body = buildLocksNarrative(upcoming, live);
@@ -22733,7 +22124,6 @@
       } catch (e) { console.warn('[HHHH] locks narrative failed', e); return ''; }
     })();
 
-    // Sprint 81 (v31.7.168) — Near Locks rendu (matchs ~70% confiance qui frôlent le seuil)
     const nearLocksHtml = nearLocks.length ? `
       <div style="margin-top:32px;padding:18px 16px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r);">
         <div style="margin-bottom:12px;">
@@ -22787,7 +22177,6 @@
         ${sectionHtml('✅ Settled récents', 'Locks réglés dans les 48 dernières heures', settled, false, { collapsedByDefault: true })}
         ${nearLocksHtml}
       </div>`;
-    // Sprint 81 — wire near-locks click → openDetail
     wrap.querySelectorAll('[data-near-lock-id]').forEach(card => {
       card.addEventListener('click', () => {
         const id = card.dataset.nearLockId;
@@ -22809,7 +22198,6 @@
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
       });
     });
-    // Chantier Q — bouton "tout marquer comme vu"
     const markAllBtn = wrap.querySelector('#mark-locks-seen-btn');
     if (markAllBtn) {
       markAllBtn.addEventListener('click', (e) => {
@@ -22838,7 +22226,6 @@
   };
   let _histDayLimit = 20;
 
-  // v31.7.77 — Page Calendrier : affiche les pronos sur 7 jours forward,
   // groupés jour par jour. Réponse au feedback user "je veux voir au moins
   // une semaine de pronos jour par jour" — la page Tous était limitée à 1
   // seul jour (currentDate).
@@ -22860,7 +22247,6 @@
     }
 
     // Pour chaque jour, collecter les picks Winamax bookable.
-    // Sprint 47 (v31.7.136) — On garde TOUS les matchs Winamax-bookable, plus
     // les "gros matchs" même sans bookable (visibilité). Avant on filtrait
     // skip+lowConf → user ne voyait pas PSG-Bayern (cotes serrées). Désormais
     // on rend chaque match avec son `getMatchStatus` ; le tri remonte les
@@ -22917,7 +22303,6 @@
     };
 
     // Render une carte pick compacte
-    // Sprint 47 (v31.7.136) — Supporte les statuts non-strong (uncertain, no_data,
     // no_odds, no_winamax). On affiche un badge à la place du %/cote dans ces cas.
     const renderPickRow = (p) => {
       const { home, away } = (typeof getSides === 'function') ? getSides(p.m) : { home: {}, away: {} };
@@ -22979,7 +22364,6 @@
     const totalPicks = dayBuckets.reduce((s, b) => s + b.picks.length, 0);
     const totalLocks = dayBuckets.reduce((s, b) => s + b.nLocks, 0);
 
-    // Sprint 55 (v31.7.144) — Heatmap 30 jours. Rolling window past 14j +
     // future 16j (=30j total) avec mini-cellules colorées par densité de
     // picks. Cliquer un jour navigue vers Tous filtré sur ce jour. Vraie
     // alternative à un calendrier mensuel (qui ferait 14-25 KB de markup).
@@ -23102,7 +22486,6 @@
     });
   }
 
-  // AUDIT-2026-04-27 (Sprint 34 #10) — Export/Import settings JSON.
   // Permet à l'user d'exporter ses préférences (theme, accent, lock
   // threshold, bankroll, sports favoris, etc.) et de les ré-importer
   // sur un autre device — sync sans serveur.
@@ -23153,8 +22536,6 @@
     }
   };
 
-  // AUDIT-2026-04-27 (Sprint 33 #2) — Page Favoris (bookmarks).
-  // Sprint 72 (v31.7.160 — câblage UI watchlist) — état local du tab favoris.
   const FAVORIS_TAB_KEY = 'favorisTab';
   function _getFavorisTab() {
     try { return localStorage.getItem(FAVORIS_TAB_KEY) || 'matches'; } catch(e) { return 'matches'; }
@@ -23165,7 +22546,6 @@
   function renderFavorisPage(wrap) {
     const data = window.PRONOSTICS_DATA;
     const ids = (typeof window._loadBookmarks === 'function') ? window._loadBookmarks() : [];
-    // Sprint 72 — Watchlist multi-niveaux (Sprint 70 backbone)
     const wl = (typeof window._loadWatchlist === 'function') ? window._loadWatchlist() : { teams: [], leagues: [], sports: [], markets: [] };
     const rules = (typeof window._loadAlertRules === 'function') ? window._loadAlertRules() : [];
     const totalEntries = ids.length + wl.teams.length + wl.leagues.length + wl.sports.length + wl.markets.length + rules.length;
@@ -23233,7 +22613,6 @@
     }));
     const found = ids.map(id => matchById.get(id)).filter(Boolean);
     const missing = ids.length - found.length;
-    // Sprint 72 fix (test live MCP) — quand ids.length > 0 mais found.length === 0
     // (matchs hors fenêtre rolling), on continuait à return l'empty state SANS
     // les sub-tabs Équipes/Ligues/Sports/Marchés/Alertes. Bug d'UX : l'user ne
     // pouvait pas accéder aux autres onglets.
@@ -23242,7 +22621,6 @@
     // l'onglet Matchs au lieu de bloquer toute la page.
     const hasOtherEntries = wl.teams.length || wl.leagues.length || wl.sports.length || wl.markets.length || rules.length;
     if (!found.length && !hasOtherEntries) {
-      // AUDIT-2026-04-27 (Sprint 46 #27) — Distinguer "data pas encore
       // chargé" (LITE blob) vs "match passé hors fenêtre".
       const isLite = !!(data && data._lite);
       wrap.innerHTML = `
@@ -23300,7 +22678,6 @@
           <button class="bookmark-btn" data-bookmark-toggle="${esc(String(m.id))}" aria-label="Retirer des favoris" data-tooltip="Retirer des favoris" style="background:transparent;border:none;color:var(--warn);font-size:18px;cursor:pointer;padding:4px 6px;line-height:1;">★</button>
         </div>`;
     }).join('');
-    // Sprint 72 — Section watchlist multi-niveaux selon currentTab
     let mainContent = '';
     if (currentTab === 'matches') {
       mainContent = `<div class="u-mt-4">${rows}</div>`;
@@ -23353,7 +22730,6 @@
         </div>
         <div style="margin-top:8px;font-size:11px;color:var(--text-dim);">Marque les marchés que tu joues souvent — les futures alertes filtreront sur ces marchés en priorité.</div>`;
     } else if (currentTab === 'alerts') {
-      // Sprint 143 (v31.7.194) — UI builder inline pour alertes (avant : console only).
       const alertBuilderHtml = `
         <details style="margin-top:14px;padding:12px 14px;background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-sm);">
           <summary style="cursor:pointer;font-size:13px;font-weight:700;color:var(--brand);">+ Créer une alerte</summary>
@@ -23443,7 +22819,6 @@
         renderFavorisPage(wrap);
       }
     }));
-    // Sprint 143 (v31.7.194) — Wire alert builder (UI inline pour créer une alerte)
     const builderBtn = wrap.querySelector('#alert-builder-create');
     if (builderBtn) {
       builderBtn.addEventListener('click', () => {
@@ -23475,7 +22850,6 @@
         e.stopPropagation();
         const id = btn.dataset.bookmarkToggle;
         if (id && typeof window._toggleBookmark === 'function') {
-          // AUDIT-2026-04-27 (Sprint 42 #10) — Save/restore scroll
           // pour éviter le saut au top sur re-render.
           const savedScrollY = window.scrollY || document.documentElement.scrollTop;
           window._toggleBookmark(id);
@@ -24394,7 +23768,6 @@
   // Brier, calibration drift) avec liens vers les onglets détaillés.
   // Le but : Théo voit en 5 secondes si le modèle se porte bien, sans avoir
   // à naviguer entre Bilan, Backtest, Crédibilité.
-  // Sprint 57 (v31.7.146) — Performance sub-tabs : Vue globale / Période /
   // Confiance / Marché. État dans localStorage.perfTab pour persistance.
   const PERF_TAB_KEY = 'perfTab';
   function _getPerfTab() {
@@ -24404,7 +23777,6 @@
     try { localStorage.setItem(PERF_TAB_KEY, t); } catch(e){}
   }
   function renderPerformancePage(wrap) {
-    // Sprint 110 (v31.7.190) — Lazy-load du backtest per-marché lors du 1er
     // affichage de Performance. Si déjà chargé : noop. Si en cours : poll
     // après resolution. Si idle : fetch + re-render quand prêt (l'onglet
     // "Marché" affichera ses données dès le chargement complet).
@@ -24424,7 +23796,6 @@
     }
     const bt = window.__backtestReportV2 || window.__backtestReport;
     if (!bt) {
-      // Sprint 111 (v31.7.190) — Skeleton loader au lieu du message statique.
       // L'utilisateur perçoit que ça charge, pas que c'est cassé. Auto-retry
       // via setTimeout : le fetch eager _loadModelCalibration() peut prendre
       // 100-500ms après le DOM ready, ce skeleton couvre ce gap perceptif.
@@ -24472,7 +23843,6 @@
     // Profit cumul : flat_pnl est en € (signed)
     const profit = overall.flat_pnl ?? overall.profit ?? null;
     const stake = overall.total_stake ?? overall.stake ?? null;
-    // Sprint 86 + FIX 2026-04-29 — ROI Kelly via kelly_pnl (€). Pas un ratio mais un montant
     // absolu — le report ne donne pas la mise totale Kelly, donc on affiche le PnL
     // directement (en €). Si on veut un %, on peut diviser par n × stake_unit, mais
     // c'est moins fiable.
@@ -24517,7 +23887,6 @@
         const order = { lock: 0, premium: 1, value: 2, standard: 3, low: 4 };
         return (order[a[0]] ?? 5) - (order[b[0]] ?? 5);
       });
-    // Sprint 57 (v31.7.146) — Sub-tabs internes
     const currentTab = _getPerfTab();
     const tabs = [
       { k: 'global',    lbl: '🎯 Vue globale' },
@@ -24537,7 +23906,6 @@
     const byPeriod = bt.by_period || bt.byPeriod || {};
     // Per-cote-bucket
     const byCote = bt.by_cote_bucket || bt.byCote || {};
-    // v32.0 (Phase 4) — Widget Health Pipeline en hero. Lit window.__healthData
     // (population par _refreshHealthIndicator). Surface visuellement quelles
     // sources data tournent et leur fraîcheur. Avant : info enfouie dans un
     // tooltip survolant l'icône topbar — invisible pour la plupart des users.
@@ -24596,7 +23964,6 @@
           ${kpiTile('Win Rate', fmtPct(wr), `${n} pari${n > 1 ? 's' : ''}`, 'var(--text)')}
           ${kpiTile('ROI flat', fmtSign(roi), stake ? `mise totale ${Number(stake).toFixed(0)}€` : 'mise constante', roiColor)}
           ${(() => {
-            // Sprint 86 + FIX 2026-04-29 — ROI Kelly. Le report donne kelly_pnl
             // en € (montant absolu), pas un ratio. On affiche le PnL en €.
             if (roiKelly != null) {
               const num = Number(roiKelly);
@@ -24613,7 +23980,6 @@
           ${edgeAvg != null ? kpiTile('Edge moyen', `${Number(edgeAvg) >= 0 ? '+' : ''}${(Number(edgeAvg)*100).toFixed(1)}pt`, 'sur paris pris', Number(edgeAvg) >= 0.03 ? 'var(--accent)' : 'var(--text-dim)') : ''}
           ${clvAvg != null ? kpiTile('CLV moyen', `${Number(clvAvg) >= 0 ? '+' : ''}${(Number(clvAvg)*100).toFixed(1)}%`, 'closing line value', Number(clvAvg) >= 0 ? 'var(--accent)' : 'var(--danger)') : ''}
           ${(() => {
-            // Sprint 98 (v31.7.183) — Sharpe ratio + drawdown + streaks max
             const adv = (typeof computeAdvancedMetrics === 'function') ? computeAdvancedMetrics() : null;
             if (!adv || !adv.n) return '';
             const sharpeColor = adv.sharpe == null ? 'var(--text-dim)' : adv.sharpe >= 0.20 ? 'var(--accent)' : adv.sharpe >= 0 ? 'var(--warn)' : 'var(--danger)';
@@ -24698,7 +24064,6 @@
         </div>` : ''}
 
         ${currentTab === 'marche' ? (() => {
-          // Sprint 74 (v31.7.162) — Branche backtest_report_markets.json (Sprint 66+76).
           // Affiche WR per-(marché, pick) avec tri par WR desc, et ROI quand dispo.
           const mktRep = window.__backtestReportMarkets;
           if (!mktRep || !mktRep.by_market_pick) {
@@ -24748,7 +24113,6 @@
               </tr>`;
           }).join('');
           const nWithRoi = entries.filter(([, v]) => v.roi != null).length;
-          // v33.15 — Insights auto basé sur CI Wilson 95% (mirror analyze_calibration.py)
           // Pour chaque (marché, pick) avec n ≥ 10, on classe :
           //   ✓ Edge significatif : ci_lo ≥ 0.55
           //   🟡 Edge faible       : ci_lo ≥ 0.50
@@ -24806,7 +24170,6 @@
               </div>
 
               ${(() => {
-                // Sprint 88 (v31.7.175) — Segmentations supplémentaires : par ligue, par période, par edge-bucket
                 const sectByDim = (title, emoji, dim, fmtKey) => {
                   if (!dim) return '';
                   const ents = Object.entries(dim).filter(([k, v]) => (v.n || 0) >= 3).sort((a, b) => (b[1].n || 0) - (a[1].n || 0)).slice(0, 12);
@@ -24887,7 +24250,6 @@
         </div>` : ''}
 
         ${currentTab === 'ligue' ? (() => {
-          // v33.10 — Onglet "Par ligue" : table triable ROI/WR/Kelly par ligue.
           // Lit bt.by_league qui contient stats détaillées (n, win_rate,
           // flat_roi_pct, kelly_pnl, brier, avg_cote) pour 40+ ligues.
           const byLeague = bt.by_league || {};
@@ -24946,7 +24308,6 @@
             </div>`;
         })() : ''}
 
-        <!-- Sprint 57 (v31.7.146) — Anciens blocs per-sport / per-tier déplacés
              dans les onglets ci-dessus. Ne plus dupliquer ici. -->
         ${''}
 
@@ -24962,7 +24323,6 @@
           <div style="margin-top:8px;font-size:11px;color:var(--text-dim2);">Source : <code class="u-text-brand">backtest_report_v2.json</code> · regénéré chaque dimanche par cron.</div>
         </div>
       </div>`;
-    // Sprint 57 (v31.7.146) — Tab click handler
     wrap.querySelectorAll('[data-perf-tab]').forEach(b => {
       b.addEventListener('click', () => {
         const t = b.dataset.perfTab;
@@ -24973,9 +24333,7 @@
   }
   try { window.renderPerformancePage = renderPerformancePage; } catch(e){}
 
-  // AUDIT-2026-04-27 (Sprint 22 #18) — Expose pour CSP-safe delegation.
   // window.renderLeaguePage défini explicitement après la définition.
-  // AUDIT-2026-04-27 (Sprint 5 #24) — Per-league deep-dive page.
   // Lit window.__backtestReportV2.by_league[<lc>] et affiche un panneau
   // détaillé : KPIs (n, WR, ROI, Brier), per-cote-bucket, top wins/loses
   // récents pour cette ligue. Hash URL : #league/eng.1 → ouvre direct.
@@ -25029,7 +24387,6 @@
     }
     // Détail d'une ligue
     const stats = bt?.by_league?.[lc];
-    // AUDIT-2026-04-27 (Sprint 17 #21) — Breadcrumbs
     const breadcrumbsHtml = `
       <nav class="breadcrumbs" aria-label="Breadcrumb">
         <button data-page="dashboard" class="page-btn">🏠 Accueil</button>
@@ -25227,7 +24584,6 @@
       if (bestDay == null || d.pl > bestDay.pl) bestDay = d;
       if (worstDay == null || d.pl < worstDay.pl) worstDay = d;
     });
-    // v33.25 — Fix bug screen Théo : si 1 seul jour, bestDay === worstDay et
     // affichait deux fois la même ligne (vert ET rouge). Forcer null sur
     // worstDay quand on a moins de 2 jours distincts → KPI affiche "—".
     if (days.length < 2 || (bestDay && worstDay && bestDay.key === worstDay.key)) {
@@ -25527,7 +24883,6 @@
       ? `<div class="bilan-empty u-mt-18">Aucun pick ne correspond aux filtres actuels. Essaye "Réinitialiser" pour tout afficher.</div>`
       : '';
 
-    // v30 — Coach IA patterns détectés retiré : il agrégeait les paris
     // trackés par l'utilisateur. Le bloc complet (IIFE FFFF) était dead
     // code après le précédent ass="const patternsHtml = ''", on le supprime.
     const patternsHtml = '';
@@ -25539,7 +24894,6 @@
           <div style="font-size:11px;color:var(--info);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Archives du modèle</div>
           <h1 style="margin:0 0 6px;font-size:40px;font-weight:800;letter-spacing:-1.4px;color:var(--text);line-height:1;">Historique</h1>
           <div style="font-size:14px;color:var(--text-dim);max-width:760px;">Tous les pronostics réglés par marché exact Winamax, groupés par jour. Filtre par sport, confiance, type, marché ou site de paris, puis exporte en CSV.</div>
-          <!-- v31.7.78 — Note rolling window data.js (~14 jours) + lien backtest -->
           <div style="margin-top:14px;padding:10px 14px;background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.20);border-left:3px solid var(--info);border-radius:0 8px 8px 0;font-size:12.5px;color:var(--text-dim);max-width:700px;line-height:1.5;">
             ℹ️ Cette page affiche l'historique présent dans <code style="background:var(--panel-3);padding:1px 5px;border-radius:3px;">data.js</code> (fenêtre rolling ~14 jours).
             Pour <b>tout l'historique vérifié</b> (depuis le déploiement, sans rolling), va sur la <button class="page-btn" data-page="backtest" style="background:transparent;border:none;color:var(--info);text-decoration:underline;cursor:pointer;font-size:inherit;font-family:inherit;padding:0;font-weight:700;">page Backtest</button> qui scanne <code style="background:var(--panel-3);padding:1px 5px;border-radius:3px;">results_archive.jsonl</code> + <code style="background:var(--panel-3);padding:1px 5px;border-radius:3px;">odds_history.jsonl</code> côté Python.
@@ -25750,7 +25104,6 @@
     window._findMatchById = _findMatchById;
   } catch(e){}
 
-  // Chantier UU — Mes paris trackés
   // localStorage key: paris_sportif_tracked_bets
   // Shape: { [uniqueId]: { id, sport, league, home, away, kickoff, pick_label, odds, stake, added_at, status } }
   // status: 'en cours' | 'gagné' | 'perdu' | 'annulé'
@@ -26343,7 +25696,6 @@
         </div>
 
         ${(() => {
-          // AUDIT-2026-04-27 (Sprint 4 #20) — Quality checks visibles
           // dans la page Santé. Lit window.__healthData rempli par
           // _refreshHealthIndicator. Permet à l'user de voir d'un coup
           // d'œil les checks sémantiques (Winamax exact ratio, foot
@@ -26414,9 +25766,7 @@
                 <div style="font-size:11px;color:var(--text-dim);margin-top:4px;line-height:1.4;">${clv.observations || 0} observations · ${isFinite(clvRate) ? clvRate.toFixed(1) : '0.0'}% positives · ${esc(clv.sample_status || 'learning')}</div>
               </div>` : ''}
               ${(() => {
-                // AUDIT-2026-04-27 (Sprint 35 #13) — Drift detector visible.
                 // Lit quality_checks.model_drift_ks (Sprint 7 #3 +
-                // Sprint 32 #38 alert seuil). KS > 0.15 = warning, > 0.25
                 // = critique.
                 const ks = q.model_drift_ks;
                 if (ks == null) return '';
@@ -26708,7 +26058,6 @@
     // settledBets = array des paris trackés clos (gagné/perdu) depuis loadTrackedBets
     if (!settledBets || settledBets.length < 10) {
       return {
-        // v30 — Avant : "Pas assez de paris réglés (0/10)" alors que la
         // page Historique en haut affiche "16 picks réglés". Confusion :
         // les 16 sont les picks du MODÈLE (auto-trackés). Ces patterns
         // analysent les paris que TU as suivis manuellement (Mes paris).
@@ -26933,7 +26282,6 @@
       return `<em>Pas de lock actif. Reviens après la prochaine actualisation (toutes les 10 min).</em>`;
     }
     const lines = [];
-    // v30 fix — Avant : on lisait l.prob / l.odd alors que renderLocksPage
     // pousse des objets {m, pred}. Résultat : "confiance moyenne 0%, cote
     // moyenne @0.00" affiché en permanence sur la page Locks. Maintenant
     // on extrait reliability + l'odd associé au pick depuis pred.odds.
@@ -27226,11 +26574,9 @@
     };
   }
 
-  // v30 — renderMesParis + _renderWinamaxImportSetup + _renderWinamaxImported
   // + _showDatePrompt + handler set-model-start-btn : tous retirés.
   // Théo n'enregistre pas ses paris sur le site (ni manuel, ni import).
 
-  // v31.7.58 — Comparateur 2 dates côte à côte (backlog V2 #4).
   // Permet de regarder les pronos de 2 jours différents en parallèle pour
   // détecter les patterns ("comment le modèle s'est comporté entre samedi
   // et dimanche", "quelle est la différence entre hier et aujourd'hui").
@@ -27406,7 +26752,6 @@
     const perSport = {};
     const perLeague = {}; // Chantier O — aggregation par ligue
     const rows = [];
-    // v26.5 — Compute available sports BEFORE applying sport filter (for filter UI)
     // Only sports with ≥1 evaluated pick in the time window make it into the pills.
     const _sportsInWindow = new Set();
     completed.forEach(m => {
@@ -27414,7 +26759,6 @@
         const md = new Date(m.date);
         if (isNaN(md.getTime()) || md < windowCutoff) return;
       }
-      // v26.5 — Apply sport filter (drill-down)
       if (_bilanSport && m.sport !== _bilanSport) return;
       const pred = predictMatch(m);
       if (!pred || !pred.pick || pred.skip) return;
@@ -27440,7 +26784,6 @@
     const wr = model.bets ? (100*model.w/model.bets) : 0;
     const roi = model.bets ? (100*model.pl/model.bets) : 0;
 
-    // v26.5 — Discover sports present in current time window (before filter)
     // to render the sport-filter pills. Counts picks per sport (using a quick
     // pre-pass); only sports with ≥1 evaluable pick appear.
     const _sportCounts = {};
@@ -27459,7 +26802,6 @@
     });
     const _availSports = Object.entries(_sportCounts).sort((a,b) => b[1]-a[1]);
     const _totalPicksInWindow = _availSports.reduce((s, [,c]) => s + c, 0);
-    // v31.7.28 a11y : role=toolbar + aria-pressed sur les pills sport-filter.
     const _sportFilterHtml = _availSports.length >= 2 ? `
       <div role="toolbar" aria-label="Filtrer le bilan par sport" style="max-width:1500px;margin:0 auto 16px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-variant-numeric:tabular-nums;">
         <span style="font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-dim2);font-weight:700;margin-right:4px;">Filtrer par sport</span>
@@ -27472,7 +26814,6 @@
       date: isoDate(r.m.date),
       delta: r.res === 'won' ? (r.odd - 1) : -1,
     }));
-    // v31.7.22 — Mode "Comparer fenêtres" : si activé, on calcule indépendamment
     // 7j/30j/90j à partir de `completed` (ignore le filtre _bilanWindow car il
     // est forcément contraint à une seule fenêtre). Sport filter respecté.
     let modelChartHtml;
@@ -27508,15 +26849,11 @@
         || `<div class="bilan-empty">Pas encore assez de paris pour tracer une courbe.</div>`;
     }
 
-    // v31.7.54 — Profit calendar GitHub-style (heatmap 365j P&L quotidien)
     const profitCalendarHtml = renderProfitCalendar(rows);
 
     // ========= PORTEFEUILLE SIMULÉ — Chantier JJ (backtest what-if) =========
-    // Chantier EE (2026-04-21) a introduit le choix du stake mode.
-    // Chantier JJ (2026-04-22) ajoute les paramètres de démarrage :
     //   - bankroll initial (10€ par défaut, 10-1000€)
     //   - date de départ (défaut = date du premier lock réglé)
-    // Chantier RR (2026-04-22) ajoute toggle tous picks vs locks seulement.
     // Le tout persisté en localStorage. Permet de répondre à :
     //   "Et si j'avais commencé avec 50€ le 15 avril en Kelly 0.25× ?"
     // Le backtest NE MODIFIE PAS les picks réels ; il ne fait que rejouer
@@ -27528,7 +26865,6 @@
     completed.forEach(m => {
       const pred = predictMatch(m);
       if (!pred || !pred.pick || pred.skip) return;
-      // Chantier RR : filtrer par mode (tous picks ou locks seulement)
       if (_walletPicksMode === 'locks' && !pred.isLock) return;
       const res = evaluateModelPick(m, pred);
       if (res == null) return;
@@ -27536,7 +26872,6 @@
       if (!odd) return;
       walletAllRows.push({ m, pred, res, odd });
     });
-    // Chantier JJ — tri puis filtre par date de départ.
     const walletAllSorted = walletAllRows
       .slice()
       .sort((a, b) => new Date(a.m.date) - new Date(b.m.date));
@@ -27550,7 +26885,6 @@
     const lockRows = walletBacktestDateEff
       ? walletAllSorted.filter(r => isoDate(r.m.date) >= walletBacktestDateEff)
       : walletAllSorted;
-    // Chantier EE — simulation de mise dynamique.
     // On itère dans l'ordre chronologique et on calcule la mise pour chaque
     // lock en fonction de la banque courante (Kelly) ou du montant flat choisi.
     // Permet de comparer différentes politiques de staking sans toucher
@@ -27638,14 +26972,12 @@
     })();
 
     // Tiny equity chart: reuse renderRoiChart API shape (date + delta)
-    // Chantier EE — utilise les deltas réels calculés dynamiquement par lock
     // (car la mise varie selon le mode : flat1/flat2/flat5/Kelly).
     const walletChartRows = lockRows.map(r => ({
       date: isoDate(r.m.date),
       delta: r.delta,
     }));
     const walletStakeModeLbl = walletStakeLabel(_walletStakeMode);
-    // Chantier RR — label dynamique "par lock" vs "par pick"
     // FIX TDZ : remonté ici (utilisé dans walletChartHtml juste en dessous).
     const walletPicksLabel = _walletPicksMode === 'locks' ? 'par lock' : 'par pick';
     const walletChartHtml = walletChartRows.length
@@ -27668,7 +27000,6 @@
             </div>`;
         }).join('')
       : '';
-    // v31.7.81 — Mélange hex/CSS-var ici crée un bug : `${walletRoiColor}44`
     // pour neutre produit `var(--text-dim)44` invalide → border-color cassé.
     // On garde tout en hex pour la concaténation alpha.
     const walletRoiColor = walletPL > 0 ? '#34d399' : walletPL < 0 ? '#f87171' : '#7b8693';
@@ -27733,7 +27064,6 @@
         </div>`
       : '';
 
-    // Chantier EE — toolbar pour sélectionner la politique de staking.
     // Ne modifie PAS les résultats réels ni les locks — c'est une simulation
     // rejouée à la volée sur l'historique. Permet de comparer "et si j'avais
     // mis 2€ flat ?" ou "et si j'avais Kelly 0.25× ?".
@@ -27745,7 +27075,6 @@
         <span style="font-size:11px;color:var(--text-dim2);margin-left:2px;" title="Kelly utilise la fiabilité (modèle pur, sans marché) comme probabilité. Fraction plafonnée à 10% de banque.">ℹ️ rejoué sur l'historique</span>
       </div>`;
 
-    // Chantier JJ — toolbar backtest what-if.
     // Permet de choisir la banque de départ (10-10000€) et la date de départ
     // (à partir de laquelle on compte les locks). La date est clampée à
     // walletEarliestISO côté code — on peut donc saisir n'importe quoi sans
@@ -27772,7 +27101,6 @@
     const walletDateLabel = (walletBacktestDateEff && walletBacktestDateEff !== walletEarliestISO)
       ? ` · depuis ${walletBacktestDateEff}` : '';
     // (walletPicksLabel déplacé plus haut — fix TDZ)
-    // Chantier RR — toggle [Tous picks | Locks seulement]
     const walletPicksModeToolbar = `
       <div style="display:flex;align-items:center;gap:8px;margin-top:0;margin-bottom:8px;flex-wrap:wrap;">
         <span style="font-size:11.5px;color:var(--text-dim2);font-weight:600;text-transform:uppercase;letter-spacing:.4px;">Mode :</span>
@@ -27923,7 +27251,6 @@
         </div>`;
       }).join('');
 
-    // Chantier O — Breakdown par ligue (top 12 par volume, min 3 paris pour être significatif)
     // Tableau trié par ROI pour identifier les ligues à fort edge.
     const leagueEntries = Object.values(perLeague)
       .filter(lg => lg.bets >= 3)
@@ -28033,14 +27360,12 @@
         }
       };
 
-      // Chantier SS — Best / worst cell pour le résumé bas de grille : n >= 10 minimum
       const qualCells = Object.values(cells).filter(c => c.bets >= 10);
       qualCells.sort((a,b) => (b.pl/b.bets) - (a.pl/a.bets));
       const bestCell = qualCells[0] || null;
       const worstCell = qualCells[qualCells.length-1] || null;
       const bestROI = bestCell ? (100 * bestCell.pl / bestCell.bets) : 0;
       const worstROI = worstCell ? (100 * worstCell.pl / worstCell.bets) : 0;
-      // Chantier SS — message si données insuffisantes
       const insufficientDataMsg = !bestCell ? `<div style="padding:9px 12px;font-size:11px;color:var(--text-dim);border-top:1px solid var(--border,#2a3744);background:var(--bg-3,#0f1823);margin-top:10px;border-radius:8px;">⚠️ Données insuffisantes pour un classement fiable (besoin ≥10 paris/créneau)</div>` : '';
 
       const headerH = `
@@ -28056,7 +27381,6 @@
           }
           const roi = 100 * c.pl / c.bets;
           const wr = 100 * c.w / c.bets;
-          // Chantier SS — Wilson 95% confidence interval sur le taux de win
           // p ± 1.96*sqrt(p(1-p)/n) appliqué à la win rate
           const p = c.w / c.bets;
           const ci_margin = 1.96 * Math.sqrt(p * (1 - p) / c.bets);
@@ -28070,7 +27394,6 @@ WR ${wr.toFixed(0)}% ${c.bets >= 5 ? ci_str : ''} · ROI ${roi>=0?'+':''}${roi.t
 P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
           let label;
           if (c.bets < 5) {
-            // Chantier SS — Dim cells with n<5, show only n=X
             label = `<div style="font-size:10px;color:${col.text};line-height:1.1;">n=${c.bets}</div>`;
           } else {
             // Normal display with CI appended
@@ -28222,7 +27545,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       </tr>`;
     }).join('');
 
-    // Chantier WW — Time-window filter toolbar with smart disable logic
     const winLabel = (_bilanWindow === 0) ? 'Tout' : `${_bilanWindow} derniers jours`;
 
     // Compute daysOfDataAvailable from earliest settled pick
@@ -28235,7 +27557,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       daysOfDataAvailable = Math.floor((today - earliest) / (1000 * 60 * 60 * 24));
     }
 
-    // v31.7.28 a11y : role=toolbar + aria-label descriptifs sur chaque
     // bouton fenêtre + aria-pressed pour le toggle Comparer.
     const windowToolbarHtml = `
       <div class="bilan-window-toolbar" role="toolbar" aria-label="Fenêtre temporelle du bilan">
@@ -28289,7 +27610,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       ${drawsCardHtml}
     `;
 
-    // Chantier CCCC — Bilan narratif IA (coach direct)
     const narrativeHtml = (() => {
       try {
         // Phase 3 #10 : Coach IA neutralisé si n<5 (échantillon trop petit)
@@ -28323,7 +27643,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     // "est-ce que le modèle gagne de l'argent en pariant flat 1u ?"
     const _modelRoi = model.bets ? roi : null;
 
-    // v30 — "Comment fonctionne le modèle" : section pédagogique en bas
     // de la page Bilan. L'utilisateur a demandé "tu ajouteras des
     // explications du modèle sur le site dans son bilan en version qui
     // explique tout". On expose les 13+ signaux que predictMatch
@@ -28443,7 +27762,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
           <div class="card-info"><strong class="u-text">Skip</strong> : pari avec moins de 2 signaux non-marché OU fiabilité &lt;45%. On ne le surface pas.</div>
         </div>
       </section>`;
-    // v30 — Epoch banner. On 2026-04-26 we shipped the Winamax 1n2
     // alignment fix (commit b6b8e1b) which corrected odds on 65 events
     // that had been priced at the wrong side. The model's historical
     // bilan before that date is partially contaminated — every pick
@@ -28465,7 +27783,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         <strong class="u-text">⚠️ Epoch ${ALIGNMENT_EPOCH_ISO}</strong> — Avant cette date, l'alignement des cotes Winamax 1n2 inversait home/away sur ~65 events (tennis, basket, hockey, foot). Les paris pris avant le ${ALIGNMENT_EPOCH_ISO} ont une part de phantom edge dans le bilan rétro. À partir de ce jour, c'est propre. <a href="#credibilite" class="u-text-accent">Détails →</a>
       </div>
     ` : '';
-    // v32.0 (Phase 3) — Widget "État Agent autonome" en hero du Bilan.
     // Lit _agentReplay() pour exposer : NAV courant, drawdown tier, streak,
     // pause status. Theo voit en 1 coup d'œil l'état de sa cagnotte +
     // les protections actives (drawdown protection v31.7.210 + tilt v31.7.218).
@@ -28479,7 +27796,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         const navColor = ratio >= 1.0 ? 'var(--accent)' : ratio >= 0.8 ? 'var(--warn,#fbbf24)' : 'var(--danger)';
         const navSign = nav >= start ? '+' : '';
         const deltaPct = ((ratio - 1) * 100);
-        // v33.5 — Détection "agent dormant" : NAV exactement = start ET 0 paris
         // joués (series.length === 0). Cas typique au boot ou si data stale
         // depuis longtemps. Distinguer visuellement de "agent rentable à
         // exactement 0%" qui est différent.
@@ -28555,13 +27871,11 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       ${_agentWidget}
       ${epochBannerHtml}
 
-      <!-- v26.5 — SPORT FILTER PILLS (drill-down) -->
       ${_sportFilterHtml}
 
       <!-- TIME-WINDOW FILTER -->
       ${windowToolbarHtml}
 
-      <!-- v31.7.8 — Bouton Export CSV du bilan -->
       <div style="max-width:1500px;margin:0 auto 14px;display:flex;justify-content:flex-end;gap:8px;align-items:center;">
         <button id="bilan-export-csv" type="button" style="padding:8px 14px;background:transparent;border:1px solid var(--border-2);color:var(--text-dim);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .15s ease;">
           ⬇ Export CSV (${rows.length} paris)
@@ -28604,7 +27918,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       </div>` : ''}
 
       ${(() => {
-        // v33.31 — Stats avancées : Sharpe, Max DD, streaks, ROI rolling 7j.
         // Utile pour évaluer la consistance du modèle au-delà du simple ROI %.
         if (!rows.length || rows.length < 5) return '';
         // Tri par date pour calculer correctement les streaks et le cum
@@ -28804,7 +28117,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         </div>
       </div>
 
-      <!-- Chantier O — Par ligue : tableau trié par ROI -->
       ${perLeagueHtml ? `
         <div class="bilan-section">
           <div class="bilan-section-head">
@@ -28815,16 +28127,13 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         </div>
       ` : ''}
 
-      <!-- Chantier OO — Heatmap sport × jour de semaine -->
       ${heatmapHtml}
 
-      <!-- Chantier FF — Tipsters scorecard : WR + ROI par source externe -->
       ${tipstersSectionHtml}
 
       <!-- CALIBRATION FIABILITÉ : reliability diagram + sparkline MAE persistant -->
       ${reliabilitySectionHtml}
 
-      <!-- v30 — Comment fonctionne le modèle (pédagogique) -->
       ${_modelExplainerHtml}
 
       <!-- HISTORIQUE MODÈLE -->
@@ -28856,7 +28165,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         ` : `<div class="bilan-empty">Aucun pari du modèle évalué pour le moment.</div>`}
       </div>
 
-      <!-- v30 — Section Winamax importée retirée : Théo n'enregistre pas
            ses paris sur le site (ni manuel, ni import). -->
     `;
 
@@ -28876,10 +28184,8 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       renderBilanPage(wrap);
     }));
     // Time-window filter buttons
-    // Chantier WW — bilan window buttons with disable check
     wrap.querySelectorAll('.bilan-win-btn').forEach(btn => btn.addEventListener('click', () => {
       if (btn.disabled) return;
-      // v31.7.22 — Le bouton "Comparer" partage la classe .bilan-win-btn pour
       // l'apparence mais a un data-* différent. Skip ici, géré ci-dessous.
       if (btn.id === 'bilan-compare-toggle') return;
       const v = parseInt(btn.dataset.win, 10);
@@ -28888,7 +28194,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       try { localStorage.setItem('bilanWindow', String(v)); } catch (e) {}
       renderBilanPage(wrap);
     }));
-    // v31.7.22 — Bouton "Comparer" : toggle multi-window superposé.
     const _compareBtn = wrap.querySelector('#bilan-compare-toggle');
     if (_compareBtn) {
       _compareBtn.addEventListener('click', () => {
@@ -28897,7 +28202,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         renderBilanPage(wrap);
       });
     }
-    // Chantier R — toggle horizon table portefeuille
     wrap.querySelectorAll('.wallet-tbl-btn').forEach(btn => btn.addEventListener('click', () => {
       const v = parseInt(btn.dataset.wtw, 10);
       if (!Number.isFinite(v) || v === _walletTableWindow) return;
@@ -28905,7 +28209,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       try { localStorage.setItem('walletTableWindow', String(v)); } catch (e) {}
       renderBilanPage(wrap);
     }));
-    // Chantier EE — toggle politique de mise (flat / Kelly)
     wrap.querySelectorAll('.wallet-stake-btn').forEach(btn => btn.addEventListener('click', () => {
       const v = btn.dataset.wsm;
       if (!['flat1','flat2','flat5','kelly025','kelly050'].includes(v) || v === _walletStakeMode) return;
@@ -28913,7 +28216,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       try { localStorage.setItem('walletStakeMode', v); } catch (e) {}
       renderBilanPage(wrap);
     }));
-    // Chantier RR — toggle mode picks (tous / locks seulement)
     wrap.querySelectorAll('.wallet-picks-mode-btn').forEach(btn => btn.addEventListener('click', () => {
       const v = btn.dataset.wpm;
       if (!['all','locks'].includes(v) || v === _walletPicksMode) return;
@@ -28921,7 +28223,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       try { localStorage.setItem('walletPicksMode', v); } catch (e) {}
       renderBilanPage(wrap);
     }));
-    // Chantier JJ — backtest what-if : banque de départ
     wrap.querySelectorAll('.wallet-bt-start').forEach(inp => {
       const commit = () => {
         let v = parseFloat(inp.value);
@@ -28935,7 +28236,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       inp.addEventListener('change', commit);
       inp.addEventListener('blur', commit);
     });
-    // Chantier JJ — backtest what-if : date de départ
     wrap.querySelectorAll('.wallet-bt-date').forEach(inp => {
       inp.addEventListener('change', () => {
         const v = inp.value;
@@ -28949,7 +28249,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         renderBilanPage(wrap);
       });
     });
-    // Chantier JJ — backtest what-if : reset
     wrap.querySelectorAll('.wallet-bt-reset').forEach(btn => btn.addEventListener('click', () => {
       if (btn.disabled) return;
       if (_walletBacktestStart === 10 && !_walletBacktestDate) return;
@@ -28961,13 +28260,11 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       } catch (e) {}
       renderBilanPage(wrap);
     }));
-    // Chantier O — click handler sur les lignes "Par ligue" pour drill-down
     wrap.querySelectorAll('[data-league-row]').forEach(row => {
       row.addEventListener('click', () => {
         row.classList.toggle('expanded');
       });
     });
-    // v33.32 — Fetch CLV asynchrone et remplit le tile dans Stats avancées.
     // Cheap (~1KB summary). Cache HTTP 5min côté SW.
     (function _loadCLV() {
       const tile = wrap.querySelector('#bilan-clv-tile');
@@ -28991,7 +28288,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         })
         .catch(() => {/* silent */});
     })();
-    // v26.5 — Sport filter pills (drill-down)
     wrap.querySelectorAll('.bilan-sport-btn').forEach(btn => btn.addEventListener('click', () => {
       const sp = btn.dataset.sport || null;
       if (sp === _bilanSport) return;
@@ -29002,7 +28298,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       } catch (e) {}
       renderBilanPage(wrap);
     }));
-    // v26.5 — Per-sport cards clickable : click = filter Bilan to that sport
     wrap.querySelectorAll('.bilan-sport-card[data-sport]').forEach(card => card.addEventListener('click', () => {
       const sp = card.dataset.sport;
       if (!sp || sp === _bilanSport) return;
@@ -29012,7 +28307,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       // Scroll to top so user sees the new filter applied
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }));
-    // v31.7.8 — Export CSV du bilan (rows actuel = filtre window+sport)
     const exportBtn = wrap.querySelector('#bilan-export-csv');
     if (exportBtn) {
       exportBtn.addEventListener('click', () => {
@@ -29043,7 +28337,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       });
     }
 
-    // AUDIT-2026-04-27 (Sprint 20 #7) — Confetti sur win streak ≥3.
     // Détecte les 3 derniers picks réglés et si tous wins → spawn confetti
     // sur la card P&L cumulé. Triggered une fois par session via flag.
     try {
@@ -29074,33 +28367,28 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     const v = parseInt(localStorage.getItem('bilanWindow'), 10);
     return [0, 7, 30, 90].includes(v) ? v : 0;
   })();
-  // v31.7.22 — Mode "Comparer fenêtres" : superpose 7j/30j/90j sur le même
   // chart pour visualiser comment la courte/moyenne/longue fenêtre se
   // comportent simultanément. Le toggle est un bool persisté.
   let _bilanCompareMode = (() => {
     return localStorage.getItem('bilanCompareMode') === '1';
   })();
-  // v26.5 — Sport filter (drill-down). null = tous les sports. Persisted.
   // Si défini, filtre model/wallet/chart/buckets/histoire à un sport unique.
   let _bilanSport = (() => {
     const v = localStorage.getItem('bilanSport');
     const valid = ['football','basketball','tennis','hockey','american-football','mma','golf','racing','baseball'];
     return v && valid.includes(v) ? v : null;
   })();
-  // Chantier R — Horizon d'affichage pour la table Portefeuille 10€
   // (indépendant de _bilanWindow ; ne change pas les KPIs/courbe).
   let _walletTableWindow = (() => {
     const v = parseInt(localStorage.getItem('walletTableWindow'), 10);
     return [0, 7, 30].includes(v) ? v : 30;
   })();
-  // Chantier EE — Simulation bankroll : mode de mise du portefeuille simulé.
   // 'flat1' (default legacy) | 'flat2' | 'flat5' | 'kelly025' | 'kelly050'
   // Persisté en localStorage. Le bankroll de départ reste 10€ pour comparabilité.
   let _walletStakeMode = (() => {
     const v = localStorage.getItem('walletStakeMode');
     return ['flat1','flat2','flat5','kelly025','kelly050'].includes(v) ? v : 'flat1';
   })();
-  // Chantier JJ — Backtest what-if : bankroll de départ + date de départ
   // customisables. Permet de simuler "et si j'avais commencé avec X€ le Y ?"
   // Bankroll : clamp 10-10000€. Date : ISO YYYY-MM-DD ou null (= premier lock).
   let _walletBacktestStart = (() => {
@@ -29113,7 +28401,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     if (!v) return null;
     return /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : null;
   })();
-  // Chantier RR — Toggle pour afficher tous les picks ou seulement les locks
   // dans le portefeuille simulé. 'all' | 'locks'. Default 'all'.
   let _walletPicksMode = (() => {
     const v = localStorage.getItem('walletPicksMode');
@@ -29143,7 +28430,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     }
   }
 
-  // Chantier PP — conversion cote américaine → décimale.
   // ML positif : +200 → 1 + 200/100 = 3.00   (payout 2:1)
   // ML négatif : -150 → 1 + 100/150 ≈ 1.667 (payout 0.667:1)
   // Retourne null pour les valeurs invalides afin que getMatchOdds puisse
@@ -29217,7 +28503,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     });
   }
 
-  // v30 — Inject up to 5 SportsEvent JSON-LD schemas for today's top matches
   // so Google can index them as rich snippets (sport, teams, kickoff, venue).
   // Runs once at boot from PRONOSTICS_DATA — keeps DOM lean by capping at 5.
   function _injectMatchSchemas() {
@@ -29271,7 +28556,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     setTimeout(_injectMatchSchemas, 1500);
   }
 
-  // v31 — Analytics opt-in (privacy-first), désactivé par défaut.
   //
   // Le site est livré SANS tracker. Pour activer une mesure d'audience
   // anonyme (≠ Google Analytics), Théo peut configurer l'une de ces
@@ -29287,7 +28571,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
   // Le script tiers n'est INJECTÉ QU'APRÈS le consentement explicite
   // (clic "Accepter" dans la bannière). Au refus, rien ne charge.
   // Conforme aux règles CNIL sur les traceurs.
-  // v31 — Plan d'événements (audit ChatGPT 2026-04-26 #2). Liste des events
   // que le site tracker SI un provider analytics est activé. Tant qu'aucun
   // n'est configuré, psEvent() est un no-op silencieux. Quand Plausible
   // est wired, les events partent automatiquement via window.plausible(...).
@@ -29358,7 +28641,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       s.src = 'https://plausible.io/js/script.js';
       document.head.appendChild(s);
       _analyticsLoaded = true;
-      // Sprint 131 (v31.7.193) — console.log retiré (production)
     } else if (window.ANALYTICS_CLOUDFLARE_TOKEN) {
       const s = document.createElement('script');
       s.defer = true;
@@ -29366,15 +28648,12 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       s.dataset.cfBeacon = JSON.stringify({ token: window.ANALYTICS_CLOUDFLARE_TOKEN });
       document.head.appendChild(s);
       _analyticsLoaded = true;
-      // Sprint 131 — console.log retiré
     }
     // Sinon : aucun analytics configuré, on no-op silencieusement.
   }
 
-  // v30 — Consent RGPD pour localStorage. Affichée tant que l'utilisateur
   // n'a pas explicitement répondu. Auto-accept silencieux si legacy data
   // détectée (compat utilisateurs existants qui avaient des prefs avant).
-  // v31.7.45 — Audit fix : ne montrer le banner RGPD qu'APRÈS l'onboarding.
   // Avant : modal Bienvenue + banner RGPD apparaissaient simultanément →
   // friction visuelle et 2 décisions à prendre en même temps.
   function _shouldShowConsentBanner() {
@@ -29403,7 +28682,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       try { localStorage.setItem('userPrefs', JSON.stringify(prefs)); } catch(e){}
       return;
     }
-    // v31.7.45 — Skip si onboarding pas terminé. Le onLevelChosen (handler)
     // ré-appelle _initConsentBanner après le choix de niveau → cascade propre.
     if (!_shouldShowConsentBanner()) return;
     const banner = document.getElementById('consent-banner');
@@ -29454,11 +28732,9 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     });
   }
   _initConsentBanner();
-  // v31 — Si déjà accepté lors d'une visite précédente, activer analytics
   // (uniquement si Théo a configuré PLAUSIBLE_DOMAIN ou CLOUDFLARE_TOKEN).
   _maybeEnableAnalytics();
 
-  // AUDIT-2026-04-27 (Sprint 3 #14) — Mode offline UX banner.
   // Plutôt que laisser l'user devant un site qui semble cassé sans
   // raison quand sa connexion tombe, on affiche une bannière jaune
   // visible avec timestamp de la dernière donnée disponible.
@@ -29503,7 +28779,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     else document.addEventListener('DOMContentLoaded', updateBanner, { once: true });
   })();
 
-  // Sprint 120 (v31.7.191) — Scroll-to-top FAB. S'affiche après scroll >800px,
   // smooth scroll au click. Throttled via requestAnimationFrame pour pas
   // saturer le scroll handler (60fps cap).
   (function _initScrollTopFab() {
@@ -29551,7 +28826,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     if (!data) {
       const banner = document.getElementById('no-data-banner');
       banner.classList.remove('hidden');
-      // v31.2 — Wire retry button. Force reload + cache bypass.
       const retryBtn = document.getElementById('no-data-retry');
       if (retryBtn) {
         retryBtn.addEventListener('click', () => {
@@ -29563,12 +28837,9 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       }
       return;
     }
-    // Chantier Q — purge des matchId vus qui ne figurent plus dans data.js
     gcSeenLocks();
-    // Chantier S — enregistrement du service worker pour installabilité PWA.
     // On ignore silencieusement sur navigateurs qui ne supportent pas (Safari
     // en mode privé, vieux Edge, file://). Pas de bloquant.
-    // v31 — déféré au-delà du FCP (idle callback + 2s) pour ne pas bloquer
     // le rendu initial. La 1re visite ne profitera pas du cache, mais la 2e
     // si — c'est le bon trade-off pour un dashboard live.
     if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
@@ -29632,7 +28903,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       const btn = ev.target && ev.target.closest && ev.target.closest('.page-btn');
       if (!btn || !btn.dataset || !btn.dataset.page) return;
       currentPage = PAGE_ALIASES[btn.dataset.page] || btn.dataset.page;
-      // BUG FIX 2026-05-01 — Ne pas persister 'legal'/'methodologie'.
       // applyPageView fait location.replace() vers la page statique HTML,
       // donc on quitte pronostics.html. Persister cette valeur cause une
       // boucle de redirect au prochain reload. Voir L133 pour le filtre
@@ -29640,7 +28910,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       if (!STATIC_REDIRECT_PAGES.has(currentPage)) {
         try { localStorage.setItem('currentPage', currentPage); } catch (e) {}
       }
-      // AUDIT-2026-04-27 — Sync URL hash sur la nav SPA. Avant : la
       // page changeait visuellement et `currentPage` bougeait, mais
       // `location.hash` restait sur l'ancienne page. Casse partage
       // de lien, refresh, back/forward. `replaceState` évite de
@@ -29655,7 +28924,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       } catch (e) {}
       applyPageView();
       _ensureScoringOddsHistoryForPage(currentPage);
-      // v30 — ferme le dropdown hub contenant ce page-btn si besoin
       const parentHub = btn.closest('.hub');
       if (parentHub) {
         parentHub.classList.remove('open');
@@ -29665,7 +28933,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch(e) {}
     });
 
-    // v30 + Sprint 105 (v31.7.190) — Hub dropdowns : toggle au clic, ferme au
     // clic extérieur, un seul ouvert à la fois. Comportement unifié desktop +
     // mobile drawer : tap sur hub-btn déplie/replie. Avant Sprint 105 le drawer
     // mobile gardait tous les hubs ouverts (drawer trop long). Maintenant un
@@ -29785,7 +29052,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       try { localStorage.setItem('notifiedPickIds', JSON.stringify([...seen].slice(-200))); } catch(e) {}
     };
 
-    // v33.33 — Round 7 P : Notification "kickoff imminent" (15 min avant).
     // Différent du système edge≥10% : ici on alerte juste avant le coup d'envoi
     // pour les TOP picks (edge ≥5% + conf ≥55%) afin que l'user ne rate pas
     // l'occasion de parier. Tag séparé pour ne pas écraser les notifs edge.
@@ -29950,7 +29216,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       } catch(e){}
     });
 
-    // v30 Sprint 5 + theme-auto — 3-state theme : dark / light / auto (système).
     // Click cycle : dark → light → auto → dark. Auto suit `prefers-color-scheme`
     // et écoute les changements en live (l'utilisateur passe en mode nuit
     // sur son OS → l'app suit sans reload).
@@ -30016,7 +29281,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       } catch(e){}
     });
 
-    // v31 — Level toggle (débutant / confirmé / pro). Cycle au clic +
     // applique data-level sur <html> (les CSS rules `.help-dot` /
     // `.beginner-hint` réagissent automatiquement).
     const levelBtn = document.getElementById('level-toggle');
@@ -30048,7 +29312,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       } catch(e){}
     });
 
-    // v30 — Health indicator click → ouvre la page Crédibilité (où le user
     // peut voir le détail performances + bientôt état pipeline complet).
     const healthBtn = document.getElementById('health-indicator');
     if (healthBtn) healthBtn.addEventListener('click', () => {
@@ -30067,12 +29330,9 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       }
     });
 
-    // v22 — Onboarding au premier chargement.
-    // v30 fix : on ne lance PAS l'overlay si l'utilisateur a déjà cliqué
     // quelque part (page-btn, lien, etc.) avant que le timer expire — on
     // intercepterait sinon son geste avec une modale, bug confirmé en
     // e2e (Playwright a dû addInitScript onboardingDone=true pour passer).
-    // v34.12 — Ne plus afficher la modale pendant le premier rendu :
     // Lighthouse la comptait comme LCP et, surtout, un nouvel utilisateur
     // voyait une modale avant même d'avoir vu le dashboard. On laisse le
     // tableau de bord respirer, puis on propose l'aide seulement si aucune
@@ -30104,7 +29364,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       }
     } catch(e){}
 
-    // v22 + theme-auto — Raccourci Maj+T : cycle dark → light → auto.
     // Délégué au handler du bouton .theme-toggle pour rester DRY (un seul
     // endroit où vit la logique de cycle, donc pas de drift entre clavier/clic).
     document.addEventListener('keydown', (ev) => {
@@ -30142,7 +29401,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       if (burger) burger.setAttribute('aria-expanded', String(open));
       if (overlay) overlay.setAttribute('aria-hidden', String(!open));
     };
-    // Sprint 105 (v31.7.190) — Quand le drawer mobile s'ouvre, auto-expand
     // le hub contenant la page active pour que l'utilisateur voie son contexte.
     const _expandActiveHubInDrawer = () => {
       if (!window.matchMedia('(max-width: 960px)').matches) return;
@@ -30176,7 +29434,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         syncSidebarAria();
       });
     }
-    // v31.5 — bouton "Menu" du bottom-nav mobile : même action que le hamburger
     const mbnMenu = document.getElementById('mbn-menu-btn');
     if (mbnMenu) {
       mbnMenu.addEventListener('click', () => {
@@ -30195,7 +29452,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         }
       });
     });
-    // v26.1 — Brand click → Accueil
     const brandBtn = document.querySelector('.topbar-brand');
     if (brandBtn) {
       brandBtn.addEventListener('click', () => {
@@ -30206,7 +29462,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); brandBtn.click(); }
       });
     }
-    // v30 — PWA install prompt banner. Le navigateur émet beforeinstallprompt
     // quand le site est installable (PWA + manifest OK + 1ère visite repassée).
     // On capture l'événement, le diffère, et propose un banner discret.
     // Snooze : 7 jours via localStorage. "Plus tard" = re-snooze.
@@ -30239,8 +29494,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         if (window.matchMedia('(display-mode: standalone)').matches) return;
       } catch(e){}
       if (_pwaIsSnoozed()) return;
-      // v31.2 — UX audit : compter les visites (engagement signal).
-      // v31.7.56 — Smarter prompt : exiger ≥3 pages distinctes visitées
       // (pas juste 2 chargements). Un visiteur qui scroll sans naviguer
       // n'est pas engagé. Tracking via pwaPagesSeen Set persisté.
       let visitCount = 0;
@@ -30249,7 +29502,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       try { localStorage.setItem('pwaVisitCount', String(visitCount)); } catch(e){}
       if (visitCount < 2) return;  // 1ère visite = pas de prompt
 
-      // v31.7.56 — Pages distinctes visitées (set persisté). On ajoute la
       // page courante puis on vérifie le total ≥3.
       let pagesSeen = [];
       try {
@@ -30264,7 +29516,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       }
       if (pagesSeen.length < 3) return;  // pas assez de pages explorées
 
-      // AUDIT-2026-04-27 (Sprint 3 #13) — Signal d'engagement supplémentaire :
       // l'user a marqué au moins 1 lock comme vu (action active sur le
       // produit, pas juste de la navigation). Sans ça on prompt PWA même
       // pour un user qui scroll sans s'investir.
@@ -30282,7 +29533,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       setTimeout(_pwaShowBanner, 60000);
     });
 
-    // v31.7.56 — Track page changes pour cumuler pwaPagesSeen au fil
     // de la session (sans attendre beforeinstallprompt).
     function _pwaTrackPage(pageName) {
       if (!pageName) return;
@@ -30327,7 +29577,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     if (_pwaLaterBtn) _pwaLaterBtn.addEventListener('click', () => { _pwaSnooze(7); _pwaHideBanner(); });
     if (_pwaDismissBtn) _pwaDismissBtn.addEventListener('click', () => { _pwaSnooze(30); _pwaHideBanner(); });
 
-    // v35.0 — Click sur badge version footer → modal récap nouveautés
     const versionBadge = document.getElementById('footer-version');
     if (versionBadge) {
       const _showWhatsNew = () => {
@@ -30364,7 +29613,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       });
     }
 
-    // v30 — Footer page-link buttons → navigate to corresponding page
     document.querySelectorAll('.footer-link[data-page-link]').forEach(btn => {
       btn.addEventListener('click', () => {
         const target = btn.dataset.pageLink;
@@ -30374,7 +29622,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch(e){}
       });
     });
-    // v30 — Footer "Last update" timestamp from data.generated_at
     function _updateFooterLastUpdate() {
       const el = document.getElementById('footer-last-update');
       if (!el) return;
@@ -30391,7 +29638,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
                 : `il y a ${Math.round(ageMin/(24*60))} j`;
       el.textContent = `📅 Données ${lbl}`;
       el.title = `Dernière actualisation : ${new Date(data.generated_at).toLocaleString('fr-FR')}`;
-      // v30 — Si la session reste ouverte longtemps et que data passe stale
       // (>2h), force-reload une seule fois (avec retry après 30 min). Ce
       // poll rattrape les utilisateurs qui laissent l'onglet ouvert toute
       // la journée — sinon ils voient des pronos sur des matchs déjà finis.
@@ -30468,13 +29714,11 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
 
     render();
     startAutoRefresh();
-    // v34.10 — Historique des cotes chargé seulement sur les pages de scoring.
     // Avant, odds_history.jsonl (~1.2 MB) partait sur l'accueil et relançait
     // un render complet avant le LCP.
     _ensureScoringOddsHistoryForPage(currentPage);
   });
 
-  // v23 — Expose les fonctions de l'IIFE à window pour que les scripts externes (FAB Que parier, chatbot, tooltips) puissent y accéder.
   try {
     window.predictMatch = predictMatch;
     window.predictLikelyScorers = predictLikelyScorers;  // v24

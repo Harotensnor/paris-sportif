@@ -1117,3 +1117,10 @@
 - Impact: chemin principal et interactions globales validés sans erreur
 - Commit: pending
 - Status: ✅ DONE
+## Sprint v35.141 (16:01 UTC)
+- Chantier: P-9.44
+- Avant: app.js 1791553 bytes, 756 version/comment lines shipped
+- Après: app.js 1765316 bytes, 0 stale version/comment lines in target set
+- Impact: -26237 bytes JS, bundle back to 1723.9 KB under cap
+- Commit: pending
+- Status: ✅ DONE
