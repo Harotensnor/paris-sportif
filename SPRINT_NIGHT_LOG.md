@@ -208,6 +208,14 @@
 - Commit: pending
 - Status: ✅ DONE
 
+## Sprint v35.113 (2026-05-02 13:48 UTC)
+- Chantier: P-9.13 bottom nav mobile
+- Avant: spacer body uniquement, contredit par des paddings `main` en `!important`
+- Après: safe-zone mobile centralisée via `--mobile-bottom-nav-h` sur main, pages et footer
+- Impact: derniers CTA/footer protégés de la bottom nav fixe
+- Commit: pending
+- Status: ✅ DONE
+
 ## Sprint v35.111 (2026-05-02 13:51 UTC)
 - Chantier: P-8.15 révision page Legal
 - Avant: legal pouvait passer en thème clair et header mobile se chevauchait
