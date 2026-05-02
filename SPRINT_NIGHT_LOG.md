@@ -605,3 +605,11 @@
 - Impact: fiches football/tennis/basket/baseball/hockey ouvrent et changent d'onglet sans erreur
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.77 (2026-05-02 12:08 UTC)
+- Chantier: P-6.4 Lighthouse-compatible audit
+- Avant: aucun score Phase 6 perf/a11y/SEO sur pages clés
+- Après: 8 rapports JSON, min perf 46, min a11y 44, SEO 83
+- Impact: top 5 opportunités listées dans `ISSUES.md` pour piloter les fixes
+- Commit: pending
+- Status: ✅ DONE
