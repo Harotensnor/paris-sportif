@@ -1101,3 +1101,11 @@
 - Impact: page Performance lisible immédiatement et transfert initial allégé
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.139 (2026-05-02 15:48 UTC)
+- Chantier: P-9.67 CLS header/trust strip
+- Avant: Lighthouse min perf 67; CLS desktop ~0.18, mobile ~0.12
+- Après: min perf 85; CLS desktop ~0.086, mobile ~0.056
+- Impact: objectif Perf 80+ atteint sur l'audit local, layout beaucoup plus stable
+- Commit: pending
+- Status: ✅ DONE

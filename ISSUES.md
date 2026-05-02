@@ -218,9 +218,9 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 
 - Sévérité : MEDIUM
 - Preuve : `.cache/lighthouse-reports/summary.json`
-- Constat : CLS mobile ~`0.061`, desktop ~`0.184`.
-- Action : réserver les dimensions des logos/images et stabiliser les blocs insérés après chargement.
-- Statut : OPEN
+- Constat : CLS mobile ~`0.061`, desktop ~`0.184` au baseline; après v35.139, mobile ~`0.056`, desktop ~`0.086`.
+- Action : CSS critique aligné sur la banderole risque/header final, trust strip réservé avant peuplement JS, topbar générique neutralisée.
+- Statut : FIXED v35.139
 
 ### P6-LH-005 — Structure H1 double
 

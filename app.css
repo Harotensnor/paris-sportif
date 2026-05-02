@@ -1424,7 +1424,8 @@
   @media (max-width: 768px) {
     .trust-strip { padding: 0.4rem 0.6rem; }
   }
-  .trust-strip.hidden { display: none; }
+  .trust-strip.hidden { display: flex !important; visibility: hidden; pointer-events: none; min-height: 42px; }
+  .trust-strip.hidden[data-dismissed="1"] { display: none !important; }
   .trust-strip-link {
     flex: 1; display: flex; align-items: center; gap: 14px;
     color: var(--text); text-decoration: none; flex-wrap: wrap;
@@ -2227,6 +2228,7 @@
     backdrop-filter: saturate(180%) blur(20px);
     -webkit-backdrop-filter: saturate(180%) blur(20px);
     border-bottom: 1px solid var(--border);
+    display: block; padding: 0;
   }
   @media (max-width: 720px) {
     :root { --rg-height: 38px; }

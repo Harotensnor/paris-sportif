@@ -133,9 +133,9 @@
 <!-- Chantier S — PWA -->
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="alternate" type="application/rss+xml" href="feed.xml" title="Paris-Sportif — Top picks du jour (RSS)">
-<!-- v35.07 — Seul le CSS est préchargé au boot. Le gros app.js?v=0eba569b reste en defer
+<!-- v35.07 — Seul le CSS est préchargé au boot. Le gros app.js?v=088cf761 reste en defer
      plus bas dans le body pour laisser le squelette critique peindre d'abord. -->
-<link rel="preload" href="app.css?v=f3e6e230" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<link rel="preload" href="app.css?v=1020e3c8" as="style" onload="this.onload=null;this.rel='stylesheet'">
 <!-- v31.1 — DNS-prefetch pour les CDN tiers utilisés sur la page (logos ESPN).
      v31.7.24 — Ajout `preconnect` pour a.espncdn.com (le plus utilisé) :
      le browser fait DNS + TLS handshake en parallèle du parse HTML, ce qui
@@ -168,6 +168,7 @@
     --text-dim2:#7f8a99; --bg:#08080a; --panel:#12151d; --panel-2:#171b24;
     --panel-3:#202634; --border:#252b37; --border-2:#354052;
     --r-sm:8px; --r-md:10px; --r-pill:999px; --shadow-sm:0 10px 28px rgba(0,0,0,.18);
+    --rg-height:32px; --header-bg:#0b0d12;
   }
   html, body {
     margin:0; min-height:100%; background:var(--bg); color:var(--text);
@@ -175,13 +176,25 @@
     letter-spacing:0; overflow-x:hidden;
   }
   .skip-link { position:absolute; left:-999px; top:auto; }
-  header.topbar {
-    min-height:58px; display:flex; align-items:center; justify-content:space-between; gap:14px;
-    padding:0 18px; border-bottom:1px solid var(--border); background:#0b0d12;
+  .rg-risk-bar {
+    position:sticky; top:0; z-index:90; min-height:var(--rg-height);
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    padding:0 16px; box-sizing:border-box; background:#030303; color:#fff;
+    border-bottom:1px solid #1f1f1f; font-size:11px; font-weight:900;
+    letter-spacing:.35px; line-height:1.2; text-align:center; text-transform:uppercase;
   }
+  .rg-risk-bar a { color:#fff; text-decoration:underline; text-underline-offset:2px; white-space:nowrap; }
+  header.topbar {
+    position:sticky; top:var(--rg-height); z-index:60;
+    display:block; padding:0; border-bottom:1px solid var(--border); background:var(--header-bg);
+  }
+  .topbar-inner { max-width:1400px; margin:0 auto; display:flex; align-items:center; gap:18px; padding:10px 24px; min-height:56px; box-sizing:border-box; }
   .topbar-brand { display:flex; align-items:center; gap:10px; min-width:0; color:var(--text); text-decoration:none; }
   .tb-brand-main { display:block; font-weight:800; font-size:15px; line-height:1.1; }
   .tb-brand-sub, .topbar-utils, nav.topbar-nav, nav.topbar-sports, .sidebar, .mobile-bottom-nav { display:none; }
+  .refresh-indicator.topbar-refresh { position:fixed; top:70px; right:12px; z-index:50; opacity:0; pointer-events:none; }
+  .trust-strip.hidden { display:flex!important; visibility:hidden; pointer-events:none; min-height:42px; }
+  .trust-strip.hidden[data-dismissed="1"] { display:none!important; }
   .content { width:100%; }
   main#main-content { max-width:1900px; min-height:900px; margin:0 auto; padding:18px; box-sizing:border-box; }
   .agent-return { display:none; }
@@ -207,7 +220,11 @@
   .boot-shell__card i { width:58%; height:12px; }
   .boot-shell__card--wide strong { width:88%; height:38px; }
   @media (max-width:720px) {
-    header.topbar { padding:0 12px; }
+    :root { --rg-height:28px; }
+    .rg-risk-bar { min-height:28px; max-height:28px; gap:4px; flex-wrap:nowrap; overflow:hidden; padding:0 8px; font-size:8px; line-height:1.05; }
+    .rg-risk-bar span { display:none; }
+    .rg-risk-bar a { max-width:178px; overflow:hidden; text-overflow:ellipsis; }
+    .topbar-inner { padding:8px 12px; gap:10px; min-height:52px; }
     main#main-content { min-height:760px; padding:12px 10px; }
     .boot-shell { padding:18px 16px; border-radius:var(--r-sm); }
     .boot-shell__top { display:block; }
@@ -224,7 +241,7 @@
      n'est chargé QU'APRÈS consentement explicite (cf. _maybeEnableAnalytics).
      Pas de tracking par défaut. -->
 <script src="analytics.config.js" defer onerror="this.remove();"></script>
-<noscript><link rel="stylesheet" href="app.css?v=f3e6e230"></noscript>
+<noscript><link rel="stylesheet" href="app.css?v=1020e3c8"></noscript>
 <script>
   // v22 — Init theme / contrast / reader BEFORE body render (évite le flash)
   (function() {
@@ -277,7 +294,7 @@
   // pour debug console. AUCUN envoi réseau — l'utilisateur peut consulter
   // ou exporter ses données, et c'est tout.
   //
-  // Pourquoi inline pré-app.js?v=0eba569b ? Il faut s'enregistrer AVANT le LCP/FCP
+  // Pourquoi inline pré-app.js?v=088cf761 ? Il faut s'enregistrer AVANT le LCP/FCP
   // pour les capter. Le bundle web-vitals officiel pèse 5 KB ; ici on
   // tombe à ~1.5 KB grâce à l'usage direct de PerformanceObserver.
   //
@@ -652,7 +669,7 @@
         </div>
       </div>
     </section>
-    <!-- v31.2 — Friendly error state (audit UX). Avant : "Fichier data_lite.js?v=46ebb44f
+    <!-- v31.2 — Friendly error state (audit UX). Avant : "Fichier data_lite.js?v=fb84272b
          introuvable" brut, casse la confiance. Maintenant : message rassurant
          avec retry + dernier refresh + offline fallback explanation. -->
     <div id="no-data-banner" class="error-banner hidden" role="alert" aria-live="polite">
@@ -735,7 +752,7 @@
       <div class="footer-brand">
         <span class="footer-logo">🎯</span>
         <span class="footer-text">Paris-Sportif</span>
-        <span class="footer-version" id="footer-version" role="button" tabindex="0" style="cursor:pointer;" title="Voir les nouveautés v35.138">v35.138</span>
+        <span class="footer-version" id="footer-version" role="button" tabindex="0" style="cursor:pointer;" title="Voir les nouveautés v35.139">v35.139</span>
       </div>
       <nav class="footer-links" aria-label="Liens du site">
         <a href="https://github.com/Harotensnor/paris-sportif" target="_blank" rel="noopener" class="footer-link" title="Code source sur GitHub">
@@ -820,8 +837,8 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="data_lite.js?v=9cbc69ce"></script>
-<script src="app.js?v=0eba569b" defer></script>
+<script src="data_lite.js?v=4dc849f3"></script>
+<script src="app.js?v=088cf761" defer></script>
 
 <!-- enhancements v20 -->
 <script src="app-enhancements.js?v=232799b3" defer></script>

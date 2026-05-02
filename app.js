@@ -5214,7 +5214,7 @@
     // Vérifier le dismiss
     try {
       const until = parseInt(localStorage.getItem('trustStripHiddenUntil') || '0', 10);
-      if (until > Date.now()) return;  // Encore masqué
+      if (until > Date.now()) { strip.dataset.dismissed = '1'; return; }
     } catch (e) {}
     const overall = rep.overall || {};
     const tiers = rep.by_tier || {};
@@ -5235,23 +5235,19 @@
       setText('trust-brier', (overall.brier || 0).toFixed(3));
       setText('trust-n', overall.n);
     }
+    delete strip.dataset.dismissed;
     strip.classList.remove('hidden');
-    // v31.7.71 — Set --trust-h pour que la sidebar et le right-rail
-    // soient repoussés sous le trust strip (sinon ils chevauchent le hero).
     _updateTrustStripHeight();
-    // Wire dismiss button
     const closeBtn = document.getElementById('trust-strip-close');
     if (closeBtn && !closeBtn._wired) {
       closeBtn._wired = true;
       closeBtn.addEventListener('click', () => {
         try {
-          // Masque pour 30 jours
           localStorage.setItem('trustStripHiddenUntil', String(Date.now() + 30 * 86400 * 1000));
         } catch (e) {}
+        strip.dataset.dismissed = '1';
         strip.classList.add('hidden');
-        // v31.7.71 — Reset --trust-h à 0 (sidebar/rail remontent)
         document.documentElement.style.setProperty('--trust-h', '0px');
-        // Sprint 144 (v31.7.194) — Toast qui informe comment ré-afficher (via __diag)
         try {
           if (typeof toast === 'function') {
             toast('Trust strip masqué pour 30j', 'info', {
@@ -5259,8 +5255,8 @@
                 label: 'Annuler',
                 onClick: () => {
                   try { localStorage.removeItem('trustStripHiddenUntil'); } catch(e){}
+                  delete strip.dataset.dismissed;
                   strip.classList.remove('hidden');
-                  // Re-populate
                   try { _populateTrustStrip(window.__backtestReportV2); } catch(e){}
                 },
               },
@@ -5275,7 +5271,7 @@
   window._resetTrustStrip = function() {
     try { localStorage.removeItem('trustStripHiddenUntil'); } catch(e){}
     const strip = document.getElementById('trust-strip');
-    if (strip) strip.classList.remove('hidden');
+    if (strip) { delete strip.dataset.dismissed; strip.classList.remove('hidden'); }
     try { _populateTrustStrip(window.__backtestReportV2); } catch(e){}
   };
   // Sprint 165 (v31.7.195) — Reset all dismissed tutorials/banners.
