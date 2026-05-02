@@ -20,12 +20,14 @@ from datetime import datetime, timezone, timedelta
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA_PATH = ROOT / 'data.js'
+H2H_OUT = ROOT / 'h2h_extended.json'
 
 # ESPN summary endpoint — same slug path as fetch_v3 uses
 SPORT_TO_ESPN_PATH = {
     'football': 'soccer',
     'basketball': 'basketball',
     'hockey': 'hockey',
+    'baseball': 'baseball',
     'tennis': 'tennis',
 }
 
@@ -57,9 +59,55 @@ def league_espn_path(event):
     if sport == 'hockey':
         return f'hockey/{code}'
     if sport == 'tennis':
-        # Tennis doesn't really have H2H via the same summary endpoint
-        return None
+        # ESPN tennis summary is sparse and can 400, but trying once lets us
+        # cache an explicit empty H2H instead of silently excluding the sport.
+        return f'tennis/{code}' if code in ('atp', 'wta') else None
     return f'{base}/{code}' if code else None
+
+def build_h2h_extended(data):
+    events = {}
+    by_sport = {}
+    for day_key, evs in (data.get('days') or {}).items():
+        for ev in evs or []:
+            h = ev.get('h2h') or {}
+            meetings = h.get('meetings') or []
+            if not h:
+                continue
+            sport = ev.get('sport') or 'unknown'
+            source = h.get('source') or 'unknown'
+            bucket = by_sport.setdefault(sport, {
+                'events': 0, 'events_with_meetings': 0, 'meetings': 0, 'sources': {}
+            })
+            bucket['events'] += 1
+            bucket['meetings'] += len(meetings)
+            if meetings:
+                bucket['events_with_meetings'] += 1
+            bucket['sources'][source] = bucket['sources'].get(source, 0) + 1
+            comps = ev.get('competitors') or []
+            events[str(ev.get('id'))] = {
+                'sport': sport,
+                'league_code': ev.get('league_code'),
+                'date': ev.get('date'),
+                'home': next(((c.get('team') or {}).get('displayName') or c.get('name') for c in comps if c.get('home_away') == 'home'), None),
+                'away': next(((c.get('team') or {}).get('displayName') or c.get('name') for c in comps if c.get('home_away') == 'away'), None),
+                'meetings_count': len(meetings),
+                'source': source,
+                'fetched_at': h.get('fetched_at'),
+            }
+    return {
+        'generated_at': datetime.now(timezone.utc).isoformat(),
+        'source': 'ESPN summary headToHeadGames + seasonseries',
+        'events_total': len(events),
+        'sports_total': len(by_sport),
+        'by_sport': by_sport,
+        'events': events,
+    }
+
+def save_h2h_extended(data):
+    H2H_OUT.write_text(
+        json.dumps(build_h2h_extended(data), ensure_ascii=False, separators=(',', ':')) + '\n',
+        encoding='utf-8'
+    )
 
 def fetch_h2h(event):
     path = league_espn_path(event)
@@ -223,6 +271,10 @@ def should_refetch(event, now):
 
 def main():
     d = load_data()
+    if '--summary-only' in sys.argv:
+        save_h2h_extended(d)
+        print(f'[h2h] wrote {H2H_OUT.name} summary-only')
+        return
     now_utc = datetime.now(timezone.utc)
     # v31.7.4 — Horizon passe de 72h a 120h (5 jours) pour couvrir tout le
     # weekend + lundi des grandes ligues europeennes. Cap passe de 180 a 280
@@ -276,6 +328,7 @@ def main():
         if checked > 280:
             break
     save_data(d)
+    save_h2h_extended(d)
     print(f'[h2h] checked={checked} enriched={enriched} errors={errors}')
 
 if __name__ == '__main__':

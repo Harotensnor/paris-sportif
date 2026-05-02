@@ -1387,3 +1387,9 @@
 - Après: form_stats_extended.json expose 749 équipes / 4 sports avec W/L, WR L10 et points pour/contre.
 - Impact: Form L10 NBA/NHL/MLB devient auditable dans health.json et réutilisable modèle/UI.
 - Vérif: fetch_team_form.py + build_health.py + check_pipeline_drift OK.
+
+## Sprint v35.184 — Phase 10 P-10.31 H2H multi-sport (21:50 UTC)
+- Avant: H2H était patché dans data.js mais peu auditable hors frontend.
+- Après: h2h_extended.json résume 150 events / 4 sports, avec source headToHeadGames ou seasonseries.
+- Impact: H2H NBA/NHL/MLB devient mesurable et tennis est tenté/caché proprement si ESPN ne sert rien.
+- Vérif: fetch_h2h.py --summary-only + build_health.py + check_pipeline_drift OK.
