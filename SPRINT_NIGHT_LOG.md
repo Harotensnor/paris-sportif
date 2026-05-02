@@ -1423,3 +1423,9 @@
 - Après: JSON structuré avec paris_trackes, settings, bankroll, stats et raw_localStorage.
 - Impact: backup/migration plus lisible sans perdre la donnée brute.
 - Vérif: node --check app.js, bundle OK, diff check OK.
+
+## Sprint v35.190 — Phase 10 P-10.37 Mode lecture nuit (22:07 UTC)
+- Avant: le thème auto suivait le système mais ne basculait pas selon l'heure.
+- Après: entre 20h et 7h, rendu sombre effectif + chaleur visuelle légère.
+- Impact: lecture tardive moins agressive sans nouvelle dépendance UI.
+- Vérif: node --check app.js, bundle OK, diff check OK.
