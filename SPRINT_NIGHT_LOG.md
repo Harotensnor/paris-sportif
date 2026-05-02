@@ -773,3 +773,11 @@
 - Impact: Théo comprend pourquoi le site refuse les micro-cotes même quand elles paraissent sûres
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.98 (2026-05-02 14:10 UTC)
+- Chantier: P-7.5 KPI gain moyen Big Bets
+- Avant: l’accueil affichait ROI, bankroll et filtres, mais pas le rendement attendu des grosses cotes
+- Après: KPI “Gain moyen Big Bets” calculé par EV moyenne, mesuré +35€/100€ sur la data locale
+- Impact: Théo voit le gain potentiel sans convertir edge/EV mentalement
+- Commit: pending
+- Status: ✅ DONE
