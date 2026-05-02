@@ -1441,3 +1441,9 @@
 - Après: print.css dédié masque l'UI, stabilise modals/cards et ajoute les URLs.
 - Impact: fiche match partageable en PDF sans alourdir app.css.
 - Vérif: bundle OK, diff check OK.
+
+## Sprint v35.193 — Phase 10 P-10.43 Doc composants (22:21 UTC)
+- Avant: les primitives UI étaient implicites dans app.js/app.css.
+- Après: docs/components.md documente Button, BetCard, Modal, Tabs, Drawer, Toast, Skeleton, Bankroll.
+- Impact: futurs sprints UI plus cohérents sans gonfler le runtime.
+- Vérif: doc ajoutée, bundle OK, diff check OK.
