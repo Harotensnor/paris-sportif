@@ -85,7 +85,7 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Preuve : `.cache/phase4-phase6-baseline/tous-mobile.png`
 - Constat : les deux rangées de tabs/chips et le retour accueil prennent beaucoup de place avant la liste utile.
 - Action : compacter en segmented control horizontal avec scroll/fade ou menu secondaire.
-- Statut : PARTIAL v35.109 — table desktop conservée, mobile passé en carte verticale; sub-nav à densifier encore.
+- Statut : FIXED v35.155 — filtres, sports et onglets `Tous` passent en rails horizontaux scroll-snap sur mobile avec fade latéral, touch targets 44px et preuve `phase10_tous_subnav_audit.json`.
 
 ### P6-VIS-008 — Page Tous mobile : lignes match trop serrées
 
