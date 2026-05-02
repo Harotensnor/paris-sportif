@@ -141,5 +141,13 @@
 - Avant: `Ticket attaque` triait surtout par EV brute; smoke: FC Tokyo -1 @4.30, EV +166%, prob 62%, score 49/100
 - Après: score attaque dédié EV + cote haute + confiance + proba minimale; garde-fous prob >=18%, score >=42; smoke navigateur conserve FC Tokyo -1 @4.30 sans erreur
 - Impact: le ticket haute cote suit explicitement l'objectif “grosse cote crédible”, sans choisir une cote longue seulement parce que l'EV brute explose
+- Commit: aa86b758
+- Status: ✅ DONE
+
+## Sprint v35.19 (2026-05-02 04:58 UTC)
+- Chantier: P16 smoke E2E autonome
+- Avant: `node scripts/smoke_e2e.js` crashait si le port 8765 était déjà occupé et ne vérifiait pas que Terminal Value 48h contenait des matchs exacts
+- Après: serveur smoke sur port dynamique, fallback Chrome Windows, 15 pages SPA OK, Terminal Value 48h confirmé à `69 marchés scorés · 69 matchs exacts`, overflow mobile 0
+- Impact: la QA locale peut être relancée même si un serveur tourne déjà, et le risque de cockpit “Terminal vide” est couvert automatiquement
 - Commit: pending
 - Status: ✅ DONE

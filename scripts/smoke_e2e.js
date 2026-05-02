@@ -17,12 +17,16 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
-const PORT = 8765;
+const PORT = Number(process.env.SMOKE_PORT || 0);
+const CHROME_EXE = process.env.CHROME_EXECUTABLE_PATH
+  || (fs.existsSync('C:/Program Files/Google/Chrome/Application/chrome.exe')
+    ? 'C:/Program Files/Google/Chrome/Application/chrome.exe'
+    : '');
 
 const PAGES = [
-  'dashboard', 'simples', 'combines', 'locks', 'buteurs',
-  'mesparis', 'top', 'academie', 'profil', 'backtest',
-  'alertes', 'historique',
+  'dashboard', 'top', 'locks', 'combines', 'buteurs',
+  'matchs', 'performance', 'valeur', 'favoris', 'sante',
+  'academie', 'profil', 'backtest', 'alertes', 'historique',
 ];
 
 // --- Minimal static server ---
@@ -59,8 +63,9 @@ function startServer() {
 
 (async () => {
   const server = await startServer();
-  console.log(`[smoke] server on http://127.0.0.1:${PORT}`);
-  const browser = await chromium.launch();
+  const actualPort = server.address().port;
+  console.log(`[smoke] server on http://127.0.0.1:${actualPort}`);
+  const browser = await chromium.launch(CHROME_EXE ? { executablePath: CHROME_EXE } : {});
   const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
   const page = await ctx.newPage();
 
@@ -76,7 +81,7 @@ function startServer() {
   });
   page.on('crash', () => failures.push({ phase: 'crash', msg: 'page crashed' }));
 
-  await page.goto(`http://127.0.0.1:${PORT}/pronostics.html`, { waitUntil: 'domcontentloaded' });
+  await page.goto(`http://127.0.0.1:${actualPort}/pronostics.html`, { waitUntil: 'domcontentloaded' });
   // Dismiss onboarding modal if present
   await page.evaluate(() => {
     const ign = Array.from(document.querySelectorAll('button,a')).find(b => /ignorer/i.test(b.textContent || ''));
@@ -102,6 +107,20 @@ function startServer() {
     const tag = newErrs.length ? `FAIL (${newErrs.length} errs)` : 'ok';
     console.log(`[${tag}] ${p}`);
   }
+
+  await page.evaluate(() => {
+    const btn = document.querySelector('.page-btn[data-page="dashboard"]');
+    if (btn) btn.click();
+  });
+  await page.waitForTimeout(500);
+  const terminalText = await page.evaluate(() => document.querySelector('.terminal-market')?.innerText || '');
+  const terminalMatch = terminalText.match(/(\d+)\s+marchés scorés\s+·\s+(\d+)\s+matchs exacts sur 48h/i);
+  if (!terminalMatch) {
+    failures.push({ phase: 'terminal-value', msg: 'Terminal Value 48h summary missing' });
+  } else if (Number(terminalMatch[2]) <= 0) {
+    failures.push({ phase: 'terminal-value', msg: `Terminal Value sees ${terminalMatch[2]} exact matches on 48h` });
+  }
+  console.log(`[${terminalMatch ? 'ok' : 'FAIL'}] terminal value 48h = ${terminalMatch ? terminalMatch[0] : 'missing'}`);
 
   // Responsive smoke at 375×812
   await page.setViewportSize({ width: 375, height: 812 });
