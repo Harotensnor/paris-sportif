@@ -1138,3 +1138,10 @@
 - Impact: -123 violations modérées, pages mobile beaucoup plus tappables
 - Commit: pending
 - Status: ✅ DONE
+## Sprint v35.144 (16:15 UTC)
+- Chantier: P-9.59/P-9.60/P-9.61/P-9.62/P-9.63
+- Avant: dernier résumé tests v35.140, 164 clicks
+- Après: click 167/0, modal tabs 5 sports/0, cohérence 50/0, flow Big Bet 3/0
+- Impact: parcours critique et boutons validés après polish CSS/a11y
+- Commit: pending
+- Status: ✅ DONE
