@@ -387,3 +387,11 @@
 - Impact: une seule porte “Méthode” dans le flow app, anciens liens préservés; test hash legacy vert, smoke E2E vert
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.50 (2026-05-02 08:00 UTC)
+- Chantier: P-3.8 fusion des 3 pages Montantes
+- Avant: `VALID_PAGES=20`, avec `montante-jour`, `montante-weekend`, `montante-semaine` comme pages séparées
+- Après: `VALID_PAGES=18`; route unique `#montantes` avec `3` onglets internes (`Jour`, `Weekend`, `Semaine`)
+- Impact: les anciens liens montante redirigent proprement vers le hub unique; test hash legacy vert, smoke E2E vert
+- Commit: pending
+- Status: ✅ DONE
