@@ -379,3 +379,11 @@
 - Impact: la performance devient le hub unique “Mes paris” sans casser les anciens liens; test legacy hashes vert, smoke E2E vert
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.49 (2026-05-02 07:51 UTC)
+- Chantier: P-3.7 fusion Méthode/Académie/Méthodologie
+- Avant: `VALID_PAGES=21`, `methodologie` restait une route SPA/statique séparée du hub Méthode
+- Après: `VALID_PAGES=20`; `#methode`, `#methodologie`, `#comment-lire`, `#comment-lire-un-prono` redirigent vers `#academie`
+- Impact: une seule porte “Méthode” dans le flow app, anciens liens préservés; test hash legacy vert, smoke E2E vert
+- Commit: pending
+- Status: ✅ DONE

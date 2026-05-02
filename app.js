@@ -107,7 +107,7 @@
   // legacy) mais aucun lien ne pointe plus vers cette valeur.
   // v31.7.77 — 'calendrier' ajouté pour vue 7 jours groupée (user feedback
   // "je veux voir au moins une semaine de pronos jour par jour").
-  const VALID_PAGES = ['dashboard','tous','buteurs','combines','academie','alertes','profil','sante','legal','methodologie','montante-jour','montante-weekend','montante-semaine','compare','calendrier','league','favoris','performance','plan-mise','valeur','simulator'];
+  const VALID_PAGES = ['dashboard','tous','buteurs','combines','academie','alertes','profil','sante','legal','montante-jour','montante-weekend','montante-semaine','compare','calendrier','league','favoris','performance','plan-mise','valeur','simulator'];
   // v30 — 'mesparis' retiré : Théo n'enregistre pas ses paris sur le site.
   // v31 — 'legal' + 'methodologie' ajoutés (transparence + dictionnaire des
   // métriques, en réponse à l'audit ChatGPT 2026-04-26).
@@ -124,6 +124,10 @@
     'historique': 'performance',
     'backtest': 'performance',
     'credibilite': 'performance',
+    'methode': 'academie',
+    'methodologie': 'academie',
+    'comment-lire': 'academie',
+    'comment-lire-un-prono': 'academie',
     'montantes-jour': 'montante-jour',
     'montantes-weekend': 'montante-weekend',
     'montantes-semaine': 'montante-semaine',
@@ -21236,7 +21240,7 @@
       agent: ['performance', 'bilan', 'historique', 'backtest'],
       explore: ['tous', 'calendrier', 'buteurs', 'combines', 'compare', 'valeur', 'plan-mise', 'montante-jour', 'montante-weekend', 'montante-semaine'],
       performance: ['performance', 'bilan', 'historique', 'backtest', 'credibilite', 'simulator'],
-      learn: ['academie', 'methodologie', 'credibilite'],
+      learn: ['academie'],
       account: ['profil', 'sante', 'favoris', 'alertes', 'legal'],
     };
     document.querySelectorAll('nav.topbar-nav .hub').forEach(h => {
