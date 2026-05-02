@@ -461,3 +461,11 @@
 - Impact: radius CSS unifié; visual diff `11.00%` attendu sur Performance dynamique, autres pages stables
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.59 (2026-05-02 08:15 UTC)
+- Chantier: P-4.29 shadow system
+- Avant: focus/glow/Winamax shadows codés en dur
+- Après: tokens `--shadow-2xl`, `--shadow-focus`, `--shadow-focus-warn`, `--shadow-focus-danger`, `--shadow-winamax`
+- Impact: ombres critiques tokenisées; visual diff `8.48%` attendu sur Performance wide, autres pages stables
+- Commit: pending
+- Status: ✅ DONE
