@@ -15679,11 +15679,25 @@
         .filter(p => p.odd >= 2.50 && p.odd <= 4.00 && p.edge >= 0.05 && p.rel >= 0.45)
         .slice(0, 6);
       const bbfOutsiderIds = new Set(bbfOutsiderBets.map(p => String(p.m.id || '')));
+      const bbfMultiMarketOutsiders = (() => {
+        const seen = new Set(), arr = [];
+        bbfPool.forEach(p => (p.best?.allCandidates || []).forEach(c => {
+          const mk = String(c.market || ''), key = `${p.m?.id || ''}:${mk}:${c.key || c.pickKey || c.line || ''}`;
+          if (seen.has(key) || (mk === p.best?.market && c.key === p.best?.key)) return;
+          if (!/(btts|ou|total|exact|tennisGames|baseballTotal|hockeyTotal|basketTotal)/i.test(mk)) return;
+          if (isBlockedHandicapMarket(c) || c.investment?.action === 'skip') return;
+          const odd = Number(c.odd || 0), rel = Number(c.prob || c.rel || 0), edge = Number(c.edge || (odd > 1 ? rel - 1 / odd : 0));
+          if (odd < 2.50 || edge < 0.06 || rel < 0.32) return;
+          seen.add(key);
+          arr.push({ ...p, best: c, odd, rel, edge, ev: Number(c.ev || rel * odd - 1), investment: c.investment || p.investment });
+        }));
+        return arr.sort((a,b)=>(b.odd-a.odd)||((b.edge||0)-(a.edge||0))).slice(0, 6);
+      })();
       const bbfRestRows = bbfPool
         .filter(p => !bbfBigIds.has(String(p.m.id || '')) && !bbfGoodIds.has(String(p.m.id || '')) && !bbfBigOddsIds.has(String(p.m.id || '')) && !bbfOutsiderIds.has(String(p.m.id || '')))
         .filter(p => p.edge >= 0.02)
         .slice(0, 80);
-      const bbfVisibleCount = bbfBigBets.length + bbfGoodBets.length + bbfBigOddsBets.length + bbfOutsiderBets.length + bbfRestRows.length;
+      const bbfVisibleCount = bbfBigBets.length + bbfGoodBets.length + bbfBigOddsBets.length + bbfOutsiderBets.length + bbfMultiMarketOutsiders.length + bbfRestRows.length;
       const bbfMarketCount = bbfPool.reduce((sum, p) => sum + Math.max(1, Number(p.best?.allCandidates?.length || 0)), 0);
       const bbfGain100 = bbfBigBets.length ? bbfBigBets.reduce((s, p) => s + Number(p.ev || 0), 0) / bbfBigBets.length * 100 : 0;
       const bbfStrength = getBetStrengthMeta;
@@ -16043,6 +16057,21 @@
                 <span>Une grosse cote sans edge clair reste une loterie : on attend le bon spot.</span>
               </div>`}
           </section>
+
+          ${bbfFocusOnly ? '' : `<section class="bbf-section bbf-section--outsiders" style="border-color:rgba(251,191,36,.22);background:linear-gradient(135deg,rgba(251,191,36,.08),rgba(255,255,255,.025));">
+            <div class="bbf-section__head">
+              <div>
+                <span>Outsiders multi-marchés · O/U, BTTS, scores, totals · cote ≥ 2.50</span>
+                <h2>Marchés secondaires à value</h2>
+              </div>
+              <button type="button" class="page-btn" data-page="tous">Comparer dans Tous →</button>
+            </div>
+            ${bbfMultiMarketOutsiders.length ? `<div class="bbf-grid bbf-grid--compact">${bbfMultiMarketOutsiders.map(p => bbfCard(p, 'compact')).join('')}</div>` : `
+              <div class="bbf-empty bbf-empty--small">
+                <strong>Pas de grosse cote secondaire cohérente.</strong>
+                <span>Score exact, BTTS et totaux restent cachés si la value n'est pas assez nette.</span>
+              </div>`}
+          </section>`}
 
           ${bbfFocusOnly ? '' : `<details class="bbf-more terminal-market">
             <summary>
