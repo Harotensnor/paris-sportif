@@ -131,6 +131,8 @@ def main() -> int:
             "weather": sum(1 for ev in events if ev.get("weather")),
             "injuries": sum(1 for ev in events if ev.get("injuries")),
             "referee": sum(1 for ev in events if ev.get("referee")),
+            "fd_calibration": sum(1 for ev in events if ev.get("fd_calibration")),
+            "fd_closing_odds": sum(1 for ev in events if ev.get("fd_closing_odds")),
         },
         "winamax_markets": {
             "matches": len(wm_matches),

@@ -225,3 +225,11 @@
 - Impact: source Sofascore réactivée (`0 → 2424`), warning Santé supprimé, filet de secours ESPN opérationnel sans perdre le dernier bon snapshot
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.30 (2026-05-02 05:21 UTC)
+- Chantier: P-A4 Football-Data health + patch
+- Avant: `health.sources.footballdata.rows=0` malgré `footballdata.json.matches=9388`; `data.js` avait `0` event avec `fd_calibration`
+- Après: Santé compte le format réel `{matches, league_calibration}`; `patch_footballdata.py` attache `fd_calibration` à `140` events foot; `night_metrics` expose `fd_calibration` et `fd_closing_odds`
+- Impact: warning faux positif supprimé, calibration ligue disponible pour le modèle foot, health warnings 4 → 3
+- Commit: pending
+- Status: ✅ DONE
