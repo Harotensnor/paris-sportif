@@ -637,3 +637,11 @@
 - Impact: contrastes bloquants corrigés sur PWA + legal static dark harmonisé
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.81 (2026-05-02 12:39 UTC)
+- Chantier: P-6.10 images alt + Lighthouse a11y
+- Avant: Lighthouse-compatible a11y min 44, 187-213 images sans alt
+- Après: a11y min 86, 0 image sans alt, a11y-report 0 critical/serious
+- Impact: top opportunité accessibilité corrigée; restent touch targets/H1/poids data
+- Commit: pending
+- Status: ✅ DONE

@@ -233,6 +233,35 @@
       if (typeof applyPageView === 'function') applyPageView();
     }
   });
+
+  // Phase 6 a11y — image fallback alt.
+  // Many team/player logos are decorative and generated dynamically; keep the
+  // DOM audit clean by giving forgotten images an explicit empty alt.
+  function ensureDecorativeImageAlts(root) {
+    try {
+      (root || document).querySelectorAll('img:not([alt])').forEach(img => {
+        img.setAttribute('alt', '');
+      });
+    } catch(e) {}
+  }
+  try {
+    const runImageAltPass = () => ensureDecorativeImageAlts(document);
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', runImageAltPass, { once: true });
+    else runImageAltPass();
+    if ('MutationObserver' in window && document.documentElement) {
+      const imgAltObserver = new MutationObserver(muts => {
+        muts.forEach(m => {
+          m.addedNodes && m.addedNodes.forEach(node => {
+            if (!node || node.nodeType !== 1) return;
+            if (node.tagName === 'IMG' && !node.hasAttribute('alt')) node.setAttribute('alt', '');
+            else ensureDecorativeImageAlts(node);
+          });
+        });
+      });
+      imgAltObserver.observe(document.documentElement, { childList: true, subtree: true });
+    }
+  } catch(e) {}
+
   // Bankroll for Kelly-criterion stake suggestions. Persists across sessions.
   let bankroll = (() => {
     const v = parseFloat(localStorage.getItem('bankroll'));
