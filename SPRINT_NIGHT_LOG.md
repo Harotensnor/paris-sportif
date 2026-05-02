@@ -165,5 +165,13 @@
 - Avant: le hockey était bloqué par le nouveau guard, mais la page Santé n'affichait pas clairement quels sports étaient en AUTO-BLOCK; si le backtest arrivait après le rendu Santé, le bloc pouvait rester absent
 - Après: page Santé affiche `Garde-fou ROI sport` avec hockey AUTO-BLOCK, ROI -15.8%, sample 19, WR 47%, Brier 0.243; Santé se re-render quand `backtest_report_v2.json` arrive; smoke vérifie le bloc
 - Impact: diagnostic visible en prod en quelques secondes, plus de blocage invisible de l'agent
+- Commit: 72eea21b
+- Status: ✅ DONE
+
+## Sprint v35.22 (2026-05-02 05:43 UTC)
+- Chantier: P17 mesure mission centralisée
+- Avant: les métriques nuit étaient recalculées par commandes ad hoc et difficiles à comparer après les pushes cron
+- Après: `scripts/measure_night_metrics.py` génère `night_metrics.json`: 1040 events, 314 Winamax exacts, 384 L10, 160 H2H, 11 lineups, 131 ClubElo, ROI global +2.88%, hockey en sport froid
+- Impact: source de vérité stable pour le rapport final et les prochains sprints data
 - Commit: pending
 - Status: ✅ DONE
