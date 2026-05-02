@@ -781,3 +781,11 @@
 - Impact: Théo voit le gain potentiel sans convertir edge/EV mentalement
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.99 (2026-05-02 14:18 UTC)
+- Chantier: P-7.8 defer non-critical JS
+- Avant: le script enhancements v20 était inline dans pronostics.html et parsé au boot
+- Après: app-enhancements.js externe en defer + précache SW; pronostics.html 99KB -> 63KB
+- Impact: moins de JS inline au parsing initial, smoke E2E toujours vert
+- Commit: pending
+- Status: ✅ DONE
