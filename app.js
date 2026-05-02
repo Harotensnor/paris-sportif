@@ -112,8 +112,6 @@
   // Sans ce guard, le manifest shortcuts (#locks #bilan #combines) ne
   // marchaient pas — l'utilisateur arrivait toujours sur dashboard.
   // n'était plus dans aucun sous-menu visible. Le code render reste safe
-  // (silent fall-through si quelqu'un set currentPage='simples' via hash
-  // legacy) mais aucun lien ne pointe plus vers cette valeur.
   // "je veux voir au moins une semaine de pronos jour par jour").
   const VALID_PAGES = ['dashboard','tous','performance','academie','profil','sante','legal','montantes'];
   // métriques, en réponse à l'audit ChatGPT 2026-04-26).
@@ -2557,7 +2555,6 @@
         : 'ou';
       _v35AddCandidate(out, row, prob, mk, key, `${row.side === 'over' ? 'Plus' : 'Moins'} de ${row.line} ${isHockeyOu ? 'buts hockey' : 'buts'}`);
     }
-    // Legacy fallback if only ou25/btts were patched.
     [['ou15', 1.5], ['ou25', 2.5], ['ou35', 3.5]].forEach(([mk, line]) => {
       const block = wxMk[mk];
       if (!block) return;
@@ -5732,8 +5729,6 @@
       // les anciennes entrées du cache geo et les fallbacks éventuels
       // peuvent encore tagger une source douteuse. On accepte uniquement
       // les sources fiables : event_city, event_venue, static_team.
-      // (legacy: pas de champ source = pre-v31.7.85, on conserve par
-      // compat. Quand le cache aura roulé, ce sera plus strict.)
       const wSource = w.source;
       const _trustedSources = new Set(['event_city', 'event_venue', 'static_team']);
       const _isTrusted = !wSource || _trustedSources.has(wSource);
@@ -6534,8 +6529,6 @@
       if (ts && ts.home_last10 && ts.away_last10) {
         // over re-counting characters here — tournament-walkover entries
         // can show as 'WW' / 'LL' in the string but already corrected in
-        // wins_last10 by the upstream cleaner. Falls back to the regex
-        // when the field is missing on legacy data.
         const hW = (typeof ts.home_wins_last10 === 'number') ? ts.home_wins_last10 : (ts.home_last10.match(/W/g) || []).length;
         const aW = (typeof ts.away_wins_last10 === 'number') ? ts.away_wins_last10 : (ts.away_last10.match(/W/g) || []).length;
         if (Math.abs(hW - aW) >= 2) {
@@ -7156,10 +7149,6 @@
       abstain,
       sharp_money: smartMoneyNudge || null,
       poisson: poi ? { xgH: poi.lamH, xgA: poi.lamA, fbrefBlend: poi.fbrefBlend || null } : null,
-      // Scores probables — shape varie selon le sport (Chantier 6 + K) :
-      //   foot   : array[{home, away, prob}] (legacy, kind 'exact' implicite)
-      //   hockey : {kind:'exact', items:[{home,away,prob,label}], caption}
-      //   basket : {kind:'basket', items:[{...}], total, margin, caption}
       //   tennis : {kind:'tennis', bestOf, items:[{...}], caption}
       // Rendu sur le modal match (openDetail) avec un switch par `kind`.
       scores: (() => {
@@ -13354,7 +13343,7 @@
             _lite: cur._lite === false ? false : true,
           };
         }
-      } catch(eFast) { /* fall through to legacy data.js */ }
+      } catch(eFast) {}
       if (!fresh) {
         const url = `data.js?t=${Date.now()}`;
         const resp = await fetch(url, { cache: 'no-store' });
@@ -27586,8 +27575,7 @@
     // Le backtest NE MODIFIE PAS les picks réels ; il ne fait que rejouer
     // la simulation de staking sur l'historique avec des paramètres custom.
     const WALLET_START = _walletBacktestStart;   // était 10 hardcodé
-    const WALLET_STAKE = 1; // legacy — utilisé pour labels "1€ flat par lock"
-    // Rows pour le wallet — historique complet, pas de windowing.
+    const WALLET_STAKE = 1;
     const walletAllRows = [];
     completed.forEach(m => {
       const pred = predictMatch(m);
@@ -29101,8 +29089,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     const v = parseInt(localStorage.getItem('walletTableWindow'), 10);
     return [0, 7, 30].includes(v) ? v : 30;
   })();
-  // 'flat1' (default legacy) | 'flat2' | 'flat5' | 'kelly025' | 'kelly050'
-  // Persisté en localStorage. Le bankroll de départ reste 10€ pour comparabilité.
   let _walletStakeMode = (() => {
     const v = localStorage.getItem('walletStakeMode');
     return ['flat1','flat2','flat5','kelly025','kelly050'].includes(v) ? v : 'flat1';
@@ -29370,9 +29356,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     // Sinon : aucun analytics configuré, on no-op silencieusement.
   }
 
-  // n'a pas explicitement répondu. Auto-accept silencieux si legacy data
-  // détectée (compat utilisateurs existants qui avaient des prefs avant).
-  // Avant : modal Bienvenue + banner RGPD apparaissaient simultanément →
   // friction visuelle et 2 décisions à prendre en même temps.
   function _shouldShowConsentBanner() {
     let prefs = {};
@@ -29388,8 +29371,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     let prefs = {};
     try { prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}'); } catch(e){}
     if (prefs.consentLocalStorage === 'accepted' || prefs.consentLocalStorage === 'declined') return;
-    // Legacy detection : si l'utilisateur a déjà des clés persistées, on
-    // considère qu'il a tacitement accepté (pas la première fois qu'il vient).
     const legacyKeys = ['userPrefs', 'currentPage', 'bankroll', 'paris_sportif_tracked_bets', 'agentRules'];
     const hasLegacy = legacyKeys.some(k => {
       const v = localStorage.getItem(k);
