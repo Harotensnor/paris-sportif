@@ -35,7 +35,7 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Preuve : `.cache/phase4-phase6-baseline/dashboard-mobile.png`
 - Constat : la rangée HOT/Football/Tennis est scrollable mais le chip Tennis est coupé sans fade ni indicateur.
 - Action : ajouter fade latéral, scroll-snap, ou réduire largeur des chips.
-- Statut : OPEN
+- Statut : FIXED v35.108 — scroll-snap mobile + fondu droit sur la rangée chips.
 
 ### P6-VIS-003 — Noms d'équipes cassés caractère par caractère
 
@@ -65,7 +65,7 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Preuve : `.cache/phase4-phase6-baseline/dashboard-mobile.png`, `tous-mobile.png`
 - Constat : plusieurs logos/photos 404 deviennent des placeholders vides peu premium.
 - Action : remplacer les placeholders vides par initiales, icône sport, ou masquer proprement l'espace.
-- Statut : OPEN
+- Statut : FIXED v35.108 — fallback initiales sur logos équipes et photos buteurs 404.
 
 ### P6-VIS-006 — Badge smart money compact trop envahissant
 

@@ -200,6 +200,14 @@
 - Commit: pending
 - Status: ✅ DONE
 
+## Sprint v35.108 (2026-05-02 13:24 UTC)
+- Chantier: P-8.9 révision dashboard
+- Avant: chips mobiles coupés sans signal; logos/photos 404 vides sur Accueil
+- Après: scroll-snap + fondu mobile; fallback initiales sur équipes et buteurs
+- Impact: Accueil plus propre et moins “cassé” sur mobile/desktop
+- Commit: pending
+- Status: ✅ DONE
+
 ## Phase 2
 
 ## Sprint v35.27 (2026-05-02 05:12 UTC)
