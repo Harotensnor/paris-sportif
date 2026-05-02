@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-02T04:05:21Z",
+  "generated_at": "2026-05-02T04:09:49Z",
   "data_age_min": 0,
   "sources": {
     "winamax_catalog": {
@@ -8,7 +8,7 @@
       "matches": 733
     },
     "winamax_markets": {
-      "age_min": 0,
+      "age_min": 4,
       "matches_with_odds": 732,
       "matches_detailed": 241
     },
@@ -22,7 +22,7 @@
       "events": 17
     },
     "team_stats": {
-      "age_min": 0,
+      "age_min": 4,
       "teams": 412
     },
     "clubelo": {
@@ -30,8 +30,8 @@
       "clubs": 630
     },
     "weather": {
-      "age_min": 2,
-      "events": 338
+      "age_min": 0,
+      "events": 339
     },
     "referees_soccer": {
       "age_min": 4,
@@ -46,7 +46,7 @@
       "total": 0
     },
     "team_form": {
-      "age_min": 2,
+      "age_min": 4,
       "teams": 735,
       "football_teams": 673
     },
@@ -75,7 +75,7 @@
     "winamax_markets": {
       "script": "scripts/fetch_winamax_match_details.py",
       "output": "winamax_markets.json",
-      "age_min": 0,
+      "age_min": 4,
       "threshold_min": 15,
       "fast_red_min": 30,
       "status": "ok"
@@ -99,7 +99,7 @@
     "team_stats": {
       "script": "scripts/fetch_team_stats.py",
       "output": "team_stats.json",
-      "age_min": 0,
+      "age_min": 4,
       "threshold_min": 300,
       "fast_red_min": null,
       "status": "ok"
@@ -115,7 +115,7 @@
     "weather": {
       "script": "scripts/fetch_weather.py",
       "output": "weather.json",
-      "age_min": 2,
+      "age_min": 0,
       "threshold_min": 60,
       "fast_red_min": 30,
       "status": "ok"
@@ -147,7 +147,7 @@
     "team_form": {
       "script": "scripts/fetch_team_form.py",
       "output": "team_form.json",
-      "age_min": 2,
+      "age_min": 4,
       "threshold_min": 360,
       "fast_red_min": null,
       "status": "ok"
@@ -210,7 +210,7 @@
     "winamax_tournament_only": 445,
     "winamax_exact_ratio": 0.399,
     "winamax_detailed_ratio": 0.895,
-    "actionable_external_odds": 0,
+    "actionable_external_odds": 246,
     "football_invalid_form": 0,
     "winamax_coverage": {
       "by_sport": {
