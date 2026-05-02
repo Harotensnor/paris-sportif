@@ -1225,3 +1225,9 @@
 - Après: Accueil mobile 375x667 = 2626px, overflow horizontal = 0.
 - Impact: issue marquée FIXED, Big Bets/Solides restent prioritaires sur mobile.
 - Vérif: phase10_dashboard_mobile_compact_audit.json PASS.
+
+## Sprint v35.157 — Phase 10 P-10.5 Lighthouse re-audit (18:20 UTC)
+- Avant: Phase 9 perf mobile 92, desktop 85.
+- Après: mobile 4 pages = 100, desktop 4 pages = 85, SEO = 100 partout.
+- Impact: perf 80+ maintenue, cible 90+ desktop documentée pour sprint perf ultérieur.
+- Vérif: scripts/lighthouse_audit.js PASS.
