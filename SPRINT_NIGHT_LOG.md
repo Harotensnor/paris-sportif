@@ -469,3 +469,11 @@
 - Impact: ombres critiques tokenisées; visual diff `8.48%` attendu sur Performance wide, autres pages stables
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.60 (2026-05-02 08:21 UTC)
+- Chantier: P-4.30 couleurs sémantiques
+- Avant: états win/warn/bad répartis en hex directs
+- Après: `--c-strong`, `--c-good`, `--c-warn`, `--c-bad`; `49` remplacements vers `var(--c-*)`
+- Impact: contrat couleur état posé; visual diff `11.00%` attendu sur Performance, autres pages stables
+- Commit: pending
+- Status: ✅ DONE
