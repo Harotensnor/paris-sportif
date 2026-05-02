@@ -173,5 +173,13 @@
 - Avant: les métriques nuit étaient recalculées par commandes ad hoc et difficiles à comparer après les pushes cron
 - Après: `scripts/measure_night_metrics.py` génère `night_metrics.json`: 1040 events, 314 Winamax exacts, 384 L10, 160 H2H, 11 lineups, 131 ClubElo, ROI global +2.88%, hockey en sport froid
 - Impact: source de vérité stable pour le rapport final et les prochains sprints data
+- Commit: 28a93fa0
+- Status: ✅ DONE
+
+## Sprint v35.23 (2026-05-02 05:55 UTC)
+- Chantier: P5 persistance marchés détaillés Winamax
+- Avant: le cron catalogue réécrivait `winamax_markets.json` avec du 1N2 seul entre deux runs détail; snapshot: 0 marché détaillé après cron, Terminal Value 55 marchés / 55 matchs exacts
+- Après: `fetch_winamax_catalog.py` préserve les marchés détaillés existants; run local conserve 3 matchs détaillés, `data.js` passe à 4 events avec marchés >1N2, smoke Terminal Value monte à `101 marchés scorés · 56 matchs exacts sur 48h`
+- Impact: les détails Winamax ne disparaissent plus au refresh catalogue; le scanner value voit plus de marchés exploitables immédiatement
 - Commit: pending
 - Status: ✅ DONE
