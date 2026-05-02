@@ -19346,17 +19346,13 @@
     } catch(e) { return ''; }
   }
 
-  // ====== v22 + Sprint 107 (v31.7.190) — Onboarding wizard 4 étapes ======
-  // Avant : 1 étape level. Après : 4 étapes guidées pour expliquer le site, fixer
-  // bankroll, démontrer comment lire un pick, et terminer sur Dashboard.
-  // Étape 1 : Welcome / promesse (ROI value vs marché Winamax)
-  // Étape 2 : Niveau (existant — adapte la densité d'info)
-  // Étape 3 : Bankroll (input numérique → userBankroll localStorage)
-  // Étape 4 : Tutoriel "comment lire un pick" (mini-card explicative)
+  // ====== v35.63 — Onboarding 3 étapes "Big Bets First" ======
+  // Le premier contact doit expliquer le flux réel : voir le gros pari,
+  // comprendre pourquoi, puis ouvrir Winamax sans noyer le visiteur.
   function showOnboardingModal() {
     try {
       const prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}');
-      if (prefs.onboardingDone) return;
+      if (prefs.onboardingDone || localStorage.getItem('paris_sportif_onboarded_v1') === '1') return;
       if (document.querySelector('.onboard-overlay')) return;
 
       const overlay = document.createElement('div');
@@ -19366,50 +19362,43 @@
       overlay.setAttribute('aria-labelledby', 'onb-title');
 
       // État interne du wizard
-      const state = { step: 1, level: prefs.level || 'confirme', bankroll: 50 };
-      const totalSteps = 4;
+      const savedBankroll = Number(localStorage.getItem('userBankroll')) || 50;
+      const state = { step: 1, level: prefs.level || 'confirme', bankroll: savedBankroll };
+      const totalSteps = 3;
 
       const renderStep = () => {
         const progressPct = (state.step / totalSteps) * 100;
         let body = '';
         if (state.step === 1) {
           body = `
-            <h2 id="onb-title">👋 Bienvenue sur Paris-Sportif</h2>
-            <div class="sub">Site indépendant, modèle Poisson + Dixon-Coles + calibration isotonique. <strong>Objectif : te faire gagner de l'argent</strong> en repérant les matchs où Winamax se trompe.</div>
+            <h2 id="onb-title">🔥 Les gros coups d'abord</h2>
+            <div class="sub">Quand tu arrives, regarde d'abord les <strong>Big Bets</strong> : 1 à 3 paris max, ceux où le modèle voit le meilleur couple chance/cote.</div>
             <div style="background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px 16px;margin:14px 0;line-height:1.6;font-size:13.5px;color:var(--text-2);">
-              <div style="margin-bottom:8px;"><strong class="u-text-accent">✓ Ce que tu trouves ici :</strong></div>
-              <div>• Picks value (edge ≥5% calculé vs cotes Winamax temps réel)</div>
-              <div>• Mises calculées (Kelly fractionné, cap 10% bankroll)</div>
-              <div>• Backtest transparent (toutes les perfs tracées)</div>
-              <div>• 100% Winamax, zéro affiliation, zéro promesse</div>
+              <div style="margin-bottom:8px;"><strong class="u-text-accent">Ton réflexe :</strong></div>
+              <div>1. Tu lis le pari mis en avant.</div>
+              <div>2. Tu vérifies la mise conseillée.</div>
+              <div>3. Tu ignores le reste si aucun gros coup n'est propre.</div>
             </div>
-            <div style="background:rgba(252,165,165,.08);border:1px solid var(--danger);border-left:3px solid var(--danger);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:14px;font-size:12.5px;color:var(--text-dim);line-height:1.5;">
-              <strong class="u-text-danger">⚠ Honnêteté :</strong> 3-5 pertes consécutives sont <strong>normales</strong>. ~60% de réussite long-terme. Pas de garantie. Joue responsable.
+            <div style="background:rgba(22,163,74,.10);border:1px solid rgba(22,163,74,.35);border-left:3px solid var(--c-strong);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:14px;font-size:12.5px;color:var(--text-dim);line-height:1.5;">
+              <strong class="u-text-accent">Objectif :</strong> trouver les rares cotes qui paient plus que le risque réel, pas parier plus souvent.
             </div>
           `;
         } else if (state.step === 2) {
           body = `
-            <h2 id="onb-title">🎯 Quel est ton niveau ?</h2>
-            <div class="sub">J'adapte la densité d'info affichée. Tu pourras changer plus tard.</div>
-            <button class="onboard-opt${state.level==='debutant'?' selected':''}" data-level="debutant">
-              <b>🌱 Débutant</b>
-              <div class="descr">Je découvre — je veux des conseils simples, sécurité max.</div>
-            </button>
-            <button class="onboard-opt${state.level==='confirme'?' selected':''}" data-level="confirme">
-              <b>🎯 Confirmé</b>
-              <div class="descr">Je parie régulièrement — stats importantes sans me noyer.</div>
-            </button>
-            <button class="onboard-opt${state.level==='pro'?' selected':''}" data-level="pro">
-              <b>📊 Pro</b>
-              <div class="descr">Tous les chiffres : cotes, Elo, rentabilité, brut.</div>
-            </button>
+            <h2 id="onb-title">🧠 Clique “Voir pourquoi”</h2>
+            <div class="sub">Un bon pari doit s'expliquer vite. La fiche te donne les raisons clés avant les détails techniques.</div>
+            <div style="display:grid;gap:10px;margin:14px 0;">
+              <div class="onboard-opt selected"><b>Forme</b><div class="descr">Qui arrive fort, qui fatigue, qui traverse une mauvaise série.</div></div>
+              <div class="onboard-opt selected"><b>Cote</b><div class="descr">Combien le marché demande, et pourquoi le modèle pense que c'est trop payé.</div></div>
+              <div class="onboard-opt selected"><b>Risque</b><div class="descr">Mise prudente, variance, blessure, composition ou source data fragile.</div></div>
+            </div>
           `;
         } else if (state.step === 3) {
           body = `
-            <h2 id="onb-title">💰 Quelle est ta bankroll ?</h2>
-            <div class="sub">Le montant total que tu acceptes de risquer sur les paris. Toutes les mises seront calibrées par rapport à ça (Kelly fractionné, cap 10% par pari).</div>
+            <h2 id="onb-title">↗ Place chez Winamax, sans forcer</h2>
+            <div class="sub">Le bouton ouvre le match Winamax quand la cote exacte existe. La mise reste proportionnelle à ta bankroll.</div>
             <div style="margin:18px 0;">
-              <label for="onb-bankroll" style="display:block;font-size:11px;font-weight:700;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;">Bankroll (€)</label>
+              <label for="onb-bankroll" style="display:block;font-size:11px;font-weight:700;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;">Ta bankroll de paris (€)</label>
               <input type="number" id="onb-bankroll" value="${state.bankroll}" min="10" max="10000" step="10" style="width:100%;padding:14px 16px;background:var(--panel-2);border:1px solid var(--border-2);border-radius:var(--r-sm);font-size:18px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;">
             </div>
             <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
@@ -19418,7 +19407,7 @@
               `).join('')}
             </div>
             <div style="font-size:11.5px;color:var(--text-dim2);line-height:1.5;">
-              💡 <strong>Conseil :</strong> commence avec une somme que tu peux perdre intégralement sans impact. Tu peux modifier dans Profil &amp; bankroll à tout moment.
+              💡 <strong>Règle simple :</strong> si le site dit “pas de gros coup”, tu ne joues pas. La patience fait partie de la stratégie.
             </div>
           `;
         } else if (state.step === 4) {
@@ -19498,6 +19487,7 @@
           p.level = state.level;
           p.onboardingDone = true;
           localStorage.setItem('userPrefs', JSON.stringify(p));
+          localStorage.setItem('paris_sportif_onboarded_v1', '1');
           localStorage.setItem('paris_sportif_onboarded_v2', '1');
           if (!skipped && state.bankroll > 0) {
             localStorage.setItem('userBankroll', String(state.bankroll));

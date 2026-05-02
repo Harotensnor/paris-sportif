@@ -133,7 +133,7 @@
 <!-- Chantier S — PWA -->
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="alternate" type="application/rss+xml" href="feed.xml" title="Paris-Sportif — Top picks du jour (RSS)">
-<!-- v35.07 — Seul le CSS est préchargé au boot. Le gros app.js?v=9f6c55da reste en defer
+<!-- v35.07 — Seul le CSS est préchargé au boot. Le gros app.js?v=e0bee41d reste en defer
      plus bas dans le body pour laisser le squelette critique peindre d'abord. -->
 <link rel="preload" href="app.css?v=9d935d9b" as="style" onload="this.onload=null;this.rel='stylesheet'">
 <!-- v31.1 — DNS-prefetch pour les CDN tiers utilisés sur la page (logos ESPN).
@@ -277,7 +277,7 @@
   // pour debug console. AUCUN envoi réseau — l'utilisateur peut consulter
   // ou exporter ses données, et c'est tout.
   //
-  // Pourquoi inline pré-app.js?v=9f6c55da ? Il faut s'enregistrer AVANT le LCP/FCP
+  // Pourquoi inline pré-app.js?v=e0bee41d ? Il faut s'enregistrer AVANT le LCP/FCP
   // pour les capter. Le bundle web-vitals officiel pèse 5 KB ; ici on
   // tombe à ~1.5 KB grâce à l'usage direct de PerformanceObserver.
   //
@@ -646,7 +646,7 @@
         </div>
       </div>
     </section>
-    <!-- v31.2 — Friendly error state (audit UX). Avant : "Fichier data.js?v=76801328
+    <!-- v31.2 — Friendly error state (audit UX). Avant : "Fichier data.js?v=b25471df
          introuvable" brut, casse la confiance. Maintenant : message rassurant
          avec retry + dernier refresh + offline fallback explanation. -->
     <div id="no-data-banner" class="error-banner hidden" role="alert" aria-live="polite">
@@ -729,7 +729,7 @@
       <div class="footer-brand">
         <span class="footer-logo">🎯</span>
         <span class="footer-text">Paris-Sportif</span>
-        <span class="footer-version" id="footer-version" role="button" tabindex="0" style="cursor:pointer;" title="Voir les nouveautés v35.62">v35.62</span>
+        <span class="footer-version" id="footer-version" role="button" tabindex="0" style="cursor:pointer;" title="Voir les nouveautés v35.63">v35.63</span>
       </div>
       <nav class="footer-links" aria-label="Liens du site">
         <a href="https://github.com/Harotensnor/paris-sportif" target="_blank" rel="noopener" class="footer-link" title="Code source sur GitHub">
@@ -813,8 +813,8 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="data.js?v=a0475370"></script>
-<script src="app.js?v=6f6490c6" defer></script>
+<script src="data.js?v=b25471df"></script>
+<script src="app.js?v=e0bee41d" defer></script>
 
 <!-- enhancements v20 -->
 <script data-tag="__paris_sportif_enh_v20__">
@@ -875,11 +875,11 @@
   };
 
   // ========== CHANTIER DDD — Mode offline robuste ==========
-  // v32.6 — Fusionné avec setupOfflineBanner (app.js?v=9f6c55da). Garde uniquement le
+  // v32.6 — Fusionné avec setupOfflineBanner (app.js?v=e0bee41d). Garde uniquement le
   // CSS qui désactive les CTAs externes en mode offline. Le banner visuel
-  // est rendu par app.js?v=9f6c55da (#offline-banner), avec timestamp dynamique. Avant
+  // est rendu par app.js?v=e0bee41d (#offline-banner), avec timestamp dynamique. Avant
   // ce fix, 2 banners coexistaient (#__offline-banner ici + #offline-banner
-  // app.js?v=9f6c55da) → duplication visuelle quand offline.
+  // app.js?v=e0bee41d) → duplication visuelle quand offline.
   function initOffline(){
     var style = document.createElement('style');
     style.textContent =

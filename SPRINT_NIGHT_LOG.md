@@ -493,3 +493,11 @@
 - Impact: lecture débutant plus claire; visual diff `11.48%` attendu sur Performance dynamique
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.63 (2026-05-02 08:55 UTC)
+- Chantier: P-4.16 onboarding Big Bets
+- Avant: wizard 4 étapes générique, pas aligné sur le flux “voir/comprendre/placer”
+- Après: onboarding 3 étapes Big Bets First + flag `paris_sportif_onboarded_v1`
+- Impact: première visite centrée sur les gros coups; visual diff `10.14%` attendu sur Performance dynamique
+- Commit: pending
+- Status: ✅ DONE
