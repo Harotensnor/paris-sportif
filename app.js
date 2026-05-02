@@ -2038,17 +2038,7 @@
    *  model's bilan becomes meaningless — every finished match defaults to
    *  a flat "home 55%" prior, turning the bilan into a home-WR measurement. */
   function getMatchOdds(match, hasDraw) {
-    // AUDIT-2026-04-27 (P2) — Promesse Winamax-only : la cote utilisée
-    // pour predictMatch (edge, market_implied, label) doit être Winamax
-    // quand un match exact existe. Avant : on lisait match.odds (ESPN
-    // live, vide pour upcoming) puis odds_snapshot (DraftKings /
-    // TennisExplorer / BetExplorer cap turé en pré-match) AVANT winamax.
-    // Résultat : 187 events live avec Winamax exact recevaient leur
-    // edge calculé sur cote DraftKings/TennisExplorer (divergence
-    // observée : Cádiz Winamax 1.92 vs DraftKings 2.05 → +7% edge fictif).
-    // Fix : Winamax exact PROVERSE en pré-match. Live ESPN reste
-    // prioritaire pour les matchs en cours (cotes pré-match Winamax
-    // figées dès le coup d'envoi).
+    // Prefer exact Winamax pre-match odds; live odds stay first in-play.
     const isLive = match && (match.live || match.status === 'STATUS_IN_PROGRESS');
     const wxOdds = match && match.winamax && match.winamax.markets && match.winamax.markets['1n2'];
     const wxValid = wxOdds && (wxOdds.home || wxOdds.away) && match.winamax.match_id;
@@ -2141,17 +2131,7 @@
   // avec celle du Chantier BB (ligne 2320) qui renvoie un nombre. Les seuls
   // call sites (hero top-picks, détail match) attendent bien un nombre.
 
-  // AUDIT-2026-04-27 (P2) — `winamax.available === true` n'est PAS un
-  // synonyme de "match exact bookable sur Winamax". Le patcher a un
-  // fallback qui set `available=true` pour les events où on a juste
-  // détecté que la ligue/sport est dispo sur Winamax (mapping statique
-  // par tournament). Sur la data live actuelle : 268/601 events (45%)
-  // sont "tournament-only" — pas de match_id, pas de markets exacts.
-  //
-  // Pour les recommandations actionnables (top picks, locks, dashboard),
-  // exiger `match_id + markets['1n2']` qui garantissent une cote bookable
-  // chez Winamax. Sinon le user clique "Voir cote" et atterrit sur la
-  // page tournoi sans son match → promesse "Winamax-only" cassée.
+  // Actionable picks require exact Winamax match id and 1N2 markets.
   function isWinamaxBookable(match) {
     const w = match && match.winamax;
     if (!w || w.available !== true) return false;
@@ -2815,6 +2795,83 @@
   }
   try { window.scoreMarketCandidate = scoreMarketCandidate; } catch(e){}
 
+  const _v35Tok = v => String(v ?? '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '');
+  function _v35Line(c) {
+    const n = Number(c?.line);
+    if (Number.isFinite(n)) return n;
+    const m = `${c?.key || ''} ${c?.pickKey || ''} ${c?.label || ''}`.match(/(\d+(?:[.,]\d+)?)/);
+    return m ? Number(m[1].replace(',', '.')) : null;
+  }
+  function _v35NormPick(c) {
+    if (!c) return { market: '', pick: '', line: null };
+    const market = String(c.market || '').trim();
+    const token = _v35Tok(c.pickValue ?? c.key ?? c.pickKey ?? c.side ?? c.label);
+    const line = _v35Line(c);
+    if (/^exact(score)?$/i.test(market) || market === 'exactScore') return { market: 'exactScore', pick: String(c.pickValue ?? c.key ?? c.pickKey ?? '').trim(), line };
+    if (market === '1n2' || market === 'ht_1n2') return { market: '1n2', pick: token === 'home' || token === '1' ? '1' : token === 'away' || token === '2' ? '2' : token === 'draw' || token === 'x' ? 'X' : String(c.key || c.pickKey || '').toUpperCase(), line };
+    if (market === 'btts') return { market: 'btts', pick: token.includes('yes') || token.includes('oui') || token === 'y' || token === 'btts_y' || token === 'bttsy' ? 'Yes' : 'No', line };
+    if (market === 'doubleChance') return { market, pick: String(c.pickValue ?? c.key ?? c.pickKey ?? c.side ?? '').replace(/_/g, '').toUpperCase(), line };
+    if (market === 'dnb') return { market, pick: String(c.pickValue ?? c.key ?? c.pickKey ?? c.side ?? '').toLowerCase().match(/2|away/) ? '2' : '1', line };
+    if (/^(ou|ou15|ou25|ou35|teamTotal|basketTotal|baseballTotal|hockeyTotal|tennisGames)$/i.test(market)) {
+      let m = market;
+      if (Number.isFinite(line)) m = Math.abs(line - 1.5) < 0.01 ? 'ou15' : Math.abs(line - 2.5) < 0.01 ? 'ou25' : Math.abs(line - 3.5) < 0.01 ? 'ou35' : market;
+      return { market: m, pick: token.includes('under') || token.startsWith('u') || token.includes('moins') ? 'Under' : 'Over', line };
+    }
+    return { market, pick: String(c.pickValue ?? c.key ?? c.pickKey ?? '').trim(), line };
+  }
+  function scoreToImpliedMarkets(score) {
+    const m = String(score || '').trim().match(/^(\d+)\s*[-:]\s*(\d+)$/);
+    if (!m) return null;
+    const h = Number(m[1]), a = Number(m[2]), total = h + a;
+    if (!Number.isFinite(total)) return null;
+    return { '1n2': h > a ? '1' : a > h ? '2' : 'X', ou15: total > 1.5 ? 'Over' : 'Under', ou25: total > 2.5 ? 'Over' : 'Under', ou35: total > 3.5 ? 'Over' : 'Under', btts: h > 0 && a > 0 ? 'Yes' : 'No', doubleChance: h > a ? ['1X', '12'] : a > h ? ['X2', '12'] : ['1X', 'X2'], dnb: h > a ? '1' : a > h ? '2' : 'PUSH', total };
+  }
+  function isPickConsistentWithScore(score, market, pick, candidate) {
+    const implied = scoreToImpliedMarkets(score);
+    if (!implied) return true;
+    if (market === 'exactScore') return String(score || '').trim() === String(pick || '').trim();
+    if (market === 'ou' || /Total$/.test(market) || market === 'tennisGames') {
+      const line = _v35Line(candidate);
+      return !Number.isFinite(line) || (implied.total > line ? 'Over' : 'Under') === pick;
+    }
+    const expected = implied[market];
+    return Array.isArray(expected) ? expected.includes(pick) : expected === 'PUSH' ? pick === 'PUSH' : expected ? expected === pick : true;
+  }
+  function isPairConsistent(c1, c2) {
+    const a = _v35NormPick(c1), b = _v35NormPick(c2);
+    if (!a.market || !b.market) return true;
+    if (a.market === 'exactScore') return isPickConsistentWithScore(a.pick, b.market, b.pick, c2);
+    if (b.market === 'exactScore') return isPickConsistentWithScore(b.pick, a.market, a.pick, c1);
+    if (a.market === b.market && a.pick && b.pick && a.pick !== b.pick && (!Number.isFinite(a.line) || !Number.isFinite(b.line) || Math.abs(a.line - b.line) < 0.01)) return false;
+    const bttsUnder15 = (x, y) => x.market === 'btts' && x.pick === 'Yes' && /^ou/.test(y.market) && y.pick === 'Under' && Number.isFinite(y.line) && y.line <= 1.5;
+    if (bttsUnder15(a, b) || bttsUnder15(b, a)) return false;
+    const oneDc = (one, dc) => one.market === '1n2' && dc.market === 'doubleChance' && ((one.pick === '1' && dc.pick === 'X2') || (one.pick === '2' && dc.pick === '1X') || (one.pick === 'X' && dc.pick === '12'));
+    if (oneDc(a, b) || oneDc(b, a)) return false;
+    const oneDnb = (one, dnb) => one.market === '1n2' && dnb.market === 'dnb' && ((one.pick === '1' && dnb.pick === '2') || (one.pick === '2' && dnb.pick === '1') || one.pick === 'X');
+    return !(oneDnb(a, b) || oneDnb(b, a));
+  }
+  function validateMarketConsistency(allCandidates, opts) {
+    opts = opts || {};
+    const consistent = opts.anchor ? [opts.anchor] : [];
+    const contradicted = [];
+    for (const c of (Array.isArray(allCandidates) ? allCandidates.filter(Boolean) : [])) {
+      if (c === opts.anchor) continue;
+      const conflict = consistent.find(k => !isPairConsistent(k, c));
+      if (conflict) {
+        const a = _v35NormPick(conflict), b = _v35NormPick(c);
+        contradicted.push({ ...c, consistencyConflict: { with: conflict.label || conflict.key || conflict.market || 'marché sélectionné', reason: a.market === 'exactScore' || b.market === 'exactScore' ? `Score ${(a.market === 'exactScore' ? a : b).pick} incompatible avec ${(a.market === 'exactScore' ? b : a).market} ${(a.market === 'exactScore' ? b : a).pick}` : `${a.market} ${a.pick} incompatible avec ${b.market} ${b.pick}` } });
+      } else consistent.push(c);
+    }
+    return { consistent, contradicted };
+  }
+
+  try {
+    window.scoreToImpliedMarkets = scoreToImpliedMarkets;
+    window.isPickConsistentWithScore = isPickConsistentWithScore;
+    window.isPairConsistent = isPairConsistent;
+    window.validateMarketConsistency = validateMarketConsistency;
+  } catch(e){}
+
   function marketHistoryConfidence(market, sport) {
     const hist = window.__marketHistoryStats || null;
     const bucket = hist && (hist[`${sport || ''}|${market}`] || hist[`*|${market}`]);
@@ -2854,34 +2911,17 @@
   }
   try { window.selectBestMarket = selectBestMarket; } catch(e){}
 
-  // Sprint 71 (v31.7.159 — audit ChatGPT 2026-04-28 P1) — Combinés multi-types
-  // + corrélation. Réponse à l'audit "Bon concept anti-corrélation, trop 1N2-
-  // centric. Indiquer corrélation entre matchs sélectionnés."
-  //
-  // Score corrélation [0..1] entre 2 picks. 1 = très corrélés (même sport +
-  // même ligue + horaire chevauchant + matchs sur même championnat avec
-  // équipes liées). 0 = totalement indépendants.
-  // Critères :
-  //   * même match (m.id) → 1.0 (rejet : on combine pas un match avec lui-même)
-  //   * même ligue ET kickoff < 2h d'écart → +0.4 (matchs serrés en compétition partagée)
-  //   * même équipe impliquée → +0.5 (très rare mais bloquant : si on parie home + draw
-  //                                   sur le même match c'est un "système" pas un combiné)
-  //   * même sport → +0.15 (faible corrélation marché)
-  //   * markets corrélés (ex : Over 2.5 + BTTS yes → +0.3, 1X2 home + Score H gagnant +0.5)
+  // Correlation score for combo warnings: same match/sport/league/team/time.
   function combinationCorrelation(p1, p2) {
     if (!p1 || !p2 || !p1.match || !p2.match) return 0;
     const m1 = p1.match;
     const m2 = p2.match;
     if (String(m1.id) === String(m2.id)) {
-      // Même match : on accepte certaines combinaisons (1X2 + OU ≠ same outcome)
-      // mais on flag à 0.6 (corrélé) pour avertir l'user.
       const market1 = p1.market || '1n2';
       const market2 = p2.market || '1n2';
       if (market1 === market2) return 1.0;
-      // Combinaisons interdites (mêmes outcome) :
       if ((market1 === '1n2' && market2 === 'doubleChance') ||
           (market1 === 'doubleChance' && market2 === '1n2')) return 0.95;
-      // Combinaisons compatibles intra-match (1X2 + OU/BTTS) — moyenne corrélation
       return 0.6;
     }
     let corr = 0;
@@ -13625,11 +13665,7 @@
     window.predictMatch = predictMatch;
   } catch(e){}
 
-  // v31.7.26 — Test API exposée pour Playwright unit tests. Permet d'asserter
-  // sur les helpers purs (dixonColesTau, haversineKm, poissonPmf, etc.) sans
-  // setup Jest ni bundler. Accessible via window.__testAPI dans les specs.
-  // Le surcoût est <1KB et zero runtime impact (juste des refs à des fns
-  // déjà allouées en mémoire).
+  // Test API for browser specs.
   try {
     window.__testAPI = {
       _dixonColesTau,
@@ -13638,7 +13674,6 @@
       poissonPmf,
       poissonTopScores,
       isoDate,
-      // AUDIT-2026-04-27 — helpers pour tests fixtures audit
       isWinamaxBookable,
       evaluateModelPick,
       kellyFraction: typeof kellyFraction === 'function' ? kellyFraction : null,
@@ -13646,14 +13681,16 @@
       oddsDisciplineProfile: typeof oddsDisciplineProfile === 'function' ? oddsDisciplineProfile : null,
       investmentScore: typeof investmentScore === 'function' ? investmentScore : null,
       getMatchOdds,
-      // Sprint 1 #5 — tests data pollution
       predictMatch: typeof predictMatch === 'function' ? predictMatch : null,
-      // Tier 2 #3 (2026-05-01) : expose _agentReplay pour tests fixtures
       _agentReplay: typeof _agentReplay === 'function' ? _agentReplay : null,
       _agentBestPick: typeof _agentBestPick === 'function' ? _agentBestPick : null,
       selectBestMarket: typeof selectBestMarket === 'function' ? selectBestMarket : null,
       buildMarketCandidates: typeof buildMarketCandidates === 'function' ? buildMarketCandidates : null,
       scoreMarketCandidate: typeof scoreMarketCandidate === 'function' ? scoreMarketCandidate : null,
+      scoreToImpliedMarkets: typeof scoreToImpliedMarkets === 'function' ? scoreToImpliedMarkets : null,
+      isPickConsistentWithScore: typeof isPickConsistentWithScore === 'function' ? isPickConsistentWithScore : null,
+      isPairConsistent: typeof isPairConsistent === 'function' ? isPairConsistent : null,
+      validateMarketConsistency: typeof validateMarketConsistency === 'function' ? validateMarketConsistency : null,
     };
   } catch(e){}
 
