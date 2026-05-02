@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-02T17:17:57Z",
+  "generated_at": "2026-05-02T17:22:46Z",
   "data_age_min": 0,
   "sources": {
     "winamax_catalog": {
@@ -30,7 +30,7 @@
       "clubs": 630
     },
     "weather": {
-      "age_min": 1,
+      "age_min": 0,
       "events": 380
     },
     "referees_soccer": {
@@ -126,7 +126,7 @@
     "weather": {
       "script": "scripts/fetch_weather.py",
       "output": "weather.json",
-      "age_min": 1,
+      "age_min": 0,
       "threshold_min": 60,
       "fast_red_min": 30,
       "status": "ok"
@@ -216,13 +216,13 @@
   "warnings": [],
   "overall": "ok",
   "quality_checks": {
-    "total_events": 372,
-    "upcoming_events": 339,
-    "winamax_available": 339,
-    "winamax_exact": 330,
-    "winamax_detailed": 324,
+    "total_events": 374,
+    "upcoming_events": 340,
+    "winamax_available": 340,
+    "winamax_exact": 331,
+    "winamax_detailed": 325,
     "winamax_tournament_only": 9,
-    "winamax_exact_ratio": 0.973,
+    "winamax_exact_ratio": 0.974,
     "winamax_detailed_ratio": 0.982,
     "winamax_detail_gap_to_target": 0,
     "winamax_detail_fetch_cap_reco": 90,
@@ -233,10 +233,10 @@
     "winamax_coverage": {
       "by_sport": {
         "football": {
-          "upcoming": 281,
-          "available": 281,
-          "exact": 274,
-          "detailed": 270,
+          "upcoming": 282,
+          "available": 282,
+          "exact": 275,
+          "detailed": 271,
           "tournament_only": 7,
           "missing": 0,
           "exact_ratio": 0.975,
