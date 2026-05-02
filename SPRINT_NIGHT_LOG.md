@@ -669,3 +669,11 @@
 - Impact: base visuelle plus premium sans croissance bundle notable; captures v35-84 OK
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.85 (2026-05-02 13:09 UTC)
+- Chantier: P-6.14 sub-nav centrale
+- Avant: header rapide orienté pages internes classiques
+- Après: Home / Live / Mes paris / Stats / Résultats avec aliases stables
+- Impact: navigation plus proche bookmaker, accès plus direct aux usages de pari
+- Commit: pending
+- Status: ✅ DONE
