@@ -973,3 +973,11 @@
 - Impact: -28% de longueur mobile; les Big Bets et Solides restent prioritaires
 - Commit: pending
 - Status: ⚠️ PARTIEL
+
+## Sprint v35.123 (2026-05-02 14:34 UTC)
+- Chantier: P-9.51 fix P9-VIS-001 accueil mobile
+- Avant: dashboard mobile 5175px après v35.122
+- Après: dashboard mobile 4238px, sous la cible 4500px
+- Impact: accueil mobile plus direct; Big Bets + 3 Solides visibles, panier déplacé hors flux mobile
+- Commit: pending
+- Status: ✅ DONE
