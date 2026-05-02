@@ -11063,6 +11063,29 @@
                     <div style="margin-top:4px;font-size:10.5px;color:var(--text-dim2,#7b8693);line-height:1.3;">Approx. Gaussienne basée sur ${sc.bestOf===5?'BO5 σ≈√50':'BO3 σ≈√25'}. Plus le match est tight, plus le total est élevé.</div>
                   </div>`;
               }
+              let hockeyMarketsHtml = '';
+              if (match.sport === 'hockey' && sc.markets) {
+                const hTotalChip = (g) => {
+                  const pPick = g.pOver >= g.pUnder ? g.pOver : g.pUnder;
+                  const sideLbl = g.pOver >= g.pUnder ? `Plus de ${g.line}` : `Moins de ${g.line}`;
+                  return `<span style="padding:8px 12px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);font-size:12px;font-weight:650;color:var(--text);font-variant-numeric:tabular-nums;">${esc(sideLbl)} buts · ${(pPick*100).toFixed(0)}%</span>`;
+                };
+                const totalsTop = (sc.markets.totals || []).map(hTotalChip).join('');
+                const tt = sc.markets.teamTotals || {};
+                const teamRows = [
+                  { label: `${home?.short || home?.name || 'Dom.'} +2.5`, p: tt.home_over_25 },
+                  { label: `${home?.short || home?.name || 'Dom.'} +3.5`, p: tt.home_over_35 },
+                  { label: `${away?.short || away?.name || 'Ext.'} +2.5`, p: tt.away_over_25 },
+                  { label: `${away?.short || away?.name || 'Ext.'} +3.5`, p: tt.away_over_35 },
+                ].filter(x => x.p > 0).map(x => `<span style="padding:7px 11px;border-radius:8px;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.18);font-size:12px;font-weight:650;color:var(--text);font-variant-numeric:tabular-nums;">${esc(x.label)} · ${(x.p*100).toFixed(0)}%</span>`).join('');
+                hockeyMarketsHtml = `
+                  <div class="u-mt-3">
+                    <div class="lbl-tiny-mb">🏒 Total buts hockey</div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">${totalsTop}</div>
+                    ${teamRows ? `<div class="lbl-tiny-mb u-mt-3">🏒 Team totals</div><div style="display:flex;gap:8px;flex-wrap:wrap;">${teamRows}</div>` : ''}
+                    <div style="margin-top:4px;font-size:10.5px;color:var(--text-dim2,#7b8693);line-height:1.3;">Poisson NHL depuis forme récente, goalie et pace. Totaux uniquement, sans handicap.</div>
+                  </div>`;
+              }
               return `
               <div style="margin-top:14px;">
                 <div class="lbl-tiny-mb">${heading}</div>
@@ -11070,6 +11093,7 @@
                 ${caption ? `<div style="margin-top:6px;font-size:10.5px;color:var(--text-dim2,#7b8693);line-height:1.3;">${esc(caption)}</div>` : ''}
                 ${tennisGamesHtml}
                 ${basketMarketsHtml}
+                ${hockeyMarketsHtml}
               </div>`;
             })()}
             ${(() => {
