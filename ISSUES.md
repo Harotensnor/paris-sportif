@@ -278,3 +278,74 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 3. P6-VIS-010 Legal mobile header.
 4. P6-VIS-003 noms équipes cassés.
 5. P6-VIS-004 cartes buteurs tronquées.
+
+## Phase 9 nouveaux bugs — audit visuel 32 captures
+
+- Source : `.cache/phase4-phase9-current/`
+- Planches : `.cache/phase9-current-contact-sheets/`
+- Pages : dashboard, tous, performance, academie, profil, sante, montantes, legal
+- Viewports : mobile 375px, tablet 768px, desktop 1440px, wide 1920px
+
+### P9-VIS-001 — Accueil mobile encore trop long
+
+- Sévérité : HIGH
+- Preuve : `.cache/phase4-phase9-current/dashboard-mobile.png` (`375x7201`)
+- Constat : la page principale dépasse 7200px; les sections secondaires noient les Big Bets sur mobile.
+- Action : replier Top buteurs / stats / gros gains par défaut sur mobile et garder Big Bets + Solides visibles en priorité.
+- Statut : OPEN
+
+### P9-VIS-002 — Santé mobile trop dense
+
+- Sévérité : MEDIUM
+- Preuve : `.cache/phase4-phase9-current/sante-mobile.png` (`375x6447`)
+- Constat : la page Santé empile trop de tables techniques; la lecture mobile devient un long tunnel.
+- Action : transformer pipeline lag / erreurs JS / checks détaillés en accordéons fermés par défaut.
+- Statut : OPEN
+
+### P9-VIS-003 — Profil desktop reste trop mono-colonne
+
+- Sévérité : MEDIUM
+- Preuve : `.cache/phase4-phase9-current/profil-desktop.png` et `profil-wide.png`
+- Constat : le contenu Profil occupe surtout la colonne gauche et laisse une grande zone vide à droite.
+- Action : passer Profil en deux colonnes desktop : Bankroll à gauche, préférences/notifications/données à droite.
+- Statut : OPEN
+
+### P9-VIS-004 — Accueil wide garde de grands espaces noirs
+
+- Sévérité : MEDIUM
+- Preuve : `.cache/phase4-phase9-current/dashboard-wide.png`
+- Constat : malgré la refonte desktop, le flux central reste visuellement étroit sur 1920px quand il y a peu de Big Bets.
+- Action : autoriser 4 cartes / rail stats plus riche / section opportunités plus large sur ultra-wide.
+- Statut : OPEN
+
+### P9-VIS-005 — Legal mobile trop compact pour du texte légal
+
+- Sévérité : MEDIUM
+- Preuve : `.cache/phase4-phase9-current/legal-mobile.png`
+- Constat : les gros blocs légaux sont lisibles mais très denses, sans respiration ni accordéon mobile.
+- Action : replier RGPD / Relation Winamax / Jeu responsable en sections accordéon sur mobile.
+- Statut : OPEN
+
+### P9-VIS-006 — Header mobile chargé
+
+- Sévérité : MEDIUM
+- Preuve : toutes les captures mobile, surtout dashboard/tous/performance
+- Constat : banderole risque + logo + sous-nav + chips produisent un haut de page très compressé.
+- Action : réduire la sous-nav mobile à icônes principales et mettre les filtres secondaires dans drawer.
+- Statut : OPEN
+
+### P9-VIS-007 — Footer/disclaimer mobile prend trop de hauteur
+
+- Sévérité : LOW
+- Preuve : captures mobile dashboard/performance/academie/profil
+- Constat : le footer répète beaucoup d'informations et rallonge fortement les pages.
+- Action : footer compact mobile avec liens secondaires repliés.
+- Statut : OPEN
+
+### P9-VIS-008 — Montantes trop vide quand aucun pick séquentiel
+
+- Sévérité : LOW
+- Preuve : `.cache/phase4-phase9-current/montantes-desktop.png` et `montantes-wide.png`
+- Constat : la page affiche surtout un empty state central et peu de pédagogie/action alternative.
+- Action : ajouter alternatives vers Sécurité / Tous les pronos + mini-explication risque de montante.
+- Statut : OPEN
