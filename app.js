@@ -9919,6 +9919,32 @@
     return 'https://www.winamax.fr/paris-sportifs/';
   }
 
+  function buildWinamaxLink(match) {
+    const wx = match && match.winamax ? match.winamax : {};
+    const matchId = wx.match_id || wx.id || match?.winamax_match_id || '';
+    if (matchId) return `https://www.winamax.fr/paris-sportifs/match/${encodeURIComponent(String(matchId))}`;
+    return winamaxUrl(match);
+  }
+
+  function trackWinamaxClick(match, url) {
+    try {
+      const key = 'paris_sportif_winamax_clicks_v1';
+      const raw = localStorage.getItem(key);
+      let data = raw ? JSON.parse(raw) : null;
+      if (!data || typeof data !== 'object' || Array.isArray(data)) data = { count: 0, clicks: [] };
+      data.count = Number(data.count || 0) + 1;
+      data.last_click_at = new Date().toISOString();
+      data.clicks = Array.isArray(data.clicks) ? data.clicks.slice(-49) : [];
+      data.clicks.push({
+        at: data.last_click_at,
+        match_id: match && match.id != null ? String(match.id) : '',
+        winamax_match_id: match && match.winamax && match.winamax.match_id ? String(match.winamax.match_id) : '',
+        url: url || ''
+      });
+      localStorage.setItem(key, JSON.stringify(data));
+    } catch(e) {}
+  }
+
   // Human-readable tipster source label
   function sourceLabel(src) {
     const map = {
@@ -15448,8 +15474,218 @@
             ${ticket(attack, 'Ticket attaque')}
           </div>
           <div class="terminal-market__strip">${marketHtml || '<span><b>1n2</b>en attente</span>'}</div>
-        </section>`;
+      </section>`;
     })();
+
+    {
+      const bbfNowMs = Date.now();
+      const bbfSafeTs = (m) => {
+        const t = new Date(m && m.date || 0).getTime();
+        return Number.isFinite(t) ? t : Number.MAX_SAFE_INTEGER;
+      };
+      const bbfScore = (p) => {
+        const inv = Number(p?.investment?.score || 0);
+        const edge = Math.max(0, Number(p?.edge || 0));
+        const ev = Math.max(0, Number(p?.ev || ((p?.rel || 0) * (p?.odd || 0) - 1) || 0));
+        const soon = Math.max(0, 1 - Math.max(0, bbfSafeTs(p?.m) - bbfNowMs) / (24 * 3600000));
+        return inv * 1.2 + edge * 360 + ev * 80 + Number(p?.rel || 0) * 24 + soon * 8;
+      };
+      const bbfSeen = new Set();
+      const bbfPool = [];
+      const bbfPush = (p) => {
+        if (!p || !p.m) return;
+        if (p.m.live || p.m.completed) return;
+        if (typeof _notStarted === 'function' && !_notStarted(p.m)) return;
+        const id = String(p.m.id || '');
+        if (!id || bbfSeen.has(id)) return;
+        const odd = Number(p.odd || p.best?.odd || 0);
+        const rel = Number(p.rel || p.best?.rel || 0);
+        const edge = Number(p.edge ?? p.best?.edge ?? (odd > 1 ? rel - 1 / odd : 0));
+        if (!odd || odd <= 1.01 || !rel || edge <= 0) return;
+        const investment = p.investment || p.best?.investment || null;
+        if (investment && investment.action === 'skip') return;
+        bbfSeen.add(id);
+        bbfPool.push({ ...p, odd, rel, edge, ev: rel * odd - 1, investment });
+      };
+      topPicks.forEach(bbfPush);
+      aggressivePicksEnriched.forEach(bbfPush);
+      prudentPicksEnriched.forEach(bbfPush);
+      otherOpportunities.slice(0, 80).map(_enrichPick).forEach(bbfPush);
+      bbfPool.sort((a, b) => bbfScore(b) - bbfScore(a));
+
+      let bbfBigBets = bbfPool
+        .filter(p => (p.pred?.isLock || (p.edge >= 0.08 && p.rel >= 0.65)) && p.odd >= 1.45 && p.odd <= 8)
+        .slice(0, 3);
+      if (!bbfBigBets.length) bbfBigBets = bbfPool.slice(0, 3);
+      const bbfBigIds = new Set(bbfBigBets.map(p => String(p.m.id || '')));
+      const bbfGoodBets = bbfPool
+        .filter(p => !bbfBigIds.has(String(p.m.id || '')))
+        .filter(p => p.edge >= 0.035 && p.rel >= 0.55)
+        .slice(0, 8);
+      const bbfRestRows = bbfPool
+        .filter(p => !bbfBigIds.has(String(p.m.id || '')))
+        .slice(0, 60);
+      const bbfMarketCount = bbfPool.reduce((sum, p) => sum + Math.max(1, Number(p.best?.allCandidates?.length || 0)), 0);
+      const bbfStrength = (p) => {
+        if (p?.pred?.isLock || (p.edge >= 0.08 && p.rel >= 0.65)) return { cls: 'bbf-strength--big', label: 'BIG BET', heat: '🔥🔥🔥' };
+        if (p.edge >= 0.04 && p.rel >= 0.55) return { cls: 'bbf-strength--strong', label: 'STRONG', heat: '🔥🔥' };
+        if (p.edge >= 0.02) return { cls: 'bbf-strength--standard', label: 'STANDARD', heat: '🔥' };
+        return { cls: 'bbf-strength--risk', label: 'RISQUÉ', heat: '⚠️' };
+      };
+      const bbfMarketLabel = (p) => {
+        const label = p.best?.label || p.pred?.pick?.label || 'Pari conseillé';
+        return String(label).replace(/\bOver\b/gi, 'Plus de').replace(/\bUnder\b/gi, 'Moins de').replace(/\bBTTS\b/gi, 'Les deux marquent');
+      };
+      const bbfStake = (p, capPct) => {
+        const kRaw = (typeof kellyFraction === 'function') ? kellyFraction(p.rel, p.odd, 0.25) : 0;
+        const capped = p.investment && isFinite(p.investment.cappedKelly) ? Math.min(kRaw, p.investment.cappedKelly) : kRaw;
+        const pct = Math.max(0, Math.min(capPct || 0.05, capped || 0));
+        return Math.max(1, Math.round(userBankroll * pct));
+      };
+      const bbfReasons = (p) => {
+        const reasons = [];
+        const implied = p.odd > 1 ? 1 / p.odd : 0;
+        reasons.push(`Notre modèle donne ${Math.round(p.rel * 100)}% de chance, la cote demande ${Math.round(implied * 100)}%.`);
+        if (p.edge > 0) reasons.push(`${p.edge >= 0.08 ? 'Gros écart' : 'Écart positif'} : +${(p.edge * 100).toFixed(1)}% mieux que le marché.`);
+        const exp = p.pred?.explain?.reasons || [];
+        exp.filter(r => r && r.text).slice(0, 2).forEach(r => reasons.push(String(r.text)));
+        if (p.investment?.score) reasons.push(`Qualité du signal : ${Math.round(p.investment.score)}/100.`);
+        return reasons.slice(0, 3);
+      };
+      const bbfTeamName = (team) => team?.short || team?.displayName || team?.name || '?';
+      const bbfCard = (p, mode) => {
+        const { home, away } = getSides(p.m);
+        const strength = bbfStrength(p);
+        const stake = bbfStake(p, mode === 'hero' ? 0.06 : 0.035);
+        const gain = stake * (p.odd - 1);
+        const href = buildWinamaxLink(p.m);
+        const hasDeepLink = !!(p.m?.winamax?.match_id);
+        const minutes = Math.round((bbfSafeTs(p.m) - bbfNowMs) / 60000);
+        const timeLabel = minutes > 0 && minutes < 120 ? `dans ${minutes} min` : (typeof fmtTime === 'function' ? fmtTime(p.m.date) : '');
+        const logo = (team) => team?.logo ? `<img src="${esc(team.logo)}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'">` : '<span></span>';
+        return `
+          <article class="bbf-card ${mode === 'hero' ? 'bbf-card--hero' : 'bbf-card--compact'} ${minutes > 0 && minutes < 120 ? 'bbf-card--soon' : ''}" data-match-id="${esc(String(p.m.id || ''))}">
+            <header class="bbf-card__top">
+              <span>${esc(sportLabel(p.m.sport))} · ${esc((p.m.league_name || '').slice(0, 42))}</span>
+              <b>${esc(timeLabel)}</b>
+            </header>
+            <div class="bbf-card__teams">
+              <div>${logo(home)}<strong>${esc(bbfTeamName(home))}</strong></div>
+              <em>vs</em>
+              <div>${logo(away)}<strong>${esc(bbfTeamName(away))}</strong></div>
+            </div>
+            <div class="bbf-card__bet">
+              <span class="bbf-strength ${strength.cls}">${strength.heat} ${strength.label}</span>
+              <strong>${esc(bbfMarketLabel(p))} <b>@${Number(p.odd).toFixed(2)}</b></strong>
+              <small>+${(p.edge * 100).toFixed(1)}% mieux que le marché · gain possible ${gain.toFixed(2)}€ pour ${stake}€</small>
+            </div>
+            <ul class="bbf-card__reasons">
+              ${bbfReasons(p).map(r => `<li>${esc(r)}</li>`).join('')}
+            </ul>
+            <footer class="bbf-card__actions">
+              <button type="button" data-big-detail="${esc(String(p.m.id || ''))}">Voir pourquoi</button>
+              ${hasDeepLink
+                ? `<a href="${esc(href)}" target="_blank" rel="noopener" data-winamax-click data-match-id="${esc(String(p.m.id || ''))}">Placer chez Winamax →</a>`
+                : `<span class="bbf-card__disabled">Cote non liée</span>`}
+            </footer>
+          </article>`;
+      };
+      const bbfRow = (p) => {
+        const { home, away } = getSides(p.m);
+        const strength = bbfStrength(p);
+        return `
+          <button type="button" class="bbf-row" data-big-detail="${esc(String(p.m.id || ''))}">
+            <span>${esc(fmtTime(p.m.date))}</span>
+            <strong>${esc(bbfTeamName(home))} vs ${esc(bbfTeamName(away))}</strong>
+            <em>${esc(bbfMarketLabel(p))}</em>
+            <b>@${Number(p.odd).toFixed(2)}</b>
+            <i class="${strength.cls}">+${(p.edge * 100).toFixed(1)}%</i>
+          </button>`;
+      };
+      const bbfEmpty = `
+        <section class="bbf-empty">
+          <strong>Pas de gros coup propre maintenant.</strong>
+          <span>Le modèle ne force pas : pas de value claire, pas de pari. La patience protège la bankroll.</span>
+          <button type="button" class="page-btn" data-page="tous">Voir tous les matchs</button>
+        </section>`;
+      const bbfClickCount = (() => {
+        try { return Number(JSON.parse(localStorage.getItem('paris_sportif_winamax_clicks_v1') || '{}').count || 0); }
+        catch(e) { return 0; }
+      })();
+      const bbfMainHtml = `
+        <div class="bbf-shell" data-phase="big-bets-first">
+          <section class="bbf-command" aria-live="polite">
+            <strong>${bbfBigBets[0] ? `Prochain gros pari : ${esc(bbfMarketLabel(bbfBigBets[0]))} @${Number(bbfBigBets[0].odd).toFixed(2)}` : 'Pas de pari urgent'}</strong>
+            <span>${_dataIsStale ? `Données trop anciennes (${_dataAgeMin} min) : refresh avant d'agir.` : `${bbfPool.length} paris value analysés · bankroll ${userBankroll.toFixed(0)}€ · ${bbfClickCount} clic${bbfClickCount > 1 ? 's' : ''} Winamax suivis`}</span>
+          </section>
+
+          <section class="bbf-hero" aria-labelledby="bbf-title">
+            <div class="bbf-hero__head">
+              <span>Big Bets First</span>
+              <h1 id="bbf-title">Les paris à regarder en premier aujourd'hui</h1>
+              <p>On cherche le meilleur couple chance / cote / gain. Une cote trop basse peut être refusée même si elle paraît sûre.</p>
+            </div>
+            ${_dataIsStale ? bbfEmpty : (bbfBigBets.length ? `<div class="bbf-grid bbf-grid--hero">${bbfBigBets.map(p => bbfCard(p, 'hero')).join('')}</div>` : bbfEmpty)}
+          </section>
+
+          <section class="bbf-section">
+            <div class="bbf-section__head">
+              <div>
+                <span>Tier 2</span>
+                <h2>Bonnes opportunités</h2>
+              </div>
+              <button type="button" class="page-btn" data-page="tous">Voir tout →</button>
+            </div>
+            ${bbfGoodBets.length ? `<div class="bbf-grid bbf-grid--compact">${bbfGoodBets.map(p => bbfCard(p, 'compact')).join('')}</div>` : `
+              <div class="bbf-empty bbf-empty--small">
+                <strong>Rien de très net après les Big Bets.</strong>
+                <span>Les autres matchs restent consultables, mais le modèle baisse le niveau d'urgence.</span>
+              </div>`}
+          </section>
+
+          <details class="bbf-more terminal-market">
+            <summary>
+              <span>Voir ${Math.max(terminalScanPool.length, bbfRestRows.length)}+ matchs analysés</span>
+              <b>${bbfMarketCount} marchés scorés · ${terminalScanPool.length} matchs exacts sur 48h</b>
+            </summary>
+            <div class="bbf-more__rows">${bbfRestRows.length ? bbfRestRows.map(bbfRow).join('') : '<p>Aucun match exploitable dans la fenêtre actuelle.</p>'}</div>
+          </details>
+
+          <section class="bbf-stats">
+            <div><span>ROI modèle</span><strong>${agent.delta7 >= 0 ? '+' : ''}${Math.round((agent.deltaPct7 || 0) * 10) / 10}%</strong><em>${daysSinceStart < 7 ? `depuis ${daysSinceStart}j` : 'sur 7j'}</em></div>
+            <div><span>Paris filtrés</span><strong>${todayStats.ok || bbfPool.length}</strong><em>${todayStats.noEdge || 0} sans value · ${todayStats.lowConf || 0} confiance basse</em></div>
+            <div><span>Cagnotte modèle</span><strong>${nav.toFixed(2)}€</strong><em>départ 10€ · Kelly protégé</em></div>
+            <div><span>Winamax</span><strong>${bbfClickCount}</strong><em>clics suivis localement</em></div>
+          </section>
+          <nav class="bbf-tools" aria-label="Outils secondaires">
+            <button type="button" class="page-btn" data-page="tous">Tous les paris</button>
+            <button type="button" class="page-btn" data-page="performance">Mes paris</button>
+            <button type="button" class="page-btn" data-page="academie">Méthode</button>
+            <button type="button" class="page-btn" data-page="sante">Santé data</button>
+          </nav>
+        </div>`;
+
+      wrap.innerHTML = bbfMainHtml;
+      const bbfMatchById = (id) => {
+        let found = null;
+        Object.values(data.days || {}).forEach(arr => (arr || []).forEach(m => { if (String(m.id) === String(id)) found = m; }));
+        return found;
+      };
+      wrap.querySelectorAll('[data-big-detail]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const m = bbfMatchById(btn.dataset.bigDetail || btn.dataset.matchId);
+          if (m && typeof openDetail === 'function') openDetail(m);
+        });
+      });
+      wrap.querySelectorAll('[data-winamax-click]').forEach(a => {
+        a.addEventListener('click', () => {
+          const m = bbfMatchById(a.dataset.matchId);
+          trackWinamaxClick(m, a.href);
+        });
+      });
+      return;
+    }
 
     wrap.innerHTML = `
       <div style="max-width:1280px;margin:0 auto;padding:0 20px;font-variant-numeric:tabular-nums;">
