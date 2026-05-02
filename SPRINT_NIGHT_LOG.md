@@ -749,3 +749,11 @@
 - Impact: les Big Bets/Solides/Outsiders privilégient 1N2, O/U, BTTS et totals sans imposer les -1/+1
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.95 (2026-05-02 13:51 UTC)
+- Chantier: P-7.2 cote minimum @2.00
+- Avant: les sélections pouvaient encore proposer des cotes basses si elles avaient un bon score
+- Après: oddMinUser défaut @2.00, réglage Profil, 18/18 meilleurs marchés testés >= @2.00
+- Impact: moins de micro-cotes, sélection alignée avec la stratégie grosses cotes
+- Commit: pending
+- Status: ✅ DONE
