@@ -709,3 +709,11 @@
 - Impact: plus de tickets buts/value et moins de combinés monotones
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.90 (2026-05-02 11:23 UTC)
+- Chantier: P-6.19 stats modal détail
+- Avant: signaux dispersés dans la modale, lecture rapide difficile
+- Après: bloc repliable Stats rapides avec L10, xG/PPDA, XI, buteurs, météo, arbitre
+- Impact: décision plus lisible en 10 secondes avant d’ouvrir les sections longues
+- Commit: pending
+- Status: ✅ DONE
