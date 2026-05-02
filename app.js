@@ -10292,8 +10292,6 @@
     _titleEl.dataset.matchId = String(match.id || '');
     document.getElementById('detail-league').textContent = `${match.league_name}${match.round ? ' · ' + match.round : ''} · ${fmtFullDate(currentDate)} · ${fmtTime(match.date)}${match.venue ? ' · ' + match.venue : ''}`;
 
-    // v33.3 — CTA Winamax dans header modal. Visible uniquement si
-    // match.winamax.url disponible. Sinon hidden (pas de lien factice).
     try {
       const _wxBtn = document.getElementById('detail-winamax-cta');
       if (_wxBtn) {
@@ -16031,6 +16029,9 @@
         const gain = stake * (p.odd - 1);
         const href = buildWinamaxLink(p.m);
         const hasDeepLink = !!(p.m?.winamax?.match_id);
+        const trackKey = String(p.best?.key || p.pred?.pick?.key || '');
+        const trackMarket = String(p.best?.market || '1n2');
+        const trackLabel = bbfMarketLabel(p);
         const minutes = Math.round((bbfSafeTs(p.m) - bbfNowMs) / 60000);
         const timeLabel = minutes > 0 && minutes < 120 ? `dans ${minutes} min` : (typeof fmtTime === 'function' ? fmtTime(p.m.date) : '');
         const initials = (team) => String(bbfTeamName(team)).split(/\s+/).filter(Boolean).slice(0,2).map(w => w[0]).join('').toUpperCase() || '•';
@@ -16068,6 +16069,7 @@
               ${hasDeepLink
                 ? `<a href="${esc(href)}" target="_blank" rel="noopener" data-winamax-click data-match-id="${esc(matchId)}">Placer chez Winamax →</a>`
                 : `<span class="bbf-card__disabled">Cote non liée</span>`}
+              ${trackKey ? `<button type="button" class="action-focus-trackbet" data-match-id="${esc(matchId)}" data-market="${esc(trackMarket)}" data-pick-key="${esc(trackKey)}" data-pick-label="${esc(trackLabel)}" data-odd="${Number(p.odd || 0)}" data-stake="${stake}">J'ai parié</button>` : ''}
             </footer>
           </article>`;
       };
@@ -16348,6 +16350,21 @@
           trackWinamaxClick(m, a.href);
         });
       });
+      wrap.querySelectorAll('.bbf-card .action-focus-trackbet').forEach(btn => {
+        if (btn.dataset.bbfTrackWired) return;
+        btn.dataset.bbfTrackWired = '1';
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (typeof window._addUserBet !== 'function') return;
+          const odd = Number(btn.dataset.odd || 0);
+          const stake = Number(btn.dataset.stake || 0);
+          if (!btn.dataset.matchId || !btn.dataset.pickKey || !(odd > 1) || !(stake >= 0)) return;
+          window._addUserBet(btn.dataset.matchId, btn.dataset.market || '1n2', btn.dataset.pickKey, btn.dataset.pickLabel || '', odd, stake);
+          if (typeof toast === 'function') toast(`✓ Pari ${stake.toFixed(0)}€ @${odd.toFixed(2)} enregistré`, 'success');
+          setTimeout(() => renderDashboardPage(wrap), 80);
+        });
+      });
       const bbfExportBasket = wrap.querySelector('[data-basket-export]');
       if (bbfExportBasket) {
         bbfExportBasket.addEventListener('click', () => {
@@ -16395,9 +16412,6 @@
 
         <!-- v30 — Daily P&L chip retiré : Théo n'enregistre pas ses paris. -->
 
-        <!-- v34.35 — Legacy ed-hero désactivé : le cockpit couvre maintenant
-             l'action principale ET l'état vide sans doublon visuel. Bloc gardé
-             une version comme rollback rapide pendant la stabilisation. -->
         ${false ? (topPicks.length ? '' : ((heroPick && topPicks.length === 0) ? (() => {
           const _reasons = heroPick.pred?.explain?.reasons || [];
           // Top 2 raisons non-marché pour donner du contexte sans saturer
@@ -18027,9 +18041,6 @@
         obsRef.observe(wrap, { childList: true, subtree: true });
       } catch(e) { /* old browser */ }
     }
-    // Sprint 118 (v31.7.191) — Click handler "J'ai parié" → ajoute le pari
-    // dans userBets localStorage. Toast confirmation, refresh dashboard pour
-    // afficher le badge "✓ Pari enregistré".
     wrap.querySelectorAll('.action-focus-trackbet').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
