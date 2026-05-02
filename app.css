@@ -2363,13 +2363,6 @@
     .v29-hero-grid { grid-template-columns: 1fr !important; }
   }
 
-  /* v29 — Desktop sidebar widgets : fixed right rail at wide viewports, hidden below.
-     v31.7.18 fix : !important sur display:none pour eviter que le rail
-     s'affiche sur mobile/tablette par erreur.
-     v31.7.20 fix user feedback : right:0, width:280.
-     v31.7.71 fix bug user : trust-strip ajoute ~38px sous le topbar et la
-     sidebar/rail (position:fixed) ne suivent pas → chevauchement avec le
-     hero. Solution : top calculé avec --trust-h (set par JS au boot). */
   .v29-dash-aside { display: none !important; }
   @media (min-width: 1280px) {
     .v29-dash-aside {
@@ -2385,12 +2378,8 @@
       padding: 0 16px 0 12px;
       box-sizing: border-box;
     }
-    /* Padding-right main : 280 (rail) + 12 (gap) = 292px */
     body.agent-home main, body.agent-inside main { padding-right: 292px !important; }
   }
-  /* v31.7.18 — Force masque mobile/tablette explicite (defensive). Si une
-     regle quelque part echappe, ce belt-and-suspenders garantit que le
-     rail est cache sur tout viewport <1280px. */
   @media (max-width: 1279px) {
     .v29-dash-aside { display: none !important; }
   }
@@ -8011,6 +8000,7 @@
 .bbf-tools{display:flex;flex-wrap:wrap;gap: var(--space-2);justify-content:center;margin:18px 0 0}.bbf-tools button{min-height:40px;border:1px solid var(--border);border-radius: var(--r-card);background:var(--panel);color:var(--text-dim);padding:0 12px;font-size:12px;font-weight:800;cursor:pointer}
 @media (prefers-reduced-motion:no-preference){@keyframes bbf-soon-pulse{0%,100%{box-shadow:0 18px 48px rgba(0,0,0,.28)}50%{box-shadow:0 18px 56px rgba(22,163,74,.22)}}}
 @media (max-width:760px){.bbf-shell{padding:0 12px 88px}.bbf-command{position:static;display:grid}.bbf-chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}.bbf-chip{flex:0 0 auto;min-height:44px}.bbf-hero{min-height:auto;padding-top:10px}.bbf-card--hero{min-height:0;padding: var(--space-4)}.bbf-card__teams{grid-template-columns:1fr}.bbf-card__teams div:last-child{justify-content:flex-start;text-align:left}.bbf-card__teams em{display:none}.bbf-card__actions{display:grid}.bbf-section__head{align-items:flex-start;flex-direction:column}.bbf-row{grid-template-columns:52px 1fr 58px}.bbf-row em,.bbf-row i{display:none}.bbf-stats{grid-template-columns:1fr 1fr}.bbf-basket{position:static!important;margin-bottom:16px}}
+@media (min-width:1280px){body.agent-home main#main-content{padding-right:18px!important}.agent-home .v29-dash-aside{display:none!important}.bbf-layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;align-items:start}.bbf-basket{position:sticky;top:calc(96px + var(--trust-h,0px));max-height:calc(100vh - 116px - var(--trust-h,0px));overflow:auto;margin-top:0}.bbf-basket.bbf-empty{padding:16px}}@media (min-width:1600px){.bbf-layout{grid-template-columns:minmax(0,1fr) 340px;gap:20px}}
 
 .health-lag-panel{background:var(--panel);border:1px solid var(--border);border-radius:10px;overflow:hidden}
 .health-lag-row{display:grid;grid-template-columns:minmax(150px,1.2fr) minmax(110px,.7fr) minmax(120px,.8fr) auto;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px}
