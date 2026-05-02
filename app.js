@@ -5274,7 +5274,8 @@
   function _predictMatchImpl(match) {
     const { home, away } = getSides(match);
     if (!home || !away) return null;
-    const hasDraw = match.sport === 'football';
+    const sportKey = String(match?.sport || 'football').toLowerCase();
+    const hasDraw = sportKey === 'football';
     const best = getMatchOdds(match, hasDraw);
 
     // Odds-based prior
@@ -5314,10 +5315,10 @@
       }
     }
 
-    // Form-based nudge (last 5) — with exponential recency decay so the most
-    // recent match counts ~2.5× the match from 5 games ago. A team on a 5-win
-    // streak with the last one being a rout should outweigh a team that scraped
-    // 5 wins ago but has since drifted. Backtest gains ~+1% ROI on football.
+    // Form-based nudge (L5/L10) — with sport-aware exponential recency decay.
+    // Football keeps the proven 0.75 slope, while faster calendars decay harder:
+    // NBA 0.65, MLB 0.55, NHL 0.70, tennis 0.50. This avoids treating a dense
+    // baseball/NBA L10 like a football month of form.
     //
     // BUG FIX 2026-05-01 — Le commentaire précédent disait "i=0 is the OLDEST"
     // mais c'est FAUX : la string forme ESPN est most-recent-FIRST (par
@@ -5327,22 +5328,29 @@
     // PLUS ANCIEN), poids 0.32 au PREMIER (le plus récent). Ratio inverse !
     // Conséquence : une équipe en mauvaise forme récente mais excellente il
     // y a 5 matchs était jugée favorablement. Pure régression silencieuse.
-    // Fix : slice(0, 5) pour les 5 plus récents + decay 0.75^i (i=0 = poids
-    // 1.0 = plus récent, i=4 = poids 0.32 = plus ancien des 5).
-    const formScore = (formStr) => {
+    // Fix : slice(0, 5) pour les 5 plus récents + decay^i (i=0 = poids
+    // 1.0 = plus récent, i=4 = plus ancien des 5).
+    const SPORT_FORM_DECAY = {
+      football: 0.75,
+      basketball: 0.65,
+      baseball: 0.55,
+      hockey: 0.70,
+      tennis: 0.50
+    };
+    const formScore = (formStr, sport = sportKey) => {
       if (!formStr) return null;
       const pts = { W: 3, T: 1, D: 1, L: 0 };
+      const decay = SPORT_FORM_DECAY[sport] || 0.75;
       // 2026-05-01 — Si form10 est dispo (10 chars), on utilise les 10
       // plus récents avec decay. Le decay rend les anciens quasi-nuls
-      // (0.75^9 ≈ 0.075) donc pas de risque de noyer le signal récent.
+      // (sport-aware) donc pas de risque de noyer le signal récent.
       const recent = formStr.slice(0, 10);  // up to 10 most-recent
       let weighted = 0, weightSum = 0;
-      // i=0 is the MOST RECENT; decay factor: 0.75^i.
-      // weights L10 : [1.0, 0.75, 0.56, 0.42, 0.32, 0.24, 0.18, 0.13, 0.10, 0.075]
+      // i=0 is the MOST RECENT; decay factor: decay^i.
       for (let i = 0; i < recent.length; i++) {
         const ch = recent[i];
         if (pts[ch] === undefined) continue;
-        const w = Math.pow(0.75, i);
+        const w = Math.pow(decay, i);
         weighted += pts[ch] * w;
         weightSum += 3 * w;
       }
@@ -5354,8 +5362,8 @@
     // Pour le foot ESPN, la string fait 5 chars donc on garde slice(0,5).
     const formExtH = home.form10 || home.team_form_l10 || home.form;
     const formExtA = away.form10 || away.team_form_l10 || away.form;
-    const fH = formScore(formExtH);
-    const fA = formScore(formExtA);
+    const fH = formScore(formExtH, sportKey);
+    const fA = formScore(formExtA, sportKey);
     let formNudge = null;
     if (fH !== null && fA !== null) {
       const diff = fH - fA; // [-1, 1]
@@ -5371,8 +5379,8 @@
       // BUG FIX 2026-05-01 — Idem formScore : slice(-3)/slice(-5) prenaient
       // les plus anciens. Pour le momentum (last-3 vs last-5), on veut
       // les 3 et 5 PLUS RÉCENTS.
-      const f3 = formScore(formStr.slice(0, 3));
-      const f5 = formScore(formStr.slice(0, 5));
+      const f3 = formScore(formStr.slice(0, 3), sportKey);
+      const f5 = formScore(formStr.slice(0, 5), sportKey);
       if (f3 == null || f5 == null) return null;
       return f3 - f5; // > 0 = heating up, < 0 = cooling
     };
