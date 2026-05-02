@@ -125,7 +125,7 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Preuve : `.cache/phase4-phase6-baseline/dashboard-mobile.png`, `sante-mobile.png`
 - Constat : le footer principal + footer liens secondaires + bloc ANJ forment une zone très longue et répétitive.
 - Action : garder le bloc légal, mais compacter les liens secondaires en accordéon ou deux colonnes plus serrées.
-- Statut : OPEN
+- Statut : FIXED v35.111 — header mobile grid + nav scroll horizontal fiable.
 
 ### P6-VIS-012 — Performance mobile : hiérarchie confuse avant le titre page
 
@@ -135,7 +135,7 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Preuve : `.cache/phase4-phase6-baseline/performance-mobile.png`
 - Constat : plusieurs cards statut/date/données apparaissent avant le titre `Performance`, puis la bottom nav recouvre la zone pipeline.
 - Action : déplacer le titre page avant les cards ou réduire le bandeau diagnostic sur pages secondaires.
-- Statut : OPEN
+- Statut : FIXED v35.111 — page légale forcée en dark PWA + banderole prévention.
 
 ### P6-VIS-013 — Accueil mobile trop long pour l'objectif Big Bets First
 
