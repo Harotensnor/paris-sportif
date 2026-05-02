@@ -685,3 +685,11 @@
 - Impact: identité plus nette et plus proche site pro; captures v35-86 OK
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.87 (2026-05-02 13:24 UTC)
+- Chantier: P-6.16 Big Odds Boost
+- Avant: grosses cotes noyées dans outsiders ou reste du flux
+- Après: section dédiée cote ≥ 3.00 + edge ≥ 7% avant les outsiders
+- Impact: focus “gros gain mais value” plus clair; captures v35-87 OK
+- Commit: pending
+- Status: ✅ DONE

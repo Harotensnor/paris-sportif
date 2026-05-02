@@ -15724,16 +15724,21 @@
         .filter(p => p.edge >= 0.04 && p.rel >= 0.60)
         .slice(0, 12);
       const bbfGoodIds = new Set(bbfGoodBets.map(p => String(p.m.id || '')));
-      const bbfOutsiderBets = bbfPool
+      const bbfBigOddsBets = bbfPool
         .filter(p => !bbfBigIds.has(String(p.m.id || '')) && !bbfGoodIds.has(String(p.m.id || '')))
+        .filter(p => p.odd >= 3.00 && p.odd <= 8 && p.edge >= 0.07 && p.rel >= 0.38)
+        .slice(0, 4);
+      const bbfBigOddsIds = new Set(bbfBigOddsBets.map(p => String(p.m.id || '')));
+      const bbfOutsiderBets = bbfPool
+        .filter(p => !bbfBigIds.has(String(p.m.id || '')) && !bbfGoodIds.has(String(p.m.id || '')) && !bbfBigOddsIds.has(String(p.m.id || '')))
         .filter(p => p.odd >= 2.50 && p.odd <= 8 && p.edge >= 0.05 && p.rel >= 0.45)
         .slice(0, 6);
       const bbfOutsiderIds = new Set(bbfOutsiderBets.map(p => String(p.m.id || '')));
       const bbfRestRows = bbfPool
-        .filter(p => !bbfBigIds.has(String(p.m.id || '')) && !bbfGoodIds.has(String(p.m.id || '')) && !bbfOutsiderIds.has(String(p.m.id || '')))
+        .filter(p => !bbfBigIds.has(String(p.m.id || '')) && !bbfGoodIds.has(String(p.m.id || '')) && !bbfBigOddsIds.has(String(p.m.id || '')) && !bbfOutsiderIds.has(String(p.m.id || '')))
         .filter(p => p.edge >= 0.02)
         .slice(0, 80);
-      const bbfVisibleCount = bbfBigBets.length + bbfGoodBets.length + bbfOutsiderBets.length + bbfRestRows.length;
+      const bbfVisibleCount = bbfBigBets.length + bbfGoodBets.length + bbfBigOddsBets.length + bbfOutsiderBets.length + bbfRestRows.length;
       const bbfMarketCount = bbfPool.reduce((sum, p) => sum + Math.max(1, Number(p.best?.allCandidates?.length || 0)), 0);
       const bbfStrength = getBetStrengthMeta;
       const bbfMarketLabel = (p) => {
@@ -15963,6 +15968,21 @@
               <div class="bbf-empty bbf-empty--small">
                 <strong>Rien de très net après les Big Bets.</strong>
                 <span>Les autres matchs restent consultables, mais le modèle baisse le niveau d'urgence.</span>
+              </div>`}
+          </section>
+
+          <section class="bbf-section bbf-section--outsiders">
+            <div class="bbf-section__head">
+              <div>
+                <span>Big Odds Boost · cote ≥ 3.00 · edge ≥ 7%</span>
+                <h2>Si ça passe, gros gain</h2>
+              </div>
+              <button type="button" class="page-btn" data-page="tous">Voir les grosses cotes →</button>
+            </div>
+            ${bbfBigOddsBets.length ? `<div class="bbf-grid bbf-grid--compact">${bbfBigOddsBets.map(p => bbfCard(p, 'compact')).join('')}</div>` : `
+              <div class="bbf-empty bbf-empty--small">
+                <strong>Pas de grosse cote value propre.</strong>
+                <span>Le site garde les grosses cotes seulement quand la probabilité reste défendable.</span>
               </div>`}
           </section>
 
