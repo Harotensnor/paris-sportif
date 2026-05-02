@@ -1,53 +1,36 @@
 {
-  "generated_at": "2026-05-02T16:15:02.1232216Z",
+  "sprint": "v35.149",
+  "click_audit": {
+    "clicks": 167,
+    "status": "passed",
+    "failures": 0
+  },
   "phase": "phase9_finale",
-  "sprint": "v35.144",
+  "generated_at": "2026-05-02T16:29:52.5088785Z",
+  "modal_tabs": {
+    "sports_tested": 5,
+    "status": "passed",
+    "failures": 0
+  },
   "smoke_e2e": {
     "status": "passed",
-    "note": "post v35.143 smoke green: dashboard/performance/favoris/sante/academie/profil/backtest/alertes/historique + terminal value + mobile overflow"
-  },
-  "click_audit": {
-    "status": "passed",
-    "clicks": 167,
-    "failures": 0
-  },
-  "modal_tabs": {
-    "status": "passed",
-    "sports_tested": 5,
-    "failures": 0
-  },
-  "market_consistency": {
-    "status": "passed",
-    "cases": 50,
-    "failures": 0
-  },
-  "user_flow": {
-    "status": "passed",
-    "steps": 3,
-    "failures": 0,
-    "steps_detail": [
-      {
-        "step": "modal_opened",
-        "title": "Royal Charleroi SC vs Racing Genk"
-      },
-      {
-        "step": "winamax_cta",
-        "clicked": true,
-        "href": "https://www.winamax.fr/paris-sportifs/match/70207488",
-        "before": 0,
-        "after": 1
-      },
-      {
-        "step": "track_bet",
-        "before": 0,
-        "after": 1
-      }
-    ]
+    "note": "dashboard/performance/favoris/sante/academie/profil/backtest/alertes/historique + terminal value + mobile overflow all green"
   },
   "a11y": {
-    "critical": 0,
     "serious": 0,
-    "moderate": 20,
-    "note": "from v35.143 a11y-report.json"
+    "moderate": 0,
+    "critical": 0,
+    "note": "from v35.148 a11y-report.json"
+  },
+  "market_consistency": {
+    "failures": 0,
+    "status": "passed",
+    "cases": 50
+  },
+  "user_flow": {
+    "failures": 0,
+    "status": "passed",
+    "steps": 3,
+    "note": "Big Bet modal, Winamax CTA and track bet path passed after v35.148 a11y polish"
   }
 }
