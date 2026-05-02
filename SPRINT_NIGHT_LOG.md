@@ -941,3 +941,11 @@
 - Impact: un score exact ne peut plus cohabiter visiblement avec BTTS/O-U/1N2/DC impossible
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.119 (2026-05-02 14:17 UTC)
+- Chantier: P-9.0c tests cohérence
+- Avant: aucun test ne couvrait 1-0 + BTTS Oui, 0-0 + Over 2.5 ou DC opposée
+- Après: tests/market-consistency.spec.js couvre 25 paires + filtrage validateMarketConsistency
+- Impact: la contradiction signalée par Théo devient une régression bloquante en CI
+- Commit: pending
+- Status: ✅ DONE
