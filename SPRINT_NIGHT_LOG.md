@@ -757,3 +757,11 @@
 - Impact: moins de micro-cotes, sélection alignée avec la stratégie grosses cotes
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.96 (2026-05-02 13:59 UTC)
+- Chantier: P-7.3 sweet spot grosses cotes
+- Avant: Big Bets mélangeait locks et cotes 1.45-8.00 avec fallback trop large
+- Après: Big Bets 2.20-3.50 edge >=7%, Solides 2.00-2.50, Outsiders 2.50-4.00, Big Odds >=4.00
+- Impact: accueil trié par cote descendante et 0 carte visible sous @2.00 en test local
+- Commit: pending
+- Status: ✅ DONE
