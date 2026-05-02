@@ -1429,3 +1429,9 @@
 - Après: entre 20h et 7h, rendu sombre effectif + chaleur visuelle légère.
 - Impact: lecture tardive moins agressive sans nouvelle dépendance UI.
 - Vérif: node --check app.js, bundle OK, diff check OK.
+
+## Sprint v35.191 — Phase 10 P-10.38 Raccourcis clavier complets (22:12 UTC)
+- Avant: B allait vers Bilan et les raccourcis g+h/j/k n'étaient pas câblés.
+- Après: g+h/t/m/e/p, j/k, Enter et B=mode Big Bets sont actifs.
+- Impact: navigation clavier plus rapide sans toucher au layout.
+- Vérif: node --check app.js, bundle OK, diff check OK.
