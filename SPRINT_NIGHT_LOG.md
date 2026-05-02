@@ -232,6 +232,14 @@
 - Commit: pending
 - Status: ✅ DONE
 
+## Sprint v35.116 (2026-05-02 13:56 UTC)
+- Chantier: P-9.46 night metrics
+- Avant: night_metrics obsolète avant Phase 9
+- Après: 385 events, Winamax exact 100%, marchés détaillés 363 events, ROI global +0.53%
+- Impact: métriques phase 9 fraîchement mesurées pour audit/report
+- Commit: pending
+- Status: ✅ DONE
+
 ## Sprint v35.111 (2026-05-02 13:51 UTC)
 - Chantier: P-8.15 révision page Legal
 - Avant: legal pouvait passer en thème clair et header mobile se chevauchait
