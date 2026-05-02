@@ -84,11 +84,24 @@ async function auditPage(page) {
         text: el ? (el.textContent || el.getAttribute('aria-label') || el.getAttribute('alt') || '').trim().replace(/\s+/g, ' ').slice(0, 120) : '',
       });
     };
-    const rgb = (value) => {
+    const rgba = (value) => {
       const m = String(value || '').match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([.\d]+))?\)/);
       if (!m) return null;
-      if (m[4] !== undefined && Number(m[4]) < 0.1) return null;
-      return [Number(m[1]), Number(m[2]), Number(m[3])];
+      return [Number(m[1]), Number(m[2]), Number(m[3]), m[4] === undefined ? 1 : Number(m[4])];
+    };
+    const blend = (top, bottom) => {
+      const a = Math.max(0, Math.min(1, top[3] == null ? 1 : top[3]));
+      return [
+        Math.round(top[0] * a + bottom[0] * (1 - a)),
+        Math.round(top[1] * a + bottom[1] * (1 - a)),
+        Math.round(top[2] * a + bottom[2] * (1 - a)),
+      ];
+    };
+    const rgb = (value, fallbackBg) => {
+      const c = rgba(value);
+      if (!c) return null;
+      if (c[3] !== undefined && c[3] < 1 && fallbackBg) return blend(c, fallbackBg);
+      return c.slice(0, 3);
     };
     const luminance = ([r, g, b]) => {
       const f = v => {
@@ -104,12 +117,16 @@ async function auditPage(page) {
     };
     const bgColor = (el) => {
       let cur = el;
+      const layers = [];
       while (cur && cur !== document.documentElement) {
-        const c = rgb(getComputedStyle(cur).backgroundColor);
-        if (c) return c;
+        const c = rgba(getComputedStyle(cur).backgroundColor);
+        if (c && c[3] > 0.01) layers.push(c);
         cur = cur.parentElement;
       }
-      return rgb(getComputedStyle(document.body).backgroundColor) || [10, 10, 10];
+      const body = rgba(getComputedStyle(document.body).backgroundColor);
+      let bg = body ? body.slice(0, 3) : [10, 10, 10];
+      layers.reverse().forEach(layer => { bg = blend(layer, bg); });
+      return bg;
     };
 
     if (!document.documentElement.lang) push('serious', 'html-has-lang', 'Le document doit déclarer une langue.', document.documentElement);
@@ -139,8 +156,8 @@ async function auditPage(page) {
     directTextEls.forEach(el => {
       if (contrastCount >= 30) return;
       const cs = getComputedStyle(el);
-      const fg = rgb(cs.color);
       const bg = bgColor(el);
+      const fg = rgb(cs.color, bg);
       if (!fg || !bg) return;
       const ratio = contrast(fg, bg);
       const fontSize = parseFloat(cs.fontSize) || 14;
@@ -175,6 +192,9 @@ async function auditPage(page) {
       } catch (e) {}
     });
     await page.goto(`${BASE_URL}/pronostics.html#${hash}`, { waitUntil: 'domcontentloaded', timeout: 15000 });
+    if (hash === 'legal') {
+      await page.waitForFunction(() => location.pathname.endsWith('/legal.html'), null, { timeout: 6000 }).catch(() => {});
+    }
     await page.waitForLoadState('networkidle', { timeout: 9000 }).catch(() => {});
     await page.waitForTimeout(1000);
     const violations = await auditPage(page);

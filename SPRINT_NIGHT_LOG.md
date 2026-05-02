@@ -629,3 +629,11 @@
 - Impact: 3 issues fixées, 2 partiellement réduites, 32 captures after2 générées
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.80 (2026-05-02 12:34 UTC)
+- Chantier: P-6.8 fix a11y serious
+- Avant: 0 critical, 75 serious, 278 moderate
+- Après: 0 critical, 0 serious, 270 moderate
+- Impact: contrastes bloquants corrigés sur PWA + legal static dark harmonisé
+- Commit: pending
+- Status: ✅ DONE

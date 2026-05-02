@@ -237,15 +237,15 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Pages : `dashboard`, `tous`, `performance`, `academie`, `profil`, `sante`, `montantes`, `legal`
 - Viewport : mobile 375px
 - Note : le runtime local n'a pas `@axe-core/cli`; le script applique les règles axe principales localement et classe les impacts.
-- Totaux : `0` critical, `75` serious, `278` moderate.
+- Totaux : `0` critical, `0` serious, `270` moderate après v35.80.
 
 ### P6-A11Y-001 — Contrastes sérieux insuffisants
 
 - Sévérité : HIGH
 - Preuve : `a11y-report.json`
-- Constat : `75` violations `color-contrast`, surtout chips sport, boutons actifs, badges santé, page legal statique.
+- Constat : `75` violations `color-contrast` au baseline, puis `0` après correction du calcul rgba, badge force et thème static legal.
 - Action : augmenter contraste des textes sur fonds colorés et harmoniser `legal.html` avec le thème dark.
-- Statut : OPEN
+- Statut : FIXED v35.80 — aucun critical/serious restant dans `a11y-report.json`.
 
 ### P6-A11Y-002 — Cibles tactiles sous 40px
 
