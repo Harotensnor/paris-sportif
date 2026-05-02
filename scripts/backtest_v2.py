@@ -48,6 +48,7 @@ RESULTS_ARCHIVE = ROOT / 'results_archive.jsonl'
 REPORT_JSON = ROOT / 'backtest_report_v2.json'
 REPORT_MD = ROOT / 'backtest_report_v2.md'
 CALIBRATION_SEGMENTS_JSON = ROOT / 'calibration_per_sport_league.json'
+BANKROLL_SIM_JSON = ROOT / 'bankroll_simulation.json'
 
 COTE_BUCKETS = [
     ('heavy_fav',   0.0, 1.50),
@@ -600,6 +601,62 @@ def compute_streaks(rows: list[dict]) -> dict:
     }
 
 
+def simulate_bankroll(rows: list[dict], start_bankroll: float = 1000.0) -> dict:
+    """Kelly rolling bankroll simulation for risk/readability reporting."""
+    bankroll = float(start_bankroll)
+    peak = bankroll
+    max_drawdown = 0.0
+    max_drawdown_pct = 0.0
+    staked_total = 0.0
+    returns = []
+    series = []
+    chrono = sorted(rows, key=lambda r: (r.get('date') or '', str(r.get('id') or '')))
+    for idx, r in enumerate(chrono, 1):
+        prev = bankroll
+        stake = kelly_stake(float(r.get('pick_prob') or 0), float(r.get('cote') or 0), bankroll)
+        pnl = stake * (float(r.get('cote') or 0) - 1.0) if r.get('won') else -stake
+        bankroll = max(0.0, bankroll + pnl)
+        staked_total += stake
+        if prev > 0:
+            returns.append(pnl / prev)
+        peak = max(peak, bankroll)
+        drawdown = peak - bankroll
+        drawdown_pct = drawdown / peak if peak > 0 else 0.0
+        max_drawdown = max(max_drawdown, drawdown)
+        max_drawdown_pct = max(max_drawdown_pct, drawdown_pct)
+        series.append({
+            'i': idx,
+            'id': r.get('id'),
+            'date': r.get('date'),
+            'sport': r.get('sport'),
+            'tier': r.get('tier'),
+            'cote': r.get('cote'),
+            'pick_prob': round(float(r.get('pick_prob') or 0), 4),
+            'stake': round(stake, 2),
+            'pnl': round(pnl, 2),
+            'bankroll': round(bankroll, 2),
+            'drawdown_pct': round(100 * drawdown_pct, 2),
+        })
+    avg_return = mean(returns) if returns else 0.0
+    variance = mean((x - avg_return) ** 2 for x in returns) if len(returns) > 1 else 0.0
+    volatility = variance ** 0.5
+    sharpe = (avg_return / volatility) if volatility > 0 else 0.0
+    return {
+        'schema': 'bankroll_simulation_v1',
+        'start_bankroll': round(start_bankroll, 2),
+        'final_bankroll': round(bankroll, 2),
+        'profit': round(bankroll - start_bankroll, 2),
+        'roi_pct': round(100 * (bankroll / start_bankroll - 1), 2) if start_bankroll > 0 else 0.0,
+        'n_picks': len(chrono),
+        'n_staked': sum(1 for p in series if p['stake'] > 0),
+        'staked_total': round(staked_total, 2),
+        'max_drawdown': round(max_drawdown, 2),
+        'max_drawdown_pct': round(100 * max_drawdown_pct, 2),
+        'sharpe_per_pick': round(sharpe, 3),
+        'series': series,
+    }
+
+
 def calibration_bins(rows: list[dict], n_bins: int = 10) -> list[dict]:
     """Courbe de calibration : regroupe par proba prédite (déciles), compare
     au WR observé. Modèle parfait = prob_mean == win_rate dans chaque bin."""
@@ -725,6 +782,11 @@ def render_markdown(report: dict) -> str:
                  f"Pick prob moyenne : {overall['avg_pick_prob']*100:.1f}%")
     lines.append(f"- **Brier** : {overall['brier']} (0 = parfait, 0.25 = pile/face)")
     lines.append(f"- **Log-loss** : {overall['logloss']} (plus bas = mieux calibré)")
+    if report.get('bankroll_simulation'):
+        bs = report['bankroll_simulation']
+        lines.append(f"- Bankroll simulée 1000€ : **{bs['final_bankroll']:.2f}€** "
+                     f"({bs['roi_pct']:+.1f}%) · DD max {bs['max_drawdown_pct']:.1f}% · "
+                     f"Sharpe/pick {bs['sharpe_per_pick']:+.3f}")
     lines.append('')
 
     # v31.7.21 — Streaks publics
@@ -975,6 +1037,7 @@ def main() -> int:
             'status': 'warning',
             'message': f"Big Bets à surveiller : ECE {big_bet_ece['ece']:.3f} > 0.050.",
         }
+    bankroll_sim = simulate_bankroll(rows, start_bankroll=1000.0)
     report = {
         'generated_at': datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
         'big_bet_definition': {
@@ -1042,6 +1105,9 @@ def main() -> int:
         # win/lose streaks ainsi que la streak courante (signed).
         'streaks': compute_streaks(rows),
         'bankroll_final_kelly': bt['bankroll_final_kelly'],
+        'bankroll_simulation': {
+            k: v for k, v in bankroll_sim.items() if k != 'series'
+        },
         # v31.7.19 — Worst picks : 10 plus gros echecs (modele tres confiant
         # qui a perdu). Critère : (pick_prob - 0) × (1 si lost else 0)
         # ranking par pick_prob desc parmi les losses. Le but est la
@@ -1112,6 +1178,11 @@ def main() -> int:
     }
     CALIBRATION_SEGMENTS_JSON.write_text(
         json.dumps(calibration_segments, ensure_ascii=False, indent=2), encoding='utf-8')
+    BANKROLL_SIM_JSON.write_text(
+        json.dumps({
+            'generated_at': report['generated_at'],
+            **bankroll_sim,
+        }, ensure_ascii=False, indent=2), encoding='utf-8')
 
     REPORT_JSON.write_text(
         json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')
