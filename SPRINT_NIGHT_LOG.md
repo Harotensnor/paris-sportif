@@ -117,5 +117,13 @@
 - Avant: 286/1038 events avaient des meetings H2H utiles, tous en football; NBA/MLB/NHL avaient `seasonseries` ESPN mais le fetcher ne lisait que `headToHeadGames`
 - Après: fallback `seasonseries` normalisé; run local post-rebase `checked=60 enriched=46`; H2H utile passe à 328 events: football 288, baseball 27, basketball 7, hockey 6
 - Impact: +40 matchs US gagnent un historique exploitable dans les fiches match et signaux, sans dépendre de Sofascore vide
+- Commit: 017b6cc6
+- Status: ✅ DONE
+
+## Sprint v35.16 (2026-05-02 04:17 UTC)
+- Chantier: P9 H2H UI/data-quality wiring
+- Avant: `computeDataQuality` ne considérait pas le baseball comme source H2H; la carte détail testait `Array.isArray(match.h2h)` alors que `h2h` est un objet `{meetings}`
+- Après: baseball inclus dans les sports H2H; la carte détail lit `match.h2h.meetings.length`; app hash `32516710`, footer/SW v35.16
+- Impact: les 27 matchs baseball enrichis au sprint précédent ne sont plus marqués à tort comme H2H manquant, et les fiches match affichent le bon statut
 - Commit: pending
 - Status: ✅ DONE
