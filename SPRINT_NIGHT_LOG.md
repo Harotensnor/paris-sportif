@@ -1381,3 +1381,9 @@
 - Après: la strip KPI affiche maintenant "Hier" avec P&L si scoré, ou "aucun pari réglé".
 - Impact: Théo comprend l'état du replay quotidien sans silence ambigu.
 - Vérif: phase10_daily_pnl_insight_audit.json, KPI visible, 0 erreur console.
+
+## Sprint v35.183 — Phase 10 P-10.30 Form L10 multi-sport (21:47 UTC)
+- Avant: team_form.json était patché mais aucun résumé multi-sport exploitable n'était publié.
+- Après: form_stats_extended.json expose 749 équipes / 4 sports avec W/L, WR L10 et points pour/contre.
+- Impact: Form L10 NBA/NHL/MLB devient auditable dans health.json et réutilisable modèle/UI.
+- Vérif: fetch_team_form.py + build_health.py + check_pipeline_drift OK.

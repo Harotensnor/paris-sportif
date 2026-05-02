@@ -22,7 +22,7 @@ from __future__ import annotations
 import json
 import re
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import concurrent.futures
 
@@ -35,6 +35,7 @@ except ImportError:
 ROOT = Path(__file__).resolve().parent.parent
 DATA_JS = ROOT / 'data.js'
 OUT = ROOT / 'team_form.json'
+EXTENDED_OUT = ROOT / 'form_stats_extended.json'
 
 RECAPTURE_HOURS = 6.0  # team form changes ~daily, no need to spam ESPN
 
@@ -49,6 +50,14 @@ SCHEDULE_URLS = {
     ('baseball', 'mlb'): 'https://site.web.api.espn.com/apis/site/v2/sports/baseball/mlb/teams/{tid}/schedule',
     ('american-football', 'nfl'): 'https://site.web.api.espn.com/apis/site/v2/sports/football/nfl/teams/{tid}/schedule',
 }
+
+
+def _utc_now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
+
+
+def _utc_now_naive() -> datetime:
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 def _schedule_url(sport: str, code: str, tid: str) -> str | None:
@@ -128,7 +137,7 @@ def _team_form_from_schedule(payload: dict, team_id: str) -> dict | None:
         'form5': form5[::-1],          # 5 chars (backward compat)
         'last10': last10,
         'last5': last5,
-        'updated_at': datetime.utcnow().isoformat() + 'Z',
+        'updated_at': _utc_now_iso(),
     }
 
 
@@ -147,6 +156,56 @@ def _collect_teams(data: dict) -> list[tuple[str, str, str]]:
                 if tid:
                     out.add((sport, code, str(tid)))
     return sorted(out)
+
+
+def _build_extended_stats(cache: dict) -> dict:
+    """Build a compact multi-sport summary from the cached ESPN forms."""
+    teams = {}
+    by_sport = {}
+    for key, info in sorted((cache or {}).items()):
+        parts = str(key).split(':', 2)
+        if len(parts) != 3 or not isinstance(info, dict):
+            continue
+        sport, league_code, team_id = parts
+        last10 = info.get('last10') or []
+        wins = sum(1 for r in last10 if r.get('won'))
+        losses = sum(1 for r in last10 if r.get('won') is False)
+        sf = [r.get('score_for') for r in last10 if isinstance(r.get('score_for'), (int, float))]
+        sa = [r.get('score_against') for r in last10 if isinstance(r.get('score_against'), (int, float))]
+        rec = {
+            'sport': sport,
+            'league_code': league_code,
+            'team_id': team_id,
+            'form': info.get('form') or info.get('form5') or '',
+            'form5': info.get('form5') or '',
+            'games_l10': len(last10),
+            'wins_l10': wins,
+            'losses_l10': losses,
+            'win_rate_l10': round(wins / len(last10), 3) if last10 else None,
+            'avg_for_l10': round(sum(sf) / len(sf), 2) if sf else None,
+            'avg_against_l10': round(sum(sa) / len(sa), 2) if sa else None,
+            'updated_at': info.get('updated_at'),
+        }
+        teams[key] = rec
+        bucket = by_sport.setdefault(sport, {
+            'teams': 0, 'games_l10': 0, 'wins_l10': 0, 'avg_win_rate_l10': 0.0
+        })
+        bucket['teams'] += 1
+        bucket['games_l10'] += len(last10)
+        bucket['wins_l10'] += wins
+        if rec['win_rate_l10'] is not None:
+            bucket['avg_win_rate_l10'] += rec['win_rate_l10']
+    for bucket in by_sport.values():
+        n = bucket['teams'] or 1
+        bucket['avg_win_rate_l10'] = round(bucket['avg_win_rate_l10'] / n, 3)
+    return {
+        'generated_at': _utc_now_iso(),
+        'source': 'ESPN public team schedule endpoints',
+        'teams_total': len(teams),
+        'sports_total': len(by_sport),
+        'by_sport': by_sport,
+        'teams': teams,
+    }
 
 
 def main():
@@ -170,7 +229,7 @@ def main():
         except json.JSONDecodeError:
             cache = {}
 
-    cutoff = datetime.utcnow() - timedelta(hours=RECAPTURE_HOURS)
+    cutoff = _utc_now_naive() - timedelta(hours=RECAPTURE_HOURS)
     teams = _collect_teams(data)
     todo = []
     for sport, code, tid in teams:
@@ -204,6 +263,10 @@ def main():
                     written += 1
 
     OUT.write_text(json.dumps(cache, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+    EXTENDED_OUT.write_text(
+        json.dumps(_build_extended_stats(cache), ensure_ascii=False, separators=(',', ':')),
+        encoding='utf-8'
+    )
     elapsed = time.time() - t0
     print(f'[fetch_team_form] wrote {written} forms, total cache size {len(cache)} | {elapsed:.1f}s', flush=True)
 
