@@ -557,3 +557,11 @@
 - Impact: Accueil plus immersif et scan match immédiat; visual diff `18.75%` attendu par refonte hero
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.71 (2026-05-02 11:03 UTC)
+- Chantier: P-5.4 badge smart money
+- Avant: signal smart money surtout lisible dans les détails
+- Après: badge rouge cliquable sur les cartes avec mouvement de cote et confiance
+- Impact: 12 events smart_money détectés dans data.js; signal fort visible dès le scan
+- Commit: pending
+- Status: ✅ DONE
