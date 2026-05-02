@@ -10998,25 +10998,23 @@
               </div>`;
             })()}
             ${(() => {
-              // Affiche comment chaque signal non-marché a poussé (+) ou retenu (−)
-              // la prédiction vs la baseline neutre (50% pour 2 issues, 33% pour 3).
               const contribs = pred.contributions || [];
               if (contribs.length === 0) return '';
               const top = contribs.slice(0, 3);
+              const max = Math.max(1, ...top.map(c => Math.abs(Math.round(c.delta * 100))));
               return `<div style="margin-top:12px;padding:10px 12px;background:rgba(255,255,255,.02);border-radius:8px;border:1px solid rgba(255,255,255,.04);">
-                <div class="lbl-tiny-mb">🎯 Pourquoi ce pick ?</div>
-                <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                <div class="lbl-tiny-mb">🎯 Top contributeurs modèle</div>
+                <div style="display:grid;gap:7px;">
                   ${top.map(c => {
                     const deltaPct = Math.round(c.delta * 100);
                     const sign = deltaPct > 0 ? '+' : '';
                     const color = deltaPct >= 0 ? '#10b981' : '#fca5a5';
-                    const bg = deltaPct >= 0 ? 'rgba(16,185,129,.10)' : 'rgba(252,165,165,.10)';
-                    const border = deltaPct >= 0 ? 'rgba(16,185,129,.25)' : 'rgba(252,165,165,.25)';
-                    return `<span style="padding:6px 10px;border-radius:6px;background:${bg};border:1px solid ${border};font-size:12px;font-variant-numeric:tabular-nums;display:inline-flex;align-items:center;gap:6px;">
-                      <span class="u-text-md">${c.icon}</span>
-                      <span style="color:var(--text,#e6ebf2);font-weight:600;">${esc(c.name)}</span>
-                      <span style="color:${color};font-weight:700;">${sign}${deltaPct}pt</span>
-                    </span>`;
+                    const width = Math.max(8, Math.round(Math.abs(deltaPct) / max * 100));
+                    return `<div style="display:grid;grid-template-columns:minmax(120px,1fr) minmax(120px,2fr) 48px;gap:8px;align-items:center;font-size:12px;font-variant-numeric:tabular-nums;">
+                      <span style="color:var(--text);font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.icon} ${esc(c.name)}</span>
+                      <span style="height:7px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden;"><i style="display:block;height:100%;width:${width}%;border-radius:inherit;background:${color};"></i></span>
+                      <b style="color:${color};text-align:right;">${sign}${deltaPct}pt</b>
+                    </div>`;
                   }).join('')}
                 </div>
               </div>`;
