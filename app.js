@@ -4125,6 +4125,16 @@
         pOver, pUnder: 1 - pOver,
       };
     });
+    const derivedTotals = (mean, sigma) => {
+      const mid = Math.round(mean / 5) * 5 + 0.5;
+      return [mid - 5, mid, mid + 5].filter(v => v > 0).map(line => {
+        const z = (mean - line) / sigma;
+        const pOver = phiCdf(z);
+        return { line, label: `Plus de ${line} pts`, pOver, pUnder: 1 - pOver };
+      });
+    };
+    const firstHalfTotals = derivedTotals(total * 0.49, 8);
+    const quarterTotals = derivedTotals(total * 0.245, 5.5);
     const handicapLines = margin >= 0 ? [3.5, 5.5, 7.5, 9.5] : [-3.5, -5.5, -7.5, -9.5];
     const handicaps = handicapLines.map(spread => {
       // P(marge_home > spread) = P((projH - projA) > spread)
@@ -4145,7 +4155,7 @@
       total,
       margin,
       caption: `${baseCap}${extras} (± ~8 pts par équipe en NBA).`,
-      markets: { totals: totalsMarkets, handicaps, sigmaTotal, sigmaMargin },
+      markets: { totals: totalsMarkets, firstHalfTotals, quarterTotals, handicaps, sigmaTotal, sigmaMargin },
     };
   }
 
@@ -10987,34 +10997,32 @@
               // si sc.markets dispo (calculé par basketScoreProjection).
               let basketMarketsHtml = '';
               if (kind === 'basket' && sc.markets) {
-                const totalsTop = (sc.markets.totals || []).slice(0, 3).map(g => {
+                const basketTotalChip = (g, prefix) => {
                   const pPick = g.pOver >= g.pUnder ? g.pOver : g.pUnder;
                   const sideLbl = g.pOver >= g.pUnder ? `Plus de ${g.line}` : `Moins de ${g.line}`;
                   const strong = pPick >= 0.65;
                   return `<span style="padding:8px 14px;border-radius:8px;background:${strong?'rgba(16,185,129,.12)':'rgba(255,255,255,.04)'};border:1px solid ${strong?'rgba(16,185,129,.3)':'rgba(255,255,255,.06)'};font-variant-numeric:tabular-nums;font-weight:${strong?700:600};color:${strong?'#10b981':'var(--text,#e6ebf2)'};display:inline-flex;flex-direction:column;align-items:flex-start;gap:2px;">
-                    <span style="font-size:13px;">${esc(sideLbl)}${strong ? ' ⭐' : ''}</span>
+                    <span style="font-size:13px;">${esc(prefix ? `${prefix} ${sideLbl}` : sideLbl)}${strong ? ' ⭐' : ''}</span>
                     <span style="color:var(--text-dim2,#7b8693);font-weight:500;font-size:11px;">${(pPick*100).toFixed(0)}%</span>
                   </span>`;
-                }).join('');
-                const handiTop = (sc.markets.handicaps || []).slice(0, 3).map(g => {
-                  const pPick = g.pCover >= g.pAgainst ? g.pCover : g.pAgainst;
-                  const sideLbl = g.pCover >= g.pAgainst ? esc(g.label) + ' ✓' : esc(g.label) + ' ✗';
-                  const strong = pPick >= 0.60;
-                  return `<span style="padding:8px 14px;border-radius:8px;background:${strong?'rgba(167,139,250,.12)':'rgba(255,255,255,.04)'};border:1px solid ${strong?'rgba(167,139,250,.3)':'rgba(255,255,255,.06)'};font-variant-numeric:tabular-nums;font-weight:${strong?700:600};color:${strong?'#a78bfa':'var(--text,#e6ebf2)'};display:inline-flex;flex-direction:column;align-items:flex-start;gap:2px;">
-                    <span style="font-size:13px;">${sideLbl}${strong ? ' ⭐' : ''}</span>
-                    <span style="color:var(--text-dim2,#7b8693);font-weight:500;font-size:11px;">${(pPick*100).toFixed(0)}%</span>
-                  </span>`;
-                }).join('');
+                };
+                const totalsTop = (sc.markets.totals || []).slice(0, 3).map(g => basketTotalChip(g, '')).join('');
+                const halfTop = (sc.markets.firstHalfTotals || []).slice(0, 3).map(g => basketTotalChip(g, '1ère MT')).join('');
+                const quarterTop = (sc.markets.quarterTotals || []).slice(0, 3).map(g => basketTotalChip(g, 'Q')).join('');
                 basketMarketsHtml = `
                   ${totalsTop ? `<div class="u-mt-3">
                     <div class="lbl-tiny-mb">🏀 Total points</div>
                     <div style="display:flex;gap:8px;flex-wrap:wrap;">${totalsTop}</div>
                   </div>` : ''}
-                  ${handiTop ? `<div class="u-mt-3">
-                    <div class="lbl-tiny-mb">🎯 Handicap</div>
-                    <div style="display:flex;gap:8px;flex-wrap:wrap;">${handiTop}</div>
+                  ${halfTop ? `<div class="u-mt-3">
+                    <div class="lbl-tiny-mb">⏱️ Total 1ère mi-temps</div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">${halfTop}</div>
                   </div>` : ''}
-                  <div style="margin-top:4px;font-size:10.5px;color:var(--text-dim2,#7b8693);line-height:1.3;">Approx. Gaussienne (NBA σ_total≈12, σ_marge≈10). Lignes Winamax courantes.</div>`;
+                  ${quarterTop ? `<div class="u-mt-3">
+                    <div class="lbl-tiny-mb">📊 Total quart-temps</div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">${quarterTop}</div>
+                  </div>` : ''}
+                  <div style="margin-top:4px;font-size:10.5px;color:var(--text-dim2,#7b8693);line-height:1.3;">Approx. Gaussienne depuis la projection score. Totaux uniquement, sans handicap pur.</div>`;
               }
               // si `sc.games` est présent (calculé par tennisScorePrediction).
               let tennisGamesHtml = '';

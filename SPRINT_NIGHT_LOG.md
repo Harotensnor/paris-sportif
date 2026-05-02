@@ -1285,3 +1285,9 @@
 - Après: strip dédié aux marchés foot étendus cohérents (mi-temps, score exact, O/U, BTTS, team totals), sans handicap promu.
 - Impact: Théo repère plus vite les alternatives bookables hors 1N2.
 - Vérif: phase10_football_extended_markets_audit.json, 10 marchés étendus détectés, 0 handicap promu.
+
+## Sprint v35.167 — Phase 10 P-10.15 Marchés basket étendus visibles (21:00 UTC)
+- Avant: la modale basket montrait surtout le total match et pouvait promouvoir le handicap.
+- Après: totaux match complet, 1ère mi-temps et quart-temps; handicap retiré du bloc visible.
+- Impact: plus de marchés basket exploitables sans contredire la préférence anti-handicap de Théo.
+- Vérif: phase10_basket_extended_markets_audit.json, 4 full + 3 HT + 3 QT, 0 handicap promu.
