@@ -733,3 +733,11 @@
 - Impact: alertes Discord prêtes sans casser la pipeline si le webhook manque
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.93 (2026-05-02 11:31 UTC)
+- Chantier: P-6.22 bankroll smart UI
+- Avant: règles bankroll cachées, pas de drawdown visible dans Profil
+- Après: module NAV/P&L/drawdown, recommandation Kelly/freeze et lock profits
+- Impact: Théo voit immédiatement quand réduire la mise ou sécuriser les gains
+- Commit: pending
+- Status: ✅ DONE
