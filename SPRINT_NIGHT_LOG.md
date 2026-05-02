@@ -395,3 +395,11 @@
 - Impact: les anciens liens montante redirigent proprement vers le hub unique; test hash legacy vert, smoke E2E vert
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.51 (2026-05-02 08:09 UTC)
+- Chantier: P-3.9 + P-3.10 cap navigation à 8 routes
+- Avant: `VALID_PAGES=18`, avec encore des outils secondaires comme routes SPA (`buteurs`, `combines`, `calendrier`, `compare`, `favoris`, etc.)
+- Après: `VALID_PAGES=8` (`dashboard`, `tous`, `performance`, `academie`, `profil`, `sante`, `legal`, `montantes`); `10` anciennes routes aliasées vers leur hub
+- Impact: objectif Phase 3 “8 pages max” atteint côté routeur sans casser les bookmarks; test legacy hashes vert, smoke E2E vert
+- Commit: pending
+- Status: ✅ DONE
