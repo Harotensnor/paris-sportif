@@ -19923,6 +19923,50 @@
       }
     } catch (e) {}
 
+    const bankrollSmartHtml = (() => {
+      const userBr = Number(localStorage.getItem('userBankroll') || bankrollStart || 50) || 50;
+      let bets = [];
+      try { bets = (typeof _loadUserBets === 'function') ? _loadUserBets() : []; } catch(e) {}
+      const settled = bets.filter(b => b && b.settled && b.result !== 'void').sort((a, b) => (a.settledTs || a.ts || 0) - (b.settledTs || b.ts || 0));
+      let nav = userBr, high = userBr, low = userBr;
+      settled.forEach(b => {
+        nav += Number(b.pnl) || 0;
+        high = Math.max(high, nav);
+        low = Math.min(low, nav);
+      });
+      const dd = high > 0 ? Math.max(0, (high - nav) / high) : 0;
+      const pnlPct = userBr > 0 ? (nav - userBr) / userBr : 0;
+      const rl = (typeof _loadRiskLimits === 'function') ? _loadRiskLimits() : { maxStakePctDay: 0.25, maxStakePctBet: 0.10, maxBetsPerDay: 5 };
+      const mode = dd >= 0.30 ? 'freeze' : dd >= 0.20 ? 'protect' : pnlPct >= 0.30 ? 'lock' : 'normal';
+      const reco = mode === 'freeze'
+        ? { color: 'var(--c-bad)', label: 'Freeze 7 jours', text: 'Drawdown >30% : stop net, pas de revanche.' }
+        : mode === 'protect'
+          ? { color: 'var(--c-warn)', label: 'Kelly réduit 0.15×', text: 'Drawdown >20% : mise plus petite jusqu’au retour au calme.' }
+          : mode === 'lock'
+            ? { color: 'var(--c-strong)', label: 'Lock profits dispo', text: 'Bankroll +30% : sécurise une partie des gains.' }
+            : { color: 'var(--c-strong)', label: 'Kelly standard 0.25×', text: 'Risque sous contrôle, on garde le plan.' };
+      const barPct = Math.min(100, Math.round(dd * 100));
+      return `
+        <div class="card-base">
+          <h3 class="section-h3">🧠 Gestion bankroll intelligente</h3>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px;">
+            <div style="padding:12px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);"><div class="u-text-xs u-text-dim">Bankroll suivie</div><div style="font-size:22px;font-weight:850;color:var(--text);">${nav.toFixed(2)}€</div></div>
+            <div style="padding:12px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);"><div class="u-text-xs u-text-dim">P&L suivi</div><div style="font-size:22px;font-weight:850;color:${pnlPct >= 0 ? 'var(--c-strong)' : 'var(--c-bad)'};">${pnlPct >= 0 ? '+' : ''}${(pnlPct*100).toFixed(1)}%</div></div>
+            <div style="padding:12px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);"><div class="u-text-xs u-text-dim">Drawdown</div><div style="font-size:22px;font-weight:850;color:${reco.color};">${(dd*100).toFixed(1)}%</div></div>
+          </div>
+          <div style="height:9px;background:var(--panel);border:1px solid var(--border);border-radius:999px;overflow:hidden;margin-bottom:10px;">
+            <div style="width:${barPct}%;height:100%;background:${reco.color};"></div>
+          </div>
+          <div style="padding:10px 12px;border-radius:var(--r-sm);border:1px solid color-mix(in srgb, ${reco.color} 35%, transparent);background:color-mix(in srgb, ${reco.color} 10%, transparent);color:var(--text);font-size:13px;line-height:1.45;">
+            <b style="color:${reco.color};">${reco.label}</b> · ${reco.text}
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
+            <span class="u-text-xs u-text-dim">Limites: ${(rl.maxStakePctBet*100).toFixed(0)}%/pari · ${(rl.maxStakePctDay*100).toFixed(0)}%/jour · ${rl.maxBetsPerDay} paris/jour</span>
+            ${mode === 'lock' ? `<button type="button" data-bankroll-lock-profits data-lock-profit="${Math.max(0, nav - userBr).toFixed(2)}" style="margin-left:auto;padding:7px 12px;border:0;border-radius:var(--r-sm);background:var(--c-strong);color:#03140b;font-weight:800;cursor:pointer;">Verrouiller les profits</button>` : ''}
+          </div>
+        </div>`;
+    })();
+
     wrap.innerHTML = `
       <div class="page-wrap">
         <div style="margin-bottom:24px;padding:32px 0 20px;border-bottom:1px solid var(--border);position:relative;display:flex;align-items:center;gap:18px;flex-wrap:wrap;">
@@ -19982,6 +20026,8 @@
             <input id="pref-bankroll" type="number" min="1" step="1" value="${bankrollStart}" aria-label="Bankroll de départ en euros" style="width:150px;padding:10px 12px;font-size:15px;font-weight:700;background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);"/>
             <div style="font-size:12px;color:var(--text-dim);margin-top:6px;">Sert à calculer la cagnotte simulée sur la page Bilan + tes mises conseillées.</div>
           </div>
+
+          ${bankrollSmartHtml}
 
           <div class="card-base">
             <h3 class="section-h3">🔒 Seuil "pari sûr" ${(typeof helpDot === 'function') ? helpDot('À partir de quelle confiance un pari est-il étiqueté "sûr" ?<br><br><b>70% (défaut)</b> : plus de paris mais certains perdent<br><b>75%+</b> : moins de paris mais très fiables<br><b>65% ou moins</b> : beaucoup de paris, risqué') : ''}</h3>
@@ -20256,6 +20302,13 @@
       const v = parseFloat(e.target.value);
       const safe = isFinite(v) && v >= 1 && v <= 10000 ? v : 10;
       savePrefs({ bankrollStart: safe });
+    });
+    const lockProfitBtn = wrap.querySelector('[data-bankroll-lock-profits]');
+    if (lockProfitBtn) lockProfitBtn.addEventListener('click', () => {
+      const profit = Number(lockProfitBtn.dataset.lockProfit || 0) || 0;
+      try { localStorage.setItem('bankrollLockedProfit', profit.toFixed(2)); } catch(e){}
+      try { if (typeof toast === 'function') toast(`✓ Profits verrouillés : ${profit.toFixed(2)}€`, 'success'); } catch(e){}
+      renderProfilPage(wrap);
     });
     const lockEl = wrap.querySelector('#pref-lock-threshold');
     const lockLbl = wrap.querySelector('#pref-lock-label');
