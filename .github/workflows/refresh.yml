@@ -76,7 +76,7 @@ jobs:
           PID_INJ=$!
           (python3 fetch_clubelo.py || true) > /tmp/fetch_clubelo.log 2>&1 &
           PID_ELO=$!
-          (python3 fetch_fbref_xg.py || true) > /tmp/fetch_xg.log 2>&1 &
+          (python3 fetch_understat_xg.py || true) > /tmp/fetch_xg.log 2>&1 &
           PID_XG=$!
           # Wait pour TOUS et imprime les logs (mêmes timeouts implicites = pas de limite ici)
           wait $PID_LIVE $PID_SOFA $PID_WNX $PID_H2H $PID_FOREBET $PID_TENNIS $PID_RUS $PID_INJ $PID_ELO $PID_XG
@@ -115,7 +115,7 @@ jobs:
           if [ $MIN_MOD30 -lt 5 ]; then
             (python3 fetch_team_form.py || true) > /tmp/fetch_tf.log 2>&1 &
           fi
-          # fetch_weather + fetch_referees + fetch_clubelo + fetch_fbref_xg : self-throttled, parallèle
+          # fetch_weather + fetch_referees + fetch_clubelo + fetch_understat_xg : self-throttled, parallèle
           (python3 fetch_weather.py || true) > /tmp/fetch_weather.log 2>&1 &
           (python3 fetch_referees_soccer.py || true) > /tmp/fetch_refs.log 2>&1 &
           # Wait pour TOUS les jobs background lancés
@@ -155,6 +155,7 @@ jobs:
           #  fbref_xg, team_stats, footballdata, mlb_pitchers, nhl_stats,
           #  nba_team_stats, tennis_features)
           python3 patch_all_quick.py || true
+          python3 patch_understat_xg.py || true
           # v33.28 — Inject data.js (window.PRONOSTICS_DATA = {...}) dans
           # pronostics.html UNE SEULE FOIS à la fin. Avant : 11 patches faisaient
           # ce regex sur 13500 lignes à chaque fois (~6-12s gaspillées par run).
@@ -266,7 +267,7 @@ jobs:
           for path in \
             data.js pronostics.html app.css app.js odds_history.jsonl \
             injuries_soccer.json winamax_catalog.json winamax_markets.json team_stats.json \
-            lineups_soccer.json clubelo.json weather.json fbref_xg.json \
+            lineups_soccer.json clubelo.json weather.json fbref_xg.json xg_team_stats.json \
             weather_geo_cache.json referees_soccer.json health.json \
             data_today.json data_manifest.json team_form.json \
             results_archive.jsonl tennis_ratings.json footballdata.json \

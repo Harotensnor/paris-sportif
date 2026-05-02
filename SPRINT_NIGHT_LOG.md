@@ -233,3 +233,11 @@
 - Impact: warning faux positif supprimé, calibration ligue disponible pour le modèle foot, health warnings 4 → 3
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.31 (2026-05-02 05:30 UTC)
+- Chantier: P-A5 Understat xG
+- Avant: `fbref_xg.json` absent, `xg_team_stats.json` absent, `night_metrics.events.xg=0`
+- Après: `fetch_understat_xg.py` collecte 112 équipes sur EPL/La Liga/Bundesliga/Serie A/Ligue 1/RFPL; `patch_understat_xg.py` patche `95` events / `150` competitors; Santé expose `xg_team_stats.teams=112`
+- Impact: le modèle foot récupère enfin un signal xG pré-match exploitable (`0 → 95` events enrichis), avec compatibilité `fbref_xg.json` pour les patchers existants
+- Commit: pending
+- Status: ✅ DONE

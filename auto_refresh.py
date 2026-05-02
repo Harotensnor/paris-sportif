@@ -62,7 +62,7 @@ FETCH_STAGES = [
     ('fetch_rus_odds.py',          5,   30),
     ('fetch_injuries.py',         10,   60),   # ESPN: NBA/NHL/NFL/MLB
     ('fetch_clubelo.py',            1,   30),   # self-throttled 1/20h
-    ('fetch_fbref_xg.py',         240,  120),   # self-throttled / slow-ish
+    ('fetch_understat_xg.py',     240,  120),   # top-5 xG, self-throttled / slow-ish
     ('snapshot_odds.py',           1,   30),   # freeze pre-match odds
     ('snapshot_results.py',        1,   30),   # archive completed matches (long backtest window)
     ('fetch_tips.py',             15,  120),   # RdJ, respectful cadence
@@ -91,6 +91,7 @@ PATCH_STAGES = [
     ('patch_sofascore_events.py',   1,   30),
     ('patch_winamax_markets.py',    1,   30),
     ('patch_all_quick.py',          1,   30),
+    ('patch_understat_xg.py',       1,   30),
     ('inject_data_in_html.py',      1,   15),
     # Pipeline status snapshot (health.json) — runs every tick, cheap.
     ('build_health.py',             1,   15),
