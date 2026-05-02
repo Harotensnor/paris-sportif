@@ -1279,3 +1279,9 @@
 - Après: bandeau dismissible "spots high-odds aujourd'hui" avec prochain pari et mémorisation locale.
 - Impact: Théo voit l'urgence du jour sans notifications externes ni bruit permanent.
 - Vérif: phase10_internal_alerts_audit.json, dismiss OK, overflow = 0.
+
+## Sprint v35.166 — Phase 10 P-10.14 Marchés foot étendus visibles (20:56 UTC)
+- Avant: la modale noyait les marchés foot secondaires dans la liste générale.
+- Après: strip dédié aux marchés foot étendus cohérents (mi-temps, score exact, O/U, BTTS, team totals), sans handicap promu.
+- Impact: Théo repère plus vite les alternatives bookables hors 1N2.
+- Vérif: phase10_football_extended_markets_audit.json, 10 marchés étendus détectés, 0 handicap promu.
