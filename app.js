@@ -14718,6 +14718,11 @@
       return (isFinite(v) && v > 0) ? v : 50;
     })();
     const userOddMin = (typeof getUserOddMin === 'function') ? getUserOddMin() : 2.00;
+    const bbfFocusKey = 'paris_sportif_focus_big_bets_v1';
+    const bbfFocusOnly = (() => {
+      try { return localStorage.getItem(bbfFocusKey) === '1'; }
+      catch(e) { return false; }
+    })();
     // Le flag autoRefreshDone est maintenant timestamped → re-tente après
     // 30min (avant : bloqué pour toute la session, donc le user qui ouvre
     // la page avec data 10h stale reste bloqué si la 1ère tentative a
@@ -15820,6 +15825,7 @@
         try { return Number(JSON.parse(localStorage.getItem('paris_sportif_winamax_clicks_v1') || '{}').count || 0); }
         catch(e) { return 0; }
       })();
+      const bbfFocusButton = `<button type="button" data-bbf-focus-toggle aria-pressed="${bbfFocusOnly ? 'true' : 'false'}" style="min-height:40px;border:1px solid ${bbfFocusOnly ? 'var(--c-strong)' : 'var(--border)'};border-radius:var(--r-pill);background:${bbfFocusOnly ? 'rgba(22,163,74,.20)' : 'rgba(255,255,255,.04)'};color:var(--text);padding:0 12px;font-size:12px;font-weight:900;cursor:pointer;">${bbfFocusOnly ? 'Focus ON' : 'Mode Big Bets'}</button>`;
       const bbfTrackedRows = (() => {
         try {
           const bets = loadTrackedBets();
@@ -15859,13 +15865,14 @@
           <section class="bbf-command" aria-live="polite">
             <strong>${bbfBigBets[0] ? `Prochain gros pari : ${esc(bbfMarketLabel(bbfBigBets[0]))} @${Number(bbfBigBets[0].odd).toFixed(2)}` : 'Pas de pari urgent'}</strong>
             <span>${_dataIsStale ? `Données trop anciennes (${_dataAgeMin} min) : refresh avant d'agir.` : `${bbfVisibleCount} paris affichables · cote min ${userOddMin.toFixed(2)} · bankroll ${userBankroll.toFixed(0)}€ · ${bbfClickCount} clic${bbfClickCount > 1 ? 's' : ''} Winamax`}</span>
+            ${bbfFocusButton}
           </section>
           ${bbfOffline}
-          ${bbfQuickActions}
-          ${bbfCategoryChips}
-          ${bbfCompetitionChips}
-          <div class="bbf-layout">
-            ${bbfLeftRailHtml}
+          ${bbfFocusOnly ? '' : bbfQuickActions}
+          ${bbfFocusOnly ? '' : bbfCategoryChips}
+          ${bbfFocusOnly ? '' : bbfCompetitionChips}
+          <div class="bbf-layout" ${bbfFocusOnly ? 'style="display:block;"' : ''}>
+            ${bbfFocusOnly ? '' : bbfLeftRailHtml}
             <main class="bbf-main">
 
           <section class="bbf-hero" aria-labelledby="bbf-title">
@@ -15877,7 +15884,7 @@
             ${_dataIsStale ? bbfEmpty : (bbfBigBets.length ? `<div class="bbf-grid bbf-grid--hero">${bbfBigBets.map(p => bbfCard(p, 'hero')).join('')}</div>` : bbfEmpty)}
           </section>
 
-          ${bbfStrategyHtml}
+          ${bbfFocusOnly ? '' : bbfStrategyHtml}
 
           <section class="bbf-section">
             <div class="bbf-section__head">
@@ -15894,7 +15901,7 @@
               </div>`}
           </section>
 
-          <section class="bbf-section bbf-section--outsiders">
+          ${bbfFocusOnly ? '' : `<section class="bbf-section bbf-section--outsiders">
             <div class="bbf-section__head">
               <div>
                 <span>Big Odds Boost · cote ≥ 4.00 · edge ≥ 10%</span>
@@ -15907,9 +15914,9 @@
                 <strong>Pas de grosse cote value propre.</strong>
                 <span>Le site garde les grosses cotes seulement quand la probabilité reste défendable.</span>
               </div>`}
-          </section>
+          </section>`}
 
-          <section class="bbf-section bbf-section--outsiders">
+          <section class="bbf-section ${bbfFocusOnly ? '' : 'bbf-section--outsiders'}">
             <div class="bbf-section__head">
               <div>
                 <span>Outsiders crédibles · cote 2.50-4.00 · edge ≥ 5%</span>
@@ -15924,15 +15931,15 @@
               </div>`}
           </section>
 
-          <details class="bbf-more terminal-market">
+          ${bbfFocusOnly ? '' : `<details class="bbf-more terminal-market">
             <summary>
               <span>Voir toutes les opportunités restantes</span>
               <b>${bbfRestRows.length} avec edge ≥ 2% · ${bbfMarketCount} marchés scorés · ${terminalScanPool.length} matchs exacts sur 48h</b>
             </summary>
             <div class="bbf-more__rows">${bbfRestRows.length ? bbfRestRows.map(bbfRow).join('') : '<p>Aucun match exploitable dans la fenêtre actuelle.</p>'}</div>
-          </details>
+          </details>`}
 
-          ${scorersToday.length ? `<details class="bbf-more bbf-scorers-section">
+          ${!bbfFocusOnly && scorersToday.length ? `<details class="bbf-more bbf-scorers-section">
             <summary>
               <span>Top buteurs du jour</span>
               <b>${scorersToday.length} joueurs · secondaire</b>
@@ -15942,24 +15949,29 @@
             </div>
           </details>` : ''}
 
-          <section class="bbf-stats">
+          ${bbfFocusOnly ? '' : `<section class="bbf-stats">
             <div><span>ROI modèle</span><strong>${agent.delta7 >= 0 ? '+' : ''}${Math.round((agent.deltaPct7 || 0) * 10) / 10}%</strong><em>${daysSinceStart < 7 ? `depuis ${daysSinceStart}j` : 'sur 7j'}</em></div>
             <div><span>Gain moyen Big Bets</span><strong>${bbfBigBets.length ? `${bbfGain100 >= 0 ? '+' : ''}${bbfGain100.toFixed(0)}€` : '—'}</strong><em>par 100€ misés · EV moyenne</em></div>
             <div><span>Paris filtrés</span><strong>${todayStats.ok || bbfPool.length}</strong><em>${todayStats.noEdge || 0} sans value · ${todayStats.lowConf || 0} confiance basse</em></div>
             <div><span>Cagnotte modèle</span><strong>${nav.toFixed(2)}€</strong><em>départ 10€ · Kelly protégé</em></div>
-          </section>
-          <nav class="bbf-tools" aria-label="Outils secondaires">
+          </section>`}
+          ${bbfFocusOnly ? '' : `<nav class="bbf-tools" aria-label="Outils secondaires">
             <button type="button" class="page-btn" data-page="tous">Tous les paris</button>
             <button type="button" class="page-btn" data-page="performance">Mes paris</button>
             <button type="button" class="page-btn" data-page="academie">Méthode</button>
             <button type="button" class="page-btn" data-page="sante">Santé data</button>
-          </nav>
+          </nav>`}
             </main>
-            ${bbfBasketHtml}
+            ${bbfFocusOnly ? '' : bbfBasketHtml}
           </div>
         </div>`;
 
       wrap.innerHTML = bbfMainHtml;
+      const bbfFocusToggle = wrap.querySelector('[data-bbf-focus-toggle]');
+      if (bbfFocusToggle) bbfFocusToggle.addEventListener('click', () => {
+        try { localStorage.setItem(bbfFocusKey, bbfFocusOnly ? '0' : '1'); } catch(e) {}
+        renderDashboardPage(wrap);
+      });
       const bbfLeftSearch = wrap.querySelector('#bbf-left-search');
       if (bbfLeftSearch) bbfLeftSearch.addEventListener('keydown', (ev) => {
         if (ev.key !== 'Enter') return;
