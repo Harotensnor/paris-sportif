@@ -1309,3 +1309,9 @@
 - Après: Total runs 6.5-10.5 + F5 totals visibles, sans handicap.
 - Impact: plus de marchés baseball exploitables malgré l'exclusion des handicaps.
 - Vérif: phase10_baseball_extended_markets_audit.json, 5 totals + 2 F5, 0 handicap promu.
+
+## Sprint v35.171 — Phase 10 P-10.19 Outsiders multi-marchés (21:09 UTC)
+- Avant: les grosses cotes secondaires restaient seulement dans les détails de marché.
+- Après: section dédiée O/U, BTTS, score exact et totals à cote ≥2.50 + edge ≥6%.
+- Impact: les value secondaires ressortent sans forcer un pick si le slate est vide.
+- Vérif: phase10_multi_market_outsiders_audit.json, section présente, 0 overflow, empty state prudent.
