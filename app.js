@@ -7117,7 +7117,7 @@
     const isFootTop5 = isFoot && SOFASCORE_LEAGUES.has(match.league_code);
     const ESPN_INJURY_SPORTS = new Set(['basketball','hockey','baseball','american-football']);
     const hasInjurySource = isFootTop5 || ESPN_INJURY_SPORTS.has(sport);
-    const ESPN_H2H_SPORTS = new Set(['football','basketball','hockey','tennis']);
+    const ESPN_H2H_SPORTS = new Set(['football','basketball','baseball','hockey','tennis']);
     const hasH2HSource = ESPN_H2H_SPORTS.has(sport);
     const hasWeatherSource = isFootTop5;
     const hasRefSource = isFootTop5;
@@ -11029,9 +11029,9 @@
             {
               icon: '⚔️',
               label: 'Confrontations directes (H2H)',
-              status: match.h2h && Array.isArray(match.h2h) && match.h2h.length ? 'ok' : 'missing',
-              detail: match.h2h && Array.isArray(match.h2h) && match.h2h.length
-                ? `${match.h2h.length} dernières rencontres` : 'Pas de H2H récents',
+              status: match.h2h && Array.isArray(match.h2h.meetings) && match.h2h.meetings.length ? 'ok' : 'missing',
+              detail: match.h2h && Array.isArray(match.h2h.meetings) && match.h2h.meetings.length
+                ? `${match.h2h.meetings.length} dernières rencontres` : 'Pas de H2H récents',
             },
             {
               icon: '🔥',
