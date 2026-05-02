@@ -837,3 +837,11 @@
 - Impact: plus de paris visibles par écran PC, sans abandonner les rails desktop
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.106 (2026-05-02 13:09 UTC)
+- Chantier: P-8.7 page Tous dense desktop
+- Avant: page Tous rendue comme une pile de cartes, peu adaptée PC
+- Après: lignes desktop en colonnes 76 / match / pick / résultat; hauteur desktop 1831px; overflow 0
+- Impact: la liste des pronos devient scannable comme un terminal de paris sur PC
+- Commit: pending
+- Status: ✅ DONE
