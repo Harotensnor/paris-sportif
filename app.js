@@ -6315,17 +6315,30 @@
       // that side. This is intentionally weaker than team signals: market
       // steam can be news, sharp action, or noise.
       const sm = match.smart_money;
+      var smartMoneyNudge = null;
       if (sm && Number(sm.confidence || 0) >= 0.55 && Number(sm.odd_drop_pct || 0) >= 8) {
         const smShift = Math.max(0.006, Math.min(0.025, Number(sm.odd_drop_pct || 0) / 600));
-        if (sm.side === 'home') {
+        const smSide = sm.side === 'home' || sm.side === 'away' || (hasDraw && sm.side === 'draw') ? sm.side : null;
+        if (smSide) {
+          smartMoneyNudge = {
+            side: smSide,
+            pick_key: sm.pick_key || null,
+            confidence: Math.round((Number(sm.confidence || 0)) * 1000) / 1000,
+            odd_drop_pct: Math.round((Number(sm.odd_drop_pct || 0)) * 10) / 10,
+            odd_open: Number(sm.odd_open || 0) || null,
+            odd_latest: Number(sm.odd_latest || 0) || null,
+            nudge: Math.round(smShift * 1000) / 1000,
+          };
+        }
+        if (smSide === 'home') {
           final.pH += smShift;
           final.pA -= smShift * (hasDraw ? 0.65 : 1);
           if (hasDraw) final.pD -= smShift * 0.35;
-        } else if (sm.side === 'away') {
+        } else if (smSide === 'away') {
           final.pA += smShift;
           final.pH -= smShift * (hasDraw ? 0.65 : 1);
           if (hasDraw) final.pD -= smShift * 0.35;
-        } else if (hasDraw && sm.side === 'draw') {
+        } else if (smSide === 'draw') {
           final.pD += smShift;
           final.pH -= smShift / 2;
           final.pA -= smShift / 2;
@@ -6397,6 +6410,17 @@
     // understands the "why" of every prono.
     const pickKey = best_pick[2];
     const reasons = [];
+    if (smartMoneyNudge) {
+      const sharpKey = smartMoneyNudge.side === 'home' ? '1' : smartMoneyNudge.side === 'away' ? '2' : 'X';
+      smartMoneyNudge.aligned_with_pick = sharpKey === pickKey;
+      reasons.push({
+        type: 'smart_money',
+        icon: '💰',
+        text: smartMoneyNudge.aligned_with_pick
+          ? `Sharp money détecté sur notre côté : cote en baisse de ${smartMoneyNudge.odd_drop_pct}% → nudge modèle +${Math.round(smartMoneyNudge.nudge * 100)}pt.`
+          : `Sharp money détecté côté ${sharpKey}, différent du pick principal — signal surveillé mais non dominant.`,
+      });
+    }
     // Market signal
     if (pH != null) {
       const marketP = pickKey === '1' ? pH : pickKey === '2' ? pA : pD;
@@ -7112,6 +7136,7 @@
       // Avoids over-confident "lock" labels on tiny samples.
       isLockStrict: reliability >= 0.75,
       abstain,
+      sharp_money: smartMoneyNudge || null,
       poisson: poi ? { xgH: poi.lamH, xgA: poi.lamA, fbrefBlend: poi.fbrefBlend || null } : null,
       // Scores probables — shape varie selon le sport (Chantier 6 + K) :
       //   foot   : array[{home, away, prob}] (legacy, kind 'exact' implicite)

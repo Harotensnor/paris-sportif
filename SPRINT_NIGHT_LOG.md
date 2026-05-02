@@ -1357,3 +1357,9 @@
 - Après: pred.prob_ci expose un IC95 Wilson et la modale affiche la fourchette.
 - Impact: Théo voit quand une proba est serrée ou large avant de miser.
 - Vérif: phase10_probability_ci_audit.json, IC95 visible en modale, 0 erreur console.
+
+## Sprint v35.179 — Phase 10 P-10.26 Sharp money dans pred (21:34 UTC)
+- Avant: le mouvement de cote nudgait le modèle mais restait peu audit-able dans la sortie.
+- Après: pred.sharp_money expose côté, drop, nudge et alignement avec le pick; raison dédiée.
+- Impact: Théo voit si la baisse de cote soutient vraiment le pari proposé.
+- Vérif: phase10_sharp_money_nudge_audit.json, +2.1pt sur home, raison smart_money OK.
