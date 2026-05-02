@@ -5510,6 +5510,42 @@
       display: inline-flex;
       align-items: center;
     }
+    .site-footer {
+      margin-top: 24px;
+      padding: 18px 12px 12px;
+    }
+    .footer-inner {
+      gap: 10px;
+    }
+    .footer-links {
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+    .footer-link {
+      flex: 0 0 auto;
+      padding: 0 10px;
+    }
+    .footer-meta .footer-meta-item:nth-child(2),
+    .footer-anj .footer-anj-pill:nth-child(3),
+    .site-footer-spa {
+      display: none !important;
+    }
+    .footer-anj {
+      display: grid;
+      gap: 6px;
+      padding: 10px;
+      margin-top: 10px;
+    }
+    .footer-anj-pill,
+    .footer-anj-pill-link {
+      min-height: 44px;
+      justify-content: center;
+      text-align: center;
+    }
   }
 
   /* v31.2 — Audit UX accessibilité dynamique : respecter prefers-reduced-motion

@@ -340,7 +340,7 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Preuve : captures mobile dashboard/performance/academie/profil
 - Constat : le footer répète beaucoup d'informations et rallonge fortement les pages.
 - Action : footer compact mobile avec liens secondaires repliés.
-- Statut : OPEN
+- Statut : FIXED v35.129 — footer SPA secondaire masqué sur mobile, liens en rail horizontal et ANJ compact; dashboard mobile `4093px → 3596px`.
 
 ### P9-VIS-008 — Montantes trop vide quand aucun pick séquentiel
 
