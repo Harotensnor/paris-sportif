@@ -1013,3 +1013,11 @@
 - Impact: page légale mobile plus scannable sans retirer le contenu obligatoire
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.128 (2026-05-02 15:22 UTC)
+- Chantier: P-9.56 fix P9-VIS-006 header mobile
+- Avant: dashboard mobile 4238px, haut de page chargé par risque + commande + chips
+- Après: dashboard mobile 4093px, banderole 28px et command center compact
+- Impact: premier viewport mobile plus respirable sans retirer les accès principaux
+- Commit: pending
+- Status: ✅ DONE

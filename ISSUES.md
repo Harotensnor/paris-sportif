@@ -332,7 +332,7 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Preuve : toutes les captures mobile, surtout dashboard/tous/performance
 - Constat : banderole risque + logo + sous-nav + chips produisent un haut de page très compressé.
 - Action : réduire la sous-nav mobile à icônes principales et mettre les filtres secondaires dans drawer.
-- Statut : OPEN
+- Statut : FIXED v35.128 — banderole risque ramenée à une ligne 28px, command center compact, chips mobile tronquées proprement; dashboard mobile `4238px → 4093px`.
 
 ### P9-VIS-007 — Footer/disclaimer mobile prend trop de hauteur
 
