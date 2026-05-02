@@ -7054,6 +7054,8 @@
       data_quality: { score: Number(dqNow?.score) || 0, max: Number(dqNow?.max) || 4 },
       variance: ensembleMeta?.agreement_variance || 0
     };
+    const ciSample = Math.max(24, Math.min(260, 40 + (Number(reliabilityMeta?.componentCount) || pureCompCount || 1) * 35 + (Number(dqNow?.score) || 0) * 12));
+    const probCi = wilsonProbInterval(reliability, ciSample);
 
     return {
       probs: final,
@@ -7062,6 +7064,8 @@
       // Used by UI gauges and tier bucketing.
       reliability,
       reliabilityMeta,
+      prob_ci: probCi,
+      confidence_interval: probCi,
       ensemble: ensembleMeta,
       odds: best,
       hasDraw,
@@ -7724,6 +7728,23 @@
     if (p >= 0.50) return { lbl: 'Serré',     cls: 'low',   color: '#fbbf24' };
     return            { lbl: 'Incertain',     cls: 'vlow',  color: '#f87171' };
   }
+  function wilsonProbInterval(prob, n, z = 1.96) {
+    const p = Math.max(0.01, Math.min(0.99, Number(prob) || 0.50));
+    const sample = Math.max(20, Math.min(500, Number(n) || 80));
+    const zz = z * z;
+    const denom = 1 + zz / sample;
+    const center = (p + zz / (2 * sample)) / denom;
+    const margin = (z * Math.sqrt((p * (1 - p) + zz / (4 * sample)) / sample)) / denom;
+    const lo = Math.max(0.01, Math.min(0.99, center - margin));
+    const hi = Math.max(0.01, Math.min(0.99, center + margin));
+    return {
+      lo: Math.round(lo * 1000) / 1000,
+      hi: Math.round(hi * 1000) / 1000,
+      n: Math.round(sample),
+      width: Math.round((hi - lo) * 1000) / 1000,
+    };
+  }
+  try { window.wilsonProbInterval = wilsonProbInterval; } catch(e) {}
 
   // Circular confidence gauge. prob in [0,1]. size: 'sm' | 'md' | 'lg'.
   // Affiche % au centre + tier en dessous (High/Mid/Low) sauf en taille sm.
@@ -10708,11 +10729,12 @@
             <div class="big-conf">
               Fiabilité <b>${((pred.reliability ?? pred.pick.prob)*100).toFixed(0)}%</b> ${confLabel(pred.reliability ?? pred.pick.prob).lbl}
               ${(() => {
-                // Si le backtest publie un win_rate_ci pour ce sport,
-                // on affiche l'IC95 derrière la fiabilité. Évite la
-                // fausse précision : "65% [IC95 52-77%]" est plus
-                // honnête que "65%" sec quand n=18 picks par sport.
                 try {
+                  const ci = pred.prob_ci || pred.confidence_interval;
+                  if (ci && isFinite(ci.lo) && isFinite(ci.hi)) {
+                    const tone = Number(ci.width) > 0.15 ? 'var(--warn)' : 'var(--text-dim)';
+                    return ` <span style="font-size:11px;color:${tone};font-weight:500;" title="Intervalle de confiance Wilson 95% sur la probabilité modèle (n≈${ci.n || '?'}). Plus l'IC est large, plus l'incertitude est grande.">[IC95 ${Math.round(ci.lo*100)}-${Math.round(ci.hi*100)}%]</span>`;
+                  }
                   const bt = window.__backtestReportV2;
                   const sportData = bt && bt.by_sport && bt.by_sport[match.sport];
                   if (!sportData || !sportData.win_rate_ci || sportData.n < 20) return '';
@@ -10778,6 +10800,9 @@
               const rm = pred.reliabilityMeta || {};
               const rsCount = (pred.explain?.reasons || []).length;
               const dq = computeDataQuality(match);
+              const ci = pred.prob_ci || pred.confidence_interval;
+              const ciTxt = ci && isFinite(ci.lo) && isFinite(ci.hi) ? `, IC95 ${Math.round(ci.lo*100)}-${Math.round(ci.hi*100)}%` : '';
+              const ciWarn = ci && Number(ci.width) > 0.15 ? ' Fourchette large : prudence sur la mise.' : '';
               // Confiance label
               // P1-9 (audit 2026-05-01) : downgrade si peu de signaux (≤2) ET
               // consensus faible (<30%). Avant : "Très haute confiance 82%"
@@ -10822,7 +10847,7 @@
               else dqLbl = ` Données <b>incomplètes</b> (${dq.score}/${dq.max}) — confiance modérée.`;
               return `<div style="margin-top:14px;padding:14px 16px;background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.18);border-left:3px solid var(--brand);border-radius:0 8px 8px 0;font-size:13.5px;line-height:1.6;color:var(--text);">
                 <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:8px;">💡 Pourquoi ce prono est fiable</div>
-                <div>Le modèle classe ce pick en <b>${confLbl}</b> (${(rel*100).toFixed(0)}%).${srcLbl}${edgeLbl}${dqLbl}${rsCount > 0 ? ` Voir les <b>${rsCount} signal${rsCount>1?'s':''}</b> détaillé${rsCount>1?'s':''} ci-dessous.` : ''}</div>
+                <div>Le modèle classe ce pick en <b>${confLbl}</b> (${(rel*100).toFixed(0)}%${ciTxt}).${ciWarn}${srcLbl}${edgeLbl}${dqLbl}${rsCount > 0 ? ` Voir les <b>${rsCount} signal${rsCount>1?'s':''}</b> détaillé${rsCount>1?'s':''} ci-dessous.` : ''}</div>
               </div>`;
             })()}
             ${pred.explain?.headline ? `<div style="margin-top:10px;padding:12px 14px;background:rgba(255,255,255,.03);border-radius:8px;border-left:3px solid var(--accent,#10b981);font-size:13.5px;line-height:1.5;color:var(--text,#e6ebf2);">${esc(pred.explain.headline)}</div>` : ''}
