@@ -18223,6 +18223,14 @@
     const settledCount = totalWon + totalLost;
     const wrPct = settledCount > 0 ? Math.round(100 * totalWon / settledCount) : 0;
     const filtersActive = tousFilters.sports.length > 0 || tousFilters.minEdge > 0 || tousFilters.minConf > 0 || tousFilters.minOdd > 0 || tousSort !== 'kickoff';
+    const compareIds = (() => {
+      try {
+        const ids = JSON.parse(localStorage.getItem('tousComparePickIds') || '[]');
+        return Array.isArray(ids) ? ids.map(String).filter(Boolean).slice(-2) : [];
+      } catch(e) { return []; }
+    })();
+    const compareSet = new Set(compareIds);
+    const comparePicks = compareIds.map(id => allPicks.find(p => String(p.m?.id || '') === id)).filter(Boolean);
 
     // intelligemment vers un onglet rempli (à venir > en cours > finis) pour
     // ne pas montrer un écran "Aucun match" alors que d'autres onglets ont
@@ -18321,6 +18329,8 @@
       const sportEm = { football:'⚽', tennis:'🎾', basketball:'🏀', hockey:'🏒', baseball:'⚾', 'american-football':'🏈', mma:'🥊', golf:'⛳', racing:'🏎️', rugby:'🏉' }[p.m.sport] || '🎯';
       const league = p.m.league_name || '';
       const url = (p.m.winamax && p.m.winamax.url) || 'https://www.winamax.fr/paris-sportifs';
+      const rowId = String(p.m.id || '');
+      const compareActive = compareSet.has(rowId);
       const resBadge = isFini ? (p.res === 'won' ? '<span style="padding:3px 10px;background:rgba(52,211,153,.15);color:var(--accent);font-weight:700;font-size:11px;border-radius:999px;">✓ GAGNÉ</span>' : p.res === 'lost' ? '<span style="padding:3px 10px;background:rgba(248,113,113,.15);color:#fca5a5;font-weight:700;font-size:11px;border-radius:999px;">✗ PERDU</span>' : '<span style="padding:3px 10px;background:rgba(148,163,184,.15);color:#94a3b8;font-weight:600;font-size:11px;border-radius:999px;">? n/a</span>') : '';
     const teamLogo = (src) => src ? `<img src="${esc(src)}" alt="" style="width:22px;height:22px;object-fit:contain;border-radius:3px;" loading="lazy" decoding="async">` : '<span style="display:inline-block;width:22px;height:22px;"></span>';
       const _cntLabel = (() => {
@@ -18362,7 +18372,7 @@
               ${realScorers.length ? `<div style="margin-top:${predScorers.length?'2':'0'}px;"><span style="opacity:.75;">Réels :</span> <b style="color:${predScorerHit ? '#34d399' : 'var(--text)'};">${realScorers.map(s => `${esc(s.name)}${s.minute ? ` <span class="u-text-dim2 u-font-normal">${esc(s.minute)}</span>` : ''}`).join(', ')}</b>${predScorerHit ? ' <span style="color:var(--accent);font-weight:600;">✓ pick touché</span>' : ''}</div>` : ''}
             </div>` : ''}
         </div>` : '';
-      return `<div class="tous-row" data-match-id="${esc(String(p.m.id || ''))}" data-match-date="${esc(String(p.m.date || ''))}" style="display:grid;gap:14px;padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${isFini ? (p.res==='won'?'#34d399':p.res==='lost'?'#fca5a5':'var(--text-dim)') : (p.rel>=0.70 ? 'var(--accent)' : 'var(--brand)')};border-radius:0 10px 10px 0;align-items:center;cursor:pointer;font-variant-numeric:tabular-nums;">
+      return `<div class="tous-row" data-match-id="${esc(rowId)}" data-match-date="${esc(String(p.m.date || ''))}" style="display:grid;gap:14px;padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${isFini ? (p.res==='won'?'#34d399':p.res==='lost'?'#fca5a5':'var(--text-dim)') : (p.rel>=0.70 ? 'var(--accent)' : 'var(--brand)')};border-radius:0 10px 10px 0;align-items:center;cursor:pointer;font-variant-numeric:tabular-nums;">
         <div style="text-align:left;">
           <div style="font-size:11px;color:var(--text-dim2,#7b8693);font-weight:600;">${sportEm} ${esc(tLbl)}</div>
           ${!isFini && _cntLabel ? `<div class="tous-cnt" style="font-size:9.5px;color:${_cntColor};margin-top:1px;font-weight:600;${_cntSoon?'background:rgba(251,191,36,.12);padding:1px 5px;border-radius:3px;display:inline-block;':''}">${esc(_cntLabel)}</div>` : ''}
@@ -18398,10 +18408,48 @@
         </div>
         <div class="u-text-right">
           ${isFini ? resBadge : ''}
+          ${!p.nonTrackable ? `<button type="button" data-compare-pick="${esc(rowId)}" aria-pressed="${compareActive ? 'true' : 'false'}" style="margin-top:6px;min-height:34px;border:1px solid ${compareActive ? 'var(--c-accent)' : 'var(--border)'};border-radius:999px;background:${compareActive ? 'rgba(230,0,0,.18)' : 'rgba(255,255,255,.04)'};color:${compareActive ? 'var(--c-accent)' : 'var(--text)'};padding:6px 10px;font-size:11px;font-weight:850;cursor:pointer;">${compareActive ? '✓ Comparé' : 'Comparer'}</button>` : ''}
           ${p.nonTrackable ? '<div style="margin-top:4px;font-size:9.5px;color:var(--text-dim2);font-style:italic;" title="Match terminé sans cote pré-match captée — résultat visible mais hors bilan ROI">📋 résultat seul</div>' : ''}
         </div>
         ${_footDetailsHtml}
       </div>`;
+    };
+    const compareBarHtml = compareIds.length ? `
+      <div style="margin:0 0 12px;padding:10px 12px;background:rgba(230,0,0,.10);border:1px solid rgba(230,0,0,.28);border-radius:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <strong style="font-size:12px;color:var(--c-accent);">Comparateur</strong>
+        <span style="font-size:12px;color:var(--text-dim);">${comparePicks.map(p => {
+          const { home, away } = getSides(p.m);
+          return esc(`${home?.short || home?.name || '?'} vs ${away?.short || away?.name || '?'}`);
+        }).join(' · ') || `${compareIds.length}/2 picks sélectionnés`}</span>
+        <button type="button" data-compare-open ${comparePicks.length < 2 ? 'disabled' : ''} style="margin-left:auto;min-height:38px;border:0;border-radius:999px;background:${comparePicks.length < 2 ? 'var(--panel-2)' : 'var(--c-accent)'};color:${comparePicks.length < 2 ? 'var(--text-dim)' : '#fff'};padding:7px 13px;font-size:12px;font-weight:900;cursor:${comparePicks.length < 2 ? 'not-allowed' : 'pointer'};">Comparer les 2</button>
+        <button type="button" data-compare-clear style="min-height:38px;border:1px solid var(--border);border-radius:999px;background:transparent;color:var(--text-dim);padding:7px 12px;font-size:12px;font-weight:800;cursor:pointer;">Vider</button>
+      </div>` : '';
+    const showTousCompareModal = () => {
+      if (comparePicks.length < 2 || typeof _showBottomSheet !== 'function') return;
+      const fmtPct = (v) => `${v >= 0 ? '+' : ''}${(Number(v || 0) * 100).toFixed(1)}%`;
+      const card = (p) => {
+        const { home, away } = getSides(p.m);
+        const ev = Number(p.rel || 0) * Number(p.odd || 0) - 1;
+        const kelly = (typeof kellyFraction === 'function') ? kellyFraction(p.rel, p.odd, 0.25) : 0;
+        const pick = p.pred?.pick?.label || 'Pick';
+        return `<article style="min-width:0;border:1px solid var(--border);border-radius:var(--r-lg);background:var(--panel);padding:14px;">
+          <div style="font-size:11px;color:var(--text-dim);font-weight:900;text-transform:uppercase;letter-spacing:.5px;">${sportEmoji(p.m?.sport)} ${esc(p.m?.league_name || p.m?.league || '')}</div>
+          <h3 style="margin:5px 0 8px;font-size:17px;color:var(--text);line-height:1.2;">${esc(home?.name || '?')} vs ${esc(away?.name || '?')}</h3>
+          <div style="font-size:13px;color:var(--brand);font-weight:850;margin-bottom:10px;">${esc(pick)}</div>
+          <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;font-variant-numeric:tabular-nums;">
+            <div><span class="u-text-xs u-text-dim">Cote</span><b style="display:block;color:var(--text);font-size:20px;">@${Number(p.odd || 0).toFixed(2)}</b></div>
+            <div><span class="u-text-xs u-text-dim">Confiance</span><b style="display:block;color:var(--text);font-size:20px;">${Math.round(Number(p.rel || 0) * 100)}%</b></div>
+            <div><span class="u-text-xs u-text-dim">Avance</span><b style="display:block;color:${p.edge >= 0 ? 'var(--c-strong)' : 'var(--c-bad)'};font-size:20px;">${fmtPct(p.edge)}</b></div>
+            <div><span class="u-text-xs u-text-dim">Gain moyen</span><b style="display:block;color:${ev >= 0 ? 'var(--c-strong)' : 'var(--c-bad)'};font-size:20px;">${fmtPct(ev)}</b></div>
+          </div>
+          <div style="margin-top:10px;font-size:12px;color:var(--text-dim);">Kelly prudent: <b style="color:var(--text);">${Math.max(0, kelly * 100).toFixed(1)}%</b> bankroll</div>
+        </article>`;
+      };
+      _showBottomSheet({
+        title: 'Comparer 2 picks',
+        body: `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;">${comparePicks.map(card).join('')}</div>`,
+        actions: [{ label: 'Fermer', primary: true }]
+      });
     };
 
     // vider les filtres au lieu de juste afficher "Aucun match".
@@ -18531,6 +18579,7 @@
           <button data-tous-tab="inprogress" style="${tousRailItemStyle}padding:10px 18px;border-radius:8px;border:1px solid ${activeTab==='inprogress'?'var(--brand)':'var(--border-2)'};background:${activeTab==='inprogress'?'rgba(167,139,250,.15)':'var(--panel)'};color:${activeTab==='inprogress'?'var(--brand)':'var(--text-2)'};font-weight:700;font-size:13px;cursor:pointer;">🔴 En cours <span style="opacity:.7;">(${inProgress.length})</span></button>
           <button data-tous-tab="finished" title="${_completedNoOdds > 0 ? `Dont ${_completedNoOdds} sans cote pré-match capturée (qualifs WTA/Challenger, etc.) — résultat visible mais pas dans le bilan ROI` : ''}" style="${tousRailItemStyle}padding:10px 18px;border-radius:8px;border:1px solid ${activeTab==='finished'?'var(--brand)':'var(--border-2)'};background:${activeTab==='finished'?'rgba(167,139,250,.15)':'var(--panel)'};color:${activeTab==='finished'?'var(--brand)':'var(--text-2)'};font-weight:700;font-size:13px;cursor:pointer;">✅ Finis <span style="opacity:.7;">(${finished.length})</span></button>
         </div>
+        ${compareBarHtml}
         <div style="display:flex;flex-direction:column;gap:8px;">
           ${activeTab === 'pending' ? pendingHtml : activeTab === 'inprogress' ? inProgressHtml : finishedHtml}
         </div>
@@ -18551,7 +18600,8 @@
     // quelle ligne, ex Reims vs X). On reconstruit le match objet depuis
     // PRONOSTICS_DATA, même pattern que .agent-pos-row plus haut (l. 9171).
     wrap.querySelectorAll('.tous-row[data-match-id]').forEach(row => {
-      row.addEventListener('click', () => {
+      row.addEventListener('click', (e) => {
+        if (e.target && e.target.closest && e.target.closest('[data-compare-pick]')) return;
         const id = row.dataset.matchId;
         if (!id || typeof openDetail !== 'function') return;
         let found = null;
@@ -18560,6 +18610,29 @@
         );
         if (found) openDetail(found);
       });
+    });
+    wrap.querySelectorAll('[data-compare-pick]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const id = String(btn.dataset.comparePick || '');
+        let ids = compareIds.slice();
+        const idx = ids.indexOf(id);
+        if (idx >= 0) ids.splice(idx, 1);
+        else {
+          ids.push(id);
+          ids = ids.slice(-2);
+        }
+        try { localStorage.setItem('tousComparePickIds', JSON.stringify(ids)); } catch(err) {}
+        renderTousPage(wrap);
+      });
+    });
+    const compareOpenBtn = wrap.querySelector('[data-compare-open]');
+    if (compareOpenBtn) compareOpenBtn.addEventListener('click', showTousCompareModal);
+    const compareClearBtn = wrap.querySelector('[data-compare-clear]');
+    if (compareClearBtn) compareClearBtn.addEventListener('click', () => {
+      try { localStorage.removeItem('tousComparePickIds'); } catch(e) {}
+      renderTousPage(wrap);
     });
     wrap.querySelectorAll('[data-tous-sport]').forEach(btn => {
       btn.addEventListener('click', () => {
