@@ -845,3 +845,11 @@
 - Impact: la liste des pronos devient scannable comme un terminal de paris sur PC
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.107 (2026-05-02 13:11 UTC)
+- Chantier: P-8.8 page Performance desktop
+- Avant: pages internes bridées par l’ancien padding rail droit, Performance utile à 884px sur 1440px
+- Après: Performance utile à 1158px sur 1440px; hauteur 1579px; overflow 0
+- Impact: les pages d’analyse arrêtent de ressembler à une vue mobile centrée
+- Commit: pending
+- Status: ✅ DONE
