@@ -2,14 +2,16 @@ import { test, expect } from '@playwright/test';
 
 const URL = '/pronostics.html';
 const PAGES = ['dashboard', 'tous', 'performance', 'academie', 'profil', 'sante', 'montantes'];
-const MAX_CLICKS_PER_PAGE = 14;
+const MAX_CLICKS_PER_PAGE = 24;
 const INTERACTIVE_SELECTOR = [
   'button:not([disabled])',
-  'a[href^="#"]',
+  'a[href]',
+  'summary',
   '[role="button"]',
   '[data-page]',
   '[data-page-link]',
   '[data-big-detail]',
+  '[data-open-detail]',
 ].join(',');
 
 const SKIP_TEXT = /réinitial|reset|vider|supprimer|effacer|oublier|exporter|discord|refresh|rafraîchir|nettoyer|re-register|winamax|github|anj|joueurs info/i;
@@ -35,6 +37,8 @@ async function markCandidates(page) {
     const visible = (el) => {
       const r = el.getBoundingClientRect();
       const cs = getComputedStyle(el);
+      if (typeof el.checkVisibility === 'function' && !el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true })) return false;
+      if (!el.offsetParent && cs.position !== 'fixed' && cs.position !== 'sticky') return false;
       return r.width >= 8 && r.height >= 8 && cs.display !== 'none' && cs.visibility !== 'hidden' && cs.pointerEvents !== 'none';
     };
     let n = 0;
@@ -42,10 +46,12 @@ async function markCandidates(page) {
       .filter(el => {
         const text = (el.textContent || el.getAttribute('aria-label') || el.getAttribute('title') || '').trim();
         const href = el.getAttribute('href') || '';
+        if (el.id === 'footer-version') return false;
+        if (el.hasAttribute('data-pronos-page')) return false;
         if (el.classList.contains('skip-to-content') || href === '#main-content') return false;
         if (!visible(el)) return false;
         if (el.matches('[disabled],[aria-disabled="true"]')) return false;
-        if (/^https?:|^tel:|^mailto:/i.test(href)) return false;
+        if (/^https?:|^tel:|^mailto:/i.test(href) || /\.(html|xml|json|png|svg|webp)$/i.test(href)) return false;
         if (skipRe.test(text) || skipRe.test(href)) return false;
         return true;
       })
