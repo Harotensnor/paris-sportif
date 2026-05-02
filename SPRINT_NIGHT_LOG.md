@@ -1291,3 +1291,9 @@
 - Après: totaux match complet, 1ère mi-temps et quart-temps; handicap retiré du bloc visible.
 - Impact: plus de marchés basket exploitables sans contredire la préférence anti-handicap de Théo.
 - Vérif: phase10_basket_extended_markets_audit.json, 4 full + 3 HT + 3 QT, 0 handicap promu.
+
+## Sprint v35.168 — Phase 10 P-10.16 Marchés tennis étendus visibles (21:02 UTC)
+- Avant: la modale tennis affichait le total jeux match mais pas les lectures par set.
+- Après: total jeux match, total jeux par set et score exact sets rendus visibles.
+- Impact: plus de marchés tennis lisibles sans nouvelle source data ni fetch externe.
+- Vérif: phase10_tennis_extended_markets_audit.json, BO5, 2 lignes match + 3 lignes set + scores exacts.
