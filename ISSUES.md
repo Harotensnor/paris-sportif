@@ -324,7 +324,7 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Preuve : `.cache/phase4-phase9-current/legal-mobile.png`
 - Constat : les gros blocs légaux sont lisibles mais très denses, sans respiration ni accordéon mobile.
 - Action : replier RGPD / Relation Winamax / Jeu responsable en sections accordéon sur mobile.
-- Statut : OPEN
+- Statut : FIXED v35.127 — Politique de confidentialité, Relation Winamax, Jeu responsable et Journal passent en accordéons; legal mobile `3656px → 2171px`.
 
 ### P9-VIS-006 — Header mobile chargé
 

@@ -1005,3 +1005,11 @@
 - Impact: l'accueil PC gaspille moins d'espace noir et les cartes respirent mieux
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.127 (2026-05-02 15:12 UTC)
+- Chantier: P-9.55 fix P9-VIS-005 legal mobile
+- Avant: legal mobile 3656px, blocs RGPD/Winamax/risque en mur de texte
+- Après: legal mobile 2171px avec accordéons de conformité
+- Impact: page légale mobile plus scannable sans retirer le contenu obligatoire
+- Commit: pending
+- Status: ✅ DONE
