@@ -1061,3 +1061,11 @@
 - Impact: les onglets Synthèse/Signaux/Cotes/H2H/Stats restent navigables après refonte
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.134 (2026-05-02 15:24 UTC)
+- Chantier: P-9.62 tests cohérence marchés étendus
+- Avant: 25 cas Playwright, pas d'audit autonome exécutable localement
+- Après: 50 cas couvrant foot/basket/tennis/baseball/hockey + audit navigateur 50/50 OK
+- Impact: garde-fou renforcé contre les contradictions inter-marchés
+- Commit: pending
+- Status: ✅ DONE
