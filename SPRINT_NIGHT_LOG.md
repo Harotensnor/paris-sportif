@@ -429,3 +429,11 @@
 - Impact: les gros paris ont maintenant une mesure de calibration dédiée au lieu d'hériter du Brier global; visual diff final `11.49%` attendu sur Performance (section calibration + footer v35.54), layout OK
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.55 (2026-05-02 07:49 UTC)
+- Chantier: P-4.3 simulation bankroll rolling
+- Avant: `bankroll_simulation.json` absent; le backtest exposait une bankroll Kelly finale mais pas de drawdown, Sharpe ou série exploitable
+- Après: `bankroll_simulation.json` généré avec `495` points; bankroll 1000€ → `2802.51€`, ROI `+180.25%`, DD max `20.42%`, Sharpe/pick `+0.111`, `189` mises engagées
+- Impact: risque bankroll lisible et traçable en JSON appendable côté UI/rapport; visual diff final `11.49%` attendu sur Performance (rapport bankroll + footer v35.55), layout OK
+- Commit: pending
+- Status: ✅ DONE

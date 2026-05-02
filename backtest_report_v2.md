@@ -1,6 +1,6 @@
 # Backtest ROI — VRAI modèle (v2)
 
-Généré : 2026-05-02T07:38:37Z
+Généré : 2026-05-02T07:47:58Z
 Source modèle : `pronostics.html` via `scripts/model_loader.py` (V8 embarqué, zéro duplication)
 Univers : 495 picks sur 2026-04-23T18:45Z → 2026-05-02T05:00Z
 Bankroll simulée (Kelly 0.25× cap 10%) : **100u → 280.25u**
@@ -15,6 +15,7 @@ Bankroll simulée (Kelly 0.25× cap 10%) : **100u → 280.25u**
 - Cote moyenne : 1.98 · Pick prob moyenne : 52.9%
 - **Brier** : 0.229 (0 = parfait, 0.25 = pile/face)
 - **Log-loss** : 0.6503 (plus bas = mieux calibré)
+- Bankroll simulée 1000€ : **2802.51€** (+180.2%) · DD max 20.4% · Sharpe/pick +0.111
 
 ## Séries
 
