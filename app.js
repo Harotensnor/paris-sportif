@@ -11,13 +11,30 @@
   // kellyMin=0 disables. oddMax=0 disables. league=''|code filters by ESPN league_code.
   // Sprint 77 (v31.7.164) — `valueOnly` filtre les picks edge ≤ 0 (no value).
   // Réponse au feedback "trop de paris faibles affichés".
+  const ODD_MIN_USER_KEY = 'oddMinUser';
+  const ODD_MIN_CHOICES = [1.50, 1.80, 2.00, 2.20, 2.50];
+  function getUserOddMin() {
+    try {
+      const v = parseFloat(localStorage.getItem(ODD_MIN_USER_KEY));
+      if (isFinite(v) && v >= 1.50 && v <= 2.50) return Math.round(v * 100) / 100;
+    } catch(e) {}
+    return 2.00;
+  }
+  function setUserOddMin(v) {
+    const n = ODD_MIN_CHOICES.reduce((best, x) => Math.abs(x - v) < Math.abs(best - v) ? x : best, 2.00);
+    try { localStorage.setItem(ODD_MIN_USER_KEY, String(n.toFixed(2))); } catch(e) {}
+    advFilters.oddMin = n;
+    try { window.advFilters = advFilters; } catch(e) {}
+    saveAdvFilters();
+    return n;
+  }
   const ADV_FILTER_KEY = 'advFilters';
   let advFilters = (() => {
     try {
       const raw = JSON.parse(localStorage.getItem(ADV_FILTER_KEY) || '{}');
       return {
         kellyMin: parseFloat(raw.kellyMin) || 0,   // e.g. 0.02 = 2%
-        oddMin: parseFloat(raw.oddMin) || 0,        // min decimal odd
+        oddMin: parseFloat(raw.oddMin) || getUserOddMin(),        // min decimal odd
         oddMax: parseFloat(raw.oddMax) || 0,        // max decimal odd (0 = no cap)
         league: raw.league || '',                   // league_code or ''
         valueOnly: !!raw.valueOnly,                  // Sprint 77 — n'afficher que edge > 0
@@ -25,7 +42,7 @@
         marketType: raw.marketType || '',            // Sprint 89 — '' | '1n2' | 'ou25' | 'btts' | 'doubleChance' | 'exactScore' | 'dnb' | 'ah' | 'basketTotal' | ...
         dataQualityMin: parseInt(raw.dataQualityMin) || 0,  // Sprint 89 — 0..4 (computeDataQuality.score min)
       };
-    } catch (e) { return { kellyMin: 0, oddMin: 0, oddMax: 0, league: '', valueOnly: false, evMin: 0, marketType: '', dataQualityMin: 0 }; }
+    } catch (e) { return { kellyMin: 0, oddMin: getUserOddMin(), oddMax: 0, league: '', valueOnly: false, evMin: 0, marketType: '', dataQualityMin: 0 }; }
   })();
   function saveAdvFilters() {
     try { localStorage.setItem(ADV_FILTER_KEY, JSON.stringify(advFilters)); } catch (e) {}
@@ -51,7 +68,7 @@
     if (advFilters.evMin > 0 && ev < advFilters.evMin) return false;
     return true;
   }
-  try { window.passesValueFilter = passesValueFilter; window.advFilters = advFilters; } catch(e){}
+  try { window.passesValueFilter = passesValueFilter; window.advFilters = advFilters; window.getUserOddMin = getUserOddMin; } catch(e){}
   let advFiltersOpen = advFiltersActive();
   // Théo only bets on Winamax, so hide everything else by default.
   // Sprint 78 (v31.7.165) — Devenu `let` pour respecter `bookmakerMode` (3 états).
@@ -2744,6 +2761,17 @@
       market: out.market,
       source: out.source || 'winamax_exact'
     });
+    const userMinOdd = (typeof getUserOddMin === 'function') ? getUserOddMin() : 2.00;
+    if (odd < userMinOdd) {
+      out.lowOddBlocked = true;
+      out.investment = {
+        ...out.investment,
+        action: 'skip',
+        label: 'Cote trop basse',
+        score: Math.min(out.investment.score || 0, 14),
+        reasons: [...(out.investment?.reasons || []), `Cote @${odd.toFixed(2)} sous ton minimum @${userMinOdd.toFixed(2)}.`]
+      };
+    }
     if (isHandicapMarket(out.market)) {
       out.handicapRestricted = true;
       out.handicapException = isAllowedStrongHandicap(out);
@@ -2803,7 +2831,8 @@
     opts = opts || {};
     const candidates = buildMarketCandidates(match, pred, { requireExact: true });
     if (!candidates.length) return null;
-    const allowed = candidates.filter(c => !isBlockedHandicapMarket(c));
+    const minOdd = opts.minOdd || ((typeof getUserOddMin === 'function') ? getUserOddMin() : 2.00);
+    const allowed = candidates.filter(c => !isBlockedHandicapMarket(c) && Number(c.odd) >= minOdd);
     if (!allowed.length) return null;
     const pool = allowed.filter(c =>
       c.source === 'winamax_exact'
@@ -8587,7 +8616,7 @@
       onAdvChange();
     });
     if (byId('adv-reset')) byId('adv-reset').addEventListener('click', () => {
-      advFilters = { kellyMin: 0, oddMin: 0, oddMax: 0, league: '', valueOnly: false, evMin: 0, marketType: '', dataQualityMin: 0 };
+      advFilters = { kellyMin: 0, oddMin: getUserOddMin(), oddMax: 0, league: '', valueOnly: false, evMin: 0, marketType: '', dataQualityMin: 0 };
       try { window.advFilters = advFilters; } catch(err){}
       onAdvChange();
     });
@@ -11547,7 +11576,10 @@
             const ev = (typeof expectedValue === 'function') ? expectedValue(c.prob, c.odd) : (c.prob * c.odd - 1);
             const isSelected = c === best || (c.market === best.market && c.key === best.key && Math.abs(Number(c.odd) - Number(best.odd)) < 0.001);
             let status, statusColor, reason;
-            if (isBlockedHandicapMarket(c)) {
+            if (c.lowOddBlocked) {
+              status = '✗ Cote basse'; statusColor = 'var(--danger)';
+              reason = c.investment?.reasons?.slice(-1)[0] || 'Sous la cote minimum utilisateur';
+            } else if (isBlockedHandicapMarket(c)) {
               status = '✗ Masqué'; statusColor = 'var(--danger)';
               reason = 'Handicap masqué par préférence utilisateur';
             } else if (c.handicapException) {
@@ -15047,6 +15079,7 @@
       const v = parseFloat(localStorage.getItem('userBankroll'));
       return (isFinite(v) && v > 0) ? v : 50;
     })();
+    const userOddMin = (typeof getUserOddMin === 'function') ? getUserOddMin() : 2.00;
     // v30 — AUTO force-refresh si data >2h obsolète (avant : 6h, trop tard).
     // Le flag autoRefreshDone est maintenant timestamped → re-tente après
     // 30min (avant : bloqué pour toute la session, donc le user qui ouvre
@@ -15894,7 +15927,7 @@
         const odd = Number(p.odd || p.best?.odd || 0);
         const rel = Number(p.rel || p.best?.rel || 0);
         const edge = Number(p.edge ?? p.best?.edge ?? (odd > 1 ? rel - 1 / odd : 0));
-        if (!odd || odd <= 1.01 || !rel || edge <= 0) return;
+        if (!odd || odd <= 1.01 || odd < userOddMin || !rel || edge <= 0) return;
         const investment = p.investment || p.best?.investment || null;
         if (investment && investment.action === 'skip') return;
         bbfSeen.add(id);
@@ -16120,7 +16153,7 @@
         <div class="bbf-shell" data-phase="big-bets-first">
           <section class="bbf-command" aria-live="polite">
             <strong>${bbfBigBets[0] ? `Prochain gros pari : ${esc(bbfMarketLabel(bbfBigBets[0]))} @${Number(bbfBigBets[0].odd).toFixed(2)}` : 'Pas de pari urgent'}</strong>
-            <span>${_dataIsStale ? `Données trop anciennes (${_dataAgeMin} min) : refresh avant d'agir.` : `${bbfVisibleCount} paris affichables · ${bbfPool.length} analysés · bankroll ${userBankroll.toFixed(0)}€ · ${bbfClickCount} clic${bbfClickCount > 1 ? 's' : ''} Winamax`}</span>
+            <span>${_dataIsStale ? `Données trop anciennes (${_dataAgeMin} min) : refresh avant d'agir.` : `${bbfVisibleCount} paris affichables · cote min ${userOddMin.toFixed(2)} · bankroll ${userBankroll.toFixed(0)}€ · ${bbfClickCount} clic${bbfClickCount > 1 ? 's' : ''} Winamax`}</span>
           </section>
           ${bbfOffline}
           ${bbfCategoryChips}
@@ -19943,6 +19976,8 @@
     const currentContrast = prefs.contrast || 'normal';
     const currentReader = prefs.reader || 'off';
     const currentLevel = prefs.level || 'confirme';
+    const currentOddMin = (typeof getUserOddMin === 'function') ? getUserOddMin() : 2.00;
+    const currentOddIdx = Math.max(0, ODD_MIN_CHOICES.findIndex(v => Math.abs(v - currentOddMin) < 0.01));
     // v31.7.61 — Theme accent variant : default | lime | amber
     const currentAccent = prefs.accent || 'default';
 
@@ -20073,6 +20108,18 @@
           </div>
 
           ${bankrollSmartHtml}
+
+          <div class="card-base">
+            <h3 class="section-h3">🎯 Cote minimum</h3>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;">
+              <div style="font-size:12px;color:var(--text-dim);line-height:1.45;">Par défaut, l'accueil et les filtres cachent les micro-cotes. Objectif : moins de paris, mais plus de rendement.</div>
+              <strong id="pref-odd-min-label" style="font-size:24px;color:var(--c-accent);font-variant-numeric:tabular-nums;">@${currentOddMin.toFixed(2)}</strong>
+            </div>
+            <input id="pref-odd-min" type="range" min="0" max="4" step="1" value="${currentOddIdx}" aria-label="Cote minimum affichée" aria-valuetext="${currentOddMin.toFixed(2)}" style="width:100%;accent-color:var(--c-accent);"/>
+            <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-top:7px;font-size:10.5px;color:var(--text-dim);text-align:center;font-variant-numeric:tabular-nums;">
+              ${ODD_MIN_CHOICES.map(v => `<span>@${v.toFixed(2)}</span>`).join('')}
+            </div>
+          </div>
 
           <div class="card-base">
             <h3 class="section-h3">🔒 Seuil "pari sûr" ${(typeof helpDot === 'function') ? helpDot('À partir de quelle confiance un pari est-il étiqueté "sûr" ?<br><br><b>70% (défaut)</b> : plus de paris mais certains perdent<br><b>75%+</b> : moins de paris mais très fiables<br><b>65% ou moins</b> : beaucoup de paris, risqué') : ''}</h3>
@@ -20354,6 +20401,15 @@
       try { localStorage.setItem('bankrollLockedProfit', profit.toFixed(2)); } catch(e){}
       try { if (typeof toast === 'function') toast(`✓ Profits verrouillés : ${profit.toFixed(2)}€`, 'success'); } catch(e){}
       renderProfilPage(wrap);
+    });
+    const oddMinEl = wrap.querySelector('#pref-odd-min');
+    const oddMinLbl = wrap.querySelector('#pref-odd-min-label');
+    if (oddMinEl && oddMinLbl) oddMinEl.addEventListener('input', (e) => {
+      const idx = Math.max(0, Math.min(ODD_MIN_CHOICES.length - 1, parseInt(e.target.value, 10) || 0));
+      const v = setUserOddMin(ODD_MIN_CHOICES[idx]);
+      oddMinLbl.textContent = '@' + v.toFixed(2);
+      e.target.setAttribute('aria-valuetext', v.toFixed(2));
+      try { if (typeof toast === 'function') toast(`Cote minimum: @${v.toFixed(2)}`, 'success'); } catch(err){}
     });
     const lockEl = wrap.querySelector('#pref-lock-threshold');
     const lockLbl = wrap.querySelector('#pref-lock-label');
