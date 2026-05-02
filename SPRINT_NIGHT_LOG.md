@@ -217,3 +217,11 @@
 - Impact: `data.js` passe à `144` events avec blessures, warnings Santé 6 → 5, et le signal devient visible/actionnable côté modèle/UI
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.29 (2026-05-02 05:19 UTC)
+- Chantier: P-A3 Sofascore events
+- Avant: `sofascore_events.json.total=0` et Santé affichait `source vide`; le fetcher écrasait le fichier même quand une requête transitoire renvoyait zéro event
+- Après: `fetch_sofascore_events.py` ajoute `--debug`, `--date`, `--days`, `--sports`; protection anti-écrasement vide; run du 2026-05-02 collecte `2424` events multi-sports
+- Impact: source Sofascore réactivée (`0 → 2424`), warning Santé supprimé, filet de secours ESPN opérationnel sans perdre le dernier bon snapshot
+- Commit: pending
+- Status: ✅ DONE
