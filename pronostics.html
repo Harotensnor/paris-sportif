@@ -135,7 +135,7 @@
 <link rel="alternate" type="application/rss+xml" href="feed.xml" title="Paris-Sportif — Top picks du jour (RSS)">
 <!-- v35.07 — Seul le CSS est préchargé au boot. Le gros app.js?v=322bf117 reste en defer
      plus bas dans le body pour laisser le squelette critique peindre d'abord. -->
-<link rel="preload" href="app.css?v=b7f79a76" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<link rel="preload" href="app.css?v=e416bbc8" as="style" onload="this.onload=null;this.rel='stylesheet'">
 <!-- v31.1 — DNS-prefetch pour les CDN tiers utilisés sur la page (logos ESPN).
      v31.7.24 — Ajout `preconnect` pour a.espncdn.com (le plus utilisé) :
      le browser fait DNS + TLS handshake en parallèle du parse HTML, ce qui
@@ -224,7 +224,7 @@
      n'est chargé QU'APRÈS consentement explicite (cf. _maybeEnableAnalytics).
      Pas de tracking par défaut. -->
 <script src="analytics.config.js" defer onerror="this.remove();"></script>
-<noscript><link rel="stylesheet" href="app.css?v=b7f79a76"></noscript>
+<noscript><link rel="stylesheet" href="app.css?v=e416bbc8"></noscript>
 <script>
   // v22 — Init theme / contrast / reader BEFORE body render (évite le flash)
   (function() {
@@ -463,7 +463,7 @@
         </svg>
       </div>
       <div class="tb-brand-text">
-        <span class="tb-brand-name">Pronostics</span>
+        <span class="tb-brand-name">PARIS-<span class="tb-brand-accent">SPORTIF</span></span>
         <span class="tb-brand-sub" id="sub">Foot · Tennis · NBA · NHL · MLB</span>
       </div>
     </a>
@@ -652,7 +652,7 @@
         </div>
       </div>
     </section>
-    <!-- v31.2 — Friendly error state (audit UX). Avant : "Fichier data.js?v=97d6b524
+    <!-- v31.2 — Friendly error state (audit UX). Avant : "Fichier data.js?v=b9f5d7fa
          introuvable" brut, casse la confiance. Maintenant : message rassurant
          avec retry + dernier refresh + offline fallback explanation. -->
     <div id="no-data-banner" class="error-banner hidden" role="alert" aria-live="polite">
@@ -735,7 +735,7 @@
       <div class="footer-brand">
         <span class="footer-logo">🎯</span>
         <span class="footer-text">Paris-Sportif</span>
-        <span class="footer-version" id="footer-version" role="button" tabindex="0" style="cursor:pointer;" title="Voir les nouveautés v35.85">v35.85</span>
+        <span class="footer-version" id="footer-version" role="button" tabindex="0" style="cursor:pointer;" title="Voir les nouveautés v35.86">v35.86</span>
       </div>
       <nav class="footer-links" aria-label="Liens du site">
         <a href="https://github.com/Harotensnor/paris-sportif" target="_blank" rel="noopener" class="footer-link" title="Code source sur GitHub">
@@ -820,8 +820,8 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="data.js?v=3fe73e97"></script>
-<script src="app.js?v=4e20d5d4" defer></script>
+<script src="data.js?v=b9f5d7fa"></script>
+<script src="app.js?v=322bf117" defer></script>
 
 <!-- enhancements v20 -->
 <script data-tag="__paris_sportif_enh_v20__">
