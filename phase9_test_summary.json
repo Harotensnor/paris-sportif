@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-05-02T15:57:05.338492+00:00",
+  "generated_at": "2026-05-02T16:15:02.1232216Z",
   "phase": "phase9_finale",
-  "sprint": "v35.140",
+  "sprint": "v35.144",
   "smoke_e2e": {
     "status": "passed",
-    "note": "dashboard/performance/favoris/sante/academie/profil/backtest/alertes/historique terminal-value and mobile overflow all green"
+    "note": "post v35.143 smoke green: dashboard/performance/favoris/sante/academie/profil/backtest/alertes/historique + terminal value + mobile overflow"
   },
   "click_audit": {
     "status": "passed",
-    "clicks": 164,
+    "clicks": 167,
     "failures": 0
   },
   "modal_tabs": {
@@ -28,12 +28,12 @@
     "steps_detail": [
       {
         "step": "modal_opened",
-        "title": "Como vs Napoli"
+        "title": "Royal Charleroi SC vs Racing Genk"
       },
       {
         "step": "winamax_cta",
         "clicked": true,
-        "href": "https://www.winamax.fr/paris-sportifs/match/61061629",
+        "href": "https://www.winamax.fr/paris-sportifs/match/70207488",
         "before": 0,
         "after": 1
       },
@@ -43,5 +43,11 @@
         "after": 1
       }
     ]
+  },
+  "a11y": {
+    "critical": 0,
+    "serious": 0,
+    "moderate": 20,
+    "note": "from v35.143 a11y-report.json"
   }
 }
