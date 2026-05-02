@@ -24561,13 +24561,14 @@
       } catch(e) { return ''; }
     })();
     wrap.innerHTML = `
-      ${_healthWidget}
       <div class="page-wrap">
         <div class="page-header">
           <div class="lbl-tiny u-text-brand">Performance · ${esc(tabs.find(t => t.k === currentTab)?.lbl || 'Vue globale')}</div>
           <h1 class="page-h1">🎯 Performance</h1>
           <div class="u-text-md u-text-dim">Synthèse du modèle sur ${n} pari${n > 1 ? 's' : ''} simulé${n > 1 ? 's' : ''}. Drill-down dans les onglets : Historique, Bilan, Backtest.</div>
         </div>
+
+        ${_healthWidget}
 
         ${subTabsHtml}
 

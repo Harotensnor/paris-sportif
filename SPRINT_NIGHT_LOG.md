@@ -200,6 +200,14 @@
 - Commit: pending
 - Status: ✅ DONE
 
+## Sprint v35.110 (2026-05-02 13:42 UTC)
+- Chantier: P-8.11 révision page Performance
+- Avant: le diagnostic pipeline s’affichait avant le titre Performance
+- Après: H1/page header d’abord, puis diagnostic et onglets
+- Impact: hiérarchie claire, page moins “empilement mobile”
+- Commit: pending
+- Status: ✅ DONE
+
 ## Sprint v35.109 (2026-05-02 13:33 UTC)
 - Chantier: P-8.10 révision page Tous
 - Avant: lignes mobiles compressées en 3 colonnes, noms/picks trop serrés

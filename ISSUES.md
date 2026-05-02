@@ -115,7 +115,7 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Preuve : `.cache/phase4-phase6-baseline/legal-mobile.png`
 - Constat : la marque `Paris-Sportif` et les liens header se chevauchent / se superposent dans le premier écran.
 - Action : adapter le header statique mobile : logo sur une ligne, nav en dessous ou menu compact.
-- Statut : OPEN
+- Statut : FIXED v35.110 — le H1 Performance repasse avant le diagnostic pipeline.
 
 ### P6-VIS-011 — Footer mobile trop lourd et redondant
 
