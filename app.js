@@ -4993,7 +4993,7 @@
   _loadModelCalibration();
 
   // v31.7.32 — Trust strip helper. Lit __backtestReportV2 et patch les 4
-  // KPIs visibles (locks WR / ROI flat / Brier / n picks). Respecte le
+  // KPIs visibles (Big Bets / ROI flat / Brier / n picks). Respecte le
   // dismiss persisté en localStorage `trustStripHiddenUntil` (timestamp ms).
   function _populateTrustStrip(rep) {
     const strip = document.getElementById('trust-strip');
@@ -5004,12 +5004,17 @@
       if (until > Date.now()) return;  // Encore masqué
     } catch (e) {}
     const overall = rep.overall || {};
-    const locks = (rep.by_tier || {}).lock || {};
+    const tiers = rep.by_tier || {};
+    const bigBets = tiers.big_bet || {};
+    const locks = tiers.lock || {};
+    const headlineTier = Object.prototype.hasOwnProperty.call(bigBets, 'n') ? bigBets : locks;
     const setText = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
-    if (locks.n > 0) {
-      setText('trust-locks-wr', Math.round((locks.win_rate || 0) * 100) + '%');
+    const firstLabel = document.querySelector('#trust-locks-wr + .trust-strip-lbl');
+    if (firstLabel) firstLabel.textContent = Object.prototype.hasOwnProperty.call(bigBets, 'n') ? 'Big Bets' : 'locks WR';
+    if (headlineTier.n > 0) {
+      setText('trust-locks-wr', Math.round((headlineTier.win_rate || 0) * 100) + '%');
     } else {
-      setText('trust-locks-wr', '—');
+      setText('trust-locks-wr', '0');
     }
     if (overall.n > 0) {
       const roiPct = overall.flat_roi_pct || 0;

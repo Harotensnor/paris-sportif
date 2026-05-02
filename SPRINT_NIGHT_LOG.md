@@ -413,3 +413,11 @@
 - Impact: baseline Phase 4 stockée dans `.cache/phase4-baseline-v35.51`; self-check diff `0.00%`, smoke E2E vert, drift pipeline OK, bundles OK
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.53 (2026-05-02 07:33 UTC)
+- Chantier: P-4.1 tier `big_bet` backtest
+- Avant: `by_tier=lock,skip,standard`; aucun tier `big_bet`; table tier sans Wilson 95%; bandeau mobile affichait `— locks WR` quand aucun lock n'était scoré
+- Après: `by_tier=big_bet,lock,standard,lowconf,skip`; définition `edge >= 8pt` + `confiance >= 65%`; `big_bet n=0` explicite; table tier avec Wilson 95%, Brier et edge moyen; bandeau affiche `0 Big Bets`
+- Impact: abstention Big Bet mesurée au lieu d'être cachée; backtest `495` picks, ROI flat `+0.53%`, Brier `0.229`; visual diff `16.35%` attendu (KPI/report refresh global), layout OK
+- Commit: pending
+- Status: ✅ DONE
