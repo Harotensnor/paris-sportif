@@ -64,6 +64,7 @@ FETCH_STAGES = [
     ('fetch_clubelo.py',            1,   30),   # self-throttled 1/20h
     ('fetch_understat_xg.py',     240,  120),   # top-5 xG, self-throttled / slow-ish
     ('snapshot_odds.py',           1,   30),   # freeze pre-match odds
+    ('detect_smart_money.py',      1,   30),   # odds_history steam detector
     ('snapshot_results.py',        1,   30),   # archive completed matches (long backtest window)
     ('fetch_tips.py',             15,  120),   # RdJ, respectful cadence
     ('fetch_injuries_soccer.py',  30,  180),   # Sofascore, every 30min (self-throttle interne)
@@ -92,6 +93,7 @@ PATCH_STAGES = [
     ('patch_winamax_markets.py',    1,   30),
     ('patch_all_quick.py',          1,   30),
     ('patch_understat_xg.py',       1,   30),
+    ('patch_smart_money.py',        1,   30),
     ('inject_data_in_html.py',      1,   15),
     # Pipeline status snapshot (health.json) — runs every tick, cheap.
     ('build_health.py',             1,   15),

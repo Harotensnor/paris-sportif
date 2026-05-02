@@ -6207,6 +6207,28 @@
         final.pA += shift;
       }
 
+      // v35.41 — Smart-money odds move. If odds_history shows a meaningful
+      // pre-match price drop on one side, apply a small capped nudge toward
+      // that side. This is intentionally weaker than team signals: market
+      // steam can be news, sharp action, or noise.
+      const sm = match.smart_money;
+      if (sm && Number(sm.confidence || 0) >= 0.55 && Number(sm.odd_drop_pct || 0) >= 8) {
+        const smShift = Math.max(0.006, Math.min(0.025, Number(sm.odd_drop_pct || 0) / 600));
+        if (sm.side === 'home') {
+          final.pH += smShift;
+          final.pA -= smShift * (hasDraw ? 0.65 : 1);
+          if (hasDraw) final.pD -= smShift * 0.35;
+        } else if (sm.side === 'away') {
+          final.pA += smShift;
+          final.pH -= smShift * (hasDraw ? 0.65 : 1);
+          if (hasDraw) final.pD -= smShift * 0.35;
+        } else if (hasDraw && sm.side === 'draw') {
+          final.pD += smShift;
+          final.pH -= smShift / 2;
+          final.pA -= smShift / 2;
+        }
+      }
+
       // Draw balance — Chantier 3 fix (2026-04-20) + AUDIT 2026-05-01.
       // Le user a re-signalé : "tu pronostique JAMAIS le match nul, bizarre".
       // Diagnostic : sur 251 matchs foot, seulement 3 picks 'X' (1.2%) alors
@@ -8644,6 +8666,7 @@
       const tIn = fmtIn(startIn);
       const myBet = getMyBet(m.id, pred.pick.key);
       const lm = lineMovement(m, pred.pick.key);
+      const smartMoney = m.smart_money;
       const reasons = pred.explain?.reasons || [];
       const topReasons = reasons.slice(0, 3);
       const wmxUrl = winamaxUrl(m);
@@ -8691,6 +8714,7 @@
               }
               return `<span title="Cote ${lm.before.toFixed(2)} → ${lm.after.toFixed(2)}. ${sevTxt} drift — marché s'éloigne." style="padding:5px 12px;border-radius:8px;background:rgba(248,113,113,${intensity});color:var(--danger);font-weight:700;font-size:12.5px;">📈 ${sevTxt} +${lm.deltaPct.toFixed(1)}%</span>`;
             })() : ''}
+            ${smartMoney ? `<span title="Cote ${Number(smartMoney.odd_open || 0).toFixed(2)} → ${Number(smartMoney.odd_latest || 0).toFixed(2)} · ${Number(smartMoney.snapshots || 0)} snapshots · confiance ${(Number(smartMoney.confidence || 0)*100).toFixed(0)}%" style="padding:5px 12px;border-radius:8px;background:rgba(52,211,153,.16);color:var(--accent);font-weight:700;font-size:12.5px;">💸 Smart money ${esc(smartMoney.pick_key || smartMoney.side || '')} -${Number(smartMoney.odd_drop_pct || 0).toFixed(1)}%</span>` : ''}
             ${(() => {
               const rel = pred.reliability ?? pred.pick.prob;
               const edge = valueBetEdge(rel, pickOdd);
