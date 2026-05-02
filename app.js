@@ -15774,6 +15774,24 @@
       const bbfOffline = (typeof navigator !== 'undefined' && navigator.onLine === false)
         ? `<section class="bbf-empty bbf-empty--small" style="margin:10px 0 0;border-color:rgba(245,158,11,.35);background:rgba(245,158,11,.08);"><strong>📡 Hors ligne — derniers paris en cache.</strong><span>Vérifie les cotes Winamax avant toute mise réelle.</span></section>`
         : '';
+      const bbfSportCounts = (_dataIsStale ? [] : todayAllWinamax)
+        .filter(m => m && !m.completed)
+        .reduce((acc, m) => {
+          const sp = String(m.sport || 'other');
+          acc[sp] = (acc[sp] || 0) + 1;
+          return acc;
+        }, {});
+      const bbfHotCount = bbfPool.filter(p => p.pred?.isLock || (p.edge >= 0.08 && p.rel >= 0.65)).length;
+      const bbfChipOrder = ['football', 'tennis', 'basketball', 'hockey', 'baseball', 'american-football', 'mma', 'golf', 'racing'];
+      const bbfSportChips = bbfChipOrder
+        .filter(sp => Number(bbfSportCounts[sp] || 0) > 0)
+        .map(sp => {
+          const cls = String(sp).replace(/[^a-z0-9-]/gi, '').toLowerCase();
+          return `<a class="bbf-chip bbf-chip--${esc(cls)}" href="#tous?sport=${encodeURIComponent(sp)}" aria-label="Voir les paris ${esc(sportLabel(sp))}"><span>${sportIcon(sp)}</span><b>${esc(sportLabel(sp))}</b><em>${bbfSportCounts[sp]}</em></a>`;
+        }).join('');
+      const bbfCategoryChips = (bbfHotCount || bbfSportChips)
+        ? `<nav class="bbf-chips" aria-label="Catégories de paris">${bbfHotCount ? `<a class="bbf-chip bbf-chip--hot" href="#tous?edge=8" aria-label="Voir les paris HOT"><span>🔥</span><b>HOT</b><em>${bbfHotCount}</em></a>` : ''}${bbfSportChips}</nav>`
+        : '';
       const bbfClickCount = (() => {
         try { return Number(JSON.parse(localStorage.getItem('paris_sportif_winamax_clicks_v1') || '{}').count || 0); }
         catch(e) { return 0; }
@@ -15785,6 +15803,7 @@
             <span>${_dataIsStale ? `Données trop anciennes (${_dataAgeMin} min) : refresh avant d'agir.` : `${bbfPool.length} paris value analysés · bankroll ${userBankroll.toFixed(0)}€ · ${bbfClickCount} clic${bbfClickCount > 1 ? 's' : ''} Winamax suivis`}</span>
           </section>
           ${bbfOffline}
+          ${bbfCategoryChips}
 
           <section class="bbf-hero" aria-labelledby="bbf-title">
             <div class="bbf-hero__head">
