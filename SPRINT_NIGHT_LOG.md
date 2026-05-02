@@ -1411,3 +1411,9 @@
 - Après: data_sources.md documente TheSportsDB et OpenLigaDB avec endpoints, limites, risques et cadence.
 - Impact: backlog data clair sans activer de scraping risqué ni toucher au modèle.
 - Vérif: docs officielles consultées, check_bundle_size OK.
+
+## Sprint v35.188 — Phase 10 P-10.35 Export CSV historique (22:00 UTC)
+- Avant: l'export historique CSV ne séparait pas home/away et n'avait pas CLV/Brier.
+- Après: colonnes date,sport,league,home,away,pick,odd,result,pl,clv,brier + métriques utiles.
+- Impact: analyse Excel plus propre des picks historiques et du P&L.
+- Vérif: node --check app.js, bundle OK, diff check OK.
