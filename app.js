@@ -7039,6 +7039,22 @@
       }
     } catch (e) { /* fail-safe : ne casse pas la prédiction si la détection foire */ }
 
+    const pickOdd = best_pick[2] === '1' ? best?.home : best_pick[2] === '2' ? best?.away : best?.draw;
+    const pickEdge = Number(pickOdd) > 1 ? reliability - (1 / Number(pickOdd)) : null;
+    const dqNow = (typeof computeDataQuality === 'function') ? computeDataQuality(match) : { score: 4, max: 4 };
+    const abstainReasons = [];
+    if (reliability < 0.50) abstainReasons.push('confidence_lt_50');
+    if (pickEdge != null && pickEdge < 0.02) abstainReasons.push('edge_lt_2pt');
+    if ((ensembleMeta?.agreement_variance || 0) > 0.15) abstainReasons.push('model_disagreement');
+    if ((Number(dqNow?.score) || 0) < 2) abstainReasons.push('data_quality_lt_2');
+    const abstain = {
+      active: abstainReasons.length > 0,
+      reasons: abstainReasons,
+      edge: pickEdge == null ? null : Math.round(pickEdge * 1000) / 1000,
+      data_quality: { score: Number(dqNow?.score) || 0, max: Number(dqNow?.max) || 4 },
+      variance: ensembleMeta?.agreement_variance || 0
+    };
+
     return {
       probs: final,
       pick: { label: best_pick[0], prob: best_pick[1], key: best_pick[2], team: best_pick[3] },
@@ -7077,7 +7093,8 @@
       // avg_rel 71.7% → modèle sur-confiant ~3pt → ROI flat -7.7%. En relevant
       // le seuil à 0.75 spécifiquement pour les heavy_fav, on retire les
       // picks border-line où l'edge perçu est largement un mirage de bruit.
-      skip: reliability < 0.50
+      skip: abstain.active
+        || reliability < 0.50
         || pureCompCount < (match.sport === 'tennis' ? 1 : 2)
         || (match.sport === 'tennis'
             && !match.tennis_features
@@ -7090,6 +7107,7 @@
       // backtest_v2) get a stricter lock threshold: 0.75 instead of 0.70.
       // Avoids over-confident "lock" labels on tiny samples.
       isLockStrict: reliability >= 0.75,
+      abstain,
       poisson: poi ? { xgH: poi.lamH, xgA: poi.lamA, fbrefBlend: poi.fbrefBlend || null } : null,
       // Scores probables — shape varie selon le sport (Chantier 6 + K) :
       //   foot   : array[{home, away, prob}] (legacy, kind 'exact' implicite)
