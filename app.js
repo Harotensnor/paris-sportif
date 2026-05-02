@@ -16306,7 +16306,7 @@
     }
 
     wrap.innerHTML = `
-      <div style="max-width:1280px;margin:0 auto;padding:0 20px;font-variant-numeric:tabular-nums;">
+      <div style="max-width:1500px;margin:0 auto;padding:0 20px;font-variant-numeric:tabular-nums;">
 
         ${_dashboardCockpit}
 
@@ -18769,7 +18769,7 @@
     })();
 
     wrap.innerHTML = `
-      <div style="max-width:1280px;margin:0 auto;padding:16px 8px 24px;font-variant-numeric:tabular-nums;">
+      <div style="max-width:1500px;margin:0 auto;padding:16px 8px 24px;font-variant-numeric:tabular-nums;">
         <div style="padding:40px 0 20px;border-bottom:1px solid var(--border);">
           <div style="font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Aujourd'hui · Winamax</div>
           <h1 style="margin:0 0 6px;font-size:32px;font-weight:800;letter-spacing:-1.1px;color:var(--text);line-height:1.1;">Tous les pronos du jour</h1>
@@ -19307,7 +19307,7 @@
       </div>`).join('');
 
     wrap.innerHTML = `
-      <div style="max-width:1280px;margin:0 auto;padding:16px 8px 24px;">
+      <div style="max-width:1500px;margin:0 auto;padding:16px 8px 24px;">
         <div style="margin-bottom:32px;padding:40px 0 24px;border-bottom:1px solid var(--border);">
           <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Pédagogie</div>
           <h1 style="margin:0 0 8px;font-size:40px;font-weight:800;letter-spacing:-1.4px;color:var(--text);line-height:1.1;">Guide</h1>
@@ -19496,7 +19496,7 @@
     const nTotal = matches.length;
 
     wrap.innerHTML = `
-      <div style="max-width:1280px;margin:0 auto;padding:16px 8px 24px;">
+      <div style="max-width:1500px;margin:0 auto;padding:16px 8px 24px;">
         <div style="margin-bottom:28px;padding:32px 0 20px;border-bottom:1px solid var(--border);position:relative;">
           <div style="position:absolute;top:0;left:0;width:40px;height:3px;background:var(--accent);border-radius:0 0 2px 2px;"></div>
           <div style="font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Prono buts · Football</div>
@@ -19538,7 +19538,7 @@
   // Théo n'enregistre pas ses paris sur le site → tout ce bloc retiré.
   function renderBacktestPage(wrap) {
     wrap.innerHTML = `
-      <div style="max-width:1280px;margin:0 auto;padding:16px 8px 24px;">
+      <div style="max-width:1500px;margin:0 auto;padding:16px 8px 24px;">
         <div class="page-header">
           <div style="position:absolute;top:0;left:0;width:40px;height:3px;background:var(--brand);border-radius:0 0 2px 2px;"></div>
           <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Backtest historique · cron hebdo</div>
@@ -21287,7 +21287,7 @@
       if (!suiviNav) {
         suiviNav = document.createElement('div');
         suiviNav.id = 'suivi-subnav';
-        suiviNav.style.cssText = 'max-width:1280px;margin:0 auto;padding:12px 8px 4px;display:flex;gap:6px;flex-wrap:wrap;';
+        suiviNav.style.cssText = 'max-width:1500px;margin:0 auto;padding:12px 8px 4px;display:flex;gap:6px;flex-wrap:wrap;';
         (document.querySelector('main') || document.body).insertBefore(suiviNav, (document.querySelector('main') || document.body).firstChild);
       }
       const tabs = [
@@ -21321,7 +21321,7 @@
       if (!pronosNav) {
         pronosNav = document.createElement('div');
         pronosNav.id = 'pronos-subnav';
-        pronosNav.style.cssText = 'max-width:1280px;margin:0 auto;padding:12px 8px 4px;display:flex;gap:6px;flex-wrap:wrap;';
+        pronosNav.style.cssText = 'max-width:1500px;margin:0 auto;padding:12px 8px 4px;display:flex;gap:6px;flex-wrap:wrap;';
         (document.querySelector('main') || document.body).insertBefore(pronosNav, (document.querySelector('main') || document.body).firstChild);
       }
       const tabs = [
@@ -21360,7 +21360,7 @@
       if (!topH1) {
         topH1 = document.createElement('div');
         topH1.id = 'top-page-h1';
-        topH1.style.cssText = 'max-width:1280px;margin:0 auto;padding:8px 8px 0;';
+        topH1.style.cssText = 'max-width:1500px;margin:0 auto;padding:8px 8px 0;';
         topH1.innerHTML = '<span class="section-eyebrow">Sélection du modèle</span><h1 class="section-title-v2" style="margin-bottom:6px;">⭐ Top du jour</h1><p class="section-subtitle-v2" style="margin-bottom:18px;">Les picks les plus solides selon le modèle, classés par valeur (edge × confiance).</p>';
         tp.parentElement.insertBefore(topH1, tp);
       }
@@ -24497,7 +24497,7 @@
         const dot = (mins) => mins < 30 ? '🟢' : mins < 120 ? '🟡' : '🔴';
         const fmtAge = (mins) => mins < 60 ? `${mins}m` : `${(mins/60).toFixed(1)}h`;
         return `
-          <div style="max-width:1280px;margin:14px auto 8px;padding:14px 18px;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${overallColor};border-radius:var(--r-md);font-variant-numeric:tabular-nums;">
+          <div style="max-width:1500px;margin:14px auto 8px;padding:14px 18px;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${overallColor};border-radius:var(--r-md);font-variant-numeric:tabular-nums;">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
               <div>
                 <span style="font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;">📡 Pipeline data</span>
@@ -27296,7 +27296,7 @@
     };
 
     wrap.innerHTML = `
-      <div style="max-width:1280px;margin:0 auto;padding:0 20px;">
+      <div style="max-width:1500px;margin:0 auto;padding:0 20px;">
         <div style="margin-bottom:24px;">
           <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:4px;">🔁 Comparateur</div>
           <h1 style="margin:0 0 6px;font-size:30px;font-weight:800;letter-spacing:-1.0px;color:var(--text);">Comparer 2 jours côte à côte</h1>
@@ -27402,7 +27402,7 @@
     const _totalPicksInWindow = _availSports.reduce((s, [,c]) => s + c, 0);
     // v31.7.28 a11y : role=toolbar + aria-pressed sur les pills sport-filter.
     const _sportFilterHtml = _availSports.length >= 2 ? `
-      <div role="toolbar" aria-label="Filtrer le bilan par sport" style="max-width:1280px;margin:0 auto 16px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-variant-numeric:tabular-nums;">
+      <div role="toolbar" aria-label="Filtrer le bilan par sport" style="max-width:1500px;margin:0 auto 16px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-variant-numeric:tabular-nums;">
         <span style="font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-dim2);font-weight:700;margin-right:4px;">Filtrer par sport</span>
         <button class="bilan-sport-btn${_bilanSport === null ? ' active' : ''}" data-sport="" title="Tous les sports" aria-label="Afficher tous les sports" aria-pressed="${_bilanSport === null}" style="padding:6px 12px;border-radius:6px;border:1px solid ${_bilanSport === null ? 'var(--brand)' : 'var(--border)'};background:${_bilanSport === null ? 'rgba(167,139,250,.12)' : 'var(--panel)'};color:${_bilanSport === null ? 'var(--brand)' : 'var(--text-dim)'};font-size:12px;font-weight:${_bilanSport === null ? 700 : 500};cursor:pointer;display:inline-flex;align-items:center;gap:6px;">Tous<span style="opacity:.6;">${_totalPicksInWindow}</span></button>
         ${_availSports.map(([sp, n]) => `<button class="bilan-sport-btn${_bilanSport === sp ? ' active' : ''}" data-sport="${esc(sp)}" title="${esc(sportLabel(sp))} · ${n} pari${n>1?'s':''}" aria-label="Filtrer sur ${esc(sportLabel(sp))}, ${n} pari${n>1?'s':''}" aria-pressed="${_bilanSport === sp}" style="padding:6px 12px;border-radius:6px;border:1px solid ${_bilanSport === sp ? 'var(--brand)' : 'var(--border)'};background:${_bilanSport === sp ? 'rgba(167,139,250,.12)' : 'var(--panel)'};color:${_bilanSport === sp ? 'var(--brand)' : 'var(--text-dim)'};font-size:12px;font-weight:${_bilanSport === sp ? 700 : 500};cursor:pointer;display:inline-flex;align-items:center;gap:6px;">${sportIcon(sp)} ${esc(sportLabel(sp))}<span style="opacity:.6;">${n}</span></button>`).join('')}
@@ -28402,7 +28402,7 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       });
     } catch (e) {}
     const epochBannerHtml = preEpochCount > 0 ? `
-      <div style="margin:12px auto 18px;padding:10px 14px;max-width:1280px;background:rgba(234,179,8,.08);border:1px solid rgba(234,179,8,.25);border-left:3px solid var(--warn,#eab308);border-radius:0 8px 8px 0;font-size:12.5px;color:var(--text-dim);line-height:1.45;">
+      <div style="margin:12px auto 18px;padding:10px 14px;max-width:1500px;background:rgba(234,179,8,.08);border:1px solid rgba(234,179,8,.25);border-left:3px solid var(--warn,#eab308);border-radius:0 8px 8px 0;font-size:12.5px;color:var(--text-dim);line-height:1.45;">
         <strong class="u-text">⚠️ Epoch ${ALIGNMENT_EPOCH_ISO}</strong> — Avant cette date, l'alignement des cotes Winamax 1n2 inversait home/away sur ~65 events (tennis, basket, hockey, foot). Les paris pris avant le ${ALIGNMENT_EPOCH_ISO} ont une part de phantom edge dans le bilan rétro. À partir de ce jour, c'est propre. <a href="#credibilite" class="u-text-accent">Détails →</a>
       </div>
     ` : '';
@@ -28441,7 +28441,7 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         const pausedHours = Math.ceil(pausedRemainingMs / 3600000);
         // Build the widget
         return `
-          <div style="max-width:1280px;margin:18px auto 12px;padding:18px 22px;background:linear-gradient(135deg,var(--panel) 0%, var(--panel-2) 100%);border:1px solid var(--border-2);border-left:4px solid ${navColor};border-radius:var(--r-md);box-shadow:var(--shadow-sm);font-variant-numeric:tabular-nums;">
+          <div style="max-width:1500px;margin:18px auto 12px;padding:18px 22px;background:linear-gradient(135deg,var(--panel) 0%, var(--panel-2) 100%);border:1px solid var(--border-2);border-left:4px solid ${navColor};border-radius:var(--r-md);box-shadow:var(--shadow-sm);font-variant-numeric:tabular-nums;">
             <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;">
               <div style="flex:1;min-width:240px;">
                 <div style="font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:4px;" title="L'agent autonome est une simulation : il parie virtuellement chaque pick value avec Kelly fractionné (0.25×, cap 10%/pari, cap 20%/jour). Démarré à 10€ — son seul but est de tester la rentabilité du modèle sans toucher à ta vraie bankroll.">🤖 Agent autonome · cagnotte simulée 10€ depuis J1</div>
@@ -28503,7 +28503,7 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       ${windowToolbarHtml}
 
       <!-- v31.7.8 — Bouton Export CSV du bilan -->
-      <div style="max-width:1280px;margin:0 auto 14px;display:flex;justify-content:flex-end;gap:8px;align-items:center;">
+      <div style="max-width:1500px;margin:0 auto 14px;display:flex;justify-content:flex-end;gap:8px;align-items:center;">
         <button id="bilan-export-csv" type="button" style="padding:8px 14px;background:transparent;border:1px solid var(--border-2);color:var(--text-dim);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .15s ease;">
           ⬇ Export CSV (${rows.length} paris)
         </button>
