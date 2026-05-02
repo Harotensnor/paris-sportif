@@ -125,8 +125,10 @@ jobs:
           # Patches : SÉQUENTIELS (tous écrivent data.js → race-condition si parallèle)
           # v33.30 — Patches "lourds" qui ont une logique spécifique (dedup,
           # multi-market lookup, merge events). Restent en scripts séparés.
-          python3 patch_winamax.py || true
           python3 patch_sofascore_events.py || true
+          # v35.36 — Sofascore merge can add non-exact fallback events. Filter
+          # after the merge so the served dataset remains Winamax-exact only.
+          python3 patch_winamax.py || true
           python3 patch_winamax_markets.py || true
           # v35.26 — Top-up léger des pages match Winamax à CHAQUE refresh.
           # Le catalog tournament garde le 1N2, puis ce passage remplit
