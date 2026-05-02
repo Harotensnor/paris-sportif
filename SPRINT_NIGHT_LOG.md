@@ -925,3 +925,11 @@
 - Impact: les pages d’analyse arrêtent de ressembler à une vue mobile centrée
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.117 (2026-05-02 14:08 UTC)
+- Chantier: P-9.0a cohérence inter-marchés
+- Avant: aucun garde-fou pur pour repérer Score exact vs BTTS/O-U/1N2 contradictoires
+- Après: helpers scoreToImpliedMarkets/isPairConsistent/validateMarketConsistency exposés pour tests
+- Impact: base logique prête pour bloquer 1-0 + BTTS Oui et autres impossibilités
+- Commit: pending
+- Status: ✅ DONE
