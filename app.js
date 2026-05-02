@@ -1811,6 +1811,20 @@
   function fmtFullDate(iso) { return new Date(iso + 'T12:00').toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' }); }
   function fmtTime(d) { if (!d) return '—'; try { return new Date(d).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}); } catch(e) { return '—'; } }
   function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function getBetStrengthMeta(p) {
+    const edge = Number(p?.edge ?? p?.best?.edge ?? 0);
+    const rel = Number(p?.rel ?? p?.best?.rel ?? p?.pred?.reliability ?? p?.pred?.pick?.prob ?? 0);
+    const isLock = !!(p?.pred?.isLock || p?.isLock);
+    if (isLock || (edge >= 0.08 && rel >= 0.65)) return { cls: 'bbf-strength--big', label: 'BIG BET', heat: '🔥🔥🔥', title: 'Gros pari : edge élevé et confiance solide.' };
+    if (edge >= 0.04 && rel >= 0.55) return { cls: 'bbf-strength--strong', label: 'STRONG', heat: '🔥🔥', title: 'Bonne opportunité : value nette avec confiance correcte.' };
+    if (edge >= 0.02) return { cls: 'bbf-strength--standard', label: 'STANDARD', heat: '🔥', title: 'Pari value standard : positif, mais moins prioritaire.' };
+    return { cls: 'bbf-strength--risk', label: 'RISQUÉ', heat: '⚠️', title: 'Variance ou confiance insuffisante : prudence.' };
+  }
+  function BetStrengthBadge(p, extraClass = '') {
+    const strength = getBetStrengthMeta(p);
+    return `<span class="bbf-strength bet-strength-badge ${strength.cls}${extraClass ? ` ${esc(extraClass)}` : ''}" title="${esc(strength.title)}" aria-label="${esc(strength.label)}">${strength.heat} ${esc(strength.label)}</span>`;
+  }
+  try { window.getBetStrengthMeta = getBetStrengthMeta; window.BetStrengthBadge = BetStrengthBadge; } catch(e) {}
   // Display money in whole euros — no centimes (user request). Keeps internals
   // (stake math, bilan totals) at full precision; only the UI rounds to €.
   // Accepts number or numeric-string; returns "12€" / "-3€" / "0€".
@@ -15631,12 +15645,7 @@
         .filter(p => !bbfBigIds.has(String(p.m.id || '')))
         .slice(0, 60);
       const bbfMarketCount = bbfPool.reduce((sum, p) => sum + Math.max(1, Number(p.best?.allCandidates?.length || 0)), 0);
-      const bbfStrength = (p) => {
-        if (p?.pred?.isLock || (p.edge >= 0.08 && p.rel >= 0.65)) return { cls: 'bbf-strength--big', label: 'BIG BET', heat: '🔥🔥🔥' };
-        if (p.edge >= 0.04 && p.rel >= 0.55) return { cls: 'bbf-strength--strong', label: 'STRONG', heat: '🔥🔥' };
-        if (p.edge >= 0.02) return { cls: 'bbf-strength--standard', label: 'STANDARD', heat: '🔥' };
-        return { cls: 'bbf-strength--risk', label: 'RISQUÉ', heat: '⚠️' };
-      };
+      const bbfStrength = getBetStrengthMeta;
       const bbfMarketLabel = (p) => {
         const label = p.best?.label || p.pred?.pick?.label || 'Pari conseillé';
         return String(label).replace(/\bOver\b/gi, 'Plus de').replace(/\bUnder\b/gi, 'Moins de').replace(/\bBTTS\b/gi, 'Les deux marquent');
@@ -15680,7 +15689,7 @@
               <div>${logo(away)}<strong>${esc(bbfTeamName(away))}</strong></div>
             </div>
             <div class="bbf-card__bet">
-              <span class="bbf-strength ${strength.cls}">${strength.heat} ${strength.label}</span>
+              ${BetStrengthBadge(p)}
               <strong>${esc(bbfMarketLabel(p))} <b>@${Number(p.odd).toFixed(2)}</b></strong>
               <small>+${(p.edge * 100).toFixed(1)}% mieux que le marché · gain possible ${gain.toFixed(2)}€ pour ${stake}€</small>
             </div>
@@ -15704,7 +15713,7 @@
             <strong>${esc(bbfTeamName(home))} vs ${esc(bbfTeamName(away))}</strong>
             <em>${esc(bbfMarketLabel(p))}</em>
             <b>@${Number(p.odd).toFixed(2)}</b>
-            <i class="${strength.cls}">+${(p.edge * 100).toFixed(1)}%</i>
+            <i class="${strength.cls}">${strength.heat} +${(p.edge * 100).toFixed(1)}%</i>
           </button>`;
       };
       const bbfEmpty = `
@@ -18047,6 +18056,7 @@
       // Bug-hunt 2026-05-02 : edge color signalé négatif (rouge) au lieu de gris neutre
       const edgeColor = p.edge > 0.10 ? 'var(--accent)' : p.edge > 0.05 ? '#fbbf24' : p.edge < 0 ? 'var(--danger)' : 'var(--text-dim)';
       const pickLabel = p.pred.pick.label || 'Pick';
+      const strengthBadge = BetStrengthBadge(p, 'bet-strength-badge--tous');
       // AUDIT-2026-04-27 (Ticket 2 — suite) — Source de cote dans la liste
       // Tous. Le tooltip "Cote décimale Winamax" ment pour les events
       // tournament-only où la cote vient d'un snapshot DraftKings/etc.
@@ -18169,7 +18179,7 @@
           <div style="display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--text);font-weight:600;">
             ${teamLogo(hLogo)}<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(hn)}</span><span style="color:var(--text-dim);font-weight:400;">vs</span>${teamLogo(aLogo)}<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(an)}</span>
           </div>
-          <div style="font-size:12px;color:var(--brand);font-weight:600;margin-top:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">→ ${esc(pickLabel)}${(() => {
+          <div style="font-size:12px;color:var(--brand);font-weight:600;margin-top:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${strengthBadge}<span>→ ${esc(pickLabel)}</span>${(() => {
             // 2026-05-01 — Streak indicator inline sur tous-row (pages Tous/Locks/Matchs)
             if (typeof renderStreakBadge !== 'function') return '';
             const _comps = p.m.competitors || [];

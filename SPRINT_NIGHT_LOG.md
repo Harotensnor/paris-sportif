@@ -477,3 +477,11 @@
 - Impact: contrat couleur état posé; visual diff `11.00%` attendu sur Performance, autres pages stables
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.61 (2026-05-02 08:30 UTC)
+- Chantier: P-4.11 badge force pari
+- Avant: badge force local Accueil; page Tous sans force unifiée
+- Après: helper `BetStrengthBadge` + `getBetStrengthMeta`; badges Accueil, scanner et Tous
+- Impact: force du pari lisible partout; visual diff `13.21%` attendu sur dashboard/Tous, smoke E2E vert
+- Commit: pending
+- Status: ✅ DONE
