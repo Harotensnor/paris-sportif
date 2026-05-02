@@ -677,3 +677,11 @@
 - Impact: navigation plus proche bookmaker, accès plus direct aux usages de pari
 - Commit: pending
 - Status: ✅ DONE
+
+## Sprint v35.86 (2026-05-02 13:16 UTC)
+- Chantier: P-6.15 header logo
+- Avant: marque header affichée comme simple “Pronostics”
+- Après: logo texte PARIS-SPORTIF, SPORTIF en rouge, taille mobile ajustée
+- Impact: identité plus nette et plus proche site pro; captures v35-86 OK
+- Commit: pending
+- Status: ✅ DONE

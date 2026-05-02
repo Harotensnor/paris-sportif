@@ -2319,7 +2319,8 @@
   .topbar-brand:hover .tb-logo { transform: scale(1.08) rotate(-3deg); }
   .topbar-brand .tb-logo svg { display: block; }
   .topbar-brand .tb-brand-text { display: flex; flex-direction: column; line-height: 1.1; }
-  .topbar-brand .tb-brand-name { font-size: 14px; font-weight: 700; letter-spacing: -.2px; color: var(--text); }
+  .topbar-brand .tb-brand-name { font-size: 21px; font-weight: 950; letter-spacing: 0; color: #fff; }
+  .topbar-brand .tb-brand-accent { color: var(--c-accent); }
   .topbar-brand .tb-brand-sub { font-size: 10px; color: var(--text-dim); margin-top: 1px; font-weight: 500; }
 
   /* --- Nav horizontale ---
@@ -3757,6 +3758,7 @@
   @media (max-width: 520px) {
     .topbar-utils .search { display: none; } /* on cache la search, la command palette reste */
     .topbar-brand { padding-right: 10px; border-right: 0; }
+    .topbar-brand .tb-brand-name { font-size: 17px; }
     .topbar-brand .tb-brand-sub { display: none; }
   }
 
