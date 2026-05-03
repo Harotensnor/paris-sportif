@@ -1656,4 +1656,8 @@
 - Avant: pas de baseline Phase 11 post-lazy-images documentee.
 - Apres: 32 captures OK, 0 failure, 0 overflow horizontal, resume phase11_visual_audit.json.
 - Impact: validation visuelle complete 8 pages x 4 viewports apres les derniers sprints.
-- Verif: visual_capture phase11-current OK, syntax/bundle OK.
+- Verif: visual_capture phase11-current OK, syntax/bundle OK.## Sprint v35.231 — Phase 11 P-11.37 Lighthouse final (13:37 local)
+- Avant: scores Lighthouse Phase 11 non figes dans un artefact suivi.
+- Apres: phase11_lighthouse_final.json, min perf 92, min a11y 96, SEO 100.
+- Impact: cible 95+ quasi tenue partout, desktop tous/performance/academie restent perf 92 mais au-dessus seuil.
+- Verif: lighthouse_audit OK, syntax/bundle OK.
