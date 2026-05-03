@@ -1483,3 +1483,9 @@
 - Apres: helpers onglets Performance restaures avec fallback `global`.
 - Impact: Performance mobile/desktop Best Practices 100 et 0 erreur console.
 - Verif: node --check app.js OK, bundle OK, Lighthouse min perf 92/a11y 98/SEO 100.
+
+## Sprint v35.200 — Phase 11 P-11.4c Night metrics refresh (09:26 UTC)
+- Avant: night_metrics.json datait du 2026-05-02 22:11 UTC.
+- Apres: metriques regenerees a 2026-05-03 09:26 UTC, 369 events, Winamax exact 100%, 244 matches detailles.
+- Impact: rapports et cockpit s'appuient sur la data cron courante.
+- Verif: scripts/measure_night_metrics.py OK.
