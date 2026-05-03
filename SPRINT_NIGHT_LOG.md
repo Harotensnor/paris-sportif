@@ -2067,3 +2067,8 @@
 - Apres: _fetchBacktestReportV2 partage une promesse/memoire par session et utilise un bucket 15 min cache-friendly; le rapport marche utilise un bucket 1h.
 - Impact: bug #22 avance: la calibration reste fraiche sans spam reseau, Performance reutilise le rapport deja charge, et le timeout de page conserve son garde-fou.
 - Verif: app.js/sw.js syntax OK; smoke navigateur local route backtest => 1 seul hit apres boot + 2 appels API, total_n=42, meme objet en memoire, 0 warning/error; spec backtest-cache ajoutee.
+## Sprint v35.312 — AUTO 10/10 Stadium metadata cache bust (21:58 UTC)
+- Avant: stadiums.json etait charge en force-cache permanent, donc les distances/fatigue pouvaient rester sur un vieux sidecar meme apres refresh data.
+- Apres: stadiums.json utilise un cache key quotidien derive de PRONOSTICS_DATA.generated_at et cache default, ce qui reste leger tout en suivant les refreshs.
+- Impact: bug #33 ferme sans fetch agressif: metadonnees stade/fatigue se renouvellent avec la date data, mais restent cachees durant la journee.
+- Verif: app.js/sw.js syntax OK; smoke navigateur local => /stadiums.json?v=20260503, dashboard 720 lignes, 0 warning/error; footer/cache/app hash bumpes.
