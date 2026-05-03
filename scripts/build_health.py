@@ -168,6 +168,16 @@ def _count_xg_coverage(d):
         'leagues': len(d.get('by_league') or {}),
     }
 
+def _count_match_previews(d):
+    if not isinstance(d, dict):
+        return None
+    previews = d.get('previews') or []
+    return {
+        'previews': len(previews),
+        'espn_hits': d.get('espn_preview_hits') or 0,
+        'local_fallbacks': d.get('local_fallbacks') or 0,
+    }
+
 SOURCES = [
     ('winamax_catalog', 'winamax_catalog.json', _count_winamax_catalog),
     ('winamax_markets', 'winamax_markets.json', _count_winamax_markets),
@@ -199,6 +209,7 @@ SOURCES = [
     ('h2h_extended', 'h2h_extended.json', _count_h2h_extended),
     ('lineups_multisport', 'lineups_multisport.json', _count_lineups_multisport),
     ('xg_coverage', 'xg_coverage.json', _count_xg_coverage),
+    ('match_previews', 'match_previews.json', _count_match_previews),
     ('injuries_multisport', 'injuries_multisport.json', lambda d: {
         'teams': len(d.get('teams') or {}) if isinstance(d, dict) else 0,
         'sports': len(d.get('by_sport') or {}) if isinstance(d, dict) else 0,
@@ -264,6 +275,7 @@ STALE_AFTER_MIN = {
     'public_team_stats': 6*60,  # merged public sidecar
     'lineups_multisport': 60,   # starter context built from patched data.js
     'xg_coverage': 60,          # product coverage of patched xG fields
+    'match_previews': 60,       # top upcoming match explanations
     'rugby_markets':   6*60,    # derived only when rugby appears in data.js
     'niche_markets':   6*60,    # darts/snooker derived sidecar
     'boosted_odds':    60,      # follows Winamax market refresh
@@ -290,6 +302,7 @@ SOURCE_SCRIPT = {
     'public_team_stats': 'scripts/build_public_team_stats.py',
     'lineups_multisport': 'scripts/build_lineups_multisport.py',
     'xg_coverage': 'scripts/build_xg_coverage.py',
+    'match_previews': 'scripts/fetch_match_previews.py',
     'rugby_markets': 'scripts/build_rugby_markets.py',
     'niche_markets': 'scripts/build_niche_markets.py',
     'boosted_odds': 'scripts/detect_boosted_odds.py',
