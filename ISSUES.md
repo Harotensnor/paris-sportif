@@ -411,3 +411,11 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Constat : hors axe-core, la suite exécute `358` tests : `263` passed, `79` failed, `16` skipped. Les échecs se concentrent sur specs legacy attendant des pages supprimées (`#locks`, `#matchs`, `Top du jour`), snapshots visuels Windows non initialisés et quelques assertions obsolètes de helpers/labels.
 - Action : prochaine passe dédiée pour adapter ou annoter les specs legacy après la refonte 8 pages, puis relancer avec dépendances complètes.
 - Statut : OPEN — la config Playwright utilise maintenant `CHROME_EXECUTABLE_PATH` quand disponible; le flow Big Bet principal a été réparé v35.206 (`tests/user-flow.spec.js` 2/2).
+
+### P11-VIS-002 — Sliders Profil trop petits sur mobile
+
+- Sévérité : LOW
+- Preuve : audit multi-viewport v35.207 (`.cache/phase11-mobile-viewports/report.json`) sur 375/414/480/568 paysage.
+- Constat : aucun overflow, aucune erreur console, aucun recouvrement bottom-nav, mais les sliders Profil avaient une hauteur tactile `16px`.
+- Action : renforcer globalement `input[type="range"]` à `44px` de hauteur minimale.
+- Statut : FIXED v35.207 — sliders Profil mesurés `313x44` sur 375px.

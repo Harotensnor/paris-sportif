@@ -1525,3 +1525,9 @@
 - Apres: le test cible les CTAs visibles pour modal + track bet.
 - Impact: conversion path Big Bet -> modal -> Winamax -> track validé desktop et mobile.
 - Verif: tests/user-flow.spec.js 2/2 OK.
+
+## Sprint v35.207 — Phase 11 P-11.12 Mobile multi-viewport (10:08 UTC)
+- Avant: audit 375/414/480/568 paysage non rejoué après les derniers correctifs.
+- Apres: 32 vues vérifiées; 0 erreur console, 0 overflow, 0 bottom-nav overlap; sliders Profil 16px -> 44px.
+- Impact: réglages Profil plus utilisables au doigt et HTML resynchronisé après le cron.
+- Verif: audit Playwright custom OK, bundle OK.
