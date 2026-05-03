@@ -1489,3 +1489,9 @@
 - Apres: metriques regenerees a 2026-05-03 09:26 UTC, 369 events, Winamax exact 100%, 244 matches detailles.
 - Impact: rapports et cockpit s'appuient sur la data cron courante.
 - Verif: scripts/measure_night_metrics.py OK.
+
+## Sprint v35.201 — Phase 11 P-11.4d Audit visuel rapide (09:37 UTC)
+- Avant: pas de baseline visuelle Phase 11 courante et quelques cibles tablette <40px.
+- Apres: 32 captures Phase 11 + planches contact; cibles tablette Profil/Sante/Montantes/Legal renforcees.
+- Impact: aucun overflow/H1 multiple en chargement frais, controles tablette plus propres.
+- Verif: visual_capture OK, audit DOM frais OK, bundle OK.

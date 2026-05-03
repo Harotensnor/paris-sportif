@@ -395,3 +395,11 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Preuve : Lighthouse mobile Performance remontait `3` erreurs console `_getPerfTab is not defined`, ce qui plafonnait Best Practices à `90`.
 - Action : restaurer les helpers d'onglet Performance persistants (`_getPerfTab`, `_setPerfTab`) avec fallback `global`.
 - Statut : FIXED v35.199 — Lighthouse Performance mobile/desktop : Best Practices `100`, erreurs console `0`.
+
+### P11-VIS-001 — Audit visuel Phase 11 rapide
+
+- Sévérité : MEDIUM
+- Preuve : `.cache/phase4-phase11-current/` + `.cache/phase11-contact-sheets/`; audit DOM frais sur 8 pages.
+- Constat : pas d'overflow horizontal ni de H1 multiple en chargement frais. Quelques contrôles tablette restaient sous `40px` sur Profil/Santé/Montantes/Légal.
+- Action : renforcer les cibles tablette sur les boutons/chips Profil, actions Santé, boutons Montantes et liens statiques Légal.
+- Statut : FIXED v35.201 — contrôles tablette ≥ `40px`, hors icônes d'aide inline volontairement compactes.
