@@ -18,6 +18,10 @@ test.describe('v35 market scanner', () => {
         id: 'v35-fixture',
         sport: 'football',
         date: new Date(Date.now() + 3600_000).toISOString(),
+        competitors: [
+          { homeAway: 'home', name: 'Freiburg', short: 'Freiburg' },
+          { homeAway: 'away', name: 'Wolfsburg', short: 'Wolfsburg' },
+        ],
         winamax: {
           available: true,
           markets: {
@@ -62,6 +66,8 @@ test.describe('v35 market scanner', () => {
         odd: c.odd,
         ev: c.ev,
         edge: c.edge,
+        label: c.label,
+        semanticGroup: c.semanticGroup,
       }));
     });
 
@@ -69,6 +75,10 @@ test.describe('v35 market scanner', () => {
     expect(candidates.every(c => c.source === 'winamax_exact' && c.exact === true)).toBe(true);
     expect(candidates.map(c => c.market)).toEqual(expect.arrayContaining(['1n2', 'ou25', 'btts', 'dnb', 'teamTotal']));
     expect(candidates.find(c => c.market === 'ou25' && c.key === 'O2.5').ev).toBeGreaterThan(0);
+    const teamTotal = candidates.find(c => c.market === 'teamTotal');
+    expect(teamTotal.label).toContain('Total buts Freiburg');
+    expect(teamTotal.label).toContain('équipe seulement');
+    expect(teamTotal.semanticGroup).toBe('team_total_goals');
   });
 
   test('does not invent an actionable market without Winamax odds', async ({ page }) => {

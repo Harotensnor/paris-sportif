@@ -2619,6 +2619,23 @@
     if (!isFinite(over)) return null;
     return side === 'over' ? over : 1 - over;
   }
+  function _v35TeamNameForMarket(match, team) {
+    try {
+      const sides = (typeof getSides === 'function') ? getSides(match) : {};
+      const t = team === 'away' ? sides.away : sides.home;
+      return t?.short || t?.displayName || t?.name || (team === 'away' ? 'équipe extérieure' : 'équipe domicile');
+    } catch(e) {
+      return team === 'away' ? 'équipe extérieure' : 'équipe domicile';
+    }
+  }
+  function _v35TeamTotalLabel(match, row) {
+    const team = row?.team === 'away' ? 'away' : 'home';
+    const name = _v35TeamNameForMarket(match, team);
+    const sideLabel = row?.side === 'under' ? 'moins de' : 'plus de';
+    const line = Number(row?.line);
+    const lineTxt = Number.isFinite(line) ? line.toFixed(line % 1 ? 1 : 0).replace('.', ',') : String(row?.line ?? '');
+    return `Total buts ${name} — ${sideLabel} ${lineTxt} (équipe seulement)`;
+  }
 
   function _v35ModelHandicapProb(pred, market, side, line) {
     const sp = market;
@@ -2737,9 +2754,10 @@
     for (const row of _v35Rows(wxMk.team_total)) {
       const p = _v35ModelTeamTotalProb(pred, row.team, row.line, row.side);
       const key = `${row.team}:${row.side === 'over' ? 'O' : 'U'}${row.line}`;
-      const teamLabel = row.team === 'home' ? 'équipe domicile' : 'équipe extérieure';
-      const sideLabel = row.side === 'over' ? 'plus de' : 'moins de';
-      _v35AddCandidate(out, row, p, 'teamTotal', key, `Total ${teamLabel} — ${sideLabel} ${row.line} but${Number(row.line) > 1 ? 's' : ''}`);
+      _v35AddCandidate(out, row, p, 'teamTotal', key, _v35TeamTotalLabel(match, row), {
+        semanticGroup: 'team_total_goals',
+        teamName: _v35TeamNameForMarket(match, row.team === 'away' ? 'away' : 'home')
+      });
     }
     for (const row of _v35Rows(wxMk.exact_score_rows)) {
       const hit = (ext.exactScores || []).find(x => x.key === row.score || x.label === row.score);
@@ -2939,6 +2957,32 @@
     const expected = implied[market];
     return Array.isArray(expected) ? expected.includes(pick) : expected === 'PUSH' ? pick === 'PUSH' : expected ? expected === pick : true;
   }
+  function _v35OneN2HandicapRelation(one, handicap) {
+    if (one?.market !== '1n2' || handicap?.market !== 'handicap' || !Number.isFinite(handicap.line)) return null;
+    const sideLabel = handicap.pick === '2' ? 'extérieur' : 'domicile';
+    if (Math.abs(handicap.line + 0.5) < 0.01) {
+      return one.pick === handicap.pick
+        ? { type: 'duplicate', reason: `Doublon logique : 1N2 ${one.pick} = handicap ${sideLabel} -0,5.` }
+        : { type: 'conflict', reason: `Incohérent : 1N2 ${one.pick} contredit handicap ${sideLabel} -0,5.` };
+    }
+    if (Math.abs(handicap.line - 0.5) < 0.01) {
+      if (handicap.pick === '1' && one.pick === '2') return { type: 'conflict', reason: 'Incohérent : victoire extérieure contredit handicap domicile +0,5.' };
+      if (handicap.pick === '2' && one.pick === '1') return { type: 'conflict', reason: 'Incohérent : victoire domicile contredit handicap extérieur +0,5.' };
+    }
+    return null;
+  }
+  function _v35ConsistencyReason(conflict, candidate) {
+    const a = _v35NormPick(conflict), b = _v35NormPick(candidate);
+    const rel = _v35OneN2HandicapRelation(a, b) || _v35OneN2HandicapRelation(b, a);
+    if (rel) return rel.reason;
+    if (a.market === 'exactScore' || b.market === 'exactScore') {
+      return `Score ${(a.market === 'exactScore' ? a : b).pick} incompatible avec ${(a.market === 'exactScore' ? b : a).market} ${(a.market === 'exactScore' ? b : a).pick}`;
+    }
+    if (String(a.market).startsWith('teamTotal:') || String(b.market).startsWith('teamTotal:')) {
+      return `${a.market} ${a.pick} incompatible avec ${b.market} ${b.pick} sur la même ligne de buts d'équipe.`;
+    }
+    return `${a.market} ${a.pick} incompatible avec ${b.market} ${b.pick}`;
+  }
   function isPairConsistent(c1, c2) {
     const a = _v35NormPick(c1), b = _v35NormPick(c2);
     if (!a.market || !b.market) return true;
@@ -2970,8 +3014,7 @@
       if (c === opts.anchor) continue;
       const conflict = consistent.find(k => !isPairConsistent(k, c));
       if (conflict) {
-        const a = _v35NormPick(conflict), b = _v35NormPick(c);
-        contradicted.push({ ...c, consistencyConflict: { with: conflict.label || conflict.key || conflict.market || 'marché sélectionné', reason: a.market === 'exactScore' || b.market === 'exactScore' ? `Score ${(a.market === 'exactScore' ? a : b).pick} incompatible avec ${(a.market === 'exactScore' ? b : a).market} ${(a.market === 'exactScore' ? b : a).pick}` : `${a.market} ${a.pick} incompatible avec ${b.market} ${b.pick}` } });
+        contradicted.push({ ...c, consistencyConflict: { with: conflict.label || conflict.key || conflict.market || 'marché sélectionné', reason: _v35ConsistencyReason(conflict, c) } });
       } else consistent.push(c);
     }
     return { consistent, contradicted };
