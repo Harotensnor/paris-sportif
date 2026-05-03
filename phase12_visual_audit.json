@@ -1,0 +1,106 @@
+{
+  "generated_at": "2026-05-03T12:41:03.758Z",
+  "baseline": ".cache/phase4-phase12-tous-coverage/",
+  "screenshots": 32,
+  "failures": 0,
+  "overflow_x_count": 0,
+  "max_heights": {
+    "tous_mobile": 41154,
+    "tous_desktop": 24025,
+    "academie_mobile": 9325,
+    "profil_mobile": 7493,
+    "sante_wide": 4295
+  },
+  "issues": [
+    {
+      "id": "P12-VIS-001",
+      "severity": "HIGH",
+      "pages": "tous",
+      "viewports": "mobile/tablet/desktop/wide",
+      "evidence": ".cache/phase4-phase12-tous-coverage/tous-mobile.png",
+      "finding": "Le preset Tout voir affiche bien 277 matchs, mais la page atteint 41 154px en mobile et 24 025px desktop.",
+      "action": "Ajouter pagination/load more ou virtualisation progressive sans réduire la couverture."
+    },
+    {
+      "id": "P12-VIS-002",
+      "severity": "MEDIUM",
+      "pages": "tous",
+      "viewports": "mobile",
+      "evidence": ".cache/phase4-phase12-tous-coverage/tous-mobile.png",
+      "finding": "Les rails Préset/Sport/Source/Edge/Confiance occupent beaucoup de hauteur avant la liste.",
+      "action": "Regrouper les filtres avancés derrière un bouton Filtres, garder Préset + Sport visibles."
+    },
+    {
+      "id": "P12-VIS-003",
+      "severity": "MEDIUM",
+      "pages": "tous",
+      "viewports": "all",
+      "evidence": ".cache/phase4-phase12-tous-coverage/tous-desktop.png",
+      "finding": "Les lignes de couverture brute affichent Winamax exact mais pas les cotes 1N2 en aperçu.",
+      "action": "Ajouter aperçu 1/N/2 ou meilleur marché quand disponible pour éviter d’ouvrir chaque détail."
+    },
+    {
+      "id": "P12-VIS-004",
+      "severity": "MEDIUM",
+      "pages": "dashboard",
+      "viewports": "mobile",
+      "evidence": ".cache/phase4-phase12-tous-coverage/dashboard-mobile.png",
+      "finding": "La bottom nav fixe tombe au milieu du premier viewport dans la capture et masque visuellement une ligne de contenu.",
+      "action": "Revalider safe-zone mobile et ajouter padding/scroll-margin autour des sections sous le fold."
+    },
+    {
+      "id": "P12-VIS-005",
+      "severity": "LOW",
+      "pages": "dashboard",
+      "viewports": "mobile",
+      "evidence": ".cache/phase4-phase12-tous-coverage/dashboard-mobile.png",
+      "finding": "Le CTA “Voir toutes les opportunités restantes” wrap en plusieurs lignes et alourdit la carte.",
+      "action": "Raccourcir le libellé ou passer en bouton pleine largeur plus lisible."
+    },
+    {
+      "id": "P12-VIS-006",
+      "severity": "MEDIUM",
+      "pages": "academie",
+      "viewports": "mobile",
+      "evidence": ".cache/phase4-phase12-tous-coverage/academie-mobile.png",
+      "finding": "Académie mobile atteint 9 325px, avec les 50 termes affichés d’un bloc.",
+      "action": "Collapser les catégories ou limiter les termes visibles avant recherche/filtre."
+    },
+    {
+      "id": "P12-VIS-007",
+      "severity": "LOW",
+      "pages": "academie",
+      "viewports": "mobile",
+      "evidence": ".cache/phase4-phase12-tous-coverage/academie-mobile.png",
+      "finding": "La table des matières mobile reste proche de la bottom nav et perd de la respiration.",
+      "action": "Ajouter marge basse et réduire le bloc toc sur mobile."
+    },
+    {
+      "id": "P12-VIS-008",
+      "severity": "MEDIUM",
+      "pages": "profil",
+      "viewports": "mobile/tablet",
+      "evidence": ".cache/phase4-phase12-tous-coverage/profil-mobile.png",
+      "finding": "Profil mobile/tablet reste très long (7 493px mobile, 5 622px tablet) avec beaucoup de panneaux ouverts.",
+      "action": "Transformer les sections secondaires en accordéons et garder Bankroll/Préférences en haut."
+    },
+    {
+      "id": "P12-VIS-009",
+      "severity": "MEDIUM",
+      "pages": "sante",
+      "viewports": "tablet/desktop/wide",
+      "evidence": ".cache/phase4-phase12-tous-coverage/sante-wide.png",
+      "finding": "Santé reste très haute sur tablette/wide (4 923px/4 295px) malgré l’espace desktop.",
+      "action": "Mettre les détails pipeline en accordéons et garder KPIs + erreurs visibles d’abord."
+    },
+    {
+      "id": "P12-VIS-010",
+      "severity": "LOW",
+      "pages": "global",
+      "viewports": "all full-page captures",
+      "evidence": ".cache/phase4-phase12-tous-coverage/manifest.json",
+      "finding": "Les éléments fixed/sticky se répètent ou couvrent du contenu dans les full-page screenshots, ce qui rend l’audit manuel plus difficile.",
+      "action": "Ajouter un mode capture CSS désactivant sticky/fixed pour les screenshots full-page."
+    }
+  ]
+}
