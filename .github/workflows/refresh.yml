@@ -169,10 +169,11 @@ jobs:
           python3 patch_understat_xg.py || true
           python3 patch_smart_money.py || true
           python3 build_public_team_stats.py || true
-          python3 build_lineups_multisport.py || true
-          python3 build_xg_coverage.py || true
-          python3 fetch_match_previews.py --limit 12 || true
-          python3 build_rugby_markets.py || true
+            python3 build_lineups_multisport.py || true
+            python3 build_xg_coverage.py || true
+            python3 fetch_match_previews.py --limit 12 || true
+            python3 build_league_bias_audit.py || true
+            python3 build_rugby_markets.py || true
           python3 build_niche_markets.py || true
           python3 detect_boosted_odds.py || true
           # v33.28 — Inject data.js (window.PRONOSTICS_DATA = {...}) dans

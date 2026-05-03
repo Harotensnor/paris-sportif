@@ -1951,3 +1951,8 @@
 - Apres: scripts/validate_ensemble_model.py appelle le vrai predictMatch via model_loader, produit ensemble_validation.json/md, compare Dixon-Coles/xG, Elo et forme, et mesure les tiers V36 soft/strict.
 - Impact: 701 predictions historiques validees, Brier ensemble 0.2333 vs 0.2500 random, 0 divergence >0.15, aucun sous-modele ne bat l'ensemble de >0.010 Brier; slate courant = 42 picks V36 classes dont 7 stricts.
 - Verif: validate_ensemble_model.py OK, py_compile OK.
+## Sprint v35.289 — Phase 12 V36 P-12.36 Audit biais ligues (18:12 UTC)
+- Avant: predictMatch penalise deja les ligues a Brier eleve, mais le guardrail etait invisible hors code et non mesurable dans health.
+- Apres: build_league_bias_audit.py genere league_bias_audit.json depuis backtest_report_v2, avec statuts trusted/watch/deprioritize et couverture courante par ligue; refresh.yml et health.json le suivent.
+- Impact: 49 ligues auditees, 22 a surveiller, 1 trusted, 144 matchs a venir situes sur des ligues watch; 0 ligue en deprioritize dur sur le snapshot.
+- Verif: build_league_bias_audit.py OK, build_health OK, py_compile OK.
