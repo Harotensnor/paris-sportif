@@ -1640,4 +1640,8 @@
 - Avant: images dynamiques dispersees, avec lazy natif parfois incomplet.
 - Apres: enhanceLazyImages applique lazy/async/fetchpriority et dimensions aux images injectees.
 - Impact: moins de priorite reseau inutile, CLS plus stable sur logos et joueurs.
-- Verif: syntax app.js/sw.js OK, bundle check OK.
+- Verif: syntax app.js/sw.js OK, bundle check OK.## Sprint v35.227 — Phase 11 P-11.35 Documentation architecture (13:19 local)
+- Avant: ARCHITECTURE.md datait d'avant les phases lite/i18n/marches etendus.
+- Apres: doc alignee sur data_lite, sources publiques, tests et etat Phase 11.
+- Impact: handoff plus fiable pour pipelines, frontend et modeles.
+- Verif: documentation relue, stamp cache/version applique.

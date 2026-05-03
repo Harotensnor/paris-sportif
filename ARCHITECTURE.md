@@ -1,26 +1,28 @@
 # Architecture Paris-Sportif
 
 > Document vivant. Mis à jour à chaque grosse refonte.
-> Dernière maj : 2026-04-27 (post-audit Codex + 12 sprints).
+> Dernière maj : 2026-05-03 (Phase 11, polish ultra-final + extensions).
 
 ## Vue d'ensemble
 
-Site statique de pronostics sportifs (foot, tennis, basket, hockey, baseball)
-avec un agent IA qui gère une "cagnotte modèle". Déployé sur GitHub Pages
-sans build step ni bundler. Données régénérées toutes les 5 minutes via
-GitHub Actions cron.
+Site statique de pronostics sportifs (foot, tennis, basket, hockey, baseball,
+rugby et marchés niche quand la data est disponible) avec un agent IA qui gère
+une "cagnotte modèle". Déployé sur GitHub Pages sans build step ni bundler.
+Données régénérées toutes les 5 minutes en période active via GitHub Actions.
 
 ## Stack technique
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
 │  CLIENT (navigateur)                                             │
-│  - pronostics.html : SPA shell + LITE blob inline               │
-│  - app.js (~1 MB IIFE)                                          │
-│  - app.css (~170 KB)                                            │
+│  - pronostics.html : shell SPA + boot data_lite                 │
+│  - app.js (~1.6 MB IIFE, logique produit + rendu)               │
+│  - app.css (~300 KB, design system + layouts)                   │
+│  - app-i18n.js : dictionnaire FR/EN léger                       │
+│  - app-enhancements.js : surcouche progressive non critique     │
 │  - sw.js (Service Worker, PWA + offline)                        │
-│  - data.js (~1.3 MB) : full archive 14 jours                    │
-│  - data_today.json : data du jour, refresh fréquent             │
+│  - data_lite.js : boot rapide des picks immédiats               │
+│  - data_today.json / data.js : data jour puis archive complète   │
 └────────────────────────────┬─────────────────────────────────────┘
                              │
                              ▼ fetch
@@ -34,7 +36,7 @@ GitHub Actions cron.
 ┌──────────────────────────────────────────────────────────────────┐
 │  GITHUB ACTIONS (cron */5 *)                                    │
 │  - .github/workflows/refresh.yml                                │
-│  - scripts/fetch_*.py : scrape ESPN, Sofascore, Sackmann, ...   │
+│  - scripts/fetch_*.py : ESPN, Sofascore, Winamax, ClubElo, ...  │
 │  - scripts/patch_*.py : applique les sidecars sur data.js        │
 │  - scripts/build_*.py : génère les pages statiques + health     │
 │  - scripts/backtest_v2.py : weekly cron (dimanche)               │
@@ -52,7 +54,7 @@ Les raisons :
 
 Conséquence :
 - `app.js` reste une IIFE classique (`(function(){...})()`)
-- Les `<script type="module">` sont OK (browsers ESM nativement)
+- Les `<script type="module">` sont OK pour les helpers progressifs natifs
 - Pas de TypeScript (JSDoc pour les types si besoin)
 
 ## Pipeline data
@@ -62,8 +64,11 @@ Ordre d'exécution dans `refresh.yml` (= `auto_refresh.py` en local) :
 1. **Fetch sources** (parallel quand possible) :
    - `fetch_v3.py` — ESPN principal
    - `fetch_winamax_catalog.py` — tournois Winamax
+   - `fetch_winamax_match_details.py` — marchés détaillés Winamax
    - `fetch_team_stats.py` — last5 stats par équipe (CACHE clé `lc:tid`)
    - `fetch_clubelo.py`, `fetch_h2h.py`, `fetch_weather.py`, etc.
+   - `fetch_thesportsdb_meta.py`, `fetch_openligadb.py` — sources publiques
+     self-throttled pour logos, métadonnées et foot allemand
 2. **Patch sidecars sur data.js** (ordre IMPORTANT) :
    - `patch_winamax.py` AVANT tous les autres (établit `match_id`)
    - `patch_winamax_markets.py` (cotes Winamax exactes, garde-fous)
@@ -72,7 +77,8 @@ Ordre d'exécution dans `refresh.yml` (= `auto_refresh.py` en local) :
 3. **Build pages** :
    - `build_health.py` — health.json + quality_checks
    - `build_backtest_page.py`, `build_credibilite_page.py`, etc.
-   - `finalize_inline.py` — inline LITE blob dans pronostics.html
+   - `finalize_inline.py` — construit `data_lite.js`, `data_today.json`
+     et garde le shell HTML léger
    - `check_data_integrity.py` — vérifie ≥50% events vs précédent
 4. **Commit + push** par le bot GitHub Actions.
 
@@ -84,6 +90,8 @@ Ordre d'exécution dans `refresh.yml` (= `auto_refresh.py` en local) :
 - Backend backtest : `scripts/model_loader.py` extrait l'IIFE et l'évalue
   via mini-racer (V8 embarqué) → garantit que le backtest mesure la
   VRAIE fonction prod, pas une duplication Python qui dériverait.
+- Phase 10+ : l'IIFE expose aussi l'ensemble model, calibration par marché,
+  abstain renforcé, IC95, sharp-money nudge et contributions de features.
 
 **Ne jamais** dupliquer la logique de `predictMatch` ailleurs.
 
@@ -149,6 +157,35 @@ Schema v2 (clé composite anti-contamination cross-sport) :
 }
 ```
 
+### `data_lite.js`
+
+Boot payload compact pour rendre l'accueil avant le chargement complet :
+
+```js
+window.PRONOSTICS_DATA_LITE = {
+  generated_at: "...",
+  days: { "YYYY-MM-DD": [/* events actionnables proches */] },
+  lite: true,
+  source: "finalize_inline"
+}
+```
+
+Le shell charge ensuite `data.js` en arrière-plan pour les pages profondes,
+les historiques et les marchés longs. Le Service Worker garde les deux chemins
+cacheables, mais le cache versionné doit être bumpé à chaque changement UI.
+
+### Préférences locales
+
+Les réglages utilisateur restent côté navigateur :
+
+- `userBankroll`, `oddMinUser`, `paris_sportif_strategy_prefs_v1`
+- `paris_sportif_focus_bigbets_v1`
+- `paris_sportif_locale_v1`
+- `paris_sportif_accessibility_prefs_v1`
+- `paris_sportif_tracked_bets`
+
+Ces clés ne doivent jamais être supprimées pendant une refonte.
+
 ## Conventions code
 
 - `const`/`let` en scope IIFE → attention TDZ (hisser les déclarations
@@ -162,11 +199,15 @@ Schema v2 (clé composite anti-contamination cross-sport) :
 
 ## Tests
 
-- `tests/critical-flows.spec.js` — 14 tests Playwright (boot, nav, theme, ...)
+- `tests/critical-flows.spec.js` — boot, nav, theme, data freshness
 - `tests/unit-helpers.spec.js` — helpers purs via `window.__testAPI`
 - `tests/visual-regression.spec.js` — snapshots SVG/CSS structures
 - `tests/a11y-axe.spec.js` — WCAG 2.1 AA via axe-core
 - `tests/smoke-buttons.spec.js` — clic chaque bouton sans error JS
+- `tests/market-consistency.spec.js` — empêche les contradictions type
+  score exact 1-0 + BTTS Oui.
+- `tests/click-everything.spec.js`, `tests/modal-tabs.spec.js`,
+  `tests/user-flow.spec.js` — parcours Big Bet → modal → CTA → tracking.
 
 ## CI workflows
 
@@ -178,10 +219,21 @@ Schema v2 (clé composite anti-contamination cross-sport) :
 
 ## Backlog dette technique
 
-- Découpage `app.js` (~1 MB IIFE) en modules ESM
+- Découpage `app.js` (~1.6 MB IIFE) en modules ESM ciblés
 - Migration inline → utility classes V3 (~250 occurrences)
 - Audit `!important` CSS (107 occurrences, 60 à reviewer)
-- Bundle size optimisation (95% du budget app.js déjà consommé)
+- Bundle size optimisation : app.js reste proche du budget, app.css est
+  volontairement gelé autour de 300 KB tant qu'aucune purge sûre n'est faite.
+
+## Phase 11 — Etat opérationnel
+
+- Accueil desktop : layout 3 colonnes, sidebar gauche, main Big Bets, right rail.
+- Accueil mobile : sections secondaires compactées, bottom nav avec marge dédiée.
+- Modèle : high-odds first, anti-handicap, cohérence inter-marchés, abstain.
+- Marchés visibles : 1N2, O/U, BTTS, scores exacts, mi-temps, quart-temps,
+  sets tennis, totals hockey/baseball, combinés et outsiders multi-marchés.
+- Qualité : Lighthouse cible 95+, a11y 0 violation sur audits locaux, CLS < 0.05
+  sur desktop après réservation des rails.
 
 ## Décisions architecturales (ADR-style)
 
