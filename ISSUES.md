@@ -546,7 +546,7 @@ Résultat : 225 combinaisons sport × cote min × marché testées ; 277 lignes 
 - Preuve : `phase12_tous_filter_combo_audit.json` (`tennis` a 1 event upcoming, `1n2` = 0).
 - Constat : le seul match tennis détecté expose des jeux tennis mais pas de candidat vainqueur simple dans l'audit.
 - Action : vérifier si l'event manque de cote 1N2 ou si le mapping tennis utilise une clé différente.
-- Statut : OPEN
+- Statut : FIXED v35.250 — l'audit compte maintenant les issues 1N2 brutes Winamax visibles; `suspiciousZeroCombos` = 0 et 1N2 = 778 candidats.
 
 ### P12-MOB-001 — Profil contient encore des inputs tactiles 16x16 sur mobile
 

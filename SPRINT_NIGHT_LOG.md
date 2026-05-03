@@ -1756,3 +1756,8 @@
 - Apres: 220 lignes mobile / 260 desktop immédiates, puis bouton Charger plus.
 - Impact: couverture reste totale (276 detectes, 220 visibles immédiatement), mobile ~37.7k px.
 - Verif: visual_capture phase12-tous-progressive 32/32 OK, mobile_device_audit OK.
+## Sprint v35.250 — Phase 12 P-12.19 Fix P12-FILT-002 audit tennis 1N2 (16:04 local)
+- Avant: l'audit combo ne comptait pas le vainqueur tennis si le modele preferait le favori <1.30.
+- Apres: les issues 1N2 brutes Winamax visibles sont ajoutees au comptage audit.
+- Impact: suspiciousZeroCombos 4 -> 0, 1N2 = 778 candidats, tennis vainqueur couvert.
+- Verif: tous_filter_combo_audit 225 combos OK, 0 suspicious.
