@@ -1901,3 +1901,8 @@
 - Apres: champ de recherche interne a Tous, filtre equipe/ligue/sport/pick, persiste dans localStorage et dans l'URL q=.
 - Impact: recherche "yankees" descend 260 lignes a 2 matchs a venir + 3 finis, avec hash #tous?q=yankees.
 - Verif: syntax app.js/sw.js OK, Playwright desktop/mobile, search input 44px mobile, 0 erreur console, capture .cache/v36-tous-instant-search.png.
+## Sprint v35.279 — Phase 12 V36 P-12.26 Export vue Tous (17:47 UTC)
+- Avant: une vue filtree dans Tous ne pouvait pas etre extraite pour analyse externe.
+- Apres: bouton Export CSV sur la barre de filtres, avec statut/date/sport/ligue/equipes/pick/cotes/source/url.
+- Impact: l'export suit exactement les filtres actifs et inclut tous les onglets affichables (a venir, live, finis).
+- Verif: syntax app.js/sw.js OK, Playwright telecharge tous-pronos-YYYY-MM-DD.csv sur #tous?q=yankees, header CSV OK, 0 erreur console.

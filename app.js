@@ -19822,6 +19822,7 @@
               <span style="font-size:12px;color:var(--text-dim2);">🔎</span>
               <input data-tous-search type="search" value="${esc(tousFilters.query || '')}" placeholder="Chercher équipe, ligue, sport..." autocomplete="off" spellcheck="false" style="width:100%;min-height:38px;border-radius:999px;border:1px solid var(--border-2);background:var(--panel-2);color:var(--text);padding:0 13px;font-size:12.5px;outline:none;">
             </label>
+            ${displayedTotal > 0 ? `<button type="button" data-tous-export style="min-height:38px;border:1px solid rgba(16,185,129,.32);border-radius:999px;background:rgba(16,185,129,.10);color:var(--accent);padding:0 12px;font-size:11.5px;font-weight:900;cursor:pointer;">⬇ Export CSV (${displayedTotal})</button>` : ''}
             ${filtersActive ? '<button data-tous-reset style="padding:5px 10px;font-size:11px;background:transparent;color:var(--text-dim);border:1px solid var(--border-2);border-radius:6px;cursor:pointer;font-weight:600;">↻ Réinitialiser</button>' : ''}
           </div>
           <div style="display:flex;align-items:center;gap:8px;${tousRailStyle}">
@@ -19921,6 +19922,52 @@
         }, 160);
       });
     }
+    const tousExport = wrap.querySelector('[data-tous-export]');
+    if (tousExport) tousExport.addEventListener('click', () => {
+      try {
+        const rows = displayPending.concat(displayInProgress, displayFinished);
+        const q = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+        const fmt = (v, n = 4) => Number.isFinite(Number(v)) ? Number(v).toFixed(n) : '';
+        const header = ['status','date','sport','league','home','away','pick','odd','edge_pct','confidence_pct','odd_1','odd_n','odd_2','source','url'];
+        const lines = ['\uFEFF' + header.join(',')];
+        rows.forEach(p => {
+          const wx = p?.m?.winamax?.markets?.['1n2'] || {};
+          const status = p.settled ? 'finished' : p.startedAndNotSettled ? 'live' : 'upcoming';
+          const pick = p?.pred?.pick?.label || p?.pred?.pick?.key || '';
+          const src = p?.winamax || p?.m?.winamax?.available ? 'winamax' : 'external';
+          lines.push([
+            q(status),
+            q(p?.m?.date || ''),
+            q(p?.m?.sport || p?.sport || ''),
+            q(p?.m?.league_name || p?.m?.league || ''),
+            q(p?.home?.name || ''),
+            q(p?.away?.name || ''),
+            q(pick),
+            fmt(p?.odd, 2),
+            Number.isFinite(Number(p?.edge)) ? (Number(p.edge) * 100).toFixed(2) : '',
+            Number.isFinite(Number(p?.rel)) ? (Number(p.rel) * 100).toFixed(1) : '',
+            fmt(wx.home, 2),
+            fmt(wx.draw, 2),
+            fmt(wx.away, 2),
+            q(src),
+            q(p?.m?.winamax?.url || 'https://www.winamax.fr/paris-sportifs')
+          ].join(','));
+        });
+        const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `tous-pronos-${new Date().toISOString().slice(0,10)}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1500);
+        try { if (typeof toast === 'function') toast('CSV exporté', 'success'); } catch(e) {}
+      } catch(e) {
+        console.warn('Tous CSV export failed:', e);
+        try { if (typeof toast === 'function') toast('Export CSV impossible', 'error'); } catch(_) {}
+      }
+    });
     wrap.querySelectorAll('[data-tous-preset]').forEach(btn => {
       btn.addEventListener('click', () => {
         try {
