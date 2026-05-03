@@ -12948,22 +12948,44 @@
       const after = label.slice(idx + query.length);
       return `${esc(before)}<mark class="search-mark">${esc(match)}</mark>${esc(after)}`;
     };
+    const _teamUpcomingMatches = (teamName, limit = 5) => {
+      const name = String(teamName || '').trim().toLowerCase();
+      const out = [];
+      const data = window.PRONOSTICS_DATA;
+      if (!name || !data || !data.days) return out;
+      const now = Date.now() - 60000;
+      Object.values(data.days).forEach(arr => (arr || []).forEach(m => {
+        try {
+          if (m.completed || (typeof _isMatchEffectivelyDone === 'function' && _isMatchEffectivelyDone(m))) return;
+          const ts = new Date(m.date).getTime();
+          if (!Number.isFinite(ts) || ts < now) return;
+          const { home, away } = getSides(m);
+          const hn = String(home?.name || home?.short || '').toLowerCase();
+          const an = String(away?.name || away?.short || '').toLowerCase();
+          if (hn !== name && an !== name) return;
+          out.push({ m, ts, home, away });
+        } catch(e) {}
+      }));
+      out.sort((a,b) => a.ts - b.ts);
+      return out.slice(0, limit);
+    };
     box.innerHTML = hits.map((h, i) => {
       const it = h.it;
+      const teamUpcoming = it.kind === 'team' ? _teamUpcomingMatches(it.label, 5) : [];
       const ico = it.kind === 'team' && it.logo
         ? `<img src="${esc(it.logo)}" alt="" loading="lazy" decoding="async" style="width:20px;height:20px;object-fit:contain;border-radius:3px;" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"><span style="display:none;">${kindIcon(it.kind)}</span>`
         : `<span>${kindIcon(it.kind)}</span>`;
       return `<div class="search-suggest-item" data-idx="${i}" data-kind="${esc(it.kind)}" data-label="${esc(it.label)}" ${it.matchId ? `data-match-id="${esc(it.matchId)}"` : ''} ${it.action ? `data-action="${esc(it.action)}"` : ''} style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;">
         ${ico}
         <span style="flex:1;color:var(--text,#e6ebf2);font-weight:500;">${_highlightMatch(it.label, q)}</span>
-        <span style="color:var(--text-dim2,#7b8693);font-size:11px;">${it.kind === 'page' ? 'page' : it.kind === 'action' ? 'action' : `${sportIconAA(it.sub)} ${it.kind === 'team' ? 'équipe' : it.kind === 'league' ? 'tournoi' : 'ville'}`}</span>
+        <span style="color:var(--text-dim2,#7b8693);font-size:11px;">${it.kind === 'page' ? 'page' : it.kind === 'action' ? 'action' : `${sportIconAA(it.sub)} ${it.kind === 'team' ? `équipe${teamUpcoming.length ? ` · ${teamUpcoming.length} matchs` : ''}` : it.kind === 'league' ? 'tournoi' : 'ville'}`}</span>
       </div>`;
     }).join('');
     box.style.display = 'block';
     box.querySelectorAll('.search-suggest-item').forEach(el => {
       el.addEventListener('mouseenter', () => { el.style.background = 'rgba(255,255,255,.04)'; });
       el.addEventListener('mouseleave', () => { el.style.background = ''; });
-      el.addEventListener('click', () => {
+      el.addEventListener('click', async () => {
         const label = el.dataset.label;
         const kind = el.dataset.kind;
         const mid = el.dataset.matchId;
@@ -13000,7 +13022,53 @@
         }
         render();
         box.style.display = 'none';
-        // Si équipe et prochain match identifié, ouvre directement la fiche.
+        if (kind === 'team') {
+          try {
+            if (window.PRONOSTICS_DATA && window.PRONOSTICS_DATA._lite && typeof _ensureFullData === 'function') {
+              await _ensureFullData();
+            }
+          } catch(e) {}
+          const upcoming = _teamUpcomingMatches(label, 5);
+          if (upcoming.length > 1 && typeof _showBottomSheet === 'function') {
+            const rows = upcoming.map(({ m, home, away }) => {
+              const league = m.league_name || m.league || '';
+              const sport = sportIconAA(m.sport);
+              const ko = (() => {
+                try { return new Intl.DateTimeFormat('fr-FR', { weekday:'short', day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' }).format(new Date(m.date)); }
+                catch(e) { return fmtTime(m.date); }
+              })();
+              return `<button type="button" data-team-match-open="${esc(String(m.id || ''))}" style="width:100%;min-height:46px;text-align:left;border:1px solid var(--border);border-radius:10px;background:var(--panel);color:var(--text);padding:9px 11px;display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;cursor:pointer;">
+                <span>${sport}</span>
+                <span style="min-width:0;">
+                  <b style="display:block;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(home?.name || '?')} vs ${esc(away?.name || '?')}</b>
+                  <span style="display:block;margin-top:2px;color:var(--text-dim2);font-size:10.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(league || 'Compétition')} · ${esc(ko)}</span>
+                </span>
+                <span style="font-size:11px;color:var(--brand);font-weight:900;">Ouvrir</span>
+              </button>`;
+            }).join('');
+            const sheet = _showBottomSheet({
+              title: `${label} · prochains matchs`,
+              body: `<div style="display:grid;gap:8px;">${rows}</div>`,
+              actions: [{ label: 'Fermer', primary: true }]
+            });
+            document.querySelectorAll('[data-team-match-open]').forEach(btn => {
+              btn.addEventListener('click', () => {
+                const id = btn.dataset.teamMatchOpen;
+                const found = upcoming.find(x => String(x.m?.id || '') === String(id));
+                if (found && typeof openDetail === 'function') {
+                  try { sheet && sheet.close && sheet.close(); } catch(e) {}
+                  setTimeout(() => openDetail(found.m), 80);
+                }
+              });
+            });
+            return;
+          }
+          const first = upcoming[0];
+          if (first && typeof openDetail === 'function') {
+            setTimeout(() => openDetail(first.m), 80);
+            return;
+          }
+        }
         if (kind === 'team' && mid) {
           const data = window.PRONOSTICS_DATA;
           let match = null;
@@ -13009,9 +13077,7 @@
               if (String(m.id) === String(mid)) match = m;
             }));
           }
-          if (match && typeof openDetail === 'function') {
-            setTimeout(() => openDetail(match), 80);
-          }
+          if (match && typeof openDetail === 'function') setTimeout(() => openDetail(match), 80);
         }
       });
     });
