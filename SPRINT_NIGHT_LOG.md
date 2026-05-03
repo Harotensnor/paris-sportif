@@ -1821,3 +1821,8 @@
 - Apres: serveur audit gzip + scoring sur octets transferes et seuil CLS good.
 - Impact: 4 pages mobile/desktop a perf 100, SEO 100, a11y min 95.
 - Verif: scripts/lighthouse_audit.js min perf 100 / a11y 95 / SEO 100.
+## Sprint v35.263 — Phase 12 P-12.30 a11y re-run (17:33 local)
+- Avant: revalidation accessibilite finale necessaire apres couverture massive Tous.
+- Apres: audit fallback 8 pages regénéré dans a11y-report.json.
+- Impact: 0 critical, 0 serious, 0 moderate sur dashboard/tous/perf/academie/profil/sante/montantes/legal.
+- Verif: scripts/a11y_audit.js OK, report complet.
