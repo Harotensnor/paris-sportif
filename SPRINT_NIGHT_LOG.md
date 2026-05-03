@@ -1781,3 +1781,8 @@
 - Apres: les panneaux secondaires passent en accordéons mobiles, bankroll/cote/strategie/simulateur restent visibles.
 - Impact: Profil mobile ~7607px -> 4155px, tablet ~5736px -> 3576px, 0 overflow.
 - Verif: visual_capture phase12-profil-compact 32/32 OK, mobile_device_audit OK, syntax/bundle OK.
+## Sprint v35.255 — Phase 12 P-12.24 Fix P12-VIS-009 Sante compacte (16:33 local)
+- Avant: Sante tablette/wide affichait quality checks, pipeline lag, drift et checks detailles ouverts.
+- Apres: conteneur elargi a 1500px et details lourds replies sur tous les viewports.
+- Impact: Sante tablet ~4923px -> 2383px, desktop ~4343px -> 1875px, wide ~4295px -> 1827px.
+- Verif: visual_capture phase12-sante-compact 32/32 OK, mobile_device_audit OK, syntax/bundle OK.

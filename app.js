@@ -24711,8 +24711,7 @@
     const globalEmoji = critCount > 0 ? '🔴' : warnCount > 0 ? '🟠' : '🟢';
     const globalLabel = critCount > 0 ? 'Problème critique' : warnCount > 0 ? 'Alertes mineures' : 'Tout est vert';
     const globalColor = critCount > 0 ? '#f87171' : warnCount > 0 ? '#eab308' : '#34d399';
-    const santeMobile = typeof matchMedia === 'function' && matchMedia('(max-width:760px)').matches;
-    const santeFold = (title, html) => !html ? '' : (santeMobile ? `<details class="sante-fold"><summary>${title}</summary><div>${html}</div></details>` : html);
+    const santeFold = (title, html) => !html ? '' : `<details class="sante-fold"><summary>${title}</summary><div>${html}</div></details>`;
 
     const navBadge = document.getElementById('count-sante-alerts');
     if (navBadge) {
@@ -25005,7 +25004,7 @@
       </div>`;
 
     wrap.innerHTML = `
-      <div style="max-width:1200px;margin:0 auto;padding:16px 20px calc(var(--mobile-bottom-gap, 90px) + 24px);">
+      <div style="max-width:1500px;margin:0 auto;padding:16px 20px calc(var(--mobile-bottom-gap, 90px) + 24px);">
         <div class="section-header top-picks" style="margin-top:8px;">
           <h1 class="page-h1"><span class="ico">⚙️</span>Santé du site</h1>
           <div class="hint">État technique en temps réel · fraîcheur des données, couverture, SW, erreurs, stockage</div>
@@ -25038,7 +25037,7 @@
           ${recoHtml}
         </div>
 
-        ${(() => {
+        ${santeFold('📊 Quality checks data', (() => {
           // dans la page Santé. Lit window.__healthData rempli par
           // _refreshHealthIndicator. Permet à l'user de voir d'un coup
           // d'œil les checks sémantiques (Winamax exact ratio, foot
@@ -25129,7 +25128,7 @@
               })()}
             </div>
           </div>`;
-        })()}
+        })())}
 
         ${santeFold('⏱ Pipeline lag par script', pipelineLagHtml)}
 
