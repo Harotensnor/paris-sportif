@@ -1936,3 +1936,8 @@
 - Apres: lineups_multisport.json unifie le contexte starter par sport et le workflow le regenere avant health.
 - Impact: 51/373 events ont un signal starter exploitable: 22 XI foot, 17 matchs MLB avec 34 pitchers, 12 matchs NHL avec 24 goalies projetes; NBA est marquee source en attente.
 - Verif: build_lineups_multisport.py OK, health sources=24, lineups_multisport coverage=13.7%.
+## Sprint v35.286 — Phase 12 V36 P-12.33 xG coverage audit (18:30 UTC)
+- Avant: Understat etait actif (112 equipes, 6 ligues) mais on ne mesurait pas combien de matchs du feed avaient xG des deux cotes.
+- Apres: xg_coverage.json mesure la couverture produit par ligue et le workflow le genere avant health.
+- Impact: le signal xG est pilotable: 68/285 matchs foot ont xG home+away (23.9%); les manques sont samples pour prioriser les prochaines sources.
+- Verif: build_xg_coverage.py OK, build_health OK, health sources=25 avec xg_coverage both_teams_pct=23.9%.
