@@ -1626,3 +1626,8 @@
 - Apres: Profil affiche points, streak, ROI perso et badges locaux depuis les paris suivis.
 - Impact: Theo suit sa progression sans reseau externe ni leaderboard public.
 - Verif: syntax app.js/sw.js OK, bundle check OK avant stamp.
+## Sprint v35.224 — Phase 11 P-11.29 Accessibilite avancee (13:10 local)
+- Avant: Profil avait contraste et lecture, mais pas de taille fine, police lisible ou filtre nuit.
+- Apres: ajout taille texte, police dyslexie/fallback, filtre nuit doux, appliques au boot et en live.
+- Impact: Theo peut adapter le confort visuel sans changer le flux Big Bets.
+- Verif: syntax app.js/sw.js OK, bundle check OK.
