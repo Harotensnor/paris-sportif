@@ -8,18 +8,20 @@
   let activeFilter = 'all';
   // Advanced filters — persisted across sessions. Applied on top of activeFilter.
   // kellyMin=0 disables. oddMax=0 disables. league=''|code filters by ESPN league_code.
-  // Réponse au feedback "trop de paris faibles affichés".
+  // V36 : Theo veut pouvoir jouer toute la journee, avec cote 1.30 minimum
+  // seulement quand la confiance est forte. Les filtres stricts restent dans
+  // les presets, mais le plancher global ne bloque plus les tiers bas.
   const ODD_MIN_USER_KEY = 'oddMinUser';
-  const ODD_MIN_CHOICES = [1.50, 1.80, 2.00, 2.20, 2.50];
+  const ODD_MIN_CHOICES = [1.30, 1.50, 1.80, 2.00, 2.50];
   function getUserOddMin() {
     try {
       const v = parseFloat(localStorage.getItem(ODD_MIN_USER_KEY));
-      if (isFinite(v) && v >= 1.50 && v <= 2.50) return Math.round(v * 100) / 100;
+      if (isFinite(v) && v >= 1.30 && v <= 2.50) return Math.round(v * 100) / 100;
     } catch(e) {}
-    return 2.00;
+    return 1.30;
   }
   function setUserOddMin(v) {
-    const n = ODD_MIN_CHOICES.reduce((best, x) => Math.abs(x - v) < Math.abs(best - v) ? x : best, 2.00);
+    const n = ODD_MIN_CHOICES.reduce((best, x) => Math.abs(x - v) < Math.abs(best - v) ? x : best, 1.30);
     try { localStorage.setItem(ODD_MIN_USER_KEY, String(n.toFixed(2))); } catch(e) {}
     advFilters.oddMin = n;
     try { window.advFilters = advFilters; } catch(e) {}
@@ -20201,7 +20203,7 @@
       ['risque','Tilt','Réaction après pertes : augmenter les mises, forcer des paris, sortir du plan.'],
       ['risque','Corrélation','Deux paris dépendants du même scénario. Exemple : Over buts + BTTS Oui.'],
       ['risque','Abstain','Le modèle renonce : pas assez de valeur, données faibles ou signaux contradictoires.'],
-      ['risque','Cote minimale','Préférence actuelle : ne pas afficher les paris trop bas sous @2.00.'],
+      ['risque','Cote minimale','V36 : @1.30 minimum par défaut, mais uniquement si confiance et contexte tiennent la route.'],
       ['risque','Responsable','Parier doit rester un loisir. Aucun pari ne mérite de l’argent nécessaire.'],
       ['modele','xG','Expected goals : qualité des occasions, plus stable que les buts bruts.'],
       ['modele','Forme L10','Dix derniers matchs, pondérés pour donner plus de poids aux plus récents.'],
@@ -20233,7 +20235,7 @@
       ['data','Data'],
     ];
     const articles = [
-      ['high-odds','Pourquoi viser les cotes hautes','Théo ne veut plus de cotes à 1.20 : le gain est trop faible pour l’énergie mentale. Le site privilégie désormais @2.00 minimum, avec une zone idéale @2.20-3.50. La variance augmente, donc il faut parier moins souvent, mais chaque bon ticket a un vrai potentiel.'],
+      ['high-odds','Pourquoi distinguer les niveaux de cotes','Théo ne veut plus un seul filtre rigide. V36 classe les paris par niveaux : sûrs @1.30-1.50, solides @1.50-2.00, value @2.00-3.00, big odds @3.00-5.00 et outsiders au-delà. La mise et l’exigence changent selon le niveau.'],
       ['value','Comment reconnaître la value','Une cote haute n’est pas automatiquement bonne. Il faut que le modèle voie plus de chances que le marché. Exemple simple : si Winamax paie @2.80 (36% implicite) et que le modèle estime 45%, l’avantage est réel. Si la cote est haute mais la proba trop faible, on passe.'],
       ['bankroll','Bankroll et mise','Le but n’est pas de tout miser sur un gros coup. La mise doit rester petite, régulière, et liée à l’avantage. Une série de pertes normale ne doit pas détruire la bankroll. Si la variance secoue, on réduit la mise ou on s’abstient.'],
       ['coherence','Cohérence entre marchés','Le site filtre les contradictions : un score exact 1-0 ne peut plus cohabiter avec BTTS Oui, et 0-0 ne peut pas cohabiter avec Over 2.5. Les marchés écartés restent auditables, mais ils ne guident plus la décision.'],
