@@ -20208,6 +20208,51 @@
           </div>
         </div>`;
     })();
+    const competitionHtml = (() => {
+      let bets = [];
+      try {
+        const tracked = (typeof loadTrackedBets === 'function') ? loadTrackedBets() : {};
+        bets = Object.values(tracked || {}).filter(b => b && (b.status === 'gagné' || b.status === 'perdu'));
+      } catch(e) { bets = []; }
+      const wins = bets.filter(b => b.status === 'gagné').length;
+      const losses = bets.filter(b => b.status === 'perdu').length;
+      const points = Math.max(0, wins * 10 - losses * 6 + Math.floor(bets.length / 5) * 3);
+      const totalStake = bets.reduce((s, b) => s + (Number(b.stake) || 0), 0);
+      const returned = bets.reduce((s, b) => s + (b.status === 'gagné' ? (Number(b.stake) || 0) * (Number(b.odds) || 0) : 0), 0);
+      const roi = totalStake > 0 ? (returned - totalStake) / totalStake * 100 : 0;
+      const sorted = bets.slice().sort((a, b) => new Date(a.added_at || a.kickoff || 0) - new Date(b.added_at || b.kickoff || 0));
+      let cur = 0, bestWin = 0, last = '';
+      sorted.forEach(b => {
+        if (b.status === 'gagné') { cur = last === 'gagné' ? cur + 1 : 1; bestWin = Math.max(bestWin, cur); }
+        else cur = 0;
+        last = b.status;
+      });
+      const recent = sorted.slice().reverse();
+      const hot = recent.length && recent[0].status === 'gagné' ? recent.findIndex(b => b.status !== 'gagné') : 0;
+      const currentWinStreak = hot < 0 ? recent.length : hot;
+      const badgeDefs = [
+        ['Premier ticket', bets.length >= 1],
+        ['10 picks trackés', bets.length >= 10],
+        ['50 picks trackés', bets.length >= 50],
+        ['100 picks', bets.length >= 100],
+        ['Hot 5W', bestWin >= 5],
+        ['ROI positif', roi > 0 && bets.length >= 5],
+        ['Mois +20% ROI', roi >= 20 && bets.length >= 10],
+      ];
+      const badgeHtml = badgeDefs.map(([label, ok]) => `<span style="min-height:32px;display:inline-flex;align-items:center;border:1px solid ${ok ? 'rgba(22,163,74,.35)' : 'var(--border)'};border-radius:999px;background:${ok ? 'rgba(22,163,74,.12)' : 'var(--panel)'};color:${ok ? 'var(--c-strong)' : 'var(--text-dim)'};padding:5px 10px;font-size:11.5px;font-weight:850;">${ok ? '✓ ' : ''}${esc(label)}</span>`).join('');
+      return `
+        <div class="card-base" id="profile-competition">
+          <h3 class="section-h3">🏆 Mode compétition</h3>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:12px;">
+            <div style="padding:12px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--panel);"><span class="u-text-xs u-text-dim">Points</span><strong style="display:block;font-size:24px;color:var(--text);">${points}</strong></div>
+            <div style="padding:12px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--panel);"><span class="u-text-xs u-text-dim">Bilan</span><strong style="display:block;font-size:24px;color:var(--text);">${wins}W-${losses}L</strong></div>
+            <div style="padding:12px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--panel);"><span class="u-text-xs u-text-dim">Streak</span><strong style="display:block;font-size:24px;color:${currentWinStreak >= 3 ? 'var(--c-strong)' : 'var(--text)'};">${currentWinStreak ? `Hot ${currentWinStreak}W` : 'Neutre'}</strong></div>
+            <div style="padding:12px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--panel);"><span class="u-text-xs u-text-dim">ROI perso</span><strong style="display:block;font-size:24px;color:${roi >= 0 ? 'var(--c-strong)' : 'var(--c-bad)'};">${roi >= 0 ? '+' : ''}${roi.toFixed(1)}%</strong></div>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;">${badgeHtml}</div>
+          <div style="margin-top:10px;font-size:12px;color:var(--text-dim);line-height:1.45;">Barème local : +10 pts par pari gagné, -6 par pari perdu, bonus régularité tous les 5 picks trackés.</div>
+        </div>`;
+    })();
     const profileSummaryHtml = `
       <section aria-label="Réglages actifs" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin:0 0 16px;">
         ${[
@@ -20304,6 +20349,7 @@
 
         ${profileSummaryHtml}
         ${personalSuggestionsHtml}
+        ${competitionHtml}
 
         <div class="profil-grid">
 
