@@ -1501,3 +1501,9 @@
 - Apres: base i18n FR/EN, detection navigator.language et toggle Profil persistant.
 - Impact: socle multi-langue pret sans perturber l'interface FR principale.
 - Verif: node --check app.js OK, test Profil EN OK, bundle OK.
+
+## Sprint v35.203 — Phase 11 P-11.7 Migration CSS hex (09:47 UTC)
+- Avant: app.css contenait 213 hex directs et flirtait avec la limite 300KB.
+- Apres: 190 hex directs, danger/success/brand/warn migrés vers tokens, app.css 299.9KB.
+- Impact: couleurs plus centralisées sans dépasser le budget bundle.
+- Verif: bundle OK, diff check OK.
