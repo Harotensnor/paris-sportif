@@ -1678,3 +1678,9 @@
 - Apres: funnel trace dans phase12_tous_filter_funnel.json + .cache/tous-filter-funnel.json.
 - Impact: cause isolee: la page transforme la couverture brute en picks actionnables puis skip 75/80 matchs du jour.
 - Verif: script funnel OK, syntax/bundle OK.
+
+## Sprint v35.236 — Phase 12 P-12.2/P-12.5 Couverture Tous (14:37 local)
+- Avant: Tous affichait uniquement les picks actionnables du jour (5-8 lignes selon refresh).
+- Apres: preset Tout voir charge data.js complet et affiche 277 matchs a venir / 369 lignes tous onglets.
+- Impact: Big Bets reste strict, Tous redevient une vraie couverture calendrier Winamax.
+- Verif: funnel 277 -> 277 visible, capture phase12-tous-coverage OK, syntax/bundle OK.

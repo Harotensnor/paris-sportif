@@ -76,6 +76,7 @@ function startServerIfNeeded() {
       localStorage.setItem('userPrefs', JSON.stringify({ onboardingDone: true, level: 'confirme', consentLocalStorage: 'accepted' }));
       localStorage.removeItem('tousFilters');
       localStorage.removeItem('tousFilterMode');
+      localStorage.removeItem('tousPreset');
       localStorage.removeItem('tousSort');
       localStorage.removeItem('tousTab');
     } catch (e) {}
@@ -83,6 +84,7 @@ function startServerIfNeeded() {
 
   await page.goto(`${BASE_URL}/pronostics.html#tous`, { waitUntil: 'domcontentloaded', timeout: 20000 });
   await page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {});
+  await page.waitForFunction(() => window.PRONOSTICS_DATA && !window.PRONOSTICS_DATA._lite, { timeout: 12000 }).catch(() => {});
   await page.waitForTimeout(1000);
 
   const report = await page.evaluate(() => {
