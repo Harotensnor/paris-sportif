@@ -1856,3 +1856,8 @@
 - Apres: sidebar V36 fixe avec 5 hubs Accueil/Tous/Performance/Methode/Reglages; le drawer mobile reutilise la meme structure.
 - Impact: navigation ramenee a 5 choix clairs, ancien rail bbf-left-rail cache sur accueil desktop pour preparer la grille 5 tiers.
 - Verif: visual_capture v36-sidebar-proof 32/32 OK, desktop padding-left 264px confirme, syntax/diff OK.
+## Sprint v35.270 — Phase 12 V36 P-12.7 Right rail sans panier (16:50 UTC)
+- Avant: l'accueil desktop gardait un rail "Panier paris" alors que Theo a demande aucun panier sur la premiere vue.
+- Apres: rail V36 sticky avec Prochains matchs, Dynamique modele et Stats live; les lignes ouvrent toujours la fiche match.
+- Impact: l'espace droite sert la decision en continu (countdown, forme modele, fraicheur data) au lieu d'un panier vide.
+- Verif: visual_capture v36-right-rail 32/32 OK, screenshot wide inspecte, syntax app.js OK.
