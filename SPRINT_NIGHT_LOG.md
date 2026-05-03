@@ -1805,3 +1805,9 @@
 - Apres: #calendrier ouvre #tous?view=calendar avec heatmap 7 jours, cartes par jour et ouverture directe des matchs.
 - Impact: 268 matchs accessibles affichés en calendrier, 7 day-cards, liste Tous conserve 220/260 lignes progressives.
 - Verif: capture phase12-calendar mobile/desktop/wide, 0 console error, syntax OK.
+
+## Sprint v35.260 — Phase 12 P-12.27 Recherche equipe 5 prochains matchs (16:52 local)
+- Avant: la recherche equipe ouvrait seulement le prochain match, parfois sans contexte 7 jours.
+- Apres: clic equipe charge le full data si besoin et affiche jusqu'a 5 prochains matchs dans une fiche.
+- Impact: New York Knicks retourne 4 matchs a venir, chaque ligne ouvre la modale detail.
+- Verif: test navigateur search -> bottom sheet, 0 console error, syntax OK.
