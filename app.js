@@ -14920,6 +14920,27 @@
         <header><span>BOOST</span><strong>Cotes boostees Winamax</strong><em>${esc(v36BoostStatus)}</em></header>
         ${v36Boosts.length ? `<div class="v36-boost-grid">${v36BoostHtml}</div>` : `<p>Pas de promotion explicite a jouer aveuglement. Le modele garde les 5 tiers comme source principale.</p>`}
       </section>`;
+      const v36GeniusPicks = v36PickPool
+        .filter(p => {
+          const variance = Number(p.pred?.ensemble?.agreement_variance || 0);
+          const componentCount = Number(p.pred?.ensemble?.sub_models?.length || 0);
+          return p.strict
+            && p.rel >= 0.56
+            && p.edge >= -0.005
+            && variance <= 0.045
+            && componentCount >= 2
+            && !p.pred?.league_bias;
+        })
+        .sort((a, b) => (b.score - a.score) || (b.rel - a.rel) || (a.ts - b.ts))
+        .slice(0, 4);
+      const v36GeniusSection = v36GeniusPicks.length ? `<section class="v36-genius-strip" aria-label="Picks du genie">
+        <header>
+          <span>GENIUS</span>
+          <strong>Picks du genie</strong>
+          <em>${v36GeniusPicks.length} consensus rare${v36GeniusPicks.length > 1 ? 's' : ''} · modele + calibration + marche alignes</em>
+        </header>
+        <div class="v36-genius-grid">${v36GeniusPicks.map(v36CompactCard).join('')}</div>
+      </section>` : '';
       const v36StatsHtml = [
         ['Picks', String(v36PickPool.length)],
         ['Matchs', String(v36UpcomingAll.length)],
@@ -14951,6 +14972,7 @@
             </div>
           </section>
           ${v36BoostSection}
+          ${v36GeniusSection}
           <div class="v36-home-grid">
             <section class="v36-tier-board" aria-label="Picks par niveau de cote">
               ${v36TierDefs.map(v36TierColumn).join('')}
