@@ -1831,3 +1831,8 @@
 - Apres: snapshot_odds remplace les snapshots externes par Winamax si match_id + marche 1N2 exact existent, et traite aussi data_lite.js.
 - Impact: external_snapshots_on_exact 154 -> 0 sur data.js, 40 -> 0 sur data_lite.js; winamax_exact_ratio maintenu a 95.7%.
 - Verif: py_compile OK, snapshot_odds idempotent a 0 au second run, check_health_quality OK.
+## Sprint v35.265 — Phase 12 V36 P-12.2 Couverture MLS/LATAM/Bundesliga (15:58 UTC)
+- Avant: H2H vide sur MLS/Liga MX/Bundesliga et meteo limitee a 36h; MLS avait 0/12 meteo, Bundesliga 2 avait 0/7.
+- Apres: fetch_h2h priorise les caches vides usa.1/mex.1/arg.1/ger.1/ger.2, fetch_weather couvre 7 jours et resout mieux les villes type "Austin, Texas".
+- Impact: H2H Arg 2/9 -> 8/9, MLS 0/12 -> 2/12, Liga MX 0/6 -> 2/6; meteo MLS 0/12 -> 11/12, ger.2 0/7 -> 7/7, ger.1 2/14 -> 9/14.
+- Verif: fetch_h2h --force-priority checked=65 enriched=62; fetch_weather total 638; patch_weather 244 events.

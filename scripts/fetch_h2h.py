@@ -21,6 +21,8 @@ from datetime import datetime, timezone, timedelta
 ROOT = Path(__file__).resolve().parent.parent
 DATA_PATH = ROOT / 'data.js'
 H2H_OUT = ROOT / 'h2h_extended.json'
+V36_PRIORITY_LEAGUES = {'usa.1', 'mex.1', 'arg.1', 'ger.1', 'ger.2'}
+EMPTY_PRIORITY_REFRESH_H = 2
 
 # ESPN summary endpoint — same slug path as fetch_v3 uses
 SPORT_TO_ESPN_PATH = {
@@ -249,7 +251,7 @@ def parse_seasonseries(summary):
             })
     return meetings
 
-def should_refetch(event, now):
+def should_refetch(event, now, force_priority=False):
     h = event.get('h2h')
     if not h or not isinstance(h, dict):
         return True
@@ -265,6 +267,13 @@ def should_refetch(event, now):
         return True
     try:
         age_h = (now - datetime.fromisoformat(fetched_at)).total_seconds() / 3600
+        # V36 coverage sprint — MLS / Liga MX / Argentina / Bundesliga had
+        # cached empty H2H blocks while ESPN summary now exposes meetings. Empty
+        # priority-league caches refresh faster than the normal 12h cadence.
+        if not meetings and event.get('league_code') in V36_PRIORITY_LEAGUES:
+            if force_priority:
+                return True
+            return age_h > EMPTY_PRIORITY_REFRESH_H
         return age_h > 12
     except Exception:
         return True
@@ -276,6 +285,7 @@ def main():
         print(f'[h2h] wrote {H2H_OUT.name} summary-only')
         return
     now_utc = datetime.now(timezone.utc)
+    force_priority = '--force-priority' in sys.argv
     # v31.7.4 — Horizon passe de 72h a 120h (5 jours) pour couvrir tout le
     # weekend + lundi des grandes ligues europeennes. Cap passe de 180 a 280
     # pour gerer les ~200 nouveaux matchs additionnels.
@@ -288,6 +298,7 @@ def main():
     checked = 0
     enriched = 0
     errors = 0
+    candidates = []
     for day_key, events in days.items():
         for ev in events:
             if ev.get('completed') or ev.get('status') == 'STATUS_IN_PROGRESS':
@@ -300,7 +311,7 @@ def main():
                 continue
             if start < lower_bound or start > horizon:
                 continue
-            if not should_refetch(ev, now_utc):
+            if not should_refetch(ev, now_utc, force_priority=force_priority):
                 continue
             # Only process events that are on Winamax (don't waste calls)
             wm = ev.get('winamax') or {}
@@ -308,25 +319,26 @@ def main():
                 continue
             if not league_espn_path(ev):
                 continue
-            checked += 1
-            if checked > 280:    # cap per run (~140s at 2 req/s)
-                break
-            try:
-                meetings = fetch_h2h(ev)
-            except Exception:
-                meetings = None
-                errors += 1
-            ev['h2h'] = {
-                'fetched_at': now_utc.isoformat(),
-                'schema_version': 2,
-                'source': (meetings and meetings[0].get('source')) or 'espn_summary_empty',
-                'meetings': meetings or [],
-            }
-            if meetings:
-                enriched += 1
-            time.sleep(0.5)     # 2 req/s
-        if checked > 280:
-            break
+            priority = 0 if ev.get('league_code') in V36_PRIORITY_LEAGUES else 1
+            candidates.append((priority, start, ev))
+
+    candidates.sort(key=lambda item: (item[0], item[1]))
+    for _priority, _start, ev in candidates[:320]:    # cap per run (~160s at 2 req/s)
+        checked += 1
+        try:
+            meetings = fetch_h2h(ev)
+        except Exception:
+            meetings = None
+            errors += 1
+        ev['h2h'] = {
+            'fetched_at': now_utc.isoformat(),
+            'schema_version': 2,
+            'source': (meetings and meetings[0].get('source')) or 'espn_summary_empty',
+            'meetings': meetings or [],
+        }
+        if meetings:
+            enriched += 1
+        time.sleep(0.5)     # 2 req/s
     save_data(d)
     save_h2h_extended(d)
     print(f'[h2h] checked={checked} enriched={enriched} errors={errors}')

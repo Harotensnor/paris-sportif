@@ -328,6 +328,19 @@ def resolve_event_location(ev: dict, geo_cache: dict) -> tuple[str, float, float
             loc = geocode(ev_city, geo_cache)
             if loc:
                 return (loc[0], loc[1], loc[2], 'event_city')
+        # V36 coverage — ESPN often gives North-American cities as
+        # "Austin, Texas" or "New York, New York". Open-Meteo search performs
+        # better with the city-only token plus country.
+        if ',' in ev_city:
+            primary_city = ev_city.split(',', 1)[0].strip()
+            if primary_city:
+                if ev_country:
+                    loc = geocode(f'{primary_city}, {ev_country}', geo_cache)
+                    if loc:
+                        return (loc[0], loc[1], loc[2], 'event_city')
+                loc = geocode(primary_city, geo_cache)
+                if loc:
+                    return (loc[0], loc[1], loc[2], 'event_city')
 
     # 2) venue + country : utile pour Camp Nou, Old Trafford, etc.
     ev_venue = (ev.get('venue') or '').strip()
@@ -454,7 +467,11 @@ def main() -> int:
     matches_out = dict(existing.get('matches') or {})
 
     now = datetime.now(timezone.utc)
-    horizon = now + timedelta(hours=36)
+    # V36 coverage — Theo wants playable opportunities throughout the whole
+    # week, not only the next day. Open-Meteo supports multi-day hourly
+    # forecasts, so keep outdoor MLS/LATAM/Bundesliga matches enriched further
+    # ahead while freshness rules still avoid re-fetching stable forecasts.
+    horizon = now + timedelta(hours=168)
 
     n_fresh = 0
     n_fetched = 0
