@@ -14839,6 +14839,7 @@
         { id: 'out', icon: '5', label: 'Outsider', range: '5.00+', desc: 'Edge 10%+', tone: 'out' }
       ];
       const v36TierById = Object.fromEntries(v36TierDefs.map(t => [t.id, t]));
+      const v36TierRank = { safe: 1, solid: 2, value: 3, big: 4, out: 5 };
       const v36HourBucket = (date) => {
         const h = new Date(date || 0).getHours();
         if (h >= 6 && h < 12) return 'morning';
@@ -14853,25 +14854,28 @@
         const edge = Number.isFinite(Number(c?.edge)) ? Number(c.edge) : (conf && odd ? conf - 1 / odd : 0);
         const ev = Number.isFinite(Number(c?.ev)) ? Number(c.ev) : (conf && odd ? conf * odd - 1 : -1);
         if (!(odd >= 1.30) || !(conf > 0) || !(edge > 0) || !(ev > 0)) return null;
-        if (odd >= 1.30 && odd < 1.50 && conf >= 0.75 && edge >= 0.01) return { id: 'safe', strict: true };
-        if (odd >= 1.50 && odd < 2.00 && conf >= 0.65 && edge >= 0.01) return { id: 'solid', strict: true };
-        if (odd >= 2.00 && odd < 3.00 && conf >= 0.50 && edge >= 0.05) return { id: 'value', strict: true };
-        if (odd >= 3.00 && odd < 5.00 && conf >= 0.28 && edge >= 0.08) return { id: 'big', strict: true };
-        if (odd >= 5.00 && conf >= 0.14 && edge >= 0.10) return { id: 'out', strict: true };
+        if (odd >= 1.30 && odd < 1.50 && conf >= 0.72 && edge >= 0.001) return { id: 'safe', strict: conf >= 0.75 && edge >= 0.01 };
+        if (odd >= 1.50 && odd < 2.00 && conf >= 0.58 && edge >= 0.001) return { id: 'solid', strict: conf >= 0.65 && edge >= 0.01 };
+        if (odd >= 2.00 && odd < 3.00 && conf >= 0.45 && edge >= 0.03) return { id: 'value', strict: edge >= 0.05 };
+        if (odd >= 3.00 && odd < 5.00 && conf >= 0.24 && edge >= 0.05) return { id: 'big', strict: edge >= 0.08 };
+        if (odd >= 5.00 && conf >= 0.10 && edge >= 0.08) return { id: 'out', strict: edge >= 0.10 };
         return null;
       };
       const v36PickPoolRaw = _dataIsStale ? [] : terminalScanPool.flatMap(m => {
         try {
           const pred = predictMatch(m);
-          if (!pred || !pred.pick || pred.skip) return [];
-          const best = _agentBestPick(m, pred);
-          if (!best) return [];
-          const rawCandidates = [best].concat(Array.isArray(best.allCandidates) ? best.allCandidates : []);
+          if (!pred || !pred.pick) return [];
+          const rawCandidates = (typeof buildMarketCandidates === 'function')
+            ? buildMarketCandidates(m, pred, { requireExact: true })
+            : (() => {
+              const best = _agentBestPick(m, pred);
+              return best ? [best].concat(Array.isArray(best.allCandidates) ? best.allCandidates : []) : [];
+            })();
           const seen = new Set();
           const ranked = rawCandidates
             .filter(c => c && Number(c.odd || 0) >= 1.30)
             .filter(c => {
-              const key = `${c.market || ''}:${c.pickKey || c.key || ''}:${Number(c.odd || 0).toFixed(2)}`;
+              const key = `${c.market || ''}:${c.pickKey || c.key || c.side || c.label || ''}:${c.line ?? ''}:${Number(c.odd || 0).toFixed(2)}`;
               if (seen.has(key)) return false;
               seen.add(key);
               return true;
@@ -14888,23 +14892,20 @@
                 m, pred, best: c, tier: tier.id, strict: tier.strict, odd, rel, edge, ev,
                 label: c.label || pred.pick?.label || 'Pick',
                 market: c.market || '1n2',
+                line: c.line ?? '',
                 pickKey: c.pickKey || c.key || pred.pick?.key || '',
                 ts: new Date(m.date || 0).getTime(),
-                score: (tier.strict ? 100 : 0) + investmentScoreValue + Math.max(-20, edge * 100) + rel * 10
+                score: (tier.strict ? 120 : 0) + investmentScoreValue + Math.max(-20, edge * 100) + rel * 10 - (pred.abstain?.active ? 12 : 0)
               };
             })
             .filter(Boolean)
             .sort((a, b) => b.score - a.score);
-          const seenTier = new Set();
-          return ranked.filter(p => {
-            if (seenTier.has(p.tier)) return false;
-            seenTier.add(p.tier);
-            return true;
-          }).slice(0, 3);
+          const leadTier = ranked[0]?.tier;
+          return leadTier ? ranked.filter(p => p.tier === leadTier).slice(0, 2) : [];
         } catch(e) { return []; }
       }).sort((a, b) => a.ts - b.ts);
       const v36PickPool = (() => {
-        const seenMatch = new Set();
+        const seenPick = new Set();
         const out = [];
         const ranked = v36PickPoolRaw.slice().sort((a, b) =>
           (Number(b.strict) - Number(a.strict))
@@ -14913,27 +14914,42 @@
         );
         for (const p of ranked) {
           const matchKey = String(p.m?.id || `${p.m?.date || ''}|${v36TeamName(getSides(p.m).home)}|${v36TeamName(getSides(p.m).away)}`);
-          if (seenMatch.has(matchKey)) continue;
-          seenMatch.add(matchKey);
+          const pickKey = `${matchKey}|${p.tier || ''}|${p.market || ''}|${p.pickKey || ''}|${p.line ?? ''}|${Number(p.odd || 0).toFixed(2)}`;
+          if (seenPick.has(pickKey)) continue;
+          seenPick.add(pickKey);
           out.push(p);
         }
         return out.sort((a, b) => a.ts - b.ts);
       })();
       const v36Sports = [...new Set(v36PickPool.map(p => p.m.sport).filter(Boolean))].slice(0, 8);
+      const v36Search = String(v36Filter.q || '').trim();
+      const v36Sort = ['tier','time','odd','conf','edge'].includes(v36Filter.sort) ? v36Filter.sort : 'tier';
       const v36Filtered = v36PickPool.filter(p => {
         if (v36Filter.sport && p.m.sport !== v36Filter.sport) return false;
         if (v36Filter.tier && p.tier !== v36Filter.tier) return false;
         if (v36Filter.time && v36HourBucket(p.m.date) !== v36Filter.time) return false;
+        if (v36Search) {
+          const { home, away } = getSides(p.m);
+          const hay = `${v36TeamName(home)} ${v36TeamName(away)} ${p.m.league_name || p.m.league || ''} ${p.label || ''} ${p.market || ''} ${sportLabel(p.m.sport || '')}`.toLowerCase();
+          if (!hay.includes(v36Search.toLowerCase())) return false;
+        }
         return true;
       });
-      const v36ByTier = Object.fromEntries(v36TierDefs.map(t => [t.id, []]));
-      v36Filtered.forEach(p => { if (v36ByTier[p.tier]) v36ByTier[p.tier].push(p); });
       const v36CountsAll = Object.fromEntries(v36TierDefs.map(t => [t.id, v36PickPool.filter(p => p.tier === t.id).length]));
       const v36Total = v36Filtered.length;
+      const v36Sorted = v36Filtered.slice().sort((a, b) => {
+        if (v36Sort === 'time') return (a.ts - b.ts) || (v36TierRank[a.tier] - v36TierRank[b.tier]) || (b.odd - a.odd);
+        if (v36Sort === 'odd') return (b.odd - a.odd) || (v36TierRank[a.tier] - v36TierRank[b.tier]) || (a.ts - b.ts);
+        if (v36Sort === 'conf') return (b.rel - a.rel) || (b.edge - a.edge) || (a.ts - b.ts);
+        if (v36Sort === 'edge') return (b.edge - a.edge) || (b.odd - a.odd) || (a.ts - b.ts);
+        return (v36TierRank[a.tier] - v36TierRank[b.tier]) || (b.odd - a.odd) || (b.edge - a.edge) || (a.ts - b.ts);
+      });
+      const v36TableRows = v36Sorted.slice(0, 120);
       const v36UpcomingAll = terminalScanPool.filter(m => new Date(m?.date || 0).getTime() > Date.now());
       const v36Next = v36UpcomingAll.slice(0, 6);
       const v36CoverageLine = `${v36PickPool.length} picks intelligents · ${v36UpcomingAll.length} matchs detectes · data ${_dataAgeMin} min`;
       const v36FilterButton = (kind, value, label, active) => `<button type="button" class="v36-filter-chip ${active ? 'is-active' : ''}" data-v36-filter="${esc(kind)}" data-v36-value="${esc(value)}">${label}</button>`;
+      const v36SortButton = (value, label) => `<button type="button" class="v36-sort-btn ${v36Sort === value ? 'is-active' : ''}" data-v36-sort="${esc(value)}">${esc(label)}</button>`;
       const v36CompactCard = (p) => {
         const { home, away } = getSides(p.m);
         const tier = v36TierById[p.tier];
@@ -14949,19 +14965,78 @@
           <span class="v36-pick-card__signals"><i>${relPct}% conf.</i><i>${edgePct >= 0 ? '+' : ''}${edgePct}% edge</i><i>${evPct >= 0 ? '+' : ''}${evPct}% EV</i></span>
         </button>`;
       };
-      const v36TierColumn = (tier) => {
-        const rows = (v36ByTier[tier.id] || []).slice(0, 14);
-        return `<section class="v36-tier-column" data-tone="${esc(tier.tone)}" id="tier-${esc(tier.id)}">
-          <header>
-            <span class="v36-tier-icon">${esc(tier.icon)}</span>
-            <div><h2>${esc(tier.label)}</h2><p>Cote ${esc(tier.range)} · ${esc(tier.desc)}</p></div>
-            <strong>${rows.length}</strong>
-          </header>
-          <div class="v36-tier-list">
-            ${rows.length ? rows.map(v36CompactCard).join('') : `<div class="v36-tier-empty">Aucun pick propre dans ce niveau pour l'instant.</div>`}
-          </div>
-        </section>`;
+      const v36TierBadge = (tierId, compact) => {
+        const tier = v36TierById[tierId] || v36TierDefs[0];
+        return `<span class="v36-tier-badge" data-tone="${esc(tier.tone)}"><b>${esc(tier.icon)}</b>${compact ? '' : `<em>${esc(tier.label)}</em>`}</span>`;
       };
+      const v36Logo = (team) => team?.logo
+        ? `<img src="${esc(team.logo)}" alt="" loading="lazy" decoding="async" width="16" height="16" onerror="this.outerHTML='<span>${esc((v36TeamName(team) || '?').slice(0,1))}</span>'">`
+        : `<span>${esc((v36TeamName(team) || '?').slice(0,1))}</span>`;
+      const v36MatchTitleHtml = (p) => {
+        const { home, away } = getSides(p.m);
+        return `<span class="v36-match-name"><i>${v36Logo(home)}</i><b>${esc(v36TeamName(home))}</b><em>-</em><i>${v36Logo(away)}</i><b>${esc(v36TeamName(away))}</b></span>`;
+      };
+      const v36ReasonTooltip = (p) => {
+        const reasons = (p.pred?.explain?.reasons || [])
+          .map(r => typeof r === 'string' ? r : r?.text)
+          .filter(Boolean)
+          .slice(0, 3);
+        if (reasons.length) return reasons.join(' · ');
+        const variance = p.pred?.ensemble?.agreement_variance == null ? 'n/a' : String(p.pred.ensemble.agreement_variance);
+        return `EV ${(p.ev * 100).toFixed(1)}% · variance ensemble ${variance} · marché ${p.market}`;
+      };
+      const v36TableRow = (p, idx) => {
+        const tier = v36TierById[p.tier] || v36TierDefs[0];
+        const league = String(p.m.league_name || p.m.league || sportLabel(p.m.sport || '') || '').replace(/^(.{34}).+$/, '$1…');
+        const edgePct = (p.edge * 100).toFixed(1);
+        const relPct = Math.round(p.rel * 100);
+        return `<tr class="v36-table-row" data-tone="${esc(tier.tone)}" data-big-detail="${esc(String(p.m.id || ''))}" tabindex="0" title="${esc(v36ReasonTooltip(p))}">
+          <td class="v36-cell-sport"><span>${sportIcon(p.m.sport || '')}</span><b>${esc(sportLabel(p.m.sport || '').slice(0, 9))}</b></td>
+          <td>${esc(fmtTime(p.m.date))}</td>
+          <td class="v36-cell-league">${esc(league)}</td>
+          <td class="v36-cell-match">${v36MatchTitleHtml(p)}</td>
+          <td class="v36-cell-pick"><b>${esc(p.label)}</b><em>${esc(p.market || '')}</em></td>
+          <td class="v36-num v36-odd">@${p.odd.toFixed(2)}</td>
+          <td class="v36-num">${relPct}%</td>
+          <td class="v36-num ${p.edge >= 0 ? 'is-pos' : 'is-neg'}">${p.edge >= 0 ? '+' : ''}${edgePct}%</td>
+          <td>${v36TierBadge(p.tier, true)}</td>
+          <td class="v36-action">→</td>
+        </tr>`;
+      };
+      const v36MobileCard = (p) => {
+        const tier = v36TierById[p.tier] || v36TierDefs[0];
+        return `<button type="button" class="v36-table-card" data-tone="${esc(tier.tone)}" data-big-detail="${esc(String(p.m.id || ''))}">
+          <span class="v36-table-card__top"><b>${sportIcon(p.m.sport || '')} ${esc(fmtTime(p.m.date))}</b>${v36TierBadge(p.tier, false)}</span>
+          <strong>${v36MatchTitleHtml(p)}</strong>
+          <em class="v36-table-card__league">${esc(p.m.league_name || p.m.league || '')}</em>
+          <span class="v36-table-card__line"><i>${esc(p.label)}</i><b>@${p.odd.toFixed(2)}</b><b>${Math.round(p.rel * 100)}%</b><b>${p.edge >= 0 ? '+' : ''}${(p.edge * 100).toFixed(1)}%</b></span>
+        </button>`;
+      };
+      const v36TableHtml = `<section class="v36-table-panel" aria-label="Tableau dense des propositions">
+        <header class="v36-table-toolbar">
+          <div>
+            <strong>${v36PickPool.length} picks aujourd'hui</strong>
+            <span>${v36TierDefs.map(t => `${v36CountsAll[t.id] || 0} ${t.label}`).join(' · ')}</span>
+          </div>
+          <label class="v36-table-search"><span>Search</span><input type="search" data-v36-search value="${esc(v36Search)}" placeholder="Équipe, ligue, marché"></label>
+          <div class="v36-sort-strip" aria-label="Tri tableau">
+            ${v36SortButton('tier', 'Tier')}
+            ${v36SortButton('time', 'Heure')}
+            ${v36SortButton('odd', 'Cote')}
+            ${v36SortButton('conf', 'Conf')}
+            ${v36SortButton('edge', 'Edge')}
+          </div>
+        </header>
+        <div class="v36-table-scroll">
+          <table class="v36-picks-table">
+            <thead><tr>
+              <th>Sport</th><th>${v36SortButton('time', 'Heure')}</th><th>Ligue</th><th>Match</th><th>Pari</th><th>${v36SortButton('odd', 'Cote')}</th><th>${v36SortButton('conf', 'Conf')}</th><th>${v36SortButton('edge', 'Edge')}</th><th>${v36SortButton('tier', 'Tier')}</th><th>Action</th>
+            </tr></thead>
+            <tbody>${v36TableRows.length ? v36TableRows.map(v36TableRow).join('') : `<tr><td colspan="10"><div class="v36-tier-empty">Aucun pick pour ce filtre. Retire un sport, une heure ou une recherche.</div></td></tr>`}</tbody>
+          </table>
+        </div>
+        <div class="v36-table-cards">${v36TableRows.length ? v36TableRows.map(v36MobileCard).join('') : `<div class="v36-tier-empty">Aucun pick pour ce filtre.</div>`}</div>
+      </section>`;
       const v36NextHtml = v36Next.length ? v36Next.map(m => {
         const { home, away } = getSides(m);
         const diff = new Date(m.date || 0).getTime() - Date.now();
@@ -15039,7 +15114,7 @@
       wrap.innerHTML = `
         <div class="v36-home-shell">
           <section class="v36-dayline" aria-label="Strategie du jour">
-            <strong>${_dataIsStale ? 'Donnees trop anciennes : refresh avant de jouer' : `Aujourd'hui : ${v36Total} picks affiches sur 5 niveaux`}</strong>
+            <h1>${_dataIsStale ? 'Donnees trop anciennes : refresh avant de jouer' : `Aujourd'hui : ${v36Total} picks affiches sur 5 niveaux`}</h1>
             <span>${esc(v36CoverageLine)}</span>
             <button type="button" class="page-btn" data-page="tous">Tout voir</button>
           </section>
@@ -15060,18 +15135,16 @@
               ${v36FilterButton('time', 'night', 'Nuit', v36Filter.time === 'night')}
             </div>
           </section>
-          ${v36BoostSection}
-          ${v36GeniusSection}
           <div class="v36-home-grid">
-            <section class="v36-tier-board" aria-label="Picks par niveau de cote">
-              ${v36TierDefs.map(v36TierColumn).join('')}
-            </section>
+            ${v36TableHtml}
             <aside class="v36-home-rail" aria-label="Radar temps reel">
               <section><header><span>Prochains matchs</span><b>${v36Next.length}</b></header>${v36NextHtml}</section>
               <section><header><span>Stats live</span><b>${v36Total}</b></header><div class="v36-side-stats">${v36StatsHtml}</div></section>
               <section><header><span>Genie mode</span><b>${v36PickPool.length}</b></header><p>Le site classe uniquement des picks +EV, sans doublon de match, par cote, confiance, edge et cohérence marché.</p></section>
             </aside>
           </div>
+          ${v36GeniusSection}
+          ${v36BoostSection}
         </div>`;
       wrap.querySelectorAll('[data-v36-filter]').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -15084,6 +15157,27 @@
           renderDashboardPage(wrap);
         });
       });
+      wrap.querySelectorAll('[data-v36-sort]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const next = { ...v36Filter, sort: btn.dataset.v36Sort || 'tier' };
+          try { localStorage.setItem(v36FilterKey, JSON.stringify(next)); } catch(e) {}
+          renderDashboardPage(wrap);
+        });
+      });
+      const v36SearchInput = wrap.querySelector('[data-v36-search]');
+      if (v36SearchInput) {
+        v36SearchInput.addEventListener('input', () => {
+          clearTimeout(wrap.__v36SearchTimer);
+          wrap.__v36SearchTimer = setTimeout(() => {
+            const next = { ...v36Filter };
+            const q = String(v36SearchInput.value || '').trim();
+            if (q) next.q = q;
+            else delete next.q;
+            try { localStorage.setItem(v36FilterKey, JSON.stringify(next)); } catch(e) {}
+            renderDashboardPage(wrap);
+          }, 140);
+        });
+      }
       const v36MatchById = (id) => {
         let found = null;
         Object.values(data.days || {}).forEach(arr => (arr || []).forEach(m => { if (String(m.id) === String(id)) found = m; }));
@@ -15091,6 +15185,12 @@
       };
       wrap.querySelectorAll('[data-big-detail]').forEach(btn => {
         btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const m = v36MatchById(btn.dataset.bigDetail || btn.dataset.matchId);
+          if (m && typeof openDetail === 'function') openDetail(m);
+        });
+        btn.addEventListener('keydown', (e) => {
+          if (e.key !== 'Enter' && e.key !== ' ') return;
           e.preventDefault();
           const m = v36MatchById(btn.dataset.bigDetail || btn.dataset.matchId);
           if (m && typeof openDetail === 'function') openDetail(m);
