@@ -5306,11 +5306,28 @@
     }
     return rawProb;
   }
+  let __backtestV2Promise = null;
+  async function _fetchBacktestReportV2(opts = {}) {
+    if (!opts.force && window.__backtestReportV2) return window.__backtestReportV2;
+    if (!opts.force && __backtestV2Promise) return __backtestV2Promise;
+    const bucket = Math.floor(Date.now() / (15 * 60 * 1000)); // max 15 min stale, SW/browser friendly
+    const fetchOpts = { cache: 'default' };
+    if (opts.signal) fetchOpts.signal = opts.signal;
+    __backtestV2Promise = fetch('backtest_report_v2.json?v=' + bucket, fetchOpts)
+      .then(r => {
+        if (!r.ok) throw new Error('http ' + r.status);
+        return r.json();
+      })
+      .then(rep => {
+        window.__backtestReportV2 = rep;
+        return rep;
+      })
+      .finally(() => { __backtestV2Promise = null; });
+    return __backtestV2Promise;
+  }
   async function _loadModelCalibration() {
     try {
-      const r = await fetch('backtest_report_v2.json?t=' + Date.now(), { cache: 'no-store' });
-      if (!r.ok) return;
-      const rep = await r.json();
+      const rep = await _fetchBacktestReportV2();
       const repFresh = _isFreshBacktestReport(rep);
       // by_sport_calibration: { football: [bins], tennis: [bins], ... }
       // by_sport: { football: { n: 234, ... }, ... } (déjà existant pour KPIs)
@@ -5351,7 +5368,6 @@
         stale: !repFresh,
       };
       // by_cote_bucket, by_tier, overall — ROI / brier / logloss).
-      window.__backtestReportV2 = rep;
       // Invalidate memoized predictions so subsequent renders apply calibration
       if (typeof __predCache !== 'undefined') __predCache = new Map();
       _populateTrustStrip(rep);
@@ -5371,7 +5387,7 @@
     if (__marketBacktestLoaded || __marketBacktestPromise) return __marketBacktestPromise;
     __marketBacktestPromise = (async () => {
       try {
-        const r = await fetch('backtest_report_markets.json?t=' + Date.now(), { cache: 'no-store' });
+        const r = await fetch('backtest_report_markets.json?v=' + Math.floor(Date.now() / (60 * 60 * 1000)), { cache: 'default' });
         if (!r.ok) { __marketBacktestLoaded = true; return; }
         const rep = await r.json();
         window.__backtestReportMarkets = rep;
@@ -14004,6 +14020,7 @@
       buildMarketCandidates: typeof buildMarketCandidates === 'function' ? buildMarketCandidates : null,
       scoreMarketCandidate: typeof scoreMarketCandidate === 'function' ? scoreMarketCandidate : null,
       _isFreshBacktestReport: typeof _isFreshBacktestReport === 'function' ? _isFreshBacktestReport : null,
+      _fetchBacktestReportV2: typeof _fetchBacktestReportV2 === 'function' ? _fetchBacktestReportV2 : null,
       safeLocalStorageJson: typeof safeLocalStorageJson === 'function' ? safeLocalStorageJson : null,
       scoreToImpliedMarkets: typeof scoreToImpliedMarkets === 'function' ? scoreToImpliedMarkets : null,
       isPickConsistentWithScore: typeof isPickConsistentWithScore === 'function' ? isPickConsistentWithScore : null,
@@ -21478,10 +21495,8 @@
     const ctrl = new AbortController();
     const timeoutId = setTimeout(() => ctrl.abort(), 5000);
     try {
-      const r = await fetch('backtest_report_v2.json?t=' + Date.now(), { cache: 'no-store', signal: ctrl.signal });
+      rep = await _fetchBacktestReportV2({ signal: ctrl.signal });
       clearTimeout(timeoutId);
-      if (!r.ok) throw new Error('http ' + r.status);
-      rep = await r.json();
     } catch (e) {
       clearTimeout(timeoutId);
       const isTimeout = e.name === 'AbortError';
