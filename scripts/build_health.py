@@ -178,6 +178,23 @@ def _count_match_previews(d):
         'local_fallbacks': d.get('local_fallbacks') or 0,
     }
 
+def _count_league_bias_audit(d):
+    if not isinstance(d, dict):
+        return None
+    summary = d.get('summary') or {}
+    status_counts = summary.get('status_counts') or {}
+    current = summary.get('current_upcoming_by_status') or {}
+    return {
+        'leagues': summary.get('leagues_total') or len(d.get('leagues') or []),
+        'deprioritize': status_counts.get('deprioritize') or 0,
+        'watch': status_counts.get('watch') or 0,
+        'trusted': status_counts.get('trusted') or 0,
+        'risky_current_leagues': summary.get('risky_current_leagues') or 0,
+        'risky_current_events': summary.get('risky_current_events') or 0,
+        'current_deprioritize_events': current.get('deprioritize') or 0,
+        'current_watch_events': current.get('watch') or 0,
+    }
+
 SOURCES = [
     ('winamax_catalog', 'winamax_catalog.json', _count_winamax_catalog),
     ('winamax_markets', 'winamax_markets.json', _count_winamax_markets),
@@ -210,6 +227,7 @@ SOURCES = [
     ('lineups_multisport', 'lineups_multisport.json', _count_lineups_multisport),
     ('xg_coverage', 'xg_coverage.json', _count_xg_coverage),
     ('match_previews', 'match_previews.json', _count_match_previews),
+    ('league_bias_audit', 'league_bias_audit.json', _count_league_bias_audit),
     ('injuries_multisport', 'injuries_multisport.json', lambda d: {
         'teams': len(d.get('teams') or {}) if isinstance(d, dict) else 0,
         'sports': len(d.get('by_sport') or {}) if isinstance(d, dict) else 0,
@@ -276,6 +294,7 @@ STALE_AFTER_MIN = {
     'lineups_multisport': 60,   # starter context built from patched data.js
     'xg_coverage': 60,          # product coverage of patched xG fields
     'match_previews': 60,       # top upcoming match explanations
+    'league_bias_audit': 60,    # model league reliability guardrail
     'rugby_markets':   6*60,    # derived only when rugby appears in data.js
     'niche_markets':   6*60,    # darts/snooker derived sidecar
     'boosted_odds':    60,      # follows Winamax market refresh
@@ -303,6 +322,7 @@ SOURCE_SCRIPT = {
     'lineups_multisport': 'scripts/build_lineups_multisport.py',
     'xg_coverage': 'scripts/build_xg_coverage.py',
     'match_previews': 'scripts/fetch_match_previews.py',
+    'league_bias_audit': 'scripts/build_league_bias_audit.py',
     'rugby_markets': 'scripts/build_rugby_markets.py',
     'niche_markets': 'scripts/build_niche_markets.py',
     'boosted_odds': 'scripts/detect_boosted_odds.py',
