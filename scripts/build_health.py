@@ -252,6 +252,17 @@ SOURCES = [
         'teams_with_xg': d.get('teams_with_xg') or 0 if isinstance(d, dict) else 0,
         'teams_with_form': d.get('teams_with_form') or 0 if isinstance(d, dict) else 0,
     }),
+    ('public_team_profiles', 'public_team_profiles.json', lambda d: {
+        'teams': d.get('teams_total') or 0 if isinstance(d, dict) else 0,
+        'upcoming': d.get('teams_with_upcoming') or 0 if isinstance(d, dict) else 0,
+        'availability': d.get('teams_with_availability') or 0 if isinstance(d, dict) else 0,
+        'deep_context': d.get('teams_with_deep_context') or 0 if isinstance(d, dict) else 0,
+    }),
+    ('public_player_profiles', 'public_player_profiles.json', lambda d: {
+        'players': d.get('players_total') or 0 if isinstance(d, dict) else 0,
+        'injuries': d.get('injury_profiles') or 0 if isinstance(d, dict) else 0,
+        'starter_context': d.get('starter_context_profiles') or 0 if isinstance(d, dict) else 0,
+    }),
     ('rugby_markets', 'rugby_markets.json', lambda d: {
         'events': len(d.get('events') or []) if isinstance(d, dict) else 0,
         'markets': d.get('markets') or 0 if isinstance(d, dict) else 0,
@@ -291,6 +302,8 @@ STALE_AFTER_MIN = {
     'thesportsdb_meta': 24*60,  # daily metadata cache
     'openligadb_matches': 12*60, # German football cross-check cache
     'public_team_stats': 6*60,  # merged public sidecar
+    'public_team_profiles': 6*60,  # team search/intelligence profile
+    'public_player_profiles': 6*60,  # player search/intelligence profile
     'lineups_multisport': 60,   # starter context built from patched data.js
     'xg_coverage': 60,          # product coverage of patched xG fields
     'match_previews': 60,       # top upcoming match explanations
@@ -319,6 +332,8 @@ SOURCE_SCRIPT = {
     'thesportsdb_meta': 'scripts/fetch_thesportsdb_meta.py',
     'openligadb_matches': 'scripts/fetch_openligadb.py',
     'public_team_stats': 'scripts/build_public_team_stats.py',
+    'public_team_profiles': 'scripts/build_public_profiles.py',
+    'public_player_profiles': 'scripts/build_public_profiles.py',
     'lineups_multisport': 'scripts/build_lineups_multisport.py',
     'xg_coverage': 'scripts/build_xg_coverage.py',
     'match_previews': 'scripts/fetch_match_previews.py',

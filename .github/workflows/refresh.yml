@@ -171,6 +171,7 @@ jobs:
           python3 build_public_team_stats.py || true
             python3 build_lineups_multisport.py || true
             python3 build_xg_coverage.py || true
+            python3 build_public_profiles.py || true
             python3 fetch_match_previews.py --limit 12 || true
             python3 build_league_bias_audit.py || true
             python3 build_rugby_markets.py || true
@@ -293,7 +294,7 @@ jobs:
             lineups_soccer.json lineups_multisport.json xg_coverage.json match_previews.json clubelo.json weather.json fbref_xg.json xg_team_stats.json \
             weather_geo_cache.json referees_soccer.json health.json \
             data_today.json data_manifest.json team_form.json form_stats_extended.json h2h_extended.json \
-            thesportsdb_meta.json openligadb_matches.json public_team_stats.json \
+            thesportsdb_meta.json openligadb_matches.json public_team_stats.json public_team_profiles.json public_player_profiles.json \
             rugby_markets.json niche_markets.json \
             boosted_odds.json \
             results_archive.jsonl tennis_ratings.json footballdata.json \

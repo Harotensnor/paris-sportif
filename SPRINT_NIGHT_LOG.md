@@ -2012,3 +2012,8 @@
 - Apres: night_metrics est regenere (367 events, 305 upcoming, Winamax exact 367/367), et les outils MCP choisissent le jour Europe/Paris actif ou le prochain jour disponible dans data.days.
 - Impact: get_pipeline_status expose local_today + data_today_field et retourne aujourd'hui=2026-05-03 sur le snapshot courant; les outils today/high_confidence/gaps/sports utilisent la meme resolution.
 - Verif: test_mcp_smoke OK 14/18 (4 tools skip args requis), py_compile OK, lecture directe get_pipeline_status => today/local_today/data_today_field = 2026-05-03.
+## Sprint v35.301 — AUTO 10/10 Data intelligence profils publics (20:59 UTC)
+- Avant: public_team_stats aggregait deja forme/xG, mais il n'existait pas de profil equipe/joueur rechercheable combinant calendrier, blessures, lineups/pitchers/goalies et contexte.
+- Apres: build_public_profiles.py genere public_team_profiles.json + public_player_profiles.json depuis les sidecars publics existants et le workflow les publie a chaque refresh.
+- Impact: 881 profils equipes, 459 avec matchs a venir, 87 avec disponibilite blessure/lineup et 500 profils joueurs prioritaires (blessures + pitchers/goalies) disponibles pour recherche approfondie.
+- Verif: build_public_profiles OK, build_health OK (29 sources suivies), py_compile OK.
