@@ -16024,6 +16024,14 @@
         try { return Number(JSON.parse(localStorage.getItem('paris_sportif_winamax_clicks_v1') || '{}').count || 0); }
         catch(e) { return 0; }
       })();
+      const bbfCockpitLive = (() => {
+        const ga = window.PRONOSTICS_DATA?.generated_at;
+        const ageMin = ga ? Math.max(0, Math.floor((Date.now() - new Date(ga).getTime()) / 60000)) : null;
+        const pace = (typeof _hasLiveMatch === 'function' && _hasLiveMatch()) ? '10s live'
+          : (typeof _hasImminentMatch === 'function' && _hasImminentMatch()) ? '12s kickoff'
+          : '30s';
+        return `Cockpit live ${pace}${ageMin == null ? '' : ` · data ${ageMin} min`}`;
+      })();
       const bbfFocusButton = `<button type="button" data-bbf-focus-toggle aria-pressed="${bbfFocusOnly ? 'true' : 'false'}" style="min-height:40px;border:1px solid ${bbfFocusOnly ? 'var(--c-strong)' : 'var(--border)'};border-radius:var(--r-pill);background:${bbfFocusOnly ? 'rgba(22,163,74,.20)' : 'rgba(255,255,255,.04)'};color:var(--text);padding:0 12px;font-size:12px;font-weight:900;cursor:pointer;">${bbfFocusOnly ? 'Focus ON' : 'Mode Big Bets'}</button>`;
       const bbfInternalAlertKey = `paris_sportif_internal_alert_seen_${todayIso}_v1`;
       const bbfInternalAlertSeen = (() => { try { return localStorage.getItem(bbfInternalAlertKey) === '1'; } catch(e) { return false; } })();
@@ -16075,7 +16083,7 @@
         <div class="bbf-shell" data-phase="big-bets-first">
           <section class="bbf-command" aria-live="polite">
             <strong>${bbfBigBets[0] ? `Prochain gros pari : ${esc(bbfMarketLabel(bbfBigBets[0]))} @${Number(bbfBigBets[0].odd).toFixed(2)}` : 'Pas de pari urgent'}</strong>
-            <span>${_dataIsStale ? `Données trop anciennes (${_dataAgeMin} min) : refresh avant d'agir.` : `${bbfVisibleCount} paris affichables · cote min ${userOddMin.toFixed(2)} · bankroll ${userBankroll.toFixed(0)}€ · ${bbfClickCount} clic${bbfClickCount > 1 ? 's' : ''} Winamax`}</span>
+            <span data-cockpit-live>${_dataIsStale ? `Données trop anciennes (${_dataAgeMin} min) : refresh avant d'agir.` : `${bbfVisibleCount} paris affichables · cote min ${userOddMin.toFixed(2)} · bankroll ${userBankroll.toFixed(0)}€ · ${bbfClickCount} clic${bbfClickCount > 1 ? 's' : ''} Winamax · ${bbfCockpitLive}`}</span>
             ${bbfFocusButton}
           </section>
           ${bbfOffline}

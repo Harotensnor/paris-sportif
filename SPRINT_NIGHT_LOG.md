@@ -1591,3 +1591,9 @@
 - Apres: Accueil ajoute une section `Picks de nuit` pour les kickoffs après 22h ou avant 6h.
 - Impact: les spots US/Asie tardifs ressortent uniquement si cote ≥2.00, edge ≥4% et confiance ≥50%.
 - Verif: JS syntax OK, bundle OK, stamps app/sw mis à jour.
+
+## Sprint v35.218 — Phase 11 P-11.23 Cockpit temps réel (10:44 UTC)
+- Avant: le polling adaptatif tournait en fond mais l'accueil ne l'expliquait pas.
+- Apres: le bandeau cockpit affiche la cadence live 10/12/30s et l'âge de la data.
+- Impact: Théo voit les KPIs se rafraîchir sans recharger la page.
+- Verif: JS syntax OK, bundle OK, stamps app/sw mis à jour.
