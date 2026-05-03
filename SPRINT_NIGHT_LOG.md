@@ -1579,3 +1579,9 @@
 - Apres: detect_boosted_odds.py scanne catalogue + marchés sans inférer de faux boost.
 - Impact: 644 matchs scannés; statut `empty` propre car aucun marqueur boost explicite aujourd'hui.
 - Verif: py_compile OK, build_health OK, boosted_odds status empty.
+
+## Sprint v35.216 — Phase 11 P-11.21 Picks consensus (10:41 UTC)
+- Avant: aucun espace dédié aux picks où ensemble, calibration et marché convergent.
+- Apres: Accueil ajoute une section `Picks consensus` avec accord fort, variance basse et calibration/sharp aligné.
+- Impact: les paris multi-signaux ressortent sans mélanger les marchés divergents au hero.
+- Verif: JS syntax OK, bundle OK, stamps app/sw mis à jour.
