@@ -76,6 +76,38 @@ function startServerIfNeeded() {
   });
 }
 
+async function enableStableCaptureMode(page) {
+  if (process.env.VISUAL_KEEP_FIXED === '1') return;
+  await page.addStyleTag({
+    content: `
+      html.visual-capture .mobile-bottom-nav,
+      html.visual-capture .scroll-top-fab,
+      html.visual-capture .toast-stack,
+      html.visual-capture #toast-host,
+      html.visual-capture #pwa-install-banner,
+      html.visual-capture #consent-banner,
+      html.visual-capture .refresh-indicator.topbar-refresh {
+        display: none !important;
+      }
+      html.visual-capture header.topbar,
+      html.visual-capture .tous-filter-bar,
+      html.visual-capture .responsible-gambling-banner,
+      html.visual-capture .rg-banner,
+      html.visual-capture .trust-strip {
+        position: static !important;
+        top: auto !important;
+        bottom: auto !important;
+      }
+      html.visual-capture body,
+      html.visual-capture main,
+      html.visual-capture .page-wrap {
+        scroll-padding-bottom: 0 !important;
+      }
+    `,
+  });
+  await page.evaluate(() => document.documentElement.classList.add('visual-capture'));
+}
+
 (async () => {
   const tag = process.argv[2] || 'snapshot';
   const dir = path.join(ROOT, '.cache', `phase4-${tag}`);
@@ -85,6 +117,7 @@ function startServerIfNeeded() {
   const manifest = {
     tag,
     base_url: BASE_URL,
+    stable_capture_mode: process.env.VISUAL_KEEP_FIXED === '1' ? false : true,
     generated_at: new Date().toISOString(),
     pages: PAGES.map(p => p.name),
     viewports: VIEWPORTS,
@@ -104,6 +137,7 @@ function startServerIfNeeded() {
         await page.goto(`${BASE_URL}/pronostics.html#${p.hash}`, { waitUntil: 'domcontentloaded', timeout: 15000 });
         await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
         await page.waitForTimeout(1200);
+        await enableStableCaptureMode(page);
         await page.screenshot({ path: out, fullPage: true });
         const metrics = await page.evaluate(() => ({
           hash: location.hash,
