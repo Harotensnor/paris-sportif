@@ -469,7 +469,7 @@ Contexte : après correction de `Tous`, la couverture monte à 277 matchs à ven
 - Viewports : mobile
 - Preuve : `.cache/phase4-phase12-tous-coverage/dashboard-mobile.png`
 - Action : Revalider safe-zone mobile et ajouter padding/scroll-margin autour des sections sous le fold.
-- Statut : OPEN
+- Statut : FIXED v35.251 — le chevauchement était un artefact full-page; `visual_capture.js` active un mode capture stable et l'audit mobile reste à 0 overlap.
 
 ### P12-VIS-005 — Le CTA “Voir toutes les opportunités restantes” wrap en plusieurs lignes et alourdit la carte.
 
@@ -523,7 +523,7 @@ Contexte : après correction de `Tous`, la couverture monte à 277 matchs à ven
 - Viewports : all full-page captures
 - Preuve : `.cache/phase4-phase12-tous-coverage/manifest.json`
 - Action : Ajouter un mode capture CSS désactivant sticky/fixed pour les screenshots full-page.
-- Statut : OPEN
+- Statut : FIXED v35.251 — mode capture stable ajouté au script; `VISUAL_KEEP_FIXED=1` permet encore de forcer le rendu fixed réel.
 
 ## Phase 12 audit filtres — combinaisons Tous
 

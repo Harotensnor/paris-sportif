@@ -1761,3 +1761,8 @@
 - Apres: les issues 1N2 brutes Winamax visibles sont ajoutees au comptage audit.
 - Impact: suspiciousZeroCombos 4 -> 0, 1N2 = 778 candidats, tennis vainqueur couvert.
 - Verif: tous_filter_combo_audit 225 combos OK, 0 suspicious.
+## Sprint v35.251 — Phase 12 P-12.20 Stabiliser captures full-page (16:08 local)
+- Avant: bottom nav et sticky bars se repetaient dans les screenshots full-page.
+- Apres: visual_capture active un mode capture stable qui masque fixed non essentiels.
+- Impact: dashboard mobile 5843px -> 3774px en capture, audit manuel plus fiable.
+- Verif: visual_capture phase12-stable-capture 32/32 OK.
