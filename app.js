@@ -19020,12 +19020,20 @@
         const edge = parseFloat(params.get('edge') || '0');
         const conf = parseFloat(params.get('conf') || '0');
         const odd = parseFloat(params.get('odd') || '0');
-        if (sports.length === 0 && !edge && !conf && !odd) return null;
+        const maxOdd = parseFloat(params.get('oddMax') || '0');
+        const league = params.get('league') || '';
+        const time = params.get('time') || 'all';
+        const tier = params.get('tier') || 'all';
+        if (sports.length === 0 && !edge && !conf && !odd && !maxOdd && !league && time === 'all' && tier === 'all') return null;
         return {
           sports: sports.filter(Boolean),
           minEdge: normalPct(edge),
           minConf: normalPct(conf),
           minOdd: isFinite(odd) ? odd : 0,
+          maxOdd: isFinite(maxOdd) ? maxOdd : 0,
+          league,
+          time,
+          tier,
         };
       } catch (e) { return null; }
     };
@@ -19042,10 +19050,14 @@
             minEdge: typeof p.minEdge === 'number' ? p.minEdge : 0,
             minConf: typeof p.minConf === 'number' ? p.minConf : 0,
             minOdd: typeof p.minOdd === 'number' ? p.minOdd : 0,
+            maxOdd: typeof p.maxOdd === 'number' ? p.maxOdd : 0,
+            league: typeof p.league === 'string' ? p.league : '',
+            time: typeof p.time === 'string' ? p.time : 'all',
+            tier: typeof p.tier === 'string' ? p.tier : 'all',
           };
         }
       } catch(e) {}
-      return { sports: [], minEdge: 0, minConf: 0, minOdd: 0 };
+      return { sports: [], minEdge: 0, minConf: 0, minOdd: 0, maxOdd: 0, league: '', time: 'all', tier: 'all' };
     };
     const tousFilters = _readFilters();
     const _readSort = () => {
@@ -19073,6 +19085,10 @@
         if (tousFilters.minEdge > 0) params.set('edge', tousFilters.minEdge);
         if (tousFilters.minConf > 0) params.set('conf', tousFilters.minConf);
         if (tousFilters.minOdd > 0) params.set('odd', tousFilters.minOdd);
+        if (tousFilters.maxOdd > 0) params.set('oddMax', tousFilters.maxOdd);
+        if (tousFilters.league) params.set('league', tousFilters.league);
+        if (tousFilters.time && tousFilters.time !== 'all') params.set('time', tousFilters.time);
+        if (tousFilters.tier && tousFilters.tier !== 'all') params.set('tier', tousFilters.tier);
         if (tousPreset !== 'all') params.set('preset', tousPreset);
         if (tousSort !== 'kickoff') params.set('sort', tousSort);
         if (tousView === 'calendar') params.set('view', 'calendar');
@@ -19137,17 +19153,59 @@
     // Sports présents (pour ne pas afficher des pills vides)
     const sportLabelMap = { football:'⚽ Foot', tennis:'🎾 Tennis', basketball:'🏀 Basket', hockey:'🏒 Hockey', baseball:'⚾ Baseball', 'american-football':'🏈 NFL', mma:'🥊 MMA', golf:'⛳ Golf', racing:'🏎️ F1', rugby:'🏉 Rugby', other:'🎯 Autres' };
     const sportsAvailable = [...new Set((isCoveragePreset ? coverageRowsAll : allPicks).map(p => p.sport))].sort();
+    const _rowLeague = (p) => String(p?.m?.league_name || p?.m?.league || '').trim();
+    const leagueAvailable = [...new Set((isCoveragePreset ? coverageRowsAll : allPicks).map(_rowLeague).filter(Boolean))]
+      .sort((a,b) => a.localeCompare(b, 'fr'))
+      .slice(0, 80);
+    const _timeBucket = (ts) => {
+      const d = new Date(ts);
+      if (!Number.isFinite(d.getTime())) return 'all';
+      const h = d.getHours();
+      if (h >= 6 && h < 12) return 'morning';
+      if (h >= 12 && h < 18) return 'afternoon';
+      if (h >= 18 && h < 23) return 'evening';
+      return 'night';
+    };
+    const _coverageBestOdd = (m) => {
+      const wx = m?.winamax?.markets?.['1n2'];
+      const nums = wx ? [wx.home, wx.draw, wx.away].map(Number).filter(n => Number.isFinite(n) && n > 1) : [];
+      return nums.length ? Math.max(...nums) : 0;
+    };
+    const _tierFromOdd = (odd, rel = 0, edge = 0) => {
+      const o = Number(odd || 0);
+      if (o >= 1.30 && o < 1.50) return 'safe';
+      if (o >= 1.50 && o < 2.00) return 'solid';
+      if (o >= 2.00 && o < 3.00) return 'value';
+      if (o >= 3.00 && o < 5.00) return 'big';
+      if (o >= 5.00) return 'outsider';
+      if (rel >= 0.75 || edge >= 0.08) return 'signal';
+      return 'all';
+    };
 
     // Apply filters
     const passesFilters = (p) => {
       if (tousFilters.sports.length && !tousFilters.sports.includes(p.sport)) return false;
+      if (tousFilters.league && _rowLeague(p) !== tousFilters.league) return false;
+      if (tousFilters.time && tousFilters.time !== 'all' && _timeBucket(p.ts) !== tousFilters.time) return false;
+      if (tousFilters.tier && tousFilters.tier !== 'all' && _tierFromOdd(p.odd, p.rel, p.edge) !== tousFilters.tier) return false;
       // car edge=0 par défaut et rel sans contexte. Ils restent visibles dans
       // le tab Finis pour transparence sur les matchs joués.
       if (!p.nonTrackable) {
         if (tousFilters.minEdge > 0 && p.edge < tousFilters.minEdge) return false;
         if (tousFilters.minConf > 0 && p.rel < tousFilters.minConf) return false;
         if (tousFilters.minOdd > 0 && p.odd < tousFilters.minOdd) return false;
+        if (tousFilters.maxOdd > 0 && p.odd > tousFilters.maxOdd) return false;
       }
+      return true;
+    };
+    const passesCoverageFilters = (p) => {
+      if (tousFilters.sports.length && !tousFilters.sports.includes(p.sport)) return false;
+      if (tousFilters.league && _rowLeague(p) !== tousFilters.league) return false;
+      if (tousFilters.time && tousFilters.time !== 'all' && _timeBucket(p.ts) !== tousFilters.time) return false;
+      const bestOdd = _coverageBestOdd(p.m);
+      if (tousFilters.minOdd > 0 && (!bestOdd || bestOdd < tousFilters.minOdd)) return false;
+      if (tousFilters.maxOdd > 0 && bestOdd && bestOdd > tousFilters.maxOdd) return false;
+      if (tousFilters.tier && tousFilters.tier !== 'all' && _tierFromOdd(bestOdd) !== tousFilters.tier) return false;
       return true;
     };
     // edge < -2pt = le marché est nettement plus confiant que nous,
@@ -19162,8 +19220,7 @@
       return true;
     };
     const filteredPicks = allPicks.filter(p => passesPreset(p) && passesFilters(p));
-    const filteredCoverageRows = coverageRowsAll
-      .filter(p => !tousFilters.sports.length || tousFilters.sports.includes(p.sport));
+    const filteredCoverageRows = coverageRowsAll.filter(passesCoverageFilters);
 
     // Sort comparator (Finis = toujours plus récent en premier, plus utile)
     const cmp = (a, b) => {
@@ -19193,7 +19250,7 @@
     const totalLost = finished.filter(p => p.res === 'lost').length;
     const settledCount = totalWon + totalLost;
     const wrPct = settledCount > 0 ? Math.round(100 * totalWon / settledCount) : 0;
-    const filtersActive = tousPreset !== 'all' || tousFilters.sports.length > 0 || tousFilters.minEdge > 0 || tousFilters.minConf > 0 || tousFilters.minOdd > 0 || tousSort !== 'kickoff';
+    const filtersActive = tousPreset !== 'all' || tousFilters.sports.length > 0 || tousFilters.minEdge > 0 || tousFilters.minConf > 0 || tousFilters.minOdd > 0 || tousFilters.maxOdd > 0 || Boolean(tousFilters.league) || (tousFilters.time && tousFilters.time !== 'all') || (tousFilters.tier && tousFilters.tier !== 'all') || tousSort !== 'kickoff';
     const compareIds = (() => {
       try {
         const ids = JSON.parse(localStorage.getItem('tousComparePickIds') || '[]');
@@ -19636,6 +19693,52 @@
               </select>
             </label>
             <label style="${tousRailItemStyle}display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-dim);">
+              Ligue
+              <select data-tous-league style="${tousSelectStyle}max-width:190px;padding:5px 8px;font-size:12px;background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:6px;cursor:pointer;">
+                <option value="" ${!tousFilters.league?'selected':''}>Toutes</option>
+                ${leagueAvailable.map(l => `<option value="${esc(l)}" ${tousFilters.league===l?'selected':''}>${esc(l.slice(0, 34))}</option>`).join('')}
+              </select>
+            </label>
+            <label style="${tousRailItemStyle}display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-dim);">
+              Cote
+              <select data-tous-odd-min style="${tousSelectStyle}padding:5px 8px;font-size:12px;background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:6px;cursor:pointer;">
+                <option value="0" ${tousFilters.minOdd===0?'selected':''}>min —</option>
+                <option value="1.30" ${tousFilters.minOdd===1.30?'selected':''}>≥1.30</option>
+                <option value="1.50" ${tousFilters.minOdd===1.50?'selected':''}>≥1.50</option>
+                <option value="2.00" ${tousFilters.minOdd===2.00?'selected':''}>≥2.00</option>
+                <option value="3.00" ${tousFilters.minOdd===3.00?'selected':''}>≥3.00</option>
+                <option value="5.00" ${tousFilters.minOdd===5.00?'selected':''}>≥5.00</option>
+              </select>
+              <select data-tous-odd-max style="${tousSelectStyle}padding:5px 8px;font-size:12px;background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:6px;cursor:pointer;">
+                <option value="0" ${tousFilters.maxOdd===0?'selected':''}>max —</option>
+                <option value="1.50" ${tousFilters.maxOdd===1.50?'selected':''}>≤1.50</option>
+                <option value="2.00" ${tousFilters.maxOdd===2.00?'selected':''}>≤2.00</option>
+                <option value="3.00" ${tousFilters.maxOdd===3.00?'selected':''}>≤3.00</option>
+                <option value="5.00" ${tousFilters.maxOdd===5.00?'selected':''}>≤5.00</option>
+              </select>
+            </label>
+            <label style="${tousRailItemStyle}display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-dim);">
+              Heure
+              <select data-tous-time style="${tousSelectStyle}padding:5px 8px;font-size:12px;background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:6px;cursor:pointer;">
+                <option value="all" ${(!tousFilters.time || tousFilters.time==='all')?'selected':''}>Toute la journée</option>
+                <option value="morning" ${tousFilters.time==='morning'?'selected':''}>Matin</option>
+                <option value="afternoon" ${tousFilters.time==='afternoon'?'selected':''}>Après-midi</option>
+                <option value="evening" ${tousFilters.time==='evening'?'selected':''}>Soir</option>
+                <option value="night" ${tousFilters.time==='night'?'selected':''}>Nuit</option>
+              </select>
+            </label>
+            <label style="${tousRailItemStyle}display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-dim);">
+              Niveau
+              <select data-tous-tier style="${tousSelectStyle}padding:5px 8px;font-size:12px;background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:6px;cursor:pointer;">
+                <option value="all" ${(!tousFilters.tier || tousFilters.tier==='all')?'selected':''}>Tous</option>
+                <option value="safe" ${tousFilters.tier==='safe'?'selected':''}>Sûr 1.30-1.50</option>
+                <option value="solid" ${tousFilters.tier==='solid'?'selected':''}>Solide 1.50-2.00</option>
+                <option value="value" ${tousFilters.tier==='value'?'selected':''}>Valeur 2.00-3.00</option>
+                <option value="big" ${tousFilters.tier==='big'?'selected':''}>Big odds 3.00-5.00</option>
+                <option value="outsider" ${tousFilters.tier==='outsider'?'selected':''}>Outsider 5.00+</option>
+              </select>
+            </label>
+            <label style="${tousRailItemStyle}display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-dim);">
               Edge min
               <select data-tous-edge style="${tousSelectStyle}padding:5px 8px;font-size:12px;background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:6px;cursor:pointer;">
                 <option value="0" ${tousFilters.minEdge===0?'selected':''}>—</option>
@@ -19868,6 +19971,36 @@
     const modeSel = wrap.querySelector('[data-tous-mode]');
     if (modeSel) modeSel.addEventListener('change', () => {
       try { localStorage.setItem('tousFilterMode', modeSel.value); } catch(e) {}
+      renderTousPage(wrap);
+    });
+    const leagueSel = wrap.querySelector('[data-tous-league]');
+    if (leagueSel) leagueSel.addEventListener('change', () => {
+      tousFilters.league = leagueSel.value || '';
+      _saveFilters();
+      renderTousPage(wrap);
+    });
+    const oddMinSel = wrap.querySelector('[data-tous-odd-min]');
+    if (oddMinSel) oddMinSel.addEventListener('change', () => {
+      tousFilters.minOdd = parseFloat(oddMinSel.value) || 0;
+      _saveFilters();
+      renderTousPage(wrap);
+    });
+    const oddMaxSel = wrap.querySelector('[data-tous-odd-max]');
+    if (oddMaxSel) oddMaxSel.addEventListener('change', () => {
+      tousFilters.maxOdd = parseFloat(oddMaxSel.value) || 0;
+      _saveFilters();
+      renderTousPage(wrap);
+    });
+    const timeSel = wrap.querySelector('[data-tous-time]');
+    if (timeSel) timeSel.addEventListener('change', () => {
+      tousFilters.time = timeSel.value || 'all';
+      _saveFilters();
+      renderTousPage(wrap);
+    });
+    const tierSel = wrap.querySelector('[data-tous-tier]');
+    if (tierSel) tierSel.addEventListener('change', () => {
+      tousFilters.tier = tierSel.value || 'all';
+      _saveFilters();
       renderTousPage(wrap);
     });
     // Sort dropdown

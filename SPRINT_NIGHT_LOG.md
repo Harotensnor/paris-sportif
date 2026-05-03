@@ -1891,3 +1891,8 @@
 - Apres: desktop passe en table dense type markets list, page-tabs/retour legacy caches, header/filtres compactes, en-tete Heure/Match/Cotes visible.
 - Impact: 260 lignes chargees sur la vue locale, 268 matchs a venir affiches en preset Tout voir, 0 overflow horizontal desktop/mobile.
 - Verif: syntax app.js/sw.js OK, Playwright desktop/mobile 260 rows, 0 erreur console, captures .cache/v36-tous-dense-*-final*.png.
+## Sprint v35.277 — Phase 12 V36 P-12.23 Filtres avances Tous (17:31 UTC)
+- Avant: Tous proposait surtout sport/source/edge/confiance, insuffisant pour explorer 250+ matchs rapidement.
+- Apres: filtres ligue, cote min/max, tranche horaire et niveau de cote branches dans localStorage + URL partageable.
+- Impact: "Tout voir" reste large (260 lignes), mais Soir + cote >=2.00 descend a 103 matchs sans empty state ni erreur.
+- Verif: syntax app.js/sw.js OK, Playwright filtre time=evening puis odd>=2.00, mobile touch targets 44px, 0 erreur console.
