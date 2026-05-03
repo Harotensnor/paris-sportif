@@ -21048,6 +21048,36 @@
         </div>
       </div>`;
 
+    const compactProfileLayout = (() => {
+      try { return window.matchMedia('(max-width: 899px)').matches; }
+      catch(e) { return false; }
+    })();
+    const wrapProfilePanel = (panel, titleOverride) => {
+      if (!panel || panel.closest('details.profile-compact-details')) return;
+      const title = titleOverride || panel.querySelector('h3')?.textContent?.trim() || 'Réglage';
+      const details = document.createElement('details');
+      details.className = 'profile-compact-details';
+      details.style.cssText = 'box-sizing:border-box;width:100%;margin:0 0 10px;border:1px solid var(--border);border-radius:var(--r-lg);background:var(--panel);overflow:hidden;';
+      const summary = document.createElement('summary');
+      summary.style.cssText = 'min-height:50px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 14px;cursor:pointer;color:var(--text);font-size:14px;font-weight:900;list-style:none;';
+      summary.innerHTML = `<span>${esc(title)}</span><span style="color:var(--text-dim);font-size:18px;">+</span>`;
+      panel.parentNode.insertBefore(details, panel);
+      details.appendChild(summary);
+      details.appendChild(panel);
+    };
+    if (compactProfileLayout) {
+      ['#profile-personal-suggestions', '#profile-competition'].forEach(sel => wrapProfilePanel(wrap.querySelector(sel)));
+      const keepOpen = new Set(['profile-bankroll', 'profile-odds', 'profile-strategy', 'profile-bankroll-simulator']);
+      const grid = wrap.querySelector('.profil-grid');
+      if (grid) {
+        Array.from(grid.children).forEach(panel => {
+          if (!panel || panel.tagName === 'DETAILS') return;
+          if (keepOpen.has(panel.id || '')) return;
+          wrapProfilePanel(panel);
+        });
+      }
+    }
+
     // Wire up
     function savePrefs(partial) {
       const cur = (function(){ try { return JSON.parse(localStorage.getItem('userPrefs') || '{}') || {}; } catch(e) { return {}; } })();
@@ -21061,7 +21091,11 @@
     wrap.querySelectorAll('[data-profile-jump]').forEach(btn => {
       btn.addEventListener('click', () => {
         const target = wrap.querySelector(btn.dataset.profileJump || '');
-        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (target) {
+          const parentDetails = target.closest('details.profile-compact-details');
+          if (parentDetails) parentDetails.open = true;
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
       });
     });
     wrap.querySelectorAll('[data-theme-btn]').forEach(btn => {

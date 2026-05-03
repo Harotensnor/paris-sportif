@@ -505,7 +505,7 @@ Contexte : après correction de `Tous`, la couverture monte à 277 matchs à ven
 - Viewports : mobile/tablet
 - Preuve : `.cache/phase4-phase12-tous-coverage/profil-mobile.png`
 - Action : Transformer les sections secondaires en accordéons et garder Bankroll/Préférences en haut.
-- Statut : OPEN
+- Statut : FIXED v35.254 — Profil mobile/tablet replie les panneaux secondaires, garde bankroll/cote/stratégie/simulateur visibles, et ouvre le panneau cible au clic résumé.
 
 ### P12-VIS-009 — Santé reste très haute sur tablette/wide (4 923px/4 295px) malgré l’espace desktop.
 
