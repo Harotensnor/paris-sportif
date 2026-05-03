@@ -15754,11 +15754,27 @@
           .sort((a, b) => (b._consensus.score - a._consensus.score) || (b.odd - a.odd))
           .slice(0, 4);
       })();
+      const bbfNightBets = (() => {
+        const seen = new Set();
+        return bbfPool
+          .filter(p => {
+            const id = String(p.m?.id || '');
+            if (!id || seen.has(id)) return false;
+            const d = new Date(p.m?.date || 0);
+            const h = d instanceof Date && !Number.isNaN(d.getTime()) ? d.getHours() : -1;
+            if (!(h >= 22 || (h >= 0 && h < 6))) return false;
+            if (p.odd < 2.00 || p.edge < 0.04 || p.rel < 0.50) return false;
+            seen.add(id);
+            return true;
+          })
+          .sort((a, b) => (b.odd - a.odd) || ((b.edge || 0) - (a.edge || 0)))
+          .slice(0, 4);
+      })();
       const bbfRestRows = bbfPool
         .filter(p => !bbfBigIds.has(String(p.m.id || '')) && !bbfGoodIds.has(String(p.m.id || '')) && !bbfBigOddsIds.has(String(p.m.id || '')) && !bbfOutsiderIds.has(String(p.m.id || '')))
         .filter(p => p.edge >= 0.02)
         .slice(0, 80);
-      const bbfVisibleCount = bbfBigBets.length + bbfGoodBets.length + bbfBigOddsBets.length + bbfOutsiderBets.length + bbfMultiMarketOutsiders.length + bbfConsensusPicks.length + bbfRestRows.length;
+      const bbfVisibleCount = bbfBigBets.length + bbfGoodBets.length + bbfBigOddsBets.length + bbfOutsiderBets.length + bbfMultiMarketOutsiders.length + bbfConsensusPicks.length + bbfNightBets.length + bbfRestRows.length;
       const bbfMarketCount = bbfPool.reduce((sum, p) => sum + Math.max(1, Number(p.best?.allCandidates?.length || 0)), 0);
       const bbfGain100 = bbfBigBets.length ? bbfBigBets.reduce((s, p) => s + Number(p.ev || 0), 0) / bbfBigBets.length * 100 : 0;
       const bbfStrength = getBetStrengthMeta;
@@ -16160,6 +16176,21 @@
           ${bbfFocusOnly ? '' : `<section class="bbf-section">
             <div class="bbf-section__head"><div><span>Top 3 par sport · tri cote haute</span><h2>Paris du jour par sport</h2></div><button type="button" class="page-btn" data-page="tous">Tous les sports →</button></div>
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;">${bbfSportDay || '<div class="bbf-empty bbf-empty--small"><strong>Aucun pick sport aujourd’hui.</strong><span>Le modèle attend une meilleure value.</span></div>'}</div>
+          </section>`}
+
+          ${bbfFocusOnly ? '' : `<section class="bbf-section" style="border-color:rgba(96,165,250,.24);background:linear-gradient(135deg,rgba(96,165,250,.075),rgba(255,255,255,.025));">
+            <div class="bbf-section__head">
+              <div>
+                <span>Night Bets · kickoff après 22h ou avant 6h · cote ≥ 2.00</span>
+                <h2>Picks de nuit</h2>
+              </div>
+              <button type="button" class="page-btn" data-page="tous">Voir le calendrier →</button>
+            </div>
+            ${bbfNightBets.length ? `<div class="bbf-grid bbf-grid--compact">${bbfNightBets.map(p => bbfCard(p, 'compact')).join('')}</div>` : `
+              <div class="bbf-empty bbf-empty--small">
+                <strong>Pas de spot de nuit propre.</strong>
+                <span>Les matchs tardifs restent cachés si la value ou la confiance ne passent pas le filtre.</span>
+              </div>`}
           </section>`}
 
           ${bbfFocusOnly ? '' : `<details class="bbf-more terminal-market">
