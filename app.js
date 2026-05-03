@@ -3,6 +3,36 @@
   'use strict';
 
   let _localIdCounter = 0;
+  const DEBUG_LOGS = (() => {
+    try {
+      return /(?:^|[?&])debug=1(?:&|$)/.test(location.search || '') ||
+        localStorage.getItem('paris_sportif_debug') === '1';
+    } catch(e) {
+      return false;
+    }
+  })();
+  function prodLog(...args) {
+    if (!DEBUG_LOGS) return;
+    try {
+      const dbg = globalThis && globalThis.console;
+      if (dbg && typeof dbg.log === 'function') dbg.log.apply(dbg, args);
+    } catch(e) {}
+  }
+  function prodWarn(...args) {
+    if (!DEBUG_LOGS) return;
+    try {
+      const dbg = globalThis && globalThis.console;
+      if (dbg && typeof dbg.warn === 'function') dbg.warn.apply(dbg, args);
+    } catch(e) {}
+  }
+  function prodTable(...args) {
+    if (!DEBUG_LOGS) return;
+    try {
+      const dbg = globalThis && globalThis.console;
+      if (dbg && typeof dbg.table === 'function') dbg.table.apply(dbg, args);
+    } catch(e) {}
+  }
+  try { window.__PARIS_DEBUG_LOGS = DEBUG_LOGS; } catch(e) {}
   function safeJsonParse(raw, fallback) {
     if (raw == null || raw === '') return fallback;
     try { return JSON.parse(raw); }
@@ -953,7 +983,7 @@
 
   /**
    * Wraps an async function with try/catch + user-facing toast on error.
-   * Logs to console.warn but never throws to caller. Returns null on error.
+  * Logs only in explicit debug mode and never throws to caller. Returns null on error.
    * @param {Function} fn - Async function to execute
    * @param {string} [errorMsg] - User-facing error message
    * @returns {Promise<*|null>} Result of fn() or null on error
@@ -961,7 +991,7 @@
   async function _safeAsync(fn, errorMsg = 'Une erreur est survenue') {
     try { return await fn(); }
     catch(e) {
-      console.warn('[_safeAsync]', errorMsg, e);
+      prodWarn('[_safeAsync]', errorMsg, e);
       try { if (typeof toast === 'function') toast('⚠ ' + errorMsg, 'warn'); } catch(_){}
       return null;
     }
@@ -9533,7 +9563,7 @@
             <div style="margin-left:auto;font-size:13px;"><span style="color:var(--text-dim,#b4bcc7);">10€ →</span> <b style="color:var(--accent);font-size:16px;">${retHtml}€</b></div>
           </div>
         </div>`;
-      } catch (e) { console.warn('[EEEE] suggestCombineIA failed', e); return ''; }
+      } catch (e) { prodWarn('[EEEE] suggestCombineIA failed', e); return ''; }
     })();
 
     const buteurCombineHtml = (() => {
@@ -12755,11 +12785,11 @@
   function bind(id, ev, fn) {
     const el = document.getElementById(id);
     if (el) el.addEventListener(ev, fn);
-    else console.warn(`[wiring] #${id} introuvable au boot — handler ${ev} ignoré`);
+    else prodWarn(`[wiring] #${id} introuvable au boot — handler ${ev} ignoré`);
     return el;
   }
   // depuis le cleanup v31.7.51 (audit reported 4.2). Le bind helper aurait
-  // émis un console.warn à chaque boot pour rien.
+  // émis un warning debug à chaque boot pour rien.
   // currentSport reste 'football' (default), modifiable via les filtres
   // inline des pages Tous/Top/Buteurs.
 
@@ -12925,7 +12955,7 @@
         const keys = await caches.keys();
         await Promise.all(keys.map(k => caches.delete(k)));
       }
-    } catch(err) { console.warn('force refresh failed:', err); }
+    } catch(err) { prodWarn('force refresh failed:', err); }
     if (typeof _hardReload === 'function') _hardReload();
     else location.reload();
   });
@@ -13513,7 +13543,7 @@
       } else {
         try { prompt('Copie ce lien :', url); } catch (e) {}
       }
-    } catch (e) { console.warn('share failed:', e); }
+    } catch (e) { prodWarn('share failed:', e); }
   });
 
   // Polls data.js every 60s, merges fresh data into window.PRONOSTICS_DATA
@@ -13576,7 +13606,7 @@
                 const keys = await caches.keys();
                 await Promise.all(keys.map(k => caches.delete(k)));
               }
-            } catch(err) { console.warn('force refresh failed:', err); }
+            } catch(err) { prodWarn('force refresh failed:', err); }
             _hardReload();
           });
         }
@@ -13848,7 +13878,7 @@
           if (typeof window._maybeDiscordPushLocks === 'function') {
             window._maybeDiscordPushLocks();
           }
-        } catch(e) { console.warn('[notif] failed:', e); }
+        } catch(e) { prodWarn('[notif] failed:', e); }
       }
     } catch (err) {
       if (ind) ind.classList.add('offline');
@@ -13859,7 +13889,7 @@
         const btn = txtEl.querySelector('[data-agent-force-refresh]');
         if (btn) btn.addEventListener('click', (e) => { e.preventDefault(); _hardReload(); });
       }
-      console.warn('[pollData] refresh failed:', err);
+      prodWarn('[pollData] refresh failed:', err);
     } finally {
       __refreshInFlight = false;
       if (ind) ind.classList.remove('refreshing');
@@ -13949,7 +13979,7 @@
         // que les callers fallback gracieusement.
         try {
           const msg = err && err.message ? err.message : 'inconnue';
-          console.warn('[_ensureFullData] failed:', msg);
+          prodWarn('[_ensureFullData] failed:', msg);
           if (typeof toast === 'function' && !navigator.onLine) {
             toast('📡 Hors-ligne — données limitées au mode lite. Reconnexion auto.', 'warn', { duration: 4000 });
           } else if (typeof toast === 'function') {
@@ -14043,11 +14073,11 @@
       },
       cache_version: typeof CACHE_VERSION !== 'undefined' ? CACHE_VERSION : '?',
     };
-    console.log('%c🔍 Paris-Sportif diag', 'color:#b6a0ff;font-weight:700;font-size:14px;');
-    console.table(out.data);
-    console.table(out.user);
-    console.table(out.health);
-    console.table(out.features);
+    prodLog('%c🔍 Paris-Sportif diag', 'color:#b6a0ff;font-weight:700;font-size:14px;');
+    prodTable(out.data);
+    prodTable(out.user);
+    prodTable(out.health);
+    prodTable(out.features);
     return out;
   };
 
@@ -15577,7 +15607,7 @@
         if (combos && Array.isArray(combos)) combinesPicks = combos.slice(0, 3);
         else if (combos && typeof combos === 'object') combinesPicks = [combos.safe, combos.balanced, combos.bold].filter(Boolean);
       }
-    } catch(e) { console.warn('combinés inline:', e); }
+    } catch(e) { prodWarn('combinés inline:', e); }
 
     // Buts du match : matches foot du jour avec OU 2.5 ou BTTS confiance élevée
     // (c'est un marché "total de buts" — pas "quel joueur marque").
@@ -15849,7 +15879,7 @@
                 const keys = await caches.keys();
                 await Promise.all(keys.map(k => caches.delete(k)));
               }
-            } catch(err) { console.warn('auto refresh failed:', err); }
+            } catch(err) { prodWarn('auto refresh failed:', err); }
             _hardReload();
           })();
         } catch(e) {}
@@ -19060,7 +19090,7 @@
             setTimeout(() => renderDashboardPage(wrap), 100);
           }
         } catch(err) {
-          console.warn('Sprint 118 trackbet failed', err);
+          prodWarn('Sprint 118 trackbet failed', err);
           if (typeof toast === 'function') toast('Erreur enregistrement pari', 'error');
         }
       });
@@ -19140,7 +19170,7 @@
         a.download = `agent-cagnotte-${new Date().toISOString().slice(0,10)}.csv`;
         document.body.appendChild(a); a.click();
         setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
-      } catch(e) { console.warn('CSV export failed:', e); alert('Erreur export CSV'); }
+      } catch(e) { prodWarn('CSV export failed:', e); alert('Erreur export CSV'); }
     });
     wrap.querySelectorAll('[data-rule-activate]').forEach(btn => btn.addEventListener('click', () => {
       const id = btn.dataset.ruleActivate;
@@ -19367,7 +19397,7 @@
         localStorage.setItem('seenLockIds', JSON.stringify(ids));
         if (typeof toast === 'function') toast('✓ Toutes les alertes marquées comme lues', 'success');
         renderAlertesPage(wrap);
-      } catch (err) { console.warn('[Alertes] clear failed', err); }
+      } catch (err) { prodWarn('[Alertes] clear failed', err); }
     });
   }
 
@@ -20454,7 +20484,7 @@
         setTimeout(() => URL.revokeObjectURL(url), 1500);
         try { if (typeof toast === 'function') toast('CSV exporté', 'success'); } catch(e) {}
       } catch(e) {
-        console.warn('Tous CSV export failed:', e);
+        prodWarn('Tous CSV export failed:', e);
         try { if (typeof toast === 'function') toast('Export CSV impossible', 'error'); } catch(_) {}
       }
     });
@@ -22990,7 +23020,7 @@
           </div>
         </div>`;
     }).catch(err => {
-      console.warn('[sparkline] load failed', err);
+      prodWarn('[sparkline] load failed', err);
       slotEl.innerHTML = '';
     });
   }
@@ -23664,14 +23694,14 @@
     }
     perfWrap.style.display = isPerformance ? '' : 'none';
     if (isPerformance) {
-      try { renderPerformancePage(perfWrap); } catch(e) { console.warn('renderPerformancePage failed', e); }
+      try { renderPerformancePage(perfWrap); } catch(e) { prodWarn('renderPerformancePage failed', e); }
       if (window.PRONOSTICS_DATA && window.PRONOSTICS_DATA._lite && typeof window._ensureFullData === 'function' && perfWrap.dataset.fullDataQueued !== '1') {
         perfWrap.dataset.fullDataQueued = '1';
         setTimeout(() => {
           if (!document.body.contains(perfWrap) || perfWrap.style.display === 'none') { delete perfWrap.dataset.fullDataQueued; return; }
           window._ensureFullData().then(() => {
             delete perfWrap.dataset.fullDataQueued;
-            if (perfWrap.style.display !== 'none') { try { renderPerformancePage(perfWrap); } catch(e) { console.warn('renderPerformancePage failed', e); } }
+            if (perfWrap.style.display !== 'none') { try { renderPerformancePage(perfWrap); } catch(e) { prodWarn('renderPerformancePage failed', e); } }
           }).catch(() => { delete perfWrap.dataset.fullDataQueued; });
         }, 12000);
       }
@@ -28217,7 +28247,7 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
             </div>
             <div style="font-size:14px;line-height:1.55;color:var(--text,#e6ebf2);">${body}</div>
           </div>`;
-      } catch (e) { console.warn('[CCCC] narrative failed', e); return ''; }
+      } catch (e) { prodWarn('[CCCC] narrative failed', e); return ''; }
     })();
 
     // Refonte 2026-04-20 : bilan modèle pur. Plus de bankroll/perso/tipsters —
@@ -29581,7 +29611,7 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
           fallback();
         }
       } catch(e) {
-        try { fallback(); } catch(err) { console.warn('[notif] failed:', err); }
+        try { fallback(); } catch(err) { prodWarn('[notif] failed:', err); }
       }
     };
     const _notifSyncBtn = () => {
@@ -29661,7 +29691,7 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
             renotify: false,
           }, location.origin + location.pathname + '#dashboard');
           seen.add(p.id);
-        } catch(e) { console.warn('[notif] failed:', e); }
+        } catch(e) { prodWarn('[notif] failed:', e); }
       });
       try { localStorage.setItem('notifiedPickIds', JSON.stringify([...seen].slice(-200))); } catch(e) {}
     };
@@ -29726,7 +29756,7 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
             renotify: false,
           }, p.wnxUrl || (location.origin + location.pathname + '#dashboard'));
           seen.add(p.id);
-        } catch(e) { console.warn('[notif kickoff] failed:', e); }
+        } catch(e) { prodWarn('[notif kickoff] failed:', e); }
       });
       try { localStorage.setItem('notifiedKickoffIds', JSON.stringify([...seen].slice(-200))); } catch(e) {}
     };
@@ -29795,7 +29825,7 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
           body: JSON.stringify(body),
           mode: 'cors',
         }).then(() => seen.add(p.id))
-          .catch((err) => console.warn('[discord webhook] failed:', err));
+          .catch((err) => prodWarn('[discord webhook] failed:', err));
       });
       try { localStorage.setItem('discordPushedLockIds', JSON.stringify([...seen].slice(-200))); } catch(e) {}
     };
