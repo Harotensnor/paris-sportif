@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-03T10:31:09Z",
+  "generated_at": "2026-05-03T10:33:27Z",
   "data_age_min": 0,
   "sources": {
     "winamax_catalog": {
@@ -54,22 +54,22 @@
       "total": 2425
     },
     "team_form": {
-      "age_min": 27,
+      "age_min": 1,
       "teams": 777,
       "football_teams": 708
     },
     "form_stats_extended": {
-      "age_min": 27,
+      "age_min": 1,
       "teams": 777,
       "sports": 4
     },
     "h2h_extended": {
-      "age_min": 0,
+      "age_min": 1,
       "events": 167,
       "sports": 5
     },
     "injuries_multisport": {
-      "age_min": 0,
+      "age_min": 2,
       "teams": 126,
       "sports": 4
     },
@@ -205,7 +205,7 @@
     "team_form": {
       "script": "scripts/fetch_team_form.py",
       "output": "team_form.json",
-      "age_min": 27,
+      "age_min": 1,
       "threshold_min": 360,
       "fast_red_min": null,
       "status": "ok"
@@ -213,7 +213,7 @@
     "form_stats_extended": {
       "script": "form_stats_extended.json",
       "output": "form_stats_extended.json",
-      "age_min": 27,
+      "age_min": 1,
       "threshold_min": 60,
       "fast_red_min": null,
       "status": "ok"
@@ -221,7 +221,7 @@
     "h2h_extended": {
       "script": "h2h_extended.json",
       "output": "h2h_extended.json",
-      "age_min": 0,
+      "age_min": 1,
       "threshold_min": 60,
       "fast_red_min": null,
       "status": "ok"
@@ -314,12 +314,7 @@
     ]
   },
   "warnings": [
-    "injuries_soccer: stale (1753min > 180min threshold)",
-    "lineups_soccer: stale (1757min > 180min threshold)",
-    "referees_soccer: stale (1736min > 480min threshold)",
-    "sofascore_events: stale (1693min > 30min threshold)",
-    "sofascore_events: lag pipeline rouge (1693min > 30min)",
-    "pipeline_drift: 4 divergence(s) auto_refresh/refresh.yml"
+    "pipeline_drift: 3 divergence(s) auto_refresh/refresh.yml"
   ],
   "overall": "warning",
   "quality_checks": {
