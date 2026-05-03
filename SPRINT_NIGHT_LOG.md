@@ -1866,3 +1866,8 @@
 - Apres: renderDashboardPage sort sur un cockpit V36: 5 colonnes Sur/Solide/Valeur/Big odds/Outsider, filtres sport/tier/heure, cartes compactes et rail temps reel.
 - Impact: sur serveur local avec full data, l'accueil affiche 24 picks repartis sur 5 niveaux et 64 matchs detectes; mobile descend a 13 picks avec data lite puis recharge full data en prod.
 - Verif: visual_capture v36-dashboard-tier-fixed 32/32 OK, capture HTTP full-data dashboard-wide-full-data-fixed.png, 0 pageerror, syntax OK.
+## Sprint v35.272 — Phase 12 V36 P-12.14 Plancher cote 1.30 (17:15 UTC)
+- Avant: le filtre global herite Phase 7 forcait @2.00 par defaut, ce qui contredisait les tiers Sur/Solide V36.
+- Apres: preference cote minimum passe a @1.30 par defaut, avec choix 1.30/1.50/1.80/2.00/2.50 et textes Academie mis a jour.
+- Impact: les picks Sur @1.30-1.50 ne sont plus bloques par un reglage global; les filtres stricts restent dans les niveaux et presets.
+- Verif: syntax app.js OK, diff --check OK.
