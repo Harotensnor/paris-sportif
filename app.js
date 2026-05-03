@@ -348,6 +348,8 @@
         try { localStorage.setItem('currentPage', currentPage); } catch(e){}
       }
       if (typeof applyPageView === 'function') applyPageView();
+    } else if (p === 'dashboard' && currentPage === 'dashboard') {
+      if (typeof applyPageView === 'function') applyPageView();
     }
   });
 
@@ -14781,13 +14783,12 @@
     const todayAllWinamax = eventsOnParisDate(data, todayIso).filter(m => m.winamax && m.winamax.available === true);
     const today = todayAllWinamax.filter(exactBookable);
     const terminalScanPool = (() => {
-      const start = now.getTime() - 2 * 3600000;
-      const end = now.getTime() + 48 * 3600000;
+      const start = now.getTime() - 7 * 24 * 3600000;
+      const end = now.getTime() + 8 * 24 * 3600000;
       const arr = [];
       Object.values(data.days || {}).forEach(dayArr => (dayArr || []).forEach(m => {
         const ts = new Date(m?.date || 0).getTime();
         if (!Number.isFinite(ts) || ts < start || ts > end) return;
-        if (m.completed || m.live) return;
         if (!exactBookable(m)) return;
         arr.push(m);
       }));
@@ -14864,6 +14865,48 @@
         if (h >= 18 && h < 23) return 'evening';
         return 'night';
       };
+      const v37DateLabel = (date) => {
+        if (!date) return '--';
+        const d = date instanceof Date ? date : new Date(date);
+        if (isNaN(d.getTime())) return '--';
+        try {
+          const raw = d.toLocaleDateString('fr-FR', { weekday: 'short', day: '2-digit', timeZone: 'Europe/Paris' }).replace('.', '');
+          return raw.charAt(0).toUpperCase() + raw.slice(1);
+        } catch(e) {
+          return isoDate(d).slice(5);
+        }
+      };
+      const v37AddDays = (baseIso, delta) => {
+        const base = /^\d{4}-\d{2}-\d{2}$/.test(String(baseIso || '')) ? baseIso : todayIso;
+        const d = new Date(base + 'T12:00:00Z');
+        d.setUTCDate(d.getUTCDate() + delta);
+        return d.toISOString().slice(0, 10);
+      };
+      const v37HashParams = (() => {
+        try { return new URLSearchParams((location.hash || '').split('?')[1] || ''); }
+        catch(e) { return new URLSearchParams(''); }
+      })();
+      const v37HashDate = v37HashParams.get('date') || '';
+      const v37StoredDate = v36Filter.date || 'all';
+      const v37DateFilter = (/^\d{4}-\d{2}-\d{2}$/.test(v37HashDate) || v37HashDate === 'all') ? v37HashDate : v37StoredDate;
+      const v37IncludeLive = v36Filter.includeLive === true || v36Filter.includeLive === '1';
+      const v37HistoryMode = /^\d{4}-\d{2}-\d{2}$/.test(v37DateFilter) && v37DateFilter < todayIso;
+      const v37IsAllHorizon = v37DateFilter === 'all';
+      const v37DateMatches = (m) => {
+        const day = parisDateISO(m?.date);
+        if (!day) return false;
+        if (v37IsAllHorizon) return true;
+        return day === v37DateFilter;
+      };
+      const v37PickIsVisibleByClock = (m) => {
+        if (v37HistoryMode) return true;
+        const ts = new Date(m?.date || 0).getTime();
+        if (!Number.isFinite(ts)) return false;
+        const isLive = !!(m?.live || m?.status === 'STATUS_IN_PROGRESS');
+        if (m?.completed || _isMatchEffectivelyDone(m)) return false;
+        if (isLive) return v37IncludeLive;
+        return ts > Date.now();
+      };
       const v36TeamName = (team) => team?.short || team?.displayName || team?.name || '?';
       const v36TierForCandidate = (c) => {
         const odd = Number(c?.odd || 0);
@@ -14878,7 +14921,8 @@
         if (odd >= 5.00 && conf >= 0.10 && edge >= 0.08) return { id: 'out', strict: edge >= 0.10 };
         return null;
       };
-      const v36PickPoolRaw = _dataIsStale ? [] : terminalScanPool.flatMap(m => {
+      const v37ScanPool = terminalScanPool.filter(m => v37DateMatches(m) && v37PickIsVisibleByClock(m));
+      const v36PickPoolRaw = _dataIsStale ? [] : v37ScanPool.flatMap(m => {
         try {
           const pred = predictMatch(m);
           if (!pred || !pred.pick) return [];
@@ -14910,15 +14954,14 @@
                 label: c.label || pred.pick?.label || 'Pick',
                 market: c.market || '1n2',
                 line: c.line ?? '',
-                pickKey: c.pickKey || c.key || pred.pick?.key || '',
+                pickKey: c.pickValue || c.pickKey || c.key || pred.pick?.key || '',
                 ts: new Date(m.date || 0).getTime(),
                 score: (tier.strict ? 120 : 0) + investmentScoreValue + Math.max(-20, edge * 100) + rel * 10 - (pred.abstain?.active ? 12 : 0)
               };
             })
             .filter(Boolean)
             .sort((a, b) => b.score - a.score);
-          const leadTier = ranked[0]?.tier;
-          return leadTier ? ranked.filter(p => p.tier === leadTier).slice(0, 2) : [];
+          return ranked.slice(0, 3);
         } catch(e) { return []; }
       }).sort((a, b) => a.ts - b.ts);
       const v36PickPool = (() => {
@@ -14940,7 +14983,7 @@
       })();
       const v36Sports = [...new Set(v36PickPool.map(p => p.m.sport).filter(Boolean))].slice(0, 8);
       const v36Search = String(v36Filter.q || '').trim();
-      const v36Sort = ['tier','time','odd','conf','edge'].includes(v36Filter.sort) ? v36Filter.sort : 'tier';
+      const v36Sort = ['tier','date','time','odd','conf','edge'].includes(v36Filter.sort) ? v36Filter.sort : 'tier';
       const v36Filtered = v36PickPool.filter(p => {
         if (v36Filter.sport && p.m.sport !== v36Filter.sport) return false;
         if (v36Filter.tier && p.tier !== v36Filter.tier) return false;
@@ -14955,16 +14998,19 @@
       const v36CountsAll = Object.fromEntries(v36TierDefs.map(t => [t.id, v36PickPool.filter(p => p.tier === t.id).length]));
       const v36Total = v36Filtered.length;
       const v36Sorted = v36Filtered.slice().sort((a, b) => {
-        if (v36Sort === 'time') return (a.ts - b.ts) || (v36TierRank[a.tier] - v36TierRank[b.tier]) || (b.odd - a.odd);
+        if (v36Sort === 'date' || v36Sort === 'time') return (a.ts - b.ts) || (v36TierRank[a.tier] - v36TierRank[b.tier]) || (b.odd - a.odd);
         if (v36Sort === 'odd') return (b.odd - a.odd) || (v36TierRank[a.tier] - v36TierRank[b.tier]) || (a.ts - b.ts);
         if (v36Sort === 'conf') return (b.rel - a.rel) || (b.edge - a.edge) || (a.ts - b.ts);
         if (v36Sort === 'edge') return (b.edge - a.edge) || (b.odd - a.odd) || (a.ts - b.ts);
         return (v36TierRank[a.tier] - v36TierRank[b.tier]) || (b.odd - a.odd) || (b.edge - a.edge) || (a.ts - b.ts);
       });
-      const v36TableRows = v36Sorted.slice(0, 120);
-      const v36UpcomingAll = terminalScanPool.filter(m => new Date(m?.date || 0).getTime() > Date.now());
+      const v36TableRows = v36Sorted.slice(0, 360);
+      const v36UpcomingAll = terminalScanPool.filter(m => new Date(m?.date || 0).getTime() > Date.now() && !m.completed);
+      const v37LiveAll = terminalScanPool.filter(m => m?.live || m?.status === 'STATUS_IN_PROGRESS');
+      const v37FinishedAll = terminalScanPool.filter(m => m?.completed || _isMatchEffectivelyDone(m));
       const v36Next = v36UpcomingAll.slice(0, 6);
-      const v36CoverageLine = `${v36PickPool.length} picks intelligents · ${v36UpcomingAll.length} matchs detectes · data ${_dataAgeMin} min`;
+      const v37ScopeLabel = v37IsAllHorizon ? '7 prochains jours' : v37DateLabel(v37DateFilter);
+      const v36CoverageLine = `${v36PickPool.length} picks · ${v36UpcomingAll.length} a venir · ${v37LiveAll.length} live · ${v37FinishedAll.length} termines · data ${_dataAgeMin} min`;
       const v36FilterButton = (kind, value, label, active) => `<button type="button" class="v36-filter-chip ${active ? 'is-active' : ''}" data-v36-filter="${esc(kind)}" data-v36-value="${esc(value)}">${label}</button>`;
       const v36SortButton = (value, label) => `<button type="button" class="v36-sort-btn ${v36Sort === value ? 'is-active' : ''}" data-v36-sort="${esc(value)}">${esc(label)}</button>`;
       const v36CompactCard = (p) => {
@@ -15002,13 +15048,39 @@
         const variance = p.pred?.ensemble?.agreement_variance == null ? 'n/a' : String(p.pred.ensemble.agreement_variance);
         return `EV ${(p.ev * 100).toFixed(1)}% · variance ensemble ${variance} · marché ${p.market}`;
       };
+      const v37ResultForPick = (p) => {
+        if (!v37HistoryMode) return null;
+        const status = String(p.m?.status || '');
+        if (p.m?.live || status === 'STATUS_IN_PROGRESS') return 'live';
+        if (!p.m?.completed) return _isMatchEffectivelyDone(p.m) ? 'void' : 'pending';
+        let res = null;
+        try {
+          res = evaluateMarketPick(p.m, p.market || '1n2', p.pickKey || p.best?.pickValue || p.best?.key || '');
+        } catch(e) { res = null; }
+        if (!res) {
+          try { res = evaluateModelPick(p.m, p.pred); } catch(e) { res = null; }
+        }
+        if (res === 'won' || res === 'lost' || res === 'void') return res;
+        if (/CANCEL|POSTPON|ABANDON|WALKOVER|RETIRED|FORFEIT/.test(status)) return 'void';
+        return 'pending';
+      };
+      const v37ResultBadge = (res) => {
+        if (res === 'won') return '<span class="v37-result v37-result--won">WON</span>';
+        if (res === 'lost') return '<span class="v37-result v37-result--lost">LOST</span>';
+        if (res === 'void') return '<span class="v37-result v37-result--void">VOID</span>';
+        if (res === 'live') return '<span class="v37-result v37-result--live">LIVE</span>';
+        return '<span class="v37-result v37-result--pending">ATTENTE</span>';
+      };
       const v36TableRow = (p, idx) => {
         const tier = v36TierById[p.tier] || v36TierDefs[0];
         const league = String(p.m.league_name || p.m.league || sportLabel(p.m.sport || '') || '').replace(/^(.{34}).+$/, '$1…');
         const edgePct = (p.edge * 100).toFixed(1);
         const relPct = Math.round(p.rel * 100);
-        return `<tr class="v36-table-row" data-tone="${esc(tier.tone)}" data-big-detail="${esc(String(p.m.id || ''))}" tabindex="0" title="${esc(v36ReasonTooltip(p))}">
+        const soon = !v37HistoryMode && p.ts > Date.now() && (p.ts - Date.now()) <= 2 * 60000;
+        const result = v37ResultForPick(p);
+        return `<tr class="v36-table-row ${soon ? 'is-imminent' : ''}" data-tone="${esc(tier.tone)}" data-big-detail="${esc(String(p.m.id || ''))}" title="${esc(v36ReasonTooltip(p))}">
           <td class="v36-cell-sport"><span>${sportIcon(p.m.sport || '')}</span><b>${esc(sportLabel(p.m.sport || '').slice(0, 9))}</b></td>
+          <td class="v36-cell-date">${esc(v37DateLabel(p.m.date))}</td>
           <td>${esc(fmtTime(p.m.date))}</td>
           <td class="v36-cell-league">${esc(league)}</td>
           <td class="v36-cell-match">${v36MatchTitleHtml(p)}</td>
@@ -15017,27 +15089,76 @@
           <td class="v36-num">${relPct}%</td>
           <td class="v36-num ${p.edge >= 0 ? 'is-pos' : 'is-neg'}">${p.edge >= 0 ? '+' : ''}${edgePct}%</td>
           <td>${v36TierBadge(p.tier, true)}</td>
-          <td class="v36-action">→</td>
+          ${v37HistoryMode ? `<td>${v37ResultBadge(result)}</td>` : ''}
         </tr>`;
       };
       const v36MobileCard = (p) => {
         const tier = v36TierById[p.tier] || v36TierDefs[0];
+        const result = v37ResultForPick(p);
         return `<button type="button" class="v36-table-card" data-tone="${esc(tier.tone)}" data-big-detail="${esc(String(p.m.id || ''))}">
-          <span class="v36-table-card__top"><b>${sportIcon(p.m.sport || '')} ${esc(fmtTime(p.m.date))}</b>${v36TierBadge(p.tier, false)}</span>
+          <span class="v36-table-card__top"><b>${sportIcon(p.m.sport || '')} ${esc(v37DateLabel(p.m.date))} · ${esc(fmtTime(p.m.date))}</b>${v36TierBadge(p.tier, false)}</span>
           <strong>${v36MatchTitleHtml(p)}</strong>
           <em class="v36-table-card__league">${esc(p.m.league_name || p.m.league || '')}</em>
           <span class="v36-table-card__line"><i>${esc(p.label)}</i><b>@${p.odd.toFixed(2)}</b><b>${Math.round(p.rel * 100)}%</b><b>${p.edge >= 0 ? '+' : ''}${(p.edge * 100).toFixed(1)}%</b></span>
+          ${v37HistoryMode ? `<span class="v36-table-card__signals">${v37ResultBadge(result)}</span>` : ''}
         </button>`;
       };
+      const v37TierLegendHtml = `<details class="v37-tier-legend" open>
+        <summary>Niveaux de confiance <span>clique un niveau pour filtrer</span></summary>
+        <div>
+          ${v36TierDefs.map(t => `<button type="button" class="${v36Filter.tier === t.id ? 'is-active' : ''}" data-tone="${esc(t.tone)}" data-v36-filter="tier" data-v36-value="${esc(t.id)}">
+            ${v36TierBadge(t.id, false)} <span>${esc(t.range)} · ${esc(t.desc)}</span>
+          </button>`).join('')}
+        </div>
+      </details>`;
+      const v37DayChip = (label, value, deltaLabel) => {
+        const active = v37DateFilter === value;
+        return `<button type="button" class="v37-day-chip ${active ? 'is-active' : ''}" data-v37-day="${esc(value)}"><b>${esc(label)}</b>${deltaLabel ? `<span>${esc(deltaLabel)}</span>` : ''}</button>`;
+      };
+      const v37DayNavHtml = `<section class="v37-day-nav" aria-label="Navigation jour par jour">
+        ${v37DayChip('7 jours', 'all', '300+ rows')}
+        ${v37DayChip('J-2', v37AddDays(todayIso, -2), v37DateLabel(v37AddDays(todayIso, -2)))}
+        ${v37DayChip('Hier', v37AddDays(todayIso, -1), v37DateLabel(v37AddDays(todayIso, -1)))}
+        ${v37DayChip("Aujourd'hui", todayIso, v37DateLabel(todayIso))}
+        ${v37DayChip('Demain', v37AddDays(todayIso, 1), v37DateLabel(v37AddDays(todayIso, 1)))}
+        ${v37DayChip('J+2', v37AddDays(todayIso, 2), v37DateLabel(v37AddDays(todayIso, 2)))}
+        ${v37DayChip('J+3', v37AddDays(todayIso, 3), v37DateLabel(v37AddDays(todayIso, 3)))}
+        ${v37DayChip('J+4', v37AddDays(todayIso, 4), v37DateLabel(v37AddDays(todayIso, 4)))}
+        ${v37DayChip('J+5', v37AddDays(todayIso, 5), v37DateLabel(v37AddDays(todayIso, 5)))}
+        <label class="v37-date-picker"><span>Date</span><input type="date" data-v37-date-input value="${esc(v37DateFilter === 'all' ? todayIso : v37DateFilter)}"></label>
+        <label class="v37-live-toggle"><input type="checkbox" data-v37-live-toggle ${v37IncludeLive ? 'checked' : ''}><span>Inclure LIVE</span></label>
+      </section>`;
+      const v37HistoryStats = (() => {
+        if (!v37HistoryMode) return '';
+        const acc = { won: 0, lost: 0, void: 0, live: 0, pending: 0, pl: 0 };
+        v36TableRows.forEach(p => {
+          const r = v37ResultForPick(p);
+          if (r === 'won') { acc.won++; acc.pl += p.odd - 1; }
+          else if (r === 'lost') { acc.lost++; acc.pl -= 1; }
+          else if (r === 'void') acc.void++;
+          else if (r === 'live') acc.live++;
+          else acc.pending++;
+        });
+        const staked = acc.won + acc.lost;
+        const roi = staked ? (acc.pl / staked) * 100 : 0;
+        return `<footer class="v37-history-footer">
+          <strong>${esc(v37DateLabel(v37DateFilter))} : ${v36TableRows.length} picks</strong>
+          <span>${acc.won} WON · ${acc.lost} LOST · ${acc.void} VOID · ${acc.pending} en attente · ROI ${roi >= 0 ? '+' : ''}${roi.toFixed(1)}%</span>
+          <button type="button" class="page-btn" data-page="performance">Voir tout l'historique</button>
+        </footer>`;
+      })();
       const v36TableHtml = `<section class="v36-table-panel" aria-label="Tableau dense des propositions">
+        ${v37TierLegendHtml}
+        ${v37DayNavHtml}
         <header class="v36-table-toolbar">
           <div>
-            <strong>${v36PickPool.length} picks aujourd'hui</strong>
-            <span>${v36TierDefs.map(t => `${v36CountsAll[t.id] || 0} ${t.label}`).join(' · ')}</span>
+            <strong>${v36PickPool.length} picks · ${esc(v37ScopeLabel)}</strong>
+            <span>${v36TierDefs.map(t => `${v36CountsAll[t.id] || 0} ${t.label}`).join(' · ')} · ${v36TableRows.length}/${v36Sorted.length} lignes rendues</span>
           </div>
           <label class="v36-table-search"><span>Search</span><input type="search" data-v36-search value="${esc(v36Search)}" placeholder="Équipe, ligue, marché"></label>
           <div class="v36-sort-strip" aria-label="Tri tableau">
             ${v36SortButton('tier', 'Tier')}
+            ${v36SortButton('date', 'Date')}
             ${v36SortButton('time', 'Heure')}
             ${v36SortButton('odd', 'Cote')}
             ${v36SortButton('conf', 'Conf')}
@@ -15047,12 +15168,13 @@
         <div class="v36-table-scroll">
           <table class="v36-picks-table">
             <thead><tr>
-              <th>Sport</th><th>${v36SortButton('time', 'Heure')}</th><th>Ligue</th><th>Match</th><th>Pari</th><th>${v36SortButton('odd', 'Cote')}</th><th>${v36SortButton('conf', 'Conf')}</th><th>${v36SortButton('edge', 'Edge')}</th><th>${v36SortButton('tier', 'Tier')}</th><th>Action</th>
+              <th>Sport</th><th>${v36SortButton('date', 'Date')}</th><th>${v36SortButton('time', 'Heure')}</th><th>Ligue</th><th>Match</th><th>Pari</th><th>${v36SortButton('odd', 'Cote')}</th><th>${v36SortButton('conf', 'Conf')}</th><th>${v36SortButton('edge', 'Edge')}</th><th>${v36SortButton('tier', 'Tier')}</th>${v37HistoryMode ? '<th>Résultat</th>' : ''}
             </tr></thead>
-            <tbody>${v36TableRows.length ? v36TableRows.map(v36TableRow).join('') : `<tr><td colspan="10"><div class="v36-tier-empty">Aucun pick pour ce filtre. Retire un sport, une heure ou une recherche.</div></td></tr>`}</tbody>
+            <tbody>${v36TableRows.length ? v36TableRows.map(v36TableRow).join('') : `<tr><td colspan="${v37HistoryMode ? '11' : '10'}"><div class="v36-tier-empty">Aucun pick pour ce filtre. Retire un sport, une heure ou une recherche.</div></td></tr>`}</tbody>
           </table>
         </div>
         <div class="v36-table-cards">${v36TableRows.length ? v36TableRows.map(v36MobileCard).join('') : `<div class="v36-tier-empty">Aucun pick pour ce filtre.</div>`}</div>
+        ${v37HistoryStats}
       </section>`;
       const v36NextHtml = v36Next.length ? v36Next.map(m => {
         const { home, away } = getSides(m);
@@ -15131,7 +15253,7 @@
       wrap.innerHTML = `
         <div class="v36-home-shell">
           <section class="v36-dayline" aria-label="Strategie du jour">
-            <h1>${_dataIsStale ? 'Donnees trop anciennes : refresh avant de jouer' : `Aujourd'hui : ${v36Total} picks affiches sur 5 niveaux`}</h1>
+            <h1>${_dataIsStale ? 'Donnees trop anciennes : refresh avant de jouer' : `V37 : ${v36Total} picks affiches · table dense ${esc(v37ScopeLabel)}`}</h1>
             <span>${esc(v36CoverageLine)}</span>
             <button type="button" class="page-btn" data-page="tous">Tout voir</button>
           </section>
@@ -15174,6 +15296,35 @@
           renderDashboardPage(wrap);
         });
       });
+      wrap.querySelectorAll('[data-v37-day]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const value = btn.dataset.v37Day || 'all';
+          const next = { ...v36Filter, date: value };
+          try { localStorage.setItem(v36FilterKey, JSON.stringify(next)); } catch(e) {}
+          try { history.replaceState(null, '', location.pathname + location.search + `#dashboard?date=${encodeURIComponent(value)}`); } catch(e) {}
+          renderDashboardPage(wrap);
+        });
+      });
+      const v37DateInput = wrap.querySelector('[data-v37-date-input]');
+      if (v37DateInput) {
+        v37DateInput.addEventListener('change', () => {
+          const value = /^\d{4}-\d{2}-\d{2}$/.test(v37DateInput.value || '') ? v37DateInput.value : todayIso;
+          const next = { ...v36Filter, date: value };
+          try { localStorage.setItem(v36FilterKey, JSON.stringify(next)); } catch(e) {}
+          try { history.replaceState(null, '', location.pathname + location.search + `#dashboard?date=${encodeURIComponent(value)}`); } catch(e) {}
+          renderDashboardPage(wrap);
+        });
+      }
+      const v37LiveInput = wrap.querySelector('[data-v37-live-toggle]');
+      if (v37LiveInput) {
+        v37LiveInput.addEventListener('change', () => {
+          const next = { ...v36Filter };
+          if (v37LiveInput.checked) next.includeLive = true;
+          else delete next.includeLive;
+          try { localStorage.setItem(v36FilterKey, JSON.stringify(next)); } catch(e) {}
+          renderDashboardPage(wrap);
+        });
+      }
       wrap.querySelectorAll('[data-v36-sort]').forEach(btn => {
         btn.addEventListener('click', () => {
           const next = { ...v36Filter, sort: btn.dataset.v36Sort || 'tier' };
@@ -15213,6 +15364,17 @@
           if (m && typeof openDetail === 'function') openDetail(m);
         });
       });
+      try {
+        if (window.__v37DashboardRefreshTimer) clearInterval(window.__v37DashboardRefreshTimer);
+        window.__v37DashboardRefreshTimer = setInterval(() => {
+          if (!wrap || !document.body.contains(wrap) || currentPage !== 'dashboard') {
+            clearInterval(window.__v37DashboardRefreshTimer);
+            window.__v37DashboardRefreshTimer = null;
+            return;
+          }
+          renderDashboardPage(wrap);
+        }, 30000);
+      } catch(e) {}
       return;
     }
 
