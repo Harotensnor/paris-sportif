@@ -179,6 +179,11 @@ SOURCES = [
         'markets': d.get('markets') or 0 if isinstance(d, dict) else 0,
         'status': d.get('status') if isinstance(d, dict) else 'missing',
     }),
+    ('boosted_odds', 'boosted_odds.json', lambda d: {
+        'matches_scanned': d.get('matches_scanned') or 0 if isinstance(d, dict) else 0,
+        'boosts': len(d.get('boosts') or []) if isinstance(d, dict) else 0,
+        'status': d.get('status') if isinstance(d, dict) else 'missing',
+    }),
     ('footballdata',    'footballdata.json',    _count_footballdata),
     ('clv_history',     'clv_history.json',     _count_clv),
 ]
@@ -204,6 +209,7 @@ STALE_AFTER_MIN = {
     'public_team_stats': 6*60,  # merged public sidecar
     'rugby_markets':   6*60,    # derived only when rugby appears in data.js
     'niche_markets':   6*60,    # darts/snooker derived sidecar
+    'boosted_odds':    60,      # follows Winamax market refresh
     'footballdata':    24*60,  # daily fetch
     'clv_history':     60,
 }
@@ -226,6 +232,7 @@ SOURCE_SCRIPT = {
     'public_team_stats': 'scripts/build_public_team_stats.py',
     'rugby_markets': 'scripts/build_rugby_markets.py',
     'niche_markets': 'scripts/build_niche_markets.py',
+    'boosted_odds': 'scripts/detect_boosted_odds.py',
     'footballdata': 'scripts/fetch_footballdata.py',
     'clv_history': 'scripts/compute_clv.py',
 }
