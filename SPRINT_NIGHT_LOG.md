@@ -1941,3 +1941,8 @@
 - Apres: xg_coverage.json mesure la couverture produit par ligue et le workflow le genere avant health.
 - Impact: le signal xG est pilotable: 68/285 matchs foot ont xG home+away (23.9%); les manques sont samples pour prioriser les prochaines sources.
 - Verif: build_xg_coverage.py OK, build_health OK, health sources=25 avec xg_coverage both_teams_pct=23.9%.
+## Sprint v35.287 — Phase 12 V36 P-12.34 Match previews signal-based (18:41 UTC)
+- Avant: la modal pouvait afficher beaucoup de donnees mais aucun resume court pre-match reutilisable par match.
+- Apres: fetch_match_previews.py tente ESPN summary public puis genere une preview analytique locale a partir de xG/H2H/lineups/pitchers/markets.
+- Impact: 12 previews top-signal produites, toutes en fallback local sur le snapshot courant; aucune fausse recap ESPN n'est affichee comme preview.
+- Verif: fetch_match_previews.py --limit 12 OK, build_health OK, health sources=26 avec match_previews previews=12.
