@@ -2047,3 +2047,8 @@
 - Apres: les listes prochains matchs sont triees strictement par kickoff et affichent Date + Heure + countdown; le rail legacy applique la meme logique.
 - Impact: le widget desktop montre une vraie file horaire, distingue aujourd'hui/demain, et evite l'impression de countdown copie-colle.
 - Verif: app.js syntax OK; smoke dashboard desktop => labels rail dates/heures/countdowns presents, 0 warning/error; app hash + cache + footer bumpes.
+## Sprint v35.308 — AUTO 10/10 Night metrics refresh (21:24 UTC)
+- Avant: night_metrics datait de 20:51 UTC pendant que le cron avait deja rafraichi data.js/data_lite/markets.
+- Apres: night_metrics regenere a 21:23:38 UTC sur le snapshot courant: 367 events, 294 upcoming, Winamax exact 367/367, 316 marches > 1N2.
+- Impact: les rapports couverture/perf repartent d'une base coherente apres la refonte table et les sprints data.
+- Verif: measure_night_metrics.py OK; winamax_exact_ratio=1.0, detail football 219/230 (95.2%), health warnings=1.
