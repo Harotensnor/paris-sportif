@@ -297,6 +297,23 @@ def main() -> int:
             time.sleep(max(0.0, args.sleep))
 
     matched = sum(1 for m in matches if m.get("local_event"))
+    by_league: dict[str, dict[str, Any]] = {}
+    for item in matches:
+        code = item.get("league_code") or "unknown"
+        bucket = by_league.setdefault(code, {
+            "league": item.get("league") or code,
+            "matches": 0,
+            "upcoming": 0,
+            "finished": 0,
+            "matched_local_events": 0,
+        })
+        bucket["matches"] += 1
+        if item.get("finished"):
+            bucket["finished"] += 1
+        else:
+            bucket["upcoming"] += 1
+        if item.get("local_event"):
+            bucket["matched_local_events"] += 1
     out = {
         "generated_at": now_iso(),
         "source": "OpenLigaDB public API",
@@ -306,6 +323,8 @@ def main() -> int:
         "requested_leagues": list(LEAGUES.keys()),
         "matches": matches,
         "matched_local_events": matched,
+        "matched_local_ratio": round(matched / len(matches), 4) if matches else 0,
+        "by_league": by_league,
         "errors": errors,
     }
     OUT.write_text(json.dumps(out, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
