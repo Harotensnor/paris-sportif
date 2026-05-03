@@ -1636,3 +1636,8 @@
 - Apres: l'Accueil lit #dashboard?sport=&minOdd=&edgeMin= et propose un bouton copier l'URL.
 - Impact: Theo peut rouvrir ou partager une vue Big Bets filtree sans friction.
 - Verif: syntax app.js/sw.js OK, bundle check OK.
+## Sprint v35.226 — Phase 11 P-11.32 Lazy-load logos equipes (13:16 local)
+- Avant: images dynamiques dispersees, avec lazy natif parfois incomplet.
+- Apres: enhanceLazyImages applique lazy/async/fetchpriority et dimensions aux images injectees.
+- Impact: moins de priorite reseau inutile, CLS plus stable sur logos et joueurs.
+- Verif: syntax app.js/sw.js OK, bundle check OK.

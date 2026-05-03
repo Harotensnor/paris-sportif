@@ -63,6 +63,46 @@
   applyAccessibilityPrefs();
   try { window.applyAccessibilityPrefs = applyAccessibilityPrefs; } catch(e) {}
 
+  function enhanceLazyImages(scope) {
+    const root = scope && scope.querySelectorAll ? scope : document;
+    try {
+      const imgs = [];
+      if (root.tagName && root.tagName.toLowerCase() === 'img') imgs.push(root);
+      if (root.querySelectorAll) imgs.push(...Array.from(root.querySelectorAll('img')));
+      imgs.forEach((img) => {
+        if (!img.hasAttribute('decoding')) img.setAttribute('decoding', 'async');
+        if (!img.hasAttribute('loading')) img.setAttribute('loading', 'lazy');
+        if (!img.hasAttribute('fetchpriority')) img.setAttribute('fetchpriority', 'low');
+        const style = img.getAttribute('style') || '';
+        const w = style.match(/width:\s*(\d+)px/i);
+        const h = style.match(/height:\s*(\d+)px/i);
+        if (w && !img.hasAttribute('width')) img.setAttribute('width', w[1]);
+        if (h && !img.hasAttribute('height')) img.setAttribute('height', h[1]);
+      });
+      root.querySelectorAll('.dash-cockpit__logos img, .bbf-card--hero img, .bbf-card:first-child img')
+        .forEach((img, idx) => {
+          if (idx > 3) return;
+          img.setAttribute('loading', 'eager');
+          img.setAttribute('fetchpriority', 'high');
+        });
+    } catch(e) {}
+  }
+  try { window.enhanceLazyImages = enhanceLazyImages; } catch(e) {}
+  try {
+    document.addEventListener('DOMContentLoaded', () => {
+      enhanceLazyImages(document);
+      if (!('MutationObserver' in window)) return;
+      const mo = new MutationObserver((mutations) => {
+        mutations.forEach((m) => {
+          m.addedNodes && m.addedNodes.forEach((node) => {
+            if (node && node.nodeType === 1) enhanceLazyImages(node);
+          });
+        });
+      });
+      mo.observe(document.body, { childList: true, subtree: true });
+    }, { once: true });
+  } catch(e) {}
+
   const ADV_FILTER_KEY = 'advFilters';
   let advFilters = (() => {
     try {
