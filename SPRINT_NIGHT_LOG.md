@@ -1648,4 +1648,8 @@
 - Avant: click audit instable sur 1 chip ligue pendant le rerender data complete.
 - Apres: runner aligne le delai de stabilisation, click audit 166/166 OK.
 - Impact: Lighthouse min perf 92, a11y 0 violation, modal tabs 4 sports OK.
-- Verif: syntax app.js/sw.js/click_audit OK, bundle check OK.
+- Verif: syntax app.js/sw.js/click_audit OK, bundle check OK.## Sprint v35.229 — Phase 11 P-11.4c Regenerate night_metrics (13:32 local)
+- Avant: night_metrics date de 09:26 UTC.
+- Apres: metrics regen 11:31 UTC, 373 events exacts Winamax, 321 multi-marches.
+- Impact: reporting Phase 11 aligne sur la data live actuelle.
+- Verif: measure_night_metrics OK, syntax/bundle OK.
