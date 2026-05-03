@@ -1881,3 +1881,8 @@
 - Apres: palette V36 dark premium, accents distincts par tier, cartes avec barre de couleur, nav compacte et fade desactive sur l'accueil.
 - Impact: desktop plus lisible et plus "pro betting"; la sidebar ne gonfle plus a 166px par item et les tiers restent visibles sans overflow.
 - Verif: Playwright desktop/mobile 20 cards, 0 erreur console, overflowX=false; captures .cache/v36-premium-skin-dashboard-final2.png et mobile.
+## Sprint v35.275 — Phase 12 V36 P-12.21 Recherche live accueil (18:16 UTC)
+- Avant: la recherche indexait surtout equipes/ligues/pages et restait un dropdown colle au header.
+- Apres: l'index ajoute les matchs a venir, la suggestion devient une palette centrale V36, et un clic sur match/equipe ouvre la fiche ou la liste des prochains matchs.
+- Impact: Theo peut chercher une equipe ou un match depuis l'accueil sans parcourir les 5 colonnes.
+- Verif: Playwright local "juv" -> palette visible, 1 resultat, clic ouvre une modal, 0 erreur console, capture .cache/v36-search-live-palette.png.

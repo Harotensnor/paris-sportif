@@ -12901,12 +12901,23 @@
     const teams = new Map();    // name -> { name, logo, sport, nextMatchId, nextTs }
     const leagues = new Map();  // name -> { name, code, sport }
     const venues = new Map();   // city -> { name, sport }
+    const matches = [];
+    const nowTs = Date.now() - 60000;
     Object.values(data.days).forEach(arr => (arr || []).forEach(m => {
       const { home, away } = getSides(m);
+      const ts = new Date(m.date).getTime();
+      if (Number.isFinite(ts) && ts >= nowTs && (home?.name || away?.name)) {
+        matches.push({
+          kind: 'match',
+          label: `${home?.name || '?'} vs ${away?.name || '?'}`,
+          sub: `${m.sport || 'sport'} · ${m.league_name || m.league || 'match à venir'}`,
+          matchId: m.id,
+          nextTs: ts,
+        });
+      }
       [home, away].forEach(s => {
         if (!s?.name) return;
         const k = s.name.toLowerCase();
-        const ts = new Date(m.date).getTime();
         const existing = teams.get(k);
         if (!existing || ts < existing.nextTs) {
           teams.set(k, { name: s.name, logo: s.logo, sport: m.sport, nextMatchId: m.id, nextTs: ts });
@@ -12923,6 +12934,7 @@
       }
     }));
     const items = [];
+    matches.sort((a, b) => a.nextTs - b.nextTs).slice(0, 90).forEach(m => items.push(m));
     teams.forEach(t => items.push({ kind: 'team', label: t.name, sub: t.sport, logo: t.logo, matchId: t.nextMatchId }));
     leagues.forEach(l => items.push({ kind: 'league', label: l.name, sub: l.sport }));
     venues.forEach(v => items.push({ kind: 'venue', label: v.name, sub: v.sport }));
@@ -12943,7 +12955,7 @@
     return { items };
   }
   const sportIconAA = (sp) => sp === 'football' ? '⚽' : sp === 'basketball' ? '🏀' : sp === 'tennis' ? '🎾' : sp === 'hockey' ? '🏒' : '🎯';
-  const kindIcon = (k) => k === 'team' ? '👕' : k === 'league' ? '🏆' : k === 'page' ? '↗' : k === 'action' ? '⚡' : '📍';
+  const kindIcon = (k) => k === 'match' ? '◈' : k === 'team' ? '👕' : k === 'league' ? '🏆' : k === 'page' ? '↗' : k === 'action' ? '⚡' : '📍';
   function renderSearchSuggest(q) {
     const box = document.getElementById('search-suggest');
     if (!box) return;
@@ -13010,7 +13022,7 @@
       return `<div class="search-suggest-item" data-idx="${i}" data-kind="${esc(it.kind)}" data-label="${esc(it.label)}" ${it.matchId ? `data-match-id="${esc(it.matchId)}"` : ''} ${it.action ? `data-action="${esc(it.action)}"` : ''} style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;">
         ${ico}
         <span style="flex:1;color:var(--text,#e6ebf2);font-weight:500;">${_highlightMatch(it.label, q)}</span>
-        <span style="color:var(--text-dim2,#7b8693);font-size:11px;">${it.kind === 'page' ? 'page' : it.kind === 'action' ? 'action' : `${sportIconAA(it.sub)} ${it.kind === 'team' ? `équipe${teamUpcoming.length ? ` · ${teamUpcoming.length} matchs` : ''}` : it.kind === 'league' ? 'tournoi' : 'ville'}`}</span>
+        <span style="color:var(--text-dim2,#7b8693);font-size:11px;">${it.kind === 'page' ? 'page' : it.kind === 'action' ? 'action' : it.kind === 'match' ? 'match' : `${sportIconAA(it.sub)} ${it.kind === 'team' ? `équipe${teamUpcoming.length ? ` · ${teamUpcoming.length} matchs` : ''}` : it.kind === 'league' ? 'tournoi' : 'ville'}`}</span>
       </div>`;
     }).join('');
     box.style.display = 'block';
@@ -13054,6 +13066,17 @@
         }
         render();
         box.style.display = 'none';
+        if (kind === 'match' && mid) {
+          const data = window.PRONOSTICS_DATA;
+          let match = null;
+          if (data && data.days) {
+            Object.values(data.days).forEach(arr => (arr || []).forEach(m => {
+              if (String(m.id) === String(mid)) match = m;
+            }));
+          }
+          if (match && typeof openDetail === 'function') setTimeout(() => openDetail(match), 80);
+          return;
+        }
         if (kind === 'team') {
           try {
             if (window.PRONOSTICS_DATA && window.PRONOSTICS_DATA._lite && typeof _ensureFullData === 'function') {
