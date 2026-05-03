@@ -2057,3 +2057,8 @@
 - Apres: backtest_report_v2 est accepte seulement si generated_at date de moins de 7 jours; sinon calibration globale/per-sport/per-market est marquee stale et les probas brutes sont conservees.
 - Impact: bug #78 ferme cote modele: une courbe obsolete ne peut plus aiguiser artificiellement un pick, et __modelCalibration expose stale/generated_at pour diagnostic.
 - Verif: app.js/sw.js syntax OK; smoke navigateur local => fresh=true, J-8=false, missing=false, liveCalTotal=647, 0 warning/error; spec model-math-guards etendue.
+## Sprint v35.310 — AUTO 10/10 Storage corruption recovery (21:47 UTC)
+- Avant: plusieurs zones user (filtres V37, favoris, watchlist, alertes) lisaient encore du JSON localStorage avec des try/catch disperses, mais sans helper unique ni test de stockage corrompu.
+- Apres: safeLocalStorageGet/safeLocalStorageJson deviennent les helpers globaux; dashboard filter, oddMin, prefs accessibilite, recent matches, bookmarks, watchlist et alert rules les utilisent.
+- Impact: bugs #39/#40 avances: un localStorage corrompu ou bloque ne casse plus l'accueil/table, et les favoris/watchlist repartent sur des defaults propres.
+- Verif: app.js/sw.js syntax OK; smoke navigateur local avec JSON corrompu => favoris/watchlist/alertes fallback OK, toggle favori OK, reload dashboard 720 lignes, 0 warning/error; spec storage-safety ajoutee.

@@ -38,6 +38,17 @@
     try { return JSON.parse(raw); }
     catch(e) { return fallback; }
   }
+  function safeLocalStorageGet(key, fallback = null) {
+    try {
+      const value = localStorage.getItem(key);
+      return value == null ? fallback : value;
+    } catch(e) {
+      return fallback;
+    }
+  }
+  function safeLocalStorageJson(key, fallback) {
+    return safeJsonParse(safeLocalStorageGet(key, null), fallback);
+  }
   function safeLocalStorageSet(key, value) {
     try {
       localStorage.setItem(key, value);
@@ -59,7 +70,13 @@
       return `${safePrefix}_${Date.now().toString(36)}_${(_localIdCounter++).toString(36)}`;
     }
   }
-  try { window.safeJsonParse = safeJsonParse; window.safeLocalStorageSet = safeLocalStorageSet; window.makeLocalId = makeLocalId; } catch(e) {}
+  try {
+    window.safeJsonParse = safeJsonParse;
+    window.safeLocalStorageGet = safeLocalStorageGet;
+    window.safeLocalStorageJson = safeLocalStorageJson;
+    window.safeLocalStorageSet = safeLocalStorageSet;
+    window.makeLocalId = makeLocalId;
+  } catch(e) {}
 
   let currentSport = 'football';
   let currentDate;
@@ -74,7 +91,7 @@
   const ODD_MIN_CHOICES = [1.30, 1.50, 1.80, 2.00, 2.50];
   function getUserOddMin() {
     try {
-      const v = parseFloat(localStorage.getItem(ODD_MIN_USER_KEY));
+      const v = parseFloat(safeLocalStorageGet(ODD_MIN_USER_KEY));
       if (isFinite(v) && v >= 1.30 && v <= 2.50) return Math.round(v * 100) / 100;
     } catch(e) {}
     return 1.30;
@@ -94,7 +111,7 @@
 
   function applyAccessibilityPrefs(prefs) {
     try {
-      if (!prefs) prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}') || {};
+      if (!prefs) prefs = safeLocalStorageJson('userPrefs', {}) || {};
     } catch(e) { prefs = {}; }
     const root = document.documentElement;
     if (!document.getElementById('accessibility-pref-style')) {
@@ -167,7 +184,7 @@
   const ADV_FILTER_KEY = 'advFilters';
   let advFilters = (() => {
     try {
-      const raw = JSON.parse(localStorage.getItem(ADV_FILTER_KEY) || '{}');
+      const raw = safeLocalStorageJson(ADV_FILTER_KEY, {}) || {};
       return {
         kellyMin: parseFloat(raw.kellyMin) || 0,   // e.g. 0.02 = 2%
         oddMin: parseFloat(raw.oddMin) || getUserOddMin(),        // min decimal odd
@@ -181,7 +198,7 @@
     } catch (e) { return { kellyMin: 0, oddMin: getUserOddMin(), oddMax: 0, league: '', valueOnly: false, evMin: 0, marketType: '', dataQualityMin: 0 }; }
   })();
   function saveAdvFilters() {
-    try { localStorage.setItem(ADV_FILTER_KEY, JSON.stringify(advFilters)); } catch (e) {}
+    safeLocalStorageSet(ADV_FILTER_KEY, JSON.stringify(advFilters));
   }
   function advFiltersActive() {
     return advFilters.kellyMin > 0 || advFilters.oddMin > 0 || advFilters.oddMax > 0
@@ -13426,8 +13443,7 @@
   const _trackRecentMatch = (match) => {
     if (!match || !match.id) return;
     try {
-      const raw = localStorage.getItem('paris_sportif_recent_matches') || '[]';
-      let arr = JSON.parse(raw);
+      let arr = safeLocalStorageJson('paris_sportif_recent_matches', []);
       if (!Array.isArray(arr)) arr = [];
       // Dedup + push en tête
       arr = arr.filter(x => x.id !== String(match.id));
@@ -13440,18 +13456,10 @@
         viewedAt: Date.now(),
       });
       arr = arr.slice(0, 10);
-      try {
-        localStorage.setItem('paris_sportif_recent_matches', JSON.stringify(arr));
-      } catch (quotaErr) {
-        // Tente une purge des plus vieux puis retry. Si toujours fail,
-        // on swallow silencieusement (tracking n'est pas critique).
-        if (quotaErr && quotaErr.name === 'QuotaExceededError') {
-          try {
-            // Purge agressive : ne garde que les 3 plus récents
-            const trimmed = arr.slice(0, 3);
-            localStorage.setItem('paris_sportif_recent_matches', JSON.stringify(trimmed));
-          } catch (e2) { /* swallow, tracking optional */ }
-        }
+      if (!safeLocalStorageSet('paris_sportif_recent_matches', JSON.stringify(arr))) {
+        // Purge agressive : ne garde que les 3 plus récents si le quota bloque.
+        const trimmed = arr.slice(0, 3);
+        safeLocalStorageSet('paris_sportif_recent_matches', JSON.stringify(trimmed));
       }
     } catch (e) {}
   };
@@ -13467,29 +13475,26 @@
   window._toggleBookmark = function toggleBookmark(matchId) {
     if (!matchId) return false;
     try {
-      const raw = localStorage.getItem('paris_sportif_bookmarks') || '[]';
-      let arr = JSON.parse(raw);
+      let arr = safeLocalStorageJson('paris_sportif_bookmarks', []);
       if (!Array.isArray(arr)) arr = [];
       const idStr = String(matchId);
       const exists = arr.includes(idStr);
       if (exists) arr = arr.filter(x => x !== idStr);
       else arr.push(idStr);
       arr = arr.slice(-50);  // cap 50
-      localStorage.setItem('paris_sportif_bookmarks', JSON.stringify(arr));
+      safeLocalStorageSet('paris_sportif_bookmarks', JSON.stringify(arr));
       return !exists;  // returns new state
     } catch (e) { return false; }
   };
   window._isBookmarked = function isBookmarked(matchId) {
     try {
-      const raw = localStorage.getItem('paris_sportif_bookmarks') || '[]';
-      const arr = JSON.parse(raw);
+      const arr = safeLocalStorageJson('paris_sportif_bookmarks', []);
       return Array.isArray(arr) && arr.includes(String(matchId));
     } catch (e) { return false; }
   };
   window._loadBookmarks = function loadBookmarks() {
     try {
-      const raw = localStorage.getItem('paris_sportif_bookmarks') || '[]';
-      const arr = JSON.parse(raw);
+      const arr = safeLocalStorageJson('paris_sportif_bookmarks', []);
       return Array.isArray(arr) ? arr : [];
     } catch (e) { return []; }
   };
@@ -13510,9 +13515,8 @@
   const ALERT_RULES_KEY = 'paris_sportif_alert_rules';
   function _loadWatchlist() {
     try {
-      const raw = localStorage.getItem(WATCHLIST_KEY);
-      if (!raw) return { teams: [], leagues: [], sports: [], markets: [] };
-      const obj = JSON.parse(raw);
+      const obj = safeLocalStorageJson(WATCHLIST_KEY, null);
+      if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return { teams: [], leagues: [], sports: [], markets: [] };
       return {
         teams: Array.isArray(obj.teams) ? obj.teams : [],
         leagues: Array.isArray(obj.leagues) ? obj.leagues : [],
@@ -13522,7 +13526,7 @@
     } catch(e) { return { teams: [], leagues: [], sports: [], markets: [] }; }
   }
   function _saveWatchlist(wl) {
-    try { localStorage.setItem(WATCHLIST_KEY, JSON.stringify(wl)); } catch(e){}
+    safeLocalStorageSet(WATCHLIST_KEY, JSON.stringify(wl));
   }
   window._toggleWatchlistEntry = function(category, value) {
     if (!['teams','leagues','sports','markets'].includes(category)) return false;
@@ -13559,9 +13563,7 @@
   // Alertes paramétrables
   function _loadAlertRules() {
     try {
-      const raw = localStorage.getItem(ALERT_RULES_KEY);
-      if (!raw) return [];
-      const arr = JSON.parse(raw);
+      const arr = safeLocalStorageJson(ALERT_RULES_KEY, []);
       return Array.isArray(arr) ? arr : [];
     } catch(e) { return []; }
   }
@@ -14002,6 +14004,7 @@
       buildMarketCandidates: typeof buildMarketCandidates === 'function' ? buildMarketCandidates : null,
       scoreMarketCandidate: typeof scoreMarketCandidate === 'function' ? scoreMarketCandidate : null,
       _isFreshBacktestReport: typeof _isFreshBacktestReport === 'function' ? _isFreshBacktestReport : null,
+      safeLocalStorageJson: typeof safeLocalStorageJson === 'function' ? safeLocalStorageJson : null,
       scoreToImpliedMarkets: typeof scoreToImpliedMarkets === 'function' ? scoreToImpliedMarkets : null,
       isPickConsistentWithScore: typeof isPickConsistentWithScore === 'function' ? isPickConsistentWithScore : null,
       isPairConsistent: typeof isPairConsistent === 'function' ? isPairConsistent : null,
@@ -15020,8 +15023,8 @@
     {
       const v36FilterKey = 'paris_sportif_v36_home_filter';
       const v36Filter = (() => {
-        try { return JSON.parse(localStorage.getItem(v36FilterKey) || '{}') || {}; }
-        catch(e) { return {}; }
+        const parsed = safeLocalStorageJson(v36FilterKey, {});
+        return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
       })();
       const v36TierDefs = [
         { id: 'safe', icon: '1', label: 'Sur', range: '1.30-1.50', desc: 'Conf. 75%+ · edge positif', tone: 'safe' },
