@@ -2032,3 +2032,8 @@
 - Apres: les conflits 1N2 <-> handicap -0,5 expliquent explicitement "Doublon logique", les contradictions +0,5 restent marquees incoherentes, et les team totals affichent "Total buts <equipe> — plus/moins de X (equipe seulement)" avec semanticGroup dedie.
 - Impact: Theo peut garder les handicaps sans voir deux fois le meme pari mathematique, et les totaux equipe ne ressemblent plus a des handicaps.
 - Verif: app.js syntax OK; smoke navigateur local => raisons Doublon/Incoherent OK, label "Total buts Freiburg — plus de 1,5 (equipe seulement)" OK, 0 warning/error; specs market-consistency/candidates enrichies.
+## Sprint v35.305 — AUTO 10/10 Garde-fous Poisson/Dixon-Coles (21:27 UTC)
+- Avant: poissonTopScores retournait [] si une lambda valait 0/invalide, et Dixon-Coles n'avait pas de clamp explicite sur rho/tau meme si tau(1,1) existait.
+- Apres: tau couvre explicitement les quatre cellules bas score (0-0, 0-1, 1-0, 1-1), clamp rho/tau pour eviter les masses negatives, et poissonTopScores bascule sur une lambda conservatrice au lieu de vider les scores exacts.
+- Impact: un match a data offensive incomplete garde une prediction exploitable et un score probable plutot qu'un trou silencieux dans la modal/table.
+- Verif: app.js syntax OK; smoke navigateur local => tau(1,1)=1.13, tau(2,2)=1, zero/NaN lambdas retournent 3 scores finis, 0 warning/error; spec model-math-guards ajoutee.

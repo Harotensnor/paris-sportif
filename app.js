@@ -3994,11 +3994,16 @@
   // 0-0, 1-0, 0-1, 1-1 (corrélation negative empirique en foot).
   // Référence : Dixon & Coles (1997) "Modelling Association Football Scores".
   function _dixonColesTau(h, a, lamH, lamA, rho) {
-    if (h === 0 && a === 0) return 1 - lamH * lamA * rho;
-    if (h === 0 && a === 1) return 1 + lamH * rho;
-    if (h === 1 && a === 0) return 1 + lamA * rho;
-    if (h === 1 && a === 1) return 1 - rho;
-    return 1;
+    const hGoal = Number(h), aGoal = Number(a);
+    const hLam = Math.max(0, Number(lamH) || 0);
+    const aLam = Math.max(0, Number(lamA) || 0);
+    const r = Math.max(-0.45, Math.min(0.45, Number.isFinite(Number(rho)) ? Number(rho) : 0));
+    let tau = 1;
+    if (hGoal === 0 && aGoal === 0) tau = 1 - hLam * aLam * r;
+    else if (hGoal === 0 && aGoal === 1) tau = 1 + hLam * r;
+    else if (hGoal === 1 && aGoal === 0) tau = 1 + aLam * r;
+    else if (hGoal === 1 && aGoal === 1) tau = 1 - r;
+    return Math.max(0.01, tau);
   }
 
   // recalibration sur saisons 2014-2024 (litterature : Constantinou & Fenton
@@ -4076,7 +4081,24 @@
   // Used for the "Score exact probable" widget — Chantier 6 + v31.7.5.
   // ρ specifique. Backward-compatible : appel sans 5e arg utilise default.
   function poissonTopScores(lamH, lamA, k = 3, maxGoals = 6, leagueCode = null) {
-    if (!(lamH > 0) || !(lamA > 0)) return [];
+    let safeLamH = Number(lamH);
+    let safeLamA = Number(lamA);
+    if (!(safeLamH > 0) && !(safeLamA > 0)) {
+      prodWarn('[poissonTopScores] lambdas invalides, fallback bas conservateur', { lamH, lamA, leagueCode });
+      safeLamH = 0.05;
+      safeLamA = 0.05;
+    } else {
+      if (!(safeLamH > 0)) {
+        prodWarn('[poissonTopScores] lambda domicile invalide, fallback relatif', { lamH, lamA, leagueCode });
+        safeLamH = Math.max(0.05, safeLamA * 0.15);
+      }
+      if (!(safeLamA > 0)) {
+        prodWarn('[poissonTopScores] lambda extérieur invalide, fallback relatif', { lamH, lamA, leagueCode });
+        safeLamA = Math.max(0.05, safeLamH * 0.15);
+      }
+    }
+    lamH = safeLamH;
+    lamA = safeLamA;
     const RHO = _dixonColesRho(leagueCode);
     const scores = [];
     let totalMass = 0;
