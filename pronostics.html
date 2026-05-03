@@ -133,9 +133,9 @@
 <!-- Chantier S — PWA -->
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="alternate" type="application/rss+xml" href="feed.xml" title="Paris-Sportif — Top picks du jour (RSS)">
-<!-- v35.07 — Seul le CSS est préchargé au boot. Le gros app.js?v=ac81c628 reste en defer
+<!-- v35.07 — Seul le CSS est préchargé au boot. Le gros app.js?v=47d9f074 reste en defer
      plus bas dans le body pour laisser le squelette critique peindre d'abord. -->
-<link rel="preload" href="app.css?v=60babb71" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<link rel="preload" href="app.css?v=e266865c" as="style" onload="this.onload=null;this.rel='stylesheet'">
 <link rel="stylesheet" href="print.css?v=313105b5" media="print">
 <!-- v31.1 — DNS-prefetch pour les CDN tiers utilisés sur la page (logos ESPN).
      v31.7.24 — Ajout `preconnect` pour a.espncdn.com (le plus utilisé) :
@@ -304,7 +304,7 @@
      n'est chargé QU'APRÈS consentement explicite (cf. _maybeEnableAnalytics).
      Pas de tracking par défaut. -->
 <script src="analytics.config.js" defer onerror="this.remove();"></script>
-<noscript><link rel="stylesheet" href="app.css?v=60babb71"></noscript>
+<noscript><link rel="stylesheet" href="app.css?v=e266865c"></noscript>
 <script>
   // v22 — Init theme / contrast / reader BEFORE body render (évite le flash)
   (function() {
@@ -363,7 +363,7 @@
   // pour debug console. AUCUN envoi réseau — l'utilisateur peut consulter
   // ou exporter ses données, et c'est tout.
   //
-// Pourquoi inline pré-app.js?v=ac81c628 ? Il faut s'enregistrer AVANT le LCP/FCP
+// Pourquoi inline pré-app.js?v=47d9f074 ? Il faut s'enregistrer AVANT le LCP/FCP
   // pour les capter. Le bundle web-vitals officiel pèse 5 KB ; ici on
   // tombe à ~1.5 KB grâce à l'usage direct de PerformanceObserver.
   //
@@ -904,9 +904,9 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="data_lite.js?v=754e1d70"></script>
+<script src="data_lite.js?v=4c10a5b0"></script>
 <script src="app-i18n.js?v=6bad7ddf" defer></script>
-<script src="app.js?v=ac81c628" defer></script>
+<script src="app.js?v=47d9f074" defer></script>
 
 <!-- enhancements v20 -->
 <script src="app-enhancements.js?v=232799b3" defer></script>
