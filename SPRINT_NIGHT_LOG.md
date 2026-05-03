@@ -1720,3 +1720,9 @@
 - Apres: 50 matchs upcoming controles sur noms, dates, Winamax, cotes 1N2 et doublons.
 - Impact: 0 ligne en anomalie, 0 duplicate id sample, 277 upcoming confirmes.
 - Verif: phase12_data_quality_sample_audit.json, script OK.
+
+## Sprint v35.243 — Phase 12 P-12.12 Audit mobile devices (15:18 local)
+- Avant: mobile valide surtout sur 375px, pas sur devices reels varies.
+- Apres: 32 vues iPhone12/Pixel5/GalaxyS20/iPadMini controlees avec screenshots top/bottom.
+- Impact: 32/32 pass, 0 overflow, 0 overlap bottom-nav, 0 console error; P12-MOB-001 logge pour inputs Profil 16x16.
+- Verif: phase12_mobile_device_audit.json, script OK.
