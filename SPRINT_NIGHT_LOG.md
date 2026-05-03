@@ -1644,4 +1644,8 @@
 - Avant: ARCHITECTURE.md datait d'avant les phases lite/i18n/marches etendus.
 - Apres: doc alignee sur data_lite, sources publiques, tests et etat Phase 11.
 - Impact: handoff plus fiable pour pipelines, frontend et modeles.
-- Verif: documentation relue, stamp cache/version applique.
+- Verif: documentation relue, stamp cache/version applique.## Sprint v35.228 — Phase 11 P-11.10/P-11.38 Tests site (13:29 local)
+- Avant: click audit instable sur 1 chip ligue pendant le rerender data complete.
+- Apres: runner aligne le delai de stabilisation, click audit 166/166 OK.
+- Impact: Lighthouse min perf 92, a11y 0 violation, modal tabs 4 sports OK.
+- Verif: syntax app.js/sw.js/click_audit OK, bundle check OK.
