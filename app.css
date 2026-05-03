@@ -2373,7 +2373,7 @@
     [data-tous-sort] { width: 100% !important; }
     [data-tous-sort] + label,
     label:has([data-tous-sort]) { margin-left: 0 !important; }
-    [data-tous-edge], [data-tous-conf], [data-tous-league], [data-tous-odd-min], [data-tous-odd-max], [data-tous-time], [data-tous-tier], [data-tous-search] {
+    [data-tous-edge], [data-tous-conf], [data-tous-league], [data-tous-odd-min], [data-tous-odd-max], [data-tous-time], [data-tous-tier], [data-tous-search], [data-tous-export] {
       padding: var(--space-2) 10px !important;
       font-size: var(--t-sm) !important;
       min-width: 80px;
@@ -5587,6 +5587,7 @@
     [data-tous-time],
     [data-tous-tier],
     [data-tous-search],
+    [data-tous-export],
     .page-btn:not(.hub-btn):not([style*="padding:0"]):not([style*="padding: 0"]) {
       min-width: 44px;
       min-height: 44px;
@@ -8272,7 +8273,7 @@ body.agent-home #search-suggest .search-suggest-item:hover{background:rgba(255,2
 @media(max-width:720px){button,summary,a[href]{min-height:44px!important}a[href]{display:inline-flex;align-items:center}.topbar-menu,.scroll-top-fab,.trust-strip-close{width:44px!important;height:44px!important}}
 @media(max-width:720px){[data-tous-search]{min-height:44px!important}}
 /* v35.196 — Lighthouse desktop target-size pass. Keeps the dense desktop look while giving every primary control a >=40px hit area. */
-@media(min-width:721px){.skip-to-content,.rg-risk-bar a,.topbar-mainnav__link,nav.topbar-nav .page-btn,nav.topbar-nav .hub-btn,.theme-pill,.page-btn,.sante-action-btn,#sante-rerun-btn,button[style*="min-height:34px"],button[style*="min-height:32px"],button[style*="min-height:30px"],.trust-strip-link,.bbf-chip,.bbf-shell a[href],#academie-wrap a[href],.agent-return,.bilan-tabs button,.page-tabs-btn,[data-pronos-page],[data-suivi-page],[data-agent-tab],[data-perf-tab],[data-tous-mode],[data-tous-tab],[data-tous-sport],[data-tous-sort],[data-tous-edge],[data-tous-conf],[data-tous-league],[data-tous-odd-min],[data-tous-odd-max],[data-tous-time],[data-tous-tier],[data-tous-search],[data-compare-pick],footer a,footer button,.footer-link,.footer-anj-link,.footer-anj-pill-link{min-height:40px!important;display:inline-flex;align-items:center}.trust-strip-close{width:40px!important;height:40px!important;min-width:40px!important;min-height:40px!important}.rg-risk-bar a,.footer-link{padding-left:8px;padding-right:8px}}
+@media(min-width:721px){.skip-to-content,.rg-risk-bar a,.topbar-mainnav__link,nav.topbar-nav .page-btn,nav.topbar-nav .hub-btn,.theme-pill,.page-btn,.sante-action-btn,#sante-rerun-btn,button[style*="min-height:34px"],button[style*="min-height:32px"],button[style*="min-height:30px"],.trust-strip-link,.bbf-chip,.bbf-shell a[href],#academie-wrap a[href],.agent-return,.bilan-tabs button,.page-tabs-btn,[data-pronos-page],[data-suivi-page],[data-agent-tab],[data-perf-tab],[data-tous-mode],[data-tous-tab],[data-tous-sport],[data-tous-sort],[data-tous-edge],[data-tous-conf],[data-tous-league],[data-tous-odd-min],[data-tous-odd-max],[data-tous-time],[data-tous-tier],[data-tous-search],[data-tous-export],[data-compare-pick],footer a,footer button,.footer-link,.footer-anj-link,.footer-anj-pill-link{min-height:40px!important;display:inline-flex;align-items:center}.trust-strip-close{width:40px!important;height:40px!important;min-width:40px!important;min-height:40px!important}.rg-risk-bar a,.footer-link{padding-left:8px;padding-right:8px}}
 @media(min-width:721px) and (max-width:1024px){button:not(.help-dot),a[role="button"],a[href*="github.com/Harotensnor/paris-sportif/actions"]{min-height:40px!important;display:inline-flex;align-items:center}}
 @media(min-width:721px) and (max-width:1024px){.topbar-menu{min-width:40px!important;width:40px!important}}
 [data-internal-alert-dismiss]{min-width:44px!important;min-height:44px!important}
