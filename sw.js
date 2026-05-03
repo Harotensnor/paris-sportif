@@ -11,7 +11,7 @@
 // The "Stamp sw.js" step replaces this entire line with the current UTC timestamp,
 // so every deploy invalidates all caches → users see the new pronostics.html
 // without needing Ctrl+Shift+R. Manual edits stay valid for local dev.
-const CACHE_VERSION = 'paris-sportif-20260503-213319-v35-294';
+const CACHE_VERSION = 'paris-sportif-20260503-213453-v35-295';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -27,22 +27,17 @@ const PRECACHE_ASSETS = [
   'icon-512.png',
   // FIX Bug 7 — pré-cache pronostics.html pour fallback offline garanti
   'pronostics.html',
-  // v31 — app.css + app.js extraits depuis pronostics.html (audit ChatGPT).
-  // CACHE_VERSION stamp invalide tout à chaque vrai changement de code.
+  // v31 — app.css extrait depuis pronostics.html (audit ChatGPT).
+  // v35.295 — app.js sort du precache : 1.6MB ne doit pas bloquer l'install PWA.
+  // Il reste servi en stale-while-revalidate au premier chargement puis en offline.
   'app.css',
   'app-i18n.js',
-  'app.js',
   'i18n.json',
   'print.css',
   'app-enhancements.js',
   // Landing page indexable + son CSS partagé.
   'static-page.css',
   'index.html',
-  // OG images partagées sur reseaux sociaux : cache 24h+
-  'og-default.png',
-  'og-backtest.png',
-  'og-credibilite.png',
-  'og-methodologie.png',
 ];
 
 // Pages éditoriales : seulement ~5% des sessions visitent ces pages.
@@ -57,6 +52,12 @@ const LAZY_CACHE_FIRST = [
   'backtest.html',
   'credibilite.html',
   '404.html',
+  // OG images partagées sur reseaux sociaux : cache-first au premier hit,
+  // pas à l'installation PWA.
+  'og-default.png',
+  'og-backtest.png',
+  'og-credibilite.png',
+  'og-methodologie.png',
 ];
 
 const SHELL_ASSETS = [...PRECACHE_ASSETS, ...LAZY_CACHE_FIRST];
