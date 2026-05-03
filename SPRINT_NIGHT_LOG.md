@@ -1507,3 +1507,9 @@
 - Apres: 190 hex directs, danger/success/brand/warn migrés vers tokens, app.css 299.9KB.
 - Impact: couleurs plus centralisées sans dépasser le budget bundle.
 - Verif: bundle OK, diff check OK.
+
+## Sprint v35.204 — Phase 11 P-11.8 Refactor app.js i18n (09:49 UTC)
+- Avant: le socle FR/EN vivait dans app.js et gonflait le bundle principal.
+- Apres: app-i18n.js dédié chargé avant app.js; app.js 1621.1KB -> 1619.1KB.
+- Impact: premier découpage ESM-safe du mégafichier sans toucher au modèle.
+- Verif: node --check app.js/app-i18n.js OK, bundle OK.
