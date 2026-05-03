@@ -115,6 +115,14 @@ async function runCases(page) {
       ['2:0 + BTTS No', score('2:0'), m('btts', 'BTTS_N', { side: 'no' }), true],
       ['2:0 + 1N2 2', score('2:0'), m('1n2', '2'), false],
       ['1-2 + DC X2', score('1-2'), m('doubleChance', 'X2'), true],
+      ['0-0 + DC 12', score('0-0'), m('doubleChance', '12'), false],
+      ['1-0 + handicap home -0.5', score('1-0'), m('handicap', 'home:-0.5', { side: 'home', line: -0.5 }), true],
+      ['1-0 + handicap away +0.5', score('1-0'), m('handicap', 'away:+0.5', { side: 'away', line: 0.5 }), false],
+      ['2-0 + handicap home -1.5', score('2-0'), m('handicap', 'home:-1.5', { side: 'home', line: -1.5 }), true],
+      ['1-0 + handicap home -1.5', score('1-0'), m('handicap', 'home:-1.5', { side: 'home', line: -1.5 }), false],
+      ['1N2 1 + handicap home -0.5 duplicate', m('1n2', '1'), m('handicap', 'home:-0.5', { side: 'home', line: -0.5 }), false],
+      ['1N2 1 + handicap away +0.5 conflict', m('1n2', '1'), m('handicap', 'away:+0.5', { side: 'away', line: 0.5 }), false],
+      ['1N2 X + handicap home +0.5 coexist', m('1n2', 'X'), m('handicap', 'home:+0.5', { side: 'home', line: 0.5 }), true],
     ];
     const rows = cases.map(([name, a, b, expected]) => ({ name, expected, actual: api.isPairConsistent(a, b) }));
     const scorePick = score('1-0');

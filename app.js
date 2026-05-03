@@ -2676,7 +2676,9 @@
     for (const row of _v35Rows(wxMk.team_total)) {
       const p = _v35ModelTeamTotalProb(pred, row.team, row.line, row.side);
       const key = `${row.team}:${row.side === 'over' ? 'O' : 'U'}${row.line}`;
-      _v35AddCandidate(out, row, p, 'teamTotal', key, `${row.team === 'home' ? 'Domicile' : 'Extérieur'} ${row.side === 'over' ? '+' : '-'}${row.line} but`);
+      const teamLabel = row.team === 'home' ? 'équipe domicile' : 'équipe extérieure';
+      const sideLabel = row.side === 'over' ? 'plus de' : 'moins de';
+      _v35AddCandidate(out, row, p, 'teamTotal', key, `Total ${teamLabel} — ${sideLabel} ${row.line} but${Number(row.line) > 1 ? 's' : ''}`);
     }
     for (const row of _v35Rows(wxMk.exact_score_rows)) {
       const hit = (ext.exactScores || []).find(x => x.key === row.score || x.label === row.score);
@@ -2809,6 +2811,12 @@
     const m = `${c?.key || ''} ${c?.pickKey || ''} ${c?.label || ''}`.match(/(\d+(?:[.,]\d+)?)/);
     return m ? Number(m[1].replace(',', '.')) : null;
   }
+  function _v35SignedLine(c) {
+    const n = Number(c?.line);
+    if (Number.isFinite(n)) return n;
+    const m = `${c?.key || ''} ${c?.pickKey || ''} ${c?.label || ''}`.match(/([+-]?\d+(?:[.,]\d+)?)/);
+    return m ? Number(m[1].replace(',', '.')) : null;
+  }
   function _v35NormPick(c) {
     if (!c) return { market: '', pick: '', line: null };
     const market = String(c.market || '').trim();
@@ -2819,6 +2827,11 @@
     if (market === 'btts') return { market: 'btts', pick: token.includes('yes') || token.includes('oui') || token === 'y' || token === 'btts_y' || token === 'bttsy' ? 'Yes' : 'No', line };
     if (market === 'doubleChance') return { market, pick: String(c.pickValue ?? c.key ?? c.pickKey ?? c.side ?? '').replace(/_/g, '').toUpperCase(), line };
     if (market === 'dnb') return { market, pick: String(c.pickValue ?? c.key ?? c.pickKey ?? c.side ?? '').toLowerCase().match(/2|away/) ? '2' : '1', line };
+    if (typeof isHandicapMarket === 'function' && isHandicapMarket(market)) {
+      const rawSide = _v35Tok(c.side ?? c.pickValue ?? c.key ?? c.pickKey ?? c.label);
+      const pick = rawSide.includes('away') || rawSide.includes('exterieur') || rawSide === '2' || rawSide.startsWith('2:') ? '2' : '1';
+      return { market: 'handicap', pick, line: _v35SignedLine(c), rawMarket: market };
+    }
     if (/^(ou|ou15|ou25|ou35|teamTotal|basketTotal|baseballTotal|hockeyTotal|tennisGames)$/i.test(market)) {
       let m = market;
       if (Number.isFinite(line)) m = Math.abs(line - 1.5) < 0.01 ? 'ou15' : Math.abs(line - 2.5) < 0.01 ? 'ou25' : Math.abs(line - 3.5) < 0.01 ? 'ou35' : market;
@@ -2831,12 +2844,19 @@
     if (!m) return null;
     const h = Number(m[1]), a = Number(m[2]), total = h + a;
     if (!Number.isFinite(total)) return null;
-    return { '1n2': h > a ? '1' : a > h ? '2' : 'X', ou15: total > 1.5 ? 'Over' : 'Under', ou25: total > 2.5 ? 'Over' : 'Under', ou35: total > 3.5 ? 'Over' : 'Under', btts: h > 0 && a > 0 ? 'Yes' : 'No', doubleChance: h > a ? ['1X', '12'] : a > h ? ['X2', '12'] : ['1X', 'X2'], dnb: h > a ? '1' : a > h ? '2' : 'PUSH', total };
+    return { '1n2': h > a ? '1' : a > h ? '2' : 'X', ou15: total > 1.5 ? 'Over' : 'Under', ou25: total > 2.5 ? 'Over' : 'Under', ou35: total > 3.5 ? 'Over' : 'Under', btts: h > 0 && a > 0 ? 'Yes' : 'No', doubleChance: h > a ? ['1X', '12'] : a > h ? ['X2', '12'] : ['1X', 'X2'], dnb: h > a ? '1' : a > h ? '2' : 'PUSH', total, homeGoals: h, awayGoals: a };
   }
   function isPickConsistentWithScore(score, market, pick, candidate) {
     const implied = scoreToImpliedMarkets(score);
     if (!implied) return true;
     if (market === 'exactScore') return String(score || '').trim() === String(pick || '').trim();
+    if (market === 'handicap') {
+      const line = _v35SignedLine(candidate);
+      if (!Number.isFinite(line)) return true;
+      const teamGoals = pick === '2' ? implied.awayGoals : implied.homeGoals;
+      const oppGoals = pick === '2' ? implied.homeGoals : implied.awayGoals;
+      return (teamGoals + line) > oppGoals;
+    }
     if (market === 'ou' || /Total$/.test(market) || market === 'tennisGames') {
       const line = _v35Line(candidate);
       return !Number.isFinite(line) || (implied.total > line ? 'Over' : 'Under') === pick;
@@ -2855,7 +2875,17 @@
     const oneDc = (one, dc) => one.market === '1n2' && dc.market === 'doubleChance' && ((one.pick === '1' && dc.pick === 'X2') || (one.pick === '2' && dc.pick === '1X') || (one.pick === 'X' && dc.pick === '12'));
     if (oneDc(a, b) || oneDc(b, a)) return false;
     const oneDnb = (one, dnb) => one.market === '1n2' && dnb.market === 'dnb' && ((one.pick === '1' && dnb.pick === '2') || (one.pick === '2' && dnb.pick === '1') || one.pick === 'X');
-    return !(oneDnb(a, b) || oneDnb(b, a));
+    if (oneDnb(a, b) || oneDnb(b, a)) return false;
+    const oneHandicap = (one, handicap) => {
+      if (one.market !== '1n2' || handicap.market !== 'handicap' || !Number.isFinite(handicap.line)) return true;
+      if (Math.abs(handicap.line + 0.5) < 0.01) return false;
+      if (Math.abs(handicap.line - 0.5) < 0.01) {
+        if (handicap.pick === '1' && one.pick === '2') return false;
+        if (handicap.pick === '2' && one.pick === '1') return false;
+      }
+      return true;
+    };
+    return oneHandicap(a, b) && oneHandicap(b, a);
   }
   function validateMarketConsistency(allCandidates, opts) {
     opts = opts || {};
@@ -14766,11 +14796,11 @@
         catch(e) { return {}; }
       })();
       const v36TierDefs = [
-        { id: 'safe', icon: 'S', label: 'Sur', range: '1.30-1.50', desc: 'Faible risque, gain modeste', tone: 'safe' },
-        { id: 'solid', icon: 'A', label: 'Solide', range: '1.50-2.00', desc: 'Bon equilibre', tone: 'solid' },
-        { id: 'value', icon: 'V', label: 'Valeur', range: '2.00-3.00', desc: 'Sweet spot value', tone: 'value' },
-        { id: 'big', icon: 'B', label: 'Big odds', range: '3.00-5.00', desc: 'Gros gain calcule', tone: 'big' },
-        { id: 'out', icon: 'O', label: 'Outsider', range: '5.00+', desc: 'Coup de genie', tone: 'out' }
+        { id: 'safe', icon: '1', label: 'Sur', range: '1.30-1.50', desc: 'Conf. 75%+ · edge positif', tone: 'safe' },
+        { id: 'solid', icon: '2', label: 'Solide', range: '1.50-2.00', desc: 'Conf. 65%+ · edge positif', tone: 'solid' },
+        { id: 'value', icon: '3', label: 'Valeur', range: '2.00-3.00', desc: 'Edge 5%+', tone: 'value' },
+        { id: 'big', icon: '4', label: 'Big odds', range: '3.00-5.00', desc: 'Edge 8%+', tone: 'big' },
+        { id: 'out', icon: '5', label: 'Outsider', range: '5.00+', desc: 'Edge 10%+', tone: 'out' }
       ];
       const v36TierById = Object.fromEntries(v36TierDefs.map(t => [t.id, t]));
       const v36HourBucket = (date) => {
@@ -14785,15 +14815,16 @@
         const odd = Number(c?.odd || 0);
         const conf = Number(c?.rel || c?.prob || 0);
         const edge = Number.isFinite(Number(c?.edge)) ? Number(c.edge) : (conf && odd ? conf - 1 / odd : 0);
-        if (!(odd >= 1.30) || !(conf > 0)) return null;
-        if (odd < 1.50 && conf >= 0.66 && edge >= -0.04) return { id: 'safe', strict: conf >= 0.75 && edge >= -0.015 };
-        if (odd < 2.00 && conf >= 0.56 && edge >= -0.03) return { id: 'solid', strict: conf >= 0.65 && edge >= -0.005 };
-        if (odd < 3.00 && edge >= 0 && conf >= 0.42) return { id: 'value', strict: edge >= 0.05 };
-        if (odd < 5.00 && edge >= 0.02 && conf >= 0.28) return { id: 'big', strict: edge >= 0.08 };
-        if (odd >= 5.00 && edge >= 0.04 && conf >= 0.14) return { id: 'out', strict: edge >= 0.10 };
+        const ev = Number.isFinite(Number(c?.ev)) ? Number(c.ev) : (conf && odd ? conf * odd - 1 : -1);
+        if (!(odd >= 1.30) || !(conf > 0) || !(edge > 0) || !(ev > 0)) return null;
+        if (odd >= 1.30 && odd < 1.50 && conf >= 0.75 && edge >= 0.01) return { id: 'safe', strict: true };
+        if (odd >= 1.50 && odd < 2.00 && conf >= 0.65 && edge >= 0.01) return { id: 'solid', strict: true };
+        if (odd >= 2.00 && odd < 3.00 && conf >= 0.50 && edge >= 0.05) return { id: 'value', strict: true };
+        if (odd >= 3.00 && odd < 5.00 && conf >= 0.28 && edge >= 0.08) return { id: 'big', strict: true };
+        if (odd >= 5.00 && conf >= 0.14 && edge >= 0.10) return { id: 'out', strict: true };
         return null;
       };
-      const v36PickPool = _dataIsStale ? [] : terminalScanPool.flatMap(m => {
+      const v36PickPoolRaw = _dataIsStale ? [] : terminalScanPool.flatMap(m => {
         try {
           const pred = predictMatch(m);
           if (!pred || !pred.pick || pred.skip) return [];
@@ -14815,9 +14846,10 @@
               const rel = Number(c.rel || c.prob || 0);
               const odd = Number(c.odd || 0);
               const edge = Number.isFinite(Number(c.edge)) ? Number(c.edge) : (rel - 1 / odd);
+              const ev = Number.isFinite(Number(c.ev)) ? Number(c.ev) : (rel * odd - 1);
               const investmentScoreValue = Number(c.investment?.score || 0);
               return {
-                m, pred, best: c, tier: tier.id, strict: tier.strict, odd, rel, edge,
+                m, pred, best: c, tier: tier.id, strict: tier.strict, odd, rel, edge, ev,
                 label: c.label || pred.pick?.label || 'Pick',
                 market: c.market || '1n2',
                 pickKey: c.pickKey || c.key || pred.pick?.key || '',
@@ -14835,6 +14867,22 @@
           }).slice(0, 3);
         } catch(e) { return []; }
       }).sort((a, b) => a.ts - b.ts);
+      const v36PickPool = (() => {
+        const seenMatch = new Set();
+        const out = [];
+        const ranked = v36PickPoolRaw.slice().sort((a, b) =>
+          (Number(b.strict) - Number(a.strict))
+          || ((b.score || 0) - (a.score || 0))
+          || (a.ts - b.ts)
+        );
+        for (const p of ranked) {
+          const matchKey = String(p.m?.id || `${p.m?.date || ''}|${v36TeamName(getSides(p.m).home)}|${v36TeamName(getSides(p.m).away)}`);
+          if (seenMatch.has(matchKey)) continue;
+          seenMatch.add(matchKey);
+          out.push(p);
+        }
+        return out.sort((a, b) => a.ts - b.ts);
+      })();
       const v36Sports = [...new Set(v36PickPool.map(p => p.m.sport).filter(Boolean))].slice(0, 8);
       const v36Filtered = v36PickPool.filter(p => {
         if (v36Filter.sport && p.m.sport !== v36Filter.sport) return false;
@@ -14855,13 +14903,14 @@
         const tier = v36TierById[p.tier];
         const relPct = Math.round(p.rel * 100);
         const edgePct = Math.round(p.edge * 1000) / 10;
+        const evPct = Math.round(p.ev * 1000) / 10;
         const timeLabel = fmtTime(p.m.date);
         const title = `${v36TeamName(home)} - ${v36TeamName(away)}`;
         return `<button type="button" class="v36-pick-card" data-tone="${esc(tier.tone)}" data-big-detail="${esc(String(p.m.id || ''))}">
           <span class="v36-pick-card__meta"><b>${esc(sportLabel(p.m.sport || ''))}</b><em>${esc(timeLabel)}</em></span>
           <strong>${esc(title)}</strong>
           <span class="v36-pick-card__bet"><b>${esc(p.label)}</b><em>@${p.odd.toFixed(2)}</em></span>
-          <span class="v36-pick-card__signals"><i>${relPct}% conf.</i><i>${edgePct >= 0 ? '+' : ''}${edgePct}% edge</i>${p.strict ? '<i>strict</i>' : '<i>souple</i>'}</span>
+          <span class="v36-pick-card__signals"><i>${relPct}% conf.</i><i>${edgePct >= 0 ? '+' : ''}${edgePct}% edge</i><i>${evPct >= 0 ? '+' : ''}${evPct}% EV</i></span>
         </button>`;
       };
       const v36TierColumn = (tier) => {
@@ -14926,12 +14975,16 @@
           const componentCount = Number(p.pred?.ensemble?.sub_models?.length || 0);
           return p.strict
             && p.rel >= 0.56
-            && p.edge >= -0.005
+            && p.edge >= 0.01
             && variance <= 0.045
             && componentCount >= 2
             && !p.pred?.league_bias;
         })
         .sort((a, b) => (b.score - a.score) || (b.rel - a.rel) || (a.ts - b.ts))
+        .filter((p, index, arr) => {
+          const matchKey = String(p.m?.id || `${p.m?.date || ''}|${v36TeamName(getSides(p.m).home)}|${v36TeamName(getSides(p.m).away)}`);
+          return arr.findIndex(x => String(x.m?.id || `${x.m?.date || ''}|${v36TeamName(getSides(x.m).home)}|${v36TeamName(getSides(x.m).away)}`) === matchKey) === index;
+        })
         .slice(0, 4);
       const v36GeniusSection = v36GeniusPicks.length ? `<section class="v36-genius-strip" aria-label="Picks du genie">
         <header>
@@ -14980,7 +15033,7 @@
             <aside class="v36-home-rail" aria-label="Radar temps reel">
               <section><header><span>Prochains matchs</span><b>${v36Next.length}</b></header>${v36NextHtml}</section>
               <section><header><span>Stats live</span><b>${v36Total}</b></header><div class="v36-side-stats">${v36StatsHtml}</div></section>
-              <section><header><span>Genie mode</span><b>${v36PickPool.filter(p => p.strict).length}</b></header><p>Le site classe les picks par cote, confiance, edge et cohérence marché. Les handicaps restent écartés sauf value exceptionnelle.</p></section>
+              <section><header><span>Genie mode</span><b>${v36PickPool.length}</b></header><p>Le site classe uniquement des picks +EV, sans doublon de match, par cote, confiance, edge et cohérence marché.</p></section>
             </aside>
           </div>
         </div>`;
