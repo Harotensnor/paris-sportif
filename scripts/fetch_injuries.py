@@ -37,6 +37,21 @@ ESPN_INJURY_PATHS = [
 ]
 
 
+def is_severe_status(status):
+    """Return True for absences that should materially affect a model pick."""
+    s = (status or '').lower()
+    if not s:
+        return False
+    if any(token in s for token in ('out', 'doubt', 'suspend', 'injured reserve')):
+        return True
+    # MLB/NBA style injured-list strings: 10-Day-IL, 15-Day-IL, 60-Day-IL.
+    if re.search(r'\b\d+\s*-?\s*day\s*-?\s*il\b', s) or re.search(r'\b\d+\s*-?\s*il\b', s):
+        return True
+    if re.search(r'\b(il|ir)\b', s) and 'day-to-day' not in s:
+        return True
+    return False
+
+
 def http_get_json(url, timeout=15):
     req = urllib.request.Request(url, headers={'User-Agent': UA})
     try:
@@ -111,7 +126,7 @@ def attach(events, league_code, inj_by_team):
             ha = c.get('home_away')
             key = 'injuries_home' if ha == 'home' else 'injuries_away'
             # Count only severe absences
-            severe = [x for x in inj if (x.get('status') or '').lower() in ('out', 'suspended', 'doubtful')]
+            severe = [x for x in inj if is_severe_status(x.get('status'))]
             ev[key] = len(severe)
         if any_hit:
             touched += 1
@@ -130,7 +145,7 @@ def write_sidecar(by_league):
         bucket['leagues'].setdefault(league_code, {'teams': 0, 'injuries': 0})
         for team_id, injuries in (inj_by_team or {}).items():
             key = f'{league_code}:{team_id}'
-            severe = [x for x in injuries if (x.get('status') or '').lower() in ('out', 'suspended', 'doubtful')]
+            severe = [x for x in injuries if is_severe_status(x.get('status'))]
             teams[key] = {
                 'sport': sport,
                 'league_code': league_code,

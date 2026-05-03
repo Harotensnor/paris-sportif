@@ -1921,3 +1921,8 @@
 - Apres: openligadb_matches.json expose by_league, upcoming, finished, matched_local_ratio; health affiche leagues/upcoming/ratio.
 - Impact: la source allemande est lisible en un coup d'oeil: 112 matchs, 58 upcoming, 22 relies au feed local, ratio 19.6%.
 - Verif: fetch_openligadb.py --force OK, build_public_team_stats OK, build_health OK, 0 erreur script.
+## Sprint v35.283 — Phase 12 V36 P-12.30 Injuries multi-sports severe count (18:08 UTC)
+- Avant: les statuts ESPN "10-Day-IL", "60-Day-IL" et "Injured Reserve" etaient listes mais pas comptes comme absences severes.
+- Apres: fetch_injuries.py a une detection severe sport-aware; sidecar et health exposent injuries total + severe total avec le bon script source.
+- Impact: MLB/NHL deviennent beaucoup plus utiles pour le modele: 677 blessures multi-sports, 481 absences severes detectees.
+- Verif: fetch_injuries.py --sidecar-only OK, build_health OK, injuries_multisport health teams=129 sports=4 severe=481.

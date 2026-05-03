@@ -153,6 +153,8 @@ SOURCES = [
     ('injuries_multisport', 'injuries_multisport.json', lambda d: {
         'teams': len(d.get('teams') or {}) if isinstance(d, dict) else 0,
         'sports': len(d.get('by_sport') or {}) if isinstance(d, dict) else 0,
+        'injuries': sum((v or {}).get('injuries_count') or 0 for v in (d.get('teams') or {}).values()) if isinstance(d, dict) else 0,
+        'severe': sum((v or {}).get('severe_count') or 0 for v in (d.get('teams') or {}).values()) if isinstance(d, dict) else 0,
     }),
     ('thesportsdb_meta', 'thesportsdb_meta.json', lambda d: {
         'requested': d.get('requested') or 0 if isinstance(d, dict) else 0,
@@ -198,6 +200,7 @@ STALE_AFTER_MIN = {
     'winamax_catalog': 15,
     'winamax_markets': 15,
     'injuries_soccer': 180,    # 2h cadence
+    'injuries_multisport': 60,  # fast ESPN public injuries endpoint
     'lineups_soccer':  180,    # 2h cadence
     'team_stats':      300,    # 4h cadence
     'clubelo':         24*60,  # daily cadence
@@ -221,6 +224,7 @@ SOURCE_SCRIPT = {
     'winamax_catalog': 'scripts/fetch_winamax_catalog.py',
     'winamax_markets': 'scripts/fetch_winamax_match_details.py',
     'injuries_soccer': 'scripts/fetch_injuries_soccer.py',
+    'injuries_multisport': 'scripts/fetch_injuries.py',
     'lineups_soccer': 'scripts/fetch_lineups_soccer.py',
     'team_stats': 'scripts/fetch_team_stats.py',
     'clubelo': 'scripts/fetch_clubelo.py',
