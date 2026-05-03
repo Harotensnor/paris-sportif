@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-03T08:08:14Z",
+  "generated_at": "2026-05-03T08:12:59Z",
   "data_age_min": 0,
   "sources": {
     "winamax_catalog": {
@@ -64,7 +64,7 @@
       "sports": 4
     },
     "h2h_extended": {
-      "age_min": 1,
+      "age_min": 2,
       "events": 165,
       "sports": 5
     },
@@ -197,7 +197,7 @@
     "h2h_extended": {
       "script": "h2h_extended.json",
       "output": "h2h_extended.json",
-      "age_min": 1,
+      "age_min": 2,
       "threshold_min": 60,
       "fast_red_min": null,
       "status": "ok"
@@ -255,31 +255,31 @@
   "warnings": [],
   "overall": "ok",
   "quality_checks": {
-    "total_events": 381,
-    "upcoming_events": 310,
-    "winamax_available": 310,
-    "winamax_exact": 300,
-    "winamax_detailed": 275,
+    "total_events": 371,
+    "upcoming_events": 309,
+    "winamax_available": 309,
+    "winamax_exact": 299,
+    "winamax_detailed": 274,
     "winamax_tournament_only": 10,
     "winamax_exact_ratio": 0.968,
-    "winamax_detailed_ratio": 0.917,
+    "winamax_detailed_ratio": 0.916,
     "winamax_detail_gap_to_target": 0,
     "winamax_detail_fetch_cap_reco": 90,
     "winamax_detail_status": "ok",
-    "actionable_external_odds": 186,
+    "actionable_external_odds": 187,
     "football_invalid_form": 0,
     "events_with_xg": 82,
     "winamax_coverage": {
       "by_sport": {
         "football": {
-          "upcoming": 259,
-          "available": 259,
-          "exact": 249,
-          "detailed": 224,
+          "upcoming": 258,
+          "available": 258,
+          "exact": 248,
+          "detailed": 223,
           "tournament_only": 10,
           "missing": 0,
           "exact_ratio": 0.961,
-          "detailed_ratio": 0.9
+          "detailed_ratio": 0.899
         },
         "baseball": {
           "upcoming": 19,
