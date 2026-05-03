@@ -487,7 +487,7 @@ Contexte : après correction de `Tous`, la couverture monte à 277 matchs à ven
 - Viewports : mobile
 - Preuve : `.cache/phase4-phase12-tous-coverage/academie-mobile.png`
 - Action : Collapser les catégories ou limiter les termes visibles avant recherche/filtre.
-- Statut : OPEN
+- Statut : FIXED v35.253 — Glossaire limité à 16 termes sur mobile, bouton "Afficher 34 termes de plus" et recherche/catégories restent complètes.
 
 ### P12-VIS-007 — La table des matières mobile reste proche de la bottom nav et perd de la respiration.
 
@@ -496,7 +496,7 @@ Contexte : après correction de `Tous`, la couverture monte à 277 matchs à ven
 - Viewports : mobile
 - Preuve : `.cache/phase4-phase12-tous-coverage/academie-mobile.png`
 - Action : Ajouter marge basse et réduire le bloc toc sur mobile.
-- Statut : OPEN
+- Statut : FIXED v35.253 — Sommaire mobile transformé en chips horizontales 44px avec scroll-snap, réduisant la hauteur et libérant la respiration basse.
 
 ### P12-VIS-008 — Profil mobile/tablet reste très long (7 493px mobile, 5 622px tablet) avec beaucoup de panneaux ouverts.
 

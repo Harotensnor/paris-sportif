@@ -1771,3 +1771,8 @@
 - Apres: libelle et metriques compactes dans le detail accordéon.
 - Impact: CTA plus net, dashboard mobile stable a 3729px en capture.
 - Verif: visual_capture phase12-dashboard-cta 32/32 OK, syntax/bundle OK.
+## Sprint v35.253 — Phase 12 P-12.22 Fix P12-VIS-006/007 Academie mobile (16:18 local)
+- Avant: Academie mobile affichait 50 termes d'un bloc et le sommaire vertical allongeait la page.
+- Apres: glossaire limite a 16 termes sur mobile avec bouton "Afficher plus", sommaire en chips horizontales.
+- Impact: hauteur mobile ~9325px -> 4816px, 0 overflow sur 32 devices/vues.
+- Verif: visual_capture phase12-academie-compact-v2 32/32 OK, mobile_device_audit OK, syntax/bundle OK.

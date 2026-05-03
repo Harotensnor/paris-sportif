@@ -19744,33 +19744,42 @@
       ['responsable','Règle de survie','Un pari reste incertain. Si aucune opportunité propre ne sort, le meilleur pari est de ne rien jouer. Le site doit aider à décider, pas pousser à l’action permanente.'],
     ];
     const catButtons = cats.map(([key,label]) => `
-      <button type="button" data-academy-cat="${key}" style="min-height:40px;padding:9px 13px;border-radius:999px;border:1px solid ${key === 'all' ? 'var(--brand)' : 'var(--border)'};background:${key === 'all' ? 'var(--brand-soft)' : 'var(--panel-2)'};color:${key === 'all' ? 'var(--brand)' : 'var(--text-2)'};font-size:12px;font-weight:800;cursor:pointer;">${esc(label)}</button>
+      <button type="button" data-academy-cat="${key}" style="min-height:44px;flex:0 0 auto;scroll-snap-align:start;padding:9px 13px;border-radius:999px;border:1px solid ${key === 'all' ? 'var(--brand)' : 'var(--border)'};background:${key === 'all' ? 'var(--brand-soft)' : 'var(--panel-2)'};color:${key === 'all' ? 'var(--brand)' : 'var(--text-2)'};font-size:12px;font-weight:800;cursor:pointer;">${esc(label)}</button>
     `).join('');
     const glossaryHtml = glossary.map(([cat,title,desc]) => `
-      <article data-glossary-item data-cat="${esc(cat)}" data-text="${esc((title + ' ' + desc).toLowerCase())}" style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-md);padding:14px;min-height:118px;">
+      <article data-glossary-item data-cat="${esc(cat)}" data-text="${esc((title + ' ' + desc).toLowerCase())}" style="box-sizing:border-box;min-width:0;overflow:hidden;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-md);padding:14px;min-height:118px;">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;">
-          <h3 style="margin:0;font-size:15px;font-weight:900;color:var(--text);">${esc(title)}</h3>
+          <h3 style="margin:0;font-size:15px;font-weight:900;color:var(--text);overflow-wrap:anywhere;">${esc(title)}</h3>
           <span style="font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-dim);">${esc(cat)}</span>
         </div>
-        <p style="margin:0;font-size:12.8px;line-height:1.55;color:var(--text-2);">${esc(desc)}</p>
+        <p style="margin:0;font-size:12.8px;line-height:1.55;color:var(--text-2);overflow-wrap:anywhere;">${esc(desc)}</p>
       </article>
     `).join('');
     const articleHtml = articles.map(([id,title,body]) => `
-      <section id="academy-${id}" style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px;margin-bottom:12px;">
-        <h2 style="margin:0 0 8px;font-size:20px;color:var(--text);">${esc(title)}</h2>
-        <p style="margin:0;font-size:14px;line-height:1.7;color:var(--text-2);">${esc(body)}</p>
+      <section id="academy-${id}" style="box-sizing:border-box;min-width:0;overflow:hidden;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px;margin-bottom:12px;">
+        <h2 style="margin:0 0 8px;font-size:20px;color:var(--text);overflow-wrap:anywhere;">${esc(title)}</h2>
+        <p style="margin:0;font-size:14px;line-height:1.7;color:var(--text-2);overflow-wrap:anywhere;">${esc(body)}</p>
       </section>
     `).join('');
     const wideAcademy = (() => { try { return window.matchMedia('(min-width: 900px)').matches; } catch(e) { return true; } })();
     const academyLayoutStyle = wideAcademy
-      ? 'display:grid;grid-template-columns:minmax(230px,280px) minmax(0,1fr);gap:18px;align-items:start;'
-      : 'display:grid;grid-template-columns:1fr;gap:14px;align-items:start;';
+      ? 'display:grid;grid-template-columns:minmax(230px,280px) minmax(0,1fr);gap:18px;align-items:start;min-width:0;'
+      : 'display:grid;grid-template-columns:minmax(0,1fr);gap:14px;align-items:start;min-width:0;';
     const academyAsideStyle = wideAcademy
-      ? 'position:sticky;top:112px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px;'
-      : 'position:static;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px;';
+      ? 'box-sizing:border-box;min-width:0;max-width:100%;position:sticky;top:112px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px;'
+      : 'box-sizing:border-box;min-width:0;max-width:100%;position:static;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px;overflow:hidden;';
+    const academyCatStyle = wideAcademy
+      ? 'display:flex;flex-wrap:wrap;gap:7px;margin-top:12px;max-width:100%;'
+      : 'display:flex;gap:7px;margin-top:12px;max-width:100%;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:4px;';
+    const academyTocStyle = wideAcademy
+      ? 'display:grid;gap:6px;margin-top:14px;border-top:1px solid var(--border);padding-top:12px;'
+      : 'display:flex;gap:8px;margin-top:14px;border-top:1px solid var(--border);padding:12px 0 4px;overflow-x:auto;scroll-snap-type:x mandatory;';
+    const academyTocLinkStyle = wideAcademy
+      ? 'min-height:36px;display:flex;align-items:center;color:var(--text-2);text-decoration:none;font-size:12.5px;font-weight:700;'
+      : 'min-height:44px;flex:0 0 auto;display:flex;align-items:center;scroll-snap-align:start;color:var(--text-2);text-decoration:none;font-size:12px;font-weight:800;border:1px solid var(--border);background:var(--panel-2);border-radius:999px;padding:0 12px;';
 
     wrap.innerHTML = `
-      <div style="max-width:1500px;margin:0 auto;padding:16px 8px 28px;">
+      <div style="box-sizing:border-box;width:100%;max-width:1500px;margin:0 auto;padding:16px 8px 28px;overflow:hidden;">
         <header style="display:block;padding:22px 0 18px;border-bottom:1px solid var(--border);margin-bottom:18px;">
           <div style="font-size:11px;color:var(--c-accent);text-transform:uppercase;letter-spacing:1.4px;font-weight:900;margin-bottom:6px;">Méthode</div>
           <h1 style="margin:0 0 8px;font-size:clamp(30px,4vw,48px);font-weight:950;color:var(--text);line-height:1.04;">Comprendre les bons paris</h1>
@@ -19780,10 +19789,10 @@
         <div style="${academyLayoutStyle}">
           <aside style="${academyAsideStyle}">
             <label for="academy-search" style="display:block;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.7px;color:var(--text-dim);margin-bottom:6px;">Recherche</label>
-            <input id="academy-search" type="search" placeholder="edge, Kelly, BTTS…" style="width:100%;min-height:44px;border-radius:var(--r-md);border:1px solid var(--border);background:var(--panel-2);color:var(--text);padding:0 12px;font-size:14px;">
-            <div style="display:flex;flex-wrap:wrap;gap:7px;margin-top:12px;">${catButtons}</div>
-            <nav aria-label="Sommaire méthode" style="display:grid;gap:6px;margin-top:14px;border-top:1px solid var(--border);padding-top:12px;">
-              ${articles.map(([id,title]) => `<a href="#academy-${id}" style="min-height:36px;display:flex;align-items:center;color:var(--text-2);text-decoration:none;font-size:12.5px;font-weight:700;">${esc(title)}</a>`).join('')}
+            <input id="academy-search" type="search" placeholder="edge, Kelly, BTTS…" style="box-sizing:border-box;width:100%;min-height:44px;border-radius:var(--r-md);border:1px solid var(--border);background:var(--panel-2);color:var(--text);padding:0 12px;font-size:14px;">
+            <div style="${academyCatStyle}">${catButtons}</div>
+            <nav aria-label="Sommaire méthode" style="${academyTocStyle}">
+              ${articles.map(([id,title]) => `<a href="#academy-${id}" style="${academyTocLinkStyle}">${esc(title)}</a>`).join('')}
             </nav>
           </aside>
 
@@ -19797,6 +19806,7 @@
                 <div id="academy-count" style="font-size:12px;color:var(--text-dim);font-variant-numeric:tabular-nums;">${glossary.length} termes</div>
               </div>
               <div id="academy-glossary-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;">${glossaryHtml}</div>
+              <button id="academy-show-all" type="button" style="display:none;margin:12px auto 0;min-height:44px;padding:0 16px;border-radius:999px;border:1px solid var(--brand);background:var(--brand-soft);color:var(--brand);font-weight:900;cursor:pointer;">Afficher tout le glossaire</button>
             </section>
 
             <section aria-label="Articles méthode">
@@ -19808,20 +19818,37 @@
 
     const search = wrap.querySelector('#academy-search');
     const count = wrap.querySelector('#academy-count');
+    const showAllBtn = wrap.querySelector('#academy-show-all');
+    const academyInitialLimit = wideAcademy ? Infinity : 16;
+    let academyExpanded = wideAcademy;
     let activeCat = 'all';
     const applyFilter = () => {
       const q = (search?.value || '').trim().toLowerCase();
-      let shown = 0;
+      const matches = [];
       wrap.querySelectorAll('[data-glossary-item]').forEach(el => {
         const okCat = activeCat === 'all' || el.dataset.cat === activeCat;
         const okText = !q || (el.dataset.text || '').includes(q);
-        const show = okCat && okText;
-        el.style.display = show ? '' : 'none';
-        if (show) shown++;
+        if (okCat && okText) matches.push(el);
+        el.style.display = 'none';
       });
-      if (count) count.textContent = `${shown}/${glossary.length} termes`;
+      const shouldLimit = !wideAcademy && !academyExpanded && activeCat === 'all' && !q;
+      const limit = shouldLimit ? academyInitialLimit : matches.length;
+      matches.forEach((el, index) => { el.style.display = index < limit ? '' : 'none'; });
+      const shown = Math.min(matches.length, limit);
+      if (count) count.textContent = shouldLimit
+        ? `${shown}/${matches.length} termes affichés`
+        : `${shown}/${glossary.length} termes`;
+      if (showAllBtn) {
+        const remaining = Math.max(0, matches.length - shown);
+        showAllBtn.style.display = shouldLimit && remaining > 0 ? 'block' : 'none';
+        showAllBtn.textContent = remaining > 0 ? `Afficher ${remaining} termes de plus` : 'Afficher tout le glossaire';
+      }
     };
     if (search) search.addEventListener('input', applyFilter);
+    if (showAllBtn) showAllBtn.addEventListener('click', () => {
+      academyExpanded = true;
+      applyFilter();
+    });
     wrap.querySelectorAll('[data-academy-cat]').forEach(btn => {
       btn.addEventListener('click', () => {
         activeCat = btn.dataset.academyCat || 'all';
@@ -19834,6 +19861,7 @@
         applyFilter();
       });
     });
+    applyFilter();
   }
 
   function renderButeursPage(wrap) {
