@@ -1896,3 +1896,8 @@
 - Apres: filtres ligue, cote min/max, tranche horaire et niveau de cote branches dans localStorage + URL partageable.
 - Impact: "Tout voir" reste large (260 lignes), mais Soir + cote >=2.00 descend a 103 matchs sans empty state ni erreur.
 - Verif: syntax app.js/sw.js OK, Playwright filtre time=evening puis odd>=2.00, mobile touch targets 44px, 0 erreur console.
+## Sprint v35.278 — Phase 12 V36 P-12.25 Recherche instantanee Tous (17:38 UTC)
+- Avant: explorer 260+ matchs demandait de scanner manuellement ou d'utiliser la palette globale.
+- Apres: champ de recherche interne a Tous, filtre equipe/ligue/sport/pick, persiste dans localStorage et dans l'URL q=.
+- Impact: recherche "yankees" descend 260 lignes a 2 matchs a venir + 3 finis, avec hash #tous?q=yankees.
+- Verif: syntax app.js/sw.js OK, Playwright desktop/mobile, search input 44px mobile, 0 erreur console, capture .cache/v36-tous-instant-search.png.

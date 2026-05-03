@@ -19024,7 +19024,8 @@
         const league = params.get('league') || '';
         const time = params.get('time') || 'all';
         const tier = params.get('tier') || 'all';
-        if (sports.length === 0 && !edge && !conf && !odd && !maxOdd && !league && time === 'all' && tier === 'all') return null;
+        const query = (params.get('q') || '').trim();
+        if (sports.length === 0 && !edge && !conf && !odd && !maxOdd && !league && time === 'all' && tier === 'all' && !query) return null;
         return {
           sports: sports.filter(Boolean),
           minEdge: normalPct(edge),
@@ -19034,6 +19035,7 @@
           league,
           time,
           tier,
+          query,
         };
       } catch (e) { return null; }
     };
@@ -19054,10 +19056,11 @@
             league: typeof p.league === 'string' ? p.league : '',
             time: typeof p.time === 'string' ? p.time : 'all',
             tier: typeof p.tier === 'string' ? p.tier : 'all',
+            query: typeof p.query === 'string' ? p.query : '',
           };
         }
       } catch(e) {}
-      return { sports: [], minEdge: 0, minConf: 0, minOdd: 0, maxOdd: 0, league: '', time: 'all', tier: 'all' };
+      return { sports: [], minEdge: 0, minConf: 0, minOdd: 0, maxOdd: 0, league: '', time: 'all', tier: 'all', query: '' };
     };
     const tousFilters = _readFilters();
     const _readSort = () => {
@@ -19089,6 +19092,7 @@
         if (tousFilters.league) params.set('league', tousFilters.league);
         if (tousFilters.time && tousFilters.time !== 'all') params.set('time', tousFilters.time);
         if (tousFilters.tier && tousFilters.tier !== 'all') params.set('tier', tousFilters.tier);
+        if (tousFilters.query) params.set('q', tousFilters.query);
         if (tousPreset !== 'all') params.set('preset', tousPreset);
         if (tousSort !== 'kickoff') params.set('sort', tousSort);
         if (tousView === 'calendar') params.set('view', 'calendar');
@@ -19166,6 +19170,17 @@
       if (h >= 18 && h < 23) return 'evening';
       return 'night';
     };
+    const _normSearch = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const _queryNeedle = _normSearch(tousFilters.query || '').trim();
+    const _matchesTousQuery = (p) => {
+      if (!_queryNeedle) return true;
+      const hay = _normSearch([
+        p?.home?.name, p?.home?.short, p?.away?.name, p?.away?.short,
+        p?.m?.name, p?.m?.league_name, p?.m?.league, p?.m?.sport,
+        p?.pred?.pick?.label, p?.pred?.pick?.key,
+      ].filter(Boolean).join(' '));
+      return hay.includes(_queryNeedle);
+    };
     const _coverageBestOdd = (m) => {
       const wx = m?.winamax?.markets?.['1n2'];
       const nums = wx ? [wx.home, wx.draw, wx.away].map(Number).filter(n => Number.isFinite(n) && n > 1) : [];
@@ -19185,6 +19200,7 @@
     // Apply filters
     const passesFilters = (p) => {
       if (tousFilters.sports.length && !tousFilters.sports.includes(p.sport)) return false;
+      if (!_matchesTousQuery(p)) return false;
       if (tousFilters.league && _rowLeague(p) !== tousFilters.league) return false;
       if (tousFilters.time && tousFilters.time !== 'all' && _timeBucket(p.ts) !== tousFilters.time) return false;
       if (tousFilters.tier && tousFilters.tier !== 'all' && _tierFromOdd(p.odd, p.rel, p.edge) !== tousFilters.tier) return false;
@@ -19200,6 +19216,7 @@
     };
     const passesCoverageFilters = (p) => {
       if (tousFilters.sports.length && !tousFilters.sports.includes(p.sport)) return false;
+      if (!_matchesTousQuery(p)) return false;
       if (tousFilters.league && _rowLeague(p) !== tousFilters.league) return false;
       if (tousFilters.time && tousFilters.time !== 'all' && _timeBucket(p.ts) !== tousFilters.time) return false;
       const bestOdd = _coverageBestOdd(p.m);
@@ -19250,7 +19267,7 @@
     const totalLost = finished.filter(p => p.res === 'lost').length;
     const settledCount = totalWon + totalLost;
     const wrPct = settledCount > 0 ? Math.round(100 * totalWon / settledCount) : 0;
-    const filtersActive = tousPreset !== 'all' || tousFilters.sports.length > 0 || tousFilters.minEdge > 0 || tousFilters.minConf > 0 || tousFilters.minOdd > 0 || tousFilters.maxOdd > 0 || Boolean(tousFilters.league) || (tousFilters.time && tousFilters.time !== 'all') || (tousFilters.tier && tousFilters.tier !== 'all') || tousSort !== 'kickoff';
+    const filtersActive = tousPreset !== 'all' || tousFilters.sports.length > 0 || tousFilters.minEdge > 0 || tousFilters.minConf > 0 || tousFilters.minOdd > 0 || tousFilters.maxOdd > 0 || Boolean(tousFilters.league) || Boolean(tousFilters.query) || (tousFilters.time && tousFilters.time !== 'all') || (tousFilters.tier && tousFilters.tier !== 'all') || tousSort !== 'kickoff';
     const compareIds = (() => {
       try {
         const ids = JSON.parse(localStorage.getItem('tousComparePickIds') || '[]');
@@ -19801,6 +19818,10 @@
               <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.8px;font-weight:700;">🎛️ Filtrer &amp; trier</div>
               <span aria-live="polite" style="display:inline-flex;align-items:center;padding:3px 9px;background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);border-radius:999px;font-size:11.5px;font-weight:700;color:var(--brand);font-variant-numeric:tabular-nums;">${detectedUpcoming} à venir · ${displayedTotal} total</span>
             </div>
+            <label style="flex:1;min-width:${tousMobile ? '100%' : '260px'};max-width:${tousMobile ? '100%' : '420px'};display:flex;align-items:center;gap:8px;">
+              <span style="font-size:12px;color:var(--text-dim2);">🔎</span>
+              <input data-tous-search type="search" value="${esc(tousFilters.query || '')}" placeholder="Chercher équipe, ligue, sport..." autocomplete="off" spellcheck="false" style="width:100%;min-height:38px;border-radius:999px;border:1px solid var(--border-2);background:var(--panel-2);color:var(--text);padding:0 13px;font-size:12.5px;outline:none;">
+            </label>
             ${filtersActive ? '<button data-tous-reset style="padding:5px 10px;font-size:11px;background:transparent;color:var(--text-dim);border:1px solid var(--border-2);border-radius:6px;cursor:pointer;font-weight:600;">↻ Réinitialiser</button>' : ''}
           </div>
           <div style="display:flex;align-items:center;gap:8px;${tousRailStyle}">
@@ -19888,6 +19909,18 @@
       try { localStorage.setItem('tousVisibleLimit', String(Math.min(activeTotalRows, activeRenderedRows + 80))); } catch(e) {}
       renderTousPage(wrap);
     });
+    const tousSearch = wrap.querySelector('[data-tous-search]');
+    if (tousSearch) {
+      tousSearch.addEventListener('input', () => {
+        try { clearTimeout(window.__tousSearchTimer); } catch(e) {}
+        window.__tousSearchTimer = setTimeout(() => {
+          tousFilters.query = String(tousSearch.value || '').trim();
+          try { localStorage.removeItem('tousVisibleLimit'); } catch(e) {}
+          _saveFilters();
+          renderTousPage(wrap);
+        }, 160);
+      });
+    }
     wrap.querySelectorAll('[data-tous-preset]').forEach(btn => {
       btn.addEventListener('click', () => {
         try {
