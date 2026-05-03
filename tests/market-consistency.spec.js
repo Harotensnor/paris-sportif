@@ -117,4 +117,24 @@ test.describe('market consistency guard', () => {
     expect(result.contradicted).toEqual(expect.arrayContaining(['BTTS Oui', 'Over 2.5', 'Draw', 'X2']));
     expect(result.reasons.some(r => r.includes('Score 1-0'))).toBe(true);
   });
+
+  test('explains 1N2 versus handicap -0.5 as a logical duplicate, not a new pick', async ({ page }) => {
+    const result = await page.evaluate(() => {
+      const api = window.__testAPI;
+      const candidates = [
+        { market: '1n2', key: '1', label: 'Victoire domicile' },
+        { market: 'handicap', key: 'home:-0.5', side: 'home', line: -0.5, label: 'Handicap domicile -0,5' },
+        { market: 'handicap', key: 'away:+0.5', side: 'away', line: 0.5, label: 'Handicap extérieur +0,5' },
+      ];
+      const out = api.validateMarketConsistency(candidates, { anchor: candidates[0] });
+      return out.contradicted.map(c => ({
+        label: c.label,
+        reason: c.consistencyConflict && c.consistencyConflict.reason,
+      }));
+    });
+
+    expect(result.map(r => r.label)).toEqual(expect.arrayContaining(['Handicap domicile -0,5', 'Handicap extérieur +0,5']));
+    expect(result.find(r => r.label === 'Handicap domicile -0,5').reason).toContain('Doublon logique');
+    expect(result.find(r => r.label === 'Handicap extérieur +0,5').reason).toContain('Incohérent');
+  });
 });

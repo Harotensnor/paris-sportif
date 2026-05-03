@@ -2027,3 +2027,8 @@
 - Apres: app.js passe par prodWarn/prodLog/prodTable, actifs uniquement avec ?debug=1 ou localStorage paris_sportif_debug=1; les helpers initiaux de pronostics.html sont aussi gardes par le meme mode debug.
 - Impact: production reste silencieuse pour Theo et les tests, mais le diagnostic complet reste disponible en debug volontaire sans perdre les traces utiles.
 - Verif: scan console direct app.js/pronostics.html => 0 occurrence prod, app.js/sw.js syntax OK, smoke dashboard local 720 lignes table, debugFlag=false, 0 warning/error; CACHE_VERSION + footer + hash app.js bumpes.
+## Sprint v35.304 — AUTO 10/10 Credibilite marches handicap/team total (21:22 UTC)
+- Avant: la garde 1N2 vs handicap -0,5 rejetait bien les doublons, mais l'explication disait seulement "incompatible"; les team totals pouvaient garder des libelles bookmaker type "Domicile +1.5" trop proches d'un handicap.
+- Apres: les conflits 1N2 <-> handicap -0,5 expliquent explicitement "Doublon logique", les contradictions +0,5 restent marquees incoherentes, et les team totals affichent "Total buts <equipe> — plus/moins de X (equipe seulement)" avec semanticGroup dedie.
+- Impact: Theo peut garder les handicaps sans voir deux fois le meme pari mathematique, et les totaux equipe ne ressemblent plus a des handicaps.
+- Verif: app.js syntax OK; smoke navigateur local => raisons Doublon/Incoherent OK, label "Total buts Freiburg — plus de 1,5 (equipe seulement)" OK, 0 warning/error; specs market-consistency/candidates enrichies.
