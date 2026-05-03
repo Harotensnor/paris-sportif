@@ -460,7 +460,7 @@ Contexte : après correction de `Tous`, la couverture monte à 277 matchs à ven
 - Viewports : all
 - Preuve : `.cache/phase4-phase12-tous-coverage/tous-desktop.png`
 - Action : Ajouter aperçu 1/N/2 ou meilleur marché quand disponible pour éviter d’ouvrir chaque détail.
-- Statut : OPEN
+- Statut : FIXED v35.246 — chips 1/N/2 ou 1/2 affichées dans chaque ligne brute avec cote Winamax.
 
 ### P12-VIS-004 — La bottom nav fixe tombe au milieu du premier viewport dans la capture et masque visuellement une ligne de contenu.
 
