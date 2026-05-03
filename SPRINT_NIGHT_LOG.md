@@ -1673,3 +1673,8 @@
 - Apres: SPRINT_NIGHT_REPORT_PHASE11.md avec metriques, artefacts, risques et Phase 12.
 - Impact: handoff Theo clair sur polish, audits et extensions livrees.
 - Verif: rapport relu, syntax/bundle OK.
+## Sprint v35.235 — Phase 12 P-12.1 Diagnostic filtres Tous (14:29 local)
+- Avant: Tous affichait 5-8 lignes alors que la data live contient beaucoup plus de matchs a venir.
+- Apres: funnel trace dans phase12_tous_filter_funnel.json + .cache/tous-filter-funnel.json.
+- Impact: cause isolee: la page transforme la couverture brute en picks actionnables puis skip 75/80 matchs du jour.
+- Verif: script funnel OK, syntax/bundle OK.

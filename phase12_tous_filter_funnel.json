@@ -1,0 +1,213 @@
+{
+  "generated_at": "2026-05-03T12:29:00.366Z",
+  "page": "#tous",
+  "data_generated_at": "2026-05-03T12:27:19Z",
+  "todayIso": "2026-05-03",
+  "counts": {
+    "all_events_all_days": 80,
+    "upcoming_all_days": 67,
+    "upcoming_all_days_with_any_odds": 66,
+    "upcoming_all_days_winamax_available": 67,
+    "today_events": 80,
+    "today_winamax_available": 80,
+    "today_winamax_upcoming": 67
+  },
+  "sport_counts": {
+    "upcoming_all_days": {
+      "football": 50,
+      "tennis": 1,
+      "baseball": 14,
+      "basketball": 2
+    },
+    "today_winamax": {
+      "baseball": 16,
+      "football": 61,
+      "tennis": 1,
+      "basketball": 2
+    }
+  },
+  "predicted": {
+    "input_today_winamax": 80,
+    "no_pred": 0,
+    "no_pick": 0,
+    "skip": 75,
+    "no_odd_non_settled": 0,
+    "completed_no_odd": 0,
+    "kept_all_picks": 5,
+    "kept_pending_before_value": 5,
+    "kept_pending_after_value_edge_gte_minus_2pt": 5,
+    "kept_inprogress_after_value_edge_gte_minus_2pt": 0,
+    "kept_finished": 0
+  },
+  "funnel_steps": [
+    {
+      "step": "events_all_days",
+      "count": 80
+    },
+    {
+      "step": "upcoming_all_days",
+      "count": 67
+    },
+    {
+      "step": "upcoming_all_days_winamax_available",
+      "count": 67
+    },
+    {
+      "step": "today_events_only",
+      "count": 80
+    },
+    {
+      "step": "today_winamax_available",
+      "count": 80
+    },
+    {
+      "step": "today_winamax_upcoming",
+      "count": 67
+    },
+    {
+      "step": "predictMatch_kept_actionable_rows",
+      "count": 5
+    },
+    {
+      "step": "pending_before_value_filter",
+      "count": 5
+    },
+    {
+      "step": "pending_after_edge_gte_minus_2pt",
+      "count": 5
+    },
+    {
+      "step": "dom_visible_rows_active_tab",
+      "count": 5
+    }
+  ],
+  "largest_drops": [
+    {
+      "from": "today_winamax_upcoming",
+      "to": "predictMatch_kept_actionable_rows",
+      "lost": 62,
+      "remaining": 5
+    },
+    {
+      "from": "events_all_days",
+      "to": "upcoming_all_days",
+      "lost": 13,
+      "remaining": 67
+    },
+    {
+      "from": "today_winamax_available",
+      "to": "today_winamax_upcoming",
+      "lost": 13,
+      "remaining": 67
+    },
+    {
+      "from": "upcoming_all_days",
+      "to": "upcoming_all_days_winamax_available",
+      "lost": 0,
+      "remaining": 67
+    },
+    {
+      "from": "today_events_only",
+      "to": "today_winamax_available",
+      "lost": 0,
+      "remaining": 80
+    },
+    {
+      "from": "predictMatch_kept_actionable_rows",
+      "to": "pending_before_value_filter",
+      "lost": 0,
+      "remaining": 5
+    },
+    {
+      "from": "pending_before_value_filter",
+      "to": "pending_after_edge_gte_minus_2pt",
+      "lost": 0,
+      "remaining": 5
+    },
+    {
+      "from": "pending_after_edge_gte_minus_2pt",
+      "to": "dom_visible_rows_active_tab",
+      "lost": 0,
+      "remaining": 5
+    },
+    {
+      "from": "upcoming_all_days_winamax_available",
+      "to": "today_events_only",
+      "lost": -13,
+      "remaining": 80
+    }
+  ],
+  "dom": {
+    "header_text": "Tous les pronos du jour",
+    "subheader_text": "5 pronos value · 5 à venir · 0 en cours · 0 fini↳ paris à venir/en cours = edge ≥ -2pt (bad value filtré). Finis = picks avec cote capturée pour tracker la perf modèle.",
+    "visible_rows": 5,
+    "active_tab_text": [
+      "⏱️ À venir (5)",
+      "🔴 En cours (0)",
+      "✅ Finis (0)"
+    ],
+    "result_chip_text": "5 résultats",
+    "source_select_value": "winamax",
+    "stray_comment_text_visible": true
+  },
+  "sample_rows": [
+    {
+      "id": "401815191",
+      "sport": "baseball",
+      "league": "MLB",
+      "kickoff": "2026-05-03T17:40Z",
+      "odd": 2.1,
+      "rel": 0.5408,
+      "edge": 0.0646,
+      "pick": "1 · Marlins"
+    },
+    {
+      "id": "401815192",
+      "sport": "baseball",
+      "league": "MLB",
+      "kickoff": "2026-05-03T17:40Z",
+      "odd": 1.74,
+      "rel": 0.6965,
+      "edge": 0.1218,
+      "pick": "1 · Rays"
+    },
+    {
+      "id": "740937",
+      "sport": "football",
+      "league": "Premier League",
+      "kickoff": "2026-05-03T18:00Z",
+      "odd": 2,
+      "rel": 0.6006,
+      "edge": 0.1006,
+      "pick": "1 · Aston Villa"
+    },
+    {
+      "id": "401815195",
+      "sport": "baseball",
+      "league": "MLB",
+      "kickoff": "2026-05-03T18:15Z",
+      "odd": 2.15,
+      "rel": 0.5518,
+      "edge": 0.0867,
+      "pick": "1 · Cardinals"
+    },
+    {
+      "id": "401815201",
+      "sport": "baseball",
+      "league": "MLB",
+      "kickoff": "2026-05-03T20:07Z",
+      "odd": 2.05,
+      "rel": 0.5412,
+      "edge": 0.0533,
+      "pick": "1 · Angels"
+    }
+  ],
+  "diagnosis": [
+    "La page Tous ne lit que data.days[todayIso], pas les 7 jours à venir.",
+    "La page Tous transforme les matchs en picks via predictMatch puis cache pred.skip, no_pick et les matchs sans cote exploitable.",
+    "La liste À venir applique ensuite un filtre value edge >= -2pt, donc elle ne représente pas la couverture brute.",
+    "Pour corriger la couverture, le preset Tout voir doit afficher des lignes de matchs bruts all-days sans filtre edge/confiance."
+  ],
+  "console_errors": [],
+  "base_url": "http://127.0.0.1:8765"
+}
