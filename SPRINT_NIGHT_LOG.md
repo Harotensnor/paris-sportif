@@ -1615,3 +1615,9 @@
 - Apres: chaque Big Bet expose un calcul mise -> retour/profit modifiable sans ouvrir la modale.
 - Impact: Theo voit immediatement le gain net pour son montant reel.
 - Verif: syntax app.js/sw.js OK, bundle check OK.
+
+## Sprint v35.222 — Phase 11 P-11.27 Suggestions personnalisees (11:04 UTC)
+- Avant: le moteur coach calculait des patterns mais le Profil ne les surfacait pas clairement.
+- Apres: carte Suggestions personnalisees avec sport/cote a privilegier, zones a reduire et actions rapides.
+- Impact: Theo voit ses propres forces/faiblesses sans fouiller la Performance.
+- Verif: syntax app.js/sw.js OK, bundle check OK.

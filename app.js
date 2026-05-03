@@ -20180,6 +20180,34 @@
       const active = excludedLeagues.includes(l.name);
       return `<button type="button" data-exclude-league="${esc(l.name)}" style="min-height:34px;border:1px solid ${active ? 'var(--c-warn)' : 'var(--border)'};border-radius:999px;background:${active ? 'rgba(245,158,11,.16)' : 'var(--panel)'};color:${active ? 'var(--c-warn)' : 'var(--text)'};padding:6px 12px;font-size:12px;font-weight:750;cursor:pointer;">${active ? 'Masquée · ' : ''}${esc(l.name)} <span style="opacity:.72;">${l.count}</span></button>`;
     }).join('') : '<span style="font-size:12px;color:var(--text-dim);">Les ligues apparaîtront dès que les données sont chargées.</span>';
+    const personalSuggestionsHtml = (() => {
+      let coach = null;
+      try { coach = (typeof computeCoachInsights === 'function') ? computeCoachInsights() : null; } catch(e) { coach = null; }
+      const insights = Array.isArray(coach?.insights) ? coach.insights.slice(0, 4) : [];
+      const bestSport = Array.isArray(coach?.bySport) ? coach.bySport.find(x => x.bets >= 3 && x.roi > 0) : null;
+      const worstSport = Array.isArray(coach?.bySport) ? [...coach.bySport].reverse().find(x => x.bets >= 3 && x.roi < 0) : null;
+      const bestOdds = Array.isArray(coach?.byOdds) ? coach.byOdds.find(x => x.bets >= 3 && x.roi > 0) : null;
+      const chip = (label, value, tone) => `<span style="min-height:34px;display:inline-flex;align-items:center;gap:6px;border:1px solid ${tone === 'bad' ? 'rgba(220,38,38,.35)' : 'rgba(22,163,74,.35)'};border-radius:999px;background:${tone === 'bad' ? 'rgba(220,38,38,.10)' : 'rgba(22,163,74,.10)'};color:var(--text);padding:6px 10px;font-size:12px;font-weight:800;"><b style="color:${tone === 'bad' ? 'var(--c-bad)' : 'var(--c-strong)'};">${esc(label)}</b>${esc(value)}</span>`;
+      const cards = insights.length ? insights.map(ins => {
+        const bad = ins.kind === 'bad';
+        const good = ins.kind === 'good';
+        return `<div style="padding:10px 12px;border:1px solid ${bad ? 'rgba(220,38,38,.28)' : good ? 'rgba(22,163,74,.28)' : 'var(--border)'};border-radius:var(--r-sm);background:${bad ? 'rgba(220,38,38,.08)' : good ? 'rgba(22,163,74,.08)' : 'var(--panel)'};font-size:12.5px;color:var(--text);line-height:1.5;"><span style="margin-right:6px;">${esc(ins.icon || '•')}</span>${ins.text || ''}</div>`;
+      }).join('') : `<div style="padding:10px 12px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--panel);font-size:12.5px;color:var(--text-dim);line-height:1.5;">Track encore quelques paris gagnés/perdus : les suggestions deviennent vraiment utiles à partir de 10 à 15 résultats.</div>`;
+      return `
+        <div class="card-base" id="profile-personal-suggestions">
+          <h3 class="section-h3">🧭 Suggestions personnalisées</h3>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+            ${bestSport ? chip('À privilégier', `${bestSport.key} · ROI ${bestSport.roi.toFixed(0)}%`, 'good') : chip('À privilégier', 'pas assez de recul', 'good')}
+            ${bestOdds ? chip('Cote forte', `${bestOdds.key} · ${bestOdds.bets} paris`, 'good') : ''}
+            ${worstSport ? chip('À réduire', `${worstSport.key} · ROI ${worstSport.roi.toFixed(0)}%`, 'bad') : ''}
+          </div>
+          <div style="display:grid;gap:8px;">${cards}</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
+            <button type="button" class="page-btn" data-page="tous" style="min-height:40px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--panel-2);color:var(--text);padding:0 12px;font-weight:850;cursor:pointer;">Voir les picks alignés</button>
+            <button type="button" class="page-btn" data-page="performance" style="min-height:40px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--panel-2);color:var(--text);padding:0 12px;font-weight:850;cursor:pointer;">Analyser l'historique</button>
+          </div>
+        </div>`;
+    })();
     const profileSummaryHtml = `
       <section aria-label="Réglages actifs" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin:0 0 16px;">
         ${[
@@ -20275,6 +20303,7 @@
         </div>
 
         ${profileSummaryHtml}
+        ${personalSuggestionsHtml}
 
         <div class="profil-grid">
 
