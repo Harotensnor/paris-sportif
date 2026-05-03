@@ -31,6 +31,7 @@ const PRECACHE_ASSETS = [
   // CACHE_VERSION stamp invalide tout à chaque vrai changement de code.
   'app.css',
   'app.js',
+  'i18n.json',
   'print.css',
   'app-enhancements.js',
   // Landing page indexable + son CSS partagé.

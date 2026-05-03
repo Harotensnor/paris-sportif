@@ -26,6 +26,74 @@
     saveAdvFilters();
     return n;
   }
+
+  const LANG_KEY = 'paris_sportif_lang_v1';
+  const I18N_FALLBACK = {
+    fr: {
+      'profile.language.title': '🌍 Langue',
+      'profile.language.body': 'Choisis la langue de l’interface. FR reste la langue principale du site.',
+      'profile.language.fr': 'Français',
+      'profile.language.en': 'English',
+      'profile.language.saved': 'Langue enregistrée',
+    },
+    en: {
+      'profile.language.title': '🌍 Language',
+      'profile.language.body': 'Choose the interface language. French remains the primary language of the site.',
+      'profile.language.fr': 'French',
+      'profile.language.en': 'English',
+      'profile.language.saved': 'Language saved',
+    }
+  };
+  let __i18nCatalog = I18N_FALLBACK;
+  function getUserLang() {
+    try {
+      const stored = localStorage.getItem(LANG_KEY);
+      if (stored === 'fr' || stored === 'en') return stored;
+      const prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}') || {};
+      if (prefs.lang === 'fr' || prefs.lang === 'en') return prefs.lang;
+    } catch(e) {}
+    try {
+      return /^en\b/i.test(navigator.language || '') ? 'en' : 'fr';
+    } catch(e) {
+      return 'fr';
+    }
+  }
+  function setUserLang(lang) {
+    const next = lang === 'en' ? 'en' : 'fr';
+    try { localStorage.setItem(LANG_KEY, next); } catch(e) {}
+    try {
+      const prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}') || {};
+      prefs.lang = next;
+      localStorage.setItem('userPrefs', JSON.stringify(prefs));
+    } catch(e) {}
+    try { document.documentElement.lang = next; } catch(e) {}
+    return next;
+  }
+  function i18n(key) {
+    const lang = getUserLang();
+    return (__i18nCatalog[lang] && __i18nCatalog[lang][key])
+      || (I18N_FALLBACK[lang] && I18N_FALLBACK[lang][key])
+      || (I18N_FALLBACK.fr && I18N_FALLBACK.fr[key])
+      || key;
+  }
+  function initI18n() {
+    setUserLang(getUserLang());
+    try {
+      fetch('i18n.json', { cache: 'no-store' })
+        .then(r => r && r.ok ? r.json() : null)
+        .then(j => {
+          if (j && j.fr && j.en) __i18nCatalog = j;
+        })
+        .catch(() => {});
+    } catch(e) {}
+  }
+  initI18n();
+  try {
+    window.getUserLang = getUserLang;
+    window.setUserLang = setUserLang;
+    window.i18n = i18n;
+  } catch(e) {}
+
   const ADV_FILTER_KEY = 'advFilters';
   let advFilters = (() => {
     try {
@@ -19970,6 +20038,7 @@
     const tiltGuard = prefs.tiltGuard !== false;
     const favSports = Array.isArray(prefs.favSports) ? prefs.favSports : [];
     const currentTheme = prefs.theme || 'dark';
+    const currentLang = getUserLang();
     const currentContrast = prefs.contrast || 'normal';
     const currentReader = prefs.reader || 'off';
     const currentLevel = prefs.level || 'confirme';
@@ -20130,6 +20199,15 @@
               </label>
             </div>
             <div style="font-size:11px;color:var(--text-dim);margin-top:8px;">Astuce : appuie sur <b>Maj + T</b> pour basculer sombre/clair.</div>
+          </div>
+
+          <div class="card-base" id="profile-language">
+            <h3 class="section-h3">${esc(i18n('profile.language.title'))}</h3>
+            <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">${esc(i18n('profile.language.body'))}</div>
+            <div class="pref-pill-group" role="group" aria-label="Langue de l'interface">
+              <button class="theme-pill ${currentLang==='fr'?'active':''}" type="button" data-lang-btn="fr">🇫🇷 ${esc(i18n('profile.language.fr'))}</button>
+              <button class="theme-pill ${currentLang==='en'?'active':''}" type="button" data-lang-btn="en">🇬🇧 ${esc(i18n('profile.language.en'))}</button>
+            </div>
           </div>
 
           <div class="card-base">
@@ -20453,6 +20531,14 @@
         savePrefs({ level, onboardingDone: true });
         try { document.documentElement.setAttribute('data-level', level); } catch(e){}
         try { if (typeof toast === 'function') toast('✓ Niveau : ' + level, 'success'); } catch(e){}
+        renderProfilPage(wrap);
+      });
+    });
+    wrap.querySelectorAll('[data-lang-btn]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const lang = setUserLang(btn.dataset.langBtn);
+        savePrefs({ lang });
+        try { if (typeof toast === 'function') toast('✓ ' + i18n('profile.language.saved') + ' : ' + lang.toUpperCase(), 'success'); } catch(e){}
         renderProfilPage(wrap);
       });
     });

@@ -1495,3 +1495,9 @@
 - Apres: 32 captures Phase 11 + planches contact; cibles tablette Profil/Sante/Montantes/Legal renforcees.
 - Impact: aucun overflow/H1 multiple en chargement frais, controles tablette plus propres.
 - Verif: visual_capture OK, audit DOM frais OK, bundle OK.
+
+## Sprint v35.202 — Phase 11 P-11.6 Multi-langue FR/EN (09:42 UTC)
+- Avant: aucune preference de langue persistante, html lang fixe cote navigateur.
+- Apres: base i18n FR/EN, detection navigator.language et toggle Profil persistant.
+- Impact: socle multi-langue pret sans perturber l'interface FR principale.
+- Verif: node --check app.js OK, test Profil EN OK, bundle OK.
