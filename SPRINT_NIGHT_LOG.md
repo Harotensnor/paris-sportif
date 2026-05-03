@@ -1946,3 +1946,8 @@
 - Apres: fetch_match_previews.py tente ESPN summary public puis genere une preview analytique locale a partir de xG/H2H/lineups/pitchers/markets.
 - Impact: 12 previews top-signal produites, toutes en fallback local sur le snapshot courant; aucune fausse recap ESPN n'est affichee comme preview.
 - Verif: fetch_match_previews.py --limit 12 OK, build_health OK, health sources=26 avec match_previews previews=12.
+## Sprint v35.288 — Phase 12 V36 P-12.35 Validation modele ensemble (18:06 UTC)
+- Avant: l'audit ensemble etait un snapshot ancien, sans comparaison Brier sous-modele vs ensemble ni mesure des niveaux V36 du slate courant.
+- Apres: scripts/validate_ensemble_model.py appelle le vrai predictMatch via model_loader, produit ensemble_validation.json/md, compare Dixon-Coles/xG, Elo et forme, et mesure les tiers V36 soft/strict.
+- Impact: 701 predictions historiques validees, Brier ensemble 0.2333 vs 0.2500 random, 0 divergence >0.15, aucun sous-modele ne bat l'ensemble de >0.010 Brier; slate courant = 42 picks V36 classes dont 7 stricts.
+- Verif: validate_ensemble_model.py OK, py_compile OK.
