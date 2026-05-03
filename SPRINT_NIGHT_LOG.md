@@ -1708,3 +1708,9 @@
 - Apres: audit direct openDetail sur football/tennis/basketball/baseball/hockey et tous les onglets presents.
 - Impact: 5 sports testes, 0 skipped, 0 failure, aucune erreur console.
 - Verif: phase12_modal_tabs_audit.json, modal_tabs_audit OK.
+
+## Sprint v35.241 — Phase 12 P-12.10 Audit filtres Tous (15:13 local)
+- Avant: les combinaisons sport/cote/marche n'etaient pas recontrolees apres le fix couverture.
+- Apres: 225 combinaisons testees, 277 lignes visibles en Tout voir, empty state strict valide.
+- Impact: deux manques logs dans ISSUES.md: totals US a 0 et mapping tennis 1N2 a verifier.
+- Verif: phase12_tous_filter_combo_audit.json, script OK, 0 console error.

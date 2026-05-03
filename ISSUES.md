@@ -524,3 +524,26 @@ Contexte : après correction de `Tous`, la couverture monte à 277 matchs à ven
 - Preuve : `.cache/phase4-phase12-tous-coverage/manifest.json`
 - Action : Ajouter un mode capture CSS désactivant sticky/fixed pour les screenshots full-page.
 - Statut : OPEN
+
+## Phase 12 audit filtres — combinaisons Tous
+
+Rapport : `phase12_tous_filter_combo_audit.json` / `.cache/tous-filter-combo-audit.json`.
+Résultat : 225 combinaisons sport × cote min × marché testées ; 277 lignes visibles en préset Tout voir ; empty state amical validé quand les filtres sont volontairement trop stricts.
+
+### P12-FILT-001 — Les marchés totals US ne sortent aucun candidat malgré des matchs disponibles
+
+- Sévérité : MEDIUM
+- Pages : `tous`, modales détail multi-sports
+- Preuve : `phase12_tous_filter_combo_audit.json` (`suspiciousZeroCombos` : basketTotal/baseballTotal/hockeyTotal = 0 à cote min 1.30/1.50/2.00).
+- Constat : 20 matchs basket, 17 baseball, 11 hockey sont bien détectés, mais les candidats `basketTotal`, `baseballTotal`, `hockeyTotal` restent à 0.
+- Action : vérifier `buildMarketCandidates` et les projections US pour exposer les totals déjà promis en Phase 10.
+- Statut : OPEN
+
+### P12-FILT-002 — Tennis vainqueur à cote min basse absent dans l'audit combo
+
+- Sévérité : LOW
+- Pages : `tous`
+- Preuve : `phase12_tous_filter_combo_audit.json` (`tennis` a 1 event upcoming, `1n2` = 0).
+- Constat : le seul match tennis détecté expose des jeux tennis mais pas de candidat vainqueur simple dans l'audit.
+- Action : vérifier si l'event manque de cote 1N2 ou si le mapping tennis utilise une clé différente.
+- Statut : OPEN
