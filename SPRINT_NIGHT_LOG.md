@@ -1543,3 +1543,9 @@
 - Apres: Chrome + Edge sur dashboard/tous/performance/profil, 0 erreur console et 0 overflow horizontal.
 - Impact: rendu Chromium stable sur deux navigateurs installés; Firefox absent de la machine locale.
 - Verif: audit Playwright cross-browser custom OK.
+
+## Sprint v35.210 — Phase 11 P-11.15 TheSportsDB metadata (10:14 UTC)
+- Avant: TheSportsDB était seulement documenté comme source candidate.
+- Apres: fetch_thesportsdb_meta.py + health + cron; matching strict pour refuser les fallbacks génériques.
+- Impact: source publique activée sans risque de faux logos/stades dans la data.
+- Verif: py_compile OK, build_health OK; API publique actuellement `degraded` sur clé démo.

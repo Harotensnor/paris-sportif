@@ -31,11 +31,11 @@ Risk / constraints:
   requests per run.
 - Requires fuzzy mapping from ESPN/Winamax event names to TheSportsDB IDs.
 
-Suggested implementation:
-- `scripts/fetch_thesportsdb_metadata.py`
-- Output: `thesportsdb_metadata.json`
-- Cadence: 6h, cache by normalized team/event key.
-- Health metric: teams matched, events matched, lineup/timeline hits.
+Implementation:
+- `scripts/fetch_thesportsdb_meta.py`
+- Output: `thesportsdb_meta.json`
+- Cadence: 24h TTL with strict fuzzy matching; generic demo-key fallbacks are rejected.
+- Health metric: teams requested, teams matched, API errors.
 
 ## Candidate 2 — OpenLigaDB
 
