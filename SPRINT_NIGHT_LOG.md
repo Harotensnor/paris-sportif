@@ -1776,3 +1776,8 @@
 - Apres: glossaire limite a 16 termes sur mobile avec bouton "Afficher plus", sommaire en chips horizontales.
 - Impact: hauteur mobile ~9325px -> 4816px, 0 overflow sur 32 devices/vues.
 - Verif: visual_capture phase12-academie-compact-v2 32/32 OK, mobile_device_audit OK, syntax/bundle OK.
+## Sprint v35.254 — Phase 12 P-12.23 Fix P12-VIS-008 Profil mobile (16:25 local)
+- Avant: Profil mobile/tablet affichait presque tous les panneaux ouverts d'un bloc.
+- Apres: les panneaux secondaires passent en accordéons mobiles, bankroll/cote/strategie/simulateur restent visibles.
+- Impact: Profil mobile ~7607px -> 4155px, tablet ~5736px -> 3576px, 0 overflow.
+- Verif: visual_capture phase12-profil-compact 32/32 OK, mobile_device_audit OK, syntax/bundle OK.
