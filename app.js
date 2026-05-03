@@ -20107,6 +20107,18 @@
     const currentLang = getUserLang();
     const currentContrast = prefs.contrast || 'normal';
     const currentReader = prefs.reader || 'off';
+    const notifSupported = typeof window !== 'undefined' && 'Notification' in window;
+    const notifPermission = notifSupported ? Notification.permission : 'unsupported';
+    const notifEnabled = prefs.pushNotifs === true;
+    const notifReady = notifSupported && notifPermission === 'granted' && notifEnabled;
+    const notifStatusLabel = !notifSupported ? 'Non supporté'
+      : notifPermission === 'denied' ? 'Bloquées par le navigateur'
+      : notifReady ? 'Actives'
+      : notifPermission === 'granted' ? 'Permission OK, désactivées'
+      : 'À activer';
+    const notifStatusColor = notifReady ? 'var(--c-strong)'
+      : notifPermission === 'denied' ? 'var(--c-bad)'
+      : 'var(--text-dim)';
     const currentLevel = prefs.level || 'confirme';
     const currentOddMin = (typeof getUserOddMin === 'function') ? getUserOddMin() : 2.00;
     const currentOddIdx = Math.max(0, ODD_MIN_CHOICES.findIndex(v => Math.abs(v - currentOddMin) < 0.01));
@@ -20414,6 +20426,22 @@
           })()}
 
           ${santeHtml}
+
+          <div class="card-base" id="profile-browser-notifs">
+            <h3 class="section-h3">🔔 Notifications navigateur</h3>
+            <div style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;">
+              <div style="font-size:12.5px;color:var(--text-dim);line-height:1.5;">
+                Reçois une alerte locale quand un Big Bet approche ou quand une forte value apparaît. Aucun compte externe, rien n'est envoyé à un serveur.
+                <div style="margin-top:6px;font-weight:800;color:${notifStatusColor};">Statut : ${esc(notifStatusLabel)}</div>
+              </div>
+              <button id="profile-browser-notif-toggle" type="button" ${!notifSupported || notifPermission === 'denied' ? 'disabled' : ''} style="min-height:44px;padding:10px 16px;border-radius:var(--r);border:1px solid ${notifReady ? 'rgba(22,163,74,.35)' : 'var(--border)'};background:${notifReady ? 'rgba(22,163,74,.14)' : 'var(--panel-2)'};color:${notifReady ? 'var(--c-strong)' : 'var(--text)'};font-size:13px;font-weight:850;cursor:${!notifSupported || notifPermission === 'denied' ? 'not-allowed' : 'pointer'};">
+                ${notifReady ? 'Désactiver' : 'Activer'}
+              </button>
+            </div>
+            <div id="profile-browser-notif-status" style="margin-top:8px;font-size:11.5px;color:var(--text-dim);" aria-live="polite">
+              ${notifPermission === 'denied' ? 'Autorise les notifications dans les réglages du navigateur pour les réactiver.' : 'Alertes limitées aux picks vraiment actionnables pour éviter le spam.'}
+            </div>
+          </div>
 
           ${(() => {
             // Permet à l'user de recevoir les top picks dans son Discord
@@ -20725,6 +20753,46 @@
     });
     const tiltEl = wrap.querySelector('#pref-tilt');
     if (tiltEl) tiltEl.addEventListener('change', (e) => savePrefs({ tiltGuard: e.target.checked }));
+    const browserNotifBtn = wrap.querySelector('#profile-browser-notif-toggle');
+    const browserNotifStatus = wrap.querySelector('#profile-browser-notif-status');
+    if (browserNotifBtn) browserNotifBtn.addEventListener('click', async () => {
+      const setNotifStatus = (msg, kind) => {
+        if (!browserNotifStatus) return;
+        browserNotifStatus.style.color = kind === 'ok' ? 'var(--c-strong)' : kind === 'err' ? 'var(--c-bad)' : 'var(--text-dim)';
+        browserNotifStatus.textContent = msg;
+      };
+      if (!('Notification' in window)) {
+        setNotifStatus('Ce navigateur ne supporte pas les notifications.', 'err');
+        return;
+      }
+      let perm = Notification.permission;
+      if (perm === 'default') {
+        setNotifStatus('Demande de permission en cours...', 'info');
+        try { perm = await Notification.requestPermission(); } catch(e) { perm = 'denied'; }
+      }
+      if (perm !== 'granted') {
+        savePrefs({ pushNotifs: false });
+        setNotifStatus('Notifications bloquées par le navigateur.', 'err');
+        try { if (typeof window._syncBrowserNotifUI === 'function') window._syncBrowserNotifUI(); } catch(e){}
+        return;
+      }
+      const next = !(prefs.pushNotifs === true);
+      savePrefs({ pushNotifs: next });
+      try {
+        if (next && 'serviceWorker' in navigator && location.protocol.startsWith('http')) {
+          await navigator.serviceWorker.register('sw.js').catch(() => null);
+        }
+      } catch(e) {}
+      try { if (typeof window._syncBrowserNotifUI === 'function') window._syncBrowserNotifUI(); } catch(e){}
+      if (next) {
+        setNotifStatus('Notifications activées. Le site préviendra les Big Bets imminents.', 'ok');
+        try { if (typeof window._maybeNotifyHighEdgePicks === 'function') window._maybeNotifyHighEdgePicks(); } catch(e){}
+        try { if (typeof window._maybeNotifyKickoffImminent === 'function') window._maybeNotifyKickoffImminent(); } catch(e){}
+      } else {
+        setNotifStatus('Notifications désactivées.', 'info');
+      }
+      setTimeout(() => renderProfilPage(wrap), 450);
+    });
     wrap.querySelectorAll('[data-toggle-sport]').forEach(btn => {
       btn.addEventListener('click', () => {
         const s = btn.dataset.toggleSport;
@@ -27678,6 +27746,45 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     // qui doit être appelée depuis un user-gesture handler.
     const NOTIF_EDGE_THRESHOLD = 0.10;       // edge ≥10pt = "forte valeur"
     const NOTIF_CONF_THRESHOLD = 0.55;       // garde-fou : ignore les flukes faible conf
+    const _openNotifTarget = (url) => {
+      const target = url || (location.origin + location.pathname + '#dashboard');
+      try {
+        if (/^https?:\/\//i.test(target) && !target.startsWith(location.origin)) {
+          window.open(target, '_blank', 'noopener');
+        } else {
+          const u = target.startsWith('http') ? target : (location.origin + location.pathname + target);
+          window.location.href = u;
+        }
+        window.focus();
+      } catch(e) {
+        try { window.focus(); } catch(err) {}
+      }
+    };
+    const _nativeNotify = (title, options = {}, url) => {
+      if (!('Notification' in window) || Notification.permission !== 'granted') return;
+      const payload = {
+        ...options,
+        data: {
+          ...(options.data || {}),
+          url: url || (location.origin + location.pathname + '#dashboard'),
+        },
+      };
+      const fallback = () => {
+        const n = new Notification(title, payload);
+        n.onclick = () => { _openNotifTarget(payload.data.url); n.close(); };
+      };
+      try {
+        if ('serviceWorker' in navigator && navigator.serviceWorker.ready && location.protocol.startsWith('http')) {
+          navigator.serviceWorker.ready
+            .then(reg => (reg && reg.showNotification) ? reg.showNotification(title, payload) : fallback())
+            .catch(() => fallback());
+        } else {
+          fallback();
+        }
+      } catch(e) {
+        try { fallback(); } catch(err) { console.warn('[notif] failed:', err); }
+      }
+    };
     const _notifSyncBtn = () => {
       const btn = document.getElementById('notif-toggle');
       if (!btn) return;
@@ -27706,6 +27813,7 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         : 'Notifs : alertes quand un pari edge ≥10% apparaît · clic pour activer';
       btn.setAttribute('aria-label', btn.title);
     };
+    window._syncBrowserNotifUI = _notifSyncBtn;
     // Exposé sur window pour que pollData() (scope IIFE racine) puisse
     // l'appeler après chaque refresh data.js. Avant ce fix, l'appel depuis
     // pollData levait silencieusement ReferenceError → notifs jamais
@@ -27746,13 +27854,13 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       // Cap : 3 notifs max par batch pour ne pas spam
       fresh.slice(0, 3).forEach(p => {
         try {
-          const n = new Notification(`💎 Pari forte valeur : ${p.home} vs ${p.away}`, {
+          _nativeNotify(`💎 Pari forte valeur : ${p.home} vs ${p.away}`, {
             body: `→ ${p.label} @${p.odd.toFixed(2)} · edge +${Math.round(p.edge*100)}pt · conf ${Math.round(p.rel*100)}%`,
             icon: 'icon-192.png',
             badge: 'icon.svg',
             tag: 'paris-sportif-' + p.id,
-          });
-          n.onclick = () => { window.focus(); n.close(); };
+            renotify: false,
+          }, location.origin + location.pathname + '#dashboard');
           seen.add(p.id);
         } catch(e) { console.warn('[notif] failed:', e); }
       });
@@ -27810,18 +27918,14 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       if (!fresh.length) return;
       fresh.slice(0, 3).forEach(p => {
         try {
-          const n = new Notification(`⏱️ Kickoff dans ${p.minToKickoff} min : ${p.home} vs ${p.away}`, {
+          _nativeNotify(`⏱️ Kickoff dans ${p.minToKickoff} min : ${p.home} vs ${p.away}`, {
             body: `Pick : ${p.label} @${p.odd.toFixed(2)} · edge +${Math.round(p.edge*100)}pt · conf ${Math.round(p.rel*100)}%`,
             icon: 'icon-192.png',
             badge: 'icon.svg',
             tag: 'paris-sportif-kickoff-' + p.id,
             requireInteraction: false,
-          });
-          n.onclick = () => {
-            window.focus();
-            if (p.wnxUrl) window.open(p.wnxUrl, '_blank', 'noopener');
-            n.close();
-          };
+            renotify: false,
+          }, p.wnxUrl || (location.origin + location.pathname + '#dashboard'));
           seen.add(p.id);
         } catch(e) { console.warn('[notif kickoff] failed:', e); }
       });
