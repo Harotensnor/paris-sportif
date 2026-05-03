@@ -1741,3 +1741,8 @@
 - Apres: chips 1/N/2 ou 1/2 ajoutées aux lignes de couverture brute.
 - Impact: la page Tous devient lisible comme calendrier cote, pas seulement liste de matchs.
 - Verif: visual_capture phase12-odds-preview 32/32 OK, syntax/bundle OK.
+## Sprint v35.247 — Phase 12 P-12.16 Fix P12-FILT-001 totals US (15:43 local)
+- Avant: basketTotal/baseballTotal/hockeyTotal sortaient 0 candidat malgré les lignes Winamax detail.
+- Apres: fallback proba no-vig quand le modèle sport US n'a pas assez de signal.
+- Impact: basketTotal 847, baseballTotal 165, hockeyTotal 118 candidats filtrables; couverture multi-marches restauree.
+- Verif: tous_filter_combo_audit 225 combos OK, syntax/bundle OK.
