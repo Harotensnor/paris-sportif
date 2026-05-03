@@ -1992,3 +1992,8 @@
 - Densite: 40 propositions aujourd'hui, 30 lignes dans la zone de table desktop, toutes les colonnes visibles, zero overflow horizontal; mobile garde 40 cards empilees.
 - UX: rail radar passe sous la table pour laisser toute la largeur au tableau; sections Genius/Boost restent sous la table comme complements.
 - Verif: app.js/sw.js syntax OK; Playwright local dashboard desktop/mobile OK, modal au clic OK, 0 erreur console, 0 cible tactile <40px; a11y audit 8 pages = 0/0/0; Lighthouse fallback min perf 97, min a11y 97, SEO 100.
+## Sprint v35.297 — AUTO 10/10 Audit post-table hardening (20:19 UTC)
+- Avant: l'audit post-table capturait bien les 32 viewports, mais le click audit gardait parfois un ancien marqueur invisible et le modal tabs audit cherchait les onglets avant d'ouvrir le volet technique V36.
+- Apres: click_audit nettoie ses marqueurs a chaque remap; modal_tabs_audit ouvre "Voir les details techniques" avant de tester les onglets; night_metrics est regenere sur le snapshot courant.
+- Couverture data: 367 events, 305 upcoming, Winamax exact 367/367 (100%), 321 events avec marches >1N2 apres rebase cron.
+- Verif: visual_capture phase-post-table-v35-297 = 32 PNG OK; click audit 191/191 sans echec; modal tabs 4 sports testes + 1 skip, 0 echec; a11y 8 pages = 0/0/0; Lighthouse min perf 97, min a11y 97, SEO 100.
