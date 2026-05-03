@@ -1961,3 +1961,8 @@
 - Apres: l'accueil affiche une section "Picks du genie" uniquement quand un pick strict a au moins 2 sous-modeles, variance <=0.045, edge propre et aucune penalite ligue.
 - Impact: 4 picks consensus visibles au-dessus du cockpit V36 sur le snapshot courant, sans ajouter de panier ni de contenu inutile.
 - Verif: Playwright local dashboard 1440px => 4 genius cards, 5 tier columns, 15 cards visibles, overflowX=false, 0 erreur console; screenshot .cache/v36-genius-dashboard.png.
+## Sprint v35.291 — AUTO 10/10 Vague 1 crédibilité tiers (19:31 UTC)
+- Avant: l'accueil V36 pouvait classer des picks hors plage (ex. cote 1.45 en Solide), afficher des tags strict/souple non documentés, et laisser un même match occuper plusieurs niveaux.
+- Après: les 5 tiers exigent tous EV/edge positifs, bornes de cote strictes, seuils conf/edge documentés, un seul pick par match sur le cockpit, et les cartes affichent EV au lieu de strict/souple.
+- Cohérence: ajout garde-fous handicap vs score exact + doublon 1N2 <-> handicap -0.5; les team totals sont renommés "Total équipe ..." pour ne plus ressembler à un handicap.
+- Vérif: app.js/sw.js syntax OK, market consistency audit 58/58, dashboard desktop 0 tier hors plage, 0 tag strict/souple, 0 overflow, 0 erreur console.
