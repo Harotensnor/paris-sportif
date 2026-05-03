@@ -2062,3 +2062,8 @@
 - Apres: safeLocalStorageGet/safeLocalStorageJson deviennent les helpers globaux; dashboard filter, oddMin, prefs accessibilite, recent matches, bookmarks, watchlist et alert rules les utilisent.
 - Impact: bugs #39/#40 avances: un localStorage corrompu ou bloque ne casse plus l'accueil/table, et les favoris/watchlist repartent sur des defaults propres.
 - Verif: app.js/sw.js syntax OK; smoke navigateur local avec JSON corrompu => favoris/watchlist/alertes fallback OK, toggle favori OK, reload dashboard 720 lignes, 0 warning/error; spec storage-safety ajoutee.
+## Sprint v35.311 — AUTO 10/10 Backtest fetch cache (21:53 UTC)
+- Avant: backtest_report_v2.json et backtest_report_markets.json etaient recuperes avec cache no-store + timestamp, donc chaque boot/page pouvait forcer un aller-retour reseau inutile.
+- Apres: _fetchBacktestReportV2 partage une promesse/memoire par session et utilise un bucket 15 min cache-friendly; le rapport marche utilise un bucket 1h.
+- Impact: bug #22 avance: la calibration reste fraiche sans spam reseau, Performance reutilise le rapport deja charge, et le timeout de page conserve son garde-fou.
+- Verif: app.js/sw.js syntax OK; smoke navigateur local route backtest => 1 seul hit apres boot + 2 appels API, total_n=42, meme objet en memoire, 0 warning/error; spec backtest-cache ajoutee.
