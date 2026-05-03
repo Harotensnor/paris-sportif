@@ -1826,3 +1826,8 @@
 - Apres: audit fallback 8 pages regénéré dans a11y-report.json.
 - Impact: 0 critical, 0 serious, 0 moderate sur dashboard/tous/perf/academie/profil/sante/montantes/legal.
 - Verif: scripts/a11y_audit.js OK, report complet.
+## Sprint v35.264 — Phase 12 V36 P-12.1 Priorite snapshots Winamax exact (16:47 UTC)
+- Avant: data.js avait 154 snapshots DraftKings alors que Winamax exact existait, data_lite.js en avait 40.
+- Apres: snapshot_odds remplace les snapshots externes par Winamax si match_id + marche 1N2 exact existent, et traite aussi data_lite.js.
+- Impact: external_snapshots_on_exact 154 -> 0 sur data.js, 40 -> 0 sur data_lite.js; winamax_exact_ratio maintenu a 95.7%.
+- Verif: py_compile OK, snapshot_odds idempotent a 0 au second run, check_health_quality OK.

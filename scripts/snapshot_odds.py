@@ -38,19 +38,22 @@ from datetime import datetime, timezone
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA_PATH = ROOT / 'data.js'
+DATA_LITE_PATH = ROOT / 'data_lite.js'
+DATA_PATHS = [DATA_PATH, DATA_LITE_PATH]
+EXTERNAL_ODDS_PROVIDERS = {'draftkings', 'tennisexplorer', 'betexplorer', 'fanduel', 'caesars'}
 
 
-def load_data():
-    txt = DATA_PATH.read_text(encoding='utf-8')
+def load_data(path=DATA_PATH):
+    txt = path.read_text(encoding='utf-8')
     m = re.search(r'window\.PRONOSTICS_DATA\s*=\s*(\{.*\})\s*;?\s*$', txt, re.DOTALL)
     if not m:
-        print('[snapshot_odds] could not parse data.js', file=sys.stderr)
+        print(f'[snapshot_odds] could not parse {path.name}', file=sys.stderr)
         sys.exit(1)
     return json.loads(m.group(1))
 
 
-def save_data(d):
-    DATA_PATH.write_text(
+def save_data(d, path=DATA_PATH):
+    path.write_text(
         'window.PRONOSTICS_DATA = ' + json.dumps(d, ensure_ascii=False, separators=(',', ':')) + ';\n',
         encoding='utf-8'
     )
@@ -96,51 +99,21 @@ def _ml_to_dec(ml):
     return None
 
 
-def snapshot(event, now_iso):
-    """Capture current odds into ev.odds_snapshot (idempotent — only writes if
-    snapshot missing AND match is still upcoming AND odds are real).
+def _winamax_1n2_prices(event):
+    """Return exact Winamax 1N2 prices when the match mapping is reliable."""
+    wnx = event.get('winamax') or {}
+    mks = wnx.get('markets') or {}
+    m1n2 = mks.get('1n2') or {}
+    wh = m1n2.get('home')
+    wa = m1n2.get('away')
+    wd = m1n2.get('draw')
+    if wnx.get('match_id') and (wh or wa):
+        return wh, wd, wa
+    return None, None, None
 
-    AUDIT-2026-04-27 (Sprint 1 #1) — Sources étendues. Avant : ne lisait
-    QUE event.odds (ESPN). Pour les qualifs WTA / Challenger / matchs où
-    ESPN ne donne pas de cote, on tombait à `[]` et le bilan ne pouvait
-    jamais évaluer ces picks → 24 matchs terminés sans cote (cf v31.7.92
-    "non-trackables"). Désormais on essaie aussi `event.winamax.markets`
-    en fallback, ce qui couvre les cas où le mapping Winamax exact
-    existe mais ESPN n'a pas de odds.
-    """
-    # Don't touch events that already have a snapshot
-    if event.get('odds_snapshot') and (event['odds_snapshot'].get('home') or event['odds_snapshot'].get('away')):
-        return False
-    # Don't snapshot live/completed matches — their odds are stale or gone
-    status = event.get('status', '') or ''
-    if event.get('completed') or 'IN_PROGRESS' in status or 'HALF' in status or 'FINAL' in status:
-        return False
-    h, d, a, prov = best_odds_from_array(event.get('odds') or [])
-    # AUDIT-2026-04-27 — fallback Winamax markets si ESPN odds vide.
-    # Uniquement quand c'est un match exact (match_id présent) — on ne
-    # snapshot pas les fallback tournament-only (cote inexistante).
-    if not h and not a:
-        wnx = event.get('winamax') or {}
-        mks = wnx.get('markets') or {}
-        m1n2 = mks.get('1n2') or {}
-        wh = m1n2.get('home')
-        wa = m1n2.get('away')
-        wd = m1n2.get('draw')
-        if wnx.get('match_id') and (wh or wa):
-            h, d, a, prov = wh, wd, wa, 'winamax'
-    if not h and not a:
-        return False
-    snap = {
-        'captured_at': now_iso,
-        'home': round(float(h), 3) if h else None,
-        'draw': round(float(d), 3) if d else None,
-        'away': round(float(a), 3) if a else None,
-        'provider': prov,
-    }
-    # Sprint 67 (v31.7.155 — audit ChatGPT 2026-04-28 P0) — Snapshot per-marché
-    # secondaire pour ROI per-marché. Lit Winamax markets (OU 2.5 + BTTS) et
-    # les freeze dans odds_snapshot.markets pour que backtest_v2 puisse calculer
-    # ROI par marché secondaire (avant : seul 1X2 était snapshoté).
+
+def _secondary_winamax_markets(event):
+    """Freeze Winamax secondary markets beside 1N2 for backtests."""
     wnx = event.get('winamax') or {}
     mks = wnx.get('markets') or {}
     secondary = {}
@@ -165,6 +138,78 @@ def snapshot(event, now_iso):
                 'over': round(float(ou['over']), 3) if ou.get('over') else None,
                 'under': round(float(ou['under']), 3) if ou.get('under') else None,
             }
+    return secondary
+
+
+def _build_winamax_snapshot(event, now_iso, replaced_provider=None):
+    h, d, a = _winamax_1n2_prices(event)
+    if not h and not a:
+        return None
+    snap = {
+        'captured_at': now_iso,
+        'home': round(float(h), 3) if h else None,
+        'draw': round(float(d), 3) if d else None,
+        'away': round(float(a), 3) if a else None,
+        'provider': 'winamax',
+        'source_priority': 'winamax_exact',
+    }
+    if replaced_provider:
+        snap['replaced_provider'] = replaced_provider
+    secondary = _secondary_winamax_markets(event)
+    if secondary:
+        snap['markets'] = secondary
+    return snap
+
+
+def snapshot(event, now_iso):
+    """Capture current odds into ev.odds_snapshot (idempotent — only writes if
+    snapshot missing AND match is still upcoming AND odds are real).
+
+    AUDIT-2026-04-27 (Sprint 1 #1) — Sources étendues. Avant : ne lisait
+    QUE event.odds (ESPN). Pour les qualifs WTA / Challenger / matchs où
+    ESPN ne donne pas de cote, on tombait à `[]` et le bilan ne pouvait
+    jamais évaluer ces picks → 24 matchs terminés sans cote (cf v31.7.92
+    "non-trackables"). Désormais on essaie aussi `event.winamax.markets`
+    en fallback, ce qui couvre les cas où le mapping Winamax exact
+    existe mais ESPN n'a pas de odds.
+    """
+    # Don't snapshot live/completed matches — their odds are stale or gone
+    status = event.get('status', '') or ''
+    if event.get('completed') or 'IN_PROGRESS' in status or 'HALF' in status or 'FINAL' in status:
+        return False
+    existing = event.get('odds_snapshot') or {}
+    existing_provider = str(existing.get('provider') or '').lower()
+    # Sprint v35.264 — Winamax-only product rule. If a reliable Winamax match
+    # mapping exists, it must beat any previously frozen external book price.
+    if existing and (existing.get('home') or existing.get('away')):
+        if existing_provider in EXTERNAL_ODDS_PROVIDERS:
+            winamax_snap = _build_winamax_snapshot(event, now_iso, replaced_provider=existing_provider)
+            if winamax_snap:
+                event['odds_snapshot'] = winamax_snap
+                return True
+        return False
+
+    # Prefer exact Winamax markets over ESPN/external arrays for new snapshots.
+    winamax_snap = _build_winamax_snapshot(event, now_iso)
+    if winamax_snap:
+        event['odds_snapshot'] = winamax_snap
+        return True
+
+    h, d, a, prov = best_odds_from_array(event.get('odds') or [])
+    if not h and not a:
+        return False
+    snap = {
+        'captured_at': now_iso,
+        'home': round(float(h), 3) if h else None,
+        'draw': round(float(d), 3) if d else None,
+        'away': round(float(a), 3) if a else None,
+        'provider': prov,
+    }
+    # Sprint 67 (v31.7.155 — audit ChatGPT 2026-04-28 P0) — Snapshot per-marché
+    # secondaire pour ROI per-marché. Lit Winamax markets (OU 2.5 + BTTS) et
+    # les freeze dans odds_snapshot.markets pour que backtest_v2 puisse calculer
+    # ROI par marché secondaire (avant : seul 1X2 était snapshoté).
+    secondary = _secondary_winamax_markets(event)
     if secondary:
         snap['markets'] = secondary
     event['odds_snapshot'] = snap
@@ -211,21 +256,31 @@ def closing_snapshot(event, now_dt, now_iso):
 
 
 def main():
-    d = load_data()
     now_dt = datetime.now(timezone.utc)
     now_iso = now_dt.isoformat()
-    new_snaps = 0
-    new_closes = 0
-    total = 0
-    for day_key, events in d.get('days', {}).items():
-        for ev in events:
-            total += 1
-            if snapshot(ev, now_iso):
-                new_snaps += 1
-            if closing_snapshot(ev, now_dt, now_iso):
-                new_closes += 1
-    save_data(d)
-    print(f'[snapshot_odds] total={total} new_snapshots={new_snaps} new_closing={new_closes}')
+    grand_total = 0
+    grand_snaps = 0
+    grand_closes = 0
+    for path in DATA_PATHS:
+        if not path.exists():
+            continue
+        d = load_data(path)
+        new_snaps = 0
+        new_closes = 0
+        total = 0
+        for day_key, events in d.get('days', {}).items():
+            for ev in events:
+                total += 1
+                if snapshot(ev, now_iso):
+                    new_snaps += 1
+                if closing_snapshot(ev, now_dt, now_iso):
+                    new_closes += 1
+        save_data(d, path)
+        grand_total += total
+        grand_snaps += new_snaps
+        grand_closes += new_closes
+        print(f'[snapshot_odds] {path.name} total={total} new_or_reprioritized_snapshots={new_snaps} new_closing={new_closes}')
+    print(f'[snapshot_odds] all total={grand_total} new_or_reprioritized_snapshots={grand_snaps} new_closing={grand_closes}')
 
 
 if __name__ == '__main__':
