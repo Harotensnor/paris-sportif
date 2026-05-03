@@ -14702,6 +14702,204 @@
     const _dataAgeMin = data.generated_at ? Math.floor((Date.now() - new Date(data.generated_at).getTime())/60000) : 9999;
     const _dataIsStale = _dataAgeMin > 240; // 4h
 
+    // V36 — nouveau cockpit d'accueil. L'ancien dashboard V35 est conserve plus bas
+    // comme fallback legacy, mais l'accueil principal sort ici.
+    {
+      const v36FilterKey = 'paris_sportif_v36_home_filter';
+      const v36Filter = (() => {
+        try { return JSON.parse(localStorage.getItem(v36FilterKey) || '{}') || {}; }
+        catch(e) { return {}; }
+      })();
+      const v36TierDefs = [
+        { id: 'safe', icon: 'S', label: 'Sur', range: '1.30-1.50', desc: 'Faible risque, gain modeste', tone: 'safe' },
+        { id: 'solid', icon: 'A', label: 'Solide', range: '1.50-2.00', desc: 'Bon equilibre', tone: 'solid' },
+        { id: 'value', icon: 'V', label: 'Valeur', range: '2.00-3.00', desc: 'Sweet spot value', tone: 'value' },
+        { id: 'big', icon: 'B', label: 'Big odds', range: '3.00-5.00', desc: 'Gros gain calcule', tone: 'big' },
+        { id: 'out', icon: 'O', label: 'Outsider', range: '5.00+', desc: 'Coup de genie', tone: 'out' }
+      ];
+      const v36TierById = Object.fromEntries(v36TierDefs.map(t => [t.id, t]));
+      const v36HourBucket = (date) => {
+        const h = new Date(date || 0).getHours();
+        if (h >= 6 && h < 12) return 'morning';
+        if (h >= 12 && h < 18) return 'afternoon';
+        if (h >= 18 && h < 23) return 'evening';
+        return 'night';
+      };
+      const v36TeamName = (team) => team?.short || team?.displayName || team?.name || '?';
+      const v36TierForCandidate = (c) => {
+        const odd = Number(c?.odd || 0);
+        const conf = Number(c?.rel || c?.prob || 0);
+        const edge = Number.isFinite(Number(c?.edge)) ? Number(c.edge) : (conf && odd ? conf - 1 / odd : 0);
+        if (!(odd >= 1.30) || !(conf > 0)) return null;
+        if (odd < 1.50 && conf >= 0.66 && edge >= -0.04) return { id: 'safe', strict: conf >= 0.75 && edge >= -0.015 };
+        if (odd < 2.00 && conf >= 0.56 && edge >= -0.03) return { id: 'solid', strict: conf >= 0.65 && edge >= -0.005 };
+        if (odd < 3.00 && edge >= 0 && conf >= 0.42) return { id: 'value', strict: edge >= 0.05 };
+        if (odd < 5.00 && edge >= 0.02 && conf >= 0.28) return { id: 'big', strict: edge >= 0.08 };
+        if (odd >= 5.00 && edge >= 0.04 && conf >= 0.14) return { id: 'out', strict: edge >= 0.10 };
+        return null;
+      };
+      const v36PickPool = _dataIsStale ? [] : terminalScanPool.flatMap(m => {
+        try {
+          const pred = predictMatch(m);
+          if (!pred || !pred.pick || pred.skip) return [];
+          const best = _agentBestPick(m, pred);
+          if (!best) return [];
+          const rawCandidates = [best].concat(Array.isArray(best.allCandidates) ? best.allCandidates : []);
+          const seen = new Set();
+          const ranked = rawCandidates
+            .filter(c => c && Number(c.odd || 0) >= 1.30)
+            .filter(c => {
+              const key = `${c.market || ''}:${c.pickKey || c.key || ''}:${Number(c.odd || 0).toFixed(2)}`;
+              if (seen.has(key)) return false;
+              seen.add(key);
+              return true;
+            })
+            .map(c => {
+              const tier = v36TierForCandidate(c);
+              if (!tier) return null;
+              const rel = Number(c.rel || c.prob || 0);
+              const odd = Number(c.odd || 0);
+              const edge = Number.isFinite(Number(c.edge)) ? Number(c.edge) : (rel - 1 / odd);
+              const investmentScoreValue = Number(c.investment?.score || 0);
+              return {
+                m, pred, best: c, tier: tier.id, strict: tier.strict, odd, rel, edge,
+                label: c.label || pred.pick?.label || 'Pick',
+                market: c.market || '1n2',
+                pickKey: c.pickKey || c.key || pred.pick?.key || '',
+                ts: new Date(m.date || 0).getTime(),
+                score: (tier.strict ? 100 : 0) + investmentScoreValue + Math.max(-20, edge * 100) + rel * 10
+              };
+            })
+            .filter(Boolean)
+            .sort((a, b) => b.score - a.score);
+          const seenTier = new Set();
+          return ranked.filter(p => {
+            if (seenTier.has(p.tier)) return false;
+            seenTier.add(p.tier);
+            return true;
+          }).slice(0, 3);
+        } catch(e) { return []; }
+      }).sort((a, b) => a.ts - b.ts);
+      const v36Sports = [...new Set(v36PickPool.map(p => p.m.sport).filter(Boolean))].slice(0, 8);
+      const v36Filtered = v36PickPool.filter(p => {
+        if (v36Filter.sport && p.m.sport !== v36Filter.sport) return false;
+        if (v36Filter.tier && p.tier !== v36Filter.tier) return false;
+        if (v36Filter.time && v36HourBucket(p.m.date) !== v36Filter.time) return false;
+        return true;
+      });
+      const v36ByTier = Object.fromEntries(v36TierDefs.map(t => [t.id, []]));
+      v36Filtered.forEach(p => { if (v36ByTier[p.tier]) v36ByTier[p.tier].push(p); });
+      const v36CountsAll = Object.fromEntries(v36TierDefs.map(t => [t.id, v36PickPool.filter(p => p.tier === t.id).length]));
+      const v36Total = v36Filtered.length;
+      const v36UpcomingAll = terminalScanPool.filter(m => new Date(m?.date || 0).getTime() > Date.now());
+      const v36Next = v36UpcomingAll.slice(0, 6);
+      const v36CoverageLine = `${v36PickPool.length} picks intelligents · ${v36UpcomingAll.length} matchs detectes · data ${_dataAgeMin} min`;
+      const v36FilterButton = (kind, value, label, active) => `<button type="button" class="v36-filter-chip ${active ? 'is-active' : ''}" data-v36-filter="${esc(kind)}" data-v36-value="${esc(value)}">${label}</button>`;
+      const v36CompactCard = (p) => {
+        const { home, away } = getSides(p.m);
+        const tier = v36TierById[p.tier];
+        const relPct = Math.round(p.rel * 100);
+        const edgePct = Math.round(p.edge * 1000) / 10;
+        const timeLabel = fmtTime(p.m.date);
+        const title = `${v36TeamName(home)} - ${v36TeamName(away)}`;
+        return `<button type="button" class="v36-pick-card" data-tone="${esc(tier.tone)}" data-big-detail="${esc(String(p.m.id || ''))}">
+          <span class="v36-pick-card__meta"><b>${esc(sportLabel(p.m.sport || ''))}</b><em>${esc(timeLabel)}</em></span>
+          <strong>${esc(title)}</strong>
+          <span class="v36-pick-card__bet"><b>${esc(p.label)}</b><em>@${p.odd.toFixed(2)}</em></span>
+          <span class="v36-pick-card__signals"><i>${relPct}% conf.</i><i>${edgePct >= 0 ? '+' : ''}${edgePct}% edge</i>${p.strict ? '<i>strict</i>' : '<i>souple</i>'}</span>
+        </button>`;
+      };
+      const v36TierColumn = (tier) => {
+        const rows = (v36ByTier[tier.id] || []).slice(0, 14);
+        return `<section class="v36-tier-column" data-tone="${esc(tier.tone)}" id="tier-${esc(tier.id)}">
+          <header>
+            <span class="v36-tier-icon">${esc(tier.icon)}</span>
+            <div><h2>${esc(tier.label)}</h2><p>Cote ${esc(tier.range)} · ${esc(tier.desc)}</p></div>
+            <strong>${rows.length}</strong>
+          </header>
+          <div class="v36-tier-list">
+            ${rows.length ? rows.map(v36CompactCard).join('') : `<div class="v36-tier-empty">Aucun pick propre dans ce niveau pour l'instant.</div>`}
+          </div>
+        </section>`;
+      };
+      const v36NextHtml = v36Next.length ? v36Next.map(m => {
+        const { home, away } = getSides(m);
+        const diff = new Date(m.date || 0).getTime() - Date.now();
+        const mins = Math.max(0, Math.round(diff / 60000));
+        const countdown = mins < 60 ? `${mins}min` : `${Math.floor(mins / 60)}h${String(mins % 60).padStart(2, '0')}`;
+        return `<button type="button" class="v36-side-row" data-big-detail="${esc(String(m.id || ''))}">
+          <span>${esc(fmtTime(m.date))} · ${esc(countdown)}</span>
+          <strong>${esc(v36TeamName(home))} - ${esc(v36TeamName(away))}</strong>
+          <em>${esc(String(m.league_name || m.league || sportLabel(m.sport || '')).slice(0, 28))}</em>
+        </button>`;
+      }).join('') : `<div class="v36-tier-empty">Aucun match proche.</div>`;
+      const v36StatsHtml = [
+        ['Picks', String(v36PickPool.length)],
+        ['Matchs', String(v36UpcomingAll.length)],
+        ['Data', `${_dataAgeMin}m`],
+        ['Live', String(todayAllWinamax.filter(m => m.live || m.status === 'STATUS_IN_PROGRESS').length)]
+      ].map(([k, v]) => `<div><span>${esc(k)}</span><b>${esc(v)}</b></div>`).join('');
+      wrap.innerHTML = `
+        <div class="v36-home-shell">
+          <section class="v36-dayline" aria-label="Strategie du jour">
+            <strong>${_dataIsStale ? 'Donnees trop anciennes : refresh avant de jouer' : `Aujourd'hui : ${v36Total} picks affiches sur 5 niveaux`}</strong>
+            <span>${esc(v36CoverageLine)}</span>
+            <button type="button" class="page-btn" data-page="tous">Tout voir</button>
+          </section>
+          <section class="v36-filter-strip" aria-label="Filtres accueil">
+            <div>
+              ${v36FilterButton('sport', '', 'Tous sports', !v36Filter.sport)}
+              ${v36Sports.map(sp => v36FilterButton('sport', sp, `${sportIcon(sp)} ${esc(sportLabel(sp))}`, v36Filter.sport === sp)).join('')}
+            </div>
+            <div>
+              ${v36FilterButton('tier', '', 'Tous niveaux', !v36Filter.tier)}
+              ${v36TierDefs.map(t => v36FilterButton('tier', t.id, `${esc(t.icon)} ${esc(t.label)} ${v36CountsAll[t.id] || 0}`, v36Filter.tier === t.id)).join('')}
+            </div>
+            <div>
+              ${v36FilterButton('time', '', 'Toute la journee', !v36Filter.time)}
+              ${v36FilterButton('time', 'morning', 'Matin', v36Filter.time === 'morning')}
+              ${v36FilterButton('time', 'afternoon', 'AM', v36Filter.time === 'afternoon')}
+              ${v36FilterButton('time', 'evening', 'Soir', v36Filter.time === 'evening')}
+              ${v36FilterButton('time', 'night', 'Nuit', v36Filter.time === 'night')}
+            </div>
+          </section>
+          <div class="v36-home-grid">
+            <section class="v36-tier-board" aria-label="Picks par niveau de cote">
+              ${v36TierDefs.map(v36TierColumn).join('')}
+            </section>
+            <aside class="v36-home-rail" aria-label="Radar temps reel">
+              <section><header><span>Prochains matchs</span><b>${v36Next.length}</b></header>${v36NextHtml}</section>
+              <section><header><span>Stats live</span><b>${v36Total}</b></header><div class="v36-side-stats">${v36StatsHtml}</div></section>
+              <section><header><span>Genie mode</span><b>${v36PickPool.filter(p => p.strict).length}</b></header><p>Le site classe les picks par cote, confiance, edge et cohérence marché. Les handicaps restent écartés sauf value exceptionnelle.</p></section>
+            </aside>
+          </div>
+        </div>`;
+      wrap.querySelectorAll('[data-v36-filter]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const kind = btn.dataset.v36Filter;
+          const value = btn.dataset.v36Value || '';
+          const next = { ...v36Filter };
+          if (!value) delete next[kind];
+          else next[kind] = value;
+          try { localStorage.setItem(v36FilterKey, JSON.stringify(next)); } catch(e) {}
+          renderDashboardPage(wrap);
+        });
+      });
+      const v36MatchById = (id) => {
+        let found = null;
+        Object.values(data.days || {}).forEach(arr => (arr || []).forEach(m => { if (String(m.id) === String(id)) found = m; }));
+        return found;
+      };
+      wrap.querySelectorAll('[data-big-detail]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const m = v36MatchById(btn.dataset.bigDetail || btn.dataset.matchId);
+          if (m && typeof openDetail === 'function') openDetail(m);
+        });
+      });
+      return;
+    }
+
     const KELLY_FRAC = 0.25, CAP_PCT = 0.10, MIN_STAKE = 0.10, DAILY_CAP_PCT = 0.20;
     const rawCandidates = [];
     // recommander des matchs déjà joués). Pause stop-loss/take-profit supprimée
