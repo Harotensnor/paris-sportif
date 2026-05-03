@@ -15167,7 +15167,9 @@
         return (v36TierRank[a.tier] - v36TierRank[b.tier]) || (b.odd - a.odd) || (b.edge - a.edge) || (a.ts - b.ts);
       });
       const v36TableRows = v36Sorted.slice(0, 360);
-      const v36UpcomingAll = terminalScanPool.filter(m => new Date(m?.date || 0).getTime() > Date.now() && !m.completed);
+      const v36UpcomingAll = terminalScanPool
+        .filter(m => new Date(m?.date || 0).getTime() > Date.now() && !m.completed)
+        .sort((a, b) => new Date(a?.date || 0).getTime() - new Date(b?.date || 0).getTime());
       const v37LiveAll = terminalScanPool.filter(m => m?.live || m?.status === 'STATUS_IN_PROGRESS');
       const v37FinishedAll = terminalScanPool.filter(m => m?.completed || _isMatchEffectivelyDone(m));
       const v36Next = v36UpcomingAll.slice(0, 6);
@@ -15344,7 +15346,7 @@
         const mins = Math.max(0, Math.round(diff / 60000));
         const countdown = mins < 60 ? `${mins}min` : `${Math.floor(mins / 60)}h${String(mins % 60).padStart(2, '0')}`;
         return `<button type="button" class="v36-side-row" data-big-detail="${esc(String(m.id || ''))}">
-          <span>${esc(fmtTime(m.date))} · ${esc(countdown)}</span>
+          <span>${esc(v37DateLabel(m.date))} · ${esc(fmtTime(m.date))} · ${esc(countdown)}</span>
           <strong>${esc(v36TeamName(home))} - ${esc(v36TeamName(away))}</strong>
           <em>${esc(String(m.league_name || m.league || sportLabel(m.sport || '')).slice(0, 28))}</em>
         </button>`;
@@ -17207,14 +17209,22 @@
         const r = mins % 60;
         return r ? `dans ${h}h${String(r).padStart(2, '0')}` : `dans ${h}h`;
       };
+      const bbfRailDateLabel = (m) => {
+        try { return v37DateLabel(m?.date); } catch(e) {
+          try {
+            return new Date(m?.date || 0).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+          } catch(_e) { return ''; }
+        }
+      };
       const bbfRailUpcoming = terminalScanPool
         .filter(m => new Date(m?.date || 0).getTime() > Date.now())
+        .sort((a, b) => new Date(a?.date || 0).getTime() - new Date(b?.date || 0).getTime())
         .slice(0, 6);
       const bbfRailUpcomingHtml = bbfRailUpcoming.length ? bbfRailUpcoming.map(m => {
         const { home, away } = getSides(m);
         const league = String(m.league_name || m.league || '').slice(0, 22);
         return `<button type="button" class="v36-rail-row" data-big-detail="${esc(String(m.id || ''))}" aria-label="Ouvrir ${esc(bbfTeamName(home))} contre ${esc(bbfTeamName(away))}">
-          <span><b>${esc(fmtTime(m.date))}</b><em>${esc(bbfRailCountdown(m))}</em></span>
+          <span><b>${esc(bbfRailDateLabel(m))} · ${esc(fmtTime(m.date))}</b><em>${esc(bbfRailCountdown(m))}</em></span>
           <strong>${esc(bbfTeamName(home))} - ${esc(bbfTeamName(away))}</strong>
           <small>${esc(league || sportLabel(m.sport || ''))}</small>
         </button>`;
