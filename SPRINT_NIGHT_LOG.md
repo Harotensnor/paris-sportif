@@ -1609,3 +1609,9 @@
 - Apres: Profil pilote les notifications, SW ouvre la bonne destination, fallback navigateur robuste.
 - Impact: Big Bets imminents et value picks alertent sans serveur externe, opt-in explicite conserve.
 - Verif: syntax app.js/sw.js OK, bundle check OK.
+
+## Sprint v35.221 — Phase 11 P-11.26 Calculateur gains rapide (11:00 UTC)
+- Avant: les cartes indiquaient un gain fixe avec mise suggérée seulement.
+- Apres: chaque Big Bet expose un calcul mise -> retour/profit modifiable sans ouvrir la modale.
+- Impact: Theo voit immediatement le gain net pour son montant reel.
+- Verif: syntax app.js/sw.js OK, bundle check OK.
