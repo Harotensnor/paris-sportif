@@ -1696,3 +1696,9 @@
 - Apres: runner elargi aux lignes, presets, chips et 8 pages; 254 clics, 0 failure.
 - Impact: les interactions principales repondent apres la refonte couverture.
 - Verif: phase12_click_audit.json, syntax click_audit OK.
+
+## Sprint v35.239 — Phase 12 P-12.8 Audit routes (15:03 local)
+- Avant: aliases cagnotte/agent chainaient vers bilan, hors VALID_PAGES moderne.
+- Apres: aliases corriges vers Performance et script route_audit verifie 27 routes/aliases.
+- Impact: anciens bookmarks et hash legacy redirigent vers un hub utile au lieu de fallback flou.
+- Verif: phase12_route_audit.json, 27 routes OK, 0 failure.
