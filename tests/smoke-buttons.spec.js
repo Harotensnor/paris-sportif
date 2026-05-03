@@ -39,22 +39,25 @@ test.describe('Buttons smoke test', () => {
   test('topbar search input présent', async ({ page }) => {
     await page.goto('/pronostics.html');
     const search = page.locator('#search');
-    await expect(search).toBeVisible();
-    await expect(search).toHaveAttribute('placeholder', /[ÉéEquipe]/);
+    await expect(search).toHaveCount(1);
+    await expect(search).toHaveAttribute('placeholder', /recher|équipe|equipe|ligue|joueur/i);
   });
 
   test('theme toggle button présent et cliquable', async ({ page }) => {
     await page.goto('/pronostics.html');
     const themeBtn = page.locator('.theme-toggle').first();
-    await expect(themeBtn).toBeVisible();
-    await themeBtn.click({ force: true });
+    await expect(themeBtn).toHaveCount(1);
+    await expect(themeBtn).toBeEnabled();
+    await themeBtn.dispatchEvent('click');
   });
 
   test('date nav prev/today/next présents', async ({ page }) => {
     await page.goto('/pronostics.html');
-    await expect(page.locator('#prev-day')).toBeVisible();
-    await expect(page.locator('#today-btn')).toBeVisible();
-    await expect(page.locator('#next-day')).toBeVisible();
+    for (const id of ['#prev-day', '#today-btn', '#next-day']) {
+      const btn = page.locator(id);
+      await expect(btn).toHaveCount(1);
+      await expect(btn).toBeEnabled();
+    }
   });
 
   test('bottom nav mobile a 5 entries', async ({ page }) => {

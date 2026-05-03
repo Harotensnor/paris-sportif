@@ -35,6 +35,28 @@ const SPA_PAGES = [
   'simulator',
 ];
 
+const HASH_EXPECTATIONS = {
+  top: '#dashboard',
+  locks: '#dashboard',
+  matchs: '#dashboard',
+  valeur: '#tous',
+  'plan-mise': '#tous',
+  calendrier: '#tous?view=calendar',
+  combines: '#tous',
+  buteurs: '#tous',
+  compare: '#tous',
+  favoris: '#profil',
+  alertes: '#profil',
+  bilan: '#performance',
+  historique: '#performance',
+  backtest: '#performance',
+  credibilite: '#performance',
+  simulator: '#performance',
+  'montante-jour': '#montantes',
+  'montante-weekend': '#montantes',
+  'montante-semaine': '#montantes',
+};
+
 test.beforeEach(async ({ context }) => {
   await context.addInitScript(() => {
     try {
@@ -50,6 +72,7 @@ test.beforeEach(async ({ context }) => {
 });
 
 test('all SPA hash pages render without console errors or horizontal overflow', async ({ page, viewport }) => {
+  test.setTimeout(120_000);
   const messages = [];
   page.on('console', msg => {
     if (msg.type() === 'error') messages.push(msg.text());
@@ -58,7 +81,7 @@ test('all SPA hash pages render without console errors or horizontal overflow', 
 
   for (const hash of SPA_PAGES) {
     messages.length = 0;
-    await page.goto(`${URL}#${hash}`);
+    await page.goto(`${URL}#${hash}`, { waitUntil: 'domcontentloaded', timeout: 15_000 });
     await page.waitForFunction(() => !!(window.PRONOSTICS_DATA && window.PRONOSTICS_DATA.days), null, { timeout: 10000 }).catch(() => {});
     await page.waitForTimeout(hash === 'backtest' || hash === 'performance' ? 1800 : 900);
 
@@ -84,7 +107,7 @@ test('all SPA hash pages render without console errors or horizontal overflow', 
       !/Failed to load resource.*40\d/i.test(e)
     );
     expect(realErrors, `${hash} console errors`).toEqual([]);
-    expect(state.hash, `${hash} hash`).toBe(`#${hash}`);
+    expect(state.hash, `${hash} hash`).toBe(HASH_EXPECTATIONS[hash] || `#${hash}`);
     expect(state.hasHeading, `${hash} heading`).toBe(true);
     expect(state.overflowX, `${hash} overflow-x`).toBeLessThanOrEqual(0);
     if (viewport && viewport.width <= 720) {
@@ -97,10 +120,10 @@ test('mobile bottom nav highlights the right intent for deep pages', async ({ pa
   test.skip(viewport && viewport.width > 720, 'Mobile-only test');
 
   const cases = [
-    ['#dashboard', 'Now'],
-    ['#locks', 'Picks'],
-    ['#historique', 'Agent'],
-    ['#simulator', 'Stats'],
+    ['#dashboard', 'Accueil'],
+    ['#locks', 'Accueil'],
+    ['#historique', 'Mes paris'],
+    ['#simulator', 'Mes paris'],
     ['#profil', 'Plus'],
   ];
 

@@ -1811,3 +1811,8 @@
 - Apres: clic equipe charge le full data si besoin et affiche jusqu'a 5 prochains matchs dans une fiche.
 - Impact: New York Knicks retourne 4 matchs a venir, chaque ligne ouvre la modale detail.
 - Verif: test navigateur search -> bottom sheet, 0 console error, syntax OK.
+## Sprint v35.261 — Phase 12 P-12.28 Revalidation Playwright (17:23 local)
+- Avant: tests obsoletes apres refonte desktop/sidebar et alias #calendrier.
+- Apres: specs smoke/routes/click alignees sur UI actuelle, audit click mobile stabilise.
+- Impact: 33 tests passes / 1 skip mobile-only desktop, modal 5 sports et coherence OK.
+- Verif: Playwright selected suite 33 passed, 1 skipped, 0 failed.
