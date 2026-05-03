@@ -235,8 +235,12 @@
   };
   function _pageFromHash() {
     try {
-      let h = (location.hash || '').replace(/^#/, '').trim();
-      h = h.split('?')[0];
+      const rawHash = (location.hash || '').replace(/^#/, '').trim();
+      let h = rawHash.split('?')[0];
+      if (h === 'calendrier') {
+        h = 'tous';
+        try { history.replaceState(null, '', location.pathname + location.search + '#tous?view=calendar'); } catch(e) {}
+      }
       if (PAGE_ALIASES[h]) {
         h = PAGE_ALIASES[h];
         try { history.replaceState(null, '', location.pathname + location.search + '#' + h); } catch(e) {}
@@ -18584,6 +18588,18 @@
       return 'all';
     };
     const tousPreset = _readTousPreset();
+    const _readTousView = () => {
+      try {
+        const hash = location.hash || '';
+        const qIdx = hash.indexOf('?');
+        if (qIdx >= 0) {
+          const view = new URLSearchParams(hash.slice(qIdx + 1)).get('view');
+          if (view === 'calendar') return 'calendar';
+        }
+      } catch(e) {}
+      return 'list';
+    };
+    const tousView = _readTousView();
     const presetMeta = {
       all: { label: 'Tout voir', short: 'Tout voir', help: 'Tous les matchs detectes, sans filtre edge/confiance.' },
       bigbets: { label: 'Big Bets', short: 'Big Bets', help: 'Cotes 2.20-3.50, edge >= 7%, confiance >= 60%.' },
@@ -18710,6 +18726,7 @@
         if (tousFilters.minOdd > 0) params.set('odd', tousFilters.minOdd);
         if (tousPreset !== 'all') params.set('preset', tousPreset);
         if (tousSort !== 'kickoff') params.set('sort', tousSort);
+        if (tousView === 'calendar') params.set('view', 'calendar');
         const q = params.toString();
         const newHash = q ? `${hash}?${q}` : hash;
         if (location.hash !== newHash) {
@@ -18874,6 +18891,86 @@
       : 'flex-wrap:wrap;';
     const tousRailItemStyle = tousMobile ? 'flex:0 0 auto;scroll-snap-align:start;min-height:44px;' : '';
     const tousSelectStyle = tousMobile ? 'min-height:44px;' : '';
+    const _calendarDayKey = (ts) => {
+      try { return new Date(ts).toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' }); } catch(e) { return ''; }
+    };
+    const _calendarDayLabel = (iso) => {
+      try {
+        return new Intl.DateTimeFormat('fr-FR', { weekday: 'short', day: '2-digit', month: 'short', timeZone: 'Europe/Paris' }).format(new Date(iso + 'T12:00:00'));
+      } catch(e) { return iso; }
+    };
+    const calendarDays = Array.from({ length: 7 }, (_, i) => addDays(todayIso, i));
+    const calendarRows = filteredCoverageRows
+      .filter(p => !p.settled && p.ts >= nowTs - 60000)
+      .sort((a,b) => a.ts - b.ts);
+    const calendarValueRows = filteredPicks
+      .filter(p => !p.settled && !p.startedAndNotSettled && isValuePick(p))
+      .sort((a,b) => b.edge - a.edge);
+    const calendarByDay = {};
+    const calendarValueByDay = {};
+    calendarDays.forEach(d => { calendarByDay[d] = []; calendarValueByDay[d] = []; });
+    calendarRows.forEach(p => {
+      const k = _calendarDayKey(p.ts);
+      if (calendarByDay[k]) calendarByDay[k].push(p);
+    });
+    calendarValueRows.forEach(p => {
+      const k = _calendarDayKey(p.ts);
+      if (calendarValueByDay[k]) calendarValueByDay[k].push(p);
+    });
+    const maxCalendarCount = Math.max(1, ...calendarDays.map(d => calendarByDay[d].length));
+    const renderCalendarMatch = (p) => {
+      const hn = (p.home && (p.home.short || p.home.name)) || '?';
+      const an = (p.away && (p.away.short || p.away.name)) || '?';
+      const sportEm = { football:'⚽', tennis:'🎾', basketball:'🏀', hockey:'🏒', baseball:'⚾', 'american-football':'🏈', mma:'🥊', golf:'⛳', racing:'🏎️', rugby:'🏉' }[p.m?.sport] || '🎯';
+      const time = fmtTime(p.m?.date);
+      return `<button type="button" class="calendar-match" data-match-id="${esc(String(p.m?.id || ''))}" style="width:100%;min-height:38px;text-align:left;border:1px solid var(--border);border-radius:8px;background:rgba(255,255,255,.035);color:var(--text);padding:7px 8px;cursor:pointer;display:grid;grid-template-columns:auto 1fr auto;gap:7px;align-items:center;">
+        <span style="font-size:13px;">${sportEm}</span>
+        <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11.5px;font-weight:800;">${esc(hn)} vs ${esc(an)}</span>
+        <span style="font-size:10.5px;color:var(--text-dim2);font-weight:850;">${esc(time)}</span>
+      </button>`;
+    };
+    const calendarHtml = tousView === 'calendar' ? `
+      <section style="margin:14px 0 16px;padding:${tousMobile ? '12px' : '16px'};background:linear-gradient(135deg,rgba(167,139,250,.12),rgba(16,185,129,.06));border:1px solid rgba(167,139,250,.26);border-radius:14px;">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
+          <div>
+            <div style="font-size:10.5px;color:var(--brand);font-weight:900;text-transform:uppercase;letter-spacing:.8px;">Calendrier 7 jours</div>
+            <h2 style="margin:3px 0 0;font-size:${tousMobile ? '19px' : '24px'};color:var(--text);letter-spacing:-.4px;">${calendarRows.length} matchs accessibles, jour par jour</h2>
+          </div>
+          <div style="font-size:11.5px;color:var(--text-dim);font-weight:750;">Clique un match pour ouvrir sa fiche</div>
+        </div>
+        <div style="display:grid;grid-template-columns:${tousMobile ? '1fr' : 'repeat(7,minmax(0,1fr))'};gap:10px;">
+          ${calendarDays.map(day => {
+            const rows = calendarByDay[day] || [];
+            const values = calendarValueByDay[day] || [];
+            const heat = rows.length / maxCalendarCount;
+            const sports = rows.reduce((acc, p) => {
+              acc[p.sport] = (acc[p.sport] || 0) + 1;
+              return acc;
+            }, {});
+            const topSports = Object.entries(sports).sort((a,b) => b[1] - a[1]).slice(0, 2).map(([s,n]) => `${sportLabelMap[s] || s} ${n}`).join(' · ');
+            return `<article data-calendar-day="${esc(day)}" style="min-height:${tousMobile ? 'auto' : '270px'};border:1px solid var(--border);border-radius:12px;background:linear-gradient(180deg,rgba(167,139,250,${(0.04 + heat * 0.16).toFixed(3)}),rgba(255,255,255,.025));padding:11px;display:flex;flex-direction:column;gap:9px;">
+              <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start;">
+                <div>
+                  <div style="font-size:12px;color:var(--text);font-weight:900;text-transform:capitalize;">${esc(_calendarDayLabel(day))}</div>
+                  <div style="font-size:10.5px;color:var(--text-dim2);margin-top:2px;">${esc(topSports || 'Aucun sport')}</div>
+                </div>
+                <span style="min-width:36px;text-align:center;padding:4px 7px;border-radius:999px;background:${rows.length ? 'rgba(16,185,129,.14)' : 'rgba(148,163,184,.12)'};color:${rows.length ? 'var(--accent)' : 'var(--text-dim2)'};font-size:11px;font-weight:950;">${rows.length}</span>
+              </div>
+              <div style="height:6px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden;">
+                <div style="height:100%;width:${Math.max(8, Math.round(heat * 100))}%;background:linear-gradient(90deg,var(--brand),var(--accent));border-radius:999px;"></div>
+              </div>
+              ${values.length ? `<div style="font-size:10.5px;color:#fbbf24;font-weight:850;">${values.length} pick${values.length>1?'s':''} value ce jour</div>` : '<div style="font-size:10.5px;color:var(--text-dim2);font-weight:750;">Couverture brute, pas de forçage value</div>'}
+              <div style="display:flex;flex-direction:column;gap:6px;margin-top:2px;">${rows.slice(0, tousMobile ? 4 : 5).map(renderCalendarMatch).join('') || '<div style="padding:12px 8px;color:var(--text-dim2);font-size:11.5px;text-align:center;border:1px dashed var(--border);border-radius:8px;">Aucun match détecté</div>'}</div>
+              ${rows.length > (tousMobile ? 4 : 5) ? `<button type="button" data-calendar-day-jump="${esc(day)}" style="margin-top:auto;min-height:34px;border:1px solid var(--brand-border);border-radius:999px;background:rgba(167,139,250,.10);color:var(--brand);font-size:11px;font-weight:900;cursor:pointer;">Voir les ${rows.length} matchs</button>` : ''}
+            </article>`;
+          }).join('')}
+        </div>
+      </section>` : '';
+    const tousViewToggleHtml = `
+        <div style="margin:${tousMobile ? '10px 0 4px' : '14px 0 4px'};display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <button type="button" data-tous-view="list" style="min-height:38px;border:1px solid ${tousView==='list'?'var(--brand)':'var(--border)'};border-radius:999px;background:${tousView==='list'?'rgba(167,139,250,.16)':'var(--panel)'};color:${tousView==='list'?'var(--brand)':'var(--text-dim)'};padding:7px 12px;font-size:12px;font-weight:900;cursor:pointer;">Liste</button>
+          <button type="button" data-tous-view="calendar" style="min-height:38px;border:1px solid ${tousView==='calendar'?'var(--brand)':'var(--border)'};border-radius:999px;background:${tousView==='calendar'?'rgba(167,139,250,.16)':'var(--panel)'};color:${tousView==='calendar'?'var(--brand)':'var(--text-dim)'};padding:7px 12px;font-size:12px;font-weight:900;cursor:pointer;">Calendrier 7j</button>
+        </div>`;
 
     const renderRow = (p, isFini) => {
       const hn = (p.home && p.home.name) || '?';
@@ -19243,6 +19340,8 @@
             ${_sourcesStats.winamax > 0 ? `<span><b class="u-text-accent">Winamax</b> ${_sourcesStats.winamax} cotes 1N2 trackables</span>` : ''}
           </div>
         ` : ''}
+        ${tousViewToggleHtml}
+        ${calendarHtml}
 
         <div class="tous-filter-bar" style="position:sticky;top:56px;z-index:20;margin:${tousMobile ? '12px 0 8px' : '18px 0 10px'};padding:${tousMobile ? '10px' : '14px'};background:var(--panel);border:1px solid var(--border);border-radius:10px;display:flex;flex-direction:column;gap:${tousMobile ? '8px' : '12px'};backdrop-filter:saturate(140%) blur(8px);-webkit-backdrop-filter:saturate(140%) blur(8px);">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
@@ -19282,6 +19381,43 @@
         </div>
         ${loadMoreHtml}
       </div>`;
+
+    wrap.querySelectorAll('[data-tous-view]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const view = btn.dataset.tousView === 'calendar' ? 'calendar' : 'list';
+        try {
+          const params = new URLSearchParams();
+          if (view === 'calendar') params.set('view', 'calendar');
+          if (tousPreset !== 'all') params.set('preset', tousPreset);
+          if (tousSort !== 'kickoff') params.set('sort', tousSort);
+          const q = params.toString();
+          history.replaceState(null, '', location.pathname + location.search + '#tous' + (q ? '?' + q : ''));
+        } catch(e) {}
+        renderTousPage(wrap);
+      });
+    });
+    wrap.querySelectorAll('.calendar-match[data-match-id]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.matchId;
+        if (!id || typeof openDetail !== 'function') return;
+        let found = null;
+        Object.values((data && data.days) || {}).forEach(arr =>
+          (arr || []).forEach(m => { if (String(m.id) === String(id)) found = m; })
+        );
+        if (found) openDetail(found);
+      });
+    });
+    wrap.querySelectorAll('[data-calendar-day-jump]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const day = btn.dataset.calendarDayJump || '';
+        const rows = Array.from(wrap.querySelectorAll('.tous-row[data-match-date]'));
+        const row = rows.find(r => {
+          const ts = new Date(r.dataset.matchDate || '').getTime();
+          return Number.isFinite(ts) && _calendarDayKey(ts) === day;
+        });
+        if (row) row.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      });
+    });
 
     // Tab switching
     wrap.querySelectorAll('[data-tous-tab]').forEach(btn => {
@@ -28285,7 +28421,8 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     document.addEventListener('click', (ev) => {
       const btn = ev.target && ev.target.closest && ev.target.closest('.page-btn');
       if (!btn || !btn.dataset || !btn.dataset.page) return;
-      currentPage = PAGE_ALIASES[btn.dataset.page] || btn.dataset.page;
+      const requestedPage = btn.dataset.page;
+      currentPage = PAGE_ALIASES[requestedPage] || requestedPage;
       // applyPageView fait location.replace() vers la page statique HTML,
       // donc on quitte pronostics.html. Persister cette valeur cause une
       // boucle de redirect au prochain reload. Voir L133 pour le filtre
@@ -28300,7 +28437,7 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
       // l'historique. Si l'user veut back, il revient au hash
       // précédent qui était valide, puis hashchange synchronise.
       try {
-        const targetHash = '#' + currentPage;
+        const targetHash = requestedPage === 'calendrier' ? '#tous?view=calendar' : '#' + currentPage;
         if (location.hash !== targetHash) {
           history.replaceState(null, '', location.pathname + location.search + targetHash);
         }
