@@ -1,19 +1,19 @@
 # Ensemble Model Validation
 
-- Generated: `2026-05-03T18:09:23Z`
+- Generated: `2026-05-03T19:32:47Z`
 - Status: **ok**
-- Historical predictions: **701 / 701**
-- Ensemble Brier: **0.2333** vs random 0.2500
+- Historical predictions: **714 / 714**
+- Ensemble Brier: **0.2355** vs random 0.2500
 - High disagreement (>0.15 variance): **0**
-- Current upcoming checked: **266**, predictions **266**
+- Current upcoming checked: **254**, predictions **254**
 
 ## Component Comparison
 
 | Kind | N | Avg weight | Component Brier | Ensemble same rows | Δ component-ensemble |
 |---|---:|---:|---:|---:|---:|
-| dixon_coles_xg | 501 | 0.5 | 0.2391 | 0.235 | 0.0041 |
-| elo | 34 | 0.3 | 0.2852 | 0.2524 | 0.0327 |
-| form | 103 | 0.3 | 0.2376 | 0.2256 | 0.0121 |
+| dixon_coles_xg | 512 | 0.5 | 0.242 | 0.2364 | 0.0057 |
+| elo | 36 | 0.3 | 0.2889 | 0.2523 | 0.0366 |
+| form | 90 | 0.3 | 0.2471 | 0.2428 | 0.0043 |
 
 ## Warnings
 
@@ -21,8 +21,8 @@
 
 ## Current Snapshot
 
-- Component counts: `{'n': 266, 'avg': 2.1992, 'p95': 3.0, 'max': 4.0}`
-- Variance: `{'n': 266, 'avg': 0.0082, 'p95': 0.0432, 'max': 0.0787}`
-- V36 tier counts: `{'tier3_valeur': 15, 'tier2_solide': 15, 'opportunity_other': 224, 'tier4_big_odds': 12}`
-- V36 qualified tier picks: **42**
+- Component counts: `{'n': 254, 'avg': 2.2047, 'p95': 4.0, 'max': 4.0}`
+- Variance: `{'n': 254, 'avg': 0.008, 'p95': 0.0432, 'max': 0.0787}`
+- V36 tier counts: `{'tier2_solide': 12, 'tier3_valeur': 13, 'opportunity_other': 214, 'tier1_sur': 1, 'tier4_big_odds': 13, 'unpriced': 1}`
+- V36 qualified tier picks: **39**
 - V36 strict tier picks: **7**

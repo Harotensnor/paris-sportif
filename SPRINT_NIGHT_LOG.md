@@ -1976,3 +1976,8 @@
 - Apres: shortcuts V36 vers Accueil/Tous/Performance/Methode avec icones, description PWA alignee 5 tiers, description HTML raccourcie, meta no-cache retirees au profit du SW, viewport iPhone notch OK.
 - Impact: bugs #61/#62/#63/#71/#72/#84 avances sans changer l'UI ni la data; sitemap root passe en daily pour refléter le refresh fréquent.
 - Verif: manifest JSON OK, app.js syntax OK, head audit OK (plus de meta Cache-Control/Pragma/Expires), diff-check OK.
+## Sprint v35.294 — AUTO 10/10 Modèle ensemble guardrails (19:48 UTC)
+- Avant: quand l'ensemble avait moins de 2 sous-modèles, agreement_variance pouvait valoir 0 et donner une impression de consensus parfait.
+- Après: variance insuffisante = null + flag insufficient; l'abstain ajoute ensemble_insufficient quand le sport n'a pas assez de signaux purs.
+- Impact: bug #74 traité sans faux positif Dixon-Coles: le 1-1 était déjà couvert par tau=1-rho et par tests unitaires existants.
+- Verif: app.js syntax OK; validate_ensemble_model.py OK (714 prédictions, Brier ensemble 0.2355, warnings=0).

@@ -7111,7 +7111,7 @@
             const mean = compProbs.reduce((x,y) => x+y, 0) / compProbs.length;
             return a + (b - mean)*(b - mean);
           }, 0) / compProbs.length
-        : 0;
+        : null;
       const roundProb = v => Math.round((Number(v) || 0) * 1000) / 1000;
       const modelKind = name => {
         const n = String(name || '').toLowerCase();
@@ -7131,7 +7131,8 @@
           pick_prob: roundProb(c[field]),
           probs: { home: roundProb(c.pH), draw: roundProb(c.pD), away: roundProb(c.pA) }
         })),
-        agreement_variance: Math.round(variance * 10000) / 10000,
+        agreement_variance: variance == null ? null : Math.round(variance * 10000) / 10000,
+        insufficient: compProbs.length < 2,
         final_prob: roundProb(best_pick[1]),
         final_probs: { home: roundProb(final.pH), draw: roundProb(final.pD), away: roundProb(final.pA) },
         pick_key: pickKey
@@ -7219,8 +7220,10 @@
     const pickEdge = Number(pickOdd) > 1 ? reliability - (1 / Number(pickOdd)) : null;
     const dqNow = (typeof computeDataQuality === 'function') ? computeDataQuality(match) : { score: 4, max: 4 };
     const abstainReasons = [];
+    const minPureComponents = match.sport === 'tennis' ? 1 : 2;
     if (reliability < 0.50) abstainReasons.push('confidence_lt_50');
     if (pickEdge != null && pickEdge < 0.02) abstainReasons.push('edge_lt_2pt');
+    if (!ensembleMeta || pureCompCount < minPureComponents) abstainReasons.push('ensemble_insufficient');
     if ((ensembleMeta?.agreement_variance || 0) > 0.15) abstainReasons.push('model_disagreement');
     if ((Number(dqNow?.score) || 0) < 2) abstainReasons.push('data_quality_lt_2');
     const abstain = {
@@ -7228,7 +7231,7 @@
       reasons: abstainReasons,
       edge: pickEdge == null ? null : Math.round(pickEdge * 1000) / 1000,
       data_quality: { score: Number(dqNow?.score) || 0, max: Number(dqNow?.max) || 4 },
-      variance: ensembleMeta?.agreement_variance || 0
+      variance: ensembleMeta?.agreement_variance ?? null
     };
     const ciSample = Math.max(24, Math.min(260, 40 + (Number(reliabilityMeta?.componentCount) || pureCompCount || 1) * 35 + (Number(dqNow?.score) || 0) * 12));
     const probCi = wilsonProbInterval(reliability, ciSample);
@@ -7276,7 +7279,7 @@
       // picks border-line où l'edge perçu est largement un mirage de bruit.
       skip: abstain.active
         || reliability < 0.50
-        || pureCompCount < (match.sport === 'tennis' ? 1 : 2)
+        || pureCompCount < minPureComponents
         || (match.sport === 'tennis'
             && !match.tennis_features
             && home?.rank && away?.rank
