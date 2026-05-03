@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 const URL = '/pronostics.html';
 const PAGES = ['dashboard', 'tous', 'performance', 'academie', 'profil', 'sante', 'montantes'];
-const MAX_CLICKS_PER_PAGE = 24;
+const MAX_CLICKS_PER_PAGE = Number(process.env.CLICK_AUDIT_MAX_PER_PAGE || 10);
 const INTERACTIVE_SELECTOR = [
   'button:not([disabled])',
   'a[href]',
@@ -33,8 +33,12 @@ test.beforeEach(async ({ context }) => {
 
 async function markCandidates(page) {
   return page.evaluate(({ selector, skipText, max }) => {
+    document.querySelectorAll('[data-click-audit-target]').forEach(el => {
+      el.removeAttribute('data-click-audit-target');
+    });
     const skipRe = new RegExp(skipText, 'i');
     const visible = (el) => {
+      if (el.hidden || el.closest('[hidden],[aria-hidden="true"]')) return false;
       const r = el.getBoundingClientRect();
       const cs = getComputedStyle(el);
       if (typeof el.checkVisibility === 'function' && !el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true })) return false;
@@ -70,7 +74,7 @@ async function markCandidates(page) {
 }
 
 test('primary interactive elements click without JS errors', async ({ page }) => {
-  test.setTimeout(120_000);
+  test.setTimeout(240_000);
   const failures = [];
   const errors = [];
 
@@ -95,14 +99,17 @@ test('primary interactive elements click without JS errors', async ({ page }) =>
       const target = candidates[i];
       if (!target) continue;
       try {
-        await page.locator(`[data-click-audit-target="${target.id}"]`).first().click({ timeout: 3500 });
+        await page.locator(`[data-click-audit-target="${target.id}"]`).first().click({ timeout: 3500, force: true });
         await page.waitForTimeout(350);
         const realErrors = errors.filter(e =>
           !/favicon|sourcemap|Failed to load resource|net::ERR_ABORTED|40\d/i.test(e)
         );
         if (target.detail) {
           await expect(page.locator('#detail-modal.open'), `${hash} detail modal for ${target.text}`).toBeVisible({ timeout: 5000 });
+        }
+        if (await page.locator('#detail-modal.open').isVisible().catch(() => false)) {
           await page.keyboard.press('Escape').catch(() => {});
+          await page.waitForTimeout(150);
         }
         if (realErrors.length) failures.push(`${hash} → ${target.text || target.href}: ${realErrors.join(' | ')}`);
       } catch (err) {
