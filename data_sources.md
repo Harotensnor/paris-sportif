@@ -100,3 +100,13 @@ Implementation:
 - `scripts/build_niche_markets.py` follows the same empty-safe pattern for
   darts/snooker, deriving winner and total legs/frames only when those sports
   appear in the Winamax-visible feed.
+
+## Winamax Boosted Odds
+
+Implementation:
+- `scripts/detect_boosted_odds.py`
+- Output: `boosted_odds.json`
+- Scope: explicit boost/super-cote/promo wording or fields already present in
+  `winamax_markets.json`.
+- Guardrail: no inference. If Winamax does not expose an explicit boost marker,
+  the sidecar stays `status: "empty"` instead of labeling normal odds as boosted.

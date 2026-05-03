@@ -1573,3 +1573,9 @@
 - Apres: build_niche_markets.py génère winner + totals legs/frames si ces sports apparaissent.
 - Impact: pipeline prêt sans faux picks; statut `empty` propre aujourd'hui.
 - Verif: py_compile OK, build_health OK, niche_markets status empty.
+
+## Sprint v35.215 — Phase 11 P-11.20 Cotes boostées Winamax (10:38 UTC)
+- Avant: aucun détecteur explicite de cotes boostées dans les marchés Winamax.
+- Apres: detect_boosted_odds.py scanne catalogue + marchés sans inférer de faux boost.
+- Impact: 644 matchs scannés; statut `empty` propre car aucun marqueur boost explicite aujourd'hui.
+- Verif: py_compile OK, build_health OK, boosted_odds status empty.
