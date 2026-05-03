@@ -230,8 +230,8 @@
     'montantes-weekend': 'montantes',
     'montantes-semaine': 'montantes',
     'vue-globale': 'performance',  // alias raccourci page Perf
-    'cagnotte': 'bilan',           // alias historique
-    'agent': 'bilan',              // alias 'page Mon agent'
+    'cagnotte': 'performance',     // alias historique
+    'agent': 'performance',        // alias 'page Mon agent'
   };
   function _pageFromHash() {
     try {
