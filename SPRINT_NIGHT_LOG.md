@@ -1851,3 +1851,8 @@
 - Apres: header V36 reduit a logo, recherche large, alertes et profil; la nav centrale est retiree, les anciens controles restent caches pour compatibilite JS.
 - Impact: premier signal V36 plus lisible desktop-first, search prioritaire, profil compact; mobile garde hamburger + alertes/profil.
 - Verif: syntax app.js/sw.js OK, diff --check OK, visual_capture v36-header-final 32/32 OK.
+## Sprint v35.269 — Phase 12 V36 P-12.6 Sidebar 5 hubs (16:38 UTC)
+- Avant: la navigation principale restait dispersee entre vieux hubs, rail gauche sport/recherche et sub-nav cachee selon les pages.
+- Apres: sidebar V36 fixe avec 5 hubs Accueil/Tous/Performance/Methode/Reglages; le drawer mobile reutilise la meme structure.
+- Impact: navigation ramenee a 5 choix clairs, ancien rail bbf-left-rail cache sur accueil desktop pour preparer la grille 5 tiers.
+- Verif: visual_capture v36-sidebar-proof 32/32 OK, desktop padding-left 264px confirme, syntax/diff OK.
