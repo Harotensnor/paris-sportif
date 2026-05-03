@@ -537,7 +537,7 @@ Résultat : 225 combinaisons sport × cote min × marché testées ; 277 lignes 
 - Preuve : `phase12_tous_filter_combo_audit.json` (`suspiciousZeroCombos` : basketTotal/baseballTotal/hockeyTotal = 0 à cote min 1.30/1.50/2.00).
 - Constat : 20 matchs basket, 17 baseball, 11 hockey sont bien détectés, mais les candidats `basketTotal`, `baseballTotal`, `hockeyTotal` restent à 0.
 - Action : vérifier `buildMarketCandidates` et les projections US pour exposer les totals déjà promis en Phase 10.
-- Statut : OPEN
+- Statut : FIXED v35.247 — fallback no-vig si le modèle US manque de proba; basketTotal 847, baseballTotal 165, hockeyTotal 118 candidats.
 
 ### P12-FILT-002 — Tennis vainqueur à cote min basse absent dans l'audit combo
 

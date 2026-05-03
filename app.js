@@ -2506,6 +2506,21 @@
     return n;
   }
 
+  function _v35NoVigProb(row, rows) {
+    const odd = Number(row?.odd);
+    if (!(odd > 1.01)) return null;
+    const inv = 1 / odd;
+    const mate = _v35Rows(rows).find(r => {
+      if (!r || r === row) return false;
+      if (String(r.side || '') === String(row?.side || '')) return false;
+      if (Math.abs(Number(r.line) - Number(row?.line)) > 0.01) return false;
+      return Number(r.odd) > 1.01;
+    });
+    if (!mate) return inv;
+    const mateInv = 1 / Number(mate.odd);
+    return inv / (inv + mateInv);
+  }
+
   function _v35ModelTotalProb(pred, market, line, side) {
     if (!pred || !(line > 0) || !side) return null;
     const choose = side === 'over' ? 'pOver' : 'pUnder';
@@ -2676,19 +2691,19 @@
     }
 
     for (const row of _v35Rows(wxMk.tennis_games)) {
-      const p = _v35ModelTotalProb(pred, 'tennis_games', row.line, row.side);
+      const p = _v35ModelTotalProb(pred, 'tennis_games', row.line, row.side) ?? _v35NoVigProb(row, wxMk.tennis_games);
       _v35AddCandidate(out, row, p, 'tennisGames', `${row.side === 'over' ? 'O' : 'U'}${row.line}`, `${row.side === 'over' ? 'Plus' : 'Moins'} de ${row.line} jeux`);
     }
     for (const row of _v35Rows(wxMk.basket_total)) {
-      const p = _v35ModelTotalProb(pred, 'basket_total', row.line, row.side);
+      const p = _v35ModelTotalProb(pred, 'basket_total', row.line, row.side) ?? _v35NoVigProb(row, wxMk.basket_total);
       _v35AddCandidate(out, row, p, 'basketTotal', `${row.side === 'over' ? 'O' : 'U'}${row.line}`, `${row.side === 'over' ? 'Plus' : 'Moins'} de ${row.line} pts`);
     }
     for (const row of _v35Rows(wxMk.baseball_total)) {
-      const p = _v35ModelTotalProb(pred, 'baseball_total', row.line, row.side);
+      const p = _v35ModelTotalProb(pred, 'baseball_total', row.line, row.side) ?? _v35NoVigProb(row, wxMk.baseball_total);
       _v35AddCandidate(out, row, p, 'baseballTotal', `${row.side === 'over' ? 'O' : 'U'}${row.line}`, `${row.side === 'over' ? 'Plus' : 'Moins'} de ${row.line} runs`);
     }
     for (const row of _v35Rows(wxMk.hockey_total)) {
-      const p = _v35ModelTotalProb(pred, 'hockey_total', row.line, row.side);
+      const p = _v35ModelTotalProb(pred, 'hockey_total', row.line, row.side) ?? _v35NoVigProb(row, wxMk.hockey_total);
       _v35AddCandidate(out, row, p, 'hockeyTotal', `${row.side === 'over' ? 'O' : 'U'}${row.line}`, `${row.side === 'over' ? 'Plus' : 'Moins'} de ${row.line} buts`);
     }
     for (const [key, market, sport] of [['run_line', 'runLine', 'baseball'], ['puck_line', 'puckLine', 'hockey'], ['basket_handicap', 'basketHandicap', 'basketball']]) {
