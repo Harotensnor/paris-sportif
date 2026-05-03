@@ -1567,3 +1567,9 @@
 - Apres: build_rugby_markets.py génère winner + totals depuis les events rugby existants.
 - Impact: pipeline prêt, statut `empty` propre aujourd'hui car aucun rugby Winamax-visible.
 - Verif: py_compile OK, build_health OK, rugby_markets status empty.
+
+## Sprint v35.214 — Phase 11 P-11.19 Marchés darts/snooker prêts (10:34 UTC)
+- Avant: aucun contrat dédié aux sports niche darts/snooker.
+- Apres: build_niche_markets.py génère winner + totals legs/frames si ces sports apparaissent.
+- Impact: pipeline prêt sans faux picks; statut `empty` propre aujourd'hui.
+- Verif: py_compile OK, build_health OK, niche_markets status empty.

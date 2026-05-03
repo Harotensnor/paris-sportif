@@ -174,6 +174,11 @@ SOURCES = [
         'markets': d.get('markets') or 0 if isinstance(d, dict) else 0,
         'status': d.get('status') if isinstance(d, dict) else 'missing',
     }),
+    ('niche_markets', 'niche_markets.json', lambda d: {
+        'events': len(d.get('events') or []) if isinstance(d, dict) else 0,
+        'markets': d.get('markets') or 0 if isinstance(d, dict) else 0,
+        'status': d.get('status') if isinstance(d, dict) else 'missing',
+    }),
     ('footballdata',    'footballdata.json',    _count_footballdata),
     ('clv_history',     'clv_history.json',     _count_clv),
 ]
@@ -198,6 +203,7 @@ STALE_AFTER_MIN = {
     'openligadb_matches': 12*60, # German football cross-check cache
     'public_team_stats': 6*60,  # merged public sidecar
     'rugby_markets':   6*60,    # derived only when rugby appears in data.js
+    'niche_markets':   6*60,    # darts/snooker derived sidecar
     'footballdata':    24*60,  # daily fetch
     'clv_history':     60,
 }
@@ -219,6 +225,7 @@ SOURCE_SCRIPT = {
     'openligadb_matches': 'scripts/fetch_openligadb.py',
     'public_team_stats': 'scripts/build_public_team_stats.py',
     'rugby_markets': 'scripts/build_rugby_markets.py',
+    'niche_markets': 'scripts/build_niche_markets.py',
     'footballdata': 'scripts/fetch_footballdata.py',
     'clv_history': 'scripts/compute_clv.py',
 }
