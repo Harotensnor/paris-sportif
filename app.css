@@ -8180,7 +8180,72 @@ body.agent-home #search-suggest::before{content:"Recherche instantanée";display
 body.agent-home #search-suggest .search-suggest-item{min-height:48px!important;background:transparent!important;border-bottom:1px solid rgba(236,244,255,.06)!important}
 body.agent-home #search-suggest .search-suggest-item:hover{background:rgba(255,255,255,.055)!important}
 @media (prefers-reduced-motion:reduce){.v36-filter-chip,.v36-pick-card,.v36-rail-row{transition:none!important}.v36-filter-chip:hover,.v36-pick-card:hover,.v36-rail-row:hover{transform:none!important}}
-@media (min-width:1024px){#tous-wrap>div{max-width:1600px!important}.tous-row{grid-template-columns:76px minmax(280px,2fr) minmax(210px,1fr) 110px!important;gap:10px!important;padding:10px 12px!important}.tous-row>div{min-width:0}.tous-row .u-text-right{justify-self:end}.tous-row-foot-details{grid-column:1/-1}}
+.v36-tous-table-head{display:none}
+@media (min-width:1024px){
+  #tous-wrap>div{max-width:1700px!important}
+  body.agent-inside .agent-return{display:none!important}
+  #tous-wrap .page-tabs{display:none!important}
+  #tous-wrap .v36-tous-table-head{
+    display:grid;
+    grid-template-columns:74px minmax(320px,2.2fr) minmax(230px,1.15fr) 104px;
+    gap:8px;
+    align-items:center;
+    padding:0 12px 8px 14px;
+    margin:0 0 4px;
+    color:#758398;
+    font-size:10px;
+    font-weight:950;
+    letter-spacing:.11em;
+    text-transform:uppercase;
+  }
+  #tous-wrap .v36-tous-table-head--coverage{
+    grid-template-columns:92px minmax(360px,2.4fr) minmax(270px,1fr);
+  }
+  #tous-wrap .v36-tous-table-body{gap:5px!important}
+  #tous-wrap .tous-filter-bar{
+    position:static!important;
+    display:grid!important;
+    grid-template-columns:auto auto minmax(0,1fr)!important;
+    align-items:center!important;
+    gap:8px 10px!important;
+  }
+  #tous-wrap .tous-filter-bar>div{margin:0!important}
+  #tous-wrap .tous-filter-bar>div:first-child{min-width:190px}
+  #tous-wrap .tous-filter-bar>div:nth-child(2),
+  #tous-wrap .tous-filter-bar>div:nth-child(3){flex-wrap:nowrap!important}
+  #tous-wrap .tous-filter-bar>div:nth-child(4){grid-column:1/-1;justify-content:space-between!important}
+  #tous-wrap .tous-filter-bar select{min-height:34px!important}
+  #tous-wrap [data-tous-preset],
+  #tous-wrap [data-tous-sport]{min-height:34px!important;padding-top:5px!important;padding-bottom:5px!important}
+  #tous-wrap .tous-row{
+    grid-template-columns:74px minmax(320px,2.2fr) minmax(230px,1.15fr) 104px!important;
+    min-height:50px;
+    gap:8px!important;
+    padding:7px 10px 7px 12px!important;
+    border-left-width:2px!important;
+    border-radius:8px!important;
+    background:linear-gradient(90deg,rgba(14,20,29,.96),rgba(7,9,13,.94))!important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.035);
+    transition:transform .14s ease,border-color .14s ease,background .14s ease;
+  }
+  #tous-wrap .tous-row--coverage{
+    grid-template-columns:92px minmax(360px,2.4fr) minmax(270px,1fr)!important;
+  }
+  #tous-wrap .tous-row--coverage>div:first-child>div+div{display:none!important}
+  #tous-wrap .tous-row--coverage>div:nth-child(2)>div:last-child{margin-top:1px!important;font-size:10.5px!important}
+  #tous-wrap .tous-row--coverage span[title^="Cote Winamax"]{min-height:22px!important;padding:0 5px!important}
+  #tous-wrap .tous-row:hover{
+    transform:translateY(-1px);
+    border-color:rgba(236,244,255,.18)!important;
+    background:linear-gradient(90deg,rgba(18,26,38,.98),rgba(9,12,18,.96))!important;
+  }
+  #tous-wrap .tous-row>div{min-width:0}
+  #tous-wrap .tous-row>div:first-child{white-space:nowrap}
+  #tous-wrap .tous-row>div:first-child div[title]{max-width:70px!important}
+  #tous-wrap .tous-row .u-text-right{justify-self:end}
+  #tous-wrap .tous-row-foot-details{display:none!important}
+  #tous-wrap .tous-cnt{font-size:9px!important}
+}
 
 .health-lag-panel{background:var(--panel);border:1px solid var(--border);border-radius:10px;overflow:hidden}
 .health-lag-row{display:grid;grid-template-columns:minmax(150px,1.2fr) minmax(110px,.7fr) minmax(120px,.8fr) auto;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px}
