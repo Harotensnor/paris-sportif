@@ -1971,3 +1971,8 @@
 - Apres: makeLocalId() utilise crypto.randomUUID() avec fallback compteur+crypto values, safeJsonParse/safeLocalStorageSet centralisent les cas quotas/corruption, et les recherches recentes sont nettoyees + cappees a 20.
 - Impact: bugs #41/#82/#83 traites sur les chemins critiques (tracked bets, user bets, alert rules), sans changer les donnees fraiches ni la logique modele.
 - Verif: app.js syntax OK; Playwright local 2000 IDs => 2000 uniques, 25 alertes => 20 gardees, 3 user bets => 3 IDs uniques, 0 erreur console.
+## Sprint v35.293 — AUTO 10/10 PWA/SEO obvious fixes (19:42 UTC)
+- Avant: manifest shortcuts pointaient encore vers #top/#locks/#bilan, la description parlait d'un ancien terminal value, et le viewport ignorait viewport-fit=cover.
+- Apres: shortcuts V36 vers Accueil/Tous/Performance/Methode avec icones, description PWA alignee 5 tiers, description HTML raccourcie, meta no-cache retirees au profit du SW, viewport iPhone notch OK.
+- Impact: bugs #61/#62/#63/#71/#72/#84 avances sans changer l'UI ni la data; sitemap root passe en daily pour refléter le refresh fréquent.
+- Verif: manifest JSON OK, app.js syntax OK, head audit OK (plus de meta Cache-Control/Pragma/Expires), diff-check OK.
