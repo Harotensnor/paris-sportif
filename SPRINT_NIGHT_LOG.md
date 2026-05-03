@@ -1585,3 +1585,9 @@
 - Apres: Accueil ajoute une section `Picks consensus` avec accord fort, variance basse et calibration/sharp aligné.
 - Impact: les paris multi-signaux ressortent sans mélanger les marchés divergents au hero.
 - Verif: JS syntax OK, bundle OK, stamps app/sw mis à jour.
+
+## Sprint v35.217 — Phase 11 P-11.22 Picks de nuit (10:42 UTC)
+- Avant: les matchs tardifs étaient noyés dans les listes générales.
+- Apres: Accueil ajoute une section `Picks de nuit` pour les kickoffs après 22h ou avant 6h.
+- Impact: les spots US/Asie tardifs ressortent uniquement si cote ≥2.00, edge ≥4% et confiance ≥50%.
+- Verif: JS syntax OK, bundle OK, stamps app/sw mis à jour.
