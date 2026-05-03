@@ -170,6 +170,7 @@ jobs:
           python3 patch_smart_money.py || true
           python3 build_public_team_stats.py || true
           python3 build_lineups_multisport.py || true
+          python3 build_xg_coverage.py || true
           python3 build_rugby_markets.py || true
           python3 build_niche_markets.py || true
           python3 detect_boosted_odds.py || true
@@ -287,7 +288,7 @@ jobs:
           for path in \
             data.js data_lite.js pronostics.html app.css app.js odds_history.jsonl \
             injuries_soccer.json injuries_multisport.json winamax_catalog.json winamax_markets.json team_stats.json \
-            lineups_soccer.json lineups_multisport.json clubelo.json weather.json fbref_xg.json xg_team_stats.json \
+            lineups_soccer.json lineups_multisport.json xg_coverage.json clubelo.json weather.json fbref_xg.json xg_team_stats.json \
             weather_geo_cache.json referees_soccer.json health.json \
             data_today.json data_manifest.json team_form.json form_stats_extended.json h2h_extended.json \
             thesportsdb_meta.json openligadb_matches.json public_team_stats.json \
