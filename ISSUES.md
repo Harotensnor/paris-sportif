@@ -547,3 +547,13 @@ Résultat : 225 combinaisons sport × cote min × marché testées ; 277 lignes 
 - Constat : le seul match tennis détecté expose des jeux tennis mais pas de candidat vainqueur simple dans l'audit.
 - Action : vérifier si l'event manque de cote 1N2 ou si le mapping tennis utilise une clé différente.
 - Statut : OPEN
+
+### P12-MOB-001 — Profil contient encore des inputs tactiles 16x16 sur mobile
+
+- Sévérité : MEDIUM
+- Pages : `profil`
+- Viewports : iPhone 12, Pixel 5, Galaxy S20, iPad Mini
+- Preuve : `phase12_mobile_device_audit.json` (`pagesWithSmallTapTargets: 4`, inputs `16x16`).
+- Constat : l'audit multi-device passe sans overflow ni chevauchement bottom-nav, mais les checkbox/toggles natifs du Profil restent trop petits pour un usage tactile confortable.
+- Action : augmenter les inputs checkbox/radio visibles à 44px ou les encapsuler dans des labels cliquables pleine hauteur.
+- Statut : OPEN
