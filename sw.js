@@ -11,7 +11,7 @@
 // The "Stamp sw.js" step replaces this entire line with the current UTC timestamp,
 // so every deploy invalidates all caches → users see the new pronostics.html
 // without needing Ctrl+Shift+R. Manual edits stay valid for local dev.
-const CACHE_VERSION = 'paris-sportif-20260503-105158';
+const CACHE_VERSION = 'paris-sportif-20260503-105424';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -80,6 +80,41 @@ self.addEventListener('activate', (event) => {
       ))
       .then(() => self.clients.claim())
   );
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const rawUrl = event.notification && event.notification.data && event.notification.data.url
+    ? event.notification.data.url
+    : 'pronostics.html#dashboard';
+  event.waitUntil((async () => {
+    const targetUrl = new URL(rawUrl, self.location.origin).href;
+    const sameOrigin = targetUrl.startsWith(self.location.origin);
+    const windows = await clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const client of windows) {
+      if (sameOrigin && 'navigate' in client) {
+        try { await client.navigate(targetUrl); } catch (e) {}
+        if ('focus' in client) return client.focus();
+      }
+      if ('focus' in client && client.url.startsWith(self.location.origin)) return client.focus();
+    }
+    if (clients.openWindow) return clients.openWindow(targetUrl);
+  })());
+});
+
+self.addEventListener('push', (event) => {
+  let payload = {};
+  try { payload = event.data ? event.data.json() : {}; } catch (e) {
+    try { payload = { body: event.data ? event.data.text() : '' }; } catch (err) { payload = {}; }
+  }
+  const title = payload.title || 'Paris-Sportif';
+  event.waitUntil(self.registration.showNotification(title, {
+    body: payload.body || 'Un Big Bet mérite ton attention.',
+    icon: payload.icon || 'icon-192.png',
+    badge: payload.badge || 'icon.svg',
+    tag: payload.tag || 'paris-sportif-alert',
+    data: { url: payload.url || 'pronostics.html#dashboard' },
+  }));
 });
 
 // AUDIT-2026-04-27 (Option E) — Helper au lieu de doublons slash/no-slash.

@@ -1603,3 +1603,9 @@
 - Apres: la recherche propose pages, actions rapides, filtres sport et historique récent.
 - Impact: accès direct à Accueil, Tous, Performance, Mode Focus et filtres high-odds depuis le clavier.
 - Verif: JS syntax OK, bundle OK, stamps app/sw mis à jour.
+
+## Sprint v35.220 — Phase 11 P-11.25 Notifications navigateur (10:53 UTC)
+- Avant: alertes locales actives seulement depuis la topbar, clic Service Worker non géré.
+- Apres: Profil pilote les notifications, SW ouvre la bonne destination, fallback navigateur robuste.
+- Impact: Big Bets imminents et value picks alertent sans serveur externe, opt-in explicite conserve.
+- Verif: syntax app.js/sw.js OK, bundle check OK.
