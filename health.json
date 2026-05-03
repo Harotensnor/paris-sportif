@@ -1,15 +1,15 @@
 {
-  "generated_at": "2026-05-03T05:37:30Z",
+  "generated_at": "2026-05-03T05:43:20Z",
   "data_age_min": 0,
   "sources": {
     "winamax_catalog": {
       "age_min": 2,
       "tournaments": 109,
-      "matches": 660
+      "matches": 659
     },
     "winamax_markets": {
       "age_min": 0,
-      "matches_with_odds": 633,
+      "matches_with_odds": 632,
       "matches_detailed": 243
     },
     "injuries_soccer": {
@@ -30,7 +30,7 @@
       "clubs": 630
     },
     "weather": {
-      "age_min": 0,
+      "age_min": 1,
       "events": 471
     },
     "referees_soccer": {
@@ -64,7 +64,7 @@
       "sports": 4
     },
     "h2h_extended": {
-      "age_min": 1,
+      "age_min": 2,
       "events": 163,
       "sports": 5
     },
@@ -141,7 +141,7 @@
     "weather": {
       "script": "scripts/fetch_weather.py",
       "output": "weather.json",
-      "age_min": 0,
+      "age_min": 1,
       "threshold_min": 60,
       "fast_red_min": 30,
       "status": "ok"
@@ -197,7 +197,7 @@
     "h2h_extended": {
       "script": "h2h_extended.json",
       "output": "h2h_extended.json",
-      "age_min": 1,
+      "age_min": 2,
       "threshold_min": 60,
       "fast_red_min": null,
       "status": "ok"
