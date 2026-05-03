@@ -22388,6 +22388,26 @@
   }
 
 
+  const PERF_TAB_STORAGE_KEY = 'paris_sportif_perf_tab_v1';
+  const PERF_TABS = new Set(['global', 'periode', 'confiance', 'marche', 'sport', 'ligue']);
+
+  function _getPerfTab() {
+    try {
+      const stored = localStorage.getItem(PERF_TAB_STORAGE_KEY) || 'global';
+      return PERF_TABS.has(stored) ? stored : 'global';
+    } catch (e) {
+      return 'global';
+    }
+  }
+
+  function _setPerfTab(tab) {
+    const next = PERF_TABS.has(tab) ? tab : 'global';
+    try {
+      localStorage.setItem(PERF_TAB_STORAGE_KEY, next);
+    } catch (e) {}
+    return next;
+  }
+
   function renderPerformancePage(wrap) {
     // affichage de Performance. Si déjà chargé : noop. Si en cours : poll
     // après resolution. Si idle : fetch + re-render quand prêt (l'onglet
