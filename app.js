@@ -18453,13 +18453,33 @@
   // retrouve sa vue à chaque retour sur la page.
   function renderTousPage(wrap) {
     const data = window.PRONOSTICS_DATA;
+    // Phase 12 : Tous doit montrer la couverture complete, pas seulement le
+    // data_lite du jour. On rend tout de suite l'etat lite, puis on recharge
+    // le full data.js une seule fois et on re-render quand il arrive.
+    if (data && data._lite && typeof _ensureFullData === 'function' && !wrap.dataset.tousFullRequested) {
+      wrap.dataset.tousFullRequested = '1';
+      _ensureFullData().then(full => { if (full) renderTousPage(wrap); }).catch(() => {});
+    }
     // prev-day/next-day n'avait aucun effet sur Tous. Utiliser currentDate
     // (variable globale IIFE-scopée mise à jour par les boutons ◀ ▶ et
     // l'input date de la topbar) pour respecter le jour navigué.
     const todayIso = (typeof currentDate === 'string' && currentDate)
       ? currentDate
       : new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
-    const today = (data && data.days && data.days[todayIso]) || [];
+    const dayMap = (data && data.days) || {};
+    const today = dayMap[todayIso] || [];
+    const allMatches = Object.values(dayMap).flatMap(arr => Array.isArray(arr) ? arr : []).filter(Boolean);
+    const nowTs = Date.now();
+    const isTousSettled = (m) => Boolean(m && (m.completed || _isMatchEffectivelyDone(m)));
+    const isTousStarted = (m) => {
+      const ts = new Date(m && m.date).getTime();
+      return Number.isFinite(ts) && ts < nowTs - 60000 && !isTousSettled(m);
+    };
+    const isTousUpcoming = (m) => {
+      const ts = new Date(m && m.date).getTime();
+      return Number.isFinite(ts) && ts >= nowTs - 60000 && !isTousSettled(m);
+    };
+    const isTousWinamax = (m) => Boolean(m && m.winamax && m.winamax.available === true);
     // Bug-hunt 2026-05-02 : avant le filter winamax.available=true masquait
     // 87% des matchs (~840 Sofa events → ~66 Winamax bookable → ~12 affichés).
     // Ajout toggle 'Tous matchs / Winamax only' (default Winamax pour ne pas
@@ -18467,9 +18487,33 @@
     const _tousMode = (() => {
       try { return localStorage.getItem('tousFilterMode') || 'winamax'; } catch(e) { return 'winamax'; }
     })();
-    const winaToday = _tousMode === 'all'
-      ? today.slice()  // tous les matchs
-      : today.filter(m => m.winamax && m.winamax.available === true);
+    const _readTousPreset = () => {
+      try {
+        const hash = location.hash || '';
+        const qIdx = hash.indexOf('?');
+        if (qIdx >= 0) {
+          const qs = new URLSearchParams(hash.slice(qIdx + 1)).get('preset');
+          if (['all', 'bigbets', 'solides', 'outsiders'].includes(qs)) return qs;
+        }
+      } catch(e) {}
+      try {
+        const saved = localStorage.getItem('tousPreset');
+        if (['all', 'bigbets', 'solides', 'outsiders'].includes(saved)) return saved;
+      } catch(e) {}
+      return 'all';
+    };
+    const tousPreset = _readTousPreset();
+    const presetMeta = {
+      all: { label: 'Tout voir', short: 'Tout voir', help: 'Tous les matchs detectes, sans filtre edge/confiance.' },
+      bigbets: { label: 'Big Bets', short: 'Big Bets', help: 'Cotes 2.20-3.50, edge >= 7%, confiance >= 60%.' },
+      solides: { label: 'Solides', short: 'Solides', help: 'Cotes 2.00-2.50, edge >= 4%, confiance >= 55%.' },
+      outsiders: { label: 'Outsiders', short: 'Outsiders', help: 'Cotes 2.50+, edge >= 5%, confiance >= 45%.' },
+    };
+    const isCoveragePreset = tousPreset === 'all';
+    const sourceMatches = _tousMode === 'all'
+      ? allMatches.slice()
+      : allMatches.filter(isTousWinamax);
+    const winaToday = sourceMatches;
 
     // Beaucoup de matchs (typiquement qualifs WTA/Challenger tennis) ont
     // winamax.available=true en fallback tournoi, mais aucune cote captée
@@ -18583,6 +18627,7 @@
         if (tousFilters.minEdge > 0) params.set('edge', tousFilters.minEdge);
         if (tousFilters.minConf > 0) params.set('conf', tousFilters.minConf);
         if (tousFilters.minOdd > 0) params.set('odd', tousFilters.minOdd);
+        if (tousPreset !== 'all') params.set('preset', tousPreset);
         if (tousSort !== 'kickoff') params.set('sort', tousSort);
         const q = params.toString();
         const newHash = q ? `${hash}?${q}` : hash;
@@ -18625,9 +18670,26 @@
       } catch (e) { return false; }
     };
 
-    // Sports présents aujourd'hui (pour ne pas afficher des pills vides)
+    const toCoverageRow = (m) => {
+      try {
+        const { home, away } = getSides(m);
+        const ts = new Date(m.date).getTime();
+        const settled = isTousSettled(m);
+        const startedAndNotSettled = isTousStarted(m);
+        return {
+          m, home, away, ts,
+          settled,
+          startedAndNotSettled,
+          sport: m.sport || 'other',
+          winamax: isTousWinamax(m),
+        };
+      } catch(e) { return null; }
+    };
+    const coverageRowsAll = sourceMatches.map(toCoverageRow).filter(Boolean);
+
+    // Sports présents (pour ne pas afficher des pills vides)
     const sportLabelMap = { football:'⚽ Foot', tennis:'🎾 Tennis', basketball:'🏀 Basket', hockey:'🏒 Hockey', baseball:'⚾ Baseball', 'american-football':'🏈 NFL', mma:'🥊 MMA', golf:'⛳ Golf', racing:'🏎️ F1', rugby:'🏉 Rugby', other:'🎯 Autres' };
-    const sportsAvailable = [...new Set(allPicks.map(p => p.sport))].sort();
+    const sportsAvailable = [...new Set((isCoveragePreset ? coverageRowsAll : allPicks).map(p => p.sport))].sort();
 
     // Apply filters
     const passesFilters = (p) => {
@@ -18646,7 +18708,15 @@
     // mais on les GARDE dans "Finis" pour tracker la perf complète
     // du modèle (win ou lose, on veut savoir combien ça a coûté).
     const isValuePick = (p) => p.edge >= -0.02;
-    const filteredPicks = allPicks.filter(passesFilters);
+    const passesPreset = (p) => {
+      if (tousPreset === 'bigbets') return p.odd >= 2.20 && p.odd <= 3.50 && p.edge >= 0.07 && p.rel >= 0.60;
+      if (tousPreset === 'solides') return p.odd >= 2.00 && p.odd <= 2.50 && p.edge >= 0.04 && p.rel >= 0.55;
+      if (tousPreset === 'outsiders') return p.odd >= 2.50 && p.edge >= 0.05 && p.rel >= 0.45;
+      return true;
+    };
+    const filteredPicks = allPicks.filter(p => passesPreset(p) && passesFilters(p));
+    const filteredCoverageRows = coverageRowsAll
+      .filter(p => !tousFilters.sports.length || tousFilters.sports.includes(p.sport));
 
     // Sort comparator (Finis = toujours plus récent en premier, plus utile)
     const cmp = (a, b) => {
@@ -18664,11 +18734,19 @@
     const pending = filteredPicks.filter(p => !p.settled && !p.startedAndNotSettled && isValuePick(p)).sort(cmp);
     const inProgress = filteredPicks.filter(p => p.startedAndNotSettled && isValuePick(p)).sort((a,b) => a.ts - b.ts);
     const finished = filteredPicks.filter(p => p.settled).sort((a,b) => b.ts - a.ts);
+    const coveragePending = filteredCoverageRows.filter(p => !p.settled && !p.startedAndNotSettled).sort((a,b) => a.ts - b.ts);
+    const coverageInProgress = filteredCoverageRows.filter(p => p.startedAndNotSettled).sort((a,b) => a.ts - b.ts);
+    const coverageFinished = filteredCoverageRows.filter(p => p.settled).sort((a,b) => b.ts - a.ts);
+    const displayPending = isCoveragePreset ? coveragePending : pending;
+    const displayInProgress = isCoveragePreset ? coverageInProgress : inProgress;
+    const displayFinished = isCoveragePreset ? coverageFinished : finished;
+    const detectedUpcoming = sourceMatches.filter(isTousUpcoming).length;
+    const displayedTotal = displayPending.length + displayInProgress.length + displayFinished.length;
     const totalWon = finished.filter(p => p.res === 'won').length;
     const totalLost = finished.filter(p => p.res === 'lost').length;
     const settledCount = totalWon + totalLost;
     const wrPct = settledCount > 0 ? Math.round(100 * totalWon / settledCount) : 0;
-    const filtersActive = tousFilters.sports.length > 0 || tousFilters.minEdge > 0 || tousFilters.minConf > 0 || tousFilters.minOdd > 0 || tousSort !== 'kickoff';
+    const filtersActive = tousPreset !== 'all' || tousFilters.sports.length > 0 || tousFilters.minEdge > 0 || tousFilters.minConf > 0 || tousFilters.minOdd > 0 || tousSort !== 'kickoff';
     const compareIds = (() => {
       try {
         const ids = JSON.parse(localStorage.getItem('tousComparePickIds') || '[]');
@@ -18685,7 +18763,7 @@
     const activeTab = (() => {
       let saved = 'pending';
       try { saved = localStorage.getItem('tousTab') || 'pending'; } catch(e) {}
-      const counts = { pending: pending.length, inprogress: inProgress.length, finished: finished.length };
+      const counts = { pending: displayPending.length, inprogress: displayInProgress.length, finished: displayFinished.length };
       if (counts[saved] > 0) return saved;
       if (counts.pending > 0) return 'pending';
       if (counts.inprogress > 0) return 'inprogress';
@@ -18858,6 +18936,46 @@
         ${_footDetailsHtml}
       </div>`;
     };
+    const renderCoverageRow = (p) => {
+      const hn = (p.home && p.home.name) || '?';
+      const an = (p.away && p.away.name) || '?';
+      const hLogo = (p.home && p.home.logo) || '';
+      const aLogo = (p.away && p.away.logo) || '';
+      const rowId = String(p.m.id || '');
+      const league = p.m.league_name || p.m.league || '';
+      const sportEm = { football:'⚽', tennis:'🎾', basketball:'🏀', hockey:'🏒', baseball:'⚾', 'american-football':'🏈', mma:'🥊', golf:'⛳', racing:'🏎️', rugby:'🏉' }[p.m.sport] || '🎯';
+      const teamLogo = (src, name) => src
+        ? `<img src="${esc(src)}" alt="" width="24" height="24" style="width:24px;height:24px;object-fit:contain;border-radius:4px;flex:0 0 auto;" loading="lazy" decoding="async">`
+        : `<span aria-hidden="true" style="width:24px;height:24px;border-radius:6px;background:rgba(255,255,255,.08);border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:var(--text-dim);flex:0 0 auto;">${esc(String(name || '?').slice(0,2).toUpperCase())}</span>`;
+      const dateLabel = (() => {
+        try {
+          return new Intl.DateTimeFormat('fr-FR', {
+            weekday: 'short', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
+          }).format(new Date(p.m.date));
+        } catch(e) { return fmtTime(p.m.date); }
+      })();
+      const statusLabel = p.settled ? 'Terminé' : p.startedAndNotSettled ? 'En cours' : 'À venir';
+      const statusColor = p.settled ? 'var(--text-dim2)' : p.startedAndNotSettled ? '#f87171' : 'var(--accent)';
+      const winamaxLabel = p.winamax ? 'Winamax exact' : 'Source externe';
+      return `<div class="tous-row tous-row--coverage" data-match-id="${esc(rowId)}" data-match-date="${esc(String(p.m.date || ''))}" style="display:grid;grid-template-columns:${tousMobile ? '1fr' : 'minmax(120px,.55fr) minmax(0,1.8fr) minmax(140px,.65fr)'};gap:${tousMobile ? '8px' : '14px'};padding:13px 16px;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${p.winamax ? 'var(--brand)' : 'var(--text-dim2)'};border-radius:0 10px 10px 0;align-items:center;cursor:pointer;font-variant-numeric:tabular-nums;">
+        <div>
+          <div style="font-size:11px;color:var(--text-dim2);font-weight:800;text-transform:uppercase;letter-spacing:.4px;">${sportEm} ${esc(dateLabel)}</div>
+          <div style="margin-top:3px;font-size:10.5px;color:${statusColor};font-weight:800;">${esc(statusLabel)}</div>
+        </div>
+        <div style="min-width:0;">
+          <div style="display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--text);font-weight:750;min-width:0;">
+            ${teamLogo(hLogo, hn)}<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(hn)}</span>
+            <span style="color:var(--text-dim);font-weight:500;">vs</span>
+            ${teamLogo(aLogo, an)}<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(an)}</span>
+          </div>
+          <div style="margin-top:3px;font-size:11.5px;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(league || 'Compétition à confirmer')}</div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:${tousMobile ? 'flex-start' : 'flex-end'};gap:8px;flex-wrap:wrap;">
+          <span style="padding:4px 9px;border-radius:999px;background:${p.winamax ? 'rgba(167,139,250,.14)' : 'rgba(148,163,184,.12)'};border:1px solid ${p.winamax ? 'rgba(167,139,250,.28)' : 'var(--border)'};color:${p.winamax ? 'var(--brand)' : 'var(--text-dim)'};font-size:10.5px;font-weight:850;">${esc(winamaxLabel)}</span>
+          <span style="font-size:11px;color:var(--text-dim2);">Détail →</span>
+        </div>
+      </div>`;
+    };
     const compareBarHtml = compareIds.length ? `
       <div style="margin:0 0 12px;padding:10px 12px;background:rgba(230,0,0,.10);border:1px solid rgba(230,0,0,.28);border-radius:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
         <strong style="font-size:12px;color:var(--c-accent);">Comparateur</strong>
@@ -18912,11 +19030,11 @@
           ${withTomorrow ? '<button class="page-btn" data-page="calendrier" style="padding:10px 16px;font-size:13px;background:transparent;color:var(--brand);border:1px solid var(--brand-border);border-radius:var(--r-sm);cursor:pointer;font-weight:600;">📅 Calendrier 7j</button>' : ''}
         </div>
       </div>`;
-    const pendingHtml = pending.length
-      ? pending.map(p => renderRow(p, false)).join('')
-      : _emptyState("Aucun match à venir pour aujourd'hui.", true);
-    const inProgressHtml = inProgress.length
-      ? inProgress.map(p => renderRow(p, false)).join('')
+    const pendingHtml = displayPending.length
+      ? displayPending.map(p => isCoveragePreset ? renderCoverageRow(p) : renderRow(p, false)).join('')
+      : _emptyState(isCoveragePreset ? "Aucun match à venir détecté." : "Aucun match à venir pour aujourd'hui.", true);
+    const inProgressHtml = displayInProgress.length
+      ? displayInProgress.map(p => isCoveragePreset ? renderCoverageRow(p) : renderRow(p, false)).join('')
       : _emptyState("Aucun match en cours.", false);
     // sont VRAIMENT terminés mais sans cote capturée (cas très commun pour
     // les WTA/Challenger qualifiers où Winamax map juste la ligue). On
@@ -18924,8 +19042,8 @@
     const finishedEmptyMsg = _completedNoOdds > 0
       ? `0 prono trackable terminé · mais ${_completedNoOdds} match${_completedNoOdds>1?'s':''} terminé${_completedNoOdds>1?'s':''} sans cote captée (qualifs / matchs sans bookmaker exact). Le bilan ne peut pas les évaluer.`
       : "Aucun match terminé aujourd'hui.";
-    const finishedHtml = finished.length
-      ? finished.map(p => renderRow(p, true)).join('')
+    const finishedHtml = displayFinished.length
+      ? displayFinished.map(p => isCoveragePreset ? renderCoverageRow(p) : renderRow(p, true)).join('')
       : _emptyState(finishedEmptyMsg, false);
 
     // Sofascore events ont l'id préfixé "sofa_". ESPN events ont id numérique.
@@ -18933,7 +19051,7 @@
     // multi-source (résilience pipeline).
     const _sourcesStats = (() => {
       try {
-        const allTodayEvents = (data?.days?.[todayIso] || []);
+        const allTodayEvents = isCoveragePreset ? sourceMatches : (data?.days?.[todayIso] || []);
         let espn = 0, sofa = 0, winamax = 0;
         allTodayEvents.forEach(ev => {
           if (String(ev.id || '').startsWith('sofa_')) sofa++;
@@ -18947,9 +19065,9 @@
     wrap.innerHTML = `
       <div style="max-width:1500px;margin:0 auto;padding:${tousMobile ? '10px 6px 18px' : '16px 8px 24px'};font-variant-numeric:tabular-nums;">
         <div style="padding:${tousMobile ? '14px 2px 12px' : '40px 0 20px'};border-bottom:1px solid var(--border);">
-          <div style="font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Aujourd'hui · Winamax</div>
-          <h1 style="margin:0 0 6px;font-size:${tousMobile ? '25px' : '32px'};font-weight:800;letter-spacing:-1.1px;color:var(--text);line-height:1.1;">Tous les pronos du jour</h1>
-          <div class="u-text-md u-text-dim">${pending.length + inProgress.length} prono${(pending.length + inProgress.length)>1?'s':''} value · ${pending.length} à venir · ${inProgress.length} en cours · ${finished.length} fini${finished.length>1?'s':''}${_completedNoOdds > 0 ? ` <span class="u-text-dim2" title="${_completedNoOdds} match${_completedNoOdds>1?'s':''} terminé${_completedNoOdds>1?'s':''} sans cote pré-match capturée (qualifs WTA/Challenger, etc.) → résultat visible mais pas dans le bilan ROI.">(+${_completedNoOdds} sans cote pré-match)</span>` : ''}${settledCount ? ` (<b style="color:${wrPct>=60?'#34d399':'var(--text-dim)'};">${wrPct}% réussite</b> sur ${settledCount})` : ''}${filtersActive ? `&nbsp;·&nbsp;<span style="color:var(--brand);font-weight:600;">filtres actifs</span>` : ''}<div style="font-size:11px;color:var(--text-dim2);margin-top:3px;">↳ paris à venir/en cours = edge ≥ -2pt (bad value filtré). Finis = picks avec cote capturée pour tracker la perf modèle.</div></div>
+          <div style="font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Couverture 7 jours · ${esc(presetMeta[tousPreset]?.label || 'Tout voir')}</div>
+          <h1 style="margin:0 0 6px;font-size:${tousMobile ? '25px' : '32px'};font-weight:800;letter-spacing:-1.1px;color:var(--text);line-height:1.1;">Tous les matchs détectés</h1>
+          <div class="u-text-md u-text-dim">${detectedUpcoming} match${detectedUpcoming>1?'s':''} à venir détecté${detectedUpcoming>1?'s':''} · ${displayPending.length} à venir affiché${displayPending.length>1?'s':''} · ${displayInProgress.length} en cours · ${displayFinished.length} fini${displayFinished.length>1?'s':''}${_completedNoOdds > 0 && !isCoveragePreset ? ` <span class="u-text-dim2" title="${_completedNoOdds} match${_completedNoOdds>1?'s':''} terminé${_completedNoOdds>1?'s':''} sans cote pré-match capturée (qualifs WTA/Challenger, etc.) → résultat visible mais pas dans le bilan ROI.">(+${_completedNoOdds} sans cote pré-match)</span>` : ''}${settledCount && !isCoveragePreset ? ` (<b style="color:${wrPct>=60?'#34d399':'var(--text-dim)'};">${wrPct}% réussite</b> sur ${settledCount})` : ''}${filtersActive ? `&nbsp;·&nbsp;<span style="color:var(--brand);font-weight:600;">filtres actifs</span>` : ''}<div style="font-size:11px;color:var(--text-dim2);margin-top:3px;">↳ Tout voir = couverture brute. Big Bets/Solides/Outsiders = sélection value stricte, séparée de l'Accueil.</div></div>
         </div>
         ${_sourcesStats && _sourcesStats.total > 0 ? `
           <div style="margin:14px 0 4px;padding:10px 14px;background:var(--panel);border:1px solid var(--border);border-radius:8px;font-size:11.5px;color:var(--text-dim);display:flex;flex-wrap:wrap;gap:14px;align-items:center;font-variant-numeric:tabular-nums;" title="Sources de la couverture events. Plus de sources = pipeline résilient (si une source ban, les autres comblent).">
@@ -18964,10 +19082,16 @@
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
             <div style="display:flex;align-items:center;gap:10px;">
               <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.8px;font-weight:700;">🎛️ Filtrer &amp; trier</div>
-                   immédiatement combien de matchs passent les filtres actuels. -->
-              <span aria-live="polite" style="display:inline-flex;align-items:center;padding:3px 9px;background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);border-radius:999px;font-size:11.5px;font-weight:700;color:var(--brand);font-variant-numeric:tabular-nums;">${pending.length + inProgress.length + finished.length} résultat${(pending.length + inProgress.length + finished.length)>1?'s':''}</span>
+              <span aria-live="polite" style="display:inline-flex;align-items:center;padding:3px 9px;background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);border-radius:999px;font-size:11.5px;font-weight:700;color:var(--brand);font-variant-numeric:tabular-nums;">${detectedUpcoming} à venir · ${displayedTotal} total</span>
             </div>
             ${filtersActive ? '<button data-tous-reset style="padding:5px 10px;font-size:11px;background:transparent;color:var(--text-dim);border:1px solid var(--border-2);border-radius:6px;cursor:pointer;font-weight:600;">↻ Réinitialiser</button>' : ''}
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;${tousRailStyle}">
+            <span style="font-size:11.5px;color:var(--text-dim);min-width:42px;${tousMobile ? 'display:none;' : ''}">Préset</span>
+            ${Object.entries(presetMeta).map(([key, meta]) => {
+              const isOn = key === tousPreset;
+              return `<button data-tous-preset="${esc(key)}" title="${esc(meta.help)}" style="${tousRailItemStyle}padding:7px 12px;font-size:12px;border-radius:999px;cursor:pointer;font-weight:800;border:1px solid ${isOn?'var(--brand)':'var(--border-2)'};background:${isOn?'rgba(167,139,250,.18)':'transparent'};color:${isOn?'var(--brand)':'var(--text-2)'};">${esc(meta.short)}</button>`;
+            }).join('')}
           </div>
           ${sportsAvailable.length > 1 ? `
           <div style="display:flex;align-items:center;gap:8px;${tousRailStyle}">
@@ -19019,9 +19143,9 @@
         </div>
 
         <div style="display:flex;gap:8px;margin:0 0 14px;${tousRailStyle}">
-          <button data-tous-tab="pending" style="${tousRailItemStyle}padding:10px 18px;border-radius:8px;border:1px solid ${activeTab==='pending'?'var(--brand)':'var(--border-2)'};background:${activeTab==='pending'?'rgba(167,139,250,.15)':'var(--panel)'};color:${activeTab==='pending'?'var(--brand)':'var(--text-2)'};font-weight:700;font-size:13px;cursor:pointer;">⏱️ À venir <span style="opacity:.7;">(${pending.length})</span></button>
-          <button data-tous-tab="inprogress" style="${tousRailItemStyle}padding:10px 18px;border-radius:8px;border:1px solid ${activeTab==='inprogress'?'var(--brand)':'var(--border-2)'};background:${activeTab==='inprogress'?'rgba(167,139,250,.15)':'var(--panel)'};color:${activeTab==='inprogress'?'var(--brand)':'var(--text-2)'};font-weight:700;font-size:13px;cursor:pointer;">🔴 En cours <span style="opacity:.7;">(${inProgress.length})</span></button>
-          <button data-tous-tab="finished" title="${_completedNoOdds > 0 ? `Dont ${_completedNoOdds} sans cote pré-match capturée (qualifs WTA/Challenger, etc.) — résultat visible mais pas dans le bilan ROI` : ''}" style="${tousRailItemStyle}padding:10px 18px;border-radius:8px;border:1px solid ${activeTab==='finished'?'var(--brand)':'var(--border-2)'};background:${activeTab==='finished'?'rgba(167,139,250,.15)':'var(--panel)'};color:${activeTab==='finished'?'var(--brand)':'var(--text-2)'};font-weight:700;font-size:13px;cursor:pointer;">✅ Finis <span style="opacity:.7;">(${finished.length})</span></button>
+          <button data-tous-tab="pending" style="${tousRailItemStyle}padding:10px 18px;border-radius:8px;border:1px solid ${activeTab==='pending'?'var(--brand)':'var(--border-2)'};background:${activeTab==='pending'?'rgba(167,139,250,.15)':'var(--panel)'};color:${activeTab==='pending'?'var(--brand)':'var(--text-2)'};font-weight:700;font-size:13px;cursor:pointer;">⏱️ À venir <span style="opacity:.7;">(${displayPending.length})</span></button>
+          <button data-tous-tab="inprogress" style="${tousRailItemStyle}padding:10px 18px;border-radius:8px;border:1px solid ${activeTab==='inprogress'?'var(--brand)':'var(--border-2)'};background:${activeTab==='inprogress'?'rgba(167,139,250,.15)':'var(--panel)'};color:${activeTab==='inprogress'?'var(--brand)':'var(--text-2)'};font-weight:700;font-size:13px;cursor:pointer;">🔴 En cours <span style="opacity:.7;">(${displayInProgress.length})</span></button>
+          <button data-tous-tab="finished" title="${_completedNoOdds > 0 && !isCoveragePreset ? `Dont ${_completedNoOdds} sans cote pré-match capturée (qualifs WTA/Challenger, etc.) — résultat visible mais pas dans le bilan ROI` : ''}" style="${tousRailItemStyle}padding:10px 18px;border-radius:8px;border:1px solid ${activeTab==='finished'?'var(--brand)':'var(--border-2)'};background:${activeTab==='finished'?'rgba(167,139,250,.15)':'var(--panel)'};color:${activeTab==='finished'?'var(--brand)':'var(--text-2)'};font-weight:700;font-size:13px;cursor:pointer;">✅ Finis <span style="opacity:.7;">(${displayFinished.length})</span></button>
         </div>
         ${compareBarHtml}
         <div style="display:flex;flex-direction:column;gap:8px;">
@@ -19033,6 +19157,19 @@
     wrap.querySelectorAll('[data-tous-tab]').forEach(btn => {
       btn.addEventListener('click', () => {
         try { localStorage.setItem('tousTab', btn.dataset.tousTab); } catch(e) {}
+        renderTousPage(wrap);
+      });
+    });
+    wrap.querySelectorAll('[data-tous-preset]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        try {
+          localStorage.setItem('tousPreset', btn.dataset.tousPreset || 'all');
+          if ((btn.dataset.tousPreset || 'all') === 'all') {
+            localStorage.removeItem('tousFilters');
+            localStorage.setItem('tousSort', 'kickoff');
+          }
+          localStorage.setItem('tousTab', 'pending');
+        } catch(e) {}
         renderTousPage(wrap);
       });
     });
@@ -19120,6 +19257,8 @@
         try {
           localStorage.removeItem('tousFilters');
           localStorage.removeItem('tousSort');
+          localStorage.removeItem('tousPreset');
+          localStorage.removeItem('tousFilterMode');
         } catch(e) {}
         renderTousPage(wrap);
       });

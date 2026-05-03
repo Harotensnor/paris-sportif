@@ -1,23 +1,24 @@
 {
-  "generated_at": "2026-05-03T12:29:00.366Z",
+  "generated_at": "2026-05-03T12:37:06.238Z",
   "page": "#tous",
   "data_generated_at": "2026-05-03T12:27:19Z",
   "todayIso": "2026-05-03",
   "counts": {
-    "all_events_all_days": 80,
-    "upcoming_all_days": 67,
-    "upcoming_all_days_with_any_odds": 66,
-    "upcoming_all_days_winamax_available": 67,
+    "all_events_all_days": 369,
+    "upcoming_all_days": 277,
+    "upcoming_all_days_with_any_odds": 276,
+    "upcoming_all_days_winamax_available": 277,
     "today_events": 80,
     "today_winamax_available": 80,
-    "today_winamax_upcoming": 67
+    "today_winamax_upcoming": 63
   },
   "sport_counts": {
     "upcoming_all_days": {
-      "football": 50,
+      "football": 228,
       "tennis": 1,
-      "baseball": 14,
-      "basketball": 2
+      "baseball": 17,
+      "basketball": 20,
+      "hockey": 11
     },
     "today_winamax": {
       "baseball": 16,
@@ -30,27 +31,27 @@
     "input_today_winamax": 80,
     "no_pred": 0,
     "no_pick": 0,
-    "skip": 75,
+    "skip": 71,
     "no_odd_non_settled": 0,
     "completed_no_odd": 0,
-    "kept_all_picks": 5,
-    "kept_pending_before_value": 5,
-    "kept_pending_after_value_edge_gte_minus_2pt": 5,
+    "kept_all_picks": 9,
+    "kept_pending_before_value": 9,
+    "kept_pending_after_value_edge_gte_minus_2pt": 9,
     "kept_inprogress_after_value_edge_gte_minus_2pt": 0,
     "kept_finished": 0
   },
   "funnel_steps": [
     {
       "step": "events_all_days",
-      "count": 80
+      "count": 369
     },
     {
       "step": "upcoming_all_days",
-      "count": 67
+      "count": 277
     },
     {
       "step": "upcoming_all_days_winamax_available",
-      "count": 67
+      "count": 277
     },
     {
       "step": "today_events_only",
@@ -62,49 +63,55 @@
     },
     {
       "step": "today_winamax_upcoming",
-      "count": 67
+      "count": 63
     },
     {
       "step": "predictMatch_kept_actionable_rows",
-      "count": 5
+      "count": 9
     },
     {
       "step": "pending_before_value_filter",
-      "count": 5
+      "count": 9
     },
     {
       "step": "pending_after_edge_gte_minus_2pt",
-      "count": 5
+      "count": 9
     },
     {
       "step": "dom_visible_rows_active_tab",
-      "count": 5
+      "count": 277
     }
   ],
   "largest_drops": [
     {
-      "from": "today_winamax_upcoming",
-      "to": "predictMatch_kept_actionable_rows",
-      "lost": 62,
-      "remaining": 5
+      "from": "upcoming_all_days_winamax_available",
+      "to": "today_events_only",
+      "lost": 197,
+      "remaining": 80
     },
     {
       "from": "events_all_days",
       "to": "upcoming_all_days",
-      "lost": 13,
-      "remaining": 67
+      "lost": 92,
+      "remaining": 277
+    },
+    {
+      "from": "today_winamax_upcoming",
+      "to": "predictMatch_kept_actionable_rows",
+      "lost": 54,
+      "remaining": 9
     },
     {
       "from": "today_winamax_available",
       "to": "today_winamax_upcoming",
-      "lost": 13,
-      "remaining": 67
+      "lost": 17,
+      "remaining": 63
     },
     {
       "from": "upcoming_all_days",
       "to": "upcoming_all_days_winamax_available",
       "lost": 0,
-      "remaining": 67
+      "remaining": 277
     },
     {
       "from": "today_events_only",
@@ -116,60 +123,64 @@
       "from": "predictMatch_kept_actionable_rows",
       "to": "pending_before_value_filter",
       "lost": 0,
-      "remaining": 5
+      "remaining": 9
     },
     {
       "from": "pending_before_value_filter",
       "to": "pending_after_edge_gte_minus_2pt",
       "lost": 0,
-      "remaining": 5
+      "remaining": 9
     },
     {
       "from": "pending_after_edge_gte_minus_2pt",
       "to": "dom_visible_rows_active_tab",
-      "lost": 0,
-      "remaining": 5
-    },
-    {
-      "from": "upcoming_all_days_winamax_available",
-      "to": "today_events_only",
-      "lost": -13,
-      "remaining": 80
+      "lost": -268,
+      "remaining": 277
     }
   ],
   "dom": {
-    "header_text": "Tous les pronos du jour",
-    "subheader_text": "5 pronos value · 5 à venir · 0 en cours · 0 fini↳ paris à venir/en cours = edge ≥ -2pt (bad value filtré). Finis = picks avec cote capturée pour tracker la perf modèle.",
-    "visible_rows": 5,
+    "header_text": "Tous les matchs détectés",
+    "subheader_text": "277 matchs à venir détectés · 277 à venir affichés · 13 en cours · 79 finis↳ Tout voir = couverture brute. Big Bets/Solides/Outsiders = sélection value stricte, séparée de l'Accueil.",
+    "visible_rows": 277,
     "active_tab_text": [
-      "⏱️ À venir (5)",
-      "🔴 En cours (0)",
-      "✅ Finis (0)"
+      "⏱️ À venir (277)",
+      "🔴 En cours (13)",
+      "✅ Finis (79)"
     ],
-    "result_chip_text": "5 résultats",
+    "result_chip_text": "277 à venir · 369 total",
     "source_select_value": "winamax",
-    "stray_comment_text_visible": true
+    "stray_comment_text_visible": false
   },
   "sample_rows": [
+    {
+      "id": "750531",
+      "sport": "football",
+      "league": "Primeira Liga",
+      "kickoff": "2026-05-03T17:00Z",
+      "odd": 1.64,
+      "rel": 0.6946,
+      "edge": 0.0849,
+      "pick": "1 · Braga"
+    },
+    {
+      "id": "401815190",
+      "sport": "baseball",
+      "league": "MLB",
+      "kickoff": "2026-05-03T17:35Z",
+      "odd": 1.7,
+      "rel": 0.7145,
+      "edge": 0.1262,
+      "pick": "2 · Brewers"
+    },
     {
       "id": "401815191",
       "sport": "baseball",
       "league": "MLB",
       "kickoff": "2026-05-03T17:40Z",
       "odd": 2.1,
-      "rel": 0.5408,
-      "edge": 0.0646,
+      "rel": 0.549,
+      "edge": 0.0728,
       "pick": "1 · Marlins"
-    },
-    {
-      "id": "401815192",
-      "sport": "baseball",
-      "league": "MLB",
-      "kickoff": "2026-05-03T17:40Z",
-      "odd": 1.74,
-      "rel": 0.6965,
-      "edge": 0.1218,
-      "pick": "1 · Rays"
     },
     {
       "id": "740937",
@@ -177,8 +188,8 @@
       "league": "Premier League",
       "kickoff": "2026-05-03T18:00Z",
       "odd": 2,
-      "rel": 0.6006,
-      "edge": 0.1006,
+      "rel": 0.6105,
+      "edge": 0.1105,
       "pick": "1 · Aston Villa"
     },
     {
@@ -187,9 +198,39 @@
       "league": "MLB",
       "kickoff": "2026-05-03T18:15Z",
       "odd": 2.15,
-      "rel": 0.5518,
-      "edge": 0.0867,
+      "rel": 0.5664,
+      "edge": 0.1013,
       "pick": "1 · Cardinals"
+    },
+    {
+      "id": "401815194",
+      "sport": "baseball",
+      "league": "MLB",
+      "kickoff": "2026-05-03T18:20Z",
+      "odd": 1.58,
+      "rel": 0.7628,
+      "edge": 0.1299,
+      "pick": "1 · Cubs"
+    },
+    {
+      "id": "401815197",
+      "sport": "baseball",
+      "league": "MLB",
+      "kickoff": "2026-05-03T19:10Z",
+      "odd": 1.54,
+      "rel": 0.7198,
+      "edge": 0.0704,
+      "pick": "2 · Braves"
+    },
+    {
+      "id": "401815199",
+      "sport": "baseball",
+      "league": "MLB",
+      "kickoff": "2026-05-03T20:05Z",
+      "odd": 1.8,
+      "rel": 0.6805,
+      "edge": 0.125,
+      "pick": "2 · Guardians"
     },
     {
       "id": "401815201",
@@ -197,8 +238,8 @@
       "league": "MLB",
       "kickoff": "2026-05-03T20:07Z",
       "odd": 2.05,
-      "rel": 0.5412,
-      "edge": 0.0533,
+      "rel": 0.5496,
+      "edge": 0.0618,
       "pick": "1 · Angels"
     }
   ],
