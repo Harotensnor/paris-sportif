@@ -1986,3 +1986,9 @@
 - Après: app.js reste stale-while-revalidate au premier hit puis offline, les OG images passent en cache-first lazy, et le precache install descend à ~493KB.
 - Impact: bugs #44/#45 avancés: install PWA plus léger, cache toujours robuste après une vraie visite, aucune donnée dynamique précachée.
 - Verif: sw.js syntax OK; calcul local precache=12 fichiers / 493KB, app.js=1725KB hors install.
+## Sprint v35.296 — AUTO 10/10 Accueil tableau dense (19:58 UTC)
+- Avant: l'accueil V36 en 5 colonnes limitait la lecture globale, et le rail droit comprimait les colonnes utiles.
+- Apres: accueil refondu en table pro betting dense: Sport / Heure / Ligue / Match / Pari / Cote / Conf / Edge / Tier / Action, tri par colonne, recherche live, badges tier et cards mobile.
+- Densite: 40 propositions aujourd'hui, 30 lignes dans la zone de table desktop, toutes les colonnes visibles, zero overflow horizontal; mobile garde 40 cards empilees.
+- UX: rail radar passe sous la table pour laisser toute la largeur au tableau; sections Genius/Boost restent sous la table comme complements.
+- Verif: app.js/sw.js syntax OK; Playwright local dashboard desktop/mobile OK, modal au clic OK, 0 erreur console, 0 cible tactile <40px; a11y audit 8 pages = 0/0/0; Lighthouse fallback min perf 97, min a11y 97, SEO 100.
