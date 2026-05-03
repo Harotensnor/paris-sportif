@@ -1684,3 +1684,9 @@
 - Apres: preset Tout voir charge data.js complet et affiche 277 matchs a venir / 369 lignes tous onglets.
 - Impact: Big Bets reste strict, Tous redevient une vraie couverture calendrier Winamax.
 - Verif: funnel 277 -> 277 visible, capture phase12-tous-coverage OK, syntax/bundle OK.
+
+## Sprint v35.237 — Phase 12 P-12.6 Audit visuel global (14:41 local)
+- Avant: couverture corrigee mais pas encore revue sur les 8 pages.
+- Apres: baseline 32 captures analysee, phase12_visual_audit.json + 10 issues P12-VIS ajoutees.
+- Impact: priorite fix claire: Tous scannable/pagine, filtres mobiles, apercu cotes, pages longues.
+- Verif: manifest 32 captures, 0 failure, 0 overflow horizontal.

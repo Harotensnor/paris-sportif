@@ -2,9 +2,9 @@
 
 Audit visuel lancé le 2026-05-02.
 
-Baseline captures : `.cache/phase4-phase6-baseline/`  
-Périmètre : 8 pages x 4 viewports = 32 captures.  
-Runtime : aucune erreur capturée dans `manifest.json`.  
+Baseline captures : `.cache/phase4-phase6-baseline/`
+Périmètre : 8 pages x 4 viewports = 32 captures.
+Runtime : aucune erreur capturée dans `manifest.json`.
 Overflow horizontal mesuré : 0 sur les 32 captures.
 
 ## Synthèse
@@ -419,3 +419,108 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Constat : aucun overflow, aucune erreur console, aucun recouvrement bottom-nav, mais les sliders Profil avaient une hauteur tactile `16px`.
 - Action : renforcer globalement `input[type="range"]` à `44px` de hauteur minimale.
 - Statut : FIXED v35.207 — sliders Profil mesurés `313x44` sur 375px.
+
+## Phase 12 nouveaux bugs — audit visuel post-couverture
+
+Baseline : `.cache/phase4-phase12-tous-coverage/`
+Captures : 8 pages x 4 viewports = 32 PNG.
+Résultat technique : 0 failure Playwright, 0 overflow horizontal.
+Contexte : après correction de `Tous`, la couverture monte à 277 matchs à venir visibles sur la data complète.
+
+### Synthèse Phase 12
+
+- Nouveaux problèmes détectés : 10
+- High : 1
+- Medium : 6
+- Low : 3
+- Priorité immédiate : garder la couverture complète tout en rendant `Tous` scannable sur mobile.
+
+### P12-VIS-001 — Le preset Tout voir affiche bien 277 matchs, mais la page atteint 41 154px en mobile et 24 025px desktop.
+
+- Sévérité : HIGH
+- Pages : `tous`
+- Viewports : mobile/tablet/desktop/wide
+- Preuve : `.cache/phase4-phase12-tous-coverage/tous-mobile.png`
+- Action : Ajouter pagination/load more ou virtualisation progressive sans réduire la couverture.
+- Statut : OPEN
+
+### P12-VIS-002 — Les rails Préset/Sport/Source/Edge/Confiance occupent beaucoup de hauteur avant la liste.
+
+- Sévérité : MEDIUM
+- Pages : `tous`
+- Viewports : mobile
+- Preuve : `.cache/phase4-phase12-tous-coverage/tous-mobile.png`
+- Action : Regrouper les filtres avancés derrière un bouton Filtres, garder Préset + Sport visibles.
+- Statut : OPEN
+
+### P12-VIS-003 — Les lignes de couverture brute affichent Winamax exact mais pas les cotes 1N2 en aperçu.
+
+- Sévérité : MEDIUM
+- Pages : `tous`
+- Viewports : all
+- Preuve : `.cache/phase4-phase12-tous-coverage/tous-desktop.png`
+- Action : Ajouter aperçu 1/N/2 ou meilleur marché quand disponible pour éviter d’ouvrir chaque détail.
+- Statut : OPEN
+
+### P12-VIS-004 — La bottom nav fixe tombe au milieu du premier viewport dans la capture et masque visuellement une ligne de contenu.
+
+- Sévérité : MEDIUM
+- Pages : `dashboard`
+- Viewports : mobile
+- Preuve : `.cache/phase4-phase12-tous-coverage/dashboard-mobile.png`
+- Action : Revalider safe-zone mobile et ajouter padding/scroll-margin autour des sections sous le fold.
+- Statut : OPEN
+
+### P12-VIS-005 — Le CTA “Voir toutes les opportunités restantes” wrap en plusieurs lignes et alourdit la carte.
+
+- Sévérité : LOW
+- Pages : `dashboard`
+- Viewports : mobile
+- Preuve : `.cache/phase4-phase12-tous-coverage/dashboard-mobile.png`
+- Action : Raccourcir le libellé ou passer en bouton pleine largeur plus lisible.
+- Statut : OPEN
+
+### P12-VIS-006 — Académie mobile atteint 9 325px, avec les 50 termes affichés d’un bloc.
+
+- Sévérité : MEDIUM
+- Pages : `academie`
+- Viewports : mobile
+- Preuve : `.cache/phase4-phase12-tous-coverage/academie-mobile.png`
+- Action : Collapser les catégories ou limiter les termes visibles avant recherche/filtre.
+- Statut : OPEN
+
+### P12-VIS-007 — La table des matières mobile reste proche de la bottom nav et perd de la respiration.
+
+- Sévérité : LOW
+- Pages : `academie`
+- Viewports : mobile
+- Preuve : `.cache/phase4-phase12-tous-coverage/academie-mobile.png`
+- Action : Ajouter marge basse et réduire le bloc toc sur mobile.
+- Statut : OPEN
+
+### P12-VIS-008 — Profil mobile/tablet reste très long (7 493px mobile, 5 622px tablet) avec beaucoup de panneaux ouverts.
+
+- Sévérité : MEDIUM
+- Pages : `profil`
+- Viewports : mobile/tablet
+- Preuve : `.cache/phase4-phase12-tous-coverage/profil-mobile.png`
+- Action : Transformer les sections secondaires en accordéons et garder Bankroll/Préférences en haut.
+- Statut : OPEN
+
+### P12-VIS-009 — Santé reste très haute sur tablette/wide (4 923px/4 295px) malgré l’espace desktop.
+
+- Sévérité : MEDIUM
+- Pages : `sante`
+- Viewports : tablet/desktop/wide
+- Preuve : `.cache/phase4-phase12-tous-coverage/sante-wide.png`
+- Action : Mettre les détails pipeline en accordéons et garder KPIs + erreurs visibles d’abord.
+- Statut : OPEN
+
+### P12-VIS-010 — Les éléments fixed/sticky se répètent ou couvrent du contenu dans les full-page screenshots, ce qui rend l’audit manuel plus difficile.
+
+- Sévérité : LOW
+- Pages : `global`
+- Viewports : all full-page captures
+- Preuve : `.cache/phase4-phase12-tous-coverage/manifest.json`
+- Action : Ajouter un mode capture CSS désactivant sticky/fixed pour les screenshots full-page.
+- Statut : OPEN
