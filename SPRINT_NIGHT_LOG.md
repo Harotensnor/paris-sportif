@@ -1876,3 +1876,8 @@
 - Apres: la premiere vue devient une fiche decision courte (match, horaire, cote, EV, Kelly, 5 raisons) et les onglets historiques sont replies derriere "Voir les details techniques".
 - Impact: la decision est lisible en 10 secondes, tout le detail reste disponible au clic, sans retirer les onglets ni les stats.
 - Verif: syntax app.js/sw.js OK, Playwright local confirme panel technique hidden -> visible, 0 erreur console, captures .cache/v36-modal-why-*.png.
+## Sprint v35.274 — Phase 12 V36 P-12.20 Dark premium skin (18:13 UTC)
+- Avant: le cockpit 5 tiers avait encore des surfaces heritees et une animation page-fade pouvait laisser l'accueil trop sombre pendant les captures.
+- Apres: palette V36 dark premium, accents distincts par tier, cartes avec barre de couleur, nav compacte et fade desactive sur l'accueil.
+- Impact: desktop plus lisible et plus "pro betting"; la sidebar ne gonfle plus a 166px par item et les tiers restent visibles sans overflow.
+- Verif: Playwright desktop/mobile 20 cards, 0 erreur console, overflowX=false; captures .cache/v36-premium-skin-dashboard-final2.png et mobile.
