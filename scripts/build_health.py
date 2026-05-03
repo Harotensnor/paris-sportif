@@ -159,6 +159,11 @@ SOURCES = [
         'matched': d.get('matched') or 0 if isinstance(d, dict) else 0,
         'status': d.get('status') if isinstance(d, dict) else 'missing',
     }),
+    ('openligadb_matches', 'openligadb_matches.json', lambda d: {
+        'matches': len(d.get('matches') or []) if isinstance(d, dict) else 0,
+        'matched_local_events': d.get('matched_local_events') or 0 if isinstance(d, dict) else 0,
+        'status': d.get('status') if isinstance(d, dict) else 'missing',
+    }),
     ('footballdata',    'footballdata.json',    _count_footballdata),
     ('clv_history',     'clv_history.json',     _count_clv),
 ]
@@ -180,6 +185,7 @@ STALE_AFTER_MIN = {
     'sofascore_events': 30,    # cron tick chaque 5min, max 30min stale
     'team_form':       6*60,   # 6h self-throttle
     'thesportsdb_meta': 24*60,  # daily metadata cache
+    'openligadb_matches': 12*60, # German football cross-check cache
     'footballdata':    24*60,  # daily fetch
     'clv_history':     60,
 }
@@ -198,6 +204,7 @@ SOURCE_SCRIPT = {
     'sofascore_events': 'scripts/fetch_sofascore_events.py',
     'team_form': 'scripts/fetch_team_form.py',
     'thesportsdb_meta': 'scripts/fetch_thesportsdb_meta.py',
+    'openligadb_matches': 'scripts/fetch_openligadb.py',
     'footballdata': 'scripts/fetch_footballdata.py',
     'clv_history': 'scripts/compute_clv.py',
 }
