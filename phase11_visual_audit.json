@@ -1,0 +1,76 @@
+{
+  "generated_at": "2026-05-03T11:33:02.304Z",
+  "tag": "phase11-current",
+  "screenshots": 32,
+  "failures": [],
+  "overflow_x_count": 0,
+  "max_heights": [
+    {
+      "page": "academie",
+      "viewport": "mobile",
+      "height": 9325,
+      "width": 375
+    },
+    {
+      "page": "profil",
+      "viewport": "mobile",
+      "height": 7441,
+      "width": 375
+    },
+    {
+      "page": "profil",
+      "viewport": "tablet",
+      "height": 5622,
+      "width": 768
+    },
+    {
+      "page": "academie",
+      "viewport": "desktop",
+      "height": 5221,
+      "width": 1440
+    },
+    {
+      "page": "sante",
+      "viewport": "tablet",
+      "height": 4923,
+      "width": 768
+    },
+    {
+      "page": "academie",
+      "viewport": "tablet",
+      "height": 4666,
+      "width": 768
+    },
+    {
+      "page": "dashboard",
+      "viewport": "tablet",
+      "height": 4569,
+      "width": 768
+    },
+    {
+      "page": "sante",
+      "viewport": "desktop",
+      "height": 4343,
+      "width": 1440
+    },
+    {
+      "page": "sante",
+      "viewport": "wide",
+      "height": 4295,
+      "width": 1920
+    },
+    {
+      "page": "profil",
+      "viewport": "desktop",
+      "height": 4187,
+      "width": 1440
+    }
+  ],
+  "manual_notes": [
+    "Dashboard desktop: 3-column layout present, no horizontal overflow.",
+    "Dashboard mobile: 3774px height, below previous compactness target; bottom nav is fixed as expected in full-page capture.",
+    "Tous mobile: dense cards remain readable; full-page capture shows fixed bottom nav overlay artifact, not horizontal overflow.",
+    "Academie/profil mobile are the longest pages because they are editorial/settings pages."
+  ],
+  "status": "pass"
+}

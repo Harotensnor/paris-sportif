@@ -1652,4 +1652,8 @@
 - Avant: night_metrics date de 09:26 UTC.
 - Apres: metrics regen 11:31 UTC, 373 events exacts Winamax, 321 multi-marches.
 - Impact: reporting Phase 11 aligne sur la data live actuelle.
-- Verif: measure_night_metrics OK, syntax/bundle OK.
+- Verif: measure_night_metrics OK, syntax/bundle OK.## Sprint v35.230 — Phase 11 P-11.36 Baseline visuelle (13:35 local)
+- Avant: pas de baseline Phase 11 post-lazy-images documentee.
+- Apres: 32 captures OK, 0 failure, 0 overflow horizontal, resume phase11_visual_audit.json.
+- Impact: validation visuelle complete 8 pages x 4 viewports apres les derniers sprints.
+- Verif: visual_capture phase11-current OK, syntax/bundle OK.
