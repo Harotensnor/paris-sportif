@@ -10350,6 +10350,7 @@
         <div class="why-bet__grid">
           <div>
             <h3 id="why-bet-title">${esc(whyLabel)} ${whyOdd ? `<span>@${whyOdd.toFixed(2)}</span>` : ''}</h3>
+            <div class="why-bet__match">${esc(home?.name || 'Domicile')} vs ${esc(away?.name || 'Extérieur')} · ${esc(fmtTime(match.date))}${match.league ? ` · ${esc(match.league)}` : ''}</div>
             <p>${whyEdge > 0 ? `+${(whyEdge * 100).toFixed(1)}% mieux que le marché` : 'Pas assez de value claire'} · ${whyEv >= 0 ? '+' : ''}${Math.round(whyEv * 100)}% attendu par euro misé.</p>
           </div>
           <div class="why-bet__stake">
@@ -12356,10 +12357,7 @@
     });
     const whyTechBtn = body.querySelector('[data-why-tech-toggle]');
     if (whyTechBtn) {
-      whyTechBtn.addEventListener('click', () => {
-        const tabs = body.querySelector('.md-tabs');
-        if (tabs) tabs.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
+      whyTechBtn.setAttribute('aria-expanded', 'false');
     }
 
     // #match/123/cotes ouvre directement le bon onglet (partage de lien).
@@ -12457,6 +12455,38 @@
         });
       });
       setActive(initialTab);
+    })();
+
+    (function setupWhyTechPanel() {
+      const whyBlock = body.querySelector('.why-bet');
+      const toggle = body.querySelector('[data-why-tech-toggle]');
+      if (!whyBlock || !toggle) return;
+      const moving = [];
+      let node = whyBlock.nextSibling;
+      while (node) {
+        const next = node.nextSibling;
+        moving.push(node);
+        node = next;
+      }
+      if (!moving.length) return;
+      const shell = document.createElement('div');
+      shell.className = 'why-tech-panel';
+      shell.id = `why-tech-panel-${String(match.id || 'match').replace(/[^a-zA-Z0-9_-]/g, '-')}`;
+      shell.hidden = true;
+      whyBlock.after(shell);
+      moving.forEach(n => shell.appendChild(n));
+      toggle.setAttribute('aria-controls', shell.id);
+      const setExpanded = (expanded) => {
+        shell.hidden = !expanded;
+        toggle.setAttribute('aria-expanded', String(expanded));
+        toggle.textContent = expanded ? 'Masquer les détails techniques' : 'Voir les détails techniques';
+        if (expanded) {
+          const tabs = shell.querySelector('.md-tabs') || shell.querySelector('.teams-big') || shell;
+          tabs.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      };
+      toggle.addEventListener('click', () => setExpanded(shell.hidden));
+      setExpanded(false);
     })();
 
     // scroll vertical (qui faisait jusqu'à 5400px sur foot top-5). Sur ≤720px,
