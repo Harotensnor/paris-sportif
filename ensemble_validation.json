@@ -1,0 +1,437 @@
+{
+  "generated_at": "2026-05-03T18:09:23Z",
+  "schema": "ensemble_validation_v1",
+  "status": "ok",
+  "historical": {
+    "resolved_candidates": 701,
+    "predictions": 701,
+    "with_ensemble": 535,
+    "missing_ensemble": 166,
+    "final_brier": 0.2333,
+    "random_50_brier": 0.25,
+    "final_vs_random_brier": -0.0167,
+    "component_counts": {
+      "n": 701,
+      "avg": 0.9101,
+      "p95": 2.0,
+      "max": 3.0
+    },
+    "agreement_variance": {
+      "n": 701,
+      "avg": 0.0005,
+      "p95": 0.0023,
+      "max": 0.0355
+    },
+    "high_disagreement_gt_015": 0,
+    "by_kind": {
+      "dixon_coles_xg": {
+        "n": 501,
+        "avg_weight": 0.5,
+        "component_brier": 0.2391,
+        "ensemble_brier_same_rows": 0.235,
+        "component_minus_ensemble_brier": 0.0041
+      },
+      "elo": {
+        "n": 34,
+        "avg_weight": 0.3,
+        "component_brier": 0.2852,
+        "ensemble_brier_same_rows": 0.2524,
+        "component_minus_ensemble_brier": 0.0327
+      },
+      "form": {
+        "n": 103,
+        "avg_weight": 0.3,
+        "component_brier": 0.2376,
+        "ensemble_brier_same_rows": 0.2256,
+        "component_minus_ensemble_brier": 0.0121
+      }
+    },
+    "v36_tier_counts": {
+      "tier2_solide": 56,
+      "opportunity_other": 516,
+      "tier3_valeur": 74,
+      "tier4_big_odds": 36,
+      "tier1_sur": 19
+    },
+    "v36_strict_tier_counts": {
+      "tier4_big_odds": 8,
+      "tier3_valeur": 24,
+      "tier2_solide": 10,
+      "tier1_sur": 3
+    },
+    "declared_weights": {
+      "dixon_coles_xg": 0.4,
+      "elo": 0.25,
+      "form": 0.1,
+      "h2h": 0.05
+    },
+    "top_disagreements": [
+      {
+        "id": "401859369",
+        "name": "Kawasaki Frontale at FC Tokyo",
+        "sport": "football",
+        "pick": "1 · FC Tokyo",
+        "final_prob": 0.558,
+        "variance": 0.0355,
+        "component_count": 2,
+        "sub_models": [
+          {
+            "name": "Buts attendus",
+            "kind": "dixon_coles_xg",
+            "weight": 0.5,
+            "pick_prob": 0.842
+          },
+          {
+            "name": "Bilan saison",
+            "kind": "form",
+            "weight": 0.3,
+            "pick_prob": 0.465
+          }
+        ]
+      },
+      {
+        "id": "747001",
+        "name": "1. FC Heidenheim 1846 at Bayern Munich",
+        "sport": "football",
+        "pick": "1 · Bayern",
+        "final_prob": 0.824,
+        "variance": 0.0337,
+        "component_count": 3,
+        "sub_models": [
+          {
+            "name": "Buts attendus",
+            "kind": "dixon_coles_xg",
+            "weight": 0.5,
+            "pick_prob": 0.979
+          },
+          {
+            "name": "Bilan saison",
+            "kind": "form",
+            "weight": 0.3,
+            "pick_prob": 0.562
+          },
+          {
+            "name": "Force",
+            "kind": "elo",
+            "weight": 0.3,
+            "pick_prob": 0.917
+          }
+        ]
+      },
+      {
+        "id": "746695",
+        "name": "Lorient at Paris Saint-Germain",
+        "sport": "football",
+        "pick": "1 · PSG",
+        "final_prob": 0.732,
+        "variance": 0.0281,
+        "component_count": 3,
+        "sub_models": [
+          {
+            "name": "Buts attendus",
+            "kind": "dixon_coles_xg",
+            "weight": 0.5,
+            "pick_prob": 0.812
+          },
+          {
+            "name": "Bilan saison",
+            "kind": "form",
+            "weight": 0.3,
+            "pick_prob": 0.474
+          },
+          {
+            "name": "Force",
+            "kind": "elo",
+            "weight": 0.3,
+            "pick_prob": 0.844
+          }
+        ]
+      },
+      {
+        "id": "737127",
+        "name": "Hellas Verona at Juventus",
+        "sport": "football",
+        "pick": "1 · Juventus",
+        "final_prob": 0.669,
+        "variance": 0.0207,
+        "component_count": 3,
+        "sub_models": [
+          {
+            "name": "Buts attendus",
+            "kind": "dixon_coles_xg",
+            "weight": 0.5,
+            "pick_prob": 0.869
+          },
+          {
+            "name": "Bilan saison",
+            "kind": "form",
+            "weight": 0.3,
+            "pick_prob": 0.542
+          },
+          {
+            "name": "Force",
+            "kind": "elo",
+            "weight": 0.3,
+            "pick_prob": 0.821
+          }
+        ]
+      },
+      {
+        "id": "740936",
+        "name": "Fulham at Arsenal",
+        "sport": "football",
+        "pick": "1 · Arsenal",
+        "final_prob": 0.684,
+        "variance": 0.0166,
+        "component_count": 3,
+        "sub_models": [
+          {
+            "name": "Buts attendus",
+            "kind": "dixon_coles_xg",
+            "weight": 0.5,
+            "pick_prob": 0.732
+          },
+          {
+            "name": "Bilan saison",
+            "kind": "form",
+            "weight": 0.3,
+            "pick_prob": 0.476
+          },
+          {
+            "name": "Force",
+            "kind": "elo",
+            "weight": 0.3,
+            "pick_prob": 0.764
+          }
+        ]
+      },
+      {
+        "id": "746691",
+        "name": "Le Havre AC at Lille",
+        "sport": "football",
+        "pick": "1 · Lille",
+        "final_prob": 0.687,
+        "variance": 0.0127,
+        "component_count": 3,
+        "sub_models": [
+          {
+            "name": "Buts attendus",
+            "kind": "dixon_coles_xg",
+            "weight": 0.5,
+            "pick_prob": 0.703
+          },
+          {
+            "name": "Bilan saison",
+            "kind": "form",
+            "weight": 0.3,
+            "pick_prob": 0.474
+          },
+          {
+            "name": "Force",
+            "kind": "elo",
+            "weight": 0.3,
+            "pick_prob": 0.721
+          }
+        ]
+      },
+      {
+        "id": "748480",
+        "name": "Barcelona at Osasuna",
+        "sport": "football",
+        "pick": "2 · Barcelona",
+        "final_prob": 0.559,
+        "variance": 0.0126,
+        "component_count": 3,
+        "sub_models": [
+          {
+            "name": "Buts attendus",
+            "kind": "dixon_coles_xg",
+            "weight": 0.5,
+            "pick_prob": 0.456
+          },
+          {
+            "name": "Bilan saison",
+            "kind": "form",
+            "weight": 0.3,
+            "pick_prob": 0.424
+          },
+          {
+            "name": "Force",
+            "kind": "elo",
+            "weight": 0.3,
+            "pick_prob": 0.676
+          }
+        ]
+      },
+      {
+        "id": "746698",
+        "name": "Brest at Paris FC",
+        "sport": "football",
+        "pick": "1 · Paris FC",
+        "final_prob": 0.51,
+        "variance": 0.012,
+        "component_count": 3,
+        "sub_models": [
+          {
+            "name": "Buts attendus",
+            "kind": "dixon_coles_xg",
+            "weight": 0.5,
+            "pick_prob": 0.628
+          },
+          {
+            "name": "Bilan saison",
+            "kind": "form",
+            "weight": 0.3,
+            "pick_prob": 0.42
+          },
+          {
+            "name": "Force",
+            "kind": "elo",
+            "weight": 0.3,
+            "pick_prob": 0.378
+          }
+        ]
+      },
+      {
+        "id": "401815175",
+        "name": "Milwaukee Brewers at Washington Nationals",
+        "sport": "baseball",
+        "pick": "2 · Brewers",
+        "final_prob": 0.627,
+        "variance": 0.0094,
+        "component_count": 2,
+        "sub_models": [
+          {
+            "name": "Domicile/Ext.",
+            "kind": "form",
+            "weight": 0.3,
+            "pick_prob": 0.741
+          },
+          {
+            "name": "Bilan saison",
+            "kind": "form",
+            "weight": 0.3,
+            "pick_prob": 0.546
+          }
+        ]
+      },
+      {
+        "id": "740942",
+        "name": "Burnley at Leeds United",
+        "sport": "football",
+        "pick": "1 · Leeds",
+        "final_prob": 0.661,
+        "variance": 0.0086,
+        "component_count": 3,
+        "sub_models": [
+          {
+            "name": "Buts attendus",
+            "kind": "dixon_coles_xg",
+            "weight": 0.5,
+            "pick_prob": 0.726
+          },
+          {
+            "name": "Bilan saison",
+            "kind": "form",
+            "weight": 0.3,
+            "pick_prob": 0.501
+          },
+          {
+            "name": "Force",
+            "kind": "elo",
+            "weight": 0.3,
+            "pick_prob": 0.639
+          }
+        ]
+      },
+      {
+        "id": "748477",
+        "name": "Levante at Villarreal",
+        "sport": "football",
+        "pick": "1 · Villarreal",
+        "final_prob": 0.622,
+        "variance": 0.0083,
+        "component_count": 3,
+        "sub_models": [
+          {
+            "name": "Buts attendus",
+            "kind": "dixon_coles_xg",
+            "weight": 0.5,
+            "pick_prob": 0.714
+          },
+          {
+            "name": "Bilan saison",
+            "kind": "form",
+            "weight": 0.3,
+            "pick_prob": 0.498
+          },
+          {
+            "name": "Force",
+            "kind": "elo",
+            "weight": 0.3,
+            "pick_prob": 0.656
+          }
+        ]
+      },
+      {
+        "id": "401815160",
+        "name": "Milwaukee Brewers at Washington Nationals",
+        "sport": "baseball",
+        "pick": "2 · Brewers",
+        "final_prob": 0.617,
+        "variance": 0.0081,
+        "component_count": 2,
+        "sub_models": [
+          {
+            "name": "Domicile/Ext.",
+            "kind": "form",
+            "weight": 0.3,
+            "pick_prob": 0.715
+          },
+          {
+            "name": "Bilan saison",
+            "kind": "form",
+            "weight": 0.3,
+            "pick_prob": 0.536
+          }
+        ]
+      }
+    ]
+  },
+  "current_snapshot": {
+    "upcoming_events_checked": 266,
+    "predictions": 266,
+    "with_ensemble": 235,
+    "component_counts": {
+      "n": 266,
+      "avg": 2.1992,
+      "p95": 3.0,
+      "max": 4.0
+    },
+    "agreement_variance": {
+      "n": 266,
+      "avg": 0.0082,
+      "p95": 0.0432,
+      "max": 0.0787
+    },
+    "v36_tier_counts": {
+      "tier3_valeur": 15,
+      "tier2_solide": 15,
+      "opportunity_other": 224,
+      "tier4_big_odds": 12
+    },
+    "v36_qualified_tier_picks": 42,
+    "v36_strict_tier_picks": 7,
+    "v36_strict_tier_counts": {
+      "tier3_valeur": 3,
+      "tier4_big_odds": 4
+    },
+    "kind_counts": {
+      "form": 238,
+      "h2h": 74,
+      "dixon_coles_xg": 168,
+      "elo": 105
+    }
+  },
+  "warnings": []
+}
