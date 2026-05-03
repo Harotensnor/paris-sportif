@@ -1621,3 +1621,8 @@
 - Apres: carte Suggestions personnalisees avec sport/cote a privilegier, zones a reduire et actions rapides.
 - Impact: Theo voit ses propres forces/faiblesses sans fouiller la Performance.
 - Verif: syntax app.js/sw.js OK, bundle check OK.
+## Sprint v35.223 — Phase 11 P-11.28 Mode competition (13:07 local)
+- Avant: progression utilisateur dispersee dans les stats, sans score lisible.
+- Apres: Profil affiche points, streak, ROI perso et badges locaux depuis les paris suivis.
+- Impact: Theo suit sa progression sans reseau externe ni leaderboard public.
+- Verif: syntax app.js/sw.js OK, bundle check OK avant stamp.
