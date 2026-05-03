@@ -1561,3 +1561,9 @@
 - Apres: public_team_stats.json fusionne Understat/ESPN/OpenLigaDB/TheSportsDB en contrat unique.
 - Impact: 880 équipes consolidées, 112 avec xG, 777 avec forme, 56 avec metadata publique.
 - Verif: py_compile OK, build_health OK, bundle OK.
+
+## Sprint v35.213 — Phase 11 P-11.18 Marchés rugby prêts (10:30 UTC)
+- Avant: aucun contrat dédié aux marchés rugby si la data en expose plus tard.
+- Apres: build_rugby_markets.py génère winner + totals depuis les events rugby existants.
+- Impact: pipeline prêt, statut `empty` propre aujourd'hui car aucun rugby Winamax-visible.
+- Verif: py_compile OK, build_health OK, rugby_markets status empty.

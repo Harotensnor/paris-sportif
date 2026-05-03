@@ -86,3 +86,14 @@ Implementation:
   adding fragile live scraping in the frontend.
 - Health metric: total teams, teams with xG, teams with form, teams with
   public metadata.
+
+## Derived Niche Markets
+
+Implementation:
+- `scripts/build_rugby_markets.py`
+- Output: `rugby_markets.json`
+- Scope: rugby events already present in `data.js` only.
+- Markets: winner and total points lines, derived from recent team scoring
+  where available with conservative priors.
+- Current behavior: emits `status: "empty"` when no Winamax-visible rugby is
+  present, so the pipeline is ready without adding fake picks.
