@@ -6,7 +6,8 @@ test.describe('model math guards', () => {
     await page.waitForFunction(
       () => window.__testAPI
         && typeof window.__testAPI._dixonColesTau === 'function'
-        && typeof window.__testAPI.poissonTopScores === 'function',
+        && typeof window.__testAPI.poissonTopScores === 'function'
+        && typeof window.__testAPI._isFreshBacktestReport === 'function',
       undefined,
       { timeout: 15000 }
     );
@@ -50,5 +51,22 @@ test.describe('model math guards', () => {
     for (const group of Object.values(out)) {
       expect(group.every(s => Number.isFinite(s.prob) && s.prob > 0)).toBe(true);
     }
+  });
+
+  test('backtest calibration reports expire after seven days', async ({ page }) => {
+    const out = await page.evaluate(() => {
+      const fresh = window.__testAPI._isFreshBacktestReport;
+      const now = new Date();
+      const old = new Date(Date.now() - 8 * 24 * 3600 * 1000);
+      return {
+        current: fresh({ generated_at: now.toISOString() }),
+        stale: fresh({ generated_at: old.toISOString() }),
+        missing: fresh({}),
+      };
+    });
+
+    expect(out.current).toBe(true);
+    expect(out.stale).toBe(false);
+    expect(out.missing).toBe(false);
   });
 });
