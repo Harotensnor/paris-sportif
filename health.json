@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-05-03T10:27:31Z",
+  "generated_at": "2026-05-03T10:27:51Z",
   "data_age_min": 0,
   "sources": {
     "winamax_catalog": {
-      "age_min": 5,
+      "age_min": 2,
       "tournaments": 111,
       "matches": 672
     },
@@ -13,58 +13,58 @@
       "matches_detailed": 248
     },
     "injuries_soccer": {
-      "age_min": 1749,
+      "age_min": 2,
       "teams": 150,
       "players": 545
     },
     "lineups_soccer": {
-      "age_min": 1753,
+      "age_min": 2,
       "events": 47
     },
     "team_stats": {
-      "age_min": 67,
+      "age_min": 2,
       "teams": 318
     },
     "clubelo": {
-      "age_min": 67,
+      "age_min": 2,
       "clubs": 630
     },
     "weather": {
-      "age_min": 0,
+      "age_min": 1,
       "events": 477
     },
     "referees_soccer": {
-      "age_min": 1732,
+      "age_min": 2,
       "events": 101
     },
     "xg_team_stats": {
-      "age_min": 0,
+      "age_min": 2,
       "teams": 112,
       "leagues": 6,
       "source": "understat"
     },
     "fbref_xg": {
-      "age_min": 0,
+      "age_min": 2,
       "teams": 112,
       "leagues": 6,
       "source": "understat_compat"
     },
     "sofascore_events": {
-      "age_min": 1690,
+      "age_min": 2,
       "total": 2425
     },
     "team_form": {
-      "age_min": 24,
+      "age_min": 2,
       "teams": 777,
       "football_teams": 708
     },
     "form_stats_extended": {
-      "age_min": 24,
+      "age_min": 2,
       "teams": 777,
       "sports": 4
     },
     "h2h_extended": {
-      "age_min": 0,
+      "age_min": 2,
       "events": 167,
       "sports": 5
     },
@@ -74,13 +74,13 @@
       "sports": 4
     },
     "thesportsdb_meta": {
-      "age_min": 12,
+      "age_min": 2,
       "requested": 12,
       "matched": 0,
       "status": "degraded"
     },
     "openligadb_matches": {
-      "age_min": 5,
+      "age_min": 2,
       "matches": 121,
       "matched_local_events": 22,
       "status": "ok"
@@ -99,7 +99,7 @@
       "seasons": 2
     },
     "clv_history": {
-      "age_min": 0,
+      "age_min": 2,
       "matches": 802,
       "observations": 2235,
       "mean_clv_pct": -0.11,
@@ -111,7 +111,7 @@
     "winamax_catalog": {
       "script": "scripts/fetch_winamax_catalog.py",
       "output": "winamax_catalog.json",
-      "age_min": 5,
+      "age_min": 2,
       "threshold_min": 15,
       "fast_red_min": 30,
       "status": "ok"
@@ -127,23 +127,23 @@
     "injuries_soccer": {
       "script": "scripts/fetch_injuries_soccer.py",
       "output": "injuries_soccer.json",
-      "age_min": 1749,
+      "age_min": 2,
       "threshold_min": 180,
       "fast_red_min": null,
-      "status": "warn"
+      "status": "ok"
     },
     "lineups_soccer": {
       "script": "scripts/fetch_lineups_soccer.py",
       "output": "lineups_soccer.json",
-      "age_min": 1753,
+      "age_min": 2,
       "threshold_min": 180,
       "fast_red_min": null,
-      "status": "warn"
+      "status": "ok"
     },
     "team_stats": {
       "script": "scripts/fetch_team_stats.py",
       "output": "team_stats.json",
-      "age_min": 67,
+      "age_min": 2,
       "threshold_min": 300,
       "fast_red_min": null,
       "status": "ok"
@@ -151,7 +151,7 @@
     "clubelo": {
       "script": "scripts/fetch_clubelo.py",
       "output": "clubelo.json",
-      "age_min": 67,
+      "age_min": 2,
       "threshold_min": 1440,
       "fast_red_min": null,
       "status": "ok"
@@ -159,7 +159,7 @@
     "weather": {
       "script": "scripts/fetch_weather.py",
       "output": "weather.json",
-      "age_min": 0,
+      "age_min": 1,
       "threshold_min": 60,
       "fast_red_min": 30,
       "status": "ok"
@@ -167,15 +167,15 @@
     "referees_soccer": {
       "script": "scripts/fetch_referees_soccer.py",
       "output": "referees_soccer.json",
-      "age_min": 1732,
+      "age_min": 2,
       "threshold_min": 480,
       "fast_red_min": null,
-      "status": "warn"
+      "status": "ok"
     },
     "xg_team_stats": {
       "script": "scripts/fetch_understat_xg.py",
       "output": "xg_team_stats.json",
-      "age_min": 0,
+      "age_min": 2,
       "threshold_min": 360,
       "fast_red_min": null,
       "status": "ok"
@@ -183,7 +183,7 @@
     "fbref_xg": {
       "script": "scripts/fetch_understat_xg.py",
       "output": "fbref_xg.json",
-      "age_min": 0,
+      "age_min": 2,
       "threshold_min": 360,
       "fast_red_min": null,
       "status": "ok"
@@ -191,15 +191,15 @@
     "sofascore_events": {
       "script": "scripts/fetch_sofascore_events.py",
       "output": "sofascore_events.json",
-      "age_min": 1690,
+      "age_min": 2,
       "threshold_min": 30,
       "fast_red_min": 30,
-      "status": "crit"
+      "status": "ok"
     },
     "team_form": {
       "script": "scripts/fetch_team_form.py",
       "output": "team_form.json",
-      "age_min": 24,
+      "age_min": 2,
       "threshold_min": 360,
       "fast_red_min": null,
       "status": "ok"
@@ -207,7 +207,7 @@
     "form_stats_extended": {
       "script": "form_stats_extended.json",
       "output": "form_stats_extended.json",
-      "age_min": 24,
+      "age_min": 2,
       "threshold_min": 60,
       "fast_red_min": null,
       "status": "ok"
@@ -215,7 +215,7 @@
     "h2h_extended": {
       "script": "h2h_extended.json",
       "output": "h2h_extended.json",
-      "age_min": 0,
+      "age_min": 2,
       "threshold_min": 60,
       "fast_red_min": null,
       "status": "ok"
@@ -223,7 +223,7 @@
     "injuries_multisport": {
       "script": "injuries_multisport.json",
       "output": "injuries_multisport.json",
-      "age_min": 0,
+      "age_min": 2,
       "threshold_min": 60,
       "fast_red_min": null,
       "status": "ok"
@@ -231,7 +231,7 @@
     "thesportsdb_meta": {
       "script": "scripts/fetch_thesportsdb_meta.py",
       "output": "thesportsdb_meta.json",
-      "age_min": 12,
+      "age_min": 2,
       "threshold_min": 1440,
       "fast_red_min": null,
       "status": "ok"
@@ -239,7 +239,7 @@
     "openligadb_matches": {
       "script": "scripts/fetch_openligadb.py",
       "output": "openligadb_matches.json",
-      "age_min": 5,
+      "age_min": 2,
       "threshold_min": 720,
       "fast_red_min": null,
       "status": "ok"
@@ -263,7 +263,7 @@
     "clv_history": {
       "script": "scripts/compute_clv.py",
       "output": "clv_history.json",
-      "age_min": 0,
+      "age_min": 2,
       "threshold_min": 60,
       "fast_red_min": null,
       "status": "ok"
@@ -299,12 +299,7 @@
     ]
   },
   "warnings": [
-    "injuries_soccer: stale (1749min > 180min threshold)",
-    "lineups_soccer: stale (1753min > 180min threshold)",
-    "referees_soccer: stale (1732min > 480min threshold)",
-    "sofascore_events: stale (1690min > 30min threshold)",
-    "sofascore_events: lag pipeline rouge (1690min > 30min)",
-    "pipeline_drift: 3 divergence(s) auto_refresh/refresh.yml"
+    "pipeline_drift: 2 divergence(s) auto_refresh/refresh.yml"
   ],
   "overall": "warning",
   "quality_checks": {
@@ -319,7 +314,7 @@
     "winamax_detail_gap_to_target": 0,
     "winamax_detail_fetch_cap_reco": 90,
     "winamax_detail_status": "ok",
-    "actionable_external_odds": 186,
+    "actionable_external_odds": 188,
     "football_invalid_form": 0,
     "events_with_xg": 82,
     "winamax_coverage": {
