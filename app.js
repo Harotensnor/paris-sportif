@@ -14888,6 +14888,38 @@
           <em>${esc(String(m.league_name || m.league || sportLabel(m.sport || '')).slice(0, 28))}</em>
         </button>`;
       }).join('') : `<div class="v36-tier-empty">Aucun match proche.</div>`;
+      if (!window.__v36BoostedOddsLoading && !window.__v36BoostedOddsData) {
+        window.__v36BoostedOddsLoading = true;
+        fetch('boosted_odds.json?t=' + Math.floor(Date.now() / 300000), { cache: 'no-store' })
+          .then(r => r.ok ? r.json() : null)
+          .then(j => { window.__v36BoostedOddsData = j || { status: 'unavailable', boosts: [] }; })
+          .catch(() => { window.__v36BoostedOddsData = { status: 'unavailable', boosts: [] }; })
+          .finally(() => {
+            window.__v36BoostedOddsLoading = false;
+            if (wrap && document.body.contains(wrap) && currentPage === 'dashboard') renderDashboardPage(wrap);
+          });
+      }
+      const v36BoostData = window.__v36BoostedOddsData || null;
+      const v36Boosts = (Array.isArray(v36BoostData?.boosts) ? v36BoostData.boosts : []).slice(0, 5);
+      const v36BoostGenerated = v36BoostData?.generated_at ? new Date(v36BoostData.generated_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '';
+      const v36BoostHtml = v36Boosts.length ? v36Boosts.map(b => {
+        const match = `${b.home || '?'} - ${b.away || '?'}`;
+        const odd = Number(b.odd || 0);
+        const pct = Number(b.boost_pct || 0);
+        return `<a class="v36-boost-card" href="${esc(b.url || 'https://www.winamax.fr/paris-sportifs')}" target="_blank" rel="noopener">
+          <span><b>${esc(b.tournament || b.category || b.sport || 'Winamax')}</b><em>${pct > 0 ? `+${pct.toFixed(1)}%` : 'boost explicite'}</em></span>
+          <strong>${esc(match)}</strong>
+          <small>${esc(b.label || b.title || 'Cote boostee')}</small>
+          <i>@${Number.isFinite(odd) && odd > 0 ? odd.toFixed(2) : '--'}</i>
+        </a>`;
+      }).join('') : '';
+      const v36BoostStatus = v36Boosts.length
+        ? `${v36Boosts.length} boost${v36Boosts.length > 1 ? 's' : ''} explicite${v36Boosts.length > 1 ? 's' : ''} detecte${v36Boosts.length > 1 ? 's' : ''}${v36BoostGenerated ? ` · scan ${v36BoostGenerated}` : ''}`
+        : (v36BoostData ? `Aucune cote boostee explicite fiable detectee${v36BoostGenerated ? ` · scan ${v36BoostGenerated}` : ''}` : 'Scan des cotes boostees Winamax en cours');
+      const v36BoostSection = `<section class="v36-boost-strip ${v36Boosts.length ? 'has-boosts' : 'is-empty'}" aria-label="Cotes boostees Winamax">
+        <header><span>BOOST</span><strong>Cotes boostees Winamax</strong><em>${esc(v36BoostStatus)}</em></header>
+        ${v36Boosts.length ? `<div class="v36-boost-grid">${v36BoostHtml}</div>` : `<p>Pas de promotion explicite a jouer aveuglement. Le modele garde les 5 tiers comme source principale.</p>`}
+      </section>`;
       const v36StatsHtml = [
         ['Picks', String(v36PickPool.length)],
         ['Matchs', String(v36UpcomingAll.length)],
@@ -14918,6 +14950,7 @@
               ${v36FilterButton('time', 'night', 'Nuit', v36Filter.time === 'night')}
             </div>
           </section>
+          ${v36BoostSection}
           <div class="v36-home-grid">
             <section class="v36-tier-board" aria-label="Picks par niveau de cote">
               ${v36TierDefs.map(v36TierColumn).join('')}

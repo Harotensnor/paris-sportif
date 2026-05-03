@@ -1906,3 +1906,8 @@
 - Apres: bouton Export CSV sur la barre de filtres, avec statut/date/sport/ligue/equipes/pick/cotes/source/url.
 - Impact: l'export suit exactement les filtres actifs et inclut tous les onglets affichables (a venir, live, finis).
 - Verif: syntax app.js/sw.js OK, Playwright telecharge tous-pronos-YYYY-MM-DD.csv sur #tous?q=yankees, header CSV OK, 0 erreur console.
+## Sprint v35.280 — Phase 12 V36 P-12.27 Cotes boostees Winamax (17:54 UTC)
+- Avant: le detecteur boosted_odds.json existait mais l'accueil ne surfacait pas les boosts, ni l'etat "aucun boost fiable".
+- Apres: chargement paresseux du sidecar Winamax, strip V36 "Cotes boostees" avec cards si boosts reels et empty state compact si scan vide.
+- Impact: Theo voit immediatement si une promotion explicite est exploitable, sans fausse inference ni encombrement du cockpit 5 tiers.
+- Verif: syntax app.js OK, git diff --check OK, Playwright dashboard 5 tiers, boosted strip visible, 0 carte (scan empty attendu), 0 erreur console.
