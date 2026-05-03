@@ -388,3 +388,10 @@ Overflow horizontal mesuré : 0 sur les 32 captures.
 - Preuve : `Select-String app.js` trouvait encore `renderLocksPage`, `renderCalendrierPage`, `renderFavorisPage`, `renderMatchsPage`, `renderPlanMisePage`, `renderValeurPage`, `renderSimulatorPage`, `renderLeaguePage` et leurs appels de dispatch.
 - Action : supprimer les dispatchs morts, garder les alias de routes vers les hubs modernes (`dashboard`, `tous`, `profil`, `performance`) et retirer le bloc de fonctions legacy.
 - Statut : FIXED v35.198 — 0 occurrence des renderers/appels legacy ciblés; `app.js` passe de `1748.5KB` à `1617.3KB`.
+
+### P11-BP-001 — Erreurs console page Performance
+
+- Sévérité : HIGH
+- Preuve : Lighthouse mobile Performance remontait `3` erreurs console `_getPerfTab is not defined`, ce qui plafonnait Best Practices à `90`.
+- Action : restaurer les helpers d'onglet Performance persistants (`_getPerfTab`, `_setPerfTab`) avec fallback `global`.
+- Statut : FIXED v35.199 — Lighthouse Performance mobile/desktop : Best Practices `100`, erreurs console `0`.

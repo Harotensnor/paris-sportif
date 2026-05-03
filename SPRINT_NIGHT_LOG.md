@@ -1477,3 +1477,9 @@
 - Apres: dispatchs morts + bloc locks/calendrier/favoris/matchs/plan/valeur/simulator/league supprimes; app.js 1617.3KB.
 - Impact: -131KB de JS initial, routes legacy gardees par aliases vers les hubs modernes.
 - Verif: node --check app.js OK, grep renderers legacy 0, bundle OK, Lighthouse min perf 92/a11y 100/SEO 100.
+
+## Sprint v35.199 — Phase 11 P-11.4b Erreurs console Performance (09:24 UTC)
+- Avant: Lighthouse Performance mobile Best Practices 90 avec 3 erreurs `_getPerfTab is not defined`.
+- Apres: helpers onglets Performance restaures avec fallback `global`.
+- Impact: Performance mobile/desktop Best Practices 100 et 0 erreur console.
+- Verif: node --check app.js OK, bundle OK, Lighthouse min perf 92/a11y 98/SEO 100.
