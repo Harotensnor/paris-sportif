@@ -1597,3 +1597,9 @@
 - Apres: le bandeau cockpit affiche la cadence live 10/12/30s et l'âge de la data.
 - Impact: Théo voit les KPIs se rafraîchir sans recharger la page.
 - Verif: JS syntax OK, bundle OK, stamps app/sw mis à jour.
+
+## Sprint v35.219 — Phase 11 P-11.24 Magic search (10:48 UTC)
+- Avant: Cmd-K focusait seulement la barre de recherche.
+- Apres: la recherche propose pages, actions rapides, filtres sport et historique récent.
+- Impact: accès direct à Accueil, Tous, Performance, Mode Focus et filtres high-odds depuis le clavier.
+- Verif: JS syntax OK, bundle OK, stamps app/sw mis à jour.

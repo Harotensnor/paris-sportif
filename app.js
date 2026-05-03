@@ -542,6 +542,8 @@
       if (input) {
         input.focus();
         input.select && input.select();
+        if (typeof _renderRecentSearches === 'function' && !(input.value || '').trim()) _renderRecentSearches();
+        else if (typeof renderSearchSuggest === 'function') renderSearchSuggest(input.value || '');
       }
     });
   } catch (e) {}
@@ -12801,10 +12803,24 @@
     teams.forEach(t => items.push({ kind: 'team', label: t.name, sub: t.sport, logo: t.logo, matchId: t.nextMatchId }));
     leagues.forEach(l => items.push({ kind: 'league', label: l.name, sub: l.sport }));
     venues.forEach(v => items.push({ kind: 'venue', label: v.name, sub: v.sport }));
+    [
+      ['page', 'Accueil Big Bets', 'dashboard', 'Voir les gros coups du jour'],
+      ['page', 'Tous les paris', 'tous', 'Filtrer tous les matchs'],
+      ['page', 'Mes paris et performance', 'performance', 'Bilan, historique, track record'],
+      ['page', 'Méthode', 'academie', 'Glossaire et stratégie'],
+      ['page', 'Profil', 'profil', 'Préférences et bankroll'],
+      ['page', 'Santé data', 'sante', 'Pipeline et erreurs'],
+      ['page', 'Montantes', 'montantes', 'Jour, weekend, semaine'],
+      ['action', 'Mode Big Bets seulement', 'focus', 'Masquer le bruit'],
+      ['action', 'Cotes 2.50+', 'sport:all:2.5', 'Filtrer les grosses cotes'],
+      ['action', 'Football du jour', 'sport:football', 'Filtrer football'],
+      ['action', 'Tennis du jour', 'sport:tennis', 'Filtrer tennis'],
+      ['action', 'Basketball du jour', 'sport:basketball', 'Filtrer basket'],
+    ].forEach(([kind, label, action, sub]) => items.push({ kind, label, action, sub }));
     return { items };
   }
   const sportIconAA = (sp) => sp === 'football' ? '⚽' : sp === 'basketball' ? '🏀' : sp === 'tennis' ? '🎾' : sp === 'hockey' ? '🏒' : '🎯';
-  const kindIcon = (k) => k === 'team' ? '👕' : k === 'league' ? '🏆' : '📍';
+  const kindIcon = (k) => k === 'team' ? '👕' : k === 'league' ? '🏆' : k === 'page' ? '↗' : k === 'action' ? '⚡' : '📍';
   function renderSearchSuggest(q) {
     const box = document.getElementById('search-suggest');
     if (!box) return;
@@ -12846,10 +12862,10 @@
       const ico = it.kind === 'team' && it.logo
         ? `<img src="${esc(it.logo)}" alt="" loading="lazy" decoding="async" style="width:20px;height:20px;object-fit:contain;border-radius:3px;" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"><span style="display:none;">${kindIcon(it.kind)}</span>`
         : `<span>${kindIcon(it.kind)}</span>`;
-      return `<div class="search-suggest-item" data-idx="${i}" data-kind="${esc(it.kind)}" data-label="${esc(it.label)}" ${it.matchId ? `data-match-id="${esc(it.matchId)}"` : ''} style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;">
+      return `<div class="search-suggest-item" data-idx="${i}" data-kind="${esc(it.kind)}" data-label="${esc(it.label)}" ${it.matchId ? `data-match-id="${esc(it.matchId)}"` : ''} ${it.action ? `data-action="${esc(it.action)}"` : ''} style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;">
         ${ico}
         <span style="flex:1;color:var(--text,#e6ebf2);font-weight:500;">${_highlightMatch(it.label, q)}</span>
-        <span style="color:var(--text-dim2,#7b8693);font-size:11px;">${sportIconAA(it.sub)} ${it.kind === 'team' ? 'équipe' : it.kind === 'league' ? 'tournoi' : 'ville'}</span>
+        <span style="color:var(--text-dim2,#7b8693);font-size:11px;">${it.kind === 'page' ? 'page' : it.kind === 'action' ? 'action' : `${sportIconAA(it.sub)} ${it.kind === 'team' ? 'équipe' : it.kind === 'league' ? 'tournoi' : 'ville'}`}</span>
       </div>`;
     }).join('');
     box.style.display = 'block';
@@ -12860,10 +12876,37 @@
         const label = el.dataset.label;
         const kind = el.dataset.kind;
         const mid = el.dataset.matchId;
+        const action = el.dataset.action || '';
         const input = document.getElementById('search');
         input.value = label;
         searchTerm = label;
         try { _saveRecentSearch(label); } catch(e){}
+        if (kind === 'page' && action) {
+          currentPage = PAGE_ALIASES[action] || action;
+          try { localStorage.setItem('currentPage', currentPage); } catch(e){}
+          try { history.replaceState(null, '', location.pathname + location.search + '#' + currentPage); } catch(e){}
+          box.style.display = 'none';
+          if (typeof applyPageView === 'function') applyPageView(); else render();
+          return;
+        }
+        if (kind === 'action' && action) {
+          if (action === 'focus') {
+            const key = 'paris_sportif_focus_big_bets_v1';
+            try { localStorage.setItem(key, localStorage.getItem(key) === '1' ? '0' : '1'); } catch(e){}
+            currentPage = 'dashboard';
+            try { history.replaceState(null, '', location.pathname + location.search + '#dashboard'); } catch(e){}
+          } else if (action.startsWith('sport:')) {
+            const parts = action.split(':');
+            const sp = parts[1] || 'all';
+            const odd = parts[2] || '';
+            const qs = sp === 'all' ? `odd=${encodeURIComponent(odd)}` : `sport=${encodeURIComponent(sp)}${odd ? `&odd=${encodeURIComponent(odd)}` : ''}`;
+            location.hash = `#tous?${qs}`;
+            currentPage = 'tous';
+          }
+          box.style.display = 'none';
+          if (typeof applyPageView === 'function') applyPageView(); else render();
+          return;
+        }
         render();
         box.style.display = 'none';
         // Si équipe et prochain match identifié, ouvre directement la fiche.
