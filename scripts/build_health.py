@@ -164,6 +164,11 @@ SOURCES = [
         'matched_local_events': d.get('matched_local_events') or 0 if isinstance(d, dict) else 0,
         'status': d.get('status') if isinstance(d, dict) else 'missing',
     }),
+    ('public_team_stats', 'public_team_stats.json', lambda d: {
+        'teams': d.get('teams_total') or 0 if isinstance(d, dict) else 0,
+        'teams_with_xg': d.get('teams_with_xg') or 0 if isinstance(d, dict) else 0,
+        'teams_with_form': d.get('teams_with_form') or 0 if isinstance(d, dict) else 0,
+    }),
     ('footballdata',    'footballdata.json',    _count_footballdata),
     ('clv_history',     'clv_history.json',     _count_clv),
 ]
@@ -186,6 +191,7 @@ STALE_AFTER_MIN = {
     'team_form':       6*60,   # 6h self-throttle
     'thesportsdb_meta': 24*60,  # daily metadata cache
     'openligadb_matches': 12*60, # German football cross-check cache
+    'public_team_stats': 6*60,  # merged public sidecar
     'footballdata':    24*60,  # daily fetch
     'clv_history':     60,
 }
@@ -205,6 +211,7 @@ SOURCE_SCRIPT = {
     'team_form': 'scripts/fetch_team_form.py',
     'thesportsdb_meta': 'scripts/fetch_thesportsdb_meta.py',
     'openligadb_matches': 'scripts/fetch_openligadb.py',
+    'public_team_stats': 'scripts/build_public_team_stats.py',
     'footballdata': 'scripts/fetch_footballdata.py',
     'clv_history': 'scripts/compute_clv.py',
 }

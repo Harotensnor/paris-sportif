@@ -1555,3 +1555,9 @@
 - Apres: fetch_openligadb.py + health + cron; Bundesliga/BL2/3. Liga sur fenêtre courante.
 - Impact: 121 matchs allemands récupérés, 22 reliés aux events locaux Winamax visibles.
 - Verif: py_compile OK, build_health OK, openligadb_matches status ok.
+
+## Sprint v35.212 — Phase 11 P-11.17 Stats publiques unifiées (10:26 UTC)
+- Avant: xG, forme ESPN et metadata publiques vivaient dans des sidecars séparés.
+- Apres: public_team_stats.json fusionne Understat/ESPN/OpenLigaDB/TheSportsDB en contrat unique.
+- Impact: 880 équipes consolidées, 112 avec xG, 777 avec forme, 56 avec metadata publique.
+- Verif: py_compile OK, build_health OK, bundle OK.

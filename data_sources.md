@@ -74,3 +74,15 @@ Implementation:
 - No live scraping loop. No odds scraping from these sources.
 - Every new source needs a sidecar JSON, `build_health.py` visibility, and
   `refresh.yml` commit coverage before it can affect UI or model decisions.
+
+## Consolidated Public Stats
+
+Implementation:
+- `scripts/build_public_team_stats.py`
+- Output: `public_team_stats.json`
+- Inputs: `xg_team_stats.json`, `team_stats.json`, `form_stats_extended.json`,
+  `thesportsdb_meta.json`, `openligadb_matches.json`
+- Purpose: one compact contract for public xG/form/metadata signals without
+  adding fragile live scraping in the frontend.
+- Health metric: total teams, teams with xG, teams with form, teams with
+  public metadata.
