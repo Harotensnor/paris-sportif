@@ -1981,3 +1981,8 @@
 - Après: variance insuffisante = null + flag insufficient; l'abstain ajoute ensemble_insufficient quand le sport n'a pas assez de signaux purs.
 - Impact: bug #74 traité sans faux positif Dixon-Coles: le 1-1 était déjà couvert par tau=1-rho et par tests unitaires existants.
 - Verif: app.js syntax OK; validate_ensemble_model.py OK (714 prédictions, Brier ensemble 0.2355, warnings=0).
+## Sprint v35.295 — AUTO 10/10 Service Worker install diet (19:53 UTC)
+- Avant: le Service Worker précachait app.js (~1.7MB) + images OG pendant l'installation, trop lourd pour une première visite mobile/3G.
+- Après: app.js reste stale-while-revalidate au premier hit puis offline, les OG images passent en cache-first lazy, et le precache install descend à ~493KB.
+- Impact: bugs #44/#45 avancés: install PWA plus léger, cache toujours robuste après une vraie visite, aucune donnée dynamique précachée.
+- Verif: sw.js syntax OK; calcul local precache=12 fichiers / 493KB, app.js=1725KB hors install.
