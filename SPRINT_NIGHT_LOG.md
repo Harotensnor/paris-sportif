@@ -1956,3 +1956,8 @@
 - Apres: build_league_bias_audit.py genere league_bias_audit.json depuis backtest_report_v2, avec statuts trusted/watch/deprioritize et couverture courante par ligue; refresh.yml et health.json le suivent.
 - Impact: 49 ligues auditees, 22 a surveiller, 1 trusted, 144 matchs a venir situes sur des ligues watch; 0 ligue en deprioritize dur sur le snapshot.
 - Verif: build_league_bias_audit.py OK, build_health OK, py_compile OK.
+## Sprint v35.290 — Phase 12 V36 P-12.37 Picks du genie (18:15 UTC)
+- Avant: les consensus rares etaient dilues dans les 5 colonnes, sans surface dediee quand ensemble + marche + calibration s'alignent.
+- Apres: l'accueil affiche une section "Picks du genie" uniquement quand un pick strict a au moins 2 sous-modeles, variance <=0.045, edge propre et aucune penalite ligue.
+- Impact: 4 picks consensus visibles au-dessus du cockpit V36 sur le snapshot courant, sans ajouter de panier ni de contenu inutile.
+- Verif: Playwright local dashboard 1440px => 4 genius cards, 5 tier columns, 15 cards visibles, overflowX=false, 0 erreur console; screenshot .cache/v36-genius-dashboard.png.
