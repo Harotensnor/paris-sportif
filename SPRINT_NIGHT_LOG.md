@@ -1795,4 +1795,8 @@
 - Avant: l'accueil ne montrait pas la couverture 7j, seulement les picks filtres Big Bets.
 - Apres: section Matchs detectes ajoutee avec total 7j, compteurs sport, aperçu horizontal et CTA Tous.
 - Impact: dashboard montre 251 matchs Winamax accessibles en full data, sans casser Big Bets.
-- Verif: visual_capture phase12-detected-matches 32/32 OK, syntax OK.
+- Verif: visual_capture phase12-detected-matches 32/32 OK, syntax OK.## Sprint v35.258 — Phase 12 hygiene push autostash (16:42 local)
+- Avant: l'autostash post-push avait laisse des marqueurs locaux dans pronostics.html/sw.js.
+- Apres: marqueurs retires, hashes restampes sur app.js courant et cache SW rebump.
+- Impact: deploy nettoye, app.js 80357195 reference correctement.
+- Verif: no conflict markers, syntax OK.
