@@ -1836,3 +1836,8 @@
 - Apres: fetch_h2h priorise les caches vides usa.1/mex.1/arg.1/ger.1/ger.2, fetch_weather couvre 7 jours et resout mieux les villes type "Austin, Texas".
 - Impact: H2H Arg 2/9 -> 8/9, MLS 0/12 -> 2/12, Liga MX 0/6 -> 2/6; meteo MLS 0/12 -> 11/12, ger.2 0/7 -> 7/7, ger.1 2/14 -> 9/14.
 - Verif: fetch_h2h --force-priority checked=65 enriched=62; fetch_weather total 638; patch_weather 244 events.
+## Sprint v35.266 — Phase 12 V36 P-12.3 Regenerate night metrics (16:07 UTC)
+- Avant: night_metrics datait de 11:31 UTC et le cron venait de reconstruire data.js sans les enrichissements V36.
+- Apres: fetch_h2h/fetch_weather reappliques sur la data remote fraiche, puis night_metrics regenere.
+- Impact: 385 events, 313 upcoming, winamax_exact_ratio 100%, markets_more_than_1n2 317, H2H 137, meteo 257, xG 104.
+- Verif: scripts/measure_night_metrics.py OK, health warnings=1 (pipeline drift seulement).
