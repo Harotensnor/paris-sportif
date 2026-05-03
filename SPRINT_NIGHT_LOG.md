@@ -1714,3 +1714,9 @@
 - Apres: 225 combinaisons testees, 277 lignes visibles en Tout voir, empty state strict valide.
 - Impact: deux manques logs dans ISSUES.md: totals US a 0 et mapping tennis 1N2 a verifier.
 - Verif: phase12_tous_filter_combo_audit.json, script OK, 0 console error.
+
+## Sprint v35.242 — Phase 12 P-12.11 Audit qualite data (15:15 local)
+- Avant: couverture remontee mais sample data pas encore verifie match par match.
+- Apres: 50 matchs upcoming controles sur noms, dates, Winamax, cotes 1N2 et doublons.
+- Impact: 0 ligne en anomalie, 0 duplicate id sample, 277 upcoming confirmes.
+- Verif: phase12_data_quality_sample_audit.json, script OK.
