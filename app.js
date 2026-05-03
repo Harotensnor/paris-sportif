@@ -19316,7 +19316,7 @@
         </div>
       </section>` : '';
     const tousViewToggleHtml = `
-        <div style="margin:${tousMobile ? '10px 0 4px' : '14px 0 4px'};display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <div style="margin:${tousMobile ? '10px 0 4px' : '8px 0 3px'};display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
           <button type="button" data-tous-view="list" style="min-height:38px;border:1px solid ${tousView==='list'?'var(--brand)':'var(--border)'};border-radius:999px;background:${tousView==='list'?'rgba(167,139,250,.16)':'var(--panel)'};color:${tousView==='list'?'var(--brand)':'var(--text-dim)'};padding:7px 12px;font-size:12px;font-weight:900;cursor:pointer;">Liste</button>
           <button type="button" data-tous-view="calendar" style="min-height:38px;border:1px solid ${tousView==='calendar'?'var(--brand)':'var(--border)'};border-radius:999px;background:${tousView==='calendar'?'rgba(167,139,250,.16)':'var(--panel)'};color:${tousView==='calendar'?'var(--brand)':'var(--text-dim)'};padding:7px 12px;font-size:12px;font-weight:900;cursor:pointer;">Calendrier 7j</button>
         </div>`;
@@ -19675,14 +19675,14 @@
       : tousAdvancedFilterHtml;
 
     wrap.innerHTML = `
-      <div style="max-width:1500px;margin:0 auto;padding:${tousMobile ? '10px 6px 18px' : '16px 8px 24px'};font-variant-numeric:tabular-nums;">
-        <div style="padding:${tousMobile ? '14px 2px 12px' : '40px 0 20px'};border-bottom:1px solid var(--border);">
+      <div style="max-width:1500px;margin:0 auto;padding:${tousMobile ? '10px 6px 18px' : '6px 8px 18px'};font-variant-numeric:tabular-nums;">
+        <div style="padding:${tousMobile ? '14px 2px 12px' : '10px 0 10px'};border-bottom:1px solid var(--border);">
           <div style="font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Couverture 7 jours · ${esc(presetMeta[tousPreset]?.label || 'Tout voir')}</div>
           <h1 style="margin:0 0 6px;font-size:${tousMobile ? '25px' : '32px'};font-weight:800;letter-spacing:-1.1px;color:var(--text);line-height:1.1;">Tous les matchs détectés</h1>
           <div class="u-text-md u-text-dim">${detectedUpcoming} match${detectedUpcoming>1?'s':''} à venir détecté${detectedUpcoming>1?'s':''} · ${displayPending.length} à venir affiché${displayPending.length>1?'s':''} · ${displayInProgress.length} en cours · ${displayFinished.length} fini${displayFinished.length>1?'s':''}${_completedNoOdds > 0 && !isCoveragePreset ? ` <span class="u-text-dim2" title="${_completedNoOdds} match${_completedNoOdds>1?'s':''} terminé${_completedNoOdds>1?'s':''} sans cote pré-match capturée (qualifs WTA/Challenger, etc.) → résultat visible mais pas dans le bilan ROI.">(+${_completedNoOdds} sans cote pré-match)</span>` : ''}${settledCount && !isCoveragePreset ? ` (<b style="color:${wrPct>=60?'#34d399':'var(--text-dim)'};">${wrPct}% réussite</b> sur ${settledCount})` : ''}${filtersActive ? `&nbsp;·&nbsp;<span style="color:var(--brand);font-weight:600;">filtres actifs</span>` : ''}<div style="font-size:11px;color:var(--text-dim2);margin-top:3px;">↳ Tout voir = couverture brute. Big Bets/Solides/Outsiders = sélection value stricte, séparée de l'Accueil.</div></div>
         </div>
         ${_sourcesStats && _sourcesStats.total > 0 ? `
-          <div style="margin:14px 0 4px;padding:10px 14px;background:var(--panel);border:1px solid var(--border);border-radius:8px;font-size:11.5px;color:var(--text-dim);display:flex;flex-wrap:wrap;gap:14px;align-items:center;font-variant-numeric:tabular-nums;" title="Sources de la couverture events. Plus de sources = pipeline résilient (si une source ban, les autres comblent).">
+          <div style="margin:${tousMobile ? '14px 0 4px' : '8px 0 3px'};padding:${tousMobile ? '10px 14px' : '7px 10px'};background:var(--panel);border:1px solid var(--border);border-radius:8px;font-size:11.5px;color:var(--text-dim);display:flex;flex-wrap:wrap;gap:14px;align-items:center;font-variant-numeric:tabular-nums;" title="Sources de la couverture events. Plus de sources = pipeline résilient (si une source ban, les autres comblent).">
             <span style="color:var(--text-dim2);text-transform:uppercase;letter-spacing:.8px;font-weight:700;font-size:10px;">📡 Sources</span>
             ${_sourcesStats.espn > 0 ? `<span><b class="u-text">ESPN</b> ${_sourcesStats.espn} events</span>` : ''}
             ${_sourcesStats.sofa > 0 ? `<span><b class="u-text">Sofascore</b> ${_sourcesStats.sofa} events <span style="opacity:.6;font-size:10px;">(couverture étendue)</span></span>` : ''}
@@ -19692,7 +19692,7 @@
         ${tousViewToggleHtml}
         ${calendarHtml}
 
-        <div class="tous-filter-bar" style="position:sticky;top:56px;z-index:20;margin:${tousMobile ? '12px 0 8px' : '18px 0 10px'};padding:${tousMobile ? '10px' : '14px'};background:var(--panel);border:1px solid var(--border);border-radius:10px;display:flex;flex-direction:column;gap:${tousMobile ? '8px' : '12px'};backdrop-filter:saturate(140%) blur(8px);-webkit-backdrop-filter:saturate(140%) blur(8px);">
+        <div class="tous-filter-bar" style="position:sticky;top:56px;z-index:20;margin:${tousMobile ? '12px 0 8px' : '10px 0 8px'};padding:${tousMobile ? '10px' : '10px'};background:var(--panel);border:1px solid var(--border);border-radius:10px;display:flex;flex-direction:column;gap:${tousMobile ? '8px' : '8px'};backdrop-filter:saturate(140%) blur(8px);-webkit-backdrop-filter:saturate(140%) blur(8px);">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
             <div style="display:flex;align-items:center;gap:10px;">
               <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.8px;font-weight:700;">🎛️ Filtrer &amp; trier</div>
@@ -19725,7 +19725,12 @@
           <button data-tous-tab="finished" title="${_completedNoOdds > 0 && !isCoveragePreset ? `Dont ${_completedNoOdds} sans cote pré-match capturée (qualifs WTA/Challenger, etc.) — résultat visible mais pas dans le bilan ROI` : ''}" style="${tousRailItemStyle}padding:10px 18px;border-radius:8px;border:1px solid ${activeTab==='finished'?'var(--brand)':'var(--border-2)'};background:${activeTab==='finished'?'rgba(167,139,250,.15)':'var(--panel)'};color:${activeTab==='finished'?'var(--brand)':'var(--text-2)'};font-weight:700;font-size:13px;cursor:pointer;">✅ Finis <span style="opacity:.7;">(${displayFinished.length})</span></button>
         </div>
         ${compareBarHtml}
-        <div style="display:flex;flex-direction:column;gap:8px;">
+        <div class="v36-tous-table-head ${isCoveragePreset ? 'v36-tous-table-head--coverage' : ''}" aria-hidden="true">
+          ${isCoveragePreset
+            ? '<span>Heure</span><span>Match</span><span>Cotes / source</span>'
+            : '<span>Heure</span><span>Match</span><span>Pick / signal</span><span>Action</span>'}
+        </div>
+        <div class="v36-tous-table-body" style="display:flex;flex-direction:column;gap:8px;">
           ${activeTab === 'pending' ? pendingHtml : activeTab === 'inprogress' ? inProgressHtml : finishedHtml}
         </div>
         ${loadMoreHtml}

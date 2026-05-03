@@ -1886,3 +1886,8 @@
 - Apres: l'index ajoute les matchs a venir, la suggestion devient une palette centrale V36, et un clic sur match/equipe ouvre la fiche ou la liste des prochains matchs.
 - Impact: Theo peut chercher une equipe ou un match depuis l'accueil sans parcourir les 5 colonnes.
 - Verif: Playwright local "juv" -> palette visible, 1 resultat, clic ouvre une modal, 0 erreur console, capture .cache/v36-search-live-palette.png.
+## Sprint v35.276 — Phase 12 V36 P-12.22 Tous dense desktop (17:22 UTC)
+- Avant: la page Tous affichait bien la couverture complete, mais avec trop de chrome herite et des lignes encore proches de cards.
+- Apres: desktop passe en table dense type markets list, page-tabs/retour legacy caches, header/filtres compactes, en-tete Heure/Match/Cotes visible.
+- Impact: 260 lignes chargees sur la vue locale, 268 matchs a venir affiches en preset Tout voir, 0 overflow horizontal desktop/mobile.
+- Verif: syntax app.js/sw.js OK, Playwright desktop/mobile 260 rows, 0 erreur console, captures .cache/v36-tous-dense-*-final*.png.
