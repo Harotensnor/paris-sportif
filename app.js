@@ -31,6 +31,38 @@
   const setUserLang = window.setUserLang || ((lang) => lang === 'en' ? 'en' : 'fr');
   const i18n = window.i18n || ((key) => key);
 
+  function applyAccessibilityPrefs(prefs) {
+    try {
+      if (!prefs) prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}') || {};
+    } catch(e) { prefs = {}; }
+    const root = document.documentElement;
+    if (!document.getElementById('accessibility-pref-style')) {
+      const st = document.createElement('style');
+      st.id = 'accessibility-pref-style';
+      st.textContent = `
+        html[data-font-scale="large"] body{font-size:16px}
+        html[data-font-scale="xl"] body{font-size:17px}
+        html[data-dyslexic="on"] body,
+        html[data-dyslexic="on"] button,
+        html[data-dyslexic="on"] input,
+        html[data-dyslexic="on"] select,
+        html[data-dyslexic="on"] textarea{font-family:"OpenDyslexic","Atkinson Hyperlegible","Verdana","Segoe UI",sans-serif!important;letter-spacing:.01em;word-spacing:.08em}
+        html[data-night-filter="on"] body{filter:sepia(.10) saturate(.92)}
+        html[data-night-filter="on"] body::before{content:"";position:fixed;inset:0;z-index:2147483647;pointer-events:none;background:rgba(255,138,0,.055);mix-blend-mode:screen}
+      `;
+      document.head.appendChild(st);
+    }
+    const fontScale = ['normal','large','xl'].includes(prefs.fontScale) ? prefs.fontScale : 'normal';
+    if (fontScale === 'normal') root.removeAttribute('data-font-scale');
+    else root.setAttribute('data-font-scale', fontScale);
+    if (prefs.dyslexic === 'on') root.setAttribute('data-dyslexic', 'on');
+    else root.removeAttribute('data-dyslexic');
+    if (prefs.nightFilter === 'on') root.setAttribute('data-night-filter', 'on');
+    else root.removeAttribute('data-night-filter');
+  }
+  applyAccessibilityPrefs();
+  try { window.applyAccessibilityPrefs = applyAccessibilityPrefs; } catch(e) {}
+
   const ADV_FILTER_KEY = 'advFilters';
   let advFilters = (() => {
     try {
@@ -20149,6 +20181,9 @@
     const currentOddMin = (typeof getUserOddMin === 'function') ? getUserOddMin() : 2.00;
     const currentOddIdx = Math.max(0, ODD_MIN_CHOICES.findIndex(v => Math.abs(v - currentOddMin) < 0.01));
     const currentAccent = prefs.accent || 'default';
+    const currentFontScale = ['normal','large','xl'].includes(prefs.fontScale) ? prefs.fontScale : 'normal';
+    const currentDyslexic = prefs.dyslexic || 'off';
+    const currentNightFilter = prefs.nightFilter || 'off';
     const strategyPrefs = (prefs.strategy && typeof prefs.strategy === 'object') ? prefs.strategy : {};
     const riskTolerance = Math.max(1, Math.min(5, Number(strategyPrefs.riskTolerance || 3)));
     const diversification = Math.max(1, Math.min(5, Number(strategyPrefs.diversification || 3)));
@@ -20376,6 +20411,20 @@
                 <input id="pref-reader" type="checkbox" ${currentReader==='on'?'checked':''} style="width:16px;height:16px;accent-color:var(--brand);"/>
                 <span style="font-size:13px;color:var(--text);">Mode lecture (plus grand)</span>
               </label>
+              <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;">
+                <input id="pref-dyslexic" type="checkbox" ${currentDyslexic==='on'?'checked':''} style="width:16px;height:16px;accent-color:var(--brand);"/>
+                <span style="font-size:13px;color:var(--text);">Police dyslexie</span>
+              </label>
+              <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;">
+                <input id="pref-night-filter" type="checkbox" ${currentNightFilter==='on'?'checked':''} style="width:16px;height:16px;accent-color:var(--brand);"/>
+                <span style="font-size:13px;color:var(--text);">Filtre nuit doux</span>
+              </label>
+            </div>
+            <div style="font-size:12px;color:var(--text-dim);margin:14px 0 6px;">Taille du texte.</div>
+            <div class="pref-pill-group">
+              <button class="theme-pill ${currentFontScale==='normal'?'active':''}" data-font-scale-btn="normal">Normal</button>
+              <button class="theme-pill ${currentFontScale==='large'?'active':''}" data-font-scale-btn="large">Grand</button>
+              <button class="theme-pill ${currentFontScale==='xl'?'active':''}" data-font-scale-btn="xl">Très grand</button>
             </div>
             <div style="font-size:11px;color:var(--text-dim);margin-top:8px;">Astuce : appuie sur <b>Maj + T</b> pour basculer sombre/clair.</div>
           </div>
@@ -20750,6 +20799,24 @@
       savePrefs({ reader: on ? 'on' : 'off' });
       if (on) document.documentElement.setAttribute('data-reader', 'on');
       else document.documentElement.removeAttribute('data-reader');
+    });
+    wrap.querySelectorAll('[data-font-scale-btn]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const fontScale = ['normal','large','xl'].includes(btn.dataset.fontScaleBtn) ? btn.dataset.fontScaleBtn : 'normal';
+        savePrefs({ fontScale });
+        applyAccessibilityPrefs();
+        renderProfilPage(wrap);
+      });
+    });
+    const dyslexicEl = wrap.querySelector('#pref-dyslexic');
+    if (dyslexicEl) dyslexicEl.addEventListener('change', (e) => {
+      savePrefs({ dyslexic: e.target.checked ? 'on' : 'off' });
+      applyAccessibilityPrefs();
+    });
+    const nightFilterEl = wrap.querySelector('#pref-night-filter');
+    if (nightFilterEl) nightFilterEl.addEventListener('change', (e) => {
+      savePrefs({ nightFilter: e.target.checked ? 'on' : 'off' });
+      applyAccessibilityPrefs();
     });
     const focusModeEl = wrap.querySelector('#pref-focus-mode');
     if (focusModeEl) focusModeEl.addEventListener('change', (e) => {
