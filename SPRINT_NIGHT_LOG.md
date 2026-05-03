@@ -1871,3 +1871,8 @@
 - Apres: preference cote minimum passe a @1.30 par defaut, avec choix 1.30/1.50/1.80/2.00/2.50 et textes Academie mis a jour.
 - Impact: les picks Sur @1.30-1.50 ne sont plus bloques par un reglage global; les filtres stricts restent dans les niveaux et presets.
 - Verif: syntax app.js OK, diff --check OK.
+## Sprint v35.273 — Phase 12 V36 P-12.19 Modal Pourquoi simplifiee (17:55 UTC)
+- Avant: la modal ouvrait directement l'interface technique complete, avec onglets/stats visibles et un bouton "details techniques" qui scrollait seulement.
+- Apres: la premiere vue devient une fiche decision courte (match, horaire, cote, EV, Kelly, 5 raisons) et les onglets historiques sont replies derriere "Voir les details techniques".
+- Impact: la decision est lisible en 10 secondes, tout le detail reste disponible au clic, sans retirer les onglets ni les stats.
+- Verif: syntax app.js/sw.js OK, Playwright local confirme panel technique hidden -> visible, 0 erreur console, captures .cache/v36-modal-why-*.png.
