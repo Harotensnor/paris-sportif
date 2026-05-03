@@ -97,3 +97,6 @@ Implementation:
   where available with conservative priors.
 - Current behavior: emits `status: "empty"` when no Winamax-visible rugby is
   present, so the pipeline is ready without adding fake picks.
+- `scripts/build_niche_markets.py` follows the same empty-safe pattern for
+  darts/snooker, deriving winner and total legs/frames only when those sports
+  appear in the Winamax-visible feed.
