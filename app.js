@@ -2861,10 +2861,19 @@
       const pick = rawSide.includes('away') || rawSide.includes('exterieur') || rawSide === '2' || rawSide.startsWith('2:') ? '2' : '1';
       return { market: 'handicap', pick, line: _v35SignedLine(c), rawMarket: market };
     }
-    if (/^(ou|ou15|ou25|ou35|teamTotal|basketTotal|baseballTotal|hockeyTotal|tennisGames)$/i.test(market)) {
+    if (/^teamTotal$/i.test(market)) {
+      const rawTeam = _v35Tok(c.team ?? c.raw?.team ?? c.key ?? c.pickKey ?? c.label);
+      const sideToken = _v35Tok(c.side ?? c.pickValue ?? c.key ?? c.pickKey ?? c.label);
+      const team = rawTeam.includes('away') || rawTeam.includes('exterieur') || rawTeam.includes('extérieur') || rawTeam.includes('visitor')
+        ? 'away'
+        : rawTeam.includes('home') || rawTeam.includes('domicile') ? 'home' : 'team';
+      return { market: `teamTotal:${team}`, pick: sideToken.includes('under') || sideToken.startsWith('u') || sideToken.includes('moins') ? 'Under' : 'Over', line, team };
+    }
+    if (/^(ou|ou15|ou25|ou35|basketTotal|baseballTotal|hockeyTotal|tennisGames)$/i.test(market)) {
       let m = market;
       if (Number.isFinite(line)) m = Math.abs(line - 1.5) < 0.01 ? 'ou15' : Math.abs(line - 2.5) < 0.01 ? 'ou25' : Math.abs(line - 3.5) < 0.01 ? 'ou35' : market;
-      return { market: m, pick: token.includes('under') || token.startsWith('u') || token.includes('moins') ? 'Under' : 'Over', line };
+      const sideToken = _v35Tok(c.side ?? c.pickValue ?? c.key ?? c.pickKey ?? c.label);
+      return { market: m, pick: sideToken.includes('under') || sideToken.startsWith('u') || sideToken.includes('moins') ? 'Under' : 'Over', line };
     }
     return { market, pick: String(c.pickValue ?? c.key ?? c.pickKey ?? '').trim(), line };
   }
@@ -2885,6 +2894,11 @@
       const teamGoals = pick === '2' ? implied.awayGoals : implied.homeGoals;
       const oppGoals = pick === '2' ? implied.homeGoals : implied.awayGoals;
       return (teamGoals + line) > oppGoals;
+    }
+    if (String(market || '').startsWith('teamTotal:')) {
+      const line = _v35Line(candidate);
+      const goals = String(market).endsWith(':away') ? implied.awayGoals : implied.homeGoals;
+      return !Number.isFinite(line) || (goals > line ? 'Over' : 'Under') === pick;
     }
     if (market === 'ou' || /Total$/.test(market) || market === 'tennisGames') {
       const line = _v35Line(candidate);
@@ -3880,7 +3894,10 @@
   }
 
   function poissonPmf(k, lam) {
-    if (lam <= 0) return k === 0 ? 1 : 0;
+    k = Number(k);
+    lam = Number(lam);
+    if (!Number.isFinite(k) || k < 0 || Math.floor(k) !== k) return 0;
+    if (!Number.isFinite(lam) || lam <= 0) return k === 0 ? 1 : 0;
     // P(X=k) = e^-λ λ^k / k!
     let logp = -lam + k * Math.log(lam);
     for (let i = 2; i <= k; i++) logp -= Math.log(i);

@@ -1997,3 +1997,8 @@
 - Apres: click_audit nettoie ses marqueurs a chaque remap; modal_tabs_audit ouvre "Voir les details techniques" avant de tester les onglets; night_metrics est regenere sur le snapshot courant.
 - Couverture data: 367 events, 305 upcoming, Winamax exact 367/367 (100%), 321 events avec marches >1N2 apres rebase cron.
 - Verif: visual_capture phase-post-table-v35-297 = 32 PNG OK; click audit 191/191 sans echec; modal tabs 4 sports testes + 1 skip, 0 echec; a11y 8 pages = 0/0/0; Lighthouse min perf 97, min a11y 97, SEO 100.
+## Sprint v35.298 — AUTO 10/10 Vague 4 crédibilité marchés (20:30 UTC)
+- Avant: les team totals etaient normalises comme des totaux globaux, ce qui pouvait confondre "total equipe domicile" avec un marche O/U de match; poissonPmf pouvait produire NaN sur lambda/k invalides.
+- Apres: teamTotal devient scope par equipe (home/away/team), score exact valide les buts de la bonne equipe, les doublons 1N2 <-> handicap -0.5 sont explicitement couverts cote home et away, et poissonPmf tombe sur un fallback 0/1 deterministe.
+- Impact: bugs #11/#13/#29/#73/#79 securises par tests/audit; les libelles "Total equipe ..." restent lisibles dans la table sans ressembler a un handicap.
+- Verif: app.js/sw.js/market_consistency_audit.js syntax OK; market_consistency_audit 64/64 sans echec; test direct poissonPmf invalides + Dixon-Coles tau(1,1) OK.
