@@ -2007,3 +2007,8 @@
 - Apres: Table V37 rend jusqu'a 360 lignes, ajoute Date, retire Action, explique les 5 tiers en bannière cliquable, ajoute nav 7 jours/J-2..J+5/date picker, toggle LIVE et refresh auto 30s.
 - Historique: les dates passees ajoutent une colonne Resultat + footer WON/LOST/VOID/ROI; les matchs commences sont retires du flux a venir si LIVE n'est pas active.
 - Verif: app.js/sw.js syntax OK; Playwright local desktop = 360 lignes rendues / 405 picks disponibles, headers Sport-Date-Heure-Ligue-Match-Pari-Cote-Conf-Edge-Tier, clic ligne modal OK, J-1 affiche Resultat + footer, 0 erreur console; visual_capture v37-table-baseline = 32 PNG; a11y 8 pages = 0/0/0; Lighthouse min perf 97, min a11y 98, SEO 100.
+## Sprint v35.300 — AUTO 10/10 Metrics + MCP date dynamique (20:54 UTC)
+- Avant: night_metrics etait deja stale apres la refonte table, et les outils MCP pouvaient croire une ancienne date si le champ data.today etait decale.
+- Apres: night_metrics est regenere (367 events, 305 upcoming, Winamax exact 367/367), et les outils MCP choisissent le jour Europe/Paris actif ou le prochain jour disponible dans data.days.
+- Impact: get_pipeline_status expose local_today + data_today_field et retourne aujourd'hui=2026-05-03 sur le snapshot courant; les outils today/high_confidence/gaps/sports utilisent la meme resolution.
+- Verif: test_mcp_smoke OK 14/18 (4 tools skip args requis), py_compile OK, lecture directe get_pipeline_status => today/local_today/data_today_field = 2026-05-03.

@@ -29,9 +29,14 @@ import json
 import os
 import re
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
+
+try:
+    from zoneinfo import ZoneInfo
+except Exception:  # pragma: no cover - fallback for old Python runtimes
+    ZoneInfo = None
 
 # === Path resolution (auto-detect project root) ===
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -92,8 +97,30 @@ def _load_data_js() -> dict:
 
 def _today_iso() -> str:
     """ISO date in Europe/Paris timezone (Y-m-d)."""
-    # Use local time conversion (Python doesn't have zoneinfo dependency-free)
-    return datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    if ZoneInfo is not None:
+        return datetime.now(ZoneInfo("Europe/Paris")).strftime("%Y-%m-%d")
+    # Conservative fallback for project hosts that run in France.
+    return (datetime.now(timezone.utc) + timedelta(hours=2)).strftime("%Y-%m-%d")
+
+
+def _active_data_day(data: dict) -> str:
+    """Return the most relevant day key for MCP tools.
+
+    `data.today` can lag behind after cron/splice races, so prefer the local
+    Europe/Paris day when available, then the next available data day.
+    """
+    days = data.get("days") or {}
+    local_today = _today_iso()
+    if local_today in days:
+        return local_today
+    day_keys = sorted(k for k, v in days.items() if isinstance(k, str) and isinstance(v, list))
+    future_day = next((k for k in day_keys if k >= local_today), None)
+    if future_day:
+        return future_day
+    data_today = data.get("today")
+    if isinstance(data_today, str) and data_today in days:
+        return data_today
+    return day_keys[-1] if day_keys else local_today
 
 
 def _is_winamax_bookable(match: dict) -> bool:
@@ -192,7 +219,7 @@ def get_today_matches(
     data = _load_data_js()
     if "_error" in data:
         return data
-    today = _today_iso()
+    today = _active_data_day(data)
     matches = (data.get("days") or {}).get(today) or []
     out = []
     for m in matches:
@@ -244,7 +271,7 @@ def get_top_value_picks(
     data = _load_data_js()
     if "_error" in data:
         return data
-    today = _today_iso()
+    today = _active_data_day(data)
     matches = (data.get("days") or {}).get(today) or []
     candidates = []
     for m in matches:
@@ -583,7 +610,7 @@ def list_sports_available() -> dict:
     data = _load_data_js()
     if "_error" in data:
         return data
-    today = _today_iso()
+    today = _active_data_day(data)
     matches = (data.get("days") or {}).get(today) or []
     by_sport: dict[str, dict] = {}
     for m in matches:
@@ -887,7 +914,7 @@ def get_today_high_confidence(min_conf_pct: float = 60.0, sport: str = None, lim
     data = _load_data_js()
     if "_error" in data:
         return data
-    today = _today_iso()
+    today = _active_data_day(data)
     matches = (data.get("days") or {}).get(today) or []
     picks = []
     for m in matches:
@@ -957,7 +984,7 @@ def get_pipeline_status() -> dict:
     sofa_path = PROJECT_ROOT / "sofascore_events.json"
     sofa = _load_json(sofa_path) if sofa_path.exists() else {}
 
-    today = data.get("today") if not "_error" in data else None
+    today = _active_data_day(data) if not "_error" in data else None
     today_events = (data.get("days") or {}).get(today, []) if today else []
 
     # Count by source — Sofascore events have id="sofa_<n>" + source="sofascore"
@@ -980,6 +1007,8 @@ def get_pipeline_status() -> dict:
 
     return {
         "today": today,
+        "local_today": _today_iso(),
+        "data_today_field": data.get("today") if not "_error" in data else None,
         "data_age_min": health.get("data_age_min") if not "_error" in health else None,
         "overall_status": health.get("overall") if not "_error" in health else "unknown",
         "events_today": {
@@ -1014,7 +1043,7 @@ def list_data_gaps(sport: str = None, limit: int = 20) -> dict:
     data = _load_data_js()
     if "_error" in data:
         return data
-    today = _today_iso()
+    today = _active_data_day(data)
     matches = (data.get("days") or {}).get(today) or []
     gaps = []
     for m in matches:
