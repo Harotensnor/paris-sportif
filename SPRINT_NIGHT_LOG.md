@@ -1726,3 +1726,8 @@
 - Apres: 32 vues iPhone12/Pixel5/GalaxyS20/iPadMini controlees avec screenshots top/bottom.
 - Impact: 32/32 pass, 0 overflow, 0 overlap bottom-nav, 0 console error; P12-MOB-001 logge pour inputs Profil 16x16.
 - Verif: phase12_mobile_device_audit.json, script OK.
+## Sprint v35.244 — Phase 12 P-12.13 Audit cas limites (15:24 local)
+- Avant: stockage corrompu/offline/data vieillie pas encore verifies apres la refonte couverture.
+- Apres: 5 cas limites valides, 0 warn, 0 fail, aucune erreur console.
+- Impact: recovery localStorage, empty states, stale indicator et banner offline tiennent.
+- Verif: phase12_edge_case_audit.json, script OK.
