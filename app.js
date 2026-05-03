@@ -4987,7 +4987,9 @@
   async function _loadStadiums() {
     if (__stadiumsCache) return __stadiumsCache;
     if (__stadiumsLoading) return __stadiumsLoading;
-    __stadiumsLoading = fetch('stadiums.json', { cache: 'force-cache' })
+    const generated = (window.PRONOSTICS_DATA && window.PRONOSTICS_DATA.generated_at) || new Date().toISOString();
+    const cacheKey = String(generated).slice(0, 10).replace(/[^0-9]/g, '') || Math.floor(Date.now() / 86400000);
+    __stadiumsLoading = fetch('stadiums.json?v=' + cacheKey, { cache: 'default' })
       .then(r => r.ok ? r.json() : null)
       .then(d => { __stadiumsCache = d || {}; return __stadiumsCache; })
       .catch(() => { __stadiumsCache = {}; return __stadiumsCache; });
