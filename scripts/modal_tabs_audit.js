@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
- * Phase 6 modal tabs audit.
+ * Phase 12 modal tabs audit.
  * Standalone Playwright runner used when @playwright/test is not installed locally.
  */
 const { chromium } = require('playwright');
@@ -148,6 +148,7 @@ async function tabState(page, target) {
   await page.goto(`${BASE_URL}/pronostics.html#tous`, { waitUntil: 'domcontentloaded', timeout: 15000 });
   await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
   await page.waitForFunction(() => !!(window.PRONOSTICS_DATA && window.PRONOSTICS_DATA.days), null, { timeout: 10000 });
+  await page.waitForFunction(() => !!(window.PRONOSTICS_DATA && !window.PRONOSTICS_DATA._lite), null, { timeout: 12000 }).catch(() => {});
   const picks = await pickMatches(page);
 
   for (const sport of SPORTS) {
