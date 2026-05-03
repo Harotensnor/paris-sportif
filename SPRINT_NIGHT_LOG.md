@@ -1861,3 +1861,8 @@
 - Apres: rail V36 sticky avec Prochains matchs, Dynamique modele et Stats live; les lignes ouvrent toujours la fiche match.
 - Impact: l'espace droite sert la decision en continu (countdown, forme modele, fraicheur data) au lieu d'un panier vide.
 - Verif: visual_capture v36-right-rail 32/32 OK, screenshot wide inspecte, syntax app.js OK.
+## Sprint v35.271 — Phase 12 V36 P-12.10 Accueil 5 tiers (17:08 UTC)
+- Avant: l'accueil restait un empilement Big Bets/sections historiques, trop long et trop restrictif pour jouer toute la journee.
+- Apres: renderDashboardPage sort sur un cockpit V36: 5 colonnes Sur/Solide/Valeur/Big odds/Outsider, filtres sport/tier/heure, cartes compactes et rail temps reel.
+- Impact: sur serveur local avec full data, l'accueil affiche 24 picks repartis sur 5 niveaux et 64 matchs detectes; mobile descend a 13 picks avec data lite puis recharge full data en prod.
+- Verif: visual_capture v36-dashboard-tier-fixed 32/32 OK, capture HTTP full-data dashboard-wide-full-data-fixed.png, 0 pageerror, syntax OK.
