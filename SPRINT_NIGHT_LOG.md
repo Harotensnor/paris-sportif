@@ -1731,3 +1731,8 @@
 - Apres: 5 cas limites valides, 0 warn, 0 fail, aucune erreur console.
 - Impact: recovery localStorage, empty states, stale indicator et banner offline tiennent.
 - Verif: phase12_edge_case_audit.json, script OK.
+## Sprint v35.245 — Phase 12 P-12.14 Fix P12-MOB-001 Profil tactile (15:31 local)
+- Avant: Profil gardait des checkboxes/help dots 16x16 sur iPhone/Pixel/Galaxy/iPad.
+- Apres: inputs checkbox/radio, help dots et champ Discord passent a 44px sur mobile/tablette.
+- Impact: pagesWithSmallTapTargets 4 -> 0, confort tactile restaure sans overflow.
+- Verif: mobile_device_audit 32/32 OK, 0 small tap target.

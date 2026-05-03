@@ -556,4 +556,4 @@ Résultat : 225 combinaisons sport × cote min × marché testées ; 277 lignes 
 - Preuve : `phase12_mobile_device_audit.json` (`pagesWithSmallTapTargets: 4`, inputs `16x16`).
 - Constat : l'audit multi-device passe sans overflow ni chevauchement bottom-nav, mais les checkbox/toggles natifs du Profil restent trop petits pour un usage tactile confortable.
 - Action : augmenter les inputs checkbox/radio visibles à 44px ou les encapsuler dans des labels cliquables pleine hauteur.
-- Statut : OPEN
+- Statut : FIXED v35.245 — inputs Profil et help dots passent en cibles 44x44 sur mobile/tablette.
