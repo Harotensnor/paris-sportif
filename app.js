@@ -16385,8 +16385,8 @@
 
           ${bbfFocusOnly ? '' : `<details class="bbf-more terminal-market">
             <summary>
-              <span>Voir toutes les opportunités restantes</span>
-              <b>${bbfRestRows.length} avec edge ≥ 2% · ${bbfMarketCount} marchés scorés · ${terminalScanPool.length} matchs exacts sur 48h</b>
+              <span>Opportunités restantes</span>
+              <b>${bbfRestRows.length} picks · ${terminalScanPool.length} matchs</b>
             </summary>
             <div class="bbf-more__rows">${bbfRestRows.length ? bbfRestRows.map(bbfRow).join('') : '<p>Aucun match exploitable dans la fenêtre actuelle.</p>'}</div>
           </details>`}
