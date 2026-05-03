@@ -18957,6 +18957,20 @@
       const statusLabel = p.settled ? 'Terminé' : p.startedAndNotSettled ? 'En cours' : 'À venir';
       const statusColor = p.settled ? 'var(--text-dim2)' : p.startedAndNotSettled ? '#f87171' : 'var(--accent)';
       const winamaxLabel = p.winamax ? 'Winamax exact' : 'Source externe';
+      const wx1n2 = (p.m.winamax && p.m.winamax.markets && p.m.winamax.markets['1n2']) || null;
+      const fmtOddChip = (v) => {
+        const n = Number(v);
+        return Number.isFinite(n) && n > 1 ? n.toFixed(2) : '';
+      };
+      const oneNtwoOddsHtml = wx1n2 ? [
+        ['1', wx1n2.home],
+        ['N', wx1n2.draw],
+        ['2', wx1n2.away],
+      ].map(([label, odd]) => {
+        const txt = fmtOddChip(odd);
+        if (!txt) return '';
+        return `<span title="Cote Winamax ${esc(label)}" style="display:inline-flex;align-items:center;gap:4px;min-height:26px;padding:0 7px;border-radius:7px;background:rgba(255,255,255,.045);border:1px solid var(--border);color:var(--text);font-size:10.5px;font-weight:900;"><b style="color:var(--text-dim2);font-size:9px;">${esc(label)}</b>@${txt}</span>`;
+      }).filter(Boolean).join('') : '';
       return `<div class="tous-row tous-row--coverage" data-match-id="${esc(rowId)}" data-match-date="${esc(String(p.m.date || ''))}" style="display:grid;grid-template-columns:${tousMobile ? '1fr' : 'minmax(120px,.55fr) minmax(0,1.8fr) minmax(140px,.65fr)'};gap:${tousMobile ? '8px' : '14px'};padding:13px 16px;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${p.winamax ? 'var(--brand)' : 'var(--text-dim2)'};border-radius:0 10px 10px 0;align-items:center;cursor:pointer;font-variant-numeric:tabular-nums;">
         <div>
           <div style="font-size:11px;color:var(--text-dim2);font-weight:800;text-transform:uppercase;letter-spacing:.4px;">${sportEm} ${esc(dateLabel)}</div>
@@ -18971,6 +18985,7 @@
           <div style="margin-top:3px;font-size:11.5px;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(league || 'Compétition à confirmer')}</div>
         </div>
         <div style="display:flex;align-items:center;justify-content:${tousMobile ? 'flex-start' : 'flex-end'};gap:8px;flex-wrap:wrap;">
+          ${oneNtwoOddsHtml}
           <span style="padding:4px 9px;border-radius:999px;background:${p.winamax ? 'rgba(167,139,250,.14)' : 'rgba(148,163,184,.12)'};border:1px solid ${p.winamax ? 'rgba(167,139,250,.28)' : 'var(--border)'};color:${p.winamax ? 'var(--brand)' : 'var(--text-dim)'};font-size:10.5px;font-weight:850;">${esc(winamaxLabel)}</span>
           <span style="font-size:11px;color:var(--text-dim2);">Détail →</span>
         </div>

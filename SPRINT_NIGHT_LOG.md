@@ -1736,3 +1736,8 @@
 - Apres: inputs checkbox/radio, help dots et champ Discord passent a 44px sur mobile/tablette.
 - Impact: pagesWithSmallTapTargets 4 -> 0, confort tactile restaure sans overflow.
 - Verif: mobile_device_audit 32/32 OK, 0 small tap target.
+## Sprint v35.246 — Phase 12 P-12.15 Fix P12-VIS-003 aperçu cotes Tous (15:38 local)
+- Avant: les lignes Tout voir affichaient Winamax exact mais aucune cote visible sans ouvrir la modale.
+- Apres: chips 1/N/2 ou 1/2 ajoutées aux lignes de couverture brute.
+- Impact: la page Tous devient lisible comme calendrier cote, pas seulement liste de matchs.
+- Verif: visual_capture phase12-odds-preview 32/32 OK, syntax/bundle OK.
