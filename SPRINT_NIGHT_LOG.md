@@ -1800,3 +1800,8 @@
 - Apres: marqueurs retires, hashes restampes sur app.js courant et cache SW rebump.
 - Impact: deploy nettoye, app.js 80357195 reference correctement.
 - Verif: no conflict markers, syntax OK.
+## Sprint v35.259 — Phase 12 P-12.26 Calendrier 7 jours dans Tous (16:48 local)
+- Avant: les CTA Calendrier retombaient sur Tous sans vue calendrier dédiée.
+- Apres: #calendrier ouvre #tous?view=calendar avec heatmap 7 jours, cartes par jour et ouverture directe des matchs.
+- Impact: 268 matchs accessibles affichés en calendrier, 7 day-cards, liste Tous conserve 220/260 lignes progressives.
+- Verif: capture phase12-calendar mobile/desktop/wide, 0 console error, syntax OK.
