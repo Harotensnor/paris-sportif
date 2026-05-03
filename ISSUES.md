@@ -478,7 +478,7 @@ Contexte : après correction de `Tous`, la couverture monte à 277 matchs à ven
 - Viewports : mobile
 - Preuve : `.cache/phase4-phase12-tous-coverage/dashboard-mobile.png`
 - Action : Raccourcir le libellé ou passer en bouton pleine largeur plus lisible.
-- Statut : OPEN
+- Statut : FIXED v35.252 — libellé raccourci à "Opportunités restantes" et métrique condensée pour tenir sur mobile.
 
 ### P12-VIS-006 — Académie mobile atteint 9 325px, avec les 50 termes affichés d’un bloc.
 

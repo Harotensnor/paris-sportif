@@ -1766,3 +1766,8 @@
 - Apres: visual_capture active un mode capture stable qui masque fixed non essentiels.
 - Impact: dashboard mobile 5843px -> 3774px en capture, audit manuel plus fiable.
 - Verif: visual_capture phase12-stable-capture 32/32 OK.
+## Sprint v35.252 — Phase 12 P-12.21 Fix P12-VIS-005 CTA dashboard mobile (16:12 local)
+- Avant: le summary "Voir toutes les opportunites restantes" wrappait sur mobile.
+- Apres: libelle et metriques compactes dans le detail accordéon.
+- Impact: CTA plus net, dashboard mobile stable a 3729px en capture.
+- Verif: visual_capture phase12-dashboard-cta 32/32 OK, syntax/bundle OK.
