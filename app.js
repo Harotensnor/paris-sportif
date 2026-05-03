@@ -18786,6 +18786,23 @@
       return saved; // tout est vide → garder la préférence
     })();
     const tousMobile = typeof matchMedia === 'function' && matchMedia('(max-width:720px)').matches;
+    const defaultCoverageLimit = isCoveragePreset ? (tousMobile ? 220 : 260) : Number.POSITIVE_INFINITY;
+    const visibleLimit = (() => {
+      if (!isCoveragePreset) return Number.POSITIVE_INFINITY;
+      try {
+        const saved = parseInt(localStorage.getItem('tousVisibleLimit') || '', 10);
+        if (Number.isFinite(saved) && saved >= defaultCoverageLimit) return saved;
+      } catch(e) {}
+      return defaultCoverageLimit;
+    })();
+    const renderSlice = (rows) => isCoveragePreset ? rows.slice(0, Math.min(rows.length, visibleLimit)) : rows;
+    const renderedPending = renderSlice(displayPending);
+    const renderedInProgress = renderSlice(displayInProgress);
+    const renderedFinished = renderSlice(displayFinished);
+    const activeTotalRows = activeTab === 'pending' ? displayPending.length : activeTab === 'inprogress' ? displayInProgress.length : displayFinished.length;
+    const activeRenderedRows = activeTab === 'pending' ? renderedPending.length : activeTab === 'inprogress' ? renderedInProgress.length : renderedFinished.length;
+    const hasMoreRows = isCoveragePreset && activeRenderedRows < activeTotalRows;
+    const nextLoadCount = hasMoreRows ? Math.min(80, activeTotalRows - activeRenderedRows) : 0;
     const tousRailStyle = tousMobile
       ? 'flex-wrap:nowrap;overflow-x:auto;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;mask-image:linear-gradient(90deg,#000 calc(100% - 32px),transparent);padding-bottom:4px;'
       : 'flex-wrap:wrap;';
@@ -19061,10 +19078,10 @@
         </div>
       </div>`;
     const pendingHtml = displayPending.length
-      ? displayPending.map(p => isCoveragePreset ? renderCoverageRow(p) : renderRow(p, false)).join('')
+      ? renderedPending.map(p => isCoveragePreset ? renderCoverageRow(p) : renderRow(p, false)).join('')
       : _emptyState(isCoveragePreset ? "Aucun match à venir détecté." : "Aucun match à venir pour aujourd'hui.", true);
     const inProgressHtml = displayInProgress.length
-      ? displayInProgress.map(p => isCoveragePreset ? renderCoverageRow(p) : renderRow(p, false)).join('')
+      ? renderedInProgress.map(p => isCoveragePreset ? renderCoverageRow(p) : renderRow(p, false)).join('')
       : _emptyState("Aucun match en cours.", false);
     // sont VRAIMENT terminés mais sans cote capturée (cas très commun pour
     // les WTA/Challenger qualifiers où Winamax map juste la ligue). On
@@ -19073,8 +19090,14 @@
       ? `0 prono trackable terminé · mais ${_completedNoOdds} match${_completedNoOdds>1?'s':''} terminé${_completedNoOdds>1?'s':''} sans cote captée (qualifs / matchs sans bookmaker exact). Le bilan ne peut pas les évaluer.`
       : "Aucun match terminé aujourd'hui.";
     const finishedHtml = displayFinished.length
-      ? displayFinished.map(p => isCoveragePreset ? renderCoverageRow(p) : renderRow(p, true)).join('')
+      ? renderedFinished.map(p => isCoveragePreset ? renderCoverageRow(p) : renderRow(p, true)).join('')
       : _emptyState(finishedEmptyMsg, false);
+    const loadMoreHtml = hasMoreRows ? `
+      <div style="display:flex;justify-content:center;margin:12px 0 4px;">
+        <button type="button" data-tous-load-more style="min-height:44px;padding:10px 18px;border-radius:999px;border:1px solid var(--brand-border);background:rgba(167,139,250,.12);color:var(--brand);font-size:12px;font-weight:900;cursor:pointer;">
+          Afficher ${nextLoadCount} match${nextLoadCount>1?'s':''} de plus · ${activeRenderedRows}/${activeTotalRows}
+        </button>
+      </div>` : '';
 
     // Sofascore events ont l'id préfixé "sofa_". ESPN events ont id numérique.
     // On compte les events visibles aujourd'hui pour signaler à l'user la
@@ -19191,6 +19214,7 @@
         <div style="display:flex;flex-direction:column;gap:8px;">
           ${activeTab === 'pending' ? pendingHtml : activeTab === 'inprogress' ? inProgressHtml : finishedHtml}
         </div>
+        ${loadMoreHtml}
       </div>`;
 
     // Tab switching
@@ -19200,10 +19224,16 @@
         renderTousPage(wrap);
       });
     });
+    const loadMoreBtn = wrap.querySelector('[data-tous-load-more]');
+    if (loadMoreBtn) loadMoreBtn.addEventListener('click', () => {
+      try { localStorage.setItem('tousVisibleLimit', String(Math.min(activeTotalRows, activeRenderedRows + 80))); } catch(e) {}
+      renderTousPage(wrap);
+    });
     wrap.querySelectorAll('[data-tous-preset]').forEach(btn => {
       btn.addEventListener('click', () => {
         try {
           localStorage.setItem('tousPreset', btn.dataset.tousPreset || 'all');
+          localStorage.removeItem('tousVisibleLimit');
           if ((btn.dataset.tousPreset || 'all') === 'all') {
             localStorage.removeItem('tousFilters');
             localStorage.setItem('tousSort', 'kickoff');

@@ -442,7 +442,7 @@ Contexte : après correction de `Tous`, la couverture monte à 277 matchs à ven
 - Viewports : mobile/tablet/desktop/wide
 - Preuve : `.cache/phase4-phase12-tous-coverage/tous-mobile.png`
 - Action : Ajouter pagination/load more ou virtualisation progressive sans réduire la couverture.
-- Statut : OPEN
+- Statut : FIXED v35.249 — rendu progressif en préset Tout voir : 220 matchs immédiats sur mobile (260 desktop) + bouton "Afficher X matchs de plus", couverture totale conservée.
 
 ### P12-VIS-002 — Les rails Préset/Sport/Source/Edge/Confiance occupent beaucoup de hauteur avant la liste.
 

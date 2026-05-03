@@ -1751,3 +1751,8 @@
 - Apres: filtres avances replies par defaut, Preset + Sport restent visibles.
 - Impact: controls conserves, filtre mobile plus court, 32 captures phase12-filter-compact OK.
 - Verif: mobile_device_audit 32/32 OK, syntax/bundle OK.
+## Sprint v35.249 — Phase 12 P-12.18 Fix P12-VIS-001 rendu progressif Tous (16:00 local)
+- Avant: le préset Tout voir rendait 276 lignes d'un coup, page mobile ~46.9k px.
+- Apres: 220 lignes mobile / 260 desktop immédiates, puis bouton Charger plus.
+- Impact: couverture reste totale (276 detectes, 220 visibles immédiatement), mobile ~37.7k px.
+- Verif: visual_capture phase12-tous-progressive 32/32 OK, mobile_device_audit OK.
