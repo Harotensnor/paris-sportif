@@ -1537,3 +1537,9 @@
 - Apres: service worker contrôlé, reload offline conserve le shell, contenu visible et banner Hors ligne actif.
 - Impact: la consultation cache reste utilisable sans réseau.
 - Verif: audit Playwright offline OK; seul bruit réseau attendu `ERR_INTERNET_DISCONNECTED`.
+
+## Sprint v35.209 — Phase 11 P-11.14 Cross-browser (10:12 UTC)
+- Avant: rendu multi-navigateur non revérifié depuis le split i18n.
+- Apres: Chrome + Edge sur dashboard/tous/performance/profil, 0 erreur console et 0 overflow horizontal.
+- Impact: rendu Chromium stable sur deux navigateurs installés; Firefox absent de la machine locale.
+- Verif: audit Playwright cross-browser custom OK.
