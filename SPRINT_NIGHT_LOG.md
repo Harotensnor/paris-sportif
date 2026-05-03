@@ -1931,3 +1931,8 @@
 - Apres: h2h_extended expose coverage_pct, events_with_meetings, empty_events et meetings_total; health reprend aussi le detail par sport.
 - Impact: le signal H2H est pilotable: 83 events, 80 avec historique, 247 meetings, couverture 96.4% sur le snapshot courant.
 - Verif: fetch_h2h.py --summary-only OK, build_health OK, py_compile OK, health h2h coverage=96.4%.
+## Sprint v35.285 — Phase 12 V36 P-12.32 Lineups multi-sports sidecar (18:22 UTC)
+- Avant: les signaux titulaires etaient disperses (XI foot, lanceurs MLB, goalie NHL) et NBA n'avait pas de statut explicite.
+- Apres: lineups_multisport.json unifie le contexte starter par sport et le workflow le regenere avant health.
+- Impact: 51/373 events ont un signal starter exploitable: 22 XI foot, 17 matchs MLB avec 34 pitchers, 12 matchs NHL avec 24 goalies projetes; NBA est marquee source en attente.
+- Verif: build_lineups_multisport.py OK, health sources=24, lineups_multisport coverage=13.7%.

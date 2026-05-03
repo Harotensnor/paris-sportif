@@ -145,6 +145,17 @@ def _count_h2h_extended(d):
         'by_sport': by_sport,
     }
 
+def _count_lineups_multisport(d):
+    if not isinstance(d, dict):
+        return None
+    return {
+        'events': d.get('events_total') or 0,
+        'with_starter_signal': d.get('events_with_starter_signal') or 0,
+        'coverage_pct': d.get('coverage_pct') or 0,
+        'sports': d.get('sports_total') or len(d.get('sports') or {}),
+        'by_sport': d.get('sports') or {},
+    }
+
 SOURCES = [
     ('winamax_catalog', 'winamax_catalog.json', _count_winamax_catalog),
     ('winamax_markets', 'winamax_markets.json', _count_winamax_markets),
@@ -174,6 +185,7 @@ SOURCES = [
         'sports': len(d.get('by_sport') or {}) if isinstance(d, dict) else 0,
     }),
     ('h2h_extended', 'h2h_extended.json', _count_h2h_extended),
+    ('lineups_multisport', 'lineups_multisport.json', _count_lineups_multisport),
     ('injuries_multisport', 'injuries_multisport.json', lambda d: {
         'teams': len(d.get('teams') or {}) if isinstance(d, dict) else 0,
         'sports': len(d.get('by_sport') or {}) if isinstance(d, dict) else 0,
@@ -237,6 +249,7 @@ STALE_AFTER_MIN = {
     'thesportsdb_meta': 24*60,  # daily metadata cache
     'openligadb_matches': 12*60, # German football cross-check cache
     'public_team_stats': 6*60,  # merged public sidecar
+    'lineups_multisport': 60,   # starter context built from patched data.js
     'rugby_markets':   6*60,    # derived only when rugby appears in data.js
     'niche_markets':   6*60,    # darts/snooker derived sidecar
     'boosted_odds':    60,      # follows Winamax market refresh
@@ -261,6 +274,7 @@ SOURCE_SCRIPT = {
     'thesportsdb_meta': 'scripts/fetch_thesportsdb_meta.py',
     'openligadb_matches': 'scripts/fetch_openligadb.py',
     'public_team_stats': 'scripts/build_public_team_stats.py',
+    'lineups_multisport': 'scripts/build_lineups_multisport.py',
     'rugby_markets': 'scripts/build_rugby_markets.py',
     'niche_markets': 'scripts/build_niche_markets.py',
     'boosted_odds': 'scripts/detect_boosted_odds.py',
