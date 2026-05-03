@@ -32,7 +32,9 @@ test('Big Bet conversion path opens modal, tracks Winamax click and records bet'
 
   await page.goto('/pronostics.html#dashboard');
   await page.waitForFunction(() => document.querySelector('[data-big-detail]') || window.PRONOSTICS_DATA, null, { timeout: 12000 });
-  await page.locator('[data-big-detail]').first().click();
+  const detailCta = page.locator('[data-big-detail]:visible').first();
+  await expect(detailCta).toBeVisible();
+  await detailCta.click();
   await expect(page.locator('#detail-modal.open')).toBeVisible();
   await expect(page.locator('#detail-title')).not.toHaveText('');
 
@@ -52,7 +54,9 @@ test('Big Bet conversion path opens modal, tracks Winamax click and records bet'
 
   await page.keyboard.press('Escape');
   const beforeBet = await storageState(page);
-  await page.locator('.action-focus-trackbet').first().click();
+  const trackCta = page.locator('.action-focus-trackbet:visible').first();
+  await expect(trackCta).toBeVisible();
+  await trackCta.click();
   await page.waitForTimeout(500);
   const afterBet = await storageState(page);
   expect(afterBet.userBets).toBeGreaterThan(beforeBet.userBets);

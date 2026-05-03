@@ -1519,3 +1519,9 @@
 - Apres: config accepte `CHROME_EXECUTABLE_PATH`; smoke agent-replay 10/10, suite hors axe 263 pass / 79 fail / 16 skip.
 - Impact: tests débloqués localement et dette de specs legacy consignée.
 - Verif: agent-replay OK, full hors axe exécuté; `@axe-core/playwright` absent du runtime local.
+
+## Sprint v35.206 — Phase 11 P-11.11 Flow Big Bet E2E (10:05 UTC)
+- Avant: le flow Big Bet échouait car le test cliquait un CTA caché par le layout responsive.
+- Apres: le test cible les CTAs visibles pour modal + track bet.
+- Impact: conversion path Big Bet -> modal -> Winamax -> track validé desktop et mobile.
+- Verif: tests/user-flow.spec.js 2/2 OK.
