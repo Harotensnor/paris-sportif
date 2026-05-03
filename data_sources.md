@@ -36,6 +36,9 @@ Implementation:
 - Output: `thesportsdb_meta.json`
 - Cadence: 24h TTL with strict fuzzy matching; generic demo-key fallbacks are rejected.
 - Health metric: teams requested, teams matched, API errors.
+- V36 guardrail: when the public demo key returns the same Arsenal payload for
+  unrelated teams, the fetcher stops early and reports `status: unavailable`
+  instead of accepting wrong badges/stadiums or hammering the API into 429s.
 
 ## Candidate 2 — OpenLigaDB
 

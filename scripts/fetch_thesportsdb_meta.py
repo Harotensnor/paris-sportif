@@ -29,6 +29,7 @@ API_KEY = os.environ.get("THESPORTSDB_API_KEY", "3")
 API = f"https://www.thesportsdb.com/api/v1/json/{API_KEY}/searchteams.php?t="
 UA = "Paris-Sportif/1.0 (+https://harotensnor.github.io/paris-sportif/)"
 TTL_SECONDS = 24 * 60 * 60
+DEMO_TEAM_SLUG = "arsenal"
 
 
 def now_iso() -> str:
@@ -89,6 +90,8 @@ def fetch_team(name: str, timeout: int = 12) -> dict[str, Any] | None:
     if not teams:
         return None
     wanted = slug(name)
+    if teams and slug(teams[0].get("strTeam") or "") == DEMO_TEAM_SLUG and wanted != DEMO_TEAM_SLUG:
+        raise RuntimeError("demo key fallback: TheSportsDB returned Arsenal for a different team")
     for team in teams:
         primary = slug(team.get("strTeam") or "")
         alternates = [slug(x) for x in re.split(r"[,;/|]", team.get("strTeamAlternate") or "") if x.strip()]
@@ -148,6 +151,7 @@ def main() -> int:
     meta: dict[str, Any] = {}
     errors: list[dict[str, str]] = []
     matched = 0
+    demo_key_locked = False
 
     for idx, team in enumerate(teams, start=1):
         key = team["key"]
@@ -163,16 +167,27 @@ def main() -> int:
         except Exception as exc:
             if key in previous and stored_matches(previous[key], team["name"]):
                 meta[key] = previous[key]
-            errors.append({"team": team["name"], "error": str(exc)[:160]})
+            msg = str(exc)[:160]
+            errors.append({"team": team["name"], "error": msg})
+            if "demo key fallback" in msg:
+                demo_key_locked = True
+                break
         if idx < len(teams):
             time.sleep(max(0.0, args.sleep))
 
+    status = "ok" if matched else "degraded"
+    if demo_key_locked and not matched:
+        status = "unavailable"
+    elif demo_key_locked:
+        status = "partial"
     out = {
         "generated_at": now_iso(),
         "source": f"TheSportsDB public V1 API key {API_KEY}",
-        "status": "ok" if matched else "degraded",
+        "status": status,
         "requested": len(teams),
         "matched": matched,
+        "demo_key_locked": demo_key_locked,
+        "note": "Set THESPORTSDB_API_KEY to a non-demo key to enable metadata matches." if demo_key_locked else None,
         "errors": errors[:25],
         "teams": meta,
     }
