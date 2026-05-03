@@ -63,6 +63,10 @@ test.describe('market consistency guard', () => {
         ['baseball same total conflict', m('baseballTotal', 'O8.5', { side: 'over', line: 8.5 }), m('baseballTotal', 'U8.5', { side: 'under', line: 8.5 }), false],
         ['hockey same total conflict', m('hockeyTotal', 'O5.5', { side: 'over', line: 5.5 }), m('hockeyTotal', 'U5.5', { side: 'under', line: 5.5 }), false],
         ['team total same line conflict', m('teamTotal', 'O1.5', { side: 'over', line: 1.5 }), m('teamTotal', 'U1.5', { side: 'under', line: 1.5 }), false],
+        ['home team total conflict stays team-scoped', m('teamTotal', 'home:O1.5', { team: 'home', side: 'over', line: 1.5 }), m('teamTotal', 'home:U1.5', { team: 'home', side: 'under', line: 1.5 }), false],
+        ['different team totals can coexist', m('teamTotal', 'home:O1.5', { team: 'home', side: 'over', line: 1.5 }), m('teamTotal', 'away:U1.5', { team: 'away', side: 'under', line: 1.5 }), true],
+        ['2-0 + home team total over 1.5', score('2-0'), m('teamTotal', 'home:O1.5', { team: 'home', side: 'over', line: 1.5 }), true],
+        ['2-0 + away team total over 0.5', score('2-0'), m('teamTotal', 'away:O0.5', { team: 'away', side: 'over', line: 0.5 }), false],
         ['same market same pick allowed', m('ou25', 'O2.5', { side: 'over', line: 2.5 }), m('ou25', 'O2.5', { side: 'over', line: 2.5 }), true],
         ['unknown unrelated markets pass', m('playerPoints', 'over_20.5', { side: 'over', line: 20.5 }), m('tennisSets', '2-0'), true],
         ['2:0 + BTTS No', score('2:0'), m('btts', 'BTTS_N', { side: 'no' }), true],
@@ -74,13 +78,15 @@ test.describe('market consistency guard', () => {
         ['2-0 + handicap home -1.5', score('2-0'), m('handicap', 'home:-1.5', { side: 'home', line: -1.5 }), true],
         ['1-0 + handicap home -1.5', score('1-0'), m('handicap', 'home:-1.5', { side: 'home', line: -1.5 }), false],
         ['1N2 1 + handicap home -0.5 duplicate', m('1n2', '1'), m('handicap', 'home:-0.5', { side: 'home', line: -0.5 }), false],
+        ['1N2 2 + handicap away -0.5 duplicate', m('1n2', '2'), m('handicap', 'away:-0.5', { side: 'away', line: -0.5 }), false],
+        ['1N2 X + handicap home -0.5 conflict', m('1n2', 'X'), m('handicap', 'home:-0.5', { side: 'home', line: -0.5 }), false],
         ['1N2 1 + handicap away +0.5 conflict', m('1n2', '1'), m('handicap', 'away:+0.5', { side: 'away', line: 0.5 }), false],
         ['1N2 X + handicap home +0.5 coexist', m('1n2', 'X'), m('handicap', 'home:+0.5', { side: 'home', line: 0.5 }), true],
       ];
       return cases.map(([name, a, b, expected]) => ({ name, expected, actual: api.isPairConsistent(a, b) }));
     });
 
-    expect(results).toHaveLength(58);
+    expect(results).toHaveLength(64);
     for (const row of results) expect(row.actual, row.name).toBe(row.expected);
   });
 

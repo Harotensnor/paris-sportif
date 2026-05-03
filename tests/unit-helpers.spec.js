@@ -118,11 +118,19 @@ test.describe('Helpers purs (window.__testAPI)', () => {
         p_2_1_5: fn(2, 1.5),
         p_0_1_0: fn(0, 1.0),
         p_3_2_0: fn(3, 2.0),
+        p_0_0: fn(0, 0),
+        p_1_0: fn(1, 0),
+        p_invalid_lam: fn(1, NaN),
+        p_invalid_k: fn(1.5, 1.2),
       };
     });
     expect(results.p_2_1_5).toBeCloseTo(0.2510, 3);
     expect(results.p_0_1_0).toBeCloseTo(0.3679, 3);
     expect(results.p_3_2_0).toBeCloseTo(0.1804, 3);
+    expect(results.p_0_0).toBe(1);
+    expect(results.p_1_0).toBe(0);
+    expect(results.p_invalid_lam).toBe(0);
+    expect(results.p_invalid_k).toBe(0);
   });
 
   test('poissonTopScores : ordering + masse totale ≈ 1', async ({ page }) => {
