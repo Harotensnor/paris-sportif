@@ -1690,3 +1690,9 @@
 - Apres: baseline 32 captures analysee, phase12_visual_audit.json + 10 issues P12-VIS ajoutees.
 - Impact: priorite fix claire: Tous scannable/pagine, filtres mobiles, apercu cotes, pages longues.
 - Verif: manifest 32 captures, 0 failure, 0 overflow horizontal.
+
+## Sprint v35.238 — Phase 12 P-12.7 Audit interactions (15:00 local)
+- Avant: click audit limite a 166/239 clics et ne couvrait pas assez les nouvelles lignes Tous.
+- Apres: runner elargi aux lignes, presets, chips et 8 pages; 254 clics, 0 failure.
+- Impact: les interactions principales repondent apres la refonte couverture.
+- Verif: phase12_click_audit.json, syntax click_audit OK.

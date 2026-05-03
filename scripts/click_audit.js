@@ -17,8 +17,8 @@ const CHROME_EXE = process.env.CHROME_EXECUTABLE_PATH
   || (fs.existsSync('C:/Program Files/Google/Chrome/Application/chrome.exe')
     ? 'C:/Program Files/Google/Chrome/Application/chrome.exe'
     : '');
-const PAGES = ['dashboard', 'tous', 'performance', 'academie', 'profil', 'sante', 'montantes'];
-const MAX_CLICKS_PER_PAGE = 24;
+const PAGES = ['dashboard', 'tous', 'performance', 'academie', 'profil', 'sante', 'montantes', 'legal'];
+const MAX_CLICKS_PER_PAGE = Number(process.env.CLICK_AUDIT_MAX || 48);
 const INTERACTIVE_SELECTOR = [
   'button:not([disabled])',
   'a[href]',
@@ -28,6 +28,13 @@ const INTERACTIVE_SELECTOR = [
   '[data-page-link]',
   '[data-big-detail]',
   '[data-open-detail]',
+  '[data-tous-tab]',
+  '[data-tous-preset]',
+  '[data-tous-sport]',
+  '.tous-row[data-match-id]',
+  '.accordion-toggle',
+  '.filter-chip',
+  '.category-chip',
 ].join(',');
 const SKIP_TEXT = /réinitial|reset|vider|supprimer|effacer|oublier|exporter|discord|refresh|rafraîchir|nettoyer|re-register|winamax|github|anj|joueurs info/i;
 
@@ -104,7 +111,9 @@ async function markCandidates(page) {
           id,
           text: (el.textContent || el.getAttribute('aria-label') || el.getAttribute('title') || '').trim().replace(/\s+/g, ' ').slice(0, 80),
           href: el.getAttribute('href') || '',
-          detail: el.hasAttribute('data-big-detail'),
+          detail: el.hasAttribute('data-big-detail')
+            || el.hasAttribute('data-open-detail')
+            || el.classList.contains('tous-row'),
         };
       });
   }, { selector: INTERACTIVE_SELECTOR, skipText: SKIP_TEXT.source, max: MAX_CLICKS_PER_PAGE });
@@ -156,6 +165,28 @@ async function markCandidates(page) {
         if (realErrors.length) report.failures.push({ hash, target, error: realErrors.join(' | ') });
         pageRow.clicked += 1;
       } catch (err) {
+        const retryable = /detached from the DOM|not stable|Timeout/i.test(err.message || '');
+        if (retryable) {
+          try {
+            const remapped = await markCandidates(page);
+            const retryTarget = remapped.find(c => c.text === target.text && c.href === target.href) || remapped[i];
+            if (!retryTarget) throw err;
+            await page.locator(`[data-click-audit-target="${retryTarget.id}"]`).first().click({ timeout: 4500, force: true });
+            await page.waitForTimeout(300);
+            const realErrors = errors.filter(e => !/favicon|sourcemap|Failed to load resource|net::ERR_ABORTED|40\d/i.test(e));
+            if (retryTarget.detail) {
+              const opened = await page.locator('#detail-modal.open').isVisible({ timeout: 3000 }).catch(() => false);
+              if (!opened) report.failures.push({ hash, target: retryTarget, error: 'detail modal did not open' });
+              await page.keyboard.press('Escape').catch(() => {});
+            }
+            if (realErrors.length) report.failures.push({ hash, target: retryTarget, error: realErrors.join(' | ') });
+            pageRow.clicked += 1;
+            continue;
+          } catch (retryErr) {
+            report.failures.push({ hash, target, error: retryErr.message });
+            continue;
+          }
+        }
         report.failures.push({ hash, target, error: err.message });
       }
     }
