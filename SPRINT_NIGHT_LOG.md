@@ -1966,3 +1966,8 @@
 - Après: les 5 tiers exigent tous EV/edge positifs, bornes de cote strictes, seuils conf/edge documentés, un seul pick par match sur le cockpit, et les cartes affichent EV au lieu de strict/souple.
 - Cohérence: ajout garde-fous handicap vs score exact + doublon 1N2 <-> handicap -0.5; les team totals sont renommés "Total équipe ..." pour ne plus ressembler à un handicap.
 - Vérif: app.js/sw.js syntax OK, market consistency audit 58/58, dashboard desktop 0 tier hors plage, 0 tag strict/souple, 0 overflow, 0 erreur console.
+## Sprint v35.292 — AUTO 10/10 Vague 2 IDs + localStorage guardrails (19:37 UTC)
+- Avant: les IDs de paris/alertes utilisaient Date.now()+Math.random(), les recherches recentes n'avaient pas de garde robuste contre corruption/bloat.
+- Apres: makeLocalId() utilise crypto.randomUUID() avec fallback compteur+crypto values, safeJsonParse/safeLocalStorageSet centralisent les cas quotas/corruption, et les recherches recentes sont nettoyees + cappees a 20.
+- Impact: bugs #41/#82/#83 traites sur les chemins critiques (tracked bets, user bets, alert rules), sans changer les donnees fraiches ni la logique modele.
+- Verif: app.js syntax OK; Playwright local 2000 IDs => 2000 uniques, 25 alertes => 20 gardees, 3 user bets => 3 IDs uniques, 0 erreur console.

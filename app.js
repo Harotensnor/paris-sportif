@@ -2,6 +2,35 @@
 (function() {
   'use strict';
 
+  let _localIdCounter = 0;
+  function safeJsonParse(raw, fallback) {
+    if (raw == null || raw === '') return fallback;
+    try { return JSON.parse(raw); }
+    catch(e) { return fallback; }
+  }
+  function safeLocalStorageSet(key, value) {
+    try {
+      localStorage.setItem(key, value);
+      return true;
+    } catch(e) {
+      return false;
+    }
+  }
+  function makeLocalId(prefix) {
+    const safePrefix = String(prefix || 'id').replace(/[^a-z0-9_-]/gi, '').toLowerCase() || 'id';
+    try {
+      if (crypto && typeof crypto.randomUUID === 'function') return `${safePrefix}_${crypto.randomUUID()}`;
+    } catch(e) {}
+    try {
+      const buf = new Uint32Array(2);
+      crypto.getRandomValues(buf);
+      return `${safePrefix}_${Date.now().toString(36)}_${(_localIdCounter++).toString(36)}_${buf[0].toString(36)}${buf[1].toString(36)}`;
+    } catch(e) {
+      return `${safePrefix}_${Date.now().toString(36)}_${(_localIdCounter++).toString(36)}`;
+    }
+  }
+  try { window.safeJsonParse = safeJsonParse; window.safeLocalStorageSet = safeLocalStorageSet; window.makeLocalId = makeLocalId; } catch(e) {}
+
   let currentSport = 'football';
   let currentDate;
   let searchTerm = '';
@@ -22,7 +51,7 @@
   }
   function setUserOddMin(v) {
     const n = ODD_MIN_CHOICES.reduce((best, x) => Math.abs(x - v) < Math.abs(best - v) ? x : best, 1.30);
-    try { localStorage.setItem(ODD_MIN_USER_KEY, String(n.toFixed(2))); } catch(e) {}
+    safeLocalStorageSet(ODD_MIN_USER_KEY, String(n.toFixed(2)));
     advFilters.oddMin = n;
     try { window.advFilters = advFilters; } catch(e) {}
     saveAdvFilters();
@@ -3082,13 +3111,13 @@
     } catch(e) { return []; }
   }
   function _saveUserBets(arr) {
-    try { localStorage.setItem(USER_BETS_KEY, JSON.stringify(arr.slice(-200))); } catch(e){}
+    safeLocalStorageSet(USER_BETS_KEY, JSON.stringify(arr.slice(-200)));
   }
   window._loadUserBets = _loadUserBets;
   window._addUserBet = function(matchId, market, key, label, odd, stake) {
     const bets = _loadUserBets();
     const bet = {
-      id: 'bet_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+      id: makeLocalId('bet'),
       matchId: String(matchId),
       market: market || '1n2',
       key: key || '',
@@ -12790,15 +12819,19 @@
   function _saveRecentSearch(q) {
     if (!q || q.length < 2) return;
     try {
-      const arr = JSON.parse(localStorage.getItem(RECENT_SEARCHES_KEY) || '[]');
-      const filtered = arr.filter(x => x.toLowerCase() !== q.toLowerCase());
-      filtered.unshift(q);
-      localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(filtered.slice(0, 5)));
+      const clean = String(q).trim().slice(0, 80);
+      if (clean.length < 2) return;
+      const arr = safeJsonParse(localStorage.getItem(RECENT_SEARCHES_KEY), []);
+      const filtered = (Array.isArray(arr) ? arr : [])
+        .filter(x => typeof x === 'string')
+        .filter(x => x.toLowerCase() !== clean.toLowerCase());
+      filtered.unshift(clean);
+      safeLocalStorageSet(RECENT_SEARCHES_KEY, JSON.stringify(filtered.slice(0, 20)));
     } catch(e){}
   }
   function _loadRecentSearches() {
-    try { return JSON.parse(localStorage.getItem(RECENT_SEARCHES_KEY) || '[]') || []; }
-    catch(e) { return []; }
+    const arr = safeJsonParse(localStorage.getItem(RECENT_SEARCHES_KEY), []);
+    return (Array.isArray(arr) ? arr : []).filter(x => typeof x === 'string' && x.trim()).slice(0, 20);
   }
   function _renderRecentSearches() {
     const box = document.getElementById('search-suggest');
@@ -13341,19 +13374,19 @@
   window._addAlertRule = function(type, threshold, scope) {
     const rules = _loadAlertRules();
     const rule = {
-      id: 'alert_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+      id: makeLocalId('alert'),
       type: String(type || 'edge_min'),
       threshold: Number(threshold) || 0.05,
       scope: scope || {},
       created_at: new Date().toISOString(),
     };
     rules.push(rule);
-    try { localStorage.setItem(ALERT_RULES_KEY, JSON.stringify(rules.slice(-20))); } catch(e){}
+    safeLocalStorageSet(ALERT_RULES_KEY, JSON.stringify(rules.slice(-20)));
     return rule.id;
   };
   window._removeAlertRule = function(id) {
     const rules = _loadAlertRules().filter(r => r.id !== id);
-    try { localStorage.setItem(ALERT_RULES_KEY, JSON.stringify(rules)); } catch(e){}
+    safeLocalStorageSet(ALERT_RULES_KEY, JSON.stringify(rules));
   };
   // n'existent pas (ex: test isolé, fragment inclusion), on no-op silencieusement
   // au lieu de crasher l'IIFE entière. Évite "Cannot read properties of null".
@@ -25272,13 +25305,11 @@
     }
   }
   function saveTrackedBets(bets) {
-    try {
-      localStorage.setItem('paris_sportif_tracked_bets', JSON.stringify(bets));
-    } catch (e) {}
+    safeLocalStorageSet('paris_sportif_tracked_bets', JSON.stringify(bets));
   }
   function addTrackedBet(bet) {
     const bets = loadTrackedBets();
-    const id = 'bet_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    const id = makeLocalId('bet');
     bets[id] = { ...bet, added_at: new Date().toISOString(), status: 'en cours' };
     saveTrackedBets(bets);
     return id;
