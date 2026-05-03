@@ -1664,4 +1664,8 @@
 - Avant: a11y final non archive en artefact Phase 11 dedie.
 - Apres: 8 pages auditees, 0 critical, 0 serious, 0 moderate, 0 minor.
 - Impact: regression a11y desktop Phase 11 cloturee et tracee.
-- Verif: a11y_audit OK, syntax/bundle OK.
+- Verif: a11y_audit OK, syntax/bundle OK.## Sprint v35.233 — Phase 11 P-11.39 Tests fonctionnels finaux (13:44 local)
+- Avant: validation fonctionnelle finale dispersee dans .cache.
+- Apres: phase11_functional_final.json, click 166/166, coherence 50/50, modal tabs 0 fail.
+- Impact: parcours interactifs critiques reverifies apres refontes Phase 11.
+- Verif: market_consistency, modal_tabs, click_audit OK; syntax/bundle OK.
