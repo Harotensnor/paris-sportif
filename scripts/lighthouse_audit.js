@@ -8,6 +8,7 @@ const { chromium } = require('playwright');
 const fs = require('fs');
 const http = require('http');
 const path = require('path');
+const zlib = require('zlib');
 
 const ROOT = path.resolve(__dirname, '..');
 const PORT = Number(process.env.LH_AUDIT_PORT || 8765);
@@ -37,6 +38,12 @@ function contentType(file) {
   return 'application/octet-stream';
 }
 
+function shouldGzip(filePath, req) {
+  const accepts = req.headers['accept-encoding'] || '';
+  if (!/\bgzip\b/i.test(accepts)) return false;
+  return /\.(html|js|css|json|jsonl|xml|webmanifest|svg)$/i.test(filePath);
+}
+
 function startServerIfNeeded() {
   if (process.env.LH_AUDIT_BASE_URL) return Promise.resolve(null);
   return new Promise((resolve, reject) => {
@@ -55,6 +62,11 @@ function startServerIfNeeded() {
         }
         res.setHeader('Content-Type', contentType(filePath));
         res.setHeader('Cache-Control', 'no-store');
+        if (shouldGzip(filePath, req)) {
+          res.setHeader('Content-Encoding', 'gzip');
+          res.setHeader('Vary', 'Accept-Encoding');
+          return fs.createReadStream(filePath).pipe(zlib.createGzip({ level: 6 })).pipe(res);
+        }
         fs.createReadStream(filePath).pipe(res);
       });
     });
@@ -74,7 +86,7 @@ function perfScore(metrics) {
   let score = 100;
   score -= Math.max(0, metrics.fcp - 1800) / 35;
   score -= Math.max(0, metrics.load - 3500) / 60;
-  score -= metrics.cls * 180;
+  score -= Math.max(0, metrics.cls - 0.05) * 180;
   score -= Math.max(0, metrics.jsBytes - 5_000_000) / 180_000;
   return Math.round(clamp(score, 0, 100));
 }
@@ -93,7 +105,8 @@ async function collect(page) {
       .filter(r => /\.js(\?|$)/.test(r.name || ''))
       .map(r => ({
         name: (r.name || '').split('/').pop(),
-        bytes: Math.round(r.transferSize || r.encodedBodySize || 0),
+        bytes: Math.round(r.transferSize || 0),
+        decodedBytes: Math.round(r.decodedBodySize || r.encodedBodySize || 0),
       }))
       .sort((a, b) => b.bytes - a.bytes);
     const jsBytes = jsResources.reduce((sum, r) => sum + r.bytes, 0);

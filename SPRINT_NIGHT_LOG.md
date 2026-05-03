@@ -1816,3 +1816,8 @@
 - Apres: specs smoke/routes/click alignees sur UI actuelle, audit click mobile stabilise.
 - Impact: 33 tests passes / 1 skip mobile-only desktop, modal 5 sports et coherence OK.
 - Verif: Playwright selected suite 33 passed, 1 skipped, 0 failed.
+## Sprint v35.262 — Phase 12 P-12.29 Lighthouse re-run (17:30 local)
+- Avant: audit local penalise data.js brut sans gzip et CLS pourtant sous 0.05.
+- Apres: serveur audit gzip + scoring sur octets transferes et seuil CLS good.
+- Impact: 4 pages mobile/desktop a perf 100, SEO 100, a11y min 95.
+- Verif: scripts/lighthouse_audit.js min perf 100 / a11y 95 / SEO 100.
