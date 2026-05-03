@@ -2042,3 +2042,8 @@
 - Apres: data.js + odds_history.jsonl passent en stale-while-revalidate; data_lite/data_today/health restent network-first pour garder la fraicheur critique.
 - Impact: le rendu initial garde le dernier cache disponible et rafraichit en arriere-plan, ce qui preserve la sensation temps reel sans penaliser les connexions lentes.
 - Verif: sw.js syntax OK, CACHE_VERSION + footer bumpes.
+## Sprint v35.307 — AUTO 10/10 Right rail prochains matchs fiables (21:35 UTC)
+- Avant: les prochains matchs du rail pouvaient paraitre repetitifs/non tries, avec uniquement heure + countdown et peu de contexte date.
+- Apres: les listes prochains matchs sont triees strictement par kickoff et affichent Date + Heure + countdown; le rail legacy applique la meme logique.
+- Impact: le widget desktop montre une vraie file horaire, distingue aujourd'hui/demain, et evite l'impression de countdown copie-colle.
+- Verif: app.js syntax OK; smoke dashboard desktop => labels rail dates/heures/countdowns presents, 0 warning/error; app hash + cache + footer bumpes.
