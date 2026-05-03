@@ -1513,3 +1513,9 @@
 - Apres: app-i18n.js dédié chargé avant app.js; app.js 1621.1KB -> 1619.1KB.
 - Impact: premier découpage ESM-safe du mégafichier sans toucher au modèle.
 - Verif: node --check app.js/app-i18n.js OK, bundle OK.
+
+## Sprint v35.205 — Phase 11 P-11.10 Tests Playwright complets (09:58 UTC)
+- Avant: Playwright local ne lançait pas Chrome (`ms-playwright` absent).
+- Apres: config accepte `CHROME_EXECUTABLE_PATH`; smoke agent-replay 10/10, suite hors axe 263 pass / 79 fail / 16 skip.
+- Impact: tests débloqués localement et dette de specs legacy consignée.
+- Verif: agent-replay OK, full hors axe exécuté; `@axe-core/playwright` absent du runtime local.

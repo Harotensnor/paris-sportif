@@ -22,6 +22,9 @@ export default defineConfig({
     baseURL: 'http://localhost:8765',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
+    launchOptions: process.env.CHROME_EXECUTABLE_PATH ? {
+      executablePath: process.env.CHROME_EXECUTABLE_PATH,
+    } : undefined,
   },
 
   projects: [
