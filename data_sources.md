@@ -59,11 +59,12 @@ Risk / constraints:
   republish substantial derived datasets.
 - Community-maintained data: use as validation/fallback, not sole source.
 
-Suggested implementation:
+Implementation:
 - `scripts/fetch_openligadb.py`
 - Output: `openligadb_matches.json`
-- Cadence: 12h, plus matchday refresh on German football days.
-- Health metric: matched German events, result freshness deltas.
+- Cadence: 12h TTL, triggered from the refresh workflow every 4h window.
+- Scope: Bundesliga / 2. Bundesliga / 3. Liga around the current match window.
+- Health metric: match count, matched local Winamax-visible events, API errors.
 
 ## Guardrails
 

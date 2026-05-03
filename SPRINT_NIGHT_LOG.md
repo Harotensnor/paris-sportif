@@ -1549,3 +1549,9 @@
 - Apres: fetch_thesportsdb_meta.py + health + cron; matching strict pour refuser les fallbacks génériques.
 - Impact: source publique activée sans risque de faux logos/stades dans la data.
 - Verif: py_compile OK, build_health OK; API publique actuellement `degraded` sur clé démo.
+
+## Sprint v35.211 — Phase 11 P-11.16 OpenLigaDB Allemagne (10:21 UTC)
+- Avant: OpenLigaDB était seulement documenté comme source candidate.
+- Apres: fetch_openligadb.py + health + cron; Bundesliga/BL2/3. Liga sur fenêtre courante.
+- Impact: 121 matchs allemands récupérés, 22 reliés aux events locaux Winamax visibles.
+- Verif: py_compile OK, build_health OK, openligadb_matches status ok.

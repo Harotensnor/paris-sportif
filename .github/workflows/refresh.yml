@@ -120,6 +120,10 @@ jobs:
           if [ $HOUR_MOD4 -eq 0 ] && [ $MIN_MOD15 -lt 5 ]; then
             (python3 fetch_thesportsdb_meta.py || true) > /tmp/fetch_tsdb.log 2>&1 &
           fi
+          # OpenLigaDB: public German football cross-check, self-throttled 12h TTL.
+          if [ $HOUR_MOD4 -eq 0 ] && [ $MIN_MOD30 -lt 5 ]; then
+            (python3 fetch_openligadb.py || true) > /tmp/fetch_openligadb.log 2>&1 &
+          fi
           # fetch_weather + fetch_referees + fetch_clubelo + fetch_understat_xg : self-throttled, parallèle
           (python3 fetch_weather.py || true) > /tmp/fetch_weather.log 2>&1 &
           (python3 fetch_referees_soccer.py || true) > /tmp/fetch_refs.log 2>&1 &
