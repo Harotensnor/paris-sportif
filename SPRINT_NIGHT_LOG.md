@@ -1660,4 +1660,8 @@
 - Avant: scores Lighthouse Phase 11 non figes dans un artefact suivi.
 - Apres: phase11_lighthouse_final.json, min perf 92, min a11y 96, SEO 100.
 - Impact: cible 95+ quasi tenue partout, desktop tous/performance/academie restent perf 92 mais au-dessus seuil.
-- Verif: lighthouse_audit OK, syntax/bundle OK.
+- Verif: lighthouse_audit OK, syntax/bundle OK.## Sprint v35.232 — Phase 11 P-11.38 a11y final (13:38 local)
+- Avant: a11y final non archive en artefact Phase 11 dedie.
+- Apres: 8 pages auditees, 0 critical, 0 serious, 0 moderate, 0 minor.
+- Impact: regression a11y desktop Phase 11 cloturee et tracee.
+- Verif: a11y_audit OK, syntax/bundle OK.
