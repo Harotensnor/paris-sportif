@@ -140,7 +140,7 @@ async function markCandidates(page) {
       errors.length = 0;
       await page.goto(`${BASE_URL}/pronostics.html#${hash}`, { waitUntil: 'domcontentloaded', timeout: 15000 });
       await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
-      await page.waitForTimeout(300);
+      await page.waitForTimeout(700);
       const candidates = await markCandidates(page);
       const target = candidates[i];
       if (!target) continue;
