@@ -2052,3 +2052,8 @@
 - Apres: night_metrics regenere a 21:23:38 UTC sur le snapshot courant: 367 events, 294 upcoming, Winamax exact 367/367, 316 marches > 1N2.
 - Impact: les rapports couverture/perf repartent d'une base coherente apres la refonte table et les sprints data.
 - Verif: measure_night_metrics.py OK; winamax_exact_ratio=1.0, detail football 219/230 (95.2%), health warnings=1.
+## Sprint v35.309 — AUTO 10/10 Calibration freshness guard (21:39 UTC)
+- Avant: les courbes isotonic/backtest pouvaient encore calibrer le modele si backtest_report_v2.json etait vieux, donnant une confiance perimee mais visuellement propre.
+- Apres: backtest_report_v2 est accepte seulement si generated_at date de moins de 7 jours; sinon calibration globale/per-sport/per-market est marquee stale et les probas brutes sont conservees.
+- Impact: bug #78 ferme cote modele: une courbe obsolete ne peut plus aiguiser artificiellement un pick, et __modelCalibration expose stale/generated_at pour diagnostic.
+- Verif: app.js/sw.js syntax OK; smoke navigateur local => fresh=true, J-8=false, missing=false, liveCalTotal=647, 0 warning/error; spec model-math-guards etendue.

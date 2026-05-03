@@ -5040,6 +5040,12 @@
   let __reliabilityCalMap = null;         // sorted [{predicted, actual, n}]
   let __reliabilityCalRef = null;         // PRONOSTICS_DATA ref at last build
   let __reliabilityCalComputing = false;  // recursion guard
+  function _isFreshBacktestReport(rep, maxAgeDays = 7) {
+    if (!rep || !rep.generated_at) return false;
+    const ts = new Date(rep.generated_at).getTime();
+    if (!Number.isFinite(ts)) return false;
+    return (Date.now() - ts) <= maxAgeDays * 24 * 3600 * 1000;
+  }
   function applyReliabilityCalibration(raw) {
     if (__reliabilityCalComputing) return raw;
     const cur = (typeof window !== 'undefined') ? window.PRONOSTICS_DATA : null;
@@ -5053,7 +5059,8 @@
         // (PAV deja applique en CI Python), on les utilise directement.
         // Avant : on faisait le PAV cote client a chaque boot.
         const rep = window.__backtestReportV2;
-        const precomputed = rep && Array.isArray(rep.isotonic_pairs) && rep.isotonic_pairs.length >= 3
+        const repFresh = _isFreshBacktestReport(rep);
+        const precomputed = repFresh && Array.isArray(rep.isotonic_pairs) && rep.isotonic_pairs.length >= 3
           ? rep.isotonic_pairs
           : null;
         if (precomputed) {
@@ -5224,6 +5231,7 @@
   }
   function _calibrateProb(rawProb, sport, leagueCode, market) {
     const cal = window.__modelCalibration;
+    if (cal && cal.stale) return rawProb;
     if (!cal || !cal.bins || !cal.total_n || cal.total_n < 20) return rawProb;
     if (!isFinite(rawProb) || rawProb <= 0 || rawProb >= 1) return rawProb;
     // est calibré à part du foot secondaire; autres sports restent sport:all.
@@ -5286,6 +5294,7 @@
       const r = await fetch('backtest_report_v2.json?t=' + Date.now(), { cache: 'no-store' });
       if (!r.ok) return;
       const rep = await r.json();
+      const repFresh = _isFreshBacktestReport(rep);
       // by_sport_calibration: { football: [bins], tennis: [bins], ... }
       // by_sport: { football: { n: 234, ... }, ... } (déjà existant pour KPIs)
       const bySport = rep.by_sport_calibration || null;
@@ -5310,17 +5319,19 @@
         }
       }
       window.__modelCalibration = {
-        bins: rep.calibration || [],
+        bins: repFresh ? (rep.calibration || []) : [],
         bySport: bySport,
         bySportLeagueTier: bySportLeagueTier,
         bySportLeagueMarket: bySportLeagueMarket,
-        total_n: (rep.overall && rep.overall.n) || 0,
+        total_n: repFresh ? ((rep.overall && rep.overall.n) || 0) : 0,
         totalNBySport: totalNBySport,
         totalNBySportLeagueTier: totalNBySportLeagueTier,
         totalNBySportLeagueMarket: totalNBySportLeagueMarket,
         // Tier 1 #2 (2026-05-01) : isotonic pairs per-sport pour remap PAV
         // plus fin que les bins. Actif si >=50 picks par sport.
-        isotonicPairsBySport: rep.isotonic_pairs_by_sport || null,
+        isotonicPairsBySport: repFresh ? (rep.isotonic_pairs_by_sport || null) : null,
+        generated_at: rep.generated_at || null,
+        stale: !repFresh,
       };
       // by_cote_bucket, by_tier, overall — ROI / brier / logloss).
       window.__backtestReportV2 = rep;
@@ -13990,6 +14001,7 @@
       selectBestMarket: typeof selectBestMarket === 'function' ? selectBestMarket : null,
       buildMarketCandidates: typeof buildMarketCandidates === 'function' ? buildMarketCandidates : null,
       scoreMarketCandidate: typeof scoreMarketCandidate === 'function' ? scoreMarketCandidate : null,
+      _isFreshBacktestReport: typeof _isFreshBacktestReport === 'function' ? _isFreshBacktestReport : null,
       scoreToImpliedMarkets: typeof scoreToImpliedMarkets === 'function' ? scoreToImpliedMarkets : null,
       isPickConsistentWithScore: typeof isPickConsistentWithScore === 'function' ? isPickConsistentWithScore : null,
       isPairConsistent: typeof isPairConsistent === 'function' ? isPairConsistent : null,
