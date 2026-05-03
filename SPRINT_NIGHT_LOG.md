@@ -1531,3 +1531,9 @@
 - Apres: 32 vues vérifiées; 0 erreur console, 0 overflow, 0 bottom-nav overlap; sliders Profil 16px -> 44px.
 - Impact: réglages Profil plus utilisables au doigt et HTML resynchronisé après le cron.
 - Verif: audit Playwright custom OK, bundle OK.
+
+## Sprint v35.208 — Phase 11 P-11.13 Offline PWA (10:10 UTC)
+- Avant: mode avion non revalidé depuis le split i18n et les derniers stamps SW.
+- Apres: service worker contrôlé, reload offline conserve le shell, contenu visible et banner Hors ligne actif.
+- Impact: la consultation cache reste utilisable sans réseau.
+- Verif: audit Playwright offline OK; seul bruit réseau attendu `ERR_INTERNET_DISCONNECTED`.
