@@ -2017,3 +2017,8 @@
 - Apres: build_public_profiles.py genere public_team_profiles.json + public_player_profiles.json depuis les sidecars publics existants et le workflow les publie a chaque refresh.
 - Impact: 881 profils equipes, 459 avec matchs a venir, 87 avec disponibilite blessure/lineup et 500 profils joueurs prioritaires (blessures + pitchers/goalies) disponibles pour recherche approfondie.
 - Verif: build_public_profiles OK, build_health OK (29 sources suivies), py_compile OK.
+## Sprint v35.302 — AUTO 10/10 Recherche profils equipes/joueurs (21:05 UTC)
+- Avant: la recherche Cmd-K/topbar indexait les matchs, equipes et ligues du feed, mais ignorait les nouveaux profils publics equipes/joueurs.
+- Apres: la recherche charge public_team_profiles.json + public_player_profiles.json en cache, puis ajoute les profils equipes, scores, tags et joueurs blesses/starters aux suggestions.
+- Impact: Theo peut chercher une equipe ou un joueur et tomber sur le contexte profond; un joueur renvoie vers son equipe pour voir les prochains matchs pertinents.
+- Verif: app.js/sw.js syntax OK, smoke navigateur local recherche "Aaron" => profils joueurs avec equipe/statut, 0 erreur console; hashes app/css restampes dans pronostics.html.
