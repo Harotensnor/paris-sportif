@@ -1702,3 +1702,9 @@
 - Apres: aliases corriges vers Performance et script route_audit verifie 27 routes/aliases.
 - Impact: anciens bookmarks et hash legacy redirigent vers un hub utile au lieu de fallback flou.
 - Verif: phase12_route_audit.json, 27 routes OK, 0 failure.
+
+## Sprint v35.240 — Phase 12 P-12.9 Audit modal multi-sports (15:06 local)
+- Avant: les modales n'etaient pas revalidees apres l'ouverture de Tous a toute la couverture.
+- Apres: audit direct openDetail sur football/tennis/basketball/baseball/hockey et tous les onglets presents.
+- Impact: 5 sports testes, 0 skipped, 0 failure, aucune erreur console.
+- Verif: phase12_modal_tabs_audit.json, modal_tabs_audit OK.
