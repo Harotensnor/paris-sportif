@@ -1846,3 +1846,8 @@
 - Apres: visual_capture v35-263-pre-refonte genere 32 PNG (8 pages x 4 viewports) dans .cache/phase4-v35-263-pre-refonte.
 - Impact: baseline compare pour la refonte navigation/dashboard; #tous mesure encore 22k-40k px, dashboard 6k-7.9k px selon viewport.
 - Verif: 32/32 captures OK avec Chrome local et mode stable capture.
+## Sprint v35.268 — Phase 12 V36 P-12.5 Header minimaliste (16:27 UTC)
+- Avant: le header cumulait nav horizontale, recherche courte, date picker, niveau, sante, notifications et theme; l'accueil faisait encore "toolbox".
+- Apres: header V36 reduit a logo, recherche large, alertes et profil; la nav centrale est retiree, les anciens controles restent caches pour compatibilite JS.
+- Impact: premier signal V36 plus lisible desktop-first, search prioritaire, profil compact; mobile garde hamburger + alertes/profil.
+- Verif: syntax app.js/sw.js OK, diff --check OK, visual_capture v36-header-final 32/32 OK.

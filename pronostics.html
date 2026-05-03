@@ -133,9 +133,9 @@
 <!-- Chantier S — PWA -->
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="alternate" type="application/rss+xml" href="feed.xml" title="Paris-Sportif — Top picks du jour (RSS)">
-<!-- v35.07 — Seul le CSS est préchargé au boot. Le gros app.js?v=9627cd74 reste en defer
+<!-- v35.07 — Seul le CSS est préchargé au boot. Le gros app.js?v=a461f01e reste en defer
      plus bas dans le body pour laisser le squelette critique peindre d'abord. -->
-<link rel="preload" href="app.css?v=72d3b72c" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<link rel="preload" href="app.css?v=882bee30" as="style" onload="this.onload=null;this.rel='stylesheet'">
 <link rel="stylesheet" href="print.css?v=313105b5" media="print">
 <!-- v31.1 — DNS-prefetch pour les CDN tiers utilisés sur la page (logos ESPN).
      v31.7.24 — Ajout `preconnect` pour a.espncdn.com (le plus utilisé) :
@@ -189,17 +189,22 @@
     position:sticky; top:var(--rg-height); z-index:60;
     display:block; padding:0; border-bottom:1px solid var(--border); background:var(--header-bg);
   }
-  .topbar-inner { max-width:1400px; margin:0 auto; display:flex; align-items:center; gap:18px; padding:10px 24px; min-height:56px; box-sizing:border-box; }
-  .topbar-brand { display:flex; align-items:center; gap:10px; min-width:0; flex-shrink:0; color:var(--text); text-decoration:none; padding:4px 18px 4px 0; border-right:1px solid var(--border); box-sizing:border-box; }
+  .topbar-inner { max-width:1900px; margin:0 auto; display:flex; align-items:center; gap:14px; padding:8px 18px; min-height:60px; box-sizing:border-box; }
+  .topbar-brand { display:flex; align-items:center; gap:10px; min-width:0; flex-shrink:0; color:var(--text); text-decoration:none; padding:4px 10px 4px 0; border-right:0; box-sizing:border-box; }
   .tb-brand-main { display:block; font-weight:800; font-size:15px; line-height:1.1; }
-  .topbar-mainnav { display:flex; align-items:center; gap:4px; margin-left:16px; }
+  .topbar-mainnav { display:none!important; }
   .topbar-mainnav__link {
     min-height:40px; padding:7px 12px; box-sizing:border-box; border:1px solid transparent;
     border-radius:8px; background:transparent; color:var(--text-dim); font-size:13px;
     font-weight:600; white-space:nowrap; cursor:pointer;
   }
   .topbar-menu { display:none; }
-  .tb-brand-sub, .topbar-utils, nav.topbar-nav, nav.topbar-sports, .sidebar, .mobile-bottom-nav { display:none; }
+  .topbar-utils { margin-left:auto; display:flex; align-items:center; justify-content:flex-end; gap:10px; flex:1; min-width:0; }
+  .tb-brand-sub, nav.topbar-nav, nav.topbar-sports, .sidebar, .mobile-bottom-nav { display:none; }
+  .v36-search-wrap { flex:1; max-width:520px; min-width:220px; }
+  .v36-search-wrap .search { width:100%; min-height:42px; border-radius:999px; padding-left:16px; }
+  .v36-hidden-controls { display:none!important; }
+  .v36-icon-btn, .v36-profile-btn { flex:0 0 auto!important; width:auto; min-height:42px; border-radius:999px; border:1px solid var(--border); background:var(--panel-2); color:var(--text); display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:0 14px; font-weight:850; }
   .refresh-indicator.topbar-refresh { position:fixed; top:70px; right:12px; z-index:50; opacity:0; pointer-events:none; }
   .trust-strip.hidden { display:flex!important; visibility:hidden; pointer-events:none; min-height:42px; }
   .trust-strip.hidden[data-dismissed="1"] { display:none!important; }
@@ -269,6 +274,8 @@
     .rg-risk-bar a { max-width:178px; overflow:hidden; text-overflow:ellipsis; }
     .topbar-inner { padding:8px 12px; gap:10px; min-height:52px; }
     .topbar-mainnav { display:none; }
+    .v36-search-wrap { display:none; }
+    .v36-profile-btn span:last-child { display:none; }
     main#main-content { min-height:760px; padding:12px 10px; }
     .boot-shell { padding:18px 16px; border-radius:var(--r-sm); }
     .boot-shell__top { display:block; }
@@ -285,7 +292,7 @@
      n'est chargé QU'APRÈS consentement explicite (cf. _maybeEnableAnalytics).
      Pas de tracking par défaut. -->
 <script src="analytics.config.js" defer onerror="this.remove();"></script>
-<noscript><link rel="stylesheet" href="app.css?v=72d3b72c"></noscript>
+<noscript><link rel="stylesheet" href="app.css?v=882bee30"></noscript>
 <script>
   // v22 — Init theme / contrast / reader BEFORE body render (évite le flash)
   (function() {
@@ -344,7 +351,7 @@
   // pour debug console. AUCUN envoi réseau — l'utilisateur peut consulter
   // ou exporter ses données, et c'est tout.
   //
-// Pourquoi inline pré-app.js?v=9627cd74 ? Il faut s'enregistrer AVANT le LCP/FCP
+// Pourquoi inline pré-app.js?v=a461f01e ? Il faut s'enregistrer AVANT le LCP/FCP
   // pour les capter. Le bundle web-vitals officiel pèse 5 KB ; ici on
   // tombe à ~1.5 KB grâce à l'usage direct de PerformanceObserver.
   //
@@ -510,8 +517,8 @@
   <a href="tel:+33974751313">Pour être aidé, appelez le 09-74-75-13-13</a>
 </div>
 
-<!-- v26.1 — TOPBAR : nav horizontale en haut (plus de sidebar) -->
-<header class="topbar" id="sidebar">
+<!-- V36 — Header minimaliste : logo, recherche, alertes, profil. -->
+<header class="topbar v36-topbar" id="sidebar">
   <div class="topbar-inner">
     <a class="topbar-brand" href="#dashboard" data-page-link="dashboard" role="button" tabindex="0" aria-label="Accueil">
       <!-- v31.7.34 — Logo SVG inline (pas de fetch supplémentaire, scalable,
@@ -543,38 +550,30 @@
       </div>
     </a>
 
-    <!-- V11 (audit phase 2) : nav horizontale principale (Top/Locks/Combinés/Bilan/Backtest)
-         à côté du brand. Avant : aucun lien direct visible, l'user devait passer par
-         la sidebar (cachée à gauche). Maintenant : accès 1-clic aux pages clés. -->
-    <nav class="topbar-mainnav" aria-label="Navigation principale rapide">
-      <button class="page-btn topbar-mainnav__link" data-page="dashboard" title="Big Bets du jour">Accueil</button>
-      <button class="page-btn topbar-mainnav__link" data-page="tous" title="Tous les paris filtrables">Tous les paris</button>
-      <button class="page-btn topbar-mainnav__link" data-page="performance" title="Bilan, historique et performance">Mes paris</button>
-      <button class="page-btn topbar-mainnav__link" data-page="academie" title="Méthode et glossaire">Méthode</button>
-      <button class="page-btn topbar-mainnav__link" data-page="profil" title="Profil, santé et réglages">Profil</button>
-    </nav>
-
-    <div class="topbar-utils">
-      <div class="search-wrap" style="position:relative;">
-        <input type="search" id="search" class="search" placeholder="Équipe, tournoi, ville…" autocomplete="off" aria-label="Rechercher une équipe, un tournoi ou une ville">
+    <div class="topbar-utils v36-topbar-utils">
+      <div class="search-wrap v36-search-wrap" style="position:relative;">
+        <input type="search" id="search" class="search" placeholder="Rechercher match, équipe, ligue…" autocomplete="off" aria-label="Rechercher un match, une équipe ou une ligue">
         <div id="search-suggest" role="listbox" aria-label="Suggestions de recherche" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--panel);border:1px solid var(--border-2);border-radius:10px;max-height:360px;overflow:auto;z-index:60;box-shadow:var(--shadow-lg);"></div>
       </div>
-      <div class="date-nav">
-        <button id="prev-day" type="button" title="Jour précédent" aria-label="Aller au jour précédent">◀</button>
-        <button id="today-btn" class="today-btn" title="Aujourd'hui">Aujourd'hui</button>
-        <button id="next-day" type="button" title="Jour suivant" aria-label="Aller au jour suivant">▶</button>
+      <button id="notif-toggle" class="v36-icon-btn" type="button" aria-label="Activer les alertes pronos forte valeur" title="Alertes">
+        <span aria-hidden="true">🔔</span>
+        <span class="v36-alert-dot" aria-hidden="true"></span>
+      </button>
+      <button type="button" class="v36-profile-btn page-btn" data-page="profil" aria-label="Ouvrir le profil et les réglages" title="Profil">
+        <span aria-hidden="true">👤</span>
+        <span>Profil</span>
+      </button>
+      <div class="v36-hidden-controls" aria-hidden="true">
+        <div class="date-nav">
+          <button id="prev-day" type="button" title="Jour précédent" aria-label="Aller au jour précédent">◀</button>
+          <button id="today-btn" class="today-btn" title="Aujourd'hui">Aujourd'hui</button>
+          <button id="next-day" type="button" title="Jour suivant" aria-label="Aller au jour suivant">▶</button>
+        </div>
+        <input type="date" id="date" class="date-picker" aria-label="Sélectionner une date">
+        <button id="level-toggle" class="theme-toggle" type="button" aria-label="Basculer niveau (débutant / confirmé / pro)" title="Niveau d'expérience · clic pour cycler">🎯</button>
+        <button id="health-indicator" class="theme-toggle" type="button" aria-label="Santé du pipeline de données" title="Santé du pipeline : chargement…" style="font-size:9px;">●</button>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Basculer thème clair/sombre" title="Thème (Maj+T)">🌙</button>
       </div>
-      <input type="date" id="date" class="date-picker" aria-label="Sélectionner une date">
-      <!-- v31 — Niveau (débutant/confirmé/pro) toggle visible.
-           Click cycle : 🌱 Débutant → 🎯 Confirmé → 📊 Pro → 🌱.
-           Persisté dans userPrefs.level + écho data-level sur <html>. -->
-      <button id="level-toggle" class="theme-toggle" type="button" aria-label="Basculer niveau (débutant / confirmé / pro)" title="Niveau d'expérience · clic pour cycler">🎯</button>
-      <!-- v30 — Indicateur santé pipeline (lit health.json) -->
-      <button id="health-indicator" class="theme-toggle" type="button" aria-label="Santé du pipeline de données" title="Santé du pipeline : chargement…" style="font-size:9px;">●</button>
-      <!-- v30 — Notif toggle (Notification API locale, alerte sur edge ≥10%) -->
-      <button id="notif-toggle" class="theme-toggle" type="button" aria-label="Activer alertes pronos forte valeur" title="Notifs : alertes quand un pari edge ≥10% apparaît">🔕</button>
-      <!-- v30 Sprint 5 — Theme toggle button (mirror of Maj+T shortcut) -->
-      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Basculer thème clair/sombre" title="Thème (Maj+T)">🌙</button>
     </div>
 
     <button class="topbar-menu" id="hamburger" aria-label="Menu" aria-controls="page-nav" aria-expanded="false">☰</button>
@@ -735,7 +734,7 @@
         </div>
       </div>
     </section>
-    <!-- v31.2 — Friendly error state (audit UX). Avant : "Fichier data_lite.js?v=909c17dd
+    <!-- v31.2 — Friendly error state (audit UX). Avant : "Fichier data_lite.js?v=13090e60
          introuvable" brut, casse la confiance. Maintenant : message rassurant
          avec retry + dernier refresh + offline fallback explanation. -->
     <div id="no-data-banner" class="error-banner hidden" role="alert" aria-live="polite">
@@ -818,7 +817,7 @@
       <div class="footer-brand">
         <span class="footer-logo">🎯</span>
         <span class="footer-text">Paris-Sportif</span>
-        <span class="footer-version" id="footer-version" role="button" tabindex="0" style="cursor:pointer;" title="Voir les nouveautés v35.267">v35.267</span>
+        <span class="footer-version" id="footer-version" role="button" tabindex="0" style="cursor:pointer;" title="Voir les nouveautés v35.268">v35.268</span>
       </div>
       <nav class="footer-links" aria-label="Liens du site">
         <a href="https://github.com/Harotensnor/paris-sportif" target="_blank" rel="noopener" class="footer-link" title="Code source sur GitHub">
@@ -903,9 +902,9 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="data_lite.js?v=accce843"></script>
+<script src="data_lite.js?v=13090e60"></script>
 <script src="app-i18n.js?v=6bad7ddf" defer></script>
-<script src="app.js?v=9627cd74" defer></script>
+<script src="app.js?v=a461f01e" defer></script>
 
 <!-- enhancements v20 -->
 <script src="app-enhancements.js?v=232799b3" defer></script>
