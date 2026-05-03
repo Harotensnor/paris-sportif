@@ -98,6 +98,18 @@ async function openMatch(page, id) {
   await page.waitForTimeout(250);
 }
 
+async function revealTechnicalTabs(page) {
+  const toggle = page.locator('#detail-modal.open [data-why-tech-toggle]').first();
+  if (await toggle.count()) {
+    const expanded = await toggle.getAttribute('aria-expanded').catch(() => null);
+    if (expanded !== 'true') {
+      await toggle.click({ timeout: 3000 });
+      await page.waitForTimeout(180);
+    }
+  }
+  await page.locator('#detail-modal.open .md-tab').first().waitFor({ state: 'visible', timeout: 4000 });
+}
+
 async function tabState(page, target) {
   return page.evaluate((key) => {
     const modal = document.querySelector('#detail-modal.open');
@@ -162,6 +174,7 @@ async function tabState(page, target) {
     report.tested.push(row);
     try {
       await openMatch(page, pick.id);
+      await revealTechnicalTabs(page);
       const tabs = await page.locator('#detail-modal.open .md-tab').evaluateAll(nodes =>
         nodes.map(n => ({
           key: n.getAttribute('data-mtab-toggle') || '',
@@ -173,7 +186,9 @@ async function tabState(page, target) {
         throw new Error(`expected at least 2 tabs, got ${tabs.length}`);
       }
       for (const tab of tabs) {
-        await page.locator(`#detail-modal.open .md-tab[data-mtab-toggle="${tab.key}"]`).click({ timeout: 3000 });
+        const tabButton = page.locator(`#detail-modal.open .md-tab[data-mtab-toggle="${tab.key}"]`).first();
+        await tabButton.scrollIntoViewIfNeeded().catch(() => {});
+        await tabButton.click({ timeout: 3000 });
         await page.waitForTimeout(120);
         const state = await tabState(page, tab.key);
         if (state.selected !== 'true') {

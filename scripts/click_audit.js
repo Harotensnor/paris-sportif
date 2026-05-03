@@ -81,6 +81,9 @@ function startServerIfNeeded() {
 
 async function markCandidates(page) {
   return page.evaluate(({ selector, skipText, max }) => {
+    document.querySelectorAll('[data-click-audit-target]').forEach(el => {
+      el.removeAttribute('data-click-audit-target');
+    });
     const skipRe = new RegExp(skipText, 'i');
     const visible = (el) => {
       const r = el.getBoundingClientRect();
