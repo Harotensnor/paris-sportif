@@ -1911,3 +1911,8 @@
 - Apres: chargement paresseux du sidecar Winamax, strip V36 "Cotes boostees" avec cards si boosts reels et empty state compact si scan vide.
 - Impact: Theo voit immediatement si une promotion explicite est exploitable, sans fausse inference ni encombrement du cockpit 5 tiers.
 - Verif: syntax app.js OK, git diff --check OK, Playwright dashboard 5 tiers, boosted strip visible, 0 carte (scan empty attendu), 0 erreur console.
+## Sprint v35.281 — Phase 12 V36 P-12.28 TheSportsDB guard (17:59 UTC)
+- Avant: le fetcher TheSportsDB etait deja branche, mais la cle demo renvoyait Arsenal pour des equipes sans rapport, puis finissait en 429.
+- Apres: detection explicite du fallback demo, arret rapide, statut `unavailable` clair dans thesportsdb_meta.json + health, doc data_sources mise a jour.
+- Impact: le pipeline n'accepte plus de faux badges/stades et reste pret a exploiter une vraie cle THESPORTSDB_API_KEY sans changer le produit Winamax-only.
+- Verif: fetch_thesportsdb_meta.py --force --limit 12 => requested=12, matched=0, demo_key_locked=true; build_health OK, overall=warning attendu.
