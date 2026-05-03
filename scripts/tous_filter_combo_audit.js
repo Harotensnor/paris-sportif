@@ -112,6 +112,16 @@ function startServerIfNeeded() {
       let pred = null;
       try { pred = typeof window.predictMatch === 'function' ? window.predictMatch(match) : null; } catch (e) {}
       const candidates = [];
+      const oneNtwo = match?.winamax?.markets?.['1n2'];
+      if (oneNtwo) {
+        [
+          ['home', oneNtwo.home],
+          ['draw', oneNtwo.draw],
+          ['away', oneNtwo.away],
+        ].forEach(([side, odd]) => {
+          if (Number(odd) > 1) candidates.push({ market: '1n2', side, odd: Number(odd) });
+        });
+      }
       try {
         if (typeof window.buildMarketCandidates === 'function') {
           candidates.push(...(window.buildMarketCandidates(match, pred, { requireExact: false }) || []));
