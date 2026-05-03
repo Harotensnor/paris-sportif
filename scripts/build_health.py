@@ -162,6 +162,9 @@ SOURCES = [
     ('openligadb_matches', 'openligadb_matches.json', lambda d: {
         'matches': len(d.get('matches') or []) if isinstance(d, dict) else 0,
         'matched_local_events': d.get('matched_local_events') or 0 if isinstance(d, dict) else 0,
+        'matched_ratio_pct': round((d.get('matched_local_ratio') or 0) * 100, 1) if isinstance(d, dict) else 0,
+        'leagues': len(d.get('by_league') or {}) if isinstance(d, dict) else 0,
+        'upcoming': sum((v or {}).get('upcoming') or 0 for v in (d.get('by_league') or {}).values()) if isinstance(d, dict) else 0,
         'status': d.get('status') if isinstance(d, dict) else 'missing',
     }),
     ('public_team_stats', 'public_team_stats.json', lambda d: {

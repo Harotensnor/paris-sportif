@@ -1916,3 +1916,8 @@
 - Apres: detection explicite du fallback demo, arret rapide, statut `unavailable` clair dans thesportsdb_meta.json + health, doc data_sources mise a jour.
 - Impact: le pipeline n'accepte plus de faux badges/stades et reste pret a exploiter une vraie cle THESPORTSDB_API_KEY sans changer le produit Winamax-only.
 - Verif: fetch_thesportsdb_meta.py --force --limit 12 => requested=12, matched=0, demo_key_locked=true; build_health OK, overall=warning attendu.
+## Sprint v35.282 — Phase 12 V36 P-12.29 OpenLigaDB coverage metrics (18:03 UTC)
+- Avant: OpenLigaDB etait branche mais le health ne montrait que matches + local_matches, pas la couverture utile par ligue/upcoming.
+- Apres: openligadb_matches.json expose by_league, upcoming, finished, matched_local_ratio; health affiche leagues/upcoming/ratio.
+- Impact: la source allemande est lisible en un coup d'oeil: 112 matchs, 58 upcoming, 22 relies au feed local, ratio 19.6%.
+- Verif: fetch_openligadb.py --force OK, build_public_team_stats OK, build_health OK, 0 erreur script.
