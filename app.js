@@ -15900,6 +15900,9 @@
         const trackKey = String(p.best?.key || p.pred?.pick?.key || '');
         const trackMarket = String(p.best?.market || '1n2');
         const trackLabel = bbfMarketLabel(p);
+        const stakeDisplay = Number(stake || 0).toFixed(stake >= 10 ? 0 : 2);
+        const returnDisplay = (stake * Number(p.odd || 0)).toFixed(stake >= 10 ? 0 : 2);
+        const profitDisplay = gain.toFixed(stake >= 10 ? 0 : 2);
         const minutes = Math.round((bbfSafeTs(p.m) - bbfNowMs) / 60000);
         const timeLabel = minutes > 0 && minutes < 120 ? `dans ${minutes} min` : (typeof fmtTime === 'function' ? fmtTime(p.m.date) : '');
         const initials = (team) => String(bbfTeamName(team)).split(/\s+/).filter(Boolean).slice(0,2).map(w => w[0]).join('').toUpperCase() || '•';
@@ -15928,6 +15931,13 @@
               ${BetStrengthBadge(p)}
               <strong>${esc(bbfMarketLabel(p))} <b>@${Number(p.odd).toFixed(2)}</b></strong>
               <small>${esc(fmtMarketAdvantage(p.edge))} · gain possible ${gain.toFixed(2)}€ pour ${stake}€</small>
+            </div>
+            <div class="bbf-card__gaincalc" data-no-detail="1" style="display:grid;grid-template-columns:minmax(98px,1fr) minmax(0,1fr);gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--border);border-radius:var(--r-card);background:rgba(255,255,255,.04);">
+              <label style="display:flex;align-items:center;gap:8px;margin:0;color:var(--text-dim);font-size:11px;font-weight:900;">
+                <span>Mise</span>
+                <input type="number" inputmode="decimal" min="0" max="10000" step="1" value="${esc(stakeDisplay)}" data-gain-input data-odd="${Number(p.odd || 0).toFixed(4)}" aria-label="Mise pour calculer le retour potentiel" style="width:76px;min-height:38px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--panel-2);color:var(--text);padding:0 8px;font-weight:900;">
+              </label>
+              <strong data-gain-output style="min-width:0;color:var(--accent);font-size:12px;text-align:right;">Retour ${returnDisplay}€ · profit +${profitDisplay}€</strong>
             </div>
             <ul class="bbf-card__reasons">
               ${bbfReasons(p).map(r => `<li>${esc(r)}</li>`).join('')}
@@ -16281,6 +16291,22 @@
         </div>`;
 
       wrap.innerHTML = bbfMainHtml;
+      wrap.querySelectorAll('.bbf-card__gaincalc').forEach(box => {
+        box.addEventListener('click', (e) => e.stopPropagation());
+        box.addEventListener('keydown', (e) => e.stopPropagation());
+      });
+      wrap.querySelectorAll('[data-gain-input]').forEach(input => {
+        const output = input.closest('.bbf-card__gaincalc')?.querySelector('[data-gain-output]');
+        const updateGain = () => {
+          const odd = Number(input.dataset.odd || 0);
+          const stakeValue = Math.max(0, Number(String(input.value || '').replace(',', '.')) || 0);
+          if (!output || !(odd > 1)) return;
+          const decimals = stakeValue >= 10 ? 0 : 2;
+          output.textContent = `Retour ${(stakeValue * odd).toFixed(decimals)}€ · profit +${(stakeValue * (odd - 1)).toFixed(decimals)}€`;
+        };
+        input.addEventListener('input', updateGain);
+        input.addEventListener('change', updateGain);
+      });
       const bbfFocusToggle = wrap.querySelector('[data-bbf-focus-toggle]');
       if (bbfFocusToggle) bbfFocusToggle.addEventListener('click', () => {
         try { localStorage.setItem(bbfFocusKey, bbfFocusOnly ? '0' : '1'); } catch(e) {}
