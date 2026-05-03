@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-05-03T18:09:23Z",
+  "generated_at": "2026-05-03T19:32:47Z",
   "schema": "ensemble_validation_v1",
   "status": "ok",
   "historical": {
-    "resolved_candidates": 701,
-    "predictions": 701,
-    "with_ensemble": 535,
-    "missing_ensemble": 166,
-    "final_brier": 0.2333,
+    "resolved_candidates": 714,
+    "predictions": 714,
+    "with_ensemble": 538,
+    "missing_ensemble": 176,
+    "final_brier": 0.2355,
     "random_50_brier": 0.25,
-    "final_vs_random_brier": -0.0167,
+    "final_vs_random_brier": -0.0145,
     "component_counts": {
-      "n": 701,
-      "avg": 0.9101,
-      "p95": 2.0,
+      "n": 714,
+      "avg": 0.8936,
+      "p95": 3.0,
       "max": 3.0
     },
     "agreement_variance": {
-      "n": 701,
+      "n": 714,
       "avg": 0.0005,
       "p95": 0.0023,
       "max": 0.0355
@@ -25,37 +25,37 @@
     "high_disagreement_gt_015": 0,
     "by_kind": {
       "dixon_coles_xg": {
-        "n": 501,
+        "n": 512,
         "avg_weight": 0.5,
-        "component_brier": 0.2391,
-        "ensemble_brier_same_rows": 0.235,
-        "component_minus_ensemble_brier": 0.0041
+        "component_brier": 0.242,
+        "ensemble_brier_same_rows": 0.2364,
+        "component_minus_ensemble_brier": 0.0057
       },
       "elo": {
-        "n": 34,
+        "n": 36,
         "avg_weight": 0.3,
-        "component_brier": 0.2852,
-        "ensemble_brier_same_rows": 0.2524,
-        "component_minus_ensemble_brier": 0.0327
+        "component_brier": 0.2889,
+        "ensemble_brier_same_rows": 0.2523,
+        "component_minus_ensemble_brier": 0.0366
       },
       "form": {
-        "n": 103,
+        "n": 90,
         "avg_weight": 0.3,
-        "component_brier": 0.2376,
-        "ensemble_brier_same_rows": 0.2256,
-        "component_minus_ensemble_brier": 0.0121
+        "component_brier": 0.2471,
+        "ensemble_brier_same_rows": 0.2428,
+        "component_minus_ensemble_brier": 0.0043
       }
     },
     "v36_tier_counts": {
-      "tier2_solide": 56,
-      "opportunity_other": 516,
-      "tier3_valeur": 74,
-      "tier4_big_odds": 36,
+      "opportunity_other": 535,
+      "tier3_valeur": 71,
+      "tier2_solide": 51,
+      "tier4_big_odds": 38,
       "tier1_sur": 19
     },
     "v36_strict_tier_counts": {
+      "tier3_valeur": 25,
       "tier4_big_odds": 8,
-      "tier3_valeur": 24,
       "tier2_solide": 10,
       "tier1_sur": 3
     },
@@ -152,7 +152,7 @@
         "name": "Hellas Verona at Juventus",
         "sport": "football",
         "pick": "1 · Juventus",
-        "final_prob": 0.669,
+        "final_prob": 0.777,
         "variance": 0.0207,
         "component_count": 3,
         "sub_models": [
@@ -210,7 +210,7 @@
         "name": "Le Havre AC at Lille",
         "sport": "football",
         "pick": "1 · Lille",
-        "final_prob": 0.687,
+        "final_prob": 0.672,
         "variance": 0.0127,
         "component_count": 3,
         "sub_models": [
@@ -268,7 +268,7 @@
         "name": "Brest at Paris FC",
         "sport": "football",
         "pick": "1 · Paris FC",
-        "final_prob": 0.51,
+        "final_prob": 0.516,
         "variance": 0.012,
         "component_count": 3,
         "sub_models": [
@@ -297,7 +297,7 @@
         "name": "Milwaukee Brewers at Washington Nationals",
         "sport": "baseball",
         "pick": "2 · Brewers",
-        "final_prob": 0.627,
+        "final_prob": 0.524,
         "variance": 0.0094,
         "component_count": 2,
         "sub_models": [
@@ -378,7 +378,7 @@
         "name": "Milwaukee Brewers at Washington Nationals",
         "sport": "baseball",
         "pick": "2 · Brewers",
-        "final_prob": 0.617,
+        "final_prob": 0.514,
         "variance": 0.0081,
         "component_count": 2,
         "sub_models": [
@@ -399,38 +399,41 @@
     ]
   },
   "current_snapshot": {
-    "upcoming_events_checked": 266,
-    "predictions": 266,
-    "with_ensemble": 235,
+    "upcoming_events_checked": 254,
+    "predictions": 254,
+    "with_ensemble": 223,
     "component_counts": {
-      "n": 266,
-      "avg": 2.1992,
-      "p95": 3.0,
+      "n": 254,
+      "avg": 2.2047,
+      "p95": 4.0,
       "max": 4.0
     },
     "agreement_variance": {
-      "n": 266,
-      "avg": 0.0082,
+      "n": 254,
+      "avg": 0.008,
       "p95": 0.0432,
       "max": 0.0787
     },
     "v36_tier_counts": {
-      "tier3_valeur": 15,
-      "tier2_solide": 15,
-      "opportunity_other": 224,
-      "tier4_big_odds": 12
+      "tier2_solide": 12,
+      "tier3_valeur": 13,
+      "opportunity_other": 214,
+      "tier1_sur": 1,
+      "tier4_big_odds": 13,
+      "unpriced": 1
     },
-    "v36_qualified_tier_picks": 42,
+    "v36_qualified_tier_picks": 39,
     "v36_strict_tier_picks": 7,
     "v36_strict_tier_counts": {
-      "tier3_valeur": 3,
-      "tier4_big_odds": 4
+      "tier4_big_odds": 4,
+      "tier3_valeur": 2,
+      "tier2_solide": 1
     },
     "kind_counts": {
-      "form": 238,
-      "h2h": 74,
-      "dixon_coles_xg": 168,
-      "elo": 105
+      "form": 222,
+      "h2h": 72,
+      "dixon_coles_xg": 164,
+      "elo": 102
     }
   },
   "warnings": []
