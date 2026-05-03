@@ -14554,6 +14554,15 @@
       wrap.innerHTML = '<div style="padding:60px;text-align:center;color:var(--text-dim);">Chargement…</div>';
       return;
     }
+    if (data._lite && typeof _ensureFullData === 'function' && wrap && wrap.dataset.dashboardFullQueued !== '1') {
+      wrap.dataset.dashboardFullQueued = '1';
+      setTimeout(() => {
+        _ensureFullData().then(() => {
+          delete wrap.dataset.dashboardFullQueued;
+          if (wrap && document.body.contains(wrap) && currentPage === 'dashboard') renderDashboardPage(wrap);
+        }).catch(() => { delete wrap.dataset.dashboardFullQueued; });
+      }, 600);
+    }
     const todayIso = parisDateISO(new Date());
     const now = new Date();
     const exactBookable = m => (
@@ -16081,6 +16090,61 @@
         const a = bbfPool.filter(p => p.m?.sport === sp).slice(0, 3);
         return a.length ? `<article class="bbf-empty bbf-empty--small" style="align-items:stretch"><strong>${sportIcon(sp)} ${esc(sportLabel(sp))}</strong>${a.map(bbfRow).join('')}</article>` : '';
       }).join('');
+      const bbfDetectedMatches = (() => {
+        if (_dataIsStale) return { total: 0, rows: [], counts: {} };
+        const seen = new Set();
+        const source = (typeof getScopedEvents === 'function')
+          ? getScopedEvents('7d', { data, requireWinamax: true })
+          : Object.values(data.days || {}).flatMap(arr => Array.isArray(arr) ? arr : []);
+        const rows = [];
+        source.forEach(m => {
+          if (!m || seen.has(String(m.id || ''))) return;
+          if (m.completed || m.live || m.status === 'STATUS_IN_PROGRESS') return;
+          if (typeof _notStarted === 'function' && !_notStarted(m)) return;
+          if (!(m.winamax && m.winamax.available === true)) return;
+          const ts = bbfSafeTs(m);
+          if (!Number.isFinite(ts) || ts < bbfNowMs || ts > bbfNowMs + 7 * 24 * 3600000) return;
+          seen.add(String(m.id || ''));
+          rows.push(m);
+        });
+        rows.sort((a, b) => bbfSafeTs(a) - bbfSafeTs(b));
+        const counts = rows.reduce((acc, m) => {
+          const sp = String(m.sport || 'other');
+          acc[sp] = (acc[sp] || 0) + 1;
+          return acc;
+        }, {});
+        return { total: rows.length, rows: rows.slice(0, 48), counts };
+      })();
+      const bbfDetectedMatchesHtml = bbfDetectedMatches.total ? `
+        <section class="bbf-section" aria-label="Matchs détectés sur les 7 prochains jours">
+          <div class="bbf-section__head">
+            <div>
+              <span>Couverture complète · 7 prochains jours · préset Tout voir</span>
+              <h2>Matchs détectés</h2>
+            </div>
+            <button type="button" class="page-btn" data-page="tous">Ouvrir Tous (${bbfDetectedMatches.total}) →</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:-4px 0 12px;">
+            <strong style="color:var(--text);font-size:13px;">${bbfDetectedMatches.total} matchs Winamax accessibles</strong>
+            ${Object.entries(bbfDetectedMatches.counts).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([sp,n]) => `<span style="min-height:30px;display:inline-flex;align-items:center;gap:6px;padding:0 9px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,.035);color:var(--text-dim);font-size:11px;font-weight:800;">${sportIcon(sp)} ${esc(sportLabel(sp))} <b style="color:var(--text);">${n}</b></span>`).join('')}
+          </div>
+          <div style="display:grid;grid-auto-flow:column;grid-auto-columns:minmax(220px,260px);gap:10px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;padding:2px 2px 10px;margin:0 -2px;">
+            ${bbfDetectedMatches.rows.map(m => {
+              const { home, away } = getSides(m);
+              const wx = (m.winamax && m.winamax.markets && m.winamax.markets['1n2']) || {};
+              const odds = [wx.home, wx.draw, wx.away].map(Number).filter(v => v > 1).slice(0, 3);
+              const ts = bbfSafeTs(m);
+              const day = Number.isFinite(ts) ? new Date(ts).toLocaleDateString('fr-FR', { weekday: 'short', day: '2-digit', month: '2-digit' }) : '';
+              return `<button type="button" data-big-detail="${esc(String(m.id || ''))}" style="scroll-snap-align:start;min-height:112px;text-align:left;border:1px solid var(--border);border-radius:var(--r-lg);background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.025));color:var(--text);padding:11px;display:grid;gap:7px;cursor:pointer;">
+                <span style="display:flex;align-items:center;justify-content:space-between;gap:8px;color:var(--text-dim);font-size:10.5px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;"><em style="font-style:normal;">${sportIcon(m.sport)} ${esc(sportLabel(m.sport))}</em><b style="color:var(--brand);">${esc(fmtTime(m.date))}</b></span>
+                <strong style="font-size:13px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${esc(bbfTeamName(home))} vs ${esc(bbfTeamName(away))}</strong>
+                <span style="color:var(--text-dim);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(day)} · ${esc(String(m.league_name || m.league || '').slice(0, 32))}</span>
+                <span style="display:flex;align-items:center;justify-content:space-between;gap:8px;color:var(--text-dim2);font-size:11px;"><em style="font-style:normal;">1N2 ${odds.length ? odds.map(v => v.toFixed(2)).join(' / ') : 'à vérifier'}</em><b style="color:var(--accent);">Détail →</b></span>
+              </button>`;
+            }).join('')}
+            ${bbfDetectedMatches.total > bbfDetectedMatches.rows.length ? `<a class="bbf-empty bbf-empty--small page-btn" data-page="tous" href="#tous" style="scroll-snap-align:start;min-height:112px;text-decoration:none;justify-content:center;"><strong>+${bbfDetectedMatches.total - bbfDetectedMatches.rows.length} autres matchs</strong><span>Préset Tout voir sur la page Tous.</span></a>` : ''}
+          </div>
+        </section>` : '';
       const bbfScorerCard = (s) => {
         const imgFallback = esc(String(s.name || '?').split(/\s+/).filter(Boolean).slice(0,2).map(w => w[0]).join('').toUpperCase() || '•');
         const img = s.pid ? `<img src="https://img.sofascore.com/api/v1/player/${esc(String(s.pid))}/image" alt="" loading="lazy" decoding="async" onerror="this.outerHTML='<span>${imgFallback}</span>'">` : `<span>${imgFallback}</span>`;
@@ -16287,6 +16351,8 @@
           </section>
 
           ${bbfFocusOnly ? '' : bbfStrategyHtml}
+
+          ${bbfFocusOnly ? '' : bbfDetectedMatchesHtml}
 
           ${bbfFocusOnly ? '' : `<section class="bbf-section" style="border-color:rgba(251,191,36,.30);background:linear-gradient(135deg,rgba(251,191,36,.075),rgba(255,255,255,.025));">
             <div class="bbf-section__head">

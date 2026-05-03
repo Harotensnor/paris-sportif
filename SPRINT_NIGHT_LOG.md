@@ -1791,3 +1791,8 @@
 - Apres: script tous_coverage_reconcile compare night_metrics, PRONOSTICS_DATA et DOM apres Charger plus.
 - Impact: Tous rend 270/270 matchs actifs (100%); ecart night_metrics=43 explique par staleness metrics.
 - Verif: phase12_tous_coverage_reconciliation.json, script OK, 0 console error.
+## Sprint v35.257 — Phase 12 P-12.25 Section Matchs detectes accueil (16:40 local)
+- Avant: l'accueil ne montrait pas la couverture 7j, seulement les picks filtres Big Bets.
+- Apres: section Matchs detectes ajoutee avec total 7j, compteurs sport, aperçu horizontal et CTA Tous.
+- Impact: dashboard montre 251 matchs Winamax accessibles en full data, sans casser Big Bets.
+- Verif: visual_capture phase12-detected-matches 32/32 OK, syntax OK.
