@@ -1786,3 +1786,8 @@
 - Apres: conteneur elargi a 1500px et details lourds replies sur tous les viewports.
 - Impact: Sante tablet ~4923px -> 2383px, desktop ~4343px -> 1875px, wide ~4295px -> 1827px.
 - Verif: visual_capture phase12-sante-compact 32/32 OK, mobile_device_audit OK, syntax/bundle OK.
+## Sprint v35.256 — Phase 12 P-12.25 Reconciliation couverture Tous (16:38 local)
+- Avant: night_metrics disait 313 upcoming mais la data active avait deja bouge avec le cron.
+- Apres: script tous_coverage_reconcile compare night_metrics, PRONOSTICS_DATA et DOM apres Charger plus.
+- Impact: Tous rend 270/270 matchs actifs (100%); ecart night_metrics=43 explique par staleness metrics.
+- Verif: phase12_tous_coverage_reconciliation.json, script OK, 0 console error.
