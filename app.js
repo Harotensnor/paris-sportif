@@ -12977,6 +12977,51 @@
     search.addEventListener('input', () => { cursorIdx = -1; });
   })();
 
+  const PUBLIC_PROFILE_SEARCH = { loaded: false, loading: null, teams: [], players: [] };
+  function _loadPublicSearchProfiles() {
+    if (PUBLIC_PROFILE_SEARCH.loaded) return Promise.resolve(PUBLIC_PROFILE_SEARCH);
+    if (PUBLIC_PROFILE_SEARCH.loading) return PUBLIC_PROFILE_SEARCH.loading;
+    const read = (url) => fetch(url, { cache: 'force-cache' }).then(r => r.ok ? r.json() : null).catch(() => null);
+    PUBLIC_PROFILE_SEARCH.loading = Promise.all([
+      read('public_team_profiles.json'),
+      read('public_player_profiles.json'),
+    ]).then(([teamPayload, playerPayload]) => {
+      PUBLIC_PROFILE_SEARCH.teams = Object.values((teamPayload && teamPayload.teams) || {})
+        .filter(p => p && p.team)
+        .map(p => ({
+          kind: 'team',
+          label: p.team,
+          sub: `profil · ${p.sport || 'sport'} · score ${Math.round(p.profile_score || 0)}`,
+          logo: (p.metadata || {}).badge,
+          matchId: ((p.upcoming || [])[0] || {}).event_id,
+          profileScore: p.profile_score,
+          profileTags: [...(p.style_tags || []), ...(p.risk_flags || [])].slice(0, 4).join(' · '),
+        }));
+      PUBLIC_PROFILE_SEARCH.players = Object.values((playerPayload && playerPayload.players) || {})
+        .filter(p => p && p.name)
+        .map(p => ({
+          kind: 'player',
+          label: p.name,
+          sub: `${p.team || 'équipe inconnue'} · ${p.position || p.role || 'joueur'} · ${p.status || 'profil'}`,
+          action: 'player-profile',
+          teamLabel: p.team,
+          profileTags: p.role === 'injury_report' ? 'Blessure / disponibilité' : 'Contexte starter',
+        }));
+      PUBLIC_PROFILE_SEARCH.loaded = true;
+      return PUBLIC_PROFILE_SEARCH;
+    }).catch(() => {
+      PUBLIC_PROFILE_SEARCH.loaded = true;
+      return PUBLIC_PROFILE_SEARCH;
+    });
+    return PUBLIC_PROFILE_SEARCH.loading;
+  }
+
+  function _appendPublicProfileSearchItems(items) {
+    if (!PUBLIC_PROFILE_SEARCH.loaded) return;
+    PUBLIC_PROFILE_SEARCH.teams.slice(0, 900).forEach(it => items.push(it));
+    PUBLIC_PROFILE_SEARCH.players.slice(0, 500).forEach(it => items.push(it));
+  }
+
   // Indexe équipes, ligues, villes et pays depuis les matchs chargés.
   // Sur sélection, on filtre (render) ET on ouvre la fiche du match le plus
   // imminent si une équipe est cliquée.
@@ -13037,15 +13082,22 @@
       ['action', 'Tennis du jour', 'sport:tennis', 'Filtrer tennis'],
       ['action', 'Basketball du jour', 'sport:basketball', 'Filtrer basket'],
     ].forEach(([kind, label, action, sub]) => items.push({ kind, label, action, sub }));
+    _appendPublicProfileSearchItems(items);
     return { items };
   }
   const sportIconAA = (sp) => sp === 'football' ? '⚽' : sp === 'basketball' ? '🏀' : sp === 'tennis' ? '🎾' : sp === 'hockey' ? '🏒' : '🎯';
-  const kindIcon = (k) => k === 'match' ? '◈' : k === 'team' ? '👕' : k === 'league' ? '🏆' : k === 'page' ? '↗' : k === 'action' ? '⚡' : '📍';
+  const kindIcon = (k) => k === 'match' ? '◈' : k === 'team' ? '👕' : k === 'player' ? '👤' : k === 'league' ? '🏆' : k === 'page' ? '↗' : k === 'action' ? '⚡' : '📍';
   function renderSearchSuggest(q) {
     const box = document.getElementById('search-suggest');
     if (!box) return;
     q = (q || '').trim().toLowerCase();
     if (q.length < 2) { box.style.display = 'none'; box.innerHTML = ''; return; }
+    if (!PUBLIC_PROFILE_SEARCH.loaded) {
+      _loadPublicSearchProfiles().then(() => {
+        const current = (document.getElementById('search')?.value || '').trim().toLowerCase();
+        if (current === q) renderSearchSuggest(current);
+      });
+    }
     const idx = buildSearchIndex();
     const hits = idx.items
       .map(it => {
@@ -13104,10 +13156,17 @@
       const ico = it.kind === 'team' && it.logo
         ? `<img src="${esc(it.logo)}" alt="" loading="lazy" decoding="async" style="width:20px;height:20px;object-fit:contain;border-radius:3px;" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"><span style="display:none;">${kindIcon(it.kind)}</span>`
         : `<span>${kindIcon(it.kind)}</span>`;
-      return `<div class="search-suggest-item" data-idx="${i}" data-kind="${esc(it.kind)}" data-label="${esc(it.label)}" ${it.matchId ? `data-match-id="${esc(it.matchId)}"` : ''} ${it.action ? `data-action="${esc(it.action)}"` : ''} style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;">
+      const metaText = it.kind === 'page' ? 'page'
+        : it.kind === 'action' ? 'action'
+        : it.kind === 'match' ? 'match'
+        : it.kind === 'player' ? (it.sub || 'joueur')
+        : it.kind === 'team' && String(it.sub || '').startsWith('profil') ? it.sub
+        : `${sportIconAA(it.sub)} ${it.kind === 'team' ? `équipe${teamUpcoming.length ? ` · ${teamUpcoming.length} matchs` : ''}` : it.kind === 'league' ? 'tournoi' : 'ville'}`;
+      const title = [it.sub, it.profileTags].filter(Boolean).join(' · ');
+      return `<div class="search-suggest-item" data-idx="${i}" data-kind="${esc(it.kind)}" data-label="${esc(it.label)}" ${it.matchId ? `data-match-id="${esc(it.matchId)}"` : ''} ${it.action ? `data-action="${esc(it.action)}"` : ''} ${it.teamLabel ? `data-team-label="${esc(it.teamLabel)}"` : ''} title="${esc(title)}" style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;">
         ${ico}
         <span style="flex:1;color:var(--text,#e6ebf2);font-weight:500;">${_highlightMatch(it.label, q)}</span>
-        <span style="color:var(--text-dim2,#7b8693);font-size:11px;">${it.kind === 'page' ? 'page' : it.kind === 'action' ? 'action' : it.kind === 'match' ? 'match' : `${sportIconAA(it.sub)} ${it.kind === 'team' ? `équipe${teamUpcoming.length ? ` · ${teamUpcoming.length} matchs` : ''}` : it.kind === 'league' ? 'tournoi' : 'ville'}`}</span>
+        <span style="color:var(--text-dim2,#7b8693);font-size:11px;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(metaText)}</span>
       </div>`;
     }).join('');
     box.style.display = 'block';
@@ -13119,6 +13178,7 @@
         const kind = el.dataset.kind;
         const mid = el.dataset.matchId;
         const action = el.dataset.action || '';
+        const teamLabel = el.dataset.teamLabel || '';
         const input = document.getElementById('search');
         input.value = label;
         searchTerm = label;
@@ -13132,6 +13192,13 @@
           return;
         }
         if (kind === 'action' && action) {
+          if (action === 'player-profile' && teamLabel) {
+            input.value = teamLabel;
+            searchTerm = teamLabel;
+            render();
+            box.style.display = 'none';
+            return;
+          }
           if (action === 'focus') {
             const key = 'paris_sportif_focus_big_bets_v1';
             try { localStorage.setItem(key, localStorage.getItem(key) === '1' ? '0' : '1'); } catch(e){}
