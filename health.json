@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-03T04:27:42Z",
+  "generated_at": "2026-05-03T04:33:06Z",
   "data_age_min": 0,
   "sources": {
     "winamax_catalog": {
@@ -22,16 +22,16 @@
       "events": 47
     },
     "team_stats": {
-      "age_min": 2,
-      "teams": 318
+      "age_min": 0,
+      "teams": 364
     },
     "clubelo": {
       "age_min": 2,
       "clubs": 630
     },
     "weather": {
-      "age_min": 1,
-      "events": 468
+      "age_min": 2,
+      "events": 471
     },
     "referees_soccer": {
       "age_min": 2,
@@ -64,7 +64,7 @@
       "sports": 4
     },
     "h2h_extended": {
-      "age_min": 1,
+      "age_min": 2,
       "events": 164,
       "sports": 5
     },
@@ -125,7 +125,7 @@
     "team_stats": {
       "script": "scripts/fetch_team_stats.py",
       "output": "team_stats.json",
-      "age_min": 2,
+      "age_min": 0,
       "threshold_min": 300,
       "fast_red_min": null,
       "status": "ok"
@@ -141,7 +141,7 @@
     "weather": {
       "script": "scripts/fetch_weather.py",
       "output": "weather.json",
-      "age_min": 1,
+      "age_min": 2,
       "threshold_min": 60,
       "fast_red_min": 30,
       "status": "ok"
@@ -197,7 +197,7 @@
     "h2h_extended": {
       "script": "h2h_extended.json",
       "output": "h2h_extended.json",
-      "age_min": 1,
+      "age_min": 2,
       "threshold_min": 60,
       "fast_red_min": null,
       "status": "ok"
