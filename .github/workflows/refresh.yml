@@ -116,6 +116,10 @@ jobs:
           if [ $MIN_MOD30 -lt 5 ]; then
             (python3 fetch_team_form.py || true) > /tmp/fetch_tf.log 2>&1 &
           fi
+          # TheSportsDB metadata: public free API, self-throttled 24h TTL.
+          if [ $HOUR_MOD4 -eq 0 ] && [ $MIN_MOD15 -lt 5 ]; then
+            (python3 fetch_thesportsdb_meta.py || true) > /tmp/fetch_tsdb.log 2>&1 &
+          fi
           # fetch_weather + fetch_referees + fetch_clubelo + fetch_understat_xg : self-throttled, parallèle
           (python3 fetch_weather.py || true) > /tmp/fetch_weather.log 2>&1 &
           (python3 fetch_referees_soccer.py || true) > /tmp/fetch_refs.log 2>&1 &
