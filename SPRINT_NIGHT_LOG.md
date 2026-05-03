@@ -2002,3 +2002,8 @@
 - Apres: teamTotal devient scope par equipe (home/away/team), score exact valide les buts de la bonne equipe, les doublons 1N2 <-> handicap -0.5 sont explicitement couverts cote home et away, et poissonPmf tombe sur un fallback 0/1 deterministe.
 - Impact: bugs #11/#13/#29/#73/#79 securises par tests/audit; les libelles "Total equipe ..." restent lisibles dans la table sans ressembler a un handicap.
 - Verif: app.js/sw.js/market_consistency_audit.js syntax OK; market_consistency_audit 64/64 sans echec; test direct poissonPmf invalides + Dixon-Coles tau(1,1) OK.
+## Sprint v35.299 — AUTO 10/10 Table V37 jour/historique (20:52 UTC)
+- Avant: l'accueil V36 plafonnait a 120 lignes, n'affichait pas la date, gardait une colonne Action inutile et ne permettait pas de lire J-1/J+5 depuis le tableau.
+- Apres: Table V37 rend jusqu'a 360 lignes, ajoute Date, retire Action, explique les 5 tiers en bannière cliquable, ajoute nav 7 jours/J-2..J+5/date picker, toggle LIVE et refresh auto 30s.
+- Historique: les dates passees ajoutent une colonne Resultat + footer WON/LOST/VOID/ROI; les matchs commences sont retires du flux a venir si LIVE n'est pas active.
+- Verif: app.js/sw.js syntax OK; Playwright local desktop = 360 lignes rendues / 405 picks disponibles, headers Sport-Date-Heure-Ligue-Match-Pari-Cote-Conf-Edge-Tier, clic ligne modal OK, J-1 affiche Resultat + footer, 0 erreur console; visual_capture v37-table-baseline = 32 PNG; a11y 8 pages = 0/0/0; Lighthouse min perf 97, min a11y 98, SEO 100.
