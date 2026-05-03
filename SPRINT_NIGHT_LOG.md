@@ -1926,3 +1926,8 @@
 - Apres: fetch_injuries.py a une detection severe sport-aware; sidecar et health exposent injuries total + severe total avec le bon script source.
 - Impact: MLB/NHL deviennent beaucoup plus utiles pour le modele: 677 blessures multi-sports, 481 absences severes detectees.
 - Verif: fetch_injuries.py --sidecar-only OK, build_health OK, injuries_multisport health teams=129 sports=4 severe=481.
+## Sprint v35.284 — Phase 12 V36 P-12.31 H2H multi-sports health (18:15 UTC)
+- Avant: h2h_extended etait bien multi-sport mais health n'affichait que events/sports, impossible de juger la couverture reelle.
+- Apres: h2h_extended expose coverage_pct, events_with_meetings, empty_events et meetings_total; health reprend aussi le detail par sport.
+- Impact: le signal H2H est pilotable: 83 events, 80 avec historique, 247 meetings, couverture 96.4% sur le snapshot courant.
+- Verif: fetch_h2h.py --summary-only OK, build_health OK, py_compile OK, health h2h coverage=96.4%.

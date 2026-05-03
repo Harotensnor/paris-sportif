@@ -118,6 +118,33 @@ def _count_xg(d):
         'source': d.get('source') or 'unknown',
     }
 
+def _count_h2h_extended(d):
+    if not isinstance(d, dict):
+        return None
+    by_sport = d.get('by_sport') or {}
+    events_total = d.get('events_total') or len(d.get('events') or {})
+    with_meetings = d.get('events_with_meetings_total')
+    if with_meetings is None:
+        with_meetings = sum(
+            (v or {}).get('events_with_meetings') or 0
+            for v in by_sport.values()
+        )
+    meetings = d.get('meetings_total')
+    if meetings is None:
+        meetings = sum((v or {}).get('meetings') or 0 for v in by_sport.values())
+    coverage = d.get('coverage_pct')
+    if coverage is None:
+        coverage = round((with_meetings / events_total) * 100, 1) if events_total else 0
+    return {
+        'events': events_total,
+        'events_with_meetings': with_meetings,
+        'meetings': meetings,
+        'coverage_pct': coverage,
+        'empty_events': d.get('empty_events_total') if d.get('empty_events_total') is not None else max(0, events_total - with_meetings),
+        'sports': len(by_sport),
+        'by_sport': by_sport,
+    }
+
 SOURCES = [
     ('winamax_catalog', 'winamax_catalog.json', _count_winamax_catalog),
     ('winamax_markets', 'winamax_markets.json', _count_winamax_markets),
@@ -146,10 +173,7 @@ SOURCES = [
         'teams': len(d.get('teams') or {}) if isinstance(d, dict) else 0,
         'sports': len(d.get('by_sport') or {}) if isinstance(d, dict) else 0,
     }),
-    ('h2h_extended', 'h2h_extended.json', lambda d: {
-        'events': len(d.get('events') or {}) if isinstance(d, dict) else 0,
-        'sports': len(d.get('by_sport') or {}) if isinstance(d, dict) else 0,
-    }),
+    ('h2h_extended', 'h2h_extended.json', _count_h2h_extended),
     ('injuries_multisport', 'injuries_multisport.json', lambda d: {
         'teams': len(d.get('teams') or {}) if isinstance(d, dict) else 0,
         'sports': len(d.get('by_sport') or {}) if isinstance(d, dict) else 0,

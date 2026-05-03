@@ -96,10 +96,24 @@ def build_h2h_extended(data):
                 'source': source,
                 'fetched_at': h.get('fetched_at'),
             }
+    events_with_meetings_total = sum(
+        (bucket or {}).get('events_with_meetings') or 0
+        for bucket in by_sport.values()
+    )
+    meetings_total = sum(
+        (bucket or {}).get('meetings') or 0
+        for bucket in by_sport.values()
+    )
+    empty_events_total = max(0, len(events) - events_with_meetings_total)
+    coverage_pct = round((events_with_meetings_total / len(events)) * 100, 1) if events else 0.0
     return {
         'generated_at': datetime.now(timezone.utc).isoformat(),
         'source': 'ESPN summary headToHeadGames + seasonseries',
         'events_total': len(events),
+        'events_with_meetings_total': events_with_meetings_total,
+        'empty_events_total': empty_events_total,
+        'meetings_total': meetings_total,
+        'coverage_pct': coverage_pct,
         'sports_total': len(by_sport),
         'by_sport': by_sport,
         'events': events,
