@@ -1841,3 +1841,8 @@
 - Apres: fetch_h2h/fetch_weather reappliques sur la data remote fraiche, puis night_metrics regenere.
 - Impact: 385 events, 313 upcoming, winamax_exact_ratio 100%, markets_more_than_1n2 317, H2H 137, meteo 257, xG 104.
 - Verif: scripts/measure_night_metrics.py OK, health warnings=1 (pipeline drift seulement).
+## Sprint v35.267 — Phase 12 V36 P-12.4 Baseline visuelle pre-refonte (16:10 UTC)
+- Avant: pas de snapshot V36 "avant" fige apres les fixes couverture/pipeline.
+- Apres: visual_capture v35-263-pre-refonte genere 32 PNG (8 pages x 4 viewports) dans .cache/phase4-v35-263-pre-refonte.
+- Impact: baseline compare pour la refonte navigation/dashboard; #tous mesure encore 22k-40k px, dashboard 6k-7.9k px selon viewport.
+- Verif: 32/32 captures OK avec Chrome local et mode stable capture.
