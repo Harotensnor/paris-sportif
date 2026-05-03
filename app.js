@@ -16360,39 +16360,69 @@
         <span style="color:var(--text-dim);font-size:12px;">${bbfAlertPicks[0] ? `${esc(bbfMarketLabel(bbfAlertPicks[0]))} @${Number(bbfAlertPicks[0].odd || 0).toFixed(2)} · ${esc(fmtTime(bbfAlertPicks[0].m.date))}` : 'Le modèle préfère attendre une vraie value.'}</span>
         <button type="button" data-internal-alert-dismiss style="margin-left:auto;min-height:34px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,.04);color:var(--text-dim);padding:5px 10px;font-size:11px;font-weight:800;cursor:pointer;">Vu</button>
       </section>` : '';
-      const bbfTrackedRows = (() => {
-        try {
-          const bets = loadTrackedBets();
-          return Object.entries(bets || {}).map(([key, bet]) => ({ key, ...(bet || {}) }));
-        } catch(e) { return []; }
+      const bbfRailCountdown = (m) => {
+        const diffMs = new Date(m?.date || 0).getTime() - Date.now();
+        if (!Number.isFinite(diffMs) || diffMs <= 0) return 'live';
+        const mins = Math.round(diffMs / 60000);
+        if (mins < 60) return `dans ${mins}min`;
+        const h = Math.floor(mins / 60);
+        const r = mins % 60;
+        return r ? `dans ${h}h${String(r).padStart(2, '0')}` : `dans ${h}h`;
+      };
+      const bbfRailUpcoming = terminalScanPool
+        .filter(m => new Date(m?.date || 0).getTime() > Date.now())
+        .slice(0, 6);
+      const bbfRailUpcomingHtml = bbfRailUpcoming.length ? bbfRailUpcoming.map(m => {
+        const { home, away } = getSides(m);
+        const league = String(m.league_name || m.league || '').slice(0, 22);
+        return `<button type="button" class="v36-rail-row" data-big-detail="${esc(String(m.id || ''))}" aria-label="Ouvrir ${esc(bbfTeamName(home))} contre ${esc(bbfTeamName(away))}">
+          <span><b>${esc(fmtTime(m.date))}</b><em>${esc(bbfRailCountdown(m))}</em></span>
+          <strong>${esc(bbfTeamName(home))} - ${esc(bbfTeamName(away))}</strong>
+          <small>${esc(league || sportLabel(m.sport || ''))}</small>
+        </button>`;
+      }).join('') : `<div class="v36-rail-empty">Aucun coup d'envoi proche.</div>`;
+      const bbfRailHotRows = psArr.slice(0, 4).map(([sport, stat]) => {
+        const bets = Number(stat?.bets || 0);
+        const wins = Number(stat?.wins || 0);
+        const pl = Number(stat?.pl ?? stat?.delta ?? 0);
+        const wr = bets ? Math.round((wins / bets) * 100) : 0;
+        return `<div class="v36-rail-statrow">
+          <span>${sportIcon(sport)} ${esc(sportLabel(sport))}</span>
+          <b style="color:${pl >= 0 ? 'var(--accent)' : 'var(--danger)'}">${pl >= 0 ? '+' : ''}${pl.toFixed(2)}€</b>
+          <em>${bets} paris · WR ${wr}%</em>
+        </div>`;
+      }).join('');
+      const bbfRailStats = (() => {
+        const generated = data.generated_at ? new Date(data.generated_at).getTime() : 0;
+        const ageMin = generated ? Math.max(0, Math.round((Date.now() - generated) / 60000)) : null;
+        const liveCount = todayAllWinamax.filter(m => m && (m.live || m.status === 'STATUS_IN_PROGRESS')).length;
+        const nextHour = terminalScanPool.filter(m => {
+          const ts = new Date(m?.date || 0).getTime();
+          return Number.isFinite(ts) && ts > Date.now() && ts <= Date.now() + 3600000;
+        }).length;
+        const exactPct = todayAllWinamax.length ? Math.round((today.length / todayAllWinamax.length) * 100) : 100;
+        return [
+          ['Data', ageMin == null ? 'n/a' : `${ageMin} min`, ageMin != null && ageMin <= 30 ? 'fresh' : 'warn'],
+          ['Winamax exact', `${exactPct}%`, exactPct >= 95 ? 'fresh' : 'warn'],
+          ['Dans 1h', `${nextHour}`, nextHour > 0 ? 'hot' : 'idle'],
+          ['Live', `${liveCount}`, liveCount > 0 ? 'hot' : 'idle'],
+        ];
       })();
-      const bbfOpenTracked = bbfTrackedRows.filter(b => !/gagn|perdu|annul|lost|won/i.test(String(b.status || 'en cours')));
-      const bbfBasketStake = bbfOpenTracked.reduce((sum, b) => sum + (Number(b.stake) || 0), 0);
-      const bbfBasketReturn = bbfOpenTracked.reduce((sum, b) => sum + ((Number(b.stake) || 0) * (Number(b.odds || b.odd) || 0)), 0);
-      const bbfBasketHtml = `<aside class="bbf-basket bbf-empty bbf-empty--small" aria-label="Panier paris" style="position:sticky;top:132px;display:grid;gap:10px;align-self:start">
-        <span>Panier paris</span>
-        <strong>${bbfOpenTracked.length ? `${bbfOpenTracked.length} pari${bbfOpenTracked.length > 1 ? 's' : ''} suivi${bbfOpenTracked.length > 1 ? 's' : ''}` : 'Ton panier est vide'}</strong>
-        ${bbfOpenTracked.length ? `
-          <div style="display:grid;gap:8px">${bbfOpenTracked.slice(0, 4).map(b => {
-            const title = b.pick_label || b.pick || b.market_label || 'Pari suivi';
-            const teams = [b.home, b.away].filter(Boolean).join(' vs ');
-            return `<div style="display:grid;gap:2px;padding:9px;border:1px solid var(--border);border-radius:var(--r-card);background:rgba(255,255,255,.035)">
-              <b style="color:var(--text);font-size:12px">${esc(title)}</b>
-              <span style="font-size:11px;color:var(--text-dim)">${esc(teams || b.league || b.sport || 'Match suivi')}</span>
-              <em style="font-style:normal;color:var(--accent);font-weight:900">@${Number(b.odds || b.odd || 0).toFixed(2)} · ${(Number(b.stake) || 0).toFixed(2)}€</em>
-            </div>`;
-          }).join('')}</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-            <div><span>Mise</span><strong style="font-size:20px">${bbfBasketStake.toFixed(2)}€</strong></div>
-            <div><span>Retour pot.</span><strong style="font-size:20px">${bbfBasketReturn.toFixed(2)}€</strong></div>
+      const bbfRightRailHtml = `<aside class="v36-right-rail" aria-label="Infos de marche desktop">
+        <section class="v36-rail-card v36-rail-card--next">
+          <header><span>Prochains matchs</span><strong>${bbfRailUpcoming.length}</strong></header>
+          <div class="v36-rail-list">${bbfRailUpcomingHtml}</div>
+        </section>
+        <section class="v36-rail-card">
+          <header><span>Dynamique modèle</span><strong>${agent.delta7 >= 0 ? '↗' : '↘'}</strong></header>
+          ${bbfRailHotRows || `<div class="v36-rail-empty">Pas encore assez de volume récent.</div>`}
+        </section>
+        <section class="v36-rail-card">
+          <header><span>Stats live</span><strong>${bbfVisibleCount}</strong></header>
+          <div class="v36-rail-metrics">
+            ${bbfRailStats.map(([label, value, tone]) => `<div data-tone="${tone}"><span>${esc(label)}</span><b>${esc(value)}</b></div>`).join('')}
           </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-            <button type="button" data-basket-export>Exporter CSV</button>
-            <button type="button" data-basket-clear>Vider</button>
-          </div>` : `
-          <div aria-hidden="true" style="width:74px;height:74px;border-radius:22px;display:grid;place-items:center;background:linear-gradient(145deg,rgba(230,0,0,.18),rgba(255,255,255,.04));font-size:34px">🧾</div>
-          <span>Ajoute un pari depuis une fiche match pour suivre mise, cote et retour potentiel.</span>
-          <button type="button" class="page-btn" data-page="tous">Trouver un pari</button>`}
+        </section>
       </aside>`;
       const bbfMainHtml = `
         <div class="bbf-shell" data-phase="big-bets-first">
@@ -16551,7 +16581,7 @@
             <button type="button" class="page-btn" data-page="sante">Santé data</button>
           </nav>`}
             </main>
-            ${bbfFocusOnly ? '' : bbfBasketHtml}
+            ${bbfFocusOnly ? '' : bbfRightRailHtml}
           </div>
         </div>`;
 
