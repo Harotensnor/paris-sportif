@@ -15726,11 +15726,39 @@
         }));
         return arr.sort((a,b)=>(b.odd-a.odd)||((b.edge||0)-(a.edge||0))).slice(0, 6);
       })();
+      const bbfConsensusPicks = (() => {
+        const seen = new Set();
+        return bbfPool
+          .map((p) => {
+            const rm = p.pred?.reliabilityMeta || {};
+            const ens = p.pred?.ensemble || {};
+            const sm = p.pred?.sharp_money || null;
+            const agreement = Number(rm.agreement || 0);
+            const variance = Number(ens.agreement_variance || 1);
+            const components = Number(rm.componentCount || ens.sub_models?.length || 0);
+            const calibrated = rm.calibrated === true || !!window.__modelCalibration;
+            const sharpAligned = sm && sm.aligned_with_pick === true;
+            const score = (agreement * 55) + ((1 - Math.min(1, variance / 0.04)) * 20) + (components * 5) + (calibrated ? 8 : 0) + (sharpAligned ? 12 : 0) + Math.max(0, p.edge || 0) * 100;
+            return { ...p, _consensus: { agreement, variance, components, calibrated, sharpAligned, score } };
+          })
+          .filter(p => {
+            const id = String(p.m?.id || '');
+            if (!id || seen.has(id)) return false;
+            const c = p._consensus || {};
+            if (p.rel < 0.55 || p.edge < 0.04 || p.odd < userOddMin) return false;
+            if (c.agreement < 0.78 || c.variance > 0.04 || c.components < 3) return false;
+            if (!c.calibrated && !c.sharpAligned) return false;
+            seen.add(id);
+            return true;
+          })
+          .sort((a, b) => (b._consensus.score - a._consensus.score) || (b.odd - a.odd))
+          .slice(0, 4);
+      })();
       const bbfRestRows = bbfPool
         .filter(p => !bbfBigIds.has(String(p.m.id || '')) && !bbfGoodIds.has(String(p.m.id || '')) && !bbfBigOddsIds.has(String(p.m.id || '')) && !bbfOutsiderIds.has(String(p.m.id || '')))
         .filter(p => p.edge >= 0.02)
         .slice(0, 80);
-      const bbfVisibleCount = bbfBigBets.length + bbfGoodBets.length + bbfBigOddsBets.length + bbfOutsiderBets.length + bbfMultiMarketOutsiders.length + bbfRestRows.length;
+      const bbfVisibleCount = bbfBigBets.length + bbfGoodBets.length + bbfBigOddsBets.length + bbfOutsiderBets.length + bbfMultiMarketOutsiders.length + bbfConsensusPicks.length + bbfRestRows.length;
       const bbfMarketCount = bbfPool.reduce((sum, p) => sum + Math.max(1, Number(p.best?.allCandidates?.length || 0)), 0);
       const bbfGain100 = bbfBigBets.length ? bbfBigBets.reduce((s, p) => s + Number(p.ev || 0), 0) / bbfBigBets.length * 100 : 0;
       const bbfStrength = getBetStrengthMeta;
@@ -15757,6 +15785,10 @@
         const reasons = [];
         const implied = p.odd > 1 ? 1 / p.odd : 0;
         reasons.push(`Notre modèle donne ${Math.round(p.rel * 100)}% de chance, la cote demande ${Math.round(implied * 100)}%.`);
+        if (p._consensus) {
+          const c = p._consensus;
+          reasons.push(`Consensus modèle ${Math.round(c.agreement * 100)}% sur ${c.components} signaux${c.sharpAligned ? ', sharp money aligné' : c.calibrated ? ', calibration active' : ''}.`);
+        }
         if (p.edge > 0) reasons.push(`${p.edge >= 0.08 ? 'Gros écart' : 'Écart positif'} : +${(p.edge * 100).toFixed(1)}% mieux que le marché.`);
         const exp = p.pred?.explain?.reasons || [];
         exp.filter(r => r && r.text).slice(0, 2).forEach(r => reasons.push(String(r.text)));
@@ -16049,6 +16081,21 @@
           </section>
 
           ${bbfFocusOnly ? '' : bbfStrategyHtml}
+
+          ${bbfFocusOnly ? '' : `<section class="bbf-section" style="border-color:rgba(251,191,36,.30);background:linear-gradient(135deg,rgba(251,191,36,.075),rgba(255,255,255,.025));">
+            <div class="bbf-section__head">
+              <div>
+                <span>Consensus · ensemble + calibration + marché alignés</span>
+                <h2>Picks consensus</h2>
+              </div>
+              <button type="button" class="page-btn" data-page="performance">Voir la validation →</button>
+            </div>
+            ${bbfConsensusPicks.length ? `<div class="bbf-grid bbf-grid--compact">${bbfConsensusPicks.map(p => bbfCard(p, 'compact')).join('')}</div>` : `
+              <div class="bbf-empty bbf-empty--small">
+                <strong>Aucun consensus triple aujourd'hui.</strong>
+                <span>Si l'ensemble, la calibration ou le marché divergent, le site préfère ne pas sur-vendre le pick.</span>
+              </div>`}
+          </section>`}
 
           <section class="bbf-section">
             <div class="bbf-section__head">
