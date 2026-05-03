@@ -514,7 +514,7 @@ Contexte : après correction de `Tous`, la couverture monte à 277 matchs à ven
 - Viewports : tablet/desktop/wide
 - Preuve : `.cache/phase4-phase12-tous-coverage/sante-wide.png`
 - Action : Mettre les détails pipeline en accordéons et garder KPIs + erreurs visibles d’abord.
-- Statut : OPEN
+- Statut : FIXED v35.255 — Santé élargie à 1500px et détails lourds (quality checks, pipeline lag/drift, ROI guard, checks, erreurs) repliés aussi tablette/desktop.
 
 ### P12-VIS-010 — Les éléments fixed/sticky se répètent ou couvrent du contenu dans les full-page screenshots, ce qui rend l’audit manuel plus difficile.
 
