@@ -2022,3 +2022,8 @@
 - Apres: la recherche charge public_team_profiles.json + public_player_profiles.json en cache, puis ajoute les profils equipes, scores, tags et joueurs blesses/starters aux suggestions.
 - Impact: Theo peut chercher une equipe ou un joueur et tomber sur le contexte profond; un joueur renvoie vers son equipe pour voir les prochains matchs pertinents.
 - Verif: app.js/sw.js syntax OK, smoke navigateur local recherche "Aaron" => profils joueurs avec equipe/statut, 0 erreur console; hashes app/css restampes dans pronostics.html.
+## Sprint v35.303 — AUTO 10/10 Console prod silencieuse (21:14 UTC)
+- Avant: 25+ chemins non bloquants ecrivaient des warnings/logs directement en console production (polling data, export CSV, notifs, diag, fallback prefs), ce qui brouillait les audits et amplifiait le bug #50.
+- Apres: app.js passe par prodWarn/prodLog/prodTable, actifs uniquement avec ?debug=1 ou localStorage paris_sportif_debug=1; les helpers initiaux de pronostics.html sont aussi gardes par le meme mode debug.
+- Impact: production reste silencieuse pour Theo et les tests, mais le diagnostic complet reste disponible en debug volontaire sans perdre les traces utiles.
+- Verif: scan console direct app.js/pronostics.html => 0 occurrence prod, app.js/sw.js syntax OK, smoke dashboard local 720 lignes table, debugFlag=false, 0 warning/error; CACHE_VERSION + footer + hash app.js bumpes.
