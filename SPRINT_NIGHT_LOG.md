@@ -2037,3 +2037,8 @@
 - Apres: tau couvre explicitement les quatre cellules bas score (0-0, 0-1, 1-0, 1-1), clamp rho/tau pour eviter les masses negatives, et poissonTopScores bascule sur une lambda conservatrice au lieu de vider les scores exacts.
 - Impact: un match a data offensive incomplete garde une prediction exploitable et un score probable plutot qu'un trou silencieux dans la modal/table.
 - Verif: app.js syntax OK; smoke navigateur local => tau(1,1)=1.13, tau(2,2)=1, zero/NaN lambdas retournent 3 scores finis, 0 warning/error; spec model-math-guards ajoutee.
+## Sprint v35.306 — AUTO 10/10 SW data lourde non bloquante (21:31 UTC)
+- Avant: le Service Worker traitait data.js et odds_history.jsonl en network-first, donc un gros fichier pouvait bloquer l'UX sur reseau lent.
+- Apres: data.js + odds_history.jsonl passent en stale-while-revalidate; data_lite/data_today/health restent network-first pour garder la fraicheur critique.
+- Impact: le rendu initial garde le dernier cache disponible et rafraichit en arriere-plan, ce qui preserve la sensation temps reel sans penaliser les connexions lentes.
+- Verif: sw.js syntax OK, CACHE_VERSION + footer bumpes.

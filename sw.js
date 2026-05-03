@@ -2,8 +2,8 @@
 //
 // Stratégie :
 //   * pronostics.html : NETWORK-FIRST (cache = fallback offline).
-//   * data.js et JSON  : NETWORK-FIRST.
-//   * odds_history.jsonl : NETWORK-FIRST (Chantier PP).
+//   * data_lite / health : NETWORK-FIRST.
+//   * data.js / odds_history.jsonl : STALE-WHILE-REVALIDATE (gros fichiers).
 //   * icônes / manifest : cache-first (change rarement).
 //   * tout le reste    : passthrough réseau.
 
@@ -11,7 +11,7 @@
 // The "Stamp sw.js" step replaces this entire line with the current UTC timestamp,
 // so every deploy invalidates all caches → users see the new pronostics.html
 // without needing Ctrl+Shift+R. Manual edits stay valid for local dev.
-const CACHE_VERSION = 'paris-sportif-20260503-v35-305-model-math-guards';
+const CACHE_VERSION = 'paris-sportif-20260503-v35-306-sw-heavy-data-swr';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -138,6 +138,20 @@ function networkFirst(req, cacheName) {
     .catch(() => caches.match(req));
 }
 
+// Gros fichiers de données : servir le dernier cache immédiatement puis
+// rafraîchir en arrière-plan. Sur mobile/3G, data.js et odds_history.jsonl ne
+// doivent jamais bloquer le rendu initial.
+function staleWhileRevalidate(req, cacheName) {
+  return caches.match(req).then(hit => {
+    const refresh = fetch(req).then(resp => {
+      const respClone = resp.clone();
+      caches.open(cacheName).then(c => c.put(req, respClone));
+      return resp;
+    }).catch(() => hit);
+    return hit || refresh;
+  });
+}
+
 self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET') return;
@@ -161,16 +175,19 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Données dynamiques rafraîchies par le cron : NETWORK-FIRST.
-  // Couvre data.js + sidecar JSON + odds_history.jsonl + manifest.
-  const isDynamicData =
-    pathEndsWith(url, 'data.js') ||
+  // Données lourdes : STALE-WHILE-REVALIDATE pour éviter le blocage 3G.
+  if (pathEndsWith(url, 'data.js') || pathEndsWith(url, 'odds_history.jsonl')) {
+    event.respondWith(staleWhileRevalidate(req, RUNTIME_CACHE));
+    return;
+  }
+
+  // Données légères critiques rafraîchies par le cron : NETWORK-FIRST.
+  const isCriticalFreshData =
     pathEndsWith(url, 'data_lite.js') ||
     pathEndsWith(url, 'data_today.json') ||
     pathEndsWith(url, 'data_manifest.json') ||
-    pathEndsWith(url, 'odds_history.jsonl') ||
     pathEndsWith(url, 'health.json');
-  if (isDynamicData) {
+  if (isCriticalFreshData) {
     event.respondWith(networkFirst(req, RUNTIME_CACHE));
     return;
   }
