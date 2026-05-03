@@ -1746,3 +1746,8 @@
 - Apres: fallback proba no-vig quand le modèle sport US n'a pas assez de signal.
 - Impact: basketTotal 847, baseballTotal 165, hockeyTotal 118 candidats filtrables; couverture multi-marches restauree.
 - Verif: tous_filter_combo_audit 225 combos OK, syntax/bundle OK.
+## Sprint v35.248 — Phase 12 P-12.17 Fix P12-VIS-002 filtres mobile Tous (15:53 local)
+- Avant: Source/edge/confiance/tri ajoutaient un rail mobile complet avant les 270+ matchs.
+- Apres: filtres avances replies par defaut, Preset + Sport restent visibles.
+- Impact: controls conserves, filtre mobile plus court, 32 captures phase12-filter-compact OK.
+- Verif: mobile_device_audit 32/32 OK, syntax/bundle OK.

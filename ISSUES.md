@@ -451,7 +451,7 @@ Contexte : après correction de `Tous`, la couverture monte à 277 matchs à ven
 - Viewports : mobile
 - Preuve : `.cache/phase4-phase12-tous-coverage/tous-mobile.png`
 - Action : Regrouper les filtres avancés derrière un bouton Filtres, garder Préset + Sport visibles.
-- Statut : OPEN
+- Statut : FIXED v35.248 — Source/edge/confiance/tri regroupés dans un panneau mobile "Filtres avancés", avec Préset + Sport gardés visibles.
 
 ### P12-VIS-003 — Les lignes de couverture brute affichent Winamax exact mais pas les cotes 1N2 en aperçu.
 

@@ -19091,6 +19091,53 @@
         return { espn, sofa, winamax, total: allTodayEvents.length };
       } catch(e) { return null; }
     })();
+    const tousAdvancedFilterHtml = `
+          <div style="display:flex;align-items:center;gap:${tousMobile ? '8px' : '14px'};${tousRailStyle}">
+            <label style="${tousRailItemStyle}display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-dim);" title="Bug-hunt 2026-05-02 : par défaut Winamax-only (matches bookables). Toggle 'Tous' pour voir les ~840 events Sofa (non bookables sans cote propre).">
+              Source
+              <select data-tous-mode style="${tousSelectStyle}padding:5px 8px;font-size:12px;background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:6px;cursor:pointer;">
+                <option value="winamax" ${_tousMode==='winamax'?'selected':''}>🎯 Winamax bookable</option>
+                <option value="all" ${_tousMode==='all'?'selected':''}>📡 Tous les matchs</option>
+              </select>
+            </label>
+            <label style="${tousRailItemStyle}display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-dim);">
+              Edge min
+              <select data-tous-edge style="${tousSelectStyle}padding:5px 8px;font-size:12px;background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:6px;cursor:pointer;">
+                <option value="0" ${tousFilters.minEdge===0?'selected':''}>—</option>
+                <option value="0.03" ${tousFilters.minEdge===0.03?'selected':''}>+3%</option>
+                <option value="0.05" ${tousFilters.minEdge===0.05?'selected':''}>+5%</option>
+                <option value="0.08" ${tousFilters.minEdge===0.08?'selected':''}>+8%</option>
+                <option value="0.10" ${tousFilters.minEdge===0.10?'selected':''}>+10%</option>
+              </select>
+            </label>
+            <label style="${tousRailItemStyle}display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-dim);">
+              Confiance min
+              <select data-tous-conf style="${tousSelectStyle}padding:5px 8px;font-size:12px;background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:6px;cursor:pointer;">
+                <option value="0" ${tousFilters.minConf===0?'selected':''}>—</option>
+                <option value="0.50" ${tousFilters.minConf===0.50?'selected':''}>50%</option>
+                <option value="0.60" ${tousFilters.minConf===0.60?'selected':''}>60%</option>
+                <option value="0.70" ${tousFilters.minConf===0.70?'selected':''}>70%</option>
+                <option value="0.80" ${tousFilters.minConf===0.80?'selected':''}>80%</option>
+              </select>
+            </label>
+            <label style="${tousRailItemStyle}display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-dim);margin-left:${tousMobile ? '0' : 'auto'};">
+              Trier par
+              <select data-tous-sort style="${tousSelectStyle}padding:5px 8px;font-size:12px;background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:6px;cursor:pointer;">
+                <option value="kickoff" ${tousSort==='kickoff'?'selected':''}>⏱️ Heure du match</option>
+                <option value="edge" ${tousSort==='edge'?'selected':''}>📈 Meilleur edge</option>
+                <option value="conf" ${tousSort==='conf'?'selected':''}>🎯 Plus haute confiance</option>
+                <option value="odd" ${tousSort==='odd'?'selected':''}>💰 Cote la plus haute</option>
+              </select>
+            </label>
+          </div>`;
+    const tousAdvancedFilterBlock = tousMobile
+      ? `<details class="tous-advanced-filters" style="border:1px solid var(--border-2);border-radius:8px;background:rgba(255,255,255,.025);overflow:hidden;">
+          <summary style="min-height:44px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 10px;color:var(--text);font-size:12px;font-weight:850;cursor:pointer;list-style:none;">
+            <span>Filtres avancés</span><span style="color:var(--text-dim2);font-size:11px;font-weight:700;">Source · edge · confiance · tri</span>
+          </summary>
+          <div style="padding:0 10px 10px;">${tousAdvancedFilterHtml}</div>
+        </details>`
+      : tousAdvancedFilterHtml;
 
     wrap.innerHTML = `
       <div style="max-width:1500px;margin:0 auto;padding:${tousMobile ? '10px 6px 18px' : '16px 8px 24px'};font-variant-numeric:tabular-nums;">
@@ -19132,44 +19179,7 @@
               return `<button data-tous-sport="${esc(s)}" style="${tousRailItemStyle}padding:6px 11px;font-size:12px;border-radius:999px;cursor:pointer;font-weight:600;border:1px solid ${isOn?'var(--brand)':'var(--border-2)'};background:${isOn?'rgba(167,139,250,.18)':'transparent'};color:${isOn?'var(--brand)':'var(--text-2)'};">${esc(lbl)}</button>`;
             }).join('')}
           </div>` : ''}
-          <div style="display:flex;align-items:center;gap:${tousMobile ? '8px' : '14px'};${tousRailStyle}">
-            <label style="${tousRailItemStyle}display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-dim);" title="Bug-hunt 2026-05-02 : par défaut Winamax-only (matches bookables). Toggle 'Tous' pour voir les ~840 events Sofa (non bookables sans cote propre).">
-              Source
-              <select data-tous-mode style="${tousSelectStyle}padding:5px 8px;font-size:12px;background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:6px;cursor:pointer;">
-                <option value="winamax" ${_tousMode==='winamax'?'selected':''}>🎯 Winamax bookable</option>
-                <option value="all" ${_tousMode==='all'?'selected':''}>📡 Tous les matchs</option>
-              </select>
-            </label>
-            <label style="${tousRailItemStyle}display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-dim);">
-              Edge min
-              <select data-tous-edge style="${tousSelectStyle}padding:5px 8px;font-size:12px;background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:6px;cursor:pointer;">
-                <option value="0" ${tousFilters.minEdge===0?'selected':''}>—</option>
-                <option value="0.03" ${tousFilters.minEdge===0.03?'selected':''}>+3%</option>
-                <option value="0.05" ${tousFilters.minEdge===0.05?'selected':''}>+5%</option>
-                <option value="0.08" ${tousFilters.minEdge===0.08?'selected':''}>+8%</option>
-                <option value="0.10" ${tousFilters.minEdge===0.10?'selected':''}>+10%</option>
-              </select>
-            </label>
-            <label style="${tousRailItemStyle}display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-dim);">
-              Confiance min
-              <select data-tous-conf style="${tousSelectStyle}padding:5px 8px;font-size:12px;background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:6px;cursor:pointer;">
-                <option value="0" ${tousFilters.minConf===0?'selected':''}>—</option>
-                <option value="0.50" ${tousFilters.minConf===0.50?'selected':''}>50%</option>
-                <option value="0.60" ${tousFilters.minConf===0.60?'selected':''}>60%</option>
-                <option value="0.70" ${tousFilters.minConf===0.70?'selected':''}>70%</option>
-                <option value="0.80" ${tousFilters.minConf===0.80?'selected':''}>80%</option>
-              </select>
-            </label>
-            <label style="${tousRailItemStyle}display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-dim);margin-left:${tousMobile ? '0' : 'auto'};">
-              Trier par
-              <select data-tous-sort style="${tousSelectStyle}padding:5px 8px;font-size:12px;background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:6px;cursor:pointer;">
-                <option value="kickoff" ${tousSort==='kickoff'?'selected':''}>⏱️ Heure du match</option>
-                <option value="edge" ${tousSort==='edge'?'selected':''}>📈 Meilleur edge</option>
-                <option value="conf" ${tousSort==='conf'?'selected':''}>🎯 Plus haute confiance</option>
-                <option value="odd" ${tousSort==='odd'?'selected':''}>💰 Cote la plus haute</option>
-              </select>
-            </label>
-          </div>
+          ${tousAdvancedFilterBlock}
         </div>
 
         <div style="display:flex;gap:8px;margin:0 0 14px;${tousRailStyle}">
