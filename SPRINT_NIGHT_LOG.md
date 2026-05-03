@@ -1631,3 +1631,8 @@
 - Apres: ajout taille texte, police dyslexie/fallback, filtre nuit doux, appliques au boot et en live.
 - Impact: Theo peut adapter le confort visuel sans changer le flux Big Bets.
 - Verif: syntax app.js/sw.js OK, bundle check OK.
+## Sprint v35.225 — Phase 11 P-11.30 Dashboard sharing URL (13:13 local)
+- Avant: filtres dashboard non partageables, chaque retour demandait de refaire les reglages.
+- Apres: l'Accueil lit #dashboard?sport=&minOdd=&edgeMin= et propose un bouton copier l'URL.
+- Impact: Theo peut rouvrir ou partager une vue Big Bets filtree sans friction.
+- Verif: syntax app.js/sw.js OK, bundle check OK.

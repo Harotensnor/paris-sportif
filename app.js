@@ -14918,6 +14918,30 @@
       try { return localStorage.getItem(bbfFocusKey) === '1'; }
       catch(e) { return false; }
     })();
+    const bbfShareFilters = (() => {
+      const params = new URLSearchParams();
+      const addParams = (src) => {
+        try { new URLSearchParams(src || '').forEach((v, k) => params.set(k, v)); } catch(e) {}
+      };
+      try { if (location.search) addParams(location.search.slice(1)); } catch(e) {}
+      try {
+        const hash = location.hash || '';
+        const qIdx = hash.indexOf('?');
+        if (qIdx >= 0) addParams(hash.slice(qIdx + 1));
+      } catch(e) {}
+      const sportRaw = String(params.get('sport') || '').trim().toLowerCase();
+      const sportMap = { foot: 'football', soccer: 'football', basket: 'basketball', hockey: 'hockey', tennis: 'tennis', baseball: 'baseball' };
+      const sport = sportMap[sportRaw] || sportRaw;
+      const minOdd = Number(String(params.get('minOdd') || params.get('odd') || '').replace(',', '.')) || 0;
+      const edgeRaw = Number(String(params.get('edgeMin') || params.get('edge') || '').replace(',', '.')) || 0;
+      const edgeMin = edgeRaw > 1 ? edgeRaw / 100 : edgeRaw;
+      return {
+        active: !!sport || minOdd > 0 || edgeMin > 0,
+        sport,
+        minOdd: Math.max(0, minOdd),
+        edgeMin: Math.max(0, edgeMin),
+      };
+    })();
     const bbfUserPrefs = (() => {
       try { return JSON.parse(localStorage.getItem('userPrefs') || '{}') || {}; }
       catch(e) { return {}; }
@@ -15747,12 +15771,15 @@
         const id = String(p.m.id || '');
         if (!id || bbfSeen.has(id)) return;
         const sport = String(p.m.sport || '');
+        if (bbfShareFilters.sport && sport !== bbfShareFilters.sport) return;
         if (bbfFavSportsPrefs.length && (!sport || !bbfFavSportsPrefs.includes(sport))) return;
         const leagueKey = String(p.m.league_name || p.m.league || p.m.league_code || '').trim();
         if (leagueKey && bbfExcludedLeagues.has(leagueKey)) return;
         const odd = Number(p.odd || p.best?.odd || 0);
         const rel = Number(p.rel || p.best?.rel || 0);
         const edge = Number(p.edge ?? p.best?.edge ?? (odd > 1 ? rel - 1 / odd : 0));
+        if (bbfShareFilters.minOdd > 0 && odd < bbfShareFilters.minOdd) return;
+        if (bbfShareFilters.edgeMin > 0 && edge < bbfShareFilters.edgeMin) return;
         if (!odd || odd <= 1.01 || odd < userOddMin || !rel || edge <= 0) return;
         if (bbfMinRelPref && rel < bbfMinRelPref) return;
         if (bbfRiskEdgePref && edge < bbfRiskEdgePref) return;
@@ -16046,7 +16073,21 @@
           <a class="bbf-chip bbf-chip--football" href="#tous?sport=football&edge=4&conf=55"><span>⚽</span><b>Foot top</b><em>solide</em></a>
           <a class="bbf-chip bbf-chip--tennis" href="#tous?sport=tennis&edge=3"><span>🎾</span><b>Tennis jour</b><em>rapide</em></a>
           <a class="bbf-chip bbf-chip--hot" href="#tous?odd=4&edge=10&sort=odd"><span>🚀</span><b>Big Odds</b><em>4.00+</em></a>
+          <button type="button" class="bbf-chip" data-bbf-share-dashboard style="cursor:pointer;"><span>🔗</span><b>Partager vue</b><em>URL</em></button>
         </nav>`;
+      const bbfShareUrl = (() => {
+        const params = new URLSearchParams();
+        if (bbfShareFilters.sport) params.set('sport', bbfShareFilters.sport);
+        params.set('minOdd', (bbfShareFilters.minOdd || userOddMin || 2).toFixed(2));
+        if (bbfShareFilters.edgeMin > 0) params.set('edgeMin', String(Math.round(bbfShareFilters.edgeMin * 100)));
+        const qs = params.toString();
+        return `${location.origin}${location.pathname}#dashboard${qs ? '?' + qs : ''}`;
+      })();
+      const bbfShareNotice = bbfShareFilters.active ? `
+        <section class="bbf-empty bbf-empty--small" style="margin:10px 0 0;border-color:rgba(96,165,250,.35);background:rgba(96,165,250,.08);">
+          <strong>🔗 Vue filtrée par URL</strong>
+          <span>${bbfShareFilters.sport ? `Sport ${esc(sportLabel(bbfShareFilters.sport))} · ` : ''}${bbfShareFilters.minOdd ? `cote ≥ ${bbfShareFilters.minOdd.toFixed(2)} · ` : ''}${bbfShareFilters.edgeMin ? `edge ≥ ${Math.round(bbfShareFilters.edgeMin * 100)}%` : 'filtre actif'}</span>
+        </section>` : '';
       const bbfLeagueIcon = (name) => {
         const n = String(name || '').toLowerCase();
         if (/premier|ligue|liga|serie|bundes|champions|europa/.test(n)) return '⚽';
@@ -16174,6 +16215,7 @@
           ${bbfOffline}
           ${bbfFocusOnly ? '' : bbfAlertHtml}
           ${bbfFocusOnly ? '' : bbfQuickActions}
+          ${bbfFocusOnly ? '' : bbfShareNotice}
           ${bbfFocusOnly ? '' : bbfCategoryChips}
           ${bbfFocusOnly ? '' : bbfCompetitionChips}
           <div class="bbf-layout" ${bbfFocusOnly ? 'style="display:block;"' : ''}>
@@ -16343,6 +16385,27 @@
       if (bbfFocusToggle) bbfFocusToggle.addEventListener('click', () => {
         try { localStorage.setItem(bbfFocusKey, bbfFocusOnly ? '0' : '1'); } catch(e) {}
         renderDashboardPage(wrap);
+      });
+      const bbfShareBtn = wrap.querySelector('[data-bbf-share-dashboard]');
+      if (bbfShareBtn) bbfShareBtn.addEventListener('click', async (ev) => {
+        ev.preventDefault();
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) await navigator.clipboard.writeText(bbfShareUrl);
+          else {
+            const tmp = document.createElement('textarea');
+            tmp.value = bbfShareUrl;
+            tmp.setAttribute('readonly', 'readonly');
+            tmp.style.position = 'fixed';
+            tmp.style.left = '-9999px';
+            document.body.appendChild(tmp);
+            tmp.select();
+            document.execCommand('copy');
+            tmp.remove();
+          }
+          if (typeof toast === 'function') toast('Lien dashboard copié', 'success');
+        } catch(e) {
+          try { if (typeof toast === 'function') toast('Copie impossible automatiquement : ' + bbfShareUrl, 'error'); } catch(_) {}
+        }
       });
       const bbfAlertDismiss = wrap.querySelector('[data-internal-alert-dismiss]');
       if (bbfAlertDismiss) bbfAlertDismiss.addEventListener('click', () => {
