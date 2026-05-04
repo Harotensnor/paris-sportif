@@ -19634,7 +19634,7 @@
     if (exportBtn) exportBtn.addEventListener('click', () => {
       try {
         if (!agent.series || agent.series.length === 0) {
-          alert('Aucun pari réglé à exporter.');
+          if (typeof toast === 'function') toast('Aucun pari réglé à exporter.', 'warn');
           return;
         }
         const rows = [['date', 'sport', 'pick_odds', 'stake_EUR', 'result', 'pl_EUR', 'bankroll_EUR']];
@@ -19650,7 +19650,10 @@
         a.download = `agent-cagnotte-${new Date().toISOString().slice(0,10)}.csv`;
         document.body.appendChild(a); a.click();
         setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
-      } catch(e) { prodWarn('CSV export failed:', e); alert('Erreur export CSV'); }
+      } catch(e) {
+        prodWarn('CSV export failed:', e);
+        if (typeof toast === 'function') toast('Erreur export CSV', 'warn');
+      }
     });
     wrap.querySelectorAll('[data-rule-activate]').forEach(btn => btn.addEventListener('click', () => {
       const id = btn.dataset.ruleActivate;
@@ -29823,7 +29826,9 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
           cancelLabel: ''
         });
       } else {
-        alert('Le site stocke uniquement tes préférences (thème, paris suivis, historique modèle) dans ton navigateur. Aucune donnée ne sort.');
+        if (typeof toast === 'function') {
+          toast('Stockage local uniquement : préférences, paris suivis et historique restent dans ton navigateur.', 'info');
+        }
       }
     });
   }
