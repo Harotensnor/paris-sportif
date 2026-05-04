@@ -2142,3 +2142,8 @@
 - Apres: `Element.innerHTML` passe par `sanitizeTrustedHTML`, qui retire scripts, iframes, handlers `on*`, `srcdoc`, URLs `javascript:` et CSS `url(javascript:)` avant injection.
 - Impact: bug #36 avance globalement: les anciens rendus restent compatibles, mais une valeur data/user mal echappee ne peut plus poser un handler/script executable via les sinks historiques.
 - Verif: app.js/sw.js syntax OK, inline scripts OK, CSP hash recalcule, smoke navigateur dashboard 360 lignes, 0 inline event, sonde XSS neutralisee, 0 erreur console; footer/cache/app hash bumpes.
+## Sprint v35.327 — AUTO 10/10 No native prompt fallback (16:07 UTC)
+- Avant: le partage de modal detail gardait un fallback `prompt()` natif si Clipboard API et Web Share etaient indisponibles.
+- Apres: le fallback utilise `_copyToClipboard` (textarea + execCommand) et remonte un toast propre en succes/echec, sans dialogue natif bloquant.
+- Impact: garde-fou produit respecte: aucune interaction de partage ne sort du design system, et le lien reste copiable sur navigateurs non securises/anciens.
+- Verif: app.js/sw.js syntax OK, grep prompt/confirm actifs => 0 hors commentaires/PWA install prompt, CSP hash recalcule; smoke navigateur a suivre avant push.
