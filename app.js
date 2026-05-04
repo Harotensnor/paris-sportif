@@ -13001,17 +13001,31 @@
     if (!box) return;
     const recents = _loadRecentSearches();
     if (!recents.length) { box.style.display = 'none'; return; }
-    box.innerHTML = `
-      <div style="padding:8px 14px;font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.5px;font-weight:700;border-bottom:1px solid var(--border);">
-        Recherches récentes
-        <button type="button" id="search-recent-clear" style="float:right;background:transparent;border:none;color:var(--text-dim2);font-size:10px;cursor:pointer;text-transform:none;letter-spacing:0;text-decoration:underline;">Effacer</button>
-      </div>
-      ${recents.map(q => `
-        <div class="search-suggest-item" data-recent-q="${esc(q)}" style="display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;">
-          <span class="u-text-dim2">🕐</span>
-          <span style="color:var(--text);flex:1;">${esc(q)}</span>
-        </div>
-      `).join('')}`;
+    box.textContent = '';
+    const head = document.createElement('div');
+    head.style.cssText = 'padding:8px 14px;font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.5px;font-weight:700;border-bottom:1px solid var(--border);';
+    head.appendChild(document.createTextNode('Recherches récentes'));
+    const clear = document.createElement('button');
+    clear.type = 'button';
+    clear.id = 'search-recent-clear';
+    clear.style.cssText = 'float:right;background:transparent;border:none;color:var(--text-dim2);font-size:10px;cursor:pointer;text-transform:none;letter-spacing:0;text-decoration:underline;';
+    clear.textContent = 'Effacer';
+    head.appendChild(clear);
+    box.appendChild(head);
+    recents.forEach(q => {
+      const item = document.createElement('div');
+      item.className = 'search-suggest-item';
+      item.dataset.recentQ = q;
+      item.style.cssText = 'display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;';
+      const icon = document.createElement('span');
+      icon.className = 'u-text-dim2';
+      icon.textContent = '🕐';
+      const label = document.createElement('span');
+      label.style.cssText = 'color:var(--text);flex:1;';
+      label.textContent = q;
+      item.append(icon, label);
+      box.appendChild(item);
+    });
     box.style.display = 'block';
     box.querySelectorAll('[data-recent-q]').forEach(el => {
       el.addEventListener('click', () => {
@@ -13232,7 +13246,7 @@
     const box = document.getElementById('search-suggest');
     if (!box) return;
     q = (q || '').trim().toLowerCase();
-    if (q.length < 2) { box.style.display = 'none'; box.innerHTML = ''; return; }
+    if (q.length < 2) { box.style.display = 'none'; box.textContent = ''; return; }
     if (!PUBLIC_PROFILE_SEARCH.loaded) {
       _loadPublicSearchProfiles().then(() => {
         const current = (document.getElementById('search')?.value || '').trim().toLowerCase();
@@ -13255,20 +13269,28 @@
       .sort((a, b) => a.score - b.score || a.it.label.length - b.it.label.length)
       .slice(0, 12);
     if (!hits.length) {
-      box.innerHTML = `<div style="padding:12px 14px;color:var(--text-dim2,#7b8693);font-size:13px;">Aucun résultat pour « ${esc(q)} »</div>`;
+      box.textContent = '';
+      const empty = document.createElement('div');
+      empty.style.cssText = 'padding:12px 14px;color:var(--text-dim2,#7b8693);font-size:13px;';
+      empty.textContent = `Aucun résultat pour « ${q} »`;
+      box.appendChild(empty);
       box.style.display = 'block';
       return;
     }
-    // Trouve la 1ère occurrence (case-insensitive) de q dans le label, wrap.
-    const _highlightMatch = (label, query) => {
-      if (!query) return esc(label);
-      const lc = label.toLowerCase();
-      const idx = lc.indexOf(query.toLowerCase());
-      if (idx < 0) return esc(label);
-      const before = label.slice(0, idx);
-      const match = label.slice(idx, idx + query.length);
-      const after = label.slice(idx + query.length);
-      return `${esc(before)}<mark class="search-mark">${esc(match)}</mark>${esc(after)}`;
+    // Trouve la 1ère occurrence (case-insensitive) de q dans le label,
+    // sans parser de HTML issu de la recherche utilisateur.
+    const _appendHighlightedText = (parent, label, query) => {
+      const text = String(label || '');
+      const needle = String(query || '');
+      if (!needle) { parent.textContent = text; return; }
+      const pos = text.toLowerCase().indexOf(needle.toLowerCase());
+      if (pos < 0) { parent.textContent = text; return; }
+      parent.appendChild(document.createTextNode(text.slice(0, pos)));
+      const mark = document.createElement('mark');
+      mark.className = 'search-mark';
+      mark.textContent = text.slice(pos, pos + needle.length);
+      parent.appendChild(mark);
+      parent.appendChild(document.createTextNode(text.slice(pos + needle.length)));
     };
     const _teamUpcomingMatches = (teamName, limit = 5) => {
       const name = String(teamName || '').trim().toLowerCase();
@@ -13291,12 +13313,10 @@
       out.sort((a,b) => a.ts - b.ts);
       return out.slice(0, limit);
     };
-    box.innerHTML = hits.map((h, i) => {
+    box.textContent = '';
+    hits.forEach((h, i) => {
       const it = h.it;
       const teamUpcoming = it.kind === 'team' ? _teamUpcomingMatches(it.label, 5) : [];
-      const ico = it.kind === 'team' && it.logo
-        ? `<img src="${esc(it.logo)}" alt="" loading="lazy" decoding="async" style="width:20px;height:20px;object-fit:contain;border-radius:3px;" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"><span style="display:none;">${kindIcon(it.kind)}</span>`
-        : `<span>${kindIcon(it.kind)}</span>`;
       const metaText = it.kind === 'page' ? 'page'
         : it.kind === 'action' ? 'action'
         : it.kind === 'match' ? 'match'
@@ -13304,12 +13324,45 @@
         : it.kind === 'team' && String(it.sub || '').startsWith('profil') ? it.sub
         : `${sportIconAA(it.sub)} ${it.kind === 'team' ? `équipe${teamUpcoming.length ? ` · ${teamUpcoming.length} matchs` : ''}` : it.kind === 'league' ? 'tournoi' : 'ville'}`;
       const title = [it.sub, it.profileTags].filter(Boolean).join(' · ');
-      return `<div class="search-suggest-item" data-idx="${i}" data-kind="${esc(it.kind)}" data-label="${esc(it.label)}" ${it.matchId ? `data-match-id="${esc(it.matchId)}"` : ''} ${it.action ? `data-action="${esc(it.action)}"` : ''} ${it.teamLabel ? `data-team-label="${esc(it.teamLabel)}"` : ''} title="${esc(title)}" style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;">
-        ${ico}
-        <span style="flex:1;color:var(--text,#e6ebf2);font-weight:500;">${_highlightMatch(it.label, q)}</span>
-        <span style="color:var(--text-dim2,#7b8693);font-size:11px;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(metaText)}</span>
-      </div>`;
-    }).join('');
+      const item = document.createElement('div');
+      item.className = 'search-suggest-item';
+      item.dataset.idx = String(i);
+      item.dataset.kind = String(it.kind || '');
+      item.dataset.label = String(it.label || '');
+      if (it.matchId) item.dataset.matchId = String(it.matchId);
+      if (it.action) item.dataset.action = String(it.action);
+      if (it.teamLabel) item.dataset.teamLabel = String(it.teamLabel);
+      item.title = title;
+      item.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;';
+      if (it.kind === 'team' && it.logo) {
+        const img = document.createElement('img');
+        img.src = String(it.logo);
+        img.alt = '';
+        img.loading = 'lazy';
+        img.decoding = 'async';
+        img.style.cssText = 'width:20px;height:20px;object-fit:contain;border-radius:3px;';
+        const fallback = document.createElement('span');
+        fallback.style.display = 'none';
+        fallback.textContent = kindIcon(it.kind);
+        img.addEventListener('error', () => {
+          img.style.display = 'none';
+          fallback.style.display = 'inline';
+        }, { once: true });
+        item.append(img, fallback);
+      } else {
+        const icon = document.createElement('span');
+        icon.textContent = kindIcon(it.kind);
+        item.appendChild(icon);
+      }
+      const labelSpan = document.createElement('span');
+      labelSpan.style.cssText = 'flex:1;color:var(--text,#e6ebf2);font-weight:500;';
+      _appendHighlightedText(labelSpan, it.label, q);
+      const meta = document.createElement('span');
+      meta.style.cssText = 'color:var(--text-dim2,#7b8693);font-size:11px;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+      meta.textContent = metaText;
+      item.append(labelSpan, meta);
+      box.appendChild(item);
+    });
     box.style.display = 'block';
     box.querySelectorAll('.search-suggest-item').forEach(el => {
       el.addEventListener('mouseenter', () => { el.style.background = 'rgba(255,255,255,.04)'; });
