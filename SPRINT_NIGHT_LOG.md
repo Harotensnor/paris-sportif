@@ -2172,3 +2172,8 @@
 - Apres: le rail charge les sidecars betting intelligence et affiche biais ligues, smart money / signaux rares, angles de match et timing de mise sans bloquer le dashboard si un JSON manque.
 - Impact: le site commence a exposer les angles "que les autres ne voient pas" directement sur l'accueil desktop, avec clic ligne -> modal match quand l'event est disponible.
 - Verif: app.js/sw.js/inline/CSP hashes OK; hash app.js recalcule d9ea6e81; cache/footer bumpes v35.332; capture visuelle bloquee localement (Playwright absent du workspace).
+## Sprint v35.333 — AUTO 10/10 Starter signals MLB/NHL (16:43 UTC)
+- Avant: `mlb_pitchers.json` et `nhl_stats.json` existaient mais `patch_all_quick.py` lisait les anciens schemas (`by_match`, `by_team`), donc pitchers/goalies restaient invisibles dans `data.js`.
+- Apres: patch rapide lit `matches` MLB par home/away/date et `teams` NHL par abbr/name, attache `event.mlb_pitchers` + `event.nhl_stats`, et `night_metrics` compte les starter signals multi-sports.
+- Impact mesure: lineups/starter_signals 32 -> 79 events, avec baseball 32 pitchers et hockey 15 goalies; blessures 192, H2H 158, xG 88, Winamax exact 342/342.
+- Verif: py_compile patch_all_quick/measure OK; patch_all_quick/build_lineups_multisport/measure_night_metrics/build_health/finalize_inline OK; data_lite hash recalc 54c58ca9; cache/footer bumpes v35.333.
