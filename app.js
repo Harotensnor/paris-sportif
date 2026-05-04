@@ -15433,6 +15433,7 @@
       });
       const v37TimingByEvent = new Map(v37Array(v37Intel.timing?.events).map(e => [String(e.event_id || ''), e]));
       const v37LeagueByCode = new Map(v37Array(v37Intel.league?.leagues).map(l => [String(l.league_code || ''), l]));
+      const v37GapByEvent = new Map(v37Array(v37Intel.gaps?.priority_gaps).map(g => [String(g.event_id || ''), g]));
       const v37Coach = (() => {
         try { return typeof computeCoachInsights === 'function' ? computeCoachInsights() : null; }
         catch(e) { return null; }
@@ -15486,6 +15487,8 @@
         const angles = v37Array((v37AnglesByEvent.get(id) || {}).angles);
         const rareSignals = v37RareByEvent.get(id) || [];
         const timing = v37TimingByEvent.get(id) || null;
+        const gap = v37GapByEvent.get(id) || null;
+        const missingSignals = v37Array(gap?.missing).filter(Boolean);
         let score = 48 + Math.max(-12, Math.min(24, edge * 180)) + Math.max(-8, Math.min(18, (rel - 0.50) * 90));
         const badges = [];
         if (tier?.strict) { score += 6; badges.push('strict'); }
@@ -15512,6 +15515,13 @@
         ].filter(Boolean).length;
         score += Math.min(8, dataBonus);
         if (dataBonus >= 5) badges.push('data riche');
+        if (missingSignals.length) {
+          const priority = Number(gap?.priority || 0);
+          const penalty = Math.min(18, 4 + missingSignals.length * 2 + Math.max(0, priority - 50) / 20);
+          score -= penalty;
+          badges.push('data gap');
+          if (missingSignals.includes('starter_signals') || missingSignals.includes('referee')) badges.push('prudence');
+        }
         const profile = v37ProfileForPick(m, odd);
         if (profile.delta) {
           score += profile.delta;
@@ -15523,8 +15533,9 @@
           badges.length ? badges.join(' · ') : 'aucun angle special',
           `edge ${(edge * 100).toFixed(1)}%`,
           `data ${dataBonus}/8`,
+          missingSignals.length ? `manque ${missingSignals.slice(0, 4).join(', ')}` : '',
           ...(profile.notes || [])
-        ].join(' · ');
+        ].filter(Boolean).join(' · ');
         return { score: clean, badges: badges.slice(0, 3), tooltip };
       };
       const v36HourBucket = (date) => {
