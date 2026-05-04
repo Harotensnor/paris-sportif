@@ -73,6 +73,23 @@ def main() -> int:
     _stub_mcp_module()
     mod = _load_mcp_module()
 
+    local_today = mod._today_iso()
+    stale_today = "2026-04-30"
+    synthetic_data = {
+        "today": stale_today,
+        "days": {
+            stale_today: [{"id": "stale"}],
+            local_today: [{"id": "fresh"}],
+        },
+    }
+    active_day = mod._active_data_day(synthetic_data)
+    if active_day != local_today:
+        print(
+            f'[mcp_smoke] FAIL active_data_day: expected {local_today}, got {active_day}',
+            file=sys.stderr,
+        )
+        return 1
+
     ok: list[str] = []
     fail: list[tuple[str, str]] = []
     skip_args: list[str] = []

@@ -2122,3 +2122,8 @@
 - Apres: les logos de la table dense utilisent `data-fallback` + delegation `error` capturee sur le dashboard, sans JavaScript inline.
 - Impact: bug #36/#65 avance sur la surface la plus exposee: le tableau d'accueil garde ses initiales de secours mais ne depend plus d'un handler HTML.
 - Verif: app.js syntax OK; smoke navigateur dashboard => 0 `img[onerror]` dans `.v36-table-panel`, fallback image remplace par initiale, 0 erreur console; footer/cache/app hash bumpes.
+## Sprint v35.323 — AUTO 10/10 Fresh metrics + MCP date guard (15:46 UTC)
+- Avant: night_metrics et le smoke MCP ne verrouillaient pas explicitement le cas `data.today` obsolete, source possible du retour `2026-04-30`.
+- Apres: night_metrics regenere sur le snapshot courant et test_mcp_smoke simule `data.today=2026-04-30` pour verifier que `_active_data_day` prend le jour Europe/Paris frais.
+- Impact: bug #16 garde-fou en place: get_pipeline_status annonce `today=2026-05-04`, local_today=2026-05-04, data_age_min=0; Winamax exact reste 342/342 (100%).
+- Verif: py_compile MCP/metrics/smoke OK; test_mcp_smoke OK 14 tools; measure_night_metrics OK; footer/cache bumpes.
