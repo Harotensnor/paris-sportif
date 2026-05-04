@@ -15403,15 +15403,16 @@
             .catch(() => null);
           Promise.all([
             read('league_inefficiencies'),
+            read('market_biases_by_league'),
             read('detected_angles'),
             read('rare_signals'),
             read('timing_edges'),
             read('signal_gap_report'),
-          ]).then(([league, angles, rare, timing, gaps]) => {
-            state.data = { league, angles, rare, timing, gaps };
+          ]).then(([league, marketBias, angles, rare, timing, gaps]) => {
+            state.data = { league, marketBias, angles, rare, timing, gaps };
             state.loaded = true;
           }).catch(() => {
-            state.data = { league: null, angles: null, rare: null, timing: null, gaps: null };
+            state.data = { league: null, marketBias: null, angles: null, rare: null, timing: null, gaps: null };
             state.loaded = true;
           }).finally(() => {
             state.loading = false;
@@ -15433,6 +15434,7 @@
       });
       const v37TimingByEvent = new Map(v37Array(v37Intel.timing?.events).map(e => [String(e.event_id || ''), e]));
       const v37LeagueByCode = new Map(v37Array(v37Intel.league?.leagues).map(l => [String(l.league_code || ''), l]));
+      const v37MarketBiasByKey = new Map(v37Array(v37Intel.marketBias?.markets).map(row => [String(row.market_key || ''), row]));
       const v37GapByEvent = new Map(v37Array(v37Intel.gaps?.priority_gaps).map(g => [String(g.event_id || ''), g]));
       const v37Coach = (() => {
         try { return typeof computeCoachInsights === 'function' ? computeCoachInsights() : null; }
@@ -15481,9 +15483,38 @@
         });
         return { delta, badges, notes };
       };
-      const v37OpportunityFor = (m, tier, rel, edge, ev, odd) => {
+      const v37MarketBiasForPick = (pick) => {
+        if (!pick || !v37MarketBiasByKey.size) return null;
+        const market = String(pick.market || '');
+        const rawPick = String(pick.pickKey || pick.key || pick.side || '');
+        const line = Number(pick.line);
+        const keys = [`${market}:${rawPick}`];
+        if (market === 'btts') {
+          if (/Y|Oui|Yes|true/i.test(rawPick)) keys.push('btts:BTTS_Y');
+          if (/N|Non|No|false/i.test(rawPick)) keys.push('btts:BTTS_N');
+        }
+        if (market === 'doubleChance') {
+          const dc = rawPick.replace(/^DC[_-]?/i, '').toUpperCase();
+          if (/^(1X|X2|12)$/.test(dc)) keys.push(`doubleChance:${dc}`);
+        }
+        if (Number.isFinite(line)) {
+          const side = /under|moins|u/i.test(rawPick) || pick.side === 'under' ? 'U' : /over|plus|o/i.test(rawPick) || pick.side === 'over' ? 'O' : '';
+          const normalized = Math.abs(line).toFixed(1);
+          if (side && Math.abs(Math.abs(line) - 1.5) < 0.11) keys.push(`ou15:${side}1.5`);
+          if (side && Math.abs(Math.abs(line) - 2.5) < 0.11) keys.push(`ou25:${side}2.5`);
+          if (side && Math.abs(Math.abs(line) - 3.5) < 0.11) keys.push(`ou35:${side}3.5`);
+          if (side) keys.push(`${market}:${side}${normalized}`);
+        }
+        for (const key of keys) {
+          const row = v37MarketBiasByKey.get(key);
+          if (row) return row;
+        }
+        return null;
+      };
+      const v37OpportunityFor = (m, tier, rel, edge, ev, odd, pick) => {
         const id = String(m?.id || '');
         const league = v37LeagueByCode.get(String(m?.league_code || '')) || null;
+        const marketBias = v37MarketBiasForPick(pick);
         const angles = v37Array((v37AnglesByEvent.get(id) || {}).angles);
         const rareSignals = v37RareByEvent.get(id) || [];
         const timing = v37TimingByEvent.get(id) || null;
@@ -15498,6 +15529,13 @@
         } else if (league?.status === 'avoid') {
           score -= Math.min(8, 3 + Math.abs(Number(league.inefficiency_score || 0)) * 8);
           badges.push('ligue froide');
+        }
+        if (marketBias?.status === 'exploit') {
+          score += Math.min(9, 4 + Math.abs(Number(marketBias.edge_vs_50_pct || 0)) / 5);
+          badges.push('marché biaisé +');
+        } else if (marketBias?.status === 'fade') {
+          score -= Math.min(9, 4 + Math.abs(Number(marketBias.edge_vs_50_pct || 0)) / 5);
+          badges.push('marché à fade');
         }
         const marketMove = angles.find(a => a?.type === 'market_move');
         if (marketMove?.direction === 'steam') { score += 7; badges.push('steam cote'); }
@@ -15532,6 +15570,7 @@
           `Score opportunite ${clean}/100`,
           badges.length ? badges.join(' · ') : 'aucun angle special',
           `edge ${(edge * 100).toFixed(1)}%`,
+          marketBias ? `${marketBias.label || 'marché'} ${marketBias.pick || ''}: ${marketBias.reason || marketBias.status}` : '',
           `data ${dataBonus}/8`,
           missingSignals.length ? `manque ${missingSignals.slice(0, 4).join(', ')}` : '',
           ...(profile.notes || [])
@@ -15629,7 +15668,7 @@
               const edge = Number.isFinite(Number(c.edge)) ? Number(c.edge) : (rel - 1 / odd);
               const ev = Number.isFinite(Number(c.ev)) ? Number(c.ev) : (rel * odd - 1);
               const investmentScoreValue = Number(c.investment?.score || 0);
-              const intel = v37OpportunityFor(m, tier, rel, edge, ev, odd);
+              const intel = v37OpportunityFor(m, tier, rel, edge, ev, odd, c);
               return {
                 m, pred, best: c, tier: tier.id, strict: tier.strict, odd, rel, edge, ev,
                 label: c.shortLabel || c.label || pred.pick?.label || 'Pick',
@@ -15981,6 +16020,18 @@
           tone: l.status === 'exploit' ? 'good' : 'warn',
         }))
         .join('');
+      const v37MarketBiasSource = Array.isArray(v37Intel.marketBias?.watchlist) && v37Intel.marketBias.watchlist.length
+        ? v37Intel.marketBias.watchlist
+        : v37Array(v37Intel.marketBias?.markets).filter(row => row?.status === 'exploit' || row?.status === 'fade');
+      const v37MarketBiasRows = v37MarketBiasSource
+        .slice(0, 4)
+        .map(row => v37InsightRow({
+          kicker: row.market_status === 'fade' || row.status === 'fade' ? 'Marché à fade' : 'Marché exploitable',
+          title: `${row.market || row.label || 'Marché'} · ${row.pick || ''}`.trim(),
+          body: row.context || `${row.reason || 'biais détecté'} · WR ${(Number(row.win_rate || 0) * 100).toFixed(0)}% · n=${Number(row.n || 0)}`,
+          tone: row.market_status === 'fade' || row.status === 'fade' ? 'warn' : 'good',
+        }))
+        .join('');
       const v37RareRows = (Array.isArray(v37Intel.rare?.signals) ? v37Intel.rare.signals : [])
         .slice()
         .sort((a, b) => new Date(a.date || 0).getTime() - new Date(b.date || 0).getTime())
@@ -16077,6 +16128,7 @@
             <aside class="v36-home-rail" aria-label="Radar temps reel">
               <section><header><span>Insights modèle</span><b>${v37IntelCount || '...'}</b></header>${v37RareRows || v37AngleRows || v37IntelFallback}</section>
               <section><header><span>Biais marché ligues</span><b>${Number(v37Intel.league?.summary?.exploit || 0)}</b></header>${v37LeagueRows || v37IntelFallback}</section>
+              <section><header><span>Biais par marché</span><b>${Number(v37Intel.marketBias?.summary?.market_exploit || 0)}</b></header>${v37MarketBiasRows || v37IntelFallback}</section>
               <section><header><span>Profil Théo</span><b>${v37CoachCount || '...'}</b></header>${v37CoachRows || `<div class="v36-tier-empty">Tracke quelques paris : le modèle apprendra tes bons sports, cotes et ligues.</div>`}</section>
               <section><header><span>Gaps data critiques</span><b>${v37GapCount || '...'}</b></header>${v37GapRows || `<div class="v36-tier-empty">Aucun trou prioritaire sur ce snapshot.</div>`}</section>
               <section><header><span>Timing mise</span><b>${Number(v37Intel.timing?.summary?.wait || 0)}</b></header>${v37TimingRows || `<div class="v36-tier-empty">Aucune attente forcée : les picks restent jouables selon ton filtre.</div>`}</section>
