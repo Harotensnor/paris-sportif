@@ -2540,9 +2540,12 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     const choose = side === 'over' ? 'pOver' : 'pUnder';
     if (market === 'football_ou') {
       const raw = pred.markets?.extended?.raw || {};
-      const key = Math.abs(line - 1.5) < 0.01 ? 'ou15'
+      const key = Math.abs(line - 0.5) < 0.01 ? 'ou05'
+        : Math.abs(line - 1.5) < 0.01 ? 'ou15'
         : Math.abs(line - 2.5) < 0.01 ? 'ou25'
         : Math.abs(line - 3.5) < 0.01 ? 'ou35'
+        : Math.abs(line - 4.5) < 0.01 ? 'ou45'
+        : Math.abs(line - 5.5) < 0.01 ? 'ou55'
         : null;
       const obj = key ? raw[key] : null;
       return obj ? (side === 'over' ? obj.over : obj.under) : null;
@@ -2749,7 +2752,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
       const h = _v37HandicapLabel(match, side, line, mk);
       full = h.label;
       tooltip = h.tooltip;
-    } else if (/^(ou|ou15|ou25|ou35|basketTotal|baseballTotal|hockeyTotal|tennisGames)$/i.test(mk)) {
+    } else if (/^(ou|ou05|ou15|ou25|ou35|ou45|ou55|basketTotal|baseballTotal|hockeyTotal|tennisGames)$/i.test(mk)) {
       full = _v37TotalLabel(match, row?.side ?? side, line, unit, '');
       tooltip = `${full}. Le pari porte sur le total du match.`;
     }
@@ -2852,7 +2855,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
         : 'ou';
       _v35AddCandidate(out, row, prob, mk, key, `${row.side === 'over' ? 'Plus' : 'Moins'} de ${row.line} ${isHockeyOu ? 'buts hockey' : 'buts'}`);
     }
-    [['ou15', 1.5], ['ou25', 2.5], ['ou35', 3.5]].forEach(([mk, line]) => {
+    [['ou05', 0.5], ['ou15', 1.5], ['ou25', 2.5], ['ou35', 3.5], ['ou45', 4.5], ['ou55', 5.5]].forEach(([mk, line]) => {
       const block = wxMk[mk];
       if (!block) return;
       ['over', 'under'].forEach(side => {
@@ -4550,9 +4553,12 @@ if (h + a <= cutoff) under += grid[h][a];
 }
 return { over: 1 - under, under };
 };
+const ou05 = cumulOver(0.5);
 const ou15 = cumulOver(1.5);
 const ou25 = cumulOver(2.5);
 const ou35 = cumulOver(3.5);
+const ou45 = cumulOver(4.5);
+const ou55 = cumulOver(5.5);
 const lamH_HT = lamH * 0.45;
 const lamA_HT = lamA * 0.45;
 let pH_HT = 0, pD_HT = 0, pA_HT = 0;
@@ -4668,7 +4674,7 @@ dnb,
 ah,
 teamTotals,
 topScores,
-ou15, ou25, ou35,
+ou05, ou15, ou25, ou35, ou45, ou55,
 ht: { p1: pH_HT, pX: pD_HT, p2: pA_HT },
 htft,           // 9 combinaisons HT/FT
 ouHT05,         // 1ère mi-temps Over/Under 0.5 buts
@@ -14433,6 +14439,35 @@ if (odd >= 5.00 && conf >= 0.10 && edge >= 0.08) return { id: 'out', strict: edg
 return null;
 };
 const v37ScanPool = terminalScanPool.filter(m => v37DateMatches(m) && v37PickIsVisibleByClock(m));
+const v37DashboardMarketLimit = (market) => {
+const m = String(market || '');
+if (m === 'exactScore' || m === 'resultBtts' || m === 'ht_1n2') return 1;
+if (m === 'teamTotal' || m === 'btts' || m === 'doubleChance' || m === 'dnb') return 2;
+return 2;
+};
+const v37DashboardCandidateLimit = (m) => String(m?.sport || '').toLowerCase() === 'football' ? 8 : 4;
+const v37TakeDiverseCandidates = (ranked, m) => {
+const limit = v37DashboardCandidateLimit(m);
+const out = [];
+const marketCounts = new Map();
+for (const p of ranked) {
+const market = String(p?.market || '1n2');
+const cap = v37DashboardMarketLimit(market);
+const count = marketCounts.get(market) || 0;
+if (count >= cap) continue;
+marketCounts.set(market, count + 1);
+out.push(p);
+if (out.length >= limit) break;
+}
+if (out.length < Math.min(limit, 3)) {
+for (const p of ranked) {
+if (out.includes(p)) continue;
+out.push(p);
+if (out.length >= limit) break;
+}
+}
+return out;
+};
 const v36PickPoolRaw = _dataIsStale ? [] : v37ScanPool.flatMap(m => {
 try {
 const pred = predictMatch(m);
@@ -14482,7 +14517,7 @@ score: (tier.strict ? 120 : 0) + investmentScoreValue + intel.score * 0.5 + Math
 })
 .filter(Boolean)
 .sort((a, b) => b.score - a.score);
-return ranked.slice(0, 3);
+return v37TakeDiverseCandidates(ranked, m);
 } catch(e) { return []; }
 }).sort((a, b) => a.ts - b.ts);
 const v36PickPool = (() => {

@@ -2,12 +2,16 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
+## Sprint v35.394 — H1 table multi-marches etendue (21:33 UTC)
+- Avant: le dashboard gardait au plus 3 candidats par match, ce qui masquait des marches Winamax detailles deja presents (mi-temps, total equipe, score exact, O/U 0,5-5,5).
+- Apres: selection diversifiee jusqu'a 8 picks foot par match et 4 autres sports, avec plafond par marche pour eviter les doublons opaques.
+- Impact mesure: ajout test Playwright dashboard-market-depth pour exiger 80+ lignes visibles et 5+ familles de marches dans la table.
+- Verif: suite cible H1+B5 OK (4/4), bundle-size OK, syntax JS OK, no-conflict-markers OK; cache/footer bumpes v35.394.
 ## Sprint v35.393 — AUTO 10/10 Validation bugs captures V37 (21:24 UTC)
 - Avant: les corrections capture etaient presentes mais pas verrouillees ensemble par un test de regression utilisateur.
 - Apres: nouveau test V37 verifie absence de jargon trader visible, legende score, groupement doublons, modal alignee et buts attendus avec noms equipes.
 - Impact mesure: couverture B5 ajoutee sur dashboard + modal sans toucher au modele.
 - Verif: suite ciblée B2-B5 OK (8/8), bundle-size OK, syntax JS OK, no-conflict-markers OK; cache/footer bumpes v35.393.
-
 
 ## Sprint v35.392 — AUTO 10/10 Signaux pour contre modal (21:18 UTC)
 - Avant: les signaux contradictoires etaient melanges dans les raisons, et le badge mitigé ne disait pas clairement quoi faire.
@@ -15,13 +19,11 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Impact mesure: test modal signaux cible ajoute; score/table gardent les badges lisibles sur desktop et mobile.
 - Verif: tests cibles B2+B3 OK (6/6), bundle-size OK, syntax JS OK, no-conflict-markers OK; cache/footer bumpes v35.392.
 
-
 ## Sprint v35.391 — AUTO 10/10 Tooltip score opportunite testable (21:10 UTC)
 - Avant: le score opportunite avait une decomposition dans data-tooltip, mais pas de fallback natif ni de test desktop/mobile garantissant sa visibilite.
 - Apres: score table + card mobile exposent title et aria-label; nouveau test Playwright cible verifie legende, decomposition et accessibilite du tooltip.
 - Impact mesure: test score opportunite OK sur desktop + mobile Chrome local; bundle reste sous seuil app.js 1.58MB / 1.70MB.
 - Verif: Playwright cible OK (2/2), bundle-size OK, syntax JS OK, no-conflict-markers OK; cache/footer bumpes v35.391.
-
 
 ## Sprint v35.344 — AUTO 10/10 Aliases sources Portugal/NL (18:05 UTC)
 - Avant: certains matchs avaient des sources publiques presentes mais non rattachees, ex. Sporting CP - Vitoria pointait `guimaraes` pendant que Sofascore publiait `vitoriasc`.
@@ -46,6 +48,7 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Apres: blessures, fatigue calendrier, lookahead, voyage extreme et back-to-back voyage comparent le signal a l'equipe réellement soutenue par le pari; backing l'equipe fragile penalise, jouer contre elle bonifie.
 - Impact produit: les nouveaux angles voyage/fatigue deviennent exploitables sans faux boost; les signaux rares non alignes restent visibles en badge sans gonfler le score.
 - Verif: app.js --check prevu; cache/footer bumpes v35.347.
+
 ## Sprint v35.352 — AUTO 10/10 Auto-refresh aligne avec cron (19:07 UTC)
 - Avant: `check_pipeline_drift.py` signalait 13 scripts presents dans le cron mais absents de `auto_refresh.py`.
 - Fix: ajout des fetchers publics TheSportsDB/OpenLigaDB/previews et des builders intelligence/profils/marches/signaux dans l'auto-refresh local avec cadences prudentes.
@@ -295,7 +298,3 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Taille brute `app.js` : ~1,86MB UTF-8 avant passe → 1,58MB fichier local, sous le seuil 1,70MB contrôlé par `scripts/audit_bundle_size.py`.
 - Hash `app.js` dans `pronostics.html` mis à jour, `CACHE_VERSION` bumpé, syntax JS/data/html OK.
 
-## Sprint v35.390 — B1 brancher poids appris runtime
-- `lightgbm_weights.json` exporté en `lightgbm_weights.js` et préchargé avant `app.js`.
-- `predictMatch` consomme les poids appris comme nudge conservateur (`max_probability_nudge` ≤ 2,5pt) avec trace `pred.learned_context` + raison modèle.
-- Audit ajouté : `scripts/audit_lightgbm_runtime.py` vérifie sidecar, HTML et consommation front. Statut assumé : `aggregate_fallback`, pas faux entraînement LightGBM ligne-à-ligne.
