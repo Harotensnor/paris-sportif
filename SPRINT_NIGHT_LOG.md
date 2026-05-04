@@ -2356,3 +2356,9 @@
 - Fix: `get_pipeline_status` expose `source_of_truth=data.js`, `data_truth`, `calculated_at` et `sync_check`; night_metrics/health declarent aussi leur source et utilisent la meme definition Winamax exact (match_id + 1n2).
 - Impact mesure: MCP today=2026-05-04, sync_check=ok, lineups/night=121 et winamax_exact truth/night=310.
 - Verif: py_compile build_health/measure/MCP OK; test_mcp_smoke OK; cache/footer bumpes v35.363.
+
+## Sprint v35.364 — AUTO 10/10 Audit JSON orphelins (19:43 UTC)
+- Bug hygiene: vieux snapshots JSON racine rendaient la data pipeline illisible et faisaient croire a plusieurs sources de verite.
+- Fix: snapshots `claude_*_snapshot.json` archives dans `archive/obsolete_json_20260504/`; `JSON_SIDECAR_AUDIT.md` documente ce qui est source runtime, conserve ou obsolete.
+- Decision: `backtest_report.json` et `ci_heartbeat.json` sont gardes car encore lus par scripts/workflow; `data.json` etait un stale local non tracke, supprime du workspace.
+- Verif: recherche references runtime OK; cache/footer bumpes v35.364.
