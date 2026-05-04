@@ -48,6 +48,40 @@ except Exception:
 ROOT = Path(__file__).resolve().parent.parent
 DATA_JS = ROOT / 'data.js'
 
+SOCCER_SIGNAL_LEAGUES = {
+    'eng.1', 'esp.1', 'ger.1', 'ita.1', 'fra.1',
+    'ned.1', 'por.1', 'tur.1', 'bel.1', 'sco.1',
+    'eng.2', 'esp.2', 'ita.2', 'ger.2', 'fra.2',
+    'uefa.champions', 'uefa.europa', 'uefa.europa.conf',
+    'usa.1', 'mex.1', 'arg.1', 'bra.1',
+}
+
+SOCCER_INJURY_SEVERE_REASONS = {1, 2, 10}
+
+TEAM_ALIAS = {
+    'asrome': 'roma',
+    'asroma': 'roma',
+    'manchesterutd': 'manchesterunited',
+    'manutd': 'manchesterunited',
+    'manunited': 'manchesterunited',
+    'manchestercity': 'manchestercity',
+    'mancity': 'manchestercity',
+    'nottinghamforest': 'nottinghamforest',
+    'nottmforest': 'nottinghamforest',
+    'brest': 'stadebrestois',
+    'lyon': 'olympiquelyonnais',
+    'psg': 'parissaintgermain',
+    'intermilan': 'inter',
+    'acmilan': 'milan',
+}
+
+GENERIC_TEAM_TOKENS = {
+    'fc', 'cf', 'sc', 'afc', 'club', 'team',
+    'united', 'city', 'town', 'county', 'real',
+    'sporting', 'athletic', 'atletico', 'deportivo',
+    'international', 'internacional', 'racing',
+}
+
 
 def _norm(name: str) -> str:
     """ASCII lowercase alnum (mirror winamax_map.py + scripts patches)."""
@@ -79,11 +113,77 @@ def _name_match(a: str, b: str) -> bool:
     return bool(_name_tokens(a) & _name_tokens(b))
 
 
+def _meaningful_tokens(name: str) -> set[str]:
+    return {
+        t for t in _name_tokens(name)
+        if len(t) >= 4 and t not in GENERIC_TEAM_TOKENS
+    }
+
+
+def _strong_name_match(a: str, b: str) -> bool:
+    na = TEAM_ALIAS.get(_norm(a), _norm(a))
+    nb = TEAM_ALIAS.get(_norm(b), _norm(b))
+    if not na or not nb:
+        return False
+    if na == nb:
+        return True
+    if min(len(na), len(nb)) >= 6 and (na in nb or nb in na):
+        return True
+    return bool(_meaningful_tokens(a) & _meaningful_tokens(b))
+
+
 def _side_name(ev: dict, side: str) -> str:
     for c in ev.get('competitors') or []:
         if c.get('home_away') == side:
             return c.get('name') or c.get('displayName') or c.get('shortDisplayName') or ''
     return ''
+
+
+def _event_sides(ev: dict) -> tuple[str, str]:
+    home_name = _side_name(ev, 'home')
+    away_name = _side_name(ev, 'away')
+    if home_name and away_name:
+        return home_name.strip(), away_name.strip()
+    ev_name = ev.get('name') or ''
+    if ' at ' not in ev_name:
+        return '', ''
+    away_name, home_name = ev_name.split(' at ', 1)
+    return home_name.strip(), away_name.strip()
+
+
+def _split_pair_key(key: str) -> tuple[str, str]:
+    if '|' not in key:
+        return key, ''
+    home_key, away_key = key.split('|', 1)
+    return home_key, away_key
+
+
+def _find_soccer_pair_entry(
+    events_idx: dict[str, dict],
+    league_code: str,
+    home_name: str,
+    away_name: str,
+) -> dict | None:
+    key = f'{_norm(home_name)}|{_norm(away_name)}'
+    direct = events_idx.get(key)
+    if direct:
+        return direct
+
+    alias_key = f'{TEAM_ALIAS.get(_norm(home_name), _norm(home_name))}|{TEAM_ALIAS.get(_norm(away_name), _norm(away_name))}'
+    direct = events_idx.get(alias_key)
+    if direct:
+        return direct
+
+    for idx_key, candidate in events_idx.items():
+        cand_league = candidate.get('league_code') or ''
+        if cand_league and league_code and cand_league != league_code:
+            continue
+        key_home, key_away = _split_pair_key(idx_key)
+        cand_home = (candidate.get('home') or {}).get('team') or key_home
+        cand_away = (candidate.get('away') or {}).get('team') or key_away
+        if _strong_name_match(home_name, cand_home) and _strong_name_match(away_name, cand_away):
+            return candidate
+    return None
 
 
 def _lineup_payload(side: dict | None) -> dict:
@@ -165,27 +265,27 @@ def patch_weather(data: dict) -> int:
 
 
 def patch_referees(data: dict) -> int:
-    """Enrich top-5 soccer events with referee stats (by home|away normalized)."""
+    """Enrich soccer events with referee stats (by home|away normalized)."""
     refs = _load_json(ROOT / 'referees_soccer.json')
     if not refs:
         return 0
     events_idx = refs.get('events') or {}
     if not events_idx:
         return 0
-    SOCCER_LEAGUES = {'eng.1', 'esp.1', 'ger.1', 'ita.1', 'fra.1'}
     n = 0
     for evs in (data.get('days') or {}).values():
         for ev in (evs or []):
-            if ev.get('league_code') not in SOCCER_LEAGUES:
+            if ev.get('sport') != 'football' or ev.get('league_code') not in SOCCER_SIGNAL_LEAGUES:
                 continue
-            if ev.get('completed'):
+            home_name, away_name = _event_sides(ev)
+            if not (home_name and away_name):
                 continue
-            ev_name = ev.get('name') or ''
-            if ' at ' not in ev_name:
-                continue
-            away_name, home_name = ev_name.split(' at ', 1)
-            key = f'{_norm(home_name.strip())}|{_norm(away_name.strip())}'
-            entry = events_idx.get(key)
+            entry = _find_soccer_pair_entry(
+                events_idx,
+                ev.get('league_code') or '',
+                home_name,
+                away_name,
+            )
             if not entry:
                 continue
             ref = entry.get('referee') or {}
@@ -193,46 +293,41 @@ def patch_referees(data: dict) -> int:
                 continue
             ev['referee'] = {
                 'name': ref.get('name'),
+                'country': ref.get('country'),
                 'yellowPerGame': ref.get('yellowPerGame'),
                 'redPerGame': ref.get('redPerGame'),
+                'cardsPerGame': ref.get('cardsPerGame') or ref.get('yellowPerGame'),
                 'games': ref.get('games'),
+                'league_code': entry.get('league_code') or ev.get('league_code') or '',
+                'sofa_event_id': entry.get('sofa_event_id') or '',
+                'source': 'sofascore',
             }
             n += 1
     return n
 
 
 def patch_lineups(data: dict) -> int:
-    """Enrich top-5 soccer events with lineup info."""
+    """Enrich soccer events with lineup info."""
     lu = _load_json(ROOT / 'lineups_soccer.json')
     if not lu:
         return 0
     events_idx = lu.get('events') or {}
     if not events_idx:
         return 0
-    SOCCER_LEAGUES = {'eng.1', 'esp.1', 'ger.1', 'ita.1', 'fra.1'}
     n = 0
     for evs in (data.get('days') or {}).values():
         for ev in (evs or []):
-            if ev.get('league_code') not in SOCCER_LEAGUES:
+            if ev.get('sport') != 'football' or ev.get('league_code') not in SOCCER_SIGNAL_LEAGUES:
                 continue
-            if ev.get('completed'):
-                continue
-            home_name = _side_name(ev, 'home')
-            away_name = _side_name(ev, 'away')
+            home_name, away_name = _event_sides(ev)
             if not (home_name and away_name):
-                ev_name = ev.get('name') or ''
-                if ' at ' not in ev_name:
-                    continue
-                away_name, home_name = ev_name.split(' at ', 1)
-            key = f'{_norm(home_name.strip())}|{_norm(away_name.strip())}'
-            entry = events_idx.get(key)
-            if not entry:
-                entry = next((
-                    candidate for idx_key, candidate in events_idx.items()
-                    if (not candidate.get('league_code') or candidate.get('league_code') == ev.get('league_code'))
-                    and _name_match(home_name, (candidate.get('home') or {}).get('team') or idx_key.split('|', 1)[0])
-                    and _name_match(away_name, (candidate.get('away') or {}).get('team') or idx_key.split('|', 1)[-1])
-                ), None)
+                continue
+            entry = _find_soccer_pair_entry(
+                events_idx,
+                ev.get('league_code') or '',
+                home_name,
+                away_name,
+            )
             if not entry:
                 continue
             home_lineup = _lineup_payload(entry.get('home'))
@@ -251,6 +346,107 @@ def patch_lineups(data: dict) -> int:
                 elif ha == 'away':
                     c['lineup'] = away_lineup
             n += 1
+    return n
+
+
+def _resolve_soccer_injury_side(
+    name: str,
+    teams: dict[str, list[dict]],
+    scanned: dict[str, str],
+) -> tuple[list[dict], bool, str]:
+    key = TEAM_ALIAS.get(_norm(name), _norm(name))
+    if key in teams:
+        return teams.get(key) or [], True, key
+    if key in scanned:
+        return [], True, key
+
+    best_key = ''
+    best_score = 0
+    for candidate_key in set(teams) | set(scanned):
+        candidate_display = scanned.get(candidate_key) or candidate_key
+        if candidate_key in teams and teams[candidate_key]:
+            candidate_display = teams[candidate_key][0].get('team') or candidate_display
+        candidate_norm = TEAM_ALIAS.get(_norm(candidate_display), _norm(candidate_display))
+        if key == candidate_norm or key == candidate_key:
+            best_key = candidate_key
+            best_score = 100
+            break
+        if min(len(key), len(candidate_norm)) >= 6 and (key in candidate_norm or candidate_norm in key):
+            score = 80 + min(len(key), len(candidate_norm))
+        else:
+            shared = _meaningful_tokens(name) & _meaningful_tokens(candidate_display)
+            if not shared:
+                continue
+            score = 30 + len(shared) * 8 + max(len(t) for t in shared)
+        if score > best_score:
+            best_key = candidate_key
+            best_score = score
+
+    if best_key and best_score >= 42:
+        return teams.get(best_key) or [], True, best_key
+    return [], False, ''
+
+
+def patch_soccer_injuries(data: dict) -> int:
+    """Attach Sofascore soccer injuries/scanned flags from injuries_soccer.json."""
+    inj = _load_json(ROOT / 'injuries_soccer.json')
+    if not inj:
+        return 0
+    teams = inj.get('teams') or {}
+    scanned = inj.get('scanned_teams') or {}
+    if not (teams or scanned):
+        return 0
+
+    n = 0
+    unmatched: list[str] = []
+    for evs in (data.get('days') or {}).values():
+        for ev in (evs or []):
+            if ev.get('sport') != 'football' or ev.get('league_code') not in SOCCER_SIGNAL_LEAGUES:
+                continue
+            home_name, away_name = _event_sides(ev)
+            if not (home_name and away_name):
+                continue
+
+            home_inj, home_known, home_key = _resolve_soccer_injury_side(home_name, teams, scanned)
+            away_inj, away_known, away_key = _resolve_soccer_injury_side(away_name, teams, scanned)
+            if not (home_known or away_known):
+                if len(unmatched) < 300:
+                    unmatched.append(f"{ev.get('league_code') or ''}\t{home_name}\t{away_name}")
+                continue
+
+            home_severe = sum(1 for x in home_inj if x.get('reason') in SOCCER_INJURY_SEVERE_REASONS)
+            away_severe = sum(1 for x in away_inj if x.get('reason') in SOCCER_INJURY_SEVERE_REASONS)
+            for c in ev.get('competitors') or []:
+                ha = c.get('home_away')
+                if ha == 'home':
+                    c['injuries'] = home_inj
+                    c['injuries_known'] = home_known
+                    c['injuries_source'] = 'sofascore'
+                    c['injuries_key'] = home_key
+                elif ha == 'away':
+                    c['injuries'] = away_inj
+                    c['injuries_known'] = away_known
+                    c['injuries_source'] = 'sofascore'
+                    c['injuries_key'] = away_key
+
+            ev['injuries'] = {
+                'home': home_inj,
+                'away': away_inj,
+                'home_known': home_known,
+                'away_known': away_known,
+                'home_severe': home_severe,
+                'away_severe': away_severe,
+                'source': 'sofascore',
+            }
+            ev['injuries_home'] = home_severe
+            ev['injuries_away'] = away_severe
+            ev['injuries_home_known'] = home_known
+            ev['injuries_away_known'] = away_known
+            ev['injuries_source'] = 'sofascore'
+            n += 1
+
+    if unmatched:
+        (ROOT / 'signal_unmatched.log').write_text('\n'.join(unmatched) + '\n', encoding='utf-8')
     return n
 
 
@@ -530,6 +726,7 @@ PATCHES = [
     ('weather', patch_weather),
     ('referees', patch_referees),
     ('lineups', patch_lineups),
+    ('soccer_injuries', patch_soccer_injuries),
     ('injuries', patch_injuries),
     ('clubelo', patch_clubelo),
     ('team_form', patch_team_form),
