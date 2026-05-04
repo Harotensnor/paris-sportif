@@ -2255,3 +2255,9 @@
 - Apres: `build_betting_intelligence.py` calcule distance Haversine + decalage estime pour MLB/NBA/NHL; nouveaux signaux `travel_extreme` et `back_to_back_travel` alimentent aussi `rare_signals.json`.
 - Impact mesure: 244 angles detectes, dont 13 `travel_extreme` et 16 `back_to_back_travel`; 91 signaux rares publies avec 25 signaux voyage/fatigue exploitables.
 - Verif: py_compile/build_betting_intelligence/build_health OK; cache/footer bumpes v35.346.
+
+## Sprint v35.347 — AUTO 10/10 Score signaux rares directionnel (18:28 UTC)
+- Avant: le dashboard ajoutait un bonus generique `signal rare`, meme quand le signal etait une alerte de fade sur l'equipe jouee.
+- Apres: blessures, fatigue calendrier, lookahead, voyage extreme et back-to-back voyage comparent le signal a l'equipe réellement soutenue par le pari; backing l'equipe fragile penalise, jouer contre elle bonifie.
+- Impact produit: les nouveaux angles voyage/fatigue deviennent exploitables sans faux boost; les signaux rares non alignes restent visibles en badge sans gonfler le score.
+- Verif: app.js --check prevu; cache/footer bumpes v35.347.
