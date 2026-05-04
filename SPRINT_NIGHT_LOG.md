@@ -2082,3 +2082,8 @@
 - Apres: le lien force-refresh est cree par DOM, les statuts freshness/live/erreur passent par textContent + elements, et le fallback Bilan n'injecte plus de HTML.
 - Impact: bug #36 avance sur les surfaces persistantes/temps reel, avec moins de parsing HTML inutile pendant le polling.
 - Verif: app.js syntax OK; smoke navigateur local => freshness visible, table dashboard 360 lignes, 0 warning/error avec serveur MIME correct; footer/cache/app hash bumpes.
+## Sprint v35.315 — AUTO 10/10 V37 detail listener delegation (22:20 UTC)
+- Avant: la table dense attachait un listener click + keydown sur chaque entree data-big-detail, soit 700+ handlers sur les vues riches.
+- Apres: l'ouverture detail V37 passe par delegation unique sur le conteneur dashboard, avec lookup match rafraichi a chaque render.
+- Impact: bug #37 avance sans changer l'UX: moins de handlers par render, clic ligne et clavier restent fonctionnels.
+- Verif: app.js syntax OK; smoke navigateur local => 730 triggers data-big-detail, delegation ouvre bien la modal FC Andorra vs Las Palmas, 0 warning/error; footer/cache/app hash bumpes.

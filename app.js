@@ -15595,19 +15595,28 @@
         Object.values(data.days || {}).forEach(arr => (arr || []).forEach(m => { if (String(m.id) === String(id)) found = m; }));
         return found;
       };
-      wrap.querySelectorAll('[data-big-detail]').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          e.preventDefault();
-          const m = v36MatchById(btn.dataset.bigDetail || btn.dataset.matchId);
+      wrap.__v37MatchById = v36MatchById;
+      if (!wrap.__v37DetailDelegated) {
+        wrap.__v37DetailDelegated = true;
+        const openBigDetail = (trigger) => {
+          const lookup = wrap.__v37MatchById;
+          const m = typeof lookup === 'function' ? lookup(trigger.dataset.bigDetail || trigger.dataset.matchId) : null;
           if (m && typeof openDetail === 'function') openDetail(m);
+        };
+        wrap.addEventListener('click', (e) => {
+          const trigger = e.target.closest && e.target.closest('[data-big-detail]');
+          if (!trigger || !wrap.contains(trigger)) return;
+          e.preventDefault();
+          openBigDetail(trigger);
         });
-        btn.addEventListener('keydown', (e) => {
+        wrap.addEventListener('keydown', (e) => {
           if (e.key !== 'Enter' && e.key !== ' ') return;
+          const trigger = e.target.closest && e.target.closest('[data-big-detail]');
+          if (!trigger || !wrap.contains(trigger)) return;
           e.preventDefault();
-          const m = v36MatchById(btn.dataset.bigDetail || btn.dataset.matchId);
-          if (m && typeof openDetail === 'function') openDetail(m);
+          openBigDetail(trigger);
         });
-      });
+      }
       try {
         if (window.__v37DashboardRefreshTimer) clearInterval(window.__v37DashboardRefreshTimer);
         window.__v37DashboardRefreshTimer = setInterval(() => {
