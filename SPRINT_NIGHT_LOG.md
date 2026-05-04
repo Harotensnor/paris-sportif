@@ -2362,3 +2362,9 @@
 - Fix: snapshots `claude_*_snapshot.json` archives dans `archive/obsolete_json_20260504/`; `JSON_SIDECAR_AUDIT.md` documente ce qui est source runtime, conserve ou obsolete.
 - Decision: `backtest_report.json` et `ci_heartbeat.json` sont gardes car encore lus par scripts/workflow; `data.json` etait un stale local non tracke, supprime du workspace.
 - Verif: recherche references runtime OK; cache/footer bumpes v35.364.
+
+## Sprint v35.365 — AUTO 10/10 Audit cotes boostees (19:50 UTC)
+- Bug produit: `boosted_odds.json` etait quasi vide sans prouver si la feature etait morte ou si Winamax n'exposait rien.
+- Fix: le detecteur publie `candidate_nodes_scanned`, `boost_keyword_matches`, `explicit_boost_field_nodes`, `empty_reason` et `next_action`; le dashboard affiche un vrai statut "scan OK".
+- Mesure: 728 matchs analyses, 22980 cotes inspectees, 0 mot-cle promo et 0 champ boost explicite dans le payload courant.
+- Verif: detect_boosted_odds + build_health OK; cache/footer bumpes v35.365.

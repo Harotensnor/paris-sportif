@@ -16268,12 +16268,19 @@
           <i>@${Number.isFinite(odd) && odd > 0 ? odd.toFixed(2) : '--'}</i>
         </a>`;
       }).join('') : '';
+      const v36BoostMatchesScanned = Number(v36BoostData?.matches_scanned || 0);
+      const v36BoostCandidateNodes = Number(v36BoostData?.candidate_nodes_scanned || 0);
+      const v36BoostKeywordMatches = Number(v36BoostData?.boost_keyword_matches || 0);
+      const v36BoostEmptyReason = String(v36BoostData?.empty_reason || '').trim();
+      const v36BoostAuditLine = v36BoostData
+        ? `Scan OK : ${v36BoostMatchesScanned || '?'} matchs${v36BoostCandidateNodes ? ` · ${v36BoostCandidateNodes} cotes inspectees` : ''}${v36BoostKeywordMatches ? ` · ${v36BoostKeywordMatches} indices promo` : ''}.`
+        : 'Scan des promotions Winamax en cours.';
       const v36BoostStatus = v36Boosts.length
         ? `${v36Boosts.length} boost${v36Boosts.length > 1 ? 's' : ''} explicite${v36Boosts.length > 1 ? 's' : ''} detecte${v36Boosts.length > 1 ? 's' : ''}${v36BoostGenerated ? ` · scan ${v36BoostGenerated}` : ''}`
-        : (v36BoostData ? `Aucune cote boostee explicite fiable detectee${v36BoostGenerated ? ` · scan ${v36BoostGenerated}` : ''}` : 'Scan des cotes boostees Winamax en cours');
+        : (v36BoostData ? `Aucune cote boostee explicite detectee${v36BoostGenerated ? ` · scan ${v36BoostGenerated}` : ''}` : 'Scan des cotes boostees Winamax en cours');
       const v36BoostSection = `<section class="v36-boost-strip ${v36Boosts.length ? 'has-boosts' : 'is-empty'}" aria-label="Cotes boostees Winamax">
         <header><span>BOOST</span><strong>Cotes boostees Winamax</strong><em>${esc(v36BoostStatus)}</em></header>
-        ${v36Boosts.length ? `<div class="v36-boost-grid">${v36BoostHtml}</div>` : `<p>Pas de promotion explicite a jouer aveuglement. Le modele garde les 5 tiers comme source principale.</p>`}
+        ${v36Boosts.length ? `<div class="v36-boost-grid">${v36BoostHtml}</div>` : `<p>${esc(v36BoostAuditLine)} ${esc(v36BoostEmptyReason || 'Pas de promotion explicite a jouer aveuglement. Le modele garde les 5 tiers comme source principale.')}</p>`}
       </section>`;
       const v36GeniusPicks = v36PickPool
         .filter(p => {
