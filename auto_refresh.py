@@ -110,6 +110,7 @@ PATCH_STAGES = [
     ('build_public_profiles.py',    1,   60),
     ('build_league_bias_audit.py',  1,   30),
     ('build_betting_intelligence.py', 1,  30),
+    ('train_lightgbm.py',           1,   30),
     ('build_rugby_markets.py',      1,   30),
     ('build_niche_markets.py',      1,   30),
     ('detect_boosted_odds.py',      1,   30),
