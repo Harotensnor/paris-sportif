@@ -2107,3 +2107,8 @@
 - Apres: pronostics.html garde le hash app 61e428df, data_lite du cron 4c19163b, footer v35.319, et sw.js a un cache propre sans marqueur.
 - Impact: le deploiement redevient chargeable; le smoke navigateur ne verra plus d'erreur Unexpected token.
 - Verif: grep conflict markers sur sw/pronostics => 0; app.js/sw.js syntax OK; prochaine etape = commit/push direct sans repull intermediaire.
+## Sprint v35.320 — AUTO 10/10 Libelles Winamax lisibles (15:32 UTC)
+- Avant: la colonne Pari pouvait afficher des codes opaques (`DNB 1`, `BTTS Oui`, `Double chance 1X`, handicaps bruts) que Theo ne retrouvait pas dans son vocabulaire Winamax.
+- Apres: tous les candidats passent par un formateur central Winamax-style avec noms d'equipes, handicaps expliques, DNB nul rembourse, team totals naturels et tooltips par marche.
+- Impact: table V37, cards mobile et modal detail partagent les memes libelles debutant-friendly sans changer les cotes, proba, edge ni settlement.
+- Verif: grep conflict markers => 0; app.js syntax OK; smoke navigateur dashboard 120 libelles scannes, 0 libelle interdit, 0 erreur console; footer v35.320 + cache/app hash bumpes.

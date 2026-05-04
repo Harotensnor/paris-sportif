@@ -7,6 +7,26 @@ pipeline without changing the Winamax-only product rule. These sources must
 never be used for odds placement or bookmaker affiliation; they are candidates
 only for metadata, schedules, lineups, results, and quality cross-checks.
 
+## Frontend label policy — Winamax-style French
+
+Verified: 2026-05-04
+
+The table and detail modal now prefer exact `labelFr` strings from Winamax
+market payloads when present. When a market has no explicit French label, the
+frontend formats it through the internal Winamax-style mapper:
+
+- 1N2 uses real team names instead of `1`, `2`, `X`.
+- DNB is shown as `{Team} (nul remboursé)`.
+- Handicap lines are explained in natural language, for example
+  `{Team} gagne par 2+ buts d'écart` instead of `{Team} -1`.
+- Team totals become `{Team} marque moins de 1,5 but` or
+  `{Team} ne marque pas (0 but)`.
+- BTTS, double chance, half-time, exact score, totals, run line, puck line,
+  and basket handicap all carry contextual tooltips.
+
+Fallback labels are a display concern only. They do not alter the underlying
+Winamax market key, odd, probability, or settlement logic.
+
 ## Candidate 1 — TheSportsDB
 
 Official docs: https://www.thesportsdb.com/documentation
