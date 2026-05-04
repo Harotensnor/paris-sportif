@@ -337,3 +337,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix: `auto_refresh.py` et `refresh.yml` generent maintenant `lightgbm_weights.js`, auditent le runtime et ajoutent les sidecars LightGBM au commit data.
 - Cache: `pronostics.html` pointe vers les hashes courants `lightgbm_weights.js`, `app.js`, `app.css` et `data_lite.js`; SW/footer bumpes v35.408.
 - Mesure: audit runtime OK (`aggregate_fallback`, 4 sports, 49 ligues), build LightGBM JS OK.
+
+## Sprint v35.409 — AUTO 10/10 Validation UI score/signaux (01:27 UTC)
+- Validation: les specs Playwright confirment la legende score, les tooltips detailles, les signaux pour/contre et les bugs captures V37 sur desktop + mobile.
+- Fix: la CSP met a jour le hash Web Vitals actuel et l'injection runtime des SportsEvent JSON-LD dynamiques est explicitement desactivee sous CSP stricte; le schema statique reste actif sans erreurs console.
+- Garde-fou: `audit_ux_clarity.py`, `audit_capture_bugs.js` et 8 tests Playwright ciblant score/modal/bugs captures passent.
+- Cache/footer bumpes v35.409; `app.js` hash `45473842`.
