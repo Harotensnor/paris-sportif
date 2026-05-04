@@ -440,7 +440,11 @@ def _extract_match_markets(state: dict, match_id: str) -> dict:
                     })
 
         # Generic totals by sport
-        if title == 'nombre de points':
+        if sport_id in ('3', '6') and 'nombre de points' in title and ('mi-temps' in title or '1ère mt' in title or '1ere mt' in title):
+            _add_ou_rows(markets, 'basket_first_half_total', bet.get('betTypeName') or '', oitems)
+        elif sport_id in ('3', '6') and 'nombre de points' in title and ('quart' in title or 'qt' in title):
+            _add_ou_rows(markets, 'basket_quarter_total', bet.get('betTypeName') or '', oitems)
+        elif title == 'nombre de points':
             _add_ou_rows(markets, 'basket_total', bet.get('betTypeName') or '', oitems)
         elif title.startswith('nombre de points de '):
             _add_ou_rows(markets, 'basket_team_total', bet.get('betTypeName') or '', oitems)
@@ -455,6 +459,8 @@ def _extract_match_markets(state: dict, match_id: str) -> dict:
             )
         elif 'écart de points' in title and 'handicap' in title:
             _add_handicap_rows(markets, 'basket_handicap', bet.get('betTypeName') or '', oitems, home_name, away_name)
+        elif 'nombre de runs' in title and ('5 premières' in title or '5 premieres' in title or 'f5' in title):
+            _add_ou_rows(markets, 'baseball_f5_total', bet.get('betTypeName') or '', oitems)
         elif title == 'nombre de runs':
             _add_ou_rows(markets, 'baseball_total', bet.get('betTypeName') or '', oitems)
         elif 'écart de runs' in title and 'handicap' in title:
