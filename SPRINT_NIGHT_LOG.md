@@ -2296,3 +2296,9 @@
 - UX: tags trader reformules en francais naturel, score opportunite documente avec legende/couleurs, doublons meme match marques, xG affiche les noms equipes et les raisons s'alignent mieux avec le pari.
 - Impact mesure: smoke Chrome local 360 lignes visibles, 50 clics controles, 0 mismatch ligne/modal, 0 erreur console apres refresh CSP.
 - Verif: `node --check app.js`, `node --check sw.js`, `check_no_conflict_markers.py`, CSP hashes + assets + cache/footer bumpes v35.353.
+
+## Sprint v35.354 — AUTO 10/10 H2H grands matchs (18:31 UTC)
+- Avant: plusieurs matchs majeurs top ligues avaient lineups/injuries/referee mais pas de H2H exploitable; `fetch_h2h.py --force-priority` ne forcait que MLS/Liga MX/Argentine/Bundesliga.
+- Fix: elargissement des ligues H2H prioritaires aux top ligues visibles par Theo (ENG/ESP/ITA/FRA/GER/POR/NED/BEL/SCO/AUT + LATAM/MLS) puis refresh cible ESPN.
+- Impact mesure: fetch H2H 28 matchs verifies, 24 enrichis; H2H night_metrics 168 -> 177; Roma-Fiorentina, Lazio-Cremonese, Real Sociedad-Sevilla et Man City-Everton passent a 7/7 sources.
+- Verif: measure_night_metrics/build_signal_gap_report/build_health/finalize_inline OK; cache/footer bumpes v35.354.
