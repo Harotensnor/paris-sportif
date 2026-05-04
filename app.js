@@ -2558,6 +2558,26 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
       const obj = key ? raw[key] : null;
       return obj ? (side === 'over' ? obj.over : obj.under) : null;
     }
+    if (market === 'football_corners') {
+      const lamH = Number(pred.poisson?.xgH);
+      const lamA = Number(pred.poisson?.xgA);
+      const xgTotal = (isFinite(lamH) ? lamH : 1.25) + (isFinite(lamA) ? lamA : 1.15);
+      const expected = 9.1 + Math.max(-1.8, Math.min(2.4, (xgTotal - 2.55) * 1.15));
+      const pOver = 1 / (1 + Math.exp((Number(line) - expected) / 1.45));
+      return side === 'over' ? pOver : 1 - pOver;
+    }
+    if (market === 'football_cards') {
+      const ref = pred.referee || {};
+      const weather = pred.weather || {};
+      let expected = Number(ref.yellowPerGame);
+      if (!isFinite(expected) || expected <= 0) expected = 4.0;
+      if (ref.tier === 'strict') expected += 0.25;
+      if (ref.tier === 'lenient') expected -= 0.20;
+      if (Number(weather.wind) > 30 || Number(weather.precip) > 3) expected += 0.15;
+      expected = Math.max(2.6, Math.min(6.3, expected));
+      const pOver = 1 / (1 + Math.exp((Number(line) - expected) / 1.05));
+      return side === 'over' ? pOver : 1 - pOver;
+    }
     const totals = pred.scores?.markets?.totals || pred.scores?.games?.lines || [];
     const row = totals.find(t => Math.abs(Number(t.line) - Number(line)) < 0.11);
     if (!row) return null;
@@ -2684,6 +2704,8 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     if (m === 'btts') return 'BTTS : Both Teams To Score, les deux équipes doivent marquer.';
     if (m === 'doubleChance') return 'Double chance : deux résultats sur trois couvrent le pari.';
     if (m === 'teamTotal') return 'Total équipe : seul le nombre de buts/points de cette équipe compte.';
+    if (m === 'cornersTotal') return 'Corners : pari sur le nombre total de corners du match.';
+    if (m === 'cardsTotal') return 'Cartons jaunes : pari sur le nombre total de cartons jaunes du match.';
     if (m === 'exactScore') return 'Score exact : le score final doit être exactement celui annoncé.';
     if (m === 'ht_1n2') return 'Mi-temps : seul le score à la pause compte.';
     if (typeof isHandicapMarket === 'function' && isHandicapMarket(m)) return 'Handicap : la ligne est ajoutée au score de l’équipe avant règlement.';
@@ -2697,6 +2719,8 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     if (m === 'btts') return 'Deux équipes marquent';
     if (m === 'doubleChance') return 'Double chance';
     if (m === 'teamTotal') return 'Total équipe';
+    if (m === 'cornersTotal') return 'Total corners';
+    if (m === 'cardsTotal') return 'Total cartons';
     if (m === 'exactScore') return 'Score exact';
     if (m === 'ht_1n2') return 'Mi-temps';
     if (m === 'htTotal') return 'Total 1re mi-temps';
@@ -2752,6 +2776,14 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
       const base = _v37TotalLabel(match, row?.side ?? side, line, unit, '');
       full = `${base} en 1re mi-temps`;
       tooltip = `${full}. Le pari est réglé uniquement sur les buts avant la pause.`;
+    } else if (mk === 'cornersTotal') {
+      const over = String(row?.side ?? side).toLowerCase() === 'over';
+      full = `${over ? 'Plus' : 'Moins'} de ${lineTxt} corners`;
+      tooltip = `${full}. Seuls les corners officiellement comptabilisés dans le match sont pris en compte.`;
+    } else if (mk === 'cardsTotal') {
+      const over = String(row?.side ?? side).toLowerCase() === 'over';
+      full = `${over ? 'Plus' : 'Moins'} de ${lineTxt} cartons jaunes`;
+      tooltip = `${full}. Les cartons jaunes du match sont comptés; les rouges directs peuvent dépendre du règlement Winamax.`;
     } else if (mk === 'exactScore') {
       full = `Score exact ${String(key || row?.score || label || '').replace(/^Score exact\s*/i, '')}`;
       tooltip = 'Score exact : le score final doit correspondre exactement.';
@@ -2889,6 +2921,36 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
         const prob = _v35ModelTotalProb(pred, 'football_ht_ou', line, side);
         const odd = Number(block[side]);
         _v35AddCandidate(out, { odd, side, line, label: `${side === 'over' ? 'Plus' : 'Moins'} de ${line}` }, prob, 'htTotal', `HT_${side === 'over' ? 'O' : 'U'}${line}`, `${side === 'over' ? 'Plus' : 'Moins'} de ${line} but(s) en 1re mi-temps`);
+      });
+    });
+    for (const row of _v35Rows(wxMk.corners_ou)) {
+      if (match.sport && match.sport !== 'football') continue;
+      const prob = _v35ModelTotalProb(pred, 'football_corners', row.line, row.side) ?? _v35NoVigProb(row, wxMk.corners_ou);
+      const key = `CORN_${row.side === 'over' ? 'O' : 'U'}${row.line}`;
+      _v35AddCandidate(out, row, prob, 'cornersTotal', key, `${row.side === 'over' ? 'Plus' : 'Moins'} de ${row.line} corners`);
+    }
+    [['corners_ou75', 7.5], ['corners_ou85', 8.5], ['corners_ou95', 9.5], ['corners_ou105', 10.5], ['corners_ou115', 11.5]].forEach(([mk, line]) => {
+      const block = wxMk[mk];
+      if (!block || (match.sport && match.sport !== 'football')) return;
+      ['over', 'under'].forEach(side => {
+        const prob = _v35ModelTotalProb(pred, 'football_corners', line, side);
+        const odd = Number(block[side]);
+        _v35AddCandidate(out, { odd, side, line, label: `${side === 'over' ? 'Plus' : 'Moins'} de ${line}` }, prob, 'cornersTotal', `CORN_${side === 'over' ? 'O' : 'U'}${line}`, `${side === 'over' ? 'Plus' : 'Moins'} de ${line} corners`);
+      });
+    });
+    for (const row of _v35Rows(wxMk.cards_ou)) {
+      if (match.sport && match.sport !== 'football') continue;
+      const prob = _v35ModelTotalProb(pred, 'football_cards', row.line, row.side) ?? _v35NoVigProb(row, wxMk.cards_ou);
+      const key = `CARD_${row.side === 'over' ? 'O' : 'U'}${row.line}`;
+      _v35AddCandidate(out, row, prob, 'cardsTotal', key, `${row.side === 'over' ? 'Plus' : 'Moins'} de ${row.line} cartons jaunes`);
+    }
+    [['cards_ou25', 2.5], ['cards_ou35', 3.5], ['cards_ou45', 4.5], ['cards_ou55', 5.5]].forEach(([mk, line]) => {
+      const block = wxMk[mk];
+      if (!block || (match.sport && match.sport !== 'football')) return;
+      ['over', 'under'].forEach(side => {
+        const prob = _v35ModelTotalProb(pred, 'football_cards', line, side);
+        const odd = Number(block[side]);
+        _v35AddCandidate(out, { odd, side, line, label: `${side === 'over' ? 'Plus' : 'Moins'} de ${line}` }, prob, 'cardsTotal', `CARD_${side === 'over' ? 'O' : 'U'}${line}`, `${side === 'over' ? 'Plus' : 'Moins'} de ${line} cartons jaunes`);
       });
     });
 
@@ -11151,7 +11213,7 @@ if (!best || !best.allCandidates) return '';
 const cands = best.allCandidates;
 const contradictedCands = Array.isArray(best.contradictedCandidates) ? best.contradictedCandidates : [];
 if (cands.length < 2 && !contradictedCands.length) return '';
-const marketEmoji = { '1n2': '🏆', 'ou25': '⚽', 'ou15': '⚽', 'ou35': '⚽', 'btts': '🔄', 'doubleChance': '🎯', 'exactScore': '🎯', 'dnb': '🎯', 'teamTotal': '⚽', 'ht_1n2': '⏱️', 'htTotal': '⏱️', 'resultBtts': '🎯', 'ah': '⚖️', 'basketTotal': '🏀', 'basketHandicap': '🏀', 'hockeyTotal': '🏒', 'puckLine': '🏒', 'baseballTotal': '⚾', 'runLine': '⚾', 'tennisGames': '🎾' };
+const marketEmoji = { '1n2': '🏆', 'ou25': '⚽', 'ou15': '⚽', 'ou35': '⚽', 'btts': '🔄', 'doubleChance': '🎯', 'exactScore': '🎯', 'dnb': '🎯', 'teamTotal': '⚽', 'cornersTotal': '🚩', 'cardsTotal': '🟨', 'ht_1n2': '⏱️', 'htTotal': '⏱️', 'resultBtts': '🎯', 'ah': '⚖️', 'basketTotal': '🏀', 'basketHandicap': '🏀', 'hockeyTotal': '🏒', 'puckLine': '🏒', 'baseballTotal': '⚾', 'runLine': '⚾', 'tennisGames': '🎾' };
 const evMin = (typeof window.advFilters !== 'undefined' && window.advFilters.evMin) || 0;
 const valueOnly = (typeof window.advFilters !== 'undefined' && window.advFilters.valueOnly) || false;
 const rows = cands.map((c, i) => {
@@ -11204,7 +11266,7 @@ i
 });
 const visibleRows = rows.filter(r => !isBlockedHandicapMarket(r.c));
 const handicapRows = rows.filter(r => isBlockedHandicapMarket(r.c));
-const footExtMarkets = new Set(['ht_1n2','htTotal','exactScore','teamTotal','resultBtts','ou15','ou35','btts','doubleChance','dnb']);
+const footExtMarkets = new Set(['ht_1n2','htTotal','exactScore','teamTotal','cornersTotal','cardsTotal','resultBtts','ou15','ou35','btts','doubleChance','dnb']);
 const footExtendedRows = match.sport === 'football'
 ? visibleRows.filter(r => footExtMarkets.has(r.c.market) && !r.c.lowOddBlocked).slice(0, 6)
 : [];
@@ -24777,6 +24839,8 @@ btts: 'BTTS',
 doubleChance: 'Double chance',
 dnb: 'DNB',
 teamTotal: 'Team total',
+cornersTotal: 'Corners',
+cardsTotal: 'Cartons',
 exactScore: 'Score exact',
 resultBtts: 'Résultat + BTTS',
 handicap: 'Handicap foot',
@@ -24788,6 +24852,7 @@ hockeyTotal: 'Total hockey',
 puckLine: 'Puck line',
 tennisGames: 'Jeux tennis',
 ht_1n2: 'Mi-temps',
+htTotal: 'Total MT',
 }[market] || market || 'Marché');
 
 const histPickFamily = (p) => {
@@ -24945,7 +25010,7 @@ const wrChartHtml = renderWrChart(wrPts, 7);
 const filterChipsHtml = (group, current, options) => options.map(o => `
       <button class="hist-chip ${current === o.v ? 'active' : ''}" data-fgroup="${group}" data-fval="${esc(o.v)}">${esc(o.label)}${o.hint ? `<span style="opacity:.6;margin-left:4px;font-size:10.5px;">${esc(o.hint)}</span>` : ''}</button>
     `).join('');
-const marketOrder = ['1n2','ou25','ou15','ou35','btts','doubleChance','dnb','teamTotal','handicap','basketTotal','basketHandicap','baseballTotal','runLine','hockeyTotal','puckLine','tennisGames','exactScore','resultBtts','ht_1n2','htTotal'];
+const marketOrder = ['1n2','ou25','ou15','ou35','btts','doubleChance','dnb','teamTotal','cornersTotal','cardsTotal','handicap','basketTotal','basketHandicap','baseballTotal','runLine','hockeyTotal','puckLine','tennisGames','exactScore','resultBtts','ht_1n2','htTotal'];
 const presentMarkets = [...new Set(picks.map(p => p.market || '1n2'))];
 const orderedMarkets = marketOrder.filter(mk => presentMarkets.includes(mk))
 .concat(presentMarkets.filter(mk => !marketOrder.includes(mk)).sort());
