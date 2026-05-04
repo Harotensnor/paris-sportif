@@ -2162,3 +2162,8 @@
 - Apres: le patch rapide colle les blessures par cle `league_code:team_id` sur baseball, basket et hockey, avec known/count/severe/source au niveau equipe et event.
 - Impact mesure a blanc cumule: blessures visibles 0 -> 192 events total, dont 164 upcoming (football 114, baseball 40, hockey 15, basket 23).
 - Verif: dry-run in-memory OK; py_compile a suivre dans garde-fous; footer/cache bumpes v35.330.
+## Sprint v35.331 — AUTO 10/10 Intelligence betting sidecars (16:33 UTC)
+- Avant: les biais ligue, angles rares et conseils de timing etaient disperses ou implicites, donc impossibles a exposer proprement dans le site.
+- Apres: `build_betting_intelligence.py` genere `league_inefficiencies.json`, `detected_angles.json`, `rare_signals.json` et `timing_edges.json`; le cron les publie et `health.json` les compte.
+- Impact mesure local: 34 ligues profilees, 151 angles detectes, 27 signaux rares, 290 conseils timing dont 7 attentes lineups et 3 cotes qui raccourcissent.
+- Verif: py_compile/build_betting_intelligence/build_health OK; footer/cache bumpes v35.331; checks JS complets avant push.
