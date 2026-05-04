@@ -2147,3 +2147,8 @@
 - Apres: le fallback utilise `_copyToClipboard` (textarea + execCommand) et remonte un toast propre en succes/echec, sans dialogue natif bloquant.
 - Impact: garde-fou produit respecte: aucune interaction de partage ne sort du design system, et le lien reste copiable sur navigateurs non securises/anciens.
 - Verif: app.js/sw.js syntax OK, grep prompt/confirm actifs => 0 hors commentaires/PWA install prompt, CSP hash recalcule; smoke navigateur a suivre avant push.
+## Sprint v35.328 — AUTO 10/10 No native alert fallback (16:10 UTC)
+- Avant: trois `alert()` natifs restaient sur export CSV et details stockage local, donc l'UX pouvait encore sortir du design system.
+- Apres: les cas utilisent `toast()` avec tons warn/info, sans dialogue navigateur bloquant.
+- Impact: parcours export/consentement plus propre et plus testable, aucun prompt/confirm/alert actif hors prompt PWA officiel.
+- Verif: app hash e997f15f, CSP hash recalcule, cache/footer bumpes; syntax + smoke navigateur a suivre avant push.
