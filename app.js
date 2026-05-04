@@ -15392,6 +15392,34 @@
       ];
       const v36TierById = Object.fromEntries(v36TierDefs.map(t => [t.id, t]));
       const v36TierRank = { safe: 1, solid: 2, value: 3, big: 4, out: 5 };
+      const v37IntelState = (() => {
+        const key = '__v37BettingIntelState';
+        const state = window[key] || (window[key] = { loaded: false, loading: false, data: null });
+        if (!state.loaded && !state.loading) {
+          state.loading = true;
+          const bucket = Math.floor(Date.now() / (5 * 60 * 1000));
+          const read = (name) => fetch(`${name}.json?v=${bucket}`, { cache: 'default' })
+            .then(r => r.ok ? r.json() : null)
+            .catch(() => null);
+          Promise.all([
+            read('league_inefficiencies'),
+            read('detected_angles'),
+            read('rare_signals'),
+            read('timing_edges'),
+          ]).then(([league, angles, rare, timing]) => {
+            state.data = { league, angles, rare, timing };
+            state.loaded = true;
+          }).catch(() => {
+            state.data = { league: null, angles: null, rare: null, timing: null };
+            state.loaded = true;
+          }).finally(() => {
+            state.loading = false;
+            if (wrap && document.body.contains(wrap) && currentPage === 'dashboard') renderDashboardPage(wrap);
+          });
+        }
+        return state;
+      })();
+      const v37Intel = v37IntelState.data || {};
       const v36HourBucket = (date) => {
         const h = new Date(date || 0).getHours();
         if (h >= 6 && h < 12) return 'morning';
@@ -15794,6 +15822,77 @@
         ['Data', `${_dataAgeMin}m`],
         ['Live', String(todayAllWinamax.filter(m => m.live || m.status === 'STATUS_IN_PROGRESS').length)]
       ].map(([k, v]) => `<div><span>${esc(k)}</span><b>${esc(v)}</b></div>`).join('');
+      const v37InsightRow = ({ kicker, title, body, eventId, tone }) => {
+        const tag = eventId ? 'button' : 'div';
+        const typeAttr = eventId ? ' type="button"' : '';
+        const detail = eventId ? ` data-big-detail="${esc(String(eventId))}"` : '';
+        return `<${tag}${typeAttr} class="v36-side-row v37-insight-row" data-tone="${esc(tone || 'info')}"${detail}>
+          <span>${esc(kicker || 'Insight')}</span>
+          <strong>${esc(title || 'Signal modèle')}</strong>
+          <em>${esc(body || '')}</em>
+        </${tag}>`;
+      };
+      const v37LeagueRows = (Array.isArray(v37Intel.league?.leagues) ? v37Intel.league.leagues : [])
+        .filter(l => l && (l.status === 'exploit' || l.status === 'avoid') && Number(l.current_upcoming || 0) > 0)
+        .sort((a, b) => (Number(b.current_upcoming || 0) - Number(a.current_upcoming || 0)) || (Number(b.inefficiency_score || 0) - Number(a.inefficiency_score || 0)))
+        .slice(0, 4)
+        .map(l => v37InsightRow({
+          kicker: l.status === 'exploit' ? 'Biais exploitable' : 'Zone froide',
+          title: `${l.league_code || 'ligue'} · ${l.status === 'exploit' ? 'marché favorable' : 'prudence'}`,
+          body: `ROI ${Number(l.flat_roi_pct || 0).toFixed(1)}% · n=${Number(l.n || 0)} · ${Number(l.current_upcoming || 0)} matchs`,
+          tone: l.status === 'exploit' ? 'good' : 'warn',
+        }))
+        .join('');
+      const v37RareRows = (Array.isArray(v37Intel.rare?.signals) ? v37Intel.rare.signals : [])
+        .slice()
+        .sort((a, b) => new Date(a.date || 0).getTime() - new Date(b.date || 0).getTime())
+        .slice(0, 4)
+        .map(s => v37InsightRow({
+          kicker: s.signal?.type === 'market_move' ? 'Smart money' : 'Signal rare',
+          title: `${s.home || '?'} - ${s.away || '?'}`,
+          body: s.signal?.context || `${s.league_name || s.league_code || ''}`,
+          eventId: s.event_id,
+          tone: 'hot',
+        }))
+        .join('');
+      const v37AngleRows = (Array.isArray(v37Intel.angles?.events) ? v37Intel.angles.events : [])
+        .filter(e => Array.isArray(e.angles) && e.angles.length)
+        .sort((a, b) => new Date(a.date || 0).getTime() - new Date(b.date || 0).getTime())
+        .slice(0, 3)
+        .map(e => {
+          const a = e.angles[0] || {};
+          return v37InsightRow({
+            kicker: a.type === 'lookahead' ? 'Lookahead' : a.type === 'schedule_congestion' ? 'Fatigue' : 'Angle',
+            title: `${e.home || '?'} - ${e.away || '?'}`,
+            body: `${a.team || 'Match'} · ${a.context || e.league_name || ''}`,
+            eventId: e.event_id,
+            tone: a.direction === 'fade' ? 'warn' : 'info',
+          });
+        })
+        .join('');
+      const v37TimingRows = (Array.isArray(v37Intel.timing?.events) ? v37Intel.timing.events : [])
+        .filter(e => e && e.advice && e.advice !== 'bet_now_if_selected')
+        .sort((a, b) => new Date(a.date || 0).getTime() - new Date(b.date || 0).getTime())
+        .slice(0, 4)
+        .map(e => {
+          const advice = e.advice === 'wait_lineups' ? 'Attendre compos'
+            : e.advice === 'price_shortening' ? 'Cote raccourcit'
+            : e.advice === 'recheck_close_to_kickoff' ? 'Recheck kickoff'
+            : 'Timing';
+          const move = e.best_move && e.best_move.side ? ` · ${e.best_move.side} ${Number(e.best_move.from || 0).toFixed(2)}→${Number(e.best_move.to || 0).toFixed(2)}` : '';
+          return v37InsightRow({
+            kicker: advice,
+            title: `${e.home || '?'} - ${e.away || '?'}`,
+            body: `${Math.round(Number(e.minutes_to_kickoff || 0))} min kickoff${move}`,
+            eventId: e.event_id,
+            tone: e.advice === 'wait_lineups' ? 'warn' : 'good',
+          });
+        })
+        .join('');
+      const v37IntelCount = Number(v37Intel.angles?.summary?.angles || 0) + Number(v37Intel.rare?.summary?.signals || 0);
+      const v37IntelFallback = v37IntelState.loading
+        ? '<div class="v36-tier-empty">Chargement des insights modèle…</div>'
+        : '<div class="v36-tier-empty">Insights modèle indisponibles pour ce snapshot.</div>';
       wrap.innerHTML = `
         <div class="v36-home-shell">
           <section class="v36-dayline" aria-label="Strategie du jour">
@@ -15821,9 +15920,10 @@
           <div class="v36-home-grid">
             ${v36TableHtml}
             <aside class="v36-home-rail" aria-label="Radar temps reel">
-              <section><header><span>Prochains matchs</span><b>${v36Next.length}</b></header>${v36NextHtml}</section>
+              <section><header><span>Insights modèle</span><b>${v37IntelCount || '...'}</b></header>${v37RareRows || v37AngleRows || v37IntelFallback}</section>
+              <section><header><span>Biais marché ligues</span><b>${Number(v37Intel.league?.summary?.exploit || 0)}</b></header>${v37LeagueRows || v37IntelFallback}</section>
+              <section><header><span>Timing mise</span><b>${Number(v37Intel.timing?.summary?.wait || 0)}</b></header>${v37TimingRows || `<div class="v36-tier-empty">Aucune attente forcée : les picks restent jouables selon ton filtre.</div>`}</section>
               <section><header><span>Stats live</span><b>${v36Total}</b></header><div class="v36-side-stats">${v36StatsHtml}</div></section>
-              <section><header><span>Genie mode</span><b>${v36PickPool.length}</b></header><p>Le site classe uniquement des picks +EV, sans doublon de match, par cote, confiance, edge et cohérence marché.</p></section>
             </aside>
           </div>
           ${v36GeniusSection}
