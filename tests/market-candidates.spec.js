@@ -6,7 +6,8 @@ test.describe('v35 market scanner', () => {
     await page.waitForFunction(
       () => window.__testAPI
         && typeof window.__testAPI.buildMarketCandidates === 'function'
-        && typeof window.__testAPI.scoreMarketCandidate === 'function',
+        && typeof window.__testAPI.scoreMarketCandidate === 'function'
+        && typeof window.__testAPI.formatWinamaxPickLabel === 'function',
       undefined,
       { timeout: 15000 }
     );
@@ -67,6 +68,9 @@ test.describe('v35 market scanner', () => {
         ev: c.ev,
         edge: c.edge,
         label: c.label,
+        shortLabel: c.shortLabel,
+        marketTooltip: c.marketTooltip,
+        marketName: c.marketName,
         semanticGroup: c.semanticGroup,
       }));
     });
@@ -76,9 +80,51 @@ test.describe('v35 market scanner', () => {
     expect(candidates.map(c => c.market)).toEqual(expect.arrayContaining(['1n2', 'ou25', 'btts', 'dnb', 'teamTotal']));
     expect(candidates.find(c => c.market === 'ou25' && c.key === 'O2.5').ev).toBeGreaterThan(0);
     const teamTotal = candidates.find(c => c.market === 'teamTotal');
-    expect(teamTotal.label).toContain('Total buts Freiburg');
-    expect(teamTotal.label).toContain('équipe seulement');
+    expect(teamTotal.label).toBe('Freiburg marque au moins 1 but');
+    expect(teamTotal.shortLabel).toBe('Freiburg marque au moins 1 but');
+    expect(teamTotal.marketTooltip).toContain('seuls les buts de Freiburg comptent');
+    expect(teamTotal.marketName).toBe('Total équipe');
     expect(teamTotal.semanticGroup).toBe('team_total_goals');
+    expect(candidates.find(c => c.market === '1n2' && c.key === '1').label).toBe('Freiburg (victoire domicile)');
+    expect(candidates.find(c => c.market === 'dnb').label).toBe('Freiburg (nul remboursé)');
+    expect(candidates.find(c => c.market === 'btts' && c.key === 'BTTS_Y').label).toBe('Les deux équipes marquent (oui)');
+    expect(candidates.map(c => c.label).join(' | ')).not.toMatch(/\bDNB\s+[12]\b|BTTS Oui|équipe seulement|^1 ·|^2 ·/);
+  });
+
+  test('formats rare markets in beginner-safe Winamax-style French', async ({ page }) => {
+    const labels = await page.evaluate(() => {
+      const api = window.__testAPI;
+      const match = {
+        sport: 'football',
+        competitors: [
+          { homeAway: 'home', name: 'Almería' },
+          { homeAway: 'away', name: 'AS Roma' },
+        ],
+      };
+      const fmt = (market, key, label, row, extra) => api.formatWinamaxPickLabel(match, market, key, label, row, extra);
+      return {
+        homeMinus05: fmt('handicap', 'home:-0.5', 'Almeria -0.5', { side: 'home', line: -0.5, odd: 1.80 }, {}).label,
+        awayMinus1: fmt('handicap', 'away:-1', 'AS Rome -1', { side: 'away', line: -1, odd: 2.20 }, {}).label,
+        dnbAway: fmt('dnb', 'DNB_2', 'DNB 2', { side: 'away', odd: 1.65 }, {}).label,
+        dc12: fmt('doubleChance', '12', 'Double chance 12', { side: '12', odd: 1.40 }, {}).label,
+        htX: fmt('ht_1n2', 'HT_X', 'Mi-temps X', { side: 'draw', odd: 2.05 }, {}).label,
+        bttsNo: fmt('btts', 'BTTS_N', 'BTTS Non', { side: 'no', odd: 1.92 }, {}).label,
+        awayUnder05: fmt('teamTotal', 'away:U0.5', 'Total buts AS Rome — moins de 0,5', { team: 'away', side: 'under', line: 0.5, odd: 3.20 }, {}).label,
+        dnbTooltip: fmt('dnb', 'DNB_1', 'DNB 1', { side: 'home', odd: 1.55 }, {}).tooltip,
+        handicapTooltip: fmt('handicap', 'away:-1', 'AS Rome -1', { side: 'away', line: -1, odd: 2.20 }, {}).tooltip,
+      };
+    });
+
+    expect(labels.homeMinus05).toBe('Almería gagne (handicap -0,5)');
+    expect(labels.awayMinus1).toBe("AS Roma gagne par 2+ buts d'écart");
+    expect(labels.dnbAway).toBe('AS Roma (nul remboursé)');
+    expect(labels.dc12).toBe('Domicile ou Extérieur (pas de nul)');
+    expect(labels.htX).toBe('Match nul à la mi-temps');
+    expect(labels.bttsNo).toBe('Au moins une équipe ne marque pas');
+    expect(labels.awayUnder05).toBe('AS Roma ne marque pas (0 but)');
+    expect(labels.dnbTooltip).toContain('mise remboursée');
+    expect(labels.handicapTooltip).toContain('gagner avec 2+ buts');
+    expect(Object.values(labels).join(' | ')).not.toMatch(/\bDNB\s+[12]\b|BTTS (Oui|Non)|Mi-temps [12X]|Total buts .*équipe seulement/);
   });
 
   test('does not invent an actionable market without Winamax odds', async ({ page }) => {
