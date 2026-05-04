@@ -1,11 +1,13 @@
 {
   "source": "referees_soccer.json",
   "available_referee_events": 105,
-  "soccer_events_scanned": 152,
-  "patched": 29,
-  "matched_exact": 20,
-  "matched_alias": 9,
+  "soccer_events_scanned": 141,
+  "patched": 20,
+  "matched_exact": 13,
+  "matched_alias": 7,
   "matched_fuzzy": 0,
+  "context_patched": 105,
+  "league_priors": 14,
   "missing_samples": [
     {
       "league_code": "esp.1",
@@ -43,13 +45,6 @@
       "canonical_key": "espanyol|realmadrid"
     },
     {
-      "league_code": "sco.1",
-      "home": "Heart of Midlothian",
-      "away": "Rangers",
-      "key": "heartofmidlothian|rangers",
-      "canonical_key": "heartofmidlothian|rangers"
-    },
-    {
       "league_code": "uefa.europa",
       "home": "Aston Villa",
       "away": "Nottingham Forest",
@@ -83,6 +78,13 @@
       "away": "Arminia Bielefeld",
       "key": "kaiserslautern|arminiabielefeld",
       "canonical_key": "kaiserslautern|arminiabielefeld"
+    },
+    {
+      "league_code": "ger.1",
+      "home": "Borussia Dortmund",
+      "away": "Eintracht Frankfurt",
+      "key": "borussiadortmund|eintrachtfrankfurt",
+      "canonical_key": "borussiadortmund|eintrachtfrankfurt"
     },
     {
       "league_code": "esp.2",
@@ -134,13 +136,6 @@
       "canonical_key": "virtusentella|carrarese"
     },
     {
-      "league_code": "ger.1",
-      "home": "Borussia Dortmund",
-      "away": "Eintracht Frankfurt",
-      "key": "borussiadortmund|eintrachtfrankfurt",
-      "canonical_key": "borussiadortmund|eintrachtfrankfurt"
-    },
-    {
       "league_code": "fra.1",
       "home": "Lens",
       "away": "Nantes",
@@ -181,6 +176,13 @@
       "away": "Chelsea",
       "key": "liverpool|chelsea",
       "canonical_key": "liverpool|chelsea"
+    },
+    {
+      "league_code": "esp.1",
+      "home": "Elche",
+      "away": "Alavés",
+      "key": "elche|alaves",
+      "canonical_key": "elche|deportivoalaves"
     }
   ]
 }

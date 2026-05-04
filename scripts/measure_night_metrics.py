@@ -173,6 +173,8 @@ def main() -> int:
             "weather": sum(1 for ev in events if ev.get("weather")),
             "injuries": sum(1 for ev in events if ev.get("injuries")),
             "referee": sum(1 for ev in events if ev.get("referee")),
+            "referee_context": sum(1 for ev in events if ev.get("referee_context")),
+            "referee_signal": sum(1 for ev in events if ev.get("referee") or ev.get("referee_context")),
             "fd_calibration": sum(1 for ev in events if ev.get("fd_calibration")),
             "fd_closing_odds": sum(1 for ev in events if ev.get("fd_closing_odds")),
             "xg": sum(1 for ev in events if _has_xg(ev)),

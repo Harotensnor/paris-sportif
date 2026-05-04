@@ -2,12 +2,6 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
-## Sprint v35.338 — AUTO 10/10 Profil Theo dans le score (17:18 UTC)
-- Avant: l'analyse des paris trackes existait dans Profil, mais la table dense ignorait encore les forces/faiblesses personnelles de Theo.
-- Apres: le score opportunite applique un bonus/malus sport, ligue et tranche de cote selon `computeCoachInsights()`; le rail ajoute un bloc "Profil Theo" avec les patterns locaux.
-- Impact: deux picks mathematiquement proches peuvent maintenant etre departages par ce que Theo reussit vraiment a jouer, sans envoyer ces donnees hors navigateur.
-- Verif: app.js hash `0640df98`, cache/footer bumpes v35.338.
-
 ## Sprint v35.339 — AUTO 10/10 Data gaps dans le score (17:29 UTC)
 - Avant: les gaps lineups/referee/H2H/xG etaient visibles dans le rail, mais le tri Score pouvait encore placer tres haut un pick sous-informe.
 - Apres: `signal_gap_report.json` est indexe par event et le score opportunite applique une penalite proportionnelle aux signaux critiques manquants, avec badges `data gap` / `prudence`.
@@ -299,4 +293,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Refactor `backtest_by_market.py` : les biais marchés ne comptent plus que les picks avec cote Winamax/snapshot réelle.
 - `market_biases_by_league` passe de `directional_only n=51` partagé à `priced_market_sample` par marché (ex. 7-8 cotes réelles sur le sample courant), sans exploit/fade sur petit volume.
 - Audits OK : intelligence consistency, data truth après regen night_metrics, syntax app/sw, no conflict markers.
+
+## Sprint v35.388 — A3 contexte arbitral honnête
+- Fetch arbitres élargi à 7 jours : les affectations exactes publiées restent faibles (20 événements exacts sur le slate courant), donc pas de faux nom arbitre.
+- `patch_referees_soccer.py` ajoute un `referee_context` de ligue quand l'arbitre exact est absent, avec `assignmentConfirmed=false` et moyennes cartes issues des arbitres confirmés.
+- `night_metrics` distingue désormais `referee` exact (20), `referee_context` (105) et `referee_signal` (125), pour une couverture signal honnête sans masquer le manque d'affectations officielles.
 
