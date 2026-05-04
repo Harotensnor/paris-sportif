@@ -15471,9 +15471,10 @@
         const tier = v36TierById[tierId] || v36TierDefs[0];
         return `<span class="v36-tier-badge" data-tone="${esc(tier.tone)}"><b>${esc(tier.icon)}</b>${compact ? '' : `<em>${esc(tier.label)}</em>`}</span>`;
       };
+      const v36LogoFallback = (team) => (v36TeamName(team) || '?').slice(0, 1);
       const v36Logo = (team) => team?.logo
-        ? `<img src="${esc(team.logo)}" alt="" loading="lazy" decoding="async" width="16" height="16" onerror="this.outerHTML='<span>${esc((v36TeamName(team) || '?').slice(0,1))}</span>'">`
-        : `<span>${esc((v36TeamName(team) || '?').slice(0,1))}</span>`;
+        ? `<img class="v36-logo-img" src="${esc(team.logo)}" alt="" loading="lazy" decoding="async" width="16" height="16" data-fallback="${esc(v36LogoFallback(team))}">`
+        : `<span>${esc(v36LogoFallback(team))}</span>`;
       const v36MatchTitleHtml = (p) => {
         const { home, away } = getSides(p.m);
         return `<span class="v36-match-name"><i>${v36Logo(home)}</i><b>${esc(v36TeamName(home))}</b><em>-</em><i>${v36Logo(away)}</i><b>${esc(v36TeamName(away))}</b></span>`;
@@ -15793,6 +15794,16 @@
         return found;
       };
       wrap.__v37MatchById = v36MatchById;
+      if (!wrap.__v37LogoErrorDelegated) {
+        wrap.__v37LogoErrorDelegated = true;
+        wrap.addEventListener('error', (e) => {
+          const img = e.target;
+          if (!img || !img.matches || !img.matches('.v36-logo-img')) return;
+          const span = document.createElement('span');
+          span.textContent = String(img.dataset.fallback || '?').slice(0, 2);
+          img.replaceWith(span);
+        }, true);
+      }
       if (!wrap.__v37DetailDelegated) {
         wrap.__v37DetailDelegated = true;
         const openBigDetail = (trigger) => {
