@@ -10894,6 +10894,35 @@
       };
       const pickSide = whyBest?.side || (/DNB_2|^2$|away/i.test(String(whyBest?.pickKey || whyBest?.key || '')) ? 'away' : /DNB_1|^1$|home/i.test(String(whyBest?.pickKey || whyBest?.key || '')) ? 'home' : '');
       const targetTeam = whyBest?.teamName || (whyBest?.raw?.team ? teamName(whyBest.raw.team) : teamName(pickSide));
+      const market = String(whyBest?.market || '');
+      const pickText = String(whyBest?.label || whyBest?.pickKey || whyBest?.key || '').toLowerCase();
+      const sideText = String(whyBest?.side || whyBest?.pickKey || whyBest?.key || '').toLowerCase();
+      const homeXg = Number(pred?.poisson?.xgH);
+      const awayXg = Number(pred?.poisson?.xgA);
+      const totalXg = (Number.isFinite(homeXg) && Number.isFinite(awayXg)) ? homeXg + awayXg : null;
+      const lineValue = Number(whyBest?.line ?? whyBest?.raw?.line);
+      const homeName = sides.home?.short || sides.home?.name || 'Domicile';
+      const awayName = sides.away?.short || sides.away?.name || 'Extérieur';
+      if ((market === '1n2' || market === 'dnb') && targetTeam) {
+        const protection = market === 'dnb' ? ' avec le nul remboursé' : '';
+        arr.push(`${targetTeam} est bien le camp analysé${protection} : la modal explique le même pari que celui cliqué dans le tableau.`);
+      }
+      if (/^(ou|ou15|ou25|ou35|basketTotal|baseballTotal|hockeyTotal|tennisGames)$/i.test(market) && totalXg != null) {
+        const dir = /under|moins|^u/.test(sideText + pickText) ? 'moins' : 'plus';
+        const lineTxt = Number.isFinite(lineValue) ? String(lineValue).replace('.', ',') : 'la ligne';
+        arr.push(`Le total attendu du match est ${totalXg.toFixed(2)} : c'est la base directe du pari ${dir} de ${lineTxt}.`);
+      }
+      if (market === 'btts' && Number.isFinite(homeXg) && Number.isFinite(awayXg)) {
+        const yes = /yes|oui|btts_y/.test(sideText + pickText);
+        arr.push(yes
+          ? `${homeName} (${homeXg.toFixed(2)} xG) et ${awayName} (${awayXg.toFixed(2)} xG) ont chacun une projection de but exploitable.`
+          : `Le pari vise qu'au moins une équipe reste muette : ${homeName} ${homeXg.toFixed(2)} xG, ${awayName} ${awayXg.toFixed(2)} xG.`);
+      }
+      if (market === 'doubleChance') {
+        const dc = String(whyBest?.side || whyBest?.pickKey || whyBest?.key || '').toUpperCase();
+        const txt = dc === '1X' ? `${homeName} ou nul` : dc === 'X2' ? `nul ou ${awayName}` : dc === '12' ? `${homeName} ou ${awayName}, sans nul` : 'deux issues couvertes';
+        arr.push(`La double chance couvre ${txt} : la raison porte sur la protection du résultat, pas sur un pari différent.`);
+      }
       if (whyBest?.market === 'teamTotal' && pred?.poisson) {
         const teamKey = whyBest.raw?.team || whyBest.team || (pickSide || 'home');
         const lambda = teamKey === 'away' ? pred.poisson.xgA : pred.poisson.xgH;
@@ -15629,7 +15658,7 @@
         return '';
       };
       const v37HumanBadge = (badge) => ({
-        strict: 'Filtre cote strict',
+        strict: 'Sélection exigeante',
         'biais ligue +': 'Biais ligue favorable',
         'ligue froide': 'Ligue à prudence',
         'marché biaisé +': 'Marché favorable',
@@ -15654,6 +15683,32 @@
         'profil cote +': 'Ton profil cote +',
         'profil cote -': 'Ton profil cote -',
       }[String(badge || '')] || String(badge || '').replace(/\bsteam\b/gi, 'cote bouge').replace(/\bfade\b/gi, 'surévalué').trim());
+      const v37BadgeTooltip = (badge) => ({
+        'Sélection exigeante': 'Le pick passe les seuils les plus exigeants de son niveau de cote.',
+        'Biais ligue favorable': 'La ligue présente un biais historique exploitable dans ce sens.',
+        'Ligue à prudence': 'Le modèle est moins fiable sur cette ligue récemment.',
+        'Marché favorable': 'Ce type de marché est sous-coté historiquement dans cette ligue.',
+        'Cote surévaluée': 'Le marché semble trop optimiste sur le camp adverse : on le fade.',
+        'Cote bouge fort': 'La cote a bougé rapidement : signal de marché à surveiller.',
+        'Cote dérive': 'La cote se détériore : attendre ou réduire la mise.',
+        'Blessures clés': 'Une différence de blessés ou absents influence le pick.',
+        'Fatigue calendrier': 'Le calendrier récent donne un avantage ou un risque.',
+        'Match piège': 'Une équipe peut avoir la tête au match suivant ou sortir d’un gros match.',
+        'Signal rare favorable': 'Angle rare aligné avec ce pari.',
+        'Signal rare défavorable': 'Angle rare contre ce pari : prudence.',
+        'Signal rare détecté': 'Un angle inhabituel est présent sur le match.',
+        'Attendre compos': 'Les compositions peuvent changer fortement la value.',
+        'Bon timing cote': 'La cote actuelle est jugée intéressante par rapport au mouvement récent.',
+        'Données riches': 'Le match dispose de plusieurs signaux fiables.',
+        'Données manquantes': 'Certaines sources clés manquent : confiance réduite.',
+        'Prudence data': 'Signal incomplet sur une source importante.',
+        'Ton profil sport +': 'Tes paris suivis performent mieux sur ce sport.',
+        'Ton profil sport -': 'Tes paris suivis performent moins bien sur ce sport.',
+        'Ton profil ligue +': 'Tes paris suivis performent mieux sur cette ligue.',
+        'Ton profil ligue -': 'Tes paris suivis performent moins bien sur cette ligue.',
+        'Ton profil cote +': 'Ton historique est favorable sur cette plage de cote.',
+        'Ton profil cote -': 'Ton historique est défavorable sur cette plage de cote.',
+      }[String(badge || '')] || `Signal détecté : ${String(badge || 'angle')}`);
       const v37OpportunityFor = (m, tier, rel, edge, ev, odd, pick) => {
         const id = String(m?.id || '');
         const league = v37LeagueByCode.get(String(m?.league_code || '')) || null;
@@ -15991,7 +16046,7 @@
         const result = v37ResultForPick(p);
         const pickHelp = p.marketTooltip || p.marketInfo || p.labelFull || p.label;
         const marketName = p.marketName || p.market || '';
-        const intelBadges = (p.opportunityBadges || []).map(x => `<i>${esc(x)}</i>`).join('');
+        const intelBadges = (p.opportunityBadges || []).map(x => `<i data-tooltip="${esc(v37BadgeTooltip(x))}" title="${esc(v37BadgeTooltip(x))}">${esc(x)}</i>`).join('');
         const sameMatchCount = v37VisibleMatchCounts.get(v37MatchKeyForPick(p)) || 0;
         const scoreClass = p.opportunity >= 80 ? 'is-high' : p.opportunity >= 60 ? 'is-mid' : p.opportunity >= 40 ? 'is-low' : 'is-muted';
         return `<tr class="v36-table-row ${soon ? 'is-imminent' : ''} ${sameMatchCount > 1 ? 'is-same-match' : ''}" data-tone="${esc(tier.tone)}" data-big-detail="${esc(String(p.m.id || ''))}" data-pick-uid="${esc(p.pickUid || '')}" data-pick-label="${esc(p.labelFull || p.label || '')}" data-pick-odd="${esc(p.odd.toFixed(2))}" title="${esc(v36ReasonTooltip(p))}">
@@ -16018,7 +16073,7 @@
           <strong>${v36MatchTitleHtml(p)}</strong>
           <em class="v36-table-card__league">${esc(p.m.league_name || p.m.league || '')}</em>
           <span class="v36-table-card__line"><i data-tooltip="${esc(p.marketTooltip || p.labelFull || p.label)}">${esc(p.labelMobile || p.label)}</i><b>@${p.odd.toFixed(2)}</b><b>${Math.round(p.rel * 100)}%</b><b>${p.edge >= 0 ? '+' : ''}${(p.edge * 100).toFixed(1)}%</b></span>
-          <span class="v36-table-card__signals"><i>Score ${esc(String(p.opportunity || 0))}/100</i>${sameMatchCount > 1 ? `<i>+${sameMatchCount - 1} autre pick même match</i>` : ''}${(p.opportunityBadges || []).slice(0, 2).map(x => `<i>${esc(x)}</i>`).join('')}</span>
+          <span class="v36-table-card__signals"><i data-tooltip="${esc(p.opportunityTooltip || '')}">Score ${esc(String(p.opportunity || 0))}/100</i>${sameMatchCount > 1 ? `<i>+${sameMatchCount - 1} autre pick même match</i>` : ''}${(p.opportunityBadges || []).slice(0, 2).map(x => `<i data-tooltip="${esc(v37BadgeTooltip(x))}" title="${esc(v37BadgeTooltip(x))}">${esc(x)}</i>`).join('')}</span>
           ${v37HistoryMode ? `<span class="v36-table-card__signals">${v37ResultBadge(result)}</span>` : ''}
         </button>`;
       };
