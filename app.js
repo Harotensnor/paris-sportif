@@ -14056,6 +14056,24 @@ if (wrap && document.body.contains(wrap) && currentPage === 'dashboard') renderD
 return state;
 })();
 const v37Intel = v37IntelState.data || {};
+const v37ClvState = (() => {
+const key = '__v37ClvSummaryState';
+const state = window[key] || (window[key] = { loaded: false, loading: false, data: null });
+if (!state.loaded && !state.loading) {
+state.loading = true;
+const bucket = Math.floor(Date.now() / (5 * 60 * 1000));
+fetchTracked(`clv_summary.json?v=${bucket}`, { cache: 'default' }, 'page')
+.then(r => r.ok ? r.json() : null)
+.then(j => { state.data = j || null; state.loaded = true; })
+.catch(() => { state.data = null; state.loaded = true; })
+.finally(() => {
+state.loading = false;
+if (wrap && document.body.contains(wrap) && currentPage === 'dashboard') renderDashboardPage(wrap);
+});
+}
+return state;
+})();
+const v37Clv = v37ClvState.data || null;
 const v37Array = (value) => Array.isArray(value) ? value : [];
 const v37AnglesByEvent = new Map(v37Array(v37Intel.angles?.events).map(e => [String(e.event_id || ''), e]));
 const v37RareByEvent = new Map();
@@ -14877,6 +14895,60 @@ const v37SportPicksSection = v37SportPicksHtml ? `<section class="v37-sport-pick
         </header>
         <div class="v37-sport-picks__grid">${v37SportPicksHtml}</div>
       </section>` : '';
+const v37SignedPct = (value, digits = 2) => {
+const n = Number(value || 0);
+return `${n >= 0 ? '+' : ''}${n.toFixed(digits)}%`;
+};
+const v37ClvMetric = (label, value, note, tone = 'neutral') => `<div class="v37-clv-metric" data-tone="${esc(tone)}">
+          <span>${esc(label)}</span>
+          <b>${esc(value)}</b>
+          <em>${esc(note)}</em>
+        </div>`;
+const v37ClvMove = (row, kind) => {
+const pct = Number(row?.clv_pct || 0);
+const side = ({ home: 'domicile', away: 'extérieur', draw: 'nul' }[String(row?.side || '')] || String(row?.side || 'side'));
+return `<div class="v37-clv-move" data-kind="${esc(kind || 'best')}">
+          <span>${esc(kind === 'best' ? 'Marché battu' : 'Cote contre nous')}</span>
+          <strong>${esc(row?.name || 'Match')}</strong>
+          <em>${esc(side)} · ${esc(v37SignedPct(pct, 2))} · ${esc(row?.opening_odd ? '@' + Number(row.opening_odd).toFixed(2) : '@--')} → ${esc(row?.closing_odd ? '@' + Number(row.closing_odd).toFixed(2) : '@--')}</em>
+        </div>`;
+};
+const v37ClvSection = (() => {
+if (!v37Clv?.summary) {
+return `<section class="v37-clv-strip is-loading" aria-label="Closing Line Value">
+        <header><span>CLV</span><strong>Closing Line Value</strong><em>${v37ClvState.loading ? 'Chargement du suivi marché…' : 'Résumé CLV indisponible'}</em></header>
+        <p>Le CLV compare la cote prise avec la cote de clôture. Positif = on a battu le marché, même avant de connaître le résultat.</p>
+      </section>`;
+}
+const summary = v37Clv.summary || {};
+const mean = Number(summary.mean_clv_pct || 0);
+const positive = Number(summary.positive_clv_rate || 0);
+const nObs = Number(summary.n_clv_observations || summary.n || 0);
+const nMatches = Number(summary.n_matches || 0);
+const sportRows = Object.entries(v37Clv.by_sport || {})
+.sort((a, b) => Number(b[1]?.n || 0) - Number(a[1]?.n || 0))
+.slice(0, 5)
+.map(([sport, stat]) => `<span><b>${esc(sportLabel(sport))}</b> ${esc(v37SignedPct(stat?.mean_clv_pct, 2))} · ${esc(String(Number(stat?.positive_clv_rate || 0).toFixed(1)))}%+</span>`)
+.join('');
+const bestRows = (Array.isArray(v37Clv.extremes?.best) ? v37Clv.extremes.best : []).slice(0, 2).map(row => v37ClvMove(row, 'best')).join('');
+const worstRows = (Array.isArray(v37Clv.extremes?.worst) ? v37Clv.extremes.worst : []).slice(0, 1).map(row => v37ClvMove(row, 'worst')).join('');
+const meanTone = mean > 0.5 ? 'good' : mean < -0.5 ? 'bad' : 'neutral';
+return `<section class="v37-clv-strip" aria-label="Closing Line Value">
+        <header>
+          <span>CLV</span>
+          <strong>Closing Line Value</strong>
+          <em>${esc(nObs.toLocaleString('fr-FR'))} observations · ${esc(nMatches.toLocaleString('fr-FR'))} matchs suivis · positif = skill marché</em>
+        </header>
+        <div class="v37-clv-metrics">
+          ${v37ClvMetric('CLV moyen', v37SignedPct(mean, 2), 'Écart moyen vs cote de clôture', meanTone)}
+          ${v37ClvMetric('Marché battu', `${positive.toFixed(1)}%`, 'Part des lignes avec CLV positif', positive >= 45 ? 'good' : positive < 35 ? 'bad' : 'neutral')}
+          ${v37ClvMetric('Échantillon', `${nMatches.toLocaleString('fr-FR')} matchs`, `${nObs.toLocaleString('fr-FR')} lignes 1N2 observées`, 'neutral')}
+        </div>
+        <p>Le CLV valide la qualité réelle des picks : si la cote ferme plus basse que notre entrée, le modèle avait vu la value avant le marché.</p>
+        ${sportRows ? `<div class="v37-clv-sports">${sportRows}</div>` : ''}
+        ${(bestRows || worstRows) ? `<div class="v37-clv-moves">${bestRows}${worstRows}</div>` : ''}
+      </section>`;
+})();
 const v36StatsHtml = [
 ['Picks', String(v36PickPool.length)],
 ['Matchs', String(v36UpcomingAll.length)],
@@ -15031,6 +15103,7 @@ wrap.innerHTML = `
             </aside>
           </div>
           ${v37SportPicksSection}
+          ${v37ClvSection}
           ${v36GeniusSection}
           ${v36BoostSection}
         </div>`;

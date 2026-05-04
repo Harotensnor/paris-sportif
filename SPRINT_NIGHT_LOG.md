@@ -2,6 +2,11 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
+## Sprint v35.397 — C1 CLV tracking dashboard (21:57 UTC)
+- Avant: le CLV existait dans `clv_history.json`, mais l'accueil ne montrait pas clairement si les picks battaient le marche avant le resultat.
+- Apres: `compute_clv.py` produit `clv_summary.json` leger, le dashboard affiche une section Closing Line Value avec CLV moyen, taux positif, sports et mouvements extremes.
+- Impact mesure: sidecar CLV resume 445KB -> 4KB pour l'accueil; nouveau test Playwright verifie la section CLV desktop + mobile.
+- Verif: Playwright CLV+score+dashboard OK (6/6), bundle-size OK, syntax JS OK, no-conflict-markers OK; cache/footer bumpes v35.397.
 ## Sprint v35.396 — C2 score opportunite stabilite fraicheur (21:46 UTC)
 - Avant: le score 0-100 combinait edge/confiance/biais/timing, mais ne penaliseait pas explicitement un consensus instable ou une data vieillissante.
 - Apres: ajout des composantes Stabilite signal et Fraicheur data, badges associes et details dans tooltip/aria-label.
@@ -294,9 +299,4 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix: detection automatique de la racine au `data.js` le plus frais + sync de la copie legacy; les deux chemins MCP pointent maintenant vers `Paris-Sportif` et `today=2026-05-04`.
 - Ratio A2: `get_pipeline_status` expose top-level `winamax_exact_ratio` depuis `data.js` autoritaire; `night_metrics`/`health` deviennent snapshots secondaires avec statut aligned/stale.
 - Verif: appels MCP local + legacy 2x OK, ratio `0.9035`, sync `ok`, `test_mcp_smoke`, `audit_data_truth`, `audit_mcp_shadow_copy` OK; cache/footer bumpes v35.386.
-
-## Sprint v35.387 — A5 market samples réels
-- Refactor `backtest_by_market.py` : les biais marchés ne comptent plus que les picks avec cote Winamax/snapshot réelle.
-- `market_biases_by_league` passe de `directional_only n=51` partagé à `priced_market_sample` par marché (ex. 7-8 cotes réelles sur le sample courant), sans exploit/fade sur petit volume.
-- Audits OK : intelligence consistency, data truth après regen night_metrics, syntax app/sw, no conflict markers.
 

@@ -2274,3 +2274,10 @@ Archived from SPRINT_NIGHT_LOG.md on 2026-05-04 to keep the active log readable.
 - `patch_referees_soccer.py` ajoute un `referee_context` de ligue quand l'arbitre exact est absent, avec `assignmentConfirmed=false` et moyennes cartes issues des arbitres confirmés.
 - `night_metrics` distingue désormais `referee` exact (20), `referee_context` (105) et `referee_signal` (125), pour une couverture signal honnête sans masquer le manque d'affectations officielles.
 
+## Sprint v35.387 — A5 market samples réels
+- Refactor `backtest_by_market.py` : les biais marchés ne comptent plus que les picks avec cote Winamax/snapshot réelle.
+- `market_biases_by_league` passe de `directional_only n=51` partagé à `priced_market_sample` par marché (ex. 7-8 cotes réelles sur le sample courant), sans exploit/fade sur petit volume.
+- Audits OK : intelligence consistency, data truth après regen night_metrics, syntax app/sw, no conflict markers.
+
+
+
