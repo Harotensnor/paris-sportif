@@ -2,6 +2,11 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
+## Sprint v35.399 — C4 calendrier P&L personnel (22:18 UTC)
+- Avant: Performance montrait le backtest modele, mais pas les jours verts/rouges de Theo sur ses paris suivis localement.
+- Apres: ajout d'une heatmap 365 jours basee sur `paris_sportif_user_bets`, avec P&L total, ROI, jours verts et pire jour.
+- Impact mesure: chaque jour tracke devient un carre colore; test Playwright impose 365 cellules et les KPI personnels visibles.
+- Verif: Playwright heatmap+tilt+CLV OK (6/6), bundle-size OK, syntax JS OK, no-conflict-markers OK; cache/footer bumpes v35.399.
 ## Sprint v35.398 — C3 detecteur tilt personnel (22:10 UTC)
 - Avant: les series du modele existaient, mais Theo n'avait pas d'alerte personnelle quand ses pertes et mises montaient ensemble.
 - Apres: ajout du detecteur de tilt sur `paris_sportif_user_bets`, avec banniere dashboard visible desktop/mobile et rail Discipline tilt.
@@ -292,10 +297,4 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Mesure: 345 events, 304 upcoming, Winamax exact 308 (89.3%), marches detailles 715/718, xG 255, injuries 217, lineups 122, referees 29.
 - Drift: `check_pipeline_drift.py` OK, auto_refresh et refresh.yml alignes sur 64 scripts chacun.
 - Verif: metrics regen + drift check OK; cache/footer bumpes v35.384.
-
-## Sprint v35.385 — AUTO 10/10 Verite data auditee (20:34 UTC)
-- Garde-fou: ajout de `scripts/audit_data_truth.py` pour comparer `data.js`, `night_metrics.json` et `health.json` sur source de verite, `generated_at` et fraicheur.
-- Mesure: audit OK sur data.js `generated_at=2026-05-04T20:28:50Z`, today `2026-05-04`, night metrics non stale.
-- Impact: les regressions type MCP/health/night_metrics avec dates divergentes deviennent detectables localement avant push.
-- Verif: audit_data_truth + py_compile OK; cache/footer bumpes v35.385.
 
