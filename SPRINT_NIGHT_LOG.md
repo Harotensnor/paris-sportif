@@ -2434,3 +2434,9 @@
 - Modal: les raisons de pari total equipe gardent le contexte de l'adversaire et les raisons generiques xG/ELO/classement ne viennent plus brouiller le pari exact clique; handicap negatif affiche une marge entiere correcte.
 - Garde-fou: ajout de `scripts/audit_ux_clarity.py` pour verrouiller tags lisibles, score explique, pick identity, xG nommes et groupement same-match.
 - Verif: audit UX clarity + app/sw syntax + no-conflict markers lances; cache/footer bumpes v35.376.
+
+## Sprint v35.377 — AUTO 10/10 InnerHTML surveille (20:07 UTC)
+- Securite: le sink global `innerHTML` assainissait deja les templates; il trace maintenant les scripts/handlers/URLs dangereuses retires via `logSafeError`.
+- Garde-fou: ajout de `scripts/audit_innerhtml_safety.py` pour refuser toute disparition du sanitizer global et compter la surface restante.
+- Impact: les injections HTML restent compatibles avec le rendu vanilla existant, mais un payload retire devient visible dans `paris_sportif_js_errors_v1` au lieu d'etre silencieux.
+- Verif: audit innerHTML + app/sw syntax + no-conflict markers lances; cache/footer bumpes v35.377.

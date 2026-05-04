@@ -2069,9 +2069,13 @@
       if (!desc || typeof desc.set !== 'function' || typeof desc.get !== 'function') return source;
       const tpl = document.createElement('template');
       desc.set.call(tpl, source);
+      let stripped = 0;
       tpl.content
         .querySelectorAll('script, iframe, object, embed, meta[http-equiv="refresh"], link[rel="import"]')
-        .forEach(node => node.remove());
+        .forEach(node => {
+          stripped += 1;
+          node.remove();
+        });
       tpl.content.querySelectorAll('*').forEach(node => {
         Array.from(node.attributes || []).forEach(attr => {
           const rawName = String(attr.name || '');
@@ -2079,19 +2083,29 @@
           const value = String(attr.value || '');
           const compactValue = value.replace(/[\u0000-\u001f\u007f\s]+/g, '');
           if (name.startsWith('on') || name === 'srcdoc') {
+            stripped += 1;
             node.removeAttribute(rawName);
             return;
           }
           if ((name === 'href' || name === 'src' || name === 'xlink:href' || name === 'formaction' || name === 'poster')
               && /^javascript:/i.test(compactValue)) {
+            stripped += 1;
             node.removeAttribute(rawName);
             return;
           }
           if (name === 'style' && /(expression\s*\(|url\s*\(\s*['"]?\s*javascript:)/i.test(value)) {
+            stripped += 1;
             node.removeAttribute(rawName);
           }
         });
       });
+      if (stripped > 0 && typeof logSafeError === 'function') {
+        const warnCount = Number(window.__v37SanitizeWarnCount || 0);
+        window.__v37SanitizeWarnCount = warnCount + 1;
+        if (warnCount < 20) {
+          logSafeError('sanitizeTrustedHTML.stripped', new Error(`Removed ${stripped} unsafe HTML item(s)`));
+        }
+      }
       return desc.get.call(tpl);
     } catch (e) {
       return esc(source);
