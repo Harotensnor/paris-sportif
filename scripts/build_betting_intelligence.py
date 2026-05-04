@@ -389,13 +389,14 @@ def market_status(
 ) -> tuple[str, str, str]:
     """Classify a market bias without mistaking high WR for value.
 
-    The historical market report evaluates several outcomes on the same
-    completed football matches. That is useful as a directional watch signal,
-    but it is not an exploitable betting angle unless we also have enough
-    priced samples or a positive value estimate.
+    The historical market report only exposes rows with a real priced sample.
+    Tiny samples remain watch-only: they are evidence that the market exists,
+    not yet evidence that it is exploitable.
     """
     if n < 20:
-        return "watch", "sample faible", "sample_insufficient"
+        if with_odds > 0:
+            return "watch", "sample de cotes faible", "sample_insufficient"
+        return "watch", "sample faible sans cotes", "sample_insufficient"
 
     if family == "doubleChance" and pick == "12" and (avg_odd is None or avg_odd <= 1.40):
         return "low_value", "WR haut mais cote trop basse pour etre rentable", "wr_without_value"
@@ -463,8 +464,8 @@ def build_market_biases(data: dict[str, Any]) -> dict[str, Any]:
             family=family,
             pick=str(key).split(":", 1)[1] if ":" in str(key) else "",
         )
-        sample_scope = "priced_market_sample" if with_odds >= 20 else "directional_settled_match_sample"
-        confidence = "priced" if with_odds >= 20 else "directional_watch"
+        sample_scope = "priced_market_sample" if with_odds > 0 else "directional_settled_match_sample"
+        confidence = "priced" if with_odds >= 20 else "priced_watch" if with_odds > 0 else "directional_watch"
         market_rows.append({
             "market_key": key,
             "family": family,
