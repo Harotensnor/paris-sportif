@@ -2290,3 +2290,9 @@
 - Apres: si la ligue existe dans le fichier source, une equipe non listee devient un signal connu vide au lieu d'un trou faux positif.
 - Impact mesure: injuries coverage 192 -> 211 events; `patch_soccer_injuries` enrichit 133 events; priority gaps recalcules a 239 sur la data cron fraiche.
 - Verif: py_compile, patch_all_quick, measure_night_metrics, build_signal_gap_report, build_health, finalize_inline OK; cache/footer bumpes v35.348.
+
+## Sprint v35.353 — AUTO 10/10 Table/modal synchro + clarte captures (18:22 UTC)
+- Bug critique: les lignes du tableau V37 peuvent maintenant transmettre le candidat exact a la modal; le titre `Pourquoi` reste aligne sur le pari et la cote cliques.
+- UX: tags trader reformules en francais naturel, score opportunite documente avec legende/couleurs, doublons meme match marques, xG affiche les noms equipes et les raisons s'alignent mieux avec le pari.
+- Impact mesure: smoke Chrome local 360 lignes visibles, 50 clics controles, 0 mismatch ligne/modal, 0 erreur console apres refresh CSP.
+- Verif: `node --check app.js`, `node --check sw.js`, `check_no_conflict_markers.py`, CSP hashes + assets + cache/footer bumpes v35.353.

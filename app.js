@@ -3332,6 +3332,43 @@
     return best;
   }
 
+  function marketCandidateSignature(candidate) {
+    const c = candidate?.best || candidate || {};
+    const odd = Number(c.odd);
+    const line = c.line ?? c.raw?.line ?? '';
+    const side = c.side ?? c.raw?.side ?? '';
+    const team = c.team ?? c.raw?.team ?? '';
+    const key = c.pickValue ?? c.pickKey ?? c.key ?? side ?? c.label ?? '';
+    return [
+      String(c.market || ''),
+      String(key || ''),
+      String(side || ''),
+      String(team || ''),
+      line === null || line === undefined ? '' : String(line),
+      Number.isFinite(odd) ? odd.toFixed(3) : '',
+    ].join('|');
+  }
+  try { window.marketCandidateSignature = marketCandidateSignature; } catch(e){}
+
+  function hydrateSelectedMarketCandidate(match, pred, selected) {
+    const raw = selected?.best || selected?.candidate || selected?.pick || selected || null;
+    if (!raw || !(Number(raw.odd) > 1.01)) return null;
+    const candidates = (typeof buildMarketCandidates === 'function') ? buildMarketCandidates(match, pred, { requireExact: true }) : [];
+    const sig = marketCandidateSignature(raw);
+    const bySig = candidates.find(c => marketCandidateSignature(c) === sig);
+    const byLoose = bySig || candidates.find(c => {
+      const sameMarket = String(c.market || '') === String(raw.market || '');
+      const sameKey = String(c.pickValue ?? c.pickKey ?? c.key ?? c.side ?? '') === String(raw.pickValue ?? raw.pickKey ?? raw.key ?? raw.side ?? '');
+      const sameLine = String(c.line ?? c.raw?.line ?? '') === String(raw.line ?? raw.raw?.line ?? '');
+      const sameTeam = String(c.team ?? c.raw?.team ?? '') === String(raw.team ?? raw.raw?.team ?? '');
+      const sameOdd = Math.abs(Number(c.odd || 0) - Number(raw.odd || 0)) < 0.006;
+      return sameMarket && sameKey && sameLine && sameTeam && sameOdd;
+    });
+    const chosen = byLoose || ((typeof scoreMarketCandidate === 'function') ? scoreMarketCandidate({ ...raw }, match, pred) : { ...raw });
+    return chosen ? _v35AttachConsistency(chosen, candidates.length ? candidates : [chosen]) : null;
+  }
+  try { window.hydrateSelectedMarketCandidate = hydrateSelectedMarketCandidate; } catch(e){}
+
   try {
     window.validateMarketConsistency = validateMarketConsistency;
   } catch(e){}
@@ -7237,7 +7274,9 @@
     // l'info au user (% poids + n matchs source). Renforce la confiance
     // pour les pronos où la data sample est solide.
     if (poi) {
-      let xgText = `Buts attendus : ${poi.lamH.toFixed(2)} – ${poi.lamA.toFixed(2)}`;
+      const homeLabel = home?.short || home?.name || 'Domicile';
+      const awayLabel = away?.short || away?.name || 'Extérieur';
+      let xgText = `Buts attendus : ${homeLabel} ${poi.lamH.toFixed(2)} – ${awayLabel} ${poi.lamA.toFixed(2)}`;
       if (poi.fbrefBlend) {
         const wPct = Math.round(poi.fbrefBlend.weight * 100);
         xgText += ` (xG ${poi.fbrefBlend.source || 'empirique'} ${wPct}% · ${poi.fbrefBlend.minMatchesPlayed} matchs)`;
@@ -10699,9 +10738,18 @@
     return map[src] || src;
   }
 
-  function openDetail(match) {
+  function openDetail(match, detailOptions) {
     const { home, away } = getSides(match);
+    const detailOpts = detailOptions && typeof detailOptions === 'object' ? detailOptions : {};
     const pred = predictMatch(match);
+    const detailSelectedPick = (() => {
+      try {
+        const requested = detailOpts.selectedPick || detailOpts.candidate || detailOpts.pick || null;
+        return requested && pred ? hydrateSelectedMarketCandidate(match, pred, requested) : null;
+      } catch(e) {
+        return null;
+      }
+    })();
     const hasDraw = match.sport === 'football';
     if (pred && pred.isLock && match.id != null) markLockSeen(match.id);
 
@@ -10819,11 +10867,12 @@
 
     const body = document.getElementById('detail-body');
     const whyBest = (() => {
+      if (detailSelectedPick) return detailSelectedPick;
       try { return (typeof _agentBestPick === 'function') ? _agentBestPick(match, pred) : null; }
       catch(e) { return null; }
     })();
     const whyOdd = Number(whyBest?.odd || (pred?.odds && pred?.pick ? (pred.pick.key === '1' ? pred.odds.home : pred.pick.key === '2' ? pred.odds.away : pred.odds.draw) : 0) || 0);
-    const whyRel = Number(whyBest?.rel || pred?.reliability || pred?.pick?.prob || 0);
+    const whyRel = Number(whyBest?.rel ?? whyBest?.prob ?? pred?.reliability ?? pred?.pick?.prob ?? 0);
     const whyEdge = whyOdd > 1 ? whyRel - 1 / whyOdd : 0;
     const whyEv = whyRel && whyOdd ? whyRel * whyOdd - 1 : 0;
     const whyLabel = whyBest?.label || pred?.pick?.label || 'Pari conseillé';
@@ -10837,6 +10886,28 @@
     })();
     const whyReasons = (() => {
       const arr = [];
+      const sides = getSides(match);
+      const teamName = (side) => {
+        if (side === 'away' || side === '2') return sides.away?.short || sides.away?.name || 'Extérieur';
+        if (side === 'home' || side === '1') return sides.home?.short || sides.home?.name || 'Domicile';
+        return '';
+      };
+      const pickSide = whyBest?.side || (/DNB_2|^2$|away/i.test(String(whyBest?.pickKey || whyBest?.key || '')) ? 'away' : /DNB_1|^1$|home/i.test(String(whyBest?.pickKey || whyBest?.key || '')) ? 'home' : '');
+      const targetTeam = whyBest?.teamName || (whyBest?.raw?.team ? teamName(whyBest.raw.team) : teamName(pickSide));
+      if (whyBest?.market === 'teamTotal' && pred?.poisson) {
+        const teamKey = whyBest.raw?.team || whyBest.team || (pickSide || 'home');
+        const lambda = teamKey === 'away' ? pred.poisson.xgA : pred.poisson.xgH;
+        const line = Number(whyBest.line ?? whyBest.raw?.line);
+        const under = /under|moins|^u/i.test(String(whyBest.side || whyBest.pickKey || whyBest.key || whyBest.label || ''));
+        if (Number.isFinite(lambda)) {
+          arr.push(`${targetTeam || 'Cette équipe'} projette ${lambda.toFixed(2)} but attendu : raison directe du pari ${under ? 'moins' : 'plus'} de ${Number.isFinite(line) ? line.toString().replace('.', ',') : 'la ligne'} but.`);
+        }
+      }
+      if (whyBest?.market && typeof isHandicapMarket === 'function' && isHandicapMarket(whyBest.market) && targetTeam) {
+        const line = Number(whyBest.line ?? whyBest.raw?.line);
+        if (Number.isFinite(line) && line < 0) arr.push(`${targetTeam} doit gagner avec ${Math.abs(line) === 0.5 ? 'au moins 1' : Math.abs(line) + 1} but d'écart : le handicap est explicitement le pari analysé.`);
+        else if (Number.isFinite(line) && line > 0) arr.push(`${targetTeam} peut perdre de peu ou gagner : le handicap +${String(line).replace('.', ',')} protège le pari.`);
+      }
       if (whyOdd > 1 && whyRel > 0) {
         arr.push(`Le marché demande ${Math.round((1 / whyOdd) * 100)}% de réussite, notre modèle voit ${Math.round(whyRel * 100)}%.`);
       }
@@ -10845,10 +10916,19 @@
       }
       (pred?.explain?.reasons || [])
         .filter(r => r && r.text)
-        .slice(0, 3)
-        .forEach(r => arr.push(String(r.text)));
+        .slice(0, 4)
+        .forEach(r => {
+          let txt = String(r.text);
+          if (r.type === 'xg' && pred?.poisson) {
+            txt = `Buts attendus : ${home?.name || 'Domicile'} ${pred.poisson.xgH.toFixed(2)} – ${away?.name || 'Extérieur'} ${pred.poisson.xgA.toFixed(2)}.`;
+          }
+          if (r.type === 'elo' && targetTeam && whyBest?.market === 'teamTotal') {
+            txt = `${targetTeam} est jugé à travers l'écart de force du match : défense adverse et rapport de niveau expliquent le total équipe.`;
+          }
+          arr.push(txt);
+        });
       if (whyBest?.investment?.score) arr.push(`Qualité du signal : ${Math.round(whyBest.investment.score)}/100.`);
-      return arr.slice(0, 5);
+      return [...new Set(arr)].slice(0, 5);
     })();
     const whyWinamaxHref = buildWinamaxLink(match);
     const whyWinamaxCta = match?.winamax?.match_id
@@ -10966,8 +11046,8 @@
         // au lieu d'un score unique. Réponse à l'audit qui demande de séparer ces
         // dimensions pour que l'user voit ce qui pousse / freine sa mise.
         if (!pred || !pred.pick || isFinal) return '';
-        const best = (typeof selectBestMarket === 'function') ? selectBestMarket(match, pred) : null;
-        const conf = Number(pred.reliability ?? pred.pick.prob) || 0;
+        const best = detailSelectedPick || ((typeof selectBestMarket === 'function') ? selectBestMarket(match, pred) : null);
+        const conf = Number(best?.rel ?? best?.prob ?? pred.reliability ?? pred.pick.prob) || 0;
         const edge = best ? best.edge : 0;
         const kelly = best ? best.kelly : 0;
         const dq = (typeof computeDataQuality === 'function') ? computeDataQuality(match) : { score: 0, max: 4 };
@@ -12041,7 +12121,7 @@
         })();
         // Alternative markets, filtered for logical consistency.
         const alternativesHtml = (() => {
-          const best = (typeof selectBestMarket === 'function') ? selectBestMarket(match, pred) : null;
+          const best = detailSelectedPick || ((typeof selectBestMarket === 'function') ? selectBestMarket(match, pred) : null);
           if (!best || !best.allCandidates) return '';
           const cands = best.allCandidates;
           const contradictedCands = Array.isArray(best.contradictedCandidates) ? best.contradictedCandidates : [];
@@ -15548,6 +15628,32 @@
         if (/btts.*oui|deux equipes.*marquent|both.*yes/i.test(String(pick?.label || ''))) return 'over';
         return '';
       };
+      const v37HumanBadge = (badge) => ({
+        strict: 'Filtre cote strict',
+        'biais ligue +': 'Biais ligue favorable',
+        'ligue froide': 'Ligue à prudence',
+        'marché biaisé +': 'Marché favorable',
+        'marché à fade': 'Cote surévaluée',
+        'steam cote': 'Cote bouge fort',
+        'drift cote': 'Cote dérive',
+        blessures: 'Blessures clés',
+        fatigue: 'Fatigue calendrier',
+        lookahead: 'Match piège',
+        'signal rare +': 'Signal rare favorable',
+        'signal rare -': 'Signal rare défavorable',
+        'signal rare': 'Signal rare détecté',
+        'attendre compos': 'Attendre compos',
+        'timing cote': 'Bon timing cote',
+        'data riche': 'Données riches',
+        'data gap': 'Données manquantes',
+        prudence: 'Prudence data',
+        'profil sport +': 'Ton profil sport +',
+        'profil sport -': 'Ton profil sport -',
+        'profil ligue +': 'Ton profil ligue +',
+        'profil ligue -': 'Ton profil ligue -',
+        'profil cote +': 'Ton profil cote +',
+        'profil cote -': 'Ton profil cote -',
+      }[String(badge || '')] || String(badge || '').replace(/\bsteam\b/gi, 'cote bouge').replace(/\bfade\b/gi, 'surévalué').trim());
       const v37OpportunityFor = (m, tier, rel, edge, ev, odd, pick) => {
         const id = String(m?.id || '');
         const league = v37LeagueByCode.get(String(m?.league_code || '')) || null;
@@ -15625,16 +15731,18 @@
           profile.badges.slice(0, 2).forEach(b => badges.push(b));
         }
         const clean = Math.max(0, Math.min(100, Math.round(score)));
+        const friendlyBadges = badges.map(v37HumanBadge).filter(Boolean);
         const tooltip = [
-          `Score opportunite ${clean}/100`,
-          badges.length ? badges.join(' · ') : 'aucun angle special',
+          `Score d'opportunité ${clean}/100`,
+          'Combine edge, confiance, biais marché, timing, signaux rares et profil Théo',
+          friendlyBadges.length ? friendlyBadges.join(' · ') : 'aucun angle spécial',
           `edge ${(edge * 100).toFixed(1)}%`,
           marketBias ? `${marketBias.label || 'marché'} ${marketBias.pick || ''}: ${marketBias.reason || marketBias.status}` : '',
           `data ${dataBonus}/8`,
           missingSignals.length ? `manque ${missingSignals.slice(0, 4).join(', ')}` : '',
           ...(profile.notes || [])
         ].filter(Boolean).join(' · ');
-        return { score: clean, badges: badges.slice(0, 3), tooltip };
+        return { score: clean, badges: friendlyBadges.slice(0, 3), tooltip };
       };
       const v36HourBucket = (date) => {
         const h = new Date(date || 0).getHours();
@@ -15686,6 +15794,7 @@
         return ts > Date.now();
       };
       const v36TeamName = (team) => team?.short || team?.displayName || team?.name || '?';
+      const v37PickUid = (m, candidate) => `${String(m?.id || '')}|${marketCandidateSignature(candidate)}`;
       const v36TierForCandidate = (c) => {
         const odd = Number(c?.odd || 0);
         const conf = Number(c?.rel || c?.prob || 0);
@@ -15730,6 +15839,7 @@
               const intel = v37OpportunityFor(m, tier, rel, edge, ev, odd, c);
               return {
                 m, pred, best: c, tier: tier.id, strict: tier.strict, odd, rel, edge, ev,
+                pickUid: v37PickUid(m, c),
                 label: c.shortLabel || c.label || pred.pick?.label || 'Pick',
                 labelFull: c.label || pred.pick?.label || 'Pick',
                 labelMobile: c.mobileLabel || c.shortLabel || c.label || pred.pick?.label || 'Pick',
@@ -15768,6 +15878,7 @@
         }
         return out.sort((a, b) => a.ts - b.ts);
       })();
+      const v37PickByUid = new Map(v36PickPool.map(p => [p.pickUid, p]));
       const v36Sports = [...new Set(v36PickPool.map(p => p.m.sport).filter(Boolean))].slice(0, 8);
       const v36Search = String(v36Filter.q || '').trim();
       const v36Sort = ['tier','date','time','odd','conf','edge','score'].includes(v36Filter.sort) ? v36Filter.sort : 'tier';
@@ -15792,6 +15903,15 @@
         if (v36Sort === 'score') return (b.opportunity - a.opportunity) || (b.edge - a.edge) || (a.ts - b.ts);
         return (v36TierRank[a.tier] - v36TierRank[b.tier]) || (b.odd - a.odd) || (b.edge - a.edge) || (a.ts - b.ts);
       });
+      const v37MatchKeyForPick = (p) => String(p?.m?.id || `${p?.m?.date || ''}|${v36TeamName(getSides(p.m).home)}|${v36TeamName(getSides(p.m).away)}`);
+      const v37VisibleMatchCounts = (() => {
+        const counts = new Map();
+        v36Sorted.forEach(p => {
+          const key = v37MatchKeyForPick(p);
+          counts.set(key, (counts.get(key) || 0) + 1);
+        });
+        return counts;
+      })();
       const v36TableRows = v36Sorted.slice(0, 360);
       const v36UpcomingAll = terminalScanPool
         .filter(m => new Date(m?.date || 0).getTime() > Date.now() && !m.completed)
@@ -15811,7 +15931,7 @@
         const evPct = Math.round(p.ev * 1000) / 10;
         const timeLabel = fmtTime(p.m.date);
         const title = `${v36TeamName(home)} - ${v36TeamName(away)}`;
-        return `<button type="button" class="v36-pick-card" data-tone="${esc(tier.tone)}" data-big-detail="${esc(String(p.m.id || ''))}">
+        return `<button type="button" class="v36-pick-card" data-tone="${esc(tier.tone)}" data-big-detail="${esc(String(p.m.id || ''))}" data-pick-uid="${esc(p.pickUid || '')}" data-pick-label="${esc(p.labelFull || p.label || '')}" data-pick-odd="${esc(p.odd.toFixed(2))}">
           <span class="v36-pick-card__meta"><b>${esc(sportLabel(p.m.sport || ''))}</b><em>${esc(timeLabel)}</em></span>
           <strong>${esc(title)}</strong>
           <span class="v36-pick-card__bet"><b data-tooltip="${esc(p.marketTooltip || p.labelFull || p.label)}">${esc(p.labelMobile || p.label)}</b><em>@${p.odd.toFixed(2)}</em></span>
@@ -15872,17 +15992,19 @@
         const pickHelp = p.marketTooltip || p.marketInfo || p.labelFull || p.label;
         const marketName = p.marketName || p.market || '';
         const intelBadges = (p.opportunityBadges || []).map(x => `<i>${esc(x)}</i>`).join('');
-        return `<tr class="v36-table-row ${soon ? 'is-imminent' : ''}" data-tone="${esc(tier.tone)}" data-big-detail="${esc(String(p.m.id || ''))}" title="${esc(v36ReasonTooltip(p))}">
+        const sameMatchCount = v37VisibleMatchCounts.get(v37MatchKeyForPick(p)) || 0;
+        const scoreClass = p.opportunity >= 80 ? 'is-high' : p.opportunity >= 60 ? 'is-mid' : p.opportunity >= 40 ? 'is-low' : 'is-muted';
+        return `<tr class="v36-table-row ${soon ? 'is-imminent' : ''} ${sameMatchCount > 1 ? 'is-same-match' : ''}" data-tone="${esc(tier.tone)}" data-big-detail="${esc(String(p.m.id || ''))}" data-pick-uid="${esc(p.pickUid || '')}" data-pick-label="${esc(p.labelFull || p.label || '')}" data-pick-odd="${esc(p.odd.toFixed(2))}" title="${esc(v36ReasonTooltip(p))}">
           <td class="v36-cell-sport"><span>${sportIcon(p.m.sport || '')}</span><b>${esc(sportLabel(p.m.sport || '').slice(0, 9))}</b></td>
           <td class="v36-cell-date">${esc(v37DateLabel(p.m.date))}</td>
           <td>${esc(fmtTime(p.m.date))}</td>
           <td class="v36-cell-league">${esc(league)}</td>
-          <td class="v36-cell-match">${v36MatchTitleHtml(p)}</td>
+          <td class="v36-cell-match">${v36MatchTitleHtml(p)}${sameMatchCount > 1 ? `<span class="v37-match-multi">+${sameMatchCount - 1} autre pick</span>` : ''}</td>
           <td class="v36-cell-pick"><b data-tooltip="${esc(pickHelp)}">${esc(p.label)}</b>${p.marketInfo ? `<span aria-hidden="true" data-tooltip="${esc(p.marketInfo)}" style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;margin-left:6px;border-radius:50%;border:1px solid var(--border);color:var(--text-dim);font-size:10px;font-weight:800;">?</span>` : ''}<em>${esc(marketName)}</em></td>
           <td class="v36-num v36-odd">@${p.odd.toFixed(2)}</td>
           <td class="v36-num">${relPct}%</td>
           <td class="v36-num ${p.edge >= 0 ? 'is-pos' : 'is-neg'}">${p.edge >= 0 ? '+' : ''}${edgePct}%</td>
-          <td class="v36-num"><span class="v37-opportunity" data-score="${esc(String(p.opportunity || 0))}" data-tooltip="${esc(p.opportunityTooltip || '')}">${esc(String(p.opportunity || 0))}</span>${intelBadges ? `<span class="v37-intel-chips">${intelBadges}</span>` : ''}</td>
+          <td class="v36-num"><span class="v37-opportunity ${scoreClass}" data-score="${esc(String(p.opportunity || 0))}" data-tooltip="${esc(p.opportunityTooltip || '')}">${esc(String(p.opportunity || 0))}</span>${intelBadges ? `<span class="v37-intel-chips">${intelBadges}</span>` : ''}</td>
           <td>${v36TierBadge(p.tier, true)}</td>
           ${v37HistoryMode ? `<td>${v37ResultBadge(result)}</td>` : ''}
         </tr>`;
@@ -15890,12 +16012,13 @@
       const v36MobileCard = (p) => {
         const tier = v36TierById[p.tier] || v36TierDefs[0];
         const result = v37ResultForPick(p);
-        return `<button type="button" class="v36-table-card" data-tone="${esc(tier.tone)}" data-big-detail="${esc(String(p.m.id || ''))}">
+        const sameMatchCount = v37VisibleMatchCounts.get(v37MatchKeyForPick(p)) || 0;
+        return `<button type="button" class="v36-table-card ${sameMatchCount > 1 ? 'is-same-match' : ''}" data-tone="${esc(tier.tone)}" data-big-detail="${esc(String(p.m.id || ''))}" data-pick-uid="${esc(p.pickUid || '')}" data-pick-label="${esc(p.labelFull || p.label || '')}" data-pick-odd="${esc(p.odd.toFixed(2))}">
           <span class="v36-table-card__top"><b>${sportIcon(p.m.sport || '')} ${esc(v37DateLabel(p.m.date))} · ${esc(fmtTime(p.m.date))}</b>${v36TierBadge(p.tier, false)}</span>
           <strong>${v36MatchTitleHtml(p)}</strong>
           <em class="v36-table-card__league">${esc(p.m.league_name || p.m.league || '')}</em>
           <span class="v36-table-card__line"><i data-tooltip="${esc(p.marketTooltip || p.labelFull || p.label)}">${esc(p.labelMobile || p.label)}</i><b>@${p.odd.toFixed(2)}</b><b>${Math.round(p.rel * 100)}%</b><b>${p.edge >= 0 ? '+' : ''}${(p.edge * 100).toFixed(1)}%</b></span>
-          <span class="v36-table-card__signals"><i>Score ${esc(String(p.opportunity || 0))}/100</i>${(p.opportunityBadges || []).slice(0, 2).map(x => `<i>${esc(x)}</i>`).join('')}</span>
+          <span class="v36-table-card__signals"><i>Score ${esc(String(p.opportunity || 0))}/100</i>${sameMatchCount > 1 ? `<i>+${sameMatchCount - 1} autre pick même match</i>` : ''}${(p.opportunityBadges || []).slice(0, 2).map(x => `<i>${esc(x)}</i>`).join('')}</span>
           ${v37HistoryMode ? `<span class="v36-table-card__signals">${v37ResultBadge(result)}</span>` : ''}
         </button>`;
       };
@@ -15906,6 +16029,7 @@
             ${v36TierBadge(t.id, false)} <span>${esc(t.range)} · ${esc(t.desc)}</span>
           </button>`).join('')}
         </div>
+        <p class="v37-score-legend"><b>Score d'opportunité (0-100)</b> : combine edge, confiance, biais marché, timing de cote, signaux rares, qualité data et profil Théo. 80+ = priorité, 60-79 = intéressant, 40-59 = prudence.</p>
       </details>`;
       const v37DayChip = (label, value, deltaLabel) => {
         const active = v37DateFilter === value;
@@ -16264,6 +16388,7 @@
         return found;
       };
       wrap.__v37MatchById = v36MatchById;
+      wrap.__v37PickByUid = v37PickByUid;
       if (!wrap.__v37LogoErrorDelegated) {
         wrap.__v37LogoErrorDelegated = true;
         wrap.addEventListener('error', (e) => {
@@ -16279,7 +16404,11 @@
         const openBigDetail = (trigger) => {
           const lookup = wrap.__v37MatchById;
           const m = typeof lookup === 'function' ? lookup(trigger.dataset.bigDetail || trigger.dataset.matchId) : null;
-          if (m && typeof openDetail === 'function') openDetail(m);
+          const pickLookup = wrap.__v37PickByUid;
+          const rowPick = trigger.dataset.pickUid && pickLookup && typeof pickLookup.get === 'function'
+            ? pickLookup.get(trigger.dataset.pickUid)
+            : null;
+          if (m && typeof openDetail === 'function') openDetail(m, rowPick ? { selectedPick: rowPick.best || rowPick, rowPick } : undefined);
         };
         wrap.addEventListener('click', (e) => {
           const trigger = e.target.closest && e.target.closest('[data-big-detail]');
