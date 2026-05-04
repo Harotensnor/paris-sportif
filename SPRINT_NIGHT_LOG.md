@@ -2132,3 +2132,8 @@
 - Apres: images cassées passent par `handleSafeImageError` delegue, les CTA/refresh utilisent des data attributes, et le CSS/analytics se chargent sans handler HTML inline.
 - Impact: bug #36/#65 avance fortement: grep inline events sur app.js/pronostics/app.css/sw.js => 0, tout en conservant les fallbacks logos/joueurs.
 - Verif: app hash 5d8f3cc5, css hash d2c9d7f2, cache/footer bumpes; syntax/smoke navigateur a suivre avant push.
+## Sprint v35.325 — AUTO 10/10 Script CSP without unsafe-inline (15:54 UTC)
+- Avant: `script-src` autorisait encore `unsafe-inline`, ce qui neutralisait une partie du durcissement XSS malgre le retrait des handlers HTML.
+- Apres: les 7 scripts inline actuels (JSON-LD inclus) sont autorises uniquement par hashes SHA-256; `unsafe-inline` est retire de script-src.
+- Impact: bug #65 ferme cote script: une injection JS inline non hashée ne peut plus s'executer, tandis que style-src garde `unsafe-inline` provisoire pour les styles historiques.
+- Verif: smoke navigateur => 730 lignes table, 0 inline event, script-src sans unsafe-inline, fallback image OK, 0 erreur console; footer/cache bumpes.
