@@ -304,19 +304,31 @@ def build_league_inefficiencies(data: dict[str, Any]) -> dict[str, Any]:
         else:
             conf = "watch"
         ineff = round((roi / 100.0) + max(-0.08, min(0.08, 0.24 - brier)), 4)
-        if roi >= 5 and brier <= 0.245:
+        if n < 20:
+            status = "data_insufficient"
+            direction = "watch_sample"
+            reason = f"Sample insuffisant ({n} picks): ne pas conclure"
+        elif roi >= 5 and brier <= 0.245:
             status = "exploit"
             direction = "model_edge"
+            reason = f"ROI {roi:+.1f}% avec Brier {brier:.3f}"
+        elif roi <= -8 and isinstance(wr, (int, float)) and wr >= 0.52:
+            status = "avoid_low_roi"
+            direction = "bookmaker_edge_low_value"
+            reason = f"WR {wr*100:.1f}% mais ROI {roi:+.1f}%: cotes trop basses"
         elif roi <= -8 or brier >= 0.255:
-            status = "avoid"
+            status = "avoid_low_wr"
             direction = "bookmaker_edge"
+            reason = f"ROI {roi:+.1f}% ou Brier {brier:.3f} fragile"
         else:
             status = "neutral"
             direction = "monitor"
+            reason = "Pas de biais exploitable confirme"
         rows.append({
             "league_code": code,
             "status": status,
             "direction": direction,
+            "reason": reason,
             "inefficiency_score": ineff,
             "confidence": conf,
             "n": n,
@@ -327,7 +339,13 @@ def build_league_inefficiencies(data: dict[str, Any]) -> dict[str, Any]:
             "current_upcoming": current.get(code, 0),
         })
     rows.sort(key=lambda r: (
-        {"exploit": 0, "avoid": 1, "neutral": 2}.get(r["status"], 9),
+        {
+            "exploit": 0,
+            "avoid_low_roi": 1,
+            "avoid_low_wr": 1,
+            "data_insufficient": 2,
+            "neutral": 3,
+        }.get(r["status"], 9),
         -abs(r["inefficiency_score"]),
         -(r.get("current_upcoming") or 0),
     ))
@@ -338,7 +356,8 @@ def build_league_inefficiencies(data: dict[str, Any]) -> dict[str, Any]:
         "summary": {
             "leagues": len(rows),
             "exploit": sum(1 for r in rows if r["status"] == "exploit"),
-            "avoid": sum(1 for r in rows if r["status"] == "avoid"),
+            "avoid": sum(1 for r in rows if str(r["status"]).startswith("avoid")),
+            "data_insufficient": sum(1 for r in rows if r["status"] == "data_insufficient"),
             "current_exploit_events": sum(r["current_upcoming"] for r in rows if r["status"] == "exploit"),
         },
         "leagues": rows[:80],
@@ -444,6 +463,8 @@ def build_market_biases(data: dict[str, Any]) -> dict[str, Any]:
             family=family,
             pick=str(key).split(":", 1)[1] if ":" in str(key) else "",
         )
+        sample_scope = "priced_market_sample" if with_odds >= 20 else "directional_settled_match_sample"
+        confidence = "priced" if with_odds >= 20 else "directional_watch"
         market_rows.append({
             "market_key": key,
             "family": family,
@@ -451,6 +472,8 @@ def build_market_biases(data: dict[str, Any]) -> dict[str, Any]:
             "label": label,
             "status": status,
             "reason": reason,
+            "sample_scope": sample_scope,
+            "confidence": confidence,
             "n": n,
             "wins": wins,
             "losses": losses,
@@ -567,6 +590,7 @@ def build_market_biases(data: dict[str, Any]) -> dict[str, Any]:
             "market_fade": sum(1 for row in market_rows if row["status"] == "fade"),
             "market_low_value": sum(1 for row in market_rows if row["status"] == "low_value"),
             "market_priced_rows": market_priced,
+            "market_sample_scope": "priced" if market_priced else "directional_only",
             "market_sample_warning": (
                 "all_market_rows_share_same_n_without_odds"
                 if len(market_rows) > 1 and len(market_ns) == 1 and market_priced == 0

@@ -2446,3 +2446,9 @@
 - Scope: sidecars dashboard (`betting_intelligence`, cotes boostees, CLV) passent en fetch page-scope sans toucher aux refresh data critiques.
 - Garde-fou: `scripts/audit_fetch_tracking.py` verifie le wrapper, l'exposition debug et au moins 3 fetchs page-scopes.
 - Verif: audit fetch tracking + app/sw syntax + no-conflict markers lances; cache/footer bumpes v35.378.
+
+## Sprint v35.379 — AUTO 10/10 Audit coherence intelligence (20:15 UTC)
+- Credibilite: les ligues avec sample <20 ne peuvent plus sortir en `exploit`; NBA/NHL WR positif mais ROI negatif deviennent `avoid_low_roi` au lieu d'un avoid ambigu.
+- Marches: les lignes sans cotes reelles portent `sample_scope=directional_settled_match_sample` et restent en watch/low_value; `Double chance 12` reste bloque en low_value si la cote ne couvre pas le WR.
+- Garde-fou: ajout de `scripts/audit_intelligence_consistency.py` pour refuser sample clone non signale, exploit sans cotes, WR league duplique massif, conflit de signaux non abstain/mixed.
+- Verif: build_betting_intelligence + audit_intelligence_consistency + py_compile + app/sw syntax + no-conflict markers OK; cache/footer bumpes v35.379.
