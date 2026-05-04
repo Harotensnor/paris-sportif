@@ -1,70 +1,70 @@
 {
-  "generated_at": "2026-05-04T18:37:07Z",
+  "generated_at": "2026-05-04T18:47:24Z",
   "data_age_min": 0,
   "sources": {
     "winamax_catalog": {
-      "age_min": 1,
-      "tournaments": 107,
-      "matches": 743
+      "age_min": 6,
+      "tournaments": 108,
+      "matches": 751
     },
     "winamax_markets": {
       "age_min": 0,
-      "matches_with_odds": 718,
+      "matches_with_odds": 723,
       "matches_detailed": 240
     },
     "injuries_soccer": {
-      "age_min": 1,
+      "age_min": 7,
       "teams": 150,
       "players": 545
     },
     "lineups_soccer": {
-      "age_min": 1,
+      "age_min": 7,
       "events": 93
     },
     "team_stats": {
-      "age_min": 1,
+      "age_min": 7,
       "teams": 328
     },
     "clubelo": {
-      "age_min": 1,
+      "age_min": 7,
       "clubs": 630
     },
     "weather": {
-      "age_min": 0,
+      "age_min": 1,
       "events": 1091
     },
     "referees_soccer": {
-      "age_min": 1,
+      "age_min": 7,
       "events": 105
     },
     "xg_team_stats": {
-      "age_min": 1,
+      "age_min": 6,
       "teams": 112,
       "leagues": 6,
       "source": "understat"
     },
     "fbref_xg": {
-      "age_min": 1,
+      "age_min": 6,
       "teams": 112,
       "leagues": 6,
       "source": "understat_compat"
     },
     "sofascore_events": {
-      "age_min": 1,
+      "age_min": 7,
       "total": 2425
     },
     "team_form": {
-      "age_min": 1,
+      "age_min": 7,
       "teams": 793,
       "football_teams": 724
     },
     "form_stats_extended": {
-      "age_min": 1,
+      "age_min": 7,
       "teams": 793,
       "sports": 4
     },
     "h2h_extended": {
-      "age_min": 1,
+      "age_min": 6,
       "events": 192,
       "events_with_meetings": 176,
       "meetings": 669,
@@ -111,18 +111,18 @@
     },
     "lineups_multisport": {
       "age_min": 0,
-      "events": 341,
+      "events": 340,
       "with_starter_signal": 119,
-      "coverage_pct": 34.9,
+      "coverage_pct": 35.0,
       "sports": 4,
       "by_sport": {
         "football": {
-          "events": 261,
+          "events": 260,
           "with_lineups": 72,
           "confirmed": 2,
           "starters": 1584,
           "source": "sofascore",
-          "coverage_pct": 27.6
+          "coverage_pct": 27.7
         },
         "baseball": {
           "events": 42,
@@ -149,11 +149,11 @@
     },
     "xg_coverage": {
       "age_min": 0,
-      "events": 261,
+      "events": 260,
       "both_teams": 64,
-      "one_team": 24,
+      "one_team": 23,
       "without_xg": 173,
-      "both_teams_pct": 24.5,
+      "both_teams_pct": 24.6,
       "leagues": 34
     },
     "match_previews": {
@@ -189,51 +189,51 @@
     },
     "detected_angles": {
       "age_min": 0,
-      "events": 116,
-      "angles": 237,
+      "events": 120,
+      "angles": 246,
       "by_type": {
         "injury_imbalance": 87,
+        "market_move": 17,
         "strict_referee": 1,
         "lookahead": 90,
         "travel_extreme": 13,
         "schedule_congestion": 22,
-        "back_to_back_travel": 16,
-        "market_move": 8
+        "back_to_back_travel": 16
       }
     },
     "rare_signals": {
       "age_min": 0,
-      "signals": 86,
+      "signals": 96,
       "by_type": {
+        "market_move": 17,
         "strict_referee": 1,
-        "injury_imbalance": 52,
+        "injury_imbalance": 53,
         "travel_extreme": 9,
-        "back_to_back_travel": 16,
-        "market_move": 8
+        "back_to_back_travel": 16
       }
     },
     "timing_edges": {
       "age_min": 0,
-      "events": 286,
-      "bet_now": 281,
-      "wait": 3,
-      "price_shortening": 2
+      "events": 285,
+      "bet_now": 275,
+      "wait": 2,
+      "price_shortening": 8
     },
     "injuries_multisport": {
-      "age_min": 1,
+      "age_min": 6,
       "teams": 130,
       "sports": 4,
       "injuries": 669,
       "severe": 478
     },
     "thesportsdb_meta": {
-      "age_min": 1,
+      "age_min": 7,
       "requested": 12,
       "matched": 0,
       "status": "unavailable"
     },
     "openligadb_matches": {
-      "age_min": 1,
+      "age_min": 7,
       "matches": 112,
       "matched_local_events": 14,
       "matched_ratio_pct": 12.5,
@@ -250,7 +250,7 @@
     "public_team_profiles": {
       "age_min": 0,
       "teams": 892,
-      "upcoming": 473,
+      "upcoming": 472,
       "availability": 159,
       "deep_context": 71
     },
@@ -274,7 +274,7 @@
     },
     "boosted_odds": {
       "age_min": 0,
-      "matches_scanned": 718,
+      "matches_scanned": 723,
       "boosts": 0,
       "status": "empty"
     },
@@ -286,7 +286,7 @@
       "seasons": 2
     },
     "clv_history": {
-      "age_min": 1,
+      "age_min": 7,
       "matches": 840,
       "observations": 2333,
       "mean_clv_pct": -0.11,
@@ -298,7 +298,7 @@
     "winamax_catalog": {
       "script": "scripts/fetch_winamax_catalog.py",
       "output": "winamax_catalog.json",
-      "age_min": 1,
+      "age_min": 6,
       "threshold_min": 15,
       "fast_red_min": 30,
       "status": "ok"
@@ -314,7 +314,7 @@
     "injuries_soccer": {
       "script": "scripts/fetch_injuries_soccer.py",
       "output": "injuries_soccer.json",
-      "age_min": 1,
+      "age_min": 7,
       "threshold_min": 180,
       "fast_red_min": null,
       "status": "ok"
@@ -322,7 +322,7 @@
     "lineups_soccer": {
       "script": "scripts/fetch_lineups_soccer.py",
       "output": "lineups_soccer.json",
-      "age_min": 1,
+      "age_min": 7,
       "threshold_min": 180,
       "fast_red_min": null,
       "status": "ok"
@@ -330,7 +330,7 @@
     "team_stats": {
       "script": "scripts/fetch_team_stats.py",
       "output": "team_stats.json",
-      "age_min": 1,
+      "age_min": 7,
       "threshold_min": 300,
       "fast_red_min": null,
       "status": "ok"
@@ -338,7 +338,7 @@
     "clubelo": {
       "script": "scripts/fetch_clubelo.py",
       "output": "clubelo.json",
-      "age_min": 1,
+      "age_min": 7,
       "threshold_min": 1440,
       "fast_red_min": null,
       "status": "ok"
@@ -346,7 +346,7 @@
     "weather": {
       "script": "scripts/fetch_weather.py",
       "output": "weather.json",
-      "age_min": 0,
+      "age_min": 1,
       "threshold_min": 60,
       "fast_red_min": 30,
       "status": "ok"
@@ -354,7 +354,7 @@
     "referees_soccer": {
       "script": "scripts/fetch_referees_soccer.py",
       "output": "referees_soccer.json",
-      "age_min": 1,
+      "age_min": 7,
       "threshold_min": 480,
       "fast_red_min": null,
       "status": "ok"
@@ -362,7 +362,7 @@
     "xg_team_stats": {
       "script": "scripts/fetch_understat_xg.py",
       "output": "xg_team_stats.json",
-      "age_min": 1,
+      "age_min": 6,
       "threshold_min": 360,
       "fast_red_min": null,
       "status": "ok"
@@ -370,7 +370,7 @@
     "fbref_xg": {
       "script": "scripts/fetch_understat_xg.py",
       "output": "fbref_xg.json",
-      "age_min": 1,
+      "age_min": 6,
       "threshold_min": 360,
       "fast_red_min": null,
       "status": "ok"
@@ -378,7 +378,7 @@
     "sofascore_events": {
       "script": "scripts/fetch_sofascore_events.py",
       "output": "sofascore_events.json",
-      "age_min": 1,
+      "age_min": 7,
       "threshold_min": 30,
       "fast_red_min": 30,
       "status": "ok"
@@ -386,7 +386,7 @@
     "team_form": {
       "script": "scripts/fetch_team_form.py",
       "output": "team_form.json",
-      "age_min": 1,
+      "age_min": 7,
       "threshold_min": 360,
       "fast_red_min": null,
       "status": "ok"
@@ -394,7 +394,7 @@
     "form_stats_extended": {
       "script": "form_stats_extended.json",
       "output": "form_stats_extended.json",
-      "age_min": 1,
+      "age_min": 7,
       "threshold_min": 60,
       "fast_red_min": null,
       "status": "ok"
@@ -402,7 +402,7 @@
     "h2h_extended": {
       "script": "h2h_extended.json",
       "output": "h2h_extended.json",
-      "age_min": 1,
+      "age_min": 6,
       "threshold_min": 60,
       "fast_red_min": null,
       "status": "ok"
@@ -482,7 +482,7 @@
     "injuries_multisport": {
       "script": "scripts/fetch_injuries.py",
       "output": "injuries_multisport.json",
-      "age_min": 1,
+      "age_min": 6,
       "threshold_min": 60,
       "fast_red_min": null,
       "status": "ok"
@@ -490,7 +490,7 @@
     "thesportsdb_meta": {
       "script": "scripts/fetch_thesportsdb_meta.py",
       "output": "thesportsdb_meta.json",
-      "age_min": 1,
+      "age_min": 7,
       "threshold_min": 1440,
       "fast_red_min": null,
       "status": "ok"
@@ -498,7 +498,7 @@
     "openligadb_matches": {
       "script": "scripts/fetch_openligadb.py",
       "output": "openligadb_matches.json",
-      "age_min": 1,
+      "age_min": 7,
       "threshold_min": 720,
       "fast_red_min": null,
       "status": "ok"
@@ -562,7 +562,7 @@
     "clv_history": {
       "script": "scripts/compute_clv.py",
       "output": "clv_history.json",
-      "age_min": 1,
+      "age_min": 7,
       "threshold_min": 60,
       "fast_red_min": null,
       "status": "ok"
@@ -596,18 +596,18 @@
   "warnings": [],
   "overall": "ok",
   "quality_checks": {
-    "total_events": 341,
+    "total_events": 340,
     "upcoming_events": 299,
     "winamax_available": 299,
     "winamax_exact": 292,
-    "winamax_detailed": 287,
+    "winamax_detailed": 289,
     "winamax_tournament_only": 7,
     "winamax_exact_ratio": 0.977,
-    "winamax_detailed_ratio": 0.983,
+    "winamax_detailed_ratio": 0.99,
     "winamax_detail_gap_to_target": 0,
     "winamax_detail_fetch_cap_reco": 90,
     "winamax_detail_status": "ok",
-    "actionable_external_odds": 0,
+    "actionable_external_odds": 20,
     "football_invalid_form": 0,
     "events_with_xg": 62,
     "winamax_coverage": {
@@ -616,11 +616,11 @@
           "upcoming": 227,
           "available": 227,
           "exact": 220,
-          "detailed": 215,
+          "detailed": 217,
           "tournament_only": 7,
           "missing": 0,
           "exact_ratio": 0.969,
-          "detailed_ratio": 0.977
+          "detailed_ratio": 0.986
         },
         "baseball": {
           "upcoming": 36,
