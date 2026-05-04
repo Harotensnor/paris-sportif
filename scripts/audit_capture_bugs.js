@@ -56,26 +56,33 @@ function serve() {
     headless: true,
     ...(CHROME ? { executablePath: CHROME } : {}),
   });
-  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  const origin = `http://127.0.0.1:${port}`;
+  const context = await browser.newContext({
+    viewport: { width: 1440, height: 900 },
+    storageState: {
+      cookies: [],
+      origins: [{
+        origin,
+        localStorage: [
+          { name: 'cookieConsent', value: 'accepted' },
+          { name: 'paris_sportif_onboarded_v1', value: '1' },
+          { name: 'paris_sportif_onboarded_v2', value: '1' },
+          { name: 'userPrefs', value: JSON.stringify({
+            onboardingDone: true,
+            level: 'confirme',
+            consentLocalStorage: 'accepted',
+          }) },
+        ],
+      }],
+    },
+  });
+  const page = await context.newPage();
   const consoleErrors = [];
   page.on('console', msg => {
     if (msg.type() === 'error') consoleErrors.push(msg.text());
   });
   page.on('pageerror', err => consoleErrors.push(err.message));
-  await page.addInitScript(() => {
-    try {
-      localStorage.setItem('cookieConsent', 'accepted');
-      localStorage.setItem('paris_sportif_onboarded_v1', '1');
-      localStorage.setItem('paris_sportif_onboarded_v2', '1');
-      localStorage.setItem('userPrefs', JSON.stringify({
-        onboardingDone: true,
-        level: 'confirme',
-        consentLocalStorage: 'accepted',
-      }));
-    } catch (e) {}
-  });
-
-  await page.goto(`http://127.0.0.1:${port}/pronostics.html#dashboard`, { waitUntil: 'domcontentloaded' });
+  await page.goto(`${origin}/pronostics.html#dashboard`, { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => window.PRONOSTICS_DATA && document.querySelector('[data-pick-uid]'), null, { timeout: 30_000 });
   await page.waitForTimeout(800);
 
@@ -126,6 +133,7 @@ function serve() {
   fs.writeFileSync(OUT, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
   console.log(JSON.stringify(report, null, 2));
 
+  await context.close();
   await browser.close();
   server.close();
   if (failures.length) process.exit(1);

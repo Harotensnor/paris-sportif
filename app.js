@@ -28507,7 +28507,14 @@ ses paris sur le site (ni manuel, ni import). -->
   // so Google can index them as rich snippets (sport, teams, kickoff, venue).
   // Runs once at boot from PRONOSTICS_DATA — keeps DOM lean by capping at 5.
   function _injectMatchSchemas() {
+    // Runtime JSON-LD changes with live data and cannot be hashed safely under
+    // the static GitHub Pages CSP. Keep the static JSON-LD in pronostics.html;
+    // generate match-level schemas at build time instead of injecting scripts.
+    return;
     try {
+      const csp = document.querySelector('meta[http-equiv="Content-Security-Policy"]')?.getAttribute('content') || '';
+      const scriptSrc = csp.split(';').find(part => part.trim().startsWith('script-src')) || '';
+      if (scriptSrc && !scriptSrc.includes("'unsafe-inline'")) return;
       const data = window.PRONOSTICS_DATA;
       if (!data || !data.days) return;
       const today = data.days[data.today] || [];
