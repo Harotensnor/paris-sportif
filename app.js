@@ -38,6 +38,32 @@
     } catch(_) {}
     return entry;
   }
+  const TRACKED_LISTENERS = new Set();
+  function trackedAddEventListener(target, eventName, handler, options, group = 'global') {
+    if (!target || typeof target.addEventListener !== 'function' || typeof handler !== 'function') {
+      logSafeError(`trackedAddEventListener:${eventName}`, new Error('invalid listener target'));
+      return () => {};
+    }
+    target.addEventListener(eventName, handler, options);
+    const rec = { target, eventName, handler, options, group };
+    TRACKED_LISTENERS.add(rec);
+    return function removeTrackedListener() {
+      try { target.removeEventListener(eventName, handler, options); }
+      catch(e) { logSafeError(`removeTrackedListener:${eventName}`, e); }
+      TRACKED_LISTENERS.delete(rec);
+    };
+  }
+  function cleanupTrackedEventListeners(group = 'page') {
+    let removed = 0;
+    Array.from(TRACKED_LISTENERS).forEach((rec) => {
+      if (!rec || rec.group !== group) return;
+      try { rec.target.removeEventListener(rec.eventName, rec.handler, rec.options); }
+      catch(e) { logSafeError(`cleanupTrackedEventListeners:${rec.eventName}`, e); }
+      TRACKED_LISTENERS.delete(rec);
+      removed++;
+    });
+    return removed;
+  }
   function prodLog(...args) {
     if (!DEBUG_LOGS) return;
     try {
@@ -59,7 +85,13 @@
       if (dbg && typeof dbg.table === 'function') dbg.table.apply(dbg, args);
     } catch(e) { logSafeError('debug prodTable', e); }
   }
-  try { window.__PARIS_DEBUG_LOGS = DEBUG_LOGS; window.logSafeError = logSafeError; } catch(e) { logSafeError('boot expose debug helpers', e); }
+  try {
+    window.__PARIS_DEBUG_LOGS = DEBUG_LOGS;
+    window.logSafeError = logSafeError;
+    window.trackedAddEventListener = trackedAddEventListener;
+    window.cleanupTrackedEventListeners = cleanupTrackedEventListeners;
+    window.__PARIS_TRACKED_LISTENERS = TRACKED_LISTENERS;
+  } catch(e) { logSafeError('boot expose debug helpers', e); }
   function safeJsonParse(raw, fallback) {
     if (raw == null || raw === '') return fallback;
     try { return JSON.parse(raw); }
@@ -223,11 +255,11 @@
     } catch(e) { logSafeError('handleSafeImageError', e); }
   }
   try {
-    document.addEventListener('error', (e) => handleSafeImageError(e.target), true);
+    trackedAddEventListener(document, 'error', (e) => handleSafeImageError(e.target), true, 'boot');
     window.handleSafeImageError = handleSafeImageError;
   } catch(e) { logSafeError('boot image error listener', e); }
   try {
-    document.addEventListener('DOMContentLoaded', () => {
+    trackedAddEventListener(document, 'DOMContentLoaded', () => {
       enhanceLazyImages(document);
       if (!('MutationObserver' in window)) return;
       const mo = new MutationObserver((mutations) => {
@@ -238,7 +270,7 @@
         });
       });
       mo.observe(document.body, { childList: true, subtree: true });
-    }, { once: true });
+    }, { once: true }, 'boot');
   } catch(e) { logSafeError('boot lazy image observer', e); }
 
   const ADV_FILTER_KEY = 'advFilters';
@@ -1065,10 +1097,10 @@
    */
   function _on(parent, eventType, selector, handler) {
     if (!parent || !parent.addEventListener) return;
-    parent.addEventListener(eventType, (e) => {
+    trackedAddEventListener(parent, eventType, (e) => {
       const target = e.target.closest && e.target.closest(selector);
       if (target && parent.contains(target)) handler.call(target, e, target);
-    });
+    }, false, 'page');
   }
   try { window._on = _on; } catch(e){}
 
@@ -8601,6 +8633,7 @@
   }
 
   function render() {
+    cleanupTrackedEventListeners('page');
     const data = window.PRONOSTICS_DATA;
     if (!data) {
       dismissBootShell();
@@ -13373,7 +13406,7 @@
   // jamais attachés → app vide en blanc.
   function bind(id, ev, fn) {
     const el = document.getElementById(id);
-    if (el) el.addEventListener(ev, fn);
+    if (el) trackedAddEventListener(el, ev, fn, false, 'boot');
     else prodWarn(`[wiring] #${id} introuvable au boot — handler ${ev} ignoré`);
     return el;
   }
