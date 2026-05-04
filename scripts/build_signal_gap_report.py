@@ -221,11 +221,16 @@ def _expected_signals(ev: dict[str, Any], now_ts: float) -> list[str]:
     sport = str(ev.get("sport") or "")
     league_code = _league(ev)
     if sport == "football":
-        base = ["h2h", "injuries", "referee"]
+        hours = _hours_until(ev, now_ts)
+        base = ["h2h", "injuries"]
+        # Referee assignments are often published late. Missing referee data is
+        # actionable near kickoff, but noisy six days ahead.
+        if hours <= 72:
+            base.append("referee")
         # Projected lineups/starters are only an actionable gap close enough to
         # kickoff. Six days ahead, "missing lineups" is normal; six hours ahead,
         # it should lower confidence and trigger manual review.
-        if _hours_until(ev, now_ts) <= 36:
+        if hours <= 36:
             base.append("starter_signals")
         if league_code in TOP_FOOTBALL_LEAGUES:
             base.extend(["xg", "clubelo", "weather"])

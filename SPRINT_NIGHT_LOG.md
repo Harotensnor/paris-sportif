@@ -2243,3 +2243,9 @@
 - Apres: `patch_all_quick.py` normalise Vitoria SC, AVS, FC Porto, Arouca, Nacional, Estrela et Heerenveen vers les cles reelles des sidecars sources.
 - Impact mesure: referee visible +1 event dans `data.js`; Sporting CP - Vitoria descend de priorite 109 a 93 car l'arbitre n'est plus marque manquant; data_lite regenere.
 - Verif: py_compile patch_all_quick OK; patch_all_quick/build_lineups_multisport/measure_night_metrics/build_signal_gap_report/build_health/finalize_inline OK; cache/footer bumpes v35.344.
+
+## Sprint v35.345 — AUTO 10/10 Gaps arbitres time-aware (18:11 UTC)
+- Avant: `signal_gap_report` exigeait l'arbitre pour tous les matchs foot, meme a J+6, ce qui gonflait les alertes avec des infos normalement pas encore publiees.
+- Apres: le gap `referee` devient attendu seulement a moins de 72h du kickoff; les starters restent attendus a moins de 36h.
+- Impact mesure: priority gaps 269 -> 239; les matchs a J+6 comme AVS - FC Porto ne sont plus penalises pour arbitre absent, tout en gardant les matchs du soir en alerte.
+- Verif: py_compile/build_signal_gap_report/build_health OK; cache/footer bumpes v35.345.
