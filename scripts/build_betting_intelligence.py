@@ -314,22 +314,60 @@ def market_label(key: str) -> tuple[str, str, str]:
     return family, PICK_LABELS.get(pick, pick), MARKET_LABELS.get(family, family or "marche")
 
 
-def market_status(n: int, wr: float, lo: float | None, hi: float | None) -> tuple[str, str]:
+def _num(value: Any, default: float | None = None) -> float | None:
+    if isinstance(value, (int, float)) and math.isfinite(float(value)):
+        return float(value)
+    return default
+
+
+def market_status(
+    n: int,
+    wr: float,
+    lo: float | None,
+    hi: float | None,
+    *,
+    with_odds: int = 0,
+    roi: float | None = None,
+    avg_odd: float | None = None,
+    family: str = "",
+    pick: str = "",
+) -> tuple[str, str, str]:
+    """Classify a market bias without mistaking high WR for value.
+
+    The historical market report evaluates several outcomes on the same
+    completed football matches. That is useful as a directional watch signal,
+    but it is not an exploitable betting angle unless we also have enough
+    priced samples or a positive value estimate.
+    """
     if n < 20:
-        return "watch", "sample faible"
-    if lo is not None and lo > 0.52:
-        return "exploit", "borne basse >52%"
-    if hi is not None and hi < 0.48:
-        return "fade", "borne haute <48%"
-    if wr >= 0.58:
-        return "exploit", "win rate fort"
-    if wr <= 0.42:
-        return "fade", "win rate faible"
-    return "neutral", "pas de biais net"
+        return "watch", "sample faible", "sample_insufficient"
+
+    if family == "doubleChance" and pick == "12" and (avg_odd is None or avg_odd <= 1.40):
+        return "low_value", "WR haut mais cote trop basse pour etre rentable", "wr_without_value"
+
+    priced = with_odds >= 20 and roi is not None
+    estimated_value = roi if priced else ((avg_odd * wr) - 1.0 if avg_odd and avg_odd > 1 else None)
+    if not priced and estimated_value is None:
+        if lo is not None and lo > 0.52:
+            return "watch", "WR fort, mais aucune cote exploitable dans le sample", "directional_only"
+        if hi is not None and hi < 0.48:
+            return "watch", "WR faible, mais aucune cote exploitable dans le sample", "directional_only"
+        return "watch", "sample directionnel sans cotes", "directional_only"
+
+    if estimated_value is not None and estimated_value <= 0 and wr >= 0.58:
+        return "low_value", "WR positif mais ROI/cote non rentable", "wr_without_value"
+    if estimated_value is not None and estimated_value >= 0.02 and (lo is not None and lo > 0.52 or wr >= 0.58):
+        return "exploit", "WR et valeur positive confirmes", "priced_value"
+    if estimated_value is not None and estimated_value <= -0.03:
+        return "fade", "ROI/cote negatif sur le sample", "priced_value"
+    if hi is not None and hi < 0.48 and estimated_value is not None and estimated_value < 0:
+        return "fade", "WR faible + valeur negative", "priced_value"
+    return "neutral", "pas de biais net", "priced_value" if estimated_value is not None else "directional_only"
 
 
 def build_market_biases(data: dict[str, Any]) -> dict[str, Any]:
     markets = load_json(BACKTEST_MARKETS)
+    league_bt = (load_json(BACKTEST).get("by_league") or {})
     current_by_league = Counter(
         str(ev.get("league_code") or "unknown")
         for ev in iter_events(data)
@@ -355,8 +393,21 @@ def build_market_biases(data: dict[str, Any]) -> dict[str, Any]:
         hi = stats.get("wr_ci_hi")
         lo = float(lo) if isinstance(lo, (int, float)) else None
         hi = float(hi) if isinstance(hi, (int, float)) else None
-        status, reason = market_status(n, wr, lo, hi)
         family, pick, label = market_label(key)
+        with_odds = int(stats.get("with_odds") or 0)
+        roi = _num(stats.get("roi"))
+        avg_odd = _num(stats.get("avg_odd"))
+        status, reason, evidence = market_status(
+            n,
+            wr,
+            lo,
+            hi,
+            with_odds=with_odds,
+            roi=roi,
+            avg_odd=avg_odd,
+            family=family,
+            pick=str(key).split(":", 1)[1] if ":" in str(key) else "",
+        )
         market_rows.append({
             "market_key": key,
             "family": family,
@@ -367,42 +418,73 @@ def build_market_biases(data: dict[str, Any]) -> dict[str, Any]:
             "n": n,
             "wins": wins,
             "losses": losses,
+            "with_odds": with_odds,
+            "roi": round(roi, 4) if roi is not None else None,
+            "avg_odd": round(avg_odd, 3) if avg_odd is not None else None,
             "win_rate": round(wr, 4),
             "wr_ci": [lo, hi],
             "edge_vs_50_pct": round((wr - 0.5) * 100, 2),
+            "evidence": evidence,
         })
 
     league_rows: list[dict[str, Any]] = []
-    for code, stats in sorted((markets.get("by_league") or {}).items()):
+    for code, stats in sorted(league_bt.items()):
         if not isinstance(stats, dict):
             continue
         n = int(stats.get("n") or 0)
-        if n < 10:
+        if n <= 0:
             continue
         wr = float(stats.get("win_rate") or 0)
-        lo = stats.get("wr_ci_lo")
-        hi = stats.get("wr_ci_hi")
-        lo = float(lo) if isinstance(lo, (int, float)) else None
-        hi = float(hi) if isinstance(hi, (int, float)) else None
-        status, reason = market_status(n, wr, lo, hi)
+        roi = _num(stats.get("flat_roi_pct"), 0.0) or 0.0
+        brier = _num(stats.get("brier"), 0.0) or 0.0
+        if n < 20:
+            status = "data_insufficient"
+            reason = f"Sample reel trop faible ({n} picks)"
+        elif roi >= 5 and brier <= 0.245:
+            status = "exploit"
+            reason = f"ROI {roi:+.1f}% avec Brier {brier:.3f}"
+        elif roi < -8 and wr >= 0.52:
+            status = "avoid_low_roi"
+            reason = f"WR {wr:.1%} mais ROI {roi:+.1f}%"
+        elif wr < 0.45:
+            status = "avoid_low_wr"
+            reason = f"WR faible {wr:.1%}"
+        elif brier >= 0.255:
+            status = "watch"
+            reason = f"Calibration fragile Brier {brier:.3f}"
+        else:
+            status = "neutral"
+            reason = "pas de biais net"
         league_rows.append({
             "league_code": code,
             "status": status,
             "reason": reason,
             "n": n,
             "win_rate": round(wr, 4),
-            "wr_ci": [lo, hi],
+            "flat_roi_pct": stats.get("flat_roi_pct"),
+            "brier": stats.get("brier"),
+            "kelly_pnl": stats.get("kelly_pnl"),
             "edge_vs_50_pct": round((wr - 0.5) * 100, 2),
             "current_upcoming": current_by_league.get(code, 0),
         })
 
+    sort_rank = {
+        "exploit": 0,
+        "fade": 1,
+        "avoid_low_roi": 1,
+        "avoid_low_wr": 1,
+        "low_value": 2,
+        "watch": 3,
+        "data_insufficient": 4,
+        "neutral": 5,
+    }
     market_rows.sort(key=lambda row: (
-        {"exploit": 0, "fade": 1, "watch": 2, "neutral": 3}.get(row["status"], 9),
+        sort_rank.get(row["status"], 9),
         -abs(row["edge_vs_50_pct"]),
         -row["n"],
     ))
     league_rows.sort(key=lambda row: (
-        {"exploit": 0, "fade": 1, "watch": 2, "neutral": 3}.get(row["status"], 9),
+        sort_rank.get(row["status"], 9),
         -row["current_upcoming"],
         -abs(row["edge_vs_50_pct"]),
     ))
@@ -417,7 +499,7 @@ def build_market_biases(data: dict[str, Any]) -> dict[str, Any]:
             "context": f"{league['league_code']} {league['reason']} · {market['label']} {market['reason']}",
         }
         for league in league_rows
-        if league["current_upcoming"] > 0 and league["status"] in {"exploit", "fade"}
+        if league["current_upcoming"] > 0 and league["status"] in {"exploit", "avoid_low_roi", "avoid_low_wr"}
         for market in market_rows[:6]
         if market["status"] in {"exploit", "fade"}
     ][:40]
@@ -436,17 +518,28 @@ def build_market_biases(data: dict[str, Any]) -> dict[str, Any]:
             if row["status"] in {"exploit", "fade"}
         ][:20]
 
+    market_ns = {row["n"] for row in market_rows}
+    market_priced = sum(1 for row in market_rows if (row.get("with_odds") or 0) > 0)
+
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
-        "schema": "market_biases_by_league_v1",
-        "source": "backtest_report_markets.json + current data.js slate",
+        "schema": "market_biases_by_league_v2",
+        "source": "backtest_report_markets.by_market_pick + backtest_report_v2.by_league + current data.js slate",
         "summary": {
             "markets": len(market_rows),
             "market_exploit": sum(1 for row in market_rows if row["status"] == "exploit"),
             "market_fade": sum(1 for row in market_rows if row["status"] == "fade"),
+            "market_low_value": sum(1 for row in market_rows if row["status"] == "low_value"),
+            "market_priced_rows": market_priced,
+            "market_sample_warning": (
+                "all_market_rows_share_same_n_without_odds"
+                if len(market_rows) > 1 and len(market_ns) == 1 and market_priced == 0
+                else None
+            ),
             "league_rows": len(league_rows),
             "league_exploit": sum(1 for row in league_rows if row["status"] == "exploit"),
-            "league_fade": sum(1 for row in league_rows if row["status"] == "fade"),
+            "league_avoid": sum(1 for row in league_rows if str(row["status"]).startswith("avoid")),
+            "league_data_insufficient": sum(1 for row in league_rows if row["status"] == "data_insufficient"),
             "current_events_by_sport": dict(current_by_sport),
             "watchlist": len(watchlist),
         },

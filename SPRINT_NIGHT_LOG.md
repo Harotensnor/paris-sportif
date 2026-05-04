@@ -2314,3 +2314,9 @@
 - Data: `fetch_fbref_xg.py` etendu MLS/Eredivisie/Portugal/D2/Scotland/Austria + merge Understat; fallback proxy ESPN form marque `espn_form_proxy`.
 - Pipeline: auto_refresh + refresh.yml alignes avec fetch_fbref_xg et patch_fbref_xg; bug shadow variable corrige dans `patch_fbref_xg.py`.
 - Verif: py_compile OK; patch_all_quick/patch_understat/patch_fbref/build_xg_coverage/measure_night_metrics/build_health/finalize_inline OK; cache/footer bumpes v35.356.
+
+## Sprint v35.357 — AUTO 10/10 Market biases sanity (19:12 UTC)
+- Bug critique: `market_biases_by_league.json` transformait des WR directionnels sans cotes en signaux exploit/fade; toutes les ligues heritaient aussi du faux 54.55% du backtest multi-marches.
+- Fix: les marches sans echantillon cote passent en `watch`, DC 12 devient `low_value`, et les lignes ligue lisent le vrai `backtest_report_v2.by_league` avec statuts `data_insufficient`, `avoid_low_roi` et `avoid_low_wr`.
+- Impact mesure: market_exploit 4 -> 0, market_fade 2 -> 0, `market_sample_warning=all_market_rows_share_same_n_without_odds`; ligues WR non constantes et NBA clarifie "WR 58.3% mais ROI -12.8%".
+- Verif: audit JSON strict OK, py_compile build_betting_intelligence OK; cache/footer bumpes v35.357.
