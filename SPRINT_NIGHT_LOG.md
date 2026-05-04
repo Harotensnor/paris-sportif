@@ -2392,3 +2392,9 @@
 - Fix: `patch_fbref_xg.py` ajoute un fallback `espn_recent_results_proxy` marque comme proxy, conservateur et distinct du vrai xG.
 - Mesure: xG events night_metrics 189 -> 256; couverture foot deux equipes 252/260 (96.9%) dans `xg_coverage.json`.
 - Verif: patch_fbref_xg + build_xg_coverage + build_health + measure_night_metrics OK; cache/footer bumpes v35.369.
+
+## Sprint v35.370 — AUTO 10/10 Matching arbitres durci (19:51 UTC)
+- Bug data: `referees_soccer.json` contenait des arbitres Sofascore, mais le patch perdait des matchs sur les variantes "AFC Bournemouth"/"Bournemouth", "AS Roma"/"Roma", "Levante"/"Levante UD".
+- Fix: matching exact -> alias canonique -> fuzzy prudent par ligue, audit `referees_patch_audit.json`, et patch aussi des matchs historiques pour garder une source de verite coherente.
+- Mesure: patch arbitres 29/152 matchs foot scannes, dont 9 via alias; Sofascore n'expose presque aucun nouvel arbitre au-dela des assignations proches du kickoff (2 nouveaux sur 158 fixtures elargies).
+- Verif: py_compile patch_referees_soccer OK; measure_night_metrics + build_health OK; cache/footer bumpes v35.370.
