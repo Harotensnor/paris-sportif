@@ -2087,3 +2087,8 @@
 - Apres: l'ouverture detail V37 passe par delegation unique sur le conteneur dashboard, avec lookup match rafraichi a chaque render.
 - Impact: bug #37 avance sans changer l'UX: moins de handlers par render, clic ligne et clavier restent fonctionnels.
 - Verif: app.js syntax OK; smoke navigateur local => 730 triggers data-big-detail, delegation ouvre bien la modal FC Andorra vs Las Palmas, 0 warning/error; footer/cache/app hash bumpes.
+## Sprint v35.316 — AUTO 10/10 Sitemap hubs V37 (22:27 UTC)
+- Avant: build_sitemap.py publiait encore les routes legacy #top/#locks/#valeur/#matchs et l'accueil racine etait annonce weekly.
+- Apres: le sitemap expose les hubs valides V37 (dashboard/tous/performance/academie/profil/sante/montantes/legal), racine daily, puis regenere 359 URLs.
+- Impact: bugs SEO #61/#69 avances: les robots voient les vraies portes du produit au lieu des anciens raccourcis morts.
+- Verif: build_sitemap OK; py_compile OK; grep legacy routes sitemap => 0 resultat; footer/cache bumpes.

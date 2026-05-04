@@ -59,7 +59,7 @@ def _lastmod(src) -> str:
 
 
 STATIC_URLS = [
-    {'loc': '/',                           'priority': 1.0,  'changefreq': 'weekly',  'lastmod_src': 'index.html'},
+    {'loc': '/',                           'priority': 1.0,  'changefreq': 'daily',   'lastmod_src': 'index.html'},
     {'loc': '/methodologie.html',          'priority': 0.9,  'changefreq': 'monthly', 'lastmod_src': 'methodologie.html'},
     {'loc': '/academie.html',              'priority': 0.85, 'changefreq': 'monthly', 'lastmod_src': 'academie.html'},
     {'loc': '/comment-lire-un-prono.html', 'priority': 0.85, 'changefreq': 'monthly', 'lastmod_src': 'comment-lire-un-prono.html'},
@@ -72,29 +72,13 @@ STATIC_URLS = [
 
 SPA_ROUTES = [
     ('dashboard', 0.95, 'daily'),
-    ('top', 0.88, 'daily'),
-    ('valeur', 0.88, 'daily'),
-    ('locks', 0.84, 'daily'),
-    ('matchs', 0.82, 'daily'),
-    ('tous', 0.80, 'daily'),
-    ('performance', 0.78, 'daily'),
-    ('historique', 0.76, 'daily'),
-    ('bilan', 0.74, 'daily'),
-    ('calendrier', 0.72, 'daily'),
-    ('combines', 0.70, 'daily'),
-    ('buteurs', 0.70, 'daily'),
-    ('favoris', 0.64, 'daily'),
-    ('compare', 0.64, 'weekly'),
-    ('plan-mise', 0.64, 'weekly'),
-    ('simulator', 0.64, 'weekly'),
-    ('montante-jour', 0.62, 'daily'),
-    ('montante-weekend', 0.60, 'weekly'),
-    ('montante-semaine', 0.60, 'weekly'),
-    ('backtest', 0.58, 'weekly'),
-    ('credibilite', 0.58, 'weekly'),
-    ('academie', 0.52, 'monthly'),
-    ('methodologie', 0.52, 'monthly'),
-    ('sante', 0.45, 'daily'),
+    ('tous', 0.92, 'daily'),
+    ('performance', 0.82, 'daily'),
+    ('academie', 0.74, 'weekly'),
+    ('profil', 0.62, 'weekly'),
+    ('sante', 0.58, 'daily'),
+    ('montantes', 0.56, 'weekly'),
+    ('legal', 0.42, 'yearly'),
 ]
 
 
