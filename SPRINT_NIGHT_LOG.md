@@ -2261,6 +2261,12 @@
 - Apres: blessures, fatigue calendrier, lookahead, voyage extreme et back-to-back voyage comparent le signal a l'equipe réellement soutenue par le pari; backing l'equipe fragile penalise, jouer contre elle bonifie.
 - Impact produit: les nouveaux angles voyage/fatigue deviennent exploitables sans faux boost; les signaux rares non alignes restent visibles en badge sans gonfler le score.
 - Verif: app.js --check prevu; cache/footer bumpes v35.347.
+## Sprint v35.349 — AUTO 10/10 Refresh H2H prioritaire ESPN (18:57 UTC)
+- Avant: la data cron fraiche etait retombee a 144 events avec H2H, alors que le cache ESPN recent contenait plus de confrontations exploitables.
+- Action: `fetch_h2h.py --force-priority` sur les ligues prioritaires + sports US, puis regeneration night_metrics / signal_gap_report / health / data_lite.
+- Impact mesure: 28 matchs verifies, 24 enrichis, 0 erreur; H2H coverage 144 -> 168 events; priority gaps 239 -> 233.
+- Verif: cache/footer bumpes v35.349, hashes app/data_lite/CSP recalcules.
+
 ## Sprint v35.348 — AUTO 10/10 Injuries vides connues (18:35 UTC)
 - Avant: les equipes absentes de `injuries_soccer.json` etaient marquees comme data manquante meme quand leur ligue etait couverte par la source Sofascore injuries.
 - Apres: si la ligue existe dans le fichier source, une equipe non listee devient un signal connu vide au lieu d'un trou faux positif.
