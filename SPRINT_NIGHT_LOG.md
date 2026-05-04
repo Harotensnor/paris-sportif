@@ -2097,3 +2097,8 @@
 - Apres: chargement cache-friendly bucket horaire, parsing borne aux 50k dernieres lignes, stats de diagnostic __oddsHistoryStats, et loader DOM leger sans innerHTML.
 - Impact: bugs #21/#44 avances: la modal garde les sparklines disponibles mais evite un fetch/parse trop agressif sur historique long.
 - Verif: app.js syntax OK; smoke navigateur local modal detail OK, 730 triggers, aucun hit odds_history tant que la sparkline n'est pas demandee, 0 warning/error; footer/cache/app hash bumpes.
+## Sprint v35.318 — AUTO 10/10 Conflict marker hotfix + audit refresh (22:43 UTC)
+- Avant: un autostash conflict avait laisse des marqueurs <<<<<<< dans pronostics.html/sw.js, detectes par le smoke navigateur post-audit.
+- Apres: marqueurs retires, app hash correct 61e428df conserve, footer v35.318, cache SW bump, night_metrics et a11y-report rafraichis.
+- Metrics: night_metrics 342 events, 304 upcoming, Winamax exact 342/342 (100%), foot detail 217/231 (93.9%), a11y 8 pages 0/0/0.
+- Verif: grep conflict markers => 0; app.js/sw.js syntax OK; smoke navigateur dashboard 730 lignes + modal ouverte, 0 warning/error.
