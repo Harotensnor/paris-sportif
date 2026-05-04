@@ -50,6 +50,8 @@ WEATHER_JSON = PROJECT_ROOT / "weather.json"
 HEALTH_JSON = PROJECT_ROOT / "health.json"
 WINAMAX_MARKETS = PROJECT_ROOT / "winamax_markets.json"
 DATA_MANIFEST = PROJECT_ROOT / "data_manifest.json"
+NIGHT_METRICS = PROJECT_ROOT / "night_metrics.json"
+SIGNAL_GAP_REPORT = PROJECT_ROOT / "signal_gap_report.json"
 
 # === MCP server import ===
 try:
@@ -983,6 +985,8 @@ def get_pipeline_status() -> dict:
     data = _load_data_js()
     sofa_path = PROJECT_ROOT / "sofascore_events.json"
     sofa = _load_json(sofa_path) if sofa_path.exists() else {}
+    night = _load_json(NIGHT_METRICS) if NIGHT_METRICS.exists() else {}
+    gap_report = _load_json(SIGNAL_GAP_REPORT) if SIGNAL_GAP_REPORT.exists() else {}
 
     today = _active_data_day(data) if not "_error" in data else None
     today_events = (data.get("days") or {}).get(today, []) if today else []
@@ -1005,17 +1009,40 @@ def get_pipeline_status() -> dict:
     def _fresh(age_min) -> bool:
         return isinstance(age_min, (int, float)) and age_min < 60
 
+    gap_rows = gap_report.get("priority_gaps") if isinstance(gap_report, dict) else []
+    if not isinstance(gap_rows, list):
+        gap_rows = []
+    missing_counts: dict[str, int] = {}
+    for row in gap_rows:
+        for missing in row.get("missing") or []:
+            missing_counts[str(missing)] = missing_counts.get(str(missing), 0) + 1
+    top_missing = [
+        {"signal": signal, "matches": count}
+        for signal, count in sorted(missing_counts.items(), key=lambda item: (-item[1], item[0]))[:8]
+    ]
+
     return {
         "today": today,
         "local_today": _today_iso(),
         "data_today_field": data.get("today") if not "_error" in data else None,
         "data_age_min": health.get("data_age_min") if not "_error" in health else None,
         "overall_status": health.get("overall") if not "_error" in health else "unknown",
+        "night_metrics": {
+            "generated_at": night.get("generated_at") if not "_error" in night else None,
+            "events": night.get("events") if not "_error" in night else None,
+        },
         "events_today": {
             "total": len(today_events),
             "from_espn": espn_count,
             "from_sofascore": sofa_count,
             "winamax_bookable": winamax_count,
+        },
+        "signal_gaps": {
+            "generated_at": gap_report.get("generated_at") if not "_error" in gap_report else None,
+            "data_generated_at": gap_report.get("data_generated_at") if not "_error" in gap_report else None,
+            "priority_gap_count": len(gap_rows),
+            "coverage": gap_report.get("coverage") if not "_error" in gap_report else None,
+            "top_missing_signals": top_missing,
         },
         "sofascore_total_all_sports": sofa.get("total") if sofa else None,
         "warnings": health.get("warnings", [])[:5] if not "_error" in health else [],
@@ -1044,6 +1071,45 @@ def list_data_gaps(sport: str = None, limit: int = 20) -> dict:
     if "_error" in data:
         return data
     today = _active_data_day(data)
+    gap_report = _load_json(SIGNAL_GAP_REPORT) if SIGNAL_GAP_REPORT.exists() else {}
+    report_rows = gap_report.get("priority_gaps") if isinstance(gap_report, dict) else []
+    if isinstance(report_rows, list) and report_rows:
+        filtered = [
+            row for row in report_rows
+            if (not sport or row.get("sport") == sport)
+        ]
+        def _priority_value(row: dict) -> float:
+            try:
+                return float(row.get("priority") or 0)
+            except Exception:
+                return 0.0
+        filtered.sort(key=lambda row: (-_priority_value(row), str(row.get("kickoff") or "")))
+        return {
+            "today": today,
+            "report_generated_at": gap_report.get("generated_at"),
+            "data_generated_at": gap_report.get("data_generated_at"),
+            "n_matches_with_gaps": len(filtered),
+            "filter_sport": sport,
+            "matches": [
+                {
+                    "event_id": row.get("event_id"),
+                    "match": row.get("match"),
+                    "league": row.get("league_name") or row.get("league_code"),
+                    "league_code": row.get("league_code"),
+                    "sport": row.get("sport"),
+                    "kickoff": row.get("kickoff"),
+                    "missing_count": len(row.get("missing") or []),
+                    "missing": row.get("missing") or [],
+                    "present": row.get("present") or [],
+                    "priority": row.get("priority"),
+                }
+                for row in filtered[:limit]
+            ],
+            "note": (
+                "Source principale: signal_gap_report.json multi-jours. "
+                "Ces lignes sont celles que le dashboard penalise dans le score opportunite."
+            ),
+        }
     matches = (data.get("days") or {}).get(today) or []
     gaps = []
     for m in matches:
