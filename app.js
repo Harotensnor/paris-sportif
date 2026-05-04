@@ -13063,14 +13063,23 @@
   // de déclencher le force-refresh sans nécessiter de listener local.
   // Avant : seul le bouton dans txtEl avait un listener (cf. ligne ~12090),
   // donc les autres références au "🔄 forcer refresh" pointaient dans le vide.
+  function _buildAgentForceRefreshLink(label = '🔄', extraStyle = '') {
+    const link = document.createElement('a');
+    link.href = '#';
+    link.dataset.agentForceRefresh = '';
+    link.title = 'Forcer le refresh (vide cache + recharge)';
+    link.style.cssText = `color:inherit;${extraStyle}`;
+    link.textContent = label;
+    return link;
+  }
   document.addEventListener('click', async (e) => {
     const btn = e.target.closest('[data-agent-force-refresh]');
     if (!btn) return;
     e.preventDefault();
     if (btn._refreshing) return;
     btn._refreshing = true;
-    const origHtml = btn.innerHTML;
-    btn.innerHTML = '⏳ refresh en cours...';
+    btn.setAttribute('aria-busy', 'true');
+    btn.textContent = '⏳ refresh en cours...';
     try {
       if ('serviceWorker' in navigator) {
         const rs = await navigator.serviceWorker.getRegistrations();
@@ -13738,27 +13747,8 @@
         // Avant : "🔴 Données obsolètes · 5h04 · forcer refresh · cron · LIVE · poll 30s"
         // (super verbeux, prend toute la largeur en bas).
         // Après : "🔴 5h04 · 🔄" (compact, juste l'essentiel).
-        txtEl.innerHTML = `🔴 ${label} <a href="#" data-agent-force-refresh title="Forcer le refresh (vide cache + recharge)" style="color:inherit;text-decoration:none;margin-left:6px;">🔄</a>`;
-        // Wire du bouton (idempotent)
-        const btn = txtEl.querySelector('[data-agent-force-refresh]');
-        if (btn && !btn._wired) {
-          btn._wired = true;
-          btn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            btn.textContent = '⏳ refresh en cours...';
-            try {
-              if ('serviceWorker' in navigator) {
-                const rs = await navigator.serviceWorker.getRegistrations();
-                await Promise.all(rs.map(r => r.unregister()));
-              }
-              if ('caches' in window) {
-                const keys = await caches.keys();
-                await Promise.all(keys.map(k => caches.delete(k)));
-              }
-            } catch(err) { prodWarn('force refresh failed:', err); }
-            _hardReload();
-          });
-        }
+        txtEl.textContent = `🔴 ${label} `;
+        txtEl.appendChild(_buildAgentForceRefreshLink('🔄', 'text-decoration:none;margin-left:6px;'));
       }
     }
     // accéléré (10s en v33.7). Petit badge à droite, non intrusif.
@@ -13770,9 +13760,13 @@
         const todayIso = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
         return (d.days[todayIso] || []).filter(m => m && m.status === 'STATUS_IN_PROGRESS' && !m.completed).length;
       })();
-      if (liveCount > 0 && txtEl && !txtEl.innerHTML.includes('data-live-badge')) {
-        const badge = ` · <span data-live-badge style="background:rgba(239,68,68,.18);color:#fca5a5;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.4px;animation:rfrPulse 2s ease-in-out infinite;">🔴 LIVE ${liveCount} · poll 10s</span>`;
-        txtEl.innerHTML = txtEl.innerHTML + badge;
+      if (liveCount > 0 && txtEl && !txtEl.querySelector('[data-live-badge]')) {
+        txtEl.appendChild(document.createTextNode(' · '));
+        const badge = document.createElement('span');
+        badge.dataset.liveBadge = '';
+        badge.style.cssText = 'background:rgba(239,68,68,.18);color:#fca5a5;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.4px;animation:rfrPulse 2s ease-in-out infinite;';
+        badge.textContent = `🔴 LIVE ${liveCount} · poll 10s`;
+        txtEl.appendChild(badge);
       }
     } catch(e){}
   }
@@ -13976,7 +13970,7 @@
         const syncBanner = document.getElementById('__boot-sync-banner');
         if (syncBanner) {
           syncBanner.style.background = 'linear-gradient(90deg,#34d399 0%,#10b981 100%)';
-          syncBanner.innerHTML = '✓ Données à jour';
+          syncBanner.textContent = '✓ Données à jour';
           setTimeout(() => syncBanner.remove(), 1500);
         }
         // FIX #12 : odds_history.jsonl peut avoir reçu de nouveaux snapshots
@@ -14034,9 +14028,8 @@
       const txtEl = ind && ind.querySelector('.rfr-txt');
       if (txtEl && !txtEl.dataset.errShown) {
         txtEl.dataset.errShown = '1';
-        txtEl.innerHTML = `⚠️ Refresh impossible · ${esc(String(err.message || err).slice(0, 40))} · <a href="#" data-agent-force-refresh style="color:inherit;text-decoration:underline;">réessayer</a>`;
-        const btn = txtEl.querySelector('[data-agent-force-refresh]');
-        if (btn) btn.addEventListener('click', (e) => { e.preventDefault(); _hardReload(); });
+        txtEl.textContent = `⚠️ Refresh impossible · ${String(err.message || err).slice(0, 40)} · `;
+        txtEl.appendChild(_buildAgentForceRefreshLink('réessayer', 'text-decoration:underline;'));
       }
       prodWarn('[pollData] refresh failed:', err);
     } finally {
@@ -19305,7 +19298,13 @@
           if (bilanChev) bilanChev.textContent = '▴';
           if (!bilanBox._rendered) {
             try { if (typeof renderBilanPage === 'function') renderBilanPage(bilanBox); bilanBox._rendered = true; }
-            catch(e) { bilanBox.innerHTML = '<div style="color:var(--text-dim);font-size:12px;">Erreur chargement Bilan.</div>'; }
+            catch(e) {
+              bilanBox.textContent = '';
+              const errBox = document.createElement('div');
+              errBox.style.cssText = 'color:var(--text-dim);font-size:12px;';
+              errBox.textContent = 'Erreur chargement Bilan.';
+              bilanBox.appendChild(errBox);
+            }
           }
           // Scroll smooth vers le toggle après ouverture
           setTimeout(() => bilanToggle.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);

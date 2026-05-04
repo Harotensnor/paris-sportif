@@ -2077,3 +2077,8 @@
 - Apres: ces surfaces rendent par DOM/textContent, le highlight utilise un mark cree par element, et le fallback logo utilise un listener error sans inline onerror.
 - Impact: la recherche profonde equipes/joueurs reste identique visuellement mais ne parse plus une saisie utilisateur comme HTML executable.
 - Verif: app.js/sw.js syntax OK; smoke navigateur local avec `<img src=x onerror=alert(1)>` => 0 dialog, 0 img injectee, 0 erreur console, table dashboard 365 lignes; footer/cache/app hash bumpes.
+## Sprint v35.314 — AUTO 10/10 Refresh DOM safety (22:14 UTC)
+- Avant: l'indicateur freshness/refresh et quelques fallbacks d'erreur utilisaient encore innerHTML pour de simples textes/liens internes.
+- Apres: le lien force-refresh est cree par DOM, les statuts freshness/live/erreur passent par textContent + elements, et le fallback Bilan n'injecte plus de HTML.
+- Impact: bug #36 avance sur les surfaces persistantes/temps reel, avec moins de parsing HTML inutile pendant le polling.
+- Verif: app.js syntax OK; smoke navigateur local => freshness visible, table dashboard 360 lignes, 0 warning/error avec serveur MIME correct; footer/cache/app hash bumpes.
