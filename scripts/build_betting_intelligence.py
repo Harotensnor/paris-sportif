@@ -26,6 +26,7 @@ ROOT = Path(__file__).resolve().parent.parent
 DATA_JS = ROOT / "data.js"
 BACKTEST = ROOT / "backtest_report_v2.json"
 BACKTEST_MARKETS = ROOT / "backtest_report_markets.json"
+STADIUMS = ROOT / "stadiums.json"
 
 OUT_LEAGUE = ROOT / "league_inefficiencies.json"
 OUT_MARKET_BIASES = ROOT / "market_biases_by_league.json"
@@ -58,14 +59,43 @@ PICK_LABELS = {
     "12": "Domicile ou exterieur",
 }
 
+SPORT_STADIUM_KEYS = {
+    ("baseball", "mlb"): "mlb",
+    ("basketball", "nba"): "nba",
+    ("hockey", "nhl"): "nhl",
+}
+
+TEAM_ABBR_ALIASES = {
+    "mlb": {
+        "BO": "BAL",
+        "MM": "MIA",
+        "PP": "PHI",
+    },
+}
+
 
 def load_json(path: Path) -> dict[str, Any]:
     if not path.exists():
         return {}
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        data = json.loads(path.read_text(encoding="utf-8"))
+        return data if isinstance(data, dict) else {}
     except Exception:
         return {}
+
+
+def normalize_abbr(value: Any, stadium_key: str) -> str:
+    raw = str(value or "").strip().upper()
+    return TEAM_ABBR_ALIASES.get(stadium_key, {}).get(raw, raw)
+
+
+def haversine_km(a: list[float] | tuple[float, float], b: list[float] | tuple[float, float]) -> float:
+    lat1, lon1 = math.radians(float(a[0])), math.radians(float(a[1]))
+    lat2, lon2 = math.radians(float(b[0])), math.radians(float(b[1]))
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+    h = math.sin(dlat / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2) ** 2
+    return 6371.0 * 2 * math.asin(min(1.0, math.sqrt(h)))
 
 
 def load_data() -> dict[str, Any]:
@@ -84,15 +114,27 @@ def iter_events(data: dict[str, Any]):
             yield ev
 
 
-def side_name(ev: dict[str, Any], side: str) -> str:
+def side_competitor(ev: dict[str, Any], side: str) -> dict[str, Any]:
     for c in ev.get("competitors") or []:
         if c.get("home_away") == side:
-            return c.get("name") or c.get("displayName") or c.get("shortDisplayName") or ""
+            return c
+    return {}
+
+
+def side_name(ev: dict[str, Any], side: str) -> str:
+    c = side_competitor(ev, side)
+    if c:
+        return c.get("name") or c.get("displayName") or c.get("shortDisplayName") or ""
     name = ev.get("name") or ""
     if " at " in name:
         away, home = name.split(" at ", 1)
         return home.strip() if side == "home" else away.strip()
     return ""
+
+
+def side_abbr(ev: dict[str, Any], side: str) -> str:
+    c = side_competitor(ev, side)
+    return c.get("abbr") or c.get("abbreviation") or c.get("shortDisplayName") or ""
 
 
 def event_ts(ev: dict[str, Any]) -> float | None:
@@ -149,6 +191,60 @@ def build_team_schedule(events: list[dict[str, Any]]) -> dict[str, list[float]]:
     for arr in schedule.values():
         arr.sort()
     return schedule
+
+
+def detect_travel_angles(
+    ev: dict[str, Any],
+    schedule: dict[str, list[float]],
+    ts: float,
+    stadiums: dict[str, Any],
+) -> list[dict[str, Any]]:
+    sport = str(ev.get("sport") or "").lower()
+    league = str(ev.get("league_code") or "").lower()
+    stadium_key = SPORT_STADIUM_KEYS.get((sport, league))
+    if not stadium_key:
+        return []
+
+    coords = stadiums.get(stadium_key) or {}
+    if not isinstance(coords, dict):
+        return []
+
+    home = side_name(ev, "home")
+    away = side_name(ev, "away")
+    home_abbr = normalize_abbr(side_abbr(ev, "home"), stadium_key)
+    away_abbr = normalize_abbr(side_abbr(ev, "away"), stadium_key)
+    home_xy = coords.get(home_abbr)
+    away_xy = coords.get(away_abbr)
+    if not home or not away or not home_xy or not away_xy:
+        return []
+
+    distance = haversine_km(away_xy, home_xy)
+    timezone_delta = abs(float(away_xy[1]) - float(home_xy[1])) / 15.0
+    arr = schedule.get(away.lower()) or []
+    prev_48h = [x for x in arr if ts - 48 * 3600 <= x < ts]
+    angles: list[dict[str, Any]] = []
+
+    if distance >= 1800 or timezone_delta >= 2.5:
+        angles.append({
+            "type": "travel_extreme",
+            "team": away,
+            "side": "away",
+            "direction": "fade",
+            "strength": min(1.0, max(distance / 4300, timezone_delta / 4.5)),
+            "context": f"Deplacement estime {distance:.0f} km, decalage ~{timezone_delta:.1f}h",
+        })
+
+    if prev_48h and distance >= 800:
+        angles.append({
+            "type": "back_to_back_travel",
+            "team": away,
+            "side": "away",
+            "direction": "fade",
+            "strength": min(1.0, 0.45 + distance / 5000 + min(0.2, len(prev_48h) * 0.08)),
+            "context": f"{len(prev_48h)} match dans les 48h + {distance:.0f} km de voyage",
+        })
+
+    return angles
 
 
 def build_league_inefficiencies(data: dict[str, Any]) -> dict[str, Any]:
@@ -360,7 +456,12 @@ def build_market_biases(data: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def detect_event_angles(ev: dict[str, Any], schedule: dict[str, list[float]], now_ts: float) -> list[dict[str, Any]]:
+def detect_event_angles(
+    ev: dict[str, Any],
+    schedule: dict[str, list[float]],
+    now_ts: float,
+    stadiums: dict[str, Any],
+) -> list[dict[str, Any]]:
     angles: list[dict[str, Any]] = []
     ts = event_ts(ev)
     if ts is None:
@@ -441,12 +542,14 @@ def detect_event_angles(ev: dict[str, Any], schedule: dict[str, list[float]], no
                 "strength": min(1.0, abs(move) / 0.18),
                 "context": f"Cote {side}: {before:.2f} -> {current:.2f} ({move*100:+.1f}%)",
             })
+    angles.extend(detect_travel_angles(ev, schedule, ts, stadiums))
     return angles
 
 
 def build_angles(data: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
     events = list(iter_events(data))
     schedule = build_team_schedule(events)
+    stadiums = load_json(STADIUMS)
     now_ts = datetime.now(timezone.utc).timestamp()
     angle_rows = []
     rare_rows = []
@@ -469,11 +572,18 @@ def build_angles(data: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any], 
             "home": home,
             "away": away,
         }
-        angles = detect_event_angles(ev, schedule, now_ts)
+        angles = detect_event_angles(ev, schedule, now_ts, stadiums)
         if angles:
             angle_rows.append({**base, "angles": angles})
         for angle in angles:
-            if angle["type"] in {"injury_imbalance", "weather_extreme", "strict_referee", "market_move"} and angle["strength"] >= 0.45:
+            if angle["type"] in {
+                "injury_imbalance",
+                "weather_extreme",
+                "strict_referee",
+                "market_move",
+                "travel_extreme",
+                "back_to_back_travel",
+            } and angle["strength"] >= 0.45:
                 rare_rows.append({**base, "signal": angle})
 
         minutes_to_kickoff = (ts - now_ts) / 60
