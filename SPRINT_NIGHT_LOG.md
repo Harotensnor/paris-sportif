@@ -2,6 +2,11 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
+## Sprint v35.398 — C3 detecteur tilt personnel (22:10 UTC)
+- Avant: les series du modele existaient, mais Theo n'avait pas d'alerte personnelle quand ses pertes et mises montaient ensemble.
+- Apres: ajout du detecteur de tilt sur `paris_sportif_user_bets`, avec banniere dashboard visible desktop/mobile et rail Discipline tilt.
+- Impact mesure: 3 pertes consecutives avec mises 3EUR -> 6EUR -> 9EUR declenchent Pause recommandee / mise divisee par 2.
+- Verif: Playwright tilt+CLV OK (4/4), bundle-size OK, syntax JS OK, no-conflict-markers OK; cache/footer bumpes v35.398.
 ## Sprint v35.397 — C1 CLV tracking dashboard (21:57 UTC)
 - Avant: le CLV existait dans `clv_history.json`, mais l'accueil ne montrait pas clairement si les picks battaient le marche avant le resultat.
 - Apres: `compute_clv.py` produit `clv_summary.json` leger, le dashboard affiche une section Closing Line Value avec CLV moyen, taux positif, sports et mouvements extremes.
@@ -293,10 +298,4 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Mesure: audit OK sur data.js `generated_at=2026-05-04T20:28:50Z`, today `2026-05-04`, night metrics non stale.
 - Impact: les regressions type MCP/health/night_metrics avec dates divergentes deviennent detectables localement avant push.
 - Verif: audit_data_truth + py_compile OK; cache/footer bumpes v35.385.
-
-## Sprint v35.386 — AUTO 10/10 MCP racine et ratio fixes (20:43 UTC)
-- Cause A1: une ancienne config desktop pointait encore vers `paris-sportif-sprints/scripts/mcp_paris_sportif.py`, copie stale du 1er mai qui lisait un vieux `data.js`.
-- Fix: detection automatique de la racine au `data.js` le plus frais + sync de la copie legacy; les deux chemins MCP pointent maintenant vers `Paris-Sportif` et `today=2026-05-04`.
-- Ratio A2: `get_pipeline_status` expose top-level `winamax_exact_ratio` depuis `data.js` autoritaire; `night_metrics`/`health` deviennent snapshots secondaires avec statut aligned/stale.
-- Verif: appels MCP local + legacy 2x OK, ratio `0.9035`, sync `ok`, `test_mcp_smoke`, `audit_data_truth`, `audit_mcp_shadow_copy` OK; cache/footer bumpes v35.386.
 

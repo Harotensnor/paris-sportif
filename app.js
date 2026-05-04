@@ -3542,6 +3542,84 @@ avgStake: bets.length > 0 ? totalStake / bets.length : 0,
 avgPnL: bets.length > 0 ? totalPnL / bets.length : 0,
 };
 };
+window._detectUserTilt = function() {
+const bets = _loadUserBets()
+.filter(b => b && b.settled && b.result !== 'void')
+.sort((a, b) => Number(a.settledTs || a.ts || 0) - Number(b.settledTs || b.ts || 0));
+if (bets.length < 3) {
+return { level: 'learning', title: 'Discipline en apprentissage', message: 'Tracke encore quelques paris pour détecter les séries à risque.', lossStreak: 0, stakeTrend: 0 };
+}
+const recent = bets.slice().reverse();
+let lossStreak = 0;
+for (const b of recent) {
+if (b.result === 'lost') lossStreak++;
+else break;
+}
+let winStreak = 0;
+for (const b of recent) {
+if (b.result === 'won') winStreak++;
+else break;
+}
+const last3 = recent.slice(0, 3);
+const prev3 = recent.slice(3, 6);
+const avgStake = rows => {
+const valid = rows.map(b => Number(b.stake || 0)).filter(v => v > 0);
+return valid.length ? valid.reduce((a, v) => a + v, 0) / valid.length : 0;
+};
+const lastAvg = avgStake(last3);
+const prevAvg = avgStake(prev3);
+const stakeTrend = prevAvg > 0 ? (lastAvg - prevAvg) / prevAvg : 0;
+const recentStakeLift = Number(last3[2]?.stake || 0) > 0
+? (Number(last3[0]?.stake || 0) - Number(last3[2]?.stake || 0)) / Number(last3[2]?.stake || 1)
+: 0;
+const stakesIncreasing = last3.length === 3
+&& last3.every(b => b.result === 'lost')
+&& Number(last3[0].stake || 0) >= Number(last3[1].stake || 0)
+&& Number(last3[1].stake || 0) >= Number(last3[2].stake || 0)
+&& (stakeTrend >= 0.15 || recentStakeLift >= 0.15);
+if (lossStreak >= 5 || (lossStreak >= 3 && stakesIncreasing)) {
+return {
+level: 'danger',
+title: 'Pause recommandée',
+message: `${lossStreak} pertes d'affilée${stakesIncreasing ? ' et mises en hausse' : ''}. Stop 24h ou mise divisée par 2 : pas de revanche contre la variance.`,
+lossStreak,
+winStreak,
+stakeTrend,
+cooldownHours: 24,
+};
+}
+if (lossStreak >= 3) {
+return {
+level: 'warn',
+title: 'Zone de tilt',
+message: `${lossStreak} pertes d'affilée. Garde les mises fixes et évite d'augmenter pour te refaire.`,
+lossStreak,
+winStreak,
+stakeTrend,
+cooldownHours: 12,
+};
+}
+if (winStreak >= 5 && stakeTrend > 0.25) {
+return {
+level: 'warn',
+title: 'Euphorie à contrôler',
+message: `${winStreak} gains d'affilée avec mises qui montent. Ne dépasse pas le Kelly conseillé : la série ne garantit rien.`,
+lossStreak,
+winStreak,
+stakeTrend,
+cooldownHours: 0,
+};
+}
+return {
+level: 'ok',
+title: 'Discipline stable',
+message: 'Pas de signal de tilt détecté sur tes derniers paris suivis.',
+lossStreak,
+winStreak,
+stakeTrend,
+cooldownHours: 0,
+};
+};
 window._computeIfYouHadFollowed = function() {
 const data = window.PRONOSTICS_DATA;
 if (!data || !data.days) return null;
@@ -14092,6 +14170,10 @@ const v37Coach = (() => {
 try { return typeof computeCoachInsights === 'function' ? computeCoachInsights() : null; }
 catch(e) { return null; }
 })();
+const v37Tilt = (() => {
+try { return typeof window._detectUserTilt === 'function' ? window._detectUserTilt() : null; }
+catch(e) { return null; }
+})();
 const v37CoachSportKey = (sport) => ({
 football: 'Football', tennis: 'Tennis', basketball: 'Basketball',
 hockey: 'Hockey', 'american-football': 'NFL', mma: 'MMA',
@@ -14966,6 +15048,19 @@ return `<${tag}${typeAttr} class="v36-side-row v37-insight-row" data-tone="${esc
         </${tag}>`;
 };
 const v37PlainText = (value) => String(value || '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+const v37TiltRow = v37Tilt ? v37InsightRow({
+kicker: v37Tilt.level === 'danger' ? 'Tilt critique' : v37Tilt.level === 'warn' ? 'Discipline' : 'Discipline',
+title: v37Tilt.title,
+body: `${v37Tilt.message}${Number(v37Tilt.stakeTrend || 0) ? ` · tendance mise ${(Number(v37Tilt.stakeTrend || 0) * 100).toFixed(0)}%` : ''}`,
+tone: v37Tilt.level === 'danger' ? 'warn' : v37Tilt.level === 'warn' ? 'warn' : 'good',
+}) : '';
+const v37TiltBanner = v37Tilt && (v37Tilt.level === 'danger' || v37Tilt.level === 'warn')
+? `<section class="v37-tilt-banner" data-level="${esc(v37Tilt.level)}" aria-label="Alerte discipline">
+        <span>${v37Tilt.level === 'danger' ? 'STOP' : 'PAUSE'}</span>
+        <strong>${esc(v37Tilt.title)}</strong>
+        <em>${esc(v37Tilt.message)}</em>
+      </section>`
+: '';
 const v37CoachRows = v37Array(v37Coach?.insights)
 .slice(0, 4)
 .map(ins => v37InsightRow({
@@ -15090,6 +15185,7 @@ wrap.innerHTML = `
               ${v36FilterButton('time', 'night', 'Nuit', v36Filter.time === 'night')}
             </div>
           </section>
+          ${v37TiltBanner}
           <div class="v36-home-grid">
             ${v36TableHtml}
             <aside class="v36-home-rail" aria-label="Radar temps reel">
@@ -15097,6 +15193,7 @@ wrap.innerHTML = `
               <section><header><span>Biais marché ligues</span><b>${Number(v37Intel.league?.summary?.exploit || 0)}</b></header>${v37LeagueRows || v37IntelFallback}</section>
               <section><header><span>Biais par marché</span><b>${Number(v37Intel.marketBias?.summary?.market_exploit || 0)}</b></header>${v37MarketBiasRows || v37IntelFallback}</section>
               <section><header><span>Profil Théo</span><b>${v37CoachCount || '...'}</b></header>${v37CoachRows || `<div class="v36-tier-empty">Tracke quelques paris : le modèle apprendra tes bons sports, cotes et ligues.</div>`}</section>
+              <section><header><span>Discipline tilt</span><b>${v37Tilt?.level === 'danger' ? 'STOP' : v37Tilt?.level === 'warn' ? '!' : 'OK'}</b></header>${v37TiltRow || `<div class="v36-tier-empty">Tracke tes paris pour activer le détecteur de tilt.</div>`}</section>
               <section><header><span>Gaps data critiques</span><b>${v37GapCount || '...'}</b></header>${v37GapRows || `<div class="v36-tier-empty">Aucun trou prioritaire sur ce snapshot.</div>`}</section>
               <section><header><span>Timing mise</span><b>${Number(v37Intel.timing?.summary?.wait || 0)}</b></header>${v37TimingRows || `<div class="v36-tier-empty">Aucune attente forcée : les picks restent jouables selon ton filtre.</div>`}</section>
               <section><header><span>Stats live</span><b>${v36Total}</b></header><div class="v36-side-stats">${v36StatsHtml}</div></section>

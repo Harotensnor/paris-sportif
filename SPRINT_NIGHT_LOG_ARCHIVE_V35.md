@@ -2278,6 +2278,10 @@ Archived from SPRINT_NIGHT_LOG.md on 2026-05-04 to keep the active log readable.
 - Refactor `backtest_by_market.py` : les biais marchés ne comptent plus que les picks avec cote Winamax/snapshot réelle.
 - `market_biases_by_league` passe de `directional_only n=51` partagé à `priced_market_sample` par marché (ex. 7-8 cotes réelles sur le sample courant), sans exploit/fade sur petit volume.
 - Audits OK : intelligence consistency, data truth après regen night_metrics, syntax app/sw, no conflict markers.
-
+## Sprint v35.386 — AUTO 10/10 MCP racine et ratio fixes (20:43 UTC)
+- Cause A1: une ancienne config desktop pointait encore vers `paris-sportif-sprints/scripts/mcp_paris_sportif.py`, copie stale du 1er mai qui lisait un vieux `data.js`.
+- Fix: detection automatique de la racine au `data.js` le plus frais + sync de la copie legacy; les deux chemins MCP pointent maintenant vers `Paris-Sportif` et `today=2026-05-04`.
+- Ratio A2: `get_pipeline_status` expose top-level `winamax_exact_ratio` depuis `data.js` autoritaire; `night_metrics`/`health` deviennent snapshots secondaires avec statut aligned/stale.
+- Verif: appels MCP local + legacy 2x OK, ratio `0.9035`, sync `ok`, `test_mcp_smoke`, `audit_data_truth`, `audit_mcp_shadow_copy` OK; cache/footer bumpes v35.386.
 
 
