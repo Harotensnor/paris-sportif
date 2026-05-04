@@ -2332,3 +2332,9 @@
 - Fix: quand la ligue est `exploit`, les malus d'angles match sont plafonnes sauf conflit explicite `signal_conflict`; badge et tooltip indiquent "Biais ligue prioritaire".
 - Impact produit: MLB peut rester prioritaire tout en gardant les vrais conflits en prudence stricte; le score explique le netting applique.
 - Verif: app.js/sw.js --check OK; cache/footer bumpes v35.359.
+
+## Sprint v35.360 — AUTO 10/10 Marches de cotes incertains (19:18 UTC)
+- Bug critique: les cotes 1N2 pouvaient bouger de facon incoherente (home+away qui montent ensemble, marge implicite anormale) et etre lues comme un vrai signal de steam.
+- Fix: detection `market_uncertain` dans odds_history + snapshot 1N2 courant, patch data, angle rare "marche incertain" et penalite directe dans le score opportunite.
+- Impact mesure: `detected_angles` ajoute 68 marches incertains; ces matchs perdent le bonus steam et affichent un badge/tooltip de verification avant pari.
+- Verif: py_compile detect/patch/build intelligence OK; app.js/sw.js syntax OK; cache/footer bumpes v35.360.

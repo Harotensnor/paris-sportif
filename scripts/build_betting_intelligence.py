@@ -178,6 +178,42 @@ def snapshot_1n2_odds(ev: dict[str, Any]) -> dict[str, float]:
     return out
 
 
+def detect_1n2_market_anomaly(cur: dict[str, float], snap: dict[str, float]) -> dict[str, Any] | None:
+    if not cur:
+        return None
+    sides = [side for side in ("home", "draw", "away") if cur.get(side, 0) > 1]
+    if len(sides) < 2:
+        return None
+    implied = sum(1 / cur[side] for side in sides)
+    margin = implied - 1
+    high_margin_limit = 0.12 if len(sides) == 2 else 0.18
+    low_implied_limit = 0.98 if len(sides) == 2 else 1.00
+    reasons: list[str] = []
+
+    home_drift = away_drift = None
+    if cur.get("home") and cur.get("away") and snap.get("home") and snap.get("away"):
+        home_drift = (cur["home"] - snap["home"]) / snap["home"]
+        away_drift = (cur["away"] - snap["away"]) / snap["away"]
+        if home_drift >= 0.06 and away_drift >= 0.06:
+            reasons.append(f"home et away montent ensemble ({home_drift*100:+.1f}% / {away_drift*100:+.1f}%)")
+
+    if margin > high_margin_limit:
+        reasons.append(f"marge bookmaker anormale {margin*100:.1f}%")
+    if implied < low_implied_limit:
+        reasons.append(f"somme probabilites trop basse {implied*100:.1f}%")
+
+    if not reasons:
+        return None
+    return {
+        "reason": "; ".join(reasons),
+        "implied_sum": round(implied, 4),
+        "margin_pct": round(margin * 100, 2),
+        "home_drift_pct": round(home_drift * 100, 2) if home_drift is not None else None,
+        "away_drift_pct": round(away_drift * 100, 2) if away_drift is not None else None,
+        "side_count": len(sides),
+    }
+
+
 def build_team_schedule(events: list[dict[str, Any]]) -> dict[str, list[float]]:
     schedule: dict[str, list[float]] = defaultdict(list)
     for ev in events:
@@ -620,8 +656,29 @@ def detect_event_angles(
             "context": f"Arbitre strict: {ypg:.1f} jaunes/match",
         })
 
+    market_uncertain = ev.get("market_uncertain") or {}
+    if isinstance(market_uncertain, dict) and market_uncertain:
+        angles.append({
+            "type": "market_uncertain",
+            "direction": "abstain",
+            "strength": 0.85,
+            "context": market_uncertain.get("reason") or "Mouvement de cote incoherent: verifier avant de parier",
+            "open_margin_pct": market_uncertain.get("open_margin_pct"),
+            "latest_margin_pct": market_uncertain.get("latest_margin_pct"),
+        })
+
     cur = current_1n2_odds(ev)
     snap = snapshot_1n2_odds(ev)
+    market_anomaly = detect_1n2_market_anomaly(cur, snap)
+    if market_anomaly:
+        angles.append({
+            "type": "market_uncertain",
+            "direction": "abstain",
+            "strength": 0.85,
+            "context": market_anomaly["reason"],
+            "margin_pct": market_anomaly.get("margin_pct"),
+            "implied_sum": market_anomaly.get("implied_sum"),
+        })
     for side, current in cur.items():
         before = snap.get(side)
         if not before:
@@ -775,6 +832,7 @@ def build_angles(data: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any], 
                 "weather_extreme",
                 "strict_referee",
                 "market_move",
+                "market_uncertain",
                 "travel_extreme",
                 "back_to_back_travel",
                 "signal_conflict",
