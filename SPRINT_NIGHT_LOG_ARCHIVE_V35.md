@@ -2221,3 +2221,10 @@ Archived from SPRINT_NIGHT_LOG.md on 2026-05-04 to keep the active log readable.
 - Verif: app.js hash `0640df98`, cache/footer bumpes v35.338.
 
 
+## Sprint v35.339 — AUTO 10/10 Data gaps dans le score (17:29 UTC)
+- Avant: les gaps lineups/referee/H2H/xG etaient visibles dans le rail, mais le tri Score pouvait encore placer tres haut un pick sous-informe.
+- Apres: `signal_gap_report.json` est indexe par event et le score opportunite applique une penalite proportionnelle aux signaux critiques manquants, avec badges `data gap` / `prudence`.
+- Impact: Theo garde la couverture complete, mais les picks sans sources fortes descendent naturellement et le tooltip dit ce qui manque.
+- Verif: app.js hash `c8bf9f75`, app.css hash `66ce6f69`, cache/footer bumpes v35.339.
+
+
