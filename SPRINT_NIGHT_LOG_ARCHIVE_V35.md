@@ -2249,3 +2249,10 @@ Archived from SPRINT_NIGHT_LOG.md on 2026-05-04 to keep the active log readable.
 - Verif: py_compile/build_betting_intelligence/build_health OK; cache/footer bumpes v35.342.
 
 
+## Sprint v35.343 — AUTO 10/10 Biais marches dans le dashboard (17:57 UTC)
+- Avant: les biais par marche etaient produits en JSON mais n'influençaient pas encore la table dense ni le rail modele.
+- Apres: le dashboard charge `market_biases_by_league.json`, applique un bonus/malus au score opportunite selon le marche exact du pick et ajoute un bloc rail "Biais par marche".
+- Impact produit: les picks alignes avec un biais historique (ex: double chance ou under 3,5) remontent; les marches a fade sont etiquetes et penalises sans cacher la couverture.
+- Verif: app.js --check OK; hashes app.js/app.css recalcules; cache/footer bumpes v35.343.
+
+
