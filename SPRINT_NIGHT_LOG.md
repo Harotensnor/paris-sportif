@@ -2261,6 +2261,12 @@
 - Apres: blessures, fatigue calendrier, lookahead, voyage extreme et back-to-back voyage comparent le signal a l'equipe réellement soutenue par le pari; backing l'equipe fragile penalise, jouer contre elle bonifie.
 - Impact produit: les nouveaux angles voyage/fatigue deviennent exploitables sans faux boost; les signaux rares non alignes restent visibles en badge sans gonfler le score.
 - Verif: app.js --check prevu; cache/footer bumpes v35.347.
+## Sprint v35.351 — AUTO 10/10 Cache merge lineups Sofascore (19:04 UTC)
+- Bug prevenu: `fetch_lineups_soccer.py` pouvait aussi ecraser un cache riche avec un scrape partiel proche kickoff.
+- Fix: merge fresh + cache existant pour conserver les compositions deja collectees; ajout stats `fresh_with_lineup`, `retained_existing`, `events_total`.
+- Impact mesure: fichier lineups 47 -> 49 events; patch_lineups 31 -> 72 events; starter signals 78 -> 119; priority gaps 231 -> 230; health warnings 7 -> 6.
+- Verif: py_compile fetch_lineups, fetch Sofascore, patch_all_quick, measure_night_metrics, signal_gap_report, build_health, finalize_inline OK; cache/footer bumpes v35.351.
+
 ## Sprint v35.350 — AUTO 10/10 Cache merge arbitres Sofascore (19:02 UTC)
 - Bug trouve: `fetch_referees_soccer.py --force` pouvait remplacer 101 arbitres caches par seulement les 7 publies dans la fenetre courante.
 - Fix: merge fresh + cache existant; les nouvelles assignations gagnent, les anciennes restent disponibles tant qu'elles ne sont pas remplacees.

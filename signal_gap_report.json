@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-05-04T18:01:19.807159+00:00",
-  "data_generated_at": "2026-05-04T17:58:16Z",
+  "generated_at": "2026-05-04T18:03:04.436849+00:00",
+  "data_generated_at": "2026-05-04T18:01:20Z",
   "events": 342,
   "upcoming": 289,
   "coverage": {
     "events": 342,
     "upcoming": 289,
-    "starter_signals": 78,
+    "starter_signals": 119,
     "injuries": 211,
     "referee": 29,
     "h2h": 168,
@@ -15,7 +15,7 @@
     "clubelo": 133,
     "smart_money": 9,
     "ratios": {
-      "starter_signals": 0.2281,
+      "starter_signals": 0.348,
       "injuries": 0.617,
       "referee": 0.0848,
       "h2h": 0.4912,
@@ -73,7 +73,7 @@
     "football": {
       "events": 261,
       "upcoming": 217,
-      "starter_signals": 31,
+      "starter_signals": 72,
       "injuries": 133,
       "referee": 29,
       "h2h": 125,
@@ -82,7 +82,7 @@
       "clubelo": 133,
       "smart_money": 5,
       "ratios": {
-        "starter_signals": 0.1188,
+        "starter_signals": 0.2759,
         "injuries": 0.5096,
         "referee": 0.1111,
         "h2h": 0.4789,
@@ -285,7 +285,7 @@
       "coverage": {
         "events": 11,
         "upcoming": 11,
-        "starter_signals": 0,
+        "starter_signals": 1,
         "injuries": 11,
         "referee": 1,
         "h2h": 6,
@@ -294,7 +294,7 @@
         "clubelo": 4,
         "smart_money": 0,
         "ratios": {
-          "starter_signals": 0.0,
+          "starter_signals": 0.0909,
           "injuries": 1.0,
           "referee": 0.0909,
           "h2h": 0.5455,
@@ -312,7 +312,7 @@
       "coverage": {
         "events": 21,
         "upcoming": 11,
-        "starter_signals": 10,
+        "starter_signals": 19,
         "injuries": 21,
         "referee": 10,
         "h2h": 6,
@@ -321,7 +321,7 @@
         "clubelo": 20,
         "smart_money": 0,
         "ratios": {
-          "starter_signals": 0.4762,
+          "starter_signals": 0.9048,
           "injuries": 1.0,
           "referee": 0.4762,
           "h2h": 0.2857,
@@ -393,7 +393,7 @@
       "coverage": {
         "events": 18,
         "upcoming": 10,
-        "starter_signals": 8,
+        "starter_signals": 16,
         "injuries": 18,
         "referee": 8,
         "h2h": 5,
@@ -402,7 +402,7 @@
         "clubelo": 18,
         "smart_money": 2,
         "ratios": {
-          "starter_signals": 0.4444,
+          "starter_signals": 0.8889,
           "injuries": 1.0,
           "referee": 0.4444,
           "h2h": 0.2778,
@@ -447,7 +447,7 @@
       "coverage": {
         "events": 19,
         "upcoming": 9,
-        "starter_signals": 11,
+        "starter_signals": 19,
         "injuries": 19,
         "referee": 7,
         "h2h": 5,
@@ -456,7 +456,7 @@
         "clubelo": 18,
         "smart_money": 0,
         "ratios": {
-          "starter_signals": 0.5789,
+          "starter_signals": 1.0,
           "injuries": 1.0,
           "referee": 0.3684,
           "h2h": 0.2632,
@@ -528,7 +528,7 @@
       "coverage": {
         "events": 8,
         "upcoming": 8,
-        "starter_signals": 0,
+        "starter_signals": 8,
         "injuries": 8,
         "referee": 0,
         "h2h": 6,
@@ -537,7 +537,7 @@
         "clubelo": 7,
         "smart_money": 0,
         "ratios": {
-          "starter_signals": 0.0,
+          "starter_signals": 1.0,
           "injuries": 1.0,
           "referee": 0.0,
           "h2h": 0.75,
@@ -582,7 +582,7 @@
       "coverage": {
         "events": 9,
         "upcoming": 8,
-        "starter_signals": 2,
+        "starter_signals": 9,
         "injuries": 9,
         "referee": 0,
         "h2h": 1,
@@ -591,7 +591,7 @@
         "clubelo": 9,
         "smart_money": 0,
         "ratios": {
-          "starter_signals": 0.2222,
+          "starter_signals": 1.0,
           "injuries": 1.0,
           "referee": 0.0,
           "h2h": 0.1111,
@@ -1949,6 +1949,7 @@
       "present": [
         "clubelo",
         "injuries",
+        "starter_signals",
         "weather"
       ],
       "priority": 61
@@ -2188,6 +2189,7 @@
       "present": [
         "h2h",
         "injuries",
+        "starter_signals",
         "weather",
         "xg"
       ],
@@ -2209,6 +2211,7 @@
         "clubelo",
         "h2h",
         "injuries",
+        "starter_signals",
         "weather"
       ],
       "priority": 57
@@ -2232,27 +2235,6 @@
         "weather"
       ],
       "priority": 57
-    },
-    {
-      "event_id": "748933",
-      "sport": "football",
-      "league_code": "esp.2",
-      "league_name": "La Liga 2",
-      "kickoff": "2026-05-04T18:30Z",
-      "match": "Almería - Mirandés",
-      "home_key": "almeria",
-      "away_key": "mirandes",
-      "missing": [
-        "starter_signals"
-      ],
-      "present": [
-        "clubelo",
-        "h2h",
-        "injuries",
-        "referee",
-        "weather"
-      ],
-      "priority": 55
     },
     {
       "event_id": "401859436",
@@ -2691,6 +2673,7 @@
       "present": [
         "clubelo",
         "injuries",
+        "starter_signals",
         "weather",
         "xg"
       ],
@@ -2711,6 +2694,7 @@
       "present": [
         "clubelo",
         "injuries",
+        "starter_signals",
         "weather",
         "xg"
       ],
@@ -2731,6 +2715,28 @@
       "present": [
         "clubelo",
         "injuries",
+        "starter_signals",
+        "weather",
+        "xg"
+      ],
+      "priority": 51
+    },
+    {
+      "event_id": "748490",
+      "sport": "football",
+      "league_code": "esp.1",
+      "league_name": "La Liga",
+      "kickoff": "2026-05-10T12:00Z",
+      "match": "Mallorca - Villarreal",
+      "home_key": "mallorca",
+      "away_key": "villarreal",
+      "missing": [
+        "h2h"
+      ],
+      "present": [
+        "clubelo",
+        "injuries",
+        "starter_signals",
         "weather",
         "xg"
       ],
@@ -2784,8 +2790,8 @@
   "source_files": {
     "lineups_soccer": {
       "exists": true,
-      "size": 106138,
-      "mtime": "2026-05-02T05:13:56.466975+00:00"
+      "size": 213515,
+      "mtime": "2026-05-04T18:02:57.846874+00:00"
     },
     "injuries_soccer": {
       "exists": true,
