@@ -2137,3 +2137,8 @@
 - Apres: les 7 scripts inline actuels (JSON-LD inclus) sont autorises uniquement par hashes SHA-256; `unsafe-inline` est retire de script-src.
 - Impact: bug #65 ferme cote script: une injection JS inline non hashée ne peut plus s'executer, tandis que style-src garde `unsafe-inline` provisoire pour les styles historiques.
 - Verif: smoke navigateur => 730 lignes table, 0 inline event, script-src sans unsafe-inline, fallback image OK, 0 erreur console; footer/cache bumpes.
+## Sprint v35.326 — AUTO 10/10 Global HTML sink sanitizer (16:00 UTC)
+- Avant: 63 sinks `innerHTML` restaient dans le megafichier, avec des templates majoritairement echappes mais sans garde-fou central contre une future interpolation risquee.
+- Apres: `Element.innerHTML` passe par `sanitizeTrustedHTML`, qui retire scripts, iframes, handlers `on*`, `srcdoc`, URLs `javascript:` et CSS `url(javascript:)` avant injection.
+- Impact: bug #36 avance globalement: les anciens rendus restent compatibles, mais une valeur data/user mal echappee ne peut plus poser un handler/script executable via les sinks historiques.
+- Verif: app.js/sw.js syntax OK, inline scripts OK, CSP hash recalcule, smoke navigateur dashboard 360 lignes, 0 inline event, sonde XSS neutralisee, 0 erreur console; footer/cache/app hash bumpes.
