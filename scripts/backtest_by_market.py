@@ -181,22 +181,72 @@ def _get_secondary_odd(ev: dict, market_key: str, pick_value: str):
     """
     snap_mk = (ev.get('odds_snapshot') or {}).get('markets') or {}
     wnx_mk = (ev.get('winamax') or {}).get('markets') or {}
+
+    def _float_odd(v):
+        try:
+            odd = float(v)
+            return odd if odd > 1 else None
+        except (TypeError, ValueError):
+            return None
+
+    def _find_row_odd(rows, side=None, line=None):
+        if not isinstance(rows, list):
+            return None
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            if side is not None and str(row.get('side') or '').lower() != str(side).lower():
+                continue
+            if line is not None:
+                try:
+                    if abs(float(row.get('line')) - float(line)) > 0.01:
+                        continue
+                except (TypeError, ValueError):
+                    continue
+            odd = _float_odd(row.get('odd'))
+            if odd:
+                return odd
+        return None
+
     if market_key in ('ou25', 'ou15', 'ou35'):
         bucket = snap_mk.get(market_key) or wnx_mk.get(market_key) or {}
         if pick_value.startswith('O'):
-            v = bucket.get('over')
-            return float(v) if v else None
+            if isinstance(bucket, dict):
+                return _float_odd(bucket.get('over'))
+            line = pick_value[1:]
+            return _find_row_odd(bucket, side='over', line=line)
         if pick_value.startswith('U'):
-            v = bucket.get('under')
-            return float(v) if v else None
+            if isinstance(bucket, dict):
+                return _float_odd(bucket.get('under'))
+            line = pick_value[1:]
+            return _find_row_odd(bucket, side='under', line=line)
     elif market_key == 'btts':
         bucket = snap_mk.get('btts') or wnx_mk.get('btts') or {}
         if pick_value == 'BTTS_Y':
-            v = bucket.get('yes')
-            return float(v) if v else None
+            if isinstance(bucket, dict):
+                return _float_odd(bucket.get('yes'))
+            return _find_row_odd(bucket, side='yes')
         if pick_value == 'BTTS_N':
-            v = bucket.get('no')
-            return float(v) if v else None
+            if isinstance(bucket, dict):
+                return _float_odd(bucket.get('no'))
+            return _find_row_odd(bucket, side='no')
+    elif market_key == 'doubleChance':
+        bucket = (
+            snap_mk.get('doubleChance') or snap_mk.get('double_chance') or
+            wnx_mk.get('doubleChance') or wnx_mk.get('double_chance') or []
+        )
+        if isinstance(bucket, dict):
+            aliases = {
+                '1X': ('1X', 'home_draw', 'home_or_draw'),
+                'X2': ('X2', 'away_draw', 'away_or_draw'),
+                '12': ('12', 'home_away', 'no_draw'),
+            }.get(pick_value, (pick_value,))
+            for alias in aliases:
+                odd = _float_odd(bucket.get(alias))
+                if odd:
+                    return odd
+            return None
+        return _find_row_odd(bucket, side=pick_value)
     return None
 
 
@@ -218,22 +268,22 @@ def main():
     # disponible (snapshot Sprint 67). Sinon on ne peut que compter WR.
     by_market = defaultdict(lambda: {
         'n': 0, 'wins': 0, 'losses': 0, 'voids': 0,
-        'with_odds': 0, 'stake': 0.0, 'profit': 0.0,
+        'with_odds': 0, 'stake': 0.0, 'profit': 0.0, 'odds_sum': 0.0,
     })
     # Sprint 88 (v31.7.175 — audit Part 15) — Segmentations supplémentaires.
     # Toutes les dimensions trackent (n, wins, losses, with_odds, stake, profit)
     # comme by_market, pour pouvoir calculer WR et ROI partout.
     by_league = defaultdict(lambda: {
         'n': 0, 'wins': 0, 'losses': 0, 'voids': 0,
-        'with_odds': 0, 'stake': 0.0, 'profit': 0.0,
+        'with_odds': 0, 'stake': 0.0, 'profit': 0.0, 'odds_sum': 0.0,
     })
     by_period = defaultdict(lambda: {
         'n': 0, 'wins': 0, 'losses': 0, 'voids': 0,
-        'with_odds': 0, 'stake': 0.0, 'profit': 0.0,
+        'with_odds': 0, 'stake': 0.0, 'profit': 0.0, 'odds_sum': 0.0,
     })
     by_edge_bucket = defaultdict(lambda: {
         'n': 0, 'wins': 0, 'losses': 0, 'voids': 0,
-        'with_odds': 0, 'stake': 0.0, 'profit': 0.0,
+        'with_odds': 0, 'stake': 0.0, 'profit': 0.0, 'odds_sum': 0.0,
     })
 
     for day_iso, evs in sorted(days.items()):
@@ -250,65 +300,37 @@ def main():
                 ev_period = _period_key(ev.get('date'))
                 def _track(market_key, pv):
                     res = evaluate_market_pure_python(ev, market_key, pv)
+                    if res is None:
+                        return
+                    odd = _get_secondary_odd(ev, market_key, pv)
+                    if not odd or odd <= 1:
+                        return
                     bucket = by_market[f'{market_key}:{pv}']
                     league_bucket = by_league[ev_league]
                     period_bucket = by_period[ev_period]
-                    if res is None:
-                        bucket['voids'] += 1
-                        league_bucket['voids'] += 1
-                        period_bucket['voids'] += 1
-                        return
                     bucket['n'] += 1
                     league_bucket['n'] += 1
                     period_bucket['n'] += 1
-                    odd = _get_secondary_odd(ev, market_key, pv)
                     edge = None  # On a pas la proba modèle ici (pas de mini-racer V8)
                     # Edge bucket fallback sur la cote implicite : si cote favorable (>1.5)
                     # on assume edge "moyen" ; sinon edge "faible". Approximation grossière.
-                    if odd:
-                        edge = 0.05 if odd > 2.0 else 0.02 if odd > 1.5 else 0
+                    edge = 0.05 if odd > 2.0 else 0.02 if odd > 1.5 else 0
                     eb_key = _edge_bucket(edge)
                     eb = by_edge_bucket[eb_key]
                     eb['n'] += 1
-                    if odd and odd > 1:
-                        bucket['with_odds'] += 1
-                        league_bucket['with_odds'] += 1
-                        period_bucket['with_odds'] += 1
-                        eb['with_odds'] += 1
-                        bucket['stake'] += 1.0
-                        league_bucket['stake'] += 1.0
-                        period_bucket['stake'] += 1.0
-                        eb['stake'] += 1.0
-                        if res == 'won':
-                            bucket['wins'] += 1
-                            league_bucket['wins'] += 1
-                            period_bucket['wins'] += 1
-                            eb['wins'] += 1
-                            profit = float(odd) - 1.0
-                            bucket['profit'] += profit
-                            league_bucket['profit'] += profit
-                            period_bucket['profit'] += profit
-                            eb['profit'] += profit
-                        elif res == 'lost':
-                            bucket['losses'] += 1
-                            league_bucket['losses'] += 1
-                            period_bucket['losses'] += 1
-                            eb['losses'] += 1
-                            bucket['profit'] -= 1.0
-                            league_bucket['profit'] -= 1.0
-                            period_bucket['profit'] -= 1.0
-                            eb['profit'] -= 1.0
-                    else:
-                        if res == 'won':
-                            bucket['wins'] += 1
-                            league_bucket['wins'] += 1
-                            period_bucket['wins'] += 1
-                            eb['wins'] += 1
-                        elif res == 'lost':
-                            bucket['losses'] += 1
-                            league_bucket['losses'] += 1
-                            period_bucket['losses'] += 1
-                            eb['losses'] += 1
+                    for agg in (bucket, league_bucket, period_bucket, eb):
+                        agg['with_odds'] += 1
+                        agg['stake'] += 1.0
+                        agg['odds_sum'] += float(odd)
+                    if res == 'won':
+                        profit = float(odd) - 1.0
+                        for agg in (bucket, league_bucket, period_bucket, eb):
+                            agg['wins'] += 1
+                            agg['profit'] += profit
+                    elif res == 'lost':
+                        for agg in (bucket, league_bucket, period_bucket, eb):
+                            agg['losses'] += 1
+                            agg['profit'] -= 1.0
                 # OU 1.5 / 2.5 / 3.5
                 for pv in ['O2.5', 'U2.5']:
                     _track('ou25', pv)
@@ -331,6 +353,7 @@ def main():
         n = v['n']
         wr = v['wins'] / n if n > 0 else None
         roi = (v['profit'] / v['stake']) if v['stake'] > 0 else None
+        avg_odd = (v.get('odds_sum', 0.0) / v['with_odds']) if v.get('with_odds', 0) > 0 else None
         ci_lo, ci_hi = _wilson_ci(v['wins'], n)
         return {
             'n': n,
@@ -345,6 +368,7 @@ def main():
             'stake': round(v['stake'], 2),
             'profit': round(v['profit'], 2),
             'roi': round(roi, 4) if roi is not None else None,
+            'avg_odd': round(avg_odd, 4) if avg_odd is not None else None,
         }
 
     summary = {k: _summarize_bucket(v) for k, v in by_market.items()}
@@ -355,13 +379,15 @@ def main():
     report = {
         'generated_at': datetime.now(timezone.utc).isoformat(),
         'description': (
-            "Backtest par marché — Sprint 88 (v31.7.175). "
-            "WR + Wilson 95% CI sur tous les pairs (marché, pick). "
+            "Backtest par marché — Sprint v35.387. "
+            "WR + Wilson 95% CI seulement sur les pairs (marché, pick) "
+            "où une cote Winamax/snapshot réelle existe. "
             "Segmentations supplémentaires : par ligue, par mois (période), "
             "par bucket d'edge. ROI calculé sur les paires où une cote book "
             "est snapshotée via odds_snapshot.markets (Sprint 67) — 1€ flat stake."
         ),
         'completed_evaluated': completed_count,
+        'sample_policy': 'priced_markets_only',
         'by_market_pick': summary,
         # Sprint 88 — Segmentations supplémentaires
         'by_league': summary_league,

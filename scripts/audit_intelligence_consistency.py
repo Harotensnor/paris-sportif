@@ -27,6 +27,8 @@ def audit_markets(errors: list[str]) -> None:
     summary = report.get("summary") or {}
     n_values = {int(r.get("n") or 0) for r in rows}
     priced_rows = int(summary.get("market_priced_rows") or 0)
+    if len(rows) > 3 and len(n_values) == 1:
+        fail(errors, "market rows still share one sample size; expected priced per-market samples")
     if len(rows) > 1 and len(n_values) == 1 and priced_rows == 0:
         if summary.get("market_sample_warning") != "all_market_rows_share_same_n_without_odds":
             fail(errors, "market rows share one n but warning is missing")
@@ -41,7 +43,9 @@ def audit_markets(errors: list[str]) -> None:
         avg_odd = row.get("avg_odd")
         if with_odds < 20 and status in {"exploit", "fade"}:
             fail(errors, f"{key} is {status} without enough priced samples")
-        if with_odds < 20 and scope != "directional_settled_match_sample":
+        if with_odds > 0 and scope != "priced_market_sample":
+            fail(errors, f"{key} missing priced market sample scope")
+        if with_odds == 0 and scope != "directional_settled_match_sample":
             fail(errors, f"{key} missing directional sample scope")
         if key == "doubleChance:12":
             priced_value = (float(avg_odd) * wr) - 1.0 if isinstance(avg_odd, (int, float)) else None

@@ -2,12 +2,6 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
-## Sprint v35.337 — AUTO 10/10 Gaps data dans le rail (17:11 UTC)
-- Avant: `signal_gap_report.json` existait mais restait un fichier technique; Theo ne voyait pas encore quels matchs etaient sous-informes avant de lire la table.
-- Apres: le dashboard charge `signal_gap_report.json` avec les autres sidecars intelligence et affiche un bloc "Gaps data critiques" dans le rail accueil avec priorite, match et signaux manquants.
-- Impact: les picks ne sont plus presentes comme equivalemment fiables quand compos/arbitres/H2H/xG manquent; les trous sources deviennent visibles et cliquables vers la modal match.
-- Verif: app.js hash `59a2c298`, app.css hash `92688e73`, cache/footer bumpes v35.337.
-
 ## Sprint v35.338 — AUTO 10/10 Profil Theo dans le score (17:18 UTC)
 - Avant: l'analyse des paris trackes existait dans Profil, mais la table dense ignorait encore les forces/faiblesses personnelles de Theo.
 - Apres: le score opportunite applique un bonus/malus sport, ligue et tranche de cote selon `computeCoachInsights()`; le rail ajoute un bloc "Profil Theo" avec les patterns locaux.
@@ -301,6 +295,8 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Ratio A2: `get_pipeline_status` expose top-level `winamax_exact_ratio` depuis `data.js` autoritaire; `night_metrics`/`health` deviennent snapshots secondaires avec statut aligned/stale.
 - Verif: appels MCP local + legacy 2x OK, ratio `0.9035`, sync `ok`, `test_mcp_smoke`, `audit_data_truth`, `audit_mcp_shadow_copy` OK; cache/footer bumpes v35.386.
 
-
-
+## Sprint v35.387 — A5 market samples réels
+- Refactor `backtest_by_market.py` : les biais marchés ne comptent plus que les picks avec cote Winamax/snapshot réelle.
+- `market_biases_by_league` passe de `directional_only n=51` partagé à `priced_market_sample` par marché (ex. 7-8 cotes réelles sur le sample courant), sans exploit/fade sur petit volume.
+- Audits OK : intelligence consistency, data truth après regen night_metrics, syntax app/sw, no conflict markers.
 

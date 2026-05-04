@@ -2207,3 +2207,10 @@ Archived from SPRINT_NIGHT_LOG.md on 2026-05-04 to keep the active log readable.
 - Impact mesure: snapshot courant = 342 events, 289 upcoming, 269 gaps prioritaires; couverture globale starter 79/342, injuries 192/342, referee 24/342, h2h 158/342, xG 88/342.
 - Verif: py_compile OK; script OK; refresh.yml appelle le rapport apres health; cache/footer bumpes v35.336.
 
+## Sprint v35.337 — AUTO 10/10 Gaps data dans le rail (17:11 UTC)
+- Avant: `signal_gap_report.json` existait mais restait un fichier technique; Theo ne voyait pas encore quels matchs etaient sous-informes avant de lire la table.
+- Apres: le dashboard charge `signal_gap_report.json` avec les autres sidecars intelligence et affiche un bloc "Gaps data critiques" dans le rail accueil avec priorite, match et signaux manquants.
+- Impact: les picks ne sont plus presentes comme equivalemment fiables quand compos/arbitres/H2H/xG manquent; les trous sources deviennent visibles et cliquables vers la modal match.
+- Verif: app.js hash `59a2c298`, app.css hash `92688e73`, cache/footer bumpes v35.337.
+
+
