@@ -2,12 +2,6 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
-## Sprint v35.334 — AUTO 10/10 Aliases signaux foot (16:51 UTC)
-- Avant: `patch_all_quick.py` avait une petite table locale d'aliases alors que `winamax_map.py` connaissait deja beaucoup de variantes FR/EN; les signaux pouvaient rester dormants sur Bayern/Heidenheim, Atletico, Ajax/PSV, MLS/Liga MX.
-- Apres: le patch rapide importe les aliases Winamax et ajoute des variantes Allemagne/UEFA/Portugal/Pays-Bas/Belgique/MLS/Liga MX/Argentine pour partager le meme vocabulaire entre cotes et signaux.
-- Impact mesure: couverture immediate stable sur le snapshot courant (starter_signals 79, injuries 192, referee 24), mais le prochain refresh peut matcher les nouvelles variantes sans nouveau code.
-- Verif: py_compile OK; patch_all_quick/build_lineups_multisport/measure_night_metrics/build_health/finalize_inline OK; data_lite hash recalc 1d0cfa8b; cache/footer bumpes v35.334.
-
 ## Sprint v35.335 — AUTO 10/10 Score opportunite table (16:56 UTC)
 - Avant: les angles rares, biais ligue, timing et richesse data etaient surtout visibles dans le rail droit; la table dense ne resumait que cote/confiance/edge.
 - Apres: chaque ligne calcule un score opportunite 0-100 qui combine edge, confiance, tier strict, biais ligue, steam/drift cote, blessures/fatigue/lookahead, timing de mise et richesse data.
@@ -300,6 +294,12 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix: suppression de 26 commentaires ligne-only stale (`PLAN 1000`, `v31.*`, `v33.*`, `v34.*`, `v35.199`, legacy retire/supprime).
 - Garde-fou: `scripts/audit_legacy_comments.py` refuse le retour de ces commentaires legacy ligne-only.
 - Verif: audit_legacy_comments + py_compile + app/sw syntax OK; cache/footer bumpes v35.383.
+
+## Sprint v35.384 — AUTO 10/10 Night metrics source unique (20:29 UTC)
+- Data: regeneration `night_metrics.json` depuis `data.js` frais (`data_generated_at=2026-05-04T20:28:50Z`).
+- Mesure: 345 events, 304 upcoming, Winamax exact 308 (89.3%), marches detailles 715/718, xG 255, injuries 217, lineups 122, referees 29.
+- Drift: `check_pipeline_drift.py` OK, auto_refresh et refresh.yml alignes sur 64 scripts chacun.
+- Verif: metrics regen + drift check OK; cache/footer bumpes v35.384.
 
 
 
