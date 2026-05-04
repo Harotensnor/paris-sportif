@@ -1,11 +1,6 @@
-# Issues — Paris-Sportif
+# Issues Active — Paris-Sportif
 
-Le fichier actif est maintenant separe pour eviter de masquer les vrais problemes sous l'historique resolu.
-
-- Voir ISSUES_ACTIVE.md pour les problemes OPEN/PARTIAL.
-- Voir ISSUES_RESOLVED.md pour l'historique FIXED et les audits archives.
-
-## Resume actif
+Split from ISSUES.md on 2026-05-04. Active means OPEN/PARTIAL only; resolved history lives in ISSUES_RESOLVED.md.
 
 - Active issues: 1
 

@@ -1,12 +1,7 @@
 # Sprint Night Log — Paris-Sportif Autonomous Night
 
-Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35_001_330.md.
+Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35_001_332.md.
 
-## Sprint v35.332 — AUTO 10/10 Rail Insights modele (16:35 UTC)
-- Avant: le rail accueil repetait prochains matchs / stats live, alors que la table contient deja cette information.
-- Apres: le rail charge les sidecars betting intelligence et affiche biais ligues, smart money / signaux rares, angles de match et timing de mise sans bloquer le dashboard si un JSON manque.
-- Impact: le site commence a exposer les angles "que les autres ne voient pas" directement sur l'accueil desktop, avec clic ligne -> modal match quand l'event est disponible.
-- Verif: app.js/sw.js/inline/CSP hashes OK; hash app.js recalcule d9ea6e81; cache/footer bumpes v35.332; capture visuelle bloquee localement (Playwright absent du workspace).
 ## Sprint v35.333 — AUTO 10/10 Starter signals MLB/NHL (16:43 UTC)
 - Avant: `mlb_pitchers.json` et `nhl_stats.json` existaient mais `patch_all_quick.py` lisait les anciens schemas (`by_match`, `by_team`), donc pitchers/goalies restaient invisibles dans `data.js`.
 - Apres: patch rapide lit `matches` MLB par home/away/date et `teams` NHL par abbr/name, attache `event.mlb_pitchers` + `event.nhl_stats`, et `night_metrics` compte les starter signals multi-sports.
@@ -296,8 +291,14 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 
 ## Sprint v35.381 — AUTO 10/10 Journal actif compacte (20:19 UTC)
 - Dette: `SPRINT_NIGHT_LOG.md` contenait 370 entrees et ~190KB, rendant les sessions et revues inutilement lourdes.
-- Fix: archive creee dans `SPRINT_NIGHT_LOG_ARCHIVE_V35_001_330.md`; le journal actif conserve les 50 derniers sprints avec un pointeur vers l'archive.
+- Fix: archive creee dans `SPRINT_NIGHT_LOG_ARCHIVE_V35_001_332.md`; le journal actif conserve les 50 derniers sprints avec un pointeur vers l'archive.
 - Mesure: active log 370 -> 50 sprints; archive 321 sprints; aucune entree perdue.
 - Verif: compte headings archive+actif identique au pre-split; cache/footer bumpes v35.381.
+
+## Sprint v35.382 — AUTO 10/10 Issues actives separees (20:24 UTC)
+- Dette: `ISSUES.md` melangeait l'historique FIXED avec les vrais problemes restants, ce qui noyait la priorite active.
+- Fix: creation de `ISSUES_ACTIVE.md` et `ISSUES_RESOLVED.md`; `ISSUES.md` devient un index court avec la seule issue OPEN actuelle.
+- Mesure: fichier principal 32KB -> 1.2KB; active=1 issue, resolved/history=53 blocs.
+- Garde-fou: `scripts/audit_issues_split.py` refuse un FIXED dans l'actif ou un OPEN/PARTIAL dans le resolu; cache/footer bumpes v35.382.
 
 
