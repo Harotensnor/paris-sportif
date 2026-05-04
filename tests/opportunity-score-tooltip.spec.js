@@ -26,12 +26,14 @@ test('opportunity score exposes a visible legend and detailed tooltip copy', asy
 
   const score = page.locator('.v37-opportunity:visible, .v36-table-card__signals i[aria-label]:visible').first();
   await expect(score).toBeVisible();
-  const tooltip = await score.getAttribute('data-tooltip');
-  const title = await score.getAttribute('title');
-  const ariaLabel = await score.getAttribute('aria-label');
+  const attrs = await score.evaluate(el => ({
+    tooltip: el.getAttribute('data-tooltip'),
+    title: el.getAttribute('title'),
+    ariaLabel: el.getAttribute('aria-label'),
+  }));
 
-  expect(tooltip || '').toContain("Score d'opportunité");
-  expect(tooltip || '').toContain('Décomposition');
-  expect(title).toBe(tooltip);
-  expect(ariaLabel).toBe(tooltip);
+  expect(attrs.tooltip || '').toContain("Score d'opportunité");
+  expect(attrs.tooltip || '').toContain('Décomposition');
+  expect(attrs.title).toBe(attrs.tooltip);
+  expect(attrs.ariaLabel).toBe(attrs.tooltip);
 });

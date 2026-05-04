@@ -2,18 +2,19 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
+## Sprint v35.392 — AUTO 10/10 Signaux pour contre modal (21:18 UTC)
+- Avant: les signaux contradictoires etaient melanges dans les raisons, et le badge mitigé ne disait pas clairement quoi faire.
+- Apres: chaque modal affiche un bloc Signaux pour / Signaux contre, avec note de prudence si les signaux se neutralisent; le badge devient Signaux mitiges - prudence.
+- Impact mesure: test modal signaux cible ajoute; score/table gardent les badges lisibles sur desktop et mobile.
+- Verif: tests cibles B2+B3 OK (6/6), bundle-size OK, syntax JS OK, no-conflict-markers OK; cache/footer bumpes v35.392.
+
+
 ## Sprint v35.391 — AUTO 10/10 Tooltip score opportunite testable (21:10 UTC)
 - Avant: le score opportunite avait une decomposition dans data-tooltip, mais pas de fallback natif ni de test desktop/mobile garantissant sa visibilite.
 - Apres: score table + card mobile exposent title et aria-label; nouveau test Playwright cible verifie legende, decomposition et accessibilite du tooltip.
 - Impact mesure: test score opportunite OK sur desktop + mobile Chrome local; bundle reste sous seuil app.js 1.58MB / 1.70MB.
 - Verif: Playwright cible OK (2/2), bundle-size OK, syntax JS OK, no-conflict-markers OK; cache/footer bumpes v35.391.
 
-
-## Sprint v35.342 — AUTO 10/10 Biais marches par ligue (17:50 UTC)
-- Avant: `build_betting_intelligence.py` exposait les biais ligue, angles rares et timing, mais pas de lecture par famille de marche (OU, BTTS, double chance).
-- Apres: publication de `market_biases_by_league.json`, ajout au refresh GitHub Actions et a `health.json`, avec labels lisibles et watchlist globale si le biais ligue manque encore de sample.
-- Impact mesure: 11 marches profiles, 4 exploitables, 2 a fade, 6 signaux watchlist; exemples forts: double chance 12 et moins de 3,5 buts.
-- Verif: py_compile/build_betting_intelligence/build_health OK; cache/footer bumpes v35.342.
 
 ## Sprint v35.343 — AUTO 10/10 Biais marches dans le dashboard (17:57 UTC)
 - Avant: les biais par marche etaient produits en JSON mais n'influençaient pas encore la table dense ni le rail modele.
@@ -297,4 +298,3 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - `lightgbm_weights.json` exporté en `lightgbm_weights.js` et préchargé avant `app.js`.
 - `predictMatch` consomme les poids appris comme nudge conservateur (`max_probability_nudge` ≤ 2,5pt) avec trace `pred.learned_context` + raison modèle.
 - Audit ajouté : `scripts/audit_lightgbm_runtime.py` vérifie sidecar, HTML et consommation front. Statut assumé : `aggregate_fallback`, pas faux entraînement LightGBM ligne-à-ligne.
-

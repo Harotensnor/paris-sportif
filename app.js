@@ -9646,6 +9646,7 @@ const capped = whyBest?.investment && isFinite(whyBest.investment.cappedKelly) ?
 return Math.max(1, Math.round(bankroll * Math.max(0, Math.min(0.06, capped || 0))));
 } catch(e) { return 1; }
 })();
+const whySignalState = { for: [], against: [], resolution: null };
 const whyReasons = (() => {
 const arr = [];
 const sides = getSides(match);
@@ -9672,6 +9673,7 @@ try {
 const intel = window.__v37BettingIntelState?.data || {};
 const rows = Array.isArray(intel.angles?.events) ? intel.angles.events : [];
 const row = rows.find(e => String(e?.event_id || '') === String(match?.id || ''));
+whySignalState.resolution = row?.signal_resolution || null;
 return Array.isArray(row?.angles) ? row.angles : [];
 } catch(e) {
 return [];
@@ -9687,8 +9689,8 @@ if (side && pickSide && ((side === 'home' && (pickSide === 'away' || pickSide ==
 if (team && target && (team === target || target.includes(team) || team.includes(target))) return 'same';
 return '';
 };
-const signalFor = [];
-const signalAgainst = [];
+const signalFor = whySignalState.for;
+const signalAgainst = whySignalState.against;
 detailAngles.forEach(angle => {
 const typ = String(angle?.type || '');
 const dir = String(angle?.direction || '').toLowerCase();
@@ -9775,6 +9777,28 @@ arr.push(txt);
 if (whyBest?.investment?.score) arr.push(`Qualité du signal : ${Math.round(whyBest.investment.score)}/100.`);
 return [...new Set(arr)].slice(0, 5);
 })();
+const whySignalsHtml = (() => {
+const signalFor = [...new Set(whySignalState.for)].slice(0, 3);
+const signalAgainst = [...new Set(whySignalState.against)].slice(0, 3);
+const resolution = whySignalState.resolution || {};
+const caution = resolution.status === 'abstain'
+? `<div class="why-bet__signal-warning">Signaux mitigés - prudence : ${esc(resolution.reason || 'les indicateurs se neutralisent')}</div>`
+: resolution.reason ? `<div class="why-bet__signal-note">${esc(resolution.reason)}</div>` : '';
+const list = (items, empty) => items.length
+? `<ul>${items.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`
+: `<p>${esc(empty)}</p>`;
+return `<div class="why-bet__signals" aria-label="Signaux pour et contre ce pari">
+          <div>
+            <h4>Signaux pour</h4>
+            ${list(signalFor, 'Aucun signal fort en plus du modèle principal.')}
+          </div>
+          <div>
+            <h4>Signaux contre</h4>
+            ${list(signalAgainst, 'Aucun contre-signal majeur détecté.')}
+          </div>
+          ${caution}
+        </div>`;
+})();
 const whyWinamaxHref = buildWinamaxLink(match);
 const whyWinamaxCta = match?.winamax?.match_id
 ? `<a class="why-bet__winamax" href="${esc(whyWinamaxHref)}" target="_blank" rel="noopener" data-modal-winamax-click>Placer chez Winamax →</a>`
@@ -9795,6 +9819,7 @@ const whyHtml = `
           </div>
         </div>
         ${whyReasons.length ? `<ol>${whyReasons.map(r => `<li>${esc(r)}</li>`).join('')}</ol>` : '<p class="why-bet__muted">Le modèle conseille d’ouvrir les détails techniques avant de décider.</p>'}
+        ${whySignalsHtml}
         <footer>
           ${whyWinamaxCta}
           <button type="button" class="why-bet__tech" data-why-tech-toggle>Voir les détails techniques</button>
@@ -14167,7 +14192,7 @@ lookahead: 'Match piège',
 'signal rare +': 'Signal rare favorable',
 'signal rare -': 'Signal rare défavorable',
 'signal rare': 'Signal rare détecté',
-'signaux mitigés': 'Signaux mitigés',
+'signaux mitigés': 'Signaux mitigés - prudence',
 'attendre compos': 'Attendre compos',
 'timing cote': 'Bon timing cote',
 'data riche': 'Données riches',
@@ -14210,6 +14235,7 @@ const v37BadgeTooltip = (badge) => ({
 'Signal rare favorable': 'Angle rare aligné avec ce pari.',
 'Signal rare défavorable': 'Angle rare contre ce pari : prudence.',
 'Signal rare détecté': 'Un angle inhabituel est présent sur le match.',
+'Signaux mitigés - prudence': 'Des signaux forts poussent dans les deux sens : réduire la mise ou attendre une confirmation.',
 'Attendre compos': 'Les compositions peuvent changer fortement la value.',
 'Bon timing cote': 'La cote actuelle est jugée intéressante par rapport au mouvement récent.',
 'Données riches': 'Le match dispose de plusieurs signaux fiables.',
