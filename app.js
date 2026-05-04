@@ -2550,6 +2550,14 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
       const obj = key ? raw[key] : null;
       return obj ? (side === 'over' ? obj.over : obj.under) : null;
     }
+    if (market === 'football_ht_ou') {
+      const raw = pred.markets?.extended?.raw || {};
+      const key = Math.abs(line - 0.5) < 0.01 ? 'ouHT05'
+        : Math.abs(line - 1.5) < 0.01 ? 'ouHT15'
+        : null;
+      const obj = key ? raw[key] : null;
+      return obj ? (side === 'over' ? obj.over : obj.under) : null;
+    }
     const totals = pred.scores?.markets?.totals || pred.scores?.games?.lines || [];
     const row = totals.find(t => Math.abs(Number(t.line) - Number(line)) < 0.11);
     if (!row) return null;
@@ -2691,6 +2699,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     if (m === 'teamTotal') return 'Total équipe';
     if (m === 'exactScore') return 'Score exact';
     if (m === 'ht_1n2') return 'Mi-temps';
+    if (m === 'htTotal') return 'Total 1re mi-temps';
     if (m === 'resultBtts') return 'Résultat + BTTS';
     if (typeof isHandicapMarket === 'function' && isHandicapMarket(m)) return 'Handicap';
     if (/tennisGames/i.test(m)) return 'Total jeux';
@@ -2739,6 +2748,10 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
       const pickSide = _v37TeamSide(match, _v37SideFromKey(key, side));
       full = pickSide.side === 'draw' ? 'Match nul à la mi-temps' : `${pickSide.name} mène à la mi-temps`;
       tooltip = 'Mi-temps : le pari est réglé sur le score à la pause uniquement.';
+    } else if (mk === 'htTotal') {
+      const base = _v37TotalLabel(match, row?.side ?? side, line, unit, '');
+      full = `${base} en 1re mi-temps`;
+      tooltip = `${full}. Le pari est réglé uniquement sur les buts avant la pause.`;
     } else if (mk === 'exactScore') {
       full = `Score exact ${String(key || row?.score || label || '').replace(/^Score exact\s*/i, '')}`;
       tooltip = 'Score exact : le score final doit correspondre exactement.';
@@ -2862,6 +2875,20 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
         const prob = _v35ModelTotalProb(pred, 'football_ou', line, side);
         const odd = Number(block[side]);
         _v35AddCandidate(out, { odd, side, line, label: `${side === 'over' ? 'Plus' : 'Moins'} de ${line}` }, prob, mk, `${side === 'over' ? 'O' : 'U'}${line}`, `${side === 'over' ? 'Plus' : 'Moins'} de ${line} buts`);
+      });
+    });
+    for (const row of _v35Rows(wxMk.ht_ou)) {
+      const prob = _v35ModelTotalProb(pred, 'football_ht_ou', row.line, row.side);
+      const key = `HT_${row.side === 'over' ? 'O' : 'U'}${row.line}`;
+      _v35AddCandidate(out, row, prob, 'htTotal', key, `${row.side === 'over' ? 'Plus' : 'Moins'} de ${row.line} but(s) en 1re mi-temps`);
+    }
+    [['ht_ou05', 0.5], ['ht_ou15', 1.5]].forEach(([mk, line]) => {
+      const block = wxMk[mk];
+      if (!block) return;
+      ['over', 'under'].forEach(side => {
+        const prob = _v35ModelTotalProb(pred, 'football_ht_ou', line, side);
+        const odd = Number(block[side]);
+        _v35AddCandidate(out, { odd, side, line, label: `${side === 'over' ? 'Plus' : 'Moins'} de ${line}` }, prob, 'htTotal', `HT_${side === 'over' ? 'O' : 'U'}${line}`, `${side === 'over' ? 'Plus' : 'Moins'} de ${line} but(s) en 1re mi-temps`);
       });
     });
 
@@ -11124,7 +11151,7 @@ if (!best || !best.allCandidates) return '';
 const cands = best.allCandidates;
 const contradictedCands = Array.isArray(best.contradictedCandidates) ? best.contradictedCandidates : [];
 if (cands.length < 2 && !contradictedCands.length) return '';
-const marketEmoji = { '1n2': '🏆', 'ou25': '⚽', 'ou15': '⚽', 'ou35': '⚽', 'btts': '🔄', 'doubleChance': '🎯', 'exactScore': '🎯', 'dnb': '🎯', 'teamTotal': '⚽', 'ht_1n2': '⏱️', 'resultBtts': '🎯', 'ah': '⚖️', 'basketTotal': '🏀', 'basketHandicap': '🏀', 'hockeyTotal': '🏒', 'puckLine': '🏒', 'baseballTotal': '⚾', 'runLine': '⚾', 'tennisGames': '🎾' };
+const marketEmoji = { '1n2': '🏆', 'ou25': '⚽', 'ou15': '⚽', 'ou35': '⚽', 'btts': '🔄', 'doubleChance': '🎯', 'exactScore': '🎯', 'dnb': '🎯', 'teamTotal': '⚽', 'ht_1n2': '⏱️', 'htTotal': '⏱️', 'resultBtts': '🎯', 'ah': '⚖️', 'basketTotal': '🏀', 'basketHandicap': '🏀', 'hockeyTotal': '🏒', 'puckLine': '🏒', 'baseballTotal': '⚾', 'runLine': '⚾', 'tennisGames': '🎾' };
 const evMin = (typeof window.advFilters !== 'undefined' && window.advFilters.evMin) || 0;
 const valueOnly = (typeof window.advFilters !== 'undefined' && window.advFilters.valueOnly) || false;
 const rows = cands.map((c, i) => {
@@ -11177,7 +11204,7 @@ i
 });
 const visibleRows = rows.filter(r => !isBlockedHandicapMarket(r.c));
 const handicapRows = rows.filter(r => isBlockedHandicapMarket(r.c));
-const footExtMarkets = new Set(['ht_1n2','exactScore','teamTotal','resultBtts','ou15','ou35','btts','doubleChance','dnb']);
+const footExtMarkets = new Set(['ht_1n2','htTotal','exactScore','teamTotal','resultBtts','ou15','ou35','btts','doubleChance','dnb']);
 const footExtendedRows = match.sport === 'football'
 ? visibleRows.filter(r => footExtMarkets.has(r.c.market) && !r.c.lowOddBlocked).slice(0, 6)
 : [];
@@ -24918,7 +24945,7 @@ const wrChartHtml = renderWrChart(wrPts, 7);
 const filterChipsHtml = (group, current, options) => options.map(o => `
       <button class="hist-chip ${current === o.v ? 'active' : ''}" data-fgroup="${group}" data-fval="${esc(o.v)}">${esc(o.label)}${o.hint ? `<span style="opacity:.6;margin-left:4px;font-size:10.5px;">${esc(o.hint)}</span>` : ''}</button>
     `).join('');
-const marketOrder = ['1n2','ou25','ou15','ou35','btts','doubleChance','dnb','teamTotal','handicap','basketTotal','basketHandicap','baseballTotal','runLine','hockeyTotal','puckLine','tennisGames','exactScore','resultBtts','ht_1n2'];
+const marketOrder = ['1n2','ou25','ou15','ou35','btts','doubleChance','dnb','teamTotal','handicap','basketTotal','basketHandicap','baseballTotal','runLine','hockeyTotal','puckLine','tennisGames','exactScore','resultBtts','ht_1n2','htTotal'];
 const presentMarkets = [...new Set(picks.map(p => p.market || '1n2'))];
 const orderedMarkets = marketOrder.filter(mk => presentMarkets.includes(mk))
 .concat(presentMarkets.filter(mk => !marketOrder.includes(mk)).sort());

@@ -343,3 +343,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix: la CSP met a jour le hash Web Vitals actuel et l'injection runtime des SportsEvent JSON-LD dynamiques est explicitement desactivee sous CSP stricte; le schema statique reste actif sans erreurs console.
 - Garde-fou: `audit_ux_clarity.py`, `audit_capture_bugs.js` et 8 tests Playwright ciblant score/modal/bugs captures passent.
 - Cache/footer bumpes v35.409; `app.js` hash `45473842`.
+
+## Sprint v35.410 — AUTO 10/10 Marches mi-temps O/U (01:39 UTC)
+- Elargissement: Winamax match details detecte maintenant les lignes "nombre de buts en mi-temps" et conserve `ht_ou`, `ht_ou05`, `ht_ou15`.
+- Front: la table peut afficher des picks exacts "Plus/Moins de X but en 1re mi-temps" via le marche `htTotal`, avec tooltip debutant-safe.
+- Garde-fou: test `market-candidates` et syntax/bundle a relancer; aucun marche n'est invente sans cote Winamax.
+- Cache/footer bumpes v35.410; `app.js` hash `130cf870`.
