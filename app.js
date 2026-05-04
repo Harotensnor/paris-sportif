@@ -14263,6 +14263,7 @@
       isPickConsistentWithScore: typeof isPickConsistentWithScore === 'function' ? isPickConsistentWithScore : null,
       isPairConsistent: typeof isPairConsistent === 'function' ? isPairConsistent : null,
       validateMarketConsistency: typeof validateMarketConsistency === 'function' ? validateMarketConsistency : null,
+      formatWinamaxPickLabel: typeof _v37FormatPickLabel === 'function' ? _v37FormatPickLabel : null,
     };
   } catch(e){}
 

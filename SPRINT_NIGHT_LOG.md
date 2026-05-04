@@ -2112,3 +2112,8 @@
 - Apres: tous les candidats passent par un formateur central Winamax-style avec noms d'equipes, handicaps expliques, DNB nul rembourse, team totals naturels et tooltips par marche.
 - Impact: table V37, cards mobile et modal detail partagent les memes libelles debutant-friendly sans changer les cotes, proba, edge ni settlement.
 - Verif: grep conflict markers => 0; app.js syntax OK; smoke navigateur dashboard 120 libelles scannes, 0 libelle interdit, 0 erreur console; footer v35.320 + cache/app hash bumpes.
+## Sprint v35.321 — AUTO 10/10 Tests libelles + credibilite marche (15:39 UTC)
+- Avant: les tests acceptaient encore les anciens libelles opaques (`Total buts ... equipe seulement`) et le formateur Winamax-style n'etait pas expose aux specs.
+- Apres: `formatWinamaxPickLabel` est disponible dans `__testAPI`, les specs verrouillent DNB/BTTS/handicap/team total en francais naturel et refusent les libelles bruts.
+- Impact: regression impossible sur le bug Theo: la table peut evoluer sans reintroduire `DNB 1`, `BTTS Oui`, `Mi-temps X` ou les handicaps incomprehensibles.
+- Verif: app.js syntax OK; smoke navigateur label formatter + table 200 libelles => 0 libelle interdit; smoke coherence marche => 1N2/-0,5 dedoublonne, 0-0+DC12 rejete, tau Dixon-Coles 1-1 OK.
