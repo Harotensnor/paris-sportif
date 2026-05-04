@@ -4996,6 +4996,37 @@ return cal[i].actual + t * (cal[i + 1].actual - cal[i].actual);
 return raw;
 }
 
+function getLearnedContextNudge(match) {
+const artifact = (typeof window !== 'undefined') ? window.PRONOSTICS_LIGHTGBM_WEIGHTS : null;
+if (!artifact || !artifact.weights) return null;
+const blend = artifact.blend || {};
+const maxNudge = Math.max(0.005, Math.min(0.03, Number(blend.max_probability_nudge) || 0.025));
+const minN = Math.max(10, Number(blend.min_context_n) || 30);
+const components = [];
+const add = (scope, key, label) => {
+if (!key) return;
+const row = artifact.weights?.[scope]?.[key];
+if (!row) return;
+const n = Number(row.n) || 0;
+const rawWeight = Number(row.weight) || 0;
+if (!rawWeight) return;
+components.push({ scope, key, label, n, status: row.status || 'neutral', weight: rawWeight, active: n >= minN });
+};
+add('by_sport', String(match?.sport || '').toLowerCase(), 'sport');
+add('by_league', String(match?.league_code || ''), 'ligue');
+const active = components.filter(c => c.active);
+if (!active.length) return { active: false, nudge: 0, status: artifact.status || 'unknown', components };
+const raw = active.reduce((sum, c) => sum + c.weight, 0);
+const nudge = Math.max(-maxNudge, Math.min(maxNudge, raw));
+return {
+active: Math.abs(nudge) >= 0.001,
+nudge: Math.round(nudge * 10000) / 10000,
+status: artifact.status || 'unknown',
+max_nudge: maxNudge,
+components,
+};
+}
+
 let __predCache = new Map();
 let __predCacheRef = null;
 function __predCacheClear() { __predCache = new Map(); __predCacheRef = window.PRONOSTICS_DATA; }
@@ -6724,6 +6755,22 @@ reasons.push({ type: 'league_bias', icon: '🧯', text: `Ligue dépriorisée : B
 }
 } catch(e) {}
 
+let learnedContext = null;
+try {
+learnedContext = getLearnedContextNudge(match);
+if (learnedContext?.active) {
+reliability = Math.max(0.25, Math.min(0.98, reliability + learnedContext.nudge));
+if (reliabilityMeta) reliabilityMeta.learnedContext = learnedContext;
+if (ensembleMeta) ensembleMeta.learned_context = learnedContext;
+const sign = learnedContext.nudge >= 0 ? '+' : '';
+reasons.push({
+type: 'learned_context',
+icon: '🧠',
+text: `Contexte appris (${learnedContext.status}) : fiabilité ${sign}${Math.round(learnedContext.nudge * 100)}pt via ${learnedContext.components.filter(c => c.active).map(c => c.label).join(' + ')}.`,
+});
+}
+} catch(e) {}
+
 let headline = '';
 const conf = reliability;  // headline speaks to the UX confidence, not raw prob
 if (conf >= 0.72) headline = `Pari très solide — fiabilité ${(conf*100).toFixed(0)}%`;
@@ -6782,6 +6829,7 @@ reliabilityMeta,
 prob_ci: probCi,
 confidence_interval: probCi,
 ensemble: ensembleMeta,
+learned_context: learnedContext,
 league_bias: leagueBias,
 odds: best,
 hasDraw,

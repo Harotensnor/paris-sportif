@@ -2,12 +2,6 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
-## Sprint v35.340 — AUTO 10/10 MCP pipeline gaps multi-jours (17:35 UTC)
-- Avant: le MCP utilisait bien la date locale, mais `get_pipeline_status` ne resumait pas encore les gaps publies et `list_data_gaps` reconstruisait seulement les trous du jour.
-- Apres: le MCP expose `night_metrics`, la couverture `signal_gap_report`, les signaux les plus manquants et liste les gaps prioritaires multi-jours.
-- Impact mesure: `get_pipeline_status` retourne today=2026-05-04, 80 gaps prioritaires, top manquants referee/starter_signals/H2H; `list_data_gaps` pointe AVS-FC Porto en priorite 101.
-- Verif: py_compile MCP OK, smoke MCP 14/18 OK (4 tools a args requis), cache/footer bumpes v35.340.
-
 ## Sprint v35.341 — AUTO 10/10 Starter gaps time-aware (17:42 UTC)
 - Avant: `signal_gap_report` classait les compositions/starters manquants comme critiques meme plusieurs jours avant le match, ce qui sur-penalisait des picks encore loin du coup d'envoi.
 - Apres: les `starter_signals` foot deviennent un gap attendu seulement a moins de 36h du kickoff, avec bonus de priorite si le match est a moins de 6h.
@@ -297,4 +291,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - `app.js` réduit par passe lexicale sûre : commentaires pleine ligne hors chaînes/templates retirés + indentation hors templates supprimée.
 - Taille brute `app.js` : ~1,86MB UTF-8 avant passe → 1,58MB fichier local, sous le seuil 1,70MB contrôlé par `scripts/audit_bundle_size.py`.
 - Hash `app.js` dans `pronostics.html` mis à jour, `CACHE_VERSION` bumpé, syntax JS/data/html OK.
+
+## Sprint v35.390 — B1 brancher poids appris runtime
+- `lightgbm_weights.json` exporté en `lightgbm_weights.js` et préchargé avant `app.js`.
+- `predictMatch` consomme les poids appris comme nudge conservateur (`max_probability_nudge` ≤ 2,5pt) avec trace `pred.learned_context` + raison modèle.
+- Audit ajouté : `scripts/audit_lightgbm_runtime.py` vérifie sidecar, HTML et consommation front. Statut assumé : `aggregate_fallback`, pas faux entraînement LightGBM ligne-à-ligne.
 
