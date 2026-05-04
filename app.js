@@ -10972,6 +10972,8 @@
       const market = String(whyBest?.market || '');
       const pickText = String(whyBest?.label || whyBest?.pickKey || whyBest?.key || '').toLowerCase();
       const sideText = String(whyBest?.side || whyBest?.pickKey || whyBest?.key || '').toLowerCase();
+      const isTeamTotalPick = market === 'teamTotal';
+      const isHandicapPick = (typeof isHandicapMarket === 'function') && isHandicapMarket(market);
       const homeXg = Number(pred?.poisson?.xgH);
       const awayXg = Number(pred?.poisson?.xgA);
       const totalXg = (Number.isFinite(homeXg) && Number.isFinite(awayXg)) ? homeXg + awayXg : null;
@@ -11047,15 +11049,19 @@
       if (whyBest?.market === 'teamTotal' && pred?.poisson) {
         const teamKey = whyBest.raw?.team || whyBest.team || (pickSide || 'home');
         const lambda = teamKey === 'away' ? pred.poisson.xgA : pred.poisson.xgH;
+        const opponentName = teamKey === 'away' ? homeName : awayName;
         const line = Number(whyBest.line ?? whyBest.raw?.line);
         const under = /under|moins|^u/i.test(String(whyBest.side || whyBest.pickKey || whyBest.key || whyBest.label || ''));
         if (Number.isFinite(lambda)) {
-          arr.push(`${targetTeam || 'Cette équipe'} projette ${lambda.toFixed(2)} but attendu : raison directe du pari ${under ? 'moins' : 'plus'} de ${Number.isFinite(line) ? line.toString().replace('.', ',') : 'la ligne'} but.`);
+          arr.push(`${targetTeam || 'Cette équipe'} projette ${lambda.toFixed(2)} but attendu face à ${opponentName} : raison directe du pari ${under ? 'moins' : 'plus'} de ${Number.isFinite(line) ? line.toString().replace('.', ',') : 'la ligne'} but.`);
         }
       }
-      if (whyBest?.market && typeof isHandicapMarket === 'function' && isHandicapMarket(whyBest.market) && targetTeam) {
+      if (isHandicapPick && targetTeam) {
         const line = Number(whyBest.line ?? whyBest.raw?.line);
-        if (Number.isFinite(line) && line < 0) arr.push(`${targetTeam} doit gagner avec ${Math.abs(line) === 0.5 ? 'au moins 1' : Math.abs(line) + 1} but d'écart : le handicap est explicitement le pari analysé.`);
+        if (Number.isFinite(line) && line < 0) {
+          const neededMargin = Math.max(1, Math.floor(Math.abs(line)) + 1);
+          arr.push(`${targetTeam} doit gagner avec ${neededMargin}+ but${neededMargin > 1 ? 's' : ''} d'écart : le handicap ${String(line).replace('.', ',')} est explicitement le pari analysé.`);
+        }
         else if (Number.isFinite(line) && line > 0) arr.push(`${targetTeam} peut perdre de peu ou gagner : le handicap +${String(line).replace('.', ',')} protège le pari.`);
       }
       if (whyOdd > 1 && whyRel > 0) {
@@ -11068,6 +11074,8 @@
         .filter(r => r && r.text)
         .slice(0, 4)
         .forEach(r => {
+          if (isTeamTotalPick && ['xg', 'elo', 'gd', 'record', 'rank'].includes(String(r.type || ''))) return;
+          if (isHandicapPick && ['market', 'gd'].includes(String(r.type || ''))) return;
           let txt = String(r.text);
           if (r.type === 'xg' && pred?.poisson) {
             txt = `Buts attendus : ${home?.name || 'Domicile'} ${pred.poisson.xgH.toFixed(2)} – ${away?.name || 'Extérieur'} ${pred.poisson.xgA.toFixed(2)}.`;
@@ -15779,7 +15787,7 @@
         return '';
       };
       const v37HumanBadge = (badge) => ({
-        strict: 'Sélection exigeante',
+        strict: 'Filtre cote stricte appliqué',
         'biais ligue +': 'Biais ligue favorable',
         'biais ligue prioritaire': 'Biais ligue prioritaire',
         'ligue froide': 'Ligue à prudence',
@@ -15806,9 +15814,24 @@
         'profil ligue -': 'Ton profil ligue -',
         'profil cote +': 'Ton profil cote +',
         'profil cote -': 'Ton profil cote -',
-      }[String(badge || '')] || String(badge || '').replace(/\bsteam\b/gi, 'cote bouge').replace(/\bfade\b/gi, 'surévalué').trim());
+      }[String(badge || '')] || (() => {
+        const raw = String(badge || '').trim();
+        if (!raw) return '';
+        const low = raw.toLowerCase();
+        const parts = [];
+        if (/\bstrict\b/.test(low)) parts.push('Filtre cote stricte appliqué');
+        if (/march[eé]\s*[àa]\s*fade|\bfade\b/.test(low)) parts.push('Cote surévaluée détectée');
+        if (/\bsteam\b/.test(low)) parts.push('Cote bouge fortement');
+        if (/signal\s+rare/.test(low)) parts.push('Signal rare détecté');
+        if (/timing\s+cote/.test(low)) parts.push('Bon moment pour parier');
+        if (parts.length) return [...new Set(parts)].join(' · ');
+        return raw.replace(/\bsteam\b/gi, 'cote bouge').replace(/\bfade\b/gi, 'surévalué').trim();
+      })());
       const v37BadgeTooltip = (badge) => ({
-        'Sélection exigeante': 'Le pick passe les seuils les plus exigeants de son niveau de cote.',
+        'Filtre cote stricte appliqué': 'Le pick passe les seuils les plus exigeants de son niveau de cote.',
+        'Cote surévaluée détectée': 'La cote ou le camp adverse semble trop optimiste par rapport au modèle.',
+        'Cote bouge fortement': 'La cote a bougé rapidement : signal de marché à surveiller.',
+        'Bon moment pour parier': 'Le timing de cote est jugé favorable maintenant.',
         'Biais ligue favorable': 'La ligue présente un biais historique exploitable dans ce sens.',
         'Ligue à prudence': 'Le modèle est moins fiable sur cette ligue récemment.',
         'Marché favorable': 'Ce type de marché est sous-coté historiquement dans cette ligue.',
