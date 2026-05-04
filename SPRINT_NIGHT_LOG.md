@@ -2,6 +2,13 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
+## Sprint v35.393 — AUTO 10/10 Validation bugs captures V37 (21:24 UTC)
+- Avant: les corrections capture etaient presentes mais pas verrouillees ensemble par un test de regression utilisateur.
+- Apres: nouveau test V37 verifie absence de jargon trader visible, legende score, groupement doublons, modal alignee et buts attendus avec noms equipes.
+- Impact mesure: couverture B5 ajoutee sur dashboard + modal sans toucher au modele.
+- Verif: suite ciblée B2-B5 OK (8/8), bundle-size OK, syntax JS OK, no-conflict-markers OK; cache/footer bumpes v35.393.
+
+
 ## Sprint v35.392 — AUTO 10/10 Signaux pour contre modal (21:18 UTC)
 - Avant: les signaux contradictoires etaient melanges dans les raisons, et le badge mitigé ne disait pas clairement quoi faire.
 - Apres: chaque modal affiche un bloc Signaux pour / Signaux contre, avec note de prudence si les signaux se neutralisent; le badge devient Signaux mitiges - prudence.
@@ -15,12 +22,6 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Impact mesure: test score opportunite OK sur desktop + mobile Chrome local; bundle reste sous seuil app.js 1.58MB / 1.70MB.
 - Verif: Playwright cible OK (2/2), bundle-size OK, syntax JS OK, no-conflict-markers OK; cache/footer bumpes v35.391.
 
-
-## Sprint v35.343 — AUTO 10/10 Biais marches dans le dashboard (17:57 UTC)
-- Avant: les biais par marche etaient produits en JSON mais n'influençaient pas encore la table dense ni le rail modele.
-- Apres: le dashboard charge `market_biases_by_league.json`, applique un bonus/malus au score opportunite selon le marche exact du pick et ajoute un bloc rail "Biais par marche".
-- Impact produit: les picks alignes avec un biais historique (ex: double chance ou under 3,5) remontent; les marches a fade sont etiquetes et penalises sans cacher la couverture.
-- Verif: app.js --check OK; hashes app.js/app.css recalcules; cache/footer bumpes v35.343.
 
 ## Sprint v35.344 — AUTO 10/10 Aliases sources Portugal/NL (18:05 UTC)
 - Avant: certains matchs avaient des sources publiques presentes mais non rattachees, ex. Sporting CP - Vitoria pointait `guimaraes` pendant que Sofascore publiait `vitoriasc`.
