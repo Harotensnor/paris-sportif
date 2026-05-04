@@ -2219,3 +2219,9 @@
 - Apres: le MCP expose `night_metrics`, la couverture `signal_gap_report`, les signaux les plus manquants et liste les gaps prioritaires multi-jours.
 - Impact mesure: `get_pipeline_status` retourne today=2026-05-04, 80 gaps prioritaires, top manquants referee/starter_signals/H2H; `list_data_gaps` pointe AVS-FC Porto en priorite 101.
 - Verif: py_compile MCP OK, smoke MCP 14/18 OK (4 tools a args requis), cache/footer bumpes v35.340.
+
+## Sprint v35.341 — AUTO 10/10 Starter gaps time-aware (17:42 UTC)
+- Avant: `signal_gap_report` classait les compositions/starters manquants comme critiques meme plusieurs jours avant le match, ce qui sur-penalisait des picks encore loin du coup d'envoi.
+- Apres: les `starter_signals` foot deviennent un gap attendu seulement a moins de 36h du kickoff, avec bonus de priorite si le match est a moins de 6h.
+- Impact mesure: top gaps recalcules; starter_signals manquants dans les 80 priorites passent a 25, tout en gardant Sporting CP - Vitoria et les matchs du soir en alerte haute.
+- Verif: build_signal_gap_report + py_compile OK; cache/footer bumpes v35.341.
