@@ -2072,3 +2072,8 @@
 - Apres: stadiums.json utilise un cache key quotidien derive de PRONOSTICS_DATA.generated_at et cache default, ce qui reste leger tout en suivant les refreshs.
 - Impact: bug #33 ferme sans fetch agressif: metadonnees stade/fatigue se renouvellent avec la date data, mais restent cachees durant la journee.
 - Verif: app.js/sw.js syntax OK; smoke navigateur local => /stadiums.json?v=20260503, dashboard 720 lignes, 0 warning/error; footer/cache/app hash bumpes.
+## Sprint v35.313 — AUTO 10/10 Search XSS hardening (22:06 UTC)
+- Avant: les suggestions de recherche et les recherches recentes reconstruisaient du HTML avec du texte utilisateur/profils publics, surface prioritaire du bug #36.
+- Apres: ces surfaces rendent par DOM/textContent, le highlight utilise un mark cree par element, et le fallback logo utilise un listener error sans inline onerror.
+- Impact: la recherche profonde equipes/joueurs reste identique visuellement mais ne parse plus une saisie utilisateur comme HTML executable.
+- Verif: app.js/sw.js syntax OK; smoke navigateur local avec `<img src=x onerror=alert(1)>` => 0 dialog, 0 img injectee, 0 erreur console, table dashboard 365 lignes; footer/cache/app hash bumpes.
