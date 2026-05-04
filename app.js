@@ -23074,6 +23074,7 @@
   let __oddsHistoryLoading = null;
   let __oddsHistoryLoadedAt = 0;
   const ODDS_HISTORY_TTL_MS = 5 * 60 * 1000;   // FIX #12 : invalide après 5min
+  const ODDS_HISTORY_MAX_LINES = 50000;        // garde une fenêtre récente si le JSONL grossit fort
   function _mlToDecimal(ml) {
     if (ml == null || !isFinite(ml)) return null;
     return ml < 0 ? 1 + 100 / Math.abs(ml) : 1 + ml / 100;
@@ -23090,11 +23091,19 @@
       return Promise.resolve(__oddsHistoryByMatch);
     }
     if (__oddsHistoryLoading) return __oddsHistoryLoading;
-    __oddsHistoryLoading = fetch('odds_history.jsonl', { cache: 'no-cache' })
+    const dataHour = (() => {
+      try {
+        const ga = window.PRONOSTICS_DATA && window.PRONOSTICS_DATA.generated_at;
+        return ga ? String(ga).slice(0, 13).replace(/[^0-9T-]/g, '') : String(Math.floor(now / (60 * 60 * 1000)));
+      } catch(e) { return String(Math.floor(now / (60 * 60 * 1000))); }
+    })();
+    __oddsHistoryLoading = fetch(`odds_history.jsonl?v=${encodeURIComponent(dataHour)}`, { cache: 'default' })
       .then(r => r.ok ? r.text() : '')
       .then(txt => {
         const byId = new Map();
-        txt.split('\n').forEach(line => {
+        const lines = txt.split('\n');
+        const scopedLines = lines.length > ODDS_HISTORY_MAX_LINES ? lines.slice(-ODDS_HISTORY_MAX_LINES) : lines;
+        scopedLines.forEach(line => {
           if (!line.trim()) return;
           let row; try { row = JSON.parse(line); } catch(e) { return; }
           if (!row.id || !row.captured_at) return;
@@ -23112,6 +23121,7 @@
         __oddsHistoryByMatch = byId;
         __oddsHistoryLoadedAt = Date.now();
         __oddsHistoryLoading = null;
+        try { window.__oddsHistoryStats = { raw_lines: lines.length, parsed_lines: scopedLines.length, match_count: byId.size, url_bucket: dataHour }; } catch(e) {}
         return byId;
       })
       .catch(() => {
@@ -23127,15 +23137,19 @@
     // FIX Bug 6 : show "Chargement…" seulement si le fetch n'est pas déjà
     // résolu (sinon le slot reste avec ce message si user re-ferme avant
     // que la promise tire). Le cas standard (fetch déjà résolu) skip la
-    // 1ère écriture innerHTML.
+    // 1ère écriture DOM légère.
     const alreadyLoaded = !!__oddsHistoryByMatch;
     if (!alreadyLoaded) {
-      slotEl.innerHTML = '<div style="font-size:11px;color:var(--text-dim);padding:6px 0;">⏳ Chargement historique…</div>';
+      slotEl.textContent = '';
+      const loading = document.createElement('div');
+      loading.style.cssText = 'font-size:11px;color:var(--text-dim);padding:6px 0;';
+      loading.textContent = '⏳ Chargement historique…';
+      slotEl.appendChild(loading);
     }
     _loadOddsHistory().then(byId => {
       const series = byId.get(String(matchId));
       if (!series || series.length < 2) {
-        slotEl.innerHTML = '';
+        slotEl.textContent = '';
         // FIX Bug 6 : reset le flag rendered pour permettre une nouvelle
         // tentative de render au prochain expand (cas où l'historique
         // arrive après le 1er fetch mais nous avons fermé entre temps).
@@ -23148,7 +23162,7 @@
       const lbl = k === 'home' ? '1 (Domicile)' : k === 'away' ? '2 (Extérieur)' : 'X (Nul)';
       const pts = series.map(s => ({ ts: s.ts, v: s[k] })).filter(p => isFinite(p.v));
       if (pts.length < 2) {
-        slotEl.innerHTML = '';
+        slotEl.textContent = '';
         return;
       }
       const W = 220, H = 50, P = 4;

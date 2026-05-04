@@ -2092,3 +2092,8 @@
 - Apres: le sitemap expose les hubs valides V37 (dashboard/tous/performance/academie/profil/sante/montantes/legal), racine daily, puis regenere 359 URLs.
 - Impact: bugs SEO #61/#69 avances: les robots voient les vraies portes du produit au lieu des anciens raccourcis morts.
 - Verif: build_sitemap OK; py_compile OK; grep legacy routes sitemap => 0 resultat; footer/cache bumpes.
+## Sprint v35.317 — AUTO 10/10 Odds history cache window (22:35 UTC)
+- Avant: odds_history.jsonl etait lazy mais charge en no-cache et parse integralement a chaque invalidation, meme si le fichier grossissait.
+- Apres: chargement cache-friendly bucket horaire, parsing borne aux 50k dernieres lignes, stats de diagnostic __oddsHistoryStats, et loader DOM leger sans innerHTML.
+- Impact: bugs #21/#44 avances: la modal garde les sparklines disponibles mais evite un fetch/parse trop agressif sur historique long.
+- Verif: app.js syntax OK; smoke navigateur local modal detail OK, 730 triggers, aucun hit odds_history tant que la sparkline n'est pas demandee, 0 warning/error; footer/cache/app hash bumpes.
