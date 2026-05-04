@@ -125,6 +125,82 @@ def _active_data_day(data: dict) -> str:
     return day_keys[-1] if day_keys else local_today
 
 
+def _truth_has_h2h(ev: dict) -> bool:
+    h = ev.get("h2h")
+    if isinstance(h, list):
+        return bool(h)
+    if isinstance(h, dict):
+        return bool(h.get("meetings") or h.get("games") or h.get("items"))
+    return False
+
+
+def _truth_has_xg(ev: dict) -> bool:
+    return any(
+        c.get("xg_stats") or c.get("fbref_xg") or c.get("xg_for_avg") is not None
+        for c in (ev.get("competitors") or [])
+        if isinstance(c, dict)
+    )
+
+
+def _truth_has_starter_signal(ev: dict) -> bool:
+    if ev.get("lineups") or ev.get("mlb_pitchers"):
+        return True
+    nhl = ev.get("nhl_stats") or {}
+    if isinstance(nhl, dict):
+        home_goalie = ((nhl.get("home") or {}).get("goalie") or {}).get("name")
+        away_goalie = ((nhl.get("away") or {}).get("goalie") or {}).get("name")
+        return bool(home_goalie or away_goalie)
+    return False
+
+
+def _data_truth_snapshot(data: dict) -> dict:
+    events = [
+        ev
+        for arr in (data.get("days") or {}).values()
+        for ev in (arr or [])
+        if isinstance(ev, dict)
+    ]
+    def is_exact(ev: dict) -> bool:
+        wnx = ev.get("winamax") or {}
+        one = (wnx.get("markets") or {}).get("1n2") or {}
+        return bool(
+            wnx.get("available") is True
+            and wnx.get("match_id")
+            and isinstance(one, dict)
+            and isinstance(one.get("home"), (int, float))
+            and isinstance(one.get("away"), (int, float))
+        )
+
+    available = sum(1 for ev in events if (ev.get("winamax") or {}).get("available") is True)
+    exact = sum(1 for ev in events if is_exact(ev))
+    upcoming = [ev for ev in events if not ev.get("completed")]
+    upcoming_available = sum(1 for ev in upcoming if (ev.get("winamax") or {}).get("available") is True)
+    upcoming_exact = sum(1 for ev in upcoming if is_exact(ev))
+    today = _active_data_day(data)
+    return {
+        "source": "data.js",
+        "calculated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "today": today,
+        "data_today_field": data.get("today"),
+        "day_keys": sorted((data.get("days") or {}).keys()),
+        "total": len(events),
+        "upcoming": len(upcoming),
+        "today_events": len((data.get("days") or {}).get(today, []) or []),
+        "winamax_available": available,
+        "winamax_exact": exact,
+        "winamax_exact_ratio": round(exact / available, 4) if available else 0,
+        "upcoming_winamax_available": upcoming_available,
+        "upcoming_winamax_exact": upcoming_exact,
+        "upcoming_winamax_exact_ratio": round(upcoming_exact / upcoming_available, 4) if upcoming_available else 0,
+        "lineups": sum(1 for ev in events if _truth_has_starter_signal(ev)),
+        "football_lineups": sum(1 for ev in events if ev.get("sport") == "football" and ev.get("lineups")),
+        "injuries": sum(1 for ev in events if ev.get("injuries")),
+        "referee": sum(1 for ev in events if ev.get("referee")),
+        "h2h": sum(1 for ev in events if _truth_has_h2h(ev)),
+        "xg": sum(1 for ev in events if _truth_has_xg(ev)),
+    }
+
+
 def _is_winamax_bookable(match: dict) -> bool:
     """Match avec match_id Winamax + markets 1n2 valides."""
     wnx = match.get("winamax") or {}
@@ -989,6 +1065,7 @@ def get_pipeline_status() -> dict:
     gap_report = _load_json(SIGNAL_GAP_REPORT) if SIGNAL_GAP_REPORT.exists() else {}
 
     today = _active_data_day(data) if not "_error" in data else None
+    truth = _data_truth_snapshot(data) if not "_error" in data else {}
     today_events = (data.get("days") or {}).get(today, []) if today else []
 
     # Count by source — Sofascore events have id="sofa_<n>" + source="sofascore"
@@ -1020,11 +1097,32 @@ def get_pipeline_status() -> dict:
         {"signal": signal, "matches": count}
         for signal, count in sorted(missing_counts.items(), key=lambda item: (-item[1], item[0]))[:8]
     ]
+    night_events = night.get("events") if isinstance(night.get("events"), dict) else {}
+    health_quality = health.get("quality_checks") if isinstance(health.get("quality_checks"), dict) else {}
+    if not health_quality and isinstance(health.get("data_quality"), dict):
+        health_quality = health.get("data_quality")
+    sync_fields = ("total", "upcoming", "winamax_exact", "lineups", "injuries", "referee", "h2h", "xg")
+    sync_mismatches = []
+    for key in sync_fields:
+        truth_value = truth.get(key)
+        night_value = night_events.get(key)
+        if night_value is not None and truth_value != night_value:
+            sync_mismatches.append({"field": key, "source": "night_metrics", "truth": truth_value, "other": night_value})
+    health_exact = health_quality.get("winamax_exact") if isinstance(health_quality, dict) else None
+    if health_exact is not None and truth.get("upcoming_winamax_exact") != health_exact:
+        sync_mismatches.append({"field": "upcoming_winamax_exact", "source": "health", "truth": truth.get("upcoming_winamax_exact"), "other": health_exact})
 
     return {
+        "calculated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "source_of_truth": "data.js",
         "today": today,
         "local_today": _today_iso(),
         "data_today_field": data.get("today") if not "_error" in data else None,
+        "data_truth": truth,
+        "sync_check": {
+            "status": "ok" if not sync_mismatches else "drift",
+            "mismatches": sync_mismatches[:12],
+        },
         "data_age_min": health.get("data_age_min") if not "_error" in health else None,
         "overall_status": health.get("overall") if not "_error" in health else "unknown",
         "night_metrics": {
