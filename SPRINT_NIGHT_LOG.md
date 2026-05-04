@@ -2117,3 +2117,8 @@
 - Apres: `formatWinamaxPickLabel` est disponible dans `__testAPI`, les specs verrouillent DNB/BTTS/handicap/team total en francais naturel et refusent les libelles bruts.
 - Impact: regression impossible sur le bug Theo: la table peut evoluer sans reintroduire `DNB 1`, `BTTS Oui`, `Mi-temps X` ou les handicaps incomprehensibles.
 - Verif: app.js syntax OK; smoke navigateur label formatter + table 200 libelles => 0 libelle interdit; smoke coherence marche => 1N2/-0,5 dedoublonne, 0-0+DC12 rejete, tau Dixon-Coles 1-1 OK.
+## Sprint v35.322 — AUTO 10/10 V37 logo fallback sans inline handler (15:43 UTC)
+- Avant: la table V37 utilisait encore un fallback logo en `onerror` inline, petite surface XSS/CSP dans la vue principale.
+- Apres: les logos de la table dense utilisent `data-fallback` + delegation `error` capturee sur le dashboard, sans JavaScript inline.
+- Impact: bug #36/#65 avance sur la surface la plus exposee: le tableau d'accueil garde ses initiales de secours mais ne depend plus d'un handler HTML.
+- Verif: app.js syntax OK; smoke navigateur dashboard => 0 `img[onerror]` dans `.v36-table-panel`, fallback image remplace par initiale, 0 erreur console; footer/cache/app hash bumpes.
