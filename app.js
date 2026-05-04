@@ -15420,6 +15420,59 @@
         return state;
       })();
       const v37Intel = v37IntelState.data || {};
+      const v37Array = (value) => Array.isArray(value) ? value : [];
+      const v37AnglesByEvent = new Map(v37Array(v37Intel.angles?.events).map(e => [String(e.event_id || ''), e]));
+      const v37RareByEvent = new Map();
+      v37Array(v37Intel.rare?.signals).forEach(s => {
+        const id = String(s.event_id || '');
+        if (!id) return;
+        const list = v37RareByEvent.get(id) || [];
+        list.push(s);
+        v37RareByEvent.set(id, list);
+      });
+      const v37TimingByEvent = new Map(v37Array(v37Intel.timing?.events).map(e => [String(e.event_id || ''), e]));
+      const v37LeagueByCode = new Map(v37Array(v37Intel.league?.leagues).map(l => [String(l.league_code || ''), l]));
+      const v37OpportunityFor = (m, tier, rel, edge, ev) => {
+        const id = String(m?.id || '');
+        const league = v37LeagueByCode.get(String(m?.league_code || '')) || null;
+        const angles = v37Array((v37AnglesByEvent.get(id) || {}).angles);
+        const rareSignals = v37RareByEvent.get(id) || [];
+        const timing = v37TimingByEvent.get(id) || null;
+        let score = 48 + Math.max(-12, Math.min(24, edge * 180)) + Math.max(-8, Math.min(18, (rel - 0.50) * 90));
+        const badges = [];
+        if (tier?.strict) { score += 6; badges.push('strict'); }
+        if (league?.status === 'exploit') {
+          score += Math.min(10, 4 + Math.abs(Number(league.inefficiency_score || 0)) * 10);
+          badges.push('biais ligue +');
+        } else if (league?.status === 'avoid') {
+          score -= Math.min(8, 3 + Math.abs(Number(league.inefficiency_score || 0)) * 8);
+          badges.push('ligue froide');
+        }
+        const marketMove = angles.find(a => a?.type === 'market_move');
+        if (marketMove?.direction === 'steam') { score += 7; badges.push('steam cote'); }
+        else if (marketMove?.direction === 'drift') { score -= 5; badges.push('drift cote'); }
+        const injuryAngle = angles.find(a => a?.type === 'injury_imbalance');
+        if (injuryAngle) { score += injuryAngle.direction === 'fade' ? -2 : 4; badges.push('blessures'); }
+        if (angles.some(a => a?.type === 'schedule_congestion')) { score -= 3; badges.push('fatigue'); }
+        if (angles.some(a => a?.type === 'lookahead')) { score -= 2; badges.push('lookahead'); }
+        if (rareSignals.length) { score += Math.min(12, 6 + rareSignals.length * 2); badges.push('signal rare'); }
+        if (timing?.advice === 'wait_lineups') { score -= 7; badges.push('attendre compos'); }
+        else if (timing?.advice === 'price_shortening') { score += 5; badges.push('timing cote'); }
+        const dataBonus = [
+          m?.weather, m?.h2h, m?.xg, m?.lineups, m?.mlb_pitchers, m?.nhl_stats,
+          m?.injuries, m?.referee
+        ].filter(Boolean).length;
+        score += Math.min(8, dataBonus);
+        if (dataBonus >= 5) badges.push('data riche');
+        const clean = Math.max(0, Math.min(100, Math.round(score)));
+        const tooltip = [
+          `Score opportunite ${clean}/100`,
+          badges.length ? badges.join(' · ') : 'aucun angle special',
+          `edge ${(edge * 100).toFixed(1)}%`,
+          `data ${dataBonus}/8`
+        ].join(' · ');
+        return { score: clean, badges: badges.slice(0, 3), tooltip };
+      };
       const v36HourBucket = (date) => {
         const h = new Date(date || 0).getHours();
         if (h >= 6 && h < 12) return 'morning';
@@ -15511,6 +15564,7 @@
               const edge = Number.isFinite(Number(c.edge)) ? Number(c.edge) : (rel - 1 / odd);
               const ev = Number.isFinite(Number(c.ev)) ? Number(c.ev) : (rel * odd - 1);
               const investmentScoreValue = Number(c.investment?.score || 0);
+              const intel = v37OpportunityFor(m, tier, rel, edge, ev);
               return {
                 m, pred, best: c, tier: tier.id, strict: tier.strict, odd, rel, edge, ev,
                 label: c.shortLabel || c.label || pred.pick?.label || 'Pick',
@@ -15522,8 +15576,11 @@
                 market: c.market || '1n2',
                 line: c.line ?? '',
                 pickKey: c.pickValue || c.pickKey || c.key || pred.pick?.key || '',
+                opportunity: intel.score,
+                opportunityBadges: intel.badges,
+                opportunityTooltip: intel.tooltip,
                 ts: new Date(m.date || 0).getTime(),
-                score: (tier.strict ? 120 : 0) + investmentScoreValue + Math.max(-20, edge * 100) + rel * 10 - (pred.abstain?.active ? 12 : 0)
+                score: (tier.strict ? 120 : 0) + investmentScoreValue + intel.score * 0.5 + Math.max(-20, edge * 100) + rel * 10 - (pred.abstain?.active ? 12 : 0)
               };
             })
             .filter(Boolean)
@@ -15550,7 +15607,7 @@
       })();
       const v36Sports = [...new Set(v36PickPool.map(p => p.m.sport).filter(Boolean))].slice(0, 8);
       const v36Search = String(v36Filter.q || '').trim();
-      const v36Sort = ['tier','date','time','odd','conf','edge'].includes(v36Filter.sort) ? v36Filter.sort : 'tier';
+      const v36Sort = ['tier','date','time','odd','conf','edge','score'].includes(v36Filter.sort) ? v36Filter.sort : 'tier';
       const v36Filtered = v36PickPool.filter(p => {
         if (v36Filter.sport && p.m.sport !== v36Filter.sport) return false;
         if (v36Filter.tier && p.tier !== v36Filter.tier) return false;
@@ -15569,6 +15626,7 @@
         if (v36Sort === 'odd') return (b.odd - a.odd) || (v36TierRank[a.tier] - v36TierRank[b.tier]) || (a.ts - b.ts);
         if (v36Sort === 'conf') return (b.rel - a.rel) || (b.edge - a.edge) || (a.ts - b.ts);
         if (v36Sort === 'edge') return (b.edge - a.edge) || (b.odd - a.odd) || (a.ts - b.ts);
+        if (v36Sort === 'score') return (b.opportunity - a.opportunity) || (b.edge - a.edge) || (a.ts - b.ts);
         return (v36TierRank[a.tier] - v36TierRank[b.tier]) || (b.odd - a.odd) || (b.edge - a.edge) || (a.ts - b.ts);
       });
       const v36TableRows = v36Sorted.slice(0, 360);
@@ -15650,6 +15708,7 @@
         const result = v37ResultForPick(p);
         const pickHelp = p.marketTooltip || p.marketInfo || p.labelFull || p.label;
         const marketName = p.marketName || p.market || '';
+        const intelBadges = (p.opportunityBadges || []).map(x => `<i>${esc(x)}</i>`).join('');
         return `<tr class="v36-table-row ${soon ? 'is-imminent' : ''}" data-tone="${esc(tier.tone)}" data-big-detail="${esc(String(p.m.id || ''))}" title="${esc(v36ReasonTooltip(p))}">
           <td class="v36-cell-sport"><span>${sportIcon(p.m.sport || '')}</span><b>${esc(sportLabel(p.m.sport || '').slice(0, 9))}</b></td>
           <td class="v36-cell-date">${esc(v37DateLabel(p.m.date))}</td>
@@ -15660,6 +15719,7 @@
           <td class="v36-num v36-odd">@${p.odd.toFixed(2)}</td>
           <td class="v36-num">${relPct}%</td>
           <td class="v36-num ${p.edge >= 0 ? 'is-pos' : 'is-neg'}">${p.edge >= 0 ? '+' : ''}${edgePct}%</td>
+          <td class="v36-num"><span class="v37-opportunity" data-score="${esc(String(p.opportunity || 0))}" data-tooltip="${esc(p.opportunityTooltip || '')}">${esc(String(p.opportunity || 0))}</span>${intelBadges ? `<span class="v37-intel-chips">${intelBadges}</span>` : ''}</td>
           <td>${v36TierBadge(p.tier, true)}</td>
           ${v37HistoryMode ? `<td>${v37ResultBadge(result)}</td>` : ''}
         </tr>`;
@@ -15672,6 +15732,7 @@
           <strong>${v36MatchTitleHtml(p)}</strong>
           <em class="v36-table-card__league">${esc(p.m.league_name || p.m.league || '')}</em>
           <span class="v36-table-card__line"><i data-tooltip="${esc(p.marketTooltip || p.labelFull || p.label)}">${esc(p.labelMobile || p.label)}</i><b>@${p.odd.toFixed(2)}</b><b>${Math.round(p.rel * 100)}%</b><b>${p.edge >= 0 ? '+' : ''}${(p.edge * 100).toFixed(1)}%</b></span>
+          <span class="v36-table-card__signals"><i>Score ${esc(String(p.opportunity || 0))}/100</i>${(p.opportunityBadges || []).slice(0, 2).map(x => `<i>${esc(x)}</i>`).join('')}</span>
           ${v37HistoryMode ? `<span class="v36-table-card__signals">${v37ResultBadge(result)}</span>` : ''}
         </button>`;
       };
@@ -15735,14 +15796,15 @@
             ${v36SortButton('odd', 'Cote')}
             ${v36SortButton('conf', 'Conf')}
             ${v36SortButton('edge', 'Edge')}
+            ${v36SortButton('score', 'Score')}
           </div>
         </header>
         <div class="v36-table-scroll">
           <table class="v36-picks-table">
             <thead><tr>
-              <th>Sport</th><th>${v36SortButton('date', 'Date')}</th><th>${v36SortButton('time', 'Heure')}</th><th>Ligue</th><th>Match</th><th>Pari</th><th>${v36SortButton('odd', 'Cote')}</th><th>${v36SortButton('conf', 'Conf')}</th><th>${v36SortButton('edge', 'Edge')}</th><th>${v36SortButton('tier', 'Tier')}</th>${v37HistoryMode ? '<th>Résultat</th>' : ''}
+              <th>Sport</th><th>${v36SortButton('date', 'Date')}</th><th>${v36SortButton('time', 'Heure')}</th><th>Ligue</th><th>Match</th><th>Pari</th><th>${v36SortButton('odd', 'Cote')}</th><th>${v36SortButton('conf', 'Conf')}</th><th>${v36SortButton('edge', 'Edge')}</th><th>${v36SortButton('score', 'Score')}</th><th>${v36SortButton('tier', 'Tier')}</th>${v37HistoryMode ? '<th>Résultat</th>' : ''}
             </tr></thead>
-            <tbody>${v36TableRows.length ? v36TableRows.map(v36TableRow).join('') : `<tr><td colspan="${v37HistoryMode ? '11' : '10'}"><div class="v36-tier-empty">Aucun pick pour ce filtre. Retire un sport, une heure ou une recherche.</div></td></tr>`}</tbody>
+            <tbody>${v36TableRows.length ? v36TableRows.map(v36TableRow).join('') : `<tr><td colspan="${v37HistoryMode ? '12' : '11'}"><div class="v36-tier-empty">Aucun pick pour ce filtre. Retire un sport, une heure ou une recherche.</div></td></tr>`}</tbody>
           </table>
         </div>
         <div class="v36-table-cards">${v36TableRows.length ? v36TableRows.map(v36MobileCard).join('') : `<div class="v36-tier-empty">Aucun pick pour ce filtre.</div>`}</div>
