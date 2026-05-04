@@ -90,7 +90,7 @@ test.describe('Visual regression — pages statiques', () => {
     await page.waitForFunction(() => window.PRONOSTICS_DATA != null, { timeout: 10000 }).catch(() => {});
     await page.waitForTimeout(800);
     const sidebar = page.locator('aside.sidebar-left, .sidebar-left').first();
-    if (await sidebar.count() === 0) test.skip();
+    if (await sidebar.count() === 0) test.skip(true, 'optional visual section missing: sidebar');
     await expect(sidebar).toHaveScreenshot('sidebar-left.png', {
       maxDiffPixelRatio: 0.05,
       animations: 'disabled',
@@ -103,7 +103,7 @@ test.describe('Visual regression — pages statiques', () => {
     await page.waitForFunction(() => window.PRONOSTICS_DATA != null, { timeout: 10000 }).catch(() => {});
     await page.waitForTimeout(1500);
     const filterBar = page.locator('.tous-filter-bar').first();
-    if (await filterBar.count() === 0) test.skip();
+    if (await filterBar.count() === 0) test.skip(true, 'optional visual section missing: tous filter bar');
     await expect(filterBar).toHaveScreenshot('tous-filter-bar.png', {
       maxDiffPixelRatio: 0.05,
       animations: 'disabled',
@@ -118,7 +118,7 @@ test.describe('Visual regression — pages statiques', () => {
     // Locks header — first .page-header inside #locks-wrap if it exists,
     // else first .page-header in main.
     const header = page.locator('#locks-wrap .page-header, main .page-header').first();
-    if (await header.count() === 0) test.skip();
+    if (await header.count() === 0) test.skip(true, 'optional visual section missing: legacy locks header');
     await expect(header).toHaveScreenshot('locks-header.png', {
       maxDiffPixelRatio: 0.10,  // KPIs Locks bougent jour à jour
       animations: 'disabled',
@@ -132,7 +132,7 @@ test.describe('Visual regression — pages statiques', () => {
     // Skeleton apparait pendant _ensureFullData — attendre que le rendu réel arrive
     await page.waitForTimeout(2500);
     const wrap = page.locator('#calendrier-wrap .page-header').first();
-    if (await wrap.count() === 0) test.skip();
+    if (await wrap.count() === 0) test.skip(true, 'optional visual section missing: legacy calendrier header');
     await expect(wrap).toHaveScreenshot('calendrier-header.png', {
       maxDiffPixelRatio: 0.05,
       animations: 'disabled',
@@ -146,11 +146,11 @@ test.describe('Visual regression — pages statiques', () => {
     await page.waitForTimeout(1500);
     // Click sur la première carte match pour ouvrir la modal
     const firstCard = page.locator('[data-match-id], .card[data-id], .match-row').first();
-    if (await firstCard.count() === 0) test.skip();
+    if (await firstCard.count() === 0) test.skip(true, 'optional visual section missing: first match card');
     await firstCard.click({ trial: false }).catch(() => {});
     await page.waitForTimeout(800);
     const tabs = page.locator('.md-tabs').first();
-    if (await tabs.count() === 0) test.skip();
+    if (await tabs.count() === 0) test.skip(true, 'optional visual section missing: modal tabs');
     await expect(tabs).toHaveScreenshot('modal-detail-tabs.png', {
       maxDiffPixelRatio: 0.05,
       animations: 'disabled',

@@ -28,7 +28,7 @@ test('dashboard rows open the exact same pick in the detail modal', async ({ pag
   await page.waitForTimeout(800);
 
   const count = await page.locator('.v36-table-row[data-pick-uid]:visible, .v36-table-card[data-pick-uid]:visible').count();
-  test.skip(count === 0, 'No visible V37 picks to verify');
+  expect(count, 'At least one visible V37 pick is required to verify row/modal sync').toBeGreaterThan(0);
 
   const max = Math.min(50, count);
   const failures = [];
