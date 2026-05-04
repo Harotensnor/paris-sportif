@@ -751,7 +751,6 @@
     if (e.target.closest && e.target.closest('#smart-suggest-banner .page-btn')) {
       try { localStorage.setItem('smartSuggestionDismissedTs', String(Date.now())); } catch(_){}
     }
-    // v35.199 — Pages legacy league supprimées : les deeplinks sont désormais aliasés vers Tous.
   });
 
   function _showShortcutsOverlay() {
@@ -1068,7 +1067,6 @@
   };
   try { window._safeStorage = _safeStorage; } catch(e){ logSafeError('boot expose _safeStorage', e); }
 
-  // PLAN 1000 — JS HELPERS COMPLETS (v31.7.196)
   // Mass implementation : utilities + features publiques
 
   /**
@@ -4533,7 +4531,6 @@
   // Top-k most likely exact scores under (Dixon-Coles ajustement)
   // Poisson(lamH) × Poisson(lamA) × τ(h,a,ρ).
   // Returns [{ home, away, prob }], sorted desc by prob.
-  // Used for the "Score exact probable" widget — Chantier 6 + v31.7.5.
   // ρ specifique. Backward-compatible : appel sans 5e arg utilise default.
   function poissonTopScores(lamH, lamA, k = 3, maxGoals = 6, leagueCode = null) {
     let safeLamH = Number(lamH);
@@ -4784,7 +4781,6 @@
     let aScored = a.scored, aConceded = a.conceded;
     let captionExtras = [];
     // season averages 60/40 pour réduire la variance des projections.
-    // Logique identique à NHL hockeyScorePrediction v31.7.25.
     const hStats = home?.nba_stats;
     const aStats = away?.nba_stats;
     if (hStats && aStats && hStats.pf_avg > 0 && aStats.pf_avg > 0) {
@@ -5667,7 +5663,6 @@
 
   // per-sport quand disponible (foot, tennis, basket, hockey, baseball ont
   // des distributions de marché distinctes → calibration globale lisse les
-  // erreurs spécifiques à chaque sport). Sprint 109 (v31.7.190) :
   //   * Lookup bins par sport via __modelCalibration.bySport[sport]
   //   * Fallback global si sport-specific absent ou n<10 par bin
   //   * Sport passé en argument optionnel par _applyCalibration
@@ -6464,7 +6459,6 @@
     let weatherStats = null;
     if (poi && match.sport === 'football' && match.weather) {
       const w = match.weather;
-      // confidence. fetch_weather.py v31.7.85 ne géocode plus par nom
       // d'équipe (qui retournait Tarma → Ada, Stockholm → Aiken). Mais
       // les anciennes entrées du cache geo et les fallbacks éventuels
       // peuvent encore tagger une source douteuse. On accepte uniquement
@@ -7273,7 +7267,6 @@
         const aW = (typeof ts.away_wins_last10 === 'number') ? ts.away_wins_last10 : (ts.away_last10.match(/W/g) || []).length;
         if (Math.abs(hW - aW) >= 2) {
           // n'est rattaché à personne. On étiquette les 2 côtés explicitement
-          // (cf. fix v31.7.70 sur la forme L5 foot).
           const leader = hW > aW ? (home?.short || home?.name) : (away?.short || away?.name);
           const other  = hW > aW ? (away?.short || away?.name) : (home?.short || home?.name);
           reasons.push({
@@ -7330,7 +7323,6 @@
       if (Math.abs(nhlStats.pace_diff) >= 1.0) {
         // (lecteur ne sait pas lequel des 2 chiffres appartient à X). On
         // étiquette les 2 côtés explicitement, comme on l'a fait pour la
-        // forme L5 (cf. v31.7.70).
         const better = nhlStats.pace_diff > 0 ? (home?.short || home?.name) : (away?.short || away?.name);
         const worse  = nhlStats.pace_diff > 0 ? (away?.short || away?.name) : (home?.short || home?.name);
         const betterPace = nhlStats.pace_diff > 0 ? nhlStats.home_pace : nhlStats.away_pace;
@@ -13137,7 +13129,6 @@
     `;
 
 
-    // Upgrade de la sticky anchor nav (v31.7.89) vers de vrais onglets qui
     // masquent les sections non actives. Démarre sur "Synthèse" par défaut.
     // Catégorisation par mots-clés dans le h4 (mapping ci-dessous).
     body.querySelectorAll('[data-modal-winamax-click]').forEach(a => {
@@ -13465,7 +13456,6 @@
     else prodWarn(`[wiring] #${id} introuvable au boot — handler ${ev} ignoré`);
     return el;
   }
-  // depuis le cleanup v31.7.51 (audit reported 4.2). Le bind helper aurait
   // émis un warning debug à chaque boot pour rien.
   // currentSport reste 'football' (default), modifiable via les filtres
   // inline des pages Tous/Top/Buteurs.
@@ -14320,7 +14310,6 @@
         txtEl.appendChild(_buildAgentForceRefreshLink('🔄', 'text-decoration:none;margin-left:6px;'));
       }
     }
-    // accéléré (10s en v33.7). Petit badge à droite, non intrusif.
     // l'user sache combien de matchs sont en cours sans naviguer.
     try {
       const liveCount = (function(){
@@ -17372,7 +17361,6 @@
         const pnlSign = stats.totalPnL >= 0 ? '+' : '';
         const adherence = (typeof window._computeAdherence === 'function') ? window._computeAdherence() : null;
         const adherencePct = adherence && adherence.adherence != null ? Math.round(adherence.adherence * 100) : null;
-        // Plan 1000 phase 3 — Streak indicator (Sprint A advanced stats)
         let streakBadge = '';
         if (stats.currentStreak && stats.currentStreak >= 2) {
           const isWin = stats.currentStreakSide === 'won';
@@ -17380,7 +17368,6 @@
           const color = isWin ? 'var(--accent)' : 'var(--danger)';
           streakBadge = `<span style="font-size:11.5px;color:${color};font-weight:700;">${emoji} ${stats.currentStreak}× ${isWin ? 'wins' : 'pertes'}</span>`;
         }
-        // Plan 1000 phase 3 — "If you had followed" comparison
         let modelComparison = '';
         try {
           const ifFollowed = (typeof window._computeIfYouHadFollowed === 'function') ? window._computeIfYouHadFollowed() : null;
@@ -19162,7 +19149,6 @@
                   ${allReasons.slice(0, 3).map(r => `<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:999px;font-size:10.5px;color:var(--text-dim);line-height:1.3;" title="${esc(r.text||'')}">${esc(r.icon||'')} ${esc((r.text||'').slice(0,42))}${(r.text||'').length>42?'…':''}</span>`).join('')}
                 </div>` : ''}
                 ${(() => {
-                  // Réutilise les helpers exposés sur window v34.29.
                   // (p n'a pas de sides défini, on les récupère depuis m.competitors)
                   const _sides = (typeof getSides === 'function') ? getSides(p.m) : null;
                   const home = _sides?.home; const away = _sides?.away;
@@ -22130,7 +22116,6 @@
             Le test ultime d'un modèle de probabilité : <b>quand je dis "70% de chance", est-ce que 70% de ces prédictions gagnent vraiment ?</b> Si oui, le modèle est calibré (honnête). Si non, ses pourcentages sont du bruit.
           </div>
           ${(() => {
-            // depuis v31.7.10 (calibration_5/10/20 dans backtest_report_v2).
             const bt = window.__backtestReportV2;
             if (!bt || !bt.calibration_5 || !bt.calibration_20) return '';
             return `
@@ -24120,7 +24105,6 @@
       try { localStorage.removeItem('recentSearches'); } catch(e){}
       if (typeof toast === 'function') toast('✓ Recherches récentes effacées', 'success');
     });
-    // Plan 1000 phase 3 — Export RGPD
     const exportBtn = wrap.querySelector('#export-data-btn');
     if (exportBtn) exportBtn.addEventListener('click', () => {
       if (typeof window._exportAllUserData === 'function') {
@@ -24128,7 +24112,6 @@
         if (typeof toast === 'function') toast('✓ Données exportées en JSON', 'success');
       }
     });
-    // Plan 1000 phase 3 — Show keyboard shortcuts modal
     const shortcutsBtn = wrap.querySelector('#show-keyboard-shortcuts');
     if (shortcutsBtn) shortcutsBtn.addEventListener('click', () => {
       if (typeof window.showShortcutsHelp === 'function') {
@@ -24918,7 +24901,6 @@
       }
     }
 
-    // v35.199 — Locks legacy supprimée : les picks sûrs sont intégrés à Accueil / Tous.
 
     // Historique page: list of all settled picks with filters + daily stats + export
     // Historique page: list of all settled picks with filters + daily stats + export
@@ -24952,7 +24934,6 @@
       }
     }
 
-    // v35.199 — Calendrier/League/Favoris legacy supprimés; aliases vers Tous/Profil.
 
     // Historique, Bilan, Backtest, Calibration. KPIs synthétiques en tête,
     // Historique, Bilan, Backtest, Calibration. KPIs synthétiques en tête,
@@ -24979,9 +24960,7 @@
       }
     }
 
-    // v35.199 — Matchs détectés legacy supprimé; la page Tous couvre le besoin.
 
-    // v35.199 — Plan/Valeur/Simulator/Calendrier legacy supprimés; fonctions fusionnées dans Tous/Profil/Performance.
 
     // Bilan page: render dedicated view in #bilan-wrap
     // Bilan page: render dedicated view in #bilan-wrap
@@ -26287,7 +26266,6 @@
   }
   try { window.renderPerformancePage = renderPerformancePage; } catch(e){}
 
-  // v35.199 — Renderers legacy supprimés: locks, calendrier, favoris, matchs, plan-mise, valeur, simulator, league.
 
   function renderHistoriquePage(wrap) {
     const data = window.PRONOSTICS_DATA;
@@ -28493,7 +28471,6 @@
       dateB = localStorage.getItem('compare_date_b') || todayIso;
     } catch(e) { dateA = yesterdayIso; dateB = todayIso; }
 
-    // Liste des jours dispo dans data.js (v33.17 — filter empty/missing arrays)
     const availableDays = Object.entries(data.days)
       .filter(([k, v]) => Array.isArray(v) && v.length > 0)
       .map(([k]) => k)
@@ -29668,7 +29645,6 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     ` : '';
     // Lit _agentReplay() pour exposer : NAV courant, drawdown tier, streak,
     // pause status. Theo voit en 1 coup d'œil l'état de sa cagnotte +
-    // les protections actives (drawdown protection v31.7.210 + tilt v31.7.218).
     const _agentWidget = (() => {
       try {
         const a = (typeof _agentReplay === 'function') ? _agentReplay() : null;
@@ -29683,14 +29659,12 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
         // depuis longtemps. Distinguer visuellement de "agent rentable à
         // exactement 0%" qui est différent.
         const isDormant = (a.series && a.series.length === 0) && Math.abs(nav - start) < 0.01;
-        // Tier drawdown (v31.7.210)
         let tier, tierLabel, kelly, tierColor;
         if (ratio < 0.40)      { tier = 'capital_preservation'; tierLabel = 'Préservation'; kelly = 0.08; tierColor = 'var(--danger)'; }
         else if (ratio < 0.60) { tier = 'deep_drawdown';        tierLabel = 'Drawdown profond'; kelly = 0.13; tierColor = 'var(--danger)'; }
         else if (ratio < 0.80) { tier = 'real_drawdown';        tierLabel = 'Drawdown'; kelly = 0.18; tierColor = 'var(--warn,#fbbf24)'; }
         else if (ratio < 1.00) { tier = 'early_caution';        tierLabel = 'Vigilance'; kelly = 0.22; tierColor = 'var(--warn,#fbbf24)'; }
         else                    { tier = 'full_sizing';          tierLabel = 'Pleine puissance'; kelly = 0.25; tierColor = 'var(--accent)'; }
-        // Streak / pause (v31.7.218)
         const streakCount = a.currentLossStreak || 0;
         const pauseCount = a.streakPauseCount || 0;
         const currentlyPausedUntil = a.currentlyPausedUntil || null;
