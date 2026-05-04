@@ -31,4 +31,8 @@ test('dashboard exposes a deeper multi-market table', async ({ page }) => {
   );
   expect(markets.length).toBeGreaterThanOrEqual(5);
   expect(markets.some(label => /Mi-temps|Total équipe|Score exact|Résultat \+ BTTS|Deux équipes marquent|Double chance/.test(label))).toBeTruthy();
+
+  const sportSection = page.locator('.v37-sport-picks');
+  await expect(sportSection).toBeVisible();
+  expect(await sportSection.locator('.v37-sport-lane').count()).toBeGreaterThanOrEqual(3);
 });

@@ -2,11 +2,17 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
+## Sprint v35.395 — H10 carrousel paris par sport (21:39 UTC)
+- Avant: la table exposait plus de marches, mais il manquait une lecture rapide par discipline pour choisir Foot/Tennis/Basket/Hockey/Baseball.
+- Apres: ajout de la section Paris du jour par sport avec top 3 par sport, sans doublon match, triee par score opportunite.
+- Impact mesure: le test dashboard-market-depth verifie maintenant table multi-marches + carrousel sport visible sur desktop et mobile.
+- Verif: suite cible H10+B5 OK (4/4), bundle-size OK, syntax JS OK, no-conflict-markers OK; cache/footer bumpes v35.395.
 ## Sprint v35.394 — H1 table multi-marches etendue (21:33 UTC)
 - Avant: le dashboard gardait au plus 3 candidats par match, ce qui masquait des marches Winamax detailles deja presents (mi-temps, total equipe, score exact, O/U 0,5-5,5).
 - Apres: selection diversifiee jusqu'a 8 picks foot par match et 4 autres sports, avec plafond par marche pour eviter les doublons opaques.
 - Impact mesure: ajout test Playwright dashboard-market-depth pour exiger 80+ lignes visibles et 5+ familles de marches dans la table.
 - Verif: suite cible H1+B5 OK (4/4), bundle-size OK, syntax JS OK, no-conflict-markers OK; cache/footer bumpes v35.394.
+
 ## Sprint v35.393 — AUTO 10/10 Validation bugs captures V37 (21:24 UTC)
 - Avant: les corrections capture etaient presentes mais pas verrouillees ensemble par un test de regression utilisateur.
 - Apres: nouveau test V37 verifie absence de jargon trader visible, legende score, groupement doublons, modal alignee et buts attendus avec noms equipes.
@@ -292,9 +298,4 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fetch arbitres élargi à 7 jours : les affectations exactes publiées restent faibles (20 événements exacts sur le slate courant), donc pas de faux nom arbitre.
 - `patch_referees_soccer.py` ajoute un `referee_context` de ligue quand l'arbitre exact est absent, avec `assignmentConfirmed=false` et moyennes cartes issues des arbitres confirmés.
 - `night_metrics` distingue désormais `referee` exact (20), `referee_context` (105) et `referee_signal` (125), pour une couverture signal honnête sans masquer le manque d'affectations officielles.
-
-## Sprint v35.389 — A4 bundle sous 1,7MB
-- `app.js` réduit par passe lexicale sûre : commentaires pleine ligne hors chaînes/templates retirés + indentation hors templates supprimée.
-- Taille brute `app.js` : ~1,86MB UTF-8 avant passe → 1,58MB fichier local, sous le seuil 1,70MB contrôlé par `scripts/audit_bundle_size.py`.
-- Hash `app.js` dans `pronostics.html` mis à jour, `CACHE_VERSION` bumpé, syntax JS/data/html OK.
 
