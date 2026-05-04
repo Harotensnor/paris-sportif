@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-04T20:43:36Z",
-  "calculated_at": "2026-05-04T20:43:36Z",
+  "generated_at": "2026-05-04T20:48:11Z",
+  "calculated_at": "2026-05-04T20:48:11Z",
   "source_of_truth": "data.js",
   "data_age_min": 0,
   "sources": {
@@ -15,7 +15,7 @@
       "matches_detailed": 715,
       "details_ratio_pct": 99.6,
       "last_run_delta": 0,
-      "last_run_limit": 150
+      "last_run_limit": 220
     },
     "injuries_soccer": {
       "age_min": 2,
@@ -27,15 +27,15 @@
       "events": 93
     },
     "team_stats": {
-      "age_min": 2,
-      "teams": 327
+      "age_min": 0,
+      "teams": 326
     },
     "clubelo": {
       "age_min": 2,
       "clubs": 630
     },
     "weather": {
-      "age_min": 0,
+      "age_min": 2,
       "events": 1099
     },
     "referees_soccer": {
@@ -70,19 +70,19 @@
     },
     "h2h_extended": {
       "age_min": 2,
-      "events": 202,
-      "events_with_meetings": 179,
-      "meetings": 683,
+      "events": 201,
+      "events_with_meetings": 178,
+      "meetings": 678,
       "coverage_pct": 88.6,
       "empty_events": 23,
       "sports": 4,
       "by_sport": {
         "football": {
-          "events": 138,
-          "events_with_meetings": 135,
-          "meetings": 508,
+          "events": 137,
+          "events_with_meetings": 134,
+          "meetings": 503,
           "sources": {
-            "headToHeadGames": 135,
+            "headToHeadGames": 134,
             "espn_summary_empty": 3
           }
         },
@@ -194,37 +194,37 @@
     },
     "detected_angles": {
       "age_min": 0,
-      "events": 174,
-      "angles": 346,
+      "events": 173,
+      "angles": 340,
       "by_type": {
         "lookahead": 98,
         "injury_imbalance": 100,
         "travel_extreme": 16,
-        "market_move": 13,
-        "signal_conflict": 10,
         "schedule_congestion": 22,
         "back_to_back_travel": 20,
-        "market_uncertain": 67
+        "market_uncertain": 67,
+        "market_move": 8,
+        "signal_conflict": 9
       }
     },
     "rare_signals": {
       "age_min": 0,
-      "signals": 174,
+      "signals": 168,
       "by_type": {
         "injury_imbalance": 52,
         "travel_extreme": 12,
-        "market_move": 13,
-        "signal_conflict": 10,
         "back_to_back_travel": 20,
-        "market_uncertain": 67
+        "market_uncertain": 67,
+        "market_move": 8,
+        "signal_conflict": 9
       }
     },
     "timing_edges": {
       "age_min": 0,
       "events": 285,
-      "bet_now": 277,
-      "wait": 4,
-      "price_shortening": 4
+      "bet_now": 280,
+      "wait": 5,
+      "price_shortening": 0
     },
     "injuries_multisport": {
       "age_min": 2,
@@ -250,13 +250,13 @@
     },
     "public_team_stats": {
       "age_min": 0,
-      "teams": 893,
+      "teams": 892,
       "teams_with_xg": 112,
-      "teams_with_form": 794
+      "teams_with_form": 793
     },
     "public_team_profiles": {
       "age_min": 0,
-      "teams": 893,
+      "teams": 892,
       "upcoming": 472,
       "availability": 154,
       "deep_context": 69
@@ -337,7 +337,7 @@
     "team_stats": {
       "script": "scripts/fetch_team_stats.py",
       "output": "team_stats.json",
-      "age_min": 2,
+      "age_min": 0,
       "threshold_min": 300,
       "fast_red_min": null,
       "status": "ok"
@@ -353,7 +353,7 @@
     "weather": {
       "script": "scripts/fetch_weather.py",
       "output": "weather.json",
-      "age_min": 0,
+      "age_min": 2,
       "threshold_min": 60,
       "fast_red_min": 30,
       "status": "ok"
@@ -578,13 +578,13 @@
   "pipeline_drift": {
     "status": "ok",
     "drift_count": 0,
-    "scripts_on_disk": 110,
+    "scripts_on_disk": 112,
     "auto_refresh_count": 64,
     "refresh_yml_count": 64,
     "only_local": [],
     "only_prod": [],
     "missing_from_disk": [],
-    "unused_count": 46,
+    "unused_count": 48,
     "unused_sample": [
       "_log.py",
       "_metrics.py",
@@ -597,7 +597,7 @@
       "audit_intelligence_consistency.py",
       "audit_issues_split.py",
       "audit_legacy_comments.py",
-      "audit_playwright_skips.py"
+      "audit_mcp_shadow_copy.py"
     ]
   },
   "warnings": [],
@@ -614,7 +614,7 @@
     "winamax_detail_gap_to_target": 0,
     "winamax_detail_fetch_cap_reco": 90,
     "winamax_detail_status": "ok",
-    "actionable_external_odds": 14,
+    "actionable_external_odds": 0,
     "football_invalid_form": 0,
     "events_with_xg": 220,
     "winamax_coverage": {
