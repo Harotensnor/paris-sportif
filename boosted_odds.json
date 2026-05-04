@@ -1,7 +1,12 @@
 {
-  "generated_at": "2026-05-04T19:34:44Z",
+  "generated_at": "2026-05-04T19:36:48Z",
   "source": "Winamax markets explicit boost detector",
-  "status": "empty",
+  "status": "no_explicit_boosts",
   "matches_scanned": 725,
+  "candidate_nodes_scanned": 23017,
+  "boost_keyword_matches": 0,
+  "explicit_boost_field_nodes": 0,
+  "empty_reason": "Winamax n'expose aucune promotion de cote explicite dans le payload scrape actuel. Le detecteur est vivant et ne cree pas de fausses cotes boostees.",
+  "next_action": "Continuer le scan cron; si Winamax ajoute un champ promo, la section s'alimente automatiquement.",
   "boosts": []
 }
