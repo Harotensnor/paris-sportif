@@ -15660,6 +15660,7 @@
       const v37HumanBadge = (badge) => ({
         strict: 'Sélection exigeante',
         'biais ligue +': 'Biais ligue favorable',
+        'biais ligue prioritaire': 'Biais ligue prioritaire',
         'ligue froide': 'Ligue à prudence',
         'marché biaisé +': 'Marché favorable',
         'marché à fade': 'Cote surévaluée',
@@ -15721,9 +15722,11 @@
         const missingSignals = v37Array(gap?.missing).filter(Boolean);
         let score = 48 + Math.max(-12, Math.min(24, edge * 180)) + Math.max(-8, Math.min(18, (rel - 0.50) * 90));
         const badges = [];
+        let leaguePriorityBonus = 0;
         if (tier?.strict) { score += 6; badges.push('strict'); }
         if (league?.status === 'exploit') {
-          score += Math.min(10, 4 + Math.abs(Number(league.inefficiency_score || 0)) * 10);
+          leaguePriorityBonus = Math.min(10, 4 + Math.abs(Number(league.inefficiency_score || 0)) * 10);
+          score += leaguePriorityBonus;
           badges.push('biais ligue +');
         } else if (league?.status === 'avoid') {
           score -= Math.min(8, 3 + Math.abs(Number(league.inefficiency_score || 0)) * 8);
@@ -15765,6 +15768,11 @@
           if (weatherAngle.direction === 'under_goals' && totalDir === 'under') rareDirectional += 5;
           else if (weatherAngle.direction === 'under_goals' && totalDir === 'over') rareDirectional -= 5;
         }
+        const rawRareDirectional = rareDirectional;
+        if (leaguePriorityBonus > 0 && rareDirectional < 0 && !conflictAngle) {
+          rareDirectional = Math.max(rareDirectional * 0.45, -Math.max(3, leaguePriorityBonus * 0.7));
+          badges.push('biais ligue prioritaire');
+        }
         if (rareDirectional) {
           score += rareDirectional;
           badges.push(rareDirectional > 0 ? 'signal rare +' : 'signal rare -');
@@ -15798,6 +15806,7 @@
           'Combine edge, confiance, biais marché, timing, signaux rares et profil Théo',
           friendlyBadges.length ? friendlyBadges.join(' · ') : 'aucun angle spécial',
           conflictAngle?.context || '',
+          rawRareDirectional !== rareDirectional ? `Biais ligue prioritaire: malus match ${rawRareDirectional.toFixed(1)} -> ${rareDirectional.toFixed(1)}` : '',
           `edge ${(edge * 100).toFixed(1)}%`,
           marketBias ? `${marketBias.label || 'marché'} ${marketBias.pick || ''}: ${marketBias.reason || marketBias.status}` : '',
           `data ${dataBonus}/8`,
