@@ -111,17 +111,32 @@ def is_boost(item: dict[str, Any], path: str) -> bool:
     return any("boost" in k or "promo" in k or "enhanced" in k for k in keys)
 
 
+def has_boost_field(item: dict[str, Any]) -> bool:
+    return any(
+        "boost" in str(key).lower() or "promo" in str(key).lower() or "enhanced" in str(key).lower()
+        for key in item.keys()
+    )
+
+
 def main() -> int:
     markets = read_json(WINAMAX_MARKETS)
     lookup = catalog_lookup()
     boosts: list[dict[str, Any]] = []
     scanned = 0
+    candidate_nodes = 0
+    boost_keyword_matches = 0
+    explicit_boost_field_nodes = 0
     for match_id, match in (markets.get("matches") or {}).items():
         scanned += 1
         meta = lookup.get(str(match_id), {})
         for path, item in iter_candidates(match.get("odds") or match, ""):
+            candidate_nodes += 1
             if not isinstance(item, dict) or not is_boost(item, path):
                 continue
+            if BOOST_RE.search(path) or BOOST_RE.search(text_blob(item)):
+                boost_keyword_matches += 1
+            if has_boost_field(item):
+                explicit_boost_field_nodes += 1
             odd = extract_odd(item)
             previous = extract_previous_odd(item)
             label = item.get("label") or item.get("name") or item.get("title") or path.split(".")[-1]
@@ -140,15 +155,29 @@ def main() -> int:
                 "boost_pct": round((odd / previous - 1) * 100, 2) if odd and previous and previous > 0 else None,
                 "url": meta.get("url"),
             })
+    empty_reason = (
+        "Winamax n'expose aucune promotion de cote explicite dans le payload scrape "
+        "actuel. Le detecteur est vivant et ne cree pas de fausses cotes boostees."
+    )
     out = {
         "generated_at": now_iso(),
         "source": "Winamax markets explicit boost detector",
-        "status": "ok" if boosts else "empty",
+        "status": "ok" if boosts else "no_explicit_boosts",
         "matches_scanned": scanned,
+        "candidate_nodes_scanned": candidate_nodes,
+        "boost_keyword_matches": boost_keyword_matches,
+        "explicit_boost_field_nodes": explicit_boost_field_nodes,
+        "empty_reason": None if boosts else empty_reason,
+        "next_action": None if boosts else "Continuer le scan cron; si Winamax ajoute un champ promo, la section s'alimente automatiquement.",
         "boosts": boosts,
     }
     OUT.write_text(json.dumps(out, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"boosted_odds: matches={scanned} boosts={len(boosts)} status={out['status']}")
+    print(
+        "boosted_odds: "
+        f"matches={scanned} candidates={candidate_nodes} "
+        f"keywords={boost_keyword_matches} boost_fields={explicit_boost_field_nodes} "
+        f"boosts={len(boosts)} status={out['status']}"
+    )
     return 0
 
 
