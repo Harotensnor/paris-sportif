@@ -228,6 +228,27 @@ SOURCES = [
     ('xg_coverage', 'xg_coverage.json', _count_xg_coverage),
     ('match_previews', 'match_previews.json', _count_match_previews),
     ('league_bias_audit', 'league_bias_audit.json', _count_league_bias_audit),
+    ('league_inefficiencies', 'league_inefficiencies.json', lambda d: {
+        'leagues': ((d.get('summary') or {}).get('leagues') or len(d.get('leagues') or [])) if isinstance(d, dict) else 0,
+        'exploit': ((d.get('summary') or {}).get('exploit') or 0) if isinstance(d, dict) else 0,
+        'avoid': ((d.get('summary') or {}).get('avoid') or 0) if isinstance(d, dict) else 0,
+        'current_exploit_events': ((d.get('summary') or {}).get('current_exploit_events') or 0) if isinstance(d, dict) else 0,
+    }),
+    ('detected_angles', 'detected_angles.json', lambda d: {
+        'events': ((d.get('summary') or {}).get('events_with_angles') or len(d.get('events') or [])) if isinstance(d, dict) else 0,
+        'angles': ((d.get('summary') or {}).get('angles') or 0) if isinstance(d, dict) else 0,
+        'by_type': ((d.get('summary') or {}).get('by_type') or {}) if isinstance(d, dict) else {},
+    }),
+    ('rare_signals', 'rare_signals.json', lambda d: {
+        'signals': ((d.get('summary') or {}).get('signals') or len(d.get('signals') or [])) if isinstance(d, dict) else 0,
+        'by_type': ((d.get('summary') or {}).get('by_type') or {}) if isinstance(d, dict) else {},
+    }),
+    ('timing_edges', 'timing_edges.json', lambda d: {
+        'events': ((d.get('summary') or {}).get('events') or len(d.get('events') or [])) if isinstance(d, dict) else 0,
+        'bet_now': ((d.get('summary') or {}).get('bet_now') or 0) if isinstance(d, dict) else 0,
+        'wait': ((d.get('summary') or {}).get('wait') or 0) if isinstance(d, dict) else 0,
+        'price_shortening': ((d.get('summary') or {}).get('price_shortening') or 0) if isinstance(d, dict) else 0,
+    }),
     ('injuries_multisport', 'injuries_multisport.json', lambda d: {
         'teams': len(d.get('teams') or {}) if isinstance(d, dict) else 0,
         'sports': len(d.get('by_sport') or {}) if isinstance(d, dict) else 0,
