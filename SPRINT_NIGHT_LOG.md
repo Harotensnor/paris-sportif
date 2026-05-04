@@ -1,12 +1,6 @@
 # Sprint Night Log — Paris-Sportif Autonomous Night
 
-Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35_001_332.md.
-
-## Sprint v35.333 — AUTO 10/10 Starter signals MLB/NHL (16:43 UTC)
-- Avant: `mlb_pitchers.json` et `nhl_stats.json` existaient mais `patch_all_quick.py` lisait les anciens schemas (`by_match`, `by_team`), donc pitchers/goalies restaient invisibles dans `data.js`.
-- Apres: patch rapide lit `matches` MLB par home/away/date et `teams` NHL par abbr/name, attache `event.mlb_pitchers` + `event.nhl_stats`, et `night_metrics` compte les starter signals multi-sports.
-- Impact mesure: lineups/starter_signals 32 -> 79 events, avec baseball 32 pitchers et hockey 15 goalies; blessures 192, H2H 158, xG 88, Winamax exact 342/342.
-- Verif: py_compile patch_all_quick/measure OK; patch_all_quick/build_lineups_multisport/measure_night_metrics/build_health/finalize_inline OK; data_lite hash recalc 54c58ca9; cache/footer bumpes v35.333.
+Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
 ## Sprint v35.334 — AUTO 10/10 Aliases signaux foot (16:51 UTC)
 - Avant: `patch_all_quick.py` avait une petite table locale d'aliases alors que `winamax_map.py` connaissait deja beaucoup de variantes FR/EN; les signaux pouvaient rester dormants sur Bayern/Heidenheim, Atletico, Ajax/PSV, MLS/Liga MX.
@@ -291,7 +285,7 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 
 ## Sprint v35.381 — AUTO 10/10 Journal actif compacte (20:19 UTC)
 - Dette: `SPRINT_NIGHT_LOG.md` contenait 370 entrees et ~190KB, rendant les sessions et revues inutilement lourdes.
-- Fix: archive creee dans `SPRINT_NIGHT_LOG_ARCHIVE_V35_001_332.md`; le journal actif conserve les 50 derniers sprints avec un pointeur vers l'archive.
+- Fix: archive creee dans `SPRINT_NIGHT_LOG_ARCHIVE_V35.md`; le journal actif conserve les 50 derniers sprints avec un pointeur vers l'archive.
 - Mesure: active log 370 -> 50 sprints; archive 321 sprints; aucune entree perdue.
 - Verif: compte headings archive+actif identique au pre-split; cache/footer bumpes v35.381.
 
@@ -300,5 +294,12 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix: creation de `ISSUES_ACTIVE.md` et `ISSUES_RESOLVED.md`; `ISSUES.md` devient un index court avec la seule issue OPEN actuelle.
 - Mesure: fichier principal 32KB -> 1.2KB; active=1 issue, resolved/history=53 blocs.
 - Garde-fou: `scripts/audit_issues_split.py` refuse un FIXED dans l'actif ou un OPEN/PARTIAL dans le resolu; cache/footer bumpes v35.382.
+
+## Sprint v35.383 — AUTO 10/10 Commentaires legacy nettoyes (20:26 UTC)
+- Dette: `app.js` gardait encore des commentaires de chantier v31-v35 obsoletes qui gonflaient le fichier sans aider au debug.
+- Fix: suppression de 26 commentaires ligne-only stale (`PLAN 1000`, `v31.*`, `v33.*`, `v34.*`, `v35.199`, legacy retire/supprime).
+- Garde-fou: `scripts/audit_legacy_comments.py` refuse le retour de ces commentaires legacy ligne-only.
+- Verif: audit_legacy_comments + py_compile + app/sw syntax OK; cache/footer bumpes v35.383.
+
 
 
