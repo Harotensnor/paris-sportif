@@ -2398,3 +2398,9 @@
 - Fix: matching exact -> alias canonique -> fuzzy prudent par ligue, audit `referees_patch_audit.json`, et patch aussi des matchs historiques pour garder une source de verite coherente.
 - Mesure: patch arbitres 29/152 matchs foot scannes, dont 9 via alias; Sofascore n'expose presque aucun nouvel arbitre au-dela des assignations proches du kickoff (2 nouveaux sur 158 fixtures elargies).
 - Verif: py_compile patch_referees_soccer OK; measure_night_metrics + build_health OK; cache/footer bumpes v35.370.
+
+## Sprint v35.371 — AUTO 10/10 Navigation 5 hubs stricte (19:58 UTC)
+- Dette produit: le site affichait 5 hubs mais le routeur acceptait encore 8 pages SPA autonomes (`sante`, `legal`, `montantes`), ce qui entretenait des parcours caches et difficiles a tester.
+- Fix: `VALID_PAGES` limite maintenant aux 5 destinations officielles; les anciens hashes redirigent vers Profil ou Performance, et Cmd-K n'expose plus les pages cachees comme destinations separees.
+- Impact UX: Legal reste un lien footer statique, Diagnostic vit sous Profil, Montantes/strategies sous Performance sans creer de pages orphelines.
+- Verif: app/sw syntax OK; hash aliases verifies; cache/footer bumpes v35.371.
