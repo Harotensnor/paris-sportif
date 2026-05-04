@@ -191,6 +191,12 @@ jobs:
           # https://harotensnor.github.io/paris-sportif/health.json so we can
           # spot stale/missing sources without scraping the workflow logs.
           python3 build_health.py || true
+          # v35.405 — Single source of truth for Winamax ratios. Measure the
+          # all-events night snapshot, rebuild health with explicit scopes,
+          # then fail if data.js/night_metrics/health disagree silently.
+          python3 measure_night_metrics.py || true
+          python3 build_health.py || true
+          python3 audit_data_truth.py
           # v35.403 — MCP diagnostics guard. The desktop connector can point to
           # a historical script path locally, so sync that copy when present and
           # smoke-test that `today` is dynamic even if data buckets are stale.
@@ -308,7 +314,7 @@ jobs:
             data.js data_lite.js pronostics.html app.css app.js odds_history.jsonl \
             injuries_soccer.json injuries_multisport.json winamax_catalog.json winamax_markets.json team_stats.json \
             lineups_soccer.json lineups_multisport.json xg_coverage.json match_previews.json clubelo.json weather.json fbref_xg.json xg_team_stats.json \
-            weather_geo_cache.json referees_soccer.json health.json \
+            weather_geo_cache.json referees_soccer.json health.json night_metrics.json \
             data_today.json data_manifest.json team_form.json form_stats_extended.json h2h_extended.json \
             thesportsdb_meta.json openligadb_matches.json public_team_stats.json public_team_profiles.json public_player_profiles.json \
             league_inefficiencies.json market_biases_by_league.json detected_angles.json rare_signals.json timing_edges.json \

@@ -477,6 +477,8 @@ def _scan_data_quality():
         return None
 
     total_events = 0
+    all_winamax_available = 0
+    all_winamax_exact = 0
     upcoming_events = 0
     winamax_available = 0  # winamax.available=true (peut être tournoi only)
     winamax_exact = 0      # winamax.match_id + markets['1n2'] présents
@@ -491,11 +493,18 @@ def _scan_data_quality():
     for evs in (data.get('days') or {}).values():
         for ev in (evs or []):
             total_events += 1
+            wnx = ev.get('winamax') or {}
+            mks = wnx.get('markets') or {}
+            all_has_1n2 = isinstance(mks.get('1n2'), dict) and mks['1n2'].get('home') is not None
+            all_is_exact = bool(wnx.get('available') is True and wnx.get('match_id') and all_has_1n2)
+            if wnx.get('available') is True:
+                all_winamax_available += 1
+                if all_is_exact:
+                    all_winamax_exact += 1
             if ev.get('completed') or ev.get('live'):
                 continue
             upcoming_events += 1
 
-            wnx = ev.get('winamax') or {}
             sport = ev.get('sport') or 'unknown'
             sb = by_sport.setdefault(sport, {'upcoming': 0, 'available': 0, 'exact': 0, 'detailed': 0, 'tournament_only': 0, 'missing': 0})
             sb['upcoming'] += 1
@@ -561,6 +570,12 @@ def _scan_data_quality():
         sb['exact_ratio'] = round(sb['exact'] / sb['available'], 3) if sb['available'] else None
         sb['detailed_ratio'] = round(sb['detailed'] / sb['exact'], 3) if sb['exact'] else None
     return {
+        'data_generated_at': data.get('generated_at'),
+        'truth_scope': 'all_events',
+        'all_winamax_available': all_winamax_available,
+        'all_winamax_exact': all_winamax_exact,
+        'all_winamax_exact_ratio': round(all_winamax_exact / all_winamax_available, 4) if all_winamax_available else None,
+        'quality_scope': 'upcoming_uncompleted_events',
         'total_events': total_events,
         'upcoming_events': upcoming_events,
         'winamax_available': winamax_available,
@@ -663,6 +678,18 @@ def main() -> int:
     q = _scan_data_quality()
     if q is not None:
         out['quality_checks'] = q
+        out['data_truth'] = {
+            'source_of_truth': 'data.js',
+            'scope': q.get('truth_scope') or 'all_events',
+            'data_generated_at': q.get('data_generated_at'),
+            'winamax_available': q.get('all_winamax_available'),
+            'winamax_exact': q.get('all_winamax_exact'),
+            'winamax_exact_ratio': q.get('all_winamax_exact_ratio'),
+            'quality_scope': q.get('quality_scope') or 'upcoming_uncompleted_events',
+            'upcoming_winamax_available': q.get('winamax_available'),
+            'upcoming_winamax_exact': q.get('winamax_exact'),
+            'upcoming_winamax_exact_ratio': q.get('winamax_exact_ratio'),
+        }
         # Warnings ciblés (seuils conservatifs, prêts à être ajustés).
         if q['football_invalid_form'] > 0:
             out['warnings'].append(
