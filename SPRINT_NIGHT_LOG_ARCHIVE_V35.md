@@ -2256,3 +2256,9 @@ Archived from SPRINT_NIGHT_LOG.md on 2026-05-04 to keep the active log readable.
 - Verif: app.js --check OK; hashes app.js/app.css recalcules; cache/footer bumpes v35.343.
 
 
+
+## Sprint v35.390 — B1 brancher poids appris runtime
+- `lightgbm_weights.json` exporté en `lightgbm_weights.js` et préchargé avant `app.js`.
+- `predictMatch` consomme les poids appris comme nudge conservateur (`max_probability_nudge` ≤ 2,5pt) avec trace `pred.learned_context` + raison modèle.
+- Audit ajouté : `scripts/audit_lightgbm_runtime.py` vérifie sidecar, HTML et consommation front. Statut assumé : `aggregate_fallback`, pas faux entraînement LightGBM ligne-à-ligne.
+
