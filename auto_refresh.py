@@ -118,6 +118,11 @@ PATCH_STAGES = [
     ('inject_data_in_html.py',      1,   15),
     # Pipeline status snapshot (health.json) — runs every tick, cheap.
     ('build_health.py',             1,   15),
+    # MCP diagnostics use a historical desktop path on Theo's machine; keep it
+    # synced and smoke-tested so stale "today" values cannot silently return.
+    ('sync_mcp_shadow_copy.py',      1,   15),
+    ('audit_mcp_shadow_copy.py',     1,   15),
+    ('test_mcp_smoke.py',            1,   30),
     ('compute_clv.py',              1,   30),
     # v31.7.23 — Dixon-Coles ρ par ligue mesuré en CI (likelihood max).
     # Lent (~2-5s pour 40 ligues) ; cadence 240 ticks (~4h) en local.
