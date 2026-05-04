@@ -451,14 +451,73 @@ def patch_soccer_injuries(data: dict) -> int:
 
 
 def patch_injuries(data: dict) -> int:
-    """Enrich US sports events with injuries from ESPN injuries.json."""
+    """Enrich non-football events with public ESPN multi-sport injuries."""
+    multi = _load_json(ROOT / 'injuries_multisport.json')
+    n = 0
+    if multi:
+        by_team = multi.get('teams') or {}
+        for evs in (data.get('days') or {}).values():
+            for ev in (evs or []):
+                if ev.get('sport') == 'football':
+                    continue
+                league_code = ev.get('league_code') or ''
+                if not league_code:
+                    continue
+                home_payload = away_payload = None
+                for c in (ev.get('competitors') or []):
+                    team_id = str(c.get('id') or '')
+                    if not team_id:
+                        continue
+                    rec = by_team.get(f'{league_code}:{team_id}')
+                    if not rec:
+                        continue
+                    injuries = rec.get('injuries') or []
+                    c['injuries'] = injuries
+                    c['injuries_count'] = rec.get('injuries_count') or len(injuries)
+                    c['injuries_severe'] = rec.get('severe_count') or 0
+                    c['injuries_source'] = 'espn_public'
+                    c['injuries_known'] = True
+                    payload = {
+                        'team_id': team_id,
+                        'team_name': c.get('name') or c.get('displayName') or '',
+                        'injuries': injuries,
+                        'known': True,
+                        'count': rec.get('injuries_count') or len(injuries),
+                        'severe': rec.get('severe_count') or 0,
+                        'source': 'espn_public',
+                    }
+                    if c.get('home_away') == 'home':
+                        home_payload = payload
+                    elif c.get('home_away') == 'away':
+                        away_payload = payload
+                if home_payload or away_payload:
+                    ev['injuries'] = {
+                        'home': (home_payload or {}).get('injuries') or [],
+                        'away': (away_payload or {}).get('injuries') or [],
+                        'home_known': bool(home_payload),
+                        'away_known': bool(away_payload),
+                        'home_severe': (home_payload or {}).get('severe') or 0,
+                        'away_severe': (away_payload or {}).get('severe') or 0,
+                        'home_count': (home_payload or {}).get('count') or 0,
+                        'away_count': (away_payload or {}).get('count') or 0,
+                        'source': 'espn_public',
+                    }
+                    ev['injuries_home'] = (home_payload or {}).get('severe') or 0
+                    ev['injuries_away'] = (away_payload or {}).get('severe') or 0
+                    ev['injuries_home_known'] = bool(home_payload)
+                    ev['injuries_away_known'] = bool(away_payload)
+                    ev['injuries_source'] = 'espn_public'
+                    n += 1
+        if n:
+            return n
+
+    # Legacy fallback kept for older snapshots that only have injuries.json.
     inj = _load_json(ROOT / 'injuries.json')
     if not inj:
         return 0
     by_team = inj.get('by_team') or {}
     if not by_team:
         return 0
-    n = 0
     for evs in (data.get('days') or {}).values():
         for ev in (evs or []):
             if ev.get('completed'):

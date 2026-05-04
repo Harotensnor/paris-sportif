@@ -2157,3 +2157,8 @@
 - Apres: le mega-patcher couvre top-5, D2, UEFA, MLS/LATAM, alias Roma/Manchester/PSG, matching paire home-away robuste, et attache blessures Sofascore avec flags known/severe/source.
 - Impact mesure a blanc: blessures foot 0 -> 114 events connus (92 upcoming), arbitres 3 -> 24, lineups 11 -> 32; ces signaux deviennent exploitables par le modele au prochain cron.
 - Verif: py_compile patch_all_quick OK; dry-run in-memory OK; footer/cache bumpes v35.329, app.js?v recale sur e997f15f.
+## Sprint v35.330 — AUTO 10/10 Blessures multi-sports exploitables (16:27 UTC)
+- Avant: `injuries_multisport.json` contenait deja ESPN public MLB/NBA/WNBA/NHL/NFL, mais `patch_all_quick.py` retombait sur un vieux `injuries.json` et attachait 0 event.
+- Apres: le patch rapide colle les blessures par cle `league_code:team_id` sur baseball, basket et hockey, avec known/count/severe/source au niveau equipe et event.
+- Impact mesure a blanc cumule: blessures visibles 0 -> 192 events total, dont 164 upcoming (football 114, baseball 40, hockey 15, basket 23).
+- Verif: dry-run in-memory OK; py_compile a suivre dans garde-fous; footer/cache bumpes v35.330.
