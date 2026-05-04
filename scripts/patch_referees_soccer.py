@@ -155,6 +155,56 @@ def _best_fuzzy_ref(events_idx: dict[str, dict], home_name: str, away_name: str,
     return (None, best_score)
 
 
+def _league_referee_priors(events_idx: dict[str, dict]) -> dict[str, dict]:
+    """Build transparent league-level context from confirmed assignments.
+
+    Exact referee appointments are often absent until late. This fallback is
+    deliberately named `referee_context` so the UI/model can distinguish it
+    from a confirmed match referee.
+    """
+    buckets: dict[str, dict] = {}
+    for entry in events_idx.values():
+        league = entry.get('league_code')
+        ref = entry.get('referee') or {}
+        if not league or not ref.get('name'):
+            continue
+        yellow = ref.get('yellowPerGame')
+        red = ref.get('redPerGame')
+        cards = ref.get('cardsPerGame') or yellow
+        games = ref.get('games') or 0
+        if yellow is None and cards is None:
+            continue
+        bucket = buckets.setdefault(league, {
+            'count': 0,
+            'yellow_sum': 0.0,
+            'red_sum': 0.0,
+            'cards_sum': 0.0,
+            'games_sum': 0,
+        })
+        bucket['count'] += 1
+        bucket['yellow_sum'] += float(yellow or cards or 0)
+        bucket['red_sum'] += float(red or 0)
+        bucket['cards_sum'] += float(cards or yellow or 0)
+        bucket['games_sum'] += int(games or 0)
+
+    priors: dict[str, dict] = {}
+    for league, bucket in buckets.items():
+        count = int(bucket['count'])
+        if count < 2:
+            continue
+        priors[league] = {
+            'assignmentConfirmed': False,
+            'source': 'league_referee_average',
+            'league_code': league,
+            'sampleSize': count,
+            'yellowPerGame': round(bucket['yellow_sum'] / count, 2),
+            'redPerGame': round(bucket['red_sum'] / count, 3),
+            'cardsPerGame': round(bucket['cards_sum'] / count, 2),
+            'games': int(bucket['games_sum']),
+        }
+    return priors
+
+
 def main() -> int:
     if not REFS.exists():
         print(f'[patch_referees] {REFS.name} missing — run fetch_referees_soccer.py first')
@@ -169,6 +219,7 @@ def main() -> int:
         print('[patch_referees] empty referees file — nothing to patch')
         return 0
     ref_index = _index_referees(events_idx)
+    league_priors = _league_referee_priors(events_idx)
 
     txt = DATA_JS.read_text(encoding='utf-8')
     m = re.search(r'window\.PRONOSTICS_DATA\s*=\s*(\{.*\})\s*;?\s*$', txt, re.DOTALL)
@@ -181,6 +232,7 @@ def main() -> int:
     matched_exact = 0
     matched_alias = 0
     matched_fuzzy = 0
+    context_patched = 0
     scanned = 0
     missing_samples: list[dict] = []
     for _day, evs in (data.get('days') or {}).items():
@@ -213,6 +265,10 @@ def main() -> int:
                     if entry:
                         matched_fuzzy += 1
             if not entry:
+                prior = league_priors.get(ev.get('league_code'))
+                if prior:
+                    ev['referee_context'] = dict(prior)
+                    context_patched += 1
                 if len(missing_samples) < 25:
                     missing_samples.append({
                         'league_code': ev.get('league_code'),
@@ -235,6 +291,7 @@ def main() -> int:
                 'league_code': entry.get('league_code'),
                 'sofa_event_id': entry.get('sofa_event_id'),
             }
+            ev.pop('referee_context', None)
             patched += 1
 
     payload = json.dumps(data, ensure_ascii=False, separators=(',', ':'))
@@ -248,6 +305,8 @@ def main() -> int:
         'matched_exact': matched_exact,
         'matched_alias': matched_alias,
         'matched_fuzzy': matched_fuzzy,
+        'context_patched': context_patched,
+        'league_priors': len(league_priors),
         'missing_samples': missing_samples,
     }
     (ROOT / 'referees_patch_audit.json').write_text(
@@ -259,7 +318,8 @@ def main() -> int:
     # (1 seul appel à la fin du pipeline plutôt que 12 regex sur ~13500 lignes)
     print(f'[patch_referees] patched {patched}/{scanned} soccer events w/ referee '
           f'({len(events_idx)} available; exact={matched_exact}, '
-          f'alias={matched_alias}, fuzzy={matched_fuzzy})')
+          f'alias={matched_alias}, fuzzy={matched_fuzzy}, '
+          f'league_context={context_patched})')
     return 0
 
 

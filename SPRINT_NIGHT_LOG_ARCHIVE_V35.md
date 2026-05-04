@@ -2214,3 +2214,10 @@ Archived from SPRINT_NIGHT_LOG.md on 2026-05-04 to keep the active log readable.
 - Verif: app.js hash `59a2c298`, app.css hash `92688e73`, cache/footer bumpes v35.337.
 
 
+## Sprint v35.338 — AUTO 10/10 Profil Theo dans le score (17:18 UTC)
+- Avant: l'analyse des paris trackes existait dans Profil, mais la table dense ignorait encore les forces/faiblesses personnelles de Theo.
+- Apres: le score opportunite applique un bonus/malus sport, ligue et tranche de cote selon `computeCoachInsights()`; le rail ajoute un bloc "Profil Theo" avec les patterns locaux.
+- Impact: deux picks mathematiquement proches peuvent maintenant etre departages par ce que Theo reussit vraiment a jouer, sans envoyer ces donnees hors navigateur.
+- Verif: app.js hash `0640df98`, cache/footer bumpes v35.338.
+
+
