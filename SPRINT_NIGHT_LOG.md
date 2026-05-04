@@ -2,12 +2,6 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
-## Sprint v35.336 — AUTO 10/10 Rapport gaps signaux (17:05 UTC)
-- Avant: les trous lineups/injuries/referee/H2H/xG etaient visibles seulement via quelques compteurs globaux et un log texte, pas actionnables match par match.
-- Apres: `build_signal_gap_report.py` publie `signal_gap_report.json` avec couverture par signal/sport/ligue, top 80 matchs prioritaires, sources presentes/manquantes et extrait des unmatched.
-- Impact mesure: snapshot courant = 342 events, 289 upcoming, 269 gaps prioritaires; couverture globale starter 79/342, injuries 192/342, referee 24/342, h2h 158/342, xG 88/342.
-- Verif: py_compile OK; script OK; refresh.yml appelle le rapport apres health; cache/footer bumpes v35.336.
-
 ## Sprint v35.337 — AUTO 10/10 Gaps data dans le rail (17:11 UTC)
 - Avant: `signal_gap_report.json` existait mais restait un fichier technique; Theo ne voyait pas encore quels matchs etaient sous-informes avant de lire la table.
 - Apres: le dashboard charge `signal_gap_report.json` avec les autres sidecars intelligence et affiche un bloc "Gaps data critiques" dans le rail accueil avec priorite, match et signaux manquants.
@@ -300,6 +294,13 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Mesure: audit OK sur data.js `generated_at=2026-05-04T20:28:50Z`, today `2026-05-04`, night metrics non stale.
 - Impact: les regressions type MCP/health/night_metrics avec dates divergentes deviennent detectables localement avant push.
 - Verif: audit_data_truth + py_compile OK; cache/footer bumpes v35.385.
+
+## Sprint v35.386 — AUTO 10/10 MCP racine et ratio fixes (20:43 UTC)
+- Cause A1: une ancienne config desktop pointait encore vers `paris-sportif-sprints/scripts/mcp_paris_sportif.py`, copie stale du 1er mai qui lisait un vieux `data.js`.
+- Fix: detection automatique de la racine au `data.js` le plus frais + sync de la copie legacy; les deux chemins MCP pointent maintenant vers `Paris-Sportif` et `today=2026-05-04`.
+- Ratio A2: `get_pipeline_status` expose top-level `winamax_exact_ratio` depuis `data.js` autoritaire; `night_metrics`/`health` deviennent snapshots secondaires avec statut aligned/stale.
+- Verif: appels MCP local + legacy 2x OK, ratio `0.9035`, sync `ok`, `test_mcp_smoke`, `audit_data_truth`, `audit_mcp_shadow_copy` OK; cache/footer bumpes v35.386.
+
 
 
 

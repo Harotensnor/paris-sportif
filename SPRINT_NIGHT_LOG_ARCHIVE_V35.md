@@ -2200,3 +2200,10 @@ Archived from SPRINT_NIGHT_LOG.md on 2026-05-04 to keep the active log readable.
 - Impact produit: Theo voit tout de suite les picks qui cumulent plusieurs signaux rares sans ouvrir la modal; tri `Score` ajoute au tableau et cartes mobile.
 - Verif: app.js/app.css hashes recalcules (`bf57994d`, `66ce6f69`), cache/footer bumpes v35.335.
 
+
+## Sprint v35.336 — AUTO 10/10 Rapport gaps signaux (17:05 UTC)
+- Avant: les trous lineups/injuries/referee/H2H/xG etaient visibles seulement via quelques compteurs globaux et un log texte, pas actionnables match par match.
+- Apres: `build_signal_gap_report.py` publie `signal_gap_report.json` avec couverture par signal/sport/ligue, top 80 matchs prioritaires, sources presentes/manquantes et extrait des unmatched.
+- Impact mesure: snapshot courant = 342 events, 289 upcoming, 269 gaps prioritaires; couverture globale starter 79/342, injuries 192/342, referee 24/342, h2h 158/342, xG 88/342.
+- Verif: py_compile OK; script OK; refresh.yml appelle le rapport apres health; cache/footer bumpes v35.336.
+
