@@ -2374,3 +2374,9 @@
 - Fix: `fetch_winamax_match_details.py` augmente cap/quotas, ajoute horizon 10j, priorise les matchs thin et scrape aussi le catalogue Winamax hors horizon data.js.
 - Mesure: couverture detaillee `winamax_markets.json` 243/728 -> 499/728, soit 33.4% -> 68.5%; +256 matchs enrichis, 0 failed.
 - Verif: py_compile fetch/build_health OK; health regen OK; cache/footer bumpes v35.366.
+
+## Sprint v35.367 — AUTO 10/10 Journal erreurs JS (20:07 UTC)
+- Dette technique: trop de `catch(e) {}` masquaient les erreurs locales, surtout storage, boot helpers, lazy images et wrappers async.
+- Fix: ajout `logSafeError(context, error)` avec ring buffer localStorage `paris_sportif_js_errors_v1` (60 entrees max) + console.warn controle; conversion des catches critiques de boot/storage.
+- Impact debug: une session longue garde maintenant les erreurs exploitables sans casser l'UX ni spammer un fichier distant.
+- Verif: app.js/sw.js syntax OK; cache/footer bumpes v35.367.

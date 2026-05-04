@@ -11,38 +11,66 @@
       return false;
     }
   })();
+  const SAFE_ERROR_KEY = 'paris_sportif_js_errors_v1';
+  const SAFE_ERROR_LIMIT = 60;
+  function logSafeError(context, error) {
+    const entry = {
+      ts: new Date().toISOString(),
+      context: String(context || 'unknown').slice(0, 120),
+      message: String((error && (error.message || error.name)) || error || 'unknown error').slice(0, 240),
+      stack: String((error && error.stack) || '').slice(0, 600),
+    };
+    try {
+      const raw = localStorage.getItem(SAFE_ERROR_KEY);
+      const arr = raw ? JSON.parse(raw) : [];
+      if (Array.isArray(arr)) {
+        arr.push(entry);
+        localStorage.setItem(SAFE_ERROR_KEY, JSON.stringify(arr.slice(-SAFE_ERROR_LIMIT)));
+      } else {
+        localStorage.setItem(SAFE_ERROR_KEY, JSON.stringify([entry]));
+      }
+    } catch(_) {}
+    try {
+      if (DEBUG_LOGS || !/^debug/i.test(entry.context)) {
+        const dbg = globalThis && globalThis.console;
+        if (dbg && typeof dbg.warn === 'function') dbg.warn('[ParisSportif]', entry.context, entry.message);
+      }
+    } catch(_) {}
+    return entry;
+  }
   function prodLog(...args) {
     if (!DEBUG_LOGS) return;
     try {
       const dbg = globalThis && globalThis.console;
       if (dbg && typeof dbg.log === 'function') dbg.log.apply(dbg, args);
-    } catch(e) {}
+    } catch(e) { logSafeError('debug prodLog', e); }
   }
   function prodWarn(...args) {
     if (!DEBUG_LOGS) return;
     try {
       const dbg = globalThis && globalThis.console;
       if (dbg && typeof dbg.warn === 'function') dbg.warn.apply(dbg, args);
-    } catch(e) {}
+    } catch(e) { logSafeError('debug prodWarn', e); }
   }
   function prodTable(...args) {
     if (!DEBUG_LOGS) return;
     try {
       const dbg = globalThis && globalThis.console;
       if (dbg && typeof dbg.table === 'function') dbg.table.apply(dbg, args);
-    } catch(e) {}
+    } catch(e) { logSafeError('debug prodTable', e); }
   }
-  try { window.__PARIS_DEBUG_LOGS = DEBUG_LOGS; } catch(e) {}
+  try { window.__PARIS_DEBUG_LOGS = DEBUG_LOGS; window.logSafeError = logSafeError; } catch(e) { logSafeError('boot expose debug helpers', e); }
   function safeJsonParse(raw, fallback) {
     if (raw == null || raw === '') return fallback;
     try { return JSON.parse(raw); }
-    catch(e) { return fallback; }
+    catch(e) { logSafeError('safeJsonParse', e); return fallback; }
   }
   function safeLocalStorageGet(key, fallback = null) {
     try {
       const value = localStorage.getItem(key);
       return value == null ? fallback : value;
     } catch(e) {
+      logSafeError(`safeLocalStorageGet:${key}`, e);
       return fallback;
     }
   }
@@ -54,6 +82,7 @@
       localStorage.setItem(key, value);
       return true;
     } catch(e) {
+      logSafeError(`safeLocalStorageSet:${key}`, e);
       return false;
     }
   }
@@ -61,12 +90,13 @@
     const safePrefix = String(prefix || 'id').replace(/[^a-z0-9_-]/gi, '').toLowerCase() || 'id';
     try {
       if (crypto && typeof crypto.randomUUID === 'function') return `${safePrefix}_${crypto.randomUUID()}`;
-    } catch(e) {}
+    } catch(e) { logSafeError('makeLocalId.randomUUID', e); }
     try {
       const buf = new Uint32Array(2);
       crypto.getRandomValues(buf);
       return `${safePrefix}_${Date.now().toString(36)}_${(_localIdCounter++).toString(36)}_${buf[0].toString(36)}${buf[1].toString(36)}`;
     } catch(e) {
+      logSafeError('makeLocalId.getRandomValues', e);
       return `${safePrefix}_${Date.now().toString(36)}_${(_localIdCounter++).toString(36)}`;
     }
   }
@@ -76,7 +106,7 @@
     window.safeLocalStorageJson = safeLocalStorageJson;
     window.safeLocalStorageSet = safeLocalStorageSet;
     window.makeLocalId = makeLocalId;
-  } catch(e) {}
+  } catch(e) { logSafeError('boot expose safe helpers', e); }
 
   let currentSport = 'football';
   let currentDate;
@@ -93,14 +123,14 @@
     try {
       const v = parseFloat(safeLocalStorageGet(ODD_MIN_USER_KEY));
       if (isFinite(v) && v >= 1.30 && v <= 2.50) return Math.round(v * 100) / 100;
-    } catch(e) {}
+    } catch(e) { logSafeError('getUserOddMin', e); }
     return 1.30;
   }
   function setUserOddMin(v) {
     const n = ODD_MIN_CHOICES.reduce((best, x) => Math.abs(x - v) < Math.abs(best - v) ? x : best, 1.30);
     safeLocalStorageSet(ODD_MIN_USER_KEY, String(n.toFixed(2)));
     advFilters.oddMin = n;
-    try { window.advFilters = advFilters; } catch(e) {}
+    try { window.advFilters = advFilters; } catch(e) { logSafeError('setUserOddMin expose advFilters', e); }
     saveAdvFilters();
     return n;
   }
@@ -139,7 +169,7 @@
     else root.removeAttribute('data-night-filter');
   }
   applyAccessibilityPrefs();
-  try { window.applyAccessibilityPrefs = applyAccessibilityPrefs; } catch(e) {}
+  try { window.applyAccessibilityPrefs = applyAccessibilityPrefs; } catch(e) { logSafeError('boot expose accessibility prefs', e); }
 
   function enhanceLazyImages(scope) {
     const root = scope && scope.querySelectorAll ? scope : document;
@@ -163,9 +193,9 @@
           img.setAttribute('loading', 'eager');
           img.setAttribute('fetchpriority', 'high');
         });
-    } catch(e) {}
+    } catch(e) { logSafeError('enhanceLazyImages', e); }
   }
-  try { window.enhanceLazyImages = enhanceLazyImages; } catch(e) {}
+  try { window.enhanceLazyImages = enhanceLazyImages; } catch(e) { logSafeError('boot expose enhanceLazyImages', e); }
   function handleSafeImageError(img) {
     try {
       if (!img || !img.matches || !img.matches('img[data-fallback-mode], img[data-fallback-text], img[data-league-logo]')) return;
@@ -190,12 +220,12 @@
         return;
       }
       img.style.display = 'none';
-    } catch(e) {}
+    } catch(e) { logSafeError('handleSafeImageError', e); }
   }
   try {
     document.addEventListener('error', (e) => handleSafeImageError(e.target), true);
     window.handleSafeImageError = handleSafeImageError;
-  } catch(e) {}
+  } catch(e) { logSafeError('boot image error listener', e); }
   try {
     document.addEventListener('DOMContentLoaded', () => {
       enhanceLazyImages(document);
@@ -209,7 +239,7 @@
       });
       mo.observe(document.body, { childList: true, subtree: true });
     }, { once: true });
-  } catch(e) {}
+  } catch(e) { logSafeError('boot lazy image observer', e); }
 
   const ADV_FILTER_KEY = 'advFilters';
   let advFilters = (() => {
@@ -225,7 +255,10 @@
         marketType: raw.marketType || '',            // Sprint 89 — '' | '1n2' | 'ou25' | 'btts' | 'doubleChance' | 'exactScore' | 'dnb' | 'ah' | 'basketTotal' | ...
         dataQualityMin: parseInt(raw.dataQualityMin) || 0,  // Sprint 89 — 0..4 (computeDataQuality.score min)
       };
-    } catch (e) { return { kellyMin: 0, oddMin: getUserOddMin(), oddMax: 0, league: '', valueOnly: false, evMin: 0, marketType: '', dataQualityMin: 0 }; }
+    } catch (e) {
+      logSafeError('load advFilters', e);
+      return { kellyMin: 0, oddMin: getUserOddMin(), oddMax: 0, league: '', valueOnly: false, evMin: 0, marketType: '', dataQualityMin: 0 };
+    }
   })();
   function saveAdvFilters() {
     safeLocalStorageSet(ADV_FILTER_KEY, JSON.stringify(advFilters));
@@ -250,7 +283,7 @@
     if (advFilters.evMin > 0 && ev < advFilters.evMin) return false;
     return true;
   }
-  try { window.passesValueFilter = passesValueFilter; window.advFilters = advFilters; window.getUserOddMin = getUserOddMin; } catch(e){}
+  try { window.passesValueFilter = passesValueFilter; window.advFilters = advFilters; window.getUserOddMin = getUserOddMin; } catch(e){ logSafeError('boot expose filters', e); }
   let advFiltersOpen = advFiltersActive();
   // Théo only bets on Winamax, so hide everything else by default.
   // Sync via _syncWinamaxOnlyFromMode() ci-dessous quand le toggle change.
@@ -267,7 +300,7 @@
     try {
       const raw = localStorage.getItem(BOOKMAKER_MODE_KEY);
       if (raw === 'all' || raw === 'catalog' || raw === 'exact') return raw;
-    } catch(e) {}
+    } catch(e) { logSafeError('load bookmakerMode', e); }
     return 'exact';  // default = mode strict (= état précédent du site)
   })();
   function setBookmakerMode(mode) {
@@ -275,8 +308,8 @@
     bookmakerMode = mode;
     // 'catalog' / 'exact' = filtre actif (l'ancien comportement par défaut).
     winamaxOnly = mode !== 'all';
-    try { localStorage.setItem(BOOKMAKER_MODE_KEY, mode); } catch(e){}
-    try { window.bookmakerMode = mode; } catch(e){}
+    try { localStorage.setItem(BOOKMAKER_MODE_KEY, mode); } catch(e){ logSafeError('save bookmakerMode', e); }
+    try { window.bookmakerMode = mode; } catch(e){ logSafeError('expose bookmakerMode', e); }
   }
   // Sync initial : si l'user avait persisté 'all', il faut désactiver winamaxOnly maintenant
   if (bookmakerMode === 'all') winamaxOnly = false;
@@ -291,7 +324,7 @@
         && w.markets && w.markets['1n2']
         && (Number(w.markets['1n2'].home) > 1 || Number(w.markets['1n2'].away) > 1);
   }
-  try { window.bookmakerMode = bookmakerMode; window.setBookmakerMode = setBookmakerMode; window.isBookableInMode = isBookableInMode; } catch(e){}
+  try { window.bookmakerMode = bookmakerMode; window.setBookmakerMode = setBookmakerMode; window.isBookableInMode = isBookableInMode; } catch(e){ logSafeError('boot expose bookmaker helpers', e); }
   // Current page view: simples (default) | combines | bilan
   // ex pronostics.html#locks → on lit location.hash pour set la bonne page.
   // Sans ce guard, le manifest shortcuts (#locks #bilan #combines) ne
@@ -933,14 +966,14 @@
       try {
         const v = localStorage.getItem(key);
         return v === null ? fallback : v;
-      } catch(e) { return fallback; }
+      } catch(e) { logSafeError(`_safeStorage.get:${key}`, e); return fallback; }
     },
     getJSON(key, fallback = null) {
       try {
         const v = localStorage.getItem(key);
         if (v === null) return fallback;
         return JSON.parse(v);
-      } catch(e) { return fallback; }
+      } catch(e) { logSafeError(`_safeStorage.getJSON:${key}`, e); return fallback; }
     },
     set(key, value) {
       try {
@@ -952,12 +985,13 @@
           try {
             // Drop oldest entries (heuristic : recent searches, oddsHistory)
             ['recentSearches', '__oddsHistoryByMatch'].forEach(k => {
-              try { localStorage.removeItem(k); } catch(e){}
+              try { localStorage.removeItem(k); } catch(e){ logSafeError(`_safeStorage.cleanup:${k}`, e); }
             });
             localStorage.setItem(key, value);
             return true;
-          } catch(e2) {}
+          } catch(e2) { logSafeError(`_safeStorage.retry:${key}`, e2); }
         }
+        logSafeError(`_safeStorage.set:${key}`, e);
         return false;
       }
     },
@@ -965,10 +999,10 @@
       return _safeStorage.set(key, JSON.stringify(value));
     },
     remove(key) {
-      try { localStorage.removeItem(key); return true; } catch(e) { return false; }
+      try { localStorage.removeItem(key); return true; } catch(e) { logSafeError(`_safeStorage.remove:${key}`, e); return false; }
     },
   };
-  try { window._safeStorage = _safeStorage; } catch(e){}
+  try { window._safeStorage = _safeStorage; } catch(e){ logSafeError('boot expose _safeStorage', e); }
 
   // PLAN 1000 — JS HELPERS COMPLETS (v31.7.196)
   // Mass implementation : utilities + features publiques
@@ -1048,6 +1082,7 @@
   async function _safeAsync(fn, errorMsg = 'Une erreur est survenue') {
     try { return await fn(); }
     catch(e) {
+      logSafeError(`_safeAsync:${errorMsg}`, e);
       prodWarn('[_safeAsync]', errorMsg, e);
       try { if (typeof toast === 'function') toast('⚠ ' + errorMsg, 'warn'); } catch(_){}
       return null;
