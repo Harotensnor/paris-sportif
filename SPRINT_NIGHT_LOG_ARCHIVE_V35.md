@@ -2283,5 +2283,10 @@ Archived from SPRINT_NIGHT_LOG.md on 2026-05-04 to keep the active log readable.
 - Fix: detection automatique de la racine au `data.js` le plus frais + sync de la copie legacy; les deux chemins MCP pointent maintenant vers `Paris-Sportif` et `today=2026-05-04`.
 - Ratio A2: `get_pipeline_status` expose top-level `winamax_exact_ratio` depuis `data.js` autoritaire; `night_metrics`/`health` deviennent snapshots secondaires avec statut aligned/stale.
 - Verif: appels MCP local + legacy 2x OK, ratio `0.9035`, sync `ok`, `test_mcp_smoke`, `audit_data_truth`, `audit_mcp_shadow_copy` OK; cache/footer bumpes v35.386.
+## Sprint v35.385 — AUTO 10/10 Verite data auditee (20:34 UTC)
+- Garde-fou: ajout de `scripts/audit_data_truth.py` pour comparer `data.js`, `night_metrics.json` et `health.json` sur source de verite, `generated_at` et fraicheur.
+- Mesure: audit OK sur data.js `generated_at=2026-05-04T20:28:50Z`, today `2026-05-04`, night metrics non stale.
+- Impact: les regressions type MCP/health/night_metrics avec dates divergentes deviennent detectables localement avant push.
+- Verif: audit_data_truth + py_compile OK; cache/footer bumpes v35.385.
 
 

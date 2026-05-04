@@ -3620,6 +3620,55 @@ stakeTrend,
 cooldownHours: 0,
 };
 };
+window._userBetsPnlCalendar = function(daysBack = 365) {
+const isoParis = (d) => {
+try { return d.toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' }); }
+catch(e) { return d.toISOString().slice(0, 10); }
+};
+const todayIso = isoParis(new Date());
+const start = new Date(todayIso + 'T00:00:00Z');
+start.setUTCDate(start.getUTCDate() - Math.max(30, Number(daysBack) || 365) + 1);
+const startIso = start.toISOString().slice(0, 10);
+const cells = new Map();
+const bets = _loadUserBets()
+.filter(b => b && b.settled && b.result !== 'void')
+.sort((a, b) => Number(a.settledTs || a.ts || 0) - Number(b.settledTs || b.ts || 0));
+bets.forEach(b => {
+const ts = Number(b.settledTs || b.ts || 0);
+if (!isFinite(ts) || ts <= 0) return;
+const key = isoParis(new Date(ts));
+if (key < startIso || key > todayIso) return;
+const c = cells.get(key) || { date: key, bets: 0, won: 0, lost: 0, stake: 0, pnl: 0 };
+c.bets++;
+c.stake += Number(b.stake || 0);
+c.pnl += Number(b.pnl || (b.result === 'won' ? Number(b.stake || 0) * (Number(b.odd || 1) - 1) : -Number(b.stake || 0)));
+if (b.result === 'won') c.won++;
+if (b.result === 'lost') c.lost++;
+cells.set(key, c);
+});
+const active = [...cells.values()];
+const totalStake = active.reduce((a, c) => a + c.stake, 0);
+const totalPnl = active.reduce((a, c) => a + c.pnl, 0);
+const positiveDays = active.filter(c => c.pnl > 0).length;
+const negativeDays = active.filter(c => c.pnl < 0).length;
+const bestDay = active.slice().sort((a, b) => b.pnl - a.pnl)[0] || null;
+const worstDay = active.slice().sort((a, b) => a.pnl - b.pnl)[0] || null;
+return {
+startIso,
+todayIso,
+daysBack: Math.max(30, Number(daysBack) || 365),
+bets: bets.length,
+activeDays: active.length,
+positiveDays,
+negativeDays,
+totalStake,
+totalPnl,
+roi: totalStake > 0 ? totalPnl / totalStake : 0,
+bestDay,
+worstDay,
+cells,
+};
+};
 window._computeIfYouHadFollowed = function() {
 const data = window.PRONOSTICS_DATA;
 if (!data || !data.days) return null;
@@ -24078,6 +24127,76 @@ return `
           </div>`;
 } catch(e) { return ''; }
 })();
+const userPnlHeatmapHtml = (() => {
+if (currentTab !== 'global') return '';
+let cal = null;
+try { cal = typeof window._userBetsPnlCalendar === 'function' ? window._userBetsPnlCalendar(365) : null; }
+catch(e) { cal = null; }
+if (!cal) return '';
+const money = (v) => `${Number(v || 0) >= 0 ? '+' : ''}${Number(v || 0).toFixed(2)}€`;
+const dayLabel = (iso) => {
+try { return new Date(iso + 'T12:00:00Z').toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }); }
+catch(e) { return iso; }
+};
+if (!cal.bets) {
+return `
+          <section class="perf-user-heatmap" aria-label="Calendrier P&L personnel" style="margin-top:18px;padding:16px 18px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-md);">
+            <div style="font-size:11px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.8px;font-weight:850;">Calendrier P&L personnel</div>
+            <div style="margin-top:6px;font-size:13px;color:var(--text-dim);line-height:1.45;">Tracke quelques paris réglés pour voir tes jours verts, tes jours rouges et tes périodes à calmer.</div>
+          </section>`;
+}
+const startDate = new Date(cal.startIso + 'T00:00:00Z');
+const startDow = (startDate.getUTCDay() + 6) % 7;
+const weekCount = Math.ceil((startDow + cal.daysBack) / 7);
+const maxAbs = Math.max(1, ...[...cal.cells.values()].map(c => Math.abs(c.pnl)));
+const cellColor = (c) => {
+if (!c || !c.bets) return { bg: 'rgba(148,163,184,.08)', border: 'rgba(148,163,184,.14)', text: 'var(--text-dim2)' };
+const alpha = Math.min(0.88, 0.18 + Math.abs(c.pnl) / maxAbs * 0.58 + Math.min(c.bets, 5) * 0.025);
+if (c.pnl > 0) return { bg: `rgba(52,211,153,${alpha.toFixed(3)})`, border: 'rgba(52,211,153,.48)', text: '#07120d' };
+if (c.pnl < 0) return { bg: `rgba(248,113,113,${alpha.toFixed(3)})`, border: 'rgba(248,113,113,.48)', text: '#180909' };
+return { bg: 'rgba(234,179,8,.22)', border: 'rgba(234,179,8,.42)', text: 'var(--text)' };
+};
+const cellsHtml = [];
+for (let i = 0; i < cal.daysBack; i++) {
+const d = new Date(startDate);
+d.setUTCDate(startDate.getUTCDate() + i);
+const iso = d.toISOString().slice(0, 10);
+const dow = (d.getUTCDay() + 6) % 7;
+const week = Math.floor((startDow + i) / 7);
+const c = cal.cells.get(iso);
+const col = cellColor(c);
+const tip = c
+? `${dayLabel(iso)} · ${c.bets} pari${c.bets > 1 ? 's' : ''} · ${c.won}W ${c.lost}L · P&L ${money(c.pnl)} · mise ${Number(c.stake || 0).toFixed(2)}€`
+: `${dayLabel(iso)} · aucun pari tracké`;
+cellsHtml.push(`<div data-pnl-day="${esc(iso)}" title="${tip.replace(/"/g, '&quot;')}" aria-label="${tip.replace(/"/g, '&quot;')}" style="grid-column:${week + 1};grid-row:${dow + 1};width:12px;height:12px;border-radius:3px;background:${col.bg};border:1px solid ${col.border};"></div>`);
+}
+const statChip = (label, value, tone) => `<span style="display:inline-flex;flex-direction:column;gap:2px;min-width:92px;padding:8px 10px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--panel-2);"><span style="font-size:10px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.5px;font-weight:850;">${esc(label)}</span><b style="font-size:15px;color:${tone || 'var(--text)'};font-variant-numeric:tabular-nums;">${esc(String(value))}</b></span>`;
+return `
+          <section class="perf-user-heatmap" aria-label="Calendrier P&L personnel" style="margin-top:18px;padding:16px 18px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-md);">
+            <div style="display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap;">
+              <div>
+                <div style="font-size:11px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.8px;font-weight:850;">Calendrier P&L personnel</div>
+                <h2 style="margin:4px 0 0;font-size:20px;line-height:1.2;color:var(--text);">365 jours de discipline</h2>
+                <div style="margin-top:4px;font-size:12px;color:var(--text-dim);">Chaque carré = une journée de paris trackés. Vert : profit, rouge : perte, gris : aucun pari.</div>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+                ${statChip('P&L total', money(cal.totalPnl), cal.totalPnl >= 0 ? 'var(--accent)' : 'var(--danger)')}
+                ${statChip('ROI', `${cal.roi >= 0 ? '+' : ''}${(cal.roi * 100).toFixed(1)}%`, cal.roi >= 0 ? 'var(--accent)' : 'var(--danger)')}
+                ${statChip('Jours verts', `${cal.positiveDays}/${cal.activeDays}`, 'var(--accent)')}
+                ${statChip('Pire jour', cal.worstDay ? `${cal.worstDay.date.slice(5)} ${money(cal.worstDay.pnl)}` : '—', 'var(--danger)')}
+              </div>
+            </div>
+            <div style="margin-top:14px;overflow-x:auto;padding-bottom:4px;">
+              <div style="display:grid;grid-template-columns:repeat(${weekCount}, 12px);grid-template-rows:repeat(7, 12px);gap:4px;min-width:${weekCount * 16}px;align-items:center;">
+                ${cellsHtml.join('')}
+              </div>
+            </div>
+            <div style="margin-top:10px;display:flex;gap:7px;align-items:center;flex-wrap:wrap;font-size:11px;color:var(--text-dim2);">
+              <span>Moins</span><span style="width:12px;height:12px;border-radius:3px;background:rgba(248,113,113,.55);border:1px solid rgba(248,113,113,.48);"></span><span style="width:12px;height:12px;border-radius:3px;background:rgba(148,163,184,.12);border:1px solid rgba(148,163,184,.18);"></span><span style="width:12px;height:12px;border-radius:3px;background:rgba(52,211,153,.55);border:1px solid rgba(52,211,153,.48);"></span><span>Plus</span>
+              <span style="margin-left:auto;">Meilleur jour : ${cal.bestDay ? `${esc(cal.bestDay.date.slice(5))} ${esc(money(cal.bestDay.pnl))}` : '—'}</span>
+            </div>
+          </section>`;
+})();
 wrap.innerHTML = `
       <div class="page-wrap">
         <div class="page-header">
@@ -24089,6 +24208,8 @@ wrap.innerHTML = `
         ${_healthWidget}
 
         ${subTabsHtml}
+
+        ${userPnlHeatmapHtml}
 
         ${currentTab !== 'global' ? '' : `
 <!-- KPIs principaux -->
