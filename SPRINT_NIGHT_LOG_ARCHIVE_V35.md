@@ -2242,3 +2242,10 @@ Archived from SPRINT_NIGHT_LOG.md on 2026-05-04 to keep the active log readable.
 - Verif: build_signal_gap_report + py_compile OK; cache/footer bumpes v35.341.
 
 
+## Sprint v35.342 — AUTO 10/10 Biais marches par ligue (17:50 UTC)
+- Avant: `build_betting_intelligence.py` exposait les biais ligue, angles rares et timing, mais pas de lecture par famille de marche (OU, BTTS, double chance).
+- Apres: publication de `market_biases_by_league.json`, ajout au refresh GitHub Actions et a `health.json`, avec labels lisibles et watchlist globale si le biais ligue manque encore de sample.
+- Impact mesure: 11 marches profiles, 4 exploitables, 2 a fade, 6 signaux watchlist; exemples forts: double chance 12 et moins de 3,5 buts.
+- Verif: py_compile/build_betting_intelligence/build_health OK; cache/footer bumpes v35.342.
+
+
