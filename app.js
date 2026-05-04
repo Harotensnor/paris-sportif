@@ -10903,6 +10903,52 @@
       const lineValue = Number(whyBest?.line ?? whyBest?.raw?.line);
       const homeName = sides.home?.short || sides.home?.name || 'Domicile';
       const awayName = sides.away?.short || sides.away?.name || 'Extérieur';
+      const detailAngles = (() => {
+        try {
+          const intel = window.__v37BettingIntelState?.data || {};
+          const rows = Array.isArray(intel.angles?.events) ? intel.angles.events : [];
+          const row = rows.find(e => String(e?.event_id || '') === String(match?.id || ''));
+          return Array.isArray(row?.angles) ? row.angles : [];
+        } catch(e) {
+          return [];
+        }
+      })();
+      const angleBrief = (angle) => String(angle?.context || angle?.type || 'signal').replace(/\s+/g, ' ').slice(0, 92);
+      const angleRelation = (angle) => {
+        const side = String(angle?.side || '').toLowerCase();
+        const team = String(angle?.team || '').toLowerCase();
+        const target = String(targetTeam || '').toLowerCase();
+        if (side && pickSide && (side === pickSide || (side === 'home' && pickSide === '1') || (side === 'away' && pickSide === '2'))) return 'same';
+        if (side && pickSide && ((side === 'home' && (pickSide === 'away' || pickSide === '2')) || (side === 'away' && (pickSide === 'home' || pickSide === '1')))) return 'opposite';
+        if (team && target && (team === target || target.includes(team) || team.includes(target))) return 'same';
+        return '';
+      };
+      const signalFor = [];
+      const signalAgainst = [];
+      detailAngles.forEach(angle => {
+        const typ = String(angle?.type || '');
+        const dir = String(angle?.direction || '').toLowerCase();
+        const rel = angleRelation(angle);
+        const brief = angleBrief(angle);
+        if (!brief) return;
+        if (typ === 'signal_conflict') {
+          signalAgainst.push(`Signaux opposés: ${brief}`);
+        } else if (typ === 'market_uncertain') {
+          signalAgainst.push(`Marché incertain: ${brief}`);
+        } else if (dir === 'steam' && rel === 'same') {
+          signalFor.push(`Cote qui confirme: ${brief}`);
+        } else if (['fade', 'drift', 'caution'].includes(dir) && rel === 'same') {
+          signalAgainst.push(`Contre le pick: ${brief}`);
+        } else if (['fade', 'drift', 'caution'].includes(dir) && rel === 'opposite') {
+          signalFor.push(`Contre l'adversaire: ${brief}`);
+        } else if (typ === 'weather_extreme') {
+          const totalDir = /under|moins|^u/.test(sideText + pickText) ? 'under' : /over|plus|^o/.test(sideText + pickText) ? 'over' : '';
+          if (angle.direction === 'under_goals' && totalDir === 'under') signalFor.push(`Météo alignée: ${brief}`);
+          else if (angle.direction === 'under_goals' && totalDir === 'over') signalAgainst.push(`Météo contre: ${brief}`);
+        }
+      });
+      if (signalFor.length) arr.push(`Signaux POUR: ${signalFor.slice(0, 2).join(' · ')}`);
+      if (signalAgainst.length) arr.push(`Signaux CONTRE: ${signalAgainst.slice(0, 2).join(' · ')}`);
       if ((market === '1n2' || market === 'dnb') && targetTeam) {
         const protection = market === 'dnb' ? ' avec le nul remboursé' : '';
         arr.push(`${targetTeam} est bien le camp analysé${protection} : la modal explique le même pari que celui cliqué dans le tableau.`);

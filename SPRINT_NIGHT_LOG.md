@@ -2344,3 +2344,9 @@
 - Fix: tooltip score enrichi avec decomposition chiffree: base, edge, confiance, tier, biais ligue/marche, marche incertain, signaux, timing, qualite data, gaps et profil Theo.
 - Impact produit: Theo peut voir pourquoi un score monte ou baisse sans deviner la logique interne.
 - Verif: app.js syntax OK; cache/footer bumpes v35.361.
+
+## Sprint v35.362 — AUTO 10/10 Modal signaux pour contre (19:27 UTC)
+- Bug credibilite: les conflits etaient penalises dans le score mais pas expliques clairement dans la modal "Pourquoi".
+- Fix: la modal lit les angles V37 du match et ajoute des lignes "Signaux POUR" / "Signaux CONTRE", incluant conflit, marche incertain, fade/drift et meteo selon le pari clique.
+- Impact produit: un pari avec signaux mitigés expose maintenant ce qui soutient et ce qui affaiblit le pick.
+- Verif: app.js syntax OK; cache/footer bumpes v35.362.
