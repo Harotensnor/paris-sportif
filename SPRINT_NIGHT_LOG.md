@@ -2261,6 +2261,12 @@
 - Apres: blessures, fatigue calendrier, lookahead, voyage extreme et back-to-back voyage comparent le signal a l'equipe réellement soutenue par le pari; backing l'equipe fragile penalise, jouer contre elle bonifie.
 - Impact produit: les nouveaux angles voyage/fatigue deviennent exploitables sans faux boost; les signaux rares non alignes restent visibles en badge sans gonfler le score.
 - Verif: app.js --check prevu; cache/footer bumpes v35.347.
+## Sprint v35.350 — AUTO 10/10 Cache merge arbitres Sofascore (19:02 UTC)
+- Bug trouve: `fetch_referees_soccer.py --force` pouvait remplacer 101 arbitres caches par seulement les 7 publies dans la fenetre courante.
+- Fix: merge fresh + cache existant; les nouvelles assignations gagnent, les anciennes restent disponibles tant qu'elles ne sont pas remplacees.
+- Impact mesure: fichier arbitres 101 -> 105 events; patch_referees 25 -> 29 events enrichis; priority gaps 233 -> 231; health warnings 8 -> 7.
+- Verif: py_compile fetch_referees, patch_all_quick, measure_night_metrics, signal_gap_report, build_health, finalize_inline OK; cache/footer bumpes v35.350.
+
 ## Sprint v35.349 — AUTO 10/10 Refresh H2H prioritaire ESPN (18:57 UTC)
 - Avant: la data cron fraiche etait retombee a 144 events avec H2H, alors que le cache ESPN recent contenait plus de confrontations exploitables.
 - Action: `fetch_h2h.py --force-priority` sur les ligues prioritaires + sports US, puis regeneration night_metrics / signal_gap_report / health / data_lite.

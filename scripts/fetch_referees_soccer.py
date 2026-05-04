@@ -231,6 +231,41 @@ def collect(selected_leagues: set[str] | None = None, pages: int = 3,
     }
 
 
+def merge_existing_referees(fresh: dict) -> dict:
+    """Merge fresh referee assignments with the existing cache.
+
+    Sofascore only exposes referee assignments close to kickoff and can return
+    a much smaller set on a later run.  Replacing the cache would silently drop
+    still-useful assignments for tomorrow/weekend matches, so fresh entries win
+    by key while older entries are retained.
+    """
+    old: dict = {}
+    if OUT.exists():
+        try:
+            old = json.loads(OUT.read_text(encoding='utf-8'))
+        except Exception:
+            old = {}
+    old_events = old.get('events') or {}
+    fresh_events = fresh.get('events') or {}
+    if not isinstance(old_events, dict):
+        old_events = {}
+    if not isinstance(fresh_events, dict):
+        fresh_events = {}
+    merged_events = dict(old_events)
+    merged_events.update(fresh_events)
+
+    stats = dict(fresh.get('stats') or {})
+    stats['fresh_with_ref'] = len(fresh_events)
+    stats['retained_existing'] = max(0, len(merged_events) - len(fresh_events))
+    stats['events_total'] = len(merged_events)
+
+    out = dict(fresh)
+    out['events'] = merged_events
+    out['stats'] = stats
+    out['merged_from_existing'] = bool(old_events)
+    return out
+
+
 def main() -> int:
     global DEBUG
     ap = argparse.ArgumentParser(description='Fetch Sofascore soccer referees.')
@@ -250,6 +285,7 @@ def main() -> int:
     if not data.get('events'):
         print('[fetch_referees] no referees collected — not overwriting existing file')
         return 1
+    data = merge_existing_referees(data)
     OUT.write_text(json.dumps(data, ensure_ascii=False, separators=(',', ':')),
                    encoding='utf-8')
     print(f'[fetch_referees] wrote {OUT.name} ({OUT.stat().st_size / 1024:.1f}KB)', flush=True)
