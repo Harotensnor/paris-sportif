@@ -53,7 +53,15 @@ def _count_winamax_markets(d):
         1 for v in matches.values()
         if isinstance(v, dict) and len(v.get('odds') or {}) > 1
     )
-    return {'matches_with_odds': len(matches), 'matches_detailed': detailed}
+    total = len(matches)
+    coverage = d.get('details_coverage') or {}
+    return {
+        'matches_with_odds': total,
+        'matches_detailed': detailed,
+        'details_ratio_pct': round(100 * detailed / total, 1) if total else 0.0,
+        'last_run_delta': coverage.get('delta_matches_detailed'),
+        'last_run_limit': coverage.get('last_run_limit'),
+    }
 
 def _count_events(d):
     if not isinstance(d, dict): return None

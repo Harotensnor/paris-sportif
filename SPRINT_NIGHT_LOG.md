@@ -2368,3 +2368,9 @@
 - Fix: le detecteur publie `candidate_nodes_scanned`, `boost_keyword_matches`, `explicit_boost_field_nodes`, `empty_reason` et `next_action`; le dashboard affiche un vrai statut "scan OK".
 - Mesure: 728 matchs analyses, 22980 cotes inspectees, 0 mot-cle promo et 0 champ boost explicite dans le payload courant.
 - Verif: detect_boosted_odds + build_health OK; cache/footer bumpes v35.365.
+
+## Sprint v35.366 — AUTO 10/10 Couverture marches Winamax detaillees (19:59 UTC)
+- Bug data: 487 matchs Winamax restaient limites au 1N2, donc beaucoup trop de picks sans OU/BTTS/DNB/handicap/team totals.
+- Fix: `fetch_winamax_match_details.py` augmente cap/quotas, ajoute horizon 10j, priorise les matchs thin et scrape aussi le catalogue Winamax hors horizon data.js.
+- Mesure: couverture detaillee `winamax_markets.json` 243/728 -> 499/728, soit 33.4% -> 68.5%; +256 matchs enrichis, 0 failed.
+- Verif: py_compile fetch/build_health OK; health regen OK; cache/footer bumpes v35.366.
