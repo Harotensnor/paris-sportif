@@ -2428,3 +2428,9 @@
 - Fix: `test_mcp_smoke.py` verifie maintenant directement `get_pipeline_status().today`, `local_today`, `source_of_truth=data.js` et refuse toute fuite de la date stale.
 - Mesure: smoke MCP OK 14/18 tools, 4 skips uniquement car arguments requis; `today=2026-05-04`.
 - Verif: py_compile + test_mcp_smoke OK; cache/footer bumpes v35.375.
+
+## Sprint v35.376 — AUTO 10/10 Clarte UX pronos (20:05 UTC)
+- UX: les tags composes type `strict marche a fade steam cote` passent maintenant par une traduction lisible (`Filtre cote stricte applique`, `Cote surevaluee detectee`, `Cote bouge fortement`, `Bon moment pour parier`).
+- Modal: les raisons de pari total equipe gardent le contexte de l'adversaire et les raisons generiques xG/ELO/classement ne viennent plus brouiller le pari exact clique; handicap negatif affiche une marge entiere correcte.
+- Garde-fou: ajout de `scripts/audit_ux_clarity.py` pour verrouiller tags lisibles, score explique, pick identity, xG nommes et groupement same-match.
+- Verif: audit UX clarity + app/sw syntax + no-conflict markers lances; cache/footer bumpes v35.376.
