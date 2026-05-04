@@ -63,6 +63,7 @@ FETCH_STAGES = [
     ('fetch_injuries.py',         10,   60),   # ESPN: NBA/NHL/NFL/MLB
     ('fetch_clubelo.py',            1,   30),   # self-throttled 1/20h
     ('fetch_understat_xg.py',     240,  120),   # top-5 xG, self-throttled / slow-ish
+    ('fetch_fbref_xg.py',         240,  180),   # v35.356 : xG extended leagues, self-throttled 6h
     ('snapshot_odds.py',           1,   30),   # freeze pre-match odds
     ('detect_smart_money.py',      1,   30),   # odds_history steam detector
     ('snapshot_results.py',        1,   30),   # archive completed matches (long backtest window)
@@ -99,6 +100,7 @@ PATCH_STAGES = [
     ('patch_winamax_markets.py',    1,   30),
     ('patch_all_quick.py',          1,   30),
     ('patch_understat_xg.py',       1,   30),
+    ('patch_fbref_xg.py',           1,   30),
     ('patch_smart_money.py',        1,   30),
     # v35.352 — Builders cron ajoutés dans l'auto-refresh pour éviter que
     # local et prod divergent sur les insights modèle / profils / marchés.

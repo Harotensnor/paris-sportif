@@ -48,7 +48,13 @@ try:
     from curl_cffi import requests as _req
     _IMPERSONATE = True
 except ImportError:
-    import requests as _req
+    try:
+        import requests as _req
+    except ImportError:
+        import urllib.request
+        _req = None
+    else:
+        urllib = None
     _IMPERSONATE = False
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -63,6 +69,19 @@ LEAGUES = {
     'Serie A':          'https://fbref.com/en/comps/11/Serie-A-Stats',
     'Ligue 1':          'https://fbref.com/en/comps/13/Ligue-1-Stats',
     'Champions League': 'https://fbref.com/en/comps/8/Champions-League-Stats',
+    # V35.356 — xG coverage boost for the leagues Theo actually sees in the
+    # table beyond top-5: second divisions, MLS and high-volume European leagues.
+    'MLS':              'https://fbref.com/en/comps/22/Major-League-Soccer-Stats',
+    'Eredivisie':       'https://fbref.com/en/comps/23/Eredivisie-Stats',
+    'Primeira Liga':    'https://fbref.com/en/comps/32/Primeira-Liga-Stats',
+    '2. Bundesliga':    'https://fbref.com/en/comps/33/2-Bundesliga-Stats',
+    'Championship':     'https://fbref.com/en/comps/10/Championship-Stats',
+    'Segunda División': 'https://fbref.com/en/comps/17/Segunda-Division-Stats',
+    'Serie B':          'https://fbref.com/en/comps/18/Serie-B-Stats',
+    'Ligue 2':          'https://fbref.com/en/comps/60/Ligue-2-Stats',
+    'Belgian Pro League': 'https://fbref.com/en/comps/37/Belgian-Pro-League-Stats',
+    'Scottish Premiership': 'https://fbref.com/en/comps/40/Scottish-Premiership-Stats',
+    'Austrian Bundesliga': 'https://fbref.com/en/comps/56/Austrian-Bundesliga-Stats',
 }
 
 
@@ -92,6 +111,15 @@ def fetch_url(url: str) -> str:
     try:
         if _IMPERSONATE:
             r = _req.get(url, impersonate='chrome120', timeout=15)
+        elif _req is None:
+            req = urllib.request.Request(url, headers={
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                'Accept-Language': 'fr-FR,fr;q=0.9,en;q=0.8',
+            })
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                if resp.status != 200:
+                    return ''
+                return resp.read().decode('utf-8', errors='replace')
         else:
             r = _req.get(url, timeout=15, headers={
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
@@ -177,8 +205,61 @@ def parse_squad_stats(html: str) -> dict:
     return teams
 
 
+def build_by_team(leagues: dict) -> dict:
+    by_team = {}
+    for league_name, league_data in (leagues or {}).items():
+        for team_name, stats in (league_data.get('teams') or {}).items():
+            if not isinstance(stats, dict):
+                continue
+            norm = stats.get('normalized_name') or normalize(team_name)
+            if not norm:
+                continue
+            by_team[norm] = {
+                **stats,
+                'normalized_name': norm,
+                'source': stats.get('source') or 'fbref',
+                'league_name': stats.get('league_name') or league_name,
+            }
+    return by_team
+
+
+def merge_existing(out: dict) -> dict:
+    """Keep the proven Understat top-5 cache and append FBref-only leagues.
+
+    fetch_understat_xg.py writes a fbref-compatible file used by the app. This
+    fetcher must extend that file, not replace its better rolling xG fields.
+    """
+    if not OUT.exists():
+        out['by_team'] = build_by_team(out.get('leagues') or {})
+        return out
+
+    try:
+        existing = json.loads(OUT.read_text(encoding='utf-8'))
+    except Exception:
+        existing = {}
+
+    existing_leagues = existing.get('leagues') if isinstance(existing, dict) else {}
+    if isinstance(existing_leagues, dict):
+        merged_leagues = dict(out.get('leagues') or {})
+        # Existing Understat-compatible leagues win on overlap because they
+        # contain rolling L10, PPDA and richer fields. New FBref leagues fill
+        # the coverage gaps.
+        merged_leagues.update(existing_leagues)
+        out['leagues'] = merged_leagues
+
+    by_team = build_by_team(out.get('leagues') or {})
+    existing_by_team = existing.get('by_team') if isinstance(existing, dict) else {}
+    if isinstance(existing_by_team, dict):
+        # Same rule: keep richer existing rows on overlap.
+        by_team.update(existing_by_team)
+    out['by_team'] = by_team
+    out['total_teams'] = len(by_team)
+    out['merged_from_existing'] = bool(existing_by_team or existing_leagues)
+    return out
+
+
 def main():
-    if is_fresh(OUT):
+    if '--force' not in sys.argv and is_fresh(OUT):
         print(f'fbref_xg.json fresh (<{STALE_H}h), skipping')
         return 0
 
@@ -191,7 +272,7 @@ def main():
     }
     total_teams = 0
     for league_name, url in LEAGUES.items():
-        print(f'  → {league_name}')
+        print(f'  -> {league_name}')
         html = fetch_url(url)
         if not html:
             print(f'    fetch failed, skip')
@@ -209,8 +290,9 @@ def main():
         return 1
 
     out['total_teams'] = total_teams
+    out = merge_existing(out)
     OUT.write_text(json.dumps(out, indent=2, ensure_ascii=False), encoding='utf-8')
-    print(f'\nWrote {OUT.name} : {total_teams} teams across {len(out["leagues"])} leagues')
+    print(f'\nWrote {OUT.name} : {len(out.get("by_team") or {})} teams across {len(out["leagues"])} leagues')
     return 0
 
 
