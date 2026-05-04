@@ -2416,3 +2416,9 @@
 - Garde-fou: faute de table feature-level `backtest_training_rows.jsonl`, le script exporte un statut explicite `aggregate_fallback` plutot qu'un faux LightGBM; les poids restent conservateurs et limites a ±2.5pt de nudge.
 - Mesure: 4 sports, 49 ligues et 5 tiers exportes depuis `backtest_report_v2.json`; baseball passe `boost`, basketball/hockey restent `watch`, football `neutral`.
 - Pipeline: `auto_refresh.py` et `.github/workflows/refresh.yml` appellent maintenant le script; `check_pipeline_drift.py` OK; cache/footer bumpes v35.373.
+
+## Sprint v35.374 — AUTO 10/10 Tests SPA alignes 5 hubs (20:14 UTC)
+- QA: `spa-pages-regression.spec.js` attendait encore `#montantes` comme page autonome et une bottom-nav mobile avec "Plus".
+- Fix: la spec protege maintenant les 5 hubs reels; `#sante`/`#legal` -> Profil, `#montantes*` -> Performance, anciens hashes toujours testes comme aliases.
+- Impact: les tests ne ressuscitent plus des pages que le produit a volontairement repliees; ils gardent la protection overflow/console errors sur les anciens liens.
+- Verif: app/sw syntax OK; Playwright non lance localement car `npx`/`@playwright/test` ne sont pas installes dans ce shell; cache/footer bumpes v35.374.
