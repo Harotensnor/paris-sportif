@@ -89,6 +89,28 @@ def main() -> int:
             file=sys.stderr,
         )
         return 1
+    pipeline = mod.get_pipeline_status()
+    if pipeline.get("today") != local_today:
+        print(
+            f'[mcp_smoke] FAIL get_pipeline_status.today: expected {local_today}, got {pipeline.get("today")}',
+            file=sys.stderr,
+        )
+        return 1
+    if pipeline.get("local_today") != local_today:
+        print(
+            f'[mcp_smoke] FAIL get_pipeline_status.local_today: expected {local_today}, got {pipeline.get("local_today")}',
+            file=sys.stderr,
+        )
+        return 1
+    if pipeline.get("source_of_truth") != "data.js":
+        print(
+            f'[mcp_smoke] FAIL source_of_truth: expected data.js, got {pipeline.get("source_of_truth")}',
+            file=sys.stderr,
+        )
+        return 1
+    if pipeline.get("today") == stale_today:
+        print('[mcp_smoke] FAIL stale hardcoded date leaked into pipeline status', file=sys.stderr)
+        return 1
 
     ok: list[str] = []
     fail: list[tuple[str, str]] = []

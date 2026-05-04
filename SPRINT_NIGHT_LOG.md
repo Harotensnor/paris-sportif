@@ -2422,3 +2422,9 @@
 - Fix: la spec protege maintenant les 5 hubs reels; `#sante`/`#legal` -> Profil, `#montantes*` -> Performance, anciens hashes toujours testes comme aliases.
 - Impact: les tests ne ressuscitent plus des pages que le produit a volontairement repliees; ils gardent la protection overflow/console errors sur les anciens liens.
 - Verif: app/sw syntax OK; Playwright non lance localement car `npx`/`@playwright/test` ne sont pas installes dans ce shell; cache/footer bumpes v35.374.
+
+## Sprint v35.375 — AUTO 10/10 Garde-fou MCP date (20:19 UTC)
+- Bug recurrent: le statut MCP a deja regresse vers `today=2026-04-30` malgre les corrections.
+- Fix: `test_mcp_smoke.py` verifie maintenant directement `get_pipeline_status().today`, `local_today`, `source_of_truth=data.js` et refuse toute fuite de la date stale.
+- Mesure: smoke MCP OK 14/18 tools, 4 skips uniquement car arguments requis; `today=2026-05-04`.
+- Verif: py_compile + test_mcp_smoke OK; cache/footer bumpes v35.375.
