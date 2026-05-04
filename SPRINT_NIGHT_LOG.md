@@ -2404,3 +2404,9 @@
 - Fix: `VALID_PAGES` limite maintenant aux 5 destinations officielles; les anciens hashes redirigent vers Profil ou Performance, et Cmd-K n'expose plus les pages cachees comme destinations separees.
 - Impact UX: Legal reste un lien footer statique, Diagnostic vit sous Profil, Montantes/strategies sous Performance sans creer de pages orphelines.
 - Verif: app/sw syntax OK; hash aliases verifies; cache/footer bumpes v35.371.
+
+## Sprint v35.372 — AUTO 10/10 Audit bundle initial (20:03 UTC)
+- Dette perf: `app.js` reste a 1.86 MB et les prochaines coupes doivent etre mesurees pour eviter de casser les 5 hubs.
+- Fix: ajout `BUNDLE_AUDIT_V35_371.md` avec tailles, top fonctions par bytes/lignes et ordre de coupe safe (`openDetail`, diagnostics Profil, sous-vues Performance).
+- Mesure: `renderDashboardPage` 338 KB, `openDetail` 176 KB, `renderBilanPage` 105 KB, `_predictMatchImpl` 95 KB; premier split recommande: modal puis sous-vues Performance.
+- Verif: app/sw syntax OK; cache/footer bumpes v35.372.
