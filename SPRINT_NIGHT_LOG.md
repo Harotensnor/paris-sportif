@@ -2,6 +2,12 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
+## Sprint v35.402 — C5 mode blind discipline (22:41 UTC)
+- Avant: le dashboard exposait directement cote et edge, ce qui pousse a juger le rendement avant de lire le contexte.
+- Apres: ajout d'un toggle persistant "Mode blind" qui masque cote et edge dans la table dense, les cards mobiles, les lanes sport et les suggestions perso.
+- Impact mesure: Theo peut scanner les equipes, le marche, la confiance, les raisons et le score d'opportunite avant de reveler mentalement la value.
+- Verif: Playwright mode blind + suggestions perso OK (4/4), bundle-size OK, syntax JS OK, no-conflict-markers OK; cache/footer bumpes v35.402.
+
 ## Sprint v35.401 — C7 suggestions perso accueil (22:38 UTC)
 - Avant: les apprentissages du profil Theo existaient surtout dans le rail, donc faciles a manquer pendant la lecture de la table.
 - Apres: ajout d'une bande "Pour ton profil" dans le flux principal avec 3 picks recommandes et une raison personnalisee sport/ligue/cote.
@@ -295,4 +301,3 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix: creation de `ISSUES_ACTIVE.md` et `ISSUES_RESOLVED.md`; `ISSUES.md` devient un index court avec la seule issue OPEN actuelle.
 - Mesure: fichier principal 32KB -> 1.2KB; active=1 issue, resolved/history=53 blocs.
 - Garde-fou: `scripts/audit_issues_split.py` refuse un FIXED dans l'actif ou un OPEN/PARTIAL dans le resolu; cache/footer bumpes v35.382.
-

@@ -14179,6 +14179,8 @@ const v36Filter = (() => {
 const parsed = safeLocalStorageJson(v36FilterKey, {});
 return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
 })();
+const v37BlindMode = v36Filter.blind === true || v36Filter.blind === '1';
+try { window.__v37BlindMode = v37BlindMode; } catch(e) {}
 const v36TierDefs = [
 { id: 'safe', icon: '1', label: 'Sur', range: '1.30-1.50', desc: 'Conf. 75%+ · edge positif', tone: 'safe' },
 { id: 'solid', icon: '2', label: 'Solide', range: '1.50-2.00', desc: 'Conf. 65%+ · edge positif', tone: 'solid' },
@@ -14788,6 +14790,12 @@ const v37ScopeLabel = v37IsAllHorizon ? '7 prochains jours' : v37DateLabel(v37Da
 const v36CoverageLine = `${v36PickPool.length} picks · ${v36UpcomingAll.length} a venir · ${v37LiveAll.length} live · ${v37FinishedAll.length} termines · data ${_dataAgeMin} min`;
 const v36FilterButton = (kind, value, label, active) => `<button type="button" class="v36-filter-chip ${active ? 'is-active' : ''}" data-v36-filter="${esc(kind)}" data-v36-value="${esc(value)}">${label}</button>`;
 const v36SortButton = (value, label) => `<button type="button" class="v36-sort-btn ${v36Sort === value ? 'is-active' : ''}" data-v36-sort="${esc(value)}">${esc(label)}</button>`;
+const v37BlindOddHtml = (odd) => v37BlindMode
+? '<span class="v37-blind-value" data-tooltip="Mode blind : la cote est cachee pour juger le pari avant le prix.">Cote cachee</span>'
+: `@${Number(odd || 0).toFixed(2)}`;
+const v37BlindEdgeHtml = (edge) => v37BlindMode
+? '<span class="v37-blind-value" data-tooltip="Mode blind : l edge est cache pour lire les raisons avant le rendement.">Edge cache</span>'
+: `${edge >= 0 ? '+' : ''}${(edge * 100).toFixed(1)}%`;
 const v36CompactCard = (p) => {
 const { home, away } = getSides(p.m);
 const tier = v36TierById[p.tier];
@@ -14799,8 +14807,8 @@ const title = `${v36TeamName(home)} - ${v36TeamName(away)}`;
 return `<button type="button" class="v36-pick-card" data-tone="${esc(tier.tone)}" data-big-detail="${esc(String(p.m.id || ''))}" data-pick-uid="${esc(p.pickUid || '')}" data-pick-label="${esc(p.labelFull || p.label || '')}" data-pick-odd="${esc(p.odd.toFixed(2))}">
           <span class="v36-pick-card__meta"><b>${esc(sportLabel(p.m.sport || ''))}</b><em>${esc(timeLabel)}</em></span>
           <strong>${esc(title)}</strong>
-          <span class="v36-pick-card__bet"><b data-tooltip="${esc(p.marketTooltip || p.labelFull || p.label)}">${esc(p.labelMobile || p.label)}</b><em>@${p.odd.toFixed(2)}</em></span>
-          <span class="v36-pick-card__signals"><i>${relPct}% conf.</i><i>${edgePct >= 0 ? '+' : ''}${edgePct}% edge</i><i>${evPct >= 0 ? '+' : ''}${evPct}% EV</i></span>
+          <span class="v36-pick-card__bet"><b data-tooltip="${esc(p.marketTooltip || p.labelFull || p.label)}">${esc(p.labelMobile || p.label)}</b><em>${v37BlindOddHtml(p.odd)}</em></span>
+          <span class="v36-pick-card__signals"><i>${relPct}% conf.</i><i>${v37BlindEdgeHtml(p.edge)}</i><i>${evPct >= 0 ? '+' : ''}${evPct}% EV</i></span>
         </button>`;
 };
 const v36TierBadge = (tierId, compact) => {
@@ -14866,9 +14874,9 @@ return `<tr class="v36-table-row ${soon ? 'is-imminent' : ''} ${sameMatchCount >
           <td class="v36-cell-league">${esc(league)}</td>
           <td class="v36-cell-match">${v36MatchTitleHtml(p)}${sameMatchCount > 1 ? `<span class="v37-match-multi">+${sameMatchCount - 1} autre pick</span>` : ''}</td>
           <td class="v36-cell-pick"><b data-tooltip="${esc(pickHelp)}">${esc(p.label)}</b>${p.marketInfo ? `<span aria-hidden="true" data-tooltip="${esc(p.marketInfo)}" style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;margin-left:6px;border-radius:50%;border:1px solid var(--border);color:var(--text-dim);font-size:10px;font-weight:800;">?</span>` : ''}<em>${esc(marketName)}</em></td>
-          <td class="v36-num v36-odd">@${p.odd.toFixed(2)}</td>
+          <td class="v36-num v36-odd">${v37BlindOddHtml(p.odd)}</td>
           <td class="v36-num">${relPct}%</td>
-          <td class="v36-num ${p.edge >= 0 ? 'is-pos' : 'is-neg'}">${p.edge >= 0 ? '+' : ''}${edgePct}%</td>
+          <td class="v36-num ${p.edge >= 0 ? 'is-pos' : 'is-neg'}">${v37BlindEdgeHtml(p.edge)}</td>
           <td class="v36-num"><span class="v37-opportunity ${scoreClass}" data-score="${esc(String(p.opportunity || 0))}" data-tooltip="${esc(p.opportunityTooltip || '')}" title="${esc(p.opportunityTooltip || '')}" aria-label="${esc(p.opportunityTooltip || `Score d'opportunité ${p.opportunity || 0}/100`)}" tabindex="0">${esc(String(p.opportunity || 0))}</span>${intelBadges ? `<span class="v37-intel-chips">${intelBadges}</span>` : ''}</td>
           <td>${v36TierBadge(p.tier, true)}</td>
           ${v37HistoryMode ? `<td>${v37ResultBadge(result)}</td>` : ''}
@@ -14882,7 +14890,7 @@ return `<button type="button" class="v36-table-card ${sameMatchCount > 1 ? 'is-s
           <span class="v36-table-card__top"><b>${sportIcon(p.m.sport || '')} ${esc(v37DateLabel(p.m.date))} · ${esc(fmtTime(p.m.date))}</b>${v36TierBadge(p.tier, false)}</span>
           <strong>${v36MatchTitleHtml(p)}</strong>
           <em class="v36-table-card__league">${esc(p.m.league_name || p.m.league || '')}</em>
-          <span class="v36-table-card__line"><i data-tooltip="${esc(p.marketTooltip || p.labelFull || p.label)}">${esc(p.labelMobile || p.label)}</i><b>@${p.odd.toFixed(2)}</b><b>${Math.round(p.rel * 100)}%</b><b>${p.edge >= 0 ? '+' : ''}${(p.edge * 100).toFixed(1)}%</b></span>
+          <span class="v36-table-card__line"><i data-tooltip="${esc(p.marketTooltip || p.labelFull || p.label)}">${esc(p.labelMobile || p.label)}</i><b>${v37BlindOddHtml(p.odd)}</b><b>${Math.round(p.rel * 100)}%</b><b>${v37BlindEdgeHtml(p.edge)}</b></span>
           <span class="v36-table-card__signals"><i data-tooltip="${esc(p.opportunityTooltip || '')}" title="${esc(p.opportunityTooltip || '')}" aria-label="${esc(p.opportunityTooltip || `Score d'opportunité ${p.opportunity || 0}/100`)}">Score ${esc(String(p.opportunity || 0))}/100</i>${sameMatchCount > 1 ? `<i>+${sameMatchCount - 1} autre pick même match</i>` : ''}${(p.opportunityBadges || []).slice(0, 2).map(x => `<i data-tooltip="${esc(v37BadgeTooltip(x))}" title="${esc(v37BadgeTooltip(x))}">${esc(x)}</i>`).join('')}</span>
           ${v37HistoryMode ? `<span class="v36-table-card__signals">${v37ResultBadge(result)}</span>` : ''}
         </button>`;
@@ -14947,7 +14955,7 @@ const reason = (profile.notes || [])[0] || 'Pick solide du jour en attendant plu
 return `<button type="button" class="v37-personal-card" data-big-detail="${esc(String(p.m.id || ''))}" data-pick-uid="${esc(p.pickUid || '')}" style="text-align:left;padding:12px 13px;border:1px solid rgba(167,139,250,.22);border-radius:var(--r-sm);background:linear-gradient(135deg,rgba(167,139,250,.12),rgba(52,211,153,.06));color:var(--text);cursor:pointer;min-width:0;">
           <span style="display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:11px;color:var(--text-dim);font-weight:800;text-transform:uppercase;letter-spacing:.5px;"><i>${esc(sportLabel(p.m.sport || ''))}</i><b style="color:var(--brand);font-variant-numeric:tabular-nums;">Score ${esc(String(p.opportunity || 0))}</b></span>
           <strong style="display:block;margin-top:6px;font-size:13px;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(v36TeamName(home))} - ${esc(v36TeamName(away))}</strong>
-          <span style="display:flex;justify-content:space-between;gap:8px;margin-top:7px;font-size:12px;line-height:1.3;"><em style="font-style:normal;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(p.labelMobile || p.label)}</em><b style="color:var(--accent);font-variant-numeric:tabular-nums;">@${p.odd.toFixed(2)}</b></span>
+          <span style="display:flex;justify-content:space-between;gap:8px;margin-top:7px;font-size:12px;line-height:1.3;"><em style="font-style:normal;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(p.labelMobile || p.label)}</em><b style="color:var(--accent);font-variant-numeric:tabular-nums;">${v37BlindOddHtml(p.odd)}</b></span>
           <small style="display:block;margin-top:7px;color:var(--text-dim);font-size:11px;line-height:1.35;">${esc(reason)}</small>
         </button>`;
 }).join('');
@@ -14968,6 +14976,9 @@ const v36TableHtml = `<section class="v36-table-panel" aria-label="Tableau dense
             <span>${v36TierDefs.map(t => `${v36CountsAll[t.id] || 0} ${t.label}`).join(' · ')} · ${v36TableRows.length}/${v36Sorted.length} lignes rendues</span>
           </div>
           <label class="v36-table-search"><span>Search</span><input type="search" data-v36-search value="${esc(v36Search)}" placeholder="Équipe, ligue, marché"></label>
+          <button type="button" class="v37-blind-toggle ${v37BlindMode ? 'is-active' : ''}" data-v37-blind aria-pressed="${v37BlindMode ? 'true' : 'false'}" data-tooltip="Cache cote et edge dans le dashboard pour lire l'analyse avant le rendement.">
+            <span>Mode blind</span><b>${v37BlindMode ? 'ON' : 'OFF'}</b>
+          </button>
           <div class="v36-sort-strip" aria-label="Tri tableau">
             ${v36SortButton('tier', 'Tier')}
             ${v36SortButton('date', 'Date')}
@@ -15352,6 +15363,16 @@ v37LiveInput.addEventListener('change', () => {
 const next = { ...v36Filter };
 if (v37LiveInput.checked) next.includeLive = true;
 else delete next.includeLive;
+try { localStorage.setItem(v36FilterKey, JSON.stringify(next)); } catch(e) {}
+renderDashboardPage(wrap);
+});
+}
+const v37BlindToggle = wrap.querySelector('[data-v37-blind]');
+if (v37BlindToggle) {
+v37BlindToggle.addEventListener('click', () => {
+const next = { ...v36Filter };
+if (v37BlindMode) delete next.blind;
+else next.blind = true;
 try { localStorage.setItem(v36FilterKey, JSON.stringify(next)); } catch(e) {}
 renderDashboardPage(wrap);
 });
