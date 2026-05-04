@@ -2201,3 +2201,9 @@
 - Apres: le dashboard charge `signal_gap_report.json` avec les autres sidecars intelligence et affiche un bloc "Gaps data critiques" dans le rail accueil avec priorite, match et signaux manquants.
 - Impact: les picks ne sont plus presentes comme equivalemment fiables quand compos/arbitres/H2H/xG manquent; les trous sources deviennent visibles et cliquables vers la modal match.
 - Verif: app.js hash `59a2c298`, app.css hash `92688e73`, cache/footer bumpes v35.337.
+
+## Sprint v35.338 — AUTO 10/10 Profil Theo dans le score (17:18 UTC)
+- Avant: l'analyse des paris trackes existait dans Profil, mais la table dense ignorait encore les forces/faiblesses personnelles de Theo.
+- Apres: le score opportunite applique un bonus/malus sport, ligue et tranche de cote selon `computeCoachInsights()`; le rail ajoute un bloc "Profil Theo" avec les patterns locaux.
+- Impact: deux picks mathematiquement proches peuvent maintenant etre departages par ce que Theo reussit vraiment a jouer, sans envoyer ces donnees hors navigateur.
+- Verif: app.js hash `0640df98`, cache/footer bumpes v35.338.
