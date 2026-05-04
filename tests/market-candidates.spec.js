@@ -41,6 +41,10 @@ test.describe('v35 market scanner', () => {
             team_total: [
               { market: 'team_total', team: 'home', side: 'over', line: 0.5, odd: 1.44, label: 'Home plus de 0,5' },
             ],
+            ht_ou: [
+              { market: 'ht_ou', side: 'over', line: 0.5, odd: 1.48, label: 'Plus de 0,5' },
+              { market: 'ht_ou', side: 'under', line: 0.5, odd: 2.55, label: 'Moins de 0,5' },
+            ],
           },
         },
       };
@@ -53,6 +57,7 @@ test.describe('v35 market scanner', () => {
           extended: {
             raw: {
               ou25: { over: 0.57, under: 0.43 },
+              ouHT05: { over: 0.69, under: 0.31 },
               dnb: { home: 0.68, away: 0.32 },
               teamTotals: { home_over_05: 0.76 },
             },
@@ -77,7 +82,7 @@ test.describe('v35 market scanner', () => {
 
     expect(candidates.length).toBeGreaterThanOrEqual(5);
     expect(candidates.every(c => c.source === 'winamax_exact' && c.exact === true)).toBe(true);
-    expect(candidates.map(c => c.market)).toEqual(expect.arrayContaining(['1n2', 'ou25', 'btts', 'dnb', 'teamTotal']));
+    expect(candidates.map(c => c.market)).toEqual(expect.arrayContaining(['1n2', 'ou25', 'btts', 'dnb', 'teamTotal', 'htTotal']));
     expect(candidates.find(c => c.market === 'ou25' && c.key === 'O2.5').ev).toBeGreaterThan(0);
     const teamTotal = candidates.find(c => c.market === 'teamTotal');
     expect(teamTotal.label).toBe('Freiburg marque au moins 1 but');
@@ -88,6 +93,7 @@ test.describe('v35 market scanner', () => {
     expect(candidates.find(c => c.market === '1n2' && c.key === '1').label).toBe('Freiburg (victoire domicile)');
     expect(candidates.find(c => c.market === 'dnb').label).toBe('Freiburg (nul remboursé)');
     expect(candidates.find(c => c.market === 'btts' && c.key === 'BTTS_Y').label).toBe('Les deux équipes marquent (oui)');
+    expect(candidates.find(c => c.market === 'htTotal' && c.key === 'HT_O0.5').label).toBe('Plus de 0,5 buts en 1re mi-temps');
     expect(candidates.map(c => c.label).join(' | ')).not.toMatch(/\bDNB\s+[12]\b|BTTS Oui|équipe seulement|^1 ·|^2 ·/);
   });
 

@@ -260,6 +260,26 @@ def _extract_match_markets(state: dict, match_id: str) -> dict:
                     _append_market(markets, 'ht_1n2_rows', {
                         'market': 'ht_1n2', 'side': side, 'odd': od, 'label': label, 'title': bet.get('betTypeName') or ''
                     })
+        # Mi-temps O/U buts
+        elif 'mi-temps' in title and ('nombre de buts' in title or 'nombre total de buts' in title):
+            _add_ou_rows(markets, 'ht_ou', bet.get('betTypeName') or '', oitems)
+            for line_val, key in [(0.5, 'ht_ou05'), (1.5, 'ht_ou15')]:
+                if key in markets:
+                    continue
+                line_str_dot = str(line_val)
+                line_str_comma = str(line_val).replace('.', ',')
+                over_v = under_v = None
+                for label, od in oitems:
+                    l = label.lower()
+                    has_line = (line_str_dot in l or line_str_comma in l)
+                    is_over = 'plus' in l or 'over' in l or l.startswith('+') or '≥' in l
+                    is_under = 'moins' in l or 'under' in l or l.startswith('-') or '<' in l
+                    if has_line and is_over:
+                        over_v = od
+                    elif has_line and is_under:
+                        under_v = od
+                if over_v and under_v:
+                    markets[key] = {'over': over_v, 'under': under_v, 'line': line_val}
         # Double Chance
         elif 'double chance' == title:
             if 'dc' not in markets:
