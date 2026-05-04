@@ -2380,3 +2380,9 @@
 - Fix: ajout `logSafeError(context, error)` avec ring buffer localStorage `paris_sportif_js_errors_v1` (60 entrees max) + console.warn controle; conversion des catches critiques de boot/storage.
 - Impact debug: une session longue garde maintenant les erreurs exploitables sans casser l'UX ni spammer un fichier distant.
 - Verif: app.js/sw.js syntax OK; cache/footer bumpes v35.367.
+
+## Sprint v35.368 — AUTO 10/10 Listeners tracables (20:14 UTC)
+- Dette perf: 318 `addEventListener` rendaient les fuites difficiles a isoler sur sessions longues.
+- Fix: ajout `trackedAddEventListener` + `cleanupTrackedEventListeners`, exposition debug `__PARIS_TRACKED_LISTENERS`, branchement sur `_on`, `bind()` et listeners boot lazy-images.
+- Impact: les listeners de groupe `page` peuvent etre nettoyes a chaque render, et les listeners boot sont maintenant inspectables.
+- Verif: app.js/sw.js syntax OK; cache/footer bumpes v35.368.
