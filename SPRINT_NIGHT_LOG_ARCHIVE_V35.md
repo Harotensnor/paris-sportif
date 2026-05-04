@@ -2228,3 +2228,10 @@ Archived from SPRINT_NIGHT_LOG.md on 2026-05-04 to keep the active log readable.
 - Verif: app.js hash `c8bf9f75`, app.css hash `66ce6f69`, cache/footer bumpes v35.339.
 
 
+## Sprint v35.340 — AUTO 10/10 MCP pipeline gaps multi-jours (17:35 UTC)
+- Avant: le MCP utilisait bien la date locale, mais `get_pipeline_status` ne resumait pas encore les gaps publies et `list_data_gaps` reconstruisait seulement les trous du jour.
+- Apres: le MCP expose `night_metrics`, la couverture `signal_gap_report`, les signaux les plus manquants et liste les gaps prioritaires multi-jours.
+- Impact mesure: `get_pipeline_status` retourne today=2026-05-04, 80 gaps prioritaires, top manquants referee/starter_signals/H2H; `list_data_gaps` pointe AVS-FC Porto en priorite 101.
+- Verif: py_compile MCP OK, smoke MCP 14/18 OK (4 tools a args requis), cache/footer bumpes v35.340.
+
+
