@@ -2440,3 +2440,9 @@
 - Garde-fou: ajout de `scripts/audit_innerhtml_safety.py` pour refuser toute disparition du sanitizer global et compter la surface restante.
 - Impact: les injections HTML restent compatibles avec le rendu vanilla existant, mais un payload retire devient visible dans `paris_sportif_js_errors_v1` au lieu d'etre silencieux.
 - Verif: audit innerHTML + app/sw syntax + no-conflict markers lances; cache/footer bumpes v35.377.
+
+## Sprint v35.378 — AUTO 10/10 Fetchs de page abortables (20:09 UTC)
+- Stabilite: ajout de `fetchTracked` + `abortTrackedFetches('page')` pour annuler les chargements annexes quand la SPA change de page.
+- Scope: sidecars dashboard (`betting_intelligence`, cotes boostees, CLV) passent en fetch page-scope sans toucher aux refresh data critiques.
+- Garde-fou: `scripts/audit_fetch_tracking.py` verifie le wrapper, l'exposition debug et au moins 3 fetchs page-scopes.
+- Verif: audit fetch tracking + app/sw syntax + no-conflict markers lances; cache/footer bumpes v35.378.

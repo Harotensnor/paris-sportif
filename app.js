@@ -64,6 +64,28 @@
     });
     return removed;
   }
+  const TRACKED_FETCHES = new Set();
+  function abortTrackedFetches(group = 'page') {
+    let aborted = 0;
+    Array.from(TRACKED_FETCHES).forEach((rec) => {
+      if (!rec || rec.group !== group) return;
+      try { rec.controller.abort(); aborted++; }
+      catch(e) { logSafeError(`abortTrackedFetches:${rec.url || 'fetch'}`, e); }
+      TRACKED_FETCHES.delete(rec);
+    });
+    return aborted;
+  }
+  function fetchTracked(input, init = {}, group = 'page') {
+    if (typeof fetch !== 'function' || typeof AbortController === 'undefined' || init?.signal) {
+      return fetch(input, init);
+    }
+    const controller = new AbortController();
+    const opts = { ...(init || {}), signal: controller.signal };
+    const url = typeof input === 'string' ? input : (input && input.url) || 'request';
+    const rec = { controller, group, url };
+    TRACKED_FETCHES.add(rec);
+    return fetch(input, opts).finally(() => TRACKED_FETCHES.delete(rec));
+  }
   function prodLog(...args) {
     if (!DEBUG_LOGS) return;
     try {
@@ -90,7 +112,10 @@
     window.logSafeError = logSafeError;
     window.trackedAddEventListener = trackedAddEventListener;
     window.cleanupTrackedEventListeners = cleanupTrackedEventListeners;
+    window.fetchTracked = fetchTracked;
+    window.abortTrackedFetches = abortTrackedFetches;
     window.__PARIS_TRACKED_LISTENERS = TRACKED_LISTENERS;
+    window.__PARIS_TRACKED_FETCHES = TRACKED_FETCHES;
   } catch(e) { logSafeError('boot expose debug helpers', e); }
   function safeJsonParse(raw, fallback) {
     if (raw == null || raw === '') return fallback;
@@ -8655,6 +8680,7 @@
 
   function render() {
     cleanupTrackedEventListeners('page');
+    abortTrackedFetches('page');
     const data = window.PRONOSTICS_DATA;
     if (!data) {
       dismissBootShell();
@@ -15650,7 +15676,7 @@
         if (!state.loaded && !state.loading) {
           state.loading = true;
           const bucket = Math.floor(Date.now() / (5 * 60 * 1000));
-          const read = (name) => fetch(`${name}.json?v=${bucket}`, { cache: 'default' })
+          const read = (name) => fetchTracked(`${name}.json?v=${bucket}`, { cache: 'default' }, 'page')
             .then(r => r.ok ? r.json() : null)
             .catch(() => null);
           Promise.all([
@@ -16357,7 +16383,7 @@
       }).join('') : `<div class="v36-tier-empty">Aucun match proche.</div>`;
       if (!window.__v36BoostedOddsLoading && !window.__v36BoostedOddsData) {
         window.__v36BoostedOddsLoading = true;
-        fetch('boosted_odds.json?t=' + Math.floor(Date.now() / 300000), { cache: 'no-store' })
+        fetchTracked('boosted_odds.json?t=' + Math.floor(Date.now() / 300000), { cache: 'no-store' }, 'page')
           .then(r => r.ok ? r.json() : null)
           .then(j => { window.__v36BoostedOddsData = j || { status: 'unavailable', boosts: [] }; })
           .catch(() => { window.__v36BoostedOddsData = { status: 'unavailable', boosts: [] }; })
@@ -30125,7 +30151,7 @@ P&L ${c.pl>=0?'+':''}${c.pl.toFixed(2)}u`;
     (function _loadCLV() {
       const tile = wrap.querySelector('#bilan-clv-tile');
       if (!tile) return;
-      fetch('clv_history.json?t=' + Math.floor(Date.now() / 60000), { cache: 'default' })
+      fetchTracked('clv_history.json?t=' + Math.floor(Date.now() / 60000), { cache: 'default' }, 'page')
         .then(r => r.ok ? r.json() : null)
         .then(j => {
           if (!j || !j.summary) return;
