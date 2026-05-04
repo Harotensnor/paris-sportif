@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-04T19:11:59Z",
+  "generated_at": "2026-05-04T19:17:22Z",
   "data_age_min": 0,
   "sources": {
     "winamax_catalog": {
@@ -30,7 +30,7 @@
       "clubs": 630
     },
     "weather": {
-      "age_min": 0,
+      "age_min": 1,
       "events": 1096
     },
     "referees_soccer": {
@@ -127,8 +127,8 @@
         "baseball": {
           "events": 45,
           "with_probable_pitcher": 34,
-          "with_both_pitchers": 25,
-          "pitchers": 59,
+          "with_both_pitchers": 26,
+          "pitchers": 60,
           "source": "mlb_stats_api",
           "coverage_pct": 75.6
         },
@@ -183,41 +183,43 @@
     "market_biases_by_league": {
       "age_min": 0,
       "markets": 11,
-      "market_exploit": 4,
-      "market_fade": 2,
-      "watchlist": 6
+      "market_exploit": 0,
+      "market_fade": 0,
+      "watchlist": 0
     },
     "detected_angles": {
       "age_min": 0,
-      "events": 121,
-      "angles": 249,
+      "events": 118,
+      "angles": 254,
       "by_type": {
         "strict_referee": 1,
-        "market_move": 12,
         "lookahead": 94,
         "injury_imbalance": 89,
         "travel_extreme": 13,
         "schedule_congestion": 22,
-        "back_to_back_travel": 18
+        "back_to_back_travel": 18,
+        "market_move": 4,
+        "signal_conflict": 13
       }
     },
     "rare_signals": {
       "age_min": 0,
-      "signals": 93,
+      "signals": 97,
       "by_type": {
         "strict_referee": 1,
-        "market_move": 12,
-        "injury_imbalance": 53,
+        "injury_imbalance": 52,
         "travel_extreme": 9,
-        "back_to_back_travel": 18
+        "back_to_back_travel": 18,
+        "market_move": 4,
+        "signal_conflict": 13
       }
     },
     "timing_edges": {
       "age_min": 0,
       "events": 285,
-      "bet_now": 277,
-      "wait": 3,
-      "price_shortening": 5
+      "bet_now": 283,
+      "wait": 2,
+      "price_shortening": 0
     },
     "injuries_multisport": {
       "age_min": 1,
@@ -257,8 +259,8 @@
     "public_player_profiles": {
       "age_min": 0,
       "players": 500,
-      "injuries": 441,
-      "starter_context": 59
+      "injuries": 440,
+      "starter_context": 60
     },
     "rugby_markets": {
       "age_min": 0,
@@ -346,7 +348,7 @@
     "weather": {
       "script": "scripts/fetch_weather.py",
       "output": "weather.json",
-      "age_min": 0,
+      "age_min": 1,
       "threshold_min": 60,
       "fast_red_min": 30,
       "status": "ok"
@@ -607,7 +609,7 @@
     "winamax_detail_gap_to_target": 0,
     "winamax_detail_fetch_cap_reco": 90,
     "winamax_detail_status": "ok",
-    "actionable_external_odds": 18,
+    "actionable_external_odds": 0,
     "football_invalid_form": 0,
     "events_with_xg": 165,
     "winamax_coverage": {
