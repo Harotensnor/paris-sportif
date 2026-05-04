@@ -36,6 +36,7 @@ ROOT = Path(__file__).resolve().parent.parent
 ODDS_HISTORY = ROOT / 'odds_history.jsonl'
 DATA_JS = ROOT / 'data.js'
 OUT = ROOT / 'clv_history.json'
+OUT_SUMMARY = ROOT / 'clv_summary.json'
 
 
 def ml_to_decimal(ml) -> float | None:
@@ -80,7 +81,9 @@ def summarize_clv(values: list[float]) -> dict:
 def main() -> int:
     if not ODDS_HISTORY.exists():
         print(f'[clv] {ODDS_HISTORY.name} missing — nothing to compute')
-        OUT.write_text(json.dumps({'records': [], 'summary': {}, 'generated_at': datetime.now(timezone.utc).isoformat()}, ensure_ascii=False, indent=2), encoding='utf-8')
+        empty = {'records': [], 'summary': {}, 'generated_at': datetime.now(timezone.utc).isoformat()}
+        OUT.write_text(json.dumps(empty, ensure_ascii=False, indent=2), encoding='utf-8')
+        OUT_SUMMARY.write_text(json.dumps({'generated_at': empty['generated_at'], 'summary': {}, 'status': 'missing'}, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
         return 0
 
     # 1. Parse odds_history (group by match_id, then by captured_at)
@@ -216,6 +219,21 @@ def main() -> int:
         'by_league': by_league,
         'extremes': extremes,
         'records': records,
+    }, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+    generated_at = datetime.now(timezone.utc).isoformat()
+    top_leagues = dict(list(by_league.items())[:12])
+    OUT_SUMMARY.write_text(json.dumps({
+        'generated_at': generated_at,
+        'parsed_lines': n_lines,
+        'skipped_lines': n_skipped,
+        'summary': summary,
+        'by_sport': by_sport,
+        'by_side': by_side,
+        'top_leagues': top_leagues,
+        'extremes': {
+            'best': extremes['best'][:5],
+            'worst': extremes['worst'][:5],
+        },
     }, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
     print(f'[clv] {len(records)} matches with CLV computed, mean={summary["mean_clv_pct"]:+.2f}%, positive_rate={summary["positive_clv_rate"]}% ({OUT.stat().st_size//1024}KB)')
     return 0
