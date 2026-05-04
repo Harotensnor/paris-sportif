@@ -179,6 +179,7 @@ jobs:
             python3 fetch_match_previews.py --limit 12 || true
             python3 build_league_bias_audit.py || true
             python3 build_betting_intelligence.py || true
+            python3 train_lightgbm.py || true
             python3 build_rugby_markets.py || true
           python3 build_niche_markets.py || true
           python3 detect_boosted_odds.py || true

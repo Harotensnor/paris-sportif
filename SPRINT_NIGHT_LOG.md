@@ -2410,3 +2410,9 @@
 - Fix: ajout `BUNDLE_AUDIT_V35_371.md` avec tailles, top fonctions par bytes/lignes et ordre de coupe safe (`openDetail`, diagnostics Profil, sous-vues Performance).
 - Mesure: `renderDashboardPage` 338 KB, `openDetail` 176 KB, `renderBilanPage` 105 KB, `_predictMatchImpl` 95 KB; premier split recommande: modal puis sous-vues Performance.
 - Verif: app/sw syntax OK; cache/footer bumpes v35.372.
+
+## Sprint v35.373 — AUTO 10/10 Poids appris offline (20:08 UTC)
+- Modele: ajout `scripts/train_lightgbm.py` pour produire un sidecar `lightgbm_weights.json` sans dependance runtime navigateur.
+- Garde-fou: faute de table feature-level `backtest_training_rows.jsonl`, le script exporte un statut explicite `aggregate_fallback` plutot qu'un faux LightGBM; les poids restent conservateurs et limites a ±2.5pt de nudge.
+- Mesure: 4 sports, 49 ligues et 5 tiers exportes depuis `backtest_report_v2.json`; baseball passe `boost`, basketball/hockey restent `watch`, football `neutral`.
+- Pipeline: `auto_refresh.py` et `.github/workflows/refresh.yml` appellent maintenant le script; `check_pipeline_drift.py` OK; cache/footer bumpes v35.373.
