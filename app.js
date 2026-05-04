@@ -15722,36 +15722,45 @@
         const timing = v37TimingByEvent.get(id) || null;
         const gap = v37GapByEvent.get(id) || null;
         const missingSignals = v37Array(gap?.missing).filter(Boolean);
-        let score = 48 + Math.max(-12, Math.min(24, edge * 180)) + Math.max(-8, Math.min(18, (rel - 0.50) * 90));
+        const signedScore = (value) => `${value >= 0 ? '+' : ''}${Number(value).toFixed(1)}`;
+        const scoreParts = ['Base 48'];
+        const addScorePart = (name, value) => {
+          const num = Number(value || 0);
+          if (Math.abs(num) >= 0.4) scoreParts.push(`${name} ${signedScore(num)}`);
+          return num;
+        };
+        const edgePart = Math.max(-12, Math.min(24, edge * 180));
+        const confidencePart = Math.max(-8, Math.min(18, (rel - 0.50) * 90));
+        let score = 48 + addScorePart('Edge', edgePart) + addScorePart('Confiance', confidencePart);
         const badges = [];
         let leaguePriorityBonus = 0;
-        if (tier?.strict) { score += 6; badges.push('strict'); }
+        if (tier?.strict) { score += addScorePart('Tier strict', 6); badges.push('strict'); }
         if (league?.status === 'exploit') {
           leaguePriorityBonus = Math.min(10, 4 + Math.abs(Number(league.inefficiency_score || 0)) * 10);
-          score += leaguePriorityBonus;
+          score += addScorePart('Biais ligue', leaguePriorityBonus);
           badges.push('biais ligue +');
         } else if (league?.status === 'avoid') {
-          score -= Math.min(8, 3 + Math.abs(Number(league.inefficiency_score || 0)) * 8);
+          score += addScorePart('Ligue prudence', -Math.min(8, 3 + Math.abs(Number(league.inefficiency_score || 0)) * 8));
           badges.push('ligue froide');
         }
         if (marketBias?.status === 'exploit') {
-          score += Math.min(9, 4 + Math.abs(Number(marketBias.edge_vs_50_pct || 0)) / 5);
+          score += addScorePart('Biais marché', Math.min(9, 4 + Math.abs(Number(marketBias.edge_vs_50_pct || 0)) / 5));
           badges.push('marché biaisé +');
         } else if (marketBias?.status === 'fade') {
-          score -= Math.min(9, 4 + Math.abs(Number(marketBias.edge_vs_50_pct || 0)) / 5);
+          score += addScorePart('Marché à fade', -Math.min(9, 4 + Math.abs(Number(marketBias.edge_vs_50_pct || 0)) / 5));
           badges.push('marché à fade');
         }
         const uncertainMarket = angles.find(a => a?.type === 'market_uncertain');
         if (uncertainMarket) {
-          score -= Math.min(18, 9 + Number(uncertainMarket.strength || 0.8) * 8);
+          score += addScorePart('Marché incertain', -Math.min(18, 9 + Number(uncertainMarket.strength || 0.8) * 8));
           badges.push('marché incertain');
         }
         const marketMove = !uncertainMarket ? angles.find(a => a?.type === 'market_move') : null;
-        if (marketMove?.direction === 'steam') { score += 7; badges.push('steam cote'); }
-        else if (marketMove?.direction === 'drift') { score -= 5; badges.push('drift cote'); }
+        if (marketMove?.direction === 'steam') { score += addScorePart('Mouvement cote', 7); badges.push('steam cote'); }
+        else if (marketMove?.direction === 'drift') { score += addScorePart('Mouvement cote', -5); badges.push('drift cote'); }
         const conflictAngle = angles.find(a => a?.type === 'signal_conflict');
         if (conflictAngle) {
-          score -= Math.min(12, 6 + Number(conflictAngle.strength || 0.5) * 6);
+          score += addScorePart('Signaux mitigés', -Math.min(12, 6 + Number(conflictAngle.strength || 0.5) * 6));
           badges.push('signaux mitigés');
         }
         const injuryAngle = angles.find(a => a?.type === 'injury_imbalance');
@@ -15781,36 +15790,37 @@
           badges.push('biais ligue prioritaire');
         }
         if (rareDirectional) {
-          score += rareDirectional;
+          score += addScorePart('Angles rares', rareDirectional);
           badges.push(rareDirectional > 0 ? 'signal rare +' : 'signal rare -');
         } else if (rareSignals.length) {
           badges.push('signal rare');
         }
-        if (timing?.advice === 'wait_lineups') { score -= 7; badges.push('attendre compos'); }
-        else if (timing?.advice === 'price_shortening') { score += 5; badges.push('timing cote'); }
+        if (timing?.advice === 'wait_lineups') { score += addScorePart('Timing', -7); badges.push('attendre compos'); }
+        else if (timing?.advice === 'price_shortening') { score += addScorePart('Timing', 5); badges.push('timing cote'); }
         const dataBonus = [
           m?.weather, m?.h2h, m?.xg, m?.lineups, m?.mlb_pitchers, m?.nhl_stats,
           m?.injuries, m?.referee
         ].filter(Boolean).length;
-        score += Math.min(8, dataBonus);
+        score += addScorePart('Qualité data', Math.min(8, dataBonus));
         if (dataBonus >= 5) badges.push('data riche');
         if (missingSignals.length) {
           const priority = Number(gap?.priority || 0);
           const penalty = Math.min(18, 4 + missingSignals.length * 2 + Math.max(0, priority - 50) / 20);
-          score -= penalty;
+          score += addScorePart('Gaps data', -penalty);
           badges.push('data gap');
           if (missingSignals.includes('starter_signals') || missingSignals.includes('referee')) badges.push('prudence');
         }
         const profile = v37ProfileForPick(m, odd);
         if (profile.delta) {
-          score += profile.delta;
+          score += addScorePart('Profil Théo', profile.delta);
           profile.badges.slice(0, 2).forEach(b => badges.push(b));
         }
         const clean = Math.max(0, Math.min(100, Math.round(score)));
         const friendlyBadges = badges.map(v37HumanBadge).filter(Boolean);
         const tooltip = [
           `Score d'opportunité ${clean}/100`,
-          'Combine edge, confiance, biais marché, timing, signaux rares et profil Théo',
+          `Décomposition: ${scoreParts.join(' · ')}`,
+          'Score plafonné entre 0 et 100; il combine edge, confiance, biais marché, timing, signaux rares et profil Théo',
           friendlyBadges.length ? friendlyBadges.join(' · ') : 'aucun angle spécial',
           conflictAngle?.context || '',
           uncertainMarket?.context ? `Marché incertain: ${uncertainMarket.context}` : '',
