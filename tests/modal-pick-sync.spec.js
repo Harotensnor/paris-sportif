@@ -1,0 +1,60 @@
+import { test, expect } from '@playwright/test';
+
+test.beforeEach(async ({ context }) => {
+  await context.addInitScript(() => {
+    try {
+      localStorage.setItem('cookieConsent', 'accepted');
+      localStorage.setItem('paris_sportif_onboarded_v1', '1');
+      localStorage.setItem('paris_sportif_onboarded_v2', '1');
+      localStorage.setItem('userPrefs', JSON.stringify({
+        onboardingDone: true,
+        level: 'confirme',
+        consentLocalStorage: 'accepted',
+      }));
+    } catch (e) {}
+  });
+});
+
+test('dashboard rows open the exact same pick in the detail modal', async ({ page }) => {
+  test.setTimeout(150_000);
+  const errors = [];
+  page.on('console', msg => {
+    if (msg.type() === 'error') errors.push(msg.text());
+  });
+  page.on('pageerror', err => errors.push(err.message));
+
+  await page.goto('/pronostics.html#dashboard');
+  await page.waitForFunction(() => window.PRONOSTICS_DATA && document.querySelector('[data-pick-uid]'), null, { timeout: 20_000 });
+  await page.waitForTimeout(800);
+
+  const count = await page.locator('.v36-table-row[data-pick-uid]:visible, .v36-table-card[data-pick-uid]:visible').count();
+  test.skip(count === 0, 'No visible V37 picks to verify');
+
+  const max = Math.min(50, count);
+  const failures = [];
+  for (let i = 0; i < max; i += 1) {
+    const selector = `.v36-table-row[data-pick-uid]:visible, .v36-table-card[data-pick-uid]:visible`;
+    const target = page.locator(selector).nth(i);
+    const expected = await target.evaluate(el => ({
+      label: el.getAttribute('data-pick-label') || '',
+      odd: el.getAttribute('data-pick-odd') || '',
+      id: el.getAttribute('data-big-detail') || '',
+    }));
+    await target.click({ timeout: 5_000, force: true });
+    await expect(page.locator('#detail-modal.open')).toBeVisible({ timeout: 5_000 });
+    const heading = (await page.locator('#why-bet-title').textContent().catch(() => '')) || '';
+    const labelNeedle = expected.label.replace(/\s+/g, ' ').trim().slice(0, 34);
+    if (labelNeedle && !heading.replace(/\s+/g, ' ').includes(labelNeedle)) {
+      failures.push(`${expected.id}: row "${expected.label}" opened "${heading}"`);
+    }
+    if (expected.odd && !heading.includes(`@${expected.odd}`)) {
+      failures.push(`${expected.id}: row odd @${expected.odd} opened "${heading}"`);
+    }
+    await page.keyboard.press('Escape').catch(() => {});
+    await page.waitForTimeout(80);
+  }
+
+  const realErrors = errors.filter(e => !/favicon|sourcemap|Failed to load resource|net::ERR_ABORTED|40\d/i.test(e));
+  expect(failures).toEqual([]);
+  expect(realErrors).toEqual([]);
+});
