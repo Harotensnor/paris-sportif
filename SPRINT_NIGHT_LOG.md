@@ -2320,3 +2320,9 @@
 - Fix: les marches sans echantillon cote passent en `watch`, DC 12 devient `low_value`, et les lignes ligue lisent le vrai `backtest_report_v2.by_league` avec statuts `data_insufficient`, `avoid_low_roi` et `avoid_low_wr`.
 - Impact mesure: market_exploit 4 -> 0, market_fade 2 -> 0, `market_sample_warning=all_market_rows_share_same_n_without_odds`; ligues WR non constantes et NBA clarifie "WR 58.3% mais ROI -12.8%".
 - Verif: audit JSON strict OK, py_compile build_betting_intelligence OK; cache/footer bumpes v35.357.
+
+## Sprint v35.358 — AUTO 10/10 Reconciliation signaux opposes (19:20 UTC)
+- Bug critique: un meme match pouvait afficher des angles de fade sur les deux equipes sans decision nette, donnant un score opportunite artificiellement confiant.
+- Fix: `resolve_contradictory_angles` calcule support/fade par side, ajoute `signal_resolution`, et publie `signal_conflict` quand les signaux s'annulent; le dashboard penalise et affiche "Signaux mitigés".
+- Impact mesure: `detected_angles` expose 11 conflits, `rare_signals` les remonte; Detroit-Boston J+1/J+2 passe en `abstain` avec raison "Signaux opposes -> prudence".
+- Verif: py_compile build_betting_intelligence OK; app.js/sw.js --check OK; cache/footer bumpes v35.358.

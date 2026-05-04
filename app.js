@@ -15671,6 +15671,7 @@
         'signal rare +': 'Signal rare favorable',
         'signal rare -': 'Signal rare défavorable',
         'signal rare': 'Signal rare détecté',
+        'signaux mitigés': 'Signaux mitigés',
         'attendre compos': 'Attendre compos',
         'timing cote': 'Bon timing cote',
         'data riche': 'Données riches',
@@ -15738,6 +15739,11 @@
         const marketMove = angles.find(a => a?.type === 'market_move');
         if (marketMove?.direction === 'steam') { score += 7; badges.push('steam cote'); }
         else if (marketMove?.direction === 'drift') { score -= 5; badges.push('drift cote'); }
+        const conflictAngle = angles.find(a => a?.type === 'signal_conflict');
+        if (conflictAngle) {
+          score -= Math.min(12, 6 + Number(conflictAngle.strength || 0.5) * 6);
+          badges.push('signaux mitigés');
+        }
         const injuryAngle = angles.find(a => a?.type === 'injury_imbalance');
         if (injuryAngle) badges.push('blessures');
         if (angles.some(a => a?.type === 'schedule_congestion')) badges.push('fatigue');
@@ -15791,6 +15797,7 @@
           `Score d'opportunité ${clean}/100`,
           'Combine edge, confiance, biais marché, timing, signaux rares et profil Théo',
           friendlyBadges.length ? friendlyBadges.join(' · ') : 'aucun angle spécial',
+          conflictAngle?.context || '',
           `edge ${(edge * 100).toFixed(1)}%`,
           marketBias ? `${marketBias.label || 'marché'} ${marketBias.pick || ''}: ${marketBias.reason || marketBias.status}` : '',
           `data ${dataBonus}/8`,

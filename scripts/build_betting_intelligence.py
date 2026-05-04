@@ -639,6 +639,97 @@ def detect_event_angles(
     return angles
 
 
+def _angle_side(angle: dict[str, Any], home: str, away: str) -> str | None:
+    side = str(angle.get("side") or "").lower()
+    if side in {"home", "away"}:
+        return side
+    team = str(angle.get("team") or "").strip().lower()
+    if team and team == home.lower():
+        return "home"
+    if team and team == away.lower():
+        return "away"
+    return None
+
+
+def resolve_contradictory_angles(
+    angles: list[dict[str, Any]],
+    home: str,
+    away: str,
+) -> dict[str, Any]:
+    """Net side-level angles before the frontend turns them into confidence.
+
+    A match can legitimately have a fade signal on both teams. In that case the
+    product should not pretend there is a clear betting edge; it should say
+    "prudence" and let the pick abstain/downweight.
+    """
+    fade = {"home": 0.0, "away": 0.0}
+    support = {"home": 0.0, "away": 0.0}
+    detail: list[dict[str, Any]] = []
+
+    for angle in angles:
+        side = _angle_side(angle, home, away)
+        if side not in {"home", "away"}:
+            continue
+        strength = max(0.0, min(1.0, float(angle.get("strength") or 0.5)))
+        direction = str(angle.get("direction") or "").lower()
+        typ = str(angle.get("type") or "")
+        if direction in {"fade", "drift"}:
+            fade[side] += strength
+            detail.append({"side": side, "type": typ, "direction": direction, "strength": round(strength, 3)})
+        elif direction == "caution":
+            fade[side] += strength * 0.45
+            detail.append({"side": side, "type": typ, "direction": direction, "strength": round(strength * 0.45, 3)})
+        elif direction == "steam":
+            support[side] += strength
+            detail.append({"side": side, "type": typ, "direction": direction, "strength": round(strength, 3)})
+
+    net = {
+        "home": support["home"] - fade["home"] + fade["away"] * 0.35,
+        "away": support["away"] - fade["away"] + fade["home"] * 0.35,
+    }
+    home_name = home or "Domicile"
+    away_name = away or "Exterieur"
+    both_faded = fade["home"] >= 0.45 and fade["away"] >= 0.45
+    close_fades = abs(fade["home"] - fade["away"]) <= 0.35
+    same_side_mixed = any(support[s] >= 0.45 and fade[s] >= 0.45 for s in ("home", "away"))
+
+    if both_faded and close_fades:
+        return {
+            "status": "abstain",
+            "net_side": None,
+            "home_score": round(net["home"], 3),
+            "away_score": round(net["away"], 3),
+            "home_fade": round(fade["home"], 3),
+            "away_fade": round(fade["away"], 3),
+            "reason": f"Signaux opposes: {home_name} fade {fade['home']:.2f}, {away_name} fade {fade['away']:.2f} -> prudence",
+            "detail": detail,
+        }
+
+    if same_side_mixed or abs(net["home"] - net["away"]) < 0.25 and (fade["home"] + fade["away"] + support["home"] + support["away"]) >= 0.8:
+        return {
+            "status": "mixed",
+            "net_side": None,
+            "home_score": round(net["home"], 3),
+            "away_score": round(net["away"], 3),
+            "home_fade": round(fade["home"], 3),
+            "away_fade": round(fade["away"], 3),
+            "reason": f"Signaux mitigés: avantage net trop faible ({home_name} {net['home']:+.2f}, {away_name} {net['away']:+.2f})",
+            "detail": detail,
+        }
+
+    side = "home" if net["home"] > net["away"] else "away"
+    return {
+        "status": "net",
+        "net_side": side,
+        "home_score": round(net["home"], 3),
+        "away_score": round(net["away"], 3),
+        "home_fade": round(fade["home"], 3),
+        "away_fade": round(fade["away"], 3),
+        "reason": f"Direction nette: {(home_name if side == 'home' else away_name)} ({net[side]:+.2f})",
+        "detail": detail,
+    }
+
+
 def build_angles(data: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
     events = list(iter_events(data))
     schedule = build_team_schedule(events)
@@ -666,8 +757,18 @@ def build_angles(data: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any], 
             "away": away,
         }
         angles = detect_event_angles(ev, schedule, now_ts, stadiums)
+        resolution = resolve_contradictory_angles(angles, home, away)
+        if resolution["status"] in {"abstain", "mixed"}:
+            angles.append({
+                "type": "signal_conflict",
+                "direction": resolution["status"],
+                "strength": min(1.0, max(abs(resolution["home_score"]), abs(resolution["away_score"]), 0.45)),
+                "context": resolution["reason"],
+                "home_score": resolution["home_score"],
+                "away_score": resolution["away_score"],
+            })
         if angles:
-            angle_rows.append({**base, "angles": angles})
+            angle_rows.append({**base, "angles": angles, "signal_resolution": resolution})
         for angle in angles:
             if angle["type"] in {
                 "injury_imbalance",
@@ -676,6 +777,7 @@ def build_angles(data: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any], 
                 "market_move",
                 "travel_extreme",
                 "back_to_back_travel",
+                "signal_conflict",
             } and angle["strength"] >= 0.45:
                 rare_rows.append({**base, "signal": angle})
 
