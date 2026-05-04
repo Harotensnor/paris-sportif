@@ -1,4 +1,4 @@
-# Sprint Night Log Archive — v35.001 to v35.330
+# Sprint Night Log Archive — v35.001 to v35.332
 
 Archived from SPRINT_NIGHT_LOG.md on 2026-05-04 to keep the active log readable.
 
@@ -2171,4 +2171,11 @@ Archived from SPRINT_NIGHT_LOG.md on 2026-05-04 to keep the active log readable.
 - Apres: `build_betting_intelligence.py` genere `league_inefficiencies.json`, `detected_angles.json`, `rare_signals.json` et `timing_edges.json`; le cron les publie et `health.json` les compte.
 - Impact mesure local: 34 ligues profilees, 151 angles detectes, 27 signaux rares, 290 conseils timing dont 7 attentes lineups et 3 cotes qui raccourcissent.
 - Verif: py_compile/build_betting_intelligence/build_health OK; footer/cache bumpes v35.331; checks JS complets avant push.
+
+
+## Sprint v35.332 — AUTO 10/10 Rail Insights modele (16:35 UTC)
+- Avant: le rail accueil repetait prochains matchs / stats live, alors que la table contient deja cette information.
+- Apres: le rail charge les sidecars betting intelligence et affiche biais ligues, smart money / signaux rares, angles de match et timing de mise sans bloquer le dashboard si un JSON manque.
+- Impact: le site commence a exposer les angles "que les autres ne voient pas" directement sur l'accueil desktop, avec clic ligne -> modal match quand l'event est disponible.
+- Verif: app.js/sw.js/inline/CSP hashes OK; hash app.js recalcule d9ea6e81; cache/footer bumpes v35.332; capture visuelle bloquee localement (Playwright absent du workspace).
 
