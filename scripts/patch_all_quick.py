@@ -475,6 +475,7 @@ def _resolve_soccer_injury_side(
     name: str,
     teams: dict[str, list[dict]],
     scanned: dict[str, str],
+    league_supported: bool = False,
 ) -> tuple[list[dict], bool, str]:
     key = TEAM_ALIAS.get(_norm(name), _norm(name))
     if key in teams:
@@ -506,6 +507,8 @@ def _resolve_soccer_injury_side(
 
     if best_key and best_score >= 42:
         return teams.get(best_key) or [], True, best_key
+    if league_supported:
+        return [], True, key
     return [], False, ''
 
 
@@ -518,19 +521,27 @@ def patch_soccer_injuries(data: dict) -> int:
     scanned = inj.get('scanned_teams') or {}
     if not (teams or scanned):
         return 0
+    injury_supported_leagues = {
+        str(row.get('league_code') or '').lower()
+        for rows in teams.values()
+        for row in (rows or [])
+        if row.get('league_code')
+    }
 
     n = 0
     unmatched: list[str] = []
     for evs in (data.get('days') or {}).values():
         for ev in (evs or []):
-            if ev.get('sport') != 'football' or ev.get('league_code') not in SOCCER_SIGNAL_LEAGUES:
+            league_code = str(ev.get('league_code') or '').lower()
+            if ev.get('sport') != 'football' or league_code not in SOCCER_SIGNAL_LEAGUES:
                 continue
             home_name, away_name = _event_sides(ev)
             if not (home_name and away_name):
                 continue
 
-            home_inj, home_known, home_key = _resolve_soccer_injury_side(home_name, teams, scanned)
-            away_inj, away_known, away_key = _resolve_soccer_injury_side(away_name, teams, scanned)
+            league_supported = league_code in injury_supported_leagues
+            home_inj, home_known, home_key = _resolve_soccer_injury_side(home_name, teams, scanned, league_supported)
+            away_inj, away_known, away_key = _resolve_soccer_injury_side(away_name, teams, scanned, league_supported)
             if not (home_known or away_known):
                 if len(unmatched) < 300:
                     unmatched.append(f"{ev.get('league_code') or ''}\t{home_name}\t{away_name}")
