@@ -180,6 +180,8 @@ jobs:
             python3 build_league_bias_audit.py || true
             python3 build_betting_intelligence.py || true
             python3 train_lightgbm.py || true
+            python3 build_lightgbm_runtime.py || true
+            python3 audit_lightgbm_runtime.py
             python3 build_rugby_markets.py || true
           python3 build_niche_markets.py || true
           python3 detect_boosted_odds.py || true
@@ -321,6 +323,7 @@ jobs:
             data_today.json data_manifest.json team_form.json form_stats_extended.json h2h_extended.json \
             thesportsdb_meta.json openligadb_matches.json public_team_stats.json public_team_profiles.json public_player_profiles.json \
             league_inefficiencies.json market_biases_by_league.json detected_angles.json rare_signals.json timing_edges.json \
+            lightgbm_weights.json lightgbm_weights.js \
             rugby_markets.json niche_markets.json \
             boosted_odds.json \
             results_archive.jsonl tennis_ratings.json footballdata.json \

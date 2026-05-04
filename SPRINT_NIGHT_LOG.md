@@ -331,3 +331,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix: `audit_bundle_size.py` serre le cap app.js a 1.6MB et couvre aussi `data_lite.js`; cron + auto_refresh lancent l'audit apres `finalize_inline.py`.
 - Doc: `BUNDLE_AUDIT_V35_406.md` fige les tailles et les prochaines coupes safe.
 - Mesure: app.js 1,585,245 / 1,600,000 bytes, app.css 353,361 / 360,000, pronostics 71,236 / 90,000, data_lite 167,554 / 220,000; cache/footer bumpes v35.407.
+
+## Sprint v35.408 — AUTO 10/10 Runtime LightGBM pipeline (01:22 UTC)
+- Modele: les poids LightGBM etaient charges cote UI, mais leur generation runtime n'etait pas verrouillee dans le cron.
+- Fix: `auto_refresh.py` et `refresh.yml` generent maintenant `lightgbm_weights.js`, auditent le runtime et ajoutent les sidecars LightGBM au commit data.
+- Cache: `pronostics.html` pointe vers les hashes courants `lightgbm_weights.js`, `app.js`, `app.css` et `data_lite.js`; SW/footer bumpes v35.408.
+- Mesure: audit runtime OK (`aggregate_fallback`, 4 sports, 49 ligues), build LightGBM JS OK.
