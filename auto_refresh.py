@@ -116,8 +116,10 @@ PATCH_STAGES = [
     ('detect_boosted_odds.py',      1,   30),
     ('build_signal_gap_report.py',  1,   15),
     ('inject_data_in_html.py',      1,   15),
+    ('measure_night_metrics.py',    1,   15),
     # Pipeline status snapshot (health.json) — runs every tick, cheap.
     ('build_health.py',             1,   15),
+    ('audit_data_truth.py',          1,   15),
     # MCP diagnostics use a historical desktop path on Theo's machine; keep it
     # synced and smoke-tested so stale "today" values cannot silently return.
     ('sync_mcp_shadow_copy.py',      1,   15),

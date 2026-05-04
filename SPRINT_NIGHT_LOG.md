@@ -313,3 +313,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix: ajout `sample_signature`, `market_sample_n_values`, `market_sample_signature_values` et `market_clone_guard` dans le sidecar.
 - Garde-fou: `audit_intelligence_consistency.py` refuse les lignes marche qui partagent une meme signature ou un clone non documente.
 - Mesure: clone guard `passed`, 10 signatures distinctes pour 10 marches, `n` reels [7,8]; build_betting_intelligence + audit OK; cache/footer bumpes v35.404.
+
+## Sprint v35.405 — AUTO 10/10 Ratios Winamax scopes explicites (01:07 UTC)
+- Data sync: `health.json` melangeait un ratio upcoming avec `night_metrics` all-events; les deux etaient valides mais ambigus.
+- Fix: `health.data_truth` expose maintenant le ratio all-events authoritative et garde le ratio upcoming sous `quality_scope`.
+- Garde-fou: `audit_data_truth.py` compare data.js, night_metrics et health sur les deux scopes; `refresh.yml` et `auto_refresh.py` regenerent night_metrics puis auditent la verite.
+- Mesure: all-events Winamax exact 314/315 = 99.68%, upcoming 295/295 = 100%; audit_data_truth OK; cache/footer bumpes v35.405.

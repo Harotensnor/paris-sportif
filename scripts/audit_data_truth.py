@@ -35,12 +35,52 @@ def parse_dt(value: Any) -> datetime | None:
         return None
 
 
+def iter_events(data: dict[str, Any]) -> list[dict[str, Any]]:
+    return [
+        ev
+        for arr in (data.get("days") or {}).values()
+        for ev in (arr or [])
+        if isinstance(ev, dict)
+    ]
+
+
+def is_winamax_exact(ev: dict[str, Any]) -> bool:
+    wnx = ev.get("winamax") or {}
+    markets = wnx.get("markets") or {}
+    one = markets.get("1n2") if isinstance(markets, dict) else {}
+    return bool(
+        wnx.get("available") is True
+        and wnx.get("match_id")
+        and isinstance(one, dict)
+        and isinstance(one.get("home"), (int, float))
+        and isinstance(one.get("away"), (int, float))
+    )
+
+
+def winamax_truth(data: dict[str, Any]) -> dict[str, Any]:
+    events = iter_events(data)
+    available = sum(1 for ev in events if (ev.get("winamax") or {}).get("available") is True)
+    exact = sum(1 for ev in events if is_winamax_exact(ev))
+    upcoming = [ev for ev in events if not ev.get("completed") and not ev.get("live")]
+    upcoming_available = sum(1 for ev in upcoming if (ev.get("winamax") or {}).get("available") is True)
+    upcoming_exact = sum(1 for ev in upcoming if is_winamax_exact(ev))
+    return {
+        "winamax_available": available,
+        "winamax_exact": exact,
+        "winamax_exact_ratio": round(exact / available, 4) if available else None,
+        "upcoming_winamax_available": upcoming_available,
+        "upcoming_winamax_exact": upcoming_exact,
+        "upcoming_winamax_exact_ratio": round(upcoming_exact / upcoming_available, 4) if upcoming_available else None,
+    }
+
+
 def main() -> int:
     errors: list[str] = []
     data = load_data_js()
     night = load_json(NIGHT)
     health = load_json(HEALTH)
     data_generated_at = data.get("generated_at")
+    truth = winamax_truth(data)
     if night.get("source_of_truth") != "data.js":
         errors.append("night_metrics.source_of_truth must be data.js")
     if night.get("data_generated_at") != data_generated_at:
@@ -59,6 +99,18 @@ def main() -> int:
         errors.append(
             f"health data_generated_at={health_generated} differs from data.js generated_at={data_generated_at}"
         )
+    night_events = night.get("events") if isinstance(night.get("events"), dict) else {}
+    if night.get("data_generated_at") == data_generated_at:
+        for key in ("winamax_available", "winamax_exact", "winamax_exact_ratio"):
+            if night_events.get(key) != truth.get(key):
+                errors.append(f"night_metrics.{key}={night_events.get(key)} differs from data.js truth={truth.get(key)}")
+    if health_truth:
+        for key in ("winamax_available", "winamax_exact", "winamax_exact_ratio"):
+            if health_truth.get(key) != truth.get(key):
+                errors.append(f"health.data_truth.{key}={health_truth.get(key)} differs from data.js truth={truth.get(key)}")
+        for key in ("upcoming_winamax_available", "upcoming_winamax_exact", "upcoming_winamax_exact_ratio"):
+            if health_truth.get(key) != truth.get(key):
+                errors.append(f"health.data_truth.{key}={health_truth.get(key)} differs from data.js truth={truth.get(key)}")
     calculated_at = parse_dt(night.get("calculated_at") or night.get("generated_at"))
     if calculated_at:
         age_minutes = (datetime.now(timezone.utc) - calculated_at.astimezone(timezone.utc)).total_seconds() / 60
