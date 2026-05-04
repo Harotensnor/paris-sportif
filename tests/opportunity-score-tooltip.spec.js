@@ -34,6 +34,8 @@ test('opportunity score exposes a visible legend and detailed tooltip copy', asy
 
   expect(attrs.tooltip || '').toContain("Score d'opportunité");
   expect(attrs.tooltip || '').toContain('Décomposition');
+  expect(attrs.tooltip || '').toContain('Stabilité signal');
+  expect(attrs.tooltip || '').toContain('Fraîcheur data');
   expect(attrs.title).toBe(attrs.tooltip);
   expect(attrs.ariaLabel).toBe(attrs.tooltip);
 });

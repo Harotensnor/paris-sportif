@@ -2268,3 +2268,9 @@ Archived from SPRINT_NIGHT_LOG.md on 2026-05-04 to keep the active log readable.
 - Taille brute `app.js` : ~1,86MB UTF-8 avant passe → 1,58MB fichier local, sous le seuil 1,70MB contrôlé par `scripts/audit_bundle_size.py`.
 - Hash `app.js` dans `pronostics.html` mis à jour, `CACHE_VERSION` bumpé, syntax JS/data/html OK.
 
+
+## Sprint v35.388 — A3 contexte arbitral honnête
+- Fetch arbitres élargi à 7 jours : les affectations exactes publiées restent faibles (20 événements exacts sur le slate courant), donc pas de faux nom arbitre.
+- `patch_referees_soccer.py` ajoute un `referee_context` de ligue quand l'arbitre exact est absent, avec `assignmentConfirmed=false` et moyennes cartes issues des arbitres confirmés.
+- `night_metrics` distingue désormais `referee` exact (20), `referee_context` (105) et `referee_signal` (125), pour une couverture signal honnête sans masquer le manque d'affectations officielles.
+
