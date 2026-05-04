@@ -108,6 +108,23 @@ def main() -> int:
             file=sys.stderr,
         )
         return 1
+    truth = pipeline.get("data_truth") or {}
+    if pipeline.get("winamax_exact_ratio") != truth.get("winamax_exact_ratio"):
+        print(
+            '[mcp_smoke] FAIL winamax_exact_ratio must be the top-level data.js truth',
+            file=sys.stderr,
+        )
+        return 1
+    if pipeline.get("project_root") and "Paris-Sportif" not in pipeline.get("project_root"):
+        print(
+            f'[mcp_smoke] FAIL project_root should prefer the fresh Paris-Sportif repo, got {pipeline.get("project_root")}',
+            file=sys.stderr,
+        )
+        return 1
+    secondary = (pipeline.get("sync_check") or {}).get("secondary_snapshots") or {}
+    if "night_metrics" not in secondary:
+        print('[mcp_smoke] FAIL missing night_metrics secondary snapshot status', file=sys.stderr)
+        return 1
     if pipeline.get("today") == stale_today:
         print('[mcp_smoke] FAIL stale hardcoded date leaked into pipeline status', file=sys.stderr)
         return 1

@@ -40,7 +40,53 @@ except Exception:  # pragma: no cover - fallback for old Python runtimes
 
 # === Path resolution (auto-detect project root) ===
 SCRIPT_DIR = Path(__file__).resolve().parent
-PROJECT_ROOT = SCRIPT_DIR.parent  # paris-sportif-sprints/
+
+
+def _parse_data_generated_at(root: Path) -> datetime:
+    data_path = root / "data.js"
+    if not data_path.exists():
+        return datetime.min.replace(tzinfo=timezone.utc)
+    try:
+        text = data_path.read_text(encoding="utf-8", errors="ignore")
+        match = re.search(r'"generated_at"\s*:\s*"([^"]+)"', text)
+        if not match:
+            return datetime.min.replace(tzinfo=timezone.utc)
+        return datetime.fromisoformat(match.group(1).replace("Z", "+00:00"))
+    except Exception:
+        return datetime.min.replace(tzinfo=timezone.utc)
+
+
+def _detect_project_root() -> Path:
+    candidates: list[Path] = []
+    env_root = os.environ.get("PARIS_SPORTIF_ROOT")
+    if env_root:
+        candidates.append(Path(env_root))
+    script_root = SCRIPT_DIR.parent
+    candidates.append(script_root)
+    projects_dir = script_root.parent
+    candidates.extend([
+        projects_dir / "Paris-Sportif",
+        projects_dir / "paris-sportif-sprints",
+    ])
+    seen: set[Path] = set()
+    valid: list[Path] = []
+    for candidate in candidates:
+        try:
+            resolved = candidate.resolve()
+        except Exception:
+            continue
+        if resolved in seen:
+            continue
+        seen.add(resolved)
+        if (resolved / "data.js").exists():
+            valid.append(resolved)
+    if not valid:
+        return script_root
+    valid.sort(key=lambda root: (_parse_data_generated_at(root), root.name.lower() == "paris-sportif"), reverse=True)
+    return valid[0]
+
+
+PROJECT_ROOT = _detect_project_root()
 DATA_JS = PROJECT_ROOT / "data.js"
 BACKTEST_V2 = PROJECT_ROOT / "backtest_report_v2.json"
 BACKTEST_MARKETS = PROJECT_ROOT / "backtest_report_markets.json"
@@ -1098,30 +1144,65 @@ def get_pipeline_status() -> dict:
         for signal, count in sorted(missing_counts.items(), key=lambda item: (-item[1], item[0]))[:8]
     ]
     night_events = night.get("events") if isinstance(night.get("events"), dict) else {}
+    data_generated_at = data.get("generated_at") if not "_error" in data else None
+    night_data_generated_at = night.get("data_generated_at") if isinstance(night, dict) else None
+    night_snapshot_status = (
+        "aligned"
+        if night_data_generated_at and night_data_generated_at == data_generated_at
+        else "stale_snapshot"
+        if night_data_generated_at
+        else "missing"
+    )
     health_quality = health.get("quality_checks") if isinstance(health.get("quality_checks"), dict) else {}
     if not health_quality and isinstance(health.get("data_quality"), dict):
         health_quality = health.get("data_quality")
+    health_truth = health.get("data_truth") if isinstance(health.get("data_truth"), dict) else {}
+    health_data_generated_at = health_truth.get("data_generated_at") or health.get("data_generated_at")
+    health_snapshot_status = (
+        "aligned"
+        if health_data_generated_at and health_data_generated_at == data_generated_at
+        else "stale_snapshot"
+        if health_data_generated_at
+        else "missing"
+    )
     sync_fields = ("total", "upcoming", "winamax_exact", "lineups", "injuries", "referee", "h2h", "xg")
     sync_mismatches = []
-    for key in sync_fields:
-        truth_value = truth.get(key)
-        night_value = night_events.get(key)
-        if night_value is not None and truth_value != night_value:
-            sync_mismatches.append({"field": key, "source": "night_metrics", "truth": truth_value, "other": night_value})
+    if night_snapshot_status == "aligned":
+        for key in sync_fields:
+            truth_value = truth.get(key)
+            night_value = night_events.get(key)
+            if night_value is not None and truth_value != night_value:
+                sync_mismatches.append({"field": key, "source": "night_metrics", "truth": truth_value, "other": night_value})
     health_exact = health_quality.get("winamax_exact") if isinstance(health_quality, dict) else None
-    if health_exact is not None and truth.get("upcoming_winamax_exact") != health_exact:
+    if health_snapshot_status == "aligned" and health_exact is not None and truth.get("upcoming_winamax_exact") != health_exact:
         sync_mismatches.append({"field": "upcoming_winamax_exact", "source": "health", "truth": truth.get("upcoming_winamax_exact"), "other": health_exact})
 
     return {
         "calculated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "source_of_truth": "data.js",
+        "project_root": str(PROJECT_ROOT),
         "today": today,
         "local_today": _today_iso(),
         "data_today_field": data.get("today") if not "_error" in data else None,
+        "data_generated_at": data_generated_at,
+        "winamax_exact": truth.get("winamax_exact"),
+        "winamax_available": truth.get("winamax_available"),
+        "winamax_exact_ratio": truth.get("winamax_exact_ratio"),
+        "authoritative_metrics": truth,
         "data_truth": truth,
         "sync_check": {
             "status": "ok" if not sync_mismatches else "drift",
             "mismatches": sync_mismatches[:12],
+            "secondary_snapshots": {
+                "night_metrics": {
+                    "status": night_snapshot_status,
+                    "data_generated_at": night_data_generated_at,
+                },
+                "health": {
+                    "status": health_snapshot_status,
+                    "data_generated_at": health_data_generated_at,
+                },
+            },
         },
         "data_age_min": health.get("data_age_min") if not "_error" in health else None,
         "overall_status": health.get("overall") if not "_error" in health else "unknown",
