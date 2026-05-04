@@ -2293,5 +2293,10 @@ Archived from SPRINT_NIGHT_LOG.md on 2026-05-04 to keep the active log readable.
 - Mesure: 345 events, 304 upcoming, Winamax exact 308 (89.3%), marches detailles 715/718, xG 255, injuries 217, lineups 122, referees 29.
 - Drift: `check_pipeline_drift.py` OK, auto_refresh et refresh.yml alignes sur 64 scripts chacun.
 - Verif: metrics regen + drift check OK; cache/footer bumpes v35.384.
+## Sprint v35.383 — AUTO 10/10 Commentaires legacy nettoyes (20:26 UTC)
+- Dette: `app.js` gardait encore des commentaires de chantier v31-v35 obsoletes qui gonflaient le fichier sans aider au debug.
+- Fix: suppression de 26 commentaires ligne-only stale (`PLAN 1000`, `v31.*`, `v33.*`, `v34.*`, `v35.199`, legacy retire/supprime).
+- Garde-fou: `scripts/audit_legacy_comments.py` refuse le retour de ces commentaires legacy ligne-only.
+- Verif: audit_legacy_comments + py_compile + app/sw syntax OK; cache/footer bumpes v35.383.
 
 
