@@ -281,7 +281,37 @@ def collect(selected_leagues: set[str] | None = None, pages: int = 3,
     return {
         'generated_at': datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace('+00:00', 'Z'),
         'events': events,
+        'stats': totals,
     }
+
+
+def merge_existing_lineups(fresh: dict) -> dict:
+    """Retain previously collected lineups when a later scrape is sparse."""
+    old: dict = {}
+    if OUT.exists():
+        try:
+            old = json.loads(OUT.read_text(encoding='utf-8'))
+        except Exception:
+            old = {}
+    old_events = old.get('events') or {}
+    fresh_events = fresh.get('events') or {}
+    if not isinstance(old_events, dict):
+        old_events = {}
+    if not isinstance(fresh_events, dict):
+        fresh_events = {}
+    merged_events = dict(old_events)
+    merged_events.update(fresh_events)
+
+    stats = dict(fresh.get('stats') or {})
+    stats['fresh_with_lineup'] = len(fresh_events)
+    stats['retained_existing'] = max(0, len(merged_events) - len(fresh_events))
+    stats['events_total'] = len(merged_events)
+
+    out = dict(fresh)
+    out['events'] = merged_events
+    out['stats'] = stats
+    out['merged_from_existing'] = bool(old_events)
+    return out
 
 
 def main() -> int:
@@ -299,6 +329,7 @@ def main() -> int:
     if not data.get('events'):
         print('  no lineups collected — not overwriting existing file')
         return 1
+    data = merge_existing_lineups(data)
     OUT.write_text(json.dumps(data, ensure_ascii=False, separators=(',', ':')),
                    encoding='utf-8')
     print(f'  wrote {OUT} ({OUT.stat().st_size / 1024:.1f}KB)', flush=True)
