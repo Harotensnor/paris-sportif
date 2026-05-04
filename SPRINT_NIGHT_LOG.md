@@ -2338,3 +2338,9 @@
 - Fix: detection `market_uncertain` dans odds_history + snapshot 1N2 courant, patch data, angle rare "marche incertain" et penalite directe dans le score opportunite.
 - Impact mesure: `detected_angles` ajoute 68 marches incertains; ces matchs perdent le bonus steam et affichent un badge/tooltip de verification avant pari.
 - Verif: py_compile detect/patch/build intelligence OK; app.js/sw.js syntax OK; cache/footer bumpes v35.360.
+
+## Sprint v35.361 — AUTO 10/10 Score opportunite decompose (19:22 UTC)
+- Bug UX: le score 79/83 restait trop opaque meme avec une legende globale.
+- Fix: tooltip score enrichi avec decomposition chiffree: base, edge, confiance, tier, biais ligue/marche, marche incertain, signaux, timing, qualite data, gaps et profil Theo.
+- Impact produit: Theo peut voir pourquoi un score monte ou baisse sans deviner la logique interne.
+- Verif: app.js syntax OK; cache/footer bumpes v35.361.
