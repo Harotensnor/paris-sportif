@@ -159,6 +159,71 @@ test.describe('v35 market scanner', () => {
     expect(count).toBe(0);
   });
 
+  test('exposes exact basket period totals and baseball F5 totals', async ({ page }) => {
+    const result = await page.evaluate(() => {
+      const basket = {
+        sport: 'basketball',
+        competitors: [
+          { homeAway: 'home', name: 'Paris Basket' },
+          { homeAway: 'away', name: 'Monaco' },
+        ],
+        winamax: {
+          available: true,
+          markets: {
+            basket_first_half_total: [
+              { market: 'basket_first_half_total', side: 'over', line: 82.5, odd: 1.91, label: 'Plus de 82,5' },
+              { market: 'basket_first_half_total', side: 'under', line: 82.5, odd: 1.87, label: 'Moins de 82,5' },
+            ],
+            basket_quarter_total: [
+              { market: 'basket_quarter_total', side: 'over', line: 41.5, odd: 1.90, label: 'Plus de 41,5' },
+              { market: 'basket_quarter_total', side: 'under', line: 41.5, odd: 1.88, label: 'Moins de 41,5' },
+            ],
+          },
+        },
+      };
+      const basketPred = {
+        pick: { key: '1', prob: 0.58, label: 'Paris Basket gagnent' },
+        reliability: 0.58,
+        scores: {
+          markets: {
+            firstHalfTotals: [{ line: 82.5, pOver: 0.57, pUnder: 0.43 }],
+            quarterTotals: [{ line: 41.5, pOver: 0.55, pUnder: 0.45 }],
+          },
+        },
+      };
+      const baseball = {
+        sport: 'baseball',
+        competitors: [
+          { homeAway: 'home', name: 'Cubs' },
+          { homeAway: 'away', name: 'Cardinals' },
+        ],
+        winamax: {
+          available: true,
+          markets: {
+            baseball_f5_total: [
+              { market: 'baseball_f5_total', side: 'over', line: 4.5, odd: 1.94, label: 'Plus de 4,5' },
+              { market: 'baseball_f5_total', side: 'under', line: 4.5, odd: 1.84, label: 'Moins de 4,5' },
+            ],
+          },
+        },
+      };
+      const baseballPred = {
+        pick: { key: '1', prob: 0.56, label: 'Cubs gagnent' },
+        reliability: 0.56,
+        scores: { markets: { totalsF5: [{ line: 4.5, pOver: 0.58, pUnder: 0.42 }] } },
+      };
+      return {
+        basket: window.__testAPI.buildMarketCandidates(basket, basketPred).map(c => ({ market: c.market, key: c.key, label: c.label })),
+        baseball: window.__testAPI.buildMarketCandidates(baseball, baseballPred).map(c => ({ market: c.market, key: c.key, label: c.label })),
+      };
+    });
+
+    expect(result.basket.map(c => c.market)).toEqual(expect.arrayContaining(['basketFirstHalfTotal', 'basketQuarterTotal']));
+    expect(result.basket.find(c => c.market === 'basketFirstHalfTotal').label).toBe('Plus de 82,5 points en 1re mi-temps');
+    expect(result.basket.find(c => c.market === 'basketQuarterTotal').label).toBe('Plus de 41,5 points au 1er quart-temps');
+    expect(result.baseball.find(c => c.market === 'baseballF5Total').label).toBe('Plus de 4,5 runs sur 5 premières manches');
+  });
+
   test('downgrades micro odds unless the value buffer is exceptional', async ({ page }) => {
     const scored = await page.evaluate(() => {
       const match = { id: 'micro-odd', sport: 'football', winamax: { available: true } };

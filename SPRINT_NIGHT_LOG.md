@@ -355,3 +355,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Front: les candidats `cornersTotal` et `cardsTotal` utilisent seulement les cotes Winamax exactes, avec libelles "Plus/Moins de X corners/cartons jaunes".
 - Modele: probas prudentes locales basees sur xG total pour corners et profil arbitre/meteo pour cartons, fallback no-vig si contexte absent.
 - Cache/footer bumpes v35.411; `app.js` hash `830d05ad`.
+
+## Sprint v35.412 — AUTO 10/10 Periodes basket et F5 baseball (01:59 UTC)
+- Elargissement: Winamax match details detecte les totaux basket mi-temps/quart-temps et les totaux baseball F5.
+- Front: nouveaux marches `basketFirstHalfTotal`, `basketQuarterTotal`, `baseballF5Total` avec libelles debutant-safe et filtres avances.
+- Modele: reutilise les projections deja presentes (`firstHalfTotals`, `quarterTotals`, `totalsF5`) puis fallback no-vig si necessaire.
+- Cache/footer bumpes v35.412; `app.js` hash `c5617af9`.

@@ -2578,6 +2578,16 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
       const pOver = 1 / (1 + Math.exp((Number(line) - expected) / 1.05));
       return side === 'over' ? pOver : 1 - pOver;
     }
+    if (market === 'basket_first_half_total' || market === 'basket_quarter_total' || market === 'baseball_f5_total') {
+      const pack = market === 'basket_first_half_total'
+        ? pred.scores?.markets?.firstHalfTotals
+        : market === 'basket_quarter_total'
+          ? pred.scores?.markets?.quarterTotals
+          : pred.scores?.markets?.totalsF5;
+      const row = (pack || []).find(t => Math.abs(Number(t.line) - Number(line)) < 0.11);
+      if (!row) return null;
+      return Number(row[choose]);
+    }
     const totals = pred.scores?.markets?.totals || pred.scores?.games?.lines || [];
     const row = totals.find(t => Math.abs(Number(t.line) - Number(line)) < 0.11);
     if (!row) return null;
@@ -2706,6 +2716,9 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     if (m === 'teamTotal') return 'Total équipe : seul le nombre de buts/points de cette équipe compte.';
     if (m === 'cornersTotal') return 'Corners : pari sur le nombre total de corners du match.';
     if (m === 'cardsTotal') return 'Cartons jaunes : pari sur le nombre total de cartons jaunes du match.';
+    if (m === 'basketFirstHalfTotal') return 'Basket mi-temps : pari sur le total de points avant la pause.';
+    if (m === 'basketQuarterTotal') return 'Basket quart-temps : pari sur le total de points du quart-temps indiqué.';
+    if (m === 'baseballF5Total') return 'Baseball F5 : pari sur le total de runs des 5 premières manches.';
     if (m === 'exactScore') return 'Score exact : le score final doit être exactement celui annoncé.';
     if (m === 'ht_1n2') return 'Mi-temps : seul le score à la pause compte.';
     if (typeof isHandicapMarket === 'function' && isHandicapMarket(m)) return 'Handicap : la ligne est ajoutée au score de l’équipe avant règlement.';
@@ -2721,6 +2734,9 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     if (m === 'teamTotal') return 'Total équipe';
     if (m === 'cornersTotal') return 'Total corners';
     if (m === 'cardsTotal') return 'Total cartons';
+    if (m === 'basketFirstHalfTotal') return 'Total basket mi-temps';
+    if (m === 'basketQuarterTotal') return 'Total basket quart-temps';
+    if (m === 'baseballF5Total') return 'Total baseball F5';
     if (m === 'exactScore') return 'Score exact';
     if (m === 'ht_1n2') return 'Mi-temps';
     if (m === 'htTotal') return 'Total 1re mi-temps';
@@ -2784,6 +2800,18 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
       const over = String(row?.side ?? side).toLowerCase() === 'over';
       full = `${over ? 'Plus' : 'Moins'} de ${lineTxt} cartons jaunes`;
       tooltip = `${full}. Les cartons jaunes du match sont comptés; les rouges directs peuvent dépendre du règlement Winamax.`;
+    } else if (mk === 'basketFirstHalfTotal') {
+      const over = String(row?.side ?? side).toLowerCase() === 'over';
+      full = `${over ? 'Plus' : 'Moins'} de ${lineTxt} points en 1re mi-temps`;
+      tooltip = `${full}. Seuls les points marqués avant la pause comptent.`;
+    } else if (mk === 'basketQuarterTotal') {
+      const over = String(row?.side ?? side).toLowerCase() === 'over';
+      full = `${over ? 'Plus' : 'Moins'} de ${lineTxt} points au 1er quart-temps`;
+      tooltip = `${full}. Seuls les points du quart-temps indiqué comptent.`;
+    } else if (mk === 'baseballF5Total') {
+      const over = String(row?.side ?? side).toLowerCase() === 'over';
+      full = `${over ? 'Plus' : 'Moins'} de ${lineTxt} runs sur 5 premières manches`;
+      tooltip = `${full}. Le pari est réglé sur les 5 premières manches uniquement.`;
     } else if (mk === 'exactScore') {
       full = `Score exact ${String(key || row?.score || label || '').replace(/^Score exact\s*/i, '')}`;
       tooltip = 'Score exact : le score final doit correspondre exactement.';
@@ -3013,9 +3041,21 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
       const p = _v35ModelTotalProb(pred, 'basket_total', row.line, row.side) ?? _v35NoVigProb(row, wxMk.basket_total);
       _v35AddCandidate(out, row, p, 'basketTotal', `${row.side === 'over' ? 'O' : 'U'}${row.line}`, `${row.side === 'over' ? 'Plus' : 'Moins'} de ${row.line} pts`);
     }
+    for (const row of _v35Rows(wxMk.basket_first_half_total)) {
+      const p = _v35ModelTotalProb(pred, 'basket_first_half_total', row.line, row.side) ?? _v35NoVigProb(row, wxMk.basket_first_half_total);
+      _v35AddCandidate(out, row, p, 'basketFirstHalfTotal', `B1H_${row.side === 'over' ? 'O' : 'U'}${row.line}`, `${row.side === 'over' ? 'Plus' : 'Moins'} de ${row.line} pts MT`);
+    }
+    for (const row of _v35Rows(wxMk.basket_quarter_total)) {
+      const p = _v35ModelTotalProb(pred, 'basket_quarter_total', row.line, row.side) ?? _v35NoVigProb(row, wxMk.basket_quarter_total);
+      _v35AddCandidate(out, row, p, 'basketQuarterTotal', `BQ_${row.side === 'over' ? 'O' : 'U'}${row.line}`, `${row.side === 'over' ? 'Plus' : 'Moins'} de ${row.line} pts QT`);
+    }
     for (const row of _v35Rows(wxMk.baseball_total)) {
       const p = _v35ModelTotalProb(pred, 'baseball_total', row.line, row.side) ?? _v35NoVigProb(row, wxMk.baseball_total);
       _v35AddCandidate(out, row, p, 'baseballTotal', `${row.side === 'over' ? 'O' : 'U'}${row.line}`, `${row.side === 'over' ? 'Plus' : 'Moins'} de ${row.line} runs`);
+    }
+    for (const row of _v35Rows(wxMk.baseball_f5_total)) {
+      const p = _v35ModelTotalProb(pred, 'baseball_f5_total', row.line, row.side) ?? _v35NoVigProb(row, wxMk.baseball_f5_total);
+      _v35AddCandidate(out, row, p, 'baseballF5Total', `F5_${row.side === 'over' ? 'O' : 'U'}${row.line}`, `${row.side === 'over' ? 'Plus' : 'Moins'} de ${row.line} runs F5`);
     }
     for (const row of _v35Rows(wxMk.hockey_total)) {
       const p = _v35ModelTotalProb(pred, 'hockey_total', row.line, row.side) ?? _v35NoVigProb(row, wxMk.hockey_total);
@@ -8264,10 +8304,13 @@ const advHtml = advFiltersOpen ? `
             <option value="ah" ${advFilters.marketType === 'ah' ? 'selected' : ''}>Asian Handicap</option>
             <option value="exactScore" ${advFilters.marketType === 'exactScore' ? 'selected' : ''}>Score exact</option>
             <option value="basketTotal" ${advFilters.marketType === 'basketTotal' ? 'selected' : ''}>Basket total</option>
+            <option value="basketFirstHalfTotal" ${advFilters.marketType === 'basketFirstHalfTotal' ? 'selected' : ''}>Basket mi-temps</option>
+            <option value="basketQuarterTotal" ${advFilters.marketType === 'basketQuarterTotal' ? 'selected' : ''}>Basket quart-temps</option>
             <option value="basketHandicap" ${advFilters.marketType === 'basketHandicap' ? 'selected' : ''}>Basket handicap</option>
             <option value="hockeyTotal" ${advFilters.marketType === 'hockeyTotal' ? 'selected' : ''}>Hockey total</option>
             <option value="puckLine" ${advFilters.marketType === 'puckLine' ? 'selected' : ''}>Puck line</option>
             <option value="baseballTotal" ${advFilters.marketType === 'baseballTotal' ? 'selected' : ''}>Baseball total</option>
+            <option value="baseballF5Total" ${advFilters.marketType === 'baseballF5Total' ? 'selected' : ''}>Baseball F5</option>
             <option value="runLine" ${advFilters.marketType === 'runLine' ? 'selected' : ''}>Run line</option>
             <option value="tennisGames" ${advFilters.marketType === 'tennisGames' ? 'selected' : ''}>Tennis jeux</option>
             <option value="teamTotal" ${advFilters.marketType === 'teamTotal' ? 'selected' : ''}>Team total</option>
@@ -11213,7 +11256,7 @@ if (!best || !best.allCandidates) return '';
 const cands = best.allCandidates;
 const contradictedCands = Array.isArray(best.contradictedCandidates) ? best.contradictedCandidates : [];
 if (cands.length < 2 && !contradictedCands.length) return '';
-const marketEmoji = { '1n2': '🏆', 'ou25': '⚽', 'ou15': '⚽', 'ou35': '⚽', 'btts': '🔄', 'doubleChance': '🎯', 'exactScore': '🎯', 'dnb': '🎯', 'teamTotal': '⚽', 'cornersTotal': '🚩', 'cardsTotal': '🟨', 'ht_1n2': '⏱️', 'htTotal': '⏱️', 'resultBtts': '🎯', 'ah': '⚖️', 'basketTotal': '🏀', 'basketHandicap': '🏀', 'hockeyTotal': '🏒', 'puckLine': '🏒', 'baseballTotal': '⚾', 'runLine': '⚾', 'tennisGames': '🎾' };
+const marketEmoji = { '1n2': '🏆', 'ou25': '⚽', 'ou15': '⚽', 'ou35': '⚽', 'btts': '🔄', 'doubleChance': '🎯', 'exactScore': '🎯', 'dnb': '🎯', 'teamTotal': '⚽', 'cornersTotal': '🚩', 'cardsTotal': '🟨', 'ht_1n2': '⏱️', 'htTotal': '⏱️', 'resultBtts': '🎯', 'ah': '⚖️', 'basketTotal': '🏀', 'basketFirstHalfTotal': '🏀', 'basketQuarterTotal': '🏀', 'basketHandicap': '🏀', 'hockeyTotal': '🏒', 'puckLine': '🏒', 'baseballTotal': '⚾', 'baseballF5Total': '⚾', 'runLine': '⚾', 'tennisGames': '🎾' };
 const evMin = (typeof window.advFilters !== 'undefined' && window.advFilters.evMin) || 0;
 const valueOnly = (typeof window.advFilters !== 'undefined' && window.advFilters.valueOnly) || false;
 const rows = cands.map((c, i) => {
@@ -24845,8 +24888,11 @@ exactScore: 'Score exact',
 resultBtts: 'Résultat + BTTS',
 handicap: 'Handicap foot',
 basketTotal: 'Total basket',
+basketFirstHalfTotal: 'Basket MT',
+basketQuarterTotal: 'Basket QT',
 basketHandicap: 'Handicap basket',
 baseballTotal: 'Runs baseball',
+baseballF5Total: 'Baseball F5',
 runLine: 'Run line',
 hockeyTotal: 'Total hockey',
 puckLine: 'Puck line',
@@ -25010,7 +25056,7 @@ const wrChartHtml = renderWrChart(wrPts, 7);
 const filterChipsHtml = (group, current, options) => options.map(o => `
       <button class="hist-chip ${current === o.v ? 'active' : ''}" data-fgroup="${group}" data-fval="${esc(o.v)}">${esc(o.label)}${o.hint ? `<span style="opacity:.6;margin-left:4px;font-size:10.5px;">${esc(o.hint)}</span>` : ''}</button>
     `).join('');
-const marketOrder = ['1n2','ou25','ou15','ou35','btts','doubleChance','dnb','teamTotal','cornersTotal','cardsTotal','handicap','basketTotal','basketHandicap','baseballTotal','runLine','hockeyTotal','puckLine','tennisGames','exactScore','resultBtts','ht_1n2','htTotal'];
+const marketOrder = ['1n2','ou25','ou15','ou35','btts','doubleChance','dnb','teamTotal','cornersTotal','cardsTotal','handicap','basketTotal','basketFirstHalfTotal','basketQuarterTotal','basketHandicap','baseballTotal','baseballF5Total','runLine','hockeyTotal','puckLine','tennisGames','exactScore','resultBtts','ht_1n2','htTotal'];
 const presentMarkets = [...new Set(picks.map(p => p.market || '1n2'))];
 const orderedMarkets = marketOrder.filter(mk => presentMarkets.includes(mk))
 .concat(presentMarkets.filter(mk => !marketOrder.includes(mk)).sort());
