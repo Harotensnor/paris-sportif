@@ -2452,3 +2452,9 @@
 - Marches: les lignes sans cotes reelles portent `sample_scope=directional_settled_match_sample` et restent en watch/low_value; `Double chance 12` reste bloque en low_value si la cote ne couvre pas le WR.
 - Garde-fou: ajout de `scripts/audit_intelligence_consistency.py` pour refuser sample clone non signale, exploit sans cotes, WR league duplique massif, conflit de signaux non abstain/mixed.
 - Verif: build_betting_intelligence + audit_intelligence_consistency + py_compile + app/sw syntax + no-conflict markers OK; cache/footer bumpes v35.379.
+
+## Sprint v35.380 — AUTO 10/10 Tests skips sous controle (20:17 UTC)
+- QA: le test critique `modal-pick-sync` ne peut plus se skip si aucune ligne V37 n'est visible; il echoue explicitement pour proteger le bug ligne/modale.
+- Documentation: les skips visuels optionnels ont maintenant une raison lisible, et `scripts/audit_playwright_skips.py` refuse les skips non documentes ou un skip dans le test de synchronisation modal.
+- Mesure: 18 skips runtime restent allowlistes (viewport/sections optionnelles/data manquante), 0 skip silencieux critique.
+- Verif: audit_playwright_skips + py_compile + cache/footer bumpes v35.380.
