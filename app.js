@@ -3669,6 +3669,41 @@ worstDay,
 cells,
 };
 };
+window._bankrollGrowthProjection = function(initialBankroll = 1000) {
+const stats = typeof window._userBetsStats === 'function' ? window._userBetsStats() : null;
+const cal = typeof window._userBetsPnlCalendar === 'function' ? window._userBetsPnlCalendar(365) : null;
+const sample = Number(stats?.n || 0);
+const observedRoi = isFinite(Number(stats?.roi)) ? Number(stats.roi) : 0.04;
+const trustedRoi = sample >= 20 ? observedRoi : sample >= 8 ? observedRoi * 0.65 + 0.02 : 0.035;
+const betsPerDay = cal && cal.activeDays ? Math.max(0.5, Math.min(8, cal.bets / cal.activeDays)) : 3;
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+const baseRoi = clamp(trustedRoi, -0.12, 0.18);
+const start = Math.max(10, Number(initialBankroll) || 1000);
+const scenarios = [
+{ key: 'prudente', name: 'Prudente', stakePct: 0.006, roi: baseRoi * 0.70, note: 'mises fixes, seulement tiers fiables' },
+{ key: 'equilibree', name: 'Équilibrée', stakePct: 0.010, roi: baseRoi, note: 'rythme normal, Kelly fractionné' },
+{ key: 'agressive', name: 'Agressive', stakePct: 0.016, roi: baseRoi * 1.12, note: 'plus volatile, drawdown plus probable' },
+];
+const horizons = [30, 90, 365];
+const project = (sc, days) => {
+const dailyReturn = clamp(sc.stakePct * betsPerDay * sc.roi, -0.025, 0.035);
+const end = start * Math.pow(1 + dailyReturn, days);
+return { days, end, delta: end - start, pct: (end / start - 1), dailyReturn };
+};
+return {
+start,
+sample,
+observedRoi,
+trustedRoi,
+betsPerDay,
+horizons,
+scenarios: scenarios.map(sc => ({
+...sc,
+projections: horizons.map(days => project(sc, days)),
+series90: Array.from({ length: 91 }, (_, i) => project(sc, i).end),
+})),
+};
+};
 window._computeIfYouHadFollowed = function() {
 const data = window.PRONOSTICS_DATA;
 if (!data || !data.days) return null;
@@ -24197,6 +24232,72 @@ return `
             </div>
           </section>`;
 })();
+const bankrollProjectorHtml = (() => {
+if (currentTab !== 'global') return '';
+let proj = null;
+try { proj = typeof window._bankrollGrowthProjection === 'function' ? window._bankrollGrowthProjection(1000) : null; }
+catch(e) { proj = null; }
+if (!proj) return '';
+const euros = (v) => `${Number(v || 0).toFixed(0)}€`;
+const signedEuros = (v) => `${Number(v || 0) >= 0 ? '+' : ''}${Number(v || 0).toFixed(0)}€`;
+const signedPct = (v) => `${Number(v || 0) >= 0 ? '+' : ''}${(Number(v || 0) * 100).toFixed(1)}%`;
+const spark = (series, color) => {
+if (!series || series.length < 2) return '';
+const w = 210, h = 54, pad = 4;
+const min = Math.min(...series);
+const max = Math.max(...series);
+const span = Math.max(1, max - min);
+const pts = series.map((v, i) => {
+const x = pad + (w - pad * 2) * (i / (series.length - 1));
+const y = h - pad - (h - pad * 2) * ((v - min) / span);
+return `${x.toFixed(1)},${y.toFixed(1)}`;
+}).join(' ');
+return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img" aria-label="Projection bankroll 90 jours" style="width:100%;height:54px;display:block;"><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline><line x1="0" y1="${h - pad}" x2="${w}" y2="${h - pad}" stroke="rgba(148,163,184,.18)" stroke-width="1"></line></svg>`;
+};
+const cardHtml = proj.scenarios.map(sc => {
+const p30 = sc.projections.find(p => p.days === 30);
+const p90 = sc.projections.find(p => p.days === 90);
+const p365 = sc.projections.find(p => p.days === 365);
+const positive = p90.delta >= 0;
+const color = positive ? 'var(--accent)' : 'var(--danger)';
+return `
+              <article style="padding:14px;background:var(--panel-2);border:1px solid ${positive ? 'rgba(52,211,153,.24)' : 'rgba(248,113,113,.24)'};border-radius:var(--r-sm);min-width:0;">
+                <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;">
+                  <div>
+                    <div style="font-size:15px;font-weight:850;color:var(--text);">${esc(sc.name)}</div>
+                    <div style="font-size:11.5px;color:var(--text-dim);margin-top:2px;">${esc(sc.note)}</div>
+                  </div>
+                  <div style="text-align:right;font-variant-numeric:tabular-nums;">
+                    <div style="font-size:18px;font-weight:900;color:${color};">${signedEuros(p90.delta)}</div>
+                    <div style="font-size:10.5px;color:var(--text-dim2);">90j · ${signedPct(p90.pct)}</div>
+                  </div>
+                </div>
+                <div style="margin-top:10px;">${spark(sc.series90, positive ? '#34d399' : '#f87171')}</div>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px;font-size:11px;font-variant-numeric:tabular-nums;">
+                  <span style="padding:7px 8px;border-radius:8px;background:rgba(255,255,255,.035);color:var(--text-dim);">30j <b style="color:${p30.delta >= 0 ? 'var(--accent)' : 'var(--danger)'};">${esc(euros(p30.end))}</b></span>
+                  <span style="padding:7px 8px;border-radius:8px;background:rgba(255,255,255,.035);color:var(--text-dim);">90j <b style="color:${color};">${esc(euros(p90.end))}</b></span>
+                  <span style="padding:7px 8px;border-radius:8px;background:rgba(255,255,255,.035);color:var(--text-dim);">365j <b style="color:${p365.delta >= 0 ? 'var(--accent)' : 'var(--danger)'};">${esc(euros(p365.end))}</b></span>
+                </div>
+              </article>`;
+}).join('');
+const sampleNote = proj.sample >= 20
+? `Basé sur ${proj.sample} paris trackés · ROI observé ${signedPct(proj.observedRoi)}.`
+: `Échantillon encore faible (${proj.sample} pari${proj.sample > 1 ? 's' : ''}) : projection volontairement prudente.`;
+return `
+          <section class="perf-bankroll-projector" aria-label="Projecteur bankroll" style="margin-top:14px;padding:16px 18px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-md);">
+            <div style="display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap;margin-bottom:12px;">
+              <div>
+                <div style="font-size:11px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.8px;font-weight:850;">Projecteur bankroll</div>
+                <h2 style="margin:4px 0 0;font-size:20px;line-height:1.2;color:var(--text);">1000€ simulés sur 30 / 90 / 365 jours</h2>
+                <div style="margin-top:4px;font-size:12px;color:var(--text-dim);">${esc(sampleNote)} Rythme estimé : ${proj.betsPerDay.toFixed(1)} pari${proj.betsPerDay >= 2 ? 's' : ''}/jour actif.</div>
+              </div>
+              <span style="padding:7px 10px;border:1px solid rgba(167,139,250,.28);border-radius:999px;background:rgba(167,139,250,.10);color:var(--brand);font-size:11px;font-weight:850;">Kelly fractionné · pas de martingale</span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;">
+              ${cardHtml}
+            </div>
+          </section>`;
+})();
 wrap.innerHTML = `
       <div class="page-wrap">
         <div class="page-header">
@@ -24210,6 +24311,7 @@ wrap.innerHTML = `
         ${subTabsHtml}
 
         ${userPnlHeatmapHtml}
+        ${bankrollProjectorHtml}
 
         ${currentTab !== 'global' ? '' : `
 <!-- KPIs principaux -->
