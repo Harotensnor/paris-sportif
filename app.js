@@ -15406,11 +15406,12 @@
             read('detected_angles'),
             read('rare_signals'),
             read('timing_edges'),
-          ]).then(([league, angles, rare, timing]) => {
-            state.data = { league, angles, rare, timing };
+            read('signal_gap_report'),
+          ]).then(([league, angles, rare, timing, gaps]) => {
+            state.data = { league, angles, rare, timing, gaps };
             state.loaded = true;
           }).catch(() => {
-            state.data = { league: null, angles: null, rare: null, timing: null };
+            state.data = { league: null, angles: null, rare: null, timing: null, gaps: null };
             state.loaded = true;
           }).finally(() => {
             state.loading = false;
@@ -15951,6 +15952,23 @@
           });
         })
         .join('');
+      const v37GapRows = (Array.isArray(v37Intel.gaps?.priority_gaps) ? v37Intel.gaps.priority_gaps : [])
+        .slice()
+        .sort((a, b) => Number(b.priority || 0) - Number(a.priority || 0))
+        .slice(0, 4)
+        .map(g => {
+          const missing = Array.isArray(g.missing) ? g.missing.slice(0, 4).join(', ') : '';
+          const title = g.match || `${g.home || '?'} - ${g.away || '?'}`;
+          return v37InsightRow({
+            kicker: `Gap data ${Number(g.priority || 0).toFixed(0)}`,
+            title,
+            body: `${g.league_code || g.league_name || 'ligue'} · manque ${missing || 'source'}`,
+            eventId: g.event_id,
+            tone: 'warn',
+          });
+        })
+        .join('');
+      const v37GapCount = Number(v37Intel.gaps?.priority_gaps?.length || 0);
       const v37IntelCount = Number(v37Intel.angles?.summary?.angles || 0) + Number(v37Intel.rare?.summary?.signals || 0);
       const v37IntelFallback = v37IntelState.loading
         ? '<div class="v36-tier-empty">Chargement des insights modèle…</div>'
@@ -15984,6 +16002,7 @@
             <aside class="v36-home-rail" aria-label="Radar temps reel">
               <section><header><span>Insights modèle</span><b>${v37IntelCount || '...'}</b></header>${v37RareRows || v37AngleRows || v37IntelFallback}</section>
               <section><header><span>Biais marché ligues</span><b>${Number(v37Intel.league?.summary?.exploit || 0)}</b></header>${v37LeagueRows || v37IntelFallback}</section>
+              <section><header><span>Gaps data critiques</span><b>${v37GapCount || '...'}</b></header>${v37GapRows || `<div class="v36-tier-empty">Aucun trou prioritaire sur ce snapshot.</div>`}</section>
               <section><header><span>Timing mise</span><b>${Number(v37Intel.timing?.summary?.wait || 0)}</b></header>${v37TimingRows || `<div class="v36-tier-empty">Aucune attente forcée : les picks restent jouables selon ton filtre.</div>`}</section>
               <section><header><span>Stats live</span><b>${v36Total}</b></header><div class="v36-side-stats">${v36StatsHtml}</div></section>
             </aside>
