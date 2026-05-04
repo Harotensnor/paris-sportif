@@ -2,6 +2,11 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
+## Sprint v35.400 — C6 projecteur bankroll discipline (22:29 UTC)
+- Avant: la page Performance montrait les resultats, mais pas une projection simple 30/90/365 jours pour choisir une strategie de mise.
+- Apres: ajout du Projecteur bankroll 1000EUR avec scenarios Prudente / Equilibree / Agressive, courbes 90j et horizons 30/90/365j.
+- Impact mesure: projections basees sur les paris trackes quand l'echantillon est suffisant; sinon estimation prudente explicite.
+- Verif: Playwright projecteur+heatmap+tilt+CLV OK (8/8), bundle-size OK, syntax JS OK, no-conflict-markers OK; cache/footer bumpes v35.400.
 ## Sprint v35.399 — C4 calendrier P&L personnel (22:18 UTC)
 - Avant: Performance montrait le backtest modele, mais pas les jours verts/rouges de Theo sur ses paris suivis localement.
 - Apres: ajout d'une heatmap 365 jours basee sur `paris_sportif_user_bets`, avec P&L total, ROI, jours verts et pire jour.
@@ -291,10 +296,4 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix: suppression de 26 commentaires ligne-only stale (`PLAN 1000`, `v31.*`, `v33.*`, `v34.*`, `v35.199`, legacy retire/supprime).
 - Garde-fou: `scripts/audit_legacy_comments.py` refuse le retour de ces commentaires legacy ligne-only.
 - Verif: audit_legacy_comments + py_compile + app/sw syntax OK; cache/footer bumpes v35.383.
-
-## Sprint v35.384 — AUTO 10/10 Night metrics source unique (20:29 UTC)
-- Data: regeneration `night_metrics.json` depuis `data.js` frais (`data_generated_at=2026-05-04T20:28:50Z`).
-- Mesure: 345 events, 304 upcoming, Winamax exact 308 (89.3%), marches detailles 715/718, xG 255, injuries 217, lineups 122, referees 29.
-- Drift: `check_pipeline_drift.py` OK, auto_refresh et refresh.yml alignes sur 64 scripts chacun.
-- Verif: metrics regen + drift check OK; cache/footer bumpes v35.384.
 

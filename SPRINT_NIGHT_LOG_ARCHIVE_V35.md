@@ -2288,5 +2288,10 @@ Archived from SPRINT_NIGHT_LOG.md on 2026-05-04 to keep the active log readable.
 - Mesure: audit OK sur data.js `generated_at=2026-05-04T20:28:50Z`, today `2026-05-04`, night metrics non stale.
 - Impact: les regressions type MCP/health/night_metrics avec dates divergentes deviennent detectables localement avant push.
 - Verif: audit_data_truth + py_compile OK; cache/footer bumpes v35.385.
+## Sprint v35.384 — AUTO 10/10 Night metrics source unique (20:29 UTC)
+- Data: regeneration `night_metrics.json` depuis `data.js` frais (`data_generated_at=2026-05-04T20:28:50Z`).
+- Mesure: 345 events, 304 upcoming, Winamax exact 308 (89.3%), marches detailles 715/718, xG 255, injuries 217, lineups 122, referees 29.
+- Drift: `check_pipeline_drift.py` OK, auto_refresh et refresh.yml alignes sur 64 scripts chacun.
+- Verif: metrics regen + drift check OK; cache/footer bumpes v35.384.
 
 
