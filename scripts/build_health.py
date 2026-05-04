@@ -234,6 +234,12 @@ SOURCES = [
         'avoid': ((d.get('summary') or {}).get('avoid') or 0) if isinstance(d, dict) else 0,
         'current_exploit_events': ((d.get('summary') or {}).get('current_exploit_events') or 0) if isinstance(d, dict) else 0,
     }),
+    ('market_biases_by_league', 'market_biases_by_league.json', lambda d: {
+        'markets': ((d.get('summary') or {}).get('markets') or len(d.get('markets') or [])) if isinstance(d, dict) else 0,
+        'market_exploit': ((d.get('summary') or {}).get('market_exploit') or 0) if isinstance(d, dict) else 0,
+        'market_fade': ((d.get('summary') or {}).get('market_fade') or 0) if isinstance(d, dict) else 0,
+        'watchlist': ((d.get('summary') or {}).get('watchlist') or len(d.get('watchlist') or [])) if isinstance(d, dict) else 0,
+    }),
     ('detected_angles', 'detected_angles.json', lambda d: {
         'events': ((d.get('summary') or {}).get('events_with_angles') or len(d.get('events') or [])) if isinstance(d, dict) else 0,
         'angles': ((d.get('summary') or {}).get('angles') or 0) if isinstance(d, dict) else 0,

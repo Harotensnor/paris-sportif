@@ -5,6 +5,8 @@ No paid API, no model training at runtime. This script extracts actionable
 signals already present in data.js and backtest sidecars:
 - league_inefficiencies.json: where the historical model/bookmaker relation
   looks exploitable or dangerous.
+- market_biases_by_league.json: which market families are hot/cold and which
+  leagues deserve extra caution.
 - detected_angles.json: fatigue, injuries, weather, referee and schedule spots.
 - rare_signals.json: compact list of uncommon but high-signal situations.
 - timing_edges.json: simple "bet now / wait" guidance from line movement and
@@ -23,11 +25,38 @@ from typing import Any
 ROOT = Path(__file__).resolve().parent.parent
 DATA_JS = ROOT / "data.js"
 BACKTEST = ROOT / "backtest_report_v2.json"
+BACKTEST_MARKETS = ROOT / "backtest_report_markets.json"
 
 OUT_LEAGUE = ROOT / "league_inefficiencies.json"
+OUT_MARKET_BIASES = ROOT / "market_biases_by_league.json"
 OUT_ANGLES = ROOT / "detected_angles.json"
 OUT_RARE = ROOT / "rare_signals.json"
 OUT_TIMING = ROOT / "timing_edges.json"
+
+MARKET_LABELS = {
+    "ou15": "Total buts 1,5",
+    "ou25": "Total buts 2,5",
+    "ou35": "Total buts 3,5",
+    "btts": "Les deux equipes marquent",
+    "doubleChance": "Double chance",
+    "1n2": "Resultat du match",
+    "dnb": "Nul rembourse",
+    "handicap": "Handicap",
+}
+
+PICK_LABELS = {
+    "BTTS_Y": "Oui",
+    "BTTS_N": "Non",
+    "O1.5": "Plus de 1,5",
+    "U1.5": "Moins de 1,5",
+    "O2.5": "Plus de 2,5",
+    "U2.5": "Moins de 2,5",
+    "O3.5": "Plus de 3,5",
+    "U3.5": "Moins de 3,5",
+    "1X": "Domicile ou nul",
+    "X2": "Nul ou exterieur",
+    "12": "Domicile ou exterieur",
+}
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -181,6 +210,153 @@ def build_league_inefficiencies(data: dict[str, Any]) -> dict[str, Any]:
             "current_exploit_events": sum(r["current_upcoming"] for r in rows if r["status"] == "exploit"),
         },
         "leagues": rows[:80],
+    }
+
+
+def market_label(key: str) -> tuple[str, str, str]:
+    family, _, pick = str(key or "").partition(":")
+    return family, PICK_LABELS.get(pick, pick), MARKET_LABELS.get(family, family or "marche")
+
+
+def market_status(n: int, wr: float, lo: float | None, hi: float | None) -> tuple[str, str]:
+    if n < 20:
+        return "watch", "sample faible"
+    if lo is not None and lo > 0.52:
+        return "exploit", "borne basse >52%"
+    if hi is not None and hi < 0.48:
+        return "fade", "borne haute <48%"
+    if wr >= 0.58:
+        return "exploit", "win rate fort"
+    if wr <= 0.42:
+        return "fade", "win rate faible"
+    return "neutral", "pas de biais net"
+
+
+def build_market_biases(data: dict[str, Any]) -> dict[str, Any]:
+    markets = load_json(BACKTEST_MARKETS)
+    current_by_league = Counter(
+        str(ev.get("league_code") or "unknown")
+        for ev in iter_events(data)
+        if not ev.get("completed")
+    )
+    current_by_sport = Counter(
+        str(ev.get("sport") or "unknown")
+        for ev in iter_events(data)
+        if not ev.get("completed")
+    )
+
+    market_rows: list[dict[str, Any]] = []
+    for key, stats in sorted((markets.get("by_market_pick") or {}).items()):
+        if not isinstance(stats, dict):
+            continue
+        n = int(stats.get("n") or 0)
+        wins = int(stats.get("wins") or 0)
+        losses = int(stats.get("losses") or 0)
+        if n <= 0 or wins + losses <= 0:
+            continue
+        wr = float(stats.get("win_rate") or (wins / max(1, wins + losses)))
+        lo = stats.get("wr_ci_lo")
+        hi = stats.get("wr_ci_hi")
+        lo = float(lo) if isinstance(lo, (int, float)) else None
+        hi = float(hi) if isinstance(hi, (int, float)) else None
+        status, reason = market_status(n, wr, lo, hi)
+        family, pick, label = market_label(key)
+        market_rows.append({
+            "market_key": key,
+            "family": family,
+            "pick": pick,
+            "label": label,
+            "status": status,
+            "reason": reason,
+            "n": n,
+            "wins": wins,
+            "losses": losses,
+            "win_rate": round(wr, 4),
+            "wr_ci": [lo, hi],
+            "edge_vs_50_pct": round((wr - 0.5) * 100, 2),
+        })
+
+    league_rows: list[dict[str, Any]] = []
+    for code, stats in sorted((markets.get("by_league") or {}).items()):
+        if not isinstance(stats, dict):
+            continue
+        n = int(stats.get("n") or 0)
+        if n < 10:
+            continue
+        wr = float(stats.get("win_rate") or 0)
+        lo = stats.get("wr_ci_lo")
+        hi = stats.get("wr_ci_hi")
+        lo = float(lo) if isinstance(lo, (int, float)) else None
+        hi = float(hi) if isinstance(hi, (int, float)) else None
+        status, reason = market_status(n, wr, lo, hi)
+        league_rows.append({
+            "league_code": code,
+            "status": status,
+            "reason": reason,
+            "n": n,
+            "win_rate": round(wr, 4),
+            "wr_ci": [lo, hi],
+            "edge_vs_50_pct": round((wr - 0.5) * 100, 2),
+            "current_upcoming": current_by_league.get(code, 0),
+        })
+
+    market_rows.sort(key=lambda row: (
+        {"exploit": 0, "fade": 1, "watch": 2, "neutral": 3}.get(row["status"], 9),
+        -abs(row["edge_vs_50_pct"]),
+        -row["n"],
+    ))
+    league_rows.sort(key=lambda row: (
+        {"exploit": 0, "fade": 1, "watch": 2, "neutral": 3}.get(row["status"], 9),
+        -row["current_upcoming"],
+        -abs(row["edge_vs_50_pct"]),
+    ))
+    watchlist = [
+        {
+            "league_code": league["league_code"],
+            "league_status": league["status"],
+            "current_upcoming": league["current_upcoming"],
+            "market": market["label"],
+            "pick": market["pick"],
+            "market_status": market["status"],
+            "context": f"{league['league_code']} {league['reason']} · {market['label']} {market['reason']}",
+        }
+        for league in league_rows
+        if league["current_upcoming"] > 0 and league["status"] in {"exploit", "fade"}
+        for market in market_rows[:6]
+        if market["status"] in {"exploit", "fade"}
+    ][:40]
+    if not watchlist:
+        total_current = sum(current_by_sport.values())
+        watchlist = [
+            {
+                "scope": "global",
+                "current_upcoming": total_current,
+                "market": row["label"],
+                "pick": row["pick"],
+                "market_status": row["status"],
+                "context": f"{row['label']} · {row['pick']} : {row['reason']} ({row['win_rate']:.1%}, n={row['n']})",
+            }
+            for row in market_rows
+            if row["status"] in {"exploit", "fade"}
+        ][:20]
+
+    return {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "schema": "market_biases_by_league_v1",
+        "source": "backtest_report_markets.json + current data.js slate",
+        "summary": {
+            "markets": len(market_rows),
+            "market_exploit": sum(1 for row in market_rows if row["status"] == "exploit"),
+            "market_fade": sum(1 for row in market_rows if row["status"] == "fade"),
+            "league_rows": len(league_rows),
+            "league_exploit": sum(1 for row in league_rows if row["status"] == "exploit"),
+            "league_fade": sum(1 for row in league_rows if row["status"] == "fade"),
+            "current_events_by_sport": dict(current_by_sport),
+            "watchlist": len(watchlist),
+        },
+        "markets": market_rows[:80],
+        "leagues": league_rows[:120],
+        "watchlist": watchlist,
     }
 
 
@@ -369,14 +545,18 @@ def main() -> int:
         print("[betting-intel] no data.js parsed")
         return 1
     league = build_league_inefficiencies(data)
+    market_biases = build_market_biases(data)
     angles, rare, timing = build_angles(data)
     write(OUT_LEAGUE, league)
+    write(OUT_MARKET_BIASES, market_biases)
     write(OUT_ANGLES, angles)
     write(OUT_RARE, rare)
     write(OUT_TIMING, timing)
     print(
         "[betting-intel] "
         f"leagues={league['summary']['leagues']} "
+        f"market_biases={market_biases['summary']['markets']} "
+        f"watchlist={market_biases['summary']['watchlist']} "
         f"angles={angles['summary']['angles']} "
         f"rare={rare['summary']['signals']} "
         f"timing={timing['summary']['events']}"
