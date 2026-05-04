@@ -26,9 +26,16 @@ def audit_markets(errors: list[str]) -> None:
     rows = report.get("markets") or []
     summary = report.get("summary") or {}
     n_values = {int(r.get("n") or 0) for r in rows}
+    signatures = {str(r.get("sample_signature") or "") for r in rows}
     priced_rows = int(summary.get("market_priced_rows") or 0)
     if len(rows) > 3 and len(n_values) == 1:
         fail(errors, "market rows still share one sample size; expected priced per-market samples")
+    if len(rows) > 3 and len(signatures) == 1:
+        fail(errors, "market rows share one sample signature; expected independent per-market samples")
+    if summary.get("market_clone_guard") not in {"passed", "watch"}:
+        fail(errors, "market clone guard missing")
+    if len(rows) > 3 and summary.get("market_clone_guard") != "passed":
+        fail(errors, f"market clone guard did not pass: {summary.get('market_sample_warning')}")
     if len(rows) > 1 and len(n_values) == 1 and priced_rows == 0:
         if summary.get("market_sample_warning") != "all_market_rows_share_same_n_without_odds":
             fail(errors, "market rows share one n but warning is missing")

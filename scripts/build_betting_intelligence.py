@@ -375,6 +375,25 @@ def _num(value: Any, default: float | None = None) -> float | None:
     return default
 
 
+def _market_sample_signature(stats: dict[str, Any]) -> str:
+    """Stable fingerprint for one market row's real evaluated sample.
+
+    This is intentionally human-readable: if a future regression accidentally
+    reuses one slice for every market, the audit can catch cloned rows even
+    when status labels stay conservative.
+    """
+    fields = (
+        int(stats.get("n") or 0),
+        int(stats.get("wins") or 0),
+        int(stats.get("losses") or 0),
+        int(stats.get("voids") or 0),
+        int(stats.get("with_odds") or 0),
+        round(float(stats.get("roi") or 0), 4),
+        round(float(stats.get("avg_odd") or 0), 4),
+    )
+    return "n={}:w={}:l={}:v={}:odds={}:roi={}:odd={}".format(*fields)
+
+
 def market_status(
     n: int,
     wr: float,
@@ -466,6 +485,7 @@ def build_market_biases(data: dict[str, Any]) -> dict[str, Any]:
         )
         sample_scope = "priced_market_sample" if with_odds > 0 else "directional_settled_match_sample"
         confidence = "priced" if with_odds >= 20 else "priced_watch" if with_odds > 0 else "directional_watch"
+        sample_signature = _market_sample_signature(stats)
         market_rows.append({
             "market_key": key,
             "family": family,
@@ -485,6 +505,7 @@ def build_market_biases(data: dict[str, Any]) -> dict[str, Any]:
             "wr_ci": [lo, hi],
             "edge_vs_50_pct": round((wr - 0.5) * 100, 2),
             "evidence": evidence,
+            "sample_signature": sample_signature,
         })
 
     league_rows: list[dict[str, Any]] = []
@@ -579,7 +600,13 @@ def build_market_biases(data: dict[str, Any]) -> dict[str, Any]:
         ][:20]
 
     market_ns = {row["n"] for row in market_rows}
+    market_signatures = {row.get("sample_signature") for row in market_rows}
     market_priced = sum(1 for row in market_rows if (row.get("with_odds") or 0) > 0)
+    market_sample_warning = None
+    if len(market_rows) > 1 and len(market_signatures) == 1:
+        market_sample_warning = "all_market_rows_share_same_sample_signature"
+    elif len(market_rows) > 1 and len(market_ns) == 1 and market_priced == 0:
+        market_sample_warning = "all_market_rows_share_same_n_without_odds"
 
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -592,11 +619,10 @@ def build_market_biases(data: dict[str, Any]) -> dict[str, Any]:
             "market_low_value": sum(1 for row in market_rows if row["status"] == "low_value"),
             "market_priced_rows": market_priced,
             "market_sample_scope": "priced" if market_priced else "directional_only",
-            "market_sample_warning": (
-                "all_market_rows_share_same_n_without_odds"
-                if len(market_rows) > 1 and len(market_ns) == 1 and market_priced == 0
-                else None
-            ),
+            "market_sample_warning": market_sample_warning,
+            "market_sample_n_values": sorted(market_ns),
+            "market_sample_signature_values": len(market_signatures),
+            "market_clone_guard": "passed" if not market_sample_warning else "watch",
             "league_rows": len(league_rows),
             "league_exploit": sum(1 for row in league_rows if row["status"] == "exploit"),
             "league_avoid": sum(1 for row in league_rows if str(row["status"]).startswith("avoid")),
