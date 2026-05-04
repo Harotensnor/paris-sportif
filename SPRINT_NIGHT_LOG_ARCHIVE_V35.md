@@ -2186,3 +2186,10 @@ Archived from SPRINT_NIGHT_LOG.md on 2026-05-04 to keep the active log readable.
 - Impact mesure: lineups/starter_signals 32 -> 79 events, avec baseball 32 pitchers et hockey 15 goalies; blessures 192, H2H 158, xG 88, Winamax exact 342/342.
 - Verif: py_compile patch_all_quick/measure OK; patch_all_quick/build_lineups_multisport/measure_night_metrics/build_health/finalize_inline OK; data_lite hash recalc 54c58ca9; cache/footer bumpes v35.333.
 
+
+## Sprint v35.334 — AUTO 10/10 Aliases signaux foot (16:51 UTC)
+- Avant: `patch_all_quick.py` avait une petite table locale d'aliases alors que `winamax_map.py` connaissait deja beaucoup de variantes FR/EN; les signaux pouvaient rester dormants sur Bayern/Heidenheim, Atletico, Ajax/PSV, MLS/Liga MX.
+- Apres: le patch rapide importe les aliases Winamax et ajoute des variantes Allemagne/UEFA/Portugal/Pays-Bas/Belgique/MLS/Liga MX/Argentine pour partager le meme vocabulaire entre cotes et signaux.
+- Impact mesure: couverture immediate stable sur le snapshot courant (starter_signals 79, injuries 192, referee 24), mais le prochain refresh peut matcher les nouvelles variantes sans nouveau code.
+- Verif: py_compile OK; patch_all_quick/build_lineups_multisport/measure_night_metrics/build_health/finalize_inline OK; data_lite hash recalc 1d0cfa8b; cache/footer bumpes v35.334.
+
