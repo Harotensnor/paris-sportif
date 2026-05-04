@@ -307,3 +307,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix: `today` est maintenant toujours la date locale courante; `active_data_day` expose separement le bucket data reellement utilise, avec `data_day_is_current`.
 - Garde-fou: `test_mcp_smoke.py` injecte un dataset stale volontaire et refuse toute fuite de date ancienne; copie MCP historique synchronisee et auditee.
 - Pipeline: `auto_refresh.py` et `refresh.yml` lancent sync/audit/smoke MCP pour eviter une nouvelle divergence desktop; cache/footer bumpes v35.403.
+
+## Sprint v35.404 — AUTO 10/10 Biais marches anti-clone (01:02 UTC)
+- Credibilite: `market_biases_by_league.json` expose maintenant une empreinte d'echantillon par marche pour prouver que chaque ligne vient de son propre sample.
+- Fix: ajout `sample_signature`, `market_sample_n_values`, `market_sample_signature_values` et `market_clone_guard` dans le sidecar.
+- Garde-fou: `audit_intelligence_consistency.py` refuse les lignes marche qui partagent une meme signature ou un clone non documente.
+- Mesure: clone guard `passed`, 10 signatures distinctes pour 10 marches, `n` reels [7,8]; build_betting_intelligence + audit OK; cache/footer bumpes v35.404.
