@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-05-04T00:27:23Z",
+  "generated_at": "2026-05-04T00:33:08Z",
   "data_age_min": 0,
   "sources": {
     "winamax_catalog": {
-      "age_min": 1,
+      "age_min": 2,
       "tournaments": 101,
       "matches": 643
     },
@@ -22,15 +22,15 @@
       "events": 47
     },
     "team_stats": {
-      "age_min": 2,
-      "teams": 318
+      "age_min": 0,
+      "teams": 317
     },
     "clubelo": {
       "age_min": 2,
       "clubs": 630
     },
     "weather": {
-      "age_min": 0,
+      "age_min": 2,
       "events": 1045
     },
     "referees_soccer": {
@@ -38,13 +38,13 @@
       "events": 101
     },
     "xg_team_stats": {
-      "age_min": 1,
+      "age_min": 2,
       "teams": 112,
       "leagues": 6,
       "source": "understat"
     },
     "fbref_xg": {
-      "age_min": 1,
+      "age_min": 2,
       "teams": 112,
       "leagues": 6,
       "source": "understat_compat"
@@ -252,7 +252,7 @@
     "winamax_catalog": {
       "script": "scripts/fetch_winamax_catalog.py",
       "output": "winamax_catalog.json",
-      "age_min": 1,
+      "age_min": 2,
       "threshold_min": 15,
       "fast_red_min": 30,
       "status": "ok"
@@ -284,7 +284,7 @@
     "team_stats": {
       "script": "scripts/fetch_team_stats.py",
       "output": "team_stats.json",
-      "age_min": 2,
+      "age_min": 0,
       "threshold_min": 300,
       "fast_red_min": null,
       "status": "ok"
@@ -300,7 +300,7 @@
     "weather": {
       "script": "scripts/fetch_weather.py",
       "output": "weather.json",
-      "age_min": 0,
+      "age_min": 2,
       "threshold_min": 60,
       "fast_red_min": 30,
       "status": "ok"
@@ -316,7 +316,7 @@
     "xg_team_stats": {
       "script": "scripts/fetch_understat_xg.py",
       "output": "xg_team_stats.json",
-      "age_min": 1,
+      "age_min": 2,
       "threshold_min": 360,
       "fast_red_min": null,
       "status": "ok"
@@ -324,7 +324,7 @@
     "fbref_xg": {
       "script": "scripts/fetch_understat_xg.py",
       "output": "fbref_xg.json",
-      "age_min": 1,
+      "age_min": 2,
       "threshold_min": 360,
       "fast_red_min": null,
       "status": "ok"
