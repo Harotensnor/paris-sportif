@@ -15511,6 +15511,43 @@
         }
         return null;
       };
+      const v37NormSideText = (value) => String(value || '')
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase().replace(/[^a-z0-9]+/g, '');
+      const v37TeamForSide = (m, side) => {
+        try {
+          const sides = getSides(m);
+          const t = side === 'away' || side === '2' ? sides.away : side === 'home' || side === '1' ? sides.home : null;
+          return t?.short || t?.displayName || t?.name || '';
+        } catch(e) { return ''; }
+      };
+      const v37PickSide = (pick) => {
+        const raw = String(pick?.pickKey ?? pick?.key ?? pick?.side ?? pick?.pick ?? pick?.label ?? '').trim().toLowerCase();
+        if (/^(1|home|domicile)$/.test(raw) || /\bdomicile\b/.test(raw)) return 'home';
+        if (/^(2|away|exterieur|extérieur)$/.test(raw) || /\bexterieur\b|\bextérieur\b/.test(raw)) return 'away';
+        return '';
+      };
+      const v37PickRelationToTeam = (m, pick, team, side) => {
+        const target = v37NormSideText(team || v37TeamForSide(m, side));
+        if (!target) return '';
+        const pickSide = v37PickSide(pick);
+        const pickTeam = v37NormSideText(v37TeamForSide(m, pickSide));
+        if (pickTeam && pickTeam === target) return 'backs';
+        const otherSide = side === 'home' || side === '1' ? 'away' : side === 'away' || side === '2' ? 'home' : '';
+        const otherTeam = v37NormSideText(v37TeamForSide(m, otherSide));
+        if (pickTeam && otherTeam && otherTeam !== target && pickTeam === otherTeam) return 'opposes';
+        const label = v37NormSideText(`${pick?.displayLabel || ''} ${pick?.label || ''} ${pick?.marketLabel || ''}`);
+        if (label && target && label.includes(target)) return 'backs';
+        return '';
+      };
+      const v37PickTotalDirection = (pick) => {
+        const raw = String(pick?.side ?? pick?.pickKey ?? pick?.key ?? pick?.pick ?? pick?.label ?? '').toLowerCase();
+        if (/under|moins|^u\d|^u\b/.test(raw)) return 'under';
+        if (/over|plus|^o\d|^o\b/.test(raw)) return 'over';
+        if (/btts.*non|au moins une.*ne marque|both.*no/i.test(String(pick?.label || ''))) return 'under';
+        if (/btts.*oui|deux equipes.*marquent|both.*yes/i.test(String(pick?.label || ''))) return 'over';
+        return '';
+      };
       const v37OpportunityFor = (m, tier, rel, edge, ev, odd, pick) => {
         const id = String(m?.id || '');
         const league = v37LeagueByCode.get(String(m?.league_code || '')) || null;
@@ -15541,10 +15578,32 @@
         if (marketMove?.direction === 'steam') { score += 7; badges.push('steam cote'); }
         else if (marketMove?.direction === 'drift') { score -= 5; badges.push('drift cote'); }
         const injuryAngle = angles.find(a => a?.type === 'injury_imbalance');
-        if (injuryAngle) { score += injuryAngle.direction === 'fade' ? -2 : 4; badges.push('blessures'); }
-        if (angles.some(a => a?.type === 'schedule_congestion')) { score -= 3; badges.push('fatigue'); }
-        if (angles.some(a => a?.type === 'lookahead')) { score -= 2; badges.push('lookahead'); }
-        if (rareSignals.length) { score += Math.min(12, 6 + rareSignals.length * 2); badges.push('signal rare'); }
+        if (injuryAngle) badges.push('blessures');
+        if (angles.some(a => a?.type === 'schedule_congestion')) badges.push('fatigue');
+        if (angles.some(a => a?.type === 'lookahead')) badges.push('lookahead');
+        let rareDirectional = 0;
+        const directionalAngles = angles.filter(a => ['injury_imbalance', 'travel_extreme', 'back_to_back_travel', 'schedule_congestion', 'lookahead'].includes(String(a?.type || '')));
+        directionalAngles.forEach(a => {
+          const relation = v37PickRelationToTeam(m, pick, a.team, a.side);
+          const strength = Math.max(0.2, Math.min(1, Number(a.strength || 0.5)));
+          if (relation === 'backs') {
+            rareDirectional -= (a.type === 'travel_extreme' || a.type === 'back_to_back_travel') ? 7 * strength : 5 * strength;
+          } else if (relation === 'opposes') {
+            rareDirectional += (a.type === 'lookahead') ? 1.5 * strength : 4 * strength;
+          }
+        });
+        const weatherAngle = angles.find(a => a?.type === 'weather_extreme');
+        if (weatherAngle) {
+          const totalDir = v37PickTotalDirection(pick);
+          if (weatherAngle.direction === 'under_goals' && totalDir === 'under') rareDirectional += 5;
+          else if (weatherAngle.direction === 'under_goals' && totalDir === 'over') rareDirectional -= 5;
+        }
+        if (rareDirectional) {
+          score += rareDirectional;
+          badges.push(rareDirectional > 0 ? 'signal rare +' : 'signal rare -');
+        } else if (rareSignals.length) {
+          badges.push('signal rare');
+        }
         if (timing?.advice === 'wait_lineups') { score -= 7; badges.push('attendre compos'); }
         else if (timing?.advice === 'price_shortening') { score += 5; badges.push('timing cote'); }
         const dataBonus = [
