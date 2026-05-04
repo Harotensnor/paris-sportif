@@ -308,6 +308,47 @@ def _find_soccer_pair_entry(
     return None
 
 
+def _league_referee_priors(events_idx: dict[str, dict]) -> dict[str, dict]:
+    buckets: dict[str, dict] = {}
+    for entry in events_idx.values():
+        league = entry.get('league_code')
+        ref = entry.get('referee') or {}
+        if not league or not ref.get('name'):
+            continue
+        yellow = ref.get('yellowPerGame')
+        cards = ref.get('cardsPerGame') or yellow
+        if yellow is None and cards is None:
+            continue
+        bucket = buckets.setdefault(league, {
+            'count': 0,
+            'yellow_sum': 0.0,
+            'red_sum': 0.0,
+            'cards_sum': 0.0,
+            'games_sum': 0,
+        })
+        bucket['count'] += 1
+        bucket['yellow_sum'] += float(yellow or cards or 0)
+        bucket['red_sum'] += float(ref.get('redPerGame') or 0)
+        bucket['cards_sum'] += float(cards or yellow or 0)
+        bucket['games_sum'] += int(ref.get('games') or 0)
+    priors: dict[str, dict] = {}
+    for league, bucket in buckets.items():
+        count = int(bucket['count'])
+        if count < 2:
+            continue
+        priors[league] = {
+            'assignmentConfirmed': False,
+            'source': 'league_referee_average',
+            'league_code': league,
+            'sampleSize': count,
+            'yellowPerGame': round(bucket['yellow_sum'] / count, 2),
+            'redPerGame': round(bucket['red_sum'] / count, 3),
+            'cardsPerGame': round(bucket['cards_sum'] / count, 2),
+            'games': int(bucket['games_sum']),
+        }
+    return priors
+
+
 def _lineup_payload(side: dict | None) -> dict:
     side = side or {}
     return {
@@ -394,21 +435,27 @@ def patch_referees(data: dict) -> int:
     events_idx = refs.get('events') or {}
     if not events_idx:
         return 0
+    league_priors = _league_referee_priors(events_idx)
     n = 0
     for evs in (data.get('days') or {}).values():
         for ev in (evs or []):
-            if ev.get('sport') != 'football' or ev.get('league_code') not in SOCCER_SIGNAL_LEAGUES:
+            league_code = ev.get('league_code') or ''
+            if ev.get('sport') != 'football' or league_code not in SOCCER_SIGNAL_LEAGUES:
                 continue
             home_name, away_name = _event_sides(ev)
             if not (home_name and away_name):
                 continue
             entry = _find_soccer_pair_entry(
                 events_idx,
-                ev.get('league_code') or '',
+                league_code,
                 home_name,
                 away_name,
             )
             if not entry:
+                prior = league_priors.get(league_code)
+                if prior:
+                    ev['referee_context'] = dict(prior)
+                    n += 1
                 continue
             ref = entry.get('referee') or {}
             if not ref.get('name'):
@@ -424,6 +471,7 @@ def patch_referees(data: dict) -> int:
                 'sofa_event_id': entry.get('sofa_event_id') or '',
                 'source': 'sofascore',
             }
+            ev.pop('referee_context', None)
             n += 1
     return n
 
