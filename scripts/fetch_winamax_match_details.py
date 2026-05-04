@@ -42,18 +42,20 @@ MARKETS = ROOT / 'winamax_markets.json'
 DATA_JS = ROOT / 'data.js'
 
 CACHE_TTL_HOURS = float(os.environ.get('WINAMAX_DETAILS_TTL_HOURS', '1'))
-GLOBAL_CAP = int(os.environ.get('WINAMAX_DETAILS_CAP', '260'))
-SLEEP_SECONDS = float(os.environ.get('WINAMAX_DETAILS_SLEEP', '0.25'))
+GLOBAL_CAP = int(os.environ.get('WINAMAX_DETAILS_CAP', '420'))
+SLEEP_SECONDS = float(os.environ.get('WINAMAX_DETAILS_SLEEP', '0.18'))
+HORIZON_DAYS = int(os.environ.get('WINAMAX_DETAILS_HORIZON_DAYS', '10'))
 DEBUG = False
 
 SPORT_QUOTAS = {
-    'football': 150,
-    'tennis': 55,
-    'basketball': 45,
-    'baseball': 35,
-    'hockey': 30,
-    'mma': 15,
-    'americanfootball': 10,
+    'football': 260,
+    'tennis': 80,
+    'basketball': 70,
+    'baseball': 60,
+    'hockey': 45,
+    'mma': 20,
+    'americanfootball': 15,
+    'unknown': 260,
 }
 
 SPORT_PRIORITY = {
@@ -64,7 +66,24 @@ SPORT_PRIORITY = {
     'hockey': 4,
     'mma': 5,
     'americanfootball': 6,
+    'unknown': 7,
 }
+
+
+def _has_detailed_markets(entry: dict) -> bool:
+    odds = (entry or {}).get('odds') or {}
+    return len(odds) > 1
+
+
+def _details_coverage(matches_dict: dict) -> dict:
+    total = len(matches_dict or {})
+    detailed = sum(1 for entry in (matches_dict or {}).values() if _has_detailed_markets(entry))
+    return {
+        'total_matches': total,
+        'matches_detailed': detailed,
+        'thin_matches': max(0, total - detailed),
+        'ratio_pct': round(100 * detailed / total, 1) if total else 0.0,
+    }
 
 
 def _fetch_state(url: str) -> dict | None:
@@ -410,7 +429,7 @@ def _select_priority_matches(existing_markets: dict, data_js_data: dict) -> list
     now_utc = datetime.now(timezone.utc)
     cutoff = now_utc - timedelta(hours=CACHE_TTL_HOURS)
     hot_horizon = now_utc + timedelta(hours=72)
-    horizon = now_utc + timedelta(days=7)
+    horizon = now_utc + timedelta(days=HORIZON_DAYS)
 
     quotas = dict(SPORT_QUOTAS)
     candidates = []
@@ -430,11 +449,12 @@ def _select_priority_matches(existing_markets: dict, data_js_data: dict) -> list
             # Récupère la dernière fetch (pour skip)
             existing_entry = (existing_markets.get(str(mid)) or {})
             existing_odds = existing_entry.get('odds') or {}
+            has_details = _has_detailed_markets(existing_entry)
             details_at = existing_entry.get('details_fetched_at')
             if details_at:
                 try:
                     last = datetime.fromisoformat(str(details_at).replace('Z', '+00:00'))
-                    if last > cutoff: continue  # déjà fresh
+                    if has_details and last > cutoff: continue  # déjà fresh
                 except Exception:
                     pass
             n_markets = len(existing_odds)
@@ -442,6 +462,7 @@ def _select_priority_matches(existing_markets: dict, data_js_data: dict) -> list
             candidates.append((str(mid), {
                 'sport': sport,
                 'n_markets': n_markets,
+                'thin': 0 if has_details else 1,
                 'start': start,
                 'hot': hot,
                 'mode': 'exact',
@@ -454,7 +475,29 @@ def _select_priority_matches(existing_markets: dict, data_js_data: dict) -> list
             continue
         seen.add(mid)
         uniq.append((mid, meta))
+    # Fallback catalog: winamax_markets.json can contain bookable matches not
+    # currently present in data.js (league gaps, late catalog entries, future
+    # matches). They still deserve detail scraping, otherwise the detailed
+    # ratio stays artificially stuck around the data.js horizon.
+    fallback_start = horizon + timedelta(days=1)
+    for mid, existing_entry in (existing_markets or {}).items():
+        mid = str(mid)
+        if mid in seen or _has_detailed_markets(existing_entry):
+            continue
+        odds = (existing_entry or {}).get('odds') or {}
+        if not odds.get('1n2'):
+            continue
+        seen.add(mid)
+        uniq.append((mid, {
+            'sport': 'unknown',
+            'n_markets': len(odds),
+            'thin': 1,
+            'start': fallback_start,
+            'hot': 2,
+            'mode': 'catalog_fallback',
+        }))
     uniq.sort(key=lambda x: (
+        -x[1]['thin'],
         x[1]['hot'],
         SPORT_PRIORITY.get(x[1]['sport'], 99),
         x[1]['n_markets'],
@@ -477,16 +520,18 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument('--limit', type=int, default=GLOBAL_CAP, help='Maximum matches to scrape this run.')
     parser.add_argument('--ttl-hours', type=float, default=CACHE_TTL_HOURS, help='Fresh-cache TTL before re-scraping a match.')
     parser.add_argument('--sleep', type=float, default=SLEEP_SECONDS, help='Delay between match page requests.')
+    parser.add_argument('--horizon-days', type=int, default=HORIZON_DAYS, help='Upcoming horizon to consider.')
     parser.add_argument('--debug', action='store_true', help='Print per-match extraction diagnostics.')
     return parser.parse_args()
 
 
 def main() -> int:
-    global CACHE_TTL_HOURS, GLOBAL_CAP, SLEEP_SECONDS, DEBUG
+    global CACHE_TTL_HOURS, GLOBAL_CAP, SLEEP_SECONDS, HORIZON_DAYS, DEBUG
     args = _parse_args()
     CACHE_TTL_HOURS = args.ttl_hours
     GLOBAL_CAP = max(1, args.limit)
     SLEEP_SECONDS = max(0.0, args.sleep)
+    HORIZON_DAYS = max(1, args.horizon_days)
     DEBUG = bool(args.debug)
 
     if not MARKETS.exists():
@@ -498,6 +543,7 @@ def main() -> int:
 
     existing = json.loads(MARKETS.read_text(encoding='utf-8'))
     matches_dict = existing.get('matches') or {}
+    before_coverage = _details_coverage(matches_dict)
 
     # Charge data.js pour identifier les matches prioritaires
     text = DATA_JS.read_text(encoding='utf-8')
@@ -509,7 +555,8 @@ def main() -> int:
 
     targets = _select_priority_matches(matches_dict, data)
     print(f'[fetch_winamax_match_details] {len(targets)} matches to scrape '
-          f'(limit={GLOBAL_CAP}, ttl={CACHE_TTL_HOURS:g}h)')
+          f'(limit={GLOBAL_CAP}, ttl={CACHE_TTL_HOURS:g}h, horizon={HORIZON_DAYS}d, '
+          f'before={before_coverage["matches_detailed"]}/{before_coverage["total_matches"]})')
 
     t0 = time.time()
     n_enriched = 0
@@ -553,6 +600,18 @@ def main() -> int:
 
     existing['matches'] = matches_dict
     existing['generated_at'] = datetime.now(timezone.utc).isoformat()
+    after_coverage = _details_coverage(matches_dict)
+    existing['details_coverage'] = {
+        **after_coverage,
+        'before_matches_detailed': before_coverage['matches_detailed'],
+        'delta_matches_detailed': after_coverage['matches_detailed'] - before_coverage['matches_detailed'],
+        'last_run_enriched': n_enriched,
+        'last_run_failed': n_failed,
+        'last_run_limit': GLOBAL_CAP,
+        'last_run_horizon_days': HORIZON_DAYS,
+        'last_run_elapsed_sec': round(elapsed, 1),
+        'calculated_at': datetime.now(timezone.utc).isoformat(),
+    }
     MARKETS.write_text(
         json.dumps(existing, ensure_ascii=False, separators=(',', ':')),
         encoding='utf-8'
