@@ -2237,3 +2237,9 @@
 - Apres: le dashboard charge `market_biases_by_league.json`, applique un bonus/malus au score opportunite selon le marche exact du pick et ajoute un bloc rail "Biais par marche".
 - Impact produit: les picks alignes avec un biais historique (ex: double chance ou under 3,5) remontent; les marches a fade sont etiquetes et penalises sans cacher la couverture.
 - Verif: app.js --check OK; hashes app.js/app.css recalcules; cache/footer bumpes v35.343.
+
+## Sprint v35.344 — AUTO 10/10 Aliases sources Portugal/NL (18:05 UTC)
+- Avant: certains matchs avaient des sources publiques presentes mais non rattachees, ex. Sporting CP - Vitoria pointait `guimaraes` pendant que Sofascore publiait `vitoriasc`.
+- Apres: `patch_all_quick.py` normalise Vitoria SC, AVS, FC Porto, Arouca, Nacional, Estrela et Heerenveen vers les cles reelles des sidecars sources.
+- Impact mesure: referee visible +1 event dans `data.js`; Sporting CP - Vitoria descend de priorite 109 a 93 car l'arbitre n'est plus marque manquant; data_lite regenere.
+- Verif: py_compile patch_all_quick OK; patch_all_quick/build_lineups_multisport/measure_night_metrics/build_signal_gap_report/build_health/finalize_inline OK; cache/footer bumpes v35.344.

@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-04T17:19:14.005686+00:00",
-  "data_generated_at": "2026-05-04T17:17:00Z",
+  "generated_at": "2026-05-04T17:32:33.643857+00:00",
+  "data_generated_at": "2026-05-04T17:27:41Z",
   "events": 342,
   "upcoming": 289,
   "coverage": {
@@ -8,7 +8,7 @@
     "upcoming": 289,
     "starter_signals": 78,
     "injuries": 192,
-    "referee": 24,
+    "referee": 25,
     "h2h": 168,
     "xg": 88,
     "weather": 238,
@@ -17,7 +17,7 @@
     "ratios": {
       "starter_signals": 0.2281,
       "injuries": 0.5614,
-      "referee": 0.0702,
+      "referee": 0.0731,
       "h2h": 0.4912,
       "xg": 0.2573,
       "weather": 0.6959,
@@ -75,7 +75,7 @@
       "upcoming": 217,
       "starter_signals": 31,
       "injuries": 114,
-      "referee": 24,
+      "referee": 25,
       "h2h": 125,
       "xg": 88,
       "weather": 238,
@@ -84,7 +84,7 @@
       "ratios": {
         "starter_signals": 0.1188,
         "injuries": 0.4368,
-        "referee": 0.092,
+        "referee": 0.0958,
         "h2h": 0.4789,
         "xg": 0.3372,
         "weather": 0.9119,
@@ -368,7 +368,7 @@
         "upcoming": 10,
         "starter_signals": 0,
         "injuries": 4,
-        "referee": 0,
+        "referee": 1,
         "h2h": 1,
         "xg": 0,
         "weather": 9,
@@ -377,7 +377,7 @@
         "ratios": {
           "starter_signals": 0.0,
           "injuries": 0.4,
-          "referee": 0.0,
+          "referee": 0.1,
           "h2h": 0.1,
           "xg": 0.0,
           "weather": 0.9,
@@ -1172,28 +1172,6 @@
   ],
   "priority_gaps": [
     {
-      "event_id": "750530",
-      "sport": "football",
-      "league_code": "por.1",
-      "league_name": "Primeira Liga",
-      "kickoff": "2026-05-04T19:15Z",
-      "match": "Sporting CP - Vitória de Guimaraes",
-      "home_key": "sportingcp",
-      "away_key": "vitoriadeguimaraes",
-      "missing": [
-        "injuries",
-        "referee",
-        "starter_signals",
-        "xg"
-      ],
-      "present": [
-        "clubelo",
-        "h2h",
-        "weather"
-      ],
-      "priority": 109
-    },
-    {
       "event_id": "762895",
       "sport": "football",
       "league_code": "arg.1",
@@ -1212,6 +1190,28 @@
         "weather"
       ],
       "priority": 101
+    },
+    {
+      "event_id": "750530",
+      "sport": "football",
+      "league_code": "por.1",
+      "league_name": "Primeira Liga",
+      "kickoff": "2026-05-04T19:15Z",
+      "match": "Sporting CP - Vitória de Guimaraes",
+      "home_key": "sportingcp",
+      "away_key": "vitoriadeguimaraes",
+      "missing": [
+        "injuries",
+        "starter_signals",
+        "xg"
+      ],
+      "present": [
+        "clubelo",
+        "h2h",
+        "referee",
+        "weather"
+      ],
+      "priority": 93
     },
     {
       "event_id": "762903",
@@ -2835,8 +2835,8 @@
     "fra.2\tRed Star FC 93\tMontpellier",
     "ger.2\t1. FC Nürnberg\tSchalke 04",
     "usa.1\tChicago Fire FC\tRed Bull New York",
-    "sco.1\tMotherwell\tHeart of Midlothian",
     "esp.2\tMálaga\tSporting Gijón",
+    "sco.1\tMotherwell\tHeart of Midlothian",
     "usa.1\tCF Montréal\tOrlando City SC",
     "usa.1\tAtlanta United FC\tLA Galaxy",
     "usa.1\tCharlotte FC\tFC Cincinnati",
@@ -2858,8 +2858,8 @@
     "por.1\tTondela\tMoreirense",
     "por.1\tVitória de Guimaraes\tCasa Pia",
     "usa.1\tNew York City FC\tColumbus Crew",
-    "usa.1\tMinnesota United FC\tAustin FC",
     "mex.1\tPachuca\tToluca",
+    "usa.1\tMinnesota United FC\tAustin FC",
     "mex.1\tPumas UNAM\tAmérica",
     "ita.1\tPisa\tLecce",
     "eng.1\tLeeds United\tBurnley"
@@ -2878,7 +2878,7 @@
     "injuries_multisport": {
       "exists": true,
       "size": 52510,
-      "mtime": "2026-05-04T17:18:51.341808+00:00"
+      "mtime": "2026-05-04T17:28:44.472076+00:00"
     },
     "referees_soccer": {
       "exists": true,
@@ -2888,7 +2888,7 @@
     "fbref_xg": {
       "exists": true,
       "size": 60742,
-      "mtime": "2026-05-04T17:18:51.318287+00:00"
+      "mtime": "2026-05-04T17:28:44.458058+00:00"
     },
     "clubelo": {
       "exists": true,
@@ -2897,8 +2897,8 @@
     },
     "weather": {
       "exists": true,
-      "size": 339565,
-      "mtime": "2026-05-04T17:18:51.381883+00:00"
+      "size": 339562,
+      "mtime": "2026-05-04T17:28:44.492610+00:00"
     },
     "mlb_pitchers": {
       "exists": true,
