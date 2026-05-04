@@ -21,7 +21,14 @@ from datetime import datetime, timezone, timedelta
 ROOT = Path(__file__).resolve().parent.parent
 DATA_PATH = ROOT / 'data.js'
 H2H_OUT = ROOT / 'h2h_extended.json'
-V36_PRIORITY_LEAGUES = {'usa.1', 'mex.1', 'arg.1', 'ger.1', 'ger.2'}
+V36_PRIORITY_LEAGUES = {
+    # Coverage recovery: these leagues often have empty cached H2H blocks even
+    # when ESPN summary exposes meetings a few hours later. Keep the set broad
+    # enough for the major matches Theo actually sees on the dashboard.
+    'eng.1', 'esp.1', 'ita.1', 'fra.1', 'ger.1', 'ger.2',
+    'por.1', 'ned.1', 'bel.1', 'sco.1', 'aut.1',
+    'usa.1', 'mex.1', 'arg.1',
+}
 EMPTY_PRIORITY_REFRESH_H = 2
 
 # ESPN summary endpoint — same slug path as fetch_v3 uses
