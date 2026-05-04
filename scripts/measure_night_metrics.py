@@ -100,6 +100,19 @@ def _detail_market_keys(markets: dict | list | None) -> list[str]:
     return []
 
 
+def _is_winamax_exact(ev: dict) -> bool:
+    wnx = ev.get("winamax") or {}
+    markets = wnx.get("markets") or {}
+    one = markets.get("1n2") if isinstance(markets, dict) else {}
+    return bool(
+        wnx.get("available") is True
+        and wnx.get("match_id")
+        and isinstance(one, dict)
+        and isinstance(one.get("home"), (int, float))
+        and isinstance(one.get("away"), (int, float))
+    )
+
+
 def main() -> int:
     data = _load_data()
     events = _events(data)
@@ -110,7 +123,7 @@ def main() -> int:
     if not isinstance(wm_matches, dict):
         wm_matches = {}
 
-    exact = sum(1 for ev in events if (ev.get("winamax") or {}).get("match_id"))
+    exact = sum(1 for ev in events if _is_winamax_exact(ev))
     available = sum(1 for ev in events if (ev.get("winamax") or {}).get("available") is True)
     detailed_market_matches = sum(
         1 for v in wm_matches.values()
@@ -137,8 +150,13 @@ def main() -> int:
         row["families"] = dict(sorted(row["families"].items(), key=lambda kv: kv[1], reverse=True)[:12])
     detailed_ratio_vs_exact = round(detailed_market_matches / exact, 4) if exact else 0
 
+    calculated_at = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
     metrics = {
-        "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z"),
+        "generated_at": calculated_at,
+        "calculated_at": calculated_at,
+        "source_of_truth": "data.js",
+        "data_generated_at": data.get("generated_at"),
+        "data_today_field": data.get("today"),
         "events": {
             "total": len(events),
             "upcoming": sum(1 for ev in events if not ev.get("completed")),

@@ -2350,3 +2350,9 @@
 - Fix: la modal lit les angles V37 du match et ajoute des lignes "Signaux POUR" / "Signaux CONTRE", incluant conflit, marche incertain, fade/drift et meteo selon le pari clique.
 - Impact produit: un pari avec signaux mitigés expose maintenant ce qui soutient et ce qui affaiblit le pick.
 - Verif: app.js syntax OK; cache/footer bumpes v35.362.
+
+## Sprint v35.363 — AUTO 10/10 Data sync source unique (19:36 UTC)
+- Bug technique: MCP, health et night_metrics pouvaient afficher des compteurs differents sans dire quelle source croire.
+- Fix: `get_pipeline_status` expose `source_of_truth=data.js`, `data_truth`, `calculated_at` et `sync_check`; night_metrics/health declarent aussi leur source et utilisent la meme definition Winamax exact (match_id + 1n2).
+- Impact mesure: MCP today=2026-05-04, sync_check=ok, lineups/night=121 et winamax_exact truth/night=310.
+- Verif: py_compile build_health/measure/MCP OK; test_mcp_smoke OK; cache/footer bumpes v35.363.

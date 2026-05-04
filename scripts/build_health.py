@@ -578,6 +578,8 @@ def main() -> int:
     now = datetime.now(timezone.utc)
     out: dict = {
         'generated_at': now.strftime('%Y-%m-%dT%H:%M:%SZ'),
+        'calculated_at': now.strftime('%Y-%m-%dT%H:%M:%SZ'),
+        'source_of_truth': 'data.js',
         'data_age_min': _age_min(ROOT / 'data.js'),
         'sources': {},
         'pipeline_lag_per_script': {},
