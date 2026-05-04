@@ -2152,3 +2152,8 @@
 - Apres: les cas utilisent `toast()` avec tons warn/info, sans dialogue navigateur bloquant.
 - Impact: parcours export/consentement plus propre et plus testable, aucun prompt/confirm/alert actif hors prompt PWA officiel.
 - Verif: app hash e997f15f, CSP hash recalcule, cache/footer bumpes; syntax + smoke navigateur a suivre avant push.
+## Sprint v35.329 — AUTO 10/10 Pipeline signaux foot visibles (16:24 UTC)
+- Avant: `patch_all_quick.py` voyait `injuries_soccer.json`, `lineups_soccer.json` et `referees_soccer.json`, mais n'injectait pas les blessures foot et matchait compos/arbitres trop strictement/top-5 only.
+- Apres: le mega-patcher couvre top-5, D2, UEFA, MLS/LATAM, alias Roma/Manchester/PSG, matching paire home-away robuste, et attache blessures Sofascore avec flags known/severe/source.
+- Impact mesure a blanc: blessures foot 0 -> 114 events connus (92 upcoming), arbitres 3 -> 24, lineups 11 -> 32; ces signaux deviennent exploitables par le modele au prochain cron.
+- Verif: py_compile patch_all_quick OK; dry-run in-memory OK; footer/cache bumpes v35.329, app.js?v recale sur e997f15f.
