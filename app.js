@@ -13987,7 +13987,10 @@
         await navigator.clipboard.writeText(url);
         if (typeof toast === 'function') toast('✅ Lien copié dans le presse-papier', 'success');
       } else {
-        try { prompt('Copie ce lien :', url); } catch (e) {}
+        const copied = await _copyToClipboard(url);
+        if (typeof toast === 'function') {
+          toast(copied ? '✅ Lien copié dans le presse-papier' : '⚠️ Copie impossible sur ce navigateur', copied ? 'success' : 'warn');
+        }
       }
     } catch (e) { prodWarn('share failed:', e); }
   });
