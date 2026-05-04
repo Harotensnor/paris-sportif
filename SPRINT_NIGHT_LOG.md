@@ -2,6 +2,11 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
+## Sprint v35.401 — C7 suggestions perso accueil (22:38 UTC)
+- Avant: les apprentissages du profil Theo existaient surtout dans le rail, donc faciles a manquer pendant la lecture de la table.
+- Apres: ajout d'une bande "Pour ton profil" dans le flux principal avec 3 picks recommandes et une raison personnalisee sport/ligue/cote.
+- Impact mesure: l'accueil remonte directement les picks compatibles avec les paris trackes sans cacher la table dense.
+- Verif: Playwright suggestions+CLV OK (4/4), bundle-size OK, syntax JS OK, no-conflict-markers OK; cache/footer bumpes v35.401.
 ## Sprint v35.400 — C6 projecteur bankroll discipline (22:29 UTC)
 - Avant: la page Performance montrait les resultats, mais pas une projection simple 30/90/365 jours pour choisir une strategie de mise.
 - Apres: ajout du Projecteur bankroll 1000EUR avec scenarios Prudente / Equilibree / Agressive, courbes 90j et horizons 30/90/365j.
@@ -290,10 +295,4 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix: creation de `ISSUES_ACTIVE.md` et `ISSUES_RESOLVED.md`; `ISSUES.md` devient un index court avec la seule issue OPEN actuelle.
 - Mesure: fichier principal 32KB -> 1.2KB; active=1 issue, resolved/history=53 blocs.
 - Garde-fou: `scripts/audit_issues_split.py` refuse un FIXED dans l'actif ou un OPEN/PARTIAL dans le resolu; cache/footer bumpes v35.382.
-
-## Sprint v35.383 — AUTO 10/10 Commentaires legacy nettoyes (20:26 UTC)
-- Dette: `app.js` gardait encore des commentaires de chantier v31-v35 obsoletes qui gonflaient le fichier sans aider au debug.
-- Fix: suppression de 26 commentaires ligne-only stale (`PLAN 1000`, `v31.*`, `v33.*`, `v34.*`, `v35.199`, legacy retire/supprime).
-- Garde-fou: `scripts/audit_legacy_comments.py` refuse le retour de ces commentaires legacy ligne-only.
-- Verif: audit_legacy_comments + py_compile + app/sw syntax OK; cache/footer bumpes v35.383.
 

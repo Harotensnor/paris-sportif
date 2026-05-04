@@ -14932,6 +14932,33 @@ return `<footer class="v37-history-footer">
           <button type="button" class="page-btn" data-page="performance">Voir tout l'historique</button>
         </footer>`;
 })();
+const v37PersonalPicksHtml = (() => {
+if (!v37Coach || Number(v37Coach.total || 0) < 10 || !v36Sorted.length) return '';
+const rows = v36Sorted
+.map(p => ({ p, profile: v37ProfileForPick(p.m, p.odd) }))
+.filter(x => x.profile.delta > 0)
+.sort((a, b) => (b.profile.delta - a.profile.delta) || (b.p.opportunity - a.p.opportunity))
+.slice(0, 3);
+const chosen = rows.length ? rows : v36Sorted.slice(0, 3).map(p => ({ p, profile: { delta: 0, notes: [] } }));
+if (!chosen.length) return '';
+const cards = chosen.map(({ p, profile }) => {
+const { home, away } = getSides(p.m);
+const reason = (profile.notes || [])[0] || 'Pick solide du jour en attendant plus de données personnelles.';
+return `<button type="button" class="v37-personal-card" data-big-detail="${esc(String(p.m.id || ''))}" data-pick-uid="${esc(p.pickUid || '')}" style="text-align:left;padding:12px 13px;border:1px solid rgba(167,139,250,.22);border-radius:var(--r-sm);background:linear-gradient(135deg,rgba(167,139,250,.12),rgba(52,211,153,.06));color:var(--text);cursor:pointer;min-width:0;">
+          <span style="display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:11px;color:var(--text-dim);font-weight:800;text-transform:uppercase;letter-spacing:.5px;"><i>${esc(sportLabel(p.m.sport || ''))}</i><b style="color:var(--brand);font-variant-numeric:tabular-nums;">Score ${esc(String(p.opportunity || 0))}</b></span>
+          <strong style="display:block;margin-top:6px;font-size:13px;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(v36TeamName(home))} - ${esc(v36TeamName(away))}</strong>
+          <span style="display:flex;justify-content:space-between;gap:8px;margin-top:7px;font-size:12px;line-height:1.3;"><em style="font-style:normal;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(p.labelMobile || p.label)}</em><b style="color:var(--accent);font-variant-numeric:tabular-nums;">@${p.odd.toFixed(2)}</b></span>
+          <small style="display:block;margin-top:7px;color:var(--text-dim);font-size:11px;line-height:1.35;">${esc(reason)}</small>
+        </button>`;
+}).join('');
+return `<section class="v37-personal-strip" aria-label="Suggestions personnalisées" style="margin:12px 0 14px;padding:14px 16px;border:1px solid rgba(167,139,250,.22);border-radius:var(--r-md);background:rgba(167,139,250,.07);">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
+          <div><div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:.8px;font-weight:900;">Pour ton profil</div><strong style="display:block;margin-top:2px;font-size:17px;color:var(--text);">3 picks recommandés aujourd'hui</strong></div>
+          <span style="font-size:11px;color:var(--text-dim);font-variant-numeric:tabular-nums;">Appris sur ${Number(v37Coach.total || 0)} paris trackés</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:9px;">${cards}</div>
+      </section>`;
+})();
 const v36TableHtml = `<section class="v36-table-panel" aria-label="Tableau dense des propositions">
         ${v37TierLegendHtml}
         ${v37DayNavHtml}
@@ -15270,6 +15297,7 @@ wrap.innerHTML = `
             </div>
           </section>
           ${v37TiltBanner}
+          ${v37PersonalPicksHtml}
           <div class="v36-home-grid">
             ${v36TableHtml}
             <aside class="v36-home-rail" aria-label="Radar temps reel">
