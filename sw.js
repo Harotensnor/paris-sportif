@@ -12,9 +12,9 @@
 // so every deploy invalidates all caches → users see the new pronostics.html
 // without needing Ctrl+Shift+R. Manual edits stay valid for local dev.
 <<<<<<< Updated upstream
-const CACHE_VERSION = 'paris-sportif-20260504-150844';
+const CACHE_VERSION = 'paris-sportif-20260504-151218';
 =======
-const CACHE_VERSION = 'paris-sportif-20260504-150844';
+const CACHE_VERSION = 'paris-sportif-20260504-151218';
 >>>>>>> Stashed changes
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
