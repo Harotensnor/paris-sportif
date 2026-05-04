@@ -2235,3 +2235,10 @@ Archived from SPRINT_NIGHT_LOG.md on 2026-05-04 to keep the active log readable.
 - Verif: py_compile MCP OK, smoke MCP 14/18 OK (4 tools a args requis), cache/footer bumpes v35.340.
 
 
+## Sprint v35.341 — AUTO 10/10 Starter gaps time-aware (17:42 UTC)
+- Avant: `signal_gap_report` classait les compositions/starters manquants comme critiques meme plusieurs jours avant le match, ce qui sur-penalisait des picks encore loin du coup d'envoi.
+- Apres: les `starter_signals` foot deviennent un gap attendu seulement a moins de 36h du kickoff, avec bonus de priorite si le match est a moins de 6h.
+- Impact mesure: top gaps recalcules; starter_signals manquants dans les 80 priorites passent a 25, tout en gardant Sporting CP - Vitoria et les matchs du soir en alerte haute.
+- Verif: build_signal_gap_report + py_compile OK; cache/footer bumpes v35.341.
+
+

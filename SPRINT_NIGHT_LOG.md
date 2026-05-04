@@ -2,11 +2,12 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
-## Sprint v35.341 — AUTO 10/10 Starter gaps time-aware (17:42 UTC)
-- Avant: `signal_gap_report` classait les compositions/starters manquants comme critiques meme plusieurs jours avant le match, ce qui sur-penalisait des picks encore loin du coup d'envoi.
-- Apres: les `starter_signals` foot deviennent un gap attendu seulement a moins de 36h du kickoff, avec bonus de priorite si le match est a moins de 6h.
-- Impact mesure: top gaps recalcules; starter_signals manquants dans les 80 priorites passent a 25, tout en gardant Sporting CP - Vitoria et les matchs du soir en alerte haute.
-- Verif: build_signal_gap_report + py_compile OK; cache/footer bumpes v35.341.
+## Sprint v35.391 — AUTO 10/10 Tooltip score opportunite testable (21:10 UTC)
+- Avant: le score opportunite avait une decomposition dans data-tooltip, mais pas de fallback natif ni de test desktop/mobile garantissant sa visibilite.
+- Apres: score table + card mobile exposent title et aria-label; nouveau test Playwright cible verifie legende, decomposition et accessibilite du tooltip.
+- Impact mesure: test score opportunite OK sur desktop + mobile Chrome local; bundle reste sous seuil app.js 1.58MB / 1.70MB.
+- Verif: Playwright cible OK (2/2), bundle-size OK, syntax JS OK, no-conflict-markers OK; cache/footer bumpes v35.391.
+
 
 ## Sprint v35.342 — AUTO 10/10 Biais marches par ligue (17:50 UTC)
 - Avant: `build_betting_intelligence.py` exposait les biais ligue, angles rares et timing, mais pas de lecture par famille de marche (OU, BTTS, double chance).
