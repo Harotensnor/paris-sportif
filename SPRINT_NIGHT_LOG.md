@@ -2249,3 +2249,9 @@
 - Apres: le gap `referee` devient attendu seulement a moins de 72h du kickoff; les starters restent attendus a moins de 36h.
 - Impact mesure: priority gaps 269 -> 239; les matchs a J+6 comme AVS - FC Porto ne sont plus penalises pour arbitre absent, tout en gardant les matchs du soir en alerte.
 - Verif: py_compile/build_signal_gap_report/build_health OK; cache/footer bumpes v35.345.
+
+## Sprint v35.346 — AUTO 10/10 Angles voyage/fatigue US (18:20 UTC)
+- Avant: `detected_angles.json` detectait calendrier, blessures, meteo, arbitre et mouvements de cote, mais ignorait les deplacements NBA/NHL/MLB alors que `stadiums.json` les rend mesurables.
+- Apres: `build_betting_intelligence.py` calcule distance Haversine + decalage estime pour MLB/NBA/NHL; nouveaux signaux `travel_extreme` et `back_to_back_travel` alimentent aussi `rare_signals.json`.
+- Impact mesure: 244 angles detectes, dont 13 `travel_extreme` et 16 `back_to_back_travel`; 91 signaux rares publies avec 25 signaux voyage/fatigue exploitables.
+- Verif: py_compile/build_betting_intelligence/build_health OK; cache/footer bumpes v35.346.
