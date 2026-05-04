@@ -32,9 +32,12 @@ def main():
         for ev in events or []:
             if ev.pop('smart_money', None) is not None:
                 cleared += 1
+            ev.pop('market_uncertain', None)
             sig = signals.get(str(ev.get('id') or ''))
             if sig:
                 ev['smart_money'] = sig
+                if isinstance(sig.get('market_uncertain'), dict):
+                    ev['market_uncertain'] = sig['market_uncertain']
                 patched += 1
     DATA_JS.write_text(
         'window.PRONOSTICS_DATA = ' + json.dumps(data, ensure_ascii=False, separators=(',', ':')) + ';',

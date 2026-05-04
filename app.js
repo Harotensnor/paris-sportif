@@ -15664,6 +15664,7 @@
         'ligue froide': 'Ligue à prudence',
         'marché biaisé +': 'Marché favorable',
         'marché à fade': 'Cote surévaluée',
+        'marché incertain': 'Marché incertain',
         'steam cote': 'Cote bouge fort',
         'drift cote': 'Cote dérive',
         blessures: 'Blessures clés',
@@ -15691,6 +15692,7 @@
         'Ligue à prudence': 'Le modèle est moins fiable sur cette ligue récemment.',
         'Marché favorable': 'Ce type de marché est sous-coté historiquement dans cette ligue.',
         'Cote surévaluée': 'Le marché semble trop optimiste sur le camp adverse : on le fade.',
+        'Marché incertain': 'Les cotes ont un mouvement anormal ou une marge bookmaker incohérente : mieux vaut vérifier avant de jouer.',
         'Cote bouge fort': 'La cote a bougé rapidement : signal de marché à surveiller.',
         'Cote dérive': 'La cote se détériore : attendre ou réduire la mise.',
         'Blessures clés': 'Une différence de blessés ou absents influence le pick.',
@@ -15739,7 +15741,12 @@
           score -= Math.min(9, 4 + Math.abs(Number(marketBias.edge_vs_50_pct || 0)) / 5);
           badges.push('marché à fade');
         }
-        const marketMove = angles.find(a => a?.type === 'market_move');
+        const uncertainMarket = angles.find(a => a?.type === 'market_uncertain');
+        if (uncertainMarket) {
+          score -= Math.min(18, 9 + Number(uncertainMarket.strength || 0.8) * 8);
+          badges.push('marché incertain');
+        }
+        const marketMove = !uncertainMarket ? angles.find(a => a?.type === 'market_move') : null;
         if (marketMove?.direction === 'steam') { score += 7; badges.push('steam cote'); }
         else if (marketMove?.direction === 'drift') { score -= 5; badges.push('drift cote'); }
         const conflictAngle = angles.find(a => a?.type === 'signal_conflict');
@@ -15806,6 +15813,7 @@
           'Combine edge, confiance, biais marché, timing, signaux rares et profil Théo',
           friendlyBadges.length ? friendlyBadges.join(' · ') : 'aucun angle spécial',
           conflictAngle?.context || '',
+          uncertainMarket?.context ? `Marché incertain: ${uncertainMarket.context}` : '',
           rawRareDirectional !== rareDirectional ? `Biais ligue prioritaire: malus match ${rawRareDirectional.toFixed(1)} -> ${rareDirectional.toFixed(1)}` : '',
           `edge ${(edge * 100).toFixed(1)}%`,
           marketBias ? `${marketBias.label || 'marché'} ${marketBias.pick || ''}: ${marketBias.reason || marketBias.status}` : '',
