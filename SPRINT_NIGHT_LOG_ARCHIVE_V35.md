@@ -2262,3 +2262,9 @@ Archived from SPRINT_NIGHT_LOG.md on 2026-05-04 to keep the active log readable.
 - `predictMatch` consomme les poids appris comme nudge conservateur (`max_probability_nudge` ≤ 2,5pt) avec trace `pred.learned_context` + raison modèle.
 - Audit ajouté : `scripts/audit_lightgbm_runtime.py` vérifie sidecar, HTML et consommation front. Statut assumé : `aggregate_fallback`, pas faux entraînement LightGBM ligne-à-ligne.
 
+
+## Sprint v35.389 — A4 bundle sous 1,7MB
+- `app.js` réduit par passe lexicale sûre : commentaires pleine ligne hors chaînes/templates retirés + indentation hors templates supprimée.
+- Taille brute `app.js` : ~1,86MB UTF-8 avant passe → 1,58MB fichier local, sous le seuil 1,70MB contrôlé par `scripts/audit_bundle_size.py`.
+- Hash `app.js` dans `pronostics.html` mis à jour, `CACHE_VERSION` bumpé, syntax JS/data/html OK.
+

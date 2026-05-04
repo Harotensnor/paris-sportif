@@ -14831,6 +14831,30 @@ const v36GeniusSection = v36GeniusPicks.length ? `<section class="v36-genius-str
         </header>
         <div class="v36-genius-grid">${v36GeniusPicks.map(v36CompactCard).join('')}</div>
       </section>` : '';
+const v37SportOrder = ['football', 'tennis', 'basketball', 'hockey', 'baseball'];
+const v37SportPicksHtml = v37SportOrder.map(sp => {
+const picks = v36PickPool
+.filter(p => p.m?.sport === sp)
+.sort((a, b) => (b.opportunity - a.opportunity) || (b.score - a.score) || (a.ts - b.ts))
+.filter((p, index, arr) => {
+const key = v37MatchKeyForPick(p);
+return arr.findIndex(x => v37MatchKeyForPick(x) === key) === index;
+})
+.slice(0, 3);
+if (!picks.length) return '';
+return `<section class="v37-sport-lane" data-sport="${esc(sp)}">
+          <header><span>${sportIcon(sp)}</span><strong>${esc(sportLabel(sp))}</strong><em>${picks.length} top pick${picks.length > 1 ? 's' : ''}</em></header>
+          <div>${picks.map(v36CompactCard).join('')}</div>
+        </section>`;
+}).filter(Boolean).join('');
+const v37SportPicksSection = v37SportPicksHtml ? `<section class="v37-sport-picks" aria-label="Paris du jour par sport">
+        <header>
+          <span>SPORTS</span>
+          <strong>Paris du jour par sport</strong>
+          <em>Top 3 par discipline, triés par score d'opportunité et sans doublon match.</em>
+        </header>
+        <div class="v37-sport-picks__grid">${v37SportPicksHtml}</div>
+      </section>` : '';
 const v36StatsHtml = [
 ['Picks', String(v36PickPool.length)],
 ['Matchs', String(v36UpcomingAll.length)],
@@ -14984,6 +15008,7 @@ wrap.innerHTML = `
               <section><header><span>Stats live</span><b>${v36Total}</b></header><div class="v36-side-stats">${v36StatsHtml}</div></section>
             </aside>
           </div>
+          ${v37SportPicksSection}
           ${v36GeniusSection}
           ${v36BoostSection}
         </div>`;
