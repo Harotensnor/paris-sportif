@@ -2261,6 +2261,12 @@
 - Apres: blessures, fatigue calendrier, lookahead, voyage extreme et back-to-back voyage comparent le signal a l'equipe réellement soutenue par le pari; backing l'equipe fragile penalise, jouer contre elle bonifie.
 - Impact produit: les nouveaux angles voyage/fatigue deviennent exploitables sans faux boost; les signaux rares non alignes restent visibles en badge sans gonfler le score.
 - Verif: app.js --check prevu; cache/footer bumpes v35.347.
+## Sprint v35.352 — AUTO 10/10 Auto-refresh aligne avec cron (19:07 UTC)
+- Avant: `check_pipeline_drift.py` signalait 13 scripts presents dans le cron mais absents de `auto_refresh.py`.
+- Fix: ajout des fetchers publics TheSportsDB/OpenLigaDB/previews et des builders intelligence/profils/marches/signaux dans l'auto-refresh local avec cadences prudentes.
+- Impact mesure: auto_refresh 48 -> 61 scripts references; refresh.yml 61 scripts; drift 13 -> 0.
+- Verif: py_compile auto_refresh OK; `check_pipeline_drift.py` OK; cache/footer bumpes v35.352.
+
 ## Sprint v35.351 — AUTO 10/10 Cache merge lineups Sofascore (19:04 UTC)
 - Bug prevenu: `fetch_lineups_soccer.py` pouvait aussi ecraser un cache riche avec un scrape partiel proche kickoff.
 - Fix: merge fresh + cache existant pour conserver les compositions deja collectees; ajout stats `fresh_with_lineup`, `retained_existing`, `events_total`.

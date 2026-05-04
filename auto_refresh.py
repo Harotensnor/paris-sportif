@@ -81,6 +81,12 @@ FETCH_STAGES = [
     ('fetch_mlb_pitchers.py',      5,   60),   # MLB Stats API probable pitchers, 6h cache
     ('fetch_nhl_stats.py',        10,   60),   # NHL official API team stats + starting goalie, 10min cache
     ('fetch_nba_team_stats.py',    5,   30),
+    # v35.352 — Alignement avec le cron: sources publiques metadata/Allemagne.
+    # Les scripts sont self-throttled, donc les appeler localement ne force pas
+    # un hit réseau à chaque tick.
+    ('fetch_thesportsdb_meta.py', 240,   60),
+    ('fetch_openligadb.py',      240,   60),
+    ('fetch_match_previews.py',   60,   60),
 ]
 
 # Patches always run after fetches. Keep this list aligned with
@@ -94,6 +100,18 @@ PATCH_STAGES = [
     ('patch_all_quick.py',          1,   30),
     ('patch_understat_xg.py',       1,   30),
     ('patch_smart_money.py',        1,   30),
+    # v35.352 — Builders cron ajoutés dans l'auto-refresh pour éviter que
+    # local et prod divergent sur les insights modèle / profils / marchés.
+    ('build_public_team_stats.py',  1,   30),
+    ('build_lineups_multisport.py', 1,   30),
+    ('build_xg_coverage.py',        1,   30),
+    ('build_public_profiles.py',    1,   60),
+    ('build_league_bias_audit.py',  1,   30),
+    ('build_betting_intelligence.py', 1,  30),
+    ('build_rugby_markets.py',      1,   30),
+    ('build_niche_markets.py',      1,   30),
+    ('detect_boosted_odds.py',      1,   30),
+    ('build_signal_gap_report.py',  1,   15),
     ('inject_data_in_html.py',      1,   15),
     # Pipeline status snapshot (health.json) — runs every tick, cheap.
     ('build_health.py',             1,   15),
