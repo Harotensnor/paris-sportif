@@ -2,12 +2,6 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
-## Sprint v35.335 — AUTO 10/10 Score opportunite table (16:56 UTC)
-- Avant: les angles rares, biais ligue, timing et richesse data etaient surtout visibles dans le rail droit; la table dense ne resumait que cote/confiance/edge.
-- Apres: chaque ligne calcule un score opportunite 0-100 qui combine edge, confiance, tier strict, biais ligue, steam/drift cote, blessures/fatigue/lookahead, timing de mise et richesse data.
-- Impact produit: Theo voit tout de suite les picks qui cumulent plusieurs signaux rares sans ouvrir la modal; tri `Score` ajoute au tableau et cartes mobile.
-- Verif: app.js/app.css hashes recalcules (`bf57994d`, `66ce6f69`), cache/footer bumpes v35.335.
-
 ## Sprint v35.336 — AUTO 10/10 Rapport gaps signaux (17:05 UTC)
 - Avant: les trous lineups/injuries/referee/H2H/xG etaient visibles seulement via quelques compteurs globaux et un log texte, pas actionnables match par match.
 - Apres: `build_signal_gap_report.py` publie `signal_gap_report.json` avec couverture par signal/sport/ligue, top 80 matchs prioritaires, sources presentes/manquantes et extrait des unmatched.
@@ -300,6 +294,12 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Mesure: 345 events, 304 upcoming, Winamax exact 308 (89.3%), marches detailles 715/718, xG 255, injuries 217, lineups 122, referees 29.
 - Drift: `check_pipeline_drift.py` OK, auto_refresh et refresh.yml alignes sur 64 scripts chacun.
 - Verif: metrics regen + drift check OK; cache/footer bumpes v35.384.
+
+## Sprint v35.385 — AUTO 10/10 Verite data auditee (20:34 UTC)
+- Garde-fou: ajout de `scripts/audit_data_truth.py` pour comparer `data.js`, `night_metrics.json` et `health.json` sur source de verite, `generated_at` et fraicheur.
+- Mesure: audit OK sur data.js `generated_at=2026-05-04T20:28:50Z`, today `2026-05-04`, night metrics non stale.
+- Impact: les regressions type MCP/health/night_metrics avec dates divergentes deviennent detectables localement avant push.
+- Verif: audit_data_truth + py_compile OK; cache/footer bumpes v35.385.
 
 
 
