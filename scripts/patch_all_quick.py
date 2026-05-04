@@ -695,7 +695,7 @@ def patch_mlb_pitchers(data: dict) -> int:
     mp = _load_json(ROOT / 'mlb_pitchers.json')
     if not mp:
         return 0
-    by_match = mp.get('by_match') or mp
+    by_match = mp.get('matches') or mp.get('by_match') or mp
     if not by_match:
         return 0
     n = 0
@@ -703,8 +703,10 @@ def patch_mlb_pitchers(data: dict) -> int:
         for ev in (evs or []):
             if ev.get('league_code') != 'mlb':
                 continue
-            mid = str(ev.get('id') or '')
-            entry = by_match.get(mid)
+            home_name, away_name = _event_sides(ev)
+            day = str(ev.get('date') or '')[:10]
+            key = f'{_norm(home_name)}|{_norm(away_name)}|{day}' if home_name and away_name and day else ''
+            entry = by_match.get(str(ev.get('id') or '')) or (by_match.get(key) if key else None)
             if entry:
                 ev['mlb_pitchers'] = entry
                 n += 1
@@ -716,20 +718,34 @@ def patch_nhl_stats(data: dict) -> int:
     ns = _load_json(ROOT / 'nhl_stats.json')
     if not ns:
         return 0
-    by_team = ns.get('by_team') or {}
-    if not by_team:
+    teams = ns.get('teams') or ns.get('by_team') or {}
+    by_abbr = {str(k).upper(): v for k, v in teams.items() if isinstance(v, dict)}
+    by_name = {
+        _norm((v or {}).get('name') or str(k)): v
+        for k, v in teams.items()
+        if isinstance(v, dict)
+    }
+    if not teams:
         return 0
     n = 0
     for evs in (data.get('days') or {}).values():
         for ev in (evs or []):
             if ev.get('league_code') != 'nhl':
                 continue
+            event_payload = {}
             for c in (ev.get('competitors') or []):
-                key = _norm(c.get('name') or '')
-                stats = by_team.get(key)
+                stats = by_abbr.get(str(c.get('abbr') or '').upper()) or by_name.get(_norm(c.get('name') or ''))
                 if stats:
                     c['nhl_stats'] = stats
-                    n += 1
+                    if c.get('home_away') in ('home', 'away'):
+                        event_payload[c.get('home_away')] = stats
+            if event_payload:
+                ev['nhl_stats'] = {
+                    'home': event_payload.get('home') or {},
+                    'away': event_payload.get('away') or {},
+                    'source': 'nhl_stats',
+                }
+                n += 1
     return n
 
 

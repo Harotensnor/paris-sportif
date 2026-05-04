@@ -74,6 +74,20 @@ def _has_xg(ev: dict) -> bool:
     )
 
 
+def _has_starter_signal(ev: dict) -> bool:
+    if ev.get("lineups"):
+        return True
+    if ev.get("mlb_pitchers"):
+        return True
+    nhl = ev.get("nhl_stats") or {}
+    if isinstance(nhl, dict):
+        home_goalie = ((nhl.get("home") or {}).get("goalie") or {}).get("name")
+        away_goalie = ((nhl.get("away") or {}).get("goalie") or {}).get("name")
+        if home_goalie or away_goalie:
+            return True
+    return False
+
+
 def _detail_market_keys(markets: dict | list | None) -> list[str]:
     if isinstance(markets, dict):
         return sorted(str(k) for k in markets.keys() if k and k != "1n2")
@@ -134,7 +148,9 @@ def main() -> int:
             "markets_more_than_1n2": sum(1 for ev in events if _markets_more_than_1n2(ev)),
             "form_l10": sum(1 for ev in events if _has_form_l10(ev)),
             "h2h": sum(1 for ev in events if _has_h2h(ev)),
-            "lineups": sum(1 for ev in events if ev.get("lineups")),
+            "lineups": sum(1 for ev in events if _has_starter_signal(ev)),
+            "football_lineups": sum(1 for ev in events if ev.get("sport") == "football" and ev.get("lineups")),
+            "starter_signals": sum(1 for ev in events if _has_starter_signal(ev)),
             "clubelo": sum(1 for ev in events if ev.get("clubelo")),
             "weather": sum(1 for ev in events if ev.get("weather")),
             "injuries": sum(1 for ev in events if ev.get("injuries")),
