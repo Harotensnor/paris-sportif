@@ -2386,3 +2386,9 @@
 - Fix: ajout `trackedAddEventListener` + `cleanupTrackedEventListeners`, exposition debug `__PARIS_TRACKED_LISTENERS`, branchement sur `_on`, `bind()` et listeners boot lazy-images.
 - Impact: les listeners de groupe `page` peuvent etre nettoyes a chaque render, et les listeners boot sont maintenant inspectables.
 - Verif: app.js/sw.js syntax OK; cache/footer bumpes v35.368.
+
+## Sprint v35.369 — AUTO 10/10 xG proxy coverage (20:46 UTC)
+- Bug data: les ligues hors Understat/FBref perdaient le signal xG meme quand ESPN expose last5/last10 buts pour/contre.
+- Fix: `patch_fbref_xg.py` ajoute un fallback `espn_recent_results_proxy` marque comme proxy, conservateur et distinct du vrai xG.
+- Mesure: xG events night_metrics 189 -> 256; couverture foot deux equipes 252/260 (96.9%) dans `xg_coverage.json`.
+- Verif: patch_fbref_xg + build_xg_coverage + build_health + measure_night_metrics OK; cache/footer bumpes v35.369.

@@ -252,6 +252,37 @@ def lookup_team_stats(competitor: dict, event: dict, team_stats_index: dict) -> 
     return team_stats_index.get(normalize(competitor.get('name') or '')) or {}
 
 
+def recent_results_proxy(competitor: dict) -> dict | None:
+    rows = competitor.get('last10') or competitor.get('last5') or []
+    if not isinstance(rows, list):
+        return None
+    clean = []
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        gf = _num(row.get('score_for'))
+        ga = _num(row.get('score_against'))
+        if gf is None or ga is None:
+            continue
+        clean.append((gf, ga))
+    if len(clean) < 3:
+        return None
+    gf = sum(x[0] for x in clean) / len(clean)
+    ga = sum(x[1] for x in clean) / len(clean)
+    baseline = 1.35
+    xg_for = _clamp((gf * 0.62) + (baseline * 0.38), 0.25, 3.25)
+    xg_against = _clamp((ga * 0.62) + (baseline * 0.38), 0.25, 3.25)
+    return {
+        'xg_for_avg': round(xg_for, 3),
+        'xg_against_avg': round(xg_against, 3),
+        'matches_played': len(clean),
+        'goals_diff': round(xg_for - xg_against, 3),
+        'source': 'espn_recent_results_proxy',
+        'method': 'recent_results_proxy_not_true_xg',
+        'proxy': True,
+    }
+
+
 def build_goal_proxy_xg(competitor: dict, event: dict, team_stats_index: dict) -> dict | None:
     """Fallback for leagues where true xG is unavailable.
 
@@ -261,14 +292,16 @@ def build_goal_proxy_xg(competitor: dict, event: dict, team_stats_index: dict) -
     """
     stats = lookup_team_stats(competitor, event, team_stats_index)
     if not isinstance(stats, dict):
-        return None
+        return recent_results_proxy(competitor)
+    if not stats:
+        return recent_results_proxy(competitor)
     played = int(_num(stats.get('played5') or stats.get('games_l10'), 0) or 0)
     if played < 3:
-        return None
+        return recent_results_proxy(competitor)
     gf = _num(stats.get('avg_gf5') or stats.get('avg_for5') or stats.get('avg_for_l10'))
     ga = _num(stats.get('avg_ga5') or stats.get('avg_against5') or stats.get('avg_against_l10'))
     if gf is None or ga is None:
-        return None
+        return recent_results_proxy(competitor)
     # Goals are noisier than xG. Pull extremes gently toward a normal football
     # baseline so one wild five-game run does not dominate Poisson.
     baseline = 1.35
