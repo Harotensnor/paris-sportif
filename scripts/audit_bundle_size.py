@@ -6,9 +6,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 LIMITS = {
-    "app.js": 1_700_000,
+    "app.js": 1_600_000,
     "app.css": 360_000,
     "pronostics.html": 90_000,
+    "data_lite.js": 220_000,
 }
 
 

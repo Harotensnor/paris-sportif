@@ -325,3 +325,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix: `patch_all_quick.py` reutilise maintenant les moyennes d'arbitres par ligue quand l'assignation exacte n'est pas encore publiee.
 - Reporting: `signal_gap_report.json` distingue `referee` (signal exact ou contexte) de `referee_exact`, pour eviter de gonfler les assignations confirmees.
 - Mesure: signal arbitre 5 exacts + 101 contextes = 106 events; gap report ratio referee 33.65%, exact 1.59%; cache/footer bumpes v35.406.
+
+## Sprint v35.407 — AUTO 10/10 Bundle guard 1.6MB (01:15 UTC)
+- Perf: `app.js` est deja sous la cible 1.7MB, mais il fallait empecher le retour vers 1.8/1.9MB.
+- Fix: `audit_bundle_size.py` serre le cap app.js a 1.6MB et couvre aussi `data_lite.js`; cron + auto_refresh lancent l'audit apres `finalize_inline.py`.
+- Doc: `BUNDLE_AUDIT_V35_406.md` fige les tailles et les prochaines coupes safe.
+- Mesure: app.js 1,585,245 / 1,600,000 bytes, app.css 353,361 / 360,000, pronostics 71,236 / 90,000, data_lite 167,554 / 220,000; cache/footer bumpes v35.407.
