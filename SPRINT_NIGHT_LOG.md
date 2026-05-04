@@ -2,12 +2,6 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
-## Sprint v35.339 — AUTO 10/10 Data gaps dans le score (17:29 UTC)
-- Avant: les gaps lineups/referee/H2H/xG etaient visibles dans le rail, mais le tri Score pouvait encore placer tres haut un pick sous-informe.
-- Apres: `signal_gap_report.json` est indexe par event et le score opportunite applique une penalite proportionnelle aux signaux critiques manquants, avec badges `data gap` / `prudence`.
-- Impact: Theo garde la couverture complete, mais les picks sans sources fortes descendent naturellement et le tooltip dit ce qui manque.
-- Verif: app.js hash `c8bf9f75`, app.css hash `66ce6f69`, cache/footer bumpes v35.339.
-
 ## Sprint v35.340 — AUTO 10/10 MCP pipeline gaps multi-jours (17:35 UTC)
 - Avant: le MCP utilisait bien la date locale, mais `get_pipeline_status` ne resumait pas encore les gaps publies et `list_data_gaps` reconstruisait seulement les trous du jour.
 - Apres: le MCP expose `night_metrics`, la couverture `signal_gap_report`, les signaux les plus manquants et liste les gaps prioritaires multi-jours.
@@ -298,4 +292,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fetch arbitres élargi à 7 jours : les affectations exactes publiées restent faibles (20 événements exacts sur le slate courant), donc pas de faux nom arbitre.
 - `patch_referees_soccer.py` ajoute un `referee_context` de ligue quand l'arbitre exact est absent, avec `assignmentConfirmed=false` et moyennes cartes issues des arbitres confirmés.
 - `night_metrics` distingue désormais `referee` exact (20), `referee_context` (105) et `referee_signal` (125), pour une couverture signal honnête sans masquer le manque d'affectations officielles.
+
+## Sprint v35.389 — A4 bundle sous 1,7MB
+- `app.js` réduit par passe lexicale sûre : commentaires pleine ligne hors chaînes/templates retirés + indentation hors templates supprimée.
+- Taille brute `app.js` : ~1,86MB UTF-8 avant passe → 1,58MB fichier local, sous le seuil 1,70MB contrôlé par `scripts/audit_bundle_size.py`.
+- Hash `app.js` dans `pronostics.html` mis à jour, `CACHE_VERSION` bumpé, syntax JS/data/html OK.
 
