@@ -78,13 +78,16 @@ jobs:
           PID_ELO=$!
           (python3 fetch_understat_xg.py || true) > /tmp/fetch_xg.log 2>&1 &
           PID_XG=$!
+          (python3 fetch_fbref_xg.py || true) > /tmp/fetch_fbref_xg.log 2>&1 &
+          PID_FBREF_XG=$!
           # Wait pour TOUS et imprime les logs (mêmes timeouts implicites = pas de limite ici)
-          wait $PID_LIVE $PID_SOFA $PID_WNX $PID_H2H $PID_FOREBET $PID_TENNIS $PID_RUS $PID_INJ $PID_ELO $PID_XG
+          wait $PID_LIVE $PID_SOFA $PID_WNX $PID_H2H $PID_FOREBET $PID_TENNIS $PID_RUS $PID_INJ $PID_ELO $PID_XG $PID_FBREF_XG
           echo "=== fetch_live ==="; cat /tmp/fetch_live.log | tail -3
           echo "=== fetch_sofascore ==="; cat /tmp/fetch_sofa.log | tail -3
           echo "=== fetch_winamax_catalog ==="; cat /tmp/fetch_wnx.log | tail -3
           echo "=== fetch_h2h ==="; cat /tmp/fetch_h2h.log | tail -2
           echo "=== fetch_clubelo ==="; cat /tmp/fetch_clubelo.log | tail -2
+          echo "=== fetch_fbref_xg ==="; cat /tmp/fetch_fbref_xg.log | tail -2
           # Snapshot odds + results (rapides, séquentiels après les fetchers)
           python3 patch_odds.py || true
           python3 snapshot_odds.py || true
@@ -167,6 +170,7 @@ jobs:
           #  nba_team_stats, tennis_features)
           python3 patch_all_quick.py || true
           python3 patch_understat_xg.py || true
+          python3 patch_fbref_xg.py || true
           python3 patch_smart_money.py || true
           python3 build_public_team_stats.py || true
             python3 build_lineups_multisport.py || true

@@ -31,6 +31,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 DATA_PATH = ROOT / 'data.js'
 XG_PATH = ROOT / 'fbref_xg.json'
+TEAM_STATS_PATH = ROOT / 'team_stats.json'
 
 # Data.js (espn) name → fbref name (normalized)
 ALIASES = {
@@ -106,6 +107,60 @@ ALIASES = {
     'atalantabc': 'atalanta',
     'bolognafc': 'bologna',
     'torino': 'torino',
+
+    # Primeira Liga / Portugal
+    'sportingcp': 'sportingcp',
+    'sportingclubedeportugal': 'sportingcp',
+    'vitoriadeguimaraes': 'vitoriaguimaraes',
+    'vitoriasc': 'vitoriaguimaraes',
+    'guimaraes': 'vitoriaguimaraes',
+    'fcporto': 'porto',
+    'portofc': 'porto',
+    'slbenfica': 'benfica',
+    'benfica': 'benfica',
+    'sportingbraga': 'braga',
+    'scbraga': 'braga',
+
+    # Scotland / Austria / Netherlands
+    'heartofmidlothian': 'hearts',
+    'hearts': 'hearts',
+    'rangersfc': 'rangers',
+    'rangers': 'rangers',
+    'lasklinz': 'lask',
+    'lask': 'lask',
+    'rapidvienna': 'rapidvienna',
+    'skrapidwien': 'rapidvienna',
+    'psveindhoven': 'psv',
+    'psv': 'psv',
+    'ajaxamsterdam': 'ajax',
+    'ajax': 'ajax',
+    'feyenoordrotterdam': 'feyenoord',
+    'feyenoord': 'feyenoord',
+
+    # MLS / North America common ESPN-vs-FBref differences
+    'lafc': 'losangelesfc',
+    'losangelesfc': 'losangelesfc',
+    'lagalaxy': 'lagalaxy',
+    'intermiamicf': 'intermiami',
+    'intermiami': 'intermiami',
+    'newyorkredbulls': 'newyorkrb',
+    'nyredbulls': 'newyorkrb',
+    'newyorkcityfc': 'nycfc',
+    'nycfc': 'nycfc',
+    'sportingkansascity': 'sportingkc',
+    'sportingkc': 'sportingkc',
+    'seattlesounders': 'seattlesounders',
+    'seattlesoundersfc': 'seattlesounders',
+    'vancouverwhitecaps': 'vancouverwhitecapsfc',
+    'vancouverwhitecapsfc': 'vancouverwhitecapsfc',
+
+    # Segunda / lower tiers frequent current-table names
+    'almeria': 'almeria',
+    'udalmeria': 'almeria',
+    'mirandes': 'mirandes',
+    'cdmirandes': 'mirandes',
+    'kaiserslautern': 'kaiserslautern',
+    'arminiabielefeld': 'arminiabielefeld',
 }
 
 
@@ -145,6 +200,91 @@ def find_xg(team_name: str, index: dict) -> dict | None:
     return None
 
 
+def _num(value, default=None):
+    try:
+        n = float(value)
+    except (TypeError, ValueError):
+        return default
+    if n != n:
+        return default
+    return n
+
+
+def _clamp(n: float, low: float, high: float) -> float:
+    return max(low, min(high, n))
+
+
+def build_team_stats_index() -> dict:
+    if not TEAM_STATS_PATH.exists():
+        return {}
+    try:
+        raw = json.loads(TEAM_STATS_PATH.read_text(encoding='utf-8'))
+    except Exception:
+        return {}
+    teams = raw.get('teams') or raw.get('by_team') or {}
+    index = {}
+    if not isinstance(teams, dict):
+        return index
+    for key, rec in teams.items():
+        if not isinstance(rec, dict):
+            continue
+        index[str(key)] = rec
+        league_code = rec.get('league_code') or ''
+        team_id = str(rec.get('team_id') or '')
+        if league_code and team_id:
+            index[f'{league_code}:{team_id}'] = rec
+        name_key = normalize(rec.get('name') or rec.get('team') or '')
+        if name_key:
+            index[name_key] = rec
+    return index
+
+
+def lookup_team_stats(competitor: dict, event: dict, team_stats_index: dict) -> dict:
+    embedded = competitor.get('team_stats') or {}
+    if isinstance(embedded, dict) and embedded:
+        return embedded
+    league_code = event.get('league_code') or event.get('league') or ''
+    team_id = str(competitor.get('id') or competitor.get('team_id') or '')
+    if league_code and team_id:
+        rec = team_stats_index.get(f'{league_code}:{team_id}')
+        if rec:
+            return rec
+    return team_stats_index.get(normalize(competitor.get('name') or '')) or {}
+
+
+def build_goal_proxy_xg(competitor: dict, event: dict, team_stats_index: dict) -> dict | None:
+    """Fallback for leagues where true xG is unavailable.
+
+    This intentionally carries source/method flags so downstream reports can
+    distinguish it from Understat/FBref. It is a conservative goals-form proxy,
+    not true shot-quality xG.
+    """
+    stats = lookup_team_stats(competitor, event, team_stats_index)
+    if not isinstance(stats, dict):
+        return None
+    played = int(_num(stats.get('played5') or stats.get('games_l10'), 0) or 0)
+    if played < 3:
+        return None
+    gf = _num(stats.get('avg_gf5') or stats.get('avg_for5') or stats.get('avg_for_l10'))
+    ga = _num(stats.get('avg_ga5') or stats.get('avg_against5') or stats.get('avg_against_l10'))
+    if gf is None or ga is None:
+        return None
+    # Goals are noisier than xG. Pull extremes gently toward a normal football
+    # baseline so one wild five-game run does not dominate Poisson.
+    baseline = 1.35
+    xg_for = _clamp((gf * 0.72) + (baseline * 0.28), 0.25, 3.40)
+    xg_against = _clamp((ga * 0.72) + (baseline * 0.28), 0.25, 3.40)
+    return {
+        'xg_for_avg': round(xg_for, 3),
+        'xg_against_avg': round(xg_against, 3),
+        'matches_played': played,
+        'goals_diff': round(xg_for - xg_against, 3),
+        'source': 'espn_form_proxy',
+        'method': 'goals_l5_proxy_not_true_xg',
+        'proxy': True,
+    }
+
+
 def main():
     if not XG_PATH.exists():
         print(f'fbref_xg.json missing — run fetch_fbref_xg.py first')
@@ -156,6 +296,7 @@ def main():
 
     xg_data = json.loads(XG_PATH.read_text(encoding='utf-8'))
     index = build_team_index(xg_data)
+    team_stats_index = build_team_stats_index()
     if not index:
         print('fbref_xg.json contains no teams, skipping')
         return 0
@@ -164,12 +305,12 @@ def main():
 
     # Read data.js
     text = DATA_PATH.read_text(encoding='utf-8')
-    m = re.search(r'window\.PRONOSTICS_DATA\s*=\s*(\{.*\})\s*;', text, flags=re.DOTALL)
-    if not m:
+    data_match = re.search(r'window\.PRONOSTICS_DATA\s*=\s*(\{.*\})\s*;', text, flags=re.DOTALL)
+    if not data_match:
         print('PRONOSTICS_DATA not found in data.js', file=sys.stderr)
         return 1
 
-    raw_json = m.group(1)
+    raw_json = data_match.group(1)
     data = json.loads(raw_json)
 
     # Iterate matches
@@ -177,21 +318,26 @@ def main():
     n_injected = 0
     n_unmatched = []
     for day_iso, matches in (data.get('days') or {}).items():
-        for m in matches or []:
-            if m.get('sport') != 'football':
+        for ev in matches or []:
+            if ev.get('sport') != 'football':
                 continue
-            for c in (m.get('competitors') or []):
+            for c in (ev.get('competitors') or []):
                 if not isinstance(c, dict):
                     continue
                 n_total += 1
                 team_name = c.get('name', '')
                 stats = find_xg(team_name, index)
+                if not stats and not c.get('xg_stats') and not c.get('fbref_xg'):
+                    stats = build_goal_proxy_xg(c, ev, team_stats_index)
                 if stats:
                     c['fbref_xg'] = {
                         'xg_for_avg': stats['xg_for_avg'],
                         'xg_against_avg': stats['xg_against_avg'],
                         'matches_played': stats['matches_played'],
                         'goals_diff': round(stats.get('goals_diff', 0), 2),
+                        'source': stats.get('source') or 'fbref',
+                        'method': stats.get('method') or 'squad_standard',
+                        'proxy': bool(stats.get('proxy')),
                     }
                     n_injected += 1
                 else:
@@ -199,7 +345,7 @@ def main():
 
     # Write back
     new_json = json.dumps(data, ensure_ascii=False, separators=(',', ':'))
-    new_text = text[:m.start(1)] + new_json + text[m.end(1):]
+    new_text = text[:data_match.start(1)] + new_json + text[data_match.end(1):]
     DATA_PATH.write_text(new_text, encoding='utf-8')
 
     coverage = (n_injected / n_total * 100) if n_total else 0

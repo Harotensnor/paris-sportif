@@ -2308,3 +2308,9 @@
 - Fix: raisons modal orientees selon le marche clique (1N2/DNB, total, BTTS, double chance, handicap, team total) et doublons meme match mieux groupes visuellement.
 - Impact mesure: audit navigateur capture bugs = 720 lignes/cards, 0 badge opaque, 360 scores tooltipes/classes, 640 marqueurs doublons, modal raisons presente, 0 erreur console.
 - Verif: `node --check app.js/sw.js/audit_capture_bugs.js`, `audit_capture_bugs.js`, `check_no_conflict_markers.py`; cache/footer bumpes v35.355.
+
+## Sprint v35.356 — AUTO 10/10 xG etendu hors top-5 (18:49 UTC)
+- Impact: xG night_metrics 88 -> 197 events; couverture foot both-team xG 64/261 (24.5%) -> 190/261 (72.8%).
+- Data: `fetch_fbref_xg.py` etendu MLS/Eredivisie/Portugal/D2/Scotland/Austria + merge Understat; fallback proxy ESPN form marque `espn_form_proxy`.
+- Pipeline: auto_refresh + refresh.yml alignes avec fetch_fbref_xg et patch_fbref_xg; bug shadow variable corrige dans `patch_fbref_xg.py`.
+- Verif: py_compile OK; patch_all_quick/patch_understat/patch_fbref/build_xg_coverage/measure_night_metrics/build_health/finalize_inline OK; cache/footer bumpes v35.356.
