@@ -2326,3 +2326,9 @@
 - Fix: `resolve_contradictory_angles` calcule support/fade par side, ajoute `signal_resolution`, et publie `signal_conflict` quand les signaux s'annulent; le dashboard penalise et affiche "Signaux mitigés".
 - Impact mesure: `detected_angles` expose 11 conflits, `rare_signals` les remonte; Detroit-Boston J+1/J+2 passe en `abstain` avec raison "Signaux opposes -> prudence".
 - Verif: py_compile build_betting_intelligence OK; app.js/sw.js --check OK; cache/footer bumpes v35.358.
+
+## Sprint v35.359 — AUTO 10/10 Hierarchie ligue vs angles (19:26 UTC)
+- Bug critique: un biais ligue exploitable pouvait etre annule par une longue liste d'angles match-level sans arbitrage lisible.
+- Fix: quand la ligue est `exploit`, les malus d'angles match sont plafonnes sauf conflit explicite `signal_conflict`; badge et tooltip indiquent "Biais ligue prioritaire".
+- Impact produit: MLB peut rester prioritaire tout en gardant les vrais conflits en prudence stricte; le score explique le netting applique.
+- Verif: app.js/sw.js --check OK; cache/footer bumpes v35.359.
