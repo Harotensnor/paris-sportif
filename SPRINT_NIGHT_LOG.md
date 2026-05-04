@@ -319,3 +319,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix: `health.data_truth` expose maintenant le ratio all-events authoritative et garde le ratio upcoming sous `quality_scope`.
 - Garde-fou: `audit_data_truth.py` compare data.js, night_metrics et health sur les deux scopes; `refresh.yml` et `auto_refresh.py` regenerent night_metrics puis auditent la verite.
 - Mesure: all-events Winamax exact 314/315 = 99.68%, upcoming 295/295 = 100%; audit_data_truth OK; cache/footer bumpes v35.405.
+
+## Sprint v35.406 — AUTO 10/10 Signal arbitre restaure (01:12 UTC)
+- Data: le patch rapide prod attachait seulement les arbitres exacts et avait perdu le fallback contexte arbitral par ligue.
+- Fix: `patch_all_quick.py` reutilise maintenant les moyennes d'arbitres par ligue quand l'assignation exacte n'est pas encore publiee.
+- Reporting: `signal_gap_report.json` distingue `referee` (signal exact ou contexte) de `referee_exact`, pour eviter de gonfler les assignations confirmees.
+- Mesure: signal arbitre 5 exacts + 101 contextes = 106 events; gap report ratio referee 33.65%, exact 1.59%; cache/footer bumpes v35.406.

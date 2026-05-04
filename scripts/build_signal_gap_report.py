@@ -159,9 +159,16 @@ def _has_injuries(ev: dict[str, Any]) -> bool:
     )
 
 
-def _has_referee(ev: dict[str, Any]) -> bool:
+def _has_referee_exact(ev: dict[str, Any]) -> bool:
     ref = ev.get("referee")
     return isinstance(ref, dict) and bool(ref.get("name"))
+
+
+def _has_referee_signal(ev: dict[str, Any]) -> bool:
+    if _has_referee_exact(ev):
+        return True
+    ctx = ev.get("referee_context")
+    return isinstance(ctx, dict) and bool(ctx.get("cardsPerGame") or ctx.get("yellowPerGame"))
 
 
 def _has_starter_signal(ev: dict[str, Any]) -> bool:
@@ -196,6 +203,7 @@ def _coverage_bucket() -> dict[str, int]:
         "starter_signals": 0,
         "injuries": 0,
         "referee": 0,
+        "referee_exact": 0,
         "h2h": 0,
         "xg": 0,
         "weather": 0,
@@ -208,7 +216,8 @@ def _event_signal_map(ev: dict[str, Any]) -> dict[str, bool]:
     return {
         "starter_signals": _has_starter_signal(ev),
         "injuries": _has_injuries(ev),
-        "referee": _has_referee(ev),
+        "referee": _has_referee_signal(ev),
+        "referee_exact": _has_referee_exact(ev),
         "h2h": _has_h2h(ev),
         "xg": _has_xg(ev),
         "weather": bool(ev.get("weather")),
@@ -339,6 +348,7 @@ def main() -> int:
                 "starter_signals",
                 "injuries",
                 "referee",
+                "referee_exact",
                 "h2h",
                 "xg",
                 "weather",
