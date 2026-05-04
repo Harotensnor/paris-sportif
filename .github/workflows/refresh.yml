@@ -186,6 +186,10 @@ jobs:
           # https://harotensnor.github.io/paris-sportif/health.json so we can
           # spot stale/missing sources without scraping the workflow logs.
           python3 build_health.py || true
+          # v35.336 — Report all remaining signal blind spots by match/league.
+          # This makes missing lineups/injuries/referee/H2H/xG actionable
+          # without reading workflow logs.
+          python3 build_signal_gap_report.py || true
           # v33.32 — Compute Closing Line Value depuis odds_history.jsonl
           # Mesure si on bat le marché (cote bouge en notre faveur après
           # qu'on ait pris la cote). Cheap (~1s sur 450 matches).
