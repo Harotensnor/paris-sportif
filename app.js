@@ -2645,13 +2645,191 @@
       return team === 'away' ? 'équipe extérieure' : 'équipe domicile';
     }
   }
+  function _v37FormatLine(value) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return String(value ?? '').replace('.', ',');
+    const fixed = Number.isInteger(n) ? String(n) : n.toFixed(1);
+    return fixed.replace('.', ',');
+  }
+  function _v37ShortLabel(label, max) {
+    const s = String(label || '').replace(/\s+/g, ' ').trim();
+    const limit = max || 60;
+    if (s.length <= limit) return s;
+    const cut = s.slice(0, Math.max(10, limit - 1)).replace(/\s+\S*$/, '');
+    return `${cut || s.slice(0, limit - 1)}…`;
+  }
+  function _v37ScoreUnitForSport(sport) {
+    const sp = String(sport || '').toLowerCase();
+    if (sp === 'basketball') return { one: 'point', many: 'points', verb: 'marque' };
+    if (sp === 'baseball') return { one: 'run', many: 'runs', verb: 'marque' };
+    if (sp === 'tennis') return { one: 'jeu', many: 'jeux', verb: 'gagne' };
+    return { one: 'but', many: 'buts', verb: 'marque' };
+  }
+  function _v37WinVerbForSport(sport) {
+    const sp = String(sport || '').toLowerCase();
+    return (sp === 'baseball' || sp === 'basketball' || sp === 'hockey' || sp === 'american-football') ? 'gagnent' : 'gagne';
+  }
+  function _v37TeamSide(match, side) {
+    try {
+      const sides = (typeof getSides === 'function') ? getSides(match) : {};
+      const raw = String(side || '').toLowerCase();
+      if (raw === 'away' || raw === '2' || raw.includes('away') || raw.includes('visitor')) {
+        return { side: 'away', team: sides.away, name: _v35TeamNameForMarket(match, 'away'), role: 'extérieur' };
+      }
+      if (raw === 'draw' || raw === 'x') return { side: 'draw', team: null, name: 'Match nul', role: 'nul' };
+      return { side: 'home', team: sides.home, name: _v35TeamNameForMarket(match, 'home'), role: 'domicile' };
+    } catch(e) {
+      return { side: 'home', team: null, name: 'Domicile', role: 'domicile' };
+    }
+  }
+  function _v37SideFromKey(key, fallback) {
+    const raw = String(key ?? fallback ?? '').toLowerCase();
+    if (raw === '2' || raw.includes('away') || raw.includes('_2') || raw.includes('dnb_2') || raw.includes('ht_2')) return 'away';
+    if (raw === 'x' || raw.includes('draw') || raw.includes('_x') || raw.includes('ht_x')) return 'draw';
+    return 'home';
+  }
+  function _v37TotalLabel(match, side, line, unit, subject) {
+    const over = String(side || '').toLowerCase() === 'over';
+    const n = Number(line);
+    const lineTxt = _v37FormatLine(line);
+    const target = subject || '';
+    const many = target && unit?.one === 'but' && Number.isFinite(n) && n <= 1.5 ? unit.one : (unit?.many || 'buts');
+    const one = unit?.one || 'but';
+    if (target && !over && Number.isFinite(n) && Math.abs(n - 0.5) < 0.01) return `${target} ne marque pas (0 ${one})`;
+    if (target && over && Number.isFinite(n) && Math.abs(n - 0.5) < 0.01) return `${target} marque au moins 1 ${one}`;
+    if (target) return `${target} marque ${over ? 'plus' : 'moins'} de ${lineTxt} ${many}`;
+    return `${over ? 'Plus' : 'Moins'} de ${lineTxt} ${many}`;
+  }
+  function _v37HandicapLabel(match, side, line, market) {
+    const unit = _v37ScoreUnitForSport(match?.sport);
+    const team = _v37TeamSide(match, side).name;
+    const n = Number(line);
+    const lineTxt = _v37FormatLine(line);
+    const sp = String(match?.sport || '').toLowerCase();
+    const isTennis = sp === 'tennis';
+    const many = isTennis ? 'jeux' : unit.many;
+    if (!Number.isFinite(n)) {
+      return { label: `${team} avec handicap`, tooltip: 'Handicap : on ajoute ou retire la ligne au score avant de régler le pari.' };
+    }
+    if (n < 0) {
+      const abs = Math.abs(n);
+      const needed = Math.floor(abs) + 1;
+      const label = needed <= 1
+        ? `${team} gagne (handicap -${_v37FormatLine(abs)})`
+        : `${team} gagne par ${needed}+ ${many} d'écart`;
+      return {
+        label,
+        tooltip: `Handicap ${lineTxt} : ${team} part avec ${lineTxt}. Il doit ${needed <= 1 ? 'gagner le match' : `gagner avec ${needed}+ ${many} d'écart`}.`
+      };
+    }
+    if (n > 0) {
+      const failBy = Math.floor(n) + 1;
+      const label = n < 1
+        ? `${team} gagne ou ne perd pas (handicap +${lineTxt})`
+        : `${team} ne perd pas par ${failBy}+ ${many}`;
+      return {
+        label,
+        tooltip: `Handicap +${lineTxt} : on ajoute ${lineTxt} ${many} à ${team}. Le pari perd seulement si l'équipe est battue trop largement.`
+      };
+    }
+    return {
+      label: `${team} gagne (handicap 0)`,
+      tooltip: `Handicap 0 : si ${team} gagne le pari gagne; si match nul, la mise est remboursée.`
+    };
+  }
+  function _v37MarketInfo(market) {
+    const m = String(market || '');
+    if (m === 'dnb') return 'Draw No Bet : si match nul, mise remboursée.';
+    if (m === 'btts') return 'BTTS : Both Teams To Score, les deux équipes doivent marquer.';
+    if (m === 'doubleChance') return 'Double chance : deux résultats sur trois couvrent le pari.';
+    if (m === 'teamTotal') return 'Total équipe : seul le nombre de buts/points de cette équipe compte.';
+    if (m === 'exactScore') return 'Score exact : le score final doit être exactement celui annoncé.';
+    if (m === 'ht_1n2') return 'Mi-temps : seul le score à la pause compte.';
+    if (typeof isHandicapMarket === 'function' && isHandicapMarket(m)) return 'Handicap : la ligne est ajoutée au score de l’équipe avant règlement.';
+    if (/Total|ou|tennisGames/i.test(m)) return 'Total : pari sur le nombre total de buts, points, runs ou jeux.';
+    return 'Marché Winamax reformulé en français naturel.';
+  }
+  function _v37MarketName(market) {
+    const m = String(market || '');
+    if (m === '1n2') return 'Résultat';
+    if (m === 'dnb') return 'Nul remboursé';
+    if (m === 'btts') return 'Deux équipes marquent';
+    if (m === 'doubleChance') return 'Double chance';
+    if (m === 'teamTotal') return 'Total équipe';
+    if (m === 'exactScore') return 'Score exact';
+    if (m === 'ht_1n2') return 'Mi-temps';
+    if (m === 'resultBtts') return 'Résultat + BTTS';
+    if (typeof isHandicapMarket === 'function' && isHandicapMarket(m)) return 'Handicap';
+    if (/tennisGames/i.test(m)) return 'Total jeux';
+    if (/basketTotal/i.test(m)) return 'Total points';
+    if (/baseballTotal/i.test(m)) return 'Total runs';
+    if (/hockeyTotal|ou/i.test(m)) return 'Total buts';
+    return m || 'Marché';
+  }
+  function _v37FormatPickLabel(match, market, key, label, row, extra) {
+    const mk = String(market || '');
+    const rawLabelFr = row?.labelFr || row?.label_fr || row?.winamaxLabelFr || row?.winamax_label_fr;
+    if (rawLabelFr) {
+      const full = String(rawLabelFr).replace(/\s+/g, ' ').trim();
+      return { label: full, shortLabel: _v37ShortLabel(full, 60), mobileLabel: _v37ShortLabel(full, 40), tooltip: _v37MarketInfo(mk), info: _v37MarketInfo(mk), source: 'winamax_labelFr' };
+    }
+    const unit = _v37ScoreUnitForSport(match?.sport);
+    const side = row?.side ?? extra?.side ?? _v37SideFromKey(key, '');
+    const line = row?.line ?? extra?.line;
+    const lineTxt = _v37FormatLine(line);
+    const sideInfo = _v37TeamSide(match, side);
+    let full = label || row?.label || key || 'Pari';
+    let tooltip = _v37MarketInfo(mk);
+    if (mk === '1n2') {
+      const pickSide = _v37TeamSide(match, _v37SideFromKey(key, side));
+      if (pickSide.side === 'draw') full = 'Match nul';
+      else if (String(match?.sport || '').toLowerCase() === 'football') full = `${pickSide.name} (victoire ${pickSide.role})`;
+      else full = `${pickSide.name} ${_v37WinVerbForSport(match?.sport)}`;
+      tooltip = pickSide.side === 'draw' ? 'Le match doit se terminer sur un nul.' : `${pickSide.name} doit gagner le match.`;
+    } else if (mk === 'dnb') {
+      const pickSide = _v37TeamSide(match, _v37SideFromKey(key, side));
+      full = `${pickSide.name} (nul remboursé)`;
+      tooltip = `Draw No Bet : si ${pickSide.name} gagne, pari gagné. Si match nul, mise remboursée.`;
+    } else if (mk === 'doubleChance') {
+      const dc = String(row?.side ?? key ?? '').toUpperCase();
+      full = dc === '1X' ? 'Domicile ou Nul' : dc === 'X2' ? 'Nul ou Extérieur' : dc === '12' ? 'Domicile ou Extérieur (pas de nul)' : `Double chance ${dc}`;
+      tooltip = 'Double chance : ton pari couvre deux issues possibles du match.';
+    } else if (mk === 'btts') {
+      const yes = /yes|oui|y|btts_y/i.test(String(row?.side ?? key ?? label ?? ''));
+      full = yes ? 'Les deux équipes marquent (oui)' : 'Au moins une équipe ne marque pas';
+      tooltip = yes ? 'Les deux équipes doivent marquer au moins un but.' : 'Le pari gagne si une équipe ou les deux terminent à 0 but.';
+    } else if (mk === 'teamTotal') {
+      const team = row?.team === 'away' ? 'away' : extra?.team === 'away' ? 'away' : 'home';
+      full = _v37TotalLabel(match, row?.side ?? side, line, unit, _v35TeamNameForMarket(match, team));
+      tooltip = `Total équipe : seuls les ${unit.many} de ${_v35TeamNameForMarket(match, team)} comptent, pas le score total du match.`;
+    } else if (mk === 'ht_1n2') {
+      const pickSide = _v37TeamSide(match, _v37SideFromKey(key, side));
+      full = pickSide.side === 'draw' ? 'Match nul à la mi-temps' : `${pickSide.name} mène à la mi-temps`;
+      tooltip = 'Mi-temps : le pari est réglé sur le score à la pause uniquement.';
+    } else if (mk === 'exactScore') {
+      full = `Score exact ${String(key || row?.score || label || '').replace(/^Score exact\s*/i, '')}`;
+      tooltip = 'Score exact : le score final doit correspondre exactement.';
+    } else if (mk === 'resultBtts') {
+      const raw = String(key || row?.label || label || '');
+      const pick = raw.includes('_2') || row?.result === 'away' ? 'Extérieur gagne' : raw.includes('_X') || row?.result === 'draw' ? 'Match nul' : 'Domicile gagne';
+      const btts = /yes|oui|_Yes|_yes/i.test(raw) || row?.btts === 'Yes' || row?.btts === 'yes';
+      full = `${pick} + ${btts ? 'les deux marquent' : 'BTTS non'}`;
+      tooltip = 'Combiné résultat + BTTS : les deux conditions doivent passer.';
+    } else if (typeof isHandicapMarket === 'function' && isHandicapMarket(mk)) {
+      const h = _v37HandicapLabel(match, side, line, mk);
+      full = h.label;
+      tooltip = h.tooltip;
+    } else if (/^(ou|ou15|ou25|ou35|basketTotal|baseballTotal|hockeyTotal|tennisGames)$/i.test(mk)) {
+      full = _v37TotalLabel(match, row?.side ?? side, line, unit, '');
+      tooltip = `${full}. Le pari porte sur le total du match.`;
+    }
+    full = String(full || '').replace(/\s+/g, ' ').trim();
+    const info = tooltip || _v37MarketInfo(mk);
+    return { label: full, shortLabel: _v37ShortLabel(full, 60), mobileLabel: _v37ShortLabel(full, 40), tooltip: info, info, source: 'internal_winamax_fr' };
+  }
+  try { window.formatWinamaxPickLabel = _v37FormatPickLabel; } catch(e){}
   function _v35TeamTotalLabel(match, row) {
-    const team = row?.team === 'away' ? 'away' : 'home';
-    const name = _v35TeamNameForMarket(match, team);
-    const sideLabel = row?.side === 'under' ? 'moins de' : 'plus de';
-    const line = Number(row?.line);
-    const lineTxt = Number.isFinite(line) ? line.toFixed(line % 1 ? 1 : 0).replace('.', ',') : String(row?.line ?? '');
-    return `Total buts ${name} — ${sideLabel} ${lineTxt} (équipe seulement)`;
+    return _v37FormatPickLabel(match, 'teamTotal', '', '', row, {}).label;
   }
 
   function _v35ModelHandicapProb(pred, market, side, line) {
@@ -2687,6 +2865,9 @@
     const odd = Number(row?.odd);
     const p = _v35Prob(prob);
     if (!(odd > 1.01) || !(p > 0) || !(p < 1)) return;
+    const match = extra?.match || out?.__match || null;
+    const labelInfo = _v37FormatPickLabel(match, market, key, label || row?.label || key, row, extra || {});
+    const rawLabel = label || row?.label || key;
     out.push({
       market,
       key,
@@ -2697,8 +2878,15 @@
       prob: p,
       odd,
       edge: p - 1 / odd,
-      label: label || row?.label || key,
-      bookLabel: row?.label || '',
+      label: labelInfo.label,
+      shortLabel: labelInfo.shortLabel,
+      mobileLabel: labelInfo.mobileLabel,
+      rawLabel,
+      bookLabel: row?.labelFr || row?.label || '',
+      marketTooltip: labelInfo.tooltip,
+      marketInfo: labelInfo.info,
+      marketName: _v37MarketName(market),
+      labelSource: labelInfo.source,
       source: 'winamax_exact',
       exact: true,
       raw: row,
@@ -2711,6 +2899,7 @@
     if (!match || !pred) return [];
     const wxMk = (match.winamax && match.winamax.markets) || {};
     const out = [];
+    out.__match = match;
 
     if (pred.pick && wxMk['1n2']) {
       const pk = pred.pick.key;
@@ -11823,7 +12012,7 @@
                 </div>
                 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:6px;">
                   ${footExtendedRows.map(r => `<div style="padding:8px 9px;border:1px solid var(--border);border-radius:var(--r-xs);background:rgba(255,255,255,.03);">
-                    <div style="font-weight:700;font-size:11.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${marketEmoji[r.c.market] || '🎯'} ${esc(r.c.label)}</div>
+                    <div style="font-weight:700;font-size:11.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" data-tooltip="${esc(r.c.marketTooltip || r.c.label)}">${marketEmoji[r.c.market] || '🎯'} ${esc(r.c.shortLabel || r.c.label)}</div>
                     <div style="margin-top:3px;font-size:10.5px;color:var(--text-dim);font-variant-numeric:tabular-nums;">@${r.c.odd.toFixed(2)} · edge ${r.c.edge >= 0 ? '+' : ''}${(r.c.edge*100).toFixed(1)}pt</div>
                   </div>`).join('')}
                 </div>
@@ -11832,8 +12021,8 @@
                   <div style="padding:9px 12px;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${r.statusColor};border-radius:0 var(--r-sm) var(--r-sm) 0;display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;font-size:12.5px;">
                     <span class="u-text-md">${marketEmoji[r.c.market] || '🎯'}</span>
                     <div>
-                      <div style="font-weight:600;color:var(--text);">${esc(r.c.label)}</div>
-                      <div style="font-size:10.5px;color:var(--text-dim);margin-top:1px;">${esc(r.reason)}</div>
+                      <div style="font-weight:600;color:var(--text);" data-tooltip="${esc(r.c.marketTooltip || r.c.label)}">${esc(r.c.shortLabel || r.c.label)}${r.c.marketInfo ? ` <span aria-hidden="true" data-tooltip="${esc(r.c.marketInfo)}" style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;margin-left:5px;border-radius:50%;border:1px solid var(--border);color:var(--text-dim);font-size:10px;font-weight:800;">?</span>` : ''}</div>
+                      <div style="font-size:10.5px;color:var(--text-dim);margin-top:1px;">${esc(r.c.marketName || r.c.market || '')} · ${esc(r.reason)}</div>
                     </div>
                     <div style="font-variant-numeric:tabular-nums;font-size:11.5px;color:var(--text-dim);">
                       <div>p=${(r.c.prob*100).toFixed(0)}% · @${r.c.odd.toFixed(2)}</div>
@@ -15193,7 +15382,12 @@
               const investmentScoreValue = Number(c.investment?.score || 0);
               return {
                 m, pred, best: c, tier: tier.id, strict: tier.strict, odd, rel, edge, ev,
-                label: c.label || pred.pick?.label || 'Pick',
+                label: c.shortLabel || c.label || pred.pick?.label || 'Pick',
+                labelFull: c.label || pred.pick?.label || 'Pick',
+                labelMobile: c.mobileLabel || c.shortLabel || c.label || pred.pick?.label || 'Pick',
+                marketTooltip: c.marketTooltip || c.marketInfo || '',
+                marketInfo: c.marketInfo || '',
+                marketName: c.marketName || c.market || '',
                 market: c.market || '1n2',
                 line: c.line ?? '',
                 pickKey: c.pickValue || c.pickKey || c.key || pred.pick?.key || '',
@@ -15232,7 +15426,7 @@
         if (v36Filter.time && v36HourBucket(p.m.date) !== v36Filter.time) return false;
         if (v36Search) {
           const { home, away } = getSides(p.m);
-          const hay = `${v36TeamName(home)} ${v36TeamName(away)} ${p.m.league_name || p.m.league || ''} ${p.label || ''} ${p.market || ''} ${sportLabel(p.m.sport || '')}`.toLowerCase();
+          const hay = `${v36TeamName(home)} ${v36TeamName(away)} ${p.m.league_name || p.m.league || ''} ${p.labelFull || p.label || ''} ${p.marketName || p.market || ''} ${sportLabel(p.m.sport || '')}`.toLowerCase();
           if (!hay.includes(v36Search.toLowerCase())) return false;
         }
         return true;
@@ -15268,7 +15462,7 @@
         return `<button type="button" class="v36-pick-card" data-tone="${esc(tier.tone)}" data-big-detail="${esc(String(p.m.id || ''))}">
           <span class="v36-pick-card__meta"><b>${esc(sportLabel(p.m.sport || ''))}</b><em>${esc(timeLabel)}</em></span>
           <strong>${esc(title)}</strong>
-          <span class="v36-pick-card__bet"><b>${esc(p.label)}</b><em>@${p.odd.toFixed(2)}</em></span>
+          <span class="v36-pick-card__bet"><b data-tooltip="${esc(p.marketTooltip || p.labelFull || p.label)}">${esc(p.labelMobile || p.label)}</b><em>@${p.odd.toFixed(2)}</em></span>
           <span class="v36-pick-card__signals"><i>${relPct}% conf.</i><i>${edgePct >= 0 ? '+' : ''}${edgePct}% edge</i><i>${evPct >= 0 ? '+' : ''}${evPct}% EV</i></span>
         </button>`;
       };
@@ -15322,13 +15516,15 @@
         const relPct = Math.round(p.rel * 100);
         const soon = !v37HistoryMode && p.ts > Date.now() && (p.ts - Date.now()) <= 2 * 60000;
         const result = v37ResultForPick(p);
+        const pickHelp = p.marketTooltip || p.marketInfo || p.labelFull || p.label;
+        const marketName = p.marketName || p.market || '';
         return `<tr class="v36-table-row ${soon ? 'is-imminent' : ''}" data-tone="${esc(tier.tone)}" data-big-detail="${esc(String(p.m.id || ''))}" title="${esc(v36ReasonTooltip(p))}">
           <td class="v36-cell-sport"><span>${sportIcon(p.m.sport || '')}</span><b>${esc(sportLabel(p.m.sport || '').slice(0, 9))}</b></td>
           <td class="v36-cell-date">${esc(v37DateLabel(p.m.date))}</td>
           <td>${esc(fmtTime(p.m.date))}</td>
           <td class="v36-cell-league">${esc(league)}</td>
           <td class="v36-cell-match">${v36MatchTitleHtml(p)}</td>
-          <td class="v36-cell-pick"><b>${esc(p.label)}</b><em>${esc(p.market || '')}</em></td>
+          <td class="v36-cell-pick"><b data-tooltip="${esc(pickHelp)}">${esc(p.label)}</b>${p.marketInfo ? `<span aria-hidden="true" data-tooltip="${esc(p.marketInfo)}" style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;margin-left:6px;border-radius:50%;border:1px solid var(--border);color:var(--text-dim);font-size:10px;font-weight:800;">?</span>` : ''}<em>${esc(marketName)}</em></td>
           <td class="v36-num v36-odd">@${p.odd.toFixed(2)}</td>
           <td class="v36-num">${relPct}%</td>
           <td class="v36-num ${p.edge >= 0 ? 'is-pos' : 'is-neg'}">${p.edge >= 0 ? '+' : ''}${edgePct}%</td>
@@ -15343,7 +15539,7 @@
           <span class="v36-table-card__top"><b>${sportIcon(p.m.sport || '')} ${esc(v37DateLabel(p.m.date))} · ${esc(fmtTime(p.m.date))}</b>${v36TierBadge(p.tier, false)}</span>
           <strong>${v36MatchTitleHtml(p)}</strong>
           <em class="v36-table-card__league">${esc(p.m.league_name || p.m.league || '')}</em>
-          <span class="v36-table-card__line"><i>${esc(p.label)}</i><b>@${p.odd.toFixed(2)}</b><b>${Math.round(p.rel * 100)}%</b><b>${p.edge >= 0 ? '+' : ''}${(p.edge * 100).toFixed(1)}%</b></span>
+          <span class="v36-table-card__line"><i data-tooltip="${esc(p.marketTooltip || p.labelFull || p.label)}">${esc(p.labelMobile || p.label)}</i><b>@${p.odd.toFixed(2)}</b><b>${Math.round(p.rel * 100)}%</b><b>${p.edge >= 0 ? '+' : ''}${(p.edge * 100).toFixed(1)}%</b></span>
           ${v37HistoryMode ? `<span class="v36-table-card__signals">${v37ResultBadge(result)}</span>` : ''}
         </button>`;
       };
