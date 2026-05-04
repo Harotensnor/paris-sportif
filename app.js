@@ -361,9 +361,10 @@
   // ex pronostics.html#locks → on lit location.hash pour set la bonne page.
   // Sans ce guard, le manifest shortcuts (#locks #bilan #combines) ne
   // marchaient pas — l'utilisateur arrivait toujours sur dashboard.
-  // n'était plus dans aucun sous-menu visible. Le code render reste safe
-  // "je veux voir au moins une semaine de pronos jour par jour").
-  const VALID_PAGES = ['dashboard','tous','performance','academie','profil','sante','legal','montantes'];
+  // v35.371 — Produit resserré à 5 hubs visibles. Les anciennes pages SPA
+  // restent joignables par alias vers leur hub naturel, mais ne sont plus des
+  // destinations autonomes.
+  const VALID_PAGES = ['dashboard','tous','performance','academie','profil'];
   // métriques, en réponse à l'audit ChatGPT 2026-04-26).
   // P0-2 (audit 2026-05-01) : alias pour les variantes pluriel/singulier que
   // l'utilisateur peut avoir bookmarké. Avant : #montantes-jour fallback sur
@@ -396,12 +397,18 @@
     'favoris': 'profil',
     'alertes': 'profil',
     'simulator': 'performance',
-    'montante-jour': 'montantes',
-    'montante-weekend': 'montantes',
-    'montante-semaine': 'montantes',
-    'montantes-jour': 'montantes',
-    'montantes-weekend': 'montantes',
-    'montantes-semaine': 'montantes',
+    'sante': 'profil',
+    'health': 'profil',
+    'diagnostic': 'profil',
+    'legal': 'profil',
+    'mentions-legales': 'profil',
+    'montantes': 'performance',
+    'montante-jour': 'performance',
+    'montante-weekend': 'performance',
+    'montante-semaine': 'performance',
+    'montantes-jour': 'performance',
+    'montantes-weekend': 'performance',
+    'montantes-semaine': 'performance',
     'vue-globale': 'performance',  // alias raccourci page Perf
     'cagnotte': 'performance',     // alias historique
     'agent': 'performance',        // alias 'page Mon agent'
@@ -429,7 +436,7 @@
   // vers legal.html → l'user est piégé et n'a plus accès au dashboard.
   // Solution : ne JAMAIS restaurer ces valeurs depuis localStorage. Le hash
   // explicite (#legal) reste respecté car c'est une intention user claire.
-  const STATIC_REDIRECT_PAGES = new Set(['legal', 'methodologie']);
+  const STATIC_REDIRECT_PAGES = new Set([]);
   let currentPage = (() => {
     const fromHash = _pageFromHash();
     if (fromHash) return fromHash;
@@ -13748,9 +13755,9 @@
       ['page', 'Tous les paris', 'tous', 'Filtrer tous les matchs'],
       ['page', 'Mes paris et performance', 'performance', 'Bilan, historique, track record'],
       ['page', 'Méthode', 'academie', 'Glossaire et stratégie'],
-      ['page', 'Profil', 'profil', 'Préférences et bankroll'],
-      ['page', 'Santé data', 'sante', 'Pipeline et erreurs'],
-      ['page', 'Montantes', 'montantes', 'Jour, weekend, semaine'],
+      ['page', 'Profil', 'profil', 'Préférences, diagnostic et bankroll'],
+      ['page', 'Diagnostic data', 'profil', 'Pipeline et erreurs dans Profil'],
+      ['page', 'Stratégies montantes', 'performance', 'Jour, weekend, semaine dans Performance'],
       ['action', 'Mode Big Bets seulement', 'focus', 'Masquer le bruit'],
       ['action', 'Cotes 2.50+', 'sport:all:2.5', 'Filtrer les grosses cotes'],
       ['action', 'Football du jour', 'sport:football', 'Filtrer football'],
@@ -25099,15 +25106,14 @@
       if (isActive) b.setAttribute('aria-current', 'page');
       else b.removeAttribute('aria-current');
     });
-    // mais sont maintenant rattachées à un hub visible pour éviter les vues
-    // "orphelines" (montantes, matchs détectés, simulateur).
+    // Les anciennes vues ont été repliées dans les 5 hubs officiels.
     const HUB_PAGES = {
       now: ['dashboard'],
       agent: ['performance'],
-      explore: ['tous', 'montantes'],
+      explore: ['tous'],
       performance: ['performance'],
       learn: ['academie'],
-      account: ['profil', 'sante', 'legal'],
+      account: ['profil'],
     };
     document.querySelectorAll('nav.topbar-nav .hub').forEach(h => {
       const k = h.dataset.hub;
