@@ -15433,7 +15433,54 @@
       });
       const v37TimingByEvent = new Map(v37Array(v37Intel.timing?.events).map(e => [String(e.event_id || ''), e]));
       const v37LeagueByCode = new Map(v37Array(v37Intel.league?.leagues).map(l => [String(l.league_code || ''), l]));
-      const v37OpportunityFor = (m, tier, rel, edge, ev) => {
+      const v37Coach = (() => {
+        try { return typeof computeCoachInsights === 'function' ? computeCoachInsights() : null; }
+        catch(e) { return null; }
+      })();
+      const v37CoachSportKey = (sport) => ({
+        football: 'Football', tennis: 'Tennis', basketball: 'Basketball',
+        hockey: 'Hockey', 'american-football': 'NFL', mma: 'MMA',
+        golf: 'Golf', racing: 'Racing', baseball: 'Baseball',
+      }[sport] || (sport ? String(sport).charAt(0).toUpperCase() + String(sport).slice(1) : '?'));
+      const v37CoachOddsBucket = (odd) => {
+        const o = Number(odd || 0);
+        if (!o || o < 1.30) return '<1.30';
+        if (o < 1.60) return '1.30–1.60';
+        if (o < 2.00) return '1.60–2.00';
+        if (o < 2.50) return '2.00–2.50';
+        if (o < 3.50) return '2.50–3.50';
+        return '≥3.50';
+      };
+      const v37CoachMap = (rows) => new Map(v37Array(rows).map(r => [String(r.key || ''), r]));
+      const v37CoachSportMap = v37CoachMap(v37Coach?.bySport);
+      const v37CoachLeagueMap = v37CoachMap(v37Coach?.byLeague);
+      const v37CoachOddsMap = v37CoachMap(v37Coach?.byOdds);
+      const v37ProfileForPick = (m, odd) => {
+        if (!v37Coach || Number(v37Coach.total || 0) < 10) return { delta: 0, badges: [], notes: [] };
+        const checks = [
+          { rec: v37CoachSportMap.get(v37CoachSportKey(m?.sport)), good: 5, bad: -7, min: 5, label: 'profil sport' },
+          { rec: v37CoachLeagueMap.get(String(m?.league_name || m?.league || '')), good: 6, bad: -8, min: 3, label: 'profil ligue' },
+          { rec: v37CoachOddsMap.get(v37CoachOddsBucket(odd)), good: 5, bad: -6, min: 4, label: 'profil cote' },
+        ];
+        let delta = 0;
+        const badges = [];
+        const notes = [];
+        checks.forEach(({ rec, good, bad, min, label }) => {
+          if (!rec || Number(rec.bets || 0) < min) return;
+          const roi = Number(rec.roi || 0);
+          if (roi > 10) {
+            delta += good;
+            badges.push(`${label} +`);
+            notes.push(`${label}: ROI +${roi.toFixed(1)}% (${rec.bets} paris)`);
+          } else if (roi < -10) {
+            delta += bad;
+            badges.push(`${label} -`);
+            notes.push(`${label}: ROI ${roi.toFixed(1)}% (${rec.bets} paris)`);
+          }
+        });
+        return { delta, badges, notes };
+      };
+      const v37OpportunityFor = (m, tier, rel, edge, ev, odd) => {
         const id = String(m?.id || '');
         const league = v37LeagueByCode.get(String(m?.league_code || '')) || null;
         const angles = v37Array((v37AnglesByEvent.get(id) || {}).angles);
@@ -15465,12 +15512,18 @@
         ].filter(Boolean).length;
         score += Math.min(8, dataBonus);
         if (dataBonus >= 5) badges.push('data riche');
+        const profile = v37ProfileForPick(m, odd);
+        if (profile.delta) {
+          score += profile.delta;
+          profile.badges.slice(0, 2).forEach(b => badges.push(b));
+        }
         const clean = Math.max(0, Math.min(100, Math.round(score)));
         const tooltip = [
           `Score opportunite ${clean}/100`,
           badges.length ? badges.join(' · ') : 'aucun angle special',
           `edge ${(edge * 100).toFixed(1)}%`,
-          `data ${dataBonus}/8`
+          `data ${dataBonus}/8`,
+          ...(profile.notes || [])
         ].join(' · ');
         return { score: clean, badges: badges.slice(0, 3), tooltip };
       };
@@ -15565,7 +15618,7 @@
               const edge = Number.isFinite(Number(c.edge)) ? Number(c.edge) : (rel - 1 / odd);
               const ev = Number.isFinite(Number(c.ev)) ? Number(c.ev) : (rel * odd - 1);
               const investmentScoreValue = Number(c.investment?.score || 0);
-              const intel = v37OpportunityFor(m, tier, rel, edge, ev);
+              const intel = v37OpportunityFor(m, tier, rel, edge, ev, odd);
               return {
                 m, pred, best: c, tier: tier.id, strict: tier.strict, odd, rel, edge, ev,
                 label: c.shortLabel || c.label || pred.pick?.label || 'Pick',
@@ -15895,6 +15948,17 @@
           <em>${esc(body || '')}</em>
         </${tag}>`;
       };
+      const v37PlainText = (value) => String(value || '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+      const v37CoachRows = v37Array(v37Coach?.insights)
+        .slice(0, 4)
+        .map(ins => v37InsightRow({
+          kicker: 'Profil Théo',
+          title: ins.kind === 'good' ? 'Angle perso favorable' : ins.kind === 'bad' ? 'Zone perso à réduire' : 'Pattern perso',
+          body: v37PlainText(ins.text),
+          tone: ins.kind === 'good' ? 'good' : ins.kind === 'bad' ? 'warn' : 'info',
+        }))
+        .join('');
+      const v37CoachCount = Number(v37Coach?.total || 0);
       const v37LeagueRows = (Array.isArray(v37Intel.league?.leagues) ? v37Intel.league.leagues : [])
         .filter(l => l && (l.status === 'exploit' || l.status === 'avoid') && Number(l.current_upcoming || 0) > 0)
         .sort((a, b) => (Number(b.current_upcoming || 0) - Number(a.current_upcoming || 0)) || (Number(b.inefficiency_score || 0) - Number(a.inefficiency_score || 0)))
@@ -16002,6 +16066,7 @@
             <aside class="v36-home-rail" aria-label="Radar temps reel">
               <section><header><span>Insights modèle</span><b>${v37IntelCount || '...'}</b></header>${v37RareRows || v37AngleRows || v37IntelFallback}</section>
               <section><header><span>Biais marché ligues</span><b>${Number(v37Intel.league?.summary?.exploit || 0)}</b></header>${v37LeagueRows || v37IntelFallback}</section>
+              <section><header><span>Profil Théo</span><b>${v37CoachCount || '...'}</b></header>${v37CoachRows || `<div class="v36-tier-empty">Tracke quelques paris : le modèle apprendra tes bons sports, cotes et ligues.</div>`}</section>
               <section><header><span>Gaps data critiques</span><b>${v37GapCount || '...'}</b></header>${v37GapRows || `<div class="v36-tier-empty">Aucun trou prioritaire sur ce snapshot.</div>`}</section>
               <section><header><span>Timing mise</span><b>${Number(v37Intel.timing?.summary?.wait || 0)}</b></header>${v37TimingRows || `<div class="v36-tier-empty">Aucune attente forcée : les picks restent jouables selon ton filtre.</div>`}</section>
               <section><header><span>Stats live</span><b>${v36Total}</b></header><div class="v36-side-stats">${v36StatsHtml}</div></section>
