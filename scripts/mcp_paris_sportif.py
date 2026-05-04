@@ -222,16 +222,20 @@ def _data_truth_snapshot(data: dict) -> dict:
     upcoming = [ev for ev in events if not ev.get("completed")]
     upcoming_available = sum(1 for ev in upcoming if (ev.get("winamax") or {}).get("available") is True)
     upcoming_exact = sum(1 for ev in upcoming if is_exact(ev))
-    today = _active_data_day(data)
+    today = _today_iso()
+    active_day = _active_data_day(data)
     return {
         "source": "data.js",
         "calculated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "today": today,
+        "active_data_day": active_day,
+        "data_day_is_current": active_day == today,
         "data_today_field": data.get("today"),
         "day_keys": sorted((data.get("days") or {}).keys()),
         "total": len(events),
         "upcoming": len(upcoming),
         "today_events": len((data.get("days") or {}).get(today, []) or []),
+        "active_day_events": len((data.get("days") or {}).get(active_day, []) or []),
         "winamax_available": available,
         "winamax_exact": exact,
         "winamax_exact_ratio": round(exact / available, 4) if available else 0,
@@ -1110,9 +1114,11 @@ def get_pipeline_status() -> dict:
     night = _load_json(NIGHT_METRICS) if NIGHT_METRICS.exists() else {}
     gap_report = _load_json(SIGNAL_GAP_REPORT) if SIGNAL_GAP_REPORT.exists() else {}
 
-    today = _active_data_day(data) if not "_error" in data else None
+    today = _today_iso() if not "_error" in data else None
+    active_day = _active_data_day(data) if not "_error" in data else None
     truth = _data_truth_snapshot(data) if not "_error" in data else {}
     today_events = (data.get("days") or {}).get(today, []) if today else []
+    active_day_events = (data.get("days") or {}).get(active_day, []) if active_day else []
 
     # Count by source — Sofascore events have id="sofa_<n>" + source="sofascore"
     # (cf. patch_sofascore_events.py / fetch_sofascore_events.py). ESPN events
@@ -1125,9 +1131,9 @@ def get_pipeline_status() -> dict:
             return True
         return False
 
-    sofa_count = sum(1 for ev in today_events if _is_sofa(ev))
-    espn_count = len(today_events) - sofa_count
-    winamax_count = sum(1 for ev in today_events if (ev.get("winamax") or {}).get("available"))
+    sofa_count = sum(1 for ev in active_day_events if _is_sofa(ev))
+    espn_count = len(active_day_events) - sofa_count
+    winamax_count = sum(1 for ev in active_day_events if (ev.get("winamax") or {}).get("available"))
 
     def _fresh(age_min) -> bool:
         return isinstance(age_min, (int, float)) and age_min < 60
@@ -1182,6 +1188,8 @@ def get_pipeline_status() -> dict:
         "source_of_truth": "data.js",
         "project_root": str(PROJECT_ROOT),
         "today": today,
+        "active_data_day": active_day,
+        "data_day_is_current": active_day == today,
         "local_today": _today_iso(),
         "data_today_field": data.get("today") if not "_error" in data else None,
         "data_generated_at": data_generated_at,
@@ -1212,6 +1220,8 @@ def get_pipeline_status() -> dict:
         },
         "events_today": {
             "total": len(today_events),
+            "active_data_day": active_day,
+            "active_day_total": len(active_day_events),
             "from_espn": espn_count,
             "from_sofascore": sofa_count,
             "winamax_bookable": winamax_count,

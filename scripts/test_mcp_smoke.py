@@ -128,6 +128,31 @@ def main() -> int:
     if pipeline.get("today") == stale_today:
         print('[mcp_smoke] FAIL stale hardcoded date leaked into pipeline status', file=sys.stderr)
         return 1
+    original_loader = mod._load_data_js
+    try:
+        mod._load_data_js = lambda: {
+            "today": stale_today,
+            "generated_at": "2026-04-30T08:00:00Z",
+            "days": {stale_today: [{"id": "stale-only"}]},
+        }
+        stale_pipeline = mod.get_pipeline_status()
+    finally:
+        mod._load_data_js = original_loader
+    if stale_pipeline.get("today") != local_today:
+        print(
+            f'[mcp_smoke] FAIL stale data must still report local today: expected {local_today}, got {stale_pipeline.get("today")}',
+            file=sys.stderr,
+        )
+        return 1
+    if stale_pipeline.get("active_data_day") != stale_today:
+        print(
+            f'[mcp_smoke] FAIL stale active_data_day should expose the stale bucket: expected {stale_today}, got {stale_pipeline.get("active_data_day")}',
+            file=sys.stderr,
+        )
+        return 1
+    if stale_pipeline.get("data_day_is_current") is not False:
+        print('[mcp_smoke] FAIL stale data must set data_day_is_current=false', file=sys.stderr)
+        return 1
 
     ok: list[str] = []
     fail: list[tuple[str, str]] = []

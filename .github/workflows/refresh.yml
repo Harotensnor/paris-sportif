@@ -191,6 +191,12 @@ jobs:
           # https://harotensnor.github.io/paris-sportif/health.json so we can
           # spot stale/missing sources without scraping the workflow logs.
           python3 build_health.py || true
+          # v35.403 — MCP diagnostics guard. The desktop connector can point to
+          # a historical script path locally, so sync that copy when present and
+          # smoke-test that `today` is dynamic even if data buckets are stale.
+          python3 sync_mcp_shadow_copy.py || true
+          python3 audit_mcp_shadow_copy.py || true
+          python3 test_mcp_smoke.py
           # v35.336 — Report all remaining signal blind spots by match/league.
           # This makes missing lineups/injuries/referee/H2H/xG actionable
           # without reading workflow logs.

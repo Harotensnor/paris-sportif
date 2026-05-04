@@ -301,3 +301,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix: creation de `ISSUES_ACTIVE.md` et `ISSUES_RESOLVED.md`; `ISSUES.md` devient un index court avec la seule issue OPEN actuelle.
 - Mesure: fichier principal 32KB -> 1.2KB; active=1 issue, resolved/history=53 blocs.
 - Garde-fou: `scripts/audit_issues_split.py` refuse un FIXED dans l'actif ou un OPEN/PARTIAL dans le resolu; cache/footer bumpes v35.382.
+
+## Sprint v35.403 — AUTO 10/10 Date MCP vraiment dynamique (00:52 UTC)
+- Bug critique: si la data bucket etait stale, `get_pipeline_status()` pouvait encore exposer ce vieux bucket comme `today`, ce qui entretenait le retour fantome `2026-04-30`.
+- Fix: `today` est maintenant toujours la date locale courante; `active_data_day` expose separement le bucket data reellement utilise, avec `data_day_is_current`.
+- Garde-fou: `test_mcp_smoke.py` injecte un dataset stale volontaire et refuse toute fuite de date ancienne; copie MCP historique synchronisee et auditee.
+- Pipeline: `auto_refresh.py` et `refresh.yml` lancent sync/audit/smoke MCP pour eviter une nouvelle divergence desktop; cache/footer bumpes v35.403.
