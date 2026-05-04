@@ -45,6 +45,14 @@ test.describe('v35 market scanner', () => {
               { market: 'ht_ou', side: 'over', line: 0.5, odd: 1.48, label: 'Plus de 0,5' },
               { market: 'ht_ou', side: 'under', line: 0.5, odd: 2.55, label: 'Moins de 0,5' },
             ],
+            corners_ou: [
+              { market: 'corners_ou', side: 'over', line: 8.5, odd: 1.92, label: 'Plus de 8,5' },
+              { market: 'corners_ou', side: 'under', line: 8.5, odd: 1.86, label: 'Moins de 8,5' },
+            ],
+            cards_ou: [
+              { market: 'cards_ou', side: 'over', line: 3.5, odd: 1.88, label: 'Plus de 3,5' },
+              { market: 'cards_ou', side: 'under', line: 3.5, odd: 1.90, label: 'Moins de 3,5' },
+            ],
           },
         },
       };
@@ -52,6 +60,8 @@ test.describe('v35 market scanner', () => {
         pick: { key: '1', prob: 0.58, label: 'Home gagne' },
         reliability: 0.58,
         odds: { home: 2.10, draw: 3.40, away: 3.20 },
+        poisson: { xgH: 1.65, xgA: 1.28 },
+        referee: { name: 'Test Ref', yellowPerGame: 4.7, games: 18, tier: 'strict' },
         markets: {
           btts: { prob: 0.54, side: 'yes', key: 'BTTS_Y' },
           extended: {
@@ -82,7 +92,7 @@ test.describe('v35 market scanner', () => {
 
     expect(candidates.length).toBeGreaterThanOrEqual(5);
     expect(candidates.every(c => c.source === 'winamax_exact' && c.exact === true)).toBe(true);
-    expect(candidates.map(c => c.market)).toEqual(expect.arrayContaining(['1n2', 'ou25', 'btts', 'dnb', 'teamTotal', 'htTotal']));
+    expect(candidates.map(c => c.market)).toEqual(expect.arrayContaining(['1n2', 'ou25', 'btts', 'dnb', 'teamTotal', 'htTotal', 'cornersTotal', 'cardsTotal']));
     expect(candidates.find(c => c.market === 'ou25' && c.key === 'O2.5').ev).toBeGreaterThan(0);
     const teamTotal = candidates.find(c => c.market === 'teamTotal');
     expect(teamTotal.label).toBe('Freiburg marque au moins 1 but');
@@ -94,6 +104,8 @@ test.describe('v35 market scanner', () => {
     expect(candidates.find(c => c.market === 'dnb').label).toBe('Freiburg (nul remboursé)');
     expect(candidates.find(c => c.market === 'btts' && c.key === 'BTTS_Y').label).toBe('Les deux équipes marquent (oui)');
     expect(candidates.find(c => c.market === 'htTotal' && c.key === 'HT_O0.5').label).toBe('Plus de 0,5 buts en 1re mi-temps');
+    expect(candidates.find(c => c.market === 'cornersTotal' && c.key === 'CORN_O8.5').label).toBe('Plus de 8,5 corners');
+    expect(candidates.find(c => c.market === 'cardsTotal' && c.key === 'CARD_O3.5').label).toBe('Plus de 3,5 cartons jaunes');
     expect(candidates.map(c => c.label).join(' | ')).not.toMatch(/\bDNB\s+[12]\b|BTTS Oui|équipe seulement|^1 ·|^2 ·/);
   });
 

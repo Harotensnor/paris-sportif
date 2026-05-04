@@ -280,6 +280,47 @@ def _extract_match_markets(state: dict, match_id: str) -> dict:
                         under_v = od
                 if over_v and under_v:
                     markets[key] = {'over': over_v, 'under': under_v, 'line': line_val}
+        # Corners O/U exacts Winamax
+        elif 'corner' in title and ('nombre' in title or 'total' in title):
+            _add_ou_rows(markets, 'corners_ou', bet.get('betTypeName') or '', oitems)
+            for line_val, key in [(7.5, 'corners_ou75'), (8.5, 'corners_ou85'), (9.5, 'corners_ou95'),
+                                  (10.5, 'corners_ou105'), (11.5, 'corners_ou115')]:
+                if key in markets:
+                    continue
+                line_str_dot = str(line_val)
+                line_str_comma = str(line_val).replace('.', ',')
+                over_v = under_v = None
+                for label, od in oitems:
+                    l = label.lower()
+                    has_line = (line_str_dot in l or line_str_comma in l)
+                    is_over = 'plus' in l or 'over' in l or l.startswith('+') or '≥' in l
+                    is_under = 'moins' in l or 'under' in l or l.startswith('-') or '<' in l
+                    if has_line and is_over:
+                        over_v = od
+                    elif has_line and is_under:
+                        under_v = od
+                if over_v and under_v:
+                    markets[key] = {'over': over_v, 'under': under_v, 'line': line_val}
+        # Cartons jaunes O/U exacts Winamax
+        elif 'carton' in title and ('jaune' in title or 'cartons' in title) and ('nombre' in title or 'total' in title):
+            _add_ou_rows(markets, 'cards_ou', bet.get('betTypeName') or '', oitems)
+            for line_val, key in [(2.5, 'cards_ou25'), (3.5, 'cards_ou35'), (4.5, 'cards_ou45'), (5.5, 'cards_ou55')]:
+                if key in markets:
+                    continue
+                line_str_dot = str(line_val)
+                line_str_comma = str(line_val).replace('.', ',')
+                over_v = under_v = None
+                for label, od in oitems:
+                    l = label.lower()
+                    has_line = (line_str_dot in l or line_str_comma in l)
+                    is_over = 'plus' in l or 'over' in l or l.startswith('+') or '≥' in l
+                    is_under = 'moins' in l or 'under' in l or l.startswith('-') or '<' in l
+                    if has_line and is_over:
+                        over_v = od
+                    elif has_line and is_under:
+                        under_v = od
+                if over_v and under_v:
+                    markets[key] = {'over': over_v, 'under': under_v, 'line': line_val}
         # Double Chance
         elif 'double chance' == title:
             if 'dc' not in markets:

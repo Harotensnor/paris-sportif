@@ -349,3 +349,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Front: la table peut afficher des picks exacts "Plus/Moins de X but en 1re mi-temps" via le marche `htTotal`, avec tooltip debutant-safe.
 - Garde-fou: test `market-candidates` et syntax/bundle a relancer; aucun marche n'est invente sans cote Winamax.
 - Cache/footer bumpes v35.410; `app.js` hash `130cf870`.
+
+## Sprint v35.411 — AUTO 10/10 Corners/cartons exacts (01:51 UTC)
+- Elargissement: Winamax match details detecte maintenant les lignes exactes corners O/U et cartons jaunes O/U.
+- Front: les candidats `cornersTotal` et `cardsTotal` utilisent seulement les cotes Winamax exactes, avec libelles "Plus/Moins de X corners/cartons jaunes".
+- Modele: probas prudentes locales basees sur xG total pour corners et profil arbitre/meteo pour cartons, fallback no-vig si contexte absent.
+- Cache/footer bumpes v35.411; `app.js` hash `830d05ad`.
