@@ -2302,3 +2302,9 @@
 - Fix: elargissement des ligues H2H prioritaires aux top ligues visibles par Theo (ENG/ESP/ITA/FRA/GER/POR/NED/BEL/SCO/AUT + LATAM/MLS) puis refresh cible ESPN.
 - Impact mesure: fetch H2H 28 matchs verifies, 24 enrichis; H2H night_metrics 168 -> 177; Roma-Fiorentina, Lazio-Cremonese, Real Sociedad-Sevilla et Man City-Everton passent a 7/7 sources.
 - Verif: measure_night_metrics/build_signal_gap_report/build_health/finalize_inline OK; cache/footer bumpes v35.354.
+
+## Sprint v35.355 — AUTO 10/10 Bugs captures #2-#6 verrouilles (18:41 UTC)
+- Fix: badges trader convertis en francais naturel avec tooltip, "strict" retire du visible au profit de "Selection exigeante"; score opportunite garde legende + tooltip + classes couleur.
+- Fix: raisons modal orientees selon le marche clique (1N2/DNB, total, BTTS, double chance, handicap, team total) et doublons meme match mieux groupes visuellement.
+- Impact mesure: audit navigateur capture bugs = 720 lignes/cards, 0 badge opaque, 360 scores tooltipes/classes, 640 marqueurs doublons, modal raisons presente, 0 erreur console.
+- Verif: `node --check app.js/sw.js/audit_capture_bugs.js`, `audit_capture_bugs.js`, `check_no_conflict_markers.py`; cache/footer bumpes v35.355.
