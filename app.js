@@ -14203,6 +14203,10 @@ lookahead: 'Match piège',
 'timing cote': 'Bon timing cote',
 'data riche': 'Données riches',
 'data gap': 'Données manquantes',
+'signal stable': 'Signal stable',
+'signal instable': 'Signal instable',
+'data fraîche': 'Data fraîche',
+'data vieillissante': 'Data vieillissante',
 prudence: 'Prudence data',
 'profil sport +': 'Ton profil sport +',
 'profil sport -': 'Ton profil sport -',
@@ -14246,6 +14250,10 @@ const v37BadgeTooltip = (badge) => ({
 'Bon timing cote': 'La cote actuelle est jugée intéressante par rapport au mouvement récent.',
 'Données riches': 'Le match dispose de plusieurs signaux fiables.',
 'Données manquantes': 'Certaines sources clés manquent : confiance réduite.',
+'Signal stable': 'Les sous-modèles sont proches : le score gagne en stabilité.',
+'Signal instable': 'Les sous-modèles divergent : le score est pénalisé.',
+'Data fraîche': 'Le snapshot data est récent.',
+'Data vieillissante': 'Le snapshot data est ancien : vérifier avant de miser.',
 'Prudence data': 'Signal incomplet sur une source importante.',
 'Ton profil sport +': 'Tes paris suivis performent mieux sur ce sport.',
 'Ton profil sport -': 'Tes paris suivis performent moins bien sur ce sport.',
@@ -14254,7 +14262,7 @@ const v37BadgeTooltip = (badge) => ({
 'Ton profil cote +': 'Ton historique est favorable sur cette plage de cote.',
 'Ton profil cote -': 'Ton historique est défavorable sur cette plage de cote.',
 }[String(badge || '')] || `Signal détecté : ${String(badge || 'angle')}`);
-const v37OpportunityFor = (m, tier, rel, edge, ev, odd, pick) => {
+const v37OpportunityFor = (m, tier, rel, edge, ev, odd, pick, pred) => {
 const id = String(m?.id || '');
 const league = v37LeagueByCode.get(String(m?.league_code || '')) || null;
 const marketBias = v37MarketBiasForPick(pick);
@@ -14274,6 +14282,18 @@ const edgePart = Math.max(-12, Math.min(24, edge * 180));
 const confidencePart = Math.max(-8, Math.min(18, (rel - 0.50) * 90));
 let score = 48 + addScorePart('Edge', edgePart) + addScorePart('Confiance', confidencePart);
 const badges = [];
+const variance = Number(pred?.ensemble?.agreement_variance);
+const stabilityPart = Number.isFinite(variance)
+? variance <= 0.03 ? 5 : variance <= 0.08 ? 2 : variance <= 0.15 ? -4 : -9
+: -3;
+score += addScorePart('Stabilité signal', stabilityPart);
+if (stabilityPart >= 4) badges.push('signal stable');
+else if (stabilityPart <= -4) badges.push('signal instable');
+const dataAge = Number(_dataAgeMin || 0);
+const freshnessPart = dataAge <= 45 ? 4 : dataAge <= 120 ? 2 : dataAge <= 240 ? 0 : -10;
+score += addScorePart('Fraîcheur data', freshnessPart);
+if (freshnessPart >= 2) badges.push('data fraîche');
+else if (freshnessPart <= -6) badges.push('data vieillissante');
 let leaguePriorityBonus = 0;
 if (tier?.strict) { score += addScorePart('Tier strict', 6); badges.push('strict'); }
 if (league?.status === 'exploit') {
@@ -14361,12 +14381,14 @@ const friendlyBadges = badges.map(v37HumanBadge).filter(Boolean);
 const tooltip = [
 `Score d'opportunité ${clean}/100`,
 `Décomposition: ${scoreParts.join(' · ')}`,
-'Score plafonné entre 0 et 100; il combine edge, confiance, biais marché, timing, signaux rares et profil Théo',
+'Score plafonné entre 0 et 100; il combine edge, confiance, stabilité du signal, fraîcheur data, biais marché, timing, signaux rares et profil Théo',
 friendlyBadges.length ? friendlyBadges.join(' · ') : 'aucun angle spécial',
 conflictAngle?.context || '',
 uncertainMarket?.context ? `Marché incertain: ${uncertainMarket.context}` : '',
 rawRareDirectional !== rareDirectional ? `Biais ligue prioritaire: malus match ${rawRareDirectional.toFixed(1)} -> ${rareDirectional.toFixed(1)}` : '',
 `edge ${(edge * 100).toFixed(1)}%`,
+Number.isFinite(variance) ? `variance ensemble ${variance.toFixed(3)}` : 'variance ensemble indisponible',
+`data ${dataAge} min`,
 marketBias ? `${marketBias.label || 'marché'} ${marketBias.pick || ''}: ${marketBias.reason || marketBias.status}` : '',
 `data ${dataBonus}/8`,
 missingSignals.length ? `manque ${missingSignals.slice(0, 4).join(', ')}` : '',
@@ -14495,7 +14517,7 @@ const odd = Number(c.odd || 0);
 const edge = Number.isFinite(Number(c.edge)) ? Number(c.edge) : (rel - 1 / odd);
 const ev = Number.isFinite(Number(c.ev)) ? Number(c.ev) : (rel * odd - 1);
 const investmentScoreValue = Number(c.investment?.score || 0);
-const intel = v37OpportunityFor(m, tier, rel, edge, ev, odd, c);
+const intel = v37OpportunityFor(m, tier, rel, edge, ev, odd, c, pred);
 return {
 m, pred, best: c, tier: tier.id, strict: tier.strict, odd, rel, edge, ev,
 pickUid: v37PickUid(m, c),
@@ -14688,7 +14710,7 @@ const v37TierLegendHtml = `<details class="v37-tier-legend" open>
 ${v36TierBadge(t.id, false)} <span>${esc(t.range)} · ${esc(t.desc)}</span>
 </button>`).join('')}
         </div>
-        <p class="v37-score-legend"><b>Score d'opportunité (0-100)</b> : combine edge, confiance, biais marché, timing de cote, signaux rares, qualité data et profil Théo. 80+ = priorité, 60-79 = intéressant, 40-59 = prudence.</p>
+        <p class="v37-score-legend"><b>Score d'opportunité (0-100)</b> : combine edge, confiance, stabilité du signal, fraîcheur data, biais marché, timing de cote, signaux rares, qualité data et profil Théo. 80+ = priorité, 60-79 = intéressant, 40-59 = prudence.</p>
       </details>`;
 const v37DayChip = (label, value, deltaLabel) => {
 const active = v37DateFilter === value;

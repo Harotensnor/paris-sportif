@@ -2,11 +2,17 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
+## Sprint v35.396 — C2 score opportunite stabilite fraicheur (21:46 UTC)
+- Avant: le score 0-100 combinait edge/confiance/biais/timing, mais ne penaliseait pas explicitement un consensus instable ou une data vieillissante.
+- Apres: ajout des composantes Stabilite signal et Fraicheur data, badges associes et details dans tooltip/aria-label.
+- Impact mesure: le test tooltip score exige maintenant les deux nouvelles composantes visibles.
+- Verif: suite score+dashboard OK (4/4), bundle-size OK, syntax JS OK, no-conflict-markers OK; cache/footer bumpes v35.396.
 ## Sprint v35.395 — H10 carrousel paris par sport (21:39 UTC)
 - Avant: la table exposait plus de marches, mais il manquait une lecture rapide par discipline pour choisir Foot/Tennis/Basket/Hockey/Baseball.
 - Apres: ajout de la section Paris du jour par sport avec top 3 par sport, sans doublon match, triee par score opportunite.
 - Impact mesure: le test dashboard-market-depth verifie maintenant table multi-marches + carrousel sport visible sur desktop et mobile.
 - Verif: suite cible H10+B5 OK (4/4), bundle-size OK, syntax JS OK, no-conflict-markers OK; cache/footer bumpes v35.395.
+
 ## Sprint v35.394 — H1 table multi-marches etendue (21:33 UTC)
 - Avant: le dashboard gardait au plus 3 candidats par match, ce qui masquait des marches Winamax detailles deja presents (mi-temps, total equipe, score exact, O/U 0,5-5,5).
 - Apres: selection diversifiee jusqu'a 8 picks foot par match et 4 autres sports, avec plafond par marche pour eviter les doublons opaques.
@@ -293,9 +299,4 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Refactor `backtest_by_market.py` : les biais marchés ne comptent plus que les picks avec cote Winamax/snapshot réelle.
 - `market_biases_by_league` passe de `directional_only n=51` partagé à `priced_market_sample` par marché (ex. 7-8 cotes réelles sur le sample courant), sans exploit/fade sur petit volume.
 - Audits OK : intelligence consistency, data truth après regen night_metrics, syntax app/sw, no conflict markers.
-
-## Sprint v35.388 — A3 contexte arbitral honnête
-- Fetch arbitres élargi à 7 jours : les affectations exactes publiées restent faibles (20 événements exacts sur le slate courant), donc pas de faux nom arbitre.
-- `patch_referees_soccer.py` ajoute un `referee_context` de ligue quand l'arbitre exact est absent, avec `assignmentConfirmed=false` et moyennes cartes issues des arbitres confirmés.
-- `night_metrics` distingue désormais `referee` exact (20), `referee_context` (105) et `referee_signal` (125), pour une couverture signal honnête sans masquer le manque d'affectations officielles.
 
