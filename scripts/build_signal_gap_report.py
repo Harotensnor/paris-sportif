@@ -113,6 +113,13 @@ def _is_upcoming(ev: dict[str, Any], now_ts: float) -> bool:
     return _date_ts(ev) > now_ts
 
 
+def _hours_until(ev: dict[str, Any], now_ts: float) -> float:
+    ts = _date_ts(ev)
+    if not ts:
+        return 999.0
+    return (ts - now_ts) / 3600
+
+
 def _has_h2h(ev: dict[str, Any]) -> bool:
     h2h = ev.get("h2h")
     if isinstance(h2h, list):
@@ -210,11 +217,16 @@ def _event_signal_map(ev: dict[str, Any]) -> dict[str, bool]:
     }
 
 
-def _expected_signals(ev: dict[str, Any]) -> list[str]:
+def _expected_signals(ev: dict[str, Any], now_ts: float) -> list[str]:
     sport = str(ev.get("sport") or "")
     league_code = _league(ev)
     if sport == "football":
-        base = ["h2h", "injuries", "starter_signals", "referee"]
+        base = ["h2h", "injuries", "referee"]
+        # Projected lineups/starters are only an actionable gap close enough to
+        # kickoff. Six days ahead, "missing lineups" is normal; six hours ahead,
+        # it should lower confidence and trigger manual review.
+        if _hours_until(ev, now_ts) <= 36:
+            base.append("starter_signals")
         if league_code in TOP_FOOTBALL_LEAGUES:
             base.extend(["xg", "clubelo", "weather"])
         elif league_code in LATAM_FOOTBALL_LEAGUES:
@@ -243,10 +255,14 @@ def _priority_score(ev: dict[str, Any], missing: list[str], now_ts: float) -> fl
         score += 10
     if ev.get("winamax", {}).get("available"):
         score += 8
-    hours = (_date_ts(ev) - now_ts) / 3600 if _date_ts(ev) else 999
+    hours = _hours_until(ev, now_ts)
     if 0 <= hours <= 48:
         score += 12
     elif 0 <= hours <= 120:
+        score += 6
+    if "starter_signals" in missing and 0 <= hours <= 6:
+        score += 10
+    if "referee" in missing and 0 <= hours <= 24:
         score += 6
     return score
 
@@ -277,7 +293,7 @@ def main() -> int:
             },
         )
         maps = _event_signal_map(ev)
-        expected = _expected_signals(ev)
+        expected = _expected_signals(ev, now_ts)
         missing = [name for name in expected if not maps.get(name)]
         is_upcoming = _is_upcoming(ev, now_ts)
 
