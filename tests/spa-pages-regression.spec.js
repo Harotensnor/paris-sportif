@@ -1,8 +1,7 @@
 // SPA pages regression smoke (v34.33).
 //
-// The site keeps many hash pages alive for power users and bookmarks. This
-// test makes sure a refactor does not silently orphan one of them, create a
-// mobile horizontal overflow, or hide the mobile intent nav again.
+// The site exposes five official hubs. Legacy hashes are still accepted, but
+// they must redirect to one of those hubs rather than resurrect old pages.
 
 import { test, expect } from '@playwright/test';
 
@@ -26,9 +25,12 @@ const SPA_PAGES = [
   'backtest',
   'academie',
   'profil',
+  'sante',
+  'legal',
   'favoris',
   'alertes',
   'matchs',
+  'montantes',
   'montante-jour',
   'montante-weekend',
   'montante-semaine',
@@ -52,9 +54,12 @@ const HASH_EXPECTATIONS = {
   backtest: '#performance',
   credibilite: '#performance',
   simulator: '#performance',
-  'montante-jour': '#montantes',
-  'montante-weekend': '#montantes',
-  'montante-semaine': '#montantes',
+  sante: '#profil',
+  legal: '#profil',
+  montantes: '#performance',
+  'montante-jour': '#performance',
+  'montante-weekend': '#performance',
+  'montante-semaine': '#performance',
 };
 
 test.beforeEach(async ({ context }) => {
@@ -122,9 +127,10 @@ test('mobile bottom nav highlights the right intent for deep pages', async ({ pa
   const cases = [
     ['#dashboard', 'Accueil'],
     ['#locks', 'Accueil'],
+    ['#tous', 'Tous'],
     ['#historique', 'Mes paris'],
     ['#simulator', 'Mes paris'],
-    ['#profil', 'Plus'],
+    ['#methodologie', 'Méthode'],
   ];
 
   for (const [hash, expected] of cases) {
