@@ -2127,3 +2127,8 @@
 - Apres: night_metrics regenere sur le snapshot courant et test_mcp_smoke simule `data.today=2026-04-30` pour verifier que `_active_data_day` prend le jour Europe/Paris frais.
 - Impact: bug #16 garde-fou en place: get_pipeline_status annonce `today=2026-05-04`, local_today=2026-05-04, data_age_min=0; Winamax exact reste 342/342 (100%).
 - Verif: py_compile MCP/metrics/smoke OK; test_mcp_smoke OK 14 tools; measure_night_metrics OK; footer/cache bumpes.
+## Sprint v35.324 — AUTO 10/10 Inline event handlers sweep (15:51 UTC)
+- Avant: app.js contenait encore des `onerror/onmouseover/onclick` inline et pronostics.html gardait `onload/onerror`, bloquant la trajectoire CSP stricte.
+- Apres: images cassées passent par `handleSafeImageError` delegue, les CTA/refresh utilisent des data attributes, et le CSS/analytics se chargent sans handler HTML inline.
+- Impact: bug #36/#65 avance fortement: grep inline events sur app.js/pronostics/app.css/sw.js => 0, tout en conservant les fallbacks logos/joueurs.
+- Verif: app hash 5d8f3cc5, css hash d2c9d7f2, cache/footer bumpes; syntax/smoke navigateur a suivre avant push.

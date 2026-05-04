@@ -166,6 +166,36 @@
     } catch(e) {}
   }
   try { window.enhanceLazyImages = enhanceLazyImages; } catch(e) {}
+  function handleSafeImageError(img) {
+    try {
+      if (!img || !img.matches || !img.matches('img[data-fallback-mode], img[data-fallback-text], img[data-league-logo]')) return;
+      if (img.dataset.fallbackHandled === '1') return;
+      img.dataset.fallbackHandled = '1';
+      if (img.dataset.leagueLogo === '1' && typeof _leagueLogoMark404 === 'function') {
+        _leagueLogoMark404(img.currentSrc || img.src);
+      }
+      const fallbackText = img.dataset.fallbackText;
+      const mode = img.dataset.fallbackMode || (fallbackText != null ? 'replace' : 'hide');
+      if (fallbackText != null && mode !== 'hide' && mode !== 'remove') {
+        const span = document.createElement('span');
+        span.textContent = fallbackText;
+        span.setAttribute('aria-hidden', 'true');
+        if (img.dataset.fallbackClass) span.className = img.dataset.fallbackClass;
+        if (img.dataset.fallbackStyle) span.setAttribute('style', img.dataset.fallbackStyle);
+        img.replaceWith(span);
+        return;
+      }
+      if (mode === 'remove') {
+        img.remove();
+        return;
+      }
+      img.style.display = 'none';
+    } catch(e) {}
+  }
+  try {
+    document.addEventListener('error', (e) => handleSafeImageError(e.target), true);
+    window.handleSafeImageError = handleSafeImageError;
+  } catch(e) {}
   try {
     document.addEventListener('DOMContentLoaded', () => {
       enhanceLazyImages(document);
@@ -597,6 +627,16 @@
 
   // pour CSP friendlier (préparation à passer en CSP strict sans
   // 'unsafe-inline' un jour).
+  document.addEventListener('click', (e) => {
+    const passiveTarget = e.target.closest && e.target.closest('[data-no-detail]');
+    if (passiveTarget) e.stopPropagation();
+    const reloadTarget = e.target.closest && e.target.closest('[data-reload-page]');
+    if (reloadTarget) {
+      e.preventDefault();
+      e.stopPropagation();
+      try { location.reload(); } catch(_) {}
+    }
+  }, true);
   document.addEventListener('click', (e) => {
     // Smart suggestion banner dismiss
     if (e.target.closest && e.target.closest('[data-smart-dismiss]')) {
@@ -9382,8 +9422,8 @@
       // Note : 1 raison compacte — explicite pourquoi ce pick plutôt qu'un autre
       const topReason = (pred.explain?.reasons || [])[0];
       const betBtnHtml = '';
-      const hLogo = home?.logo ? `<img class="team__logo" src="${esc(home.logo)}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'">` : '<span class="team__logo team__logo--placeholder"></span>';
-      const aLogo = away?.logo ? `<img class="team__logo" src="${esc(away.logo)}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'">` : '<span class="team__logo team__logo--placeholder"></span>';
+      const hLogo = home?.logo ? `<img class="team__logo" src="${esc(home.logo)}" alt="" loading="lazy" decoding="async" data-fallback-mode="hide">` : '<span class="team__logo team__logo--placeholder"></span>';
+      const aLogo = away?.logo ? `<img class="team__logo" src="${esc(away.logo)}" alt="" loading="lazy" decoding="async" data-fallback-mode="hide">` : '<span class="team__logo team__logo--placeholder"></span>';
       return `
         <div class="top-pick pick-row ${urgent ? 'urgent' : ''}" data-id="${esc(m.id)}">
           <div class="tp-head">
@@ -9898,7 +9938,7 @@
           const aName = aC.name || aC.short || '?';
           // img hides itself on 404 so missing photos fall back cleanly.
           const faceHtml = l.scorer.pid
-            ? `<img loading="lazy" decoding="async" src="https://img.sofascore.com/api/v1/player/${l.scorer.pid}/image" alt="" style="width:36px;height:36px;border-radius:50%;object-fit:cover;background:var(--bg);border:1px solid var(--border);flex-shrink:0;" onerror="this.style.display='none'">`
+            ? `<img loading="lazy" decoding="async" src="https://img.sofascore.com/api/v1/player/${l.scorer.pid}/image" alt="" style="width:36px;height:36px;border-radius:50%;object-fit:cover;background:var(--bg);border:1px solid var(--border);flex-shrink:0;" data-fallback-mode="hide">`
             : `<div style="width:36px;height:36px;border-radius:50%;background:var(--bg);border:1px solid var(--border);display:grid;place-items:center;font-size:13px;font-weight:700;color:var(--text-dim);flex-shrink:0;">${esc((l.scorer.name||'?').split(/\s+/).slice(-1)[0]?.[0]||'?')}</div>`;
           return `
           <div style="display:grid;grid-template-columns:36px 1fr auto auto;gap:12px;padding:10px 12px;border-bottom:1px solid var(--border);align-items:center;">
@@ -10455,14 +10495,14 @@
             const lname = m.league_name || m.league_code || '';
             const ico = sportIcon(m.sport);
             return `<span class="venue" style="display:inline-flex;align-items:center;gap:5px;">
-              ${lurl ? `<img src="${esc(lurl)}" alt="" loading="lazy" decoding="async" style="width:14px;height:14px;object-fit:contain;" onerror="window._leagueLogoMark404 && window._leagueLogoMark404(this.src);this.outerHTML='<span style=\\'font-size:11px;\\'>${ico}</span>';">` : `<span style="font-size:11px;">${ico}</span>`}
+              ${lurl ? `<img src="${esc(lurl)}" alt="" loading="lazy" decoding="async" style="width:14px;height:14px;object-fit:contain;" data-league-logo="1" data-fallback-text="${esc(ico)}" data-fallback-style="font-size:11px;">` : `<span style="font-size:11px;">${ico}</span>`}
               <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:140px;">${esc(lname)}</span>
             </span>`;
           })()}
         </div>
         <div class="teams">
           <div class="team ${hWinner ? 'winner' : ''}">
-            ${home?.logo ? `<img class="logo" src="${esc(home.logo)}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'">` : '<span class="logo"></span>'}
+            ${home?.logo ? `<img class="logo" src="${esc(home.logo)}" alt="" loading="lazy" decoding="async" data-fallback-mode="hide">` : '<span class="logo"></span>'}
             <div class="name-wrap">
               <div class="name">${escWithHighlight(home?.name || 'Domicile')}</div>
               <div class="meta">
@@ -10474,7 +10514,7 @@
             <span class="score">${showScore ? esc(home?.score ?? '') : ''}</span>
           </div>
           <div class="team ${aWinner ? 'winner' : ''}">
-            ${away?.logo ? `<img class="logo" src="${esc(away.logo)}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'">` : '<span class="logo"></span>'}
+            ${away?.logo ? `<img class="logo" src="${esc(away.logo)}" alt="" loading="lazy" decoding="async" data-fallback-mode="hide">` : '<span class="logo"></span>'}
             <div class="name-wrap">
               <div class="name">${escWithHighlight(away?.name || 'Extérieur')}</div>
               <div class="meta">
@@ -10844,7 +10884,7 @@
       ${whyHtml}
       <div class="teams-big">
         <div class="side">
-          ${home?.logo ? `<img src="${esc(home.logo)}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'">` : ''}
+          ${home?.logo ? `<img src="${esc(home.logo)}" alt="" loading="lazy" decoding="async" data-fallback-mode="hide">` : ''}
           <div class="name">${esc(home?.name || '—')}</div>
           <div class="rec">${esc(getRecord(home) || '')}${stdH ? ` · #${esc(stdH.rank)} au classement · ${esc(stdH.points || 0)} pts` : ''}</div>
           ${(() => { const f = derivedForm(home); return f ? renderForm(f, true) : ''; })()}
@@ -10853,7 +10893,7 @@
           ${isFinal ? `<div class="score">${esc(home?.score ?? '')} - ${esc(away?.score ?? '')}</div>` : '<div>VS</div>'}
         </div>
         <div class="side">
-          ${away?.logo ? `<img src="${esc(away.logo)}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'">` : ''}
+          ${away?.logo ? `<img src="${esc(away.logo)}" alt="" loading="lazy" decoding="async" data-fallback-mode="hide">` : ''}
           <div class="name">${esc(away?.name || '—')}</div>
           <div class="rec">${esc(getRecord(away) || '')}${stdA ? ` · #${esc(stdA.rank)} au classement · ${esc(stdA.points || 0)} pts` : ''}</div>
           ${(() => { const f = derivedForm(away); return f ? renderForm(f, true) : ''; })()}
@@ -16679,7 +16719,7 @@
           // Bouton orange en TÊTE des CTAs pour rendre l'action principale
           // (parier) visible au premier coup d'œil.
           const _wxUrl = (top.m.winamax && top.m.winamax.url) ? top.m.winamax.url : 'https://www.winamax.fr/paris-sportifs';
-          return `<a href="${esc(_wxUrl)}" target="_blank" rel="noopener noreferrer" data-no-detail="1" style="display:flex;align-items:center;justify-content:center;gap:10px;padding:13px 16px;margin-bottom:8px;background:linear-gradient(135deg,#fbbf24 0%,#f59e0b 100%);color:#0c0a0a;border:none;border-radius:var(--r-sm);font-size:14.5px;font-weight:800;text-decoration:none;cursor:pointer;box-shadow:0 6px 18px rgba(251,191,36,.30);transition:transform .12s,box-shadow .12s;letter-spacing:.2px;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 8px 22px rgba(251,191,36,.40)';" onmouseout="this.style.transform='';this.style.boxShadow='0 6px 18px rgba(251,191,36,.30)';" onclick="event.stopPropagation();" aria-label="Parier ce match sur Winamax (ouvre dans un nouvel onglet)">
+          return `<a href="${esc(_wxUrl)}" target="_blank" rel="noopener noreferrer" data-no-detail="1" style="display:flex;align-items:center;justify-content:center;gap:10px;padding:13px 16px;margin-bottom:8px;background:linear-gradient(135deg,#fbbf24 0%,#f59e0b 100%);color:#0c0a0a;border:none;border-radius:var(--r-sm);font-size:14.5px;font-weight:800;text-decoration:none;cursor:pointer;box-shadow:0 6px 18px rgba(251,191,36,.30);transition:transform .12s,box-shadow .12s;letter-spacing:.2px;" aria-label="Parier ce match sur Winamax (ouvre dans un nouvel onglet)">
             <span style="font-size:16px;">💰</span>
             <span>Parier sur Winamax</span>
             <span style="opacity:.7;font-size:12px;">↗</span>
@@ -16771,8 +16811,8 @@
         const matchId = String(primary.m && primary.m.id || '');
         const market = (primary.best && primary.best.market) || '1n2';
         const pickKey = (primary.best && primary.best.key) || (primary.pred && primary.pred.pick && primary.pred.pick.key) || '';
-        const logoHome = primary.homeLogo ? `<img src="${esc(primary.homeLogo)}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'">` : '<span></span>';
-        const logoAway = primary.awayLogo ? `<img src="${esc(primary.awayLogo)}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'">` : '<span></span>';
+        const logoHome = primary.homeLogo ? `<img src="${esc(primary.homeLogo)}" alt="" loading="lazy" decoding="async" data-fallback-mode="hide">` : '<span></span>';
+        const logoAway = primary.awayLogo ? `<img src="${esc(primary.awayLogo)}" alt="" loading="lazy" decoding="async" data-fallback-mode="hide">` : '<span></span>';
         return `
           <article class="dash-cockpit__pick interactive" data-match-id="${esc(matchId)}" role="button" tabindex="0">
             <div class="dash-cockpit__pick-head">
@@ -17236,8 +17276,8 @@
         const minutes = Math.round((bbfSafeTs(p.m) - bbfNowMs) / 60000);
         const timeLabel = minutes > 0 && minutes < 120 ? `dans ${minutes} min` : (typeof fmtTime === 'function' ? fmtTime(p.m.date) : '');
         const initials = (team) => String(bbfTeamName(team)).split(/\s+/).filter(Boolean).slice(0,2).map(w => w[0]).join('').toUpperCase() || '•';
-        const logo = (team) => team?.logo ? `<img src="${esc(team.logo)}" alt="" loading="lazy" decoding="async" onerror="this.outerHTML='<span>${esc(initials(team))}</span>'">` : `<span>${esc(initials(team))}</span>`;
-        const backdropLogo = (team) => team?.logo ? `<img src="${esc(team.logo)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : '';
+        const logo = (team) => team?.logo ? `<img src="${esc(team.logo)}" alt="" loading="lazy" decoding="async" data-fallback-text="${esc(initials(team))}">` : `<span>${esc(initials(team))}</span>`;
+        const backdropLogo = (team) => team?.logo ? `<img src="${esc(team.logo)}" alt="" loading="lazy" decoding="async" data-fallback-mode="remove">` : '';
         const heroBackdrop = mode === 'hero' ? `<div class="bbf-card__backdrop" aria-hidden="true">${backdropLogo(home)}${backdropLogo(away)}</div>` : '';
         const centerTime = mode === 'hero' && typeof fmtTime === 'function' ? fmtTime(p.m.date) : 'vs';
         const sm = p.m?.smart_money;
@@ -17354,7 +17394,7 @@
         </section>` : '';
       const bbfScorerCard = (s) => {
         const imgFallback = esc(String(s.name || '?').split(/\s+/).filter(Boolean).slice(0,2).map(w => w[0]).join('').toUpperCase() || '•');
-        const img = s.pid ? `<img src="https://img.sofascore.com/api/v1/player/${esc(String(s.pid))}/image" alt="" loading="lazy" decoding="async" onerror="this.outerHTML='<span>${imgFallback}</span>'">` : `<span>${imgFallback}</span>`;
+        const img = s.pid ? `<img src="https://img.sofascore.com/api/v1/player/${esc(String(s.pid))}/image" alt="" loading="lazy" decoding="async" data-fallback-text="${imgFallback}">` : `<span>${imgFallback}</span>`;
         const odd = s.impliedOdd ? `@${Number(s.impliedOdd).toFixed(2)}` : 'cote à vérifier';
         const href = s.url ? (/^https?:/i.test(String(s.url)) ? String(s.url) : `https://www.winamax.fr${String(s.url)}`) : '';
         return `<article class="bbf-scorer" data-match-id="${esc(String(s.mId || ''))}">
@@ -17889,8 +17929,8 @@
                   const sides = (typeof getSides === 'function') ? getSides(heroPick.m) : { home: null, away: null };
                   const hL = sides.home?.logo;
                   const aL = sides.away?.logo;
-                  const hImg = hL ? `<img src="${esc(hL)}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'" style="width:36px;height:36px;border-radius:6px;background:rgba(255,255,255,.04);padding:2px;vertical-align:middle;margin-right:8px;">` : '';
-                  const aImg = aL ? `<img src="${esc(aL)}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'" style="width:36px;height:36px;border-radius:6px;background:rgba(255,255,255,.04);padding:2px;vertical-align:middle;margin-left:8px;">` : '';
+                  const hImg = hL ? `<img src="${esc(hL)}" alt="" loading="lazy" decoding="async" data-fallback-mode="hide" style="width:36px;height:36px;border-radius:6px;background:rgba(255,255,255,.04);padding:2px;vertical-align:middle;margin-right:8px;">` : '';
+                  const aImg = aL ? `<img src="${esc(aL)}" alt="" loading="lazy" decoding="async" data-fallback-mode="hide" style="width:36px;height:36px;border-radius:6px;background:rgba(255,255,255,.04);padding:2px;vertical-align:middle;margin-left:8px;">` : '';
                   return `${hImg}${esc(heroPick.homeName)}<span class="ed-hero__vs"> vs </span>${esc(heroPick.awayName)}${aImg}`;
                 } catch(e) {
                   return `${esc(heroPick.homeName)} <span class="ed-hero__vs">vs</span> ${esc(heroPick.awayName)}`;
@@ -18123,7 +18163,7 @@
             const sides = (typeof getSides === 'function') ? getSides(s.m) : { home: {}, away: {} };
             const teams = `${(sides.home && sides.home.short) || (sides.home && sides.home.name) || '?'} vs ${(sides.away && sides.away.short) || (sides.away && sides.away.name) || '?'}`.slice(0, 50);
             const pickLabel = ((s.best && s.best.label) || s.pred?.pick?.label || '').slice(0, 28);
-            return `<div data-match-id="${esc(String(s.m.id || ''))}" class="agent-pos-row" style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--border);font-size:12.5px;cursor:pointer;transition:background .12s;" onmouseover="this.style.background='rgba(255,255,255,.03)';" onmouseout="this.style.background='';">
+            return `<div data-match-id="${esc(String(s.m.id || ''))}" class="agent-pos-row" style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--border);font-size:12.5px;cursor:pointer;transition:background .12s;">
               <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:${col}22;color:${col};font-weight:700;font-size:12px;flex-shrink:0;">${ico}</span>
               <div style="flex:1;min-width:0;line-height:1.3;">
                 <div style="color:var(--text);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(teams)}</div>
@@ -18311,7 +18351,7 @@
                      sinon homepage paris-sportifs). target=_blank pour ne pas
                      perdre le contexte du dashboard. rel="noopener noreferrer"
                      pour sécurité (pas de window.opener). -->
-                <a href="${esc(url)}" target="_blank" rel="noopener noreferrer" data-no-detail="1" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;margin-top:8px;background:linear-gradient(135deg,#fbbf24 0%,#f59e0b 100%);color:#0c0a0a;border:none;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;cursor:pointer;box-shadow:0 4px 12px rgba(251,191,36,.25);transition:transform .12s,box-shadow .12s;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 16px rgba(251,191,36,.35)';" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 12px rgba(251,191,36,.25)';" onclick="event.stopPropagation();" aria-label="Parier ce match sur Winamax (ouvre dans un nouvel onglet)">
+                <a href="${esc(url)}" target="_blank" rel="noopener noreferrer" data-no-detail="1" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;margin-top:8px;background:linear-gradient(135deg,#fbbf24 0%,#f59e0b 100%);color:#0c0a0a;border:none;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;cursor:pointer;box-shadow:0 4px 12px rgba(251,191,36,.25);transition:transform .12s,box-shadow .12s;" aria-label="Parier ce match sur Winamax (ouvre dans un nouvel onglet)">
                   <span class="u-text-md">💰</span>
                   <span>Parier sur Winamax</span>
                   <span style="opacity:.6;font-size:11px;">↗</span>
@@ -19010,7 +19050,7 @@
           const hs = home?.score ?? '-', as = away?.score ?? '-';
           const league = (m.league_name || '').slice(0, 24);
           // tabindex+role+aria-label pour accessibilité clavier
-          return `<div class="aside-live-row" data-match-id="${esc(String(m.id||''))}" role="button" tabindex="0" aria-label="Match en direct ${esc(home?.name||'?')} vs ${esc(away?.name||'?')}" style="padding:8px 10px;background:rgba(248,113,113,.06);border-left:2px solid var(--danger);border-radius:0 6px 6px 0;margin-bottom:6px;cursor:pointer;transition:background .15s;" onmouseover="this.style.background='rgba(248,113,113,.12)';" onmouseout="this.style.background='rgba(248,113,113,.06)';">
+          return `<div class="aside-live-row" data-match-id="${esc(String(m.id||''))}" role="button" tabindex="0" aria-label="Match en direct ${esc(home?.name||'?')} vs ${esc(away?.name||'?')}" style="padding:8px 10px;background:rgba(248,113,113,.06);border-left:2px solid var(--danger);border-radius:0 6px 6px 0;margin-bottom:6px;cursor:pointer;transition:background .15s;">
             <div style="font-size:10px;color:var(--danger);font-weight:700;letter-spacing:.3px;">🔴 LIVE · ${esc(league)}</div>
             <div style="font-size:12.5px;color:var(--text);font-weight:600;margin-top:2px;line-height:1.3;">${esc(home?.name||'?')} <b class="u-text-accent">${esc(String(hs))}</b></div>
             <div style="font-size:12.5px;color:var(--text);font-weight:600;line-height:1.3;">${esc(away?.name||'?')} <b class="u-text-accent">${esc(String(as))}</b></div>
@@ -19019,7 +19059,7 @@
         const upcomingHtml = upcoming.length ? upcoming.map(x => {
           const { home, away } = (typeof getSides === 'function') ? getSides(x.m) : { home: {}, away: {} };
           const pick = (x.best && x.best.label) || x.pred.pick.label || 'Pick';
-          return `<div class="aside-upcoming-row" data-match-id="${esc(String(x.m.id||''))}" role="button" tabindex="0" aria-label="Pronostic à venir ${esc(home?.name||'?')} vs ${esc(away?.name||'?')}" style="padding:8px 10px;background:rgba(167,139,250,.04);border-left:2px solid var(--brand);border-radius:0 6px 6px 0;margin-bottom:6px;cursor:pointer;transition:background .15s;" onmouseover="this.style.background='rgba(167,139,250,.10)';" onmouseout="this.style.background='rgba(167,139,250,.04)';">
+          return `<div class="aside-upcoming-row" data-match-id="${esc(String(x.m.id||''))}" role="button" tabindex="0" aria-label="Pronostic à venir ${esc(home?.name||'?')} vs ${esc(away?.name||'?')}" style="padding:8px 10px;background:rgba(167,139,250,.04);border-left:2px solid var(--brand);border-radius:0 6px 6px 0;margin-bottom:6px;cursor:pointer;transition:background .15s;">
             <div style="display:flex;justify-content:space-between;align-items:baseline;gap:6px;">
               <div style="font-size:10px;color:var(--brand);font-weight:700;">${esc(fmtTime(x.m.date))} · ${esc(fmtCountdown(x.m))}</div>
               <div style="font-size:11px;color:var(--accent);font-weight:700;">@${x.odd.toFixed(2)}</div>
@@ -19721,7 +19761,7 @@
           const col = colMap[a.color] || '#5e5ce6';
           const time = new Date(a.ts).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
           return `
-            <div data-alert-action="${esc(a.action)}" style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 18px;cursor:pointer;transition:all .15s;display:flex;gap:14px;align-items:flex-start;" onmouseover="this.style.borderColor='${col}44';this.style.transform='translateX(2px)';" onmouseout="this.style.borderColor='var(--border)';this.style.transform='';">
+            <div data-alert-action="${esc(a.action)}" style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 18px;cursor:pointer;transition:all .15s;display:flex;gap:14px;align-items:flex-start;">
               <div style="width:36px;height:36px;border-radius:50%;background:${col}22;display:grid;place-items:center;font-size:16px;flex-shrink:0;">${a.icon}</div>
               <div style="flex:1;min-width:0;">
                 <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
@@ -21656,7 +21696,7 @@
               const posIcon = s.pos === 'F' ? '⚔️' : s.pos === 'M' ? '🎯' : s.pos === 'D' ? '🛡️' : '🧤';
               // is known ; falls back to the position emoji when not available.
               const faceHtml = s.pid
-                ? `<img loading="lazy" decoding="async" src="https://img.sofascore.com/api/v1/player/${s.pid}/image" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;background:var(--bg);border:1px solid var(--border);" onerror="this.outerHTML='<div style=\\'font-size:14px;width:28px;height:28px;display:grid;place-items:center;\\'>${posIcon}</div>'">`
+                ? `<img loading="lazy" decoding="async" src="https://img.sofascore.com/api/v1/player/${s.pid}/image" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;background:var(--bg);border:1px solid var(--border);" data-fallback-text="${esc(posIcon)}" data-fallback-style="font-size:14px;width:28px;height:28px;display:grid;place-items:center;">`
                 : `<div style="font-size:14px;width:28px;height:28px;display:grid;place-items:center;">${posIcon}</div>`;
               return `
                 <div style="display:grid;grid-template-columns:28px 1fr auto auto;gap:10px;padding:7px 10px;border-bottom:1px solid var(--border);align-items:center;">
@@ -21774,7 +21814,7 @@
       host.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-dim);font-size:13px;">
         <div style="color:var(--warn);font-weight:600;margin-bottom:4px;">${isTimeout ? '⏱️ Timeout (>5s)' : 'Rapport backtest indisponible'}</div>
         <div>${isTimeout ? 'Le fichier <code>backtest_report_v2.json</code> n\'a pas répondu en 5s — vérifie ta connexion ou réessaye.' : 'Le cron hebdomadaire n\'a pas encore produit <code>backtest_report_v2.json</code>. Il tourne chaque dimanche 03:00 UTC.'}</div>
-        <button onclick="location.reload()" style="margin-top:12px;padding:6px 14px;background:var(--brand);color:#08080a;border:none;border-radius:6px;font-weight:700;cursor:pointer;">🔄 Réessayer</button>
+        <button type="button" data-reload-page="1" style="margin-top:12px;padding:6px 14px;background:var(--brand);color:#08080a;border:none;border-radius:6px;font-weight:700;cursor:pointer;">🔄 Réessayer</button>
       </div>`;
       return;
     }
