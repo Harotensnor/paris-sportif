@@ -2183,3 +2183,9 @@
 - Apres: le patch rapide importe les aliases Winamax et ajoute des variantes Allemagne/UEFA/Portugal/Pays-Bas/Belgique/MLS/Liga MX/Argentine pour partager le meme vocabulaire entre cotes et signaux.
 - Impact mesure: couverture immediate stable sur le snapshot courant (starter_signals 79, injuries 192, referee 24), mais le prochain refresh peut matcher les nouvelles variantes sans nouveau code.
 - Verif: py_compile OK; patch_all_quick/build_lineups_multisport/measure_night_metrics/build_health/finalize_inline OK; data_lite hash recalc 1d0cfa8b; cache/footer bumpes v35.334.
+
+## Sprint v35.335 — AUTO 10/10 Score opportunite table (16:56 UTC)
+- Avant: les angles rares, biais ligue, timing et richesse data etaient surtout visibles dans le rail droit; la table dense ne resumait que cote/confiance/edge.
+- Apres: chaque ligne calcule un score opportunite 0-100 qui combine edge, confiance, tier strict, biais ligue, steam/drift cote, blessures/fatigue/lookahead, timing de mise et richesse data.
+- Impact produit: Theo voit tout de suite les picks qui cumulent plusieurs signaux rares sans ouvrir la modal; tri `Score` ajoute au tableau et cartes mobile.
+- Verif: app.js/app.css hashes recalcules (`bf57994d`, `66ce6f69`), cache/footer bumpes v35.335.
