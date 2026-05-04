@@ -2261,3 +2261,8 @@
 - Apres: blessures, fatigue calendrier, lookahead, voyage extreme et back-to-back voyage comparent le signal a l'equipe réellement soutenue par le pari; backing l'equipe fragile penalise, jouer contre elle bonifie.
 - Impact produit: les nouveaux angles voyage/fatigue deviennent exploitables sans faux boost; les signaux rares non alignes restent visibles en badge sans gonfler le score.
 - Verif: app.js --check prevu; cache/footer bumpes v35.347.
+## Sprint v35.348 — AUTO 10/10 Injuries vides connues (18:35 UTC)
+- Avant: les equipes absentes de `injuries_soccer.json` etaient marquees comme data manquante meme quand leur ligue etait couverte par la source Sofascore injuries.
+- Apres: si la ligue existe dans le fichier source, une equipe non listee devient un signal connu vide au lieu d'un trou faux positif.
+- Impact mesure: injuries coverage 192 -> 211 events; `patch_soccer_injuries` enrichit 133 events; priority gaps recalcules a 239 sur la data cron fraiche.
+- Verif: py_compile, patch_all_quick, measure_night_metrics, build_signal_gap_report, build_health, finalize_inline OK; cache/footer bumpes v35.348.

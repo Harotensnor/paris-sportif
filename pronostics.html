@@ -18,7 +18,7 @@
      manifest-src 'self', upgrade-insecure-requests, plausible.io et
      cloudflareinsights pour analytics opt-in. `frame-ancestors` ne marche pas
      en meta CSP (header HTTP only), donc on ne le met pas ici. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-et3zcLjrlerq+0ra7BBZ+Lu/TCNaz6zINNMRoySgV8Y=' 'sha256-tGrwqR+d+7KYbrSJE3a3nE0QoGrTpkTgFOYMPopdMmc=' 'sha256-TntT6RHEVVDBaGJGZp97+MNGXAmuGoumyTi1Cul5VSI=' 'sha256-PeMbW+FaFFjBHp0lLPNkemQWsQC/b9N9fOSxC7TYzqc=' 'sha256-U90J6JiY/oIUgnIUS+wUKblZgwUczFwJFoOngAC9ABQ=' 'sha256-xekpL1L+0+uan2Z/c6dVRMvu7tcOj4RAyc4/gMFxzJ4=' https://plausible.io https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://a.espncdn.com https://a1.espncdn.com https://a2.espncdn.com https://a3.espncdn.com https://a4.espncdn.com https://www.gstatic.com https://img.sofascore.com; connect-src 'self' https://api.clubelo.com https://sports.core.api.espn.com https://site.api.espn.com https://plausible.io https://cloudflareinsights.com; font-src 'self' data:; base-uri 'self'; form-action 'self'; object-src 'none'; media-src 'none'; worker-src 'self'; manifest-src 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-nYAh1UAdmBce3POv9b2f/0r8MHj94/4ZcNPBgLoS5ow=' 'sha256-jgocFQ1C8UWG/6iBHpuUHEGTO4djPI2HJmQvXV7oXgk=' 'sha256-APaShsM2YTVPbRGmqBkJAq6n6EXISHTzL1ici0ggq2Q=' 'sha256-D5MNFgbW8N/sD+ueYnX1iYj16pVYTJGh9/dfKh9PUPs=' 'sha256-VR7bhy6fQrOIcrLPsBXIdiThpW/ukrTCTZXTa2Q34IM=' 'sha256-JeNyY4xvmC/8HFFQ+JiswRcEmqgxnwCZJTzZtCemjY0=' https://plausible.io https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://a.espncdn.com https://a1.espncdn.com https://a2.espncdn.com https://a3.espncdn.com https://a4.espncdn.com https://www.gstatic.com https://img.sofascore.com; connect-src 'self' https://api.clubelo.com https://sports.core.api.espn.com https://site.api.espn.com https://plausible.io https://cloudflareinsights.com; font-src 'self' data:; base-uri 'self'; form-action 'self'; object-src 'none'; media-src 'none'; worker-src 'self'; manifest-src 'self'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <!-- AUDIT-2026-04-27 (Sprint 12 #29) — Sécurité possible via meta tags.
      GH Pages ne permet pas de custom HTTP headers ; on garde uniquement les
@@ -132,7 +132,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="alternate" type="application/rss+xml" href="feed.xml" title="Paris-Sportif — Top picks du jour (RSS)">
 <!-- v35.324 — CSS chargé sans handler inline pour préparer CSP strict. -->
-<link rel="stylesheet" href="app.css?v=92688e73">
+<link rel="stylesheet" href="app.css?v=66ce6f69">
 <link rel="stylesheet" href="print.css?v=313105b5" media="print">
 <!-- v31.1 — DNS-prefetch pour les CDN tiers utilisés sur la page (logos ESPN).
      v31.7.24 — Ajout `preconnect` pour a.espncdn.com (le plus utilisé) :
@@ -301,7 +301,7 @@
      n'est chargé QU'APRÈS consentement explicite (cf. _maybeEnableAnalytics).
      Pas de tracking par défaut. -->
 <script src="analytics.config.js" defer></script>
-<noscript><link rel="stylesheet" href="app.css?v=92688e73"></noscript>
+<noscript><link rel="stylesheet" href="app.css?v=66ce6f69"></noscript>
 <script>
   // v22 — Init theme / contrast / reader BEFORE body render (évite le flash)
   (function() {
@@ -363,7 +363,7 @@
   // pour debug console. AUCUN envoi réseau — l'utilisateur peut consulter
   // ou exporter ses données, et c'est tout.
   //
-  // Pourquoi inline pré-app.js?v=6be13291 ? Il faut s'enregistrer AVANT le LCP/FCP
+  // Pourquoi inline pré-app.js?v=822bd0ca ? Il faut s'enregistrer AVANT le LCP/FCP
   // pour les capter. Le bundle web-vitals officiel pèse 5 KB ; ici on
   // tombe à ~1.5 KB grâce à l'usage direct de PerformanceObserver.
   //
@@ -738,7 +738,7 @@
         </div>
       </div>
     </section>
-    <!-- v31.2 — Friendly error state (audit UX). Avant : "Fichier data_lite.js?v=937d439c
+    <!-- v31.2 — Friendly error state (audit UX). Avant : "Fichier data_lite.js?v=41cf822d
          introuvable" brut, casse la confiance. Maintenant : message rassurant
          avec retry + dernier refresh + offline fallback explanation. -->
     <div id="no-data-banner" class="error-banner hidden" role="alert" aria-live="polite">
@@ -821,7 +821,7 @@
       <div class="footer-brand">
         <span class="footer-logo">🎯</span>
         <span class="footer-text">Paris-Sportif</span>
-        <span class="footer-version" id="footer-version" role="button" tabindex="0" style="cursor:pointer;" title="Voir les nouveautés v35.347">v35.347</span>
+        <span class="footer-version" id="footer-version" role="button" tabindex="0" style="cursor:pointer;" title="Voir les nouveautés v35.348">v35.348</span>
       </div>
       <nav class="footer-links" aria-label="Liens du site">
         <a href="https://github.com/Harotensnor/paris-sportif" target="_blank" rel="noopener" class="footer-link" title="Code source sur GitHub">
@@ -906,9 +906,9 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="data_lite.js?v=57965829"></script>
+<script src="data_lite.js?v=41cf822d"></script>
 <script src="app-i18n.js?v=6bad7ddf" defer></script>
-<script src="app.js?v=6be13291" defer></script>
+<script src="app.js?v=822bd0ca" defer></script>
 
 <!-- enhancements v20 -->
 <script src="app-enhancements.js?v=232799b3" defer></script>
