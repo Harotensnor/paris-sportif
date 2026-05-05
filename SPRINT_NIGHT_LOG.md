@@ -693,3 +693,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Historique: ajout d'une spec qui ouvre J-1 et verifie que les picks passes restent visibles avec badges resultat et footer historique quand ils existent.
 - QA: `phase-finale-dashboard.spec.js` passe 6/6 desktop+mobile, syntax `app.js` OK, no conflict markers OK.
 - Cache/footer bumpes v35.466; `app.js` hash `55e22e8f`.
+
+## Sprint v35.467 — AUTO 10/10 Audit stabilite post-table (18:32 UTC)
+- A11y: `scripts/a11y_audit.js` passe sur dashboard, Tous, Performance, Academie, Profil, Sante, Montantes, Legal avec 0 critical / 0 serious / 0 moderate.
+- Lighthouse: `scripts/lighthouse_audit.js` confirme 100 perf / 100 a11y / 100 SEO sur mobile et desktop pour Accueil, Tous, Performance, Academie.
+- Bundle: `app.js` mesure 1,607,397 bytes et reste sous le cap 1.7MB; `app.css` mesure 359,119 bytes.
+- Aucun changement applicatif requis apres audit.
