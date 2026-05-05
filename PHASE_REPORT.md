@@ -2,6 +2,55 @@
 
 Date: 2026-05-05
 
+## Phase 6 — Modèle V4 contextuel
+
+Status: livré en couche gardée (`v36.001` → `v36.013`).
+
+### Livré
+
+- Priors bayésiens équipe via `team_priors.json` / `team_priors.js`, blendés dans Poisson quand les deux équipes ont assez d'historique.
+- Patterns saison via `season_phase.json`, avec decay de confiance early/cup et exposition dans Crédibilité.
+- Contexte compétition Cup / League / Continental, avec badges dans la modale détail.
+- Impact stars absentes via `star_players.json`, croisé avec blessures et injecté dans les lambdas foot.
+- Decay xG paramétrable par ligue via `xg_decay_params.json`.
+- Voyage et densité calendrier via `team_travel.json` et `schedule_density.json`.
+- Tendances arbitres via `referee_stats.json`, avec boost home-bias borné.
+- Surface tennis, goalies NHL et pitchers MLB via `tennis_elo_surface.json` et `goalie_pitcher_context.json`.
+- Effets stade, tenure coach, derbies et stats équipe étendues via sidecars dédiés.
+- Benchmark `MODEL_V4_BENCHMARK.md`: V4-A promu comme couche gardée, tous les nudges étant bornés.
+- Anomaly guard: les gaps modèle/marché >15pt sont plafonnés à 12pt et visibles sur Santé, au lieu de skipper le pick en silence.
+- Test Playwright `tests/model-v4-context.spec.js` couvrant le chargement des sidecars V4 et l'accès prédiction.
+
+### Métriques après passe
+
+- `team_priors.json`: 3730 équipes, dont 1306 football.
+- `season_phase.json`: 68 ligues.
+- `star_players.json`: 769 stars, 187 équipes.
+- `xg_decay_params.json`: 32 ligues football.
+- `team_travel.json` / `schedule_density.json`: 278 matchs.
+- `referee_stats.json`: 105 arbitres, 36 top-5.
+- `tennis_elo_surface.json`: 710 joueurs.
+- `goalie_pitcher_context.json`: 49 matchs NHL/MLB.
+- `stadium_effects.json`: 244 stades.
+- `coach_tenure.json`: 427 équipes.
+- `derbies.json`: 53 rivalités.
+- `team_stats_extended.json`: 367 équipes.
+- `model_anomalies_summary.json`: 215 événements 1N2 scannés, 0 overround outlier au dernier run.
+
+### Validation effectuée
+
+- Syntaxe `app.js`: OK.
+- `python -m py_compile` sur les scripts V4 finaux: OK.
+- `python scripts/check_pipeline_drift.py`: OK, 0 drift.
+- `python scripts/build_health.py`: OK, `health.json` régénéré avec les sources V4.
+- `npx playwright test tests/model-v4-context.spec.js --project=chromium-desktop --project=mobile-chromium`: 2 passed, 0 failed.
+
+### Points reportés
+
+- Backtest complet six mois V4 vs V3 en vrai replay historique: reporté jusqu'à ce que suffisamment de picks V4 taggés soient réglés.
+- Les effets contextuels sont volontairement bornés; la prochaine passe doit mesurer leur poids par sport avant d'augmenter l'amplitude.
+- `health.json` peut rester en `warning` quand le snapshot local vieillit entre deux ticks; la prod doit être jugée après le prochain cron.
+
 ## Phase 1 — Fondations data
 
 Status: livré en passe large.
