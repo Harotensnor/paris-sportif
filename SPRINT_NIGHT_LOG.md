@@ -966,3 +966,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Tests: `first-last-goal-markets.spec.js` passe desktop + mobile (2/2); `app.js` syntax OK; drift pipeline OK.
 - Cache/footer bumpes v36.019; `app.js` hash `ee474604`, SW `paris-sportif-20260505-215228`.
 
+## Sprint v36.020 — AUTO 10/10 Phase 7 WW BTTS deux mi-temps (21:53 UTC)
+- Modèle: probabilité BTTS oui en première MT et deuxième MT calculée depuis les lambdas Poisson split 45/55.
+- UI: la modal détail expose le marché rare BTTS deux mi-temps quand le signal est lisible.
+- Garde-fou: `yes + no` reste normalisé à 100%, avec sous-probas première/deuxième MT disponibles.
+- Tests: `btts-both-halves.spec.js` passe desktop + mobile (2/2); `app.js` syntax OK; drift pipeline OK.
+- Cache/footer bumpes v36.020; `app.js` hash `a9293deb`, SW `paris-sportif-20260505-215352`.
+
