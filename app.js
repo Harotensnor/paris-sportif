@@ -10801,34 +10801,39 @@ return `<div style="margin-top:12px;padding:10px 12px;background:rgba(255,255,25
 })() : ''}
 ${(() => {
 const contrib = pred.contributions || [];
-const factors = {};
-
+const groups = new Map();
+const addGroup = (key, label, icon, c) => {
+const delta = Math.abs(Number(c?.delta || 0));
+const modelWeight = Math.max(0.1, Number(c?.w || 0));
+const influence = Math.max(0.25, delta * 100 * modelWeight);
+const prev = groups.get(key) || { label, icon, score: 0, samples: [] };
+prev.score += influence;
+prev.samples.push(`${c.icon || ''} ${c.name || label}`.trim());
+groups.set(key, prev);
+};
 contrib.forEach(c => {
-const name = c.name || '?';
-let weight = 0;
-if (name.includes('Marché') || name.includes('marché')) weight = 30;
-else if (name.includes('Forme') || name.includes('forme')) weight = 25;
-else if (name.includes('H2H') || name.includes('historique')) weight = 15;
-else if (name.includes('Blessure') || name.includes('blessure') || name.includes('Injury')) weight = 10;
-else weight = 5; // fallback for unknown signals
-if (weight > 0) factors[name] = weight;
+const name = String(c?.name || '').toLowerCase();
+if (name.includes('xg')) addGroup('xg', 'xG', '📐', c);
+else if (name.includes('but') || name.includes('poisson')) addGroup('poisson', 'Buts attendus', '⚽', c);
+else if (name.includes('force') || name.includes('elo') || name.includes('classement')) addGroup('elo', 'Force/Elo', '💪', c);
+else if (name.includes('forme') || name.includes('bilan') || name.includes('domicile') || name.includes('pace') || name.includes('goalie') || name.includes('pitcher')) addGroup('form', 'Forme/contexte', '🔥', c);
+else if (name.includes('h2h') || name.includes('face')) addGroup('h2h', 'Face-à-face', '⚔️', c);
+else addGroup('signal', 'Signal annexe', '📊', c);
 });
-
-if (Object.keys(factors).length > 0) {
-const totalWeight = Object.values(factors).reduce((a,b)=>a+b, 0);
-const normalized = Object.fromEntries(Object.entries(factors).map(([k,v]) => [k, v / totalWeight * 100]));
+const rows = Array.from(groups.values()).sort((a, b) => b.score - a.score).slice(0, 5);
+const totalWeight = rows.reduce((a, b) => a + b.score, 0);
+if (totalWeight > 0) {
 return `<div style="margin-top:12px;padding:10px 12px;background:rgba(255,255,255,.02);border-radius:8px;border:1px solid rgba(255,255,255,.04);">
-                  <div class="lbl-tiny-mb">📊 Composé de</div>
-                  <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:12px;">
-                    ${Object.entries(normalized).filter(([_,w]) => w > 0).map(([name, pct]) => {
-                      let shortName = name.replace(/Forme|/g, '').replace(/Marché|/g, '').replace(/H2H|/g, '').trim();
-                      if (name.includes('Marché')) shortName = 'marché';
-                      if (name.includes('Forme')) shortName = 'forme';
-                      if (name.includes('H2H')) shortName = 'H2H';
-                      if (name.includes('Blessure') || name.includes('blessure')) shortName = 'blessures';
-                      return `<span style="color:var(--text-dim,#b4bcc7);"><span class="u-text">${shortName}</span> <b>${pct.toFixed(0)}%</b></span>`;
-                    }).join(' · ')}
-                    <span class="u-text-dim2">calibration −3%</span>
+                  <div class="lbl-tiny-mb">📊 Importance des signaux</div>
+                  <div style="display:grid;gap:7px;">
+                    ${rows.map(row => {
+                      const pct = Math.max(3, Math.round(row.score / totalWeight * 100));
+                      return `<div title="${esc(row.samples.slice(0, 4).join(' · '))}" style="display:grid;grid-template-columns:110px minmax(90px,1fr) 42px;gap:8px;align-items:center;font-size:12px;font-variant-numeric:tabular-nums;">
+                        <span style="color:var(--text);font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${row.icon} ${esc(row.label)}</span>
+                        <span style="height:7px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden;"><i style="display:block;width:${pct}%;height:100%;border-radius:inherit;background:linear-gradient(90deg,#a78bfa,#10b981);"></i></span>
+                        <b style="text-align:right;color:var(--text);">${pct}%</b>
+                      </div>`;
+                    }).join('')}
                   </div>
                 </div>`;
 }

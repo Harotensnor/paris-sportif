@@ -391,3 +391,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Pondération: metadata ensemble expose maintenant `poisson_dc 0.40 / elo 0.25 / xg 0.20 / form_decay 0.10 / h2h 0.05`.
 - Transparence: le tooltip modal peut afficher la source xG et les buts attendus du sous-modele empirique.
 - Mesure: syntax JS OK, bundle `app.js` 1,596,191 bytes sous cap; cache/footer bumpes v35.417.
+
+## Sprint v35.418 — AUTO 10/10 Importance signaux lisible (02:46 UTC)
+- Modal: le bloc "Composé de" devient une vraie lecture d'importance basee sur les contributions du pick.
+- UX: ajout de barres par famille de signal (xG, buts attendus, Force/Elo, forme/contexte, H2H, signal annexe) avec pourcentages.
+- Cleanup: suppression de l'ancienne repartition fixe et d'une regex fragile; la calibration n'est plus affichee comme un faux -3%.
+- Mesure: syntax JS OK, bundle `app.js` 1,596,925 bytes sous cap; cache/footer bumpes v35.418.
