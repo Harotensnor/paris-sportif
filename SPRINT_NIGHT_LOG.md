@@ -670,3 +670,12 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - QA: l'audit Playwright axe ne cible plus les anciennes routes SPA `locks/calendrier/bilan/alertes`; il couvre les hubs V37 actuels: Tous, Performance, Academie, Profil.
 - Stabilite: le setup a11y initialise consentement, onboarding et auto-refresh session pour eviter les overlays parasites.
 - Mesure: `tests/a11y-axe.spec.js` passe 24/24 desktop + mobile, 0 violation serious/critical.
+
+## Sprint v35.464 — AUTO 10/10 Tableau Theo stable (18:19 UTC)
+- Fix critique: `_ensureFullData()` ne remet plus la journee lite par-dessus `data.js`; le dashboard garde la data complete au lieu de revenir a 0 ligne apres un re-render.
+- Stabilite: l'auto-refresh ne se declenche plus sur le snapshot lite stale pendant que la data complete charge, ce qui evitait une boucle de reload chez l'utilisateur.
+- Table: seuils V37 assouplis selon le brief, fallback cote indicative 1N2 si Winamax exact manque, limite candidats relevee a 10 foot / 6 autres sports, et reset auto des filtres locaux qui masquent tout.
+- Clarte: panneau `?debug=1` enrichi avec raisons de rejet et exemples, guide "Comment choisir", tooltips Edge/Score/Cote/Conf, micro-label de mise par score, badge "indicatif".
+- Validation live locale: dashboard debug affiche 285 matchs scannes, 257 visibles horloge, 490 picks qualifies, 360 lignes rendues; captures desktop/mobile dans `.cache/validation-tableau-theo-dashboard-*.png`.
+- QA: syntax `app.js` OK, no conflict markers OK, `phase-finale-dashboard.spec.js` 4/4 desktop+mobile.
+- Cache/footer bumpes v35.464; `app.js` hash `bba6d793`, `app.css` hash `a159d9f7`.
