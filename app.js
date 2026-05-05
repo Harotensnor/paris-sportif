@@ -18026,6 +18026,122 @@ swipeStart = null;
 }, { passive: true });
 wrap.addEventListener('touchcancel', () => { swipeStart = null; }, { passive: true });
 }
+if (!wrap.__v36LongPressMenuWired) {
+wrap.__v36LongPressMenuWired = true;
+let pressTimer = null;
+let pressStart = null;
+const hideContextMenu = () => {
+const existing = document.querySelector('.v36-context-menu');
+if (existing) existing.remove();
+};
+const contextCard = (target) => target?.closest?.('.v36-table-card, .v36-pick-card, .dash-pick-card, .v37-personal-card');
+const contextInteractive = (target) => target?.closest?.('input, select, textarea, a, button:not(.v36-table-card):not(.v36-pick-card):not(.dash-pick-card):not(.v37-personal-card), [data-v37-day], [data-v36-filter], [data-v36-sort], [data-v37-live-toggle], [data-v37-blind], [data-compare-pick]');
+const addMenuButton = (menu, action, label) => {
+const btn = document.createElement('button');
+btn.type = 'button';
+btn.dataset.v36ContextAction = action;
+btn.textContent = label;
+menu.appendChild(btn);
+};
+const showContextMenu = (card, x, y) => {
+hideContextMenu();
+wrap.__v36ContextCard = card;
+const menu = document.createElement('div');
+menu.className = 'v36-context-menu';
+menu.setAttribute('role', 'menu');
+menu.dataset.matchId = card.dataset.bigDetail || card.dataset.matchId || '';
+menu.dataset.pickUid = card.dataset.pickUid || '';
+const title = document.createElement('b');
+title.textContent = card.dataset.pickLabel || 'Pick sélectionné';
+menu.appendChild(title);
+addMenuButton(menu, 'favorite', '☆ Ajouter aux favoris');
+addMenuButton(menu, 'compare', '↔ Comparer');
+addMenuButton(menu, 'track', '✓ Suivre ce pari');
+addMenuButton(menu, 'open', 'Ouvrir le détail');
+wrap.appendChild(menu);
+const rect = menu.getBoundingClientRect();
+menu.style.left = `${Math.max(12, Math.min(window.innerWidth - rect.width - 12, x - rect.width / 2))}px`;
+menu.style.top = `${Math.max(72, Math.min(window.innerHeight - rect.height - 12, y - 18))}px`;
+try { if (navigator.vibrate) navigator.vibrate(10); } catch(e) {}
+wrap.__v36ContextBlockClickUntil = Date.now() + 700;
+};
+const cancelPress = () => {
+if (pressTimer) clearTimeout(pressTimer);
+pressTimer = null;
+pressStart = null;
+};
+wrap.addEventListener('touchstart', (e) => {
+if (window.innerWidth > 720 || !e.touches || e.touches.length !== 1) return;
+if (document.getElementById('detail-modal')?.classList.contains('open')) return;
+if (contextInteractive(e.target)) return;
+const card = contextCard(e.target);
+if (!card) return;
+const t = e.touches[0];
+pressStart = { x: t.clientX, y: t.clientY, card };
+pressTimer = setTimeout(() => showContextMenu(card, t.clientX, t.clientY), 560);
+}, { passive: true });
+wrap.addEventListener('touchmove', (e) => {
+if (!pressStart || !e.touches || !e.touches[0]) return;
+const t = e.touches[0];
+if (Math.abs(t.clientX - pressStart.x) > 14 || Math.abs(t.clientY - pressStart.y) > 14) cancelPress();
+}, { passive: true });
+wrap.addEventListener('touchend', cancelPress, { passive: true });
+wrap.addEventListener('touchcancel', cancelPress, { passive: true });
+wrap.addEventListener('click', (e) => {
+const actionBtn = e.target.closest && e.target.closest('[data-v36-context-action]');
+if (actionBtn) {
+e.preventDefault();
+e.stopPropagation();
+const menu = actionBtn.closest('.v36-context-menu');
+const matchId = menu?.dataset.matchId || '';
+const pickUid = menu?.dataset.pickUid || '';
+const cssEscape = (value) => (window.CSS && typeof CSS.escape === 'function') ? CSS.escape(String(value || '')) : String(value || '').replace(/["\\]/g, '\\$&');
+const storedCard = wrap.__v36ContextCard && wrap.contains(wrap.__v36ContextCard) ? wrap.__v36ContextCard : null;
+const card = storedCard || (matchId ? wrap.querySelector(`[data-big-detail="${cssEscape(matchId)}"][data-pick-uid="${cssEscape(pickUid)}"], [data-match-id="${cssEscape(matchId)}"][data-pick-uid="${cssEscape(pickUid)}"]`) : null);
+const rowPick = pickUid && wrap.__v37PickByUid && typeof wrap.__v37PickByUid.get === 'function' ? wrap.__v37PickByUid.get(pickUid) : null;
+const best = rowPick?.best || rowPick || {};
+if (actionBtn.dataset.v36ContextAction === 'favorite') {
+let ids = [];
+try { ids = JSON.parse(localStorage.getItem('paris_sportif_favorite_match_ids') || '[]'); } catch(e) { ids = []; }
+ids = Array.from(new Set([...(Array.isArray(ids) ? ids.map(String) : []), String(matchId)])).filter(Boolean).slice(-80);
+try { localStorage.setItem('paris_sportif_favorite_match_ids', JSON.stringify(ids)); } catch(e) {}
+try { toast('Match ajouté aux favoris', 'success', { duration: 1100 }); } catch(e) {}
+} else if (actionBtn.dataset.v36ContextAction === 'compare') {
+let ids = [];
+try { ids = JSON.parse(localStorage.getItem('tousComparePickIds') || '[]'); } catch(e) { ids = []; }
+ids = Array.from(new Set([...(Array.isArray(ids) ? ids.map(String) : []), String(matchId)])).filter(Boolean).slice(-2);
+try { localStorage.setItem('tousComparePickIds', JSON.stringify(ids)); } catch(e) {}
+try { toast(`${ids.length}/2 picks dans le comparateur`, 'info', { duration: 1100 }); } catch(e) {}
+} else if (actionBtn.dataset.v36ContextAction === 'track') {
+const odd = Number(best.odd || card?.dataset.pickOdd || 0);
+const pickKey = String(best.key || best.pickKey || best.selection || pickUid || matchId);
+const market = String(best.market || '1n2');
+const label = String(best.labelFull || best.label || card?.dataset.pickLabel || 'Pick');
+if (typeof window._addUserBet === 'function' && matchId && pickKey && odd > 1) {
+window._addUserBet(matchId, market, pickKey, label, odd, 1);
+try { toast(`Pari suivi @${odd.toFixed(2)}`, 'success', { duration: 1200 }); } catch(e) {}
+} else {
+try { toast('Pick incomplet pour le suivi', 'warn', { duration: 1200 }); } catch(e) {}
+}
+} else if (actionBtn.dataset.v36ContextAction === 'open') {
+if (card) {
+wrap.__v36ContextBlockClickUntil = 0;
+card.click();
+}
+}
+hideContextMenu();
+return;
+}
+if (Date.now() < Number(wrap.__v36ContextBlockClickUntil || 0)) {
+e.preventDefault();
+e.stopPropagation();
+}
+}, true);
+document.addEventListener('click', (e) => {
+if (e.target.closest && e.target.closest('.v36-context-menu')) return;
+hideContextMenu();
+}, true);
+}
 if (!wrap.__v37LogoErrorDelegated) {
 wrap.__v37LogoErrorDelegated = true;
 wrap.addEventListener('error', (e) => {
