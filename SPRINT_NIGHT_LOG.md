@@ -2,6 +2,12 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
+## Sprint v35.442 — AUTO 10/10 Section K3/K4 spots calendrier (11:12 UTC)
+- Innovation K3/K4 : `build_schedule_spots_summary.py` transforme les angles lookahead/voyage/fatigue en decisions nettes `lean_home`, `lean_away`, `abstain` ou `monitor`.
+- Garde-fou : les deux equipes fatiguees pareil deviennent `abstain`, au lieu de vendre une fausse direction.
+- Mesure : 52 spots actifs, 25 abstain, 24 lean domicile, 3 lean exterieur; health expose `schedule_spots_summary`.
+- Pipeline : cron, auto-refresh, health et git add workflow branches; cache/footer bumpes v35.442.
+
 ## Sprint v35.441 — AUTO 10/10 Section K2 anti-public local (11:07 UTC)
 - Innovation K2 : `build_anti_public_angles.py` derive les angles smart money / anti-public depuis `event.smart_money` deja patche.
 - Garde-fou : separation stricte entre `active` a venir et `expired_sample`; aucun signal passe ne remonte comme opportunite live.

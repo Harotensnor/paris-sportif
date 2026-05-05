@@ -194,6 +194,7 @@ jobs:
           python3 build_sports_expansion_audit.py || true
           python3 detect_boosted_odds.py || true
           python3 build_anti_public_angles.py || true
+          python3 build_schedule_spots_summary.py || true
           # v33.28 — Inject data.js (window.PRONOSTICS_DATA = {...}) dans
           # pronostics.html UNE SEULE FOIS à la fin. Avant : 11 patches faisaient
           # ce regex sur 13500 lignes à chaque fois (~6-12s gaspillées par run).
@@ -334,12 +335,12 @@ jobs:
             weather_geo_cache.json referees_soccer.json health.json night_metrics.json \
             data_today.json data_manifest.json team_form.json form_stats_extended.json h2h_extended.json \
             thesportsdb_meta.json openligadb_matches.json public_team_stats.json public_team_profiles.json public_player_profiles.json \
-            league_inefficiencies.json market_biases_by_league.json detected_angles.json rare_signals.json timing_edges.json \
+            league_inefficiencies.json market_biases_by_league.json detected_angles.json anti_public_angles.json schedule_spots_summary.json rare_signals.json timing_edges.json \
             daily_insights.json \
             market_auc_report.json \
             backtest_training_rows.jsonl backtest_training_rows_summary.json \
             lightgbm_weights.json lightgbm_weights.js \
-            rugby_markets.json niche_markets.json \
+            rugby_markets.json niche_markets.json mlb_player_props.json nhl_playoff_markets.json tennis_challenger_watchlist.json football_expansion_watchlist.json sports_expansion_audit.json \
             boosted_odds.json \
             results_archive.jsonl tennis_ratings.json footballdata.json \
             mlb_pitchers.json nhl_stats.json backtest.html feed.xml \
