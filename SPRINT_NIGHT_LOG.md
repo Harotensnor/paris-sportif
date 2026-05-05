@@ -929,3 +929,11 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Tests: `football-player-props.spec.js` passe desktop + mobile (2/2).
 - Cache/footer bumpes v36.014; `app.js` hash `32a2b5b2`, `football_player_props.js` hash `c66b144d`, SW `paris-sportif-20260505-213625`.
 
+## Sprint v36.015 — AUTO 10/10 Phase 7 QQ props joueurs NBA/WNBA (21:39 UTC)
+- Data: `nba_player_props.json` couvre 17 matchs basket Winamax et 256 projections joueur.
+- Marchés: points, rebonds, passes et 3-points avec lignes, probas over/under et cotes fair.
+- Modal: les props joueurs basket apparaissent dans les stats rapides et les badges V4.
+- Pipeline: `build_nba_player_props.py` branché dans cron local/GHA/health; drift pipeline OK.
+- Tests: `nba-player-props.spec.js` passe desktop + mobile (2/2).
+- Cache/footer bumpes v36.015; `app.js` hash `adb47b25`, `nba_player_props.js` hash `458a95df`, SW `paris-sportif-20260505-213948`.
+

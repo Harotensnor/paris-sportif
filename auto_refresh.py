@@ -152,6 +152,7 @@ PATCH_STAGES = [
     ('build_derbies.py',            1,   30),
     ('build_team_stats_extended_v4.py', 1, 30),
     ('build_football_player_props.py', 1, 30),
+    ('build_nba_player_props.py',   1,   30),
     ('benchmark_model_v4.py',       1,   60),
     ('build_model_anomalies.py',    1,   30),
     ('snapshot_pick_odds.py',       1,   30),

@@ -5423,6 +5423,7 @@ const coach = pred?.coachContext || getCoachContext(match);
 const derby = pred?.derbyContext || getDerbyContext(match);
 const extStats = pred?.poisson?.extendedStats || getTeamStatsExtendedContext(match);
 const anomaly = pred?.market_anomaly || null;
+const nbaProps = match?.sport === 'basketball' && typeof getNbaPlayerProps === 'function' ? getNbaPlayerProps(match) : [];
 const badges = [];
 if (competition) badges.push({ label: competition.label, title: competition.reason || 'Contexte compétition' });
 if (season) badges.push({ label: season.label, title: `Phase saison · ${season.sample_teams || 0} équipes suivies` });
@@ -5439,6 +5440,7 @@ if (coach?.home?.status && coach.home.status !== 'stable') badges.push({ label: 
 if (coach?.away?.status && coach.away.status !== 'stable') badges.push({ label: `Coach ${coach.away.status}`, title: `${coach.away.team} · ${coach.away.days_since_nomination}j` });
 if (derby) badges.push({ label: `Derby : ${derby.label}`, title: `Variance ×${derby.variance_multiplier} · edge requis +${Math.round(derby.edge_required_bonus * 100)}pt` });
 if (anomaly) badges.push({ label: 'Anomalie modèle/marché', title: `Écart brut ${Math.round(Math.abs(anomaly.gap || 0) * 100)}pt · proba plafonnée à ${Math.round((anomaly.capped_prob || 0) * 100)}%` });
+if (nbaProps.length) badges.push({ label: `${nbaProps.length} props joueurs NBA/WNBA`, title: 'Points, rebonds, passes et 3-points projetés depuis les profils joueurs locaux.' });
 if (!badges.length) return '';
 return `<div class="v4-context-badges" style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 14px;">
 ${badges.map(b => `<span style="display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--border);border-radius:999px;background:var(--panel-2);font-size:12px;font-weight:750;color:var(--text);" title="${esc(b.title)}">${esc(b.label)}</span>`).join('')}
@@ -6128,6 +6130,27 @@ source: row[11] || 'football_player_props',
 } : row).filter(Boolean).sort((a, b) => (b.prob || 0) - (a.prob || 0));
 }
 try { window.getFootballPlayerProps = getFootballPlayerProps; } catch(e) {}
+
+function getNbaPlayerProps(match) {
+const data = window.NBA_PLAYER_PROPS || null;
+const rows = data?.events?.[String(match?.id || match?.uid || '')] || [];
+return rows.map(row => Array.isArray(row) ? {
+name: row[0],
+teamName: row[1],
+teamSide: row[2],
+pos: row[3],
+market: row[4],
+label: row[5],
+line: Number(row[6]) || 0,
+mean: Number(row[7]) || 0,
+overProb: Number(row[8]) || 0,
+underProb: Number(row[9]) || 0,
+fairOddsOver: Number(row[10]) || null,
+fairOddsUnder: Number(row[11]) || null,
+source: row[12] || 'nba_player_props',
+} : row).filter(Boolean);
+}
+try { window.getNbaPlayerProps = getNbaPlayerProps; } catch(e) {}
 
 function predictLikelyScorers(match, pred) {
 try {
@@ -11246,13 +11269,16 @@ const ref = match.referee || null;
 const scorers = (match.sport === 'football' && pred && typeof predictLikelyScorers === 'function')
 ? (predictLikelyScorers(match, pred) || []).slice(0, 3)
 : [];
+const nbaProps = (match.sport === 'basketball' && typeof getNbaPlayerProps === 'function')
+? getNbaPlayerProps(match).slice(0, 8)
+: [];
 const tile = (label, value, sub) => `
         <div style="padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);min-width:0;">
           <div style="font-size:10px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.5px;font-weight:800;margin-bottom:4px;">${esc(label)}</div>
           <div style="font-size:13px;color:var(--text);font-weight:750;line-height:1.35;">${value}</div>
           ${sub ? `<div style="margin-top:3px;font-size:10.5px;color:var(--text-dim);line-height:1.35;">${sub}</div>` : ''}
         </div>`;
-const hasAny = hForm.length || aForm.length || hxg || axg || hStarters || aStarters || w || ref?.name || scorers.length;
+const hasAny = hForm.length || aForm.length || hxg || axg || hStarters || aStarters || w || ref?.name || scorers.length || nbaProps.length;
 if (!hasAny) return '';
 const weatherValue = w
 ? `${w.temp_c != null ? Math.round(w.temp_c) + '°C' : '—'}${w.wind_kmh != null ? ` · ${Math.round(w.wind_kmh)} km/h` : ''}`
@@ -11266,6 +11292,14 @@ return `
             ${(hxg || axg) ? tile('xG / xGA L10', `${esc(home?.short || 'Dom.')} ${fmt(hxg?.xg_l10 ?? hxg?.xg_for_avg)} / ${fmt(hxg?.xga_l10 ?? hxg?.xg_against_avg)}<br>${esc(away?.short || 'Ext.')} ${fmt(axg?.xg_l10 ?? axg?.xg_for_avg)} / ${fmt(axg?.xga_l10 ?? axg?.xg_against_avg)}`, `PPDA ${esc(home?.short || 'D')}: ${fmt(hxg?.ppda, 1)} · ${esc(away?.short || 'E')}: ${fmt(axg?.ppda, 1)}`) : ''}
             ${(hStarters || aStarters) ? tile('Compositions XI', `${esc(home?.short || 'Dom.')} ${hStarters || '—'}/11 · ${esc(away?.short || 'Ext.')} ${aStarters || '—'}/11`, 'Signal clé si les titulaires sont confirmés.') : ''}
             ${scorers.length ? tile('Buteurs probables', scorers.map(s => `${esc(s.name)} <span class="u-text-dim">(${Math.round(s.prob*100)}%)</span>`).join('<br>'), 'À vérifier dans le marché buteur Winamax.') : ''}
+            ${nbaProps.length ? tile('Props joueurs', (() => {
+const byPlayer = new Map();
+nbaProps.forEach(p => {
+if (!byPlayer.has(p.name)) byPlayer.set(p.name, []);
+byPlayer.get(p.name).push(`${esc(p.label)} ${p.line} <span class="u-text-dim">(${Math.round(p.overProb*100)}% over)</span>`);
+});
+return Array.from(byPlayer.entries()).slice(0, 3).map(([name, rows]) => `<b>${esc(name)}</b> · ${rows.slice(0, 2).join(' · ')}`).join('<br>');
+})(), 'Points, rebonds, passes et tirs à 3 points projetés localement.') : ''}
             ${w ? tile('Météo', esc(weatherValue), esc(w.city || w.condition || 'Open-Meteo')) : ''}
             ${ref?.name ? tile('Arbitre', refValue, `${ref.cards_per_match != null ? `${Number(ref.cards_per_match).toFixed(1)} cartons/match` : ref.yellowPerGame != null ? `${Number(ref.yellowPerGame).toFixed(1)} jaunes/match` : 'Profil discipline disponible'}`) : ''}
           </div>
