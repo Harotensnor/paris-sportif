@@ -387,7 +387,7 @@ return w.available === true && !!w.match_id
 && (Number(w.markets['1n2'].home) > 1 || Number(w.markets['1n2'].away) > 1);
 }
 try { window.bookmakerMode = bookmakerMode; window.setBookmakerMode = setBookmakerMode; window.isBookableInMode = isBookableInMode; } catch(e){ logSafeError('boot expose bookmaker helpers', e); }
-const VALID_PAGES = ['dashboard','tous','performance','academie','profil'];
+const VALID_PAGES = ['dashboard','tous','performance','academie','profil','buteurs'];
 const PAGE_ALIASES = {
 'top': 'dashboard',
 'locks': 'dashboard',
@@ -406,7 +406,7 @@ const PAGE_ALIASES = {
 'methodologie': 'academie',
 'comment-lire': 'academie',
 'comment-lire-un-prono': 'academie',
-'buteurs': 'tous',
+'buteur': 'buteurs',
 'combines': 'tous',
 'calendrier': 'tous',
 'compare': 'tous',
@@ -6108,6 +6108,27 @@ let __predCache = new Map();
 let __predCacheRef = null;
 function __predCacheClear() { __predCache = new Map(); __predCacheRef = window.PRONOSTICS_DATA; }
 
+function getFootballPlayerProps(match) {
+const data = window.FOOTBALL_PLAYER_PROPS || null;
+const rows = data?.events?.[String(match?.id || match?.uid || '')] || [];
+return rows.map(row => Array.isArray(row) ? {
+name: row[0],
+teamName: row[1],
+teamShort: row[1],
+teamSide: row[2],
+pos: row[3],
+prob: Number(row[4]) || 0,
+firstGoalProb: Number(row[5]) || 0,
+twoPlusProb: Number(row[6]) || 0,
+cardProb: row[7] == null ? null : Number(row[7]) || 0,
+impliedOdd: Number(row[8]) || null,
+firstGoalOdd: Number(row[9]) || null,
+twoPlusOdd: Number(row[10]) || null,
+source: row[11] || 'football_player_props',
+} : row).filter(Boolean).sort((a, b) => (b.prob || 0) - (a.prob || 0));
+}
+try { window.getFootballPlayerProps = getFootballPlayerProps; } catch(e) {}
+
 function predictLikelyScorers(match, pred) {
 try {
 if (!match || match.sport !== 'football') return null;
@@ -6159,6 +6180,27 @@ const all = [
 ...scorersFromSide(home, xgH, true),
 ...scorersFromSide(away, xgA, false),
 ];
+if (!all.length) {
+const props = getFootballPlayerProps(match);
+if (props.length) return props.map(p => ({
+name: p.name,
+pos: p.pos,
+captain: false,
+pid: null,
+teamName: p.teamName,
+teamShort: p.teamShort,
+teamAbbr: '',
+isHome: p.teamSide === 'home',
+prob: p.prob,
+firstGoalProb: p.firstGoalProb,
+twoPlusProb: p.twoPlusProb,
+cardProb: p.cardProb,
+impliedOdd: p.impliedOdd,
+firstGoalOdd: p.firstGoalOdd,
+twoPlusOdd: p.twoPlusOdd,
+source: p.source,
+}));
+}
 if (!all.length) return null;
 all.sort((a, b) => b.prob - a.prob);
 return all;
@@ -19498,7 +19540,7 @@ ${_nUpcoming > 0 ? `<button type="button" class="ed-hero__secondary page-btn" da
             }
             // Buteurs probables foot : seulement matchs foot non-completés
             // avec lineups ou xG > 0 (heuristique) → potentiellement avec buteurs
-            if (m.sport === 'football' && !m.completed && (m.lineups || m.h2h)) {
+            if (m.sport === 'football' && !m.completed && (m.lineups || m.h2h || (typeof getFootballPlayerProps === 'function' && getFootballPlayerProps(m).length))) {
               _nButeursMatch++;
             }
           });
@@ -22929,9 +22971,11 @@ entry.hasLineup = !!(
 (h && h.lineup && h.lineup.starters && h.lineup.starters.length) ||
 (a && a.lineup && a.lineup.starters && a.lineup.starters.length)
 );
+entry.hasPlayerProps = !!(typeof getFootballPlayerProps === 'function' && getFootballPlayerProps(entry.m).length);
 });
 matches.sort((a,b) => {
 if (a.hasLineup !== b.hasLineup) return a.hasLineup ? -1 : 1;
+if (a.hasPlayerProps !== b.hasPlayerProps) return a.hasPlayerProps ? -1 : 1;
 const sa = Math.max(a.pred.markets.ou.prob || 0, a.pred.markets.btts.prob || 0);
 const sb = Math.max(b.pred.markets.ou.prob || 0, b.pred.markets.btts.prob || 0);
 return sb - sa;
@@ -23017,6 +23061,9 @@ return `
             const top = scorers.slice(0, 5);
             const rows = top.map(s => {
               const probPct = (s.prob * 100).toFixed(0);
+              const firstPct = s.firstGoalProb ? Math.round(s.firstGoalProb * 100) : null;
+              const twoPlusPct = s.twoPlusProb ? Math.round(s.twoPlusProb * 100) : null;
+              const cardPct = s.cardProb ? Math.round(s.cardProb * 100) : null;
               const confColor = s.prob >= 0.50 ? 'var(--accent)' : s.prob >= 0.35 ? 'var(--info)' : s.prob >= 0.22 ? 'var(--warn)' : 'var(--text-dim)';
               const posIcon = s.pos === 'F' ? '⚔️' : s.pos === 'M' ? '🎯' : s.pos === 'D' ? '🛡️' : '🧤';
               // is known ; falls back to the position emoji when not available.
@@ -23029,6 +23076,7 @@ ${faceHtml}
 <div style="min-width:0;">
 <div style="font-size:13px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(s.name)}${s.captain ? ' <span style="color:var(--gold);font-size:10px;" title="Capitaine">©</span>' : ''}</div>
 <div style="font-size:10.5px;color:var(--text-dim);">${esc(s.teamShort)}</div>
+${(firstPct || twoPlusPct || cardPct) ? `<div style="font-size:10px;color:var(--text-dim2);margin-top:2px;">${firstPct ? `1er but ${firstPct}%` : ''}${firstPct && twoPlusPct ? ' · ' : ''}${twoPlusPct ? `2+ buts ${twoPlusPct}%` : ''}${(firstPct || twoPlusPct) && cardPct ? ' · ' : ''}${cardPct ? `carton ${cardPct}%` : ''}</div>` : ''}
 </div>
 <div style="font-size:11px;color:var(--text-dim);font-variant-numeric:tabular-nums;">${s.impliedOdd ? 'cote ~' + s.impliedOdd.toFixed(2) : '—'}</div>
 <div style="font-size:13px;font-weight:700;color:${confColor};font-variant-numeric:tabular-nums;min-width:40px;text-align:right;">${probPct}%</div>
@@ -23060,7 +23108,7 @@ const cardsHtml = matches.length ? matches.slice(0, 25).map(cardHtml).join('')
            <div style="font-size:12.5px;max-width:360px;margin:0 auto;">Les cotes Winamax pour les matchs d'aujourd'hui et demain ne sont pas encore ouvertes ou les matchs n'ont pas assez de données. Reviens en fin de matinée !</div>
          </div>`;
 
-const nWithLineup = matches.filter(x => x.hasLineup).length;
+const nWithLineup = matches.filter(x => x.hasLineup || x.hasPlayerProps).length;
 const nTotal = matches.length;
 
 wrap.innerHTML = `
@@ -23079,19 +23127,19 @@ wrap.innerHTML = `
 <div style="font-size:22px;font-weight:800;color:var(--text);margin-top:2px;font-variant-numeric:tabular-nums;">${nTotal}</div>
 </div>
 <div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r);">
-<div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;font-weight:700;">Compos dispo</div>
+<div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;font-weight:700;">Joueurs projetés</div>
 <div style="font-size:22px;font-weight:800;color:${nWithLineup>0?'var(--accent)':'var(--text-dim)'};margin-top:2px;font-variant-numeric:tabular-nums;">${nWithLineup}</div>
-<div style="font-size:10.5px;color:var(--text-dim);">prono joueurs possibles</div>
+<div style="font-size:10.5px;color:var(--text-dim);">compo réelle ou sidecar V4</div>
 </div>
 <div style="padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r);">
 <div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;font-weight:700;">En attente</div>
 <div style="font-size:22px;font-weight:800;color:var(--warn);margin-top:2px;font-variant-numeric:tabular-nums;">${nTotal - nWithLineup}</div>
-<div style="font-size:10.5px;color:var(--text-dim);">compos annoncées 1h avant</div>
+<div style="font-size:10.5px;color:var(--text-dim);">manque de noms fiables</div>
 </div>
 </div>` : ''}
 
         <div style="padding:12px 14px;background:var(--info-soft);border:1px solid rgba(96,165,250,.25);border-radius:var(--r);font-size:12.5px;color:var(--text-2);line-height:1.5;margin-bottom:16px;">
-          <b style="color:var(--info);">💡 Comment ça marche ?</b> On estime les buts à partir de l'attaque/défense des deux équipes + le contexte (météo, arbitre, forme). Pour <b>les joueurs buteurs</b>, il nous faut la composition d'équipe — annoncée <b>1h avant le coup d'envoi</b>.
+          <b style="color:var(--info);">💡 Comment ça marche ?</b> On estime les buts à partir de l'attaque/défense des deux équipes + le contexte (météo, arbitre, forme). Pour <b>les joueurs buteurs</b>, on utilise d'abord les compositions; si elles manquent, le sidecar V4 propose les meilleurs profils connus.
         </div>
 
         ${cardsHtml}
@@ -25265,7 +25313,7 @@ return `
     const isAcademie = currentPage === 'academie';
     const isBacktest = false;
     const isProfil = currentPage === 'profil';
-    const isButeurs = false;
+    const isButeurs = currentPage === 'buteurs';
     const isTous = currentPage === 'tous';
     const isCredibilite = false;
     const isMontante = currentPage === 'montantes';

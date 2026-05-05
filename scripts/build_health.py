@@ -307,6 +307,10 @@ SOURCES = [
     ('team_stats_extended', 'team_stats_extended.json', lambda d: {
         'teams': (d.get('team_count') or len(d.get('teams') or {})) if isinstance(d, dict) else 0,
     }),
+    ('football_player_props', 'football_player_props.json', lambda d: {
+        'events': (d.get('event_count') or len(d.get('events') or {})) if isinstance(d, dict) else 0,
+        'props': (d.get('prop_count') or 0) if isinstance(d, dict) else 0,
+    }),
     ('model_v4_benchmark', 'model_v4_benchmark.json', lambda d: {
         'status': ((d.get('v4a') or {}).get('status') or 'unknown') if isinstance(d, dict) else 'missing',
         'baseline_n': ((d.get('baseline') or {}).get('n') or 0) if isinstance(d, dict) else 0,
