@@ -987,3 +987,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Tests: `tennis-games-sets.spec.js` passe desktop + mobile (2/2); `app.js` syntax OK; drift pipeline OK.
 - Cache/footer bumpes v36.022; `app.js` hash `6177f748`, SW `paris-sportif-20260505-215715`.
 
+## Sprint v36.023 — AUTO 10/10 Phase 7 ZZ props MLB/NHL (22:01 UTC)
+- Data: `mlb_player_props.js` et `nhl_playoff_markets.js` générés depuis les JSON existants, sans nouvelle source.
+- MLB: props pitchers strikeouts et home run allowed visibles en modal, même si la projection score n'est pas disponible.
+- NHL: totaux buts + 1ère période exposés depuis `nhl_playoff_markets`.
+- Tests: `mlb-nhl-props.spec.js` passe desktop + mobile (2/2); `app.js` syntax OK; drift pipeline OK.
+- Cache/footer bumpes v36.023; `app.js` hash `06f49c36`, sidecars `0f71499f/9b80b4c8`, SW `paris-sportif-20260505-220121`.
+

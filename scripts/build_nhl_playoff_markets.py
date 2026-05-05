@@ -17,6 +17,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parent.parent
 DATA_JS = ROOT / "data.js"
 OUT = ROOT / "nhl_playoff_markets.json"
+OUT_JS = ROOT / "nhl_playoff_markets.js"
 
 TOTAL_LINES = [4.5, 5.5, 6.5, 7.5]
 
@@ -170,6 +171,21 @@ def main() -> int:
         "markets": sum(2 + len(((e.get("markets") or {}).get("totals") or [])) for e in events),
     }
     OUT.write_text(json.dumps(out, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    compact = {
+        "generated_at": out["generated_at"],
+        "status": out["status"],
+        "event_count": len(events),
+        "market_count": out["markets"],
+        "events": {
+            str(e.get("event_id")): [
+                e.get("match"),
+                e.get("projection") or {},
+                e.get("markets") or {},
+            ]
+            for e in events if e.get("event_id")
+        },
+    }
+    OUT_JS.write_text("window.NHL_PLAYOFF_MARKETS = " + json.dumps(compact, ensure_ascii=False, separators=(",", ":")) + ";\n", encoding="utf-8")
     print(f"nhl_playoff_markets: events={len(events)} markets={out['markets']} status={out['status']}")
     return 0
 

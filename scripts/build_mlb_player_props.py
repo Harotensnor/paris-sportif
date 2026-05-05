@@ -18,6 +18,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parent.parent
 DATA_JS = ROOT / "data.js"
 OUT = ROOT / "mlb_player_props.json"
+OUT_JS = ROOT / "mlb_player_props.js"
 
 
 def now_iso() -> str:
@@ -185,6 +186,27 @@ def main() -> int:
         "markets": ["pitcher_strikeouts", "pitcher_home_run_allowed"],
     }
     OUT.write_text(json.dumps(out, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    compact = {
+        "generated_at": out["generated_at"],
+        "status": out["status"],
+        "event_count": len(events),
+        "prop_count": out["props"],
+        "events": {
+            str(e.get("event_id")): [
+                e.get("match"),
+                [
+                    [
+                        p.get("market"), p.get("pitcher"), p.get("label"), p.get("line"),
+                        p.get("pick"), p.get("probability"), p.get("fair_odds"),
+                        p.get("expected_strikeouts"), p.get("expected_hr_allowed"), p.get("side"),
+                    ]
+                    for p in (e.get("props") or [])
+                ],
+            ]
+            for e in events if e.get("event_id")
+        },
+    }
+    OUT_JS.write_text("window.MLB_PLAYER_PROPS = " + json.dumps(compact, ensure_ascii=False, separators=(",", ":")) + ";\n", encoding="utf-8")
     print(f"mlb_player_props: events={len(events)} props={out['props']} status={out['status']}")
     return 0
 
