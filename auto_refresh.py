@@ -129,6 +129,7 @@ PATCH_STAGES = [
     ('audit_mcp_shadow_copy.py',     1,   15),
     ('test_mcp_smoke.py',            1,   30),
     ('compute_clv.py',              1,   30),
+    ('build_daily_insights.py',      1,   15),
     # v31.7.23 — Dixon-Coles ρ par ligue mesuré en CI (likelihood max).
     # Lent (~2-5s pour 40 ligues) ; cadence 240 ticks (~4h) en local.
     # En prod la cadence est 1×/jour (cron H=00:00 UTC) — voir refresh.yml.

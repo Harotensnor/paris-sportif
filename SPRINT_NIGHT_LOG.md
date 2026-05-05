@@ -403,3 +403,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Garde-fou: exclusion des picks avec signaux contradictoires, marche incertain, marche a fade ou AUC faible/low value.
 - UX: la section reste rare et garde le max 1 pick par match pour eviter les doublons trompeurs.
 - Cache/footer bumpes v35.419; `app.js` hash `7f621642`.
+
+## Sprint v35.420 — AUTO 10/10 Briefing quotidien local (00:41 UTC)
+- Produit: ajout de `daily_insights.json`, un briefing court construit depuis les sidecars locaux deja presents (biais ligue, signaux rares, timing, CLV, gaps data, AUC).
+- Front: l'accueil affiche maintenant une section "Insights du jour" et le rail modele a un bloc "Briefing jour" cliquable vers les matchs concernes.
+- Pipeline: `auto_refresh.py`, `refresh.yml` et `health.json` generent, commitent et monitorent le nouveau sidecar.
+- Mesure: 7 insights generes, capture visuelle 32 PNG OK, syntax JS OK, modal sync 2/2, bundle `app.js` 1,598,741 bytes sous cap; cache/footer bumpes v35.420.
