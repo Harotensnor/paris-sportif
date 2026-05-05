@@ -27,6 +27,7 @@ DATA_JS = ROOT / "data.js"
 BACKTEST = ROOT / "backtest_report_v2.json"
 BACKTEST_MARKETS = ROOT / "backtest_report_markets.json"
 STADIUMS = ROOT / "stadiums.json"
+ODDS_HISTORY = ROOT / "odds_history.jsonl"
 
 OUT_LEAGUE = ROOT / "league_inefficiencies.json"
 OUT_MARKET_BIASES = ROOT / "market_biases_by_league.json"
@@ -82,6 +83,84 @@ def load_json(path: Path) -> dict[str, Any]:
         return data if isinstance(data, dict) else {}
     except Exception:
         return {}
+
+
+def parse_dt(value: Any) -> datetime | None:
+    if not value:
+        return None
+    try:
+        dt = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+    except Exception:
+        return None
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
+
+
+def moneyline_to_decimal(value: Any) -> float | None:
+    try:
+        ml = float(value)
+    except Exception:
+        return None
+    if ml >= 100:
+        return 1 + ml / 100
+    if ml <= -100:
+        return 1 + 100 / abs(ml)
+    return None
+
+
+def load_odds_trends() -> dict[str, dict[str, dict[str, Any]]]:
+    if not ODDS_HISTORY.exists():
+        return {}
+    grouped: dict[str, dict[str, list[tuple[datetime, float]]]] = defaultdict(lambda: defaultdict(list))
+    side_keys = {"home": "homeML", "away": "awayML", "draw": "drawML"}
+    try:
+        with ODDS_HISTORY.open("r", encoding="utf-8") as handle:
+            for line in handle:
+                if not line.strip():
+                    continue
+                try:
+                    rec = json.loads(line)
+                except Exception:
+                    continue
+                mid = str(rec.get("id") or "")
+                captured = parse_dt(rec.get("captured_at"))
+                if not mid or captured is None:
+                    continue
+                for side, key in side_keys.items():
+                    odd = moneyline_to_decimal(rec.get(key))
+                    if odd:
+                        grouped[mid][side].append((captured, odd))
+    except Exception:
+        return {}
+
+    out: dict[str, dict[str, dict[str, Any]]] = {}
+    for mid, sides in grouped.items():
+        out[mid] = {}
+        for side, points in sides.items():
+            points = sorted(points, key=lambda p: p[0])
+            if len(points) < 2:
+                continue
+            latest_ts = points[-1][0]
+            recent = [p for p in points if (latest_ts - p[0]).total_seconds() <= 24 * 3600]
+            if len(recent) < 2:
+                recent = points[-12:]
+            vals = [p[1] for p in recent]
+            mean = sum(vals) / len(vals)
+            variance = sum((v - mean) ** 2 for v in vals) / len(vals)
+            stdev = math.sqrt(max(0.0, variance))
+            range_pct = ((max(vals) - min(vals)) / mean * 100) if mean else 0
+            out[mid][side] = {
+                "snapshots": len(recent),
+                "volatility_pct": round((stdev / mean * 100) if mean else 0, 2),
+                "range_pct": round(range_pct, 2),
+                "latest_odd": round(vals[-1], 3),
+                "sparkline": [
+                    {"at": p[0].isoformat().replace("+00:00", "Z"), "odd": round(p[1], 3)}
+                    for p in recent[-12:]
+                ],
+            }
+    return out
 
 
 def normalize_abbr(value: Any, stadium_key: str) -> str:
@@ -874,6 +953,7 @@ def build_angles(data: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any], 
     events = list(iter_events(data))
     schedule = build_team_schedule(events)
     stadiums = load_json(STADIUMS)
+    odds_trends = load_odds_trends()
     now_ts = datetime.now(timezone.utc).timestamp()
     angle_rows = []
     rare_rows = []
@@ -939,11 +1019,34 @@ def build_angles(data: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any], 
                 advice = "price_shortening"
             elif best_move and best_move["move_pct"] < -0.08:
                 advice = "wait_or_recheck"
+            trend = None
+            if best_move:
+                trend = (odds_trends.get(str(ev.get("id") or "")) or {}).get(best_move.get("side"))
+            volatility = float((trend or {}).get("volatility_pct") or 0)
+            range_pct = float((trend or {}).get("range_pct") or 0)
+            recommendation = "parier_maintenant" if advice in {"bet_now_if_selected", "price_shortening"} else "attendre"
+            reason = "Timing neutre: jouer seulement si le pick principal reste value."
+            if advice == "wait_lineups":
+                recommendation = "attendre_compos"
+                reason = "Match foot proche: attendre les compositions peut eviter une mauvaise entree."
+            elif advice == "wait_or_recheck":
+                recommendation = "reverifier_cote"
+                reason = "La cote derive contre le signal: reverifier avant de jouer."
+            elif advice == "price_shortening":
+                reason = "La cote raccourcit: le marche confirme, ne pas attendre trop longtemps."
+            if volatility >= 10 and minutes_to_kickoff > 120 and advice != "price_shortening":
+                recommendation = "reverifier_cote"
+                reason = f"Cote volatile ({volatility:.1f}%): attendre un meilleur point d'entree ou rechecker."
             timing_rows.append({
                 **base,
                 "minutes_to_kickoff": round(minutes_to_kickoff, 1),
                 "advice": advice,
+                "recommendation": recommendation,
+                "reason": reason,
                 "best_move": best_move,
+                "volatility": trend,
+                "volatility_pct": round(volatility, 2),
+                "range_pct": round(range_pct, 2),
             })
 
     angle_type_counts = Counter(a["type"] for row in angle_rows for a in row["angles"])
@@ -975,6 +1078,8 @@ def build_angles(data: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any], 
                 "bet_now": sum(1 for r in timing_rows if r["advice"] == "bet_now_if_selected"),
                 "wait": sum(1 for r in timing_rows if r["advice"] in {"wait_lineups", "wait_or_recheck"}),
                 "price_shortening": sum(1 for r in timing_rows if r["advice"] == "price_shortening"),
+                "volatile": sum(1 for r in timing_rows if float(r.get("volatility_pct") or 0) >= 10),
+                "recheck": sum(1 for r in timing_rows if r.get("recommendation") == "reverifier_cote"),
             },
             "events": timing_rows[:200],
         },
