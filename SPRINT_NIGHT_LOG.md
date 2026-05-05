@@ -1001,3 +1001,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Tests: `same-game-combos.spec.js` passe desktop + mobile (2/2); suite Phase 7 desktop complète 9/9.
 - Cache/footer bumpes v36.024; Phase 7 documentée dans `PHASE_REPORT.md`.
 
+## Sprint v36.025 — AUTO 10/10 Phase 8 BBB mobile compact (22:19 UTC)
+- Mobile: les picks dashboard deviennent des cartes verticales sous 720px, au lieu d'une table comprimée.
+- Lisibilité: cote agrandie, score en chip, tier abrégé S/SO/V/B/O, match et marché lisibles sur deux lignes.
+- A11y/touch: carte conserve une hauteur cible 124px et reste sans overflow horizontal à 390px.
+- Tests: `mobile-compact-layout.spec.js` passe mobile Chromium (1/1); `app.js` syntax OK; drift pipeline OK.
+- Cache/footer bumpes v36.025; `pronostics.html` porte la couche CSS mobile dédiée.
+

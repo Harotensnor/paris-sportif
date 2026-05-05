@@ -134,6 +134,94 @@
 <!-- v35.324 — CSS chargé sans handler inline pour préparer CSP strict. -->
 <link rel="stylesheet" href="app.css?v=e464318c">
 <link rel="stylesheet" href="print.css?v=313105b5" media="print">
+<style id="v36-mobile-compact-cards">
+@media (max-width:720px) {
+  body.agent-home main#main-content { padding: 10px 10px 96px !important; }
+  body.agent-home .v36-home-shell { gap: 12px !important; }
+  body.agent-home .v36-dayline { padding: 14px !important; border-radius: 12px !important; }
+  body.agent-home .v36-dayline h1 { font-size: 20px !important; line-height: 1.15 !important; letter-spacing: 0 !important; }
+  body.agent-home .v36-filter-strip { position: sticky; top: 0; z-index: 32; padding: 9px !important; border-radius: 12px !important; }
+  body.agent-home .v36-picks-table { display: none !important; }
+  body.agent-home .v36-table-cards { display: grid !important; gap: 10px !important; }
+  body.agent-home .v36-table-card {
+    display: grid !important;
+    grid-template-columns: minmax(0,1fr) auto;
+    gap: 8px 10px !important;
+    min-height: 124px !important;
+    padding: 12px !important;
+    border-radius: 12px !important;
+    text-align: left !important;
+    touch-action: manipulation;
+  }
+  body.agent-home .v36-table-card__top,
+  body.agent-home .v36-table-card__line,
+  body.agent-home .v36-table-card__signals { grid-column: 1 / -1; }
+  body.agent-home .v36-table-card__top { display: flex !important; align-items: center; justify-content: space-between; gap: 8px; }
+  body.agent-home .v36-table-card > strong { display: block; min-width: 0; font-size: 15px !important; line-height: 1.25 !important; }
+  body.agent-home .v36-table-card__league { font-size: 11px !important; color: var(--text-dim) !important; }
+  body.agent-home .v36-table-card__line {
+    display: grid !important;
+    grid-template-columns: minmax(0,1fr) auto auto auto;
+    align-items: center;
+    gap: 7px !important;
+    padding-top: 2px;
+  }
+  body.agent-home .v36-table-card__line i { white-space: normal !important; line-height: 1.25 !important; font-size: 12px !important; }
+  body.agent-home .v36-table-card__line b:first-of-type {
+    color: var(--tier) !important;
+    font-size: 22px !important;
+    line-height: 1 !important;
+    letter-spacing: 0 !important;
+  }
+  body.agent-home .v36-table-card__line b:not(:first-of-type) {
+    min-height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 8px;
+    border: 1px solid rgba(236,244,255,.10);
+    border-radius: 999px;
+    background: rgba(255,255,255,.035);
+    font-size: 11px !important;
+  }
+  body.agent-home .v36-table-card__signals { display: flex !important; flex-wrap: wrap; gap: 6px !important; }
+  body.agent-home .v36-table-card__signals i {
+    min-height: 26px;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 8px;
+    border-radius: 999px;
+    border: 1px solid rgba(236,244,255,.10);
+    background: rgba(255,255,255,.035);
+    color: #b7c4d6;
+    font-size: 10.5px !important;
+    font-style: normal;
+    font-weight: 850;
+  }
+  body.agent-home .v36-table-card__signals i:first-child {
+    border-color: color-mix(in srgb,var(--tier) 44%,rgba(236,244,255,.10));
+    background: color-mix(in srgb,var(--tier) 14%,rgba(255,255,255,.035));
+    color: #f7fbff;
+  }
+  body.agent-home .v36-tier-badge {
+    min-width: 34px;
+    min-height: 30px;
+    padding: 0 8px !important;
+    justify-content: center;
+    border-radius: 999px !important;
+  }
+  body.agent-home .v36-tier-badge em { display: none !important; }
+  body.agent-home .v36-tier-badge b { font-size: 0 !important; line-height: 1; }
+  body.agent-home .v36-tier-badge[data-tone="safe"] b::after { content: "S"; font-size: 11px; }
+  body.agent-home .v36-tier-badge[data-tone="solid"] b::after { content: "SO"; font-size: 11px; }
+  body.agent-home .v36-tier-badge[data-tone="value"] b::after { content: "V"; font-size: 11px; }
+  body.agent-home .v36-tier-badge[data-tone="big"] b::after { content: "B"; font-size: 11px; }
+  body.agent-home .v36-tier-badge[data-tone="out"] b::after { content: "O"; font-size: 11px; }
+  body.agent-home .v36-match-name { display: inline-flex; max-width: 100%; align-items: center; gap: 5px; flex-wrap: wrap; }
+  body.agent-home .v36-match-name b { max-width: 118px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  body.agent-home .v36-match-name i { width: 18px; height: 18px; flex: 0 0 18px; }
+}
+</style>
 <!-- v31.1 — DNS-prefetch pour les CDN tiers utilisés sur la page (logos ESPN).
      v31.7.24 — Ajout `preconnect` pour a.espncdn.com (le plus utilisé) :
      le browser fait DNS + TLS handshake en parallèle du parse HTML, ce qui
@@ -831,7 +919,7 @@
       <div class="footer-brand">
         <span class="footer-logo">🎯</span>
         <span class="footer-text">Paris-Sportif</span>
-        <span class="footer-version" id="footer-version" role="button" tabindex="0" style="cursor:pointer;" title="Voir les nouveautés v36.024">v36.024</span>
+        <span class="footer-version" id="footer-version" role="button" tabindex="0" style="cursor:pointer;" title="Voir les nouveautés v36.025">v36.025</span>
       </div>
       <nav class="footer-links" aria-label="Liens du site">
         <a href="https://github.com/Harotensnor/paris-sportif" target="_blank" rel="noopener" class="footer-link" title="Code source sur GitHub">
@@ -1221,6 +1309,7 @@
 </footer>
 </body>
 </html>
+
 
 
 
