@@ -4883,6 +4883,13 @@ const HOME_ADV = 2.5; // ~2.5 pts d'home-court, consensus NBA.
     };
     const firstHalfTotals = derivedTotals(total * 0.49, 8);
     const quarterTotals = derivedTotals(total * 0.245, 5.5);
+    const quarterWeightsRaw = [0.24, 0.26, 0.25, 0.26];
+    const quarterWeightSum = quarterWeightsRaw.reduce((s, v) => s + v, 0) || 1;
+    const quarterTotalsByQuarter = quarterWeightsRaw.map((w, idx) => ({
+      quarter: `Q${idx + 1}`,
+      share: w / quarterWeightSum,
+      lines: derivedTotals(total * (w / quarterWeightSum), 5.5),
+    }));
     const handicapLines = margin >= 0 ? [3.5, 5.5, 7.5, 9.5] : [-3.5, -5.5, -7.5, -9.5];
     const handicaps = handicapLines.map(spread => {
       // P(marge_home > spread) = P((projH - projA) > spread)
@@ -4903,7 +4910,7 @@ const HOME_ADV = 2.5; // ~2.5 pts d'home-court, consensus NBA.
       total,
       margin,
       caption: `${baseCap}${extras} (± ~8 pts par équipe en NBA).`,
-      markets: { totals: totalsMarkets, firstHalfTotals, quarterTotals, handicaps, sigmaTotal, sigmaMargin },
+      markets: { totals: totalsMarkets, firstHalfTotals, quarterTotals, quarterTotalsByQuarter, handicaps, sigmaTotal, sigmaMargin },
     };
   }
 
@@ -12254,6 +12261,10 @@ return `<span style="padding:8px 14px;border-radius:8px;background:${strong?'rgb
 const totalsTop = (sc.markets.totals || []).slice(0, 3).map(g => basketTotalChip(g, '')).join('');
 const halfTop = (sc.markets.firstHalfTotals || []).slice(0, 3).map(g => basketTotalChip(g, '1ère MT')).join('');
 const quarterTop = (sc.markets.quarterTotals || []).slice(0, 3).map(g => basketTotalChip(g, 'Q')).join('');
+const quarterByQuarterTop = (sc.markets.quarterTotalsByQuarter || []).map(q => {
+const best = (q.lines || []).slice().sort((a, b) => Math.max(b.pOver, b.pUnder) - Math.max(a.pOver, a.pUnder))[0];
+return best ? basketTotalChip(best, q.quarter) : '';
+}).filter(Boolean).join('');
 basketMarketsHtml = `
                   ${totalsTop ? `<div class="u-mt-3">
 <div class="lbl-tiny-mb">🏀 Total points</div>
@@ -12263,9 +12274,13 @@ basketMarketsHtml = `
 <div class="lbl-tiny-mb">⏱️ Total 1ère mi-temps</div>
 <div style="display:flex;gap:8px;flex-wrap:wrap;">${halfTop}</div>
 </div>` : ''}
-                  ${quarterTop ? `<div class="u-mt-3">
+${quarterTop ? `<div class="u-mt-3">
 <div class="lbl-tiny-mb">📊 Total quart-temps</div>
 <div style="display:flex;gap:8px;flex-wrap:wrap;">${quarterTop}</div>
+</div>` : ''}
+                  ${quarterByQuarterTop ? `<div class="u-mt-3" data-market-panel="basket-quarter-by-quarter">
+<div class="lbl-tiny-mb">📊 Totaux Q1 / Q2 / Q3 / Q4</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;">${quarterByQuarterTop}</div>
 </div>` : ''}
                   <div style="margin-top:4px;font-size:10.5px;color:var(--text-dim2,#7b8693);line-height:1.3;">Approx. Gaussienne depuis la projection score. Totaux uniquement, sans handicap pur.</div>`;
 }
