@@ -466,10 +466,21 @@ if (_pageFromHash() && !STATIC_REDIRECT_PAGES.has(currentPage)
 localStorage.setItem('currentPage', currentPage);
 }
 } catch(e){}
+const _decodeHashPart = (value) => {
+try { return decodeURIComponent(String(value || '')); } catch(e) { return String(value || ''); }
+};
+function _buildMatchShareUrl(matchId, tab) {
+const cleanId = String(matchId || '').trim();
+const base = `${location.origin}${location.pathname}`;
+if (!cleanId) return location.href;
+const suffix = tab ? `/${encodeURIComponent(String(tab))}` : '';
+return `${base}#match/${encodeURIComponent(cleanId)}${suffix}`;
+}
+try { window._buildMatchShareUrl = _buildMatchShareUrl; } catch(e){}
 window.addEventListener('hashchange', () => {
 const matchHashMatch = (location.hash || '').match(/^#match\/([^/]+)(?:\/(\w+))?$/);
 if (matchHashMatch) {
-const targetId = matchHashMatch[1];
+const targetId = _decodeHashPart(matchHashMatch[1]);
 try {
 const data = window.PRONOSTICS_DATA;
 if (data && data.days) {
@@ -14762,9 +14773,8 @@ try {
 const titleEl = document.getElementById('detail-title');
 const matchId = titleEl?.dataset.matchId || '';
 const matchName = titleEl?.textContent || 'Match';
-const url = matchId
-? `${location.origin}${location.pathname}?match=${encodeURIComponent(matchId)}`
-: location.href;
+const activeTab = document.querySelector('.md-tab[aria-selected="true"]')?.dataset?.mtabToggle || '';
+const url = matchId ? _buildMatchShareUrl(matchId, activeTab || 'synthese') : location.href;
 const text = `Regarde ce match sur Paris-Sportif : ${matchName}`;
 if (navigator.share) {
 try {
@@ -32673,7 +32683,7 @@ setTimeout(() => {
 try {
 const initMatchHash = (location.hash || '').match(/^#match\/([^/]+)/);
 if (!initMatchHash) return;
-const targetId = initMatchHash[1];
+const targetId = (typeof _decodeHashPart === 'function') ? _decodeHashPart(initMatchHash[1]) : initMatchHash[1];
 const data = window.PRONOSTICS_DATA;
 if (!data || !data.days) return;
 for (const arr of Object.values(data.days)) {

@@ -1051,3 +1051,11 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Tests: mobile-long-press-menu passe mobile Chromium (1/1); app.js syntax OK; drift pipeline OK.
 - Cache/footer bumpes v36.031; app.js hash 3c6e3cfb; SW paris-sportif-20260505-223409.
 
+
+## Sprint v36.032 — AUTO 10/10 Phase 8 III partage natif (22:35 UTC)
+- Modal: le bouton partager utilise maintenant un deep-link #match/<id>/<onglet>.
+- Robustesse: le routeur decode les IDs encodés et rouvre la modale depuis le hash.
+- Mobile: Web Share API prioritaire, fallback presse-papier conserve le même lien profond.
+- Tests: mobile-native-share passe mobile Chromium (1/1); app.js syntax OK; drift pipeline OK.
+- Cache/footer bumpes v36.032; app.js hash 76b13749; SW paris-sportif-20260505-223557.
+
