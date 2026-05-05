@@ -421,3 +421,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - QA: le test modal/table gele maintenant son horloge proche de `generated_at` pour verifier la synchro pick même quand la machine tourne avec une donnee locale devenue stale.
 - Mesure avant/apres: `app.js` 1,599,126 -> 1,597,420 bytes, soit ~1.7 KB de marge recuperee sous le cap 1,600,000.
 - Cache/footer bumpes v35.422; `app.js` hash `d9aa35cd`.
+
+## Sprint v35.423 — AUTO 10/10 Diagnostic MCP tracable (10:07 UTC)
+- Diagnostic: `get_pipeline_status` expose maintenant `mcp_runtime` avec chemin du script, hash courant et statut de la copie legacy.
+- Fix ops: la copie historique `paris-sportif-sprints` a ete resynchronisee pour eviter qu'une ancienne config desktop retourne encore une date stale.
+- Mesure: smoke MCP OK, shadow audit OK, sortie live `today=2026-05-05`, `winamax_exact_ratio=0.9968`, shadow `aligned`.
+- Cache/footer bumpes v35.423.

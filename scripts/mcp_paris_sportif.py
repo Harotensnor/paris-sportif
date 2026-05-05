@@ -26,6 +26,7 @@ PROJECT_ROOT est auto-détecté depuis la position du script.
 from __future__ import annotations
 
 import json
+import hashlib
 import os
 import re
 import sys
@@ -98,6 +99,37 @@ WINAMAX_MARKETS = PROJECT_ROOT / "winamax_markets.json"
 DATA_MANIFEST = PROJECT_ROOT / "data_manifest.json"
 NIGHT_METRICS = PROJECT_ROOT / "night_metrics.json"
 SIGNAL_GAP_REPORT = PROJECT_ROOT / "signal_gap_report.json"
+
+
+def _file_sha12(path: Path) -> str | None:
+    try:
+        return hashlib.sha256(path.read_bytes()).hexdigest()[:12]
+    except Exception:
+        return None
+
+
+def _legacy_mcp_path() -> Path:
+    return PROJECT_ROOT.parent / "paris-sportif-sprints" / "scripts" / "mcp_paris_sportif.py"
+
+
+def _mcp_runtime_snapshot() -> dict:
+    current = Path(__file__).resolve()
+    legacy = _legacy_mcp_path()
+    current_sha = _file_sha12(current)
+    legacy_sha = _file_sha12(legacy) if legacy.exists() else None
+    return {
+        "script": str(current),
+        "script_sha": current_sha,
+        "legacy_script": str(legacy),
+        "legacy_script_sha": legacy_sha,
+        "legacy_shadow_status": (
+            "aligned"
+            if legacy_sha and current_sha == legacy_sha
+            else "missing"
+            if not legacy_sha
+            else "stale"
+        ),
+    }
 
 # === MCP server import ===
 try:
@@ -1187,6 +1219,7 @@ def get_pipeline_status() -> dict:
         "calculated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "source_of_truth": "data.js",
         "project_root": str(PROJECT_ROOT),
+        "mcp_runtime": _mcp_runtime_snapshot(),
         "today": today,
         "active_data_day": active_day,
         "data_day_is_current": active_day == today,
