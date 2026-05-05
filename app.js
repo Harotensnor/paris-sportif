@@ -5877,6 +5877,46 @@ window.getTeamStatsExtendedContext = getTeamStatsExtendedContext;
 window.getTeamStatsExtendedDebugSummary = getTeamStatsExtendedDebugSummary;
 } catch (e) {}
 
+function _footballStatsMarketFromTuple(matchId, row, marketKey) {
+if (!Array.isArray(row)) return row || null;
+const rows = (row[3] || []).map(r => ({
+market_key: marketKey,
+line: Number(r[0]),
+over_prob: Number(r[1]),
+under_prob: Number(r[2]),
+fair_odds_over: Number(r[3]),
+fair_odds_under: Number(r[4]),
+}));
+return {
+match_id: matchId,
+expected: Number(row[0]) || 0,
+source: row[1] || 'derived',
+referee: row[2] || null,
+rows,
+};
+}
+function getFootballStatsMarkets(match) {
+const mid = String(match?.id || '');
+if (!mid || match?.sport !== 'football') return null;
+const corners = _footballStatsMarketFromTuple(mid, window.TOTAL_CORNERS?.events?.[mid], 'cornersTotal');
+const cards = _footballStatsMarketFromTuple(mid, window.TOTAL_CARDS?.events?.[mid], 'cardsTotal');
+const fouls = _footballStatsMarketFromTuple(mid, window.TOTAL_FOULS?.events?.[mid], 'foulsTotal');
+if (!corners && !cards && !fouls) return null;
+return { corners, cards, fouls };
+}
+function getFootballStatsMarketsDebugSummary() {
+return {
+corners: Number(window.TOTAL_CORNERS?.event_count || Object.keys(window.TOTAL_CORNERS?.events || {}).length || 0),
+cards: Number(window.TOTAL_CARDS?.event_count || Object.keys(window.TOTAL_CARDS?.events || {}).length || 0),
+fouls: Number(window.TOTAL_FOULS?.event_count || Object.keys(window.TOTAL_FOULS?.events || {}).length || 0),
+generatedAt: window.TOTAL_CORNERS?.generated_at || window.TOTAL_CARDS?.generated_at || window.TOTAL_FOULS?.generated_at || null,
+};
+}
+try {
+window.getFootballStatsMarkets = getFootballStatsMarkets;
+window.getFootballStatsMarketsDebugSummary = getFootballStatsMarketsDebugSummary;
+} catch (e) {}
+
 function poissonComponent(match) {
 if (match.sport !== 'football') return null;
 const { home, away } = getSides(match);
@@ -12358,6 +12398,42 @@ const htftGrid = (ext && Array.isArray(ext.htftAll) && ext.htftAll.length)
     </div>
   </div>`
 : '';
+const statsMarkets = (typeof getFootballStatsMarkets === 'function') ? getFootballStatsMarkets(match) : null;
+const statPanel = statsMarkets ? (() => {
+const mkBlock = (title, data, color) => {
+if (!data || !Array.isArray(data.rows) || !data.rows.length) return '';
+const rows = data.rows.slice(0, 4).map(r => {
+const leanOver = Number(r.over_prob) >= Number(r.under_prob);
+const prob = leanOver ? r.over_prob : r.under_prob;
+const fair = leanOver ? r.fair_odds_over : r.fair_odds_under;
+return `<div style="border:1px solid rgba(255,255,255,.08);background:rgba(8,12,20,.32);border-radius:7px;padding:7px 8px;">
+  <div style="font-size:12px;font-weight:800;color:var(--text,#e6ebf2);">${leanOver ? 'Over' : 'Under'} ${Number(r.line).toFixed(1)}</div>
+  <div style="font-size:11px;color:var(--text-dim,#b4bcc7);font-variant-numeric:tabular-nums;">${Math.round(prob * 100)}% · fair ${Number(fair || 0).toFixed(2)}</div>
+</div>`;
+}).join('');
+return `<div style="min-width:190px;flex:1;">
+  <div style="display:flex;justify-content:space-between;gap:8px;margin-bottom:6px;">
+    <span style="font-size:11px;text-transform:uppercase;letter-spacing:.45px;color:${color};font-weight:800;">${title}</span>
+    <span style="font-size:10.5px;color:var(--text-dim2,#7b8693);font-variant-numeric:tabular-nums;">x ${Number(data.expected || 0).toFixed(1)}</span>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(82px,1fr));gap:6px;">${rows}</div>
+</div>`;
+};
+const html = [
+mkBlock('Corners', statsMarkets.corners, '#facc15'),
+mkBlock('Cartons', statsMarkets.cards, '#fde68a'),
+mkBlock('Fautes', statsMarkets.fouls, '#93c5fd'),
+].filter(Boolean).join('');
+if (!html) return '';
+return `<div data-market-panel="football-stats" style="margin-top:10px;padding:10px;border:1px solid rgba(148,163,184,.18);background:rgba(148,163,184,.06);border-radius:8px;">
+  <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:8px;">
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:.45px;color:var(--text,#e6ebf2);font-weight:800;">Marchés stats</div>
+    <div style="font-size:10.5px;color:var(--text-dim2,#7b8693);">corners · cartons · fautes</div>
+  </div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;">${html}</div>
+  <div style="margin-top:7px;font-size:10.5px;color:var(--text-dim2,#7b8693);">Régression locale basée sur xG, pressing et profil arbitre. Cotes fair indicatives.</div>
+</div>`;
+})() : '';
 return `<div style="margin-top:14px;">
                 <div class="lbl-tiny-mb">🥅 Marchés buts (Poisson)</div>
                 <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -12366,6 +12442,7 @@ return `<div style="margin-top:14px;">
                   ${extChips}
                 </div>
                 ${htftGrid}
+                ${statPanel}
                           <div style="margin-top:6px;font-size:10.5px;color:var(--text-dim2,#7b8693);line-height:1.3;">Picks alternatifs dérivés des buts attendus (${pred.poisson ? `xG ${pred.poisson.xgH.toFixed(2)}–${pred.poisson.xgA.toFixed(2)}` : 'modèle Poisson'}). ⭐ = ≥65%.${ext ? ' Marchés étendus : double chance, score exact, mi-temps, handicap et total asiatique.' : ''}</div>
               </div>`;
 })()}
@@ -16863,6 +16940,7 @@ stadiumEffects: getStadiumEffectsDebugSummary(),
 coachTenure: getCoachTenureDebugSummary(),
 derbies: getDerbiesDebugSummary(),
 teamStatsExtended: getTeamStatsExtendedDebugSummary(),
+footballStatsMarkets: getFootballStatsMarketsDebugSummary(),
 qualityCounters: v37QualityCounters,
 qualitySamples: v37QualitySamples,
 rejectReasons: v37RejectReasons,

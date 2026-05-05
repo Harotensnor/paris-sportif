@@ -951,3 +951,11 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Tests: `htft-market-matrix.spec.js` passe desktop + mobile (2/2); `app.js` syntax OK; drift pipeline OK.
 - Cache/footer bumpes v36.017; `app.js` hash `3ddea759`, SW `paris-sportif-20260505-214532`.
 
+## Sprint v36.018 — AUTO 10/10 Phase 7 UU marches stats foot (21:50 UTC)
+- Data: `total_corners.json`, `total_cards.json` et `total_fouls.json` couvrent 188 matchs foot Winamax.
+- Modèle: lignes corners 7.5-10.5, cartons 2.5-5.5 et fautes 20.5-28.5 dérivées de xG, pressing et arbitre.
+- UI: la modal détail affiche un panneau Marchés stats avec proba over/under et cote fair indicative.
+- Pipeline: `build_football_stats_markets.py` branché dans cron local/GHA/health; drift pipeline OK.
+- Tests: `football-stats-markets.spec.js` passe desktop + mobile (2/2); `app.js` syntax OK.
+- Cache/footer bumpes v36.018; `app.js` hash `6050d87d`, sidecars stats `f21c5812/c2e10705/e41f7aac`, SW `paris-sportif-20260505-215044`.
+
