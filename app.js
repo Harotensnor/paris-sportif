@@ -14330,7 +14330,18 @@ if (k <= 0) { return; } // pas d'edge → pas de mise
     }
 
     //   Sinon le site suggère de parier sur des matchs qui n'existent plus / ont déjà joué.
-const _dataAgeMin = data.generated_at ? Math.floor((Date.now() - new Date(data.generated_at).getTime())/60000) : 9999;
+const _dashboardGeneratedMs = data.generated_at ? new Date(data.generated_at).getTime() : NaN;
+const _dashboardFakeAgeMin = (() => {
+try {
+const qs = new URLSearchParams(location.search || '');
+const n = Number(qs.get('fakeAgeMin'));
+return qs.get('debug') === '1' && Number.isFinite(n) && n >= 0 ? n : NaN;
+} catch(e) { return NaN; }
+})();
+const _dashboardNowMs = Number.isFinite(_dashboardGeneratedMs) && Number.isFinite(_dashboardFakeAgeMin)
+? _dashboardGeneratedMs + _dashboardFakeAgeMin * 60000
+: Date.now();
+const _dataAgeMin = data.generated_at ? Math.floor((_dashboardNowMs - _dashboardGeneratedMs)/60000) : 9999;
 const _dataIsStale = _dataAgeMin > 240; // 4h
 
 {
@@ -14351,11 +14362,11 @@ return clean;
 const v37BlindMode = v36Filter.blind === true || v36Filter.blind === '1';
 try { window.__v37BlindMode = v37BlindMode; } catch(e) {}
 const v36TierDefs = [
-{ id: 'safe', icon: '1', label: 'Sur', range: '1.30-1.50', desc: 'Conf. 70%+ · avantage proche neutre accepte', tone: 'safe' },
-{ id: 'solid', icon: '2', label: 'Solide', range: '1.50-2.00', desc: 'Conf. 55%+ · bon equilibre risque/gain', tone: 'solid' },
-{ id: 'value', icon: '3', label: 'Valeur', range: '2.00-3.00', desc: 'Conf. 40%+ · avantage 2%+', tone: 'value' },
-{ id: 'big', icon: '4', label: 'Big odds', range: '3.00-5.00', desc: 'Conf. 20%+ · avantage 4%+', tone: 'big' },
-{ id: 'out', icon: '5', label: 'Outsider', range: '5.00+', desc: 'Conf. 8%+ · avantage 6%+', tone: 'out' }
+{ id: 'safe', icon: '1', label: 'Sur', range: '1.30-1.50', desc: 'Conf. 65%+ · avantage proche neutre accepte', tone: 'safe' },
+{ id: 'solid', icon: '2', label: 'Solide', range: '1.50-2.00', desc: 'Conf. 50%+ · bon equilibre risque/gain', tone: 'solid' },
+{ id: 'value', icon: '3', label: 'Valeur', range: '2.00-3.00', desc: 'Conf. 35%+ · avantage 1%+', tone: 'value' },
+{ id: 'big', icon: '4', label: 'Big odds', range: '3.00-5.00', desc: 'Conf. 18%+ · avantage 3%+', tone: 'big' },
+{ id: 'out', icon: '5', label: 'Outsider', range: '5.00+', desc: 'Conf. 6%+ · avantage 5%+', tone: 'out' }
 ];
 const v36TierById = Object.fromEntries(v36TierDefs.map(t => [t.id, t]));
 const v36TierRank = { safe: 1, solid: 2, value: 3, big: 4, out: 5 };
@@ -14848,26 +14859,35 @@ winamax: isWinamaxBookable(match)
 } catch(e) {}
 }
 };
+let v37FilterResetNotice = '';
 const v37HashDate = v37HashParams.get('date') || '';
 const v37StoredDate = v36Filter.date || 'all';
-const v37DateFilter = (/^\d{4}-\d{2}-\d{2}$/.test(v37HashDate) || v37HashDate === 'all') ? v37HashDate : v37StoredDate;
+let v37DateSource = v37HashDate ? 'url' : (v36Filter.date ? 'localStorage' : 'default');
+let v37DateFilter = (/^\d{4}-\d{2}-\d{2}$/.test(v37HashDate) || v37HashDate === 'all') ? v37HashDate : v37StoredDate;
 const v37IncludeLive = v36Filter.includeLive === true || v36Filter.includeLive === '1';
-const v37HistoryMode = /^\d{4}-\d{2}-\d{2}$/.test(v37DateFilter) && v37DateFilter < todayIso;
-const v37IsAllHorizon = v37DateFilter === 'all';
-const v37DateMatches = (m) => {
+const v37IsHistoryDate = (dateFilter) => /^\d{4}-\d{2}-\d{2}$/.test(String(dateFilter || '')) && dateFilter < todayIso;
+let v37HistoryMode = v37IsHistoryDate(v37DateFilter);
+let v37IsAllHorizon = v37DateFilter === 'all';
+const v37DateMatchesFor = (m, dateFilter) => {
 const day = parisDateISO(m?.date);
 if (!day) return false;
-if (v37IsAllHorizon) return true;
-return day === v37DateFilter;
+if (dateFilter === 'all') return true;
+return day === dateFilter;
 };
-const v37PickIsVisibleByClock = (m) => {
-if (v37HistoryMode) return true;
+const v37DateMatches = (m) => v37DateMatchesFor(m, v37DateFilter);
+const v37PickIsVisibleByClockFor = (m, historyMode) => {
+if (historyMode) return true;
 const ts = new Date(m?.date || 0).getTime();
 if (!Number.isFinite(ts)) return false;
 const isLive = !!(m?.live || m?.status === 'STATUS_IN_PROGRESS');
 if (m?.completed || _isMatchEffectivelyDone(m)) return false;
 if (isLive) return v37IncludeLive;
-return ts > Date.now();
+return ts > _dashboardNowMs;
+};
+const v37PickIsVisibleByClock = (m) => v37PickIsVisibleByClockFor(m, v37HistoryMode);
+const v37BuildScanPool = (dateFilter) => {
+const historyMode = v37IsHistoryDate(dateFilter);
+return terminalScanPool.filter(m => v37DateMatchesFor(m, dateFilter) && v37PickIsVisibleByClockFor(m, historyMode));
 };
 const v36TeamName = (team) => team?.short || team?.displayName || team?.name || '?';
 const v37PickUid = (m, candidate) => `${String(m?.id || '')}|${marketCandidateSignature(candidate)}`;
@@ -14878,14 +14898,28 @@ const conf = Number(c?.rel || c?.prob || 0);
 const edge = Number.isFinite(Number(c?.edge)) ? Number(c.edge) : (conf && odd ? conf - 1 / odd : 0);
 const ev = Number.isFinite(Number(c?.ev)) ? Number(c.ev) : (conf && odd ? conf * odd - 1 : -1);
 if (!(odd >= 1.30) || !(conf > 0) || !(edge >= v37SoftEdgeFloor) || !(ev >= v37SoftEdgeFloor)) return null;
-if (odd >= 1.30 && odd < 1.50 && conf >= 0.70 && edge >= v37SoftEdgeFloor) return { id: 'safe', strict: conf >= 0.75 && edge >= 0.01 };
-if (odd >= 1.50 && odd < 2.00 && conf >= 0.55 && edge >= v37SoftEdgeFloor) return { id: 'solid', strict: conf >= 0.65 && edge >= 0.01 };
-if (odd >= 2.00 && odd < 3.00 && conf >= 0.40 && edge >= 0.02) return { id: 'value', strict: edge >= 0.05 };
-if (odd >= 3.00 && odd < 5.00 && conf >= 0.20 && edge >= 0.04) return { id: 'big', strict: edge >= 0.08 };
-if (odd >= 5.00 && conf >= 0.08 && edge >= 0.06) return { id: 'out', strict: edge >= 0.10 };
+if (odd >= 1.30 && odd < 1.50 && conf >= 0.65 && edge >= v37SoftEdgeFloor) return { id: 'safe', strict: conf >= 0.73 && edge >= 0.01 };
+if (odd >= 1.50 && odd < 2.00 && conf >= 0.50 && edge >= v37SoftEdgeFloor) return { id: 'solid', strict: conf >= 0.62 && edge >= 0.01 };
+if (odd >= 2.00 && odd < 3.00 && conf >= 0.35 && edge >= 0.01) return { id: 'value', strict: edge >= 0.05 };
+if (odd >= 3.00 && odd < 5.00 && conf >= 0.18 && edge >= 0.03) return { id: 'big', strict: edge >= 0.08 };
+if (odd >= 5.00 && conf >= 0.06 && edge >= 0.05) return { id: 'out', strict: edge >= 0.10 };
 return null;
 };
-const v37ScanPool = terminalScanPool.filter(m => v37DateMatches(m) && v37PickIsVisibleByClock(m));
+let v37ScanPool = v37BuildScanPool(v37DateFilter);
+if (!v37HashDate && v37DateFilter !== 'all' && !v37HistoryMode && v37ScanPool.length < 30) {
+const allHorizonPool = v37BuildScanPool('all');
+if (allHorizonPool.length >= 30) {
+v37FilterResetNotice = 'Date locale remise sur 7 jours : elle masquait presque tout le tableau.';
+v37DateFilter = 'all';
+v37DateSource = 'auto_all_horizon';
+v37HistoryMode = false;
+v37IsAllHorizon = true;
+v37ScanPool = allHorizonPool;
+v36Filter.date = 'all';
+try { localStorage.setItem(v36FilterKey, JSON.stringify(v36Filter)); } catch(e) {}
+v37Reject('date_localstorage_reset', null, `${allHorizonPool.length} matchs horizon`);
+}
+}
 const v37DashboardMarketLimit = (market) => {
 const m = String(market || '');
 if (m === 'exactScore' || m === 'resultBtts' || m === 'ht_1n2') return 1;
@@ -15002,7 +15036,6 @@ const v37PickByUid = new Map(v36PickPool.map(p => [p.pickUid, p]));
 const v36Sports = [...new Set(v36PickPool.map(p => p.m.sport).filter(Boolean))].slice(0, 8);
 let v36Search = String(v36Filter.q || '').trim();
 const v36Sort = ['tier','date','time','odd','conf','edge','score'].includes(v36Filter.sort) ? v36Filter.sort : 'tier';
-let v37FilterResetNotice = '';
 let v36Filtered = v36PickPool.filter(p => {
 if (v36Filter.sport && p.m.sport !== v36Filter.sport) return false;
 if (v36Filter.tier && p.tier !== v36Filter.tier) return false;
@@ -15046,10 +15079,11 @@ return counts;
 })();
 const v37DenseRowLimit = 360;
 const v37PickRowKey = (p) => p?.pickUid || `${v37MatchKeyForPick(p)}|${p?.tier || ''}|${p?.market || ''}|${p?.pickKey || ''}|${p?.line ?? ''}|${Number(p?.odd || 0).toFixed(2)}`;
+const v37DataOnlyScanPool = (v37ScanPool.length > 10 || v37HistoryMode) ? v37ScanPool : v37BuildScanPool('all');
 const v37DataOnlyPool = (() => {
-if (v36PickPool.length || v37ScanPool.length <= 10) return [];
+if (v36PickPool.length || v37DataOnlyScanPool.length <= 10) return [];
 const out = [];
-for (const m of v37ScanPool) {
+for (const m of v37DataOnlyScanPool) {
 try {
 const pred = predictMatch(m);
 if (!pred?.pick) continue;
@@ -15103,7 +15137,7 @@ ts: new Date(m.date || 0).getTime(),
 score: Math.max(20, Math.min(70, (rel * 80) + Math.max(-10, edge * 100))),
 dataOnly: true
 });
-if (out.length >= 10) break;
+if (out.length >= 30) break;
 } catch(e) {}
 }
 return out.sort((a, b) => (b.opportunity - a.opportunity) || (a.ts - b.ts));
@@ -15140,14 +15174,16 @@ return out;
 const v37RenderPool = v36Sorted.length ? v36Sorted : v37DataOnlyPool;
 const v36TableRows = v37EnsureTierCoverage(v37RenderPool.slice(0, v37DenseRowLimit), v37RenderPool);
 const v36UpcomingAll = terminalScanPool
-.filter(m => new Date(m?.date || 0).getTime() > Date.now() && !m.completed)
+.filter(m => new Date(m?.date || 0).getTime() > _dashboardNowMs && !m.completed)
 .sort((a, b) => new Date(a?.date || 0).getTime() - new Date(b?.date || 0).getTime());
 const v37LiveAll = terminalScanPool.filter(m => m?.live || m?.status === 'STATUS_IN_PROGRESS');
 const v37FinishedAll = terminalScanPool.filter(m => m?.completed || _isMatchEffectivelyDone(m));
 const v36Next = v36UpcomingAll.slice(0, 6);
 const v37ScopeLabel = v37IsAllHorizon ? '7 prochains jours' : v37DateLabel(v37DateFilter);
 const v37DisplayTotal = v36Sorted.length ? v36Total : v37DataOnlyPool.length;
-const v36CoverageLine = `${v37DisplayTotal} lignes visibles · ${v36PickPool.length} picks qualifies · ${v36UpcomingAll.length} a venir · ${v37LiveAll.length} live · ${v37FinishedAll.length} termines · data ${_dataAgeMin} min`;
+const v37QualifiedMatchCount = new Set(v36PickPool.map(p => v37MatchKeyForPick(p))).size;
+const v37QualificationRate = terminalScanPool.length ? Math.round((v37QualifiedMatchCount / terminalScanPool.length) * 100) : 0;
+const v36CoverageLine = `${v37DisplayTotal} lignes visibles · ${v37QualifiedMatchCount}/${terminalScanPool.length} matchs avec pick (${v37QualificationRate}%) · ${v36PickPool.length} picks qualifies · ${v36UpcomingAll.length} a venir · ${v37LiveAll.length} live · ${v37FinishedAll.length} termines · data ${_dataAgeMin} min`;
 const v37DebugMatches = () => terminalScanPool.slice(0, 10).map(m => {
 const { home, away } = getSides(m);
 return `${sportLabel(m?.sport || '')} ${parisDateISO(m?.date) || '?'} ${v36TeamName(home)}-${v36TeamName(away)} W:${isWinamaxBookable(m) ? '1' : '0'}`;
@@ -15159,11 +15195,14 @@ v36PickPoolRaw: v36PickPoolRaw.length,
 v36PickPool: v36PickPool.length,
 v36Filtered: v36Filtered.length,
 v37DataOnlyFallback: v37DataOnlyPool.length,
+v37DataOnlyScanPool: v37DataOnlyScanPool.length,
 v36TableRows: v36TableRows.length,
+v37QualifiedMatchCount,
 activeDate: v37DateFilter,
-dateSource: v37HashDate ? 'url' : (v36Filter.date ? 'localStorage' : 'default'),
+dateSource: v37DateSource,
 historyMode: v37HistoryMode,
 allHorizon: v37IsAllHorizon,
+qualificationRate: v37QualificationRate,
 v36Filter,
 _dataIsStale,
 _dataAgeMin,
@@ -15176,8 +15215,8 @@ try { console.log('[v37 debug]', { ...v37DebugState, sampleMatches: v37DebugMatc
 }
 const v37DebugPanelHtml = v37DebugOn ? `<section class="v37-debug-panel" data-v37-debug-panel><b>Debug tableau V37</b><span>Filtres actifs · Raisons de rejet · 10 premiers matchs scannes</span><pre>${esc(JSON.stringify({ ...v37DebugState, sampleMatches: v37DebugMatches() }, null, 2))}</pre></section>` : '';
 const v37EmptyPoolHelpHtml = (!v36PickPool.length && terminalScanPool.length > 10) ? `<section class="v37-empty-pool-help">
-        <strong>Pas de pick haut-conviction sur ce filtre.</strong>
-        <span>${terminalScanPool.length} matchs sont disponibles. Le tableau affiche ${v37DataOnlyPool.length ? 'les meilleurs matchs data-only à vérifier' : 'la liste complète dans Tous'} au lieu de rester vide.</span>
+        <strong>Mode secours actif : le tableau ne reste jamais vide.</strong>
+        <span>${terminalScanPool.length} matchs sont disponibles. ${v37DataOnlyPool.length ? `${v37DataOnlyPool.length} matchs data-only sont affiches avec cote a verifier.` : 'La liste complete reste accessible dans Tous.'}</span>
         <button type="button" class="page-btn" data-page="tous">Voir tous les matchs</button>
       </section>` : '';
 const v37FilterResetHtml = v37FilterResetNotice ? `<section class="v37-empty-pool-help is-info"><strong>Filtres corriges</strong><span>${esc(v37FilterResetNotice)}</span></section>` : '';
@@ -15263,7 +15302,7 @@ const tier = v36TierById[p.tier] || v36TierDefs[0];
 const league = String(p.m.league_name || p.m.league || sportLabel(p.m.sport || '') || '').replace(/^(.{34}).+$/, '$1…');
 const edgePct = (p.edge * 100).toFixed(1);
 const relPct = Math.round(p.rel * 100);
-const soon = !v37HistoryMode && p.ts > Date.now() && (p.ts - Date.now()) <= 2 * 60000;
+const soon = !v37HistoryMode && p.ts > _dashboardNowMs && (p.ts - _dashboardNowMs) <= 2 * 60000;
 const result = v37ResultForPick(p);
 const pickHelp = p.marketTooltip || p.marketInfo || p.labelFull || p.label;
 const marketName = p.marketName || p.market || '';
@@ -15411,7 +15450,7 @@ const v36TableHtml = `<section class="v36-table-panel" aria-label="Tableau dense
       </section>`;
 const v36NextHtml = v36Next.length ? v36Next.map(m => {
 const { home, away } = getSides(m);
-const diff = new Date(m.date || 0).getTime() - Date.now();
+const diff = new Date(m.date || 0).getTime() - _dashboardNowMs;
 const mins = Math.max(0, Math.round(diff / 60000));
 const countdown = mins < 60 ? `${mins}min` : `${Math.floor(mins / 60)}h${String(mins % 60).padStart(2, '0')}`;
 return `<button type="button" class="v36-side-row" data-big-detail="${esc(String(m.id || ''))}">
