@@ -2,6 +2,12 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
+## Sprint v35.429 — AUTO 10/10 Pipeline data frais (10:35 UTC)
+- Diagnostic Section 0.2 : derniers runs `refresh-data` publics en failure/cancelled; `audit_data_truth` bloquait car `data.today=2026-05-04`.
+- Restauration locale Section 0.3/0.7 : `fetch_live` OK (792 events, 0 erreur globale), Winamax catalog OK (723 matchs), patch Winamax-only applique.
+- Mesure apres patch : 293 events Winamax, 280 upcoming, 293 exacts, ratio 100%, 293 marches >1n2; `data_today=2026-05-05`; `audit_data_truth` OK.
+- Cache/footer bumpes v35.429; `data_lite.js` hash SHA1 `4ad9582b`.
+
 ## Sprint v35.428 — AUTO 10/10 Table stale lisible (10:31 UTC)
 - Fix Section 0.1 : le dashboard dense ne vide plus `v36PickPoolRaw` quand la data depasse 4h.
 - UX : table visible en lecture seule avec warning stale + refresh avant mise; plus d'ecran vide au reveil.
