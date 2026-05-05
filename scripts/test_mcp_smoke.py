@@ -121,6 +121,16 @@ def main() -> int:
             file=sys.stderr,
         )
         return 1
+    runtime = pipeline.get("mcp_runtime") or {}
+    if not runtime.get("script_sha"):
+        print('[mcp_smoke] FAIL mcp_runtime.script_sha missing', file=sys.stderr)
+        return 1
+    if runtime.get("legacy_shadow_status") not in {"aligned", "missing"}:
+        print(
+            f'[mcp_smoke] FAIL legacy MCP shadow is stale: {runtime.get("legacy_shadow_status")}',
+            file=sys.stderr,
+        )
+        return 1
     secondary = (pipeline.get("sync_check") or {}).get("secondary_snapshots") or {}
     if "night_metrics" not in secondary:
         print('[mcp_smoke] FAIL missing night_metrics secondary snapshot status', file=sys.stderr)
