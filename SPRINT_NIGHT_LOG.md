@@ -650,3 +650,8 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - UX table: la fenetre dense de 360 lignes garantit maintenant au moins un representant de chaque tier disponible, donc l'Outsider n'est plus cache derriere le tri par tier.
 - QA: syntax JS/HTML/SW OK, bundle sous cap (`app.js` 1,599,230 bytes), `phase-finale-dashboard.spec.js` 4/4 desktop+mobile, `check_pipeline_drift` OK.
 - Cache/footer bumpes v35.459; `app.js` hash `c2c2f384`.
+
+## Sprint v35.460 — AUTO 10/10 Team form refresh (15:31 UTC)
+- Pipeline: `fetch_team_form.py` relance les calendriers ESPN sur le nouveau snapshot Winamax exact; 470 equipes vues, 255 formes rafraichies, cache total 793 equipes.
+- Data: `form_stats_extended.json`, profils publics et `night_metrics.json` regeneres; `data.js` reste coherent avec `audit_data_truth.py`.
+- Health: warnings 31 -> 29 apres rafraichissement team_form; les sources critiques du tableau restent fraiches et `data_age_min=0`.
