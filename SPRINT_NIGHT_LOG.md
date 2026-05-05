@@ -628,3 +628,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Pipeline: `night_metrics.json` regenere depuis `data.js`; MCP live `today=2026-05-05`, `winamax_exact_ratio=0.9839`, `sync_check=ok`.
 - Tests: phase finale + score + CLV + signaux modal 10/10; Lighthouse 100/100/100/100 sur mobile/desktop; syntax JS OK; bundle `app.js` 1,599,342 bytes sous cap.
 - Cache/footer bumpes v35.456; `app.js` hash `0869ee0e`.
+
+## Sprint v35.457 — AUTO 10/10 Recap validation extensions (14:48 UTC)
+- Issues: `ISSUES.md` et `ISSUES_ACTIVE.md` refletent la validation live v35.456 au lieu de l'ancien recap v35.452.
+- Produit: l'accueil est confirme plein (271 lignes, 5 tiers) et les extensions visibles sont documentees: tier 2 foot, Asie/LATAM, MLB, NHL, Serie B, Bundesliga 2, Ligue 2, Liga 2.
+- Transparence: foot feminin, Challenger et rugby restent en `watch_not_bookable` parce qu'aucun evenement Winamax exact n'est present dans le snapshot courant.
+- QA: les specs critiques V37 vertes sont listees; le seul chantier actif reste le nettoyage du run complet Playwright legacy.
