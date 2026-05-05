@@ -889,3 +889,11 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Modal/debug: badges coach et `?debug=1.coachTenure` exposent le signal.
 - Pipeline: `build_coach_tenure.py` branché dans cron local/GHA/health; drift pipeline OK.
 - Cache/footer bumpes v36.009; `app.js` hash `0c3a1cd4`, `coach_tenure.js` hash `cde016ac`, SW `paris-sportif-20260505-212035`.
+
+## Sprint v36.010 — AUTO 10/10 Modèle V4 LL derbies (21:22 UTC)
+- Derbies: `derbies.json` liste 53 rivalités multi-sport avec variance ×1.25 et edge requis +1pt.
+- Modèle: `predictMatch()` resserre légèrement la confiance sur derby pour éviter l'overconfidence.
+- Modal/debug: badge `Derby` et `?debug=1.derbies` exposent le signal.
+- Pipeline: `build_derbies.py` branché dans cron local/GHA/health; drift pipeline OK.
+- QA: `app.js` syntax OK, scripts Python compilés, health warning non critique.
+- Cache/footer bumpes v36.010; `app.js` hash `bdf0f72a`, `derbies.js` hash `e4d558e2`, SW `paris-sportif-20260505-212241`.
