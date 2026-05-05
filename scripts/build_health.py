@@ -317,6 +317,7 @@ SOURCES = [
     }),
     ('rugby_markets', 'rugby_markets.json', lambda d: {
         'events': len(d.get('events') or []) if isinstance(d, dict) else 0,
+        'watchlist': len(d.get('source_watchlist') or []) if isinstance(d, dict) else 0,
         'markets': d.get('markets') or 0 if isinstance(d, dict) else 0,
         'status': d.get('status') if isinstance(d, dict) else 'missing',
     }),

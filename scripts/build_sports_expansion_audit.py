@@ -145,6 +145,7 @@ def main() -> int:
     buckets["J2_tennis_challenger_itf"]["watchlist_events"] = len(tennis_watch.get("watchlist") or []) if isinstance(tennis_watch, dict) else 0
     buckets["J2_tennis_challenger_itf"]["bookable_tennis_events"] = tennis_watch.get("bookable_tennis_events", 0) if isinstance(tennis_watch, dict) else 0
     buckets["J8_rugby"]["derived_markets"] = rugby.get("markets", 0)
+    buckets["J8_rugby"]["watchlist_events"] = len(rugby.get("source_watchlist") or []) if isinstance(rugby, dict) else 0
     buckets["J8_rugby"]["status"] = rugby.get("status", "missing")
 
     out = {

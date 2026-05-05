@@ -18,6 +18,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA_JS = ROOT / "data.js"
+SOFA = ROOT / "sofascore_events.json"
 OUT = ROOT / "rugby_markets.json"
 
 TOTAL_LINES = [38.5, 42.5, 46.5, 50.5, 54.5]
@@ -33,6 +34,13 @@ def parse_data() -> dict[str, Any]:
     if not m:
         raise RuntimeError("could not parse data.js")
     return json.loads(m.group(1))
+
+
+def load_json(path: Path, default: Any) -> Any:
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return default
 
 
 def normal_cdf(x: float, mu: float, sigma: float) -> float:
@@ -137,11 +145,27 @@ def main() -> int:
             projection = project_event(ev)
             if projection:
                 events.append(projection)
+    source_watchlist: list[dict[str, Any]] = []
+    sofa = load_json(SOFA, {})
+    for sport, day_events in (sofa.get("events") or {}).items():
+        if "rugby" not in str(sport).lower():
+            continue
+        for ev in day_events or []:
+            if len(source_watchlist) >= 20:
+                break
+            source_watchlist.append({
+                "event_id": ev.get("id"),
+                "kickoff": ev.get("date"),
+                "match": ev.get("name") or ev.get("shortName"),
+                "league": ev.get("league_name") or ev.get("league_code"),
+                "status": "watch_not_actionable_until_winamax_exact",
+            })
     out = {
         "generated_at": now_iso(),
         "source": "derived from rugby events already present in data.js",
-        "status": "ok" if events else "empty",
+        "status": "ok" if events else ("watch" if source_watchlist else "empty"),
         "events": events,
+        "source_watchlist": source_watchlist,
         "markets": sum(1 + len((e.get("markets") or {}).get("totals") or []) for e in events),
     }
     OUT.write_text(json.dumps(out, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

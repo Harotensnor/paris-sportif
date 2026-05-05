@@ -2,6 +2,12 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
+## Sprint v35.439 — AUTO 10/10 Section J Rugby watch (11:04 UTC)
+- Extension J8 : `build_rugby_markets.py` ne renvoie plus un simple empty quand la source voit du rugby mais Winamax exact non.
+- Mesure : 1 match rugby source Sofascore en watchlist, 0 bookable, 0 marche derive; status `watch` explicite dans `rugby_markets.json`.
+- Health suit maintenant `watchlist=1`; audit J8 affiche `watchlist_events=1` et `status=watch`.
+- Garde-fou : aucun pick rugby non bookable ne remonte; cache/footer bumpes v35.439.
+
 ## Sprint v35.438 — AUTO 10/10 Section J Foot expansion (11:02 UTC)
 - Extension J1/J5/J6/J7 : `build_football_expansion_watchlist.py` separe bookable Winamax et source watch pour foot feminin, tier 2, coupes, Asie/LATAM.
 - Mesure : tier2 15/22, coupes 32/22, Asie/LATAM 51/67 en status OK; foot feminin 0/7 en watch non-actionnable.
