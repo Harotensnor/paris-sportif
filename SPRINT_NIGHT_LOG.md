@@ -772,3 +772,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Sécurité: CSP restampe avec les hashes LF reels des 7 scripts inline pour supprimer les violations au boot Playwright.
 - QA: `node --check app.js/sw.js` OK, `critical-flows.spec.js` 30/30 passes + 4 skips attendus sur chromium desktop, `a11y_audit.js` 0 critical/serious/moderate.
 - Cache/footer bumpes v35.477; `app.js` hash `42c6dac4`, `app.css` hash `d19b2228`, SW `paris-sportif-20260505-190102`.
+
+## Sprint v35.478 — AUTO 10/10 Page Tous plus scannable (19:11 UTC)
+- Tous: tri par défaut `Niveau puis edge`, stats bar compacte (`pronos`, `locks 70%+`, `value edge 5%+`, répartition sports) et lignes plus lisibles avec match en gras + ligue/sport.
+- Stabilité: correction TDZ sur `filteredPicks`/`tousMobile`; le rendu Tous ne tombe plus sur le fallback refresh impossible.
+- QA: `node --check app.js` OK, `critical-flows.spec.js` 30/30 passes + 4 skips attendus sur chromium desktop.
+- Cache/footer bumpes v35.478; `app.js` hash `3c4b2aa0`, `app.css` hash `d19b2228`, SW `paris-sportif-20260505-191102`.

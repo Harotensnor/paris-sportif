@@ -20241,14 +20241,14 @@ const hash = location.hash || '';
 const qIdx = hash.indexOf('?');
 if (qIdx >= 0) {
 const qs = new URLSearchParams(hash.slice(qIdx + 1)).get('sort');
-if (['kickoff', 'edge', 'conf', 'odd'].includes(qs)) return qs;
+if (['tier', 'kickoff', 'edge', 'conf', 'odd'].includes(qs)) return qs;
 }
 } catch(e) {}
 try {
 const s = localStorage.getItem('tousSort');
-if (['kickoff', 'edge', 'conf', 'odd'].includes(s)) return s;
+if (['tier', 'kickoff', 'edge', 'conf', 'odd'].includes(s)) return s;
 } catch(e) {}
-return 'kickoff';
+return 'tier';
 };
 const tousSort = _readSort();
 const _saveFilters = () => {
@@ -20266,7 +20266,7 @@ if (tousFilters.time && tousFilters.time !== 'all') params.set('time', tousFilte
 if (tousFilters.tier && tousFilters.tier !== 'all') params.set('tier', tousFilters.tier);
 if (tousFilters.query) params.set('q', tousFilters.query);
 if (tousPreset !== 'all') params.set('preset', tousPreset);
-if (tousSort !== 'kickoff') params.set('sort', tousSort);
+if (tousSort !== 'tier') params.set('sort', tousSort);
 if (tousView === 'calendar') params.set('view', 'calendar');
 const q = params.toString();
 const newHash = q ? `${hash}?${q}` : hash;
@@ -20400,9 +20400,33 @@ return true;
 };
 const filteredPicks = allPicks.filter(p => passesPreset(p) && passesFilters(p));
 const filteredCoverageRows = coverageRowsAll.filter(passesCoverageFilters);
+const tousStatsRows = filteredPicks.filter(p => !p.settled && !p.startedAndNotSettled && isValuePick(p));
+const tousSportStats = tousStatsRows.reduce((acc, p) => {
+acc[p.sport || 'other'] = (acc[p.sport || 'other'] || 0) + 1;
+return acc;
+}, {});
+const tousSportTop = Object.entries(tousSportStats)
+.sort((a,b) => b[1] - a[1])
+.slice(0, 3)
+.map(([sport, count]) => `${sportLabelMap[sport] || sport} ${tousStatsRows.length ? Math.round(count * 100 / tousStatsRows.length) : 0}%`)
+.join(' / ');
+const tousStatsBarHtml = `
+        <div style="margin:10px 0 4px;padding:9px 12px;display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;background:var(--panel);border:1px solid var(--border);border-radius:10px;font-size:12px;color:var(--text-dim);font-variant-numeric:tabular-nums;">
+          <span style="font-size:10.5px;color:var(--text-dim2);font-weight:900;text-transform:uppercase;letter-spacing:.7px;">Lecture rapide</span>
+          <span><b style="color:var(--text);">${tousStatsRows.length}</b> pronos à venir</span>
+          <span><b style="color:var(--accent);">${tousStatsRows.filter(p => p.rel >= 0.70).length}</b> locks 70%+</span>
+          <span><b style="color:#fbbf24;">${tousStatsRows.filter(p => p.edge >= 0.05).length}</b> value edge 5%+</span>
+          <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">sports : ${esc(tousSportTop || 'pas assez de picks')}</span>
+        </div>`;
 
+const tierSortRank = { safe: 0, solid: 1, value: 2, big: 3, outsider: 4, signal: 5, all: 6 };
 const cmp = (a, b) => {
 switch (tousSort) {
+case 'tier': {
+const ar = tierSortRank[_tierFromOdd(a.odd, a.rel, a.edge)] ?? 9;
+const br = tierSortRank[_tierFromOdd(b.odd, b.rel, b.edge)] ?? 9;
+return (ar - br) || (b.edge - a.edge) || (b.rel - a.rel) || (a.ts - b.ts);
+}
 case 'edge':    return b.edge - a.edge;
 case 'conf':    return b.rel - a.rel;
 case 'odd':     return b.odd - a.odd;
@@ -20425,7 +20449,7 @@ const totalWon = finished.filter(p => p.res === 'won').length;
 const totalLost = finished.filter(p => p.res === 'lost').length;
 const settledCount = totalWon + totalLost;
 const wrPct = settledCount > 0 ? Math.round(100 * totalWon / settledCount) : 0;
-const filtersActive = tousPreset !== 'all' || tousFilters.sports.length > 0 || tousFilters.minEdge > 0 || tousFilters.minConf > 0 || tousFilters.minOdd > 0 || tousFilters.maxOdd > 0 || Boolean(tousFilters.league) || Boolean(tousFilters.query) || (tousFilters.time && tousFilters.time !== 'all') || (tousFilters.tier && tousFilters.tier !== 'all') || tousSort !== 'kickoff';
+const filtersActive = tousPreset !== 'all' || tousFilters.sports.length > 0 || tousFilters.minEdge > 0 || tousFilters.minConf > 0 || tousFilters.minOdd > 0 || tousFilters.maxOdd > 0 || Boolean(tousFilters.league) || Boolean(tousFilters.query) || (tousFilters.time && tousFilters.time !== 'all') || (tousFilters.tier && tousFilters.tier !== 'all') || tousSort !== 'tier';
 const compareIds = (() => {
 try {
 const ids = JSON.parse(localStorage.getItem('tousComparePickIds') || '[]');
@@ -20647,15 +20671,15 @@ ${predScorers.length ? `<div><span style="opacity:.75;">Probables :</span> <b cl
 ${realScorers.length ? `<div style="margin-top:${predScorers.length?'2':'0'}px;"><span style="opacity:.75;">Réels :</span> <b style="color:${predScorerHit ? '#34d399' : 'var(--text)'};">${realScorers.map(s => `${esc(s.name)}${s.minute ? ` <span class="u-text-dim2 u-font-normal">${esc(s.minute)}</span>` : ''}`).join(', ')}</b>${predScorerHit ? ' <span style="color:var(--accent);font-weight:600;">✓ pick touché</span>' : ''}</div>` : ''}
 </div>` : ''}
         </div>` : '';
-return `<div class="tous-row" data-match-id="${esc(rowId)}" data-match-date="${esc(String(p.m.date || ''))}" style="display:grid;gap:14px;padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${isFini ? (p.res==='won'?'#34d399':p.res==='lost'?'#fca5a5':'var(--text-dim)') : (p.rel>=0.70 ? 'var(--accent)' : 'var(--brand)')};border-radius:0 10px 10px 0;align-items:center;cursor:pointer;font-variant-numeric:tabular-nums;">
+return `<div class="tous-row" data-match-id="${esc(rowId)}" data-match-date="${esc(String(p.m.date || ''))}" style="display:grid;grid-template-columns:${tousMobile ? 'minmax(0,1fr)' : '104px minmax(260px,1.25fr) minmax(230px,.85fr) auto'};gap:${tousMobile ? '9px' : '14px'};padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${isFini ? (p.res==='won'?'#34d399':p.res==='lost'?'#fca5a5':'var(--text-dim)') : (p.rel>=0.70 ? 'var(--accent)' : 'var(--brand)')};border-radius:0 10px 10px 0;align-items:center;cursor:pointer;font-variant-numeric:tabular-nums;transition:border-color .16s ease,transform .16s ease,background .16s ease;">
         <div style="text-align:left;">
           <div style="font-size:11px;color:var(--text-dim2,#7b8693);font-weight:600;">${sportEm} ${esc(tLbl)}</div>
           ${!isFini && _cntLabel ? `<div class="tous-cnt" style="font-size:9.5px;color:${_cntColor};margin-top:1px;font-weight:600;${_cntSoon?'background:rgba(251,191,36,.12);padding:1px 5px;border-radius:3px;display:inline-block;':''}">${esc(_cntLabel)}</div>` : ''}
           <div style="font-size:10px;color:var(--text-dim);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70px;" title="${esc(league)}">${esc(league.slice(0,22))}</div>
         </div>
-        <div>
-          <div style="display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--text);font-weight:600;">
-            ${teamLogo(hLogo)}<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(hn)}</span><span style="color:var(--text-dim);font-weight:400;">vs</span>${teamLogo(aLogo)}<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(an)}</span>
+        <div style="min-width:0;">
+          <div style="display:flex;align-items:center;gap:8px;font-size:14.5px;color:var(--text);font-weight:900;min-width:0;">
+            ${teamLogo(hLogo)}<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">${esc(hn)} vs ${esc(an)}</span>${teamLogo(aLogo)}<span style="display:inline-flex;align-items:center;min-height:22px;padding:2px 7px;border:1px solid var(--border);border-radius:999px;color:var(--text-dim);font-size:10.5px;font-weight:800;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${sportEm} ${esc(league || 'Ligue')}</span>
           </div>
           <div style="font-size:12px;color:var(--brand);font-weight:600;margin-top:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${strengthBadge}<span>→ ${esc(pickLabel)}</span>${(() => {
             if (typeof renderStreakBadge !== 'function') return '';
@@ -20900,6 +20924,7 @@ const tousAdvancedFilterHtml = `
             <label style="${tousRailItemStyle}display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-dim);margin-left:${tousMobile ? '0' : 'auto'};">
               Trier par
               <select data-tous-sort style="${tousSelectStyle}padding:5px 8px;font-size:12px;background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:6px;cursor:pointer;">
+                <option value="tier" ${tousSort==='tier'?'selected':''}>🏷️ Niveau puis edge</option>
                 <option value="kickoff" ${tousSort==='kickoff'?'selected':''}>⏱️ Heure du match</option>
                 <option value="edge" ${tousSort==='edge'?'selected':''}>📈 Meilleur edge</option>
                 <option value="conf" ${tousSort==='conf'?'selected':''}>🎯 Plus haute confiance</option>
@@ -20923,6 +20948,7 @@ wrap.innerHTML = `
           <h1 style="margin:0 0 6px;font-size:${tousMobile ? '25px' : '32px'};font-weight:800;letter-spacing:-1.1px;color:var(--text);line-height:1.1;">Tous les matchs détectés</h1>
           <div class="u-text-md u-text-dim">${detectedUpcoming} match${detectedUpcoming>1?'s':''} à venir détecté${detectedUpcoming>1?'s':''} · ${displayPending.length} à venir affiché${displayPending.length>1?'s':''} · ${displayInProgress.length} en cours · ${displayFinished.length} fini${displayFinished.length>1?'s':''}${_completedNoOdds > 0 && !isCoveragePreset ? ` <span class="u-text-dim2" title="${_completedNoOdds} match${_completedNoOdds>1?'s':''} terminé${_completedNoOdds>1?'s':''} sans cote pré-match capturée (qualifs WTA/Challenger, etc.) → résultat visible mais pas dans le bilan ROI.">(+${_completedNoOdds} sans cote pré-match)</span>` : ''}${settledCount && !isCoveragePreset ? ` (<b style="color:${wrPct>=60?'#34d399':'var(--text-dim)'};">${wrPct}% réussite</b> sur ${settledCount})` : ''}${filtersActive ? `&nbsp;·&nbsp;<span style="color:var(--brand);font-weight:600;">filtres actifs</span>` : ''}<div style="font-size:11px;color:var(--text-dim2);margin-top:3px;">↳ Tout voir = couverture brute. Big Bets/Solides/Outsiders = sélection value stricte, séparée de l'Accueil.</div></div>
         </div>
+        ${tousStatsBarHtml}
         ${_sourcesStats && _sourcesStats.total > 0 ? `
 <div style="margin:${tousMobile ? '14px 0 4px' : '8px 0 3px'};padding:${tousMobile ? '10px 14px' : '7px 10px'};background:var(--panel);border:1px solid var(--border);border-radius:8px;font-size:11.5px;color:var(--text-dim);display:flex;flex-wrap:wrap;gap:14px;align-items:center;font-variant-numeric:tabular-nums;" title="Sources de la couverture events. Plus de sources = pipeline résilient (si une source ban, les autres comblent).">
 <span style="color:var(--text-dim2);text-transform:uppercase;letter-spacing:.8px;font-weight:700;font-size:10px;">📡 Sources</span>
@@ -20990,7 +21016,7 @@ try {
 const params = new URLSearchParams();
 if (view === 'calendar') params.set('view', 'calendar');
 if (tousPreset !== 'all') params.set('preset', tousPreset);
-if (tousSort !== 'kickoff') params.set('sort', tousSort);
+if (tousSort !== 'tier') params.set('sort', tousSort);
 const q = params.toString();
 history.replaceState(null, '', location.pathname + location.search + '#tous' + (q ? '?' + q : ''));
 } catch(e) {}
@@ -21096,7 +21122,7 @@ localStorage.setItem('tousPreset', btn.dataset.tousPreset || 'all');
 localStorage.removeItem('tousVisibleLimit');
 if ((btn.dataset.tousPreset || 'all') === 'all') {
 localStorage.removeItem('tousFilters');
-localStorage.setItem('tousSort', 'kickoff');
+localStorage.setItem('tousSort', 'tier');
 }
 localStorage.setItem('tousTab', 'pending');
 } catch(e) {}
