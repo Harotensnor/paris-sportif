@@ -5347,6 +5347,81 @@ generatedAt: data?.generated_at || idx?.generated_at || null,
 }
 try { window.getTeamPriorsDebugSummary = getTeamPriorsDebugSummary; } catch (e) {}
 
+function _seasonPhaseFromTuple(key, row) {
+if (!Array.isArray(row)) return row || null;
+return {
+league_code: key,
+phase: row[0],
+avg_matches_played: Number(row[1]) || 0,
+sample_teams: Number(row[2]) || 0,
+confidence_decay: Number(row[3]) || 1,
+variance_multiplier: Number(row[4]) || 1,
+motivation_hint: row[5] || '',
+league_name: row[6] || key,
+sport: row[7] || 'unknown',
+};
+}
+function getSeasonPhaseContext(match) {
+const data = window.SEASON_PHASE || null;
+if (!data || !match) return null;
+const leagueCode = String(match.league_code || match.league_name || '').trim();
+const row = data.leagues?.[leagueCode] || data.leagues?.[String(match.league_name || '')];
+const ctx = _seasonPhaseFromTuple(leagueCode, row);
+if (!ctx) return null;
+return {
+...ctx,
+label: ctx.phase === 'early' ? 'Début de saison' : ctx.phase === 'late' ? 'Fin de saison' : 'Milieu de saison',
+};
+}
+function getSeasonPhaseDebugSummary() {
+const data = window.SEASON_PHASE || null;
+return {
+loaded: !!data,
+leagues: Number(data?.league_count || Object.keys(data?.leagues || {}).length || 0),
+summary: data?.summary || {},
+generatedAt: data?.generated_at || null,
+};
+}
+try {
+window.getSeasonPhaseContext = getSeasonPhaseContext;
+window.getSeasonPhaseDebugSummary = getSeasonPhaseDebugSummary;
+} catch (e) {}
+
+function getCompetitionContext(match) {
+if (!match) return null;
+const raw = `${match.league_name || ''} ${match.league_code || ''} ${match.name || ''} ${match.round || ''}`.toLowerCase();
+const domesticCup = /(fa cup|carabao|efl cup|copa del rey|dfb.?pokal|coppa italia|coupe de france|taca|taça|pokal|cup|coupe|copa)/i.test(raw)
+&& !/(world cup|champions|libertadores|sudamericana|europa|conference|concacaf|afc|caf|continental)/i.test(raw);
+const continental = /(champions league|europa league|conference league|libertadores|sudamericana|concacaf|afc|caf|continental|world cup|club world cup)/i.test(raw);
+const type = continental ? 'continental' : domesticCup ? 'domestic_cup' : 'league';
+return {
+type,
+label: type === 'continental' ? 'Continental' : type === 'domestic_cup' ? 'Cup' : 'League',
+confidence_decay: type === 'domestic_cup' ? 0.85 : 1,
+variance_multiplier: type === 'domestic_cup' ? 1.18 : type === 'continental' ? 1.08 : 1,
+edge_required_bonus: type === 'domestic_cup' ? 0.01 : 0,
+reason: type === 'domestic_cup'
+? 'Coupe nationale : rotations et variance plus fortes.'
+: type === 'continental'
+? 'Compétition continentale : motivation élevée, variance ajustée.'
+: 'Match de championnat : régime standard.',
+};
+}
+try { window.getCompetitionContext = getCompetitionContext; } catch (e) {}
+
+function buildV4ContextBadges(match, pred) {
+const season = pred?.seasonContext || getSeasonPhaseContext(match);
+const competition = pred?.competitionContext || getCompetitionContext(match);
+const badges = [];
+if (competition) badges.push({ label: competition.label, title: competition.reason || 'Contexte compétition' });
+if (season) badges.push({ label: season.label, title: `Phase saison · ${season.sample_teams || 0} équipes suivies` });
+if (!badges.length) return '';
+return `<div class="v4-context-badges" style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 14px;">
+${badges.map(b => `<span style="display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--border);border-radius:999px;background:var(--panel-2);font-size:12px;font-weight:750;color:var(--text);" title="${esc(b.title)}">${esc(b.label)}</span>`).join('')}
+</div>`;
+}
+try { window.buildV4ContextBadges = buildV4ContextBadges; } catch (e) {}
+
 function poissonComponent(match) {
 if (match.sport !== 'football') return null;
 const { home, away } = getSides(match);
@@ -7327,6 +7402,8 @@ let reliabilityMeta = null;
 let ensembleMeta = null;
 let leagueBias = null;
 let pureCompCount = 0;
+let seasonContext = null;
+let competitionContext = null;
 {
 const pickKey = best_pick[2]; // '1' | 'X' | '2'
 const fieldMap = { '1': 'pH', 'X': 'pD', '2': 'pA' };
@@ -7390,6 +7467,17 @@ let rawReliability = Math.max(0.25, Math.min(0.98, pickProbVal * boost));
 if (lineupBoost) {
 rawReliability = Math.max(0.25, Math.min(0.98, rawReliability + lineupBoost));
 }
+seasonContext = getSeasonPhaseContext(match);
+competitionContext = getCompetitionContext(match);
+const contextDecay = Math.min(
+1,
+Number(seasonContext?.confidence_decay || 1),
+Number(competitionContext?.confidence_decay || 1)
+);
+if (contextDecay < 1) {
+rawReliability = 0.5 + (rawReliability - 0.5) * contextDecay;
+rawReliability = Math.max(0.25, Math.min(0.98, rawReliability));
+}
 const calibrated = applyReliabilityCalibration(rawReliability);
 reliability = calibrated;
 reliabilityMeta = {
@@ -7401,7 +7489,23 @@ boost: Math.round(boost * 1000) / 1000,
 rawReliability: Math.round(rawReliability * 1000) / 1000,
 calibrated: Math.abs(calibrated - rawReliability) > 0.005,
 lineupBoost: lineupBoost ? Math.round(lineupBoost * 1000) / 1000 : 0,
+seasonPhase: seasonContext ? { phase: seasonContext.phase, decay: seasonContext.confidence_decay, variance: seasonContext.variance_multiplier } : null,
+competition: competitionContext ? { type: competitionContext.type, decay: competitionContext.confidence_decay, variance: competitionContext.variance_multiplier, edgeBonus: competitionContext.edge_required_bonus } : null,
 };
+if (seasonContext) {
+reasons.push({
+type: 'season_phase',
+icon: '📅',
+text: `${seasonContext.label} : ${Math.round((seasonContext.avg_matches_played || 0) * 10) / 10} matchs moyens, variance ×${Number(seasonContext.variance_multiplier || 1).toFixed(2)}.`,
+});
+}
+if (competitionContext && competitionContext.type !== 'league') {
+reasons.push({
+type: 'competition_context',
+icon: competitionContext.type === 'continental' ? '🏆' : '🎟️',
+text: `${competitionContext.label} : ${competitionContext.reason}`,
+});
+}
 }
 try {
 const lg = window.__backtestReportV2?.by_league?.[match.league_code];
@@ -7519,6 +7623,8 @@ isLockStrict: reliability >= 0.75,
 abstain,
 sharp_money: smartMoneyNudge || null,
 poisson: poi ? { xgH: poi.lamH, xgA: poi.lamA, fbrefBlend: poi.fbrefBlend || null, bayesianPrior: poi.bayesianPrior || null } : null,
+seasonContext,
+competitionContext,
 scores: (() => {
 if (poi) return poissonTopScores(poi.lamH, poi.lamA, 10, 6, match.league_code);
 if (match.sport === 'hockey') return hockeyScorePrediction(match);
@@ -10585,6 +10691,7 @@ return `
 })();
 body.innerHTML = `
       ${whyHtml}
+      ${buildV4ContextBadges(match, pred)}
       <div class="teams-big">
         <div class="side">
           ${home?.logo ? `<img src="${esc(home.logo)}" alt="" loading="lazy" decoding="async" data-fallback-mode="hide">` : ''}
@@ -15962,6 +16069,7 @@ top30MarketDistinct: v37Top30MarketDistinct,
 tierDiagnostics: v37TierDiagnostics,
 oddsSnapshotCoverage: v37SnapshotCoverage,
 teamPriors: getTeamPriorsDebugSummary(),
+seasonPhase: getSeasonPhaseDebugSummary(),
 qualityCounters: v37QualityCounters,
 qualitySamples: v37QualitySamples,
 rejectReasons: v37RejectReasons,
@@ -21818,6 +21926,28 @@ ${ciBar}
           </div>
         </div>`;
 }
+const v4SeasonPhaseHtml = (() => {
+const data = window.SEASON_PHASE || null;
+if (!data || !data.leagues) return '';
+const rows = Object.entries(data.leagues).slice(0, 8).map(([key, row]) => _seasonPhaseFromTuple(key, row)).filter(Boolean);
+const summary = data.summary || {};
+const phaseLabel = p => p === 'early' ? 'Début' : p === 'late' ? 'Fin' : 'Milieu';
+return `<section style="margin-top:32px;">
+          <h2 class="page-h2">📅 Calibration par phase saison</h2>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:10px;">
+            ${['early','mid','late'].map(p => `<div style="padding:14px;background:var(--panel);border:1px solid var(--border);border-radius:12px;"><div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;font-weight:800;">${phaseLabel(p)}</div><div style="font-size:24px;font-weight:900;margin-top:4px;">${Number(summary[p] || 0)}</div><div style="font-size:11px;color:var(--text-dim2);">ligues suivies</div></div>`).join('')}
+          </div>
+          <div style="padding:14px;background:var(--panel);border:1px solid var(--border);border-radius:12px;">
+            <div style="font-size:12px;color:var(--text-dim);margin-bottom:8px;">Le modèle V4 réduit la confiance en début de saison et en coupes où la variance est plus haute.</div>
+            ${rows.map(r => `<div style="display:grid;grid-template-columns:1fr 70px 70px 70px;gap:8px;padding:7px 0;border-top:1px solid var(--border);font-size:12px;align-items:center;">
+              <b>${esc(r.league_name || r.league_code)}</b>
+              <span>${phaseLabel(r.phase)}</span>
+              <span>${Number(r.avg_matches_played || 0).toFixed(1)} matchs</span>
+              <span>decay ${Number(r.confidence_decay || 1).toFixed(2)}</span>
+            </div>`).join('')}
+          </div>
+        </section>`;
+})();
 wrap.innerHTML = `
       <div style="max-width:900px;margin:0 auto;padding:16px 12px 40px;">
         <div style="padding:40px 0 16px;border-bottom:1px solid var(--border);">
@@ -21847,6 +21977,8 @@ wrap.innerHTML = `
           </div>
           <div style="margin-top:10px;font-size:12px;color:var(--text-dim2);line-height:1.5;"><b>Où vérifier :</b> la page <a href="#" class="page-btn" data-page="backtest" style="color:var(--brand);text-decoration:underline;cursor:pointer;">Performance</a> montre la courbe complète, par mois, par sport, avec chaque pari comptabilisé. Le script Python tourne chaque semaine en CI public sur GitHub — <b>tu peux re-rouler le backtest toi-même</b> pour valider les chiffres.</div>
         </section>
+
+        ${v4SeasonPhaseHtml}
 
         <section style="margin-top:32px;">
           <h2 class="page-h2">🧮 Comment le modèle décide</h2>

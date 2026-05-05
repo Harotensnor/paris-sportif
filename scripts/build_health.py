@@ -266,6 +266,12 @@ SOURCES = [
         'decay_k': (d.get('decay_k') or 0) if isinstance(d, dict) else 0,
         'max_matches': (d.get('max_matches') or 0) if isinstance(d, dict) else 0,
     }),
+    ('season_phase', 'season_phase.json', lambda d: {
+        'leagues': (d.get('league_count') or len(d.get('leagues') or {})) if isinstance(d, dict) else 0,
+        'early': ((d.get('summary') or {}).get('early') or 0) if isinstance(d, dict) else 0,
+        'mid': ((d.get('summary') or {}).get('mid') or 0) if isinstance(d, dict) else 0,
+        'late': ((d.get('summary') or {}).get('late') or 0) if isinstance(d, dict) else 0,
+    }),
     ('data_quality_report', 'data_quality_report.json', lambda d: {
         'events_quarantined': (d.get('events_quarantined') or 0) if isinstance(d, dict) else 0,
         'status': (d.get('status') or 'unknown') if isinstance(d, dict) else 'missing',
