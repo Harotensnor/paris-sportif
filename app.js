@@ -5513,6 +5513,29 @@ window.getStarImpact = getStarImpact;
 window.getStarPlayersDebugSummary = getStarPlayersDebugSummary;
 } catch (e) {}
 
+function _xgDecayParamFromTuple(key, row) {
+if (!Array.isArray(row)) return row || null;
+return { league_code: key, decay_k: Number(row[0]) || 0.10, profile: row[1] || 'default_football', reason: row[2] || '', league_name: row[3] || key };
+}
+function getXGDecayParam(match) {
+const data = window.XG_DECAY_PARAMS || null;
+const key = String(match?.league_code || match?.league_name || '');
+const row = data?.leagues?.[key] || data?.leagues?.[String(match?.league_name || '')];
+return _xgDecayParamFromTuple(key, row) || { league_code: key || 'unknown', decay_k: 0.10, profile: 'fallback', reason: 'Fallback decay standard.' };
+}
+function getXGDecayDebugSummary() {
+const data = window.XG_DECAY_PARAMS || null;
+return {
+loaded: !!data,
+leagues: Number(data?.league_count || Object.keys(data?.leagues || {}).length || 0),
+generatedAt: data?.generated_at || null,
+};
+}
+try {
+window.getXGDecayParam = getXGDecayParam;
+window.getXGDecayDebugSummary = getXGDecayDebugSummary;
+} catch (e) {}
+
 function poissonComponent(match) {
 if (match.sport !== 'football') return null;
 const { home, away } = getSides(match);
@@ -5530,17 +5553,44 @@ const aDef = aX.conceded / lgAvg;
 let lamH = Math.max(0.2, hAtt * aDef * lgAvg * HOME_ADV);
 let lamA = Math.max(0.2, aAtt * hDef * lgAvg / HOME_ADV);
 let fbrefBlend = null;
+const decayParam = getXGDecayParam(match);
+const decayedRecentProxy = (side) => {
+const rows = Array.isArray(side?.last10) ? side.last10.slice() : [];
+if (!rows.length) return null;
+const k = Number(decayParam?.decay_k || 0.10);
+let wSum = 0, gf = 0, ga = 0, n = 0;
+rows.slice(-10).reverse().forEach((r, idx) => {
+const forVal = Number(r.score_for);
+const againstVal = Number(r.score_against);
+if (!Number.isFinite(forVal) || !Number.isFinite(againstVal)) return;
+const w = Math.exp(-k * idx);
+wSum += w;
+gf += forVal * w;
+ga += againstVal * w;
+n += 1;
+});
+if (!wSum || !n) return null;
+return { xg_for_avg: gf / wSum, xg_against_avg: ga / wSum, sample: n, decay_k: k };
+};
 const readEmpXG = (side) => {
 const x = side?.xg_stats || side?.fbref_xg || null;
 if (!x) return null;
-const xgFor = Number(x.xg_for_avg ?? x.xg_l10);
-const xgAgainst = Number(x.xg_against_avg ?? x.xga_l10);
+let xgFor = Number(x.xg_for_avg ?? x.xg_l10);
+let xgAgainst = Number(x.xg_against_avg ?? x.xga_l10);
 if (!Number.isFinite(xgFor) || !Number.isFinite(xgAgainst)) return null;
+const recent = decayedRecentProxy(side);
+if (recent) {
+xgFor = 0.75 * xgFor + 0.25 * recent.xg_for_avg;
+xgAgainst = 0.75 * xgAgainst + 0.25 * recent.xg_against_avg;
+}
 return {
 xg_for_avg: xgFor,
 xg_against_avg: xgAgainst,
 matches_played: Number(x.matches_played || x.n || x.sample || 10) || 10,
 source: side?.xg_stats ? 'Understat' : 'fbref',
+decay_k: Number(decayParam?.decay_k || 0.10),
+decay_profile: decayParam?.profile || 'fallback',
+decay_sample: recent?.sample || 0,
 };
 };
 const hXG = readEmpXG(home);
@@ -5558,6 +5608,9 @@ lamA_model: Math.round(lamA * 1000) / 1000,
 lamH_emp: Math.round(lamH_emp * 1000) / 1000,
 lamA_emp: Math.round(lamA_emp * 1000) / 1000,
 source: hXG.source === aXG.source ? hXG.source : 'xG',
+decay_k: Math.round(Number(decayParam?.decay_k || 0.10) * 1000) / 1000,
+decay_profile: decayParam?.profile || 'fallback',
+decay_sample: Math.min(hXG.decay_sample || 0, aXG.decay_sample || 0),
 };
 lamH = Math.max(0.2, (1 - w) * lamH + w * lamH_emp);
 lamA = Math.max(0.2, (1 - w) * lamA + w * lamA_emp);
@@ -7236,6 +7289,7 @@ let xgText = `Buts attendus : ${homeLabel} ${poi.lamH.toFixed(2)} – ${awayLabe
 if (poi.fbrefBlend) {
 const wPct = Math.round(poi.fbrefBlend.weight * 100);
 xgText += ` (xG ${poi.fbrefBlend.source || 'empirique'} ${wPct}% · ${poi.fbrefBlend.minMatchesPlayed} matchs)`;
+if (poi.fbrefBlend.decay_k) xgText += ` · decay k=${Number(poi.fbrefBlend.decay_k).toFixed(2)}`;
 }
 if (poi.bayesianPrior) {
 const priorPct = Math.round(poi.bayesianPrior.weight * 100);
@@ -16175,6 +16229,7 @@ oddsSnapshotCoverage: v37SnapshotCoverage,
 teamPriors: getTeamPriorsDebugSummary(),
 seasonPhase: getSeasonPhaseDebugSummary(),
 starPlayers: getStarPlayersDebugSummary(),
+xgDecay: getXGDecayDebugSummary(),
 qualityCounters: v37QualityCounters,
 qualitySamples: v37QualitySamples,
 rejectReasons: v37RejectReasons,

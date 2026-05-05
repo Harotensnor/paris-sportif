@@ -276,6 +276,9 @@ SOURCES = [
         'teams': (d.get('team_count') or len(d.get('teams') or {})) if isinstance(d, dict) else 0,
         'stars': (d.get('star_count') or sum(len(v.get('players') or []) for v in (d.get('teams') or {}).values())) if isinstance(d, dict) else 0,
     }),
+    ('xg_decay_params', 'xg_decay_params.json', lambda d: {
+        'leagues': (d.get('league_count') or len(d.get('leagues') or {})) if isinstance(d, dict) else 0,
+    }),
     ('data_quality_report', 'data_quality_report.json', lambda d: {
         'events_quarantined': (d.get('events_quarantined') or 0) if isinstance(d, dict) else 0,
         'status': (d.get('status') or 'unknown') if isinstance(d, dict) else 'missing',

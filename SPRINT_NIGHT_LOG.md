@@ -841,3 +841,11 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Debug: `?debug=1` expose `starPlayers` (teams, stars, generatedAt).
 - Pipeline: `build_star_players.py` branché dans `auto_refresh.py`, `refresh.yml`, `build_health.py`; drift pipeline OK.
 - Cache/footer bumpes v36.003; `app.js` hash `5859c20f`, `star_players.js` hash `06fabd7c`, SW `paris-sportif-20260505-210733`.
+
+## Sprint v36.004 — AUTO 10/10 Modèle V4 EE xG decay ligues (21:09 UTC)
+- xG decay: `xg_decay_params.json` couvre 32 ligues foot avec k=0.08/0.10/0.15 selon stabilité ou volatilité.
+- Modèle: `poissonComponent()` pondère la forme récente `last10` via decay exponentiel et la blend avec xG/fbref existant.
+- Debug: `?debug=1` expose `xgDecay`; les raisons xG affichent désormais `decay k=...` quand appliqué.
+- Pipeline: `build_xg_decay_params.py` branché dans `auto_refresh.py`, `refresh.yml`, `build_health.py`; drift pipeline OK.
+- QA: `app.js` syntax OK, scripts Python compilés, health régénéré en warning non critique.
+- Cache/footer bumpes v36.004; `app.js` hash `3c4f29b6`, `xg_decay_params.js` hash `c12b43f9`, SW `paris-sportif-20260505-210913`.
