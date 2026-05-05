@@ -279,6 +279,12 @@ SOURCES = [
     ('xg_decay_params', 'xg_decay_params.json', lambda d: {
         'leagues': (d.get('league_count') or len(d.get('leagues') or {})) if isinstance(d, dict) else 0,
     }),
+    ('team_travel', 'team_travel.json', lambda d: {
+        'matches': (d.get('match_count') or len(d.get('matches') or {})) if isinstance(d, dict) else 0,
+    }),
+    ('schedule_density', 'schedule_density.json', lambda d: {
+        'matches': (d.get('match_count') or len(d.get('matches') or {})) if isinstance(d, dict) else 0,
+    }),
     ('data_quality_report', 'data_quality_report.json', lambda d: {
         'events_quarantined': (d.get('events_quarantined') or 0) if isinstance(d, dict) else 0,
         'status': (d.get('status') or 'unknown') if isinstance(d, dict) else 'missing',

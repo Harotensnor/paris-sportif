@@ -849,3 +849,11 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Pipeline: `build_xg_decay_params.py` branché dans `auto_refresh.py`, `refresh.yml`, `build_health.py`; drift pipeline OK.
 - QA: `app.js` syntax OK, scripts Python compilés, health régénéré en warning non critique.
 - Cache/footer bumpes v36.004; `app.js` hash `3c4f29b6`, `xg_decay_params.js` hash `c12b43f9`, SW `paris-sportif-20260505-210913`.
+
+## Sprint v36.005 — AUTO 10/10 Modèle V4 FF/GG voyage et calendrier (21:11 UTC)
+- Voyage: `team_travel.json` couvre 278 matchs avec distance, fuseau, repos et pénalité fatigue quand les coordonnées sont disponibles.
+- Calendrier: `schedule_density.json` couvre 278 matchs avec compteurs 4j/5j/7j pour domicile et extérieur.
+- Modèle: `predictMatch()` applique une petite pénalité de fiabilité quand voyage extrême ou calendrier dense est actif.
+- Modal/debug: badges `Voyage` / `Calendrier dense` et `?debug=1.travelSchedule` exposent les signaux.
+- Pipeline: builder unique `build_travel_schedule_context.py` branché dans cron local/GHA/health; drift pipeline OK.
+- Cache/footer bumpes v36.005; `app.js` hash `fd1e338a`, `team_travel.js` hash `0531e34e`, `schedule_density.js` hash `7f4d9066`, SW `paris-sportif-20260505-211134`.

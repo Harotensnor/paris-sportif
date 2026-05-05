@@ -5413,10 +5413,14 @@ function buildV4ContextBadges(match, pred) {
 const season = pred?.seasonContext || getSeasonPhaseContext(match);
 const competition = pred?.competitionContext || getCompetitionContext(match);
 const starImpact = pred?.starImpact || getStarImpact(match);
+const travel = pred?.travelContext || getTravelContext(match);
+const schedule = pred?.scheduleDensityContext || getScheduleDensityContext(match);
 const badges = [];
 if (competition) badges.push({ label: competition.label, title: competition.reason || 'Contexte compétition' });
 if (season) badges.push({ label: season.label, title: `Phase saison · ${season.sample_teams || 0} équipes suivies` });
 if (starImpact) badges.push({ label: `Impact absence : ${starImpact.active ? starImpact.label : 'aucun star absent majeur'}`, title: starImpact.detail || 'Top joueurs croisés avec la liste des absents.' });
+if (travel && travel.label !== 'normal') badges.push({ label: `Voyage : ${Math.round(Number(travel.travel_km) || 0)}km`, title: `Fuseau ${travel.timezone_delta ?? '—'}h · repos ${travel.time_since_last_match_h ?? '—'}h · fatigue ${travel.penalty}` });
+if (schedule && (schedule.home_label !== 'normal' || schedule.away_label !== 'normal')) badges.push({ label: 'Calendrier dense', title: `Dom ${schedule.home?.last_7d || 0}/7j · Ext ${schedule.away?.last_7d || 0}/7j` });
 if (!badges.length) return '';
 return `<div class="v4-context-badges" style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 14px;">
 ${badges.map(b => `<span style="display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--border);border-radius:999px;background:var(--panel-2);font-size:12px;font-weight:750;color:var(--text);" title="${esc(b.title)}">${esc(b.label)}</span>`).join('')}
@@ -5534,6 +5538,36 @@ generatedAt: data?.generated_at || null,
 try {
 window.getXGDecayParam = getXGDecayParam;
 window.getXGDecayDebugSummary = getXGDecayDebugSummary;
+} catch (e) {}
+
+function getTravelContext(match) {
+const row = window.TEAM_TRAVEL?.matches?.[String(match?.id || match?.uid || match?.name || '')];
+if (!Array.isArray(row)) return null;
+return {
+travel_km: row[0],
+timezone_delta: row[1],
+time_since_last_match_h: row[2],
+penalty: Number(row[3]) || 0,
+label: row[4] || 'normal',
+};
+}
+function getScheduleDensityContext(match) {
+const row = window.SCHEDULE_DENSITY?.matches?.[String(match?.id || match?.uid || match?.name || '')];
+if (!Array.isArray(row)) return null;
+return { home: row[0] || {}, away: row[1] || {}, home_label: row[2] || 'normal', away_label: row[3] || 'normal' };
+}
+function getTravelScheduleDebugSummary() {
+return {
+travelMatches: Number(window.TEAM_TRAVEL?.match_count || Object.keys(window.TEAM_TRAVEL?.matches || {}).length || 0),
+scheduleMatches: Number(window.SCHEDULE_DENSITY?.match_count || Object.keys(window.SCHEDULE_DENSITY?.matches || {}).length || 0),
+travelGeneratedAt: window.TEAM_TRAVEL?.generated_at || null,
+scheduleGeneratedAt: window.SCHEDULE_DENSITY?.generated_at || null,
+};
+}
+try {
+window.getTravelContext = getTravelContext;
+window.getScheduleDensityContext = getScheduleDensityContext;
+window.getTravelScheduleDebugSummary = getTravelScheduleDebugSummary;
 } catch (e) {}
 
 function poissonComponent(match) {
@@ -7561,6 +7595,8 @@ let leagueBias = null;
 let pureCompCount = 0;
 let seasonContext = null;
 let competitionContext = null;
+let travelContext = null;
+let scheduleDensityContext = null;
 {
 const pickKey = best_pick[2]; // '1' | 'X' | '2'
 const fieldMap = { '1': 'pH', 'X': 'pD', '2': 'pA' };
@@ -7626,6 +7662,8 @@ rawReliability = Math.max(0.25, Math.min(0.98, rawReliability + lineupBoost));
 }
 seasonContext = getSeasonPhaseContext(match);
 competitionContext = getCompetitionContext(match);
+travelContext = getTravelContext(match);
+scheduleDensityContext = getScheduleDensityContext(match);
 const contextDecay = Math.min(
 1,
 Number(seasonContext?.confidence_decay || 1),
@@ -7634,6 +7672,10 @@ Number(competitionContext?.confidence_decay || 1)
 if (contextDecay < 1) {
 rawReliability = 0.5 + (rawReliability - 0.5) * contextDecay;
 rawReliability = Math.max(0.25, Math.min(0.98, rawReliability));
+}
+if (travelContext?.penalty) {
+const penalty = Math.min(0.04, Math.abs(Number(travelContext.penalty) || 0) / (match.sport === 'basketball' ? 100 : 10));
+rawReliability = Math.max(0.25, rawReliability - penalty);
 }
 const calibrated = applyReliabilityCalibration(rawReliability);
 reliability = calibrated;
@@ -7648,6 +7690,8 @@ calibrated: Math.abs(calibrated - rawReliability) > 0.005,
 lineupBoost: lineupBoost ? Math.round(lineupBoost * 1000) / 1000 : 0,
 seasonPhase: seasonContext ? { phase: seasonContext.phase, decay: seasonContext.confidence_decay, variance: seasonContext.variance_multiplier } : null,
 competition: competitionContext ? { type: competitionContext.type, decay: competitionContext.confidence_decay, variance: competitionContext.variance_multiplier, edgeBonus: competitionContext.edge_required_bonus } : null,
+travel: travelContext,
+scheduleDensity: scheduleDensityContext,
 };
 if (seasonContext) {
 reasons.push({
@@ -7661,6 +7705,20 @@ reasons.push({
 type: 'competition_context',
 icon: competitionContext.type === 'continental' ? '🏆' : '🎟️',
 text: `${competitionContext.label} : ${competitionContext.reason}`,
+});
+}
+if (travelContext && travelContext.label !== 'normal') {
+reasons.push({
+type: 'travel_fatigue',
+icon: '✈️',
+text: `Voyage : ${travelContext.travel_km != null ? Math.round(travelContext.travel_km) + 'km' : 'distance inconnue'}, fuseau ${travelContext.timezone_delta ?? '—'}h, fatigue ${travelContext.penalty}.`,
+});
+}
+if (scheduleDensityContext && (scheduleDensityContext.home_label !== 'normal' || scheduleDensityContext.away_label !== 'normal')) {
+reasons.push({
+type: 'schedule_density',
+icon: '🗓️',
+text: `Calendrier dense : domicile ${scheduleDensityContext.home?.last_7d || 0} matchs/7j, extérieur ${scheduleDensityContext.away?.last_7d || 0} matchs/7j.`,
 });
 }
 }
@@ -7783,6 +7841,8 @@ poisson: poi ? { xgH: poi.lamH, xgA: poi.lamA, fbrefBlend: poi.fbrefBlend || nul
 seasonContext,
 competitionContext,
 starImpact: poi?.starImpact || getStarImpact(match),
+travelContext,
+scheduleDensityContext,
 scores: (() => {
 if (poi) return poissonTopScores(poi.lamH, poi.lamA, 10, 6, match.league_code);
 if (match.sport === 'hockey') return hockeyScorePrediction(match);
@@ -16230,6 +16290,7 @@ teamPriors: getTeamPriorsDebugSummary(),
 seasonPhase: getSeasonPhaseDebugSummary(),
 starPlayers: getStarPlayersDebugSummary(),
 xgDecay: getXGDecayDebugSummary(),
+travelSchedule: getTravelScheduleDebugSummary(),
 qualityCounters: v37QualityCounters,
 qualitySamples: v37QualitySamples,
 rejectReasons: v37RejectReasons,

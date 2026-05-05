@@ -144,6 +144,7 @@ PATCH_STAGES = [
     ('build_season_phase.py',       1,   30),
     ('build_star_players.py',       1,   30),
     ('build_xg_decay_params.py',    1,   30),
+    ('build_travel_schedule_context.py', 1, 30),
     ('snapshot_pick_odds.py',       1,   30),
     ('compute_clv.py',              1,   30),
     ('settle_picks.py',             1,   15),
