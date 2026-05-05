@@ -865,3 +865,11 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Pipeline: `build_referee_stats.py` branché dans cron local/GHA/health; drift pipeline OK.
 - QA: `app.js` syntax OK, scripts Python compilés, health régénéré en warning non critique.
 - Cache/footer bumpes v36.006; `app.js` hash `a6751a0d`, `referee_stats.js` hash `f97068c3`, SW `paris-sportif-20260505-211334`.
+
+## Sprint v36.007 — AUTO 10/10 Modèle V4 II tennis/goalies/pitchers (21:16 UTC)
+- Tennis: `tennis_elo_surface.json` couvre 710 joueurs avec Elo hard/clay/grass/indoor.
+- NHL/MLB: `goalie_pitcher_context.json` couvre 49 matchs avec goalies SV%/GAA et pitchers ERA/WHIP/K9 quand disponibles.
+- Modèle: `predictMatch()` applique un petit nudge surface tennis ou goalie/pitcher si le signal soutient clairement le side.
+- Modal/debug: badges `Surface`, `Goalie`, `Pitcher` + `?debug=1.roleContext` visibles.
+- Pipeline: `build_role_context.py` branché dans cron local/GHA/health; drift pipeline OK.
+- Cache/footer bumpes v36.007; `app.js` hash `82951933`, `tennis_elo_surface.js` hash `ca9a2859`, `goalie_pitcher_context.js` hash `26b2b1f0`, SW `paris-sportif-20260505-211608`.

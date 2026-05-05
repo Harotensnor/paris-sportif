@@ -289,6 +289,12 @@ SOURCES = [
         'referees': (d.get('referee_count') or len(d.get('referees') or {})) if isinstance(d, dict) else 0,
         'top5': (d.get('top5_count') or 0) if isinstance(d, dict) else 0,
     }),
+    ('tennis_elo_surface', 'tennis_elo_surface.json', lambda d: {
+        'players': (d.get('player_count') or len(d.get('players') or {})) if isinstance(d, dict) else 0,
+    }),
+    ('goalie_pitcher_context', 'goalie_pitcher_context.json', lambda d: {
+        'matches': (d.get('match_count') or len(d.get('matches') or {})) if isinstance(d, dict) else 0,
+    }),
     ('data_quality_report', 'data_quality_report.json', lambda d: {
         'events_quarantined': (d.get('events_quarantined') or 0) if isinstance(d, dict) else 0,
         'status': (d.get('status') or 'unknown') if isinstance(d, dict) else 'missing',
