@@ -3608,7 +3608,66 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     } catch(e) {}
     return Math.min(1, corr);
   }
+  function comboLegForCorrelation(leg) {
+    if (!leg) return null;
+    return {
+      match: leg.match || leg.m || leg.event || null,
+      market: leg.market || leg.marketPick?.market || leg.best?.market || leg.pick?.market || leg.pred?.pick?.market || '1n2'
+    };
+  }
+  function comboCorrelationStats(legs) {
+    const list = Array.isArray(legs) ? legs.map(comboLegForCorrelation).filter(x => x && x.match) : [];
+    if (list.length < 2) return { avg: 0, max: 0, pairs: 0 };
+    let sum = 0;
+    let max = 0;
+    let pairs = 0;
+    for (let i = 0; i < list.length; i++) {
+      for (let j = i + 1; j < list.length; j++) {
+        const corr = (typeof combinationCorrelation === 'function') ? combinationCorrelation(list[i], list[j]) : 0;
+        sum += corr;
+        max = Math.max(max, corr);
+        pairs++;
+      }
+    }
+    return { avg: pairs ? sum / pairs : 0, max, pairs };
+  }
+  function estimateSameGameComboProb(legs, type) {
+    const list = Array.isArray(legs) ? legs : [];
+    const raw = list.reduce((acc, l) => acc * clamp(Number(l?.pred?.pick?.prob ?? l?.rel ?? l?.prob ?? 0), 0, 1), 1);
+    const minLegProb = list.reduce((acc, l) => Math.min(acc, clamp(Number(l?.pred?.pick?.prob ?? l?.rel ?? l?.prob ?? 0), 0, 1)), 1);
+    const stats = comboCorrelationStats(list);
+    const sameMatch = list.length >= 2 && list.every(l => String((l?.m || l?.match || {})?.id || '') === String((list[0]?.m || list[0]?.match || {})?.id || ''));
+    let multiplier = 1 - stats.avg * 0.12;
+    let note = 'corrélation prudente';
+    if (sameMatch) {
+      const t = String(type || '').toLowerCase();
+      if (t.includes('goals-builder') || t.includes('btts-both-halves') || t.includes('ht-goals')) {
+        multiplier = 1 + stats.avg * 0.22;
+        note = 'corrélation positive buts';
+      } else if (t.includes('result-btts') || t.includes('result-goals')) {
+        multiplier = 1 + stats.avg * 0.10;
+        note = 'corrélation scénario';
+      } else if (t.includes('safe-scenario')) {
+        multiplier = 1 - stats.avg * 0.08;
+        note = 'corrélation défensive';
+      }
+    }
+    const lower = raw * 0.55;
+    const upper = Math.max(lower, Math.min(minLegProb * 0.92, raw * 1.55));
+    const adjusted = clamp(raw * multiplier, lower, upper);
+    return {
+      raw,
+      adjusted,
+      multiplier,
+      correlationAvg: stats.avg,
+      correlationMax: stats.max,
+      correlationPairs: stats.pairs,
+      note
+    };
+  }
   try { window.combinationCorrelation = combinationCorrelation; } catch(e){}
+  try { window.comboCorrelationStats = comboCorrelationStats; } catch(e){}
+  try { window.estimateSameGameComboProb = estimateSameGameComboProb; } catch(e){}
 
   // Synthétise les signaux dominants du modèle pour le pick choisi en
   // langage naturel, accessible. Lit pred.contributions (Sprint U Chantier) et
@@ -10259,43 +10318,100 @@ const ok = c => c
 && c.source === 'winamax_exact'
 && c.investment?.action !== 'skip'
 && Number(c.odd) > 1.20
-&& Number(c.prob) > 0.42
-&& Number(c.edge) > 0.015;
+&& Number(c.prob) > 0.34
+&& Number(c.edge) > 0.004;
 const combos = [];
-const over25 = candidates.find(c => ok(c) && c.market === 'ou25' && /^O2\.5$/.test(String(c.key || '')))
-|| candidates.find(c => ok(c) && c.market === 'ou25' && /plus/i.test(String(c.label || '')));
-const bttsYes = candidates.find(c => ok(c) && c.market === 'btts' && String(c.key || '') === 'BTTS_Y')
-|| candidates.find(c => ok(c) && c.market === 'btts' && /oui/i.test(String(c.label || '')));
-const sidePick = candidates.find(c => ok(c) && c.market === '1n2' && ['1','2'].includes(String(c.key || c.pickKey || '')));
-if (over25 && bttsYes) {
-const legs = [makeMarketLeg(x, over25), makeMarketLeg(x, bttsYes)];
-const totalOdd = legs.reduce((acc, l) => acc * l.odd, 1);
-combos.push({
-type: 'goals-builder',
-title: '⚽ Buts + BTTS',
-desc: 'Même match · Plus de 2,5 buts + les deux équipes marquent · cotes exactes Winamax',
-legs,
-score: (over25.edge + bttsYes.edge) * 100 + Math.min(totalOdd, 5),
-totalOdd,
-});
-}
-if (sidePick && bttsYes) {
-const legs = [makeMarketLeg(x, sidePick), makeMarketLeg(x, bttsYes)];
-const totalOdd = legs.reduce((acc, l) => acc * l.odd, 1);
-combos.push({
-type: 'result-btts-builder',
-title: '🏆 Résultat + BTTS',
-desc: 'Même match · vainqueur + les deux équipes marquent · cotes exactes Winamax',
-legs,
-score: (sidePick.edge + bttsYes.edge) * 100 + Math.min(totalOdd, 6) - 0.4,
-totalOdd,
-});
+const best = (fn) => candidates.filter(c => ok(c) && fn(c)).sort((a, b) =>
+  (b.edge || 0) - (a.edge || 0)
+  || (b.prob || 0) - (a.prob || 0)
+  || (b.investment?.score || 0) - (a.investment?.score || 0)
+)[0];
+const keyOf = c => String(c?.key || c?.pickKey || c?.side || '');
+const isOver = (c, line) => /^O/.test(keyOf(c)) && (line == null || Math.abs(Number(c.line ?? String(keyOf(c)).replace(/[^\d.]/g, '')) - line) < 0.05);
+const isUnder = (c, line) => /^U/.test(keyOf(c)) && (line == null || Math.abs(Number(c.line ?? String(keyOf(c)).replace(/[^\d.]/g, '')) - line) < 0.05);
+const over25 = best(c => c.market === 'ou25' && (isOver(c, 2.5) || /plus/i.test(String(c.label || ''))));
+const over15 = best(c => (c.market === 'ou15' || c.market === 'ou25') && (isOver(c, 1.5) || /plus/i.test(String(c.label || ''))));
+const under35 = best(c => (c.market === 'ou35' || c.market === 'ou25') && (isUnder(c, 3.5) || /moins/i.test(String(c.label || ''))));
+const htOver05 = best(c => c.market === 'htTotal' && (isOver(c, 0.5) || /plus/i.test(String(c.label || ''))));
+const bttsYes = best(c => c.market === 'btts' && (keyOf(c) === 'BTTS_Y' || /oui/i.test(String(c.label || ''))));
+const sidePick = best(c => c.market === '1n2' && ['1','2'].includes(keyOf(c)));
+const doubleChance = best(c => c.market === 'doubleChance' && ['1X','X2','12'].includes(keyOf(c)));
+const dnb = best(c => c.market === 'dnb');
+const resultBtts = best(c => c.market === 'resultBtts' && /yes|oui|BTTS_Y|_yes/i.test(`${c.key || ''} ${c.label || ''}`));
+const teamTotalOver = best(c => c.market === 'teamTotal' && (isOver(c) || /plus/i.test(String(c.label || ''))));
+const teamTotalUnder = best(c => c.market === 'teamTotal' && (isUnder(c) || /moins/i.test(String(c.label || ''))));
+const htSide = best(c => c.market === 'ht_1n2' && ['HT_1','HT_2','HT_X'].includes(keyOf(c)));
+const cornersOver = best(c => c.market === 'cornersTotal' && (isOver(c) || /plus/i.test(String(c.label || ''))));
+const cardsOver = best(c => c.market === 'cardsTotal' && (isOver(c) || /plus/i.test(String(c.label || ''))));
+const addPair = (type, title, desc, a, b, boost = 0) => {
+  if (!a || !b) return;
+  const sig = [a.market, keyOf(a), a.line ?? '', b.market, keyOf(b), b.line ?? ''].join('|');
+  if (combos.some(c => c.signature === sig)) return;
+  const legs = [makeMarketLeg(x, a), makeMarketLeg(x, b)];
+  const totalOdd = legs.reduce((acc, l) => acc * l.odd, 1);
+  const prob = (typeof estimateSameGameComboProb === 'function')
+    ? estimateSameGameComboProb(legs, type)
+    : { raw: legs.reduce((acc, l) => acc * l.pred.pick.prob, 1), adjusted: legs.reduce((acc, l) => acc * l.pred.pick.prob, 1), correlationAvg: 0, note: 'corrélation non mesurée' };
+  combos.push({
+    type,
+    title,
+    desc: `${desc} · ${prob.note} (${Math.round((prob.correlationAvg || 0) * 100)}%)`,
+    legs,
+    sameGame: true,
+    signature: sig,
+    rawCombinedProb: prob.raw,
+    combinedProb: prob.adjusted,
+    correlationAvg: prob.correlationAvg,
+    correlationNote: prob.note,
+    score: (a.edge + b.edge) * 100 + Math.min(totalOdd, 6) + boost + (prob.adjusted - prob.raw) * 25,
+    totalOdd,
+  });
+};
+addPair('goals-builder', '⚽ Buts + BTTS', 'Même match · Plus de 2,5 buts + les deux équipes marquent · cotes exactes Winamax', over25, bttsYes, 1.2);
+addPair('result-btts-builder', '🏆 Résultat + BTTS', 'Même match · vainqueur + les deux équipes marquent · cotes exactes Winamax', sidePick, bttsYes, 0.6);
+addPair('result-goals-builder', '📈 Résultat + buts', 'Même match · vainqueur + total de buts · proba corrigée', sidePick, over25, 0.4);
+addPair('safe-scenario-builder', '🧩 Scénario prudent', 'Même match · double chance + total raisonnable · proba corrigée', doubleChance, under35, 0.2);
+addPair('safe-goals-builder', '🛡️ DNB + buts', 'Même match · nul remboursé + total de buts · proba corrigée', dnb, over15, 0.1);
+addPair('ht-goals-builder', '⏱️ Départ rapide', 'Même match · but en 1re mi-temps + total match · proba corrigée', htOver05, over25, 0.3);
+if (resultBtts && over15) addPair('result-btts-total-builder', '🎯 Résultat BTTS + filet', 'Même match · résultat+BTTS appuyé par total 1,5 · proba corrigée', resultBtts, over15, 0.5);
+addPair('team-btts-builder', '👥 Équipe + BTTS', 'Même match · total équipe + BTTS · proba corrigée', teamTotalOver, bttsYes, 0.2);
+addPair('team-goals-builder', '🥅 Équipe + buts', 'Même match · total équipe + total match · proba corrigée', teamTotalOver, over15, 0.1);
+addPair('team-under-safe-builder', '🧱 Équipe limitée + prudence', 'Même match · total équipe bas + total match prudent · proba corrigée', teamTotalUnder, under35, 0);
+addPair('ht-result-builder', '⏱️ Mi-temps + scénario', 'Même match · 1re mi-temps + total match · proba corrigée', htSide, over15, 0);
+addPair('tempo-builder', '📊 Rythme du match', 'Même match · corners + cartons · proba corrigée', cornersOver, cardsOver, 0);
+const compatibleSameGamePair = (a, b) => {
+  if (!a || !b) return false;
+  const am = String(a.market || ''), bm = String(b.market || '');
+  const ak = keyOf(a), bk = keyOf(b);
+  if (am === bm && am !== 'teamTotal' && am !== 'htTotal') return false;
+  const aOver = /^O/.test(ak) || /plus/i.test(String(a.label || ''));
+  const bOver = /^O/.test(bk) || /plus/i.test(String(b.label || ''));
+  const aUnder = /^U/.test(ak) || /moins/i.test(String(a.label || ''));
+  const bUnder = /^U/.test(bk) || /moins/i.test(String(b.label || ''));
+  if (am === bm && ((aOver && bUnder) || (aUnder && bOver))) return false;
+  if ((am === 'btts' && ak === 'BTTS_Y' && bm === 'teamTotal' && bUnder && Number(b.line) <= 0.5) ||
+      (bm === 'btts' && bk === 'BTTS_Y' && am === 'teamTotal' && aUnder && Number(a.line) <= 0.5)) return false;
+  if (am === '1n2' && bm === 'doubleChance') return false;
+  if (bm === '1n2' && am === 'doubleChance') return false;
+  return true;
+};
+const genericSameGamePool = candidates
+  .filter(ok)
+  .filter(c => ['1n2','dnb','doubleChance','ou15','ou25','ou35','htTotal','ht_1n2','teamTotal','btts','cornersTotal','cardsTotal','handicap'].includes(c.market))
+  .sort((a, b) => (b.investment?.score || 0) - (a.investment?.score || 0) || (b.edge || 0) - (a.edge || 0))
+  .slice(0, 18);
+for (let i = 0; i < genericSameGamePool.length && combos.length < 12; i++) {
+  for (let j = i + 1; j < genericSameGamePool.length && combos.length < 12; j++) {
+    const a = genericSameGamePool[i], b = genericSameGamePool[j];
+    if (!compatibleSameGamePair(a, b)) continue;
+    addPair('same-game-value-builder', '🧮 Same-game value', 'Même match · deux signaux compatibles · proba corrigée', a, b, -0.2);
+  }
 }
 return combos;
 })
 .reduce((acc, items) => acc.concat(items || []), [])
 .sort((a, b) => b.score - a.score)
-.slice(0, 4);
+.slice(0, 12);
 
 [safe, balanced, bold, lockCombo].forEach(arr => arr.sort((a, b) => a.startIn - b.startIn));
 
@@ -10308,15 +10424,27 @@ type: combo.type || 'same-match-builder',
 title: idx === 0 ? combo.title : combo.type === 'result-btts-builder' ? '🏆 Résultat + BTTS' : '⚽ Scénario buts',
 desc: combo.desc || 'Même match · marchés corrélés exacts Winamax',
 legs: combo.legs,
+sameGame: true,
+rawCombinedProb: combo.rawCombinedProb,
+combinedProb: combo.combinedProb,
+correlationAvg: combo.correlationAvg,
+correlationNote: combo.correlationNote,
+totalOdd: combo.totalOdd,
 }));
 if (bold.length >= 2) combines.push({ type: 'bold', title: '🎯 Audacieux', desc: 'Fiabilité correcte sur cotes plus hautes', legs: bold });
 
 return combines.map(c => {
 const totalOdd = c.legs.reduce((acc, l) => acc * l.odd, 1);
 const avgProb = c.legs.reduce((acc, l) => acc + l.pred.pick.prob, 0) / c.legs.length;
-const combinedProb = c.legs.reduce((acc, l) => acc * l.pred.pick.prob, 1);
+const rawCombinedProb = c.rawCombinedProb ?? c.legs.reduce((acc, l) => acc * l.pred.pick.prob, 1);
+const comboProb = (typeof estimateSameGameComboProb === 'function')
+? estimateSameGameComboProb(c.legs, c.type)
+: { adjusted: rawCombinedProb, correlationAvg: 0, note: 'corrélation non mesurée' };
+const combinedProb = c.combinedProb ?? comboProb.adjusted;
+const correlationAvg = c.correlationAvg ?? comboProb.correlationAvg ?? 0;
+const correlationNote = c.correlationNote ?? comboProb.note ?? '';
 const nextKickoff = Math.min(...c.legs.map(l => l.startIn));
-return { ...c, totalOdd, avgProb, combinedProb, nextKickoff };
+return { ...c, totalOdd, avgProb, rawCombinedProb, combinedProb, correlationAvg, correlationNote, nextKickoff };
 });
 }
 try { window.buildCombines = buildCombines; } catch(e){}

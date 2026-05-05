@@ -2,6 +2,43 @@
 
 Date: 2026-05-05
 
+## Phase 7 — Couverture marchés étendue
+
+Status: livré (`v36.014` → `v36.024`).
+
+### Livré
+
+- Marchés joueurs foot: buteur, 2+ buts et carton joueur via `football_player_props.json/js`.
+- Marchés joueurs basket: points, rebonds, passes et 3-points via `nba_player_props.json/js`.
+- Asian handicap quart-point et total asiatique quart-point dans le modèle Poisson étendu.
+- Score correct mi-temps / temps plein: matrice complète des 9 combinaisons HT/FT.
+- Marchés stats foot: corners, cartons et fautes via `total_corners.json/js`, `total_cards.json/js`, `total_fouls.json/js`.
+- Première et dernière équipe à marquer, BTTS deux mi-temps, totaux basket Q1/Q2/Q3/Q4.
+- Tennis: total jeux match, jeux par set et nombre de sets.
+- MLB/NHL: strikeouts pitcher, HR allowed, totaux NHL et 1ère période via les sidecars existants.
+- Same-game builders: combinés même match avec probabilité brute + probabilité corrigée par corrélation.
+
+### Métriques après passe
+
+- `football_player_props.json`: 75 matchs, 592 props.
+- `nba_player_props.json`: 17 matchs, 256 props.
+- Stats foot: 188 matchs couverts sur corners/cartons/fautes.
+- MLB/NHL props: sidecars JS générés et chargés dans `pronostics.html`.
+- Same-game builders: 10+ tickets corrélés disponibles sur le snapshot local quand un match foot exact propose plusieurs marchés.
+
+### Validation effectuée
+
+- Syntaxe `app.js`: OK.
+- `python scripts/check_pipeline_drift.py`: OK, 0 drift.
+- `python scripts/build_health.py`: OK, `health.json` régénéré (`warning` local car snapshot vieux de 90 min).
+- Suite Phase 7 Chromium desktop: 9 passed, 0 failed.
+- Test ciblé same-game desktop + mobile: 2 passed, 0 failed.
+
+### Points reportés
+
+- Les props MLB/NHL restent dépendantes des sidecars existants; pas de nouvelle source live ajoutée dans cette passe.
+- Les probabilités same-game sont heuristiques et conservatrices; elles devront être recalibrées avec `picks_history.jsonl` quand les tickets corrélés auront assez d'historique réglé.
+
 ## Phase 6 — Modèle V4 contextuel
 
 Status: livré en couche gardée (`v36.001` → `v36.013`).
