@@ -620,3 +620,11 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Tests: `critical-flows.spec.js` 61 passed / 7 skipped; paquet combine audit P0 + helpers + evaluate + audit fixes 112 passed / 4 skipped.
 - Gardes: syntax JS/HTML OK, no conflict markers OK, bundle sous cap (`app.js` 1,598,951 / 1,600,000).
 - Cache/footer bumpes v35.455; `app.js` hash `30066214`.
+
+## Sprint v35.456 — AUTO 10/10 Tableau legacy filters + audits finaux (14:41 UTC)
+- Validation live: ancien filtre local `sport/tier/time=all` ne vide plus l'accueil; table desktop affiche 271 picks et les 5 tiers.
+- QA: ajout de `phase-finale-dashboard.spec.js` pour garantir >=30 picks visibles, 5 tiers, legende score et tooltip decomposition sur desktop + mobile.
+- UX/a11y: le bandeau de synchro abandonne les gradients pour des couleurs solides lisibles, ce qui remet l'audit a11y a 0 critical / 0 serious / 0 moderate.
+- Pipeline: `night_metrics.json` regenere depuis `data.js`; MCP live `today=2026-05-05`, `winamax_exact_ratio=0.9839`, `sync_check=ok`.
+- Tests: phase finale + score + CLV + signaux modal 10/10; Lighthouse 100/100/100/100 sur mobile/desktop; syntax JS OK; bundle `app.js` 1,599,342 bytes sous cap.
+- Cache/footer bumpes v35.456; `app.js` hash `0869ee0e`.

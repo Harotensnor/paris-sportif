@@ -13375,7 +13375,8 @@ changedIds.add(String(ev.id));
 window.__pendingScoreFlash = changedIds;
 const syncBanner = document.getElementById('__boot-sync-banner');
 if (syncBanner) {
-syncBanner.style.background = 'linear-gradient(90deg,#34d399 0%,#10b981 100%)';
+syncBanner.style.background = '#bbf7d0';
+syncBanner.style.color = '#052e16';
 syncBanner.textContent = '✓ Données à jour';
 setTimeout(() => syncBanner.remove(), 1500);
 }
@@ -13644,11 +13645,11 @@ shouldPollAtBoot = !d?.generated_at || !Number.isFinite(ageMs) || ageMs > 30 * 6
 if (ageMs > 30 * 60000) {
 const banner = document.createElement('div');
 banner.id = '__boot-sync-banner';
-banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99;padding:10px 16px;background:linear-gradient(90deg,rgba(167,139,250,.95) 0%,rgba(52,211,153,.85) 100%);color:#08080a;font-size:13px;font-weight:700;text-align:center;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 2px 12px rgba(0,0,0,.3);';
+banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99;padding:10px 16px;background:#dbeafe;color:#0f172a;font-size:13px;font-weight:700;text-align:center;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 2px 12px rgba(0,0,0,.3);';
 banner.setAttribute('role', 'status');
 banner.setAttribute('aria-live', 'polite');
 banner.innerHTML = `
-          <span style="display:inline-block;width:14px;height:14px;border:2px solid #08080a;border-top-color:transparent;border-radius:50%;animation:bsync-spin 0.8s linear infinite;"></span>
+          <span style="display:inline-block;width:14px;height:14px;border:2px solid #0f172a;border-top-color:transparent;border-radius:50%;animation:bsync-spin 0.8s linear infinite;"></span>
           📡 Synchronisation des dernières données… (la version affichée est en cache)
         `;
 if (!document.getElementById('__boot-sync-style')) {
@@ -14366,7 +14367,16 @@ const _dataIsStale = _dataAgeMin > 240; // 4h
 const v36FilterKey = 'paris_sportif_v36_home_filter';
 const v36Filter = (() => {
 const parsed = safeLocalStorageJson(v36FilterKey, {});
-return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {};
+const clean = { ...parsed };
+['sport', 'tier', 'time', 'q'].forEach(key => {
+const value = String(clean[key] ?? '').trim();
+if (!value || value === 'all' || value === 'tous' || value === 'undefined' || value === 'null') clean[key] = '';
+});
+if (clean.search && !clean.q) clean.q = String(clean.search || '').trim();
+if (!['tier','date','time','odd','conf','edge','score'].includes(clean.sort)) clean.sort = 'tier';
+if (!clean.date) clean.date = 'all';
+return clean;
 })();
 const v37BlindMode = v36Filter.blind === true || v36Filter.blind === '1';
 try { window.__v37BlindMode = v37BlindMode; } catch(e) {}
@@ -14799,7 +14809,7 @@ const friendlyBadges = badges.map(v37HumanBadge).filter(Boolean);
 const tooltip = [
 `Score d'opportunité ${clean}/100`,
 `Décomposition: ${scoreParts.join(' · ')}`,
-'Score plafonné entre 0 et 100; il combine edge, confiance, stabilité du signal, fraîcheur data, biais marché, timing, signaux rares et profil Théo',
+'Score plafonné entre 0 et 100; il combine edge, confiance, stabilité du signal, Fraîcheur data, biais marché, timing, signaux rares et profil Théo',
 friendlyBadges.length ? friendlyBadges.join(' · ') : 'aucun angle spécial',
 conflictAngle?.context || '',
 uncertainMarket?.context ? `Marché incertain: ${uncertainMarket.context}` : '',
