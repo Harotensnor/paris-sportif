@@ -2,6 +2,12 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
+## Sprint v35.445 — AUTO 10/10 Phase finale validation tableau (11:48 UTC)
+- Validation post-mega #1.1 : accueil teste en navigateur desktop 1440x900 avec donnees locales servies en no-store.
+- Resultat : 279 picks visibles, table presente, 0 erreur console, stale warning absent car data fraiche.
+- Couverture tiers : Tier 1=40, Tier 2=99, Tier 3=87, Tier 4=43, Tier 5=10; tous les niveaux sont bien alimentes.
+- Artefacts : `audit-artifacts/phase-finale-dashboard-validation.json` et capture `audit-artifacts/phase-finale-dashboard-1440.png`; cache/footer bumpes v35.445.
+
 ## Sprint v35.444 — AUTO 10/10 Section K6 timing mise (11:19 UTC)
 - Innovation K6 : `timing_edges.json` expose maintenant une recommandation lisible (`parier_maintenant`, `attendre_compos`, `reverifier_cote`) avec raison en francais naturel.
 - Calcul local : `build_betting_intelligence.py` lit `odds_history.jsonl` pour preparer volatilite, range de cote et sparkline-ready quand les snapshots existent.
