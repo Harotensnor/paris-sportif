@@ -980,3 +980,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Tests: `basket-quarter-totals.spec.js` passe desktop + mobile (2/2); `app.js` syntax OK; drift pipeline OK.
 - Cache/footer bumpes v36.021; `app.js` hash `3b1b730d`, SW `paris-sportif-20260505-215524`.
 
+## Sprint v36.022 — AUTO 10/10 Phase 7 YY tennis jeux et sets (21:57 UTC)
+- Modèle: `tennisScorePrediction()` reste exposé en debug/test et couvre total jeux match, jeux par set et score sets.
+- UI: libellé corrigé en `Total jeux match`, avec panneaux testables pour jeux par set et nombre de sets.
+- Robustesse: le test passe même si le snapshot du jour ne contient pas de tennis bookable, via scénario synthétique contrôlé.
+- Tests: `tennis-games-sets.spec.js` passe desktop + mobile (2/2); `app.js` syntax OK; drift pipeline OK.
+- Cache/footer bumpes v36.022; `app.js` hash `6177f748`, SW `paris-sportif-20260505-215715`.
+

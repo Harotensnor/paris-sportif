@@ -5009,6 +5009,7 @@ const HOME_ADV = 2.5; // ~2.5 pts d'home-court, consensus NBA.
       games: { avgGames, avgSets, avgGamesPerSet, lines: games, setLines, sigma },
     };
   }
+  try { window.tennisScorePrediction = tennisScorePrediction; } catch(e){}
 
   // Secondary markets from the same Poisson model:
   //   Over/Under N.5  —  P(H+A > N) (default line 2.5, Winamax's most-liquid football total)
@@ -12306,11 +12307,11 @@ return `<span style="padding:7px 11px;border-radius:8px;background:rgba(255,255,
 }).join('');
 const setExact = (sc.items || []).slice(0, sc.bestOf === 5 ? 4 : 3).map(s => `<span style="padding:7px 11px;border-radius:8px;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.18);font-size:12px;font-weight:650;color:var(--text);font-variant-numeric:tabular-nums;">Sets ${esc(s.label)} · ${(s.prob*100).toFixed(0)}%</span>`).join('');
 tennisGamesHtml = `
-                  <div class="u-mt-3">
-                    <div class="lbl-tiny-mb">🎾 Total jeux (Phase 3)</div>
+                  <div class="u-mt-3" data-market-panel="tennis-games">
+                    <div class="lbl-tiny-mb">🎾 Total jeux match</div>
                     <div style="display:flex;gap:8px;flex-wrap:wrap;">${gameLines}</div>
-                    ${setLines ? `<div class="lbl-tiny-mb u-mt-3">🎾 Total jeux par set</div><div style="display:flex;gap:8px;flex-wrap:wrap;">${setLines}</div>` : ''}
-                    ${setExact ? `<div class="lbl-tiny-mb u-mt-3">🎾 Score exact sets</div><div style="display:flex;gap:8px;flex-wrap:wrap;">${setExact}</div>` : ''}
+                    ${setLines ? `<div class="lbl-tiny-mb u-mt-3">🎾 Total jeux par set</div><div data-market-panel="tennis-set-games" style="display:flex;gap:8px;flex-wrap:wrap;">${setLines}</div>` : ''}
+                    ${setExact ? `<div class="lbl-tiny-mb u-mt-3">🎾 Nombre de sets / score exact</div><div data-market-panel="tennis-set-count" style="display:flex;gap:8px;flex-wrap:wrap;">${setExact}</div>` : ''}
                     <div style="margin-top:4px;font-size:10.5px;color:var(--text-dim2,#7b8693);line-height:1.3;">Approx. Gaussienne basée sur ${sc.bestOf===5?'BO5 σ≈√50':'BO3 σ≈√25'}. Plus le match est tight, plus le total est élevé.</div>
                   </div>`;
 }
