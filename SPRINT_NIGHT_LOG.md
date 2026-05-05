@@ -2,6 +2,12 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
+## Sprint v35.433 — AUTO 10/10 Section 0 validation finale (10:46 UTC)
+- Validation Section 0.7 : `night_metrics` regenere depuis `data.js`, `data.today=2026-05-05`, `audit_data_truth` OK.
+- Couverture : 334 events Winamax, 304 upcoming, 329 exacts Winamax (98.5%), 329 marchés >1n2, 715/721 détails Winamax disponibles.
+- Santé : MCP smoke OK 14/18 (4 outils a arguments skippes), pipeline drift OK, health data 6 min old.
+- Tableau : `dashboard-market-depth` desktop+mobile OK, donc >80 lignes rendues et table non vide; cache/footer bumpes v35.433.
+
 ## Sprint v35.432 — AUTO 10/10 Marches placeholders non bloquants (10:45 UTC)
 - Fix Section 0.6 : les marchés à petit sample restent taggés `watch` au lieu de devenir des faux exploits ou de disparaître.
 - UI : le rail modèle affiche maintenant ces lignes comme "Marché en observation" avec ton prudent, sans bonus agressif dans le score.
