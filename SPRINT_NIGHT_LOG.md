@@ -2,6 +2,12 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
+## Sprint v35.428 — AUTO 10/10 Table stale lisible (10:31 UTC)
+- Fix Section 0.1 : le dashboard dense ne vide plus `v36PickPoolRaw` quand la data depasse 4h.
+- UX : table visible en lecture seule avec warning stale + refresh avant mise; plus d'ecran vide au reveil.
+- Tests : syntax OK; `dashboard-market-depth` desktop+mobile OK; bundle OK (`app.js` 1,597,405 / 1,600,000).
+- Cache/footer bumpes v35.428; `app.js` hash `6435c036`.
+
 ## Sprint v35.402 — C5 mode blind discipline (22:41 UTC)
 - Avant: le dashboard exposait directement cote et edge, ce qui pousse a juger le rendement avant de lire le contexte.
 - Apres: ajout d'un toggle persistant "Mode blind" qui masque cote et edge dans la table dense, les cards mobiles, les lanes sport et les suggestions perso.
