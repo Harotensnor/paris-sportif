@@ -873,3 +873,11 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Modal/debug: badges `Surface`, `Goalie`, `Pitcher` + `?debug=1.roleContext` visibles.
 - Pipeline: `build_role_context.py` branché dans cron local/GHA/health; drift pipeline OK.
 - Cache/footer bumpes v36.007; `app.js` hash `82951933`, `tennis_elo_surface.js` hash `ca9a2859`, `goalie_pitcher_context.js` hash `26b2b1f0`, SW `paris-sportif-20260505-211608`.
+
+## Sprint v36.008 — AUTO 10/10 Modèle V4 JJ effets stade (21:18 UTC)
+- Stades: `stadium_effects.json` couvre 244 venues avec altitude, capacité approximée et surface.
+- Modèle: Poisson ajoute +0.10 buts total uniquement pour les stades foot à altitude >1500m.
+- Modal/debug: badge stade altitude et `?debug=1.stadiumEffects` disponibles.
+- Pipeline: `build_stadium_effects.py` branché dans cron local/GHA/health; drift pipeline OK.
+- QA: `app.js` syntax OK, scripts Python compilés, health warning non critique.
+- Cache/footer bumpes v36.008; `app.js` hash `b22ac91c`, `stadium_effects.js` hash `59ba8826`, SW `paris-sportif-20260505-211842`.
