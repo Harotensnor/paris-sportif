@@ -6659,9 +6659,21 @@ baselineBrier: Number(artifact?.training?.rolling_origin?.baseline_brier || 0),
 featureImportance: (artifact?.feature_importance || []).slice(0, 8),
 };
 }
+function getFeatureEngineeringV5DebugSummary() {
+const artifact = (typeof window !== 'undefined') ? window.FEATURE_ENGINEERING_V5 : null;
+return {
+loaded: !!artifact,
+rows: Number(artifact?.rows || 0),
+featureCount: Number(artifact?.feature_count || 0),
+families: artifact?.families || {},
+topFeatures: (artifact?.feature_importance || []).slice(0, 10),
+generatedAt: artifact?.generated_at || null,
+};
+}
 try {
 window.getStackingMetaV5Nudge = getStackingMetaV5Nudge;
 window.getStackingMetaV5DebugSummary = getStackingMetaV5DebugSummary;
+window.getFeatureEngineeringV5DebugSummary = getFeatureEngineeringV5DebugSummary;
 } catch (e) {}
 
 let __predCache = new Map();
@@ -17527,6 +17539,7 @@ oddsSnapshotCoverage: v37SnapshotCoverage,
 teamPriors: getTeamPriorsDebugSummary(),
 bayesianPriorsV5: getBayesianV5DebugSummary(),
 stackingMetaV5: getStackingMetaV5DebugSummary(),
+featureEngineeringV5: getFeatureEngineeringV5DebugSummary(),
 seasonPhase: getSeasonPhaseDebugSummary(),
 starPlayers: getStarPlayersDebugSummary(),
 xgDecay: getXGDecayDebugSummary(),
@@ -23694,6 +23707,25 @@ return `<section style="margin-top:32px;">
           </div>
         </section>`;
 })();
+const v5FeatureEngineeringHtml = (() => {
+const data = window.FEATURE_ENGINEERING_V5 || null;
+if (!data) return '';
+const fam = data.families || {};
+return `<section style="margin-top:32px;">
+          <h2 class="page-h2">🧩 Feature engineering V5</h2>
+          <div style="padding:14px;background:var(--panel);border:1px solid var(--border);border-radius:12px;">
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+              ${Object.entries(fam).map(([k, arr]) => `<span style="padding:6px 9px;border-radius:999px;background:rgba(167,139,250,.10);border:1px solid rgba(167,139,250,.18);font-size:11.5px;color:var(--text-2);"><b>${esc(k)}</b> · ${Array.isArray(arr) ? arr.length : 0}</span>`).join('')}
+            </div>
+            <div style="font-size:12px;color:var(--text-dim);margin-bottom:8px;">Interactions, polynômes degré 2, fenêtres rolling 5/10/20 et encodages cycliques sont calculés hors UI puis exposés au debug.</div>
+            ${(data.feature_importance || []).slice(0, 8).map(it => `<div style="display:grid;grid-template-columns:1fr 80px 80px;gap:8px;padding:6px 0;border-top:1px solid var(--border);font-size:12px;align-items:center;">
+              <span>${esc(it.feature)}</span>
+              <span style="text-align:right;">corr ${Number(it.abs_corr_label || 0).toFixed(3)}</span>
+              <b style="text-align:right;color:var(--brand);">${Number(it.importance || 0).toFixed(3)}</b>
+            </div>`).join('')}
+          </div>
+        </section>`;
+})();
 wrap.innerHTML = `
       <div style="max-width:900px;margin:0 auto;padding:16px 12px 40px;">
         <div style="padding:40px 0 16px;border-bottom:1px solid var(--border);">
@@ -23727,6 +23759,7 @@ wrap.innerHTML = `
         ${v4SeasonPhaseHtml}
         ${v5BayesianPriorsHtml}
         ${v5StackingHtml}
+        ${v5FeatureEngineeringHtml}
 
         <section style="margin-top:32px;">
           <h2 class="page-h2">🧮 Comment le modèle décide</h2>
