@@ -48,7 +48,7 @@ test.describe('Audit 2026-05-01 fixes', () => {
     expect(result.whitelist).toContain('football');
   });
 
-  // P0-2 : alias #montantes-jour → montante-jour
+  // P0-2 : aliases legacy → hubs V36/V37
   test('P0-2 : router alias plural → singular for montantes', async ({ page }) => {
     const result = await page.evaluate(() => {
       return window.PAGE_ALIASES && {
@@ -56,8 +56,8 @@ test.describe('Audit 2026-05-01 fixes', () => {
         agent: window.PAGE_ALIASES['agent'],
       };
     });
-    expect(result.montantesJour).toBe('montante-jour');
-    expect(result.agent).toBe('bilan');
+    expect(result.montantesJour).toBe('performance');
+    expect(result.agent).toBe('performance');
   });
 
   // P0-7 : footer version mis à jour (pas v30)

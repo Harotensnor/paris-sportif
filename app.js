@@ -2198,7 +2198,12 @@ if (!w.match_id) return false;
 const mk = w.markets;
 if (!mk || !mk['1n2']) return false;
 const m = mk['1n2'];
-return Number(m.home) > 1 || Number(m.away) > 1;
+const homeOdd = Number(m.home);
+const awayOdd = Number(m.away);
+const drawOdd = m.draw == null ? null : Number(m.draw);
+if (!(homeOdd > 1) || !(awayOdd > 1)) return false;
+if (drawOdd != null && !(drawOdd > 1)) return false;
+return true;
 }
 try { window.isWinamaxBookable = isWinamaxBookable; } catch(e){}
 
@@ -29750,6 +29755,15 @@ const target = btn.dataset.pageLink;
 if (!target) return;
 const navBtn = document.querySelector(`.page-btn[data-page="${target}"]`);
 if (navBtn) navBtn.click();
+else {
+const resolved = (typeof PAGE_ALIASES !== 'undefined' && PAGE_ALIASES[target]) ? PAGE_ALIASES[target] : target;
+if (typeof VALID_PAGES !== 'undefined' && VALID_PAGES.includes(resolved)) {
+currentPage = resolved;
+try { localStorage.setItem('currentPage', resolved); } catch(e){}
+try { history.replaceState(null, '', location.pathname + location.search + '#' + resolved); } catch(e){}
+if (typeof applyPageView === 'function') applyPageView();
+}
+}
 try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch(e){}
 });
 });

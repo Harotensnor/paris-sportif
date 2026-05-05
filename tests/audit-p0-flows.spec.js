@@ -21,6 +21,7 @@ test.beforeEach(async ({ context }) => {
       const prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}');
       prefs.onboardingDone = true;
       localStorage.setItem('userPrefs', JSON.stringify(prefs));
+      sessionStorage.setItem('autoRefreshDoneAt', String(Date.now()));
     } catch (e) {}
   });
 });
@@ -135,8 +136,14 @@ test.describe('Audit P0 — Pages clés navigables', () => {
   test('page #matchs (Sprint 48) accessible', async ({ page }) => {
     await page.goto(URL + '#matchs');
     await page.waitForLoadState('networkidle');
-    // La page rendue contient "Matchs détectés" en titre
-    await expect(page.getByText('Matchs détectés')).toBeVisible({ timeout: 10000 });
+    // V37 consolide #matchs vers Accueil dense.
+    await page.waitForFunction(() => {
+      return Array.from(document.querySelectorAll('.v36-picks-table, .v36-table-cards')).some((el) => {
+        const style = getComputedStyle(el);
+        const rect = el.getBoundingClientRect();
+        return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+      });
+    }, { timeout: 10000 });
   });
 
   test('page #performance (Sprint 52) accessible avec sub-tabs', async ({ page }) => {
@@ -166,8 +173,8 @@ test.describe('Audit P0 — Backtest helpers exposés', () => {
         completed: true,
         status: 'STATUS_FINAL',
         competitors: [
-          { home_away: 'home', score: '2' },
-          { home_away: 'away', score: '1' },
+          { home_away: 'home', name: 'Home', score: '2' },
+          { home_away: 'away', name: 'Away', score: '1' },
         ],
       };
       return window.evaluateMarketPick(fakeMatch, '1n2', '1');
@@ -183,8 +190,8 @@ test.describe('Audit P0 — Backtest helpers exposés', () => {
         completed: true,
         status: 'STATUS_RETIRED',
         competitors: [
-          { home_away: 'home', score: '1' },
-          { home_away: 'away', score: '0' },
+          { home_away: 'home', name: 'Home', score: '1' },
+          { home_away: 'away', name: 'Away', score: '0' },
         ],
       };
       return window.evaluateMarketPick(fakeMatch, '1n2', '1');
@@ -305,7 +312,7 @@ test.describe('Audit Part 16 — Cohérence formules EV / Kelly / Edge', () => {
       const orig = window.advFilters || {};
       const saved = JSON.stringify(orig);
       try {
-        window.advFilters = { ...orig, valueOnly: true, evMin: 0 };
+        Object.assign(window.advFilters, { valueOnly: true, evMin: 0 });
         const fn = window.passesValueFilter;
         if (typeof fn !== 'function') return { error: 'no helper' };
         // edge négatif → false

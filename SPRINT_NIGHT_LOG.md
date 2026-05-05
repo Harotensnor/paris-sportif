@@ -613,3 +613,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Garde-fou: le test vérifie lignes non vides, labels 0/1, cotes/probas valides, et `training_rows_count` synchronisé.
 - Mesure: `tests/backtest-training-rows.spec.js` 2/2 desktop + mobile.
 - Cache/footer bumpes v35.427.
+
+## Sprint v35.455 — AUTO 10/10 Validation finale stabilisee (13:02 UTC)
+- QA: stabilisation des specs V37 apres refonte 5 hubs, footer aliases, modal detail et table responsive.
+- Fix: `isWinamaxBookable` refuse maintenant les cotes polluees sans home/away valides; les liens footer legacy retombent vers les aliases de pages valides.
+- Tests: `critical-flows.spec.js` 61 passed / 7 skipped; paquet combine audit P0 + helpers + evaluate + audit fixes 112 passed / 4 skipped.
+- Gardes: syntax JS/HTML OK, no conflict markers OK, bundle sous cap (`app.js` 1,598,951 / 1,600,000).
+- Cache/footer bumpes v35.455; `app.js` hash `30066214`.

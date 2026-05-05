@@ -129,8 +129,8 @@ test.describe('evaluateModelPick — fixture-based smoke tests', () => {
         status: 'STATUS_FINAL',
         sport: 'football',
         competitors: [
-          { home_away: 'home', score: '3', winner: true },
-          { home_away: 'away', score: '0', winner: false },
+          { home_away: 'home', name: 'Home', score: '3', winner: true },
+          { home_away: 'away', name: 'Away', score: '0', winner: false },
         ],
       };
       const pred = { pick: { key: '1', label: 'Home' } };
