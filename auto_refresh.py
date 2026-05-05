@@ -120,6 +120,7 @@ PATCH_STAGES = [
     ('build_niche_markets.py',      1,   30),
     ('build_mlb_player_props.py',   1,   15),
     ('build_nhl_playoff_markets.py', 1,  15),
+    ('build_tennis_challenger_watchlist.py', 1, 15),
     ('build_sports_expansion_audit.py', 1, 15),
     ('detect_boosted_odds.py',      1,   30),
     ('build_signal_gap_report.py',  1,   15),
