@@ -280,6 +280,7 @@ def collect(selected_leagues: set[str] | None = None, pages: int = 3,
           f'({totals["misses"]} misses, {elapsed:.1f}s)', flush=True)
     return {
         'generated_at': datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace('+00:00', 'Z'),
+        'status': 'ok' if events else 'no_fresh_lineups',
         'events': events,
         'stats': totals,
     }
@@ -319,17 +320,18 @@ def main() -> int:
     ap = argparse.ArgumentParser(description='Fetch Sofascore soccer lineups.')
     ap.add_argument('--debug', action='store_true', help='log expected 404/no-lineup misses')
     ap.add_argument('--top-leagues', default='', help='comma-separated league codes to fetch')
-    ap.add_argument('--hours-ahead', type=int, default=72, help='upcoming window; lineups often appear <72h')
-    ap.add_argument('--pages', type=int, default=3, help='Sofascore pagination depth per league')
+    ap.add_argument('--hours-ahead', type=int, default=168, help='upcoming window; lineups often appear close to kickoff')
+    ap.add_argument('--pages', type=int, default=4, help='Sofascore pagination depth per league')
     args = ap.parse_args()
     DEBUG = bool(args.debug)
     selected = {x.strip() for x in args.top_leagues.split(',') if x.strip()} or None
     data = collect(selected_leagues=selected, pages=max(1, args.pages),
                    hours_ahead=max(1, args.hours_ahead))
-    if not data.get('events'):
-        print('  no lineups collected — not overwriting existing file')
-        return 1
     data = merge_existing_lineups(data)
+    if not data.get('events'):
+        data['status'] = 'no_lineups_available'
+    elif data.get('status') == 'no_fresh_lineups':
+        data['status'] = 'retained_existing_lineups'
     OUT.write_text(json.dumps(data, ensure_ascii=False, separators=(',', ':')),
                    encoding='utf-8')
     print(f'  wrote {OUT} ({OUT.stat().st_size / 1024:.1f}KB)', flush=True)

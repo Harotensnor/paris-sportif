@@ -641,3 +641,12 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fallback: si le pool de picks est vide alors que le scan contient des matchs, le tableau affiche un message actionnable vers Tous les matchs au lieu d'une zone muette.
 - Cache: `app.js` et `app.css` restampes, `CACHE_VERSION` bumpe pour forcer le navigateur de Theo a reprendre le nouveau bundle.
 - QA: `phase-finale-dashboard.spec.js` couvre le mode debug desktop/mobile; syntax JS OK, bundle sous cap (`app.js` 1,598,136 bytes), no conflict markers OK.
+
+## Sprint v35.459 — AUTO 10/10 Pipeline frais + 5 tiers visibles (15:29 UTC)
+- Pipeline: refresh live local puis patch Winamax, injuries, lineups, referees, weather, xG, team stats et profils publics; `data.js` revient a `generated_at=2026-05-05T15:23:16Z`.
+- Donnees: `night_metrics` confirme 285 events Winamax, 285 exacts, 285 avec marches detailles, 265 a venir, injuries 159, lineups 97, referee_signal 97, xG 199.
+- Robustesse fetchers: injuries/lineups/referees passent par defaut a 168h/4 pages, ecrivent un `status` explicite et ne laissent plus un fichier stale silencieux si la source ne retourne rien.
+- Health: `build_health.py` remonte maintenant les statuts source (`ok`, `no_fresh_*`, etc.) dans `health.json`; `audit_data_truth.py` et MCP smoke OK.
+- UX table: la fenetre dense de 360 lignes garantit maintenant au moins un representant de chaque tier disponible, donc l'Outsider n'est plus cache derriere le tri par tier.
+- QA: syntax JS/HTML/SW OK, bundle sous cap (`app.js` 1,599,230 bytes), `phase-finale-dashboard.spec.js` 4/4 desktop+mobile, `check_pipeline_drift` OK.
+- Cache/footer bumpes v35.459; `app.js` hash `c2c2f384`.
