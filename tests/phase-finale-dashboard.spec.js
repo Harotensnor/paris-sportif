@@ -68,3 +68,49 @@ test('phase finale: dashboard remains full when legacy filters stored "all"', as
   expect(state.scoreTooltip).toContain("Score d'opportunité");
   expect(state.scoreTooltip).toContain('Décomposition');
 });
+
+test('phase finale: dashboard debug mode exposes real filtering counters', async ({ page }) => {
+  const logs = [];
+  page.on('console', (msg) => {
+    if (msg.text().includes('[v37 debug]')) logs.push(msg.text());
+  });
+
+  await page.goto('/pronostics.html?debug=1#dashboard');
+  await expect(page.locator('[data-v37-debug-panel]')).toBeVisible({ timeout: 20_000 });
+  await page.waitForFunction(() => {
+    const panel = document.querySelector('[data-v37-debug-panel]');
+    return !!panel && panel.textContent.includes('terminalScanPool') && panel.textContent.includes('v36PickPool');
+  });
+  await page.waitForFunction(() => {
+    const visible = (el) => {
+      const style = getComputedStyle(el);
+      const rect = el.getBoundingClientRect();
+      return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+    };
+    const rows = [...document.querySelectorAll('.v36-picks-table tbody .v36-table-row')].filter(visible);
+    const cards = [...document.querySelectorAll('.v36-table-cards .v36-table-card')].filter(visible);
+    return Math.max(rows.length, cards.length) >= 30;
+  }, null, { timeout: 20_000 });
+
+  const state = await page.evaluate(() => {
+    const visible = (el) => {
+      const style = getComputedStyle(el);
+      const rect = el.getBoundingClientRect();
+      return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+    };
+    const panel = document.querySelector('[data-v37-debug-panel]');
+    const rows = [...document.querySelectorAll('.v36-picks-table tbody .v36-table-row')].filter(visible);
+    const cards = [...document.querySelectorAll('.v36-table-cards .v36-table-card')].filter(visible);
+    return {
+      panelText: panel?.textContent || '',
+      rows: Math.max(rows.length, cards.length),
+      emptyHelp: document.querySelector('.v37-empty-pool-help')?.textContent || '',
+    };
+  });
+
+  expect(state.panelText).toContain('Raisons de rejet');
+  expect(state.panelText).toContain('Filtres actifs');
+  expect(state.rows).toBeGreaterThanOrEqual(30);
+  expect(state.emptyHelp).toBe('');
+  expect(logs.length).toBeGreaterThanOrEqual(1);
+});

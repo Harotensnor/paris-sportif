@@ -634,3 +634,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Produit: l'accueil est confirme plein (271 lignes, 5 tiers) et les extensions visibles sont documentees: tier 2 foot, Asie/LATAM, MLB, NHL, Serie B, Bundesliga 2, Ligue 2, Liga 2.
 - Transparence: foot feminin, Challenger et rugby restent en `watch_not_bookable` parce qu'aucun evenement Winamax exact n'est present dans le snapshot courant.
 - QA: les specs critiques V37 vertes sont listees; le seul chantier actif reste le nettoyage du run complet Playwright legacy.
+
+## Sprint v35.458 — AUTO 10/10 Diagnostic tableau Theo (16:13 UTC)
+- UX: ajout du mode `?debug=1` sur l'accueil avec compteurs V37, filtres actifs, raisons de rejet et 10 premiers matchs scannes pour isoler les caches ou filtres utilisateur.
+- Modele/table: le seuil d'entree tolere maintenant les edges tres serres jusqu'a -0.5pt sur les tiers Sur/Solide, sans transformer les autres tiers value en faux positifs.
+- Fallback: si le pool de picks est vide alors que le scan contient des matchs, le tableau affiche un message actionnable vers Tous les matchs au lieu d'une zone muette.
+- Cache: `app.js` et `app.css` restampes, `CACHE_VERSION` bumpe pour forcer le navigateur de Theo a reprendre le nouveau bundle.
+- QA: `phase-finale-dashboard.spec.js` couvre le mode debug desktop/mobile; syntax JS OK, bundle sous cap (`app.js` 1,598,136 bytes), no conflict markers OK.

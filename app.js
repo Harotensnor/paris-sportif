@@ -964,35 +964,12 @@ try { localStorage.removeItem(key); return true; } catch(e) { logSafeError(`_saf
 try { window._safeStorage = _safeStorage; } catch(e){ logSafeError('boot expose _safeStorage', e); }
 
 
-/**
-   * Wrapper around document.querySelector for shorter calls.
-   * @param {string} selector - CSS selector
-   * @param {ParentNode} [root=document] - Root element to search within
-   * @returns {Element|null}
-   */
 function _qs(selector, root = document) {
 return root.querySelector(selector);
 }
-/**
-   * Wrapper around document.querySelectorAll that returns an Array (not NodeList).
-   * Allows .map/.filter/.forEach without conversion.
-   * @param {string} selector - CSS selector
-   * @param {ParentNode} [root=document] - Root element to search within
-   * @returns {Element[]}
-   */
 function _qsa(selector, root = document) {
 return Array.from(root.querySelectorAll(selector));
 }
-/**
-   * Create DOM element with attributes and children.
-   * Supports {style: {color: 'red'}}, {dataset: {id: '1'}}, {onClick: fn}, plain attrs.
-   * Children can be strings (auto text nodes) or DOM nodes.
-   * @param {string} tag - Element tag name
-   * @param {Object} [attrs={}] - Attributes/props/event listeners
-   * @param {...(string|Node)} children - Child nodes
-   * @returns {HTMLElement}
-   * @example _ce('button', { class: 'btn', onClick: handleClick }, 'Click me')
-   */
 function _ce(tag, attrs = {}, ...children) {
 const el = document.createElement(tag);
 for (const [k, v] of Object.entries(attrs)) {
@@ -1010,16 +987,6 @@ return el;
 }
 try { window._qs = _qs; window._qsa = _qsa; window._ce = _ce; } catch(e){}
 
-/**
-   * Event delegation : attach a listener on parent, dispatched only when target
-   * matches the selector. Allows attaching once on a static parent for many
-   * dynamic children, and survives DOM updates.
-   * @param {Element} parent - Parent element to attach listener on
-   * @param {string} eventType - 'click', 'input', etc.
-   * @param {string} selector - CSS selector for target match
-   * @param {Function} handler - (event, matchedTarget) => void
-   * @example _on(wrap, 'click', '[data-bookmark]', (e, btn) => toggle(btn.dataset.bookmark))
-   */
 function _on(parent, eventType, selector, handler) {
 if (!parent || !parent.addEventListener) return;
 trackedAddEventListener(parent, eventType, (e) => {
@@ -1029,13 +996,6 @@ if (target && parent.contains(target)) handler.call(target, e, target);
 }
 try { window._on = _on; } catch(e){}
 
-/**
-   * Wraps an async function with try/catch + user-facing toast on error.
-  * Logs only in explicit debug mode and never throws to caller. Returns null on error.
-   * @param {Function} fn - Async function to execute
-   * @param {string} [errorMsg] - User-facing error message
-   * @returns {Promise<*|null>} Result of fn() or null on error
-   */
 async function _safeAsync(fn, errorMsg = 'Une erreur est survenue') {
 try { return await fn(); }
 catch(e) {
@@ -1047,12 +1007,6 @@ return null;
 }
 try { window._safeAsync = _safeAsync; } catch(e){}
 
-/**
-   * Copy text to clipboard. Uses Clipboard API in secure contexts,
-   * falls back to execCommand('copy') on older browsers / non-HTTPS.
-   * @param {string} text - Text to copy
-   * @returns {Promise<boolean>} true on success
-   */
 async function _copyToClipboard(text) {
 if (!text) return false;
 try {
@@ -1073,13 +1027,6 @@ return ok;
 }
 try { window._copyToClipboard = _copyToClipboard; } catch(e){}
 
-/**
-   * Human-friendly relative time (FR locale).
-   * Past : "à l'instant", "il y a 5 min", "il y a 3 jours", "il y a 2 ans"
-   * Future : "dans 10 min", "dans 2 jours"
-   * @param {number} ts - Unix timestamp (ms)
-   * @returns {string}
-   */
 function _fmtRelativeTime(ts) {
 if (!ts || !isFinite(ts)) return '';
 const diffMs = Date.now() - ts;
@@ -1106,17 +1053,6 @@ return n.toLocaleString('fr-FR', { minimumFractionDigits: decimals, maximumFract
 }
 try { window._fmtNumber = _fmtNumber; } catch(e){}
 
-/**
-   * Custom-styled confirm modal (replacement for native confirm()).
-   * Better UX, themable, keyboard-accessible (Esc=cancel, Enter=confirm).
-   * @param {Object} opts
-   * @param {string} [opts.title='Confirmer']
-   * @param {string} [opts.body='']
-   * @param {string} [opts.confirmLabel='Confirmer']
-   * @param {string} [opts.cancelLabel='Annuler']
-   * @param {boolean} [opts.danger=false]
-   * @returns {Promise<boolean>} true if user confirmed, false otherwise
-   */
 function _showConfirm(opts) {
 return new Promise(resolve => {
 const overlay = document.createElement('div');
@@ -1156,10 +1092,6 @@ if (btn) btn.focus();
 }
 try { window._showConfirm = _showConfirm; } catch(e){}
 
-/**
-   * Trigger haptic vibration on mobile (no-op if unsupported).
-   * @param {'light'|'medium'|'heavy'|'double'} [type='light']
-   */
 function _haptic(type = 'light') {
 if (!navigator.vibrate) return;
 const patterns = { light: 8, medium: 18, heavy: 30, double: [10, 50, 10] };
@@ -14853,6 +14785,17 @@ const v37HashParams = (() => {
 try { return new URLSearchParams((location.hash || '').split('?')[1] || ''); }
 catch(e) { return new URLSearchParams(''); }
 })();
+const v37DebugOn = (() => {
+try {
+const qs = new URLSearchParams(location.search || '');
+return qs.get('debug') === '1' || v37HashParams.get('debug') === '1' || safeLocalStorageGet('paris_sportif_v37_debug', '') === '1';
+} catch(e) { return false; }
+})();
+const v37RejectReasons = {};
+const v37Reject = (reason) => {
+if (!reason) return;
+v37RejectReasons[reason] = (v37RejectReasons[reason] || 0) + 1;
+};
 const v37HashDate = v37HashParams.get('date') || '';
 const v37StoredDate = v36Filter.date || 'all';
 const v37DateFilter = (/^\d{4}-\d{2}-\d{2}$/.test(v37HashDate) || v37HashDate === 'all') ? v37HashDate : v37StoredDate;
@@ -14876,14 +14819,15 @@ return ts > Date.now();
 };
 const v36TeamName = (team) => team?.short || team?.displayName || team?.name || '?';
 const v37PickUid = (m, candidate) => `${String(m?.id || '')}|${marketCandidateSignature(candidate)}`;
+const v37SoftEdgeFloor = -0.005;
 const v36TierForCandidate = (c) => {
 const odd = Number(c?.odd || 0);
 const conf = Number(c?.rel || c?.prob || 0);
 const edge = Number.isFinite(Number(c?.edge)) ? Number(c.edge) : (conf && odd ? conf - 1 / odd : 0);
 const ev = Number.isFinite(Number(c?.ev)) ? Number(c.ev) : (conf && odd ? conf * odd - 1 : -1);
-if (!(odd >= 1.30) || !(conf > 0) || !(edge > 0) || !(ev > 0)) return null;
-if (odd >= 1.30 && odd < 1.50 && conf >= 0.72 && edge >= 0.001) return { id: 'safe', strict: conf >= 0.75 && edge >= 0.01 };
-if (odd >= 1.50 && odd < 2.00 && conf >= 0.58 && edge >= 0.001) return { id: 'solid', strict: conf >= 0.65 && edge >= 0.01 };
+if (!(odd >= 1.30) || !(conf > 0) || !(edge >= v37SoftEdgeFloor) || !(ev >= v37SoftEdgeFloor)) return null;
+if (odd >= 1.30 && odd < 1.50 && conf >= 0.72 && edge >= v37SoftEdgeFloor) return { id: 'safe', strict: conf >= 0.75 && edge >= 0.01 };
+if (odd >= 1.50 && odd < 2.00 && conf >= 0.58 && edge >= v37SoftEdgeFloor) return { id: 'solid', strict: conf >= 0.65 && edge >= 0.01 };
 if (odd >= 2.00 && odd < 3.00 && conf >= 0.45 && edge >= 0.03) return { id: 'value', strict: edge >= 0.05 };
 if (odd >= 3.00 && odd < 5.00 && conf >= 0.24 && edge >= 0.05) return { id: 'big', strict: edge >= 0.08 };
 if (odd >= 5.00 && conf >= 0.10 && edge >= 0.08) return { id: 'out', strict: edge >= 0.10 };
@@ -14922,16 +14866,23 @@ return out;
 const v36PickPoolRaw = v37ScanPool.flatMap(m => {
 try {
 const pred = predictMatch(m);
-if (!pred || !pred.pick) return [];
+if (!pred || !pred.pick) { v37Reject('no_pred_pick'); return []; }
 const rawCandidates = (typeof buildMarketCandidates === 'function')
 ? buildMarketCandidates(m, pred, { requireExact: true })
 : (() => {
 const best = _agentBestPick(m, pred);
 return best ? [best].concat(Array.isArray(best.allCandidates) ? best.allCandidates : []) : [];
 })();
+const candidateList = Array.isArray(rawCandidates) ? rawCandidates : [];
+if (!candidateList.length) v37Reject('require_exact_no_candidate');
 const seen = new Set();
-const ranked = rawCandidates
-.filter(c => c && Number(c.odd || 0) >= 1.30)
+const ranked = candidateList
+.filter(c => {
+const odd = Number(c?.odd || 0);
+if (!c) { v37Reject('empty_candidate'); return false; }
+if (!(odd >= 1.30)) { v37Reject('odd_lt_130'); return false; }
+return true;
+})
 .filter(c => {
 const key = `${c.market || ''}:${c.pickKey || c.key || c.side || c.label || ''}:${c.line ?? ''}:${Number(c.odd || 0).toFixed(2)}`;
 if (seen.has(key)) return false;
@@ -14940,11 +14891,14 @@ return true;
 })
 .map(c => {
 const tier = v36TierForCandidate(c);
-if (!tier) return null;
 const rel = Number(c.rel || c.prob || 0);
 const odd = Number(c.odd || 0);
 const edge = Number.isFinite(Number(c.edge)) ? Number(c.edge) : (rel - 1 / odd);
 const ev = Number.isFinite(Number(c.ev)) ? Number(c.ev) : (rel * odd - 1);
+if (!tier) {
+v37Reject(edge < v37SoftEdgeFloor ? 'edge_too_low' : ev < v37SoftEdgeFloor ? 'ev_too_low' : 'tier_threshold');
+return null;
+}
 const investmentScoreValue = Number(c.investment?.score || 0);
 const intel = v37OpportunityFor(m, tier, rel, edge, ev, odd, c, pred);
 return {
@@ -14968,8 +14922,9 @@ score: (tier.strict ? 120 : 0) + investmentScoreValue + intel.score * 0.5 + Math
 })
 .filter(Boolean)
 .sort((a, b) => b.score - a.score);
+if (!ranked.length) v37Reject('no_ranked_candidate');
 return v37TakeDiverseCandidates(ranked, m);
-} catch(e) { return []; }
+} catch(e) { v37Reject('candidate_exception'); return []; }
 }).sort((a, b) => a.ts - b.ts);
 const v36PickPool = (() => {
 const seenPick = new Set();
@@ -15031,6 +14986,31 @@ const v37FinishedAll = terminalScanPool.filter(m => m?.completed || _isMatchEffe
 const v36Next = v36UpcomingAll.slice(0, 6);
 const v37ScopeLabel = v37IsAllHorizon ? '7 prochains jours' : v37DateLabel(v37DateFilter);
 const v36CoverageLine = `${v36PickPool.length} picks · ${v36UpcomingAll.length} a venir · ${v37LiveAll.length} live · ${v37FinishedAll.length} termines · data ${_dataAgeMin} min`;
+const v37DebugMatches = () => terminalScanPool.slice(0, 10).map(m => {
+const { home, away } = getSides(m);
+return `${sportLabel(m?.sport || '')} ${parisDateISO(m?.date) || '?'} ${v36TeamName(home)}-${v36TeamName(away)} W:${isWinamaxBookable(m) ? '1' : '0'}`;
+});
+const v37DebugState = {
+terminalScanPool: terminalScanPool.length,
+v37ScanPool: v37ScanPool.length,
+v36PickPoolRaw: v36PickPoolRaw.length,
+v36PickPool: v36PickPool.length,
+v36Filtered: v36Filtered.length,
+v36Filter,
+_dataIsStale,
+_dataAgeMin,
+today: todayIso,
+rejectReasons: v37RejectReasons
+};
+if (v37DebugOn) {
+try { console.log('[v37 debug]', { ...v37DebugState, sampleMatches: v37DebugMatches() }); } catch(e) {}
+}
+const v37DebugPanelHtml = v37DebugOn ? `<section class="v37-debug-panel" data-v37-debug-panel><b>Debug tableau V37</b><span>Filtres actifs · Raisons de rejet · 10 premiers matchs scannes</span><pre>${esc(JSON.stringify({ ...v37DebugState, sampleMatches: v37DebugMatches() }, null, 2))}</pre></section>` : '';
+const v37EmptyPoolHelpHtml = (!v36PickPool.length && terminalScanPool.length > 10) ? `<section class="v37-empty-pool-help">
+        <strong>Aucun pick conforme aux 5 tiers pour l'instant.</strong>
+        <span>${terminalScanPool.length} matchs sont disponibles dans le scan, mais aucun ne passe les seuils cote, confiance, edge et marché exact Winamax. La liste complète reste consultable.</span>
+        <button type="button" class="page-btn" data-page="tous">Voir tous les matchs</button>
+      </section>` : '';
 const v36FilterButton = (kind, value, label, active) => `<button type="button" class="v36-filter-chip ${active ? 'is-active' : ''}" data-v36-filter="${esc(kind)}" data-v36-value="${esc(value)}">${label}</button>`;
 const v36SortButton = (value, label) => `<button type="button" class="v36-sort-btn ${v36Sort === value ? 'is-active' : ''}" data-v36-sort="${esc(value)}">${esc(label)}</button>`;
 const v37BlindOddHtml = (odd) => v37BlindMode
@@ -15211,6 +15191,8 @@ return `<section class="v37-personal-strip" aria-label="Suggestions personnalis�
       </section>`;
 })();
 const v36TableHtml = `<section class="v36-table-panel" aria-label="Tableau dense des propositions">
+        ${v37DebugPanelHtml}
+        ${v37EmptyPoolHelpHtml}
         ${v37TierLegendHtml}
         ${v37DayNavHtml}
         <header class="v36-table-toolbar">
@@ -29727,18 +29709,7 @@ if (_pwaDismissBtn) _pwaDismissBtn.addEventListener('click', () => { _pwaSnooze(
 const versionBadge = document.getElementById('footer-version');
 if (versionBadge) {
 const _showWhatsNew = () => {
-const features = [
-'Terminal Value : scanner exact Winamax sur 1N2, O/U, BTTS, DNB, handicaps, totals et marchés sport',
-'Deux tickets : principal value bankroll et attaque cote haute crédible, avec EV et Kelly capés',
-'Historique marchés : filtre par type de pari, proba, EV, edge, résultat et export CSV enrichi',
-'Coverage Winamax : le backend priorise tous les matchs exacts à 48h puis 7 jours avec cache et quotas',
-'Santé data : warnings sources vides et ratio de marchés détaillés visibles pour éviter les faux signaux',
-];
-const html = '<div style="text-align:left;padding:8px 0;">' +
-'<h3 style="margin:0 0 12px;font-size:18px;color:var(--text);">Nouveautés v35.0</h3>' +
-'<div style="font-size:11px;color:var(--text-dim);margin-bottom:14px;">Le site passe en mode value bankroll : une cote n\'est jouable que si la probabilité modèle bat la cote exacte Winamax.</div>' +
-'<ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:7px;font-size:13px;color:var(--text-2);line-height:1.5;">' +
-features.map(f => `<li>${f}</li>`).join('') + '</ul></div>';
+const html = '<div style="text-align:left;padding:8px 0;"><h3 style="margin:0 0 12px;font-size:18px;color:var(--text);">Nouveautés v35</h3><p style="font-size:13px;color:var(--text-2);line-height:1.5;margin:0;">Tableau V37 dense, score opportunité, marchés Winamax exacts, filtres sûrs et diagnostic data intégré.</p></div>';
 const existing = document.getElementById('__whatsnew-modal');
 if (existing) { existing.remove(); return; }
 const div = document.createElement('div');
