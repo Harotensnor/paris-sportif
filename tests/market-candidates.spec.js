@@ -145,8 +145,8 @@ test.describe('v35 market scanner', () => {
     expect(Object.values(labels).join(' | ')).not.toMatch(/\bDNB\s+[12]\b|BTTS (Oui|Non)|Mi-temps [12X]|Total buts .*équipe seulement/);
   });
 
-  test('does not invent an actionable market without Winamax odds', async ({ page }) => {
-    const count = await page.evaluate(() => {
+  test('keeps strict Winamax mode clean while allowing indicative fallback explicitly', async ({ page }) => {
+    const result = await page.evaluate(() => {
       const match = { id: 'no-bookmaker-market', sport: 'football', winamax: { available: true, markets: {} } };
       const pred = {
         pick: { key: '1', prob: 0.72, label: 'Home' },
@@ -154,9 +154,13 @@ test.describe('v35 market scanner', () => {
         odds: { home: 1.35, draw: 4.20, away: 7.00 },
         markets: { btts: { prob: 0.61 }, extended: { raw: { ou25: { over: 0.63, under: 0.37 } } } },
       };
-      return window.__testAPI.buildMarketCandidates(match, pred).length;
+      return {
+        strict: window.__testAPI.buildMarketCandidates(match, pred, { requireExact: true }).length,
+        indicative: window.__testAPI.buildMarketCandidates(match, pred, { requireExact: false }).filter(c => c.source === 'cote_indicative').length,
+      };
     });
-    expect(count).toBe(0);
+    expect(result.strict).toBe(0);
+    expect(result.indicative).toBeGreaterThanOrEqual(1);
   });
 
   test('exposes exact basket period totals and baseball F5 totals', async ({ page }) => {

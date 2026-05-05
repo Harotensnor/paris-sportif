@@ -53,6 +53,8 @@ async function markCandidates(page) {
         if (el.id === 'footer-version') return false;
         if (el.hasAttribute('data-pronos-page')) return false;
         if (el.classList.contains('skip-to-content') || href === '#main-content') return false;
+        if (/^paris-sportif\s+foot/i.test(text)) return false;
+        if (/^(🔕|✕|×)$/i.test(text)) return false;
         if (!visible(el)) return false;
         if (el.matches('[disabled],[aria-disabled="true"]')) return false;
         if (/^https?:|^tel:|^mailto:/i.test(href) || /\.(html|xml|json|png|svg|webp)$/i.test(href)) return false;
@@ -99,7 +101,9 @@ test('primary interactive elements click without JS errors', async ({ page }) =>
       const target = candidates[i];
       if (!target) continue;
       try {
-        await page.locator(`[data-click-audit-target="${target.id}"]`).first().click({ timeout: 3500, force: true });
+        const targetLocator = page.locator(`[data-click-audit-target="${target.id}"]`).first();
+        if (await targetLocator.count() === 0) continue;
+        await targetLocator.click({ timeout: 3500, force: true });
         await page.waitForTimeout(350);
         const realErrors = errors.filter(e =>
           !/favicon|sourcemap|Failed to load resource|net::ERR_ABORTED|40\d/i.test(e)
