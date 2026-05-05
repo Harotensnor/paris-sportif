@@ -2851,6 +2851,23 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
       const label = pred.pick.label || (pk === '1' ? 'Victoire domicile' : pk === '2' ? 'Victoire extérieur' : 'Match nul');
       _v35AddCandidate(out, { odd, side: pk === '1' ? 'home' : pk === '2' ? 'away' : 'draw', label }, rel, '1n2', pk, label);
     }
+    if (!opts.requireExact && pred.pick && pred.odds && !wxMk['1n2']) {
+      const pk = pred.pick.key;
+      const odd = pk === '1' ? pred.odds.home : pk === '2' ? pred.odds.away : pred.odds.draw;
+      const rel = _v35Prob(pred.pick?.prob ?? pred.reliability);
+      const label = pred.pick.label || (pk === '1' ? 'Victoire domicile' : pk === '2' ? 'Victoire extérieur' : 'Match nul');
+      _v35AddCandidate(out, {
+        odd,
+        side: pk === '1' ? 'home' : pk === '2' ? 'away' : 'draw',
+        label
+      }, rel, '1n2', pk, label, {
+        source: 'cote_indicative',
+        exact: false,
+        marketName: '1N2 · cote indicative',
+        marketInfo: 'Cote indicative issue du flux disponible, à revérifier chez Winamax avant de jouer.',
+        marketTooltip: 'Cote indicative : elle aide à lire le match, mais le prix final doit être vérifié chez Winamax.'
+      });
+    }
 
     const ext = pred.markets?.extended || {};
     const raw = ext.raw || {};
@@ -7065,12 +7082,15 @@ const pickOdd = best_pick[2] === '1' ? best?.home : best_pick[2] === '2' ? best?
 const pickEdge = Number(pickOdd) > 1 ? reliability - (1 / Number(pickOdd)) : null;
 const dqNow = (typeof computeDataQuality === 'function') ? computeDataQuality(match) : { score: 4, max: 4 };
 const abstainReasons = [];
-const minPureComponents = sportKey === 'football' ? 2 : 1;
-const ensembleMissing = !ensembleMeta || pureCompCount < minPureComponents;
+const leagueText = String(match?.league_name || match?.league || match?.league_code || '').toLowerCase();
+const isTopFootball = sportKey === 'football' && /(premier|liga|serie a|bundesliga|ligue 1|champions|europa|top-5)/i.test(leagueText);
+const isReducedModelSport = ['basketball', 'hockey', 'baseball', 'tennis'].includes(sportKey);
+const minPureComponents = isTopFootball ? 3 : sportKey === 'football' ? 2 : isReducedModelSport ? 1 : 1;
+const ensembleMissing = !ensembleMeta ? isTopFootball : pureCompCount < minPureComponents;
 if (reliability < 0.50) abstainReasons.push('confidence_lt_50');
-if (pickEdge != null && pickEdge < 0.02) abstainReasons.push('edge_lt_2pt');
+if (pickEdge != null && pickEdge < -0.005) abstainReasons.push('edge_negative');
 if (ensembleMissing) abstainReasons.push('ensemble_insufficient');
-if ((ensembleMeta?.agreement_variance || 0) > 0.15) abstainReasons.push('model_disagreement');
+if ((ensembleMeta?.agreement_variance || 0) > 0.20) abstainReasons.push('model_disagreement');
 if ((Number(dqNow?.score) || 0) < 2) abstainReasons.push('data_quality_lt_2');
 const abstain = {
 active: abstainReasons.length > 0,
@@ -13419,13 +13439,14 @@ if (!m) throw new Error('parse data.js failed');
 const full = JSON.parse(m[1]);
 const curNow = window.PRONOSTICS_DATA || {};
 const todayKey = curNow.today || full.today;
-const mergedDays = { ...(full.days || {}), ...(curNow.days || {}) };
-if (todayKey && curNow.days && curNow.days[todayKey]) {
+const keepCurrentDays = curNow && curNow._lite === false && curNow.days ? curNow.days : {};
+const mergedDays = { ...keepCurrentDays, ...(full.days || {}) };
+if (todayKey && curNow._lite === false && curNow.days && curNow.days[todayKey]) {
 mergedDays[todayKey] = curNow.days[todayKey];
 }
 window.PRONOSTICS_DATA = {
-...full,
 ...curNow,
+...full,
 days: mergedDays,
 _lite: false,
 _available_days: full.days ? Object.entries(full.days).filter(([, v]) => Array.isArray(v) && v.length).map(([k]) => k).sort() : [],
@@ -14225,8 +14246,12 @@ if (k <= 0) { return; } // pas d'edge → pas de mise
         _ensureFullData().then(() => {
           delete wrap.dataset.dashboardFullQueued;
           if (wrap && document.body.contains(wrap) && currentPage === 'dashboard') renderDashboardPage(wrap);
-        }).catch(() => { delete wrap.dataset.dashboardFullQueued; });
+        }).catch(() => { delete wrap.dataset.dashboardFullQueued; if (wrap) wrap.dataset.dashboardFullFailed = '1'; });
       }, 600);
+    }
+    if (data._lite && wrap && wrap.dataset.dashboardFullFailed !== '1') {
+      wrap.innerHTML = '<section class="v37-empty-pool-help is-info" style="margin:16px;"><strong>Chargement du tableau complet</strong><span>Les données rapides sont visibles, mais les 300+ matchs complets arrivent. Le tableau se remplit automatiquement dans quelques secondes.</span></section>';
+      return;
     }
     const todayIso = parisDateISO(new Date());
     const now = new Date();
@@ -14313,11 +14338,11 @@ return clean;
 const v37BlindMode = v36Filter.blind === true || v36Filter.blind === '1';
 try { window.__v37BlindMode = v37BlindMode; } catch(e) {}
 const v36TierDefs = [
-{ id: 'safe', icon: '1', label: 'Sur', range: '1.30-1.50', desc: 'Conf. 75%+ · edge positif', tone: 'safe' },
-{ id: 'solid', icon: '2', label: 'Solide', range: '1.50-2.00', desc: 'Conf. 65%+ · edge positif', tone: 'solid' },
-{ id: 'value', icon: '3', label: 'Valeur', range: '2.00-3.00', desc: 'Edge 5%+', tone: 'value' },
-{ id: 'big', icon: '4', label: 'Big odds', range: '3.00-5.00', desc: 'Edge 8%+', tone: 'big' },
-{ id: 'out', icon: '5', label: 'Outsider', range: '5.00+', desc: 'Edge 10%+', tone: 'out' }
+{ id: 'safe', icon: '1', label: 'Sur', range: '1.30-1.50', desc: 'Conf. 70%+ · avantage proche neutre accepte', tone: 'safe' },
+{ id: 'solid', icon: '2', label: 'Solide', range: '1.50-2.00', desc: 'Conf. 55%+ · bon equilibre risque/gain', tone: 'solid' },
+{ id: 'value', icon: '3', label: 'Valeur', range: '2.00-3.00', desc: 'Conf. 40%+ · avantage 2%+', tone: 'value' },
+{ id: 'big', icon: '4', label: 'Big odds', range: '3.00-5.00', desc: 'Conf. 20%+ · avantage 4%+', tone: 'big' },
+{ id: 'out', icon: '5', label: 'Outsider', range: '5.00+', desc: 'Conf. 8%+ · avantage 6%+', tone: 'out' }
 ];
 const v36TierById = Object.fromEntries(v36TierDefs.map(t => [t.id, t]));
 const v36TierRank = { safe: 1, solid: 2, value: 3, big: 4, out: 5 };
@@ -14792,9 +14817,23 @@ return qs.get('debug') === '1' || v37HashParams.get('debug') === '1' || safeLoca
 } catch(e) { return false; }
 })();
 const v37RejectReasons = {};
-const v37Reject = (reason) => {
+const v37RejectSamples = [];
+const v37Reject = (reason, match, detail) => {
 if (!reason) return;
 v37RejectReasons[reason] = (v37RejectReasons[reason] || 0) + 1;
+if (v37DebugOn && match && v37RejectSamples.length < 12) {
+try {
+const sides = getSides(match);
+v37RejectSamples.push({
+reason,
+detail: detail || '',
+sport: match.sport || '',
+date: parisDateISO(match.date) || '',
+match: `${v36TeamName(sides.home)} - ${v36TeamName(sides.away)}`,
+winamax: isWinamaxBookable(match)
+});
+} catch(e) {}
+}
 };
 const v37HashDate = v37HashParams.get('date') || '';
 const v37StoredDate = v36Filter.date || 'all';
@@ -14826,11 +14865,11 @@ const conf = Number(c?.rel || c?.prob || 0);
 const edge = Number.isFinite(Number(c?.edge)) ? Number(c.edge) : (conf && odd ? conf - 1 / odd : 0);
 const ev = Number.isFinite(Number(c?.ev)) ? Number(c.ev) : (conf && odd ? conf * odd - 1 : -1);
 if (!(odd >= 1.30) || !(conf > 0) || !(edge >= v37SoftEdgeFloor) || !(ev >= v37SoftEdgeFloor)) return null;
-if (odd >= 1.30 && odd < 1.50 && conf >= 0.72 && edge >= v37SoftEdgeFloor) return { id: 'safe', strict: conf >= 0.75 && edge >= 0.01 };
-if (odd >= 1.50 && odd < 2.00 && conf >= 0.58 && edge >= v37SoftEdgeFloor) return { id: 'solid', strict: conf >= 0.65 && edge >= 0.01 };
-if (odd >= 2.00 && odd < 3.00 && conf >= 0.45 && edge >= 0.03) return { id: 'value', strict: edge >= 0.05 };
-if (odd >= 3.00 && odd < 5.00 && conf >= 0.24 && edge >= 0.05) return { id: 'big', strict: edge >= 0.08 };
-if (odd >= 5.00 && conf >= 0.10 && edge >= 0.08) return { id: 'out', strict: edge >= 0.10 };
+if (odd >= 1.30 && odd < 1.50 && conf >= 0.70 && edge >= v37SoftEdgeFloor) return { id: 'safe', strict: conf >= 0.75 && edge >= 0.01 };
+if (odd >= 1.50 && odd < 2.00 && conf >= 0.55 && edge >= v37SoftEdgeFloor) return { id: 'solid', strict: conf >= 0.65 && edge >= 0.01 };
+if (odd >= 2.00 && odd < 3.00 && conf >= 0.40 && edge >= 0.02) return { id: 'value', strict: edge >= 0.05 };
+if (odd >= 3.00 && odd < 5.00 && conf >= 0.20 && edge >= 0.04) return { id: 'big', strict: edge >= 0.08 };
+if (odd >= 5.00 && conf >= 0.08 && edge >= 0.06) return { id: 'out', strict: edge >= 0.10 };
 return null;
 };
 const v37ScanPool = terminalScanPool.filter(m => v37DateMatches(m) && v37PickIsVisibleByClock(m));
@@ -14840,7 +14879,7 @@ if (m === 'exactScore' || m === 'resultBtts' || m === 'ht_1n2') return 1;
 if (m === 'teamTotal' || m === 'btts' || m === 'doubleChance' || m === 'dnb') return 2;
 return 2;
 };
-const v37DashboardCandidateLimit = (m) => String(m?.sport || '').toLowerCase() === 'football' ? 8 : 4;
+const v37DashboardCandidateLimit = (m) => String(m?.sport || '').toLowerCase() === 'football' ? 10 : 6;
 const v37TakeDiverseCandidates = (ranked, m) => {
 const limit = v37DashboardCandidateLimit(m);
 const out = [];
@@ -14866,21 +14905,23 @@ return out;
 const v36PickPoolRaw = v37ScanPool.flatMap(m => {
 try {
 const pred = predictMatch(m);
-if (!pred || !pred.pick) { v37Reject('no_pred_pick'); return []; }
+if (!isWinamaxBookable(m)) v37Reject('pas_winamax_exact', m, 'fallback cote indicative possible');
+if (!pred || !pred.pick) { v37Reject('no_pred_pick', m); return []; }
+if (pred.skip || pred.abstain?.active) v37Reject('pred_skip_abstain', m, (pred.abstain?.reasons || []).join(', '));
 const rawCandidates = (typeof buildMarketCandidates === 'function')
-? buildMarketCandidates(m, pred, { requireExact: true })
+? buildMarketCandidates(m, pred, { requireExact: false })
 : (() => {
 const best = _agentBestPick(m, pred);
 return best ? [best].concat(Array.isArray(best.allCandidates) ? best.allCandidates : []) : [];
 })();
 const candidateList = Array.isArray(rawCandidates) ? rawCandidates : [];
-if (!candidateList.length) v37Reject('require_exact_no_candidate');
+if (!candidateList.length) v37Reject('no_market_candidate', m);
 const seen = new Set();
 const ranked = candidateList
 .filter(c => {
 const odd = Number(c?.odd || 0);
-if (!c) { v37Reject('empty_candidate'); return false; }
-if (!(odd >= 1.30)) { v37Reject('odd_lt_130'); return false; }
+if (!c) { v37Reject('empty_candidate', m); return false; }
+if (!(odd >= 1.30)) { v37Reject('odd_lt_130', m, c?.label || c?.market || ''); return false; }
 return true;
 })
 .filter(c => {
@@ -14895,8 +14936,9 @@ const rel = Number(c.rel || c.prob || 0);
 const odd = Number(c.odd || 0);
 const edge = Number.isFinite(Number(c.edge)) ? Number(c.edge) : (rel - 1 / odd);
 const ev = Number.isFinite(Number(c.ev)) ? Number(c.ev) : (rel * odd - 1);
+if (!(rel > 0)) { v37Reject('conf_lte_0', m, c.label || c.market || ''); return null; }
 if (!tier) {
-v37Reject(edge < v37SoftEdgeFloor ? 'edge_too_low' : ev < v37SoftEdgeFloor ? 'ev_too_low' : 'tier_threshold');
+v37Reject(edge < v37SoftEdgeFloor ? 'edge_lte_0' : ev < v37SoftEdgeFloor ? 'ev_lte_0' : 'pas_de_tier_match', m, `${c.market || ''} @${odd.toFixed(2)} conf ${(rel*100).toFixed(0)} edge ${(edge*100).toFixed(1)} ev ${(ev*100).toFixed(1)}`);
 return null;
 }
 const investmentScoreValue = Number(c.investment?.score || 0);
@@ -14945,9 +14987,10 @@ return out.sort((a, b) => a.ts - b.ts);
 })();
 const v37PickByUid = new Map(v36PickPool.map(p => [p.pickUid, p]));
 const v36Sports = [...new Set(v36PickPool.map(p => p.m.sport).filter(Boolean))].slice(0, 8);
-const v36Search = String(v36Filter.q || '').trim();
+let v36Search = String(v36Filter.q || '').trim();
 const v36Sort = ['tier','date','time','odd','conf','edge','score'].includes(v36Filter.sort) ? v36Filter.sort : 'tier';
-const v36Filtered = v36PickPool.filter(p => {
+let v37FilterResetNotice = '';
+let v36Filtered = v36PickPool.filter(p => {
 if (v36Filter.sport && p.m.sport !== v36Filter.sport) return false;
 if (v36Filter.tier && p.tier !== v36Filter.tier) return false;
 if (v36Filter.time && v36HourBucket(p.m.date) !== v36Filter.time) return false;
@@ -14958,6 +15001,17 @@ if (!hay.includes(v36Search.toLowerCase())) return false;
 }
 return true;
 });
+if (!v36Filtered.length && v36PickPool.length && (v36Filter.sport || v36Filter.tier || v36Filter.time || v36Search)) {
+v37FilterResetNotice = 'Filtres locaux remis à zéro : ils masquaient tous les picks.';
+v36Filter.sport = '';
+v36Filter.tier = '';
+v36Filter.time = '';
+v36Filter.q = '';
+v36Search = '';
+try { localStorage.setItem(v36FilterKey, JSON.stringify(v36Filter)); } catch(e) {}
+v36Filtered = v36PickPool.slice();
+v37Reject('filtre_localstorage_reset');
+}
 const v36CountsAll = Object.fromEntries(v36TierDefs.map(t => [t.id, v36PickPool.filter(p => p.tier === t.id).length]));
 const v36Total = v36Filtered.length;
 const v36Sorted = v36Filtered.slice().sort((a, b) => {
@@ -14979,6 +15033,68 @@ return counts;
 })();
 const v37DenseRowLimit = 360;
 const v37PickRowKey = (p) => p?.pickUid || `${v37MatchKeyForPick(p)}|${p?.tier || ''}|${p?.market || ''}|${p?.pickKey || ''}|${p?.line ?? ''}|${Number(p?.odd || 0).toFixed(2)}`;
+const v37DataOnlyPool = (() => {
+if (v36PickPool.length || v37ScanPool.length <= 10) return [];
+const out = [];
+for (const m of v37ScanPool) {
+try {
+const pred = predictMatch(m);
+if (!pred?.pick) continue;
+const odds = pred.odds || getMatchOdds(m, m.sport === 'football');
+const pk = pred.pick.key;
+const odd = Number(pk === '1' ? odds?.home : pk === '2' ? odds?.away : odds?.draw);
+const rel = Number(pred.pick?.prob ?? pred.reliability ?? 0);
+if (!(odd >= 1.30) || !(rel > 0)) continue;
+const edge = rel - 1 / odd;
+const ev = rel * odd - 1;
+const tier = v36TierForCandidate({ odd, rel, edge, ev }) || {
+id: odd < 1.50 ? 'safe' : odd < 2.00 ? 'solid' : odd < 3.00 ? 'value' : odd < 5.00 ? 'big' : 'out',
+strict: false
+};
+const source = odds?._fromWinamax ? 'winamax_exact' : 'cote_indicative';
+const candidate = {
+market: '1n2',
+key: pk,
+pickKey: pk,
+rel,
+prob: rel,
+odd,
+edge,
+ev,
+label: pred.pick.label || 'Pick data',
+shortLabel: pred.pick.label || 'Pick data',
+mobileLabel: pred.pick.label || 'Pick data',
+marketName: source === 'winamax_exact' ? '1N2' : '1N2 · cote indicative',
+marketTooltip: source === 'winamax_exact' ? 'Marché principal 1N2.' : 'Cote indicative : à vérifier chez Winamax avant de jouer.',
+marketInfo: source === 'winamax_exact' ? '' : 'Cote indicative issue du flux disponible, pas un prix Winamax exact.',
+source,
+exact: source === 'winamax_exact'
+};
+const intel = v37OpportunityFor(m, tier, rel, edge, ev, odd, candidate, pred);
+out.push({
+m, pred, best: candidate, tier: tier.id, strict: false, odd, rel, edge, ev,
+pickUid: v37PickUid(m, candidate),
+label: candidate.shortLabel,
+labelFull: candidate.label,
+labelMobile: candidate.mobileLabel,
+marketTooltip: candidate.marketTooltip,
+marketInfo: candidate.marketInfo,
+marketName: candidate.marketName,
+market: '1n2',
+line: '',
+pickKey: pk,
+opportunity: Math.max(20, Math.min(68, intel.score || Math.round(rel * 70))),
+opportunityBadges: ['data fiable'],
+opportunityTooltip: `Ligne data-only : aucun pick haut-conviction ne passe les seuils. Cote ${source === 'winamax_exact' ? 'Winamax' : 'indicative'} à vérifier avant action.`,
+ts: new Date(m.date || 0).getTime(),
+score: Math.max(20, Math.min(70, (rel * 80) + Math.max(-10, edge * 100))),
+dataOnly: true
+});
+if (out.length >= 10) break;
+} catch(e) {}
+}
+return out.sort((a, b) => (b.opportunity - a.opportunity) || (a.ts - b.ts));
+})();
 const v37EnsureTierCoverage = (rows, pool) => {
 const out = rows.slice();
 const keys = new Set(out.map(v37PickRowKey));
@@ -15008,7 +15124,8 @@ keys.add(v37PickRowKey(candidate));
 }
 return out;
 };
-const v36TableRows = v37EnsureTierCoverage(v36Sorted.slice(0, v37DenseRowLimit), v36Sorted);
+const v37RenderPool = v36Sorted.length ? v36Sorted : v37DataOnlyPool;
+const v36TableRows = v37EnsureTierCoverage(v37RenderPool.slice(0, v37DenseRowLimit), v37RenderPool);
 const v36UpcomingAll = terminalScanPool
 .filter(m => new Date(m?.date || 0).getTime() > Date.now() && !m.completed)
 .sort((a, b) => new Date(a?.date || 0).getTime() - new Date(b?.date || 0).getTime());
@@ -15016,7 +15133,8 @@ const v37LiveAll = terminalScanPool.filter(m => m?.live || m?.status === 'STATUS
 const v37FinishedAll = terminalScanPool.filter(m => m?.completed || _isMatchEffectivelyDone(m));
 const v36Next = v36UpcomingAll.slice(0, 6);
 const v37ScopeLabel = v37IsAllHorizon ? '7 prochains jours' : v37DateLabel(v37DateFilter);
-const v36CoverageLine = `${v36PickPool.length} picks · ${v36UpcomingAll.length} a venir · ${v37LiveAll.length} live · ${v37FinishedAll.length} termines · data ${_dataAgeMin} min`;
+const v37DisplayTotal = v36Sorted.length ? v36Total : v37DataOnlyPool.length;
+const v36CoverageLine = `${v37DisplayTotal} lignes visibles · ${v36PickPool.length} picks qualifies · ${v36UpcomingAll.length} a venir · ${v37LiveAll.length} live · ${v37FinishedAll.length} termines · data ${_dataAgeMin} min`;
 const v37DebugMatches = () => terminalScanPool.slice(0, 10).map(m => {
 const { home, away } = getSides(m);
 return `${sportLabel(m?.sport || '')} ${parisDateISO(m?.date) || '?'} ${v36TeamName(home)}-${v36TeamName(away)} W:${isWinamaxBookable(m) ? '1' : '0'}`;
@@ -15027,21 +15145,33 @@ v37ScanPool: v37ScanPool.length,
 v36PickPoolRaw: v36PickPoolRaw.length,
 v36PickPool: v36PickPool.length,
 v36Filtered: v36Filtered.length,
+v37DataOnlyFallback: v37DataOnlyPool.length,
+v36TableRows: v36TableRows.length,
 v36Filter,
 _dataIsStale,
 _dataAgeMin,
 today: todayIso,
-rejectReasons: v37RejectReasons
+rejectReasons: v37RejectReasons,
+rejectSamples: v37RejectSamples
 };
 if (v37DebugOn) {
 try { console.log('[v37 debug]', { ...v37DebugState, sampleMatches: v37DebugMatches() }); } catch(e) {}
 }
 const v37DebugPanelHtml = v37DebugOn ? `<section class="v37-debug-panel" data-v37-debug-panel><b>Debug tableau V37</b><span>Filtres actifs · Raisons de rejet · 10 premiers matchs scannes</span><pre>${esc(JSON.stringify({ ...v37DebugState, sampleMatches: v37DebugMatches() }, null, 2))}</pre></section>` : '';
 const v37EmptyPoolHelpHtml = (!v36PickPool.length && terminalScanPool.length > 10) ? `<section class="v37-empty-pool-help">
-        <strong>Aucun pick conforme aux 5 tiers pour l'instant.</strong>
-        <span>${terminalScanPool.length} matchs sont disponibles dans le scan, mais aucun ne passe les seuils cote, confiance, edge et marché exact Winamax. La liste complète reste consultable.</span>
+        <strong>Pas de pick haut-conviction sur ce filtre.</strong>
+        <span>${terminalScanPool.length} matchs sont disponibles. Le tableau affiche ${v37DataOnlyPool.length ? 'les meilleurs matchs data-only à vérifier' : 'la liste complète dans Tous'} au lieu de rester vide.</span>
         <button type="button" class="page-btn" data-page="tous">Voir tous les matchs</button>
       </section>` : '';
+const v37FilterResetHtml = v37FilterResetNotice ? `<section class="v37-empty-pool-help is-info"><strong>Filtres corriges</strong><span>${esc(v37FilterResetNotice)}</span></section>` : '';
+const v37DecisionGuideHtml = `<details class="v37-decision-guide" open>
+        <summary>Comment choisir un pari <span>score d'abord, puis tier, puis cote</span></summary>
+        <ol>
+          <li><b>Score 0-100</b> : note globale. 70+ = prioritaire, 60-69 = jouable, moins = mise reduite.</li>
+          <li><b>Tier</b> : Sur/Solide = moins de risque, Big/Outsider = plus de gain mais plus de variance.</li>
+          <li><b>Edge (avantage)</b> : ecart entre notre proba et la cote. +5% veut dire que le prix semble 5 points meilleur que le marche.</li>
+        </ol>
+      </details>`;
 const v36FilterButton = (kind, value, label, active) => `<button type="button" class="v36-filter-chip ${active ? 'is-active' : ''}" data-v36-filter="${esc(kind)}" data-v36-value="${esc(value)}">${label}</button>`;
 const v36SortButton = (value, label) => `<button type="button" class="v36-sort-btn ${v36Sort === value ? 'is-active' : ''}" data-v36-sort="${esc(value)}">${esc(label)}</button>`;
 const v37BlindOddHtml = (odd) => v37BlindMode
@@ -15121,17 +15251,19 @@ const marketName = p.marketName || p.market || '';
 const intelBadges = (p.opportunityBadges || []).map(x => `<i data-tooltip="${esc(v37BadgeTooltip(x))}" title="${esc(v37BadgeTooltip(x))}">${esc(x)}</i>`).join('');
 const sameMatchCount = v37VisibleMatchCounts.get(v37MatchKeyForPick(p)) || 0;
 const scoreClass = p.opportunity >= 80 ? 'is-high' : p.opportunity >= 60 ? 'is-mid' : p.opportunity >= 40 ? 'is-low' : 'is-muted';
-return `<tr class="v36-table-row ${soon ? 'is-imminent' : ''} ${sameMatchCount > 1 ? 'is-same-match' : ''}" data-tone="${esc(tier.tone)}" data-big-detail="${esc(String(p.m.id || ''))}" data-pick-uid="${esc(p.pickUid || '')}" data-pick-label="${esc(p.labelFull || p.label || '')}" data-pick-odd="${esc(p.odd.toFixed(2))}" title="${esc(v36ReasonTooltip(p))}">
+const scoreAdvice = p.opportunity >= 80 ? 'Forte' : p.opportunity >= 60 ? 'Moderee' : p.opportunity >= 40 ? 'Reduite' : 'Eviter';
+const indicativeBadge = p.best?.source === 'cote_indicative' ? '<small class="v37-source-badge" title="Cote indicative : vérifie le prix final chez Winamax">indicatif</small>' : '';
+return `<tr class="v36-table-row ${soon ? 'is-imminent' : ''} ${sameMatchCount > 1 ? 'is-same-match' : ''} ${p.dataOnly ? 'is-data-only' : ''}" data-tone="${esc(tier.tone)}" data-big-detail="${esc(String(p.m.id || ''))}" data-pick-uid="${esc(p.pickUid || '')}" data-pick-label="${esc(p.labelFull || p.label || '')}" data-pick-odd="${esc(p.odd.toFixed(2))}" title="${esc(v36ReasonTooltip(p))}">
           <td class="v36-cell-sport"><span>${sportIcon(p.m.sport || '')}</span><b>${esc(sportLabel(p.m.sport || '').slice(0, 9))}</b></td>
           <td class="v36-cell-date">${esc(v37DateLabel(p.m.date))}</td>
           <td>${esc(fmtTime(p.m.date))}</td>
           <td class="v36-cell-league">${esc(league)}</td>
           <td class="v36-cell-match">${v36MatchTitleHtml(p)}${sameMatchCount > 1 ? `<span class="v37-match-multi">+${sameMatchCount - 1} autre pick</span>` : ''}</td>
-          <td class="v36-cell-pick"><b data-tooltip="${esc(pickHelp)}">${esc(p.label)}</b>${p.marketInfo ? `<span aria-hidden="true" data-tooltip="${esc(p.marketInfo)}" style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;margin-left:6px;border-radius:50%;border:1px solid var(--border);color:var(--text-dim);font-size:10px;font-weight:800;">?</span>` : ''}<em>${esc(marketName)}</em></td>
+          <td class="v36-cell-pick"><b data-tooltip="${esc(pickHelp)}">${esc(p.label)}</b>${p.marketInfo ? `<span aria-hidden="true" data-tooltip="${esc(p.marketInfo)}" style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;margin-left:6px;border-radius:50%;border:1px solid var(--border);color:var(--text-dim);font-size:10px;font-weight:800;">?</span>` : ''}<em>${esc(marketName)}</em>${indicativeBadge}</td>
           <td class="v36-num v36-odd">${v37BlindOddHtml(p.odd)}</td>
           <td class="v36-num">${relPct}%</td>
-          <td class="v36-num ${p.edge >= 0 ? 'is-pos' : 'is-neg'}">${v37BlindEdgeHtml(p.edge)}</td>
-          <td class="v36-num"><span class="v37-opportunity ${scoreClass}" data-score="${esc(String(p.opportunity || 0))}" data-tooltip="${esc(p.opportunityTooltip || '')}" title="${esc(p.opportunityTooltip || '')}" aria-label="${esc(p.opportunityTooltip || `Score d'opportunité ${p.opportunity || 0}/100`)}" tabindex="0">${esc(String(p.opportunity || 0))}</span>${intelBadges ? `<span class="v37-intel-chips">${intelBadges}</span>` : ''}</td>
+          <td class="v36-num ${p.edge >= 0 ? 'is-pos' : 'is-neg'}"><span data-tooltip="Edge (avantage) : notre probabilité dépasse celle implicite dans la cote. Plus c'est haut, mieux le pari est payé.">${v37BlindEdgeHtml(p.edge)}</span></td>
+          <td class="v36-num"><span class="v37-opportunity ${scoreClass}" data-score="${esc(String(p.opportunity || 0))}" data-tooltip="${esc(p.opportunityTooltip || '')}" title="${esc(p.opportunityTooltip || '')}" aria-label="${esc(p.opportunityTooltip || `Score d'opportunité ${p.opportunity || 0}/100`)}" tabindex="0">${esc(String(p.opportunity || 0))}</span><em class="v37-score-advice">${esc(scoreAdvice)}</em>${intelBadges ? `<span class="v37-intel-chips">${intelBadges}</span>` : ''}</td>
           <td>${v36TierBadge(p.tier, true)}</td>
           ${v37HistoryMode ? `<td>${v37ResultBadge(result)}</td>` : ''}
         </tr>`;
@@ -15145,7 +15277,7 @@ return `<button type="button" class="v36-table-card ${sameMatchCount > 1 ? 'is-s
           <strong>${v36MatchTitleHtml(p)}</strong>
           <em class="v36-table-card__league">${esc(p.m.league_name || p.m.league || '')}</em>
           <span class="v36-table-card__line"><i data-tooltip="${esc(p.marketTooltip || p.labelFull || p.label)}">${esc(p.labelMobile || p.label)}</i><b>${v37BlindOddHtml(p.odd)}</b><b>${Math.round(p.rel * 100)}%</b><b>${v37BlindEdgeHtml(p.edge)}</b></span>
-          <span class="v36-table-card__signals"><i data-tooltip="${esc(p.opportunityTooltip || '')}" title="${esc(p.opportunityTooltip || '')}" aria-label="${esc(p.opportunityTooltip || `Score d'opportunité ${p.opportunity || 0}/100`)}">Score ${esc(String(p.opportunity || 0))}/100</i>${sameMatchCount > 1 ? `<i>+${sameMatchCount - 1} autre pick même match</i>` : ''}${(p.opportunityBadges || []).slice(0, 2).map(x => `<i data-tooltip="${esc(v37BadgeTooltip(x))}" title="${esc(v37BadgeTooltip(x))}">${esc(x)}</i>`).join('')}</span>
+          <span class="v36-table-card__signals"><i data-tooltip="${esc(p.opportunityTooltip || '')}" title="${esc(p.opportunityTooltip || '')}" aria-label="${esc(p.opportunityTooltip || `Score d'opportunité ${p.opportunity || 0}/100`)}">Score ${esc(String(p.opportunity || 0))}/100</i>${p.best?.source === 'cote_indicative' ? '<i>Cote indicative</i>' : ''}${sameMatchCount > 1 ? `<i>+${sameMatchCount - 1} autre pick même match</i>` : ''}${(p.opportunityBadges || []).slice(0, 2).map(x => `<i data-tooltip="${esc(v37BadgeTooltip(x))}" title="${esc(v37BadgeTooltip(x))}">${esc(x)}</i>`).join('')}</span>
           ${v37HistoryMode ? `<span class="v36-table-card__signals">${v37ResultBadge(result)}</span>` : ''}
         </button>`;
 };
@@ -15223,7 +15355,9 @@ return `<section class="v37-personal-strip" aria-label="Suggestions personnalis�
 })();
 const v36TableHtml = `<section class="v36-table-panel" aria-label="Tableau dense des propositions">
         ${v37DebugPanelHtml}
+        ${v37FilterResetHtml}
         ${v37EmptyPoolHelpHtml}
+        ${v37DecisionGuideHtml}
         ${v37TierLegendHtml}
         ${v37DayNavHtml}
         <header class="v36-table-toolbar">
@@ -15241,14 +15375,14 @@ const v36TableHtml = `<section class="v36-table-panel" aria-label="Tableau dense
             ${v36SortButton('time', 'Heure')}
             ${v36SortButton('odd', 'Cote')}
             ${v36SortButton('conf', 'Conf')}
-            ${v36SortButton('edge', 'Edge')}
+            ${v36SortButton('edge', 'Edge (avantage)')}
             ${v36SortButton('score', 'Score')}
           </div>
         </header>
         <div class="v36-table-scroll">
           <table class="v36-picks-table">
             <thead><tr>
-              <th>Sport</th><th>${v36SortButton('date', 'Date')}</th><th>${v36SortButton('time', 'Heure')}</th><th>Ligue</th><th>Match</th><th>Pari</th><th>${v36SortButton('odd', 'Cote')}</th><th>${v36SortButton('conf', 'Conf')}</th><th>${v36SortButton('edge', 'Edge')}</th><th>${v36SortButton('score', 'Score')}</th><th>${v36SortButton('tier', 'Tier')}</th>${v37HistoryMode ? '<th>Résultat</th>' : ''}
+              <th>Sport</th><th>${v36SortButton('date', 'Date')}</th><th>${v36SortButton('time', 'Heure')}</th><th>Ligue</th><th>Match</th><th>Pari</th><th data-tooltip="Cote : combien tu gagnes pour 1 euro misé. @1.85 = 0.85 euro net si gagné.">${v36SortButton('odd', 'Cote')}</th><th data-tooltip="Confiance : probabilité estimée par notre modèle.">${v36SortButton('conf', 'Conf')}</th><th data-tooltip="Edge (avantage) : écart entre notre probabilité et celle du marché. +5% = cote intéressante.">${v36SortButton('edge', 'Edge')}</th><th data-tooltip="Score : note globale 0-100 qui combine confiance, edge, fraîcheur data, timing et signaux.">${v36SortButton('score', 'Score')}</th><th data-tooltip="Tier : niveau de risque/gain. Sur et Solide sont plus prudents, Big et Outsider plus variables.">${v36SortButton('tier', 'Tier')}</th>${v37HistoryMode ? '<th>Résultat</th>' : ''}
             </tr></thead>
             <tbody>${v36TableRows.length ? v36TableRows.map(v36TableRow).join('') : `<tr><td colspan="${v37HistoryMode ? '12' : '11'}"><div class="v36-tier-empty">Aucun pick pour ce filtre. Retire un sport, une heure ou une recherche.</div></td></tr>`}</tbody>
           </table>
@@ -16105,7 +16239,7 @@ const bbfFavSportsPrefs = Array.isArray(bbfUserPrefs.favSports) ? bbfUserPrefs.f
 const bbfExcludedLeagues = new Set(Array.isArray(bbfStrategyPrefs.excludedLeagues) ? bbfStrategyPrefs.excludedLeagues.map(String) : []);
 const bbfMinRelPref = bbfStrategyHasPrefs ? Math.max(0.50, Math.min(0.90, Number(bbfStrategyPrefs.minConfidence || 55) / 100)) : 0;
 const bbfRiskEdgePref = bbfStrategyHasPrefs ? ({ 1: 0.08, 2: 0.06, 3: 0.04, 4: 0.03, 5: 0.02 }[Math.max(1, Math.min(5, Number(bbfStrategyPrefs.riskTolerance || 3)))] || 0.04) : 0;
-if (_dataAgeMin > 120) {
+if (_dataAgeMin > 120 && !data._lite) {
 const lastTry = parseInt(sessionStorage.getItem('autoRefreshDoneAt') || '0', 10);
 const ageMin = (Date.now() - lastTry) / 60000;
 if (!isFinite(ageMin) || ageMin > 30) {
@@ -29795,7 +29929,7 @@ const lbl = ageMin < 1 ? 'à l\'instant'
 : `il y a ${Math.round(ageMin/(24*60))} j`;
 el.textContent = `📅 Données ${lbl}`;
 el.title = `Dernière actualisation : ${new Date(data.generated_at).toLocaleString('fr-FR')}`;
-if (ageMin > 120) {
+if (ageMin > 120 && !(data && data._lite)) {
 try {
 const lastTry = parseInt(sessionStorage.getItem('autoRefreshDoneAt') || '0', 10);
 const sinceLast = (Date.now() - lastTry) / 60000;
