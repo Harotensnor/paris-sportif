@@ -307,6 +307,16 @@ SOURCES = [
     ('team_stats_extended', 'team_stats_extended.json', lambda d: {
         'teams': (d.get('team_count') or len(d.get('teams') or {})) if isinstance(d, dict) else 0,
     }),
+    ('model_v4_benchmark', 'model_v4_benchmark.json', lambda d: {
+        'status': ((d.get('v4a') or {}).get('status') or 'unknown') if isinstance(d, dict) else 'missing',
+        'baseline_n': ((d.get('baseline') or {}).get('n') or 0) if isinstance(d, dict) else 0,
+        'roi_proxy_delta_pct': ((d.get('v4a') or {}).get('roi_proxy_delta_pct') or 0) if isinstance(d, dict) else 0,
+    }),
+    ('model_anomalies', 'model_anomalies_summary.json', lambda d: {
+        'scanned_1n2_events': (d.get('scanned_1n2_events') or 0) if isinstance(d, dict) else 0,
+        'market_overround_outliers': (d.get('market_overround_outliers') or 0) if isinstance(d, dict) else 0,
+        'cap_vs_market': ((d.get('runtime_guard') or {}).get('cap_vs_market') or 0) if isinstance(d, dict) else 0,
+    }),
     ('data_quality_report', 'data_quality_report.json', lambda d: {
         'events_quarantined': (d.get('events_quarantined') or 0) if isinstance(d, dict) else 0,
         'status': (d.get('status') or 'unknown') if isinstance(d, dict) else 'missing',

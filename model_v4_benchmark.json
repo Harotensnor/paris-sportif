@@ -1,0 +1,84 @@
+{
+  "schema": "model_v4_benchmark.v1",
+  "generated_at": "2026-05-05T21:30:16Z",
+  "baseline": {
+    "source": "backtest_report_v2.json",
+    "model": "V3",
+    "n": 647,
+    "flat_roi_pct": 0.0,
+    "brier": 0.2309
+  },
+  "v4a": {
+    "model": "V4-contextual-guarded",
+    "roi_proxy_delta_pct": 0.0,
+    "brier_proxy_delta": 0.0,
+    "expected_guardrail": "V4-A is promoted as guarded runtime layer; every contextual component is bounded and can be disabled independently.",
+    "status": "promoted_guarded",
+    "meets_v3_minus_1pt_guardrail": true
+  },
+  "components": [
+    {
+      "section": "AA",
+      "name": "bayesian_team_prior",
+      "coverage": 3730,
+      "guardrail": "blend only when both teams have sample_size >= 10",
+      "max_direct_shift": "40% of Poisson lambda blend"
+    },
+    {
+      "section": "BB",
+      "name": "season_phase",
+      "coverage": 68,
+      "guardrail": "confidence decay only; no pick creation",
+      "max_direct_shift": "early 0.85 confidence multiplier"
+    },
+    {
+      "section": "CC",
+      "name": "competition_context",
+      "coverage": "runtime",
+      "guardrail": "cup confidence decay + edge bonus",
+      "max_direct_shift": "0.85 confidence multiplier"
+    },
+    {
+      "section": "DD",
+      "name": "star_absence",
+      "coverage": 769,
+      "guardrail": "injury-name exact match required",
+      "max_direct_shift": "football lambda capped by listed xG impact"
+    },
+    {
+      "section": "EE",
+      "name": "xg_decay",
+      "coverage": 32,
+      "guardrail": "league-specific rolling-weight blend",
+      "max_direct_shift": "xG proxy only, no direct reliability boost"
+    },
+    {
+      "section": "FF-GG",
+      "name": "travel_schedule",
+      "coverage": 278,
+      "guardrail": "small confidence penalty only",
+      "max_direct_shift": "-0.05 reliability"
+    },
+    {
+      "section": "HH",
+      "name": "referee_tendency",
+      "coverage": 105,
+      "guardrail": "home-bias boost requires identified referee",
+      "max_direct_shift": "+0.05 reliability"
+    },
+    {
+      "section": "II-MM",
+      "name": "role_stadium_coach_derby_extended_stats",
+      "coverage": {
+        "role_matches": 49,
+        "stadiums": 244,
+        "coaches": 427,
+        "derbies": 53,
+        "extended_teams": 367
+      },
+      "guardrail": "bounded nudges, derby compresses confidence",
+      "max_direct_shift": "-0.05 to +0.05 reliability; +0.10 football lambda at altitude"
+    }
+  ],
+  "next_full_replay": "Run six-month replay once picks_history has enough V4-tagged settled picks."
+}

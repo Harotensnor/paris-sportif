@@ -5422,6 +5422,7 @@ const stadium = pred?.poisson?.stadiumEffect || getStadiumEffect(match);
 const coach = pred?.coachContext || getCoachContext(match);
 const derby = pred?.derbyContext || getDerbyContext(match);
 const extStats = pred?.poisson?.extendedStats || getTeamStatsExtendedContext(match);
+const anomaly = pred?.market_anomaly || null;
 const badges = [];
 if (competition) badges.push({ label: competition.label, title: competition.reason || 'Contexte compétition' });
 if (season) badges.push({ label: season.label, title: `Phase saison · ${season.sample_teams || 0} équipes suivies` });
@@ -5437,6 +5438,7 @@ if (extStats?.home?.set_piece_xG > 0.4 || extStats?.away?.set_piece_xG > 0.4) ba
 if (coach?.home?.status && coach.home.status !== 'stable') badges.push({ label: `Coach ${coach.home.status}`, title: `${coach.home.team} · ${coach.home.days_since_nomination}j` });
 if (coach?.away?.status && coach.away.status !== 'stable') badges.push({ label: `Coach ${coach.away.status}`, title: `${coach.away.team} · ${coach.away.days_since_nomination}j` });
 if (derby) badges.push({ label: `Derby : ${derby.label}`, title: `Variance ×${derby.variance_multiplier} · edge requis +${Math.round(derby.edge_required_bonus * 100)}pt` });
+if (anomaly) badges.push({ label: 'Anomalie modèle/marché', title: `Écart brut ${Math.round(Math.abs(anomaly.gap || 0) * 100)}pt · proba plafonnée à ${Math.round((anomaly.capped_prob || 0) * 100)}%` });
 if (!badges.length) return '';
 return `<div class="v4-context-badges" style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 14px;">
 ${badges.map(b => `<span style="display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--border);border-radius:999px;background:var(--panel-2);font-size:12px;font-weight:750;color:var(--text);" title="${esc(b.title)}">${esc(b.label)}</span>`).join('')}
@@ -6589,8 +6591,28 @@ const implied = 1 / odd;
 const rel = p.reliability ?? p.pick.prob;
 if (!isFinite(rel)) return p;
 const edge = rel - implied;
-if (edge > 0.15) {
-return { ...p, suspect: true, suspect_reason: 'huge_edge_>15pt', skip: true };
+if (Math.abs(edge) > 0.15) {
+const sign = edge >= 0 ? 1 : -1;
+const capped = Math.max(0.01, Math.min(0.99, implied + sign * 0.12));
+return {
+...p,
+reliability_raw_uncapped: rel,
+reliability: capped,
+pick: { ...p.pick, prob_raw_uncapped: p.pick.prob, prob: capped },
+suspect: true,
+suspect_reason: 'market_gap_>15pt_capped',
+market_anomaly: {
+type: 'model_vs_market_gap',
+odd,
+market_prob: implied,
+original_prob: rel,
+capped_prob: capped,
+gap: edge,
+cap: 0.12,
+selection: k,
+match_id: match?.id || match?.uid || ''
+}
+};
 }
 return p;
 }
@@ -28105,6 +28127,43 @@ return `
           </div>
         </div>`;
 })();
+const modelAnomalyHtml = (() => {
+try {
+const pct = (v) => `${Math.round((Number(v) || 0) * 100)}%`;
+const rows = typeof getDisplayablePicks === 'function'
+? getDisplayablePicks({ includeSettled: true, includeStarted: true, diversifyByMatch: false, topUniqueLimit: 999 })
+: [];
+const anomalies = rows.filter(r => r?.pred?.market_anomaly).slice(0, 8);
+if (!anomalies.length) {
+return `<div style="margin-top:22px;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.25);border-radius:10px;padding:14px;">
+<div style="font-size:13px;font-weight:800;color:#34d399;">Aucune anomalie modèle/marché active</div>
+<div style="font-size:11px;color:var(--text-dim);margin-top:4px;">Le plafonnement V4 limite automatiquement tout écart brut supérieur à 15 points face au consensus de cote.</div>
+</div>`;
+}
+return `<div style="margin-top:22px;background:rgba(234,179,8,.08);border:1px solid rgba(234,179,8,.25);border-radius:10px;padding:14px;">
+<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
+<div>
+<div style="font-size:13px;font-weight:800;color:#eab308;text-transform:uppercase;letter-spacing:.4px;">Anomalies modèle/marché plafonnées</div>
+<div style="font-size:11px;color:var(--text-dim);margin-top:4px;">Un pick reste visible, mais sa proba est ramenée à 12 points max du marché.</div>
+</div>
+${statusPill('warn')}
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;">
+${anomalies.map(r => {
+const a = r.pred.market_anomaly;
+const title = `${r.home?.name || r.m?.home || 'Dom'} - ${r.away?.name || r.m?.away || 'Ext'}`;
+return `<div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px;">
+<div style="font-size:12px;font-weight:800;color:var(--text);line-height:1.3;">${esc(title)}</div>
+<div style="font-size:11px;color:var(--text-dim);margin-top:5px;">${esc(r.labelFull || r.label || 'Pick')} · cote ${Number(a.odd || r.odd || 0).toFixed(2)}</div>
+<div style="font-size:11px;color:#eab308;margin-top:5px;font-variant-numeric:tabular-nums;">marché ${pct(a.market_prob)} · modèle brut ${pct(a.original_prob)} · cap ${pct(a.capped_prob)}</div>
+</div>`;
+}).join('')}
+</div>
+</div>`;
+} catch(e) {
+return '';
+}
+})();
 const allChecksHtml = `
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
         <div style="font-size:13px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;">📋 Tous les checks</div>
@@ -28142,6 +28201,8 @@ wrap.innerHTML = `
         </div>
 
         ${quickHealthHtml}
+
+        ${santeFold('🧪 Anomalies modèle/marché', modelAnomalyHtml)}
 
         <div style="margin-top:22px;">
           <div style="font-size:13px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;">🧠 Recommandations</div>
