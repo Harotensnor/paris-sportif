@@ -6681,11 +6681,25 @@ history: artifact?.history || [],
 artifacts: artifact?.artifacts || {},
 };
 }
+function getFeatureDriftV5DebugSummary() {
+const artifact = (typeof window !== 'undefined') ? window.FEATURE_DRIFT_V5 : null;
+return {
+loaded: !!artifact,
+overall: artifact?.overall || 'missing',
+maxKl: Number(artifact?.max_kl || 0),
+rows: artifact?.rows || {},
+syntheticShiftDetected: !!artifact?.synthetic_shift_test?.detected,
+features: (artifact?.features || []).slice(0, 10),
+message: artifact?.message || '',
+generatedAt: artifact?.generated_at || null,
+};
+}
 try {
 window.getStackingMetaV5Nudge = getStackingMetaV5Nudge;
 window.getStackingMetaV5DebugSummary = getStackingMetaV5DebugSummary;
 window.getFeatureEngineeringV5DebugSummary = getFeatureEngineeringV5DebugSummary;
 window.getModelVersionsV5DebugSummary = getModelVersionsV5DebugSummary;
+window.getFeatureDriftV5DebugSummary = getFeatureDriftV5DebugSummary;
 } catch (e) {}
 
 let __predCache = new Map();
@@ -17553,6 +17567,7 @@ bayesianPriorsV5: getBayesianV5DebugSummary(),
 stackingMetaV5: getStackingMetaV5DebugSummary(),
 featureEngineeringV5: getFeatureEngineeringV5DebugSummary(),
 modelVersionsV5: getModelVersionsV5DebugSummary(),
+featureDriftV5: getFeatureDriftV5DebugSummary(),
 seasonPhase: getSeasonPhaseDebugSummary(),
 starPlayers: getStarPlayersDebugSummary(),
 xgDecay: getXGDecayDebugSummary(),
@@ -29469,6 +29484,28 @@ const allChecksHtml = `
         ${checks.map((c, i) => checkRow(c, i)).join('')}
       </div>`;
 
+const v5FeatureDriftHtml = (() => {
+const d = window.FEATURE_DRIFT_V5;
+if (!d) return '';
+const col = d.overall === 'critical' ? '#f87171' : d.overall === 'warning' ? '#eab308' : '#34d399';
+const label = d.overall === 'critical' ? 'Drift critique' : d.overall === 'warning' ? 'Drift à surveiller' : 'Stable';
+return `<div style="margin-top:22px;">
+        <div style="font-size:13px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;">🧬 Drift features V5</div>
+        <div style="background:linear-gradient(135deg,${col}18,transparent);border:1px solid var(--border);border-left:4px solid ${col};border-radius:10px;padding:14px;">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;">
+            <div><div class="lbl-mini">Statut</div><div style="font-size:22px;font-weight:900;color:${col};">${label}</div></div>
+            <div><div class="lbl-mini">KL max</div><div style="font-size:22px;font-weight:900;color:var(--text);">${Number(d.max_kl || 0).toFixed(3)}</div></div>
+            <div><div class="lbl-mini">Fenêtre</div><div style="font-size:22px;font-weight:900;color:var(--text);">${Number(d.rows?.prediction || 0)}/${Number(d.rows?.train || 0)}</div></div>
+            <div><div class="lbl-mini">Test synthétique</div><div style="font-size:22px;font-weight:900;color:${d.synthetic_shift_test?.detected ? '#34d399' : '#f87171'};">${d.synthetic_shift_test?.detected ? 'détecté' : 'raté'}</div></div>
+          </div>
+          <div style="font-size:12px;color:var(--text-dim);margin:8px 0;">${esc(d.message || '')}</div>
+          ${(d.features || []).slice(0, 6).map(f => `<div style="display:grid;grid-template-columns:1fr 80px 90px;gap:8px;padding:6px 0;border-top:1px solid var(--border);font-size:12px;align-items:center;">
+            <span>${esc(f.feature)}</span><b style="text-align:right;">${Number(f.kl || 0).toFixed(3)}</b><span style="text-align:right;color:var(--text-dim);">${esc(f.status || '')}</span>
+          </div>`).join('')}
+        </div>
+      </div>`;
+})();
+
 wrap.innerHTML = `
       <div style="max-width:1500px;margin:0 auto;padding:16px 20px calc(var(--mobile-bottom-gap, 90px) + 24px);">
         <div class="section-header top-picks" style="margin-top:8px;">
@@ -29497,6 +29534,7 @@ wrap.innerHTML = `
         </div>
 
         ${quickHealthHtml}
+        ${v5FeatureDriftHtml}
 
         ${santeFold('🧪 Anomalies modèle/marché', modelAnomalyHtml)}
 
