@@ -104,3 +104,14 @@ Limitation documentée: le repo local ne contient actuellement que la fenêtre h
 - UI: la modal détail affiche `méta-confiance XX%` dans la décomposition fiabilité.
 
 Facteurs utilisés: consensus inter-signaux, richesse data, nombre de composantes, largeur de l'intervalle bootstrap V5, variance ensemble, edge, cold start, drift feature et abstain.
+
+## Section M — Adversarial validation
+
+- Status: **active**
+- Artifact: `adversarial_validation.json`
+- Split: chronologique 65/35 sur `backtest_training_rows.jsonl`
+- AUC train/test: `0.892` avec seuil d'alerte `0.600`
+- Test synthétique: AUC `0.934`, drift correctement détecté.
+- UI: Crédibilité et Santé affichent le statut, l'AUC et les top shifts.
+
+Interprétation: le sample local est encore court (`49` lignes), donc l'alerte bloque surtout la promotion automatique agressive. Elle indique que les lignes récentes diffèrent assez du train historique pour garder V5 en rollout prudent jusqu'à plus de picks settled.

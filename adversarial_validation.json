@@ -1,0 +1,291 @@
+{
+  "schema": "paris-sportif.adversarial_validation.v5",
+  "generated_at": "2026-05-05T23:41:57Z",
+  "threshold_auc": 0.6,
+  "rows": 49,
+  "train_rows": 31,
+  "test_rows": 18,
+  "split": "chronological_65_35",
+  "auc": 0.892473,
+  "status": "warning",
+  "drift_detected": true,
+  "top_numeric_shifts": [
+    {
+      "feature": "away_xg_for",
+      "train_mean": 2.529,
+      "test_mean": 1.364333,
+      "standardized_shift": 6.180506
+    },
+    {
+      "feature": "away_xg_against",
+      "train_mean": 1.127,
+      "test_mean": 1.765667,
+      "standardized_shift": 4.144969
+    },
+    {
+      "feature": "elo_diff",
+      "train_mean": -293.7,
+      "test_mean": 24.066667,
+      "standardized_shift": 4.075166
+    },
+    {
+      "feature": "ref_yellow_per_game",
+      "train_mean": 6.0,
+      "test_mean": 4.766667,
+      "standardized_shift": 3.331661
+    },
+    {
+      "feature": "home_xg_for",
+      "train_mean": 1.651,
+      "test_mean": 1.333667,
+      "standardized_shift": 1.118061
+    },
+    {
+      "feature": "injuries_home",
+      "train_mean": 1.0,
+      "test_mean": 3.555556,
+      "standardized_shift": 1.10281
+    },
+    {
+      "feature": "home_elo",
+      "train_mean": 1680.1,
+      "test_mean": 1630.225,
+      "standardized_shift": 0.992106
+    },
+    {
+      "feature": "weather_precip_mm",
+      "train_mean": 0.3,
+      "test_mean": 0.0,
+      "standardized_shift": 0.68313
+    }
+  ],
+  "categorical_shifts": [
+    {
+      "feature": "sport",
+      "top_shift": [
+        {
+          "value": "basketball",
+          "train_pct": 0.0,
+          "test_pct": 0.111111,
+          "abs_delta": 0.111111
+        },
+        {
+          "value": "hockey",
+          "train_pct": 0.064516,
+          "test_pct": 0.0,
+          "abs_delta": 0.064516
+        },
+        {
+          "value": "baseball",
+          "train_pct": 0.258065,
+          "test_pct": 0.222222,
+          "abs_delta": 0.035842
+        }
+      ]
+    },
+    {
+      "feature": "league_code",
+      "top_shift": [
+        {
+          "value": "esp.1",
+          "train_pct": 0.096774,
+          "test_pct": 0.333333,
+          "abs_delta": 0.236559
+        },
+        {
+          "value": "mex.1",
+          "train_pct": 0.193548,
+          "test_pct": 0.0,
+          "abs_delta": 0.193548
+        },
+        {
+          "value": "fra.1",
+          "train_pct": 0.0,
+          "test_pct": 0.166667,
+          "abs_delta": 0.166667
+        }
+      ]
+    },
+    {
+      "feature": "market",
+      "top_shift": [
+        {
+          "value": "1n2",
+          "train_pct": 1.0,
+          "test_pct": 1.0,
+          "abs_delta": 0.0
+        }
+      ]
+    },
+    {
+      "feature": "pick_side",
+      "top_shift": [
+        {
+          "value": "draw",
+          "train_pct": 0.225806,
+          "test_pct": 0.222222,
+          "abs_delta": 0.003584
+        },
+        {
+          "value": "away",
+          "train_pct": 0.387097,
+          "test_pct": 0.388889,
+          "abs_delta": 0.001792
+        },
+        {
+          "value": "home",
+          "train_pct": 0.387097,
+          "test_pct": 0.388889,
+          "abs_delta": 0.001792
+        }
+      ]
+    }
+  ],
+  "synthetic_check": {
+    "auc": 0.933692,
+    "status": "warning",
+    "drift_detected": true,
+    "top_numeric_shifts": [
+      {
+        "feature": "weather_wind_kmh",
+        "train_mean": 14.9,
+        "test_mean": 31.2,
+        "standardized_shift": 2.389755
+      },
+      {
+        "feature": "away_elo",
+        "train_mean": 1693.85,
+        "test_mean": 1973.8,
+        "standardized_shift": 1.290994
+      },
+      {
+        "feature": "injuries_home",
+        "train_mean": 1.0,
+        "test_mean": 3.666667,
+        "standardized_shift": 1.052803
+      },
+      {
+        "feature": "implied_prob",
+        "train_mean": 0.433629,
+        "test_mean": 0.339874,
+        "standardized_shift": 0.67869
+      },
+      {
+        "feature": "weather_precip_mm",
+        "train_mean": 0.3,
+        "test_mean": 0.75,
+        "standardized_shift": 0.617914
+      },
+      {
+        "feature": "odd",
+        "train_mean": 2.68,
+        "test_mean": 3.13875,
+        "standardized_shift": 0.440363
+      },
+      {
+        "feature": "injuries_away",
+        "train_mean": 2.290323,
+        "test_mean": 3.777778,
+        "standardized_shift": 0.279088
+      },
+      {
+        "feature": "home_elo",
+        "train_mean": 1680.1,
+        "test_mean": 1680.1,
+        "standardized_shift": 0.0
+      }
+    ],
+    "categorical_shifts": [
+      {
+        "feature": "sport",
+        "top_shift": [
+          {
+            "value": "baseball",
+            "train_pct": 0.258065,
+            "test_pct": 0.444444,
+            "abs_delta": 0.18638
+          },
+          {
+            "value": "football",
+            "train_pct": 0.677419,
+            "test_pct": 0.5,
+            "abs_delta": 0.177419
+          },
+          {
+            "value": "hockey",
+            "train_pct": 0.064516,
+            "test_pct": 0.055556,
+            "abs_delta": 0.008961
+          }
+        ]
+      },
+      {
+        "feature": "league_code",
+        "top_shift": [
+          {
+            "value": "mex.1",
+            "train_pct": 0.193548,
+            "test_pct": 0.0,
+            "abs_delta": 0.193548
+          },
+          {
+            "value": "gre.1",
+            "train_pct": 0.193548,
+            "test_pct": 0.0,
+            "abs_delta": 0.193548
+          },
+          {
+            "value": "mlb",
+            "train_pct": 0.258065,
+            "test_pct": 0.444444,
+            "abs_delta": 0.18638
+          }
+        ]
+      },
+      {
+        "feature": "market",
+        "top_shift": [
+          {
+            "value": "1n2",
+            "train_pct": 1.0,
+            "test_pct": 0.0,
+            "abs_delta": 1.0
+          },
+          {
+            "value": "synthetic_shift",
+            "train_pct": 0.0,
+            "test_pct": 1.0,
+            "abs_delta": 1.0
+          }
+        ]
+      },
+      {
+        "feature": "pick_side",
+        "top_shift": [
+          {
+            "value": "draw",
+            "train_pct": 0.225806,
+            "test_pct": 0.166667,
+            "abs_delta": 0.05914
+          },
+          {
+            "value": "home",
+            "train_pct": 0.387097,
+            "test_pct": 0.444444,
+            "abs_delta": 0.057348
+          },
+          {
+            "value": "away",
+            "train_pct": 0.387097,
+            "test_pct": 0.388889,
+            "abs_delta": 0.001792
+          }
+        ]
+      }
+    ]
+  },
+  "recommendations": [
+    "Bloquer promotion V5 automatique et recalibrer sur la dernière fenêtre settled.",
+    "Sample local faible : enrichir picks_history avant décision ROI forte."
+  ]
+}

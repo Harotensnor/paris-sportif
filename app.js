@@ -6890,6 +6890,22 @@ recommendations: artifact?.recommendations || [],
 limitations: artifact?.limitations || [],
 };
 }
+function getAdversarialValidationV5DebugSummary() {
+const artifact = (typeof window !== 'undefined') ? window.ADVERSARIAL_VALIDATION_V5 : null;
+return {
+loaded: !!artifact,
+status: artifact?.status || 'missing',
+auc: Number(artifact?.auc || 0),
+threshold_auc: Number(artifact?.threshold_auc || 0.6),
+drift_detected: !!artifact?.drift_detected,
+rows: Number(artifact?.rows || 0),
+train_rows: Number(artifact?.train_rows || 0),
+test_rows: Number(artifact?.test_rows || 0),
+top_numeric_shifts: artifact?.top_numeric_shifts || [],
+synthetic_check: artifact?.synthetic_check || null,
+recommendations: artifact?.recommendations || [],
+};
+}
 try {
 window.getStackingMetaV5Nudge = getStackingMetaV5Nudge;
 window.getStackingMetaV5DebugSummary = getStackingMetaV5DebugSummary;
@@ -6904,6 +6920,7 @@ window.getMultitaskV5MarketPolicy = getMultitaskV5MarketPolicy;
 window.getMultitaskContextV5 = getMultitaskContextV5;
 window.getMultitaskV5DebugSummary = getMultitaskV5DebugSummary;
 window.getBacktestDeepV5DebugSummary = getBacktestDeepV5DebugSummary;
+window.getAdversarialValidationV5DebugSummary = getAdversarialValidationV5DebugSummary;
 } catch (e) {}
 
 let __predCache = new Map();
@@ -17964,6 +17981,7 @@ adaptiveEnsembleV5: getAdaptiveEnsembleV5DebugSummary(),
 coldStartV5: getColdStartV5DebugSummary(),
 multitaskV5: getMultitaskV5DebugSummary(),
 backtestDeepV5: getBacktestDeepV5DebugSummary(),
+adversarialValidationV5: getAdversarialValidationV5DebugSummary(),
 selfEvaluationV5: v37SelfEvaluationSummary,
 seasonPhase: getSeasonPhaseDebugSummary(),
 starPlayers: getStarPlayersDebugSummary(),
@@ -24275,6 +24293,32 @@ return `<section style="margin-top:32px;">
           </div>
         </section>`;
 })();
+const v5AdversarialHtml = (() => {
+const data = window.ADVERSARIAL_VALIDATION_V5 || null;
+if (!data) return '';
+const auc = Number(data.auc || 0);
+const threshold = Number(data.threshold_auc || 0.6);
+const warn = auc > threshold;
+const col = warn ? 'var(--warn)' : 'var(--accent)';
+const synthetic = data.synthetic_check || {};
+return `<section style="margin-top:32px;">
+          <h2 class="page-h2">🧬 Adversarial validation V5</h2>
+          <div style="padding:14px;background:var(--panel);border:1px solid var(--border);border-left:4px solid ${col};border-radius:0 12px 12px 0;">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:10px;">
+              <div><div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;font-weight:800;">AUC train/test</div><div style="font-size:24px;font-weight:900;color:${col};">${auc.toFixed(3)}</div><div style="font-size:11px;color:var(--text-dim2);">seuil ${threshold.toFixed(2)}</div></div>
+              <div><div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;font-weight:800;">Statut</div><div style="font-size:24px;font-weight:900;color:${col};">${warn ? 'drift' : 'stable'}</div><div style="font-size:11px;color:var(--text-dim2);">${Number(data.rows || 0)} lignes</div></div>
+              <div><div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;font-weight:800;">Test synthétique</div><div style="font-size:24px;font-weight:900;color:${synthetic.drift_detected ? 'var(--accent)' : 'var(--danger)'};">${Number(synthetic.auc || 0).toFixed(3)}</div><div style="font-size:11px;color:var(--text-dim2);">${synthetic.drift_detected ? 'drift détecté' : 'à vérifier'}</div></div>
+            </div>
+            <div style="font-size:12px;color:var(--text-dim);margin-bottom:8px;">Le classifieur tente de reconnaître les lignes récentes face au train historique. AUC &gt; ${threshold.toFixed(2)} = distribution différente, donc rollout V5 à surveiller.</div>
+            ${(data.top_numeric_shifts || []).slice(0, 5).map(f => `<div style="display:grid;grid-template-columns:1fr 86px 86px 76px;gap:8px;padding:7px 0;border-top:1px solid var(--border);font-size:12px;align-items:center;">
+              <b>${esc(f.feature || '')}</b>
+              <span>train ${Number(f.train_mean || 0).toFixed(2)}</span>
+              <span>test ${Number(f.test_mean || 0).toFixed(2)}</span>
+              <span style="text-align:right;color:var(--brand);">Δ ${Number(f.standardized_shift || 0).toFixed(2)}</span>
+            </div>`).join('')}
+          </div>
+        </section>`;
+})();
 wrap.innerHTML = `
       <div style="max-width:900px;margin:0 auto;padding:16px 12px 40px;">
         <div style="padding:40px 0 16px;border-bottom:1px solid var(--border);">
@@ -24314,6 +24358,7 @@ wrap.innerHTML = `
         ${v5AdaptiveEnsembleHtml}
         ${v5MultitaskHtml}
         ${v5BacktestDeepHtml}
+        ${v5AdversarialHtml}
 
         <section style="margin-top:32px;">
           <h2 class="page-h2">🧮 Comment le modèle décide</h2>
@@ -29542,6 +29587,22 @@ checks.push({ key: 'odds-coverage', label: '💰 Couverture cotes', status: oSta
 value: upcomingAll.length ? `${oddsPct.toFixed(0)}%` : 'n/a',
 detail: upcomingAll.length ? `${withOdds.length}/${upcomingAll.length} matchs Winamax restants ont des cotes.` : `Aucun match restant.` });
 
+const advV5 = window.ADVERSARIAL_VALIDATION_V5 || null;
+if (advV5) {
+const advAuc = Number(advV5.auc || 0);
+const advThreshold = Number(advV5.threshold_auc || 0.6);
+const advWarn = advAuc > advThreshold;
+checks.push({
+key: 'adversarial-validation-v5',
+label: '🧬 Adversarial validation V5',
+status: advWarn ? 'warn' : 'ok',
+value: `AUC ${advAuc.toFixed(3)}`,
+detail: advWarn
+? `Le train et les lignes récentes sont différentiables (seuil ${advThreshold.toFixed(2)}). Rollout V5 prudent recommandé.`
+: `Distribution train/test acceptable sous le seuil ${advThreshold.toFixed(2)}.`,
+});
+}
+
 let lockCount = 0, lockWithOdds = 0;
 try {
 upcomingAll.forEach(m => {
@@ -29646,6 +29707,7 @@ extraHtml: `<a href="https://github.com/Harotensnor/paris-sportif/actions" targe
 return { checks, meta: { totalToday, todayWinCount: todayWin.length, totalRemaining,
 perSportRemaining, lockCount, lsMb, recentErrorCount: recent.length } };
 }
+try { window.computeSiteHealth = computeSiteHealth; } catch (e) {}
 
 function renderSantePage(wrap) {
 const health = computeSiteHealth();
@@ -30008,6 +30070,34 @@ return `<div style="margin-top:22px;">
         </div>
       </div>`;
 })();
+const v5AdversarialSanteHtml = (() => {
+const d = window.ADVERSARIAL_VALIDATION_V5;
+if (!d) return '';
+const auc = Number(d.auc || 0);
+const threshold = Number(d.threshold_auc || 0.6);
+const warn = auc > threshold;
+const col = warn ? '#eab308' : '#34d399';
+const top = (d.top_numeric_shifts || []).slice(0, 4);
+return `<div style="margin-top:22px;">
+        <div style="font-size:13px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;">🧬 Adversarial validation V5</div>
+        <div style="background:linear-gradient(135deg,${col}18,transparent);border:1px solid var(--border);border-left:4px solid ${col};border-radius:10px;padding:14px;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
+            <div>
+              <div style="font-size:22px;font-weight:900;color:${col};font-variant-numeric:tabular-nums;">AUC ${auc.toFixed(3)}</div>
+              <div style="font-size:11px;color:var(--text-dim);margin-top:4px;">${Number(d.train_rows || 0)} train · ${Number(d.test_rows || 0)} test · seuil ${threshold.toFixed(2)}</div>
+            </div>
+            ${statusPill(warn ? 'warn' : 'ok')}
+          </div>
+          <div style="font-size:12px;color:var(--text-dim);line-height:1.45;margin-bottom:8px;">${warn ? 'Le train et les lignes récentes sont différentiables : garder V5 en rollout prudent et recalibrer quand plus de settled picks arrivent.' : 'La distribution train/test reste acceptable pour le rollout prudent.'}</div>
+          ${top.map(f => `<div style="display:grid;grid-template-columns:1fr 72px 72px 62px;gap:8px;padding:6px 0;border-top:1px solid var(--border);font-size:12px;align-items:center;">
+            <span>${esc(f.feature || '')}</span>
+            <span>tr ${Number(f.train_mean || 0).toFixed(2)}</span>
+            <span>te ${Number(f.test_mean || 0).toFixed(2)}</span>
+            <b style="text-align:right;color:var(--brand);">${Number(f.standardized_shift || 0).toFixed(2)}</b>
+          </div>`).join('')}
+        </div>
+      </div>`;
+})();
 
 wrap.innerHTML = `
       <div style="max-width:1500px;margin:0 auto;padding:16px 20px calc(var(--mobile-bottom-gap, 90px) + 24px);">
@@ -30038,6 +30128,7 @@ wrap.innerHTML = `
 
         ${quickHealthHtml}
         ${v5FeatureDriftHtml}
+        ${v5AdversarialSanteHtml}
 
         ${santeFold('🧪 Anomalies modèle/marché', modelAnomalyHtml)}
 
