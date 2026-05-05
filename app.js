@@ -17303,6 +17303,7 @@ const v37DecisionGuideHtml = `<details class="v37-decision-guide" ${v37DecisionG
       </details>`;
 const v36FilterButton = (kind, value, label, active) => `<button type="button" class="v36-filter-chip ${active ? 'is-active' : ''}" data-v36-filter="${esc(kind)}" data-v36-value="${esc(value)}">${label}</button>`;
 const v36SortButton = (value, label) => `<button type="button" class="v36-sort-btn ${v36Sort === value ? 'is-active' : ''}" data-v36-sort="${esc(value)}">${esc(label)}</button>`;
+const v36QuickButton = (action, label, active) => `<button type="button" class="${active ? 'is-active' : ''}" data-v36-quick="${esc(action)}">${esc(label)}</button>`;
 const v37BlindOddHtml = (odd) => v37BlindMode
 ? '<span class="v37-blind-value" data-tooltip="Mode blind : la cote est cachee pour juger le pari avant le prix.">Cote cachee</span>'
 : `@${Number(odd || 0).toFixed(2)}`;
@@ -17858,6 +17859,12 @@ wrap.innerHTML = `
             <button type="button" class="page-btn" data-page="tous">Tout voir</button>
           </section>
           <section class="v36-filter-strip" aria-label="Filtres accueil">
+            <nav class="v36-mobile-quick" aria-label="Filtres rapides mobile">
+              ${v36QuickButton('today', "Aujourd'hui", v37DateFilter === todayIso)}
+              ${v36QuickButton('locks', 'Locks', v36Filter.tier === 'safe')}
+              ${v36QuickButton('edge', 'Top edges', v36Sort === 'edge')}
+              ${v36QuickButton('football', 'Foot only', v36Filter.sport === 'football')}
+            </nav>
             <div>
               ${v36FilterButton('sport', '', 'Tous sports', !v36Filter.sport)}
               ${v36Sports.map(sp => v36FilterButton('sport', sp, `${sportIcon(sp)} ${esc(sportLabel(sp))}`, v36Filter.sport === sp)).join('')}
@@ -17910,6 +17917,30 @@ const next = { ...v36Filter };
 if (!value) delete next[kind];
 else next[kind] = value;
 try { localStorage.setItem(v36FilterKey, JSON.stringify(next)); } catch(e) {}
+renderDashboardPage(wrap);
+});
+});
+wrap.querySelectorAll('[data-v36-quick]').forEach(btn => {
+btn.addEventListener('click', () => {
+const action = btn.dataset.v36Quick || '';
+const next = { ...v36Filter };
+if (action === 'today') {
+next.date = todayIso;
+} else if (action === 'locks') {
+if (next.tier === 'safe') delete next.tier;
+else next.tier = 'safe';
+next.sort = 'tier';
+} else if (action === 'edge') {
+next.sort = next.sort === 'edge' ? 'tier' : 'edge';
+} else if (action === 'football') {
+if (next.sport === 'football') delete next.sport;
+else next.sport = 'football';
+}
+try { localStorage.setItem(v36FilterKey, JSON.stringify(next)); } catch(e) {}
+if (action === 'today') {
+try { history.replaceState(null, '', location.pathname + location.search + `#dashboard?date=${encodeURIComponent(todayIso)}`); } catch(e) {}
+}
+try { if (navigator.vibrate) navigator.vibrate(6); } catch(e) {}
 renderDashboardPage(wrap);
 });
 });
@@ -17984,7 +18015,7 @@ if (!wrap.__v36MobileSwipeWired) {
 wrap.__v36MobileSwipeWired = true;
 let swipeStart = null;
 const v36GestureTarget = (target) => target?.closest?.('.v36-table-card, .v36-pick-card, .dash-pick-card');
-const v36GestureInteractive = (target) => target?.closest?.('input, select, textarea, a, [data-v37-day], [data-v36-filter], [data-v36-sort], [data-v37-live-toggle], [data-v37-blind], [data-compare-pick], [data-tous-load-more]');
+const v36GestureInteractive = (target) => target?.closest?.('input, select, textarea, a, [data-v37-day], [data-v36-filter], [data-v36-quick], [data-v36-sort], [data-v37-live-toggle], [data-v37-blind], [data-compare-pick], [data-tous-load-more]');
 const v36GoDateBySwipe = (direction) => {
 let storedFilter = {};
 try { storedFilter = JSON.parse(localStorage.getItem(v36FilterKey) || '{}') || {}; } catch(e) { storedFilter = {}; }
@@ -18045,7 +18076,7 @@ const existing = document.querySelector('.v36-context-menu');
 if (existing) existing.remove();
 };
 const contextCard = (target) => target?.closest?.('.v36-table-card, .v36-pick-card, .dash-pick-card, .v37-personal-card');
-const contextInteractive = (target) => target?.closest?.('input, select, textarea, a, button:not(.v36-table-card):not(.v36-pick-card):not(.dash-pick-card):not(.v37-personal-card), [data-v37-day], [data-v36-filter], [data-v36-sort], [data-v37-live-toggle], [data-v37-blind], [data-compare-pick]');
+const contextInteractive = (target) => target?.closest?.('input, select, textarea, a, button:not(.v36-table-card):not(.v36-pick-card):not(.dash-pick-card):not(.v37-personal-card), [data-v37-day], [data-v36-filter], [data-v36-quick], [data-v36-sort], [data-v37-live-toggle], [data-v37-blind], [data-compare-pick]');
 const addMenuButton = (menu, action, label) => {
 const btn = document.createElement('button');
 btn.type = 'button';
