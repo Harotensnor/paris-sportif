@@ -55,3 +55,13 @@ Guardrail: les poids sont normalisés par sport et bornés côté runtime entre 
 - Inputs: dispersion des sous-modèles, variance d'accord, qualité data et drift features.
 
 Guardrail: le Wilson 95% historique reste disponible en fallback, mais la modal privilégie désormais la fourchette bootstrap V5 pour parler d'incertitude propre au match.
+
+## Section I — Cold start handling
+
+- Status: **active**
+- Artifact: `cold_start_v5.json`
+- Coverage: `3730` équipes connues, dont `3337` en cold start strict (`sample_size < 5`).
+- Policy: fallback ligue/sport pour les équipes nouvelles, variance `×1.25`, confidence decay `0.88`, edge requis `+2pt`.
+- Runtime: `predictMatch` réduit la confiance des équipes cold start et ajoute `cold_start_edge_lt_2pt` si le pick ne compense pas l'incertitude.
+
+Guardrail: la règle ne bloque pas silencieusement le tableau entier ; elle ne s'applique qu'aux équipes réellement peu observées et reste visible dans `?debug=1` + modal détail via le badge `Cold start V5`.
