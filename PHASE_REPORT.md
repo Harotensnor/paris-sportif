@@ -132,3 +132,33 @@ Status: livré en passe large.
 - `python scripts/check_pipeline_freshness.py --max-age-min 30`: OK après reseed local.
 - `npx playwright test --project=chromium-desktop`: 208 passed, 10 skipped, 0 failed.
 - Bundle budget: `app.js` 1660333 bytes / 1700000, `app.css` 266672 bytes / 360000.
+
+## Phase 8 — Mobile UX dédiée
+
+Status: livré.
+
+### Livré
+
+- Layout mobile compact des cards dashboard, avec table masquée et cards verticales sous 720px.
+- Swipe horizontal entre jours et swipe vertical sur carte pour ouvrir le détail.
+- Pull-to-refresh haptique avec seuil 80px, état prêt et toast de confirmation.
+- Modale détail en bottom sheet mobile avec poignée, snap 50/90/full et drag-down to close.
+- Filtres dashboard sticky puis compacts pendant le scroll long.
+- Audit zones tactiles: boutons/filtres/cards/modale/topbar/bottom nav à 48px sur mobile.
+- Menu long-press sur pick: favoris, comparer, suivre 1u, ouvrir le détail.
+- Partage natif depuis la modale avec deep-link #match/<id>/<onglet>.
+- Filtres rapides mobile: Aujourd'hui, Locks, Top edges, Foot only.
+- Badges de tier compacts: S, SO, V, B, O.
+
+### Validation effectuée
+
+- Syntaxe app.js: OK.
+- Suite Playwright Phase 8 mobile: 9 passed, 0 failed.
+- Lighthouse fallback: 8 audits à 100 perf / 100 a11y / 100 SEO.
+- Pipeline drift: OK, 0 drift.
+
+### Points reportés
+
+- Gestes avancés type long-press multi-actions sur pages secondaires hors dashboard: à garder pour une passe future si usage réel.
+- Haptics dépendant du navigateur: fallback silencieux conservé quand navigator.vibrate est indisponible.
+
