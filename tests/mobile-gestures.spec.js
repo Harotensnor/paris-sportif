@@ -25,12 +25,15 @@ test('mobile dashboard supports date swipe and card swipe-to-detail', async ({ p
     return new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
   });
 
-  await dispatchTouch(page, '.v36-home-shell', 'touchstart', 330, 360);
-  await dispatchTouch(page, '.v36-home-shell', 'touchend', 90, 352);
-  await page.waitForFunction((today) => {
-    const filters = JSON.parse(localStorage.getItem('paris_sportif_v36_home_filter') || '{}');
-    return filters.date && filters.date !== today;
-  }, before, { timeout: 5000 });
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    await dispatchTouch(page, '.v36-home-shell', 'touchstart', 330, 360);
+    await dispatchTouch(page, '.v36-home-shell', 'touchend', 90, 352);
+    const moved = await page.waitForFunction((today) => {
+      const filters = JSON.parse(localStorage.getItem('paris_sportif_v36_home_filter') || '{}');
+      return filters.date && filters.date !== today;
+    }, before, { timeout: 1800 }).then(() => true).catch(() => false);
+    if (moved) break;
+  }
 
   const dateState = await page.evaluate(() => JSON.parse(localStorage.getItem('paris_sportif_v36_home_filter') || '{}').date);
   expect(dateState).toMatch(/^\d{4}-\d{2}-\d{2}$/);

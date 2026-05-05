@@ -18036,6 +18036,19 @@ span.textContent = String(img.dataset.fallback || '?').slice(0, 2);
 img.replaceWith(span);
 }, true);
 }
+if (!window.__v36FilterCompactWired) {
+window.__v36FilterCompactWired = true;
+const syncFilterCompact = () => {
+const active = window.innerWidth <= 720
+&& (window.scrollY || document.documentElement.scrollTop || 0) > 260
+&& Boolean(document.querySelector('.v36-filter-strip'));
+document.body.classList.toggle('v36-mobile-filter-compact', active);
+};
+window.addEventListener('scroll', syncFilterCompact, { passive: true });
+window.addEventListener('resize', syncFilterCompact, { passive: true });
+window.__v36SyncFilterCompact = syncFilterCompact;
+}
+try { if (typeof window.__v36SyncFilterCompact === 'function') window.__v36SyncFilterCompact(); } catch(e) {}
 if (!wrap.__v37DetailDelegated) {
 wrap.__v37DetailDelegated = true;
 const openBigDetail = async (trigger) => {

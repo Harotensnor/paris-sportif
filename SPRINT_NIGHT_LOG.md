@@ -1029,3 +1029,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Tests: `mobile-bottom-sheet.spec.js` passe mobile Chromium (1/1); `app.js` syntax OK; drift pipeline OK.
 - Cache/footer bumpes v36.028; `app.js` hash `db5c649c`, SW `paris-sportif-20260505-222229`.
 
+## Sprint v36.029 — AUTO 10/10 Phase 8 FFF filtres sticky compacts (22:26 UTC)
+- Mobile: les filtres dashboard se contractent en scroll profond et restent ancrés dans le viewport.
+- Lisibilité: les chips deviennent compactes, avec le filtre actif gardé plus large pour conserver le contexte.
+- Robustesse: le mode compact se synchronise au scroll/resize et ne dépend pas du rendu initial.
+- Tests: suite mobile Phase 8 actuelle 5/5; Lighthouse fallback 100/100/100 sur 4 pages x 2 profils; drift pipeline OK.
+- Cache/footer bumpes v36.029; `app.js` hash `7f048c43`, SW `paris-sportif-20260505-222617`.
+
