@@ -1110,3 +1110,12 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Tests: suite model-v5 passe desktop + mobile Chromium (6/6); app.js syntax OK; drift pipeline OK.
 - Cache/footer bumpés v37.003; app.js hash 0215e2b7; feature hash df2bfa11; SW paris-sportif-20260505-230154.
 
+
+## Sprint v37.004 — AUTO 10/10 Phase V5 D online learning prep (23:03 UTC)
+- Data: build_model_versions_v5.py génère model_versions.json/js avec version v5.0, historique et hashes artifacts.
+- Rollout: politique A/B 10% → 50% → 100% avec critères ROI/Brier et rollback documenté.
+- Crédibilité/debug: online learning V5 visible avec prochaine recalibration dominicale et étapes de rollout.
+- Pipeline: refresh.yml et auto_refresh.py reconstruisent model_versions à chaque tick.
+- Tests: suite model-v5 passe desktop + mobile Chromium (8/8); app.js syntax OK; drift pipeline OK.
+- Cache/footer bumpés v37.004; app.js hash e5024038; model_versions hash 23ad6181; SW paris-sportif-20260505-230352.
+
