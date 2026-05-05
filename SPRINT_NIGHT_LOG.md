@@ -756,3 +756,12 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Mesures: dry-run `current` 215 picks / 130 matchs qualifies; scenario Theo stale 397 min 213 picks; tiers non vides dont 1 Outsider; max edge affiche +25%.
 - QA: `phase-finale-dashboard.spec.js` 10/10, `run_dashboard_dry.js` OK, `a11y_audit.js` 0 critical/serious/moderate, `lighthouse_audit.js` 100/100/100 mobile+desktop, `node --check app.js/sw.js` OK, `check_bundle_size.py` OK (`app.js` 1579.3 KB < 1750 KB).
 - Cache/footer bumpes v35.475; `app.js` hash `9a270a22`, `app.css` hash `e464318c`, SW `paris-sportif-20260505-180559`.
+
+## Sprint v35.476 — AUTO 10/10 Cohérence pronos et indicateurs (18:35 UTC)
+- Score: `v37OpportunityFor()` et `qualityScore()` recalibres pour redevenir discriminants; dry-run frais 213 picks avec distribution 2% en 80+, 49% en 50-79, 49% sous 50 au lieu d'un tableau tout a 100.
+- Cohérence: dedup canonique par match/marche/selection, conservation du meilleur edge x confiance, et filtre same-match via `isPairConsistent()`; dry-run retire 37 doublons exacts et 3 contradictions.
+- Diversité/debug: top 30 plafonne a ~20% par marche quand le pool le permet; debug `?debug=1` expose histogramme score, breakdown marketKey, couverture snapshots cotes (84%), compteurs/samples dedup et contradictions.
+- Indicateurs: Performance distingue `Pipeline sain`, `OK avec alertes`, `dégradé`; warnings ouvrables en détail; Brier recalibre (0.22-0.25 = correct), et KPI "pronos générés" clarifie la différence avec les paris suivis par Théo.
+- Stale: footer passe en orange apres 30 min (`Données en attente de refresh`) et rouge apres 4h (`Pipeline en panne`) pour eviter le badge vert contradictoire.
+- QA: `node --check app.js/sw.js` OK, `run_dashboard_dry.js` OK, `phase-finale-dashboard.spec.js` 10/10 desktop+mobile, `check_bundle_size.py` OK (`app.js` 1589.6 KB < 1750 KB).
+- Cache/footer bumpes v35.476; `app.js` hash `b4dbbfe0`, `app.css` hash `e464318c`, SW `paris-sportif-20260505-183558`.

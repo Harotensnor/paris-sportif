@@ -105,6 +105,7 @@ test('phase finale: dashboard debug mode exposes real filtering counters', async
       panelText: panel?.textContent || '',
       rows: Math.max(rows.length, cards.length),
       emptyHelp: document.querySelector('.v37-empty-pool-help')?.textContent || '',
+      debug: JSON.parse(document.querySelector('[data-v37-debug-panel] pre')?.textContent || '{}'),
     };
   });
 
@@ -112,6 +113,12 @@ test('phase finale: dashboard debug mode exposes real filtering counters', async
   expect(state.panelText).toContain('Filtres actifs');
   expect(state.rows).toBeGreaterThanOrEqual(30);
   expect(state.emptyHelp).toBe('');
+  expect(state.debug.scoreHistogram?.['50-79']?.count).toBeGreaterThan(0);
+  expect(state.debug.scoreHistogram?.['<50']?.count).toBeGreaterThan(0);
+  expect(state.debug.top30MarketDistinct).toBeGreaterThanOrEqual(5);
+  expect(state.debug.oddsSnapshotCoverage?.pct).toBeGreaterThanOrEqual(80);
+  expect(state.debug.qualityCounters?.dedupExactRemoved).toBeGreaterThanOrEqual(0);
+  expect(state.debug.qualityCounters?.sameMatchContradictionsRemoved).toBeGreaterThanOrEqual(0);
   expect(logs.length).toBeGreaterThanOrEqual(1);
 });
 
