@@ -254,6 +254,12 @@ SOURCES = [
         'exclude_low_auc': ((d.get('summary') or {}).get('exclude_low_auc') or 0) if isinstance(d, dict) else 0,
         'policy': (d.get('sample_policy') or 'unknown') if isinstance(d, dict) else 'missing',
     }),
+    ('daily_insights', 'daily_insights.json', lambda d: {
+        'insights': ((d.get('summary') or {}).get('insights') or len(d.get('insights') or [])) if isinstance(d, dict) else 0,
+        'events_today': ((d.get('summary') or {}).get('events_today') or 0) if isinstance(d, dict) else 0,
+        'events_next_36h': ((d.get('summary') or {}).get('events_next_36h') or 0) if isinstance(d, dict) else 0,
+        'sources_loaded': ((d.get('summary') or {}).get('sources_loaded') or 0) if isinstance(d, dict) else 0,
+    }),
     ('detected_angles', 'detected_angles.json', lambda d: {
         'events': ((d.get('summary') or {}).get('events_with_angles') or len(d.get('events') or [])) if isinstance(d, dict) else 0,
         'angles': ((d.get('summary') or {}).get('angles') or 0) if isinstance(d, dict) else 0,
@@ -384,6 +390,7 @@ SOURCE_SCRIPT = {
     'boosted_odds': 'scripts/detect_boosted_odds.py',
     'footballdata': 'scripts/fetch_footballdata.py',
     'clv_history': 'scripts/compute_clv.py',
+    'daily_insights': 'scripts/build_daily_insights.py',
 }
 
 FAST_PIPELINE_SOURCES = {

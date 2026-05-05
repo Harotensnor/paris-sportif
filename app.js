@@ -14390,11 +14390,12 @@ read('rare_signals'),
 read('timing_edges'),
 read('signal_gap_report'),
 read('market_auc_report'),
-]).then(([league, marketBias, angles, rare, timing, gaps, marketAuc]) => {
-state.data = { league, marketBias, angles, rare, timing, gaps, marketAuc };
+read('daily_insights'),
+]).then(([league, marketBias, angles, rare, timing, gaps, marketAuc, daily]) => {
+state.data = { league, marketBias, angles, rare, timing, gaps, marketAuc, daily };
 state.loaded = true;
 }).catch(() => {
-state.data = { league: null, marketBias: null, angles: null, rare: null, timing: null, gaps: null, marketAuc: null };
+state.data = { league: null, marketBias: null, angles: null, rare: null, timing: null, gaps: null, marketAuc: null, daily: null };
 state.loaded = true;
 }).finally(() => {
 state.loading = false;
@@ -15406,6 +15407,26 @@ return `<${tag}${typeAttr} class="v36-side-row v37-insight-row" data-tone="${esc
         </${tag}>`;
 };
 const v37PlainText = (value) => String(value || '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+const v37DailyInsights = v37Array(v37Intel.daily?.insights);
+const v37DailyRows = v37DailyInsights
+.slice(0, 5)
+.map(ins => v37InsightRow({
+kicker: ins.kicker || 'Briefing jour',
+title: ins.title || 'Insight du jour',
+body: ins.body || '',
+eventId: ins.event_id,
+tone: ins.tone || 'info',
+}))
+.join('');
+const v37DailySummary = v37Intel.daily?.summary || {};
+const v37DailySection = v37DailyInsights.length ? `<section class="v37-daily-strip" aria-label="Briefing quotidien">
+        <header>
+          <span>BRIEFING</span>
+          <strong>Insights du jour</strong>
+          <em>${esc(Number(v37DailySummary.events_upcoming_today || v37DailySummary.events_next_36h || 0).toLocaleString('fr-FR'))} matchs à surveiller · ${esc(String(v37DailySummary.sources_loaded || 0))} sources locales croisées</em>
+        </header>
+        <div class="v37-daily-grid">${v37DailyRows}</div>
+      </section>` : '';
 const v37TiltRow = v37Tilt ? v37InsightRow({
 kicker: v37Tilt.level === 'danger' ? 'Tilt critique' : v37Tilt.level === 'warn' ? 'Discipline' : 'Discipline',
 title: v37Tilt.title,
@@ -15544,10 +15565,12 @@ wrap.innerHTML = `
             </div>
           </section>
           ${v37TiltBanner}
+          ${v37DailySection}
           ${v37PersonalPicksHtml}
           <div class="v36-home-grid">
             ${v36TableHtml}
             <aside class="v36-home-rail" aria-label="Radar temps reel">
+              <section><header><span>Briefing jour</span><b>${Number(v37Intel.daily?.summary?.insights || 0) || '...'}</b></header>${v37DailyRows || v37IntelFallback}</section>
               <section><header><span>Insights modèle</span><b>${v37IntelCount || '...'}</b></header>${v37RareRows || v37AngleRows || v37IntelFallback}</section>
               <section><header><span>Biais marché ligues</span><b>${Number(v37Intel.league?.summary?.exploit || 0)}</b></header>${v37LeagueRows || v37IntelFallback}</section>
               <section><header><span>Biais par marché</span><b>${Number(v37Intel.marketBias?.summary?.market_exploit || 0)}</b></header>${v37MarketBiasRows || v37IntelFallback}</section>

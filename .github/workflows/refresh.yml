@@ -214,6 +214,9 @@ jobs:
           # Mesure si on bat le marché (cote bouge en notre faveur après
           # qu'on ait pris la cote). Cheap (~1s sur 450 matches).
           python3 compute_clv.py || true
+          # v35.420 — Briefing quotidien local depuis les sidecars deja
+          # construits. Aucune source externe: juste synthese actionnable UI.
+          python3 build_daily_insights.py || true
           # v31.7.23 — Mesure ρ Dixon-Coles par ligue via likelihood max.
           # Lent (~2-5s pour 40 ligues), tourne 1×/jour à minute=0 (cron).
           # Tant qu'une ligue n'a pas ≥40 matchs archivés, fallback litterature.
@@ -324,6 +327,7 @@ jobs:
             data_today.json data_manifest.json team_form.json form_stats_extended.json h2h_extended.json \
             thesportsdb_meta.json openligadb_matches.json public_team_stats.json public_team_profiles.json public_player_profiles.json \
             league_inefficiencies.json market_biases_by_league.json detected_angles.json rare_signals.json timing_edges.json \
+            daily_insights.json \
             market_auc_report.json \
             lightgbm_weights.json lightgbm_weights.js \
             rugby_markets.json niche_markets.json \
