@@ -36,5 +36,6 @@ test('quarter Asian handicap and total markets are computed and shown in the det
   expect(state.totalCount).toBeGreaterThanOrEqual(3);
   expect(state.ahLabel).toContain('AH');
   expect(state.totalLabel).toContain('asiatique');
-  expect(state.modalText).toContain('handicap et total asiatique');
+  expect(state.modalText).toContain('Asian Handicap');
+  expect(state.modalText).toContain('Total asiatique');
 });

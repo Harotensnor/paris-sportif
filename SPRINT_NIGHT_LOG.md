@@ -994,3 +994,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Tests: `mlb-nhl-props.spec.js` passe desktop + mobile (2/2); `app.js` syntax OK; drift pipeline OK.
 - Cache/footer bumpes v36.023; `app.js` hash `06f49c36`, sidecars `0f71499f/9b80b4c8`, SW `paris-sportif-20260505-220121`.
 
+## Sprint v36.024 — AUTO 10/10 Phase 7 AAA same-game builders (22:13 UTC)
+- Modèle: combinés même match avec proba brute, proba corrigée par corrélation et note de corrélation visible.
+- Marchés: scénarios 1N2/DNB/double chance + buts, BTTS, mi-temps, team totals et rythme du match.
+- UI: page Combinés expose 10+ tickets same-game quand un match exact offre plusieurs marchés compatibles.
+- Tests: `same-game-combos.spec.js` passe desktop + mobile (2/2); suite Phase 7 desktop complète 9/9.
+- Cache/footer bumpes v36.024; Phase 7 documentée dans `PHASE_REPORT.md`.
+
