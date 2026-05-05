@@ -114,3 +114,44 @@ test('phase finale: dashboard debug mode exposes real filtering counters', async
   expect(state.emptyHelp).toBe('');
   expect(logs.length).toBeGreaterThanOrEqual(1);
 });
+
+test('phase finale: dashboard history date keeps past picks explicit', async ({ page }) => {
+  const yesterday = new Date(Date.now() - 86_400_000).toISOString().slice(0, 10);
+  await page.goto(`/pronostics.html?debug=1#dashboard?date=${yesterday}`);
+
+  await expect(page.locator('[data-v37-debug-panel]')).toBeVisible({ timeout: 20_000 });
+  await page.waitForFunction(() => {
+    const panel = document.querySelector('[data-v37-debug-panel] pre');
+    return !!panel && panel.textContent.includes('"activeDate"');
+  });
+
+  const state = await page.evaluate(() => {
+    const panel = document.querySelector('[data-v37-debug-panel] pre');
+    const debug = JSON.parse(panel?.textContent || '{}');
+    const visible = (el) => {
+      const style = getComputedStyle(el);
+      const rect = el.getBoundingClientRect();
+      return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+    };
+    const rows = [...document.querySelectorAll('.v36-picks-table tbody .v36-table-row')].filter(visible);
+    const cards = [...document.querySelectorAll('.v36-table-cards .v36-table-card')].filter(visible);
+    return {
+      debug,
+      visiblePicks: Math.max(rows.length, cards.length),
+      resultCells: document.querySelectorAll('.v37-result').length,
+      hasHistoryFooter: !!document.querySelector('.v37-history-footer'),
+      emptyHelp: document.querySelector('.v37-empty-pool-help')?.textContent || '',
+    };
+  });
+
+  expect(state.debug.activeDate).toBe(yesterday);
+  expect(state.debug.dateSource).toBe('url');
+  expect(state.debug.historyMode).toBe(true);
+  if (state.debug.v36PickPool > 0) {
+    expect(state.visiblePicks).toBeGreaterThan(0);
+    expect(state.resultCells).toBeGreaterThan(0);
+    expect(state.hasHistoryFooter).toBe(true);
+  } else {
+    expect(state.emptyHelp).not.toContain('Chargement');
+  }
+});

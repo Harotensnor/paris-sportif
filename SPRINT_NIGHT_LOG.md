@@ -687,3 +687,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Validation live locale: desktop 1440 affiche 360 lignes, nav `sticky row` 1404px, tableau 1366px; mobile 390 affiche 360 cards et bottom-nav visible.
 - QA: syntax `app.js`/`sw.js` OK, no conflict markers OK, `phase-finale-dashboard.spec.js` 4/4 desktop+mobile.
 - Cache/footer bumpes v35.465; `app.css` hash `89198144`.
+
+## Sprint v35.466 — AUTO 10/10 Historique explicite (18:29 UTC)
+- Debug: le panneau `?debug=1` expose maintenant `activeDate`, `dateSource`, `historyMode` et `allHorizon`, donc une date URL ne ressemble plus a un filtre local `all`.
+- Historique: ajout d'une spec qui ouvre J-1 et verifie que les picks passes restent visibles avec badges resultat et footer historique quand ils existent.
+- QA: `phase-finale-dashboard.spec.js` passe 6/6 desktop+mobile, syntax `app.js` OK, no conflict markers OK.
+- Cache/footer bumpes v35.466; `app.js` hash `55e22e8f`.
