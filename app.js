@@ -13,6 +13,22 @@ return false;
 })();
 const SAFE_ERROR_KEY = 'paris_sportif_js_errors_v1';
 const SAFE_ERROR_LIMIT = 60;
+const GUARD_STATS = { nonFinite: 0, badOdd: 0, badProb: 0, skippedEvents: 0 };
+function clamp(v, lo, hi) {
+const n = Number(v);
+const low = Number(lo);
+const high = Number(hi);
+if (!Number.isFinite(n)) return Number.isFinite(low) ? low : 0;
+if (!Number.isFinite(low) || !Number.isFinite(high)) return n;
+return Math.max(low, Math.min(high, n));
+}
+function guardNumber(value, fallback = 0, context = 'number') {
+const n = Number(value);
+if (Number.isFinite(n)) return n;
+GUARD_STATS.nonFinite++;
+try { logSafeError(`guard:${context}`, new Error(`non finite value: ${String(value).slice(0, 80)}`)); } catch(_) {}
+return fallback;
+}
 function logSafeError(context, error) {
 const entry = {
 ts: new Date().toISOString(),
@@ -2205,8 +2221,14 @@ default:         return true;
 try { window.getScopedEvents = getScopedEvents; } catch(e){}
 
 function expectedValue(prob, odd) {
-if (!(prob > 0) || !(odd > 1)) return 0;
-return prob * odd - 1;
+const p = guardNumber(prob, 0, 'expectedValue.prob');
+const o = guardNumber(odd, 0, 'expectedValue.odd');
+if (!(p > 0) || !(o > 1)) {
+if (!(o > 1)) GUARD_STATS.badOdd++;
+if (!(p > 0)) GUARD_STATS.badProb++;
+return 0;
+}
+return p * o - 1;
 }
 try { window.expectedValue = expectedValue; } catch(e){}
 
@@ -2580,9 +2602,9 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
               return best ? [best].concat(Array.isArray(best.allCandidates) ? best.allCandidates : []) : [];
             })();
         for (const c of (Array.isArray(candidates) ? candidates : [])) {
-          const odd = Number(c?.odd || 0);
-          if (!(odd >= 1.30)) continue;
-          const rel = Number(c.rel || c.prob || pred.reliability || pred.pick?.prob || 0);
+          const odd = guardNumber(c?.odd || 0, 0, 'displayable.odd');
+          if (!(odd >= 1.30) || odd > 50) { GUARD_STATS.badOdd++; continue; }
+          const rel = clamp(guardNumber(c.rel || c.prob || pred.reliability || pred.pick?.prob || 0, 0, 'displayable.prob'), 0, 1);
           const rawEdge = Number.isFinite(Number(c.edge)) ? Number(c.edge) : (rel - 1 / odd);
           const rawEv = Number.isFinite(Number(c.ev)) ? Number(c.ev) : (rel * odd - 1);
           const edge = Math.max(-0.25, Math.min(0.25, rawEdge));
@@ -2623,6 +2645,18 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     return rows;
   }
   try { window.getDisplayablePicks = getDisplayablePicks; } catch(e){}
+
+  function getTierBreakdown(picks) {
+    const rows = Array.isArray(picks) ? picks : getDisplayablePicks({ includeSettled: true, includeStarted: true });
+    const out = { safe: 0, solid: 0, value: 0, big: 0, out: 0, watch: 0, total: 0 };
+    for (const row of rows || []) {
+      const tier = String(row?.tier || '').toLowerCase();
+      if (Object.prototype.hasOwnProperty.call(out, tier)) out[tier]++;
+      out.total++;
+    }
+    return out;
+  }
+  try { window.getTierBreakdown = getTierBreakdown; } catch(e){}
 
   function _v35Rows(block) {
     return Array.isArray(block) ? block.filter(Boolean) : [];
@@ -3214,9 +3248,13 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
 
   function scoreMarketCandidate(candidate, match, pred) {
     if (!candidate) return null;
-    const prob = _v35Prob(candidate.prob ?? candidate.rel);
-    const odd = Number(candidate.odd);
-    if (!(prob > 0) || !(odd > 1.01)) return null;
+    const prob = clamp(guardNumber(_v35Prob(candidate.prob ?? candidate.rel), 0, 'candidate.prob'), 0, 1);
+    const odd = guardNumber(candidate.odd, 0, 'candidate.odd');
+    if (!(prob > 0) || !(odd > 1.01) || odd > 50) {
+      if (!(odd > 1.01) || odd > 50) GUARD_STATS.badOdd++;
+      if (!(prob > 0)) GUARD_STATS.badProb++;
+      return null;
+    }
     const dq = (() => {
       try { return (typeof computeDataQuality === 'function') ? computeDataQuality(match) : null; }
       catch(e) { return null; }
@@ -3267,7 +3305,8 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     }
     const b = odd - 1;
     const rawKelly = b > 0 ? Math.max(0, (b * prob - (1 - prob)) / b) : 0;
-    const cap = out.investment?.profile?.capPct ?? (out.market === '1n2' ? 0.10 : 0.05);
+    const hardMarketCap = out.market === '1n2' ? 0.10 : 0.05;
+    const cap = Math.min(out.investment?.profile?.capPct ?? hardMarketCap, hardMarketCap);
     out.kelly = Math.min(cap, rawKelly * 0.25);
     if (out.edge > 0.18 && out.market !== 'exactScore') {
       out.suspect = true;
@@ -13766,6 +13805,7 @@ backtest_loaded: !!window.__backtestReportV2,
 calibration_loaded: !!window.__modelCalibration,
 dixon_coles_rho_loaded: !!__dcRhoMeasured,
 stadiums_loaded: !!__stadiumsCache,
+guard_stats: { ...GUARD_STATS },
 },
 features: {
 focus_trap_modal: typeof _trapFocus === 'function',
@@ -25302,6 +25342,7 @@ return next;
 }
 
 function renderPerformancePage(wrap) {
+const archiveSummary = _ensurePicksHistorySummary(wrap, () => renderPerformancePage(wrap));
 if (typeof window._loadMarketBacktest === 'function' && !window.__backtestReportMarkets) {
 const reschedule = () => {
 window._loadMarketBacktest().then(() => {
@@ -25343,7 +25384,7 @@ renderPerformancePage(wrap);
 return;
 }
 const overall = bt.overall || bt.global || {};
-const n = overall.n || 0;
+const n = archiveSummary ? Number(archiveSummary.total || 0) : (overall.n || 0);
 const wr = overall.win_rate ?? overall.winRate ?? null;
 const roi = (overall.flat_roi_pct != null) ? overall.flat_roi_pct / 100
 : (overall.roi ?? null);
@@ -25398,6 +25439,9 @@ const order = { lock: 0, premium: 1, value: 2, standard: 3, low: 4 };
 return (order[a[0]] ?? 5) - (order[b[0]] ?? 5);
 });
 const currentTab = _getPerfTab();
+const archiveNote = archiveSummary
+? `<div style="margin:10px 0 0;padding:10px 12px;background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.20);border-radius:var(--r-sm);font-size:12px;color:var(--text-dim);">Performance modèle : <b class="u-text">${Number(archiveSummary.total || 0)} pronos générés</b> dans l'archive persistante · <b class="u-text">${Number(archiveSummary.settled || 0)}</b> réglés. Bilan personnel : uniquement les paris que tu suis manuellement.</div>`
+: '';
 const tabs = [
 { k: 'global',    lbl: '🎯 Vue globale' },
 { k: 'periode',   lbl: '📆 Par période' },
@@ -25609,6 +25653,7 @@ wrap.innerHTML = `
           <div class="lbl-tiny u-text-brand">Performance · ${esc(tabs.find(t => t.k === currentTab)?.lbl || 'Vue globale')}</div>
           <h1 class="page-h1">🎯 Performance</h1>
           <div class="u-text-md u-text-dim">Synthèse du modèle sur ${n} pari${n > 1 ? 's' : ''} simulé${n > 1 ? 's' : ''}. Drill-down dans les onglets : Historique, Bilan, Backtest.</div>
+          ${archiveNote}
         </div>
 
         ${_healthWidget}
@@ -25985,8 +26030,105 @@ renderPerformancePage(wrap);
 }
 try { window.renderPerformancePage = renderPerformancePage; } catch(e){}
 
+function _ensurePicksHistorySummary(wrap, rerender) {
+  if (window.__picksHistorySummary) return window.__picksHistorySummary;
+  if (!window.__picksHistorySummaryPromise) {
+    const bucket = encodeURIComponent((window.PRONOSTICS_DATA && window.PRONOSTICS_DATA.generated_at) || String(Date.now()));
+    window.__picksHistorySummaryPromise = fetch(`picks_history_summary.json?v=${bucket}`, { cache: 'default' })
+      .then(r => r.ok ? r.json() : null)
+      .then(j => {
+        if (j && Array.isArray(j.by_day)) window.__picksHistorySummary = j;
+        return window.__picksHistorySummary || null;
+      })
+      .catch(() => null);
+  }
+  if (wrap && !wrap.dataset.historySummaryLoading) {
+    wrap.dataset.historySummaryLoading = '1';
+    window.__picksHistorySummaryPromise.then(() => {
+      delete wrap.dataset.historySummaryLoading;
+      if (document.body.contains(wrap) && typeof rerender === 'function') rerender();
+    });
+  }
+  return null;
+}
+
+function renderPicksHistoryArchivePage(wrap, archive) {
+  const days = Array.isArray(archive?.by_day) ? archive.by_day : [];
+  const todayArchiveIso = new Date().toISOString().slice(0, 10);
+  const pastDays = days.filter(d => String(d?.date || '') <= todayArchiveIso);
+  const futureDays = days.filter(d => String(d?.date || '') > todayArchiveIso);
+  const settled = Number(archive?.settled || 0);
+  const pending = Number(archive?.pending || 0);
+  const total = Number(archive?.total || 0);
+  const settledRows = pastDays.flatMap(d => (d.picks || []).filter(p => ['won', 'lost', 'void'].includes(p.result)));
+  const wins = Number(archive?.won ?? settledRows.filter(p => p.result === 'won').length);
+  const losses = Number(archive?.lost ?? settledRows.filter(p => p.result === 'lost').length);
+  const wr = wins + losses ? Math.round((wins / (wins + losses)) * 100) : null;
+  const pl = Number.isFinite(Number(archive?.flat_pnl_units)) ? Number(archive.flat_pnl_units) : settledRows.reduce((sum, p) => {
+    if (p.result === 'won') return sum + (Number(p.odd_book || 1) - 1);
+    if (p.result === 'lost') return sum - 1;
+    return sum;
+  }, 0);
+  const dayHtml = pastDays.slice(0, 14).map(d => {
+    const picks = (d.picks || []).slice(0, 120);
+    const settledN = Number(d.won || 0) + Number(d.lost || 0) + Number(d.void || 0);
+    const wrDay = (Number(d.won || 0) + Number(d.lost || 0)) ? Math.round((Number(d.won || 0) / (Number(d.won || 0) + Number(d.lost || 0))) * 100) : null;
+    const plCol = Number(d.pl_units || 0) > 0 ? 'var(--accent)' : Number(d.pl_units || 0) < 0 ? 'var(--danger)' : 'var(--text-dim)';
+    const rows = picks.map(p => {
+      const res = p.result === 'won' ? '<b style="color:var(--accent);">WON</b>' : p.result === 'lost' ? '<b style="color:var(--danger);">LOST</b>' : p.result === 'void' ? '<b style="color:var(--text-dim);">VOID</b>' : '<b style="color:var(--warn);">PENDING</b>';
+      const tier = String(p.tier || 'watch').toUpperCase();
+      const edge = Number.isFinite(Number(p.edge)) ? `${(Number(p.edge) * 100).toFixed(1)}pt` : '—';
+      const prob = Number.isFinite(Number(p.prob_model)) ? `${Math.round(Number(p.prob_model) * 100)}%` : '—';
+      return `<div class="hist-pick-row" data-match-id="${esc(String(p.source_event_id || ''))}">
+        <div class="hist-pick-sport">${p.sport === 'football' ? '⚽' : p.sport === 'basketball' ? '🏀' : p.sport === 'hockey' ? '🏒' : p.sport === 'baseball' ? '⚾' : p.sport === 'tennis' ? '🎾' : '🎯'}</div>
+        <div class="hist-pick-match"><div class="hist-pick-title">${esc(`${p.home || 'Domicile'} - ${p.away || 'Extérieur'}`)}</div><div class="hist-pick-sub">${esc(p.league || '')} · ${esc(tier)} · score ${esc(String(p.score_quality ?? '—'))}</div></div>
+        <div class="hist-pick-cell hist-pick-market"><span>${esc(p.market_key || 'marché')}</span></div>
+        <div class="hist-pick-cell hist-pick-pick">${esc(p.label || p.selection || 'Pick')}</div>
+        <div class="hist-pick-cell">@${Number(p.odd_book || 0).toFixed(2)}</div>
+        <div class="hist-pick-cell hist-pick-conf">${prob}</div>
+        <div class="hist-pick-cell">${esc(edge)}</div>
+        <div class="hist-pick-cell" style="text-align:right;">${res}</div>
+      </div>`;
+    }).join('');
+    return `<section class="hist-day-block">
+      <div class="hist-day-head">
+        <div class="hist-day-date">${esc(d.date || '')}</div>
+        <div class="hist-day-stats">
+          <span class="hist-day-chip">${Number(d.total || 0)} picks</span>
+          <span class="hist-day-chip">${settledN} réglés</span>
+          <span class="hist-day-chip">${Number(d.won || 0)}W · ${Number(d.lost || 0)}L · ${Number(d.void || 0)} void${wrDay == null ? '' : ` · WR ${wrDay}%`}</span>
+          <span class="hist-day-chip" style="color:${plCol};font-weight:800;">${Number(d.pl_units || 0) >= 0 ? '+' : ''}${Number(d.pl_units || 0).toFixed(2)}u</span>
+        </div>
+      </div>
+      <div class="hist-day-body">
+        <div class="hist-pick-head"><div></div><div>Match</div><div>Marché</div><div>Pick</div><div>Cote</div><div>Proba</div><div>Edge</div><div class="u-text-right">Résultat</div></div>
+        ${rows || '<div class="bilan-empty">Aucun pick archivé sur cette journée.</div>'}
+      </div>
+    </section>`;
+  }).join('');
+  wrap.innerHTML = `<div class="page-wrap">
+    <div class="page-header">
+      <div class="lbl-tiny u-text-brand">Archives persistantes du modèle</div>
+      <h1 class="page-h1">Historique</h1>
+      <div style="font-size:14px;color:var(--text-dim);max-width:780px;">Source append-only <code>picks_history.jsonl</code> : les pronostics passés restent visibles après la fenêtre rolling, avec résultat final quand le match est réglé.${futureDays.length ? ` ${futureDays.length} journée(s) futures restent archivées mais masquées ici.` : ''}</div>
+    </div>
+    <div class="bilan-kpis">
+      <div class="bilan-kpi brand"><div class="kpi-label">Pronos archivés</div><div class="kpi-value">${total}</div><div class="kpi-sub">${pending} en attente</div></div>
+      <div class="bilan-kpi"><div class="kpi-label">Réglés</div><div class="kpi-value">${settled}</div><div class="kpi-sub">won/lost/void</div></div>
+      <div class="bilan-kpi"><div class="kpi-label">Win Rate</div><div class="kpi-value">${wr == null ? '—' : `${wr}%`}</div><div class="kpi-sub">${wins}W · ${losses}L</div></div>
+      <div class="bilan-kpi"><div class="kpi-label">P&L flat</div><div class="kpi-value" style="color:${pl >= 0 ? 'var(--accent)' : 'var(--danger)'}">${pl >= 0 ? '+' : ''}${pl.toFixed(2)}u</div><div class="kpi-sub">hors void</div></div>
+    </div>
+    <div class="hist-day-list">${dayHtml || '<div class="bilan-empty">Archive encore vide.</div>'}</div>
+  </div>`;
+}
+
 
 function renderHistoriquePage(wrap) {
+const archive = _ensurePicksHistorySummary(wrap, () => renderHistoriquePage(wrap));
+if (archive) {
+renderPicksHistoryArchivePage(wrap, archive);
+return;
+}
 const data = window.PRONOSTICS_DATA;
 if (!data || !data.days) {
 wrap.innerHTML = '<div style="max-width:1200px;margin:0 auto;padding:16px 8px 24px;"><div class="bilan-empty">Pas de données d\'historique disponibles.</div></div>';
