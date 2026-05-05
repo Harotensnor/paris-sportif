@@ -2,6 +2,12 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
+## Sprint v35.451 — AUTO 10/10 Phase finale validation contenu (12:00 UTC)
+- Validation post-mega #1.7 : glossaire, articles, insights quotidiens, previews longues et badges trust.
+- Resultat : glossaire docs 91 termes, 5 articles de fond tous >=1500 mots, `daily_insights.json` 7 insights, `match_previews.json` 7 previews.
+- Decision : contenu long conserve dans `docs/` pour rester indexable sans gonfler `app.js`; runtime Academie garde le glossaire compact.
+- Artefact : `audit-artifacts/phase-finale-content-validation.json`; cache/footer bumpes v35.451.
+
 ## Sprint v35.450 — AUTO 10/10 Phase finale validation polish code (11:57 UTC)
 - Validation post-mega #1.6 : innerHTML, fetch tracking, listeners, erreurs safe, JSON orphelins, modules sidecars et skips Playwright.
 - Resultat : `audit_innerhtml_safety.py` OK, `audit_fetch_tracking.py` OK, `audit_playwright_skips.py` OK, `audit_data_truth.py` OK.
