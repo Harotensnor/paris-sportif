@@ -409,3 +409,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Front: l'accueil affiche maintenant une section "Insights du jour" et le rail modele a un bloc "Briefing jour" cliquable vers les matchs concernes.
 - Pipeline: `auto_refresh.py`, `refresh.yml` et `health.json` generent, commitent et monitorent le nouveau sidecar.
 - Mesure: 7 insights generes, capture visuelle 32 PNG OK, syntax JS OK, modal sync 2/2, bundle `app.js` 1,598,741 bytes sous cap; cache/footer bumpes v35.420.
+
+## Sprint v35.421 — AUTO 10/10 Test briefing cliquable (10:00 UTC)
+- QA: ajout d'un test Playwright dedie au briefing quotidien, couvrant schema JSON, rendu accueil et ouverture des insights cibles.
+- Fix: le clic sur un insight charge maintenant `data.js` complet si le match n'est pas encore dans le blob lite, puis ouvre la modale au lieu d'echouer silencieusement.
+- Mesure: `tests/daily-insights.spec.js` 2/2, syntax JS OK, bundle `app.js` 1,599,126 bytes sous cap, no conflict markers OK.
+- Cache/footer bumpes v35.421; `app.js` hash `fdcfd159`.

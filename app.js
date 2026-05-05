@@ -15676,9 +15676,22 @@ img.replaceWith(span);
 }
 if (!wrap.__v37DetailDelegated) {
 wrap.__v37DetailDelegated = true;
-const openBigDetail = (trigger) => {
+const openBigDetail = async (trigger) => {
+const id = trigger.dataset.bigDetail || trigger.dataset.matchId;
+const findInData = () => {
+let found = null;
+Object.values((window.PRONOSTICS_DATA || {}).days || {}).forEach(arr => (arr || []).forEach(m => { if (String(m.id) === String(id)) found = m; }));
+return found;
+};
 const lookup = wrap.__v37MatchById;
-const m = typeof lookup === 'function' ? lookup(trigger.dataset.bigDetail || trigger.dataset.matchId) : null;
+let m = typeof lookup === 'function' ? lookup(id) : null;
+if (!m) m = findInData();
+if (!m && typeof window._ensureFullData === 'function') {
+try {
+await window._ensureFullData();
+m = findInData();
+} catch(e) {}
+}
 const pickLookup = wrap.__v37PickByUid;
 const rowPick = trigger.dataset.pickUid && pickLookup && typeof pickLookup.get === 'function'
 ? pickLookup.get(trigger.dataset.pickUid)
