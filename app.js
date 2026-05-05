@@ -28785,38 +28785,7 @@ ses paris sur le site (ni manuel, ni import). -->
     });
   }
 
-  //
-  // Le site est livré SANS tracker. Pour activer une mesure d'audience
-  // anonyme (≠ Google Analytics), Théo peut configurer l'une de ces
-  // deux options dans `analytics.config.js` (à créer au root) :
-  //
-  //   window.ANALYTICS_PLAUSIBLE_DOMAIN = "paris-sportif.example";  // Plausible cloud
-  //   // OU
-  //   window.ANALYTICS_CLOUDFLARE_TOKEN = "abc123...";              // Cloudflare Web Analytics
-  //
-  // Plausible : https://plausible.io  — privacy-first, pas de cookies, pas de PII.
-  // Cloudflare Web Analytics : https://www.cloudflare.com/web-analytics/  — gratuit, RUM.
-  //
-  // Le script tiers n'est INJECTÉ QU'APRÈS le consentement explicite
-  // (clic "Accepter" dans la bannière). Au refus, rien ne charge.
-  // Conforme aux règles CNIL sur les traceurs.
-  // que le site tracker SI un provider analytics est activé. Tant qu'aucun
-  // n'est configuré, psEvent() est un no-op silencieux. Quand Plausible
-  // est wired, les events partent automatiquement via window.plausible(...).
-  // Cette approche garantit qu'on ne perd pas l'instrumentation entre
-  // l'activation et la désactivation (audit / opt-out).
-  //
-  // Schéma des events :
-  //   view_prono             — match modal/card opened
-  //   click_prono_card       — top pick / value pick clicked
-  //   click_methodology      — link to /methodologie.html
-  //   click_backtest         — link to /backtest.html or #backtest
-  //   click_academie         — link to /academie.html
-  //   newsletter_submit      — (pas d'inscription mail aujourd'hui)
-  //   click_bookmaker_outbound — clic vers winamax.fr
-  //   scroll_75              — scroll 75% de la page
-  //   consent_accept         — bandeau RGPD accepté
-  //   consent_refuse         — bandeau RGPD refusé
+  // Tracking no-op par defaut; activable via analytics.config.js apres consentement.
   window.psEvent = function(name, props) {
     try {
       if (typeof window.plausible === 'function') {
