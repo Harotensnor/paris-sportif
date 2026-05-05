@@ -12344,6 +12344,20 @@ ext.doubleChance.prob >= 0.65 ? extChip(`Double chance ${ext.doubleChance.label}
 (ext.ouHT15 && ext.ouHT15.prob >= 0.55) ? extChip(ext.ouHT15.label, ext.ouHT15.prob, '⚽ Buts en 1ère MT', 'rgba(167,139,250,.08)', 'rgba(167,139,250,.25)', '#c4b5fd') : '',
 (ext.resultBtts && ext.resultBtts.prob >= 0.30) ? extChip(ext.resultBtts.label, ext.resultBtts.prob, '🎯 Résultat + BTTS combo', 'rgba(52,211,153,.08)', 'rgba(52,211,153,.25)', '#6ee7b7') : '',
 ].filter(Boolean).join('') : '';
+const htftGrid = (ext && Array.isArray(ext.htftAll) && ext.htftAll.length)
+? `<div data-market-panel="htft-all" style="margin-top:10px;padding:10px;border:1px solid rgba(244,114,182,.22);background:rgba(244,114,182,.06);border-radius:8px;">
+    <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:8px;">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.45px;color:#f9a8d4;font-weight:800;">HT/FT - 9 combinaisons</div>
+      <div style="font-size:10.5px;color:var(--text-dim2,#7b8693);">Mi-temps / score final</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(86px,1fr));gap:6px;">
+      ${ext.htftAll.slice(0, 9).map(x => `<div data-htft-key="${esc(x.key)}" style="border:1px solid rgba(255,255,255,.08);background:rgba(8,12,20,.34);border-radius:7px;padding:7px 8px;">
+        <div style="font-size:12px;font-weight:800;color:var(--text,#e6ebf2);">${esc(x.label.replace('HT/FT ', ''))}</div>
+        <div style="font-size:11px;color:var(--text-dim,#b4bcc7);font-variant-numeric:tabular-nums;">${Math.round(x.prob * 100)}% · cote fair ${x.prob > 0.02 ? (1 / x.prob).toFixed(2) : '—'}</div>
+      </div>`).join('')}
+    </div>
+  </div>`
+: '';
 return `<div style="margin-top:14px;">
                 <div class="lbl-tiny-mb">🥅 Marchés buts (Poisson)</div>
                 <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -12351,6 +12365,7 @@ return `<div style="margin-top:14px;">
                   ${chipHtml(mk.btts, 'rgba(236,72,153,.08)', 'rgba(236,72,153,.25)', '#f472b6', '🔄', bttsBookOdd)}
                   ${extChips}
                 </div>
+                ${htftGrid}
                           <div style="margin-top:6px;font-size:10.5px;color:var(--text-dim2,#7b8693);line-height:1.3;">Picks alternatifs dérivés des buts attendus (${pred.poisson ? `xG ${pred.poisson.xgH.toFixed(2)}–${pred.poisson.xgA.toFixed(2)}` : 'modèle Poisson'}). ⭐ = ≥65%.${ext ? ' Marchés étendus : double chance, score exact, mi-temps, handicap et total asiatique.' : ''}</div>
               </div>`;
 })()}

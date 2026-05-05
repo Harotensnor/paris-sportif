@@ -944,3 +944,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Tests: `asian-quarter-markets.spec.js` passe desktop + mobile (2/2); `app.js` syntax OK; drift pipeline OK.
 - Cache/footer bumpes v36.016; `app.js` hash `5090cd96`, SW `paris-sportif-20260505-214409`.
 
+## Sprint v36.017 — AUTO 10/10 Phase 7 TT matrice HT/FT (21:45 UTC)
+- UI: la modal détail affiche désormais les 9 combinaisons mi-temps / fin de match avec proba et cote fair.
+- Modèle: le calcul HT/FT existant reste centralisé dans `poissonMarketsExtended()`, sans dupliquer de logique de pick.
+- Lisibilité: le meilleur HT/FT reste en chip rapide, la matrice complète sert au contrôle expert.
+- Tests: `htft-market-matrix.spec.js` passe desktop + mobile (2/2); `app.js` syntax OK; drift pipeline OK.
+- Cache/footer bumpes v36.017; `app.js` hash `3ddea759`, SW `paris-sportif-20260505-214532`.
+
