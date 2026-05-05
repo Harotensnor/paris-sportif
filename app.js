@@ -1503,8 +1503,8 @@ ex: '+5% ROI sur 100 paris à 1€ = +5€ de gain',
 },
 brier: {
 t: 'Calibration',
-d: 'Mesure de calibration : "quand le modèle dit 60%, il a raison ~60% du temps ?". Plus bas = mieux. <0.20 = bon, <0.15 = excellent.',
-ex: 'Calibration : excellente = les probabilités annoncées sont fiables',
+d: 'Mesure de calibration : "quand le modèle dit 60%, il a raison ~60% du temps ?". Plus bas = mieux. En sports d équipe : ≤0.18 excellent, ≤0.22 bon, ≤0.25 correct, ≤0.30 à surveiller.',
+ex: 'Brier 0.21 = bon sur football ; au tennis, on attend souvent un score plus bas car le marché est binaire.',
 },
 calibration: {
 t: 'Calibration',
@@ -1950,7 +1950,7 @@ return `Mise : ${n.toFixed(2)}€/100€`;
 function fmtCalibrationHuman(brier) {
 const n = Number(brier);
 if (!isFinite(n)) return 'Calibration : en apprentissage';
-const label = n < 0.20 ? 'excellente' : n <= 0.235 ? 'bonne' : n <= 0.27 ? 'acceptable' : 'médiocre';
+const label = n <= 0.18 ? 'excellente' : n <= 0.22 ? 'bonne' : n <= 0.25 ? 'correcte' : n <= 0.30 ? 'à surveiller' : 'insuffisante';
 return `Calibration : ${label}`;
 }
 function fmtClvHuman(clv) {
@@ -2390,46 +2390,51 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
   // Réponse au brief Part 7 "élevé/moyen/faible".
   function qualityScore(match, pred, best) {
     if (!match || !pred) return { score: 0, label: 'low', reasons: [] };
-    let score = 0;
+    let score = 12;
     const reasons = [];
-    // 1. Edge — 40 pts max
-    const edge = best ? best.edge : 0;
-    if (edge >= 0.10) { score += 40; reasons.push({ icon: '💎', text: `Forte avance (${fmtMarketAdvantage(edge, 0)})` }); }
-    else if (edge >= 0.05) { score += 30; reasons.push({ icon: '✓', text: `Avance value (${fmtMarketAdvantage(edge, 0)})` }); }
-    else if (edge >= 0.02) { score += 20; reasons.push({ icon: '~', text: `Petite avance (${fmtMarketAdvantage(edge, 0)})` }); }
-    else if (edge >= 0) { score += 10; }
+    const rel = Number(best?.rel ?? best?.prob ?? pred?.reliability ?? pred?.pick?.prob ?? 0);
+    // 1. Edge — 24 pts max, plafonné pour éviter qu'un marché halluciné force 100/100.
+    const edge = Number(best?.edge || 0);
+    const edgeScore = Math.max(0, Math.min(24, (Math.min(edge, 0.12) / 0.12) * 24));
+    score += edgeScore;
+    if (edge >= 0.08) { reasons.push({ icon: '💎', text: `Avance forte (${fmtMarketAdvantage(Math.min(edge, 0.25), 0)})` }); }
+    else if (edge >= 0.04) { reasons.push({ icon: '✓', text: `Avance value (${fmtMarketAdvantage(edge, 0)})` }); }
+    else if (edge >= 0.015) { reasons.push({ icon: '~', text: `Petite avance (${fmtMarketAdvantage(edge, 0)})` }); }
     else { reasons.push({ icon: '⚠', text: `Moins bon que le marché (${(edge*100).toFixed(0)}%)` }); }
-    // 2. Data quality — 25 pts max
+    // 2. Confiance calibrée — 18 pts max.
+    if (Number.isFinite(rel) && rel > 0) {
+      score += Math.max(0, Math.min(18, ((rel - 0.35) / 0.45) * 18));
+    }
+    // 3. Data quality — 18 pts max
     let dq = null;
     try { dq = (typeof computeDataQuality === 'function') ? computeDataQuality(match) : null; } catch(e) {}
     if (dq && dq.max > 0) {
       const ratio = dq.score / dq.max;
-      score += Math.round(25 * ratio);
+      score += Math.round(18 * ratio);
       if (ratio >= 0.75) reasons.push({ icon: '📊', text: `Données riches (${dq.score}/${dq.max})` });
       else if (ratio < 0.5) reasons.push({ icon: '📉', text: `Données pauvres (${dq.score}/${dq.max})` });
     }
-    // 3. Stabilité cote — 20 pts max. Compare odds_snapshot vs cote actuelle.
-    // Si la cote n'a pas bougé de plus de 5%, c'est stable. Si line a beaucoup
-    // bougé contre nous (cote a baissé alors qu'on l'a price haute), on perd.
+    // 4. Stabilité cote — 14 pts max. Compare odds_snapshot vs cote actuelle.
+    // Sans snapshot exploitable, composante neutre : elle ne doit jamais gonfler artificiellement le score.
     const snap = match.odds_snapshot;
     const currentOdd = best ? best.odd : null;
     if (snap && currentOdd && best && best.market === '1n2') {
       const pickKey = best.key;
       const snapOdd = pickKey === '1' ? snap.home : pickKey === '2' ? snap.away : snap.draw;
       if (snapOdd && Math.abs(snapOdd - currentOdd) / Math.max(snapOdd, currentOdd) <= 0.05) {
-        score += 20;
+        score += 14;
         reasons.push({ icon: '🎯', text: 'Cote stable depuis snapshot' });
       } else if (snapOdd && currentOdd > snapOdd * 1.05) {
-        score += 15;
+        score += 10;
         reasons.push({ icon: '📈', text: `Cote a monté (+${((currentOdd/snapOdd - 1)*100).toFixed(0)}%)` });
       } else {
-        score += 5;
+        score += 3;
         reasons.push({ icon: '📉', text: 'Cote a baissé depuis snapshot' });
       }
     } else {
-      score += 10;  // neutre si pas de snapshot
+      score += 7;
     }
-    // 4. Historique ligue — 15 pts max
+    // 5. Historique ligue — 10 pts max
     const lc = match.league_code;
     const bt = window.__backtestReportV2;
     if (bt && bt.by_league && lc && bt.by_league[lc]) {
@@ -2437,13 +2442,18 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
       const wr = lg.win_rate ?? lg.winRate;
       const n = lg.n || 0;
       if (n >= 30 && wr != null) {
-        if (wr >= 0.55) { score += 15; reasons.push({ icon: '📈', text: `Modèle fort sur ${lc} (WR ${(wr*100).toFixed(0)}%, n=${n})` }); }
-        else if (wr >= 0.50) score += 10;
-        else if (wr >= 0.45) score += 5;
+        if (wr >= 0.55) { score += 10; reasons.push({ icon: '📈', text: `Modèle fort sur ${lc} (WR ${(wr*100).toFixed(0)}%, n=${n})` }); }
+        else if (wr >= 0.50) score += 7;
+        else if (wr >= 0.45) score += 4;
         else reasons.push({ icon: '⚠', text: `Modèle faible sur ${lc} (WR ${(wr*100).toFixed(0)}%, n=${n})` });
       }
     }
-    score = Math.max(0, Math.min(100, score));
+    let maxScore = 94;
+    if (!(edge >= 0.015)) maxScore = Math.min(maxScore, 58);
+    else if (edge < 0.04) maxScore = Math.min(maxScore, 72);
+    else if (edge < 0.08) maxScore = Math.min(maxScore, 84);
+    if (!(Number.isFinite(rel) && rel >= 0.70)) maxScore = Math.min(maxScore, 88);
+    score = Math.max(0, Math.min(maxScore, Math.round(score)));
     const label = score >= 70 ? 'high' : score >= 45 ? 'medium' : 'low';
     return { score, label, reasons };
   }
@@ -3214,6 +3224,13 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     if (a.market === 'exactScore') return isPickConsistentWithScore(a.pick, b.market, b.pick, c2);
     if (b.market === 'exactScore') return isPickConsistentWithScore(b.pick, a.market, a.pick, c1);
     if (a.market === b.market && a.pick && b.pick && a.pick !== b.pick && (!Number.isFinite(a.line) || !Number.isFinite(b.line) || Math.abs(a.line - b.line) < 0.01)) return false;
+    const sameTeamTotalOpposite = String(a.market || '').startsWith('teamTotal:')
+      && a.market === b.market
+      && a.pick !== b.pick
+      && Number.isFinite(a.line)
+      && Number.isFinite(b.line)
+      && Math.abs(a.line - b.line) < 0.01;
+    if (sameTeamTotalOpposite) return false;
     const bttsUnder15 = (x, y) => x.market === 'btts' && x.pick === 'Yes' && /^ou/.test(y.market) && y.pick === 'Under' && Number.isFinite(y.line) && y.line <= 1.5;
     if (bttsUnder15(a, b) || bttsUnder15(b, a)) return false;
     const bttsTeamNoGoal = (x, y) => x.market === 'btts' && x.pick === 'Yes' && String(y.market || '').startsWith('teamTotal:') && y.pick === 'Under' && Number.isFinite(y.line) && y.line <= 0.5;
@@ -3233,16 +3250,37 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     };
     return oneHandicap(a, b) && oneHandicap(b, a);
   }
+  function _v35CandidatePriority(c) {
+    const edge = Number(c?.edge);
+    const rel = Number(c?.rel ?? c?.prob ?? c?.pickProb);
+    const score = Number(c?.score ?? c?.investment?.score);
+    const odd = Number(c?.odd);
+    return (Number.isFinite(edge) ? edge : 0) * 100000
+      + (Number.isFinite(rel) ? rel : 0) * 10000
+      + (Number.isFinite(score) ? score : 0)
+      + (Number.isFinite(odd) ? Math.min(odd, 20) : 0) / 100;
+  }
   function validateMarketConsistency(allCandidates, opts) {
     opts = opts || {};
     const consistent = opts.anchor ? [opts.anchor] : [];
     const contradicted = [];
     for (const c of (Array.isArray(allCandidates) ? allCandidates.filter(Boolean) : [])) {
       if (c === opts.anchor) continue;
-      const conflict = consistent.find(k => !isPairConsistent(k, c));
-      if (conflict) {
-        contradicted.push({ ...c, consistencyConflict: { with: conflict.label || conflict.key || conflict.market || 'marché sélectionné', reason: _v35ConsistencyReason(conflict, c) } });
-      } else consistent.push(c);
+      let blocked = false;
+      while (true) {
+        const conflictIdx = consistent.findIndex(k => !isPairConsistent(k, c));
+        if (conflictIdx < 0) break;
+        const conflict = consistent[conflictIdx];
+        const keepConflict = conflict === opts.anchor || _v35CandidatePriority(conflict) >= _v35CandidatePriority(c);
+        if (keepConflict) {
+          contradicted.push({ ...c, consistencyConflict: { with: conflict.label || conflict.key || conflict.market || 'marché sélectionné', reason: _v35ConsistencyReason(conflict, c) } });
+          blocked = true;
+          break;
+        }
+        consistent.splice(conflictIdx, 1);
+        contradicted.push({ ...conflict, consistencyConflict: { with: c.label || c.key || c.market || 'marché sélectionné', reason: _v35ConsistencyReason(c, conflict), replacedByStrongerPick: true } });
+      }
+      if (!blocked) consistent.push(c);
     }
     return { consistent, contradicted };
   }
@@ -10299,7 +10337,7 @@ return `
 <div style="margin-top:8px;font-size:10.5px;color:var(--text-dim2);line-height:1.4;">
 <b class="u-text-dim">Edge</b> = proba modèle - 1/cote (en points de proba).
 <b class="u-text-dim">EV</b> = proba × cote - 1 (retour attendu par mise unitaire).
-<b class="u-text-dim">Score Qualité</b> = composite (edge ×40 + data ×25 + stabilité cote ×20 + historique ligue ×15).
+<b class="u-text-dim">Score Qualité</b> = composite plafonné (edge ×24 + confiance ×18 + data ×18 + stabilité cote ×14 + historique ligue ×10 + base).
 <b class="u-text-dim">Actionability</b> = composite (Confiance ×30 + Edge ×25 + Kelly ×20 + Qualité ×15 + Winamax exact ×10).
 </div>
 ${(() => {
@@ -14678,15 +14716,15 @@ const rawEdge = Number.isFinite(Number(edge)) ? Number(edge) : 0;
 const edgeForScore = Math.max(-0.25, Math.min(0.25, rawEdge));
 const edgeWasCapped = Math.abs(rawEdge - edgeForScore) > 0.0001;
 const edgeAnomalous = rawEdge > 0.30;
-const scoreParts = ['Base 36'];
+const scoreParts = ['Base 28'];
 const addScorePart = (name, value) => {
 const num = Number(value || 0);
 if (Math.abs(num) >= 0.4) scoreParts.push(`${name} ${signedScore(num)}`);
 return num;
 };
-const edgePart = Math.max(-10, Math.min(15, edgeForScore * 60));
-const confidencePart = Math.max(-12, Math.min(12, (rel - 0.54) * 50));
-let score = 36 + addScorePart('Edge', edgePart) + addScorePart('Confiance', confidencePart);
+const edgePart = Math.max(-12, Math.min(14, edgeForScore * 55));
+const confidencePart = Math.max(-12, Math.min(11, (rel - 0.58) * 45));
+let score = 28 + addScorePart('Edge', edgePart) + addScorePart('Confiance', confidencePart);
 const badges = [];
 const variance = Number(pred?.ensemble?.agreement_variance);
 const stabilityPart = Number.isFinite(variance)
@@ -14795,13 +14833,16 @@ profile.badges.slice(0, 2).forEach(b => badges.push(b));
 }
 let clean = Math.max(0, Math.min(100, Math.round(score)));
 if (edgeAnomalous) clean = Math.min(clean, 69);
-else if (edgeForScore < 0.015) clean = Math.min(clean, 58);
-else if (edgeForScore < 0.05) clean = Math.min(clean, 68);
-else if (edgeForScore < 0.10) clean = Math.min(clean, 78);
-if (rel < 0.35) clean = Math.min(clean, 58);
-if (rel < 0.20) clean = Math.min(clean, 48);
-if (!edgeAnomalous && edgeForScore >= 0.16 && rel >= 0.65) clean = Math.min(82, clean + 5);
-else if (!edgeAnomalous && edgeForScore >= 0.13 && rel >= 0.72) clean = Math.min(80, clean + 3);
+else if (edgeForScore < 0.015) clean = Math.min(clean, 45);
+else if (edgeForScore < 0.05) clean = Math.min(clean, 62);
+else if (edgeForScore < 0.10) clean = Math.min(clean, 74);
+if (rel < 0.35) clean = Math.min(clean, 52);
+if (rel < 0.20) clean = Math.min(clean, 42);
+const dataFreshEnoughForElite = dataAge <= 240;
+if (dataFreshEnoughForElite && !edgeAnomalous && edgeForScore >= 0.16 && rel >= 0.65) clean = Math.min(86, clean + 16);
+else if (dataFreshEnoughForElite && !edgeAnomalous && edgeForScore >= 0.10 && rel >= 0.60) clean = Math.min(84, clean + 12);
+else if (dataFreshEnoughForElite && !edgeAnomalous && edgeForScore >= 0.08 && rel >= 0.58) clean = Math.min(82, clean + 10);
+else if (dataFreshEnoughForElite && !edgeAnomalous && edgeForScore >= 0.13 && rel >= 0.72) clean = Math.min(82, clean + 8);
 const friendlyBadges = badges.map(v37HumanBadge).filter(Boolean);
 const tooltip = [
 `Score d'opportunité ${clean}/100`,
@@ -14874,6 +14915,20 @@ winamax: isWinamaxBookable(match)
 });
 } catch(e) {}
 }
+};
+const v37QualityCounters = {
+dedupExactRemoved: 0,
+sameMatchContradictionsRemoved: 0,
+matchCapRemoved: 0,
+marketCapRemoved: 0,
+tierBackfillInjected: 0
+};
+const v37QualitySamples = { duplicates: [], contradictions: [] };
+const v37RememberQualitySample = (key, item, max = 5) => {
+try {
+const arr = v37QualitySamples[key];
+if (Array.isArray(arr) && arr.length < max) arr.push(item);
+} catch(e) {}
 };
 let v37FilterResetNotice = '';
 const v37HashDate = v37HashParams.get('date') || '';
@@ -15069,14 +15124,60 @@ if (!ranked.length) v37Reject('no_ranked_candidate');
 return v37TakeDiverseCandidates(ranked, m);
 } catch(e) { v37Reject('candidate_exception'); return []; }
 }).sort((a, b) => a.ts - b.ts);
+const v37SelectionKeyForPick = (p) => {
+const m = p?.m || {};
+const sides = getSides(m);
+const matchKey = String(m?.id || `${m?.date || ''}|${v36TeamName(sides.home)}|${v36TeamName(sides.away)}`);
+const raw = p?.best || {};
+const selection = raw.pickValue ?? raw.pickKey ?? raw.key ?? raw.side ?? p?.pickKey ?? p?.labelFull ?? p?.label ?? '';
+return [
+matchKey,
+String(p?.market || raw.market || '1n2'),
+String(selection || '').toLowerCase(),
+p?.line ?? raw.line ?? '',
+String(raw.team || raw.raw?.team || '')
+].join('|');
+};
+const v37PickComposite = (p) => {
+const rel = Number(p?.rel || p?.best?.rel || p?.best?.prob || 0);
+const edge = Number(p?.edge || p?.best?.edge || 0);
+return Math.max(-1, edge) * Math.max(0, rel) + Number(p?.score || 0) / 10000;
+};
+const v36PickPoolCanonical = (() => {
+const byKey = new Map();
+for (const p of v36PickPoolRaw) {
+const key = v37SelectionKeyForPick(p);
+const current = byKey.get(key);
+if (!current || v37PickComposite(p) > v37PickComposite(current)) {
+if (current) {
+v37QualityCounters.dedupExactRemoved++;
+v37RememberQualitySample('duplicates', {
+kept: p.labelFull || p.label || '',
+dropped: current.labelFull || current.label || '',
+key
+});
+}
+byKey.set(key, p);
+} else {
+v37QualityCounters.dedupExactRemoved++;
+v37RememberQualitySample('duplicates', {
+kept: current.labelFull || current.label || '',
+dropped: p.labelFull || p.label || '',
+key
+});
+}
+}
+return Array.from(byKey.values());
+})();
 const v36PickPool = (() => {
 const seenPick = new Set();
 const seenDisplay = new Set();
 const matchCounts = new Map();
 const marketCounts = new Map();
 const matchSignals = new Map();
+const matchSelected = new Map();
 const out = [];
-const ranked = v36PickPoolRaw.slice().sort((a, b) =>
+const ranked = v36PickPoolCanonical.slice().sort((a, b) =>
 (Number(b.strict) - Number(a.strict))
 || ((b.score || 0) - (a.score || 0))
 || (a.ts - b.ts)
@@ -15085,17 +15186,49 @@ for (const p of ranked) {
 const matchKey = String(p.m?.id || `${p.m?.date || ''}|${v36TeamName(getSides(p.m).home)}|${v36TeamName(getSides(p.m).away)}`);
 const pickKey = `${matchKey}|${p.tier || ''}|${p.market || ''}|${p.pickKey || ''}|${p.line ?? ''}|${Number(p.odd || 0).toFixed(2)}`;
 const displayKey = `${matchKey}|${p.tier || ''}|${p.market || ''}|${v37NormDisplayKey(p.labelFull || p.label || '')}|${Number(p.odd || 0).toFixed(2)}`;
-if (seenPick.has(pickKey) || seenDisplay.has(displayKey)) { v37Reject('doublon_exact_filtre', p.m, p.labelFull || p.label || ''); continue; }
+if (seenPick.has(pickKey) || seenDisplay.has(displayKey)) {
+v37QualityCounters.dedupExactRemoved++;
+v37Reject('doublon_exact_filtre', p.m, p.labelFull || p.label || '');
+continue;
+}
 const matchCount = matchCounts.get(matchKey) || 0;
-if (matchCount >= 2) { v37Reject('cap_match_2', p.m, p.labelFull || p.label || ''); continue; }
+if (matchCount >= 2) {
+v37QualityCounters.matchCapRemoved++;
+v37Reject('cap_match_2', p.m, p.labelFull || p.label || '');
+continue;
+}
 const family = v37MarketFamilyKey(p);
 const familyCount = marketCounts.get(family) || 0;
 const familyCap = v37GlobalMarketCap(family);
-if (familyCount >= familyCap) { v37Reject('cap_marche_global', p.m, family); continue; }
+if (familyCount >= familyCap) {
+v37QualityCounters.marketCapRemoved++;
+v37Reject('cap_marche_global', p.m, family);
+continue;
+}
+const alreadySelected = matchSelected.get(matchKey) || [];
+const consistencyConflict = alreadySelected.find(x => typeof isPairConsistent === 'function' && !isPairConsistent(x.best || x, p.best || p));
+if (consistencyConflict) {
+v37QualityCounters.sameMatchContradictionsRemoved++;
+v37RememberQualitySample('contradictions', {
+match: matchKey,
+kept: consistencyConflict.labelFull || consistencyConflict.label || consistencyConflict.best?.label || '',
+dropped: p.labelFull || p.label || '',
+reason: typeof _v35ConsistencyReason === 'function' ? _v35ConsistencyReason(consistencyConflict.best || consistencyConflict, p.best || p) : ''
+});
+v37Reject('contradiction_same_match_filtre', p.m, p.labelFull || p.label || '');
+continue;
+}
 const signals = matchSignals.get(matchKey) || { bttsYes: false, teamNoGoal: new Set() };
 const bttsSide = v37BttsSide(p);
 const noGoalTeam = v37TeamNoGoalKey(p);
 if ((bttsSide === 'yes' && signals.teamNoGoal.size) || (noGoalTeam && signals.bttsYes)) {
+v37QualityCounters.sameMatchContradictionsRemoved++;
+v37RememberQualitySample('contradictions', {
+match: matchKey,
+kept: alreadySelected.map(x => x.labelFull || x.label || '').filter(Boolean).join(' / '),
+dropped: p.labelFull || p.label || '',
+reason: 'BTTS Oui incompatible avec équipe à 0 but'
+});
 v37Reject('contradiction_btts_teamtotal', p.m, p.labelFull || p.label || '');
 continue;
 }
@@ -15106,6 +15239,8 @@ marketCounts.set(family, familyCount + 1);
 if (bttsSide === 'yes') signals.bttsYes = true;
 if (noGoalTeam) signals.teamNoGoal.add(noGoalTeam);
 matchSignals.set(matchKey, signals);
+alreadySelected.push(p);
+matchSelected.set(matchKey, alreadySelected);
 out.push(p);
 }
 for (const tierDef of v36TierDefs) {
@@ -15120,9 +15255,14 @@ const currentMatchCount = matchCounts.get(matchKey) || 0;
 if (currentMatchCount >= 2) {
 const replaceIdx = out.findIndex(x => String(x.m?.id || `${x.m?.date || ''}|${v36TeamName(getSides(x.m).home)}|${v36TeamName(getSides(x.m).away)}`) === matchKey && x.tier !== tierDef.id);
 if (replaceIdx < 0) continue;
-out.splice(replaceIdx, 1);
+const replaced = out.splice(replaceIdx, 1)[0];
 matchCounts.set(matchKey, currentMatchCount - 1);
+const selected = (matchSelected.get(matchKey) || []).filter(x => x !== replaced);
+matchSelected.set(matchKey, selected);
 }
+const alreadySelected = matchSelected.get(matchKey) || [];
+const consistencyConflict = alreadySelected.find(x => typeof isPairConsistent === 'function' && !isPairConsistent(x.best || x, p.best || p));
+if (consistencyConflict) continue;
 const signals = matchSignals.get(matchKey) || { bttsYes: false, teamNoGoal: new Set() };
 const bttsSide = v37BttsSide(p);
 const noGoalTeam = v37TeamNoGoalKey(p);
@@ -15135,6 +15275,9 @@ marketCounts.set(family, (marketCounts.get(family) || 0) + 1);
 if (bttsSide === 'yes') signals.bttsYes = true;
 if (noGoalTeam) signals.teamNoGoal.add(noGoalTeam);
 matchSignals.set(matchKey, signals);
+alreadySelected.push(p);
+matchSelected.set(matchKey, alreadySelected);
+v37QualityCounters.tierBackfillInjected++;
 v37Reject('tier_backfill', p.m, tierDef.id);
 out.push(p);
 }
@@ -15176,10 +15319,32 @@ if (v36Sort === 'edge') return (b.edge - a.edge) || (b.odd - a.odd) || (a.ts - b
 if (v36Sort === 'score') return (b.opportunity - a.opportunity) || (b.edge - a.edge) || (a.ts - b.ts);
 return (v36TierRank[a.tier] - v36TierRank[b.tier]) || (b.odd - a.odd) || (b.edge - a.edge) || (a.ts - b.ts);
 });
+const v37ApplyTopMarketDiversity = (rows) => {
+const list = Array.isArray(rows) ? rows.slice() : [];
+if (list.length <= 12) return list;
+const topLimit = Math.min(30, list.length);
+const cap = Math.max(4, Math.ceil(topLimit * 0.20));
+const kept = [];
+const overflow = [];
+const counts = new Map();
+for (const row of list) {
+if (kept.length >= topLimit) { overflow.push(row); continue; }
+const family = v37MarketFamilyKey(row);
+const count = counts.get(family) || 0;
+if (count < cap) {
+counts.set(family, count + 1);
+kept.push(row);
+} else {
+overflow.push(row);
+}
+}
+return kept.concat(overflow);
+};
+const v37SortedDiverse = v37ApplyTopMarketDiversity(v36Sorted);
 const v37MatchKeyForPick = (p) => String(p?.m?.id || `${p?.m?.date || ''}|${v36TeamName(getSides(p.m).home)}|${v36TeamName(getSides(p.m).away)}`);
 const v37VisibleMatchCounts = (() => {
 const counts = new Map();
-v36Sorted.forEach(p => {
+v37SortedDiverse.forEach(p => {
 const key = v37MatchKeyForPick(p);
 counts.set(key, (counts.get(key) || 0) + 1);
 });
@@ -15279,7 +15444,7 @@ keys.add(v37PickRowKey(candidate));
 }
 return out;
 };
-const v37RenderPool = v36Sorted.length ? v36Sorted : v37DataOnlyPool;
+const v37RenderPool = v37SortedDiverse.length ? v37SortedDiverse : v37DataOnlyPool;
 const v36TableRows = v37EnsureTierCoverage(v37RenderPool.slice(0, v37DenseRowLimit), v37RenderPool);
 const v36UpcomingAll = terminalScanPool
 .filter(m => new Date(m?.date || 0).getTime() > _dashboardNowMs && !m.completed)
@@ -15292,6 +15457,50 @@ const v37DisplayTotal = v36Sorted.length ? v36Total : v37DataOnlyPool.length;
 const v37QualifiedMatchCount = new Set(v36PickPool.map(p => v37MatchKeyForPick(p))).size;
 const v37QualificationRate = terminalScanPool.length ? Math.round((v37QualifiedMatchCount / terminalScanPool.length) * 100) : 0;
 const v36CoverageLine = `${v37DisplayTotal} lignes visibles · ${v37QualifiedMatchCount}/${terminalScanPool.length} matchs avec pick (${v37QualificationRate}%) · ${v36PickPool.length} picks qualifies · ${v36UpcomingAll.length} a venir · ${v37LiveAll.length} live · ${v37FinishedAll.length} termines · data ${_dataAgeMin} min`;
+const v37CountBy = (rows, keyFn, limit) => Object.entries((rows || []).reduce((acc, row) => {
+const key = keyFn(row) || 'inconnu';
+acc[key] = (acc[key] || 0) + 1;
+return acc;
+}, {})).sort((a, b) => b[1] - a[1]).slice(0, limit || 10).map(([key, count]) => ({ key, count }));
+const v37ScoreHistogram = (() => {
+const rows = v36PickPool.length ? v36PickPool : v37DataOnlyPool;
+const buckets = [
+{ key: '80+', label: '80-100', min: 80, max: 101 },
+{ key: '50-79', label: '50-79', min: 50, max: 80 },
+{ key: '<50', label: '0-49', min: -Infinity, max: 50 }
+];
+const total = rows.length || 1;
+return buckets.reduce((acc, b) => {
+const count = rows.filter(p => Number(p?.opportunity || p?.score || 0) >= b.min && Number(p?.opportunity || p?.score || 0) < b.max).length;
+const pct = Math.round((count / total) * 100);
+acc[b.key] = { label: b.label, count, pct, bar: `${'#'.repeat(Math.max(0, Math.round(pct / 5)))}${'.'.repeat(Math.max(0, 20 - Math.round(pct / 5)))}` };
+return acc;
+}, {});
+})();
+const v37MarketBreakdownTop10 = v37CountBy(v36PickPool, p => v37MarketFamilyKey(p), 10);
+const v37Top30MarketBreakdown = v37CountBy(v37SortedDiverse.slice(0, 30), p => v37MarketFamilyKey(p), 10);
+const v37Top30MarketDistinct = new Set(v37SortedDiverse.slice(0, 30).map(p => v37MarketFamilyKey(p))).size;
+const v37TierDiagnostics = v36TierDefs.map(t => {
+const count = v36CountsAll[t.id] || 0;
+const note = count ? '' : (t.id === 'safe' || t.id === 'out')
+? `Aucun pick ${t.label} aujourd'hui : les conditions sont strictes et le pool réel n'en produit pas.`
+: '';
+return { id: t.id, label: t.label, count, note };
+});
+const v37SnapshotCoverage = (() => {
+const base = v37ScanPool.length ? v37ScanPool : terminalScanPool;
+const matchesWithSnapshot = base.filter(m => !!(m?.odds_snapshot || m?.oddsSnapshot)).length;
+const picksWithSnapshot = v36PickPool.filter(p => !!(p?.m?.odds_snapshot || p?.m?.oddsSnapshot)).length;
+const pct = base.length ? Math.round((matchesWithSnapshot / base.length) * 100) : 0;
+return {
+matchesWithSnapshot,
+matchesTotal: base.length,
+picksWithSnapshot,
+picksTotal: v36PickPool.length,
+pct,
+stabilityMode: pct >= 80 ? 'active' : 'neutral_snapshot_insufficient'
+};
+})();
 const v37DebugMatches = () => terminalScanPool.slice(0, 10).map(m => {
 const { home, away } = getSides(m);
 return `${sportLabel(m?.sport || '')} ${parisDateISO(m?.date) || '?'} ${v36TeamName(home)}-${v36TeamName(away)} W:${isWinamaxBookable(m) ? '1' : '0'}`;
@@ -15300,6 +15509,7 @@ const v37DebugState = {
 terminalScanPool: terminalScanPool.length,
 v37ScanPool: v37ScanPool.length,
 v36PickPoolRaw: v36PickPoolRaw.length,
+v36PickPoolCanonical: v36PickPoolCanonical.length,
 v36PickPool: v36PickPool.length,
 v36Filtered: v36Filtered.length,
 v37DataOnlyFallback: v37DataOnlyPool.length,
@@ -15315,6 +15525,14 @@ v36Filter,
 _dataIsStale,
 _dataAgeMin,
 today: todayIso,
+scoreHistogram: v37ScoreHistogram,
+marketBreakdownTop10: v37MarketBreakdownTop10,
+top30MarketBreakdown: v37Top30MarketBreakdown,
+top30MarketDistinct: v37Top30MarketDistinct,
+tierDiagnostics: v37TierDiagnostics,
+oddsSnapshotCoverage: v37SnapshotCoverage,
+qualityCounters: v37QualityCounters,
+qualitySamples: v37QualitySamples,
 rejectReasons: v37RejectReasons,
 rejectSamples: v37RejectSamples
 };
@@ -24754,7 +24972,8 @@ const kpiTile = (label, value, sub, color) => `
         ${sub ? `<div style="font-size:11px;color:var(--text-dim);margin-top:2px;">${esc(sub)}</div>` : ''}
       </div>`;
 const roiColor = roi == null ? 'var(--text)' : Number(roi) >= 0.02 ? 'var(--accent, #22c55e)' : Number(roi) >= -0.02 ? 'var(--warn, #c79b00)' : 'var(--danger, #ef4444)';
-const brierColor = brier == null ? 'var(--text)' : Number(brier) <= 0.18 ? 'var(--accent, #22c55e)' : Number(brier) <= 0.22 ? 'var(--warn, #c79b00)' : 'var(--danger, #ef4444)';
+const brierColor = brier == null ? 'var(--text)' : Number(brier) <= 0.18 ? 'var(--accent, #22c55e)' : Number(brier) <= 0.25 ? 'var(--warn, #c79b00)' : Number(brier) <= 0.30 ? 'var(--warn,#fbbf24)' : 'var(--danger, #ef4444)';
+const brierLabel = brier == null ? '' : Number(brier) <= 0.18 ? 'Calibration excellente' : Number(brier) <= 0.22 ? 'Calibration bonne' : Number(brier) <= 0.25 ? 'Calibration correcte' : Number(brier) <= 0.30 ? 'À surveiller' : 'Insuffisant';
 const perTier = bt.by_tier || {};
 const tierRows = Object.entries(perTier)
 .filter(([k, v]) => v && (v.n || 0) > 0)
@@ -24785,8 +25004,17 @@ const h = window.__healthData;
 if (!h || !h.sources) return '';
 const ageMin = isFinite(h.data_age_min) ? h.data_age_min : 999;
 const warningCount = Array.isArray(h.warnings) ? h.warnings.length : 0;
-const overallColor = ageMin < 30 && warningCount === 0 ? 'var(--accent)' : ageMin < 120 ? 'var(--warn,#fbbf24)' : 'var(--danger)';
-const overallLabel = ageMin < 30 && warningCount === 0 ? '✓ Pipeline sain' : ageMin < 120 ? (warningCount ? `✓ Pipeline OK · ${warningCount} alertes mineures` : '⚠ Ralenti') : '✗ En retard';
+const warningLevel = warningCount === 0 ? 'healthy' : warningCount <= 10 ? 'ok_alerts' : 'degraded';
+const overallColor = ageMin >= 240 || warningLevel === 'degraded' ? 'var(--danger)' : ageMin >= 30 || warningLevel === 'ok_alerts' ? 'var(--warn,#fbbf24)' : 'var(--accent)';
+const overallLabel = ageMin >= 240
+? '✗ Pipeline en panne'
+: warningLevel === 'degraded'
+? `⚠ Pipeline dégradé · ${warningCount} alertes`
+: warningLevel === 'ok_alerts'
+? `✓ Pipeline OK avec alertes · ${warningCount}`
+: ageMin >= 30
+? '⚠ Pipeline ralenti'
+: '✓ Pipeline sain';
 const srcEntries = Object.entries(h.sources)
 .filter(([_, v]) => v && v.age_min != null)
 .sort((a, b) => (a[1].age_min || 999) - (b[1].age_min || 999))
@@ -24794,6 +25022,14 @@ const srcEntries = Object.entries(h.sources)
 if (!srcEntries.length) return '';
 const dot = (mins) => mins < 30 ? '🟢' : mins < 120 ? '🟡' : '🔴';
 const fmtAge = (mins) => mins < 60 ? `${mins}m` : `${(mins/60).toFixed(1)}h`;
+const warningDetails = warningCount ? `
+              <details style="font-size:11.5px;color:var(--warn,#fbbf24);">
+                <summary style="cursor:pointer;font-weight:700;">Voir ${warningCount} alerte${warningCount>1?'s':''}</summary>
+                <ul style="margin:6px 0 0 18px;padding:0;color:var(--text-dim);line-height:1.45;">
+                  ${(h.warnings || []).slice(0, 8).map(w => `<li>${esc(String(w))}</li>`).join('')}
+                  ${warningCount > 8 ? `<li>${warningCount - 8} autres alertes masquées ici.</li>` : ''}
+                </ul>
+              </details>` : '';
 return `
           <div style="max-width:1500px;margin:14px auto 8px;padding:14px 18px;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${overallColor};border-radius:var(--r-md);font-variant-numeric:tabular-nums;">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
@@ -24802,7 +25038,7 @@ return `
                 <span style="font-size:13px;color:${overallColor};font-weight:700;margin-left:8px;">${overallLabel}</span>
                 <span style="font-size:11.5px;color:var(--text-dim);margin-left:6px;">data.js : ${fmtAge(ageMin)}</span>
               </div>
-              ${warningCount ? `<span style="font-size:11.5px;color:var(--warn,#fbbf24);">⚠ ${warningCount} alerte${warningCount>1?'s':''}</span>` : ''}
+              ${warningDetails}
             </div>
             <div style="display:flex;flex-wrap:wrap;gap:6px;font-size:11.5px;">
               ${srcEntries.map(([name, v]) => `
@@ -24970,7 +25206,7 @@ wrap.innerHTML = `
         ${currentTab !== 'global' ? '' : `
 <!-- KPIs principaux -->
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:18px;">
-${kpiTile('Win Rate', fmtPct(wr), `${n} pari${n > 1 ? 's' : ''}`, 'var(--text)')}
+${kpiTile('Win Rate', fmtPct(wr), `${n} prono${n > 1 ? 's' : ''} généré${n > 1 ? 's' : ''}`, 'var(--text)')}
 ${kpiTile('ROI flat', fmtSign(roi), stake ? `mise totale ${Number(stake).toFixed(0)}€` : 'mise constante', roiColor)}
 ${(() => {
 if (roiKelly != null) {
@@ -24983,9 +25219,9 @@ return kpiTile('PnL Kelly', display, 'mise pondérée Kelly 0.25', c);
 }
 return kpiTile('PnL Kelly', '—', 'pas encore calculé', 'var(--text-dim)');
 })()}
-${kpiTile('Brier score', brier == null ? '—' : Number(brier).toFixed(3), brier == null ? '' : Number(brier) <= 0.18 ? 'Calibration excellente' : Number(brier) <= 0.22 ? 'Calibration correcte' : 'Calibration médiocre', brierColor)}
+${kpiTile('Brier score', brier == null ? '—' : Number(brier).toFixed(3), brierLabel, brierColor)}
 ${profit != null ? kpiTile('Profit cumul', `${Number(profit) >= 0 ? '+' : ''}${Number(profit).toFixed(2)}€`, '', Number(profit) >= 0 ? 'var(--accent)' : 'var(--danger)') : ''}
-${edgeAvg != null ? kpiTile('Edge moyen', `${Number(edgeAvg) >= 0 ? '+' : ''}${(Number(edgeAvg)*100).toFixed(1)}pt`, 'sur paris pris', Number(edgeAvg) >= 0.03 ? 'var(--accent)' : 'var(--text-dim)') : ''}
+${edgeAvg != null ? kpiTile('Edge moyen', `${Number(edgeAvg) >= 0 ? '+' : ''}${(Number(edgeAvg)*100).toFixed(1)}pt`, 'sur pronos générés', Number(edgeAvg) >= 0.03 ? 'var(--accent)' : 'var(--text-dim)') : ''}
 ${clvAvg != null ? kpiTile('CLV moyen', `${Number(clvAvg) >= 0 ? '+' : ''}${(Number(clvAvg)*100).toFixed(1)}%`, 'closing line value', Number(clvAvg) >= 0 ? 'var(--accent)' : 'var(--danger)') : ''}
 ${(() => {
 const adv = (typeof computeAdvancedMetrics === 'function') ? computeAdvancedMetrics() : null;
@@ -25307,7 +25543,7 @@ return `
 </div>
 ${rows.length > 30 ? `<div style="margin-top:8px;font-size:11px;color:var(--text-dim2);text-align:center;">+ ${rows.length - 30} ligues supplémentaires non affichées (volume insuffisant pour signal fiable)</div>` : ''}
 <div style="margin-top:14px;padding:10px 14px;background:rgba(167,139,250,.06);border:1px solid var(--brand-soft);border-radius:var(--r-sm);font-size:12px;color:var(--text-dim);line-height:1.5;">
-<b class="u-text-brand">💡 Comment lire :</b> ★ = top 3 par Kelly cumul. <b class="u-text-accent">Kelly +Xu</b> = profit total que tu aurais fait en pariant 1u Kelly sur cette ligue. <b class="u-text-danger">Kelly négatif</b> = à éviter sur cette ligue (modèle pas calibré). Brier <0.20 = excellent, &gt;0.25 = mauvais.
+<b class="u-text-brand">💡 Comment lire :</b> ★ = top 3 par Kelly cumul. <b class="u-text-accent">Kelly +Xu</b> = profit total que tu aurais fait en pariant 1u Kelly sur cette ligue. <b class="u-text-danger">Kelly négatif</b> = à éviter sur cette ligue (modèle pas calibré). Brier ≤0.18 = excellent, ≤0.22 = bon, ≤0.25 = correct, &gt;0.30 = insuffisant.
 </div>
 </div>`;
         })() : ''}
@@ -28391,7 +28627,7 @@ const _modelExplainerHtml = `
         </div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:8px;font-size:12.5px;line-height:1.5;color:var(--text-dim);">
           <div class="card-info"><strong class="u-text">ROI flat 1u</strong> : profit/perte si on mise 1 unité fixe sur chaque pari du modèle. Pas de Kelly, pas de progressive — juste 1u sec.</div>
-          <div class="card-info"><strong class="u-text">Brier score</strong> : moyenne du carré des écarts entre proba prédite et résultat (0 ou 1). Plus c'est bas, mieux c'est. <em>0.18 = bon, 0.25 = moyen, 0.30+ = à revoir.</em></div>
+          <div class="card-info"><strong class="u-text">Brier score</strong> : moyenne du carré des écarts entre proba prédite et résultat (0 ou 1). Plus c'est bas, mieux c'est. <em>Sports d'équipe : ≤0.18 excellent, ≤0.22 bon, ≤0.25 correct, ≤0.30 à surveiller, au-delà insuffisant. Tennis : seuils souvent plus exigeants.</em></div>
           <div class="card-info"><strong class="u-text">Edge</strong> : différence entre notre probabilité et la probabilité implicite de la cote. >5pt = value bet potentielle, &lt;0 = on est plus pessimiste que le marché → skip.</div>
           <div class="card-info"><strong class="u-text">Kelly fractionné (¼)</strong> : formule de mise optimale qui maximise la croissance long-terme sans ruiner sur les bad runs. On utilise ¼ Kelly + cap à 10% de la cagnotte = sécurité supplémentaire.</div>
           <div class="card-info"><strong class="u-text">Lock</strong> : pari à fiabilité ≥70%, censé tomber ≥80% des fois (cible). C'est là que la mise est la plus grosse en Kelly.</div>
@@ -30087,7 +30323,16 @@ const lbl = ageMin < 1 ? 'à l\'instant'
 : ageMin < 60 ? `il y a ${ageMin} min`
 : ageMin < 24*60 ? `il y a ${Math.round(ageMin/60)} h`
 : `il y a ${Math.round(ageMin/(24*60))} j`;
+if (ageMin > 240) {
+el.textContent = `🔴 Pipeline en panne — données ${lbl}`;
+el.style.color = 'var(--danger)';
+} else if (ageMin > 30) {
+el.textContent = `🟠 Données en attente de refresh (${lbl})`;
+el.style.color = 'var(--warn)';
+} else {
 el.textContent = `📅 Données ${lbl}`;
+el.style.color = '';
+}
 el.title = `Dernière actualisation : ${new Date(data.generated_at).toLocaleString('fr-FR')}`;
 if (ageMin > 120 && !(data && data._lite)) {
 try {
