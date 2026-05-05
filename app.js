@@ -6817,6 +6817,61 @@ components: artifact?.components || {},
 generatedAt: artifact?.generated_at || null,
 };
 }
+function normalizeMultitaskMarketKeyV5(key) {
+const raw = String(key || '').toLowerCase();
+if (!raw || raw === '1n2' || raw === 'moneyline') return '1n2';
+if (raw.includes('ou25') || raw.includes('o2.5') || raw.includes('u2.5') || raw.includes('over_25') || raw.includes('under_25')) return 'ou_25';
+if (raw.includes('btts')) return 'btts';
+if (raw.includes('exact') || raw.includes('score')) return 'exact_score';
+return raw;
+}
+function getMultitaskV5MarketPolicy(marketKey) {
+const artifact = (typeof window !== 'undefined') ? window.MULTITASK_V5 : null;
+const task = normalizeMultitaskMarketKeyV5(marketKey);
+const row = artifact?.by_market?.[task] || null;
+if (!row) return { task, active: false, status: 'missing', n: 0, loss_weight: 0 };
+return {
+task,
+active: row.status === 'pass',
+status: row.status || 'neutral',
+n: Number(row.n || 0),
+loss_weight: Number(row.loss_weight || artifact?.task_weights?.[task] || 0),
+baseline_brier: Number(row.baseline_brier || 0),
+v5_brier: Number(row.v5_brier || 0),
+reason: row.reason || '',
+};
+}
+function getMultitaskContextV5(match) {
+const artifact = (typeof window !== 'undefined') ? window.MULTITASK_V5 : null;
+if (!artifact) return null;
+const sport = String(match?.sport || 'unknown').toLowerCase();
+const sportRow = artifact.by_sport?.[sport] || null;
+return {
+status: artifact.status || 'missing',
+tasks: artifact.tasks || [],
+weights: artifact.task_weights || {},
+market_policy: {
+one_n_two: getMultitaskV5MarketPolicy('1n2'),
+ou_25: getMultitaskV5MarketPolicy('ou_25'),
+btts: getMultitaskV5MarketPolicy('btts'),
+exact_score: getMultitaskV5MarketPolicy('exact_score'),
+},
+sport,
+sport_brier: sportRow ? Number(sportRow.v5_brier || sportRow.baseline_brier || 0) : null,
+};
+}
+function getMultitaskV5DebugSummary() {
+const artifact = (typeof window !== 'undefined') ? window.MULTITASK_V5 : null;
+return {
+loaded: !!artifact,
+status: artifact?.status || 'missing',
+tasks: artifact?.tasks || [],
+task_weights: artifact?.task_weights || {},
+by_market: artifact?.by_market || {},
+guardrails: artifact?.guardrails || {},
+worst_zones: artifact?.worst_zones || [],
+};
+}
 try {
 window.getStackingMetaV5Nudge = getStackingMetaV5Nudge;
 window.getStackingMetaV5DebugSummary = getStackingMetaV5DebugSummary;
@@ -6827,6 +6882,9 @@ window.applyCalibrationMethodV5 = applyCalibrationMethodV5;
 window.getCalibrationMethodV5DebugSummary = getCalibrationMethodV5DebugSummary;
 window.getAdaptiveComponentWeightV5 = getAdaptiveComponentWeightV5;
 window.getAdaptiveEnsembleV5DebugSummary = getAdaptiveEnsembleV5DebugSummary;
+window.getMultitaskV5MarketPolicy = getMultitaskV5MarketPolicy;
+window.getMultitaskContextV5 = getMultitaskContextV5;
+window.getMultitaskV5DebugSummary = getMultitaskV5DebugSummary;
 } catch (e) {}
 
 let __predCache = new Map();
@@ -9001,6 +9059,7 @@ coachContext,
 derbyContext,
 coldStartContext,
 cold_start_v5: coldStartContext,
+multitask_v5: getMultitaskContextV5(match),
 scores: (() => {
 if (poi) return poissonTopScores(poi.lamH, poi.lamA, 10, 6, match.league_code);
 if (match.sport === 'hockey') return hockeyScorePrediction(match);
@@ -17785,6 +17844,7 @@ featureDriftV5: getFeatureDriftV5DebugSummary(),
 calibrationMethodV5: getCalibrationMethodV5DebugSummary(),
 adaptiveEnsembleV5: getAdaptiveEnsembleV5DebugSummary(),
 coldStartV5: getColdStartV5DebugSummary(),
+multitaskV5: getMultitaskV5DebugSummary(),
 seasonPhase: getSeasonPhaseDebugSummary(),
 starPlayers: getStarPlayersDebugSummary(),
 xgDecay: getXGDecayDebugSummary(),
@@ -24042,6 +24102,34 @@ return `<section style="margin-top:32px;">
           </div>
         </section>`;
 })();
+const v5MultitaskHtml = (() => {
+const data = window.MULTITASK_V5 || null;
+if (!data) return '';
+const rows = Object.entries(data.by_market || {});
+const label = task => task === '1n2' ? '1N2' : task === 'ou_25' ? 'O/U 2.5' : task === 'btts' ? 'BTTS' : task === 'exact_score' ? 'Score exact' : task;
+return `<section style="margin-top:32px;">
+          <h2 class="page-h2">🧠 Multi-task V5</h2>
+          <div style="padding:14px;background:var(--panel);border:1px solid var(--border);border-radius:12px;">
+            <div style="font-size:12px;color:var(--text-dim);margin-bottom:8px;">Le modèle suit une loss commune 1N2 / O-U 2.5 / BTTS / score exact. Chaque branche reste gated : elle ne peut être active que si son Brier ne dégrade pas le baseline.</div>
+            ${rows.map(([task, r]) => {
+              const base = Number(r.baseline_brier || 0);
+              const v5 = Number(r.v5_brier || base);
+              const delta = v5 - base;
+              const ok = delta <= 0.000001;
+              return `<div style="display:grid;grid-template-columns:1fr 70px 86px 86px 76px;gap:8px;padding:7px 0;border-top:1px solid var(--border);font-size:12px;align-items:center;">
+                <b>${esc(label(task))}</b>
+                <span>n=${Number(r.n || 0)}</span>
+                <span>Brier ${base.toFixed(3)}</span>
+                <span style="color:${ok ? 'var(--accent)' : 'var(--warn)'};">V5 ${v5.toFixed(3)}</span>
+                <span style="text-align:right;color:${ok ? 'var(--accent)' : 'var(--text-dim)'};">${esc(r.status || '—')}</span>
+              </div>`;
+            }).join('')}
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">
+              ${Object.entries(data.task_weights || {}).map(([task, w]) => `<span style="padding:6px 9px;border-radius:999px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.18);font-size:11.5px;color:var(--text-2);">${esc(label(task))} · ${Math.round(Number(w || 0) * 100)}%</span>`).join('')}
+            </div>
+          </div>
+        </section>`;
+})();
 wrap.innerHTML = `
       <div style="max-width:900px;margin:0 auto;padding:16px 12px 40px;">
         <div style="padding:40px 0 16px;border-bottom:1px solid var(--border);">
@@ -24079,6 +24167,7 @@ wrap.innerHTML = `
         ${v5ModelVersionsHtml}
         ${v5CalibrationHtml}
         ${v5AdaptiveEnsembleHtml}
+        ${v5MultitaskHtml}
 
         <section style="margin-top:32px;">
           <h2 class="page-h2">🧮 Comment le modèle décide</h2>

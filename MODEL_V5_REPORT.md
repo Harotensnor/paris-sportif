@@ -65,3 +65,22 @@ Guardrail: le Wilson 95% historique reste disponible en fallback, mais la modal 
 - Runtime: `predictMatch` réduit la confiance des équipes cold start et ajoute `cold_start_edge_lt_2pt` si le pick ne compense pas l'incertitude.
 
 Guardrail: la règle ne bloque pas silencieusement le tableau entier ; elle ne s'applique qu'aux équipes réellement peu observées et reste visible dans `?debug=1` + modal détail via le badge `Cold start V5`.
+
+## Section J — Multi-task learning
+
+- Status: **active**
+- Artifact: `multitask_v5.json`
+- Tasks: `1n2`, `ou_25`, `btts`, `exact_score`
+- Loss policy: `weighted_market_loss_gated_no_worse_than_baseline`
+- Brier guardrail: chaque branche garde `v5_brier <= baseline_brier`; la branche score exact reste neutre tant que le sample ligne par ligne manque.
+
+Task weights:
+
+| Task | Weight |
+|---|---:|
+| 1N2 | 43.3% |
+| O/U 2.5 | 25.3% |
+| BTTS | 25.3% |
+| Score exact | 6.1% |
+
+Guardrail: la couche multi-task expose la vérité par marché dans `?debug=1` et Crédibilité, mais ne force aucun ajustement agressif sans preuve backtest.
