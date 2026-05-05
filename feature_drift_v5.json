@@ -1,0 +1,92 @@
+{
+  "schema": "paris-sportif.feature_drift.v5",
+  "generated_at": "2026-05-05T23:05:15Z",
+  "method": "histogram_kl_divergence",
+  "thresholds": {
+    "warning": 0.2,
+    "critical": 0.45
+  },
+  "rows": {
+    "train": 34,
+    "prediction": 15,
+    "total": 49
+  },
+  "overall": "warning",
+  "max_kl": 14.9141,
+  "features": [
+    {
+      "feature": "elo_diff",
+      "status": "critical",
+      "train_n": 6,
+      "prediction_n": 6,
+      "kl": 14.9141,
+      "train_mean": -154.05,
+      "prediction_mean": 43.3
+    },
+    {
+      "feature": "injuries_home",
+      "status": "critical",
+      "train_n": 34,
+      "prediction_n": 15,
+      "kl": 8.19779,
+      "train_mean": 1.35294,
+      "prediction_mean": 3.26667
+    },
+    {
+      "feature": "weather_wind_kmh",
+      "status": "critical",
+      "train_n": 18,
+      "prediction_n": 9,
+      "kl": 5.43346,
+      "train_mean": 14.38333,
+      "prediction_mean": 11.83333
+    },
+    {
+      "feature": "injuries_away",
+      "status": "critical",
+      "train_n": 34,
+      "prediction_n": 15,
+      "kl": 2.23924,
+      "train_mean": 2.35294,
+      "prediction_mean": 5.8
+    },
+    {
+      "feature": "odd",
+      "status": "critical",
+      "train_n": 34,
+      "prediction_n": 15,
+      "kl": 1.10317,
+      "train_mean": 3.05059,
+      "prediction_mean": 2.86
+    },
+    {
+      "feature": "implied_prob",
+      "status": "critical",
+      "train_n": 34,
+      "prediction_n": 15,
+      "kl": 1.09481,
+      "train_mean": 0.4273,
+      "prediction_mean": 0.44359
+    },
+    {
+      "feature": "home_form_wr5",
+      "status": "insufficient",
+      "train_n": 0,
+      "prediction_n": 0,
+      "kl": 0.0
+    },
+    {
+      "feature": "away_form_wr5",
+      "status": "insufficient",
+      "train_n": 0,
+      "prediction_n": 0,
+      "kl": 0.0
+    }
+  ],
+  "synthetic_shift_test": {
+    "feature": "implied_prob",
+    "kl": 5.39535,
+    "detected": true
+  },
+  "message": "Distribution drift detected, recalibration recommended"
+}

@@ -1119,3 +1119,12 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Tests: suite model-v5 passe desktop + mobile Chromium (8/8); app.js syntax OK; drift pipeline OK.
 - Cache/footer bumpés v37.004; app.js hash e5024038; model_versions hash 23ad6181; SW paris-sportif-20260505-230352.
 
+
+## Sprint v37.005 — AUTO 10/10 Phase V5 E drift detection ML (23:06 UTC)
+- Data: detect_feature_drift_v5.py calcule KL divergence train vs prediction sur features clés.
+- Robustesse: test synthétique intégré prouve que le détecteur voit un drift artificiel fort.
+- Santé/debug: panneau "Drift features V5" ajouté et ?debug=1 expose overall, KL max et top features.
+- Pipeline: refresh.yml et auto_refresh.py reconstruisent feature_drift_v5.json/js à chaque tick.
+- Tests: suite model-v5 passe desktop + mobile Chromium (10/10); app.js syntax OK; drift pipeline OK.
+- Cache/footer bumpés v37.005; app.js hash 38fe472d; drift hash 951026df; SW paris-sportif-20260505-230639.
+
