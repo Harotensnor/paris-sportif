@@ -1,0 +1,67 @@
+{
+  "schema": "paris-sportif.model_versions.v5",
+  "generated_at": "2026-05-05T23:02:35Z",
+  "current": "v5.0",
+  "online_learning": {
+    "weekly_recalibration_day": "sunday",
+    "weekly_recalibration_utc": "03:00",
+    "next_recalibration_at": "2026-05-10T03:00:00Z",
+    "trainer_scripts": [
+      "build_bayesian_priors_v5.py",
+      "build_feature_engineering_v5.py",
+      "build_stacking_meta_v5.py"
+    ],
+    "settled_source": "picks_history.jsonl + backtest_training_rows.jsonl"
+  },
+  "rollout_policy": {
+    "strategy": "deterministic_pick_hash_bucket",
+    "stages": [
+      {
+        "share": 0.1,
+        "min_days": 7,
+        "promote_if": "ROI >= baseline and Brier <= baseline + 0.005"
+      },
+      {
+        "share": 0.5,
+        "min_days": 7,
+        "promote_if": "ROI >= baseline and no critical drift"
+      },
+      {
+        "share": 1.0,
+        "min_days": 7,
+        "promote_if": "health overall ok/warning"
+      }
+    ],
+    "rollback_if": [
+      "ROI delta <= -2pt on 100+ settled picks",
+      "Brier delta >= +0.010",
+      "feature KL drift critical"
+    ]
+  },
+  "history": [
+    {
+      "version": "v4-contextual",
+      "status": "promoted_guarded",
+      "promoted_at": "2026-05-05T21:30:16Z",
+      "roi_pct": 0.0,
+      "brier": 0.2309
+    },
+    {
+      "version": "v5.0",
+      "status": "shadow_ab",
+      "promoted_at": "2026-05-05T23:02:35Z",
+      "share": 0.1,
+      "priors_teams": 3730,
+      "stacking_rows": 49,
+      "feature_count": 13,
+      "rolling_origin_brier": 0.205,
+      "baseline_brier": 0.2309
+    }
+  ],
+  "artifacts": {
+    "bayesian_priors.json": "1930019018cc",
+    "feature_engineering_v5.json": "1334eb60d5d4",
+    "stacking_meta_weights.json": "cb89cf58aa74",
+    "calibration_method.json": null
+  }
+}

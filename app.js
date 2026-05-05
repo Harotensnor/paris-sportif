@@ -6670,10 +6670,22 @@ topFeatures: (artifact?.feature_importance || []).slice(0, 10),
 generatedAt: artifact?.generated_at || null,
 };
 }
+function getModelVersionsV5DebugSummary() {
+const artifact = (typeof window !== 'undefined') ? window.MODEL_VERSIONS_V5 : null;
+return {
+loaded: !!artifact,
+current: artifact?.current || 'unknown',
+nextRecalibrationAt: artifact?.online_learning?.next_recalibration_at || null,
+rolloutStages: artifact?.rollout_policy?.stages || [],
+history: artifact?.history || [],
+artifacts: artifact?.artifacts || {},
+};
+}
 try {
 window.getStackingMetaV5Nudge = getStackingMetaV5Nudge;
 window.getStackingMetaV5DebugSummary = getStackingMetaV5DebugSummary;
 window.getFeatureEngineeringV5DebugSummary = getFeatureEngineeringV5DebugSummary;
+window.getModelVersionsV5DebugSummary = getModelVersionsV5DebugSummary;
 } catch (e) {}
 
 let __predCache = new Map();
@@ -17540,6 +17552,7 @@ teamPriors: getTeamPriorsDebugSummary(),
 bayesianPriorsV5: getBayesianV5DebugSummary(),
 stackingMetaV5: getStackingMetaV5DebugSummary(),
 featureEngineeringV5: getFeatureEngineeringV5DebugSummary(),
+modelVersionsV5: getModelVersionsV5DebugSummary(),
 seasonPhase: getSeasonPhaseDebugSummary(),
 starPlayers: getStarPlayersDebugSummary(),
 xgDecay: getXGDecayDebugSummary(),
@@ -23726,6 +23739,28 @@ return `<section style="margin-top:32px;">
           </div>
         </section>`;
 })();
+const v5ModelVersionsHtml = (() => {
+const data = window.MODEL_VERSIONS_V5 || null;
+if (!data) return '';
+const stages = data.rollout_policy?.stages || [];
+const current = (data.history || []).find(v => v.version === data.current) || {};
+return `<section style="margin-top:32px;">
+          <h2 class="page-h2">🔁 Online learning V5</h2>
+          <div style="padding:14px;background:var(--panel);border:1px solid var(--border);border-radius:12px;">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:10px;">
+              <div><div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;font-weight:800;">Version active</div><div style="font-size:24px;font-weight:900;">${esc(data.current || '—')}</div><div style="font-size:11px;color:var(--text-dim2);">${esc(current.status || 'shadow')}</div></div>
+              <div><div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;font-weight:800;">Prochaine recalibration</div><div style="font-size:15px;font-weight:900;margin-top:8px;">${esc(String(data.online_learning?.next_recalibration_at || '—')).replace('T',' ').replace('Z',' UTC')}</div><div style="font-size:11px;color:var(--text-dim2);">cron dimanche</div></div>
+              <div><div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;font-weight:800;">Rollout</div><div style="font-size:24px;font-weight:900;">${Math.round(Number(current.share || stages[0]?.share || 0) * 100)}%</div><div style="font-size:11px;color:var(--text-dim2);">A/B shadow</div></div>
+            </div>
+            <div style="font-size:12px;color:var(--text-dim);margin-bottom:8px;">Le modèle V5 est versionné : 10% → 50% → 100% seulement si ROI/Brier restent au-dessus du baseline. Rollback automatique documenté dans l'artefact.</div>
+            ${stages.map((s, idx) => `<div style="display:grid;grid-template-columns:55px 70px 1fr;gap:8px;padding:6px 0;border-top:1px solid var(--border);font-size:12px;align-items:center;">
+              <b>Étape ${idx + 1}</b>
+              <span>${Math.round(Number(s.share || 0) * 100)}%</span>
+              <span>${esc(s.promote_if || '')}</span>
+            </div>`).join('')}
+          </div>
+        </section>`;
+})();
 wrap.innerHTML = `
       <div style="max-width:900px;margin:0 auto;padding:16px 12px 40px;">
         <div style="padding:40px 0 16px;border-bottom:1px solid var(--border);">
@@ -23760,6 +23795,7 @@ wrap.innerHTML = `
         ${v5BayesianPriorsHtml}
         ${v5StackingHtml}
         ${v5FeatureEngineeringHtml}
+        ${v5ModelVersionsHtml}
 
         <section style="margin-top:32px;">
           <h2 class="page-h2">🧮 Comment le modèle décide</h2>
