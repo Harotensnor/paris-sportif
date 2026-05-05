@@ -138,6 +138,7 @@ jobs:
           # v33.30 — Patches "lourds" qui ont une logique spécifique (dedup,
           # multi-market lookup, merge events). Restent en scripts séparés.
           python3 patch_sofascore_events.py || true
+          python3 patch_sofascore_league_codes.py || true
           # v35.36 — Sofascore merge can add non-exact fallback events. Filter
           # after the merge so the served dataset remains Winamax-exact only.
           python3 patch_winamax.py || true
@@ -186,6 +187,7 @@ jobs:
             python3 audit_lightgbm_runtime.py
             python3 build_rugby_markets.py || true
           python3 build_niche_markets.py || true
+          python3 build_sports_expansion_audit.py || true
           python3 detect_boosted_odds.py || true
           # v33.28 — Inject data.js (window.PRONOSTICS_DATA = {...}) dans
           # pronostics.html UNE SEULE FOIS à la fin. Avant : 11 patches faisaient

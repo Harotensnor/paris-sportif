@@ -96,6 +96,7 @@ FETCH_STAGES = [
 PATCH_STAGES = [
     ('patch_odds.py',               1,   60),
     ('patch_sofascore_events.py',   1,   30),
+    ('patch_sofascore_league_codes.py', 1, 15),
     ('patch_winamax.py',            1,   30),
     ('patch_winamax_markets.py',    1,   30),
     ('patch_all_quick.py',          1,   30),
@@ -117,6 +118,7 @@ PATCH_STAGES = [
     ('audit_lightgbm_runtime.py',   1,   15),
     ('build_rugby_markets.py',      1,   30),
     ('build_niche_markets.py',      1,   30),
+    ('build_sports_expansion_audit.py', 1, 15),
     ('detect_boosted_odds.py',      1,   30),
     ('build_signal_gap_report.py',  1,   15),
     ('inject_data_in_html.py',      1,   15),
