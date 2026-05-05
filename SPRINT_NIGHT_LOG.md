@@ -778,3 +778,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Stabilité: correction TDZ sur `filteredPicks`/`tousMobile`; le rendu Tous ne tombe plus sur le fallback refresh impossible.
 - QA: `node --check app.js` OK, `critical-flows.spec.js` 30/30 passes + 4 skips attendus sur chromium desktop.
 - Cache/footer bumpes v35.478; `app.js` hash `3c4b2aa0`, `app.css` hash `d19b2228`, SW `paris-sportif-20260505-191102`.
+
+## Sprint v35.479 — AUTO 10/10 Méthode hiérarchisée (19:17 UTC)
+- Méthode: les articles deviennent 5 sections claires avec ancres directes `#methode-tier`, `#methode-data`, `#methode-confiance`, `#methode-mesure`, `#methode-limites`.
+- Clarté: les sections répondent aux questions clés (choisir un prono, sources, confiance, mesure, limites) au lieu d'un flot d'articles génériques.
+- QA: `node --check app.js` OK, `critical-flows.spec.js` + `spa-pages-regression.spec.js` passent 31/31 avec 5 skips attendus sur chromium desktop.
+- Cache/footer bumpes v35.479; `app.js` hash `2ad06cd7`, `app.css` hash `d19b2228`, SW `paris-sportif-20260505-191702`.

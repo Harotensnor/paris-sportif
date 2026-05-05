@@ -21624,11 +21624,11 @@ const cats = [
 ['data','Data'],
 ];
 const articles = [
-['high-odds','Pourquoi distinguer les niveaux de cotes','Théo ne veut plus un seul filtre rigide. V36 classe les paris par niveaux : sûrs @1.30-1.50, solides @1.50-2.00, value @2.00-3.00, big odds @3.00-5.00 et outsiders au-delà. La mise et l’exigence changent selon le niveau.'],
-['value','Comment reconnaître la value','Une cote haute n’est pas automatiquement bonne. Il faut que le modèle voie plus de chances que le marché. Exemple simple : si Winamax paie @2.80 (36% implicite) et que le modèle estime 45%, l’avantage est réel. Si la cote est haute mais la proba trop faible, on passe.'],
-['bankroll','Bankroll et mise','Le but n’est pas de tout miser sur un gros coup. La mise doit rester petite, régulière, et liée à l’avantage. Une série de pertes normale ne doit pas détruire la bankroll. Si la variance secoue, on réduit la mise ou on s’abstient.'],
-['coherence','Cohérence entre marchés','Le site filtre les contradictions : un score exact 1-0 ne peut plus cohabiter avec BTTS Oui, et 0-0 ne peut pas cohabiter avec Over 2.5. Les marchés écartés restent auditables, mais ils ne guident plus la décision.'],
-['responsable','Règle de survie','Un pari reste incertain. Si aucune opportunité propre ne sort, le meilleur pari est de ne rien jouer. Le site doit aider à décider, pas pousser à l’action permanente.'],
+['methode-tier','Comment on choisit un prono','Le tableau combine cinq critères : cote bookable, confiance modèle, edge, fraîcheur des données et cohérence entre marchés. Les tiers ne veulent pas dire “gagné d’avance” : Sûr cherche la stabilité, Solide le compromis, Valeur l’avantage statistique, Big odds le potentiel, Outsider uniquement quand le prix compense le risque.'],
+['methode-data','D’où viennent les données','Le socle vient des événements sportifs, cotes Winamax, historique de cotes, résultats, forme, xG, blessures, lineups, météo et arbitres quand ils existent. La cadence change selon la source : les cotes bougent souvent, les blessures et lineups sont plus lentes. Une donnée ancienne est signalée au lieu d’être masquée.'],
+['methode-confiance','Comment on calcule la confiance','La confiance mélange Poisson/Dixon-Coles pour les scores, Elo pour la force, xG/forme pour le contexte et signaux marché pour le prix. Si les modèles sont alignés, la confiance monte. Si les signaux se contredisent ou si la donnée manque, le score baisse même si la cote semble belle.'],
+['methode-mesure','Comment on mesure si on a raison','Le suivi ne regarde pas seulement le nombre de victoires. On contrôle le Brier pour la calibration des probabilités, le ROI pour la rentabilité, l’edge réalisé, la CLV et les résultats par sport/marché. Une cote à 1.20 peut gagner souvent et rester mauvaise si elle paie trop peu.'],
+['methode-limites','Limites assumées','Le site évite les contradictions évidentes, mais il ne connaît pas tout : dernières compositions, void rules spécifiques, marchés non couverts, rythme d’un match ou information de vestiaire. Quand les signaux sont faibles, s’abstenir est une décision normale, pas un bug.'],
 ];
 const catButtons = cats.map(([key,label]) => `
       <button type="button" data-academy-cat="${key}" style="min-height:44px;flex:0 0 auto;scroll-snap-align:start;padding:9px 13px;border-radius:999px;border:1px solid ${key === 'all' ? 'var(--brand)' : 'var(--border)'};background:${key === 'all' ? 'var(--brand-soft)' : 'var(--panel-2)'};color:${key === 'all' ? 'var(--brand)' : 'var(--text-2)'};font-size:12px;font-weight:800;cursor:pointer;">${esc(label)}</button>
@@ -21643,7 +21643,7 @@ const glossaryHtml = glossary.map(([cat,title,desc]) => `
       </article>
     `).join('');
 const articleHtml = articles.map(([id,title,body]) => `
-      <section id="academy-${id}" style="box-sizing:border-box;min-width:0;overflow:hidden;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px;margin-bottom:12px;">
+      <section id="${esc(id)}" style="box-sizing:border-box;min-width:0;overflow:hidden;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px;margin-bottom:12px;">
         <h2 style="margin:0 0 8px;font-size:20px;color:var(--text);overflow-wrap:anywhere;">${esc(title)}</h2>
         <p style="margin:0;font-size:14px;line-height:1.7;color:var(--text-2);overflow-wrap:anywhere;">${esc(body)}</p>
       </section>
@@ -21679,7 +21679,7 @@ wrap.innerHTML = `
             <input id="academy-search" type="search" placeholder="edge, Kelly, BTTS…" style="box-sizing:border-box;width:100%;min-height:44px;border-radius:var(--r-md);border:1px solid var(--border);background:var(--panel-2);color:var(--text);padding:0 12px;font-size:14px;">
             <div style="${academyCatStyle}">${catButtons}</div>
             <nav aria-label="Sommaire méthode" style="${academyTocStyle}">
-              ${articles.map(([id,title]) => `<a href="#academy-${id}" style="${academyTocLinkStyle}">${esc(title)}</a>`).join('')}
+              ${articles.map(([id,title]) => `<a href="#${esc(id)}" style="${academyTocLinkStyle}">${esc(title)}</a>`).join('')}
             </nav>
           </aside>
 
