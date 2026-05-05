@@ -27,14 +27,11 @@ const PAGES = [
   { name: 'credibilite', path: '/credibilite.html' },
   { name: 'comment-lire', path: '/comment-lire-un-prono.html' },
   { name: 'legal', path: '/legal.html' },
-  // AUDIT-2026-04-27 (Sprint 12 #28) — Étendu aux pages SPA dynamiques
-  // qui ont le plus de DOM custom. Test visite via hash navigation.
+  // Hubs SPA V37: navigation produit reduite a 5 pages principales.
   { name: 'spa-tous', path: '/pronostics.html#tous' },
-  { name: 'spa-locks', path: '/pronostics.html#locks' },
-  { name: 'spa-calendrier', path: '/pronostics.html#calendrier' },
-  { name: 'spa-bilan', path: '/pronostics.html#bilan' },
+  { name: 'spa-performance', path: '/pronostics.html#performance' },
+  { name: 'spa-academie', path: '/pronostics.html#academie' },
   { name: 'spa-profil', path: '/pronostics.html#profil' },
-  { name: 'spa-alertes', path: '/pronostics.html#alertes' },
 ];
 
 test.beforeEach(async ({ context }) => {
@@ -44,6 +41,10 @@ test.beforeEach(async ({ context }) => {
       const prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}');
       prefs.onboardingDone = true;
       localStorage.setItem('userPrefs', JSON.stringify(prefs));
+      sessionStorage.setItem('autoRefreshDoneAt', String(Date.now()));
+      localStorage.setItem('cookieConsent', 'accepted');
+      localStorage.setItem('paris_sportif_onboarded_v1', '1');
+      localStorage.setItem('paris_sportif_onboarded_v2', '1');
     } catch (e) {}
   });
 });
