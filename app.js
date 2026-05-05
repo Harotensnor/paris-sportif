@@ -5257,6 +5257,96 @@ if (sum <= 0) return null;
 return { pH: hSplit / sum, pD: 0, pA: aSplit / sum };
 }
 
+let __teamPriorIndexRef = null;
+let __teamPriorIndex = null;
+function _teamPriorNorm(value) {
+return String(value || '').trim().toLowerCase().replace(/[^a-z0-9]+/gi, '-').replace(/^-+|-+$/g, '') || 'unknown';
+}
+function _teamPriorFromTuple(row) {
+if (!Array.isArray(row)) return row || null;
+return {
+key: row[0],
+team_name: row[1],
+sport: 'football',
+league: row[2],
+prior_xG: Number(row[3]),
+prior_xGA: Number(row[4]),
+prior_winrate_home: Number(row[5]),
+prior_winrate_away: Number(row[6]),
+prior_btts_rate: Number(row[7]),
+prior_over25_rate: Number(row[8]),
+sample_size: Number(row[9]) || 0,
+last_updated: row[10],
+fallback: row[11] === 1,
+};
+}
+function _getTeamPriorIndex() {
+const data = window.TEAM_PRIORS || null;
+if (__teamPriorIndexRef === data && __teamPriorIndex) return __teamPriorIndex;
+const exact = new Map();
+const bySportName = new Map();
+const byName = new Map();
+const rows = Array.isArray(data?.teams)
+? data.teams.map(_teamPriorFromTuple)
+: Object.entries(data?.teams || {}).map(([key, value]) => ({ key, ...value }));
+for (const prior of rows) {
+if (!prior) continue;
+const sport = String(prior.sport || 'football').toLowerCase();
+const league = String(prior.league || 'unknown').toLowerCase();
+const nameKey = _teamPriorNorm(prior.team_name);
+const fullKey = `${sport}|${league}|${nameKey}`;
+exact.set(String(prior.key || fullKey).toLowerCase(), prior);
+exact.set(fullKey, prior);
+const sportName = `${sport}|${nameKey}`;
+if (!bySportName.has(sportName) || (prior.sample_size || 0) > (bySportName.get(sportName)?.sample_size || 0)) {
+bySportName.set(sportName, prior);
+}
+if (!byName.has(nameKey) || (prior.sample_size || 0) > (byName.get(nameKey)?.sample_size || 0)) {
+byName.set(nameKey, prior);
+}
+}
+__teamPriorIndex = { exact, bySportName, byName, generated_at: data?.generated_at || null, football_team_count: data?.football_team_count || rows.length || 0 };
+__teamPriorIndexRef = data;
+return __teamPriorIndex;
+}
+function getTeamPrior(match, side) {
+if (!match || !side) return null;
+const idx = _getTeamPriorIndex();
+if (!idx || !idx.exact.size) return null;
+const sport = String(match.sport || 'football').toLowerCase();
+const league = String(match.league_code || match.league_name || side.league || 'unknown').toLowerCase();
+const candidates = [side.name, side.short, side.abbr, side.id].filter(Boolean).map(_teamPriorNorm);
+for (const nameKey of candidates) {
+const exact = idx.exact.get(`${sport}|${league}|${nameKey}`);
+if (exact) return exact;
+}
+for (const nameKey of candidates) {
+const sportMatch = idx.bySportName.get(`${sport}|${nameKey}`);
+if (sportMatch) return sportMatch;
+}
+for (const nameKey of candidates) {
+const anyMatch = idx.byName.get(nameKey);
+if (anyMatch) return anyMatch;
+}
+return null;
+}
+try { window.getTeamPrior = getTeamPrior; } catch (e) {}
+
+function getTeamPriorsDebugSummary() {
+const idx = _getTeamPriorIndex();
+const data = window.TEAM_PRIORS || null;
+return {
+loaded: !!(idx && idx.exact && idx.exact.size),
+teams: Number(data?.team_count || idx?.exact?.size || 0),
+footballTeams: Number(data?.football_team_count || idx?.football_team_count || 0),
+leagues: Number(data?.league_count || 0),
+decayK: Number(data?.decay_k || 0.05),
+maxMatches: Number(data?.max_matches || 20),
+generatedAt: data?.generated_at || idx?.generated_at || null,
+};
+}
+try { window.getTeamPriorsDebugSummary = getTeamPriorsDebugSummary; } catch (e) {}
+
 function poissonComponent(match) {
 if (match.sport !== 'football') return null;
 const { home, away } = getSides(match);
@@ -5306,9 +5396,30 @@ source: hXG.source === aXG.source ? hXG.source : 'xG',
 lamH = Math.max(0.2, (1 - w) * lamH + w * lamH_emp);
 lamA = Math.max(0.2, (1 - w) * lamA + w * lamA_emp);
 }
+let bayesianPrior = null;
+const hPrior = getTeamPrior(match, home);
+const aPrior = getTeamPrior(match, away);
+if (hPrior && aPrior && Number.isFinite(hPrior.prior_xG) && Number.isFinite(hPrior.prior_xGA) && Number.isFinite(aPrior.prior_xG) && Number.isFinite(aPrior.prior_xGA)) {
+const priorLamH = Math.max(0.2, ((hPrior.prior_xG + aPrior.prior_xGA) / 2) * HOME_ADV);
+const priorLamA = Math.max(0.2, ((aPrior.prior_xG + hPrior.prior_xGA) / 2) / HOME_ADV);
+const minSample = Math.min(Number(hPrior.sample_size) || 0, Number(aPrior.sample_size) || 0);
+const wPrior = minSample >= 10 ? 0.4 : minSample >= 5 ? 0.2 : 0.12;
+bayesianPrior = {
+weight: wPrior,
+homeSample: Number(hPrior.sample_size) || 0,
+awaySample: Number(aPrior.sample_size) || 0,
+homeFallback: !!hPrior.fallback,
+awayFallback: !!aPrior.fallback,
+lamH_prior: Math.round(priorLamH * 1000) / 1000,
+lamA_prior: Math.round(priorLamA * 1000) / 1000,
+generated_at: _getTeamPriorIndex()?.generated_at || null,
+};
+lamH = Math.max(0.2, (1 - wPrior) * lamH + wPrior * priorLamH);
+lamA = Math.max(0.2, (1 - wPrior) * lamA + wPrior * priorLamA);
+}
 const probs = poissonProbs(lamH, lamA);
 if (!probs) return null;
-return { ...probs, lamH, lamA, fbrefBlend };
+return { ...probs, lamH, lamA, fbrefBlend, bayesianPrior };
 }
 
 let __congestionCache = null;
@@ -6955,11 +7066,23 @@ if (poi.fbrefBlend) {
 const wPct = Math.round(poi.fbrefBlend.weight * 100);
 xgText += ` (xG ${poi.fbrefBlend.source || 'empirique'} ${wPct}% · ${poi.fbrefBlend.minMatchesPlayed} matchs)`;
 }
+if (poi.bayesianPrior) {
+const priorPct = Math.round(poi.bayesianPrior.weight * 100);
+const priorSample = Math.min(poi.bayesianPrior.homeSample || 0, poi.bayesianPrior.awaySample || 0);
+xgText += ` · prior équipe ${priorPct}% (${priorSample} matchs min)`;
+}
 reasons.push({
 type: 'xg',
 icon: '⚽',
 text: xgText
 });
+if (poi.bayesianPrior && Math.min(poi.bayesianPrior.homeSample || 0, poi.bayesianPrior.awaySample || 0) >= 10) {
+reasons.push({
+type: 'bayesian_prior',
+icon: '🧠',
+text: `Prior V4 : 20 derniers matchs pondérés, blend ${Math.round(poi.bayesianPrior.weight * 100)}% dans le modèle buts.`,
+});
+}
 }
 if (eloStats && Math.abs(eloStats.diff) >= 30) {
 const leaderElo = eloStats.diff > 0 ? (home?.short || home?.name) : (away?.short || away?.name);
@@ -7395,7 +7518,7 @@ return typeof _po === 'number' && _po > 0 && _po <= 1.5;
 isLockStrict: reliability >= 0.75,
 abstain,
 sharp_money: smartMoneyNudge || null,
-poisson: poi ? { xgH: poi.lamH, xgA: poi.lamA, fbrefBlend: poi.fbrefBlend || null } : null,
+poisson: poi ? { xgH: poi.lamH, xgA: poi.lamA, fbrefBlend: poi.fbrefBlend || null, bayesianPrior: poi.bayesianPrior || null } : null,
 scores: (() => {
 if (poi) return poissonTopScores(poi.lamH, poi.lamA, 10, 6, match.league_code);
 if (match.sport === 'hockey') return hockeyScorePrediction(match);
@@ -15838,6 +15961,7 @@ top30MarketBreakdown: v37Top30MarketBreakdown,
 top30MarketDistinct: v37Top30MarketDistinct,
 tierDiagnostics: v37TierDiagnostics,
 oddsSnapshotCoverage: v37SnapshotCoverage,
+teamPriors: getTeamPriorsDebugSummary(),
 qualityCounters: v37QualityCounters,
 qualitySamples: v37QualitySamples,
 rejectReasons: v37RejectReasons,

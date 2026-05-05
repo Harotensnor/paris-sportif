@@ -817,3 +817,11 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Reporting: `PHASE_REPORT.md`, `BACKLOG.md` et `WINDOWS_DEBLOCK_LOG.md` créés; aucun déblocage Windows système n'a été utilisé.
 - QA: `app.js` syntax OK, nouveaux scripts Python compilent, `check_pipeline_drift.py` OK, `check_pipeline_freshness.py --max-age-min 30` OK, `npx playwright test --project=chromium-desktop` passe 208/208 avec 10 skips attendus.
 - Cache/footer bumpes v35.502; `app.js` hash `65789556`, `app.css` hash `e464318c`, `data_lite.js` hash `c3dccc6c`, SW `paris-sportif-20260505-224625`.
+
+## Sprint v36.001 — AUTO 10/10 Modèle V4 AA prior équipes (21:01 UTC)
+- Bayesian prior: `team_priors.json` couvre 3730 équipes (1306 foot) avec les 20 derniers matchs pondérés `e^(-0.05*days)`.
+- Modèle: `poissonComponent()` blend désormais Poisson courant avec prior équipe à 40% si les deux équipes ont 10+ matchs, fallback progressif sinon.
+- Debug: `?debug=1` expose `teamPriors` (coverage, ligues, decay, date) et `predictMatch()` renvoie `poisson.bayesianPrior`.
+- Pipeline: `build_team_priors.py` est branché dans `auto_refresh.py`, `refresh.yml` et `build_health.py`.
+- QA: génération priors OK, scripts Python compilent, `app.js` syntax OK, `tests/team-priors.spec.js` passe sur Chromium desktop.
+- Cache/footer bumpes v36.001; `app.js` hash `2a4de62b`, `team_priors.js` hash `11cb015c`, SW `paris-sportif-20260505-210116`.

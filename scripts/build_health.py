@@ -260,6 +260,12 @@ SOURCES = [
         'pending': (d.get('pending') or 0) if isinstance(d, dict) else 0,
         'days': len(d.get('by_day') or []) if isinstance(d, dict) else 0,
     }),
+    ('team_priors', 'team_priors.json', lambda d: {
+        'teams': (d.get('team_count') or len(d.get('teams') or {})) if isinstance(d, dict) else 0,
+        'leagues': (d.get('league_count') or len(d.get('league_averages') or {})) if isinstance(d, dict) else 0,
+        'decay_k': (d.get('decay_k') or 0) if isinstance(d, dict) else 0,
+        'max_matches': (d.get('max_matches') or 0) if isinstance(d, dict) else 0,
+    }),
     ('data_quality_report', 'data_quality_report.json', lambda d: {
         'events_quarantined': (d.get('events_quarantined') or 0) if isinstance(d, dict) else 0,
         'status': (d.get('status') or 'unknown') if isinstance(d, dict) else 'missing',
