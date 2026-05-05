@@ -367,3 +367,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Cleanup: suppression definitive du bloc `_injectMatchSchemas()` et de son appel idle, sans toucher au schema statique valide dans `pronostics.html`.
 - Mesure: `app.js` repasse a 1,592,160 bytes sous le cap 1,600,000, soit environ 3.2 KB recuperes apres les nouveaux marches V37.
 - Cache/footer bumpes v35.413; `app.js` hash `b7ed36d7`.
+
+## Sprint v35.414 — AUTO 10/10 Combos intra-match resultats (02:12 UTC)
+- Elargissement: les combinés même match ne se limitent plus au scénario "Plus de 2,5 + BTTS".
+- Front: ajout des combos "vainqueur + les deux équipes marquent" quand les deux jambes sont des marchés exacts Winamax et non skip.
+- Garde-fou: le moteur garde les cotes comme assemblage de jambes Winamax, sans les faire passer pour une cote simple inventée.
+- Cache/footer bumpes v35.414; `app.js` hash `5a435def`, taille 1,593,039 bytes sous cap.

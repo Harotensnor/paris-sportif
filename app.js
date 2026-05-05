@@ -8900,7 +8900,7 @@ prob: candidate.prob,
 }
 });
 
-const sameMatchGoalCombos = pool
+const sameMatchCombos = pool
 .filter(x => x.m?.sport === 'football' && x.startIn !== null && x.startIn >= minMinutes && (maxMinutes < 0 || x.startIn <= maxMinutes))
 .map(x => {
 let candidates = [];
@@ -8912,22 +8912,41 @@ const ok = c => c
 && Number(c.odd) > 1.20
 && Number(c.prob) > 0.42
 && Number(c.edge) > 0.015;
+const combos = [];
 const over25 = candidates.find(c => ok(c) && c.market === 'ou25' && /^O2\.5$/.test(String(c.key || '')))
 || candidates.find(c => ok(c) && c.market === 'ou25' && /plus/i.test(String(c.label || '')));
 const bttsYes = candidates.find(c => ok(c) && c.market === 'btts' && String(c.key || '') === 'BTTS_Y')
 || candidates.find(c => ok(c) && c.market === 'btts' && /oui/i.test(String(c.label || '')));
-if (!over25 || !bttsYes) return null;
+const sidePick = candidates.find(c => ok(c) && c.market === '1n2' && ['1','2'].includes(String(c.key || c.pickKey || '')));
+if (over25 && bttsYes) {
 const legs = [makeMarketLeg(x, over25), makeMarketLeg(x, bttsYes)];
 const totalOdd = legs.reduce((acc, l) => acc * l.odd, 1);
-return {
+combos.push({
+type: 'goals-builder',
+title: '⚽ Buts + BTTS',
+desc: 'Même match · Plus de 2,5 buts + les deux équipes marquent · cotes exactes Winamax',
 legs,
 score: (over25.edge + bttsYes.edge) * 100 + Math.min(totalOdd, 5),
 totalOdd,
-};
+});
+}
+if (sidePick && bttsYes) {
+const legs = [makeMarketLeg(x, sidePick), makeMarketLeg(x, bttsYes)];
+const totalOdd = legs.reduce((acc, l) => acc * l.odd, 1);
+combos.push({
+type: 'result-btts-builder',
+title: '🏆 Résultat + BTTS',
+desc: 'Même match · vainqueur + les deux équipes marquent · cotes exactes Winamax',
+legs,
+score: (sidePick.edge + bttsYes.edge) * 100 + Math.min(totalOdd, 6) - 0.4,
+totalOdd,
+});
+}
+return combos;
 })
-.filter(Boolean)
+.reduce((acc, items) => acc.concat(items || []), [])
 .sort((a, b) => b.score - a.score)
-.slice(0, 2);
+.slice(0, 4);
 
 [safe, balanced, bold, lockCombo].forEach(arr => arr.sort((a, b) => a.startIn - b.startIn));
 
@@ -8935,10 +8954,10 @@ const combines = [];
 if (lockCombo.length >= 2) combines.push({ type: 'locks', title: '🔒 Lock Combo', desc: 'Que des locks (fiab ≥ 70%) · anti-corrélation', legs: lockCombo });
 if (safe.length >= 2) combines.push({ type: 'safe', title: '🛡️ Sécurisé', desc: 'Pronostics fiables (haute conf.)', legs: safe });
 if (balanced.length >= 3) combines.push({ type: 'balanced', title: '⚖️ Équilibré', desc: 'Bon rapport risque/gain', legs: balanced });
-sameMatchGoalCombos.forEach((combo, idx) => combines.push({
-type: 'goals-builder',
-title: idx === 0 ? '⚽ Buts + BTTS' : '⚽ Scénario buts',
-desc: 'Même match · Over 2.5 + les deux équipes marquent · cotes exactes Winamax',
+sameMatchCombos.forEach((combo, idx) => combines.push({
+type: combo.type || 'same-match-builder',
+title: idx === 0 ? combo.title : combo.type === 'result-btts-builder' ? '🏆 Résultat + BTTS' : '⚽ Scénario buts',
+desc: combo.desc || 'Même match · marchés corrélés exacts Winamax',
 legs: combo.legs,
 }));
 if (bold.length >= 2) combines.push({ type: 'bold', title: '🎯 Audacieux', desc: 'Fiabilité correcte sur cotes plus hautes', legs: bold });
@@ -13401,6 +13420,7 @@ _agentReplay: typeof _agentReplay === 'function' ? _agentReplay : null,
 _agentBestPick: typeof _agentBestPick === 'function' ? _agentBestPick : null,
 selectBestMarket: typeof selectBestMarket === 'function' ? selectBestMarket : null,
 buildMarketCandidates: typeof buildMarketCandidates === 'function' ? buildMarketCandidates : null,
+buildCombines: typeof buildCombines === 'function' ? buildCombines : null,
 scoreMarketCandidate: typeof scoreMarketCandidate === 'function' ? scoreMarketCandidate : null,
 _isFreshBacktestReport: typeof _isFreshBacktestReport === 'function' ? _isFreshBacktestReport : null,
 _fetchBacktestReportV2: typeof _fetchBacktestReportV2 === 'function' ? _fetchBacktestReportV2 : null,
