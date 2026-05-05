@@ -5420,6 +5420,7 @@ const tennisSurface = pred?.tennisSurfaceContext || getTennisSurfaceContext(matc
 const roleContext = pred?.goaliePitcherContext || getGoaliePitcherContext(match);
 const stadium = pred?.poisson?.stadiumEffect || getStadiumEffect(match);
 const coach = pred?.coachContext || getCoachContext(match);
+const derby = pred?.derbyContext || getDerbyContext(match);
 const badges = [];
 if (competition) badges.push({ label: competition.label, title: competition.reason || 'Contexte compétition' });
 if (season) badges.push({ label: season.label, title: `Phase saison · ${season.sample_teams || 0} équipes suivies` });
@@ -5433,6 +5434,7 @@ if (roleContext?.home_pitcher) badges.push({ label: `Pitcher ${roleContext.home_
 if (stadium?.altitude_m > 0) badges.push({ label: `Stade ${stadium.altitude_m}m`, title: `${stadium.name || 'Stade'} · capacité ${stadium.capacity || '—'} · ${stadium.surface_type || 'surface inconnue'}` });
 if (coach?.home?.status && coach.home.status !== 'stable') badges.push({ label: `Coach ${coach.home.status}`, title: `${coach.home.team} · ${coach.home.days_since_nomination}j` });
 if (coach?.away?.status && coach.away.status !== 'stable') badges.push({ label: `Coach ${coach.away.status}`, title: `${coach.away.team} · ${coach.away.days_since_nomination}j` });
+if (derby) badges.push({ label: `Derby : ${derby.label}`, title: `Variance ×${derby.variance_multiplier} · edge requis +${Math.round(derby.edge_required_bonus * 100)}pt` });
 if (!badges.length) return '';
 return `<div class="v4-context-badges" style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 14px;">
 ${badges.map(b => `<span style="display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--border);border-radius:999px;background:var(--panel-2);font-size:12px;font-weight:750;color:var(--text);" title="${esc(b.title)}">${esc(b.label)}</span>`).join('')}
@@ -5703,6 +5705,26 @@ generatedAt: window.COACH_TENURE?.generated_at || null,
 try {
 window.getCoachContext = getCoachContext;
 window.getCoachTenureDebugSummary = getCoachTenureDebugSummary;
+} catch (e) {}
+
+function getDerbyContext(match) {
+const { home, away } = getSides(match || {});
+if (!home || !away || !window.DERBIES?.pairs) return null;
+const key = [_teamPriorNorm(home.name || home.short), _teamPriorNorm(away.name || away.short)].sort().join('|');
+const row = window.DERBIES.pairs[key];
+if (!Array.isArray(row)) return null;
+return { label: row[0], variance_multiplier: Number(row[1]) || 1.25, edge_required_bonus: Number(row[2]) || 0.01, home: row[3], away: row[4] };
+}
+function getDerbiesDebugSummary() {
+return {
+loaded: !!window.DERBIES,
+pairs: Number(window.DERBIES?.pair_count || Object.keys(window.DERBIES?.pairs || {}).length || 0),
+generatedAt: window.DERBIES?.generated_at || null,
+};
+}
+try {
+window.getDerbyContext = getDerbyContext;
+window.getDerbiesDebugSummary = getDerbiesDebugSummary;
 } catch (e) {}
 
 function poissonComponent(match) {
@@ -7748,6 +7770,7 @@ let refereeTendency = null;
 let tennisSurfaceContext = null;
 let goaliePitcherContext = null;
 let coachContext = null;
+let derbyContext = null;
 {
 const pickKey = best_pick[2]; // '1' | 'X' | '2'
 const fieldMap = { '1': 'pH', 'X': 'pD', '2': 'pA' };
@@ -7819,6 +7842,7 @@ refereeTendency = getRefereeTendency(match);
 tennisSurfaceContext = getTennisSurfaceContext(match);
 goaliePitcherContext = getGoaliePitcherContext(match);
 coachContext = getCoachContext(match);
+derbyContext = getDerbyContext(match);
 const contextDecay = Math.min(
 1,
 Number(seasonContext?.confidence_decay || 1),
@@ -7857,6 +7881,10 @@ if (coachContext && (best_pick[2] === '1' || best_pick[2] === '2')) {
 const coach = best_pick[2] === '1' ? coachContext.home : coachContext.away;
 if (coach?.confidence_adjustment) rawReliability = Math.max(0.25, Math.min(0.98, rawReliability + coach.confidence_adjustment));
 }
+if (derbyContext) {
+rawReliability = 0.5 + (rawReliability - 0.5) * 0.92;
+rawReliability = Math.max(0.25, Math.min(0.98, rawReliability));
+}
 const calibrated = applyReliabilityCalibration(rawReliability);
 reliability = calibrated;
 reliabilityMeta = {
@@ -7876,6 +7904,7 @@ refereeTendency,
 tennisSurface: tennisSurfaceContext,
 goaliePitcher: goaliePitcherContext,
 coach: coachContext,
+derby: derbyContext,
 };
 if (seasonContext) {
 reasons.push({
@@ -7934,6 +7963,13 @@ reasons.push({
 type: 'coach_tenure',
 icon: '🧑‍💼',
 text: `Coach : ${activeCoach.team} ${activeCoach.status} (${activeCoach.days_since_nomination}j), ajustement fiabilité ${activeCoach.confidence_adjustment >= 0 ? '+' : ''}${Math.round(activeCoach.confidence_adjustment * 100)}pt.`,
+});
+}
+if (derbyContext) {
+reasons.push({
+type: 'derby_intensity',
+icon: '🔥',
+text: `Derby : ${derbyContext.label}, variance ×${derbyContext.variance_multiplier.toFixed(2)} et edge requis +${Math.round(derbyContext.edge_required_bonus * 100)}pt.`,
 });
 }
 }
@@ -8062,6 +8098,7 @@ refereeTendency,
 tennisSurfaceContext,
 goaliePitcherContext,
 coachContext,
+derbyContext,
 scores: (() => {
 if (poi) return poissonTopScores(poi.lamH, poi.lamA, 10, 6, match.league_code);
 if (match.sport === 'hockey') return hockeyScorePrediction(match);
@@ -16514,6 +16551,7 @@ refereeStats: getRefereeStatsDebugSummary(),
 roleContext: getRoleContextDebugSummary(),
 stadiumEffects: getStadiumEffectsDebugSummary(),
 coachTenure: getCoachTenureDebugSummary(),
+derbies: getDerbiesDebugSummary(),
 qualityCounters: v37QualityCounters,
 qualitySamples: v37QualitySamples,
 rejectReasons: v37RejectReasons,

@@ -301,6 +301,9 @@ SOURCES = [
     ('coach_tenure', 'coach_tenure.json', lambda d: {
         'teams': (d.get('team_count') or len(d.get('teams') or {})) if isinstance(d, dict) else 0,
     }),
+    ('derbies', 'derbies.json', lambda d: {
+        'pairs': (d.get('pair_count') or len(d.get('pairs') or [])) if isinstance(d, dict) else 0,
+    }),
     ('data_quality_report', 'data_quality_report.json', lambda d: {
         'events_quarantined': (d.get('events_quarantined') or 0) if isinstance(d, dict) else 0,
         'status': (d.get('status') or 'unknown') if isinstance(d, dict) else 'missing',
