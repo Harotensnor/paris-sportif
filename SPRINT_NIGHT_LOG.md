@@ -660,3 +660,8 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - QA: `phase3-validation.spec.js` ne tape plus le cache GitHub Pages; il valide le dashboard local V37 avec preload full data quand `data_lite.js` est actif.
 - Modernisation: les anciennes assertions `#top`, `.decision-tile`, logos legacy et theme visible mobile sont remplacees par table dense, modal "Pourquoi" synchronisee, tabs detail, tiers et legende score.
 - Mesure: `tests/phase3-validation.spec.js` passe 12/12 sur desktop + mobile.
+
+## Sprint v35.462 — AUTO 10/10 Modal tabs V37 (15:52 UTC)
+- QA: `modal-tabs.spec.js` ouvre maintenant le panneau "Voir les details techniques" avant de valider les onglets, ce qui colle au parcours utilisateur actuel.
+- Robustesse: la spec force le chargement full data quand le boot part de `data_lite.js`, puis teste les onglets visibles dans le panneau technique sur sports representatifs.
+- Mesure: `tests/modal-tabs.spec.js` passe 2/2 desktop + mobile.
