@@ -1075,3 +1075,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Tests: mobile-compact-tier-badges passe; suite Phase 8 mobile 9/9; Lighthouse 100/100/100 sur 8 audits; drift pipeline OK.
 - Cache/footer bumpes v36.034; app.js hash 3cb57fe1; SW paris-sportif-20260505-224128.
 
+
+## Sprint v36.035 — AUTO 10/10 Phase 9 LLL mode novice/expert (22:46 UTC)
+- Profil: ajout du mode d'affichage Novice / Expert dans les réglages, avec persistance userPrefs.uiMode.
+- UX: le document reçoit data-ui-mode pour masquer les aides novice en expert et inversement.
+- Accueil: guide "Comment choisir" enrichi d'une aide novice "Pourquoi cette cote ?" et d'un raccourci expert.
+- Tests: ui-mode-novice-expert passe desktop + mobile Chromium (2/2); app.js syntax OK; drift pipeline OK.
+- Cache/footer bumpes v36.035; app.js hash adb5f835; SW paris-sportif-20260505-224657.
