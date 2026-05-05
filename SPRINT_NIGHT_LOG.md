@@ -2,6 +2,12 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
+## Sprint v35.438 — AUTO 10/10 Section J Foot expansion (11:02 UTC)
+- Extension J1/J5/J6/J7 : `build_football_expansion_watchlist.py` separe bookable Winamax et source watch pour foot feminin, tier 2, coupes, Asie/LATAM.
+- Mesure : tier2 15/22, coupes 32/22, Asie/LATAM 51/67 en status OK; foot feminin 0/7 en watch non-actionnable.
+- Health expose `football_expansion_watchlist` : 98 events bookables, 118 source, 3 categories OK sur 4.
+- Garde-fou : aucun match non bookable ne devient pick; cache/footer bumpes v35.438.
+
 ## Sprint v35.437 — AUTO 10/10 Section J Tennis Challenger watch (11:00 UTC)
 - Extension J2 : `build_tennis_challenger_watchlist.py` suit les matchs Challenger/ITF deja presents dans `sofascore_events.json`.
 - Garde-fou produit : status `watch`, pas de pick actionnable tant que Winamax exact ne booke pas ces matchs.
