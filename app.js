@@ -606,34 +606,53 @@ if (!('ontouchstart' in window)) return;
 let startY = 0;
 let pullDistance = 0;
 let pulling = false;
+let readyBuzzed = false;
 let indicator = null;
 const THRESHOLD = 80;
+const hideIndicator = (delay = 500) => {
+setTimeout(() => {
+if (!indicator) return;
+indicator.classList.remove('visible', 'ready', 'refreshing');
+indicator.setAttribute('aria-hidden', 'true');
+}, delay);
+};
 const ensureIndicator = () => {
 if (indicator) return indicator;
 indicator = document.createElement('div');
 indicator.className = 'ptr-indicator';
 indicator.setAttribute('role', 'status');
 indicator.setAttribute('aria-hidden', 'true');
+indicator.setAttribute('aria-live', 'polite');
 document.body.appendChild(indicator);
 return indicator;
 };
 document.addEventListener('touchstart', (e) => {
 if (window.innerWidth > 720) return;
+if (!e.touches || e.touches.length !== 1) return;
 const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
 if (scrollY > 5) return;
 if (document.getElementById('detail-modal')?.classList.contains('open')) return;
 startY = e.touches[0].clientY;
+pullDistance = 0;
+readyBuzzed = false;
 pulling = true;
 }, { passive: true });
 document.addEventListener('touchmove', (e) => {
 if (!pulling) return;
 pullDistance = Math.max(0, e.touches[0].clientY - startY);
 if (pullDistance > 20) {
-try { e.preventDefault(); } catch (err) {}
+try { if (e.cancelable) e.preventDefault(); } catch (err) {}
 const ind = ensureIndicator();
 const ready = pullDistance >= THRESHOLD;
 ind.textContent = ready ? '↺ Relâche pour rafraîchir' : '↓ Tire pour rafraîchir';
 ind.classList.toggle('visible', pullDistance > 30);
+ind.classList.toggle('ready', ready);
+ind.setAttribute('aria-hidden', pullDistance > 30 ? 'false' : 'true');
+ind.style.setProperty('--ptr-progress', String(Math.min(1, pullDistance / THRESHOLD).toFixed(2)));
+if (ready && !readyBuzzed) {
+readyBuzzed = true;
+try { if (navigator.vibrate) navigator.vibrate(8); } catch (err) {}
+}
 }
 }, { passive: false });
 document.addEventListener('touchend', () => {
@@ -641,28 +660,33 @@ if (!pulling) return;
 pulling = false;
 if (pullDistance >= THRESHOLD && indicator) {
 indicator.textContent = 'Rafraîchissement…';
-indicator.classList.add('refreshing');
+indicator.classList.add('visible', 'refreshing');
+indicator.classList.remove('ready');
+indicator.setAttribute('aria-hidden', 'false');
+try { if (navigator.vibrate) navigator.vibrate([8, 32, 8]); } catch (err) {}
 try {
 if (typeof window.pollData === 'function') {
-window.pollData(true).finally(() => {
-setTimeout(() => {
-if (indicator) {
-indicator.classList.remove('visible', 'refreshing');
-}
-}, 600);
-});
+Promise.resolve(window.pollData(true))
+.then(() => { try { toast('Données rafraîchies', 'success', { duration: 1000 }); } catch (err) {} })
+.catch(() => { try { toast('Refresh indisponible', 'warn', { duration: 1200 }); } catch (err) {} })
+.finally(() => hideIndicator(600));
 } else {
-setTimeout(() => {
-if (indicator) indicator.classList.remove('visible', 'refreshing');
-}, 1200);
+try { toast('Refresh demandé', 'info', { duration: 1000 }); } catch (err) {}
+hideIndicator(900);
 }
 } catch (e) {
-if (indicator) indicator.classList.remove('visible', 'refreshing');
+try { toast('Refresh indisponible', 'warn', { duration: 1200 }); } catch (err) {}
+hideIndicator(0);
 }
 } else if (indicator) {
-indicator.classList.remove('visible');
+hideIndicator(0);
 }
 pullDistance = 0;
+}, { passive: true });
+document.addEventListener('touchcancel', () => {
+pulling = false;
+pullDistance = 0;
+if (indicator) hideIndicator(0);
 }, { passive: true });
 })();
 

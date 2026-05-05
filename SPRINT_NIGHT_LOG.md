@@ -1015,3 +1015,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Tests: `mobile-gestures.spec.js` passe mobile Chromium (1/1); `app.js` syntax OK; drift pipeline OK.
 - Cache/footer bumpes v36.026; `app.js` hash `ab50d203`, SW `paris-sportif-20260505-221656`.
 
+## Sprint v36.027 — AUTO 10/10 Phase 8 DDD pull-to-refresh haptique (22:19 UTC)
+- Mobile: pull-to-refresh seuil 80px avec état `Relâche pour rafraîchir` et vibration au franchissement.
+- Feedback: spinner pendant le refresh, toast succès/alerte, et fallback propre si le refresh n'est pas disponible.
+- Robustesse: `pollData(true)` accepte désormais Promise ou retour synchrone sans casser l'indicateur.
+- Tests: `mobile-pull-to-refresh.spec.js` passe mobile Chromium (1/1); `app.js` syntax OK; drift pipeline OK.
+- Cache/footer bumpes v36.027; `app.js` hash `180b2b44`, SW `paris-sportif-20260505-221908`.
+
