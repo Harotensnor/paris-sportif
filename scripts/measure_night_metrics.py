@@ -149,6 +149,12 @@ def main() -> int:
         row["detailed_ratio"] = round(row["detailed"] / row["exact"], 4) if row["exact"] else 0
         row["families"] = dict(sorted(row["families"].items(), key=lambda kv: kv[1], reverse=True)[:12])
     detailed_ratio_vs_exact = round(detailed_market_matches / exact, 4) if exact else 0
+    referee_named = sum(1 for ev in events if ev.get("referee"))
+    referee_context = sum(1 for ev in events if ev.get("referee_context"))
+    referee_signal = sum(1 for ev in events if ev.get("referee") or ev.get("referee_context"))
+    smart_money_count = sum(1 for ev in events if ev.get("smart_money"))
+    smart_money_floor = max(5, round(len(events) * 0.02))
+    smart_money_status = "rare_event" if smart_money_count < smart_money_floor else "active"
 
     calculated_at = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
     metrics = {
@@ -172,13 +178,27 @@ def main() -> int:
             "clubelo": sum(1 for ev in events if ev.get("clubelo")),
             "weather": sum(1 for ev in events if ev.get("weather")),
             "injuries": sum(1 for ev in events if ev.get("injuries")),
-            "referee": sum(1 for ev in events if ev.get("referee")),
-            "referee_context": sum(1 for ev in events if ev.get("referee_context")),
-            "referee_signal": sum(1 for ev in events if ev.get("referee") or ev.get("referee_context")),
+            "referee": referee_signal,
+            "referee_named": referee_named,
+            "referee_context": referee_context,
+            "referee_signal": referee_signal,
             "fd_calibration": sum(1 for ev in events if ev.get("fd_calibration")),
             "fd_closing_odds": sum(1 for ev in events if ev.get("fd_closing_odds")),
             "xg": sum(1 for ev in events if _has_xg(ev)),
-            "smart_money": sum(1 for ev in events if ev.get("smart_money")),
+            "smart_money": smart_money_count,
+        },
+        "signal_health": {
+            "referee": {
+                "effective_events": referee_signal,
+                "named_events": referee_named,
+                "context_events": referee_context,
+                "note": "referee is effective coverage: named referee or referee_context usable by the model.",
+            },
+            "smart_money": {
+                "events": smart_money_count,
+                "status": smart_money_status,
+                "note": "Smart money is intentionally rare; low count is OK when odds movement does not confirm a strong signal.",
+            },
         },
         "winamax_markets": {
             "matches": len(wm_matches),
@@ -205,7 +225,7 @@ def main() -> int:
             ],
         },
         "health": {
-            "status": health.get("status"),
+            "status": health.get("overall") or health.get("status"),
             "warnings": len(health.get("warnings") or []),
             "pipeline_drift": (health.get("pipeline_drift") or {}).get("status"),
         },

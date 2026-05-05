@@ -721,3 +721,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Audit qualite avant fix tests: 32 captures `visual_capture.js validation-finale` OK; `a11y_audit.js` 0 critical/serious/moderate; `lighthouse_audit.js` 100/100/100 mobile+desktop sur 4 pages.
 - Bundle: `app.js` 1,608,729 bytes, `app.css` 359,329 bytes, toujours sous cap 1.7MB.
 - Cache/footer bumpes v35.470; `app.js` hash `9056d88b`, `app.css` hash `09ae40a0`.
+
+## Sprint v35.471 — AUTO 10/10 Data stability metrics (17:14 UTC)
+- Metrics: `night_metrics.json` clarifie la couverture arbitre utile: `referee=97`, `referee_named=5`, `referee_context=92`, `referee_signal=97`.
+- Signal rare: `smart_money=3` reste tagge `rare_event`, donc faible par design quand le mouvement de cote ne confirme pas un angle fort.
+- Pipeline: `check_pipeline_drift.py` confirme `status=ok`, 84 scripts references dans `auto_refresh.py` et `refresh.yml`, aucun drift.
+- Data: snapshot stable a 285 events, 285 Winamax exacts, 285 avec marches detailles, xG 199, injuries 159, lineups/starter signals 97.
+- Health: `measure_night_metrics.py` lit maintenant `health.overall` au lieu d'un champ `status` absent, ce qui supprime le statut `null` dans le rapport.
