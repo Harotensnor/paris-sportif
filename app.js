@@ -5280,6 +5280,14 @@ return { over: 1 - under, under };
 };
 const ouHT05 = cumulOverHT(0.5);
 const ouHT15 = cumulOverHT(1.5);
+const bttsHTYes = (1 - Math.exp(-lamH_HT)) * (1 - Math.exp(-lamA_HT));
+const btts2HYes = (1 - Math.exp(-lamH_2H)) * (1 - Math.exp(-lamA_2H));
+const bttsBothHalves = {
+yes: Math.max(0, Math.min(1, bttsHTYes * btts2HYes)),
+no: Math.max(0, Math.min(1, 1 - (bttsHTYes * btts2HYes))),
+first_half_yes: bttsHTYes,
+second_half_yes: btts2HYes,
+};
 let p1_btts_yes = 0, pX_btts_yes = 0, p2_btts_yes = 0;
 let p1_btts_no = 0, pX_btts_no = 0, p2_btts_no = 0;
 for (let h = 0; h <= maxGoals; h++) {
@@ -5312,6 +5320,7 @@ ht: { p1: pH_HT, pX: pD_HT, p2: pA_HT },
 htft,           // 9 combinaisons HT/FT
 ouHT05,         // 1ère mi-temps Over/Under 0.5 buts
 ouHT15,         // 1ère mi-temps Over/Under 1.5 buts
+bttsBothHalves, // BTTS oui en 1ère MT et en 2e MT
 resultBtts,     // 1X2 × BTTS combiné
 };
 }
@@ -8495,6 +8504,9 @@ const ouHT05Pick = ext.ouHT05 ? (ext.ouHT05.over >= ext.ouHT05.under
 const ouHT15Pick = ext.ouHT15 ? (ext.ouHT15.over >= ext.ouHT15.under
 ? { side: 'over', label: '+1.5 buts (1ère MT)', prob: ext.ouHT15.over, key: 'OHT_O1.5' }
 : { side: 'under', label: '-1.5 buts (1ère MT)', prob: ext.ouHT15.under, key: 'OHT_U1.5' }) : null;
+const bttsBothHalvesPick = ext.bttsBothHalves ? (ext.bttsBothHalves.yes >= 0.08
+? { side: 'yes', label: 'BTTS dans les 2 mi-temps : Oui', prob: ext.bttsBothHalves.yes, key: 'BTTS_BOTH_Y' }
+: { side: 'no', label: 'BTTS dans les 2 mi-temps : Non', prob: ext.bttsBothHalves.no, key: 'BTTS_BOTH_N' }) : null;
 const resultBttsAll = ext.resultBtts ? Object.entries(ext.resultBtts)
 .map(([k, p]) => {
 const [r, btts] = k.split('_');
@@ -8533,6 +8545,7 @@ htft: htftPick,
 htftAll,
 ouHT05: ouHT05Pick,
 ouHT15: ouHT15Pick,
+bttsBothHalves: bttsBothHalvesPick,
 resultBtts: resultBttsPick,
 resultBttsAll,
 firstGoal: firstGoalPick,
@@ -12406,6 +12419,7 @@ ext.doubleChance.prob >= 0.65 ? extChip(`Double chance ${ext.doubleChance.label}
 (ext.htft && ext.htft.prob >= 0.20) ? extChip(ext.htft.label, ext.htft.prob, '⏱️ HT/FT (Mi-temps/Final)', 'rgba(244,114,182,.08)', 'rgba(244,114,182,.25)', '#f472b6') : '',
 (ext.ouHT05 && ext.ouHT05.prob >= 0.65) ? extChip(ext.ouHT05.label, ext.ouHT05.prob, '⚽ Buts en 1ère MT', 'rgba(167,139,250,.08)', 'rgba(167,139,250,.25)', '#c4b5fd') : '',
 (ext.ouHT15 && ext.ouHT15.prob >= 0.55) ? extChip(ext.ouHT15.label, ext.ouHT15.prob, '⚽ Buts en 1ère MT', 'rgba(167,139,250,.08)', 'rgba(167,139,250,.25)', '#c4b5fd') : '',
+(ext.bttsBothHalves && (ext.bttsBothHalves.side === 'yes' ? ext.bttsBothHalves.prob >= 0.08 : ext.bttsBothHalves.prob >= 0.80)) ? extChip(ext.bttsBothHalves.label, ext.bttsBothHalves.prob, '🔄 BTTS deux mi-temps', 'rgba(45,212,191,.08)', 'rgba(45,212,191,.25)', '#5eead4') : '',
 (ext.resultBtts && ext.resultBtts.prob >= 0.30) ? extChip(ext.resultBtts.label, ext.resultBtts.prob, '🎯 Résultat + BTTS combo', 'rgba(52,211,153,.08)', 'rgba(52,211,153,.25)', '#6ee7b7') : '',
 (ext.firstGoal && ext.firstGoal.prob >= 0.30) ? extChip(ext.firstGoal.label, ext.firstGoal.prob, '🥇 Première équipe à marquer', 'rgba(250,204,21,.08)', 'rgba(250,204,21,.25)', '#fde047') : '',
 (ext.lastGoal && ext.lastGoal.prob >= 0.30) ? extChip(ext.lastGoal.label, ext.lastGoal.prob, '🏁 Dernière équipe à marquer', 'rgba(96,165,250,.08)', 'rgba(96,165,250,.25)', '#93c5fd') : '',
@@ -12469,7 +12483,7 @@ return `<div style="margin-top:14px;">
                 </div>
                 ${htftGrid}
                 ${statPanel}
-                          <div style="margin-top:6px;font-size:10.5px;color:var(--text-dim2,#7b8693);line-height:1.3;">Picks alternatifs dérivés des buts attendus (${pred.poisson ? `xG ${pred.poisson.xgH.toFixed(2)}–${pred.poisson.xgA.toFixed(2)}` : 'modèle Poisson'}). ⭐ = ≥65%.${ext ? ' Marchés étendus : double chance, score exact, mi-temps, handicap, total asiatique et ordre des buts.' : ''}</div>
+                          <div style="margin-top:6px;font-size:10.5px;color:var(--text-dim2,#7b8693);line-height:1.3;">Picks alternatifs dérivés des buts attendus (${pred.poisson ? `xG ${pred.poisson.xgH.toFixed(2)}–${pred.poisson.xgA.toFixed(2)}` : 'modèle Poisson'}). ⭐ = ≥65%.${ext ? ' Marchés étendus : double chance, score exact, mi-temps, handicap, total asiatique, BTTS deux mi-temps et ordre des buts.' : ''}</div>
               </div>`;
 })()}
 </div>
