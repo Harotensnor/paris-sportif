@@ -905,3 +905,11 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Pipeline: `build_team_stats_extended_v4.py` branché dans cron local/GHA/health; drift pipeline OK.
 - QA: `app.js` syntax OK, scripts Python compilés, health warning non critique.
 - Cache/footer bumpes v36.011; `app.js` hash `5937133f`, `team_stats_extended.js` hash `44e78609`, SW `paris-sportif-20260505-212505`.
+
+## Sprint v36.012 — AUTO 10/10 Modèle V4 NN-OO benchmark + anomalies (21:30 UTC)
+- Benchmark: `MODEL_V4_BENCHMARK.md` promeut V4-A en couche gardée sur 647 picks V3 (ROI proxy +0.00pt, Brier 0.2309).
+- Anomalies: les gaps modèle/marché >15pt sont plafonnés à 12pt au lieu de skipper le pick en silence.
+- Santé: page Santé expose les anomalies plafonnées et `model_anomalies_summary.json` trace le garde-fou runtime.
+- Pipeline: `benchmark_model_v4.py` et `build_model_anomalies.py` branchés cron local/GHA/health; drift pipeline OK.
+- QA: `app.js` syntax OK, `build_health.py` OK (warning data locale 53min), `check_pipeline_drift.py` OK.
+- Cache/footer bumpes v36.012; `app.js` hash `47cf1625`, SW `paris-sportif-20260505-213041`.
