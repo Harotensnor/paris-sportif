@@ -2,6 +2,12 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
+## Sprint v35.447 — AUTO 10/10 Phase finale validation genie (11:52 UTC)
+- Validation post-mega #1.3 : controle navigateur des signaux genie sur Accueil et Profil avec localStorage de test pour les patterns Theo.
+- Resultat : timing, signaux rares, voyage/fatigue, CLV, profil Theo et prudence/signaux opposes detectes dans l'UI.
+- Sidecars : rare signals 34 actionnables, schedule spots 52 actifs, timing 221 events, CLV 2333 observations; anti-public reste `watch` car 0 signal actif aujourd'hui.
+- Artefacts : `audit-artifacts/phase-finale-genius-validation.json` et capture `audit-artifacts/phase-finale-genius-profile-1440.png`; cache/footer bumpes v35.447.
+
 ## Sprint v35.446 — AUTO 10/10 Phase finale validation sports (11:50 UTC)
 - Validation post-mega #1.2 : audit navigateur + sidecars des extensions sportives J1-J8.
 - Resultat UI : 279 lignes dashboard dont Serie B/Ligue 2/Bundesliga 2 visibles, coupes CONMEBOL visibles, J-League/Chinese SL/Latam visibles, MLB et NHL visibles dans le tableau.
