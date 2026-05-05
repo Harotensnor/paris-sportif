@@ -8569,6 +8569,7 @@ let reliabilityMeta = null;
 let ensembleMeta = null;
 let leagueBias = null;
 let pureCompCount = 0;
+let reliabilityComponentProbs = [];
 let seasonContext = null;
 let competitionContext = null;
 let travelContext = null;
@@ -8586,6 +8587,7 @@ const pureComponents = components.filter(c => !c.isMarket);
 const compProbs = pureComponents
 .map(c => (c && typeof c[field] === 'number') ? c[field] : null)
 .filter(x => x != null);
+reliabilityComponentProbs = compProbs.slice();
 pureCompCount = compProbs.length;
 const pickProbVal = best_pick[1];
 const richness = Math.min(1, Math.max(0, compProbs.length / 4));
@@ -8878,6 +8880,14 @@ variance: ensembleMeta?.agreement_variance ?? null
 };
 const ciSample = Math.max(24, Math.min(260, 40 + (Number(reliabilityMeta?.componentCount) || pureCompCount || 1) * 35 + (Number(dqNow?.score) || 0) * 12));
 const probCi = wilsonProbInterval(reliability, ciSample);
+const predictionIntervalV5 = bootstrapPredictionIntervalV5(reliability, {
+matchId: match?.id || match?.uid || `${match?.home_team || ''}-${match?.away_team || ''}`,
+componentProbs: reliabilityComponentProbs,
+dataQuality: dqNow,
+agreementVariance: ensembleMeta?.agreement_variance,
+driftOverall: window.FEATURE_DRIFT_V5?.overall,
+});
+if (reliabilityMeta) reliabilityMeta.predictionIntervalV5 = predictionIntervalV5;
 
 return {
 probs: final,
@@ -8886,6 +8896,8 @@ reliability,
 reliabilityMeta,
 prob_ci: probCi,
 confidence_interval: probCi,
+prediction_interval_v5: predictionIntervalV5,
+bootstrap_interval: predictionIntervalV5,
 ensemble: ensembleMeta,
 learned_context: learnedContext,
 stacking_meta_v5: stackingMetaV5,
@@ -9513,6 +9525,57 @@ width: Math.round((hi - lo) * 1000) / 1000,
 };
 }
 try { window.wilsonProbInterval = wilsonProbInterval; } catch(e) {}
+function bootstrapPredictionIntervalV5(prob, context = {}) {
+const p = Math.max(0.02, Math.min(0.98, Number(prob) || 0.50));
+const values = Array.isArray(context.componentProbs)
+? context.componentProbs.map(Number).filter(Number.isFinite).filter(v => v > 0 && v < 1)
+: [];
+let componentStd = 0;
+if (values.length >= 2) {
+const mean = values.reduce((s, v) => s + v, 0) / values.length;
+componentStd = Math.sqrt(values.reduce((s, v) => s + Math.pow(v - mean, 2), 0) / values.length);
+}
+const dqScore = Number(context.dataQuality?.score || 0);
+const dqMax = Math.max(1, Number(context.dataQuality?.max || 4));
+const dqGap = Math.max(0, 1 - dqScore / dqMax);
+const variance = Math.max(0, Number(context.agreementVariance || 0));
+const driftOverall = String(context.driftOverall || '').toLowerCase();
+const driftBump = driftOverall === 'critical' ? 0.025 : driftOverall === 'warning' ? 0.015 : 0;
+const sigma = Math.max(0.025, Math.min(0.14, 0.025 + componentStd * 0.55 + Math.sqrt(variance) * 0.18 + dqGap * 0.045 + driftBump));
+let seed = 2166136261;
+const id = String(context.matchId || context.seed || 'v5-bootstrap');
+for (let i = 0; i < id.length; i += 1) {
+seed ^= id.charCodeAt(i);
+seed = Math.imul(seed, 16777619) >>> 0;
+}
+const rnd = () => {
+seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+return (seed + 1) / 4294967297;
+};
+const samples = [];
+for (let i = 0; i < 100; i += 1) {
+const u1 = Math.max(1e-6, rnd());
+const u2 = Math.max(1e-6, rnd());
+const z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+const sample = Math.max(0.02, Math.min(0.98, p + z * sigma));
+samples.push(sample);
+}
+samples.sort((a, b) => a - b);
+const p10 = samples[9];
+const p90 = samples[89];
+return {
+method: 'bootstrap_v5_p10_p90',
+runs: 100,
+lo: Math.round(p10 * 1000) / 1000,
+hi: Math.round(p90 * 1000) / 1000,
+p10: Math.round(p10 * 1000) / 1000,
+p90: Math.round(p90 * 1000) / 1000,
+width: Math.round((p90 - p10) * 1000) / 1000,
+sigma: Math.round(sigma * 1000) / 1000,
+component_std: Math.round(componentStd * 1000) / 1000,
+};
+}
+try { window.bootstrapPredictionIntervalV5 = bootstrapPredictionIntervalV5; } catch(e) {}
 
 function confGauge(prob, size = 'md') {
 const p = Math.max(0, Math.min(1, prob || 0));
@@ -12536,6 +12599,11 @@ ${(!weather && !ref && !meetingsCount) ? '<span class="u-text-dim2">Pas de condi
               Fiabilité <b>${((pred.reliability ?? pred.pick.prob)*100).toFixed(0)}%</b> ${confLabel(pred.reliability ?? pred.pick.prob).lbl}
               ${(() => {
                 try {
+                  const pi = pred.prediction_interval_v5 || pred.bootstrap_interval;
+                  if (pi && isFinite(pi.lo) && isFinite(pi.hi)) {
+                    const tone = Number(pi.width) > 0.15 ? 'var(--warn)' : 'var(--text-dim)';
+                    return ` <span data-v5-prediction-interval="1" style="font-size:11px;color:${tone};font-weight:500;" title="Intervalle bootstrap V5 80% (P10-P90), 100 simulations déterministes autour des signaux du match.">[confiance ${Math.round(pi.lo*100)}-${Math.round(pi.hi*100)}%]</span>`;
+                  }
                   const ci = pred.prob_ci || pred.confidence_interval;
                   if (ci && isFinite(ci.lo) && isFinite(ci.hi)) {
                     const tone = Number(ci.width) > 0.15 ? 'var(--warn)' : 'var(--text-dim)';
@@ -12601,8 +12669,9 @@ const rel = pred.reliability ?? pred.pick.prob;
 const rm = pred.reliabilityMeta || {};
 const rsCount = (pred.explain?.reasons || []).length;
 const dq = computeDataQuality(match);
-const ci = pred.prob_ci || pred.confidence_interval;
-const ciTxt = ci && isFinite(ci.lo) && isFinite(ci.hi) ? `, IC95 ${Math.round(ci.lo*100)}-${Math.round(ci.hi*100)}%` : '';
+const ci = pred.prediction_interval_v5 || pred.bootstrap_interval || pred.prob_ci || pred.confidence_interval;
+const ciIsBootstrap = ci && ci.method === 'bootstrap_v5_p10_p90';
+const ciTxt = ci && isFinite(ci.lo) && isFinite(ci.hi) ? `, ${ciIsBootstrap ? 'fourchette V5' : 'IC95'} ${Math.round(ci.lo*100)}-${Math.round(ci.hi*100)}%` : '';
 const ciWarn = ci && Number(ci.width) > 0.15 ? ' Fourchette large : prudence sur la mise.' : '';
 const nComp = rm.n_components ?? rm.nComponents ?? null;
 const consensus = rm.consensus ?? null;

@@ -1146,3 +1146,11 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Tests: suite model-v5 passe desktop + mobile Chromium (14/14); app.js syntax OK; drift pipeline OK.
 - Cache/footer bumpés v37.007; ensemble hash f802d3c7; SW paris-sportif-20260505-231431.
 
+
+## Sprint v37.008 — AUTO 10/10 Phase V5 H prediction intervals (23:22 UTC)
+- Modèle: bootstrapPredictionIntervalV5 calcule 100 runs déterministes P10-P90 par pick.
+- Modal: la fiabilité affiche désormais la fourchette V5 "[confiance lo-hi%]" avant le fallback Wilson.
+- Robustesse: l'intervalle intègre dispersion des sous-modèles, variance d'accord, qualité data et drift feature.
+- Tests: suite model-v5 passe desktop + mobile Chromium (16/16); app.js syntax OK; drift pipeline OK.
+- Cache/footer bumpés v37.008; app.js hash 17719ba6; SW paris-sportif-20260505-231838.
+
