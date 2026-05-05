@@ -937,3 +937,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Tests: `nba-player-props.spec.js` passe desktop + mobile (2/2).
 - Cache/footer bumpes v36.015; `app.js` hash `adb47b25`, `nba_player_props.js` hash `458a95df`, SW `paris-sportif-20260505-213948`.
 
+## Sprint v36.016 — AUTO 10/10 Phase 7 RR-SS marches asiatiques quart-point (21:44 UTC)
+- Modèle: `poissonMarketsExtended()` calcule AH -0.25/-0.75/+0.25/+0.75 avec demi-gain/demi-push/demi-perte.
+- Totaux: lignes asiatiques 2.25/2.75/3.25 calculées en over/under avec cotes fair corrigées des pushes.
+- Modal: les meilleurs AH quart-point et totaux asiatiques apparaissent dans les marchés alternatifs, sans polluer le tableau principal.
+- Tests: `asian-quarter-markets.spec.js` passe desktop + mobile (2/2); `app.js` syntax OK; drift pipeline OK.
+- Cache/footer bumpes v36.016; `app.js` hash `5090cd96`, SW `paris-sportif-20260505-214409`.
+

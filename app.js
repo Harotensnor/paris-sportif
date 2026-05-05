@@ -5102,6 +5102,121 @@ away_minus_1: pA_2plus,
 home_minus_025: (p1 + pH_strict) / 2,    // moitié 0, moitié -0.5
 home_minus_075: (pH_strict + pH_2plus) / 2, // moitié -0.5, moitié -1
 };
+const _fmtAsianLine = (line) => {
+const n = Number(line);
+if (!Number.isFinite(n)) return '';
+const s = Math.abs(n).toFixed(2).replace(/\.00$/, '').replace(/0$/, '');
+return `${n > 0 ? '+' : n < 0 ? '-' : ''}${s}`;
+};
+const _fmtAsianTotalLine = (line) => Number(line).toFixed(2).replace(/\.00$/, '').replace(/0$/, '');
+const _splitAsianQuarterLine = (line) => {
+if (line === -0.75) return [-0.5, -1];
+if (line === -0.25) return [0, -0.5];
+if (line === 0.25) return [0, 0.5];
+if (line === 0.75) return [0.5, 1];
+const rounded = Math.round(line * 4) / 4;
+return rounded === line ? [line, line] : [rounded, rounded];
+};
+const _settleAsian = (diff, line) => {
+const adjusted = diff + line;
+if (adjusted > 1e-9) return 'win';
+if (adjusted < -1e-9) return 'loss';
+return 'push';
+};
+const _settleAsianSplit = (diff, parts) => {
+let win = 0, push = 0, loss = 0;
+parts.forEach(part => {
+const settled = _settleAsian(diff, part);
+if (settled === 'win') win += 0.5;
+else if (settled === 'push') push += 0.5;
+else loss += 0.5;
+});
+return { win, push, loss };
+};
+const _fairAsianProb = (winEq, lossEq) => {
+const denom = winEq + lossEq;
+return denom > 0 ? Math.max(0, Math.min(1, winEq / denom)) : 0.5;
+};
+const asianHandicapQuarter = [];
+['home', 'away'].forEach(side => {
+[-0.75, -0.25, 0.25, 0.75].forEach(line => {
+const parts = _splitAsianQuarterLine(line);
+let winEq = 0, pushEq = 0, lossEq = 0;
+for (let h = 0; h <= maxGoals; h++) {
+for (let a = 0; a <= maxGoals; a++) {
+const p = grid[h][a];
+const diff = side === 'home' ? h - a : a - h;
+const settled = _settleAsianSplit(diff, parts);
+winEq += p * settled.win;
+pushEq += p * settled.push;
+lossEq += p * settled.loss;
+}
+}
+const lineLabel = _fmtAsianLine(line);
+asianHandicapQuarter.push({
+key: `AHQ_${side === 'home' ? 'H' : 'A'}_${lineLabel.replace('+', 'p').replace('-', 'm').replace('.', '')}`,
+side,
+line,
+label: `${side === 'home' ? 'Home' : 'Away'} AH ${lineLabel}`,
+prob: _fairAsianProb(winEq, lossEq),
+winEq,
+pushEq,
+lossEq,
+fairOdd: winEq > 0 ? 1 + (lossEq / winEq) : null,
+parts,
+});
+});
+});
+asianHandicapQuarter.sort((a, b) => b.prob - a.prob);
+const _settleAsianTotal = (total, line, side) => {
+const diff = side === 'over' ? total - line : line - total;
+if (diff > 1e-9) return 'win';
+if (diff < -1e-9) return 'loss';
+return 'push';
+};
+const _splitAsianTotalLine = (line) => {
+const base = Math.floor(line);
+const frac = Math.round((line - base) * 100) / 100;
+if (frac === 0.25) return [base, base + 0.5];
+if (frac === 0.75) return [base + 0.5, base + 1];
+return [line, line];
+};
+const asianTotalQuarter = [];
+[2.25, 2.75, 3.25].forEach(line => {
+['over', 'under'].forEach(side => {
+const parts = _splitAsianTotalLine(line);
+let winEq = 0, pushEq = 0, lossEq = 0;
+for (let h = 0; h <= maxGoals; h++) {
+for (let a = 0; a <= maxGoals; a++) {
+const p = grid[h][a];
+let settledWin = 0, settledPush = 0, settledLoss = 0;
+parts.forEach(part => {
+const settled = _settleAsianTotal(h + a, part, side);
+if (settled === 'win') settledWin += 0.5;
+else if (settled === 'push') settledPush += 0.5;
+else settledLoss += 0.5;
+});
+winEq += p * settledWin;
+pushEq += p * settledPush;
+lossEq += p * settledLoss;
+}
+}
+const lineLabel = _fmtAsianTotalLine(line);
+asianTotalQuarter.push({
+key: `ATQ_${side === 'over' ? 'O' : 'U'}_${lineLabel.replace('.', '')}`,
+side,
+line,
+label: `${side === 'over' ? 'Over' : 'Under'} ${lineLabel} asiatique`,
+prob: _fairAsianProb(winEq, lossEq),
+winEq,
+pushEq,
+lossEq,
+fairOdd: winEq > 0 ? 1 + (lossEq / winEq) : null,
+parts,
+});
+});
+});
+asianTotalQuarter.sort((a, b) => b.prob - a.prob);
 const _poissonOver = (lam, N) => {
 let cdf = 0;
 for (let k = 0; k <= N; k++) cdf += poissonPmf(k, lam);
@@ -5176,6 +5291,8 @@ p1, pX, p2,
 doubleChance: { p1X, pX2, p12 },
 dnb,
 ah,
+asianHandicapQuarter,
+asianTotalQuarter,
 teamTotals,
 topScores,
 ou05, ou15, ou25, ou35, ou45, ou55,
@@ -8286,6 +8403,36 @@ const ahCandidates = ext.ah ? [
 ].filter(x => x.prob >= 0.55 && x.prob <= 0.85)
 .sort((a, b) => b.prob - a.prob) : [];
 const ahPick = ahCandidates[0] || null;
+const ahQuarterCandidates = Array.isArray(ext.asianHandicapQuarter)
+? ext.asianHandicapQuarter
+.filter(x => x && x.prob >= 0.52 && x.prob <= 0.88)
+.map(x => ({
+key: x.key,
+label: x.label,
+prob: x.prob,
+line: x.line,
+side: x.side,
+fairOdd: x.fairOdd,
+settle: { winEq: x.winEq, pushEq: x.pushEq, lossEq: x.lossEq },
+}))
+.sort((a, b) => b.prob - a.prob)
+: [];
+const ahQuarterPick = ahQuarterCandidates[0] || null;
+const asianTotalQuarterAll = Array.isArray(ext.asianTotalQuarter)
+? ext.asianTotalQuarter
+.filter(x => x && x.prob >= 0.52 && x.prob <= 0.88)
+.map(x => ({
+key: x.key,
+label: x.label,
+prob: x.prob,
+line: x.line,
+side: x.side,
+fairOdd: x.fairOdd,
+settle: { winEq: x.winEq, pushEq: x.pushEq, lossEq: x.lossEq },
+}))
+.sort((a, b) => b.prob - a.prob)
+: [];
+const asianTotalQuarterPick = asianTotalQuarterAll[0] || null;
 const htftAll = ext.htft ? Object.entries(ext.htft)
 .map(([k, p]) => ({ key: 'HTFT_' + k, label: `HT/FT ${k}`, prob: p }))
 .sort((a,b) => b.prob - a.prob) : [];
@@ -8317,6 +8464,10 @@ dnb: dnbPick,
 dnbRaw: ext.dnb,
 asianHandicap: ahPick,
 asianHandicapAll: ahCandidates,
+asianHandicapQuarter: ahQuarterPick,
+asianHandicapQuarterAll: ahQuarterCandidates,
+asianTotalQuarter: asianTotalQuarterPick,
+asianTotalQuarterAll,
 htft: htftPick,
 htftAll,
 ouHT05: ouHT05Pick,
@@ -12186,6 +12337,8 @@ ext.doubleChance.prob >= 0.65 ? extChip(`Double chance ${ext.doubleChance.label}
 (ext.ou35.prob >= 0.55) ? extChip(ext.ou35.label, ext.ou35.prob, '⚽ O/U 3.5', 'rgba(139,92,246,.08)', 'rgba(139,92,246,.25)', '#a78bfa') : '',
 (ext.dnb && ext.dnb.prob >= 0.60) ? extChip(ext.dnb.label, ext.dnb.prob, '🎯 DNB (Draw No Bet)', 'rgba(251,146,60,.08)', 'rgba(251,146,60,.25)', '#fb923c') : '',
 (ext.asianHandicap && ext.asianHandicap.prob >= 0.62) ? extChip(ext.asianHandicap.label, ext.asianHandicap.prob, '⚖️ Asian Handicap', 'rgba(34,211,238,.08)', 'rgba(34,211,238,.25)', '#22d3ee') : '',
+(ext.asianHandicapQuarter && ext.asianHandicapQuarter.prob >= 0.58) ? extChip(ext.asianHandicapQuarter.label, ext.asianHandicapQuarter.prob, '⚖️ AH quart-point', 'rgba(34,211,238,.08)', 'rgba(34,211,238,.25)', '#67e8f9') : '',
+(ext.asianTotalQuarter && ext.asianTotalQuarter.prob >= 0.56) ? extChip(ext.asianTotalQuarter.label, ext.asianTotalQuarter.prob, '⚽ Total asiatique', 'rgba(20,184,166,.08)', 'rgba(20,184,166,.25)', '#5eead4') : '',
 (ext.htft && ext.htft.prob >= 0.20) ? extChip(ext.htft.label, ext.htft.prob, '⏱️ HT/FT (Mi-temps/Final)', 'rgba(244,114,182,.08)', 'rgba(244,114,182,.25)', '#f472b6') : '',
 (ext.ouHT05 && ext.ouHT05.prob >= 0.65) ? extChip(ext.ouHT05.label, ext.ouHT05.prob, '⚽ Buts en 1ère MT', 'rgba(167,139,250,.08)', 'rgba(167,139,250,.25)', '#c4b5fd') : '',
 (ext.ouHT15 && ext.ouHT15.prob >= 0.55) ? extChip(ext.ouHT15.label, ext.ouHT15.prob, '⚽ Buts en 1ère MT', 'rgba(167,139,250,.08)', 'rgba(167,139,250,.25)', '#c4b5fd') : '',
@@ -12198,7 +12351,7 @@ return `<div style="margin-top:14px;">
                   ${chipHtml(mk.btts, 'rgba(236,72,153,.08)', 'rgba(236,72,153,.25)', '#f472b6', '🔄', bttsBookOdd)}
                   ${extChips}
                 </div>
-                <div style="margin-top:6px;font-size:10.5px;color:var(--text-dim2,#7b8693);line-height:1.3;">Picks alternatifs dérivés des buts attendus (${pred.poisson ? `xG ${pred.poisson.xgH.toFixed(2)}–${pred.poisson.xgA.toFixed(2)}` : 'modèle Poisson'}). ⭐ = ≥65%.${ext ? ' Marchés étendus : double chance, score exact, mi-temps.' : ''}</div>
+                          <div style="margin-top:6px;font-size:10.5px;color:var(--text-dim2,#7b8693);line-height:1.3;">Picks alternatifs dérivés des buts attendus (${pred.poisson ? `xG ${pred.poisson.xgH.toFixed(2)}–${pred.poisson.xgA.toFixed(2)}` : 'modèle Poisson'}). ⭐ = ≥65%.${ext ? ' Marchés étendus : double chance, score exact, mi-temps, handicap et total asiatique.' : ''}</div>
               </div>`;
 })()}
 </div>
