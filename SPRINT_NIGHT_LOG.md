@@ -2,6 +2,12 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
+## Sprint v35.449 — AUTO 10/10 Phase finale validation produit (11:55 UTC)
+- Validation post-mega #1.5 : CLV, score opportunite enrichi, streak/tilt, P&L, correlation combines, meteo modele et profils equipe.
+- Resultat : CLV visible Accueil + Performance, score tooltip decompose edge/confiance/stabilite/fraicheur/profil Theo, tilt visible avec localStorage test, correlation visible, meteo visible.
+- Donnees : CLV 2333 observations, profils equipes 894 dont 67 deep context; `public_team_profiles.json` charge dans la recherche Profil/Cmd-K.
+- Artefact : `audit-artifacts/phase-finale-product-features-validation.json` et capture `audit-artifacts/phase-finale-product-features-profil-1440.png`; cache/footer bumpes v35.449.
+
 ## Sprint v35.448 — AUTO 10/10 Phase finale validation modele (11:54 UTC)
 - Validation post-mega #1.4 : LightGBM runtime, calibration contexte, abstain guards, CI, sharp/timing, AUC, daily insight et modal signaux.
 - Resultat : `audit_lightgbm_runtime.py` OK, `audit_intelligence_consistency.py` OK, 6 tests Playwright modal/CLV passent desktop + mobile.
