@@ -14902,7 +14902,7 @@ if (out.length >= limit) break;
 }
 return out;
 };
-const v36PickPoolRaw = _dataIsStale ? [] : v37ScanPool.flatMap(m => {
+const v36PickPoolRaw = v37ScanPool.flatMap(m => {
 try {
 const pred = predictMatch(m);
 if (!pred || !pred.pick) return [];
@@ -15543,7 +15543,7 @@ const v37IntelFallback = v37IntelState.loading
 wrap.innerHTML = `
         <div class="v36-home-shell">
           <section class="v36-dayline" aria-label="Strategie du jour">
-            <h1>${_dataIsStale ? 'Donnees trop anciennes : refresh avant de jouer' : `V37 : ${v36Total} picks affiches · table dense ${esc(v37ScopeLabel)}`}</h1>
+            <h1>${_dataIsStale ? `Donnees anciennes : ${v36Total} picks visibles en lecture seule` : `V37 : ${v36Total} picks affiches · table dense ${esc(v37ScopeLabel)}`}</h1>
             <span>${esc(v36CoverageLine)}</span>
             <button type="button" class="page-btn" data-page="tous">Tout voir</button>
           </section>
@@ -16504,7 +16504,7 @@ const missionLabel = _dataIsStale
 : (topPicks.length ? 'Action'
 : (allTodayRaw.length ? 'Surveillance' : 'Patience'));
 const missionCopy = _dataIsStale
-? 'Les données sont trop anciennes, aucun pari actionnable.'
+? 'Data stale : table visible, refresh avant mise.'
 : (topPicks.length
 ? `${topPicks.length} value bet${topPicks.length > 1 ? 's' : ''} passe${topPicks.length > 1 ? 'nt' : ''} les filtres edge + EV.`
 : (allTodayRaw.length
@@ -17933,9 +17933,9 @@ ${items}
 
         ${_dataIsStale ? `
 <div class="info-banner info-banner--danger" style="padding:24px;margin:24px 0;">
-<div class="info-banner__title text-danger">⚠ Recommandations en pause</div>
-<div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px;">Données obsolètes — je ne te donne pas de picks</div>
-<div style="font-size:13px;line-height:1.5;">La dernière mise à jour date de <strong>${_dataAgeMin < 120 ? _dataAgeMin+' min' : Math.floor(_dataAgeMin/60)+'h'}</strong>. Les matchs affichés pourraient être faux ou déjà joués.</div>
+<div class="info-banner__title text-danger">⚠ Données en retard</div>
+<div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px;">Table visible en lecture seule — refresh avant de miser</div>
+<div style="font-size:13px;line-height:1.5;">La dernière mise à jour date de <strong>${_dataAgeMin < 120 ? _dataAgeMin+' min' : Math.floor(_dataAgeMin/60)+'h'}</strong>. Les cotes et horaires doivent être vérifiés sur Winamax.</div>
 <a href="#" data-agent-force-refresh style="display:inline-block;margin-top:10px;background:#fca5a5;color:#1a0a0a;padding:8px 16px;border-radius:6px;font-weight:700;font-size:13px;text-decoration:none;cursor:pointer;">🔄 Forcer le refresh maintenant</a>
 </div>` : ''}
 
