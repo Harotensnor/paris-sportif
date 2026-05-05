@@ -315,6 +315,15 @@ SOURCES = [
         'events': (d.get('event_count') or len(d.get('events') or {})) if isinstance(d, dict) else 0,
         'props': (d.get('prop_count') or 0) if isinstance(d, dict) else 0,
     }),
+    ('total_corners', 'total_corners.json', lambda d: {
+        'events': (d.get('event_count') or len(d.get('events') or {})) if isinstance(d, dict) else 0,
+    }),
+    ('total_cards', 'total_cards.json', lambda d: {
+        'events': (d.get('event_count') or len(d.get('events') or {})) if isinstance(d, dict) else 0,
+    }),
+    ('total_fouls', 'total_fouls.json', lambda d: {
+        'events': (d.get('event_count') or len(d.get('events') or {})) if isinstance(d, dict) else 0,
+    }),
     ('model_v4_benchmark', 'model_v4_benchmark.json', lambda d: {
         'status': ((d.get('v4a') or {}).get('status') or 'unknown') if isinstance(d, dict) else 'missing',
         'baseline_n': ((d.get('baseline') or {}).get('n') or 0) if isinstance(d, dict) else 0,
@@ -492,6 +501,9 @@ STALE_AFTER_MIN = {
     'boosted_odds':    60,      # follows Winamax market refresh
     'footballdata':    24*60,  # daily fetch
     'clv_history':     60,
+    'total_corners':   60,
+    'total_cards':     60,
+    'total_fouls':     60,
 }
 
 SOURCE_SCRIPT = {
@@ -529,6 +541,9 @@ SOURCE_SCRIPT = {
     'boosted_odds': 'scripts/detect_boosted_odds.py',
     'footballdata': 'scripts/fetch_footballdata.py',
     'clv_history': 'scripts/compute_clv.py',
+    'total_corners': 'scripts/build_football_stats_markets.py',
+    'total_cards': 'scripts/build_football_stats_markets.py',
+    'total_fouls': 'scripts/build_football_stats_markets.py',
     'backtest_training_rows': 'scripts/build_backtest_training_rows.py',
     'daily_insights': 'scripts/build_daily_insights.py',
 }
