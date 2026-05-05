@@ -140,6 +140,7 @@ PATCH_STAGES = [
     ('audit_mcp_shadow_copy.py',     1,   15),
     ('test_mcp_smoke.py',            1,   30),
     ('build_picks_history.py',      1,   30),
+    ('build_team_priors.py',        1,   30),
     ('snapshot_pick_odds.py',       1,   30),
     ('compute_clv.py',              1,   30),
     ('settle_picks.py',             1,   15),
