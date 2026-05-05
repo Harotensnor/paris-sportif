@@ -2,6 +2,12 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
+## Sprint v35.444 — AUTO 10/10 Section K6 timing mise (11:19 UTC)
+- Innovation K6 : `timing_edges.json` expose maintenant une recommandation lisible (`parier_maintenant`, `attendre_compos`, `reverifier_cote`) avec raison en francais naturel.
+- Calcul local : `build_betting_intelligence.py` lit `odds_history.jsonl` pour preparer volatilite, range de cote et sparkline-ready quand les snapshots existent.
+- Mesure : 221 timing edges, 210 `parier_maintenant`, 1 `reverifier_cote`, 10 mouvements de cote favorables; volatilite courante a 0 car les snapshots recents ne matchent pas encore les events actifs.
+- Pipeline : sidecars recalcules, health rafraichi, cache/footer bumpes v35.444.
+
 ## Sprint v35.443 — AUTO 10/10 Section K5 signaux rares qualifiés (11:15 UTC)
 - Innovation K5 : `build_rare_signal_summary.py` separe les signaux rares `actionable`, `watch` et `risk` sans toucher au flux brut utilise par le score.
 - UX : la right rail prefere maintenant `rare_signal_summary.active_actionable`, donc un conflit/marche incertain ne s'affiche plus comme opportunite.
