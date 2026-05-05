@@ -361,3 +361,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Front: nouveaux marches `basketFirstHalfTotal`, `basketQuarterTotal`, `baseballF5Total` avec libelles debutant-safe et filtres avances.
 - Modele: reutilise les projections deja presentes (`firstHalfTotals`, `quarterTotals`, `totalsF5`) puis fallback no-vig si necessaire.
 - Cache/footer bumpes v35.412; `app.js` hash `c5617af9`.
+
+## Sprint v35.413 — AUTO 10/10 Bundle relief JSON-LD runtime (02:05 UTC)
+- Perf: le runtime JSON-LD SportsEvent avait deja ete desactive sous CSP stricte; il restait pourtant dans `app.js`.
+- Cleanup: suppression definitive du bloc `_injectMatchSchemas()` et de son appel idle, sans toucher au schema statique valide dans `pronostics.html`.
+- Mesure: `app.js` repasse a 1,592,160 bytes sous le cap 1,600,000, soit environ 3.2 KB recuperes apres les nouveaux marches V37.
+- Cache/footer bumpes v35.413; `app.js` hash `b7ed36d7`.

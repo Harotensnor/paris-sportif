@@ -28642,66 +28642,6 @@ ses paris sur le site (ni manuel, ni import). -->
     });
   }
 
-  // so Google can index them as rich snippets (sport, teams, kickoff, venue).
-  // Runs once at boot from PRONOSTICS_DATA — keeps DOM lean by capping at 5.
-  function _injectMatchSchemas() {
-    // Runtime JSON-LD changes with live data and cannot be hashed safely under
-    // the static GitHub Pages CSP. Keep the static JSON-LD in pronostics.html;
-    // generate match-level schemas at build time instead of injecting scripts.
-    return;
-    try {
-      const csp = document.querySelector('meta[http-equiv="Content-Security-Policy"]')?.getAttribute('content') || '';
-      const scriptSrc = csp.split(';').find(part => part.trim().startsWith('script-src')) || '';
-      if (scriptSrc && !scriptSrc.includes("'unsafe-inline'")) return;
-      const data = window.PRONOSTICS_DATA;
-      if (!data || !data.days) return;
-      const today = data.days[data.today] || [];
-      const upcoming = today
-        .filter(m => m && !m.completed && m.winamax && m.winamax.available === true && m.date)
-        .sort((a, b) => new Date(a.date) - new Date(b.date))
-        .slice(0, 5);
-      if (!upcoming.length) return;
-      const sportMap = {
-        football: 'Soccer', tennis: 'Tennis', basketball: 'Basketball',
-        hockey: 'IceHockey', baseball: 'Baseball', mma: 'MartialArt',
-        'american-football': 'AmericanFootball', rugby: 'Rugby', golf: 'Golf',
-      };
-      upcoming.forEach(m => {
-        // Prefer the home_away tag for SEO competitor labels — sending
-        // wrong team-side metadata to Google for events where ESPN
-        // ordering doesn't match home/away (US sports, tennis) was
-        // sending an inverted "Home plays Away" signal.
-        const home = (m.competitors || []).find(c => c.home_away === 'home') || (m.competitors && m.competitors[0]) || {};
-        const away = (m.competitors || []).find(c => c.home_away === 'away') || (m.competitors && m.competitors[1]) || {};
-        const schema = {
-          '@context': 'https://schema.org',
-          '@type': 'SportsEvent',
-          name: m.name || `${home.name || ''} vs ${away.name || ''}`,
-          startDate: m.date,
-          sport: sportMap[m.sport] || 'SportEvent',
-          eventStatus: m.live ? 'https://schema.org/EventInProgress' : 'https://schema.org/EventScheduled',
-          eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
-          competitor: [
-            { '@type': 'SportsTeam', name: home.name || 'Home' },
-            { '@type': 'SportsTeam', name: away.name || 'Away' },
-          ],
-        };
-        if (m.venue) schema.location = { '@type': 'Place', name: m.venue, address: m.city || '' };
-        if (m.league_name) schema.superEvent = { '@type': 'SportsEvent', name: m.league_name };
-        const tag = document.createElement('script');
-        tag.type = 'application/ld+json';
-        tag.textContent = JSON.stringify(schema);
-        document.head.appendChild(tag);
-      });
-    } catch(e) { /* silent — never break boot for SEO */ }
-  }
-  // Defer to idle so it doesn't compete with first paint
-  if ('requestIdleCallback' in window) {
-    requestIdleCallback(_injectMatchSchemas, { timeout: 3000 });
-  } else {
-    setTimeout(_injectMatchSchemas, 1500);
-  }
-
   //
   // Le site est livré SANS tracker. Pour activer une mesure d'audience
   // anonyme (≠ Google Analytics), Théo peut configurer l'une de ces
