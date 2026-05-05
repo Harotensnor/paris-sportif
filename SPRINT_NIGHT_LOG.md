@@ -2,6 +2,12 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
+## Sprint v35.453 — AUTO 10/10 Phase finale regressions a11y/Lighthouse (12:16 UTC)
+- Regression Section 2.1/2.2 : Lighthouse fallback et audit a11y relances apres la validation post-mega.
+- Fix : cibles tactiles refresh, tri V37, date/live et filtres Tous remontees a 40-44px.
+- Resultat : Lighthouse mobile+desktop 100/100/100/100 sur dashboard/tous/performance/academie; a11y 0 critical/serious/moderate sur 8 pages.
+- Artefact : `audit-artifacts/phase-finale-lighthouse-a11y-regression.json`; hashes app/css/data_lite + cache/footer bumpes v35.453.
+
 ## Sprint v35.452 — AUTO 10/10 Phase finale ISSUES recap (12:02 UTC)
 - Validation post-mega #1.8 : `ISSUES.md` et `ISSUES_ACTIVE.md` remis a jour avec les preuves v35.445-v35.451.
 - Resultat : 0 regression bloquante trouvee pendant 1.1-1.7; 1 issue active restante (`P11-TEST-001`, suite Playwright complete a revalider).
