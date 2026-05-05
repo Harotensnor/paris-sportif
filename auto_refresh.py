@@ -125,6 +125,7 @@ PATCH_STAGES = [
     ('build_sports_expansion_audit.py', 1, 15),
     ('detect_boosted_odds.py',      1,   30),
     ('build_signal_gap_report.py',  1,   15),
+    ('build_anti_public_angles.py', 1,   15),
     ('inject_data_in_html.py',      1,   15),
     ('measure_night_metrics.py',    1,   15),
     # Pipeline status snapshot (health.json) — runs every tick, cheap.

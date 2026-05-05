@@ -2,6 +2,12 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
+## Sprint v35.441 — AUTO 10/10 Section K2 anti-public local (11:07 UTC)
+- Innovation K2 : `build_anti_public_angles.py` derive les angles smart money / anti-public depuis `event.smart_money` deja patche.
+- Garde-fou : separation stricte entre `active` a venir et `expired_sample`; aucun signal passe ne remonte comme opportunite live.
+- Mesure : 0 actif, 3 exemples expires, types balanced_steam=2 et underdog_steam=1; status `watch` dans `anti_public_angles.json`.
+- Health expose `anti_public_angles`; cache/footer bumpes v35.441.
+
 ## Sprint v35.440 — AUTO 10/10 Section K1 inefficiences v2 (11:05 UTC)
 - Innovation K1 : `league_inefficiencies.json` passe en schema v2 avec `action`, `direction_net`, `sample_quality` et score de fiabilite modele.
 - Mesure : 34 ligues, 5 actionnables, 27 watch sample; MLB reste boostable avec 42 events courants, NBA/NHL deviennent deprioritize low value.

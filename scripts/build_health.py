@@ -350,6 +350,12 @@ SOURCES = [
         'ok_categories': ((d.get('summary') or {}).get('ok_categories') or 0) if isinstance(d, dict) else 0,
         'status': d.get('status') if isinstance(d, dict) else 'missing',
     }),
+    ('anti_public_angles', 'anti_public_angles.json', lambda d: {
+        'active': ((d.get('summary') or {}).get('active') or 0) if isinstance(d, dict) else 0,
+        'expired_sample': ((d.get('summary') or {}).get('expired_sample') or 0) if isinstance(d, dict) else 0,
+        'types': len(((d.get('summary') or {}).get('by_type') or {})) if isinstance(d, dict) else 0,
+        'status': d.get('status') if isinstance(d, dict) else 'missing',
+    }),
     ('boosted_odds', 'boosted_odds.json', lambda d: {
         'matches_scanned': d.get('matches_scanned') or 0 if isinstance(d, dict) else 0,
         'boosts': len(d.get('boosts') or []) if isinstance(d, dict) else 0,
@@ -391,6 +397,7 @@ STALE_AFTER_MIN = {
     'nhl_playoff_markets': 60,   # derived from patched NHL team/goalie stats
     'tennis_challenger_watchlist': 60,  # source coverage watchlist, not actionable
     'football_expansion_watchlist': 60, # bookable vs source status for J1/J5/J6/J7
+    'anti_public_angles': 60,      # derived from patched smart money movements
     'boosted_odds':    60,      # follows Winamax market refresh
     'footballdata':    24*60,  # daily fetch
     'clv_history':     60,
@@ -425,6 +432,7 @@ SOURCE_SCRIPT = {
     'nhl_playoff_markets': 'scripts/build_nhl_playoff_markets.py',
     'tennis_challenger_watchlist': 'scripts/build_tennis_challenger_watchlist.py',
     'football_expansion_watchlist': 'scripts/build_football_expansion_watchlist.py',
+    'anti_public_angles': 'scripts/build_anti_public_angles.py',
     'boosted_odds': 'scripts/detect_boosted_odds.py',
     'footballdata': 'scripts/fetch_footballdata.py',
     'clv_history': 'scripts/compute_clv.py',
