@@ -226,6 +226,7 @@ jobs:
           # qu'on ait pris la cote). Cheap (~1s sur 450 matches).
           python3 build_picks_history.py || true
           python3 build_team_priors.py || true
+          python3 build_bayesian_priors_v5.py || true
           python3 build_season_phase.py || true
           python3 build_star_players.py || true
           python3 build_xg_decay_params.py || true

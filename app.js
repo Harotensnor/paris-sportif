@@ -5608,6 +5608,107 @@ return null;
 }
 try { window.getTeamPrior = getTeamPrior; } catch (e) {}
 
+let __bayesianV5IndexRef = null;
+let __bayesianV5Index = null;
+function _bayesianV5FromTuple(row) {
+if (!Array.isArray(row)) return row || null;
+return {
+key: row[0],
+team_name: row[1],
+sport: row[2],
+league: row[3],
+prior_xG: Number(row[4]),
+prior_xGA: Number(row[5]),
+prior_winrate_home: Number(row[6]),
+prior_winrate_away: Number(row[7]),
+prior_btts_rate: Number(row[8]),
+prior_over25_rate: Number(row[9]),
+sample_size: Number(row[10]) || 0,
+shrink_team: Number(row[11]) || 0,
+shrink_league: Number(row[12]) || 0,
+shrink_sport: Number(row[13]) || 0,
+prior_reliability: Number(row[14]) || 0,
+player_strength: Number(row[15]) || 0,
+v5: true,
+};
+}
+function _getBayesianV5Index() {
+const data = window.BAYESIAN_PRIORS_V5 || null;
+if (__bayesianV5IndexRef === data && __bayesianV5Index) return __bayesianV5Index;
+const exact = new Map();
+const bySportName = new Map();
+const byName = new Map();
+const rows = Array.isArray(data?.teams)
+? data.teams.map(_bayesianV5FromTuple)
+: Object.entries(data?.teams || {}).map(([key, value]) => ({ key, ...value }));
+for (const prior of rows) {
+if (!prior) continue;
+const sport = String(prior.sport || 'unknown').toLowerCase();
+const league = String(prior.league || 'unknown').toLowerCase();
+const nameKey = _teamPriorNorm(prior.team_name);
+const fullKey = `${sport}|${league}|${nameKey}`;
+exact.set(String(prior.key || fullKey).toLowerCase(), prior);
+exact.set(fullKey, prior);
+const sportName = `${sport}|${nameKey}`;
+if (!bySportName.has(sportName) || (prior.sample_size || 0) > (bySportName.get(sportName)?.sample_size || 0)) {
+bySportName.set(sportName, prior);
+}
+if (!byName.has(nameKey) || (prior.sample_size || 0) > (byName.get(nameKey)?.sample_size || 0)) {
+byName.set(nameKey, prior);
+}
+}
+__bayesianV5Index = {
+exact,
+bySportName,
+byName,
+generated_at: data?.generated_at || null,
+coverage: data?.coverage || {},
+decay: data?.decay || {},
+};
+__bayesianV5IndexRef = data;
+return __bayesianV5Index;
+}
+function getBayesianPriorV5(match, side) {
+if (!match || !side) return null;
+const idx = _getBayesianV5Index();
+if (!idx || !idx.exact.size) return null;
+const sport = String(match.sport || 'football').toLowerCase();
+const league = String(match.league_code || match.league_name || side.league || 'unknown').toLowerCase();
+const candidates = [side.name, side.short, side.abbr, side.id].filter(Boolean).map(_teamPriorNorm);
+for (const nameKey of candidates) {
+const exact = idx.exact.get(`${sport}|${league}|${nameKey}`);
+if (exact) return exact;
+}
+for (const nameKey of candidates) {
+const sportMatch = idx.bySportName.get(`${sport}|${nameKey}`);
+if (sportMatch) return sportMatch;
+}
+for (const nameKey of candidates) {
+const anyMatch = idx.byName.get(nameKey);
+if (anyMatch) return anyMatch;
+}
+return null;
+}
+function getBayesianV5DebugSummary() {
+const idx = _getBayesianV5Index();
+const data = window.BAYESIAN_PRIORS_V5 || null;
+const cov = data?.coverage || {};
+return {
+loaded: !!(idx && idx.exact && idx.exact.size),
+teams: Number(cov.teams || idx?.exact?.size || 0),
+leagues: Number(cov.leagues || 0),
+sports: Number(cov.sports || 0),
+teamsWithPlayers: Number(cov.teams_with_player_prior || 0),
+players: Number(cov.players || 0),
+generatedAt: data?.generated_at || idx?.generated_at || null,
+decay: data?.decay || {},
+};
+}
+try {
+window.getBayesianPriorV5 = getBayesianPriorV5;
+window.getBayesianV5DebugSummary = getBayesianV5DebugSummary;
+} catch (e) {}
+
 function getTeamPriorsDebugSummary() {
 const idx = _getTeamPriorIndex();
 const data = window.TEAM_PRIORS || null;
@@ -6201,22 +6302,32 @@ lamH = Math.max(0.2, (1 - w) * lamH + w * lamH_emp);
 lamA = Math.max(0.2, (1 - w) * lamA + w * lamA_emp);
 }
 let bayesianPrior = null;
-const hPrior = getTeamPrior(match, home);
-const aPrior = getTeamPrior(match, away);
+const hPriorV5 = getBayesianPriorV5(match, home);
+const aPriorV5 = getBayesianPriorV5(match, away);
+const hPrior = hPriorV5 || getTeamPrior(match, home);
+const aPrior = aPriorV5 || getTeamPrior(match, away);
 if (hPrior && aPrior && Number.isFinite(hPrior.prior_xG) && Number.isFinite(hPrior.prior_xGA) && Number.isFinite(aPrior.prior_xG) && Number.isFinite(aPrior.prior_xGA)) {
 const priorLamH = Math.max(0.2, ((hPrior.prior_xG + aPrior.prior_xGA) / 2) * HOME_ADV);
 const priorLamA = Math.max(0.2, ((aPrior.prior_xG + hPrior.prior_xGA) / 2) / HOME_ADV);
 const minSample = Math.min(Number(hPrior.sample_size) || 0, Number(aPrior.sample_size) || 0);
-const wPrior = minSample >= 10 ? 0.4 : minSample >= 5 ? 0.2 : 0.12;
+const v5Reliability = Math.min(Number(hPrior.prior_reliability) || 0, Number(aPrior.prior_reliability) || 0);
+const v5Weight = Number.isFinite(v5Reliability) && v5Reliability > 0
+? Math.max(0.10, Math.min(0.42, 0.16 + v5Reliability * 0.28))
+: 0;
+const wPrior = hPrior.v5 && aPrior.v5 ? v5Weight : (minSample >= 10 ? 0.4 : minSample >= 5 ? 0.2 : 0.12);
 bayesianPrior = {
 weight: wPrior,
+version: hPrior.v5 && aPrior.v5 ? 'V5 hierarchical' : 'V4 team',
 homeSample: Number(hPrior.sample_size) || 0,
 awaySample: Number(aPrior.sample_size) || 0,
 homeFallback: !!hPrior.fallback,
 awayFallback: !!aPrior.fallback,
+homeShrinkage: hPrior.v5 ? { team: hPrior.shrink_team, league: hPrior.shrink_league, sport: hPrior.shrink_sport } : null,
+awayShrinkage: aPrior.v5 ? { team: aPrior.shrink_team, league: aPrior.shrink_league, sport: aPrior.shrink_sport } : null,
+playerStrength: hPrior.v5 || aPrior.v5 ? Math.max(Number(hPrior.player_strength) || 0, Number(aPrior.player_strength) || 0) : 0,
 lamH_prior: Math.round(priorLamH * 1000) / 1000,
 lamA_prior: Math.round(priorLamA * 1000) / 1000,
-generated_at: _getTeamPriorIndex()?.generated_at || null,
+generated_at: hPrior.v5 && aPrior.v5 ? _getBayesianV5Index()?.generated_at || null : _getTeamPriorIndex()?.generated_at || null,
 };
 lamH = Math.max(0.2, (1 - wPrior) * lamH + wPrior * priorLamH);
 lamA = Math.max(0.2, (1 - wPrior) * lamA + wPrior * priorLamA);
@@ -17300,6 +17411,7 @@ top30MarketDistinct: v37Top30MarketDistinct,
 tierDiagnostics: v37TierDiagnostics,
 oddsSnapshotCoverage: v37SnapshotCoverage,
 teamPriors: getTeamPriorsDebugSummary(),
+bayesianPriorsV5: getBayesianV5DebugSummary(),
 seasonPhase: getSeasonPhaseDebugSummary(),
 starPlayers: getStarPlayersDebugSummary(),
 xgDecay: getXGDecayDebugSummary(),
@@ -23408,6 +23520,42 @@ return `<section style="margin-top:32px;">
           </div>
         </section>`;
 })();
+const v5BayesianPriorsHtml = (() => {
+const data = window.BAYESIAN_PRIORS_V5 || null;
+const cov = data?.coverage || {};
+if (!data || !cov.teams) return '';
+const sports = Object.entries(data.sports || {}).sort((a, b) => (b[1]?.sample_size || 0) - (a[1]?.sample_size || 0)).slice(0, 6);
+const leagueRows = Object.entries(data.leagues || {}).sort((a, b) => (b[1]?.weighted_sample || 0) - (a[1]?.weighted_sample || 0)).slice(0, 8);
+const fmtN = n => Number(n || 0).toLocaleString('fr-FR');
+return `<section style="margin-top:32px;">
+          <h2 class="page-h2">🧠 Priors bayésiens V5</h2>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:10px;">
+            <div style="padding:14px;background:var(--panel);border:1px solid var(--border);border-radius:12px;"><div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;font-weight:800;">Équipes</div><div style="font-size:24px;font-weight:900;margin-top:4px;">${fmtN(cov.teams)}</div><div style="font-size:11px;color:var(--text-dim2);">hiérarchie sport → ligue → équipe</div></div>
+            <div style="padding:14px;background:var(--panel);border:1px solid var(--border);border-radius:12px;"><div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;font-weight:800;">Ligues</div><div style="font-size:24px;font-weight:900;margin-top:4px;">${fmtN(cov.leagues)}</div><div style="font-size:11px;color:var(--text-dim2);">moyenne de repli</div></div>
+            <div style="padding:14px;background:var(--panel);border:1px solid var(--border);border-radius:12px;"><div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;font-weight:800;">Joueurs top</div><div style="font-size:24px;font-weight:900;margin-top:4px;">${fmtN(cov.players)}</div><div style="font-size:11px;color:var(--text-dim2);">prior joueur borné</div></div>
+          </div>
+          <div style="padding:14px;background:var(--panel);border:1px solid var(--border);border-radius:12px;">
+            <div style="font-size:12px;color:var(--text-dim);margin-bottom:8px;">V5 applique un shrinkage : une équipe pauvre en historique emprunte d'abord à sa ligue, puis à son sport. Les équipes riches gardent plus de poids propre.</div>
+            ${sports.map(([key, row]) => `<div style="display:grid;grid-template-columns:1fr 70px 70px 70px;gap:8px;padding:7px 0;border-top:1px solid var(--border);font-size:12px;align-items:center;">
+              <b>${esc(key)}</b>
+              <span>${fmtN(row.team_count)} équipes</span>
+              <span>${fmtN(row.sample_size)} matchs</span>
+              <span>xG ${Number(row.prior_xG || 0).toFixed(2)}</span>
+            </div>`).join('')}
+            <details style="margin-top:10px;">
+              <summary style="cursor:pointer;color:var(--brand);font-weight:800;font-size:12px;">Voir les ligues les plus documentées</summary>
+              <div style="margin-top:8px;">
+                ${leagueRows.map(([key, row]) => `<div style="display:grid;grid-template-columns:1fr 70px 70px 70px;gap:8px;padding:6px 0;border-top:1px solid var(--border);font-size:12px;align-items:center;color:var(--text-2);">
+                  <span>${esc(key)}</span>
+                  <span>${fmtN(row.team_count)} équipes</span>
+                  <span>${fmtN(row.sample_size)} matchs</span>
+                  <span>xGA ${Number(row.prior_xGA || 0).toFixed(2)}</span>
+                </div>`).join('')}
+              </div>
+            </details>
+          </div>
+        </section>`;
+})();
 wrap.innerHTML = `
       <div style="max-width:900px;margin:0 auto;padding:16px 12px 40px;">
         <div style="padding:40px 0 16px;border-bottom:1px solid var(--border);">
@@ -23439,6 +23587,7 @@ wrap.innerHTML = `
         </section>
 
         ${v4SeasonPhaseHtml}
+        ${v5BayesianPriorsHtml}
 
         <section style="margin-top:32px;">
           <h2 class="page-h2">🧮 Comment le modèle décide</h2>

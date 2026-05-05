@@ -1082,3 +1082,13 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Accueil: guide "Comment choisir" enrichi d'une aide novice "Pourquoi cette cote ?" et d'un raccourci expert.
 - Tests: ui-mode-novice-expert passe desktop + mobile Chromium (2/2); app.js syntax OK; drift pipeline OK.
 - Cache/footer bumpes v36.035; app.js hash adb5f835; SW paris-sportif-20260505-224657.
+
+
+## Sprint v37.001 — AUTO 10/10 Phase V5 A priors hiérarchiques (22:54 UTC)
+- Data: build_bayesian_priors_v5.py génère bayesian_priors.json/js avec hiérarchie sport → ligue → équipe → joueurs.
+- Modèle: predictMatch privilégie le prior V5 shrinké, borné par fiabilité, puis fallback V4 si absent.
+- Crédibilité/debug: distribution des priors V5 visible sur Crédibilité et ?debug=1 expose coverage/décays.
+- Pipeline: refresh.yml et auto_refresh.py reconstruisent le sidecar V5 à chaque tick.
+- Tests: model-v5-priors passe desktop + mobile Chromium (2/2); app.js syntax OK; drift pipeline OK.
+- Cache/footer bumpés v37.001; app.js hash f8898d89; bayesian_priors hash a8a2a782; SW paris-sportif-20260505-225522.
+
