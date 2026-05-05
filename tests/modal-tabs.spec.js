@@ -48,10 +48,15 @@ async function openMatch(page, id) {
     window.openDetail(match);
   }, id);
   await expect(page.locator('#detail-modal.open')).toBeVisible({ timeout: 5000 });
+  const techToggle = page.locator('#detail-modal.open [data-why-tech-toggle]');
+  if (await techToggle.count()) {
+    await techToggle.click();
+    await expect(techToggle).toHaveAttribute('aria-expanded', 'true');
+  }
 }
 
 test('detail modal tabs render and switch on representative sports', async ({ page }) => {
-  test.setTimeout(60_000);
+  test.setTimeout(90_000);
   const failures = [];
   const errors = [];
   page.on('console', msg => {
@@ -62,6 +67,11 @@ test('detail modal tabs render and switch on representative sports', async ({ pa
 
   await page.goto(URL);
   await page.waitForFunction(() => !!(window.PRONOSTICS_DATA && window.PRONOSTICS_DATA.days), null, { timeout: 10000 });
+  await page.evaluate(async () => {
+    if (window.PRONOSTICS_DATA?._lite && typeof window._ensureFullData === 'function') {
+      await window._ensureFullData();
+    }
+  });
   await page.waitForTimeout(700);
   const picks = await pickMatches(page);
 
@@ -71,7 +81,8 @@ test('detail modal tabs render and switch on representative sports', async ({ pa
     errors.length = 0;
     try {
       await openMatch(page, pick.id);
-      const tabs = await page.locator('#detail-modal.open .md-tab').evaluateAll(nodes =>
+      const tabRoot = '#detail-modal.open .why-tech-panel:not([hidden])';
+      const tabs = await page.locator(`${tabRoot} .md-tab`).evaluateAll(nodes =>
         nodes.map(n => ({
           key: n.getAttribute('data-mtab-toggle') || '',
           label: (n.textContent || '').trim().replace(/\s+/g, ' '),
@@ -79,9 +90,10 @@ test('detail modal tabs render and switch on representative sports', async ({ pa
       );
       expect(tabs.length, `${sport} should expose useful tabs`).toBeGreaterThanOrEqual(2);
       for (const tab of tabs) {
-        await page.locator(`#detail-modal.open .md-tab[data-mtab-toggle="${tab.key}"]`).click();
-        await expect(page.locator(`#detail-modal.open .md-tab[data-mtab-toggle="${tab.key}"]`)).toHaveAttribute('aria-selected', 'true');
-        const visibleSections = await page.locator(`#detail-modal.open [data-mtab="${tab.key}"]`).evaluateAll(nodes =>
+        const tabLocator = page.locator(`${tabRoot} .md-tab[data-mtab-toggle="${tab.key}"]`);
+        await tabLocator.click();
+        await expect(tabLocator).toHaveAttribute('aria-selected', 'true');
+        const visibleSections = await page.locator(`${tabRoot} [data-mtab="${tab.key}"]`).evaluateAll(nodes =>
           nodes.filter(n => getComputedStyle(n).display !== 'none').length
         );
         expect(visibleSections, `${sport}/${tab.key} should show tab content`).toBeGreaterThan(0);
