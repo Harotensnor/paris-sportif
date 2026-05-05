@@ -133,12 +133,16 @@ PATCH_STAGES = [
     # Pipeline status snapshot (health.json) — runs every tick, cheap.
     ('build_health.py',             1,   15),
     ('audit_data_truth.py',          1,   15),
+    ('validate_data_quality.py',     1,   15),
     # MCP diagnostics use a historical desktop path on Theo's machine; keep it
     # synced and smoke-tested so stale "today" values cannot silently return.
     ('sync_mcp_shadow_copy.py',      1,   15),
     ('audit_mcp_shadow_copy.py',     1,   15),
     ('test_mcp_smoke.py',            1,   30),
+    ('build_picks_history.py',      1,   30),
+    ('snapshot_pick_odds.py',       1,   30),
     ('compute_clv.py',              1,   30),
+    ('settle_picks.py',             1,   15),
     ('build_daily_insights.py',      1,   15),
     # v31.7.23 — Dixon-Coles ρ par ligue mesuré en CI (likelihood max).
     # Lent (~2-5s pour 40 ligues) ; cadence 240 ticks (~4h) en local.
@@ -173,6 +177,7 @@ PATCH_STAGES = [
     # data.js et perdrait le bénéfice du lazy-load.
     ('finalize_inline.py',          1,   15),
     ('check_pipeline_health.py',    1,   15),
+    ('check_pipeline_freshness.py', 1,   15),
     ('audit_bundle_size.py',        1,   15),
     # v35.92 — No-op sans DISCORD_WEBHOOK_URL ; garde le drift CI/local aligné.
     ('notify_discord.py',           1,   20),

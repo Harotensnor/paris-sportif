@@ -806,3 +806,14 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - UX: page Tous ajoute le toggle existant de diversification par match; Performance ajoute des tooltips KPI et affiche `Pipeline OK · alertes mineures` si les warnings sont non bloquants.
 - QA: `npx playwright test --project=chromium-desktop` passe 208/208 avec 10 skips attendus; `audit_bundle_size.py`, `check_pipeline_drift.py`, `check_pipeline_health.py`, `build_health.py` OK/Warning non critique.
 - Cache/footer bumpes v35.482; `app.js` hash `4938195f`, `app.css` hash `e6dccde2`, SW `paris-sportif-20260505-214630`.
+
+## Sprint v35.502 — AUTO 10/10 Fondations data persistantes (20:39 UTC)
+- Historique: `picks_history.jsonl` devient l'archive append-only des pronos générés, avec settling, backfill Git 14 jours et résumé `picks_history_summary.json`.
+- Rétro: la page Historique lit maintenant l'archive persistante et affiche les journées passées; 2026-05-04 contient 101 picks rétrospectifs (45W / 45L / 6 void / 5 pending).
+- CLV: `snapshot_pick_odds.py` enrichit `odds_history.jsonl`; `compute_clv.py` sort désormais un breakdown par sport, marché, tranche de cote et ligue.
+- Robustesse: `validate_data_quality.py`, `data_quarantine.jsonl`, garde-fous UI `Number.isFinite` et `__diag().health.guard_stats` empêchent NaN/Infinity/cotes extrêmes dans le tableau.
+- Pipeline: `build_picks_history.py`, `settle_picks.py`, `snapshot_pick_odds.py`, `validate_data_quality.py` et `check_pipeline_freshness.py` sont branchés dans `auto_refresh.py` et `refresh.yml`.
+- Data: reseed local frais à 278 events Winamax exacts, 278 marchés détaillés, injuries 159, lineups 97, referee effectif 97, xG 185.
+- Reporting: `PHASE_REPORT.md`, `BACKLOG.md` et `WINDOWS_DEBLOCK_LOG.md` créés; aucun déblocage Windows système n'a été utilisé.
+- QA: `app.js` syntax OK, nouveaux scripts Python compilent, `check_pipeline_drift.py` OK, `check_pipeline_freshness.py --max-age-min 30` OK, `npx playwright test --project=chromium-desktop` passe 208/208 avec 10 skips attendus.
+- Cache/footer bumpes v35.502; `app.js` hash `65789556`, `app.css` hash `e464318c`, `data_lite.js` hash `c3dccc6c`, SW `paris-sportif-20260505-224625`.

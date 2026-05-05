@@ -210,6 +210,7 @@ jobs:
           python3 measure_night_metrics.py || true
           python3 build_health.py || true
           python3 audit_data_truth.py
+          python3 validate_data_quality.py || true
           # v35.403 — MCP diagnostics guard. The desktop connector can point to
           # a historical script path locally, so sync that copy when present and
           # smoke-test that `today` is dynamic even if data buckets are stale.
@@ -223,7 +224,10 @@ jobs:
           # v33.32 — Compute Closing Line Value depuis odds_history.jsonl
           # Mesure si on bat le marché (cote bouge en notre faveur après
           # qu'on ait pris la cote). Cheap (~1s sur 450 matches).
+          python3 build_picks_history.py || true
+          python3 snapshot_pick_odds.py || true
           python3 compute_clv.py || true
+          python3 settle_picks.py || true
           # v35.420 — Briefing quotidien local depuis les sidecars deja
           # construits. Aucune source externe: juste synthese actionnable UI.
           python3 build_daily_insights.py || true
@@ -264,6 +268,7 @@ jobs:
           # dans pronostics.html. Réduit le 1er paint de ~1.4 MB à ~0.4 MB.
           python3 finalize_inline.py || true
           python3 check_pipeline_health.py --max-age-min 30
+          python3 check_pipeline_freshness.py --max-age-min 30
           # v35.407 — Bundle guard: app.js must stay below 1.6 MB after the
           # V36/V37 cleanup. Fails fast if a sprint reintroduces dead code.
           python3 audit_bundle_size.py

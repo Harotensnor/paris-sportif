@@ -171,6 +171,19 @@ def main() -> int:
 
     # 3. Summary stats : moyenne CLV par side/sport/league.
     observations = []
+    pick_rows_by_key: dict[str, list[dict]] = defaultdict(list)
+    with ODDS_HISTORY.open('r', encoding='utf-8') as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                rec = json.loads(line)
+            except Exception:
+                continue
+            key = rec.get('pick_archive_key')
+            if key:
+                pick_rows_by_key[str(key)].append(rec)
     for r in records:
         for side, d in r['sides'].items():
             observations.append({
@@ -184,10 +197,44 @@ def main() -> int:
                 'closing_odd': d['closing_odd'],
             })
     all_clv = [o['clv_pct'] for o in observations]
+    pick_observations = []
+    for key, rows in pick_rows_by_key.items():
+        rows.sort(key=lambda r: r.get('ts') or r.get('captured_at') or '')
+        first = rows[0]
+        last = rows[-1]
+        open_odd = first.get('odd_open') or first.get('odd_now')
+        close_odd = last.get('odd_close') or last.get('odd_now')
+        try:
+            open_odd = float(open_odd)
+            close_odd = float(close_odd)
+        except (TypeError, ValueError):
+            continue
+        if not (open_odd > 1 and close_odd > 1):
+            continue
+        clv_pct = ((open_odd - close_odd) / close_odd) * 100
+        pick_observations.append({
+            'pick_archive_key': key,
+            'id': last.get('id') or last.get('match_id'),
+            'name': last.get('name'),
+            'sport': last.get('sport') or 'unknown',
+            'league_code': last.get('league_code') or 'unknown',
+            'market_key': last.get('market_key') or 'unknown',
+            'selection': last.get('selection') or '',
+            'opening_odd': round(open_odd, 3),
+            'closing_odd': round(close_odd, 3),
+            'clv_pct': round(clv_pct, 2),
+            'snaps_count': len(rows),
+            'sharp_action_flag': any(bool(r.get('sharp_action_flag')) for r in rows),
+            'line_movement_pct': last.get('line_movement_pct'),
+        })
+    all_pick_clv = [o['clv_pct'] for o in pick_observations]
     summary = summarize_clv(all_clv)
     summary.update({
         'n_matches': len(records),
         'n_clv_observations': len(observations),
+        'n_pick_clv_observations': len(pick_observations),
+        'pick_mean_clv_pct': summarize_clv(all_pick_clv)['mean_clv_pct'] if all_pick_clv else 0,
+        'sharp_action_flags': sum(1 for o in pick_observations if o.get('sharp_action_flag')),
         'sample_status': 'validated' if len(observations) >= 500 else 'learning',
     })
 
@@ -203,6 +250,32 @@ def main() -> int:
     by_sport = grouped('sport')
     by_side = grouped('side')
     by_league = grouped('league_code', min_n=8)
+    def grouped_pick(key: str, min_n: int = 1) -> dict:
+        buckets: dict[str, list[float]] = defaultdict(list)
+        for o in pick_observations:
+            buckets[str(o.get(key) or 'unknown')].append(o['clv_pct'])
+        return {
+            k: v for k, vals in sorted(buckets.items(), key=lambda kv: len(kv[1]), reverse=True)
+            if (v := summarize_clv(vals))['n'] >= min_n
+        }
+    def odd_bucket(o: dict) -> str:
+        odd = o.get('opening_odd') or 0
+        if odd < 1.5:
+            return '1.30-1.50'
+        if odd < 2.0:
+            return '1.50-2.00'
+        if odd < 3.0:
+            return '2.00-3.00'
+        if odd < 5.0:
+            return '3.00-5.00'
+        return '5.00+'
+    by_pick_odd_bucket_vals: dict[str, list[float]] = defaultdict(list)
+    for o in pick_observations:
+        by_pick_odd_bucket_vals[odd_bucket(o)].append(o['clv_pct'])
+    by_pick_odd_bucket = {k: summarize_clv(v) for k, v in by_pick_odd_bucket_vals.items()}
+    by_pick_market = grouped_pick('market_key')
+    by_pick_sport = grouped_pick('sport')
+    by_pick_league = grouped_pick('league_code', min_n=5)
     movers = sorted(observations, key=lambda o: o['clv_pct'])
     extremes = {
         'worst': movers[:10],
@@ -217,6 +290,15 @@ def main() -> int:
         'by_sport': by_sport,
         'by_side': by_side,
         'by_league': by_league,
+        'pick_level': {
+            'summary': summarize_clv(all_pick_clv),
+            'by_sport': by_pick_sport,
+            'by_market': by_pick_market,
+            'by_odd_bucket': by_pick_odd_bucket,
+            'by_league': by_pick_league,
+            'sharp_action_flags': [o for o in pick_observations if o.get('sharp_action_flag')][:50],
+            'records': pick_observations[-1000:],
+        },
         'extremes': extremes,
         'records': records,
     }, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
@@ -229,6 +311,13 @@ def main() -> int:
         'summary': summary,
         'by_sport': by_sport,
         'by_side': by_side,
+        'pick_level': {
+            'summary': summarize_clv(all_pick_clv),
+            'by_sport': by_pick_sport,
+            'by_market': by_pick_market,
+            'by_odd_bucket': by_pick_odd_bucket,
+            'sharp_action_flags': sum(1 for o in pick_observations if o.get('sharp_action_flag')),
+        },
         'top_leagues': top_leagues,
         'extremes': {
             'best': extremes['best'][:5],

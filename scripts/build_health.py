@@ -254,6 +254,16 @@ SOURCES = [
         'exclude_low_auc': ((d.get('summary') or {}).get('exclude_low_auc') or 0) if isinstance(d, dict) else 0,
         'policy': (d.get('sample_policy') or 'unknown') if isinstance(d, dict) else 'missing',
     }),
+    ('picks_history_summary', 'picks_history_summary.json', lambda d: {
+        'total': (d.get('total') or 0) if isinstance(d, dict) else 0,
+        'settled': (d.get('settled') or 0) if isinstance(d, dict) else 0,
+        'pending': (d.get('pending') or 0) if isinstance(d, dict) else 0,
+        'days': len(d.get('by_day') or []) if isinstance(d, dict) else 0,
+    }),
+    ('data_quality_report', 'data_quality_report.json', lambda d: {
+        'events_quarantined': (d.get('events_quarantined') or 0) if isinstance(d, dict) else 0,
+        'status': (d.get('status') or 'unknown') if isinstance(d, dict) else 'missing',
+    }),
     ('backtest_training_rows', 'backtest_training_rows_summary.json', lambda d: {
         'rows': (d.get('rows') or 0) if isinstance(d, dict) else 0,
         'positive_rate': (d.get('positive_rate') or 0) if isinstance(d, dict) else 0,
