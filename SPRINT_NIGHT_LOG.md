@@ -2,6 +2,12 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
+## Sprint v35.437 — AUTO 10/10 Section J Tennis Challenger watch (11:00 UTC)
+- Extension J2 : `build_tennis_challenger_watchlist.py` suit les matchs Challenger/ITF deja presents dans `sofascore_events.json`.
+- Garde-fou produit : status `watch`, pas de pick actionnable tant que Winamax exact ne booke pas ces matchs.
+- Mesure : 668 ITF, 150 challenger-like, 40 matchs en watchlist, 0 tennis bookable dans `data.js` aujourd'hui; health expose la source.
+- Audit J2 enrichi avec `watchlist_events` et `bookable_tennis_events`; cache/footer bumpes v35.437.
+
 ## Sprint v35.436 — AUTO 10/10 Section J NHL renforcé (10:58 UTC)
 - Extension J3 : `build_nhl_playoff_markets.py` derive des marches NHL depuis les stats equipe/gardien deja patchees dans `data.js`.
 - Marches locaux : vainqueur, totals 4.5/5.5/6.5/7.5 et total 1ere periode 1.5, avec projections buts et gardiens confirmes quand disponibles.

@@ -336,6 +336,13 @@ SOURCES = [
         'markets': d.get('markets') or 0 if isinstance(d, dict) else 0,
         'status': d.get('status') if isinstance(d, dict) else 'missing',
     }),
+    ('tennis_challenger_watchlist', 'tennis_challenger_watchlist.json', lambda d: {
+        'bookable': d.get('bookable_tennis_events') or 0 if isinstance(d, dict) else 0,
+        'watchlist': len(d.get('watchlist') or []) if isinstance(d, dict) else 0,
+        'itf': ((d.get('counts') or {}).get('itf') or 0) if isinstance(d, dict) else 0,
+        'challenger_like': ((d.get('counts') or {}).get('challenger_like') or 0) if isinstance(d, dict) else 0,
+        'status': d.get('status') if isinstance(d, dict) else 'missing',
+    }),
     ('boosted_odds', 'boosted_odds.json', lambda d: {
         'matches_scanned': d.get('matches_scanned') or 0 if isinstance(d, dict) else 0,
         'boosts': len(d.get('boosts') or []) if isinstance(d, dict) else 0,
@@ -375,6 +382,7 @@ STALE_AFTER_MIN = {
     'niche_markets':   6*60,    # darts/snooker derived sidecar
     'mlb_player_props': 60,      # derived from current probable pitchers
     'nhl_playoff_markets': 60,   # derived from patched NHL team/goalie stats
+    'tennis_challenger_watchlist': 60,  # source coverage watchlist, not actionable
     'boosted_odds':    60,      # follows Winamax market refresh
     'footballdata':    24*60,  # daily fetch
     'clv_history':     60,
@@ -407,6 +415,7 @@ SOURCE_SCRIPT = {
     'niche_markets': 'scripts/build_niche_markets.py',
     'mlb_player_props': 'scripts/build_mlb_player_props.py',
     'nhl_playoff_markets': 'scripts/build_nhl_playoff_markets.py',
+    'tennis_challenger_watchlist': 'scripts/build_tennis_challenger_watchlist.py',
     'boosted_odds': 'scripts/detect_boosted_odds.py',
     'footballdata': 'scripts/fetch_footballdata.py',
     'clv_history': 'scripts/compute_clv.py',

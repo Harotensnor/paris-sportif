@@ -189,6 +189,7 @@ jobs:
           python3 build_niche_markets.py || true
           python3 build_mlb_player_props.py || true
           python3 build_nhl_playoff_markets.py || true
+          python3 build_tennis_challenger_watchlist.py || true
           python3 build_sports_expansion_audit.py || true
           python3 detect_boosted_odds.py || true
           # v33.28 — Inject data.js (window.PRONOSTICS_DATA = {...}) dans
