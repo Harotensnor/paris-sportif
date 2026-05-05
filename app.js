@@ -14388,15 +14388,16 @@ read('league_inefficiencies'),
 read('market_biases_by_league'),
 read('detected_angles'),
 read('rare_signals'),
+read('rare_signal_summary'),
 read('timing_edges'),
 read('signal_gap_report'),
 read('market_auc_report'),
 read('daily_insights'),
-]).then(([league, marketBias, angles, rare, timing, gaps, marketAuc, daily]) => {
-state.data = { league, marketBias, angles, rare, timing, gaps, marketAuc, daily };
+]).then(([league, marketBias, angles, rare, rareSummary, timing, gaps, marketAuc, daily]) => {
+state.data = { league, marketBias, angles, rare, rareSummary, timing, gaps, marketAuc, daily };
 state.loaded = true;
 }).catch(() => {
-state.data = { league: null, marketBias: null, angles: null, rare: null, timing: null, gaps: null, marketAuc: null, daily: null };
+state.data = { league: null, marketBias: null, angles: null, rare: null, rareSummary: null, timing: null, gaps: null, marketAuc: null, daily: null };
 state.loaded = true;
 }).finally(() => {
 state.loading = false;
@@ -15474,14 +15475,17 @@ body: row.context || `${row.reason || 'biais détecté'} · WR ${(Number(row.win
 tone: row.market_status === 'fade' || row.status === 'fade' || row.market_status === 'watch' || row.status === 'watch' || row.market_status === 'low_value' || row.status === 'low_value' ? 'warn' : 'good',
 }))
 .join('');
-const v37RareRows = (Array.isArray(v37Intel.rare?.signals) ? v37Intel.rare.signals : [])
+const v37RareSource = Array.isArray(v37Intel.rareSummary?.active_actionable) && v37Intel.rareSummary.active_actionable.length
+? v37Intel.rareSummary.active_actionable
+: (Array.isArray(v37Intel.rare?.signals) ? v37Intel.rare.signals : []);
+const v37RareRows = v37RareSource
 .slice()
-.sort((a, b) => new Date(a.date || 0).getTime() - new Date(b.date || 0).getTime())
+.sort((a, b) => (Number(b.strength || b.signal?.strength || 0) - Number(a.strength || a.signal?.strength || 0)) || (new Date(a.date || 0).getTime() - new Date(b.date || 0).getTime()))
 .slice(0, 4)
 .map(s => v37InsightRow({
-kicker: s.signal?.type === 'market_move' ? 'Smart money' : 'Signal rare',
+kicker: (s.type || s.signal?.type) === 'market_move' ? 'Smart money' : 'Signal rare fort',
 title: `${s.home || '?'} - ${s.away || '?'}`,
-body: s.signal?.context || `${s.league_name || s.league_code || ''}`,
+body: s.context || s.signal?.context || s.quality_reason || `${s.league_name || s.league_code || ''}`,
 eventId: s.event_id,
 tone: 'hot',
 }))
@@ -15537,7 +15541,7 @@ tone: 'warn',
 })
 .join('');
 const v37GapCount = Number(v37Intel.gaps?.priority_gaps?.length || 0);
-const v37IntelCount = Number(v37Intel.angles?.summary?.angles || 0) + Number(v37Intel.rare?.summary?.signals || 0);
+const v37IntelCount = Number(v37Intel.angles?.summary?.angles || 0) + Number(v37Intel.rareSummary?.summary?.actionable || v37Intel.rare?.summary?.signals || 0);
 const v37IntelFallback = v37IntelState.loading
 ? '<div class="v36-tier-empty">Chargement des insights modèle…</div>'
 : '<div class="v36-tier-empty">Insights modèle indisponibles pour ce snapshot.</div>';

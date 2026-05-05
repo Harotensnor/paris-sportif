@@ -281,6 +281,13 @@ SOURCES = [
         'signals': ((d.get('summary') or {}).get('signals') or len(d.get('signals') or [])) if isinstance(d, dict) else 0,
         'by_type': ((d.get('summary') or {}).get('by_type') or {}) if isinstance(d, dict) else {},
     }),
+    ('rare_signal_summary', 'rare_signal_summary.json', lambda d: {
+        'active': ((d.get('summary') or {}).get('active_events') or 0) if isinstance(d, dict) else 0,
+        'actionable': ((d.get('summary') or {}).get('actionable') or 0) if isinstance(d, dict) else 0,
+        'watch': ((d.get('summary') or {}).get('watch') or 0) if isinstance(d, dict) else 0,
+        'risk': ((d.get('summary') or {}).get('risk') or 0) if isinstance(d, dict) else 0,
+        'status': d.get('status') if isinstance(d, dict) else 'missing',
+    }),
     ('timing_edges', 'timing_edges.json', lambda d: {
         'events': ((d.get('summary') or {}).get('events') or len(d.get('events') or [])) if isinstance(d, dict) else 0,
         'bet_now': ((d.get('summary') or {}).get('bet_now') or 0) if isinstance(d, dict) else 0,
@@ -406,6 +413,7 @@ STALE_AFTER_MIN = {
     'football_expansion_watchlist': 60, # bookable vs source status for J1/J5/J6/J7
     'anti_public_angles': 60,      # derived from patched smart money movements
     'schedule_spots_summary': 60,  # derived lookahead/travel/fatigue decision layer
+    'rare_signal_summary': 60,     # derived rare-signal quality layer
     'boosted_odds':    60,      # follows Winamax market refresh
     'footballdata':    24*60,  # daily fetch
     'clv_history':     60,
@@ -442,6 +450,7 @@ SOURCE_SCRIPT = {
     'football_expansion_watchlist': 'scripts/build_football_expansion_watchlist.py',
     'anti_public_angles': 'scripts/build_anti_public_angles.py',
     'schedule_spots_summary': 'scripts/build_schedule_spots_summary.py',
+    'rare_signal_summary': 'scripts/build_rare_signal_summary.py',
     'boosted_odds': 'scripts/detect_boosted_odds.py',
     'footballdata': 'scripts/fetch_footballdata.py',
     'clv_history': 'scripts/compute_clv.py',

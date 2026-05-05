@@ -127,6 +127,7 @@ PATCH_STAGES = [
     ('build_signal_gap_report.py',  1,   15),
     ('build_anti_public_angles.py', 1,   15),
     ('build_schedule_spots_summary.py', 1, 15),
+    ('build_rare_signal_summary.py', 1, 15),
     ('inject_data_in_html.py',      1,   15),
     ('measure_night_metrics.py',    1,   15),
     # Pipeline status snapshot (health.json) — runs every tick, cheap.
