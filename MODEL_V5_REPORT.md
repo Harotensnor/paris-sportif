@@ -1,6 +1,6 @@
 # MODEL_V5_REPORT
 
-Generated: `2026-05-05T22:57:31Z`
+Generated: `2026-05-06T00:00:00Z`
 
 ## Section B — Stacking meta-apprentissage
 
@@ -115,3 +115,32 @@ Facteurs utilisés: consensus inter-signaux, richesse data, nombre de composante
 - UI: Crédibilité et Santé affichent le statut, l'AUC et les top shifts.
 
 Interprétation: le sample local est encore court (`49` lignes), donc l'alerte bloque surtout la promotion automatique agressive. Elle indique que les lignes récentes diffèrent assez du train historique pour garder V5 en rollout prudent jusqu'à plus de picks settled.
+
+## Section N — Vérification finale
+
+- Status: **clôturé v37.014**
+- Playwright V5: `26/26` desktop + mobile.
+- Syntaxe: `app.js` parse OK via `new Function(app.js)`.
+- Drift pipeline: `python scripts/check_pipeline_drift.py` OK, `0` divergence auto_refresh vs refresh.yml.
+- Health: `python scripts/build_health.py` génère `overall=warning` avec `67` warnings non bloquants.
+- Freshness: `python scripts/check_pipeline_freshness.py` OK, `data.js` âgé de `3 min` après refresh local.
+- Captures: `captures/v37.014/accueil.png`, `tous.png`, `performance.png`, `credibilite.png`.
+
+Matrice V5:
+
+| Item | Résultat |
+|---|---|
+| Bayesian priors | `3730` équipes, `769` joueurs |
+| Stacking meta | entraîné, influence runtime clampée ±2.5pt |
+| Feature engineering | ranking exposé dans `?debug=1` |
+| Online learning prep | `model_versions.json`, rollout 10% → 50% → 100% |
+| Drift detection | KL features actif, adversarial AUC `0.892` en alerte prudente |
+| Calibration | par sport, corrections appliquées seulement si gain Brier ≥ `0.005` |
+| Ensemble adaptatif | poids bornés et recalculables chaque dimanche |
+| Prediction intervals | P10-P90 visibles en modal |
+| Cold start | edge +2pt et variance augmentée pour équipes peu observées |
+| Multi-task | 1N2 / O-U 2.5 / BTTS / score exact gated no-worse |
+| Backtest deep | `BACKTEST_DEEP_V5.md` + breakdowns 6 familles |
+| Self-evaluation | `confidence_in_confidence` et malus si < `0.40` |
+
+Décision: V5 est livré comme couche prudente et auditable. La promotion agressive reste bloquée tant que l'historique settled local est court ; la fraîcheur data est revenue sous 30 minutes sur cette passe.

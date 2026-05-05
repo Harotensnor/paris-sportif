@@ -1198,3 +1198,11 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Tests: suite model-v5 desktop + mobile 26/26, app.js syntax OK, drift pipeline OK.
 - Cache/footer bumpés v37.013; app.js hash 7b3e6914; adversarial_validation hash c1aaf593; SW paris-sportif-20260506-014652.
 
+
+## Sprint v37.014 — AUTO 10/10 Phase V5 N clôture (00:08 UTC)
+- Vérifs: suite model-v5 desktop + mobile 26/26, app.js syntax OK, check_pipeline_drift OK.
+- Health: build_health.py overall=warning; check_pipeline_freshness OK avec data.js à 3 min après refresh local.
+- Rapports: MODEL_V5_REPORT.md complète la matrice finale et référence BACKTEST_DEEP_V5.md.
+- Captures: accueil, tous, performance, crédibilité générées dans captures/v37.014/.
+- Cache/footer bumpés v37.014; app.js hash 7b3e6914; SW paris-sportif-20260506-015100.
+
