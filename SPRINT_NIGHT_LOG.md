@@ -433,3 +433,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Audit: `audit_intelligence_consistency.py` echoue si tous les marches reprennent `n=51` ou si WR `0.5455` revient en masse sur les ligues.
 - Mesure: build intelligence OK, `placeholder_guard=passed`, `market_n51_rows=0`, `league_wr5455_rows=1`, audit consistency OK.
 - Cache/footer bumpes v35.424.
+
+## Sprint v35.425 — AUTO 10/10 Referee signal truth MCP (10:13 UTC)
+- Diagnostic: le MCP distingue maintenant `referee` exact, `referee_context` et `referee_signal` pour ne plus masquer les signaux arbitres de ligue comme donnees absentes.
+- Gaps: `list_data_gaps` marque `referee_exact` quand seul le contexte de ligue existe, et `referee` seulement quand aucun signal arbitre n'est disponible.
+- Mesure: smoke MCP OK, shadow audit OK, `referee_exact=5`, `referee_context=101`, `referee_signal=106`.
+- Cache/footer bumpes v35.425.

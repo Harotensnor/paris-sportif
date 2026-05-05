@@ -115,6 +115,9 @@ def main() -> int:
             file=sys.stderr,
         )
         return 1
+    if int(truth.get("referee_signal") or 0) < int(truth.get("referee") or 0):
+        print('[mcp_smoke] FAIL referee_signal cannot be lower than exact referee count', file=sys.stderr)
+        return 1
     if pipeline.get("project_root") and "Paris-Sportif" not in pipeline.get("project_root"):
         print(
             f'[mcp_smoke] FAIL project_root should prefer the fresh Paris-Sportif repo, got {pipeline.get("project_root")}',

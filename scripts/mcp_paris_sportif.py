@@ -231,6 +231,17 @@ def _truth_has_starter_signal(ev: dict) -> bool:
     return False
 
 
+def _truth_has_referee_exact(ev: dict) -> bool:
+    return bool((ev.get("referee") or {}).get("name"))
+
+
+def _truth_has_referee_signal(ev: dict) -> bool:
+    if _truth_has_referee_exact(ev):
+        return True
+    ctx = ev.get("referee_context") or {}
+    return bool(ctx.get("yellowPerGame") or ctx.get("cardsPerGame"))
+
+
 def _data_truth_snapshot(data: dict) -> dict:
     events = [
         ev
@@ -277,7 +288,9 @@ def _data_truth_snapshot(data: dict) -> dict:
         "lineups": sum(1 for ev in events if _truth_has_starter_signal(ev)),
         "football_lineups": sum(1 for ev in events if ev.get("sport") == "football" and ev.get("lineups")),
         "injuries": sum(1 for ev in events if ev.get("injuries")),
-        "referee": sum(1 for ev in events if ev.get("referee")),
+        "referee": sum(1 for ev in events if _truth_has_referee_exact(ev)),
+        "referee_context": sum(1 for ev in events if ev.get("referee_context")),
+        "referee_signal": sum(1 for ev in events if _truth_has_referee_signal(ev)),
         "h2h": sum(1 for ev in events if _truth_has_h2h(ev)),
         "xg": sum(1 for ev in events if _truth_has_xg(ev)),
     }
@@ -1203,7 +1216,7 @@ def get_pipeline_status() -> dict:
         if health_data_generated_at
         else "missing"
     )
-    sync_fields = ("total", "upcoming", "winamax_exact", "lineups", "injuries", "referee", "h2h", "xg")
+    sync_fields = ("total", "upcoming", "winamax_exact", "lineups", "injuries", "referee", "referee_signal", "h2h", "xg")
     sync_mismatches = []
     if night_snapshot_status == "aligned":
         for key in sync_fields:
@@ -1359,8 +1372,10 @@ def list_data_gaps(sport: str = None, limit: int = 20) -> dict:
             away = next((c for c in comps if c.get("home_away") == "away"), {})
             if not home.get("injuries") and not away.get("injuries"):
                 missing.append("injuries")
-            if not (m.get("referee") or {}).get("name"):
+            if not _truth_has_referee_signal(m):
                 missing.append("referee")
+            elif not _truth_has_referee_exact(m):
+                missing.append("referee_exact")
             if not m.get("lineups") and not any(c.get("lineup") for c in comps):
                 missing.append("lineups")
             if not home.get("team_stats") and not away.get("team_stats"):
