@@ -959,3 +959,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Tests: `football-stats-markets.spec.js` passe desktop + mobile (2/2); `app.js` syntax OK.
 - Cache/footer bumpes v36.018; `app.js` hash `6050d87d`, sidecars stats `f21c5812/c2e10705/e41f7aac`, SW `paris-sportif-20260505-215044`.
 
+## Sprint v36.019 — AUTO 10/10 Phase 7 VV ordre des buts (21:52 UTC)
+- Modèle: `poissonMarketsExtended()` calcule première équipe à marquer, dernière équipe à marquer et probabilité de 0-0.
+- UI: la modal détail expose les chips première/dernière équipe quand la probabilité est exploitable.
+- Cohérence: les probabilités first-goal se somment à 100% avec le cas aucun but.
+- Tests: `first-last-goal-markets.spec.js` passe desktop + mobile (2/2); `app.js` syntax OK; drift pipeline OK.
+- Cache/footer bumpes v36.019; `app.js` hash `ee474604`, SW `paris-sportif-20260505-215228`.
+
