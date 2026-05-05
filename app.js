@@ -838,9 +838,22 @@ document.addEventListener('focusin', (e) => {
 const r = _resolveTooltipTarget(e.target);
 if (r) _showTooltip(r.el, r.text);
 });
+document.addEventListener('focus', (e) => {
+const r = _resolveTooltipTarget(e.target);
+if (r) _showTooltip(r.el, r.text);
+}, true);
 document.addEventListener('focusout', (e) => {
 if (e.target.closest && e.target.closest('[data-tooltip]')) _hideTooltip();
 });
+document.addEventListener('blur', (e) => {
+if (e.target.closest && e.target.closest('[data-tooltip]')) _hideTooltip();
+}, true);
+setTimeout(() => {
+try {
+const r = _resolveTooltipTarget(document.activeElement);
+if (r) _showTooltip(r.el, r.text);
+} catch(e) {}
+}, 0);
 let _ttScrollScheduled = false;
 document.addEventListener('scroll', () => {
 if (_ttScrollScheduled) return;
@@ -2459,6 +2472,158 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
   }
   try { window.qualityScore = qualityScore; } catch(e){}
 
+  function getDataAge(data = window.PRONOSTICS_DATA, opts = {}) {
+    const ts = data && data.generated_at ? new Date(data.generated_at).getTime() : NaN;
+    const nowMs = Number.isFinite(Number(opts.nowMs)) ? Number(opts.nowMs) : Date.now();
+    const minutes = Number.isFinite(ts) ? Math.max(0, Math.floor((nowMs - ts) / 60000)) : 9999;
+    const label = minutes < 1 ? "à l'instant"
+      : minutes < 60 ? `il y a ${minutes} min`
+      : minutes < 24 * 60 ? `il y a ${Math.round(minutes / 60)} h`
+      : `il y a ${Math.round(minutes / (24 * 60))} j`;
+    const state = minutes > 240 ? 'down' : minutes > 30 ? 'waiting' : 'fresh';
+    return { minutes, label, state, generatedAt: data && data.generated_at || null };
+  }
+  try { window.getDataAge = getDataAge; } catch(e){}
+
+  function _displayablePickTier(c) {
+    const odd = Number(c?.odd || 0);
+    const conf = Number(c?.rel || c?.prob || 0);
+    const edge = Number.isFinite(Number(c?.edge)) ? Number(c.edge) : (conf && odd ? conf - 1 / odd : 0);
+    const ev = Number.isFinite(Number(c?.ev)) ? Number(c.ev) : (conf && odd ? conf * odd - 1 : -1);
+    if (!(odd >= 1.30) || !(conf > 0) || !(edge >= -0.005) || !(ev >= -0.005)) return null;
+    if (odd < 1.50 && conf >= 0.65) return 'safe';
+    if (odd < 2.00 && conf >= 0.50) return 'solid';
+    if (odd < 3.00 && conf >= 0.35 && edge >= 0.01) return 'value';
+    if (odd < 5.00 && conf >= 0.18 && edge >= 0.03) return 'big';
+    if (conf >= 0.06 && edge >= 0.05) return 'out';
+    return null;
+  }
+
+  function _displayableMatchKey(m) {
+    if (!m) return '';
+    if (m.winamax && m.winamax.match_id) return `wnx:${m.winamax.match_id}`;
+    const sides = typeof getSides === 'function' ? getSides(m) : {};
+    const home = String(sides.home?.name || sides.home?.short || '').toLowerCase();
+    const away = String(sides.away?.name || sides.away?.short || '').toLowerCase();
+    const day = typeof parisDateISO === 'function' ? parisDateISO(m.date) : String(m.date || '').slice(0, 10);
+    return String(m.id || `${day}|${home}|${away}`);
+  }
+
+  function _displayableSelectionKey(m, c) {
+    const raw = c || {};
+    const sel = raw.pickValue ?? raw.pickKey ?? raw.key ?? raw.side ?? raw.label ?? '';
+    return [
+      _displayableMatchKey(m),
+      String(raw.market || '1n2'),
+      String(sel).toLowerCase(),
+      raw.line ?? '',
+      String(raw.team || raw.raw?.team || '')
+    ].join('|');
+  }
+
+  function _sortDisplayablePicks(rows, sort = 'tier') {
+    const tierRank = { safe: 0, solid: 1, value: 2, big: 3, out: 4, outsider: 4, signal: 5 };
+    return (Array.isArray(rows) ? rows.slice() : []).sort((a, b) => {
+      if (sort === 'kickoff') return (a.ts - b.ts) || (b.quality - a.quality);
+      if (sort === 'edge') return (b.edge - a.edge) || (b.quality - a.quality);
+      if (sort === 'conf') return (b.rel - a.rel) || (b.edge - a.edge);
+      if (sort === 'odd') return (b.odd - a.odd) || (b.edge - a.edge);
+      return (tierRank[a.tier] ?? 9) - (tierRank[b.tier] ?? 9) || (b.edge - a.edge) || (b.quality - a.quality) || (a.ts - b.ts);
+    });
+  }
+
+  function _diversifyTopMatches(rows, topLimit = 10) {
+    const list = Array.isArray(rows) ? rows.slice() : [];
+    const top = [];
+    const overflow = [];
+    const seen = new Set();
+    for (const row of list) {
+      if (top.length < topLimit) {
+        const key = row.matchKey || _displayableMatchKey(row.m);
+        if (!seen.has(key)) {
+          seen.add(key);
+          top.push(row);
+          continue;
+        }
+      }
+      overflow.push(row);
+    }
+    return top.concat(overflow);
+  }
+
+  function getDisplayablePicks(opts = {}) {
+    const data = opts.data || window.PRONOSTICS_DATA || {};
+    const days = data.days || {};
+    const nowMs = Number.isFinite(Number(opts.nowMs)) ? Number(opts.nowMs) : Date.now();
+    const matches = Array.isArray(opts.matches)
+      ? opts.matches
+      : Object.values(days).flatMap(arr => Array.isArray(arr) ? arr : []);
+    const includeSettled = opts.includeSettled !== false;
+    const includeStarted = opts.includeStarted !== false;
+    const onlyWinamax = opts.onlyWinamax !== false;
+    const byKey = new Map();
+    for (const m of matches) {
+      try {
+        if (!m) continue;
+        if (onlyWinamax && !(typeof isWinamaxBookable === 'function' ? isWinamaxBookable(m) : m?.winamax?.available === true)) continue;
+        const ts = new Date(m.date || 0).getTime();
+        const settled = Boolean(m.completed || (typeof _isMatchEffectivelyDone === 'function' && _isMatchEffectivelyDone(m)));
+        const startedAndNotSettled = Number.isFinite(ts) && ts < nowMs - 60000 && !settled;
+        if (!includeSettled && settled) continue;
+        if (!includeStarted && startedAndNotSettled) continue;
+        const pred = predictMatch(m);
+        if (!pred || !pred.pick || pred.skip) continue;
+        const candidates = (typeof buildMarketCandidates === 'function')
+          ? buildMarketCandidates(m, pred, { requireExact: false })
+          : (() => {
+              const best = typeof _agentBestPick === 'function' ? _agentBestPick(m, pred) : null;
+              return best ? [best].concat(Array.isArray(best.allCandidates) ? best.allCandidates : []) : [];
+            })();
+        for (const c of (Array.isArray(candidates) ? candidates : [])) {
+          const odd = Number(c?.odd || 0);
+          if (!(odd >= 1.30)) continue;
+          const rel = Number(c.rel || c.prob || pred.reliability || pred.pick?.prob || 0);
+          const rawEdge = Number.isFinite(Number(c.edge)) ? Number(c.edge) : (rel - 1 / odd);
+          const rawEv = Number.isFinite(Number(c.ev)) ? Number(c.ev) : (rel * odd - 1);
+          const edge = Math.max(-0.25, Math.min(0.25, rawEdge));
+          const ev = Math.max(-0.25, Math.min(0.35, rawEv));
+          const tier = _displayablePickTier({ ...c, odd, rel, edge, ev });
+          if (!tier) continue;
+          const quality = (() => {
+            try { return qualityScore(m, pred, { ...c, odd, rel, edge }).score || 0; }
+            catch(e) { return Math.round(Math.max(0, Math.min(100, rel * 70 + edge * 140))); }
+          })();
+          const sides = typeof getSides === 'function' ? getSides(m) : {};
+          const row = {
+            m, pred, best: c, odd, rel, edge, ev, tier,
+            quality,
+            opportunity: quality,
+            home: sides.home, away: sides.away,
+            settled,
+            live: m.status === 'STATUS_IN_PROGRESS' || Boolean(m.live),
+            startedAndNotSettled,
+            res: settled && typeof evaluateModelPick === 'function' ? evaluateModelPick(m, pred) : null,
+            ts,
+            sport: m.sport || 'other',
+            matchKey: _displayableMatchKey(m),
+            pickKey: c.pickValue || c.pickKey || c.key || pred.pick?.key || '',
+            market: c.market || '1n2',
+            label: c.shortLabel || c.label || pred.pick?.label || 'Pick',
+            labelFull: c.label || pred.pick?.label || 'Pick',
+          };
+          const key = _displayableSelectionKey(m, c);
+          const prev = byKey.get(key);
+          const composite = edge * rel + quality / 10000;
+          if (!prev || composite > (prev.edge * prev.rel + prev.quality / 10000)) byKey.set(key, row);
+        }
+      } catch(e) {}
+    }
+    let rows = _sortDisplayablePicks(Array.from(byKey.values()), opts.sort || 'tier');
+    if (opts.diversifyByMatch !== false) rows = _diversifyTopMatches(rows, opts.topUniqueLimit || 10);
+    return rows;
+  }
+  try { window.getDisplayablePicks = getDisplayablePicks; } catch(e){}
+
   function _v35Rows(block) {
     return Array.isArray(block) ? block.filter(Boolean) : [];
   }
@@ -3526,6 +3691,18 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     const bets = _loadUserBets().filter(b => b.id !== id);
     _saveUserBets(bets);
   };
+  document.addEventListener('click', (e) => {
+    const btn = e.target && e.target.closest ? e.target.closest('.action-focus-trackbet') : null;
+    if (!btn || e.defaultPrevented) return;
+    const odd = Number(btn.dataset.odd || 0);
+    const stake = Number(btn.dataset.stake || 0);
+    if (!btn.dataset.matchId || !btn.dataset.pickKey || !(odd > 1) || !(stake >= 0)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const betId = window._addUserBet(btn.dataset.matchId, btn.dataset.market || '1n2', btn.dataset.pickKey, btn.dataset.pickLabel || '', odd, stake);
+    if (typeof toast === 'function') toast(`✓ Pari ${stake.toFixed(0)}€ @${odd.toFixed(2)} enregistré`, 'success');
+    btn.dataset.trackedBetId = betId || '';
+  }, true);
   window._settleUserBets = function() {
     // Met à jour les paris en attente avec leur résultat si dispo
     const data = window.PRONOSTICS_DATA;
@@ -5651,11 +5828,12 @@ const wrap = document.getElementById('sante-wrap');
 if (wrap) setTimeout(() => renderSantePage(wrap), 0);
 }
 } catch(e){}
-const ageMin = isFinite(h.data_age_min) ? h.data_age_min : 999;
+const ageInfo = (typeof getDataAge === 'function') ? getDataAge(window.PRONOSTICS_DATA) : null;
+const ageMin = ageInfo ? ageInfo.minutes : (isFinite(h.data_age_min) ? h.data_age_min : 999);
 const warnings = Array.isArray(h.warnings) ? h.warnings : [];
 let color, label;
 if (ageMin < 30 && warnings.length === 0) { color = '#34d399'; label = '🟢 Pipeline OK'; }
-else if (ageMin < 120 && warnings.length <= 2) { color = '#fbbf24'; label = '🟠 Pipeline ralenti'; }
+else if (ageMin < 240) { color = '#fbbf24'; label = warnings.length ? '🟠 Pipeline OK · alertes mineures' : '🟠 Pipeline ralenti'; }
 else { color = '#f87171'; label = '🔴 Pipeline en panne'; }
 btn.style.color = color;
 const lines = [];
@@ -14381,7 +14559,9 @@ return qs.get('debug') === '1' && Number.isFinite(n) && n >= 0 ? n : NaN;
 const _dashboardNowMs = Number.isFinite(_dashboardGeneratedMs) && Number.isFinite(_dashboardFakeAgeMin)
 ? _dashboardGeneratedMs + _dashboardFakeAgeMin * 60000
 : Date.now();
-const _dataAgeMin = data.generated_at ? Math.floor((_dashboardNowMs - _dashboardGeneratedMs)/60000) : 9999;
+const _dataAgeMin = (typeof getDataAge === 'function')
+? getDataAge(data, { nowMs: _dashboardNowMs }).minutes
+: (data.generated_at ? Math.floor((_dashboardNowMs - _dashboardGeneratedMs)/60000) : 9999);
 const _dataIsStale = _dataAgeMin > 240; // 4h
 
 {
@@ -14961,7 +15141,14 @@ const historyMode = v37IsHistoryDate(dateFilter);
 return terminalScanPool.filter(m => v37DateMatchesFor(m, dateFilter) && v37PickIsVisibleByClockFor(m, historyMode));
 };
 const v36TeamName = (team) => team?.short || team?.displayName || team?.name || '?';
-const v37PickUid = (m, candidate) => `${String(m?.id || '')}|${marketCandidateSignature(candidate)}`;
+const v37StableMatchKey = (m) => {
+if (!m) return '';
+if (m.winamax && m.winamax.match_id) return `wnx:${m.winamax.match_id}`;
+if (typeof _displayableMatchKey === 'function') return _displayableMatchKey(m);
+const sides = getSides(m);
+return String(m?.id || `${parisDateISO(m?.date) || ''}|${v36TeamName(sides.home)}|${v36TeamName(sides.away)}`);
+};
+const v37PickUid = (m, candidate) => `${v37StableMatchKey(m)}|${marketCandidateSignature(candidate)}`;
 const v37SoftEdgeFloor = -0.005;
 const v37EdgeDisplayCap = 0.25;
 const v37EdgeAnomalyThreshold = 0.30;
@@ -15127,7 +15314,7 @@ return v37TakeDiverseCandidates(ranked, m);
 const v37SelectionKeyForPick = (p) => {
 const m = p?.m || {};
 const sides = getSides(m);
-const matchKey = String(m?.id || `${m?.date || ''}|${v36TeamName(sides.home)}|${v36TeamName(sides.away)}`);
+const matchKey = v37StableMatchKey(m);
 const raw = p?.best || {};
 const selection = raw.pickValue ?? raw.pickKey ?? raw.key ?? raw.side ?? p?.pickKey ?? p?.labelFull ?? p?.label ?? '';
 return [
@@ -15183,7 +15370,7 @@ const ranked = v36PickPoolCanonical.slice().sort((a, b) =>
 || (a.ts - b.ts)
 );
 for (const p of ranked) {
-const matchKey = String(p.m?.id || `${p.m?.date || ''}|${v36TeamName(getSides(p.m).home)}|${v36TeamName(getSides(p.m).away)}`);
+const matchKey = v37StableMatchKey(p.m);
 const pickKey = `${matchKey}|${p.tier || ''}|${p.market || ''}|${p.pickKey || ''}|${p.line ?? ''}|${Number(p.odd || 0).toFixed(2)}`;
 const displayKey = `${matchKey}|${p.tier || ''}|${p.market || ''}|${v37NormDisplayKey(p.labelFull || p.label || '')}|${Number(p.odd || 0).toFixed(2)}`;
 if (seenPick.has(pickKey) || seenDisplay.has(displayKey)) {
@@ -15247,13 +15434,21 @@ for (const tierDef of v36TierDefs) {
 if (out.some(p => p.tier === tierDef.id)) continue;
 const p = ranked.find(x => x.tier === tierDef.id);
 if (!p) continue;
-const matchKey = String(p.m?.id || `${p.m?.date || ''}|${v36TeamName(getSides(p.m).home)}|${v36TeamName(getSides(p.m).away)}`);
+const matchKey = v37StableMatchKey(p.m);
+const family = v37MarketFamilyKey(p);
+const familyCount = marketCounts.get(family) || 0;
+const familyCap = v37GlobalMarketCap(family);
+let familyReplaceIdx = -1;
+if (familyCount >= familyCap) {
+familyReplaceIdx = out.findIndex(x => v37MarketFamilyKey(x) === family && x.tier !== tierDef.id);
+if (familyReplaceIdx < 0) continue;
+}
 const pickKey = `${matchKey}|${p.tier || ''}|${p.market || ''}|${p.pickKey || ''}|${p.line ?? ''}|${Number(p.odd || 0).toFixed(2)}`;
 const displayKey = `${matchKey}|${p.tier || ''}|${p.market || ''}|${v37NormDisplayKey(p.labelFull || p.label || '')}|${Number(p.odd || 0).toFixed(2)}`;
 if (seenPick.has(pickKey) || seenDisplay.has(displayKey)) continue;
 const currentMatchCount = matchCounts.get(matchKey) || 0;
 if (currentMatchCount >= 2) {
-const replaceIdx = out.findIndex(x => String(x.m?.id || `${x.m?.date || ''}|${v36TeamName(getSides(x.m).home)}|${v36TeamName(getSides(x.m).away)}`) === matchKey && x.tier !== tierDef.id);
+const replaceIdx = out.findIndex(x => v37StableMatchKey(x.m) === matchKey && x.tier !== tierDef.id);
 if (replaceIdx < 0) continue;
 const replaced = out.splice(replaceIdx, 1)[0];
 matchCounts.set(matchKey, currentMatchCount - 1);
@@ -15267,10 +15462,16 @@ const signals = matchSignals.get(matchKey) || { bttsYes: false, teamNoGoal: new 
 const bttsSide = v37BttsSide(p);
 const noGoalTeam = v37TeamNoGoalKey(p);
 if ((bttsSide === 'yes' && signals.teamNoGoal.size) || (noGoalTeam && signals.bttsYes)) continue;
+if (familyReplaceIdx >= 0) {
+const replaced = out.splice(familyReplaceIdx, 1)[0];
+const replacedMatchKey = v37StableMatchKey(replaced?.m);
+matchCounts.set(replacedMatchKey, Math.max(0, (matchCounts.get(replacedMatchKey) || 1) - 1));
+marketCounts.set(family, Math.max(0, (marketCounts.get(family) || 1) - 1));
+matchSelected.set(replacedMatchKey, (matchSelected.get(replacedMatchKey) || []).filter(x => x !== replaced));
+}
 seenPick.add(pickKey);
 seenDisplay.add(displayKey);
 matchCounts.set(matchKey, (matchCounts.get(matchKey) || 0) + 1);
-const family = v37MarketFamilyKey(p);
 marketCounts.set(family, (marketCounts.get(family) || 0) + 1);
 if (bttsSide === 'yes') signals.bttsYes = true;
 if (noGoalTeam) signals.teamNoGoal.add(noGoalTeam);
@@ -15280,6 +15481,21 @@ matchSelected.set(matchKey, alreadySelected);
 v37QualityCounters.tierBackfillInjected++;
 v37Reject('tier_backfill', p.m, tierDef.id);
 out.push(p);
+}
+const ht15Rows = out.filter(p => v37MarketFamilyKey(p) === 'ht_ou_15');
+if (ht15Rows.length > 5) {
+const keepHt15 = new Set(ht15Rows
+.slice()
+.sort((a, b) => (Number(b.tier === 'out') - Number(a.tier === 'out')) || ((b.score || 0) - (a.score || 0)) || (a.ts - b.ts))
+.slice(0, 5));
+let removedHt15 = 0;
+for (let i = out.length - 1; i >= 0; i--) {
+if (v37MarketFamilyKey(out[i]) === 'ht_ou_15' && !keepHt15.has(out[i])) {
+out.splice(i, 1);
+removedHt15++;
+}
+}
+v37QualityCounters.marketCapRemoved += removedHt15;
 }
 return out.sort((a, b) => a.ts - b.ts);
 })();
@@ -15323,13 +15539,14 @@ const v37ApplyTopMarketDiversity = (rows) => {
 const list = Array.isArray(rows) ? rows.slice() : [];
 if (list.length <= 12) return list;
 const topLimit = Math.min(30, list.length);
-const cap = Math.max(4, Math.ceil(topLimit * 0.20));
+const defaultCap = Math.max(4, Math.ceil(topLimit * 0.20));
 const kept = [];
 const overflow = [];
 const counts = new Map();
 for (const row of list) {
 if (kept.length >= topLimit) { overflow.push(row); continue; }
 const family = v37MarketFamilyKey(row);
+const cap = family === 'ht_ou_15' ? Math.min(5, defaultCap) : defaultCap;
 const count = counts.get(family) || 0;
 if (count < cap) {
 counts.set(family, count + 1);
@@ -15340,8 +15557,30 @@ overflow.push(row);
 }
 return kept.concat(overflow);
 };
-const v37SortedDiverse = v37ApplyTopMarketDiversity(v36Sorted);
-const v37MatchKeyForPick = (p) => String(p?.m?.id || `${p?.m?.date || ''}|${v36TeamName(getSides(p.m).home)}|${v36TeamName(getSides(p.m).away)}`);
+const v37ApplyTopMatchDiversity = (rows) => {
+const list = Array.isArray(rows) ? rows.slice() : [];
+const kept = [];
+const overflow = [];
+const seenTop = new Set();
+const topLimit = Math.min(10, list.length);
+for (const row of list) {
+if (kept.length < topLimit) {
+const key = v37StableMatchKey(row?.m);
+if (!seenTop.has(key)) {
+seenTop.add(key);
+kept.push(row);
+continue;
+}
+v37QualityCounters.matchCapRemoved++;
+overflow.push(row);
+continue;
+}
+overflow.push(row);
+}
+return kept.concat(overflow);
+};
+const v37SortedDiverse = v37ApplyTopMatchDiversity(v37ApplyTopMarketDiversity(v36Sorted));
+const v37MatchKeyForPick = (p) => v37StableMatchKey(p?.m);
 const v37VisibleMatchCounts = (() => {
 const counts = new Map();
 v37SortedDiverse.forEach(p => {
@@ -15426,6 +15665,22 @@ for (const tier of v36TierDefs) {
 if (out.some(p => p.tier === tier.id)) continue;
 const candidate = pool.find(p => p.tier === tier.id && !keys.has(v37PickRowKey(p)));
 if (!candidate) continue;
+const family = v37MarketFamilyKey(candidate);
+const familyCap = v37GlobalMarketCap(family);
+const familyCount = out.filter(p => v37MarketFamilyKey(p) === family).length;
+let familyReplaceIdx = -1;
+if (familyCount >= familyCap) {
+for (let i = out.length - 1; i >= 0; i--) {
+if (v37MarketFamilyKey(out[i]) === family && out[i].tier !== tier.id) { familyReplaceIdx = i; break; }
+}
+if (familyReplaceIdx < 0) continue;
+}
+if (familyReplaceIdx >= 0) {
+keys.delete(v37PickRowKey(out[familyReplaceIdx]));
+out[familyReplaceIdx] = candidate;
+keys.add(v37PickRowKey(candidate));
+continue;
+}
 if (out.length < v37DenseRowLimit) {
 out.push(candidate);
 keys.add(v37PickRowKey(candidate));
@@ -15464,18 +15719,30 @@ return acc;
 }, {})).sort((a, b) => b[1] - a[1]).slice(0, limit || 10).map(([key, count]) => ({ key, count }));
 const v37ScoreHistogram = (() => {
 const rows = v36PickPool.length ? v36PickPool : v37DataOnlyPool;
-const buckets = [
-{ key: '80+', label: '80-100', min: 80, max: 101 },
-{ key: '50-79', label: '50-79', min: 50, max: 80 },
-{ key: '<50', label: '0-49', min: -Infinity, max: 50 }
-];
+const buckets = Array.from({ length: 10 }, (_, i) => ({ key: `${i * 10}-${i * 10 + 9}`, label: `${i * 10}-${i === 9 ? 100 : i * 10 + 9}`, min: i * 10, max: i === 9 ? 101 : i * 10 + 10 }));
 const total = rows.length || 1;
-return buckets.reduce((acc, b) => {
-const count = rows.filter(p => Number(p?.opportunity || p?.score || 0) >= b.min && Number(p?.opportunity || p?.score || 0) < b.max).length;
+const scores = rows.map(p => Number(p?.opportunity || p?.score || 0)).filter(Number.isFinite);
+const mean = scores.length ? scores.reduce((a, n) => a + n, 0) / scores.length : 0;
+const variance = scores.length ? scores.reduce((a, n) => a + Math.pow(n - mean, 2), 0) / scores.length : 0;
+const bucketSummary = (label, count) => {
 const pct = Math.round((count / total) * 100);
-acc[b.key] = { label: b.label, count, pct, bar: `${'#'.repeat(Math.max(0, Math.round(pct / 5)))}${'.'.repeat(Math.max(0, 20 - Math.round(pct / 5)))}` };
+return { label, count, pct, bar: `${'#'.repeat(Math.max(0, Math.round(pct / 5)))}${'.'.repeat(Math.max(0, 20 - Math.round(pct / 5)))}` };
+};
+const histogram = buckets.reduce((acc, b) => {
+const count = rows.filter(p => Number(p?.opportunity || p?.score || 0) >= b.min && Number(p?.opportunity || p?.score || 0) < b.max).length;
+acc[b.key] = bucketSummary(b.label, count);
 return acc;
 }, {});
+histogram['<50'] = bucketSummary('<50', scores.filter(n => n < 50).length);
+histogram['50-79'] = bucketSummary('50-79', scores.filter(n => n >= 50 && n < 80).length);
+histogram['80+'] = bucketSummary('80+', scores.filter(n => n >= 80).length);
+histogram.summary = {
+count: scores.length,
+mean: Math.round(mean * 10) / 10,
+stddev: Math.round(Math.sqrt(variance) * 10) / 10,
+distinctTop30: new Set(v37SortedDiverse.slice(0, 30).map(p => Number(p?.opportunity || 0))).size
+};
+return histogram;
 })();
 const v37MarketBreakdownTop10 = v37CountBy(v36PickPool, p => v37MarketFamilyKey(p), 10);
 const v37Top30MarketBreakdown = v37CountBy(v37SortedDiverse.slice(0, 30), p => v37MarketFamilyKey(p), 10);
@@ -15710,6 +15977,17 @@ return `<footer class="v37-history-footer">
           <button type="button" class="page-btn" data-page="performance">Voir tout l'historique</button>
         </footer>`;
 })();
+const v37TrackFirstButton = (() => {
+try {
+const p = v36TableRows.find(x => x && Number(x.odd || 0) > 1);
+if (!p) return '';
+const matchId = v37StableMatchKey(p.m);
+const market = (p.best && p.best.market) || p.market || '1n2';
+const pickKey = (p.best && (p.best.key || p.best.pickKey || p.best.pickValue || p.best.side)) || p.pickKey || p.label || '';
+if (!matchId || !pickKey) return '';
+return `<button type="button" class="v37-track-inline action-focus-trackbet" data-match-id="${esc(matchId)}" data-market="${esc(market)}" data-pick-key="${esc(pickKey)}" data-pick-label="${esc(p.labelFull || p.label || 'Pick')}" data-odd="${Number(p.odd || 0)}" data-stake="1" data-tooltip="Enregistre ce pick dans ton suivi personnel sans quitter le tableau." style="min-height:40px;border:1px solid rgba(45,212,168,.38);background:rgba(45,212,168,.10);color:var(--accent);border-radius:999px;padding:0 12px;font-size:11px;font-weight:950;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;white-space:nowrap;">J'ai parié le pick #1</button>`;
+} catch(e) { return ''; }
+})();
 const v37PersonalPicksHtml = (() => {
 if (!v37Coach || Number(v37Coach.total || 0) < 10 || !v36Sorted.length) return '';
 const rows = v36Sorted
@@ -15753,6 +16031,7 @@ const v36TableHtml = `<section class="v36-table-panel" aria-label="Tableau dense
           <button type="button" class="v37-blind-toggle ${v37BlindMode ? 'is-active' : ''}" data-v37-blind aria-pressed="${v37BlindMode ? 'true' : 'false'}" data-tooltip="Cache cote et edge dans le dashboard pour lire l'analyse avant le rendement.">
             <span>Mode blind</span><b>${v37BlindMode ? 'ON' : 'OFF'}</b>
           </button>
+          ${v37TrackFirstButton}
           <div class="v36-sort-strip" aria-label="Tri tableau">
             ${v36SortButton('tier', 'Tier')}
             ${v36SortButton('date', 'Date')}
@@ -15848,8 +16127,8 @@ return p.strict
 })
 .sort((a, b) => (b.score - a.score) || (b.rel - a.rel) || (a.ts - b.ts))
 .filter((p, index, arr) => {
-const matchKey = String(p.m?.id || `${p.m?.date || ''}|${v36TeamName(getSides(p.m).home)}|${v36TeamName(getSides(p.m).away)}`);
-return arr.findIndex(x => String(x.m?.id || `${x.m?.date || ''}|${v36TeamName(getSides(x.m).home)}|${v36TeamName(getSides(x.m).away)}`) === matchKey) === index;
+const matchKey = v37MatchKeyForPick(p);
+return arr.findIndex(x => v37MatchKeyForPick(x) === matchKey) === index;
 })
 .slice(0, 4);
 const v36GeniusSection = v36GeniusPicks.length ? `<section class="v36-genius-strip" aria-label="Picks du genie">
@@ -20152,7 +20431,12 @@ const winaToday = sourceMatches;
 let _completedNoOdds = 0;
 let _completedFiltered = 0;  // sport filter active
 
-const allPicks = winaToday.map(m => {
+const diversifyByMatch = (() => {
+try { return localStorage.getItem('tousDiversifyByMatch') !== '0'; } catch(e) { return true; }
+})();
+const allPicks = (typeof getDisplayablePicks === 'function')
+? getDisplayablePicks({ matches: winaToday, includeSettled: true, includeStarted: true, onlyWinamax: _tousMode !== 'all', sort: 'tier', diversifyByMatch, topUniqueLimit: 10 })
+: winaToday.map(m => {
 try {
 const pred = predictMatch(m);
 if (!pred || !pred.pick || pred.skip) return null;
@@ -20167,7 +20451,7 @@ if (!odd) {
 if (settled) {
 _completedNoOdds++;
 const rel = pred.reliability ?? pred.pick.prob;
-const res = evaluateModelPick(m, pred);  // on a quand même la prédiction
+const res = evaluateModelPick(m, pred);
 return { m, pred, odd: null, rel, edge: 0,
 home, away, settled: true, live: false,
 startedAndNotSettled: false, res, ts: ko,
@@ -20400,6 +20684,16 @@ return true;
 };
 const filteredPicks = allPicks.filter(p => passesPreset(p) && passesFilters(p));
 const filteredCoverageRows = coverageRowsAll.filter(passesCoverageFilters);
+const _tousTierKey = (p) => {
+const raw = String(p?.tier || '');
+if (raw === 'out') return 'outsider';
+return raw || _tierFromOdd(p?.odd, p?.rel, p?.edge);
+};
+const filteredTierCounts = filteredPicks.reduce((acc, p) => {
+const k = _tousTierKey(p);
+acc[k] = (acc[k] || 0) + 1;
+return acc;
+}, {});
 const tousStatsRows = filteredPicks.filter(p => !p.settled && !p.startedAndNotSettled && isValuePick(p));
 const tousSportStats = tousStatsRows.reduce((acc, p) => {
 acc[p.sport || 'other'] = (acc[p.sport || 'other'] || 0) + 1;
@@ -20416,6 +20710,7 @@ const tousStatsBarHtml = `
           <span><b style="color:var(--text);">${tousStatsRows.length}</b> pronos à venir</span>
           <span><b style="color:var(--accent);">${tousStatsRows.filter(p => p.rel >= 0.70).length}</b> locks 70%+</span>
           <span><b style="color:#fbbf24;">${tousStatsRows.filter(p => p.edge >= 0.05).length}</b> value edge 5%+</span>
+          <span title="Compteurs calculés sur les mêmes pronos filtrés que la liste."><b style="color:var(--text);">${filteredTierCounts.safe || 0}</b> Sûr · <b style="color:var(--text);">${filteredTierCounts.solid || 0}</b> Solide · <b style="color:var(--text);">${filteredTierCounts.value || 0}</b> Valeur · <b style="color:var(--text);">${filteredTierCounts.big || 0}</b> Big · <b style="color:var(--text);">${filteredTierCounts.outsider || 0}</b> Out</span>
           <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">sports : ${esc(tousSportTop || 'pas assez de picks')}</span>
         </div>`;
 
@@ -20434,7 +20729,10 @@ case 'kickoff':
 default:        return a.ts - b.ts;
 }
 };
-const pending = filteredPicks.filter(p => !p.settled && !p.startedAndNotSettled && isValuePick(p)).sort(cmp);
+const diversifyTousRows = (rows) => (diversifyByMatch && typeof _diversifyTopMatches === 'function')
+? _diversifyTopMatches(rows, 10)
+: rows;
+const pending = diversifyTousRows(filteredPicks.filter(p => !p.settled && !p.startedAndNotSettled && isValuePick(p)).sort(cmp));
 const inProgress = filteredPicks.filter(p => p.startedAndNotSettled && isValuePick(p)).sort((a,b) => a.ts - b.ts);
 const finished = filteredPicks.filter(p => p.settled).sort((a,b) => b.ts - a.ts);
 const coveragePending = filteredCoverageRows.filter(p => !p.settled && !p.startedAndNotSettled).sort((a,b) => a.ts - b.ts);
@@ -20581,7 +20879,7 @@ const aLogo = (p.away && p.away.logo) || '';
 const tLbl = fmtTime(p.m.date);
 const confColor = p.rel >= 0.70 ? 'var(--accent)' : p.rel >= 0.60 ? '#fbbf24' : 'var(--text-dim)';
 const edgeColor = p.edge > 0.10 ? 'var(--accent)' : p.edge > 0.05 ? '#fbbf24' : p.edge < 0 ? 'var(--danger)' : 'var(--text-dim)';
-const pickLabel = p.pred.pick.label || 'Pick';
+const pickLabel = p.label || p.labelFull || p.pred?.pick?.label || 'Pick';
 const strengthBadge = BetStrengthBadge(p, 'bet-strength-badge--tous');
 let _coteSrc = '';
 const _o = p.pred && p.pred.odds;
@@ -20854,6 +21152,10 @@ const tousAdvancedFilterHtml = `
                 <option value="winamax" ${_tousMode==='winamax'?'selected':''}>🎯 Winamax bookable</option>
                 <option value="all" ${_tousMode==='all'?'selected':''}>📡 Tous les matchs</option>
               </select>
+            </label>
+            <label style="${tousRailItemStyle}display:inline-flex;align-items:center;gap:7px;font-size:11.5px;color:var(--text-dim);" title="Activé : le top 10 garde au maximum une ligne par match, puis les autres marchés descendent plus bas.">
+              <input type="checkbox" data-tous-diversify ${diversifyByMatch ? 'checked' : ''} style="width:16px;height:16px;accent-color:var(--brand);">
+              Diversifier par match
             </label>
             <label style="${tousRailItemStyle}display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-dim);">
               Ligue
@@ -21189,6 +21491,11 @@ renderTousPage(wrap);
 const modeSel = wrap.querySelector('[data-tous-mode]');
 if (modeSel) modeSel.addEventListener('change', () => {
 try { localStorage.setItem('tousFilterMode', modeSel.value); } catch(e) {}
+renderTousPage(wrap);
+});
+const diversifySel = wrap.querySelector('[data-tous-diversify]');
+if (diversifySel) diversifySel.addEventListener('change', () => {
+try { localStorage.setItem('tousDiversifyByMatch', diversifySel.checked ? '1' : '0'); } catch(e) {}
 renderTousPage(wrap);
 });
 const leagueSel = wrap.querySelector('[data-tous-league]');
@@ -25065,9 +25372,18 @@ const sign = num >= 0 ? '+' : '';
 return `${sign}${(num * 100).toFixed(1)}%`;
 };
 const sportEmojis = { football: '⚽', tennis: '🎾', basketball: '🏀', hockey: '🏒', baseball: '⚾' };
+const perfKpiHelp = {
+'Win Rate': 'Part des pronos gagnants parmi les pronos réglés.',
+'ROI flat': 'Retour sur investissement à mise plate : profit net divisé par la mise totale.',
+'PnL Kelly': 'Profit/perte simulé avec staking Kelly prudent.',
+'Brier score': 'Qualité des probabilités : plus bas est meilleur, autour de 0,20 est bon en foot.',
+'Profit cumul': 'Profit net total sur la période suivie.',
+'Edge moyen': 'Avantage moyen estimé contre la cote du marché.',
+'Sharpe ratio': 'Rendement ajusté au risque : plus haut signifie plus régulier.'
+};
 const kpiTile = (label, value, sub, color) => `
-      <div class="kpi-tile" style="padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
-        <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;">${esc(label)}</div>
+      <div class="kpi-tile" title="${esc(perfKpiHelp[label] || `${label} · indicateur de performance`)}" style="padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
+        <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700;border-bottom:1px dotted var(--text-dim2);display:inline-block;cursor:help;">${esc(label)}</div>
         <div style="font-size:28px;font-weight:800;color:${color || 'var(--text)'};margin-top:4px;font-variant-numeric:tabular-nums;">${esc(String(value))}</div>
         ${sub ? `<div style="font-size:11px;color:var(--text-dim);margin-top:2px;">${esc(sub)}</div>` : ''}
       </div>`;
@@ -25102,16 +25418,15 @@ const _healthWidget = (() => {
 try {
 const h = window.__healthData;
 if (!h || !h.sources) return '';
-const ageMin = isFinite(h.data_age_min) ? h.data_age_min : 999;
+const ageInfo = (typeof getDataAge === 'function') ? getDataAge(window.PRONOSTICS_DATA) : null;
+const ageMin = ageInfo ? ageInfo.minutes : (isFinite(h.data_age_min) ? h.data_age_min : 999);
 const warningCount = Array.isArray(h.warnings) ? h.warnings.length : 0;
-const warningLevel = warningCount === 0 ? 'healthy' : warningCount <= 10 ? 'ok_alerts' : 'degraded';
-const overallColor = ageMin >= 240 || warningLevel === 'degraded' ? 'var(--danger)' : ageMin >= 30 || warningLevel === 'ok_alerts' ? 'var(--warn,#fbbf24)' : 'var(--accent)';
+const warningLevel = warningCount === 0 ? 'healthy' : 'minor_alerts';
+const overallColor = ageMin >= 240 ? 'var(--danger)' : ageMin >= 30 || warningCount ? 'var(--warn,#fbbf24)' : 'var(--accent)';
 const overallLabel = ageMin >= 240
 ? '✗ Pipeline en panne'
-: warningLevel === 'degraded'
-? `⚠ Pipeline dégradé · ${warningCount} alertes`
-: warningLevel === 'ok_alerts'
-? `✓ Pipeline OK avec alertes · ${warningCount}`
+: warningLevel === 'minor_alerts'
+? `✓ Pipeline OK · ${warningCount} alertes mineures`
 : ageMin >= 30
 ? '⚠ Pipeline ralenti'
 : '✓ Pipeline sain';
@@ -30417,12 +30732,12 @@ if (!data || !data.generated_at) {
 el.textContent = '📅 —';
 return;
 }
-const ts = new Date(data.generated_at).getTime();
-const ageMin = Math.max(0, Math.round((Date.now() - ts) / 60000));
-const lbl = ageMin < 1 ? 'à l\'instant'
+const ageInfo = (typeof getDataAge === 'function') ? getDataAge(data) : null;
+const ageMin = ageInfo ? ageInfo.minutes : Math.max(0, Math.round((Date.now() - new Date(data.generated_at).getTime()) / 60000));
+const lbl = ageInfo ? ageInfo.label : (ageMin < 1 ? 'à l\'instant'
 : ageMin < 60 ? `il y a ${ageMin} min`
 : ageMin < 24*60 ? `il y a ${Math.round(ageMin/60)} h`
-: `il y a ${Math.round(ageMin/(24*60))} j`;
+: `il y a ${Math.round(ageMin/(24*60))} j`);
 if (ageMin > 240) {
 el.textContent = `🔴 Pipeline en panne — données ${lbl}`;
 el.style.color = 'var(--danger)';

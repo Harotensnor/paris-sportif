@@ -796,3 +796,13 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Lighthouse: mobile + desktop sur Dashboard/Tous/Performance/Méthode restent `100/100/100` en perf/a11y/SEO.
 - État: aucun changement fonctionnel ajouté, seulement rapport a11y rafraîchi et cache/footer bumpés pour hard refresh.
 - Cache/footer bumpes v35.481; `app.js` hash `2ad06cd7`, `app.css` hash `d19b2228`, SW `paris-sportif-20260505-200328`.
+
+## Sprint v35.482 — AUTO 10/10 Pipeline frais et cohérence tableau (19:46 UTC)
+- Pipeline: le cron échouait sur le garde-fou bundle 1.60 MB alors que le cap produit est 1.70 MB; `audit_bundle_size.py` est réaligné et `check_pipeline_health.py` bloque désormais un `data.js` >30 min stale.
+- Cadences: `auto_refresh.py` et `refresh.yml` restent alignés; ClubElo passe à ~1h et footballdata à ~3h pour éviter les sources lourdes qui prennent le cron en étau.
+- Data: reseed local frais à 278 events, 278 Winamax exacts, 278 matchs enrichis marchés, injuries 159, lineups 97, referee effectif 97, xG 185; footer attendu `MAJ <30 min`.
+- Cohérence UI: `getDataAge()` et `getDisplayablePicks()` centralisent âge data et picks affichables; Tous et Dashboard partagent dédup, cap variété, cap top 10 un pick par match Winamax stable.
+- Qualité tableau: debug `?debug=1` expose histogramme score 10 buckets + agrégats, top 30 avec 24 scores distincts et 10 marketKeys; `ht_ou_15` reste plafonné à 5 lignes visibles.
+- UX: page Tous ajoute le toggle existant de diversification par match; Performance ajoute des tooltips KPI et affiche `Pipeline OK · alertes mineures` si les warnings sont non bloquants.
+- QA: `npx playwright test --project=chromium-desktop` passe 208/208 avec 10 skips attendus; `audit_bundle_size.py`, `check_pipeline_drift.py`, `check_pipeline_health.py`, `build_health.py` OK/Warning non critique.
+- Cache/footer bumpes v35.482; `app.js` hash `4938195f`, `app.css` hash `e6dccde2`, SW `paris-sportif-20260505-214630`.

@@ -263,6 +263,7 @@ jobs:
           # écrit data_today.json + data_manifest.json + ré-inline LITE blob
           # dans pronostics.html. Réduit le 1er paint de ~1.4 MB à ~0.4 MB.
           python3 finalize_inline.py || true
+          python3 check_pipeline_health.py --max-age-min 30
           # v35.407 — Bundle guard: app.js must stay below 1.6 MB after the
           # V36/V37 cleanup. Fails fast if a sprint reintroduces dead code.
           python3 audit_bundle_size.py
