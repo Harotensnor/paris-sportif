@@ -1067,3 +1067,11 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Tests: mobile-quick-filters passe mobile Chromium (1/1); app.js syntax OK; drift pipeline OK.
 - Cache/footer bumpes v36.033; app.js hash 28ed27c5; SW paris-sportif-20260505-223856.
 
+
+## Sprint v36.034 — AUTO 10/10 Phase 8 KKK badges compacts (22:41 UTC)
+- Mobile: badges de tier convertis en codes S / SO / V / B / O.
+- Lisibilité: les cards mobiles affichent le code compact seul, avec aria-label complet pour le niveau.
+- Cohérence: les légendes et filtres réutilisent les mêmes définitions de tier.
+- Tests: mobile-compact-tier-badges passe; suite Phase 8 mobile 9/9; Lighthouse 100/100/100 sur 8 audits; drift pipeline OK.
+- Cache/footer bumpes v36.034; app.js hash 3cb57fe1; SW paris-sportif-20260505-224128.
+

@@ -16047,11 +16047,11 @@ return clean;
 const v37BlindMode = v36Filter.blind === true || v36Filter.blind === '1';
 try { window.__v37BlindMode = v37BlindMode; } catch(e) {}
 const v36TierDefs = [
-{ id: 'safe', icon: '1', label: 'Sur', range: '1.30-1.50', desc: 'Conf. 65%+ · avantage proche neutre accepte', tone: 'safe' },
-{ id: 'solid', icon: '2', label: 'Solide', range: '1.50-2.00', desc: 'Conf. 50%+ · bon equilibre risque/gain', tone: 'solid' },
-{ id: 'value', icon: '3', label: 'Valeur', range: '2.00-3.00', desc: 'Conf. 35%+ · avantage 1%+', tone: 'value' },
-{ id: 'big', icon: '4', label: 'Big odds', range: '3.00-5.00', desc: 'Conf. 18%+ · avantage 3%+', tone: 'big' },
-{ id: 'out', icon: '5', label: 'Outsider', range: '5.00+', desc: 'Conf. 6%+ · avantage 5%+', tone: 'out' }
+{ id: 'safe', icon: 'S', abbr: 'S', label: 'Sur', range: '1.30-1.50', desc: 'Conf. 65%+ · avantage proche neutre accepte', tone: 'safe' },
+{ id: 'solid', icon: 'SO', abbr: 'SO', label: 'Solide', range: '1.50-2.00', desc: 'Conf. 50%+ · bon equilibre risque/gain', tone: 'solid' },
+{ id: 'value', icon: 'V', abbr: 'V', label: 'Valeur', range: '2.00-3.00', desc: 'Conf. 35%+ · avantage 1%+', tone: 'value' },
+{ id: 'big', icon: 'B', abbr: 'B', label: 'Big odds', range: '3.00-5.00', desc: 'Conf. 18%+ · avantage 3%+', tone: 'big' },
+{ id: 'out', icon: 'O', abbr: 'O', label: 'Outsider', range: '5.00+', desc: 'Conf. 6%+ · avantage 5%+', tone: 'out' }
 ];
 const v36TierById = Object.fromEntries(v36TierDefs.map(t => [t.id, t]));
 const v36TierRank = { safe: 1, solid: 2, value: 3, big: 4, out: 5 };
@@ -17327,7 +17327,7 @@ return `<button type="button" class="v36-pick-card" data-tone="${esc(tier.tone)}
 };
 const v36TierBadge = (tierId, compact) => {
 const tier = v36TierById[tierId] || v36TierDefs[0];
-return `<span class="v36-tier-badge" data-tone="${esc(tier.tone)}"><b>${esc(tier.icon)}</b>${compact ? '' : `<em>${esc(tier.label)}</em>`}</span>`;
+return `<span class="v36-tier-badge" data-tone="${esc(tier.tone)}" aria-label="${esc(tier.label)}"><b>${esc(compact ? (tier.abbr || tier.icon) : tier.icon)}</b>${compact ? '' : `<em>${esc(tier.label)}</em>`}</span>`;
 };
 const v36LogoFallback = (team) => (v36TeamName(team) || '?').slice(0, 1);
 const v36Logo = (team) => team?.logo
@@ -17403,7 +17403,7 @@ const tier = v36TierById[p.tier] || v36TierDefs[0];
 const result = v37ResultForPick(p);
 const sameMatchCount = v37VisibleMatchCounts.get(v37MatchKeyForPick(p)) || 0;
 return `<button type="button" class="v36-table-card ${sameMatchCount > 1 ? 'is-same-match' : ''}" data-tone="${esc(tier.tone)}" data-big-detail="${esc(String(p.m.id || ''))}" data-pick-uid="${esc(p.pickUid || '')}" data-pick-label="${esc(p.labelFull || p.label || '')}" data-pick-odd="${esc(p.odd.toFixed(2))}">
-          <span class="v36-table-card__top"><b>${sportIcon(p.m.sport || '')} ${esc(v37DateLabel(p.m.date))} · ${esc(fmtTime(p.m.date))}</b>${v36TierBadge(p.tier, false)}</span>
+          <span class="v36-table-card__top"><b>${sportIcon(p.m.sport || '')} ${esc(v37DateLabel(p.m.date))} · ${esc(fmtTime(p.m.date))}</b>${v36TierBadge(p.tier, true)}</span>
           <strong>${v36MatchTitleHtml(p)}</strong>
           <em class="v36-table-card__league">${esc(p.m.league_name || p.m.league || '')}</em>
           <span class="v36-table-card__line"><i data-tooltip="${esc(p.marketTooltip || p.labelFull || p.label)}">${esc(p.labelMobile || p.label)}</i><b>${v37BlindOddHtml(p.odd)}</b><b>${Math.round(p.rel * 100)}%</b><b>${v37BlindEdgeHtml(p.edge)}</b></span>
