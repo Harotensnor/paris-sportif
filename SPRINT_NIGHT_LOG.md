@@ -679,3 +679,11 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Validation live locale: dashboard debug affiche 285 matchs scannes, 257 visibles horloge, 490 picks qualifies, 360 lignes rendues; captures desktop/mobile dans `.cache/validation-tableau-theo-dashboard-*.png`.
 - QA: syntax `app.js` OK, no conflict markers OK, `phase-finale-dashboard.spec.js` 4/4 desktop+mobile.
 - Cache/footer bumpes v35.464; `app.js` hash `bba6d793`, `app.css` hash `a159d9f7`.
+
+## Sprint v35.465 — AUTO 10/10 Nav topbar full-width (18:26 UTC)
+- Layout: sur desktop, l'accueil n'utilise plus la sidebar gauche; les 5 hubs passent en nav horizontale sticky sous le header.
+- Table: `main#main-content` revient a `padding-left=18px`, ce qui donne au tableau dense 1366px utiles sur 1440px au lieu d'une surface rognee.
+- Mobile: le comportement existant est preserve; nav desktop masquee, cards verticales et bottom-nav actives.
+- Validation live locale: desktop 1440 affiche 360 lignes, nav `sticky row` 1404px, tableau 1366px; mobile 390 affiche 360 cards et bottom-nav visible.
+- QA: syntax `app.js`/`sw.js` OK, no conflict markers OK, `phase-finale-dashboard.spec.js` 4/4 desktop+mobile.
+- Cache/footer bumpes v35.465; `app.css` hash `89198144`.
