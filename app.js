@@ -15279,11 +15279,22 @@ const v36GeniusPicks = v36PickPool
 .filter(p => {
 const variance = Number(p.pred?.ensemble?.agreement_variance || 0);
 const componentCount = Number(p.pred?.ensemble?.sub_models?.length || 0);
+const marketBias = v37MarketBiasForPick(p.best || p);
+const marketAuc = v37MarketAucForPick(p.best || p);
+const angles = v37Array((v37AnglesByEvent.get(String(p.m?.id || '')) || {}).angles);
+const hasConflict = angles.some(a => a?.type === 'signal_conflict' || a?.type === 'market_uncertain');
+const sharpAligned = p.pred?.sharp_money?.aligned_with_pick === true;
+const marketSupport = sharpAligned || marketBias?.status === 'exploit' || marketAuc?.status === 'pass' || Number(p.score || 0) >= 84;
 return p.strict
 && p.rel >= 0.56
 && p.edge >= 0.01
 && variance <= 0.045
 && componentCount >= 2
+&& !hasConflict
+&& marketSupport
+&& marketBias?.status !== 'fade'
+&& marketAuc?.status !== 'exclude_low_auc'
+&& marketAuc?.status !== 'low_value_watch'
 && !p.pred?.league_bias;
 })
 .sort((a, b) => (b.score - a.score) || (b.rel - a.rel) || (a.ts - b.ts))
@@ -15296,7 +15307,7 @@ const v36GeniusSection = v36GeniusPicks.length ? `<section class="v36-genius-str
         <header>
           <span>GENIUS</span>
           <strong>Picks du genie</strong>
-          <em>${v36GeniusPicks.length} consensus rare${v36GeniusPicks.length > 1 ? 's' : ''} · modele + calibration + marche alignes</em>
+          <em>${v36GeniusPicks.length} consensus rare${v36GeniusPicks.length > 1 ? 's' : ''} · modele + marche + signaux sans conflit</em>
         </header>
         <div class="v36-genius-grid">${v36GeniusPicks.map(v36CompactCard).join('')}</div>
       </section>` : '';

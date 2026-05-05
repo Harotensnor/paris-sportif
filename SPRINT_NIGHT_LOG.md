@@ -397,3 +397,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - UX: ajout de barres par famille de signal (xG, buts attendus, Force/Elo, forme/contexte, H2H, signal annexe) avec pourcentages.
 - Cleanup: suppression de l'ancienne repartition fixe et d'une regex fragile; la calibration n'est plus affichee comme un faux -3%.
 - Mesure: syntax JS OK, bundle `app.js` 1,596,925 bytes sous cap; cache/footer bumpes v35.418.
+
+## Sprint v35.419 — AUTO 10/10 Picks du genie V2 prudents (02:54 UTC)
+- Produit: "Picks du genie" exige maintenant un support marche clair (smart money aligne, biais marche, AUC valide ou score 84+).
+- Garde-fou: exclusion des picks avec signaux contradictoires, marche incertain, marche a fade ou AUC faible/low value.
+- UX: la section reste rare et garde le max 1 pick par match pour eviter les doublons trompeurs.
+- Cache/footer bumpes v35.419; `app.js` hash `7f621642`.
