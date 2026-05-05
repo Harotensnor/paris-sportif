@@ -747,3 +747,12 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fallback: mode data-only et debug enrichis (scan pool, matches qualifies, rejection reasons, data-only scan pool) avec 30 lignes de secours au lieu de 10.
 - QA: syntax `app.js`/`run_dashboard_dry.js` OK, dry-run OK, `phase-finale-dashboard.spec.js` 8/8 desktop+mobile, bundle OK (`app.js` 1573.5 KB, `app.css` 260.4 KB).
 - Cache/footer bumpes v35.474; `app.js` hash `121d0591`, `app.css` hash `e464318c`, SW `paris-sportif-20260505-194306`.
+
+## Sprint v35.475 — AUTO 10/10 Qualite pronos dashboard (18:05 UTC)
+- Fix score: `v37OpportunityFor()` ne sature plus a 100/100; base et bonus reduits, score cappe par edge/confiance, et vrais picks high-conviction preserves sans transformer tout le tableau en "conviction forte".
+- Fix edge: edge affiche plafonne a +25%; les edges bruts >30% sont logges `edge_anormal_cap` et badges "Edge plafonne" au lieu de faire remonter des signaux hallucines.
+- Fix coherence: contradiction `BTTS Oui` vs `teamTotal Under 0.5` interdite; dedup renforce sur libelle+cote; cap strict max 2 picks par match et max 5 picks `ht_ou_15` dans le tableau.
+- Fix UX visible: suppression des commentaires HTML leaks, libelle pipeline clarifie (`Pipeline OK · alertes mineures`), calibration Brier 0.23 = bonne/acceptable au lieu de "mediocre".
+- Mesures: dry-run `current` 215 picks / 130 matchs qualifies; scenario Theo stale 397 min 213 picks; tiers non vides dont 1 Outsider; max edge affiche +25%.
+- QA: `phase-finale-dashboard.spec.js` 10/10, `run_dashboard_dry.js` OK, `a11y_audit.js` 0 critical/serious/moderate, `lighthouse_audit.js` 100/100/100 mobile+desktop, `node --check app.js/sw.js` OK, `check_bundle_size.py` OK (`app.js` 1579.3 KB < 1750 KB).
+- Cache/footer bumpes v35.475; `app.js` hash `9a270a22`, `app.css` hash `e464318c`, SW `paris-sportif-20260505-180559`.
