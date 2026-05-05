@@ -6694,12 +6694,47 @@ message: artifact?.message || '',
 generatedAt: artifact?.generated_at || null,
 };
 }
+function applyCalibrationMethodV5(prob, sport) {
+const artifact = (typeof window !== 'undefined') ? window.CALIBRATION_METHOD_V5 : null;
+if (!artifact || !Number.isFinite(Number(prob))) return prob;
+const key = String(sport || '').toLowerCase();
+const row = artifact.by_sport?.[key] || artifact.global || null;
+if (!row || !row.active || row.method === 'none') return prob;
+const p = Math.max(0.001, Math.min(0.999, Number(prob)));
+if (row.method === 'platt' && row.platt) {
+const z = Math.log(p / (1 - p));
+const out = 1 / (1 + Math.exp(-((Number(row.platt.intercept) || 0) + (Number(row.platt.slope) || 1) * z)));
+return Math.max(0.02, Math.min(0.98, out));
+}
+if (row.method === 'isotonic' && Array.isArray(row.isotonic?.knots)) {
+const knots = row.isotonic.knots;
+for (const k of knots) {
+if (p >= Number(k[0]) && p <= Number(k[1])) return Math.max(0.02, Math.min(0.98, Number(k[2]) || p));
+}
+if (knots.length) return p < Number(knots[0][0]) ? Number(knots[0][2]) || p : Number(knots[knots.length - 1][2]) || p;
+}
+return prob;
+}
+function getCalibrationMethodV5DebugSummary() {
+const artifact = (typeof window !== 'undefined') ? window.CALIBRATION_METHOD_V5 : null;
+const sports = artifact?.by_sport || {};
+return {
+loaded: !!artifact,
+global: artifact?.global || null,
+activeSports: Object.entries(sports).filter(([, v]) => v?.active).map(([k]) => k),
+bySport: sports,
+policy: artifact?.policy || '',
+generatedAt: artifact?.generated_at || null,
+};
+}
 try {
 window.getStackingMetaV5Nudge = getStackingMetaV5Nudge;
 window.getStackingMetaV5DebugSummary = getStackingMetaV5DebugSummary;
 window.getFeatureEngineeringV5DebugSummary = getFeatureEngineeringV5DebugSummary;
 window.getModelVersionsV5DebugSummary = getModelVersionsV5DebugSummary;
 window.getFeatureDriftV5DebugSummary = getFeatureDriftV5DebugSummary;
+window.applyCalibrationMethodV5 = applyCalibrationMethodV5;
+window.getCalibrationMethodV5DebugSummary = getCalibrationMethodV5DebugSummary;
 } catch (e) {}
 
 let __predCache = new Map();
@@ -7238,9 +7273,10 @@ return _markSuspectIfHugeEdge(p, match);
 const sport = match && match.sport ? match.sport : null;
 const leagueCode = match && match.league_code ? match.league_code : null;
 const adjusted = _calibrateProb(p.reliability, sport, leagueCode, '1n2');
-const out = adjusted === p.reliability
+const adjustedV5 = applyCalibrationMethodV5(adjusted, sport);
+const out = adjustedV5 === p.reliability
 ? p
-: { ...p, reliability: adjusted, reliability_raw: p.reliability, calibrated: true };
+: { ...p, reliability: adjustedV5, reliability_raw: p.reliability, calibrated: true, calibration_v5: adjustedV5 !== adjusted };
 return _markSuspectIfHugeEdge(out, match);
 }
 function _markSuspectIfHugeEdge(p, match) {
@@ -17568,6 +17604,7 @@ stackingMetaV5: getStackingMetaV5DebugSummary(),
 featureEngineeringV5: getFeatureEngineeringV5DebugSummary(),
 modelVersionsV5: getModelVersionsV5DebugSummary(),
 featureDriftV5: getFeatureDriftV5DebugSummary(),
+calibrationMethodV5: getCalibrationMethodV5DebugSummary(),
 seasonPhase: getSeasonPhaseDebugSummary(),
 starPlayers: getStarPlayersDebugSummary(),
 xgDecay: getXGDecayDebugSummary(),
@@ -23776,6 +23813,24 @@ return `<section style="margin-top:32px;">
           </div>
         </section>`;
 })();
+const v5CalibrationHtml = (() => {
+const data = window.CALIBRATION_METHOD_V5 || null;
+if (!data) return '';
+const rows = Object.entries(data.by_sport || {}).sort((a, b) => (b[1]?.n || 0) - (a[1]?.n || 0));
+return `<section style="margin-top:32px;">
+          <h2 class="page-h2">🎚 Calibration V5</h2>
+          <div style="padding:14px;background:var(--panel);border:1px solid var(--border);border-radius:12px;">
+            <div style="font-size:12px;color:var(--text-dim);margin-bottom:8px;">Platt scaling et isotonic regression sont comparés par sport. Le modèle applique une correction seulement si le Brier gagne au moins 0.005.</div>
+            ${rows.map(([sport, r]) => `<div style="display:grid;grid-template-columns:1fr 70px 90px 90px 90px;gap:8px;padding:6px 0;border-top:1px solid var(--border);font-size:12px;align-items:center;">
+              <b>${esc(sport)}</b>
+              <span>n=${Number(r.n || 0)}</span>
+              <span>${esc(r.method || 'none')}</span>
+              <span>Brier ${Number(r.baseline_brier || 0).toFixed(3)}</span>
+              <span style="color:${r.active ? 'var(--accent)' : 'var(--text-dim)'};">${r.active ? 'actif' : 'neutre'}</span>
+            </div>`).join('')}
+          </div>
+        </section>`;
+})();
 wrap.innerHTML = `
       <div style="max-width:900px;margin:0 auto;padding:16px 12px 40px;">
         <div style="padding:40px 0 16px;border-bottom:1px solid var(--border);">
@@ -23811,6 +23866,7 @@ wrap.innerHTML = `
         ${v5StackingHtml}
         ${v5FeatureEngineeringHtml}
         ${v5ModelVersionsHtml}
+        ${v5CalibrationHtml}
 
         <section style="margin-top:32px;">
           <h2 class="page-h2">🧮 Comment le modèle décide</h2>

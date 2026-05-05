@@ -1128,3 +1128,12 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Tests: suite model-v5 passe desktop + mobile Chromium (10/10); app.js syntax OK; drift pipeline OK.
 - Cache/footer bumpés v37.005; app.js hash 38fe472d; drift hash 951026df; SW paris-sportif-20260505-230639.
 
+
+## Sprint v37.006 — AUTO 10/10 Phase V5 F calibration sklearn-like (23:09 UTC)
+- Data: build_calibration_method_v5.py compare Platt scaling et isotonic regression par sport.
+- Modèle: applyCalibrationMethodV5 corrige la fiabilité seulement si le Brier gagne au moins 0.005.
+- Crédibilité/debug: choix calibration V5 visible avec méthode, Brier baseline et statut actif/neutre.
+- Pipeline: refresh.yml et auto_refresh.py reconstruisent calibration_method.json/js avant model_versions.
+- Tests: suite model-v5 passe desktop + mobile Chromium (12/12); app.js syntax OK; drift pipeline OK.
+- Cache/footer bumpés v37.006; app.js hash ac919c63; calibration hash daca389a; SW paris-sportif-20260505-230938.
+
