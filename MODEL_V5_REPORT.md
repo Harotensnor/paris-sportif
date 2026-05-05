@@ -84,3 +84,13 @@ Task weights:
 | Score exact | 6.1% |
 
 Guardrail: la couche multi-task expose la vérité par marché dans `?debug=1` et Crédibilité, mais ne force aucun ajustement agressif sans preuve backtest.
+
+## Section K — Backtest deep
+
+- Status: **active**
+- Artifact: `backtest_deep_v5.json`
+- Report: `BACKTEST_DEEP_V5.md`
+- Breakdown: sport, ligue, bucket de cote, marché, mois et météo.
+- Worst zones: 5 zones triées par risque ROI/Brier, avec recommandations.
+
+Limitation documentée: le repo local ne contient actuellement que la fenêtre historisée disponible dans `backtest_training_rows.jsonl`; la demande 24 mois est conservée dans l'artefact, sans inventer d'historique absent.
