@@ -13914,7 +13914,20 @@ if (closeBtn) closeBtn.focus({ preventScroll: true });
 if (window.matchMedia('(max-width: 720px)').matches) {
 const sheet = modal.querySelector('.modal');
 const head = modal.querySelector('.modal-head');
-if (sheet && head && !sheet.dataset.dragWired) {
+const handle = modal.querySelector('.modal-drag-handle');
+if (sheet) {
+const snaps = ['50', '90', 'full'];
+const snapIndex = () => Math.max(0, snaps.indexOf(sheet.dataset.sheetSnap || '90'));
+const setSheetSnap = (snap, vibrate = false) => {
+const safeSnap = snaps.includes(snap) ? snap : '90';
+sheet.dataset.sheetSnap = safeSnap;
+sheet.style.transition = 'height 200ms cubic-bezier(.32,.72,0,1), max-height 200ms cubic-bezier(.32,.72,0,1), transform 200ms cubic-bezier(.32,.72,0,1)';
+sheet.style.transform = '';
+try { if (vibrate && navigator.vibrate) navigator.vibrate(6); } catch(e) {}
+};
+setSheetSnap('90', false);
+window.__v36DetailSheetSnap = setSheetSnap;
+if ((handle || head) && !sheet.dataset.dragWired) {
 let startY = 0;
 let currentY = 0;
 let dragging = false;
@@ -13926,6 +13939,7 @@ return;
 }
 const t = e.touches ? e.touches[0] : e;
 startY = t.clientY;
+currentY = 0;
 dragging = true;
 sheet.style.transition = 'none';
 };
@@ -13933,16 +13947,28 @@ const onMove = (e) => {
 if (!dragging) return;
 const t = e.touches ? e.touches[0] : e;
 const dy = t.clientY - startY;
-if (dy > 0) {
 currentY = dy;
-sheet.style.transform = `translateY(${dy}px)`;
-}
+try { if (e.cancelable) e.preventDefault(); } catch(err) {}
+const elastic = dy < 0 ? dy * 0.35 : dy;
+sheet.style.transform = `translateY(${elastic}px)`;
 };
-const onEnd = () => {
+const onEnd = (e) => {
 if (!dragging) return;
 dragging = false;
+const endTouch = e && e.changedTouches && e.changedTouches[0];
+if (endTouch && currentY === 0) currentY = endTouch.clientY - startY;
 sheet.style.transition = 'transform 200ms cubic-bezier(.32,.72,0,1)';
-if (currentY > 100) {
+const closeDistance = sheet.dataset.sheetSnap === '50' ? 92 : Math.min(220, window.innerHeight * 0.24);
+if (currentY > closeDistance) {
+sheet.style.transform = 'translateY(100%)';
+setTimeout(() => {
+if (typeof window.closeDetailModal === 'function') window.closeDetailModal();
+sheet.style.transform = '';
+sheet.style.transition = '';
+}, 200);
+} else if (currentY > 64) {
+const idx = snapIndex();
+if (idx <= 0) {
 sheet.style.transform = 'translateY(100%)';
 setTimeout(() => {
 if (typeof window.closeDetailModal === 'function') window.closeDetailModal();
@@ -13950,15 +13976,23 @@ sheet.style.transform = '';
 sheet.style.transition = '';
 }, 200);
 } else {
+setSheetSnap(snaps[idx - 1], true);
+}
+} else if (currentY < -64) {
+const idx = snapIndex();
+setSheetSnap(snaps[Math.min(snaps.length - 1, idx + 1)], true);
+} else {
 sheet.style.transform = '';
 }
 currentY = 0;
 };
-head.addEventListener('touchstart', onStart, { passive: true });
-head.addEventListener('touchmove', onMove, { passive: true });
-head.addEventListener('touchend', onEnd, { passive: true });
-head.addEventListener('touchcancel', onEnd, { passive: true });
+const dragZone = handle || head;
+dragZone.addEventListener('touchstart', onStart, { passive: true });
+dragZone.addEventListener('touchmove', onMove, { passive: false });
+dragZone.addEventListener('touchend', onEnd, { passive: true });
+dragZone.addEventListener('touchcancel', onEnd, { passive: true });
 sheet.dataset.dragWired = '1';
+}
 }
 }
 if (window._modalTrapRelease) window._modalTrapRelease();

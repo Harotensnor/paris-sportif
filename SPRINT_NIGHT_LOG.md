@@ -1022,3 +1022,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Tests: `mobile-pull-to-refresh.spec.js` passe mobile Chromium (1/1); `app.js` syntax OK; drift pipeline OK.
 - Cache/footer bumpes v36.027; `app.js` hash `180b2b44`, SW `paris-sportif-20260505-221908`.
 
+## Sprint v36.028 — AUTO 10/10 Phase 8 EEE modal bottom sheet (22:22 UTC)
+- Mobile: la modal détail devient un bottom sheet avec poignée visible et hauteur initiale 90vh.
+- Interaction: glissé haut vers full, glissé bas vers 90 puis 50, puis fermeture depuis 50.
+- Robustesse: le snap se décide aussi depuis la position finale du doigt si `touchmove` manque.
+- Tests: `mobile-bottom-sheet.spec.js` passe mobile Chromium (1/1); `app.js` syntax OK; drift pipeline OK.
+- Cache/footer bumpes v36.028; `app.js` hash `db5c649c`, SW `paris-sportif-20260505-222229`.
+
