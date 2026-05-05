@@ -665,3 +665,8 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - QA: `modal-tabs.spec.js` ouvre maintenant le panneau "Voir les details techniques" avant de valider les onglets, ce qui colle au parcours utilisateur actuel.
 - Robustesse: la spec force le chargement full data quand le boot part de `data_lite.js`, puis teste les onglets visibles dans le panneau technique sur sports representatifs.
 - Mesure: `tests/modal-tabs.spec.js` passe 2/2 desktop + mobile.
+
+## Sprint v35.463 — AUTO 10/10 A11y 5 hubs (15:54 UTC)
+- QA: l'audit Playwright axe ne cible plus les anciennes routes SPA `locks/calendrier/bilan/alertes`; il couvre les hubs V37 actuels: Tous, Performance, Academie, Profil.
+- Stabilite: le setup a11y initialise consentement, onboarding et auto-refresh session pour eviter les overlays parasites.
+- Mesure: `tests/a11y-axe.spec.js` passe 24/24 desktop + mobile, 0 violation serious/critical.
