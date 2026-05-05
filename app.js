@@ -7128,10 +7128,11 @@ const pickOdd = best_pick[2] === '1' ? best?.home : best_pick[2] === '2' ? best?
 const pickEdge = Number(pickOdd) > 1 ? reliability - (1 / Number(pickOdd)) : null;
 const dqNow = (typeof computeDataQuality === 'function') ? computeDataQuality(match) : { score: 4, max: 4 };
 const abstainReasons = [];
-const minPureComponents = match.sport === 'tennis' ? 1 : 2;
+const minPureComponents = sportKey === 'football' ? 2 : 1;
+const ensembleMissing = !ensembleMeta || pureCompCount < minPureComponents;
 if (reliability < 0.50) abstainReasons.push('confidence_lt_50');
 if (pickEdge != null && pickEdge < 0.02) abstainReasons.push('edge_lt_2pt');
-if (!ensembleMeta || pureCompCount < minPureComponents) abstainReasons.push('ensemble_insufficient');
+if (ensembleMissing) abstainReasons.push('ensemble_insufficient');
 if ((ensembleMeta?.agreement_variance || 0) > 0.15) abstainReasons.push('model_disagreement');
 if ((Number(dqNow?.score) || 0) < 2) abstainReasons.push('data_quality_lt_2');
 const abstain = {
@@ -7165,7 +7166,7 @@ return thinSports.has(match.sport)
 lowConf: reliability < 0.50,
 skip: abstain.active
 || reliability < 0.50
-|| pureCompCount < minPureComponents
+|| ensembleMissing
 || (match.sport === 'tennis'
 && !match.tennis_features
 && home?.rank && away?.rank
