@@ -881,3 +881,11 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Pipeline: `build_stadium_effects.py` branché dans cron local/GHA/health; drift pipeline OK.
 - QA: `app.js` syntax OK, scripts Python compilés, health warning non critique.
 - Cache/footer bumpes v36.008; `app.js` hash `b22ac91c`, `stadium_effects.js` hash `59ba8826`, SW `paris-sportif-20260505-211842`.
+
+## Sprint v36.009 — AUTO 10/10 Modèle V4 KK coach tenure (21:20 UTC)
+- Coach: `coach_tenure.json` couvre 427 équipes avec statut stable/new_manager/long_tenure et ajustement fiabilité borné.
+- Manuel: `manager_changes.json` initialisé pour permettre un reset forme 5 matchs sans changer le code.
+- Modèle: `predictMatch()` applique -5pt pour nouveau coach ou +3pt long tenure quand le side concerné est pické.
+- Modal/debug: badges coach et `?debug=1.coachTenure` exposent le signal.
+- Pipeline: `build_coach_tenure.py` branché dans cron local/GHA/health; drift pipeline OK.
+- Cache/footer bumpes v36.009; `app.js` hash `0c3a1cd4`, `coach_tenure.js` hash `cde016ac`, SW `paris-sportif-20260505-212035`.

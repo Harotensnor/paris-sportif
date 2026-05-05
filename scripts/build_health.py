@@ -298,6 +298,9 @@ SOURCES = [
     ('stadium_effects', 'stadium_effects.json', lambda d: {
         'stadiums': (d.get('stadium_count') or len(d.get('stadiums') or {})) if isinstance(d, dict) else 0,
     }),
+    ('coach_tenure', 'coach_tenure.json', lambda d: {
+        'teams': (d.get('team_count') or len(d.get('teams') or {})) if isinstance(d, dict) else 0,
+    }),
     ('data_quality_report', 'data_quality_report.json', lambda d: {
         'events_quarantined': (d.get('events_quarantined') or 0) if isinstance(d, dict) else 0,
         'status': (d.get('status') or 'unknown') if isinstance(d, dict) else 'missing',
