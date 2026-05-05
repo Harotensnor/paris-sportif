@@ -439,3 +439,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Gaps: `list_data_gaps` marque `referee_exact` quand seul le contexte de ligue existe, et `referee` seulement quand aucun signal arbitre n'est disponible.
 - Mesure: smoke MCP OK, shadow audit OK, `referee_exact=5`, `referee_context=101`, `referee_signal=106`.
 - Cache/footer bumpes v35.425.
+
+## Sprint v35.426 — AUTO 10/10 Table training LightGBM (10:17 UTC)
+- Modele: ajout de `build_backtest_training_rows.py`, qui exporte des lignes JSONL locales depuis les matchs Winamax 1N2 regles.
+- Pipeline: `auto_refresh.py`, `refresh.yml` et `health.json` suivent maintenant `backtest_training_rows_summary.json` avant `train_lightgbm.py`.
+- Mesure: 49 lignes generees, 19 positives, 4 sports; LightGBM passe en `row_level_table_detected_training_pending`; audit runtime OK.
+- Cache/footer bumpes v35.426; `lightgbm_weights.js` hash `acc94279`.

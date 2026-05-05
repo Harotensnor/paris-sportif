@@ -180,6 +180,7 @@ jobs:
             python3 build_league_bias_audit.py || true
             python3 build_betting_intelligence.py || true
             python3 build_market_auc.py || true
+            python3 build_backtest_training_rows.py || true
             python3 train_lightgbm.py || true
             python3 build_lightgbm_runtime.py || true
             python3 audit_lightgbm_runtime.py
@@ -329,6 +330,7 @@ jobs:
             league_inefficiencies.json market_biases_by_league.json detected_angles.json rare_signals.json timing_edges.json \
             daily_insights.json \
             market_auc_report.json \
+            backtest_training_rows.jsonl backtest_training_rows_summary.json \
             lightgbm_weights.json lightgbm_weights.js \
             rugby_markets.json niche_markets.json \
             boosted_odds.json \
