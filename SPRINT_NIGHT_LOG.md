@@ -2,6 +2,12 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
+## Sprint v35.440 — AUTO 10/10 Section K1 inefficiences v2 (11:05 UTC)
+- Innovation K1 : `league_inefficiencies.json` passe en schema v2 avec `action`, `direction_net`, `sample_quality` et score de fiabilite modele.
+- Mesure : 34 ligues, 5 actionnables, 27 watch sample; MLB reste boostable avec 42 events courants, NBA/NHL deviennent deprioritize low value.
+- Garde-fou : les samples insuffisants restent `watch_more_sample`, pas d'exploitation forcee malgre ROI extreme.
+- Validation : `audit_intelligence_consistency.py` OK; cache/footer bumpes v35.440.
+
 ## Sprint v35.439 — AUTO 10/10 Section J Rugby watch (11:04 UTC)
 - Extension J8 : `build_rugby_markets.py` ne renvoie plus un simple empty quand la source voit du rugby mais Winamax exact non.
 - Mesure : 1 match rugby source Sofascore en watchlist, 0 bookable, 0 marche derive; status `watch` explicite dans `rugby_markets.json`.
