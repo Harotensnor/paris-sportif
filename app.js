@@ -1950,7 +1950,7 @@ return `Mise : ${n.toFixed(2)}€/100€`;
 function fmtCalibrationHuman(brier) {
 const n = Number(brier);
 if (!isFinite(n)) return 'Calibration : en apprentissage';
-const label = n <= 0.15 ? 'excellente' : n <= 0.20 ? 'bonne' : n <= 0.24 ? 'correcte' : 'à surveiller';
+const label = n < 0.20 ? 'excellente' : n <= 0.235 ? 'bonne' : n <= 0.27 ? 'acceptable' : 'médiocre';
 return `Calibration : ${label}`;
 }
 function fmtClvHuman(clv) {
@@ -3216,6 +3216,8 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     if (a.market === b.market && a.pick && b.pick && a.pick !== b.pick && (!Number.isFinite(a.line) || !Number.isFinite(b.line) || Math.abs(a.line - b.line) < 0.01)) return false;
     const bttsUnder15 = (x, y) => x.market === 'btts' && x.pick === 'Yes' && /^ou/.test(y.market) && y.pick === 'Under' && Number.isFinite(y.line) && y.line <= 1.5;
     if (bttsUnder15(a, b) || bttsUnder15(b, a)) return false;
+    const bttsTeamNoGoal = (x, y) => x.market === 'btts' && x.pick === 'Yes' && String(y.market || '').startsWith('teamTotal:') && y.pick === 'Under' && Number.isFinite(y.line) && y.line <= 0.5;
+    if (bttsTeamNoGoal(a, b) || bttsTeamNoGoal(b, a)) return false;
     const oneDc = (one, dc) => one.market === '1n2' && dc.market === 'doubleChance' && ((one.pick === '1' && dc.pick === 'X2') || (one.pick === '2' && dc.pick === '1X') || (one.pick === 'X' && dc.pick === '12'));
     if (oneDc(a, b) || oneDc(b, a)) return false;
     const oneDnb = (one, dnb) => one.market === '1n2' && dnb.market === 'dnb' && ((one.pick === '1' && dnb.pick === '2') || (one.pick === '2' && dnb.pick === '1') || one.pick === 'X');
@@ -14653,6 +14655,7 @@ const v37BadgeTooltip = (badge) => ({
 'Data fraîche': 'Le snapshot data est récent.',
 'Data vieillissante': 'Le snapshot data est ancien : vérifier avant de miser.',
 'Prudence data': 'Signal incomplet sur une source importante.',
+'Edge plafonné': 'Le modèle a détecté un edge trop haut pour être crédible : affichage plafonné et score réduit.',
 'Ton profil sport +': 'Tes paris suivis performent mieux sur ce sport.',
 'Ton profil sport -': 'Tes paris suivis performent moins bien sur ce sport.',
 'Ton profil ligue +': 'Tes paris suivis performent mieux sur cette ligue.',
@@ -14671,15 +14674,19 @@ const timing = v37TimingByEvent.get(id) || null;
 const gap = v37GapByEvent.get(id) || null;
 const missingSignals = v37Array(gap?.missing).filter(Boolean);
 const signedScore = (value) => `${value >= 0 ? '+' : ''}${Number(value).toFixed(1)}`;
-const scoreParts = ['Base 48'];
+const rawEdge = Number.isFinite(Number(edge)) ? Number(edge) : 0;
+const edgeForScore = Math.max(-0.25, Math.min(0.25, rawEdge));
+const edgeWasCapped = Math.abs(rawEdge - edgeForScore) > 0.0001;
+const edgeAnomalous = rawEdge > 0.30;
+const scoreParts = ['Base 36'];
 const addScorePart = (name, value) => {
 const num = Number(value || 0);
 if (Math.abs(num) >= 0.4) scoreParts.push(`${name} ${signedScore(num)}`);
 return num;
 };
-const edgePart = Math.max(-12, Math.min(24, edge * 180));
-const confidencePart = Math.max(-8, Math.min(18, (rel - 0.50) * 90));
-let score = 48 + addScorePart('Edge', edgePart) + addScorePart('Confiance', confidencePart);
+const edgePart = Math.max(-10, Math.min(15, edgeForScore * 60));
+const confidencePart = Math.max(-12, Math.min(12, (rel - 0.54) * 50));
+let score = 36 + addScorePart('Edge', edgePart) + addScorePart('Confiance', confidencePart);
 const badges = [];
 const variance = Number(pred?.ensemble?.agreement_variance);
 const stabilityPart = Number.isFinite(variance)
@@ -14694,9 +14701,10 @@ score += addScorePart('Fraîcheur data', freshnessPart);
 if (freshnessPart >= 2) badges.push('data fraîche');
 else if (freshnessPart <= -6) badges.push('data vieillissante');
 let leaguePriorityBonus = 0;
-if (tier?.strict) { score += addScorePart('Tier strict', 6); badges.push('strict'); }
+if (edgeWasCapped) badges.push('edge plafonné');
+if (tier?.strict) { score += addScorePart('Tier strict', 3); badges.push('strict'); }
 if (league?.status === 'exploit') {
-leaguePriorityBonus = Math.min(10, 4 + Math.abs(Number(league.inefficiency_score || 0)) * 10);
+leaguePriorityBonus = Math.min(4, 2 + Math.abs(Number(league.inefficiency_score || 0)) * 6);
 score += addScorePart('Biais ligue', leaguePriorityBonus);
 badges.push('biais ligue +');
 } else if (league?.status === 'avoid') {
@@ -14704,10 +14712,10 @@ score += addScorePart('Ligue prudence', -Math.min(8, 3 + Math.abs(Number(league.
 badges.push('ligue froide');
 }
 if (marketBias?.status === 'exploit') {
-score += addScorePart('Biais marché', Math.min(9, 4 + Math.abs(Number(marketBias.edge_vs_50_pct || 0)) / 5));
+score += addScorePart('Biais marché', Math.min(4, 2 + Math.abs(Number(marketBias.edge_vs_50_pct || 0)) / 9));
 badges.push('marché biaisé +');
 } else if (marketBias?.status === 'fade') {
-score += addScorePart('Marché à fade', -Math.min(9, 4 + Math.abs(Number(marketBias.edge_vs_50_pct || 0)) / 5));
+score += addScorePart('Marché à fade', -Math.min(8, 3 + Math.abs(Number(marketBias.edge_vs_50_pct || 0)) / 7));
 badges.push('marché à fade');
 }
 if (marketAuc?.exclude_from_big_bets || marketAuc?.status === 'exclude_low_auc') {
@@ -14717,7 +14725,7 @@ badges.push('AUC faible');
 score += addScorePart('AUC marché', marketAuc?.status === 'low_value_watch' ? -5 : -2);
 badges.push('AUC à surveiller');
 } else if (marketAuc?.status === 'pass') {
-score += addScorePart('AUC marché', 3);
+score += addScorePart('AUC marché', 2);
 badges.push('AUC validée');
 }
 const uncertainMarket = angles.find(a => a?.type === 'market_uncertain');
@@ -14726,7 +14734,7 @@ score += addScorePart('Marché incertain', -Math.min(18, 9 + Number(uncertainMar
 badges.push('marché incertain');
 }
 const marketMove = !uncertainMarket ? angles.find(a => a?.type === 'market_move') : null;
-if (marketMove?.direction === 'steam') { score += addScorePart('Mouvement cote', 7); badges.push('steam cote'); }
+if (marketMove?.direction === 'steam') { score += addScorePart('Mouvement cote', 3); badges.push('steam cote'); }
 else if (marketMove?.direction === 'drift') { score += addScorePart('Mouvement cote', -5); badges.push('drift cote'); }
 const conflictAngle = angles.find(a => a?.type === 'signal_conflict');
 if (conflictAngle) {
@@ -14771,7 +14779,7 @@ const dataBonus = [
 m?.weather, m?.h2h, m?.xg, m?.lineups, m?.mlb_pitchers, m?.nhl_stats,
 m?.injuries, m?.referee
 ].filter(Boolean).length;
-score += addScorePart('Qualité data', Math.min(8, dataBonus));
+score += addScorePart('Qualité data', Math.min(3, dataBonus));
 if (dataBonus >= 5) badges.push('data riche');
 if (missingSignals.length) {
 const priority = Number(gap?.priority || 0);
@@ -14785,17 +14793,25 @@ if (profile.delta) {
 score += addScorePart('Profil Théo', profile.delta);
 profile.badges.slice(0, 2).forEach(b => badges.push(b));
 }
-const clean = Math.max(0, Math.min(100, Math.round(score)));
+let clean = Math.max(0, Math.min(100, Math.round(score)));
+if (edgeAnomalous) clean = Math.min(clean, 69);
+else if (edgeForScore < 0.015) clean = Math.min(clean, 58);
+else if (edgeForScore < 0.05) clean = Math.min(clean, 68);
+else if (edgeForScore < 0.10) clean = Math.min(clean, 78);
+if (rel < 0.35) clean = Math.min(clean, 58);
+if (rel < 0.20) clean = Math.min(clean, 48);
+if (!edgeAnomalous && edgeForScore >= 0.16 && rel >= 0.65) clean = Math.min(82, clean + 5);
+else if (!edgeAnomalous && edgeForScore >= 0.13 && rel >= 0.72) clean = Math.min(80, clean + 3);
 const friendlyBadges = badges.map(v37HumanBadge).filter(Boolean);
 const tooltip = [
 `Score d'opportunité ${clean}/100`,
 `Décomposition: ${scoreParts.join(' · ')}`,
-'Score plafonné entre 0 et 100; il combine edge, confiance, stabilité du signal, Fraîcheur data, biais marché, timing, signaux rares et profil Théo',
+'Score plafonné selon edge et confiance; il combine avantage, confiance, stabilité du signal, fraîcheur data, biais marché, timing, signaux rares et profil Théo',
 friendlyBadges.length ? friendlyBadges.join(' · ') : 'aucun angle spécial',
 conflictAngle?.context || '',
 uncertainMarket?.context ? `Marché incertain: ${uncertainMarket.context}` : '',
 rawRareDirectional !== rareDirectional ? `Biais ligue prioritaire: malus match ${rawRareDirectional.toFixed(1)} -> ${rareDirectional.toFixed(1)}` : '',
-`edge ${(edge * 100).toFixed(1)}%`,
+edgeWasCapped ? `edge affiché plafonné ${(edgeForScore * 100).toFixed(1)}% (brut ${(rawEdge * 100).toFixed(1)}%)` : `edge ${(edgeForScore * 100).toFixed(1)}%`,
 Number.isFinite(variance) ? `variance ensemble ${variance.toFixed(3)}` : 'variance ensemble indisponible',
 `data ${dataAge} min`,
 marketBias ? `${marketBias.label || 'marché'} ${marketBias.pick || ''}: ${marketBias.reason || marketBias.status}` : '',
@@ -14892,6 +14908,38 @@ return terminalScanPool.filter(m => v37DateMatchesFor(m, dateFilter) && v37PickI
 const v36TeamName = (team) => team?.short || team?.displayName || team?.name || '?';
 const v37PickUid = (m, candidate) => `${String(m?.id || '')}|${marketCandidateSignature(candidate)}`;
 const v37SoftEdgeFloor = -0.005;
+const v37EdgeDisplayCap = 0.25;
+const v37EdgeAnomalyThreshold = 0.30;
+const v37CapEdge = (value) => {
+const n = Number(value);
+return Number.isFinite(n) ? Math.max(-0.25, Math.min(v37EdgeDisplayCap, n)) : 0;
+};
+const v37CapEv = (value) => {
+const n = Number(value);
+return Number.isFinite(n) ? Math.max(-0.25, Math.min(0.35, n)) : -1;
+};
+const v37NormDisplayKey = (value) => String(value || '')
+.toLowerCase()
+.normalize('NFD')
+.replace(/[\u0300-\u036f]/g, '')
+.replace(/\s+/g, ' ')
+.trim();
+const v37IsHtOu15 = (p) => String(p?.market || '') === 'htTotal' && Math.abs(Number(p?.line) - 1.5) < 0.01;
+const v37MarketFamilyKey = (p) => v37IsHtOu15(p) ? 'ht_ou_15' : String(p?.market || '1n2');
+const v37GlobalMarketCap = (family) => family === 'ht_ou_15' ? 5 : Infinity;
+const v37BttsSide = (p) => {
+if (String(p?.market || '') !== 'btts') return '';
+const raw = v37NormDisplayKey(`${p?.pickKey || ''} ${p?.best?.side || ''} ${p?.labelFull || p?.label || ''}`);
+return raw.includes('btts_y') || raw.includes('oui') || raw.includes('yes') ? 'yes' : raw.includes('non') || raw.includes('no') ? 'no' : '';
+};
+const v37TeamNoGoalKey = (p) => {
+if (String(p?.market || '') !== 'teamTotal') return '';
+const line = Number(p?.line);
+const side = v37NormDisplayKey(`${p?.best?.side || ''} ${p?.pickKey || ''} ${p?.labelFull || p?.label || ''}`);
+if (!(Number.isFinite(line) && line <= 0.5 && (side.includes('under') || side.includes('moins') || side.includes(' u')))) return '';
+const team = p?.best?.teamName || p?.best?.raw?.team || p?.best?.team || p?.best?.raw?.side || p?.pickKey || p?.labelFull || p?.label || '';
+return v37NormDisplayKey(team) || 'team';
+};
 const v36TierForCandidate = (c) => {
 const odd = Number(c?.odd || 0);
 const conf = Number(c?.rel || c?.prob || 0);
@@ -14978,20 +15026,26 @@ seen.add(key);
 return true;
 })
 .map(c => {
-const tier = v36TierForCandidate(c);
 const rel = Number(c.rel || c.prob || 0);
 const odd = Number(c.odd || 0);
-const edge = Number.isFinite(Number(c.edge)) ? Number(c.edge) : (rel - 1 / odd);
-const ev = Number.isFinite(Number(c.ev)) ? Number(c.ev) : (rel * odd - 1);
+const rawEdge = Number.isFinite(Number(c.edge)) ? Number(c.edge) : (rel - 1 / odd);
+const rawEv = Number.isFinite(Number(c.ev)) ? Number(c.ev) : (rel * odd - 1);
+const edge = v37CapEdge(rawEdge);
+const ev = v37CapEv(rawEv);
+const edgeCapped = Math.abs(rawEdge - edge) > 0.0001;
+const edgeAnomaly = rawEdge > v37EdgeAnomalyThreshold;
+const tier = v36TierForCandidate({ ...c, edge, ev });
 if (!(rel > 0)) { v37Reject('conf_lte_0', m, c.label || c.market || ''); return null; }
+if (edgeAnomaly) v37Reject('edge_anormal_cap', m, `${c.market || ''} @${odd.toFixed(2)} edge brut ${(rawEdge*100).toFixed(1)}%`);
 if (!tier) {
 v37Reject(edge < v37SoftEdgeFloor ? 'edge_lte_0' : ev < v37SoftEdgeFloor ? 'ev_lte_0' : 'pas_de_tier_match', m, `${c.market || ''} @${odd.toFixed(2)} conf ${(rel*100).toFixed(0)} edge ${(edge*100).toFixed(1)} ev ${(ev*100).toFixed(1)}`);
 return null;
 }
 const investmentScoreValue = Number(c.investment?.score || 0);
 const intel = v37OpportunityFor(m, tier, rel, edge, ev, odd, c, pred);
+const opportunityBadges = edgeCapped ? ['Edge plafonné'].concat(intel.badges || []) : (intel.badges || []);
 return {
-m, pred, best: c, tier: tier.id, strict: tier.strict, odd, rel, edge, ev,
+m, pred, best: c, tier: tier.id, strict: tier.strict, odd, rel, edge, ev, rawEdge, rawEv, edgeCapped, edgeAnomaly,
 pickUid: v37PickUid(m, c),
 label: c.shortLabel || c.label || pred.pick?.label || 'Pick',
 labelFull: c.label || pred.pick?.label || 'Pick',
@@ -15003,10 +15057,10 @@ market: c.market || '1n2',
 line: c.line ?? '',
 pickKey: c.pickValue || c.pickKey || c.key || pred.pick?.key || '',
 opportunity: intel.score,
-opportunityBadges: intel.badges,
-opportunityTooltip: intel.tooltip,
+opportunityBadges,
+opportunityTooltip: edgeCapped ? `${intel.tooltip} · Edge brut ${(rawEdge * 100).toFixed(1)}% plafonné à ${(edge * 100).toFixed(1)}% pour éviter un faux signal.` : intel.tooltip,
 ts: new Date(m.date || 0).getTime(),
-score: (tier.strict ? 120 : 0) + investmentScoreValue + intel.score * 0.5 + Math.max(-20, edge * 100) + rel * 10 - (pred.abstain?.active ? 12 : 0)
+score: (tier.strict ? 24 : 0) + Math.min(60, investmentScoreValue) * 0.55 + intel.score * 0.7 + Math.max(-12, edge * 70) + rel * 6 - (edgeAnomaly ? 18 : 0) - (pred.abstain?.active ? 12 : 0)
 };
 })
 .filter(Boolean)
@@ -15017,6 +15071,10 @@ return v37TakeDiverseCandidates(ranked, m);
 }).sort((a, b) => a.ts - b.ts);
 const v36PickPool = (() => {
 const seenPick = new Set();
+const seenDisplay = new Set();
+const matchCounts = new Map();
+const marketCounts = new Map();
+const matchSignals = new Map();
 const out = [];
 const ranked = v36PickPoolRaw.slice().sort((a, b) =>
 (Number(b.strict) - Number(a.strict))
@@ -15026,8 +15084,58 @@ const ranked = v36PickPoolRaw.slice().sort((a, b) =>
 for (const p of ranked) {
 const matchKey = String(p.m?.id || `${p.m?.date || ''}|${v36TeamName(getSides(p.m).home)}|${v36TeamName(getSides(p.m).away)}`);
 const pickKey = `${matchKey}|${p.tier || ''}|${p.market || ''}|${p.pickKey || ''}|${p.line ?? ''}|${Number(p.odd || 0).toFixed(2)}`;
-if (seenPick.has(pickKey)) continue;
+const displayKey = `${matchKey}|${p.tier || ''}|${p.market || ''}|${v37NormDisplayKey(p.labelFull || p.label || '')}|${Number(p.odd || 0).toFixed(2)}`;
+if (seenPick.has(pickKey) || seenDisplay.has(displayKey)) { v37Reject('doublon_exact_filtre', p.m, p.labelFull || p.label || ''); continue; }
+const matchCount = matchCounts.get(matchKey) || 0;
+if (matchCount >= 2) { v37Reject('cap_match_2', p.m, p.labelFull || p.label || ''); continue; }
+const family = v37MarketFamilyKey(p);
+const familyCount = marketCounts.get(family) || 0;
+const familyCap = v37GlobalMarketCap(family);
+if (familyCount >= familyCap) { v37Reject('cap_marche_global', p.m, family); continue; }
+const signals = matchSignals.get(matchKey) || { bttsYes: false, teamNoGoal: new Set() };
+const bttsSide = v37BttsSide(p);
+const noGoalTeam = v37TeamNoGoalKey(p);
+if ((bttsSide === 'yes' && signals.teamNoGoal.size) || (noGoalTeam && signals.bttsYes)) {
+v37Reject('contradiction_btts_teamtotal', p.m, p.labelFull || p.label || '');
+continue;
+}
 seenPick.add(pickKey);
+seenDisplay.add(displayKey);
+matchCounts.set(matchKey, matchCount + 1);
+marketCounts.set(family, familyCount + 1);
+if (bttsSide === 'yes') signals.bttsYes = true;
+if (noGoalTeam) signals.teamNoGoal.add(noGoalTeam);
+matchSignals.set(matchKey, signals);
+out.push(p);
+}
+for (const tierDef of v36TierDefs) {
+if (out.some(p => p.tier === tierDef.id)) continue;
+const p = ranked.find(x => x.tier === tierDef.id);
+if (!p) continue;
+const matchKey = String(p.m?.id || `${p.m?.date || ''}|${v36TeamName(getSides(p.m).home)}|${v36TeamName(getSides(p.m).away)}`);
+const pickKey = `${matchKey}|${p.tier || ''}|${p.market || ''}|${p.pickKey || ''}|${p.line ?? ''}|${Number(p.odd || 0).toFixed(2)}`;
+const displayKey = `${matchKey}|${p.tier || ''}|${p.market || ''}|${v37NormDisplayKey(p.labelFull || p.label || '')}|${Number(p.odd || 0).toFixed(2)}`;
+if (seenPick.has(pickKey) || seenDisplay.has(displayKey)) continue;
+const currentMatchCount = matchCounts.get(matchKey) || 0;
+if (currentMatchCount >= 2) {
+const replaceIdx = out.findIndex(x => String(x.m?.id || `${x.m?.date || ''}|${v36TeamName(getSides(x.m).home)}|${v36TeamName(getSides(x.m).away)}`) === matchKey && x.tier !== tierDef.id);
+if (replaceIdx < 0) continue;
+out.splice(replaceIdx, 1);
+matchCounts.set(matchKey, currentMatchCount - 1);
+}
+const signals = matchSignals.get(matchKey) || { bttsYes: false, teamNoGoal: new Set() };
+const bttsSide = v37BttsSide(p);
+const noGoalTeam = v37TeamNoGoalKey(p);
+if ((bttsSide === 'yes' && signals.teamNoGoal.size) || (noGoalTeam && signals.bttsYes)) continue;
+seenPick.add(pickKey);
+seenDisplay.add(displayKey);
+matchCounts.set(matchKey, (matchCounts.get(matchKey) || 0) + 1);
+const family = v37MarketFamilyKey(p);
+marketCounts.set(family, (marketCounts.get(family) || 0) + 1);
+if (bttsSide === 'yes') signals.bttsYes = true;
+if (noGoalTeam) signals.teamNoGoal.add(noGoalTeam);
+matchSignals.set(matchKey, signals);
+v37Reject('tier_backfill', p.m, tierDef.id);
 out.push(p);
 }
 return out.sort((a, b) => a.ts - b.ts);
@@ -18115,13 +18223,6 @@ ${_nUpcoming > 0 ? `<button type="button" class="ed-hero__secondary page-btn" da
 </nav>`;
         })()}
 
-             surchargée selon retour user). La streak du modèle reste visible
-             dans Bilan / Crédibilité ; les sports en perte sont visibles
-             dans Crédibilité aussi. Le dashboard se recentre sur ce qui est
-             actionable maintenant : top picks + 5 derniers + warning data. -->
-
-             que l'user n'enregistre pas). Le focus du dashboard est sur les
-             pronos du modèle, pas sur le bilan personnel. -->
         ${(() => {
           // on liste les 5 dernières évaluations de l'agent (won/lost) avec
           // le résultat, l'edge et le P&L flat 1u — pour que l'user voie ce
@@ -18325,11 +18426,6 @@ return `<div style="margin:8px 0;padding:8px 10px;background:rgba(255,255,255,.0
 <div><span style="color:var(--text-dim);border-bottom:1px dotted var(--text-dim);cursor:help;" title="Confiance du modèle : probabilité estimée que ce pari gagne. ≥70 % = très fiable.">Conf</span> <strong class="u-text">${Math.round(p.rel*100)}%</strong></div>
 <div><span style="color:var(--text-dim);border-bottom:1px dotted var(--text-dim);cursor:help;" title="Edge = notre probabilité − probabilité implicite de la cote. > 0 = on est plus optimiste que le bookmaker (=valeur).">Edge</span> <strong style="color:${edgeColor};">+${Math.round(p.edge*100)}pt</strong></div>
 </div>
-existait mais n'était pas utilisée. Maintenant un bouton
-                     direct ouvre la page match Winamax (deeplink si présent,
-                     sinon homepage paris-sportifs). target=_blank pour ne pas
-                     perdre le contexte du dashboard. rel="noopener noreferrer"
-                     pour sécurité (pas de window.opener). -->
                 <a href="${esc(url)}" target="_blank" rel="noopener noreferrer" data-no-detail="1" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;margin-top:8px;background:linear-gradient(135deg,#fbbf24 0%,#f59e0b 100%);color:#0c0a0a;border:none;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;cursor:pointer;box-shadow:0 4px 12px rgba(251,191,36,.25);transition:transform .12s,box-shadow .12s;" aria-label="Parier ce match sur Winamax (ouvre dans un nouvel onglet)">
                   <span class="u-text-md">💰</span>
                   <span>Parier sur Winamax</span>
@@ -24688,8 +24784,9 @@ try {
 const h = window.__healthData;
 if (!h || !h.sources) return '';
 const ageMin = isFinite(h.data_age_min) ? h.data_age_min : 999;
-const overallColor = ageMin < 30 ? 'var(--accent)' : ageMin < 120 ? 'var(--warn,#fbbf24)' : 'var(--danger)';
-const overallLabel = ageMin < 30 ? '✓ Pipeline sain' : ageMin < 120 ? '⚠ Ralenti' : '✗ En retard';
+const warningCount = Array.isArray(h.warnings) ? h.warnings.length : 0;
+const overallColor = ageMin < 30 && warningCount === 0 ? 'var(--accent)' : ageMin < 120 ? 'var(--warn,#fbbf24)' : 'var(--danger)';
+const overallLabel = ageMin < 30 && warningCount === 0 ? '✓ Pipeline sain' : ageMin < 120 ? (warningCount ? `✓ Pipeline OK · ${warningCount} alertes mineures` : '⚠ Ralenti') : '✗ En retard';
 const srcEntries = Object.entries(h.sources)
 .filter(([_, v]) => v && v.age_min != null)
 .sort((a, b) => (a[1].age_min || 999) - (b[1].age_min || 999))
@@ -24705,7 +24802,7 @@ return `
                 <span style="font-size:13px;color:${overallColor};font-weight:700;margin-left:8px;">${overallLabel}</span>
                 <span style="font-size:11.5px;color:var(--text-dim);margin-left:6px;">data.js : ${fmtAge(ageMin)}</span>
               </div>
-              ${h.warnings && h.warnings.length ? `<span style="font-size:11.5px;color:var(--warn,#fbbf24);">⚠ ${h.warnings.length} warning${h.warnings.length>1?'s':''}</span>` : ''}
+              ${warningCount ? `<span style="font-size:11.5px;color:var(--warn,#fbbf24);">⚠ ${warningCount} alerte${warningCount>1?'s':''}</span>` : ''}
             </div>
             <div style="display:flex;flex-wrap:wrap;gap:6px;font-size:11.5px;">
               ${srcEntries.map(([name, v]) => `
@@ -25215,10 +25312,7 @@ ${rows.length > 30 ? `<div style="margin-top:8px;font-size:11px;color:var(--text
 </div>`;
         })() : ''}
 
-             dans les onglets ci-dessus. Ne plus dupliquer ici. -->
         ${''}
-
-        <!-- Liens vers les onglets détaillés -->
         <div style="margin-top:32px;padding:18px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
           <div style="font-size:13px;color:var(--text-dim);margin-bottom:10px;">Drill-down détaillé :</div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
