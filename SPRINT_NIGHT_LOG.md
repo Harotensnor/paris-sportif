@@ -2,6 +2,12 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
+## Sprint v35.450 — AUTO 10/10 Phase finale validation polish code (11:57 UTC)
+- Validation post-mega #1.6 : innerHTML, fetch tracking, listeners, erreurs safe, JSON orphelins, modules sidecars et skips Playwright.
+- Resultat : `audit_innerhtml_safety.py` OK, `audit_fetch_tracking.py` OK, `audit_playwright_skips.py` OK, `audit_data_truth.py` OK.
+- Decision : `backtest_report.json` et `ci_heartbeat.json` restent car encore references par scripts/workflow et documentes dans `JSON_SIDECAR_AUDIT.md`.
+- Artefact : `audit-artifacts/phase-finale-code-polish-validation.json`; cache/footer bumpes v35.450.
+
 ## Sprint v35.449 — AUTO 10/10 Phase finale validation produit (11:55 UTC)
 - Validation post-mega #1.5 : CLV, score opportunite enrichi, streak/tilt, P&L, correlation combines, meteo modele et profils equipe.
 - Resultat : CLV visible Accueil + Performance, score tooltip decompose edge/confiance/stabilite/fraicheur/profil Theo, tilt visible avec localStorage test, correlation visible, meteo visible.
