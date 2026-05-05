@@ -2,6 +2,12 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
+## Sprint v35.448 — AUTO 10/10 Phase finale validation modele (11:54 UTC)
+- Validation post-mega #1.4 : LightGBM runtime, calibration contexte, abstain guards, CI, sharp/timing, AUC, daily insight et modal signaux.
+- Resultat : `audit_lightgbm_runtime.py` OK, `audit_intelligence_consistency.py` OK, 6 tests Playwright modal/CLV passent desktop + mobile.
+- Notes modele : LightGBM est actif en nudge conservateur 8% / max 2.5pt; AUC reste en `watch` car les lignes proba par match manquent encore, donc aucun marche n'est sur-vendu.
+- Artefact : `audit-artifacts/phase-finale-model-validation.json`; cache/footer bumpes v35.448.
+
 ## Sprint v35.447 — AUTO 10/10 Phase finale validation genie (11:52 UTC)
 - Validation post-mega #1.3 : controle navigateur des signaux genie sur Accueil et Profil avec localStorage de test pour les patterns Theo.
 - Resultat : timing, signaux rares, voyage/fatigue, CLV, profil Theo et prudence/signaux opposes detectes dans l'UI.
