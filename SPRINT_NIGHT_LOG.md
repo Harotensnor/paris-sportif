@@ -739,3 +739,11 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Rapport: creation de `SPRINT_NIGHT_REPORT_STABILITE.md` avec etat tableau, aide decision, data, qualite, performance et risques restants.
 - Issues: `ISSUES.md` et `ISSUES_ACTIVE.md` pointent maintenant sur la revue v35.472 et gardent une seule issue active: nettoyage du run Playwright legacy complet.
 - Decision: la phase reste en mode qualite/stabilite; aucun ajout produit, seulement documentation de l'etat valide et des garde-fous.
+
+## Sprint v35.474 — AUTO 10/10 Tableau Theo debloque (19:43 UTC)
+- Diagnostic: ajout de `scripts/run_dashboard_dry.js` pour ouvrir le vrai dashboard en `?debug=1`, simuler `fakeAgeMin=397` et exporter `.cache/dashboard_pipeline_breakdown.json`.
+- Fix produit: une date locale trop restrictive repasse automatiquement en horizon 7 jours si elle masque le tableau; le cas Theo stale 397 min affiche 360 lignes visibles et 536 picks qualifies.
+- Seuils: tiers assouplis (safe 65%, solid 50%, value 35% + edge 1%, big 18% + edge 3%, outsider 6% + edge 5%) sans filtrer les handicaps.
+- Fallback: mode data-only et debug enrichis (scan pool, matches qualifies, rejection reasons, data-only scan pool) avec 30 lignes de secours au lieu de 10.
+- QA: syntax `app.js`/`run_dashboard_dry.js` OK, dry-run OK, `phase-finale-dashboard.spec.js` 8/8 desktop+mobile, bundle OK (`app.js` 1573.5 KB, `app.css` 260.4 KB).
+- Cache/footer bumpes v35.474; `app.js` hash `121d0591`, `app.css` hash `e464318c`, SW `paris-sportif-20260505-194306`.

@@ -155,3 +155,59 @@ test('phase finale: dashboard history date keeps past picks explicit', async ({ 
     expect(state.emptyHelp).not.toContain('Chargement');
   }
 });
+
+test('phase finale: dashboard auto-recovers from Theo stale stored day', async ({ page }) => {
+  const dataResponse = await page.request.get('/data.js');
+  const dataText = await dataResponse.text();
+  const today = /"today"\s*:\s*"([^"]+)"/.exec(dataText)?.[1] || new Date().toISOString().slice(0, 10);
+
+  await page.addInitScript(({ today }) => {
+    try {
+      localStorage.setItem('paris_sportif_v36_home_filter', JSON.stringify({
+        sport: '',
+        tier: '',
+        time: '',
+        q: '',
+        sort: 'tier',
+        date: today,
+        includeLive: false,
+      }));
+    } catch (e) {}
+  }, { today });
+
+  await page.goto('/pronostics.html?debug=1&fakeAgeMin=397#dashboard');
+  await expect(page.locator('[data-v37-debug-panel]')).toBeVisible({ timeout: 20_000 });
+  await page.waitForFunction(() => {
+    const visible = (el) => {
+      const style = getComputedStyle(el);
+      const rect = el.getBoundingClientRect();
+      return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+    };
+    const rows = [...document.querySelectorAll('.v36-picks-table tbody .v36-table-row')].filter(visible);
+    const cards = [...document.querySelectorAll('.v36-table-cards .v36-table-card')].filter(visible);
+    return Math.max(rows.length, cards.length) >= 30;
+  }, null, { timeout: 20_000 });
+
+  const state = await page.evaluate(() => {
+    const visible = (el) => {
+      const style = getComputedStyle(el);
+      const rect = el.getBoundingClientRect();
+      return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+    };
+    const debug = JSON.parse(document.querySelector('[data-v37-debug-panel] pre')?.textContent || '{}');
+    const rows = [...document.querySelectorAll('.v36-picks-table tbody .v36-table-row')].filter(visible);
+    const cards = [...document.querySelectorAll('.v36-table-cards .v36-table-card')].filter(visible);
+    return {
+      debug,
+      visiblePicks: Math.max(rows.length, cards.length),
+      heading: document.querySelector('h1')?.textContent || '',
+      filterNotice: document.querySelector('.v37-empty-pool-help.is-info')?.textContent || '',
+    };
+  });
+
+  expect(state.visiblePicks).toBeGreaterThanOrEqual(30);
+  expect(state.debug.activeDate).toBe('all');
+  expect(['auto_all_horizon', 'localStorage']).toContain(state.debug.dateSource);
+  expect(state.debug._dataAgeMin).toBeGreaterThanOrEqual(390);
+  expect(state.heading).not.toContain('0 picks visibles');
+});
