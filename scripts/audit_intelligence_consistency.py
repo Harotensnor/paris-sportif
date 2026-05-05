@@ -36,6 +36,13 @@ def audit_markets(errors: list[str]) -> None:
         fail(errors, "market clone guard missing")
     if len(rows) > 3 and summary.get("market_clone_guard") != "passed":
         fail(errors, f"market clone guard did not pass: {summary.get('market_sample_warning')}")
+    n51_rows = [r for r in rows if int(r.get("n") or 0) == 51]
+    if len(rows) > 3 and len(n51_rows) == len(rows):
+        fail(errors, "all market rows still use the old n=51 placeholder")
+    if summary.get("placeholder_guard") not in {"passed", "watch", None}:
+        fail(errors, "placeholder guard has an invalid status")
+    if summary.get("placeholder_guard") == "watch":
+        fail(errors, "placeholder guard is still watch; expected all placeholder regressions cleared")
     if len(rows) > 1 and len(n_values) == 1 and priced_rows == 0:
         if summary.get("market_sample_warning") != "all_market_rows_share_same_n_without_odds":
             fail(errors, "market rows share one n but warning is missing")
@@ -72,6 +79,8 @@ def audit_leagues(errors: list[str]) -> None:
     top_wr, top_count = wr_counts.most_common(1)[0]
     if top_count / max(1, len(rows)) > 0.4:
         fail(errors, f"league WR value {top_wr} appears on {top_count}/{len(rows)} rows")
+    if wr_counts.get(0.5455, 0) > 3:
+        fail(errors, f"old placeholder WR 0.5455 appears on {wr_counts.get(0.5455, 0)} league rows")
     for row in rows:
         code = str(row.get("league_code") or "")
         status = str(row.get("status") or "")

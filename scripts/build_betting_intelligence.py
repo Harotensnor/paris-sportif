@@ -602,11 +602,19 @@ def build_market_biases(data: dict[str, Any]) -> dict[str, Any]:
     market_ns = {row["n"] for row in market_rows}
     market_signatures = {row.get("sample_signature") for row in market_rows}
     market_priced = sum(1 for row in market_rows if (row.get("with_odds") or 0) > 0)
+    market_n51_rows = sum(1 for row in market_rows if int(row.get("n") or 0) == 51)
+    league_wr5455_rows = sum(1 for row in league_rows if round(float(row.get("win_rate") or 0), 4) == 0.5455)
     market_sample_warning = None
     if len(market_rows) > 1 and len(market_signatures) == 1:
         market_sample_warning = "all_market_rows_share_same_sample_signature"
     elif len(market_rows) > 1 and len(market_ns) == 1 and market_priced == 0:
         market_sample_warning = "all_market_rows_share_same_n_without_odds"
+    placeholder_guard = (
+        "passed"
+        if not (len(market_rows) > 3 and market_n51_rows == len(market_rows))
+        and league_wr5455_rows <= 3
+        else "watch"
+    )
 
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -623,6 +631,9 @@ def build_market_biases(data: dict[str, Any]) -> dict[str, Any]:
             "market_sample_n_values": sorted(market_ns),
             "market_sample_signature_values": len(market_signatures),
             "market_clone_guard": "passed" if not market_sample_warning else "watch",
+            "placeholder_guard": placeholder_guard,
+            "market_n51_rows": market_n51_rows,
+            "league_wr5455_rows": league_wr5455_rows,
             "league_rows": len(league_rows),
             "league_exploit": sum(1 for row in league_rows if row["status"] == "exploit"),
             "league_avoid": sum(1 for row in league_rows if str(row["status"]).startswith("avoid")),
