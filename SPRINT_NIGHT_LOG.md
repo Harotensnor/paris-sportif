@@ -1043,3 +1043,11 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Tests: `mobile-touch-targets.spec.js` passe mobile Chromium (1/1); `app.js` syntax OK; drift pipeline OK.
 - Cache/footer bumpes v36.030; `app.js` hash `7f048c43`, SW `paris-sportif-20260505-222759`.
 
+
+## Sprint v36.031 — AUTO 10/10 Phase 8 HHH menu long-press (22:34 UTC)
+- Mobile: long-press sur carte pick ouvre un menu contextuel compact.
+- Actions: favoris, comparateur, suivi 1u et ouverture detail branchés sur les stockages/actions existants.
+- Robustesse: annule le long-press au mouvement et bloque le clic fantôme après ouverture du menu.
+- Tests: mobile-long-press-menu passe mobile Chromium (1/1); app.js syntax OK; drift pipeline OK.
+- Cache/footer bumpes v36.031; app.js hash 3c6e3cfb; SW paris-sportif-20260505-223409.
+
