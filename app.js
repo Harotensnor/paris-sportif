@@ -15468,10 +15468,10 @@ const v37MarketBiasSource = Array.isArray(v37Intel.marketBias?.watchlist) && v37
 const v37MarketBiasRows = v37MarketBiasSource
 .slice(0, 4)
 .map(row => v37InsightRow({
-kicker: row.market_status === 'fade' || row.status === 'fade' ? 'Marché à fade' : 'Marché exploitable',
+kicker: row.market_status === 'fade' || row.status === 'fade' ? 'Marché à fade' : row.market_status === 'watch' || row.status === 'watch' || row.market_status === 'low_value' || row.status === 'low_value' ? 'Marché en observation' : 'Marché exploitable',
 title: `${row.market || row.label || 'Marché'} · ${row.pick || ''}`.trim(),
 body: row.context || `${row.reason || 'biais détecté'} · WR ${(Number(row.win_rate || 0) * 100).toFixed(0)}% · n=${Number(row.n || 0)}`,
-tone: row.market_status === 'fade' || row.status === 'fade' ? 'warn' : 'good',
+tone: row.market_status === 'fade' || row.status === 'fade' || row.market_status === 'watch' || row.status === 'watch' || row.market_status === 'low_value' || row.status === 'low_value' ? 'warn' : 'good',
 }))
 .join('');
 const v37RareRows = (Array.isArray(v37Intel.rare?.signals) ? v37Intel.rare.signals : [])

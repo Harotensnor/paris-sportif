@@ -596,7 +596,7 @@ def build_market_biases(data: dict[str, Any]) -> dict[str, Any]:
                 "context": f"{row['label']} · {row['pick']} : {row['reason']} ({row['win_rate']:.1%}, n={row['n']})",
             }
             for row in market_rows
-            if row["status"] in {"exploit", "fade"}
+            if row["status"] in {"exploit", "fade", "watch", "low_value"}
         ][:20]
 
     market_ns = {row["n"] for row in market_rows}

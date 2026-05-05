@@ -2,6 +2,12 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
+## Sprint v35.432 — AUTO 10/10 Marches placeholders non bloquants (10:45 UTC)
+- Fix Section 0.6 : les marchés à petit sample restent taggés `watch` au lieu de devenir des faux exploits ou de disparaître.
+- UI : le rail modèle affiche maintenant ces lignes comme "Marché en observation" avec ton prudent, sans bonus agressif dans le score.
+- Mesure : `placeholder_guard=passed`, `market_n51_rows=0`, 10 marchés en watchlist observation, audit intelligence OK.
+- Tests : syntax JS OK, bundle OK (`app.js` 1,597,705 bytes sous cap), `dashboard-market-depth` desktop+mobile OK; cache/footer bumpes v35.432.
+
 ## Sprint v35.431 — AUTO 10/10 Abstain multi-sport souple (10:43 UTC)
 - Fix Section 0.5 : `ensemble_insufficient` devient sport-aware; le foot garde 2 composants purs minimum, les sports sans xG passent avec 1 composant reel.
 - Impact : basket/hockey/baseball ne sont plus exclus en bloc faute de xG, tout en gardant le skip si aucun signal modele n'existe.
