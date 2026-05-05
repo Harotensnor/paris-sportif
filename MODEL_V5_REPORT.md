@@ -27,3 +27,22 @@ Top coefficients:
 | is_football | -0.1168 |
 
 Guardrail: browser runtime clamps the stacking influence to ±2.5pt and only nudges when the meta-model differs from the current confidence by at least 0.4pt.
+
+## Section G — Pondération adaptative ensemble
+
+- Status: **ok**
+- Artifact: `ensemble_adaptive_weights.json`
+- Policy: validation Brier + importance stacking + pénalité drift, avec bornes conservatrices.
+- Drift state: `warning`, pénalité appliquée `0.9500`.
+
+Top weights:
+
+| Component | Weight |
+|---|---:|
+| dixon_coles_xg | 20.6% |
+| market | 19.6% |
+| form | 8.4% |
+| elo | 7.4% |
+| empirical_xg | 7.0% |
+
+Guardrail: les poids sont normalisés par sport et bornés côté runtime entre 4% et 55%, donc un signal utile peut monter sans écraser le consensus.

@@ -65,6 +65,7 @@ def build() -> dict[str, Any]:
                 "build_bayesian_priors_v5.py",
                 "build_feature_engineering_v5.py",
                 "build_stacking_meta_v5.py",
+                "build_adaptive_ensemble_v5.py",
             ],
             "settled_source": "picks_history.jsonl + backtest_training_rows.jsonl",
         },
@@ -106,6 +107,7 @@ def build() -> dict[str, Any]:
             "feature_engineering_v5.json": sha("feature_engineering_v5.json"),
             "stacking_meta_weights.json": sha("stacking_meta_weights.json"),
             "calibration_method.json": sha("calibration_method.json"),
+            "ensemble_adaptive_weights.json": sha("ensemble_adaptive_weights.json"),
         },
     }
 

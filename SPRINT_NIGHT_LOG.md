@@ -1137,3 +1137,12 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Tests: suite model-v5 passe desktop + mobile Chromium (12/12); app.js syntax OK; drift pipeline OK.
 - Cache/footer bumpés v37.006; app.js hash ac919c63; calibration hash daca389a; SW paris-sportif-20260505-230938.
 
+
+## Sprint v37.007 — AUTO 10/10 Phase V5 G ensemble adaptatif (23:15 UTC)
+- Data: build_adaptive_ensemble_v5.py génère ensemble_adaptive_weights.json/js depuis Brier validation, stacking et drift KL.
+- Modèle: predictMatch utilise les poids adaptatifs bornés par composante et par sport dans le mix final.
+- Crédibilité/debug: section "Poids adaptatifs V5" visible et ?debug=1 expose weights, bySport, drift et components.
+- Pipeline: refresh.yml et auto_refresh.py reconstruisent l'ensemble adaptatif avant model_versions.
+- Tests: suite model-v5 passe desktop + mobile Chromium (14/14); app.js syntax OK; drift pipeline OK.
+- Cache/footer bumpés v37.007; ensemble hash f802d3c7; SW paris-sportif-20260505-231431.
+
