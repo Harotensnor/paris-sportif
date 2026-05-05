@@ -220,6 +220,38 @@
   body.agent-home .v36-match-name { display: inline-flex; max-width: 100%; align-items: center; gap: 5px; flex-wrap: wrap; }
   body.agent-home .v36-match-name b { max-width: 118px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   body.agent-home .v36-match-name i { width: 18px; height: 18px; flex: 0 0 18px; }
+  body.agent-home.v36-mobile-filter-compact .v36-filter-strip {
+    position: fixed !important;
+    top: calc(var(--rg-height,32px) + 54px) !important;
+    left: 8px !important;
+    right: 8px !important;
+    z-index: 86 !important;
+    gap: 6px !important;
+    padding: 6px !important;
+    border-radius: 0 0 12px 12px !important;
+    background: color-mix(in srgb,var(--panel) 90%,rgba(8,12,18,.92)) !important;
+    box-shadow: 0 10px 28px rgba(0,0,0,.34);
+  }
+  body.agent-home.v36-mobile-filter-compact .v36-filter-strip > div,
+  body.agent-home.v36-mobile-filter-compact .v37-day-nav {
+    gap: 5px !important;
+    overflow-x: auto !important;
+    scrollbar-width: none;
+  }
+  body.agent-home.v36-mobile-filter-compact .v36-filter-strip > div::-webkit-scrollbar,
+  body.agent-home.v36-mobile-filter-compact .v37-day-nav::-webkit-scrollbar { display: none; }
+  body.agent-home.v36-mobile-filter-compact .v36-filter-chip,
+  body.agent-home.v36-mobile-filter-compact .v37-day-chip {
+    min-height: 36px !important;
+    max-width: 48px;
+    padding: 0 10px !important;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: clip;
+    flex: 0 0 auto;
+  }
+  body.agent-home.v36-mobile-filter-compact .v36-filter-chip.is-active,
+  body.agent-home.v36-mobile-filter-compact .v37-day-chip.is-active { max-width: 136px; }
   .ptr-indicator.ready {
     border-color: color-mix(in srgb,var(--accent) 54%,rgba(236,244,255,.16)) !important;
     background: color-mix(in srgb,var(--accent) 18%,rgba(12,18,26,.96)) !important;
@@ -508,7 +540,7 @@
   // pour debug console. AUCUN envoi réseau — l'utilisateur peut consulter
   // ou exporter ses données, et c'est tout.
   //
-  // Pourquoi inline pré-app.js?v=db5c649c ? Il faut s'enregistrer AVANT le LCP/FCP
+  // Pourquoi inline pré-app.js?v=7f048c43 ? Il faut s'enregistrer AVANT le LCP/FCP
   // pour les capter. Le bundle web-vitals officiel pèse 5 KB ; ici on
   // tombe à ~1.5 KB grâce à l'usage direct de PerformanceObserver.
   //
@@ -966,7 +998,7 @@
       <div class="footer-brand">
         <span class="footer-logo">🎯</span>
         <span class="footer-text">Paris-Sportif</span>
-        <span class="footer-version" id="footer-version" role="button" tabindex="0" style="cursor:pointer;" title="Voir les nouveautés v36.028">v36.028</span>
+        <span class="footer-version" id="footer-version" role="button" tabindex="0" style="cursor:pointer;" title="Voir les nouveautés v36.029">v36.029</span>
       </div>
       <nav class="footer-links" aria-label="Liens du site">
         <a href="https://github.com/Harotensnor/paris-sportif" target="_blank" rel="noopener" class="footer-link" title="Code source sur GitHub">
@@ -1075,7 +1107,7 @@
 <script src="nhl_playoff_markets.js?v=9b80b4c8"></script>
 <script src="app-i18n.js?v=6bad7ddf" defer></script>
   <script src="lightgbm_weights.js?v=acc94279"></script>
-  <script src="app.js?v=db5c649c" defer></script>
+  <script src="app.js?v=7f048c43" defer></script>
 
 <!-- enhancements v20 -->
 <script src="app-enhancements.js?v=232799b3" defer></script>
@@ -1357,6 +1389,7 @@
 </footer>
 </body>
 </html>
+
 
 
 
