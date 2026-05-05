@@ -1163,3 +1163,12 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Tests: suite model-v5 passe desktop + mobile Chromium (18/18); app.js syntax OK; drift pipeline OK.
 - Cache/footer bumpés v37.009; cold_start_v5 hash d2edd8dc; SW paris-sportif-20260505-232508.
 
+
+## Sprint v37.010 — AUTO 10/10 Phase V5 J multi-task learning (23:37 UTC)
+- Data: build_multitask_v5.py produit multitask_v5.json/js avec loss commune 1N2, O/U 2.5, BTTS et score exact.
+- Modèle: predictMatch expose multitask_v5 et les politiques par marché, avec guardrail Brier no-worse.
+- Crédibilité/debug: section Multi-task V5 ajoutée et ?debug=1 expose weights, tâches et worst zones.
+- Pipeline: refresh.yml, auto_refresh.py et model_versions suivent l'artefact multitask.
+- Tests: suite model-v5 desktop + mobile à relancer après stamp; app.js syntax/drift en attente.
+- Cache/footer bumpés v37.010; multitask_v5 hash a2d764c8; SW paris-sportif-20260505-232942.
+

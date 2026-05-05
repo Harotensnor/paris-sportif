@@ -1,6 +1,6 @@
 {
   "schema": "paris-sportif.model_versions.v5",
-  "generated_at": "2026-05-05T23:21:27Z",
+  "generated_at": "2026-05-05T23:27:44Z",
   "current": "v5.0",
   "online_learning": {
     "weekly_recalibration_day": "sunday",
@@ -11,7 +11,8 @@
       "build_feature_engineering_v5.py",
       "build_stacking_meta_v5.py",
       "build_adaptive_ensemble_v5.py",
-      "build_cold_start_v5.py"
+      "build_cold_start_v5.py",
+      "build_multitask_v5.py"
     ],
     "settled_source": "picks_history.jsonl + backtest_training_rows.jsonl"
   },
@@ -51,7 +52,7 @@
     {
       "version": "v5.0",
       "status": "shadow_ab",
-      "promoted_at": "2026-05-05T23:21:27Z",
+      "promoted_at": "2026-05-05T23:27:44Z",
       "share": 0.1,
       "priors_teams": 3730,
       "stacking_rows": 49,
@@ -66,6 +67,7 @@
     "stacking_meta_weights.json": "cb89cf58aa74",
     "calibration_method.json": "e28a83ff85e5",
     "ensemble_adaptive_weights.json": "721d83d0e465",
-    "cold_start_v5.json": "76cb7055d3b7"
+    "cold_start_v5.json": "76cb7055d3b7",
+    "multitask_v5.json": "167f2b85e177"
   }
 }
