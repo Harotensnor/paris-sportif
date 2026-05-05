@@ -1092,3 +1092,12 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Tests: model-v5-priors passe desktop + mobile Chromium (2/2); app.js syntax OK; drift pipeline OK.
 - Cache/footer bumpés v37.001; app.js hash f8898d89; bayesian_priors hash a8a2a782; SW paris-sportif-20260505-225522.
 
+
+## Sprint v37.002 — AUTO 10/10 Phase V5 B stacking méta (22:59 UTC)
+- Data: build_stacking_meta_v5.py entraîne une régression logistique bornée sur backtest_training_rows.jsonl.
+- Modèle: predictMatch applique un nudge stacking V5 plafonné ±2.5pt et conserve les signaux dans reliabilityMeta.
+- Crédibilité/debug: poids, Brier rolling-origin et importance features visibles sur Crédibilité et ?debug=1.
+- Pipeline: refresh.yml et auto_refresh.py reconstruisent stacking_meta_weights.json/js à chaque tick.
+- Tests: model-v5 priors + stacking passent desktop + mobile Chromium (4/4); app.js syntax OK; drift pipeline OK.
+- Cache/footer bumpés v37.002; app.js hash b5d43ecd; stacking hash d3779a93; SW paris-sportif-20260505-225931.
+
