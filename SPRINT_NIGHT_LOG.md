@@ -973,3 +973,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Tests: `btts-both-halves.spec.js` passe desktop + mobile (2/2); `app.js` syntax OK; drift pipeline OK.
 - Cache/footer bumpes v36.020; `app.js` hash `a9293deb`, SW `paris-sportif-20260505-215352`.
 
+## Sprint v36.021 — AUTO 10/10 Phase 7 XX totaux quart-temps basket (21:55 UTC)
+- Modèle: `basketScorePrediction()` expose Q1/Q2/Q3/Q4 avec partage 24/26/25/26 normalisé.
+- UI: la modal détail affiche une ligne dédiée Totaux Q1 / Q2 / Q3 / Q4 avec les meilleures lignes.
+- Cohérence: le marché générique quart-temps reste disponible, les quarts individuels servent à la lecture fine.
+- Tests: `basket-quarter-totals.spec.js` passe desktop + mobile (2/2); `app.js` syntax OK; drift pipeline OK.
+- Cache/footer bumpes v36.021; `app.js` hash `3b1b730d`, SW `paris-sportif-20260505-215524`.
+
