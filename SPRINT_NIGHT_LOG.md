@@ -385,3 +385,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Garde-fou: si les probabilites ligne par ligne manquent, le rapport passe en `auc_unavailable_without_row_scores` et les marches restent en surveillance.
 - Front: le score d'opportunite lit le rapport AUC et ajoute un bonus/malus explicite dans le tooltip du pick.
 - Pipeline: `auto_refresh.py`, `refresh.yml` et `health.json` savent generer, committer et monitorer le rapport AUC; cache/footer bumpes v35.416.
+
+## Sprint v35.417 — AUTO 10/10 Ensemble xG separe (02:39 UTC)
+- Modele: quand les xG empiriques sont disponibles, ils deviennent un sous-modele distinct `xg` au lieu d'etre caches dans Poisson.
+- Pondération: metadata ensemble expose maintenant `poisson_dc 0.40 / elo 0.25 / xg 0.20 / form_decay 0.10 / h2h 0.05`.
+- Transparence: le tooltip modal peut afficher la source xG et les buts attendus du sous-modele empirique.
+- Mesure: syntax JS OK, bundle `app.js` 1,596,191 bytes sous cap; cache/footer bumpes v35.417.

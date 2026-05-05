@@ -6095,6 +6095,25 @@ redDelta: redDelta < 0 ? Math.round(redDelta * 1000) / 1000 : 0,
 }
 }
 const hrComp = homeRoadComponent(match);
+let xgComp = null;
+if (poi?.fbrefBlend && match.sport === 'football') {
+const lamHemp = Number(poi.fbrefBlend.lamH_emp);
+const lamAemp = Number(poi.fbrefBlend.lamA_emp);
+if (Number.isFinite(lamHemp) && Number.isFinite(lamAemp) && lamHemp > 0 && lamAemp > 0) {
+const xp = poissonProbs(lamHemp, lamAemp);
+if (xp) {
+xgComp = {
+pH: xp.pH,
+pD: xp.pD,
+pA: xp.pA,
+lamH: lamHemp,
+lamA: lamAemp,
+source: poi.fbrefBlend.source || 'xG',
+minMatchesPlayed: poi.fbrefBlend.minMatchesPlayed || null,
+};
+}
+}
+}
 
 let lineupBoost = 0;
 let lineupStats = null;
@@ -6217,7 +6236,8 @@ eloStats = { home: eloH, away: eloA, diff: Math.round(eloH - eloA) };
 let final;
 const components = [];
 if (pH != null) components.push({ w: 0.50, pH, pD: (pD||0), pA, isMarket: true, name: 'Marché',   icon: '📊' });
-if (poi)       components.push({ w: 0.50, pH: poi.pH,     pD: poi.pD,        pA: poi.pA,     name: 'Buts attendus', icon: '⚽' });
+if (poi)       components.push({ w: xgComp ? 0.40 : 0.50, pH: poi.pH,     pD: poi.pD,        pA: poi.pA,     name: 'Buts attendus', icon: '⚽' });
+if (xgComp)   components.push({ w: 0.20, pH: xgComp.pH,  pD: xgComp.pD,     pA: xgComp.pA,  name: 'xG empirique', icon: '📐' });
 if (hrComp)    components.push({ w: 0.30, pH: hrComp.pH,  pD: 0,             pA: hrComp.pA,  name: 'Domicile/Ext.', icon: '🏠' });
 if (recScore)  components.push({ w: 0.30, pH: recScore.pH,pD: recScore.pD||0,pA: recScore.pA,name: 'Bilan saison',  icon: '📈' });
 if (eloComp)   components.push({ w: 0.30, pH: eloComp.pH, pD: eloComp.pD||0, pA: eloComp.pA, name: 'Force',         icon: '💪' });
@@ -6999,15 +7019,16 @@ return a + (b - mean)*(b - mean);
 const roundProb = v => Math.round((Number(v) || 0) * 1000) / 1000;
 const modelKind = name => {
 const n = String(name || '').toLowerCase();
-if (n.includes('but') || n.includes('poisson')) return 'dixon_coles_xg';
+if (n.includes('xg')) return 'xg';
+if (n.includes('but') || n.includes('poisson')) return 'poisson_dc';
 if (n.includes('force') || n.includes('elo') || n.includes('classement')) return 'elo';
-if (n.includes('forme') || n.includes('bilan') || n.includes('domicile') || n.includes('pace') || n.includes('goalie') || n.includes('pitcher')) return 'form';
+if (n.includes('forme') || n.includes('bilan') || n.includes('domicile') || n.includes('pace') || n.includes('goalie') || n.includes('pitcher')) return 'form_decay';
 if (n.includes('h2h') || n.includes('face')) return 'h2h';
 return 'signal';
 };
 ensembleMeta = {
-version: 'v35.175',
-weights: { dixon_coles_xg: 0.40, elo: 0.25, form: 0.10, h2h: 0.05 },
+version: 'v35.417',
+weights: { poisson_dc: 0.40, elo: 0.25, xg: 0.20, form_decay: 0.10, h2h: 0.05 },
 sub_models: pureComponents.map(c => ({
 name: c.name,
 kind: modelKind(c.name),
@@ -7019,7 +7040,12 @@ agreement_variance: variance == null ? null : Math.round(variance * 10000) / 100
 insufficient: compProbs.length < 2,
 final_prob: roundProb(best_pick[1]),
 final_probs: { home: roundProb(final.pH), draw: roundProb(final.pD), away: roundProb(final.pA) },
-pick_key: pickKey
+pick_key: pickKey,
+xg_model: xgComp ? {
+source: xgComp.source,
+min_matches_played: xgComp.minMatchesPlayed,
+expected_goals: { home: roundProb(xgComp.lamH), away: roundProb(xgComp.lamA) },
+} : null
 };
 const blend = 0.70 * agreement + 0.30 * richness;
 const boost = 0.85 + 0.23 * blend;
