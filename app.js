@@ -207,6 +207,31 @@ const getUserLang = window.getUserLang || (() => 'fr');
 const setUserLang = window.setUserLang || ((lang) => lang === 'en' ? 'en' : 'fr');
 const i18n = window.i18n || ((key) => key);
 
+function normalizeUiMode(value) {
+return value === 'expert' ? 'expert' : 'novice';
+}
+function getUserUiMode(prefs) {
+try {
+const p = prefs || safeLocalStorageJson('userPrefs', {}) || {};
+return normalizeUiMode(p.uiMode);
+} catch(e) {
+logSafeError('getUserUiMode', e);
+return 'novice';
+}
+}
+function setUserUiMode(mode) {
+const uiMode = normalizeUiMode(mode);
+try {
+const prefs = safeLocalStorageJson('userPrefs', {}) || {};
+prefs.uiMode = uiMode;
+safeLocalStorageSet('userPrefs', JSON.stringify(prefs));
+applyAccessibilityPrefs(prefs);
+} catch(e) {
+logSafeError('setUserUiMode', e);
+}
+return uiMode;
+}
+
 function applyAccessibilityPrefs(prefs) {
 try {
 if (!prefs) prefs = safeLocalStorageJson('userPrefs', {}) || {};
@@ -225,9 +250,16 @@ st.textContent = `
         html[data-dyslexic="on"] textarea{font-family:"OpenDyslexic","Atkinson Hyperlegible","Verdana","Segoe UI",sans-serif!important;letter-spacing:.01em;word-spacing:.08em}
         html[data-night-filter="on"] body{filter:sepia(.10) saturate(.92)}
         html[data-night-filter="on"] body::before{content:"";position:fixed;inset:0;z-index:2147483647;pointer-events:none;background:rgba(255,138,0,.055);mix-blend-mode:screen}
+        html[data-ui-mode="expert"] .novice-only{display:none!important}
+        html:not([data-ui-mode="expert"]) .expert-only{display:none!important}
+        .ui-mode-segment{display:flex;flex-wrap:wrap;gap:8px}
+        .ui-mode-segment button{min-height:42px;border:1px solid var(--border);border-radius:999px;background:var(--panel);color:var(--text);padding:8px 13px;font-size:12px;font-weight:850;cursor:pointer}
+        .ui-mode-segment button.is-active{border-color:var(--brand);background:color-mix(in srgb,var(--brand) 18%,var(--panel));color:var(--text)}
+        .ui-mode-note{margin-top:10px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--panel);font-size:12px;color:var(--text-dim);line-height:1.45}
       `;
 document.head.appendChild(st);
 }
+root.setAttribute('data-ui-mode', getUserUiMode(prefs));
 const fontScale = ['normal','large','xl'].includes(prefs.fontScale) ? prefs.fontScale : 'normal';
 if (fontScale === 'normal') root.removeAttribute('data-font-scale');
 else root.setAttribute('data-font-scale', fontScale);
@@ -237,7 +269,11 @@ if (prefs.nightFilter === 'on') root.setAttribute('data-night-filter', 'on');
 else root.removeAttribute('data-night-filter');
 }
 applyAccessibilityPrefs();
-try { window.applyAccessibilityPrefs = applyAccessibilityPrefs; } catch(e) { logSafeError('boot expose accessibility prefs', e); }
+try {
+window.applyAccessibilityPrefs = applyAccessibilityPrefs;
+window.getUserUiMode = getUserUiMode;
+window.setUserUiMode = setUserUiMode;
+} catch(e) { logSafeError('boot expose accessibility prefs', e); }
 
 function enhanceLazyImages(scope) {
 const root = scope && scope.querySelectorAll ? scope : document;
@@ -17299,6 +17335,8 @@ const v37DecisionGuideHtml = `<details class="v37-decision-guide" ${v37DecisionG
           <li><b>Tier</b> : Sûr = peu de risque, Solide = équilibre, Big odds / Outsider = gros gain mais plus de variance.</li>
           <li><b>Cote</b> : choisis selon ton appétit risque. @1.30 = prudent, @5.00+ = outsider.</li>
           <li><b>Edge (avantage)</b> : dit si la cote semble sous-évaluée. Plus c'est haut, mieux c'est.</li>
+          <li class="novice-only"><b>Pourquoi cette cote ?</b> La cote traduit le risque vu par le marché : @2.00 veut dire environ 50% implicite. Si notre modèle voit 56%, le pari a un petit avantage.</li>
+          <li class="expert-only"><b>Mode expert</b> : priorise score, edge, EV et Kelly ; les aides longues sont repliées pour garder le tableau dense.</li>
         </ol>
       </details>`;
 const v36FilterButton = (kind, value, label, active) => `<button type="button" class="v36-filter-chip ${active ? 'is-active' : ''}" data-v36-filter="${esc(kind)}" data-v36-value="${esc(value)}">${label}</button>`;
@@ -24420,6 +24458,7 @@ const esc2 = (typeof esc === 'function') ? esc : (s) => String(s).replace(/[&<>"
       : notifPermission === 'denied' ? 'var(--c-bad)'
       : 'var(--text-dim)';
     const currentLevel = prefs.level || 'confirme';
+    const currentUiMode = getUserUiMode(prefs);
     const currentOddMin = (typeof getUserOddMin === 'function') ? getUserOddMin() : 2.00;
     const currentOddIdx = Math.max(0, ODD_MIN_CHOICES.findIndex(v => Math.abs(v - currentOddMin) < 0.01));
     const currentAccent = prefs.accent || 'default';
@@ -24537,6 +24576,7 @@ const esc2 = (typeof esc === 'function') ? esc : (s) => String(s).replace(/[&<>"
           ['profile-odds', 'Cote min', `@${currentOddMin.toFixed(2)}`, 'Filtre par défaut'],
           ['profile-strategy', 'Stratégie', `${riskLabels[riskTolerance]} · ${minConfidence}%`, 'Appliqué à l’accueil'],
           ['profile-appearance', 'Thème', themeLabel, 'Affichage actuel'],
+          ['profile-ui-mode', 'Mode', currentUiMode === 'expert' ? 'Expert' : 'Novice', currentUiMode === 'expert' ? 'Chiffres bruts' : 'Explications guidées'],
           ['profile-sports', 'Sports', favSportsLabel, 'Priorité accueil'],
           ['profile-data', 'Données', 'Export / reset', 'Contrôle local'],
         ].map(([id,label,value,hint]) => `
@@ -24678,6 +24718,17 @@ const esc2 = (typeof esc === 'function') ? esc : (s) => String(s).replace(/[&<>"
               <button class="theme-pill ${currentLang==='fr'?'active':''}" type="button" data-lang-btn="fr">🇫🇷 ${esc(i18n('profile.language.fr'))}</button>
               <button class="theme-pill ${currentLang==='en'?'active':''}" type="button" data-lang-btn="en">🇬🇧 ${esc(i18n('profile.language.en'))}</button>
             </div>
+          </div>
+
+          <div class="card-base" id="profile-ui-mode">
+            <h3 class="section-h3">🧭 Mode d'affichage</h3>
+            <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">Novice explique les termes directement. Expert garde les chiffres bruts visibles plus vite.</div>
+            <div class="ui-mode-segment" role="group" aria-label="Mode d'affichage">
+              <button type="button" data-ui-mode-btn="novice" class="${currentUiMode==='novice'?'is-active':''}" aria-pressed="${currentUiMode==='novice'?'true':'false'}">Novice · guidé</button>
+              <button type="button" data-ui-mode-btn="expert" class="${currentUiMode==='expert'?'is-active':''}" aria-pressed="${currentUiMode==='expert'?'true':'false'}">Expert · dense</button>
+            </div>
+            <div class="ui-mode-note novice-only">Mode novice actif : le site privilégie les explications courtes, les liens de glossaire et les libellés "pourquoi cette cote".</div>
+            <div class="ui-mode-note expert-only">Mode expert actif : les aides longues se replient, les métriques restent prioritaires.</div>
           </div>
 
           <div class="card-base">
@@ -24952,7 +25003,7 @@ return `
             || txt.includes('bankroll') || txt.includes('cagnotte') || txt.includes('simuler une progression') || txt.includes('suggestions personnalisées') || txt.includes('mode compétition');
         }
         if (group === 'prefs') {
-          return ['profile-appearance', 'profile-language', 'profile-strategy', 'profile-sports', 'profile-browser-notifs'].includes(id)
+          return ['profile-appearance', 'profile-language', 'profile-ui-mode', 'profile-strategy', 'profile-sports', 'profile-browser-notifs'].includes(id)
             || txt.includes('apparence') || txt.includes('langue') || txt.includes('mon niveau') || txt.includes('stratégie') || txt.includes('pari sûr') || txt.includes('anti-panique') || txt.includes('mode focus') || txt.includes('sports favoris') || txt.includes('notifications navigateur') || txt.includes('discord');
         }
         if (group === 'data') {
@@ -25030,7 +25081,7 @@ return `
     };
     if (compactProfileLayout && !wrap.querySelector('.profile-accordion')) {
       ['#profile-personal-suggestions', '#profile-competition'].forEach(sel => wrapProfilePanel(wrap.querySelector(sel)));
-      const keepOpen = new Set(['profile-bankroll', 'profile-odds', 'profile-strategy', 'profile-bankroll-simulator']);
+      const keepOpen = new Set(['profile-bankroll', 'profile-odds', 'profile-strategy', 'profile-bankroll-simulator', 'profile-ui-mode']);
       const grid = wrap.querySelector('.profil-grid');
       if (grid) {
         Array.from(grid.children).forEach(panel => {
@@ -25112,6 +25163,15 @@ return `
         savePrefs({ level, onboardingDone: true });
         try { document.documentElement.setAttribute('data-level', level); } catch(e){}
         try { if (typeof toast === 'function') toast('✓ Niveau : ' + level, 'success'); } catch(e){}
+        renderProfilPage(wrap);
+      });
+    });
+    wrap.querySelectorAll('[data-ui-mode-btn]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const uiMode = normalizeUiMode(btn.dataset.uiModeBtn);
+        savePrefs({ uiMode });
+        try { setUserUiMode(uiMode); } catch(e) { logSafeError('profile set ui mode', e); }
+        try { if (typeof toast === 'function') toast(uiMode === 'expert' ? 'Mode expert actif' : 'Mode novice actif', 'success'); } catch(e){}
         renderProfilPage(wrap);
       });
     });
