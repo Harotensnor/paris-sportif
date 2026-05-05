@@ -1,6 +1,6 @@
 {
   "schema": "paris-sportif.model_versions.v5",
-  "generated_at": "2026-05-05T23:08:46Z",
+  "generated_at": "2026-05-05T23:13:40Z",
   "current": "v5.0",
   "online_learning": {
     "weekly_recalibration_day": "sunday",
@@ -9,7 +9,8 @@
     "trainer_scripts": [
       "build_bayesian_priors_v5.py",
       "build_feature_engineering_v5.py",
-      "build_stacking_meta_v5.py"
+      "build_stacking_meta_v5.py",
+      "build_adaptive_ensemble_v5.py"
     ],
     "settled_source": "picks_history.jsonl + backtest_training_rows.jsonl"
   },
@@ -49,7 +50,7 @@
     {
       "version": "v5.0",
       "status": "shadow_ab",
-      "promoted_at": "2026-05-05T23:08:46Z",
+      "promoted_at": "2026-05-05T23:13:40Z",
       "share": 0.1,
       "priors_teams": 3730,
       "stacking_rows": 49,
@@ -62,6 +63,7 @@
     "bayesian_priors.json": "1930019018cc",
     "feature_engineering_v5.json": "1334eb60d5d4",
     "stacking_meta_weights.json": "cb89cf58aa74",
-    "calibration_method.json": "e28a83ff85e5"
+    "calibration_method.json": "e28a83ff85e5",
+    "ensemble_adaptive_weights.json": "721d83d0e465"
   }
 }

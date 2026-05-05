@@ -1,0 +1,225 @@
+{
+  "schema": "paris-sportif.ensemble_adaptive.v5",
+  "generated_at": "2026-05-05T23:13:40Z",
+  "window_days": 30,
+  "policy": "weekly bounded reweighting from validation brier, stacking importance and feature drift",
+  "status": "ok",
+  "weights": {
+    "market": 0.1956,
+    "dixon_coles_xg": 0.2058,
+    "empirical_xg": 0.0699,
+    "home_away": 0.0608,
+    "form": 0.0838,
+    "elo": 0.0736,
+    "h2h": 0.0338,
+    "tennis_surface": 0.0675,
+    "tennis_form": 0.054,
+    "nhl_pace": 0.054,
+    "nhl_goalie": 0.0473,
+    "mlb_pitcher": 0.054
+  },
+  "by_sport": {
+    "football": {
+      "weights": {
+        "market": 0.2704,
+        "dixon_coles_xg": 0.2845,
+        "empirical_xg": 0.0966,
+        "home_away": 0.0841,
+        "form": 0.1159,
+        "elo": 0.1018,
+        "h2h": 0.0467
+      },
+      "brier": 0.2297,
+      "n": 528,
+      "adjustment": 1.0
+    },
+    "soccer": {
+      "weights": {
+        "market": 0.2704,
+        "dixon_coles_xg": 0.2845,
+        "empirical_xg": 0.0966,
+        "home_away": 0.0841,
+        "form": 0.1159,
+        "elo": 0.1018,
+        "h2h": 0.0467
+      },
+      "brier": 0.23,
+      "n": 0,
+      "adjustment": 1.0
+    },
+    "tennis": {
+      "weights": {
+        "market": 0.5574,
+        "tennis_surface": 0.1924,
+        "tennis_form": 0.1539,
+        "h2h": 0.0963
+      },
+      "brier": 0.23,
+      "n": 0,
+      "adjustment": 1.0
+    },
+    "hockey": {
+      "weights": {
+        "market": 0.5138,
+        "nhl_pace": 0.1418,
+        "nhl_goalie": 0.1242,
+        "form": 0.2201
+      },
+      "brier": 0.2371,
+      "n": 21,
+      "adjustment": 1.0
+    },
+    "baseball": {
+      "weights": {
+        "market": 0.5867,
+        "mlb_pitcher": 0.162,
+        "form": 0.2513
+      },
+      "brier": 0.2337,
+      "n": 74,
+      "adjustment": 1.0
+    },
+    "basketball": {
+      "weights": {
+        "market": 0.5541,
+        "form": 0.2374,
+        "elo": 0.2085
+      },
+      "brier": 0.2424,
+      "n": 24,
+      "adjustment": 1.0
+    }
+  },
+  "components": {
+    "market": {
+      "weight_raw": 0.21839867658000003,
+      "base": 0.28,
+      "n": 0,
+      "component_brier": 0.25,
+      "gain_vs_ensemble": 0.0,
+      "sample_factor": 0.35,
+      "drift_penalty": 0.9,
+      "weight": 0.1956
+    },
+    "dixon_coles_xg": {
+      "weight_raw": 0.2298032069539822,
+      "base": 0.24,
+      "n": 512,
+      "component_brier": 0.242,
+      "gain_vs_ensemble": 0.0057,
+      "sample_factor": 1.0,
+      "drift_penalty": 0.9,
+      "weight": 0.2058
+    },
+    "empirical_xg": {
+      "weight_raw": 0.07807432347,
+      "base": 0.1,
+      "n": 0,
+      "component_brier": 0.25,
+      "gain_vs_ensemble": 0.0,
+      "sample_factor": 0.35,
+      "drift_penalty": 0.9,
+      "weight": 0.0699
+    },
+    "home_away": {
+      "weight_raw": 0.0678375,
+      "base": 0.09,
+      "n": 0,
+      "component_brier": 0.25,
+      "gain_vs_ensemble": 0.0,
+      "sample_factor": 0.35,
+      "drift_penalty": 0.9,
+      "weight": 0.0608
+    },
+    "form": {
+      "weight_raw": 0.09356713969460291,
+      "base": 0.11,
+      "n": 90,
+      "component_brier": 0.2471,
+      "gain_vs_ensemble": 0.0043,
+      "sample_factor": 0.7256,
+      "drift_penalty": 0.9,
+      "weight": 0.0838
+    },
+    "elo": {
+      "weight_raw": 0.08221973605900934,
+      "base": 0.1,
+      "n": 36,
+      "component_brier": 0.2889,
+      "gain_vs_ensemble": 0.0366,
+      "sample_factor": 0.5809,
+      "drift_penalty": 0.9,
+      "weight": 0.0736
+    },
+    "h2h": {
+      "weight_raw": 0.037687500000000006,
+      "base": 0.05,
+      "n": 0,
+      "component_brier": 0.25,
+      "gain_vs_ensemble": 0.0,
+      "sample_factor": 0.35,
+      "drift_penalty": 0.9,
+      "weight": 0.0338
+    },
+    "tennis_surface": {
+      "weight_raw": 0.07537500000000001,
+      "base": 0.1,
+      "n": 0,
+      "component_brier": 0.25,
+      "gain_vs_ensemble": 0.0,
+      "sample_factor": 0.35,
+      "drift_penalty": 0.9,
+      "weight": 0.0675
+    },
+    "tennis_form": {
+      "weight_raw": 0.060300000000000006,
+      "base": 0.08,
+      "n": 0,
+      "component_brier": 0.25,
+      "gain_vs_ensemble": 0.0,
+      "sample_factor": 0.35,
+      "drift_penalty": 0.9,
+      "weight": 0.054
+    },
+    "nhl_pace": {
+      "weight_raw": 0.060300000000000006,
+      "base": 0.08,
+      "n": 0,
+      "component_brier": 0.25,
+      "gain_vs_ensemble": 0.0,
+      "sample_factor": 0.35,
+      "drift_penalty": 0.9,
+      "weight": 0.054
+    },
+    "nhl_goalie": {
+      "weight_raw": 0.05276250000000001,
+      "base": 0.07,
+      "n": 0,
+      "component_brier": 0.25,
+      "gain_vs_ensemble": 0.0,
+      "sample_factor": 0.35,
+      "drift_penalty": 0.9,
+      "weight": 0.0473
+    },
+    "mlb_pitcher": {
+      "weight_raw": 0.060300000000000006,
+      "base": 0.08,
+      "n": 0,
+      "component_brier": 0.25,
+      "gain_vs_ensemble": 0.0,
+      "sample_factor": 0.35,
+      "drift_penalty": 0.9,
+      "weight": 0.054
+    }
+  },
+  "drift": {
+    "overall": "warning",
+    "max_kl": 14.9141,
+    "penalty": 0.9
+  },
+  "source_metrics": {
+    "validation_generated_at": "2026-05-03T19:32:47Z",
+    "stacking_generated_at": "2026-05-05T22:57:31Z",
+    "backtest_generated_at": "2026-05-03T06:10:24Z"
+  }
+}

@@ -231,6 +231,7 @@ jobs:
           python3 build_feature_engineering_v5.py || true
           python3 detect_feature_drift_v5.py || true
           python3 build_calibration_method_v5.py || true
+          python3 build_adaptive_ensemble_v5.py || true
           python3 build_model_versions_v5.py || true
           python3 build_season_phase.py || true
           python3 build_star_players.py || true

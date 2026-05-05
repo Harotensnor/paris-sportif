@@ -6727,6 +6727,47 @@ policy: artifact?.policy || '',
 generatedAt: artifact?.generated_at || null,
 };
 }
+function adaptiveComponentKeyV5(name) {
+const key = String(name || '').toLowerCase();
+if (key.includes('march')) return 'market';
+if (key.includes('buts attendus')) return 'dixon_coles_xg';
+if (key.includes('xg empirique')) return 'empirical_xg';
+if (key.includes('domicile')) return 'home_away';
+if (key.includes('bilan') || key.includes('forme')) return key.includes('tennis') || key.includes('l10') ? 'tennis_form' : 'form';
+if (key.includes('force')) return 'elo';
+if (key.includes('face') || key.includes('h2h')) return 'h2h';
+if (key.includes('elo')) return 'tennis_surface';
+if (key.includes('pace')) return 'nhl_pace';
+if (key.includes('goalie')) return 'nhl_goalie';
+if (key.includes('pitcher')) return 'mlb_pitcher';
+return key.replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '') || 'unknown';
+}
+function getAdaptiveComponentWeightV5(name, fallback, match) {
+const artifact = (typeof window !== 'undefined') ? window.ENSEMBLE_ADAPTIVE_V5 : null;
+const base = Number(fallback);
+if (!artifact || !Number.isFinite(base)) return fallback;
+const componentKey = adaptiveComponentKeyV5(name);
+const sport = String(match?.sport || '').toLowerCase();
+const sportWeights = artifact.by_sport?.[sport]?.weights || null;
+const globalWeights = artifact.weights || {};
+const raw = sportWeights?.[componentKey] ?? globalWeights?.[componentKey];
+const w = Number(raw);
+if (!Number.isFinite(w) || w <= 0) return fallback;
+return Math.max(0.04, Math.min(0.55, w));
+}
+function getAdaptiveEnsembleV5DebugSummary() {
+const artifact = (typeof window !== 'undefined') ? window.ENSEMBLE_ADAPTIVE_V5 : null;
+return {
+loaded: !!artifact,
+status: artifact?.status || 'missing',
+policy: artifact?.policy || '',
+weights: artifact?.weights || {},
+bySport: artifact?.by_sport || {},
+drift: artifact?.drift || null,
+components: artifact?.components || {},
+generatedAt: artifact?.generated_at || null,
+};
+}
 try {
 window.getStackingMetaV5Nudge = getStackingMetaV5Nudge;
 window.getStackingMetaV5DebugSummary = getStackingMetaV5DebugSummary;
@@ -6735,6 +6776,8 @@ window.getModelVersionsV5DebugSummary = getModelVersionsV5DebugSummary;
 window.getFeatureDriftV5DebugSummary = getFeatureDriftV5DebugSummary;
 window.applyCalibrationMethodV5 = applyCalibrationMethodV5;
 window.getCalibrationMethodV5DebugSummary = getCalibrationMethodV5DebugSummary;
+window.getAdaptiveComponentWeightV5 = getAdaptiveComponentWeightV5;
+window.getAdaptiveEnsembleV5DebugSummary = getAdaptiveEnsembleV5DebugSummary;
 } catch (e) {}
 
 let __predCache = new Map();
@@ -7733,13 +7776,14 @@ eloStats = { home: eloH, away: eloA, diff: Math.round(eloH - eloA) };
 
 let final;
 const components = [];
-if (pH != null) components.push({ w: 0.50, pH, pD: (pD||0), pA, isMarket: true, name: 'Marché',   icon: '📊' });
-if (poi)       components.push({ w: xgComp ? 0.40 : 0.50, pH: poi.pH,     pD: poi.pD,        pA: poi.pA,     name: 'Buts attendus', icon: '⚽' });
-if (xgComp)   components.push({ w: 0.20, pH: xgComp.pH,  pD: xgComp.pD,     pA: xgComp.pA,  name: 'xG empirique', icon: '📐' });
-if (hrComp)    components.push({ w: 0.30, pH: hrComp.pH,  pD: 0,             pA: hrComp.pA,  name: 'Domicile/Ext.', icon: '🏠' });
-if (recScore)  components.push({ w: 0.30, pH: recScore.pH,pD: recScore.pD||0,pA: recScore.pA,name: 'Bilan saison',  icon: '📈' });
-if (eloComp)   components.push({ w: 0.30, pH: eloComp.pH, pD: eloComp.pD||0, pA: eloComp.pA, name: 'Force',         icon: '💪' });
-if (h2hComp)   components.push({ w: 0.25, pH: h2hComp.pH, pD: h2hComp.pD||0, pA: h2hComp.pA, name: 'Face-à-face',   icon: '⚔️' });
+const adaptiveW = (name, fallback) => getAdaptiveComponentWeightV5(name, fallback, match);
+if (pH != null) components.push({ w: adaptiveW('Marché', 0.50), pH, pD: (pD||0), pA, isMarket: true, name: 'Marché',   icon: '📊' });
+if (poi)       components.push({ w: adaptiveW('Buts attendus', xgComp ? 0.40 : 0.50), pH: poi.pH,     pD: poi.pD,        pA: poi.pA,     name: 'Buts attendus', icon: '⚽' });
+if (xgComp)   components.push({ w: adaptiveW('xG empirique', 0.20), pH: xgComp.pH,  pD: xgComp.pD,     pA: xgComp.pA,  name: 'xG empirique', icon: '📐' });
+if (hrComp)    components.push({ w: adaptiveW('Domicile/Ext.', 0.30), pH: hrComp.pH,  pD: 0,             pA: hrComp.pA,  name: 'Domicile/Ext.', icon: '🏠' });
+if (recScore)  components.push({ w: adaptiveW('Bilan saison', 0.30), pH: recScore.pH,pD: recScore.pD||0,pA: recScore.pA,name: 'Bilan saison',  icon: '📈' });
+if (eloComp)   components.push({ w: adaptiveW('Force', 0.30), pH: eloComp.pH, pD: eloComp.pD||0, pA: eloComp.pA, name: 'Force',         icon: '💪' });
+if (h2hComp)   components.push({ w: adaptiveW('Face-à-face', 0.25), pH: h2hComp.pH, pD: h2hComp.pD||0, pA: h2hComp.pA, name: 'Face-à-face',   icon: '⚔️' });
 const _hasSackmann = match.sport === 'tennis' && match.tennis_features
 && (match.tennis_features.home || match.tennis_features.away);
 if (match.sport === 'tennis' && !_hasSackmann && home?.rank && away?.rank) {
@@ -7747,7 +7791,7 @@ const rH = Number(home.rank), rA = Number(away.rank);
 if (rH > 0 && rA > 0 && rH !== rA) {
 const lg = Math.log(rA) - Math.log(rH);
 const pTennisHome = Math.max(0.15, Math.min(0.85, 0.5 + 0.5 * Math.tanh(lg * 0.45)));
-components.push({ w: 0.40, pH: pTennisHome, pD: 0, pA: 1 - pTennisHome, name: 'Classement ATP/WTA', icon: '🏆' });
+    components.push({ w: adaptiveW('Elo joueur', 0.40), pH: pTennisHome, pD: 0, pA: 1 - pTennisHome, name: 'Classement ATP/WTA', icon: '🏆' });
 }
 }
 let tennisStats = null;
@@ -7758,7 +7802,7 @@ if (hF && aF && typeof tf.surface_elo_diff === 'number') {
 const diff = tf.surface_elo_diff;
 const pSurfHome = 1 / (1 + Math.pow(10, -diff / 400));
 const pSurfClamp = Math.max(0.10, Math.min(0.90, pSurfHome));
-components.push({ w: 0.30, pH: pSurfClamp, pD: 0, pA: 1 - pSurfClamp,
+components.push({ w: adaptiveW('Elo joueur', 0.30), pH: pSurfClamp, pD: 0, pA: 1 - pSurfClamp,
 name: tf.surface ? `Elo ${tf.surface}` : 'Elo joueur',
 icon: tf.surface === 'Clay' ? '🟧' : tf.surface === 'Grass' ? '🟩' : '🏆' });
 }
@@ -7767,7 +7811,7 @@ const hW = (hF.wins_last10 || 0) / Math.max(hF.last10.length, 1);
 const aW = (aF.wins_last10 || 0) / Math.max(aF.last10.length, 1);
 const diff = hW - aW;
 const pFormHome = Math.max(0.20, Math.min(0.80, 0.5 + 0.5 * Math.tanh(diff * 1.2)));
-components.push({ w: 0.20, pH: pFormHome, pD: 0, pA: 1 - pFormHome,
+components.push({ w: adaptiveW('Forme L10', 0.20), pH: pFormHome, pD: 0, pA: 1 - pFormHome,
 name: 'Forme L10', icon: '🔥' });
 }
 if (hF && aF) {
@@ -7792,7 +7836,7 @@ const total = hW + aW;
 if (total >= 2) {  // 1-match H2H is barely a signal, skip
 const pH2HHome = (hW + 1) / (total + 2);
 const pH2HClamped = Math.max(0.25, Math.min(0.75, pH2HHome));
-components.push({ w: 0.15, pH: pH2HClamped, pD: 0, pA: 1 - pH2HClamped,
+components.push({ w: adaptiveW('H2H tennis', 0.15), pH: pH2HClamped, pD: 0, pA: 1 - pH2HClamped,
 name: 'H2H tennis', icon: '⚔️' });
 if (tennisStats) {
 tennisStats.h2h_home_wins = hW;
@@ -7812,7 +7856,7 @@ const hPace = hT.gf_per_game - hT.ga_per_game;
 const aPace = aT.gf_per_game - aT.ga_per_game;
 const paceDiff = hPace - aPace;
 const pPaceHome = Math.max(0.30, Math.min(0.70, 0.5 + 0.05 * paceDiff));
-components.push({ w: 0.20, pH: pPaceHome, pD: 0, pA: 1 - pPaceHome,
+components.push({ w: adaptiveW('Pace NHL', 0.20), pH: pPaceHome, pD: 0, pA: 1 - pPaceHome,
 name: 'Pace NHL', icon: '🏒' });
 nhlStats = {
 home_pace: Math.round(hPace * 100) / 100,
@@ -7824,7 +7868,7 @@ if (hT?.goalie?.save_pct && aT?.goalie?.save_pct) {
 const svH = hT.goalie.save_pct, svA = aT.goalie.save_pct;
 const svDiff = svH - svA;
 const pGoalieHome = Math.max(0.35, Math.min(0.65, 0.5 + 3 * svDiff));
-components.push({ w: 0.15, pH: pGoalieHome, pD: 0, pA: 1 - pGoalieHome,
+components.push({ w: adaptiveW('Goalie NHL', 0.15), pH: pGoalieHome, pD: 0, pA: 1 - pGoalieHome,
 name: 'Goalie NHL', icon: '🥅' });
 if (nhlStats) {
 nhlStats.home_goalie = hT.goalie;
@@ -7847,7 +7891,7 @@ const eraH = shrink(hp.era, hp.ip);
 const eraA = shrink(ap.era, ap.ip);
 const eraDiff = eraA - eraH;  // positive when home pitcher is better
 const pPitcherHome = Math.max(0.30, Math.min(0.70, 0.5 + 0.07 * eraDiff));
-components.push({ w: 0.20, pH: pPitcherHome, pD: 0, pA: 1 - pPitcherHome,
+components.push({ w: adaptiveW('Pitcher partant', 0.20), pH: pPitcherHome, pD: 0, pA: 1 - pPitcherHome,
 name: 'Pitcher partant', icon: '⚾' });
 pitcherStats = { home: hp, away: ap, era_diff: eraDiff };
 }
@@ -17605,6 +17649,7 @@ featureEngineeringV5: getFeatureEngineeringV5DebugSummary(),
 modelVersionsV5: getModelVersionsV5DebugSummary(),
 featureDriftV5: getFeatureDriftV5DebugSummary(),
 calibrationMethodV5: getCalibrationMethodV5DebugSummary(),
+adaptiveEnsembleV5: getAdaptiveEnsembleV5DebugSummary(),
 seasonPhase: getSeasonPhaseDebugSummary(),
 starPlayers: getStarPlayersDebugSummary(),
 xgDecay: getXGDecayDebugSummary(),
@@ -23831,6 +23876,37 @@ return `<section style="margin-top:32px;">
           </div>
         </section>`;
 })();
+const v5AdaptiveEnsembleHtml = (() => {
+const data = window.ENSEMBLE_ADAPTIVE_V5 || null;
+if (!data) return '';
+const rows = Object.entries(data.weights || {}).sort((a, b) => Number(b[1] || 0) - Number(a[1] || 0)).slice(0, 10);
+const sportRows = Object.entries(data.by_sport || {}).slice(0, 6);
+return `<section style="margin-top:32px;">
+          <h2 class="page-h2">⚖️ Poids adaptatifs V5</h2>
+          <div style="padding:14px;background:var(--panel);border:1px solid var(--border);border-radius:12px;">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:10px;">
+              <div><div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;font-weight:800;">Statut</div><div style="font-size:24px;font-weight:900;color:${data.status === 'ok' ? 'var(--accent)' : 'var(--warn)'};">${esc(data.status || '—')}</div><div style="font-size:11px;color:var(--text-dim2);">reweight borné</div></div>
+              <div><div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;font-weight:800;">Drift</div><div style="font-size:24px;font-weight:900;">${esc(data.drift?.overall || '—')}</div><div style="font-size:11px;color:var(--text-dim2);">KL max ${Number(data.drift?.max_kl || 0).toFixed(2)}</div></div>
+              <div><div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;font-weight:800;">Fenêtre</div><div style="font-size:24px;font-weight:900;">${Number(data.window_days || 30)}j</div><div style="font-size:11px;color:var(--text-dim2);">recalage dimanche</div></div>
+            </div>
+            <div style="font-size:12px;color:var(--text-dim);margin-bottom:8px;">Les poids de l'ensemble sont recalculés hors UI depuis le Brier validation, l'importance du stacking et le drift. Les bornes évitent qu'un seul signal écrase les autres.</div>
+            ${rows.map(([key, weight]) => `<div style="display:grid;grid-template-columns:1fr 90px;gap:8px;padding:6px 0;border-top:1px solid var(--border);font-size:12px;align-items:center;">
+              <span>${esc(key.replace(/_/g, ' '))}</span>
+              <b style="text-align:right;color:var(--brand);">${Math.round(Number(weight || 0) * 100)}%</b>
+            </div>`).join('')}
+            <details style="margin-top:10px;">
+              <summary style="cursor:pointer;color:var(--brand);font-weight:800;font-size:12px;">Voir les poids par sport</summary>
+              <div style="margin-top:8px;">
+                ${sportRows.map(([sport, row]) => `<div style="padding:7px 0;border-top:1px solid var(--border);font-size:12px;">
+                  <b>${esc(sport)}</b>
+                  <span style="color:var(--text-dim2);margin-left:8px;">Brier ${Number(row.brier || 0).toFixed(3)} · n=${Number(row.n || 0)}</span>
+                  <div style="margin-top:4px;color:var(--text-dim);">${Object.entries(row.weights || {}).map(([k, v]) => `${esc(k.replace(/_/g, ' '))} ${Math.round(Number(v || 0) * 100)}%`).join(' · ')}</div>
+                </div>`).join('')}
+              </div>
+            </details>
+          </div>
+        </section>`;
+})();
 wrap.innerHTML = `
       <div style="max-width:900px;margin:0 auto;padding:16px 12px 40px;">
         <div style="padding:40px 0 16px;border-bottom:1px solid var(--border);">
@@ -23867,6 +23943,7 @@ wrap.innerHTML = `
         ${v5FeatureEngineeringHtml}
         ${v5ModelVersionsHtml}
         ${v5CalibrationHtml}
+        ${v5AdaptiveEnsembleHtml}
 
         <section style="margin-top:32px;">
           <h2 class="page-h2">🧮 Comment le modèle décide</h2>
