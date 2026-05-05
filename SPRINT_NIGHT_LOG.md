@@ -765,3 +765,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Stale: footer passe en orange apres 30 min (`Données en attente de refresh`) et rouge apres 4h (`Pipeline en panne`) pour eviter le badge vert contradictoire.
 - QA: `node --check app.js/sw.js` OK, `run_dashboard_dry.js` OK, `phase-finale-dashboard.spec.js` 10/10 desktop+mobile, `check_bundle_size.py` OK (`app.js` 1589.6 KB < 1750 KB).
 - Cache/footer bumpes v35.476; `app.js` hash `b4dbbfe0`, `app.css` hash `e464318c`, SW `paris-sportif-20260505-183558`.
+
+## Sprint v35.477 — AUTO 10/10 Profil lisible en accordéons (19:01 UTC)
+- Profil: les blocs sont regroupes en 4 accordéons persistants (`Mon argent`, `Mes préférences`, `Mes données`, `Légal & confidentialité`) sans supprimer de réglage existant.
+- UX: le premier accordéon reste ouvert par défaut; les résumés Profil ouvrent automatiquement le bon groupe avant de scroller vers le réglage ciblé.
+- Sécurité: CSP restampe avec les hashes LF reels des 7 scripts inline pour supprimer les violations au boot Playwright.
+- QA: `node --check app.js/sw.js` OK, `critical-flows.spec.js` 30/30 passes + 4 skips attendus sur chromium desktop, `a11y_audit.js` 0 critical/serious/moderate.
+- Cache/footer bumpes v35.477; `app.js` hash `42c6dac4`, `app.css` hash `d19b2228`, SW `paris-sportif-20260505-190102`.

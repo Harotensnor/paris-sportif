@@ -22880,6 +22880,80 @@ return `
 </div>
 </div>`;
 
+    const buildProfileAccordions = () => {
+      const grid = wrap.querySelector('.profil-grid');
+      if (!grid || grid.dataset.profileAccordions === '1') return;
+      let state = {};
+      try { state = JSON.parse(localStorage.getItem('profilAccordionState') || '{}') || {}; } catch(e) { state = {}; }
+      const cards = Array.from(grid.children).filter(el => el && el.nodeType === 1);
+      const textOf = (el) => String(el.querySelector('h3')?.textContent || el.textContent || '').toLowerCase();
+      const belongs = (el, group) => {
+        const id = el.id || '';
+        const txt = textOf(el);
+        if (group === 'money') {
+          return ['profile-bankroll', 'profile-bankroll-simulator', 'profile-odds', 'profile-personal-suggestions', 'profile-competition'].includes(id)
+            || txt.includes('bankroll') || txt.includes('cagnotte') || txt.includes('simuler une progression') || txt.includes('suggestions personnalisées') || txt.includes('mode compétition');
+        }
+        if (group === 'prefs') {
+          return ['profile-appearance', 'profile-language', 'profile-strategy', 'profile-sports', 'profile-browser-notifs'].includes(id)
+            || txt.includes('apparence') || txt.includes('langue') || txt.includes('mon niveau') || txt.includes('stratégie') || txt.includes('pari sûr') || txt.includes('anti-panique') || txt.includes('mode focus') || txt.includes('sports favoris') || txt.includes('notifications navigateur') || txt.includes('discord');
+        }
+        if (group === 'data') {
+          return ['profile-data'].includes(id)
+            || txt.includes('santé technique') || txt.includes('ce que tu as appris') || txt.includes('performance navigateur') || txt.includes('exports') || txt.includes('astuces');
+        }
+        return txt.includes('zone danger') || txt.includes('rgpd') || txt.includes('confidentialité') || txt.includes('légal');
+      };
+      const groupDefs = [
+        { key: 'money', title: 'Mon argent', desc: 'Bankroll, suivi et progression', open: true },
+        { key: 'prefs', title: 'Mes préférences', desc: 'Thème, stratégie, sports et notifications', open: false },
+        { key: 'data', title: 'Mes données', desc: 'Exports, santé et historique local', open: false },
+        { key: 'legal', title: 'Légal & confidentialité', desc: 'Reset, RGPD et contrôle local', open: false },
+      ];
+      const assigned = new Set();
+      const buckets = new Map(groupDefs.map(g => [g.key, []]));
+      cards.forEach(card => {
+        const key = groupDefs.find(g => belongs(card, g.key))?.key || 'prefs';
+        assigned.add(card);
+        buckets.get(key).push(card);
+      });
+      if (!assigned.size) return;
+      grid.dataset.profileAccordions = '1';
+      grid.innerHTML = '';
+      groupDefs.forEach(def => {
+        const items = buckets.get(def.key) || [];
+        if (!items.length) return;
+        const details = document.createElement('details');
+        details.className = 'profile-accordion';
+        details.dataset.profileAccordion = def.key;
+        details.open = Object.prototype.hasOwnProperty.call(state, def.key) ? Boolean(state[def.key]) : Boolean(def.open);
+        details.style.cssText = 'box-sizing:border-box;width:100%;border:1px solid var(--border);border-radius:var(--r-lg);background:color-mix(in srgb,var(--panel) 82%,transparent);overflow:hidden;';
+        const summary = document.createElement('summary');
+        summary.style.cssText = 'min-height:58px;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:0 16px;cursor:pointer;list-style:none;color:var(--text);';
+        summary.innerHTML = `
+          <span style="min-width:0;">
+            <b style="display:block;font-size:15px;font-weight:950;">${esc(def.title)}</b>
+            <em style="display:block;font-style:normal;font-size:11.5px;color:var(--text-dim);margin-top:2px;">${esc(def.desc)} · ${items.length} bloc${items.length > 1 ? 's' : ''}</em>
+          </span>
+          <span aria-hidden="true" style="flex:0 0 auto;color:var(--text-dim);font-size:18px;">⌄</span>`;
+        const body = document.createElement('div');
+        body.className = 'profile-accordion-body';
+        body.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;padding:0 14px 14px;';
+        items.forEach(item => body.appendChild(item));
+        details.appendChild(summary);
+        details.appendChild(body);
+        details.addEventListener('toggle', () => {
+          try {
+            const cur = JSON.parse(localStorage.getItem('profilAccordionState') || '{}') || {};
+            cur[def.key] = details.open;
+            localStorage.setItem('profilAccordionState', JSON.stringify(cur));
+          } catch(e) {}
+        });
+        grid.appendChild(details);
+      });
+    };
+    buildProfileAccordions();
+
     const compactProfileLayout = (() => {
       try { return window.matchMedia('(max-width: 899px)').matches; }
       catch(e) { return false; }
@@ -22897,7 +22971,7 @@ return `
       details.appendChild(summary);
       details.appendChild(panel);
     };
-    if (compactProfileLayout) {
+    if (compactProfileLayout && !wrap.querySelector('.profile-accordion')) {
       ['#profile-personal-suggestions', '#profile-competition'].forEach(sel => wrapProfilePanel(wrap.querySelector(sel)));
       const keepOpen = new Set(['profile-bankroll', 'profile-odds', 'profile-strategy', 'profile-bankroll-simulator']);
       const grid = wrap.querySelector('.profil-grid');
@@ -22924,7 +22998,7 @@ return `
       btn.addEventListener('click', () => {
         const target = wrap.querySelector(btn.dataset.profileJump || '');
         if (target) {
-          const parentDetails = target.closest('details.profile-compact-details');
+          const parentDetails = target.closest('details.profile-compact-details,details.profile-accordion');
           if (parentDetails) parentDetails.open = true;
           target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
