@@ -5421,6 +5421,7 @@ const roleContext = pred?.goaliePitcherContext || getGoaliePitcherContext(match)
 const stadium = pred?.poisson?.stadiumEffect || getStadiumEffect(match);
 const coach = pred?.coachContext || getCoachContext(match);
 const derby = pred?.derbyContext || getDerbyContext(match);
+const extStats = pred?.poisson?.extendedStats || getTeamStatsExtendedContext(match);
 const badges = [];
 if (competition) badges.push({ label: competition.label, title: competition.reason || 'Contexte compétition' });
 if (season) badges.push({ label: season.label, title: `Phase saison · ${season.sample_teams || 0} équipes suivies` });
@@ -5432,6 +5433,7 @@ if (tennisSurface) badges.push({ label: `Surface ${tennisSurface.surface}`, titl
 if (roleContext?.home_goalie) badges.push({ label: `Goalie ${roleContext.home_goalie.name || 'NHL'}`, title: `SV% ${roleContext.home_goalie.save_pct || '—'} · GAA ${roleContext.home_goalie.gaa || '—'}` });
 if (roleContext?.home_pitcher) badges.push({ label: `Pitcher ${roleContext.home_pitcher.name || 'MLB'}`, title: `ERA ${roleContext.home_pitcher.era || '—'} · WHIP ${roleContext.home_pitcher.whip || '—'}` });
 if (stadium?.altitude_m > 0) badges.push({ label: `Stade ${stadium.altitude_m}m`, title: `${stadium.name || 'Stade'} · capacité ${stadium.capacity || '—'} · ${stadium.surface_type || 'surface inconnue'}` });
+if (extStats?.home?.set_piece_xG > 0.4 || extStats?.away?.set_piece_xG > 0.4) badges.push({ label: 'Set pieces forts', title: `${extStats.home?.team || 'Dom'} ${extStats.home?.set_piece_xG || '—'} · ${extStats.away?.team || 'Ext'} ${extStats.away?.set_piece_xG || '—'}` });
 if (coach?.home?.status && coach.home.status !== 'stable') badges.push({ label: `Coach ${coach.home.status}`, title: `${coach.home.team} · ${coach.home.days_since_nomination}j` });
 if (coach?.away?.status && coach.away.status !== 'stable') badges.push({ label: `Coach ${coach.away.status}`, title: `${coach.away.team} · ${coach.away.days_since_nomination}j` });
 if (derby) badges.push({ label: `Derby : ${derby.label}`, title: `Variance ×${derby.variance_multiplier} · edge requis +${Math.round(derby.edge_required_bonus * 100)}pt` });
@@ -5727,6 +5729,33 @@ window.getDerbyContext = getDerbyContext;
 window.getDerbiesDebugSummary = getDerbiesDebugSummary;
 } catch (e) {}
 
+function _teamStatsExtendedFromTuple(key, row) {
+if (!Array.isArray(row)) return row || null;
+return { team_key: key, team: row[0], league: row[1], set_piece_xG: Number(row[2]) || 0, counter_attack_xG: Number(row[3]) || 0, pressing_intensity: Number(row[4]) || 0, xg_for_avg: Number(row[5]) || 0, xg_against_avg: Number(row[6]) || 0 };
+}
+function getTeamStatsExtendedForSide(side) {
+const key = _teamPriorNorm(side?.name || side?.short || side?.abbr || '');
+return _teamStatsExtendedFromTuple(key, window.TEAM_STATS_EXTENDED?.teams?.[key]);
+}
+function getTeamStatsExtendedContext(match) {
+const { home, away } = getSides(match || {});
+const h = getTeamStatsExtendedForSide(home);
+const a = getTeamStatsExtendedForSide(away);
+if (!h && !a) return null;
+return { home: h, away: a };
+}
+function getTeamStatsExtendedDebugSummary() {
+return {
+loaded: !!window.TEAM_STATS_EXTENDED,
+teams: Number(window.TEAM_STATS_EXTENDED?.team_count || Object.keys(window.TEAM_STATS_EXTENDED?.teams || {}).length || 0),
+generatedAt: window.TEAM_STATS_EXTENDED?.generated_at || null,
+};
+}
+try {
+window.getTeamStatsExtendedContext = getTeamStatsExtendedContext;
+window.getTeamStatsExtendedDebugSummary = getTeamStatsExtendedDebugSummary;
+} catch (e) {}
+
 function poissonComponent(match) {
 if (match.sport !== 'football') return null;
 const { home, away } = getSides(match);
@@ -5749,6 +5778,11 @@ if (stadiumEffect?.goal_adjustment) {
 lamH = Math.max(0.2, lamH + stadiumEffect.goal_adjustment / 2);
 lamA = Math.max(0.2, lamA + stadiumEffect.goal_adjustment / 2);
 }
+const extendedStats = getTeamStatsExtendedContext(match);
+if (extendedStats?.home?.set_piece_xG > 0.4 && (extendedStats?.away?.xg_against_avg || 0) > 1.35) lamH += 0.05;
+if (extendedStats?.away?.set_piece_xG > 0.4 && (extendedStats?.home?.xg_against_avg || 0) > 1.35) lamA += 0.05;
+if (extendedStats?.home?.counter_attack_xG > 0.35 && (extendedStats?.away?.pressing_intensity || 0) > 70) lamH += 0.04;
+if (extendedStats?.away?.counter_attack_xG > 0.35 && (extendedStats?.home?.pressing_intensity || 0) > 70) lamA += 0.04;
 const decayParam = getXGDecayParam(match);
 const decayedRecentProxy = (side) => {
 const rows = Array.isArray(side?.last10) ? side.last10.slice() : [];
@@ -5839,7 +5873,7 @@ lamA = Math.max(0.2, lamA - (Number(starImpact.awayGoalPenalty) || 0));
 }
 const probs = poissonProbs(lamH, lamA);
 if (!probs) return null;
-return { ...probs, lamH, lamA, fbrefBlend, bayesianPrior, starImpact, stadiumEffect };
+return { ...probs, lamH, lamA, fbrefBlend, bayesianPrior, starImpact, stadiumEffect, extendedStats };
 }
 
 let __congestionCache = null;
@@ -7518,6 +7552,16 @@ icon: '🏟️',
 text: `Effet stade : ${poi.stadiumEffect.name || 'stade'} à ${poi.stadiumEffect.altitude_m}m, total buts +${poi.stadiumEffect.goal_adjustment.toFixed(2)}.`,
 });
 }
+if (poi.extendedStats?.home || poi.extendedStats?.away) {
+const h = poi.extendedStats.home;
+const a = poi.extendedStats.away;
+const top = [h, a].filter(Boolean).sort((x, y) => (y.set_piece_xG + y.counter_attack_xG) - (x.set_piece_xG + x.counter_attack_xG))[0];
+reasons.push({
+type: 'team_stats_extended',
+icon: '🎯',
+text: `Stats V4 : ${top.team} set-piece ${top.set_piece_xG.toFixed(2)} xG, contre ${top.counter_attack_xG.toFixed(2)} xG, pressing ${Math.round(top.pressing_intensity)}.`,
+});
+}
 }
 if (eloStats && Math.abs(eloStats.diff) >= 30) {
 const leaderElo = eloStats.diff > 0 ? (home?.short || home?.name) : (away?.short || away?.name);
@@ -8088,7 +8132,7 @@ return typeof _po === 'number' && _po > 0 && _po <= 1.5;
 isLockStrict: reliability >= 0.75,
 abstain,
 sharp_money: smartMoneyNudge || null,
-poisson: poi ? { xgH: poi.lamH, xgA: poi.lamA, fbrefBlend: poi.fbrefBlend || null, bayesianPrior: poi.bayesianPrior || null, stadiumEffect: poi.stadiumEffect || null } : null,
+poisson: poi ? { xgH: poi.lamH, xgA: poi.lamA, fbrefBlend: poi.fbrefBlend || null, bayesianPrior: poi.bayesianPrior || null, stadiumEffect: poi.stadiumEffect || null, extendedStats: poi.extendedStats || null } : null,
 seasonContext,
 competitionContext,
 starImpact: poi?.starImpact || getStarImpact(match),
@@ -16552,6 +16596,7 @@ roleContext: getRoleContextDebugSummary(),
 stadiumEffects: getStadiumEffectsDebugSummary(),
 coachTenure: getCoachTenureDebugSummary(),
 derbies: getDerbiesDebugSummary(),
+teamStatsExtended: getTeamStatsExtendedDebugSummary(),
 qualityCounters: v37QualityCounters,
 qualitySamples: v37QualitySamples,
 rejectReasons: v37RejectReasons,

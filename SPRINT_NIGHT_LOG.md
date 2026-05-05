@@ -897,3 +897,11 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Pipeline: `build_derbies.py` branché dans cron local/GHA/health; drift pipeline OK.
 - QA: `app.js` syntax OK, scripts Python compilés, health warning non critique.
 - Cache/footer bumpes v36.010; `app.js` hash `bdf0f72a`, `derbies.js` hash `e4d558e2`, SW `paris-sportif-20260505-212241`.
+
+## Sprint v36.011 — AUTO 10/10 Modèle V4 MM team stats étendues (21:25 UTC)
+- Team stats: `team_stats_extended.json` couvre 367 équipes avec set_piece_xG, counter_attack_xG et pressing_intensity.
+- Modèle: Poisson ajoute seulement +0.04/+0.05 buts si set pieces/contres croisent une défense ou un pressing exposé.
+- Modal/debug: badge set pieces et `?debug=1.teamStatsExtended` disponibles.
+- Pipeline: `build_team_stats_extended_v4.py` branché dans cron local/GHA/health; drift pipeline OK.
+- QA: `app.js` syntax OK, scripts Python compilés, health warning non critique.
+- Cache/footer bumpes v36.011; `app.js` hash `5937133f`, `team_stats_extended.js` hash `44e78609`, SW `paris-sportif-20260505-212505`.
