@@ -5412,15 +5412,106 @@ try { window.getCompetitionContext = getCompetitionContext; } catch (e) {}
 function buildV4ContextBadges(match, pred) {
 const season = pred?.seasonContext || getSeasonPhaseContext(match);
 const competition = pred?.competitionContext || getCompetitionContext(match);
+const starImpact = pred?.starImpact || getStarImpact(match);
 const badges = [];
 if (competition) badges.push({ label: competition.label, title: competition.reason || 'Contexte compétition' });
 if (season) badges.push({ label: season.label, title: `Phase saison · ${season.sample_teams || 0} équipes suivies` });
+if (starImpact) badges.push({ label: `Impact absence : ${starImpact.active ? starImpact.label : 'aucun star absent majeur'}`, title: starImpact.detail || 'Top joueurs croisés avec la liste des absents.' });
 if (!badges.length) return '';
 return `<div class="v4-context-badges" style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 14px;">
 ${badges.map(b => `<span style="display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--border);border-radius:999px;background:var(--panel-2);font-size:12px;font-weight:750;color:var(--text);" title="${esc(b.title)}">${esc(b.label)}</span>`).join('')}
 </div>`;
 }
 try { window.buildV4ContextBadges = buildV4ContextBadges; } catch (e) {}
+
+function _starPlayerFromTuple(row) {
+if (!Array.isArray(row)) return row || null;
+return {
+name: row[0],
+xG_per_match: Number(row[1]) || 0,
+assists_per_match: Number(row[2]) || 0,
+points_per_match: Number(row[3]) || 0,
+goals_per_match: Number(row[4]) || 0,
+leadership_score: Number(row[5]) || 0,
+position: row[6] || '',
+role: row[7] || '',
+};
+}
+function getStarPlayersForSide(match, side) {
+const data = window.STAR_PLAYERS || null;
+if (!data || !side) return [];
+const keys = [side.name, side.short, side.abbr].filter(Boolean).map(_teamPriorNorm);
+for (const key of keys) {
+const rows = data.teams?.[key];
+if (Array.isArray(rows)) return rows.map(_starPlayerFromTuple).filter(Boolean);
+if (rows?.players) return rows.players.map(_starPlayerFromTuple).filter(Boolean);
+}
+return [];
+}
+function _injuryNamesForSide(side) {
+const rows = Array.isArray(side?.injuries) ? side.injuries : [];
+return rows.map(x => x?.player || x?.name || '').filter(Boolean);
+}
+function getStarImpact(match) {
+const { home, away } = getSides(match || {});
+if (!home || !away) return null;
+const sport = String(match?.sport || '').toLowerCase();
+const sides = [
+{ side: 'home', team: home, stars: getStarPlayersForSide(match, home), injuries: _injuryNamesForSide(home) },
+{ side: 'away', team: away, stars: getStarPlayersForSide(match, away), injuries: _injuryNamesForSide(away) },
+];
+let homeGoalPenalty = 0;
+let awayGoalPenalty = 0;
+let homePointPenalty = 0;
+let awayPointPenalty = 0;
+const matches = [];
+for (const row of sides) {
+const injuredKeys = new Set(row.injuries.map(_teamPriorNorm));
+for (const star of row.stars) {
+if (!star?.name || !injuredKeys.has(_teamPriorNorm(star.name))) continue;
+let impact = 0;
+if (sport === 'football') impact = (Number(star.xG_per_match) || 0) * 0.7;
+else if (sport === 'basketball') impact = (Number(star.points_per_match) || 0) * 0.6;
+else if (sport === 'hockey') impact = (Number(star.goals_per_match) || 0) * 0.5;
+else if (sport === 'baseball') impact = String(star.role || '').includes('pitcher') ? 0.18 : 0.06;
+if (impact <= 0) continue;
+if (sport === 'basketball') {
+if (row.side === 'home') homePointPenalty += impact; else awayPointPenalty += impact;
+} else {
+if (row.side === 'home') homeGoalPenalty += impact; else awayGoalPenalty += impact;
+}
+matches.push({ side: row.side, team: row.team.name, name: star.name, impact: Math.round(impact * 100) / 100, role: star.role || star.position || '' });
+}
+}
+const active = matches.length > 0;
+const label = sport === 'basketball'
+? `${active ? '-' + Math.max(homePointPenalty, awayPointPenalty).toFixed(1) + ' pts' : '0 pt'}`
+: `${active ? '-' + Math.max(homeGoalPenalty, awayGoalPenalty).toFixed(2) + ' buts attendus' : '0 but attendu'}`;
+return {
+active,
+homeGoalPenalty: Math.round(homeGoalPenalty * 1000) / 1000,
+awayGoalPenalty: Math.round(awayGoalPenalty * 1000) / 1000,
+homePointPenalty: Math.round(homePointPenalty * 1000) / 1000,
+awayPointPenalty: Math.round(awayPointPenalty * 1000) / 1000,
+matches,
+label,
+detail: active ? matches.map(m => `${m.name} (${m.team}) ${m.impact}`).join(' · ') : 'Aucune absence majeure croisée avec les top joueurs.',
+};
+}
+function getStarPlayersDebugSummary() {
+const data = window.STAR_PLAYERS || null;
+return {
+loaded: !!data,
+teams: Number(data?.team_count || Object.keys(data?.teams || {}).length || 0),
+stars: Number(data?.star_count || 0),
+generatedAt: data?.generated_at || null,
+};
+}
+try {
+window.getStarPlayersForSide = getStarPlayersForSide;
+window.getStarImpact = getStarImpact;
+window.getStarPlayersDebugSummary = getStarPlayersDebugSummary;
+} catch (e) {}
 
 function poissonComponent(match) {
 if (match.sport !== 'football') return null;
@@ -5492,9 +5583,14 @@ generated_at: _getTeamPriorIndex()?.generated_at || null,
 lamH = Math.max(0.2, (1 - wPrior) * lamH + wPrior * priorLamH);
 lamA = Math.max(0.2, (1 - wPrior) * lamA + wPrior * priorLamA);
 }
+const starImpact = getStarImpact(match);
+if (starImpact?.active) {
+lamH = Math.max(0.2, lamH - (Number(starImpact.homeGoalPenalty) || 0));
+lamA = Math.max(0.2, lamA - (Number(starImpact.awayGoalPenalty) || 0));
+}
 const probs = poissonProbs(lamH, lamA);
 if (!probs) return null;
-return { ...probs, lamH, lamA, fbrefBlend, bayesianPrior };
+return { ...probs, lamH, lamA, fbrefBlend, bayesianPrior, starImpact };
 }
 
 let __congestionCache = null;
@@ -7158,6 +7254,13 @@ icon: '🧠',
 text: `Prior V4 : 20 derniers matchs pondérés, blend ${Math.round(poi.bayesianPrior.weight * 100)}% dans le modèle buts.`,
 });
 }
+if (poi.starImpact?.active) {
+reasons.push({
+type: 'star_absence',
+icon: '⭐',
+text: `Impact absence : ${poi.starImpact.label} (${poi.starImpact.matches.slice(0, 2).map(s => s.name).join(', ')}).`,
+});
+}
 }
 if (eloStats && Math.abs(eloStats.diff) >= 30) {
 const leaderElo = eloStats.diff > 0 ? (home?.short || home?.name) : (away?.short || away?.name);
@@ -7625,6 +7728,7 @@ sharp_money: smartMoneyNudge || null,
 poisson: poi ? { xgH: poi.lamH, xgA: poi.lamA, fbrefBlend: poi.fbrefBlend || null, bayesianPrior: poi.bayesianPrior || null } : null,
 seasonContext,
 competitionContext,
+starImpact: poi?.starImpact || getStarImpact(match),
 scores: (() => {
 if (poi) return poissonTopScores(poi.lamH, poi.lamA, 10, 6, match.league_code);
 if (match.sport === 'hockey') return hockeyScorePrediction(match);
@@ -16070,6 +16174,7 @@ tierDiagnostics: v37TierDiagnostics,
 oddsSnapshotCoverage: v37SnapshotCoverage,
 teamPriors: getTeamPriorsDebugSummary(),
 seasonPhase: getSeasonPhaseDebugSummary(),
+starPlayers: getStarPlayersDebugSummary(),
 qualityCounters: v37QualityCounters,
 qualitySamples: v37QualitySamples,
 rejectReasons: v37RejectReasons,
