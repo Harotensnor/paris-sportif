@@ -699,3 +699,8 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Lighthouse: `scripts/lighthouse_audit.js` confirme 100 perf / 100 a11y / 100 SEO sur mobile et desktop pour Accueil, Tous, Performance, Academie.
 - Bundle: `app.js` mesure 1,607,397 bytes et reste sous le cap 1.7MB; `app.css` mesure 359,119 bytes.
 - Aucun changement applicatif requis apres audit.
+
+## Sprint v35.468 — AUTO 10/10 Documentation hebergement (18:36 UTC)
+- Doc: creation de `HEBERGEMENT.md` pour expliquer GitHub Pages actuel, discretion par URL, options privees gerees, GitHub Pages prive et hebergement personnel.
+- Recommandation: rester sur GitHub Pages discret a court terme, car la priorite produit reste la confiance tableau/picks/historique.
+- Aucun changement applicatif ni cache requis.
