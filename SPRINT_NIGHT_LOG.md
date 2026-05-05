@@ -734,3 +734,8 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Bundle: `scripts/check_bundle_size.py` repasse OK; `app.js` reste a 1,571.4 KB / 1,750 KB et `app.css` a 260.4 KB / 300 KB.
 - Cache: `pronostics.html` pointe sur `app.css?v=e464318c`, footer v35.472 et `sw.js` cache `paris-sportif-20260505-191537`.
 - QA: syntax inline/app/sw OK avec Node runtime local; `phase-finale-dashboard.spec.js` passe 6/6 desktop+mobile apres compression CSS.
+
+## Sprint v35.473 — AUTO 10/10 Rapport stabilite final (19:20 UTC)
+- Rapport: creation de `SPRINT_NIGHT_REPORT_STABILITE.md` avec etat tableau, aide decision, data, qualite, performance et risques restants.
+- Issues: `ISSUES.md` et `ISSUES_ACTIVE.md` pointent maintenant sur la revue v35.472 et gardent une seule issue active: nettoyage du run Playwright legacy complet.
+- Decision: la phase reste en mode qualite/stabilite; aucun ajout produit, seulement documentation de l'etat valide et des garde-fous.
