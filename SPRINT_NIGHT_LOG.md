@@ -1186,6 +1186,15 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Modèle: selfEvaluateConfidenceV5 estime la confiance dans la confiance par pick.
 - Scoring: méta-confiance <40% pénalise score qualité et score opportunité.
 - Modal/debug: "méta-confiance XX%" visible en détail et résumé selfEvaluationV5 dans ?debug=1.
-- Tests: suite model-v5 desktop + mobile à relancer après stamp; app.js syntax/drift en attente.
+- Tests: suite model-v5 desktop + mobile 24/24, app.js syntax OK, drift pipeline OK.
 - Cache/footer bumpés v37.012; app.js hash 8c5b6c7e; SW paris-sportif-20260505-233618.
+
+
+## Sprint v37.013 — AUTO 10/10 Phase V5 M adversarial validation (23:58 UTC)
+- Data: build_adversarial_validation_v5.py génère adversarial_validation.json/js depuis backtest_training_rows.jsonl.
+- Modèle: AUC train/test chronologique 0.892, seuil 0.600, promotion V5 marquée en rollout prudent.
+- Santé/Crédibilité/debug: résumé AUC, top shifts et test synthétique visibles via helpers V5.
+- Pipeline: auto_refresh.py, refresh.yml et model_versions référencent l'artefact adversarial.
+- Tests: suite model-v5 desktop + mobile 26/26, app.js syntax OK, drift pipeline OK.
+- Cache/footer bumpés v37.013; app.js hash 7b3e6914; adversarial_validation hash c1aaf593; SW paris-sportif-20260506-014652.
 

@@ -69,6 +69,7 @@ def build() -> dict[str, Any]:
                 "build_cold_start_v5.py",
                 "build_multitask_v5.py",
                 "build_backtest_deep_v5.py",
+                "build_adversarial_validation_v5.py",
             ],
             "settled_source": "picks_history.jsonl + backtest_training_rows.jsonl",
         },
@@ -114,6 +115,7 @@ def build() -> dict[str, Any]:
             "cold_start_v5.json": sha("cold_start_v5.json"),
             "multitask_v5.json": sha("multitask_v5.json"),
             "backtest_deep_v5.json": sha("backtest_deep_v5.json"),
+            "adversarial_validation.json": sha("adversarial_validation.json"),
         },
     }
 
