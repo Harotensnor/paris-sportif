@@ -147,6 +147,7 @@ PATCH_STAGES = [
     ('detect_feature_drift_v5.py',  1,   30),
     ('build_calibration_method_v5.py', 1, 30),
     ('build_adaptive_ensemble_v5.py', 1, 30),
+    ('build_cold_start_v5.py',     1,   30),
     ('build_model_versions_v5.py',  1,   30),
     ('build_season_phase.py',       1,   30),
     ('build_star_players.py',       1,   30),

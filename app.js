@@ -5709,6 +5709,53 @@ window.getBayesianPriorV5 = getBayesianPriorV5;
 window.getBayesianV5DebugSummary = getBayesianV5DebugSummary;
 } catch (e) {}
 
+function getColdStartContextV5(match) {
+if (!match) return null;
+const sides = getSides(match);
+const rows = [
+{ side: 'home', team: sides.home, prior: getBayesianPriorV5(match, sides.home) },
+{ side: 'away', team: sides.away, prior: getBayesianPriorV5(match, sides.away) },
+].filter(row => row.team);
+if (!rows.length) return null;
+const cold = rows.filter(row => !row.prior || (Number(row.prior.sample_size) || 0) < 5);
+if (!cold.length) return {
+active: false,
+min_sample: Math.min(...rows.map(row => Number(row.prior?.sample_size || 999))),
+policy: window.COLD_START_V5?.policy || null,
+};
+const policy = window.COLD_START_V5?.policy || {};
+return {
+active: true,
+version: 'v5',
+teams: cold.map(row => ({
+side: row.side,
+name: row.team?.short || row.team?.name || row.prior?.team_name || row.side,
+sample_size: Number(row.prior?.sample_size || 0),
+league: row.prior?.league || match.league_code || match.league_name || null,
+fallback: !row.prior || !!row.prior.fallback,
+})),
+min_sample: Math.min(...cold.map(row => Number(row.prior?.sample_size || 0))),
+confidence_decay: Number(policy.confidence_decay || 0.88),
+variance_multiplier: Number(policy.variance_multiplier || 1.25),
+edge_required_bonus: Number(policy.edge_required_bonus || 0.02),
+fallback: policy.fallback || 'league_mean_then_sport_mean',
+};
+}
+function getColdStartV5DebugSummary() {
+const data = window.COLD_START_V5 || null;
+return {
+loaded: !!data,
+coverage: data?.coverage || {},
+policy: data?.policy || {},
+sample: (data?.teams || []).slice(0, 8),
+generatedAt: data?.generated_at || null,
+};
+}
+try {
+window.getColdStartContextV5 = getColdStartContextV5;
+window.getColdStartV5DebugSummary = getColdStartV5DebugSummary;
+} catch (e) {}
+
 function getTeamPriorsDebugSummary() {
 const idx = _getTeamPriorIndex();
 const data = window.TEAM_PRIORS || null;
@@ -5798,6 +5845,7 @@ const roleContext = pred?.goaliePitcherContext || getGoaliePitcherContext(match)
 const stadium = pred?.poisson?.stadiumEffect || getStadiumEffect(match);
 const coach = pred?.coachContext || getCoachContext(match);
 const derby = pred?.derbyContext || getDerbyContext(match);
+const coldStart = pred?.coldStartContext || pred?.cold_start_v5 || getColdStartContextV5(match);
 const extStats = pred?.poisson?.extendedStats || getTeamStatsExtendedContext(match);
 const anomaly = pred?.market_anomaly || null;
 const nbaProps = match?.sport === 'basketball' && typeof getNbaPlayerProps === 'function' ? getNbaPlayerProps(match) : [];
@@ -5816,6 +5864,7 @@ if (extStats?.home?.set_piece_xG > 0.4 || extStats?.away?.set_piece_xG > 0.4) ba
 if (coach?.home?.status && coach.home.status !== 'stable') badges.push({ label: `Coach ${coach.home.status}`, title: `${coach.home.team} · ${coach.home.days_since_nomination}j` });
 if (coach?.away?.status && coach.away.status !== 'stable') badges.push({ label: `Coach ${coach.away.status}`, title: `${coach.away.team} · ${coach.away.days_since_nomination}j` });
 if (derby) badges.push({ label: `Derby : ${derby.label}`, title: `Variance ×${derby.variance_multiplier} · edge requis +${Math.round(derby.edge_required_bonus * 100)}pt` });
+if (coldStart?.active) badges.push({ label: 'Cold start V5', title: `Fallback ${coldStart.fallback} · edge requis +${Math.round(coldStart.edge_required_bonus * 100)}pt · ${coldStart.teams.map(t => `${t.name} n=${t.sample_size}`).join(' / ')}` });
 if (anomaly) badges.push({ label: 'Anomalie modèle/marché', title: `Écart brut ${Math.round(Math.abs(anomaly.gap || 0) * 100)}pt · proba plafonnée à ${Math.round((anomaly.capped_prob || 0) * 100)}%` });
 if (nbaProps.length) badges.push({ label: `${nbaProps.length} props joueurs NBA/WNBA`, title: 'Points, rebonds, passes et 3-points projetés depuis les profils joueurs locaux.' });
 if (!badges.length) return '';
@@ -6489,7 +6538,7 @@ const precomputed = repFresh && Array.isArray(rep.isotonic_pairs) && rep.isotoni
 : null;
 if (precomputed) {
 __reliabilityCalMap = precomputed.slice().sort((a, b) => a.predicted - b.predicted);
-return;
+return raw;
 }
 const buckets = (typeof computeCalibration === 'function') ? computeCalibration() : [];
 const solid = (buckets || []).filter(b => b.n >= 8);
@@ -8579,6 +8628,7 @@ let tennisSurfaceContext = null;
 let goaliePitcherContext = null;
 let coachContext = null;
 let derbyContext = null;
+let coldStartContext = null;
 {
 const pickKey = best_pick[2]; // '1' | 'X' | '2'
 const fieldMap = { '1': 'pH', 'X': 'pD', '2': 'pA' };
@@ -8652,10 +8702,12 @@ tennisSurfaceContext = getTennisSurfaceContext(match);
 goaliePitcherContext = getGoaliePitcherContext(match);
 coachContext = getCoachContext(match);
 derbyContext = getDerbyContext(match);
+coldStartContext = getColdStartContextV5(match);
 const contextDecay = Math.min(
 1,
 Number(seasonContext?.confidence_decay || 1),
-Number(competitionContext?.confidence_decay || 1)
+Number(competitionContext?.confidence_decay || 1),
+Number(coldStartContext?.confidence_decay || 1)
 );
 if (contextDecay < 1) {
 rawReliability = 0.5 + (rawReliability - 0.5) * contextDecay;
@@ -8714,6 +8766,7 @@ tennisSurface: tennisSurfaceContext,
 goaliePitcher: goaliePitcherContext,
 coach: coachContext,
 derby: derbyContext,
+coldStart: coldStartContext,
 };
 if (seasonContext) {
 reasons.push({
@@ -8779,6 +8832,13 @@ reasons.push({
 type: 'derby_intensity',
 icon: '🔥',
 text: `Derby : ${derbyContext.label}, variance ×${derbyContext.variance_multiplier.toFixed(2)} et edge requis +${Math.round(derbyContext.edge_required_bonus * 100)}pt.`,
+});
+}
+if (coldStartContext?.active) {
+reasons.push({
+type: 'cold_start_v5',
+icon: '🧊',
+text: `Cold start V5 : ${coldStartContext.teams.map(t => `${t.name} n=${t.sample_size}`).join(' / ')} → fallback ligue/sport, variance ×${coldStartContext.variance_multiplier.toFixed(2)} et edge requis +${Math.round(coldStartContext.edge_required_bonus * 100)}pt.`,
 });
 }
 }
@@ -8861,6 +8921,7 @@ const pickOdd = best_pick[2] === '1' ? best?.home : best_pick[2] === '2' ? best?
 const pickEdge = Number(pickOdd) > 1 ? reliability - (1 / Number(pickOdd)) : null;
 const dqNow = (typeof computeDataQuality === 'function') ? computeDataQuality(match) : { score: 4, max: 4 };
 const abstainReasons = [];
+const coldStartEdgeRequired = coldStartContext?.active ? Number(coldStartContext.edge_required_bonus || 0.02) : 0;
 const leagueText = String(match?.league_name || match?.league || match?.league_code || '').toLowerCase();
 const isTopFootball = sportKey === 'football' && /(premier|liga|serie a|bundesliga|ligue 1|champions|europa|top-5)/i.test(leagueText);
 const isReducedModelSport = ['basketball', 'hockey', 'baseball', 'tennis'].includes(sportKey);
@@ -8868,6 +8929,7 @@ const minPureComponents = isTopFootball ? 3 : sportKey === 'football' ? 2 : isRe
 const ensembleMissing = !ensembleMeta ? isTopFootball : pureCompCount < minPureComponents;
 if (reliability < 0.50) abstainReasons.push('confidence_lt_50');
 if (pickEdge != null && pickEdge < -0.005) abstainReasons.push('edge_negative');
+if (pickEdge != null && coldStartEdgeRequired > 0 && pickEdge < coldStartEdgeRequired) abstainReasons.push('cold_start_edge_lt_2pt');
 if (ensembleMissing) abstainReasons.push('ensemble_insufficient');
 if ((ensembleMeta?.agreement_variance || 0) > 0.20) abstainReasons.push('model_disagreement');
 if ((Number(dqNow?.score) || 0) < 2) abstainReasons.push('data_quality_lt_2');
@@ -8875,6 +8937,7 @@ const abstain = {
 active: abstainReasons.length > 0,
 reasons: abstainReasons,
 edge: pickEdge == null ? null : Math.round(pickEdge * 1000) / 1000,
+edge_required: Math.round(coldStartEdgeRequired * 1000) / 1000,
 data_quality: { score: Number(dqNow?.score) || 0, max: Number(dqNow?.max) || 4 },
 variance: ensembleMeta?.agreement_variance ?? null
 };
@@ -8936,6 +8999,8 @@ tennisSurfaceContext,
 goaliePitcherContext,
 coachContext,
 derbyContext,
+coldStartContext,
+cold_start_v5: coldStartContext,
 scores: (() => {
 if (poi) return poissonTopScores(poi.lamH, poi.lamA, 10, 6, match.league_code);
 if (match.sport === 'hockey') return hockeyScorePrediction(match);
@@ -17719,6 +17784,7 @@ modelVersionsV5: getModelVersionsV5DebugSummary(),
 featureDriftV5: getFeatureDriftV5DebugSummary(),
 calibrationMethodV5: getCalibrationMethodV5DebugSummary(),
 adaptiveEnsembleV5: getAdaptiveEnsembleV5DebugSummary(),
+coldStartV5: getColdStartV5DebugSummary(),
 seasonPhase: getSeasonPhaseDebugSummary(),
 starPlayers: getStarPlayersDebugSummary(),
 xgDecay: getXGDecayDebugSummary(),

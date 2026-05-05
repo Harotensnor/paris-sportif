@@ -1154,3 +1154,12 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Tests: suite model-v5 passe desktop + mobile Chromium (16/16); app.js syntax OK; drift pipeline OK.
 - Cache/footer bumpés v37.008; app.js hash 17719ba6; SW paris-sportif-20260505-231838.
 
+
+## Sprint v37.009 — AUTO 10/10 Phase V5 I cold start handling (23:28 UTC)
+- Data: build_cold_start_v5.py génère cold_start_v5.json/js depuis les priors bayesiens hiérarchiques.
+- Modèle: predictMatch applique fallback ligue/sport, variance ×1.25, decay confiance et edge requis +2pt sur équipes nouvelles.
+- UI/debug: badge Cold start V5 visible en modal et ?debug=1 expose couverture, policy et équipes concernées.
+- Pipeline: refresh.yml et auto_refresh.py reconstruisent cold_start_v5 avant model_versions.
+- Tests: suite model-v5 passe desktop + mobile Chromium (18/18); app.js syntax OK; drift pipeline OK.
+- Cache/footer bumpés v37.009; cold_start_v5 hash d2edd8dc; SW paris-sportif-20260505-232508.
+
