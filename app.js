@@ -14977,7 +14977,38 @@ counts.set(key, (counts.get(key) || 0) + 1);
 });
 return counts;
 })();
-const v36TableRows = v36Sorted.slice(0, 360);
+const v37DenseRowLimit = 360;
+const v37PickRowKey = (p) => p?.pickUid || `${v37MatchKeyForPick(p)}|${p?.tier || ''}|${p?.market || ''}|${p?.pickKey || ''}|${p?.line ?? ''}|${Number(p?.odd || 0).toFixed(2)}`;
+const v37EnsureTierCoverage = (rows, pool) => {
+const out = rows.slice();
+const keys = new Set(out.map(v37PickRowKey));
+const tierCounts = () => out.reduce((acc, p) => {
+acc[p.tier] = (acc[p.tier] || 0) + 1;
+return acc;
+}, {});
+for (const tier of v36TierDefs) {
+if (out.some(p => p.tier === tier.id)) continue;
+const candidate = pool.find(p => p.tier === tier.id && !keys.has(v37PickRowKey(p)));
+if (!candidate) continue;
+if (out.length < v37DenseRowLimit) {
+out.push(candidate);
+keys.add(v37PickRowKey(candidate));
+continue;
+}
+const counts = tierCounts();
+let replaceIdx = -1;
+for (let i = out.length - 1; i >= 0; i--) {
+if ((counts[out[i].tier] || 0) > 1) { replaceIdx = i; break; }
+}
+if (replaceIdx >= 0) {
+keys.delete(v37PickRowKey(out[replaceIdx]));
+out[replaceIdx] = candidate;
+keys.add(v37PickRowKey(candidate));
+}
+}
+return out;
+};
+const v36TableRows = v37EnsureTierCoverage(v36Sorted.slice(0, v37DenseRowLimit), v36Sorted);
 const v36UpcomingAll = terminalScanPool
 .filter(m => new Date(m?.date || 0).getTime() > Date.now() && !m.completed)
 .sort((a, b) => new Date(a?.date || 0).getTime() - new Date(b?.date || 0).getTime());

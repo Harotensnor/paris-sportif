@@ -121,7 +121,7 @@ def archive_pre_match_odds(events):
             last_seen[eid] = now
             written += 1
     if written:
-        print(f'  archived {written} new pre-match odds rows → {ODDS_HISTORY.name}', flush=True)
+        print(f'  archived {written} new pre-match odds rows -> {ODDS_HISTORY.name}', flush=True)
 
 
 def rotate_odds_history(keep_days: int = 180, soft_cap: int = 20000):

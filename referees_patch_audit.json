@@ -1,28 +1,14 @@
 {
   "source": "referees_soccer.json",
-  "available_referee_events": 105,
-  "soccer_events_scanned": 141,
-  "patched": 20,
-  "matched_exact": 13,
-  "matched_alias": 7,
+  "available_referee_events": 106,
+  "soccer_events_scanned": 63,
+  "patched": 3,
+  "matched_exact": 2,
+  "matched_alias": 1,
   "matched_fuzzy": 0,
-  "context_patched": 105,
+  "context_patched": 54,
   "league_priors": 14,
   "missing_samples": [
-    {
-      "league_code": "esp.1",
-      "home": "Celta Vigo",
-      "away": "Elche",
-      "key": "celtavigo|elche",
-      "canonical_key": "celta|elche"
-    },
-    {
-      "league_code": "esp.1",
-      "home": "Getafe",
-      "away": "Rayo Vallecano",
-      "key": "getafe|rayovallecano",
-      "canonical_key": "getafe|rayo"
-    },
     {
       "league_code": "fra.1",
       "home": "Paris FC",
@@ -38,60 +24,11 @@
       "canonical_key": "betis|realoviedo"
     },
     {
-      "league_code": "esp.1",
-      "home": "Espanyol",
-      "away": "Real Madrid",
-      "key": "espanyol|realmadrid",
-      "canonical_key": "espanyol|realmadrid"
-    },
-    {
-      "league_code": "uefa.europa",
-      "home": "Aston Villa",
-      "away": "Nottingham Forest",
-      "key": "astonvilla|nottinghamforest",
-      "canonical_key": "astonvilla|nottinghamforest"
-    },
-    {
-      "league_code": "uefa.europa",
-      "home": "SC Freiburg",
-      "away": "Braga",
-      "key": "scfreiburg|braga",
-      "canonical_key": "scfreiburg|braga"
-    },
-    {
-      "league_code": "uefa.europa.conf",
-      "home": "Crystal Palace",
-      "away": "Shakhtar Donetsk",
-      "key": "crystalpalace|shakhtardonetsk",
-      "canonical_key": "crystalpalace|shakhtardonetsk"
-    },
-    {
-      "league_code": "uefa.europa.conf",
-      "home": "Strasbourg",
-      "away": "Rayo Vallecano",
-      "key": "strasbourg|rayovallecano",
-      "canonical_key": "strasbourg|rayo"
-    },
-    {
-      "league_code": "ger.2",
-      "home": "Kaiserslautern",
-      "away": "Arminia Bielefeld",
-      "key": "kaiserslautern|arminiabielefeld",
-      "canonical_key": "kaiserslautern|arminiabielefeld"
-    },
-    {
       "league_code": "ger.1",
       "home": "Borussia Dortmund",
       "away": "Eintracht Frankfurt",
       "key": "borussiadortmund|eintrachtfrankfurt",
       "canonical_key": "borussiadortmund|eintrachtfrankfurt"
-    },
-    {
-      "league_code": "esp.2",
-      "home": "Cádiz",
-      "away": "Deportivo La Coruña",
-      "key": "cadiz|deportivolacoruna",
-      "canonical_key": "cadiz|coruna"
     },
     {
       "league_code": "ita.2",
@@ -157,20 +94,6 @@
       "canonical_key": "levanteud|osasuna"
     },
     {
-      "league_code": "ger.2",
-      "home": "TSV Eintracht Braunschweig",
-      "away": "Dynamo Dresden",
-      "key": "tsveintrachtbraunschweig|dynamodresden",
-      "canonical_key": "tsveintrachtbraunschweig|dynamodresden"
-    },
-    {
-      "league_code": "ger.2",
-      "home": "VfL Bochum",
-      "away": "Hannover 96",
-      "key": "vflbochum|hannover96",
-      "canonical_key": "vflbochum|hannover96"
-    },
-    {
       "league_code": "eng.1",
       "home": "Liverpool",
       "away": "Chelsea",
@@ -183,6 +106,83 @@
       "away": "Alavés",
       "key": "elche|alaves",
       "canonical_key": "elche|deportivoalaves"
+    },
+    {
+      "league_code": "ita.1",
+      "home": "Cagliari",
+      "away": "Udinese",
+      "key": "cagliari|udinese",
+      "canonical_key": "cagliari|udinese"
+    },
+    {
+      "league_code": "ger.1",
+      "home": "FC Augsburg",
+      "away": "Borussia Mönchengladbach",
+      "key": "fcaugsburg|borussiamonchengladbach",
+      "canonical_key": "fcaugsburg|borussiamonchengladbach"
+    },
+    {
+      "league_code": "ger.1",
+      "home": "RB Leipzig",
+      "away": "St. Pauli",
+      "key": "rbleipzig|stpauli",
+      "canonical_key": "rbleipzig|stpauli"
+    },
+    {
+      "league_code": "ger.1",
+      "home": "TSG Hoffenheim",
+      "away": "Werder Bremen",
+      "key": "tsghoffenheim|werderbremen",
+      "canonical_key": "tsghoffenheim|werder"
+    },
+    {
+      "league_code": "ger.1",
+      "home": "VfB Stuttgart",
+      "away": "Bayer Leverkusen",
+      "key": "vfbstuttgart|bayerleverkusen",
+      "canonical_key": "vfbstuttgart|bayerleverkusen"
+    },
+    {
+      "league_code": "eng.1",
+      "home": "Brighton & Hove Albion",
+      "away": "Wolverhampton Wanderers",
+      "key": "brightonhovealbion|wolverhamptonwanderers",
+      "canonical_key": "brightonhovealbion|wolverhampton"
+    },
+    {
+      "league_code": "eng.1",
+      "home": "Fulham",
+      "away": "AFC Bournemouth",
+      "key": "fulham|afcbournemouth",
+      "canonical_key": "fulham|bournemouth"
+    },
+    {
+      "league_code": "eng.1",
+      "home": "Sunderland",
+      "away": "Manchester United",
+      "key": "sunderland|manchesterunited",
+      "canonical_key": "sunderland|manutd"
+    },
+    {
+      "league_code": "esp.1",
+      "home": "Sevilla",
+      "away": "Espanyol",
+      "key": "sevilla|espanyol",
+      "canonical_key": "sevilla|espanyol"
+    },
+    {
+      "league_code": "ita.1",
+      "home": "Lazio",
+      "away": "Internazionale",
+      "key": "lazio|internazionale",
+      "canonical_key": "lazio|inter"
+    },
+    {
+      "league_code": "ger.1",
+      "home": "VfL Wolfsburg",
+      "away": "Bayern Munich",
+      "key": "vflwolfsburg|bayernmunich",
+      "canonical_key": "vflwolfsburg|bayern"
     }
   ]
 }

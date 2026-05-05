@@ -711,6 +711,11 @@ def main() -> int:
             d = json.loads(path.read_text(encoding='utf-8'))
             counts = counter(d) or {}
             entry.update(counts)
+            src_status = d.get('status') if isinstance(d, dict) else None
+            if src_status:
+                entry['status'] = src_status
+                if src_status not in {'ok', 'watch', 'validated', 'no_explicit_boosts'}:
+                    out['warnings'].append(f'{key}: status={src_status}')
             if key == 'team_form' and counts.get('teams') == 0:
                 out['warnings'].append('team_form: source vide — signal forme L10 désactivé')
             if key == 'footballdata' and counts.get('rows') == 0:
