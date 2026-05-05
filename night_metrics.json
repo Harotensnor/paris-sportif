@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-05T15:30:58Z",
-  "calculated_at": "2026-05-05T15:30:58Z",
+  "generated_at": "2026-05-05T17:14:29Z",
+  "calculated_at": "2026-05-05T17:14:29Z",
   "source_of_truth": "data.js",
   "data_generated_at": "2026-05-05T15:23:16.404840Z",
   "data_today_field": "2026-05-05",
@@ -19,13 +19,27 @@
     "clubelo": 96,
     "weather": 189,
     "injuries": 159,
-    "referee": 5,
+    "referee": 97,
+    "referee_named": 5,
     "referee_context": 92,
     "referee_signal": 97,
     "fd_calibration": 0,
     "fd_closing_odds": 0,
     "xg": 199,
     "smart_money": 3
+  },
+  "signal_health": {
+    "referee": {
+      "effective_events": 97,
+      "named_events": 5,
+      "context_events": 92,
+      "note": "referee is effective coverage: named referee or referee_context usable by the model."
+    },
+    "smart_money": {
+      "events": 3,
+      "status": "rare_event",
+      "note": "Smart money is intentionally rare; low count is OK when odds movement does not confirm a strong signal."
+    }
   },
   "winamax_markets": {
     "matches": 721,
@@ -136,7 +150,7 @@
     ]
   },
   "health": {
-    "status": null,
+    "status": "warning",
     "warnings": 29,
     "pipeline_drift": "ok"
   }
