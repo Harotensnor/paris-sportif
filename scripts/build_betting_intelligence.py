@@ -308,28 +308,45 @@ def build_league_inefficiencies(data: dict[str, Any]) -> dict[str, Any]:
             status = "data_insufficient"
             direction = "watch_sample"
             reason = f"Sample insuffisant ({n} picks): ne pas conclure"
+            action = "watch_more_sample"
+            direction_net = "neutral"
         elif roi >= 5 and brier <= 0.245:
             status = "exploit"
             direction = "model_edge"
             reason = f"ROI {roi:+.1f}% avec Brier {brier:.3f}"
+            action = "boost_if_pick_quality_ok"
+            direction_net = "back_model"
         elif roi <= -8 and isinstance(wr, (int, float)) and wr >= 0.52:
             status = "avoid_low_roi"
             direction = "bookmaker_edge_low_value"
             reason = f"WR {wr*100:.1f}% mais ROI {roi:+.1f}%: cotes trop basses"
+            action = "deprioritize_low_value"
+            direction_net = "fade_model_price"
         elif roi <= -8 or brier >= 0.255:
             status = "avoid_low_wr"
             direction = "bookmaker_edge"
             reason = f"ROI {roi:+.1f}% ou Brier {brier:.3f} fragile"
+            action = "deprioritize_low_reliability"
+            direction_net = "fade_model"
         else:
             status = "neutral"
             direction = "monitor"
             reason = "Pas de biais exploitable confirme"
+            action = "monitor"
+            direction_net = "neutral"
+        quality = "actionable" if n >= 50 else ("usable" if n >= 25 else "watch")
+        if status == "data_insufficient":
+            quality = "insufficient"
         rows.append({
             "league_code": code,
             "status": status,
             "direction": direction,
+            "direction_net": direction_net,
+            "action": action,
             "reason": reason,
             "inefficiency_score": ineff,
+            "model_reliability_score": round(max(0.0, min(1.0, 1.0 - brier)), 4),
+            "sample_quality": quality,
             "confidence": conf,
             "n": n,
             "win_rate": wr,
@@ -349,16 +366,20 @@ def build_league_inefficiencies(data: dict[str, Any]) -> dict[str, Any]:
         -abs(r["inefficiency_score"]),
         -(r.get("current_upcoming") or 0),
     ))
+    actionable = [r for r in rows if r["action"] in {"boost_if_pick_quality_ok", "deprioritize_low_value", "deprioritize_low_reliability"}]
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
-        "schema": "league_inefficiencies_v1",
+        "schema": "league_inefficiencies_v2",
         "source": "backtest_report_v2.by_league + current data.js slate",
         "summary": {
             "leagues": len(rows),
             "exploit": sum(1 for r in rows if r["status"] == "exploit"),
             "avoid": sum(1 for r in rows if str(r["status"]).startswith("avoid")),
             "data_insufficient": sum(1 for r in rows if r["status"] == "data_insufficient"),
+            "actionable_leagues": len(actionable),
+            "watch_leagues": sum(1 for r in rows if r["action"] == "watch_more_sample"),
             "current_exploit_events": sum(r["current_upcoming"] for r in rows if r["status"] == "exploit"),
+            "current_deprioritize_events": sum(r["current_upcoming"] for r in rows if str(r["status"]).startswith("avoid")),
         },
         "leagues": rows[:80],
     }
