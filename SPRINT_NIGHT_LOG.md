@@ -655,3 +655,8 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Pipeline: `fetch_team_form.py` relance les calendriers ESPN sur le nouveau snapshot Winamax exact; 470 equipes vues, 255 formes rafraichies, cache total 793 equipes.
 - Data: `form_stats_extended.json`, profils publics et `night_metrics.json` regeneres; `data.js` reste coherent avec `audit_data_truth.py`.
 - Health: warnings 31 -> 29 apres rafraichissement team_form; les sources critiques du tableau restent fraiches et `data_age_min=0`.
+
+## Sprint v35.461 — AUTO 10/10 Tests Phase 3 V37 (15:49 UTC)
+- QA: `phase3-validation.spec.js` ne tape plus le cache GitHub Pages; il valide le dashboard local V37 avec preload full data quand `data_lite.js` est actif.
+- Modernisation: les anciennes assertions `#top`, `.decision-tile`, logos legacy et theme visible mobile sont remplacees par table dense, modal "Pourquoi" synchronisee, tabs detail, tiers et legende score.
+- Mesure: `tests/phase3-validation.spec.js` passe 12/12 sur desktop + mobile.
