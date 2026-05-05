@@ -790,3 +790,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Couverture: lineups/starter signals 97, injuries 159, referee effectif 97 (5 nommés + 92 contextuels), xG 199, weather 189.
 - Pipeline: `check_pipeline_drift.py` reste `OK` (84 scripts alignés auto_refresh/refresh.yml); `build_health.py` met `health.json` à jour avec données 206 min old et 40 warnings non critiques.
 - Cache/footer bumpes v35.480; `app.js` hash `2ad06cd7`, `app.css` hash `d19b2228`, SW `paris-sportif-20260505-195744`.
+
+## Sprint v35.481 — AUTO 10/10 Audit final stabilité (20:03 UTC)
+- Vérifs: `check_bundle_size.py` OK (`app.js` 1597.1 KB < 1750 KB), `a11y_audit.js` 0 critical/serious/moderate sur 8 pages.
+- Lighthouse: mobile + desktop sur Dashboard/Tous/Performance/Méthode restent `100/100/100` en perf/a11y/SEO.
+- État: aucun changement fonctionnel ajouté, seulement rapport a11y rafraîchi et cache/footer bumpés pour hard refresh.
+- Cache/footer bumpes v35.481; `app.js` hash `2ad06cd7`, `app.css` hash `d19b2228`, SW `paris-sportif-20260505-200328`.
