@@ -1101,3 +1101,12 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Tests: model-v5 priors + stacking passent desktop + mobile Chromium (4/4); app.js syntax OK; drift pipeline OK.
 - Cache/footer bumpés v37.002; app.js hash b5d43ecd; stacking hash d3779a93; SW paris-sportif-20260505-225931.
 
+
+## Sprint v37.003 — AUTO 10/10 Phase V5 C feature engineering avancé (23:01 UTC)
+- Data: build_feature_engineering_v5.py calcule interactions, polynômes degré 2, rolling windows et encodages cycliques.
+- Debug: ?debug=1 expose familles, top features et ranking d'importance V5.
+- Crédibilité: section "Feature engineering V5" ajoutée avec familles et corrélations label.
+- Pipeline: refresh.yml et auto_refresh.py reconstruisent feature_engineering_v5.json/js à chaque tick.
+- Tests: suite model-v5 passe desktop + mobile Chromium (6/6); app.js syntax OK; drift pipeline OK.
+- Cache/footer bumpés v37.003; app.js hash 0215e2b7; feature hash df2bfa11; SW paris-sportif-20260505-230154.
+

@@ -143,6 +143,7 @@ PATCH_STAGES = [
     ('build_team_priors.py',        1,   30),
     ('build_bayesian_priors_v5.py', 1,   30),
     ('build_stacking_meta_v5.py',   1,   30),
+    ('build_feature_engineering_v5.py', 1, 30),
     ('build_season_phase.py',       1,   30),
     ('build_star_players.py',       1,   30),
     ('build_xg_decay_params.py',    1,   30),
