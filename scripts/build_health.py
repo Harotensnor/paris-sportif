@@ -272,6 +272,10 @@ SOURCES = [
         'mid': ((d.get('summary') or {}).get('mid') or 0) if isinstance(d, dict) else 0,
         'late': ((d.get('summary') or {}).get('late') or 0) if isinstance(d, dict) else 0,
     }),
+    ('star_players', 'star_players.json', lambda d: {
+        'teams': (d.get('team_count') or len(d.get('teams') or {})) if isinstance(d, dict) else 0,
+        'stars': (d.get('star_count') or sum(len(v.get('players') or []) for v in (d.get('teams') or {}).values())) if isinstance(d, dict) else 0,
+    }),
     ('data_quality_report', 'data_quality_report.json', lambda d: {
         'events_quarantined': (d.get('events_quarantined') or 0) if isinstance(d, dict) else 0,
         'status': (d.get('status') or 'unknown') if isinstance(d, dict) else 'missing',

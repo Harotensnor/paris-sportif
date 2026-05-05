@@ -833,3 +833,11 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - UI: modal détail affiche les badges V4 contexte; page Crédibilité ajoute la section `Calibration par phase saison`.
 - Pipeline: `build_season_phase.py` est branché dans `auto_refresh.py`, `refresh.yml` et `build_health.py`; drift pipeline OK.
 - Cache/footer bumpes v36.002; `app.js` hash `a7d02c52`, `season_phase.js` hash `2e14d28b`, SW `paris-sportif-20260505-210446`.
+
+## Sprint v36.003 — AUTO 10/10 Modèle V4 DD impact stars (21:07 UTC)
+- Stars: `star_players.json` suit 769 joueurs clés sur 187 équipes depuis lineups, blessures et profils publics déjà présents.
+- Modèle: `poissonComponent()` retranche l'impact des stars absentes sur lambda buts foot; NBA/NHL/MLB sont préparés en impact points/goals/pitcher.
+- Modal: badge `Impact absence` visible même si aucune star majeure absente, avec détail des joueurs croisés si actif.
+- Debug: `?debug=1` expose `starPlayers` (teams, stars, generatedAt).
+- Pipeline: `build_star_players.py` branché dans `auto_refresh.py`, `refresh.yml`, `build_health.py`; drift pipeline OK.
+- Cache/footer bumpes v36.003; `app.js` hash `5859c20f`, `star_players.js` hash `06fabd7c`, SW `paris-sportif-20260505-210733`.
