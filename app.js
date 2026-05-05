@@ -14358,11 +14358,12 @@ read('detected_angles'),
 read('rare_signals'),
 read('timing_edges'),
 read('signal_gap_report'),
-]).then(([league, marketBias, angles, rare, timing, gaps]) => {
-state.data = { league, marketBias, angles, rare, timing, gaps };
+read('market_auc_report'),
+]).then(([league, marketBias, angles, rare, timing, gaps, marketAuc]) => {
+state.data = { league, marketBias, angles, rare, timing, gaps, marketAuc };
 state.loaded = true;
 }).catch(() => {
-state.data = { league: null, marketBias: null, angles: null, rare: null, timing: null, gaps: null };
+state.data = { league: null, marketBias: null, angles: null, rare: null, timing: null, gaps: null, marketAuc: null };
 state.loaded = true;
 }).finally(() => {
 state.loading = false;
@@ -14403,6 +14404,7 @@ v37RareByEvent.set(id, list);
 const v37TimingByEvent = new Map(v37Array(v37Intel.timing?.events).map(e => [String(e.event_id || ''), e]));
 const v37LeagueByCode = new Map(v37Array(v37Intel.league?.leagues).map(l => [String(l.league_code || ''), l]));
 const v37MarketBiasByKey = new Map(v37Array(v37Intel.marketBias?.markets).map(row => [String(row.market_key || ''), row]));
+const v37MarketAucByKey = new Map(v37Array(v37Intel.marketAuc?.markets).map(row => [String(row.market_key || ''), row]));
 const v37GapByEvent = new Map(v37Array(v37Intel.gaps?.priority_gaps).map(g => [String(g.event_id || ''), g]));
 const v37Coach = (() => {
 try { return typeof computeCoachInsights === 'function' ? computeCoachInsights() : null; }
@@ -14479,6 +14481,34 @@ if (side) keys.push(`${market}:${side}${normalized}`);
 }
 for (const key of keys) {
 const row = v37MarketBiasByKey.get(key);
+if (row) return row;
+}
+return null;
+};
+const v37MarketAucForPick = (pick) => {
+if (!pick || !v37MarketAucByKey.size) return null;
+const market = String(pick.market || '');
+const rawPick = String(pick.pickKey || pick.key || pick.side || '');
+const line = Number(pick.line);
+const keys = [`${market}:${rawPick}`];
+if (market === 'btts') {
+if (/Y|Oui|Yes|true/i.test(rawPick)) keys.push('btts:BTTS_Y');
+if (/N|Non|No|false/i.test(rawPick)) keys.push('btts:BTTS_N');
+}
+if (market === 'doubleChance') {
+const dc = rawPick.replace(/^DC[_-]?/i, '').toUpperCase();
+if (/^(1X|X2|12)$/.test(dc)) keys.push(`doubleChance:${dc}`);
+}
+if (Number.isFinite(line)) {
+const side = /under|moins|u/i.test(rawPick) || pick.side === 'under' ? 'U' : /over|plus|o/i.test(rawPick) || pick.side === 'over' ? 'O' : '';
+const normalized = Math.abs(line).toFixed(1);
+if (side && Math.abs(Math.abs(line) - 1.5) < 0.11) keys.push(`ou15:${side}1.5`);
+if (side && Math.abs(Math.abs(line) - 2.5) < 0.11) keys.push(`ou25:${side}2.5`);
+if (side && Math.abs(Math.abs(line) - 3.5) < 0.11) keys.push(`ou35:${side}3.5`);
+if (side) keys.push(`${market}:${side}${normalized}`);
+}
+for (const key of keys) {
+const row = v37MarketAucByKey.get(key);
 if (row) return row;
 }
 return null;
@@ -14604,6 +14634,7 @@ const v37OpportunityFor = (m, tier, rel, edge, ev, odd, pick, pred) => {
 const id = String(m?.id || '');
 const league = v37LeagueByCode.get(String(m?.league_code || '')) || null;
 const marketBias = v37MarketBiasForPick(pick);
+const marketAuc = v37MarketAucForPick(pick);
 const angles = v37Array((v37AnglesByEvent.get(id) || {}).angles);
 const rareSignals = v37RareByEvent.get(id) || [];
 const timing = v37TimingByEvent.get(id) || null;
@@ -14648,6 +14679,16 @@ badges.push('marché biaisé +');
 } else if (marketBias?.status === 'fade') {
 score += addScorePart('Marché à fade', -Math.min(9, 4 + Math.abs(Number(marketBias.edge_vs_50_pct || 0)) / 5));
 badges.push('marché à fade');
+}
+if (marketAuc?.exclude_from_big_bets || marketAuc?.status === 'exclude_low_auc') {
+score += addScorePart('AUC marché', -12);
+badges.push('AUC faible');
+} else if (marketAuc?.status === 'watch' || marketAuc?.status === 'auc_unavailable' || marketAuc?.status === 'low_value_watch') {
+score += addScorePart('AUC marché', marketAuc?.status === 'low_value_watch' ? -5 : -2);
+badges.push('AUC à surveiller');
+} else if (marketAuc?.status === 'pass') {
+score += addScorePart('AUC marché', 3);
+badges.push('AUC validée');
 }
 const uncertainMarket = angles.find(a => a?.type === 'market_uncertain');
 if (uncertainMarket) {
@@ -14728,6 +14769,7 @@ rawRareDirectional !== rareDirectional ? `Biais ligue prioritaire: malus match $
 Number.isFinite(variance) ? `variance ensemble ${variance.toFixed(3)}` : 'variance ensemble indisponible',
 `data ${dataAge} min`,
 marketBias ? `${marketBias.label || 'marché'} ${marketBias.pick || ''}: ${marketBias.reason || marketBias.status}` : '',
+marketAuc ? `${marketAuc.label || 'AUC marché'}: ${marketAuc.reason || marketAuc.status}${Number.isFinite(Number(marketAuc.auc)) ? ` (AUC ${Number(marketAuc.auc).toFixed(3)})` : ''}` : '',
 `data ${dataBonus}/8`,
 missingSignals.length ? `manque ${missingSignals.slice(0, 4).join(', ')}` : '',
 ...(profile.notes || [])

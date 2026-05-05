@@ -248,6 +248,12 @@ SOURCES = [
         'market_fade': ((d.get('summary') or {}).get('market_fade') or 0) if isinstance(d, dict) else 0,
         'watchlist': ((d.get('summary') or {}).get('watchlist') or len(d.get('watchlist') or [])) if isinstance(d, dict) else 0,
     }),
+    ('market_auc_report', 'market_auc_report.json', lambda d: {
+        'markets': ((d.get('summary') or {}).get('markets') or len(d.get('markets') or [])) if isinstance(d, dict) else 0,
+        'computed': ((d.get('summary') or {}).get('computed') or 0) if isinstance(d, dict) else 0,
+        'exclude_low_auc': ((d.get('summary') or {}).get('exclude_low_auc') or 0) if isinstance(d, dict) else 0,
+        'policy': (d.get('sample_policy') or 'unknown') if isinstance(d, dict) else 'missing',
+    }),
     ('detected_angles', 'detected_angles.json', lambda d: {
         'events': ((d.get('summary') or {}).get('events_with_angles') or len(d.get('events') or [])) if isinstance(d, dict) else 0,
         'angles': ((d.get('summary') or {}).get('angles') or 0) if isinstance(d, dict) else 0,

@@ -379,3 +379,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix: chaque sport est maintenant retrié par score d'opportunité, puis edge et cote, pour exposer les 3 meilleurs picks réels par discipline.
 - Impact: les nouveaux marchés exacts (mi-temps, corners, cartons, périodes, F5) peuvent remonter dans la vitrine sport s'ils ont le meilleur signal.
 - Cache/footer bumpes v35.415; `app.js` hash `09525337`, taille 1,593,174 bytes sous cap.
+
+## Sprint v35.416 — AUTO 10/10 AUC marche honnete (02:30 UTC)
+- Modele: ajout de `market_auc_report.json` pour tracer le pouvoir discriminant par marche sans sur-promettre.
+- Garde-fou: si les probabilites ligne par ligne manquent, le rapport passe en `auc_unavailable_without_row_scores` et les marches restent en surveillance.
+- Front: le score d'opportunite lit le rapport AUC et ajoute un bonus/malus explicite dans le tooltip du pick.
+- Pipeline: `auto_refresh.py`, `refresh.yml` et `health.json` savent generer, committer et monitorer le rapport AUC; cache/footer bumpes v35.416.
