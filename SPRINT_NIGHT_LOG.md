@@ -445,3 +445,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Pipeline: `auto_refresh.py`, `refresh.yml` et `health.json` suivent maintenant `backtest_training_rows_summary.json` avant `train_lightgbm.py`.
 - Mesure: 49 lignes generees, 19 positives, 4 sports; LightGBM passe en `row_level_table_detected_training_pending`; audit runtime OK.
 - Cache/footer bumpes v35.426; `lightgbm_weights.js` hash `acc94279`.
+
+## Sprint v35.427 — AUTO 10/10 Test rows LightGBM (10:19 UTC)
+- QA: ajout d'une spec Playwright qui valide le JSONL training, le résumé et le lien avec `lightgbm_weights.json`.
+- Garde-fou: le test vérifie lignes non vides, labels 0/1, cotes/probas valides, et `training_rows_count` synchronisé.
+- Mesure: `tests/backtest-training-rows.spec.js` 2/2 desktop + mobile.
+- Cache/footer bumpes v35.427.
