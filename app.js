@@ -5416,6 +5416,8 @@ const starImpact = pred?.starImpact || getStarImpact(match);
 const travel = pred?.travelContext || getTravelContext(match);
 const schedule = pred?.scheduleDensityContext || getScheduleDensityContext(match);
 const referee = pred?.refereeTendency || getRefereeTendency(match);
+const tennisSurface = pred?.tennisSurfaceContext || getTennisSurfaceContext(match);
+const roleContext = pred?.goaliePitcherContext || getGoaliePitcherContext(match);
 const badges = [];
 if (competition) badges.push({ label: competition.label, title: competition.reason || 'Contexte compétition' });
 if (season) badges.push({ label: season.label, title: `Phase saison · ${season.sample_teams || 0} équipes suivies` });
@@ -5423,6 +5425,9 @@ if (starImpact) badges.push({ label: `Impact absence : ${starImpact.active ? sta
 if (travel && travel.label !== 'normal') badges.push({ label: `Voyage : ${Math.round(Number(travel.travel_km) || 0)}km`, title: `Fuseau ${travel.timezone_delta ?? '—'}h · repos ${travel.time_since_last_match_h ?? '—'}h · fatigue ${travel.penalty}` });
 if (schedule && (schedule.home_label !== 'normal' || schedule.away_label !== 'normal')) badges.push({ label: 'Calendrier dense', title: `Dom ${schedule.home?.last_7d || 0}/7j · Ext ${schedule.away?.last_7d || 0}/7j` });
 if (referee) badges.push({ label: `Arbitre : ${referee.cards_per_match.toFixed(1)} cartons/match`, title: `${referee.name} · pens ${referee.pens_per_match} · home bias ${referee.home_bias_pct}%` });
+if (tennisSurface) badges.push({ label: `Surface ${tennisSurface.surface}`, title: `${tennisSurface.home?.name || 'J1'} ${Math.round(tennisSurface.home?.elo || 0)} vs ${tennisSurface.away?.name || 'J2'} ${Math.round(tennisSurface.away?.elo || 0)}` });
+if (roleContext?.home_goalie) badges.push({ label: `Goalie ${roleContext.home_goalie.name || 'NHL'}`, title: `SV% ${roleContext.home_goalie.save_pct || '—'} · GAA ${roleContext.home_goalie.gaa || '—'}` });
+if (roleContext?.home_pitcher) badges.push({ label: `Pitcher ${roleContext.home_pitcher.name || 'MLB'}`, title: `ERA ${roleContext.home_pitcher.era || '—'} · WHIP ${roleContext.home_pitcher.whip || '—'}` });
 if (!badges.length) return '';
 return `<div class="v4-context-badges" style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 14px;">
 ${badges.map(b => `<span style="display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--border);border-radius:999px;background:var(--panel-2);font-size:12px;font-weight:750;color:var(--text);" title="${esc(b.title)}">${esc(b.label)}</span>`).join('')}
@@ -5603,6 +5608,48 @@ generatedAt: data?.generated_at || null,
 try {
 window.getRefereeTendency = getRefereeTendency;
 window.getRefereeStatsDebugSummary = getRefereeStatsDebugSummary;
+} catch (e) {}
+
+function _surfacePlayerFromTuple(key, row) {
+if (!Array.isArray(row)) return row || null;
+return { key, name: row[0], elo: Number(row[1]) || 1500, hard: Number(row[2]) || 1500, clay: Number(row[3]) || 1500, grass: Number(row[4]) || 1500, indoor: Number(row[5]) || 1500, rank: Number(row[6]) || 0, n_matches: Number(row[7]) || 0 };
+}
+function _tennisSurface(match) {
+const raw = `${match?.surface || ''} ${match?.league_name || ''} ${match?.name || ''}`.toLowerCase();
+if (raw.includes('clay') || raw.includes('terre')) return 'clay';
+if (raw.includes('grass') || raw.includes('gazon')) return 'grass';
+if (raw.includes('indoor')) return 'indoor';
+return 'hard';
+}
+function getTennisSurfaceContext(match) {
+if (String(match?.sport || '').toLowerCase() !== 'tennis') return null;
+const { home, away } = getSides(match || {});
+const data = window.TENNIS_ELO_SURFACE?.players || {};
+const h = _surfacePlayerFromTuple(_teamPriorNorm(home?.name), data[_teamPriorNorm(home?.name)]);
+const a = _surfacePlayerFromTuple(_teamPriorNorm(away?.name), data[_teamPriorNorm(away?.name)]);
+const surface = _tennisSurface(match);
+if (!h && !a) return null;
+return {
+surface,
+home: h ? { name: h.name, elo: h[surface] || h.elo, base: h.elo, rank: h.rank, n: h.n_matches } : null,
+away: a ? { name: a.name, elo: a[surface] || a.elo, base: a.elo, rank: a.rank, n: a.n_matches } : null,
+};
+}
+function getGoaliePitcherContext(match) {
+const row = window.GOALIE_PITCHER_CONTEXT?.matches?.[String(match?.id || match?.uid || match?.name || '')];
+if (!Array.isArray(row)) return null;
+return { sport: row[0], home_goalie: row[1] || null, away_goalie: row[2] || null, home_pitcher: row[3] || null, away_pitcher: row[4] || null };
+}
+function getRoleContextDebugSummary() {
+return {
+tennisPlayers: Number(window.TENNIS_ELO_SURFACE?.player_count || Object.keys(window.TENNIS_ELO_SURFACE?.players || {}).length || 0),
+goaliePitcherMatches: Number(window.GOALIE_PITCHER_CONTEXT?.match_count || Object.keys(window.GOALIE_PITCHER_CONTEXT?.matches || {}).length || 0),
+};
+}
+try {
+window.getTennisSurfaceContext = getTennisSurfaceContext;
+window.getGoaliePitcherContext = getGoaliePitcherContext;
+window.getRoleContextDebugSummary = getRoleContextDebugSummary;
 } catch (e) {}
 
 function poissonComponent(match) {
@@ -7633,6 +7680,8 @@ let competitionContext = null;
 let travelContext = null;
 let scheduleDensityContext = null;
 let refereeTendency = null;
+let tennisSurfaceContext = null;
+let goaliePitcherContext = null;
 {
 const pickKey = best_pick[2]; // '1' | 'X' | '2'
 const fieldMap = { '1': 'pH', 'X': 'pD', '2': 'pA' };
@@ -7701,6 +7750,8 @@ competitionContext = getCompetitionContext(match);
 travelContext = getTravelContext(match);
 scheduleDensityContext = getScheduleDensityContext(match);
 refereeTendency = getRefereeTendency(match);
+tennisSurfaceContext = getTennisSurfaceContext(match);
+goaliePitcherContext = getGoaliePitcherContext(match);
 const contextDecay = Math.min(
 1,
 Number(seasonContext?.confidence_decay || 1),
@@ -7716,6 +7767,24 @@ rawReliability = Math.max(0.25, rawReliability - penalty);
 }
 if (refereeTendency?.home_bias_pct > 60 && best_pick[2] === '1') {
 rawReliability = Math.min(0.98, rawReliability + 0.05);
+}
+if (tennisSurfaceContext?.home && tennisSurfaceContext?.away && (best_pick[2] === '1' || best_pick[2] === '2')) {
+const diff = Number(tennisSurfaceContext.home.elo || 0) - Number(tennisSurfaceContext.away.elo || 0);
+const signed = best_pick[2] === '1' ? diff : -diff;
+if (signed > 60) rawReliability = Math.min(0.98, rawReliability + Math.min(0.04, signed / 5000));
+else if (signed < -60) rawReliability = Math.max(0.25, rawReliability - Math.min(0.04, Math.abs(signed) / 5000));
+}
+if (goaliePitcherContext && (best_pick[2] === '1' || best_pick[2] === '2')) {
+const hGoalie = Number(goaliePitcherContext.home_goalie?.save_pct || 0);
+const aGoalie = Number(goaliePitcherContext.away_goalie?.save_pct || 0);
+const hEra = Number(goaliePitcherContext.home_pitcher?.era || 0);
+const aEra = Number(goaliePitcherContext.away_pitcher?.era || 0);
+let signed = 0;
+if (hGoalie && aGoalie) signed = (hGoalie - aGoalie) * 2;
+if (hEra && aEra) signed = (aEra - hEra) / 10;
+signed = best_pick[2] === '1' ? signed : -signed;
+if (signed > 0.02) rawReliability = Math.min(0.98, rawReliability + Math.min(0.03, signed));
+else if (signed < -0.02) rawReliability = Math.max(0.25, rawReliability - Math.min(0.03, Math.abs(signed)));
 }
 const calibrated = applyReliabilityCalibration(rawReliability);
 reliability = calibrated;
@@ -7733,6 +7802,8 @@ competition: competitionContext ? { type: competitionContext.type, decay: compet
 travel: travelContext,
 scheduleDensity: scheduleDensityContext,
 refereeTendency,
+tennisSurface: tennisSurfaceContext,
+goaliePitcher: goaliePitcherContext,
 };
 if (seasonContext) {
 reasons.push({
@@ -7767,6 +7838,22 @@ reasons.push({
 type: 'referee_tendency',
 icon: '🟨',
 text: `Arbitre : ${refereeTendency.name} · ${refereeTendency.cards_per_match.toFixed(1)} cartons/match · biais domicile ${refereeTendency.home_bias_pct.toFixed(0)}%.`,
+});
+}
+if (tennisSurfaceContext?.home || tennisSurfaceContext?.away) {
+reasons.push({
+type: 'tennis_surface',
+icon: '🎾',
+text: `Surface ${tennisSurfaceContext.surface} : ${tennisSurfaceContext.home?.name || 'J1'} ${Math.round(tennisSurfaceContext.home?.elo || 0)} Elo vs ${tennisSurfaceContext.away?.name || 'J2'} ${Math.round(tennisSurfaceContext.away?.elo || 0)}.`,
+});
+}
+if (goaliePitcherContext?.home_goalie || goaliePitcherContext?.home_pitcher) {
+reasons.push({
+type: 'goalie_pitcher',
+icon: '🥅',
+text: goaliePitcherContext.sport === 'hockey'
+? `Goalies : ${goaliePitcherContext.home_goalie?.name || '—'} SV% ${goaliePitcherContext.home_goalie?.save_pct || '—'} vs ${goaliePitcherContext.away_goalie?.name || '—'} SV% ${goaliePitcherContext.away_goalie?.save_pct || '—'}.`
+: `Pitchers : ${goaliePitcherContext.home_pitcher?.name || '—'} ERA ${goaliePitcherContext.home_pitcher?.era || '—'} vs ${goaliePitcherContext.away_pitcher?.name || '—'} ERA ${goaliePitcherContext.away_pitcher?.era || '—'}.`,
 });
 }
 }
@@ -7892,6 +7979,8 @@ starImpact: poi?.starImpact || getStarImpact(match),
 travelContext,
 scheduleDensityContext,
 refereeTendency,
+tennisSurfaceContext,
+goaliePitcherContext,
 scores: (() => {
 if (poi) return poissonTopScores(poi.lamH, poi.lamA, 10, 6, match.league_code);
 if (match.sport === 'hockey') return hockeyScorePrediction(match);
@@ -16341,6 +16430,7 @@ starPlayers: getStarPlayersDebugSummary(),
 xgDecay: getXGDecayDebugSummary(),
 travelSchedule: getTravelScheduleDebugSummary(),
 refereeStats: getRefereeStatsDebugSummary(),
+roleContext: getRoleContextDebugSummary(),
 qualityCounters: v37QualityCounters,
 qualitySamples: v37QualitySamples,
 rejectReasons: v37RejectReasons,
