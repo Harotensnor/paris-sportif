@@ -150,6 +150,7 @@ PATCH_STAGES = [
     ('build_stadium_effects.py',    1,   30),
     ('build_coach_tenure.py',       1,   30),
     ('build_derbies.py',            1,   30),
+    ('build_team_stats_extended_v4.py', 1, 30),
     ('snapshot_pick_odds.py',       1,   30),
     ('compute_clv.py',              1,   30),
     ('settle_picks.py',             1,   15),
