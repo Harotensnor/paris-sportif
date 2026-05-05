@@ -415,3 +415,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix: le clic sur un insight charge maintenant `data.js` complet si le match n'est pas encore dans le blob lite, puis ouvre la modale au lieu d'echouer silencieusement.
 - Mesure: `tests/daily-insights.spec.js` 2/2, syntax JS OK, bundle `app.js` 1,599,126 bytes sous cap, no conflict markers OK.
 - Cache/footer bumpes v35.421; `app.js` hash `fdcfd159`.
+
+## Sprint v35.422 — AUTO 10/10 Marge bundle immediate (10:03 UTC)
+- Perf: suppression d'un long commentaire analytics/RGPD redondant dans `app.js`, sans changer le comportement ni le consentement.
+- QA: le test modal/table gele maintenant son horloge proche de `generated_at` pour verifier la synchro pick même quand la machine tourne avec une donnee locale devenue stale.
+- Mesure avant/apres: `app.js` 1,599,126 -> 1,597,420 bytes, soit ~1.7 KB de marge recuperee sous le cap 1,600,000.
+- Cache/footer bumpes v35.422; `app.js` hash `d9aa35cd`.

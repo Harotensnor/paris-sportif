@@ -2,6 +2,19 @@ import { test, expect } from '@playwright/test';
 
 test.beforeEach(async ({ context }) => {
   await context.addInitScript(() => {
+    const fixedNow = new Date('2026-05-05T00:10:43Z').getTime();
+    const RealDate = Date;
+    class FixedDate extends RealDate {
+      constructor(...args) {
+        if (args.length === 0) return new RealDate(fixedNow);
+        return new RealDate(...args);
+      }
+      static now() { return fixedNow; }
+      static parse(value) { return RealDate.parse(value); }
+      static UTC(...args) { return RealDate.UTC(...args); }
+    }
+    Object.setPrototypeOf(FixedDate, RealDate);
+    window.Date = FixedDate;
     try {
       localStorage.setItem('cookieConsent', 'accepted');
       localStorage.setItem('paris_sportif_onboarded_v1', '1');
