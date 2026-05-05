@@ -6568,6 +6568,102 @@ components,
 };
 }
 
+function getStackingMetaV5Nudge(match, bestPick, ctx) {
+const artifact = (typeof window !== 'undefined') ? window.STACKING_META_V5 : null;
+if (!artifact || artifact.runtime?.enabled === false || !artifact.coefficients) return null;
+const minRows = Math.max(20, Number(artifact.runtime?.min_rows) || 40);
+const rows = Number(artifact.training?.rows) || 0;
+if (rows < minRows) return { active: false, nudge: 0, status: 'limited_sample', rows };
+const odd = bestPick?.key === '1' ? Number(ctx?.odds?.home)
+: bestPick?.key === '2' ? Number(ctx?.odds?.away)
+: Number(ctx?.odds?.draw);
+const baseProb = Math.max(0.02, Math.min(0.98, Number(ctx?.reliability ?? bestPick?.prob ?? 0.5) || 0.5));
+const impliedProb = odd > 1 ? Math.max(0.02, Math.min(0.98, 1 / odd)) : Math.max(0.02, Math.min(0.98, Number(bestPick?.prob || 0.5)));
+const sport = String(match?.sport || '').toLowerCase();
+const pickKey = bestPick?.key || '';
+const home = getSides(match).home || {};
+const away = getSides(match).away || {};
+const eloDiff = Number(home?.elo || home?.clubelo || 0) - Number(away?.elo || away?.clubelo || 0);
+const eloHome = 1 / (1 + Math.exp(-(Number.isFinite(eloDiff) ? eloDiff : 0) / 350));
+const eloProb = pickKey === '2' ? 1 - eloHome : eloHome;
+const hXgFor = Number(home?.xg_stats?.xg_for_avg ?? home?.fbref_xg?.xg_for_avg ?? 0);
+const aXgFor = Number(away?.xg_stats?.xg_for_avg ?? away?.fbref_xg?.xg_for_avg ?? 0);
+const hXgAgainst = Number(home?.xg_stats?.xg_against_avg ?? home?.fbref_xg?.xg_against_avg ?? 0);
+const aXgAgainst = Number(away?.xg_stats?.xg_against_avg ?? away?.fbref_xg?.xg_against_avg ?? 0);
+let xgProb = impliedProb;
+if ([hXgFor, aXgFor, hXgAgainst, aXgAgainst].some(Number.isFinite) && (hXgFor || aXgFor || hXgAgainst || aXgAgainst)) {
+const hStrength = (hXgFor + aXgAgainst) / 2;
+const aStrength = (aXgFor + hXgAgainst) / 2;
+const xgHome = 1 / (1 + Math.exp(-((hStrength - aStrength) / 1.2)));
+xgProb = pickKey === '2' ? 1 - xgHome : xgHome;
+}
+const homeForm = Number(home?.form_wr5 ?? home?.form?.wr5 ?? 0.5);
+const awayForm = Number(away?.form_wr5 ?? away?.form?.wr5 ?? 0.5);
+const formHome = Math.max(0.02, Math.min(0.98, 0.5 + ((Number.isFinite(homeForm) ? homeForm : 0.5) - (Number.isFinite(awayForm) ? awayForm : 0.5)) * 0.45));
+const formProb = pickKey === '2' ? 1 - formHome : formHome;
+const lightgbmProb = Math.max(0.02, Math.min(0.98, baseProb + Number(ctx?.learnedContext?.nudge || 0)));
+const bayesianProb = Math.max(0.02, Math.min(0.98, baseProb + (Number(ctx?.poisson?.bayesianPrior?.weight || 0) - 0.25) * 0.04));
+const injuriesHome = Array.isArray(home?.injuries) ? home.injuries.length : Number(match?.injuries?.home_count || 0);
+const injuriesAway = Array.isArray(away?.injuries) ? away.injuries.length : Number(match?.injuries?.away_count || 0);
+let injuryDiff = ((Number(injuriesAway) || 0) - (Number(injuriesHome) || 0)) / 5;
+if (pickKey === '2') injuryDiff *= -1;
+const wind = Number(match?.weather?.wind_kmh || match?.weather?.wind || 0);
+const features = {
+base_prob: baseProb,
+implied_prob: impliedProb,
+log_odd: odd > 1 ? Math.log(odd) : Math.log(1 / impliedProb),
+elo_prob: Math.max(0.02, Math.min(0.98, eloProb)),
+xg_prob: Math.max(0.02, Math.min(0.98, xgProb)),
+form_prob: Math.max(0.02, Math.min(0.98, formProb)),
+lightgbm_prob: lightgbmProb,
+bayesian_prob: bayesianProb,
+is_football: sport === 'football' ? 1 : 0,
+is_basketball: sport === 'basketball' ? 1 : 0,
+is_hockey: sport === 'hockey' ? 1 : 0,
+is_baseball: sport === 'baseball' ? 1 : 0,
+is_tennis: sport === 'tennis' ? 1 : 0,
+has_lineups: match?.lineups || home?.lineup || away?.lineup ? 1 : 0,
+has_referee_signal: match?.referee || match?.referee_stats ? 1 : 0,
+injury_diff: Math.max(-2, Math.min(2, injuryDiff)),
+weather_wind_scaled: Math.min(2, (Number.isFinite(wind) ? wind : 0) / 40),
+};
+let z = Number(artifact.intercept) || 0;
+const coefficients = artifact.coefficients || {};
+for (const name of artifact.feature_names || Object.keys(coefficients)) {
+z += (Number(coefficients[name]) || 0) * ((Number(features[name]) || 0) - 0.5);
+}
+const metaProb = Math.max(0.02, Math.min(0.98, 1 / (1 + Math.exp(-z))));
+const delta = metaProb - baseProb;
+const maxNudge = Math.max(0.005, Math.min(0.03, Number(artifact.runtime?.max_probability_nudge) || 0.025));
+const floor = Math.max(0.001, Number(artifact.runtime?.apply_if_abs_delta_ge) || 0.004);
+const nudge = Math.max(-maxNudge, Math.min(maxNudge, delta));
+const topFeatures = (artifact.feature_importance || []).slice(0, 5).map(f => f.feature);
+return {
+active: Math.abs(nudge) >= floor,
+nudge: Math.round(nudge * 10000) / 10000,
+meta_prob: Math.round(metaProb * 1000) / 1000,
+base_prob: Math.round(baseProb * 1000) / 1000,
+status: artifact.status || 'trained',
+rows,
+top_features: topFeatures,
+};
+}
+function getStackingMetaV5DebugSummary() {
+const artifact = (typeof window !== 'undefined') ? window.STACKING_META_V5 : null;
+return {
+loaded: !!artifact,
+status: artifact?.status || 'missing',
+rows: Number(artifact?.training?.rows || 0),
+metaBrier: Number(artifact?.training?.rolling_origin?.meta_brier || 0),
+baselineBrier: Number(artifact?.training?.rolling_origin?.baseline_brier || 0),
+featureImportance: (artifact?.feature_importance || []).slice(0, 8),
+};
+}
+try {
+window.getStackingMetaV5Nudge = getStackingMetaV5Nudge;
+window.getStackingMetaV5DebugSummary = getStackingMetaV5DebugSummary;
+} catch (e) {}
+
 let __predCache = new Map();
 let __predCacheRef = null;
 function __predCacheClear() { __predCache = new Map(); __predCacheRef = window.PRONOSTICS_DATA; }
@@ -8594,6 +8690,23 @@ text: `Contexte appris (${learnedContext.status}) : fiabilité ${sign}${Math.rou
 }
 } catch(e) {}
 
+let stackingMetaV5 = null;
+try {
+const bestPickObject = { label: best_pick[0], prob: best_pick[1], key: best_pick[2], team: best_pick[3] };
+stackingMetaV5 = getStackingMetaV5Nudge(match, bestPickObject, { odds: best, reliability, learnedContext, poisson: poi, ensembleMeta });
+if (stackingMetaV5?.active) {
+reliability = Math.max(0.25, Math.min(0.98, reliability + stackingMetaV5.nudge));
+if (reliabilityMeta) reliabilityMeta.stackingMetaV5 = stackingMetaV5;
+if (ensembleMeta) ensembleMeta.stacking_meta_v5 = stackingMetaV5;
+const sign = stackingMetaV5.nudge >= 0 ? '+' : '';
+reasons.push({
+type: 'stacking_meta_v5',
+icon: '🧬',
+text: `Stacking V5 (${stackingMetaV5.status}, ${stackingMetaV5.rows} lignes) : fiabilité ${sign}${Math.round(stackingMetaV5.nudge * 100)}pt, méta-proba ${Math.round(stackingMetaV5.meta_prob * 100)}%.`,
+});
+}
+} catch(e) {}
+
 let headline = '';
 const conf = reliability;  // headline speaks to the UX confidence, not raw prob
 if (conf >= 0.72) headline = `Pari très solide — fiabilité ${(conf*100).toFixed(0)}%`;
@@ -8657,6 +8770,7 @@ prob_ci: probCi,
 confidence_interval: probCi,
 ensemble: ensembleMeta,
 learned_context: learnedContext,
+stacking_meta_v5: stackingMetaV5,
 league_bias: leagueBias,
 odds: best,
 hasDraw,
@@ -17412,6 +17526,7 @@ tierDiagnostics: v37TierDiagnostics,
 oddsSnapshotCoverage: v37SnapshotCoverage,
 teamPriors: getTeamPriorsDebugSummary(),
 bayesianPriorsV5: getBayesianV5DebugSummary(),
+stackingMetaV5: getStackingMetaV5DebugSummary(),
 seasonPhase: getSeasonPhaseDebugSummary(),
 starPlayers: getStarPlayersDebugSummary(),
 xgDecay: getXGDecayDebugSummary(),
@@ -23556,6 +23671,29 @@ return `<section style="margin-top:32px;">
           </div>
         </section>`;
 })();
+const v5StackingHtml = (() => {
+const data = window.STACKING_META_V5 || null;
+if (!data) return '';
+const validation = data.training?.rolling_origin || {};
+const rows = Number(data.training?.rows || 0);
+const delta = Number(data.training?.v5_delta?.brier_delta_vs_book_rows || 0);
+const color = delta <= -0.005 ? 'var(--accent)' : delta <= 0 ? '#fbbf24' : 'var(--danger)';
+return `<section style="margin-top:32px;">
+          <h2 class="page-h2">🧬 Stacking V5</h2>
+          <div style="padding:14px;background:var(--panel);border:1px solid var(--border);border-radius:12px;">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:10px;">
+              <div><div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;font-weight:800;">Échantillon</div><div style="font-size:24px;font-weight:900;">${rows}</div><div style="font-size:11px;color:var(--text-dim2);">lignes backtest</div></div>
+              <div><div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;font-weight:800;">Brier baseline</div><div style="font-size:24px;font-weight:900;">${Number(validation.baseline_brier || 0).toFixed(3)}</div><div style="font-size:11px;color:var(--text-dim2);">book / base rows</div></div>
+              <div><div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;font-weight:800;">Brier méta</div><div style="font-size:24px;font-weight:900;color:${color};">${Number(validation.meta_brier || 0).toFixed(3)}</div><div style="font-size:11px;color:var(--text-dim2);">rolling-origin</div></div>
+            </div>
+            <div style="font-size:12px;color:var(--text-dim);margin-bottom:8px;">Le méta-modèle combine marché, Elo, xG, forme, LightGBM et prior bayésien. En runtime il ne peut modifier la confiance que de ±2.5pt.</div>
+            ${(data.feature_importance || []).slice(0, 8).map(it => `<div style="display:grid;grid-template-columns:1fr 80px;gap:8px;padding:6px 0;border-top:1px solid var(--border);font-size:12px;align-items:center;">
+              <span>${esc(it.feature)}</span>
+              <b style="text-align:right;color:${Number(it.weight || 0) >= 0 ? 'var(--accent)' : 'var(--danger)'};">${Number(it.weight || 0) >= 0 ? '+' : ''}${Number(it.weight || 0).toFixed(3)}</b>
+            </div>`).join('')}
+          </div>
+        </section>`;
+})();
 wrap.innerHTML = `
       <div style="max-width:900px;margin:0 auto;padding:16px 12px 40px;">
         <div style="padding:40px 0 16px;border-bottom:1px solid var(--border);">
@@ -23588,6 +23726,7 @@ wrap.innerHTML = `
 
         ${v4SeasonPhaseHtml}
         ${v5BayesianPriorsHtml}
+        ${v5StackingHtml}
 
         <section style="margin-top:32px;">
           <h2 class="page-h2">🧮 Comment le modèle décide</h2>
