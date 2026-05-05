@@ -2,6 +2,12 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
+## Sprint v35.454 — AUTO 10/10 Phase finale Playwright triage (12:26 UTC)
+- Regression Section 2.4 : suite Playwright complete lancee apres fix a11y/Lighthouse.
+- Fix harness : `a11y-axe.spec.js` utilise axe si disponible, sinon fallback local noms boutons/liens/images; la suite ne bloque plus sur `@axe-core/playwright` absent du runtime desktop.
+- Resultat : full run collecte 430 tests; relance `--last-failed` = 77 tests, 16 repasses, 61 encore rouges a traiter (legacy 5 hubs/pages supprimees + helpers).
+- Artefact : `audit-artifacts/phase-finale-playwright-regression.json`; issue active P11-TEST-001 precisee, cache/footer bumpes v35.454.
+
 ## Sprint v35.453 — AUTO 10/10 Phase finale regressions a11y/Lighthouse (12:16 UTC)
 - Regression Section 2.1/2.2 : Lighthouse fallback et audit a11y relances apres la validation post-mega.
 - Fix : cibles tactiles refresh, tri V37, date/live et filtres Tous remontees a 40-44px.
