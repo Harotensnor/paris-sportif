@@ -18,6 +18,7 @@ DATA_JS = ROOT / "data.js"
 SOFA = ROOT / "sofascore_events.json"
 MLB_PITCHERS = ROOT / "mlb_pitchers.json"
 MLB_PLAYER_PROPS = ROOT / "mlb_player_props.json"
+NHL_PLAYOFF_MARKETS = ROOT / "nhl_playoff_markets.json"
 RUGBY = ROOT / "rugby_markets.json"
 OUT = ROOT / "sports_expansion_audit.json"
 
@@ -92,6 +93,7 @@ def main() -> int:
     sofa = load_json(SOFA, {})
     mlb = load_json(MLB_PITCHERS, {})
     mlb_props = load_json(MLB_PLAYER_PROPS, {})
+    nhl_markets = load_json(NHL_PLAYOFF_MARKETS, {})
     rugby = load_json(RUGBY, {})
 
     buckets: dict[str, dict[str, Any]] = {
@@ -136,6 +138,8 @@ def main() -> int:
     buckets["J4_baseball_major_props_pool"]["pitcher_records"] = pitcher_count
     buckets["J4_baseball_major_props_pool"]["player_prop_events"] = len(mlb_props.get("events") or []) if isinstance(mlb_props, dict) else 0
     buckets["J4_baseball_major_props_pool"]["player_props"] = mlb_props.get("props", 0) if isinstance(mlb_props, dict) else 0
+    buckets["J3_nhl_playoffs"]["derived_events"] = len(nhl_markets.get("events") or []) if isinstance(nhl_markets, dict) else 0
+    buckets["J3_nhl_playoffs"]["derived_markets"] = nhl_markets.get("markets", 0) if isinstance(nhl_markets, dict) else 0
     buckets["J8_rugby"]["derived_markets"] = rugby.get("markets", 0)
     buckets["J8_rugby"]["status"] = rugby.get("status", "missing")
 

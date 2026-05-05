@@ -331,6 +331,11 @@ SOURCES = [
         'markets': len(d.get('markets') or []) if isinstance(d, dict) else 0,
         'status': d.get('status') if isinstance(d, dict) else 'missing',
     }),
+    ('nhl_playoff_markets', 'nhl_playoff_markets.json', lambda d: {
+        'events': len(d.get('events') or []) if isinstance(d, dict) else 0,
+        'markets': d.get('markets') or 0 if isinstance(d, dict) else 0,
+        'status': d.get('status') if isinstance(d, dict) else 'missing',
+    }),
     ('boosted_odds', 'boosted_odds.json', lambda d: {
         'matches_scanned': d.get('matches_scanned') or 0 if isinstance(d, dict) else 0,
         'boosts': len(d.get('boosts') or []) if isinstance(d, dict) else 0,
@@ -369,6 +374,7 @@ STALE_AFTER_MIN = {
     'rugby_markets':   6*60,    # derived only when rugby appears in data.js
     'niche_markets':   6*60,    # darts/snooker derived sidecar
     'mlb_player_props': 60,      # derived from current probable pitchers
+    'nhl_playoff_markets': 60,   # derived from patched NHL team/goalie stats
     'boosted_odds':    60,      # follows Winamax market refresh
     'footballdata':    24*60,  # daily fetch
     'clv_history':     60,
@@ -400,6 +406,7 @@ SOURCE_SCRIPT = {
     'rugby_markets': 'scripts/build_rugby_markets.py',
     'niche_markets': 'scripts/build_niche_markets.py',
     'mlb_player_props': 'scripts/build_mlb_player_props.py',
+    'nhl_playoff_markets': 'scripts/build_nhl_playoff_markets.py',
     'boosted_odds': 'scripts/detect_boosted_odds.py',
     'footballdata': 'scripts/fetch_footballdata.py',
     'clv_history': 'scripts/compute_clv.py',

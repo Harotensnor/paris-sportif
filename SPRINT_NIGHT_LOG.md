@@ -2,6 +2,12 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
+## Sprint v35.436 — AUTO 10/10 Section J NHL renforcé (10:58 UTC)
+- Extension J3 : `build_nhl_playoff_markets.py` derive des marches NHL depuis les stats equipe/gardien deja patchees dans `data.js`.
+- Marches locaux : vainqueur, totals 4.5/5.5/6.5/7.5 et total 1ere periode 1.5, avec projections buts et gardiens confirmes quand disponibles.
+- Mesure : 11 matchs NHL futurs, 66 marches derives; health expose `nhl_playoff_markets`, audit J3 affiche maintenant 11 events/66 markets.
+- Garde-fou : skip des matchs passes et aucun nouvel appel reseau; cache/footer bumpes v35.436.
+
 ## Sprint v35.435 — AUTO 10/10 Section J MLB props lanceurs (10:56 UTC)
 - Extension J4 : `build_mlb_player_props.py` derive des props joueurs MLB depuis les lanceurs probables deja patches dans `data.js`.
 - Marches locaux : strikeouts lanceur O/U + home run concédé oui/non, avec proba, fair odds, IP projetées et inputs K/9, ERA, WHIP.
