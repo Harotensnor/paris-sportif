@@ -1059,3 +1059,11 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Tests: mobile-native-share passe mobile Chromium (1/1); app.js syntax OK; drift pipeline OK.
 - Cache/footer bumpes v36.032; app.js hash 76b13749; SW paris-sportif-20260505-223557.
 
+
+## Sprint v36.033 — AUTO 10/10 Phase 8 JJJ filtres rapides mobiles (22:38 UTC)
+- Mobile: sous-barre rapide Aujourd'hui / Locks / Top edges / Foot only au-dessus des filtres complets.
+- Cohérence: chaque chip réutilise paris_sportif_v36_home_filter et relance le rendu existant.
+- UX: barre pleine largeur et z-index corrigé pour éviter l'interception des taps par les filtres classiques.
+- Tests: mobile-quick-filters passe mobile Chromium (1/1); app.js syntax OK; drift pipeline OK.
+- Cache/footer bumpes v36.033; app.js hash 28ed27c5; SW paris-sportif-20260505-223856.
+
