@@ -5946,6 +5946,41 @@ window.getFootballStatsMarkets = getFootballStatsMarkets;
 window.getFootballStatsMarketsDebugSummary = getFootballStatsMarketsDebugSummary;
 } catch (e) {}
 
+function getMlbPlayerProps(match) {
+const row = window.MLB_PLAYER_PROPS?.events?.[String(match?.id || '')];
+if (!Array.isArray(row)) return [];
+return (row[1] || []).map(p => ({
+market: p[0],
+pitcher: p[1],
+label: p[2],
+line: p[3],
+pick: p[4],
+probability: Number(p[5]) || 0,
+fair_odds: Number(p[6]) || null,
+expected_strikeouts: Number(p[7]) || null,
+expected_hr_allowed: Number(p[8]) || null,
+side: p[9],
+}));
+}
+function getNhlPlayoffMarkets(match) {
+const row = window.NHL_PLAYOFF_MARKETS?.events?.[String(match?.id || '')];
+if (!Array.isArray(row)) return null;
+return { match: row[0], projection: row[1] || {}, markets: row[2] || {} };
+}
+function getMlbNhlPropsDebugSummary() {
+return {
+mlbEvents: Number(window.MLB_PLAYER_PROPS?.event_count || Object.keys(window.MLB_PLAYER_PROPS?.events || {}).length || 0),
+mlbProps: Number(window.MLB_PLAYER_PROPS?.prop_count || 0),
+nhlEvents: Number(window.NHL_PLAYOFF_MARKETS?.event_count || Object.keys(window.NHL_PLAYOFF_MARKETS?.events || {}).length || 0),
+nhlMarkets: Number(window.NHL_PLAYOFF_MARKETS?.market_count || 0),
+};
+}
+try {
+window.getMlbPlayerProps = getMlbPlayerProps;
+window.getNhlPlayoffMarkets = getNhlPlayoffMarkets;
+window.getMlbNhlPropsDebugSummary = getMlbNhlPropsDebugSummary;
+} catch (e) {}
+
 function poissonComponent(match) {
 if (match.sport !== 'football') return null;
 const { home, away } = getSides(match);
@@ -12330,11 +12365,22 @@ const teamRows = [
 { label: `${away?.short || away?.name || 'Ext.'} +2.5`, p: tt.away_over_25 },
 { label: `${away?.short || away?.name || 'Ext.'} +3.5`, p: tt.away_over_35 },
 ].filter(x => x.p > 0).map(x => `<span style="padding:7px 11px;border-radius:8px;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.18);font-size:12px;font-weight:650;color:var(--text);font-variant-numeric:tabular-nums;">${esc(x.label)} · ${(x.p*100).toFixed(0)}%</span>`).join('');
+const nhlSidecar = (typeof getNhlPlayoffMarkets === 'function') ? getNhlPlayoffMarkets(match) : null;
+const nhlSidecarHtml = nhlSidecar ? (() => {
+const fp = nhlSidecar.markets?.first_period_total_1_5;
+const totals = (nhlSidecar.markets?.totals || []).slice(0, 4).map(t => `<span style="padding:7px 11px;border-radius:8px;background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.18);font-size:12px;font-weight:650;color:var(--text);font-variant-numeric:tabular-nums;">${t.pick === 'over' ? 'Plus' : 'Moins'} ${t.line} · ${(Number(t.probability || 0)*100).toFixed(0)}%</span>`).join('');
+return `<div class="lbl-tiny-mb u-mt-3">🏒 NHL props période / totaux</div>
+<div data-market-panel="nhl-props" style="display:flex;gap:8px;flex-wrap:wrap;">
+${fp ? `<span style="padding:7px 11px;border-radius:8px;background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.18);font-size:12px;font-weight:650;color:var(--text);font-variant-numeric:tabular-nums;">1ère période ${fp.pick === 'over' ? 'Plus' : 'Moins'} 1.5 · ${(Number(fp.probability || 0)*100).toFixed(0)}%</span>` : ''}
+${totals}
+</div>`;
+})() : '';
 hockeyMarketsHtml = `
                   <div class="u-mt-3">
                     <div class="lbl-tiny-mb">🏒 Total buts hockey</div>
                     <div style="display:flex;gap:8px;flex-wrap:wrap;">${totalsTop}</div>
                     ${teamRows ? `<div class="lbl-tiny-mb u-mt-3">🏒 Team totals</div><div style="display:flex;gap:8px;flex-wrap:wrap;">${teamRows}</div>` : ''}
+                    ${nhlSidecarHtml}
                     <div style="margin-top:4px;font-size:10.5px;color:var(--text-dim2,#7b8693);line-height:1.3;">Poisson NHL depuis forme récente, goalie et pace. Totaux uniquement, sans handicap.</div>
                   </div>`;
 }
@@ -12347,11 +12393,17 @@ return `<span style="padding:8px 12px;border-radius:8px;background:rgba(255,255,
 };
 const totalsTop = (sc.markets.totals || []).map(g => bbChip(g)).join('');
 const f5Top = (sc.markets.totalsF5 || []).map(g => bbChip(g, 'F5')).join('');
+const mlbProps = (typeof getMlbPlayerProps === 'function') ? getMlbPlayerProps(match).slice(0, 4) : [];
+const mlbPropsHtml = mlbProps.length ? `<div class="lbl-tiny-mb u-mt-3">⚾ Props pitchers</div>
+<div data-market-panel="mlb-props" style="display:flex;gap:8px;flex-wrap:wrap;">
+${mlbProps.map(p => `<span style="padding:7px 11px;border-radius:8px;background:rgba(251,146,60,.08);border:1px solid rgba(251,146,60,.18);font-size:12px;font-weight:650;color:var(--text);font-variant-numeric:tabular-nums;">${esc(p.label)} · ${(Number(p.probability || 0)*100).toFixed(0)}%</span>`).join('')}
+</div>` : '';
 baseballMarketsHtml = `
                   <div class="u-mt-3">
                     <div class="lbl-tiny-mb">⚾ Total runs baseball</div>
                     <div style="display:flex;gap:8px;flex-wrap:wrap;">${totalsTop}</div>
                     ${f5Top ? `<div class="lbl-tiny-mb u-mt-3">⚾ F5 totals</div><div style="display:flex;gap:8px;flex-wrap:wrap;">${f5Top}</div>` : ''}
+                    ${mlbPropsHtml}
                     <div style="margin-top:4px;font-size:10.5px;color:var(--text-dim2,#7b8693);line-height:1.3;">Projection MLB depuis forme récente et pitchers. Totaux uniquement, sans handicap.</div>
                   </div>`;
 }
@@ -12365,6 +12417,36 @@ return `
                 ${hockeyMarketsHtml}
                 ${baseballMarketsHtml}
               </div>`;
+})()}
+${(() => {
+const hasScoreMarkets = !!(pred?.scores?.markets);
+if (hasScoreMarkets) return '';
+if (match.sport === 'baseball') {
+const props = (typeof getMlbPlayerProps === 'function') ? getMlbPlayerProps(match).slice(0, 4) : [];
+if (!props.length) return '';
+return `<div style="margin-top:14px;">
+  <div class="lbl-tiny-mb">⚾ Props pitchers</div>
+  <div data-market-panel="mlb-props" style="display:flex;gap:8px;flex-wrap:wrap;">
+    ${props.map(p => `<span style="padding:7px 11px;border-radius:8px;background:rgba(251,146,60,.08);border:1px solid rgba(251,146,60,.18);font-size:12px;font-weight:650;color:var(--text);font-variant-numeric:tabular-nums;">${esc(p.label)} · ${(Number(p.probability || 0)*100).toFixed(0)}%</span>`).join('')}
+  </div>
+  <div style="margin-top:4px;font-size:10.5px;color:var(--text-dim2,#7b8693);line-height:1.3;">Props dérivées des pitchers probables déjà présents dans le snapshot local.</div>
+</div>`;
+}
+if (match.sport === 'hockey') {
+const nhl = (typeof getNhlPlayoffMarkets === 'function') ? getNhlPlayoffMarkets(match) : null;
+if (!nhl) return '';
+const fp = nhl.markets?.first_period_total_1_5;
+const totals = (nhl.markets?.totals || []).slice(0, 4).map(t => `<span style="padding:7px 11px;border-radius:8px;background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.18);font-size:12px;font-weight:650;color:var(--text);font-variant-numeric:tabular-nums;">${t.pick === 'over' ? 'Plus' : 'Moins'} ${t.line} · ${(Number(t.probability || 0)*100).toFixed(0)}%</span>`).join('');
+return `<div style="margin-top:14px;">
+  <div class="lbl-tiny-mb">🏒 NHL props période / totaux</div>
+  <div data-market-panel="nhl-props" style="display:flex;gap:8px;flex-wrap:wrap;">
+    ${fp ? `<span style="padding:7px 11px;border-radius:8px;background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.18);font-size:12px;font-weight:650;color:var(--text);font-variant-numeric:tabular-nums;">1ère période ${fp.pick === 'over' ? 'Plus' : 'Moins'} 1.5 · ${(Number(fp.probability || 0)*100).toFixed(0)}%</span>` : ''}
+    ${totals}
+  </div>
+  <div style="margin-top:4px;font-size:10.5px;color:var(--text-dim2,#7b8693);line-height:1.3;">Projection issue des stats NHL et goalies déjà patchées.</div>
+</div>`;
+}
+return '';
 })()}
 ${(() => {
 const mk = pred.markets;
@@ -16997,6 +17079,7 @@ coachTenure: getCoachTenureDebugSummary(),
 derbies: getDerbiesDebugSummary(),
 teamStatsExtended: getTeamStatsExtendedDebugSummary(),
 footballStatsMarkets: getFootballStatsMarketsDebugSummary(),
+mlbNhlProps: getMlbNhlPropsDebugSummary(),
 qualityCounters: v37QualityCounters,
 qualitySamples: v37QualitySamples,
 rejectReasons: v37RejectReasons,
