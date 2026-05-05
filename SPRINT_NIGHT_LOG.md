@@ -825,3 +825,11 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Pipeline: `build_team_priors.py` est branché dans `auto_refresh.py`, `refresh.yml` et `build_health.py`.
 - QA: génération priors OK, scripts Python compilent, `app.js` syntax OK, `tests/team-priors.spec.js` passe sur Chromium desktop.
 - Cache/footer bumpes v36.001; `app.js` hash `2a4de62b`, `team_priors.js` hash `11cb015c`, SW `paris-sportif-20260505-210116`.
+
+## Sprint v36.002 — AUTO 10/10 Modèle V4 BB/CC saison et compétition (21:04 UTC)
+- Saison: `season_phase.json` couvre 68 ligues (20 early / 21 mid / 27 late) depuis classements et historiques `data.js`.
+- Modèle: `predictMatch()` applique `confidence_decay` saison et coupe, avec `seasonContext` + `competitionContext` dans le résultat.
+- Compétition: détection `League / Cup / Continental`; Cup applique variance accrue et confiance ×0.85.
+- UI: modal détail affiche les badges V4 contexte; page Crédibilité ajoute la section `Calibration par phase saison`.
+- Pipeline: `build_season_phase.py` est branché dans `auto_refresh.py`, `refresh.yml` et `build_health.py`; drift pipeline OK.
+- Cache/footer bumpes v36.002; `app.js` hash `a7d02c52`, `season_phase.js` hash `2e14d28b`, SW `paris-sportif-20260505-210446`.
