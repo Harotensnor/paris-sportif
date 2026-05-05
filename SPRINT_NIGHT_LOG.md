@@ -2,6 +2,12 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
+## Sprint v35.452 — AUTO 10/10 Phase finale ISSUES recap (12:02 UTC)
+- Validation post-mega #1.8 : `ISSUES.md` et `ISSUES_ACTIVE.md` remis a jour avec les preuves v35.445-v35.451.
+- Resultat : 0 regression bloquante trouvee pendant 1.1-1.7; 1 issue active restante (`P11-TEST-001`, suite Playwright complete a revalider).
+- Watchlist explicite : foot feminin/Challenger/rugby non bookables Winamax, anti-public sans signal actif, AUC en watch.
+- Artefact : `audit-artifacts/phase-finale-issues-recap.json`; cache/footer bumpes v35.452.
+
 ## Sprint v35.451 — AUTO 10/10 Phase finale validation contenu (12:00 UTC)
 - Validation post-mega #1.7 : glossaire, articles, insights quotidiens, previews longues et badges trust.
 - Resultat : glossaire docs 91 termes, 5 articles de fond tous >=1500 mots, `daily_insights.json` 7 insights, `match_previews.json` 7 previews.
