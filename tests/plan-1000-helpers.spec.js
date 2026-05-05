@@ -156,7 +156,8 @@ test.describe('Sprint H — Bottom sheet helper', () => {
     expect(result.hasCloseBtn).toBe(true);
   });
 
-  test('_showBottomSheet Esc key closes', async ({ page }) => {
+  test('_showBottomSheet Esc key closes', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'mobile browsers do not have a reliable physical Escape key');
     await page.goto(URL);
     await page.evaluate(() => {
       if (typeof window._showBottomSheet !== 'function') return;

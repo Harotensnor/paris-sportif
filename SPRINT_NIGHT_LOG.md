@@ -713,3 +713,11 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Modal Pourquoi: les 3 raisons sont hierarchisees en `Raison principale`, `Signal support`, `Risque a connaitre`.
 - QA: syntax `app.js`/`sw.js` OK, `phase-finale-dashboard.spec.js` 6/6 desktop+mobile.
 - Cache/footer bumpes v35.469; `app.js` hash `60e7e015`, `app.css` hash `09ae40a0`.
+
+## Sprint v35.470 — AUTO 10/10 Tests stabilite V37 (19:10 UTC)
+- Fix runtime: les rows `Insights du jour` ne sont cliquables que si l'event existe encore dans le snapshot; sinon elles sont marquees `data-stale-detail` au lieu de produire un clic silencieux.
+- Fix modales: `_showConfirm` expose `data-confirm="0/1"` pour les tests et `_showBottomSheet` ecoute Escape en capture desktop.
+- Tests: `market-candidates`, `daily-insights`, `plan-1000-helpers`, `sprint-105-113-features`, `visual-regression` et `click-everything` passent 77/77 avec 11 skips optionnels documentes.
+- Audit qualite avant fix tests: 32 captures `visual_capture.js validation-finale` OK; `a11y_audit.js` 0 critical/serious/moderate; `lighthouse_audit.js` 100/100/100 mobile+desktop sur 4 pages.
+- Bundle: `app.js` 1,608,729 bytes, `app.css` 359,329 bytes, toujours sous cap 1.7MB.
+- Cache/footer bumpes v35.470; `app.js` hash `9056d88b`, `app.css` hash `09ae40a0`.

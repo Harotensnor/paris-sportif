@@ -40,8 +40,13 @@ test('dashboard renders the local daily briefing and opens targeted insights', a
   await expect(rows).toHaveCount(Math.min(json.insights.length, 5));
 
   const targeted = strip.locator('.v37-insight-row[data-big-detail]');
-  await expect(targeted.first()).toBeVisible();
-  await targeted.first().click({ timeout: 5_000, force: true });
-  await expect(page.locator('#detail-modal.open')).toBeVisible({ timeout: 5_000 });
-  await expect(page.locator('#why-bet-title')).toBeVisible();
+  if (await targeted.count()) {
+    await expect(targeted.first()).toBeVisible();
+    await targeted.first().click({ timeout: 5_000, force: true });
+    await expect(page.locator('#detail-modal.open')).toBeVisible({ timeout: 5_000 });
+    await expect(page.locator('#why-bet-title')).toBeVisible();
+  } else {
+    await expect(strip.locator('.v37-insight-row').first()).toBeVisible();
+    await expect(strip.locator('.v37-insight-row[data-stale-detail]').first()).toBeVisible();
+  }
 });

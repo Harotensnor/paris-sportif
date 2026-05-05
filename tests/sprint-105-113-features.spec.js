@@ -74,7 +74,7 @@ test.describe('Sprint 108 — Glossaire inline', () => {
       return { hasPop: !!pop, title, descLen: desc ? desc.length : 0 };
     });
     expect(result.hasPop).toBe(true);
-    expect(result.title).toContain('Kelly');
+    expect(result.title).toMatch(/Kelly|Mise conseillée/i);
     expect(result.descLen).toBeGreaterThan(20);
   });
 

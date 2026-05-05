@@ -1365,15 +1365,18 @@ inner.appendChild(actDiv);
 }
 overlay.appendChild(inner);
 const close = () => {
+if (!overlay.isConnected) return;
 overlay.style.opacity = '0';
 setTimeout(() => {
 overlay.remove();
 document.removeEventListener('keydown', onKey);
+window.removeEventListener('keydown', onKey, true);
 if (typeof onClose === 'function') try { onClose(); } catch(e){}
 }, 150);
 };
 const onKey = (e) => { if (e.key === 'Escape') close(); };
 document.addEventListener('keydown', onKey);
+window.addEventListener('keydown', onKey, true);
 closeBtn.addEventListener('click', close);
 overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
 document.body.appendChild(overlay);
@@ -13229,8 +13232,8 @@ div.innerHTML = `
           <h3 id="__confirm-title" style="margin:0 0 12px;font-size:16px;color:var(--text);font-weight:700;">${esc(title)}</h3>
           <div id="__confirm-body" style="font-size:13.5px;color:var(--text-2);line-height:1.55;margin-bottom:18px;">${body}</div>
           <div style="display:flex;gap:8px;justify-content:flex-end;">
-            <button id="__confirm-cancel" type="button" style="padding:8px 14px;background:transparent;color:var(--text-dim);border:1px solid var(--border-2);border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;">${esc(cancelLbl)}</button>
-            <button id="__confirm-ok" type="button" style="padding:8px 18px;background:${danger ? '#f87171' : 'var(--brand)'};color:${danger ? '#fff' : '#08080a'};border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700;">${esc(confirmLbl)}</button>
+            <button id="__confirm-cancel" data-confirm="0" type="button" style="padding:8px 14px;background:transparent;color:var(--text-dim);border:1px solid var(--border-2);border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;">${esc(cancelLbl)}</button>
+            <button id="__confirm-ok" data-confirm="1" type="button" style="padding:8px 18px;background:${danger ? '#f87171' : 'var(--brand)'};color:${danger ? '#fff' : '#08080a'};border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700;">${esc(confirmLbl)}</button>
           </div>
         </div>`;
 document.body.appendChild(div);
@@ -15576,10 +15579,12 @@ const v36StatsHtml = [
 ['Data', `${_dataAgeMin}m`],
 ['Live', String(todayAllWinamax.filter(m => m.live || m.status === 'STATUS_IN_PROGRESS').length)]
 ].map(([k, v]) => `<div><span>${esc(k)}</span><b>${esc(v)}</b></div>`).join('');
+const v37KnownEventIds = new Set(terminalScanPool.map(m => String(m?.id || '')).filter(Boolean));
 const v37InsightRow = ({ kicker, title, body, eventId, tone }) => {
-const tag = eventId ? 'button' : 'div';
-const typeAttr = eventId ? ' type="button"' : '';
-const detail = eventId ? ` data-big-detail="${esc(String(eventId))}"` : '';
+const canOpen = eventId && v37KnownEventIds.has(String(eventId));
+const tag = canOpen ? 'button' : 'div';
+const typeAttr = canOpen ? ' type="button"' : '';
+const detail = canOpen ? ` data-big-detail="${esc(String(eventId))}"` : (eventId ? ` data-stale-detail="${esc(String(eventId))}"` : '');
 return `<${tag}${typeAttr} class="v36-side-row v37-insight-row" data-tone="${esc(tone || 'info')}"${detail}>
           <span>${esc(kicker || 'Insight')}</span>
           <strong>${esc(title || 'Signal modèle')}</strong>
