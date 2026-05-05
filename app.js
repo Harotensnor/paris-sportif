@@ -10080,6 +10080,16 @@ arr.push(txt);
 if (whyBest?.investment?.score) arr.push(`Qualité du signal : ${Math.round(whyBest.investment.score)}/100.`);
 return [...new Set(arr)].slice(0, 5);
 })();
+const whyDecisionReasons = (() => {
+const clean = whyReasons.map(x => String(x || '').trim()).filter(Boolean);
+const risk = [...whySignalState.against, ...clean]
+.find(x => /prudence|risque|contre|incertain|mitig|faible|manque|léger|leger|data/i.test(String(x || '')));
+return [
+{ label: 'Raison principale', text: clean[0] || `Le modèle voit ${Math.round(whyRel * 100)}% de réussite sur ce pari.` },
+{ label: 'Signal support', text: clean[1] || clean[0] || 'Les signaux disponibles vont dans le même sens que le pick.' },
+{ label: 'Risque à connaître', text: risk || 'Aucun contre-signal majeur détecté sur ce snapshot.' }
+];
+})();
 const whySignalsHtml = (() => {
 const signalFor = [...new Set(whySignalState.for)].slice(0, 3);
 const signalAgainst = [...new Set(whySignalState.against)].slice(0, 3);
@@ -10121,7 +10131,7 @@ const whyHtml = `
             <em>Kelly protégé</em>
           </div>
         </div>
-        ${whyReasons.length ? `<ol>${whyReasons.map(r => `<li>${esc(r)}</li>`).join('')}</ol>` : '<p class="why-bet__muted">Le modèle conseille d’ouvrir les détails techniques avant de décider.</p>'}
+        <ol>${whyDecisionReasons.map(r => `<li><b>${esc(r.label)}</b><span>${esc(r.text)}</span></li>`).join('')}</ol>
         ${whySignalsHtml}
         <footer>
           ${whyWinamaxCta}
@@ -15168,12 +15178,14 @@ const v37EmptyPoolHelpHtml = (!v36PickPool.length && terminalScanPool.length > 1
         <button type="button" class="page-btn" data-page="tous">Voir tous les matchs</button>
       </section>` : '';
 const v37FilterResetHtml = v37FilterResetNotice ? `<section class="v37-empty-pool-help is-info"><strong>Filtres corriges</strong><span>${esc(v37FilterResetNotice)}</span></section>` : '';
-const v37DecisionGuideHtml = `<details class="v37-decision-guide" open>
-        <summary>Comment choisir un pari <span>score d'abord, puis tier, puis cote</span></summary>
+const v37DecisionGuideSeen = safeLocalStorageGet('paris_sportif_decision_guide_seen', '') === '1';
+const v37DecisionGuideHtml = `<details class="v37-decision-guide" ${v37DecisionGuideSeen ? '' : 'open'} data-v37-decision-guide>
+        <summary>Comment choisir un pari <span>score, tier, cote : l'ordre simple</span></summary>
         <ol>
-          <li><b>Score 0-100</b> : note globale. 70+ = prioritaire, 60-69 = jouable, moins = mise reduite.</li>
-          <li><b>Tier</b> : Sur/Solide = moins de risque, Big/Outsider = plus de gain mais plus de variance.</li>
-          <li><b>Edge (avantage)</b> : ecart entre notre proba et la cote. +5% veut dire que le prix semble 5 points meilleur que le marche.</li>
+          <li><b>Score 0-100</b> : combine tous les signaux. 70+ = très solide, 60-69 = jouable, moins = mise réduite.</li>
+          <li><b>Tier</b> : Sûr = peu de risque, Solide = équilibre, Big odds / Outsider = gros gain mais plus de variance.</li>
+          <li><b>Cote</b> : choisis selon ton appétit risque. @1.30 = prudent, @5.00+ = outsider.</li>
+          <li><b>Edge (avantage)</b> : dit si la cote semble sous-évaluée. Plus c'est haut, mieux c'est.</li>
         </ol>
       </details>`;
 const v36FilterButton = (kind, value, label, active) => `<button type="button" class="v36-filter-chip ${active ? 'is-active' : ''}" data-v36-filter="${esc(kind)}" data-v36-value="${esc(value)}">${label}</button>`;
@@ -15255,7 +15267,7 @@ const marketName = p.marketName || p.market || '';
 const intelBadges = (p.opportunityBadges || []).map(x => `<i data-tooltip="${esc(v37BadgeTooltip(x))}" title="${esc(v37BadgeTooltip(x))}">${esc(x)}</i>`).join('');
 const sameMatchCount = v37VisibleMatchCounts.get(v37MatchKeyForPick(p)) || 0;
 const scoreClass = p.opportunity >= 80 ? 'is-high' : p.opportunity >= 60 ? 'is-mid' : p.opportunity >= 40 ? 'is-low' : 'is-muted';
-const scoreAdvice = p.opportunity >= 80 ? 'Forte' : p.opportunity >= 60 ? 'Moderee' : p.opportunity >= 40 ? 'Reduite' : 'Eviter';
+const scoreAdvice = p.opportunity >= 80 ? 'Conviction forte' : p.opportunity >= 60 ? 'Bon pari' : p.opportunity >= 40 ? 'Acceptable' : 'Peu fiable';
 const indicativeBadge = p.best?.source === 'cote_indicative' ? '<small class="v37-source-badge" title="Cote indicative : vérifie le prix final chez Winamax">indicatif</small>' : '';
 return `<tr class="v36-table-row ${soon ? 'is-imminent' : ''} ${sameMatchCount > 1 ? 'is-same-match' : ''} ${p.dataOnly ? 'is-data-only' : ''}" data-tone="${esc(tier.tone)}" data-big-detail="${esc(String(p.m.id || ''))}" data-pick-uid="${esc(p.pickUid || '')}" data-pick-label="${esc(p.labelFull || p.label || '')}" data-pick-odd="${esc(p.odd.toFixed(2))}" title="${esc(v36ReasonTooltip(p))}">
           <td class="v36-cell-sport"><span>${sportIcon(p.m.sport || '')}</span><b>${esc(sportLabel(p.m.sport || '').slice(0, 9))}</b></td>
@@ -15266,7 +15278,7 @@ return `<tr class="v36-table-row ${soon ? 'is-imminent' : ''} ${sameMatchCount >
           <td class="v36-cell-pick"><b data-tooltip="${esc(pickHelp)}">${esc(p.label)}</b>${p.marketInfo ? `<span aria-hidden="true" data-tooltip="${esc(p.marketInfo)}" style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;margin-left:6px;border-radius:50%;border:1px solid var(--border);color:var(--text-dim);font-size:10px;font-weight:800;">?</span>` : ''}<em>${esc(marketName)}</em>${indicativeBadge}</td>
           <td class="v36-num v36-odd">${v37BlindOddHtml(p.odd)}</td>
           <td class="v36-num">${relPct}%</td>
-          <td class="v36-num ${p.edge >= 0 ? 'is-pos' : 'is-neg'}"><span data-tooltip="Edge (avantage) : notre probabilité dépasse celle implicite dans la cote. Plus c'est haut, mieux le pari est payé.">${v37BlindEdgeHtml(p.edge)}</span></td>
+          <td class="v36-num ${p.edge >= 0 ? 'is-pos' : 'is-neg'}"><span data-tooltip="Edge (avantage) : l'edge mesure si la cote est sous-évaluée par le marché. Plus c'est haut, mieux c'est.">${v37BlindEdgeHtml(p.edge)}</span></td>
           <td class="v36-num"><span class="v37-opportunity ${scoreClass}" data-score="${esc(String(p.opportunity || 0))}" data-tooltip="${esc(p.opportunityTooltip || '')}" title="${esc(p.opportunityTooltip || '')}" aria-label="${esc(p.opportunityTooltip || `Score d'opportunité ${p.opportunity || 0}/100`)}" tabindex="0">${esc(String(p.opportunity || 0))}</span><em class="v37-score-advice">${esc(scoreAdvice)}</em>${intelBadges ? `<span class="v37-intel-chips">${intelBadges}</span>` : ''}</td>
           <td>${v36TierBadge(p.tier, true)}</td>
           ${v37HistoryMode ? `<td>${v37ResultBadge(result)}</td>` : ''}
@@ -15281,7 +15293,7 @@ return `<button type="button" class="v36-table-card ${sameMatchCount > 1 ? 'is-s
           <strong>${v36MatchTitleHtml(p)}</strong>
           <em class="v36-table-card__league">${esc(p.m.league_name || p.m.league || '')}</em>
           <span class="v36-table-card__line"><i data-tooltip="${esc(p.marketTooltip || p.labelFull || p.label)}">${esc(p.labelMobile || p.label)}</i><b>${v37BlindOddHtml(p.odd)}</b><b>${Math.round(p.rel * 100)}%</b><b>${v37BlindEdgeHtml(p.edge)}</b></span>
-          <span class="v36-table-card__signals"><i data-tooltip="${esc(p.opportunityTooltip || '')}" title="${esc(p.opportunityTooltip || '')}" aria-label="${esc(p.opportunityTooltip || `Score d'opportunité ${p.opportunity || 0}/100`)}">Score ${esc(String(p.opportunity || 0))}/100</i>${p.best?.source === 'cote_indicative' ? '<i>Cote indicative</i>' : ''}${sameMatchCount > 1 ? `<i>+${sameMatchCount - 1} autre pick même match</i>` : ''}${(p.opportunityBadges || []).slice(0, 2).map(x => `<i data-tooltip="${esc(v37BadgeTooltip(x))}" title="${esc(v37BadgeTooltip(x))}">${esc(x)}</i>`).join('')}</span>
+          <span class="v36-table-card__signals"><i data-tooltip="${esc(p.opportunityTooltip || '')}" title="${esc(p.opportunityTooltip || '')}" aria-label="${esc(p.opportunityTooltip || `Score d'opportunité ${p.opportunity || 0}/100`)}">Score ${esc(String(p.opportunity || 0))}/100 · ${esc(p.opportunity >= 80 ? 'Conviction forte' : p.opportunity >= 60 ? 'Bon pari' : p.opportunity >= 40 ? 'Acceptable' : 'Peu fiable')}</i>${p.best?.source === 'cote_indicative' ? '<i>Cote indicative</i>' : ''}${sameMatchCount > 1 ? `<i>+${sameMatchCount - 1} autre pick même match</i>` : ''}${(p.opportunityBadges || []).slice(0, 2).map(x => `<i data-tooltip="${esc(v37BadgeTooltip(x))}" title="${esc(v37BadgeTooltip(x))}">${esc(x)}</i>`).join('')}</span>
           ${v37HistoryMode ? `<span class="v36-table-card__signals">${v37ResultBadge(result)}</span>` : ''}
         </button>`;
 };
@@ -15386,7 +15398,7 @@ const v36TableHtml = `<section class="v36-table-panel" aria-label="Tableau dense
         <div class="v36-table-scroll">
           <table class="v36-picks-table">
             <thead><tr>
-              <th>Sport</th><th>${v36SortButton('date', 'Date')}</th><th>${v36SortButton('time', 'Heure')}</th><th>Ligue</th><th>Match</th><th>Pari</th><th data-tooltip="Cote : combien tu gagnes pour 1 euro misé. @1.85 = 0.85 euro net si gagné.">${v36SortButton('odd', 'Cote')}</th><th data-tooltip="Confiance : probabilité estimée par notre modèle.">${v36SortButton('conf', 'Conf')}</th><th data-tooltip="Edge (avantage) : écart entre notre probabilité et celle du marché. +5% = cote intéressante.">${v36SortButton('edge', 'Edge')}</th><th data-tooltip="Score : note globale 0-100 qui combine confiance, edge, fraîcheur data, timing et signaux.">${v36SortButton('score', 'Score')}</th><th data-tooltip="Tier : niveau de risque/gain. Sur et Solide sont plus prudents, Big et Outsider plus variables.">${v36SortButton('tier', 'Tier')}</th>${v37HistoryMode ? '<th>Résultat</th>' : ''}
+              <th>Sport</th><th>${v36SortButton('date', 'Date')}</th><th>${v36SortButton('time', 'Heure')}</th><th>Ligue</th><th>Match</th><th>Pari</th><th data-tooltip="Cote : combien tu gagnes pour 1 euro misé. @1.85 = 0.85 euro net si gagné.">${v36SortButton('odd', 'Cote')}</th><th data-tooltip="Conf : probabilité estimée par notre modèle. 65% veut dire environ 65 chances sur 100 selon les données.">${v36SortButton('conf', 'Conf')}</th><th data-tooltip="Edge (avantage) : avantage statistique vs marché. +5% = la cote vaut environ 5% de plus que le risque réel.">${v36SortButton('edge', 'Edge (avantage)')}</th><th data-tooltip="Score : note globale 0-100. Plus haut = meilleur pick car le score combine confiance, edge, fraîcheur data, timing et signaux.">${v36SortButton('score', 'Score')}</th><th data-tooltip="Tier : niveau de risque/gain. Sûr et Solide sont prudents, Big odds et Outsider cherchent plus de rendement.">${v36SortButton('tier', 'Tier')}</th>${v37HistoryMode ? '<th>Résultat</th>' : ''}
             </tr></thead>
             <tbody>${v36TableRows.length ? v36TableRows.map(v36TableRow).join('') : `<tr><td colspan="${v37HistoryMode ? '12' : '11'}"><div class="v36-tier-empty">Aucun pick pour ce filtre. Retire un sport, une heure ou une recherche.</div></td></tr>`}</tbody>
           </table>
@@ -15757,6 +15769,12 @@ wrap.innerHTML = `
           ${v36GeniusSection}
           ${v36BoostSection}
         </div>`;
+const v37GuideDetails = wrap.querySelector('[data-v37-decision-guide]');
+if (v37GuideDetails) {
+v37GuideDetails.addEventListener('toggle', () => {
+if (!v37GuideDetails.open) safeLocalStorageSet('paris_sportif_decision_guide_seen', '1');
+});
+}
 wrap.querySelectorAll('[data-v36-filter]').forEach(btn => {
 btn.addEventListener('click', () => {
 const kind = btn.dataset.v36Filter;

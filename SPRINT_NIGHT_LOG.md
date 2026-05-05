@@ -704,3 +704,12 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Doc: creation de `HEBERGEMENT.md` pour expliquer GitHub Pages actuel, discretion par URL, options privees gerees, GitHub Pages prive et hebergement personnel.
 - Recommandation: rester sur GitHub Pages discret a court terme, car la priorite produit reste la confiance tableau/picks/historique.
 - Aucun changement applicatif ni cache requis.
+
+## Sprint v35.469 — AUTO 10/10 Aide decision tableau (18:44 UTC)
+- Validation Theo: `?debug=1#dashboard?date=all` affiche 285 matchs scannes, 490 picks qualifies, 360 lignes rendues et les 5 tiers presents; mobile affiche 360 cards.
+- Mesure rolling: les dates strictes basses (J/J-1) restent expliquees par l'historique/passes, tandis que le mode 7 jours garde le tableau plein par defaut.
+- Clarte: guide "Comment choisir" reformule en Score → Tier → Cote → Edge, repli memorise via `paris_sportif_decision_guide_seen`.
+- Decision: headers Cote/Conf/Edge/Score/Tier ont des tooltips plus simples; score affiche `Conviction forte`, `Bon pari`, `Acceptable`, `Peu fiable`.
+- Modal Pourquoi: les 3 raisons sont hierarchisees en `Raison principale`, `Signal support`, `Risque a connaitre`.
+- QA: syntax `app.js`/`sw.js` OK, `phase-finale-dashboard.spec.js` 6/6 desktop+mobile.
+- Cache/footer bumpes v35.469; `app.js` hash `60e7e015`, `app.css` hash `09ae40a0`.
