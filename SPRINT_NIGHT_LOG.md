@@ -728,3 +728,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Pipeline: `check_pipeline_drift.py` confirme `status=ok`, 84 scripts references dans `auto_refresh.py` et `refresh.yml`, aucun drift.
 - Data: snapshot stable a 285 events, 285 Winamax exacts, 285 avec marches detailles, xG 199, injuries 159, lineups/starter signals 97.
 - Health: `measure_night_metrics.py` lit maintenant `health.overall` au lieu d'un champ `status` absent, ce qui supprime le statut `null` dans le rapport.
+
+## Sprint v35.472 — AUTO 10/10 Bundle CSS under budget (19:15 UTC)
+- Perf: `app.css` compresse les commentaires/espaces sans changement fonctionnel, 350.9 KB -> 260.4 KB.
+- Bundle: `scripts/check_bundle_size.py` repasse OK; `app.js` reste a 1,571.4 KB / 1,750 KB et `app.css` a 260.4 KB / 300 KB.
+- Cache: `pronostics.html` pointe sur `app.css?v=e464318c`, footer v35.472 et `sw.js` cache `paris-sportif-20260505-191537`.
+- QA: syntax inline/app/sw OK avec Node runtime local; `phase-finale-dashboard.spec.js` passe 6/6 desktop+mobile apres compression CSS.
