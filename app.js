@@ -6872,6 +6872,18 @@ guardrails: artifact?.guardrails || {},
 worst_zones: artifact?.worst_zones || [],
 };
 }
+function getBacktestDeepV5DebugSummary() {
+const artifact = (typeof window !== 'undefined') ? window.BACKTEST_DEEP_V5 : null;
+return {
+loaded: !!artifact,
+rows: Number(artifact?.overall?.n || 0),
+date_range: artifact?.actual_date_range || null,
+overall: artifact?.overall || null,
+worst_zones: artifact?.worst_zones || [],
+recommendations: artifact?.recommendations || [],
+limitations: artifact?.limitations || [],
+};
+}
 try {
 window.getStackingMetaV5Nudge = getStackingMetaV5Nudge;
 window.getStackingMetaV5DebugSummary = getStackingMetaV5DebugSummary;
@@ -6885,6 +6897,7 @@ window.getAdaptiveEnsembleV5DebugSummary = getAdaptiveEnsembleV5DebugSummary;
 window.getMultitaskV5MarketPolicy = getMultitaskV5MarketPolicy;
 window.getMultitaskContextV5 = getMultitaskContextV5;
 window.getMultitaskV5DebugSummary = getMultitaskV5DebugSummary;
+window.getBacktestDeepV5DebugSummary = getBacktestDeepV5DebugSummary;
 } catch (e) {}
 
 let __predCache = new Map();
@@ -17845,6 +17858,7 @@ calibrationMethodV5: getCalibrationMethodV5DebugSummary(),
 adaptiveEnsembleV5: getAdaptiveEnsembleV5DebugSummary(),
 coldStartV5: getColdStartV5DebugSummary(),
 multitaskV5: getMultitaskV5DebugSummary(),
+backtestDeepV5: getBacktestDeepV5DebugSummary(),
 seasonPhase: getSeasonPhaseDebugSummary(),
 starPlayers: getStarPlayersDebugSummary(),
 xgDecay: getXGDecayDebugSummary(),
@@ -24130,6 +24144,31 @@ return `<section style="margin-top:32px;">
           </div>
         </section>`;
 })();
+const v5BacktestDeepHtml = (() => {
+const data = window.BACKTEST_DEEP_V5 || null;
+if (!data) return '';
+const overall = data.overall || {};
+const range = data.actual_date_range || {};
+const pct = v => `${Number(v || 0) >= 0 ? '+' : ''}${(Number(v || 0) * 100).toFixed(1)}%`;
+return `<section style="margin-top:32px;">
+          <h2 class="page-h2">🧪 Backtest deep V5</h2>
+          <div style="padding:14px;background:var(--panel);border:1px solid var(--border);border-radius:12px;">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:10px;">
+              <div><div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;font-weight:800;">Lignes</div><div style="font-size:24px;font-weight:900;">${Number(overall.n || 0)}</div><div style="font-size:11px;color:var(--text-dim2);">fenêtre disponible</div></div>
+              <div><div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;font-weight:800;">ROI flat</div><div style="font-size:24px;font-weight:900;color:${Number(overall.roi_flat || 0) >= 0 ? 'var(--accent)' : 'var(--danger)'};">${pct(overall.roi_flat)}</div><div style="font-size:11px;color:var(--text-dim2);">mise 1u</div></div>
+              <div><div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;font-weight:800;">Brier</div><div style="font-size:24px;font-weight:900;">${Number(overall.brier || 0).toFixed(3)}</div><div style="font-size:11px;color:var(--text-dim2);">global</div></div>
+            </div>
+            <div style="font-size:12px;color:var(--text-dim);margin-bottom:8px;">Fenêtre ${esc(String(range.start || '—')).slice(0,10)} → ${esc(String(range.end || '—')).slice(0,10)}. Le rapport complet est dans <code>BACKTEST_DEEP_V5.md</code>.</div>
+            ${(data.worst_zones || []).slice(0, 5).map(z => `<div style="display:grid;grid-template-columns:1fr 52px 70px 70px 70px;gap:8px;padding:7px 0;border-top:1px solid var(--border);font-size:12px;align-items:center;">
+              <b>${esc(z.zone || '')}</b>
+              <span>n=${Number(z.n || 0)}</span>
+              <span>WR ${(Number(z.win_rate || 0) * 100).toFixed(0)}%</span>
+              <span style="color:${Number(z.roi_flat || 0) >= 0 ? 'var(--accent)' : 'var(--danger)'};">${pct(z.roi_flat)}</span>
+              <span>Brier ${Number(z.brier || 0).toFixed(3)}</span>
+            </div>`).join('')}
+          </div>
+        </section>`;
+})();
 wrap.innerHTML = `
       <div style="max-width:900px;margin:0 auto;padding:16px 12px 40px;">
         <div style="padding:40px 0 16px;border-bottom:1px solid var(--border);">
@@ -24168,6 +24207,7 @@ wrap.innerHTML = `
         ${v5CalibrationHtml}
         ${v5AdaptiveEnsembleHtml}
         ${v5MultitaskHtml}
+        ${v5BacktestDeepHtml}
 
         <section style="margin-top:32px;">
           <h2 class="page-h2">🧮 Comment le modèle décide</h2>

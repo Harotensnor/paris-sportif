@@ -68,6 +68,7 @@ def build() -> dict[str, Any]:
                 "build_adaptive_ensemble_v5.py",
                 "build_cold_start_v5.py",
                 "build_multitask_v5.py",
+                "build_backtest_deep_v5.py",
             ],
             "settled_source": "picks_history.jsonl + backtest_training_rows.jsonl",
         },
@@ -112,6 +113,7 @@ def build() -> dict[str, Any]:
             "ensemble_adaptive_weights.json": sha("ensemble_adaptive_weights.json"),
             "cold_start_v5.json": sha("cold_start_v5.json"),
             "multitask_v5.json": sha("multitask_v5.json"),
+            "backtest_deep_v5.json": sha("backtest_deep_v5.json"),
         },
     }
 

@@ -1172,3 +1172,12 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Tests: suite model-v5 desktop + mobile à relancer après stamp; app.js syntax/drift en attente.
 - Cache/footer bumpés v37.010; multitask_v5 hash a2d764c8; SW paris-sportif-20260505-232942.
 
+
+## Sprint v37.011 — AUTO 10/10 Phase V5 K backtest deep (23:43 UTC)
+- Data: build_backtest_deep_v5.py génère backtest_deep_v5.json/js et BACKTEST_DEEP_V5.md.
+- Analyse: breakdowns sport, ligue, cote, marché, mois et météo avec 5 zones fragiles.
+- Crédibilité/debug: section Backtest deep V5 et ?debug=1 exposent fenêtre, Brier, ROI et recommandations.
+- Pipeline: refresh.yml, auto_refresh.py et model_versions suivent l'artefact backtest deep.
+- Tests: suite model-v5 desktop + mobile à relancer après stamp; app.js syntax/drift en attente.
+- Cache/footer bumpés v37.011; backtest_deep_v5 hash be7d058e; SW paris-sportif-20260505-233236.
+
