@@ -17912,6 +17912,62 @@ return found;
 };
 wrap.__v37MatchById = v36MatchById;
 wrap.__v37PickByUid = v37PickByUid;
+if (!wrap.__v36MobileSwipeWired) {
+wrap.__v36MobileSwipeWired = true;
+let swipeStart = null;
+const v36GestureTarget = (target) => target?.closest?.('.v36-table-card, .v36-pick-card, .dash-pick-card');
+const v36GestureInteractive = (target) => target?.closest?.('input, select, textarea, a, [data-v37-day], [data-v36-filter], [data-v36-sort], [data-v37-live-toggle], [data-v37-blind], [data-compare-pick], [data-tous-load-more]');
+const v36GoDateBySwipe = (direction) => {
+let storedFilter = {};
+try { storedFilter = JSON.parse(localStorage.getItem(v36FilterKey) || '{}') || {}; } catch(e) { storedFilter = {}; }
+const currentDate = storedFilter.date || v37DateFilter || todayIso;
+const base = /^\d{4}-\d{2}-\d{2}$/.test(String(currentDate || '')) ? currentDate : todayIso;
+const value = v37AddDays(base, direction);
+const next = { ...storedFilter, date: value };
+try { localStorage.setItem(v36FilterKey, JSON.stringify(next)); } catch(e) {}
+try { history.replaceState(null, '', location.pathname + location.search + `#dashboard?date=${encodeURIComponent(value)}`); } catch(e) {}
+try { if (navigator.vibrate) navigator.vibrate(8); } catch(e) {}
+try { if (typeof toast === 'function') toast(direction > 0 ? 'Jour suivant' : 'Jour précédent', 'info', { duration: 900 }); } catch(e) {}
+renderDashboardPage(wrap);
+};
+wrap.addEventListener('touchstart', (e) => {
+if (window.innerWidth > 720 || !e.touches || e.touches.length !== 1) return;
+if (document.getElementById('detail-modal')?.classList.contains('open')) return;
+const t = e.touches[0];
+swipeStart = {
+x: t.clientX,
+y: t.clientY,
+time: Date.now(),
+card: v36GestureTarget(e.target),
+interactive: Boolean(v36GestureInteractive(e.target))
+};
+}, { passive: true });
+wrap.addEventListener('touchend', (e) => {
+if (!swipeStart || window.innerWidth > 720) { swipeStart = null; return; }
+const t = e.changedTouches && e.changedTouches[0];
+if (!t) { swipeStart = null; return; }
+const dx = t.clientX - swipeStart.x;
+const dy = t.clientY - swipeStart.y;
+const ax = Math.abs(dx);
+const ay = Math.abs(dy);
+const elapsed = Date.now() - swipeStart.time;
+if (!swipeStart.interactive && ax >= 72 && ax > ay * 1.2 && elapsed < 900) {
+v36GoDateBySwipe(dx < 0 ? 1 : -1);
+swipeStart = null;
+return;
+}
+if (swipeStart.card && ay >= 78 && ay > ax * 1.25 && dy < 0 && elapsed < 900) {
+const id = swipeStart.card.dataset.bigDetail || swipeStart.card.dataset.matchId || '';
+const match = v36MatchById(id);
+if (match && typeof openDetail === 'function') {
+try { if (navigator.vibrate) navigator.vibrate(6); } catch(e) {}
+openDetail(match);
+}
+}
+swipeStart = null;
+}, { passive: true });
+wrap.addEventListener('touchcancel', () => { swipeStart = null; }, { passive: true });
+}
 if (!wrap.__v37LogoErrorDelegated) {
 wrap.__v37LogoErrorDelegated = true;
 wrap.addEventListener('error', (e) => {

@@ -1008,3 +1008,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Tests: `mobile-compact-layout.spec.js` passe mobile Chromium (1/1); `app.js` syntax OK; drift pipeline OK.
 - Cache/footer bumpes v36.025; `pronostics.html` porte la couche CSS mobile dédiée.
 
+## Sprint v36.026 — AUTO 10/10 Phase 8 CCC gestes mobiles (22:16 UTC)
+- Mobile: swipe horizontal sur le dashboard pour passer au jour précédent/suivant avec retour haptique léger.
+- Détail: swipe vertical sur une carte pick ouvre la modal match sans viser un petit bouton.
+- Robustesse: les gestes ignorent les filtres, boutons et champs interactifs pour éviter les changements involontaires.
+- Tests: `mobile-gestures.spec.js` passe mobile Chromium (1/1); `app.js` syntax OK; drift pipeline OK.
+- Cache/footer bumpes v36.026; `app.js` hash `ab50d203`, SW `paris-sportif-20260505-221656`.
+
