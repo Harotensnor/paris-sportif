@@ -325,6 +325,12 @@ SOURCES = [
         'markets': d.get('markets') or 0 if isinstance(d, dict) else 0,
         'status': d.get('status') if isinstance(d, dict) else 'missing',
     }),
+    ('mlb_player_props', 'mlb_player_props.json', lambda d: {
+        'events': len(d.get('events') or []) if isinstance(d, dict) else 0,
+        'props': d.get('props') or 0 if isinstance(d, dict) else 0,
+        'markets': len(d.get('markets') or []) if isinstance(d, dict) else 0,
+        'status': d.get('status') if isinstance(d, dict) else 'missing',
+    }),
     ('boosted_odds', 'boosted_odds.json', lambda d: {
         'matches_scanned': d.get('matches_scanned') or 0 if isinstance(d, dict) else 0,
         'boosts': len(d.get('boosts') or []) if isinstance(d, dict) else 0,
@@ -362,6 +368,7 @@ STALE_AFTER_MIN = {
     'league_bias_audit': 60,    # model league reliability guardrail
     'rugby_markets':   6*60,    # derived only when rugby appears in data.js
     'niche_markets':   6*60,    # darts/snooker derived sidecar
+    'mlb_player_props': 60,      # derived from current probable pitchers
     'boosted_odds':    60,      # follows Winamax market refresh
     'footballdata':    24*60,  # daily fetch
     'clv_history':     60,
@@ -392,6 +399,7 @@ SOURCE_SCRIPT = {
     'league_bias_audit': 'scripts/build_league_bias_audit.py',
     'rugby_markets': 'scripts/build_rugby_markets.py',
     'niche_markets': 'scripts/build_niche_markets.py',
+    'mlb_player_props': 'scripts/build_mlb_player_props.py',
     'boosted_odds': 'scripts/detect_boosted_odds.py',
     'footballdata': 'scripts/fetch_footballdata.py',
     'clv_history': 'scripts/compute_clv.py',
