@@ -1169,7 +1169,7 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Modèle: predictMatch expose multitask_v5 et les politiques par marché, avec guardrail Brier no-worse.
 - Crédibilité/debug: section Multi-task V5 ajoutée et ?debug=1 expose weights, tâches et worst zones.
 - Pipeline: refresh.yml, auto_refresh.py et model_versions suivent l'artefact multitask.
-- Tests: suite model-v5 desktop + mobile à relancer après stamp; app.js syntax/drift en attente.
+- Tests: suite model-v5 desktop + mobile 24/24, app.js syntax OK, drift pipeline OK.
 - Cache/footer bumpés v37.010; multitask_v5 hash a2d764c8; SW paris-sportif-20260505-232942.
 
 
@@ -1180,4 +1180,12 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Pipeline: refresh.yml, auto_refresh.py et model_versions suivent l'artefact backtest deep.
 - Tests: suite model-v5 desktop + mobile à relancer après stamp; app.js syntax/drift en attente.
 - Cache/footer bumpés v37.011; backtest_deep_v5 hash be7d058e; SW paris-sportif-20260505-233236.
+
+
+## Sprint v37.012 — AUTO 10/10 Phase V5 L self-evaluation (23:51 UTC)
+- Modèle: selfEvaluateConfidenceV5 estime la confiance dans la confiance par pick.
+- Scoring: méta-confiance <40% pénalise score qualité et score opportunité.
+- Modal/debug: "méta-confiance XX%" visible en détail et résumé selfEvaluationV5 dans ?debug=1.
+- Tests: suite model-v5 desktop + mobile à relancer après stamp; app.js syntax/drift en attente.
+- Cache/footer bumpés v37.012; app.js hash 8c5b6c7e; SW paris-sportif-20260505-233618.
 

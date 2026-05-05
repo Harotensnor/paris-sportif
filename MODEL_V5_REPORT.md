@@ -94,3 +94,13 @@ Guardrail: la couche multi-task expose la vérité par marché dans `?debug=1` e
 - Worst zones: 5 zones triées par risque ROI/Brier, avec recommandations.
 
 Limitation documentée: le repo local ne contient actuellement que la fenêtre historisée disponible dans `backtest_training_rows.jsonl`; la demande 24 mois est conservée dans l'artefact, sans inventer d'historique absent.
+
+## Section L — Self-evaluation framework
+
+- Status: **active**
+- Runtime: `selfEvaluateConfidenceV5(match, pred, best)`
+- Output: `confidence_in_confidence ∈ [0,1]`, label, factors et penalty.
+- Guardrail: si la méta-confiance passe sous `0.40`, le score qualité et le score d'opportunité reçoivent un malus visible.
+- UI: la modal détail affiche `méta-confiance XX%` dans la décomposition fiabilité.
+
+Facteurs utilisés: consensus inter-signaux, richesse data, nombre de composantes, largeur de l'intervalle bootstrap V5, variance ensemble, edge, cold start, drift feature et abstain.

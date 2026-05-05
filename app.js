@@ -2554,6 +2554,12 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
         else reasons.push({ icon: '⚠', text: `Modèle faible sur ${lc} (WR ${(wr*100).toFixed(0)}%, n=${n})` });
       }
     }
+    const selfEval = pred?.self_evaluation_v5 || pred?.selfEvaluationV5 || null;
+    if (selfEval && Number(selfEval.penalty || 0) > 0) {
+      const penalty = Math.min(14, Number(selfEval.penalty || 0));
+      score -= penalty;
+      reasons.push({ icon: '🧪', text: `Méta-confiance ${Math.round(Number(selfEval.confidence_in_confidence || 0) * 100)}% (${selfEval.label})` });
+    }
     let maxScore = 94;
     if (!(edge >= 0.015)) maxScore = Math.min(maxScore, 58);
     else if (edge < 0.04) maxScore = Math.min(maxScore, 72);
@@ -9022,12 +9028,31 @@ agreementVariance: ensembleMeta?.agreement_variance,
 driftOverall: window.FEATURE_DRIFT_V5?.overall,
 });
 if (reliabilityMeta) reliabilityMeta.predictionIntervalV5 = predictionIntervalV5;
+const selfEvaluationV5 = selfEvaluateConfidenceV5(match, {
+reliability,
+reliabilityMeta,
+ensemble: ensembleMeta,
+prediction_interval_v5: predictionIntervalV5,
+coldStartContext,
+cold_start_v5: coldStartContext,
+abstain,
+}, { edge: pickEdge });
+if (reliabilityMeta) reliabilityMeta.selfEvaluationV5 = selfEvaluationV5;
+if (selfEvaluationV5.penalty > 0) {
+reasons.push({
+type: 'self_evaluation_v5',
+icon: '🧪',
+text: `Auto-évaluation V5 : confiance dans la confiance ${Math.round(selfEvaluationV5.confidence_in_confidence * 100)}% (${selfEvaluationV5.label}), score qualité pénalisé.`,
+});
+}
 
 return {
 probs: final,
 pick: { label: best_pick[0], prob: best_pick[1], key: best_pick[2], team: best_pick[3] },
 reliability,
 reliabilityMeta,
+confidence_in_confidence: selfEvaluationV5.confidence_in_confidence,
+self_evaluation_v5: selfEvaluationV5,
 prob_ci: probCi,
 confidence_interval: probCi,
 prediction_interval_v5: predictionIntervalV5,
@@ -9713,6 +9738,66 @@ component_std: Math.round(componentStd * 1000) / 1000,
 };
 }
 try { window.bootstrapPredictionIntervalV5 = bootstrapPredictionIntervalV5; } catch(e) {}
+
+function selfEvaluateConfidenceV5(match, pred = {}, best = {}) {
+const rm = pred?.reliabilityMeta || {};
+const agreement = Math.max(0, Math.min(1, Number(rm.agreement || 0)));
+const richness = Math.max(0, Math.min(1, Number(rm.richness || 0)));
+const componentCount = Math.max(0, Number(rm.componentCount || rm.n_components || 0));
+const componentScore = Math.max(0, Math.min(1, componentCount / 5));
+let dqRatio = 0.5;
+try {
+const dq = (typeof computeDataQuality === 'function') ? computeDataQuality(match) : null;
+if (dq && dq.max) dqRatio = Math.max(0, Math.min(1, Number(dq.score || 0) / Number(dq.max || 1)));
+} catch(e) {}
+const interval = pred?.prediction_interval_v5 || pred?.bootstrap_interval || rm.predictionIntervalV5 || null;
+const width = Number(interval?.width || 0.18);
+const intervalScore = Math.max(0, Math.min(1, 1 - width / 0.28));
+const variance = Number(pred?.ensemble?.agreement_variance);
+const varianceScore = Number.isFinite(variance) ? Math.max(0, Math.min(1, 1 - variance / 0.20)) : 0.55;
+const edge = Math.max(-0.08, Math.min(0.18, Number(best?.edge || pred?.pickEdge || 0)));
+const edgeScore = Math.max(0, Math.min(1, (edge + 0.01) / 0.12));
+const coldPenalty = (pred?.coldStartContext?.active || pred?.cold_start_v5?.active) ? 0.08 : 0;
+const drift = String(window.FEATURE_DRIFT_V5?.overall || '').toLowerCase();
+const driftPenalty = drift === 'critical' ? 0.12 : drift === 'warning' ? 0.06 : 0;
+const abstainPenalty = pred?.abstain?.active ? 0.10 : 0;
+let meta = 0.12
++ agreement * 0.19
++ richness * 0.12
++ componentScore * 0.13
++ dqRatio * 0.14
++ intervalScore * 0.14
++ varianceScore * 0.10
++ edgeScore * 0.06
+- coldPenalty
+- driftPenalty
+- abstainPenalty;
+meta = Math.max(0.05, Math.min(0.97, meta));
+const penalty = meta < 0.40 ? Math.round(Math.min(14, 6 + (0.40 - meta) * 35)) : 0;
+const label = meta >= 0.70 ? 'haute' : meta >= 0.55 ? 'correcte' : meta >= 0.40 ? 'fragile' : 'basse';
+return {
+schema: 'self_evaluation_v5',
+confidence_in_confidence: Math.round(meta * 1000) / 1000,
+meta_confidence: Math.round(meta * 1000) / 1000,
+label,
+penalty,
+factors: {
+agreement: Math.round(agreement * 1000) / 1000,
+richness: Math.round(richness * 1000) / 1000,
+componentScore: Math.round(componentScore * 1000) / 1000,
+dataQuality: Math.round(dqRatio * 1000) / 1000,
+intervalScore: Math.round(intervalScore * 1000) / 1000,
+varianceScore: Math.round(varianceScore * 1000) / 1000,
+edgeScore: Math.round(edgeScore * 1000) / 1000,
+},
+flags: {
+coldStart: coldPenalty > 0,
+drift,
+abstain: !!pred?.abstain?.active,
+},
+};
+}
+try { window.selfEvaluateConfidenceV5 = selfEvaluateConfidenceV5; } catch(e) {}
 
 function confGauge(prob, size = 'md') {
 const p = Math.max(0, Math.min(1, prob || 0));
@@ -12883,12 +12968,15 @@ const rawPct = (rm.pickProb*100).toFixed(0);
 const relPct = ((pred.reliability ?? pred.pick.prob)*100).toFixed(0);
 const delta = Math.round((pred.reliability - rm.pickProb) * 100);
 const deltaTxt = delta === 0 ? '' : delta > 0 ? ` +${delta}pt` : ` ${delta}pt`;
+const sev = pred.self_evaluation_v5 || rm.selfEvaluationV5 || null;
+const sevPct = sev ? Math.round(Number(sev.confidence_in_confidence || 0) * 100) : null;
 return `<div style="margin-top:12px;padding:10px 12px;background:rgba(255,255,255,.02);border-radius:8px;border:1px solid rgba(255,255,255,.04);font-size:12px;color:var(--text-dim,#b4bcc7);line-height:1.5;">
                 <div style="font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-dim2,#7b8693);margin-bottom:6px;">🎚️ Décomposition fiabilité</div>
                 <div style="display:flex;gap:16px;flex-wrap:wrap;font-variant-numeric:tabular-nums;">
                   <span><b style="color:var(--text,#e6ebf2);">${rm.componentCount}</b> sources</span>
                   <span>consensus ${consensusLbl}</span>
                   <span>proba brute <b style="color:var(--text,#e6ebf2);">${rawPct}%</b> → fiabilité <b style="color:var(--text,#e6ebf2);">${relPct}%</b><span style="color:${delta>0?'#10b981':delta<0?'#fca5a5':'var(--text-dim2)'};">${deltaTxt}</span></span>
+                  ${sev ? `<span title="Le modèle juge la solidité de sa propre confiance via consensus, richesse data, largeur d'intervalle et drift.">méta-confiance <b style="color:${sevPct >= 55 ? 'var(--accent)' : sevPct >= 40 ? 'var(--warn)' : 'var(--danger)'};">${sevPct}%</b> (${esc(sev.label || '—')})</span>` : ''}
                 </div>
               </div>`;
 })() : ''}
@@ -17061,6 +17149,11 @@ if (profile.delta) {
 score += addScorePart('Profil Théo', profile.delta);
 profile.badges.slice(0, 2).forEach(b => badges.push(b));
 }
+const selfEval = pred?.self_evaluation_v5 || pred?.selfEvaluationV5 || null;
+if (selfEval && Number(selfEval.penalty || 0) > 0) {
+score += addScorePart('Méta-confiance', -Math.min(14, Number(selfEval.penalty || 0)));
+badges.push('méta-confiance basse');
+}
 let clean = Math.max(0, Math.min(100, Math.round(score)));
 if (edgeAnomalous) clean = Math.min(clean, 69);
 else if (edgeForScore < 0.015) clean = Math.min(clean, 45);
@@ -17818,6 +17911,18 @@ pct,
 stabilityMode: pct >= 80 ? 'active' : 'neutral_snapshot_insufficient'
 };
 })();
+const v37SelfEvaluationSummary = (() => {
+const vals = (v36PickPool.length ? v36PickPool : v37DataOnlyPool)
+.map(p => Number(p?.pred?.self_evaluation_v5?.confidence_in_confidence))
+.filter(Number.isFinite);
+const avg = vals.length ? vals.reduce((a, n) => a + n, 0) / vals.length : 0;
+return {
+count: vals.length,
+avg: Math.round(avg * 1000) / 1000,
+low_lt_40: vals.filter(n => n < 0.40).length,
+fragile_lt_55: vals.filter(n => n < 0.55).length,
+};
+})();
 const v37DebugMatches = () => terminalScanPool.slice(0, 10).map(m => {
 const { home, away } = getSides(m);
 return `${sportLabel(m?.sport || '')} ${parisDateISO(m?.date) || '?'} ${v36TeamName(home)}-${v36TeamName(away)} W:${isWinamaxBookable(m) ? '1' : '0'}`;
@@ -17859,6 +17964,7 @@ adaptiveEnsembleV5: getAdaptiveEnsembleV5DebugSummary(),
 coldStartV5: getColdStartV5DebugSummary(),
 multitaskV5: getMultitaskV5DebugSummary(),
 backtestDeepV5: getBacktestDeepV5DebugSummary(),
+selfEvaluationV5: v37SelfEvaluationSummary,
 seasonPhase: getSeasonPhaseDebugSummary(),
 starPlayers: getStarPlayersDebugSummary(),
 xgDecay: getXGDecayDebugSummary(),
