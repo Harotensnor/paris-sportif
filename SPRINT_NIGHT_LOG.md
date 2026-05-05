@@ -921,3 +921,11 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - QA: `app.js` syntax OK, pipeline drift OK, benchmark V4 promu guarded.
 - Cache/footer bumpes v36.013; `app.js` hash `47cf1625`, SW `paris-sportif-20260505-213244`.
 
+## Sprint v36.014 — AUTO 10/10 Phase 7 PP marchés joueurs foot (21:36 UTC)
+- Data: `football_player_props.json` couvre 75 matchs foot Winamax et 592 projections joueur.
+- Modèle/UI: `predictLikelyScorers()` utilise les compos si disponibles, sinon le sidecar V4 pour buteur anytime / premier buteur / 2+ buts / carton.
+- UX: page Buteurs réactivée en route dédiée `#buteurs`, avec fallback joueur lisible et stats de couverture.
+- Pipeline: `build_football_player_props.py` branché dans cron local/GHA/health; drift pipeline OK.
+- Tests: `football-player-props.spec.js` passe desktop + mobile (2/2).
+- Cache/footer bumpes v36.014; `app.js` hash `32a2b5b2`, `football_player_props.js` hash `c66b144d`, SW `paris-sportif-20260505-213625`.
+
