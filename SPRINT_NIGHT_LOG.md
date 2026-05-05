@@ -2,6 +2,12 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
+## Sprint v35.435 — AUTO 10/10 Section J MLB props lanceurs (10:56 UTC)
+- Extension J4 : `build_mlb_player_props.py` derive des props joueurs MLB depuis les lanceurs probables deja patches dans `data.js`.
+- Marches locaux : strikeouts lanceur O/U + home run concédé oui/non, avec proba, fair odds, IP projetées et inputs K/9, ERA, WHIP.
+- Mesure : 11 matchs MLB futurs, 36 props joueurs, 78 fiches lanceurs source; health expose maintenant `mlb_player_props`.
+- Garde-fou : les matchs deja passes sont exclus meme si la source ne les marque pas encore `completed`; cache/footer bumpes v35.435.
+
 ## Sprint v35.434 — AUTO 10/10 Section J taxonomy sports (10:53 UTC)
 - Extension Section J : Sofascore demande maintenant aussi le rugby et mappe femmes, tier 2, coupes, Asie/LATAM, NHL playoffs, KBO/NPB avec codes stables.
 - Nouveau patch : `patch_sofascore_league_codes.py` normalise les events deja presents; `sports_expansion_audit.json` suit J1-J8 sans appel reseau.
