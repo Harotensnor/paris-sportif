@@ -72,6 +72,8 @@ SPORT_MAPPING = {
     'ice-hockey': 'hockey',
     'baseball': 'baseball',
     'american-football': 'football-american',
+    'rugby': 'rugby',
+    'rugby-league': 'rugby',
 }
 
 # Quelques mappings de tournois Sofascore → ESPN league_code pour les top
@@ -91,7 +93,107 @@ LEAGUE_MAPPING = {
     'NHL': 'nhl',
     'ATP': 'atp',
     'WTA': 'wta',
+    # Section J — richer taxonomy for already-fetched public schedules.
+    # These codes make tier-2 leagues, cups, women football and Asia/LATAM
+    # events distinguishable downstream without adding new paid services.
+    "UEFA Women's Champions League": 'uefa.women.champions',
+    "Women's Super League": 'eng.w.1',
+    'Liga F': 'esp.w.1',
+    'Serie A, Women': 'ita.w.1',
+    'Frauen-Bundesliga': 'ger.w.1',
+    'Division 1, Women': 'fra.w.1',
+    '2. Bundesliga': 'ger.2',
+    'Eerste Divisie': 'ned.2',
+    'LaLiga 2': 'esp.2',
+    'LaLiga Hypermotion': 'esp.2',
+    'Serie B': 'ita.2',
+    'Ligue 2': 'fra.2',
+    'FA Cup': 'eng.fa_cup',
+    'Copa del Rey': 'esp.copa_del_rey',
+    'DFB Pokal': 'ger.dfb_pokal',
+    'DFB-Pokal': 'ger.dfb_pokal',
+    'Coppa Italia': 'ita.coppa_italia',
+    'J1 League': 'jpn.1',
+    'J1 League, East': 'jpn.1',
+    'J1 League, West': 'jpn.1',
+    'J2/J3 League, East A': 'jpn.2',
+    'J2/J3 League, East B': 'jpn.2',
+    'J2/J3 League, West A': 'jpn.2',
+    'J2/J3 League, West B': 'jpn.2',
+    'K League 1': 'kor.1',
+    'Chinese Super League': 'chn.1',
+    'Saudi Pro League': 'ksa.1',
+    'Brasileirão Série A': 'bra.1',
+    'Brasileirão Série B': 'bra.2',
+    'Brasileirão Série C': 'bra.3',
+    'Liga Profesional de Fútbol, Apertura': 'arg.1',
+    'CONMEBOL Libertadores': 'conmebol.libertadores',
+    'CONMEBOL Sudamericana': 'conmebol.sudamericana',
+    'NHL, Playoffs': 'nhl.playoffs',
+    'AHL, Playoffs': 'ahl.playoffs',
+    'MLB': 'mlb',
+    'KBO League': 'kbo',
+    'Professional Baseball, Pacific League': 'npb.pacific',
+    'Professional Baseball, Central League': 'npb.central',
+    'Rugby Union': 'rugby.union',
+    'Rugby League': 'rugby.league',
 }
+
+
+def _league_code(league_name: str, sport: str) -> str:
+    """Return a stable internal code for richer sports expansion reporting."""
+    mapped = LEAGUE_MAPPING.get(league_name)
+    if mapped:
+        return mapped
+    low = (league_name or '').lower()
+    sofa_sport = (sport or '').lower()
+    if sofa_sport == 'football':
+        if any(tok in low for tok in ('women', 'fémin', 'feminine', 'frauen', 'femen')):
+            return 'football.women'
+        if 'libertadores' in low:
+            return 'conmebol.libertadores'
+        if 'sudamericana' in low:
+            return 'conmebol.sudamericana'
+        if 'j1 league' in low:
+            return 'jpn.1'
+        if 'j2' in low or 'j3' in low:
+            return 'jpn.2'
+        if 'k league 1' in low:
+            return 'kor.1'
+        if 'chinese super league' in low:
+            return 'chn.1'
+        if 'saudi pro league' in low:
+            return 'ksa.1'
+        if 'brasileir' in low:
+            return 'bra.1'
+        if 'liga profesional' in low:
+            return 'arg.1'
+        if any(tok in low for tok in ('fa cup', 'copa del rey', 'dfb', 'coppa italia', 'cup')):
+            return 'football.cup'
+    if sofa_sport == 'tennis':
+        if low.startswith('itf '):
+            return 'itf'
+        if 'challenger' in low:
+            return 'atp.challenger'
+        if low.startswith('atp ') or 'atp ' in low:
+            return 'atp'
+        if low.startswith('wta ') or 'wta ' in low:
+            return 'wta'
+    if sofa_sport == 'ice-hockey':
+        if 'nhl' in low and 'playoff' in low:
+            return 'nhl.playoffs'
+        if 'nhl' in low:
+            return 'nhl'
+    if sofa_sport == 'baseball':
+        if 'mlb' in low:
+            return 'mlb'
+        if 'kbo' in low:
+            return 'kbo'
+        if 'professional baseball' in low:
+            return 'npb'
+    if 'rugby' in sofa_sport or 'rugby' in low:
+        return 'rugby'
+    return _normalize(league_name)[:20] or 'other'
 
 
 def _get(url: str) -> dict | None:
@@ -151,10 +253,7 @@ def _to_espn_event(sofa_evt: dict, sport: str) -> dict | None:
 
         tournament = sofa_evt.get('tournament') or {}
         league_name = tournament.get('name') or ''
-        league_code = LEAGUE_MAPPING.get(league_name, '')
-        if not league_code:
-            # Try slug-style fallback
-            league_code = _normalize(league_name)[:20] or 'other'
+        league_code = _league_code(league_name, sport)
 
         # Status : Sofascore code 100 = finished, 0 = not started, 7 = in progress
         status = sofa_evt.get('status') or {}
@@ -242,7 +341,7 @@ def main() -> int:
     ap.add_argument('--debug', action='store_true')
     ap.add_argument('--date', default='', help='YYYY-MM-DD UTC date; default today')
     ap.add_argument('--days', type=int, default=1, help='number of UTC days to fetch from --date')
-    ap.add_argument('--sports', default='football,tennis,basketball,ice-hockey,baseball')
+    ap.add_argument('--sports', default='football,tennis,basketball,ice-hockey,baseball,rugby')
     args = ap.parse_args()
     DEBUG = bool(args.debug)
     start = args.date or datetime.now(timezone.utc).strftime('%Y-%m-%d')

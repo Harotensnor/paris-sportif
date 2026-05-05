@@ -2,6 +2,12 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
+## Sprint v35.434 — AUTO 10/10 Section J taxonomy sports (10:53 UTC)
+- Extension Section J : Sofascore demande maintenant aussi le rugby et mappe femmes, tier 2, coupes, Asie/LATAM, NHL playoffs, KBO/NPB avec codes stables.
+- Nouveau patch : `patch_sofascore_league_codes.py` normalise les events deja presents; `sports_expansion_audit.json` suit J1-J8 sans appel reseau.
+- Mesure : 1825 events source Sofascore dont rugby=1; flux Winamax garde 311 events, 281 upcoming, exact ratio 98.4%; audit J = tier2 15, coupes 32, Asie/LATAM 51, baseball major pool 51.
+- Tests : Python compile OK, syntax JS/HTML OK, bundle OK, no conflict markers OK, `dashboard-market-depth` desktop+mobile OK; cache/footer bumpes v35.434.
+
 ## Sprint v35.433 — AUTO 10/10 Section 0 validation finale (10:46 UTC)
 - Validation Section 0.7 : `night_metrics` regenere depuis `data.js`, `data.today=2026-05-05`, `audit_data_truth` OK.
 - Couverture : 334 events Winamax, 304 upcoming, 329 exacts Winamax (98.5%), 329 marchés >1n2, 715/721 détails Winamax disponibles.
