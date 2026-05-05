@@ -254,6 +254,11 @@ SOURCES = [
         'exclude_low_auc': ((d.get('summary') or {}).get('exclude_low_auc') or 0) if isinstance(d, dict) else 0,
         'policy': (d.get('sample_policy') or 'unknown') if isinstance(d, dict) else 'missing',
     }),
+    ('backtest_training_rows', 'backtest_training_rows_summary.json', lambda d: {
+        'rows': (d.get('rows') or 0) if isinstance(d, dict) else 0,
+        'positive_rate': (d.get('positive_rate') or 0) if isinstance(d, dict) else 0,
+        'sports': len(d.get('by_sport') or {}) if isinstance(d, dict) else 0,
+    }),
     ('daily_insights', 'daily_insights.json', lambda d: {
         'insights': ((d.get('summary') or {}).get('insights') or len(d.get('insights') or [])) if isinstance(d, dict) else 0,
         'events_today': ((d.get('summary') or {}).get('events_today') or 0) if isinstance(d, dict) else 0,
@@ -390,6 +395,7 @@ SOURCE_SCRIPT = {
     'boosted_odds': 'scripts/detect_boosted_odds.py',
     'footballdata': 'scripts/fetch_footballdata.py',
     'clv_history': 'scripts/compute_clv.py',
+    'backtest_training_rows': 'scripts/build_backtest_training_rows.py',
     'daily_insights': 'scripts/build_daily_insights.py',
 }
 
