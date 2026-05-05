@@ -373,3 +373,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Front: ajout des combos "vainqueur + les deux équipes marquent" quand les deux jambes sont des marchés exacts Winamax et non skip.
 - Garde-fou: le moteur garde les cotes comme assemblage de jambes Winamax, sans les faire passer pour une cote simple inventée.
 - Cache/footer bumpes v35.414; `app.js` hash `5a435def`, taille 1,593,039 bytes sous cap.
+
+## Sprint v35.415 — AUTO 10/10 Top sport par opportunite (02:19 UTC)
+- Produit: la section "Paris du jour par sport" utilisait encore l'ordre cote haute du pool global.
+- Fix: chaque sport est maintenant retrié par score d'opportunité, puis edge et cote, pour exposer les 3 meilleurs picks réels par discipline.
+- Impact: les nouveaux marchés exacts (mi-temps, corners, cartons, périodes, F5) peuvent remonter dans la vitrine sport s'ils ont le meilleur signal.
+- Cache/footer bumpes v35.415; `app.js` hash `09525337`, taille 1,593,174 bytes sous cap.

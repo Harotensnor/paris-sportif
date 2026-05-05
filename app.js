@@ -16962,7 +16962,10 @@ return `
           </button>`;
 };
 const bbfSportDay = ['football','tennis','basketball','hockey','baseball'].map(sp => {
-const a = bbfPool.filter(p => p.m?.sport === sp).slice(0, 3);
+const a = bbfPool
+.filter(p => p.m?.sport === sp)
+.sort((a, b) => (bbfScore(b) - bbfScore(a)) || (Number(b.edge || 0) - Number(a.edge || 0)) || (Number(b.odd || 0) - Number(a.odd || 0)))
+.slice(0, 3);
 return a.length ? `<article class="bbf-empty bbf-empty--small" style="align-items:stretch"><strong>${sportIcon(sp)} ${esc(sportLabel(sp))}</strong>${a.map(bbfRow).join('')}</article>` : '';
 }).join('');
 const bbfDetectedMatches = (() => {
@@ -17342,8 +17345,8 @@ ${bbfMultiMarketOutsiders.length ? `<div class="bbf-grid bbf-grid--compact">${bb
               </div>`}
 </section>`}
 
-          ${bbfFocusOnly ? '' : `<section class="bbf-section">
-<div class="bbf-section__head"><div><span>Top 3 par sport · tri cote haute</span><h2>Paris du jour par sport</h2></div><button type="button" class="page-btn" data-page="tous">Tous les sports →</button></div>
+${bbfFocusOnly ? '' : `<section class="bbf-section">
+<div class="bbf-section__head"><div><span>Top 3 par sport · score d'opportunité</span><h2>Paris du jour par sport</h2></div><button type="button" class="page-btn" data-page="tous">Tous les sports →</button></div>
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;">${bbfSportDay || '<div class="bbf-empty bbf-empty--small"><strong>Aucun pick sport aujourd’hui.</strong><span>Le modèle attend une meilleure value.</span></div>'}</div>
 </section>`}
 
