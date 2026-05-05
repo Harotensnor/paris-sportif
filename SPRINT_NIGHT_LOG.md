@@ -1036,3 +1036,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Tests: suite mobile Phase 8 actuelle 5/5; Lighthouse fallback 100/100/100 sur 4 pages x 2 profils; drift pipeline OK.
 - Cache/footer bumpes v36.029; `app.js` hash `7f048c43`, SW `paris-sportif-20260505-222617`.
 
+## Sprint v36.030 — AUTO 10/10 Phase 8 GGG zones tactiles (22:28 UTC)
+- Mobile: filtres, cartes, topbar, bottom-nav et actions de modal passent à des zones tactiles 48px minimum.
+- Modal: la poignée de bottom sheet et le CTA Winamax respectent aussi la cible tactile 48px.
+- Espacement: les groupes de filtres gardent au moins 8px de respiration entre boutons.
+- Tests: `mobile-touch-targets.spec.js` passe mobile Chromium (1/1); `app.js` syntax OK; drift pipeline OK.
+- Cache/footer bumpes v36.030; `app.js` hash `7f048c43`, SW `paris-sportif-20260505-222759`.
+
