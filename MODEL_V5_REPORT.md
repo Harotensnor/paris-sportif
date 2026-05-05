@@ -46,3 +46,12 @@ Top weights:
 | empirical_xg | 7.0% |
 
 Guardrail: les poids sont normalisés par sport et bornés côté runtime entre 4% et 55%, donc un signal utile peut monter sans écraser le consensus.
+
+## Section H — Prediction intervals
+
+- Status: **active**
+- Method: bootstrap déterministe V5, 100 runs par pick.
+- Interval: P10-P90, affiché en modal sous forme `[confiance lo-hi%]`.
+- Inputs: dispersion des sous-modèles, variance d'accord, qualité data et drift features.
+
+Guardrail: le Wilson 95% historique reste disponible en fallback, mais la modal privilégie désormais la fourchette bootstrap V5 pour parler d'incertitude propre au match.
