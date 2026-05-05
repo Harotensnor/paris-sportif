@@ -913,3 +913,11 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Pipeline: `benchmark_model_v4.py` et `build_model_anomalies.py` branchés cron local/GHA/health; drift pipeline OK.
 - QA: `app.js` syntax OK, `build_health.py` OK (warning data locale 53min), `check_pipeline_drift.py` OK.
 - Cache/footer bumpes v36.012; `app.js` hash `47cf1625`, SW `paris-sportif-20260505-213041`.
+
+## Sprint v36.013 — AUTO 10/10 Phase 6 validation finale (21:35 UTC)
+- Tests: `tests/model-v4-context.spec.js` vérifie les sidecars V4, la disponibilité prédiction et la disparition du skip `huge_edge_>15pt`.
+- Validation: Chromium desktop + mobile passent (2/2) sur le test ciblé V4.
+- Reporting: `PHASE_REPORT.md` documente la Phase 6 avec métriques sidecars, validation et points reportés.
+- QA: `app.js` syntax OK, pipeline drift OK, benchmark V4 promu guarded.
+- Cache/footer bumpes v36.013; `app.js` hash `47cf1625`, SW `paris-sportif-20260505-213244`.
+
