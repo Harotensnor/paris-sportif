@@ -857,3 +857,11 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Modal/debug: badges `Voyage` / `Calendrier dense` et `?debug=1.travelSchedule` exposent les signaux.
 - Pipeline: builder unique `build_travel_schedule_context.py` branché dans cron local/GHA/health; drift pipeline OK.
 - Cache/footer bumpes v36.005; `app.js` hash `fd1e338a`, `team_travel.js` hash `0531e34e`, `schedule_density.js` hash `7f4d9066`, SW `paris-sportif-20260505-211134`.
+
+## Sprint v36.006 — AUTO 10/10 Modèle V4 HH tendances arbitres (21:13 UTC)
+- Arbitres: `referee_stats.json` agrège 105 arbitres, dont 36 top-5, avec cartons/match, pénos estimés, draw rate et biais domicile conservateur.
+- Modèle: pick domicile reçoit +5pt de fiabilité seulement si l'arbitre identifié dépasse 60% de biais domicile.
+- Modal/debug: badge arbitre enrichi + `?debug=1.refereeStats`; les raisons listent cartons/match et biais domicile.
+- Pipeline: `build_referee_stats.py` branché dans cron local/GHA/health; drift pipeline OK.
+- QA: `app.js` syntax OK, scripts Python compilés, health régénéré en warning non critique.
+- Cache/footer bumpes v36.006; `app.js` hash `a6751a0d`, `referee_stats.js` hash `f97068c3`, SW `paris-sportif-20260505-211334`.
