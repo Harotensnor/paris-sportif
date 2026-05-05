@@ -147,6 +147,7 @@ PATCH_STAGES = [
     ('build_travel_schedule_context.py', 1, 30),
     ('build_referee_stats.py',      1,   30),
     ('build_role_context.py',       1,   30),
+    ('build_stadium_effects.py',    1,   30),
     ('snapshot_pick_odds.py',       1,   30),
     ('compute_clv.py',              1,   30),
     ('settle_picks.py',             1,   15),

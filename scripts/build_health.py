@@ -295,6 +295,9 @@ SOURCES = [
     ('goalie_pitcher_context', 'goalie_pitcher_context.json', lambda d: {
         'matches': (d.get('match_count') or len(d.get('matches') or {})) if isinstance(d, dict) else 0,
     }),
+    ('stadium_effects', 'stadium_effects.json', lambda d: {
+        'stadiums': (d.get('stadium_count') or len(d.get('stadiums') or {})) if isinstance(d, dict) else 0,
+    }),
     ('data_quality_report', 'data_quality_report.json', lambda d: {
         'events_quarantined': (d.get('events_quarantined') or 0) if isinstance(d, dict) else 0,
         'status': (d.get('status') or 'unknown') if isinstance(d, dict) else 'missing',

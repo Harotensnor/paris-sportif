@@ -5418,6 +5418,7 @@ const schedule = pred?.scheduleDensityContext || getScheduleDensityContext(match
 const referee = pred?.refereeTendency || getRefereeTendency(match);
 const tennisSurface = pred?.tennisSurfaceContext || getTennisSurfaceContext(match);
 const roleContext = pred?.goaliePitcherContext || getGoaliePitcherContext(match);
+const stadium = pred?.poisson?.stadiumEffect || getStadiumEffect(match);
 const badges = [];
 if (competition) badges.push({ label: competition.label, title: competition.reason || 'Contexte compétition' });
 if (season) badges.push({ label: season.label, title: `Phase saison · ${season.sample_teams || 0} équipes suivies` });
@@ -5428,6 +5429,7 @@ if (referee) badges.push({ label: `Arbitre : ${referee.cards_per_match.toFixed(1
 if (tennisSurface) badges.push({ label: `Surface ${tennisSurface.surface}`, title: `${tennisSurface.home?.name || 'J1'} ${Math.round(tennisSurface.home?.elo || 0)} vs ${tennisSurface.away?.name || 'J2'} ${Math.round(tennisSurface.away?.elo || 0)}` });
 if (roleContext?.home_goalie) badges.push({ label: `Goalie ${roleContext.home_goalie.name || 'NHL'}`, title: `SV% ${roleContext.home_goalie.save_pct || '—'} · GAA ${roleContext.home_goalie.gaa || '—'}` });
 if (roleContext?.home_pitcher) badges.push({ label: `Pitcher ${roleContext.home_pitcher.name || 'MLB'}`, title: `ERA ${roleContext.home_pitcher.era || '—'} · WHIP ${roleContext.home_pitcher.whip || '—'}` });
+if (stadium?.altitude_m > 0) badges.push({ label: `Stade ${stadium.altitude_m}m`, title: `${stadium.name || 'Stade'} · capacité ${stadium.capacity || '—'} · ${stadium.surface_type || 'surface inconnue'}` });
 if (!badges.length) return '';
 return `<div class="v4-context-badges" style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 14px;">
 ${badges.map(b => `<span style="display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--border);border-radius:999px;background:var(--panel-2);font-size:12px;font-weight:750;color:var(--text);" title="${esc(b.title)}">${esc(b.label)}</span>`).join('')}
@@ -5652,6 +5654,27 @@ window.getGoaliePitcherContext = getGoaliePitcherContext;
 window.getRoleContextDebugSummary = getRoleContextDebugSummary;
 } catch (e) {}
 
+function _stadiumEffectFromTuple(key, row) {
+if (!Array.isArray(row)) return row || null;
+return { stadium_id: key, name: row[0], city: row[1], country: row[2], sport: row[3], altitude_m: Number(row[4]) || 0, capacity: Number(row[5]) || 0, surface_type: row[6] || '', goal_adjustment: Number(row[7]) || 0 };
+}
+function getStadiumEffect(match) {
+const key = _teamPriorNorm(`${match?.venue || match?.site || match?.city || match?.name || ''}-${match?.city || ''}-${match?.country || ''}`);
+const row = window.STADIUM_EFFECTS?.stadiums?.[key];
+return _stadiumEffectFromTuple(key, row);
+}
+function getStadiumEffectsDebugSummary() {
+return {
+loaded: !!window.STADIUM_EFFECTS,
+stadiums: Number(window.STADIUM_EFFECTS?.stadium_count || Object.keys(window.STADIUM_EFFECTS?.stadiums || {}).length || 0),
+generatedAt: window.STADIUM_EFFECTS?.generated_at || null,
+};
+}
+try {
+window.getStadiumEffect = getStadiumEffect;
+window.getStadiumEffectsDebugSummary = getStadiumEffectsDebugSummary;
+} catch (e) {}
+
 function poissonComponent(match) {
 if (match.sport !== 'football') return null;
 const { home, away } = getSides(match);
@@ -5669,6 +5692,11 @@ const aDef = aX.conceded / lgAvg;
 let lamH = Math.max(0.2, hAtt * aDef * lgAvg * HOME_ADV);
 let lamA = Math.max(0.2, aAtt * hDef * lgAvg / HOME_ADV);
 let fbrefBlend = null;
+const stadiumEffect = getStadiumEffect(match);
+if (stadiumEffect?.goal_adjustment) {
+lamH = Math.max(0.2, lamH + stadiumEffect.goal_adjustment / 2);
+lamA = Math.max(0.2, lamA + stadiumEffect.goal_adjustment / 2);
+}
 const decayParam = getXGDecayParam(match);
 const decayedRecentProxy = (side) => {
 const rows = Array.isArray(side?.last10) ? side.last10.slice() : [];
@@ -5759,7 +5787,7 @@ lamA = Math.max(0.2, lamA - (Number(starImpact.awayGoalPenalty) || 0));
 }
 const probs = poissonProbs(lamH, lamA);
 if (!probs) return null;
-return { ...probs, lamH, lamA, fbrefBlend, bayesianPrior, starImpact };
+return { ...probs, lamH, lamA, fbrefBlend, bayesianPrior, starImpact, stadiumEffect };
 }
 
 let __congestionCache = null;
@@ -7431,6 +7459,13 @@ icon: '⭐',
 text: `Impact absence : ${poi.starImpact.label} (${poi.starImpact.matches.slice(0, 2).map(s => s.name).join(', ')}).`,
 });
 }
+if (poi.stadiumEffect?.goal_adjustment) {
+reasons.push({
+type: 'stadium_effect',
+icon: '🏟️',
+text: `Effet stade : ${poi.stadiumEffect.name || 'stade'} à ${poi.stadiumEffect.altitude_m}m, total buts +${poi.stadiumEffect.goal_adjustment.toFixed(2)}.`,
+});
+}
 }
 if (eloStats && Math.abs(eloStats.diff) >= 30) {
 const leaderElo = eloStats.diff > 0 ? (home?.short || home?.name) : (away?.short || away?.name);
@@ -7972,7 +8007,7 @@ return typeof _po === 'number' && _po > 0 && _po <= 1.5;
 isLockStrict: reliability >= 0.75,
 abstain,
 sharp_money: smartMoneyNudge || null,
-poisson: poi ? { xgH: poi.lamH, xgA: poi.lamA, fbrefBlend: poi.fbrefBlend || null, bayesianPrior: poi.bayesianPrior || null } : null,
+poisson: poi ? { xgH: poi.lamH, xgA: poi.lamA, fbrefBlend: poi.fbrefBlend || null, bayesianPrior: poi.bayesianPrior || null, stadiumEffect: poi.stadiumEffect || null } : null,
 seasonContext,
 competitionContext,
 starImpact: poi?.starImpact || getStarImpact(match),
@@ -16431,6 +16466,7 @@ xgDecay: getXGDecayDebugSummary(),
 travelSchedule: getTravelScheduleDebugSummary(),
 refereeStats: getRefereeStatsDebugSummary(),
 roleContext: getRoleContextDebugSummary(),
+stadiumEffects: getStadiumEffectsDebugSummary(),
 qualityCounters: v37QualityCounters,
 qualitySamples: v37QualitySamples,
 rejectReasons: v37RejectReasons,
