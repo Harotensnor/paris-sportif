@@ -427,3 +427,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix ops: la copie historique `paris-sportif-sprints` a ete resynchronisee pour eviter qu'une ancienne config desktop retourne encore une date stale.
 - Mesure: smoke MCP OK, shadow audit OK, sortie live `today=2026-05-05`, `winamax_exact_ratio=0.9968`, shadow `aligned`.
 - Cache/footer bumpes v35.423.
+
+## Sprint v35.424 — AUTO 10/10 Garde-fou placeholders marche (10:10 UTC)
+- Modele: `market_biases_by_league.json` expose maintenant un `placeholder_guard` pour tracer les anciens faux signaux `n=51` et WR `0.5455`.
+- Audit: `audit_intelligence_consistency.py` echoue si tous les marches reprennent `n=51` ou si WR `0.5455` revient en masse sur les ligues.
+- Mesure: build intelligence OK, `placeholder_guard=passed`, `market_n51_rows=0`, `league_wr5455_rows=1`, audit consistency OK.
+- Cache/footer bumpes v35.424.
