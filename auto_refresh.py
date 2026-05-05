@@ -61,7 +61,7 @@ FETCH_STAGES = [
     ('fetch_tennis_odds.py',       5,   60),
     ('fetch_rus_odds.py',          5,   30),
     ('fetch_injuries.py',         10,   60),   # ESPN: NBA/NHL/NFL/MLB
-    ('fetch_clubelo.py',            1,   30),   # self-throttled 1/20h
+    ('fetch_clubelo.py',           60,   30),   # self-throttled 1/20h; avoid probing every local tick
     ('fetch_understat_xg.py',     240,  120),   # top-5 xG, self-throttled / slow-ish
     ('fetch_fbref_xg.py',         240,  180),   # v35.356 : xG extended leagues, self-throttled 6h
     ('snapshot_odds.py',           1,   30),   # freeze pre-match odds
@@ -78,7 +78,7 @@ FETCH_STAGES = [
     # pas .form sur ces sports, contrairement au foot). Self-throttled 6h.
     ('fetch_team_form.py',        15,  120),
     ('fetch_tennis_sackmann.py',   1,   60),   # ATP/WTA Elo + surface + fatigue, 24h cache
-    ('fetch_footballdata.py',      1,   60),   # closing odds + league calibration, 6h cache
+    ('fetch_footballdata.py',     180,   60),   # closing odds + league calibration, 6h cache; local 3h probe
     ('fetch_mlb_pitchers.py',      5,   60),   # MLB Stats API probable pitchers, 6h cache
     ('fetch_nhl_stats.py',        10,   60),   # NHL official API team stats + starting goalie, 10min cache
     ('fetch_nba_team_stats.py',    5,   30),
@@ -172,6 +172,7 @@ PATCH_STAGES = [
     # pronostics.html. Sans ça, le client tomberait toujours sur le fallback
     # data.js et perdrait le bénéfice du lazy-load.
     ('finalize_inline.py',          1,   15),
+    ('check_pipeline_health.py',    1,   15),
     ('audit_bundle_size.py',        1,   15),
     # v35.92 — No-op sans DISCORD_WEBHOOK_URL ; garde le drift CI/local aligné.
     ('notify_discord.py',           1,   20),
