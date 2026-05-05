@@ -2,6 +2,12 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
+## Sprint v35.446 — AUTO 10/10 Phase finale validation sports (11:50 UTC)
+- Validation post-mega #1.2 : audit navigateur + sidecars des extensions sportives J1-J8.
+- Resultat UI : 279 lignes dashboard dont Serie B/Ligue 2/Bundesliga 2 visibles, coupes CONMEBOL visibles, J-League/Chinese SL/Latam visibles, MLB et NHL visibles dans le tableau.
+- Resultat sidecars : MLB props 11 events / 36 props, NHL markets 11 events / 66 marches; foot feminin, Challenger et rugby restent `watch_not_bookable` tant que Winamax exact n'est pas disponible.
+- Artefacts : `audit-artifacts/phase-finale-sports-extension-validation.json` et capture `audit-artifacts/phase-finale-sports-extensions-1440.png`; cache/footer bumpes v35.446.
+
 ## Sprint v35.445 — AUTO 10/10 Phase finale validation tableau (11:48 UTC)
 - Validation post-mega #1.1 : accueil teste en navigateur desktop 1440x900 avec donnees locales servies en no-store.
 - Resultat : 279 picks visibles, table presente, 0 erreur console, stale warning absent car data fraiche.
