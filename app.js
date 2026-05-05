@@ -12548,7 +12548,7 @@ const link = document.createElement('a');
 link.href = '#';
 link.dataset.agentForceRefresh = '';
 link.title = 'Forcer le refresh (vide cache + recharge)';
-link.style.cssText = `color:inherit;${extraStyle}`;
+link.style.cssText = `color:inherit;display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;touch-action:manipulation;${extraStyle}`;
 link.textContent = label;
 return link;
 }
@@ -19924,8 +19924,8 @@ const nextLoadCount = hasMoreRows ? Math.min(80, activeTotalRows - activeRendere
 const tousRailStyle = tousMobile
 ? 'flex-wrap:nowrap;overflow-x:auto;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;mask-image:linear-gradient(90deg,#000 calc(100% - 32px),transparent);padding-bottom:4px;'
 : 'flex-wrap:wrap;';
-const tousRailItemStyle = tousMobile ? 'flex:0 0 auto;scroll-snap-align:start;min-height:44px;' : '';
-const tousSelectStyle = tousMobile ? 'min-height:44px;' : '';
+const tousRailItemStyle = tousMobile ? 'flex:0 0 auto;scroll-snap-align:start;min-height:44px;' : 'min-height:40px;';
+const tousSelectStyle = tousMobile ? 'min-height:44px;' : 'min-height:40px;';
 const _calendarDayKey = (ts) => {
 try { return new Date(ts).toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' }); } catch(e) { return ''; }
 };
@@ -20003,8 +20003,8 @@ ${rows.length > (tousMobile ? 4 : 5) ? `<button type="button" data-calendar-day-
       </section>` : '';
 const tousViewToggleHtml = `
         <div style="margin:${tousMobile ? '10px 0 4px' : '8px 0 3px'};display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-          <button type="button" data-tous-view="list" style="min-height:38px;border:1px solid ${tousView==='list'?'var(--brand)':'var(--border)'};border-radius:999px;background:${tousView==='list'?'rgba(167,139,250,.16)':'var(--panel)'};color:${tousView==='list'?'var(--brand)':'var(--text-dim)'};padding:7px 12px;font-size:12px;font-weight:900;cursor:pointer;">Liste</button>
-          <button type="button" data-tous-view="calendar" style="min-height:38px;border:1px solid ${tousView==='calendar'?'var(--brand)':'var(--border)'};border-radius:999px;background:${tousView==='calendar'?'rgba(167,139,250,.16)':'var(--panel)'};color:${tousView==='calendar'?'var(--brand)':'var(--text-dim)'};padding:7px 12px;font-size:12px;font-weight:900;cursor:pointer;">Calendrier 7j</button>
+          <button type="button" data-tous-view="list" style="min-height:40px;border:1px solid ${tousView==='list'?'var(--brand)':'var(--border)'};border-radius:999px;background:${tousView==='list'?'rgba(167,139,250,.16)':'var(--panel)'};color:${tousView==='list'?'var(--brand)':'var(--text-dim)'};padding:7px 12px;font-size:12px;font-weight:900;cursor:pointer;">Liste</button>
+          <button type="button" data-tous-view="calendar" style="min-height:40px;border:1px solid ${tousView==='calendar'?'var(--brand)':'var(--border)'};border-radius:999px;background:${tousView==='calendar'?'rgba(167,139,250,.16)':'var(--panel)'};color:${tousView==='calendar'?'var(--brand)':'var(--text-dim)'};padding:7px 12px;font-size:12px;font-weight:900;cursor:pointer;">Calendrier 7j</button>
         </div>`;
 
 const renderRow = (p, isFini) => {
