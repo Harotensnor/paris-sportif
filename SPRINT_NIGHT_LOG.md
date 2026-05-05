@@ -2,6 +2,12 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
+## Sprint v35.431 — AUTO 10/10 Abstain multi-sport souple (10:43 UTC)
+- Fix Section 0.5 : `ensemble_insufficient` devient sport-aware; le foot garde 2 composants purs minimum, les sports sans xG passent avec 1 composant reel.
+- Impact : basket/hockey/baseball ne sont plus exclus en bloc faute de xG, tout en gardant le skip si aucun signal modele n'existe.
+- Tests : syntax JS OK, bundle OK (`app.js` 1,597,427 bytes sous cap), no conflict markers OK, `dashboard-market-depth` desktop+mobile OK.
+- Cache/footer bumpes v35.431; `app.js` hash `d598a18f`.
+
 ## Sprint v35.430 — AUTO 10/10 Sofascore frais sans boot lourd (10:40 UTC)
 - Restauration Section 0.4 : `fetch_sofascore_events` OK (1808 events source), puis patch Sofascore + Winamax-only; table repassee a 334 events Winamax, 304 upcoming.
 - Garde-fou perf : `finalize_inline.py` cappe maintenant le boot lite a 5 events, tout en gardant `data_lite_72h.json` pour le chargement complet.
