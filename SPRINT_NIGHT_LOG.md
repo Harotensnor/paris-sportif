@@ -2,6 +2,12 @@
 
 Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_ARCHIVE_V35.md.
 
+## Sprint v35.430 — AUTO 10/10 Sofascore frais sans boot lourd (10:40 UTC)
+- Restauration Section 0.4 : `fetch_sofascore_events` OK (1808 events source), puis patch Sofascore + Winamax-only; table repassee a 334 events Winamax, 304 upcoming.
+- Garde-fou perf : `finalize_inline.py` cappe maintenant le boot lite a 5 events, tout en gardant `data_lite_72h.json` pour le chargement complet.
+- Mesure : `data_lite.js` 140,831 bytes sous cap, Winamax exact 98.5%, 329 marches >1n2, `audit_data_truth` OK.
+- Tests : syntax JS OK, bundle OK, no conflict markers OK, `dashboard-market-depth` desktop+mobile OK; cache/footer bumpes v35.430.
+
 ## Sprint v35.429 — AUTO 10/10 Pipeline data frais (10:35 UTC)
 - Diagnostic Section 0.2 : derniers runs `refresh-data` publics en failure/cancelled; `audit_data_truth` bloquait car `data.today=2026-05-04`.
 - Restauration locale Section 0.3/0.7 : `fetch_live` OK (792 events, 0 erreur globale), Winamax catalog OK (723 matchs), patch Winamax-only applique.

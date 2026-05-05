@@ -43,6 +43,7 @@ DATA_LITE_JS = ROOT / 'data_lite.js'
 # data.js full reste asynchrone pour l'archive complète 14j+).
 DATA_LITE_72H = ROOT / 'data_lite_72h.json'
 LITE_HORIZON_DAYS = 3  # today + tomorrow + J+2
+BOOT_EVENT_CAP = 5
 
 
 ALLOWED_SPORTS = {'football', 'tennis', 'basketball', 'hockey', 'baseball', 'football-american'}
@@ -136,6 +137,7 @@ def main():
         # Sprint 61 — Métadonnées du scope LITE pour traçabilité côté client.
         'lite_scope': scope_72h_keys,
         'event_counts_lite_72h': {k: len(days.get(k, [])) for k in scope_72h_keys},
+        'boot_event_cap': BOOT_EVENT_CAP,
     }
     DATA_MANIFEST.write_text(
         json.dumps(manifest, ensure_ascii=False, separators=(',', ':')),
@@ -145,7 +147,11 @@ def main():
     # 3. LITE boot blob — v35.112 : today only.
     # Le sidecar data_lite_72h.json reste disponible pour un fetch futur, mais
     # le premier chargement doit éviter le poids J+1/J+2 pour remonter Lighthouse.
-    lite_days = {today: today_events}
+    boot_events = sorted(
+        today_events,
+        key=lambda m: (not ((m.get('winamax') or {}).get('available')), m.get('date') or ''),
+    )[:BOOT_EVENT_CAP]
+    lite_days = {today: boot_events}
 
     lite = {
         'generated_at': manifest['generated_at'],
