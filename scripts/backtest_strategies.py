@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Backtest 6 stake-sizing strategies + Monte Carlo drawdown simulation.
+"""Backtest 7 stake-sizing strategies + Monte Carlo drawdown simulation.
 
 Reads `picks_history.jsonl` (3000+ settled picks with prob_model, odd_book,
 edge, tier, result) and produces `backtest_strategies.json` consumed by the
@@ -13,6 +13,7 @@ Strategies compared (1€ baseline bankroll = 1000 units):
 - value_only  : flat 1 unit, only when edge ≥ 5pt
 - sharp_only  : flat 1 unit, only when tier ∈ {safe, solid}
 - safe_blend  : kelly_half + tier filter (production-like)
+- outsider_only: flat 1 unit, only when tier = out and edge ≥ 5pt
 
 Per strategy we report bankroll curve, ROI, hit rate, n_bets, profit, max
 drawdown, longest losing streak, sharpe (mean / stdev of per-bet returns).
@@ -49,7 +50,9 @@ KELLY_FLOOR = 0.0001  # below 0.01% the math is noise — skip the bet.
 # for a recreational user. Set to None to allow uncapped compounding.
 MAX_STAKE_UNITS: float | None = 50.0
 VALUE_EDGE_MIN = 0.05  # 5pt edge for value_only strategy.
+OUTSIDER_EDGE_MIN = 0.05  # 5pt edge floor for outsider_only strategy.
 SHARP_TIERS = {"safe", "solid"}
+OUTSIDER_TIERS = {"out"}
 MC_RESAMPLES = 10_000
 MC_SEASON_LENGTH = 200
 MC_SEED = 1337
@@ -153,6 +156,8 @@ def stake_for(strategy: str, pick: dict, bankroll: float) -> float:
         return 1.0 if edge >= VALUE_EDGE_MIN else 0.0
     if strategy == "sharp_only":
         return 1.0 if tier in SHARP_TIERS else 0.0
+    if strategy == "outsider_only":
+        return 1.0 if tier in OUTSIDER_TIERS and edge >= OUTSIDER_EDGE_MIN else 0.0
     if strategy == "kelly_full":
         f = min(kelly_fraction(prob, odd), KELLY_CAP)
         return _apply_stake_cap(bankroll * f) if f >= KELLY_FLOOR else 0.0
@@ -334,12 +339,16 @@ def main() -> int:
         "value_only",
         "sharp_only",
         "safe_blend",
+        "outsider_only",
     ]
     results = {s: run_strategy(s, picks) for s in strategies}
 
     # Monte Carlo the most actionable strategies (the ones a user might
     # actually pick from the UI). Keeps the report compact.
-    mc = {s: monte_carlo(picks, s) for s in ("flat", "kelly_half", "safe_blend")}
+    mc = {
+        s: monte_carlo(picks, s)
+        for s in ("flat", "kelly_half", "safe_blend", "outsider_only")
+    }
 
     # Quick comparison ranking by ROI.
     ranked = sorted(
@@ -366,7 +375,9 @@ def main() -> int:
         "initial_bankroll": INITIAL_BANKROLL,
         "kelly_cap": KELLY_CAP,
         "value_edge_min": VALUE_EDGE_MIN,
+        "outsider_edge_min": OUTSIDER_EDGE_MIN,
         "sharp_tiers": sorted(SHARP_TIERS),
+        "outsider_tiers": sorted(OUTSIDER_TIERS),
         "strategies": results,
         "leaderboard": leaderboard,
         "monte_carlo": mc,

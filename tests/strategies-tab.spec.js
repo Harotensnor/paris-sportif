@@ -57,3 +57,12 @@ test('Strategies tab activates and renders a panel', async ({ page }) => {
   }, null, { timeout: 6000 });
   expect(renderedSomething).toBeTruthy();
 });
+
+test('Strategies tab exposes the outsider-only strategy', async ({ page }) => {
+  await page.goto(URL + '#performance', { waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => {
+    return Boolean(document.querySelector('[data-perf-tab="strategies"]'));
+  }, null, { timeout: 8000 });
+  await page.click('[data-perf-tab="strategies"]');
+  await expect(page.locator('body')).toContainText('Outsider-only', { timeout: 8000 });
+});

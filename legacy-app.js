@@ -29139,8 +29139,8 @@ ${rows.length > 30 ? `<div style="margin-top:8px;font-size:11px;color:var(--text
 
         ${currentTab === 'strategies' ? (() => {
           // v37.025 — Strategies tab. Renders the bankroll-sizing comparison
-          // (6 strategies on every settled pick from picks_history.jsonl) +
-          // Monte Carlo distribution of ROI/drawdown for the 3 most user-
+          // (7 strategies on every settled pick from picks_history.jsonl) +
+          // Monte Carlo distribution of ROI/drawdown for the most user-
           // actionable strategies. Lazy-loaded from backtest_strategies.json.
           const sb = window.__backtestStrategies;
           if (!sb || !sb.strategies) {
@@ -29159,6 +29159,7 @@ ${rows.length > 30 ? `<div style="margin-top:8px;font-size:11px;color:var(--text
             value_only: 'Value-only (edge ≥5pt)',
             sharp_only: 'Sharp-only (tier safe/solid)',
             safe_blend: 'Safe blend (Kelly demi + tier safe)',
+            outsider_only: 'Outsider-only (tier out + edge ≥5pt)',
           };
           const fmtPctSigned = (v) => {
             if (v == null || !isFinite(v)) return '—';
@@ -29254,6 +29255,7 @@ return `
             value_only: '#34d399',
             sharp_only: '#fbbf24',
             safe_blend: '#f472b6',
+            outsider_only: '#c084fc',
           };
           const curves = orderedKeys
             .map(k => ({ key: k, curve: (strategies[k] || {}).bankroll_curve || [] }))
@@ -29415,6 +29417,7 @@ ${ticks}
 <b class="u-text">Kelly demi</b> = mise proportionnelle à l'edge, divisée par 2 (compromis croissance / risque). Plafond ${(Number(sb.kelly_cap || 0) * 100).toFixed(0)}% du bankroll par pari.
 <b class="u-text">Value-only</b> = filtre les picks edge ≥${(Number(sb.value_edge_min || 0) * 100).toFixed(0)}pt — moins de paris, meilleure ROI moyenne.
 <b class="u-text">Sharp-only</b> = uniquement tier safe / solid (échantillon plus petit, à monitorer).
+<b class="u-text">Outsider-only</b> = uniquement tier outsider avec edge ≥${(Number(sb.outsider_edge_min || 0.05) * 100).toFixed(0)}pt — plus volatile, mais utile pour repérer si les grosses cotes sont réellement rentables.
 <b class="u-text">Monte Carlo</b> = "si je joue 200 picks au hasard tirés de l'historique 10 000 fois, à quoi ressemble la distribution de ROI ?" — sert à juger si la perf actuelle est <i>réelle</i> ou dans le bruit.
 <b class="u-text">Calibration des tiers</b> = vérité historique sur chaque badge ; surface les tiers où le modèle est trop confiant.
 </div>`;

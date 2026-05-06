@@ -57,6 +57,16 @@ def test_sharp_only_filters_by_tier():
     assert bs.stake_for("sharp_only", pick_low, 1000.0) == 0.0
 
 
+def test_outsider_only_requires_out_tier_and_edge_floor():
+    good = {"edge": 0.06, "odd": 8.0, "prob": 0.18, "tier": "out"}
+    low_edge = {"edge": 0.03, "odd": 8.0, "prob": 0.15, "tier": "out"}
+    wrong_tier = {"edge": 0.20, "odd": 8.0, "prob": 0.20, "tier": "big"}
+
+    assert bs.stake_for("outsider_only", good, 1000.0) == 1.0
+    assert bs.stake_for("outsider_only", low_edge, 1000.0) == 0.0
+    assert bs.stake_for("outsider_only", wrong_tier, 1000.0) == 0.0
+
+
 def test_kelly_half_caps_at_5_percent():
     # Crazy-high prob+odd combo would push Kelly > 5%. Strategy must cap.
     pick = {"edge": 0.5, "odd": 3.0, "prob": 0.9, "tier": "big"}

@@ -10,6 +10,7 @@ on:
     paths:
       - 'pronostics.html'
       - 'sw.js'
+      - 'legacy-app.js'
       - 'scripts/smoke_e2e.js'
       - 'scripts/probe_all_pages.js'
       - 'scripts/probe_tous_modal.js'
@@ -17,6 +18,7 @@ on:
       - 'scripts/probe_table_combos.js'
       - 'scripts/probe_modal_sports.js'
       - 'scripts/probe_nav_chain.js'
+      - 'scripts/probe_strategies_outsider.js'
       - '.github/workflows/smoke.yml'
   pull_request:
     branches: [main]
@@ -30,6 +32,7 @@ on:
       - 'scripts/probe_table_combos.js'
       - 'scripts/probe_modal_sports.js'
       - 'scripts/probe_nav_chain.js'
+      - 'scripts/probe_strategies_outsider.js'
   workflow_dispatch: {}
 
 concurrency:
@@ -99,3 +102,9 @@ jobs:
         # references an undeclared variable) and the v37.048 hash sync
         # bug.
         run: node scripts/probe_nav_chain.js
+
+      - name: Run outsider strategy probe
+        # Locks the Performance > Strategies surfacing of outsider_only
+        # from backtest_strategies.json so the high-ROI out tier cannot
+        # disappear silently from the UI.
+        run: node scripts/probe_strategies_outsider.js
