@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-06T23:43:12Z",
+  "generated_at": "2026-05-06T23:48:09Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -774,10 +774,10 @@
       }
     },
     {
-      "event_id": "sofa_15496115",
+      "event_id": "401815235",
       "source_event_ids": [
-        "sofa_15496115",
-        "401815235"
+        "401815235",
+        "sofa_15496115"
       ],
       "kickoff": "2026-05-06T23:40Z",
       "sport": "baseball",
@@ -805,11 +805,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
+        "home_score": -0.698,
+        "away_score": 0.112,
+        "home_fade": 0.75,
         "away_fade": 0.15,
-        "reason": "Direction nette: Cincinnati Reds (-0.10)",
+        "reason": "Direction nette: Cincinnati Reds (+0.11)",
         "detail": [
           {
             "side": "home",
@@ -822,6 +822,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.6
           }
         ]
       }
@@ -3008,8 +3014,8 @@
     {
       "event_id": "401815236",
       "source_event_ids": [
-        "sofa_15501352",
-        "401815236"
+        "401815236",
+        "sofa_15501352"
       ],
       "kickoff": "2026-05-06T23:40Z",
       "sport": "baseball",
