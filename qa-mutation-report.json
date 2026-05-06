@@ -1,0 +1,59 @@
+{
+  "generated_at": "2026-05-06T15:35:01.583Z",
+  "status": "ok",
+  "mutation_score_pct": 100,
+  "gate_pct": 70,
+  "rows": [
+    {
+      "name": "kelly_no_cap",
+      "status": "killed",
+      "reason": "kelly cap broken"
+    },
+    {
+      "name": "kelly_accepts_negative",
+      "status": "killed",
+      "reason": "kelly negative stake broken"
+    },
+    {
+      "name": "probability_over_one",
+      "status": "killed",
+      "reason": "probability clamp broken"
+    },
+    {
+      "name": "edge_nan",
+      "status": "killed",
+      "reason": "edge finite guard broken"
+    },
+    {
+      "name": "quality_score_uncapped",
+      "status": "killed",
+      "reason": "quality score cap broken"
+    },
+    {
+      "name": "poisson_negative_lambda",
+      "status": "killed",
+      "reason": "poisson lambda guard broken"
+    },
+    {
+      "name": "tier_safe_without_edge",
+      "status": "killed",
+      "reason": "safe tier edge guard broken"
+    },
+    {
+      "name": "data_age_negative",
+      "status": "killed",
+      "reason": "data age lower bound broken"
+    },
+    {
+      "name": "odd_zero_division",
+      "status": "killed",
+      "reason": "book probability division guard broken"
+    },
+    {
+      "name": "winamax_filter_bypass",
+      "status": "killed",
+      "reason": "winamax-only contract broken"
+    }
+  ],
+  "note": "Dependency-free mutation smoke; full Stryker can use this as the initial mutant list."
+}

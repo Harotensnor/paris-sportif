@@ -3,6 +3,10 @@
 > Tableau de pronostics sportifs Winamax-only, modèle multi-signaux, pipeline
 > GitHub Pages et documentation pro pour auditer chaque chiffre.
 
+[![QA gates](https://github.com/Harotensnor/paris-sportif/actions/workflows/qa-gates.yml/badge.svg)](https://github.com/Harotensnor/paris-sportif/actions/workflows/qa-gates.yml)
+[![Synthetic monitor](https://github.com/Harotensnor/paris-sportif/actions/workflows/synthetic-monitor.yml/badge.svg)](https://github.com/Harotensnor/paris-sportif/actions/workflows/synthetic-monitor.yml)
+[![Lighthouse](https://github.com/Harotensnor/paris-sportif/actions/workflows/lighthouse.yml/badge.svg)](https://github.com/Harotensnor/paris-sportif/actions/workflows/lighthouse.yml)
+
 [Live](https://harotensnor.github.io/paris-sportif/) · [Wiki](docs/wiki/Architecture.md) · [Runbook](docs/RUNBOOK.md) · [Glossary](docs/GLOSSARY.md) · [FAQ](docs/FAQ.md)
 
 ## Pourquoi ce projet
@@ -30,6 +34,7 @@ python -m http.server 8765
 python scripts/check_pipeline_drift.py
 python scripts/check_data_integrity.py
 python scripts/audit_privacy_features.py
+python scripts/qa_quality_gate.py
 ```
 
 ## Documentation

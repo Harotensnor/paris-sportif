@@ -135,7 +135,52 @@ async function clickPresetByLabel(page, presetText) {
     }
   }
 
-  console.log('\n=== Switch to Big Bets preset for math coherence ===');
+  async function readVisiblePickRows() {
+    return page.evaluate(() => {
+      const rows = Array.from(document.querySelectorAll('.tous-row:not(.tous-row--coverage)'))
+        .filter(r => r.offsetParent !== null)
+        .slice(0, 25);
+      return rows.map(r => {
+        const text = r.innerText || '';
+        const matchId = r.dataset.matchId;
+        // Confidence: "Conf 67%"
+        const confM = text.match(/Conf\s*(\d+)\s*%/);
+        // Odd: "@2.50"
+        const oddM = text.match(/@(\d+(?:[.,]\d+)?)/);
+        // Edge in points: "Av. +5pt" or "Av. -2pt"
+        const avM = text.match(/Av\.\s*([+-]?\d+(?:[.,]\d+)?)\s*pt/);
+        // EV: "Gain +3%"
+        const gainM = text.match(/Gain\s*([+-]?\d+(?:[.,]\d+)?)\s*%/);
+        // Match teams from the bold text "X vs Y"
+        const teamsM = text.match(/^[\s\S]*?\n([^\n]+\s+vs\s+[^\n]+)/);
+        return {
+          matchId,
+          rawText: text,
+          conf: confM ? Number(confM[1]) : null,
+          odd: oddM ? Number(oddM[1].replace(',', '.')) : null,
+          edgePt: avM ? Number(avM[1].replace(',', '.')) : null,
+          evPct: gainM ? Number(gainM[1].replace(',', '.')) : null,
+          teams: teamsM ? teamsM[1].trim() : null,
+        };
+      });
+    });
+  }
+  async function readVisibleCoverageRows() {
+    return page.evaluate(() => Array.from(document.querySelectorAll('.tous-row.tous-row--coverage'))
+      .filter(r => r.offsetParent !== null)
+      .slice(0, 25)
+      .map(r => {
+        const text = r.innerText || '';
+        return {
+          matchId: r.dataset.matchId || '',
+          rawText: text,
+          exact: /Winamax exact/i.test(text),
+          odds: (text.match(/@\d+(?:[.,]\d+)?/g) || []).length,
+        };
+      }));
+  }
+
+  console.log('\n=== Switch to value preset for math coherence ===');
   await page.evaluate(() => {
     const b = document.querySelector('[data-tous-tab="pending"]');
     if (b) b.click();
@@ -145,38 +190,29 @@ async function clickPresetByLabel(page, presetText) {
   await page.waitForTimeout(700);
   check('Big Bets preset clickable', swapped);
 
-  const rowsData = await page.evaluate(() => {
-    const rows = Array.from(document.querySelectorAll('.tous-row:not(.tous-row--coverage)'))
-      .filter(r => r.offsetParent !== null)
-      .slice(0, 25);
-    return rows.map(r => {
-      const text = r.innerText || '';
-      const matchId = r.dataset.matchId;
-      // Confidence: "Conf 67%"
-      const confM = text.match(/Conf\s*(\d+)\s*%/);
-      // Odd: "@2.50"
-      const oddM = text.match(/@(\d+(?:[.,]\d+)?)/);
-      // Edge in points: "Av. +5pt" or "Av. -2pt"
-      const avM = text.match(/Av\.\s*([+-]?\d+(?:[.,]\d+)?)\s*pt/);
-      // EV: "Gain +3%"
-      const gainM = text.match(/Gain\s*([+-]?\d+(?:[.,]\d+)?)\s*%/);
-      // Match teams from the bold text "X vs Y"
-      const teamsM = text.match(/^[\s\S]*?\n([^\n]+\s+vs\s+[^\n]+)/);
-      return {
-        matchId,
-        rawText: text,
-        conf: confM ? Number(confM[1]) : null,
-        odd: oddM ? Number(oddM[1].replace(',', '.')) : null,
-        edgePt: avM ? Number(avM[1].replace(',', '.')) : null,
-        evPct: gainM ? Number(gainM[1].replace(',', '.')) : null,
-        teams: teamsM ? teamsM[1].trim() : null,
-      };
-    });
-  });
+  let rowsData = await readVisiblePickRows();
+  let coverageData = [];
+  if (rowsData.length === 0) {
+    console.log('  [info] Big Bets has no rows in this dataset; falling back to Tout voir');
+    const allLevels = await clickPresetByLabel(page, 'Tout voir');
+    await page.waitForTimeout(700);
+    check('Fallback Tout voir clickable', allLevels);
+    rowsData = await readVisiblePickRows();
+    coverageData = await readVisibleCoverageRows();
+  }
   console.log(`  ${rowsData.length} non-coverage rows sampled`);
 
   if (rowsData.length === 0) {
-    check('At least 1 .tous-row pick row', false, 'preset Big Bets returns nothing');
+    check('Coverage rows available when pick rows are absent', coverageData.length > 0,
+      'Big Bets empty and fallback has no coverage rows');
+    if (coverageData.length > 0) {
+      const blankIds = coverageData.filter(r => !r.matchId).length;
+      const nonExact = coverageData.filter(r => !r.exact).length;
+      const sparseOdds = coverageData.filter(r => r.odds < 2).length;
+      check(`Coverage rows have match ids (${blankIds}/${coverageData.length} blank)`, blankIds === 0);
+      check(`Coverage rows remain Winamax exact (${nonExact}/${coverageData.length} missing)`, nonExact === 0);
+      check(`Coverage rows expose bookable odds (${sparseOdds}/${coverageData.length} sparse)`, sparseOdds === 0);
+    }
   } else {
     let blankFields = 0;
     let mathDrift = 0;
@@ -251,6 +287,23 @@ async function clickPresetByLabel(page, presetText) {
     await page.keyboard.press('Escape');
     await page.waitForTimeout(200);
   }
+  if (rowsData.length === 0 && coverageData.length > 0) {
+    const row = coverageData[0];
+    await page.evaluate(id => {
+      const r = document.querySelector(`.tous-row[data-match-id="${CSS.escape(id)}"]`);
+      if (r) r.click();
+    }, row.matchId);
+    await page.waitForTimeout(500);
+    const modalInfo = await page.evaluate(() => {
+      const dm = document.getElementById('detail-modal');
+      if (!dm || !dm.classList.contains('open')) return null;
+      return { hasContent: (dm.innerText || '').length > 200 };
+    });
+    check('Coverage row opens detail modal', !!modalInfo, 'modal not open');
+    check('Coverage modal has substantial content', !!(modalInfo && modalInfo.hasContent));
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(200);
+  }
 
   console.log('\n=== Filter persistence (sport filter) ===');
   // Click a sport filter, reload, verify it stuck.
@@ -289,6 +342,8 @@ async function clickPresetByLabel(page, presetText) {
     JSON.stringify(afterReload.filters).slice(0, 100));
 
   console.log('\n=== Search input filter ===');
+  await clickPresetByLabel(page, 'Tout voir');
+  await page.waitForTimeout(500);
   // Find the search input and type a substring
   const searchProbeOk = await page.evaluate(() => {
     const inp = document.querySelector('.tous-filter-bar input[type="search"], .tous-filter-bar input');

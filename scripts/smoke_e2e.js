@@ -125,8 +125,8 @@ function startServer() {
   await activatePage('dashboard');
   await page.waitForTimeout(500);
   // Data freshness gate: when running on a feature branch, the checked-out
-  // data.js can be hours old. Several downstream UI sections (Terminal Value,
-  // Sante guard) only render with current-day data. Detect stale data and
+  // data.js can be hours old. Several downstream UI sections (dense dashboard
+  // value summary, Sante guard) only render with current-day data. Detect stale data and
   // soft-skip the data-dependent checks instead of producing flake.
   const dataAgeMin = await page.evaluate(() => {
     try {
@@ -137,16 +137,38 @@ function startServer() {
   });
   const dataIsFresh = dataAgeMin <= 240; // 4h budget
   console.log(`[info] data age = ${Number.isFinite(dataAgeMin) ? dataAgeMin + 'min' : 'unknown'} (${dataIsFresh ? 'fresh' : 'stale, data-dependent checks skipped'})`);
-  const terminalText = await page.evaluate(() => document.querySelector('.terminal-market')?.innerText || '');
-  const terminalMatch = terminalText.match(/(\d+)\s+marchés scorés\s+·\s+(\d+)\s+matchs exacts sur 48h/i);
-  if (!terminalMatch) {
-    if (dataIsFresh) {
-      failures.push({ phase: 'terminal-value', msg: 'Terminal Value 48h summary missing' });
+  const valueSummary = await page.evaluate(() => {
+    const terminalText = document.querySelector('.terminal-market')?.innerText || '';
+    const terminalMatch = terminalText.match(/(\d+)\s+marchés scorés\s+·\s+(\d+)\s+matchs exacts sur 48h/i);
+    if (terminalMatch) {
+      return {
+        kind: 'terminal',
+        rows: Number(terminalMatch[1]),
+        exact: Number(terminalMatch[2]),
+        label: terminalMatch[0],
+      };
     }
-  } else if (Number(terminalMatch[2]) <= 0 && dataIsFresh) {
-    failures.push({ phase: 'terminal-value', msg: `Terminal Value sees ${terminalMatch[2]} exact matches on 48h` });
+    const body = document.body?.innerText || '';
+    const title = document.querySelector('h1')?.innerText || '';
+    const titleMatch = (title.match(/V37\s*:\s*(\d+)\s+lignes affichées/i)
+      || body.match(/V37\s*:\s*(\d+)\s+lignes affichées/i));
+    const scopeMatch = body.match(/(\d+)\/(\d+)\s+matchs du scope avec pick/i);
+    if (titleMatch || scopeMatch) {
+      return {
+        kind: 'dense-table',
+        rows: Number(titleMatch?.[1] || 0),
+        exact: Number(scopeMatch?.[1] || 0),
+        label: `${titleMatch ? titleMatch[0] : 'V37 table'} · ${scopeMatch ? scopeMatch[0] : 'scope n/a'}`,
+      };
+    }
+    return null;
+  });
+  if (!valueSummary) {
+    if (dataIsFresh) failures.push({ phase: 'dashboard-value', msg: 'Dashboard value summary missing' });
+  } else if (dataIsFresh && (Number(valueSummary.rows) <= 0 || Number(valueSummary.exact) <= 0)) {
+    failures.push({ phase: 'dashboard-value', msg: `${valueSummary.kind} summary has rows=${valueSummary.rows} exact=${valueSummary.exact}` });
   }
-  console.log(`[${terminalMatch ? 'ok' : (dataIsFresh ? 'FAIL' : 'skip')}] terminal value 48h = ${terminalMatch ? terminalMatch[0] : 'missing'}`);
+  console.log(`[${valueSummary ? 'ok' : (dataIsFresh ? 'FAIL' : 'skip')}] dashboard value summary = ${valueSummary ? valueSummary.label : 'missing'}`);
 
   await page.waitForFunction(() => !!window.__backtestReportV2, null, { timeout: 5000 }).catch(() => {});
   const sportGuard = await page.evaluate(() => {

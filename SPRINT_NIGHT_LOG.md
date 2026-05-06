@@ -1449,3 +1449,34 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : audit qui compare tous les probes du dossier scripts avec les exécutions et triggers smoke.yml.
 - Verrou : scripts/audit_all_probes_wired.py ajouté à qa gate et e2e.
 - Résultat : 26/26 qa gate; 19 probes Playwright confirmés exécutés et path-filtered.
+
+## Sprint v37.023 — AUTO 10/10 Pipeline freshness P0 (14:03 UTC)
+- Data: refresh coeur local ESPN/Sofascore/Winamax, 263 events Winamax disponibles, 261 exacts, generated_at 2026-05-06T13:59:08Z.
+- Guard: `check_data_integrity.py` compare maintenant la couverture Winamax exacte avant le total brut, pour ne plus rejeter un nettoyage de watchlist non bookable.
+- Cron: audits LightGBM/data truth/MCP non critiques passent en warning au lieu de bloquer le workflow refresh-data.
+- Sync: `night_metrics.json` et `health.json` régénérés depuis data.js, freshness OK.
+- Vérifs: check_data_integrity OK (+20.8% exact), audit_data_truth OK, check_pipeline_freshness OK, SW paris-sportif-20260506-140300, footer v37.023.
+
+## Sprint v37.024 — AUTO 10/10 Dashboard horizon dense (14:24 UTC)
+- UX: l'accueil bascule automatiquement sur les 7 prochains jours quand la date locale a moins de 60 matchs restants.
+- Debug: `?debug=1` expose la date initiale, le pool initial, le seuil dense et la raison du basculement horizon.
+- Cohérence: la ligne de couverture calcule le taux de qualification sur le scope affiché, plus sur tout le dataset.
+- Cache: footer v37.024 et SW paris-sportif-20260506-142400.
+
+## Sprint v37.025 — AUTO 10/10 Dashboard low-pick fill (15:05 UTC)
+- UX: si le scope a moins de 30 picks qualifiés, le tableau se complète avec des lignes data fiable jusqu'à 30 lignes quand assez de matchs existent.
+- Clarté: l'entête parle désormais de lignes affichées, et détaille picks qualifiés vs lignes data.
+- Debug: `?debug=1` expose `v37DenseMinimumRows` et le volume de fallback data.
+- Cache: footer v37.025 et SW paris-sportif-20260506-151200.
+
+## Sprint v37.026 — AUTO 10/10 Today auto-horizon (15:30 UTC)
+- UX: si `Aujourd'hui` est dans l'URL mais ne peut pas remplir un tableau dense, l'accueil passe automatiquement sur l'horizon 7 jours.
+- Clarté: le bandeau explique que la journée seule est trop courte au lieu de laisser 20 lignes et un grand vide.
+- Debug: `?debug=1` expose `v37HashDate` et `v37CanAutoHorizonLowPool` pour vérifier le chemin URL.
+- Cache: footer v37.026 et SW paris-sportif-20260506-153600.
+
+## Sprint v37.089 — AUTO 10/10 Merge main resync (21:24 UTC)
+- Hypothèse : PR #2 reste non mergeable parce que main a avancé avec data fraîche et workflows QA parallèles.
+- Fix : merge de origin/main dans la branche, data/health main conservés, verrous QA de branche conservés.
+- Verrou : asset hashes restampés après résolution et mergeability locale contrôlée via merge-tree.
+- Résultat : conflits résolus sur workflows, logs, shell, health, pronostics, QA runtime et SW.

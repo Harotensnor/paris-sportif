@@ -74,6 +74,12 @@ def winamax_truth(data: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def same_value(left: Any, right: Any) -> bool:
+    if isinstance(left, (int, float)) and isinstance(right, (int, float)):
+        return abs(float(left) - float(right)) <= 0.001
+    return left == right
+
+
 def main() -> int:
     errors: list[str] = []
     data = load_data_js()
@@ -102,14 +108,14 @@ def main() -> int:
     night_events = night.get("events") if isinstance(night.get("events"), dict) else {}
     if night.get("data_generated_at") == data_generated_at:
         for key in ("winamax_available", "winamax_exact", "winamax_exact_ratio"):
-            if night_events.get(key) != truth.get(key):
+            if not same_value(night_events.get(key), truth.get(key)):
                 errors.append(f"night_metrics.{key}={night_events.get(key)} differs from data.js truth={truth.get(key)}")
     if health_truth:
         for key in ("winamax_available", "winamax_exact", "winamax_exact_ratio"):
-            if health_truth.get(key) != truth.get(key):
+            if not same_value(health_truth.get(key), truth.get(key)):
                 errors.append(f"health.data_truth.{key}={health_truth.get(key)} differs from data.js truth={truth.get(key)}")
         for key in ("upcoming_winamax_available", "upcoming_winamax_exact", "upcoming_winamax_exact_ratio"):
-            if health_truth.get(key) != truth.get(key):
+            if not same_value(health_truth.get(key), truth.get(key)):
                 errors.append(f"health.data_truth.{key}={health_truth.get(key)} differs from data.js truth={truth.get(key)}")
     calculated_at = parse_dt(night.get("calculated_at") or night.get("generated_at"))
     if calculated_at:

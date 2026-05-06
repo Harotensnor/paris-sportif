@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="fr">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QA Report Paris-Sportif</title>
+<style>
+body{font-family:Inter,system-ui,sans-serif;background:#09090b;color:#f8fafc;margin:0;padding:28px}
+h1{font-size:42px;margin:0 0 6px}p{color:#cbd5e1}.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.card{border:1px solid #273244;background:#111827;border-radius:14px;padding:16px;overflow:auto}
+.badge{font-size:12px;border-radius:999px;padding:4px 9px;margin-left:8px}.ok{background:#064e3b;color:#d1fae5}.warn{background:#78350f;color:#ffedd5}.fail{background:#7f1d1d;color:#fee2e2}
+pre{white-space:pre-wrap;font-size:12px;line-height:1.45;color:#d1d5db}
+</style>
+<main>
+  <h1>QA Report</h1>
+  <p>Généré 2026-05-06T14:20:31Z. Rapport local sans envoi externe.</p>
+  <div class="grid">
+    <section class="card">
+  <h2>Quality gate <span class="badge ok">ok</span></h2>
+  <p><code>qa-gate-report.json</code></p>
+  <pre>{
+  &quot;generated_at&quot;: &quot;2026-05-06T14:04:12Z&quot;,
+  &quot;status&quot;: &quot;ok&quot;,
+  &quot;steps&quot;: [
+    {
+      &quot;name&quot;: &quot;unit helpers&quot;,
+      &quot;cmd&quot;: &quot;C:\\Users\\bouln\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe scripts/qa_unit_runner.js&quot;,
+      &quot;returncode&quot;: 0,
+      &quot;required&quot;: true,
+      &quot;stdout&quot;: &quot;QA unit runner: 6/6 passed · helper coverage 100%\n&quot;,
+      &quot;stderr&quot;: &quot;&quot;,
+      &quot;status&quot;: &quot;ok&quot;
+    },
+    {
+      &quot;name&quot;: &quot;mutation smoke&quot;,
+      &quot;cmd&quot;: &quot;C:\\Users\\bouln\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe scripts/qa_mutation_smoke.js&quot;,
+      &quot;returncode&quot;: 0,
+      &quot;required&quot;: true,
+      &quot;stdout&quot;: &quot;QA mutation smoke: 100% (10/10 mutants killed)\n&quot;,
+      &quot;stderr&quot;: &quot;&quot;,
+      &quot;status&quot;: &quot;ok&quot;
+    },
+    {
+      &quot;name&quot;: &quot;snapshots&quot;,
+      &quot;cmd&quot;: &quot;C:\\Users\\bouln\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe scripts/qa_snapshot_runner.js&quot;,
+      &quot;returncode&quot;: 0,
+      &quot;required&quot;: true,
+      &quot;stdout&quot;: &quot;QA snapshots: ok\n&quot;,
+      &quot;stderr&quot;: &quot;&quot;,
+      &quot;status&quot;: &quot;ok&quot;
+    },
+    {
+      &quot;name&quot;: &quot;load 1000 picks&quot;,
+      &quot;cmd&quot;: &quot;C:\\Users\\bouln\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe scripts/qa_load_test.js&quot;,
+      &quot;returncode&quot;: 0,
+      &quot;required&quot;: true,
+      &quot;stdout&quot;: &quot;QA load: 1000 picks in 0.3ms · fps 60\n&quot;,
+      &quot;stderr&quot;: &quot;&quot;,
+      &quot;status&quot;: &quot;ok&quot;
+    },
+    {
+      &quot;name&quot;: &quot;data contracts&quot;,
+      &quot;cmd&quot;: &quot;C:\\Users\\bouln\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe scripts/qa_contract_tests.py&quot;,
+      &quot;returncode&quot;: 0,
+      &quot;required&quot;: true,
+      &quot;stdout&quot;: &quot;QA contract tests: events=263 winamax=100.0% errors=0 warnings=2\n&quot;,
+      &quot;stderr&quot;: &quot;&quot;,
+      &quot;status&quot;: &quot;ok&quot;
+    },
+    {
+      &quot;name&quot;: &quot;data integrity&quot;,
+      &quot;cmd&quot;: &quot;C:\\Users\\bouln\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe scripts/check_data_integrity.py&quot;,
+      &quot;returncode&quot;: 0,
+      &quot;required&quot;: true,
+      &quot;stdout&quot;: &quot;check_data_integrity: winamax_exact current=261, previous=216, delta=+20.8% (raw total 263/1018, exact 261/216)\nOK: data.js dans plage acceptable.\n&quot;,
+      &quot;stderr&quot;: &quot;&quot;,
+      &quot;status&quot;: &quot;ok&quot;
+    },
+    {
+      &quot;name&quot;: &quot;pipeline drift&quot;,
+      &quot;cmd&quot;: &quot;C:\\Users\\bouln\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe scripts/check_pipeline_drift.py&quot;,
+      &quot;returncode&quot;: 0,
+      &quot;required&quot;: true,
+      &quot;stdout&quot;: &quot;[check_pipeline_drift] Vérification…\n  scripts/ on disk : 177 fichiers\n  auto_refresh.py  : 121 référencés\n  refresh.yml      : 121 référencés\n\n  [INFO] 56 script(s) sur disque non reference(s) (souvent OK : helpers, modules) :\n      - _log.py\n      - _metrics.py\n      - _retry.py\n      - ab_test_predictmatch.py\n      - analyze_calibration.py\n      - audit_fetch_tracking.py\n      - audit_innerhtml_safety.py\n      - audit_intelligence_consistency.py\n      - audit_issues_split.py\n      - audit_legacy_comments.py\n      - audit_local_analytics.py\n      - audit_playwright_skips.py\n      - audit_privacy_features.py\n      - audit_qa_runtime.py\n      - audit_ux_clarity.py\n      - backfill_odds.py\n      - backtest_by_market.py\n      - backup_data_snapshot.py\n      - build_changelog.py\n      - build_docs_pack.py\n      - build_history_compact.py\n      - check_bundle_size.py\n      - check_data_integrity.py\n      - check_health_quality.py\n      - check_model_drift.py\n      - cv_backtest.py\n      - fetch_winamax_markets.py\n      - import_winamax_account.py\n      - mcp_paris_sportif.py\n      - measure_transfer_sizes.py\n      - notify_health_warnings.py\n      - optimize_static_images.py\n      - patch_clubelo.py\n      - patch_footballdata.py\n      - patch_injuries_soccer.py\n      - patch_lineups_soccer.py\n      - patch_mlb_pitchers.py\n      - patch_nba_team_stats.py\n      - patch_nhl_stats.py\n      - patch_referees_soccer.py\n      - patch_team_form.py\n      - patch_team_stats.py\n      - patch_tennis_features.py\n      - patch_weather.py\n      - performance_budget.py\n      - picks_history_lib.py\n      - post_deploy_health_check.py\n      - qa_contract_tests.py\n      - qa_html_report.py\n      - qa_quality_gate.py\n      - synthetic_monitor.py\n      - tune_thresholds.py\n      - validate_ensemble_model.py\n      - winamax_cookie_extractor.py\n      - winamax_cookie_via_cdp.py\n      - winamax_v20_decrypt.py\n\n  [OK]   Pipeline alignee. Aucun drift.\n&quot;,
+      &quot;stderr&quot;: &quot;&quot;,
+      &quot;status&quot;: &quot;ok&quot;
+    },
+    {
+      &quot;name&quot;: &quot;bundle budget&quot;,
+      &quot;cmd&quot;: &quot;C:\\Users\\bouln\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe scripts/check_bundle_size.py&quot;,
+      &quot;returncode&quot;: 0,
+      &quot;required&quot;: true,
+      &quot;stdout&quot;: &quot;  [ok]app.js: 0.8 KB / 1750 KB budget (0%)\n  [ok]app.css: 260.4 KB / 300 KB budget (87%)\n  [ok]pronostics.html: 84.0 KB / 1150 KB budget (7%)\n  [ok]sw.js: 10.7 KB / 15 KB budget (71%)\n  [ok]index.html: 23.1 KB / 35 KB budget (66%)\n  [ok]methodologie.html: 26.2 KB / 35 KB budget (75%)\n  [ok]academie.html: 22.7 KB / 40 KB budget (57%)\n  [ok]comment-lire-un-prono.html: 17.6 KB / 35 KB budget (50%)\n  [ok]backtest.html: 40.2 KB / 80 KB budget (50%)\n  [ok]credibilite.html: 16.7 KB / 70 KB budget (24%)\n\nWARNINGS :\n  [warn]legacy-app.js: 1782.5 KB / 1850 KB budget (96%) � proche du budget\n  [warn]legal.html: 18.3 KB / 20 KB budget (91%) � proche du budget\n  [warn]static-page.css: 22.9 KB / 25 KB budget (92%) � proche du budget\n\nOK: tous les bundles dans leur budget.\n&quot;,
+      &quot;stderr&quot;: &quot;&quot;,
+      &quot;status&quot;: &quot;ok&quot;
+    },
+    {
+      &quot;name&quot;: &quot;qa runtime privacy&quot;,
+      &quot;cmd&quot;: &quot;C:\\Users\\bouln\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe scripts/audit_qa_runtime.py&quot;,
+      &quot;returncode&quot;: 0,
+      &quot;required&quot;: true,
+      &quot;stdout&quot;: &quot;QA runtime audit OK\n&quot;,
+      &quot;stderr&quot;: &quot;&quot;,
+      &quot;status&quot;: &quot;ok&quot;
+    },
+    {
+      &quot;name&quot;: &quot;local analytics privacy&quot;,
+      &quot;cmd&quot;: &quot;C:\\Users\\bouln\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe scripts/audit_local_analytics.py&quot;,
+      &quot;returncode&quot;: 0,
+      &quot;required&quot;: true,
+      &quot;stdout&quot;: &quot;Local analytics audit OK: zero network primitive, localStorage only\n&quot;,
+      &quot;stderr&quot;: &quot;&quot;,
+      &quot;status&quot;: &quot;ok&quot;
+    },
+    {
+      &quot;name&quot;: &quot;privacy social&quot;,
+      &quot;cmd&quot;: &quot;C:\\Users\\bouln\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe scripts/audit_privacy_features.py&quot;,
+      &quot;returncode&quot;: 0,
+      &quot;required&quot;: true,
+      &quot;stdout&quot;: &quot;Privacy audit OK: no network primitive in src/privacy-social.js\n&quot;,
+      &quot;stderr&quot;: &quot;&quot;,
+      &quot;status&quot;: &quot;ok&quot;
+    },
+    {
+      &quot;name&quot;: &quot;pipeline freshness&quot;,
+      &quot;cmd&quot;: &quot;C:\\Users\\bouln\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe scripts/check_pipeline_freshness.py&quot;,
+      &quot;returncode&quot;: 0,
+      &quot;required&quot;: false,
+      &quot;stdout&quot;: &quot;[pipeline-health] OK data.js age=5min generated_at=2026-05-06T13:59:08Z\n&quot;,
+      &quot;stderr&quot;: &quot;&quot;,
+      &quot;status&quot;: &quot;ok&quot;
+    }
+  ],
+  &quot;reports&quot;: {
+    &quot;unit&quot;: {
+      &quot;generated_at&quot;: &quot;2026-05-06T14:04:11.810Z&quot;,
+      &quot;status&quot;: &quot;ok&quot;,
+      &quot;duration_ms&quot;: 3,
+      &quot;tests&quot;: [
+        {
+          &quot;name&quot;: &quot;utils clamp and number formatting are stable&quot;,
+          &quot;status&quot;: &quot;passed&quot;
+        },
+        {
+          &quot;name&quot;: &quot;kellyFraction respects zero-edge and cap invariants&quot;,
+          &quot;status&quot;: &quot;passed&quot;
+        },
+        {
+          &quot;name&quot;: &quot;qualityScore distributes realistic candidates&quot;,
+          &quot;status&quot;: &quot;passed&quot;
+        },
+        {
+          &quot;name&quot;: &quot;model math helpers return sane probabilities&quot;,
+          &quot;status&quot;: &quot;passed&quot;
+        },
+        {
+          &quot;name&quot;: &quot;tier thresholds and breakdown are coherent&quot;,
+          &quot;status&quot;: &quot;passed&quot;
+        },
+        {
+          &quot;name&quot;: &quot;data access helpers use one source of truth&quot;,
+          &quot;status&quot;: &quot;passed&quot;
+        }
+      ],
+      &quot;target_helpers&quot;: [
+        &quot;clamp&quot;,
+        &quot;safeNumber&quot;,
+        &quot;formatOdd&quot;,
+        &quot;formatPct&quot;,
+        &quot;formatEUR&quot;,
+        &quot;formatTimeAgo&quot;,
+        &quot;percentile&quot;,
+        &quot;kellyFraction&quot;,
+        &quot;qualityScore&quot;,
+        &quot;poissonProbability&quot;,
+        &quot;eloProbability&quot;,
+        &quot;gaussianCdf&quot;,
+        &quot;dixonColesAdjustment&quot;,
+        &quot;v36TierForCandidate&quot;,
+        &quot;getTierBreakdown&quot;,
+        &quot;getDataAge&quot;,
+        &quot;getDisplayablePicks&quot;
+      ],
+      &quot;covered_helpers&quot;: [
+        &quot;clamp&quot;,
+        &quot;dixonColesAdjustment&quot;,
+        &quot;eloProbability&quot;,
+        &quot;formatEUR&quot;,
+        &quot;formatOdd&quot;,
+        &quot;formatPct&quot;,
+        &quot;formatTimeAgo&quot;,
+        &quot;gaussianCdf&quot;,
+        &quot;getDataAge&quot;,
+        &quot;getDisplayablePicks&quot;,
+        &quot;getTierBreakdown&quot;,
+        &quot;kellyFraction&quot;,
+        &quot;percentile&quot;,
+        &quot;poissonProbability&quot;,
+        &quot;qualityScore&quot;,
+        &quot;safeNumber&quot;,
+        &quot;v36TierForCandidate&quot;
+      ],
+      &quot;helper_coverage_pct&quot;: 100,
+      &quot;coverage_gate_pct&quot;: 90
+    },
+    &quot;mutation&quot;: {
+      &quot;generated_at&quot;: &quot;2026-05-06T14:04:11.858Z&quot;,
+      &quot;status&quot;: &quot;ok&quot;,
+      &quot;mutation_score_pct&quot;: 100,
+      &quot;gate_pct&quot;: 70,
+      &quot;rows&quot;: [
+        {
+          &quot;name&quot;: &quot;kelly_no_cap&quot;,
+          &quot;status&quot;: &quot;killed&quot;,
+          &quot;reason&quot;: &quot;kelly cap broken&quot;
+        },
+        {
+          &quot;name&quot;: &quot;kelly_accepts_negative&quot;,
+          &quot;status&quot;: &quot;killed&quot;,
+          &quot;reason&quot;: &quot;kelly negative stake broken&quot;
+        },
+        {
+          &quot;name&quot;: &quot;probability_over_one&quot;,
+          &quot;status&quot;: &quot;killed&quot;,
+          &quot;reason&quot;: &quot;probability clamp broken&quot;
+        },
+        {
+          &quot;name&quot;: &quot;edge_nan&quot;,
+          &quot;status&quot;: &quot;killed&quot;,
+          &quot;reason&quot;: &quot;edge finite guard broken&quot;
+        },
+        {
+          &quot;name&quot;: &quot;quality_score_uncapped&quot;,
+          &quot;status&quot;: &quot;killed&quot;,
+          &quot;reason&quot;: &quot;quality score cap broken&quot;
+        },
+        {
+          &quot;name&quot;: &quot;poisson_negative_lambda&quot;,
+          &quot;status&quot;: &quot;killed&quot;,
+          &quot;reason&quot;: &quot;poisson lambda guard broken&quot;
+        },
+        {
+          &quot;name&quot;: &quot;tier_safe_without_edge&quot;,
+          &quot;status&quot;: &quot;killed&quot;,
+          &quot;reason&quot;: &quot;safe tier edge guard broken&quot;
+        },
+        {
+          &quot;name&quot;: &quot;data_age_negative&quot;,
+          &quot;status&quot;: &quot;killed&quot;,
+          &quot;reason&quot;: &quot;data age lower bound broken&quot;
+        },
+        {
+          &quot;name&quot;: &quot;odd_zero_division&quot;,
+          &quot;status&quot;: &quot;killed&quot;,
+          &quot;reason&quot;: &quot;book probability division guard broken&quot;
+        },
+        {
+          &quot;name&quot;: &quot;winamax_filter_bypass&quot;,
+          &quot;status&quot;: &quot;killed&quot;,
+          &quot;reason&quot;: &quot;winamax-only contract broken&quot;
+        }
+      ],
+      &quot;note&quot;: &quot;Dependency-free mutation smoke; full Stryker can use this as the initial mutant list.&quot;
+    },
+    &quot;snapshot&quot;: {
+      &quot;generated_at&quot;: &quot;2026-05-06T14:04:11.907Z&quot;,
+      &quot;status&quot;: &quot;ok&quot;,
+      &quot;snapshot&quot;: &quot;tests\\snapshots\\qa-pick-card.snapshot.html&quot;,
+      &quot;fixture_count&quot;: 2
+    },
+    &quot;load&quot;: {
+      &quot;generated_at&quot;: &quot;2026-05-06T14:04:11.958Z&quot;,
+      &quot;status&quot;: &quot;ok&quot;,
+      &quot;picks_rendered&quot;: 1000,
+      &quot;render_ms&quot;: 0.3,
+      &quot;fps_estimate&quot;: 60,
+      &quot;html_bytes&quot;: 117685,
+      &quot;gate_fps_min&quot;: 30
+    },
+    &quot;contract&quot;: {
+      &quot;generated_at&quot;: &quot;2026-05-06T14:04:12Z&quot;,
+      &quot;status&quot;: &quot;ok&quot;,
+      &quot;events&quot;: 263,
+      &quot;winamax_events&quot;: 263,
+      &quot;winamax_pct&quot;: 100.0,
+      &quot;sidecars&quot;: [
+        {
+          &quot;name&quot;: &quot;winamax_catalog.json&quot;,
+          &quot;status&quot;: &quot;ok&quot;,
+          &quot;items&quot;: 3
+        },
+        {
+          &quot;name&quot;: &quot;winamax_markets.json&quot;,
+          &quot;status&quot;: &quot;ok&quot;,
+          &quot;items&quot;: 755
+        },
+        {
+          &quot;name&quot;: &quot;health.json&quot;,
+          &quot;status&quot;: &quot;ok&quot;,
+          &quot;items&quot;: 66
+        },
+        {
+          &quot;name&quot;: &quot;night_metrics.json&quot;,
+          &quot;status&quot;: &quot;ok&quot;,
+          &quot;items&quot;: 22
+        },
+        {
+          &quot;name&quot;: &quot;picks_history_summary.json&quot;,
+          &quot;status&quot;: &quot;ok&quot;,
+          &quot;items&quot;: 15
+        }
+      ],
+      &quot;errors&quot;: [],
+      &quot;warnings&quot;: [
+        &quot;winamax_catalog.json: missing optional contract key matches&quot;,
+        &quot;winamax_catalog.json: low item count 3 &lt; 100&quot;
+      ]
+    },
+    &quot;local_analytics&quot;: {
+      &quot;status&quot;: &quot;ok&quot;,
+      &quot;checked_files&quot;: [
+        &quot;s</pre>
+</section>
+<section class="card">
+  <h2>Unit helpers <span class="badge ok">ok</span></h2>
+  <p><code>qa-unit-report.json</code></p>
+  <pre>{
+  &quot;generated_at&quot;: &quot;2026-05-06T14:04:11.810Z&quot;,
+  &quot;status&quot;: &quot;ok&quot;,
+  &quot;duration_ms&quot;: 3,
+  &quot;tests&quot;: [
+    {
+      &quot;name&quot;: &quot;utils clamp and number formatting are stable&quot;,
+      &quot;status&quot;: &quot;passed&quot;
+    },
+    {
+      &quot;name&quot;: &quot;kellyFraction respects zero-edge and cap invariants&quot;,
+      &quot;status&quot;: &quot;passed&quot;
+    },
+    {
+      &quot;name&quot;: &quot;qualityScore distributes realistic candidates&quot;,
+      &quot;status&quot;: &quot;passed&quot;
+    },
+    {
+      &quot;name&quot;: &quot;model math helpers return sane probabilities&quot;,
+      &quot;status&quot;: &quot;passed&quot;
+    },
+    {
+      &quot;name&quot;: &quot;tier thresholds and breakdown are coherent&quot;,
+      &quot;status&quot;: &quot;passed&quot;
+    },
+    {
+      &quot;name&quot;: &quot;data access helpers use one source of truth&quot;,
+      &quot;status&quot;: &quot;passed&quot;
+    }
+  ],
+  &quot;target_helpers&quot;: [
+    &quot;clamp&quot;,
+    &quot;safeNumber&quot;,
+    &quot;formatOdd&quot;,
+    &quot;formatPct&quot;,
+    &quot;formatEUR&quot;,
+    &quot;formatTimeAgo&quot;,
+    &quot;percentile&quot;,
+    &quot;kellyFraction&quot;,
+    &quot;qualityScore&quot;,
+    &quot;poissonProbability&quot;,
+    &quot;eloProbability&quot;,
+    &quot;gaussianCdf&quot;,
+    &quot;dixonColesAdjustment&quot;,
+    &quot;v36TierForCandidate&quot;,
+    &quot;getTierBreakdown&quot;,
+    &quot;getDataAge&quot;,
+    &quot;getDisplayablePicks&quot;
+  ],
+  &quot;covered_helpers&quot;: [
+    &quot;clamp&quot;,
+    &quot;dixonColesAdjustment&quot;,
+    &quot;eloProbability&quot;,
+    &quot;formatEUR&quot;,
+    &quot;formatOdd&quot;,
+    &quot;formatPct&quot;,
+    &quot;formatTimeAgo&quot;,
+    &quot;gaussianCdf&quot;,
+    &quot;getDataAge&quot;,
+    &quot;getDisplayablePicks&quot;,
+    &quot;getTierBreakdown&quot;,
+    &quot;kellyFraction&quot;,
+    &quot;percentile&quot;,
+    &quot;poissonProbability&quot;,
+    &quot;qualityScore&quot;,
+    &quot;safeNumber&quot;,
+    &quot;v36TierForCandidate&quot;
+  ],
+  &quot;helper_coverage_pct&quot;: 100,
+  &quot;coverage_gate_pct&quot;: 90
+}</pre>
+</section>
+<section class="card">
+  <h2>Mutation <span class="badge ok">ok</span></h2>
+  <p><code>qa-mutation-report.json</code></p>
+  <pre>{
+  &quot;generated_at&quot;: &quot;2026-05-06T14:04:11.858Z&quot;,
+  &quot;status&quot;: &quot;ok&quot;,
+  &quot;mutation_score_pct&quot;: 100,
+  &quot;gate_pct&quot;: 70,
+  &quot;rows&quot;: [
+    {
+      &quot;name&quot;: &quot;kelly_no_cap&quot;,
+      &quot;status&quot;: &quot;killed&quot;,
+      &quot;reason&quot;: &quot;kelly cap broken&quot;
+    },
+    {
+      &quot;name&quot;: &quot;kelly_accepts_negative&quot;,
+      &quot;status&quot;: &quot;killed&quot;,
+      &quot;reason&quot;: &quot;kelly negative stake broken&quot;
+    },
+    {
+      &quot;name&quot;: &quot;probability_over_one&quot;,
+      &quot;status&quot;: &quot;killed&quot;,
+      &quot;reason&quot;: &quot;probability clamp broken&quot;
+    },
+    {
+      &quot;name&quot;: &quot;edge_nan&quot;,
+      &quot;status&quot;: &quot;killed&quot;,
+      &quot;reason&quot;: &quot;edge finite guard broken&quot;
+    },
+    {
+      &quot;name&quot;: &quot;quality_score_uncapped&quot;,
+      &quot;status&quot;: &quot;killed&quot;,
+      &quot;reason&quot;: &quot;quality score cap broken&quot;
+    },
+    {
+      &quot;name&quot;: &quot;poisson_negative_lambda&quot;,
+      &quot;status&quot;: &quot;killed&quot;,
+      &quot;reason&quot;: &quot;poisson lambda guard broken&quot;
+    },
+    {
+      &quot;name&quot;: &quot;tier_safe_without_edge&quot;,
+      &quot;status&quot;: &quot;killed&quot;,
+      &quot;reason&quot;: &quot;safe tier edge guard broken&quot;
+    },
+    {
+      &quot;name&quot;: &quot;data_age_negative&quot;,
+      &quot;status&quot;: &quot;killed&quot;,
+      &quot;reason&quot;: &quot;data age lower bound broken&quot;
+    },
+    {
+      &quot;name&quot;: &quot;odd_zero_division&quot;,
+      &quot;status&quot;: &quot;killed&quot;,
+      &quot;reason&quot;: &quot;book probability division guard broken&quot;
+    },
+    {
+      &quot;name&quot;: &quot;winamax_filter_bypass&quot;,
+      &quot;status&quot;: &quot;killed&quot;,
+      &quot;reason&quot;: &quot;winamax-only contract broken&quot;
+    }
+  ],
+  &quot;note&quot;: &quot;Dependency-free mutation smoke; full Stryker can use this as the initial mutant list.&quot;
+}</pre>
+</section>
+<section class="card">
+  <h2>Snapshots <span class="badge ok">ok</span></h2>
+  <p><code>qa-snapshot-report.json</code></p>
+  <pre>{
+  &quot;generated_at&quot;: &quot;2026-05-06T14:04:11.907Z&quot;,
+  &quot;status&quot;: &quot;ok&quot;,
+  &quot;snapshot&quot;: &quot;tests\\snapshots\\qa-pick-card.snapshot.html&quot;,
+  &quot;fixture_count&quot;: 2
+}</pre>
+</section>
+<section class="card">
+  <h2>Load <span class="badge ok">ok</span></h2>
+  <p><code>qa-load-report.json</code></p>
+  <pre>{
+  &quot;generated_at&quot;: &quot;2026-05-06T14:04:11.958Z&quot;,
+  &quot;status&quot;: &quot;ok&quot;,
+  &quot;picks_rendered&quot;: 1000,
+  &quot;render_ms&quot;: 0.3,
+  &quot;fps_estimate&quot;: 60,
+  &quot;html_bytes&quot;: 117685,
+  &quot;gate_fps_min&quot;: 30
+}</pre>
+</section>
+<section class="card">
+  <h2>Contracts <span class="badge ok">ok</span></h2>
+  <p><code>qa-contract-report.json</code></p>
+  <pre>{
+  &quot;generated_at&quot;: &quot;2026-05-06T14:04:12Z&quot;,
+  &quot;status&quot;: &quot;ok&quot;,
+  &quot;events&quot;: 263,
+  &quot;winamax_events&quot;: 263,
+  &quot;winamax_pct&quot;: 100.0,
+  &quot;sidecars&quot;: [
+    {
+      &quot;name&quot;: &quot;winamax_catalog.json&quot;,
+      &quot;status&quot;: &quot;ok&quot;,
+      &quot;items&quot;: 3
+    },
+    {
+      &quot;name&quot;: &quot;winamax_markets.json&quot;,
+      &quot;status&quot;: &quot;ok&quot;,
+      &quot;items&quot;: 755
+    },
+    {
+      &quot;name&quot;: &quot;health.json&quot;,
+      &quot;status&quot;: &quot;ok&quot;,
+      &quot;items&quot;: 66
+    },
+    {
+      &quot;name&quot;: &quot;night_metrics.json&quot;,
+      &quot;status&quot;: &quot;ok&quot;,
+      &quot;items&quot;: 22
+    },
+    {
+      &quot;name&quot;: &quot;picks_history_summary.json&quot;,
+      &quot;status&quot;: &quot;ok&quot;,
+      &quot;items&quot;: 15
+    }
+  ],
+  &quot;errors&quot;: [],
+  &quot;warnings&quot;: [
+    &quot;winamax_catalog.json: missing optional contract key matches&quot;,
+    &quot;winamax_catalog.json: low item count 3 &lt; 100&quot;
+  ]
+}</pre>
+</section>
+<section class="card">
+  <h2>Lighthouse <span class="badge warn">warning</span></h2>
+  <p><code>qa-lighthouse-report.json</code></p>
+  <pre>{
+  &quot;generated_at&quot;: &quot;2026-05-06T13:37:16Z&quot;,
+  &quot;status&quot;: &quot;warning&quot;,
+  &quot;scope&quot;: &quot;lighthouse&quot;,
+  &quot;local_result&quot;: &quot;ci_delegated&quot;,
+  &quot;reason&quot;: &quot;npm/npx Lighthouse is not available in this local desktop runtime; the GitHub Actions Lighthouse workflow installs Lighthouse and produces the authoritative JSON/HTML artifact.&quot;,
+  &quot;ci_workflow&quot;: &quot;.github/workflows/lighthouse.yml&quot;,
+  &quot;ci_artifact&quot;: &quot;lighthouse-report&quot;,
+  &quot;baseline_source&quot;: &quot;lighthouse_phase9_summary.json&quot;,
+  &quot;baseline_note&quot;: &quot;Last local fallback Lighthouse-compatible baseline remains committed as a comparison artifact; CI remains the source of truth for real Lighthouse scores.&quot;,
+  &quot;baseline_summary&quot;: {
+    &quot;pages&quot;: 4,
+    &quot;profiles&quot;: [
+      &quot;mobile&quot;,
+      &quot;desktop&quot;
+    ],
+    &quot;categories&quot;: [
+      &quot;performance&quot;,
+      &quot;accessibility&quot;,
+      &quot;best-practices&quot;,
+      &quot;seo&quot;
+    ]
+  },
+  &quot;quality_gate&quot;: {
+    &quot;local_bundle_budget&quot;: &quot;checked by scripts/qa_quality_gate.py&quot;,
+    &quot;ci_lighthouse_thresholds&quot;: &quot;checked by .github/workflows/lighthouse.yml&quot;,
+    &quot;post_deploy_health&quot;: &quot;checked by scripts/post_deploy_health_check.py&quot;
+  }
+}</pre>
+</section>
+<section class="card">
+  <h2>Local analytics privacy <span class="badge ok">ok</span></h2>
+  <p><code>analytics_local_privacy_audit.json</code></p>
+  <pre>{
+  &quot;status&quot;: &quot;ok&quot;,
+  &quot;checked_files&quot;: [
+    &quot;src\\local-analytics.js&quot;,
+    &quot;pronostics.html&quot;
+  ],
+  &quot;privacy_model&quot;: {
+    &quot;server_uploads&quot;: 0,
+    &quot;tracking_calls&quot;: 0,
+    &quot;network_primitives&quot;: 0,
+    &quot;storage&quot;: [
+      &quot;localStorage.usage_telemetry&quot;,
+      &quot;localStorage.usage_telemetry_prefs&quot;
+    ],
+    &quot;retention&quot;: &quot;bounded local arrays, oldest entries trimmed in browser&quot;
+  },
+  &quot;features_checked&quot;: [
+    &quot;local page visits&quot;,
+    &quot;local click heatmap&quot;,
+    &quot;local funnel&quot;,
+    &quot;local recommendations&quot;,
+    &quot;local smart alerts&quot;,
+    &quot;local saved views&quot;,
+    &quot;local reset&quot;
+  ],
+  &quot;errors&quot;: []
+}</pre>
+</section>
+<section class="card">
+  <h2>Synthetic monitor <span class="badge ok">ok</span></h2>
+  <p><code>synthetic-monitor-report.json</code></p>
+  <pre>{
+  &quot;generated_at&quot;: &quot;2026-05-06T13:38:13Z&quot;,
+  &quot;status&quot;: &quot;ok&quot;,
+  &quot;url&quot;: &quot;https://harotensnor.github.io/paris-sportif/pronostics.html&quot;,
+  &quot;http_status&quot;: 200,
+  &quot;response_ms&quot;: 365.7,
+  &quot;max_response_ms&quot;: 2000,
+  &quot;bytes_checked&quot;: 84461,
+  &quot;errors&quot;: []
+}</pre>
+</section>
+<section class="card">
+  <h2>Post-deploy health <span class="badge ok">ok</span></h2>
+  <p><code>post-deploy-health.json</code></p>
+  <pre>{
+  &quot;generated_at&quot;: &quot;2026-05-06T14:07:16Z&quot;,
+  &quot;status&quot;: &quot;ok&quot;,
+  &quot;url&quot;: &quot;https://harotensnor.github.io/paris-sportif&quot;,
+  &quot;checks&quot;: {
+    &quot;html_status&quot;: 200,
+    &quot;html_ms&quot;: 320.8,
+    &quot;has_brand&quot;: true,
+    &quot;has_app_script&quot;: true,
+    &quot;footer_version&quot;: &quot;v37.023&quot;,
+    &quot;manifest_status&quot;: 200,
+    &quot;manifest_ms&quot;: 208.3,
+    &quot;data_generated_at&quot;: &quot;2026-05-06T13:59:08Z&quot;
+  },
+  &quot;errors&quot;: [],
+  &quot;rollback&quot;: {
+    &quot;available&quot;: true,
+    &quot;mode&quot;: &quot;workflow can revert HEAD when QA_AUTO_ROLLBACK=1&quot;
+  }
+}</pre>
+</section>
+  </div>
+</main>
+</html>

@@ -1,0 +1,71 @@
+{
+  "generated_at": "2026-05-06T15:35:01.520Z",
+  "status": "ok",
+  "duration_ms": 5,
+  "tests": [
+    {
+      "name": "utils clamp and number formatting are stable",
+      "status": "passed"
+    },
+    {
+      "name": "kellyFraction respects zero-edge and cap invariants",
+      "status": "passed"
+    },
+    {
+      "name": "qualityScore distributes realistic candidates",
+      "status": "passed"
+    },
+    {
+      "name": "model math helpers return sane probabilities",
+      "status": "passed"
+    },
+    {
+      "name": "tier thresholds and breakdown are coherent",
+      "status": "passed"
+    },
+    {
+      "name": "data access helpers use one source of truth",
+      "status": "passed"
+    }
+  ],
+  "target_helpers": [
+    "clamp",
+    "safeNumber",
+    "formatOdd",
+    "formatPct",
+    "formatEUR",
+    "formatTimeAgo",
+    "percentile",
+    "kellyFraction",
+    "qualityScore",
+    "poissonProbability",
+    "eloProbability",
+    "gaussianCdf",
+    "dixonColesAdjustment",
+    "v36TierForCandidate",
+    "getTierBreakdown",
+    "getDataAge",
+    "getDisplayablePicks"
+  ],
+  "covered_helpers": [
+    "clamp",
+    "dixonColesAdjustment",
+    "eloProbability",
+    "formatEUR",
+    "formatOdd",
+    "formatPct",
+    "formatTimeAgo",
+    "gaussianCdf",
+    "getDataAge",
+    "getDisplayablePicks",
+    "getTierBreakdown",
+    "kellyFraction",
+    "percentile",
+    "poissonProbability",
+    "qualityScore",
+    "safeNumber",
+    "v36TierForCandidate"
+  ],
+  "helper_coverage_pct": 100,
+  "coverage_gate_pct": 90
+}
