@@ -1558,3 +1558,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : resync origin/main, sidecars/data main conservés, shell et verrous QA branche conservés.
 - Verrou : audit_data_truth.py réaligne health/night_metrics sur le timestamp data.js frais.
 - Résultat : la branche reprend le snapshot 21:57 UTC sans perdre les probes jour/nav ni le guard backtest.
+
+## Sprint v37.103 — AUTO 10/10 Cron data resync (22:10 UTC)
+- Hypothèse : le run refresh 4428 a publié un nouveau snapshot pendant que les checks PR recalculaient.
+- Fix : merge origin/main, sidecars 22:05 UTC conservés, shell et cache versionnés v37.103.
+- Verrou : mêmes probes jour/nav et audit_data_truth avant push, pour garder la data visible cohérente.
+- Résultat : la PR est réalignée sur la dernière tête main connue sans écraser les correctifs Tier 0.
