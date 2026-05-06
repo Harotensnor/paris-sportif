@@ -22,6 +22,7 @@ on:
       - 'scripts/probe_data_freshness.js'
       - 'scripts/probe_onboarding_fresh.js'
       - 'scripts/probe_theme_cycle.js'
+      - 'scripts/probe_pull_to_refresh.js'
       - 'scripts/probe_strategies_outsider.js'
       - 'scripts/probe_prob_calibration_sport.js'
       - '.github/workflows/smoke.yml'
@@ -41,6 +42,7 @@ on:
       - 'scripts/probe_data_freshness.js'
       - 'scripts/probe_onboarding_fresh.js'
       - 'scripts/probe_theme_cycle.js'
+      - 'scripts/probe_pull_to_refresh.js'
       - 'scripts/probe_strategies_outsider.js'
       - 'scripts/probe_prob_calibration_sport.js'
   workflow_dispatch: {}
@@ -134,6 +136,12 @@ jobs:
         # Locks the topbar/Maj+T three-state cycle and verifies that
         # stored theme, data-theme and meta theme-color stay in sync.
         run: node scripts/probe_theme_cycle.js
+
+      - name: Run pull-to-refresh probe
+        # Locks the mobile gesture: pull at scroll top shows the ready
+        # indicator, calls pollData(true), keeps UI interactive, then
+        # hides the indicator once the refresh settles.
+        run: node scripts/probe_pull_to_refresh.js
 
       - name: Run outsider strategy probe
         # Locks the Performance > Strategies surfacing of outsider_only

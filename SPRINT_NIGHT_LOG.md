@@ -1281,3 +1281,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Verrou: `scripts/probe_theme_cycle.js` couvre Shift+T, prefs, `data-theme`, meta theme-color et auto dark/light.
 - CI: smoke.yml exécute la probe theme cycle à chaque PR/push concerné.
 - Vérifs: probe theme cycle OK, SW/legacy hash/footer restampés.
+
+## Sprint v37.061 — AUTO 10/10 Pull refresh QA (16:45 UTC)
+- Hypothèse : le geste mobile pull-to-refresh pouvait casser sans alerte car aucun test ne le simulait.
+- Fix : ajout de `scripts/probe_pull_to_refresh.js` avec geste tactile Chrome DevTools, pollData(true), indicateur et fermeture.
+- Verrou : probe branchée dans `smoke.yml` pour bloquer les régressions mobile.
+- Résultat : probe locale en cours, version/footer/SW bumpés.
