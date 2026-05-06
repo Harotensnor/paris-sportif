@@ -1267,3 +1267,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Runtime QA: `src/qa-runtime.js` centralise erreurs locales, export bug report JSON, canary 10% et audit privacy sans envoi automatique.
 - Docs: `QA_REPORT.md`, badges README et scripts npm `qa:*`.
 - Vérifs: qa_quality_gate OK, synthetic monitor OK, post-deploy health OK, visual local skipped faute Playwright local, SW paris-sportif-20260506-053000, footer v37.022.
+
+## Sprint v37.023 — AUTO 10/10 Pipeline freshness P0 (14:03 UTC)
+- Data: refresh coeur local ESPN/Sofascore/Winamax, 263 events Winamax disponibles, 261 exacts, generated_at 2026-05-06T13:59:08Z.
+- Guard: `check_data_integrity.py` compare maintenant la couverture Winamax exacte avant le total brut, pour ne plus rejeter un nettoyage de watchlist non bookable.
+- Cron: audits LightGBM/data truth/MCP non critiques passent en warning au lieu de bloquer le workflow refresh-data.
+- Sync: `night_metrics.json` et `health.json` régénérés depuis data.js, freshness OK.
+- Vérifs: check_data_integrity OK (+20.8% exact), audit_data_truth OK, check_pipeline_freshness OK, SW paris-sportif-20260506-140300, footer v37.023.

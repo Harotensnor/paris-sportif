@@ -12,13 +12,13 @@ pre{white-space:pre-wrap;font-size:12px;line-height:1.45;color:#d1d5db}
 </style>
 <main>
   <h1>QA Report</h1>
-  <p>Généré 2026-05-06T13:42:46Z. Rapport local sans envoi externe.</p>
+  <p>Généré 2026-05-06T14:04:33Z. Rapport local sans envoi externe.</p>
   <div class="grid">
     <section class="card">
   <h2>Quality gate <span class="badge ok">ok</span></h2>
   <p><code>qa-gate-report.json</code></p>
   <pre>{
-  &quot;generated_at&quot;: &quot;2026-05-06T13:39:49Z&quot;,
+  &quot;generated_at&quot;: &quot;2026-05-06T14:04:12Z&quot;,
   &quot;status&quot;: &quot;ok&quot;,
   &quot;steps&quot;: [
     {
@@ -62,7 +62,7 @@ pre{white-space:pre-wrap;font-size:12px;line-height:1.45;color:#d1d5db}
       &quot;cmd&quot;: &quot;C:\\Users\\bouln\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe scripts/qa_contract_tests.py&quot;,
       &quot;returncode&quot;: 0,
       &quot;required&quot;: true,
-      &quot;stdout&quot;: &quot;QA contract tests: events=1018 winamax=21.2% errors=0 warnings=2\n&quot;,
+      &quot;stdout&quot;: &quot;QA contract tests: events=263 winamax=100.0% errors=0 warnings=2\n&quot;,
       &quot;stderr&quot;: &quot;&quot;,
       &quot;status&quot;: &quot;ok&quot;
     },
@@ -71,7 +71,7 @@ pre{white-space:pre-wrap;font-size:12px;line-height:1.45;color:#d1d5db}
       &quot;cmd&quot;: &quot;C:\\Users\\bouln\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe scripts/check_data_integrity.py&quot;,
       &quot;returncode&quot;: 0,
       &quot;required&quot;: true,
-      &quot;stdout&quot;: &quot;check_data_integrity: events current=1018, previous=1018, delta=+0.0%\nOK: data.js dans plage acceptable.\n&quot;,
+      &quot;stdout&quot;: &quot;check_data_integrity: winamax_exact current=261, previous=216, delta=+20.8% (raw total 263/1018, exact 261/216)\nOK: data.js dans plage acceptable.\n&quot;,
       &quot;stderr&quot;: &quot;&quot;,
       &quot;status&quot;: &quot;ok&quot;
     },
@@ -123,16 +123,16 @@ pre{white-space:pre-wrap;font-size:12px;line-height:1.45;color:#d1d5db}
     {
       &quot;name&quot;: &quot;pipeline freshness&quot;,
       &quot;cmd&quot;: &quot;C:\\Users\\bouln\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe scripts/check_pipeline_freshness.py&quot;,
-      &quot;returncode&quot;: 1,
+      &quot;returncode&quot;: 0,
       &quot;required&quot;: false,
-      &quot;stdout&quot;: &quot;[pipeline-health] FAIL data.js stale: 831min &gt; 30min (generated_at=2026-05-05T23:48:51.512634Z)\n&quot;,
+      &quot;stdout&quot;: &quot;[pipeline-health] OK data.js age=5min generated_at=2026-05-06T13:59:08Z\n&quot;,
       &quot;stderr&quot;: &quot;&quot;,
-      &quot;status&quot;: &quot;warning&quot;
+      &quot;status&quot;: &quot;ok&quot;
     }
   ],
   &quot;reports&quot;: {
     &quot;unit&quot;: {
-      &quot;generated_at&quot;: &quot;2026-05-06T13:39:48.358Z&quot;,
+      &quot;generated_at&quot;: &quot;2026-05-06T14:04:11.810Z&quot;,
       &quot;status&quot;: &quot;ok&quot;,
       &quot;duration_ms&quot;: 3,
       &quot;tests&quot;: [
@@ -203,7 +203,7 @@ pre{white-space:pre-wrap;font-size:12px;line-height:1.45;color:#d1d5db}
       &quot;coverage_gate_pct&quot;: 90
     },
     &quot;mutation&quot;: {
-      &quot;generated_at&quot;: &quot;2026-05-06T13:39:48.408Z&quot;,
+      &quot;generated_at&quot;: &quot;2026-05-06T14:04:11.858Z&quot;,
       &quot;status&quot;: &quot;ok&quot;,
       &quot;mutation_score_pct&quot;: 100,
       &quot;gate_pct&quot;: 70,
@@ -262,13 +262,13 @@ pre{white-space:pre-wrap;font-size:12px;line-height:1.45;color:#d1d5db}
       &quot;note&quot;: &quot;Dependency-free mutation smoke; full Stryker can use this as the initial mutant list.&quot;
     },
     &quot;snapshot&quot;: {
-      &quot;generated_at&quot;: &quot;2026-05-06T13:39:48.457Z&quot;,
+      &quot;generated_at&quot;: &quot;2026-05-06T14:04:11.907Z&quot;,
       &quot;status&quot;: &quot;ok&quot;,
       &quot;snapshot&quot;: &quot;tests\\snapshots\\qa-pick-card.snapshot.html&quot;,
       &quot;fixture_count&quot;: 2
     },
     &quot;load&quot;: {
-      &quot;generated_at&quot;: &quot;2026-05-06T13:39:48.507Z&quot;,
+      &quot;generated_at&quot;: &quot;2026-05-06T14:04:11.958Z&quot;,
       &quot;status&quot;: &quot;ok&quot;,
       &quot;picks_rendered&quot;: 1000,
       &quot;render_ms&quot;: 0.3,
@@ -277,11 +277,11 @@ pre{white-space:pre-wrap;font-size:12px;line-height:1.45;color:#d1d5db}
       &quot;gate_fps_min&quot;: 30
     },
     &quot;contract&quot;: {
-      &quot;generated_at&quot;: &quot;2026-05-06T13:39:48Z&quot;,
+      &quot;generated_at&quot;: &quot;2026-05-06T14:04:12Z&quot;,
       &quot;status&quot;: &quot;ok&quot;,
-      &quot;events&quot;: 1018,
-      &quot;winamax_events&quot;: 216,
-      &quot;winamax_pct&quot;: 21.22,
+      &quot;events&quot;: 263,
+      &quot;winamax_events&quot;: 263,
+      &quot;winamax_pct&quot;: 100.0,
       &quot;sidecars&quot;: [
         {
           &quot;name&quot;: &quot;winamax_catalog.json&quot;,
@@ -291,7 +291,7 @@ pre{white-space:pre-wrap;font-size:12px;line-height:1.45;color:#d1d5db}
         {
           &quot;name&quot;: &quot;winamax_markets.json&quot;,
           &quot;status&quot;: &quot;ok&quot;,
-          &quot;items&quot;: 773
+          &quot;items&quot;: 755
         },
         {
           &quot;name&quot;: &quot;health.json&quot;,
@@ -318,13 +318,13 @@ pre{white-space:pre-wrap;font-size:12px;line-height:1.45;color:#d1d5db}
     &quot;local_analytics&quot;: {
       &quot;status&quot;: &quot;ok&quot;,
       &quot;checked_files&quot;: [
-        &quot;src\\local-an</pre>
+        &quot;s</pre>
 </section>
 <section class="card">
   <h2>Unit helpers <span class="badge ok">ok</span></h2>
   <p><code>qa-unit-report.json</code></p>
   <pre>{
-  &quot;generated_at&quot;: &quot;2026-05-06T13:39:48.358Z&quot;,
+  &quot;generated_at&quot;: &quot;2026-05-06T14:04:11.810Z&quot;,
   &quot;status&quot;: &quot;ok&quot;,
   &quot;duration_ms&quot;: 3,
   &quot;tests&quot;: [
@@ -399,7 +399,7 @@ pre{white-space:pre-wrap;font-size:12px;line-height:1.45;color:#d1d5db}
   <h2>Mutation <span class="badge ok">ok</span></h2>
   <p><code>qa-mutation-report.json</code></p>
   <pre>{
-  &quot;generated_at&quot;: &quot;2026-05-06T13:39:48.408Z&quot;,
+  &quot;generated_at&quot;: &quot;2026-05-06T14:04:11.858Z&quot;,
   &quot;status&quot;: &quot;ok&quot;,
   &quot;mutation_score_pct&quot;: 100,
   &quot;gate_pct&quot;: 70,
@@ -462,7 +462,7 @@ pre{white-space:pre-wrap;font-size:12px;line-height:1.45;color:#d1d5db}
   <h2>Snapshots <span class="badge ok">ok</span></h2>
   <p><code>qa-snapshot-report.json</code></p>
   <pre>{
-  &quot;generated_at&quot;: &quot;2026-05-06T13:39:48.457Z&quot;,
+  &quot;generated_at&quot;: &quot;2026-05-06T14:04:11.907Z&quot;,
   &quot;status&quot;: &quot;ok&quot;,
   &quot;snapshot&quot;: &quot;tests\\snapshots\\qa-pick-card.snapshot.html&quot;,
   &quot;fixture_count&quot;: 2
@@ -472,7 +472,7 @@ pre{white-space:pre-wrap;font-size:12px;line-height:1.45;color:#d1d5db}
   <h2>Load <span class="badge ok">ok</span></h2>
   <p><code>qa-load-report.json</code></p>
   <pre>{
-  &quot;generated_at&quot;: &quot;2026-05-06T13:39:48.507Z&quot;,
+  &quot;generated_at&quot;: &quot;2026-05-06T14:04:11.958Z&quot;,
   &quot;status&quot;: &quot;ok&quot;,
   &quot;picks_rendered&quot;: 1000,
   &quot;render_ms&quot;: 0.3,
@@ -485,11 +485,11 @@ pre{white-space:pre-wrap;font-size:12px;line-height:1.45;color:#d1d5db}
   <h2>Contracts <span class="badge ok">ok</span></h2>
   <p><code>qa-contract-report.json</code></p>
   <pre>{
-  &quot;generated_at&quot;: &quot;2026-05-06T13:39:48Z&quot;,
+  &quot;generated_at&quot;: &quot;2026-05-06T14:04:12Z&quot;,
   &quot;status&quot;: &quot;ok&quot;,
-  &quot;events&quot;: 1018,
-  &quot;winamax_events&quot;: 216,
-  &quot;winamax_pct&quot;: 21.22,
+  &quot;events&quot;: 263,
+  &quot;winamax_events&quot;: 263,
+  &quot;winamax_pct&quot;: 100.0,
   &quot;sidecars&quot;: [
     {
       &quot;name&quot;: &quot;winamax_catalog.json&quot;,
@@ -499,7 +499,7 @@ pre{white-space:pre-wrap;font-size:12px;line-height:1.45;color:#d1d5db}
     {
       &quot;name&quot;: &quot;winamax_markets.json&quot;,
       &quot;status&quot;: &quot;ok&quot;,
-      &quot;items&quot;: 773
+      &quot;items&quot;: 755
     },
     {
       &quot;name&quot;: &quot;health.json&quot;,

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-06T13:39:49Z",
+  "generated_at": "2026-05-06T14:04:12Z",
   "status": "ok",
   "steps": [
     {
@@ -43,7 +43,7 @@
       "cmd": "C:\\Users\\bouln\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe scripts/qa_contract_tests.py",
       "returncode": 0,
       "required": true,
-      "stdout": "QA contract tests: events=1018 winamax=21.2% errors=0 warnings=2\n",
+      "stdout": "QA contract tests: events=263 winamax=100.0% errors=0 warnings=2\n",
       "stderr": "",
       "status": "ok"
     },
@@ -52,7 +52,7 @@
       "cmd": "C:\\Users\\bouln\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe scripts/check_data_integrity.py",
       "returncode": 0,
       "required": true,
-      "stdout": "check_data_integrity: events current=1018, previous=1018, delta=+0.0%\nOK: data.js dans plage acceptable.\n",
+      "stdout": "check_data_integrity: winamax_exact current=261, previous=216, delta=+20.8% (raw total 263/1018, exact 261/216)\nOK: data.js dans plage acceptable.\n",
       "stderr": "",
       "status": "ok"
     },
@@ -104,16 +104,16 @@
     {
       "name": "pipeline freshness",
       "cmd": "C:\\Users\\bouln\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe scripts/check_pipeline_freshness.py",
-      "returncode": 1,
+      "returncode": 0,
       "required": false,
-      "stdout": "[pipeline-health] FAIL data.js stale: 831min > 30min (generated_at=2026-05-05T23:48:51.512634Z)\n",
+      "stdout": "[pipeline-health] OK data.js age=5min generated_at=2026-05-06T13:59:08Z\n",
       "stderr": "",
-      "status": "warning"
+      "status": "ok"
     }
   ],
   "reports": {
     "unit": {
-      "generated_at": "2026-05-06T13:39:48.358Z",
+      "generated_at": "2026-05-06T14:04:11.810Z",
       "status": "ok",
       "duration_ms": 3,
       "tests": [
@@ -184,7 +184,7 @@
       "coverage_gate_pct": 90
     },
     "mutation": {
-      "generated_at": "2026-05-06T13:39:48.408Z",
+      "generated_at": "2026-05-06T14:04:11.858Z",
       "status": "ok",
       "mutation_score_pct": 100,
       "gate_pct": 70,
@@ -243,13 +243,13 @@
       "note": "Dependency-free mutation smoke; full Stryker can use this as the initial mutant list."
     },
     "snapshot": {
-      "generated_at": "2026-05-06T13:39:48.457Z",
+      "generated_at": "2026-05-06T14:04:11.907Z",
       "status": "ok",
       "snapshot": "tests\\snapshots\\qa-pick-card.snapshot.html",
       "fixture_count": 2
     },
     "load": {
-      "generated_at": "2026-05-06T13:39:48.507Z",
+      "generated_at": "2026-05-06T14:04:11.958Z",
       "status": "ok",
       "picks_rendered": 1000,
       "render_ms": 0.3,
@@ -258,11 +258,11 @@
       "gate_fps_min": 30
     },
     "contract": {
-      "generated_at": "2026-05-06T13:39:48Z",
+      "generated_at": "2026-05-06T14:04:12Z",
       "status": "ok",
-      "events": 1018,
-      "winamax_events": 216,
-      "winamax_pct": 21.22,
+      "events": 263,
+      "winamax_events": 263,
+      "winamax_pct": 100.0,
       "sidecars": [
         {
           "name": "winamax_catalog.json",
@@ -272,7 +272,7 @@
         {
           "name": "winamax_markets.json",
           "status": "ok",
-          "items": 773
+          "items": 755
         },
         {
           "name": "health.json",
