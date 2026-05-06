@@ -10,6 +10,8 @@
 
 - Phase 2: calibration sport/marché/cote/ligue avec drift documenté.
 - Phase 2: `ensemble_weights.json` avec Poisson, Dixon-Coles, Elo, LightGBM.
+- Couverture sports étendue: brancher des fetchers réellement bookables pour handball, volley, e-sports, cyclisme, ski, athlétisme et NFL playoffs avant de générer des picks.
+- Couverture sports étendue: transformer la watchlist rugby / tennis Challenger / foot féminin en picks uniquement quand Winamax exact expose les marchés.
 - Phase 3: audit a11y avancé sur focus order, labels et navigation clavier.
 - Phase 4: budget bundle CI complet (`app.js`, `app.css`, sidecars).
 - Phase 5: documentation `docs/PIPELINE.md`, `docs/MODEL.md`, `docs/DATA_SOURCES.md`.
@@ -20,4 +22,3 @@
 - Monte Carlo ROI / drawdown.
 - Refactor conditionnel d'`app.js` en modules si le budget maintenance l'exige.
 - Préparation i18n par extraction progressive des chaînes.
-

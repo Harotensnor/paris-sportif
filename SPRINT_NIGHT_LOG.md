@@ -1206,3 +1206,11 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Captures: accueil, tous, performance, crédibilité générées dans captures/v37.014/.
 - Cache/footer bumpés v37.014; app.js hash 7b3e6914; SW paris-sportif-20260506-015100.
 
+
+## Sprint v37.015 — AUTO 10/10 Couverture sports étendue (00:02 UTC)
+- Data: sports_coverage_extended.json/js indexe 11 familles sportives avec statut bookable/watch/missing.
+- UI: routes #sports-tous + #rugby/#handball/#volley/#esport/#combat/#cyclisme/#ski/#athle/#tennis-challenger/#foot-feminin/#nfl branchées.
+- Pipeline: auto_refresh.py et refresh.yml régénèrent la matrice à chaque tick sans appel réseau additionnel.
+- Vérifs: sports-coverage desktop + mobile 4/4, app.js syntax OK, check_pipeline_drift OK, freshness OK.
+- Captures: 12 PNG dans captures/sports-coverage-v37.015/; footer v37.015, app.js hash 5f66ec12, sports hash 1ad353fa, SW paris-sportif-20260506-020200.
+

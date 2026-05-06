@@ -123,6 +123,7 @@ PATCH_STAGES = [
     ('build_tennis_challenger_watchlist.py', 1, 15),
     ('build_football_expansion_watchlist.py', 1, 15),
     ('build_sports_expansion_audit.py', 1, 15),
+    ('build_sports_coverage_extended.py', 1, 15),
     ('detect_boosted_odds.py',      1,   30),
     ('build_signal_gap_report.py',  1,   15),
     ('build_anti_public_angles.py', 1,   15),

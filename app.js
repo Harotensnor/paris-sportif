@@ -423,7 +423,11 @@ return w.available === true && !!w.match_id
 && (Number(w.markets['1n2'].home) > 1 || Number(w.markets['1n2'].away) > 1);
 }
 try { window.bookmakerMode = bookmakerMode; window.setBookmakerMode = setBookmakerMode; window.isBookableInMode = isBookableInMode; } catch(e){ logSafeError('boot expose bookmaker helpers', e); }
-const VALID_PAGES = ['dashboard','tous','performance','academie','profil','buteurs'];
+const SPORTS_COVERAGE_PAGES = [
+'sports-tous', 'rugby', 'handball', 'volley', 'esport', 'combat',
+'cyclisme', 'ski', 'athle', 'tennis-challenger', 'foot-feminin', 'nfl'
+];
+const VALID_PAGES = ['dashboard','tous','performance','academie','profil','buteurs', ...SPORTS_COVERAGE_PAGES];
 const PAGE_ALIASES = {
 'top': 'dashboard',
 'locks': 'dashboard',
@@ -467,6 +471,32 @@ const PAGE_ALIASES = {
 'vue-globale': 'performance',  // alias raccourci page Perf
 'cagnotte': 'performance',     // alias historique
 'agent': 'performance',        // alias 'page Mon agent'
+'sports': 'sports-tous',
+'sports-tous': 'sports-tous',
+'sports-etendus': 'sports-tous',
+'volleyball': 'volley',
+'volley-ball': 'volley',
+'esports': 'esport',
+'e-sport': 'esport',
+'e-sports': 'esport',
+'mma': 'combat',
+'boxe': 'combat',
+'box-mma': 'combat',
+'boxing': 'combat',
+'cycling': 'cyclisme',
+'sports-hiver': 'ski',
+'winter': 'ski',
+'winter-sports': 'ski',
+'biathlon': 'ski',
+'athletisme': 'athle',
+'athlétisme': 'athle',
+'tennis-challenger-itf': 'tennis-challenger',
+'challenger': 'tennis-challenger',
+'itf': 'tennis-challenger',
+'football-feminin': 'foot-feminin',
+'football-féminin': 'foot-feminin',
+'women-football': 'foot-feminin',
+'nfl-playoffs': 'nfl',
 };
 function _pageFromHash() {
 try {
@@ -16064,7 +16094,7 @@ if (!team) return '';
 return '';
 }
 function sportEmoji(sport) {
-const m = { football:'⚽', tennis:'🎾', basketball:'🏀', hockey:'🏒', baseball:'⚾', rugby:'🏉', mma:'🥊', f1:'🏎️', esports:'🎮' };
+const m = { football:'⚽', tennis:'🎾', basketball:'🏀', hockey:'🏒', baseball:'⚾', rugby:'🏉', handball:'🤾', volleyball:'🏐', volley:'🏐', mma:'🥊', combat:'🥊', boxing:'🥊', f1:'🏎️', esports:'🎮', esport:'🎮', cycling:'🚴', cyclisme:'🚴', ski:'🎿', 'winter_sports':'🎿', athletics:'🏃', athle:'🏃', nfl:'🏈', 'football-american':'🏈' };
 return m[String(sport||'').toLowerCase()] || '🏆';
 }
 function teamAvatarHtml(name, sport, size) {
@@ -24734,6 +24764,139 @@ applyFilter();
 applyFilter();
 }
 
+function getSportsCoverageExtended() {
+const payload = window.SPORTS_COVERAGE_EXTENDED || {};
+const sports = Array.isArray(payload.sports) ? payload.sports : [];
+return {
+generated_at: payload.generated_at || null,
+summary: payload.summary || {},
+sports,
+};
+}
+try { window.getSportsCoverageExtended = getSportsCoverageExtended; } catch(e){}
+
+function _sportsCoverageByRoute(route) {
+const payload = getSportsCoverageExtended();
+const key = String(route || '').toLowerCase();
+return payload.sports.find(s => s.route === key || s.key === key) || null;
+}
+
+function _sportsCoverageStatusStyle(status) {
+if (status === 'ready') return { bg: 'rgba(16,185,129,.14)', bd: 'rgba(16,185,129,.38)', fg: '#34d399', label: 'Bookable' };
+if (status === 'derived') return { bg: 'rgba(96,165,250,.14)', bd: 'rgba(96,165,250,.38)', fg: '#60a5fa', label: 'Modèle prêt' };
+if (status === 'watch') return { bg: 'rgba(251,191,36,.14)', bd: 'rgba(251,191,36,.38)', fg: '#fbbf24', label: 'Watch' };
+return { bg: 'rgba(148,163,184,.10)', bd: 'rgba(148,163,184,.28)', fg: 'var(--text-dim)', label: 'À brancher' };
+}
+
+function _sportsCoverageRouteButtons(activeRoute) {
+const payload = getSportsCoverageExtended();
+const rows = [{ route: 'sports-tous', label: 'Tous', emoji: '🧭', status: 'index' }, ...payload.sports];
+return rows.map(item => {
+const route = item.route || 'sports-tous';
+const active = route === activeRoute || (activeRoute === 'sports-tous' && route === 'sports-tous');
+return `<button type="button" data-sports-route="${esc(route)}" style="min-height:40px;padding:0 12px;border-radius:8px;border:1px solid ${active ? 'var(--brand)' : 'var(--border)'};background:${active ? 'var(--brand-soft)' : 'var(--panel)'};color:${active ? 'var(--brand)' : 'var(--text)'};font-weight:850;cursor:pointer;">${item.emoji || '🏆'} ${esc(item.label || item.key || route)}</button>`;
+}).join('');
+}
+
+function _sportsCoverageCard(item, compact) {
+const st = _sportsCoverageStatusStyle(item.status);
+const markets = (item.markets || []).slice(0, compact ? 4 : 8).map(m => `<span style="display:inline-flex;align-items:center;min-height:26px;padding:0 8px;border-radius:7px;border:1px solid var(--border);background:var(--panel-2);font-size:12px;font-weight:800;color:var(--text);">${esc(m)}</span>`).join('');
+const samples = (item.samples || []).slice(0, compact ? 2 : 5).map(s => `
+<li style="display:grid;gap:2px;padding:8px 0;border-top:1px solid var(--border);">
+  <span style="font-weight:850;color:var(--text);">${esc(s.match || 'Match détecté')}</span>
+  <span style="font-size:12px;color:var(--text-dim);">${esc(s.league || 'Ligue inconnue')} · ${esc(s.source || 'source')} · ${esc(s.status || item.status_label || '')}</span>
+</li>`).join('');
+const notes = (item.notes || []).slice(0, compact ? 1 : 4).map(n => `<li>${esc(n)}</li>`).join('');
+return `
+<article class="sports-coverage-card" data-sport-key="${esc(item.key)}" style="border:1px solid var(--border);background:var(--panel);border-radius:8px;padding:16px;display:grid;gap:12px;box-shadow:var(--shadow-sm);">
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+    <div>
+      <div style="font-size:26px;line-height:1;">${item.emoji || '🏆'}</div>
+      <h2 style="margin:8px 0 3px;font-size:${compact ? '17px' : '21px'};letter-spacing:0;color:var(--text);">${esc(item.label || item.key)}</h2>
+      <p style="margin:0;color:var(--text-dim);font-size:13px;line-height:1.45;">${esc(item.target || '')}</p>
+    </div>
+    <span style="white-space:nowrap;border:1px solid ${st.bd};background:${st.bg};color:${st.fg};border-radius:999px;padding:6px 9px;font-size:12px;font-weight:900;">${st.label}</span>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;">
+    ${[
+      ['Bookable', item.bookable_events || 0],
+      ['Watch', item.source_events || 0],
+      ['Marchés', item.derived_markets || 0],
+    ].map(([label, value]) => `
+      <div style="border:1px solid var(--border);border-radius:8px;background:var(--panel-2);padding:10px;">
+        <div style="font-size:18px;font-weight:950;font-variant-numeric:tabular-nums;color:var(--text);">${esc(value)}</div>
+        <div style="font-size:11px;text-transform:uppercase;color:var(--text-dim);font-weight:850;">${esc(label)}</div>
+      </div>`).join('')}
+  </div>
+  <div>
+    <div style="font-size:12px;text-transform:uppercase;color:var(--text-dim);font-weight:900;margin-bottom:7px;">Modèle adapté</div>
+    <p style="margin:0;color:var(--text);font-size:13px;line-height:1.5;">${esc(item.model || 'Modèle à brancher quand la source devient bookable.')}</p>
+  </div>
+  <div>
+    <div style="font-size:12px;text-transform:uppercase;color:var(--text-dim);font-weight:900;margin-bottom:7px;">Marchés prévus</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;">${markets || '<span style="color:var(--text-dim);font-size:13px;">Aucun marché actif.</span>'}</div>
+  </div>
+  ${samples ? `<ul style="list-style:none;margin:0;padding:0;">${samples}</ul>` : '<div style="color:var(--text-dim);font-size:13px;border-top:1px solid var(--border);padding-top:10px;">Aucun event local détecté sur le dernier snapshot.</div>'}
+  ${notes ? `<div style="font-size:12px;color:var(--text-dim);line-height:1.45;"><b style="color:var(--text);">Notes</b><ul style="margin:6px 0 0 18px;padding:0;">${notes}</ul></div>` : ''}
+  <button type="button" data-sports-route="${esc(item.route || 'sports-tous')}" style="justify-self:start;min-height:38px;padding:0 12px;border-radius:8px;border:1px solid var(--border);background:var(--panel-2);color:var(--text);font-weight:850;cursor:pointer;">Ouvrir ${esc(item.label || item.key)}</button>
+</article>`;
+}
+
+function renderSportsCoveragePage(wrap, route) {
+if (!wrap) return;
+const payload = getSportsCoverageExtended();
+const activeRoute = route || 'sports-tous';
+const selected = activeRoute === 'sports-tous' ? null : _sportsCoverageByRoute(activeRoute);
+const summary = payload.summary || {};
+const sports = payload.sports || [];
+const ready = Number(summary.ready || 0);
+const watch = Number(summary.watch || 0) + Number(summary.derived || 0);
+const missing = Number(summary.missing || 0);
+const updated = payload.generated_at ? new Date(payload.generated_at).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' }) : 'non généré';
+const pageTitle = selected ? `${selected.emoji || '🏆'} ${selected.label}` : 'Couverture sports';
+wrap.innerHTML = `
+<div class="page-wrap sports-coverage-page" style="max-width:1500px;margin:0 auto;padding:20px 8px 44px;">
+  <div class="page-header" style="margin-bottom:14px;">
+    <div class="lbl-tiny u-text-brand">Couverture étendue</div>
+    <h1 class="page-h1">${esc(pageTitle)}</h1>
+    <p class="page-sub">Index honnête des sports demandés : bookable quand Winamax est exact, watch quand la source existe, à brancher quand aucun event local n'est disponible.</p>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px;">${_sportsCoverageRouteButtons(activeRoute)}</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:16px;">
+    ${[
+      ['Sports', summary.sports_total || sports.length || 0],
+      ['Bookables', summary.bookable_events || 0],
+      ['Sources watch', summary.source_events || 0],
+      ['Ready', ready],
+      ['À brancher', missing],
+    ].map(([label, value]) => `
+      <div style="border:1px solid var(--border);background:var(--panel);border-radius:8px;padding:12px;">
+        <div style="font-size:20px;font-weight:950;font-variant-numeric:tabular-nums;color:var(--text);">${esc(value)}</div>
+        <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;font-weight:900;">${esc(label)}</div>
+      </div>`).join('')}
+  </div>
+  <div style="border:1px solid var(--border);background:${ready ? 'rgba(16,185,129,.10)' : 'rgba(251,191,36,.10)'};border-radius:8px;padding:12px 14px;margin-bottom:16px;color:var(--text);font-size:13px;line-height:1.45;">
+    <b>${ready ? 'Couverture active' : 'Couverture prudente'}</b> · ${ready} famille${ready > 1 ? 's' : ''} bookable · ${watch} famille${watch > 1 ? 's' : ''} en surveillance · MAJ ${esc(updated)}.
+  </div>
+  ${selected ? _sportsCoverageCard(selected, false) : `
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;">
+      ${sports.map(item => _sportsCoverageCard(item, true)).join('')}
+    </div>
+  `}
+</div>`;
+wrap.querySelectorAll('[data-sports-route]').forEach(btn => {
+btn.addEventListener('click', () => {
+const target = btn.getAttribute('data-sports-route') || 'sports-tous';
+currentPage = PAGE_ALIASES[target] || target;
+try { localStorage.setItem('currentPage', currentPage); } catch(e){}
+try { history.replaceState(null, '', location.pathname + location.search + '#' + currentPage); } catch(e){}
+applyPageView();
+window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+});
+}
+try { window.renderSportsCoveragePage = renderSportsCoveragePage; } catch(e){}
+
 function renderButeursPage(wrap) {
 const data = window.PRONOSTICS_DATA;
 const todayIso = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
@@ -27138,6 +27301,7 @@ return `
     const isValeur = false;
     const isSimulator = false; // v35.199 — pages legacy aliasées vers hubs modernes.
     const isPerformance = currentPage === 'performance';
+    const isSportsCoverage = SPORTS_COVERAGE_PAGES.includes(currentPage);
     const _renderPageSkeleton = (wrap, label, title, count = 4) => {
       if (!wrap || wrap.dataset.skeletonSeen === currentPage) return;
       wrap.dataset.skeletonSeen = currentPage;
@@ -27249,7 +27413,7 @@ const comb = document.getElementById('combines-wrap');
 if (comb) comb.style.display = isCombines ? '' : 'none';
 
 const sum = document.getElementById('summary-bar');
-if (sum) sum.style.display = (isCombines || isValue || isLocks || isHistorique || isSante || isDashboard || isAlertes || isAcademie || isBacktest || isProfil || isButeurs || isTous || isCredibilite || isMontante || isCalendrier || isLeague || isFavoris) ? 'none' : '';
+if (sum) sum.style.display = (isCombines || isValue || isLocks || isHistorique || isSante || isDashboard || isAlertes || isAcademie || isBacktest || isProfil || isButeurs || isTous || isCredibilite || isMontante || isCalendrier || isLeague || isFavoris || isSportsCoverage) ? 'none' : '';
 
 const iaSimples = document.getElementById('ia-simples-wrap');
 if (iaSimples) {
@@ -27413,6 +27577,15 @@ buteursWrap.id = 'buteurs-wrap';
 }
 buteursWrap.style.display = isButeurs ? '' : 'none';
 if (isButeurs) renderButeursPage(buteursWrap);
+
+let sportsCoverageWrap = document.getElementById('sports-coverage-wrap');
+if (!sportsCoverageWrap) {
+sportsCoverageWrap = document.createElement('div');
+sportsCoverageWrap.id = 'sports-coverage-wrap';
+(document.querySelector('main') || document.body).appendChild(sportsCoverageWrap);
+}
+sportsCoverageWrap.style.display = isSportsCoverage ? '' : 'none';
+if (isSportsCoverage) renderSportsCoveragePage(sportsCoverageWrap, currentPage);
 
 let academieWrap = document.getElementById('academie-wrap');
 if (!academieWrap) {
