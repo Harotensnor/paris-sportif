@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-06T19:03:31Z",
+  "generated_at": "2026-05-06T19:10:28Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 85,
+    "active_events": 87,
     "actionable": 28,
     "watch": 5,
-    "risk": 52,
+    "risk": 54,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 23,
       "travel_extreme": 11,
-      "back_to_back_travel": 24,
-      "signal_conflict": 11,
+      "back_to_back_travel": 25,
+      "signal_conflict": 14,
       "market_uncertain": 43
     },
     "by_quality": {
       "watch": 5,
       "actionable": 28,
-      "risk": 52
+      "risk": 54
     }
   },
   "active_actionable": [
@@ -326,6 +326,24 @@
       "direction": "fade",
       "team": "Minnesota Twins",
       "side": "away",
+      "strength": 0.951,
+      "context": "4 match dans les 48h + 1504 km de voyage"
+    },
+    {
+      "event_id": "401815232",
+      "date": "2026-05-06T22:45Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Washington Nationals",
+      "away": "Minnesota Twins",
+      "match": "Washington Nationals - Minnesota Twins",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Minnesota Twins",
+      "side": "away",
       "strength": 0.911,
       "context": "2 match dans les 48h + 1504 km de voyage"
     },
@@ -398,8 +416,8 @@
       "direction": "fade",
       "team": "Cleveland Guardians",
       "side": "away",
-      "strength": 0.834,
-      "context": "2 match dans les 48h + 1118 km de voyage"
+      "strength": 0.874,
+      "context": "3 match dans les 48h + 1118 km de voyage"
     },
     {
       "event_id": "401815250",
@@ -416,26 +434,26 @@
       "direction": "fade",
       "team": "Cleveland Guardians",
       "side": "away",
-      "strength": 0.834,
-      "context": "2 match dans les 48h + 1118 km de voyage"
+      "strength": 0.874,
+      "context": "4 match dans les 48h + 1118 km de voyage"
     },
     {
-      "event_id": "401815232",
-      "date": "2026-05-06T22:45Z",
+      "event_id": "401815231",
+      "date": "2026-05-06T22:40Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
-      "home": "Washington Nationals",
-      "away": "Minnesota Twins",
-      "match": "Washington Nationals - Minnesota Twins",
+      "home": "Detroit Tigers",
+      "away": "Boston Red Sox",
+      "match": "Detroit Tigers - Boston Red Sox",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
       "type": "back_to_back_travel",
       "direction": "fade",
-      "team": "Minnesota Twins",
+      "team": "Boston Red Sox",
       "side": "away",
-      "strength": 0.831,
-      "context": "1 match dans les 48h + 1504 km de voyage"
+      "strength": 0.806,
+      "context": "2 match dans les 48h + 981 km de voyage"
     },
     {
       "event_id": "401856891",
@@ -508,24 +526,6 @@
       "side": "away",
       "strength": 0.757,
       "context": "1 match dans les 48h + 1135 km de voyage"
-    },
-    {
-      "event_id": "401815231",
-      "date": "2026-05-06T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Detroit Tigers",
-      "away": "Boston Red Sox",
-      "match": "Detroit Tigers - Boston Red Sox",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Boston Red Sox",
-      "side": "away",
-      "strength": 0.726,
-      "context": "1 match dans les 48h + 981 km de voyage"
     }
   ],
   "active_watch": [
@@ -1394,6 +1394,42 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 19.1%"
+    },
+    {
+      "event_id": "401815244",
+      "date": "2026-05-07T22:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Philadelphia Phillies",
+      "away": "Athletics",
+      "match": "Philadelphia Phillies - Athletics",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.52,
+      "context": "Signaux opposes: Philadelphia Phillies fade 0.80, Athletics fade 0.80 -> prudence"
+    },
+    {
+      "event_id": "sofa_15496115",
+      "date": "2026-05-06T23:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Chicago Cubs",
+      "away": "Cincinnati Reds",
+      "match": "Chicago Cubs - Cincinnati Reds",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.488,
+      "context": "Signaux opposes: Chicago Cubs fade 0.75, Cincinnati Reds fade 0.75 -> prudence"
     },
     {
       "event_id": "401871162",
