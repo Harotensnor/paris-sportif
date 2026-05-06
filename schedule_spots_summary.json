@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-05-06T23:14:50Z",
+  "generated_at": "2026-05-06T23:19:27Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 58,
+    "active_events": 57,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 81,
-      "travel_extreme": 18,
-      "back_to_back_travel": 20,
+      "lookahead": 77,
+      "back_to_back_travel": 19,
+      "travel_extreme": 17,
       "schedule_congestion": 43
     },
     "by_decision": {
       "abstain": 29,
-      "lean_home": 24,
+      "lean_home": 23,
       "lean_away": 5
     },
-    "lean_home": 24,
+    "lean_home": 23,
     "lean_away": 5,
     "abstain": 29,
     "monitor": 0
@@ -738,10 +738,10 @@
       }
     },
     {
-      "event_id": "sofa_15496115",
+      "event_id": "401815235",
       "source_event_ids": [
-        "sofa_15496115",
-        "401815235"
+        "401815235",
+        "sofa_15496115"
       ],
       "kickoff": "2026-05-06T23:40Z",
       "sport": "baseball",
@@ -769,11 +769,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
+        "home_score": -0.698,
+        "away_score": 0.112,
+        "home_fade": 0.75,
         "away_fade": 0.15,
-        "reason": "Direction nette: Cincinnati Reds (-0.10)",
+        "reason": "Direction nette: Cincinnati Reds (+0.11)",
         "detail": [
           {
             "side": "home",
@@ -786,6 +786,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.6
           }
         ]
       }
@@ -2675,81 +2681,6 @@
       }
     },
     {
-      "event_id": "401815233",
-      "source_event_ids": [
-        "sofa_15501355",
-        "401815233"
-      ],
-      "kickoff": "2026-05-06T23:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "New York Yankees",
-      "away": "Texas Rangers",
-      "match": "New York Yankees - Texas Rangers",
-      "decision": "lean_home",
-      "net_team": "New York Yankees",
-      "reason": "Texas Rangers plus penalise par calendrier/voyage (1.65 vs 0.15)",
-      "pressure_score": 2.166,
-      "home_fade": 0.15,
-      "away_fade": 1.649,
-      "travel_score": 1.499,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "Deplacement estime 2240 km, decalage ~1.5h",
-        "1 match dans les 48h + 2240 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.777,
-        "away_score": -2.597,
-        "home_fade": 0.15,
-        "away_fade": 2.649,
-        "reason": "Direction nette: New York Yankees (+0.78)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.521
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.978
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815245",
       "source_event_ids": [
         "401815245"
@@ -3023,8 +2954,8 @@
     {
       "event_id": "401815236",
       "source_event_ids": [
-        "sofa_15501352",
-        "401815236"
+        "401815236",
+        "sofa_15501352"
       ],
       "kickoff": "2026-05-06T23:40Z",
       "sport": "baseball",
