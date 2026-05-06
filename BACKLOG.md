@@ -3,7 +3,7 @@
 ## P0
 
 - Pipeline freshness locale: `check_pipeline_freshness.py` échoue sur le snapshot main (92min). Un refresh local rapide remet l'âge à 0min mais `check_data_integrity.py` refuse le résultat car la couverture passe de 1018 à 240 events; investiguer pourquoi `patch_winamax.py` ne conserve que 23% malgré un catalogue Winamax à 771 matchs.
-- Affiner `validate_data_quality.py`: ne pas compter les score exacts > 50 comme corruption si le marché est explicitement `exactScore`, ou les classer `long_shot_odd` au lieu de `bad_odd`.
+- ~~Affiner `validate_data_quality.py`: ne pas compter les score exacts > 50 comme corruption si le marché est explicitement `exactScore`, ou les classer `long_shot_odd` au lieu de `bad_odd`.~~ ✅ Fait — `classify_odd()` distingue `LONG_SHOT_MARKETS` (exact_score, htft → seuil 1000) et `ELEVATED_MARKETS` (team_total, ht_*, result_btts → seuil 100). Quarantaine 479 → 297 events, 2709 long-shot odds bien réétiquetés (rapport `data_quality_report.json` expose `long_shot_odd_total`/`long_shot_by_market`). Couvert par `tests/test_validate_data_quality.py`.
 - Réduire les warnings `health.json`: distinguer alertes actuelles, alertes 7 jours, sources optionnelles et données bloquantes.
 - Ajouter un test automatisé qui vérifie que la page Historique affiche au moins 100 picks sur J-1 quand l'archive les contient.
 

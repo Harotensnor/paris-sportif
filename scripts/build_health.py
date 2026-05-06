@@ -341,6 +341,10 @@ SOURCES = [
     ('data_quality_report', 'data_quality_report.json', lambda d: {
         'events_quarantined': (d.get('events_quarantined') or 0) if isinstance(d, dict) else 0,
         'status': (d.get('status') or 'unknown') if isinstance(d, dict) else 'missing',
+        # Long-shot odds are informational, not corruption — surface them
+        # separately so the dashboard can stop conflating them with bad data.
+        'long_shot_odd_total': (d.get('long_shot_odd_total') or 0) if isinstance(d, dict) else 0,
+        'long_shot_events': (d.get('long_shot_events') or 0) if isinstance(d, dict) else 0,
     }),
     ('backtest_training_rows', 'backtest_training_rows_summary.json', lambda d: {
         'rows': (d.get('rows') or 0) if isinstance(d, dict) else 0,
