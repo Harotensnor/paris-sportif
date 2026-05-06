@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-06T19:37:07Z",
+  "generated_at": "2026-05-06T19:45:07Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -726,10 +726,10 @@
       }
     },
     {
-      "event_id": "401815229",
+      "event_id": "sofa_15501357",
       "source_event_ids": [
-        "401815229",
-        "sofa_15501357"
+        "sofa_15501357",
+        "401815229"
       ],
       "kickoff": "2026-05-06T22:40Z",
       "sport": "baseball",
@@ -758,10 +758,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.098,
-        "away_score": 0.902,
+        "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Athletics (+0.90)",
+        "reason": "Direction nette: Athletics (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -774,12 +774,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
           }
         ]
       }
@@ -901,10 +895,10 @@
       }
     },
     {
-      "event_id": "401815235",
+      "event_id": "sofa_15496115",
       "source_event_ids": [
-        "401815235",
-        "sofa_15496115"
+        "sofa_15496115",
+        "401815235"
       ],
       "kickoff": "2026-05-06T23:40Z",
       "sport": "baseball",
@@ -932,11 +926,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.498,
-        "away_score": 0.043,
-        "home_fade": 0.55,
+        "home_score": -0.098,
+        "away_score": -0.098,
+        "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Cincinnati Reds (+0.04)",
+        "reason": "Direction nette: Cincinnati Reds (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -949,12 +943,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
           }
         ]
       }
@@ -2577,8 +2565,8 @@
     {
       "event_id": "401815233",
       "source_event_ids": [
-        "401815233",
-        "sofa_15501355"
+        "sofa_15501355",
+        "401815233"
       ],
       "kickoff": "2026-05-06T23:05Z",
       "sport": "baseball",
@@ -2608,13 +2596,13 @@
         "1 match dans les 48h + 2240 km de voyage"
       ],
       "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
+        "status": "net",
+        "net_side": "home",
         "home_score": 0.777,
-        "away_score": -1.998,
+        "away_score": -2.597,
         "home_fade": 0.15,
         "away_fade": 2.649,
-        "reason": "Signaux mitigés: avantage net trop faible (New York Yankees +0.78, Texas Rangers -2.00)",
+        "reason": "Direction nette: New York Yankees (+0.78)",
         "detail": [
           {
             "side": "home",
@@ -2633,12 +2621,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.599
           },
           {
             "side": "away",
@@ -2968,10 +2950,10 @@
       }
     },
     {
-      "event_id": "401815230",
+      "event_id": "sofa_15501356",
       "source_event_ids": [
-        "401815230",
-        "sofa_15501356"
+        "sofa_15501356",
+        "401815230"
       ],
       "kickoff": "2026-05-06T22:40Z",
       "sport": "baseball",
@@ -3001,11 +2983,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.546,
-        "away_score": -1.935,
+        "home_score": 0.196,
+        "away_score": -0.935,
         "home_fade": 0.15,
-        "away_fade": 1.988,
-        "reason": "Direction nette: Miami Marlins (+0.55)",
+        "away_fade": 0.988,
+        "reason": "Direction nette: Miami Marlins (+0.20)",
         "detail": [
           {
             "side": "home",
@@ -3021,12 +3003,6 @@
           },
           {
             "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.838
@@ -3037,8 +3013,8 @@
     {
       "event_id": "401815236",
       "source_event_ids": [
-        "401815236",
-        "sofa_15501352"
+        "sofa_15501352",
+        "401815236"
       ],
       "kickoff": "2026-05-06T23:40Z",
       "sport": "baseball",
@@ -3104,8 +3080,8 @@
     {
       "event_id": "401815232",
       "source_event_ids": [
-        "401815232",
-        "sofa_15501358"
+        "sofa_15501358",
+        "401815232"
       ],
       "kickoff": "2026-05-06T22:45Z",
       "sport": "baseball",
@@ -3135,7 +3111,7 @@
       "global_resolution": {
         "status": "abstain",
         "net_side": null,
-        "home_score": 0.108,
+        "home_score": -0.407,
         "away_score": -0.718,
         "home_fade": 0.75,
         "away_fade": 0.981,
@@ -3158,12 +3134,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.515
           },
           {
             "side": "away",
@@ -3427,19 +3397,19 @@
         "1 match dans les 48h + 981 km de voyage"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.146,
-        "away_score": -0.586,
-        "home_fade": 0.4,
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.346,
+        "away_score": -0.516,
+        "home_fade": 0.6,
         "away_fade": 0.726,
-        "reason": "Direction nette: Detroit Tigers (-0.15)",
+        "reason": "Signaux opposes: Detroit Tigers fade 0.60, Boston Red Sox fade 0.73 -> prudence",
         "detail": [
           {
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.4
+            "strength": 0.6
           },
           {
             "side": "away",
