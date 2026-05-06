@@ -27557,6 +27557,16 @@ return `
         b.addEventListener('click', () => {
         currentPage = PAGE_ALIASES[b.dataset.suiviPage] || b.dataset.suiviPage;
           try { localStorage.setItem('currentPage', currentPage); } catch(e){}
+          // v37.048 — sync the hash so reload / share / back-forward
+          // restore the right page. Without this, a user who lands on
+          // /pronostics.html#performance, clicks "Historique" in the
+          // suivi sub-nav, then reloads, gets bounced back to Performance.
+          try {
+            const newHash = '#' + currentPage;
+            if (location.hash !== newHash) {
+              history.replaceState(null, '', location.pathname + location.search + newHash);
+            }
+          } catch(e) {}
           applyPageView();
         });
       });
