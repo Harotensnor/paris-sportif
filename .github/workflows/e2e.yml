@@ -64,8 +64,8 @@ jobs:
         # v37.036 — these static audits used to run only locally. Wiring
         # them into drift catches regressions in legacy-app.js that the
         # smoke E2E only exposes after a full Chromium boot (slower).
-        # v37.044 — added orphan renderers detector (catches the dead
-        # renderXxxPage / aliased route pattern that hid eight pages).
+        # v37.044 — added orphan renderers detector.
+        # v37.050 — added localStorage corruption-safety static audit.
         run: |
           python3 scripts/audit_innerhtml_safety.py
           python3 scripts/audit_fetch_tracking.py
@@ -76,6 +76,7 @@ jobs:
           python3 scripts/audit_local_analytics.py
           python3 scripts/audit_privacy_features.py
           python3 scripts/audit_orphan_renderers.py
+          python3 scripts/audit_localstorage_safety.py
       - name: Pytest (Python unit tests)
         # v37.036 — pytest covers data-quality classifiers, the multi-strategy
         # backtest math, the calibration maps and the historique archive
