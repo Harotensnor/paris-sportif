@@ -1317,3 +1317,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : suppression du rendu `pronosPages`/`data-pronos-page` et retrait des exceptions de clic devenues mortes.
 - Verrou : ajout de `scripts/audit_no_dead_pronos_subnav.py` dans le groupe drift statique.
 - Résultat : 50/50 pytest, 17 probes navigateur verts, 8 audits statiques verts, `legacy-app.js` 1795.4 KB.
+
+## Sprint v37.067 — AUTO 10/10 Dead top page (17:33 UTC)
+- Hypothèse : l'ancien Top du jour était encore calculé alors que `#top` est aliasé vers l'accueil moderne.
+- Fix : suppression de `renderTopPicks`, du conteneur `top-picks-wrap` et du gating `isTop` devenu impossible.
+- Verrou : ajout de `scripts/audit_no_dead_top_page.py` dans le groupe drift statique.
+- Résultat : 50/50 pytest, 17 probes navigateur verts, 9 audits statiques verts, `legacy-app.js` descend à 1774.3 KB.
