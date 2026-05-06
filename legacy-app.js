@@ -29539,6 +29539,21 @@ if (archive) {
 renderPicksHistoryArchivePage(wrap, archive);
 return;
 }
+// v37.049 — when the archive is still loading (first render before
+// the fetch resolves), show a skeleton instead of falling through to
+// the legacy data.days iteration below. The legacy path references
+// _histFilters which has never been declared in this codebase, so it
+// crashes with `_histFilters is not defined` on every cold #historique
+// navigation. The unaliased route in v37.043 made this crash visible
+// where it had been silent before.
+wrap.innerHTML = `<div style="max-width:1200px;margin:0 auto;padding:32px 16px;">
+  <div class="page-header"><h1 class="page-h1">📜 Historique</h1>
+    <div style="font-size:13px;color:var(--text-dim);">Chargement de l'archive…</div></div>
+  <div class="skel skel-card" style="margin-top:14px;"></div>
+  <div class="skel skel-card"></div>
+  <div class="skel skel-card"></div>
+</div>`;
+return;
 const data = window.PRONOSTICS_DATA;
 if (!data || !data.days) {
 wrap.innerHTML = '<div style="max-width:1200px;margin:0 auto;padding:16px 8px 24px;"><div class="bilan-empty">Pas de données d\'historique disponibles.</div></div>';

@@ -15,6 +15,8 @@ on:
       - 'scripts/probe_tous_modal.js'
       - 'scripts/probe_table_deep.js'
       - 'scripts/probe_table_combos.js'
+      - 'scripts/probe_modal_sports.js'
+      - 'scripts/probe_nav_chain.js'
       - '.github/workflows/smoke.yml'
   pull_request:
     branches: [main]
@@ -26,6 +28,8 @@ on:
       - 'scripts/probe_tous_modal.js'
       - 'scripts/probe_table_deep.js'
       - 'scripts/probe_table_combos.js'
+      - 'scripts/probe_modal_sports.js'
+      - 'scripts/probe_nav_chain.js'
   workflow_dispatch: {}
 
 concurrency:
@@ -87,3 +91,11 @@ jobs:
         # sport-specific render errors (basketball stats panel,
         # baseball pitcher block) before they ship.
         run: node scripts/probe_modal_sports.js
+
+      - name: Run navigation chain probe
+        # v37.049 — walks the full user flow (dashboard → modal → close
+        # → revived routes → suivi sub-nav → reload → page-btn active).
+        # Caught the v37.049 _histFilters crash (legacy historique path
+        # references an undeclared variable) and the v37.048 hash sync
+        # bug.
+        run: node scripts/probe_nav_chain.js
