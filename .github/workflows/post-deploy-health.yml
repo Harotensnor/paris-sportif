@@ -1,0 +1,59 @@
+name: post-deploy-health
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'pronostics.html'
+      - 'app.js'
+      - 'app.css'
+      - 'src/**'
+      - 'sw.js'
+      - 'data_manifest.json'
+      - '.github/workflows/post-deploy-health.yml'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: post-deploy-health-main
+  cancel-in-progress: true
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Wait for GitHub Pages propagation
+        run: sleep 75
+
+      - name: Post-deploy health check
+        id: health
+        env:
+          QA_DEPLOY_URL: https://harotensnor.github.io/paris-sportif
+        run: python scripts/post_deploy_health_check.py
+
+      - name: Auto rollback failed deploy
+        if: failure() && github.ref == 'refs/heads/main' && vars.QA_AUTO_ROLLBACK == '1'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git revert --no-edit HEAD
+          git push origin HEAD:main
+
+      - name: Upload post-deploy report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: post-deploy-health
+          path: post-deploy-health.json
+          retention-days: 14

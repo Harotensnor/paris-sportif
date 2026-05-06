@@ -1,0 +1,334 @@
+{
+  "generated_at": "2026-05-06T13:39:49Z",
+  "status": "ok",
+  "steps": [
+    {
+      "name": "unit helpers",
+      "cmd": "C:\\Users\\bouln\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe scripts/qa_unit_runner.js",
+      "returncode": 0,
+      "required": true,
+      "stdout": "QA unit runner: 6/6 passed · helper coverage 100%\n",
+      "stderr": "",
+      "status": "ok"
+    },
+    {
+      "name": "mutation smoke",
+      "cmd": "C:\\Users\\bouln\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe scripts/qa_mutation_smoke.js",
+      "returncode": 0,
+      "required": true,
+      "stdout": "QA mutation smoke: 100% (10/10 mutants killed)\n",
+      "stderr": "",
+      "status": "ok"
+    },
+    {
+      "name": "snapshots",
+      "cmd": "C:\\Users\\bouln\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe scripts/qa_snapshot_runner.js",
+      "returncode": 0,
+      "required": true,
+      "stdout": "QA snapshots: ok\n",
+      "stderr": "",
+      "status": "ok"
+    },
+    {
+      "name": "load 1000 picks",
+      "cmd": "C:\\Users\\bouln\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe scripts/qa_load_test.js",
+      "returncode": 0,
+      "required": true,
+      "stdout": "QA load: 1000 picks in 0.3ms · fps 60\n",
+      "stderr": "",
+      "status": "ok"
+    },
+    {
+      "name": "data contracts",
+      "cmd": "C:\\Users\\bouln\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe scripts/qa_contract_tests.py",
+      "returncode": 0,
+      "required": true,
+      "stdout": "QA contract tests: events=1018 winamax=21.2% errors=0 warnings=2\n",
+      "stderr": "",
+      "status": "ok"
+    },
+    {
+      "name": "data integrity",
+      "cmd": "C:\\Users\\bouln\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe scripts/check_data_integrity.py",
+      "returncode": 0,
+      "required": true,
+      "stdout": "check_data_integrity: events current=1018, previous=1018, delta=+0.0%\nOK: data.js dans plage acceptable.\n",
+      "stderr": "",
+      "status": "ok"
+    },
+    {
+      "name": "pipeline drift",
+      "cmd": "C:\\Users\\bouln\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe scripts/check_pipeline_drift.py",
+      "returncode": 0,
+      "required": true,
+      "stdout": "[check_pipeline_drift] Vérification…\n  scripts/ on disk : 177 fichiers\n  auto_refresh.py  : 121 référencés\n  refresh.yml      : 121 référencés\n\n  [INFO] 56 script(s) sur disque non reference(s) (souvent OK : helpers, modules) :\n      - _log.py\n      - _metrics.py\n      - _retry.py\n      - ab_test_predictmatch.py\n      - analyze_calibration.py\n      - audit_fetch_tracking.py\n      - audit_innerhtml_safety.py\n      - audit_intelligence_consistency.py\n      - audit_issues_split.py\n      - audit_legacy_comments.py\n      - audit_local_analytics.py\n      - audit_playwright_skips.py\n      - audit_privacy_features.py\n      - audit_qa_runtime.py\n      - audit_ux_clarity.py\n      - backfill_odds.py\n      - backtest_by_market.py\n      - backup_data_snapshot.py\n      - build_changelog.py\n      - build_docs_pack.py\n      - build_history_compact.py\n      - check_bundle_size.py\n      - check_data_integrity.py\n      - check_health_quality.py\n      - check_model_drift.py\n      - cv_backtest.py\n      - fetch_winamax_markets.py\n      - import_winamax_account.py\n      - mcp_paris_sportif.py\n      - measure_transfer_sizes.py\n      - notify_health_warnings.py\n      - optimize_static_images.py\n      - patch_clubelo.py\n      - patch_footballdata.py\n      - patch_injuries_soccer.py\n      - patch_lineups_soccer.py\n      - patch_mlb_pitchers.py\n      - patch_nba_team_stats.py\n      - patch_nhl_stats.py\n      - patch_referees_soccer.py\n      - patch_team_form.py\n      - patch_team_stats.py\n      - patch_tennis_features.py\n      - patch_weather.py\n      - performance_budget.py\n      - picks_history_lib.py\n      - post_deploy_health_check.py\n      - qa_contract_tests.py\n      - qa_html_report.py\n      - qa_quality_gate.py\n      - synthetic_monitor.py\n      - tune_thresholds.py\n      - validate_ensemble_model.py\n      - winamax_cookie_extractor.py\n      - winamax_cookie_via_cdp.py\n      - winamax_v20_decrypt.py\n\n  [OK]   Pipeline alignee. Aucun drift.\n",
+      "stderr": "",
+      "status": "ok"
+    },
+    {
+      "name": "bundle budget",
+      "cmd": "C:\\Users\\bouln\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe scripts/check_bundle_size.py",
+      "returncode": 0,
+      "required": true,
+      "stdout": "  [ok]app.js: 0.8 KB / 1750 KB budget (0%)\n  [ok]app.css: 260.4 KB / 300 KB budget (87%)\n  [ok]pronostics.html: 84.0 KB / 1150 KB budget (7%)\n  [ok]sw.js: 10.7 KB / 15 KB budget (71%)\n  [ok]index.html: 23.1 KB / 35 KB budget (66%)\n  [ok]methodologie.html: 26.2 KB / 35 KB budget (75%)\n  [ok]academie.html: 22.7 KB / 40 KB budget (57%)\n  [ok]comment-lire-un-prono.html: 17.6 KB / 35 KB budget (50%)\n  [ok]backtest.html: 40.2 KB / 80 KB budget (50%)\n  [ok]credibilite.html: 16.7 KB / 70 KB budget (24%)\n\nWARNINGS :\n  [warn]legacy-app.js: 1782.5 KB / 1850 KB budget (96%) � proche du budget\n  [warn]legal.html: 18.3 KB / 20 KB budget (91%) � proche du budget\n  [warn]static-page.css: 22.9 KB / 25 KB budget (92%) � proche du budget\n\nOK: tous les bundles dans leur budget.\n",
+      "stderr": "",
+      "status": "ok"
+    },
+    {
+      "name": "qa runtime privacy",
+      "cmd": "C:\\Users\\bouln\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe scripts/audit_qa_runtime.py",
+      "returncode": 0,
+      "required": true,
+      "stdout": "QA runtime audit OK\n",
+      "stderr": "",
+      "status": "ok"
+    },
+    {
+      "name": "local analytics privacy",
+      "cmd": "C:\\Users\\bouln\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe scripts/audit_local_analytics.py",
+      "returncode": 0,
+      "required": true,
+      "stdout": "Local analytics audit OK: zero network primitive, localStorage only\n",
+      "stderr": "",
+      "status": "ok"
+    },
+    {
+      "name": "privacy social",
+      "cmd": "C:\\Users\\bouln\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe scripts/audit_privacy_features.py",
+      "returncode": 0,
+      "required": true,
+      "stdout": "Privacy audit OK: no network primitive in src/privacy-social.js\n",
+      "stderr": "",
+      "status": "ok"
+    },
+    {
+      "name": "pipeline freshness",
+      "cmd": "C:\\Users\\bouln\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe scripts/check_pipeline_freshness.py",
+      "returncode": 1,
+      "required": false,
+      "stdout": "[pipeline-health] FAIL data.js stale: 831min > 30min (generated_at=2026-05-05T23:48:51.512634Z)\n",
+      "stderr": "",
+      "status": "warning"
+    }
+  ],
+  "reports": {
+    "unit": {
+      "generated_at": "2026-05-06T13:39:48.358Z",
+      "status": "ok",
+      "duration_ms": 3,
+      "tests": [
+        {
+          "name": "utils clamp and number formatting are stable",
+          "status": "passed"
+        },
+        {
+          "name": "kellyFraction respects zero-edge and cap invariants",
+          "status": "passed"
+        },
+        {
+          "name": "qualityScore distributes realistic candidates",
+          "status": "passed"
+        },
+        {
+          "name": "model math helpers return sane probabilities",
+          "status": "passed"
+        },
+        {
+          "name": "tier thresholds and breakdown are coherent",
+          "status": "passed"
+        },
+        {
+          "name": "data access helpers use one source of truth",
+          "status": "passed"
+        }
+      ],
+      "target_helpers": [
+        "clamp",
+        "safeNumber",
+        "formatOdd",
+        "formatPct",
+        "formatEUR",
+        "formatTimeAgo",
+        "percentile",
+        "kellyFraction",
+        "qualityScore",
+        "poissonProbability",
+        "eloProbability",
+        "gaussianCdf",
+        "dixonColesAdjustment",
+        "v36TierForCandidate",
+        "getTierBreakdown",
+        "getDataAge",
+        "getDisplayablePicks"
+      ],
+      "covered_helpers": [
+        "clamp",
+        "dixonColesAdjustment",
+        "eloProbability",
+        "formatEUR",
+        "formatOdd",
+        "formatPct",
+        "formatTimeAgo",
+        "gaussianCdf",
+        "getDataAge",
+        "getDisplayablePicks",
+        "getTierBreakdown",
+        "kellyFraction",
+        "percentile",
+        "poissonProbability",
+        "qualityScore",
+        "safeNumber",
+        "v36TierForCandidate"
+      ],
+      "helper_coverage_pct": 100,
+      "coverage_gate_pct": 90
+    },
+    "mutation": {
+      "generated_at": "2026-05-06T13:39:48.408Z",
+      "status": "ok",
+      "mutation_score_pct": 100,
+      "gate_pct": 70,
+      "rows": [
+        {
+          "name": "kelly_no_cap",
+          "status": "killed",
+          "reason": "kelly cap broken"
+        },
+        {
+          "name": "kelly_accepts_negative",
+          "status": "killed",
+          "reason": "kelly negative stake broken"
+        },
+        {
+          "name": "probability_over_one",
+          "status": "killed",
+          "reason": "probability clamp broken"
+        },
+        {
+          "name": "edge_nan",
+          "status": "killed",
+          "reason": "edge finite guard broken"
+        },
+        {
+          "name": "quality_score_uncapped",
+          "status": "killed",
+          "reason": "quality score cap broken"
+        },
+        {
+          "name": "poisson_negative_lambda",
+          "status": "killed",
+          "reason": "poisson lambda guard broken"
+        },
+        {
+          "name": "tier_safe_without_edge",
+          "status": "killed",
+          "reason": "safe tier edge guard broken"
+        },
+        {
+          "name": "data_age_negative",
+          "status": "killed",
+          "reason": "data age lower bound broken"
+        },
+        {
+          "name": "odd_zero_division",
+          "status": "killed",
+          "reason": "book probability division guard broken"
+        },
+        {
+          "name": "winamax_filter_bypass",
+          "status": "killed",
+          "reason": "winamax-only contract broken"
+        }
+      ],
+      "note": "Dependency-free mutation smoke; full Stryker can use this as the initial mutant list."
+    },
+    "snapshot": {
+      "generated_at": "2026-05-06T13:39:48.457Z",
+      "status": "ok",
+      "snapshot": "tests\\snapshots\\qa-pick-card.snapshot.html",
+      "fixture_count": 2
+    },
+    "load": {
+      "generated_at": "2026-05-06T13:39:48.507Z",
+      "status": "ok",
+      "picks_rendered": 1000,
+      "render_ms": 0.3,
+      "fps_estimate": 60,
+      "html_bytes": 117685,
+      "gate_fps_min": 30
+    },
+    "contract": {
+      "generated_at": "2026-05-06T13:39:48Z",
+      "status": "ok",
+      "events": 1018,
+      "winamax_events": 216,
+      "winamax_pct": 21.22,
+      "sidecars": [
+        {
+          "name": "winamax_catalog.json",
+          "status": "ok",
+          "items": 3
+        },
+        {
+          "name": "winamax_markets.json",
+          "status": "ok",
+          "items": 773
+        },
+        {
+          "name": "health.json",
+          "status": "ok",
+          "items": 66
+        },
+        {
+          "name": "night_metrics.json",
+          "status": "ok",
+          "items": 22
+        },
+        {
+          "name": "picks_history_summary.json",
+          "status": "ok",
+          "items": 15
+        }
+      ],
+      "errors": [],
+      "warnings": [
+        "winamax_catalog.json: missing optional contract key matches",
+        "winamax_catalog.json: low item count 3 < 100"
+      ]
+    },
+    "local_analytics": {
+      "status": "ok",
+      "checked_files": [
+        "src\\local-analytics.js",
+        "pronostics.html"
+      ],
+      "privacy_model": {
+        "server_uploads": 0,
+        "tracking_calls": 0,
+        "network_primitives": 0,
+        "storage": [
+          "localStorage.usage_telemetry",
+          "localStorage.usage_telemetry_prefs"
+        ],
+        "retention": "bounded local arrays, oldest entries trimmed in browser"
+      },
+      "features_checked": [
+        "local page visits",
+        "local click heatmap",
+        "local funnel",
+        "local recommendations",
+        "local smart alerts",
+        "local saved views",
+        "local reset"
+      ],
+      "errors": []
+    }
+  },
+  "quality_gates": {
+    "helper_coverage_min_pct": 90,
+    "mutation_score_min_pct": 70,
+    "visual_diff_max_pct": 1,
+    "a11y_critical_serious_moderate": 0,
+    "load_fps_min": 30
+  }
+}
