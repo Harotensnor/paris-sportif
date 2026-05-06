@@ -28218,7 +28218,7 @@ return n;
 
 
 const PERF_TAB_STORAGE_KEY = 'paris_sportif_perf_tab_v1';
-const PERF_TABS = new Set(['global', 'periode', 'confiance', 'marche', 'sport', 'ligue']);
+const PERF_TABS = new Set(['global', 'periode', 'confiance', 'marche', 'sport', 'ligue', 'strategies']);
 
 function _getPerfTab() {
 try {

@@ -18,7 +18,7 @@
      manifest-src 'self', upgrade-insecure-requests, plausible.io et
      cloudflareinsights pour analytics opt-in. `frame-ancestors` ne marche pas
      en meta CSP (header HTTP only), donc on ne le met pas ici. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-pa4usEMoTXe8ZDWYhSfcZgpBc7pZm06GlvK88xcN5P8=' 'sha256-et3zcLjrlerq+0ra7BBZ+Lu/TCNaz6zINNMRoySgV8Y=' 'sha256-UB8kj8R7TEMzyS5SIVd03Ijhe3k2ZKjkPiGo17AxlkI=' 'sha256-TntT6RHEVVDBaGJGZp97+MNGXAmuGoumyTi1Cul5VSI=' 'sha256-PeMbW+FaFFjBHp0lLPNkemQWsQC/b9N9fOSxC7TYzqc=' 'sha256-U90J6JiY/oIUgnIUS+wUKblZgwUczFwJFoOngAC9ABQ=' 'sha256-xekpL1L+0+uan2Z/c6dVRMvu7tcOj4RAyc4/gMFxzJ4=' 'sha256-S+3UbhI66FBwvf8ZN/6v6urCJD6sv/CpB2KUrO03xyg=' 'sha256-chp+kaIqPdKfQR8/KVk3tv39DJ2nuNcrGX2UvyX77QI=' https://plausible.io https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://a.espncdn.com https://a1.espncdn.com https://a2.espncdn.com https://a3.espncdn.com https://a4.espncdn.com https://www.gstatic.com https://img.sofascore.com; connect-src 'self' https://api.clubelo.com https://sports.core.api.espn.com https://site.api.espn.com https://plausible.io https://cloudflareinsights.com; font-src 'self' data:; base-uri 'self'; form-action 'self'; object-src 'none'; media-src 'none'; worker-src 'self'; manifest-src 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-pa4usEMoTXe8ZDWYhSfcZgpBc7pZm06GlvK88xcN5P8=' 'sha256-et3zcLjrlerq+0ra7BBZ+Lu/TCNaz6zINNMRoySgV8Y=' 'sha256-UB8kj8R7TEMzyS5SIVd03Ijhe3k2ZKjkPiGo17AxlkI=' 'sha256-TntT6RHEVVDBaGJGZp97+MNGXAmuGoumyTi1Cul5VSI=' 'sha256-PeMbW+FaFFjBHp0lLPNkemQWsQC/b9N9fOSxC7TYzqc=' 'sha256-U90J6JiY/oIUgnIUS+wUKblZgwUczFwJFoOngAC9ABQ=' 'sha256-xekpL1L+0+uan2Z/c6dVRMvu7tcOj4RAyc4/gMFxzJ4=' 'sha256-S+3UbhI66FBwvf8ZN/6v6urCJD6sv/CpB2KUrO03xyg=' 'sha256-Hmrgcl3HNvdNcEa3F3ffn8kX2JKCxtV52B7H7t3165M=' https://plausible.io https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://a.espncdn.com https://a1.espncdn.com https://a2.espncdn.com https://a3.espncdn.com https://a4.espncdn.com https://www.gstatic.com https://img.sofascore.com; connect-src 'self' https://api.clubelo.com https://sports.core.api.espn.com https://site.api.espn.com https://plausible.io https://cloudflareinsights.com; font-src 'self' data:; base-uri 'self'; form-action 'self'; object-src 'none'; media-src 'none'; worker-src 'self'; manifest-src 'self'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <!-- AUDIT-2026-04-27 (Sprint 12 #29) — Sécurité possible via meta tags.
      GH Pages ne permet pas de custom HTTP headers ; on garde uniquement les
@@ -638,7 +638,7 @@
   // pour debug console. AUCUN envoi réseau — l'utilisateur peut consulter
   // ou exporter ses données, et c'est tout.
   //
-  // Pourquoi inline pré-legacy-app.js?v=ddaeffaa ? Il faut s'enregistrer AVANT le LCP/FCP
+  // Pourquoi inline pré legacy-app.js ? Il faut s'enregistrer AVANT le LCP/FCP
   // pour les capter. Le bundle web-vitals officiel pèse 5 KB ; ici on
   // tombe à ~1.5 KB grâce à l'usage direct de PerformanceObserver.
   //
