@@ -128,11 +128,15 @@ function check(label, ok, detail = '') {
     }
     return ['football', 'basketball', 'baseball'].map((sport) => {
       const pred = window.predictMatch(matchFor(sport));
+      const calibrated = typeof window._calibrateProb === 'function'
+        ? Number(window._calibrateProb(0.99, sport))
+        : null;
       return {
         sport,
         cap: window.MODEL_PROB_CAP,
         reliability: Number(pred && pred.reliability),
         pickProb: Number(pred && pred.pick && pred.pick.prob),
+        calibrated,
         rawCap: Number(pred && pred.reliability_raw_cap),
         pickRawCap: Number(pred && pred.pick && pred.pick.prob_raw_cap),
         suspect: !!(pred && pred.suspect),
@@ -144,6 +148,7 @@ function check(label, ok, detail = '') {
     check(`${row.sport}: cap exposed`, row.cap === 0.95, JSON.stringify(row));
     check(`${row.sport}: reliability <= 0.95`, Number.isFinite(row.reliability) && row.reliability <= 0.95, JSON.stringify(row));
     check(`${row.sport}: pick.prob <= 0.95`, Number.isFinite(row.pickProb) && row.pickProb <= 0.95, JSON.stringify(row));
+    check(`${row.sport}: _calibrateProb <= 0.95`, Number.isFinite(row.calibrated) && row.calibrated <= 0.95, JSON.stringify(row));
   }
   check('probe run has zero console errors', errors.length === 0, errors.join(' | '));
 

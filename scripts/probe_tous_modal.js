@@ -257,7 +257,7 @@ function check(label, ok, detail) {
   check('kellyFraction(0.6, 2.0) ≈ 0.05 (quarter Kelly default)', Math.abs((helperOutputs.kelly || 0) - 0.05) < 0.005, `got=${helperOutputs.kelly}`);
   check('kellyFraction(0.6, 2.0, 1.0, 1.0) ≈ 0.20 (full Kelly)', Math.abs((helperOutputs.kellyFull || 0) - 0.20) < 0.01, `got=${helperOutputs.kellyFull}`);
   check('expectedValue(0.6, 2.0) ≈ 0.20', Math.abs((helperOutputs.ev || 0) - 0.20) < 0.01, `got=${helperOutputs.ev}`);
-  check('_calibrateProb(0.99) ≤ 0.99 (calibrated down)', helperOutputs.calibrated == null || helperOutputs.calibrated <= 0.99, `got=${helperOutputs.calibrated}`);
+  check('_calibrateProb(0.99) respects MODEL_PROB_CAP', helperOutputs.calibrated == null || helperOutputs.calibrated <= 0.95, `got=${helperOutputs.calibrated}`);
   check('predictMatch returns object', helperOutputs.predict === 'object', `got=${helperOutputs.predict}`);
 
   console.log('\n=== Console errors during the run ===');

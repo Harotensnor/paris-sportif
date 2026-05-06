@@ -7181,11 +7181,16 @@ return `${s}:all`;
 function _calibrationMarketKey(sport, leagueCode, market) {
 return `${_calibrationGroupKey(sport, leagueCode)}|${market || '1n2'}`;
 }
+function _capPublicProbValue(value) {
+const num = Number(value);
+if (!Number.isFinite(num)) return value;
+return Math.max(0.01, Math.min(MODEL_PROB_CAP, num));
+}
 function _calibrateProb(rawProb, sport, leagueCode, market) {
 const cal = window.__modelCalibration;
-if (cal && cal.stale) return rawProb;
-if (!cal || !cal.bins || !cal.total_n || cal.total_n < 20) return rawProb;
-if (!isFinite(rawProb) || rawProb <= 0 || rawProb >= 1) return rawProb;
+if (cal && cal.stale) return _capPublicProbValue(rawProb);
+if (!cal || !cal.bins || !cal.total_n || cal.total_n < 20) return _capPublicProbValue(rawProb);
+if (!isFinite(rawProb) || rawProb <= 0 || rawProb >= 1) return _capPublicProbValue(rawProb);
 let bins = cal.bins;
 let usedSportBins = false;
 const marketKey = _calibrationMarketKey(sport, leagueCode, market || '1n2');
@@ -7219,13 +7224,13 @@ if (bin.n >= 3 && bin.gap != null && rawProb >= bin.lo && rawProb < bin.hi) {
 const minNStrong = usedSportBins ? 12 : 8;
 if (bin.n >= minNStrong) {
 const adj = Math.max(-0.08, Math.min(0.08, bin.gap));
-return Math.max(0.01, Math.min(0.99, rawProb + adj));
+return _capPublicProbValue(rawProb + adj);
 }
 const adj = Math.max(-0.05, Math.min(0.05, bin.gap));
-return Math.max(0.01, Math.min(0.99, rawProb + adj));
+return _capPublicProbValue(rawProb + adj);
 }
 }
-return rawProb;
+return _capPublicProbValue(rawProb);
 }
 let __backtestV2Promise = null;
 async function _fetchBacktestReportV2(opts = {}) {
@@ -7369,7 +7374,7 @@ try { window._loadProbCalibration = _loadProbCalibration; } catch(e){}
 // to the global map. Returns the input unchanged if the map isn't loaded yet.
 function _calibrateProb(p, sport) {
 const num = Number(p);
-if (!Number.isFinite(num) || num <= 0 || num >= 1) return num;
+if (!Number.isFinite(num) || num <= 0 || num >= 1) return _capPublicProbValue(num);
 const rep = window.__probCalibration;
 const sportKey = String(sport || '').toLowerCase();
 const sportRep = sportKey && rep && rep.bins_by_sport && rep.bins_by_sport[sportKey];
@@ -7377,17 +7382,17 @@ const sportBins = sportRep && Number(sportRep.n_settled || 0) >= 30 && Array.isA
   ? sportRep.bins
   : null;
 const bins = sportBins || (rep && Array.isArray(rep.bins) ? rep.bins : null);
-if (!bins || !bins.length) return num;
+if (!bins || !bins.length) return _capPublicProbValue(num);
 // Find the bin containing num.
 const idx = Math.min(bins.length - 1, Math.max(0, Math.floor(num * bins.length)));
 const bin = bins[idx];
-if (!bin) return num;
+if (!bin) return _capPublicProbValue(num);
 // If the bin has no observations, skip correction (factor defaults to ~1).
 const factor = Number(bin.calibration_factor);
-if (!Number.isFinite(factor) || factor <= 0) return num;
+if (!Number.isFinite(factor) || factor <= 0) return _capPublicProbValue(num);
 const corrected = num * factor;
 // Clamp to a sane range so a noisy bin can't push the prob to 0 / 1.
-return Math.max(0.01, Math.min(0.99, corrected));
+return _capPublicProbValue(corrected);
 }
 try { window._calibrateProb = _calibrateProb; } catch(e){}
 _loadModelCalibration();

@@ -1401,3 +1401,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : ajout de qa-gates matrix OS/Python, synthetic monitor 15 min, post-deploy health avec rollback explicitement gated.
 - Verrou : scripts/audit_qa_workflows.py + inclusion dans e2e drift; rapport local scripts/qa_gate_report.py.
 - Résultat : gates rapides centralisés, freshness prod visible/actionnable, rollback inactif sans ENABLE_AUTO_ROLLBACK.
+
+## Sprint v37.081 — AUTO 10/10 Calibration cap (19:58 UTC)
+- Hypothèse : le cap 0.95 bloque predictMatch, mais le helper public _calibrateProb peut encore remonter à 0.99.
+- Fix : clamp de _calibrateProb sur MODEL_PROB_CAP et durcissement des probes modal + proba synthétique.
+- Verrou : scripts/probe_tous_modal.js + scripts/probe_model_probability_caps.js contrôlent désormais le helper public.
+- Résultat : 23/23 qa gate, 20/20 probes navigateur verts; aucune probabilité publique ne dépasse 0.95, même via calibration console/UI.
