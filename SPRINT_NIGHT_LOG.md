@@ -1540,3 +1540,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : la concurrency globale n'utilise plus `matrix.*`, indisponible avant l'expansion des jobs.
 - Verrou : audit_qa_workflows.py bloque désormais toute référence matrix dans l'en-tête workflow.
 - Résultat : le workflow QA peut démarrer sa matrice au lieu de tomber en erreur YAML immédiate.
+
+## Sprint v37.100 — AUTO 10/10 Backtest sample guard (21:52 UTC)
+- Hypothèse : backtest-compare signalait une régression ROI sur un échantillon trop petit pour être interprété.
+- Fix : le workflow compare le ROI seulement si PR et main ont au moins 30 picks scorables.
+- Verrou : audit_qa_workflows.py exige le garde-fou `MIN_BACKTEST_N` et les compteurs n PR/main.
+- Résultat : les datasets clairsemés produisent une notice CI au lieu d'un faux rouge -100pt.

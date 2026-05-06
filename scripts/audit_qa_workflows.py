@@ -19,6 +19,7 @@ def main() -> int:
     qa = _text("qa-gates.yml")
     synthetic = _text("synthetic-monitor.yml")
     post = _text("post-deploy-health.yml")
+    backtest = _text("backtest-pr.yml")
 
     if not qa:
         findings.append(".github/workflows/qa-gates.yml missing")
@@ -74,6 +75,18 @@ def main() -> int:
         ):
             if needle not in post:
                 findings.append(f"post-deploy-health.yml missing {needle}")
+
+    if not backtest:
+        findings.append(".github/workflows/backtest-pr.yml missing")
+    else:
+        for needle in (
+            "MIN_BACKTEST_N",
+            "pr_n=",
+            "main_n=",
+            "Backtest ROI gate skipped: insufficient sample",
+        ):
+            if needle not in backtest:
+                findings.append(f"backtest-pr.yml missing {needle}")
 
     if findings:
         print("[qa-workflows] FAIL")
