@@ -1,172 +1,8 @@
 {
-  "generated_at": "2026-05-06T23:37:03Z",
+  "generated_at": "2026-05-06T23:43:10Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815235",
-      "kickoff": "2026-05-06T23:40Z",
-      "league": "MLB",
-      "match": "Cincinnati Reds at Chicago Cubs",
-      "home": "Chicago Cubs",
-      "away": "Cincinnati Reds",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Chicago Cubs",
-          "pitcher": "Colin Rea",
-          "label": "Colin Rea moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5896,
-          "fair_odds": 1.7,
-          "expected_strikeouts": 6.06,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 8.27,
-            "era": 4.41,
-            "whip": 1.32,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Chicago Cubs",
-          "pitcher": "Colin Rea",
-          "label": "Colin Rea ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5441,
-          "fair_odds": 1.84,
-          "expected_hr_allowed": 0.609,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 0.83,
-            "era": 4.41,
-            "whip": 1.32
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Cincinnati Reds",
-          "pitcher": "Brady Singer",
-          "label": "Brady Singer plus de 2,5 strikeouts",
-          "line": 2.5,
-          "pick": "over",
-          "probability": 0.6015,
-          "fair_odds": 1.66,
-          "expected_strikeouts": 2.84,
-          "projected_ip": 4.59,
-          "inputs": {
-            "k9": 5.57,
-            "era": 5.57,
-            "whip": 1.73,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Cincinnati Reds",
-          "pitcher": "Brady Singer",
-          "label": "Brady Singer concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6297,
-          "fair_odds": 1.59,
-          "expected_hr_allowed": 0.994,
-          "projected_ip": 4.59,
-          "inputs": {
-            "hr9": 1.95,
-            "era": 5.57,
-            "whip": 1.73
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815236",
-      "kickoff": "2026-05-06T23:40Z",
-      "league": "MLB",
-      "match": "Cleveland Guardians at Kansas City Royals",
-      "home": "Kansas City Royals",
-      "away": "Cleveland Guardians",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Kansas City Royals",
-          "pitcher": "Cole Ragans",
-          "label": "Cole Ragans plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5662,
-          "fair_odds": 1.77,
-          "expected_strikeouts": 5.81,
-          "projected_ip": 4.59,
-          "inputs": {
-            "k9": 11.41,
-            "era": 5.29,
-            "whip": 1.45,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Kansas City Royals",
-          "pitcher": "Cole Ragans",
-          "label": "Cole Ragans concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.7574,
-          "fair_odds": 1.32,
-          "expected_hr_allowed": 1.416,
-          "projected_ip": 4.59,
-          "inputs": {
-            "hr9": 2.78,
-            "era": 5.29,
-            "whip": 1.45
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Cleveland Guardians",
-          "pitcher": "Joey Cantillo",
-          "label": "Joey Cantillo moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5876,
-          "fair_odds": 1.7,
-          "expected_strikeouts": 5.11,
-          "projected_ip": 4.87,
-          "inputs": {
-            "k9": 9.44,
-            "era": 3.67,
-            "whip": 1.4,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Cleveland Guardians",
-          "pitcher": "Joey Cantillo",
-          "label": "Joey Cantillo concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5079,
-          "fair_odds": 1.97,
-          "expected_hr_allowed": 0.709,
-          "projected_ip": 4.87,
-          "inputs": {
-            "hr9": 1.31,
-            "era": 3.67,
-            "whip": 1.4
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "sofa_15496115",
       "kickoff": "2026-05-06T23:40Z",
@@ -254,6 +90,170 @@
       "kickoff": "2026-05-06T23:40Z",
       "league": "MLB",
       "match": "Kansas City Royals vs Cleveland Guardians",
+      "home": "Kansas City Royals",
+      "away": "Cleveland Guardians",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Kansas City Royals",
+          "pitcher": "Cole Ragans",
+          "label": "Cole Ragans plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5662,
+          "fair_odds": 1.77,
+          "expected_strikeouts": 5.81,
+          "projected_ip": 4.59,
+          "inputs": {
+            "k9": 11.41,
+            "era": 5.29,
+            "whip": 1.45,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Kansas City Royals",
+          "pitcher": "Cole Ragans",
+          "label": "Cole Ragans concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.7574,
+          "fair_odds": 1.32,
+          "expected_hr_allowed": 1.416,
+          "projected_ip": 4.59,
+          "inputs": {
+            "hr9": 2.78,
+            "era": 5.29,
+            "whip": 1.45
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Cleveland Guardians",
+          "pitcher": "Joey Cantillo",
+          "label": "Joey Cantillo moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5876,
+          "fair_odds": 1.7,
+          "expected_strikeouts": 5.11,
+          "projected_ip": 4.87,
+          "inputs": {
+            "k9": 9.44,
+            "era": 3.67,
+            "whip": 1.4,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Cleveland Guardians",
+          "pitcher": "Joey Cantillo",
+          "label": "Joey Cantillo concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5079,
+          "fair_odds": 1.97,
+          "expected_hr_allowed": 0.709,
+          "projected_ip": 4.87,
+          "inputs": {
+            "hr9": 1.31,
+            "era": 3.67,
+            "whip": 1.4
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815235",
+      "kickoff": "2026-05-06T23:40Z",
+      "league": "MLB",
+      "match": "Cincinnati Reds at Chicago Cubs",
+      "home": "Chicago Cubs",
+      "away": "Cincinnati Reds",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Chicago Cubs",
+          "pitcher": "Colin Rea",
+          "label": "Colin Rea moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5896,
+          "fair_odds": 1.7,
+          "expected_strikeouts": 6.06,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 8.27,
+            "era": 4.41,
+            "whip": 1.32,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Chicago Cubs",
+          "pitcher": "Colin Rea",
+          "label": "Colin Rea ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5441,
+          "fair_odds": 1.84,
+          "expected_hr_allowed": 0.609,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 0.83,
+            "era": 4.41,
+            "whip": 1.32
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Cincinnati Reds",
+          "pitcher": "Brady Singer",
+          "label": "Brady Singer plus de 2,5 strikeouts",
+          "line": 2.5,
+          "pick": "over",
+          "probability": 0.6015,
+          "fair_odds": 1.66,
+          "expected_strikeouts": 2.84,
+          "projected_ip": 4.59,
+          "inputs": {
+            "k9": 5.57,
+            "era": 5.57,
+            "whip": 1.73,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Cincinnati Reds",
+          "pitcher": "Brady Singer",
+          "label": "Brady Singer concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6297,
+          "fair_odds": 1.59,
+          "expected_hr_allowed": 0.994,
+          "projected_ip": 4.59,
+          "inputs": {
+            "hr9": 1.95,
+            "era": 5.57,
+            "whip": 1.73
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815236",
+      "kickoff": "2026-05-06T23:40Z",
+      "league": "MLB",
+      "match": "Cleveland Guardians at Kansas City Royals",
       "home": "Kansas City Royals",
       "away": "Cleveland Guardians",
       "props": [
