@@ -113,7 +113,9 @@ function qaCanaryVariant(name = 'default') {
 
 window.__errors = () => qaReadErrors().slice().reverse();
 window.__bugReport = qaBugReport;
+window.__qaBugReport = qaBugReport;
 window.__exportBugReport = qaExportBugReport;
+window.__qaExportBugReport = qaExportBugReport;
 window.__qaCanaryVariant = qaCanaryVariant;
 window.__qaRuntimeInstalled = true;
 

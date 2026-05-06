@@ -1504,3 +1504,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : 438 catch silencieux routés vers swallowError(), muet en prod et traçable en mode debug.
 - Verrou : audit_no_empty_catch_legacy.py ajouté au qa gate pour bloquer toute régression.
 - Résultat : 0 catch vide restant, bundle 1732.9 KB / 1750 KB.
+
+## Sprint v37.094 — AUTO 10/10 Audit gate widen (22:24 UTC)
+- Hypothèse : plusieurs audits verts existaient hors gate central et pouvaient régresser sans bloquer la CI QA.
+- Fix : qa_gate_report inclut data_truth, runtime QA, privacy, innerHTML, fetch tracking, UX, LightGBM et skips Playwright.
+- Verrou : alias __qaBugReport restauré pour compatibilité et night_metrics/health resynchronisés sur data.js.
+- Résultat : data_truth OK, audit_qa_runtime OK, qa gate élargi au-delà de 35 checks.
