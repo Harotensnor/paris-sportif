@@ -1377,3 +1377,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : ajout des chemins self-trigger côté PR et audit statique de tous les workflows filtrés par `paths`.
 - Verrou : `scripts/audit_workflow_self_triggers.py` branché dans le groupe drift statique.
 - Résultat : 50/50 pytest, 18 probes navigateur verts, 16 audits statiques verts, workflows PR auto-vérifiés.
+
+## Sprint v37.077 — AUTO 10/10 Runtime QA local (19:12 UTC)
+- Hypothèse : le support bug local promis par QA n'expose pas encore `__errors()` ni un rapport téléchargeable sans backend.
+- Fix : module `src/qa-runtime.js`, capture locale early, export bug report, canary local, hash asset et hooks legacy sans doublon.
+- Verrou : `scripts/probe_qa_runtime.js` + `scripts/audit_qa_runtime_privacy.py` branchés CI.
+- Résultat : 50/50 pytest, 19 probes navigateur verts, 18 audits statiques verts, runtime QA local sans réseau.

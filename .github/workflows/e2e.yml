@@ -11,6 +11,7 @@ on:
       - 'legacy-app.js'
       - 'app.js'
       - 'app.css'
+      - 'src/**'
       - 'tests/**'
       - 'playwright.config.js'
       - 'package.json'
@@ -24,6 +25,7 @@ on:
       - 'legacy-app.js'
       - 'app.js'
       - 'app.css'
+      - 'src/**'
       - 'tests/**'
       - 'playwright.config.js'
       - 'package.json'
@@ -91,6 +93,7 @@ jobs:
           python3 scripts/audit_no_empty_catch_modules.py
           python3 scripts/audit_smoke_workflow_triggers.py
           python3 scripts/audit_workflow_self_triggers.py
+          python3 scripts/audit_qa_runtime_privacy.py
           python3 scripts/audit_modal_aria.py
       - name: Pytest (Python unit tests)
         # v37.036 — pytest covers data-quality classifiers, the multi-strategy

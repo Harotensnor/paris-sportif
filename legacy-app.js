@@ -28622,14 +28622,18 @@ if (btn) btn.addEventListener('click', () => location.reload());
 try {
 window.addEventListener('error', (ev) => {
 if (ev.target && ev.target !== window && !ev.error) return;
+if (!window.__qaRuntimeInstalled) {
 logJsError('error', ev.message || (ev.error && ev.error.message) || 'unknown',
 (ev.error && ev.error.stack) || `${ev.filename || ''}:${ev.lineno || ''}`);
+}
 showGlobalErrorBoundary('Diagnostic enregistré localement.');
 });
 window.addEventListener('unhandledrejection', (ev) => {
 const r = ev.reason;
+if (!window.__qaRuntimeInstalled) {
 logJsError('promise', (r && (r.message || r.toString())) || 'unhandled rejection',
 (r && r.stack) || '');
+}
 showGlobalErrorBoundary('Une action n’a pas abouti correctement.');
 });
 } catch (e) { /* pas critique */ }

@@ -11,6 +11,7 @@ on:
       - 'pronostics.html'
       - 'sw.js'
       - 'legacy-app.js'
+      - 'src/qa-runtime.js'
       - 'scripts/smoke_e2e.js'
       - 'scripts/probe_all_pages.js'
       - 'scripts/probe_tous_modal.js'
@@ -29,6 +30,7 @@ on:
       - 'scripts/probe_strategies_outsider.js'
       - 'scripts/probe_prob_calibration_sport.js'
       - 'scripts/probe_corrupt_storage.js'
+      - 'scripts/probe_qa_runtime.js'
       - '.github/workflows/smoke.yml'
   pull_request:
     branches: [main]
@@ -36,6 +38,7 @@ on:
       - 'pronostics.html'
       - 'sw.js'
       - 'legacy-app.js'
+      - 'src/qa-runtime.js'
       - 'scripts/smoke_e2e.js'
       - 'scripts/probe_all_pages.js'
       - 'scripts/probe_tous_modal.js'
@@ -54,6 +57,7 @@ on:
       - 'scripts/probe_strategies_outsider.js'
       - 'scripts/probe_prob_calibration_sport.js'
       - 'scripts/probe_corrupt_storage.js'
+      - 'scripts/probe_qa_runtime.js'
       - '.github/workflows/smoke.yml'
   workflow_dispatch: {}
 
@@ -186,3 +190,8 @@ jobs:
         # Poisons JSON-backed localStorage keys before boot and verifies
         # the main routes still mount without console errors.
         run: node scripts/probe_corrupt_storage.js
+
+      - name: Run runtime QA probe
+        # Locks the local-only DevTools QA surface: error capture,
+        # downloadable bug report payload and deterministic canary variant.
+        run: node scripts/probe_qa_runtime.js
