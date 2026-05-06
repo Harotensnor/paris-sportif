@@ -34,6 +34,7 @@ def main() -> int:
             "'22'",
             "scripts/qa_gate_report.py",
             "audit_asset_hashes.py",
+            "audit_all_probes_wired.py",
             "actions/upload-artifact@v4",
             "'sw.js'",
             "backtest_strategies.json",

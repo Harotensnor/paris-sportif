@@ -1443,3 +1443,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : script de restamp générique pour tous les assets locaux et correction de 49 références périmées.
 - Verrou : scripts/audit_asset_hashes.py dans qa gate, e2e et refresh; le cron vérifie après stamp.
 - Résultat : 25/25 qa gate; probes smoke/all-pages/modal/SW/freshness/QA runtime verts.
+
+## Sprint v37.088 — AUTO 10/10 Probe wiring lock (21:06 UTC)
+- Hypothèse : un nouveau scripts/probe_*.js peut rester orphelin, sans step smoke ni path filter.
+- Fix : audit qui compare tous les probes du dossier scripts avec les exécutions et triggers smoke.yml.
+- Verrou : scripts/audit_all_probes_wired.py ajouté à qa gate et e2e.
+- Résultat : 26/26 qa gate; 19 probes Playwright confirmés exécutés et path-filtered.
