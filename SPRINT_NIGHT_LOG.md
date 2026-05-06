@@ -1552,3 +1552,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : resync origin/main, données/health/night_metrics main conservés, shell QA branche conservé.
 - Verrou : stamp_asset_hashes.py recalcule les hashes après résolution des conflits de script tags.
 - Résultat : la PR retrouve une base mergeable avec data fraîche sans écraser les fixes UX/CI.
+
+## Sprint v37.102 — AUTO 10/10 Cron data resync (22:02 UTC)
+- Hypothèse : le cron data a repris un commit d'avance et bloque à nouveau le merge-ref PR.
+- Fix : resync origin/main, sidecars/data main conservés, shell et verrous QA branche conservés.
+- Verrou : audit_data_truth.py réaligne health/night_metrics sur le timestamp data.js frais.
+- Résultat : la branche reprend le snapshot 21:57 UTC sans perdre les probes jour/nav ni le guard backtest.
