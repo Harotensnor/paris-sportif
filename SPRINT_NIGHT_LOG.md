@@ -1419,3 +1419,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : sanitation du lecteur backtest; longshots prob>=0.95 à cote>10 deviennent abstention pour les stratégies probabilité-dépendantes.
 - Verrou : test pytest dédié dans 	ests/test_backtest_strategies.py + régénération acktest_strategies.json.
 - Résultat : outsider_only reste +121.14% ROI; Kelly corrompu ne bénéficie plus des probas 0.999 historiques.
+
+## Sprint v37.084 — AUTO 10/10 Bundle budget tighten (20:28 UTC)
+- Hypothèse : le budget legacy-app.js à 1850 KB laisse repasser une dérive au-dessus de la cible produit 1750 KB.
+- Fix : budget CI legacy-app.js resserré à 1750 KB, sans toucher le runtime.
+- Verrou : scripts/check_bundle_size.py dans qa gate et e2e drift.
+- Résultat : 23/23 qa gate; legacy-app.js 1729.7 KB / 1750 KB, toute régression >1750 KB bloque la CI.
