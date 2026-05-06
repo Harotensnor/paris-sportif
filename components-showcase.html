@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Paris-Sportif · Components showcase</title>
+  <link rel="stylesheet" href="app.css?v=e464318c">
+  <link rel="stylesheet" href="app-design-v3.css?v=2650e92e">
+  <style>
+    body { padding: 28px; }
+    .showcase-shell { max-width: 1180px; margin: 0 auto; display: grid; gap: 24px; }
+    .showcase-hero { display: flex; justify-content: space-between; gap: 20px; align-items: flex-start; }
+    .showcase-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    .showcase-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .showcase-card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius-3); padding: 18px; box-shadow: var(--shadow-1); }
+    .showcase-card h2 { margin: 0 0 12px; font-size: var(--ds-step-1); }
+    .swatch { width: 52px; height: 52px; border-radius: var(--radius-2); border: 1px solid var(--border); display: grid; place-items: end; padding: 5px; font-size: 10px; color: var(--text); }
+    .mock-modal { max-width: 480px; }
+    @media (max-width: 760px) {
+      body { padding: 16px; }
+      .showcase-hero { display: grid; }
+      .showcase-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="showcase-shell">
+    <section class="showcase-hero">
+      <div>
+        <p class="lbl-tiny lbl-tiny--brand">Design system v3</p>
+        <h1 class="page-h1">Components showcase</h1>
+        <p class="text-dim">Surface admin pour verifier les tokens, themes, composants, etats et animations sans charger le tableau complet.</p>
+      </div>
+      <div class="showcase-row" aria-label="Changer de theme">
+        <button class="btn-secondary" data-theme-choice="dark">Sombre</button>
+        <button class="btn-secondary" data-theme-choice="light">Clair</button>
+        <button class="btn-secondary" data-theme-choice="ocean">Ocean</button>
+        <button class="btn-secondary" data-theme-choice="sunset">Sunset</button>
+        <button class="btn-secondary" data-theme-choice="forest">Forest</button>
+        <button class="btn-secondary" data-theme-choice="mono">Mono</button>
+      </div>
+    </section>
+
+    <section class="showcase-grid">
+      <article class="showcase-card">
+        <h2>Boutons</h2>
+        <div class="showcase-row">
+          <button class="btn-primary">Primaire</button>
+          <button class="btn-secondary">Secondaire</button>
+          <button class="btn-ghost">Ghost</button>
+          <button class="btn-primary" disabled>Disabled</button>
+        </div>
+      </article>
+
+      <article class="showcase-card">
+        <h2>Badges & chips</h2>
+        <div class="showcase-row">
+          <span class="badge">Solide</span>
+          <span class="badge badge-success">Gagne</span>
+          <span class="badge badge-warning">Alerte</span>
+          <span class="badge badge-danger">Risque</span>
+          <button class="chip is-active">Football</button>
+          <button class="chip">Tennis</button>
+        </div>
+      </article>
+
+      <article class="showcase-card">
+        <h2>Inputs</h2>
+        <div style="display:grid; gap:10px;">
+          <label>Recherche <input class="input" placeholder="Equipe, ligue, marche"></label>
+          <label>Sport <select class="select"><option>Football</option><option>Basket</option><option>Tennis</option></select></label>
+          <label class="form-field is-invalid">Cote minimum <input class="input" value="abc" aria-invalid="true"><span class="form-error">Entre une cote numerique.</span></label>
+        </div>
+      </article>
+
+      <article class="showcase-card">
+        <h2>Couleurs</h2>
+        <div class="showcase-row">
+          <span class="swatch" style="background:var(--semantic-brand)">Brand</span>
+          <span class="swatch" style="background:var(--semantic-success)">OK</span>
+          <span class="swatch" style="background:var(--semantic-warning)">Warn</span>
+          <span class="swatch" style="background:var(--semantic-danger)">Danger</span>
+          <span class="swatch" style="background:var(--semantic-info)">Info</span>
+        </div>
+      </article>
+
+      <article class="showcase-card">
+        <h2>Table</h2>
+        <table class="table-base">
+          <thead><tr><th class="sort-indicator" aria-sort="descending">Score</th><th>Match</th><th>Cote</th></tr></thead>
+          <tbody>
+            <tr><td>82</td><td>Lyon - Lille</td><td>1.72</td></tr>
+            <tr><td>67</td><td>Nice - Rennes</td><td>2.05</td></tr>
+            <tr><td>44</td><td>Reims - Nantes</td><td>3.10</td></tr>
+          </tbody>
+        </table>
+      </article>
+
+      <article class="showcase-card">
+        <h2>Empty state</h2>
+        <div class="empty-state-base">
+          <svg viewBox="0 0 96 72" aria-hidden="true"><rect x="12" y="14" width="72" height="44" rx="10" fill="none" stroke="currentColor" stroke-width="3"/><path d="M26 43h44M26 30h24" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+          <h3>Pas de pick pour ce filtre</h3>
+          <p>Change de sport ou de tier pour retrouver des opportunites lisibles.</p>
+          <button class="btn-secondary">Reset filtres</button>
+        </div>
+      </article>
+
+      <article class="showcase-card">
+        <h2>Skeleton</h2>
+        <div class="skeleton" style="height:18px; width:82%; margin-bottom:10px;"></div>
+        <div class="skeleton" style="height:18px; width:64%; margin-bottom:10px;"></div>
+        <div class="skeleton" style="height:44px; width:100%;"></div>
+      </article>
+
+      <article class="showcase-card">
+        <h2>Modal</h2>
+        <div class="modal-base mock-modal">
+          <div class="modal-head"><strong>Synthese du pick</strong><button class="btn-ghost" aria-label="Fermer">×</button></div>
+          <p class="text-dim">Le modele estime la selection a 62%, avec edge positif et donnees fraiches.</p>
+          <div class="showcase-row"><span class="badge badge-success">Confiance</span><span class="badge">Edge +6%</span></div>
+        </div>
+      </article>
+    </section>
+  </main>
+  <script>
+    document.querySelectorAll('[data-theme-choice]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const theme = button.getAttribute('data-theme-choice');
+        if (theme === 'dark') document.documentElement.removeAttribute('data-theme');
+        else document.documentElement.setAttribute('data-theme', theme);
+      });
+    });
+  </script>
+</body>
+</html>

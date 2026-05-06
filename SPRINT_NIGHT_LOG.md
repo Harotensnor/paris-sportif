@@ -1214,3 +1214,11 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Vérifs: sports-coverage desktop + mobile 4/4, app.js syntax OK, check_pipeline_drift OK, freshness OK.
 - Captures: 12 PNG dans captures/sports-coverage-v37.015/; footer v37.015, app.js hash 5f66ec12, sports hash 1ad353fa, SW paris-sportif-20260506-020200.
 
+
+## Sprint v37.016 — AUTO 10/10 UX/UI overhaul foundation (02:20 UTC)
+- UI: design system v3 branche via app-design-v3.css avec tokens, composants, themes Ocean/Sunset/Forest/Mono/System et micro-interactions.
+- Docs: docs/DESIGN_TOKENS.md, components-showcase.html et UX_OVERHAUL_REPORT.md livrent la reference visuelle.
+- Etats: toast dismissible, error boundary visible, skeleton/empty/form/table/modal bases normalises et print modal A4.
+- Vérifs: ux-overhaul desktop + mobile 6/6, app.js syntax OK, a11y 0/0/0, Lighthouse fallback 100/100/100 sur 4 pages x2, pipeline drift/freshness OK.
+- Captures: 12 avant + 12 après dans captures/ux-overhaul-v37.015-before/ et captures/ux-overhaul-v37.016/.
+

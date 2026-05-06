@@ -133,7 +133,8 @@
 <link rel="alternate" type="application/rss+xml" href="feed.xml" title="Paris-Sportif — Top picks du jour (RSS)">
 <!-- v35.324 — CSS chargé sans handler inline pour préparer CSP strict. -->
 <link rel="stylesheet" href="app.css?v=e464318c">
-<link rel="stylesheet" href="print.css?v=313105b5" media="print">
+<link rel="stylesheet" href="app-design-v3.css?v=2650e92e">
+<link rel="stylesheet" href="print.css?v=8bb11566" media="print">
 <style id="v36-mobile-compact-cards">
 @media (max-width:720px) {
   body.agent-home main#main-content { padding: 10px 10px 96px !important; }
@@ -558,7 +559,7 @@
      n'est chargé QU'APRÈS consentement explicite (cf. _maybeEnableAnalytics).
      Pas de tracking par défaut. -->
 <script src="analytics.config.js" defer></script>
-<noscript><link rel="stylesheet" href="app.css?v=e464318c"></noscript>
+<noscript><link rel="stylesheet" href="app.css?v=e464318c"><link rel="stylesheet" href="app-design-v3.css?v=2650e92e"></noscript>
 <script>
   // v22 — Init theme / contrast / reader BEFORE body render (évite le flash)
   (function() {
@@ -585,12 +586,12 @@
       var dyslexic = prefs.dyslexic || 'off';
       var nightFilter = prefs.nightFilter || 'off';
       var root = document.documentElement;
-      // theme = 'auto' → résoudre via prefers-color-scheme avant render
-      var effectiveTheme = theme;
-      if (theme === 'auto' && window.matchMedia) {
+      // theme = 'auto'/'system' → résoudre via prefers-color-scheme avant render
+      var effectiveTheme = theme === 'system' ? 'auto' : theme;
+      if (effectiveTheme === 'auto' && window.matchMedia) {
         effectiveTheme = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
       }
-      if (effectiveTheme === 'light') root.setAttribute('data-theme', 'light');
+      if (effectiveTheme && effectiveTheme !== 'dark') root.setAttribute('data-theme', effectiveTheme);
       if (contrast === 'high') root.setAttribute('data-contrast', 'high');
       if (reader === 'on') root.setAttribute('data-reader', 'on');
       if (fontScale === 'large' || fontScale === 'xl') root.setAttribute('data-font-scale', fontScale);
@@ -620,7 +621,7 @@
   // pour debug console. AUCUN envoi réseau — l'utilisateur peut consulter
   // ou exporter ses données, et c'est tout.
   //
-  // Pourquoi inline pré-app.js?v=5f66ec12 ? Il faut s'enregistrer AVANT le LCP/FCP
+  // Pourquoi inline pré-app.js?v=3d651e42 ? Il faut s'enregistrer AVANT le LCP/FCP
   // pour les capter. Le bundle web-vitals officiel pèse 5 KB ; ici on
   // tombe à ~1.5 KB grâce à l'usage direct de PerformanceObserver.
   //
@@ -1078,7 +1079,7 @@
       <div class="footer-brand">
         <span class="footer-logo">🎯</span>
         <span class="footer-text">Paris-Sportif</span>
-        <span class="footer-version" id="footer-version" role="button" tabindex="0" style="cursor:pointer;" title="Voir les nouveautés v37.015">v37.015</span>
+        <span class="footer-version" id="footer-version" role="button" tabindex="0" style="cursor:pointer;" title="Voir les nouveautés v37.016">v37.016</span>
       </div>
       <nav class="footer-links" aria-label="Liens du site">
         <a href="https://github.com/Harotensnor/paris-sportif" target="_blank" rel="noopener" class="footer-link" title="Code source sur GitHub">
@@ -1199,7 +1200,7 @@
 <script src="backtest_deep_v5.js?v=be7d058e"></script>
 <script src="adversarial_validation.js?v=c1aaf593"></script>
 <script src="sports_coverage_extended.js?v=1ad353fa"></script>
-<script src="app.js?v=5f66ec12" defer></script>
+<script src="app.js?v=3d651e42" defer></script>
 
 <!-- enhancements v20 -->
 <script src="app-enhancements.js?v=232799b3" defer></script>
