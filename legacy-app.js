@@ -29344,8 +29344,15 @@ function renderPicksHistoryArchivePage(wrap, archive) {
     if (p.result === 'lost') return sum - 1;
     return sum;
   }, 0);
+  // v37.030 — Bumped per-day cap from 120 → 200 after a P0 backlog test
+  // surfaced J-1 silently losing picks (146 archived, 120 rendered → 26
+  // ghosted). 200 covers >95% of historical days; the few mega-days
+  // (>200 picks) get an explicit truncation chip below.
+  const HIST_PICKS_PER_DAY = 200;
   const dayHtml = pastDays.slice(0, 14).map(d => {
-    const picks = (d.picks || []).slice(0, 120);
+    const allPicks = d.picks || [];
+    const picks = allPicks.slice(0, HIST_PICKS_PER_DAY);
+    const truncated = allPicks.length > HIST_PICKS_PER_DAY ? allPicks.length - HIST_PICKS_PER_DAY : 0;
     const settledN = Number(d.won || 0) + Number(d.lost || 0) + Number(d.void || 0);
     const wrDay = (Number(d.won || 0) + Number(d.lost || 0)) ? Math.round((Number(d.won || 0) / (Number(d.won || 0) + Number(d.lost || 0))) * 100) : null;
     const plCol = Number(d.pl_units || 0) > 0 ? 'var(--accent)' : Number(d.pl_units || 0) < 0 ? 'var(--danger)' : 'var(--text-dim)';
@@ -29378,6 +29385,7 @@ function renderPicksHistoryArchivePage(wrap, archive) {
       <div class="hist-day-body">
         <div class="hist-pick-head"><div></div><div>Match</div><div>Marché</div><div>Pick</div><div>Cote</div><div>Proba</div><div>Edge</div><div class="u-text-right">Résultat</div></div>
         ${rows || '<div class="bilan-empty">Aucun pick archivé sur cette journée.</div>'}
+        ${truncated > 0 ? `<div style="padding:10px 14px;text-align:center;font-size:11.5px;color:var(--text-dim2);font-style:italic;">+ ${truncated} pick${truncated > 1 ? 's' : ''} archivé${truncated > 1 ? 's' : ''} non affiché${truncated > 1 ? 's' : ''} (cap d'affichage à ${HIST_PICKS_PER_DAY} par jour)</div>` : ''}
       </div>
     </section>`;
   }).join('');
