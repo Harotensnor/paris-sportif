@@ -14,6 +14,7 @@ on:
       - 'scripts/probe_all_pages.js'
       - 'scripts/probe_tous_modal.js'
       - 'scripts/probe_table_deep.js'
+      - 'scripts/probe_table_combos.js'
       - '.github/workflows/smoke.yml'
   pull_request:
     branches: [main]
@@ -24,6 +25,7 @@ on:
       - 'scripts/probe_all_pages.js'
       - 'scripts/probe_tous_modal.js'
       - 'scripts/probe_table_deep.js'
+      - 'scripts/probe_table_combos.js'
   workflow_dispatch: {}
 
 concurrency:
@@ -70,3 +72,18 @@ jobs:
         # row click opens a modal whose content matches the row, and
         # the search input + sport-filter persistence survive a reload.
         run: node scripts/probe_table_deep.js
+
+      - name: Run combinatorial table probe (preset × sport × sub-tab)
+        # v37.046 — walks every (preset × sport × sub-tab) combo and
+        # asserts rendered count <= badge count for each, with zero
+        # console errors. 72 combos in current schema. Catches drift
+        # between the badge math and what the renderer actually paints.
+        run: node scripts/probe_table_combos.js
+
+      - name: Run modal sports probe (per-sport detail modal)
+        # v37.046 — opens the detail modal on one match per sport in
+        # the current dataset (football, hockey, basketball, baseball,
+        # tennis when available) and clicks every modal tab. Catches
+        # sport-specific render errors (basketball stats panel,
+        # baseball pitcher block) before they ship.
+        run: node scripts/probe_modal_sports.js
