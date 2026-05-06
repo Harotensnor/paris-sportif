@@ -1359,3 +1359,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : activation hash directe pour les routes aliasées, focus explicite du wizard et listener clavier en capture.
 - Verrou : `scripts/smoke_e2e.js` ouvre 15 routes connues, `scripts/probe_onboarding_fresh.js` vérifie toujours les flèches.
 - Résultat : 50/50 pytest, 17 probes navigateur verts, 14 audits statiques verts, smoke sans skip de nav.
+
+## Sprint v37.074 — AUTO 10/10 Corrupt storage resilience (18:47 UTC)
+- Hypothèse : des préférences locales JSON corrompues peuvent casser un retour utilisateur réel après plusieurs semaines.
+- Fix : ajout d'un probe qui empoisonne les clés locales critiques avant boot et parcours Accueil/Tous/Performance/Profil.
+- Verrou : `scripts/probe_corrupt_storage.js` branché dans `smoke.yml`, avec `smoke_e2e.js` ajouté aux triggers PR.
+- Résultat : 50/50 pytest, 18 probes navigateur verts, 14 audits statiques verts, stockage corrompu sans crash.

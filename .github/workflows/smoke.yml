@@ -28,6 +28,7 @@ on:
       - 'scripts/probe_service_worker_cache.js'
       - 'scripts/probe_strategies_outsider.js'
       - 'scripts/probe_prob_calibration_sport.js'
+      - 'scripts/probe_corrupt_storage.js'
       - '.github/workflows/smoke.yml'
   pull_request:
     branches: [main]
@@ -35,6 +36,7 @@ on:
       - 'pronostics.html'
       - 'sw.js'
       - 'legacy-app.js'
+      - 'scripts/smoke_e2e.js'
       - 'scripts/probe_all_pages.js'
       - 'scripts/probe_tous_modal.js'
       - 'scripts/probe_table_deep.js'
@@ -51,6 +53,7 @@ on:
       - 'scripts/probe_service_worker_cache.js'
       - 'scripts/probe_strategies_outsider.js'
       - 'scripts/probe_prob_calibration_sport.js'
+      - 'scripts/probe_corrupt_storage.js'
   workflow_dispatch: {}
 
 concurrency:
@@ -177,3 +180,8 @@ jobs:
         # window._calibrateProb(prob, sport) prefers sport bins only when
         # the sport sample is large enough.
         run: node scripts/probe_prob_calibration_sport.js
+
+      - name: Run corrupt storage resilience probe
+        # Poisons JSON-backed localStorage keys before boot and verifies
+        # the main routes still mount without console errors.
+        run: node scripts/probe_corrupt_storage.js
