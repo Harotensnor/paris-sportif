@@ -2687,7 +2687,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
   }
   try { window.getDataAge = getDataAge; } catch(e){}
 
-  function _displayablePickTier(c) {
+  function _displayablePickTier(c, sport) {
     const odd = Number(c?.odd || 0);
     const rawConf = Number(c?.rel || c?.prob || 0);
     // v37.051 — apply calibration map to the raw model probability before
@@ -2699,7 +2699,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     // loaded yet (cold boot before _loadProbCalibration resolves),
     // falls back to raw conf — preserves backward-compat.
     const conf = (typeof window !== 'undefined' && typeof window._calibrateProb === 'function')
-      ? window._calibrateProb(rawConf)
+      ? window._calibrateProb(rawConf, sport || c?.sport)
       : rawConf;
     const edge = Number.isFinite(Number(c?.edge)) ? Number(c.edge) : (conf && odd ? conf - 1 / odd : 0);
     const ev = Number.isFinite(Number(c?.ev)) ? Number(c.ev) : (conf && odd ? conf * odd - 1 : -1);
@@ -2800,7 +2800,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
           const rawEv = Number.isFinite(Number(c.ev)) ? Number(c.ev) : (rel * odd - 1);
           const edge = Math.max(-0.25, Math.min(0.25, rawEdge));
           const ev = Math.max(-0.25, Math.min(0.35, rawEv));
-          const tier = _displayablePickTier({ ...c, odd, rel, edge, ev });
+          const tier = _displayablePickTier({ ...c, odd, rel, edge, ev }, m.sport);
           if (!tier) continue;
           const quality = (() => {
             try { return qualityScore(m, pred, { ...c, odd, rel, edge }).score || 0; }
@@ -7357,13 +7357,18 @@ return __probCalibrationPromise;
 try { window._loadProbCalibration = _loadProbCalibration; } catch(e){}
 // Runtime helper: map a raw model probability to its empirically-calibrated
 // counterpart using the histogram binning from build_prob_calibration.py.
-// Returns the input unchanged if the map isn't loaded yet or the input is
-// degenerate. Linear interpolation between bin centers smooths the steps.
-function _calibrateProb(p) {
+// Prefer sport-specific bins when sample size is usable, otherwise fall back
+// to the global map. Returns the input unchanged if the map isn't loaded yet.
+function _calibrateProb(p, sport) {
 const num = Number(p);
 if (!Number.isFinite(num) || num <= 0 || num >= 1) return num;
 const rep = window.__probCalibration;
-const bins = rep && Array.isArray(rep.bins) ? rep.bins : null;
+const sportKey = String(sport || '').toLowerCase();
+const sportRep = sportKey && rep && rep.bins_by_sport && rep.bins_by_sport[sportKey];
+const sportBins = sportRep && Number(sportRep.n_settled || 0) >= 30 && Array.isArray(sportRep.bins)
+  ? sportRep.bins
+  : null;
+const bins = sportBins || (rep && Array.isArray(rep.bins) ? rep.bins : null);
 if (!bins || !bins.length) return num;
 // Find the bin containing num.
 const idx = Math.min(bins.length - 1, Math.max(0, Math.floor(num * bins.length)));
@@ -29375,6 +29380,7 @@ const pc = window.__probCalibration;
 if (!pc || !Array.isArray(pc.bins) || !pc.n_settled) return '';
 const bins = pc.bins.filter(b => b.n > 0);
 if (!bins.length) return '';
+const sportCalKeys = pc.bins_by_sport && typeof pc.bins_by_sport === 'object' ? Object.keys(pc.bins_by_sport).sort() : [];
 const W = 600, H = 130, PAD = 24;
 const barW = (W - 2 * PAD) / pc.n_bins;
 const barFor = (b) => {
@@ -29396,7 +29402,7 @@ const brierColor = brierDelta > 0.005 ? 'var(--accent)' : brierDelta < -0.005 ? 
 return `
 <div style="margin-top:14px;padding:14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
 <div style="font-size:13px;color:var(--text-dim);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-<span><b class="u-text">📐 Carte de calibration des probabilités</b> · ${pc.n_settled} paris</span>
+<span><b class="u-text">📐 Carte de calibration des probabilités</b> · ${pc.n_settled} paris${sportCalKeys.length ? ` · sports ${sportCalKeys.map(k => esc(k)).join(', ')}` : ''}</span>
 <span style="font-size:11.5px;color:var(--text-dim2);">Brier score : <b class="u-text">${Number(pc.brier_raw||0).toFixed(3)}</b> → calibré <b style="color:${brierColor};">${Number(pc.brier_calibrated||0).toFixed(3)}</b> (Δ ${brierDelta >= 0 ? '+' : ''}${brierDelta.toFixed(3)})</span>
 </div>
 <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:130px;display:block;">

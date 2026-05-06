@@ -18,7 +18,8 @@ prior, equivalent to Laplace add-one). Each bin reports:
   - smoothed win rate (Bayesian estimate, more robust on low-n bins)
   - calibration_factor (smoothed_wr / mean_pred, capped to [0.5, 1.5])
 
-Output: `prob_calibration.json` with bins + Brier score before/after.
+Output: `prob_calibration.json` with global bins, sport-specific bins and
+Brier score before/after.
 
 The runtime helper interpolates linearly between bin centers. We do
 NOT yet apply the correction inside predictMatch — that's a separate
@@ -66,8 +67,8 @@ def _num(v):
     return x
 
 
-def load_settled() -> list[tuple[float, int]]:
-    """Return [(prob_model, outcome_int)] for won/lost picks. Voids skipped.
+def load_settled_records() -> list[dict]:
+    """Return won/lost picks with prob, outcome and sport. Voids skipped.
 
     Filters obviously-corrupt rows from older versions of picks_history_lib.py
     that wrote prob_model=0.999 on long-shot outsiders (odd > 10). A real
@@ -77,7 +78,7 @@ def load_settled() -> list[tuple[float, int]]:
     polluted with 44 outsider rows that drag the calibration map's
     factor down for legitimate 90%+ predictions.
     """
-    rows: list[tuple[float, int]] = []
+    rows: list[dict] = []
     skipped_corrupt = 0
     if not HISTORY.exists():
         return rows
@@ -101,13 +102,21 @@ def load_settled() -> list[tuple[float, int]]:
         if prob >= 0.95 and odd is not None and odd > 10:
             skipped_corrupt += 1
             continue
-        rows.append((prob, 1 if result == "won" else 0))
+        rows.append({
+            "prob": prob,
+            "outcome": 1 if result == "won" else 0,
+            "sport": str(p.get("sport") or "unknown").lower(),
+        })
     if skipped_corrupt:
         print(
             f"[prob_calibration] skipped {skipped_corrupt} corrupt rows "
             f"(prob>=0.95 at odd>10 — historical artifact)"
         )
     return rows
+
+
+def load_settled() -> list[tuple[float, int]]:
+    return [(r["prob"], r["outcome"]) for r in load_settled_records()]
 
 
 def bin_index(prob: float) -> int:
@@ -174,33 +183,59 @@ def brier_score(rows: list[tuple[float, int]], bins: list[dict] | None = None) -
     return total / len(rows)
 
 
-def main() -> int:
-    rows = load_settled()
-    if not rows:
-        print("[prob_calibration] no settled picks", file=sys.stderr)
-        return 1
+def build_group_report(rows: list[tuple[float, int]]) -> dict:
     bins = build_bins(rows)
     brier_raw = brier_score(rows)
     brier_calibrated = brier_score(rows, bins)
-    payload = {
-        "generated_at": _now_iso(),
-        "schema": "paris-sportif.prob_calibration.v1",
+    return {
         "n_settled": len(rows),
-        "n_bins": N_BINS,
         "bins": bins,
         "brier_raw": round(brier_raw, 6),
         "brier_calibrated": round(brier_calibrated, 6),
         "brier_delta": round(brier_raw - brier_calibrated, 6),
+    }
+
+
+def build_bins_by_sport(records: list[dict]) -> dict[str, dict]:
+    grouped: dict[str, list[tuple[float, int]]] = {}
+    for row in records:
+        sport = str(row.get("sport") or "unknown").lower()
+        grouped.setdefault(sport, []).append((row["prob"], row["outcome"]))
+    return {
+        sport: build_group_report(rows)
+        for sport, rows in sorted(grouped.items())
+    }
+
+
+def main() -> int:
+    records = load_settled_records()
+    rows = [(r["prob"], r["outcome"]) for r in records]
+    if not rows:
+        print("[prob_calibration] no settled picks", file=sys.stderr)
+        return 1
+    global_report = build_group_report(rows)
+    by_sport = build_bins_by_sport(records)
+    payload = {
+        "generated_at": _now_iso(),
+        "schema": "paris-sportif.prob_calibration.v2",
+        "n_settled": len(rows),
+        "n_bins": N_BINS,
+        "bins": global_report["bins"],
+        "bins_by_sport": by_sport,
+        "brier_raw": global_report["brier_raw"],
+        "brier_calibrated": global_report["brier_calibrated"],
+        "brier_delta": global_report["brier_delta"],
         # Negative delta means calibration HURT; positive means it helped.
-        "applies_at_runtime": False,  # Helper exposed but not yet plumbed into predictMatch.
+        "applies_at_runtime": True,
     }
     OUT.write_text(json.dumps(payload, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     print(f"[prob_calibration] wrote {OUT.name} (n={len(rows)}, bins={N_BINS})")
-    print(f"  Brier raw         : {brier_raw:.4f}")
-    print(f"  Brier calibrated  : {brier_calibrated:.4f}")
-    print(f"  Δ (improvement)   : {brier_raw - brier_calibrated:+.4f}")
-    print(f"  Bin map (predicted → empirical):")
-    for b in bins:
+    print(f"  Brier raw         : {global_report['brier_raw']:.4f}")
+    print(f"  Brier calibrated  : {global_report['brier_calibrated']:.4f}")
+    print(f"  Delta improvement : {global_report['brier_delta']:+.4f}")
+    print(f"  Sports calibrated : {', '.join(sorted(by_sport))}")
+    print(f"  Bin map (predicted -> empirical):")
+    for b in global_report["bins"]:
         if b["n"] == 0:
             print(f"    [{b['lower']:.1f}, {b['upper']:.1f})  empty")
             continue

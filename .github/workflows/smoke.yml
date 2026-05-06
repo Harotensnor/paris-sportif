@@ -19,6 +19,7 @@ on:
       - 'scripts/probe_modal_sports.js'
       - 'scripts/probe_nav_chain.js'
       - 'scripts/probe_strategies_outsider.js'
+      - 'scripts/probe_prob_calibration_sport.js'
       - '.github/workflows/smoke.yml'
   pull_request:
     branches: [main]
@@ -33,6 +34,7 @@ on:
       - 'scripts/probe_modal_sports.js'
       - 'scripts/probe_nav_chain.js'
       - 'scripts/probe_strategies_outsider.js'
+      - 'scripts/probe_prob_calibration_sport.js'
   workflow_dispatch: {}
 
 concurrency:
@@ -108,3 +110,9 @@ jobs:
         # from backtest_strategies.json so the high-ROI out tier cannot
         # disappear silently from the UI.
         run: node scripts/probe_strategies_outsider.js
+
+      - name: Run sport probability calibration probe
+        # Verifies prob_calibration.json exposes bins_by_sport and that
+        # window._calibrateProb(prob, sport) prefers sport bins only when
+        # the sport sample is large enough.
+        run: node scripts/probe_prob_calibration_sport.js

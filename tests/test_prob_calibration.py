@@ -73,6 +73,25 @@ def test_brier_improves_when_calibration_helps():
     assert cal < raw
 
 
+def test_build_bins_by_sport_keeps_independent_maps():
+    records = (
+        [{"sport": "football", "prob": 0.70, "outcome": 1}] * 20
+        + [{"sport": "football", "prob": 0.70, "outcome": 0}] * 80
+        + [{"sport": "baseball", "prob": 0.70, "outcome": 1}] * 80
+        + [{"sport": "baseball", "prob": 0.70, "outcome": 0}] * 20
+    )
+
+    by_sport = bpc.build_bins_by_sport(records)
+
+    assert set(by_sport) == {"baseball", "football"}
+    football_factor = by_sport["football"]["bins"][7]["calibration_factor"]
+    baseball_factor = by_sport["baseball"]["bins"][7]["calibration_factor"]
+    assert football_factor < 0.5 + 0.05
+    assert baseball_factor > 1.0
+    assert by_sport["football"]["n_settled"] == 100
+    assert by_sport["baseball"]["n_settled"] == 100
+
+
 def test_empty_bin_factor_defaults_to_one():
     # No data in a bin → factor 1.0 (no correction applied at runtime).
     rows = [(0.55, 1)] * 10
