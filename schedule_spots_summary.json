@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-05-06T19:54:47Z",
+  "generated_at": "2026-05-06T19:57:06Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 63,
+    "active_events": 62,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 92,
       "travel_extreme": 15,
       "back_to_back_travel": 23,
+      "lookahead": 91,
       "schedule_congestion": 44
     },
     "by_decision": {
       "abstain": 32,
-      "lean_home": 27,
+      "lean_home": 26,
       "lean_away": 4
     },
-    "lean_home": 27,
+    "lean_home": 26,
     "lean_away": 4,
     "abstain": 32,
     "monitor": 0
@@ -726,10 +726,10 @@
       }
     },
     {
-      "event_id": "sofa_15501357",
+      "event_id": "401815229",
       "source_event_ids": [
-        "sofa_15501357",
-        "401815229"
+        "401815229",
+        "sofa_15501357"
       ],
       "kickoff": "2026-05-06T22:40Z",
       "sport": "baseball",
@@ -758,10 +758,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.098,
-        "away_score": -0.098,
+        "away_score": 0.848,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Athletics (-0.10)",
+        "reason": "Direction nette: Athletics (+0.85)",
         "detail": [
           {
             "side": "home",
@@ -774,6 +774,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.945
           }
         ]
       }
@@ -895,10 +901,10 @@
       }
     },
     {
-      "event_id": "sofa_15496115",
+      "event_id": "401815235",
       "source_event_ids": [
-        "sofa_15496115",
-        "401815235"
+        "401815235",
+        "sofa_15496115"
       ],
       "kickoff": "2026-05-06T23:40Z",
       "sport": "baseball",
@@ -926,11 +932,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
+        "home_score": -0.498,
+        "away_score": 0.043,
+        "home_fade": 0.55,
         "away_fade": 0.15,
-        "reason": "Direction nette: Cincinnati Reds (-0.10)",
+        "reason": "Direction nette: Cincinnati Reds (+0.04)",
         "detail": [
           {
             "side": "home",
@@ -943,6 +949,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
           }
         ]
       }
@@ -2565,8 +2577,8 @@
     {
       "event_id": "401815233",
       "source_event_ids": [
-        "sofa_15501355",
-        "401815233"
+        "401815233",
+        "sofa_15501355"
       ],
       "kickoff": "2026-05-06T23:05Z",
       "sport": "baseball",
@@ -2950,10 +2962,10 @@
       }
     },
     {
-      "event_id": "sofa_15501356",
+      "event_id": "401815230",
       "source_event_ids": [
-        "sofa_15501356",
-        "401815230"
+        "401815230",
+        "sofa_15501356"
       ],
       "kickoff": "2026-05-06T22:40Z",
       "sport": "baseball",
@@ -2983,11 +2995,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.196,
-        "away_score": -0.935,
+        "home_score": 0.546,
+        "away_score": -1.935,
         "home_fade": 0.15,
-        "away_fade": 0.988,
-        "reason": "Direction nette: Miami Marlins (+0.20)",
+        "away_fade": 1.988,
+        "reason": "Direction nette: Miami Marlins (+0.55)",
         "detail": [
           {
             "side": "home",
@@ -3003,6 +3015,12 @@
           },
           {
             "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.838
@@ -3013,8 +3031,8 @@
     {
       "event_id": "401815236",
       "source_event_ids": [
-        "sofa_15501352",
-        "401815236"
+        "401815236",
+        "sofa_15501352"
       ],
       "kickoff": "2026-05-06T23:40Z",
       "sport": "baseball",
@@ -3080,8 +3098,8 @@
     {
       "event_id": "401815232",
       "source_event_ids": [
-        "sofa_15501358",
-        "401815232"
+        "401815232",
+        "sofa_15501358"
       ],
       "kickoff": "2026-05-06T22:45Z",
       "sport": "baseball",
@@ -3111,7 +3129,7 @@
       "global_resolution": {
         "status": "abstain",
         "net_side": null,
-        "home_score": -0.407,
+        "home_score": 0.108,
         "away_score": -0.718,
         "home_fade": 0.75,
         "away_fade": 0.981,
@@ -3134,6 +3152,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.515
           },
           {
             "side": "away",
@@ -3416,57 +3440,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.726
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815243",
-      "source_event_ids": [
-        "401815243"
-      ],
-      "kickoff": "2026-05-06T19:45Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "San Diego Padres",
-      "match": "San Francisco Giants - San Diego Padres",
-      "decision": "lean_home",
-      "net_team": "San Francisco Giants",
-      "reason": "San Diego Padres plus penalise par calendrier/voyage (0.30 vs 0.00)",
-      "pressure_score": 0.667,
-      "home_fade": 0.0,
-      "away_fade": 0.3,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 1
-      },
-      "contexts": [
-        "2 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.495,
-        "away_score": -0.09,
-        "home_fade": 0.6,
-        "away_fade": 0.3,
-        "reason": "Direction nette: San Diego Padres (-0.09)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
           }
         ]
       }
