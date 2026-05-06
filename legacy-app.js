@@ -33382,8 +33382,12 @@ ses paris sur le site (ni manuel, ni import). -->
     let prefs = {};
     try { prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}'); } catch(e){}
     if (prefs.consentLocalStorage !== 'accepted') return;
+    // v37.038 — set type explicitly so Chromium does not log
+    // "The script does not have a MIME type" for the dynamic injection.
+    // Default behaviour (treat as JS) is unchanged.
     if (window.ANALYTICS_PLAUSIBLE_DOMAIN) {
       const s = document.createElement('script');
+      s.type = 'text/javascript';
       s.defer = true;
       s.dataset.domain = window.ANALYTICS_PLAUSIBLE_DOMAIN;
       s.src = 'https://plausible.io/js/script.js';
@@ -33391,6 +33395,7 @@ ses paris sur le site (ni manuel, ni import). -->
       _analyticsLoaded = true;
     } else if (window.ANALYTICS_CLOUDFLARE_TOKEN) {
       const s = document.createElement('script');
+      s.type = 'text/javascript';
       s.defer = true;
       s.src = 'https://static.cloudflareinsights.com/beacon.min.js';
       s.dataset.cfBeacon = JSON.stringify({ token: window.ANALYTICS_CLOUDFLARE_TOKEN });

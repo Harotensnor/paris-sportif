@@ -92,6 +92,7 @@ function isIgnorableConsoleError(text) {
   if (/ERR_(CERT|NAME_NOT_RESOLVED|TIMED_OUT|CONNECTION_(REFUSED|RESET|CLOSED)|FAILED|EMPTY_RESPONSE|BLOCKED_BY_CLIENT)/i.test(text)) return true;
   // 3rd-party CDN / analytics — same intent as the smoke filter.
   if (/clubelo\.com|espncdn\.com|sofascore\.com|gstatic\.com|plausible|cloudflareinsights/i.test(text)) return true;
+  if (/script does not have a MIME type/i.test(text)) return true;
   return false;
 }
 

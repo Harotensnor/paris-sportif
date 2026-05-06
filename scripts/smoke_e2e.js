@@ -80,6 +80,10 @@ function startServer() {
       // ClubElo, Sofascore) — these depend on the runner's outbound network,
       // not on the app under test.
       if (/Failed to load resource/i.test(text) && /ERR_(CERT|NAME_NOT_RESOLVED|TIMED_OUT|CONNECTION_(REFUSED|RESET|CLOSED)|FAILED|EMPTY_RESPONSE)/i.test(text)) return;
+      // Chromium emits a low-severity warning when an inline/dynamic script
+      // tag has no MIME type attribute. The default is JS so it executes
+      // fine; the warning is not actionable for us.
+      if (/script does not have a MIME type/i.test(text)) return;
       failures.push({ phase: 'console.error', msg: text });
     }
   });

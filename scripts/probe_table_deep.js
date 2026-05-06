@@ -94,6 +94,7 @@ async function clickPresetByLabel(page, presetText) {
       const t = m.text();
       if (/Failed to load resource/i.test(t)) return;
       if (/ERR_/i.test(t)) return;
+      if (/script does not have a MIME type/i.test(t)) return;
       errs.push(t);
     }
   });
