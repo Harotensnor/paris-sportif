@@ -32,7 +32,7 @@ Cette passe met en place une pyramide QA exploitable sans changer le produit : u
 | Mutation smoke | 100% |
 | Snapshots | OK |
 | Load 1000 picks | OK, FPS 60 |
-| Data contracts | OK, 1018 events, 21.2% Winamax |
+| Data contracts | OK, 263 events, 100.0% Winamax |
 | Data integrity | OK |
 | Pipeline drift | OK |
 | Bundle budget | OK |
@@ -61,7 +61,7 @@ Cette passe met en place une pyramide QA exploitable sans changer le produit : u
 ## Notes d'environnement
 
 - Playwright/npm ne sont pas disponibles sur ce poste local, donc la visual regression locale est marquée `skipped`. Le workflow CI installe Playwright et exécute Chromium / Firefox / WebKit.
-- `check_pipeline_freshness.py` reste en warning local : le snapshot main est stale, mais un refresh local complet réduit la couverture events de 1018 à 240. Ce point est déjà en P0 dans `BACKLOG.md`; la passe QA ne commit pas de data régressée.
+- `check_pipeline_freshness.py` repasse OK après v37.023 : le garde-fou d'intégrité compare maintenant les événements Winamax exacts avant le total brut, afin de ne pas rejeter un nettoyage de watchlist non bookable.
 - Le rollback automatique est câblé mais protégé par la variable repo `QA_AUTO_ROLLBACK=1` pour éviter les boucles de revert sur incident réseau transitoire.
 
 ## Matrice
