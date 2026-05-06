@@ -52,7 +52,7 @@ on:
   workflow_dispatch: {}
 
 concurrency:
-  group: qa-gates-${{ github.ref }}-${{ matrix.os }}-${{ matrix.python-version }}
+  group: qa-gates-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:

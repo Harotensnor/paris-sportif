@@ -23,6 +23,9 @@ def main() -> int:
     if not qa:
         findings.append(".github/workflows/qa-gates.yml missing")
     else:
+        header = qa.split("\njobs:", 1)[0]
+        if "${{ matrix." in header:
+            findings.append("qa-gates.yml uses matrix context before jobs are created")
         for needle in (
             "strategy:",
             "matrix:",

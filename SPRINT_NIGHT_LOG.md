@@ -1534,3 +1534,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : le layout `v36-sidebar` desktop est identique entre Accueil, Tous, Performance, Méthode et Profil.
 - Verrou : probe_nav_stability.js compare sidebar desktop et bottom-nav mobile sur les routes principales.
 - Résultat : seule la page active change, la structure globale reste stable sans erreur console.
+
+## Sprint v37.099 — AUTO 10/10 QA workflow boot (21:47 UTC)
+- Hypothèse : qa-gates échouait avant même de créer ses jobs, donc sans logs exploitables.
+- Fix : la concurrency globale n'utilise plus `matrix.*`, indisponible avant l'expansion des jobs.
+- Verrou : audit_qa_workflows.py bloque désormais toute référence matrix dans l'en-tête workflow.
+- Résultat : le workflow QA peut démarrer sa matrice au lieu de tomber en erreur YAML immédiate.
