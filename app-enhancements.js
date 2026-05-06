@@ -6,6 +6,10 @@
 (function(){
   'use strict';
 
+  function reportEnhancementError(context, error){
+    if (typeof window.logSafeError === 'function') window.logSafeError(context, error);
+  }
+
   // ========== Utility : toast (si pas déjà dispo) ==========
   if (!window.__toast){
     window.__toast = function(msg, type){
@@ -181,9 +185,9 @@
         await navigator.clipboard.writeText(shareUrl);
         window.__toast('✅ Lien copié dans le presse-papier', 'success');
         return;
-      } catch (e) { /* fallthrough to prompt */ }
+      } catch (e) { reportEnhancementError('enh clipboard share fallback', e); }
     }
-    try { prompt('Copie ce lien:', shareUrl); } catch (e) { /* sandbox */ }
+    try { prompt('Copie ce lien:', shareUrl); } catch (e) { reportEnhancementError('enh prompt share fallback', e); }
   };
   function restoreShared(){
     var params = new URLSearchParams(window.location.search);
@@ -223,7 +227,7 @@
           if (btn) btn.click();
         }, 500);
       }
-    } catch(e){}
+    } catch(e){ reportEnhancementError('enh restoreShared', e); }
   }
 
   // ========== CHANTIER CCC — Fuzzy score (expose util) ==========
@@ -480,7 +484,7 @@
           var rfrBtn = document.querySelector('[data-force-refresh], #refresh-btn');
           if (rfrBtn) rfrBtn.click();
           if (typeof window.toast === 'function') window.toast('🔄 Actualisation des données…', 'info');
-        } catch(err) {}
+        } catch(err) { reportEnhancementError('enh shortcut refresh', err); }
       }
       else if (e.key === '/'){
         // Focus search input
@@ -561,7 +565,7 @@
     // nouveaux paris trackés) puis on met à jour la visibilité.
     var existing = document.getElementById('__cal-heatmap');
     if (existing) {
-      try { populateCalHeatmapGrid(existing); } catch(_){}
+      try { populateCalHeatmapGrid(existing); } catch(e){ reportEnhancementError('enh heatmap populate', e); }
       updateCalHeatmapVisibility();
       return;
     }
@@ -615,20 +619,20 @@
     try { initOffline(); } catch(e){ console.warn('[enh] offline init failed', e); }
     try { initCommandPalette(); initShortcuts(); injectHintButton(); }
     catch(e){ console.warn('[enh] cmd palette init failed', e); }
-    try { restoreShared(); } catch(e){}
+    try { restoreShared(); } catch(e){ reportEnhancementError('enh restoreShared init', e); }
     // Migration : réparer les anciens paris trackés "? vs ?" (régression v20).
     // On attend 1.2s pour être sûr que PRONOSTICS_DATA soit chargé.
-    setTimeout(function(){ try { repairTrackedBets(); } catch(e){} }, 1200);
+    setTimeout(function(){ try { repairTrackedBets(); } catch(e){ reportEnhancementError('enh repair tracked delayed', e); } }, 1200);
     setTimeout(function(){
       try { renderCalendarHeatmap(); } catch(e){ console.warn('[enh] heatmap failed', e); }
-      try { injectMesParisActions(); } catch(e){}
+      try { injectMesParisActions(); } catch(e){ reportEnhancementError('enh mes paris actions', e); }
     }, 900);
     // Re-check on page changes (hash/clicks on .page-btn)
     document.addEventListener('click', function(e){
       if (e.target && e.target.closest && e.target.closest('.page-btn')){
         setTimeout(function(){
-          try { renderCalendarHeatmap(); } catch(_){}
-          try { injectMesParisActions(); } catch(_){}
+          try { renderCalendarHeatmap(); } catch(e){ reportEnhancementError('enh heatmap nav rerender', e); }
+          try { injectMesParisActions(); } catch(e){ reportEnhancementError('enh mes paris nav rerender', e); }
         }, 250);
       }
     });

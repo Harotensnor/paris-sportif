@@ -85,6 +85,20 @@ async function waitForStep(page, step) {
   );
 }
 
+async function waitForOverlay(page) {
+  await page.waitForFunction(
+    () => {
+      const overlay = document.querySelector('.onboard-overlay[role="dialog"][aria-modal="true"]');
+      if (!overlay) return false;
+      const style = window.getComputedStyle(overlay);
+      const rect = overlay.getBoundingClientRect();
+      return style.visibility !== 'hidden' && style.display !== 'none' && rect.width > 0 && rect.height > 0;
+    },
+    null,
+    { timeout: 5000 }
+  );
+}
+
 async function newFreshPage(browser, port) {
   const ctx = await browser.newContext({ viewport: { width: 1280, height: 820 } });
   await ctx.addInitScript(() => {
@@ -117,7 +131,7 @@ async function newFreshPage(browser, port) {
 
   const completeRun = await newFreshPage(browser, port);
   const startMs = Date.now();
-  await completeRun.page.waitForSelector('.onboard-overlay[role="dialog"]', { timeout: 5000 });
+  await waitForOverlay(completeRun.page);
   const appearMs = Date.now() - startMs;
   const firstStep = await readStep(completeRun.page);
   check('wizard appears quickly for fresh user', appearMs <= 5000, `${appearMs}ms`);
@@ -150,7 +164,7 @@ async function newFreshPage(browser, port) {
   await completeRun.ctx.close();
 
   const skipRun = await newFreshPage(browser, port);
-  await skipRun.page.waitForSelector('.onboard-overlay[role="dialog"]', { timeout: 5000 });
+  await waitForOverlay(skipRun.page);
   await skipRun.page.click('[data-skip="1"]');
   await skipRun.page.waitForSelector('.onboard-overlay', { state: 'detached', timeout: 1200 });
   const skippedState = await skipRun.page.evaluate(() => ({

@@ -1341,3 +1341,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : ajout d'un audit dédié sur runtime, scripts QA et service worker.
 - Verrou : `scripts/audit_no_todo_markers.py` branché dans le groupe drift statique.
 - Résultat : 50/50 pytest, 17 probes navigateur verts, 12 audits statiques verts, aucun marqueur bloqué.
+
+## Sprint v37.071 — AUTO 10/10 Empty catch modules (18:17 UTC)
+- Hypothèse : les modules extraits peuvent masquer des erreurs UX réelles avec des `catch` silencieux.
+- Fix : routage des erreurs de partage, onboarding docs, web vitals, backups et privacy vers `logSafeError`.
+- Verrou : `scripts/audit_no_empty_catch_modules.py` branché dans le groupe drift statique.
+- Résultat : 50/50 pytest, 17 probes navigateur verts (probe onboarding durci), 13 audits statiques verts.
