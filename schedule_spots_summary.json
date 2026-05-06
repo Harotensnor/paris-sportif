@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-05-06T17:17:19Z",
+  "generated_at": "2026-05-06T17:23:04Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 60,
+    "active_events": 59,
     "expired_sample": 0,
     "by_type": {
-      "back_to_back_travel": 23,
       "travel_extreme": 12,
+      "back_to_back_travel": 22,
       "lookahead": 84,
       "schedule_congestion": 33
     },
     "by_decision": {
       "abstain": 29,
-      "lean_home": 26,
+      "lean_home": 25,
       "lean_away": 5
     },
-    "lean_home": 26,
+    "lean_home": 25,
     "lean_away": 5,
     "abstain": 29,
     "monitor": 0
@@ -319,11 +319,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.595,
-        "away_score": -0.055,
-        "home_fade": 0.7,
+        "home_score": -1.595,
+        "away_score": 1.221,
+        "home_fade": 1.7,
         "away_fade": 0.3,
-        "reason": "Direction nette: Tampa Bay Rays (-0.06)",
+        "reason": "Direction nette: Tampa Bay Rays (+1.22)",
         "detail": [
           {
             "side": "home",
@@ -342,6 +342,18 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.926
           }
         ]
       }
@@ -665,10 +677,10 @@
       }
     },
     {
-      "event_id": "401815229",
+      "event_id": "sofa_15501357",
       "source_event_ids": [
-        "401815229",
-        "sofa_15501357"
+        "sofa_15501357",
+        "401815229"
       ],
       "kickoff": "2026-05-06T22:40Z",
       "sport": "baseball",
@@ -782,10 +794,10 @@
       }
     },
     {
-      "event_id": "401815235",
+      "event_id": "sofa_15496115",
       "source_event_ids": [
-        "401815235",
-        "sofa_15496115"
+        "sofa_15496115",
+        "401815235"
       ],
       "kickoff": "2026-05-06T23:40Z",
       "sport": "baseball",
@@ -813,11 +825,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.498,
-        "away_score": 0.043,
-        "home_fade": 0.55,
+        "home_score": -0.098,
+        "away_score": -0.098,
+        "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Cincinnati Reds (+0.04)",
+        "reason": "Direction nette: Cincinnati Reds (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -830,12 +842,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
           }
         ]
       }
@@ -2077,8 +2083,8 @@
     {
       "event_id": "401815233",
       "source_event_ids": [
-        "401815233",
-        "sofa_15501355"
+        "sofa_15501355",
+        "401815233"
       ],
       "kickoff": "2026-05-06T23:05Z",
       "sport": "baseball",
@@ -2492,13 +2498,13 @@
         "1 match dans les 48h + 1789 km de voyage"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.187,
-        "away_score": -0.845,
-        "home_fade": 0.55,
+        "status": "mixed",
+        "net_side": null,
+        "home_score": -1.187,
+        "away_score": 0.431,
+        "home_fade": 1.55,
         "away_fade": 1.038,
-        "reason": "Direction nette: Toronto Blue Jays (-0.19)",
+        "reason": "Signaux mitigés: avantage net trop faible (Toronto Blue Jays -1.19, Tampa Bay Rays +0.43)",
         "detail": [
           {
             "side": "home",
@@ -2519,6 +2525,18 @@
             "strength": 0.4
           },
           {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.926
+          },
+          {
             "side": "away",
             "type": "back_to_back_travel",
             "direction": "fade",
@@ -2528,10 +2546,10 @@
       }
     },
     {
-      "event_id": "401815230",
+      "event_id": "sofa_15501356",
       "source_event_ids": [
-        "401815230",
-        "sofa_15501356"
+        "sofa_15501356",
+        "401815230"
       ],
       "kickoff": "2026-05-06T22:40Z",
       "sport": "baseball",
@@ -2561,11 +2579,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.546,
-        "away_score": -1.935,
+        "home_score": 0.196,
+        "away_score": -0.935,
         "home_fade": 0.15,
-        "away_fade": 1.988,
-        "reason": "Direction nette: Miami Marlins (+0.55)",
+        "away_fade": 0.988,
+        "reason": "Direction nette: Miami Marlins (+0.20)",
         "detail": [
           {
             "side": "home",
@@ -2581,12 +2599,6 @@
           },
           {
             "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.838
@@ -2597,8 +2609,8 @@
     {
       "event_id": "401815236",
       "source_event_ids": [
-        "401815236",
-        "sofa_15501352"
+        "sofa_15501352",
+        "401815236"
       ],
       "kickoff": "2026-05-06T23:40Z",
       "sport": "baseball",
@@ -2664,8 +2676,8 @@
     {
       "event_id": "401815232",
       "source_event_ids": [
-        "401815232",
-        "sofa_15501358"
+        "sofa_15501358",
+        "401815232"
       ],
       "kickoff": "2026-05-06T22:45Z",
       "sport": "baseball",
@@ -2968,57 +2980,6 @@
       }
     },
     {
-      "event_id": "401815234",
-      "source_event_ids": [
-        "401815234"
-      ],
-      "kickoff": "2026-05-06T17:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Tampa Bay Rays",
-      "away": "Toronto Blue Jays",
-      "match": "Tampa Bay Rays - Toronto Blue Jays",
-      "decision": "lean_home",
-      "net_team": "Tampa Bay Rays",
-      "reason": "Toronto Blue Jays plus penalise par calendrier/voyage (0.97 vs 0.00)",
-      "pressure_score": 0.968,
-      "home_fade": 0.0,
-      "away_fade": 0.968,
-      "travel_score": 0.968,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "2 match dans les 48h + 1789 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.479,
-        "away_score": -1.368,
-        "home_fade": 0.0,
-        "away_fade": 1.368,
-        "reason": "Direction nette: Tampa Bay Rays (+0.48)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.968
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815325",
       "source_event_ids": [
         "401815325"
@@ -3046,19 +3007,31 @@
         "2 match dans les 48h + 1789 km de voyage"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.061,
-        "away_score": -0.828,
-        "home_fade": 0.4,
+        "status": "mixed",
+        "net_side": null,
+        "home_score": -1.061,
+        "away_score": 0.448,
+        "home_fade": 1.4,
         "away_fade": 0.968,
-        "reason": "Direction nette: Toronto Blue Jays (-0.06)",
+        "reason": "Signaux mitigés: avantage net trop faible (Toronto Blue Jays -1.06, Tampa Bay Rays +0.45)",
         "detail": [
           {
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.926
           },
           {
             "side": "away",
@@ -3235,22 +3208,16 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.15,
-        "away_score": 0.698,
+        "away_score": 0.052,
         "home_fade": 0.15,
         "away_fade": 0.0,
-        "reason": "Direction nette: Paris Saint-Germain (+0.70)",
+        "reason": "Direction nette: Paris Saint-Germain (+0.05)",
         "detail": [
           {
             "side": "home",
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.646
           }
         ]
       }
