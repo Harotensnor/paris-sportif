@@ -14,7 +14,7 @@
 
   function ready() {
     window.PS_APP_SHELL = {
-      version: 'v37.021',
+      version: 'v37.031',
       startedAt,
       readyAt: performance.now(),
       bootMs: Math.round(performance.now() - startedAt),

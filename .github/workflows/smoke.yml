@@ -11,12 +11,17 @@ on:
       - 'pronostics.html'
       - 'sw.js'
       - 'scripts/smoke_e2e.js'
+      - 'scripts/probe_all_pages.js'
+      - 'scripts/probe_tous_modal.js'
       - '.github/workflows/smoke.yml'
   pull_request:
     branches: [main]
     paths:
       - 'pronostics.html'
       - 'sw.js'
+      - 'legacy-app.js'
+      - 'scripts/probe_all_pages.js'
+      - 'scripts/probe_tous_modal.js'
   workflow_dispatch: {}
 
 concurrency:
@@ -44,3 +49,13 @@ jobs:
 
       - name: Run smoke
         run: node scripts/smoke_e2e.js
+
+      - name: Run page probe (every route, desktop + mobile)
+        # v37.031 — visits 17 routes × 2 viewports + 7 perf sub-tabs.
+        # Asserts no JS errors, no overflow, content actually mounted.
+        run: node scripts/probe_all_pages.js
+
+      - name: Run modal/helpers probe
+        # v37.031 — drills the Tous filter pipeline, the detail modal +
+        # its 6 tabs, and the public window.* helper surface.
+        run: node scripts/probe_tous_modal.js

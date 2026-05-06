@@ -15922,6 +15922,13 @@ if (ind) ind.classList.remove('refreshing');
 try {
 window.pollData = pollData;
 window.predictMatch = predictMatch;
+// v37.031 — expose pure utility helpers that downstream code (tests,
+// probes, console debugging) was already reaching for via __testAPI.
+// Public-facing window names match the convention used by predictMatch
+// / evaluateModelPick / qualityScore. Both functions are referentially
+// transparent — no risk in surfacing them.
+if (typeof kellyFraction === 'function') window.kellyFraction = kellyFraction;
+if (typeof getMatchOdds === 'function') window.getMatchOdds = getMatchOdds;
 } catch(e){}
 
 try {
