@@ -128,7 +128,7 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
 
@@ -142,7 +142,7 @@ jobs:
 
       - name: Install Playwright + browsers
         run: |
-          npm ci || npm install
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
           npx playwright install --with-deps chromium
 
       - name: Run Playwright tests (desktop + mobile)

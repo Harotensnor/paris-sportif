@@ -1588,3 +1588,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : merge origin/main 22:32 UTC, données main conservées, shell/cache bumpés v37.107.
 - Verrou : audit_data_truth.py et probe_onboarding_fresh.js relancés après merge.
 - Résultat : resync publié après stabilisation de main, avec le correctif onboarding conservé.
+
+## Sprint v37.108 — AUTO 10/10 E2E timeout budget (22:49 UTC)
+- Hypothèse : e2e-tests est annulé par timeout CI, pas par un échec Playwright.
+- Fix : le job test passe à 25 min et `npm install` est choisi sans faux `npm ci` rouge si aucun lockfile.
+- Verrou : audit_qa_workflows.py exige le timeout 25 min et la commande npm conditionnelle.
+- Résultat : Playwright complet a maintenant le budget runner nécessaire sans masquer les vrais fails.

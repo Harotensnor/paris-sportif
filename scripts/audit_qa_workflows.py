@@ -20,6 +20,7 @@ def main() -> int:
     synthetic = _text("synthetic-monitor.yml")
     post = _text("post-deploy-health.yml")
     backtest = _text("backtest-pr.yml")
+    e2e = _text("e2e.yml")
 
     if not qa:
         findings.append(".github/workflows/qa-gates.yml missing")
@@ -87,6 +88,17 @@ def main() -> int:
         ):
             if needle not in backtest:
                 findings.append(f"backtest-pr.yml missing {needle}")
+
+    if not e2e:
+        findings.append(".github/workflows/e2e.yml missing")
+    else:
+        for needle in (
+            "timeout-minutes: 25",
+            "if [ -f package-lock.json ]; then npm ci; else npm install; fi",
+            "npx playwright test --project=chromium-desktop --project=mobile-chromium",
+        ):
+            if needle not in e2e:
+                findings.append(f"e2e.yml missing {needle}")
 
     if findings:
         print("[qa-workflows] FAIL")
