@@ -1,29 +1,46 @@
 {
-  "generated_at": "2026-05-06T16:59:00Z",
+  "generated_at": "2026-05-06T17:03:08Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 92,
-    "actionable": 27,
+    "active_events": 93,
+    "actionable": 25,
     "watch": 5,
-    "risk": 60,
+    "risk": 63,
     "expired_sample": 0,
     "by_type": {
       "back_to_back_travel": 22,
       "injury_imbalance": 20,
-      "market_uncertain": 53,
+      "market_uncertain": 54,
       "travel_extreme": 8,
-      "signal_conflict": 12,
-      "market_move": 5
+      "signal_conflict": 11
     },
     "by_quality": {
-      "actionable": 27,
-      "risk": 60,
+      "actionable": 25,
+      "risk": 63,
       "watch": 5
     }
   },
   "active_actionable": [
+    {
+      "event_id": "401815237",
+      "date": "2026-05-06T18:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Houston Astros",
+      "away": "Los Angeles Dodgers",
+      "match": "Houston Astros - Los Angeles Dodgers",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Los Angeles Dodgers",
+      "side": "away",
+      "strength": 1.0,
+      "context": "2 match dans les 48h + 2208 km de voyage"
+    },
     {
       "event_id": "401815240",
       "date": "2026-05-06T20:10Z",
@@ -40,7 +57,7 @@
       "team": "Atlanta Braves",
       "side": "away",
       "strength": 1.0,
-      "context": "1 match dans les 48h + 3490 km de voyage"
+      "context": "2 match dans les 48h + 3490 km de voyage"
     },
     {
       "event_id": "401815230",
@@ -59,24 +76,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 5-11"
-    },
-    {
-      "event_id": "401871404",
-      "date": "2026-05-06T23:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Buffalo Sabres",
-      "away": "Montreal Canadiens",
-      "match": "Buffalo Sabres - Montreal Canadiens",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 1.77 -> 2.20 (-24.4%)"
     },
     {
       "event_id": "401815233",
@@ -113,24 +112,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 6-15"
-    },
-    {
-      "event_id": "401871424",
-      "date": "2026-05-07T01:30Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Vegas Golden Knights",
-      "away": "Anaheim Ducks",
-      "match": "Vegas Golden Knights - Anaheim Ducks",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 1.60 -> 1.98 (-23.6%)"
     },
     {
       "event_id": "401815242",
@@ -223,24 +204,6 @@
       "context": "Absences severes 5-11"
     },
     {
-      "event_id": "401815237",
-      "date": "2026-05-06T18:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Houston Astros",
-      "away": "Los Angeles Dodgers",
-      "match": "Houston Astros - Los Angeles Dodgers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Los Angeles Dodgers",
-      "side": "away",
-      "strength": 0.972,
-      "context": "1 match dans les 48h + 2208 km de voyage"
-    },
-    {
       "event_id": "401815234",
       "date": "2026-05-06T17:10Z",
       "sport": "baseball",
@@ -254,6 +217,24 @@
       "type": "back_to_back_travel",
       "direction": "fade",
       "team": "Toronto Blue Jays",
+      "side": "away",
+      "strength": 0.968,
+      "context": "2 match dans les 48h + 1789 km de voyage"
+    },
+    {
+      "event_id": "401815325",
+      "date": "2026-05-13T23:07Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Toronto Blue Jays",
+      "away": "Tampa Bay Rays",
+      "match": "Toronto Blue Jays - Tampa Bay Rays",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Tampa Bay Rays",
       "side": "away",
       "strength": 0.968,
       "context": "2 match dans les 48h + 1789 km de voyage"
@@ -273,8 +254,8 @@
       "direction": "fade",
       "team": "Minnesota Twins",
       "side": "away",
-      "strength": 0.951,
-      "context": "3 match dans les 48h + 1504 km de voyage"
+      "strength": 0.911,
+      "context": "2 match dans les 48h + 1504 km de voyage"
     },
     {
       "event_id": "401871328",
@@ -331,8 +312,8 @@
       "context": "1 match dans les 48h + 1789 km de voyage"
     },
     {
-      "event_id": "401815250",
-      "date": "2026-05-07T18:10Z",
+      "event_id": "401815236",
+      "date": "2026-05-06T23:40Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
@@ -345,12 +326,12 @@
       "direction": "fade",
       "team": "Cleveland Guardians",
       "side": "away",
-      "strength": 0.874,
-      "context": "3 match dans les 48h + 1118 km de voyage"
+      "strength": 0.834,
+      "context": "2 match dans les 48h + 1118 km de voyage"
     },
     {
-      "event_id": "401815236",
-      "date": "2026-05-06T23:40Z",
+      "event_id": "401815250",
+      "date": "2026-05-07T18:10Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
@@ -491,24 +472,6 @@
       "side": "away",
       "strength": 0.726,
       "context": "1 match dans les 48h + 981 km de voyage"
-    },
-    {
-      "event_id": "746705",
-      "date": "2026-05-10T19:00Z",
-      "sport": "football",
-      "league_code": "fra.1",
-      "league_name": "Ligue 1",
-      "home": "Paris Saint-Germain",
-      "away": "Brest",
-      "match": "Paris Saint-Germain - Brest",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.694,
-      "context": "Cote away: 12.00 -> 10.50 (+12.5%)"
     }
   ],
   "active_watch": [
@@ -785,24 +748,6 @@
       "context": "marge bookmaker anormale 19.3%"
     },
     {
-      "event_id": "401842712",
-      "date": "2026-05-09T13:00Z",
-      "sport": "football",
-      "league_code": "allsvenskan",
-      "league_name": "Allsvenskan",
-      "home": "Degerfors IF",
-      "away": "Mjällby AIF",
-      "match": "Degerfors IF - Mjällby AIF",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.3%"
-    },
-    {
       "event_id": "401866564",
       "date": "2026-05-09T13:00Z",
       "sport": "football",
@@ -819,6 +764,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 19.0%"
+    },
+    {
+      "event_id": "401842712",
+      "date": "2026-05-09T13:00Z",
+      "sport": "football",
+      "league_code": "allsvenskan",
+      "league_name": "Allsvenskan",
+      "home": "Degerfors IF",
+      "away": "Mjällby AIF",
+      "match": "Degerfors IF - Mjällby AIF",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.3%"
     },
     {
       "event_id": "401867708",
@@ -1523,6 +1486,60 @@
       "context": "marge bookmaker anormale 18.9%"
     },
     {
+      "event_id": "401866576",
+      "date": "2026-05-13T14:00Z",
+      "sport": "football",
+      "league_code": "superleaguegrece",
+      "league_name": "Super League Grèce",
+      "home": "Levadiakos",
+      "away": "OFI Crete",
+      "match": "Levadiakos - OFI Crete",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.7%"
+    },
+    {
+      "event_id": "401866572",
+      "date": "2026-05-13T14:00Z",
+      "sport": "football",
+      "league_code": "superleaguegrece",
+      "league_name": "Super League Grèce",
+      "home": "Volos NFC",
+      "away": "Aris",
+      "match": "Volos NFC - Aris",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.8%"
+    },
+    {
+      "event_id": "401866574",
+      "date": "2026-05-13T16:30Z",
+      "sport": "football",
+      "league_code": "superleaguegrece",
+      "league_name": "Super League Grèce",
+      "home": "PAOK Salonika",
+      "away": "AEK Athens",
+      "match": "PAOK Salonika - AEK Athens",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 19.1%"
+    },
+    {
       "event_id": "401871162",
       "date": "2026-05-10T19:30Z",
       "sport": "basketball",
@@ -1577,22 +1594,22 @@
       "context": "Signaux opposes: Anaheim Ducks fade 0.75, Vegas Golden Knights fade 0.75 -> prudence"
     },
     {
-      "event_id": "401815244",
-      "date": "2026-05-07T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Philadelphia Phillies",
-      "away": "Athletics",
-      "match": "Philadelphia Phillies - Athletics",
+      "event_id": "401871336",
+      "date": "2026-05-12T00:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "Cleveland Cavaliers",
+      "away": "Detroit Pistons",
+      "match": "Cleveland Cavaliers - Detroit Pistons",
       "quality": "risk",
       "quality_reason": "Signal de prudence, pas une opportunite directe",
       "type": "signal_conflict",
       "direction": "abstain",
       "team": null,
       "side": null,
-      "strength": 0.45,
-      "context": "Signaux opposes: Philadelphia Phillies fade 0.60, Athletics fade 0.60 -> prudence"
+      "strength": 0.488,
+      "context": "Signaux opposes: Cleveland Cavaliers fade 0.75, Detroit Pistons fade 0.75 -> prudence"
     },
     {
       "event_id": "401871156",
