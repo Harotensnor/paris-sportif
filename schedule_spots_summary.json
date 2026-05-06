@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-06T14:20:45Z",
+  "generated_at": "2026-05-06T14:26:11Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -168,13 +168,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Montreal Canadiens (-0.10)",
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.747,
+        "away_score": -0.747,
+        "home_fade": 1.15,
+        "away_fade": 1.15,
+        "reason": "Signaux opposes: Buffalo Sabres fade 1.15, Montreal Canadiens fade 1.15 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -187,15 +187,27 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
     },
     {
-      "event_id": "sofa_15496115",
+      "event_id": "401815235",
       "source_event_ids": [
-        "sofa_15496115",
-        "401815235"
+        "401815235",
+        "sofa_15496115"
       ],
       "kickoff": "2026-05-06T23:40Z",
       "sport": "baseball",
@@ -223,11 +235,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
+        "home_score": -0.498,
+        "away_score": 0.043,
+        "home_fade": 0.55,
         "away_fade": 0.15,
-        "reason": "Direction nette: Cincinnati Reds (-0.10)",
+        "reason": "Direction nette: Cincinnati Reds (+0.04)",
         "detail": [
           {
             "side": "home",
@@ -240,6 +252,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
           }
         ]
       }
@@ -325,13 +343,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Anaheim Ducks (-0.10)",
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.747,
+        "away_score": -0.747,
+        "home_fade": 1.15,
+        "away_fade": 1.15,
+        "reason": "Signaux opposes: Vegas Golden Knights fade 1.15, Anaheim Ducks fade 1.15 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -344,6 +362,18 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
@@ -1406,8 +1436,8 @@
     {
       "event_id": "401815232",
       "source_event_ids": [
-        "sofa_15501358",
-        "401815232"
+        "401815232",
+        "sofa_15501358"
       ],
       "kickoff": "2026-05-06T22:45Z",
       "sport": "baseball",
@@ -1473,8 +1503,8 @@
     {
       "event_id": "401815236",
       "source_event_ids": [
-        "sofa_15501352",
-        "401815236"
+        "401815236",
+        "sofa_15501352"
       ],
       "kickoff": "2026-05-06T23:40Z",
       "sport": "baseball",
@@ -1655,10 +1685,10 @@
       }
     },
     {
-      "event_id": "sofa_15501356",
+      "event_id": "401815230",
       "source_event_ids": [
-        "sofa_15501356",
-        "401815230"
+        "401815230",
+        "sofa_15501356"
       ],
       "kickoff": "2026-05-06T22:40Z",
       "sport": "baseball",
@@ -1685,12 +1715,18 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.293,
-        "away_score": -0.838,
+        "home_score": 0.643,
+        "away_score": -1.838,
         "home_fade": 0.0,
-        "away_fade": 0.838,
-        "reason": "Direction nette: Miami Marlins (+0.29)",
+        "away_fade": 1.838,
+        "reason": "Direction nette: Miami Marlins (+0.64)",
         "detail": [
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 1.0
+          },
           {
             "side": "away",
             "type": "back_to_back_travel",
@@ -1974,16 +2010,22 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.15,
-        "away_score": 0.052,
+        "away_score": 0.582,
         "home_fade": 0.15,
         "away_fade": 0.0,
-        "reason": "Direction nette: Paris Saint-Germain (+0.05)",
+        "reason": "Direction nette: Paris Saint-Germain (+0.58)",
         "detail": [
           {
             "side": "home",
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.529
           }
         ]
       }
