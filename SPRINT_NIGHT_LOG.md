@@ -1612,3 +1612,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : e2e-tests garde desktop/mobile mais les découpe en 3 shards Playwright par projet.
 - Verrou : audit_qa_workflows.py exige les shards et les artefacts nommés par shard.
 - Résultat : toutes les specs restent actives, avec six jobs courts au lieu de deux jobs longs.
+
+## Sprint v37.112 — AUTO 10/10 Cron resync shards (23:48 UTC)
+- Hypothèse : main a avancé de plusieurs snapshots pendant le sharding e2e.
+- Fix : merge origin/main, données cron conservées, shell v37.112 restampé.
+- Verrou : audit_data_truth.py et audit_qa_workflows.py valident data fraîche + sharding.
+- Résultat : le sharding Playwright est posé sur la dernière base main disponible.
