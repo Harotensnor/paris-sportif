@@ -130,7 +130,7 @@
         }
       });
       if (changed > 0) localStorage.setItem('paris_sportif_tracked_bets', JSON.stringify(raw));
-    } catch(e){ console.warn('[enh] repairTrackedBets failed', e); }
+    } catch(e){ reportEnhancementError('enh repairTrackedBets', e); }
   }
   window.__exportTrackedBetsCSV = function(){
     var bets = getTrackedBets();
@@ -616,15 +616,15 @@
 
   // ========== INIT ==========
   function init(){
-    try { initOffline(); } catch(e){ console.warn('[enh] offline init failed', e); }
+    try { initOffline(); } catch(e){ reportEnhancementError('enh offline init', e); }
     try { initCommandPalette(); initShortcuts(); injectHintButton(); }
-    catch(e){ console.warn('[enh] cmd palette init failed', e); }
+    catch(e){ reportEnhancementError('enh command palette init', e); }
     try { restoreShared(); } catch(e){ reportEnhancementError('enh restoreShared init', e); }
     // Migration : réparer les anciens paris trackés "? vs ?" (régression v20).
     // On attend 1.2s pour être sûr que PRONOSTICS_DATA soit chargé.
     setTimeout(function(){ try { repairTrackedBets(); } catch(e){ reportEnhancementError('enh repair tracked delayed', e); } }, 1200);
     setTimeout(function(){
-      try { renderCalendarHeatmap(); } catch(e){ console.warn('[enh] heatmap failed', e); }
+      try { renderCalendarHeatmap(); } catch(e){ reportEnhancementError('enh heatmap initial render', e); }
       try { injectMesParisActions(); } catch(e){ reportEnhancementError('enh mes paris actions', e); }
     }, 900);
     // Re-check on page changes (hash/clicks on .page-btn)

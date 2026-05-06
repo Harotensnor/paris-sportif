@@ -1347,3 +1347,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : routage des erreurs de partage, onboarding docs, web vitals, backups et privacy vers `logSafeError`.
 - Verrou : `scripts/audit_no_empty_catch_modules.py` branché dans le groupe drift statique.
 - Résultat : 50/50 pytest, 17 probes navigateur verts (probe onboarding durci), 13 audits statiques verts.
+
+## Sprint v37.072 — AUTO 10/10 Module console hygiene (18:28 UTC)
+- Hypothèse : des `console.warn` directs dans les modules extraits contournent le journal local et polluent la prod.
+- Fix : routage des erreurs app-enhancements vers `logSafeError`.
+- Verrou : `scripts/audit_no_direct_console_modules.py` branché dans le groupe drift statique.
+- Résultat : 50/50 pytest, 17 probes navigateur verts, 14 audits statiques verts, console module propre.
