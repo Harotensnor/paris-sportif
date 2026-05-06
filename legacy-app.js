@@ -427,7 +427,7 @@ const SPORTS_COVERAGE_PAGES = [
 'sports-tous', 'rugby', 'handball', 'volley', 'esport', 'combat',
 'cyclisme', 'ski', 'athle', 'tennis-challenger', 'foot-feminin', 'nfl'
 ];
-const VALID_PAGES = ['dashboard','tous','performance','academie','profil','buteurs','combines','sante','alertes', ...SPORTS_COVERAGE_PAGES];
+const VALID_PAGES = ['dashboard','tous','performance','academie','profil','buteurs','combines','sante','alertes','credibilite','bilan','historique','backtest','montantes', ...SPORTS_COVERAGE_PAGES];
 const PAGE_ALIASES = {
 'top': 'dashboard',
 'locks': 'dashboard',
@@ -438,10 +438,17 @@ const PAGE_ALIASES = {
 'stats': 'performance',
 'resultats': 'performance',
 'mes-paris': 'performance',
-'bilan': 'performance',
-'historique': 'performance',
-'backtest': 'performance',
-'credibilite': 'performance',
+// v37.043 — un-alias bilan, historique, backtest. Each has its own
+// renderXxxPage + #xxx-wrap div produced by applyPageView. Previously
+// `currentPage === 'bilan'` etc. could never turn true thanks to the
+// alias rewrite, so 13 nav buttons (data-page="bilan", etc.) silently
+// landed users on the Performance hub with no per-page content.
+// v37.042 — un-alias 'credibilite'. The page has its own renderer
+// (renderCredibilitePage) with the calibration plot SVG that no other
+// page replicates. Three links in the codebase point at #credibilite
+// (Performance "🎯 Calibration" button, "Pourquoi ces filtres ?", and
+// the alignment-epoch warning's Détails link); all of them silently
+// dropped users on Performance instead.
 'methode': 'academie',
 'methodologie': 'academie',
 'comment-lire': 'academie',
@@ -469,10 +476,13 @@ const PAGE_ALIASES = {
 'diagnostic': 'profil',
 'legal': 'profil',
 'mentions-legales': 'profil',
-'montantes': 'performance',
-'montante-jour': 'performance',
-'montante-weekend': 'performance',
-'montante-semaine': 'performance',
+// v37.043 — un-alias 'montantes'. The Montantes page has its own
+// renderer with three sub-tabs (jour/weekend/semaine) toggled via
+// localStorage.montanteType. Per-type entries route to 'montantes'
+// + stamp the type so direct hash navigation lands on the right tab.
+'montante-jour': 'montantes',
+'montante-weekend': 'montantes',
+'montante-semaine': 'montantes',
 'montantes-jour': 'performance',
 'montantes-weekend': 'performance',
 'montantes-semaine': 'performance',
@@ -513,6 +523,12 @@ let h = rawHash.split('?')[0];
 if (h === 'calendrier') {
 h = 'tous';
 try { history.replaceState(null, '', location.pathname + location.search + '#tous?view=calendar'); } catch(e) {}
+}
+// v37.043 — montante-{jour,weekend,semaine} aliases stamp the
+// montanteType in localStorage so the Montantes page lands on the
+// matching sub-tab when reached via direct hash.
+if (h === 'montante-jour' || h === 'montante-weekend' || h === 'montante-semaine') {
+try { localStorage.setItem('montanteType', h.replace('montante-', '')); } catch(e) {}
 }
 if (PAGE_ALIASES[h]) {
 h = PAGE_ALIASES[h];
@@ -27463,16 +27479,19 @@ return `
     const isValue = false;  // v31.7.6 — page 'value' retirée (cf. cleanup)
     const isBilan = currentPage === 'bilan';
     const isTop = false;
-    const isHistorique = false;
+    // v37.043 — these used to be hardcoded false because the routes
+    // were aliased to other hubs. Now the aliases are gone and the
+    // wrap-display gating actually fires.
+    const isHistorique = currentPage === 'historique';
     const isSante = currentPage === 'sante';
     const isDashboard = currentPage === 'dashboard';
     const isAlertes = currentPage === 'alertes';
     const isAcademie = currentPage === 'academie';
-    const isBacktest = false;
+    const isBacktest = currentPage === 'backtest';
     const isProfil = currentPage === 'profil';
     const isButeurs = currentPage === 'buteurs';
     const isTous = currentPage === 'tous';
-    const isCredibilite = false;
+    const isCredibilite = currentPage === 'credibilite';
     const isMontante = currentPage === 'montantes';
     const isMontantes = isMontante;
     const isLocks = false;
