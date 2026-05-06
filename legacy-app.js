@@ -7289,7 +7289,54 @@ __tierCalibrationLoaded = true;
 return __tierCalibrationPromise;
 }
 try { window._loadTierCalibration = _loadTierCalibration; } catch(e){}
+let __probCalibrationLoaded = false;
+let __probCalibrationPromise = null;
+async function _loadProbCalibration() {
+if (__probCalibrationLoaded || __probCalibrationPromise) return __probCalibrationPromise;
+__probCalibrationPromise = (async () => {
+try {
+const r = await fetch('prob_calibration.json?v=' + Math.floor(Date.now() / (60 * 60 * 1000)), { cache: 'default' });
+if (!r.ok) { __probCalibrationLoaded = true; return; }
+const rep = await r.json();
+window.__probCalibration = rep;
+__probCalibrationLoaded = true;
+} catch(e) {
+__probCalibrationLoaded = true;
+}
+})();
+return __probCalibrationPromise;
+}
+try { window._loadProbCalibration = _loadProbCalibration; } catch(e){}
+// Runtime helper: map a raw model probability to its empirically-calibrated
+// counterpart using the histogram binning from build_prob_calibration.py.
+// Returns the input unchanged if the map isn't loaded yet or the input is
+// degenerate. Linear interpolation between bin centers smooths the steps.
+function _calibrateProb(p) {
+const num = Number(p);
+if (!Number.isFinite(num) || num <= 0 || num >= 1) return num;
+const rep = window.__probCalibration;
+const bins = rep && Array.isArray(rep.bins) ? rep.bins : null;
+if (!bins || !bins.length) return num;
+// Find the bin containing num.
+const idx = Math.min(bins.length - 1, Math.max(0, Math.floor(num * bins.length)));
+const bin = bins[idx];
+if (!bin) return num;
+// If the bin has no observations, skip correction (factor defaults to ~1).
+const factor = Number(bin.calibration_factor);
+if (!Number.isFinite(factor) || factor <= 0) return num;
+const corrected = num * factor;
+// Clamp to a sane range so a noisy bin can't push the prob to 0 / 1.
+return Math.max(0.01, Math.min(0.99, corrected));
+}
+try { window._calibrateProb = _calibrateProb; } catch(e){}
 _loadModelCalibration();
+// Schedule prob calibration load on idle so it's ready by the time the
+// dashboard or credibilité page wants to display the curve.
+if (typeof requestIdleCallback === 'function') {
+requestIdleCallback(() => { try { _loadProbCalibration(); } catch(e){} }, { timeout: 4000 });
+} else {
+setTimeout(() => { try { _loadProbCalibration(); } catch(e){} }, 1500);
+}
 
 function _populateTrustStrip(rep) {
 const strip = document.getElementById('trust-strip');
@@ -29183,6 +29230,45 @@ return `
 }).join('')}
 </div>
 ${(calRep.overconfident_tiers || []).length ? `<div style="margin-top:10px;padding:11px 14px;background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.20);border-radius:var(--r-sm);font-size:12.5px;color:var(--text);line-height:1.55;"><b style="color:var(--danger);">⚠ Tiers surestimés actuellement :</b> <b>${(calRep.overconfident_tiers || []).join(', ')}</b>. Le modèle annonce ces niveaux comme "à mise raisonnable" mais la cote moyenne demande un taux de réussite plus élevé que ce que les picks atteignent réellement. À utiliser avec prudence — ou attendre une recalibration.</div>` : ''}
+${(() => {
+const pc = window.__probCalibration;
+if (!pc || !Array.isArray(pc.bins) || !pc.n_settled) return '';
+const bins = pc.bins.filter(b => b.n > 0);
+if (!bins.length) return '';
+const W = 600, H = 130, PAD = 24;
+const barW = (W - 2 * PAD) / pc.n_bins;
+const barFor = (b) => {
+const f = Number(b.calibration_factor || 1);
+const dev = f - 1; // negative = overconfident
+const h = Math.min(50, Math.abs(dev) * 100); // 1 unit of deviation = 100px max
+const y0 = H / 2;
+const y = dev >= 0 ? y0 - h : y0;
+const color = dev <= -0.10 ? 'var(--danger)' : dev <= -0.03 ? 'var(--warn,#fbbf24)' : dev >= 0.03 ? 'var(--accent)' : 'var(--text-dim)';
+const x = PAD + Math.floor(b.lower * pc.n_bins) * barW + 2;
+return `<rect x="${x}" y="${y.toFixed(1)}" width="${(barW - 4).toFixed(1)}" height="${h.toFixed(1)}" fill="${color}" opacity=".75"/>`;
+};
+const ticks = pc.bins.map((b, i) => {
+const cx = PAD + (i + 0.5) * barW;
+return `<text x="${cx.toFixed(1)}" y="${H - 4}" font-size="9" fill="var(--text-dim)" text-anchor="middle">${(b.center * 100).toFixed(0)}%</text>`;
+}).join('');
+const brierDelta = Number(pc.brier_delta || 0);
+const brierColor = brierDelta > 0.005 ? 'var(--accent)' : brierDelta < -0.005 ? 'var(--danger)' : 'var(--text)';
+return `
+<div style="margin-top:14px;padding:14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
+<div style="font-size:13px;color:var(--text-dim);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+<span><b class="u-text">📐 Carte de calibration des probabilités</b> · ${pc.n_settled} paris</span>
+<span style="font-size:11.5px;color:var(--text-dim2);">Brier score : <b class="u-text">${Number(pc.brier_raw||0).toFixed(3)}</b> → calibré <b style="color:${brierColor};">${Number(pc.brier_calibrated||0).toFixed(3)}</b> (Δ ${brierDelta >= 0 ? '+' : ''}${brierDelta.toFixed(3)})</span>
+</div>
+<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:130px;display:block;">
+<line x1="${PAD}" y1="${(H/2).toFixed(1)}" x2="${W - PAD}" y2="${(H/2).toFixed(1)}" stroke="var(--border-2)" stroke-width="1"/>
+${pc.bins.map(barFor).join('')}
+${ticks}
+<text x="${PAD - 4}" y="${(H/2 - 35).toFixed(1)}" font-size="9" fill="var(--accent)" text-anchor="end">+f</text>
+<text x="${PAD - 4}" y="${(H/2 + 40).toFixed(1)}" font-size="9" fill="var(--danger)" text-anchor="end">-f</text>
+</svg>
+<div style="font-size:11.5px;color:var(--text-dim);margin-top:6px;line-height:1.5;">Pour chaque tranche de proba prédite, on affiche le facteur correctif (smoothed_wr / mean_predicted) borné à [0.5, 1.5]. <b style="color:var(--danger);">Barres rouges/jaunes vers le bas</b> = tranches où le modèle est surconfiant. Helper <code>window._calibrateProb(p)</code> dispo en console.</div>
+</div>`;
+})()}
 </div>` : '';
           const helpHtml = `
 <div style="margin-top:14px;padding:12px 14px;background:rgba(167,139,250,.06);border:1px solid var(--brand-soft);border-radius:var(--r-sm);font-size:12.5px;color:var(--text-dim);line-height:1.6;">

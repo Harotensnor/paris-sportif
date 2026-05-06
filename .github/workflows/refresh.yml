@@ -191,6 +191,11 @@ jobs:
             # Surfaces overconfident tiers (safe / solid currently lose money)
             # to the UI so users see the historical reality next to the badge.
             python3 build_tier_calibration.py || true
+            # v37.029 — Probability calibration map (histogram binning,
+            # 10 bins). Surfaces the systematic overconfidence at low
+            # odds. Helper exposed at runtime; not yet plumbed into
+            # predictMatch (separate chantier).
+            python3 build_prob_calibration.py || true
             python3 train_lightgbm.py || true
             python3 build_lightgbm_runtime.py || true
             python3 audit_lightgbm_runtime.py
