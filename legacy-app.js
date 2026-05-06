@@ -436,56 +436,21 @@ const PAGE_ALIASES = {
 'stats': 'performance',
 'resultats': 'performance',
 'mes-paris': 'performance',
-// v37.043 — un-alias bilan, historique, backtest. Each has its own
-// renderXxxPage + #xxx-wrap div produced by applyPageView. Previously
-// `currentPage === 'bilan'` etc. could never turn true thanks to the
-// alias rewrite, so 13 nav buttons (data-page="bilan", etc.) silently
-// landed users on the Performance hub with no per-page content.
-// v37.042 — un-alias 'credibilite'. The page has its own renderer
-// (renderCredibilitePage) with the calibration plot SVG that no other
-// page replicates. Three links in the codebase point at #credibilite
-// (Performance "🎯 Calibration" button, "Pourquoi ces filtres ?", and
-// the alignment-epoch warning's Détails link); all of them silently
-// dropped users on Performance instead.
 'methode': 'academie',
 'methodologie': 'academie',
 'comment-lire': 'academie',
 'comment-lire-un-prono': 'academie',
 'buteur': 'buteurs',
-// v37.040 — un-alias 'combines'. The Combinés page has its own
-// renderCombines() pipeline writing into #combines-wrap (10+ KB of
-// content); previously the alias to 'tous' meant clicking "🔗 Combinés"
-// in the nav silently routed users to Tous and the rendered Combinés
-// content stayed hidden behind display:none.
 'calendrier': 'tous',
-// v37.044 — un-alias 'compare' (date comparison page). renderComparePage
-// + compare-wrap exist, but `currentPage === 'compare'` was unreachable
-// through the 'compare' → 'tous' alias. The "↔️ Comparer" sub-nav link
-// landed users on Tous instead.
 'league': 'tous',
 'valeur': 'tous',
 'plan-mise': 'tous',
 'favoris': 'profil',
-// v37.041 — un-alias 'alertes' and 'sante'. Both have dedicated
-// renderers (renderAlertesPage / renderSantePage) and wraps that
-// were silently hidden by display:none because the alias rewrote
-// currentPage → 'profil' before isAlertes / isSante could turn true.
-// Net result: the Dashboard's "Santé data" link landed users on
-// Profil with no health diagnostics in sight.
-// v37.044 — 'simulator' (the What-if bankroll simulator) lives inside
-// the Profil page at #profile-bankroll-simulator, NOT inside Performance.
-// The previous alias dropped users on the Performance hub which has no
-// simulator section. Re-route to Profil; the section auto-scrolls if
-// reached via #simulator.
 'simulator': 'profil',
 'health': 'profil',
 'diagnostic': 'profil',
 'legal': 'profil',
 'mentions-legales': 'profil',
-// v37.043 — un-alias 'montantes'. The Montantes page has its own
-// renderer with three sub-tabs (jour/weekend/semaine) toggled via
-// localStorage.montanteType. Per-type entries route to 'montantes'
-// + stamp the type so direct hash navigation lands on the right tab.
 'montante-jour': 'montantes',
 'montante-weekend': 'montantes',
 'montante-semaine': 'montantes',
@@ -530,14 +495,9 @@ if (h === 'calendrier') {
 h = 'tous';
 try { history.replaceState(null, '', location.pathname + location.search + '#tous?view=calendar'); } catch(e) {}
 }
-// v37.043 — montante-{jour,weekend,semaine} aliases stamp the
-// montanteType in localStorage so the Montantes page lands on the
-// matching sub-tab when reached via direct hash.
 if (h === 'montante-jour' || h === 'montante-weekend' || h === 'montante-semaine') {
 try { localStorage.setItem('montanteType', h.replace('montante-', '')); } catch(e) {}
 }
-// v37.044 — '#simulator' lands on Profil; stamp an anchor so the page
-// can scroll to the bankroll simulator section after render.
 if (h === 'simulator') {
 try { localStorage.setItem('profilScrollTo', 'profile-bankroll-simulator'); } catch(e) {}
 }
@@ -2698,14 +2658,6 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
   function _displayablePickTier(c, sport) {
     const odd = Number(c?.odd || 0);
     const rawConf = Number(c?.rel || c?.prob || 0);
-    // v37.051 — apply calibration map to the raw model probability before
-    // tier gating. The historical archive showed raw conf ≥ 65% only
-    // delivered ~62% actual WR (safe tier ROI -14%); ≥ 50% delivered ~49%
-    // (solid -19%). Using the calibrated prob makes the gate honest:
-    // a "safe" pick now requires the BIN-CORRECTED prob to clear 65%,
-    // not the raw model output. When the calibration sidecar isn't
-    // loaded yet (cold boot before _loadProbCalibration resolves),
-    // falls back to raw conf — preserves backward-compat.
     const conf = (typeof window !== 'undefined' && typeof window._calibrateProb === 'function')
       ? window._calibrateProb(rawConf, sport || c?.sport)
       : rawConf;
@@ -14928,11 +14880,6 @@ if (ind) ind.classList.remove('refreshing');
 try {
 window.pollData = pollData;
 window.predictMatch = predictMatch;
-// v37.031 — expose pure utility helpers that downstream code (tests,
-// probes, console debugging) was already reaching for via __testAPI.
-// Public-facing window names match the convention used by predictMatch
-// / evaluateModelPick / qualityScore. Both functions are referentially
-// transparent — no risk in surfacing them.
 if (typeof kellyFraction === 'function') window.kellyFraction = kellyFraction;
 if (typeof getMatchOdds === 'function') window.getMatchOdds = getMatchOdds;
 } catch(e){}
@@ -22365,11 +22312,6 @@ let saved = 'pending';
 try { saved = localStorage.getItem('tousTab') || 'pending'; } catch(e) {}
 const counts = { pending: displayPending.length, inprogress: displayInProgress.length, finished: displayFinished.length };
 const validKeys = ['pending', 'inprogress', 'finished'];
-// v37.037 — always honour the saved tab when it's a valid key. The
-// previous behaviour silently fell back to 'pending' whenever the
-// saved tab had 0 items, which meant clicking "En cours (0)"
-// rerouted the user to the 194 pending rows. The badge already
-// shows "(0)" so the empty state is the honest answer.
 if (validKeys.includes(saved)) return saved;
 if (counts[saved] > 0) return saved;
 if (counts.pending > 0) return 'pending';
@@ -22949,11 +22891,6 @@ if (found) openDetail(found);
 wrap.querySelectorAll('[data-calendar-day-jump]').forEach(btn => {
 btn.addEventListener('click', () => {
 const day = btn.dataset.calendarDayJump || '';
-// v37.039 — the previous handler queried .tous-row[data-match-date]
-// which only exists in the list view; from the calendar view itself
-// rows is always empty and the click did nothing. Switch to list view
-// first, then on the next render the scroll handler at hashchange
-// jumps to the requested day.
 let foundInline = false;
 try {
   const calRows = Array.from(wrap.querySelectorAll('.tous-row[data-match-date]'));
@@ -26501,9 +26438,6 @@ return `
     } catch(e){}
     const isCombines = currentPage === 'combines';
     const isBilan = currentPage === 'bilan';
-    // v37.043 — these used to be hardcoded false because the routes
-    // were aliased to other hubs. Now the aliases are gone and the
-    // wrap-display gating actually fires.
     const isHistorique = currentPage === 'historique';
     const isSante = currentPage === 'sante';
     const isDashboard = currentPage === 'dashboard';
@@ -26558,10 +26492,6 @@ return `
         b.addEventListener('click', () => {
         currentPage = PAGE_ALIASES[b.dataset.suiviPage] || b.dataset.suiviPage;
           try { localStorage.setItem('currentPage', currentPage); } catch(e){}
-          // v37.048 — sync the hash so reload / share / back-forward
-          // restore the right page. Without this, a user who lands on
-          // /pronostics.html#performance, clicks "Historique" in the
-          // suivi sub-nav, then reloads, gets bounced back to Performance.
           try {
             const newHash = '#' + currentPage;
             _setUserNavHash(newHash);
@@ -26744,8 +26674,6 @@ if (isProfil) {
 _renderPageSkeleton(profilWrap, 'Profil', 'Profil & bankroll', 3);
 requestAnimationFrame(() => {
   renderProfilPage(profilWrap);
-  // v37.044 — auto-scroll to a section if profilScrollTo was stamped
-  // (e.g. via #simulator → profile-bankroll-simulator).
   try {
     const target = localStorage.getItem('profilScrollTo');
     if (target) {
@@ -26835,11 +26763,6 @@ b.classList.toggle('active', isActive);
 if (isActive) b.setAttribute('aria-current', 'page');
 else b.removeAttribute('aria-current');
 });
-// v37.047 — extend HUB_PAGES to cover the routes revived in v37.040–044.
-// Without this, navigating to e.g. #historique kept all hub buttons
-// inactive even though Historique conceptually belongs to the Performance
-// hub. Each hub now lists every sub-page that should keep its top-nav
-// button highlighted.
 const HUB_PAGES = {
 now: ['dashboard'],
 agent: ['performance', 'bilan', 'historique', 'backtest', 'credibilite', 'montantes'],
@@ -27333,9 +27256,6 @@ requestIdleCallback(reschedule, { timeout: 1500 });
 setTimeout(reschedule, 50);
 }
 }
-// v37.025 — Strategies tab payload (flat/Kelly/value-only/sharp-only/safe-blend
-// + Monte Carlo). Lazy-loaded from backtest_strategies.json so the dashboard
-// boot stays light when the user never opens the Strategies tab.
 if (typeof window._loadStrategyBacktest === 'function' && !window.__backtestStrategies) {
 const reschedule = () => {
 window._loadStrategyBacktest().then(() => {
@@ -27348,8 +27268,6 @@ requestIdleCallback(reschedule, { timeout: 1500 });
 setTimeout(reschedule, 80);
 }
 }
-// v37.028 — Tier calibration payload (historical WR vs implied WR per tier
-// badge). Surfaces overconfident tiers in the Strategies tab.
 if (typeof window._loadTierCalibration === 'function' && !window.__tierCalibration) {
 const reschedule = () => {
 window._loadTierCalibration().then(() => {
@@ -28017,10 +27935,6 @@ ${rows.length > 30 ? `<div style="margin-top:8px;font-size:11px;color:var(--text
         })() : ''}
 
         ${currentTab === 'strategies' ? (() => {
-          // v37.025 — Strategies tab. Renders the bankroll-sizing comparison
-          // (7 strategies on every settled pick from picks_history.jsonl) +
-          // Monte Carlo distribution of ROI/drawdown for the most user-
-          // actionable strategies. Lazy-loaded from backtest_strategies.json.
           const sb = window.__backtestStrategies;
           if (!sb || !sb.strategies) {
             return `<div style="margin-top:18px;padding:24px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);text-align:center;color:var(--text-dim);">
@@ -28199,9 +28113,6 @@ return `
 }).join('')}
 </div>
 </div>` : '';
-          // v37.028 — Tier calibration section: surfaces the historical
-          // WR vs implied WR per tier so the user sees which badges are
-          // currently honest (profitable) vs misleading (overconfident).
           const calRep = window.__tierCalibration;
           const calRows = calRep && Array.isArray(calRep.tiers) ? calRep.tiers : [];
           const tierLabels = {
@@ -28365,10 +28276,6 @@ function renderPicksHistoryArchivePage(wrap, archive) {
     if (p.result === 'lost') return sum - 1;
     return sum;
   }, 0);
-  // v37.030 — Bumped per-day cap from 120 → 200 after a P0 backlog test
-  // surfaced J-1 silently losing picks (146 archived, 120 rendered → 26
-  // ghosted). 200 covers >95% of historical days; the few mega-days
-  // (>200 picks) get an explicit truncation chip below.
   const HIST_PICKS_PER_DAY = 200;
   const dayHtml = pastDays.slice(0, 14).map(d => {
     const allPicks = d.picks || [];
@@ -28433,13 +28340,6 @@ if (archive) {
 renderPicksHistoryArchivePage(wrap, archive);
 return;
 }
-// v37.049 — when the archive is still loading (first render before
-// the fetch resolves), show a skeleton instead of falling through to
-// the legacy data.days iteration below. The legacy path references
-// _histFilters which has never been declared in this codebase, so it
-// crashes with `_histFilters is not defined` on every cold #historique
-// navigation. The unaliased route in v37.043 made this crash visible
-// where it had been silent before.
 wrap.innerHTML = `<div style="max-width:1200px;margin:0 auto;padding:32px 16px;">
   <div class="page-header"><h1 class="page-h1">📜 Historique</h1>
     <div style="font-size:13px;color:var(--text-dim);">Chargement de l'archive…</div></div>
@@ -31862,9 +31762,6 @@ ses paris sur le site (ni manuel, ni import). -->
     let prefs = {};
     try { prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}'); } catch(e){}
     if (prefs.consentLocalStorage !== 'accepted') return;
-    // v37.038 — set type explicitly so Chromium does not log
-    // "The script does not have a MIME type" for the dynamic injection.
-    // Default behaviour (treat as JS) is unchanged.
     if (window.ANALYTICS_PLAUSIBLE_DOMAIN) {
       const s = document.createElement('script');
       s.type = 'text/javascript';

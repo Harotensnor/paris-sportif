@@ -49,6 +49,7 @@ def _checks() -> list[tuple[str, list[str]]]:
         "scripts/audit_localstorage_safety.py",
         "scripts/audit_csp_inline_hashes.py",
         "scripts/audit_asset_hashes.py",
+        "scripts/audit_line_endings.py",
         "scripts/audit_no_unused_imports.py",
         "scripts/audit_all_probes_wired.py",
         "scripts/audit_modal_aria.py",

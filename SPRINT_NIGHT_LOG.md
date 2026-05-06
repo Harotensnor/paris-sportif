@@ -1492,3 +1492,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : troisième resync ciblée, même résolution : data main, shell QA branche, SW neuf, hashes restampés.
 - Verrou : qa_gate_report et asset hash audit relancés dans la fenêtre courte avant push.
 - Résultat : conflit mécanique pronostics/SW neutralisé sans toucher aux protections QA.
+
+## Sprint v37.092 — AUTO 10/10 Legacy comment diet (22:05 UTC)
+- Hypothèse : les commentaires de sprint v37.x dans legacy-app.js gonflent le bundle sans protéger le produit.
+- Fix : suppression de 103 lignes de commentaires historiques et audit legacy-comments étendu à legacy-app.js.
+- Verrou : audit_line_endings.py bloque les conversions CRLF qui faussent le budget bundle sous Windows.
+- Résultat : legacy-app.js redescend à 1724.8 KB / 1750 KB, qa gate porté à 27 checks.
