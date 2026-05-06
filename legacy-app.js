@@ -427,7 +427,7 @@ const SPORTS_COVERAGE_PAGES = [
 'sports-tous', 'rugby', 'handball', 'volley', 'esport', 'combat',
 'cyclisme', 'ski', 'athle', 'tennis-challenger', 'foot-feminin', 'nfl'
 ];
-const VALID_PAGES = ['dashboard','tous','performance','academie','profil','buteurs', ...SPORTS_COVERAGE_PAGES];
+const VALID_PAGES = ['dashboard','tous','performance','academie','profil','buteurs','combines', ...SPORTS_COVERAGE_PAGES];
 const PAGE_ALIASES = {
 'top': 'dashboard',
 'locks': 'dashboard',
@@ -447,7 +447,11 @@ const PAGE_ALIASES = {
 'comment-lire': 'academie',
 'comment-lire-un-prono': 'academie',
 'buteur': 'buteurs',
-'combines': 'tous',
+// v37.040 — un-alias 'combines'. The Combinés page has its own
+// renderCombines() pipeline writing into #combines-wrap (10+ KB of
+// content); previously the alias to 'tous' meant clicking "🔗 Combinés"
+// in the nav silently routed users to Tous and the rendered Combinés
+// content stayed hidden behind display:none.
 'calendrier': 'tous',
 'compare': 'tous',
 'league': 'tous',
@@ -27586,6 +27590,11 @@ if (sportTabs) sportTabs.style.display = isSimples ? 'flex' : 'none';
 
 const comb = document.getElementById('combines-wrap');
 if (comb) comb.style.display = isCombines ? '' : 'none';
+// v37.040 — when navigating to #combines, re-render so the page picks
+// up data that may have arrived after the initial boot render.
+if (isCombines && typeof renderCombines === 'function') {
+  try { renderCombines(); } catch(e) {}
+}
 
 const sum = document.getElementById('summary-bar');
 if (sum) sum.style.display = (isCombines || isValue || isLocks || isHistorique || isSante || isDashboard || isAlertes || isAcademie || isBacktest || isProfil || isButeurs || isTous || isCredibilite || isMontante || isCalendrier || isLeague || isFavoris || isSportsCoverage) ? 'none' : '';
