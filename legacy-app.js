@@ -12637,7 +12637,14 @@ ${sub ? `<div class="decision-tile__sub">${esc(sub)}</div>` : ''}
 <h4>📊 Fiche de décision</h4>
 ${best && best.suspect ? `<div class="warning-chip">⚠ Écart anormal — ${esc(best.suspectReason || 'edge > 15pt')}</div>` : ''}
 <div class="decision-strip">
-${tile('Confiance', `${Math.round(conf * 100)}%`, conf >= 0.65 ? 'Solide' : conf >= 0.55 ? 'Correcte' : 'Limite', kindOf(conf, 0.65, 0.55))}
+${(() => {
+const calConfFn = (typeof window._calibrateProb === 'function') ? window._calibrateProb : null;
+const calibrated = calConfFn ? calConfFn(conf) : null;
+const showCal = calibrated != null && Math.abs(calibrated - conf) > 0.02;
+const subLabel = conf >= 0.65 ? 'Solide' : conf >= 0.55 ? 'Correcte' : 'Limite';
+const calSub = showCal ? `${subLabel} · cal. ${Math.round(calibrated * 100)}%` : subLabel;
+return tile('Confiance', `${Math.round(conf * 100)}%`, calSub, kindOf(conf, 0.65, 0.55));
+})()}
 ${tile('Edge', `${edge >= 0 ? '+' : ''}${(edge * 100).toFixed(1)}pt`, edge >= 0.05 ? 'Value forte' : edge >= 0.02 ? 'Value' : edge >= 0 ? 'Neutre' : 'Négatif', kindOf(edge, 0.05, 0.02))}
 ${tile('EV', `${ev >= 0 ? '+' : ''}${(ev * 100).toFixed(1)}%`, ev >= 0.10 ? 'EV+ fort' : ev >= 0.03 ? 'EV+' : ev >= 0 ? 'Break-even' : 'EV-', kindOf(ev, 0.05, 0))}
 ${tile('Kelly', `${(kelly * 100).toFixed(1)}%`, kelly >= 0.03 ? 'Mise franche' : kelly >= 0.01 ? 'Mise modérée' : 'Skip', kindOf(kelly, 0.03, 0.01))}
