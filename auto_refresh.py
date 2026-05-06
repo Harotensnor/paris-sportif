@@ -12,13 +12,14 @@ surprises when iterating on pronostics.html.
 Usage: python auto_refresh.py
        (or started automatically by serveur.py)
 """
-import sys, time, subprocess, traceback
+import json, sys, time, subprocess, traceback
 from pathlib import Path
 from datetime import datetime
 
 HERE = Path(__file__).resolve().parent
 PROJECT = HERE                     # auto_refresh.py lives at project root
 SCRIPTS = PROJECT / 'scripts'      # fetch/patch scripts moved here in v27+
+TRACE_LOG = PROJECT / 'pipeline_traces.jsonl'
 
 INTERVAL = 60  # seconds between ticks
 
@@ -27,20 +28,43 @@ def run(script_name, timeout=180):
     """Run a scripts/<name>.py, return (rc, tail_of_output)."""
     path = SCRIPTS / script_name
     if not path.exists():
+        append_trace(script_name, -3, 0, 'missing')
         return -3, f'missing: {path.name}'
+    started = time.time()
     try:
         p = subprocess.run([sys.executable, str(path)], cwd=PROJECT,
                            capture_output=True, text=True, timeout=timeout)
         out = (p.stdout + p.stderr).strip().splitlines()
+        append_trace(script_name, p.returncode, time.time() - started, '\n'.join(out[-3:]))
         return p.returncode, '\n'.join(out[-2:])
     except subprocess.TimeoutExpired:
+        append_trace(script_name, -1, time.time() - started, 'timeout')
         return -1, 'timeout'
     except Exception as ex:
+        append_trace(script_name, -2, time.time() - started, f'error: {ex!r}')
         return -2, f'error: {ex!r}'
 
 
 def ts():
     return datetime.now().strftime('%H:%M:%S')
+
+
+def append_trace(script_name, rc, elapsed, tail):
+    """Append a local pipeline trace without ever failing the refresh loop."""
+    try:
+        status = 'ok' if rc == 0 else 'timeout' if rc == -1 else 'missing' if rc == -3 else 'error'
+        row = {
+            'ts': datetime.utcnow().replace(microsecond=0).isoformat() + 'Z',
+            'script': f'scripts/{script_name}',
+            'status': status,
+            'returncode': rc,
+            'duration_ms': int(elapsed * 1000),
+            'tail': str(tail or '')[-500:],
+        }
+        with TRACE_LOG.open('a', encoding='utf-8') as fh:
+            fh.write(json.dumps(row, ensure_ascii=False, separators=(',', ':')) + '\n')
+    except Exception:
+        pass
 
 
 # Pipeline stages — mirror refresh.yml order.
@@ -129,12 +153,15 @@ PATCH_STAGES = [
     ('build_anti_public_angles.py', 1,   15),
     ('build_schedule_spots_summary.py', 1, 15),
     ('build_rare_signal_summary.py', 1, 15),
+    ('apply_data_lineage.py',        1,   15),
     ('inject_data_in_html.py',      1,   15),
     ('measure_night_metrics.py',    1,   15),
     # Pipeline status snapshot (health.json) — runs every tick, cheap.
     ('build_health.py',             1,   15),
     ('audit_data_truth.py',          1,   15),
     ('validate_data_quality.py',     1,   15),
+    ('data_integrity_monitor.py',    1,   20),
+    ('build_health.py',              1,   15),
     # MCP diagnostics use a historical desktop path on Theo's machine; keep it
     # synced and smoke-tested so stale "today" values cannot silently return.
     ('sync_mcp_shadow_copy.py',      1,   15),
@@ -209,6 +236,7 @@ PATCH_STAGES = [
     ('audit_bundle_size.py',        1,   15),
     # v35.92 — No-op sans DISCORD_WEBHOOK_URL ; garde le drift CI/local aligné.
     ('notify_discord.py',           1,   20),
+    ('notify_discord_health.py',    1,   20),
 ]
 
 

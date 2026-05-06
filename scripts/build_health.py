@@ -35,6 +35,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / 'health.json'
+DATA_INTEGRITY_REPORT = ROOT / 'data_integrity_report.json'
+SOURCE_HEALTH_REPORT = ROOT / 'source_health.json'
+PIPELINE_TRACES_SUMMARY = ROOT / 'pipeline_traces_summary.json'
+DATA_LINEAGE_SUMMARY = ROOT / 'data_lineage_summary.json'
 
 # Each source : (filename, count_extractor) where count_extractor returns
 # a dict of useful counts when called on the parsed JSON. None on failure.
@@ -574,6 +578,48 @@ def _age_min(path: Path) -> int | None:
     return max(0, int((now - mtime) / 60))
 
 
+def _data_generated_age_min() -> int | None:
+    data_path = ROOT / 'data.js'
+    if not data_path.exists():
+        return None
+    try:
+        import re
+        text = data_path.read_text(encoding='utf-8')
+        m = re.search(r'window\.PRONOSTICS_DATA\s*=\s*(\{.*\})\s*;?\s*$', text, re.DOTALL)
+        if not m:
+            return None
+        generated_at = json.loads(m.group(1)).get('generated_at')
+        if not generated_at:
+            return None
+        dt = datetime.fromisoformat(str(generated_at).replace('Z', '+00:00'))
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return max(0, int((datetime.now(timezone.utc) - dt.astimezone(timezone.utc)).total_seconds() / 60))
+    except Exception:
+        return None
+
+
+def _load_optional_json(path: Path) -> dict | None:
+    if not path.exists():
+        return None
+    try:
+        data = json.loads(path.read_text(encoding='utf-8'))
+        return data if isinstance(data, dict) else None
+    except Exception:
+        return None
+
+
+def _status_bucket(*statuses: str | None) -> str:
+    vals = {s for s in statuses if s}
+    if vals & {'critical', 'error'}:
+        return 'critical'
+    if vals & {'degraded', 'warning', 'warn'}:
+        return 'degraded'
+    if vals & {'healthy', 'ok'}:
+        return 'healthy'
+    return 'unknown'
+
+
 def _extract_pipeline_scripts(path: Path, pattern: str) -> set[str]:
     import re
     if not path.exists():
@@ -771,7 +817,8 @@ def main() -> int:
         'generated_at': now.strftime('%Y-%m-%dT%H:%M:%SZ'),
         'calculated_at': now.strftime('%Y-%m-%dT%H:%M:%SZ'),
         'source_of_truth': 'data.js',
-        'data_age_min': _age_min(ROOT / 'data.js'),
+        'data_age_min': _data_generated_age_min(),
+        'data_file_age_min': _age_min(ROOT / 'data.js'),
         'sources': {},
         'pipeline_lag_per_script': {},
         'pipeline_drift': {},
@@ -886,6 +933,71 @@ def main() -> int:
                 f'({q["winamax_detailed"]}/{q["winamax_exact"]}) — '
                 f'top-up détails recommandé cap={q.get("winamax_detail_fetch_cap_reco", 90)}'
             )
+
+    integrity = _load_optional_json(DATA_INTEGRITY_REPORT)
+    source_health = _load_optional_json(SOURCE_HEALTH_REPORT)
+    traces = _load_optional_json(PIPELINE_TRACES_SUMMARY)
+    lineage = _load_optional_json(DATA_LINEAGE_SUMMARY)
+    if integrity:
+        out['data_integrity'] = {
+            'status': integrity.get('status'),
+            'schema_version': integrity.get('schema_version'),
+            'sources_validated': integrity.get('sources_validated'),
+            'sources_ok': integrity.get('sources_ok'),
+            'sources_warning': integrity.get('sources_warning'),
+            'sources_critical': integrity.get('sources_critical'),
+            'quarantine_records': integrity.get('quarantine_records'),
+            'anomalies_emitted': integrity.get('anomalies_emitted'),
+        }
+        if integrity.get('status') == 'critical':
+            out['warnings'].append('data_integrity: validation critique')
+        elif integrity.get('status') == 'degraded':
+            out['warnings'].append('data_integrity: alertes non bloquantes')
+    if source_health:
+        out['source_health'] = source_health
+    if traces:
+        out['observability'] = {
+            'pipeline_traces': traces,
+        }
+    if lineage:
+        out['data_lineage'] = lineage
+
+    data_section_status = _status_bucket((integrity or {}).get('status'), 'ok' if not out.get('quality_checks', {}).get('football_invalid_form') else 'warning')
+    pipeline_section_status = 'healthy'
+    if any(str(x).startswith('data.js is stale') for x in out['warnings']):
+        pipeline_section_status = 'degraded'
+    if out.get('data_age_min') is None or (out.get('data_age_min') or 0) > 240:
+        pipeline_section_status = 'critical'
+    if out.get('pipeline_drift', {}).get('status') not in {None, 'ok'}:
+        pipeline_section_status = 'degraded'
+
+    out['sections'] = {
+        'pipeline': {
+            'status': pipeline_section_status,
+            'data_age_min': out.get('data_age_min'),
+            'drift_status': out.get('pipeline_drift', {}).get('status'),
+            'sources_red': sum(1 for row in out.get('pipeline_lag_per_script', {}).values() if row.get('status') in {'crit', 'missing'}),
+        },
+        'data': {
+            'status': data_section_status,
+            'sources_validated': (integrity or {}).get('sources_validated', 0),
+            'quarantine_records': (integrity or {}).get('quarantine_records', 0),
+            'lineage_coverage_pct': (lineage or {}).get('coverage_pct'),
+        },
+        'model': {
+            'status': 'healthy' if (ROOT / 'model_versions.json').exists() else 'degraded',
+            'versions_file': 'model_versions.json',
+        },
+        'ui': {
+            'status': 'healthy' if (ROOT / 'a11y-report.json').exists() else 'unknown',
+            'a11y_report': 'a11y-report.json' if (ROOT / 'a11y-report.json').exists() else None,
+        },
+        'tests': {
+            'status': 'healthy' if (ROOT / 'performance-reports' / 'lighthouse-after' / 'summary.json').exists() else 'unknown',
+            'latest_lighthouse': 'performance-reports/lighthouse-after/summary.json' if (ROOT / 'performance-reports' / 'lighthouse-after' / 'summary.json').exists() else None,
+        },
+    }
+    out['global_status'] = _status_bucket(*(section.get('status') for section in out['sections'].values()))
 
     # Bug-hunt 2026-05-02 : compute `overall` selon les warnings + data freshness
     n_warnings = len(out['warnings'])
