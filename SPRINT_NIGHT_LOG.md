@@ -1274,3 +1274,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Verrou: `scripts/probe_onboarding_fresh.js` couvre apparition, clavier, completion, skip et non-réapparition après reload.
 - CI: smoke.yml exécute la probe onboarding fresh à chaque PR/push concerné.
 - Vérifs: probe onboarding fresh OK, SW/legacy hash/footer restampés.
+
+## Sprint v37.060 — AUTO 10/10 Theme cycle QA (16:39 UTC)
+- Symptôme: Maj+T cyclait vers les thèmes premium et le choix "clair" restait visuellement sombre sur le dashboard.
+- Fix: cycle topbar ramené à sombre/clair/auto, forçage horaire retiré, variables v36 light alignées avec `data-theme=light`.
+- Verrou: `scripts/probe_theme_cycle.js` couvre Shift+T, prefs, `data-theme`, meta theme-color et auto dark/light.
+- CI: smoke.yml exécute la probe theme cycle à chaque PR/push concerné.
+- Vérifs: probe theme cycle OK, SW/legacy hash/footer restampés.

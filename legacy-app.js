@@ -26016,7 +26016,7 @@ const esc2 = (typeof esc === 'function') ? esc : (s) => String(s).replace(/[&<>"
               <button class="theme-pill theme-chip ${currentTheme==='sunset'?'active':''}" data-theme="sunset" data-theme-btn="sunset">🌅 Sunset</button>
               <button class="theme-pill theme-chip ${currentTheme==='forest'?'active':''}" data-theme="forest" data-theme-btn="forest">🌲 Forest</button>
               <button class="theme-pill theme-chip ${currentTheme==='mono'?'active':''}" data-theme="mono" data-theme-btn="mono">◐ Mono</button>
-              <button class="theme-pill theme-chip ${(currentTheme==='auto'||currentTheme==='system')?'active':''}" data-theme="system" data-theme-btn="system">🌓 System</button>
+              <button class="theme-pill theme-chip ${(currentTheme==='auto'||currentTheme==='system')?'active':''}" data-theme="auto" data-theme-btn="auto">🌓 Auto</button>
               <button class="theme-pill theme-chip ${currentTheme==='dark'?'active':''}" data-theme="dark" data-theme-btn="dark">🌙 Sombre</button>
               <button class="theme-pill theme-chip ${currentTheme==='light'?'active':''}" data-theme="light" data-theme-btn="light">☀️ Clair</button>
             </div>
@@ -26050,7 +26050,7 @@ const esc2 = (typeof esc === 'function') ? esc : (s) => String(s).replace(/[&<>"
               <button class="theme-pill ${currentFontScale==='large'?'active':''}" data-font-scale-btn="large">Grand</button>
               <button class="theme-pill ${currentFontScale==='xl'?'active':''}" data-font-scale-btn="xl">Très grand</button>
             </div>
-            <div style="font-size:11px;color:var(--text-dim);margin-top:8px;">Astuce : appuie sur <b>Maj + T</b> pour basculer sombre/clair.</div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:8px;">Astuce : appuie sur <b>Maj + T</b> pour basculer sombre/clair/auto.</div>
           </div>
 
           <div class="card-base" id="profile-language">
@@ -33624,14 +33624,12 @@ if (p.pushNotifs && typeof window._maybeNotifyHighEdgePicks === 'function') wind
 const _systemPrefersLight = () => window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
 const UX_THEME_CHOICES = ['dark', 'light', 'system', 'auto', 'ocean', 'sunset', 'forest', 'mono'];
 const _resolveTheme = (storedTheme) => (storedTheme === 'auto' || storedTheme === 'system') ? (_systemPrefersLight() ? 'light' : 'dark') : storedTheme;
-const _nightRead = () => { const h = new Date().getHours(); return h >= 20 || h < 7; };
 const _applyTheme = (storedTheme) => {
-const premium = ['ocean', 'sunset', 'forest', 'mono'].includes(storedTheme);
-const effective = (!premium && _nightRead()) ? 'dark' : _resolveTheme(storedTheme);
+const effective = _resolveTheme(storedTheme);
 const root = document.documentElement;
 if (effective && effective !== 'dark') root.setAttribute('data-theme', effective);
 else root.removeAttribute('data-theme');
-root.style.filter = (!premium && _nightRead()) ? 'sepia(.06) saturate(.92)' : '';
+root.style.filter = '';
 const meta = document.getElementById('theme-color-meta');
 const themeMeta = { light: '#f5f5f7', ocean: '#051925', sunset: '#211008', forest: '#061a12', mono: '#000000' };
 if (meta) meta.setAttribute('content', themeMeta[effective] || '#08080a');
@@ -33677,13 +33675,13 @@ if (themeBtn) themeBtn.addEventListener('click', () => {
 try {
 const p = JSON.parse(localStorage.getItem('userPrefs') || '{}');
 const cur = UX_THEME_CHOICES.includes(p.theme) ? p.theme : 'dark';
-const cycle = { dark: 'light', light: 'system', system: 'ocean', auto: 'ocean', ocean: 'sunset', sunset: 'forest', forest: 'mono', mono: 'dark' };
-const next = cycle[cur];
+const cycle = { dark: 'light', light: 'auto', auto: 'dark', system: 'dark', ocean: 'dark', sunset: 'dark', forest: 'dark', mono: 'dark' };
+const next = cycle[cur] || 'dark';
 p.theme = next;
 _currentTheme = next;
 localStorage.setItem('userPrefs', JSON.stringify(p));
 _applyTheme(next);
-const labels = { dark: 'sombre', light: 'clair', system: 'system', auto: 'system', ocean: 'Ocean', sunset: 'Sunset', forest: 'Forest', mono: 'Mono' };
+const labels = { dark: 'sombre', light: 'clair', system: 'auto', auto: 'auto', ocean: 'Ocean', sunset: 'Sunset', forest: 'Forest', mono: 'Mono' };
 if (typeof toast === 'function') toast('🎨 Thème : ' + labels[next], 'info');
 } catch(e){}
 });
