@@ -638,7 +638,6 @@
   } else {
     init();
   }
-  // (removed console.log "enhancements v20 loaded" — bruit en prod)
 })();
 
 // v31.7 — Coach IA flottant supprime (jamais utilise). Bloc setupChatbot retire (~300L).

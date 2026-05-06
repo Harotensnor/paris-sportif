@@ -84,6 +84,7 @@ jobs:
           python3 scripts/audit_no_dead_pronos_subnav.py
           python3 scripts/audit_no_dead_top_page.py
           python3 scripts/audit_no_dead_sports_grid.py
+          python3 scripts/audit_no_prod_console_log.py
           python3 scripts/audit_modal_aria.py
       - name: Pytest (Python unit tests)
         # v37.036 — pytest covers data-quality classifiers, the multi-strategy

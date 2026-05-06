@@ -1329,3 +1329,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : suppression de la grille single-sport, des wrappers HTML, de `renderFilters`, `renderSummary`, `renderCard` et du quick-take dormant.
 - Verrou : ajout de `scripts/audit_no_dead_sports_grid.py` dans le groupe drift statique.
 - Résultat : 50/50 pytest, 17 probes navigateur verts, 10 audits statiques verts, `legacy-app.js` passe sous cible à 1728.2 KB.
+
+## Sprint v37.069 — AUTO 10/10 Prod console log (17:58 UTC)
+- Hypothèse : un `console.log` direct en runtime peut polluer la console prod et masquer de vrais signaux QA.
+- Fix : remplacement du debug V37 par `prodLog` et retrait d'un commentaire qui gardait le motif bloqué.
+- Verrou : ajout de `scripts/audit_no_prod_console_log.py` dans le groupe drift statique.
+- Résultat : 50/50 pytest, 17 probes navigateur verts (1 rerun réseau), 11 audits statiques verts, console prod clean.

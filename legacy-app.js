@@ -17135,7 +17135,7 @@ rejectReasons: v37RejectReasons,
 rejectSamples: v37RejectSamples
 };
 if (v37DebugOn) {
-try { console.log('[v37 debug]', { ...v37DebugState, sampleMatches: v37DebugMatches() }); } catch(e) {}
+try { prodLog('[v37 debug]', { ...v37DebugState, sampleMatches: v37DebugMatches() }); } catch(e) {}
 }
 const v37DebugPanelHtml = v37DebugOn ? `<section class="v37-debug-panel" data-v37-debug-panel><b>Debug tableau V37</b><span>Filtres actifs · Raisons de rejet · 10 premiers matchs scannes</span><pre>${esc(JSON.stringify({ ...v37DebugState, sampleMatches: v37DebugMatches() }, null, 2))}</pre></section>` : '';
 const v37EmptyPoolHelpHtml = (!v36PickPool.length && terminalScanPool.length > 10) ? `<section class="v37-empty-pool-help">
