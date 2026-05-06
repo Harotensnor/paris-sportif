@@ -1389,3 +1389,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : extension des `paths` CI aux assets critiques et audit dédié sur les filtres push/PR.
 - Verrou : `scripts/audit_ci_critical_paths.py` branché dans le groupe drift statique.
 - Résultat : 50/50 pytest, 19 probes navigateur verts, 19 audits statiques verts, assets critiques couverts.
+
+## Sprint v37.079 — AUTO 10/10 Probability hard cap (19:30 UTC)
+- Hypothèse : `predictMatch` peut encore exposer des probabilités 0.98/0.999 malgré le cap archive Python à 0.95.
+- Fix : cap public `MODEL_PROB_CAP=0.95` sur `reliability` et `pick.prob`, y compris après anomalies marché.
+- Verrou : `scripts/probe_model_probability_caps.js` + test pytest non-football fallback.
+- Résultat : 51/51 pytest, 20 probes navigateur verts, 19 audits statiques verts, cap proba aligné.

@@ -7637,6 +7637,7 @@ window._refreshCountdowns = _refreshCountdowns;
 const SUPPORTED_SPORTS = new Set([
 'football', 'tennis', 'basketball', 'hockey', 'baseball', 'football-american',
 ]);
+const MODEL_PROB_CAP = 0.95;
 function _isMatchEffectivelyDone(m) {
 if (!m) return false;
 if (m.completed) return true;
@@ -7662,9 +7663,10 @@ __predCache.set(match.id, p);
 return p;
 }
 try { window.SUPPORTED_SPORTS = SUPPORTED_SPORTS; } catch(e){}
+try { window.MODEL_PROB_CAP = MODEL_PROB_CAP; } catch(e){}
 function _applyCalibration(p, match) {
 if (!p || !isFinite(p.reliability) || p.calibrated) {
-return _markSuspectIfHugeEdge(p, match);
+return _capModelProbability(_markSuspectIfHugeEdge(p, match));
 }
 const sport = match && match.sport ? match.sport : null;
 const leagueCode = match && match.league_code ? match.league_code : null;
@@ -7673,7 +7675,28 @@ const adjustedV5 = applyCalibrationMethodV5(adjusted, sport);
 const out = adjustedV5 === p.reliability
 ? p
 : { ...p, reliability: adjustedV5, reliability_raw: p.reliability, calibrated: true, calibration_v5: adjustedV5 !== adjusted };
-return _markSuspectIfHugeEdge(out, match);
+return _capModelProbability(_markSuspectIfHugeEdge(out, match));
+}
+function _capModelProbability(p) {
+if (!p || typeof p !== 'object') return p;
+const rel = Number(p.reliability);
+const pickProb = Number(p.pick && p.pick.prob);
+const hasRel = Number.isFinite(rel);
+const hasPickProb = Number.isFinite(pickProb);
+const nextRel = hasRel ? Math.max(0.001, Math.min(MODEL_PROB_CAP, rel)) : p.reliability;
+const nextPickProb = hasPickProb ? Math.max(0.001, Math.min(MODEL_PROB_CAP, pickProb)) : (p.pick && p.pick.prob);
+if ((!hasRel || nextRel === rel) && (!hasPickProb || nextPickProb === pickProb)) return p;
+return {
+...p,
+prob_cap: MODEL_PROB_CAP,
+reliability_raw_cap: hasRel && rel > MODEL_PROB_CAP ? rel : p.reliability_raw_cap,
+reliability: nextRel,
+pick: p.pick ? {
+...p.pick,
+prob_raw_cap: hasPickProb && pickProb > MODEL_PROB_CAP ? pickProb : p.pick.prob_raw_cap,
+prob: nextPickProb,
+} : p.pick,
+};
 }
 function _markSuspectIfHugeEdge(p, match) {
 if (!p || !p.pick || !p.odds) return p;
@@ -7686,7 +7709,7 @@ if (!isFinite(rel)) return p;
 const edge = rel - implied;
 if (Math.abs(edge) > 0.15) {
 const sign = edge >= 0 ? 1 : -1;
-const capped = Math.max(0.01, Math.min(0.99, implied + sign * 0.12));
+const capped = Math.max(0.01, Math.min(MODEL_PROB_CAP, implied + sign * 0.12));
 return {
 ...p,
 reliability_raw_uncapped: rel,

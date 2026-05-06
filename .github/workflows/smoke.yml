@@ -34,6 +34,7 @@ on:
       - 'scripts/probe_prob_calibration_sport.js'
       - 'scripts/probe_corrupt_storage.js'
       - 'scripts/probe_qa_runtime.js'
+      - 'scripts/probe_model_probability_caps.js'
       - '.github/workflows/smoke.yml'
   pull_request:
     branches: [main]
@@ -64,6 +65,7 @@ on:
       - 'scripts/probe_prob_calibration_sport.js'
       - 'scripts/probe_corrupt_storage.js'
       - 'scripts/probe_qa_runtime.js'
+      - 'scripts/probe_model_probability_caps.js'
       - '.github/workflows/smoke.yml'
   workflow_dispatch: {}
 
@@ -201,3 +203,8 @@ jobs:
         # Locks the local-only DevTools QA surface: error capture,
         # downloadable bug report payload and deterministic canary variant.
         run: node scripts/probe_qa_runtime.js
+
+      - name: Run model probability cap probe
+        # Synthetic football/basketball/baseball favourites must never leak
+        # 0.98/0.999 probabilities into the public model output.
+        run: node scripts/probe_model_probability_caps.js

@@ -62,3 +62,20 @@ def test_generated_archive_picks_never_emit_999_prob_model():
         p["selection"] == "1" and p["prob_model"] == ph.MAX_MODEL_PROB
         for p in picks
     )
+
+
+def test_non_football_implied_fallback_also_caps_prob_model():
+    event = _extreme_football_event()
+    event["id"] = "prob-cap-baseball"
+    event["sport"] = "baseball"
+    event["winamax"]["markets"]["1n2"] = {"home": 1.30, "away": 20.0}
+    event["winamax"]["markets"]["match_winner"] = [
+        {"side": "home", "odd": 1.30, "label": "Massive Home"},
+        {"side": "away", "odd": 20.0, "label": "Tiny Away"},
+    ]
+
+    picks = ph.generate_event_picks(event, ts_generated="2026-05-06T00:00:00Z")
+
+    assert picks
+    assert max(p["prob_model"] for p in picks) <= ph.MAX_MODEL_PROB
+    assert any(p["selection"] == "1" and p["prob_model"] == ph.MAX_MODEL_PROB for p in picks)
