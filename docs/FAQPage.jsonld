@@ -1,0 +1,446 @@
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Comment choisir un pari ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Lis d'abord le score qualité, puis le tier, puis la cote. Le détail modal explique les signaux et les risques."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Pourquoi le score qualité n'est pas une probabilité ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Le score qualité agrège edge, fraîcheur, stabilité, historique et signaux. La probabilité reste affichée séparément."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Pourquoi un pick peut-il disparaître ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Un match passé, une donnée stale ou une incohérence marché peut le retirer du tableau actionnable."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Que signifie edge ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "L'edge mesure l'écart entre la probabilité modèle et la probabilité implicite de la cote."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Un edge élevé suffit-il ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Non. Il faut aussi vérifier confiance, marché, cohérence et fraîcheur data."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Pourquoi limiter les edges extrêmes ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Pour éviter qu'une cote ou une proba corrompue fasse croire à une opportunité irréaliste."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Que mesure le Brier ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "La calibration des probabilités. Plus il est bas, plus les probabilités annoncées sont honnêtes."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Qu'est-ce que CLV ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "La Closing Line Value compare la cote prise à la cote de clôture."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Pourquoi faire du backtest ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Pour vérifier que les règles auraient tenu sur des données passées."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Que veut dire drift ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Un changement de distribution ou de performance qui rend les anciens réglages moins fiables."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Pourquoi le footer indique données anciennes ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Parce que `data.generated_at` dépasse le seuil de fraîcheur attendu."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Pourquoi le pipeline peut être en warning ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Une source annexe peut être lente ou partielle sans bloquer toute la page."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Winamax exact veut dire quoi ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Le match est précisément identifié chez Winamax avec une cote actionnable."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Cote indicative veut dire quoi ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "La cote vient d'une source de comparaison et demande une vérification avant action."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Que faire si le tableau est vide ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ouvrir `?debug=1`, lire les compteurs et vérifier la fraîcheur dans Profil."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Où voir les sources ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Page Santé/Profil et docs Data sources."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Pourquoi garder un historique ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Pour auditer les résultats passés et éviter que la rolling window efface le contexte."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Qu'est-ce que la quarantaine data ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Une zone où les événements invalides sont isolés au lieu de polluer le modèle."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Pourquoi plusieurs IDs pour un match ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "ESPN, Winamax et sidecars peuvent nommer le même match différemment."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Pourquoi les horaires peuvent bouger ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Fuseau horaire, report ou merge incomplet peuvent décaler l'affichage."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Qu'est-ce qu'un tier Sûr ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Un pick à cote basse et confiance élevée, mais jamais garanti."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Qu'est-ce qu'un outsider ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Un pari à cote élevée, plus rare, qui exige un edge plus fort."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Comment gérer la bankroll ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Utiliser une mise fixe ou Kelly fractionné, jamais une mise émotionnelle."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Pourquoi éviter les montantes trop longues ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "La probabilité cumulée chute vite quand les jambes s'ajoutent."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Qu'est-ce qu'un void ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Un pari annulé/remboursé, souvent match reporté ou ligne push."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Pourquoi suivre ses paris ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Pour comparer la performance personnelle au modèle."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Que veut dire ROI flat ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Profit divisé par mises avec une unité constante."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Que veut dire PNL Kelly ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Profit simulé avec une stratégie Kelly prudente."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Pourquoi une cote 1.10 peut être risquée ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Le gain est faible ; une seule erreur peut effacer beaucoup de petites victoires."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Pourquoi le marché peut avoir raison ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Les cotes agrègent beaucoup d'information publique et sharp."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Où est le frontend ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "`pronostics.html`, `legacy-app.js`, `app.js` et les modules `src/`."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Où est la pipeline ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Dans `scripts/` et `.github/workflows/refresh.yml`."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Comment tester vite ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Syntaxe JS, drift pipeline, data integrity, puis Playwright ciblé."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Pourquoi un Service Worker ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Pour accélérer et fournir un fallback offline/stale contrôlé."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Pourquoi bumper le cache ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Pour forcer les navigateurs à prendre la nouvelle version."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Pourquoi un changelog auto ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Pour relier les commits aux versions visibles."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Pourquoi des ADRs ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Pour garder la mémoire des décisions techniques."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Pourquoi une wiki interne ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Pour transmettre le projet sans relire tout le code."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Comment ajouter une source ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Créer fetcher, patcher, health tracking, cadence et tests."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Comment ajouter une page ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Créer rendu, route, test, lien et documentation."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Le site place-t-il des paris ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Non, il affiche des recommandations et suivis locaux selon les sections existantes."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Y a-t-il une affiliation Winamax ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Non, les liens sont indicatifs sans tag d'affiliation."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Les données personnelles sortent-elles ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Les préférences et suivis restent dans ton navigateur."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Comment effacer mes données ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Utiliser le bouton Profil ou vider le localStorage du domaine."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Les QR codes uploadent-ils quelque chose ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Non, ils encodent localement un fragment d'URL."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Le site utilise-t-il des cookies tiers ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Non."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Pourquoi un disclaimer 18+ ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Parce que les paris comportent un risque financier réel."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Les résultats sont-ils garantis ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Non, le modèle fournit des probabilités, pas des certitudes."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Puis-je auditer le code ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Oui, le dépôt est public."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Que voit GitHub Pages ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Comme hébergeur, GitHub peut voir des logs techniques, pas les données locales."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Comment relancer le tutoriel ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Dans Profil ou via le bouton aide global."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Comment chercher dans la doc ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Depuis l'Académie ou le bouton aide, la base de connaissance filtre les docs."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Comment lire une modal détail ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Synthèse d'abord, puis signaux, cotes, historique et risques."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Comment construire un combiné ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Privilégier des jambes peu corrélées et un risque total maîtrisé."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Comment signaler un bug ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Créer une issue GitHub avec capture, URL, version footer et panneau debug si utile."
+      }
+    }
+  ]
+}

@@ -1,0 +1,279 @@
+# Glossary
+
+200+ termes utiles pour comprendre le modèle, les paris, la donnée et l'interface.
+
+## Paris
+
+- **1N2** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Cote décimale** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Probabilité implicite** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Value bet** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Edge** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Expected value** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Mise plate** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Mise Kelly** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Kelly fractionné** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Bankroll** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Yield** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **ROI flat** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **PNL** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **CLV** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Closing line** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Overround** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Marge bookmaker** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Cote d'ouverture** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Cote de clôture** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Cashout** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Void** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Push** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Handicap** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Asian handicap** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Draw no bet** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Double chance** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Both teams to score** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Total goals** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Under** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Over** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Correct score** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Half-time** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Full-time** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Same-game combo** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Accumulator** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Stake** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Unit** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Max drawdown** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Stop-loss** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Take-profit** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Risk of ruin** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Staking plan** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Outsider** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Favori** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Steam move** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Line movement** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Market consensus** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Sharp money** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Public money** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Closing value** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **No bet** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Bookable** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Winamax exact** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Cote indicative** — Notion paris utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+
+## Modèle
+
+- **Poisson** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Dixon-Coles** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Elo** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **LightGBM** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Bayesian prior** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Stacking** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Meta-modèle** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Calibration** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Brier score** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Log loss** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Isotonic regression** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Platt scaling** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Backtest** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Rolling origin** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Cross-validation** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Leakage** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Feature drift** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **KL divergence** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Adversarial validation** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Bootstrap** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Prediction interval** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Confidence interval** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Meta-confidence** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Feature importance** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Signal rare** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Penalty** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Boost** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Shrinkage** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Cold start** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Variance** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Overfitting** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Underfitting** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Baseline** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Challenger** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **A/B test** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Wilcoxon** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **P-value** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Sample size** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Wilson interval** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Regression** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Classifier** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Multitask** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Loss** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Hyperparameter** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Decay exponentiel** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Rolling window** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Lag feature** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Cyclic encoding** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Home advantage** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Market prior** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Consensus prior** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Quality score** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Tier** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Reliability** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Actionability** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Data freshness** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Anomaly flag** — Notion modèle utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+
+## Data
+
+- **Pipeline** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Fetcher** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Patcher** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Sidecar** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Schema version** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Health check** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Freshness** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Stale data** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Lineage** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Audit trail** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Quarantine** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Fallback** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Retry exponentiel** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Trace pipeline** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Completeness** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Coverage** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Consistency** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **SLA** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Source health** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Data lite** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Data full** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Manifest** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Service Worker** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Cache-first** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Network-first** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Stale-while-revalidate** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **IndexedDB** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **localStorage** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **JSONL** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Append-only** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Snapshot** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Diff** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Drift check** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Cron** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **GitHub Actions** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Race condition** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Splice data** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Generated at** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Timezone** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **UTC** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Europe/Paris** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Scoreboard** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Event id** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Merge id** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Dedup** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Bookmaker mapping** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Market key** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Selection key** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Odds history** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **CLV history** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Health JSON** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Privacy audit** — Notion data utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+
+## Sports
+
+- **xG** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **xGA** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **BTTS rate** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Over 2.5 rate** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Lineup** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Injury** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Suspension** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Referee bias** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Cards per match** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Home bias** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Travel fatigue** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Back-to-back** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **3-in-4** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Cup match** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **League match** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Continental cup** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Derby** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Motivation** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Relegation pressure** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Rotation** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Fixture congestion** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Set piece** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Counter attack** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Pressing intensity** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Stadium altitude** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Surface tennis** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Goalie SV%** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Pitcher ERA** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Bullpen** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Pace** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Possession** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Shot volume** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Expected assists** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Roster shock** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Manager change** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Coach tenure** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Season phase** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Early season** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Late season** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Playoffs** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Neutral venue** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Weather impact** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Wind** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Rain** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Temperature** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Surface type** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Rest days** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Form** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Head-to-head** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **League strength** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Promotion** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Relegation** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Table position** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Goal difference** — Notion sports utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+
+## UX
+
+- **Tooltip** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Onboarding** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Help modal** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Knowledge base** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **FAQPage** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **JSON-LD** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Deep link** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Hash route** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Skeleton** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Empty state** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Toast** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Modal** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Bottom sheet** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Focus order** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **ARIA label** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Skip link** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Touch target** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Reduced motion** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Contrast ratio** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Dark mode** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Responsive** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Sticky header** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Search index** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Lunr** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Command palette** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Glossary link** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Contextual help** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Runbook** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **ADR** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Changelog** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Sitemap** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Quickstart** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Storyboarding** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Feature tour** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Novice mode** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Expert mode** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Progressive disclosure** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Copywriting** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Decision aid** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Trust badge** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+- **Disclosure** — Notion ux utilisée dans Paris-Sportif. À lire avec le score qualité, la fraîcheur des données et le contexte du match ; un terme isolé ne suffit jamais à décider une mise.
+
+
+_Total : 258 termes._

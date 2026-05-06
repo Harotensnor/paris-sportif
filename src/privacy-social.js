@@ -883,6 +883,7 @@
     initNetworkAudit();
     renderAll();
     handleComboHash();
+    if (new URLSearchParams(location.search || '').has('docsNoTour')) localStorage.setItem(STORAGE.ack, '1');
     showPrivacyModal(false);
     const root = $('#app') || document.body;
     const observer = new MutationObserver(renderSoon);
