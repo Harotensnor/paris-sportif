@@ -1371,3 +1371,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : audit statique des `run: node scripts/*.js` de `smoke.yml` contre les deux listes de chemins.
 - Verrou : `scripts/audit_smoke_workflow_triggers.py` branché dans le groupe drift statique.
 - Résultat : 50/50 pytest, 18 probes navigateur verts, 15 audits statiques verts, triggers smoke alignés.
+
+## Sprint v37.076 — AUTO 10/10 Workflow self triggers (19:03 UTC)
+- Hypothèse : une PR qui modifie `smoke.yml` ou `e2e.yml` peut ne pas relancer le workflow concerné.
+- Fix : ajout des chemins self-trigger côté PR et audit statique de tous les workflows filtrés par `paths`.
+- Verrou : `scripts/audit_workflow_self_triggers.py` branché dans le groupe drift statique.
+- Résultat : 50/50 pytest, 18 probes navigateur verts, 16 audits statiques verts, workflows PR auto-vérifiés.

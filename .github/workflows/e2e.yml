@@ -27,6 +27,7 @@ on:
       - 'tests/**'
       - 'playwright.config.js'
       - 'package.json'
+      - '.github/workflows/e2e.yml'
       - 'auto_refresh.py'
       - '.github/workflows/refresh.yml'
       - 'scripts/**'
@@ -89,6 +90,7 @@ jobs:
           python3 scripts/audit_no_todo_markers.py
           python3 scripts/audit_no_empty_catch_modules.py
           python3 scripts/audit_smoke_workflow_triggers.py
+          python3 scripts/audit_workflow_self_triggers.py
           python3 scripts/audit_modal_aria.py
       - name: Pytest (Python unit tests)
         # v37.036 — pytest covers data-quality classifiers, the multi-strategy
