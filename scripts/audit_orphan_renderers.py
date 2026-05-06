@@ -112,7 +112,13 @@ def find_valid_pages(src: str) -> set[str]:
     if not m:
         return set()
     body = m.group(1)
-    return {tok.strip().strip("'\"") for tok in re.findall(r"'([a-z][a-z0-9-]+)'", body)}
+    out = {tok.strip().strip("'\"") for tok in re.findall(r"'([a-z][a-z0-9-]+)'", body)}
+    # VALID_PAGES uses `...SPORTS_COVERAGE_PAGES` to spread sport routes.
+    # Read SPORTS_COVERAGE_PAGES separately and merge.
+    sm = re.search(r"SPORTS_COVERAGE_PAGES\s*=\s*\[([\s\S]*?)\]", src)
+    if sm:
+        out |= {tok.strip().strip("'\"") for tok in re.findall(r"'([a-z][a-z0-9-]+)'", sm.group(1))}
+    return out
 
 
 def find_page_aliases(src: str) -> dict[str, str]:

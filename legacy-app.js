@@ -498,7 +498,7 @@ const PAGE_ALIASES = {
 'cagnotte': 'performance',     // alias historique
 'agent': 'performance',        // alias 'page Mon agent'
 'sports': 'sports-tous',
-'sports-tous': 'sports-tous',
+// 'sports-tous' is itself in VALID_PAGES — no alias needed (was a no-op).
 'sports-etendus': 'sports-tous',
 'volleyball': 'volley',
 'volley-ball': 'volley',
