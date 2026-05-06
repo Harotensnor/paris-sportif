@@ -427,7 +427,7 @@ const SPORTS_COVERAGE_PAGES = [
 'sports-tous', 'rugby', 'handball', 'volley', 'esport', 'combat',
 'cyclisme', 'ski', 'athle', 'tennis-challenger', 'foot-feminin', 'nfl'
 ];
-const VALID_PAGES = ['dashboard','tous','performance','academie','profil','buteurs','combines','sante','alertes','credibilite','bilan','historique','backtest','montantes', ...SPORTS_COVERAGE_PAGES];
+const VALID_PAGES = ['dashboard','tous','performance','academie','profil','buteurs','combines','sante','alertes','credibilite','bilan','historique','backtest','montantes','compare', ...SPORTS_COVERAGE_PAGES];
 const PAGE_ALIASES = {
 'top': 'dashboard',
 'locks': 'dashboard',
@@ -460,7 +460,10 @@ const PAGE_ALIASES = {
 // in the nav silently routed users to Tous and the rendered Combinés
 // content stayed hidden behind display:none.
 'calendrier': 'tous',
-'compare': 'tous',
+// v37.044 — un-alias 'compare' (date comparison page). renderComparePage
+// + compare-wrap exist, but `currentPage === 'compare'` was unreachable
+// through the 'compare' → 'tous' alias. The "↔️ Comparer" sub-nav link
+// landed users on Tous instead.
 'league': 'tous',
 'valeur': 'tous',
 'plan-mise': 'tous',
@@ -471,7 +474,12 @@ const PAGE_ALIASES = {
 // currentPage → 'profil' before isAlertes / isSante could turn true.
 // Net result: the Dashboard's "Santé data" link landed users on
 // Profil with no health diagnostics in sight.
-'simulator': 'performance',
+// v37.044 — 'simulator' (the What-if bankroll simulator) lives inside
+// the Profil page at #profile-bankroll-simulator, NOT inside Performance.
+// The previous alias dropped users on the Performance hub which has no
+// simulator section. Re-route to Profil; the section auto-scrolls if
+// reached via #simulator.
+'simulator': 'profil',
 'health': 'profil',
 'diagnostic': 'profil',
 'legal': 'profil',
@@ -529,6 +537,11 @@ try { history.replaceState(null, '', location.pathname + location.search + '#tou
 // matching sub-tab when reached via direct hash.
 if (h === 'montante-jour' || h === 'montante-weekend' || h === 'montante-semaine') {
 try { localStorage.setItem('montanteType', h.replace('montante-', '')); } catch(e) {}
+}
+// v37.044 — '#simulator' lands on Profil; stamp an anchor so the page
+// can scroll to the bankroll simulator section after render.
+if (h === 'simulator') {
+try { localStorage.setItem('profilScrollTo', 'profile-bankroll-simulator'); } catch(e) {}
 }
 if (PAGE_ALIASES[h]) {
 h = PAGE_ALIASES[h];
@@ -27829,7 +27842,23 @@ profilWrap.id = 'profil-wrap';
 profilWrap.style.display = isProfil ? '' : 'none';
 if (isProfil) {
 _renderPageSkeleton(profilWrap, 'Profil', 'Profil & bankroll', 3);
-requestAnimationFrame(() => renderProfilPage(profilWrap));
+requestAnimationFrame(() => {
+  renderProfilPage(profilWrap);
+  // v37.044 — auto-scroll to a section if profilScrollTo was stamped
+  // (e.g. via #simulator → profile-bankroll-simulator).
+  try {
+    const target = localStorage.getItem('profilScrollTo');
+    if (target) {
+      localStorage.removeItem('profilScrollTo');
+      setTimeout(() => {
+        try {
+          const el = document.getElementById(target);
+          if (el) el.scrollIntoView({ block: 'start', behavior: 'smooth' });
+        } catch(e) {}
+      }, 250);
+    }
+  } catch(e) {}
+});
 }
 
 let montanteWrap = document.getElementById('montante-wrap');
