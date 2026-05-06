@@ -94,8 +94,12 @@ def main() -> int:
     else:
         for needle in (
             "timeout-minutes: 25",
+            "strategy:",
+            "matrix:",
+            "project: [chromium-desktop, mobile-chromium]",
             "if [ -f package-lock.json ]; then npm ci; else npm install; fi",
-            "npx playwright test --project=chromium-desktop --project=mobile-chromium",
+            "npx playwright test --project=${{ matrix.project }}",
+            "playwright-report-${{ matrix.project }}",
         ):
             if needle not in e2e:
                 findings.append(f"e2e.yml missing {needle}")

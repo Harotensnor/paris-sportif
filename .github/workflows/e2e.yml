@@ -129,6 +129,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [chromium-desktop, mobile-chromium]
     steps:
       - uses: actions/checkout@v4
 
@@ -150,12 +154,12 @@ jobs:
         # Avant : seul chromium-desktop tournait. Or 60% du trafic est mobile.
         # Après : les 2 projets en parallèle, mobile catch les régressions
         # bottom-nav / drawer / modal / sub-nav scroll.
-        run: npx playwright test --project=chromium-desktop --project=mobile-chromium
+        run: npx playwright test --project=${{ matrix.project }}
 
       - name: Upload Playwright report on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report
+          name: playwright-report-${{ matrix.project }}
           path: playwright-report/
           retention-days: 7

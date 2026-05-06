@@ -1594,3 +1594,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : le job test passe à 25 min et `npm install` est choisi sans faux `npm ci` rouge si aucun lockfile.
 - Verrou : audit_qa_workflows.py exige le timeout 25 min et la commande npm conditionnelle.
 - Résultat : Playwright complet a maintenant le budget runner nécessaire sans masquer les vrais fails.
+
+## Sprint v37.109 — AUTO 10/10 E2E project matrix (23:23 UTC)
+- Hypothèse : desktop et mobile s'exécutaient en série dans le même budget runner.
+- Fix : e2e-tests lance une matrice par projet Playwright, avec artefact séparé par viewport.
+- Verrou : audit_qa_workflows.py exige la matrice projet et la commande `${{ matrix.project }}`.
+- Résultat : le test mobile garde son invariant sans bloquer le projet desktop ni consumer le budget complet.
