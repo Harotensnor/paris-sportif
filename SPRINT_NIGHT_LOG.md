@@ -1431,3 +1431,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : ajout des JSON/JS critiques backtest/calibration dans les filtres CI smoke, e2e et qa-gates.
 - Verrou : audits udit_ci_critical_paths.py et udit_qa_workflows.py exigent ces sidecars.
 - Résultat : 23/23 qa gate; toute dérive de stratégie/calibration relance les probes Performance concernés.
+
+## Sprint v37.086 — AUTO 10/10 QA matrix widen (20:44 UTC)
+- Hypothèse : une passe qui ne teste que Node 20 / Python 3.11-3.12 peut laisser passer une casse runtime ailleurs.
+- Fix : qa-gates couvre maintenant 3 OS x 3 Python x 3 Node, avec Python 3.13 et Node 18/22 inclus.
+- Verrou : scripts/audit_qa_matrix_versions.py bloque tout rétrécissement silencieux de matrice.
+- Résultat : 24/24 qa gate; audit dédié passé après avoir échoué sur la matrice précédente.

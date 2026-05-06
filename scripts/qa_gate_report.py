@@ -63,6 +63,7 @@ def _checks() -> list[tuple[str, list[str]]]:
         "scripts/audit_qa_runtime_privacy.py",
         "scripts/audit_ci_critical_paths.py",
         "scripts/audit_qa_workflows.py",
+        "scripts/audit_qa_matrix_versions.py",
     ]
     checks: list[tuple[str, list[str]]] = [
         ("syntax legacy-app.js", [node, "--check", "legacy-app.js"]),
