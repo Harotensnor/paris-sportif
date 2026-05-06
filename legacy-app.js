@@ -16477,7 +16477,7 @@ let v37ScanPool = v37BuildScanPool(v37DateFilter);
 const v37InitialDateFilter = v37DateFilter;
 const v37InitialScanPoolLength = v37ScanPool.length;
 const v37MinDenseDailyScanPool = 60;
-const v37CanAutoHorizonLowPool = v37DateFilter !== 'all' && !v37HistoryMode && (!v37HashDate || v37DateFilter === todayIso);
+const v37CanAutoHorizonLowPool = v37DateFilter !== 'all' && !v37HistoryMode && !v37HashDate;
 if (v37CanAutoHorizonLowPool && v37ScanPool.length < v37MinDenseDailyScanPool) {
 const allHorizonPool = v37BuildScanPool('all');
 if (allHorizonPool.length >= Math.max(v37MinDenseDailyScanPool, v37ScanPool.length + 30)) {

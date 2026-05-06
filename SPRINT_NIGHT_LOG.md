@@ -1522,3 +1522,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : resync origin/main, health/night_metrics remote conservés, shell QA branche conservé et hashes restampés.
 - Verrou : qa_gate_report élargi et synthetic monitor relancés après résolution.
 - Résultat : données prod fraîches, artefacts data alignés et cache SW bumpé.
+
+## Sprint v37.097 — AUTO 10/10 Filtre jour explicite (21:28 UTC)
+- Hypothèse : le clic Aujourd'hui est bien reçu mais l'auto-horizon le réécrit aussitôt en vue 7 jours.
+- Fix : l'élargissement 7 jours reste disponible seulement sans date explicite dans l'URL.
+- Verrou : probe_day_filter.js clique chaque chip jour et bloque la régression Aujourd'hui → 7 jours.
+- Résultat : date choisie persistée, chip actif stable, aucun warning console sur la sonde dédiée.

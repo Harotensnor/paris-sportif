@@ -41,6 +41,7 @@ on:
       - 'scripts/probe_corrupt_storage.js'
       - 'scripts/probe_qa_runtime.js'
       - 'scripts/probe_model_probability_caps.js'
+      - 'scripts/probe_day_filter.js'
       - '.github/workflows/smoke.yml'
   pull_request:
     branches: [main]
@@ -78,6 +79,7 @@ on:
       - 'scripts/probe_corrupt_storage.js'
       - 'scripts/probe_qa_runtime.js'
       - 'scripts/probe_model_probability_caps.js'
+      - 'scripts/probe_day_filter.js'
       - '.github/workflows/smoke.yml'
   workflow_dispatch: {}
 
@@ -220,3 +222,8 @@ jobs:
         # Synthetic football/basketball/baseball favourites must never leak
         # 0.98/0.999 probabilities into the public model output.
         run: node scripts/probe_model_probability_caps.js
+
+      - name: Run dashboard date filter probe
+        # Locks the V37 date chips: a deliberate Aujourd'hui click must
+        # persist the Paris date and must not be auto-expanded to 7 days.
+        run: node scripts/probe_day_filter.js
