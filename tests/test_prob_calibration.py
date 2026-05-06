@@ -1,4 +1,5 @@
 """Tests for scripts/build_prob_calibration.py."""
+import json
 import sys
 from pathlib import Path
 
@@ -81,3 +82,34 @@ def test_empty_bin_factor_defaults_to_one():
     # mean_predicted defaults to bin center (0.05); smoothed_wr =
     # (0+1)/(0+2) = 0.5 → factor = 0.5/0.05 = 10 → clamped to MAX_FACTOR.
     assert empty["calibration_factor"] == bpc.MAX_FACTOR
+
+
+def test_load_settled_filters_corrupt_high_prob_high_odd(tmp_path, monkeypatch):
+    # 99% prob at odd 32 is mathematically impossible on real markets
+    # (would mean +9x edge). Older versions of picks_history_lib.py
+    # accidentally emitted these on outsider tier rows. The filter must
+    # drop them so they don't pollute the calibration map.
+    history = tmp_path / "picks_history.jsonl"
+    rows = [
+        # legit: 60% predicted, won
+        {"prob_model": 0.60, "odd_book": 1.85, "result": "won"},
+        # legit: 35% predicted, lost
+        {"prob_model": 0.35, "odd_book": 3.0, "result": "lost"},
+        # corrupt: 99.9% on odd 32, must be skipped
+        {"prob_model": 0.999, "odd_book": 32.0, "result": "lost"},
+        # corrupt: 95% on odd 12, must be skipped
+        {"prob_model": 0.95, "odd_book": 12.0, "result": "won"},
+        # legit: 95% on odd 1.10 (favourite), kept
+        {"prob_model": 0.95, "odd_book": 1.10, "result": "won"},
+    ]
+    history.write_text(
+        "\n".join(json.dumps(r) for r in rows),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(bpc, "HISTORY", history)
+    out = bpc.load_settled()
+    # 3 legit rows (the two corrupt ones at odd>10 with prob>=0.95 are dropped)
+    assert len(out) == 3
+    # The 95%@1.10 favourite is the only ≥0.95 row that survived.
+    high_prob_kept = [p for p, _ in out if p >= 0.95]
+    assert high_prob_kept == [0.95]

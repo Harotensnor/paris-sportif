@@ -67,8 +67,18 @@ def _num(v):
 
 
 def load_settled() -> list[tuple[float, int]]:
-    """Return [(prob_model, outcome_int)] for won/lost picks. Voids skipped."""
+    """Return [(prob_model, outcome_int)] for won/lost picks. Voids skipped.
+
+    Filters obviously-corrupt rows from older versions of picks_history_lib.py
+    that wrote prob_model=0.999 on long-shot outsiders (odd > 10). A real
+    99% confidence at odd 10+ is mathematically impossible (it would mean
+    a 9x+ edge), so we treat these as data corruption and exclude them
+    from the calibration training. Without this, the 0.9-1.0 bin gets
+    polluted with 44 outsider rows that drag the calibration map's
+    factor down for legitimate 90%+ predictions.
+    """
     rows: list[tuple[float, int]] = []
+    skipped_corrupt = 0
     if not HISTORY.exists():
         return rows
     for line in HISTORY.read_text(encoding="utf-8").splitlines():
@@ -85,7 +95,18 @@ def load_settled() -> list[tuple[float, int]]:
         prob = _num(p.get("prob_model"))
         if prob is None or prob <= 0 or prob >= 1:
             continue
+        odd = _num(p.get("odd_book"))
+        # Sanity gate: prob >= 0.95 at odd > 10 cannot coexist on real
+        # markets. Skip these — they are leftovers from a fixed bug.
+        if prob >= 0.95 and odd is not None and odd > 10:
+            skipped_corrupt += 1
+            continue
         rows.append((prob, 1 if result == "won" else 0))
+    if skipped_corrupt:
+        print(
+            f"[prob_calibration] skipped {skipped_corrupt} corrupt rows "
+            f"(prob>=0.95 at odd>10 — historical artifact)"
+        )
     return rows
 
 
