@@ -1564,3 +1564,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : merge origin/main, sidecars 22:05 UTC conservés, shell et cache versionnés v37.103.
 - Verrou : mêmes probes jour/nav et audit_data_truth avant push, pour garder la data visible cohérente.
 - Résultat : la PR est réalignée sur la dernière tête main connue sans écraser les correctifs Tier 0.
+
+## Sprint v37.104 — AUTO 10/10 Fast cron resync (22:19 UTC)
+- Hypothèse : il faut publier le resync juste après le snapshot cron pour laisser GitHub créer les checks PR.
+- Fix : merge origin/main 22:18 UTC, data/health main conservés, shell v37.104 restampé.
+- Verrou : audit_data_truth.py, stamp hashes et smoke rapide gardent le snapshot cohérent avant push.
+- Résultat : branche poussée sur la tête main fraîche pour réduire la fenêtre dirty entre deux ticks cron.
