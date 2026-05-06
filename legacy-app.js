@@ -27935,13 +27935,18 @@ b.classList.toggle('active', isActive);
 if (isActive) b.setAttribute('aria-current', 'page');
 else b.removeAttribute('aria-current');
 });
+// v37.047 — extend HUB_PAGES to cover the routes revived in v37.040–044.
+// Without this, navigating to e.g. #historique kept all hub buttons
+// inactive even though Historique conceptually belongs to the Performance
+// hub. Each hub now lists every sub-page that should keep its top-nav
+// button highlighted.
 const HUB_PAGES = {
 now: ['dashboard'],
-agent: ['performance'],
-explore: ['tous'],
-performance: ['performance'],
+agent: ['performance', 'bilan', 'historique', 'backtest', 'credibilite', 'montantes'],
+explore: ['tous', 'compare', 'buteurs', 'combines'],
+performance: ['performance', 'bilan', 'historique', 'backtest', 'credibilite', 'montantes'],
 learn: ['academie'],
-account: ['profil'],
+account: ['profil', 'sante', 'alertes'],
 };
 document.querySelectorAll('nav.topbar-nav .hub').forEach(h => {
 const k = h.dataset.hub;
