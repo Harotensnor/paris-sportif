@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-06T15:12:34Z",
+  "generated_at": "2026-05-06T15:35:02Z",
   "status": "ok",
   "steps": [
     {
@@ -34,7 +34,7 @@
       "cmd": "C:\\Users\\bouln\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe scripts/qa_load_test.js",
       "returncode": 0,
       "required": true,
-      "stdout": "QA load: 1000 picks in 0.3ms · fps 60\n",
+      "stdout": "QA load: 1000 picks in 0.5ms · fps 60\n",
       "stderr": "",
       "status": "ok"
     },
@@ -43,7 +43,7 @@
       "cmd": "C:\\Users\\bouln\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe scripts/qa_contract_tests.py",
       "returncode": 0,
       "required": true,
-      "stdout": "QA contract tests: events=311 winamax=100.0% errors=0 warnings=2\n",
+      "stdout": "QA contract tests: events=309 winamax=100.0% errors=0 warnings=2\n",
       "stderr": "",
       "status": "ok"
     },
@@ -52,7 +52,7 @@
       "cmd": "C:\\Users\\bouln\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe scripts/check_data_integrity.py",
       "returncode": 0,
       "required": true,
-      "stdout": "check_data_integrity: winamax_exact current=309, previous=309, delta=+0.0% (raw total 311/311, exact 309/309)\nOK: data.js dans plage acceptable.\n",
+      "stdout": "check_data_integrity: winamax_exact current=307, previous=307, delta=+0.0% (raw total 309/309, exact 307/307)\nOK: data.js dans plage acceptable.\n",
       "stderr": "",
       "status": "ok"
     },
@@ -70,7 +70,7 @@
       "cmd": "C:\\Users\\bouln\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe scripts/check_bundle_size.py",
       "returncode": 0,
       "required": true,
-      "stdout": "  [ok]app.js: 0.8 KB / 1750 KB budget (0%)\n  [ok]app.css: 260.4 KB / 300 KB budget (87%)\n  [ok]pronostics.html: 82.5 KB / 1150 KB budget (7%)\n  [ok]sw.js: 10.7 KB / 15 KB budget (71%)\n  [ok]index.html: 23.1 KB / 35 KB budget (66%)\n  [ok]methodologie.html: 26.2 KB / 35 KB budget (75%)\n  [ok]academie.html: 22.7 KB / 40 KB budget (57%)\n  [ok]comment-lire-un-prono.html: 17.6 KB / 35 KB budget (50%)\n  [ok]backtest.html: 40.2 KB / 80 KB budget (50%)\n  [ok]credibilite.html: 16.7 KB / 70 KB budget (24%)\n\nWARNINGS :\n  [warn]legacy-app.js: 1784.2 KB / 1850 KB budget (96%) � proche du budget\n  [warn]legal.html: 18.3 KB / 20 KB budget (91%) � proche du budget\n  [warn]static-page.css: 22.9 KB / 25 KB budget (92%) � proche du budget\n\nOK: tous les bundles dans leur budget.\n",
+      "stdout": "  [ok]app.js: 0.8 KB / 1750 KB budget (0%)\n  [ok]app.css: 260.4 KB / 300 KB budget (87%)\n  [ok]pronostics.html: 84.0 KB / 1150 KB budget (7%)\n  [ok]sw.js: 11.0 KB / 15 KB budget (73%)\n  [ok]index.html: 23.1 KB / 35 KB budget (66%)\n  [ok]methodologie.html: 26.2 KB / 35 KB budget (75%)\n  [ok]academie.html: 22.7 KB / 40 KB budget (57%)\n  [ok]comment-lire-un-prono.html: 17.6 KB / 35 KB budget (50%)\n  [ok]backtest.html: 40.2 KB / 80 KB budget (50%)\n  [ok]credibilite.html: 16.7 KB / 70 KB budget (24%)\n\nWARNINGS :\n  [warn]legacy-app.js: 1784.3 KB / 1850 KB budget (96%) � proche du budget\n  [warn]legal.html: 18.3 KB / 20 KB budget (91%) � proche du budget\n  [warn]static-page.css: 22.9 KB / 25 KB budget (92%) � proche du budget\n\nOK: tous les bundles dans leur budget.\n",
       "stderr": "",
       "status": "ok"
     },
@@ -106,16 +106,16 @@
       "cmd": "C:\\Users\\bouln\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe scripts/check_pipeline_freshness.py",
       "returncode": 0,
       "required": false,
-      "stdout": "[pipeline-health] OK data.js age=3min generated_at=2026-05-06T15:09:52Z\n",
+      "stdout": "[pipeline-health] OK data.js age=1min generated_at=2026-05-06T15:33:36Z\n",
       "stderr": "",
       "status": "ok"
     }
   ],
   "reports": {
     "unit": {
-      "generated_at": "2026-05-06T15:12:33.126Z",
+      "generated_at": "2026-05-06T15:35:01.520Z",
       "status": "ok",
-      "duration_ms": 3,
+      "duration_ms": 5,
       "tests": [
         {
           "name": "utils clamp and number formatting are stable",
@@ -184,7 +184,7 @@
       "coverage_gate_pct": 90
     },
     "mutation": {
-      "generated_at": "2026-05-06T15:12:33.179Z",
+      "generated_at": "2026-05-06T15:35:01.583Z",
       "status": "ok",
       "mutation_score_pct": 100,
       "gate_pct": 70,
@@ -243,25 +243,25 @@
       "note": "Dependency-free mutation smoke; full Stryker can use this as the initial mutant list."
     },
     "snapshot": {
-      "generated_at": "2026-05-06T15:12:33.233Z",
+      "generated_at": "2026-05-06T15:35:01.641Z",
       "status": "ok",
       "snapshot": "tests\\snapshots\\qa-pick-card.snapshot.html",
       "fixture_count": 2
     },
     "load": {
-      "generated_at": "2026-05-06T15:12:33.288Z",
+      "generated_at": "2026-05-06T15:35:01.698Z",
       "status": "ok",
       "picks_rendered": 1000,
-      "render_ms": 0.3,
+      "render_ms": 0.5,
       "fps_estimate": 60,
       "html_bytes": 117685,
       "gate_fps_min": 30
     },
     "contract": {
-      "generated_at": "2026-05-06T15:12:33Z",
+      "generated_at": "2026-05-06T15:35:02Z",
       "status": "ok",
-      "events": 311,
-      "winamax_events": 311,
+      "events": 309,
+      "winamax_events": 309,
       "winamax_pct": 100.0,
       "sidecars": [
         {
@@ -272,7 +272,7 @@
         {
           "name": "winamax_markets.json",
           "status": "ok",
-          "items": 754
+          "items": 758
         },
         {
           "name": "health.json",
