@@ -1407,3 +1407,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : clamp de _calibrateProb sur MODEL_PROB_CAP et durcissement des probes modal + proba synthétique.
 - Verrou : scripts/probe_tous_modal.js + scripts/probe_model_probability_caps.js contrôlent désormais le helper public.
 - Résultat : 23/23 qa gate, 20/20 probes navigateur verts; aucune probabilité publique ne dépasse 0.95, même via calibration console/UI.
+
+## Sprint v37.082 — AUTO 10/10 QA path filters (20:10 UTC)
+- Hypothèse : qa-gates peut ne pas tourner sur un changement SW ou workflow QA adjacent.
+- Fix : ajout de sw.js, synthetic-monitor et post-deploy-health dans les filtres push/PR de qa-gates.
+- Verrou : scripts/audit_qa_workflows.py exige maintenant ces chemins critiques.
+- Résultat : 23/23 qa gate, service-worker probe vert; les gates rapides se déclenchent sur tout changement QA/cache critique.

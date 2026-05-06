@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'pronostics.html'
+      - 'sw.js'
       - 'legacy-app.js'
       - 'app-enhancements.js'
       - 'app-i18n.js'
@@ -14,10 +15,13 @@ on:
       - '.github/workflows/qa-gates.yml'
       - '.github/workflows/e2e.yml'
       - '.github/workflows/smoke.yml'
+      - '.github/workflows/synthetic-monitor.yml'
+      - '.github/workflows/post-deploy-health.yml'
   pull_request:
     branches: [main]
     paths:
       - 'pronostics.html'
+      - 'sw.js'
       - 'legacy-app.js'
       - 'app-enhancements.js'
       - 'app-i18n.js'
@@ -27,6 +31,8 @@ on:
       - '.github/workflows/qa-gates.yml'
       - '.github/workflows/e2e.yml'
       - '.github/workflows/smoke.yml'
+      - '.github/workflows/synthetic-monitor.yml'
+      - '.github/workflows/post-deploy-health.yml'
   workflow_dispatch: {}
 
 concurrency:

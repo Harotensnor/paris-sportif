@@ -31,7 +31,10 @@ def main() -> int:
             "node-version:",
             "scripts/qa_gate_report.py",
             "actions/upload-artifact@v4",
+            "'sw.js'",
             ".github/workflows/qa-gates.yml",
+            ".github/workflows/synthetic-monitor.yml",
+            ".github/workflows/post-deploy-health.yml",
         ):
             if needle not in qa:
                 findings.append(f"qa-gates.yml missing {needle}")
