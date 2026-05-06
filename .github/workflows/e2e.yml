@@ -60,6 +60,26 @@ jobs:
         run: python3 scripts/check_bundle_size.py
       - name: MCP tools smoke test (v33.22)
         run: python3 scripts/test_mcp_smoke.py
+      - name: innerHTML sink + fetch tracking + UX clarity audits
+        # v37.036 — these static audits used to run only locally. Wiring
+        # them into drift catches regressions in legacy-app.js that the
+        # smoke E2E only exposes after a full Chromium boot (slower).
+        run: |
+          python3 scripts/audit_innerhtml_safety.py
+          python3 scripts/audit_fetch_tracking.py
+          python3 scripts/audit_ux_clarity.py
+          python3 scripts/audit_playwright_skips.py
+          python3 scripts/audit_intelligence_consistency.py
+          python3 scripts/audit_legacy_comments.py
+          python3 scripts/audit_local_analytics.py
+          python3 scripts/audit_privacy_features.py
+      - name: Pytest (Python unit tests)
+        # v37.036 — pytest covers data-quality classifiers, the multi-strategy
+        # backtest math, the calibration maps and the historique archive
+        # contract. Cheap (<1s) and catches regressions before E2E runs.
+        run: |
+          pip install pytest --break-system-packages
+          python3 -m pytest tests/ -q
 
   test:
     runs-on: ubuntu-latest
