@@ -80,6 +80,7 @@ jobs:
           python3 scripts/audit_orphan_renderers.py
           python3 scripts/audit_localstorage_safety.py
           python3 scripts/audit_no_unused_imports.py
+          python3 scripts/audit_no_legacy_imports.py
           python3 scripts/audit_modal_aria.py
       - name: Pytest (Python unit tests)
         # v37.036 — pytest covers data-quality classifiers, the multi-strategy

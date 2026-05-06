@@ -1305,3 +1305,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : ajout d'un runtime SW mocké qui exécute `sw.js` et simule caches, fetch, activate et fetch events.
 - Verrou : `scripts/probe_service_worker_cache.js` couvre nettoyage caches, data.js SWR, corruption data, HTML offline et images cache-first.
 - Résultat : 50/50 pytest, 7 audits statiques, smoke/probe_all_pages/probe_data_freshness/probe_service_worker_cache verts.
+
+## Sprint v37.065 — AUTO 10/10 Legacy import audit (17:21 UTC)
+- Hypothèse : un import/export dans `legacy-app.js` casserait le chargement classic `<script defer>` sans audit dédié.
+- Fix : ajout de `scripts/audit_no_legacy_imports.py` pour bloquer import statique, import dynamique et export.
+- Verrou : audit branché dans `e2e.yml` avec les autres checks drift statiques.
+- Résultat : audit import OK, 50/50 pytest, 7 audits statiques et smoke_e2e verts.
