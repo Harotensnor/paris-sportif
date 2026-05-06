@@ -1237,3 +1237,11 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Monitoring: health.json expose sections pipeline/data/model/ui/tests, source health, traces et age generated_at reel.
 - Recovery: SW refuse de remplacer le cache par un data.js corrompu; backup IndexedDB quotidien des snapshots critiques.
 - Vérifs: pytest data integrity 5/5, build_health OK overall=warning/global=degraded, rapport DATA_INTEGRITY_REPORT.md et docs disaster/schema livres.
+
+
+## Sprint v37.019 — AUTO 10/10 Privacy-first social local (04:15 UTC)
+- Social local: partage QR de combinés via hash base64, réception #combo et export JSON sans serveur.
+- Profil/Bilan: badges locaux (32), rangs, goals, leaderboard amis saisi main, heatmap P&L, export PDF et snapshots.
+- Données user: export/import JSON avec validation, effacement complet et modal confidentialité premier visit.
+- Légal: politique zéro tracking enrichie pour QR, PDF, JSON, amis et badges locaux.
+- Vérifs: privacy audit OK (0 primitive réseau), JS syntax OK, SW paris-sportif-20260506-041500, footer v37.019.
