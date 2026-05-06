@@ -1582,3 +1582,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : merge origin/main 22:29 UTC, données main conservées, shell/cache bumpés v37.106.
 - Verrou : audit_data_truth.py et probe_onboarding_fresh.js avant push.
 - Résultat : le correctif smoke reste présent sur une base PR fraîche.
+
+## Sprint v37.107 — AUTO 10/10 Stable-window resync (22:35 UTC)
+- Hypothèse : attendre une tête main stable 45s laisse une meilleure fenêtre de checks PR.
+- Fix : merge origin/main 22:32 UTC, données main conservées, shell/cache bumpés v37.107.
+- Verrou : audit_data_truth.py et probe_onboarding_fresh.js relancés après merge.
+- Résultat : resync publié après stabilisation de main, avec le correctif onboarding conservé.
