@@ -17337,6 +17337,7 @@ if (Array.isArray(arr) && arr.length < max) arr.push(item);
 } catch(e) {}
 };
 let v37FilterResetNotice = '';
+let v37AutoHorizonReason = '';
 const v37HashDate = v37HashParams.get('date') || '';
 const v37StoredDate = v36Filter.date || 'all';
 let v37DateSource = v37HashDate ? 'url' : (v36Filter.date ? 'localStorage' : 'default');
@@ -17422,10 +17423,14 @@ if (odd >= 5.00 && conf >= 0.06 && edge >= 0.05) return { id: 'out', strict: edg
 return null;
 };
 let v37ScanPool = v37BuildScanPool(v37DateFilter);
-if (!v37HashDate && v37DateFilter !== 'all' && !v37HistoryMode && v37ScanPool.length < 30) {
+const v37InitialDateFilter = v37DateFilter;
+const v37InitialScanPoolLength = v37ScanPool.length;
+const v37MinDenseDailyScanPool = 60;
+if (!v37HashDate && v37DateFilter !== 'all' && !v37HistoryMode && v37ScanPool.length < v37MinDenseDailyScanPool) {
 const allHorizonPool = v37BuildScanPool('all');
-if (allHorizonPool.length >= 30) {
-v37FilterResetNotice = 'Date locale remise sur 7 jours : elle masquait presque tout le tableau.';
+if (allHorizonPool.length >= Math.max(v37MinDenseDailyScanPool, v37ScanPool.length + 30)) {
+v37AutoHorizonReason = `${v37InitialScanPoolLength} matchs restants sur ${v37DateLabel(v37InitialDateFilter)} ; ${allHorizonPool.length} matchs sur 7 jours.`;
+v37FilterResetNotice = `Vue élargie aux 7 prochains jours : ${v37AutoHorizonReason} L'accueil garde les mêmes seuils mais privilégie un tableau exploitable.`;
 v37DateFilter = 'all';
 v37DateSource = 'auto_all_horizon';
 v37HistoryMode = false;
@@ -17433,7 +17438,7 @@ v37IsAllHorizon = true;
 v37ScanPool = allHorizonPool;
 v36Filter.date = 'all';
 try { localStorage.setItem(v36FilterKey, JSON.stringify(v36Filter)); } catch(e) {}
-v37Reject('date_localstorage_reset', null, `${allHorizonPool.length} matchs horizon`);
+v37Reject('date_auto_horizon_low_pool', null, v37AutoHorizonReason);
 }
 }
 const v37DashboardMarketLimit = (market) => {
@@ -17936,8 +17941,9 @@ const v36Next = v36UpcomingAll.slice(0, 6);
 const v37ScopeLabel = v37IsAllHorizon ? '7 prochains jours' : v37DateLabel(v37DateFilter);
 const v37DisplayTotal = v36Sorted.length ? v36Total : v37DataOnlyPool.length;
 const v37QualifiedMatchCount = new Set(v36PickPool.map(p => v37MatchKeyForPick(p))).size;
-const v37QualificationRate = terminalScanPool.length ? Math.round((v37QualifiedMatchCount / terminalScanPool.length) * 100) : 0;
-const v36CoverageLine = `${v37DisplayTotal} lignes visibles · ${v37QualifiedMatchCount}/${terminalScanPool.length} matchs avec pick (${v37QualificationRate}%) · ${v36PickPool.length} picks qualifies · ${v36UpcomingAll.length} a venir · ${v37LiveAll.length} live · ${v37FinishedAll.length} termines · data ${_dataAgeMin} min`;
+const v37ScopeMatchDenominator = v37ScanPool.length || terminalScanPool.length;
+const v37QualificationRate = v37ScopeMatchDenominator ? Math.round((v37QualifiedMatchCount / v37ScopeMatchDenominator) * 100) : 0;
+const v36CoverageLine = `${v37DisplayTotal} lignes visibles · ${v37QualifiedMatchCount}/${v37ScopeMatchDenominator} matchs du scope avec pick (${v37QualificationRate}%) · ${v36PickPool.length} picks qualifies · ${v36UpcomingAll.length} a venir · ${v37LiveAll.length} live · ${v37FinishedAll.length} termines · data ${_dataAgeMin} min`;
 const v37CountBy = (rows, keyFn, limit) => Object.entries((rows || []).reduce((acc, row) => {
 const key = keyFn(row) || 'inconnu';
 acc[key] = (acc[key] || 0) + 1;
@@ -18013,6 +18019,10 @@ return `${sportLabel(m?.sport || '')} ${parisDateISO(m?.date) || '?'} ${v36TeamN
 const v37DebugState = {
 terminalScanPool: terminalScanPool.length,
 v37ScanPool: v37ScanPool.length,
+v37InitialDateFilter,
+v37InitialScanPoolLength,
+v37MinDenseDailyScanPool,
+v37AutoHorizonReason,
 v36PickPoolRaw: v36PickPoolRaw.length,
 v36PickPoolCanonical: v36PickPoolCanonical.length,
 v36PickPool: v36PickPool.length,
@@ -18021,6 +18031,7 @@ v37DataOnlyFallback: v37DataOnlyPool.length,
 v37DataOnlyScanPool: v37DataOnlyScanPool.length,
 v36TableRows: v36TableRows.length,
 v37QualifiedMatchCount,
+v37ScopeMatchDenominator,
 activeDate: v37DateFilter,
 dateSource: v37DateSource,
 historyMode: v37HistoryMode,
