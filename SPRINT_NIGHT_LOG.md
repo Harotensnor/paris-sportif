@@ -1280,3 +1280,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Debug: `?debug=1` expose la date initiale, le pool initial, le seuil dense et la raison du basculement horizon.
 - Cohérence: la ligne de couverture calcule le taux de qualification sur le scope affiché, plus sur tout le dataset.
 - Cache: footer v37.024 et SW paris-sportif-20260506-142400.
+
+## Sprint v37.025 — AUTO 10/10 Dashboard low-pick fill (15:05 UTC)
+- UX: si le scope a moins de 30 picks qualifiés, le tableau se complète avec des lignes data fiable jusqu'à 30 lignes quand assez de matchs existent.
+- Clarté: l'entête parle désormais de lignes affichées, et détaille picks qualifiés vs lignes data.
+- Debug: `?debug=1` expose `v37DenseMinimumRows` et le volume de fallback data.
+- Cache: footer v37.025 et SW paris-sportif-20260506-151200.

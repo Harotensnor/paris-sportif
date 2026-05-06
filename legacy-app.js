@@ -17821,13 +17821,18 @@ counts.set(key, (counts.get(key) || 0) + 1);
 return counts;
 })();
 const v37DenseRowLimit = 360;
+const v37DenseMinimumRows = Math.min(30, Math.max(0, v37ScanPool.length));
 const v37PickRowKey = (p) => p?.pickUid || `${v37MatchKeyForPick(p)}|${p?.tier || ''}|${p?.market || ''}|${p?.pickKey || ''}|${p?.line ?? ''}|${Number(p?.odd || 0).toFixed(2)}`;
 const v37DataOnlyScanPool = (v37ScanPool.length > 10 || v37HistoryMode) ? v37ScanPool : v37BuildScanPool('all');
 const v37DataOnlyPool = (() => {
-if (v36PickPool.length || v37DataOnlyScanPool.length <= 10) return [];
+const fillTarget = Math.max(0, v37DenseMinimumRows - v36PickPool.length);
+if (!fillTarget || v37DataOnlyScanPool.length <= 10) return [];
 const out = [];
+const pickedMatches = new Set(v36PickPool.map(p => v37MatchKeyForPick(p)));
 for (const m of v37DataOnlyScanPool) {
 try {
+const matchKey = v37StableMatchKey(m);
+if (pickedMatches.has(matchKey)) continue;
 const pred = predictMatch(m);
 if (!pred?.pick) continue;
 const odds = pred.odds || getMatchOdds(m, m.sport === 'football');
@@ -17880,7 +17885,8 @@ ts: new Date(m.date || 0).getTime(),
 score: Math.max(20, Math.min(70, (rel * 80) + Math.max(-10, edge * 100))),
 dataOnly: true
 });
-if (out.length >= 30) break;
+pickedMatches.add(matchKey);
+if (out.length >= fillTarget) break;
 } catch(e) {}
 }
 return out.sort((a, b) => (b.opportunity - a.opportunity) || (a.ts - b.ts));
@@ -17930,7 +17936,7 @@ keys.add(v37PickRowKey(candidate));
 }
 return out;
 };
-const v37RenderPool = v37SortedDiverse.length ? v37SortedDiverse : v37DataOnlyPool;
+const v37RenderPool = v37SortedDiverse.length ? v37SortedDiverse.concat(v37DataOnlyPool) : v37DataOnlyPool;
 const v36TableRows = v37EnsureTierCoverage(v37RenderPool.slice(0, v37DenseRowLimit), v37RenderPool);
 const v36UpcomingAll = terminalScanPool
 .filter(m => new Date(m?.date || 0).getTime() > _dashboardNowMs && !m.completed)
@@ -17939,11 +17945,11 @@ const v37LiveAll = terminalScanPool.filter(m => m?.live || m?.status === 'STATUS
 const v37FinishedAll = terminalScanPool.filter(m => m?.completed || _isMatchEffectivelyDone(m));
 const v36Next = v36UpcomingAll.slice(0, 6);
 const v37ScopeLabel = v37IsAllHorizon ? '7 prochains jours' : v37DateLabel(v37DateFilter);
-const v37DisplayTotal = v36Sorted.length ? v36Total : v37DataOnlyPool.length;
+const v37DisplayTotal = v36TableRows.length;
 const v37QualifiedMatchCount = new Set(v36PickPool.map(p => v37MatchKeyForPick(p))).size;
 const v37ScopeMatchDenominator = v37ScanPool.length || terminalScanPool.length;
 const v37QualificationRate = v37ScopeMatchDenominator ? Math.round((v37QualifiedMatchCount / v37ScopeMatchDenominator) * 100) : 0;
-const v36CoverageLine = `${v37DisplayTotal} lignes visibles · ${v37QualifiedMatchCount}/${v37ScopeMatchDenominator} matchs du scope avec pick (${v37QualificationRate}%) · ${v36PickPool.length} picks qualifies · ${v36UpcomingAll.length} a venir · ${v37LiveAll.length} live · ${v37FinishedAll.length} termines · data ${_dataAgeMin} min`;
+const v36CoverageLine = `${v37DisplayTotal} lignes visibles · ${v37QualifiedMatchCount}/${v37ScopeMatchDenominator} matchs du scope avec pick (${v37QualificationRate}%) · ${v36PickPool.length} picks qualifies · ${v37DataOnlyPool.length} lignes data · ${v36UpcomingAll.length} a venir · ${v37LiveAll.length} live · ${v37FinishedAll.length} termines · data ${_dataAgeMin} min`;
 const v37CountBy = (rows, keyFn, limit) => Object.entries((rows || []).reduce((acc, row) => {
 const key = keyFn(row) || 'inconnu';
 acc[key] = (acc[key] || 0) + 1;
@@ -18022,6 +18028,7 @@ v37ScanPool: v37ScanPool.length,
 v37InitialDateFilter,
 v37InitialScanPoolLength,
 v37MinDenseDailyScanPool,
+v37DenseMinimumRows,
 v37AutoHorizonReason,
 v36PickPoolRaw: v36PickPoolRaw.length,
 v36PickPoolCanonical: v36PickPoolCanonical.length,
@@ -18085,6 +18092,10 @@ const v37EmptyPoolHelpHtml = (!v36PickPool.length && terminalScanPool.length > 1
         <strong>Mode secours actif : le tableau ne reste jamais vide.</strong>
         <span>${terminalScanPool.length} matchs sont disponibles. ${v37DataOnlyPool.length ? `${v37DataOnlyPool.length} matchs data-only sont affiches avec cote a verifier.` : 'La liste complete reste accessible dans Tous.'}</span>
         <button type="button" class="page-btn" data-page="tous">Voir tous les matchs</button>
+      </section>` : '';
+const v37DenseFallbackHtml = (v36PickPool.length > 0 && v37DataOnlyPool.length > 0) ? `<section class="v37-empty-pool-help is-info">
+        <strong>Tableau complété en lecture prudente</strong>
+        <span>${v36PickPool.length} picks qualifiés seulement sur ce scope ; ${v37DataOnlyPool.length} matchs data fiables ont été ajoutés pour atteindre une lecture exploitable. Les lignes "data fiable" restent à vérifier chez Winamax.</span>
       </section>` : '';
 const v37FilterResetHtml = v37FilterResetNotice ? `<section class="v37-empty-pool-help is-info"><strong>Filtres corriges</strong><span>${esc(v37FilterResetNotice)}</span></section>` : '';
 const v37DecisionGuideSeen = safeLocalStorageGet('paris_sportif_decision_guide_seen', '') === '1';
@@ -18296,13 +18307,14 @@ const v36TableHtml = `<section class="v36-table-panel" aria-label="Tableau dense
         ${v37DebugPanelHtml}
         ${v37FilterResetHtml}
         ${v37EmptyPoolHelpHtml}
+        ${v37DenseFallbackHtml}
         ${v37DecisionGuideHtml}
         ${v37TierLegendHtml}
         ${v37DayNavHtml}
         <header class="v36-table-toolbar">
           <div>
-            <strong>${v36PickPool.length} picks · ${esc(v37ScopeLabel)}</strong>
-            <span>${v36TierDefs.map(t => `${v36CountsAll[t.id] || 0} ${t.label}`).join(' · ')} · ${v36TableRows.length}/${v36Sorted.length} lignes rendues</span>
+            <strong>${v36TableRows.length} lignes · ${esc(v37ScopeLabel)}</strong>
+            <span>${v36PickPool.length} picks qualifiés${v37DataOnlyPool.length ? ` · ${v37DataOnlyPool.length} lignes data fiable` : ''} · ${v36TierDefs.map(t => `${v36CountsAll[t.id] || 0} ${t.label}`).join(' · ')} · ${v36TableRows.length}/${v37RenderPool.length || v36TableRows.length} lignes rendues</span>
           </div>
           <label class="v36-table-search"><span>Search</span><input type="search" data-v36-search value="${esc(v36Search)}" placeholder="Équipe, ligue, marché"></label>
           <button type="button" class="v37-blind-toggle ${v37BlindMode ? 'is-active' : ''}" data-v37-blind aria-pressed="${v37BlindMode ? 'true' : 'false'}" data-tooltip="Cache cote et edge dans le dashboard pour lire l'analyse avant le rendement.">
@@ -18652,7 +18664,7 @@ const v37IntelFallback = v37IntelState.loading
 wrap.innerHTML = `
         <div class="v36-home-shell">
           <section class="v36-dayline" aria-label="Strategie du jour">
-            <h1>${_dataIsStale ? `Donnees anciennes : ${v36Total} picks visibles en lecture seule` : `V37 : ${v36Total} picks affiches · table dense ${esc(v37ScopeLabel)}`}</h1>
+            <h1>${_dataIsStale ? `Donnees anciennes : ${v37DisplayTotal} lignes visibles en lecture seule` : `V37 : ${v37DisplayTotal} lignes affichées · table dense ${esc(v37ScopeLabel)}`}</h1>
             <span>${esc(v36CoverageLine)}</span>
             <button type="button" class="page-btn" data-page="tous">Tout voir</button>
           </section>
