@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-06T14:36:56Z",
-  "calculated_at": "2026-05-06T14:36:56Z",
+  "generated_at": "2026-05-06T14:42:10Z",
+  "calculated_at": "2026-05-06T14:42:10Z",
   "source_of_truth": "data.js",
   "data_age_min": 0,
   "data_file_age_min": 0,
@@ -73,7 +73,7 @@
       "sports": 4
     },
     "h2h_extended": {
-      "age_min": 0,
+      "age_min": 1,
       "events": 228,
       "events_with_meetings": 118,
       "meetings": 459,
@@ -325,16 +325,16 @@
     },
     "detected_angles": {
       "age_min": 0,
-      "events": 136,
-      "angles": 248,
+      "events": 147,
+      "angles": 271,
       "by_type": {
         "injury_imbalance": 66,
         "back_to_back_travel": 14,
         "market_uncertain": 52,
         "travel_extreme": 9,
         "lookahead": 49,
-        "signal_conflict": 9,
-        "market_move": 43,
+        "market_move": 61,
+        "signal_conflict": 14,
         "schedule_congestion": 6
       }
     },
@@ -348,30 +348,30 @@
     },
     "rare_signals": {
       "age_min": 0,
-      "signals": 161,
+      "signals": 184,
       "by_type": {
         "back_to_back_travel": 14,
         "injury_imbalance": 37,
         "market_uncertain": 52,
         "travel_extreme": 6,
-        "signal_conflict": 9,
-        "market_move": 43
+        "market_move": 61,
+        "signal_conflict": 14
       }
     },
     "rare_signal_summary": {
       "age_min": 0,
-      "active": 74,
-      "actionable": 35,
-      "watch": 12,
-      "risk": 27,
+      "active": 73,
+      "actionable": 30,
+      "watch": 19,
+      "risk": 24,
       "status": "ok"
     },
     "timing_edges": {
       "age_min": 0,
-      "events": 227,
-      "bet_now": 202,
+      "events": 219,
+      "bet_now": 182,
       "wait": 15,
-      "price_shortening": 10
+      "price_shortening": 22
     },
     "injuries_multisport": {
       "age_min": 1,
@@ -592,7 +592,7 @@
     "h2h_extended": {
       "script": "h2h_extended.json",
       "output": "h2h_extended.json",
-      "age_min": 0,
+      "age_min": 1,
       "threshold_min": 60,
       "fast_red_min": null,
       "status": "ok"
@@ -1050,7 +1050,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-05-06T14:36:06.934465Z",
+    "data_generated_at": "2026-05-06T14:41:21.875811Z",
     "truth_scope": "all_events",
     "all_winamax_available": 270,
     "all_winamax_exact": 268,
@@ -1067,7 +1067,7 @@
     "winamax_detail_gap_to_target": 0,
     "winamax_detail_fetch_cap_reco": 90,
     "winamax_detail_status": "ok",
-    "actionable_external_odds": 0,
+    "actionable_external_odds": 30,
     "football_invalid_form": 0,
     "events_with_xg": 163,
     "winamax_coverage": {
@@ -1121,7 +1121,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-05-06T14:36:06.934465Z",
+    "data_generated_at": "2026-05-06T14:41:21.875811Z",
     "winamax_available": 270,
     "winamax_exact": 268,
     "winamax_exact_ratio": 0.9926,
@@ -1141,7 +1141,7 @@
     "anomalies_emitted": 5
   },
   "source_health": {
-    "generated_at": "2026-05-06T14:36:56Z",
+    "generated_at": "2026-05-06T14:42:10Z",
     "sources_total": 11,
     "sources_ok": 6,
     "sources_warning": 5,
@@ -1241,7 +1241,7 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-05-06T14:36:56Z",
+      "generated_at": "2026-05-06T14:42:10Z",
       "runs_observed": 99,
       "by_status": {
         "warning": 69,
@@ -1253,13 +1253,13 @@
           "runs": 99,
           "errors": 1,
           "last_status": "ok",
-          "max_duration_ms": 490
+          "max_duration_ms": 479
         }
       }
     }
   },
   "data_lineage": {
-    "generated_at": "2026-05-06T14:36:56Z",
+    "generated_at": "2026-05-06T14:42:10Z",
     "status": "ok",
     "events": 270,
     "events_missing_inline_lineage": 0,
@@ -1267,7 +1267,7 @@
     "source_counts": {
       "espn": 270,
       "winamax": 270,
-      "h2h": 221,
+      "h2h": 175,
       "xg": 174,
       "weather": 165,
       "injuries": 143,
