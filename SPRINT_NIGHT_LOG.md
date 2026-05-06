@@ -1335,3 +1335,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : remplacement du debug V37 par `prodLog` et retrait d'un commentaire qui gardait le motif bloqué.
 - Verrou : ajout de `scripts/audit_no_prod_console_log.py` dans le groupe drift statique.
 - Résultat : 50/50 pytest, 17 probes navigateur verts (1 rerun réseau), 11 audits statiques verts, console prod clean.
+
+## Sprint v37.070 — AUTO 10/10 TODO marker audit (18:05 UTC)
+- Hypothèse : les marqueurs `TODO`/`FIXME`/`XXX` peuvent réintroduire une dette connue sans verrou ni issue.
+- Fix : ajout d'un audit dédié sur runtime, scripts QA et service worker.
+- Verrou : `scripts/audit_no_todo_markers.py` branché dans le groupe drift statique.
+- Résultat : 50/50 pytest, 17 probes navigateur verts, 12 audits statiques verts, aucun marqueur bloqué.
