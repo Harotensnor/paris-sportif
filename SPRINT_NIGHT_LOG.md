@@ -1437,3 +1437,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : qa-gates couvre maintenant 3 OS x 3 Python x 3 Node, avec Python 3.13 et Node 18/22 inclus.
 - Verrou : scripts/audit_qa_matrix_versions.py bloque tout rétrécissement silencieux de matrice.
 - Résultat : 24/24 qa gate; audit dédié passé après avoir échoué sur la matrice précédente.
+
+## Sprint v37.087 — AUTO 10/10 Asset hash lock (20:58 UTC)
+- Hypothèse : les query hashes ?v= de pronostics.html peuvent rester vieux et servir des assets stale malgré un déploiement frais.
+- Fix : script de restamp générique pour tous les assets locaux et correction de 49 références périmées.
+- Verrou : scripts/audit_asset_hashes.py dans qa gate, e2e et refresh; le cron vérifie après stamp.
+- Résultat : 25/25 qa gate; probes smoke/all-pages/modal/SW/freshness/QA runtime verts.

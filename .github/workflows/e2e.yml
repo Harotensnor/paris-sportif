@@ -77,6 +77,8 @@ jobs:
         # editing a comment inside an inline script silently broke its
         # hash and made the script fail to execute under strict CSP.
         run: python3 scripts/audit_csp_inline_hashes.py
+      - name: Check asset cache-busting hashes
+        run: python3 scripts/audit_asset_hashes.py
       - name: Check health.json quality_checks (sprint 1 #4)
         run: python3 scripts/check_health_quality.py
       - name: Check bundle size budget (sprint 6 #30)
