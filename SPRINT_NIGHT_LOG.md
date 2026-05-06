@@ -1311,3 +1311,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : ajout de `scripts/audit_no_legacy_imports.py` pour bloquer import statique, import dynamique et export.
 - Verrou : audit branché dans `e2e.yml` avec les autres checks drift statiques.
 - Résultat : audit import OK, 50/50 pytest, 7 audits statiques et smoke_e2e verts.
+
+## Sprint v37.066 — AUTO 10/10 Dead pronos subnav (17:25 UTC)
+- Hypothèse : la sous-nav pronos legacy était une branche impossible gardant du JS, des handlers et une exception de clic inutiles.
+- Fix : suppression du rendu `pronosPages`/`data-pronos-page` et retrait des exceptions de clic devenues mortes.
+- Verrou : ajout de `scripts/audit_no_dead_pronos_subnav.py` dans le groupe drift statique.
+- Résultat : 50/50 pytest, 17 probes navigateur verts, 8 audits statiques verts, `legacy-app.js` 1795.4 KB.

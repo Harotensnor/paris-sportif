@@ -27634,42 +27634,6 @@ return `
       suiviNav.style.display = 'none';
     }
 
-    // Mêmes onglets que le dropdown Pronos, mais rendus en ligne au-dessus
-    // de la page pour que l'user switche sans rouvrir le menu.
-const pronosPages = []; // v35.199 — sous-nav legacy retirée; les hubs modernes couvrent les accès utiles.
-const isPronos = pronosPages.includes(currentPage);
-let pronosNav = document.getElementById('pronos-subnav');
-if (isPronos) {
-if (!pronosNav) {
-pronosNav = document.createElement('div');
-pronosNav.id = 'pronos-subnav';
-pronosNav.style.cssText = 'max-width:1500px;margin:0 auto;padding:12px 8px 4px;display:flex;gap:6px;flex-wrap:wrap;';
-(document.querySelector('main') || document.body).insertBefore(pronosNav, (document.querySelector('main') || document.body).firstChild);
-}
-const tabs = [
-{ k:'tous',     emoji:'📋', label:'Tous pronostics' },
-{ k:'matchs',   emoji:'🔍', label:'Matchs détectés' },
-{ k:'locks',    emoji:'🔒', label:'Paris sûrs' },
-{ k:'buteurs',  emoji:'⚽', label:'Buts & joueurs' },
-{ k:'combines', emoji:'🔗', label:'Combinés' },
-{ k:'simples',  emoji:'🎯', label:'Par sport' },
-{ k:'top',      emoji:'⭐', label:'Top du jour' },
-];
-pronosNav.innerHTML = tabs.map(t => `
-        <button data-pronos-page="${t.k}" style="padding:8px 14px;border-radius:var(--r);border:1px solid ${currentPage===t.k?'var(--brand)':'var(--border-2)'};background:${currentPage===t.k?'var(--brand-soft)':'var(--panel)'};color:${currentPage===t.k?'var(--brand)':'var(--text-2)'};font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;">${t.emoji} ${t.label}</button>
-      `).join('');
-pronosNav.querySelectorAll('[data-pronos-page]').forEach(b => {
-b.addEventListener('click', () => {
-currentPage = PAGE_ALIASES[b.dataset.pronosPage] || b.dataset.pronosPage;
-try { localStorage.setItem('currentPage', currentPage); } catch(e){}
-applyPageView();
-});
-});
-pronosNav.style.display = '';
-} else if (pronosNav) {
-pronosNav.style.display = 'none';
-}
-
 const el = document.getElementById('filters');
 if (el) el.style.display = isSimples ? '' : 'none';
 const tp = document.getElementById('top-picks-wrap');
