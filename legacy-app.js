@@ -579,6 +579,15 @@ if (!cleanId) return location.href;
 const suffix = tab ? `/${encodeURIComponent(String(tab))}` : '';
 return `${base}#match/${encodeURIComponent(cleanId)}${suffix}`;
 }
+function _setUserNavHash(newHash) {
+try {
+if (!newHash || location.hash === newHash) return;
+history.pushState(null, '', location.pathname + location.search + newHash);
+} catch(e) {
+logSafeError('navigation push hash', e);
+try { location.hash = newHash; } catch(err) { logSafeError('navigation fallback hash', err); }
+}
+}
 try { window._buildMatchShareUrl = _buildMatchShareUrl; } catch(e){}
 window.addEventListener('hashchange', () => {
 const matchHashMatch = (location.hash || '').match(/^#match\/([^/]+)(?:\/(\w+))?$/);
@@ -15413,7 +15422,7 @@ try { _saveRecentSearch(label); } catch(e){}
 if (kind === 'page' && action) {
 currentPage = PAGE_ALIASES[action] || action;
 try { localStorage.setItem('currentPage', currentPage); } catch(e){}
-try { history.replaceState(null, '', location.pathname + location.search + '#' + currentPage); } catch(e){}
+_setUserNavHash('#' + currentPage);
 box.style.display = 'none';
 if (typeof applyPageView === 'function') applyPageView(); else render();
 return;
@@ -25112,7 +25121,7 @@ btn.addEventListener('click', () => {
 const target = btn.getAttribute('data-sports-route') || 'sports-tous';
 currentPage = PAGE_ALIASES[target] || target;
 try { localStorage.setItem('currentPage', currentPage); } catch(e){}
-try { history.replaceState(null, '', location.pathname + location.search + '#' + currentPage); } catch(e){}
+_setUserNavHash('#' + currentPage);
 applyPageView();
 window.scrollTo({ top: 0, behavior: 'smooth' });
 });
@@ -27579,9 +27588,7 @@ return `
           // suivi sub-nav, then reloads, gets bounced back to Performance.
           try {
             const newHash = '#' + currentPage;
-            if (location.hash !== newHash) {
-              history.replaceState(null, '', location.pathname + location.search + newHash);
-            }
+            _setUserNavHash(newHash);
           } catch(e) {}
           applyPageView();
         });
@@ -33289,9 +33296,7 @@ try { localStorage.setItem('currentPage', currentPage); } catch (e) {}
 }
 try {
 const targetHash = requestedPage === 'calendrier' ? '#tous?view=calendar' : '#' + currentPage;
-if (location.hash !== targetHash) {
-history.replaceState(null, '', location.pathname + location.search + targetHash);
-}
+_setUserNavHash(targetHash);
 } catch (e) {}
 applyPageView();
 _ensureScoringOddsHistoryForPage(currentPage);

@@ -1260,3 +1260,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Personnalisation: recommandations basées sur picks ouverts, sport/ligue/tier/cote préférés, nav adaptative "Perso" et modules dashboard réordonnables.
 - Audit: `scripts/audit_local_analytics.py` + `analytics_local_privacy_audit.json`, spec Playwright `tests/local-analytics.spec.js`.
 - Vérifs: JS syntax OK, audit local analytics OK, captures Edge headless OK; refresh local rejeté par intégrité data (1018 → 240) puis restauré, SW paris-sportif-20260506-045500, footer v37.021.
+
+## Sprint v37.056 — AUTO 10/10 Navigation history QA (16:13 UTC)
+- Symptôme: les sous-vues Performance synchronisaient le hash avec `replaceState`, donc Back/Forward ne pouvait pas restaurer la page précédente.
+- Fix: navigation utilisateur explicite empile désormais un hash via `_setUserNavHash`, les filtres restent en replace.
+- Verrou: `scripts/probe_back_forward.js` couvre dashboard → Tous → Performance → Crédibilité → Back/Forward → Historique.
+- CI: smoke.yml exécute la probe back/forward à chaque PR/push concerné.
+- Vérifs: `node --check legacy-app.js` OK, probe back/forward OK, SW/legacy hash/footer restampés.

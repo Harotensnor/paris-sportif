@@ -18,6 +18,7 @@ on:
       - 'scripts/probe_table_combos.js'
       - 'scripts/probe_modal_sports.js'
       - 'scripts/probe_nav_chain.js'
+      - 'scripts/probe_back_forward.js'
       - 'scripts/probe_strategies_outsider.js'
       - 'scripts/probe_prob_calibration_sport.js'
       - '.github/workflows/smoke.yml'
@@ -33,6 +34,7 @@ on:
       - 'scripts/probe_table_combos.js'
       - 'scripts/probe_modal_sports.js'
       - 'scripts/probe_nav_chain.js'
+      - 'scripts/probe_back_forward.js'
       - 'scripts/probe_strategies_outsider.js'
       - 'scripts/probe_prob_calibration_sport.js'
   workflow_dispatch: {}
@@ -104,6 +106,11 @@ jobs:
         # references an undeclared variable) and the v37.048 hash sync
         # bug.
         run: node scripts/probe_nav_chain.js
+
+      - name: Run browser back/forward probe
+        # Locks hash navigation against SPA history regressions: Back and
+        # Forward must restore both location.hash and the visible page hub.
+        run: node scripts/probe_back_forward.js
 
       - name: Run outsider strategy probe
         # Locks the Performance > Strategies surfacing of outsider_only
