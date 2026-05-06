@@ -1486,3 +1486,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : deuxième merge de origin/main, données fraîches conservées, shell QA gardé, hashes assets restampés.
 - Verrou : freshness probe, service worker probe et qa_gate_report relancés avant push.
 - Résultat : prod fraîche (< 30 min), cache-busting cohérent et PR réalignée localement avec main.
+
+## Sprint v37.091 — AUTO 10/10 Cron race resync (21:53 UTC)
+- Hypothèse : le cron 5 minutes peut encore modifier main entre le push et la vérification de mergeability.
+- Fix : troisième resync ciblée, même résolution : data main, shell QA branche, SW neuf, hashes restampés.
+- Verrou : qa_gate_report et asset hash audit relancés dans la fenêtre courte avant push.
+- Résultat : conflit mécanique pronostics/SW neutralisé sans toucher aux protections QA.
