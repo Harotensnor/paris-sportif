@@ -101,6 +101,7 @@ jobs:
           python3 scripts/audit_workflow_self_triggers.py
           python3 scripts/audit_qa_runtime_privacy.py
           python3 scripts/audit_ci_critical_paths.py
+          python3 scripts/audit_qa_workflows.py
           python3 scripts/audit_modal_aria.py
       - name: Pytest (Python unit tests)
         # v37.036 — pytest covers data-quality classifiers, the multi-strategy

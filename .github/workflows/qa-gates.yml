@@ -1,0 +1,72 @@
+name: qa-gates
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'pronostics.html'
+      - 'legacy-app.js'
+      - 'app-enhancements.js'
+      - 'app-i18n.js'
+      - 'src/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - '.github/workflows/qa-gates.yml'
+      - '.github/workflows/e2e.yml'
+      - '.github/workflows/smoke.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'pronostics.html'
+      - 'legacy-app.js'
+      - 'app-enhancements.js'
+      - 'app-i18n.js'
+      - 'src/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - '.github/workflows/qa-gates.yml'
+      - '.github/workflows/e2e.yml'
+      - '.github/workflows/smoke.yml'
+  workflow_dispatch: {}
+
+concurrency:
+  group: qa-gates-${{ github.ref }}-${{ matrix.os }}-${{ matrix.python-version }}
+  cancel-in-progress: true
+
+jobs:
+  gates:
+    name: qa ${{ matrix.os }} py${{ matrix.python-version }} node${{ matrix.node-version }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.11', '3.12']
+        node-version: ['20']
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install Python test runner
+        run: python -m pip install pytest
+
+      - name: Fast QA gate
+        run: python scripts/qa_gate_report.py
+
+      - name: Upload QA report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qa-gate-${{ matrix.os }}-py${{ matrix.python-version }}
+          path: |
+            .cache/qa-gates-report.json
+            .cache/qa-gates-report.html
+          retention-days: 14

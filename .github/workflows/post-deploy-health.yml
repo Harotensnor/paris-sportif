@@ -1,0 +1,55 @@
+name: post-deploy-health
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'pronostics.html'
+      - 'legacy-app.js'
+      - 'sw.js'
+      - 'data.js'
+      - 'scripts/synthetic_monitor.py'
+      - '.github/workflows/post-deploy-health.yml'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: post-deploy-health-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Wait briefly for GitHub Pages propagation
+        run: sleep 45
+
+      - name: Post-deploy synthetic health
+        run: python scripts/synthetic_monitor.py --warn-age-min 30 --max-age-min 240
+
+      - name: Upload post-deploy health report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: post-deploy-health-report
+          path: .cache/synthetic-monitor.json
+          retention-days: 14
+
+      - name: Roll back last commit when explicitly enabled
+        if: failure() && vars.ENABLE_AUTO_ROLLBACK == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git revert --no-edit HEAD
+          git push origin HEAD:main

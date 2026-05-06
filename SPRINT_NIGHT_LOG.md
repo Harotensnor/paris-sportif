@@ -1395,3 +1395,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : cap public `MODEL_PROB_CAP=0.95` sur `reliability` et `pick.prob`, y compris après anomalies marché.
 - Verrou : `scripts/probe_model_probability_caps.js` + test pytest non-football fallback.
 - Résultat : 51/51 pytest, 20 probes navigateur verts, 19 audits statiques verts, cap proba aligné.
+
+## Sprint v37.080 — AUTO 10/10 QA workflows (19:45 UTC)
+- Hypothèse : les gates QA dédiés du plan restent absents, donc une régression peut passer si smoke/e2e ne se déclenchent pas.
+- Fix : ajout de qa-gates matrix OS/Python, synthetic monitor 15 min, post-deploy health avec rollback explicitement gated.
+- Verrou : scripts/audit_qa_workflows.py + inclusion dans e2e drift; rapport local scripts/qa_gate_report.py.
+- Résultat : gates rapides centralisés, freshness prod visible/actionnable, rollback inactif sans ENABLE_AUTO_ROLLBACK.

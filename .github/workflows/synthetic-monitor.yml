@@ -1,0 +1,40 @@
+name: synthetic-monitor
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/synthetic_monitor.py'
+      - '.github/workflows/synthetic-monitor.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: synthetic-monitor
+  cancel-in-progress: true
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Check production availability and freshness
+        run: python scripts/synthetic_monitor.py --warn-age-min 30 --max-age-min 240
+
+      - name: Upload synthetic monitor report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: synthetic-monitor-report
+          path: .cache/synthetic-monitor.json
+          retention-days: 14
