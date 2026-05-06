@@ -1510,3 +1510,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : qa_gate_report inclut data_truth, runtime QA, privacy, innerHTML, fetch tracking, UX, LightGBM et skips Playwright.
 - Verrou : alias __qaBugReport restauré pour compatibilité et night_metrics/health resynchronisés sur data.js.
 - Résultat : data_truth OK, audit_qa_runtime OK, qa gate élargi au-delà de 35 checks.
+
+## Sprint v37.095 — AUTO 10/10 QA manifest lock (22:31 UTC)
+- Hypothèse : le gate central peut être rétréci plus tard sans que les workflows GitHub changent.
+- Fix : audit_qa_gate_manifest.py vérifie la présence des audits critiques dans qa_gate_report.py.
+- Verrou : le manifest est lui-même exécuté par le gate central.
+- Résultat : le retrait silencieux de data_truth, privacy, runtime QA ou probes-wiring bloque désormais la CI.

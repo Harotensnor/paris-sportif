@@ -72,6 +72,7 @@ def _checks() -> list[tuple[str, list[str]]]:
         "scripts/audit_playwright_skips.py",
         "scripts/audit_privacy_features.py",
         "scripts/audit_qa_runtime.py",
+        "scripts/audit_qa_gate_manifest.py",
         "scripts/audit_ux_clarity.py",
         "scripts/audit_smoke_workflow_triggers.py",
         "scripts/audit_workflow_self_triggers.py",
