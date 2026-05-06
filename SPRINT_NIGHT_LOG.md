@@ -1365,3 +1365,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : ajout d'un probe qui empoisonne les clés locales critiques avant boot et parcours Accueil/Tous/Performance/Profil.
 - Verrou : `scripts/probe_corrupt_storage.js` branché dans `smoke.yml`, avec `smoke_e2e.js` ajouté aux triggers PR.
 - Résultat : 50/50 pytest, 18 probes navigateur verts, 14 audits statiques verts, stockage corrompu sans crash.
+
+## Sprint v37.075 — AUTO 10/10 Smoke trigger coverage (18:54 UTC)
+- Hypothèse : un probe ajouté au smoke peut être exécuté en CI mais oublié dans les triggers de chemins PR/push.
+- Fix : audit statique des `run: node scripts/*.js` de `smoke.yml` contre les deux listes de chemins.
+- Verrou : `scripts/audit_smoke_workflow_triggers.py` branché dans le groupe drift statique.
+- Résultat : 50/50 pytest, 18 probes navigateur verts, 15 audits statiques verts, triggers smoke alignés.
