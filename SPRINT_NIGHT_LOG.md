@@ -1425,3 +1425,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : budget CI legacy-app.js resserré à 1750 KB, sans toucher le runtime.
 - Verrou : scripts/check_bundle_size.py dans qa gate et e2e drift.
 - Résultat : 23/23 qa gate; legacy-app.js 1729.7 KB / 1750 KB, toute régression >1750 KB bloque la CI.
+
+## Sprint v37.085 — AUTO 10/10 Sidecar CI triggers (20:36 UTC)
+- Hypothèse : un changement de sidecar Performance/calibration peut modifier l'UI sans déclencher smoke/e2e/qa-gates.
+- Fix : ajout des JSON/JS critiques backtest/calibration dans les filtres CI smoke, e2e et qa-gates.
+- Verrou : audits udit_ci_critical_paths.py et udit_qa_workflows.py exigent ces sidecars.
+- Résultat : 23/23 qa gate; toute dérive de stratégie/calibration relance les probes Performance concernés.
