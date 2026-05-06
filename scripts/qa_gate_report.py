@@ -60,6 +60,7 @@ def _checks() -> list[tuple[str, list[str]]]:
         "scripts/audit_no_prod_console_log.py",
         "scripts/audit_no_todo_markers.py",
         "scripts/audit_no_empty_catch_modules.py",
+        "scripts/audit_no_empty_catch_legacy.py",
         "scripts/audit_no_direct_console_modules.py",
         "scripts/audit_smoke_workflow_triggers.py",
         "scripts/audit_workflow_self_triggers.py",

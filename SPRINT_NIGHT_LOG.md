@@ -1498,3 +1498,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : suppression de 103 lignes de commentaires historiques et audit legacy-comments étendu à legacy-app.js.
 - Verrou : audit_line_endings.py bloque les conversions CRLF qui faussent le budget bundle sous Windows.
 - Résultat : legacy-app.js redescend à 1724.8 KB / 1750 KB, qa gate porté à 27 checks.
+
+## Sprint v37.093 — AUTO 10/10 Empty catch audit (22:14 UTC)
+- Hypothèse : les catch vides du runtime legacy peuvent masquer des erreurs utilisateur sans trace exploitable.
+- Fix : 438 catch silencieux routés vers swallowError(), muet en prod et traçable en mode debug.
+- Verrou : audit_no_empty_catch_legacy.py ajouté au qa gate pour bloquer toute régression.
+- Résultat : 0 catch vide restant, bundle 1732.9 KB / 1750 KB.

@@ -26,7 +26,7 @@ function guardNumber(value, fallback = 0, context = 'number') {
 const n = Number(value);
 if (Number.isFinite(n)) return n;
 GUARD_STATS.nonFinite++;
-try { logSafeError(`guard:${context}`, new Error(`non finite value: ${String(value).slice(0, 80)}`)); } catch(_) {}
+try { logSafeError(`guard:${context}`, new Error(`non finite value: ${String(value).slice(0, 80)}`)); } catch(_) { swallowError(_); }
 return fallback;
 }
 function logSafeError(context, error) {
@@ -45,13 +45,13 @@ localStorage.setItem(SAFE_ERROR_KEY, JSON.stringify(arr.slice(-SAFE_ERROR_LIMIT)
 } else {
 localStorage.setItem(SAFE_ERROR_KEY, JSON.stringify([entry]));
 }
-} catch(_) {}
+} catch(_) { swallowError(_); }
 try {
 if (DEBUG_LOGS || !/^debug/i.test(entry.context)) {
 const dbg = globalThis && globalThis.console;
 if (dbg && typeof dbg.warn === 'function') dbg.warn('[ParisSportif]', entry.context, entry.message);
 }
-} catch(_) {}
+} catch(_) { swallowError(_); }
 return entry;
 }
 const TRACKED_LISTENERS = new Set();
@@ -122,6 +122,14 @@ try {
 const dbg = globalThis && globalThis.console;
 if (dbg && typeof dbg.table === 'function') dbg.table.apply(dbg, args);
 } catch(e) { logSafeError('debug prodTable', e); }
+}
+function swallowError(error) {
+if (!DEBUG_LOGS) return;
+try {
+const dbg = globalThis && globalThis.console;
+const msg = error && (error.message || error.name || error);
+if (dbg && typeof dbg.debug === 'function') dbg.debug('[ParisSportif:ignored]', msg || 'ignored error');
+} catch(swallowErr) { void swallowErr; }
 }
 try {
 window.__PARIS_DEBUG_LOGS = DEBUG_LOGS;
@@ -493,22 +501,22 @@ const rawHash = (location.hash || '').replace(/^#/, '').trim();
 let h = rawHash.split('?')[0];
 if (h === 'calendrier') {
 h = 'tous';
-try { history.replaceState(null, '', location.pathname + location.search + '#tous?view=calendar'); } catch(e) {}
+try { history.replaceState(null, '', location.pathname + location.search + '#tous?view=calendar'); } catch(e) { swallowError(e); }
 }
 if (h === 'montante-jour' || h === 'montante-weekend' || h === 'montante-semaine') {
-try { localStorage.setItem('montanteType', h.replace('montante-', '')); } catch(e) {}
+try { localStorage.setItem('montanteType', h.replace('montante-', '')); } catch(e) { swallowError(e); }
 }
 if (h === 'simulator') {
-try { localStorage.setItem('profilScrollTo', 'profile-bankroll-simulator'); } catch(e) {}
+try { localStorage.setItem('profilScrollTo', 'profile-bankroll-simulator'); } catch(e) { swallowError(e); }
 }
 if (PAGE_ALIASES[h]) {
 h = PAGE_ALIASES[h];
-try { history.replaceState(null, '', location.pathname + location.search + '#' + h); } catch(e) {}
+try { history.replaceState(null, '', location.pathname + location.search + '#' + h); } catch(e) { swallowError(e); }
 }
 return VALID_PAGES.includes(h) ? h : null;
 } catch(e) { return null; }
 }
-try { window.PAGE_ALIASES = PAGE_ALIASES; } catch(e){}
+try { window.PAGE_ALIASES = PAGE_ALIASES; } catch(e) { swallowError(e); }
 const STATIC_REDIRECT_PAGES = new Set([]);
 let currentPage = (() => {
 const fromHash = _pageFromHash();
@@ -517,7 +525,7 @@ let stored = localStorage.getItem('currentPage');
 if (stored && PAGE_ALIASES[stored]) stored = PAGE_ALIASES[stored];
 if (stored && VALID_PAGES.includes(stored) && !STATIC_REDIRECT_PAGES.has(stored)) return stored;
 if (stored && STATIC_REDIRECT_PAGES.has(stored)) {
-try { localStorage.removeItem('currentPage'); } catch(e){}
+try { localStorage.removeItem('currentPage'); } catch(e) { swallowError(e); }
 }
 return 'dashboard';
 })();
@@ -526,7 +534,7 @@ if (_pageFromHash() && !STATIC_REDIRECT_PAGES.has(currentPage)
 && localStorage.getItem('currentPage') !== currentPage) {
 localStorage.setItem('currentPage', currentPage);
 }
-} catch(e){}
+} catch(e) { swallowError(e); }
 const _decodeHashPart = (value) => {
 try { return decodeURIComponent(String(value || '')); } catch(e) { return String(value || ''); }
 };
@@ -546,7 +554,7 @@ logSafeError('navigation push hash', e);
 try { location.hash = newHash; } catch(err) { logSafeError('navigation fallback hash', err); }
 }
 }
-try { window._buildMatchShareUrl = _buildMatchShareUrl; } catch(e){}
+try { window._buildMatchShareUrl = _buildMatchShareUrl; } catch(e) { swallowError(e); }
 window.addEventListener('hashchange', () => {
 const matchHashMatch = (location.hash || '').match(/^#match\/([^/]+)(?:\/(\w+))?$/);
 if (matchHashMatch) {
@@ -572,7 +580,7 @@ const p = _pageFromHash();
 if (p && p !== currentPage) {
 currentPage = p;
 if (!STATIC_REDIRECT_PAGES.has(currentPage)) {
-try { localStorage.setItem('currentPage', currentPage); } catch(e){}
+try { localStorage.setItem('currentPage', currentPage); } catch(e) { swallowError(e); }
 }
 if (typeof applyPageView === 'function') applyPageView();
 } else if (p === 'dashboard' && currentPage === 'dashboard') {
@@ -585,7 +593,7 @@ try {
 (root || document).querySelectorAll('img:not([alt])').forEach(img => {
 img.setAttribute('alt', '');
 });
-} catch(e) {}
+} catch(e) { swallowError(e); }
 }
 try {
 const runImageAltPass = () => ensureDecorativeImageAlts(document);
@@ -603,7 +611,7 @@ else ensureDecorativeImageAlts(node);
 });
 imgAltObserver.observe(document.documentElement, { childList: true, subtree: true });
 }
-} catch(e) {}
+} catch(e) { swallowError(e); }
 
 let bankroll = (() => {
 const v = parseFloat(localStorage.getItem('bankroll'));
@@ -637,7 +645,7 @@ const today = new Date().toISOString().slice(0, 10);
 document.querySelectorAll('.nav-new-badge[data-new-until]').forEach(b => {
 if (b.dataset.newUntil && b.dataset.newUntil < today) b.remove();
 });
-} catch (e) {}
+} catch(e) { swallowError(e); }
 
 window._spawnConfetti = function spawnConfetti(targetEl, n = 12) {
 if (!targetEl) return;
@@ -646,7 +654,7 @@ try {
 const lowMem = navigator.deviceMemory && navigator.deviceMemory < 4;
 const lowCpu = navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4;
 if (lowMem || lowCpu) n = Math.min(n, 6);
-} catch (e) {}
+} catch(e) { swallowError(e); }
 targetEl.classList.add('has-confetti');
 const colors = ['var(--accent)', 'var(--brand)', 'var(--warn)', '#f472b6', '#60a5fa'];
 for (let i = 0; i < n; i++) {
@@ -672,14 +680,14 @@ const rect = t.getBoundingClientRect();
 if (rect.top > window.innerHeight / 2) {
 t.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
-} catch (e) {}
+} catch(e) { swallowError(e); }
 }, 300);  // attendre que le keyboard soit ouvert
 });
 
 window._haptic = function haptic(pattern = 10) {
 try {
 if (navigator.vibrate) navigator.vibrate(pattern);
-} catch (e) {}
+} catch(e) { swallowError(e); }
 };
 
 (function setupPullToRefresh() {
@@ -722,7 +730,7 @@ document.addEventListener('touchmove', (e) => {
 if (!pulling) return;
 pullDistance = Math.max(0, e.touches[0].clientY - startY);
 if (pullDistance > 20) {
-try { if (e.cancelable) e.preventDefault(); } catch (err) {}
+try { if (e.cancelable) e.preventDefault(); } catch(err) { swallowError(err); }
 const ind = ensureIndicator();
 const ready = pullDistance >= THRESHOLD;
 ind.textContent = ready ? '↺ Relâche pour rafraîchir' : '↓ Tire pour rafraîchir';
@@ -732,7 +740,7 @@ ind.setAttribute('aria-hidden', pullDistance > 30 ? 'false' : 'true');
 ind.style.setProperty('--ptr-progress', String(Math.min(1, pullDistance / THRESHOLD).toFixed(2)));
 if (ready && !readyBuzzed) {
 readyBuzzed = true;
-try { if (navigator.vibrate) navigator.vibrate(8); } catch (err) {}
+try { if (navigator.vibrate) navigator.vibrate(8); } catch(err) { swallowError(err); }
 }
 }
 }, { passive: false });
@@ -744,19 +752,19 @@ indicator.textContent = 'Rafraîchissement…';
 indicator.classList.add('visible', 'refreshing');
 indicator.classList.remove('ready');
 indicator.setAttribute('aria-hidden', 'false');
-try { if (navigator.vibrate) navigator.vibrate([8, 32, 8]); } catch (err) {}
+try { if (navigator.vibrate) navigator.vibrate([8, 32, 8]); } catch(err) { swallowError(err); }
 try {
 if (typeof window.pollData === 'function') {
 Promise.resolve(window.pollData(true))
-.then(() => { try { toast('Données rafraîchies', 'success', { duration: 1000 }); } catch (err) {} })
-.catch(() => { try { toast('Refresh indisponible', 'warn', { duration: 1200 }); } catch (err) {} })
+.then(() => { try { toast('Données rafraîchies', 'success', { duration: 1000 }); } catch(err) { swallowError(err); } })
+.catch(() => { try { toast('Refresh indisponible', 'warn', { duration: 1200 }); } catch(err) { swallowError(err); } })
 .finally(() => hideIndicator(600));
 } else {
-try { toast('Refresh demandé', 'info', { duration: 1000 }); } catch (err) {}
+try { toast('Refresh demandé', 'info', { duration: 1000 }); } catch(err) { swallowError(err); }
 hideIndicator(900);
 }
 } catch (e) {
-try { toast('Refresh indisponible', 'warn', { duration: 1200 }); } catch (err) {}
+try { toast('Refresh indisponible', 'warn', { duration: 1200 }); } catch(err) { swallowError(err); }
 hideIndicator(0);
 }
 } else if (indicator) {
@@ -778,7 +786,7 @@ const reloadTarget = e.target.closest && e.target.closest('[data-reload-page]');
 if (reloadTarget) {
 e.preventDefault();
 e.stopPropagation();
-try { location.reload(); } catch(_) {}
+try { location.reload(); } catch(_) { swallowError(_); }
 }
 }, true);
 document.addEventListener('click', (e) => {
@@ -792,7 +800,7 @@ e.stopPropagation();
 return;
 }
 if (e.target.closest && e.target.closest('#smart-suggest-banner .page-btn')) {
-try { localStorage.setItem('smartSuggestionDismissedTs', String(Date.now())); } catch(_){}
+try { localStorage.setItem('smartSuggestionDismissedTs', String(Date.now())); } catch(_) { swallowError(_); }
 }
 });
 
@@ -858,7 +866,7 @@ __sraLive.style.cssText = 'position:absolute;left:-9999px;width:1px;height:1px;o
 document.body.appendChild(__sraLive);
 }
 __sraLive.textContent = msg;
-} catch (e) {}
+} catch(e) { swallowError(e); }
 };
 
 try {
@@ -877,7 +885,7 @@ if (typeof _renderRecentSearches === 'function' && !(input.value || '').trim()) 
 else if (typeof renderSearchSuggest === 'function') renderSearchSuggest(input.value || '');
 }
 });
-} catch (e) {}
+} catch(e) { swallowError(e); }
 
 let _lpTimer = null;
 let _lpTarget = null;
@@ -974,7 +982,7 @@ setTimeout(() => {
 try {
 const r = _resolveTooltipTarget(document.activeElement);
 if (r) _showTooltip(r.el, r.text);
-} catch(e) {}
+} catch(e) { swallowError(e); }
 }, 0);
 let _ttScrollScheduled = false;
 document.addEventListener('scroll', () => {
@@ -1048,14 +1056,14 @@ const onKey = (e) => { if (e.key === 'Escape') close(); };
 document.addEventListener('keydown', onKey);
 overlay.querySelector('.how-to-read-close').addEventListener('click', close);
 overlay.querySelector('.how-to-read-ok').addEventListener('click', () => {
-try { localStorage.setItem('howToReadDismissedTs', String(Date.now())); } catch(e){}
+try { localStorage.setItem('howToReadDismissedTs', String(Date.now())); } catch(e) { swallowError(e); }
 close();
 });
 overlay.addEventListener('click', (e) => {
 if (e.target === overlay) close();
 });
 }
-try { window._showHowToReadTutorial = _showHowToReadTutorial; } catch(e){}
+try { window._showHowToReadTutorial = _showHowToReadTutorial; } catch(e) { swallowError(e); }
 
 const _safeStorage = {
 get(key, fallback = null) {
@@ -1120,7 +1128,7 @@ else el.appendChild(c);
 });
 return el;
 }
-try { window._qs = _qs; window._qsa = _qsa; window._ce = _ce; } catch(e){}
+try { window._qs = _qs; window._qsa = _qsa; window._ce = _ce; } catch(e) { swallowError(e); }
 
 function _on(parent, eventType, selector, handler) {
 if (!parent || !parent.addEventListener) return;
@@ -1129,18 +1137,18 @@ const target = e.target.closest && e.target.closest(selector);
 if (target && parent.contains(target)) handler.call(target, e, target);
 }, false, 'page');
 }
-try { window._on = _on; } catch(e){}
+try { window._on = _on; } catch(e) { swallowError(e); }
 
 async function _safeAsync(fn, errorMsg = 'Une erreur est survenue') {
 try { return await fn(); }
 catch(e) {
 logSafeError(`_safeAsync:${errorMsg}`, e);
 prodWarn('[_safeAsync]', errorMsg, e);
-try { if (typeof toast === 'function') toast('⚠ ' + errorMsg, 'warn'); } catch(_){}
+try { if (typeof toast === 'function') toast('⚠ ' + errorMsg, 'warn'); } catch(_) { swallowError(_); }
 return null;
 }
 }
-try { window._safeAsync = _safeAsync; } catch(e){}
+try { window._safeAsync = _safeAsync; } catch(e) { swallowError(e); }
 
 async function _copyToClipboard(text) {
 if (!text) return false;
@@ -1160,7 +1168,7 @@ ta.remove();
 return ok;
 } catch(e) { return false; }
 }
-try { window._copyToClipboard = _copyToClipboard; } catch(e){}
+try { window._copyToClipboard = _copyToClipboard; } catch(e) { swallowError(e); }
 
 function _fmtRelativeTime(ts) {
 if (!ts || !isFinite(ts)) return '';
@@ -1180,13 +1188,13 @@ else if (day < 365) { const m = Math.floor(day / 30); unit = m === 1 ? 'mois' : 
 else { const y = Math.floor(day / 365); unit = y === 1 ? 'an' : 'ans'; n = y; }
 return isPast ? `il y a ${n} ${unit}` : `dans ${n} ${unit}`;
 }
-try { window._fmtRelativeTime = _fmtRelativeTime; } catch(e){}
+try { window._fmtRelativeTime = _fmtRelativeTime; } catch(e) { swallowError(e); }
 
 function _fmtNumber(n, decimals = 0) {
 if (!isFinite(n)) return '—';
 return n.toLocaleString('fr-FR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
 }
-try { window._fmtNumber = _fmtNumber; } catch(e){}
+try { window._fmtNumber = _fmtNumber; } catch(e) { swallowError(e); }
 
 function _showConfirm(opts) {
 return new Promise(resolve => {
@@ -1225,14 +1233,14 @@ if (btn) btn.focus();
 }, 50);
 });
 }
-try { window._showConfirm = _showConfirm; } catch(e){}
+try { window._showConfirm = _showConfirm; } catch(e) { swallowError(e); }
 
 function _haptic(type = 'light') {
 if (!navigator.vibrate) return;
 const patterns = { light: 8, medium: 18, heavy: 30, double: [10, 50, 10] };
-try { navigator.vibrate(patterns[type] || 10); } catch(e){}
+try { navigator.vibrate(patterns[type] || 10); } catch(e) { swallowError(e); }
 }
-try { window._haptic = _haptic; } catch(e){}
+try { window._haptic = _haptic; } catch(e) { swallowError(e); }
 
 function _getConnectionType() {
 const c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
@@ -1240,7 +1248,7 @@ if (!c) return 'unknown';
 if (c.saveData) return 'save-data';
 return c.effectiveType || 'unknown';  // '4g', '3g', '2g', 'slow-2g'
 }
-try { window._getConnectionType = _getConnectionType; } catch(e){}
+try { window._getConnectionType = _getConnectionType; } catch(e) { swallowError(e); }
 
 const __visListeners = [];
 function _onVisibilityChange(handler) {
@@ -1248,9 +1256,9 @@ __visListeners.push(handler);
 }
 document.addEventListener('visibilitychange', () => {
 const isVisible = document.visibilityState === 'visible';
-__visListeners.forEach(h => { try { h(isVisible); } catch(e){} });
+__visListeners.forEach(h => { try { h(isVisible); } catch(e) { swallowError(e); } });
 });
-try { window._onVisibilityChange = _onVisibilityChange; } catch(e){}
+try { window._onVisibilityChange = _onVisibilityChange; } catch(e) { swallowError(e); }
 
 const _OBF_KEY = 'paris-sportif-2026';
 function _obfuscate(plaintext) {
@@ -1274,7 +1282,7 @@ result += String.fromCharCode(decoded.charCodeAt(i) ^ _OBF_KEY.charCodeAt(i % _O
 return result;
 } catch(e) { return ciphertext; }
 }
-try { window._obfuscate = _obfuscate; window._deobfuscate = _deobfuscate; } catch(e){}
+try { window._obfuscate = _obfuscate; window._deobfuscate = _deobfuscate; } catch(e) { swallowError(e); }
 
 window._exportAllUserData = function() {
 const raw = {};
@@ -1290,7 +1298,7 @@ raw[key] = JSON.parse(value);
 raw[key] = value;
 }
 }
-} catch(e) {}
+} catch(e) { swallowError(e); }
 const tracked = raw.paris_sportif_tracked_bets || {};
 const data = {
 exported_at: new Date().toISOString(),
@@ -1330,12 +1338,12 @@ if (!confirm) return false;
 try {
 const keep = ['theme'];
 const keepValues = {};
-keep.forEach(k => { try { keepValues[k] = localStorage.getItem(k); } catch(e){} });
+keep.forEach(k => { try { keepValues[k] = localStorage.getItem(k); } catch(e) { swallowError(e); } });
 localStorage.clear();
 Object.entries(keepValues).forEach(([k, v]) => {
-if (v != null) try { localStorage.setItem(k, v); } catch(e){}
+if (v != null) try { localStorage.setItem(k, v); } catch(e) { swallowError(e); }
 });
-try { sessionStorage.clear(); } catch(e){}
+try { sessionStorage.clear(); } catch(e) { swallowError(e); }
 if (typeof window.toast === 'function') window.toast('✓ Toutes les données effacées', 'success');
 setTimeout(() => location.reload(), 800);
 return true;
@@ -1366,7 +1374,7 @@ ${esc(t.label)}
 `).join('')}
       </div>`;
 }
-try { window._pageTabsHTML = _pageTabsHTML; } catch(e){}
+try { window._pageTabsHTML = _pageTabsHTML; } catch(e) { swallowError(e); }
 
 const _PAGE_TAB_GROUPS = {
 picks: [
@@ -1428,7 +1436,7 @@ const tabsContainer = document.createElement('div');
 tabsContainer.innerHTML = tabsHtml;
 target.insertBefore(tabsContainer.firstElementChild, target.firstChild);
 }
-try { window._injectPageTabsAuto = _injectPageTabsAuto; } catch(e){}
+try { window._injectPageTabsAuto = _injectPageTabsAuto; } catch(e) { swallowError(e); }
 /**
    * Get tabs HTML for a known group, automatically highlighting current page.
    * @param {string} groupKey - 'picks' | 'perf' | 'bilan' | 'montantes' | 'favoris'
@@ -1440,7 +1448,7 @@ const tabs = _PAGE_TAB_GROUPS[groupKey];
 if (!tabs) return '';
 return _pageTabsHTML(currentPage, tabs);
 }
-try { window._pageTabsForGroup = _pageTabsForGroup; } catch(e){}
+try { window._pageTabsForGroup = _pageTabsForGroup; } catch(e) { swallowError(e); }
 
 /**
    * Mobile-first bottom sheet modal (slide-up on mobile, center modal on desktop).
@@ -1491,7 +1499,7 @@ btn.type = 'button';
 btn.className = a.primary ? 'btn-primary' : 'btn-secondary';
 btn.textContent = a.label || 'OK';
 btn.addEventListener('click', () => {
-try { if (typeof a.onClick === 'function') a.onClick(); } catch(e){}
+try { if (typeof a.onClick === 'function') a.onClick(); } catch(e) { swallowError(e); }
 close();
 });
 actDiv.appendChild(btn);
@@ -1506,7 +1514,7 @@ setTimeout(() => {
 overlay.remove();
 document.removeEventListener('keydown', onKey);
 window.removeEventListener('keydown', onKey, true);
-if (typeof onClose === 'function') try { onClose(); } catch(e){}
+if (typeof onClose === 'function') try { onClose(); } catch(e) { swallowError(e); }
 }, 150);
 };
 const onKey = (e) => { if (e.key === 'Escape') close(); };
@@ -1517,7 +1525,7 @@ overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); })
 document.body.appendChild(overlay);
 return { close };
 }
-try { window._showBottomSheet = _showBottomSheet; } catch(e){}
+try { window._showBottomSheet = _showBottomSheet; } catch(e) { swallowError(e); }
 
 function _debounce(fn, wait) {
 let t = null;
@@ -1544,7 +1552,7 @@ fn.apply(this, args);
 }
 };
 }
-try { window._debounce = _debounce; window._throttle = _throttle; } catch(e){}
+try { window._debounce = _debounce; window._throttle = _throttle; } catch(e) { swallowError(e); }
 
 const _fmt = {
 pct(v, decimals = 1) {
@@ -1585,7 +1593,7 @@ if (h < 24) return `${h}h`;
 return `${Math.floor(h / 24)}j`;
 },
 };
-try { window._fmt = _fmt; } catch(e){}
+try { window._fmt = _fmt; } catch(e) { swallowError(e); }
 
 function _emptyState(opts) {
 const { icon = 'ℹ️', title = 'Rien ici', body = '', actions = [] } = opts || {};
@@ -1613,7 +1621,7 @@ return `
         ${actHtml}
       </div>`;
 }
-try { window._emptyState = _emptyState; } catch(e){}
+try { window._emptyState = _emptyState; } catch(e) { swallowError(e); }
 
 const _GLOSSARY = {
 edge: {
@@ -1748,7 +1756,7 @@ if (!e.target.closest('.gloss-popover')) _hideGlossPopover();
 document.addEventListener('keydown', (e) => {
 if (e.key === 'Escape') _hideGlossPopover();
 });
-try { window._GLOSSARY = _GLOSSARY; window._showGlossPopover = _showGlossPopover; } catch(e){}
+try { window._GLOSSARY = _GLOSSARY; window._showGlossPopover = _showGlossPopover; } catch(e) { swallowError(e); }
 
 window._animateCounter = function animateCounter(el, opts = {}) {
 if (!el) return;
@@ -1799,7 +1807,7 @@ actBtn.className = 'toast-action';
 actBtn.textContent = opts.action.label || 'Action';
 actBtn.style.cssText = 'background:rgba(255,255,255,.15);color:inherit;border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:4px 10px;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0;';
 actBtn.addEventListener('click', () => {
-try { opts.action.onClick(); } catch(e) {}
+try { opts.action.onClick(); } catch(e) { swallowError(e); }
 el.classList.add('dismissing');
 setTimeout(() => el.remove(), 220);
 });
@@ -1859,7 +1867,7 @@ try { return JSON.parse(localStorage.getItem(MY_BETS_KEY) || '{}') || {}; }
 catch (e) { return {}; }
 }
 function saveMyBets(obj) {
-try { localStorage.setItem(MY_BETS_KEY, JSON.stringify(obj)); } catch (e) {}
+try { localStorage.setItem(MY_BETS_KEY, JSON.stringify(obj)); } catch(e) { swallowError(e); }
 }
 function myBetKey(matchId, pickKey) { return `${matchId}::${pickKey || '1X2'}`; }
 function getMyBet(matchId, pickKey) { return loadMyBets()[myBetKey(matchId, pickKey)] || null; }
@@ -1882,7 +1890,7 @@ return new Set(Array.isArray(raw) ? raw.map(String) : []);
 } catch (e) { return new Set(); }
 }
 function saveSeenLocks(set) {
-try { localStorage.setItem(SEEN_LOCKS_KEY, JSON.stringify([...set])); } catch (e) {}
+try { localStorage.setItem(SEEN_LOCKS_KEY, JSON.stringify([...set])); } catch(e) { swallowError(e); }
 }
 let _seenLocks = loadSeenLocks();
 function isNewLock(matchId) {
@@ -1915,7 +1923,7 @@ return (raw && typeof raw === 'object') ? raw : {};
 } catch (e) { return {}; }
 }
 function saveReliabilityHist(obj) {
-try { localStorage.setItem(RELIABILITY_HIST_KEY, JSON.stringify(obj)); } catch (e) {}
+try { localStorage.setItem(RELIABILITY_HIST_KEY, JSON.stringify(obj)); } catch(e) { swallowError(e); }
 }
 let _reliabilityHist = loadReliabilityHist();
 function snapshotReliability(matchId, reliability) {
@@ -1946,7 +1954,7 @@ Object.keys(_reliabilityHist).forEach(id => {
 if (!liveIds.has(id)) { delete _reliabilityHist[id]; changed = true; }
 });
 if (changed) saveReliabilityHist(_reliabilityHist);
-} catch (e) {}
+} catch(e) { swallowError(e); }
 }
 
 function gcSeenLocks() {
@@ -1958,7 +1966,7 @@ Object.values(data.days).forEach(arr => (arr || []).forEach(m => { if (m.id != n
 const before = _seenLocks.size;
 _seenLocks = new Set([..._seenLocks].filter(id => liveIds.has(id)));
 if (_seenLocks.size !== before) saveSeenLocks(_seenLocks);
-} catch (e) {}
+} catch(e) { swallowError(e); }
 }
 
 function isoDate(d) {
@@ -2077,7 +2085,7 @@ desc.set.call(this, sanitizeTrustedHTML(value));
 });
 window.__v37SafeHTMLSinkInstalled = true;
 window.sanitizeTrustedHTML = sanitizeTrustedHTML;
-} catch (e) {}
+} catch(e) { swallowError(e); }
 }
 installSafeHTMLSink();
 function getBetStrengthMeta(p) {
@@ -2141,7 +2149,7 @@ window.fmtEvShort = fmtEvShort;
 window.fmtKellyHuman = fmtKellyHuman;
 window.fmtCalibrationHuman = fmtCalibrationHuman;
 window.fmtClvHuman = fmtClvHuman;
-} catch(e) {}
+} catch(e) { swallowError(e); }
 function fmtEur(v) {
 const n = typeof v === 'number' ? v : parseFloat(v);
 if (!isFinite(n)) return '—';
@@ -2311,10 +2319,10 @@ if (!(homeOdd > 1) || !(awayOdd > 1)) return false;
 if (drawOdd != null && !(drawOdd > 1)) return false;
 return true;
 }
-try { window.isWinamaxBookable = isWinamaxBookable; } catch(e){}
+try { window.isWinamaxBookable = isWinamaxBookable; } catch(e) { swallowError(e); }
 
 const VIEW_SCOPES = ['now', 'today', 'tomorrow', '72h', '7d', 'all'];
-try { window.VIEW_SCOPES = VIEW_SCOPES; } catch(e){}
+try { window.VIEW_SCOPES = VIEW_SCOPES; } catch(e) { swallowError(e); }
 function _scopeIsToday(date) {
 try {
 const iso = new Date(date).toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
@@ -2360,7 +2368,7 @@ default:         return true;
 }
 }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 }
-try { window.getScopedEvents = getScopedEvents; } catch(e){}
+try { window.getScopedEvents = getScopedEvents; } catch(e) { swallowError(e); }
 
 function expectedValue(prob, odd) {
 const p = guardNumber(prob, 0, 'expectedValue.prob');
@@ -2372,7 +2380,7 @@ return 0;
 }
 return p * o - 1;
 }
-try { window.expectedValue = expectedValue; } catch(e){}
+try { window.expectedValue = expectedValue; } catch(e) { swallowError(e); }
 
 const BLACKLIST_MARKETS = ['handicap','asianhandicap','runline','puckline','baskethandicap','spread','ah'];
 function isHandicapMarket(market) {
@@ -2387,7 +2395,7 @@ return isHandicapMarket(c?.market) && !isAllowedStrongHandicap(c);
 try {
 window.isHandicapMarket = isHandicapMarket;
 window.isBlockedHandicapMarket = isBlockedHandicapMarket;
-} catch(e){}
+} catch(e) { swallowError(e); }
 
 function oddsDisciplineProfile(odd) {
 const o = Number(odd);
@@ -2432,7 +2440,7 @@ multiplier: 0.58, minEv: 0.145, minEdge: 0.045, capPct: 0.035,
 text: 'Cote longue : petite mise seulement, même si le gain potentiel fait envie.'
 };
 }
-try { window.oddsDisciplineProfile = oddsDisciplineProfile; } catch(e){}
+try { window.oddsDisciplineProfile = oddsDisciplineProfile; } catch(e) { swallowError(e); }
 
 function investmentScore(rel, odd, dq, opts) {
 opts = opts || {};
@@ -2498,7 +2506,7 @@ market: opts.market || '',
 source: opts.source || ''
 };
 }
-try { window.investmentScore = investmentScore; } catch(e){}
+try { window.investmentScore = investmentScore; } catch(e) { swallowError(e); }
 
 function valueRating(rel, odd, dq) {
 if (!(rel > 0) || !(odd > 1)) return { score: 0, stars: 0, label: '—' };
@@ -2519,13 +2527,13 @@ else if (score >= 20) { stars = 1; label = 'Faible'; }
 else { stars = 0; label = 'À éviter'; }
 return { score: Math.round(score), stars, label, edge, ev };
 }
-try { window.valueRating = valueRating; } catch(e){}
+try { window.valueRating = valueRating; } catch(e) { swallowError(e); }
 
 function renderStars(stars) {
 const filled = Math.max(0, Math.min(5, stars));
 return '★'.repeat(filled) + '☆'.repeat(5 - filled);
 }
-try { window.renderStars = renderStars; } catch(e){}
+try { window.renderStars = renderStars; } catch(e) { swallowError(e); }
 
 function renderForm5Compact(formStr, opts) {
 if (!formStr || typeof formStr !== 'string') return '';
@@ -2541,7 +2549,7 @@ const bg = norm === 'W' ? 'rgba(52,211,153,.15)' : norm === 'L' ? 'rgba(248,113,
 return `<span style="display:inline-block;width:${size}px;height:${size}px;line-height:${size}px;text-align:center;border-radius:3px;background:${bg};color:${col};font-size:${fontSize}px;font-weight:700;">${ch}</span>`;
 }).join('');
 }
-try { window.renderForm5Compact = renderForm5Compact; } catch(e){}
+try { window.renderForm5Compact = renderForm5Compact; } catch(e) { swallowError(e); }
 
 function renderStreakBadge(competitor) {
 if (!competitor || typeof competitor.form !== 'string' || competitor.form.length < 3) return '';
@@ -2555,7 +2563,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     if (fc === 'L') return `<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 6px;background:rgba(248,113,113,.18);color:var(--danger);border-radius:999px;font-size:10px;font-weight:700;" title="${name} sur une série de ${count} défaites d'affilée">❄️ ${count}D</span>`;
     return '';
   }
-  try { window.renderStreakBadge = renderStreakBadge; } catch(e){}
+  try { window.renderStreakBadge = renderStreakBadge; } catch(e) { swallowError(e); }
 
   // Synthétise 4 dimensions en un score 0..100 + label "high/medium/low" :
   //   * edge (40 pts) : value forte +5pt+ → 40, +2pt → 20, 0 → 10
@@ -2584,7 +2592,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     }
     // 3. Data quality — 18 pts max
     let dq = null;
-    try { dq = (typeof computeDataQuality === 'function') ? computeDataQuality(match) : null; } catch(e) {}
+    try { dq = (typeof computeDataQuality === 'function') ? computeDataQuality(match) : null; } catch(e) { swallowError(e); }
     if (dq && dq.max > 0) {
       const ratio = dq.score / dq.max;
       score += Math.round(18 * ratio);
@@ -2640,7 +2648,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     const label = score >= 70 ? 'high' : score >= 45 ? 'medium' : 'low';
     return { score, label, reasons };
   }
-  try { window.qualityScore = qualityScore; } catch(e){}
+  try { window.qualityScore = qualityScore; } catch(e) { swallowError(e); }
 
   function getDataAge(data = window.PRONOSTICS_DATA, opts = {}) {
     const ts = data && data.generated_at ? new Date(data.generated_at).getTime() : NaN;
@@ -2653,7 +2661,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     const state = minutes > 240 ? 'down' : minutes > 30 ? 'waiting' : 'fresh';
     return { minutes, label, state, generatedAt: data && data.generated_at || null };
   }
-  try { window.getDataAge = getDataAge; } catch(e){}
+  try { window.getDataAge = getDataAge; } catch(e) { swallowError(e); }
 
   function _displayablePickTier(c, sport) {
     const odd = Number(c?.odd || 0);
@@ -2789,13 +2797,13 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
           const composite = edge * rel + quality / 10000;
           if (!prev || composite > (prev.edge * prev.rel + prev.quality / 10000)) byKey.set(key, row);
         }
-      } catch(e) {}
+      } catch(e) { swallowError(e); }
     }
     let rows = _sortDisplayablePicks(Array.from(byKey.values()), opts.sort || 'tier');
     if (opts.diversifyByMatch !== false) rows = _diversifyTopMatches(rows, opts.topUniqueLimit || 10);
     return rows;
   }
-  try { window.getDisplayablePicks = getDisplayablePicks; } catch(e){}
+  try { window.getDisplayablePicks = getDisplayablePicks; } catch(e) { swallowError(e); }
 
   function getTierBreakdown(picks) {
     const rows = Array.isArray(picks) ? picks : getDisplayablePicks({ includeSettled: true, includeStarted: true });
@@ -2807,7 +2815,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     }
     return out;
   }
-  try { window.getTierBreakdown = getTierBreakdown; } catch(e){}
+  try { window.getTierBreakdown = getTierBreakdown; } catch(e) { swallowError(e); }
 
   function _v35Rows(block) {
     return Array.isArray(block) ? block.filter(Boolean) : [];
@@ -3133,7 +3141,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     const info = tooltip || _v37MarketInfo(mk);
     return { label: full, shortLabel: _v37ShortLabel(full, 60), mobileLabel: _v37ShortLabel(full, 40), tooltip: info, info, source: 'internal_winamax_fr' };
   }
-  try { window.formatWinamaxPickLabel = _v37FormatPickLabel; } catch(e){}
+  try { window.formatWinamaxPickLabel = _v37FormatPickLabel; } catch(e) { swallowError(e); }
   function _v35TeamTotalLabel(match, row) {
     return _v37FormatPickLabel(match, 'teamTotal', '', '', row, {}).label;
   }
@@ -3395,7 +3403,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     });
     return scored;
   }
-  try { window.buildMarketCandidates = buildMarketCandidates; } catch(e){}
+  try { window.buildMarketCandidates = buildMarketCandidates; } catch(e) { swallowError(e); }
 
   function scoreMarketCandidate(candidate, match, pred) {
     if (!candidate) return null;
@@ -3471,7 +3479,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     }
     return out;
   }
-  try { window.scoreMarketCandidate = scoreMarketCandidate; } catch(e){}
+  try { window.scoreMarketCandidate = scoreMarketCandidate; } catch(e) { swallowError(e); }
 
   const _v35Tok = v => String(v ?? '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '');
   function _v35Line(c) {
@@ -3663,7 +3671,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
       Number.isFinite(odd) ? odd.toFixed(3) : '',
     ].join('|');
   }
-  try { window.marketCandidateSignature = marketCandidateSignature; } catch(e){}
+  try { window.marketCandidateSignature = marketCandidateSignature; } catch(e) { swallowError(e); }
 
   function hydrateSelectedMarketCandidate(match, pred, selected) {
     const raw = selected?.best || selected?.candidate || selected?.pick || selected || null;
@@ -3682,11 +3690,11 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     const chosen = byLoose || ((typeof scoreMarketCandidate === 'function') ? scoreMarketCandidate({ ...raw }, match, pred) : { ...raw });
     return chosen ? _v35AttachConsistency(chosen, candidates.length ? candidates : [chosen]) : null;
   }
-  try { window.hydrateSelectedMarketCandidate = hydrateSelectedMarketCandidate; } catch(e){}
+  try { window.hydrateSelectedMarketCandidate = hydrateSelectedMarketCandidate; } catch(e) { swallowError(e); }
 
   try {
     window.validateMarketConsistency = validateMarketConsistency;
-  } catch(e){}
+  } catch(e) { swallowError(e); }
 
   function marketHistoryConfidence(market, sport) {
     const hist = window.__marketHistoryStats || null;
@@ -3697,7 +3705,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     if (bucket.n >= 15 && roi < -0.08) return { tier: 'cold', label: `Marché froid (${bucket.n} picks, ROI ${Math.round(roi*100)}%)`, penalty: 12, n: bucket.n };
     return { tier: 'neutral', label: `Historique marché neutre (${bucket.n} picks)`, penalty: 0, n: bucket.n };
   }
-  try { window.marketHistoryConfidence = marketHistoryConfidence; } catch(e){}
+  try { window.marketHistoryConfidence = marketHistoryConfidence; } catch(e) { swallowError(e); }
 
   // Retourne { market, key, label, prob, odd, edge, kelly, ev } ou null.
   function selectBestMarket(match, pred, opts) {
@@ -3723,7 +3731,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     });
     return _v35AttachConsistency(sorted[0], candidates);
   }
-  try { window.selectBestMarket = selectBestMarket; } catch(e){}
+  try { window.selectBestMarket = selectBestMarket; } catch(e) { swallowError(e); }
 
   // Correlation score for combo warnings: same match/sport/league/team/time.
   function combinationCorrelation(p1, p2) {
@@ -3756,7 +3764,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
         const teams2 = [sides2.home?.name, sides2.away?.name].filter(Boolean);
         if (teams1.some(t => teams2.includes(t))) corr += 0.50;
       }
-    } catch(e) {}
+    } catch(e) { swallowError(e); }
     return Math.min(1, corr);
   }
   function comboLegForCorrelation(leg) {
@@ -3816,9 +3824,9 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
       note
     };
   }
-  try { window.combinationCorrelation = combinationCorrelation; } catch(e){}
-  try { window.comboCorrelationStats = comboCorrelationStats; } catch(e){}
-  try { window.estimateSameGameComboProb = estimateSameGameComboProb; } catch(e){}
+  try { window.combinationCorrelation = combinationCorrelation; } catch(e) { swallowError(e); }
+  try { window.comboCorrelationStats = comboCorrelationStats; } catch(e) { swallowError(e); }
+  try { window.estimateSameGameComboProb = estimateSameGameComboProb; } catch(e) { swallowError(e); }
 
   // Synthétise les signaux dominants du modèle pour le pick choisi en
   // langage naturel, accessible. Lit pred.contributions (Sprint U Chantier) et
@@ -3874,7 +3882,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     }
     // Quality data
     let dq = null;
-    try { dq = (typeof computeDataQuality === 'function') ? computeDataQuality(match) : null; } catch(e){}
+    try { dq = (typeof computeDataQuality === 'function') ? computeDataQuality(match) : null; } catch(e) { swallowError(e); }
     if (dq && dq.score >= 3) pros.push({ icon: '📊', label: 'Données riches', text: `${dq.score}/${dq.max} sources d'enrichissement présentes` });
     else if (dq && dq.score <= 1) cons.push({ icon: '📉', label: 'Données pauvres', text: `Seulement ${dq.score}/${dq.max} sources — incertitude plus forte` });
     // Historique ligue (si backtest dispo)
@@ -3900,7 +3908,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     const summary = `Le modèle voit ${pros.length} argument${pros.length>1?'s':''} pour, ${cons.length} contre. ${recommendation === 'À jouer' || recommendation === 'À jouer avec mise modérée' ? 'La balance penche en faveur du pari.' : recommendation === 'À surveiller — limite' ? 'La balance est à peu près neutre, prudence.' : 'La balance penche contre, mieux vaut skip.'}`;
     return { pros, cons, summary, recommendation };
   }
-  try { window.aiCoachExplain = aiCoachExplain; } catch(e){}
+  try { window.aiCoachExplain = aiCoachExplain; } catch(e) { swallowError(e); }
 
   // L'user note "j'ai parié X€ sur ce match" → comparison avec ce que le modèle
   // aurait suggéré. Adherence score : "Tu as suivi le modèle 8/10 fois".
@@ -4005,7 +4013,7 @@ if (!pred || !pred.pick || pred.skip || pred.lowConf) return;
 const rel = pred.reliability ?? pred.pick.prob ?? 0;
 if (rel < 0.65) return;  // pas un strong pick
 strongModelPicks.push({ id: String(m.id), name: m.name, ts });
-} catch(e){}
+} catch(e) { swallowError(e); }
 }));
 if (!strongModelPicks.length) return { adherence: null, modelPicksCount: 0, userBetsCount: bets.length, missed: [] };
 const followed = strongModelPicks.filter(p => userMatchIds.has(p.id)).length;
@@ -4285,7 +4293,7 @@ missedPnL += stake * (odd - 1);
 missedPnL -= stake;
 }
 }
-} catch(e){}
+} catch(e) { swallowError(e); }
 }));
 return {
 n,
@@ -4361,7 +4369,7 @@ color = 'var(--text-dim)';
 const newEdge = (pred.reliability ?? pred.pick?.prob ?? 0) - 1 / currentOdd;
 return { drift, driftPct, status, label, color, snapOdd, currentOdd, newEdge };
 }
-try { window.computeOddsDrift = computeOddsDrift; } catch(e){}
+try { window.computeOddsDrift = computeOddsDrift; } catch(e) { swallowError(e); }
 
 function computeAdvancedMetrics() {
 const data = window.PRONOSTICS_DATA;
@@ -4379,7 +4387,7 @@ const odd = pred.odds && (pickKey === '1' ? pred.odds.home : pickKey === '2' ? p
 if (!(odd > 1)) return;
 const pnl = res === 'won' ? (Number(odd) - 1) : -1;  // 1u flat stake
 settled.push({ ts: new Date(m.date).getTime(), result: res, pnl });
-} catch(e){}
+} catch(e) { swallowError(e); }
 }));
 if (!settled.length) return null;
 settled.sort((a, b) => a.ts - b.ts);  // chrono ascending
@@ -4412,7 +4420,7 @@ maxWinStreak, maxLossStreak,
 sharpe, meanPnL, stdev,
 };
 }
-try { window.computeAdvancedMetrics = computeAdvancedMetrics; } catch(e){}
+try { window.computeAdvancedMetrics = computeAdvancedMetrics; } catch(e) { swallowError(e); }
 
 function detectStreaks() {
 const data = window.PRONOSTICS_DATA;
@@ -4426,7 +4434,7 @@ if (!pred || !pred.pick) return;
 const res = (typeof evaluateModelPick === 'function') ? evaluateModelPick(m, pred) : null;
 if (res !== 'won' && res !== 'lost') return;
 settled.push({ ts: new Date(m.date).getTime(), result: res, name: m.name });
-} catch(e){}
+} catch(e) { swallowError(e); }
 }));
 settled.sort((a, b) => b.ts - a.ts);
 if (!settled.length) return { streakWins: 0, streakLosses: 0, alert: null };
@@ -4464,7 +4472,7 @@ msg: `📉 Seulement ${last10Wins}/${last10.length} gagnants sur les 10 derniers
 }
 return { streakWins, streakLosses, currentSide, settledCount: settled.length, last10Wins, alert };
 }
-try { window.detectStreaks = detectStreaks; } catch(e){}
+try { window.detectStreaks = detectStreaks; } catch(e) { swallowError(e); }
 
 const RISK_LIMITS_KEY = 'riskLimits';
 function _loadRiskLimits() {
@@ -4483,7 +4491,7 @@ return { maxBetsPerDay: 5, maxStakePctDay: 0.25, maxStakePctBet: 0.10, corrThres
 }
 }
 function _saveRiskLimits(rl) {
-try { localStorage.setItem(RISK_LIMITS_KEY, JSON.stringify(rl)); } catch(e){}
+try { localStorage.setItem(RISK_LIMITS_KEY, JSON.stringify(rl)); } catch(e) { swallowError(e); }
 }
 window._loadRiskLimits = _loadRiskLimits;
 window._saveRiskLimits = _saveRiskLimits;
@@ -4588,7 +4596,7 @@ buts: lowCorrCombo(buts),
 tomorrow: lowCorrCombo(tomorrow),
 };
 }
-try { window.buildComboVariants = buildComboVariants; } catch(e){}
+try { window.buildComboVariants = buildComboVariants; } catch(e) { swallowError(e); }
 
 const _topLeagues = new Set([
 'eng.1', 'esp.1', 'ita.1', 'ger.1', 'fra.1',  // Top-5 EU
@@ -4658,7 +4666,7 @@ else if (eloMax > 1800) score += 15;
 else if (eloMax > 1700) score += 10;
 else if (eloMax > 1600) score += 5;
 }
-} catch(e) {}
+} catch(e) { swallowError(e); }
 try {
 const sides = getSides(match);
 const recH = getRecord(sides.home) || '';
@@ -4667,7 +4675,7 @@ const wH = parseInt(String(recH).split('-')[0], 10) || 0;
 const wA = parseInt(String(recA).split('-')[0], 10) || 0;
 if (wH > 30 || wA > 30) score += 12;
 else if (wH > 20 || wA > 20) score += 8;
-} catch(e) {}
+} catch(e) { swallowError(e); }
 if (match.sport === 'football') score += 5;
 if (_isDerby(match)) score += 15;
 try {
@@ -4685,10 +4693,10 @@ else if (rH <= 5 && rA <= 5) score += 12;   // top-5 vs top-5
 else if (rH <= 3 || rA <= 3) score += 8;    // un top-3
 else if (rH <= 5 || rA <= 5) score += 4;
 }
-} catch(e) {}
+} catch(e) { swallowError(e); }
 return Math.min(100, Math.max(0, score));
 }
-try { window.matchImportance = matchImportance; } catch(e){}
+try { window.matchImportance = matchImportance; } catch(e) { swallowError(e); }
 
 function getMatchStatus(match, pred) {
 if (!match) return { code: 'no_data', label: 'Données insuffisantes', hint: 'Match introuvable', color: 'var(--text-dim)' };
@@ -4713,7 +4721,7 @@ return { code: 'uncertain', label: 'Match incertain', hint: 'Modèle hésite —
 }
 return { code: 'strong', label: 'Prono fort', hint: 'Signaux convergents, mise recommandée', color: 'var(--accent, #22c55e)' };
 }
-try { window.getMatchStatus = getMatchStatus; } catch(e){}
+try { window.getMatchStatus = getMatchStatus; } catch(e) { swallowError(e); }
 
 function getSides(match) {
 const comps = (match.competitors || []).filter(c => c && c.name);  // P0-4 : skip null competitors
@@ -5219,7 +5227,7 @@ const HOME_ADV = 2.5; // ~2.5 pts d'home-court, consensus NBA.
       games: { avgGames, avgSets, avgGamesPerSet, lines: games, setLines, sigma },
     };
   }
-  try { window.tennisScorePrediction = tennisScorePrediction; } catch(e){}
+  try { window.tennisScorePrediction = tennisScorePrediction; } catch(e) { swallowError(e); }
 
   // Secondary markets from the same Poisson model:
   //   Over/Under N.5  —  P(H+A > N) (default line 2.5, Winamax's most-liquid football total)
@@ -5542,7 +5550,7 @@ bttsBothHalves, // BTTS oui en 1ère MT et en 2e MT
 resultBtts,     // 1X2 × BTTS combiné
 };
 }
-try { window.poissonMarketsExtended = poissonMarketsExtended; } catch(e){}
+try { window.poissonMarketsExtended = poissonMarketsExtended; } catch(e) { swallowError(e); }
 
 function standingsXG(match, side, league) {
 const s = getStandingsEntry(match, side);
@@ -5686,7 +5694,7 @@ if (anyMatch) return anyMatch;
 }
 return null;
 }
-try { window.getTeamPrior = getTeamPrior; } catch (e) {}
+try { window.getTeamPrior = getTeamPrior; } catch(e) { swallowError(e); }
 
 let __bayesianV5IndexRef = null;
 let __bayesianV5Index = null;
@@ -5787,7 +5795,7 @@ decay: data?.decay || {},
 try {
 window.getBayesianPriorV5 = getBayesianPriorV5;
 window.getBayesianV5DebugSummary = getBayesianV5DebugSummary;
-} catch (e) {}
+} catch(e) { swallowError(e); }
 
 function getColdStartContextV5(match) {
 if (!match) return null;
@@ -5834,7 +5842,7 @@ generatedAt: data?.generated_at || null,
 try {
 window.getColdStartContextV5 = getColdStartContextV5;
 window.getColdStartV5DebugSummary = getColdStartV5DebugSummary;
-} catch (e) {}
+} catch(e) { swallowError(e); }
 
 function getTeamPriorsDebugSummary() {
 const idx = _getTeamPriorIndex();
@@ -5849,7 +5857,7 @@ maxMatches: Number(data?.max_matches || 20),
 generatedAt: data?.generated_at || idx?.generated_at || null,
 };
 }
-try { window.getTeamPriorsDebugSummary = getTeamPriorsDebugSummary; } catch (e) {}
+try { window.getTeamPriorsDebugSummary = getTeamPriorsDebugSummary; } catch(e) { swallowError(e); }
 
 function _seasonPhaseFromTuple(key, row) {
 if (!Array.isArray(row)) return row || null;
@@ -5889,7 +5897,7 @@ generatedAt: data?.generated_at || null,
 try {
 window.getSeasonPhaseContext = getSeasonPhaseContext;
 window.getSeasonPhaseDebugSummary = getSeasonPhaseDebugSummary;
-} catch (e) {}
+} catch(e) { swallowError(e); }
 
 function getCompetitionContext(match) {
 if (!match) return null;
@@ -5911,7 +5919,7 @@ reason: type === 'domestic_cup'
 : 'Match de championnat : régime standard.',
 };
 }
-try { window.getCompetitionContext = getCompetitionContext; } catch (e) {}
+try { window.getCompetitionContext = getCompetitionContext; } catch(e) { swallowError(e); }
 
 function buildV4ContextBadges(match, pred) {
 const season = pred?.seasonContext || getSeasonPhaseContext(match);
@@ -5952,7 +5960,7 @@ return `<div class="v4-context-badges" style="display:flex;flex-wrap:wrap;gap:8p
 ${badges.map(b => `<span style="display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--border);border-radius:999px;background:var(--panel-2);font-size:12px;font-weight:750;color:var(--text);" title="${esc(b.title)}">${esc(b.label)}</span>`).join('')}
 </div>`;
 }
-try { window.buildV4ContextBadges = buildV4ContextBadges; } catch (e) {}
+try { window.buildV4ContextBadges = buildV4ContextBadges; } catch(e) { swallowError(e); }
 
 function _starPlayerFromTuple(row) {
 if (!Array.isArray(row)) return row || null;
@@ -6041,7 +6049,7 @@ try {
 window.getStarPlayersForSide = getStarPlayersForSide;
 window.getStarImpact = getStarImpact;
 window.getStarPlayersDebugSummary = getStarPlayersDebugSummary;
-} catch (e) {}
+} catch(e) { swallowError(e); }
 
 function _xgDecayParamFromTuple(key, row) {
 if (!Array.isArray(row)) return row || null;
@@ -6064,7 +6072,7 @@ generatedAt: data?.generated_at || null,
 try {
 window.getXGDecayParam = getXGDecayParam;
 window.getXGDecayDebugSummary = getXGDecayDebugSummary;
-} catch (e) {}
+} catch(e) { swallowError(e); }
 
 function getTravelContext(match) {
 const row = window.TEAM_TRAVEL?.matches?.[String(match?.id || match?.uid || match?.name || '')];
@@ -6094,7 +6102,7 @@ try {
 window.getTravelContext = getTravelContext;
 window.getScheduleDensityContext = getScheduleDensityContext;
 window.getTravelScheduleDebugSummary = getTravelScheduleDebugSummary;
-} catch (e) {}
+} catch(e) { swallowError(e); }
 
 function _refereeStatFromTuple(key, row) {
 if (!Array.isArray(row)) return row || null;
@@ -6127,7 +6135,7 @@ generatedAt: data?.generated_at || null,
 try {
 window.getRefereeTendency = getRefereeTendency;
 window.getRefereeStatsDebugSummary = getRefereeStatsDebugSummary;
-} catch (e) {}
+} catch(e) { swallowError(e); }
 
 function _surfacePlayerFromTuple(key, row) {
 if (!Array.isArray(row)) return row || null;
@@ -6169,7 +6177,7 @@ try {
 window.getTennisSurfaceContext = getTennisSurfaceContext;
 window.getGoaliePitcherContext = getGoaliePitcherContext;
 window.getRoleContextDebugSummary = getRoleContextDebugSummary;
-} catch (e) {}
+} catch(e) { swallowError(e); }
 
 function _stadiumEffectFromTuple(key, row) {
 if (!Array.isArray(row)) return row || null;
@@ -6190,7 +6198,7 @@ generatedAt: window.STADIUM_EFFECTS?.generated_at || null,
 try {
 window.getStadiumEffect = getStadiumEffect;
 window.getStadiumEffectsDebugSummary = getStadiumEffectsDebugSummary;
-} catch (e) {}
+} catch(e) { swallowError(e); }
 
 function _coachTenureFromTuple(key, row) {
 if (!Array.isArray(row)) return row || null;
@@ -6217,7 +6225,7 @@ generatedAt: window.COACH_TENURE?.generated_at || null,
 try {
 window.getCoachContext = getCoachContext;
 window.getCoachTenureDebugSummary = getCoachTenureDebugSummary;
-} catch (e) {}
+} catch(e) { swallowError(e); }
 
 function getDerbyContext(match) {
 const { home, away } = getSides(match || {});
@@ -6237,7 +6245,7 @@ generatedAt: window.DERBIES?.generated_at || null,
 try {
 window.getDerbyContext = getDerbyContext;
 window.getDerbiesDebugSummary = getDerbiesDebugSummary;
-} catch (e) {}
+} catch(e) { swallowError(e); }
 
 function _teamStatsExtendedFromTuple(key, row) {
 if (!Array.isArray(row)) return row || null;
@@ -6264,7 +6272,7 @@ generatedAt: window.TEAM_STATS_EXTENDED?.generated_at || null,
 try {
 window.getTeamStatsExtendedContext = getTeamStatsExtendedContext;
 window.getTeamStatsExtendedDebugSummary = getTeamStatsExtendedDebugSummary;
-} catch (e) {}
+} catch(e) { swallowError(e); }
 
 function _footballStatsMarketFromTuple(matchId, row, marketKey) {
 if (!Array.isArray(row)) return row || null;
@@ -6304,7 +6312,7 @@ generatedAt: window.TOTAL_CORNERS?.generated_at || window.TOTAL_CARDS?.generated
 try {
 window.getFootballStatsMarkets = getFootballStatsMarkets;
 window.getFootballStatsMarketsDebugSummary = getFootballStatsMarketsDebugSummary;
-} catch (e) {}
+} catch(e) { swallowError(e); }
 
 function getMlbPlayerProps(match) {
 const row = window.MLB_PLAYER_PROPS?.events?.[String(match?.id || '')];
@@ -6339,7 +6347,7 @@ try {
 window.getMlbPlayerProps = getMlbPlayerProps;
 window.getNhlPlayoffMarkets = getNhlPlayoffMarkets;
 window.getMlbNhlPropsDebugSummary = getMlbNhlPropsDebugSummary;
-} catch (e) {}
+} catch(e) { swallowError(e); }
 
 function poissonComponent(match) {
 if (match.sport !== 'football') return null;
@@ -6995,7 +7003,7 @@ window.getMultitaskContextV5 = getMultitaskContextV5;
 window.getMultitaskV5DebugSummary = getMultitaskV5DebugSummary;
 window.getBacktestDeepV5DebugSummary = getBacktestDeepV5DebugSummary;
 window.getAdversarialValidationV5DebugSummary = getAdversarialValidationV5DebugSummary;
-} catch (e) {}
+} catch(e) { swallowError(e); }
 
 let __predCache = new Map();
 let __predCacheRef = null;
@@ -7020,7 +7028,7 @@ twoPlusOdd: Number(row[10]) || null,
 source: row[11] || 'football_player_props',
 } : row).filter(Boolean).sort((a, b) => (b.prob || 0) - (a.prob || 0));
 }
-try { window.getFootballPlayerProps = getFootballPlayerProps; } catch(e) {}
+try { window.getFootballPlayerProps = getFootballPlayerProps; } catch(e) { swallowError(e); }
 
 function getNbaPlayerProps(match) {
 const data = window.NBA_PLAYER_PROPS || null;
@@ -7041,7 +7049,7 @@ fairOddsUnder: Number(row[11]) || null,
 source: row[12] || 'nba_player_props',
 } : row).filter(Boolean);
 }
-try { window.getNbaPlayerProps = getNbaPlayerProps; } catch(e) {}
+try { window.getNbaPlayerProps = getNbaPlayerProps; } catch(e) { swallowError(e); }
 
 function predictLikelyScorers(match, pred) {
 try {
@@ -7265,7 +7273,7 @@ __marketBacktestLoaded = true;
 })();
 return __marketBacktestPromise;
 }
-try { window._loadMarketBacktest = _loadMarketBacktest; } catch(e){}
+try { window._loadMarketBacktest = _loadMarketBacktest; } catch(e) { swallowError(e); }
 let __strategyBacktestLoaded = false;
 let __strategyBacktestPromise = null;
 async function _loadStrategyBacktest() {
@@ -7283,7 +7291,7 @@ __strategyBacktestLoaded = true;
 })();
 return __strategyBacktestPromise;
 }
-try { window._loadStrategyBacktest = _loadStrategyBacktest; } catch(e){}
+try { window._loadStrategyBacktest = _loadStrategyBacktest; } catch(e) { swallowError(e); }
 let __tierCalibrationLoaded = false;
 let __tierCalibrationPromise = null;
 async function _loadTierCalibration() {
@@ -7301,7 +7309,7 @@ __tierCalibrationLoaded = true;
 })();
 return __tierCalibrationPromise;
 }
-try { window._loadTierCalibration = _loadTierCalibration; } catch(e){}
+try { window._loadTierCalibration = _loadTierCalibration; } catch(e) { swallowError(e); }
 let __probCalibrationLoaded = false;
 let __probCalibrationPromise = null;
 async function _loadProbCalibration() {
@@ -7319,7 +7327,7 @@ __probCalibrationLoaded = true;
 })();
 return __probCalibrationPromise;
 }
-try { window._loadProbCalibration = _loadProbCalibration; } catch(e){}
+try { window._loadProbCalibration = _loadProbCalibration; } catch(e) { swallowError(e); }
 // Runtime helper: map a raw model probability to its empirically-calibrated
 // counterpart using the histogram binning from build_prob_calibration.py.
 // Prefer sport-specific bins when sample size is usable, otherwise fall back
@@ -7346,14 +7354,14 @@ const corrected = num * factor;
 // Clamp to a sane range so a noisy bin can't push the prob to 0 / 1.
 return _capPublicProbValue(corrected);
 }
-try { window._calibrateProb = _calibrateProb; } catch(e){}
+try { window._calibrateProb = _calibrateProb; } catch(e) { swallowError(e); }
 _loadModelCalibration();
 // Schedule prob calibration load on idle so it's ready by the time the
 // dashboard or credibilité page wants to display the curve.
 if (typeof requestIdleCallback === 'function') {
-requestIdleCallback(() => { try { _loadProbCalibration(); } catch(e){} }, { timeout: 4000 });
+requestIdleCallback(() => { try { _loadProbCalibration(); } catch(e) { swallowError(e); } }, { timeout: 4000 });
 } else {
-setTimeout(() => { try { _loadProbCalibration(); } catch(e){} }, 1500);
+setTimeout(() => { try { _loadProbCalibration(); } catch(e) { swallowError(e); } }, 1500);
 }
 
 function _populateTrustStrip(rep) {
@@ -7362,7 +7370,7 @@ if (!strip || !rep) return;
 try {
 const until = parseInt(localStorage.getItem('trustStripHiddenUntil') || '0', 10);
 if (until > Date.now()) { strip.dataset.dismissed = '1'; return; }
-} catch (e) {}
+} catch(e) { swallowError(e); }
 const overall = rep.overall || {};
 const tiers = rep.by_tier || {};
 const bigBets = tiers.big_bet || {};
@@ -7391,7 +7399,7 @@ closeBtn._wired = true;
 closeBtn.addEventListener('click', () => {
 try {
 localStorage.setItem('trustStripHiddenUntil', String(Date.now() + 30 * 86400 * 1000));
-} catch (e) {}
+} catch(e) { swallowError(e); }
 strip.dataset.dismissed = '1';
 strip.classList.add('hidden');
 document.documentElement.style.setProperty('--trust-h', '0px');
@@ -7401,23 +7409,23 @@ toast('Trust strip masqué pour 30j', 'info', {
 action: {
 label: 'Annuler',
 onClick: () => {
-try { localStorage.removeItem('trustStripHiddenUntil'); } catch(e){}
+try { localStorage.removeItem('trustStripHiddenUntil'); } catch(e) { swallowError(e); }
 delete strip.dataset.dismissed;
 strip.classList.remove('hidden');
-try { _populateTrustStrip(window.__backtestReportV2); } catch(e){}
+try { _populateTrustStrip(window.__backtestReportV2); } catch(e) { swallowError(e); }
 },
 },
 });
 }
-} catch(e){}
+} catch(e) { swallowError(e); }
 });
 }
 }
 window._resetTrustStrip = function() {
-try { localStorage.removeItem('trustStripHiddenUntil'); } catch(e){}
+try { localStorage.removeItem('trustStripHiddenUntil'); } catch(e) { swallowError(e); }
 const strip = document.getElementById('trust-strip');
 if (strip) { delete strip.dataset.dismissed; strip.classList.remove('hidden'); }
-try { _populateTrustStrip(window.__backtestReportV2); } catch(e){}
+try { _populateTrustStrip(window.__backtestReportV2); } catch(e) { swallowError(e); }
 };
 window._resetAllTutorials = function() {
 const keys = [
@@ -7433,7 +7441,7 @@ if (localStorage.getItem(k) !== null) {
 localStorage.removeItem(k);
 n++;
 }
-} catch(e){}
+} catch(e) { swallowError(e); }
 });
 try {
 const prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}');
@@ -7441,7 +7449,7 @@ delete prefs.onboardingDone;
 delete prefs.howToShownTimes;
 localStorage.setItem('userPrefs', JSON.stringify(prefs));
 n++;
-} catch(e){}
+} catch(e) { swallowError(e); }
 if (typeof window.toast === 'function') {
 window.toast(`✓ ${n} tutoriels/banners réinitialisés. Recharge la page pour les revoir.`, 'success');
 }
@@ -7459,7 +7467,7 @@ document.documentElement.style.setProperty('--trust-h', h + 'px');
 }
 if (typeof window !== 'undefined') {
 window.addEventListener('resize', () => {
-try { _updateTrustStripHeight(); } catch(e){}
+try { _updateTrustStripHeight(); } catch(e) { swallowError(e); }
 });
 }
 
@@ -7476,13 +7484,13 @@ btn.style.color = 'var(--text-dim)';
 btn.title = 'Santé pipeline : health.json indisponible';
 return;
 }
-try { window.__healthData = h; } catch(e){}
+try { window.__healthData = h; } catch(e) { swallowError(e); }
 try {
 if (currentPage === 'sante') {
 const wrap = document.getElementById('sante-wrap');
 if (wrap) setTimeout(() => renderSantePage(wrap), 0);
 }
-} catch(e){}
+} catch(e) { swallowError(e); }
 const ageInfo = (typeof getDataAge === 'function') ? getDataAge(window.PRONOSTICS_DATA) : null;
 const ageMin = ageInfo ? ageInfo.minutes : (isFinite(h.data_age_min) ? h.data_age_min : 999);
 const warnings = Array.isArray(h.warnings) ? h.warnings : [];
@@ -7603,7 +7611,7 @@ if (!isFinite(d) || d === 0) return false;
 const ageH = (Date.now() - d) / 3600000;
 return ageH > 6;
 }
-try { window._isMatchEffectivelyDone = _isMatchEffectivelyDone; } catch(e){}
+try { window._isMatchEffectivelyDone = _isMatchEffectivelyDone; } catch(e) { swallowError(e); }
 function predictMatch(match) {
 const cur = window.PRONOSTICS_DATA;
 if (__predCacheRef !== cur) { __predCache = new Map(); __predCacheRef = cur; }
@@ -7619,8 +7627,8 @@ const p = _applyCalibration(_predictMatchImpl(match), match);
 __predCache.set(match.id, p);
 return p;
 }
-try { window.SUPPORTED_SPORTS = SUPPORTED_SPORTS; } catch(e){}
-try { window.MODEL_PROB_CAP = MODEL_PROB_CAP; } catch(e){}
+try { window.SUPPORTED_SPORTS = SUPPORTED_SPORTS; } catch(e) { swallowError(e); }
+try { window.MODEL_PROB_CAP = MODEL_PROB_CAP; } catch(e) { swallowError(e); }
 function _applyCalibration(p, match) {
 if (!p || !isFinite(p.reliability) || p.calibrated) {
 return _capModelProbability(_markSuspectIfHugeEdge(p, match));
@@ -9136,7 +9144,7 @@ reliability = Math.max(0.25, reliability - penalty);
 leagueBias = { league: match.league_code, n, brier: Math.round(brier * 1000) / 1000, penalty: Math.round(penalty * 1000) / 1000 };
 reasons.push({ type: 'league_bias', icon: '🧯', text: `Ligue dépriorisée : Brier ${leagueBias.brier} sur ${n} picks → fiabilité −${Math.round(penalty * 100)}pt.` });
 }
-} catch(e) {}
+} catch(e) { swallowError(e); }
 
 let learnedContext = null;
 try {
@@ -9152,7 +9160,7 @@ icon: '🧠',
 text: `Contexte appris (${learnedContext.status}) : fiabilité ${sign}${Math.round(learnedContext.nudge * 100)}pt via ${learnedContext.components.filter(c => c.active).map(c => c.label).join(' + ')}.`,
 });
 }
-} catch(e) {}
+} catch(e) { swallowError(e); }
 
 let stackingMetaV5 = null;
 try {
@@ -9169,7 +9177,7 @@ icon: '🧬',
 text: `Stacking V5 (${stackingMetaV5.status}, ${stackingMetaV5.rows} lignes) : fiabilité ${sign}${Math.round(stackingMetaV5.nudge * 100)}pt, méta-proba ${Math.round(stackingMetaV5.meta_prob * 100)}%.`,
 });
 }
-} catch(e) {}
+} catch(e) { swallowError(e); }
 
 let headline = '';
 const conf = reliability;  // headline speaks to the UX confidence, not raw prob
@@ -9451,7 +9459,7 @@ firstLastGoalAll,
 raw: ext,
 };
 }
-} catch(e) {}
+} catch(e) { swallowError(e); }
 return { ou: ouPick, btts: bttsPick, raw: mk, extended };
 })() : null,
 components: components.map(c => ({ w: c.w, name: c.name, icon: c.icon, isMarket: !!c.isMarket })),
@@ -9598,7 +9606,7 @@ if (key === 'X') return null;  // pas de signal nul si on n'a que winner
     return null;
   }
   // FIX 2026-04-29 — Expose evaluateModelPick pour debug console + tests live.
-  try { window.evaluateModelPick = evaluateModelPick; } catch(e){}
+  try { window.evaluateModelPick = evaluateModelPick; } catch(e) { swallowError(e); }
 
   // pour les marchés secondaires (OU, BTTS, DC, score exact, mi-temps,
   // total points basket, handicap basket). Retourne 'won' / 'lost' / null
@@ -9733,7 +9741,7 @@ default:
 return null;
 }
 }
-try { window.evaluateMarketPick = evaluateMarketPick; } catch(e){}
+try { window.evaluateMarketPick = evaluateMarketPick; } catch(e) { swallowError(e); }
 
 function buildLossPostMortem(match, pred) {
 if (!match?.completed || !pred) return null;
@@ -9893,7 +9901,7 @@ n: Math.round(sample),
 width: Math.round((hi - lo) * 1000) / 1000,
 };
 }
-try { window.wilsonProbInterval = wilsonProbInterval; } catch(e) {}
+try { window.wilsonProbInterval = wilsonProbInterval; } catch(e) { swallowError(e); }
 function bootstrapPredictionIntervalV5(prob, context = {}) {
 const p = Math.max(0.02, Math.min(0.98, Number(prob) || 0.50));
 const values = Array.isArray(context.componentProbs)
@@ -9944,7 +9952,7 @@ sigma: Math.round(sigma * 1000) / 1000,
 component_std: Math.round(componentStd * 1000) / 1000,
 };
 }
-try { window.bootstrapPredictionIntervalV5 = bootstrapPredictionIntervalV5; } catch(e) {}
+try { window.bootstrapPredictionIntervalV5 = bootstrapPredictionIntervalV5; } catch(e) { swallowError(e); }
 
 function selfEvaluateConfidenceV5(match, pred = {}, best = {}) {
 const rm = pred?.reliabilityMeta || {};
@@ -9956,7 +9964,7 @@ let dqRatio = 0.5;
 try {
 const dq = (typeof computeDataQuality === 'function') ? computeDataQuality(match) : null;
 if (dq && dq.max) dqRatio = Math.max(0, Math.min(1, Number(dq.score || 0) / Number(dq.max || 1)));
-} catch(e) {}
+} catch(e) { swallowError(e); }
 const interval = pred?.prediction_interval_v5 || pred?.bootstrap_interval || rm.predictionIntervalV5 || null;
 const width = Number(interval?.width || 0.18);
 const intervalScore = Math.max(0, Math.min(1, 1 - width / 0.28));
@@ -10004,7 +10012,7 @@ abstain: !!pred?.abstain?.active,
 },
 };
 }
-try { window.selfEvaluateConfidenceV5 = selfEvaluateConfidenceV5; } catch(e) {}
+try { window.selfEvaluateConfidenceV5 = selfEvaluateConfidenceV5; } catch(e) { swallowError(e); }
 
 function confGauge(prob, size = 'md') {
 const p = Math.max(0, Math.min(1, prob || 0));
@@ -10215,7 +10223,7 @@ const rel = p.reliability ?? p.pick.prob;
 if (rel < 0.55) return;
 const edge = rel - 1 / odd;
 if (edge >= 0.05) nActions++;
-} catch(e) {}
+} catch(e) { swallowError(e); }
 });
 const newDashText = String(nActions);
 if (dashboardCountEl.textContent && dashboardCountEl.textContent !== newDashText && nActions > 0) {
@@ -10512,7 +10520,7 @@ const nextKickoff = Math.min(...c.legs.map(l => l.startIn));
 return { ...c, totalOdd, avgProb, rawCombinedProb, combinedProb, correlationAvg, correlationNote, nextKickoff };
 });
 }
-try { window.buildCombines = buildCombines; } catch(e){}
+try { window.buildCombines = buildCombines; } catch(e) { swallowError(e); }
 
 function fmtIn(mins) {
 if (mins == null) return '';
@@ -10691,7 +10699,7 @@ if (!scorers || !scorers.length) return;
 const top = scorers[0];
 if (top.prob < 0.30) return;
 bestPerMatch.push({ m, scorer: top });
-} catch(e){}
+} catch(e) { swallowError(e); }
 });
 bestPerMatch.sort((a, b) => b.scorer.prob - a.scorer.prob);
 const legs = bestPerMatch.slice(0, 3);
@@ -10760,7 +10768,7 @@ match: m, pred, isLock: pred.isLock,
 market: best.market, key: best.key, label: best.label,
 prob: best.prob, odd: best.odd, edge: best.edge, kelly: best.kelly,
 });
-} catch(e){}
+} catch(e) { swallowError(e); }
 });
 if (!picksAll.length) return '';
 const variants = buildComboVariants(picksAll);
@@ -10942,7 +10950,7 @@ _leagueLogo404Dirty = true;
 }
 setInterval(() => {
 if (!_leagueLogo404Dirty) return;
-try { localStorage.setItem(_LEAGUE_LOGO_404_KEY, JSON.stringify(_leagueLogo404Cache)); } catch(e){}
+try { localStorage.setItem(_LEAGUE_LOGO_404_KEY, JSON.stringify(_leagueLogo404Cache)); } catch(e) { swallowError(e); }
 _leagueLogo404Dirty = false;
 }, 60 * 1000);
 window._leagueLogoMark404 = _leagueLogoMark404;
@@ -11088,7 +11096,7 @@ return `<div style="display:flex;flex-wrap:wrap;gap:10px;padding:6px 12px;font-s
         url: url || ''
       });
       localStorage.setItem(key, JSON.stringify(data));
-    } catch(e) {}
+    } catch(e) { swallowError(e); }
   }
 
   // Human-readable tipster source label
@@ -11138,7 +11146,7 @@ _wxBtn.removeAttribute('href');
 _wxBtn.style.display = 'none';
 }
 }
-} catch(e) {}
+} catch(e) { swallowError(e); }
 
 const recH = parseRecord(getRecord(home));
 const recA = parseRecord(getRecord(away));
@@ -13587,7 +13595,7 @@ ${match.surface ? `<div class="kv"><div class="k">Surface</div><div class="v">${
               history.replaceState(null, '', location.pathname + location.search + newHash);
             }
           }
-        } catch(e){}
+        } catch(e) { swallowError(e); }
         // Scroll back to top of body (for long sections)
         body.scrollTop = 0;
       };
@@ -13718,7 +13726,7 @@ const safeSnap = snaps.includes(snap) ? snap : '90';
 sheet.dataset.sheetSnap = safeSnap;
 sheet.style.transition = 'height 200ms cubic-bezier(.32,.72,0,1), max-height 200ms cubic-bezier(.32,.72,0,1), transform 200ms cubic-bezier(.32,.72,0,1)';
 sheet.style.transform = '';
-try { if (vibrate && navigator.vibrate) navigator.vibrate(6); } catch(e) {}
+try { if (vibrate && navigator.vibrate) navigator.vibrate(6); } catch(e) { swallowError(e); }
 };
 setSheetSnap('90', false);
 window.__v36DetailSheetSnap = setSheetSnap;
@@ -13743,7 +13751,7 @@ if (!dragging) return;
 const t = e.touches ? e.touches[0] : e;
 const dy = t.clientY - startY;
 currentY = dy;
-try { if (e.cancelable) e.preventDefault(); } catch(err) {}
+try { if (e.cancelable) e.preventDefault(); } catch(err) { swallowError(err); }
 const elastic = dy < 0 ? dy * 0.35 : dy;
 sheet.style.transform = `translateY(${elastic}px)`;
 };
@@ -13829,7 +13837,7 @@ container.addEventListener('keydown', onKeyDown);
 return function release() {
 container.removeEventListener('keydown', onKeyDown);
 if (prevActive && typeof prevActive.focus === 'function') {
-try { prevActive.focus({ preventScroll: true }); } catch (e) {}
+try { prevActive.focus({ preventScroll: true }); } catch(e) { swallowError(e); }
 }
 };
 }
@@ -13914,7 +13922,7 @@ const filtered = (Array.isArray(arr) ? arr : [])
 .filter(x => x.toLowerCase() !== clean.toLowerCase());
 filtered.unshift(clean);
 safeLocalStorageSet(RECENT_SEARCHES_KEY, JSON.stringify(filtered.slice(0, 20)));
-} catch(e){}
+} catch(e) { swallowError(e); }
 }
 function _loadRecentSearches() {
 const arr = safeJsonParse(localStorage.getItem(RECENT_SEARCHES_KEY), []);
@@ -13964,7 +13972,7 @@ if (inp) { inp.value = q; inp.dispatchEvent(new Event('input', { bubbles: true }
 const clearBtn = box.querySelector('#search-recent-clear');
 if (clearBtn) clearBtn.addEventListener('click', (e) => {
 e.stopPropagation();
-try { localStorage.removeItem(RECENT_SEARCHES_KEY); } catch(e){}
+try { localStorage.removeItem(RECENT_SEARCHES_KEY); } catch(e) { swallowError(e); }
 box.style.display = 'none';
 });
 }
@@ -14236,7 +14244,7 @@ const hn = String(home?.name || home?.short || '').toLowerCase();
 const an = String(away?.name || away?.short || '').toLowerCase();
 if (hn !== name && an !== name) return;
 out.push({ m, ts, home, away });
-} catch(e) {}
+} catch(e) { swallowError(e); }
 }));
 out.sort((a,b) => a.ts - b.ts);
 return out.slice(0, limit);
@@ -14307,10 +14315,10 @@ const teamLabel = el.dataset.teamLabel || '';
 const input = document.getElementById('search');
 input.value = label;
 searchTerm = label;
-try { _saveRecentSearch(label); } catch(e){}
+try { _saveRecentSearch(label); } catch(e) { swallowError(e); }
 if (kind === 'page' && action) {
 currentPage = PAGE_ALIASES[action] || action;
-try { localStorage.setItem('currentPage', currentPage); } catch(e){}
+try { localStorage.setItem('currentPage', currentPage); } catch(e) { swallowError(e); }
 _setUserNavHash('#' + currentPage);
 box.style.display = 'none';
 if (typeof applyPageView === 'function') applyPageView(); else render();
@@ -14326,9 +14334,9 @@ return;
 }
 if (action === 'focus') {
 const key = 'paris_sportif_focus_big_bets_v1';
-try { localStorage.setItem(key, localStorage.getItem(key) === '1' ? '0' : '1'); } catch(e){}
+try { localStorage.setItem(key, localStorage.getItem(key) === '1' ? '0' : '1'); } catch(e) { swallowError(e); }
 currentPage = 'dashboard';
-try { history.replaceState(null, '', location.pathname + location.search + '#dashboard'); } catch(e){}
+try { history.replaceState(null, '', location.pathname + location.search + '#dashboard'); } catch(e) { swallowError(e); }
 } else if (action.startsWith('sport:')) {
 const parts = action.split(':');
 const sp = parts[1] || 'all';
@@ -14359,7 +14367,7 @@ try {
 if (window.PRONOSTICS_DATA && window.PRONOSTICS_DATA._lite && typeof _ensureFullData === 'function') {
 await _ensureFullData();
 }
-} catch(e) {}
+} catch(e) { swallowError(e); }
 const upcoming = _teamUpcomingMatches(label, 5);
 if (upcoming.length > 1 && typeof _showBottomSheet === 'function') {
 const rows = upcoming.map(({ m, home, away }) => {
@@ -14388,7 +14396,7 @@ btn.addEventListener('click', () => {
 const id = btn.dataset.teamMatchOpen;
 const found = upcoming.find(x => String(x.m?.id || '') === String(id));
 if (found && typeof openDetail === 'function') {
-try { sheet && sheet.close && sheet.close(); } catch(e) {}
+try { sheet && sheet.close && sheet.close(); } catch(e) { swallowError(e); }
 setTimeout(() => openDetail(found.m), 80);
 }
 });
@@ -14420,7 +14428,7 @@ const m = document.getElementById('detail-modal');
 m.classList.remove('open');
 m.setAttribute('aria-hidden', 'true');
 if (window._modalTrapRelease) {
-try { window._modalTrapRelease(); } catch(e){}
+try { window._modalTrapRelease(); } catch(e) { swallowError(e); }
 window._modalTrapRelease = null;
 }
 try {
@@ -14429,7 +14437,7 @@ if (url.searchParams.has('match')) {
 url.searchParams.delete('match');
 history.replaceState(null, '', url.pathname + (url.search ? url.search : '') + url.hash);
 }
-} catch(e) {}
+} catch(e) { swallowError(e); }
 };
 window.openDetail = openDetail;
 window.closeDetailModal = closeDetailModal;
@@ -14453,11 +14461,11 @@ if (!safeLocalStorageSet('paris_sportif_recent_matches', JSON.stringify(arr))) {
 const trimmed = arr.slice(0, 3);
 safeLocalStorageSet('paris_sportif_recent_matches', JSON.stringify(trimmed));
 }
-} catch (e) {}
+} catch(e) { swallowError(e); }
 };
 const _origOpenDetail = openDetail;
 window.openDetail = function trackedOpenDetail(match) {
-try { _trackRecentMatch(match); } catch (e) {}
+try { _trackRecentMatch(match); } catch(e) { swallowError(e); }
 return _origOpenDetail(match);
 };
 
@@ -14532,7 +14540,7 @@ if (sides) {
 if (wl.teams.includes(sides.home?.name)) return true;
 if (wl.teams.includes(sides.away?.name)) return true;
 }
-} catch(e) {}
+} catch(e) { swallowError(e); }
 return false;
 };
 function _loadAlertRules() {
@@ -14643,7 +14651,7 @@ badge.style.cssText = 'background:rgba(239,68,68,.18);color:#fca5a5;padding:1px 
 badge.textContent = `🔴 LIVE ${liveCount} · poll 10s`;
 txtEl.appendChild(badge);
 }
-} catch(e){}
+} catch(e) { swallowError(e); }
 }
 
 function _showStakePrompt(suggested = '1', label = 'Mise en € ?') {
@@ -14685,10 +14693,10 @@ input.addEventListener('keydown', (e) => {
 if (e.key === 'Enter') { e.preventDefault(); cleanup(input.value); }
 if (e.key === 'Escape') { e.preventDefault(); cleanup(null); }
 });
-setTimeout(() => { try { input.focus(); input.select(); } catch(e){} }, 50);
+setTimeout(() => { try { input.focus(); input.select(); } catch(e) { swallowError(e); } }, 50);
 });
 }
-try { window._showStakePrompt = _showStakePrompt; } catch(e){}
+try { window._showStakePrompt = _showStakePrompt; } catch(e) { swallowError(e); }
 
 function _showConfirm(opts = {}) {
 const title = opts.title || 'Confirmer';
@@ -14725,10 +14733,10 @@ if (e.key === 'Enter') { e.preventDefault(); cleanup(true); document.removeEvent
 if (e.key === 'Escape') { e.preventDefault(); cleanup(false); document.removeEventListener('keydown', onKey); }
 };
 document.addEventListener('keydown', onKey);
-setTimeout(() => { try { div.querySelector('#__confirm-ok').focus(); } catch(e){} }, 50);
+setTimeout(() => { try { div.querySelector('#__confirm-ok').focus(); } catch(e) { swallowError(e); } }, 50);
 });
 }
-try { window._showConfirm = _showConfirm; } catch(e){}
+try { window._showConfirm = _showConfirm; } catch(e) { swallowError(e); }
 
 function _hardReload() {
 try {
@@ -14766,7 +14774,7 @@ _available_days: manifest.days,
 _lite: cur._lite === false ? false : true,
 };
 }
-} catch(eFast) {}
+} catch(eFast) { swallowError(eFast); }
 if (!fresh) {
 const url = `data.js?t=${Date.now()}`;
 const resp = await fetch(url, { cache: 'no-store' });
@@ -14795,7 +14803,7 @@ away: away?.score ?? null,
 });
 });
 }
-} catch(e){}
+} catch(e) { swallowError(e); }
 window.PRONOSTICS_DATA = fresh;
 const changedIds = new Set();
 try {
@@ -14815,7 +14823,7 @@ changedIds.add(String(ev.id));
 });
 });
 }
-} catch(e){}
+} catch(e) { swallowError(e); }
 window.__pendingScoreFlash = changedIds;
 const syncBanner = document.getElementById('__boot-sync-banner');
 if (syncBanner) {
@@ -14849,7 +14857,7 @@ setTimeout(() => el.classList.remove('score-flash'), 1600);
 });
 window.__pendingScoreFlash = null;
 }
-} catch(e){}
+} catch(e) { swallowError(e); }
 updateFreshness();
 try {
 if (typeof window._maybeNotifyHighEdgePicks === 'function') {
@@ -14882,7 +14890,7 @@ window.pollData = pollData;
 window.predictMatch = predictMatch;
 if (typeof kellyFraction === 'function') window.kellyFraction = kellyFraction;
 if (typeof getMatchOdds === 'function') window.getMatchOdds = getMatchOdds;
-} catch(e){}
+} catch(e) { swallowError(e); }
 
 try {
 window.__testAPI = {
@@ -14915,7 +14923,7 @@ isPairConsistent: typeof isPairConsistent === 'function' ? isPairConsistent : nu
 validateMarketConsistency: typeof validateMarketConsistency === 'function' ? validateMarketConsistency : null,
 formatWinamaxPickLabel: typeof _v37FormatPickLabel === 'function' ? _v37FormatPickLabel : null,
 };
-} catch(e){}
+} catch(e) { swallowError(e); }
 
 let __fullDataPromise = null;
 async function _ensureFullData() {
@@ -14945,7 +14953,7 @@ days: mergedDays,
 _lite: false,
 _available_days: full.days ? Object.entries(full.days).filter(([, v]) => Array.isArray(v) && v.length).map(([k]) => k).sort() : [],
 };
-try { if (typeof render === 'function') render(); } catch(e){}
+try { if (typeof render === 'function') render(); } catch(e) { swallowError(e); }
 return window.PRONOSTICS_DATA;
 } catch (err) {
 __fullDataPromise = null;
@@ -14957,13 +14965,13 @@ toast('📡 Hors-ligne — données limitées au mode lite. Reconnexion auto.', 
 } else if (typeof toast === 'function') {
 toast('⚠ Erreur chargement données complètes — réessayer dans 30s', 'warn', { duration: 4000 });
 }
-} catch(_) {}
+} catch(_) { swallowError(_); }
 throw err;
 }
 })();
 return __fullDataPromise;
 }
-try { window._ensureFullData = _ensureFullData; } catch(e){}
+try { window._ensureFullData = _ensureFullData; } catch(e) { swallowError(e); }
 
 function _scheduleFullPreload() {
 if (window.__ENABLE_FULL_DATA_PRELOAD !== true) return;
@@ -14991,16 +14999,16 @@ if (m.winamax && m.winamax.available) withWinamax++;
 });
 });
 let prefs = {};
-try { prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}'); } catch(e){}
+try { prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}'); } catch(e) { swallowError(e); }
 let trackedCount = 0;
 try {
 const t = JSON.parse(localStorage.getItem('paris_sportif_tracked_bets') || '{}');
 trackedCount = Object.keys(t || {}).length;
-} catch(e){}
+} catch(e) { swallowError(e); }
 let errCount = 0;
-try { errCount = (JSON.parse(localStorage.getItem('paris_sportif_js_errors_v1') || '[]') || []).length; } catch(e){}
+try { errCount = (JSON.parse(localStorage.getItem('paris_sportif_js_errors_v1') || '[]') || []).length; } catch(e) { swallowError(e); }
 let pwaPagesSeen = [];
-try { pwaPagesSeen = JSON.parse(localStorage.getItem('pwaPagesSeen') || '[]'); } catch(e){}
+try { pwaPagesSeen = JSON.parse(localStorage.getItem('pwaPagesSeen') || '[]'); } catch(e) { swallowError(e); }
 const out = {
 data: {
 generated_at: d?.generated_at || '?',
@@ -15134,13 +15142,13 @@ const idle = now - __lastUserInteraction > idleAfterMs;
 const hidden = document.visibilityState === 'hidden';
 const typing = document.activeElement && ['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName);
 if (hidden && idle && !typing) {
-try { location.reload(); } catch (e) {}
+try { location.reload(); } catch(e) { swallowError(e); }
 }
 }
-try { updateSanteBadge(); } catch (e) {}
+try { updateSanteBadge(); } catch(e) { swallowError(e); }
 }, tickMs);
 updateFreshness();
-try { updateSanteBadge(); } catch (e) {}
+try { updateSanteBadge(); } catch(e) { swallowError(e); }
 }
 
 document.addEventListener('visibilitychange', () => {
@@ -15210,7 +15218,7 @@ if (m.completed) settled.push(entry);
 else if (m.live) live.push(entry);
 else upcoming.push(entry);
 if (pred.isLock) locks.push(entry);
-} catch (e) {}
+} catch(e) { swallowError(e); }
 });
 
 const lines = [];
@@ -15257,7 +15265,7 @@ today.forEach(m => {
 try {
 const pred = predictMatch(m);
 if (pred && pred.isLock && !m.completed && !seenIds.has(String(m.id))) newLocks.push({ m, pred });
-} catch (e) {}
+} catch(e) { swallowError(e); }
 });
 if (newLocks.length) {
 const _bodyOf = (e) => {
@@ -15272,7 +15280,7 @@ body: newLocks.slice(0,3).map(_bodyOf).join(' · '),
 action: 'locks', color: 'gold'
 });
 }
-} catch (e) {}
+} catch(e) { swallowError(e); }
 
 
 try {
@@ -15298,7 +15306,7 @@ body: `${esc(_hN)} vs ${esc(_aN)} · cote ${top.odd.toFixed(2)}`,
 action: 'top', color: 'purple'
 });
 }
-} catch (e) {}
+} catch(e) { swallowError(e); }
 
 try {
 const live = today.filter(m => m.live);
@@ -15314,7 +15322,7 @@ return `${esc(hC.name || hC.short || '?')} vs ${esc(aC.name || aC.short || '?')}
 action: 'locks', color: 'red'
 });
 }
-} catch (e) {}
+} catch(e) { swallowError(e); }
 
 
 return items.sort((a,b) => b.priority - a.priority);
@@ -15449,19 +15457,19 @@ roiPct,
 note: `${label}: ROI backtest ${roiPct.toFixed(1)}% sur ${sample} picks`
 };
 }
-try { window._sportRoiGuard = _sportRoiGuard; } catch(e) {}
+try { window._sportRoiGuard = _sportRoiGuard; } catch(e) { swallowError(e); }
 
 function _loadAgentRules() {
 try { return JSON.parse(localStorage.getItem('agentRules') || '[]'); } catch(e) { return []; }
 }
 function _saveAgentRules(r) {
-try { localStorage.setItem('agentRules', JSON.stringify(r)); } catch(e) {}
+try { localStorage.setItem('agentRules', JSON.stringify(r)); } catch(e) { swallowError(e); }
 }
 function _loadAgentIgnored() {
 try { return JSON.parse(localStorage.getItem('agentRulesIgnored') || '[]'); } catch(e) { return []; }
 }
 function _saveAgentIgnored(r) {
-try { localStorage.setItem('agentRulesIgnored', JSON.stringify(r)); } catch(e) {}
+try { localStorage.setItem('agentRulesIgnored', JSON.stringify(r)); } catch(e) { swallowError(e); }
 }
 function _applyAgentRules(pick) {
 const rules = _loadAgentRules();
@@ -15567,10 +15575,10 @@ b.tier = b.n >= 30 && b.roi > 0.03 ? 'validated'
 : b.n >= 8 ? 'neutral'
 : 'learning';
 });
-try { window.__marketHistoryStats = stats; } catch(e) {}
+try { window.__marketHistoryStats = stats; } catch(e) { swallowError(e); }
 return stats;
 }
-try { window._buildMarketHistoryStats = _buildMarketHistoryStats; } catch(e){}
+try { window._buildMarketHistoryStats = _buildMarketHistoryStats; } catch(e) { swallowError(e); }
 
 let __agentReplayCache = null;
 let __agentReplayDataRef = null;
@@ -15605,7 +15613,7 @@ if (res !== 'won' && res !== 'lost') return;
 const ts = new Date(m.date).getTime() || 0;
 if (resetTs && ts < resetTs) return;
 scorable.push({ m, pred, best, odd: best.odd, rel: best.rel, res, ts, dayIso });
-} catch (e) {}
+} catch(e) { swallowError(e); }
 });
 });
 scorable.sort((a,b) => a.ts - b.ts);
@@ -15844,7 +15852,7 @@ if (!clean.date) clean.date = 'all';
 return clean;
 })();
 const v37BlindMode = v36Filter.blind === true || v36Filter.blind === '1';
-try { window.__v37BlindMode = v37BlindMode; } catch(e) {}
+try { window.__v37BlindMode = v37BlindMode; } catch(e) { swallowError(e); }
 const v36TierDefs = [
 { id: 'safe', icon: 'S', abbr: 'S', label: 'Sur', range: '1.30-1.50', desc: 'Conf. 65%+ · avantage proche neutre accepte', tone: 'safe' },
 { id: 'solid', icon: 'SO', abbr: 'SO', label: 'Solide', range: '1.50-2.00', desc: 'Conf. 50%+ · bon equilibre risque/gain', tone: 'solid' },
@@ -16362,7 +16370,7 @@ date: parisDateISO(match.date) || '',
 match: `${v36TeamName(sides.home)} - ${v36TeamName(sides.away)}`,
 winamax: isWinamaxBookable(match)
 });
-} catch(e) {}
+} catch(e) { swallowError(e); }
 }
 };
 const v37QualityCounters = {
@@ -16377,7 +16385,7 @@ const v37RememberQualitySample = (key, item, max = 5) => {
 try {
 const arr = v37QualitySamples[key];
 if (Array.isArray(arr) && arr.length < max) arr.push(item);
-} catch(e) {}
+} catch(e) { swallowError(e); }
 };
 let v37FilterResetNotice = '';
 let v37AutoHorizonReason = '';
@@ -16481,7 +16489,7 @@ v37HistoryMode = false;
 v37IsAllHorizon = true;
 v37ScanPool = allHorizonPool;
 v36Filter.date = 'all';
-try { localStorage.setItem(v36FilterKey, JSON.stringify(v36Filter)); } catch(e) {}
+try { localStorage.setItem(v36FilterKey, JSON.stringify(v36Filter)); } catch(e) { swallowError(e); }
 v37Reject('date_auto_horizon_low_pool', null, v37AutoHorizonReason);
 }
 }
@@ -16796,7 +16804,7 @@ v36Filter.tier = '';
 v36Filter.time = '';
 v36Filter.q = '';
 v36Search = '';
-try { localStorage.setItem(v36FilterKey, JSON.stringify(v36Filter)); } catch(e) {}
+try { localStorage.setItem(v36FilterKey, JSON.stringify(v36Filter)); } catch(e) { swallowError(e); }
 v36Filtered = v36PickPool.slice();
 v37Reject('filtre_localstorage_reset');
 }
@@ -16931,7 +16939,7 @@ dataOnly: true
 });
 pickedMatches.add(matchKey);
 if (out.length >= fillTarget) break;
-} catch(e) {}
+} catch(e) { swallowError(e); }
 }
 return out.sort((a, b) => (b.opportunity - a.opportunity) || (a.ts - b.ts));
 })();
@@ -17131,7 +17139,7 @@ rejectReasons: v37RejectReasons,
 rejectSamples: v37RejectSamples
 };
 if (v37DebugOn) {
-try { prodLog('[v37 debug]', { ...v37DebugState, sampleMatches: v37DebugMatches() }); } catch(e) {}
+try { prodLog('[v37 debug]', { ...v37DebugState, sampleMatches: v37DebugMatches() }); } catch(e) { swallowError(e); }
 }
 const v37DebugPanelHtml = v37DebugOn ? `<section class="v37-debug-panel" data-v37-debug-panel><b>Debug tableau V37</b><span>Filtres actifs · Raisons de rejet · 10 premiers matchs scannes</span><pre>${esc(JSON.stringify({ ...v37DebugState, sampleMatches: v37DebugMatches() }, null, 2))}</pre></section>` : '';
 const v37EmptyPoolHelpHtml = (!v36PickPool.length && terminalScanPool.length > 10) ? `<section class="v37-empty-pool-help">
@@ -17772,7 +17780,7 @@ const value = btn.dataset.v36Value || '';
 const next = { ...v36Filter };
 if (!value) delete next[kind];
 else next[kind] = value;
-try { localStorage.setItem(v36FilterKey, JSON.stringify(next)); } catch(e) {}
+try { localStorage.setItem(v36FilterKey, JSON.stringify(next)); } catch(e) { swallowError(e); }
 renderDashboardPage(wrap);
 });
 });
@@ -17792,11 +17800,11 @@ next.sort = next.sort === 'edge' ? 'tier' : 'edge';
 if (next.sport === 'football') delete next.sport;
 else next.sport = 'football';
 }
-try { localStorage.setItem(v36FilterKey, JSON.stringify(next)); } catch(e) {}
+try { localStorage.setItem(v36FilterKey, JSON.stringify(next)); } catch(e) { swallowError(e); }
 if (action === 'today') {
-try { history.replaceState(null, '', location.pathname + location.search + `#dashboard?date=${encodeURIComponent(todayIso)}`); } catch(e) {}
+try { history.replaceState(null, '', location.pathname + location.search + `#dashboard?date=${encodeURIComponent(todayIso)}`); } catch(e) { swallowError(e); }
 }
-try { if (navigator.vibrate) navigator.vibrate(6); } catch(e) {}
+try { if (navigator.vibrate) navigator.vibrate(6); } catch(e) { swallowError(e); }
 renderDashboardPage(wrap);
 });
 });
@@ -17804,8 +17812,8 @@ wrap.querySelectorAll('[data-v37-day]').forEach(btn => {
 btn.addEventListener('click', () => {
 const value = btn.dataset.v37Day || 'all';
 const next = { ...v36Filter, date: value };
-try { localStorage.setItem(v36FilterKey, JSON.stringify(next)); } catch(e) {}
-try { history.replaceState(null, '', location.pathname + location.search + `#dashboard?date=${encodeURIComponent(value)}`); } catch(e) {}
+try { localStorage.setItem(v36FilterKey, JSON.stringify(next)); } catch(e) { swallowError(e); }
+try { history.replaceState(null, '', location.pathname + location.search + `#dashboard?date=${encodeURIComponent(value)}`); } catch(e) { swallowError(e); }
 renderDashboardPage(wrap);
 });
 });
@@ -17814,8 +17822,8 @@ if (v37DateInput) {
 v37DateInput.addEventListener('change', () => {
 const value = /^\d{4}-\d{2}-\d{2}$/.test(v37DateInput.value || '') ? v37DateInput.value : todayIso;
 const next = { ...v36Filter, date: value };
-try { localStorage.setItem(v36FilterKey, JSON.stringify(next)); } catch(e) {}
-try { history.replaceState(null, '', location.pathname + location.search + `#dashboard?date=${encodeURIComponent(value)}`); } catch(e) {}
+try { localStorage.setItem(v36FilterKey, JSON.stringify(next)); } catch(e) { swallowError(e); }
+try { history.replaceState(null, '', location.pathname + location.search + `#dashboard?date=${encodeURIComponent(value)}`); } catch(e) { swallowError(e); }
 renderDashboardPage(wrap);
 });
 }
@@ -17825,7 +17833,7 @@ v37LiveInput.addEventListener('change', () => {
 const next = { ...v36Filter };
 if (v37LiveInput.checked) next.includeLive = true;
 else delete next.includeLive;
-try { localStorage.setItem(v36FilterKey, JSON.stringify(next)); } catch(e) {}
+try { localStorage.setItem(v36FilterKey, JSON.stringify(next)); } catch(e) { swallowError(e); }
 renderDashboardPage(wrap);
 });
 }
@@ -17835,14 +17843,14 @@ v37BlindToggle.addEventListener('click', () => {
 const next = { ...v36Filter };
 if (v37BlindMode) delete next.blind;
 else next.blind = true;
-try { localStorage.setItem(v36FilterKey, JSON.stringify(next)); } catch(e) {}
+try { localStorage.setItem(v36FilterKey, JSON.stringify(next)); } catch(e) { swallowError(e); }
 renderDashboardPage(wrap);
 });
 }
 wrap.querySelectorAll('[data-v36-sort]').forEach(btn => {
 btn.addEventListener('click', () => {
 const next = { ...v36Filter, sort: btn.dataset.v36Sort || 'tier' };
-try { localStorage.setItem(v36FilterKey, JSON.stringify(next)); } catch(e) {}
+try { localStorage.setItem(v36FilterKey, JSON.stringify(next)); } catch(e) { swallowError(e); }
 renderDashboardPage(wrap);
 });
 });
@@ -17855,7 +17863,7 @@ const next = { ...v36Filter };
 const q = String(v36SearchInput.value || '').trim();
 if (q) next.q = q;
 else delete next.q;
-try { localStorage.setItem(v36FilterKey, JSON.stringify(next)); } catch(e) {}
+try { localStorage.setItem(v36FilterKey, JSON.stringify(next)); } catch(e) { swallowError(e); }
 renderDashboardPage(wrap);
 }, 140);
 });
@@ -17879,10 +17887,10 @@ const currentDate = storedFilter.date || v37DateFilter || todayIso;
 const base = /^\d{4}-\d{2}-\d{2}$/.test(String(currentDate || '')) ? currentDate : todayIso;
 const value = v37AddDays(base, direction);
 const next = { ...storedFilter, date: value };
-try { localStorage.setItem(v36FilterKey, JSON.stringify(next)); } catch(e) {}
-try { history.replaceState(null, '', location.pathname + location.search + `#dashboard?date=${encodeURIComponent(value)}`); } catch(e) {}
-try { if (navigator.vibrate) navigator.vibrate(8); } catch(e) {}
-try { if (typeof toast === 'function') toast(direction > 0 ? 'Jour suivant' : 'Jour précédent', 'info', { duration: 900 }); } catch(e) {}
+try { localStorage.setItem(v36FilterKey, JSON.stringify(next)); } catch(e) { swallowError(e); }
+try { history.replaceState(null, '', location.pathname + location.search + `#dashboard?date=${encodeURIComponent(value)}`); } catch(e) { swallowError(e); }
+try { if (navigator.vibrate) navigator.vibrate(8); } catch(e) { swallowError(e); }
+try { if (typeof toast === 'function') toast(direction > 0 ? 'Jour suivant' : 'Jour précédent', 'info', { duration: 900 }); } catch(e) { swallowError(e); }
 renderDashboardPage(wrap);
 };
 wrap.addEventListener('touchstart', (e) => {
@@ -17915,7 +17923,7 @@ if (swipeStart.card && ay >= 78 && ay > ax * 1.25 && dy < 0 && elapsed < 900) {
 const id = swipeStart.card.dataset.bigDetail || swipeStart.card.dataset.matchId || '';
 const match = v36MatchById(id);
 if (match && typeof openDetail === 'function') {
-try { if (navigator.vibrate) navigator.vibrate(6); } catch(e) {}
+try { if (navigator.vibrate) navigator.vibrate(6); } catch(e) { swallowError(e); }
 openDetail(match);
 }
 }
@@ -17959,7 +17967,7 @@ wrap.appendChild(menu);
 const rect = menu.getBoundingClientRect();
 menu.style.left = `${Math.max(12, Math.min(window.innerWidth - rect.width - 12, x - rect.width / 2))}px`;
 menu.style.top = `${Math.max(72, Math.min(window.innerHeight - rect.height - 12, y - 18))}px`;
-try { if (navigator.vibrate) navigator.vibrate(10); } catch(e) {}
+try { if (navigator.vibrate) navigator.vibrate(10); } catch(e) { swallowError(e); }
 wrap.__v36ContextBlockClickUntil = Date.now() + 700;
 };
 const cancelPress = () => {
@@ -18001,14 +18009,14 @@ if (actionBtn.dataset.v36ContextAction === 'favorite') {
 let ids = [];
 try { ids = JSON.parse(localStorage.getItem('paris_sportif_favorite_match_ids') || '[]'); } catch(e) { ids = []; }
 ids = Array.from(new Set([...(Array.isArray(ids) ? ids.map(String) : []), String(matchId)])).filter(Boolean).slice(-80);
-try { localStorage.setItem('paris_sportif_favorite_match_ids', JSON.stringify(ids)); } catch(e) {}
-try { toast('Match ajouté aux favoris', 'success', { duration: 1100 }); } catch(e) {}
+try { localStorage.setItem('paris_sportif_favorite_match_ids', JSON.stringify(ids)); } catch(e) { swallowError(e); }
+try { toast('Match ajouté aux favoris', 'success', { duration: 1100 }); } catch(e) { swallowError(e); }
 } else if (actionBtn.dataset.v36ContextAction === 'compare') {
 let ids = [];
 try { ids = JSON.parse(localStorage.getItem('tousComparePickIds') || '[]'); } catch(e) { ids = []; }
 ids = Array.from(new Set([...(Array.isArray(ids) ? ids.map(String) : []), String(matchId)])).filter(Boolean).slice(-2);
-try { localStorage.setItem('tousComparePickIds', JSON.stringify(ids)); } catch(e) {}
-try { toast(`${ids.length}/2 picks dans le comparateur`, 'info', { duration: 1100 }); } catch(e) {}
+try { localStorage.setItem('tousComparePickIds', JSON.stringify(ids)); } catch(e) { swallowError(e); }
+try { toast(`${ids.length}/2 picks dans le comparateur`, 'info', { duration: 1100 }); } catch(e) { swallowError(e); }
 } else if (actionBtn.dataset.v36ContextAction === 'track') {
 const odd = Number(best.odd || card?.dataset.pickOdd || 0);
 const pickKey = String(best.key || best.pickKey || best.selection || pickUid || matchId);
@@ -18016,9 +18024,9 @@ const market = String(best.market || '1n2');
 const label = String(best.labelFull || best.label || card?.dataset.pickLabel || 'Pick');
 if (typeof window._addUserBet === 'function' && matchId && pickKey && odd > 1) {
 window._addUserBet(matchId, market, pickKey, label, odd, 1);
-try { toast(`Pari suivi @${odd.toFixed(2)}`, 'success', { duration: 1200 }); } catch(e) {}
+try { toast(`Pari suivi @${odd.toFixed(2)}`, 'success', { duration: 1200 }); } catch(e) { swallowError(e); }
 } else {
-try { toast('Pick incomplet pour le suivi', 'warn', { duration: 1200 }); } catch(e) {}
+try { toast('Pick incomplet pour le suivi', 'warn', { duration: 1200 }); } catch(e) { swallowError(e); }
 }
 } else if (actionBtn.dataset.v36ContextAction === 'open') {
 if (card) {
@@ -18061,7 +18069,7 @@ window.addEventListener('scroll', syncFilterCompact, { passive: true });
 window.addEventListener('resize', syncFilterCompact, { passive: true });
 window.__v36SyncFilterCompact = syncFilterCompact;
 }
-try { if (typeof window.__v36SyncFilterCompact === 'function') window.__v36SyncFilterCompact(); } catch(e) {}
+try { if (typeof window.__v36SyncFilterCompact === 'function') window.__v36SyncFilterCompact(); } catch(e) { swallowError(e); }
 if (!wrap.__v37DetailDelegated) {
 wrap.__v37DetailDelegated = true;
 const openBigDetail = async (trigger) => {
@@ -18078,7 +18086,7 @@ if (!m && typeof window._ensureFullData === 'function') {
 try {
 await window._ensureFullData();
 m = findInData();
-} catch(e) {}
+} catch(e) { swallowError(e); }
 }
 const pickLookup = wrap.__v37PickByUid;
 const rowPick = trigger.dataset.pickUid && pickLookup && typeof pickLookup.get === 'function'
@@ -18110,7 +18118,7 @@ return;
 }
 renderDashboardPage(wrap);
 }, 30000);
-} catch(e) {}
+} catch(e) { swallowError(e); }
 return;
 }
 
@@ -18154,7 +18162,7 @@ if (k <= 0) return; // v27.1 — pas d'edge → pas de pari
         if (stake > nav) stake = nav;
         const ts = new Date(m.date).getTime();
         rawCandidates.push({ m, pred, best, odd, rel, stake, ts, isLive: !!m.live });
-      } catch(e) {}
+      } catch(e) { swallowError(e); }
     });
     rawCandidates.sort((a,b) => {
       const bs = b.best && b.best.investment ? b.best.investment.score : 0;
@@ -18292,10 +18300,10 @@ if (!m || m.live) return;
 if (seenIds.has(m.id)) return;
 if (!(m.winamax && m.winamax.match_id)) return;
 let importance = 0;
-try { importance = matchImportance(m); } catch(e) {}
+try { importance = matchImportance(m); } catch(e) { swallowError(e); }
 if (importance < 30) return;  // seuil "gros match"
 let pred = null;
-try { pred = predictMatch(m); } catch(e) {}
+try { pred = predictMatch(m); } catch(e) { swallowError(e); }
 const status = getMatchStatus(m, pred);
 const ts = new Date(m.date).getTime();
 arr.push({ m, pred, status, importance, ts });
@@ -18429,14 +18437,14 @@ catch(e) { return false; }
 const bbfShareFilters = (() => {
 const params = new URLSearchParams();
 const addParams = (src) => {
-try { new URLSearchParams(src || '').forEach((v, k) => params.set(k, v)); } catch(e) {}
+try { new URLSearchParams(src || '').forEach((v, k) => params.set(k, v)); } catch(e) { swallowError(e); }
 };
-try { if (location.search) addParams(location.search.slice(1)); } catch(e) {}
+try { if (location.search) addParams(location.search.slice(1)); } catch(e) { swallowError(e); }
 try {
 const hash = location.hash || '';
 const qIdx = hash.indexOf('?');
 if (qIdx >= 0) addParams(hash.slice(qIdx + 1));
-} catch(e) {}
+} catch(e) { swallowError(e); }
 const sportRaw = String(params.get('sport') || '').trim().toLowerCase();
 const sportMap = { foot: 'football', soccer: 'football', basket: 'basketball', hockey: 'hockey', tennis: 'tennis', baseball: 'baseball' };
 const sport = sportMap[sportRaw] || sportRaw;
@@ -18479,7 +18487,7 @@ await Promise.all(keys.map(k => caches.delete(k)));
 } catch(err) { prodWarn('auto refresh failed:', err); }
 _hardReload();
 })();
-} catch(e) {}
+} catch(e) { swallowError(e); }
 }
 }
 const _nowMs = Date.now();
@@ -18492,7 +18500,7 @@ const _losingSports = (() => {
 try {
 const prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}');
 if (prefs.disableSportRoiAlerts === true) return new Set();
-} catch(e){}
+} catch(e) { swallowError(e); }
 const rep = window.__backtestReportV2;
 if (!rep || !rep.by_sport) return new Set();
 return new Set(Object.entries(rep.by_sport)
@@ -18701,7 +18709,7 @@ const diffSign = diff >= 0 ? '+' : '';
 const diffColor = diff > 1 ? 'var(--accent)' : diff < -1 ? 'var(--danger)' : 'var(--text-dim2)';
 modelComparison = `<span style="font-size:11px;color:var(--text-dim2);" data-tooltip="Si tu avais suivi tous les locks, ton ROI serait à ${modelROIPct}% (vs tes ${userROIPct}% actuels)">📈 Modèle : <strong style="color:${diffColor};">${diffSign}${diff.toFixed(1)}pt</strong></span>`;
 }
-} catch(e){}
+} catch(e) { swallowError(e); }
 return `
           <section class="user-bilan-mini" role="region" aria-label="Mon bilan personnel" style="margin:0 0 16px;padding:12px 16px;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${roiColor};border-radius:var(--r-sm);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-variant-numeric:tabular-nums;">
             <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
@@ -18734,7 +18742,7 @@ streakBanner = `
             ${esc(sk.alert.msg)}
           </div>`;
 }
-} catch(e) {}
+} catch(e) { swallowError(e); }
 const top = topPicks[0] || heroPick;
 if (!top) return streakBanner;
 const topStake = top.stake || 0;
@@ -19130,7 +19138,7 @@ return `
           const cands = (typeof buildMarketCandidates === 'function') ? buildMarketCandidates(m, pred, { requireExact: true }) : [];
           candidateCount += cands.length;
           cands.forEach(c => rows.push({ m, pred, c }));
-        } catch(e) {}
+        } catch(e) { swallowError(e); }
       });
       const valueRows = rows
         .filter(x => x.c && x.c.source === 'winamax_exact' && x.c.ev > 0 && x.c.edge > 0 && x.c.investment?.action !== 'skip')
@@ -19928,7 +19936,7 @@ input.addEventListener('change', updateGain);
 });
 const bbfFocusToggle = wrap.querySelector('[data-bbf-focus-toggle]');
 if (bbfFocusToggle) bbfFocusToggle.addEventListener('click', () => {
-try { localStorage.setItem(bbfFocusKey, bbfFocusOnly ? '0' : '1'); } catch(e) {}
+try { localStorage.setItem(bbfFocusKey, bbfFocusOnly ? '0' : '1'); } catch(e) { swallowError(e); }
 renderDashboardPage(wrap);
 });
 const bbfShareBtn = wrap.querySelector('[data-bbf-share-dashboard]');
@@ -19949,12 +19957,12 @@ tmp.remove();
 }
 if (typeof toast === 'function') toast('Lien dashboard copié', 'success');
 } catch(e) {
-try { if (typeof toast === 'function') toast('Copie impossible automatiquement : ' + bbfShareUrl, 'error'); } catch(_) {}
+try { if (typeof toast === 'function') toast('Copie impossible automatiquement : ' + bbfShareUrl, 'error'); } catch(_) { swallowError(_); }
 }
 });
 const bbfAlertDismiss = wrap.querySelector('[data-internal-alert-dismiss]');
 if (bbfAlertDismiss) bbfAlertDismiss.addEventListener('click', () => {
-try { localStorage.setItem(bbfInternalAlertKey, '1'); } catch(e) {}
+try { localStorage.setItem(bbfInternalAlertKey, '1'); } catch(e) { swallowError(e); }
 renderDashboardPage(wrap);
 });
 const bbfLeftSearch = wrap.querySelector('#bbf-left-search');
@@ -21362,9 +21370,9 @@ return `
       });
     });
     const _saveFilter = (patch) => {
-      let f = {}; try { f = JSON.parse(localStorage.getItem('agentFilter') || '{}') || {}; } catch(e){}
+      let f = {}; try { f = JSON.parse(localStorage.getItem('agentFilter') || '{}') || {}; } catch(e) { swallowError(e); }
       Object.assign(f, patch);
-      try { localStorage.setItem('agentFilter', JSON.stringify(f)); } catch(e){}
+      try { localStorage.setItem('agentFilter', JSON.stringify(f)); } catch(e) { swallowError(e); }
       renderDashboardPage(wrap);
     };
     wrap.querySelectorAll('[data-agent-filter]').forEach(sel => {
@@ -21377,19 +21385,19 @@ return `
     wrap.querySelectorAll('[data-agent-sort]').forEach(el => {
       el.addEventListener('click', () => {
         const col = el.dataset.agentSort;
-        let f = {}; try { f = JSON.parse(localStorage.getItem('agentFilter') || '{}') || {}; } catch(e){}
+        let f = {}; try { f = JSON.parse(localStorage.getItem('agentFilter') || '{}') || {}; } catch(e) { swallowError(e); }
         if (f.sortBy === col) {
           f.sortDir = f.sortDir === 'asc' ? 'desc' : 'asc';
         } else {
           f.sortBy = col; f.sortDir = 'desc';
         }
-        try { localStorage.setItem('agentFilter', JSON.stringify(f)); } catch(e){}
+        try { localStorage.setItem('agentFilter', JSON.stringify(f)); } catch(e) { swallowError(e); }
         renderDashboardPage(wrap);
       });
     });
     const resetFilterBtn = wrap.querySelector('[data-agent-filter-reset]');
     if (resetFilterBtn) resetFilterBtn.addEventListener('click', () => {
-      try { localStorage.removeItem('agentFilter'); } catch(e){}
+      try { localStorage.removeItem('agentFilter'); } catch(e) { swallowError(e); }
       renderDashboardPage(wrap);
     });
     const bankrollInput = wrap.querySelector('#user-bankroll-input');
@@ -21397,7 +21405,7 @@ return `
       bankrollInput.addEventListener('change', () => {
         const v = parseFloat(bankrollInput.value);
         if (isFinite(v) && v >= 10 && v <= 10000) {
-          try { localStorage.setItem('userBankroll', String(v)); } catch(e){}
+          try { localStorage.setItem('userBankroll', String(v)); } catch(e) { swallowError(e); }
           renderDashboardPage(wrap);
         }
       });
@@ -21554,7 +21562,7 @@ return `
         // OU si plus de 12h écoulées (safety belt contre les leaks).
         if (!document.body.contains(_countdownEl) || (Date.now() - intervalStartTs) > 12 * 3600 * 1000) {
           clearInterval(intervalId);
-          if (obsRef) try { obsRef.disconnect(); } catch(e){}
+          if (obsRef) try { obsRef.disconnect(); } catch(e) { swallowError(e); }
           return;
         }
         updateCountdown();
@@ -21626,7 +21634,7 @@ confirmLabel: 'Annuler le reset',
 cancelLabel: 'Garder',
 });
 if (ok) {
-try { localStorage.removeItem('agentResetTs'); } catch(e){}
+try { localStorage.removeItem('agentResetTs'); } catch(e) { swallowError(e); }
 renderDashboardPage(wrap);
 }
 return;
@@ -21639,7 +21647,7 @@ cancelLabel: 'Annuler',
 danger: true,
 });
 if (!ok) return;
-try { localStorage.setItem('agentResetTs', String(Date.now())); } catch(e){}
+try { localStorage.setItem('agentResetTs', String(Date.now())); } catch(e) { swallowError(e); }
 renderDashboardPage(wrap);
 });
 const bilanToggle = wrap.querySelector('[data-toggle-bilan]');
@@ -21747,9 +21755,9 @@ body: `Nouveau pari sûr Winamax · ${((pred.reliability||0)*100).toFixed(0)}% d
 action: 'locks'
 });
 }
-} catch (e) {}
+} catch(e) { swallowError(e); }
 });
-} catch (e) {}
+} catch(e) { swallowError(e); }
 
 
 try {
@@ -21764,7 +21772,7 @@ body: `${sportEmoji(m.sport)} ${sportLabel(m.sport) || m.sport || ''} · check l
 action: 'locks'
 });
 });
-} catch (e) {}
+} catch(e) { swallowError(e); }
 
 try {
 const today = ((data && data.days && data.days[todayIso]) || []).filter(m => m.winamax && m.winamax.available === true);
@@ -21785,9 +21793,9 @@ title: `${hN} vs ${aN}`,
 body: `Pari sûr · démarre dans ${Math.round(minToKickoff)}min · ${((pred.reliability||0)*100).toFixed(0)}% conf.`,
 action: 'locks'
 });
-} catch(e) {}
+} catch(e) { swallowError(e); }
 });
-} catch (e) {}
+} catch(e) { swallowError(e); }
 
 try {
 const today = ((data && data.days && data.days[todayIso]) || []).filter(m => m.winamax && m.winamax.available === true);
@@ -21809,9 +21817,9 @@ title: `${hN} vs ${aN}`,
 body: `${pred.pick.label} @${odd.toFixed(2)} · edge +${Math.round(edge*100)}pt · ${Math.round(rel*100)}% conf.`,
 action: 'tous'
 });
-} catch(e) {}
+} catch(e) { swallowError(e); }
 });
-} catch (e) {}
+} catch(e) { swallowError(e); }
 
 try {
 const settled = [];
@@ -21844,7 +21852,7 @@ action: 'bilan'
 });
 }
 }
-} catch (e) {}
+} catch(e) { swallowError(e); }
 
 const colMap = {
 gold: '#ffd60a', green: '#30d158', red: '#ff3b30', orange: '#ff9f0a',
@@ -21946,11 +21954,11 @@ if (qIdx >= 0) {
 const qs = new URLSearchParams(hash.slice(qIdx + 1)).get('preset');
 if (['all', 'bigbets', 'solides', 'outsiders'].includes(qs)) return qs;
 }
-} catch(e) {}
+} catch(e) { swallowError(e); }
 try {
 const saved = localStorage.getItem('tousPreset');
 if (['all', 'bigbets', 'solides', 'outsiders'].includes(saved)) return saved;
-} catch(e) {}
+} catch(e) { swallowError(e); }
 return 'all';
 };
 const tousPreset = _readTousPreset();
@@ -21962,7 +21970,7 @@ if (qIdx >= 0) {
 const view = new URLSearchParams(hash.slice(qIdx + 1)).get('view');
 if (view === 'calendar') return 'calendar';
 }
-} catch(e) {}
+} catch(e) { swallowError(e); }
 return 'list';
 };
 const tousView = _readTousView();
@@ -22065,7 +22073,7 @@ tier: typeof p.tier === 'string' ? p.tier : 'all',
 query: typeof p.query === 'string' ? p.query : '',
 };
 }
-} catch(e) {}
+} catch(e) { swallowError(e); }
 return { sports: [], minEdge: 0, minConf: 0, minOdd: 0, maxOdd: 0, league: '', time: 'all', tier: 'all', query: '' };
 };
 const tousFilters = _readFilters();
@@ -22077,16 +22085,16 @@ if (qIdx >= 0) {
 const qs = new URLSearchParams(hash.slice(qIdx + 1)).get('sort');
 if (['tier', 'kickoff', 'edge', 'conf', 'odd'].includes(qs)) return qs;
 }
-} catch(e) {}
+} catch(e) { swallowError(e); }
 try {
 const s = localStorage.getItem('tousSort');
 if (['tier', 'kickoff', 'edge', 'conf', 'odd'].includes(s)) return s;
-} catch(e) {}
+} catch(e) { swallowError(e); }
 return 'tier';
 };
 const tousSort = _readSort();
 const _saveFilters = () => {
-try { localStorage.setItem('tousFilters', JSON.stringify(tousFilters)); } catch(e) {}
+try { localStorage.setItem('tousFilters', JSON.stringify(tousFilters)); } catch(e) { swallowError(e); }
 try {
 const hash = '#tous';
 const params = new URLSearchParams();
@@ -22107,7 +22115,7 @@ const newHash = q ? `${hash}?${q}` : hash;
 if (location.hash !== newHash) {
 history.replaceState(null, '', location.pathname + location.search + newHash);
 }
-} catch (e) {}
+} catch(e) { swallowError(e); }
 };
 
 window._loadSavedFilterPresets = () => {
@@ -22309,7 +22317,7 @@ const comparePicks = compareIds.map(id => allPicks.find(p => String(p.m?.id || '
 
 const activeTab = (() => {
 let saved = 'pending';
-try { saved = localStorage.getItem('tousTab') || 'pending'; } catch(e) {}
+try { saved = localStorage.getItem('tousTab') || 'pending'; } catch(e) { swallowError(e); }
 const counts = { pending: displayPending.length, inprogress: displayInProgress.length, finished: displayFinished.length };
 const validKeys = ['pending', 'inprogress', 'finished'];
 if (validKeys.includes(saved)) return saved;
@@ -22326,7 +22334,7 @@ if (!isCoveragePreset) return Number.POSITIVE_INFINITY;
 try {
 const saved = parseInt(localStorage.getItem('tousVisibleLimit') || '', 10);
 if (Number.isFinite(saved) && saved >= defaultCoverageLimit) return saved;
-} catch(e) {}
+} catch(e) { swallowError(e); }
 return defaultCoverageLimit;
 })();
 const renderSlice = (rows) => isCoveragePreset ? rows.slice(0, Math.min(rows.length, visibleLimit)) : rows;
@@ -22471,7 +22479,7 @@ if (isFoot && typeof predictLikelyScorers === 'function') {
 const all = predictLikelyScorers(p.m, p.pred) || [];
 predScorers = all.slice(0, 2);
 }
-} catch(e){}
+} catch(e) { swallowError(e); }
 const realScorers = (isFoot && Array.isArray(p.m.scorers)) ? p.m.scorers : [];
 const predScorerHit = (predScorers.length && realScorers.length) ? predScorers.some(ps =>
 realScorers.some(rs => {
@@ -22873,7 +22881,7 @@ if (tousPreset !== 'all') params.set('preset', tousPreset);
 if (tousSort !== 'tier') params.set('sort', tousSort);
 const q = params.toString();
 history.replaceState(null, '', location.pathname + location.search + '#tous' + (q ? '?' + q : ''));
-} catch(e) {}
+} catch(e) { swallowError(e); }
 renderTousPage(wrap);
 });
 });
@@ -22902,7 +22910,7 @@ try {
     row.scrollIntoView({ block: 'center', behavior: 'smooth' });
     foundInline = true;
   }
-} catch(e) {}
+} catch(e) { swallowError(e); }
 if (!foundInline) {
   // We were probably in calendar view. Strip the ?view=calendar query
   // from the hash so the next render falls back to the list view; then
@@ -22912,14 +22920,14 @@ if (!foundInline) {
     if (location.hash !== newHash) {
       history.replaceState(null, '', location.pathname + location.search + newHash);
     }
-  } catch(e) {}
+  } catch(e) { swallowError(e); }
   renderTousPage(wrap);
   // After re-render, scroll to the first row of that day if any.
   setTimeout(() => {
     try {
       const target = wrap.querySelector(`.tous-row[data-match-date^="${day}"]`);
       if (target) target.scrollIntoView({ block: 'start', behavior: 'smooth' });
-    } catch(e) {}
+    } catch(e) { swallowError(e); }
   }, 200);
 }
 });
@@ -22927,22 +22935,22 @@ if (!foundInline) {
 
 wrap.querySelectorAll('[data-tous-tab]').forEach(btn => {
 btn.addEventListener('click', () => {
-try { localStorage.setItem('tousTab', btn.dataset.tousTab); } catch(e) {}
+try { localStorage.setItem('tousTab', btn.dataset.tousTab); } catch(e) { swallowError(e); }
 renderTousPage(wrap);
 });
 });
 const loadMoreBtn = wrap.querySelector('[data-tous-load-more]');
 if (loadMoreBtn) loadMoreBtn.addEventListener('click', () => {
-try { localStorage.setItem('tousVisibleLimit', String(Math.min(activeTotalRows, activeRenderedRows + 80))); } catch(e) {}
+try { localStorage.setItem('tousVisibleLimit', String(Math.min(activeTotalRows, activeRenderedRows + 80))); } catch(e) { swallowError(e); }
 renderTousPage(wrap);
 });
 const tousSearch = wrap.querySelector('[data-tous-search]');
 if (tousSearch) {
 tousSearch.addEventListener('input', () => {
-try { clearTimeout(window.__tousSearchTimer); } catch(e) {}
+try { clearTimeout(window.__tousSearchTimer); } catch(e) { swallowError(e); }
 window.__tousSearchTimer = setTimeout(() => {
 tousFilters.query = String(tousSearch.value || '').trim();
-try { localStorage.removeItem('tousVisibleLimit'); } catch(e) {}
+try { localStorage.removeItem('tousVisibleLimit'); } catch(e) { swallowError(e); }
 _saveFilters();
 renderTousPage(wrap);
 }, 160);
@@ -22988,10 +22996,10 @@ document.body.appendChild(a);
 a.click();
 a.remove();
 setTimeout(() => URL.revokeObjectURL(url), 1500);
-try { if (typeof toast === 'function') toast('CSV exporté', 'success'); } catch(e) {}
+try { if (typeof toast === 'function') toast('CSV exporté', 'success'); } catch(e) { swallowError(e); }
 } catch(e) {
 prodWarn('Tous CSV export failed:', e);
-try { if (typeof toast === 'function') toast('Export CSV impossible', 'error'); } catch(_) {}
+try { if (typeof toast === 'function') toast('Export CSV impossible', 'error'); } catch(_) { swallowError(_); }
 }
 });
 wrap.querySelectorAll('[data-tous-preset]').forEach(btn => {
@@ -23004,7 +23012,7 @@ localStorage.removeItem('tousFilters');
 localStorage.setItem('tousSort', 'tier');
 }
 localStorage.setItem('tousTab', 'pending');
-} catch(e) {}
+} catch(e) { swallowError(e); }
 renderTousPage(wrap);
 });
 });
@@ -23032,7 +23040,7 @@ else {
 ids.push(id);
 ids = ids.slice(-2);
 }
-try { localStorage.setItem('tousComparePickIds', JSON.stringify(ids)); } catch(err) {}
+try { localStorage.setItem('tousComparePickIds', JSON.stringify(ids)); } catch(err) { swallowError(err); }
 renderTousPage(wrap);
 });
 });
@@ -23040,7 +23048,7 @@ const compareOpenBtn = wrap.querySelector('[data-compare-open]');
 if (compareOpenBtn) compareOpenBtn.addEventListener('click', showTousCompareModal);
 const compareClearBtn = wrap.querySelector('[data-compare-clear]');
 if (compareClearBtn) compareClearBtn.addEventListener('click', () => {
-try { localStorage.removeItem('tousComparePickIds'); } catch(e) {}
+try { localStorage.removeItem('tousComparePickIds'); } catch(e) { swallowError(e); }
 renderTousPage(wrap);
 });
 wrap.querySelectorAll('[data-tous-sport]').forEach(btn => {
@@ -23067,12 +23075,12 @@ renderTousPage(wrap);
 });
 const modeSel = wrap.querySelector('[data-tous-mode]');
 if (modeSel) modeSel.addEventListener('change', () => {
-try { localStorage.setItem('tousFilterMode', modeSel.value); } catch(e) {}
+try { localStorage.setItem('tousFilterMode', modeSel.value); } catch(e) { swallowError(e); }
 renderTousPage(wrap);
 });
 const diversifySel = wrap.querySelector('[data-tous-diversify]');
 if (diversifySel) diversifySel.addEventListener('change', () => {
-try { localStorage.setItem('tousDiversifyByMatch', diversifySel.checked ? '1' : '0'); } catch(e) {}
+try { localStorage.setItem('tousDiversifyByMatch', diversifySel.checked ? '1' : '0'); } catch(e) { swallowError(e); }
 renderTousPage(wrap);
 });
 const leagueSel = wrap.querySelector('[data-tous-league]');
@@ -23107,7 +23115,7 @@ renderTousPage(wrap);
 });
 const sortSel = wrap.querySelector('[data-tous-sort]');
 if (sortSel) sortSel.addEventListener('change', () => {
-try { localStorage.setItem('tousSort', sortSel.value); } catch(e) {}
+try { localStorage.setItem('tousSort', sortSel.value); } catch(e) { swallowError(e); }
 renderTousPage(wrap);
 });
 wrap.querySelectorAll('[data-tous-reset]').forEach(btn => {
@@ -23117,7 +23125,7 @@ localStorage.removeItem('tousFilters');
 localStorage.removeItem('tousSort');
 localStorage.removeItem('tousPreset');
 localStorage.removeItem('tousFilterMode');
-} catch(e) {}
+} catch(e) { swallowError(e); }
 renderTousPage(wrap);
 });
 });
@@ -23905,7 +23913,7 @@ summary: payload.summary || {},
 sports,
 };
 }
-try { window.getSportsCoverageExtended = getSportsCoverageExtended; } catch(e){}
+try { window.getSportsCoverageExtended = getSportsCoverageExtended; } catch(e) { swallowError(e); }
 
 function _sportsCoverageByRoute(route) {
 const payload = getSportsCoverageExtended();
@@ -24020,14 +24028,14 @@ wrap.querySelectorAll('[data-sports-route]').forEach(btn => {
 btn.addEventListener('click', () => {
 const target = btn.getAttribute('data-sports-route') || 'sports-tous';
 currentPage = PAGE_ALIASES[target] || target;
-try { localStorage.setItem('currentPage', currentPage); } catch(e){}
+try { localStorage.setItem('currentPage', currentPage); } catch(e) { swallowError(e); }
 _setUserNavHash('#' + currentPage);
 applyPageView();
 window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 });
 }
-try { window.renderSportsCoveragePage = renderSportsCoveragePage; } catch(e){}
+try { window.renderSportsCoveragePage = renderSportsCoveragePage; } catch(e) { swallowError(e); }
 
 function renderButeursPage(wrap) {
 const data = window.PRONOSTICS_DATA;
@@ -24044,7 +24052,7 @@ try {
 const pred = predictMatch(m);
 if (!pred || !pred.markets || !pred.markets.ou || !pred.markets.btts) return;
 matches.push({ m, pred, dayIso: iso });
-} catch(e){}
+} catch(e) { swallowError(e); }
 });
 });
 
@@ -24136,7 +24144,7 @@ return `
                 if (!isNaN(when.getTime())) {
                   returnTime = when.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit', timeZone:'Europe/Paris' });
                 }
-              } catch(e){}
+              } catch(e) { swallowError(e); }
               return `<div style="margin-top:12px;padding:12px 14px;background:var(--info-soft);border:1px solid rgba(96,165,250,.25);border-radius:var(--r);font-size:12px;color:var(--text-2);line-height:1.5;">
 <div style="font-weight:700;color:var(--info);margin-bottom:3px;">⏳ Prono joueurs buteurs : bientôt dispo</div>
 <div>Les compositions officielles sont annoncées <b>1 heure avant le coup d'envoi</b>${returnTime ? ` — reviens vers <b>${returnTime}</b>` : ''}. D'ici là, on ne peut pas estimer qui va marquer.</div>
@@ -24399,7 +24407,7 @@ const esc2 = (typeof esc === 'function') ? esc : (s) => String(s).replace(/[&<>"
       list.unshift(lesson);
       if (list.length > USER_LESSONS_MAX) list = list.slice(0, USER_LESSONS_MAX);
       localStorage.setItem(USER_LESSONS_KEY, JSON.stringify(list));
-    } catch(e){}
+    } catch(e) { swallowError(e); }
   }
   function extractLessonFromBet(bet) {
     try {
@@ -24642,10 +24650,10 @@ const esc2 = (typeof esc === 'function') ? esc : (s) => String(s).replace(/[&<>"
         } catch(e){ if (typeof prodWarn === 'function') prodWarn('onboarding_persist_failed', e); }
         if (cleanupOnboardingKeyboard) cleanupOnboardingKeyboard();
         overlay.remove();
-        try { if (typeof toast === 'function') toast(skipped ? '✓ Tutoriel ignoré' : `✓ Setup terminé · niveau ${state.level} · bankroll ${state.bankroll}€`, 'success'); } catch(e){}
-        try { if (typeof applyPageView === 'function') applyPageView(); } catch(e){}
+        try { if (typeof toast === 'function') toast(skipped ? '✓ Tutoriel ignoré' : `✓ Setup terminé · niveau ${state.level} · bankroll ${state.bankroll}€`, 'success'); } catch(e) { swallowError(e); }
+        try { if (typeof applyPageView === 'function') applyPageView(); } catch(e) { swallowError(e); }
         setTimeout(() => {
-          try { if (typeof _initConsentBanner === 'function') _initConsentBanner(); } catch(e){}
+          try { if (typeof _initConsentBanner === 'function') _initConsentBanner(); } catch(e) { swallowError(e); }
         }, 600);
       };
 
@@ -24719,7 +24727,7 @@ const esc2 = (typeof esc === 'function') ? esc : (s) => String(s).replace(/[&<>"
           if (!name) return;
           counts.set(name, (counts.get(name) || 0) + 1);
         }));
-      } catch(e) {}
+      } catch(e) { swallowError(e); }
       return [...counts.entries()]
         .sort((a, b) => b[1] - a[1])
         .slice(0, 10)
@@ -24846,12 +24854,12 @@ const esc2 = (typeof esc === 'function') ? esc : (s) => String(s).replace(/[&<>"
             </div>`;
         }
       }
-    } catch (e) {}
+    } catch(e) { swallowError(e); }
 
     const bankrollSmartHtml = (() => {
       const userBr = Number(localStorage.getItem('userBankroll') || bankrollStart || 50) || 50;
       let bets = [];
-      try { bets = (typeof _loadUserBets === 'function') ? _loadUserBets() : []; } catch(e) {}
+      try { bets = (typeof _loadUserBets === 'function') ? _loadUserBets() : []; } catch(e) { swallowError(e); }
       const settled = bets.filter(b => b && b.settled && b.result !== 'void').sort((a, b) => (a.settledTs || a.ts || 0) - (b.settledTs || b.ts || 0));
       let nav = userBr, high = userBr, low = userBr;
       settled.forEach(b => {
@@ -25084,7 +25092,7 @@ const esc2 = (typeof esc === 'function') ? esc : (s) => String(s).replace(/[&<>"
 
 ${(() => {
 let lessons = [];
-try { lessons = (typeof loadUserLessons === 'function') ? loadUserLessons() : []; } catch(e){}
+try { lessons = (typeof loadUserLessons === 'function') ? loadUserLessons() : []; } catch(e) { swallowError(e); }
 if (!lessons.length) return `
               <div class="card-base">
                 <h3 style="margin:0 0 8px;font-size:16px;font-weight:700;color:var(--text);">💡 Ce que tu as appris</h3>
@@ -25133,7 +25141,7 @@ Reçois une alerte locale quand un Big Bet approche ou quand une forte value app
           ${(() => {
             // Permet à l'user de recevoir les top picks dans son Discord
 const wh = '';
-try { /* lecture init pour pré-remplir */ } catch(e){}
+try { /* lecture init pour pré-remplir */ } catch(e) { swallowError(e); }
 return `
             <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;margin-top:14px;">
               <h3 style="margin:0 0 6px;font-size:16px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;">💬 Notifications Discord (optionnel)</h3>
@@ -25155,7 +25163,7 @@ return `
 
 ${(() => {
 let sessions = [];
-try { sessions = JSON.parse(localStorage.getItem('paris_sportif_web_vitals_v1') || '[]'); } catch(e){}
+try { sessions = JSON.parse(localStorage.getItem('paris_sportif_web_vitals_v1') || '[]'); } catch(e) { swallowError(e); }
 if (!Array.isArray(sessions) || sessions.length < 3) return `
               <div class="card-base">
                 <h3 style="margin:0 0 8px;font-size:16px;font-weight:700;color:var(--text);">⚡ Performance navigateur</h3>
@@ -25299,7 +25307,7 @@ return `
             const cur = JSON.parse(localStorage.getItem('profilAccordionState') || '{}') || {};
             cur[def.key] = details.open;
             localStorage.setItem('profilAccordionState', JSON.stringify(cur));
-          } catch(e) {}
+          } catch(e) { swallowError(e); }
         });
         grid.appendChild(details);
       });
@@ -25389,7 +25397,7 @@ return `
           }
         });
       }
-    } catch(e){}
+    } catch(e) { swallowError(e); }
     wrap.querySelectorAll('[data-accent-btn]').forEach(btn => {
       btn.addEventListener('click', () => {
         const accent = btn.dataset.accentBtn;
@@ -25397,7 +25405,7 @@ return `
         const root = document.documentElement;
         if (accent === 'default') root.removeAttribute('data-accent');
         else root.setAttribute('data-accent', accent);
-        try { if (typeof toast === 'function') toast('✓ Accent : ' + accent, 'success'); } catch(e){}
+        try { if (typeof toast === 'function') toast('✓ Accent : ' + accent, 'success'); } catch(e) { swallowError(e); }
         renderProfilPage(wrap);
       });
     });
@@ -25405,8 +25413,8 @@ return `
       btn.addEventListener('click', () => {
         const level = btn.dataset.levelBtn;
         savePrefs({ level, onboardingDone: true });
-        try { document.documentElement.setAttribute('data-level', level); } catch(e){}
-        try { if (typeof toast === 'function') toast('✓ Niveau : ' + level, 'success'); } catch(e){}
+        try { document.documentElement.setAttribute('data-level', level); } catch(e) { swallowError(e); }
+        try { if (typeof toast === 'function') toast('✓ Niveau : ' + level, 'success'); } catch(e) { swallowError(e); }
         renderProfilPage(wrap);
       });
     });
@@ -25415,7 +25423,7 @@ return `
         const uiMode = normalizeUiMode(btn.dataset.uiModeBtn);
         savePrefs({ uiMode });
         try { setUserUiMode(uiMode); } catch(e) { logSafeError('profile set ui mode', e); }
-        try { if (typeof toast === 'function') toast(uiMode === 'expert' ? 'Mode expert actif' : 'Mode novice actif', 'success'); } catch(e){}
+        try { if (typeof toast === 'function') toast(uiMode === 'expert' ? 'Mode expert actif' : 'Mode novice actif', 'success'); } catch(e) { swallowError(e); }
         renderProfilPage(wrap);
       });
     });
@@ -25423,7 +25431,7 @@ return `
       btn.addEventListener('click', () => {
         const lang = setUserLang(btn.dataset.langBtn);
         savePrefs({ lang });
-        try { if (typeof toast === 'function') toast('✓ ' + i18n('profile.language.saved') + ' : ' + lang.toUpperCase(), 'success'); } catch(e){}
+        try { if (typeof toast === 'function') toast('✓ ' + i18n('profile.language.saved') + ' : ' + lang.toUpperCase(), 'success'); } catch(e) { swallowError(e); }
         renderProfilPage(wrap);
       });
     });
@@ -25463,7 +25471,7 @@ return `
     if (focusModeEl) focusModeEl.addEventListener('change', (e) => {
       const on = e.target.checked;
       savePrefs({ focusMode: on });
-      try { localStorage.setItem('paris_sportif_focus_big_bets_v1', on ? '1' : '0'); } catch(err) {}
+      try { localStorage.setItem('paris_sportif_focus_big_bets_v1', on ? '1' : '0'); } catch(err) { swallowError(err); }
       if (on) document.body.classList.add('focus-mode');
       else document.body.classList.remove('focus-mode');
     });
@@ -25519,8 +25527,8 @@ return `
     const lockProfitBtn = wrap.querySelector('[data-bankroll-lock-profits]');
     if (lockProfitBtn) lockProfitBtn.addEventListener('click', () => {
       const profit = Number(lockProfitBtn.dataset.lockProfit || 0) || 0;
-      try { localStorage.setItem('bankrollLockedProfit', profit.toFixed(2)); } catch(e){}
-      try { if (typeof toast === 'function') toast(`✓ Profits verrouillés : ${profit.toFixed(2)}€`, 'success'); } catch(e){}
+      try { localStorage.setItem('bankrollLockedProfit', profit.toFixed(2)); } catch(e) { swallowError(e); }
+      try { if (typeof toast === 'function') toast(`✓ Profits verrouillés : ${profit.toFixed(2)}€`, 'success'); } catch(e) { swallowError(e); }
       renderProfilPage(wrap);
     });
     const oddMinEl = wrap.querySelector('#pref-odd-min');
@@ -25530,7 +25538,7 @@ return `
       const v = setUserOddMin(ODD_MIN_CHOICES[idx]);
       oddMinLbl.textContent = '@' + v.toFixed(2);
       e.target.setAttribute('aria-valuetext', v.toFixed(2));
-      try { if (typeof toast === 'function') toast(`Cote minimum: @${v.toFixed(2)}`, 'success'); } catch(err){}
+      try { if (typeof toast === 'function') toast(`Cote minimum: @${v.toFixed(2)}`, 'success'); } catch(err) { swallowError(err); }
     });
     const riskEl = wrap.querySelector('#pref-risk-tolerance');
     const riskLbl = wrap.querySelector('#pref-risk-label');
@@ -25582,7 +25590,7 @@ return `
       if (perm !== 'granted') {
         savePrefs({ pushNotifs: false });
         setNotifStatus('Notifications bloquées par le navigateur.', 'err');
-        try { if (typeof window._syncBrowserNotifUI === 'function') window._syncBrowserNotifUI(); } catch(e){}
+        try { if (typeof window._syncBrowserNotifUI === 'function') window._syncBrowserNotifUI(); } catch(e) { swallowError(e); }
         return;
       }
       const next = !(prefs.pushNotifs === true);
@@ -25591,12 +25599,12 @@ return `
         if (next && 'serviceWorker' in navigator && location.protocol.startsWith('http')) {
           await navigator.serviceWorker.register('sw.js').catch(() => null);
         }
-      } catch(e) {}
-      try { if (typeof window._syncBrowserNotifUI === 'function') window._syncBrowserNotifUI(); } catch(e){}
+      } catch(e) { swallowError(e); }
+      try { if (typeof window._syncBrowserNotifUI === 'function') window._syncBrowserNotifUI(); } catch(e) { swallowError(e); }
       if (next) {
         setNotifStatus('Notifications activées. Le site préviendra les Big Bets imminents.', 'ok');
-        try { if (typeof window._maybeNotifyHighEdgePicks === 'function') window._maybeNotifyHighEdgePicks(); } catch(e){}
-        try { if (typeof window._maybeNotifyKickoffImminent === 'function') window._maybeNotifyKickoffImminent(); } catch(e){}
+        try { if (typeof window._maybeNotifyHighEdgePicks === 'function') window._maybeNotifyHighEdgePicks(); } catch(e) { swallowError(e); }
+        try { if (typeof window._maybeNotifyKickoffImminent === 'function') window._maybeNotifyKickoffImminent(); } catch(e) { swallowError(e); }
       } else {
         setNotifStatus('Notifications désactivées.', 'info');
       }
@@ -25636,7 +25644,7 @@ return `
       _discordStatus.textContent = msg;
     };
     if (_discordInput) {
-      try { _discordInput.value = localStorage.getItem('discord_webhook_url') || ''; } catch(e){}
+      try { _discordInput.value = localStorage.getItem('discord_webhook_url') || ''; } catch(e) { swallowError(e); }
       const _isValidWebhook = (u) => /^https:\/\/(?:discord(?:app)?\.com|ptb\.discord\.com|canary\.discord\.com)\/api\/webhooks\/\d+\/[\w-]+$/.test(u || '');
       const _saveBtn = wrap.querySelector('#discord-save-btn');
       if (_saveBtn) _saveBtn.addEventListener('click', () => {
@@ -25647,7 +25655,7 @@ return `
         if (!_isValidWebhook(v)) {
           _discordSetStatus('⚠️ URL invalide. Format attendu : https://discord.com/api/webhooks/.../...', 'err'); return;
         }
-        try { localStorage.setItem('discord_webhook_url', v); } catch(e){}
+        try { localStorage.setItem('discord_webhook_url', v); } catch(e) { swallowError(e); }
         _discordSetStatus('✓ URL enregistrée localement.', 'ok');
       });
       const _testBtn = wrap.querySelector('#discord-test-btn');
@@ -25734,7 +25742,7 @@ return `
       });
       const _clearBtn = wrap.querySelector('#discord-clear-btn');
       if (_clearBtn) _clearBtn.addEventListener('click', () => {
-        try { localStorage.removeItem('discord_webhook_url'); } catch(e){}
+        try { localStorage.removeItem('discord_webhook_url'); } catch(e) { swallowError(e); }
         if (_discordInput) _discordInput.value = '';
         _discordSetStatus('✓ Webhook oublié (localStorage cleared).', 'info');
       });
@@ -25785,7 +25793,7 @@ return `
         toRemove.forEach(k => localStorage.removeItem(k));
         if (typeof toast === 'function') toast('✓ Tout réinitialisé', 'success');
         renderProfilPage(wrap);
-      } catch (e) {}
+      } catch(e) { swallowError(e); }
     });
     const replayBanner = wrap.querySelector('#replay-beginner-banner');
     if (replayBanner) replayBanner.addEventListener('click', () => {
@@ -25796,7 +25804,7 @@ return `
         // FIX audit #9 : feedback explicite, l'utilisateur ne voit pas la
         // bannière apparaître ici (elle est sur Accueil).
         if (typeof toast === 'function') toast('✓ Bannière réactivée — visible sur Accueil', 'success');
-      } catch(e){}
+      } catch(e) { swallowError(e); }
     });
     const clearLessons = wrap.querySelector('#clear-user-lessons');
     if (clearLessons) clearLessons.addEventListener('click', async () => {
@@ -25814,7 +25822,7 @@ return `
         localStorage.removeItem('paris_sportif_user_lessons_v1');
         if (typeof toast === 'function') toast('✓ Leçons effacées', 'success');
         renderProfilPage(wrap);
-      } catch(e){}
+      } catch(e) { swallowError(e); }
     });
     const resetTutsBtn = wrap.querySelector('#reset-tutorials-btn');
     if (resetTutsBtn) resetTutsBtn.addEventListener('click', () => {
@@ -25837,7 +25845,7 @@ return `
     });
     const clearSearchesBtn = wrap.querySelector('#clear-recent-searches');
     if (clearSearchesBtn) clearSearchesBtn.addEventListener('click', () => {
-      try { localStorage.removeItem('recentSearches'); } catch(e){}
+      try { localStorage.removeItem('recentSearches'); } catch(e) { swallowError(e); }
       if (typeof toast === 'function') toast('✓ Recherches récentes effacées', 'success');
     });
     const exportBtn = wrap.querySelector('#export-data-btn');
@@ -25929,7 +25937,7 @@ return `
         __oddsHistoryByMatch = byId;
         __oddsHistoryLoadedAt = Date.now();
         __oddsHistoryLoading = null;
-        try { window.__oddsHistoryStats = { raw_lines: lines.length, parsed_lines: scopedLines.length, match_count: byId.size, url_bucket: dataHour }; } catch(e) {}
+        try { window.__oddsHistoryStats = { raw_lines: lines.length, parsed_lines: scopedLines.length, match_count: byId.size, url_bucket: dataHour }; } catch(e) { swallowError(e); }
         return byId;
       })
       .catch(() => {
@@ -26399,7 +26407,7 @@ return `
         void _main.offsetWidth;
         _main.classList.add('page-fade-in');
       }
-    } catch(e){}
+    } catch(e) { swallowError(e); }
     // Avant : MO observait main sans filter. _animateCounter modifie
     // textContent → MO refire → re-scan → potentielle boucle (les
     // animDone flag aidaient mais la MO continuait à scan inutilement).
@@ -26435,7 +26443,7 @@ return `
       };
       setTimeout(scanAndAnimate, 50);
       setTimeout(scanAndAnimate, 1500);  // couvre LITE→FULL re-render
-    } catch(e){}
+    } catch(e) { swallowError(e); }
     const isCombines = currentPage === 'combines';
     const isBilan = currentPage === 'bilan';
     const isHistorique = currentPage === 'historique';
@@ -26491,11 +26499,11 @@ return `
       suiviNav.querySelectorAll('[data-suivi-page]').forEach(b => {
         b.addEventListener('click', () => {
         currentPage = PAGE_ALIASES[b.dataset.suiviPage] || b.dataset.suiviPage;
-          try { localStorage.setItem('currentPage', currentPage); } catch(e){}
+          try { localStorage.setItem('currentPage', currentPage); } catch(e) { swallowError(e); }
           try {
             const newHash = '#' + currentPage;
             _setUserNavHash(newHash);
-          } catch(e) {}
+          } catch(e) { swallowError(e); }
           applyPageView();
         });
       });
@@ -26507,7 +26515,7 @@ return `
 const comb = document.getElementById('combines-wrap');
 if (comb) comb.style.display = isCombines ? '' : 'none';
 if (isCombines && typeof renderCombines === 'function') {
-  try { renderCombines(); } catch(e) {}
+  try { renderCombines(); } catch(e) { swallowError(e); }
 }
 
 let historiqueWrap = document.getElementById('historique-wrap');
@@ -26520,7 +26528,7 @@ historiqueWrap.style.display = isHistorique ? '' : 'none';
 if (isHistorique) {
 renderHistoriquePage(historiqueWrap);
 if (window.PRONOSTICS_DATA && window.PRONOSTICS_DATA._lite && typeof window._ensureFullData === 'function') {
-window._ensureFullData().then(() => { try { renderHistoriquePage(historiqueWrap); } catch(e){} }).catch(()=>{});
+window._ensureFullData().then(() => { try { renderHistoriquePage(historiqueWrap); } catch(e) { swallowError(e); } }).catch(()=>{});
 }
 }
 
@@ -26535,7 +26543,7 @@ compareWrap.style.display = isCompare ? '' : 'none';
 if (isCompare) {
 renderComparePage(compareWrap);
 if (window.PRONOSTICS_DATA && window.PRONOSTICS_DATA._lite && typeof window._ensureFullData === 'function') {
-window._ensureFullData().then(() => { try { renderComparePage(compareWrap); } catch(e){} }).catch(()=>{});
+window._ensureFullData().then(() => { try { renderComparePage(compareWrap); } catch(e) { swallowError(e); } }).catch(()=>{});
 }
 }
 
@@ -26573,7 +26581,7 @@ bilanWrap.style.display = isBilan ? '' : 'none';
 if (isBilan) {
 renderBilanPage(bilanWrap);
 if (window.PRONOSTICS_DATA && window.PRONOSTICS_DATA._lite && typeof window._ensureFullData === 'function') {
-window._ensureFullData().then(() => { try { renderBilanPage(bilanWrap); } catch(e){} }).catch(()=>{});
+window._ensureFullData().then(() => { try { renderBilanPage(bilanWrap); } catch(e) { swallowError(e); } }).catch(()=>{});
 }
 }
 
@@ -26659,7 +26667,7 @@ backtestWrap.style.display = isBacktest ? '' : 'none';
 if (isBacktest) {
 renderBacktestPage(backtestWrap);
 if (window.PRONOSTICS_DATA && window.PRONOSTICS_DATA._lite && typeof window._ensureFullData === 'function') {
-window._ensureFullData().then(() => { try { renderBacktestPage(backtestWrap); } catch(e){} }).catch(()=>{});
+window._ensureFullData().then(() => { try { renderBacktestPage(backtestWrap); } catch(e) { swallowError(e); } }).catch(()=>{});
 }
 }
 
@@ -26682,10 +26690,10 @@ requestAnimationFrame(() => {
         try {
           const el = document.getElementById(target);
           if (el) el.scrollIntoView({ block: 'start', behavior: 'smooth' });
-        } catch(e) {}
+        } catch(e) { swallowError(e); }
       }, 250);
     }
-  } catch(e) {}
+  } catch(e) { swallowError(e); }
 });
 }
 
@@ -26702,7 +26710,7 @@ let type = 'jour';
 try {
 const saved = localStorage.getItem('montanteType') || '';
 if (['jour', 'weekend', 'semaine'].includes(saved)) type = saved;
-} catch(e) {}
+} catch(e) { swallowError(e); }
 montanteWrap.innerHTML = `
         <div class="page-wrap">
           <div class="page-header">
@@ -26723,7 +26731,7 @@ const inner = montanteWrap.querySelector('#montante-inner') || montanteWrap;
 renderMontantePage(inner, type);
 montanteWrap.querySelectorAll('[data-montante-type]').forEach(btn => {
 btn.addEventListener('click', () => {
-try { localStorage.setItem('montanteType', btn.dataset.montanteType); } catch(e) {}
+try { localStorage.setItem('montanteType', btn.dataset.montanteType); } catch(e) { swallowError(e); }
 renderMontantePage(montanteWrap.querySelector('#montante-inner') || montanteWrap, btn.dataset.montanteType);
 montanteWrap.querySelectorAll('[data-montante-type]').forEach(b => b.classList.toggle('active', b === btn));
 });
@@ -26794,7 +26802,7 @@ try {
 setTimeout(() => {
 if (typeof _injectPageTabsAuto === 'function') _injectPageTabsAuto(currentPage);
 }, 50);
-} catch(e){}
+} catch(e) { swallowError(e); }
 }
 
 function computeMyBilan() {
@@ -27238,7 +27246,7 @@ function _setPerfTab(tab) {
 const next = PERF_TABS.has(tab) ? tab : 'global';
 try {
 localStorage.setItem(PERF_TAB_STORAGE_KEY, next);
-} catch (e) {}
+} catch(e) { swallowError(e); }
 return next;
 }
 
@@ -28235,7 +28243,7 @@ renderPerformancePage(wrap);
 });
 });
 }
-try { window.renderPerformancePage = renderPerformancePage; } catch(e){}
+try { window.renderPerformancePage = renderPerformancePage; } catch(e) { swallowError(e); }
 
 function _ensurePicksHistorySummary(wrap, rerender) {
   if (window.__picksHistorySummary) return window.__picksHistorySummary;
@@ -28469,7 +28477,7 @@ return found;
 try {
 window._computeCLV = _computeCLV;
 window._findMatchById = _findMatchById;
-} catch(e){}
+} catch(e) { swallowError(e); }
 
 function loadTrackedBets() {
 try {
@@ -28511,7 +28519,7 @@ return Array.isArray(raw) ? raw : [];
 } catch (e) { return []; }
 }
 function saveJsErrors(arr) {
-try { localStorage.setItem(JS_ERRORS_KEY, JSON.stringify(arr.slice(-JS_ERRORS_MAX))); } catch (e) {}
+try { localStorage.setItem(JS_ERRORS_KEY, JSON.stringify(arr.slice(-JS_ERRORS_MAX))); } catch(e) { swallowError(e); }
 }
 function exportJsErrors() {
 try {
@@ -28543,7 +28551,7 @@ if (typeof toast === 'function') toast('Journal erreurs exporté', 'success');
 if (typeof toast === 'function') toast('Export erreurs impossible', 'error');
 }
 }
-try { window._exportJsErrors = exportJsErrors; } catch (e) {}
+try { window._exportJsErrors = exportJsErrors; } catch(e) { swallowError(e); }
 function logJsError(type, msg, stack) {
 try {
 const arr = loadJsErrors();
@@ -28703,7 +28711,7 @@ const pickOdd = p.odds && (pickKey === '1' ? p.odds.home : pickKey === '2' ? p.o
 if (pickOdd) lockWithOdds++;
 }
 });
-} catch (e) {}
+} catch(e) { swallowError(e); }
 checks.push({ key: 'locks-active', label: '🔒 Locks actifs', status: 'info',
 value: `${lockCount}`,
 detail: `${lockCount} lock${lockCount>1?'s':''} upcoming Winamax${lockCount?` (${lockWithOdds} avec cote utilisable)`:' aujourd\'hui'}.` });
@@ -28796,7 +28804,7 @@ extraHtml: `<a href="https://github.com/Harotensnor/paris-sportif/actions" targe
 return { checks, meta: { totalToday, todayWinCount: todayWin.length, totalRemaining,
 perSportRemaining, lockCount, lsMb, recentErrorCount: recent.length } };
 }
-try { window.computeSiteHealth = computeSiteHealth; } catch (e) {}
+try { window.computeSiteHealth = computeSiteHealth; } catch(e) { swallowError(e); }
 
 function renderSantePage(wrap) {
 const health = computeSiteHealth();
@@ -30087,7 +30095,7 @@ const col = sel.dataset.col;
 try {
 if (col === 'JOUR A') localStorage.setItem('compare_date_a', sel.value);
 else if (col === 'JOUR B') localStorage.setItem('compare_date_b', sel.value);
-} catch(e){}
+} catch(e) { swallowError(e); }
 renderComparePage(wrap);
 });
 });
@@ -31011,7 +31019,7 @@ preEpochCount++;
 }
 });
 });
-} catch (e) {}
+} catch(e) { swallowError(e); }
 const epochBannerHtml = preEpochCount > 0 ? `
       <div style="margin:12px auto 18px;padding:10px 14px;max-width:1500px;background:rgba(234,179,8,.08);border:1px solid rgba(234,179,8,.25);border-left:3px solid var(--warn,#eab308);border-radius:0 8px 8px 0;font-size:12.5px;color:var(--text-dim);line-height:1.45;">
         <strong class="u-text">⚠️ Epoch ${ALIGNMENT_EPOCH_ISO}</strong> — Avant cette date, l'alignement des cotes Winamax 1n2 inversait home/away sur ~65 events (tennis, basket, hockey, foot). Les paris pris avant le ${ALIGNMENT_EPOCH_ISO} ont une part de phantom edge dans le bilan rétro. À partir de ce jour, c'est propre. <a href="#credibilite" class="u-text-accent">Détails →</a>
@@ -31405,14 +31413,14 @@ ses paris sur le site (ni manuel, ni import). -->
       const v = parseInt(btn.dataset.win, 10);
       if (!Number.isFinite(v) || v === _bilanWindow) return;
       _bilanWindow = v;
-      try { localStorage.setItem('bilanWindow', String(v)); } catch (e) {}
+      try { localStorage.setItem('bilanWindow', String(v)); } catch(e) { swallowError(e); }
       renderBilanPage(wrap);
     }));
     const _compareBtn = wrap.querySelector('#bilan-compare-toggle');
     if (_compareBtn) {
       _compareBtn.addEventListener('click', () => {
         _bilanCompareMode = !_bilanCompareMode;
-        try { localStorage.setItem('bilanCompareMode', _bilanCompareMode ? '1' : '0'); } catch (e) {}
+        try { localStorage.setItem('bilanCompareMode', _bilanCompareMode ? '1' : '0'); } catch(e) { swallowError(e); }
         renderBilanPage(wrap);
       });
     }
@@ -31420,21 +31428,21 @@ ses paris sur le site (ni manuel, ni import). -->
       const v = parseInt(btn.dataset.wtw, 10);
       if (!Number.isFinite(v) || v === _walletTableWindow) return;
       _walletTableWindow = v;
-      try { localStorage.setItem('walletTableWindow', String(v)); } catch (e) {}
+      try { localStorage.setItem('walletTableWindow', String(v)); } catch(e) { swallowError(e); }
       renderBilanPage(wrap);
     }));
     wrap.querySelectorAll('.wallet-stake-btn').forEach(btn => btn.addEventListener('click', () => {
       const v = btn.dataset.wsm;
       if (!['flat1','flat2','flat5','kelly025','kelly050'].includes(v) || v === _walletStakeMode) return;
       _walletStakeMode = v;
-      try { localStorage.setItem('walletStakeMode', v); } catch (e) {}
+      try { localStorage.setItem('walletStakeMode', v); } catch(e) { swallowError(e); }
       renderBilanPage(wrap);
     }));
     wrap.querySelectorAll('.wallet-picks-mode-btn').forEach(btn => btn.addEventListener('click', () => {
       const v = btn.dataset.wpm;
       if (!['all','locks'].includes(v) || v === _walletPicksMode) return;
       _walletPicksMode = v;
-      try { localStorage.setItem('walletPicksMode', v); } catch (e) {}
+      try { localStorage.setItem('walletPicksMode', v); } catch(e) { swallowError(e); }
       renderBilanPage(wrap);
     }));
     wrap.querySelectorAll('.wallet-bt-start').forEach(inp => {
@@ -31444,7 +31452,7 @@ ses paris sur le site (ni manuel, ni import). -->
         v = Math.max(10, Math.min(10000, Math.round(v)));
         if (v === _walletBacktestStart) return;
         _walletBacktestStart = v;
-        try { localStorage.setItem('walletBacktestStart', String(v)); } catch (e) {}
+        try { localStorage.setItem('walletBacktestStart', String(v)); } catch(e) { swallowError(e); }
         renderBilanPage(wrap);
       };
       inp.addEventListener('change', commit);
@@ -31459,7 +31467,7 @@ ses paris sur le site (ni manuel, ni import). -->
         try {
           if (next) localStorage.setItem('walletBacktestDate', next);
           else localStorage.removeItem('walletBacktestDate');
-        } catch (e) {}
+        } catch(e) { swallowError(e); }
         renderBilanPage(wrap);
       });
     });
@@ -31471,7 +31479,7 @@ ses paris sur le site (ni manuel, ni import). -->
       try {
         localStorage.removeItem('walletBacktestStart');
         localStorage.removeItem('walletBacktestDate');
-      } catch (e) {}
+      } catch(e) { swallowError(e); }
       renderBilanPage(wrap);
     }));
     wrap.querySelectorAll('[data-league-row]').forEach(row => {
@@ -31509,14 +31517,14 @@ ses paris sur le site (ni manuel, ni import). -->
       try {
         if (sp) localStorage.setItem('bilanSport', sp);
         else localStorage.removeItem('bilanSport');
-      } catch (e) {}
+      } catch(e) { swallowError(e); }
       renderBilanPage(wrap);
     }));
     wrap.querySelectorAll('.bilan-sport-card[data-sport]').forEach(card => card.addEventListener('click', () => {
       const sp = card.dataset.sport;
       if (!sp || sp === _bilanSport) return;
       _bilanSport = sp;
-      try { localStorage.setItem('bilanSport', sp); } catch (e) {}
+      try { localStorage.setItem('bilanSport', sp); } catch(e) { swallowError(e); }
       renderBilanPage(wrap);
       // Scroll to top so user sees the new filter applied
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -31547,7 +31555,7 @@ ses paris sur le site (ni manuel, ni import). -->
         a.download = `bilan${sportSuffix}${winSuffix}-${new Date().toISOString().slice(0,10)}.csv`;
         a.click();
         setTimeout(() => URL.revokeObjectURL(url), 1500);
-        try { if (typeof toast === 'function') toast('✓ CSV téléchargé', 'success'); } catch(e){}
+        try { if (typeof toast === 'function') toast('✓ CSV téléchargé', 'success'); } catch(e) { swallowError(e); }
       });
     }
 
@@ -31567,7 +31575,7 @@ ses paris sur le site (ni manuel, ni import). -->
           if (target && typeof window._spawnConfetti === 'function') {
             setTimeout(() => {
               window._spawnConfetti(target, 14);
-              try { sessionStorage.setItem(sessionFlag, today); } catch(e){}
+              try { sessionStorage.setItem(sessionFlag, today); } catch(e) { swallowError(e); }
             }, 600);
           }
         }
@@ -31698,7 +31706,7 @@ ses paris sur le site (ni manuel, ni import). -->
       __scoringOddsHistoryPromise = loadOddsHistory().then(loaded => {
         if (loaded) {
           __scoringOddsHistoryReady = true;
-          try { __predCacheClear(); } catch (e) {}
+          try { __predCacheClear(); } catch(e) { swallowError(e); }
         } else {
           __scoringOddsHistoryPromise = null;
         }
@@ -31710,7 +31718,7 @@ ses paris sur le site (ni manuel, ni import). -->
     }
     __scoringOddsHistoryPromise.then(loaded => {
       if (loaded && _pageNeedsScoringOddsHistory(currentPage)) {
-        try { render(); } catch (e) {}
+        try { render(); } catch(e) { swallowError(e); }
       }
     });
   }
@@ -31760,7 +31768,7 @@ ses paris sur le site (ni manuel, ni import). -->
   function _maybeEnableAnalytics() {
     if (_analyticsLoaded) return;
     let prefs = {};
-    try { prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}'); } catch(e){}
+    try { prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}'); } catch(e) { swallowError(e); }
     if (prefs.consentLocalStorage !== 'accepted') return;
     if (window.ANALYTICS_PLAUSIBLE_DOMAIN) {
       const s = document.createElement('script');
@@ -31785,7 +31793,7 @@ ses paris sur le site (ni manuel, ni import). -->
   // friction visuelle et 2 décisions à prendre en même temps.
   function _shouldShowConsentBanner() {
     let prefs = {};
-    try { prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}'); } catch(e){}
+    try { prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}'); } catch(e) { swallowError(e); }
     // Already decided
     if (prefs.consentLocalStorage === 'accepted' || prefs.consentLocalStorage === 'declined') return false;
     // Onboarding pas terminé → patienter
@@ -31795,7 +31803,7 @@ ses paris sur le site (ni manuel, ni import). -->
   }
   function _initConsentBanner() {
     let prefs = {};
-    try { prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}'); } catch(e){}
+    try { prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}'); } catch(e) { swallowError(e); }
     if (prefs.consentLocalStorage === 'accepted' || prefs.consentLocalStorage === 'declined') return;
     const legacyKeys = ['userPrefs', 'currentPage', 'bankroll', 'paris_sportif_tracked_bets', 'agentRules'];
     const hasLegacy = legacyKeys.some(k => {
@@ -31804,7 +31812,7 @@ ses paris sur le site (ni manuel, ni import). -->
     });
     if (hasLegacy) {
       prefs.consentLocalStorage = 'accepted';
-      try { localStorage.setItem('userPrefs', JSON.stringify(prefs)); } catch(e){}
+      try { localStorage.setItem('userPrefs', JSON.stringify(prefs)); } catch(e) { swallowError(e); }
       return;
     }
     // ré-appelle _initConsentBanner après le choix de niveau → cascade propre.
@@ -31818,7 +31826,7 @@ ses paris sur le site (ni manuel, ni import). -->
         p.consentLocalStorage = val;
         p.consentTs = new Date().toISOString();
         localStorage.setItem('userPrefs', JSON.stringify(p));
-      } catch(e){}
+      } catch(e) { swallowError(e); }
       banner.style.display = 'none';
     };
     banner.querySelector('#consent-accept')?.addEventListener('click', () => {
@@ -31894,7 +31902,7 @@ ses paris sur le site (ni manuel, ni import). -->
           if (!isNaN(d.getTime())) {
             when = ` · données du ${d.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' })}`;
           }
-        } catch(e){}
+        } catch(e) { swallowError(e); }
       }
       b.textContent = `📡 Mode offline${when} — les nouvelles cotes ne s'actualiseront pas.`;
       b.classList.add('visible');
@@ -32002,19 +32010,19 @@ subEl.textContent = [...sportsToday].join(' · ') + ' aujourd\'hui';
 subEl.textContent = 'Foot · Tennis · NBA · NHL · MLB';
 }
 }
-} catch(e){}
+} catch(e) { swallowError(e); }
 document.addEventListener('click', (ev) => {
 const btn = ev.target && ev.target.closest && ev.target.closest('.page-btn');
 if (!btn || !btn.dataset || !btn.dataset.page) return;
 const requestedPage = btn.dataset.page;
 currentPage = PAGE_ALIASES[requestedPage] || requestedPage;
 if (!STATIC_REDIRECT_PAGES.has(currentPage)) {
-try { localStorage.setItem('currentPage', currentPage); } catch (e) {}
+try { localStorage.setItem('currentPage', currentPage); } catch(e) { swallowError(e); }
 }
 try {
 const targetHash = requestedPage === 'calendrier' ? '#tous?view=calendar' : '#' + currentPage;
 _setUserNavHash(targetHash);
-} catch (e) {}
+} catch(e) { swallowError(e); }
 applyPageView();
 _ensureScoringOddsHistoryForPage(currentPage);
 const parentHub = btn.closest('.hub');
@@ -32023,7 +32031,7 @@ parentHub.classList.remove('open');
 const hb = parentHub.querySelector('.hub-btn');
 if (hb) hb.setAttribute('aria-expanded', 'false');
 }
-try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch(e) {}
+try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch(e) { swallowError(e); }
 });
 
 document.querySelectorAll('nav.topbar-nav .hub .hub-btn').forEach(btn => {
@@ -32064,7 +32072,7 @@ window.location.href = u;
 }
 window.focus();
 } catch(e) {
-try { window.focus(); } catch(err) {}
+try { window.focus(); } catch(err) { swallowError(err); }
 }
 };
 const _nativeNotify = (title, options = {}, url) => {
@@ -32131,7 +32139,7 @@ if (!data || !data.days) return;
 const todayIso = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
 const today = data.days[todayIso] || [];
 const seen = new Set();
-try { (JSON.parse(localStorage.getItem('notifiedPickIds') || '[]') || []).forEach(id => seen.add(id)); } catch(e) {}
+try { (JSON.parse(localStorage.getItem('notifiedPickIds') || '[]') || []).forEach(id => seen.add(id)); } catch(e) { swallowError(e); }
 const fresh = [];
 const now = Date.now();
 for (const m of today) {
@@ -32166,7 +32174,7 @@ renotify: false,
 seen.add(p.id);
 } catch(e) { prodWarn('[notif] failed:', e); }
 });
-try { localStorage.setItem('notifiedPickIds', JSON.stringify([...seen].slice(-200))); } catch(e) {}
+try { localStorage.setItem('notifiedPickIds', JSON.stringify([...seen].slice(-200))); } catch(e) { swallowError(e); }
 };
 
 window._maybeNotifyKickoffImminent = function _maybeNotifyKickoffImminent() {
@@ -32179,7 +32187,7 @@ if (!data || !data.days) return;
 const todayIso = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
 const today = data.days[todayIso] || [];
 const seen = new Set();
-try { (JSON.parse(localStorage.getItem('notifiedKickoffIds') || '[]') || []).forEach(id => seen.add(id)); } catch(e) {}
+try { (JSON.parse(localStorage.getItem('notifiedKickoffIds') || '[]') || []).forEach(id => seen.add(id)); } catch(e) { swallowError(e); }
 const fresh = [];
 const now = Date.now();
 const WINDOW_MIN = 10;  // notifier si kickoff dans [10..20] min
@@ -32226,7 +32234,7 @@ renotify: false,
 seen.add(p.id);
 } catch(e) { prodWarn('[notif kickoff] failed:', e); }
 });
-try { localStorage.setItem('notifiedKickoffIds', JSON.stringify([...seen].slice(-200))); } catch(e) {}
+try { localStorage.setItem('notifiedKickoffIds', JSON.stringify([...seen].slice(-200))); } catch(e) { swallowError(e); }
 };
 
 window._maybeDiscordPushLocks = function _maybeDiscordPushLocks() {
@@ -32239,7 +32247,7 @@ if (!data || !data.days) return;
 const todayIso = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
 const today = data.days[todayIso] || [];
 const seen = new Set();
-try { (JSON.parse(localStorage.getItem('discordPushedLockIds') || '[]') || []).forEach(id => seen.add(id)); } catch(e) {}
+try { (JSON.parse(localStorage.getItem('discordPushedLockIds') || '[]') || []).forEach(id => seen.add(id)); } catch(e) { swallowError(e); }
 const now = Date.now();
 const fresh = [];
 for (const m of today) {
@@ -32290,7 +32298,7 @@ mode: 'cors',
 }).then(() => seen.add(p.id))
 .catch((err) => prodWarn('[discord webhook] failed:', err));
 });
-try { localStorage.setItem('discordPushedLockIds', JSON.stringify([...seen].slice(-200))); } catch(e) {}
+try { localStorage.setItem('discordPushedLockIds', JSON.stringify([...seen].slice(-200))); } catch(e) { swallowError(e); }
 };
 
 _notifSyncBtn();
@@ -32313,7 +32321,7 @@ localStorage.setItem('userPrefs', JSON.stringify(p));
 if (typeof toast === 'function') toast(p.pushNotifs ? '🔔 Notifs activées · alertes sur edge ≥10%' : '🔕 Notifs désactivées', 'info');
 _notifSyncBtn();
 if (p.pushNotifs && typeof window._maybeNotifyHighEdgePicks === 'function') window._maybeNotifyHighEdgePicks();   // déclenche immédiatement si data fresh contient des picks
-} catch(e){}
+} catch(e) { swallowError(e); }
 });
 
 const _systemPrefersLight = () => window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
@@ -32347,13 +32355,13 @@ const initPrefs = JSON.parse(localStorage.getItem('userPrefs') || '{}');
 _currentTheme = UX_THEME_CHOICES.includes(initPrefs.theme) ? initPrefs.theme : 'dark';
 _applyTheme(_currentTheme);
 } catch(e) { _applyTheme('dark'); }
-try { setInterval(() => _applyTheme(_currentTheme), 600000); } catch(e){}
+try { setInterval(() => _applyTheme(_currentTheme), 600000); } catch(e) { swallowError(e); }
 try {
 const mql = window.matchMedia('(prefers-color-scheme: light)');
 const _onSysChange = () => { if (_currentTheme === 'auto' || _currentTheme === 'system') _applyTheme(_currentTheme); };
 if (mql.addEventListener) mql.addEventListener('change', _onSysChange);
 else if (mql.addListener) mql.addListener(_onSysChange);
-} catch(e){}
+} catch(e) { swallowError(e); }
 window.addEventListener('storage', (ev) => {
 if (ev.key !== 'userPrefs') return;
 try {
@@ -32363,7 +32371,7 @@ if (next !== _currentTheme) {
 _currentTheme = next;
 _applyTheme(next);
 }
-} catch(e){}
+} catch(e) { swallowError(e); }
 });
 const themeBtn = document.getElementById('theme-toggle');
 if (themeBtn) themeBtn.addEventListener('click', () => {
@@ -32378,7 +32386,7 @@ localStorage.setItem('userPrefs', JSON.stringify(p));
 _applyTheme(next);
 const labels = { dark: 'sombre', light: 'clair', system: 'auto', auto: 'auto', ocean: 'Ocean', sunset: 'Sunset', forest: 'Forest', mono: 'Mono' };
 if (typeof toast === 'function') toast('🎨 Thème : ' + labels[next], 'info');
-} catch(e){}
+} catch(e) { swallowError(e); }
 });
 
 const levelBtn = document.getElementById('level-toggle');
@@ -32386,7 +32394,7 @@ const _levelLabels = { debutant: '🌱 Débutant', confirme: '🎯 Confirmé', p
 const _levelIcons = { debutant: '🌱', confirme: '🎯', pro: '📊' };
 const _levelTitle = (lv) => `Niveau : ${_levelLabels[lv] || lv} · clic pour cycler`;
 const _applyLevel = (lv) => {
-try { document.documentElement.setAttribute('data-level', lv); } catch(e){}
+try { document.documentElement.setAttribute('data-level', lv); } catch(e) { swallowError(e); }
 if (levelBtn) {
 levelBtn.textContent = _levelIcons[lv] || '🎯';
 levelBtn.title = _levelTitle(lv);
@@ -32407,12 +32415,12 @@ p.level = next;
 localStorage.setItem('userPrefs', JSON.stringify(p));
 _applyLevel(next);
 if (typeof toast === 'function') toast('🎯 Niveau : ' + _levelLabels[next], 'info');
-} catch(e){}
+} catch(e) { swallowError(e); }
 });
 
 const healthBtn = document.getElementById('health-indicator');
 if (healthBtn) healthBtn.addEventListener('click', () => {
-try { localStorage.setItem('currentPage', 'credibilite'); } catch(e){}
+try { localStorage.setItem('currentPage', 'credibilite'); } catch(e) { swallowError(e); }
 if (typeof currentPage !== 'undefined') currentPage = 'credibilite';
 if (typeof applyPageView === 'function') applyPageView();
 });
@@ -32444,10 +32452,10 @@ window.removeEventListener('scroll', _markInteract);
 if (_userInteracted) return;  // user is doing something, don't interrupt
         // Don't open if any modal is already on screen (lock unlock, help, etc.)
 if (document.querySelector('.modal.show, .modal[open], #share-modal.show')) return;
-try { if (typeof showOnboardingModal === 'function') showOnboardingModal(); } catch(e){}
+try { if (typeof showOnboardingModal === 'function') showOnboardingModal(); } catch(e) { swallowError(e); }
 };
 setTimeout(_runOnboarding, 800);
-} catch(e){}
+} catch(e) { swallowError(e); }
 
 document.addEventListener('keydown', (ev) => {
 if (ev.shiftKey && !ev.ctrlKey && !ev.metaKey && !ev.altKey && (ev.key === 'T' || ev.key === 't')) {
@@ -32464,7 +32472,7 @@ const onBR = () => {
 const v = validateBankroll(brInput.value, brInput);
 if (v == null) return;
 bankroll = v;
-try { localStorage.setItem('bankroll', String(v)); } catch (e) {}
+try { localStorage.setItem('bankroll', String(v)); } catch(e) { swallowError(e); }
 render(); // re-render so Top Picks show updated € stakes
 };
 brInput.addEventListener('change', onBR);
@@ -32544,7 +32552,7 @@ return isFinite(v) && Date.now() < v;
 } catch(e) { return false; }
 };
 const _pwaSnooze = (days) => {
-try { localStorage.setItem(PWA_SNOOZE_KEY, String(Date.now() + days * 86400000)); } catch(e){}
+try { localStorage.setItem(PWA_SNOOZE_KEY, String(Date.now() + days * 86400000)); } catch(e) { swallowError(e); }
 };
 const _pwaShowBanner = () => {
 const banner = document.getElementById('pwa-install-banner');
@@ -32560,12 +32568,12 @@ e.preventDefault();
 _pwaDeferredPrompt = e;
 try {
 if (window.matchMedia('(display-mode: standalone)').matches) return;
-} catch(e){}
+} catch(e) { swallowError(e); }
 if (_pwaIsSnoozed()) return;
 let visitCount = 0;
-try { visitCount = parseInt(localStorage.getItem('pwaVisitCount') || '0', 10); } catch(e){}
+try { visitCount = parseInt(localStorage.getItem('pwaVisitCount') || '0', 10); } catch(e) { swallowError(e); }
 visitCount = (isFinite(visitCount) ? visitCount : 0) + 1;
-try { localStorage.setItem('pwaVisitCount', String(visitCount)); } catch(e){}
+try { localStorage.setItem('pwaVisitCount', String(visitCount)); } catch(e) { swallowError(e); }
 if (visitCount < 2) return;  // 1ère visite = pas de prompt
 
 let pagesSeen = [];
@@ -32573,11 +32581,11 @@ try {
 const raw = localStorage.getItem('pwaPagesSeen') || '[]';
 pagesSeen = JSON.parse(raw);
 if (!Array.isArray(pagesSeen)) pagesSeen = [];
-} catch(e){}
+} catch(e) { swallowError(e); }
 const curPage = (typeof currentPage !== 'undefined' && currentPage) || location.hash.replace(/^#/, '') || 'dashboard';
 if (curPage && !pagesSeen.includes(curPage)) {
 pagesSeen.push(curPage);
-try { localStorage.setItem('pwaPagesSeen', JSON.stringify(pagesSeen.slice(-10))); } catch(e){}
+try { localStorage.setItem('pwaPagesSeen', JSON.stringify(pagesSeen.slice(-10))); } catch(e) { swallowError(e); }
 }
 if (pagesSeen.length < 3) return;  // pas assez de pages explorées
 
@@ -32586,7 +32594,7 @@ try {
 const raw = localStorage.getItem('seenLockIds');
 const arr = raw ? JSON.parse(raw) : [];
 hasSeenLock = Array.isArray(arr) && arr.length > 0;
-} catch(e){}
+} catch(e) { swallowError(e); }
 const hasStrongExplore = pagesSeen.length >= 5;
 if (!hasSeenLock && !hasStrongExplore) return;
 
@@ -32603,7 +32611,7 @@ if (!seen.includes(pageName)) {
 seen.push(pageName);
 localStorage.setItem('pwaPagesSeen', JSON.stringify(seen.slice(-10)));
 }
-} catch(e){}
+} catch(e) { swallowError(e); }
 }
 window.addEventListener('hashchange', () => {
 const p = location.hash.replace(/^#/, '');
@@ -32628,7 +32636,7 @@ _pwaDeferredPrompt.prompt();
 const choice = await _pwaDeferredPrompt.userChoice;
 if (choice && choice.outcome === 'dismissed') _pwaSnooze(7);
 _pwaDeferredPrompt = null;
-} catch(e){}
+} catch(e) { swallowError(e); }
 _pwaHideBanner();
 });
 if (_pwaLaterBtn) _pwaLaterBtn.addEventListener('click', () => { _pwaSnooze(7); _pwaHideBanner(); });
@@ -32668,12 +32676,12 @@ else {
 const resolved = (typeof PAGE_ALIASES !== 'undefined' && PAGE_ALIASES[target]) ? PAGE_ALIASES[target] : target;
 if (typeof VALID_PAGES !== 'undefined' && VALID_PAGES.includes(resolved)) {
 currentPage = resolved;
-try { localStorage.setItem('currentPage', resolved); } catch(e){}
-try { history.replaceState(null, '', location.pathname + location.search + '#' + resolved); } catch(e){}
+try { localStorage.setItem('currentPage', resolved); } catch(e) { swallowError(e); }
+try { history.replaceState(null, '', location.pathname + location.search + '#' + resolved); } catch(e) { swallowError(e); }
 if (typeof applyPageView === 'function') applyPageView();
 }
 }
-try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch(e){}
+try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch(e) { swallowError(e); }
 });
 });
 function _updateFooterLastUpdate() {
@@ -32707,7 +32715,7 @@ const lastTry = parseInt(sessionStorage.getItem('autoRefreshDoneAt') || '0', 10)
 const sinceLast = (Date.now() - lastTry) / 60000;
 if (!isFinite(sinceLast) || sinceLast > 30) {
 sessionStorage.setItem('autoRefreshDoneAt', String(Date.now()));
-try { if (typeof toast === 'function') toast(`Données ${lbl} — actualisation automatique`, 'info'); } catch(e){}
+try { if (typeof toast === 'function') toast(`Données ${lbl} — actualisation automatique`, 'info'); } catch(e) { swallowError(e); }
 (async () => {
 try {
 if ('serviceWorker' in navigator) {
@@ -32755,7 +32763,7 @@ if ((e.key === 'b' || e.key === 'B')) {
 e.preventDefault();
 const key = 'paris_sportif_focus_big_bets_v1';
 const on = localStorage.getItem(key) !== '1';
-try { localStorage.setItem(key, on ? '1' : '0'); } catch(_) {}
+try { localStorage.setItem(key, on ? '1' : '0'); } catch(_) { swallowError(_); }
 go('dashboard');
 }
 if (e.key === 'j' || e.key === 'k') {
@@ -32795,7 +32803,7 @@ window.esc = esc;
 window.sportEmoji = sportEmoji;
 window.sportLabel = sportLabel;
 window.applyPageView = applyPageView;
-} catch (e) {}
+} catch(e) { swallowError(e); }
 
 setTimeout(() => {
 try {
@@ -32812,7 +32820,7 @@ return;
 }
 }
 }
-} catch(_){}
+} catch(_) { swallowError(_); }
 }, 300);
 
 })();
