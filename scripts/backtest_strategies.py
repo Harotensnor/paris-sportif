@@ -51,6 +51,7 @@ KELLY_FLOOR = 0.0001  # below 0.01% the math is noise — skip the bet.
 MAX_STAKE_UNITS: float | None = 50.0
 VALUE_EDGE_MIN = 0.05  # 5pt edge for value_only strategy.
 OUTSIDER_EDGE_MIN = 0.05  # 5pt edge floor for outsider_only strategy.
+MAX_MODEL_PROB = 0.95
 SHARP_TIERS = {"safe", "solid"}
 OUTSIDER_TIERS = {"out"}
 MC_RESAMPLES = 10_000
@@ -77,6 +78,21 @@ def _num(value) -> float | None:
     return x
 
 
+def sanitize_backtest_probability(prob: float | None, odd: float | None) -> tuple[float, bool]:
+    """Return a model probability safe for staking simulations.
+
+    Older history rows can contain prob_model=0.999 on long-shot odds. These
+    rows are historical artifacts: using them in Kelly simulations massively
+    overstates stake sizing. Flat strategies keep the row, but probability-
+    dependent strategies see prob=0 and abstain.
+    """
+    if prob is None or prob <= 0:
+        return 0.0, False
+    if prob >= MAX_MODEL_PROB and odd is not None and odd > 10:
+        return 0.0, True
+    return min(prob, MAX_MODEL_PROB), prob > MAX_MODEL_PROB
+
+
 def load_settled_picks() -> list[dict]:
     """Return picks with result ∈ {won, lost, void} and usable odd/edge."""
     picks: list[dict] = []
@@ -100,6 +116,7 @@ def load_settled_picks() -> list[dict]:
             # We still keep the row for flat strategies, marking it as
             # "unstaked" downstream; but most picks have both fields.
             pass
+        sanitized_prob, prob_corrupt = sanitize_backtest_probability(prob, odd)
         picks.append({
             "match_id": row.get("match_id"),
             "kickoff_utc": row.get("kickoff_utc"),
@@ -109,7 +126,9 @@ def load_settled_picks() -> list[dict]:
             "tier": (row.get("tier") or "").lower(),
             "result": result,
             "odd": odd if odd else 0.0,
-            "prob": prob if prob else 0.0,
+            "prob": sanitized_prob,
+            "prob_raw": prob if prob else 0.0,
+            "prob_corrupt": prob_corrupt,
             "edge": _num(row.get("edge")) or 0.0,
             "kelly": _num(row.get("kelly")) or 0.0,
         })

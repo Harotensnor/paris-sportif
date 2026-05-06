@@ -1413,3 +1413,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : ajout de sw.js, synthetic-monitor et post-deploy-health dans les filtres push/PR de qa-gates.
 - Verrou : scripts/audit_qa_workflows.py exige maintenant ces chemins critiques.
 - Résultat : 23/23 qa gate, service-worker probe vert; les gates rapides se déclenchent sur tout changement QA/cache critique.
+
+## Sprint v37.083 — AUTO 10/10 Backtest prob sanitation (20:20 UTC)
+- Hypothèse : les anciennes lignes prob_model=0.999 restent dans picks_history.jsonl et biaisent les stratégies Kelly.
+- Fix : sanitation du lecteur backtest; longshots prob>=0.95 à cote>10 deviennent abstention pour les stratégies probabilité-dépendantes.
+- Verrou : test pytest dédié dans 	ests/test_backtest_strategies.py + régénération acktest_strategies.json.
+- Résultat : outsider_only reste +121.14% ROI; Kelly corrompu ne bénéficie plus des probas 0.999 historiques.

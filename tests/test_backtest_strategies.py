@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 import backtest_strategies as bs  # noqa: E402
+import json
 
 
 def test_kelly_fraction_basic():
@@ -29,6 +30,41 @@ def test_kelly_fraction_handles_degenerate_inputs():
     assert bs.kelly_fraction(0.0, 2.0) == 0.0
     assert bs.kelly_fraction(1.0, 2.0) == 0.0
     assert bs.kelly_fraction(0.5, 1.0) == 0.0
+
+
+def test_load_settled_sanitizes_corrupt_999_longshot(tmp_path, monkeypatch):
+    history = tmp_path / "picks_history.jsonl"
+    rows = [
+        {
+            "match_id": "bad-longshot",
+            "result": "lost",
+            "odd_book": 32.0,
+            "prob_model": 0.999,
+            "edge": 0.50,
+            "tier": "out",
+            "settled_at": "2026-01-01T00:00:00Z",
+        },
+        {
+            "match_id": "high-fav",
+            "result": "won",
+            "odd_book": 1.10,
+            "prob_model": 0.999,
+            "edge": 0.02,
+            "tier": "safe",
+            "settled_at": "2026-01-02T00:00:00Z",
+        },
+    ]
+    history.write_text("\n".join(json.dumps(r) for r in rows), encoding="utf-8")
+    monkeypatch.setattr(bs, "HISTORY", history)
+
+    picks = bs.load_settled_picks()
+    by_id = {p["match_id"]: p for p in picks}
+
+    assert by_id["bad-longshot"]["prob"] == 0.0
+    assert by_id["bad-longshot"]["prob_corrupt"] is True
+    assert bs.stake_for("kelly_half", by_id["bad-longshot"], 1000.0) == 0.0
+    assert by_id["high-fav"]["prob"] == bs.MAX_MODEL_PROB
+    assert by_id["high-fav"]["prob_corrupt"] is True
 
 
 def test_settle_won_lost_void():
