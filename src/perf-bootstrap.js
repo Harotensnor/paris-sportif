@@ -141,12 +141,66 @@ function setupVitalsV2() {
   };
 }
 
+function setupDataBackups() {
+  if (!('indexedDB' in window)) return;
+  const dbName = 'paris_sportif_data_backups_v1';
+  const storageKey = 'paris_sportif_last_data_backup_at';
+  const everyMs = 24 * 60 * 60 * 1000;
+  const last = Number(localStorage.getItem(storageKey) || 0);
+  if (Number.isFinite(last) && Date.now() - last < everyMs) return;
+
+  const openDb = () => new Promise((resolve, reject) => {
+    const req = indexedDB.open(dbName, 1);
+    req.onupgradeneeded = () => {
+      const db = req.result;
+      if (!db.objectStoreNames.contains('snapshots')) db.createObjectStore('snapshots', { keyPath: 'id' });
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+
+  const put = (db, row) => new Promise((resolve, reject) => {
+    const tx = db.transaction('snapshots', 'readwrite');
+    tx.objectStore('snapshots').put(row);
+    tx.oncomplete = resolve;
+    tx.onerror = () => reject(tx.error);
+  });
+
+  const run = async () => {
+    try {
+      const db = await openDb();
+      const files = ['data.js', 'health.json', 'source_health.json', 'data_integrity_report.json'];
+      const ts = new Date().toISOString();
+      for (const file of files) {
+        const resp = await fetch(file, { cache: 'no-store' }).catch(() => null);
+        if (!resp || !resp.ok) continue;
+        const text = await resp.text();
+        await put(db, { id: `${file}:${ts.slice(0, 10)}`, file, ts, size: text.length, text });
+      }
+      localStorage.setItem(storageKey, String(Date.now()));
+      window.dispatchEvent(new CustomEvent('ps:data-backup', { detail: { ts } }));
+    } catch (error) {}
+  };
+
+  const schedule = window.requestIdleCallback || ((fn) => setTimeout(fn, 2500));
+  schedule(run);
+  window.__dataBackups = () => new Promise((resolve, reject) => {
+    openDb().then((db) => {
+      const tx = db.transaction('snapshots', 'readonly');
+      const req = tx.objectStore('snapshots').getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => reject(req.error);
+    }).catch(reject);
+  });
+}
+
 setupResourceHints();
 setupWorkers();
 setupNavigationPrefetch();
 setupImageFallbackOptimization();
 setupLongTaskTracking();
 setupVitalsV2();
+setupDataBackups();
 
 window.PS_ESM = Object.freeze({
   utils,

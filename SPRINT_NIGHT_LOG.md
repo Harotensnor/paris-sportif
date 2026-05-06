@@ -1230,3 +1230,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Assets: WebP + AVIF generés pour icones et OG; budget app.js 0.43KB gzip, CSS 46.75KB gzip; legacy reste 452.9KB gzip.
 - Vérifs: syntax OK, performance/UX/Kelly/evaluate tests 50/50, Lighthouse fallback 100/100/100/100 sur 4 pages x2, a11y 0, memory profile OK.
 
+
+## Sprint v37.018 — AUTO 10/10 Data integrity + monitoring (00:45 UTC)
+- Validation: data_integrity_monitor.py controle 11 sidecars sur structure/types/semantique et emet quarantaine + source_health.
+- Provenance: apply_data_lineage.py ajoute event.lineage sur 1018/1018 events avec audit trail append-only.
+- Monitoring: health.json expose sections pipeline/data/model/ui/tests, source health, traces et age generated_at reel.
+- Recovery: SW refuse de remplacer le cache par un data.js corrompu; backup IndexedDB quotidien des snapshots critiques.
+- Vérifs: pytest data integrity 5/5, build_health OK overall=warning/global=degraded, rapport DATA_INTEGRITY_REPORT.md et docs disaster/schema livres.

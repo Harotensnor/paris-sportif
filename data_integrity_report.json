@@ -1,0 +1,769 @@
+{
+  "generated_at": "2026-05-06T00:47:24Z",
+  "schema_version": 2,
+  "status": "degraded",
+  "sources_validated": 11,
+  "sources_ok": 2,
+  "sources_warning": 9,
+  "sources_critical": 0,
+  "quarantine_records": 11,
+  "anomalies_emitted": 11,
+  "results": [
+    {
+      "source": "winamax_catalog",
+      "file": "winamax_catalog.json",
+      "schema_version_target": 2,
+      "present": true,
+      "status": "warning",
+      "items": 777,
+      "issues": [
+        {
+          "ts": "2026-05-06T00:47:24Z",
+          "level": "info",
+          "source": "winamax_catalog",
+          "code": "schema_migration_available",
+          "message": "sidecar lu comme v1 et valide avec les règles v2"
+        },
+        {
+          "ts": "2026-05-06T00:47:24Z",
+          "level": "warning",
+          "source": "winamax_catalog",
+          "code": "freshness_sla",
+          "message": "source stale: 59min > 15min",
+          "age_min": 59,
+          "sla_min": 15
+        }
+      ],
+      "migration": {
+        "source": "winamax_catalog",
+        "from": 1,
+        "to": 2,
+        "mode": "runtime_non_mutating",
+        "changes": [
+          "add schema_version=2 at root",
+          "preserve payload keys",
+          "validate with v2 rules"
+        ]
+      },
+      "health_score": 92,
+      "schema_version": 1,
+      "size_bytes": 76024,
+      "sha256": "d0bd2215fdc565820060768f625cf0a2dd3caef393ffdfb3c243735b02da3bc7",
+      "age_min": 0,
+      "generated_at": "2026-05-05T23:48:53.473013Z",
+      "sla_min": 15,
+      "critical": true
+    },
+    {
+      "source": "winamax_markets",
+      "file": "winamax_markets.json",
+      "schema_version_target": 2,
+      "present": true,
+      "status": "warning",
+      "items": 773,
+      "issues": [
+        {
+          "ts": "2026-05-06T00:47:24Z",
+          "level": "info",
+          "source": "winamax_markets",
+          "code": "schema_migration_available",
+          "message": "sidecar lu comme v1 et valide avec les règles v2"
+        },
+        {
+          "ts": "2026-05-06T00:47:24Z",
+          "level": "warning",
+          "source": "winamax_markets",
+          "code": "freshness_sla",
+          "message": "source stale: 57min > 15min",
+          "age_min": 57,
+          "sla_min": 15
+        },
+        {
+          "ts": "2026-05-06T00:47:24Z",
+          "level": "warning",
+          "source": "winamax_markets",
+          "code": "bad_odd",
+          "message": "6 cote(s) invalides <1.01/non finies",
+          "sample": [
+            {
+              "path": "66456994.odds.dnb.home",
+              "odd": 1.0
+            },
+            {
+              "path": "66457070.odds.dnb.home",
+              "odd": 1.0
+            },
+            {
+              "path": "70708864.odds.dnb.home",
+              "odd": 1.0
+            },
+            {
+              "path": "1000102003.odds.1n2.home",
+              "odd": 1.0
+            },
+            {
+              "path": "69833416.odds.1n2.away",
+              "odd": 1.0
+            },
+            {
+              "path": "69833532.odds.1n2.away",
+              "odd": 1.0
+            }
+          ]
+        },
+        {
+          "ts": "2026-05-06T00:47:24Z",
+          "level": "warning",
+          "source": "winamax_markets",
+          "code": "high_odd_review",
+          "message": "16071 cote(s) >50 à surveiller",
+          "sample": [
+            {
+              "path": "61061645.odds.exact_scores.5-0",
+              "odd": 110.0
+            },
+            {
+              "path": "61061645.odds.exact_scores.5-1",
+              "odd": 100.0
+            },
+            {
+              "path": "61061645.odds.exact_scores.4-2",
+              "odd": 60.0
+            },
+            {
+              "path": "61061645.odds.exact_scores.5-2",
+              "odd": 150.0
+            },
+            {
+              "path": "61061645.odds.exact_scores.3-3",
+              "odd": 55.0
+            },
+            {
+              "path": "61061645.odds.exact_scores.4-3",
+              "odd": 110.0
+            },
+            {
+              "path": "61061645.odds.exact_scores.5-3",
+              "odd": 300.0
+            },
+            {
+              "path": "61061645.odds.exact_scores.0-4",
+              "odd": 60.0
+            },
+            {
+              "path": "61061645.odds.exact_scores.1-4",
+              "odd": 55.0
+            },
+            {
+              "path": "61061645.odds.exact_scores.2-4",
+              "odd": 65.0
+            }
+          ]
+        }
+      ],
+      "migration": {
+        "source": "winamax_markets",
+        "from": 1,
+        "to": 2,
+        "mode": "runtime_non_mutating",
+        "changes": [
+          "add schema_version=2 at root",
+          "preserve payload keys",
+          "validate with v2 rules"
+        ]
+      },
+      "health_score": 76,
+      "schema_version": 1,
+      "size_bytes": 10001578,
+      "sha256": "a24367dadba64cd490e3e3d65c8e1d0c607a2a360ca04f860df098ed22de79e6",
+      "age_min": 0,
+      "generated_at": "2026-05-05T23:49:59.423472+00:00",
+      "sla_min": 15,
+      "critical": true
+    },
+    {
+      "source": "injuries_soccer",
+      "file": "injuries_soccer.json",
+      "schema_version_target": 2,
+      "present": true,
+      "status": "warning",
+      "items": 411,
+      "issues": [
+        {
+          "ts": "2026-05-06T00:47:24Z",
+          "level": "info",
+          "source": "injuries_soccer",
+          "code": "schema_migration_available",
+          "message": "sidecar lu comme v1 et valide avec les règles v2"
+        },
+        {
+          "ts": "2026-05-06T00:47:24Z",
+          "level": "warning",
+          "source": "injuries_soccer",
+          "code": "freshness_sla",
+          "message": "source stale: 569min > 180min",
+          "age_min": 569,
+          "sla_min": 180
+        }
+      ],
+      "migration": {
+        "source": "injuries_soccer",
+        "from": 1,
+        "to": 2,
+        "mode": "runtime_non_mutating",
+        "changes": [
+          "add schema_version=2 at root",
+          "preserve payload keys",
+          "validate with v2 rules"
+        ]
+      },
+      "health_score": 57,
+      "schema_version": 1,
+      "size_bytes": 57810,
+      "sha256": "14e823ec5531c8493eab5015dc548ea553897e6e37280a5ccf4b87db8e183617",
+      "age_min": 569,
+      "generated_at": "2026-05-05T15:18:44Z",
+      "sla_min": 180,
+      "critical": false
+    },
+    {
+      "source": "lineups_soccer",
+      "file": "lineups_soccer.json",
+      "schema_version_target": 2,
+      "present": true,
+      "status": "warning",
+      "items": 97,
+      "issues": [
+        {
+          "ts": "2026-05-06T00:47:24Z",
+          "level": "info",
+          "source": "lineups_soccer",
+          "code": "schema_migration_available",
+          "message": "sidecar lu comme v1 et valide avec les règles v2"
+        },
+        {
+          "ts": "2026-05-06T00:47:24Z",
+          "level": "warning",
+          "source": "lineups_soccer",
+          "code": "freshness_sla",
+          "message": "source stale: 569min > 180min",
+          "age_min": 569,
+          "sla_min": 180
+        }
+      ],
+      "migration": {
+        "source": "lineups_soccer",
+        "from": 1,
+        "to": 2,
+        "mode": "runtime_non_mutating",
+        "changes": [
+          "add schema_version=2 at root",
+          "preserve payload keys",
+          "validate with v2 rules"
+        ]
+      },
+      "health_score": 57,
+      "schema_version": 1,
+      "size_bytes": 222508,
+      "sha256": "e468b43f1a1915229abce53dfea3f8fa5610106e81c6efcc3c9e60efd26baa04",
+      "age_min": 569,
+      "generated_at": "2026-05-05T15:18:42Z",
+      "sla_min": 180,
+      "critical": false
+    },
+    {
+      "source": "referees_soccer",
+      "file": "referees_soccer.json",
+      "schema_version_target": 2,
+      "present": true,
+      "status": "warning",
+      "items": 106,
+      "issues": [
+        {
+          "ts": "2026-05-06T00:47:24Z",
+          "level": "info",
+          "source": "referees_soccer",
+          "code": "schema_migration_available",
+          "message": "sidecar lu comme v1 et valide avec les règles v2"
+        },
+        {
+          "ts": "2026-05-06T00:47:24Z",
+          "level": "warning",
+          "source": "referees_soccer",
+          "code": "freshness_sla",
+          "message": "source stale: 569min > 180min",
+          "age_min": 569,
+          "sla_min": 180
+        }
+      ],
+      "migration": {
+        "source": "referees_soccer",
+        "from": 1,
+        "to": 2,
+        "mode": "runtime_non_mutating",
+        "changes": [
+          "add schema_version=2 at root",
+          "preserve payload keys",
+          "validate with v2 rules"
+        ]
+      },
+      "health_score": 57,
+      "schema_version": 1,
+      "size_bytes": 21805,
+      "sha256": "7413dc03398941d73d6115dccea4a200af0416f6d1204ff0331f6b5387407be0",
+      "age_min": 569,
+      "generated_at": "2026-05-05T15:18:41Z",
+      "sla_min": 180,
+      "critical": false
+    },
+    {
+      "source": "weather",
+      "file": "weather.json",
+      "schema_version_target": 2,
+      "present": true,
+      "status": "warning",
+      "items": 1104,
+      "issues": [
+        {
+          "ts": "2026-05-06T00:47:24Z",
+          "level": "info",
+          "source": "weather",
+          "code": "schema_migration_available",
+          "message": "sidecar lu comme v1 et valide avec les règles v2"
+        },
+        {
+          "ts": "2026-05-06T00:47:24Z",
+          "level": "warning",
+          "source": "weather",
+          "code": "freshness_sla",
+          "message": "source stale: 568min > 60min",
+          "age_min": 568,
+          "sla_min": 60
+        }
+      ],
+      "migration": {
+        "source": "weather",
+        "from": 1,
+        "to": 2,
+        "mode": "runtime_non_mutating",
+        "changes": [
+          "add schema_version=2 at root",
+          "preserve payload keys",
+          "validate with v2 rules"
+        ]
+      },
+      "health_score": 57,
+      "schema_version": 1,
+      "size_bytes": 357210,
+      "sha256": "e46819c7f4c5ff827cec7e79a5b53ccbcbe9f5e7f3a7710c1c54db78be9b518e",
+      "age_min": 567,
+      "generated_at": "2026-05-05T15:19:00.670066+00:00",
+      "sla_min": 60,
+      "critical": false
+    },
+    {
+      "source": "team_stats",
+      "file": "team_stats.json",
+      "schema_version_target": 2,
+      "present": true,
+      "status": "warning",
+      "items": 144,
+      "issues": [
+        {
+          "ts": "2026-05-06T00:47:24Z",
+          "level": "warning",
+          "source": "team_stats",
+          "code": "freshness_sla",
+          "message": "source stale: 567min > 300min",
+          "age_min": 567,
+          "sla_min": 300
+        }
+      ],
+      "migration": null,
+      "health_score": 61,
+      "schema_version": 2,
+      "size_bytes": 87625,
+      "sha256": "8da77afd562e06786fe34a7079a668820d5828e1d8e5ee3eb856c256f2b69b9a",
+      "age_min": 567,
+      "generated_at": "2026-05-05T15:20:39.122440+00:00",
+      "sla_min": 300,
+      "critical": false
+    },
+    {
+      "source": "clubelo",
+      "file": "clubelo.json",
+      "schema_version_target": 2,
+      "present": true,
+      "status": "warning",
+      "items": 630,
+      "issues": [
+        {
+          "ts": "2026-05-06T00:47:24Z",
+          "level": "info",
+          "source": "clubelo",
+          "code": "schema_migration_available",
+          "message": "sidecar lu comme v1 et valide avec les règles v2"
+        },
+        {
+          "ts": "2026-05-06T00:47:24Z",
+          "level": "warning",
+          "source": "clubelo",
+          "code": "freshness_sla",
+          "message": "source stale: 1555min > 1440min",
+          "age_min": 1555,
+          "sla_min": 1440
+        }
+      ],
+      "migration": {
+        "source": "clubelo",
+        "from": 1,
+        "to": 2,
+        "mode": "runtime_non_mutating",
+        "changes": [
+          "add schema_version=2 at root",
+          "preserve payload keys",
+          "validate with v2 rules"
+        ]
+      },
+      "health_score": 89,
+      "schema_version": 1,
+      "size_bytes": 84284,
+      "sha256": "327fa409b0c3890a31bb34be298f888380d42291e0db01d5c326c17e3105b8eb",
+      "age_min": 1548,
+      "generated_at": "2026-05-04T22:52:52.900509+00:00",
+      "sla_min": 1440,
+      "critical": false
+    },
+    {
+      "source": "sofascore_events",
+      "file": "sofascore_events.json",
+      "schema_version_target": 2,
+      "present": true,
+      "status": "warning",
+      "items": 1986,
+      "issues": [
+        {
+          "ts": "2026-05-06T00:47:24Z",
+          "level": "info",
+          "source": "sofascore_events",
+          "code": "schema_migration_available",
+          "message": "sidecar lu comme v1 et valide avec les règles v2"
+        },
+        {
+          "ts": "2026-05-06T00:47:24Z",
+          "level": "warning",
+          "source": "sofascore_events",
+          "code": "freshness_sla",
+          "message": "source stale: 59min > 30min",
+          "age_min": 59,
+          "sla_min": 30
+        }
+      ],
+      "migration": {
+        "source": "sofascore_events",
+        "from": 1,
+        "to": 2,
+        "mode": "runtime_non_mutating",
+        "changes": [
+          "add schema_version=2 at root",
+          "preserve payload keys",
+          "validate with v2 rules"
+        ]
+      },
+      "health_score": 58,
+      "schema_version": 1,
+      "size_bytes": 1050258,
+      "sha256": "98d8af19b272b45ec09fe79eaea994a06fb72eec68e3edd238e53aa7657777d4",
+      "age_min": 59,
+      "generated_at": "2026-05-05T23:48:51Z",
+      "sla_min": 30,
+      "critical": true
+    },
+    {
+      "source": "team_priors",
+      "file": "team_priors.json",
+      "schema_version_target": 2,
+      "present": true,
+      "status": "ok",
+      "items": 3730,
+      "issues": [
+        {
+          "ts": "2026-05-06T00:47:24Z",
+          "level": "info",
+          "source": "team_priors",
+          "code": "schema_migration_available",
+          "message": "sidecar lu comme v1 et valide avec les règles v2"
+        }
+      ],
+      "migration": {
+        "source": "team_priors",
+        "from": 1,
+        "to": 2,
+        "mode": "runtime_non_mutating",
+        "changes": [
+          "add schema_version=2 at root",
+          "preserve payload keys",
+          "validate with v2 rules"
+        ]
+      },
+      "health_score": 100,
+      "schema_version": 1,
+      "size_bytes": 1492191,
+      "sha256": "89d7c58d79fb50b90e9a8df2a2f3ded6ea80eb54edbe4737e0be3a7aa0b085e5",
+      "age_min": 227,
+      "generated_at": "2026-05-05T21:00:48Z",
+      "sla_min": 1440,
+      "critical": false
+    },
+    {
+      "source": "bayesian_priors",
+      "file": "bayesian_priors.json",
+      "schema_version_target": 2,
+      "present": true,
+      "status": "ok",
+      "items": 3,
+      "issues": [
+        {
+          "ts": "2026-05-06T00:47:24Z",
+          "level": "info",
+          "source": "bayesian_priors",
+          "code": "schema_migration_available",
+          "message": "sidecar lu comme v1 et valide avec les règles v2"
+        }
+      ],
+      "migration": {
+        "source": "bayesian_priors",
+        "from": 1,
+        "to": 2,
+        "mode": "runtime_non_mutating",
+        "changes": [
+          "add schema_version=2 at root",
+          "preserve payload keys",
+          "validate with v2 rules"
+        ]
+      },
+      "health_score": 100,
+      "schema_version": 1,
+      "size_bytes": 2950108,
+      "sha256": "1930019018cc38a710db3f59d424b6b0f5f395827ae00266ef37d2b5c60e41ef",
+      "age_min": 112,
+      "generated_at": "2026-05-05T22:55:11Z",
+      "sla_min": 1440,
+      "critical": false
+    }
+  ],
+  "lineage": {
+    "generated_at": "2026-05-06T00:47:24Z",
+    "status": "ok",
+    "events": 1018,
+    "events_missing_inline_lineage": 0,
+    "coverage_pct": 100.0,
+    "source_counts": {
+      "espn": 1018,
+      "winamax": 216,
+      "xg": 170,
+      "weather": 163,
+      "injuries": 133,
+      "h2h": 126,
+      "sofascore_referees": 96,
+      "clubelo": 95,
+      "sofascore_lineups": 48,
+      "smart_money": 3
+    },
+    "sample": [
+      {
+        "event_id": "401859369",
+        "sport": "football",
+        "league": "jleague",
+        "lineage": [
+          "espn",
+          "weather",
+          "winamax",
+          "xg"
+        ]
+      },
+      {
+        "event_id": "sofa_15388637",
+        "sport": "football",
+        "league": "erovnuliliga",
+        "lineage": [
+          "espn",
+          "winamax",
+          "xg"
+        ]
+      },
+      {
+        "event_id": "748480",
+        "sport": "football",
+        "league": "esp.1",
+        "lineage": [
+          "clubelo",
+          "espn",
+          "injuries",
+          "sofascore_lineups",
+          "sofascore_referees",
+          "weather",
+          "winamax",
+          "xg"
+        ]
+      },
+      {
+        "event_id": "sofa_14083495",
+        "sport": "football",
+        "league": "esp.1",
+        "lineage": [
+          "clubelo",
+          "espn",
+          "injuries",
+          "sofascore_lineups",
+          "sofascore_referees",
+          "weather",
+          "winamax",
+          "xg"
+        ]
+      },
+      {
+        "event_id": "401871166",
+        "sport": "hockey",
+        "league": "nhl",
+        "lineage": [
+          "espn",
+          "injuries",
+          "winamax"
+        ]
+      },
+      {
+        "event_id": "401870486",
+        "sport": "football",
+        "league": "ligamx",
+        "lineage": [
+          "espn",
+          "smart_money",
+          "weather",
+          "winamax",
+          "xg"
+        ]
+      },
+      {
+        "event_id": "sofa_16081441",
+        "sport": "football",
+        "league": "ligamxclausuraplayof",
+        "lineage": [
+          "espn",
+          "winamax",
+          "xg"
+        ]
+      },
+      {
+        "event_id": "401870484",
+        "sport": "football",
+        "league": "ligamx",
+        "lineage": [
+          "espn",
+          "weather",
+          "winamax",
+          "xg"
+        ]
+      }
+    ]
+  },
+  "kpis": {
+    "generated_at": "2026-05-06T00:47:24Z",
+    "sources_total": 11,
+    "sources_ok": 2,
+    "sources_warning": 9,
+    "sources_critical": 0,
+    "source_health_avg": 73.1,
+    "source_health_min": 57,
+    "by_source": {
+      "winamax_catalog": {
+        "score": 92,
+        "status": "warning",
+        "items": 777,
+        "age_min": 0,
+        "sla_min": 15,
+        "issues": 2
+      },
+      "winamax_markets": {
+        "score": 76,
+        "status": "warning",
+        "items": 773,
+        "age_min": 0,
+        "sla_min": 15,
+        "issues": 4
+      },
+      "injuries_soccer": {
+        "score": 57,
+        "status": "warning",
+        "items": 411,
+        "age_min": 569,
+        "sla_min": 180,
+        "issues": 2
+      },
+      "lineups_soccer": {
+        "score": 57,
+        "status": "warning",
+        "items": 97,
+        "age_min": 569,
+        "sla_min": 180,
+        "issues": 2
+      },
+      "referees_soccer": {
+        "score": 57,
+        "status": "warning",
+        "items": 106,
+        "age_min": 569,
+        "sla_min": 180,
+        "issues": 2
+      },
+      "weather": {
+        "score": 57,
+        "status": "warning",
+        "items": 1104,
+        "age_min": 567,
+        "sla_min": 60,
+        "issues": 2
+      },
+      "team_stats": {
+        "score": 61,
+        "status": "warning",
+        "items": 144,
+        "age_min": 567,
+        "sla_min": 300,
+        "issues": 1
+      },
+      "clubelo": {
+        "score": 89,
+        "status": "warning",
+        "items": 630,
+        "age_min": 1548,
+        "sla_min": 1440,
+        "issues": 2
+      },
+      "sofascore_events": {
+        "score": 58,
+        "status": "warning",
+        "items": 1986,
+        "age_min": 59,
+        "sla_min": 30,
+        "issues": 2
+      },
+      "team_priors": {
+        "score": 100,
+        "status": "ok",
+        "items": 3730,
+        "age_min": 227,
+        "sla_min": 1440,
+        "issues": 1
+      },
+      "bayesian_priors": {
+        "score": 100,
+        "status": "ok",
+        "items": 3,
+        "age_min": 112,
+        "sla_min": 1440,
+        "issues": 1
+      }
+    }
+  }
+}

@@ -11,7 +11,7 @@
 // The "Stamp sw.js" step replaces this entire line with the current UTC timestamp,
 // so every deploy invalidates all caches → users see the new pronostics.html
 // without needing Ctrl+Shift+R. Manual edits stay valid for local dev.
-const CACHE_VERSION = 'paris-sportif-20260506-033500';
+const CACHE_VERSION = 'paris-sportif-20260506-035000';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -179,6 +179,34 @@ function staleWhileRevalidate(req, cacheName) {
   });
 }
 
+// Data recovery: ne jamais remplacer un data.js cache par une réponse
+// manifestement corrompue. En cas de panne réseau ou de payload cassé, le
+// dernier snapshot valide reste servi.
+function staleWhileRevalidateData(req, cacheName) {
+  return caches.match(req).then(hit => {
+    const refresh = fetch(req).then(resp => {
+      if (!resp || !resp.ok) throw new Error('data response not ok');
+      const headers = resp.headers;
+      return resp.clone().text().then(text => {
+        if (!/window\.PRONOSTICS_DATA\s*=/.test(text)) {
+          throw new Error('data.js missing PRONOSTICS_DATA marker');
+        }
+        const safeResp = new Response(text, {
+          status: resp.status,
+          statusText: resp.statusText,
+          headers,
+        });
+        caches.open(cacheName).then(c => c.put(req, safeResp.clone()));
+        return safeResp;
+      });
+    }).catch(() => hit || new Response(
+      'window.PRONOSTICS_DATA_RECOVERY_ERROR = true;',
+      { status: 503, headers: { 'Content-Type': 'application/javascript; charset=utf-8' } }
+    ));
+    return hit || refresh;
+  });
+}
+
 self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET') return;
@@ -203,7 +231,12 @@ self.addEventListener('fetch', (event) => {
   }
 
   // Données lourdes : STALE-WHILE-REVALIDATE pour éviter le blocage 3G.
-  if (pathEndsWith(url, 'data.js') || pathEndsWith(url, 'odds_history.jsonl')) {
+  if (pathEndsWith(url, 'data.js')) {
+    event.respondWith(staleWhileRevalidateData(req, RUNTIME_CACHE));
+    return;
+  }
+
+  if (pathEndsWith(url, 'odds_history.jsonl')) {
     event.respondWith(staleWhileRevalidate(req, RUNTIME_CACHE));
     return;
   }
