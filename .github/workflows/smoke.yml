@@ -20,6 +20,7 @@ on:
       - 'scripts/probe_nav_chain.js'
       - 'scripts/probe_back_forward.js'
       - 'scripts/probe_data_freshness.js'
+      - 'scripts/probe_onboarding_fresh.js'
       - 'scripts/probe_strategies_outsider.js'
       - 'scripts/probe_prob_calibration_sport.js'
       - '.github/workflows/smoke.yml'
@@ -37,6 +38,7 @@ on:
       - 'scripts/probe_nav_chain.js'
       - 'scripts/probe_back_forward.js'
       - 'scripts/probe_data_freshness.js'
+      - 'scripts/probe_onboarding_fresh.js'
       - 'scripts/probe_strategies_outsider.js'
       - 'scripts/probe_prob_calibration_sport.js'
   workflow_dispatch: {}
@@ -119,6 +121,12 @@ jobs:
         # checks that fresh data hides stale warnings while >4h data shows
         # an explicit read-only/pipeline warning.
         run: node scripts/probe_data_freshness.js
+
+      - name: Run fresh onboarding probe
+        # Locks the first-run wizard: quick appearance, keyboard
+        # navigation, persisted completion/skip flags and no reappearance
+        # after reload.
+        run: node scripts/probe_onboarding_fresh.js
 
       - name: Run outsider strategy probe
         # Locks the Performance > Strategies surfacing of outsider_only

@@ -25592,7 +25592,11 @@ const esc2 = (typeof esc === 'function') ? esc : (s) => String(s).replace(/[&<>"
   function showOnboardingModal() {
     try {
       const prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}');
-      if (prefs.onboardingDone || localStorage.getItem('paris_sportif_onboarded_v1') === '1') return;
+      if (
+        prefs.onboardingDone ||
+        localStorage.getItem('paris_sportif_onboarded_v1') === '1' ||
+        localStorage.getItem('paris_sportif_onboarded_v2') === '1'
+      ) return;
       if (document.querySelector('.onboard-overlay')) return;
 
       const overlay = document.createElement('div');
@@ -25605,6 +25609,7 @@ const esc2 = (typeof esc === 'function') ? esc : (s) => String(s).replace(/[&<>"
       const savedBankroll = Number(localStorage.getItem('userBankroll')) || 50;
       const state = { step: 1, level: prefs.level || 'confirme', bankroll: savedBankroll };
       const totalSteps = 3;
+      let cleanupOnboardingKeyboard = null;
 
       const renderStep = () => {
         const progressPct = (state.step / totalSteps) * 100;
@@ -25732,7 +25737,8 @@ const esc2 = (typeof esc === 'function') ? esc : (s) => String(s).replace(/[&<>"
           if (!skipped && state.bankroll > 0) {
             localStorage.setItem('userBankroll', String(state.bankroll));
           }
-        } catch(e){}
+        } catch(e){ if (typeof prodWarn === 'function') prodWarn('onboarding_persist_failed', e); }
+        if (cleanupOnboardingKeyboard) cleanupOnboardingKeyboard();
         overlay.remove();
         try { if (typeof toast === 'function') toast(skipped ? '✓ Tutoriel ignoré' : `✓ Setup terminé · niveau ${state.level} · bankroll ${state.bankroll}€`, 'success'); } catch(e){}
         try { if (typeof applyPageView === 'function') applyPageView(); } catch(e){}
@@ -25742,8 +25748,24 @@ const esc2 = (typeof esc === 'function') ? esc : (s) => String(s).replace(/[&<>"
       };
 
       document.body.appendChild(overlay);
+      const onOnboardingKeydown = (ev) => {
+        if (!document.body.contains(overlay)) return;
+        if (ev.key === 'ArrowRight') {
+          ev.preventDefault();
+          if (state.step < totalSteps) { state.step++; renderStep(); }
+          else finish(false);
+        } else if (ev.key === 'ArrowLeft') {
+          ev.preventDefault();
+          if (state.step > 1) { state.step--; renderStep(); }
+        } else if (ev.key === 'Escape') {
+          ev.preventDefault();
+          finish(true);
+        }
+      };
+      document.addEventListener('keydown', onOnboardingKeydown);
+      cleanupOnboardingKeyboard = () => document.removeEventListener('keydown', onOnboardingKeydown);
       renderStep();
-    } catch(e) { /* noop */ }
+    } catch(e) { if (typeof prodWarn === 'function') prodWarn('onboarding_open_failed', e); }
   }
 
 
@@ -33731,12 +33753,7 @@ if (_userInteracted) return;  // user is doing something, don't interrupt
 if (document.querySelector('.modal.show, .modal[open], #share-modal.show')) return;
 try { if (typeof showOnboardingModal === 'function') showOnboardingModal(); } catch(e){}
 };
-const _delayOnboarding = () => setTimeout(_runOnboarding, 12000);
-if (typeof requestIdleCallback === 'function') {
-requestIdleCallback(_delayOnboarding, { timeout: 3000 });
-} else {
-_delayOnboarding();
-}
+setTimeout(_runOnboarding, 800);
 } catch(e){}
 
 document.addEventListener('keydown', (ev) => {

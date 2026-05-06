@@ -1267,3 +1267,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Verrou: `scripts/probe_back_forward.js` couvre dashboard → Tous → Performance → Crédibilité → Back/Forward → Historique.
 - CI: smoke.yml exécute la probe back/forward à chaque PR/push concerné.
 - Vérifs: `node --check legacy-app.js` OK, probe back/forward OK, SW/legacy hash/footer restampés.
+
+## Sprint v37.059 — AUTO 10/10 Fresh onboarding QA (16:29 UTC)
+- Symptôme: le premier tutoriel utilisateur était déclenché après 12s, trop tard pour le flux fresh user et non verrouillé en CI.
+- Fix: onboarding lancé après 800ms d'inactivité, flags v1/v2 respectés, navigation clavier ArrowLeft/ArrowRight/Escape ajoutée.
+- Verrou: `scripts/probe_onboarding_fresh.js` couvre apparition, clavier, completion, skip et non-réapparition après reload.
+- CI: smoke.yml exécute la probe onboarding fresh à chaque PR/push concerné.
+- Vérifs: probe onboarding fresh OK, SW/legacy hash/footer restampés.
