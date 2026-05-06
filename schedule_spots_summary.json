@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-06T16:22:28Z",
+  "generated_at": "2026-05-06T16:29:21Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -784,10 +784,10 @@
       }
     },
     {
-      "event_id": "401815229",
+      "event_id": "sofa_15501357",
       "source_event_ids": [
-        "401815229",
-        "sofa_15501357"
+        "sofa_15501357",
+        "401815229"
       ],
       "kickoff": "2026-05-06T22:40Z",
       "sport": "baseball",
@@ -953,10 +953,10 @@
       }
     },
     {
-      "event_id": "401815235",
+      "event_id": "sofa_15496115",
       "source_event_ids": [
-        "401815235",
-        "sofa_15496115"
+        "sofa_15496115",
+        "401815235"
       ],
       "kickoff": "2026-05-06T23:40Z",
       "sport": "baseball",
@@ -984,11 +984,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.498,
-        "away_score": 0.043,
-        "home_fade": 0.55,
+        "home_score": -0.098,
+        "away_score": -0.098,
+        "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Cincinnati Reds (+0.04)",
+        "reason": "Direction nette: Cincinnati Reds (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -1001,12 +1001,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
           }
         ]
       }
@@ -2300,8 +2294,8 @@
     {
       "event_id": "401815233",
       "source_event_ids": [
-        "401815233",
-        "sofa_15501355"
+        "sofa_15501355",
+        "401815233"
       ],
       "kickoff": "2026-05-06T23:05Z",
       "sport": "baseball",
@@ -2751,10 +2745,10 @@
       }
     },
     {
-      "event_id": "401815230",
+      "event_id": "sofa_15501356",
       "source_event_ids": [
-        "401815230",
-        "sofa_15501356"
+        "sofa_15501356",
+        "401815230"
       ],
       "kickoff": "2026-05-06T22:40Z",
       "sport": "baseball",
@@ -2784,11 +2778,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.546,
-        "away_score": -1.935,
+        "home_score": 0.196,
+        "away_score": -0.935,
         "home_fade": 0.15,
-        "away_fade": 1.988,
-        "reason": "Direction nette: Miami Marlins (+0.55)",
+        "away_fade": 0.988,
+        "reason": "Direction nette: Miami Marlins (+0.20)",
         "detail": [
           {
             "side": "home",
@@ -2804,12 +2798,6 @@
           },
           {
             "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.838
@@ -2820,8 +2808,8 @@
     {
       "event_id": "401815236",
       "source_event_ids": [
-        "401815236",
-        "sofa_15501352"
+        "sofa_15501352",
+        "401815236"
       ],
       "kickoff": "2026-05-06T23:40Z",
       "sport": "baseball",
@@ -2887,8 +2875,8 @@
     {
       "event_id": "401815232",
       "source_event_ids": [
-        "401815232",
-        "sofa_15501358"
+        "sofa_15501358",
+        "401815232"
       ],
       "kickoff": "2026-05-06T22:45Z",
       "sport": "baseball",
@@ -3458,22 +3446,16 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.15,
-        "away_score": 0.634,
+        "away_score": 0.052,
         "home_fade": 0.15,
         "away_fade": 0.0,
-        "reason": "Direction nette: Paris Saint-Germain (+0.63)",
+        "reason": "Direction nette: Paris Saint-Germain (+0.05)",
         "detail": [
           {
             "side": "home",
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.581
           }
         ]
       }
