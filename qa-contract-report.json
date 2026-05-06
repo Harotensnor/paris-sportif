@@ -1,0 +1,39 @@
+{
+  "generated_at": "2026-05-06T13:39:48Z",
+  "status": "ok",
+  "events": 1018,
+  "winamax_events": 216,
+  "winamax_pct": 21.22,
+  "sidecars": [
+    {
+      "name": "winamax_catalog.json",
+      "status": "ok",
+      "items": 3
+    },
+    {
+      "name": "winamax_markets.json",
+      "status": "ok",
+      "items": 773
+    },
+    {
+      "name": "health.json",
+      "status": "ok",
+      "items": 66
+    },
+    {
+      "name": "night_metrics.json",
+      "status": "ok",
+      "items": 22
+    },
+    {
+      "name": "picks_history_summary.json",
+      "status": "ok",
+      "items": 15
+    }
+  ],
+  "errors": [],
+  "warnings": [
+    "winamax_catalog.json: missing optional contract key matches",
+    "winamax_catalog.json: low item count 3 < 100"
+  ]
+}

@@ -6,7 +6,12 @@
   "scripts": {
     "test": "playwright test",
     "test:headed": "playwright test --headed",
-    "test:report": "playwright show-report"
+    "test:report": "playwright show-report",
+    "qa:unit": "node scripts/qa_unit_runner.js",
+    "qa:contract": "python scripts/qa_contract_tests.py",
+    "qa:gates": "python scripts/qa_quality_gate.py",
+    "qa:visual": "node scripts/qa_visual_regression.js",
+    "qa:report": "python scripts/qa_html_report.py"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.0",

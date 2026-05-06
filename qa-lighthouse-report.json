@@ -1,0 +1,29 @@
+{
+  "generated_at": "2026-05-06T13:37:16Z",
+  "status": "warning",
+  "scope": "lighthouse",
+  "local_result": "ci_delegated",
+  "reason": "npm/npx Lighthouse is not available in this local desktop runtime; the GitHub Actions Lighthouse workflow installs Lighthouse and produces the authoritative JSON/HTML artifact.",
+  "ci_workflow": ".github/workflows/lighthouse.yml",
+  "ci_artifact": "lighthouse-report",
+  "baseline_source": "lighthouse_phase9_summary.json",
+  "baseline_note": "Last local fallback Lighthouse-compatible baseline remains committed as a comparison artifact; CI remains the source of truth for real Lighthouse scores.",
+  "baseline_summary": {
+    "pages": 4,
+    "profiles": [
+      "mobile",
+      "desktop"
+    ],
+    "categories": [
+      "performance",
+      "accessibility",
+      "best-practices",
+      "seo"
+    ]
+  },
+  "quality_gate": {
+    "local_bundle_budget": "checked by scripts/qa_quality_gate.py",
+    "ci_lighthouse_thresholds": "checked by .github/workflows/lighthouse.yml",
+    "post_deploy_health": "checked by scripts/post_deploy_health_check.py"
+  }
+}

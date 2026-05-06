@@ -1260,3 +1260,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Personnalisation: recommandations basées sur picks ouverts, sport/ligue/tier/cote préférés, nav adaptative "Perso" et modules dashboard réordonnables.
 - Audit: `scripts/audit_local_analytics.py` + `analytics_local_privacy_audit.json`, spec Playwright `tests/local-analytics.spec.js`.
 - Vérifs: JS syntax OK, audit local analytics OK, captures Edge headless OK; refresh local rejeté par intégrité data (1018 → 240) puis restauré, SW paris-sportif-20260506-045500, footer v37.021.
+
+## Sprint v37.022 — AUTO 10/10 Tests + QA + CI/CD (05:30 UTC)
+- Tests: unit/property runner, data contracts, mutation smoke, snapshots, load test 1000 picks, visual regression Playwright et QA HTML report.
+- CI/CD: `qa-gates.yml` matrice 3 OS x 3 Node x 3 Python, cross-browser critical flows, synthetic monitor 15 min et post-deploy health avec rollback opt-in.
+- Runtime QA: `src/qa-runtime.js` centralise erreurs locales, export bug report JSON, canary 10% et audit privacy sans envoi automatique.
+- Docs: `QA_REPORT.md`, badges README et scripts npm `qa:*`.
+- Vérifs: qa_quality_gate OK, synthetic monitor OK, post-deploy health OK, visual local skipped faute Playwright local, SW paris-sportif-20260506-053000, footer v37.022.

@@ -1,0 +1,30 @@
+{
+  "generated_at": "2026-05-06T00:00:00Z",
+  "description": "Small deterministic fixtures for QA unit/integration tests.",
+  "matches": [
+    {
+      "id": "fixture-foot-001",
+      "sport": "football",
+      "league": "Ligue QA",
+      "date": "2026-05-06T18:00:00Z",
+      "home": "Paris QA",
+      "away": "Lyon QA",
+      "winamax": { "available": true, "match_id": "wqa001" },
+      "data_quality": 0.92,
+      "league_trust": 0.71,
+      "expected": { "tier": "value", "min_quality_score": 60 }
+    },
+    {
+      "id": "fixture-tennis-001",
+      "sport": "tennis",
+      "league": "ATP QA",
+      "date": "2026-05-06T13:00:00Z",
+      "home": "Player A",
+      "away": "Player B",
+      "winamax": { "available": true, "match_id": "wqa002" },
+      "data_quality": 0.78,
+      "league_trust": 0.62,
+      "expected": { "tier": "solid", "min_quality_score": 50 }
+    }
+  ]
+}
