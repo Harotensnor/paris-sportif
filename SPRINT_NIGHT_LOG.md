@@ -1274,3 +1274,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Cron: audits LightGBM/data truth/MCP non critiques passent en warning au lieu de bloquer le workflow refresh-data.
 - Sync: `night_metrics.json` et `health.json` régénérés depuis data.js, freshness OK.
 - Vérifs: check_data_integrity OK (+20.8% exact), audit_data_truth OK, check_pipeline_freshness OK, SW paris-sportif-20260506-140300, footer v37.023.
+
+## Sprint v37.024 — AUTO 10/10 Dashboard horizon dense (14:24 UTC)
+- UX: l'accueil bascule automatiquement sur les 7 prochains jours quand la date locale a moins de 60 matchs restants.
+- Debug: `?debug=1` expose la date initiale, le pool initial, le seuil dense et la raison du basculement horizon.
+- Cohérence: la ligne de couverture calcule le taux de qualification sur le scope affiché, plus sur tout le dataset.
+- Cache: footer v37.024 et SW paris-sportif-20260506-142400.
