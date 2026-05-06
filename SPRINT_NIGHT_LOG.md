@@ -1245,3 +1245,11 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Données user: export/import JSON avec validation, effacement complet et modal confidentialité premier visit.
 - Légal: politique zéro tracking enrichie pour QR, PDF, JSON, amis et badges locaux.
 - Vérifs: privacy audit OK (0 primitive réseau), JS syntax OK, SW paris-sportif-20260506-041500, footer v37.019.
+
+
+## Sprint v37.020 — AUTO 10/10 Documentation + onboarding pro (04:30 UTC)
+- Docs: wiki interne 8 pages, ADR x20, glossaire 258 termes, FAQ 55 questions, runbook, API reference et sitemap.
+- Automation: build_changelog.py génère CHANGELOG.md depuis git; build_docs_pack.py régénère le corpus docs + index search.
+- UI aide: module docs-onboarding.js branche #faq, #tour, bouton aide global, recherche Académie et onboarding 8 étapes.
+- Vendor: lunr.min.js local pour recherche documentaire sans service distant.
+- Vérifs: JS syntax OK, inline scripts OK, docs counts OK, SW paris-sportif-20260506-043000, footer v37.020.
