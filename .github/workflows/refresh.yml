@@ -182,6 +182,11 @@ jobs:
             python3 build_betting_intelligence.py || true
             python3 build_market_auc.py || true
             python3 build_backtest_training_rows.py || true
+            # v37.025 — Multi-strategy backtest + Monte Carlo drawdown.
+            # Reads picks_history.jsonl, writes backtest_strategies.json
+            # consumed by Performance > Stratégies tab. Keep || true so a
+            # transient empty history file doesn't kill the cron.
+            python3 backtest_strategies.py || true
             python3 train_lightgbm.py || true
             python3 build_lightgbm_runtime.py || true
             python3 audit_lightgbm_runtime.py

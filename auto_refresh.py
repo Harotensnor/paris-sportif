@@ -137,6 +137,8 @@ PATCH_STAGES = [
     ('build_betting_intelligence.py', 1,  30),
     ('build_market_auc.py',         1,   15),
     ('build_backtest_training_rows.py', 1, 30),
+    # v37.025 — Multi-strategy backtest + Monte Carlo drawdown.
+    ('backtest_strategies.py',      1,   30),
     ('train_lightgbm.py',           1,   30),
     ('build_lightgbm_runtime.py',   1,   15),
     ('audit_lightgbm_runtime.py',   1,   15),

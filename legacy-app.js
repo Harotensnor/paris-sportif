@@ -7253,6 +7253,24 @@ __marketBacktestLoaded = true;
 return __marketBacktestPromise;
 }
 try { window._loadMarketBacktest = _loadMarketBacktest; } catch(e){}
+let __strategyBacktestLoaded = false;
+let __strategyBacktestPromise = null;
+async function _loadStrategyBacktest() {
+if (__strategyBacktestLoaded || __strategyBacktestPromise) return __strategyBacktestPromise;
+__strategyBacktestPromise = (async () => {
+try {
+const r = await fetch('backtest_strategies.json?v=' + Math.floor(Date.now() / (60 * 60 * 1000)), { cache: 'default' });
+if (!r.ok) { __strategyBacktestLoaded = true; return; }
+const rep = await r.json();
+window.__backtestStrategies = rep;
+__strategyBacktestLoaded = true;
+} catch(e) {
+__strategyBacktestLoaded = true;
+}
+})();
+return __strategyBacktestPromise;
+}
+try { window._loadStrategyBacktest = _loadStrategyBacktest; } catch(e){}
 _loadModelCalibration();
 
 function _populateTrustStrip(rep) {
@@ -28233,6 +28251,21 @@ requestIdleCallback(reschedule, { timeout: 1500 });
 setTimeout(reschedule, 50);
 }
 }
+// v37.025 — Strategies tab payload (flat/Kelly/value-only/sharp-only/safe-blend
+// + Monte Carlo). Lazy-loaded from backtest_strategies.json so the dashboard
+// boot stays light when the user never opens the Strategies tab.
+if (typeof window._loadStrategyBacktest === 'function' && !window.__backtestStrategies) {
+const reschedule = () => {
+window._loadStrategyBacktest().then(() => {
+if (document.body.contains(wrap)) renderPerformancePage(wrap);
+});
+};
+if (typeof requestIdleCallback === 'function') {
+requestIdleCallback(reschedule, { timeout: 1500 });
+} else {
+setTimeout(reschedule, 80);
+}
+}
 const bt = window.__backtestReportV2 || window.__backtestReport;
 if (!bt) {
 wrap.innerHTML = `
@@ -28321,12 +28354,13 @@ const archiveNote = archiveSummary
 ? `<div style="margin:10px 0 0;padding:10px 12px;background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.20);border-radius:var(--r-sm);font-size:12px;color:var(--text-dim);">Performance modèle : <b class="u-text">${Number(archiveSummary.total || 0)} pronos générés</b> dans l'archive persistante · <b class="u-text">${Number(archiveSummary.settled || 0)}</b> réglés. Bilan personnel : uniquement les paris que tu suis manuellement.</div>`
 : '';
 const tabs = [
-{ k: 'global',    lbl: '🎯 Vue globale' },
-{ k: 'periode',   lbl: '📆 Par période' },
-{ k: 'confiance', lbl: '🎚️ Par confiance' },
-{ k: 'marche',    lbl: '🏷️ Par marché' },
-{ k: 'sport',     lbl: '🏆 Par sport' },
-{ k: 'ligue',     lbl: '⚽ Par ligue' },  // v33.10 — drill-down par ligue
+{ k: 'global',     lbl: '🎯 Vue globale' },
+{ k: 'periode',    lbl: '📆 Par période' },
+{ k: 'confiance',  lbl: '🎚️ Par confiance' },
+{ k: 'marche',     lbl: '🏷️ Par marché' },
+{ k: 'sport',      lbl: '🏆 Par sport' },
+{ k: 'ligue',      lbl: '⚽ Par ligue' },  // v33.10 — drill-down par ligue
+{ k: 'strategies', lbl: '⚖️ Stratégies' },  // v37.025 — staking comparison + Monte Carlo
 ];
 const subTabsHtml = `
       <div style="margin-top:14px;display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:8px;">
@@ -28884,6 +28918,199 @@ ${rows.length > 30 ? `<div style="margin-top:8px;font-size:11px;color:var(--text
 <b class="u-text-brand">💡 Comment lire :</b> ★ = top 3 par Kelly cumul. <b class="u-text-accent">Kelly +Xu</b> = profit total que tu aurais fait en pariant 1u Kelly sur cette ligue. <b class="u-text-danger">Kelly négatif</b> = à éviter sur cette ligue (modèle pas calibré). Brier ≤0.18 = excellent, ≤0.22 = bon, ≤0.25 = correct, &gt;0.30 = insuffisant.
 </div>
 </div>`;
+        })() : ''}
+
+        ${currentTab === 'strategies' ? (() => {
+          // v37.025 — Strategies tab. Renders the bankroll-sizing comparison
+          // (6 strategies on every settled pick from picks_history.jsonl) +
+          // Monte Carlo distribution of ROI/drawdown for the 3 most user-
+          // actionable strategies. Lazy-loaded from backtest_strategies.json.
+          const sb = window.__backtestStrategies;
+          if (!sb || !sb.strategies) {
+            return `<div style="margin-top:18px;padding:24px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);text-align:center;color:var(--text-dim);">
+              <div style="font-size:14px;margin-bottom:6px;">⏳ Comparatif des stratégies en cours de chargement…</div>
+              <div style="font-size:12px;color:var(--text-dim2);">Si rien ne s'affiche, lance <code>python scripts/backtest_strategies.py</code> pour générer <code>backtest_strategies.json</code>.</div>
+            </div>`;
+          }
+          const lb = Array.isArray(sb.leaderboard) ? sb.leaderboard : [];
+          const strategies = sb.strategies || {};
+          const mc = sb.monte_carlo || {};
+          const labels = {
+            flat: 'Flat 1u',
+            kelly_full: 'Kelly plein',
+            kelly_half: 'Kelly demi',
+            value_only: 'Value-only (edge ≥5pt)',
+            sharp_only: 'Sharp-only (tier safe/solid)',
+            safe_blend: 'Safe blend (Kelly demi + tier safe)',
+          };
+          const fmtPctSigned = (v) => {
+            if (v == null || !isFinite(v)) return '—';
+            const num = Number(v) * 100;
+            const sign = num >= 0 ? '+' : '';
+            return `${sign}${num.toFixed(2)}%`;
+          };
+          const fmtPctAbs = (v) => {
+            if (v == null || !isFinite(v)) return '—';
+            return `${(Number(v) * 100).toFixed(2)}%`;
+          };
+          const fmtSignU = (v) => {
+            if (v == null || !isFinite(v)) return '—';
+            const num = Number(v);
+            return `${num >= 0 ? '+' : ''}${num.toFixed(1)}u`;
+          };
+          const colorRoi = (v) => {
+            if (v == null) return 'var(--text-dim)';
+            const n = Number(v);
+            if (n >= 0.10) return 'var(--accent)';
+            if (n >= 0) return 'var(--text)';
+            if (n >= -0.05) return 'var(--warn,#fbbf24)';
+            return 'var(--danger)';
+          };
+          const colorDD = (v) => {
+            if (v == null) return 'var(--text-dim)';
+            const n = Number(v);
+            if (n <= 0.05) return 'var(--accent)';
+            if (n <= 0.15) return 'var(--text)';
+            if (n <= 0.30) return 'var(--warn,#fbbf24)';
+            return 'var(--danger)';
+          };
+          // Best/worst summary chips.
+          const best = lb[0];
+          const worst = lb[lb.length - 1];
+          const headerHtml = `
+<div style="margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;">
+<div style="padding:13px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
+  <div style="font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:4px;">Picks réglés</div>
+  <div style="font-size:22px;color:var(--text);font-weight:700;font-variant-numeric:tabular-nums;">${Number(sb.settled_picks || 0).toLocaleString('fr-FR')}</div>
+  <div style="font-size:11px;color:var(--text-dim);margin-top:2px;">won/lost/void</div>
+</div>
+<div style="padding:13px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
+  <div style="font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:4px;">Bankroll initial</div>
+  <div style="font-size:22px;color:var(--text);font-weight:700;font-variant-numeric:tabular-nums;">${Number(sb.initial_bankroll || 0).toLocaleString('fr-FR')}u</div>
+  <div style="font-size:11px;color:var(--text-dim);margin-top:2px;">cap Kelly ${(Number(sb.kelly_cap || 0) * 100).toFixed(0)}% / pari</div>
+</div>
+${best ? `<div style="padding:13px 14px;background:rgba(52,211,153,.06);border:1px solid var(--brand-soft);border-radius:var(--r-sm);">
+  <div style="font-size:10.5px;color:var(--accent);text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:4px;">★ Meilleure ROI</div>
+  <div style="font-size:18px;color:var(--text);font-weight:700;">${esc(labels[best.strategy] || best.strategy)}</div>
+  <div style="font-size:13px;color:var(--accent);font-weight:700;font-variant-numeric:tabular-nums;margin-top:2px;">${fmtPctSigned(best.roi)} sur ${best.bets_placed} paris</div>
+</div>` : ''}
+${worst ? `<div style="padding:13px 14px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.20);border-radius:var(--r-sm);">
+  <div style="font-size:10.5px;color:var(--danger);text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:4px;">⚠ Moins bonne ROI</div>
+  <div style="font-size:18px;color:var(--text);font-weight:700;">${esc(labels[worst.strategy] || worst.strategy)}</div>
+  <div style="font-size:13px;color:var(--danger);font-weight:700;font-variant-numeric:tabular-nums;margin-top:2px;">${fmtPctSigned(worst.roi)} sur ${worst.bets_placed} paris</div>
+</div>` : ''}
+</div>`;
+          // Comparison table.
+          const orderedKeys = lb.length ? lb.map(r => r.strategy) : Object.keys(strategies);
+          const tableHtml = `
+<div class="u-mt-18" style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;font-variant-numeric:tabular-nums;">
+<div style="display:grid;grid-template-columns:minmax(0,1.6fr) 70px 80px 90px 90px 80px 80px;gap:8px;padding:10px 14px;background:var(--panel-2);border-bottom:1px solid var(--border);font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.5px;font-weight:700;">
+<div>Stratégie</div>
+<div class="u-text-right">Paris</div>
+<div class="u-text-right">Hit %</div>
+<div class="u-text-right">ROI</div>
+<div class="u-text-right">Profit</div>
+<div class="u-text-right">DD max</div>
+<div class="u-text-right">Sharpe</div>
+</div>
+${orderedKeys.map((k, idx) => {
+const r = strategies[k];
+if (!r) return '';
+const isBest = idx === 0;
+return `
+<div style="display:grid;grid-template-columns:minmax(0,1.6fr) 70px 80px 90px 90px 80px 80px;gap:8px;padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;${isBest ? 'background:rgba(52,211,153,.04);' : ''}">
+<div style="color:var(--text);font-weight:600;">${isBest ? '<span style="color:var(--accent);margin-right:4px;">★</span>' : ''}${esc(labels[k] || k)}</div>
+<div style="text-align:right;color:var(--text-dim);">${r.bets_placed || 0}</div>
+<div style="text-align:right;color:var(--text);">${(Number(r.hit_rate || 0) * 100).toFixed(1)}%</div>
+<div style="text-align:right;color:${colorRoi(r.roi)};font-weight:700;">${fmtPctSigned(r.roi)}</div>
+<div style="text-align:right;color:${(r.profit || 0) >= 0 ? 'var(--accent)' : 'var(--danger)'};font-weight:600;">${fmtSignU(r.profit)}</div>
+<div style="text-align:right;color:${colorDD(r.max_drawdown_pct)};font-weight:600;">${fmtPctAbs(r.max_drawdown_pct)}</div>
+<div style="text-align:right;color:var(--text-dim);font-size:12px;">${(r.sharpe_per_bet || 0).toFixed(3)}</div>
+</div>`;
+}).join('')}
+</div>`;
+          // Bankroll curves (sparkline-style SVG, one path per strategy).
+          const curveColors = {
+            flat: '#60a5fa',
+            kelly_full: '#a78bfa',
+            kelly_half: '#22d3ee',
+            value_only: '#34d399',
+            sharp_only: '#fbbf24',
+            safe_blend: '#f472b6',
+          };
+          const curves = orderedKeys
+            .map(k => ({ key: k, curve: (strategies[k] || {}).bankroll_curve || [] }))
+            .filter(x => x.curve.length > 1);
+          const curveSvg = (() => {
+            if (!curves.length) return '';
+            const W = 800;
+            const H = 200;
+            const PAD = 6;
+            const allMin = Math.min(...curves.flatMap(x => x.curve));
+            const allMax = Math.max(...curves.flatMap(x => x.curve));
+            const range = Math.max(1, allMax - allMin);
+            const yFor = (v) => H - PAD - ((v - allMin) / range) * (H - 2 * PAD);
+            const xFor = (i, n) => PAD + (i / Math.max(1, n - 1)) * (W - 2 * PAD);
+            const init = Number(sb.initial_bankroll || 1000);
+            const initY = yFor(init);
+            const paths = curves.map(({ key, curve }) => {
+              const d = curve.map((v, i) => `${i === 0 ? 'M' : 'L'}${xFor(i, curve.length).toFixed(1)},${yFor(v).toFixed(1)}`).join(' ');
+              return `<path d="${d}" fill="none" stroke="${curveColors[key] || '#94a3b8'}" stroke-width="1.6" opacity=".95"/>`;
+            }).join('');
+            const legend = curves.map(({ key }) => `<span style="display:inline-flex;align-items:center;gap:5px;margin-right:14px;font-size:11.5px;color:var(--text-dim);"><span style="width:12px;height:3px;background:${curveColors[key] || '#94a3b8'};border-radius:2px;"></span>${esc(labels[key] || key)}</span>`).join('');
+            return `
+<div class="u-mt-18" style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px;">
+<div style="font-size:13px;color:var(--text-dim);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+<span><b class="u-text">Évolution du bankroll</b> · ${curves[0].curve.length} points (sous-échantillonnés)</span>
+<span style="font-size:11px;color:var(--text-dim2);">Pointillé = bankroll initial (${init}u)</span>
+</div>
+<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:200px;display:block;">
+<line x1="${PAD}" y1="${initY.toFixed(1)}" x2="${W - PAD}" y2="${initY.toFixed(1)}" stroke="var(--border-2)" stroke-width="1" stroke-dasharray="4 3"/>
+${paths}
+</svg>
+<div style="margin-top:10px;line-height:1.9;">${legend}</div>
+</div>`;
+          })();
+          // Monte Carlo box.
+          const mcEntries = Object.entries(mc);
+          const mcHtml = mcEntries.length ? `
+<div class="u-mt-18">
+<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">🎲 Monte Carlo · distribution sur ${(mc[mcEntries[0][0]] || {}).season_length || 200} paris</div>
+<div style="font-size:12px;color:var(--text-dim);margin-bottom:14px;">${Number((mc[mcEntries[0][0]] || {}).samples || 0).toLocaleString('fr-FR')} simulations bootstrap : on tire au hasard ${(mc[mcEntries[0][0]] || {}).season_length || 200} picks dans l'historique et on compte combien de "saisons" finissent en positif, le drawdown médian, etc.</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;">
+${mcEntries.map(([k, m]) => {
+const roi = m.roi || {};
+const dd = m.max_drawdown_pct || {};
+const pNeg = Number(m.p_roi_negative || 0);
+const pBust = Number(m.p_bust_at_50pct || 0);
+const negColor = pNeg <= 0.20 ? 'var(--accent)' : pNeg <= 0.40 ? 'var(--text)' : pNeg <= 0.60 ? 'var(--warn,#fbbf24)' : 'var(--danger)';
+const bustColor = pBust <= 0.02 ? 'var(--accent)' : pBust <= 0.10 ? 'var(--warn,#fbbf24)' : 'var(--danger)';
+return `
+<div style="padding:14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
+<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;">${esc(labels[k] || k)}</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;font-size:12.5px;">
+<div><span style="color:var(--text-dim);">ROI médian :</span> <b style="color:${colorRoi(roi.p50)};">${fmtPctSigned(roi.p50)}</b></div>
+<div><span style="color:var(--text-dim);">DD médian :</span> <b style="color:${colorDD(dd.p50)};">${fmtPctAbs(dd.p50)}</b></div>
+<div><span style="color:var(--text-dim);">ROI p5 (worst) :</span> <b style="color:${colorRoi(roi.p5)};">${fmtPctSigned(roi.p5)}</b></div>
+<div><span style="color:var(--text-dim);">DD p95 (worst) :</span> <b style="color:${colorDD(dd.p95)};">${fmtPctAbs(dd.p95)}</b></div>
+<div><span style="color:var(--text-dim);">ROI p95 (best) :</span> <b style="color:${colorRoi(roi.p95)};">${fmtPctSigned(roi.p95)}</b></div>
+<div><span style="color:var(--text-dim);">P(ROI &lt; 0) :</span> <b style="color:${negColor};">${(pNeg * 100).toFixed(1)}%</b></div>
+<div style="grid-column:1/-1;padding-top:6px;border-top:1px solid var(--border-2);"><span style="color:var(--text-dim);">P(bankroll &lt; 50%) :</span> <b style="color:${bustColor};">${(pBust * 100).toFixed(2)}%</b></div>
+</div>
+</div>`;
+}).join('')}
+</div>
+</div>` : '';
+          const helpHtml = `
+<div style="margin-top:14px;padding:12px 14px;background:rgba(167,139,250,.06);border:1px solid var(--brand-soft);border-radius:var(--r-sm);font-size:12.5px;color:var(--text-dim);line-height:1.6;">
+<b class="u-text-brand">💡 Comment lire :</b>
+<b class="u-text">Flat 1u</b> = mise plate sur chaque pick (référence honnête).
+<b class="u-text">Kelly demi</b> = mise proportionnelle à l'edge, divisée par 2 (compromis croissance / risque). Plafond ${(Number(sb.kelly_cap || 0) * 100).toFixed(0)}% du bankroll par pari.
+<b class="u-text">Value-only</b> = filtre les picks edge ≥${(Number(sb.value_edge_min || 0) * 100).toFixed(0)}pt — moins de paris, meilleure ROI moyenne.
+<b class="u-text">Sharp-only</b> = uniquement tier safe / solid (échantillon plus petit, à monitorer).
+<b class="u-text">Monte Carlo</b> = "si je joue 200 picks au hasard tirés de l'historique 10 000 fois, à quoi ressemble la distribution de ROI ?" — sert à juger si la perf actuelle est <i>réelle</i> ou dans le bruit.
+</div>`;
+          return `<div class="u-mt-18">${headerHtml}${tableHtml}${curveSvg}${mcHtml}${helpHtml}</div>`;
         })() : ''}
 
         ${''}
