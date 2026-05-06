@@ -1600,3 +1600,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : e2e-tests lance une matrice par projet Playwright, avec artefact séparé par viewport.
 - Verrou : audit_qa_workflows.py exige la matrice projet et la commande `${{ matrix.project }}`.
 - Résultat : le test mobile garde son invariant sans bloquer le projet desktop ni consumer le budget complet.
+
+## Sprint v37.110 — AUTO 10/10 Cron resync matrix (23:31 UTC)
+- Hypothèse : le cron data a avancé main juste après le fix e2e matrix.
+- Fix : merge origin/main, données cron conservées, shell v37.110 restampé.
+- Verrou : audit_data_truth.py et stamp_asset_hashes.py gardent l'âge data et les hashes cohérents.
+- Résultat : la PR repart sur le snapshot main frais avec le split Playwright conservé.
