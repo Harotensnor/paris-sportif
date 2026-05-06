@@ -23924,12 +23924,42 @@ if (found) openDetail(found);
 wrap.querySelectorAll('[data-calendar-day-jump]').forEach(btn => {
 btn.addEventListener('click', () => {
 const day = btn.dataset.calendarDayJump || '';
-const rows = Array.from(wrap.querySelectorAll('.tous-row[data-match-date]'));
-const row = rows.find(r => {
-const ts = new Date(r.dataset.matchDate || '').getTime();
-return Number.isFinite(ts) && _calendarDayKey(ts) === day;
-});
-if (row) row.scrollIntoView({ block: 'center', behavior: 'smooth' });
+// v37.039 — the previous handler queried .tous-row[data-match-date]
+// which only exists in the list view; from the calendar view itself
+// rows is always empty and the click did nothing. Switch to list view
+// first, then on the next render the scroll handler at hashchange
+// jumps to the requested day.
+let foundInline = false;
+try {
+  const calRows = Array.from(wrap.querySelectorAll('.tous-row[data-match-date]'));
+  const row = calRows.find(r => {
+    const ts = new Date(r.dataset.matchDate || '').getTime();
+    return Number.isFinite(ts) && _calendarDayKey(ts) === day;
+  });
+  if (row) {
+    row.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    foundInline = true;
+  }
+} catch(e) {}
+if (!foundInline) {
+  // We were probably in calendar view. Strip the ?view=calendar query
+  // from the hash so the next render falls back to the list view; then
+  // scroll to the first row matching the target day.
+  try {
+    const newHash = '#tous';
+    if (location.hash !== newHash) {
+      history.replaceState(null, '', location.pathname + location.search + newHash);
+    }
+  } catch(e) {}
+  renderTousPage(wrap);
+  // After re-render, scroll to the first row of that day if any.
+  setTimeout(() => {
+    try {
+      const target = wrap.querySelector(`.tous-row[data-match-date^="${day}"]`);
+      if (target) target.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    } catch(e) {}
+  }, 200);
+}
 });
 });
 
