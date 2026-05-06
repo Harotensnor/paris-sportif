@@ -187,6 +187,10 @@ jobs:
             # consumed by Performance > Stratégies tab. Keep || true so a
             # transient empty history file doesn't kill the cron.
             python3 backtest_strategies.py || true
+            # v37.028 — Tier calibration: WR/ROI vs implied per tier badge.
+            # Surfaces overconfident tiers (safe / solid currently lose money)
+            # to the UI so users see the historical reality next to the badge.
+            python3 build_tier_calibration.py || true
             python3 train_lightgbm.py || true
             python3 build_lightgbm_runtime.py || true
             python3 audit_lightgbm_runtime.py

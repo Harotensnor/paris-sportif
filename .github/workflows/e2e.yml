@@ -48,6 +48,12 @@ jobs:
         run: python3 scripts/check_pipeline_drift.py
       - name: Check no conflict markers (anti-rebase-fail safety)
         run: python3 scripts/check_no_conflict_markers.py
+      - name: Check CSP inline script hashes (v37.028)
+        # Each inline <script> in pronostics.html must have its SHA-256
+        # listed in the meta CSP. Catches the v37.025 regression where
+        # editing a comment inside an inline script silently broke its
+        # hash and made the script fail to execute under strict CSP.
+        run: python3 scripts/audit_csp_inline_hashes.py
       - name: Check health.json quality_checks (sprint 1 #4)
         run: python3 scripts/check_health_quality.py
       - name: Check bundle size budget (sprint 6 #30)

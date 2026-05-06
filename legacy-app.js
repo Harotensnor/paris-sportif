@@ -7271,6 +7271,24 @@ __strategyBacktestLoaded = true;
 return __strategyBacktestPromise;
 }
 try { window._loadStrategyBacktest = _loadStrategyBacktest; } catch(e){}
+let __tierCalibrationLoaded = false;
+let __tierCalibrationPromise = null;
+async function _loadTierCalibration() {
+if (__tierCalibrationLoaded || __tierCalibrationPromise) return __tierCalibrationPromise;
+__tierCalibrationPromise = (async () => {
+try {
+const r = await fetch('tier_calibration.json?v=' + Math.floor(Date.now() / (60 * 60 * 1000)), { cache: 'default' });
+if (!r.ok) { __tierCalibrationLoaded = true; return; }
+const rep = await r.json();
+window.__tierCalibration = rep;
+__tierCalibrationLoaded = true;
+} catch(e) {
+__tierCalibrationLoaded = true;
+}
+})();
+return __tierCalibrationPromise;
+}
+try { window._loadTierCalibration = _loadTierCalibration; } catch(e){}
 _loadModelCalibration();
 
 function _populateTrustStrip(rep) {
@@ -28266,6 +28284,20 @@ requestIdleCallback(reschedule, { timeout: 1500 });
 setTimeout(reschedule, 80);
 }
 }
+// v37.028 — Tier calibration payload (historical WR vs implied WR per tier
+// badge). Surfaces overconfident tiers in the Strategies tab.
+if (typeof window._loadTierCalibration === 'function' && !window.__tierCalibration) {
+const reschedule = () => {
+window._loadTierCalibration().then(() => {
+if (document.body.contains(wrap)) renderPerformancePage(wrap);
+});
+};
+if (typeof requestIdleCallback === 'function') {
+requestIdleCallback(reschedule, { timeout: 1500 });
+} else {
+setTimeout(reschedule, 100);
+}
+}
 const bt = window.__backtestReportV2 || window.__backtestReport;
 if (!bt) {
 wrap.innerHTML = `
@@ -29101,6 +29133,57 @@ return `
 }).join('')}
 </div>
 </div>` : '';
+          // v37.028 — Tier calibration section: surfaces the historical
+          // WR vs implied WR per tier so the user sees which badges are
+          // currently honest (profitable) vs misleading (overconfident).
+          const calRep = window.__tierCalibration;
+          const calRows = calRep && Array.isArray(calRep.tiers) ? calRep.tiers : [];
+          const tierLabels = {
+            safe: '🔒 Safe', solid: '✅ Solid', value: '💎 Value',
+            big: '💥 Big', out: '🌙 Outsider', watch: '👁️ Watch', signal: '⚡ Signal',
+          };
+          const statusLabels = {
+            profitable: { lbl: '★ Rentable historiquement', color: 'var(--accent)', bg: 'rgba(52,211,153,.06)' },
+            breakeven: { lbl: '~ À l\'équilibre', color: 'var(--text)', bg: 'var(--panel)' },
+            overconfident: { lbl: '⚠ Tier surestimé (perd en moyenne)', color: 'var(--danger)', bg: 'rgba(248,113,113,.06)' },
+            undersample: { lbl: '⏳ Pas encore assez de paris', color: 'var(--text-dim)', bg: 'var(--panel)' },
+          };
+          const calibrationHtml = calRows.length ? `
+<div class="u-mt-18">
+<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">🎚️ Calibration des tiers · transparence</div>
+<div style="font-size:12px;color:var(--text-dim);margin-bottom:14px;">Pour chaque badge tier, on compare le <b class="u-text">taux de réussite réel</b> à celui qui serait nécessaire pour rentabiliser à la cote moyenne. <b class="u-text-danger">Si delta &lt; 0</b>, le tier surestime ses chances et perd en moyenne.</div>
+<div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;font-variant-numeric:tabular-nums;">
+<div style="display:grid;grid-template-columns:minmax(0,1.2fr) 60px 70px 80px 80px 80px 1fr;gap:8px;padding:10px 14px;background:var(--panel-2);border-bottom:1px solid var(--border);font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.5px;font-weight:700;">
+<div>Tier</div>
+<div class="u-text-right">Paris</div>
+<div class="u-text-right">WR réel</div>
+<div class="u-text-right">Cote moy.</div>
+<div class="u-text-right">Δ vs implicite</div>
+<div class="u-text-right">ROI</div>
+<div>Verdict</div>
+</div>
+${calRows.map(r => {
+const meta = statusLabels[r.status] || statusLabels.breakeven;
+const delta = Number(r.calibration_delta_pt || 0);
+const deltaColor = delta >= 1 ? 'var(--accent)' : delta >= -1 ? 'var(--text)' : 'var(--danger)';
+const deltaTxt = (delta >= 0 ? '+' : '') + delta.toFixed(1) + 'pt';
+const roi = Number(r.roi || 0) * 100;
+const roiColor = roi >= 5 ? 'var(--accent)' : roi >= -2 ? 'var(--text)' : 'var(--danger)';
+const roiTxt = (roi >= 0 ? '+' : '') + roi.toFixed(1) + '%';
+return `
+<div style="display:grid;grid-template-columns:minmax(0,1.2fr) 60px 70px 80px 80px 80px 1fr;gap:8px;padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;background:${meta.bg};">
+<div style="color:var(--text);font-weight:600;">${esc(tierLabels[r.tier] || r.tier)}</div>
+<div style="text-align:right;color:var(--text-dim);">${r.n}</div>
+<div style="text-align:right;color:var(--text);">${(Number(r.hit_rate||0)*100).toFixed(1)}%</div>
+<div style="text-align:right;color:var(--text-dim);">${Number(r.avg_odd||0).toFixed(2)}</div>
+<div style="text-align:right;color:${deltaColor};font-weight:700;">${deltaTxt}</div>
+<div style="text-align:right;color:${roiColor};font-weight:700;">${roiTxt}</div>
+<div style="color:${meta.color};font-weight:600;font-size:11.5px;">${meta.lbl}</div>
+</div>`;
+}).join('')}
+</div>
+${(calRep.overconfident_tiers || []).length ? `<div style="margin-top:10px;padding:11px 14px;background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.20);border-radius:var(--r-sm);font-size:12.5px;color:var(--text);line-height:1.55;"><b style="color:var(--danger);">⚠ Tiers surestimés actuellement :</b> <b>${(calRep.overconfident_tiers || []).join(', ')}</b>. Le modèle annonce ces niveaux comme "à mise raisonnable" mais la cote moyenne demande un taux de réussite plus élevé que ce que les picks atteignent réellement. À utiliser avec prudence — ou attendre une recalibration.</div>` : ''}
+</div>` : '';
           const helpHtml = `
 <div style="margin-top:14px;padding:12px 14px;background:rgba(167,139,250,.06);border:1px solid var(--brand-soft);border-radius:var(--r-sm);font-size:12.5px;color:var(--text-dim);line-height:1.6;">
 <b class="u-text-brand">💡 Comment lire :</b>
@@ -29109,8 +29192,9 @@ return `
 <b class="u-text">Value-only</b> = filtre les picks edge ≥${(Number(sb.value_edge_min || 0) * 100).toFixed(0)}pt — moins de paris, meilleure ROI moyenne.
 <b class="u-text">Sharp-only</b> = uniquement tier safe / solid (échantillon plus petit, à monitorer).
 <b class="u-text">Monte Carlo</b> = "si je joue 200 picks au hasard tirés de l'historique 10 000 fois, à quoi ressemble la distribution de ROI ?" — sert à juger si la perf actuelle est <i>réelle</i> ou dans le bruit.
+<b class="u-text">Calibration des tiers</b> = vérité historique sur chaque badge ; surface les tiers où le modèle est trop confiant.
 </div>`;
-          return `<div class="u-mt-18">${headerHtml}${tableHtml}${curveSvg}${mcHtml}${helpHtml}</div>`;
+          return `<div class="u-mt-18">${headerHtml}${tableHtml}${curveSvg}${mcHtml}${calibrationHtml}${helpHtml}</div>`;
         })() : ''}
 
         ${''}
