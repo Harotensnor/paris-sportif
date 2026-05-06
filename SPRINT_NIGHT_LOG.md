@@ -1516,3 +1516,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : audit_qa_gate_manifest.py vérifie la présence des audits critiques dans qa_gate_report.py.
 - Verrou : le manifest est lui-même exécuté par le gate central.
 - Résultat : le retrait silencieux de data_truth, privacy, runtime QA ou probes-wiring bloque désormais la CI.
+
+## Sprint v37.096 — AUTO 10/10 Fresh main resync (22:38 UTC)
+- Hypothèse : le cron data avance main pendant la chasse QA et rend la PR non mergeable sur les artefacts générés.
+- Fix : resync origin/main, health/night_metrics remote conservés, shell QA branche conservé et hashes restampés.
+- Verrou : qa_gate_report élargi et synthetic monitor relancés après résolution.
+- Résultat : données prod fraîches, artefacts data alignés et cache SW bumpé.
