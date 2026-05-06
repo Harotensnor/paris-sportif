@@ -11,7 +11,7 @@
 // The "Stamp sw.js" step replaces this entire line with the current UTC timestamp,
 // so every deploy invalidates all caches → users see the new pronostics.html
 // without needing Ctrl+Shift+R. Manual edits stay valid for local dev.
-const CACHE_VERSION = 'paris-sportif-20260506-015100';
+const CACHE_VERSION = 'paris-sportif-20260506-020200';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -32,6 +32,7 @@ const PRECACHE_ASSETS = [
   // Il reste servi en stale-while-revalidate au premier chargement puis en offline.
   'app.css',
   'app-i18n.js',
+  'sports_coverage_extended.js',
   'i18n.json',
   'print.css',
   'app-enhancements.js',
