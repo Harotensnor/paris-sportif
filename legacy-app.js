@@ -23339,6 +23339,13 @@ const activeTab = (() => {
 let saved = 'pending';
 try { saved = localStorage.getItem('tousTab') || 'pending'; } catch(e) {}
 const counts = { pending: displayPending.length, inprogress: displayInProgress.length, finished: displayFinished.length };
+const validKeys = ['pending', 'inprogress', 'finished'];
+// v37.037 — always honour the saved tab when it's a valid key. The
+// previous behaviour silently fell back to 'pending' whenever the
+// saved tab had 0 items, which meant clicking "En cours (0)"
+// rerouted the user to the 194 pending rows. The badge already
+// shows "(0)" so the empty state is the honest answer.
+if (validKeys.includes(saved)) return saved;
 if (counts[saved] > 0) return saved;
 if (counts.pending > 0) return 'pending';
 if (counts.inprogress > 0) return 'inprogress';

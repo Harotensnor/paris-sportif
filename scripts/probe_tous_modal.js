@@ -67,6 +67,13 @@ function check(label, ok, detail) {
       // intercept clicks aimed at pick rows or detail modals.
       prefs.consentLocalStorage = 'accepted';
       localStorage.setItem('userPrefs', JSON.stringify(prefs));
+      // v37.037 — wipe Tous filter / tab state so a previous probe run
+      // does not contaminate this one (e.g. landing on inprogress with
+      // 0 rows or with a sport filter that hides every match).
+      localStorage.removeItem('tousFilters');
+      localStorage.removeItem('tousSort');
+      localStorage.removeItem('tousTab');
+      localStorage.removeItem('advFilters');
     } catch (e) {}
   });
   const page = await ctx.newPage();
@@ -136,25 +143,37 @@ function check(label, ok, detail) {
   }
 
   console.log('\n=== Modal detail flow ===');
-  // The previous tab-switch click triggered a re-render — wait for the
-  // Tous view to settle, otherwise our pick click can hit a stale node
-  // that has already been replaced.
-  await page.evaluate(() => { window.location.hash = '#tous'; });
-  await page.waitForTimeout(800);
+  // Reset tousTab to pending and click it manually so renderTousPage
+  // re-runs with the right active tab. Plain hash-change doesn't always
+  // re-render when we're already on #tous.
+  await page.evaluate(() => {
+    try { localStorage.setItem('tousTab', 'pending'); } catch(e) {}
+    const btn = document.querySelector('[data-tous-tab="pending"]');
+    if (btn) btn.click();
+  });
+  await page.waitForTimeout(900);
   const opened = await page.evaluate(() => {
     const candidates = Array.from(document.querySelectorAll(
-      '[data-pick-uid], .v36-table-row, [data-match-id]'
+      '[data-pick-uid], .v36-table-row, .tous-row, [data-match-id]'
     )).filter(el => el.offsetParent !== null);
     const target = candidates.find(el => {
       const id = el.dataset.matchId || el.dataset.pickUid;
       return id && String(id).length > 0;
     });
-    if (!target) return { ok: false, reason: 'no clickable pick' };
+    if (!target) {
+      const debug = {
+        candidates: candidates.length,
+        tousRow: document.querySelectorAll('.tous-row').length,
+        tousTab: localStorage.getItem('tousTab'),
+        tousVisible: !!document.querySelector('#tous-wrap')?.offsetParent,
+      };
+      return { ok: false, reason: 'no clickable pick', debug };
+    }
     target.click();
     return { ok: true, id: target.dataset.matchId || target.dataset.pickUid };
   });
   if (!opened.ok) {
-    check('Modal: pick clickable', false, opened.reason);
+    check('Modal: pick clickable', false, `${opened.reason} ${JSON.stringify(opened.debug || {})}`);
   } else {
     await page.waitForTimeout(600);
     const modal = await page.evaluate(() => {
