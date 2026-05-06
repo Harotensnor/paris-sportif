@@ -24513,6 +24513,7 @@ const esc2 = (typeof esc === 'function') ? esc : (s) => String(s).replace(/[&<>"
       overlay.setAttribute('role', 'dialog');
       overlay.setAttribute('aria-modal', 'true');
       overlay.setAttribute('aria-labelledby', 'onb-title');
+      overlay.setAttribute('tabindex', '-1');
 
       // État interne du wizard
       const savedBankroll = Number(localStorage.getItem('userBankroll')) || 50;
@@ -24633,6 +24634,7 @@ const esc2 = (typeof esc === 'function') ? esc : (s) => String(s).replace(/[&<>"
           if (state.step < totalSteps) { state.step++; renderStep(); }
           else finish(false);
         });
+        try { overlay.focus({ preventScroll: true }); } catch(e){ if (typeof prodWarn === 'function') prodWarn('onboarding_focus_failed', e); }
       };
 
       const finish = (skipped) => {
@@ -24671,8 +24673,8 @@ const esc2 = (typeof esc === 'function') ? esc : (s) => String(s).replace(/[&<>"
           finish(true);
         }
       };
-      document.addEventListener('keydown', onOnboardingKeydown);
-      cleanupOnboardingKeyboard = () => document.removeEventListener('keydown', onOnboardingKeydown);
+      document.addEventListener('keydown', onOnboardingKeydown, true);
+      cleanupOnboardingKeyboard = () => document.removeEventListener('keydown', onOnboardingKeydown, true);
       renderStep();
     } catch(e) { if (typeof prodWarn === 'function') prodWarn('onboarding_open_failed', e); }
   }

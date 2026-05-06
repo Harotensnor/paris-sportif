@@ -1353,3 +1353,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : routage des erreurs app-enhancements vers `logSafeError`.
 - Verrou : `scripts/audit_no_direct_console_modules.py` branché dans le groupe drift statique.
 - Résultat : 50/50 pytest, 17 probes navigateur verts, 14 audits statiques verts, console module propre.
+
+## Sprint v37.073 — AUTO 10/10 Smoke + onboarding honesty (18:40 UTC)
+- Hypothèse : le smoke E2E pouvait rester vert en sautant des routes, et l'onboarding clavier pouvait flaker sans focus stable.
+- Fix : activation hash directe pour les routes aliasées, focus explicite du wizard et listener clavier en capture.
+- Verrou : `scripts/smoke_e2e.js` ouvre 15 routes connues, `scripts/probe_onboarding_fresh.js` vérifie toujours les flèches.
+- Résultat : 50/50 pytest, 17 probes navigateur verts, 14 audits statiques verts, smoke sans skip de nav.

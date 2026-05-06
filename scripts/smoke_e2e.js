@@ -97,29 +97,32 @@ function startServer() {
   });
   await page.waitForTimeout(300);
 
-  // Click each page and wait a tick
+  async function activatePage(pageName) {
+    return page.evaluate(name => {
+      const btn = document.querySelector(`.page-btn[data-page="${name}"]`);
+      if (btn) {
+        btn.click();
+        return 'button';
+      }
+      const nextHash = `#${name}`;
+      if (window.location.hash !== nextHash) window.location.hash = nextHash;
+      else window.dispatchEvent(new HashChangeEvent('hashchange', { oldURL: location.href, newURL: location.href }));
+      return 'hash';
+    }, pageName);
+  }
+
+  // Open every supported route. Some routes are intentionally hash-only
+  // aliases now, so the smoke must exercise them instead of skipping.
   for (const p of PAGES) {
     const before = failures.length;
-    const found = await page.evaluate(pageName => {
-      const btn = document.querySelector(`.page-btn[data-page="${pageName}"]`);
-      if (!btn) return 'no-btn';
-      btn.click();
-      return 'clicked';
-    }, p);
-    if (found === 'no-btn') {
-      console.log(`[skip] ${p} — nav button not found`);
-      continue;
-    }
+    const via = await activatePage(p);
     await page.waitForTimeout(250);
     const newErrs = failures.slice(before);
     const tag = newErrs.length ? `FAIL (${newErrs.length} errs)` : 'ok';
-    console.log(`[${tag}] ${p}`);
+    console.log(`[${tag}] ${p} via ${via}`);
   }
 
-  await page.evaluate(() => {
-    const btn = document.querySelector('.page-btn[data-page="dashboard"]');
-    if (btn) btn.click();
-  });
+  await activatePage('dashboard');
   await page.waitForTimeout(500);
   // Data freshness gate: when running on a feature branch, the checked-out
   // data.js can be hours old. Several downstream UI sections (Terminal Value,
@@ -162,7 +165,7 @@ function startServer() {
   }
   console.log(`[${!sportGuard.checked || sportGuard.blocked ? 'ok' : 'FAIL'}] sport ROI guard = ${sportGuard.checked ? `${sportGuard.sport} blocked` : 'no cold sport'}`);
 
-  await page.evaluate(() => document.querySelector('.page-btn[data-page="sante"]')?.click());
+  await activatePage('sante');
   await page.waitForTimeout(300);
   const santeGuardVisible = await page.evaluate(() => {
     const wrap = document.querySelector('#sante-wrap');
