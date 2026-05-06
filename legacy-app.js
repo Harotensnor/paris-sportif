@@ -17426,11 +17426,12 @@ let v37ScanPool = v37BuildScanPool(v37DateFilter);
 const v37InitialDateFilter = v37DateFilter;
 const v37InitialScanPoolLength = v37ScanPool.length;
 const v37MinDenseDailyScanPool = 60;
-if (!v37HashDate && v37DateFilter !== 'all' && !v37HistoryMode && v37ScanPool.length < v37MinDenseDailyScanPool) {
+const v37CanAutoHorizonLowPool = v37DateFilter !== 'all' && !v37HistoryMode && (!v37HashDate || v37DateFilter === todayIso);
+if (v37CanAutoHorizonLowPool && v37ScanPool.length < v37MinDenseDailyScanPool) {
 const allHorizonPool = v37BuildScanPool('all');
 if (allHorizonPool.length >= Math.max(v37MinDenseDailyScanPool, v37ScanPool.length + 30)) {
 v37AutoHorizonReason = `${v37InitialScanPoolLength} matchs restants sur ${v37DateLabel(v37InitialDateFilter)} ; ${allHorizonPool.length} matchs sur 7 jours.`;
-v37FilterResetNotice = `Vue élargie aux 7 prochains jours : ${v37AutoHorizonReason} L'accueil garde les mêmes seuils mais privilégie un tableau exploitable.`;
+v37FilterResetNotice = `Vue élargie aux 7 prochains jours : ${v37AutoHorizonReason} Aujourd'hui seul est trop court pour un tableau dense.`;
 v37DateFilter = 'all';
 v37DateSource = 'auto_all_horizon';
 v37HistoryMode = false;
@@ -18029,6 +18030,8 @@ v37InitialDateFilter,
 v37InitialScanPoolLength,
 v37MinDenseDailyScanPool,
 v37DenseMinimumRows,
+v37HashDate,
+v37CanAutoHorizonLowPool,
 v37AutoHorizonReason,
 v36PickPoolRaw: v36PickPoolRaw.length,
 v36PickPoolCanonical: v36PickPoolCanonical.length,

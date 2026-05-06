@@ -1286,3 +1286,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Clarté: l'entête parle désormais de lignes affichées, et détaille picks qualifiés vs lignes data.
 - Debug: `?debug=1` expose `v37DenseMinimumRows` et le volume de fallback data.
 - Cache: footer v37.025 et SW paris-sportif-20260506-151200.
+
+## Sprint v37.026 — AUTO 10/10 Today auto-horizon (15:30 UTC)
+- UX: si `Aujourd'hui` est dans l'URL mais ne peut pas remplir un tableau dense, l'accueil passe automatiquement sur l'horizon 7 jours.
+- Clarté: le bandeau explique que la journée seule est trop courte au lieu de laisser 20 lignes et un grand vide.
+- Debug: `?debug=1` expose `v37HashDate` et `v37CanAutoHorizonLowPool` pour vérifier le chemin URL.
+- Cache: footer v37.026 et SW paris-sportif-20260506-153600.
