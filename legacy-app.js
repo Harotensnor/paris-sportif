@@ -427,7 +427,7 @@ const SPORTS_COVERAGE_PAGES = [
 'sports-tous', 'rugby', 'handball', 'volley', 'esport', 'combat',
 'cyclisme', 'ski', 'athle', 'tennis-challenger', 'foot-feminin', 'nfl'
 ];
-const VALID_PAGES = ['dashboard','tous','performance','academie','profil','buteurs','combines', ...SPORTS_COVERAGE_PAGES];
+const VALID_PAGES = ['dashboard','tous','performance','academie','profil','buteurs','combines','sante','alertes', ...SPORTS_COVERAGE_PAGES];
 const PAGE_ALIASES = {
 'top': 'dashboard',
 'locks': 'dashboard',
@@ -458,9 +458,13 @@ const PAGE_ALIASES = {
 'valeur': 'tous',
 'plan-mise': 'tous',
 'favoris': 'profil',
-'alertes': 'profil',
+// v37.041 — un-alias 'alertes' and 'sante'. Both have dedicated
+// renderers (renderAlertesPage / renderSantePage) and wraps that
+// were silently hidden by display:none because the alias rewrote
+// currentPage → 'profil' before isAlertes / isSante could turn true.
+// Net result: the Dashboard's "Santé data" link landed users on
+// Profil with no health diagnostics in sight.
 'simulator': 'performance',
-'sante': 'profil',
 'health': 'profil',
 'diagnostic': 'profil',
 'legal': 'profil',
@@ -27462,7 +27466,7 @@ return `
     const isHistorique = false;
     const isSante = currentPage === 'sante';
     const isDashboard = currentPage === 'dashboard';
-    const isAlertes = false;
+    const isAlertes = currentPage === 'alertes';
     const isAcademie = currentPage === 'academie';
     const isBacktest = false;
     const isProfil = currentPage === 'profil';
