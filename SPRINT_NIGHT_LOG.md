@@ -1299,3 +1299,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : ajout d'un probe privacy-first avec API Notification locale simulée, sans appel externe.
 - Verrou : `scripts/probe_notifications_optin.js` vérifie boot sans prompt, clic explicite, préférence push et reload sans re-prompt.
 - Résultat : 50/50 pytest, 7 audits statiques, 16/16 probes navigateur vertes; aucune demande Notification au boot.
+
+## Sprint v37.064 — AUTO 10/10 Service worker cache QA (17:16 UTC)
+- Hypothèse : les stratégies SW data/cache/offline pouvaient régresser sans navigateur réel ni CI dédiée.
+- Fix : ajout d'un runtime SW mocké qui exécute `sw.js` et simule caches, fetch, activate et fetch events.
+- Verrou : `scripts/probe_service_worker_cache.js` couvre nettoyage caches, data.js SWR, corruption data, HTML offline et images cache-first.
+- Résultat : 50/50 pytest, 7 audits statiques, smoke/probe_all_pages/probe_data_freshness/probe_service_worker_cache verts.
