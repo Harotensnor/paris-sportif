@@ -42,6 +42,7 @@ on:
       - 'scripts/probe_qa_runtime.js'
       - 'scripts/probe_model_probability_caps.js'
       - 'scripts/probe_day_filter.js'
+      - 'scripts/probe_nav_stability.js'
       - '.github/workflows/smoke.yml'
   pull_request:
     branches: [main]
@@ -80,6 +81,7 @@ on:
       - 'scripts/probe_qa_runtime.js'
       - 'scripts/probe_model_probability_caps.js'
       - 'scripts/probe_day_filter.js'
+      - 'scripts/probe_nav_stability.js'
       - '.github/workflows/smoke.yml'
   workflow_dispatch: {}
 
@@ -227,3 +229,8 @@ jobs:
         # Locks the V37 date chips: a deliberate Aujourd'hui click must
         # persist the Paris date and must not be auto-expanded to 7 days.
         run: node scripts/probe_day_filter.js
+
+      - name: Run global navigation stability probe
+        # Locks the desktop sidebar and mobile bottom nav skeletons so
+        # leaving Accueil changes only the active state and main content.
+        run: node scripts/probe_nav_stability.js

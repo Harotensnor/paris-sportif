@@ -1528,3 +1528,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : l'élargissement 7 jours reste disponible seulement sans date explicite dans l'URL.
 - Verrou : probe_day_filter.js clique chaque chip jour et bloque la régression Aujourd'hui → 7 jours.
 - Résultat : date choisie persistée, chip actif stable, aucun warning console sur la sonde dédiée.
+
+## Sprint v37.098 — AUTO 10/10 Navigation globale stable (21:40 UTC)
+- Hypothèse : Accueil gardait une nav horizontale spécifique alors que les autres pages passaient en sidebar.
+- Fix : le layout `v36-sidebar` desktop est identique entre Accueil, Tous, Performance, Méthode et Profil.
+- Verrou : probe_nav_stability.js compare sidebar desktop et bottom-nav mobile sur les routes principales.
+- Résultat : seule la page active change, la structure globale reste stable sans erreur console.

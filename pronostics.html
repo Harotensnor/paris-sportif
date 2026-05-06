@@ -501,11 +501,13 @@
   .boot-shell__card--wide strong { width:88%; height:38px; }
   @media (min-width:960px) {
     .topbar-brand { width:224px; }
-    body.agent-inside nav.topbar-nav {
-      display:flex!important; flex-direction:column; gap:4px;
-      position:fixed; left:0; top:calc(60px + var(--rg-height)); bottom:0;
-      width:240px; box-sizing:border-box; padding:14px 10px 28px;
-      overflow:auto; z-index:40; background:var(--panel); border-right:1px solid var(--border);
+    body.agent-inside nav.topbar-nav,
+    body.agent-home nav.topbar-nav,
+    body.agent-home nav.topbar-nav.v36-sidebar {
+      display:flex!important; flex-direction:column!important; gap:4px;
+      position:fixed!important; left:0!important; right:auto!important; top:calc(60px + var(--rg-height))!important; bottom:0!important;
+      width:240px!important; box-sizing:border-box; margin:0!important; padding:14px 10px 28px!important;
+      overflow:auto!important; z-index:40; background:var(--panel); border-right:1px solid var(--border); border-bottom:0; border-radius:0;
     }
     nav.topbar-nav.v36-sidebar { gap:8px; padding:18px 12px 28px; }
     .v36-nav-item { width:100%; min-height:60px; display:grid; grid-template-columns:38px 1fr; align-items:center; gap:10px; padding:10px 12px; border-radius:12px; border:1px solid transparent; background:transparent; color:var(--text-dim); text-align:left; }
@@ -514,47 +516,42 @@
     .v36-nav-copy { display:grid; gap:3px; min-width:0; }
     .v36-nav-copy strong { font-size:14px; }
     .v36-nav-copy em { font-size:11px; font-style:normal; color:var(--text-dim2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    body.agent-inside .content main { padding-left:264px!important; max-width:none; }
-    body.agent-home nav.topbar-nav.v36-sidebar {
-      display:flex!important; flex-direction:row; position:sticky; left:auto; right:auto; bottom:auto;
-      top:calc(60px + var(--rg-height)); width:min(1900px, calc(100% - 36px));
-      margin:0 auto 10px; padding:8px 18px; overflow-x:auto; overflow-y:visible;
-      border-right:0; border-bottom:1px solid var(--border); border-radius:0 0 18px 18px;
-    }
-    body.agent-home nav.topbar-nav.v36-sidebar .v36-nav-item {
-      width:auto; min-width:150px; min-height:44px; grid-template-columns:28px minmax(0,1fr); padding:7px 10px;
-    }
-    body.agent-home nav.topbar-nav.v36-sidebar .v36-nav-ico { width:28px; height:28px; border-radius:9px; font-size:14px; }
-    body.agent-home nav.topbar-nav.v36-sidebar .v36-nav-copy em { display:none; }
-    body.agent-home main#main-content { padding-left:18px!important; max-width:none; }
+    body.agent-inside .content main,
+    body.agent-home .content main { padding-left:264px!important; max-width:none; }
     body.agent-home .bbf-left-rail { display:none!important; }
     body.agent-home .bbf-layout { grid-template-columns:minmax(0,1fr) 300px!important; }
     body.agent-inside nav.topbar-nav .page-btn,
-    body.agent-inside nav.topbar-nav .hub-btn { min-height:40px; }
-    body.agent-inside nav.topbar-nav .page-btn.hub-solo {
+    body.agent-inside nav.topbar-nav .hub-btn,
+    body.agent-home nav.topbar-nav .page-btn,
+    body.agent-home nav.topbar-nav .hub-btn { min-height:40px; }
+    body.agent-inside nav.topbar-nav .page-btn.hub-solo,
+    body.agent-home nav.topbar-nav .page-btn.hub-solo {
       width:100%; justify-content:flex-start; padding:8px 14px; font-size:13px; font-weight:700;
     }
-    body.agent-inside nav.topbar-nav .hub {
+    body.agent-inside nav.topbar-nav .hub,
+    body.agent-home nav.topbar-nav .hub {
       display:flex; flex-direction:column; width:100%; border-top:1px solid var(--border);
       padding-top:10px; margin-top:6px;
     }
-    body.agent-inside nav.topbar-nav .hub-btn {
+    body.agent-inside nav.topbar-nav .hub-btn,
+    body.agent-home nav.topbar-nav .hub-btn {
       justify-content:flex-start; width:100%; padding:6px 14px 4px; font-size:11px;
       color:var(--text-dim2); text-transform:uppercase; letter-spacing:0; cursor:default;
     }
-    body.agent-inside nav.topbar-nav .hub-btn .chev { display:none; }
-    body.agent-inside nav.topbar-nav .hub-menu {
+    body.agent-inside nav.topbar-nav .hub-btn .chev,
+    body.agent-home nav.topbar-nav .hub-btn .chev { display:none; }
+    body.agent-inside nav.topbar-nav .hub-menu,
+    body.agent-home nav.topbar-nav .hub-menu {
       display:flex!important; flex-direction:column; position:static; min-width:0; gap:2px; padding:0;
       background:none; border:0; box-shadow:none;
     }
-    body.agent-inside nav.topbar-nav .hub-menu .page-btn {
+    body.agent-inside nav.topbar-nav .hub-menu .page-btn,
+    body.agent-home nav.topbar-nav .hub-menu .page-btn {
       width:100%; justify-content:flex-start; padding:9px 14px; font-size:13.5px;
     }
   }
   @media (min-width:1440px) {
-    body.agent-home nav.topbar-nav:not(.v36-sidebar) { display:none!important; }
-    body.agent-home nav.topbar-nav.v36-sidebar { display:flex!important; }
-    body.agent-home main#main-content { padding-left:18px!important; padding-right:18px!important; max-width:none; }
+    body.agent-home main#main-content { padding-left:264px!important; padding-right:18px!important; max-width:none; }
   }
   @media (max-width:720px) {
     :root { --rg-height:28px; }
@@ -1062,7 +1059,7 @@
       <div class="footer-brand">
         <span class="footer-logo">🎯</span>
         <span class="footer-text">Paris-Sportif</span>
-        <span class="footer-version" id="footer-version" role="button" tabindex="0" style="cursor:pointer;" title="Voir les nouveautés v37.097">v37.097</span>
+        <span class="footer-version" id="footer-version" role="button" tabindex="0" style="cursor:pointer;" title="Voir les nouveautés v37.098">v37.098</span>
       </div>
       <nav class="footer-links" aria-label="Liens du site">
         <a href="https://github.com/Harotensnor/paris-sportif" target="_blank" rel="noopener" class="footer-link" title="Code source sur GitHub">
@@ -1186,7 +1183,7 @@
 <script type="module" src="src/qa-runtime.js?v=c82e1da1"></script>
 <script type="module" src="src/perf-bootstrap.js?v=ba6f182f"></script>
 <script src="legacy-app.js?v=37a35748" defer></script>
-<script src="app.js?v=6dbfb6ca" defer></script>
+<script src="app.js?v=1b460d58" defer></script>
 
 <!-- enhancements v20 -->
 <script src="app-enhancements.js?v=4be786de" defer></script>
