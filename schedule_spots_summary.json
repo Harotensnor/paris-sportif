@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-06T23:19:27Z",
+  "generated_at": "2026-05-06T23:21:35Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -57,7 +57,7 @@
       "global_resolution": {
         "status": "abstain",
         "net_side": null,
-        "home_score": -0.488,
+        "home_score": 0.396,
         "away_score": -0.488,
         "home_fade": 0.75,
         "away_fade": 0.75,
@@ -86,6 +86,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.884
           }
         ]
       }
@@ -491,7 +497,7 @@
         "status": "abstain",
         "net_side": null,
         "home_score": -0.39,
-        "away_score": -0.39,
+        "away_score": 0.494,
         "home_fade": 0.6,
         "away_fade": 0.6,
         "reason": "Signaux opposes: New York Knicks fade 0.60, Philadelphia 76ers fade 0.60 -> prudence",
@@ -507,6 +513,12 @@
             "type": "schedule_congestion",
             "direction": "fade",
             "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.884
           }
         ]
       }
@@ -542,11 +554,11 @@
       "global_resolution": {
         "status": "mixed",
         "net_side": null,
-        "home_score": -0.25,
-        "away_score": 0.166,
-        "home_fade": 0.6,
+        "home_score": -1.25,
+        "away_score": 0.56,
+        "home_fade": 1.6,
         "away_fade": 1.0,
-        "reason": "Signaux mitigés: avantage net trop faible (Montreal Canadiens -0.25, Buffalo Sabres +0.17)",
+        "reason": "Signaux mitigés: avantage net trop faible (Montreal Canadiens -1.25, Buffalo Sabres +0.56)",
         "detail": [
           {
             "side": "home",
@@ -567,10 +579,16 @@
             "strength": 0.4
           },
           {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
             "side": "away",
             "type": "market_move",
             "direction": "steam",
-            "strength": 0.956
+            "strength": 1.0
           }
         ]
       }
@@ -738,10 +756,10 @@
       }
     },
     {
-      "event_id": "401815235",
+      "event_id": "sofa_15496115",
       "source_event_ids": [
-        "401815235",
-        "sofa_15496115"
+        "sofa_15496115",
+        "401815235"
       ],
       "kickoff": "2026-05-06T23:40Z",
       "sport": "baseball",
@@ -769,11 +787,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.698,
-        "away_score": 0.112,
-        "home_fade": 0.75,
+        "home_score": -0.098,
+        "away_score": -0.098,
+        "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Cincinnati Reds (+0.11)",
+        "reason": "Direction nette: Cincinnati Reds (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -786,12 +804,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
           }
         ]
       }
@@ -1104,12 +1116,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
+        "net_side": "home",
+        "home_score": 0.786,
         "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: New York Knicks (-0.10)",
+        "reason": "Direction nette: Philadelphia 76ers (+0.79)",
         "detail": [
           {
             "side": "home",
@@ -1122,6 +1134,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.884
           }
         ]
       }
@@ -1157,11 +1175,11 @@
       "global_resolution": {
         "status": "mixed",
         "net_side": null,
-        "home_score": 0.459,
-        "away_score": 0.043,
+        "home_score": 0.852,
+        "away_score": -0.957,
         "home_fade": 0.55,
-        "away_fade": 0.15,
-        "reason": "Signaux mitigés: avantage net trop faible (Buffalo Sabres +0.46, Montreal Canadiens +0.04)",
+        "away_fade": 1.15,
+        "reason": "Signaux mitigés: avantage net trop faible (Buffalo Sabres +0.85, Montreal Canadiens -0.96)",
         "detail": [
           {
             "side": "home",
@@ -1185,7 +1203,13 @@
             "side": "home",
             "type": "market_move",
             "direction": "steam",
-            "strength": 0.956
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
@@ -1591,11 +1615,11 @@
       "global_resolution": {
         "status": "mixed",
         "net_side": null,
-        "home_score": 0.043,
-        "away_score": 0.459,
-        "home_fade": 0.15,
+        "home_score": -0.957,
+        "away_score": 0.852,
+        "home_fade": 1.15,
         "away_fade": 0.55,
-        "reason": "Signaux mitigés: avantage net trop faible (Montreal Canadiens +0.04, Buffalo Sabres +0.46)",
+        "reason": "Signaux mitigés: avantage net trop faible (Montreal Canadiens -0.96, Buffalo Sabres +0.85)",
         "detail": [
           {
             "side": "home",
@@ -1616,10 +1640,16 @@
             "strength": 0.4
           },
           {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
             "side": "away",
             "type": "market_move",
             "direction": "steam",
-            "strength": 0.956
+            "strength": 1.0
           }
         ]
       }
@@ -2713,11 +2743,11 @@
       "global_resolution": {
         "status": "mixed",
         "net_side": null,
-        "home_score": 1.645,
-        "away_score": -3.348,
+        "home_score": 1.364,
+        "away_score": -3.252,
         "home_fade": 0.6,
-        "away_fade": 3.558,
-        "reason": "Signaux mitigés: avantage net trop faible (Miami Marlins +1.65, Baltimore Orioles -3.35)",
+        "away_fade": 3.462,
+        "reason": "Signaux mitigés: avantage net trop faible (Miami Marlins +1.36, Baltimore Orioles -3.25)",
         "detail": [
           {
             "side": "home",
@@ -2741,13 +2771,13 @@
             "side": "home",
             "type": "market_move",
             "direction": "steam",
-            "strength": 1.0
+            "strength": 0.752
           },
           {
             "side": "away",
             "type": "market_move",
             "direction": "drift",
-            "strength": 1.0
+            "strength": 0.904
           },
           {
             "side": "away",
@@ -2954,8 +2984,8 @@
     {
       "event_id": "401815236",
       "source_event_ids": [
-        "401815236",
-        "sofa_15501352"
+        "sofa_15501352",
+        "401815236"
       ],
       "kickoff": "2026-05-06T23:40Z",
       "sport": "baseball",
