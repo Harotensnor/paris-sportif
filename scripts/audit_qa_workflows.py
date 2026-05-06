@@ -97,9 +97,11 @@ def main() -> int:
             "strategy:",
             "matrix:",
             "project: [chromium-desktop, mobile-chromium]",
+            "shard-index: [1, 2, 3]",
+            "shard-total: [3]",
             "if [ -f package-lock.json ]; then npm ci; else npm install; fi",
-            "npx playwright test --project=${{ matrix.project }}",
-            "playwright-report-${{ matrix.project }}",
+            "npx playwright test --project=${{ matrix.project }} --shard=${{ matrix.shard-index }}/${{ matrix.shard-total }}",
+            "playwright-report-${{ matrix.project }}-${{ matrix.shard-index }}of${{ matrix.shard-total }}",
         ):
             if needle not in e2e:
                 findings.append(f"e2e.yml missing {needle}")

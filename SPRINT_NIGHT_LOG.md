@@ -1606,3 +1606,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : merge origin/main, données cron conservées, shell v37.110 restampé.
 - Verrou : audit_data_truth.py et stamp_asset_hashes.py gardent l'âge data et les hashes cohérents.
 - Résultat : la PR repart sur le snapshot main frais avec le split Playwright conservé.
+
+## Sprint v37.111 — AUTO 10/10 E2E shard matrix (23:47 UTC)
+- Hypothèse : chaque viewport exécute encore trop de specs dans un seul job CI.
+- Fix : e2e-tests garde desktop/mobile mais les découpe en 3 shards Playwright par projet.
+- Verrou : audit_qa_workflows.py exige les shards et les artefacts nommés par shard.
+- Résultat : toutes les specs restent actives, avec six jobs courts au lieu de deux jobs longs.

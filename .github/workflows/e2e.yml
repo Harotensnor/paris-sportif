@@ -133,6 +133,8 @@ jobs:
       fail-fast: false
       matrix:
         project: [chromium-desktop, mobile-chromium]
+        shard-index: [1, 2, 3]
+        shard-total: [3]
     steps:
       - uses: actions/checkout@v4
 
@@ -154,12 +156,12 @@ jobs:
         # Avant : seul chromium-desktop tournait. Or 60% du trafic est mobile.
         # Après : les 2 projets en parallèle, mobile catch les régressions
         # bottom-nav / drawer / modal / sub-nav scroll.
-        run: npx playwright test --project=${{ matrix.project }}
+        run: npx playwright test --project=${{ matrix.project }} --shard=${{ matrix.shard-index }}/${{ matrix.shard-total }}
 
       - name: Upload Playwright report on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report-${{ matrix.project }}
+          name: playwright-report-${{ matrix.project }}-${{ matrix.shard-index }}of${{ matrix.shard-total }}
           path: playwright-report/
           retention-days: 7
