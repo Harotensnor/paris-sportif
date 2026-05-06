@@ -11,7 +11,7 @@
 // The "Stamp sw.js" step replaces this entire line with the current UTC timestamp,
 // so every deploy invalidates all caches → users see the new pronostics.html
 // without needing Ctrl+Shift+R. Manual edits stay valid for local dev.
-const CACHE_VERSION = 'paris-sportif-20260506-022900';
+const CACHE_VERSION = 'paris-sportif-20260506-033500';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -23,7 +23,11 @@ const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const PRECACHE_ASSETS = [
   'manifest.webmanifest',
   'icon.svg',
+  'icon-192.webp',
+  'icon-192.avif',
   'icon-192.png',
+  'icon-512.webp',
+  'icon-512.avif',
   'icon-512.png',
   // FIX Bug 7 — pré-cache pronostics.html pour fallback offline garanti
   'pronostics.html',
@@ -32,6 +36,18 @@ const PRECACHE_ASSETS = [
   // Il reste servi en stale-while-revalidate au premier chargement puis en offline.
   'app.css',
   'app-design-v3.css',
+  'app.js',
+  'legacy-app.js',
+  'src/perf-bootstrap.js',
+  'src/utils.js',
+  'src/model.js',
+  'src/core.js',
+  'src/tier.js',
+  'src/data-access.js',
+  'src/pages.js',
+  'workers/quality-worker.js',
+  'workers/backtest-worker.js',
+  'workers/bayesian-worker.js',
   'app-i18n.js',
   'sports_coverage_extended.js',
   'i18n.json',
@@ -58,9 +74,17 @@ const LAZY_CACHE_FIRST = [
   // OG images partagées sur reseaux sociaux : cache-first au premier hit,
   // pas à l'installation PWA.
   'og-default.png',
+  'og-default.webp',
+  'og-default.avif',
   'og-backtest.png',
+  'og-backtest.webp',
+  'og-backtest.avif',
   'og-credibilite.png',
+  'og-credibilite.webp',
+  'og-credibilite.avif',
   'og-methodologie.png',
+  'og-methodologie.webp',
+  'og-methodologie.avif',
 ];
 
 const SHELL_ASSETS = [...PRECACHE_ASSETS, ...LAZY_CACHE_FIRST];
@@ -195,10 +219,21 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  if (/\.(?:png|jpg|jpeg|webp|avif|svg|ico)$/i.test(path)) {
+    event.respondWith(
+      caches.match(req).then(hit => hit || fetch(req).then(resp => {
+        const respClone = resp.clone();
+        caches.open(SHELL_CACHE).then(c => c.put(req, respClone));
+        return resp;
+      }))
+    );
+    return;
+  }
+
   // app.css + app.js : STALE-WHILE-REVALIDATE. Servir le cache
   // immédiatement (instant render) ET refetch en background pour la prochaine
   // visite. Couplé au stamp CACHE_VERSION bumpé à chaque vrai changement.
-  if (pathEndsWith(url, 'app.css') || pathEndsWith(url, 'app-design-v3.css') || pathEndsWith(url, 'app.js')) {
+  if (pathEndsWith(url, 'app.css') || pathEndsWith(url, 'app-design-v3.css') || pathEndsWith(url, 'app.js') || pathEndsWith(url, 'legacy-app.js')) {
     event.respondWith(
       caches.match(req).then(hit => {
         const fetchPromise = fetch(req).then(resp => {

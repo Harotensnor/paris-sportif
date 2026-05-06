@@ -41,6 +41,7 @@ BUDGETS_KB = {
     # le garde-fou restait calé sur une ancienne taille et faisait échouer
     # toute la CI alors que le budget Lighthouse contrôle déjà le poids réel.
     'app.js':                    1750,
+    'legacy-app.js':             1850,
     'app.css':                    300,
     'pronostics.html':           1150,
     'sw.js':                       15,
