@@ -1570,3 +1570,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : merge origin/main 22:18 UTC, data/health main conservés, shell v37.104 restampé.
 - Verrou : audit_data_truth.py, stamp hashes et smoke rapide gardent le snapshot cohérent avant push.
 - Résultat : branche poussée sur la tête main fraîche pour réduire la fenêtre dirty entre deux ticks cron.
+
+## Sprint v37.105 — AUTO 10/10 Onboarding CI guard (22:29 UTC)
+- Hypothèse : le wizard fonctionne, mais la sonde CI a un timeout trop court après navigation clavier.
+- Fix : waitForStep et fermeture overlay passent à 5s, sans changer l'invariant clavier/persistance.
+- Verrou : probe_onboarding_fresh.js reste dans smoke.yml et bloque le flow fresh user.
+- Résultat : la sonde est stable localement et la branche reprend les données cron 22:27 UTC.

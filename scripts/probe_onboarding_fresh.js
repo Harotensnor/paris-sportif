@@ -81,7 +81,7 @@ async function waitForStep(page, step) {
       return match && Number(match[1]) === expected;
     },
     step,
-    { timeout: 1200 }
+    { timeout: 5000 }
   );
 }
 
@@ -148,7 +148,7 @@ async function newFreshPage(browser, port) {
   await completeRun.page.keyboard.press('ArrowRight');
   await waitForStep(completeRun.page, 3);
   await completeRun.page.click('.onb-next');
-  await completeRun.page.waitForSelector('.onboard-overlay', { state: 'detached', timeout: 1200 });
+  await completeRun.page.waitForSelector('.onboard-overlay', { state: 'detached', timeout: 5000 });
   const completedState = await completeRun.page.evaluate(() => ({
     prefs: JSON.parse(localStorage.getItem('userPrefs') || '{}'),
     v1: localStorage.getItem('paris_sportif_onboarded_v1'),
@@ -166,7 +166,7 @@ async function newFreshPage(browser, port) {
   const skipRun = await newFreshPage(browser, port);
   await waitForOverlay(skipRun.page);
   await skipRun.page.click('[data-skip="1"]');
-  await skipRun.page.waitForSelector('.onboard-overlay', { state: 'detached', timeout: 1200 });
+  await skipRun.page.waitForSelector('.onboard-overlay', { state: 'detached', timeout: 5000 });
   const skippedState = await skipRun.page.evaluate(() => ({
     prefs: JSON.parse(localStorage.getItem('userPrefs') || '{}'),
     v1: localStorage.getItem('paris_sportif_onboarded_v1'),

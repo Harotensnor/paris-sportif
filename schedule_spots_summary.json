@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-06T22:18:34Z",
+  "generated_at": "2026-05-06T22:26:53Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -10,7 +10,7 @@
       "lookahead": 99,
       "back_to_back_travel": 24,
       "travel_extreme": 18,
-      "schedule_congestion": 45
+      "schedule_congestion": 43
     },
     "by_decision": {
       "abstain": 32,
@@ -1879,161 +1879,6 @@
       }
     },
     {
-      "event_id": "401815267",
-      "source_event_ids": [
-        "401815267"
-      ],
-      "kickoff": "2026-05-09T01:45Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Diego Padres",
-      "away": "St. Louis Cardinals",
-      "match": "San Diego Padres - St. Louis Cardinals",
-      "decision": "lean_home",
-      "net_team": "San Diego Padres",
-      "reason": "St. Louis Cardinals plus penalise par calendrier/voyage (1.88 vs 0.90)",
-      "pressure_score": 3.518,
-      "home_fade": 0.9,
-      "away_fade": 1.884,
-      "travel_score": 1.584,
-      "lookahead_score": 1.333,
-      "congestion_score": 0.6,
-      "types": {
-        "schedule_congestion": 1,
-        "lookahead": 2,
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours",
-        "Deplacement estime 2513 km, decalage ~1.8h"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -1.24,
-        "away_score": -1.219,
-        "home_fade": 1.9,
-        "away_fade": 1.884,
-        "reason": "Signaux opposes: San Diego Padres fade 1.90, St. Louis Cardinals fade 1.88 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.584
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815297",
-      "source_event_ids": [
-        "401815297"
-      ],
-      "kickoff": "2026-05-10T20:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Diego Padres",
-      "away": "St. Louis Cardinals",
-      "match": "San Diego Padres - St. Louis Cardinals",
-      "decision": "lean_home",
-      "net_team": "San Diego Padres",
-      "reason": "St. Louis Cardinals plus penalise par calendrier/voyage (2.18 vs 1.00)",
-      "pressure_score": 3.184,
-      "home_fade": 1.0,
-      "away_fade": 2.184,
-      "travel_score": 1.584,
-      "lookahead_score": 0,
-      "congestion_score": 1.6,
-      "types": {
-        "schedule_congestion": 2,
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "5 matchs sur les 7 derniers jours",
-        "3 matchs sur les 7 derniers jours",
-        "Deplacement estime 2513 km, decalage ~1.8h",
-        "2 match dans les 48h + 2513 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -1.235,
-        "away_score": -1.484,
-        "home_fade": 2.0,
-        "away_fade": 2.184,
-        "reason": "Signaux opposes: San Diego Padres fade 2.00, St. Louis Cardinals fade 2.18 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.584
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815273",
       "source_event_ids": [
         "401815273"
@@ -2109,87 +1954,6 @@
       }
     },
     {
-      "event_id": "401815282",
-      "source_event_ids": [
-        "401815282"
-      ],
-      "kickoff": "2026-05-09T23:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Diego Padres",
-      "away": "St. Louis Cardinals",
-      "match": "San Diego Padres - St. Louis Cardinals",
-      "decision": "lean_home",
-      "net_team": "San Diego Padres",
-      "reason": "St. Louis Cardinals plus penalise par calendrier/voyage (1.73 vs 0.95)",
-      "pressure_score": 3.051,
-      "home_fade": 0.95,
-      "away_fade": 1.734,
-      "travel_score": 1.584,
-      "lookahead_score": 0.667,
-      "congestion_score": 0.8,
-      "types": {
-        "schedule_congestion": 1,
-        "lookahead": 2,
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "4 matchs sur les 7 derniers jours",
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "Deplacement estime 2513 km, decalage ~1.8h"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -1.343,
-        "away_score": -1.052,
-        "home_fade": 1.95,
-        "away_fade": 1.734,
-        "reason": "Signaux opposes: San Diego Padres fade 1.95, St. Louis Cardinals fade 1.73 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.584
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815288",
       "source_event_ids": [
         "401815288"
@@ -2253,6 +2017,80 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.996
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815267",
+      "source_event_ids": [
+        "401815267"
+      ],
+      "kickoff": "2026-05-09T01:45Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "San Diego Padres",
+      "away": "St. Louis Cardinals",
+      "match": "San Diego Padres - St. Louis Cardinals",
+      "decision": "lean_home",
+      "net_team": "San Diego Padres",
+      "reason": "St. Louis Cardinals plus penalise par calendrier/voyage (1.88 vs 0.30)",
+      "pressure_score": 2.918,
+      "home_fade": 0.3,
+      "away_fade": 1.884,
+      "travel_score": 1.584,
+      "lookahead_score": 1.333,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2,
+        "travel_extreme": 1,
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "2 match important/proche dans les 3 jours",
+        "2 match important/proche dans les 3 jours",
+        "Deplacement estime 2513 km, decalage ~1.8h",
+        "1 match dans les 48h + 2513 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.64,
+        "away_score": -1.429,
+        "home_fade": 1.3,
+        "away_fade": 1.884,
+        "reason": "Direction nette: San Diego Padres (-0.64)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.584
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 1.0
           }
         ]
       }
@@ -2389,6 +2227,80 @@
             "type": "travel_extreme",
             "direction": "fade",
             "strength": 0.612
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 1.0
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815297",
+      "source_event_ids": [
+        "401815297"
+      ],
+      "kickoff": "2026-05-10T20:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "San Diego Padres",
+      "away": "St. Louis Cardinals",
+      "match": "San Diego Padres - St. Louis Cardinals",
+      "decision": "lean_home",
+      "net_team": "San Diego Padres",
+      "reason": "St. Louis Cardinals plus penalise par calendrier/voyage (2.18 vs 0.60)",
+      "pressure_score": 2.784,
+      "home_fade": 0.6,
+      "away_fade": 2.184,
+      "travel_score": 1.584,
+      "lookahead_score": 0,
+      "congestion_score": 1.2,
+      "types": {
+        "schedule_congestion": 2,
+        "travel_extreme": 1,
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "3 matchs sur les 7 derniers jours",
+        "3 matchs sur les 7 derniers jours",
+        "Deplacement estime 2513 km, decalage ~1.8h",
+        "2 match dans les 48h + 2513 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.835,
+        "away_score": -1.624,
+        "home_fade": 1.6,
+        "away_fade": 2.184,
+        "reason": "Direction nette: San Diego Padres (-0.84)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.584
           },
           {
             "side": "away",
@@ -2745,6 +2657,80 @@
             "type": "travel_extreme",
             "direction": "fade",
             "strength": 0.612
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 1.0
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815282",
+      "source_event_ids": [
+        "401815282"
+      ],
+      "kickoff": "2026-05-09T23:15Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "San Diego Padres",
+      "away": "St. Louis Cardinals",
+      "match": "San Diego Padres - St. Louis Cardinals",
+      "decision": "lean_home",
+      "net_team": "San Diego Padres",
+      "reason": "St. Louis Cardinals plus penalise par calendrier/voyage (1.73 vs 0.15)",
+      "pressure_score": 2.251,
+      "home_fade": 0.15,
+      "away_fade": 1.734,
+      "travel_score": 1.584,
+      "lookahead_score": 0.667,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2,
+        "travel_extreme": 1,
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours",
+        "1 match important/proche dans les 3 jours",
+        "Deplacement estime 2513 km, decalage ~1.8h",
+        "2 match dans les 48h + 2513 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.543,
+        "away_score": -1.332,
+        "home_fade": 1.15,
+        "away_fade": 1.734,
+        "reason": "Direction nette: San Diego Padres (-0.54)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.584
           },
           {
             "side": "away",
