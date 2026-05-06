@@ -1323,3 +1323,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : suppression de `renderTopPicks`, du conteneur `top-picks-wrap` et du gating `isTop` devenu impossible.
 - Verrou : ajout de `scripts/audit_no_dead_top_page.py` dans le groupe drift statique.
 - Résultat : 50/50 pytest, 17 probes navigateur verts, 9 audits statiques verts, `legacy-app.js` descend à 1774.3 KB.
+
+## Sprint v37.068 — AUTO 10/10 Dead sports grid (17:44 UTC)
+- Hypothèse : l'ancienne page `simples` gardait une grille sports, filtres et cartes alors que la route n'est plus valide.
+- Fix : suppression de la grille single-sport, des wrappers HTML, de `renderFilters`, `renderSummary`, `renderCard` et du quick-take dormant.
+- Verrou : ajout de `scripts/audit_no_dead_sports_grid.py` dans le groupe drift statique.
+- Résultat : 50/50 pytest, 17 probes navigateur verts, 10 audits statiques verts, `legacy-app.js` passe sous cible à 1728.2 KB.

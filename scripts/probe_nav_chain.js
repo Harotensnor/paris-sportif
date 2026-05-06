@@ -121,17 +121,31 @@ async function nav(page, hash, wait = 700) {
   await page.waitForTimeout(300);
 
   console.log('\n=== Step 4: revived routes (combines, sante, alertes) ===');
-  for (const route of ['#combines', '#sante', '#alertes', '#bilan', '#historique', '#backtest', '#credibilite', '#compare', '#montantes', '#simulator']) {
+  const routeExpectations = {
+    '#combines': 'combines-wrap',
+    '#sante': 'sante-wrap',
+    '#alertes': 'alertes-wrap',
+    '#bilan': 'bilan-wrap',
+    '#historique': 'historique-wrap',
+    '#backtest': 'backtest-wrap',
+    '#credibilite': 'credibilite-wrap',
+    '#compare': 'compare-wrap',
+    '#montantes': 'montante-wrap',
+    '#simulator': 'profil-wrap',
+  };
+  for (const [route, expectedWrap] of Object.entries(routeExpectations)) {
     const before = errs.length;
     await nav(page, route, 1100);
-    const visibleId = await page.evaluate(() => {
+    const visibleIds = await page.evaluate(() => {
       const main = document.querySelector('#main-content');
       const visible = Array.from(main.querySelectorAll(':scope > div')).filter(el => el.offsetParent !== null);
-      return visible.map(el => el.id).filter(Boolean).join(',');
+      return visible.map(el => el.id).filter(Boolean);
     });
     const newErrs = errs.slice(before);
-    check(`${route} → visible wraps: ${visibleId}`, newErrs.length === 0 && visibleId.length > 0,
-      `errs=${newErrs.length}`);
+    const hasExpected = visibleIds.includes(expectedWrap);
+    const leaksCombines = route !== '#combines' && visibleIds.includes('combines-wrap');
+    check(`${route} → visible wraps: ${visibleIds.join(',')}`, newErrs.length === 0 && hasExpected && !leaksCombines,
+      `errs=${newErrs.length}, expected=${expectedWrap}, visible=${visibleIds.join(',')}`);
   }
 
   console.log('\n=== Step 5: hash survives reload (suivi sub-nav v37.048) ===');
