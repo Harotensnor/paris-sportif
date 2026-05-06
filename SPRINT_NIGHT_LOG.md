@@ -1383,3 +1383,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : module `src/qa-runtime.js`, capture locale early, export bug report, canary local, hash asset et hooks legacy sans doublon.
 - Verrou : `scripts/probe_qa_runtime.js` + `scripts/audit_qa_runtime_privacy.py` branchés CI.
 - Résultat : 50/50 pytest, 19 probes navigateur verts, 18 audits statiques verts, runtime QA local sans réseau.
+
+## Sprint v37.078 — AUTO 10/10 Critical CI paths (19:18 UTC)
+- Hypothèse : un changement de module runtime (`app-enhancements.js`, `src/**`, `vendor/**`) peut ne pas déclencher smoke/e2e.
+- Fix : extension des `paths` CI aux assets critiques et audit dédié sur les filtres push/PR.
+- Verrou : `scripts/audit_ci_critical_paths.py` branché dans le groupe drift statique.
+- Résultat : 50/50 pytest, 19 probes navigateur verts, 19 audits statiques verts, assets critiques couverts.
