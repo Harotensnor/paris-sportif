@@ -1222,3 +1222,11 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Vérifs: ux-overhaul desktop + mobile 6/6, app.js syntax OK, a11y 0/0/0, Lighthouse fallback 100/100/100 sur 4 pages x2, pipeline drift/freshness OK.
 - Captures: 12 avant + 12 après dans captures/ux-overhaul-v37.015-before/ et captures/ux-overhaul-v37.016/.
 
+
+## Sprint v37.017 — AUTO 10/10 Performance shell + ESM (03:35 UTC)
+- Runtime: app.js devient shell <1KB, legacy-app.js isole le chunk historique, 6 modules ESM natifs branchés.
+- Workers: quality distribution, backtest simulation et bayesian priors sortis en workers.
+- Chargement: critical CSS inline, preload data_lite_72h, modulepreload, preconnect ESPN/Sofascore, SW cache images/modules/workers.
+- Assets: WebP + AVIF generés pour icones et OG; budget app.js 0.43KB gzip, CSS 46.75KB gzip; legacy reste 452.9KB gzip.
+- Vérifs: syntax OK, performance/UX/Kelly/evaluate tests 50/50, Lighthouse fallback 100/100/100/100 sur 4 pages x2, a11y 0, memory profile OK.
+

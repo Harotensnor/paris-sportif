@@ -1,0 +1,68 @@
+{
+  "generated_at": "2026-05-06T00:34:08.958720Z",
+  "targets": {
+    "app_js_gzip_target_kb": 350,
+    "css_gzip_target_kb": 50
+  },
+  "assets": {
+    "app.js": {
+      "exists": true,
+      "raw_kb": 0.82,
+      "gzip_kb": 0.43,
+      "budget": {
+        "raw_kb": 20,
+        "gzip_kb": 8
+      }
+    },
+    "legacy-app.js": {
+      "exists": true,
+      "raw_kb": 1782.52,
+      "gzip_kb": 452.9,
+      "budget": {
+        "raw_kb": 1850,
+        "gzip_kb": 500
+      }
+    },
+    "app.css": {
+      "exists": true,
+      "raw_kb": 260.42,
+      "gzip_kb": 46.75,
+      "budget": {
+        "raw_kb": 300,
+        "gzip_kb": 50
+      }
+    },
+    "app-design-v3.css": {
+      "exists": true,
+      "raw_kb": 16.23,
+      "gzip_kb": 4.03,
+      "budget": {
+        "raw_kb": 32,
+        "gzip_kb": 8
+      }
+    },
+    "pronostics.html": {
+      "exists": true,
+      "raw_kb": 83.6,
+      "gzip_kb": 24.79,
+      "budget": {
+        "raw_kb": 1150,
+        "gzip_kb": 90
+      }
+    },
+    "src/perf-bootstrap.js": {
+      "exists": true,
+      "raw_kb": 6.73,
+      "gzip_kb": 2.4,
+      "budget": {
+        "raw_kb": 20,
+        "gzip_kb": 8
+      }
+    }
+  },
+  "failures": [],
+  "warnings": [
+    "legacy-app.js gzip 452.9KB above long-term target 350KB"
+  ],
+  "status": "warning"
+}
