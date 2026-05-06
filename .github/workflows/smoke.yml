@@ -24,6 +24,7 @@ on:
       - 'scripts/probe_theme_cycle.js'
       - 'scripts/probe_pull_to_refresh.js'
       - 'scripts/probe_cmdk_search.js'
+      - 'scripts/probe_notifications_optin.js'
       - 'scripts/probe_strategies_outsider.js'
       - 'scripts/probe_prob_calibration_sport.js'
       - '.github/workflows/smoke.yml'
@@ -45,6 +46,7 @@ on:
       - 'scripts/probe_theme_cycle.js'
       - 'scripts/probe_pull_to_refresh.js'
       - 'scripts/probe_cmdk_search.js'
+      - 'scripts/probe_notifications_optin.js'
       - 'scripts/probe_strategies_outsider.js'
       - 'scripts/probe_prob_calibration_sport.js'
   workflow_dispatch: {}
@@ -150,6 +152,11 @@ jobs:
         # listbox: Ctrl/Cmd-K focus, results, highlight, arrow/enter
         # activation and Escape close.
         run: node scripts/probe_cmdk_search.js
+
+      - name: Run notifications opt-in probe
+        # Locks the privacy rule: Notification.requestPermission() is
+        # never called at boot, only after explicit user opt-in.
+        run: node scripts/probe_notifications_optin.js
 
       - name: Run outsider strategy probe
         # Locks the Performance > Strategies surfacing of outsider_only

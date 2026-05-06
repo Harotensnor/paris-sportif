@@ -1293,3 +1293,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : legacy laisse la palette gérer Ctrl-K; la palette expose dialog/listbox/options, reset sélection à chaque saisie et blur au close.
 - Verrou : `scripts/probe_cmdk_search.js` couvre Ctrl+K, option active, ArrowDown/Enter, Escape et `/` pour la recherche topbar.
 - Résultat : 50/50 pytest, 7 audits statiques, 15/15 probes navigateur vertes; legacy-app.js 1797.3 KB.
+
+## Sprint v37.063 — AUTO 10/10 Notifications opt-in QA (17:10 UTC)
+- Hypothèse : les notifications pourraient demander la permission au boot si une préférence locale existe déjà.
+- Fix : ajout d'un probe privacy-first avec API Notification locale simulée, sans appel externe.
+- Verrou : `scripts/probe_notifications_optin.js` vérifie boot sans prompt, clic explicite, préférence push et reload sans re-prompt.
+- Résultat : 50/50 pytest, 7 audits statiques, 16/16 probes navigateur vertes; aucune demande Notification au boot.
