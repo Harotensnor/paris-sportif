@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-05-06T14:58:19Z",
+  "generated_at": "2026-05-06T15:09:50Z",
   "method": "Dixon-Coles MLE grid search (ρ ∈ [-0.30, 0.10] step 0.005), λ_h, λ_a fixés à moyenne empirique par ligue. CI 95% via LR test.",
   "min_matches": 40,
   "default_rho": -0.13,
-  "n_leagues": 127,
+  "n_leagues": 128,
   "n_measured": 0,
   "leagues": {
     "1lig": {
@@ -149,6 +149,14 @@
       "rho_used": -0.13,
       "source": "literature_fallback",
       "reason": "n=5 < 40"
+    },
+    "championsleague": {
+      "n": 1,
+      "rho_measured": null,
+      "rho_literature": -0.13,
+      "rho_used": -0.13,
+      "source": "literature_fallback",
+      "reason": "n=1 < 40"
     },
     "chi.1": {
       "n": 9,
