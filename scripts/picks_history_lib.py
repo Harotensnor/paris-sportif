@@ -21,6 +21,8 @@ from _data_io import DATA_RE, load_data_js, iter_events
 ROOT = Path(__file__).resolve().parent.parent
 HISTORY_PATH = ROOT / "picks_history.jsonl"
 SUMMARY_PATH = ROOT / "picks_history_summary.json"
+MIN_MODEL_PROB = 0.001
+MAX_MODEL_PROB = 0.95
 
 
 def utc_now_iso() -> str:
@@ -235,7 +237,7 @@ def football_model(event: dict) -> dict[str, float]:
         model[f"HT_U{line}"] = 1 - p_over
     model["DNB_1"] = p_home / max(0.0001, p_home + p_away)
     model["DNB_2"] = p_away / max(0.0001, p_home + p_away)
-    return {k: clamp(v, 0.001, 0.999) for k, v in model.items()}
+    return {k: clamp(v, MIN_MODEL_PROB, MAX_MODEL_PROB) for k, v in model.items()}
 
 
 def implied_fallback(odd: float, siblings: list[dict], row: dict) -> float:
@@ -255,7 +257,7 @@ def add_candidate(out: list[dict], event: dict, row: dict, siblings: list[dict],
     if odd is None or odd < 1.01 or odd > 50:
         return
     base = implied_fallback(odd, siblings, row)
-    prob = clamp(model_prob if model_prob is not None else base + 0.012, 0.001, 0.999)
+    prob = clamp(model_prob if model_prob is not None else base + 0.012, MIN_MODEL_PROB, MAX_MODEL_PROB)
     edge = prob - (1 / odd)
     ev = prob * odd - 1
     tier = tier_for(odd, prob, edge)
