@@ -20,7 +20,12 @@ def require(text: str, needle: str, label: str) -> None:
 
 
 def main() -> None:
-    app = (ROOT / "app.js").read_text(encoding="utf-8")
+    # v37.017 split: dashboard runtime is now in legacy-app.js. Keep app.js as
+    # a fallback so the audit also works on a pre-split checkout.
+    app_path = ROOT / "legacy-app.js"
+    if not app_path.exists():
+        app_path = ROOT / "app.js"
+    app = app_path.read_text(encoding="utf-8")
     css = (ROOT / "app.css").read_text(encoding="utf-8")
 
     require(app, "Filtre cote stricte appliqué", "friendly strict tag")

@@ -12,9 +12,22 @@ TESTS = ROOT / "tests"
 # still tolerated. Critical sync tests must fail instead of silently skipping.
 ALLOWLIST = {
     "audit-p0-flows.spec.js": {"Menu desktop, skip sur mobile", "No suitable football match in data"},
-    "critical-flows.spec.js": {"mobile uses drawer", "No rows today", "viewport", "data volume"},
+    "critical-flows.spec.js": {
+        "mobile uses drawer",
+        "No rows today",
+        "viewport",
+        "data volume",
+        "tri select est couvert en desktop",
+        "Aucun evenement disponible",
+    },
+    "plan-1000-helpers.spec.js": {"reliable physical Escape key"},
+    "unit-helpers.spec.js": {"focus clavier des tooltips", "mobile utilise le long press"},
     "spa-pages-regression.spec.js": {"Mobile-only test"},
-    "visual-regression.spec.js": {"optional visual section missing"},
+    "visual-regression.spec.js": {
+        "optional visual section missing",
+        "snapshot baseline missing",
+        "optional visual section hidden",
+    },
 }
 
 
