@@ -23,6 +23,7 @@ on:
       - 'scripts/probe_onboarding_fresh.js'
       - 'scripts/probe_theme_cycle.js'
       - 'scripts/probe_pull_to_refresh.js'
+      - 'scripts/probe_cmdk_search.js'
       - 'scripts/probe_strategies_outsider.js'
       - 'scripts/probe_prob_calibration_sport.js'
       - '.github/workflows/smoke.yml'
@@ -43,6 +44,7 @@ on:
       - 'scripts/probe_onboarding_fresh.js'
       - 'scripts/probe_theme_cycle.js'
       - 'scripts/probe_pull_to_refresh.js'
+      - 'scripts/probe_cmdk_search.js'
       - 'scripts/probe_strategies_outsider.js'
       - 'scripts/probe_prob_calibration_sport.js'
   workflow_dispatch: {}
@@ -142,6 +144,12 @@ jobs:
         # indicator, calls pollData(true), keeps UI interactive, then
         # hides the indicator once the refresh settles.
         run: node scripts/probe_pull_to_refresh.js
+
+      - name: Run Cmd-K search probe
+        # Locks the topbar command search as a keyboard-navigable
+        # listbox: Ctrl/Cmd-K focus, results, highlight, arrow/enter
+        # activation and Escape close.
+        run: node scripts/probe_cmdk_search.js
 
       - name: Run outsider strategy probe
         # Locks the Performance > Strategies surfacing of outsider_only

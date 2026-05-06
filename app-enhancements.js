@@ -300,16 +300,20 @@
   function initCommandPalette(){
     cmdModal = document.createElement('div');
     cmdModal.id = '__cmd-modal';
+    cmdModal.setAttribute('role', 'dialog');
+    cmdModal.setAttribute('aria-modal', 'true');
+    cmdModal.setAttribute('aria-labelledby', '__cmd-title');
     cmdModal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(6px);' +
       'z-index:100000;display:none;align-items:flex-start;justify-content:center;padding-top:10vh;';
     cmdModal.innerHTML =
       '<div style="background:#17171b;border:1px solid rgba(255,255,255,0.12);border-radius:14px;' +
       'width:min(600px,92vw);max-height:70vh;display:flex;flex-direction:column;overflow:hidden;' +
       'box-shadow:0 24px 60px rgba(0,0,0,0.7);">' +
-      '<input id="__cmd-input" type="text" placeholder="Tape une commande, une page..." aria-label="Recherche commande ou page" autocomplete="off" spellcheck="false" ' +
+      '<h2 id="__cmd-title" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;">Palette de commandes</h2>' +
+      '<input id="__cmd-input" type="text" placeholder="Tape une commande, une page..." aria-label="Recherche commande ou page" aria-controls="__cmd-results" autocomplete="off" spellcheck="false" ' +
       'style="background:none;border:none;color:#ededef;padding:18px 22px;font-size:16px;outline:none;' +
       'border-bottom:1px solid rgba(255,255,255,0.08);">' +
-      '<div id="__cmd-results" style="overflow-y:auto;padding:6px 0;flex:1;"></div>' +
+      '<div id="__cmd-results" role="listbox" aria-label="Commandes disponibles" style="overflow-y:auto;padding:6px 0;flex:1;"></div>' +
       '<div style="padding:10px 22px;font-size:11px;color:#5c5c62;border-top:1px solid rgba(255,255,255,0.06);' +
       'display:flex;gap:14px;flex-wrap:wrap;">' +
       '<span>↑↓ naviguer</span><span>↵ valider</span><span>Esc fermer</span>' +
@@ -317,7 +321,10 @@
     document.body.appendChild(cmdModal);
     cmdInput = cmdModal.querySelector('#__cmd-input');
     cmdResults = cmdModal.querySelector('#__cmd-results');
-    cmdInput.addEventListener('input', renderCmdResults);
+    cmdInput.addEventListener('input', function(){
+      cmdSelectedIdx = 0;
+      renderCmdResults();
+    });
     cmdInput.addEventListener('keydown', handleCmdKey);
     cmdModal.addEventListener('click', function(e){ if (e.target === cmdModal) closeCmd(); });
   }
@@ -328,7 +335,13 @@
     renderCmdResults();
     setTimeout(function(){ cmdInput.focus(); }, 50);
   }
-  function closeCmd(){ cmdModal.style.display = 'none'; }
+  function closeCmd(){
+    cmdModal.style.display = 'none';
+    if (cmdInput) {
+      cmdInput.removeAttribute('aria-activedescendant');
+      cmdInput.blur();
+    }
+  }
   function renderCmdResults(){
     var q = cmdInput.value.trim().toLowerCase();
     cmdItems = commands.map(function(c){
@@ -338,13 +351,15 @@
     }).filter(function(c){ return !q || c.score > 0; }).sort(function(a,b){ return b.score - a.score; });
     if (cmdSelectedIdx >= cmdItems.length) cmdSelectedIdx = 0;
     cmdResults.innerHTML = cmdItems.map(function(c, i){
-      return '<div class="__cmd-item" data-idx="' + i + '" style="padding:11px 22px;cursor:pointer;' +
+      return '<div class="__cmd-item" id="__cmd-opt-' + i + '" role="option" aria-selected="' + (i === cmdSelectedIdx ? 'true' : 'false') + '" data-idx="' + i + '" style="padding:11px 22px;cursor:pointer;' +
         'display:flex;align-items:center;gap:14px;' +
         (i === cmdSelectedIdx ? 'background:rgba(167,139,250,0.16);' : '') + '">' +
         '<span style="font-size:18px;">' + c.icon + '</span>' +
         '<span style="color:#ededef;font-size:14px;">' + c.label + '</span>' +
         '</div>';
     }).join('');
+    if (cmdItems.length) cmdInput.setAttribute('aria-activedescendant', '__cmd-opt-' + cmdSelectedIdx);
+    else cmdInput.removeAttribute('aria-activedescendant');
     Array.prototype.forEach.call(cmdResults.querySelectorAll('.__cmd-item'), function(el){
       el.addEventListener('click', function(){
         var it = cmdItems[+el.dataset.idx];
@@ -354,7 +369,9 @@
         cmdSelectedIdx = +el.dataset.idx;
         Array.prototype.forEach.call(cmdResults.querySelectorAll('.__cmd-item'), function(el2, j){
           el2.style.background = j === cmdSelectedIdx ? 'rgba(167,139,250,0.16)' : '';
+          el2.setAttribute('aria-selected', j === cmdSelectedIdx ? 'true' : 'false');
         });
+        cmdInput.setAttribute('aria-activedescendant', el.id);
       });
     });
   }

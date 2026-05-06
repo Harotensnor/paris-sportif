@@ -1286,4 +1286,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Hypothèse : le geste mobile pull-to-refresh pouvait casser sans alerte car aucun test ne le simulait.
 - Fix : ajout de `scripts/probe_pull_to_refresh.js` avec geste tactile Chrome DevTools, pollData(true), indicateur et fermeture.
 - Verrou : probe branchée dans `smoke.yml` pour bloquer les régressions mobile.
-- Résultat : probe locale en cours, version/footer/SW bumpés.
+- Résultat : 50/50 pytest, 7 audits statiques, 14/14 probes navigateur vertes.
+
+## Sprint v37.062 — AUTO 10/10 Cmd-K keyboard QA (16:54 UTC)
+- Hypothèse : Cmd-K ouvrait une vraie palette mais restait en conflit avec le focus recherche legacy et sans sélection ARIA verrouillée.
+- Fix : legacy laisse la palette gérer Ctrl-K; la palette expose dialog/listbox/options, reset sélection à chaque saisie et blur au close.
+- Verrou : `scripts/probe_cmdk_search.js` couvre Ctrl+K, option active, ArrowDown/Enter, Escape et `/` pour la recherche topbar.
+- Résultat : 50/50 pytest, 7 audits statiques, 15/15 probes navigateur vertes; legacy-app.js 1797.3 KB.
