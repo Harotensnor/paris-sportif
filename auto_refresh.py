@@ -143,6 +143,8 @@ PATCH_STAGES = [
     ('build_tier_calibration.py',   1,   30),
     # v37.029 — Probability calibration map.
     ('build_prob_calibration.py',   1,   30),
+    # v37.033 — Stamp site version label from latest commit subject.
+    ('stamp_version.py',            1,   60),
     ('train_lightgbm.py',           1,   30),
     ('build_lightgbm_runtime.py',   1,   15),
     ('audit_lightgbm_runtime.py',   1,   15),
