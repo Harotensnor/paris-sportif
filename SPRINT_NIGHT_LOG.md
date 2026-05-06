@@ -1576,3 +1576,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : waitForStep et fermeture overlay passent à 5s, sans changer l'invariant clavier/persistance.
 - Verrou : probe_onboarding_fresh.js reste dans smoke.yml et bloque le flow fresh user.
 - Résultat : la sonde est stable localement et la branche reprend les données cron 22:27 UTC.
+
+## Sprint v37.106 — AUTO 10/10 Cron follow-up resync (22:32 UTC)
+- Hypothèse : le fix onboarding doit être republié au-dessus du dernier snapshot main pour lancer les checks.
+- Fix : merge origin/main 22:29 UTC, données main conservées, shell/cache bumpés v37.106.
+- Verrou : audit_data_truth.py et probe_onboarding_fresh.js avant push.
+- Résultat : le correctif smoke reste présent sur une base PR fraîche.
