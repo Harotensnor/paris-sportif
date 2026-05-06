@@ -1253,3 +1253,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - UI aide: module docs-onboarding.js branche #faq, #tour, bouton aide global, recherche Académie et onboarding 8 étapes.
 - Vendor: lunr.min.js local pour recherche documentaire sans service distant.
 - Vérifs: JS syntax OK, inline scripts OK, docs counts OK, SW paris-sportif-20260506-043000, footer v37.020.
+
+## Sprint v37.021 — AUTO 10/10 Analytics personnalisation locale (04:55 UTC)
+- Privacy: module `src/local-analytics.js` sans fetch/XHR/sendBeacon/WebSocket/EventSource, stockage borné dans `localStorage.usage_telemetry`.
+- UX locale: `#my-dashboard`, `#activity`, heatmap clics, funnel, weekly summary, smart alerts, saved views, segment local et badges "Match pour toi".
+- Personnalisation: recommandations basées sur picks ouverts, sport/ligue/tier/cote préférés, nav adaptative "Perso" et modules dashboard réordonnables.
+- Audit: `scripts/audit_local_analytics.py` + `analytics_local_privacy_audit.json`, spec Playwright `tests/local-analytics.spec.js`.
+- Vérifs: JS syntax OK, audit local analytics OK, captures Edge headless OK; refresh local rejeté par intégrité data (1018 → 240) puis restauré, SW paris-sportif-20260506-045500, footer v37.021.
