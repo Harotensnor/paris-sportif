@@ -1802,6 +1802,16 @@ el.appendChild(actBtn);
 } else {
 el.textContent = msg;
 }
+const closeBtn = document.createElement('button');
+closeBtn.type = 'button';
+closeBtn.className = 'toast-close';
+closeBtn.setAttribute('aria-label', 'Fermer la notification');
+closeBtn.textContent = '×';
+closeBtn.addEventListener('click', () => {
+el.classList.add('dismissing');
+setTimeout(() => el.remove(), 180);
+});
+el.appendChild(closeBtn);
 host.appendChild(el);
 const cap = window.innerWidth < 380 ? 2 : 3;
 while (host.children.length > cap) host.removeChild(host.firstChild);
@@ -1811,6 +1821,32 @@ el.classList.add('dismissing');
 setTimeout(() => el.remove(), 220);
 }, duration);
 }
+
+(function setupUxMicroInteractions() {
+try {
+document.addEventListener('pointerdown', (event) => {
+const target = event.target && event.target.closest
+? event.target.closest('button,.btn-primary,.btn-secondary,.btn-ghost,.chip,.page-btn,[role="button"]')
+: null;
+if (!target || target.disabled || target.getAttribute('aria-disabled') === 'true') return;
+if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+const rect = target.getBoundingClientRect();
+if (!rect.width || !rect.height) return;
+const ripple = document.createElement('span');
+ripple.className = 'ux-ripple';
+const size = Math.max(rect.width, rect.height);
+ripple.style.width = `${size}px`;
+ripple.style.height = `${size}px`;
+ripple.style.left = `${event.clientX - rect.left}px`;
+ripple.style.top = `${event.clientY - rect.top}px`;
+const pos = getComputedStyle(target).position;
+if (pos === 'static') target.style.position = 'relative';
+target.style.overflow = target.style.overflow || 'hidden';
+target.appendChild(ripple);
+setTimeout(() => ripple.remove(), 560);
+}, { passive: true });
+} catch(e) { logSafeError('setupUxMicroInteractions', e); }
+})();
 
 const MY_BETS_KEY = 'myBets';
 function loadMyBets() {
@@ -25572,7 +25608,8 @@ const esc2 = (typeof esc === 'function') ? esc : (s) => String(s).replace(/[&<>"
     const favSportsLabel = favSports.length
       ? favSports.slice(0, 4).map(s => `${sportEmoji(s)} ${s}`).join(' · ') + (favSports.length > 4 ? ` · +${favSports.length - 4}` : '')
       : 'Aucun favori';
-    const themeLabel = currentTheme === 'light' ? 'Clair' : currentTheme === 'auto' ? 'Auto' : 'Sombre';
+    const themeLabels = { dark: 'Sombre', light: 'Clair', auto: 'System', system: 'System', ocean: 'Ocean', sunset: 'Sunset', forest: 'Forest', mono: 'Mono' };
+    const themeLabel = themeLabels[currentTheme] || 'Sombre';
     const riskLabels = { 1: 'Très prudent', 2: 'Prudent', 3: 'Équilibré', 4: 'Offensif', 5: 'Très offensif' };
     const divLabels = { 1: 'Très concentré', 2: 'Concentré', 3: 'Équilibré', 4: 'Diversifié', 5: 'Très diversifié' };
     const leagueButtons = availableLeagues.length ? availableLeagues.map(l => {
@@ -25757,9 +25794,13 @@ const esc2 = (typeof esc === 'function') ? esc : (s) => String(s).replace(/[&<>"
             <h3 class="section-h3">🎨 Apparence</h3>
             <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">Choisis la couleur du site.</div>
             <div class="pref-pill-group">
+              <button class="theme-pill theme-chip ${currentTheme==='ocean'?'active':''}" data-theme="ocean" data-theme-btn="ocean">🌊 Ocean</button>
+              <button class="theme-pill theme-chip ${currentTheme==='sunset'?'active':''}" data-theme="sunset" data-theme-btn="sunset">🌅 Sunset</button>
+              <button class="theme-pill theme-chip ${currentTheme==='forest'?'active':''}" data-theme="forest" data-theme-btn="forest">🌲 Forest</button>
+              <button class="theme-pill theme-chip ${currentTheme==='mono'?'active':''}" data-theme="mono" data-theme-btn="mono">◐ Mono</button>
+              <button class="theme-pill theme-chip ${(currentTheme==='auto'||currentTheme==='system')?'active':''}" data-theme="system" data-theme-btn="system">🌓 System</button>
               <button class="theme-pill theme-chip ${currentTheme==='dark'?'active':''}" data-theme="dark" data-theme-btn="dark">🌙 Sombre</button>
               <button class="theme-pill theme-chip ${currentTheme==='light'?'active':''}" data-theme="light" data-theme-btn="light">☀️ Clair</button>
-              <button class="theme-pill theme-chip ${currentTheme==='auto'?'active':''}" data-theme="auto" data-theme-btn="auto">🔄 Auto</button>
             </div>
             <div style="font-size:12px;color:var(--text-dim);margin:14px 0 6px;">Accent (couleur des éléments WIN/positifs).</div>
             <div class="pref-pill-group">
@@ -26200,18 +26241,18 @@ return `
         const theme = btn.dataset.themeBtn;
         savePrefs({ theme });
         const root = document.documentElement;
-        if (theme === 'auto') {
-          // 'auto' suit prefers-color-scheme — pas de data-theme, le browser choisit
+        if (theme === 'auto' || theme === 'system') {
           const sys = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
           if (sys === 'light') root.setAttribute('data-theme', 'light');
           else root.removeAttribute('data-theme');
-        } else if (theme === 'light') {
-          root.setAttribute('data-theme', 'light');
-        } else {
+        } else if (theme === 'dark') {
           root.removeAttribute('data-theme');
+        } else {
+          root.setAttribute('data-theme', theme);
         }
         const meta = document.getElementById('theme-color-meta');
-        if (meta) meta.setAttribute('content', theme === 'light' ? '#f5f5f7' : '#08080a');
+        const themeMeta = { light: '#f5f5f7', ocean: '#051925', sunset: '#211008', forest: '#061a12', mono: '#000000' };
+        if (meta) meta.setAttribute('content', themeMeta[theme] || '#08080a');
         renderProfilPage(wrap);
       });
     });
@@ -26221,7 +26262,7 @@ return `
         mql._wired = true;
         mql.addEventListener('change', () => {
           let p; try { p = JSON.parse(localStorage.getItem('userPrefs') || '{}'); } catch(e) { p = {}; }
-          if ((p.theme || 'dark') === 'auto') {
+          if ((p.theme || 'dark') === 'auto' || (p.theme || 'dark') === 'system') {
             const root = document.documentElement;
             if (mql.matches) root.setAttribute('data-theme', 'light');
             else root.removeAttribute('data-theme');
@@ -29664,15 +29705,33 @@ url: (typeof location !== 'undefined' && location.href) || '',
 saveJsErrors(arr);
 } catch (e) { /* swallow */ }
 }
+function showGlobalErrorBoundary(message) {
+try {
+if (document.getElementById('global-error-boundary')) return;
+const banner = document.createElement('div');
+banner.id = 'global-error-boundary';
+banner.className = 'global-error-banner';
+banner.setAttribute('role', 'alert');
+banner.innerHTML = `
+<span><b>Une erreur est survenue.</b> ${esc(message || 'Rafraîchis la page si l’affichage semble bloqué.')}</span>
+<button type="button" class="btn-secondary" data-error-refresh>Rafraîchir</button>`;
+document.body.appendChild(banner);
+const btn = banner.querySelector('[data-error-refresh]');
+if (btn) btn.addEventListener('click', () => location.reload());
+} catch (e) { /* no UI fallback */ }
+}
 try {
 window.addEventListener('error', (ev) => {
+if (ev.target && ev.target !== window && !ev.error) return;
 logJsError('error', ev.message || (ev.error && ev.error.message) || 'unknown',
 (ev.error && ev.error.stack) || `${ev.filename || ''}:${ev.lineno || ''}`);
+showGlobalErrorBoundary('Diagnostic enregistré localement.');
 });
 window.addEventListener('unhandledrejection', (ev) => {
 const r = ev.reason;
 logJsError('promise', (r && (r.message || r.toString())) || 'unhandled rejection',
 (r && r.stack) || '');
+showGlobalErrorBoundary('Une action n’a pas abouti correctement.');
 });
 } catch (e) { /* pas critique */ }
 
@@ -33452,21 +33511,28 @@ if (p.pushNotifs && typeof window._maybeNotifyHighEdgePicks === 'function') wind
 });
 
 const _systemPrefersLight = () => window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
-const _resolveTheme = (storedTheme) => storedTheme === 'auto' ? (_systemPrefersLight() ? 'light' : 'dark') : storedTheme;
+const UX_THEME_CHOICES = ['dark', 'light', 'system', 'auto', 'ocean', 'sunset', 'forest', 'mono'];
+const _resolveTheme = (storedTheme) => (storedTheme === 'auto' || storedTheme === 'system') ? (_systemPrefersLight() ? 'light' : 'dark') : storedTheme;
 const _nightRead = () => { const h = new Date().getHours(); return h >= 20 || h < 7; };
 const _applyTheme = (storedTheme) => {
-const effective = _nightRead() ? 'dark' : _resolveTheme(storedTheme);
+const premium = ['ocean', 'sunset', 'forest', 'mono'].includes(storedTheme);
+const effective = (!premium && _nightRead()) ? 'dark' : _resolveTheme(storedTheme);
 const root = document.documentElement;
-if (effective === 'light') root.setAttribute('data-theme', 'light');
+if (effective && effective !== 'dark') root.setAttribute('data-theme', effective);
 else root.removeAttribute('data-theme');
-root.style.filter = _nightRead() ? 'sepia(.06) saturate(.92)' : '';
+root.style.filter = (!premium && _nightRead()) ? 'sepia(.06) saturate(.92)' : '';
 const meta = document.getElementById('theme-color-meta');
-if (meta) meta.setAttribute('content', effective === 'light' ? '#f5f5f7' : '#08080a');
+const themeMeta = { light: '#f5f5f7', ocean: '#051925', sunset: '#211008', forest: '#061a12', mono: '#000000' };
+if (meta) meta.setAttribute('content', themeMeta[effective] || '#08080a');
 const tt = document.getElementById('theme-toggle');
 if (tt) {
-tt.textContent = storedTheme === 'auto' ? '🌓' : storedTheme === 'light' ? '☀️' : '🌙';
-tt.title = storedTheme === 'auto' ? 'Thème : auto (système) · clic pour cycler'
+tt.textContent = storedTheme === 'auto' || storedTheme === 'system' ? '🌓' : storedTheme === 'light' ? '☀️' : storedTheme === 'ocean' ? '🌊' : storedTheme === 'sunset' ? '🌅' : storedTheme === 'forest' ? '🌲' : storedTheme === 'mono' ? '◐' : '🌙';
+tt.title = storedTheme === 'auto' || storedTheme === 'system' ? 'Thème : system · clic pour cycler'
 : storedTheme === 'light' ? 'Thème : clair · clic pour cycler'
+: storedTheme === 'ocean' ? 'Thème : Ocean · clic pour cycler'
+: storedTheme === 'sunset' ? 'Thème : Sunset · clic pour cycler'
+: storedTheme === 'forest' ? 'Thème : Forest · clic pour cycler'
+: storedTheme === 'mono' ? 'Thème : Mono · clic pour cycler'
 : 'Thème : sombre · clic pour cycler';
 tt.setAttribute('aria-label', tt.title);
 }
@@ -33474,13 +33540,13 @@ tt.setAttribute('aria-label', tt.title);
 let _currentTheme = 'dark';
 try {
 const initPrefs = JSON.parse(localStorage.getItem('userPrefs') || '{}');
-_currentTheme = ['dark', 'light', 'auto'].includes(initPrefs.theme) ? initPrefs.theme : 'dark';
+_currentTheme = UX_THEME_CHOICES.includes(initPrefs.theme) ? initPrefs.theme : 'dark';
 _applyTheme(_currentTheme);
 } catch(e) { _applyTheme('dark'); }
 try { setInterval(() => _applyTheme(_currentTheme), 600000); } catch(e){}
 try {
 const mql = window.matchMedia('(prefers-color-scheme: light)');
-const _onSysChange = () => { if (_currentTheme === 'auto') _applyTheme('auto'); };
+const _onSysChange = () => { if (_currentTheme === 'auto' || _currentTheme === 'system') _applyTheme(_currentTheme); };
 if (mql.addEventListener) mql.addEventListener('change', _onSysChange);
 else if (mql.addListener) mql.addListener(_onSysChange);
 } catch(e){}
@@ -33488,7 +33554,7 @@ window.addEventListener('storage', (ev) => {
 if (ev.key !== 'userPrefs') return;
 try {
 const fresh = JSON.parse(ev.newValue || '{}');
-const next = ['dark', 'light', 'auto'].includes(fresh.theme) ? fresh.theme : 'dark';
+const next = UX_THEME_CHOICES.includes(fresh.theme) ? fresh.theme : 'dark';
 if (next !== _currentTheme) {
 _currentTheme = next;
 _applyTheme(next);
@@ -33499,14 +33565,14 @@ const themeBtn = document.getElementById('theme-toggle');
 if (themeBtn) themeBtn.addEventListener('click', () => {
 try {
 const p = JSON.parse(localStorage.getItem('userPrefs') || '{}');
-const cur = ['dark', 'light', 'auto'].includes(p.theme) ? p.theme : 'dark';
-const cycle = { dark: 'light', light: 'auto', auto: 'dark' };
+const cur = UX_THEME_CHOICES.includes(p.theme) ? p.theme : 'dark';
+const cycle = { dark: 'light', light: 'system', system: 'ocean', auto: 'ocean', ocean: 'sunset', sunset: 'forest', forest: 'mono', mono: 'dark' };
 const next = cycle[cur];
 p.theme = next;
 _currentTheme = next;
 localStorage.setItem('userPrefs', JSON.stringify(p));
 _applyTheme(next);
-const labels = { dark: 'sombre', light: 'clair', auto: 'auto (système)' };
+const labels = { dark: 'sombre', light: 'clair', system: 'system', auto: 'system', ocean: 'Ocean', sunset: 'Sunset', forest: 'Forest', mono: 'Mono' };
 if (typeof toast === 'function') toast('🎨 Thème : ' + labels[next], 'info');
 } catch(e){}
 });

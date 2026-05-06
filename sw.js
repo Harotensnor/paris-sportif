@@ -11,7 +11,7 @@
 // The "Stamp sw.js" step replaces this entire line with the current UTC timestamp,
 // so every deploy invalidates all caches → users see the new pronostics.html
 // without needing Ctrl+Shift+R. Manual edits stay valid for local dev.
-const CACHE_VERSION = 'paris-sportif-20260506-020200';
+const CACHE_VERSION = 'paris-sportif-20260506-022900';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -31,6 +31,7 @@ const PRECACHE_ASSETS = [
   // v35.295 — app.js sort du precache : 1.6MB ne doit pas bloquer l'install PWA.
   // Il reste servi en stale-while-revalidate au premier chargement puis en offline.
   'app.css',
+  'app-design-v3.css',
   'app-i18n.js',
   'sports_coverage_extended.js',
   'i18n.json',
@@ -53,6 +54,7 @@ const LAZY_CACHE_FIRST = [
   'backtest.html',
   'credibilite.html',
   '404.html',
+  'components-showcase.html',
   // OG images partagées sur reseaux sociaux : cache-first au premier hit,
   // pas à l'installation PWA.
   'og-default.png',
@@ -196,7 +198,7 @@ self.addEventListener('fetch', (event) => {
   // app.css + app.js : STALE-WHILE-REVALIDATE. Servir le cache
   // immédiatement (instant render) ET refetch en background pour la prochaine
   // visite. Couplé au stamp CACHE_VERSION bumpé à chaque vrai changement.
-  if (pathEndsWith(url, 'app.css') || pathEndsWith(url, 'app.js')) {
+  if (pathEndsWith(url, 'app.css') || pathEndsWith(url, 'app-design-v3.css') || pathEndsWith(url, 'app.js')) {
     event.respondWith(
       caches.match(req).then(hit => {
         const fetchPromise = fetch(req).then(resp => {
