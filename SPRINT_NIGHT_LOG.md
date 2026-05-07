@@ -1867,3 +1867,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Expanded the detail modal into a complete prono sheet with synthesis, odds, why-this-pick, signals, alternatives, history, risks and sources.
 - Neutralized travel penalties in the model path; travel remains visible as context but no longer changes probability, edge, score or tier.
 - Added a smoke probe locking complete prono sheets, top-pick odd validation and travel-neutral scoring.
+
+### v37.168 — Top Paris audit and reliability lock
+- Added a visible "Pourquoi pas plus de top picks ?" audit panel under Top Paris du jour.
+- Exposed `window.__v38TopParisAudit` with scanned, eligible, selected, odd-status and rejection counts.
+- Counted exclusions for stale data, invalid odds, low score, duplicate matches, market caps and overflow.
+- Extended the prono-sheet probe so CI verifies the audit panel and selected count.
+- Added `audit_top_paris_contract.py` to lock the Top Paris reliability contract in the drift job.
