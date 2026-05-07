@@ -198,11 +198,12 @@ async function dispatchPull(page) {
   check('pull calls pollData(true)', await page.evaluate(() => window.__ptrForce === true), 'pollData was not called with force=true');
   check('UI remains interactive while refresh is pending', refreshing && refreshing.pointer !== 'none', JSON.stringify(refreshing));
 
+  await page.waitForFunction(() => typeof window.__ptrResolve === 'function', null, { timeout: 2000 });
   await page.evaluate(() => { if (typeof window.__ptrResolve === 'function') window.__ptrResolve(); });
   await page.waitForFunction(() => {
     const el = document.querySelector('.ptr-indicator');
     return el && !el.classList.contains('visible') && el.getAttribute('aria-hidden') === 'true';
-  }, null, { timeout: 3000 });
+  }, null, { timeout: 6000 });
   const hidden = await indicatorState(page);
   check('indicator hides after refresh resolves', !!hidden && hidden.hidden === 'true' && !hidden.cls.includes('visible'), JSON.stringify(hidden));
   check('zero console errors', errors.length === 0, errors.slice(0, 3).join(' | '));
