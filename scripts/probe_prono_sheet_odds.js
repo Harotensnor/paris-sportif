@@ -76,15 +76,23 @@ function check(label, ok, detail) {
 
   const topState = await page.evaluate(() => {
     const section = document.querySelector('[data-v38-top-paris]');
+    const auditNode = document.querySelector('[data-v38-top-audit]');
     const cards = Array.from(document.querySelectorAll('[data-top-paris-card]'));
+    const audit = window.__v38TopParisAudit || {};
     return {
       hasSection: !!section,
+      hasAudit: !!auditNode,
+      audit,
       count: cards.length,
       badStatuses: cards.map(c => c.dataset.oddStatus || '').filter(s => !['verified', 'changed'].includes(s)),
+      auditText: auditNode ? (auditNode.innerText || '').slice(0, 240) : '',
       text: section ? (section.innerText || '').slice(0, 180) : ''
     };
   });
   check('Top Paris section rendered', topState.hasSection, topState.text);
+  check('Top Paris audit rendered', topState.hasAudit, topState.auditText);
+  check('Top Paris audit selected count matches cards', Number(topState.audit.selected || 0) === topState.count, JSON.stringify(topState.audit));
+  check('Top Paris audit exposes rejection reasons', topState.auditText.includes('Pourquoi pas plus') && Number.isFinite(Number(topState.audit.scanned)), topState.auditText);
   check('Top Paris cards use only verified/changed odds', topState.badStatuses.length === 0, topState.badStatuses.join(', '));
 
   const opened = await page.evaluate(() => {

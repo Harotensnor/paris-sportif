@@ -3605,6 +3605,13 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
       .v38-top-card p{margin:8px 0 0;color:var(--text-dim);font-size:11.5px;line-height:1.4}
       .v38-top-card__chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
       .v38-top-card__chips i{font-style:normal;border:1px solid var(--border);border-radius:999px;padding:3px 7px;font-size:10px;color:var(--text-dim)}
+      .v38-top-audit{margin-top:12px;border:1px solid rgba(148,163,184,.16);border-radius:12px;background:rgba(15,23,42,.45);padding:10px 12px}
+      .v38-top-audit h5{margin:0 0 8px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-dim)}
+      .v38-top-audit__grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+      .v38-top-audit__item{border:1px solid rgba(148,163,184,.12);border-radius:10px;padding:8px;background:rgba(2,6,23,.35)}
+      .v38-top-audit__item span{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-dim)}
+      .v38-top-audit__item b{display:block;margin-top:2px;font-size:15px;color:var(--text)}
+      .v38-top-audit__item em{display:block;margin-top:2px;font-style:normal;font-size:10px;color:var(--text-dim)}
       .v38-open-analysis{display:inline-flex;margin-top:6px;color:var(--brand);font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.04em}
       @media (max-width:720px){.v38-prono-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.v38-prono-hero h3{font-size:20px}.v38-alt-table{font-size:11px}.v38-alt-table th:nth-child(4),.v38-alt-table td:nth-child(4){display:none}}
     `;
@@ -17518,38 +17525,98 @@ const v37SportPicksSection = v37SportPicksHtml ? `<section class="v37-sport-pick
         </header>
         <div class="v37-sport-picks__grid">${v37SportPicksHtml}</div>
       </section>` : '';
-const v38TopParisEligible = (p) => {
+const v38TopParisReasonLabel = {
+data_stale: 'Data ancienne',
+data_only: 'Lecture seule',
+edge_anomaly: 'Edge anormal',
+odd_missing: 'Cote non vérifiée',
+odd_mismatch: 'Cote suspecte',
+odd_suspicious: 'Cote suspecte',
+odd_stale: 'Cote ancienne',
+odd_other: 'Cote invalide',
+low_odd: 'Cote trop basse',
+low_score: 'Score insuffisant',
+edge_too_high: 'Edge hors borne',
+duplicate_match: 'Doublon match',
+market_cap: 'Marché saturé',
+overflow: 'Limite 12 atteinte'
+};
+const v38TopParisAudit = {
+scanned: v37SortedDiverse.length,
+eligible: 0,
+selected: 0,
+rejected: {},
+odd_statuses: {},
+selected_odd_statuses: {},
+selected_markets: {},
+};
+const v38TopParisBump = (bucket, key, inc = 1) => {
+const safeKey = String(key || 'unknown');
+bucket[safeKey] = Number(bucket[safeKey] || 0) + inc;
+};
+const v38TopParisAssess = (p) => {
 const meta = p?.oddValidation || (typeof validatePickOdd === 'function' ? validatePickOdd(p?.m, p?.best || p, p?.pred) : { status: 'missing' });
 p.oddValidation = meta;
-if (_dataIsStale || p?.dataOnly || p?.edgeAnomaly) return false;
-if (!['verified', 'changed'].includes(String(meta.status || ''))) return false;
-if (!(Number(p?.odd || 0) >= 1.30)) return false;
-if (!(Number(p?.opportunity || p?.score || 0) >= 45)) return false;
-if (Number(p?.rawEdge || p?.edge || 0) > v37EdgeAnomalyThreshold) return false;
-return true;
+const status = String(meta.status || 'missing');
+v38TopParisBump(v38TopParisAudit.odd_statuses, status);
+const reject = (reason) => {
+v38TopParisBump(v38TopParisAudit.rejected, reason);
+return { ok: false, reason, meta };
 };
+if (_dataIsStale) return reject('data_stale');
+if (p?.dataOnly) return reject('data_only');
+if (p?.edgeAnomaly) return reject('edge_anomaly');
+if (!['verified', 'changed'].includes(status)) return reject(`odd_${v38TopParisReasonLabel[`odd_${status}`] ? status : 'other'}`);
+if (!(Number(p?.odd || 0) >= 1.30)) return reject('low_odd');
+if (!(Number(p?.opportunity || p?.score || 0) >= 45)) return reject('low_score');
+if (Number(p?.rawEdge || p?.edge || 0) > v37EdgeAnomalyThreshold) return reject('edge_too_high');
+return { ok: true, reason: 'eligible', meta };
+};
+const v38TopParisCandidates = v37SortedDiverse
+.map(p => ({ p, check: v38TopParisAssess(p) }))
+.filter(row => row.check.ok);
+v38TopParisAudit.eligible = v38TopParisCandidates.length;
 const v38TopParis = (() => {
 const out = [];
 const seenMatches = new Set();
 const marketCounts = new Map();
-const ranked = v37SortedDiverse
-.filter(v38TopParisEligible)
+const ranked = v38TopParisCandidates
 .slice()
-.sort((a, b) => (b.opportunity - a.opportunity) || (b.edge - a.edge) || (a.ts - b.ts));
-for (const p of ranked) {
+.sort((a, b) => (b.p.opportunity - a.p.opportunity) || (b.p.edge - a.p.edge) || (a.p.ts - b.p.ts));
+for (const row of ranked) {
+const p = row.p;
 const matchKey = v37MatchKeyForPick(p);
-if (seenMatches.has(matchKey)) continue;
+if (seenMatches.has(matchKey)) { v38TopParisBump(v38TopParisAudit.rejected, 'duplicate_match'); continue; }
 const family = v37MarketFamilyKey(p);
 const count = marketCounts.get(family) || 0;
-if (count >= 3) continue;
+if (count >= 3) { v38TopParisBump(v38TopParisAudit.rejected, 'market_cap'); continue; }
+if (out.length >= 12) { v38TopParisBump(v38TopParisAudit.rejected, 'overflow'); continue; }
 seenMatches.add(matchKey);
 marketCounts.set(family, count + 1);
 out.push(p);
-if (out.length >= 12) break;
+v38TopParisBump(v38TopParisAudit.selected_odd_statuses, p.oddValidation?.status || 'missing');
+v38TopParisBump(v38TopParisAudit.selected_markets, family);
 }
 return out;
 })();
-try { window.__v38TopParis = v38TopParis; } catch(e) { swallowError(e); }
+v38TopParisAudit.selected = v38TopParis.length;
+try { window.__v38TopParis = v38TopParis; window.__v38TopParisAudit = v38TopParisAudit; } catch(e) { swallowError(e); }
+const v38TopParisAuditItems = (() => {
+const rejectRows = Object.entries(v38TopParisAudit.rejected)
+.sort((a, b) => Number(b[1] || 0) - Number(a[1] || 0))
+.slice(0, 5);
+const oddRows = Object.entries(v38TopParisAudit.odd_statuses)
+.sort((a, b) => Number(b[1] || 0) - Number(a[1] || 0))
+.slice(0, 3);
+const rows = [
+['Scannés', String(v38TopParisAudit.scanned), 'picks candidats du tableau'],
+['Éligibles', String(v38TopParisAudit.eligible), 'après cote/data/score'],
+['Retenus', `${v38TopParisAudit.selected}/12`, 'sans doublon match'],
+...rejectRows.map(([key, value]) => [v38TopParisReasonLabel[key] || key, String(value), 'exclus du top']),
+...oddRows.map(([key, value]) => [`Cotes ${v38OddStatusMeta(key).label.toLowerCase()}`, String(value), 'statut vu dans le pool'])
+];
+return rows.slice(0, 9).map(([label, value, note]) => `<div class="v38-top-audit__item"><span>${esc(label)}</span><b>${esc(value)}</b><em>${esc(note)}</em></div>`).join('');
+})();
 const v38TopParisSection = `<section class="v38-top-paris" aria-label="Top Paris du jour" data-v38-top-paris>
         <header>
           <div><span>TOP PARIS</span><strong>Top Paris du jour</strong><em>${_dataIsStale ? 'Data ancienne : aucun pick recommandé fort.' : 'Shortlist limitée aux cotes Winamax vérifiées, sans doublon match.'}</em></div>
@@ -17567,6 +17634,10 @@ return `<button type="button" class="v38-top-card" data-top-paris-card data-odd-
               <span class="v38-top-card__chips">${v38OddStatusChip(p.oddValidation)}<i>${esc((v36TierById[p.tier] || {}).label || p.tier || 'tier')}</i><i>analyse complète</i></span>
             </button>`;
 }).join('')}</div>` : `<p style="margin:0;color:var(--text-dim);font-size:13px;line-height:1.45;">Aucun top pick recommandé avec cote vérifiée sur ce scope. Le tableau complet reste consultable en lecture prudente.</p>`}
+        <div class="v38-top-audit" data-v38-top-audit>
+          <h5>Pourquoi pas plus de top picks ?</h5>
+          <div class="v38-top-audit__grid">${v38TopParisAuditItems}</div>
+        </div>
       </section>`;
 const v37SignedPct = (value, digits = 2) => {
 const n = Number(value || 0);

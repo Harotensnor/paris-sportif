@@ -122,6 +122,7 @@ jobs:
           python3 scripts/audit_a11y_aria_labels.py
           python3 scripts/audit_image_alts.py
           python3 scripts/audit_color_contrast.py
+          python3 scripts/audit_top_paris_contract.py
       - name: Pytest (Python unit tests)
         # v37.036 — pytest covers data-quality classifiers, the multi-strategy
         # backtest math, the calibration maps and the historique archive
