@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-07T19:03:58Z",
+  "generated_at": "2026-05-07T19:09:52Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 59,
+    "active_events": 60,
     "actionable": 20,
     "watch": 1,
-    "risk": 38,
+    "risk": 39,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 14,
       "travel_extreme": 6,
       "back_to_back_travel": 13,
-      "market_uncertain": 29,
-      "signal_conflict": 9
+      "signal_conflict": 10,
+      "market_uncertain": 29
     },
     "by_quality": {
       "actionable": 20,
-      "watch": 1,
-      "risk": 38
+      "risk": 39,
+      "watch": 1
     }
   },
   "active_actionable": [
@@ -926,6 +926,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.8%"
+    },
+    {
+      "event_id": "401815244",
+      "date": "2026-05-07T22:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Philadelphia Phillies",
+      "away": "Athletics",
+      "match": "Philadelphia Phillies - Athletics",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.52,
+      "context": "Signaux opposes: Philadelphia Phillies fade 0.80, Athletics fade 0.80 -> prudence"
     },
     {
       "event_id": "401871336",
