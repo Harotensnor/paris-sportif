@@ -116,6 +116,7 @@
   .pos { color: #34d399; font-weight: 600; }
   .neg { color: #f87171; font-weight: 600; }
   .neu { color: #fbbf24; font-weight: 500; }
+  .contrib-prompt a, main p a, p a, li a { text-decoration: underline !important; }
 
   table {
     width: 100%; border-collapse: collapse; margin: 0 0 16px;
@@ -138,6 +139,7 @@
     border-bottom: 1px solid rgba(255,255,255,.08);
     z-index: 1;
   }
+<<<<<<< HEAD
 
   tbody td {
     padding: 10px 12px;
@@ -214,6 +216,9 @@
 
   <div class="meta-banner">
     📅 Période : <b>2026-04-23T18:45Z</b> → <b>2026-05-03T03:15Z</b><br>
+=======
+</b> → <b>2026-05-03T03:15Z</b><br>
+>>>>>>> origin/main
     🔄 Régénéré : <b>2026-05-03 06:10 UTC</b><br>
     📦 Sources brutes : <a href="backtest_report_v2.json">backtest_report_v2.json</a> · <a href="backtest_report_v2.md">.md</a> · <a href="results_archive.jsonl">results_archive.jsonl</a>
   </div>
@@ -599,7 +604,12 @@
     headers.forEach((th, idx) => {
       if (th.dataset.sortable === 'false') return;
       th.style.cursor = 'pointer';
+<<<<<<< HEAD
       // a11y: leave the implicit columnheader role on th
+=======
+      // a11y: leave the implicit `columnheader` role on <th>; setting role="button"
+      // strips that semantic and disallows aria-sort (axe-core aria-allowed-attr).
+>>>>>>> origin/main
       th.setAttribute('tabindex', '0');
       th.setAttribute('aria-sort', 'none');
       th.title = 'Cliquer pour trier';
