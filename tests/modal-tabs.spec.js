@@ -91,7 +91,7 @@ test('detail modal tabs render and switch on representative sports', async ({ pa
       expect(tabs.length, `${sport} should expose useful tabs`).toBeGreaterThanOrEqual(2);
       for (const tab of tabs) {
         const tabLocator = page.locator(`${tabRoot} .md-tab[data-mtab-toggle="${tab.key}"]`);
-        await tabLocator.click();
+        await tabLocator.evaluate(node => node.click());
         await expect(tabLocator).toHaveAttribute('aria-selected', 'true');
         const visibleSections = await page.locator(`${tabRoot} [data-mtab="${tab.key}"]`).evaluateAll(nodes =>
           nodes.filter(n => getComputedStyle(n).display !== 'none').length

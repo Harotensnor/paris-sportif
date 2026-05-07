@@ -1,6 +1,10 @@
 import { test, expect } from '@playwright/test';
 
-test('mobile dashboard filters stay sticky and compact during long scroll', async ({ page }) => {
+test('mobile dashboard filters stay sticky and compact during long scroll', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'Mobile-only sticky filter invariant.');
+  await page.addInitScript(() => {
+    localStorage.setItem('userPrefs', JSON.stringify({ onboardingDone: true, level: 'confirme' }));
+  });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/pronostics.html?debug=1');
   await page.waitForFunction(() => document.querySelector('.v36-filter-strip') && document.querySelector('.v36-table-card'), null, { timeout: 15000 });

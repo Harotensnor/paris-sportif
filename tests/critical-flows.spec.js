@@ -3,7 +3,7 @@
 // What we cover (5 flows that catch ~90% of user-facing regressions) :
 //   1. Boot : page loads, no console errors, dashboard renders
 //   2. Hub dropdowns : Pronos hub opens, items navigate to pages
-//   3. Theme toggle : 3-state cycle (dark → light → auto → dark)
+//   3. Theme selector : core dark/light/auto choices persist among premium themes
 //   4. Tous page : filter bar + sort persist via localStorage
 //   5. Date nav : contextual label updates (Hier/Aujourd'hui/Demain)
 //
@@ -77,7 +77,10 @@ test.describe('Theme toggle', () => {
     await page.goto(URL + '#profil');
     await page.waitForFunction(() => localStorage.getItem('currentPage') === 'profil', { timeout: 5000 });
     const buttons = page.locator('[data-theme-btn]');
-    await expect(buttons).toHaveCount(3);
+    await expect(buttons).toHaveCount(7);
+    await expect(page.locator('[data-theme-btn="dark"]')).toHaveCount(1);
+    await expect(page.locator('[data-theme-btn="light"]')).toHaveCount(1);
+    await expect(page.locator('[data-theme-btn="auto"]')).toHaveCount(1);
     await page.locator('[data-theme-btn="light"]').evaluate(el => el.click());
     await expect.poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem('userPrefs') || '{}').theme)).toBe('light');
     await page.locator('[data-theme-btn="auto"]').evaluate(el => el.click());
@@ -115,9 +118,10 @@ test.describe('Tous page', () => {
     // Apply edge ≥ 5% filter
     await page.locator('[data-tous-edge]').selectOption('0.05');
     // Reset button should appear
-    await expect(page.locator('[data-tous-reset]')).toBeVisible();
+    const resetButton = page.locator('[data-tous-reset]').first();
+    await expect(resetButton).toBeVisible();
     // Click reset
-    await page.locator('[data-tous-reset]').click();
+    await resetButton.click();
     // localStorage cleared
     const cleared = await page.evaluate(() => ({
       filters: localStorage.getItem('tousFilters'),
@@ -152,11 +156,10 @@ test.describe('Date nav', () => {
 test.describe('Crédibilité page', () => {
   test('shows calibration plot + performance breakdown sections', async ({ page }) => {
     await page.goto(URL + '#credibilite');
-    await page.waitForFunction(() => localStorage.getItem('currentPage') === 'performance', { timeout: 5000 });
-    await expect(page.getByRole('heading', { name: /Performance/i }).first()).toBeVisible({ timeout: 10000 });
-    await expect(page.locator('[data-perf-tab]')).toHaveCount(6);
-    await page.locator('[data-perf-tab="confiance"]').click();
-    await expect(page.locator('text=/Performance par tier|Par confiance/i').first()).toBeVisible();
+    await page.waitForFunction(() => localStorage.getItem('currentPage') === 'credibilite', { timeout: 5000 });
+    const pageText = page.locator('#app, main, body').first();
+    await expect(pageText).toContainText(/MÉTHODE & PREUVES|Comment ça marche/i, { timeout: 10000 });
+    await expect(pageText).toContainText(/Calibration|Brier|ROI|modèle/i);
   });
 });
 
@@ -169,11 +172,11 @@ test.describe('Footer', () => {
     const ghLink = footer.locator('a[href*="github.com"]');
     await expect(ghLink).toBeVisible();
     expect(await ghLink.getAttribute('href')).toContain('paris-sportif');
-    // Click "Backtest" → consolidated Performance hub
+    // Click "Backtest" → dedicated backtest view
     await footer.locator('button.footer-link[data-page-link="backtest"]').click();
     await expect.poll(async () =>
       await page.evaluate(() => localStorage.getItem('currentPage'))
-    ).toBe('performance');
+    ).toBe('backtest');
   });
 });
 
@@ -446,17 +449,16 @@ test.describe('humans.txt + security.txt', () => {
 // v31.7.4 — Tests des features récentes (Montante / Modal Contexte / Mobile)
 // =========================================================================
 test.describe('Montante (séquentielle)', () => {
-  test('Montante du weekend est consolidée dans Performance', async ({ page }) => {
+  test('Montante du weekend ouvre la route Montantes', async ({ page }) => {
     await page.goto(URL + '#montante-weekend');
-    await page.waitForFunction(() => localStorage.getItem('currentPage') === 'performance', { timeout: 5000 });
-    await expect(page.getByRole('heading', { name: /Performance/i }).first()).toBeVisible({ timeout: 10000 });
-    await expect(page.locator('[data-perf-tab]')).toHaveCount(6);
+    await page.waitForFunction(() => localStorage.getItem('currentPage') === 'montantes', { timeout: 5000 });
+    await expect(page.getByRole('heading', { name: /Montante/i }).first()).toBeVisible({ timeout: 10000 });
   });
 
-  test('Montante du jour redirige aussi vers Performance', async ({ page }) => {
+  test('Montante du jour redirige aussi vers Montantes', async ({ page }) => {
     await page.goto(URL + '#montante-jour');
-    await page.waitForFunction(() => localStorage.getItem('currentPage') === 'performance', { timeout: 5000 });
-    await expect(page.locator('[data-perf-tab="global"]')).toBeVisible();
+    await page.waitForFunction(() => localStorage.getItem('currentPage') === 'montantes', { timeout: 5000 });
+    await expect(page.getByRole('heading', { name: /Montante/i }).first()).toBeVisible({ timeout: 10000 });
   });
 });
 

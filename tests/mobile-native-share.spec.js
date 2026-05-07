@@ -1,8 +1,10 @@
 import { test, expect } from '@playwright/test';
 
-test('detail modal share button uses native share with a #match deep link', async ({ page }) => {
+test('detail modal share button uses native share with a #match deep link', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'Mobile-only share invariant.');
   await page.setViewportSize({ width: 390, height: 844 });
   await page.addInitScript(() => {
+    localStorage.setItem('userPrefs', JSON.stringify({ onboardingDone: true, level: 'confirme' }));
     Object.defineProperty(navigator, 'share', {
       configurable: true,
       value: async (payload) => {

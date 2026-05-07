@@ -1702,3 +1702,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix: add `warning_categories` and counts for actuel, 7j, optionnel, bloquant.
 - Verrou: `tests/test_health_quality_categorization.py` covers stale, optional and 7j cases.
 - Chiffres: 61/61 pytest, 45/45 QA gates, pipeline drift OK, bundle 1692.6 KB.
+
+## Sprint v37.125 — AUTO 10/10 e2e route locks
+- Symptom: the e2e shard still failed on old route, theme, mobile, and live-data assumptions.
+- Cause: specs expected stale aliases, desktop execution of mobile gestures, and current live basket rows.
+- Fix: align route assertions, use deterministic basket/context fixtures, and scope mobile-only invariants.
+- Verrou: Playwright desktop shard 2/3 plus day filter, nav stability, modal, table, combo and page probes.
+- Chiffres: 61/61 pytest, 45/45 QA gates, 9/9 probes critiques, footer/SW v37.125.

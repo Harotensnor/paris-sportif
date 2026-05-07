@@ -23,6 +23,12 @@ ALLOWLIST = {
     "plan-1000-helpers.spec.js": {"reliable physical Escape key"},
     "unit-helpers.spec.js": {"focus clavier des tooltips", "mobile utilise le long press"},
     "spa-pages-regression.spec.js": {"Mobile-only test"},
+    "mobile-compact-layout.spec.js": {"Mobile-only layout invariant"},
+    "mobile-long-press-menu.spec.js": {"Mobile-only long-press invariant"},
+    "mobile-native-share.spec.js": {"Mobile-only share invariant"},
+    "mobile-pull-to-refresh.spec.js": {"Mobile-only pull-to-refresh invariant"},
+    "mobile-quick-filters.spec.js": {"Mobile-only quick-filter invariant"},
+    "mobile-sticky-filters.spec.js": {"Mobile-only sticky filter invariant"},
     "visual-regression.spec.js": {
         "optional visual section missing",
         "snapshot baseline missing",

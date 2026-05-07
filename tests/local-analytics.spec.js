@@ -6,6 +6,7 @@ test.beforeEach(async ({ context }) => {
   await context.addInitScript(() => {
     localStorage.setItem('ps_privacy_ack_v2', '1');
     localStorage.setItem('ps_docs_onboarding_done_v1', '1');
+    localStorage.setItem('userPrefs', JSON.stringify({ onboardingDone: true, level: 'confirme' }));
   });
 });
 
@@ -27,11 +28,11 @@ test.describe('local analytics personalisation', () => {
   test('renders the personal dashboard and activity timeline', async ({ page }) => {
     await page.goto(`${URL}#my-dashboard`);
     await page.waitForFunction(() => Boolean(window.__localAnalyticsAudit));
-    await expect(page.locator('[data-local-analytics-route]')).toContainText('Mon dashboard');
-    await expect(page.locator('[data-local-analytics-route]')).toContainText('Picks que tu pourrais aimer');
+    await expect(page.locator('#local-analytics-route')).toContainText('Mon dashboard');
+    await expect(page.locator('#local-analytics-route')).toContainText('Picks que tu pourrais aimer');
 
     await page.goto(`${URL}#activity`);
-    await expect(page.locator('[data-local-analytics-route]')).toContainText('Activity');
+    await expect(page.locator('#local-analytics-route')).toContainText('Activity');
     await expect(page.locator('[data-la-activity-filter]')).toBeVisible();
   });
 
