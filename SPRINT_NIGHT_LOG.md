@@ -1775,3 +1775,8 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Local discovery cards are now removed whenever the detail modal opens, preventing stacked overlays on mobile.
 - Stabilizes the bottom-sheet drag flow without hiding the actual gesture test behind retry noise.
 - Locked by mobile-bottom-sheet and mobile Chromium shard 2/3 in CI-like single-worker mode.
+
+### v37.136 — Main data catch-up
+- Synced the branch with the latest cron data from main without replacing the v37 runtime shell.
+- Kept generated health/night truth from prod and restamped script hashes plus service-worker cache.
+- Locked by syntax, asset hash, drift, bundle, day-filter and nav-stability checks.
