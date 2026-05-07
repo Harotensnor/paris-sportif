@@ -51,9 +51,9 @@ def main() -> int:
     report = {
         "status": "ok" if not errors else "failed",
         "checked_files": [
-            str(MODULE.relative_to(ROOT)),
-            str(HTML.relative_to(ROOT)),
-            str(QR.relative_to(ROOT)),
+            MODULE.relative_to(ROOT).as_posix(),
+            HTML.relative_to(ROOT).as_posix(),
+            QR.relative_to(ROOT).as_posix(),
         ],
         "privacy_model": {
             "server_uploads": 0,
