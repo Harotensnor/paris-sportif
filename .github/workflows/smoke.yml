@@ -44,6 +44,7 @@ on:
       - 'scripts/probe_model_probability_caps.js'
       - 'scripts/probe_day_filter.js'
       - 'scripts/probe_nav_stability.js'
+      - 'scripts/probe_tous_csv_export.js'
       - '.github/workflows/smoke.yml'
   pull_request:
     branches: [main]
@@ -84,6 +85,7 @@ on:
       - 'scripts/probe_model_probability_caps.js'
       - 'scripts/probe_day_filter.js'
       - 'scripts/probe_nav_stability.js'
+      - 'scripts/probe_tous_csv_export.js'
       - '.github/workflows/smoke.yml'
   workflow_dispatch: {}
 
@@ -241,3 +243,8 @@ jobs:
         # Locks the desktop sidebar and mobile bottom nav skeletons so
         # leaving Accueil changes only the active state and main content.
         run: node scripts/probe_nav_stability.js
+
+      - name: Run Tous CSV export probe
+        # Downloads the real Tous CSV and locks the Excel/LibreOffice FR
+        # contract: UTF-8 BOM, semicolon separator and at least one row.
+        run: node scripts/probe_tous_csv_export.js

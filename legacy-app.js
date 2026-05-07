@@ -22677,7 +22677,8 @@ const rows = displayPending.concat(displayInProgress, displayFinished);
 const q = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
 const fmt = (v, n = 4) => Number.isFinite(Number(v)) ? Number(v).toFixed(n) : '';
 const header = ['status','date','sport','league','home','away','pick','odd','edge_pct','confidence_pct','odd_1','odd_n','odd_2','source','url'];
-const lines = ['\uFEFF' + header.join(',')];
+const sep = ';';
+const lines = ['\uFEFF' + header.join(sep)];
 rows.forEach(p => {
 const wx = p?.m?.winamax?.markets?.['1n2'] || {};
 const status = p.settled ? 'finished' : p.startedAndNotSettled ? 'live' : 'upcoming';
@@ -22699,7 +22700,7 @@ fmt(wx.draw, 2),
 fmt(wx.away, 2),
 q(src),
 q(p?.m?.winamax?.url || 'https://www.winamax.fr/paris-sportifs')
-].join(','));
+].join(sep));
 });
 const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
 const url = URL.createObjectURL(blob);

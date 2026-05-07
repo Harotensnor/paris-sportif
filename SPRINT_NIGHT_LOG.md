@@ -1653,3 +1653,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix: add conservative label, image-alt, and color-contrast audits; name exposed controls and hide decorative logos.
 - Verrou: `audit_a11y_aria_labels.py`, `audit_image_alts.py`, `audit_color_contrast.py` wired into QA gate + e2e drift.
 - Chiffres: 54/54 pytest, 43/43 QA gates, 7/7 probes critiques, bundle legacy 1698.4 KB.
+
+## Sprint v37.118 — AUTO 10/10 Tous CSV Excel
+- Symptom: the Tous CSV export was not locked against separator regressions for French spreadsheet apps.
+- Cause: the file had a UTF-8 BOM but still used comma-delimited rows.
+- Fix: switch the Tous export to semicolon rows and add a Playwright download probe.
+- Verrou: `scripts/probe_tous_csv_export.js` wired into `smoke.yml`.
+- Chiffres: 54/54 pytest, 43/43 QA gates, 6/6 probes ciblés, bundle legacy 1698.4 KB.
