@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-07T19:47:35Z",
+  "generated_at": "2026-05-07T19:55:15Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815251",
-      "kickoff": "2026-05-07T19:40Z",
-      "league": "MLB",
-      "match": "Pittsburgh Pirates at Arizona Diamondbacks",
-      "home": "Arizona Diamondbacks",
-      "away": "Pittsburgh Pirates",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Arizona Diamondbacks",
-          "pitcher": "Zac Gallen",
-          "label": "Zac Gallen plus de 2,5 strikeouts",
-          "line": 2.5,
-          "pick": "over",
-          "probability": 0.5337,
-          "fair_odds": 1.87,
-          "expected_strikeouts": 2.61,
-          "projected_ip": 4.14,
-          "inputs": {
-            "k9": 5.67,
-            "era": 4.59,
-            "whip": 1.5,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Arizona Diamondbacks",
-          "pitcher": "Zac Gallen",
-          "label": "Zac Gallen ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6891,
-          "fair_odds": 1.45,
-          "expected_hr_allowed": 0.372,
-          "projected_ip": 4.14,
-          "inputs": {
-            "hr9": 0.81,
-            "era": 4.59,
-            "whip": 1.5
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Pittsburgh Pirates",
-          "pitcher": "Mitch Keller",
-          "label": "Mitch Keller moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5181,
-          "fair_odds": 1.93,
-          "expected_strikeouts": 4.43,
-          "projected_ip": 5.86,
-          "inputs": {
-            "k9": 6.8,
-            "era": 2.85,
-            "whip": 1.05,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Pittsburgh Pirates",
-          "pitcher": "Mitch Keller",
-          "label": "Mitch Keller ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.8666,
-          "fair_odds": 1.15,
-          "expected_hr_allowed": 0.143,
-          "projected_ip": 5.86,
-          "inputs": {
-            "hr9": 0.22,
-            "era": 2.85,
-            "whip": 1.05
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815244",
       "kickoff": "2026-05-07T22:40Z",
@@ -624,7 +542,7 @@
       ]
     }
   ],
-  "props": 30,
+  "props": 26,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
