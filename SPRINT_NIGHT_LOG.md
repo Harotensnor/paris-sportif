@@ -1830,3 +1830,8 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Merged the next completed refresh-data tick after GitHub Pages advanced main again.
 - Rebuilt night metrics and health from the 07:12 UTC data snapshot.
 - Restamped asset hashes, footer version and service-worker cache while preserving the e2e sidecar fixes.
+
+### v37.147 — A11y and touch CI hardening
+- Reproduced the e2e failures from shard 1 and shard 2: serious axe contrast issues plus an undersized dashboard touch target set.
+- Raised static editorial contrast, fixed SPA tab/chip active states, made the debug panel focusable and exposed the health control as a stable touch target.
+- Verified the axe and mobile-touch Playwright specs locally across desktop and mobile before restamping assets and cache.

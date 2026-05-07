@@ -16922,7 +16922,7 @@ rejectSamples: v37RejectSamples
 if (v37DebugOn) {
 try { prodLog('[v37 debug]', { ...v37DebugState, sampleMatches: v37DebugMatches() }); } catch(e) { swallowError(e); }
 }
-const v37DebugPanelHtml = v37DebugOn ? `<section class="v37-debug-panel" data-v37-debug-panel><b>Debug tableau V37</b><span>Filtres actifs · Raisons de rejet · 10 premiers matchs scannes</span><pre>${esc(JSON.stringify({ ...v37DebugState, sampleMatches: v37DebugMatches() }, null, 2))}</pre></section>` : '';
+const v37DebugPanelHtml = v37DebugOn ? `<section class="v37-debug-panel" data-v37-debug-panel><b>Debug tableau V37</b><span>Filtres actifs · Raisons de rejet · 10 premiers matchs scannes</span><pre tabindex="0" aria-label="Données de diagnostic du tableau">${esc(JSON.stringify({ ...v37DebugState, sampleMatches: v37DebugMatches() }, null, 2))}</pre></section>` : '';
 const v37EmptyPoolHelpHtml = (!v36PickPool.length && terminalScanPool.length > 10) ? `<section class="v37-empty-pool-help">
         <strong>Mode secours actif : le tableau ne reste jamais vide.</strong>
         <span>${terminalScanPool.length} matchs sont disponibles. ${v37DataOnlyPool.length ? `${v37DataOnlyPool.length} matchs data-only sont affiches avec cote a verifier.` : 'La liste complete reste accessible dans Tous.'}</span>
@@ -22602,7 +22602,7 @@ wrap.innerHTML = `
 <div style="margin:${tousMobile ? '14px 0 4px' : '8px 0 3px'};padding:${tousMobile ? '10px 14px' : '7px 10px'};background:var(--panel);border:1px solid var(--border);border-radius:8px;font-size:11.5px;color:var(--text-dim);display:flex;flex-wrap:wrap;gap:14px;align-items:center;font-variant-numeric:tabular-nums;" title="Sources de la couverture events. Plus de sources = pipeline résilient (si une source ban, les autres comblent).">
 <span style="color:var(--text-dim2);text-transform:uppercase;letter-spacing:.8px;font-weight:700;font-size:10px;">📡 Sources</span>
 ${_sourcesStats.espn > 0 ? `<span><b class="u-text">ESPN</b> ${_sourcesStats.espn} events</span>` : ''}
-${_sourcesStats.sofa > 0 ? `<span><b class="u-text">Sofascore</b> ${_sourcesStats.sofa} events <span style="opacity:.6;font-size:10px;">(couverture étendue)</span></span>` : ''}
+${_sourcesStats.sofa > 0 ? `<span><b class="u-text">Sofascore</b> ${_sourcesStats.sofa} events <span style="color:var(--text-dim);font-size:10.5px;font-weight:800;">(couverture étendue)</span></span>` : ''}
 ${_sourcesStats.winamax > 0 ? `<span><b class="u-text-accent">Winamax</b> ${_sourcesStats.winamax} cotes 1N2 trackables</span>` : ''}
 </div>
 ` : ''}
@@ -22642,9 +22642,9 @@ return `<button data-tous-sport="${esc(s)}" style="${tousRailItemStyle}padding:6
         </div>
 
         <div style="display:flex;gap:8px;margin:0 0 14px;${tousRailStyle}">
-          <button data-tous-tab="pending" style="${tousRailItemStyle}padding:10px 18px;border-radius:8px;border:1px solid ${activeTab==='pending'?'var(--brand)':'var(--border-2)'};background:${activeTab==='pending'?'rgba(167,139,250,.15)':'var(--panel)'};color:${activeTab==='pending'?'var(--brand)':'var(--text-2)'};font-weight:700;font-size:13px;cursor:pointer;">⏱️ À venir <span style="opacity:.7;">(${displayPending.length})</span></button>
-          <button data-tous-tab="inprogress" style="${tousRailItemStyle}padding:10px 18px;border-radius:8px;border:1px solid ${activeTab==='inprogress'?'var(--brand)':'var(--border-2)'};background:${activeTab==='inprogress'?'rgba(167,139,250,.15)':'var(--panel)'};color:${activeTab==='inprogress'?'var(--brand)':'var(--text-2)'};font-weight:700;font-size:13px;cursor:pointer;">🔴 En cours <span style="opacity:.7;">(${displayInProgress.length})</span></button>
-          <button data-tous-tab="finished" title="${_completedNoOdds > 0 && !isCoveragePreset ? `Dont ${_completedNoOdds} sans cote pré-match capturée (qualifs WTA/Challenger, etc.) — résultat visible mais pas dans le bilan ROI` : ''}" style="${tousRailItemStyle}padding:10px 18px;border-radius:8px;border:1px solid ${activeTab==='finished'?'var(--brand)':'var(--border-2)'};background:${activeTab==='finished'?'rgba(167,139,250,.15)':'var(--panel)'};color:${activeTab==='finished'?'var(--brand)':'var(--text-2)'};font-weight:700;font-size:13px;cursor:pointer;">✅ Finis <span style="opacity:.7;">(${displayFinished.length})</span></button>
+          <button data-tous-tab="pending" style="${tousRailItemStyle}padding:10px 18px;border-radius:8px;border:1px solid ${activeTab==='pending'?'var(--brand)':'var(--border-2)'};background:${activeTab==='pending'?'rgba(167,139,250,.15)':'var(--panel)'};color:${activeTab==='pending'?'var(--brand)':'var(--text-2)'};font-weight:700;font-size:13px;cursor:pointer;">⏱️ À venir <span style="color:${activeTab==='pending'?'var(--text)':'var(--text-dim)'};font-weight:900;">(${displayPending.length})</span></button>
+          <button data-tous-tab="inprogress" style="${tousRailItemStyle}padding:10px 18px;border-radius:8px;border:1px solid ${activeTab==='inprogress'?'var(--brand)':'var(--border-2)'};background:${activeTab==='inprogress'?'rgba(167,139,250,.15)':'var(--panel)'};color:${activeTab==='inprogress'?'var(--brand)':'var(--text-2)'};font-weight:700;font-size:13px;cursor:pointer;">🔴 En cours <span style="color:${activeTab==='inprogress'?'var(--text)':'var(--text-dim)'};font-weight:900;">(${displayInProgress.length})</span></button>
+          <button data-tous-tab="finished" title="${_completedNoOdds > 0 && !isCoveragePreset ? `Dont ${_completedNoOdds} sans cote pré-match capturée (qualifs WTA/Challenger, etc.) — résultat visible mais pas dans le bilan ROI` : ''}" style="${tousRailItemStyle}padding:10px 18px;border-radius:8px;border:1px solid ${activeTab==='finished'?'var(--brand)':'var(--border-2)'};background:${activeTab==='finished'?'rgba(167,139,250,.15)':'var(--panel)'};color:${activeTab==='finished'?'var(--brand)':'var(--text-2)'};font-weight:700;font-size:13px;cursor:pointer;">✅ Finis <span style="color:${activeTab==='finished'?'var(--text)':'var(--text-dim)'};font-weight:900;">(${displayFinished.length})</span></button>
         </div>
         ${compareBarHtml}
         <div class="v36-tous-table-head ${isCoveragePreset ? 'v36-tous-table-head--coverage' : ''}" aria-hidden="true">
@@ -23572,7 +23572,7 @@ const articles = [
 ['methode-limites','Limites assumées','Le site évite les contradictions évidentes, mais il ne connaît pas tout : dernières compositions, void rules spécifiques, marchés non couverts, rythme d’un match ou information de vestiaire. Quand les signaux sont faibles, s’abstenir est une décision normale, pas un bug.'],
 ];
 const catButtons = cats.map(([key,label]) => `
-      <button type="button" data-academy-cat="${key}" style="min-height:44px;flex:0 0 auto;scroll-snap-align:start;padding:9px 13px;border-radius:999px;border:1px solid ${key === 'all' ? 'var(--brand)' : 'var(--border)'};background:${key === 'all' ? 'var(--brand-soft)' : 'var(--panel-2)'};color:${key === 'all' ? 'var(--brand)' : 'var(--text-2)'};font-size:12px;font-weight:800;cursor:pointer;">${esc(label)}</button>
+      <button type="button" data-academy-cat="${key}" style="min-height:44px;flex:0 0 auto;scroll-snap-align:start;padding:9px 13px;border-radius:999px;border:1px solid ${key === 'all' ? '#4c1d95' : 'var(--border)'};background:${key === 'all' ? '#4c1d95' : 'var(--panel-2)'};color:${key === 'all' ? '#fff' : 'var(--text-2)'};font-size:12px;font-weight:800;cursor:pointer;">${esc(label)}</button>
     `).join('');
 const glossaryHtml = glossary.map(([cat,title,desc]) => `
       <article data-glossary-item data-cat="${esc(cat)}" data-text="${esc((title + ' ' + desc).toLowerCase())}" style="box-sizing:border-box;min-width:0;overflow:hidden;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-md);padding:14px;min-height:118px;">
@@ -23609,9 +23609,9 @@ const academyTocLinkStyle = wideAcademy
 wrap.innerHTML = `
       <div style="box-sizing:border-box;width:100%;max-width:1500px;margin:0 auto;padding:16px 8px 28px;overflow:hidden;">
         <header style="display:block;padding:22px 0 18px;border-bottom:1px solid var(--border);margin-bottom:18px;">
-          <div style="font-size:11px;color:var(--c-accent);text-transform:uppercase;letter-spacing:1.4px;font-weight:900;margin-bottom:6px;">Méthode</div>
+          <div style="font-size:11px;color:var(--text);text-transform:uppercase;letter-spacing:1.4px;font-weight:900;margin-bottom:6px;">Méthode</div>
           <h1 style="margin:0 0 8px;font-size:clamp(30px,4vw,48px);font-weight:950;color:var(--text);line-height:1.04;">Comprendre les bons paris</h1>
-          <p style="margin:0;font-size:15px;color:var(--text-dim);max-width:760px;line-height:1.6;">Glossaire, méthode et stratégie cotes hautes. La page est pensée pour trouver vite un terme, puis revenir au pari sans se perdre.</p>
+          <p style="margin:0;font-size:15px;color:var(--text);max-width:760px;line-height:1.6;">Glossaire, méthode et stratégie cotes hautes. La page est pensée pour trouver vite un terme, puis revenir au pari sans se perdre.</p>
         </header>
 
         <div style="${academyLayoutStyle}">
@@ -23682,9 +23682,9 @@ btn.addEventListener('click', () => {
 activeCat = btn.dataset.academyCat || 'all';
 wrap.querySelectorAll('[data-academy-cat]').forEach(b => {
 const on = b === btn;
-b.style.borderColor = on ? 'var(--brand)' : 'var(--border)';
-b.style.background = on ? 'var(--brand-soft)' : 'var(--panel-2)';
-b.style.color = on ? 'var(--brand)' : 'var(--text-2)';
+b.style.borderColor = on ? '#4c1d95' : 'var(--border)';
+b.style.background = on ? '#4c1d95' : 'var(--panel-2)';
+b.style.color = on ? '#fff' : 'var(--text-2)';
 });
 applyFilter();
 });
@@ -26186,7 +26186,7 @@ return `
         { k:'backtest',    emoji:'📈', label:'Backtest' },
       ];
       suiviNav.innerHTML = tabs.map(t => `
-        <button data-suivi-page="${t.k}" style="padding:8px 14px;border-radius:var(--r);border:1px solid ${currentPage===t.k?'var(--brand)':'var(--border-2)'};background:${currentPage===t.k?'var(--brand-soft)':'var(--panel)'};color:${currentPage===t.k?'var(--brand)':'var(--text-2)'};font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;">${t.emoji} ${t.label}</button>
+        <button data-suivi-page="${t.k}" style="padding:8px 14px;border-radius:var(--r);border:1px solid ${currentPage===t.k?'#4c1d95':'var(--border-2)'};background:${currentPage===t.k?'#4c1d95':'var(--panel)'};color:${currentPage===t.k?'#fff':'var(--text-2)'};font-size:13px;font-weight:800;cursor:pointer;transition:all .15s;">${t.emoji} ${t.label}</button>
       `).join('');
       suiviNav.querySelectorAll('[data-suivi-page]').forEach(b => {
         b.addEventListener('click', () => {
