@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-07T02:51:20Z",
+  "generated_at": "2026-05-07T02:58:20Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -452,10 +452,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.098,
-        "away_score": 0.375,
+        "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Nottingham Forest (+0.38)",
+        "reason": "Direction nette: Nottingham Forest (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -468,12 +468,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.473
           }
         ]
       }
@@ -561,11 +555,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -1.079,
-        "away_score": -0.539,
-        "home_fade": 1.444,
-        "away_fade": 1.045,
-        "reason": "Direction nette: Carolina Hurricanes (-0.54)",
+        "home_score": -0.698,
+        "away_score": 0.112,
+        "home_fade": 0.75,
+        "away_fade": 0.15,
+        "reason": "Direction nette: Carolina Hurricanes (+0.11)",
         "detail": [
           {
             "side": "home",
@@ -584,18 +578,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 0.694
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 0.895
           }
         ]
       }
@@ -2422,30 +2404,18 @@
         "2 match dans les 48h + 2936 km de voyage"
       ],
       "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -1.411,
-        "away_score": 0.017,
-        "home_fade": 2.0,
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.411,
+        "away_score": -1.333,
+        "home_fade": 1.0,
         "away_fade": 1.683,
-        "reason": "Signaux opposes: Arizona Diamondbacks fade 2.00, Pittsburgh Pirates fade 1.68 -> prudence",
+        "reason": "Direction nette: Arizona Diamondbacks (-0.41)",
         "detail": [
           {
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
             "strength": 1.0
           },
           {
@@ -2493,30 +2463,18 @@
         "2 match dans les 48h + 2632 km de voyage"
       ],
       "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
-        "home_score": -0.086,
-        "away_score": -1.262,
-        "home_fade": 1.0,
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.914,
+        "away_score": -2.612,
+        "home_fade": 0.0,
         "away_fade": 2.612,
-        "reason": "Signaux mitigés: avantage net trop faible (Colorado Rockies -0.09, New York Mets -1.26)",
+        "reason": "Direction nette: Colorado Rockies (+0.91)",
         "detail": [
           {
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
             "strength": 1.0
           },
           {
