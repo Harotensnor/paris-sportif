@@ -624,6 +624,54 @@ def _status_bucket(*statuses: str | None) -> str:
     return 'unknown'
 
 
+WARNING_CATEGORY_KEYS = ('actuel', '7j', 'optionnel', 'bloquant')
+
+
+def categorize_health_warning(message: str, data_age_min: int | None = None) -> str:
+    text = str(message or '').strip().lower()
+    if not text:
+        return 'optionnel'
+    if '7j' in text or '7 jours' in text or 'sur 7 jours' in text or 'rolling 7' in text:
+        return '7j'
+    if 'data.js is stale' in text:
+        age = data_age_min
+        marker = text.split('data.js is stale (', 1)
+        if len(marker) == 2:
+            raw = marker[1].split('min', 1)[0]
+            try:
+                age = int(float(raw))
+            except ValueError:
+                pass
+        return 'bloquant' if age is None or age > 240 else 'actuel'
+    if any(token in text for token in (
+        'pipeline broken',
+        'data.js is missing',
+        'parse error',
+        'file missing',
+        'football_invalid_form_stats',
+        'pipeline_drift:',
+        'validation critique',
+    )):
+        return 'bloquant'
+    if any(token in text for token in (
+        'no_source_events',
+        'retained_existing',
+        'rare_event',
+        'no_explicit_boosts',
+        'optionnel',
+    )):
+        return 'optionnel'
+    return 'actuel'
+
+
+def categorize_health_warnings(warnings, data_age_min: int | None = None) -> dict:
+    grouped = {key: [] for key in WARNING_CATEGORY_KEYS}
+    for warning in warnings or []:
+        category = categorize_health_warning(str(warning), data_age_min)
+        grouped.setdefault(category, []).append(str(warning))
+    return grouped
+
+
 def _extract_pipeline_scripts(path: Path, pattern: str) -> set[str]:
     import re
     if not path.exists():
@@ -1002,6 +1050,11 @@ def main() -> int:
         },
     }
     out['global_status'] = _status_bucket(*(section.get('status') for section in out['sections'].values()))
+    out['warning_categories'] = categorize_health_warnings(out['warnings'], out.get('data_age_min'))
+    out['warning_category_counts'] = {
+        key: len(out['warning_categories'].get(key, []))
+        for key in WARNING_CATEGORY_KEYS
+    }
 
     # Bug-hunt 2026-05-02 : compute `overall` selon les warnings + data freshness
     n_warnings = len(out['warnings'])

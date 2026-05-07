@@ -1695,3 +1695,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix: merge fresh data/health, preserve QA runtime ordering, restamp assets and SW cache.
 - Verrou: conflict-marker QA gate plus day/nav/keyboard/console probes after merge.
 - Chiffres: 56/56 pytest, 45/45 QA gates, 41/41 page probes, 32/32 route loads clean.
+
+## Sprint v37.124 — AUTO 10/10 health categories
+- Symptom: health warnings were a flat list, so optional sources looked like live blockers.
+- Cause: `build_health.py` emitted warning text without stable buckets for UI/tests.
+- Fix: add `warning_categories` and counts for actuel, 7j, optionnel, bloquant.
+- Verrou: `tests/test_health_quality_categorization.py` covers stale, optional and 7j cases.
+- Chiffres: 61/61 pytest, 45/45 QA gates, pipeline drift OK, bundle 1692.6 KB.
