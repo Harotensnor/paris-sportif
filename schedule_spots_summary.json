@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-05-07T18:18:44Z",
+  "generated_at": "2026-05-07T18:22:21Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 52,
+    "active_events": 51,
     "expired_sample": 0,
     "by_type": {
-      "schedule_congestion": 28,
-      "back_to_back_travel": 14,
+      "schedule_congestion": 26,
       "lookahead": 69,
-      "travel_extreme": 14
+      "travel_extreme": 14,
+      "back_to_back_travel": 13
     },
     "by_decision": {
       "abstain": 29,
-      "lean_home": 19,
+      "lean_home": 18,
       "lean_away": 4
     },
-    "lean_home": 19,
+    "lean_home": 18,
     "lean_away": 4,
     "abstain": 29,
     "monitor": 0
@@ -498,10 +498,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.098,
-        "away_score": -0.098,
+        "away_score": 0.365,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Nottingham Forest (-0.10)",
+        "reason": "Direction nette: Nottingham Forest (+0.37)",
         "detail": [
           {
             "side": "home",
@@ -514,6 +514,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.463
           }
         ]
       }
@@ -601,11 +607,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.898,
-        "away_score": 0.183,
-        "home_fade": 0.95,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Carolina Hurricanes (+0.18)",
+        "home_score": -1.548,
+        "away_score": -0.467,
+        "home_fade": 1.95,
+        "away_fade": 1.15,
+        "reason": "Direction nette: Carolina Hurricanes (-0.47)",
         "detail": [
           {
             "side": "home",
@@ -624,6 +630,18 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
@@ -2277,72 +2295,6 @@
       }
     },
     {
-      "event_id": "401815250",
-      "source_event_ids": [
-        "401815250"
-      ],
-      "kickoff": "2026-05-07T18:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Kansas City Royals",
-      "away": "Cleveland Guardians",
-      "match": "Kansas City Royals - Cleveland Guardians",
-      "decision": "lean_home",
-      "net_team": "Kansas City Royals",
-      "reason": "Cleveland Guardians plus penalise par calendrier/voyage (1.47 vs 0.60)",
-      "pressure_score": 2.074,
-      "home_fade": 0.6,
-      "away_fade": 1.474,
-      "travel_score": 0.874,
-      "lookahead_score": 0,
-      "congestion_score": 1.2,
-      "types": {
-        "schedule_congestion": 2,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "3 matchs sur les 7 derniers jours",
-        "3 match dans les 48h + 1118 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.484,
-        "away_score": -1.124,
-        "home_fade": 1.0,
-        "away_fade": 1.474,
-        "reason": "Direction nette: Kansas City Royals (-0.48)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.874
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815247",
       "source_event_ids": [
         "401815247"
@@ -2784,16 +2736,22 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.15,
-        "away_score": 0.052,
+        "away_score": 0.497,
         "home_fade": 0.15,
         "away_fade": 0.0,
-        "reason": "Direction nette: Shakhtar Donetsk (+0.05)",
+        "reason": "Direction nette: Shakhtar Donetsk (+0.50)",
         "detail": [
           {
             "side": "home",
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.444
           }
         ]
       }
