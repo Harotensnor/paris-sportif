@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-07T02:12:37Z",
+  "generated_at": "2026-05-07T02:17:25Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -11,42 +11,6 @@
       "home": "New York Yankees",
       "away": "Texas Rangers",
       "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "New York Yankees",
-          "pitcher": "Ryan Weathers",
-          "label": "Ryan Weathers moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5307,
-          "fair_odds": 1.88,
-          "expected_strikeouts": 6.35,
-          "projected_ip": 5.46,
-          "inputs": {
-            "k9": 10.47,
-            "era": 3.03,
-            "whip": 1.19,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "New York Yankees",
-          "pitcher": "Ryan Weathers",
-          "label": "Ryan Weathers concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5721,
-          "fair_odds": 1.75,
-          "expected_hr_allowed": 0.849,
-          "projected_ip": 5.46,
-          "inputs": {
-            "hr9": 1.4,
-            "era": 3.03,
-            "whip": 1.19
-          },
-          "side": "home"
-        },
         {
           "market": "pitcher_strikeouts",
           "team": "Texas Rangers",
@@ -1034,7 +998,7 @@
       ]
     }
   ],
-  "props": 50,
+  "props": 48,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
