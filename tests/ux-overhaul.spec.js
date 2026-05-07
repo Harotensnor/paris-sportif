@@ -22,7 +22,7 @@ test.describe('UX design system v3', () => {
     await page.waitForSelector('#profil-wrap', { timeout: 15000 });
     await page.evaluate(() => document.querySelectorAll('details.profile-accordion').forEach((details) => { details.open = true; }));
 
-    for (const theme of ['ocean', 'sunset', 'forest', 'mono', 'system', 'dark', 'light']) {
+    for (const theme of ['ocean', 'sunset', 'forest', 'mono', 'auto', 'dark', 'light']) {
       await expect(page.locator(`[data-theme-btn="${theme}"]`).first()).toBeVisible();
     }
 

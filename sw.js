@@ -11,7 +11,7 @@
 // The "Stamp sw.js" step replaces this entire line with the current UTC timestamp,
 // so every deploy invalidates all caches → users see the new pronostics.html
 // without needing Ctrl+Shift+R. Manual edits stay valid for local dev.
-const CACHE_VERSION = 'paris-sportif-20260506-234846';
+const CACHE_VERSION = 'paris-sportif-20260507-000500';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -55,6 +55,7 @@ const PRECACHE_ASSETS = [
   'vendor/lunr.min.js',
   'src/docs-onboarding.js',
   'src/local-analytics.js',
+  'src/qa-runtime.js',
   'docs/search-index.json',
   'i18n.json',
   'print.css',
@@ -146,7 +147,7 @@ self.addEventListener('push', (event) => {
     body: payload.body || 'Un Big Bet mérite ton attention.',
     icon: payload.icon || 'icon-192.png',
     badge: payload.badge || 'icon.svg',
-    tag: payload.tag || 'paris-sportif-20260506-215456',
+    tag: payload.tag || 'paris-sportif-20260507-000500',
     data: { url: payload.url || 'pronostics.html#dashboard' },
   }));
 });

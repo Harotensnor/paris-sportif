@@ -1618,3 +1618,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix : merge origin/main, données cron conservées, shell v37.112 restampé.
 - Verrou : audit_data_truth.py et audit_qa_workflows.py valident data fraîche + sharding.
 - Résultat : le sharding Playwright est posé sur la dernière base main disponible.
+
+## Sprint v37.113 — AUTO 10/10 E2E spec alignment
+- Symptom: sharded e2e failed on stale hash redirects, mobile nav intent, and the old `system` theme selector.
+- Cause: specs assumed legacy aliases collapsed into Performance, and the dashboard CSS still overrode the global sidebar.
+- Fix: align SPA expectations with current router, keep simulator under Profil/Plus, restore stable sidebar on dashboard, and harden midnight data truth.
+- Verrou: `spa-pages-regression.spec.js`, `ux-overhaul.spec.js`, `team-priors.spec.js`, `test_audit_data_truth.py`, `probe_nav_stability.js`.
+- Chiffres: 54/54 pytest, 40/40 QA gates, 11/11 local probes, footer/SW v37.113.

@@ -1,26 +1,26 @@
 {
-  "generated_at": "2026-05-06T23:48:09Z",
+  "generated_at": "2026-05-06T23:59:26Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 74,
-    "actionable": 29,
-    "watch": 9,
-    "risk": 36,
+    "actionable": 30,
+    "watch": 7,
+    "risk": 37,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 19,
-      "back_to_back_travel": 17,
-      "market_move": 27,
+      "market_move": 28,
+      "injury_imbalance": 18,
       "travel_extreme": 9,
+      "back_to_back_travel": 16,
       "market_uncertain": 35,
-      "signal_conflict": 13
+      "signal_conflict": 14
     },
     "by_quality": {
-      "watch": 9,
-      "actionable": 29,
-      "risk": 36
+      "watch": 7,
+      "actionable": 30,
+      "risk": 37
     }
   },
   "active_actionable": [
@@ -457,24 +457,6 @@
       "context": "3 match dans les 48h + 1118 km de voyage"
     },
     {
-      "event_id": "401815236",
-      "date": "2026-05-06T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Kansas City Royals",
-      "away": "Cleveland Guardians",
-      "match": "Kansas City Royals - Cleveland Guardians",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Cleveland Guardians",
-      "side": "away",
-      "strength": 0.834,
-      "context": "2 match dans les 48h + 1118 km de voyage"
-    },
-    {
       "event_id": "401856891",
       "date": "2026-05-08T23:30Z",
       "sport": "basketball",
@@ -529,6 +511,24 @@
       "context": "1 match dans les 48h + 1135 km de voyage"
     },
     {
+      "event_id": "401865431",
+      "date": "2026-05-07T00:00Z",
+      "sport": "football",
+      "league_code": "conmebol.sudamericana",
+      "league_name": "Copa Sudamericana",
+      "home": "Macará",
+      "away": "Tigre",
+      "match": "Macará - Tigre",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.746,
+      "context": "Cote away: 3.35 -> 2.90 (+13.4%)"
+    },
+    {
       "event_id": "401865419",
       "date": "2026-05-07T00:30Z",
       "sport": "football",
@@ -545,45 +545,27 @@
       "side": "away",
       "strength": 0.725,
       "context": "Cote away: 3.45 -> 3.00 (+13.0%)"
-    }
-  ],
-  "active_watch": [
+    },
     {
-      "event_id": "401865422",
-      "date": "2026-05-07T00:00Z",
+      "event_id": "401865424",
+      "date": "2026-05-07T02:00Z",
       "sport": "football",
       "league_code": "conmebol.sudamericana",
       "league_name": "Copa Sudamericana",
-      "home": "Barracas Central",
-      "away": "Club Olimpia",
-      "match": "Barracas Central - Club Olimpia",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
+      "home": "Alianza Atlético",
+      "away": "América de Cali",
+      "match": "Alianza Atlético - América de Cali",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
       "type": "market_move",
       "direction": "steam",
       "team": null,
       "side": "home",
-      "strength": 0.627,
-      "context": "Cote home: 3.10 -> 2.75 (+11.3%)"
-    },
-    {
-      "event_id": "401815235",
-      "date": "2026-05-06T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Chicago Cubs",
-      "away": "Cincinnati Reds",
-      "match": "Chicago Cubs - Cincinnati Reds",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Chicago Cubs",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 11-8"
-    },
+      "strength": 0.673,
+      "context": "Cote home: 3.30 -> 2.90 (+12.1%)"
+    }
+  ],
+  "active_watch": [
     {
       "event_id": "401871412",
       "date": "2026-05-08T00:00Z",
@@ -639,40 +621,40 @@
       "context": "Absences severes 0-3"
     },
     {
-      "event_id": "401865431",
+      "event_id": "401865422",
       "date": "2026-05-07T00:00Z",
       "sport": "football",
       "league_code": "conmebol.sudamericana",
       "league_name": "Copa Sudamericana",
-      "home": "Macará",
-      "away": "Tigre",
-      "match": "Macará - Tigre",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.598,
-      "context": "Cote away: 3.25 -> 2.90 (+10.8%)"
-    },
-    {
-      "event_id": "401865424",
-      "date": "2026-05-07T02:00Z",
-      "sport": "football",
-      "league_code": "conmebol.sudamericana",
-      "league_name": "Copa Sudamericana",
-      "home": "Alianza Atlético",
-      "away": "América de Cali",
-      "match": "Alianza Atlético - América de Cali",
+      "home": "Barracas Central",
+      "away": "Club Olimpia",
+      "match": "Barracas Central - Club Olimpia",
       "quality": "watch",
       "quality_reason": "Signal rare present mais intensite moyenne",
       "type": "market_move",
       "direction": "steam",
       "team": null,
       "side": "home",
-      "strength": 0.598,
-      "context": "Cote home: 3.25 -> 2.90 (+10.8%)"
+      "strength": 0.546,
+      "context": "Cote home: 3.05 -> 2.75 (+9.8%)"
+    },
+    {
+      "event_id": "401865525",
+      "date": "2026-05-07T00:30Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Independiente Santa Fe",
+      "away": "Corinthians",
+      "match": "Independiente Santa Fe - Corinthians",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.521,
+      "context": "Cote home: 3.20 -> 2.90 (+9.4%)"
     },
     {
       "event_id": "401865519",
@@ -1359,6 +1341,24 @@
       "side": null,
       "strength": 0.45,
       "context": "Signaux opposes: San Antonio Spurs fade 0.60, Minnesota Timberwolves fade 0.60 -> prudence"
+    },
+    {
+      "event_id": "401871427",
+      "date": "2026-05-12T04:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Vegas Golden Knights",
+      "away": "Anaheim Ducks",
+      "match": "Vegas Golden Knights - Anaheim Ducks",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.45,
+      "context": "Signaux opposes: Vegas Golden Knights fade 0.60, Anaheim Ducks fade 0.60 -> prudence"
     }
   ],
   "expired_sample": []

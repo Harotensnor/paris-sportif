@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-06T23:48:09Z",
+  "generated_at": "2026-05-06T23:59:26Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 57,
+    "active_events": 55,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 77,
-      "back_to_back_travel": 19,
+      "lookahead": 69,
       "travel_extreme": 17,
+      "back_to_back_travel": 18,
       "schedule_congestion": 43
     },
     "by_decision": {
-      "abstain": 29,
-      "lean_home": 23,
+      "abstain": 28,
+      "lean_home": 22,
       "lean_away": 5
     },
-    "lean_home": 23,
+    "lean_home": 22,
     "lean_away": 5,
-    "abstain": 29,
+    "abstain": 28,
     "monitor": 0
   },
   "active": [
@@ -763,65 +763,6 @@
             "type": "schedule_congestion",
             "direction": "fade",
             "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815235",
-      "source_event_ids": [
-        "401815235",
-        "sofa_15496115"
-      ],
-      "kickoff": "2026-05-06T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Chicago Cubs",
-      "away": "Cincinnati Reds",
-      "match": "Chicago Cubs - Cincinnati Reds",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Chicago Cubs 0.15, Cincinnati Reds 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.698,
-        "away_score": 0.112,
-        "home_fade": 0.75,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Cincinnati Reds (+0.11)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
           },
           {
             "side": "home",
@@ -3007,73 +2948,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815236",
-      "source_event_ids": [
-        "401815236",
-        "sofa_15501352"
-      ],
-      "kickoff": "2026-05-06T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Kansas City Royals",
-      "away": "Cleveland Guardians",
-      "match": "Kansas City Royals - Cleveland Guardians",
-      "decision": "lean_home",
-      "net_team": "Kansas City Royals",
-      "reason": "Cleveland Guardians plus penalise par calendrier/voyage (0.98 vs 0.15)",
-      "pressure_score": 1.5,
-      "home_fade": 0.15,
-      "away_fade": 0.984,
-      "travel_score": 0.834,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "2 match dans les 48h + 1118 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.206,
-        "away_score": -0.791,
-        "home_fade": 0.55,
-        "away_fade": 0.984,
-        "reason": "Direction nette: Kansas City Royals (-0.21)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.834
           }
         ]
       }

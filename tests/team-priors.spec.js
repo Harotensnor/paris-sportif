@@ -3,6 +3,12 @@ import { test, expect } from '@playwright/test';
 test('V4 team priors load and blend into football predictions', async ({ page }) => {
   await page.goto('/pronostics.html');
   await page.waitForFunction(() => window.PRONOSTICS_DATA && window.TEAM_PRIORS && window.predictMatch, null, { timeout: 15000 });
+  await page.waitForFunction(() => {
+    const footballMatches = Object.values(window.PRONOSTICS_DATA?.days || {})
+      .flat()
+      .filter(m => m?.sport === 'football' && (m?.competitors || []).length >= 2);
+    return footballMatches.some(m => window.predictMatch(m)?.poisson?.bayesianPrior);
+  }, null, { timeout: 15000 });
   const state = await page.evaluate(() => {
     const footballMatches = Object.values(window.PRONOSTICS_DATA.days || {})
       .flat()

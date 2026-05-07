@@ -80,6 +80,19 @@ def same_value(left: Any, right: Any) -> bool:
     return left == right
 
 
+def data_today_error(data: dict[str, Any], now: datetime | None = None) -> str | None:
+    data_today = data.get("today")
+    if not data_today:
+        return None
+    now = now or datetime.now(timezone.utc)
+    today = now.date().isoformat()
+    generated_at = parse_dt(data.get("generated_at"))
+    generated_today = generated_at.astimezone(timezone.utc).date().isoformat() if generated_at else None
+    if data_today == today or (generated_today and data_today == generated_today):
+        return None
+    return f"data.js today={data_today} differs from UTC today={today}"
+
+
 def main() -> int:
     errors: list[str] = []
     data = load_data_js()
@@ -94,9 +107,11 @@ def main() -> int:
             f"night_metrics data_generated_at={night.get('data_generated_at')} "
             f"differs from data.js generated_at={data_generated_at}"
         )
-    today = datetime.now(timezone.utc).date().isoformat()
-    if data.get("today") and data.get("today") != today:
-        errors.append(f"data.js today={data.get('today')} differs from UTC today={today}")
+    now = datetime.now(timezone.utc)
+    today = now.date().isoformat()
+    today_err = data_today_error(data, now)
+    if today_err:
+        errors.append(today_err)
     health_truth = (health.get("data_truth") or {})
     if health_truth and health_truth.get("source_of_truth") != "data.js":
         errors.append("health.data_truth.source_of_truth must be data.js")
