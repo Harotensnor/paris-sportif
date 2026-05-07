@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-07T14:56:46Z",
+  "generated_at": "2026-05-07T15:07:22Z",
   "source": "local data.js + sports sidecars",
   "status": "ok",
   "sections": {
@@ -23,19 +23,9 @@
       "derived_markets": 90
     },
     "J4_baseball_major_props_pool": {
-      "data_events": 38,
+      "data_events": 34,
       "sofascore_events": 46,
       "samples": [
-        {
-          "event": "Miami Marlins vs Baltimore Orioles",
-          "league": "MLB",
-          "code": "mlb"
-        },
-        {
-          "event": "Philadelphia Phillies vs Athletics",
-          "league": "MLB",
-          "code": "mlb"
-        },
         {
           "event": "Athletics Athletics at Philadelphia Phillies",
           "league": "MLB",
@@ -47,7 +37,17 @@
           "code": "mlb"
         },
         {
-          "event": "Washington Nationals vs Minnesota Twins",
+          "event": "Minnesota Twins at Washington Nationals",
+          "league": "MLB",
+          "code": "mlb"
+        },
+        {
+          "event": "Texas Rangers at New York Yankees",
+          "league": "MLB",
+          "code": "mlb"
+        },
+        {
+          "event": "Cincinnati Reds at Chicago Cubs",
           "league": "MLB",
           "code": "mlb"
         }
@@ -88,9 +88,14 @@
       ]
     },
     "J6_coupes_nationales": {
-      "data_events": 9,
+      "data_events": 10,
       "sofascore_events": 20,
       "samples": [
+        {
+          "event": "Nacional at Deportes Tolima",
+          "league": "Copa Libertadores",
+          "code": "conmebol.libertadores"
+        },
         {
           "event": "Millonarios at Boston River",
           "league": "Copa Sudamericana",
@@ -110,16 +115,11 @@
           "event": "Peñarol at Platense",
           "league": "Copa Libertadores",
           "code": "conmebol.libertadores"
-        },
-        {
-          "event": "Universitario at Coquimbo Unido",
-          "league": "Copa Libertadores",
-          "code": "conmebol.libertadores"
         }
       ]
     },
     "J7_asie_latam": {
-      "data_events": 18,
+      "data_events": 19,
       "sofascore_events": 66,
       "samples": [
         {
@@ -128,6 +128,11 @@
           "code": "chn.1"
         },
         {
+          "event": "Nacional at Deportes Tolima",
+          "league": "Copa Libertadores",
+          "code": "conmebol.libertadores"
+        },
+        {
           "event": "Millonarios at Boston River",
           "league": "Copa Sudamericana",
           "code": "conmebol.sudamericana"
@@ -139,11 +144,6 @@
         },
         {
           "event": "Liga de Quito at Mirassol",
-          "league": "Copa Libertadores",
-          "code": "conmebol.libertadores"
-        },
-        {
-          "event": "Peñarol at Platense",
           "league": "Copa Libertadores",
           "code": "conmebol.libertadores"
         }
