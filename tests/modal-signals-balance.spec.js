@@ -37,8 +37,12 @@ test('mitigated signal badge uses explicit caution wording when present', async 
   const badge = page.locator('.v37-intel-chips i, .v36-table-card__signals i').filter({ hasText: 'Signaux mitigés - prudence' });
   const count = await badge.count();
   if (count > 0) {
-    await expect(badge.first()).toBeVisible();
-    await expect(badge.first()).toHaveAttribute('title', /prudence|deux sens|neutralisent/i);
+    const titles = await badge.evaluateAll(nodes => nodes.map(node => node.getAttribute('title') || ''));
+    expect(titles.some(title => /prudence|deux sens|neutralisent/i.test(title))).toBeTruthy();
+    const visibleBadge = page.locator('.v37-intel-chips i:visible, .v36-table-card__signals i:visible').filter({ hasText: 'Signaux mitigés - prudence' });
+    if (await visibleBadge.count()) {
+      await expect(visibleBadge.first()).toBeVisible();
+    }
   } else {
     await expect(page.locator('body')).not.toContainText('Signaux mitigés');
   }

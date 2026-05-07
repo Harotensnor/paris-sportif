@@ -1716,3 +1716,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix: require viewport intersection before marking a control as a click-audit target.
 - Verrou: `tests/click-everything.spec.js` targeted mobile plus full mobile shard 1/3.
 - Chiffres: click audit 1/1, mobile shard 1/3 91/91, 45/45 QA gates, footer/SW v37.126.
+
+## Sprint v37.127 — AUTO 10/10 mobile shard two
+- Symptom: mobile shard 2/3 failed on analytics clicks, sticky filters, modal sync and touch targets.
+- Cause: probes hit hidden duplicates, compact filters were contained, and long-press menus sat below overlays.
+- Fix: stabilize visible probes, release compact containment, move context menus to the top layer, enlarge modal targets.
+- Verrou: mobile shard 2/3 plus modal sync, signal balance, long-press, sticky filters and touch-target specs.
+- Chiffres: 61/61 pytest, mobile shard 2/3 90/90, bundle 1692.8 KB, footer/SW v37.127.

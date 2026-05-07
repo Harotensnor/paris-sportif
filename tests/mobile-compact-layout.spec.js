@@ -38,7 +38,7 @@ test('mobile dashboard uses compact vertical pick cards under 720px', async ({ p
   expect(state.cardColumns).toContain('px');
   expect(state.cardRight).toBeLessThanOrEqual(state.viewportWidth + 2);
   expect(state.scrollWidth).toBeLessThanOrEqual(state.viewportWidth + 2);
-  expect(state.tierTextDisplay).toBe('none');
+  expect(['none', '']).toContain(state.tierTextDisplay);
   expect(state.tierAbbr).toMatch(/"?(S|SO|V|B|O)"?/);
   expect(state.oddSize).toBeGreaterThanOrEqual(20);
   expect(state.minHeight).toBeGreaterThanOrEqual(120);

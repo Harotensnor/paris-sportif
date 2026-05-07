@@ -17534,6 +17534,7 @@ let pressStart = null;
 const hideContextMenu = () => {
 const existing = document.querySelector('.v36-context-menu');
 if (existing) existing.remove();
+if (window.__v36ActiveContextWrap === wrap) window.__v36ActiveContextWrap = null;
 };
 const contextCard = (target) => target?.closest?.('.v36-table-card, .v36-pick-card, .dash-pick-card, .v37-personal-card');
 const contextInteractive = (target) => target?.closest?.('input, select, textarea, a, button:not(.v36-table-card):not(.v36-pick-card):not(.dash-pick-card):not(.v37-personal-card), [data-v37-day], [data-v36-filter], [data-v36-quick], [data-v36-sort], [data-v37-live-toggle], [data-v37-blind], [data-compare-pick]');
@@ -17546,6 +17547,7 @@ menu.appendChild(btn);
 };
 const showContextMenu = (card, x, y) => {
 hideContextMenu();
+window.__v36ActiveContextWrap = wrap;
 wrap.__v36ContextCard = card;
 const menu = document.createElement('div');
 menu.className = 'v36-context-menu';
@@ -17559,10 +17561,12 @@ addMenuButton(menu, 'favorite', '☆ Ajouter aux favoris');
 addMenuButton(menu, 'compare', '↔ Comparer');
 addMenuButton(menu, 'track', '✓ Suivre ce pari');
 addMenuButton(menu, 'open', 'Ouvrir le détail');
-wrap.appendChild(menu);
+document.body.appendChild(menu);
 const rect = menu.getBoundingClientRect();
+const navRect = document.getElementById('mobile-bottom-nav')?.getBoundingClientRect?.();
+const bottomSafe = navRect && navRect.top < window.innerHeight ? Math.max(12, window.innerHeight - navRect.top + 12) : 12;
 menu.style.left = `${Math.max(12, Math.min(window.innerWidth - rect.width - 12, x - rect.width / 2))}px`;
-menu.style.top = `${Math.max(72, Math.min(window.innerHeight - rect.height - 12, y - 18))}px`;
+menu.style.top = `${Math.max(72, Math.min(window.innerHeight - rect.height - bottomSafe, y - 18))}px`;
 try { if (navigator.vibrate) navigator.vibrate(10); } catch(e) { swallowError(e); }
 wrap.__v36ContextBlockClickUntil = Date.now() + 700;
 };
@@ -17588,11 +17592,13 @@ if (Math.abs(t.clientX - pressStart.x) > 14 || Math.abs(t.clientY - pressStart.y
 }, { passive: true });
 wrap.addEventListener('touchend', cancelPress, { passive: true });
 wrap.addEventListener('touchcancel', cancelPress, { passive: true });
-wrap.addEventListener('click', (e) => {
+document.addEventListener('click', (e) => {
 const actionBtn = e.target.closest && e.target.closest('[data-v36-context-action]');
 if (actionBtn) {
+if (window.__v36ActiveContextWrap && window.__v36ActiveContextWrap !== wrap) return;
 e.preventDefault();
 e.stopPropagation();
+if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
 const menu = actionBtn.closest('.v36-context-menu');
 const matchId = menu?.dataset.matchId || '';
 const pickUid = menu?.dataset.pickUid || '';

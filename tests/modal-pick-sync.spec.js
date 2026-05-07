@@ -40,20 +40,21 @@ test('dashboard rows open the exact same pick in the detail modal', async ({ pag
   await page.waitForFunction(() => window.PRONOSTICS_DATA && document.querySelector('[data-pick-uid]'), null, { timeout: 20_000 });
   await page.waitForTimeout(800);
 
-  const count = await page.locator('.v36-table-row[data-pick-uid]:visible, .v36-table-card[data-pick-uid]:visible').count();
+  const selector = '.v36-table-row[data-pick-uid]:visible, .v36-table-card[data-pick-uid]:visible';
+  const count = await page.locator(selector).count();
   expect(count, 'At least one visible V37 pick is required to verify row/modal sync').toBeGreaterThan(0);
 
   const max = Math.min(50, count);
   const failures = [];
   for (let i = 0; i < max; i += 1) {
-    const selector = `.v36-table-row[data-pick-uid]:visible, .v36-table-card[data-pick-uid]:visible`;
     const target = page.locator(selector).nth(i);
+    await target.scrollIntoViewIfNeeded();
     const expected = await target.evaluate(el => ({
       label: el.getAttribute('data-pick-label') || '',
       odd: el.getAttribute('data-pick-odd') || '',
       id: el.getAttribute('data-big-detail') || '',
     }));
-    await target.click({ timeout: 5_000, force: true });
+    await target.evaluate(el => el.click());
     await expect(page.locator('#detail-modal.open')).toBeVisible({ timeout: 5_000 });
     const heading = (await page.locator('#why-bet-title').textContent().catch(() => '')) || '';
     const labelNeedle = expected.label.replace(/\s+/g, ' ').trim().slice(0, 34);
@@ -64,7 +65,7 @@ test('dashboard rows open the exact same pick in the detail modal', async ({ pag
       failures.push(`${expected.id}: row odd @${expected.odd} opened "${heading}"`);
     }
     await page.keyboard.press('Escape').catch(() => {});
-    await page.waitForTimeout(80);
+    await page.waitForFunction(() => !document.querySelector('#detail-modal.open'), null, { timeout: 3_000 }).catch(() => {});
   }
 
   const realErrors = errors.filter(e => !/favicon|sourcemap|Failed to load resource|net::ERR_ABORTED|40\d/i.test(e));
