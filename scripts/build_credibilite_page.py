@@ -161,7 +161,7 @@ PAGE_TEMPLATE = '''<!DOCTYPE html>
 </script>
 
 <style>
-  :root {{ color-scheme: dark light; }}
+  :root {{ color-scheme: dark; }}
   * {{ box-sizing: border-box; }}
   html, body {{ margin: 0; padding: 0; font-family: "SF Pro Display", "Inter", -apple-system, BlinkMacSystemFont, sans-serif; background: #08080a; color: #e6ebf2; line-height: 1.65; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }}
   body {{ min-height: 100vh; }}
@@ -193,10 +193,17 @@ PAGE_TEMPLATE = '''<!DOCTYPE html>
   tbody td:nth-child(2), tbody td:nth-child(3), tbody td:nth-child(4), tbody td:nth-child(5) {{ text-align: right; }}
   .legend {{ display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: #a3a3aa; margin: 12px 0 0; padding: 10px 14px; background: rgba(255,255,255,.02); border-radius: 8px; }}
   .legend .swatch {{ display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }}
-  footer.site-footer {{ border-top: 1px solid rgba(255,255,255,.06); margin-top: 40px; padding: 24px 20px; text-align: center; font-size: 12.5px; color: #6b6b73; }}
-  footer.site-footer nav a {{ margin: 0 10px; color: #a3a3aa; }}
+  footer.site-footer {{ border-top: 1px solid rgba(255,255,255,.06); margin-top: 40px; padding: 24px 20px; text-align: center; font-size: 12.5px; color: #c5c5cc; }}
+  footer.site-footer nav a {{ margin: 0 10px; color: #d4d4dc; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }}
   @media (prefers-color-scheme: light) {{
     html, body {{ background: #f5f5f7; color: #08080a; }}
+    /* a11y light-mode contrast: footer + breadcrumb + lead links */
+    footer.site-footer nav a {{ color: #4b5563 !important; text-decoration: underline; }}
+    footer.site-footer {{ color: #4b5563 !important; }}
+    .breadcrumb {{ color: #4b5563 !important; }}
+    .breadcrumb a {{ color: #4338ca !important; text-decoration: underline; }}
+    .lead a, main p a {{ color: #4338ca !important; text-decoration: underline; }}
+    .lead {{ color: #2a2a30 !important; }}
     .topbar {{ background: rgba(245,245,247,.85); border-bottom-color: rgba(0,0,0,.08); }}
     .topbar nav a {{ color: #444; }}
     .kpi-card, table, section.card {{ background: #fff; border-color: rgba(0,0,0,.08); color: #2a2a30; }}

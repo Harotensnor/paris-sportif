@@ -634,7 +634,7 @@ PAGE_TEMPLATE = '''<!DOCTYPE html>
 </script>
 
 <style>
-  :root {{ color-scheme: dark light; }}
+  :root {{ color-scheme: dark; }}
   * {{ box-sizing: border-box; }}
   html, body {{
     margin: 0; padding: 0;
@@ -752,6 +752,13 @@ PAGE_TEMPLATE = '''<!DOCTYPE html>
   footer.site-footer nav a {{ margin: 0 10px; color: #a3a3aa; }}
   @media (prefers-color-scheme: light) {{
     html, body {{ background: #f5f5f7; color: #08080a; }}
+    /* a11y light-mode contrast: footer + breadcrumb + lead links */
+    footer.site-footer nav a {{ color: #4b5563 !important; text-decoration: underline; }}
+    footer.site-footer {{ color: #4b5563 !important; }}
+    .breadcrumb {{ color: #4b5563 !important; }}
+    .breadcrumb a {{ color: #4338ca !important; text-decoration: underline; }}
+    .lead a, main p a {{ color: #4338ca !important; text-decoration: underline; }}
+    .lead {{ color: #2a2a30 !important; }}
     .topbar {{ background: rgba(245,245,247,.85); border-bottom-color: rgba(0,0,0,.08); }}
     .topbar nav a {{ color: #444; }}
     .kpi-card, table {{ background: #fff; border-color: rgba(0,0,0,.08); color: #2a2a30; }}
@@ -872,7 +879,8 @@ PAGE_TEMPLATE = '''<!DOCTYPE html>
     headers.forEach((th, idx) => {{
       if (th.dataset.sortable === 'false') return;
       th.style.cursor = 'pointer';
-      th.setAttribute('role', 'button');
+      // a11y: leave the implicit `columnheader` role on <th>; setting role="button"
+      // strips that semantic and disallows aria-sort (axe-core aria-allowed-attr).
       th.setAttribute('tabindex', '0');
       th.setAttribute('aria-sort', 'none');
       th.title = 'Cliquer pour trier';
