@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-07T17:28:40Z",
+  "generated_at": "2026-05-07T17:52:07Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
@@ -12,9 +12,9 @@
     "by_type": {
       "back_to_back_travel": 14,
       "injury_imbalance": 15,
-      "market_move": 12,
+      "market_move": 13,
       "travel_extreme": 6,
-      "signal_conflict": 7,
+      "signal_conflict": 8,
       "market_uncertain": 30
     },
     "by_quality": {
@@ -223,6 +223,24 @@
       "context": "2 match dans les 48h + 1928 km de voyage"
     },
     {
+      "event_id": "401865517",
+      "date": "2026-05-08T00:30Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Independiente Medellín",
+      "away": "Flamengo",
+      "match": "Independiente Medellín - Flamengo",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.926,
+      "context": "Cote home: 4.80 -> 4.00 (+16.7%)"
+    },
+    {
       "event_id": "401815258",
       "date": "2026-05-08T23:10Z",
       "sport": "baseball",
@@ -329,24 +347,6 @@
       "side": "away",
       "strength": 0.849,
       "context": "Cote away: 3.60 -> 3.05 (+15.3%)"
-    },
-    {
-      "event_id": "401865517",
-      "date": "2026-05-08T00:30Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Independiente Medellín",
-      "away": "Flamengo",
-      "match": "Independiente Medellín - Flamengo",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.81,
-      "context": "Cote home: 4.80 -> 4.10 (+14.6%)"
     },
     {
       "event_id": "401856894",
@@ -491,8 +491,8 @@
       "direction": "steam",
       "team": null,
       "side": "away",
-      "strength": 0.644,
-      "context": "Cote away: 3.45 -> 3.05 (+11.6%)"
+      "strength": 0.635,
+      "context": "Cote away: 3.50 -> 3.10 (+11.4%)"
     },
     {
       "event_id": "401815249",
@@ -529,24 +529,6 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 4-1"
-    },
-    {
-      "event_id": "401862909",
-      "date": "2026-05-07T19:00Z",
-      "sport": "football",
-      "league_code": "europaleague",
-      "league_name": "Europa League",
-      "home": "SC Freiburg",
-      "away": "Braga",
-      "match": "SC Freiburg - Braga",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.582,
-      "context": "Cote away: 5.25 -> 4.70 (+10.5%)"
     },
     {
       "event_id": "401865433",
@@ -601,6 +583,24 @@
       "side": "away",
       "strength": 0.57,
       "context": "Cote away: 3.90 -> 3.50 (+10.3%)"
+    },
+    {
+      "event_id": "401862909",
+      "date": "2026-05-07T19:00Z",
+      "sport": "football",
+      "league_code": "europaleague",
+      "league_name": "Europa League",
+      "home": "SC Freiburg",
+      "away": "Braga",
+      "match": "SC Freiburg - Braga",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.476,
+      "context": "Cote away: 5.25 -> 4.80 (+8.6%)"
     }
   ],
   "active_risk": [
