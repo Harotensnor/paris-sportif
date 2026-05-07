@@ -1681,3 +1681,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix: add the conflict marker scan to `qa_gate_report.py` and its manifest audit.
 - Verrou: `check_no_conflict_markers.py` now runs locally and in CI.
 - Chiffres: 54/54 pytest, 45/45 QA gates, 925 files scanned, footer/SW v37.121.
+
+## Sprint v37.122 — AUTO 10/10 patch idempotence
+- Symptom: Winamax/ESPN market alignment had no unit test proving retry idempotence.
+- Cause: the helper mutates market odds in place, so a double patch must never flip sides twice.
+- Fix: add pytest coverage for swapped tennis names and ambiguous same-name no-op cases.
+- Verrou: `tests/test_data_pipeline_idempotent.py`.
+- Chiffres: 56/56 pytest, 45/45 QA gates, footer/SW v37.122.
