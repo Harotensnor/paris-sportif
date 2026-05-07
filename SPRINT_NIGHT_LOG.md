@@ -1795,3 +1795,8 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Regenerated night metrics and health from the current data.js snapshot so QA reads one freshness truth.
 - Normalized sw.js to LF endings after conflict resolution to keep bundle checks deterministic.
 - Locked by qa_gate_report, audit_data_truth and audit_line_endings.
+
+### v37.140 — Cron catch-up after QA gate
+- Merged the next refresh-data tick from main after the QA data-truth fix.
+- Rebuilt night metrics and health from the merged data.js snapshot.
+- Locked by qa_gate_report plus day-filter and nav-stability probes.
