@@ -45,6 +45,7 @@ on:
       - 'scripts/probe_day_filter.js'
       - 'scripts/probe_nav_stability.js'
       - 'scripts/probe_tous_csv_export.js'
+      - 'scripts/probe_console_matrix.js'
       - '.github/workflows/smoke.yml'
   pull_request:
     branches: [main]
@@ -86,6 +87,7 @@ on:
       - 'scripts/probe_day_filter.js'
       - 'scripts/probe_nav_stability.js'
       - 'scripts/probe_tous_csv_export.js'
+      - 'scripts/probe_console_matrix.js'
       - '.github/workflows/smoke.yml'
   workflow_dispatch: {}
 
@@ -248,3 +250,8 @@ jobs:
         # Downloads the real Tous CSV and locks the Excel/LibreOffice FR
         # contract: UTF-8 BOM, semicolon separator and at least one row.
         run: node scripts/probe_tous_csv_export.js
+
+      - name: Run console matrix probe
+        # Fresh-loads 16 routes on desktop and mobile. Locks the
+        # "0 console error on 32 page loads" release criterion.
+        run: node scripts/probe_console_matrix.js

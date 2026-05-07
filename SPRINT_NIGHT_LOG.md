@@ -1660,3 +1660,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix: switch the Tous export to semicolon rows and add a Playwright download probe.
 - Verrou: `scripts/probe_tous_csv_export.js` wired into `smoke.yml`.
 - Chiffres: 54/54 pytest, 43/43 QA gates, 6/6 probes ciblés, bundle legacy 1698.4 KB.
+
+## Sprint v37.119 — AUTO 10/10 console matrix
+- Symptom: the 32 page-load console-error release criterion was covered indirectly but not reported directly.
+- Cause: `probe_all_pages.js` mixes render/overflow checks with console checks, making the criterion harder to read.
+- Fix: add a fresh-load matrix probe over 16 routes × desktop/mobile and write a JSON report.
+- Verrou: `scripts/probe_console_matrix.js` wired into `smoke.yml`.
+- Chiffres: 32/32 route loads clean, 0 console errors, footer/SW v37.119.
