@@ -27,26 +27,26 @@ const PORT = Number(process.env.PROBE_PORT || 0);
 const CHROME_EXE = process.env.CHROME_EXECUTABLE_PATH || '';
 
 // Each entry: hash, label, expected wrap id (the renderer mounts there).
-// All routes resolve to one of dashboard / tous / performance / profil /
-// academie / buteurs after PAGE_ALIASES rewriting; we still probe each
-// alias to verify the rewrite + sub-view selection works.
+// Some hashes are true pages, others are aliases that intentionally resolve
+// to a parent page. The probe must verify the expected visible wrap, not just
+// that some previous page left enough text in the main container.
 const PROBES = [
   { hash: '#dashboard',     label: 'Accueil',                    wrap: 'dashboard-wrap' },
   { hash: '#tous',          label: 'Tous les pronostics',        wrap: 'tous-wrap' },
-  { hash: '#combines',      label: 'Combinés (alias tous)',      wrap: 'tous-wrap' },
+  { hash: '#combines',      label: 'Combinés',                   wrap: 'combines-wrap' },
   { hash: '#valeur',        label: 'Valeur (alias tous)',        wrap: 'tous-wrap' },
   { hash: '#calendrier',    label: 'Calendrier (alias tous)',    wrap: 'tous-wrap' },
   { hash: '#plan-mise',     label: 'Plan de mise (alias tous)',  wrap: 'tous-wrap' },
   { hash: '#performance',   label: 'Performance',                wrap: 'performance-wrap' },
-  { hash: '#bilan',         label: 'Bilan (alias performance)',  wrap: 'performance-wrap' },
-  { hash: '#historique',    label: 'Historique (alias perf)',    wrap: 'performance-wrap' },
-  { hash: '#backtest',      label: 'Backtest (alias perf)',      wrap: 'performance-wrap' },
+  { hash: '#bilan',         label: 'Bilan',                      wrap: 'bilan-wrap' },
+  { hash: '#historique',    label: 'Historique',                 wrap: 'historique-wrap' },
+  { hash: '#backtest',      label: 'Backtest',                   wrap: 'backtest-wrap' },
   { hash: '#credibilite',   label: 'Crédibilité',                wrap: 'credibilite-wrap' },
   { hash: '#academie',      label: 'Académie',                   wrap: 'academie-wrap' },
   { hash: '#profil',        label: 'Profil',                     wrap: 'profil-wrap' },
   { hash: '#favoris',       label: 'Favoris (alias profil)',     wrap: 'profil-wrap' },
-  { hash: '#alertes',       label: 'Alertes (alias profil)',     wrap: 'profil-wrap' },
-  { hash: '#sante',         label: 'Santé (alias profil)',       wrap: 'profil-wrap' },
+  { hash: '#alertes',       label: 'Alertes',                    wrap: 'alertes-wrap' },
+  { hash: '#sante',         label: 'Santé',                      wrap: 'sante-wrap' },
   { hash: '#buteurs',       label: 'Buteurs',                    wrap: 'buteurs-wrap' },
 ];
 
@@ -161,21 +161,22 @@ const MIN_TEXT_LEN = 100;
       }, probe.wrap);
 
       const newErrs = errs.slice(before);
-      const renderOk = renderInfo.totalTextLen >= MIN_TEXT_LEN;
+      const renderOk = renderInfo.expectedVisible && renderInfo.totalTextLen >= MIN_TEXT_LEN;
       const ok = newErrs.length === 0 && overflow <= 2 && renderOk;
       if (ok) pageOk++;
 
       const flags = [];
       if (newErrs.length) flags.push(`${newErrs.length} JS error(s)`);
       if (overflow > 2) flags.push(`overflow ${overflow}px`);
-      if (!renderOk) flags.push(`text=${renderInfo.totalTextLen} on [${renderInfo.visibleIds}]`);
+      if (!renderInfo.expectedVisible) flags.push(`missing ${probe.wrap} in [${renderInfo.visibleIds}]`);
+      if (renderInfo.totalTextLen < MIN_TEXT_LEN) flags.push(`text=${renderInfo.totalTextLen} on [${renderInfo.visibleIds}]`);
       console.log(`  [${ok ? 'ok' : 'FAIL'}] ${probe.hash.padEnd(20)} ${probe.label}${flags.length ? ' — ' + flags.join(', ') : ''}`);
       for (const err of newErrs.slice(0, 3)) {
         console.log(`        ${err.kind}: ${String(err.msg).slice(0, 240)}`);
         failures.push({ viewport: viewport.label, probe: probe.hash, ...err });
       }
       if (overflow > 2) failures.push({ viewport: viewport.label, probe: probe.hash, kind: 'overflow', msg: `${overflow}px` });
-      if (!renderOk) failures.push({ viewport: viewport.label, probe: probe.hash, kind: 'render', msg: `text=${renderInfo.totalTextLen} visibleIds=${renderInfo.visibleIds}` });
+      if (!renderOk) failures.push({ viewport: viewport.label, probe: probe.hash, kind: 'render', msg: `expected=${probe.wrap} visible=${renderInfo.expectedVisible} text=${renderInfo.totalTextLen} visibleIds=${renderInfo.visibleIds}` });
     }
 
     if (viewport.label === 'desktop') {
@@ -184,16 +185,15 @@ const MIN_TEXT_LEN = 100;
       await page.waitForTimeout(500);
       for (const tabKey of PERF_TABS) {
         const before = errs.length;
-        const clicked = await page.evaluate((k) => {
-          const btn = document.querySelector(`[data-perf-tab="${k}"]`);
-          if (!btn) return false;
-          btn.click();
-          return true;
-        }, tabKey);
+        const selector = `[data-perf-tab="${tabKey}"]`;
+        const clicked = await page.waitForSelector(selector, { timeout: 2000 })
+          .then(btn => btn.evaluate(el => { el.click(); return true; }))
+          .catch(() => false);
         await page.waitForTimeout(350);
         const newErrs = errs.slice(before);
         if (!clicked) {
-          console.log(`    [skip] ${tabKey.padEnd(12)} button not present`);
+          console.log(`    [FAIL] ${tabKey.padEnd(12)} button not present`);
+          failures.push({ viewport: 'desktop-subtab', probe: `perf:${tabKey}`, kind: 'render', msg: 'button not present' });
           continue;
         }
         pagesProbed++;

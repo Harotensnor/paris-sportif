@@ -1730,3 +1730,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix: pre-stamp onboarding completion in profile probes, freeze dynamic chrome, refresh mobile baselines.
 - Verrou: mobile shard 3/3, profile mode/theme probes, topbar/footer visual snapshots, QA gate.
 - Chiffres: 61/61 pytest, 45/45 QA gates, mobile shard 3/3 90/90, night metrics fresh.
+
+## Sprint v37.129 — AUTO 10/10 route-wrap probe
+- Symptom: page probe could pass a route even when the declared route wrap was hidden.
+- Cause: probe_all_pages collected global visible text but ignored expectedVisible.
+- Fix: require the expected visible wrap and realign Combinés/Bilan/Historique/Backtest/Santé/Alertes wraps.
+- Verrou: probe_all_pages now fails on stale visible content from the previous route and missing Performance tabs.
+- Chiffres: probe_all_pages 41/41 expected, desktop shards 3/3 green, mobile shards 3/3 green.
