@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-07T18:18:40Z",
+  "generated_at": "2026-05-07T18:22:18Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815250",
-      "kickoff": "2026-05-07T18:10Z",
-      "league": "MLB",
-      "match": "Cleveland Guardians at Kansas City Royals",
-      "home": "Kansas City Royals",
-      "away": "Cleveland Guardians",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Kansas City Royals",
-          "pitcher": "Seth Lugo",
-          "label": "Seth Lugo plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.53,
-          "fair_odds": 1.89,
-          "expected_strikeouts": 4.63,
-          "projected_ip": 5.5,
-          "inputs": {
-            "k9": 7.57,
-            "era": 3.27,
-            "whip": 1.32,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Kansas City Royals",
-          "pitcher": "Seth Lugo",
-          "label": "Seth Lugo ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.885,
-          "fair_odds": 1.13,
-          "expected_hr_allowed": 0.122,
-          "projected_ip": 5.5,
-          "inputs": {
-            "hr9": 0.2,
-            "era": 3.27,
-            "whip": 1.32
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Cleveland Guardians",
-          "pitcher": "Slade Cecconi",
-          "label": "Slade Cecconi plus de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "over",
-          "probability": 0.6143,
-          "fair_odds": 1.63,
-          "expected_strikeouts": 3.95,
-          "projected_ip": 5.03,
-          "inputs": {
-            "k9": 7.07,
-            "era": 6.56,
-            "whip": 1.57,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Cleveland Guardians",
-          "pitcher": "Slade Cecconi",
-          "label": "Slade Cecconi concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6765,
-          "fair_odds": 1.48,
-          "expected_hr_allowed": 1.129,
-          "projected_ip": 5.03,
-          "inputs": {
-            "hr9": 2.02,
-            "era": 6.56,
-            "whip": 1.57
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815249",
       "kickoff": "2026-05-07T18:20Z",
@@ -870,7 +788,7 @@
       ]
     }
   ],
-  "props": 42,
+  "props": 38,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
