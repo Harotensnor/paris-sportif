@@ -1,5 +1,13 @@
 #!/usr/bin/env node
-const { chromium } = require('playwright');
+let chromium;
+try { ({ chromium } = require('playwright')); }
+catch (err) {
+  try { ({ chromium } = require('@playwright/test')); }
+  catch (fallbackErr) {
+    console.error('[probe-day-filter] Playwright runtime unavailable:', fallbackErr.message || err.message);
+    process.exit(2);
+  }
+}
 const http = require('http');
 const fs = require('fs');
 const path = require('path');

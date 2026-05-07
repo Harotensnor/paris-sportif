@@ -1,5 +1,13 @@
 #!/usr/bin/env node
-const { chromium } = require('playwright');
+let chromium;
+try { ({ chromium } = require('playwright')); }
+catch (err) {
+  try { ({ chromium } = require('@playwright/test')); }
+  catch (fallbackErr) {
+    console.error('[probe-prono-sheet-odds] Playwright runtime unavailable:', fallbackErr.message || err.message);
+    process.exit(2);
+  }
+}
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
@@ -74,32 +82,28 @@ function check(label, ok, detail) {
   await page.goto(`http://127.0.0.1:${port}/pronostics.html#dashboard`, { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(1600);
 
-  const topState = await page.evaluate(() => {
-    const section = document.querySelector('[data-v38-top-paris]');
-    const auditNode = document.querySelector('[data-v38-top-audit]');
-    const cards = Array.from(document.querySelectorAll('[data-top-paris-card]'));
-    const audit = window.__v38TopParisAudit || {};
-    const grid = document.querySelector('.v38-top-paris__grid');
-    const auditGrid = document.querySelector('.v38-top-audit__grid');
+  const homeState = await page.evaluate(() => {
+    const table = document.querySelector('.v36-table-panel');
+    const shell = document.querySelector('[data-home-table-only]');
+    const topSection = document.querySelector('[data-v38-top-paris]');
+    const rail = document.querySelector('.v36-home-rail');
+    const rows = Array.from(document.querySelectorAll('.v36-picks-table tbody tr'));
+    const resultHeader = Array.from(document.querySelectorAll('.v36-picks-table th')).some(th => /Résultat/i.test(th.textContent || ''));
+    const beginnerCopy = Array.from(document.querySelectorAll('.v37-beginner-copy')).map(el => (el.textContent || '').trim()).filter(Boolean);
     return {
-      hasSection: !!section,
-      hasAudit: !!auditNode,
-      audit,
-      count: cards.length,
-      badStatuses: cards.map(c => c.dataset.oddStatus || '').filter(s => !['verified', 'changed'].includes(s)),
-      topGridDisplay: grid ? getComputedStyle(grid).display : '',
-      auditGridDisplay: auditGrid ? getComputedStyle(auditGrid).display : '',
-      firstCardBorder: cards[0] ? getComputedStyle(cards[0]).borderStyle : '',
-      auditText: auditNode ? (auditNode.innerText || '').slice(0, 240) : '',
-      text: section ? (section.innerText || '').slice(0, 180) : ''
+      hasTable: !!table,
+      tableOnly: !!shell && !topSection && !rail,
+      rows: rows.length,
+      resultHeader,
+      beginnerCopyCount: beginnerCopy.length,
+      sampleBeginnerCopy: beginnerCopy[0] || '',
+      text: table ? (table.innerText || '').slice(0, 220) : ''
     };
   });
-  check('Top Paris section rendered', topState.hasSection, topState.text);
-  check('Top Paris audit rendered', topState.hasAudit, topState.auditText);
-  check('Top Paris audit selected count matches cards', Number(topState.audit.selected || 0) === topState.count, JSON.stringify(topState.audit));
-  check('Top Paris audit exposes rejection reasons', topState.auditText.includes('Pourquoi pas plus') && Number.isFinite(Number(topState.audit.scanned)), topState.auditText);
-  check('Top Paris cards use only verified/changed odds', topState.badStatuses.length === 0, topState.badStatuses.join(', '));
-  check('Top Paris dashboard styles loaded', topState.auditGridDisplay === 'grid' && (topState.count === 0 || (topState.topGridDisplay === 'grid' && topState.firstCardBorder !== 'none')), JSON.stringify(topState));
+  check('Accueil renders the table as the main content', homeState.hasTable && homeState.rows > 0, JSON.stringify(homeState));
+  check('Accueil is table-only, with extra dashboard blocks moved away', homeState.tableOnly, JSON.stringify(homeState));
+  check('Today table exposes result column for passed/live/upcoming picks', homeState.resultHeader, JSON.stringify(homeState));
+  check('Rows include beginner-friendly explanation text', homeState.beginnerCopyCount > 0 && /Lecture simple|alerte/i.test(homeState.sampleBeginnerCopy), homeState.sampleBeginnerCopy);
 
   const opened = await page.evaluate(() => {
     const target = document.querySelector('[data-top-paris-card]') ||

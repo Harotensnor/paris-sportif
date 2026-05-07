@@ -3613,6 +3613,8 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
       .v38-top-audit__item b{display:block;margin-top:2px;font-size:15px;color:var(--text)}
       .v38-top-audit__item em{display:block;margin-top:2px;font-style:normal;font-size:10px;color:var(--text-dim)}
       .v38-open-analysis{display:inline-flex;margin-top:6px;color:var(--brand);font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.04em}
+      .v37-beginner-copy{display:block;margin-top:6px;color:var(--text-dim);font-size:11px;line-height:1.35;max-width:360px}
+      .v37-beginner-copy b{color:var(--text);font-weight:900}
       @media (max-width:720px){.v38-prono-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.v38-prono-hero h3{font-size:20px}.v38-alt-table{font-size:11px}.v38-alt-table th:nth-child(4),.v38-alt-table td:nth-child(4){display:none}}
     `;
     document.head.appendChild(st);
@@ -3635,6 +3637,123 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     const info = v38OddStatusMeta(m.status);
     const title = [info.detail, m.reason, m.verifiedAt ? `Vérifiée ${m.verifiedAt}` : ''].filter(Boolean).join(' · ');
     return `<span class="v38-odd-status" data-status="${esc(m.status || 'missing')}" title="${esc(title)}">${esc(info.label)}</span>`;
+  }
+
+  function v38OddNorm(value) {
+    return String(value ?? '')
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9.]+/g, ' ')
+      .trim();
+  }
+
+  function v38OddSideAliases(value) {
+    const raw = v38OddNorm(value);
+    const out = new Set([raw]);
+    if (/^(1|home|domicile)$/.test(raw)) ['home', '1', 'domicile'].forEach(x => out.add(x));
+    if (/^(2|away|exterieur|extérieur)$/.test(raw)) ['away', '2', 'exterieur'].forEach(x => out.add(x));
+    if (/^(x|draw|nul|match nul)$/.test(raw)) ['draw', 'x', 'nul', 'match nul'].forEach(x => out.add(x));
+    if (/over|plus|^o$/.test(raw)) ['over', 'plus'].forEach(x => out.add(x));
+    if (/under|moins|^u$/.test(raw)) ['under', 'moins'].forEach(x => out.add(x));
+    if (/yes|oui|btts y|marquent/.test(raw)) ['yes', 'oui'].forEach(x => out.add(x));
+    if (/no|non|btts n|ne marque/.test(raw)) ['no', 'non'].forEach(x => out.add(x));
+    if (/1x/.test(raw)) out.add('1x');
+    if (/x2/.test(raw)) out.add('x2');
+    if (/12/.test(raw)) out.add('12');
+    return out;
+  }
+
+  function v38OddMarketAliases(market) {
+    const raw = String(market || '1n2');
+    const norm = raw.replace(/[_-]/g, '').toLowerCase();
+    const aliases = new Set([raw, raw.toLowerCase(), norm]);
+    if (['1n2', 'matchwinner', 'winner'].includes(norm)) ['1n2', 'match_winner'].forEach(x => aliases.add(x));
+    if (['doublechance', 'dc'].includes(norm)) ['double_chance', 'doubleChance'].forEach(x => aliases.add(x));
+    if (['drawnobet', 'dnb'].includes(norm)) ['dnb', 'dnb_rows'].forEach(x => aliases.add(x));
+    if (['ou', 'total', 'totals', 'overunder', 'ou05', 'ou15', 'ou25', 'ou35', 'ou45'].includes(norm)) ['ou', 'ou05', 'ou15', 'ou25', 'ou35', 'ou45'].forEach(x => aliases.add(x));
+    if (['httotal', 'htou', 'htou05', 'htou15'].includes(norm)) ['ht_ou', 'ht_ou05', 'ht_ou15', 'htTotal'].forEach(x => aliases.add(x));
+    if (['ht1n2', 'halftimewinner'].includes(norm)) ['ht_1n2', 'ht_1n2_rows'].forEach(x => aliases.add(x));
+    if (['btts', 'bothteamstoscore'].includes(norm)) ['btts', 'btts_rows'].forEach(x => aliases.add(x));
+    if (['teamtotal', 'teamtotals'].includes(norm)) ['team_total', 'teamTotal'].forEach(x => aliases.add(x));
+    if (['handicap', 'asianhandicap'].includes(norm)) aliases.add('handicap');
+    if (['exactscore', 'correctscore'].includes(norm)) ['exact_score', 'exact_scores', 'exact_score_rows', 'exactScore'].forEach(x => aliases.add(x));
+    return aliases;
+  }
+
+  function v38CollectWinamaxOdds(markets) {
+    const rows = [];
+    const push = (marketKey, side, odd, row) => {
+      const price = Number(odd);
+      if (!Number.isFinite(price)) return;
+      const raw = row && typeof row === 'object' ? row : {};
+      rows.push({
+        marketKey: String(marketKey || raw.market || ''),
+        market: String(raw.market || marketKey || ''),
+        side: raw.side ?? side ?? raw.pick ?? raw.key ?? '',
+        label: raw.label ?? raw.name ?? raw.title ?? side ?? '',
+        title: raw.title ?? raw.market_label ?? '',
+        line: raw.line ?? raw.handicap ?? raw.total ?? null,
+        team: raw.team ?? raw.side ?? '',
+        odd: price,
+        raw,
+      });
+    };
+    Object.entries(markets || {}).forEach(([marketKey, value]) => {
+      if (Array.isArray(value)) {
+        value.forEach(row => {
+          if (row && typeof row === 'object') push(marketKey, row.side ?? row.pick ?? row.key ?? row.label, row.odd ?? row.price, row);
+        });
+        return;
+      }
+      if (!value || typeof value !== 'object') return;
+      Object.entries(value).forEach(([key, val]) => {
+        if (typeof val === 'number' || typeof val === 'string') push(marketKey, key, val, { market: marketKey, side: key, label: key, line: value.line });
+        else if (val && typeof val === 'object') push(marketKey, key, val.odd ?? val.price, { ...val, market: val.market || marketKey, side: val.side || key });
+      });
+    });
+    return rows;
+  }
+
+  function v38FindWinamaxOdd(match, candidate) {
+    const c = candidate?.best || candidate || {};
+    const markets = match?.winamax?.markets || {};
+    const rows = v38CollectWinamaxOdds(markets);
+    const marketAliases = v38OddMarketAliases(c.market || c.raw?.market || '1n2');
+    const sideAliases = v38OddSideAliases(c.pickValue ?? c.pickKey ?? c.key ?? c.side ?? c.raw?.side ?? c.label ?? '');
+    const labelTokens = v38OddNorm(`${c.label || ''} ${c.labelFull || ''} ${c.displayLabel || ''} ${c.raw?.label || ''}`);
+    const wantedLine = Number(c.line ?? c.raw?.line);
+    const sameMarket = rows.filter(row => {
+      const rowMarkets = [row.marketKey, row.market].map(x => String(x || ''));
+      return rowMarkets.some(x => marketAliases.has(x) || marketAliases.has(x.toLowerCase()) || marketAliases.has(x.replace(/[_-]/g, '').toLowerCase()));
+    }).sort((a, b) => {
+      const score = (row) => {
+        let n = 0;
+        if (String(row.raw?.source || '').includes('winamax_detail')) n += 4;
+        if (/_rows$|match_winner|double_chance|team_total|exact_score/i.test(String(row.marketKey || ''))) n += 2;
+        if (row.label) n += 1;
+        if (row.title) n += 1;
+        return n;
+      };
+      return score(b) - score(a);
+    });
+    const matchSide = (row) => {
+      const rowSide = v38OddSideAliases(`${row.side || ''} ${row.label || ''} ${row.team || ''}`);
+      for (const side of sideAliases) if (rowSide.has(side)) return true;
+      const rowLabel = v38OddNorm(`${row.label || ''} ${row.title || ''}`);
+      if (labelTokens && rowLabel && (rowLabel.includes(labelTokens) || labelTokens.includes(rowLabel))) return true;
+      if (sideAliases.has('draw') && /match nul|nul|draw/.test(rowLabel)) return true;
+      return false;
+    };
+    const matchLine = (row) => {
+      const rowLine = Number(row.line);
+      if (!Number.isFinite(wantedLine)) return true;
+      if (!Number.isFinite(rowLine)) return false;
+      return Math.abs(rowLine - wantedLine) <= 0.011;
+    };
+    const exact = sameMarket.find(row => matchSide(row) && matchLine(row));
+    if (exact) return { row: exact, rows: sameMarket.length, reason: '' };
+    const sameMarketSameOdd = sameMarket.find(row => Math.abs(Number(row.odd) - Number(c.odd)) <= 0.006);
+    return { row: null, rows: sameMarket.length, sameMarketSameOdd, reason: sameMarket.length ? 'sélection ou ligne introuvable dans Winamax' : 'marché introuvable dans Winamax' };
   }
 
   function validatePickOdd(match, candidate, pred, opts) {
@@ -3660,11 +3779,15 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     if (dataAge > 240) return { ...base, status: 'stale', reason: `data ${Math.round(dataAge / 60)}h` };
     if (c.suspect || Number(c.edge || 0) > 0.30) return { ...base, status: 'suspicious', reason: c.suspectReason || 'edge anormal' };
     if (c.source !== 'winamax_exact' || c.exact === false) return { ...base, status: 'missing', reason: 'cote indicative non liée Winamax exact' };
+    const found = v38FindWinamaxOdd(match, c);
+    if (!found.row) return { ...base, status: found.sameMarketSameOdd ? 'mismatch' : 'missing', reason: found.reason };
+    const currentOdd = Number(found.row.odd);
     const rawOdd = Number(c.raw?.odd);
     if (Number.isFinite(rawOdd) && Math.abs(rawOdd - odd) > 0.006) return { ...base, status: 'mismatch', reason: 'prix brut différent du prix affiché' };
-    if (Number.isFinite(displayedOdd) && Math.abs(displayedOdd - odd) > 0.006) return { ...base, status: 'changed', reason: `ancien @${displayedOdd.toFixed(2)} → actuel @${odd.toFixed(2)}` };
+    if (Number.isFinite(currentOdd) && Math.abs(currentOdd - odd) > 0.006) return { ...base, status: 'changed', currentOdd, reason: `Winamax actuel @${currentOdd.toFixed(2)} au lieu de @${odd.toFixed(2)}` };
+    if (Number.isFinite(displayedOdd) && Math.abs(displayedOdd - odd) > 0.006) return { ...base, status: 'changed', currentOdd, reason: `ancien @${displayedOdd.toFixed(2)} → actuel @${odd.toFixed(2)}` };
     if (!c.market || !c.label) return { ...base, status: 'mismatch', reason: 'marché ou sélection incomplet' };
-    return { ...base, status: 'verified', reason: 'marché exact Winamax retrouvé' };
+    return { ...base, status: 'verified', currentOdd, reason: 'marché, sélection et ligne retrouvés dans Winamax' };
   }
   try { window.validatePickOdd = validatePickOdd; } catch(e) { swallowError(e); }
 
@@ -15859,7 +15982,7 @@ if (!value || value === 'all' || value === 'tous' || value === 'undefined' || va
 });
 if (clean.search && !clean.q) clean.q = String(clean.search || '').trim();
 if (!['tier','date','time','odd','conf','edge','score'].includes(clean.sort)) clean.sort = 'tier';
-if (!clean.date) clean.date = 'all';
+if (!clean.date) clean.date = todayIso;
 return clean;
 })();
 const v37BlindMode = v36Filter.blind === true || v36Filter.blind === '1';
@@ -16401,7 +16524,7 @@ if (Array.isArray(arr) && arr.length < max) arr.push(item);
 let v37FilterResetNotice = '';
 let v37AutoHorizonReason = '';
 const v37HashDate = v37HashParams.get('date') || '';
-const v37StoredDate = v36Filter.date || 'all';
+const v37StoredDate = v36Filter.date || todayIso;
 let v37DateSource = v37HashDate ? 'url' : (v36Filter.date ? 'localStorage' : 'default');
 let v37DateFilter = (/^\d{4}-\d{2}-\d{2}$/.test(v37HashDate) || v37HashDate === 'all') ? v37HashDate : v37StoredDate;
 const v37IncludeLive = v36Filter.includeLive === true || v36Filter.includeLive === '1';
@@ -16415,19 +16538,19 @@ if (dateFilter === 'all') return true;
 return day === dateFilter;
 };
 const v37DateMatches = (m) => v37DateMatchesFor(m, v37DateFilter);
-const v37PickIsVisibleByClockFor = (m, historyMode) => {
-if (historyMode) return true;
+const v37PickIsVisibleByClockFor = (m, dateFilter, historyMode) => {
 const ts = new Date(m?.date || 0).getTime();
 if (!Number.isFinite(ts)) return false;
+if (historyMode || dateFilter === todayIso) return true;
 const isLive = !!(m?.live || m?.status === 'STATUS_IN_PROGRESS');
 if (m?.completed || _isMatchEffectivelyDone(m)) return false;
 if (isLive) return v37IncludeLive;
 return ts > _dashboardNowMs;
 };
-const v37PickIsVisibleByClock = (m) => v37PickIsVisibleByClockFor(m, v37HistoryMode);
+const v37PickIsVisibleByClock = (m) => v37PickIsVisibleByClockFor(m, v37DateFilter, v37HistoryMode);
 const v37BuildScanPool = (dateFilter) => {
 const historyMode = v37IsHistoryDate(dateFilter);
-return terminalScanPool.filter(m => v37DateMatchesFor(m, dateFilter) && v37PickIsVisibleByClockFor(m, historyMode));
+return terminalScanPool.filter(m => v37DateMatchesFor(m, dateFilter) && v37PickIsVisibleByClockFor(m, dateFilter, historyMode));
 };
 const v36TeamName = (team) => team?.short || team?.displayName || team?.name || '?';
 const v37StableMatchKey = (m) => {
@@ -16488,7 +16611,7 @@ let v37ScanPool = v37BuildScanPool(v37DateFilter);
 const v37InitialDateFilter = v37DateFilter;
 const v37InitialScanPoolLength = v37ScanPool.length;
 const v37MinDenseDailyScanPool = 60;
-const v37CanAutoHorizonLowPool = v37DateFilter !== 'all' && !v37HistoryMode && !v37HashDate;
+const v37CanAutoHorizonLowPool = false;
 if (v37CanAutoHorizonLowPool && v37ScanPool.length < v37MinDenseDailyScanPool) {
 const allHorizonPool = v37BuildScanPool('all');
 if (allHorizonPool.length >= Math.max(v37MinDenseDailyScanPool, v37ScanPool.length + 30)) {
@@ -16504,6 +16627,7 @@ try { localStorage.setItem(v36FilterKey, JSON.stringify(v36Filter)); } catch(e) 
 v37Reject('date_auto_horizon_low_pool', null, v37AutoHorizonReason);
 }
 }
+const v37ShowResultColumn = v37HistoryMode || v37DateFilter === todayIso;
 const v37DashboardMarketLimit = (market) => {
 const m = String(market || '');
 if (m === 'exactScore' || m === 'resultBtts' || m === 'ht_1n2') return 1;
@@ -16888,7 +17012,7 @@ return counts;
 const v37DenseRowLimit = 360;
 const v37DenseMinimumRows = Math.min(30, Math.max(0, v37ScanPool.length));
 const v37PickRowKey = (p) => p?.pickUid || `${v37MatchKeyForPick(p)}|${p?.tier || ''}|${p?.market || ''}|${p?.pickKey || ''}|${p?.line ?? ''}|${Number(p?.odd || 0).toFixed(2)}`;
-const v37DataOnlyScanPool = (v37ScanPool.length > 10 || v37HistoryMode) ? v37ScanPool : v37BuildScanPool('all');
+const v37DataOnlyScanPool = v37ScanPool;
 const v37DataOnlyPool = (() => {
 const fillTarget = Math.max(0, v37DenseMinimumRows - v36PickPool.length);
 if (!fillTarget || v37DataOnlyScanPool.length <= 10) return [];
@@ -17225,8 +17349,16 @@ if (reasons.length) return reasons.join(' · ');
 const variance = p.pred?.ensemble?.agreement_variance == null ? 'n/a' : String(p.pred.ensemble.agreement_variance);
 return `EV ${(p.ev * 100).toFixed(1)}% · variance ensemble ${variance} · marché ${p.market}`;
 };
+const v37BeginnerPickText = (p, oddMeta) => {
+const status = String(oddMeta?.status || 'missing');
+if (!['verified', 'changed'].includes(status)) return `Lis-le comme une alerte : la cote n'est pas sûre (${v38OddStatusMeta(status).label.toLowerCase()}). Ne le mets pas dans tes priorités avant vérification Winamax.`;
+if (p.opportunity >= 75) return 'Lecture simple : le modèle aime ce pari et la cote Winamax est retrouvée. Candidat sérieux, mise raisonnable.';
+if (p.opportunity >= 60) return 'Lecture simple : pari jouable, mais pas automatique. La cote semble correcte, garde une mise prudente.';
+if (p.edge >= 0.04) return 'Lecture simple : il y a de la value, mais le risque reste plus haut. À jouer petit ou à surveiller.';
+return 'Lecture simple : avantage faible ou données incomplètes. À lire pour info, pas une priorité.';
+};
 const v37ResultForPick = (p) => {
-if (!v37HistoryMode) return null;
+if (!v37ShowResultColumn) return null;
 const status = String(p.m?.status || '');
 if (p.m?.live || status === 'STATUS_IN_PROGRESS') return 'live';
 if (!p.m?.completed) return _isMatchEffectivelyDone(p.m) ? 'void' : 'pending';
@@ -17242,11 +17374,11 @@ if (/CANCEL|POSTPON|ABANDON|WALKOVER|RETIRED|FORFEIT/.test(status)) return 'void
 return 'pending';
 };
 const v37ResultBadge = (res) => {
-if (res === 'won') return '<span class="v37-result v37-result--won">WON</span>';
-if (res === 'lost') return '<span class="v37-result v37-result--lost">LOST</span>';
-if (res === 'void') return '<span class="v37-result v37-result--void">VOID</span>';
+if (res === 'won') return '<span class="v37-result v37-result--won">Gagné</span>';
+if (res === 'lost') return '<span class="v37-result v37-result--lost">Perdu</span>';
+if (res === 'void') return '<span class="v37-result v37-result--void">Remboursé</span>';
 if (res === 'live') return '<span class="v37-result v37-result--live">LIVE</span>';
-return '<span class="v37-result v37-result--pending">ATTENTE</span>';
+return '<span class="v37-result v37-result--pending">À venir</span>';
 };
 const v36TableRow = (p, idx) => {
 const tier = v36TierById[p.tier] || v36TierDefs[0];
@@ -17264,19 +17396,20 @@ const scoreAdvice = p.opportunity >= 80 ? 'Conviction forte' : p.opportunity >= 
 const indicativeBadge = p.best?.source === 'cote_indicative' ? '<small class="v37-source-badge" title="Cote indicative : vérifie le prix final chez Winamax">indicatif</small>' : '';
 const oddMeta = p.oddValidation || (typeof validatePickOdd === 'function' ? validatePickOdd(p.m, p.best || p, p.pred) : { status: p.best?.exact ? 'verified' : 'missing' });
 const oddBadge = typeof v38OddStatusChip === 'function' ? v38OddStatusChip(oddMeta) : '';
+const beginnerText = v37BeginnerPickText(p, oddMeta);
 return `<tr class="v36-table-row ${soon ? 'is-imminent' : ''} ${sameMatchCount > 1 ? 'is-same-match' : ''} ${p.dataOnly ? 'is-data-only' : ''}" data-tone="${esc(tier.tone)}" data-big-detail="${esc(String(p.m.id || ''))}" data-pick-uid="${esc(p.pickUid || '')}" data-pick-label="${esc(p.labelFull || p.label || '')}" data-pick-odd="${esc(p.odd.toFixed(2))}" title="${esc(v36ReasonTooltip(p))}">
           <td class="v36-cell-sport"><span>${sportIcon(p.m.sport || '')}</span><b>${esc(sportLabel(p.m.sport || '').slice(0, 9))}</b></td>
           <td class="v36-cell-date">${esc(v37DateLabel(p.m.date))}</td>
           <td>${esc(fmtTime(p.m.date))}</td>
           <td class="v36-cell-league">${esc(league)}</td>
           <td class="v36-cell-match">${v36MatchTitleHtml(p)}${sameMatchCount > 1 ? `<span class="v37-match-multi">+${sameMatchCount - 1} autre pick</span>` : ''}</td>
-          <td class="v36-cell-pick"><b data-tooltip="${esc(pickHelp)}">${esc(p.label)}</b>${p.marketInfo ? `<span aria-hidden="true" data-tooltip="${esc(p.marketInfo)}" style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;margin-left:6px;border-radius:50%;border:1px solid var(--border);color:var(--text-dim);font-size:10px;font-weight:800;">?</span>` : ''}<em>${esc(marketName)}</em><span style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:5px;">${oddBadge}${indicativeBadge}<i class="v38-open-analysis">analyse complète</i></span></td>
+          <td class="v36-cell-pick"><b data-tooltip="${esc(pickHelp)}">${esc(p.label)}</b>${p.marketInfo ? `<span aria-hidden="true" data-tooltip="${esc(p.marketInfo)}" style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;margin-left:6px;border-radius:50%;border:1px solid var(--border);color:var(--text-dim);font-size:10px;font-weight:800;">?</span>` : ''}<em>${esc(marketName)}</em><small class="v37-beginner-copy">${esc(beginnerText)}</small><span style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:5px;">${oddBadge}${indicativeBadge}<i class="v38-open-analysis">analyse complète</i></span></td>
           <td class="v36-num v36-odd">${v37BlindOddHtml(p.odd)}</td>
           <td class="v36-num">${relPct}%</td>
           <td class="v36-num ${p.edge >= 0 ? 'is-pos' : 'is-neg'}"><span data-tooltip="Edge (avantage) : l'edge mesure si la cote est sous-évaluée par le marché. Plus c'est haut, mieux c'est.">${v37BlindEdgeHtml(p.edge)}</span></td>
           <td class="v36-num"><span class="v37-opportunity ${scoreClass}" data-score="${esc(String(p.opportunity || 0))}" data-tooltip="${esc(p.opportunityTooltip || '')}" title="${esc(p.opportunityTooltip || '')}" aria-label="${esc(p.opportunityTooltip || `Score d'opportunité ${p.opportunity || 0}/100`)}" tabindex="0">${esc(String(p.opportunity || 0))}</span><em class="v37-score-advice">${esc(scoreAdvice)}</em>${intelBadges ? `<span class="v37-intel-chips">${intelBadges}</span>` : ''}</td>
           <td>${v36TierBadge(p.tier, true)}</td>
-          ${v37HistoryMode ? `<td>${v37ResultBadge(result)}</td>` : ''}
+          ${v37ShowResultColumn ? `<td>${v37ResultBadge(result)}</td>` : ''}
         </tr>`;
 };
 const v36MobileCard = (p) => {
@@ -17284,13 +17417,15 @@ const tier = v36TierById[p.tier] || v36TierDefs[0];
 const result = v37ResultForPick(p);
 const sameMatchCount = v37VisibleMatchCounts.get(v37MatchKeyForPick(p)) || 0;
 const oddMeta = p.oddValidation || (typeof validatePickOdd === 'function' ? validatePickOdd(p.m, p.best || p, p.pred) : { status: p.best?.exact ? 'verified' : 'missing' });
+const beginnerText = v37BeginnerPickText(p, oddMeta);
 return `<button type="button" class="v36-table-card ${sameMatchCount > 1 ? 'is-same-match' : ''}" data-tone="${esc(tier.tone)}" data-big-detail="${esc(String(p.m.id || ''))}" data-pick-uid="${esc(p.pickUid || '')}" data-pick-label="${esc(p.labelFull || p.label || '')}" data-pick-odd="${esc(p.odd.toFixed(2))}">
           <span class="v36-table-card__top"><b>${sportIcon(p.m.sport || '')} ${esc(v37DateLabel(p.m.date))} · ${esc(fmtTime(p.m.date))}</b>${v36TierBadge(p.tier, true)}</span>
           <strong>${v36MatchTitleHtml(p)}</strong>
           <em class="v36-table-card__league">${esc(p.m.league_name || p.m.league || '')}</em>
           <span class="v36-table-card__line"><i data-tooltip="${esc(p.marketTooltip || p.labelFull || p.label)}">${esc(p.labelMobile || p.label)}</i><b>${v37BlindOddHtml(p.odd)}</b><b>${Math.round(p.rel * 100)}%</b><b>${v37BlindEdgeHtml(p.edge)}</b></span>
+          <small class="v37-beginner-copy">${esc(beginnerText)}</small>
           <span class="v36-table-card__signals"><i data-tooltip="${esc(p.opportunityTooltip || '')}" title="${esc(p.opportunityTooltip || '')}" aria-label="${esc(p.opportunityTooltip || `Score d'opportunité ${p.opportunity || 0}/100`)}">Score ${esc(String(p.opportunity || 0))}/100 · ${esc(p.opportunity >= 80 ? 'Conviction forte' : p.opportunity >= 60 ? 'Bon pari' : p.opportunity >= 40 ? 'Acceptable' : 'Peu fiable')}</i>${typeof v38OddStatusChip === 'function' ? v38OddStatusChip(oddMeta) : ''}${p.best?.source === 'cote_indicative' ? '<i>Cote indicative</i>' : ''}${sameMatchCount > 1 ? `<i>+${sameMatchCount - 1} autre pick même match</i>` : ''}${(p.opportunityBadges || []).slice(0, 2).map(x => `<i data-tooltip="${esc(v37BadgeTooltip(x))}" title="${esc(v37BadgeTooltip(x))}">${esc(x)}</i>`).join('')}</span>
-          ${v37HistoryMode ? `<span class="v36-table-card__signals">${v37ResultBadge(result)}</span>` : ''}
+          ${v37ShowResultColumn ? `<span class="v36-table-card__signals">${v37ResultBadge(result)}</span>` : ''}
         </button>`;
 };
 const v37TierLegendHtml = `<details class="v37-tier-legend" open>
@@ -17320,7 +17455,7 @@ const v37DayNavHtml = `<section class="v37-day-nav" aria-label="Navigation jour 
         <label class="v37-live-toggle"><input type="checkbox" data-v37-live-toggle ${v37IncludeLive ? 'checked' : ''}><span>Inclure LIVE</span></label>
       </section>`;
 const v37HistoryStats = (() => {
-if (!v37HistoryMode) return '';
+if (!v37ShowResultColumn) return '';
 const acc = { won: 0, lost: 0, void: 0, live: 0, pending: 0, pl: 0 };
 v36TableRows.forEach(p => {
 const r = v37ResultForPick(p);
@@ -17334,7 +17469,7 @@ const staked = acc.won + acc.lost;
 const roi = staked ? (acc.pl / staked) * 100 : 0;
 return `<footer class="v37-history-footer">
           <strong>${esc(v37DateLabel(v37DateFilter))} : ${v36TableRows.length} picks</strong>
-          <span>${acc.won} WON · ${acc.lost} LOST · ${acc.void} VOID · ${acc.pending} en attente · ROI ${roi >= 0 ? '+' : ''}${roi.toFixed(1)}%</span>
+          <span>${acc.won} gagnés · ${acc.lost} perdus · ${acc.void} remboursés · ${acc.live} live · ${acc.pending} à venir · ROI ${roi >= 0 ? '+' : ''}${roi.toFixed(1)}%</span>
           <button type="button" class="page-btn" data-page="performance">Voir tout l'historique</button>
         </footer>`;
 })();
@@ -17407,9 +17542,9 @@ const v36TableHtml = `<section class="v36-table-panel" aria-label="Tableau dense
         <div class="v36-table-scroll">
           <table class="v36-picks-table">
             <thead><tr>
-              <th>Sport</th><th>${v36SortButton('date', 'Date')}</th><th>${v36SortButton('time', 'Heure')}</th><th>Ligue</th><th>Match</th><th>Pari</th><th data-tooltip="Cote : combien tu gagnes pour 1 euro misé. @1.85 = 0.85 euro net si gagné.">${v36SortButton('odd', 'Cote')}</th><th data-tooltip="Conf : probabilité estimée par notre modèle. 65% veut dire environ 65 chances sur 100 selon les données.">${v36SortButton('conf', 'Conf')}</th><th data-tooltip="Edge (avantage) : avantage statistique vs marché. +5% = la cote vaut environ 5% de plus que le risque réel.">${v36SortButton('edge', 'Edge (avantage)')}</th><th data-tooltip="Score : note globale 0-100. Plus haut = meilleur pick car le score combine confiance, edge, fraîcheur data, timing et signaux.">${v36SortButton('score', 'Score')}</th><th data-tooltip="Tier : niveau de risque/gain. Sûr et Solide sont prudents, Big odds et Outsider cherchent plus de rendement.">${v36SortButton('tier', 'Tier')}</th>${v37HistoryMode ? '<th>Résultat</th>' : ''}
+              <th>Sport</th><th>${v36SortButton('date', 'Date')}</th><th>${v36SortButton('time', 'Heure')}</th><th>Ligue</th><th>Match</th><th>Pari</th><th data-tooltip="Cote : combien tu gagnes pour 1 euro misé. @1.85 = 0.85 euro net si gagné.">${v36SortButton('odd', 'Cote')}</th><th data-tooltip="Conf : probabilité estimée par notre modèle. 65% veut dire environ 65 chances sur 100 selon les données.">${v36SortButton('conf', 'Conf')}</th><th data-tooltip="Edge (avantage) : avantage statistique vs marché. +5% = la cote vaut environ 5% de plus que le risque réel.">${v36SortButton('edge', 'Edge (avantage)')}</th><th data-tooltip="Score : note globale 0-100. Plus haut = meilleur pick car le score combine confiance, edge, fraîcheur data, timing et signaux.">${v36SortButton('score', 'Score')}</th><th data-tooltip="Tier : niveau de risque/gain. Sûr et Solide sont prudents, Big odds et Outsider cherchent plus de rendement.">${v36SortButton('tier', 'Tier')}</th>${v37ShowResultColumn ? '<th>Résultat</th>' : ''}
             </tr></thead>
-            <tbody>${v36TableRows.length ? v36TableRows.map(v36TableRow).join('') : `<tr><td colspan="${v37HistoryMode ? '12' : '11'}"><div class="v36-tier-empty">Aucun pick pour ce filtre. Retire un sport, une heure ou une recherche.</div></td></tr>`}</tbody>
+            <tbody>${v36TableRows.length ? v36TableRows.map(v36TableRow).join('') : `<tr><td colspan="${v37ShowResultColumn ? '12' : '11'}"><div class="v36-tier-empty">Aucun pick pour ce filtre. Retire un sport, une heure ou une recherche.</div></td></tr>`}</tbody>
           </table>
         </div>
         <div class="v36-table-cards">${v36TableRows.length ? v36TableRows.map(v36MobileCard).join('') : `<div class="v36-tier-empty">Aucun pick pour ce filtre.</div>`}</div>
@@ -17850,57 +17985,8 @@ const v37IntelFallback = v37IntelState.loading
 ? '<div class="v36-tier-empty">Chargement des insights modèle…</div>'
 : '<div class="v36-tier-empty">Insights modèle indisponibles pour ce snapshot.</div>';
 wrap.innerHTML = `
-        <div class="v36-home-shell">
-          <section class="v36-dayline" aria-label="Strategie du jour">
-            <h1>${_dataIsStale ? `Donnees anciennes : ${v37DisplayTotal} lignes visibles en lecture seule` : `V37 : ${v37DisplayTotal} lignes affichées · table dense ${esc(v37ScopeLabel)}`}</h1>
-            <span>${esc(v36CoverageLine)}</span>
-            <button type="button" class="page-btn" data-page="tous">Tout voir</button>
-          </section>
-          <section class="v36-filter-strip" aria-label="Filtres accueil">
-            <nav class="v36-mobile-quick" aria-label="Filtres rapides mobile">
-              ${v36QuickButton('today', "Aujourd'hui", v37DateFilter === todayIso)}
-              ${v36QuickButton('locks', 'Locks', v36Filter.tier === 'safe')}
-              ${v36QuickButton('edge', 'Top edges', v36Sort === 'edge')}
-              ${v36QuickButton('football', 'Foot only', v36Filter.sport === 'football')}
-            </nav>
-            <div>
-              ${v36FilterButton('sport', '', 'Tous sports', !v36Filter.sport)}
-              ${v36Sports.map(sp => v36FilterButton('sport', sp, `${sportIcon(sp)} ${esc(sportLabel(sp))}`, v36Filter.sport === sp)).join('')}
-            </div>
-            <div>
-              ${v36FilterButton('tier', '', 'Tous niveaux', !v36Filter.tier)}
-              ${v36TierDefs.map(t => v36FilterButton('tier', t.id, `${esc(t.icon)} ${esc(t.label)} ${v36CountsAll[t.id] || 0}`, v36Filter.tier === t.id)).join('')}
-            </div>
-            <div>
-              ${v36FilterButton('time', '', 'Toute la journee', !v36Filter.time)}
-              ${v36FilterButton('time', 'morning', 'Matin', v36Filter.time === 'morning')}
-              ${v36FilterButton('time', 'afternoon', 'AM', v36Filter.time === 'afternoon')}
-              ${v36FilterButton('time', 'evening', 'Soir', v36Filter.time === 'evening')}
-              ${v36FilterButton('time', 'night', 'Nuit', v36Filter.time === 'night')}
-            </div>
-          </section>
-          ${v37TiltBanner}
-          ${v37DailySection}
-          ${v37PersonalPicksHtml}
-          ${v38TopParisSection}
-          <div class="v36-home-grid">
-            ${v36TableHtml}
-            <aside class="v36-home-rail" aria-label="Radar temps reel">
-              <section><header><span>Briefing jour</span><b>${Number(v37Intel.daily?.summary?.insights || 0) || '...'}</b></header>${v37DailyRows || v37IntelFallback}</section>
-              <section><header><span>Insights modèle</span><b>${v37IntelCount || '...'}</b></header>${v37RareRows || v37AngleRows || v37IntelFallback}</section>
-              <section><header><span>Biais marché ligues</span><b>${Number(v37Intel.league?.summary?.exploit || 0)}</b></header>${v37LeagueRows || v37IntelFallback}</section>
-              <section><header><span>Biais par marché</span><b>${Number(v37Intel.marketBias?.summary?.market_exploit || 0)}</b></header>${v37MarketBiasRows || v37IntelFallback}</section>
-              <section><header><span>Profil Théo</span><b>${v37CoachCount || '...'}</b></header>${v37CoachRows || `<div class="v36-tier-empty">Tracke quelques paris : le modèle apprendra tes bons sports, cotes et ligues.</div>`}</section>
-              <section><header><span>Discipline tilt</span><b>${v37Tilt?.level === 'danger' ? 'STOP' : v37Tilt?.level === 'warn' ? '!' : 'OK'}</b></header>${v37TiltRow || `<div class="v36-tier-empty">Tracke tes paris pour activer le détecteur de tilt.</div>`}</section>
-              <section><header><span>Gaps data critiques</span><b>${v37GapCount || '...'}</b></header>${v37GapRows || `<div class="v36-tier-empty">Aucun trou prioritaire sur ce snapshot.</div>`}</section>
-              <section><header><span>Timing mise</span><b>${Number(v37Intel.timing?.summary?.wait || 0)}</b></header>${v37TimingRows || `<div class="v36-tier-empty">Aucune attente forcée : les picks restent jouables selon ton filtre.</div>`}</section>
-              <section><header><span>Stats live</span><b>${v36Total}</b></header><div class="v36-side-stats">${v36StatsHtml}</div></section>
-            </aside>
-          </div>
-          ${v37SportPicksSection}
-          ${v37ClvSection}
-          ${v36GeniusSection}
-          ${v36BoostSection}
+        <div class="v36-home-shell" data-home-table-only>
+          ${v36TableHtml}
         </div>`;
 const v37GuideDetails = wrap.querySelector('[data-v37-decision-guide]');
 if (v37GuideDetails) {
