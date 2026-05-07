@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-05-07T17:12:14Z",
+  "generated_at": "2026-05-07T17:17:07Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 53,
+    "active_events": 52,
     "expired_sample": 0,
     "by_type": {
-      "schedule_congestion": 30,
-      "back_to_back_travel": 15,
+      "schedule_congestion": 28,
+      "back_to_back_travel": 14,
       "lookahead": 69,
       "travel_extreme": 14
     },
     "by_decision": {
       "abstain": 29,
-      "lean_home": 20,
+      "lean_home": 19,
       "lean_away": 4
     },
-    "lean_home": 20,
+    "lean_home": 19,
     "lean_away": 4,
     "abstain": 29,
     "monitor": 0
@@ -2221,72 +2221,6 @@
       }
     },
     {
-      "event_id": "401815246",
-      "source_event_ids": [
-        "401815246"
-      ],
-      "kickoff": "2026-05-07T17:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Washington Nationals",
-      "away": "Minnesota Twins",
-      "match": "Washington Nationals - Minnesota Twins",
-      "decision": "lean_home",
-      "net_team": "Washington Nationals",
-      "reason": "Minnesota Twins plus penalise par calendrier/voyage (1.55 vs 0.60)",
-      "pressure_score": 2.151,
-      "home_fade": 0.6,
-      "away_fade": 1.551,
-      "travel_score": 0.951,
-      "lookahead_score": 0,
-      "congestion_score": 1.2,
-      "types": {
-        "schedule_congestion": 2,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "3 matchs sur les 7 derniers jours",
-        "3 match dans les 48h + 1504 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.657,
-        "away_score": -1.131,
-        "home_fade": 1.2,
-        "away_fade": 1.551,
-        "reason": "Direction nette: Washington Nationals (-0.66)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.951
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815273",
       "source_event_ids": [
         "401815273"
@@ -2862,22 +2796,16 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.15,
-        "away_score": 0.497,
+        "away_score": 0.052,
         "home_fade": 0.15,
         "away_fade": 0.0,
-        "reason": "Direction nette: Shakhtar Donetsk (+0.50)",
+        "reason": "Direction nette: Shakhtar Donetsk (+0.05)",
         "detail": [
           {
             "side": "home",
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.444
           }
         ]
       }

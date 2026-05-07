@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-07T17:12:11Z",
+  "generated_at": "2026-05-07T17:17:03Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815246",
-      "kickoff": "2026-05-07T17:05Z",
-      "league": "MLB",
-      "match": "Minnesota Twins at Washington Nationals",
-      "home": "Washington Nationals",
-      "away": "Minnesota Twins",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Washington Nationals",
-          "pitcher": "Jake Irvin",
-          "label": "Jake Irvin moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5002,
-          "fair_odds": 2.0,
-          "expected_strikeouts": 5.5,
-          "projected_ip": 4.89,
-          "inputs": {
-            "k9": 10.13,
-            "era": 4.93,
-            "whip": 1.3,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Washington Nationals",
-          "pitcher": "Jake Irvin",
-          "label": "Jake Irvin ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5686,
-          "fair_odds": 1.76,
-          "expected_hr_allowed": 0.565,
-          "projected_ip": 4.89,
-          "inputs": {
-            "hr9": 1.04,
-            "era": 4.93,
-            "whip": 1.3
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Minnesota Twins",
-          "pitcher": "Simeon Woods Richardson",
-          "label": "Simeon Woods Richardson moins de 2,5 strikeouts",
-          "line": 2.5,
-          "pick": "under",
-          "probability": 0.535,
-          "fair_odds": 1.87,
-          "expected_strikeouts": 2.39,
-          "projected_ip": 4.89,
-          "inputs": {
-            "k9": 4.41,
-            "era": 6.49,
-            "whip": 1.76,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Minnesota Twins",
-          "pitcher": "Simeon Woods Richardson",
-          "label": "Simeon Woods Richardson concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6767,
-          "fair_odds": 1.48,
-          "expected_hr_allowed": 1.129,
-          "projected_ip": 4.89,
-          "inputs": {
-            "hr9": 2.08,
-            "era": 6.49,
-            "whip": 1.76
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815250",
       "kickoff": "2026-05-07T18:10Z",
@@ -952,7 +870,7 @@
       ]
     }
   ],
-  "props": 46,
+  "props": 42,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
