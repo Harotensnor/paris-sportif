@@ -1820,3 +1820,8 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Stabilized football player props when the fresh cron window has zero active football matches.
 - Added sport-level V5 prior fallback from team rows so synthetic/current predictions still prove V5 application.
 - Locked the modal pick sync test against row re-render detaches by clicking a stable UID snapshot.
+
+### v37.145 — Cron catch-up after e2e fix
+- Merged the latest refresh-data tick from main to restore a clean PR merge base.
+- Regenerated night metrics and health from the fresh data.js snapshot.
+- Restamped sidecar hashes, footer version and service-worker cache without changing the v37.144 runtime fix.
