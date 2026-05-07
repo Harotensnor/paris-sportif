@@ -1,5 +1,19 @@
 import { test, expect } from '@playwright/test';
 
+test.beforeEach(async ({ context }) => {
+  // Avoid onboarding modal + consent banner blocking the modal under test.
+  await context.addInitScript(() => {
+    try {
+      localStorage.setItem('userPrefs', JSON.stringify({
+        onboardingDone: true,
+        level: 'confirme',
+        consentLocalStorage: 'accepted',
+      }));
+      localStorage.setItem('paris_sportif_onboarded_v2', '1');
+    } catch (e) {}
+  });
+});
+
 async function dragHandle(page, deltaY) {
   const box = await page.locator('.modal-drag-handle').boundingBox();
   if (!box) throw new Error('Missing modal drag handle box');

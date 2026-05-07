@@ -138,8 +138,8 @@
 <link rel="preload" href="data_lite_72h.json" as="fetch" type="application/json" crossorigin>
 <link rel="modulepreload" href="src/perf-bootstrap.js?v=ba6f182f">
 <!-- v35.324 — CSS chargé sans handler inline pour préparer CSP strict. -->
-<link rel="preload" href="app.css?v=85f39233" as="style">
-<link rel="stylesheet" href="app.css?v=85f39233">
+<link rel="preload" href="app.css?v=019dcf49" as="style">
+<link rel="stylesheet" href="app.css?v=019dcf49">
 <link rel="stylesheet" href="app-design-v3.css?v=d41915cb">
 <link rel="stylesheet" href="print.css?v=313105b5" media="print">
 <style id="perf-critical-css">
@@ -147,7 +147,7 @@
   html,body{margin:0;background:var(--bg,var(--perf-bg));color:var(--text,var(--perf-text));font-family:"Inter","SF Pro Text",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
   body{min-height:100vh;overflow-x:hidden}
   header.topbar{position:sticky;top:0;z-index:60;background:rgba(8,9,13,.82);border-bottom:1px solid var(--border,var(--perf-border));backdrop-filter:blur(18px)}
-  main#main-content{min-height:72vh;contain:layout paint style}
+  main#main-content{min-height:72vh;contain:layout style}
   .boot-shell,.v36-dayline,.card-base{background:var(--panel,var(--perf-panel));border:1px solid var(--border,var(--perf-border));border-radius:12px}
 </style>
 <style id="v36-mobile-compact-cards">
@@ -571,7 +571,7 @@
      n'est chargé QU'APRÈS consentement explicite (cf. _maybeEnableAnalytics).
      Pas de tracking par défaut. -->
 <script src="analytics.config.js" defer></script>
-<noscript><link rel="stylesheet" href="app.css?v=85f39233"><link rel="stylesheet" href="app-design-v3.css?v=d41915cb"></noscript>
+<noscript><link rel="stylesheet" href="app.css?v=019dcf49"><link rel="stylesheet" href="app-design-v3.css?v=d41915cb"></noscript>
 <script>
   // v22 — Init theme / contrast / reader BEFORE body render (évite le flash)
   (function() {
@@ -844,6 +844,7 @@
         <span class="v36-alert-dot" aria-hidden="true"></span>
       </button>
       <button id="health-indicator" class="v36-icon-btn v36-health-btn" type="button" aria-label="Santé du pipeline de données" title="Santé du pipeline : chargement…">●</button>
+      <button id="theme-toggle" class="v36-icon-btn" type="button" aria-label="Basculer thème clair/sombre / auto" title="Thème (Maj+T)">🌙</button>
       <button type="button" class="v36-profile-btn page-btn" data-page="profil" aria-label="Ouvrir le profil et les réglages" title="Profil">
         <span aria-hidden="true">👤</span>
         <span>Profil</span>
@@ -856,7 +857,6 @@
         </div>
         <input type="date" id="date" class="date-picker" aria-label="Sélectionner une date">
         <button id="level-toggle" class="theme-toggle" type="button" aria-label="Basculer niveau (débutant / confirmé / pro)" title="Niveau d'expérience · clic pour cycler">🎯</button>
-        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Basculer thème clair/sombre" title="Thème (Maj+T)">🌙</button>
       </div>
     </div>
 
@@ -1140,42 +1140,43 @@
 <div class="toast" id="toast"></div>
 
 <script src="data_lite.js?v=03d22c44"></script>
-<script src="team_priors.js?v=30956547"></script>
-<script src="bayesian_priors.js?v=38e040bd"></script>
-<script src="season_phase.js?v=c823d95a"></script>
-<script src="star_players.js?v=07f51051"></script>
-<script src="football_player_props.js?v=7b09822b"></script>
-<script src="nba_player_props.js?v=d18513c2"></script>
-<script src="xg_decay_params.js?v=43b5e15a"></script>
-<script src="team_travel.js?v=1976ef54"></script>
-<script src="schedule_density.js?v=72578f25"></script>
-<script src="referee_stats.js?v=b001664a"></script>
-<script src="tennis_elo_surface.js?v=6f88857b"></script>
-<script src="goalie_pitcher_context.js?v=ef0c842d"></script>
-<script src="stadium_effects.js?v=1a1fb885"></script>
-<script src="coach_tenure.js?v=14348b33"></script>
-<script src="derbies.js?v=8a590387"></script>
-<script src="team_stats_extended.js?v=5803d469"></script>
-<script src="total_corners.js?v=d8c9a5e1"></script>
-<script src="total_cards.js?v=9981ec47"></script>
-<script src="total_fouls.js?v=fab90368"></script>
-<script src="mlb_player_props.js?v=6f61a514"></script>
-<script src="nhl_playoff_markets.js?v=78848cc5"></script>
+<script src="team_priors.js?v=c21b478e"></script>
+<script src="bayesian_priors.js?v=0bbae5b3"></script>
+<script src="season_phase.js?v=de408ff4"></script>
+<script src="star_players.js?v=c631769a"></script>
+<script src="football_player_props.js?v=53e3cd03"></script>
+<script src="nba_player_props.js?v=cb63f958"></script>
+<script src="xg_decay_params.js?v=54c82a97"></script>
+<script src="team_travel.js?v=7c7d64f2"></script>
+<script src="schedule_density.js?v=0e12cdb1"></script>
+<script src="referee_stats.js?v=a02d7ce0"></script>
+<script src="tennis_elo_surface.js?v=25dfda78"></script>
+<script src="goalie_pitcher_context.js?v=eefa190d"></script>
+<script src="stadium_effects.js?v=d2d4b566"></script>
+<script src="coach_tenure.js?v=9323bcbc"></script>
+<script src="derbies.js?v=24b67559"></script>
+<script src="team_stats_extended.js?v=b7faf64f"></script>
+<script src="total_corners.js?v=b091ac27"></script>
+<script src="total_cards.js?v=5acb9c2d"></script>
+<script src="total_fouls.js?v=704c27cd"></script>
+<script src="mlb_player_props.js?v=9bfc9f86"></script>
+<script src="nhl_playoff_markets.js?v=35ef9589"></script>
 <script src="app-i18n.js?v=84f1f252" defer></script>
 <script src="lightgbm_weights.js?v=a7ce0696"></script>
-<script src="stacking_meta_weights.js?v=e3035a0f"></script>
-<script src="feature_engineering_v5.js?v=2053ae88"></script>
-<script src="model_versions.js?v=b85e9149"></script>
-<script src="feature_drift_v5.js?v=4a6e11c7"></script>
-<script src="calibration_method.js?v=d6a56dea"></script>
-<script src="ensemble_adaptive_weights.js?v=772f6ce8"></script>
-<script src="cold_start_v5.js?v=3a7495c1"></script>
-<script src="multitask_v5.js?v=e4ea0e43"></script>
-<script src="backtest_deep_v5.js?v=9472965a"></script>
-<script src="adversarial_validation.js?v=ef7d75cd"></script>
-<script src="sports_coverage_extended.js?v=f3db6cbc"></script>
+<script src="stacking_meta_weights.js?v=6b1dd744"></script>
+<script src="feature_engineering_v5.js?v=43df7f65"></script>
+<script src="model_versions.js?v=c27d9ae3"></script>
+<script src="feature_drift_v5.js?v=96435452"></script>
+<script src="calibration_method.js?v=277470bf"></script>
+<script src="ensemble_adaptive_weights.js?v=b7f9ce2e"></script>
+<script src="cold_start_v5.js?v=473d6b42"></script>
+<script src="multitask_v5.js?v=62a22955"></script>
+<script src="backtest_deep_v5.js?v=0bb0a6cb"></script>
+<script src="adversarial_validation.js?v=38534b29"></script>
+<script src="sports_coverage_extended.js?v=4ade1530"></script>
 <script type="module" src="src/perf-bootstrap.js?v=ba6f182f"></script>
-<script src="legacy-app.js?v=da5488d5" defer></script>
+<script src="src/qa-runtime.js?v=c82e1da1" defer></script>
+<script src="legacy-app.js?v=fc22c38d" defer></script>
 <script src="app.js?v=81dcedea" defer></script>
 
 <!-- enhancements v20 -->
