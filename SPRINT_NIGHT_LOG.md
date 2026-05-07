@@ -1855,3 +1855,8 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Merged the next main cron tick after the v37.150 test hardening commit made the PR dirty again.
 - Preserved the e2e timing fix and refreshed the data sidecars, health metrics, night metrics and cache stamp from the new data.js.
 - Revalidated the data timestamp alignment before pushing the resync.
+
+### v37.152 — Fast cron catch-up
+- Caught the 09:38 UTC refresh tick before pushing again so the PR head contains the latest main data parent.
+- Reused the same conflict strategy: fresh sidecars from main, local UI/test fixes preserved, health and night metrics rebuilt from data.js.
+- Kept the push window short to give GitHub Actions time to start before the next cron tick.
