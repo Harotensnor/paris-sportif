@@ -17617,6 +17617,7 @@ const rows = [
 ];
 return rows.slice(0, 9).map(([label, value, note]) => `<div class="v38-top-audit__item"><span>${esc(label)}</span><b>${esc(value)}</b><em>${esc(note)}</em></div>`).join('');
 })();
+if (typeof v38EnsurePronoStyles === 'function') v38EnsurePronoStyles();
 const v38TopParisSection = `<section class="v38-top-paris" aria-label="Top Paris du jour" data-v38-top-paris>
         <header>
           <div><span>TOP PARIS</span><strong>Top Paris du jour</strong><em>${_dataIsStale ? 'Data ancienne : aucun pick recommandé fort.' : 'Shortlist limitée aux cotes Winamax vérifiées, sans doublon match.'}</em></div>
