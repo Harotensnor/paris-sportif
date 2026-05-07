@@ -42,9 +42,9 @@ MARKETS = ROOT / 'winamax_markets.json'
 DATA_JS = ROOT / 'data.js'
 
 CACHE_TTL_HOURS = float(os.environ.get('WINAMAX_DETAILS_TTL_HOURS', '1'))
-GLOBAL_CAP = int(os.environ.get('WINAMAX_DETAILS_CAP', '420'))
+GLOBAL_CAP = int(os.environ.get('WINAMAX_DETAILS_CAP', '900'))
 SLEEP_SECONDS = float(os.environ.get('WINAMAX_DETAILS_SLEEP', '0.18'))
-HORIZON_DAYS = int(os.environ.get('WINAMAX_DETAILS_HORIZON_DAYS', '10'))
+HORIZON_DAYS = int(os.environ.get('WINAMAX_DETAILS_HORIZON_DAYS', '30'))
 DEBUG = False
 
 SPORT_QUOTAS = {
@@ -55,7 +55,7 @@ SPORT_QUOTAS = {
     'hockey': 45,
     'mma': 20,
     'americanfootball': 15,
-    'unknown': 260,
+    'unknown': 900,
 }
 
 SPORT_PRIORITY = {
@@ -72,7 +72,7 @@ SPORT_PRIORITY = {
 
 def _has_detailed_markets(entry: dict) -> bool:
     odds = (entry or {}).get('odds') or {}
-    return len(odds) > 1
+    return len(odds) > 1 and bool(odds.get('all_markets'))
 
 
 def _details_coverage(matches_dict: dict) -> dict:
@@ -143,6 +143,96 @@ def _selection_side(label: str, home_name: str = '', away_name: str = '') -> str
     if at and (lt & at) and not (lt & ht):
         return 'away'
     return None
+
+
+def _slug(text: str) -> str:
+    text = (text or '').lower()
+    text = re.sub(r'[^a-z0-9]+', '_', text)
+    return re.sub(r'_+', '_', text).strip('_')[:80] or 'market'
+
+
+def _generic_market_key(title: str, sport_id: str) -> str:
+    t = (title or '').lower()
+    if 'double chance' in t:
+        return 'double_chance'
+    if 'rembours' in t and 'match nul' in t:
+        return 'dnb'
+    if 'mi-temps' in t and 'résultat' in t:
+        return 'ht_1n2'
+    if ('résultat' in t or 'vainqueur' in t) and 'nombre' not in t and 'score exact' not in t:
+        return '1n2'
+    if 'score exact' in t:
+        return 'exact_score'
+    if ('les deux équipes' in t or 'les 2 équipes' in t) and 'marquent' in t:
+        return 'btts'
+    if 'résultat et les deux' in t and 'marquent' in t:
+        return 'result_btts'
+    if 'mi-temps' in t and ('nombre de buts' in t or 'nombre total de buts' in t):
+        return 'ht_ou'
+    if t.startswith('nombre de buts de '):
+        return 'team_total'
+    if title == 'nombre de buts' or 'nombre total de buts' in t:
+        return 'ou'
+    if 'corner' in t and ('nombre' in t or 'total' in t):
+        return 'corners_ou'
+    if 'carton' in t and ('nombre' in t or 'total' in t):
+        return 'cards_ou'
+    if 'handicap' in t or 'écart de' in t or 'ecart de' in t:
+        if sport_id in ('3', '6'):
+            return 'basket_handicap'
+        if sport_id in ('4', '14'):
+            return 'puck_line'
+        if sport_id == '5':
+            return 'tennis_handicap'
+        if sport_id == '2':
+            return 'baseball_handicap'
+        return 'handicap'
+    if 'nombre de points' in t:
+        if 'quart' in t or 'qt' in t:
+            return 'basket_quarter_total'
+        if 'mi-temps' in t or '1ère mt' in t or '1ere mt' in t:
+            return 'basket_first_half_total'
+        if t.startswith('nombre de points de '):
+            return 'basket_team_total'
+        return 'basket_total'
+    if 'nombre de runs' in t:
+        if '5 premières' in t or '5 premieres' in t or 'f5' in t:
+            return 'baseball_f5_total'
+        return 'baseball_total'
+    if 'nombre de jeux' in t:
+        return 'tennis_games'
+    if 'nombre de rounds' in t:
+        return 'mma_rounds'
+    if 'combat va à son terme' in t:
+        return 'mma_goes_distance'
+    return 'winamax_all'
+
+
+def _generic_side(market: str, label: str, home_name: str = '', away_name: str = '') -> str:
+    l = (label or '').lower().strip()
+    if market in {'ou', 'ht_ou', 'team_total', 'corners_ou', 'cards_ou', 'basket_total',
+                  'basket_team_total', 'basket_quarter_total', 'basket_first_half_total',
+                  'baseball_total', 'baseball_f5_total', 'tennis_games', 'mma_rounds'}:
+        if 'plus' in l or 'over' in l or l.startswith('+') or '≥' in l:
+            return 'over'
+        if 'moins' in l or 'under' in l or l.startswith('-') or '<' in l:
+            return 'under'
+    if market in {'1n2', 'dnb', 'ht_1n2', 'handicap', 'basket_handicap',
+                  'puck_line', 'tennis_handicap', 'baseball_handicap'}:
+        return _selection_side(label, home_name, away_name) or label
+    if market == 'btts' or market == 'mma_goes_distance':
+        if l.startswith('oui') or l == 'yes':
+            return 'yes'
+        if l.startswith('non') or l == 'no':
+            return 'no'
+    if market == 'double_chance':
+        if ('1' in l and 'n' in l) or '1x' in l:
+            return '1X'
+        if ('n' in l and '2' in l) or 'x2' in l:
+            return 'X2'
+        if '1' in l and '2' in l:
+            return '12'
+    return label
 
 
 def _append_market(markets: dict, key: str, row: dict) -> None:
@@ -227,6 +317,26 @@ def _extract_match_markets(state: dict, match_id: str) -> dict:
                 oitems.append((label, od))
         if not oitems:
             continue
+
+        raw_title = bet.get('betTypeName') or bet.get('betTitle') or bet.get('title') or bet.get('name') or ''
+        generic_market = _generic_market_key(title, sport_id)
+        needs_line = any(token in generic_market for token in (
+            'ou', 'total', 'handicap', 'line', 'rounds', 'games'
+        ))
+        for label, od in oitems:
+            row = {
+                'market': generic_market,
+                'market_key': _slug(raw_title),
+                'side': _generic_side(generic_market, label, home_name, away_name),
+                'odd': od,
+                'label': label,
+                'title': raw_title,
+            }
+            if needs_line:
+                line = _parse_decimal(label)
+                if line is not None:
+                    row['line'] = line
+            _append_market(markets, 'all_markets', row)
 
         # ===== Classify markets =====
         # 1N2

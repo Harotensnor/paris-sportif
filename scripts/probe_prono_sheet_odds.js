@@ -120,13 +120,24 @@ function check(label, ok, detail) {
     const body = document.getElementById('detail-body');
     const tabs = Array.from(document.querySelectorAll('#detail-modal [data-mtab-toggle]')).map(b => b.dataset.mtabToggle);
     const text = body ? body.innerText || '' : '';
+    const tabText = [];
+    document.querySelectorAll('#detail-modal [data-mtab-toggle]').forEach(btn => {
+      try {
+        btn.click();
+        const updated = document.getElementById('detail-body');
+        tabText.push(updated ? updated.innerText || '' : '');
+      } catch (e) {
+        tabText.push('');
+      }
+    });
+    const allText = `${text}\n${tabText.join('\n')}`;
     return {
       open: !!modal && modal.classList.contains('open'),
       tabs,
       hasSheet: !!document.querySelector('[data-v38-prono-sheet]'),
       hasOddsStatus: !!document.querySelector('#detail-modal .v38-odd-status'),
-      hasMissingInfo: /non disponible|source absente|ignoré dans le modèle principal/i.test(text),
-      text: text.slice(0, 220)
+      hasMissingInfo: /non disponible|source absente|ignoré dans le modèle principal/i.test(allText),
+      text: allText.slice(0, 220)
     };
   });
   check('Prono modal opens', modalState.open, modalState.text);
