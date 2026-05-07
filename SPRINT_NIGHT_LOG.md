@@ -1887,3 +1887,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Tightened odd validation: a pick is verified only when market, selection and line are found in the Winamax markets attached to the match.
 - Added beginner-readable explanations inside each row so the table says what to do in plain French, not only numbers.
 - Updated the prono-sheet smoke probe to lock the table-only homepage and beginner/result copy.
+
+### v37.171 — Winamax full market capture
+- Expanded the Winamax catalog fetch to every supported sport page instead of the old small whitelist.
+- Preserved every extracted direct-match market selection in `winamax_markets.json` under `all_markets`.
+- Kept `data.js` compact by storing full-market metadata only, with the complete odds remaining in the Winamax sidecar.
+- Raised the cron detail pass to refresh the complete 30-day Winamax horizon instead of only a small rotating subset.
+- Local verification snapshot: 25 sport pages, 154 tournaments, 887 matches, 655 detailed match pages and 372k+ Winamax selections captured.

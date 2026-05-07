@@ -77,6 +77,38 @@ def _align_markets_to_espn(markets: dict, ev: dict) -> None:
             n12['home_name'], n12['away_name'] = n12['away_name'], n12['home_name']
 
 
+def _compact_markets_for_frontend(odds_block: dict) -> tuple[dict, dict]:
+    """Keep data.js light; full selections stay in winamax_markets.json."""
+    compact = {}
+    meta = {
+        'full_markets_available': False,
+        'full_markets_count': 0,
+        'full_market_keys': [],
+        'full_markets_source': 'winamax_markets.json',
+    }
+    if not isinstance(odds_block, dict):
+        return compact, meta
+
+    all_rows = odds_block.get('all_markets')
+    if isinstance(all_rows, list) and all_rows:
+        keys = sorted({
+            str(row.get('market_key') or row.get('market') or '').strip()
+            for row in all_rows
+            if isinstance(row, dict) and (row.get('market_key') or row.get('market'))
+        })
+        meta.update({
+            'full_markets_available': True,
+            'full_markets_count': len(all_rows),
+            'full_market_keys': keys[:80],
+        })
+
+    for key, value in odds_block.items():
+        if key == 'all_markets':
+            continue
+        compact[key] = value
+    return compact, meta
+
+
 def main() -> int:
     if not MARKETS.exists():
         print(f'WARN: {MARKETS} absent — nothing to patch. Skip.')
@@ -164,8 +196,13 @@ def main() -> int:
                 continue
             # 1n2 home/away can be flipped vs ESPN — realign before storing
             _align_markets_to_espn(odds_block, ev)
-            wx['markets'] = odds_block
+            compact_odds, markets_meta = _compact_markets_for_frontend(odds_block)
+            wx['markets'] = compact_odds
             wx['markets_fetched_at'] = mk.get('fetched_at')
+            wx['markets_source'] = markets_meta['full_markets_source']
+            wx['full_markets_available'] = markets_meta['full_markets_available']
+            wx['full_markets_count'] = markets_meta['full_markets_count']
+            wx['full_market_keys'] = markets_meta['full_market_keys']
             ev['winamax'] = wx
             stats['matched'] += 1
 

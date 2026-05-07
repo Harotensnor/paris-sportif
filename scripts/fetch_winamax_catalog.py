@@ -40,7 +40,10 @@ OUT_MARKETS = ROOT / 'winamax_markets.json'
 # matches — that was a v28 oversight that meant Théo only saw foot picks
 # even though Winamax accepts bets on every sport listed here.
 # v30 fix : fetch one page per sport, merge the trees.
-SPORTS_OF_INTEREST = {1, 2, 3, 4, 5, 16, 117}  # foot, basket, baseball, hockey, tennis, us-foot, MMA
+SPORTS_OF_INTEREST = {
+    1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 16, 17, 19, 20, 23,
+    29, 40, 44, 48, 79, 117, 190, 9992, 100000,
+}
 SPORTS_STR = {str(s) for s in SPORTS_OF_INTEREST}
 INDEX_URL_FMT = 'https://www.winamax.fr/paris-sportifs/sports/{sid}'
 

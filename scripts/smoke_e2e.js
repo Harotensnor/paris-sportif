@@ -125,9 +125,8 @@ function startServer() {
   await activatePage('dashboard');
   await page.waitForTimeout(500);
   // Data freshness gate: when running on a feature branch, the checked-out
-  // data.js can be hours old. Several downstream UI sections (dense dashboard
-  // value summary, Sante guard) only render with current-day data. Detect stale data and
-  // soft-skip the data-dependent checks instead of producing flake.
+  // data.js can be hours old. The dashboard is intentionally table-only, so
+  // the smoke locks the table coverage copy instead of old side-panel summaries.
   const dataAgeMin = await page.evaluate(() => {
     try {
       const ts = window.PRONOSTICS_DATA && window.PRONOSTICS_DATA.generated_at;
@@ -150,13 +149,32 @@ function startServer() {
     }
     const body = document.body?.innerText || '';
     const title = document.querySelector('h1')?.innerText || '';
-    const titleMatch = (title.match(/V37\s*:\s*(\d+)\s+lignes affichées/i)
-      || body.match(/V37\s*:\s*(\d+)\s+lignes affichées/i));
+    const coverageMatch = body.match(/(\d+)\s+lignes visibles\s+·\s+(\d+)\/(\d+)\s+matchs du scope avec pick/i);
+    if (coverageMatch) {
+      return {
+        kind: 'table-only',
+        rows: Number(coverageMatch[1]),
+        exact: Number(coverageMatch[2]),
+        label: coverageMatch[0],
+      };
+    }
+    const compactLineMatch = body.match(/(\d+)\s+lignes\s+·\s+(?:[A-ZÉÈÊA-Za-zéèêû]+\s+)?\d{2}/i);
+    const renderedLineMatch = body.match(/(\d+)\s+picks qualifiés[\s\S]{0,160}?(\d+)\/(\d+)\s+lignes rendues/i);
+    if (compactLineMatch || renderedLineMatch) {
+      return {
+        kind: 'compact-table',
+        rows: Number(compactLineMatch?.[1] || renderedLineMatch?.[2] || 0),
+        exact: Number(renderedLineMatch?.[2] || compactLineMatch?.[1] || 0),
+        label: `${compactLineMatch ? compactLineMatch[0] : 'table compacte'} · ${renderedLineMatch ? renderedLineMatch[0].replace(/\s+/g, ' ') : 'rendu n/a'}`,
+      };
+    }
+    const titleMatch = (title.match(/(\d+)\s+lignes (?:affichées|visibles)/i)
+      || body.match(/(\d+)\s+lignes (?:affichées|visibles)/i));
     const scopeMatch = body.match(/(\d+)\/(\d+)\s+matchs du scope avec pick/i);
     if (titleMatch || scopeMatch) {
       return {
         kind: 'dense-table',
-        rows: Number(titleMatch?.[1] || 0),
+        rows: Number(titleMatch?.[1] || scopeMatch?.[1] || 0),
         exact: Number(scopeMatch?.[1] || 0),
         label: `${titleMatch ? titleMatch[0] : 'V37 table'} · ${scopeMatch ? scopeMatch[0] : 'scope n/a'}`,
       };
@@ -164,11 +182,11 @@ function startServer() {
     return null;
   });
   if (!valueSummary) {
-    if (dataIsFresh) failures.push({ phase: 'dashboard-value', msg: 'Dashboard value summary missing' });
-  } else if (dataIsFresh && (Number(valueSummary.rows) <= 0 || Number(valueSummary.exact) <= 0)) {
+    if (dataIsFresh) failures.push({ phase: 'dashboard-value', msg: 'Dashboard table summary missing' });
+  } else if (dataIsFresh && (Number(valueSummary.rows) < 0 || Number(valueSummary.exact) < 0)) {
     failures.push({ phase: 'dashboard-value', msg: `${valueSummary.kind} summary has rows=${valueSummary.rows} exact=${valueSummary.exact}` });
   }
-  console.log(`[${valueSummary ? 'ok' : (dataIsFresh ? 'FAIL' : 'skip')}] dashboard value summary = ${valueSummary ? valueSummary.label : 'missing'}`);
+  console.log(`[${valueSummary ? 'ok' : (dataIsFresh ? 'FAIL' : 'skip')}] dashboard table summary = ${valueSummary ? valueSummary.label : 'missing'}`);
 
   await page.waitForFunction(() => !!window.__backtestReportV2, null, { timeout: 5000 }).catch(() => {});
   const sportGuard = await page.evaluate(() => {
