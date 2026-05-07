@@ -1874,3 +1874,9 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Counted exclusions for stale data, invalid odds, low score, duplicate matches, market caps and overflow.
 - Extended the prono-sheet probe so CI verifies the audit panel and selected count.
 - Added `audit_top_paris_contract.py` to lock the Top Paris reliability contract in the drift job.
+
+### v37.169 — Top Paris dashboard styles
+- Fixed the Top Paris du jour cards rendering as unstyled grey buttons before opening any prono sheet.
+- Loads the shared v38 prono styles during dashboard render, not only when the modal opens.
+- Extended `probe_prono_sheet_odds.js` to assert the dashboard Top Paris grid and audit grid computed styles.
+- Restamped asset hashes and service worker cache so the styled block is visible after refresh.
