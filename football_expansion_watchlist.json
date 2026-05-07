@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-07T15:57:14Z",
+  "generated_at": "2026-05-07T16:03:23Z",
   "source": "data.js bookable feed + sofascore_events source feed",
   "status": "ok",
   "categories": {
@@ -149,9 +149,17 @@
     },
     "J6_coupes": {
       "label": "Coupes",
-      "bookable": 9,
+      "bookable": 10,
       "source": 43,
       "samples": [
+        {
+          "event_id": "401865519",
+          "source": "winamax_exact",
+          "kickoff": "2026-05-07T02:00Z",
+          "match": "Nacional at Deportes Tolima",
+          "league": "Copa Libertadores",
+          "code": "conmebol.libertadores"
+        },
         {
           "event_id": "401865434",
           "source": "winamax_exact",
@@ -207,21 +215,13 @@
           "match": "River Plate at Carabobo",
           "league": "Copa Sudamericana",
           "code": "conmebol.sudamericana"
-        },
-        {
-          "event_id": "401865517",
-          "source": "winamax_exact",
-          "kickoff": "2026-05-08T00:30Z",
-          "match": "Flamengo at Independiente Medellín",
-          "league": "Copa Libertadores",
-          "code": "conmebol.libertadores"
         }
       ],
       "status": "ok"
     },
     "J7_asie_latam": {
       "label": "Asie / Amérique latine",
-      "bookable": 18,
+      "bookable": 19,
       "source": 66,
       "samples": [
         {
@@ -233,6 +233,14 @@
           "code": "chn.1"
         },
         {
+          "event_id": "401865519",
+          "source": "winamax_exact",
+          "kickoff": "2026-05-07T02:00Z",
+          "match": "Nacional at Deportes Tolima",
+          "league": "Copa Libertadores",
+          "code": "conmebol.libertadores"
+        },
+        {
           "event_id": "401865434",
           "source": "winamax_exact",
           "kickoff": "2026-05-07T22:00Z",
@@ -279,21 +287,13 @@
           "match": "Red Bull Bragantino at Blooming",
           "league": "Copa Sudamericana",
           "code": "conmebol.sudamericana"
-        },
-        {
-          "event_id": "401865426",
-          "source": "winamax_exact",
-          "kickoff": "2026-05-08T00:30Z",
-          "match": "River Plate at Carabobo",
-          "league": "Copa Sudamericana",
-          "code": "conmebol.sudamericana"
         }
       ],
       "status": "ok"
     }
   },
   "summary": {
-    "bookable_total": 42,
+    "bookable_total": 44,
     "source_total": 141,
     "ok_categories": 3
   }
