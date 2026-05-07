@@ -29,12 +29,7 @@ test('V37 capture regressions stay fixed on dashboard and modal', async ({ page 
     await expect(duplicatedRows.first()).toBeVisible();
   }
 
-  // Lock the pick reference by data-pick-uid before reading label & clicking.
-  // Without this, the v36 table re-renders between getAttribute and click
-  // (auto-refresh interval), and `.first()` may resolve to a different DOM
-  // node by click time → modal opens on the wrong pick.
-  const firstUid = await page.locator('.v36-table-row[data-pick-uid]:visible, .v36-table-card[data-pick-uid]:visible').first().getAttribute('data-pick-uid');
-  const pick = page.locator(`[data-pick-uid="${firstUid}"]`).first();
+  const pick = page.locator('.v36-table-row[data-pick-uid]:visible, .v36-table-card[data-pick-uid]:visible').first();
   const expectedLabel = await pick.getAttribute('data-pick-label');
   await pick.click({ force: true });
   await expect(page.locator('#detail-modal.open')).toBeVisible({ timeout: 5_000 });
