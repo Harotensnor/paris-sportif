@@ -1709,3 +1709,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix: align route assertions, use deterministic basket/context fixtures, and scope mobile-only invariants.
 - Verrou: Playwright desktop shard 2/3 plus day filter, nav stability, modal, table, combo and page probes.
 - Chiffres: 61/61 pytest, 45/45 QA gates, 9/9 probes critiques, footer/SW v37.125.
+
+## Sprint v37.126 — AUTO 10/10 mobile click audit
+- Symptom: mobile shard 1/3 failed when click audit selected off-screen quick-filter buttons.
+- Cause: the generic visibility helper checked display state but not viewport intersection.
+- Fix: require viewport intersection before marking a control as a click-audit target.
+- Verrou: `tests/click-everything.spec.js` targeted mobile plus full mobile shard 1/3.
+- Chiffres: click audit 1/1, mobile shard 1/3 91/91, 45/45 QA gates, footer/SW v37.126.

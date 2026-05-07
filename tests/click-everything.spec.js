@@ -43,7 +43,8 @@ async function markCandidates(page) {
       const cs = getComputedStyle(el);
       if (typeof el.checkVisibility === 'function' && !el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true })) return false;
       if (!el.offsetParent && cs.position !== 'fixed' && cs.position !== 'sticky') return false;
-      return r.width >= 8 && r.height >= 8 && cs.display !== 'none' && cs.visibility !== 'hidden' && cs.pointerEvents !== 'none';
+      const inViewport = r.bottom > 0 && r.right > 0 && r.top < window.innerHeight && r.left < window.innerWidth;
+      return inViewport && r.width >= 8 && r.height >= 8 && cs.display !== 'none' && cs.visibility !== 'hidden' && cs.pointerEvents !== 'none';
     };
     let n = 0;
     return [...document.querySelectorAll(selector)]
