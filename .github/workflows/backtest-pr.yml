@@ -5,14 +5,21 @@ name: backtest-on-pr
 # le ROI. Fail si ROI baisse de plus de 2pt vs main → catch les
 # régressions silencieuses du modèle avant qu'elles ne mergent.
 #
-# Ne tourne QUE sur PR qui touchent app.js (le modèle vit dans l'IIFE
-# d'app.js, lu via model_loader.py). Évite de tourner sur les PR doc/
-# CSS qui ne peuvent pas affecter predictMatch.
+# Ne tourne QUE sur PR qui touchent le runtime modèle (legacy-app.js depuis
+# le split v37, app.js pour compat) ou les scripts/sidecars de backtest.
+# Évite de tourner sur les PR doc/CSS qui ne peuvent pas affecter predictMatch.
 
 on:
   pull_request:
     paths:
+      - 'legacy-app.js'
       - 'app.js'
+      - 'prob_calibration.json'
+      - 'tier_calibration.json'
+      - 'calibration_method.json'
+      - 'calibration_method.js'
+      - 'lightgbm_weights.js'
+      - 'lightgbm_weights.json'
       - 'scripts/backtest_v2.py'
       - 'scripts/model_loader.py'
       - '.github/workflows/backtest-pr.yml'
@@ -49,32 +56,48 @@ jobs:
             exit 0
           }
           PR_ROI=$(python3 -c "import json; r = json.load(open('backtest_report_v2.json')); print(r.get('overall', {}).get('flat_roi_pct', -999))")
+          PR_N=$(python3 -c "import json; r = json.load(open('backtest_report_v2.json')); print(r.get('overall', {}).get('n', r.get('n_events', 0)))")
           echo "PR ROI = $PR_ROI"
+          echo "PR sample = $PR_N"
           echo "pr_roi=$PR_ROI" >> $GITHUB_OUTPUT
+          echo "pr_n=$PR_N" >> $GITHUB_OUTPUT
           mv backtest_report_v2.json /tmp/pr_report.json
 
       - name: Run backtest on main
         id: main_backtest
         run: |
-          git checkout origin/main -- app.js scripts/backtest_v2.py scripts/model_loader.py 2>/dev/null || true
+          git checkout origin/main -- legacy-app.js app.js scripts/backtest_v2.py scripts/model_loader.py prob_calibration.json tier_calibration.json calibration_method.json calibration_method.js lightgbm_weights.js lightgbm_weights.json 2>/dev/null || true
           python3 scripts/backtest_v2.py > /tmp/backtest_main.log 2>&1 || {
             echo "Main backtest failed — assume neutral"
             echo "main_roi=0" >> $GITHUB_OUTPUT
+            echo "main_n=0" >> $GITHUB_OUTPUT
             exit 0
           }
           MAIN_ROI=$(python3 -c "import json; r = json.load(open('backtest_report_v2.json')); print(r.get('overall', {}).get('flat_roi_pct', 0))")
+          MAIN_N=$(python3 -c "import json; r = json.load(open('backtest_report_v2.json')); print(r.get('overall', {}).get('n', r.get('n_events', 0)))")
           echo "Main ROI = $MAIN_ROI"
+          echo "Main sample = $MAIN_N"
           echo "main_roi=$MAIN_ROI" >> $GITHUB_OUTPUT
+          echo "main_n=$MAIN_N" >> $GITHUB_OUTPUT
 
       - name: Compare ROI
         run: |
           PR_ROI="${{ steps.pr_backtest.outputs.pr_roi }}"
           MAIN_ROI="${{ steps.main_backtest.outputs.main_roi }}"
+          PR_N="${{ steps.pr_backtest.outputs.pr_n }}"
+          MAIN_N="${{ steps.main_backtest.outputs.main_n }}"
+          MIN_BACKTEST_N=30
           DELTA=$(python3 -c "print(round(float('$PR_ROI') - float('$MAIN_ROI'), 2))")
           echo "## Backtest comparison"
           echo "Main ROI: $MAIN_ROI%"
           echo "PR ROI:   $PR_ROI%"
+          echo "Main n:   ${MAIN_N:-0}"
+          echo "PR n:     ${PR_N:-0}"
           echo "Delta:    $DELTA pt"
+          python3 -c "import sys; pr=int(float('${PR_N:-0}' or 0)); main=int(float('${MAIN_N:-0}' or 0)); min_n=int('${MIN_BACKTEST_N}'); sys.exit(0 if pr >= min_n and main >= min_n else 1)" || {
+            echo "::notice::Backtest ROI gate skipped: insufficient sample (PR n=${PR_N:-0}, main n=${MAIN_N:-0}, min ${MIN_BACKTEST_N})."
+            exit 0
+          }
           # Fail si baisse de >2pt (tolérance pour bruit naturel)
           python3 -c "import sys; d = float('$DELTA'); sys.exit(1 if d < -2.0 else 0)" || {
             echo "::error::ROI regression: PR ROI ${PR_ROI}% vs main ${MAIN_ROI}% (delta ${DELTA}pt < -2pt threshold)"

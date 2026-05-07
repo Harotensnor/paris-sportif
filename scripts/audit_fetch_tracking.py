@@ -15,7 +15,13 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def main() -> None:
-    app = (ROOT / "app.js").read_text(encoding="utf-8")
+    # v37.017 split: the SPA now lives in legacy-app.js. Keep app.js as
+    # a fallback so the audit still catches missing guards in the older
+    # monolithic layout.
+    target = ROOT / "legacy-app.js"
+    if not target.exists():
+        target = ROOT / "app.js"
+    app = target.read_text(encoding="utf-8")
     required = [
         "const TRACKED_FETCHES = new Set();",
         "function abortTrackedFetches",

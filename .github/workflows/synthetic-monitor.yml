@@ -4,31 +4,37 @@ on:
   schedule:
     - cron: '*/15 * * * *'
   workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/synthetic_monitor.py'
+      - '.github/workflows/synthetic-monitor.yml'
 
 permissions:
   contents: read
 
+concurrency:
+  group: synthetic-monitor
+  cancel-in-progress: true
+
 jobs:
   monitor:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 4
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.11'
 
-      - name: Synthetic site check
-        env:
-          QA_MONITOR_URL: https://harotensnor.github.io/paris-sportif/pronostics.html
-          QA_MONITOR_MAX_MS: '2000'
-        run: python scripts/synthetic_monitor.py
+      - name: Check production availability and freshness
+        run: python scripts/synthetic_monitor.py --warn-age-min 30 --max-age-min 240
 
-      - name: Upload synthetic report
+      - name: Upload synthetic monitor report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: synthetic-monitor-report
-          path: synthetic-monitor-report.json
+          path: .cache/synthetic-monitor.json
           retention-days: 14

@@ -1,6 +1,10 @@
 import { test, expect } from '@playwright/test';
 
-test('mobile quick filters update the dashboard filter state', async ({ page }) => {
+test('mobile quick filters update the dashboard filter state', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'Mobile-only quick-filter invariant.');
+  await page.addInitScript(() => {
+    localStorage.setItem('userPrefs', JSON.stringify({ onboardingDone: true, level: 'confirme' }));
+  });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/pronostics.html');
   await page.waitForFunction(() => document.querySelector('.v36-mobile-quick [data-v36-quick]'), null, { timeout: 15000 });

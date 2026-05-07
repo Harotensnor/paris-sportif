@@ -634,7 +634,17 @@
     btn.innerHTML = `<span class="v36-nav-ico" aria-hidden="true">◎</span><span class="v36-nav-copy"><strong>Perso</strong><em>${esc(top ? top.page : 'Dashboard local')}</em></span>`;
     nav.appendChild(btn);
   }
+  function detailModalOpen() {
+    return Boolean(document.getElementById('detail-modal')?.classList.contains('open'));
+  }
+  function removeDiscoveryCard() {
+    $('[data-la-discovery]')?.remove();
+  }
   function maybeFeatureDiscovery() {
+    if (detailModalOpen() || $('.la-modal')) {
+      removeDiscoveryCard();
+      return;
+    }
     if ($('[data-la-discovery]')) return;
     const t = loadTelemetry();
     const settings = mergePrefs();
@@ -647,6 +657,14 @@
     card.innerHTML = `<h3>Découverte</h3><p>Tu n’as pas encore exploré les combinés. Le module peut t’aider à comparer le risque.</p><div class="la-actions"><a class="la-btn" href="#combines">Voir</a><button class="la-btn secondary" data-la-dismiss-discovery>Plus tard</button></div>`;
     document.body.appendChild(card);
     mutateTelemetry(x => { x.alertsSeen.discovery = now(); });
+  }
+  function watchDetailModal() {
+    const detail = document.getElementById('detail-modal');
+    if (!detail || detail.dataset.laDiscoveryWatch === '1') return;
+    detail.dataset.laDiscoveryWatch = '1';
+    new MutationObserver(() => {
+      if (detailModalOpen()) removeDiscoveryCard();
+    }).observe(detail, { attributes: true, attributeFilter: ['class'] });
   }
   function saveCurrentView() {
     const prefs = mergePrefs();
@@ -773,6 +791,7 @@
   }
   function renderAll() {
     injectStyle();
+    watchDetailModal();
     routeLocal();
     injectPersonalBadges();
     injectDashboardPanel();

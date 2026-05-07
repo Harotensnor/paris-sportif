@@ -37,12 +37,21 @@ except ImportError:
     )
 
 ROOT = Path(__file__).resolve().parent.parent
+LEGACY_APP_JS = ROOT / 'legacy-app.js'
 APP_JS = ROOT / 'app.js'
 PRONOSTICS_HTML = ROOT / 'pronostics.html'
 
 
 def _resolve_source_path() -> Path:
-    """Renvoie app.js si présent (v31.1+), sinon pronostics.html (legacy)."""
+    """Renvoie le fichier qui contient `window.predictMatch = predictMatch`.
+
+    v37.017+ : la SPA a été splittée en `app.js` (30-line ESM shell) +
+    `legacy-app.js` (le runtime monolithique avec predictMatch). On
+    privilégie `legacy-app.js` puis fallback sur `app.js` (pré-split)
+    puis `pronostics.html` (legacy v30 et avant).
+    """
+    if LEGACY_APP_JS.exists():
+        return LEGACY_APP_JS
     if APP_JS.exists():
         return APP_JS
     return PRONOSTICS_HTML
@@ -65,31 +74,51 @@ def _extract_model_iife_body(source_text: str, *, is_html: bool) -> str:
         )
         candidates = list(script_blocks)
     else:
-        # app.js : on lit tout le fichier comme une seule source. Il peut y
-        # avoir plusieurs IIFE successives ; on les capture toutes au top-level
-        # (lignes commençant par `(function`) et on garde celle qui contient
-        # l'export `window.predictMatch = predictMatch`.
+        # JS source. v37.017 split: legacy-app.js is now ONE big top-level
+        # IIFE wrapping the entire ~34k lines, with many nested IIFE blocks
+        # inside it. The previous greedy line-scan stopped at the first
+        # nested `})();` and missed the predictMatch export. Approach:
+        # 1) if the file is a single top-level IIFE (starts with `(function()`
+        #    and ends with `})();`), the whole file is a candidate.
+        # 2) otherwise, fall back to the nested-IIFE scan (used by pre-split
+        #    app.js where the model lived inside one of several top-level
+        #    IIFEs side-by-side).
         candidates = []
-        # Scan ligne par ligne pour trouver les IIFE top-level
-        lines = source_text.split('\n')
-        i = 0
-        while i < len(lines):
-            line = lines[i].lstrip()
-            if line.startswith('(function()') or line.startswith('(function ()'):
-                # Trouve le `})();` correspondant en cherchant la prochaine
-                # ligne qui commence (sans indentation) par `})();`
-                start = i
-                j = i + 1
-                while j < len(lines):
-                    if lines[j].rstrip() == '})();':
-                        candidates.append('\n'.join(lines[start:j + 1]))
-                        i = j + 1
-                        break
-                    j += 1
+        first_line = source_text.lstrip().splitlines()[0] if source_text.strip() else ''
+        last_line = source_text.rstrip().splitlines()[-1] if source_text.strip() else ''
+        is_single_iife = (
+            first_line.startswith('(function()') or first_line.startswith('(function ()')
+        ) and last_line.rstrip() == '})();'
+        if is_single_iife and 'window.predictMatch = predictMatch' in source_text:
+            candidates.append(source_text)
+        else:
+            # Pre-split layout: scan for top-level IIFEs ending on a bare `})();`.
+            lines = source_text.split('\n')
+            i = 0
+            while i < len(lines):
+                line = lines[i].lstrip()
+                if line.startswith('(function()') or line.startswith('(function ()'):
+                    start = i
+                    j = i + 1
+                    depth = 1
+                    while j < len(lines):
+                        # Track nesting properly so we don't bail out on the
+                        # first nested `})();`. Increase depth on a new
+                        # `(function()` and decrease on `})();`.
+                        s = lines[j].lstrip()
+                        if s.startswith('(function()') or s.startswith('(function ()'):
+                            depth += 1
+                        elif lines[j].rstrip() == '})();':
+                            depth -= 1
+                            if depth == 0:
+                                candidates.append('\n'.join(lines[start:j + 1]))
+                                i = j + 1
+                                break
+                        j += 1
+                    else:
+                        i += 1
                 else:
                     i += 1
-            else:
-                i += 1
 
     target = None
     for block in candidates:

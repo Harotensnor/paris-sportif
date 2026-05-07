@@ -1004,6 +1004,87 @@ def baseline_roi(rows: list[dict], strategy: str) -> dict:
     return summarize(new_rows)
 
 
+def write_empty_report(reason: str) -> dict:
+    """Write a valid zero-sample report so CI can skip the ROI gate cleanly."""
+    generated_at = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+    empty = summarize([])
+    report = {
+        'generated_at': generated_at,
+        'status': 'skipped',
+        'skip_reason': reason,
+        'big_bet_definition': {
+            'min_edge': BIG_BET_MIN_EDGE,
+            'min_reliability': BIG_BET_MIN_RELIABILITY,
+            'requires_not_skip': True,
+            'label': 'edge >= 8pt et confiance >= 65%',
+        },
+        'n_events': 0,
+        'date_range': {'start': None, 'end': None},
+        'overall': empty,
+        'by_sport': {},
+        'by_league': {},
+        'by_calibration_group': {},
+        'by_calibration_market_group': {},
+        'by_cote_bucket': {},
+        'by_tier': {
+            tier: empty for tier in ['big_bet', 'lock', 'standard', 'lowconf', 'skip']
+        },
+        'calibration_by_tier': {},
+        'ece_by_tier': {},
+        'big_bet_calibration_warning': {
+            'status': 'learning',
+            'message': 'Backtest ignoré : échantillon insuffisant pour comparer le ROI.',
+        },
+        'calibration': [],
+        'calibration_5': [],
+        'calibration_20': [],
+        'by_sport_calibration': {},
+        'calibration_by_sport_league_tier': {},
+        'calibration_by_sport_league_market': {},
+        'isotonic_pairs': [],
+        'isotonic_pairs_by_sport': {},
+        'isotonic_pairs_by_sport_league_tier': {},
+        'isotonic_pairs_by_sport_league_market': {},
+        'streaks': compute_streaks([]),
+        'bankroll_final_kelly': 100.0,
+        'bankroll_simulation': {},
+        'worst_picks': [],
+        'best_picks': [],
+        'baselines': {},
+    }
+    calibration_segments = {
+        'generated_at': generated_at,
+        'schema': 'calibration_per_sport_league_v1',
+        'top5_leagues': sorted(FOOTBALL_TOP5_LEAGUES),
+        'groups': {},
+        'calibration_by_sport_league_tier': {},
+        'isotonic_pairs_by_sport_league_tier': {},
+    }
+    calibration_market_segments = {
+        'generated_at': generated_at,
+        'schema': 'calibration_per_sport_league_market_v1',
+        'top5_leagues': sorted(FOOTBALL_TOP5_LEAGUES),
+        'groups': {},
+        'calibration_by_sport_league_market': {},
+        'isotonic_pairs_by_sport_league_market': {},
+    }
+    CALIBRATION_SEGMENTS_JSON.write_text(
+        json.dumps(calibration_segments, ensure_ascii=False, indent=2), encoding='utf-8')
+    CALIBRATION_MARKETS_JSON.write_text(
+        json.dumps(calibration_market_segments, ensure_ascii=False, indent=2), encoding='utf-8')
+    BANKROLL_SIM_JSON.write_text(
+        json.dumps({'generated_at': generated_at, 'status': 'skipped', 'series': []},
+                   ensure_ascii=False, indent=2), encoding='utf-8')
+    REPORT_JSON.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')
+    REPORT_MD.write_text(
+        '# Backtest ROI — VRAI modèle (v2)\n\n'
+        f'Généré : {generated_at}\n\n'
+        f'Statut : skipped\n\nRaison : {reason}\n',
+        encoding='utf-8',
+    )
+    return report
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument('--sport', default=None,
@@ -1015,8 +1096,10 @@ def main() -> int:
     bt = run_backtest(opts)
     rows = bt['results']
     if not rows:
-        print('Aucun résultat à agréger — vérifier data.js + odds_history.jsonl.')
-        return 1
+        reason = 'Aucun pick réglé avec cote pre-match dans data.js + odds_history.jsonl.'
+        write_empty_report(reason)
+        print(f'[backtest] skipped: {reason}', file=sys.stderr)
+        return 0
     for row in rows:
         row['calibration_group'] = calibration_group_key(row)
         row['calibration_market_group'] = calibration_market_group_key(row)

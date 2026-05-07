@@ -6,6 +6,10 @@
 (function(){
   'use strict';
 
+  function reportEnhancementError(context, error){
+    if (typeof window.logSafeError === 'function') window.logSafeError(context, error);
+  }
+
   // ========== Utility : toast (si pas déjà dispo) ==========
   if (!window.__toast){
     window.__toast = function(msg, type){
@@ -126,7 +130,7 @@
         }
       });
       if (changed > 0) localStorage.setItem('paris_sportif_tracked_bets', JSON.stringify(raw));
-    } catch(e){ console.warn('[enh] repairTrackedBets failed', e); }
+    } catch(e){ reportEnhancementError('enh repairTrackedBets', e); }
   }
   window.__exportTrackedBetsCSV = function(){
     var bets = getTrackedBets();
@@ -181,9 +185,9 @@
         await navigator.clipboard.writeText(shareUrl);
         window.__toast('✅ Lien copié dans le presse-papier', 'success');
         return;
-      } catch (e) { /* fallthrough to prompt */ }
+      } catch (e) { reportEnhancementError('enh clipboard share fallback', e); }
     }
-    try { prompt('Copie ce lien:', shareUrl); } catch (e) { /* sandbox */ }
+    try { prompt('Copie ce lien:', shareUrl); } catch (e) { reportEnhancementError('enh prompt share fallback', e); }
   };
   function restoreShared(){
     var params = new URLSearchParams(window.location.search);
@@ -223,7 +227,7 @@
           if (btn) btn.click();
         }, 500);
       }
-    } catch(e){}
+    } catch(e){ reportEnhancementError('enh restoreShared', e); }
   }
 
   // ========== CHANTIER CCC — Fuzzy score (expose util) ==========
@@ -300,16 +304,20 @@
   function initCommandPalette(){
     cmdModal = document.createElement('div');
     cmdModal.id = '__cmd-modal';
+    cmdModal.setAttribute('role', 'dialog');
+    cmdModal.setAttribute('aria-modal', 'true');
+    cmdModal.setAttribute('aria-labelledby', '__cmd-title');
     cmdModal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(6px);' +
       'z-index:100000;display:none;align-items:flex-start;justify-content:center;padding-top:10vh;';
     cmdModal.innerHTML =
       '<div style="background:#17171b;border:1px solid rgba(255,255,255,0.12);border-radius:14px;' +
       'width:min(600px,92vw);max-height:70vh;display:flex;flex-direction:column;overflow:hidden;' +
       'box-shadow:0 24px 60px rgba(0,0,0,0.7);">' +
-      '<input id="__cmd-input" type="text" placeholder="Tape une commande, une page..." aria-label="Recherche commande ou page" autocomplete="off" spellcheck="false" ' +
+      '<h2 id="__cmd-title" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;">Palette de commandes</h2>' +
+      '<input id="__cmd-input" type="text" placeholder="Tape une commande, une page..." aria-label="Recherche commande ou page" aria-controls="__cmd-results" autocomplete="off" spellcheck="false" ' +
       'style="background:none;border:none;color:#ededef;padding:18px 22px;font-size:16px;outline:none;' +
       'border-bottom:1px solid rgba(255,255,255,0.08);">' +
-      '<div id="__cmd-results" style="overflow-y:auto;padding:6px 0;flex:1;"></div>' +
+      '<div id="__cmd-results" role="listbox" aria-label="Commandes disponibles" style="overflow-y:auto;padding:6px 0;flex:1;"></div>' +
       '<div style="padding:10px 22px;font-size:11px;color:#5c5c62;border-top:1px solid rgba(255,255,255,0.06);' +
       'display:flex;gap:14px;flex-wrap:wrap;">' +
       '<span>↑↓ naviguer</span><span>↵ valider</span><span>Esc fermer</span>' +
@@ -317,7 +325,10 @@
     document.body.appendChild(cmdModal);
     cmdInput = cmdModal.querySelector('#__cmd-input');
     cmdResults = cmdModal.querySelector('#__cmd-results');
-    cmdInput.addEventListener('input', renderCmdResults);
+    cmdInput.addEventListener('input', function(){
+      cmdSelectedIdx = 0;
+      renderCmdResults();
+    });
     cmdInput.addEventListener('keydown', handleCmdKey);
     cmdModal.addEventListener('click', function(e){ if (e.target === cmdModal) closeCmd(); });
   }
@@ -328,7 +339,13 @@
     renderCmdResults();
     setTimeout(function(){ cmdInput.focus(); }, 50);
   }
-  function closeCmd(){ cmdModal.style.display = 'none'; }
+  function closeCmd(){
+    cmdModal.style.display = 'none';
+    if (cmdInput) {
+      cmdInput.removeAttribute('aria-activedescendant');
+      cmdInput.blur();
+    }
+  }
   function renderCmdResults(){
     var q = cmdInput.value.trim().toLowerCase();
     cmdItems = commands.map(function(c){
@@ -338,13 +355,15 @@
     }).filter(function(c){ return !q || c.score > 0; }).sort(function(a,b){ return b.score - a.score; });
     if (cmdSelectedIdx >= cmdItems.length) cmdSelectedIdx = 0;
     cmdResults.innerHTML = cmdItems.map(function(c, i){
-      return '<div class="__cmd-item" data-idx="' + i + '" style="padding:11px 22px;cursor:pointer;' +
+      return '<div class="__cmd-item" id="__cmd-opt-' + i + '" role="option" aria-selected="' + (i === cmdSelectedIdx ? 'true' : 'false') + '" data-idx="' + i + '" style="padding:11px 22px;cursor:pointer;' +
         'display:flex;align-items:center;gap:14px;' +
         (i === cmdSelectedIdx ? 'background:rgba(167,139,250,0.16);' : '') + '">' +
         '<span style="font-size:18px;">' + c.icon + '</span>' +
         '<span style="color:#ededef;font-size:14px;">' + c.label + '</span>' +
         '</div>';
     }).join('');
+    if (cmdItems.length) cmdInput.setAttribute('aria-activedescendant', '__cmd-opt-' + cmdSelectedIdx);
+    else cmdInput.removeAttribute('aria-activedescendant');
     Array.prototype.forEach.call(cmdResults.querySelectorAll('.__cmd-item'), function(el){
       el.addEventListener('click', function(){
         var it = cmdItems[+el.dataset.idx];
@@ -354,7 +373,9 @@
         cmdSelectedIdx = +el.dataset.idx;
         Array.prototype.forEach.call(cmdResults.querySelectorAll('.__cmd-item'), function(el2, j){
           el2.style.background = j === cmdSelectedIdx ? 'rgba(167,139,250,0.16)' : '';
+          el2.setAttribute('aria-selected', j === cmdSelectedIdx ? 'true' : 'false');
         });
+        cmdInput.setAttribute('aria-activedescendant', el.id);
       });
     });
   }
@@ -463,7 +484,7 @@
           var rfrBtn = document.querySelector('[data-force-refresh], #refresh-btn');
           if (rfrBtn) rfrBtn.click();
           if (typeof window.toast === 'function') window.toast('🔄 Actualisation des données…', 'info');
-        } catch(err) {}
+        } catch(err) { reportEnhancementError('enh shortcut refresh', err); }
       }
       else if (e.key === '/'){
         // Focus search input
@@ -544,7 +565,7 @@
     // nouveaux paris trackés) puis on met à jour la visibilité.
     var existing = document.getElementById('__cal-heatmap');
     if (existing) {
-      try { populateCalHeatmapGrid(existing); } catch(_){}
+      try { populateCalHeatmapGrid(existing); } catch(e){ reportEnhancementError('enh heatmap populate', e); }
       updateCalHeatmapVisibility();
       return;
     }
@@ -595,23 +616,23 @@
 
   // ========== INIT ==========
   function init(){
-    try { initOffline(); } catch(e){ console.warn('[enh] offline init failed', e); }
+    try { initOffline(); } catch(e){ reportEnhancementError('enh offline init', e); }
     try { initCommandPalette(); initShortcuts(); injectHintButton(); }
-    catch(e){ console.warn('[enh] cmd palette init failed', e); }
-    try { restoreShared(); } catch(e){}
+    catch(e){ reportEnhancementError('enh command palette init', e); }
+    try { restoreShared(); } catch(e){ reportEnhancementError('enh restoreShared init', e); }
     // Migration : réparer les anciens paris trackés "? vs ?" (régression v20).
     // On attend 1.2s pour être sûr que PRONOSTICS_DATA soit chargé.
-    setTimeout(function(){ try { repairTrackedBets(); } catch(e){} }, 1200);
+    setTimeout(function(){ try { repairTrackedBets(); } catch(e){ reportEnhancementError('enh repair tracked delayed', e); } }, 1200);
     setTimeout(function(){
-      try { renderCalendarHeatmap(); } catch(e){ console.warn('[enh] heatmap failed', e); }
-      try { injectMesParisActions(); } catch(e){}
+      try { renderCalendarHeatmap(); } catch(e){ reportEnhancementError('enh heatmap initial render', e); }
+      try { injectMesParisActions(); } catch(e){ reportEnhancementError('enh mes paris actions', e); }
     }, 900);
     // Re-check on page changes (hash/clicks on .page-btn)
     document.addEventListener('click', function(e){
       if (e.target && e.target.closest && e.target.closest('.page-btn')){
         setTimeout(function(){
-          try { renderCalendarHeatmap(); } catch(_){}
-          try { injectMesParisActions(); } catch(_){}
+          try { renderCalendarHeatmap(); } catch(e){ reportEnhancementError('enh heatmap nav rerender', e); }
+          try { injectMesParisActions(); } catch(e){ reportEnhancementError('enh mes paris nav rerender', e); }
         }, 250);
       }
     });
@@ -621,7 +642,6 @@
   } else {
     init();
   }
-  // (removed console.log "enhancements v20 loaded" — bruit en prod)
 })();
 
 // v31.7 — Coach IA flottant supprime (jamais utilise). Bloc setupChatbot retire (~300L).

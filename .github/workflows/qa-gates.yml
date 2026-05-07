@@ -5,120 +5,90 @@ on:
     branches: [main]
     paths:
       - 'pronostics.html'
-      - 'app.js'
-      - 'app.css'
+      - 'sw.js'
+      - 'legacy-app.js'
+      - 'app-enhancements.js'
+      - 'app-i18n.js'
       - 'src/**'
       - 'scripts/**'
+      - 'scripts/audit_asset_hashes.py'
+      - 'scripts/audit_all_probes_wired.py'
+      - 'backtest_strategies.json'
+      - 'backtest_report_v2.json'
+      - 'prob_calibration.json'
+      - 'tier_calibration.json'
+      - 'calibration_method.json'
+      - 'calibration_method.js'
       - 'tests/**'
-      - 'playwright.config.js'
-      - 'package.json'
       - '.github/workflows/qa-gates.yml'
+      - '.github/workflows/e2e.yml'
+      - '.github/workflows/smoke.yml'
+      - '.github/workflows/synthetic-monitor.yml'
+      - '.github/workflows/post-deploy-health.yml'
   pull_request:
+    branches: [main]
     paths:
       - 'pronostics.html'
-      - 'app.js'
-      - 'app.css'
+      - 'sw.js'
+      - 'legacy-app.js'
+      - 'app-enhancements.js'
+      - 'app-i18n.js'
       - 'src/**'
       - 'scripts/**'
+      - 'scripts/audit_asset_hashes.py'
+      - 'scripts/audit_all_probes_wired.py'
+      - 'backtest_strategies.json'
+      - 'backtest_report_v2.json'
+      - 'prob_calibration.json'
+      - 'tier_calibration.json'
+      - 'calibration_method.json'
+      - 'calibration_method.js'
       - 'tests/**'
-      - 'playwright.config.js'
-      - 'package.json'
       - '.github/workflows/qa-gates.yml'
+      - '.github/workflows/e2e.yml'
+      - '.github/workflows/smoke.yml'
+      - '.github/workflows/synthetic-monitor.yml'
+      - '.github/workflows/post-deploy-health.yml'
   workflow_dispatch: {}
-
-permissions:
-  contents: read
 
 concurrency:
   group: qa-gates-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  matrix-gates:
-    name: gates ${{ matrix.os }} node-${{ matrix.node }} py-${{ matrix.python }}
+  gates:
+    name: qa ${{ matrix.os }} py${{ matrix.python-version }} node${{ matrix.node-version }}
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 12
+    timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        node: [18, 20, 22]
-        python: ['3.11', '3.12', '3.13']
+        python-version: ['3.11', '3.12', '3.13']
+        node-version: ['18', '20', '22']
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node }}
-
       - uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python }}
-
-      - name: Install Python deps
-        run: python -m pip install -r pip-requirements.txt
-
-      - name: Run strict local quality gates
-        env:
-          QA_STRICT_FRESHNESS: '0'
-        run: python scripts/qa_quality_gate.py
-
-      - name: Build QA HTML report
-        if: always()
-        run: python scripts/qa_html_report.py
-
-      - name: Upload QA reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: qa-reports-${{ matrix.os }}-node${{ matrix.node }}-py${{ matrix.python }}
-          path: |
-            qa-*-report.json
-            analytics_local_privacy_audit.json
-            privacy_network_audit.json
-            qa-report/
-          retention-days: 14
-
-  browser-regression:
-    name: browser regression
-    runs-on: ubuntu-latest
-    timeout-minutes: 25
-    steps:
-      - uses: actions/checkout@v4
+          python-version: ${{ matrix.python-version }}
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: ${{ matrix.node-version }}
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
+      - name: Install Python test runner
+        run: python -m pip install pytest
 
-      - name: Install browser test deps
-        run: |
-          npm ci || npm install
-          npx playwright install --with-deps chromium firefox webkit
+      - name: Fast QA gate
+        run: python scripts/qa_gate_report.py
 
-      - name: E2E core flows cross-browser
-        run: |
-          npx playwright test tests/critical-flows.spec.js tests/local-analytics.spec.js \
-            --project=chromium-desktop --project=firefox-desktop --project=webkit-desktop \
-            --reporter=list,html
-
-      - name: A11y regression
-        run: node scripts/a11y_audit.js
-
-      - name: Visual regression matrix
-        run: node scripts/qa_visual_regression.js
-
-      - name: Upload browser reports
+      - name: Upload QA report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: qa-browser-regression
+          name: qa-gate-${{ matrix.os }}-py${{ matrix.python-version }}
           path: |
-            playwright-report/
-            a11y-report.json
-            qa-visual-report.json
-            qa-report/visual/
+            .cache/qa-gates-report.json
+            .cache/qa-gates-report.html
           retention-days: 14

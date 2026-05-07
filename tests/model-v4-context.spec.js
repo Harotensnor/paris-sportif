@@ -6,12 +6,23 @@ test('V4 contextual sidecars load and are available to predictions', async ({ pa
 
   const state = await page.evaluate(() => {
     const matches = Object.values(window.PRONOSTICS_DATA.days || {}).flat().filter(Boolean);
-    const football = matches.find(m => m?.sport === 'football' && (m?.competitors || []).length >= 2);
+    const seasonKey = Object.keys(window.SEASON_PHASE?.leagues || {})[0] || 'eng.1';
+    const football = {
+      id: 'probe-v4-season-context',
+      sport: 'football',
+      league_code: seasonKey,
+      league_name: seasonKey,
+      name: 'Probe Home vs Probe Away',
+      competitors: [
+        { name: 'Probe Home', home_away: 'home' },
+        { name: 'Probe Away', home_away: 'away' },
+      ],
+    };
     const any = matches.find(m => (m?.competitors || []).length >= 2) || football;
     const pred = any ? window.predictMatch(any) : null;
     const season = football ? window.getSeasonPhaseContext(football) : null;
-    const competition = football ? window.getCompetitionContext(football) : null;
-    const badges = any && pred ? window.buildV4ContextBadges(any, pred) : '';
+    const competition = football ? window.getCompetitionContext({ ...football, league_name: 'Champions League' }) : null;
+    const badges = window.buildV4ContextBadges(football, pred || {}) || '';
     return {
       teamPriors: window.TEAM_PRIORS?.team_count || 0,
       footballPriors: window.TEAM_PRIORS?.football_team_count || 0,

@@ -1,22 +1,6 @@
-/* =========================================================================
-   static-page.css — Polish visuel partagé pour les 7 pages éditoriales
-   (index, legal, methodologie, academie, comment-lire-un-prono,
-   credibilite, backtest).
-   -------------------------------------------------------------------------
-   Pourquoi un fichier séparé : les pages statiques ont chacune leur bloc
-   <style> inline (taillé pour leur structure). Ce fichier ajoute par
-   ABOVE les rules existantes — il ne remplace pas, il enrichit le polish.
-   Tout selecteur ici est intentionnellement robuste pour fonctionner sans
-   casser les rules existantes.
 
-   Conventions :
-   - Variables CSS alignées sur app.css (palette identique)
-   - Animations respect `prefers-reduced-motion`
-   - Toutes les classes prefixées `.sp-*` (static-page) pour eviter les
-     collisions avec des classes des pages individuelles.
-   ========================================================================= */
 
-/* --- Design tokens partagés (alignés sur app.css) --- */
+
 :root {
   --sp-brand: #a78bfa;
   --sp-brand-2: #8b5cf6;
@@ -43,11 +27,11 @@
   --sp-trans: .18s ease;
 }
 
-/* --- Reset léger pour TOUTES les pages : letter-spacing serré + smoothing --- */
+
 html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 body { font-feature-settings: "cv11", "ss01", "kern"; }
 
-/* --- Eyebrow (label uppercase qui chapeaute un titre) --- */
+
 .sp-eyebrow {
   display: inline-block;
   font-size: 11px; font-weight: 700;
@@ -64,7 +48,7 @@ body { font-feature-settings: "cv11", "ss01", "kern"; }
   margin-right: 8px; border-radius: 2px;
 }
 
-/* --- Hero pattern : titre énorme + subtitle muted + 1-2 CTAs --- */
+
 .sp-hero {
   padding: 64px 0 48px;
   text-align: center;
@@ -87,7 +71,7 @@ body { font-feature-settings: "cv11", "ss01", "kern"; }
   line-height: 1.6;
 }
 
-/* --- CTA buttons (alignés sur app.css .cta-primary / .cta-secondary) --- */
+
 .sp-cta-row {
   display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
   margin-top: 24px;
@@ -125,7 +109,7 @@ body { font-feature-settings: "cv11", "ss01", "kern"; }
   text-decoration: none;
 }
 
-/* --- Card pattern (article, panel) avec hover lift --- */
+
 .sp-card {
   background: var(--sp-panel);
   border: 1px solid var(--sp-border);
@@ -150,7 +134,7 @@ body { font-feature-settings: "cv11", "ss01", "kern"; }
   font-size: 14px; line-height: 1.6;
 }
 
-/* --- Card grid (3-2-1 cols responsive) --- */
+
 .sp-card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -158,7 +142,7 @@ body { font-feature-settings: "cv11", "ss01", "kern"; }
   margin: 32px 0;
 }
 
-/* --- Stat card (gros chiffre + label) --- */
+
 .sp-stat {
   background: var(--sp-panel);
   border: 1px solid var(--sp-border);
@@ -187,14 +171,14 @@ body { font-feature-settings: "cv11", "ss01", "kern"; }
 .sp-stat.success { border-left-color: var(--sp-accent); }
 .sp-stat.success::after { background: radial-gradient(circle, var(--sp-accent) 0%, transparent 60%); }
 
-/* --- Section divider (séparateur subtil entre blocs longs) --- */
+
 .sp-divider {
   height: 1px; border: none;
   background: linear-gradient(90deg, transparent, var(--sp-border-2), transparent);
   margin: 56px 0;
 }
 
-/* --- Lists polish (bullets brand-colored) --- */
+
 .sp-list { list-style: none; padding: 0; margin: 0; }
 .sp-list li {
   position: relative;
@@ -209,7 +193,7 @@ body { font-feature-settings: "cv11", "ss01", "kern"; }
   font-weight: 700;
 }
 
-/* --- Inline code chips (var, term) --- */
+
 .sp-chip {
   display: inline-block;
   padding: 2px 8px; border-radius: 999px;
@@ -220,7 +204,7 @@ body { font-feature-settings: "cv11", "ss01", "kern"; }
   font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 }
 
-/* --- Section header pattern --- */
+
 .sp-section-header {
   margin: 48px 0 24px;
   text-align: left;
@@ -235,7 +219,7 @@ body { font-feature-settings: "cv11", "ss01", "kern"; }
   margin: 0; max-width: 640px; line-height: 1.6;
 }
 
-/* --- Breadcrumb (in-page nav) --- */
+
 .sp-breadcrumb {
   display: flex; gap: 8px; align-items: center;
   font-size: 12.5px; color: var(--sp-text-dim);
@@ -249,7 +233,7 @@ body { font-feature-settings: "cv11", "ss01", "kern"; }
 .sp-breadcrumb a:hover { color: var(--sp-brand); text-decoration: none; }
 .sp-breadcrumb .sp-bc-sep { color: var(--sp-border-2); user-select: none; }
 
-/* --- Callout (info/warn boxes) --- */
+
 .sp-callout {
   padding: 16px 20px; border-radius: var(--sp-radius-sm);
   background: rgba(167,139,250,.06);
@@ -276,7 +260,7 @@ body { font-feature-settings: "cv11", "ss01", "kern"; }
 }
 .sp-callout strong { color: var(--sp-text); font-weight: 700; }
 
-/* --- Table polish --- */
+
 .sp-table {
   width: 100%; border-collapse: separate; border-spacing: 0;
   background: var(--sp-panel);
@@ -302,7 +286,7 @@ body { font-feature-settings: "cv11", "ss01", "kern"; }
 .sp-table tr:hover td { background: rgba(167,139,250,.05); transition: background .12s ease; }
 .sp-table tr:last-child td { border-bottom: none; }
 
-/* --- Inline KPI bar (used on backtest, credibilite) --- */
+
 .sp-kpi-bar {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -310,7 +294,7 @@ body { font-feature-settings: "cv11", "ss01", "kern"; }
   margin: 24px 0 32px;
 }
 
-/* --- Animations (respect prefers-reduced-motion) --- */
+
 @media (prefers-reduced-motion: no-preference) {
   .sp-fade-in {
     animation: spFadeIn .55s ease both;
@@ -327,7 +311,7 @@ body { font-feature-settings: "cv11", "ss01", "kern"; }
   .sp-card:nth-child(6) { animation-delay: .20s; }
 }
 
-/* --- Focus visible : ring brand 2px (alignement avec SPA) --- */
+
 .sp-card:focus-visible,
 .sp-cta-primary:focus-visible,
 .sp-cta-secondary:focus-visible,
@@ -336,7 +320,7 @@ body { font-feature-settings: "cv11", "ss01", "kern"; }
   outline-offset: 3px;
 }
 
-/* --- Mobile responsive --- */
+
 @media (max-width: 720px) {
   .sp-hero { padding: 40px 16px 32px; }
   .sp-card { padding: 20px 18px; }
@@ -348,15 +332,9 @@ body { font-feature-settings: "cv11", "ss01", "kern"; }
   .sp-table th, .sp-table td { padding: 10px 12px; }
 }
 
-/* =========================================================================
-   v31.6.1 — UPGRADE DES CLASSES EXISTANTES (sans toucher au HTML)
-   -------------------------------------------------------------------------
-   Comme cette feuille est linkée APRÈS les <style> inline de chaque page,
-   on overrride pour donner un look polished aux selecteurs déjà utilisés
-   par les pages.
-   ========================================================================= */
 
-/* --- Body : ajout du fond gradient subtil cohérent avec la SPA --- */
+
+
 body {
   background:
     radial-gradient(1200px 600px at 80% -10%, rgba(167,139,250,.10), transparent 60%),
@@ -373,13 +351,13 @@ body {
   }
 }
 
-/* --- Topbar : box-shadow subtle pour depth --- */
+
 header.topbar {
   box-shadow: 0 1px 0 rgba(255,255,255,.02) inset,
               0 2px 12px rgba(0,0,0,.18) !important;
 }
 
-/* --- Brand : scale slight au hover --- */
+
 header.topbar .brand,
 header.topbar a.brand {
   transition: transform .22s ease, opacity .22s ease;
@@ -390,7 +368,7 @@ header.topbar a.brand:hover {
   opacity: 1;
 }
 
-/* --- Uppercase pill (eyebrow) : preserved colors but with gradient lead-in --- */
+
 .uppercase-pill {
   position: relative;
   padding-left: 24px;
@@ -403,7 +381,7 @@ header.topbar a.brand:hover {
   border-radius: 2px;
 }
 
-/* --- H1 : gradient text systematique sur toutes les pages --- */
+
 main > h1,
 .sp-hero h1 {
   background: linear-gradient(135deg, #ffffff 0%, #a78bfa 100%);
@@ -420,7 +398,7 @@ main > h1,
   }
 }
 
-/* --- Section.card (cards content) : hover lift + smoother shadow --- */
+
 section.card {
   transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
   position: relative;
@@ -431,7 +409,7 @@ section.card:hover {
   border-color: rgba(167,139,250,.20) !important;
   box-shadow: 0 6px 20px rgba(0,0,0,.30);
 }
-/* Add a subtle gradient accent on top-left at hover */
+
 section.card::before {
   content: ''; position: absolute; inset: 0;
   background: linear-gradient(135deg, rgba(167,139,250,.04) 0%, transparent 40%);
@@ -441,11 +419,11 @@ section.card::before {
 }
 section.card:hover::before { opacity: 1; }
 
-/* Variantes purple/danger/info gardent leur look mais hover plus polished */
+
 section.card.purple:hover { border-color: rgba(167,139,250,.45) !important; }
 section.card.danger:hover { border-color: rgba(248,113,113,.45) !important; }
 
-/* --- TOC pills : hover glow brand --- */
+
 .toc a {
   transition: all .18s ease;
   position: relative;
@@ -458,7 +436,7 @@ section.card.danger:hover { border-color: rgba(248,113,113,.45) !important; }
   text-decoration: none;
 }
 
-/* --- Breadcrumb : subtle hover pulse --- */
+
 .breadcrumb a {
   transition: color .15s ease;
 }
@@ -467,7 +445,7 @@ section.card.danger:hover { border-color: rgba(248,113,113,.45) !important; }
   text-decoration: none;
 }
 
-/* --- KPI cards (credibilite / backtest) : gradient accent + hover --- */
+
 .kpi-card {
   transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
   position: relative; overflow: hidden;
@@ -488,12 +466,12 @@ section.card.danger:hover { border-color: rgba(248,113,113,.45) !important; }
 }
 .kpi-card:hover::after { opacity: .18; }
 
-/* KPI value (le gros chiffre) : letter-spacing serré + tabular-nums déjà là */
+
 .kpi-value {
   letter-spacing: -.8px !important;
 }
 
-/* --- Tables : aération + alternation + hover row --- */
+
 table {
   border-collapse: separate !important;
   border-spacing: 0 !important;
@@ -510,7 +488,7 @@ table tbody tr:hover td {
   table tbody tr:hover td { background: rgba(94,92,230,.05) !important; }
 }
 
-/* --- Mock card (comment-lire) : subtle pulse around the corner pill --- */
+
 .mock-card {
   transition: transform .22s ease, box-shadow .22s ease;
 }
@@ -522,7 +500,7 @@ table tbody tr:hover td {
   box-shadow: 0 2px 8px rgba(167,139,250,.30);
 }
 
-/* --- Stats strip (index.html) : hover lift + gradient corner --- */
+
 .stats-strip > * {
   transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
   position: relative;
@@ -534,7 +512,7 @@ table tbody tr:hover td {
   box-shadow: 0 6px 20px rgba(0,0,0,.25);
 }
 
-/* --- CTA buttons sur la landing : glow plus prononcé --- */
+
 .cta-primary {
   background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%) !important;
   box-shadow: 0 4px 14px rgba(139,92,246,.35),
@@ -555,7 +533,7 @@ table tbody tr:hover td {
   transform: translateY(-1px);
 }
 
-/* --- Footer site : separator gradient au lieu de flat border --- */
+
 footer.site-footer {
   border-top: none !important;
   position: relative;
@@ -575,7 +553,7 @@ footer.site-footer nav a:hover {
   text-decoration: none;
 }
 
-/* --- Pill (page index hero) : pulse subtle --- */
+
 .pill .dot {
   animation: spPulseDot 2s ease infinite;
 }
@@ -584,7 +562,7 @@ footer.site-footer nav a:hover {
   50%      { opacity: .5; transform: scale(1.25); }
 }
 
-/* --- Code chips : softer brand background --- */
+
 code {
   transition: background .15s ease;
 }
@@ -592,7 +570,7 @@ code:hover {
   background: rgba(167,139,250,.18) !important;
 }
 
-/* --- Anj-pill (legal.html) : subtle lift au hover --- */
+
 .anj-pill {
   transition: transform .15s ease, border-color .15s ease;
 }
@@ -601,7 +579,7 @@ code:hover {
   border-color: rgba(248,113,113,.45) !important;
 }
 
-/* --- Definition lists (academie.html) : space + hover indicator --- */
+
 dl > div {
   position: relative;
   padding-left: 6px;
@@ -613,7 +591,7 @@ dl > div:hover {
   padding-left: 12px;
 }
 
-/* --- Banner / callout (meta-banner, danger-banner) : hover glow --- */
+
 .meta-banner,
 .danger-banner {
   transition: box-shadow .22s ease, border-color .22s ease;
@@ -625,17 +603,14 @@ dl > div:hover {
   box-shadow: 0 4px 14px rgba(248,113,113,.18);
 }
 
-/* --- Mobile breathing room --- */
+
 @media (max-width: 600px) {
   main { padding-left: 16px !important; padding-right: 16px !important; }
   section.card { padding: 16px !important; }
   .kpi-card { padding: 14px 16px !important; }
 }
 
-/* v31.7.43 — A11y : link-in-text-block (WCAG 1.4.1) — fix audit 2026-04-27.
-   Souligner les liens dans le corps de texte pour pallier le contraste
-   1.58:1 du violet d'accent. Liens "structurels" (CTA, breadcrumb, nav,
-   TOC, footer) restent sans souligné. */
+
 main p a,
 main li a,
 main td a,
@@ -659,7 +634,7 @@ main td a:hover,
   text-decoration-thickness: 2px;
 }
 
-/* Liens "structurels" : exclus du soulignement par défaut */
+
 .cta-primary, .cta-secondary,
 .breadcrumb a, .toc a,
 header.topbar a, footer.site-footer a,
@@ -670,10 +645,7 @@ nav a {
   text-decoration: none !important;
 }
 
-/* v31.7.43 — Block "Une question..." centralisé en classe.
-   Avant : <p style="...color:#6b6b73..."> 6× dupliqué sur 6 pages
-   et 3.69:1 contrast (insuffisant). Maintenant : couleur #9ba1ac
-   (5.05:1 ≥ 4.5 AA ✓). */
+
 .contrib-prompt {
   margin-top: 32px;
   padding: 14px 16px;
@@ -687,7 +659,7 @@ nav a {
 }
 .contrib-prompt strong { color: #c5c5cc; }
 
-/* v31.7.43 — Breadcrumb sans inline color hardcodé */
+
 nav.breadcrumb a, .breadcrumb a {
   color: #9ba1ac;
   text-decoration: none;
@@ -697,8 +669,7 @@ nav.breadcrumb a:hover, .breadcrumb a:hover {
   text-decoration: underline;
 }
 
-/* Phase 6 a11y pass — static pages keep dark contrast even when legacy
-   inline styles or gradient text are present. */
+
 html,
 body {
   color-scheme: dark !important;
@@ -766,3 +737,121 @@ code,
 }
 @media(max-width:720px){a[href],button,summary{min-width:44px!important;min-height:44px!important;display:inline-flex;align-items:center}}
 @media(min-width:721px) and (max-width:1024px){header a,nav a,footer a,.breadcrumb a,summary,section.card a{min-width:40px!important;min-height:40px!important;display:inline-flex;align-items:center}}
+
+
+.breadcrumb a,
+nav[aria-label="Fil d'ariane"] a,
+a[href^="tel:"] {
+  color: #f1f5f9 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 2px !important;
+  text-decoration-thickness: 1px !important;
+  font-weight: 800;
+}
+.stat-card .value.neutral { color: #d8b4fe !important; }
+.h2-sub { color: #cbd5e1 !important; }
+.lead code { color: #f8fafc !important; }
+#positionnement .feature-card h3 { color: #111827 !important; }
+#positionnement .feature-card p { color: #374151 !important; }
+#positionnement .feature-card[style] h3 { color: #f8fafc !important; }
+#positionnement .feature-card[style] p { color: #cbd5e1 !important; }
+.brand-text b,
+.tb-brand-accent { color: #ff4d4d !important; }
+.mock-card,
+.reasons-panel,
+.reason-row {
+  color: #f1f5f9 !important;
+}
+.mock-card .teams,
+.mock-card .vs,
+.mock-card .meta,
+.badge.rel,
+.reason-row {
+  color: #f8fafc !important;
+}
+@media (prefers-color-scheme: light) {
+  header.topbar,
+  .topbar {
+    background: rgba(245,245,247,.96) !important;
+    color: #111827 !important;
+    border-bottom-color: rgba(0,0,0,.12) !important;
+  }
+  header.topbar .brand,
+  .topbar .brand,
+  header.topbar .brand-text,
+  .topbar .brand-text {
+    color: #111827 !important;
+    -webkit-text-fill-color: #111827 !important;
+  }
+  header.topbar .brand-sub,
+  .topbar .brand-sub { color: #4b5563 !important; }
+  header.topbar nav a:not(.cta-primary),
+  .topbar nav a:not(.cta-primary) {
+    color: #374151 !important;
+  }
+  header.topbar nav a:not(.cta-primary):hover,
+  .topbar nav a:not(.cta-primary):hover {
+    color: #111827 !important;
+  }
+  .toc a {
+    background: #ffffff !important;
+    color: #1f2937 !important;
+    border-color: rgba(0,0,0,.12) !important;
+  }
+  .stat-card .value.neutral { color: #5b21b6 !important; }
+  .stat-card .value.pos { color: #047857 !important; }
+  .badge.pick {
+    background: rgba(5, 150, 105, .14) !important;
+    color: #047857 !important;
+  }
+  .badge.edge {
+    background: rgba(190, 24, 93, .12) !important;
+    color: #9d174d !important;
+  }
+  .badge.kelly {
+    background: rgba(91, 33, 182, .12) !important;
+    color: #5b21b6 !important;
+  }
+  code { color: #111827 !important; }
+  main p a,
+  section.block p a,
+  .h2-sub a,
+  .contrib-prompt a {
+    color: #bfdbfe !important;
+    text-decoration: underline !important;
+    text-underline-offset: 2px !important;
+    font-weight: 800 !important;
+  }
+  .feature-card p a,
+  section.block .feature-card p a,
+  section.final-cta p a {
+    color: #4c1d95 !important;
+  }
+  .breadcrumb,
+  nav[aria-label="Fil d'ariane"] {
+    color: #4b5563 !important;
+  }
+  .breadcrumb a,
+  nav[aria-label="Fil d'ariane"] a {
+    color: #f1f5f9 !important;
+  }
+  .mock-card,
+  .reasons-panel,
+  .source-card {
+    background: #ffffff !important;
+    border-color: rgba(0,0,0,.12) !important;
+    color: #1f2937 !important;
+  }
+  .source-card .meta { color: #374151 !important; }
+  .feature-card h3 { color: #111827 !important; }
+  .mock-card .teams,
+  .mock-card .vs,
+  .mock-card .meta,
+  .badge.rel,
+  .reason-row {
+    color: #1f2937 !important;
+  }
+  .badge.rel {
+    background: #f1f5f9 !important;
+  }
+}

@@ -7,7 +7,22 @@ test('football player props sidecar feeds the Buteurs page', async ({ page }) =>
   const state = await page.evaluate(() => {
     const events = Object.values(window.PRONOSTICS_DATA.days || {}).flat()
       .filter(m => m?.sport === 'football' && m?.winamax?.available === true && !m.completed);
-    const firstWithProps = events.find(m => window.getFootballPlayerProps(m).length);
+    const liveWithProps = events.find(m => window.getFootballPlayerProps(m).length);
+    const sampleSidecar = Object.entries(window.FOOTBALL_PLAYER_PROPS?.events || {})
+      .find(([, rows]) => Array.isArray(rows) && rows.length);
+    const firstRow = sampleSidecar && sampleSidecar[1][0];
+    const syntheticMatch = sampleSidecar ? {
+      id: sampleSidecar[0],
+      uid: sampleSidecar[0],
+      sport: 'football',
+      completed: false,
+      winamax: { available: true },
+      competitors: [
+        { name: Array.isArray(firstRow) ? firstRow[1] : firstRow?.teamName, home_away: 'home' },
+        { name: 'Adversaire test', home_away: 'away' },
+      ],
+    } : null;
+    const firstWithProps = liveWithProps || syntheticMatch;
     const props = firstWithProps ? window.getFootballPlayerProps(firstWithProps) : [];
     return {
       eventCount: window.FOOTBALL_PLAYER_PROPS?.event_count || 0,

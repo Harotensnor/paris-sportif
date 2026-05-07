@@ -10,13 +10,85 @@ on:
     paths:
       - 'pronostics.html'
       - 'sw.js'
+      - 'legacy-app.js'
+      - 'app-enhancements.js'
+      - 'app-i18n.js'
+      - 'src/**'
+      - 'vendor/**'
+      - 'backtest_strategies.json'
+      - 'backtest_report_v2.json'
+      - 'prob_calibration.json'
+      - 'tier_calibration.json'
+      - 'calibration_method.json'
+      - 'calibration_method.js'
       - 'scripts/smoke_e2e.js'
+      - 'scripts/probe_all_pages.js'
+      - 'scripts/probe_tous_modal.js'
+      - 'scripts/probe_table_deep.js'
+      - 'scripts/probe_table_combos.js'
+      - 'scripts/probe_modal_sports.js'
+      - 'scripts/probe_nav_chain.js'
+      - 'scripts/probe_back_forward.js'
+      - 'scripts/probe_data_freshness.js'
+      - 'scripts/probe_onboarding_fresh.js'
+      - 'scripts/probe_theme_cycle.js'
+      - 'scripts/probe_pull_to_refresh.js'
+      - 'scripts/probe_cmdk_search.js'
+      - 'scripts/probe_keyboard_navigation.js'
+      - 'scripts/probe_notifications_optin.js'
+      - 'scripts/probe_service_worker_cache.js'
+      - 'scripts/probe_strategies_outsider.js'
+      - 'scripts/probe_prob_calibration_sport.js'
+      - 'scripts/probe_corrupt_storage.js'
+      - 'scripts/probe_qa_runtime.js'
+      - 'scripts/probe_model_probability_caps.js'
+      - 'scripts/probe_day_filter.js'
+      - 'scripts/probe_nav_stability.js'
+      - 'scripts/probe_tous_csv_export.js'
+      - 'scripts/probe_console_matrix.js'
       - '.github/workflows/smoke.yml'
   pull_request:
     branches: [main]
     paths:
       - 'pronostics.html'
       - 'sw.js'
+      - 'legacy-app.js'
+      - 'app-enhancements.js'
+      - 'app-i18n.js'
+      - 'src/**'
+      - 'vendor/**'
+      - 'backtest_strategies.json'
+      - 'backtest_report_v2.json'
+      - 'prob_calibration.json'
+      - 'tier_calibration.json'
+      - 'calibration_method.json'
+      - 'calibration_method.js'
+      - 'scripts/smoke_e2e.js'
+      - 'scripts/probe_all_pages.js'
+      - 'scripts/probe_tous_modal.js'
+      - 'scripts/probe_table_deep.js'
+      - 'scripts/probe_table_combos.js'
+      - 'scripts/probe_modal_sports.js'
+      - 'scripts/probe_nav_chain.js'
+      - 'scripts/probe_back_forward.js'
+      - 'scripts/probe_data_freshness.js'
+      - 'scripts/probe_onboarding_fresh.js'
+      - 'scripts/probe_theme_cycle.js'
+      - 'scripts/probe_pull_to_refresh.js'
+      - 'scripts/probe_cmdk_search.js'
+      - 'scripts/probe_keyboard_navigation.js'
+      - 'scripts/probe_notifications_optin.js'
+      - 'scripts/probe_service_worker_cache.js'
+      - 'scripts/probe_strategies_outsider.js'
+      - 'scripts/probe_prob_calibration_sport.js'
+      - 'scripts/probe_corrupt_storage.js'
+      - 'scripts/probe_qa_runtime.js'
+      - 'scripts/probe_model_probability_caps.js'
+      - 'scripts/probe_day_filter.js'
+      - 'scripts/probe_nav_stability.js'
+      - 'scripts/probe_tous_csv_export.js'
+      - 'scripts/probe_console_matrix.js'
+      - '.github/workflows/smoke.yml'
   workflow_dispatch: {}
 
 concurrency:
@@ -44,3 +116,142 @@ jobs:
 
       - name: Run smoke
         run: node scripts/smoke_e2e.js
+
+      - name: Run page probe (every route, desktop + mobile)
+        # v37.031 — visits 17 routes × 2 viewports + 7 perf sub-tabs.
+        # Asserts no JS errors, no overflow, content actually mounted.
+        run: node scripts/probe_all_pages.js
+
+      - name: Run modal/helpers probe
+        # v37.031 — drills the Tous filter pipeline, the detail modal +
+        # its 6 tabs, and the public window.* helper surface.
+        run: node scripts/probe_tous_modal.js
+
+      - name: Run deep table probe (Tous sub-tabs, math, modal coherence)
+        # v37.037 — validates that every visible row in the Tous table
+        # has coherent edge / EV math (rounding within 1.5pt), the
+        # sub-tab badges match the rendered count (catches the
+        # "En cours (0) → 194 pending shown" regression v37.037 fixed),
+        # row click opens a modal whose content matches the row, and
+        # the search input + sport-filter persistence survive a reload.
+        run: node scripts/probe_table_deep.js
+
+      - name: Run combinatorial table probe (preset × sport × sub-tab)
+        # v37.046 — walks every (preset × sport × sub-tab) combo and
+        # asserts rendered count <= badge count for each, with zero
+        # console errors. 72 combos in current schema. Catches drift
+        # between the badge math and what the renderer actually paints.
+        run: node scripts/probe_table_combos.js
+
+      - name: Run modal sports probe (per-sport detail modal)
+        # v37.046 — opens the detail modal on one match per sport in
+        # the current dataset (football, hockey, basketball, baseball,
+        # tennis when available) and clicks every modal tab. Catches
+        # sport-specific render errors (basketball stats panel,
+        # baseball pitcher block) before they ship.
+        run: node scripts/probe_modal_sports.js
+
+      - name: Run navigation chain probe
+        # v37.049 — walks the full user flow (dashboard → modal → close
+        # → revived routes → suivi sub-nav → reload → page-btn active).
+        # Caught the v37.049 _histFilters crash (legacy historique path
+        # references an undeclared variable) and the v37.048 hash sync
+        # bug.
+        run: node scripts/probe_nav_chain.js
+
+      - name: Run browser back/forward probe
+        # Locks hash navigation against SPA history regressions: Back and
+        # Forward must restore both location.hash and the visible page hub.
+        run: node scripts/probe_back_forward.js
+
+      - name: Run data freshness banner probe
+        # Rewrites only PRONOSTICS_DATA.generated_at at serve time and
+        # checks that fresh data hides stale warnings while >4h data shows
+        # an explicit read-only/pipeline warning.
+        run: node scripts/probe_data_freshness.js
+
+      - name: Run fresh onboarding probe
+        # Locks the first-run wizard: quick appearance, keyboard
+        # navigation, persisted completion/skip flags and no reappearance
+        # after reload.
+        run: node scripts/probe_onboarding_fresh.js
+
+      - name: Run theme cycle probe
+        # Locks the topbar/Maj+T three-state cycle and verifies that
+        # stored theme, data-theme and meta theme-color stay in sync.
+        run: node scripts/probe_theme_cycle.js
+
+      - name: Run pull-to-refresh probe
+        # Locks the mobile gesture: pull at scroll top shows the ready
+        # indicator, calls pollData(true), keeps UI interactive, then
+        # hides the indicator once the refresh settles.
+        run: node scripts/probe_pull_to_refresh.js
+
+      - name: Run Cmd-K search probe
+        # Locks the topbar command search as a keyboard-navigable
+        # listbox: Ctrl/Cmd-K focus, results, highlight, arrow/enter
+        # activation and Escape close.
+        run: node scripts/probe_cmdk_search.js
+
+      - name: Run keyboard navigation probe
+        # Locks no-mouse access across global nav, Tous row focus,
+        # detail modal open/close and the command palette.
+        run: node scripts/probe_keyboard_navigation.js
+
+      - name: Run notifications opt-in probe
+        # Locks the privacy rule: Notification.requestPermission() is
+        # never called at boot, only after explicit user opt-in.
+        run: node scripts/probe_notifications_optin.js
+
+      - name: Run service worker cache probe
+        # Executes sw.js in a mocked worker runtime and locks cache cleanup,
+        # data.js stale-while-revalidate, corrupt-data recovery and offline
+        # HTML fallback.
+        run: node scripts/probe_service_worker_cache.js
+
+      - name: Run outsider strategy probe
+        # Locks the Performance > Strategies surfacing of outsider_only
+        # from backtest_strategies.json so the high-ROI out tier cannot
+        # disappear silently from the UI.
+        run: node scripts/probe_strategies_outsider.js
+
+      - name: Run sport probability calibration probe
+        # Verifies prob_calibration.json exposes bins_by_sport and that
+        # window._calibrateProb(prob, sport) prefers sport bins only when
+        # the sport sample is large enough.
+        run: node scripts/probe_prob_calibration_sport.js
+
+      - name: Run corrupt storage resilience probe
+        # Poisons JSON-backed localStorage keys before boot and verifies
+        # the main routes still mount without console errors.
+        run: node scripts/probe_corrupt_storage.js
+
+      - name: Run runtime QA probe
+        # Locks the local-only DevTools QA surface: error capture,
+        # downloadable bug report payload and deterministic canary variant.
+        run: node scripts/probe_qa_runtime.js
+
+      - name: Run model probability cap probe
+        # Synthetic football/basketball/baseball favourites must never leak
+        # 0.98/0.999 probabilities into the public model output.
+        run: node scripts/probe_model_probability_caps.js
+
+      - name: Run dashboard date filter probe
+        # Locks the V37 date chips: a deliberate Aujourd'hui click must
+        # persist the Paris date and must not be auto-expanded to 7 days.
+        run: node scripts/probe_day_filter.js
+
+      - name: Run global navigation stability probe
+        # Locks the desktop sidebar and mobile bottom nav skeletons so
+        # leaving Accueil changes only the active state and main content.
+        run: node scripts/probe_nav_stability.js
+
+      - name: Run Tous CSV export probe
+        # Downloads the real Tous CSV and locks the Excel/LibreOffice FR
+        # contract: UTF-8 BOM, semicolon separator and at least one row.
+        run: node scripts/probe_tous_csv_export.js
+
+      - name: Run console matrix probe
+        # Fresh-loads 16 routes on desktop and mobile. Locks the
+        # "0 console error on 32 page loads" release criterion.
+        run: node scripts/probe_console_matrix.js

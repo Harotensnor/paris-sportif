@@ -98,7 +98,6 @@ async function markCandidates(page) {
         const text = (el.textContent || el.getAttribute('aria-label') || el.getAttribute('title') || '').trim();
         const href = el.getAttribute('href') || '';
         if (el.id === 'footer-version') return false;
-        if (el.hasAttribute('data-pronos-page')) return false;
         if (el.classList.contains('skip-to-content') || href === '#main-content') return false;
         if (!visible(el)) return false;
         if (el.matches('[disabled],[aria-disabled="true"]')) return false;

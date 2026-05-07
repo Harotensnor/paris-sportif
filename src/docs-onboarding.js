@@ -43,6 +43,9 @@
   function toast(message) {
     if (typeof window.toast === 'function') window.toast(message, 'info');
   }
+  function reportDocsError(context, error) {
+    if (typeof window.logSafeError === 'function') window.logSafeError(context, error);
+  }
 
   function injectStyle() {
     if ($('#docs-onboarding-style')) return;
@@ -112,7 +115,8 @@
         });
       }
       searchState = { loaded: true, docs, idx };
-    } catch (_) {
+    } catch (error) {
+      reportDocsError('docs search index load', error);
       searchState = { loaded: true, docs: [], idx: null };
     }
     return searchState;
@@ -125,7 +129,9 @@
       try {
         const byId = new Map(state.docs.map(doc => [doc.id, doc]));
         return state.idx.search(q).slice(0, 8).map(hit => byId.get(hit.ref)).filter(Boolean);
-      } catch (_) {}
+      } catch (error) {
+        reportDocsError('docs lunr search', error);
+      }
     }
     const needle = q.toLowerCase();
     return state.docs
@@ -155,7 +161,8 @@
         item.name,
         item.acceptedAnswer && item.acceptedAnswer.text ? item.acceptedAnswer.text : ''
       ]);
-    } catch (_) {
+    } catch (error) {
+      reportDocsError('docs faq load', error);
       faqCache = FALLBACK_FAQ;
     }
     return faqCache;
