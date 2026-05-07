@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-05-07T22:46:57Z",
+  "generated_at": "2026-05-07T22:52:35Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 74,
+    "active_events": 72,
     "expired_sample": 0,
     "by_type": {
-      "schedule_congestion": 30,
-      "lookahead": 107,
-      "back_to_back_travel": 29,
-      "travel_extreme": 24
+      "lookahead": 105,
+      "travel_extreme": 24,
+      "schedule_congestion": 26,
+      "back_to_back_travel": 28
     },
     "by_decision": {
       "abstain": 33,
-      "lean_home": 35,
-      "lean_away": 6
+      "lean_home": 34,
+      "lean_away": 5
     },
-    "lean_home": 35,
-    "lean_away": 6,
+    "lean_home": 34,
+    "lean_away": 5,
     "abstain": 33,
     "monitor": 0
   },
@@ -1897,80 +1897,6 @@
       }
     },
     {
-      "event_id": "401815245",
-      "source_event_ids": [
-        "401815245"
-      ],
-      "kickoff": "2026-05-07T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Miami Marlins",
-      "away": "Baltimore Orioles",
-      "match": "Miami Marlins - Baltimore Orioles",
-      "decision": "lean_home",
-      "net_team": "Miami Marlins",
-      "reason": "Baltimore Orioles plus penalise par calendrier/voyage (1.56 vs 0.96)",
-      "pressure_score": 2.958,
-      "home_fade": 0.96,
-      "away_fade": 1.558,
-      "travel_score": 0.958,
-      "lookahead_score": 0.8,
-      "congestion_score": 1.2,
-      "types": {
-        "schedule_congestion": 2,
-        "lookahead": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "3 match important/proche dans les 3 jours",
-        "3 matchs sur les 7 derniers jours",
-        "3 match dans les 48h + 1539 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.065,
-        "away_score": -2.222,
-        "home_fade": 0.96,
-        "away_fade": 2.558,
-        "reason": "Direction nette: Miami Marlins (-0.06)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.958
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815267",
       "source_event_ids": [
         "401815267"
@@ -2953,7 +2879,7 @@
         "status": "abstain",
         "net_side": null,
         "home_score": -0.829,
-        "away_score": 0.171,
+        "away_score": -0.538,
         "home_fade": 1.16,
         "away_fade": 0.944,
         "reason": "Signaux opposes: San Diego Padres fade 1.16, St. Louis Cardinals fade 0.94 -> prudence",
@@ -2975,12 +2901,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.709
           },
           {
             "side": "away",
@@ -3459,66 +3379,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.91
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815244",
-      "source_event_ids": [
-        "401815244"
-      ],
-      "kickoff": "2026-05-07T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Philadelphia Phillies",
-      "away": "Athletics",
-      "match": "Philadelphia Phillies - Athletics",
-      "decision": "lean_away",
-      "net_team": "Athletics",
-      "reason": "Philadelphia Phillies plus penalise par calendrier/voyage (0.96 vs 0.60)",
-      "pressure_score": 2.0,
-      "home_fade": 0.96,
-      "away_fade": 0.6,
-      "travel_score": 0,
-      "lookahead_score": 0.8,
-      "congestion_score": 1.2,
-      "types": {
-        "schedule_congestion": 2,
-        "lookahead": 1
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "3 match important/proche dans les 3 jours",
-        "3 matchs sur les 7 derniers jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.75,
-        "away_score": -0.264,
-        "home_fade": 0.96,
-        "away_fade": 0.6,
-        "reason": "Direction nette: Athletics (-0.26)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
           }
         ]
       }
