@@ -44,17 +44,26 @@ test('dashboard rows open the exact same pick in the detail modal', async ({ pag
   const count = await page.locator(selector).count();
   expect(count, 'At least one visible V37 pick is required to verify row/modal sync').toBeGreaterThan(0);
 
-  const max = Math.min(50, count);
+  const rows = await page.locator(selector).evaluateAll((els, limit) => els.slice(0, limit).map(el => ({
+    uid: el.getAttribute('data-pick-uid') || '',
+    label: el.getAttribute('data-pick-label') || '',
+    odd: el.getAttribute('data-pick-odd') || '',
+    id: el.getAttribute('data-big-detail') || '',
+  })), Math.min(50, count));
   const failures = [];
-  for (let i = 0; i < max; i += 1) {
-    const target = page.locator(selector).nth(i);
-    await target.scrollIntoViewIfNeeded();
-    const expected = await target.evaluate(el => ({
-      label: el.getAttribute('data-pick-label') || '',
-      odd: el.getAttribute('data-pick-odd') || '',
-      id: el.getAttribute('data-big-detail') || '',
-    }));
-    await target.evaluate(el => el.click());
+  for (const expected of rows) {
+    const clicked = await page.evaluate(uid => {
+      const el = Array.from(document.querySelectorAll('[data-pick-uid]'))
+        .find(node => node.getAttribute('data-pick-uid') === uid);
+      if (!el) return false;
+      el.scrollIntoView({ block: 'center', inline: 'nearest' });
+      el.click();
+      return true;
+    }, expected.uid);
+    if (!clicked) {
+      failures.push(`${expected.id}: row disappeared before click`);
+      continue;
+    }
     await expect(page.locator('#detail-modal.open')).toBeVisible({ timeout: 5_000 });
     const heading = (await page.locator('#why-bet-title').textContent().catch(() => '')) || '';
     const labelNeedle = expected.label.replace(/\s+/g, ' ').trim().slice(0, 34);

@@ -1815,3 +1815,8 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Merged the next refresh-data tick from main before GitHub could create a clean PR merge commit.
 - Rebuilt night metrics and health, restamped sidecar hashes and cache version.
 - Kept the deterministic pull-to-refresh probe and v37 shell intact.
+
+### v37.144 — E2E sidecar fallbacks
+- Stabilized football player props when the fresh cron window has zero active football matches.
+- Added sport-level V5 prior fallback from team rows so synthetic/current predictions still prove V5 application.
+- Locked the modal pick sync test against row re-render detaches by clicking a stable UID snapshot.

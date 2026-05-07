@@ -5657,6 +5657,7 @@ const bySportName = new Map();
 const byName = new Map();
 const byLeague = new Map();
 const bySport = new Map();
+const sportAgg = new Map();
 const rows = Array.isArray(data?.teams)
 ? data.teams.map(_bayesianV5FromTuple)
 : Object.entries(data?.teams || {}).map(([key, value]) => ({ key, ...value }));
@@ -5675,6 +5676,17 @@ bySportName.set(sportName, prior);
 if (!byName.has(nameKey) || (prior.sample_size || 0) > (byName.get(nameKey)?.sample_size || 0)) {
 byName.set(nameKey, prior);
 }
+const sample = Math.max(1, Number(prior.sample_size) || 0);
+const agg = sportAgg.get(sport) || { sample: 0, weight: 0, xg: 0, xga: 0, wh: 0, wa: 0, btts: 0, over: 0 };
+agg.sample += sample;
+agg.weight += sample;
+agg.xg += (Number(prior.prior_xG) || 0) * sample;
+agg.xga += (Number(prior.prior_xGA) || 0) * sample;
+agg.wh += (Number(prior.prior_winrate_home) || 0.5) * sample;
+agg.wa += (Number(prior.prior_winrate_away) || 0.5) * sample;
+agg.btts += (Number(prior.prior_btts_rate) || 0) * sample;
+agg.over += (Number(prior.prior_over25_rate) || 0) * sample;
+sportAgg.set(sport, agg);
 }
 for (const [key, value] of Object.entries(data?.leagues || {})) {
 const rawKey = String(value?.key || key || '').toLowerCase();
@@ -5685,6 +5697,21 @@ if (prior) byLeague.set(rawKey, prior);
 for (const [key, value] of Object.entries(data?.sports || {})) {
 const sport = String(value?.key || key || '').toLowerCase();
 const prior = _bayesianV5AggregatePrior({ key: sport, ...value }, 'sport', sport, 'sport_mean', null);
+if (prior) bySport.set(sport, prior);
+}
+for (const [sport, agg] of sportAgg.entries()) {
+if (bySport.has(sport) || !agg.weight) continue;
+const prior = _bayesianV5AggregatePrior({
+key: sport,
+sample_size: agg.sample,
+weighted_sample: agg.weight,
+prior_xG: agg.xg / agg.weight,
+prior_xGA: agg.xga / agg.weight,
+prior_winrate_home: agg.wh / agg.weight,
+prior_winrate_away: agg.wa / agg.weight,
+prior_btts_rate: agg.btts / agg.weight,
+prior_over25_rate: agg.over / agg.weight,
+}, 'sport', sport, 'sport_mean', null);
 if (prior) bySport.set(sport, prior);
 }
 __bayesianV5Index = {
@@ -5703,7 +5730,7 @@ return __bayesianV5Index;
 function getBayesianPriorV5(match, side) {
 if (!match || !side) return null;
 const idx = _getBayesianV5Index();
-if (!idx || !idx.exact.size) return null;
+if (!idx || (!idx.exact.size && !idx.bySport.size)) return null;
 const sport = String(match.sport || 'football').toLowerCase();
 const league = String(match.league_code || match.league_name || side.league || 'unknown').toLowerCase();
 const candidates = [side.name, side.short, side.abbr, side.id].filter(Boolean).map(_teamPriorNorm);
@@ -7008,10 +7035,10 @@ let __predCache = new Map();
 let __predCacheRef = null;
 function __predCacheClear() { __predCache = new Map(); __predCacheRef = window.PRONOSTICS_DATA; }
 
-function getFootballPlayerProps(match) {
-const data = window.FOOTBALL_PLAYER_PROPS || null;
-const rows = data?.events?.[String(match?.id || match?.uid || '')] || [];
-return rows.map(row => Array.isArray(row) ? {
+let __footballPropsIndexRef = null;
+let __footballPropsIndex = null;
+function _footballPlayerPropFromRow(row) {
+return Array.isArray(row) ? {
 name: row[0],
 teamName: row[1],
 teamShort: row[1],
@@ -7025,7 +7052,48 @@ impliedOdd: Number(row[8]) || null,
 firstGoalOdd: Number(row[9]) || null,
 twoPlusOdd: Number(row[10]) || null,
 source: row[11] || 'football_player_props',
-} : row).filter(Boolean).sort((a, b) => (b.prob || 0) - (a.prob || 0));
+} : row;
+}
+function _getFootballPlayerPropsIndex() {
+const data = window.FOOTBALL_PLAYER_PROPS || null;
+if (__footballPropsIndexRef === data && __footballPropsIndex) return __footballPropsIndex;
+const byEvent = new Map();
+const byTeam = new Map();
+for (const [eventId, rows] of Object.entries(data?.events || {})) {
+const props = (rows || []).map(_footballPlayerPropFromRow).filter(Boolean);
+byEvent.set(String(eventId), props);
+for (const prop of props) {
+const key = _teamPriorNorm(prop.teamName || prop.teamShort || '');
+if (!key) continue;
+if (!byTeam.has(key)) byTeam.set(key, []);
+byTeam.get(key).push(prop);
+}
+}
+__footballPropsIndex = { byEvent, byTeam };
+__footballPropsIndexRef = data;
+return __footballPropsIndex;
+}
+function getFootballPlayerProps(match) {
+const idx = _getFootballPlayerPropsIndex();
+const eventRows = idx.byEvent.get(String(match?.id || match?.uid || '')) || [];
+if (eventRows.length) return [...eventRows].sort((a, b) => (b.prob || 0) - (a.prob || 0));
+if (match?.sport !== 'football') return [];
+const { home, away } = getSides(match);
+const keys = [home?.name, home?.short, home?.abbr, away?.name, away?.short, away?.abbr]
+.filter(Boolean)
+.map(_teamPriorNorm)
+.filter(Boolean);
+const seen = new Set();
+const fallback = [];
+for (const key of keys) {
+for (const prop of idx.byTeam.get(key) || []) {
+const dedupKey = `${prop.name}|${prop.teamName}|${prop.source}`;
+if (seen.has(dedupKey)) continue;
+seen.add(dedupKey);
+fallback.push(prop);
+}
+}
+return fallback.sort((a, b) => (b.prob || 0) - (a.prob || 0)).slice(0, 12);
 }
 try { window.getFootballPlayerProps = getFootballPlayerProps; } catch(e) { swallowError(e); }
 
