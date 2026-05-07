@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-07T01:15:41Z",
+  "generated_at": "2026-05-07T01:20:05Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -702,6 +702,42 @@
             "whip": 1.4
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Tampa Bay Rays",
+          "pitcher": "Griffin Jax",
+          "label": "Griffin Jax plus de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "over",
+          "probability": 0.5199,
+          "fair_odds": 1.92,
+          "expected_strikeouts": 6.6,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 9.0,
+            "era": 5.14,
+            "whip": 1.5,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Tampa Bay Rays",
+          "pitcher": "Griffin Jax",
+          "label": "Griffin Jax concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.7572,
+          "fair_odds": 1.32,
+          "expected_hr_allowed": 1.415,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 1.93,
+            "era": 5.14,
+            "whip": 1.5
+          },
+          "side": "away"
         }
       ]
     },
@@ -998,7 +1034,7 @@
       ]
     }
   ],
-  "props": 48,
+  "props": 50,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
