@@ -1825,3 +1825,8 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Merged the latest refresh-data tick from main to restore a clean PR merge base.
 - Regenerated night metrics and health from the fresh data.js snapshot.
 - Restamped sidecar hashes, footer version and service-worker cache without changing the v37.144 runtime fix.
+
+### v37.146 — Cron catch-up latest tick
+- Merged the next completed refresh-data tick after GitHub Pages advanced main again.
+- Rebuilt night metrics and health from the 07:12 UTC data snapshot.
+- Restamped asset hashes, footer version and service-worker cache while preserving the e2e sidecar fixes.
