@@ -1751,3 +1751,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix: merge main data, preserve branch runtime assets, restamp hashes, regenerate night_metrics and health from data.js.
 - Verrou: audit_data_truth enforces data.js, health.json and night_metrics.json freshness alignment.
 - Chiffres: 45/45 QA gates, desktop shard 1/3 91/91, console matrix 32/32, probe_day_filter OK.
+
+## Sprint v37.132 — AUTO 10/10 cron catchup sync
+- Symptom: main advanced again during the PR push, leaving GitHub mergeability dirty by four data commits.
+- Cause: refresh-data cron continued to update generated data while QA fixes were landing on the PR branch.
+- Fix: merge latest main snapshot, keep branch runtime shell, restamp assets, regenerate health and night_metrics.
+- Verrou: audit_data_truth and audit_asset_hashes re-check generated freshness plus shell hash consistency.
+- Chiffres: health data 3min old before final gates, branch caught up to origin/main at merge-base.

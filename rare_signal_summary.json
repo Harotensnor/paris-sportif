@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-05-07T03:29:09Z",
+  "generated_at": "2026-05-07T03:47:07Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 77,
-    "actionable": 24,
-    "watch": 5,
+    "actionable": 25,
+    "watch": 4,
     "risk": 48,
     "expired_sample": 0,
     "by_type": {
@@ -14,12 +14,12 @@
       "travel_extreme": 7,
       "back_to_back_travel": 16,
       "signal_conflict": 5,
-      "market_uncertain": 45,
-      "market_move": 13
+      "market_uncertain": 46,
+      "market_move": 15
     },
     "by_quality": {
-      "actionable": 24,
-      "watch": 5,
+      "actionable": 25,
+      "watch": 4,
       "risk": 48
     }
   },
@@ -148,7 +148,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 2.90 -> 1.76 (+39.3%)"
+      "context": "Cote home: 2.90 -> 1.66 (+42.8%)"
     },
     {
       "event_id": "401815267",
@@ -220,7 +220,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 2.90 -> 1.76 (+39.3%)"
+      "context": "Cote home: 2.90 -> 1.66 (+42.8%)"
     },
     {
       "event_id": "401871427",
@@ -238,7 +238,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 1.96 -> 3.90 (-99.0%)"
+      "context": "Cote home: 1.96 -> 4.70 (-139.8%)"
     },
     {
       "event_id": "401871428",
@@ -256,7 +256,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 2.90 -> 1.76 (+39.3%)"
+      "context": "Cote home: 2.90 -> 1.66 (+42.8%)"
     },
     {
       "event_id": "401815273",
@@ -365,6 +365,24 @@
       "side": "away",
       "strength": 0.91,
       "context": "1 match dans les 48h + 1899 km de voyage"
+    },
+    {
+      "event_id": "401871412",
+      "date": "2026-05-08T00:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Philadelphia Flyers",
+      "away": "Carolina Hurricanes",
+      "match": "Philadelphia Flyers - Carolina Hurricanes",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "away",
+      "strength": 0.895,
+      "context": "Cote away: 1.60 -> 1.86 (-16.1%)"
     },
     {
       "event_id": "401815250",
@@ -477,24 +495,6 @@
       "context": "Absences severes 11-8"
     },
     {
-      "event_id": "401871412",
-      "date": "2026-05-08T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Philadelphia Flyers",
-      "away": "Carolina Hurricanes",
-      "match": "Philadelphia Flyers - Carolina Hurricanes",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Philadelphia Flyers",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 3-0"
-    },
-    {
       "event_id": "401871413",
       "date": "2026-05-09T22:00Z",
       "sport": "hockey",
@@ -566,7 +566,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 14.6%"
+      "context": "marge bookmaker anormale 15.0%"
     },
     {
       "event_id": "747320",
@@ -1124,7 +1124,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 14.6%"
+      "context": "marge bookmaker anormale 15.0%"
     },
     {
       "event_id": "401870615",
@@ -1196,7 +1196,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 14.6%"
+      "context": "marge bookmaker anormale 15.0%"
     },
     {
       "event_id": "401866570",
@@ -1358,7 +1358,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 14.6%"
+      "context": "marge bookmaker anormale 15.0%"
     },
     {
       "event_id": "401871336",
