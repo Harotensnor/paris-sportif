@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-07T01:20:08Z",
+  "generated_at": "2026-05-07T01:22:34Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -121,11 +121,11 @@
       "global_resolution": {
         "status": "mixed",
         "net_side": null,
-        "home_score": -0.053,
+        "home_score": 0.36,
         "away_score": -1.18,
         "home_fade": 1.2,
         "away_fade": 1.6,
-        "reason": "Signaux mitigés: avantage net trop faible (Chicago Cubs -0.05, Cincinnati Reds -1.18)",
+        "reason": "Signaux mitigés: avantage net trop faible (Chicago Cubs +0.36, Cincinnati Reds -1.18)",
         "detail": [
           {
             "side": "home",
@@ -149,7 +149,7 @@
             "side": "home",
             "type": "market_move",
             "direction": "steam",
-            "strength": 0.587
+            "strength": 1.0
           },
           {
             "side": "away",
@@ -631,11 +631,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.698,
-        "away_score": 0.112,
-        "home_fade": 0.75,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Carolina Hurricanes (+0.11)",
+        "home_score": -1.079,
+        "away_score": -0.539,
+        "home_fade": 1.444,
+        "away_fade": 1.045,
+        "reason": "Direction nette: Carolina Hurricanes (-0.54)",
         "detail": [
           {
             "side": "home",
@@ -654,6 +654,18 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 0.694
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 0.895
           }
         ]
       }
@@ -2429,13 +2441,13 @@
         "3 match dans les 48h + 1539 km de voyage"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
+        "status": "mixed",
+        "net_side": null,
         "home_score": -0.705,
-        "away_score": -1.998,
+        "away_score": -0.998,
         "home_fade": 1.6,
         "away_fade": 2.558,
-        "reason": "Direction nette: Miami Marlins (-0.70)",
+        "reason": "Signaux mitigés: avantage net trop faible (Miami Marlins -0.70, Baltimore Orioles -1.00)",
         "detail": [
           {
             "side": "home",
@@ -2459,6 +2471,12 @@
             "side": "home",
             "type": "market_move",
             "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
             "strength": 1.0
           },
           {
