@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-07T22:55:42Z",
+  "generated_at": "2026-05-07T23:15:18Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 72,
+    "active_events": 70,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 105,
-      "travel_extreme": 24,
+      "lookahead": 101,
+      "travel_extreme": 23,
       "schedule_congestion": 26,
       "back_to_back_travel": 28
     },
     "by_decision": {
-      "abstain": 33,
-      "lean_home": 34,
+      "abstain": 32,
+      "lean_home": 33,
       "lean_away": 5
     },
-    "lean_home": 34,
+    "lean_home": 33,
     "lean_away": 5,
-    "abstain": 33,
+    "abstain": 32,
     "monitor": 0
   },
   "active": [
@@ -694,58 +694,6 @@
       }
     },
     {
-      "event_id": "401871334",
-      "source_event_ids": [
-        "401871334"
-      ],
-      "kickoff": "2026-05-07T23:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Detroit Pistons",
-      "away": "Cleveland Cavaliers",
-      "match": "Detroit Pistons - Cleveland Cavaliers",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Detroit Pistons 0.15, Cleveland Cavaliers 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Cleveland Cavaliers (-0.10)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401871412",
       "source_event_ids": [
         "401871412"
@@ -776,11 +724,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -1.548,
-        "away_score": -0.467,
-        "home_fade": 1.95,
-        "away_fade": 1.15,
-        "reason": "Direction nette: Carolina Hurricanes (-0.47)",
+        "home_score": -0.898,
+        "away_score": 0.183,
+        "home_fade": 0.95,
+        "away_fade": 0.15,
+        "reason": "Direction nette: Carolina Hurricanes (+0.18)",
         "detail": [
           {
             "side": "home",
@@ -799,18 +747,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
           }
         ]
       }
@@ -1931,11 +1867,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.44,
-        "away_score": -1.499,
-        "home_fade": 1.1,
+        "home_score": -0.64,
+        "away_score": -1.429,
+        "home_fade": 1.3,
         "away_fade": 1.884,
-        "reason": "Direction nette: San Diego Padres (-0.44)",
+        "reason": "Direction nette: San Diego Padres (-0.64)",
         "detail": [
           {
             "side": "home",
@@ -1953,7 +1889,7 @@
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.8
+            "strength": 1.0
           },
           {
             "side": "away",
@@ -2005,11 +1941,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.635,
-        "away_score": -1.694,
-        "home_fade": 1.4,
+        "home_score": -0.835,
+        "away_score": -1.624,
+        "home_fade": 1.6,
         "away_fade": 2.184,
-        "reason": "Direction nette: San Diego Padres (-0.64)",
+        "reason": "Direction nette: San Diego Padres (-0.84)",
         "detail": [
           {
             "side": "home",
@@ -2027,7 +1963,7 @@
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.8
+            "strength": 1.0
           },
           {
             "side": "away",
@@ -2806,11 +2742,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.343,
-        "away_score": -1.402,
-        "home_fade": 0.95,
+        "home_score": -0.543,
+        "away_score": -1.332,
+        "home_fade": 1.15,
         "away_fade": 1.734,
-        "reason": "Direction nette: San Diego Padres (-0.34)",
+        "reason": "Direction nette: San Diego Padres (-0.54)",
         "detail": [
           {
             "side": "home",
@@ -2828,7 +2764,7 @@
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.8
+            "strength": 1.0
           },
           {
             "side": "away",
@@ -2876,13 +2812,13 @@
         "Deplacement estime 2513 km, decalage ~1.8h"
       ],
       "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.829,
-        "away_score": 0.252,
-        "home_fade": 1.16,
+        "status": "net",
+        "net_side": "away",
+        "home_score": -1.029,
+        "away_score": -0.468,
+        "home_fade": 1.36,
         "away_fade": 0.944,
-        "reason": "Signaux opposes: San Diego Padres fade 1.16, St. Louis Cardinals fade 0.94 -> prudence",
+        "reason": "Direction nette: St. Louis Cardinals (-0.47)",
         "detail": [
           {
             "side": "home",
@@ -2900,13 +2836,7 @@
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.79
+            "strength": 1.0
           },
           {
             "side": "away",
@@ -3251,72 +3181,6 @@
             "type": "travel_extreme",
             "direction": "fade",
             "strength": 0.721
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815247",
-      "source_event_ids": [
-        "401815247"
-      ],
-      "kickoff": "2026-05-07T23:00Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Boston Red Sox",
-      "away": "Tampa Bay Rays",
-      "match": "Boston Red Sox - Tampa Bay Rays",
-      "decision": "lean_home",
-      "net_team": "Boston Red Sox",
-      "reason": "Tampa Bay Rays plus penalise par calendrier/voyage (0.81 vs 0.36)",
-      "pressure_score": 2.048,
-      "home_fade": 0.36,
-      "away_fade": 0.808,
-      "travel_score": 0.448,
-      "lookahead_score": 1.6,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "travel_extreme": 1
-      },
-      "contexts": [
-        "3 match important/proche dans les 3 jours",
-        "3 match important/proche dans les 3 jours",
-        "Deplacement estime 1928 km, decalage ~0.8h"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.477,
-        "away_score": -0.542,
-        "home_fade": 0.76,
-        "away_fade": 0.808,
-        "reason": "Signaux opposes: Boston Red Sox fade 0.76, Tampa Bay Rays fade 0.81 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.448
           }
         ]
       }

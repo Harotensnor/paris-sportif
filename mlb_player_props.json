@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-07T22:55:20Z",
+  "generated_at": "2026-05-07T23:15:02Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815247",
-      "kickoff": "2026-05-07T23:00Z",
-      "league": "MLB",
-      "match": "Tampa Bay Rays at Boston Red Sox",
-      "home": "Boston Red Sox",
-      "away": "Tampa Bay Rays",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Boston Red Sox",
-          "pitcher": "Jake Bennett",
-          "label": "Jake Bennett moins de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "under",
-          "probability": 0.6443,
-          "fair_odds": 1.55,
-          "expected_strikeouts": 3.0,
-          "projected_ip": 5.0,
-          "inputs": {
-            "k9": 5.4,
-            "era": 1.8,
-            "whip": 1.4,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Boston Red Sox",
-          "pitcher": "Jake Bennett",
-          "label": "Jake Bennett concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6321,
-          "fair_odds": 1.58,
-          "expected_hr_allowed": 1.0,
-          "projected_ip": 5.0,
-          "inputs": {
-            "hr9": 1.8,
-            "era": 1.8,
-            "whip": 1.4
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Tampa Bay Rays",
-          "pitcher": "Griffin Jax",
-          "label": "Griffin Jax plus de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "over",
-          "probability": 0.5199,
-          "fair_odds": 1.92,
-          "expected_strikeouts": 6.6,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 9.0,
-            "era": 5.14,
-            "whip": 1.5,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Tampa Bay Rays",
-          "pitcher": "Griffin Jax",
-          "label": "Griffin Jax concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.7572,
-          "fair_odds": 1.32,
-          "expected_hr_allowed": 1.415,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 1.93,
-            "era": 5.14,
-            "whip": 1.5
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815252",
       "kickoff": "2026-05-08T02:00Z",
@@ -1874,7 +1792,7 @@
       ]
     }
   ],
-  "props": 90,
+  "props": 86,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
