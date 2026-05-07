@@ -1,26 +1,25 @@
 {
-  "generated_at": "2026-05-07T12:58:30Z",
+  "generated_at": "2026-05-07T13:03:40Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 64,
-    "actionable": 21,
-    "watch": 3,
-    "risk": 40,
+    "actionable": 20,
+    "watch": 1,
+    "risk": 43,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 13,
       "travel_extreme": 7,
       "back_to_back_travel": 16,
-      "signal_conflict": 6,
-      "market_uncertain": 35,
-      "market_move": 4
+      "signal_conflict": 10,
+      "market_uncertain": 34
     },
     "by_quality": {
-      "actionable": 21,
-      "watch": 3,
-      "risk": 40
+      "actionable": 20,
+      "watch": 1,
+      "risk": 43
     }
   },
   "active_actionable": [
@@ -95,24 +94,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 5-11"
-    },
-    {
-      "event_id": "401871412",
-      "date": "2026-05-08T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Philadelphia Flyers",
-      "away": "Carolina Hurricanes",
-      "match": "Philadelphia Flyers - Carolina Hurricanes",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 2.40 -> 3.05 (-27.1%)"
     },
     {
       "event_id": "401815252",
@@ -241,24 +222,6 @@
       "context": "2 match dans les 48h + 1928 km de voyage"
     },
     {
-      "event_id": "401815246",
-      "date": "2026-05-07T17:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Washington Nationals",
-      "away": "Minnesota Twins",
-      "match": "Washington Nationals - Minnesota Twins",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Minnesota Twins",
-      "side": "away",
-      "strength": 0.951,
-      "context": "3 match dans les 48h + 1504 km de voyage"
-    },
-    {
       "event_id": "401815258",
       "date": "2026-05-08T23:10Z",
       "sport": "baseball",
@@ -275,6 +238,24 @@
       "side": "away",
       "strength": 0.916,
       "context": "1 match dans les 48h + 1928 km de voyage"
+    },
+    {
+      "event_id": "401815246",
+      "date": "2026-05-07T17:05Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Washington Nationals",
+      "away": "Minnesota Twins",
+      "match": "Washington Nationals - Minnesota Twins",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Minnesota Twins",
+      "side": "away",
+      "strength": 0.911,
+      "context": "2 match dans les 48h + 1504 km de voyage"
     },
     {
       "event_id": "401871328",
@@ -327,8 +308,8 @@
       "direction": "fade",
       "team": "Cleveland Guardians",
       "side": "away",
-      "strength": 0.874,
-      "context": "3 match dans les 48h + 1118 km de voyage"
+      "strength": 0.834,
+      "context": "2 match dans les 48h + 1118 km de voyage"
     },
     {
       "event_id": "401856891",
@@ -421,42 +402,6 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 11-8"
-    },
-    {
-      "event_id": "401861376",
-      "date": "2026-05-10T12:00Z",
-      "sport": "football",
-      "league_code": "chn.1",
-      "league_name": "Chinese Super League",
-      "home": "Qingdao Hainiu",
-      "away": "Dalian Yingbo",
-      "match": "Qingdao Hainiu - Dalian Yingbo",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "away",
-      "strength": 0.517,
-      "context": "Cote away: 2.15 -> 2.35 (-9.3%)"
-    },
-    {
-      "event_id": "401861535",
-      "date": "2026-05-09T11:35Z",
-      "sport": "football",
-      "league_code": "chn.1",
-      "league_name": "Chinese Super League",
-      "home": "Shanghai Shenhua",
-      "away": "Chongqing Tonglianglong",
-      "match": "Shanghai Shenhua - Chongqing Tonglianglong",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "away",
-      "strength": 0.454,
-      "context": "Cote away: 4.90 -> 5.30 (-8.2%)"
     }
   ],
   "active_risk": [
@@ -1091,14 +1036,68 @@
       "context": "Signaux opposes: Cleveland Cavaliers fade 0.75, Detroit Pistons fade 0.75 -> prudence"
     },
     {
-      "event_id": "401815244",
-      "date": "2026-05-07T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Philadelphia Phillies",
-      "away": "Athletics",
-      "match": "Philadelphia Phillies - Athletics",
+      "event_id": "401871163",
+      "date": "2026-05-12T04:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "New York Knicks",
+      "away": "Philadelphia 76ers",
+      "match": "New York Knicks - Philadelphia 76ers",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.488,
+      "context": "Signaux opposes: New York Knicks fade 0.75, Philadelphia 76ers fade 0.75 -> prudence"
+    },
+    {
+      "event_id": "401871407",
+      "date": "2026-05-12T23:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Montreal Canadiens",
+      "away": "Buffalo Sabres",
+      "match": "Montreal Canadiens - Buffalo Sabres",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.488,
+      "context": "Signaux opposes: Montreal Canadiens fade 0.75, Buffalo Sabres fade 0.75 -> prudence"
+    },
+    {
+      "event_id": "401871427",
+      "date": "2026-05-13T01:30Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Vegas Golden Knights",
+      "away": "Anaheim Ducks",
+      "match": "Vegas Golden Knights - Anaheim Ducks",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.488,
+      "context": "Signaux opposes: Vegas Golden Knights fade 0.75, Anaheim Ducks fade 0.75 -> prudence"
+    },
+    {
+      "event_id": "401871156",
+      "date": "2026-05-12T04:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "San Antonio Spurs",
+      "away": "Minnesota Timberwolves",
+      "match": "San Antonio Spurs - Minnesota Timberwolves",
       "quality": "risk",
       "quality_reason": "Signal de prudence, pas une opportunite directe",
       "type": "signal_conflict",
@@ -1106,7 +1105,7 @@
       "team": null,
       "side": null,
       "strength": 0.45,
-      "context": "Signaux opposes: Philadelphia Phillies fade 0.60, Athletics fade 0.60 -> prudence"
+      "context": "Signaux opposes: San Antonio Spurs fade 0.60, Minnesota Timberwolves fade 0.60 -> prudence"
     },
     {
       "event_id": "401871337",
