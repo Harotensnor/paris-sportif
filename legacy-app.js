@@ -1898,10 +1898,13 @@ const parsed = new Date(s);
 return isNaN(parsed.getTime()) ? '' : parsed.toISOString().slice(0, 10);
 }
 function todayISO() {
-const g = window.PRONOSTICS_DATA?.today;
-if (g) return g;
-return isoDate(new Date());
+return currentParisDateISO();
 }
+function currentParisDateISO() {
+try { return new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' }); }
+catch(e) { return isoDate(new Date()); }
+}
+try { window.currentParisDateISO = currentParisDateISO; } catch(e) { swallowError(e); }
 function parisDateISO(value) {
 if (!value) return '';
 const d = value instanceof Date ? value : new Date(value);
@@ -3576,7 +3579,8 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
       .v38-prono-kpi b{display:block;margin-top:4px;font-size:18px;color:var(--text);font-variant-numeric:tabular-nums}
       .v38-prono-kpi em{display:block;margin-top:3px;font-size:10.5px;color:var(--text-dim);font-style:normal;line-height:1.25}
       .v38-odd-status{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--border);border-radius:999px;padding:3px 8px;font-size:10px;font-weight:900;line-height:1;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
-      .v38-odd-status[data-status="verified"],.v38-odd-status[data-status="changed"]{border-color:rgba(45,212,168,.36);background:rgba(45,212,168,.12);color:var(--accent)}
+      .v38-odd-status[data-status="verified"]{border-color:rgba(45,212,168,.36);background:rgba(45,212,168,.12);color:var(--accent)}
+      .v38-odd-status[data-status="changed"]{border-color:rgba(245,158,11,.42);background:rgba(245,158,11,.12);color:var(--warn)}
       .v38-odd-status[data-status="stale"]{border-color:rgba(251,191,36,.36);background:rgba(251,191,36,.12);color:var(--warn)}
       .v38-odd-status[data-status="missing"],.v38-odd-status[data-status="mismatch"],.v38-odd-status[data-status="suspicious"]{border-color:rgba(248,113,113,.38);background:rgba(248,113,113,.12);color:var(--danger)}
       .v38-info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
@@ -3623,7 +3627,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
   function v38OddStatusMeta(status) {
     const map = {
       verified: { label: 'Cote validée', tone: 'good', detail: 'Prix exact retrouvé dans les marchés Winamax du match.' },
-      changed: { label: 'Cote changée', tone: 'good', detail: 'Le prix Winamax a changé depuis l’affichage initial, mais le marché exact est retrouvé.' },
+      changed: { label: 'Cote changée', tone: 'warn', detail: 'Le prix Winamax a changé depuis l’affichage initial : prudence, seule une vérification récente peut rester jouable.' },
       stale: { label: 'Cote ancienne', tone: 'warn', detail: 'La cote provient d’un snapshot trop ancien : prudence avant action.' },
       mismatch: { label: 'Cote suspecte', tone: 'bad', detail: 'La sélection ou la ligne ne correspond pas proprement au marché Winamax.' },
       missing: { label: 'Non vérifiée', tone: 'bad', detail: 'Aucun prix Winamax exact n’a été retrouvé pour ce pick.' },
@@ -3638,6 +3642,21 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     const title = [info.detail, m.reason, m.verifiedAt ? `Vérifiée ${m.verifiedAt}` : ''].filter(Boolean).join(' · ');
     return `<span class="v38-odd-status" data-status="${esc(m.status || 'missing')}" title="${esc(title)}">${esc(info.label)}</span>`;
   }
+
+  function v38OddSnapshotAgeMin(ts) {
+    const t = new Date(ts || 0).getTime();
+    if (!Number.isFinite(t) || t <= 0) return Infinity;
+    return Math.round((Date.now() - t) / 60000);
+  }
+
+  function v38OddTopEligible(meta) {
+    const status = String(meta?.status || 'missing');
+    if (status === 'verified') return true;
+    if (status !== 'changed') return false;
+    const age = Number(meta?.ageMin);
+    return Number.isFinite(age) && age <= 30 && Number.isFinite(Number(meta?.currentOdd));
+  }
+  try { window.v38OddTopEligible = v38OddTopEligible; } catch(e) { swallowError(e); }
 
   function v38OddNorm(value) {
     return String(value ?? '')
@@ -3764,6 +3783,8 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     const wx = match?.winamax || {};
     const markets = wx.markets || {};
     const dataAge = typeof getDataAge === 'function' ? getDataAge().minutes : 9999;
+    const verifiedAt = wx.markets_fetched_at || window.PRONOSTICS_DATA?.generated_at || null;
+    const marketAgeMin = v38OddSnapshotAgeMin(verifiedAt);
     const base = {
       status: 'missing',
       odd: Number.isFinite(odd) ? odd : null,
@@ -3771,12 +3792,14 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
       market: c.market || '1n2',
       selection: c.pickValue ?? c.pickKey ?? c.key ?? c.side ?? '',
       line: c.line ?? c.raw?.line ?? null,
-      verifiedAt: window.PRONOSTICS_DATA?.generated_at || null,
+      verifiedAt,
+      ageMin: marketAgeMin,
       reason: '',
     };
     if (!(odd > 1.01) || odd > 50) return { ...base, status: 'suspicious', reason: 'cote hors bornes' };
     if (!wx.available || !wx.match_id || !markets || !Object.keys(markets).length) return { ...base, status: 'missing', reason: 'match Winamax ou marchés absents' };
     if (dataAge > 240) return { ...base, status: 'stale', reason: `data ${Math.round(dataAge / 60)}h` };
+    if (marketAgeMin > 180) return { ...base, status: 'stale', reason: `marchés Winamax vérifiés il y a ${Math.round(marketAgeMin / 60)}h` };
     if (c.suspect || Number(c.edge || 0) > 0.30) return { ...base, status: 'suspicious', reason: c.suspectReason || 'edge anormal' };
     if (c.source !== 'winamax_exact' || c.exact === false) return { ...base, status: 'missing', reason: 'cote indicative non liée Winamax exact' };
     const found = v38FindWinamaxOdd(match, c);
@@ -3792,8 +3815,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
   try { window.validatePickOdd = validatePickOdd; } catch(e) { swallowError(e); }
 
   function v38PickVerdict(score, edge, oddMeta) {
-    const status = oddMeta?.status || 'missing';
-    if (!['verified', 'changed'].includes(status)) return 'À vérifier';
+    if (!v38OddTopEligible(oddMeta)) return 'À vérifier';
     if (score >= 80 && edge >= 0.03) return 'Top pick';
     if (score >= 60) return 'Bon pick';
     if (edge >= 0.06) return 'Value risquée';
@@ -17668,6 +17690,7 @@ odd_missing: 'Cote non vérifiée',
 odd_mismatch: 'Cote suspecte',
 odd_suspicious: 'Cote suspecte',
 odd_stale: 'Cote ancienne',
+odd_changed_not_recent: 'Cote changée trop ancienne',
 odd_other: 'Cote invalide',
 low_odd: 'Cote trop basse',
 low_score: 'Score insuffisant',
@@ -17701,7 +17724,7 @@ return { ok: false, reason, meta };
 if (_dataIsStale) return reject('data_stale');
 if (p?.dataOnly) return reject('data_only');
 if (p?.edgeAnomaly) return reject('edge_anomaly');
-if (!['verified', 'changed'].includes(status)) return reject(`odd_${v38TopParisReasonLabel[`odd_${status}`] ? status : 'other'}`);
+if (!v38OddTopEligible(meta)) return reject(status === 'changed' ? 'odd_changed_not_recent' : `odd_${v38TopParisReasonLabel[`odd_${status}`] ? status : 'other'}`);
 if (!(Number(p?.odd || 0) >= 1.30)) return reject('low_odd');
 if (!(Number(p?.opportunity || p?.score || 0) >= 45)) return reject('low_score');
 if (Number(p?.rawEdge || p?.edge || 0) > v37EdgeAnomalyThreshold) return reject('edge_too_high');

@@ -1894,3 +1894,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Kept `data.js` compact by storing full-market metadata only, with the complete odds remaining in the Winamax sidecar.
 - Raised the cron detail pass to refresh the complete 30-day Winamax horizon instead of only a small rotating subset.
 - Local verification snapshot: 25 sport pages, 154 tournaments, 887 matches, 655 detailed match pages and 372k+ Winamax selections captured.
+
+### v37.172 — Date and odd truth hardening
+- Switched `todayISO()` to the real Europe/Paris date so stale `data.today` can no longer shift the site to yesterday.
+- Downgraded changed odds to a warning visual state and limited Top Paris eligibility to verified odds or changed odds refreshed within 30 minutes.
+- Added explicit `odd_changed_not_recent` rejection in the Top Paris audit so old changed prices cannot enter recommendations.
+- Extended the prono-sheet probe to assert Top Paris never contains invalid odd statuses.
+- Added pytest/static contracts for Paris-local today and fresh odd eligibility.

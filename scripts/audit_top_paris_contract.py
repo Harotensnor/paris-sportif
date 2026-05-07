@@ -21,6 +21,9 @@ def main():
         require(legacy, f"{status}:", f"odd status {status}")
 
     require(legacy, "v38FindWinamaxOdd", "strict Winamax odd lookup")
+    require(legacy, "v38OddTopEligible", "top-pick odd eligibility helper")
+    require(legacy, "odd_changed_not_recent", "changed odds freshness rejection")
+    require(legacy, "currentParisDateISO", "Paris-local today helper")
     require(legacy, "marché, sélection et ligne retrouvés dans Winamax", "strict verified copy")
     require(legacy, "v37CanAutoHorizonLowPool = false", "no automatic 7-day expansion")
     require(legacy, "v37ShowResultColumn", "today result column")
@@ -31,7 +34,11 @@ def main():
     require(probe, "Today table exposes result column", "probe result column assertion")
     require(probe, "Rows include beginner-friendly explanation text", "probe beginner copy assertion")
     require(probe, "Modal shows odd validation status", "probe odd validation assertion")
+    require(probe, "No Top Paris card has an invalid odd status", "probe top odd assertion")
     require(smoke, "probe_prono_sheet_odds.js", "smoke workflow wiring")
+
+    if "const g = window.PRONOSTICS_DATA?.today" in legacy:
+        raise SystemExit("[top-paris-contract] FAIL todayISO must use the real Europe/Paris date, not stale data.today")
 
     print("[top-paris-contract] OK")
 
