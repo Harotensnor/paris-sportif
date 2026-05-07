@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-05-07T05:48:42Z",
+  "generated_at": "2026-05-07T05:56:25Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 77,
-    "actionable": 19,
-    "watch": 4,
+    "actionable": 18,
+    "watch": 5,
     "risk": 54,
     "expired_sample": 0,
     "by_type": {
@@ -14,12 +14,11 @@
       "travel_extreme": 7,
       "back_to_back_travel": 16,
       "signal_conflict": 6,
-      "market_uncertain": 51,
-      "market_move": 2
+      "market_uncertain": 50
     },
     "by_quality": {
-      "actionable": 19,
-      "watch": 4,
+      "actionable": 18,
+      "watch": 5,
       "risk": 54
     }
   },
@@ -295,24 +294,6 @@
       "context": "1 match dans les 48h + 1899 km de voyage"
     },
     {
-      "event_id": "401871412",
-      "date": "2026-05-08T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Philadelphia Flyers",
-      "away": "Carolina Hurricanes",
-      "match": "Philadelphia Flyers - Carolina Hurricanes",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "away",
-      "strength": 0.895,
-      "context": "Cote away: 1.60 -> 1.86 (-16.1%)"
-    },
-    {
       "event_id": "401815250",
       "date": "2026-05-07T18:10Z",
       "sport": "baseball",
@@ -385,6 +366,24 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 11-8"
+    },
+    {
+      "event_id": "401871412",
+      "date": "2026-05-08T00:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Philadelphia Flyers",
+      "away": "Carolina Hurricanes",
+      "match": "Philadelphia Flyers - Carolina Hurricanes",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Philadelphia Flyers",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 3-0"
     },
     {
       "event_id": "401871413",

@@ -1785,3 +1785,8 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Backtest PR now triggers on legacy-app.js and calibration sidecars, not only the thin app.js shell.
 - Main comparison now checks out legacy-app.js too, so PR and main models are actually distinct.
 - Locked by audit_qa_workflows plus a local limited backtest smoke.
+
+### v37.138 — Cron data catch-up
+- Merged the latest refresh-data tick from main after the backtest workflow fix.
+- Preserved the v37 runtime shell, restamped assets and bumped the service-worker cache.
+- Locked by syntax, asset hash, drift and bundle checks.
