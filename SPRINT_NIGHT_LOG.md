@@ -1850,3 +1850,8 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Reproduced the local desktop Playwright failure where the Big Bet flow asserted before the dashboard CTA finished rendering under parallel load.
 - Changed the test to wait for the visible CTA itself and refreshed the topbar snapshot after the intentional health-control addition.
 - Re-ran the full chromium desktop suite: 254 passed, 17 skipped, 0 failed.
+
+### v37.151 — Cron resync after E2E fix
+- Merged the next main cron tick after the v37.150 test hardening commit made the PR dirty again.
+- Preserved the e2e timing fix and refreshed the data sidecars, health metrics, night metrics and cache stamp from the new data.js.
+- Revalidated the data timestamp alignment before pushing the resync.
