@@ -47,6 +47,7 @@ def _checks() -> list[tuple[str, list[str]]]:
         "scripts/check_bundle_size.py",
         "scripts/audit_bundle_size.py",
         "scripts/audit_orphan_renderers.py",
+        "scripts/audit_legacy_dead_helpers.py",
         "scripts/audit_data_truth.py",
         "scripts/audit_fetch_tracking.py",
         "scripts/audit_innerhtml_safety.py",

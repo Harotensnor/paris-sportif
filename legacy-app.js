@@ -1866,21 +1866,6 @@ function loadMyBets() {
 try { return JSON.parse(localStorage.getItem(MY_BETS_KEY) || '{}') || {}; }
 catch (e) { return {}; }
 }
-function saveMyBets(obj) {
-try { localStorage.setItem(MY_BETS_KEY, JSON.stringify(obj)); } catch(e) { swallowError(e); }
-}
-function myBetKey(matchId, pickKey) { return `${matchId}::${pickKey || '1X2'}`; }
-function getMyBet(matchId, pickKey) { return loadMyBets()[myBetKey(matchId, pickKey)] || null; }
-function upsertMyBet(bet) {
-const all = loadMyBets();
-all[myBetKey(bet.matchId, bet.pickKey)] = bet;
-saveMyBets(all);
-}
-function removeMyBet(matchId, pickKey) {
-const all = loadMyBets();
-delete all[myBetKey(matchId, pickKey)];
-saveMyBets(all);
-}
 
 const SEEN_LOCKS_KEY = 'seenLocks';
 function loadSeenLocks() {
@@ -1904,57 +1889,17 @@ if (_seenLocks.has(s)) return;
 _seenLocks.add(s);
 saveSeenLocks(_seenLocks);
 }
-function markAllLocksSeen(matchIds) {
-let changed = false;
-matchIds.forEach(id => {
-const s = String(id);
-if (!_seenLocks.has(s)) { _seenLocks.add(s); changed = true; }
-});
-if (changed) saveSeenLocks(_seenLocks);
-return changed;
-}
 const RELIABILITY_HIST_KEY = 'reliability_history_v1';
-const RELIABILITY_HIST_WINDOW_MS = 12 * 60 * 60 * 1000;  // 12h
-const RELIABILITY_HIST_MIN_INTERVAL_MS = 10 * 60 * 1000; // 10 min entre 2 samples
 function loadReliabilityHist() {
 try {
 const raw = JSON.parse(localStorage.getItem(RELIABILITY_HIST_KEY) || '{}');
 return (raw && typeof raw === 'object') ? raw : {};
 } catch (e) { return {}; }
 }
-function saveReliabilityHist(obj) {
-try { localStorage.setItem(RELIABILITY_HIST_KEY, JSON.stringify(obj)); } catch(e) { swallowError(e); }
-}
 let _reliabilityHist = loadReliabilityHist();
-function snapshotReliability(matchId, reliability) {
-if (matchId == null || !Number.isFinite(reliability)) return;
-const key = String(matchId);
-const now = Date.now();
-const arr = _reliabilityHist[key] || [];
-const last = arr[arr.length - 1];
-if (last && (now - last.t) < RELIABILITY_HIST_MIN_INTERVAL_MS
-&& Math.abs(last.r - reliability) < 0.01) return;
-arr.push({ t: now, r: Math.round(reliability * 1000) / 1000 });
-const cutoff = now - RELIABILITY_HIST_WINDOW_MS;
-_reliabilityHist[key] = arr.filter(p => p.t >= cutoff);
-saveReliabilityHist(_reliabilityHist);
-}
 function getReliabilityHist(matchId) {
 if (matchId == null) return [];
 return (_reliabilityHist[String(matchId)] || []).slice();
-}
-function gcReliabilityHist() {
-try {
-const data = window.PRONOSTICS_DATA;
-if (!data || !data.days) return;
-const liveIds = new Set();
-Object.values(data.days).forEach(arr => (arr || []).forEach(m => { if (m.id != null) liveIds.add(String(m.id)); }));
-let changed = false;
-Object.keys(_reliabilityHist).forEach(id => {
-if (!liveIds.has(id)) { delete _reliabilityHist[id]; changed = true; }
-});
-if (changed) saveReliabilityHist(_reliabilityHist);
-} catch(e) { swallowError(e); }
 }
 
 function gcSeenLocks() {
@@ -2157,24 +2102,6 @@ return Math.round(n) + '€';
 }
 window.fmtEur = fmtEur;
 function norm(s) { return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
-function escWithHighlight(s) {
-const str = String(s ?? '');
-const q = (typeof searchTerm === 'string') ? searchTerm.trim() : '';
-if (!q) return esc(str);
-const nStr = norm(str);
-const nQ = norm(q);
-if (!nQ || !nStr.includes(nQ)) return esc(str);
-let out = '';
-let i = 0;
-while (i < str.length) {
-const idx = nStr.indexOf(nQ, i);
-if (idx < 0) { out += esc(str.slice(i)); break; }
-out += esc(str.slice(i, idx));
-out += `<mark class="srch-hi">${esc(str.slice(idx, idx + nQ.length))}</mark>`;
-i = idx + nQ.length;
-}
-return out;
-}
 
 function mlToDecimal(ml) {
 if (ml === null || ml === undefined || ml === '') return null;
@@ -2202,14 +2129,6 @@ function valueBetEdge(reliability, decimalOdds) {
 if (!(reliability > 0) || !(decimalOdds > 1)) return null;
 const implied = 1 / decimalOdds;
 return reliability - implied;
-}
-
-/** Parse "BAL -140" style details into favorite moneyline */
-function parseDetailsForFavorite(details) {
-if (!details) return null;
-const m = String(details).match(/([A-Z]{2,4})\s+([+-]\d+(?:\.\d+)?)/);
-if (!m) return null;
-return { abbr: m[1], value: parseFloat(m[2]) };
 }
 
 /** Return best (highest) decimal odds from multiple providers for each outcome.
@@ -2287,23 +2206,6 @@ _fromHistory: true,
 }
 return live;
 }
-
-function lineMovement(match, pickKey) {
-const snap = match.odds_snapshot;
-if (!snap) return null;
-const live = bestOdds(match.odds, match.sport === 'football');
-if (!live) return null;
-const sideKey = pickKey === '1' ? 'home' : pickKey === '2' ? 'away' : 'draw';
-const before = Number(snap[sideKey]);
-const after = Number(live[sideKey]);
-if (!isFinite(before) || !isFinite(after) || before <= 1 || after <= 1) return null;
-const deltaPct = ((after - before) / before) * 100;
-const abs = Math.abs(deltaPct);
-if (abs < 4) return null;
-const severity = abs >= 12 ? 'sharp' : abs >= 7 ? 'notable' : 'soft';
-return { before, after, deltaPct, severity };
-}
-
 
 function isWinamaxBookable(match) {
 const w = match && match.winamax;
@@ -10036,13 +9938,6 @@ return `<div class="conf-gauge ${cls} ${size}" title="Confiance ${Math.round(p*1
     </div>`;
 }
 
-function groupBy(arr, fn) {
-const m = new Map();
-arr.forEach(x => { const k = fn(x); if (!m.has(k)) m.set(k, []); m.get(k).push(x); });
-return m;
-}
-
-
 function derivedForm(side) {
 if (!side) return null;
 if (typeof side.form === 'string' && side.form.length) return side.form;
@@ -15024,23 +14919,10 @@ badge.style.color = critN > 0 ? '#f87171' : '#eab308';
 
 
 
-function teamLogoUrl(team, sport) {
-if (!team) return '';
-return '';
-}
 function sportEmoji(sport) {
 const m = { football:'⚽', tennis:'🎾', basketball:'🏀', hockey:'🏒', baseball:'⚾', rugby:'🏉', handball:'🤾', volleyball:'🏐', volley:'🏐', mma:'🥊', combat:'🥊', boxing:'🥊', f1:'🏎️', esports:'🎮', esport:'🎮', cycling:'🚴', cyclisme:'🚴', ski:'🎿', 'winter_sports':'🎿', athletics:'🏃', athle:'🏃', nfl:'🏈', 'football-american':'🏈' };
 return m[String(sport||'').toLowerCase()] || '🏆';
 }
-function teamAvatarHtml(name, sport, size) {
-size = size || 32;
-const initials = String(name || '?').trim().split(/\s+/).slice(0,2).map(s => s[0] || '').join('').toUpperCase().slice(0,2) || '?';
-const hash = String(name || '').split('').reduce((h,c) => (h*31 + c.charCodeAt(0)) | 0, 0);
-const hue = Math.abs(hash) % 360;
-return `<div style="width:${size}px;height:${size}px;border-radius:50%;background:hsl(${hue},60%,88%);color:hsl(${hue},55%,32%);display:inline-grid;place-items:center;font-size:${Math.round(size*0.38)}px;font-weight:700;letter-spacing:-.5px;border:1px solid rgba(0,0,0,.06);flex-shrink:0;">${esc(initials)}</div>`;
-}
-
-
 
 function _agentBestPick(m, pred) {
 if (!m || !pred) return null;
@@ -25500,10 +25382,6 @@ return `
   // + section biais et limites. Réponse à l'audit ChatGPT 2026-04-26.
 
 
-  function todayIsoName() {
-    try { return new Date().toISOString().slice(0,10); } catch (e) { return 'export'; }
-  }
-
   // Charge `odds_history.jsonl` une seule fois au premier appel (lazy), parse,
   // groupe par match_id. Render une mini SVG montrant l'évolution de la cote
   // décimale du pick choisi sur la dernière fenêtre disponible.
@@ -26791,34 +26669,6 @@ return `
     `;
 }
 
-function computeBankrollGuards() {
-const data = window.PRONOSTICS_DATA;
-const bets = loadMyBets();
-const today = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
-const byId = {};
-if (data && data.days) {
-Object.values(data.days).forEach(arr => (arr || []).forEach(m => { if (m.id) byId[m.id] = m; }));
-}
-let engagedToday = 0;
-let plToday = 0;
-Object.values(bets).forEach(b => {
-const m = byId[b.matchId];
-const matchDay = m?.date ? new Date(m.date).toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' }) : isoDate(b.placedAt);
-if (matchDay !== today) return;
-if (!m || !m.completed) {
-engagedToday += b.stake;
-} else {
-const pseudo = { pick: { key: b.pickKey } };
-const r = evaluateModelPick(m, pseudo);
-if (r === 'won') plToday += b.stake * (b.odds - 1);
-else if (r === 'lost') plToday += -b.stake;
-}
-});
-const dailyCap = bankroll * 0.05;
-const stopLoss = -bankroll * 0.15;
-return { engagedToday, dailyCap, plToday, stopLoss, today };
-}
-
 function wilsonCI(wins, n, z = 1.96) {
 if (!n || n <= 0) return { low: 0, high: 0, point: 0 };
 const p = wins / n;
@@ -26841,17 +26691,6 @@ const currentPeak = peak;
 const currentDD = peak - cum;
 return { maxDD, ddStartIdx, ddEndIdx, currentPeak, currentDD };
 }
-
-function getMatchBetCount(matchId) {
-if (!matchId) return 0;
-const bets = loadMyBets();
-let n = 0;
-for (const k of Object.keys(bets)) {
-if (bets[k].matchId === String(matchId)) n++;
-}
-return n;
-}
-
 
 const PERF_TAB_STORAGE_KEY = 'paris_sportif_perf_tab_v1';
 const PERF_TABS = new Set(['global', 'periode', 'confiance', 'marche', 'sport', 'ligue', 'strategies']);
@@ -28043,19 +27882,6 @@ bets[id] = { ...bet, added_at: new Date().toISOString(), status: 'en cours' };
 saveTrackedBets(bets);
 return id;
 }
-function updateTrackedBet(id, updates) {
-const bets = loadTrackedBets();
-if (bets[id]) {
-bets[id] = { ...bets[id], ...updates };
-saveTrackedBets(bets);
-}
-}
-function removeTrackedBet(id) {
-const bets = loadTrackedBets();
-delete bets[id];
-saveTrackedBets(bets);
-}
-
 const JS_ERRORS_KEY = 'paris_sportif_js_errors_v1';
 const JS_ERRORS_MAX = 100;
 function loadJsErrors() {

@@ -1667,3 +1667,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix: add a fresh-load matrix probe over 16 routes × desktop/mobile and write a JSON report.
 - Verrou: `scripts/probe_console_matrix.js` wired into `smoke.yml`.
 - Chiffres: 32/32 route loads clean, 0 console errors, footer/SW v37.119.
+
+## Sprint v37.120 — AUTO 10/10 dead helpers trim
+- Symptom: bundle was below target but still carried declaration-only legacy helpers.
+- Cause: old local-bet, reliability, avatar, and movement utilities had no runtime callers after routed UX changes.
+- Fix: remove 20 dead helper declarations while keeping the documented `kellyStake` API untouched.
+- Verrou: `scripts/audit_legacy_dead_helpers.py` wired into QA gate + e2e drift.
+- Chiffres: legacy bundle 1698.4 KB -> 1692.6 KB, footer/SW v37.120.

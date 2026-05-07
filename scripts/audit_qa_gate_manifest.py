@@ -16,6 +16,7 @@ REQUIRED = [
     "scripts/audit_no_empty_catch_legacy.py",
     "scripts/audit_privacy_features.py",
     "scripts/audit_innerhtml_safety.py",
+    "scripts/audit_legacy_dead_helpers.py",
     "scripts/audit_fetch_tracking.py",
     "scripts/audit_all_probes_wired.py",
     "scripts/audit_a11y_aria_labels.py",
