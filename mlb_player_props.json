@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-07T20:56:48Z",
+  "generated_at": "2026-05-07T21:05:13Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -962,6 +962,88 @@
       ]
     },
     {
+      "event_id": "401815265",
+      "kickoff": "2026-05-09T01:40Z",
+      "league": "MLB",
+      "match": "New York Mets at Arizona Diamondbacks",
+      "home": "Arizona Diamondbacks",
+      "away": "New York Mets",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Arizona Diamondbacks",
+          "pitcher": "Merrill Kelly",
+          "label": "Merrill Kelly moins de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "under",
+          "probability": 0.5002,
+          "fair_odds": 2.0,
+          "expected_strikeouts": 3.5,
+          "projected_ip": 4.75,
+          "inputs": {
+            "k9": 6.63,
+            "era": 9.95,
+            "whip": 2.32,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Arizona Diamondbacks",
+          "pitcher": "Merrill Kelly",
+          "label": "Merrill Kelly concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.7766,
+          "fair_odds": 1.29,
+          "expected_hr_allowed": 1.499,
+          "projected_ip": 4.75,
+          "inputs": {
+            "hr9": 2.84,
+            "era": 9.95,
+            "whip": 2.32
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "New York Mets",
+          "pitcher": "Clay Holmes",
+          "label": "Clay Holmes moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5291,
+          "fair_odds": 1.89,
+          "expected_strikeouts": 4.38,
+          "projected_ip": 6.03,
+          "inputs": {
+            "k9": 6.54,
+            "era": 1.69,
+            "whip": 0.98,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "New York Mets",
+          "pitcher": "Clay Holmes",
+          "label": "Clay Holmes ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6557,
+          "fair_odds": 1.53,
+          "expected_hr_allowed": 0.422,
+          "projected_ip": 6.03,
+          "inputs": {
+            "hr9": 0.63,
+            "era": 1.69,
+            "whip": 0.98
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
       "event_id": "401815267",
       "kickoff": "2026-05-09T01:45Z",
       "league": "MLB",
@@ -1710,6 +1792,88 @@
       ]
     },
     {
+      "event_id": "401815280",
+      "kickoff": "2026-05-09T23:15Z",
+      "league": "MLB",
+      "match": "New York Mets at Arizona Diamondbacks",
+      "home": "Arizona Diamondbacks",
+      "away": "New York Mets",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Arizona Diamondbacks",
+          "pitcher": "Merrill Kelly",
+          "label": "Merrill Kelly moins de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "under",
+          "probability": 0.5002,
+          "fair_odds": 2.0,
+          "expected_strikeouts": 3.5,
+          "projected_ip": 4.75,
+          "inputs": {
+            "k9": 6.63,
+            "era": 9.95,
+            "whip": 2.32,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Arizona Diamondbacks",
+          "pitcher": "Merrill Kelly",
+          "label": "Merrill Kelly concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.7766,
+          "fair_odds": 1.29,
+          "expected_hr_allowed": 1.499,
+          "projected_ip": 4.75,
+          "inputs": {
+            "hr9": 2.84,
+            "era": 9.95,
+            "whip": 2.32
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "New York Mets",
+          "pitcher": "Clay Holmes",
+          "label": "Clay Holmes moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5291,
+          "fair_odds": 1.89,
+          "expected_strikeouts": 4.38,
+          "projected_ip": 6.03,
+          "inputs": {
+            "k9": 6.54,
+            "era": 1.69,
+            "whip": 0.98,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "New York Mets",
+          "pitcher": "Clay Holmes",
+          "label": "Clay Holmes ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6557,
+          "fair_odds": 1.53,
+          "expected_hr_allowed": 0.422,
+          "projected_ip": 6.03,
+          "inputs": {
+            "hr9": 0.63,
+            "era": 1.69,
+            "whip": 0.98
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
       "event_id": "401815282",
       "kickoff": "2026-05-09T23:15Z",
       "league": "MLB",
@@ -1792,7 +1956,7 @@
       ]
     }
   ],
-  "props": 86,
+  "props": 94,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

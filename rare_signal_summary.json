@@ -1,24 +1,25 @@
 {
-  "generated_at": "2026-05-07T20:56:51Z",
+  "generated_at": "2026-05-07T21:05:16Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 74,
-    "actionable": 39,
-    "watch": 0,
-    "risk": 35,
+    "active_events": 81,
+    "actionable": 43,
+    "watch": 1,
+    "risk": 37,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 32,
-      "back_to_back_travel": 28,
-      "signal_conflict": 13,
-      "travel_extreme": 13,
+      "back_to_back_travel": 31,
+      "signal_conflict": 14,
+      "travel_extreme": 16,
       "market_uncertain": 27
     },
     "by_quality": {
-      "actionable": 39,
-      "risk": 35
+      "actionable": 43,
+      "risk": 37,
+      "watch": 1
     }
   },
   "active_actionable": [
@@ -92,7 +93,7 @@
       "team": "Colorado Rockies",
       "side": "away",
       "strength": 1.0,
-      "context": "1 match dans les 48h + 2535 km de voyage"
+      "context": "2 match dans les 48h + 2535 km de voyage"
     },
     {
       "event_id": "401856890",
@@ -129,6 +130,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 5-13"
+    },
+    {
+      "event_id": "401815265",
+      "date": "2026-05-09T01:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Arizona Diamondbacks",
+      "away": "New York Mets",
+      "match": "Arizona Diamondbacks - New York Mets",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "New York Mets",
+      "side": "away",
+      "strength": 1.0,
+      "context": "1 match dans les 48h + 3457 km de voyage"
     },
     {
       "event_id": "401815267",
@@ -219,6 +238,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 5-13"
+    },
+    {
+      "event_id": "401815280",
+      "date": "2026-05-09T23:15Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Arizona Diamondbacks",
+      "away": "New York Mets",
+      "match": "Arizona Diamondbacks - New York Mets",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "New York Mets",
+      "side": "away",
+      "strength": 1.0,
+      "context": "1 match dans les 48h + 3457 km de voyage"
     },
     {
       "event_id": "401815282",
@@ -327,6 +364,24 @@
       "side": "away",
       "strength": 1.0,
       "context": "2 match dans les 48h + 3100 km de voyage"
+    },
+    {
+      "event_id": "401815295",
+      "date": "2026-05-10T20:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Arizona Diamondbacks",
+      "away": "New York Mets",
+      "match": "Arizona Diamondbacks - New York Mets",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "New York Mets",
+      "side": "away",
+      "strength": 1.0,
+      "context": "2 match dans les 48h + 3457 km de voyage"
     },
     {
       "event_id": "401815297",
@@ -707,6 +762,24 @@
       "context": "1 match dans les 48h + 1135 km de voyage"
     },
     {
+      "event_id": "401815272",
+      "date": "2026-05-09T22:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Cleveland Guardians",
+      "away": "Minnesota Twins",
+      "match": "Cleveland Guardians - Minnesota Twins",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Minnesota Twins",
+      "side": "away",
+      "strength": 0.733,
+      "context": "1 match dans les 48h + 1015 km de voyage"
+    },
+    {
       "event_id": "401815264",
       "date": "2026-05-09T02:10Z",
       "sport": "baseball",
@@ -725,26 +798,27 @@
       "context": "Deplacement estime 3100 km, decalage ~2.3h"
     }
   ],
-  "active_watch": [],
-  "active_risk": [
+  "active_watch": [
     {
-      "event_id": "401815272",
-      "date": "2026-05-09T22:10Z",
+      "event_id": "401815257",
+      "date": "2026-05-08T23:15Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
       "home": "Cleveland Guardians",
       "away": "Minnesota Twins",
       "match": "Cleveland Guardians - Minnesota Twins",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "signal_conflict",
-      "direction": "abstain",
-      "team": null,
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Minnesota Twins",
       "side": null,
-      "strength": 1.0,
-      "context": "Signaux opposes: Cleveland Guardians fade 1.15, Minnesota Twins fade 1.48 -> prudence"
-    },
+      "strength": 0.6,
+      "context": "Absences severes 3-6"
+    }
+  ],
+  "active_risk": [
     {
       "event_id": "747320",
       "date": "2026-05-09T11:00Z",
@@ -1232,24 +1306,6 @@
       "context": "marge bookmaker anormale 18.8%"
     },
     {
-      "event_id": "401815257",
-      "date": "2026-05-08T23:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Cleveland Guardians",
-      "away": "Minnesota Twins",
-      "match": "Cleveland Guardians - Minnesota Twins",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "signal_conflict",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.785,
-      "context": "Signaux opposes: Cleveland Guardians fade 1.10, Minnesota Twins fade 0.90 -> prudence"
-    },
-    {
       "event_id": "401815247",
       "date": "2026-05-07T23:00Z",
       "sport": "baseball",
@@ -1284,6 +1340,78 @@
       "side": null,
       "strength": 0.488,
       "context": "Signaux opposes: Cleveland Cavaliers fade 0.75, Detroit Pistons fade 0.75 -> prudence"
+    },
+    {
+      "event_id": "401871163",
+      "date": "2026-05-12T04:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "New York Knicks",
+      "away": "Philadelphia 76ers",
+      "match": "New York Knicks - Philadelphia 76ers",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.488,
+      "context": "Signaux opposes: New York Knicks fade 0.75, Philadelphia 76ers fade 0.75 -> prudence"
+    },
+    {
+      "event_id": "401871407",
+      "date": "2026-05-12T23:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Montreal Canadiens",
+      "away": "Buffalo Sabres",
+      "match": "Montreal Canadiens - Buffalo Sabres",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.488,
+      "context": "Signaux opposes: Montreal Canadiens fade 0.75, Buffalo Sabres fade 0.75 -> prudence"
+    },
+    {
+      "event_id": "401871427",
+      "date": "2026-05-13T01:30Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Vegas Golden Knights",
+      "away": "Anaheim Ducks",
+      "match": "Vegas Golden Knights - Anaheim Ducks",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.488,
+      "context": "Signaux opposes: Vegas Golden Knights fade 0.75, Anaheim Ducks fade 0.75 -> prudence"
+    },
+    {
+      "event_id": "401871156",
+      "date": "2026-05-12T04:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "San Antonio Spurs",
+      "away": "Minnesota Timberwolves",
+      "match": "San Antonio Spurs - Minnesota Timberwolves",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.45,
+      "context": "Signaux opposes: San Antonio Spurs fade 0.60, Minnesota Timberwolves fade 0.60 -> prudence"
     },
     {
       "event_id": "401871337",
