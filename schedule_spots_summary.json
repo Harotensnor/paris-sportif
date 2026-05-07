@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-07T20:48:03Z",
+  "generated_at": "2026-05-07T20:51:55Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -2205,11 +2205,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.282,
-        "away_score": -1.559,
-        "home_fade": 0.3,
+        "home_score": -0.118,
+        "away_score": -1.419,
+        "home_fade": 0.7,
         "away_fade": 1.664,
-        "reason": "Direction nette: Boston Red Sox (+0.28)",
+        "reason": "Direction nette: Boston Red Sox (-0.12)",
         "detail": [
           {
             "side": "home",
@@ -2222,6 +2222,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.3
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
           },
           {
             "side": "away",
@@ -2273,11 +2279,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.115,
-        "away_score": -1.834,
-        "home_fade": 0.6,
+        "home_score": -0.285,
+        "away_score": -1.694,
+        "home_fade": 1.0,
         "away_fade": 2.044,
-        "reason": "Direction nette: Boston Red Sox (+0.12)",
+        "reason": "Direction nette: Boston Red Sox (-0.28)",
         "detail": [
           {
             "side": "home",
@@ -2290,6 +2296,12 @@
             "type": "schedule_congestion",
             "direction": "fade",
             "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
           },
           {
             "side": "away",
@@ -2997,13 +3009,13 @@
         "Deplacement estime 2513 km, decalage ~1.8h"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "away",
+        "status": "mixed",
+        "net_side": null,
         "home_score": -1.029,
-        "away_score": -0.468,
+        "away_score": 0.322,
         "home_fade": 1.36,
         "away_fade": 0.944,
-        "reason": "Direction nette: St. Louis Cardinals (-0.47)",
+        "reason": "Signaux mitigés: avantage net trop faible (San Diego Padres -1.03, St. Louis Cardinals +0.32)",
         "detail": [
           {
             "side": "home",
@@ -3022,6 +3034,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.79
           },
           {
             "side": "away",
@@ -3397,11 +3415,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.408,
-        "away_score": -1.542,
-        "home_fade": 0.15,
+        "home_score": 0.008,
+        "away_score": -1.402,
+        "home_fade": 0.55,
         "away_fade": 1.594,
-        "reason": "Direction nette: Boston Red Sox (+0.41)",
+        "reason": "Direction nette: Boston Red Sox (+0.01)",
         "detail": [
           {
             "side": "home",
@@ -3414,6 +3432,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
           },
           {
             "side": "away",
@@ -3527,13 +3551,13 @@
         "Deplacement estime 1928 km, decalage ~0.8h"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.077,
-        "away_score": -0.682,
-        "home_fade": 0.36,
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.477,
+        "away_score": -0.542,
+        "home_fade": 0.76,
         "away_fade": 0.808,
-        "reason": "Direction nette: Boston Red Sox (-0.08)",
+        "reason": "Signaux opposes: Boston Red Sox fade 0.76, Tampa Bay Rays fade 0.81 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -3546,6 +3570,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.36
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
           },
           {
             "side": "away",
