@@ -1770,3 +1770,8 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Light theme now updates the v36 dashboard surface tokens instead of leaving Accueil visually black.
 - V5 Bayesian priors now fall back team -> league -> sport and can drive football Poisson when raw xG is absent.
 - Locked by model-v5-priors plus Chromium desktop shard 2/3 in CI-like single-worker mode.
+
+### v37.135 — Mobile discovery modal guard
+- Local discovery cards are now removed whenever the detail modal opens, preventing stacked overlays on mobile.
+- Stabilizes the bottom-sheet drag flow without hiding the actual gesture test behind retry noise.
+- Locked by mobile-bottom-sheet and mobile Chromium shard 2/3 in CI-like single-worker mode.

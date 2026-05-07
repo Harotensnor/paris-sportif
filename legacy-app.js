@@ -13574,17 +13574,31 @@ if ((handle || head) && !sheet.dataset.dragWired) {
 let startY = 0;
 let currentY = 0;
 let dragging = false;
+const stopWindowDragListeners = () => {
+window.removeEventListener('touchmove', onMove);
+window.removeEventListener('touchend', onEnd);
+window.removeEventListener('touchcancel', onEnd);
+window.removeEventListener('mousemove', onMove);
+window.removeEventListener('mouseup', onEnd);
+};
 const onStart = (e) => {
 const target = e.target;
 if (target && target.closest && target.closest('button, a, input, [role="button"]')) {
 dragging = false;
 return;
 }
+if (!e.touches && e.button != null && e.button !== 0) return;
 const t = e.touches ? e.touches[0] : e;
 startY = t.clientY;
 currentY = 0;
 dragging = true;
 sheet.style.transition = 'none';
+window.addEventListener('touchmove', onMove, { passive: false });
+window.addEventListener('touchend', onEnd, { passive: true });
+window.addEventListener('touchcancel', onEnd, { passive: true });
+window.addEventListener('mousemove', onMove);
+window.addEventListener('mouseup', onEnd);
+try { if (!e.touches && e.cancelable) e.preventDefault(); } catch(err) { swallowError(err); }
 };
 const onMove = (e) => {
 if (!dragging) return;
@@ -13596,10 +13610,15 @@ const elastic = dy < 0 ? dy * 0.35 : dy;
 sheet.style.transform = `translateY(${elastic}px)`;
 };
 const onEnd = (e) => {
-if (!dragging) return;
+if (!dragging) {
+stopWindowDragListeners();
+return;
+}
 dragging = false;
+stopWindowDragListeners();
 const endTouch = e && e.changedTouches && e.changedTouches[0];
 if (endTouch && currentY === 0) currentY = endTouch.clientY - startY;
+if (!endTouch && e && Number.isFinite(e.clientY) && currentY === 0) currentY = e.clientY - startY;
 sheet.style.transition = 'transform 200ms cubic-bezier(.32,.72,0,1)';
 const closeDistance = sheet.dataset.sheetSnap === '50' ? 92 : Math.min(220, window.innerHeight * 0.24);
 if (currentY > closeDistance) {
@@ -13634,6 +13653,7 @@ dragZone.addEventListener('touchstart', onStart, { passive: true });
 dragZone.addEventListener('touchmove', onMove, { passive: false });
 dragZone.addEventListener('touchend', onEnd, { passive: true });
 dragZone.addEventListener('touchcancel', onEnd, { passive: true });
+dragZone.addEventListener('mousedown', onStart);
 sheet.dataset.dragWired = '1';
 }
 }
