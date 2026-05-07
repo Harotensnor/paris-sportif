@@ -1780,3 +1780,8 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Synced the branch with the latest cron data from main without replacing the v37 runtime shell.
 - Kept generated health/night truth from prod and restamped script hashes plus service-worker cache.
 - Locked by syntax, asset hash, drift, bundle, day-filter and nav-stability checks.
+
+### v37.137 — Backtest workflow model path
+- Backtest PR now triggers on legacy-app.js and calibration sidecars, not only the thin app.js shell.
+- Main comparison now checks out legacy-app.js too, so PR and main models are actually distinct.
+- Locked by audit_qa_workflows plus a local limited backtest smoke.

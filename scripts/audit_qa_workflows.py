@@ -81,6 +81,10 @@ def main() -> int:
         findings.append(".github/workflows/backtest-pr.yml missing")
     else:
         for needle in (
+            "'legacy-app.js'",
+            "'prob_calibration.json'",
+            "'calibration_method.json'",
+            "git checkout origin/main -- legacy-app.js app.js",
             "MIN_BACKTEST_N",
             "pr_n=",
             "main_n=",

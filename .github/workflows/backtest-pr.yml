@@ -5,14 +5,21 @@ name: backtest-on-pr
 # le ROI. Fail si ROI baisse de plus de 2pt vs main → catch les
 # régressions silencieuses du modèle avant qu'elles ne mergent.
 #
-# Ne tourne QUE sur PR qui touchent app.js (le modèle vit dans l'IIFE
-# d'app.js, lu via model_loader.py). Évite de tourner sur les PR doc/
-# CSS qui ne peuvent pas affecter predictMatch.
+# Ne tourne QUE sur PR qui touchent le runtime modèle (legacy-app.js depuis
+# le split v37, app.js pour compat) ou les scripts/sidecars de backtest.
+# Évite de tourner sur les PR doc/CSS qui ne peuvent pas affecter predictMatch.
 
 on:
   pull_request:
     paths:
+      - 'legacy-app.js'
       - 'app.js'
+      - 'prob_calibration.json'
+      - 'tier_calibration.json'
+      - 'calibration_method.json'
+      - 'calibration_method.js'
+      - 'lightgbm_weights.js'
+      - 'lightgbm_weights.json'
       - 'scripts/backtest_v2.py'
       - 'scripts/model_loader.py'
       - '.github/workflows/backtest-pr.yml'
@@ -59,7 +66,7 @@ jobs:
       - name: Run backtest on main
         id: main_backtest
         run: |
-          git checkout origin/main -- app.js scripts/backtest_v2.py scripts/model_loader.py 2>/dev/null || true
+          git checkout origin/main -- legacy-app.js app.js scripts/backtest_v2.py scripts/model_loader.py prob_calibration.json tier_calibration.json calibration_method.json calibration_method.js lightgbm_weights.js lightgbm_weights.json 2>/dev/null || true
           python3 scripts/backtest_v2.py > /tmp/backtest_main.log 2>&1 || {
             echo "Main backtest failed — assume neutral"
             echo "main_roi=0" >> $GITHUB_OUTPUT
