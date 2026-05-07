@@ -1674,3 +1674,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix: remove 20 dead helper declarations while keeping the documented `kellyStake` API untouched.
 - Verrou: `scripts/audit_legacy_dead_helpers.py` wired into QA gate + e2e drift.
 - Chiffres: legacy bundle 1698.4 KB -> 1692.6 KB, footer/SW v37.120.
+
+## Sprint v37.121 — AUTO 10/10 conflict marker gate
+- Symptom: cron resyncs can leave conflict markers that are easy to miss before a manual push.
+- Cause: `check_no_conflict_markers.py` ran in e2e drift but not in the fast local QA gate.
+- Fix: add the conflict marker scan to `qa_gate_report.py` and its manifest audit.
+- Verrou: `check_no_conflict_markers.py` now runs locally and in CI.
+- Chiffres: 54/54 pytest, 45/45 QA gates, 925 files scanned, footer/SW v37.121.

@@ -89,6 +89,7 @@ def _checks() -> list[tuple[str, list[str]]]:
         ("syntax legacy-app.js", [node, "--check", "legacy-app.js"]),
         ("syntax src/qa-runtime.js", [node, "--check", "src/qa-runtime.js"]),
         ("pytest", [py, "-m", "pytest", "tests/", "-q"]),
+        ("check_no_conflict_markers.py", [py, "scripts/check_no_conflict_markers.py"]),
     ]
     checks.extend((Path(audit).name, [py, audit]) for audit in audits)
     return checks

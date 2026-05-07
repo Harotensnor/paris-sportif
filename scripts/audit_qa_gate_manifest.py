@@ -8,6 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 GATE = ROOT / "scripts" / "qa_gate_report.py"
 REQUIRED = [
     "scripts/check_pipeline_drift.py",
+    "scripts/check_no_conflict_markers.py",
     "scripts/check_bundle_size.py",
     "scripts/audit_data_truth.py",
     "scripts/audit_qa_runtime.py",
