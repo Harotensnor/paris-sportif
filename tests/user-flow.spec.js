@@ -31,7 +31,7 @@ test('Big Bet conversion path opens modal, tracks Winamax click and records bet'
   page.on('popup', popup => popup.close().catch(() => {}));
 
   await page.goto('/pronostics.html#dashboard');
-  await page.waitForFunction(() => document.querySelector('[data-big-detail]') || window.PRONOSTICS_DATA, null, { timeout: 12000 });
+  await page.waitForSelector('[data-big-detail]:visible', { timeout: 15000 });
   const detailCta = page.locator('[data-big-detail]:visible').first();
   await expect(detailCta).toBeVisible();
   await detailCta.click();

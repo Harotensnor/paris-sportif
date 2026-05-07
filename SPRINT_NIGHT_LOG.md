@@ -1845,3 +1845,8 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Merged the latest main cron tick after GitHub marked the PR dirty again.
 - Kept the QA runtime and bundle cleanup structure, took fresh health/night metrics from main, then restamped assets and cache.
 - Preserved the fresh Winamax/data sidecars while keeping v37.148 runtime behavior intact.
+
+### v37.150 — E2E timing hardening
+- Reproduced the local desktop Playwright failure where the Big Bet flow asserted before the dashboard CTA finished rendering under parallel load.
+- Changed the test to wait for the visible CTA itself and refreshed the topbar snapshot after the intentional health-control addition.
+- Re-ran the full chromium desktop suite: 254 passed, 17 skipped, 0 failed.
