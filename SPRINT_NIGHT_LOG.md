@@ -1688,3 +1688,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix: add pytest coverage for swapped tennis names and ambiguous same-name no-op cases.
 - Verrou: `tests/test_data_pipeline_idempotent.py`.
 - Chiffres: 56/56 pytest, 45/45 QA gates, footer/SW v37.122.
+
+## Sprint v37.123 — AUTO 10/10 cron data resync
+- Symptom: branch drifted behind fresh cron data while local QA locks were ahead.
+- Cause: `origin/main` updated data sidecars, health metrics, and asset hashes during the sprint.
+- Fix: merge fresh data/health, preserve QA runtime ordering, restamp assets and SW cache.
+- Verrou: conflict-marker QA gate plus day/nav/keyboard/console probes after merge.
+- Chiffres: 56/56 pytest, 45/45 QA gates, 41/41 page probes, 32/32 route loads clean.
