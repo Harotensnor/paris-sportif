@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-07T03:47:07Z",
+  "generated_at": "2026-05-07T03:52:44Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 77,
-    "actionable": 25,
-    "watch": 4,
+    "active_events": 87,
+    "actionable": 27,
+    "watch": 12,
     "risk": 48,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 17,
       "travel_extreme": 7,
       "back_to_back_travel": 16,
-      "signal_conflict": 5,
-      "market_uncertain": 46,
-      "market_move": 15
+      "market_move": 26,
+      "signal_conflict": 8,
+      "market_uncertain": 46
     },
     "by_quality": {
-      "actionable": 25,
-      "watch": 4,
+      "actionable": 27,
+      "watch": 12,
       "risk": 48
     }
   },
@@ -148,7 +148,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 2.90 -> 1.66 (+42.8%)"
+      "context": "Cote home: 2.90 -> 1.56 (+46.2%)"
     },
     {
       "event_id": "401815267",
@@ -220,7 +220,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 2.90 -> 1.66 (+42.8%)"
+      "context": "Cote home: 2.90 -> 1.56 (+46.2%)"
     },
     {
       "event_id": "401871427",
@@ -238,7 +238,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 1.96 -> 4.70 (-139.8%)"
+      "context": "Cote home: 1.96 -> 5.70 (-190.8%)"
     },
     {
       "event_id": "401871428",
@@ -256,7 +256,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 2.90 -> 1.66 (+42.8%)"
+      "context": "Cote home: 2.90 -> 1.56 (+46.2%)"
     },
     {
       "event_id": "401815273",
@@ -473,9 +473,99 @@
       "side": "away",
       "strength": 0.757,
       "context": "1 match dans les 48h + 1135 km de voyage"
+    },
+    {
+      "event_id": "401865526",
+      "date": "2026-05-08T02:00Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Atlético Junior",
+      "away": "Cerro Porteño",
+      "match": "Atlético Junior - Cerro Porteño",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.731,
+      "context": "Cote away: 3.80 -> 3.30 (+13.2%)"
+    },
+    {
+      "event_id": "401865517",
+      "date": "2026-05-08T00:30Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Independiente Medellín",
+      "away": "Flamengo",
+      "match": "Independiente Medellín - Flamengo",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.725,
+      "context": "Cote home: 4.60 -> 4.00 (+13.0%)"
     }
   ],
   "active_watch": [
+    {
+      "event_id": "401865527",
+      "date": "2026-05-07T22:00Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Mirassol",
+      "away": "Liga de Quito",
+      "match": "Mirassol - Liga de Quito",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.648,
+      "context": "Cote away: 6.00 -> 5.30 (+11.7%)"
+    },
+    {
+      "event_id": "401865426",
+      "date": "2026-05-08T00:30Z",
+      "sport": "football",
+      "league_code": "conmebol.sudamericana",
+      "league_name": "Copa Sudamericana",
+      "home": "Carabobo",
+      "away": "River Plate",
+      "match": "Carabobo - River Plate",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.631,
+      "context": "Cote home: 4.40 -> 3.90 (+11.4%)"
+    },
+    {
+      "event_id": "401865521",
+      "date": "2026-05-08T00:00Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Coquimbo Unido",
+      "away": "Universitario",
+      "match": "Coquimbo Unido - Universitario",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.609,
+      "context": "Cote away: 3.65 -> 3.25 (+11.0%)"
+    },
     {
       "event_id": "401815249",
       "date": "2026-05-07T18:20Z",
@@ -547,6 +637,96 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 3-0"
+    },
+    {
+      "event_id": "401862909",
+      "date": "2026-05-07T19:00Z",
+      "sport": "football",
+      "league_code": "europaleague",
+      "league_name": "Europa League",
+      "home": "SC Freiburg",
+      "away": "Braga",
+      "match": "SC Freiburg - Braga",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.556,
+      "context": "Cote away: 5.00 -> 4.50 (+10.0%)"
+    },
+    {
+      "event_id": "401865433",
+      "date": "2026-05-07T22:00Z",
+      "sport": "football",
+      "league_code": "conmebol.sudamericana",
+      "league_name": "Copa Sudamericana",
+      "home": "O'Higgins",
+      "away": "São Paulo",
+      "match": "O'Higgins - São Paulo",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.538,
+      "context": "Cote home: 3.10 -> 2.80 (+9.7%)"
+    },
+    {
+      "event_id": "401865434",
+      "date": "2026-05-07T22:00Z",
+      "sport": "football",
+      "league_code": "conmebol.sudamericana",
+      "league_name": "Copa Sudamericana",
+      "home": "Boston River",
+      "away": "Millonarios",
+      "match": "Boston River - Millonarios",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.517,
+      "context": "Cote home: 4.30 -> 3.90 (+9.3%)"
+    },
+    {
+      "event_id": "401862910",
+      "date": "2026-05-07T19:00Z",
+      "sport": "football",
+      "league_code": "europaleague",
+      "league_name": "Europa League",
+      "home": "Aston Villa",
+      "away": "Nottingham Forest",
+      "match": "Aston Villa - Nottingham Forest",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.473,
+      "context": "Cote away: 4.70 -> 4.30 (+8.5%)"
+    },
+    {
+      "event_id": "401865528",
+      "date": "2026-05-07T22:00Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Platense",
+      "away": "Peñarol",
+      "match": "Platense - Peñarol",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.463,
+      "context": "Cote away: 3.60 -> 3.30 (+8.3%)"
     }
   ],
   "active_risk": [
