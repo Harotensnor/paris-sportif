@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-07T22:14:36Z",
+  "generated_at": "2026-05-07T22:18:54Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -776,11 +776,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -1.548,
-        "away_score": -0.467,
-        "home_fade": 1.95,
-        "away_fade": 1.15,
-        "reason": "Direction nette: Carolina Hurricanes (-0.47)",
+        "home_score": -0.898,
+        "away_score": 0.183,
+        "home_fade": 0.95,
+        "away_fade": 0.15,
+        "reason": "Direction nette: Carolina Hurricanes (+0.18)",
         "detail": [
           {
             "side": "home",
@@ -799,18 +799,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
           }
         ]
       }
@@ -2086,11 +2074,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.64,
-        "away_score": -1.429,
-        "home_fade": 1.3,
+        "home_score": -0.44,
+        "away_score": -1.499,
+        "home_fade": 1.1,
         "away_fade": 1.884,
-        "reason": "Direction nette: San Diego Padres (-0.64)",
+        "reason": "Direction nette: San Diego Padres (-0.44)",
         "detail": [
           {
             "side": "home",
@@ -2108,7 +2096,7 @@
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 1.0
+            "strength": 0.8
           },
           {
             "side": "away",
@@ -2227,11 +2215,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.835,
-        "away_score": -1.624,
-        "home_fade": 1.6,
+        "home_score": -0.635,
+        "away_score": -1.694,
+        "home_fade": 1.4,
         "away_fade": 2.184,
-        "reason": "Direction nette: San Diego Padres (-0.84)",
+        "reason": "Direction nette: San Diego Padres (-0.64)",
         "detail": [
           {
             "side": "home",
@@ -2249,7 +2237,7 @@
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 1.0
+            "strength": 0.8
           },
           {
             "side": "away",
@@ -3028,11 +3016,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.543,
-        "away_score": -1.332,
-        "home_fade": 1.15,
+        "home_score": -0.343,
+        "away_score": -1.402,
+        "home_fade": 0.95,
         "away_fade": 1.734,
-        "reason": "Direction nette: San Diego Padres (-0.54)",
+        "reason": "Direction nette: San Diego Padres (-0.34)",
         "detail": [
           {
             "side": "home",
@@ -3050,7 +3038,7 @@
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 1.0
+            "strength": 0.8
           },
           {
             "side": "away",
@@ -3098,13 +3086,13 @@
         "Deplacement estime 2513 km, decalage ~1.8h"
       ],
       "global_resolution": {
-        "status": "mixed",
+        "status": "abstain",
         "net_side": null,
-        "home_score": -1.029,
-        "away_score": 0.322,
-        "home_fade": 1.36,
+        "home_score": -0.829,
+        "away_score": -0.538,
+        "home_fade": 1.16,
         "away_fade": 0.944,
-        "reason": "Signaux mitigés: avantage net trop faible (San Diego Padres -1.03, St. Louis Cardinals +0.32)",
+        "reason": "Signaux opposes: San Diego Padres fade 1.16, St. Louis Cardinals fade 0.94 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -3122,13 +3110,7 @@
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.79
+            "strength": 0.8
           },
           {
             "side": "away",
