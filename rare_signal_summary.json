@@ -1,26 +1,26 @@
 {
-  "generated_at": "2026-05-07T22:52:35Z",
+  "generated_at": "2026-05-07T22:55:42Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 73,
-    "actionable": 38,
-    "watch": 3,
+    "active_events": 77,
+    "actionable": 40,
+    "watch": 5,
     "risk": 32,
     "expired_sample": 0,
     "by_type": {
       "signal_conflict": 10,
+      "market_move": 8,
       "injury_imbalance": 29,
       "market_uncertain": 26,
-      "market_move": 3,
       "travel_extreme": 16,
       "back_to_back_travel": 28
     },
     "by_quality": {
       "risk": 32,
-      "actionable": 38,
-      "watch": 3
+      "actionable": 40,
+      "watch": 5
     }
   },
   "active_actionable": [
@@ -707,9 +707,63 @@
       "side": "away",
       "strength": 0.721,
       "context": "Deplacement estime 3100 km, decalage ~2.3h"
+    },
+    {
+      "event_id": "401865426",
+      "date": "2026-05-08T00:30Z",
+      "sport": "football",
+      "league_code": "conmebol.sudamericana",
+      "league_name": "Copa Sudamericana",
+      "home": "Carabobo",
+      "away": "River Plate",
+      "match": "Carabobo - River Plate",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.678,
+      "context": "Cote home: 4.10 -> 3.60 (+12.2%)"
+    },
+    {
+      "event_id": "401865521",
+      "date": "2026-05-08T00:00Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Coquimbo Unido",
+      "away": "Universitario",
+      "match": "Coquimbo Unido - Universitario",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.663,
+      "context": "Cote away: 3.35 -> 2.95 (+11.9%)"
     }
   ],
   "active_watch": [
+    {
+      "event_id": "401865517",
+      "date": "2026-05-08T00:30Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Independiente Medellín",
+      "away": "Flamengo",
+      "match": "Independiente Medellín - Flamengo",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.646,
+      "context": "Cote home: 4.30 -> 3.80 (+11.6%)"
+    },
     {
       "event_id": "401856890",
       "date": "2026-05-08T23:30Z",
@@ -763,6 +817,24 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 3-6"
+    },
+    {
+      "event_id": "401865526",
+      "date": "2026-05-08T02:00Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Atlético Junior",
+      "away": "Cerro Porteño",
+      "match": "Atlético Junior - Cerro Porteño",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.57,
+      "context": "Cote away: 3.90 -> 3.50 (+10.3%)"
     }
   ],
   "active_risk": [
