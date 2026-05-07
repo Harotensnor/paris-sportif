@@ -1790,3 +1790,8 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Merged the latest refresh-data tick from main after the backtest workflow fix.
 - Preserved the v37 runtime shell, restamped assets and bumped the service-worker cache.
 - Locked by syntax, asset hash, drift and bundle checks.
+
+### v37.139 — QA data truth gate
+- Regenerated night metrics and health from the current data.js snapshot so QA reads one freshness truth.
+- Normalized sw.js to LF endings after conflict resolution to keep bundle checks deterministic.
+- Locked by qa_gate_report, audit_data_truth and audit_line_endings.
