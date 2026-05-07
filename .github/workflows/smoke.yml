@@ -34,6 +34,7 @@ on:
       - 'scripts/probe_theme_cycle.js'
       - 'scripts/probe_pull_to_refresh.js'
       - 'scripts/probe_cmdk_search.js'
+      - 'scripts/probe_keyboard_navigation.js'
       - 'scripts/probe_notifications_optin.js'
       - 'scripts/probe_service_worker_cache.js'
       - 'scripts/probe_strategies_outsider.js'
@@ -73,6 +74,7 @@ on:
       - 'scripts/probe_theme_cycle.js'
       - 'scripts/probe_pull_to_refresh.js'
       - 'scripts/probe_cmdk_search.js'
+      - 'scripts/probe_keyboard_navigation.js'
       - 'scripts/probe_notifications_optin.js'
       - 'scripts/probe_service_worker_cache.js'
       - 'scripts/probe_strategies_outsider.js'
@@ -186,6 +188,11 @@ jobs:
         # listbox: Ctrl/Cmd-K focus, results, highlight, arrow/enter
         # activation and Escape close.
         run: node scripts/probe_cmdk_search.js
+
+      - name: Run keyboard navigation probe
+        # Locks no-mouse access across global nav, Tous row focus,
+        # detail modal open/close and the command palette.
+        run: node scripts/probe_keyboard_navigation.js
 
       - name: Run notifications opt-in probe
         # Locks the privacy rule: Notification.requestPermission() is

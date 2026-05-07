@@ -1625,3 +1625,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix: align SPA expectations with current router, keep simulator under Profil/Plus, restore stable sidebar on dashboard, and harden midnight data truth.
 - Verrou: `spa-pages-regression.spec.js`, `ux-overhaul.spec.js`, `team-priors.spec.js`, `test_audit_data_truth.py`, `probe_nav_stability.js`.
 - Chiffres: 54/54 pytest, 40/40 QA gates, 11/11 local probes, footer/SW v37.113.
+
+## Sprint v37.114 — AUTO 10/10 keyboard navigation lock
+- Symptom: keyboard-only access had no dedicated CI guard across nav, Tous rows, modal, and command palette.
+- Cause: mouse probes covered the flows, but Tab/Enter/Escape regressions could pass silently.
+- Fix: add a Playwright no-mouse probe and wire it into smoke path filters and execution.
+- Verrou: `scripts/probe_keyboard_navigation.js` in `.github/workflows/smoke.yml`.
+- Chiffres: 54/54 pytest, 40/40 QA gates, 12/12 probes critiques, bundle legacy 1732.9 KB, footer/SW v37.114.
