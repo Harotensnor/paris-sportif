@@ -1,25 +1,26 @@
 {
-  "generated_at": "2026-05-07T03:06:44Z",
+  "generated_at": "2026-05-07T03:10:41Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 75,
+    "active_events": 78,
     "actionable": 20,
     "watch": 5,
-    "risk": 50,
+    "risk": 53,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 17,
       "travel_extreme": 7,
       "back_to_back_travel": 16,
-      "signal_conflict": 8,
-      "market_uncertain": 45
+      "market_move": 1,
+      "signal_conflict": 9,
+      "market_uncertain": 49
     },
     "by_quality": {
       "actionable": 20,
       "watch": 5,
-      "risk": 50
+      "risk": 53
     }
   },
   "active_actionable": [
@@ -222,6 +223,24 @@
       "context": "2 match dans les 48h + 1928 km de voyage"
     },
     {
+      "event_id": "401815246",
+      "date": "2026-05-07T17:05Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Washington Nationals",
+      "away": "Minnesota Twins",
+      "match": "Washington Nationals - Minnesota Twins",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Minnesota Twins",
+      "side": "away",
+      "strength": 0.951,
+      "context": "4 match dans les 48h + 1504 km de voyage"
+    },
+    {
       "event_id": "401815258",
       "date": "2026-05-08T23:10Z",
       "sport": "baseball",
@@ -238,24 +257,6 @@
       "side": "away",
       "strength": 0.916,
       "context": "1 match dans les 48h + 1928 km de voyage"
-    },
-    {
-      "event_id": "401815246",
-      "date": "2026-05-07T17:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Washington Nationals",
-      "away": "Minnesota Twins",
-      "match": "Washington Nationals - Minnesota Twins",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Minnesota Twins",
-      "side": "away",
-      "strength": 0.911,
-      "context": "2 match dans les 48h + 1504 km de voyage"
     },
     {
       "event_id": "401871328",
@@ -308,8 +309,8 @@
       "direction": "fade",
       "team": "Cleveland Guardians",
       "side": "away",
-      "strength": 0.834,
-      "context": "2 match dans les 48h + 1118 km de voyage"
+      "strength": 0.874,
+      "context": "4 match dans les 48h + 1118 km de voyage"
     },
     {
       "event_id": "401856891",
@@ -494,6 +495,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 14.6%"
+    },
+    {
+      "event_id": "401871425",
+      "date": "2026-05-09T01:30Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Anaheim Ducks",
+      "away": "Vegas Golden Knights",
+      "match": "Anaheim Ducks - Vegas Golden Knights",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.4%"
     },
     {
       "event_id": "747320",
@@ -1090,6 +1109,24 @@
       "context": "marge bookmaker anormale 18.9%"
     },
     {
+      "event_id": "401871426",
+      "date": "2026-05-11T01:30Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Anaheim Ducks",
+      "away": "Vegas Golden Knights",
+      "match": "Anaheim Ducks - Vegas Golden Knights",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.4%"
+    },
+    {
       "event_id": "401842707",
       "date": "2026-05-11T17:00Z",
       "sport": "football",
@@ -1124,6 +1161,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 14.6%"
+    },
+    {
+      "event_id": "401871427",
+      "date": "2026-05-12T04:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Vegas Golden Knights",
+      "away": "Anaheim Ducks",
+      "match": "Vegas Golden Knights - Anaheim Ducks",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.4%"
     },
     {
       "event_id": "401866570",
@@ -1288,6 +1343,42 @@
       "context": "marge bookmaker anormale 14.6%"
     },
     {
+      "event_id": "401871428",
+      "date": "2026-05-14T04:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Anaheim Ducks",
+      "away": "Vegas Golden Knights",
+      "match": "Anaheim Ducks - Vegas Golden Knights",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.4%"
+    },
+    {
+      "event_id": "401815244",
+      "date": "2026-05-07T22:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Philadelphia Phillies",
+      "away": "Athletics",
+      "match": "Philadelphia Phillies - Athletics",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.52,
+      "context": "Signaux opposes: Philadelphia Phillies fade 0.80, Athletics fade 0.80 -> prudence"
+    },
+    {
       "event_id": "401871336",
       "date": "2026-05-12T00:00Z",
       "sport": "basketball",
@@ -1304,24 +1395,6 @@
       "side": null,
       "strength": 0.488,
       "context": "Signaux opposes: Cleveland Cavaliers fade 0.75, Detroit Pistons fade 0.75 -> prudence"
-    },
-    {
-      "event_id": "401871427",
-      "date": "2026-05-12T04:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Vegas Golden Knights",
-      "away": "Anaheim Ducks",
-      "match": "Vegas Golden Knights - Anaheim Ducks",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "signal_conflict",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.488,
-      "context": "Signaux opposes: Vegas Golden Knights fade 0.75, Anaheim Ducks fade 0.75 -> prudence"
     },
     {
       "event_id": "401871156",
@@ -1358,24 +1431,6 @@
       "side": null,
       "strength": 0.45,
       "context": "Signaux opposes: Detroit Pistons fade 0.60, Cleveland Cavaliers fade 0.60 -> prudence"
-    },
-    {
-      "event_id": "401871428",
-      "date": "2026-05-14T04:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Anaheim Ducks",
-      "away": "Vegas Golden Knights",
-      "match": "Anaheim Ducks - Vegas Golden Knights",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "signal_conflict",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.45,
-      "context": "Signaux opposes: Anaheim Ducks fade 0.60, Vegas Golden Knights fade 0.60 -> prudence"
     }
   ],
   "expired_sample": []
