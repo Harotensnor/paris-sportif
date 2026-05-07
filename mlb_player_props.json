@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-07T18:28:38Z",
+  "generated_at": "2026-05-07T18:32:22Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815249",
-      "kickoff": "2026-05-07T18:20Z",
-      "league": "MLB",
-      "match": "Cincinnati Reds at Chicago Cubs",
-      "home": "Chicago Cubs",
-      "away": "Cincinnati Reds",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Chicago Cubs",
-          "pitcher": "Shota Imanaga",
-          "label": "Shota Imanaga moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5809,
-          "fair_odds": 1.72,
-          "expected_strikeouts": 6.11,
-          "projected_ip": 5.87,
-          "inputs": {
-            "k9": 9.36,
-            "era": 2.4,
-            "whip": 0.85,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Chicago Cubs",
-          "pitcher": "Shota Imanaga",
-          "label": "Shota Imanaga ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6544,
-          "fair_odds": 1.53,
-          "expected_hr_allowed": 0.424,
-          "projected_ip": 5.87,
-          "inputs": {
-            "hr9": 0.65,
-            "era": 2.4,
-            "whip": 0.85
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Cincinnati Reds",
-          "pitcher": "Rhett Lowder",
-          "label": "Rhett Lowder plus de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "over",
-          "probability": 0.55,
-          "fair_odds": 1.82,
-          "expected_strikeouts": 3.69,
-          "projected_ip": 5.01,
-          "inputs": {
-            "k9": 6.62,
-            "era": 5.09,
-            "whip": 1.39,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Cincinnati Reds",
-          "pitcher": "Rhett Lowder",
-          "label": "Rhett Lowder ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.87,
-          "fair_odds": 1.15,
-          "expected_hr_allowed": 0.139,
-          "projected_ip": 5.01,
-          "inputs": {
-            "hr9": 0.25,
-            "era": 5.09,
-            "whip": 1.39
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401871498",
       "kickoff": "2026-05-07T19:10Z",
@@ -788,7 +706,7 @@
       ]
     }
   ],
-  "props": 38,
+  "props": 34,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
