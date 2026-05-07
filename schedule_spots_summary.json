@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-07T04:22:09Z",
+  "generated_at": "2026-05-07T04:26:18Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 53,
+    "active_events": 51,
     "expired_sample": 0,
     "by_type": {
       "schedule_congestion": 32,
       "travel_extreme": 15,
       "back_to_back_travel": 16,
-      "lookahead": 67
+      "lookahead": 63
     },
     "by_decision": {
-      "abstain": 28,
+      "abstain": 26,
       "lean_home": 21,
       "lean_away": 4
     },
     "lean_home": 21,
     "lean_away": 4,
-    "abstain": 28,
+    "abstain": 26,
     "monitor": 0
   },
   "active": [
@@ -449,13 +449,13 @@
         "3 matchs sur les 7 derniers jours"
       ],
       "global_resolution": {
-        "status": "mixed",
+        "status": "abstain",
         "net_side": null,
-        "home_score": 0.41,
-        "away_score": -1.39,
+        "home_score": -0.39,
+        "away_score": -0.39,
         "home_fade": 0.6,
-        "away_fade": 1.6,
-        "reason": "Signaux mitigés: avantage net trop faible (Anaheim Ducks +0.41, Vegas Golden Knights -1.39)",
+        "away_fade": 0.6,
+        "reason": "Signaux opposes: Anaheim Ducks fade 0.60, Vegas Golden Knights fade 0.60 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -468,18 +468,6 @@
             "type": "schedule_congestion",
             "direction": "fade",
             "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.45
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
           }
         ]
       }
@@ -516,10 +504,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.098,
-        "away_score": 0.375,
+        "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Nottingham Forest (+0.38)",
+        "reason": "Direction nette: Nottingham Forest (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -532,12 +520,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.473
           }
         ]
       }
@@ -625,11 +607,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -1.195,
-        "away_score": -0.499,
-        "home_fade": 1.56,
-        "away_fade": 1.045,
-        "reason": "Direction nette: Carolina Hurricanes (-0.50)",
+        "home_score": -0.698,
+        "away_score": 0.112,
+        "home_fade": 0.75,
+        "away_fade": 0.15,
+        "reason": "Direction nette: Carolina Hurricanes (+0.11)",
         "detail": [
           {
             "side": "home",
@@ -648,18 +630,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 0.81
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 0.895
           }
         ]
       }
@@ -775,70 +745,6 @@
       }
     },
     {
-      "event_id": "401871154",
-      "source_event_ids": [
-        "401871154"
-      ],
-      "kickoff": "2026-05-09T01:30Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Minnesota Timberwolves",
-      "away": "San Antonio Spurs",
-      "match": "Minnesota Timberwolves - San Antonio Spurs",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Minnesota Timberwolves 0.15, San Antonio Spurs 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -1.097,
-        "away_score": 0.929,
-        "home_fade": 1.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: San Antonio Spurs (+0.93)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.676
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401871425",
       "source_event_ids": [
         "401871425"
@@ -868,12 +774,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
-        "home_score": 0.703,
-        "away_score": -1.097,
+        "net_side": "away",
+        "home_score": -0.098,
+        "away_score": -0.098,
         "home_fade": 0.15,
-        "away_fade": 1.15,
-        "reason": "Direction nette: Anaheim Ducks (+0.70)",
+        "away_fade": 0.15,
+        "reason": "Direction nette: Vegas Golden Knights (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -886,18 +792,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.45
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
           }
         ]
       }
@@ -1279,70 +1173,6 @@
       }
     },
     {
-      "event_id": "401871155",
-      "source_event_ids": [
-        "401871155"
-      ],
-      "kickoff": "2026-05-10T23:30Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Minnesota Timberwolves",
-      "away": "San Antonio Spurs",
-      "match": "Minnesota Timberwolves - San Antonio Spurs",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Minnesota Timberwolves 0.15, San Antonio Spurs 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -1.097,
-        "away_score": 0.929,
-        "home_fade": 1.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: San Antonio Spurs (+0.93)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.676
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401871426",
       "source_event_ids": [
         "401871426"
@@ -1372,12 +1202,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
-        "home_score": 0.703,
-        "away_score": -1.097,
+        "net_side": "away",
+        "home_score": -0.098,
+        "away_score": -0.098,
         "home_fade": 0.15,
-        "away_fade": 1.15,
-        "reason": "Direction nette: Anaheim Ducks (+0.70)",
+        "away_fade": 0.15,
+        "reason": "Direction nette: Vegas Golden Knights (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -1390,18 +1220,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.45
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
           }
         ]
       }
@@ -1605,11 +1423,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -1.097,
-        "away_score": 0.703,
-        "home_fade": 1.15,
+        "home_score": -0.098,
+        "away_score": -0.098,
+        "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Anaheim Ducks (+0.70)",
+        "reason": "Direction nette: Anaheim Ducks (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -1622,18 +1440,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.45
           }
         ]
       }
@@ -2761,13 +2567,13 @@
         "2 match dans les 48h + 2632 km de voyage"
       ],
       "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
-        "home_score": -0.086,
-        "away_score": -1.262,
-        "home_fade": 1.0,
-        "away_fade": 2.612,
-        "reason": "Signaux mitigés: avantage net trop faible (Colorado Rockies -0.09, New York Mets -1.26)",
+        "status": "net",
+        "net_side": "home",
+        "home_score": 2.264,
+        "away_score": -3.612,
+        "home_fade": 0.0,
+        "away_fade": 3.612,
+        "reason": "Direction nette: Colorado Rockies (+2.26)",
         "detail": [
           {
             "side": "away",
@@ -2778,13 +2584,13 @@
           {
             "side": "home",
             "type": "market_move",
-            "direction": "drift",
+            "direction": "steam",
             "strength": 1.0
           },
           {
             "side": "away",
             "type": "market_move",
-            "direction": "steam",
+            "direction": "drift",
             "strength": 1.0
           },
           {
@@ -2998,22 +2804,16 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.15,
-        "away_score": 0.659,
+        "away_score": 0.052,
         "home_fade": 0.15,
         "away_fade": 0.0,
-        "reason": "Direction nette: Shakhtar Donetsk (+0.66)",
+        "reason": "Direction nette: Shakhtar Donetsk (+0.05)",
         "detail": [
           {
             "side": "home",
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.606
           }
         ]
       }
