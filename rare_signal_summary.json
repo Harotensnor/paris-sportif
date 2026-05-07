@@ -1,26 +1,26 @@
 {
-  "generated_at": "2026-05-07T00:23:01Z",
+  "generated_at": "2026-05-07T00:33:52Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 73,
-    "actionable": 20,
+    "active_events": 76,
+    "actionable": 24,
     "watch": 5,
-    "risk": 48,
+    "risk": 47,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 17,
       "travel_extreme": 7,
       "back_to_back_travel": 16,
-      "signal_conflict": 6,
-      "market_uncertain": 43,
-      "market_move": 4
+      "signal_conflict": 9,
+      "market_uncertain": 42,
+      "market_move": 16
     },
     "by_quality": {
-      "actionable": 20,
+      "actionable": 24,
       "watch": 5,
-      "risk": 48
+      "risk": 47
     }
   },
   "active_actionable": [
@@ -115,6 +115,24 @@
       "context": "Absences severes 8-3"
     },
     {
+      "event_id": "401871405",
+      "date": "2026-05-08T23:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Buffalo Sabres",
+      "away": "Montreal Canadiens",
+      "match": "Buffalo Sabres - Montreal Canadiens",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 1.52 -> 1.07 (+29.6%)"
+    },
+    {
       "event_id": "401856890",
       "date": "2026-05-08T23:30Z",
       "sport": "basketball",
@@ -185,6 +203,60 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 8-3"
+    },
+    {
+      "event_id": "401871406",
+      "date": "2026-05-10T23:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Montreal Canadiens",
+      "away": "Buffalo Sabres",
+      "match": "Montreal Canadiens - Buffalo Sabres",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 4.30 -> 26.00 (-504.7%)"
+    },
+    {
+      "event_id": "401871407",
+      "date": "2026-05-12T04:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Montreal Canadiens",
+      "away": "Buffalo Sabres",
+      "match": "Montreal Canadiens - Buffalo Sabres",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 4.30 -> 26.00 (-504.7%)"
+    },
+    {
+      "event_id": "401871408",
+      "date": "2026-05-14T04:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Buffalo Sabres",
+      "away": "Montreal Canadiens",
+      "match": "Buffalo Sabres - Montreal Canadiens",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 1.52 -> 1.07 (+29.6%)"
     },
     {
       "event_id": "401815273",
@@ -494,7 +566,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 15.9%"
+      "context": "marge bookmaker anormale 15.7%"
     },
     {
       "event_id": "747320",
@@ -1016,7 +1088,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 15.9%"
+      "context": "marge bookmaker anormale 15.7%"
     },
     {
       "event_id": "401870615",
@@ -1055,24 +1127,6 @@
       "context": "marge bookmaker anormale 18.9%"
     },
     {
-      "event_id": "401842707",
-      "date": "2026-05-11T17:00Z",
-      "sport": "football",
-      "league_code": "allsvenskan",
-      "league_name": "Allsvenskan",
-      "home": "IK Sirius",
-      "away": "Örgryte IS",
-      "match": "IK Sirius - Örgryte IS",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 19.0%"
-    },
-    {
       "event_id": "401871163",
       "date": "2026-05-12T04:00Z",
       "sport": "basketball",
@@ -1088,7 +1142,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 15.9%"
+      "context": "marge bookmaker anormale 15.7%"
     },
     {
       "event_id": "401866570",
@@ -1250,7 +1304,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 15.9%"
+      "context": "marge bookmaker anormale 15.7%"
     },
     {
       "event_id": "401815247",

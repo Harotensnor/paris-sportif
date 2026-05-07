@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-07T00:23:01Z",
+  "generated_at": "2026-05-07T00:33:52Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -339,13 +339,13 @@
         "3 matchs sur les 7 derniers jours"
       ],
       "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": 0.064,
-        "away_score": -0.39,
-        "home_fade": 0.6,
+        "status": "net",
+        "net_side": "away",
+        "home_score": -1.07,
+        "away_score": -0.152,
+        "home_fade": 1.28,
         "away_fade": 0.6,
-        "reason": "Signaux opposes: Philadelphia 76ers fade 0.60, New York Knicks fade 0.60 -> prudence",
+        "reason": "Direction nette: New York Knicks (-0.15)",
         "detail": [
           {
             "side": "home",
@@ -362,8 +362,8 @@
           {
             "side": "home",
             "type": "market_move",
-            "direction": "steam",
-            "strength": 0.454
+            "direction": "drift",
+            "strength": 0.68
           }
         ]
       }
@@ -397,13 +397,13 @@
         "3 matchs sur les 7 derniers jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.79,
-        "away_score": -0.25,
+        "status": "mixed",
+        "net_side": null,
+        "home_score": 0.56,
+        "away_score": -1.25,
         "home_fade": 1.0,
-        "away_fade": 0.6,
-        "reason": "Direction nette: Montreal Canadiens (-0.25)",
+        "away_fade": 1.6,
+        "reason": "Signaux mitigés: avantage net trop faible (Buffalo Sabres +0.56, Montreal Canadiens -1.25)",
         "detail": [
           {
             "side": "home",
@@ -422,6 +422,18 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
@@ -670,12 +682,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
-        "home_score": 0.356,
-        "away_score": -0.098,
-        "home_fade": 0.15,
+        "net_side": "away",
+        "home_score": -0.778,
+        "away_score": 0.141,
+        "home_fade": 0.83,
         "away_fade": 0.15,
-        "reason": "Direction nette: Philadelphia 76ers (+0.36)",
+        "reason": "Direction nette: New York Knicks (+0.14)",
         "detail": [
           {
             "side": "home",
@@ -692,8 +704,8 @@
           {
             "side": "home",
             "type": "market_move",
-            "direction": "steam",
-            "strength": 0.454
+            "direction": "drift",
+            "strength": 0.68
           }
         ]
       }
@@ -727,13 +739,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.498,
-        "away_score": 0.043,
+        "status": "mixed",
+        "net_side": null,
+        "home_score": 0.852,
+        "away_score": -0.957,
         "home_fade": 0.55,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Montreal Canadiens (+0.04)",
+        "away_fade": 1.15,
+        "reason": "Signaux mitigés: avantage net trop faible (Buffalo Sabres +0.85, Montreal Canadiens -0.96)",
         "detail": [
           {
             "side": "home",
@@ -752,6 +764,18 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
@@ -1156,12 +1180,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
-        "home_score": 0.356,
-        "away_score": -0.098,
-        "home_fade": 0.15,
+        "net_side": "away",
+        "home_score": -0.778,
+        "away_score": 0.141,
+        "home_fade": 0.83,
         "away_fade": 0.15,
-        "reason": "Direction nette: Philadelphia 76ers (+0.36)",
+        "reason": "Direction nette: New York Knicks (+0.14)",
         "detail": [
           {
             "side": "home",
@@ -1178,8 +1202,8 @@
           {
             "side": "home",
             "type": "market_move",
-            "direction": "steam",
-            "strength": 0.454
+            "direction": "drift",
+            "strength": 0.68
           }
         ]
       }
@@ -1213,13 +1237,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.043,
-        "away_score": -0.498,
-        "home_fade": 0.15,
+        "status": "mixed",
+        "net_side": null,
+        "home_score": -0.957,
+        "away_score": 0.852,
+        "home_fade": 1.15,
         "away_fade": 0.55,
-        "reason": "Direction nette: Montreal Canadiens (+0.04)",
+        "reason": "Signaux mitigés: avantage net trop faible (Montreal Canadiens -0.96, Buffalo Sabres +0.85)",
         "detail": [
           {
             "side": "home",
@@ -1238,6 +1262,18 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
           }
         ]
       }
@@ -1434,12 +1470,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": 0.356,
+        "net_side": "home",
+        "home_score": 0.141,
+        "away_score": -0.778,
         "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Philadelphia 76ers (+0.36)",
+        "away_fade": 0.83,
+        "reason": "Direction nette: New York Knicks (+0.14)",
         "detail": [
           {
             "side": "home",
@@ -1456,8 +1492,8 @@
           {
             "side": "away",
             "type": "market_move",
-            "direction": "steam",
-            "strength": 0.454
+            "direction": "drift",
+            "strength": 0.68
           }
         ]
       }
@@ -1491,13 +1527,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.043,
-        "away_score": -0.498,
-        "home_fade": 0.15,
+        "status": "mixed",
+        "net_side": null,
+        "home_score": -0.957,
+        "away_score": 0.852,
+        "home_fade": 1.15,
         "away_fade": 0.55,
-        "reason": "Direction nette: Montreal Canadiens (+0.04)",
+        "reason": "Signaux mitigés: avantage net trop faible (Montreal Canadiens -0.96, Buffalo Sabres +0.85)",
         "detail": [
           {
             "side": "home",
@@ -1516,6 +1552,18 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
           }
         ]
       }

@@ -1632,3 +1632,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix: add a Playwright no-mouse probe and wire it into smoke path filters and execution.
 - Verrou: `scripts/probe_keyboard_navigation.js` in `.github/workflows/smoke.yml`.
 - Chiffres: 54/54 pytest, 40/40 QA gates, 12/12 probes critiques, bundle legacy 1732.9 KB, footer/SW v37.114.
+
+## Sprint v37.115 — AUTO 10/10 cron resync keyboard
+- Symptom: main advanced again after v37.114, leaving the PR marked dirty despite local gates green.
+- Cause: the five-minute data cron pushed a fresher `data.js` and sidecars during the branch push.
+- Fix: merge latest `origin/main`, keep the keyboard probe and QA runtime ordering, then restamp assets/footer/SW.
+- Verrou: `audit_data_truth.py`, `stamp_asset_hashes.py --check`, and `probe_keyboard_navigation.js`.
+- Chiffres: resync on data 2026-05-07T00:34Z, footer/SW v37.115.
