@@ -1835,3 +1835,8 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Reproduced the e2e failures from shard 1 and shard 2: serious axe contrast issues plus an undersized dashboard touch target set.
 - Raised static editorial contrast, fixed SPA tab/chip active states, made the debug panel focusable and exposed the health control as a stable touch target.
 - Verified the axe and mobile-touch Playwright specs locally across desktop and mobile before restamping assets and cache.
+
+### v37.148 — Bundle threshold cleanup
+- Trimmed long runtime-only comments from legacy-app.js after the bundle gate reported 1702 KB, just above the overnight 1700 KB target.
+- Kept the JavaScript logic untouched, restamped the legacy asset hash, refreshed the CSP hash and bumped the shell cache.
+- Rechecked syntax and bundle size so the bundle now lands under 1700 KB with the same runtime behavior.

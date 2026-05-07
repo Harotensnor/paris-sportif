@@ -1353,12 +1353,6 @@ return false;
 }
 };
 
-/**
-   * Generate sister pages tabs bar HTML.
-   * @param {string} currentPage - data-page of the current page (highlighted active)
-   * @param {Array<{page: string, label: string}>} tabs - Sister pages
-   * @returns {string} HTML to inject
-   */
 function _pageTabsHTML(currentPage, tabs) {
 if (!Array.isArray(tabs) || tabs.length < 2) return '';
 return `
@@ -1412,11 +1406,6 @@ const _PAGE_TO_GROUP = {};
 for (const [groupKey, tabs] of Object.entries(_PAGE_TAB_GROUPS)) {
 tabs.forEach(t => { _PAGE_TO_GROUP[t.page] = groupKey; });
 }
-/**
-   * Auto-inject page-tabs in the active page wrap if it belongs to a group.
-   * Idempotent : skip si déjà présent. Cherche le wrap actif dans <main>.
-   * @param {string} currentPage - data-page actif
-   */
 function _injectPageTabsAuto(currentPage) {
 const groupKey = _PAGE_TO_GROUP[currentPage];
 if (!groupKey) return;
@@ -1437,12 +1426,6 @@ tabsContainer.innerHTML = tabsHtml;
 target.insertBefore(tabsContainer.firstElementChild, target.firstChild);
 }
 try { window._injectPageTabsAuto = _injectPageTabsAuto; } catch(e) { swallowError(e); }
-/**
-   * Get tabs HTML for a known group, automatically highlighting current page.
-   * @param {string} groupKey - 'picks' | 'perf' | 'bilan' | 'montantes' | 'favoris'
-   * @param {string} currentPage - active page-id
-   * @returns {string} HTML or '' if group unknown
-   */
 function _pageTabsForGroup(groupKey, currentPage) {
 const tabs = _PAGE_TAB_GROUPS[groupKey];
 if (!tabs) return '';
@@ -1450,16 +1433,6 @@ return _pageTabsHTML(currentPage, tabs);
 }
 try { window._pageTabsForGroup = _pageTabsForGroup; } catch(e) { swallowError(e); }
 
-/**
-   * Mobile-first bottom sheet modal (slide-up on mobile, center modal on desktop).
-   * Includes drag handle (mobile), close button, Esc + outside-click handlers.
-   * @param {Object} opts
-   * @param {string} [opts.title=''] - Sheet title
-   * @param {string|Node} [opts.body=''] - Body (HTML string or DOM node)
-   * @param {Array<{label: string, onClick: Function, primary?: boolean}>} [opts.actions=[]]
-   * @param {Function} [opts.onClose] - Called when sheet closes
-   * @returns {{close: Function}} API to programmatically close
-   */
 function _showBottomSheet(opts) {
 const { title = '', body = '', actions = [], onClose = null } = opts || {};
 const overlay = document.createElement('div');
@@ -2467,20 +2440,11 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
   }
   try { window.renderStreakBadge = renderStreakBadge; } catch(e) { swallowError(e); }
 
-  // Synthétise 4 dimensions en un score 0..100 + label "high/medium/low" :
-  //   * edge (40 pts) : value forte +5pt+ → 40, +2pt → 20, 0 → 10
-  //   * data quality (25 pts) : computeDataQuality.score / max
-  //   * stabilité cote (20 pts) : odds_snapshot proche de cote actuelle
-  //     (line movement faible = pari plus stable)
-  //   * historique ligue (15 pts) : backtest_v2 WR de la ligue ≥ baseline
-  // Affiché en chip sur les cards + dans la fiche de décision (Sprint 69).
-  // Réponse au brief Part 7 "élevé/moyen/faible".
   function qualityScore(match, pred, best) {
     if (!match || !pred) return { score: 0, label: 'low', reasons: [] };
     let score = 12;
     const reasons = [];
     const rel = Number(best?.rel ?? best?.prob ?? pred?.reliability ?? pred?.pick?.prob ?? 0);
-    // 1. Edge — 24 pts max, plafonné pour éviter qu'un marché halluciné force 100/100.
     const edge = Number(best?.edge || 0);
     const edgeScore = Math.max(0, Math.min(24, (Math.min(edge, 0.12) / 0.12) * 24));
     score += edgeScore;
@@ -2488,11 +2452,9 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     else if (edge >= 0.04) { reasons.push({ icon: '✓', text: `Avance value (${fmtMarketAdvantage(edge, 0)})` }); }
     else if (edge >= 0.015) { reasons.push({ icon: '~', text: `Petite avance (${fmtMarketAdvantage(edge, 0)})` }); }
     else { reasons.push({ icon: '⚠', text: `Moins bon que le marché (${(edge*100).toFixed(0)}%)` }); }
-    // 2. Confiance calibrée — 18 pts max.
     if (Number.isFinite(rel) && rel > 0) {
       score += Math.max(0, Math.min(18, ((rel - 0.35) / 0.45) * 18));
     }
-    // 3. Data quality — 18 pts max
     let dq = null;
     try { dq = (typeof computeDataQuality === 'function') ? computeDataQuality(match) : null; } catch(e) { swallowError(e); }
     if (dq && dq.max > 0) {
@@ -2501,8 +2463,6 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
       if (ratio >= 0.75) reasons.push({ icon: '📊', text: `Données riches (${dq.score}/${dq.max})` });
       else if (ratio < 0.5) reasons.push({ icon: '📉', text: `Données pauvres (${dq.score}/${dq.max})` });
     }
-    // 4. Stabilité cote — 14 pts max. Compare odds_snapshot vs cote actuelle.
-    // Sans snapshot exploitable, composante neutre : elle ne doit jamais gonfler artificiellement le score.
     const snap = match.odds_snapshot;
     const currentOdd = best ? best.odd : null;
     if (snap && currentOdd && best && best.market === '1n2') {
@@ -2521,7 +2481,6 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     } else {
       score += 7;
     }
-    // 5. Historique ligue — 10 pts max
     const lc = match.league_code;
     const bt = window.__backtestReportV2;
     if (bt && bt.by_league && lc && bt.by_league[lc]) {
@@ -3730,16 +3689,10 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
   try { window.comboCorrelationStats = comboCorrelationStats; } catch(e) { swallowError(e); }
   try { window.estimateSameGameComboProb = estimateSameGameComboProb; } catch(e) { swallowError(e); }
 
-  // Synthétise les signaux dominants du modèle pour le pick choisi en
-  // langage naturel, accessible. Lit pred.contributions (Sprint U Chantier) et
-  // pred.explain.reasons + autres signaux dispo. Ajoute aussi les anti-arguments
-  // (pourquoi NE PAS parier) basés sur les risk flags.
-  // Retourne { pros: [...], cons: [...], summary, recommendation }
   function aiCoachExplain(match, pred, best) {
     if (!match || !pred || !pred.pick) return null;
     const pros = [];
     const cons = [];
-    // Pros : signaux positifs depuis contributions
     if (Array.isArray(pred.contributions)) {
       pred.contributions.slice(0, 6).forEach(c => {
         if (c.delta != null && c.delta > 0.02) {
@@ -3757,7 +3710,6 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
         }
       });
     }
-    // Edge / EV / Kelly
     if (best && best.edge >= 0.05) {
       pros.push({ icon: '💎', label: 'Avance forte', text: `${fmtMarketAdvantage(best.edge, 0)} → value confirmée` });
     } else if (best && best.edge >= 0.02) {
@@ -3765,15 +3717,12 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     } else if (best && best.edge < 0) {
       cons.push({ icon: '⚠', label: 'Pas assez de value', text: `${(best.edge*100).toFixed(1)}% — la cote demande plus que le modèle ne donne` });
     }
-    // Kelly
     if (best && best.kelly > 0.03) {
       pros.push({ icon: '💰', label: 'Mise forte', text: `${fmtKellyHuman(best.kelly)} — conviction haute` });
     }
-    // Confiance
     const conf = Number(pred.reliability ?? pred.pick.prob) || 0;
     if (conf >= 0.70) pros.push({ icon: '🔒', label: 'Lock confiance', text: `${Math.round(conf*100)}% — le modèle est sûr` });
     else if (conf < 0.55) cons.push({ icon: '🤔', label: 'Confiance limite', text: `${Math.round(conf*100)}% — proche du seuil de skip` });
-    // Drift cote
     const drift = (typeof computeOddsDrift === 'function') ? computeOddsDrift(match, pred, best) : null;
     if (drift) {
       if (drift.status === 'better' || drift.status === 'slight_better') {
@@ -3782,12 +3731,10 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
         cons.push({ icon: '📉', label: 'Cote en baisse', text: drift.label });
       }
     }
-    // Quality data
     let dq = null;
     try { dq = (typeof computeDataQuality === 'function') ? computeDataQuality(match) : null; } catch(e) { swallowError(e); }
     if (dq && dq.score >= 3) pros.push({ icon: '📊', label: 'Données riches', text: `${dq.score}/${dq.max} sources d'enrichissement présentes` });
     else if (dq && dq.score <= 1) cons.push({ icon: '📉', label: 'Données pauvres', text: `Seulement ${dq.score}/${dq.max} sources — incertitude plus forte` });
-    // Historique ligue (si backtest dispo)
     const lc = match.league_code;
     const bt = window.__backtestReportV2;
     if (bt && bt.by_league && lc && bt.by_league[lc]) {
@@ -3797,11 +3744,9 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
         else if (lg.win_rate < 0.45) cons.push({ icon: '📉', label: 'Modèle faible sur cette ligue', text: `WR ${(lg.win_rate*100).toFixed(0)}% sur ${lg.n} paris historiques — doute` });
       }
     }
-    // Météo / risques
     if (match.weather && (match.weather.precip_mm > 5 || match.weather.wind_kmh > 30)) {
       cons.push({ icon: '🌧️', label: 'Météo défavorable', text: `Précip ou vent fort — affecte les xG` });
     }
-    // Synthèse texte
     const score = pros.length - cons.length * 1.2;
     const recommendation = score >= 3 ? 'À jouer'
                          : score >= 1 ? 'À jouer avec mise modérée'
@@ -3812,10 +3757,6 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
   }
   try { window.aiCoachExplain = aiCoachExplain; } catch(e) { swallowError(e); }
 
-  // L'user note "j'ai parié X€ sur ce match" → comparison avec ce que le modèle
-  // aurait suggéré. Adherence score : "Tu as suivi le modèle 8/10 fois".
-  // Schema localStorage.userBets = [{ id, matchId, market, key, label, odd,
-  //   stake, ts, settled?, result?, pnl? }]
   const USER_BETS_KEY = 'paris_sportif_user_bets';
   function _loadUserBets() {
     try {
