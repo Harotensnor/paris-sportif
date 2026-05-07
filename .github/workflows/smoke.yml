@@ -46,6 +46,7 @@ on:
       - 'scripts/probe_nav_stability.js'
       - 'scripts/probe_tous_csv_export.js'
       - 'scripts/probe_console_matrix.js'
+      - 'scripts/probe_prono_sheet_odds.js'
       - '.github/workflows/smoke.yml'
   pull_request:
     branches: [main]
@@ -88,6 +89,7 @@ on:
       - 'scripts/probe_nav_stability.js'
       - 'scripts/probe_tous_csv_export.js'
       - 'scripts/probe_console_matrix.js'
+      - 'scripts/probe_prono_sheet_odds.js'
       - '.github/workflows/smoke.yml'
   workflow_dispatch: {}
 
@@ -255,3 +257,9 @@ jobs:
         # Fresh-loads 16 routes on desktop and mobile. Locks the
         # "0 console error on 32 page loads" release criterion.
         run: node scripts/probe_console_matrix.js
+
+      - name: Run prono sheet and odds probe
+        # Locks the complete prono sheet: Top Paris uses only verified
+        # Winamax odds, modal exposes all decision tabs, and travel is
+        # informational only.
+        run: node scripts/probe_prono_sheet_odds.js

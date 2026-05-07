@@ -1860,3 +1860,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Caught the 09:38 UTC refresh tick before pushing again so the PR head contains the latest main data parent.
 - Reused the same conflict strategy: fresh sidecars from main, local UI/test fixes preserved, health and night metrics rebuilt from data.js.
 - Kept the push window short to give GitHub Actions time to start before the next cron tick.
+
+### v37.153 — Complete prono sheets and verified top picks
+- Added a normalized Winamax odd-validation status so picks can be marked verified, changed, stale, missing, mismatch or suspicious.
+- Promoted a new Top Paris du jour shortlist that accepts only verified/changed odds and keeps the full table available for cautious exploration.
+- Expanded the detail modal into a complete prono sheet with synthesis, odds, why-this-pick, signals, alternatives, history, risks and sources.
+- Neutralized travel penalties in the model path; travel remains visible as context but no longer changes probability, edge, score or tier.
+- Added a smoke probe locking complete prono sheets, top-pick odd validation and travel-neutral scoring.
