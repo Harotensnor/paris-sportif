@@ -3287,6 +3287,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
       market: out.market,
       source: out.source || 'winamax_exact'
     });
+    out.oddValidation = validatePickOdd(match, out, pred);
     const userMinOdd = (typeof getUserOddMin === 'function') ? getUserOddMin() : 2.00;
     if (odd < userMinOdd) {
       out.lowOddBlocked = true;
@@ -3549,6 +3550,9 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
       return sameMarket && sameKey && sameLine && sameTeam && sameOdd;
     });
     const chosen = byLoose || ((typeof scoreMarketCandidate === 'function') ? scoreMarketCandidate({ ...raw }, match, pred) : { ...raw });
+    if (chosen && typeof validatePickOdd === 'function') {
+      chosen.oddValidation = validatePickOdd(match, chosen, pred, { displayedOdd: raw.odd });
+    }
     return chosen ? _v35AttachConsistency(chosen, candidates.length ? candidates : [chosen]) : null;
   }
   try { window.hydrateSelectedMarketCandidate = hydrateSelectedMarketCandidate; } catch(e) { swallowError(e); }
@@ -3556,6 +3560,280 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
   try {
     window.validateMarketConsistency = validateMarketConsistency;
   } catch(e) { swallowError(e); }
+
+  function v38EnsurePronoStyles() {
+    if (document.getElementById('v38-prono-sheet-style')) return;
+    const st = document.createElement('style');
+    st.id = 'v38-prono-sheet-style';
+    st.textContent = `
+      .v38-prono-hero{border:1px solid rgba(167,139,250,.28);background:linear-gradient(135deg,rgba(167,139,250,.13),rgba(45,212,168,.06));border-radius:16px;padding:16px;margin:12px 0 14px}
+      .v38-prono-hero__top{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap}
+      .v38-prono-hero h3{margin:4px 0 4px;font-size:24px;line-height:1.08;color:var(--text)}
+      .v38-prono-hero p{margin:0;color:var(--text-dim);font-size:13px;line-height:1.45}
+      .v38-prono-kpis{display:grid;grid-template-columns:repeat(6,minmax(92px,1fr));gap:8px;margin-top:14px}
+      .v38-prono-kpi{border:1px solid var(--border);background:rgba(255,255,255,.035);border-radius:12px;padding:10px;min-width:0}
+      .v38-prono-kpi span{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-dim2);font-weight:850}
+      .v38-prono-kpi b{display:block;margin-top:4px;font-size:18px;color:var(--text);font-variant-numeric:tabular-nums}
+      .v38-prono-kpi em{display:block;margin-top:3px;font-size:10.5px;color:var(--text-dim);font-style:normal;line-height:1.25}
+      .v38-odd-status{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--border);border-radius:999px;padding:3px 8px;font-size:10px;font-weight:900;line-height:1;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+      .v38-odd-status[data-status="verified"],.v38-odd-status[data-status="changed"]{border-color:rgba(45,212,168,.36);background:rgba(45,212,168,.12);color:var(--accent)}
+      .v38-odd-status[data-status="stale"]{border-color:rgba(251,191,36,.36);background:rgba(251,191,36,.12);color:var(--warn)}
+      .v38-odd-status[data-status="missing"],.v38-odd-status[data-status="mismatch"],.v38-odd-status[data-status="suspicious"]{border-color:rgba(248,113,113,.38);background:rgba(248,113,113,.12);color:var(--danger)}
+      .v38-info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+      .v38-info-card{border:1px solid var(--border);background:var(--panel);border-radius:12px;padding:12px;min-width:0}
+      .v38-info-card span{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-dim2);font-weight:850;margin-bottom:5px}
+      .v38-info-card b{color:var(--text);font-size:13px;line-height:1.35}
+      .v38-info-card p,.v38-info-card li{color:var(--text-dim);font-size:12px;line-height:1.45}
+      .v38-info-card ul,.v38-info-card ol{margin:7px 0 0;padding-left:17px}
+      .v38-alt-table{width:100%;border-collapse:separate;border-spacing:0 6px}
+      .v38-alt-table th{text-align:left;font-size:10px;text-transform:uppercase;color:var(--text-dim2);letter-spacing:.05em;padding:0 8px}
+      .v38-alt-table td{background:rgba(255,255,255,.035);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:9px 8px;font-size:12px;color:var(--text);vertical-align:top}
+      .v38-alt-table td:first-child{border-left:1px solid var(--border);border-radius:10px 0 0 10px}
+      .v38-alt-table td:last-child{border-right:1px solid var(--border);border-radius:0 10px 10px 0}
+      .v38-top-paris{border:1px solid rgba(45,212,168,.28);background:linear-gradient(135deg,rgba(45,212,168,.10),rgba(56,189,248,.05));border-radius:16px;padding:14px;margin:12px 0 14px}
+      .v38-top-paris>header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
+      .v38-top-paris>header span{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:950}
+      .v38-top-paris>header strong{display:block;margin-top:3px;font-size:17px;color:var(--text)}
+      .v38-top-paris>header em{font-size:11px;color:var(--text-dim);font-style:normal;line-height:1.35}
+      .v38-top-paris__grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:9px}
+      .v38-top-card{border:1px solid rgba(45,212,168,.25);background:rgba(6,14,24,.58);border-radius:12px;padding:12px;text-align:left;color:var(--text);cursor:pointer;min-width:0}
+      .v38-top-card:hover{border-color:rgba(45,212,168,.55);transform:translateY(-1px)}
+      .v38-top-card__meta{display:flex;justify-content:space-between;gap:8px;font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.04em;font-weight:850}
+      .v38-top-card strong{display:block;margin-top:7px;font-size:14px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      .v38-top-card__pick{display:flex;justify-content:space-between;gap:8px;margin-top:8px;font-size:13px;line-height:1.3}
+      .v38-top-card__pick b{color:var(--accent);font-variant-numeric:tabular-nums}
+      .v38-top-card p{margin:8px 0 0;color:var(--text-dim);font-size:11.5px;line-height:1.4}
+      .v38-top-card__chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+      .v38-top-card__chips i{font-style:normal;border:1px solid var(--border);border-radius:999px;padding:3px 7px;font-size:10px;color:var(--text-dim)}
+      .v38-open-analysis{display:inline-flex;margin-top:6px;color:var(--brand);font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.04em}
+      @media (max-width:720px){.v38-prono-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.v38-prono-hero h3{font-size:20px}.v38-alt-table{font-size:11px}.v38-alt-table th:nth-child(4),.v38-alt-table td:nth-child(4){display:none}}
+    `;
+    document.head.appendChild(st);
+  }
+
+  function v38OddStatusMeta(status) {
+    const map = {
+      verified: { label: 'Cote validée', tone: 'good', detail: 'Prix exact retrouvé dans les marchés Winamax du match.' },
+      changed: { label: 'Cote changée', tone: 'good', detail: 'Le prix Winamax a changé depuis l’affichage initial, mais le marché exact est retrouvé.' },
+      stale: { label: 'Cote ancienne', tone: 'warn', detail: 'La cote provient d’un snapshot trop ancien : prudence avant action.' },
+      mismatch: { label: 'Cote suspecte', tone: 'bad', detail: 'La sélection ou la ligne ne correspond pas proprement au marché Winamax.' },
+      missing: { label: 'Non vérifiée', tone: 'bad', detail: 'Aucun prix Winamax exact n’a été retrouvé pour ce pick.' },
+      suspicious: { label: 'Cote suspecte', tone: 'bad', detail: 'Prix ou edge anormal : vérifier le mapping avant de miser.' },
+    };
+    return map[status] || map.missing;
+  }
+
+  function v38OddStatusChip(meta) {
+    const m = meta || { status: 'missing' };
+    const info = v38OddStatusMeta(m.status);
+    const title = [info.detail, m.reason, m.verifiedAt ? `Vérifiée ${m.verifiedAt}` : ''].filter(Boolean).join(' · ');
+    return `<span class="v38-odd-status" data-status="${esc(m.status || 'missing')}" title="${esc(title)}">${esc(info.label)}</span>`;
+  }
+
+  function validatePickOdd(match, candidate, pred, opts) {
+    opts = opts || {};
+    const c = candidate?.best || candidate || {};
+    const odd = Number(c.odd);
+    const displayedOdd = Number(opts.displayedOdd || c.displayedOdd || odd);
+    const wx = match?.winamax || {};
+    const markets = wx.markets || {};
+    const dataAge = typeof getDataAge === 'function' ? getDataAge().minutes : 9999;
+    const base = {
+      status: 'missing',
+      odd: Number.isFinite(odd) ? odd : null,
+      displayedOdd: Number.isFinite(displayedOdd) ? displayedOdd : null,
+      market: c.market || '1n2',
+      selection: c.pickValue ?? c.pickKey ?? c.key ?? c.side ?? '',
+      line: c.line ?? c.raw?.line ?? null,
+      verifiedAt: window.PRONOSTICS_DATA?.generated_at || null,
+      reason: '',
+    };
+    if (!(odd > 1.01) || odd > 50) return { ...base, status: 'suspicious', reason: 'cote hors bornes' };
+    if (!wx.available || !wx.match_id || !markets || !Object.keys(markets).length) return { ...base, status: 'missing', reason: 'match Winamax ou marchés absents' };
+    if (dataAge > 240) return { ...base, status: 'stale', reason: `data ${Math.round(dataAge / 60)}h` };
+    if (c.suspect || Number(c.edge || 0) > 0.30) return { ...base, status: 'suspicious', reason: c.suspectReason || 'edge anormal' };
+    if (c.source !== 'winamax_exact' || c.exact === false) return { ...base, status: 'missing', reason: 'cote indicative non liée Winamax exact' };
+    const rawOdd = Number(c.raw?.odd);
+    if (Number.isFinite(rawOdd) && Math.abs(rawOdd - odd) > 0.006) return { ...base, status: 'mismatch', reason: 'prix brut différent du prix affiché' };
+    if (Number.isFinite(displayedOdd) && Math.abs(displayedOdd - odd) > 0.006) return { ...base, status: 'changed', reason: `ancien @${displayedOdd.toFixed(2)} → actuel @${odd.toFixed(2)}` };
+    if (!c.market || !c.label) return { ...base, status: 'mismatch', reason: 'marché ou sélection incomplet' };
+    return { ...base, status: 'verified', reason: 'marché exact Winamax retrouvé' };
+  }
+  try { window.validatePickOdd = validatePickOdd; } catch(e) { swallowError(e); }
+
+  function v38PickVerdict(score, edge, oddMeta) {
+    const status = oddMeta?.status || 'missing';
+    if (!['verified', 'changed'].includes(status)) return 'À vérifier';
+    if (score >= 80 && edge >= 0.03) return 'Top pick';
+    if (score >= 60) return 'Bon pick';
+    if (edge >= 0.06) return 'Value risquée';
+    return 'À éviter';
+  }
+
+  function v38MissingSignals(match, pred, candidate) {
+    const rows = [];
+    const add = (ok, label, missing) => rows.push(ok ? `${label} disponible` : missing);
+    add(Boolean(match?.lineups || match?.lineup), 'Compositions', 'Composition non disponible');
+    add(Boolean(match?.injuries || match?.injuries_home || match?.injuries_away), 'Blessures', 'Blessures non confirmées');
+    add(Boolean(match?.winamax?.markets), 'Cotes', 'Cote non retrouvée');
+    add(Boolean(candidate?.history && candidate.history.n >= 8), 'Historique marché', 'Historique marché insuffisant');
+    add(Boolean(match?.weather), 'Météo', 'Météo non disponible');
+    add(Boolean(match?.referee), 'Arbitre', 'Arbitre non disponible');
+    if (pred?.travelContext || pred?.reliabilityMeta?.travel) rows.push('Déplacement présent mais ignoré dans le modèle principal');
+    return rows;
+  }
+
+  function v38SegmentHistory(match, candidate) {
+    const report = window.__backtestReportV2 || window.__strategyBacktest || {};
+    const sport = match?.sport || 'sport';
+    const market = candidate?.market || '1n2';
+    const sportRow = report.by_sport?.[sport] || report.sports?.[sport] || null;
+    const marketRow = window.__marketHistoryStats?.[`${sport}|${market}`] || window.__marketHistoryStats?.[`*|${market}`] || candidate?.history || null;
+    const fmtRoi = (v) => {
+      const n = Number(v);
+      if (!Number.isFinite(n)) return '—';
+      const pct = Math.abs(n) <= 1 ? n * 100 : n;
+      return `${pct >= 0 ? '+' : ''}${pct.toFixed(1)}%`;
+    };
+    return {
+      sportRoi: fmtRoi(sportRow?.roi || sportRow?.flat_roi || sportRow?.flat_roi_pct),
+      marketRoi: fmtRoi(marketRow?.roi || marketRow?.flat_roi || marketRow?.flat_roi_pct),
+      sample: Number(marketRow?.n || marketRow?.count || candidate?.history?.n || 0),
+      brier: Number.isFinite(Number(sportRow?.brier)) ? Number(sportRow.brier).toFixed(3) : '—',
+      clv: Number.isFinite(Number(marketRow?.mean_clv_pct)) ? `${Number(marketRow.mean_clv_pct) >= 0 ? '+' : ''}${Number(marketRow.mean_clv_pct).toFixed(2)}%` : '—'
+    };
+  }
+
+  function buildV38PronoSheet(match, pred, selectedPick) {
+    v38EnsurePronoStyles();
+    const candidate = selectedPick || (() => {
+      try { return typeof selectBestMarket === 'function' ? selectBestMarket(match, pred) : null; }
+      catch(e) { return null; }
+    })();
+    if (!match || !pred || !candidate) return '';
+    const { home, away } = getSides(match);
+    const odd = Number(candidate.odd || 0);
+    const rel = Number(candidate.rel ?? candidate.prob ?? pred.reliability ?? 0);
+    const edge = Number.isFinite(Number(candidate.edge)) ? Number(candidate.edge) : (odd > 1 ? rel - 1 / odd : 0);
+    const score = (() => {
+      try { return qualityScore(match, pred, candidate).score || 0; }
+      catch(e) { return Math.round(Math.max(0, Math.min(100, rel * 70 + edge * 120))); }
+    })();
+    const oddMeta = validatePickOdd(match, candidate, pred);
+    const history = v38SegmentHistory(match, candidate);
+    const verdict = v38PickVerdict(score, edge, oddMeta);
+    const implied = odd > 1 ? 1 / odd : 0;
+    const alternatives = (() => {
+      try {
+        return buildMarketCandidates(match, pred, { requireExact: false })
+          .filter(c => marketCandidateSignature(c) !== marketCandidateSignature(candidate))
+          .slice(0, 10);
+      } catch(e) { return []; }
+    })();
+    const missing = v38MissingSignals(match, pred, candidate);
+    const reasons = (pred?.explain?.reasons || []).map(r => typeof r === 'string' ? r : r?.text).filter(Boolean).slice(0, 5);
+    const signalsPositive = [
+      edge > 0 ? `Edge utile +${(edge * 100).toFixed(1)}pt` : '',
+      rel > implied ? `Modèle ${Math.round(rel * 100)}% vs marché ${Math.round(implied * 100)}%` : '',
+      candidate?.history?.tier === 'validated' ? candidate.history.label : '',
+      ...(reasons.slice(0, 2))
+    ].filter(Boolean);
+    const risks = [
+      !['verified', 'changed'].includes(oddMeta.status) ? oddMeta.reason || 'Cote non validée' : '',
+      candidate?.suspectReason || '',
+      candidate?.history?.tier === 'learning' ? 'Sample marché encore faible' : '',
+      edge > 0.25 ? 'Edge trop haut : possible mauvais mapping' : '',
+      missing.filter(x => /non disponible|non confirm|insuffisant|non retrouv/.test(x)).slice(0, 3).join(' · ')
+    ].filter(Boolean);
+    const infoCard = (label, body, sub) => `<div class="v38-info-card"><span>${esc(label)}</span><b>${body}</b>${sub ? `<p>${sub}</p>` : ''}</div>`;
+    const sourceRows = [
+      ['Winamax', match?.winamax?.match_id ? `match ${match.winamax.match_id}` : 'source absente'],
+      ['ESPN/Data match', match?.id ? `event ${match.id}` : 'source absente'],
+      ['Blessures', (match?.injuries || match?.injuries_home || match?.injuries_away) ? 'disponible' : 'source absente'],
+      ['Compositions', (match?.lineups || match?.lineup) ? 'disponible' : 'source absente'],
+      ['Météo', match?.weather ? 'disponible' : 'source absente'],
+      ['Arbitre', match?.referee ? 'disponible' : 'source absente'],
+    ];
+    return `
+      <section class="v38-prono-hero section" data-v38-prono-sheet>
+        <h4>Synthèse prono complète</h4>
+        <div class="v38-prono-hero__top">
+          <div>
+            <p>${esc(sportLabel(match.sport || ''))} · ${esc(match.league_name || match.league || 'Ligue inconnue')} · ${esc(fmtTime(match.date))}</p>
+            <h3>${esc(candidate.label || pred.pick?.label || 'Pari recommandé')} ${odd ? `<span>@${odd.toFixed(2)}</span>` : ''}</h3>
+            <p>${esc(home?.name || 'Domicile')} vs ${esc(away?.name || 'Extérieur')} · verdict : <b>${esc(verdict)}</b></p>
+          </div>
+          <div>${v38OddStatusChip(oddMeta)}</div>
+        </div>
+        <div class="v38-prono-kpis">
+          ${infoCard('Score', `${score}/100`, score >= 80 ? 'Très solide' : score >= 60 ? 'Bon pick' : score >= 40 ? 'À vérifier' : 'Faible priorité')}
+          ${infoCard('Confiance', `${Math.round(rel * 100)}%`, 'Probabilité estimée par le modèle')}
+          ${infoCard('Marché', `${Math.round(implied * 100)}%`, 'Probabilité implicite de la cote')}
+          ${infoCard('Edge', `${edge >= 0 ? '+' : ''}${(edge * 100).toFixed(1)}pt`, 'Écart modèle vs bookmaker')}
+          ${infoCard('Tier', esc(candidate.tier || candidate.discipline?.label || '—'), 'Niveau de risque/gain')}
+          ${infoCard('Cote', odd ? `@${odd.toFixed(2)}` : '—', v38OddStatusMeta(oddMeta.status).label)}
+        </div>
+      </section>
+      <section class="section v38-prono-section">
+        <h4>Cotes vérifiées</h4>
+        <div class="v38-info-grid">
+          ${infoCard('Statut cote', v38OddStatusChip(oddMeta), esc(oddMeta.reason || v38OddStatusMeta(oddMeta.status).detail))}
+          ${infoCard('Cote affichée', oddMeta.displayedOdd ? `@${Number(oddMeta.displayedOdd).toFixed(2)}` : '—', 'Prix vu au moment du clic')}
+          ${infoCard('Cote Winamax', oddMeta.odd ? `@${Number(oddMeta.odd).toFixed(2)}` : '—', oddMeta.verifiedAt ? `Snapshot ${esc(String(oddMeta.verifiedAt).slice(0, 16))}` : 'Horodatage absent')}
+          ${infoCard('Marché exact', esc(candidate.marketName || candidate.market || '—'), `Sélection : ${esc(candidate.label || candidate.pickKey || candidate.key || '—')} · ligne ${esc(candidate.line ?? candidate.raw?.line ?? '—')}`)}
+        </div>
+      </section>
+      <section class="section v38-prono-section">
+        <h4>Pourquoi ce pick</h4>
+        <div class="v38-info-grid">
+          ${infoCard('Prix juste', `${Math.round(rel * 100)}% modèle vs ${Math.round(implied * 100)}% marché`, `Le modèle voit ${edge >= 0 ? 'un avantage' : 'peu de value'} de ${edge >= 0 ? '+' : ''}${(edge * 100).toFixed(1)}pt.`)}
+          ${infoCard('Raison principale', esc(signalsPositive[0] || reasons[0] || 'Signal principal non disponible'), esc(signalsPositive[1] || 'Aucun second signal fort détecté.'))}
+          ${infoCard('Risque principal', esc(risks[0] || 'Aucun risque majeur détecté sur ce snapshot'), 'Réduire la mise si ce point te gêne.')}
+        </div>
+      </section>
+      <section class="section v38-prono-section">
+        <h4>Signaux disponibles et manquants</h4>
+        <div class="v38-info-grid">
+          ${infoCard('Signaux positifs', `<ul>${signalsPositive.slice(0, 5).map(x => `<li>${esc(x)}</li>`).join('') || '<li>Aucun signal fort disponible</li>'}</ul>`)}
+          ${infoCard('Informations manquantes', `<ul>${missing.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`)}
+          ${infoCard('Déplacement', 'Ignoré dans le modèle principal', 'Le voyage peut rester visible en contexte, mais ne modifie plus proba, edge, score ou tier.')}
+        </div>
+      </section>
+      <section class="section v38-prono-section">
+        <h4>Marchés alternatifs</h4>
+        ${alternatives.length ? `<table class="v38-alt-table"><thead><tr><th>Marché</th><th>Cote</th><th>Edge</th><th>Statut</th><th>Lecture</th></tr></thead><tbody>${alternatives.map(c => {
+          const meta = validatePickOdd(match, c, pred);
+          const cOdd = Number(c.odd || 0);
+          const cRel = Number(c.rel ?? c.prob ?? 0);
+          const cEdge = Number.isFinite(Number(c.edge)) ? Number(c.edge) : (cOdd > 1 ? cRel - 1 / cOdd : 0);
+          const why = marketCandidateSignature(c) === marketCandidateSignature(candidate) ? 'pick principal' : (cEdge > edge ? 'meilleure value brute, à comparer au risque' : 'moins fort que le pick principal');
+          return `<tr><td><b>${esc(c.label || c.shortLabel || c.market || 'Marché')}</b><br><span class="u-text-dim">${esc(c.marketName || c.market || '')}</span></td><td>@${cOdd.toFixed(2)}</td><td>${cEdge >= 0 ? '+' : ''}${(cEdge * 100).toFixed(1)}pt</td><td>${v38OddStatusChip(meta)}</td><td>${esc(why)}</td></tr>`;
+        }).join('')}</tbody></table>` : '<p class="u-text-dim">Aucun marché alternatif fiable détecté sur ce snapshot.</p>'}
+      </section>
+      <section class="section v38-prono-section">
+        <h4>Historique résultats du segment</h4>
+        <div class="v38-info-grid">
+          ${infoCard('ROI sport', esc(history.sportRoi), esc(match.sport || 'sport'))}
+          ${infoCard('ROI marché', esc(history.marketRoi), esc(candidate.market || 'marché'))}
+          ${infoCard('Brier sport', esc(history.brier), 'Calibration historique du segment')}
+          ${infoCard('CLV moyen', esc(history.clv), 'Closing Line Value si disponible')}
+          ${infoCard('Volume', `${history.sample || 0} picks`, history.sample < 8 ? 'Sample trop faible' : 'Sample exploitable')}
+        </div>
+      </section>
+      <section class="section v38-prono-section">
+        <h4>Risques du prono</h4>
+        <div class="v38-info-grid">
+          ${risks.length ? risks.slice(0, 6).map((r, i) => infoCard(`Risque ${i + 1}`, esc(r), i === 0 ? 'Point prioritaire avant de miser' : '')).join('') : infoCard('Risque', 'Aucun risque majeur détecté', 'Toujours revérifier chez Winamax avant action')}
+        </div>
+      </section>
+      <section class="section v38-prono-section">
+        <h4>Sources et provenance</h4>
+        <div class="v38-info-grid">
+          ${sourceRows.map(([label, value]) => infoCard(label, esc(value))).join('')}
+        </div>
+      </section>
+    `;
+  }
 
   function marketHistoryConfidence(market, sport) {
     const hist = window.__marketHistoryStats || null;
@@ -8332,14 +8610,11 @@ if (Math.abs(travelNudge) > 0.005) {
 travelStats = {
 home_km: homeKm != null ? Math.round(homeKm) : null,
 away_km: awayKm != null ? Math.round(awayKm) : null,
+ignored_in_model: true,
 };
 }
 }
 }
-}
-if (travelNudge !== 0) {
-final.pH += travelNudge;
-final.pA -= travelNudge;
 }
 const injH = match.injuries_home || 0;
 const injA = match.injuries_away || 0;
@@ -8996,6 +9271,9 @@ rawReliability = Math.max(0.25, Math.min(0.98, rawReliability + lineupBoost));
 seasonContext = getSeasonPhaseContext(match);
 competitionContext = getCompetitionContext(match);
 travelContext = getTravelContext(match);
+if (travelContext) {
+travelContext = { ...travelContext, ignored_in_model: true, model_note: 'Déplacement informatif seulement : aucun impact proba/edge/score.' };
+}
 scheduleDensityContext = getScheduleDensityContext(match);
 refereeTendency = getRefereeTendency(match);
 tennisSurfaceContext = getTennisSurfaceContext(match);
@@ -9012,10 +9290,6 @@ Number(coldStartContext?.confidence_decay || 1)
 if (contextDecay < 1) {
 rawReliability = 0.5 + (rawReliability - 0.5) * contextDecay;
 rawReliability = Math.max(0.25, Math.min(0.98, rawReliability));
-}
-if (travelContext?.penalty) {
-const penalty = Math.min(0.04, Math.abs(Number(travelContext.penalty) || 0) / (match.sport === 'basketball' ? 100 : 10));
-rawReliability = Math.max(0.25, rawReliability - penalty);
 }
 if (refereeTendency?.home_bias_pct > 60 && best_pick[2] === '1') {
 rawReliability = Math.min(0.98, rawReliability + 0.05);
@@ -9086,7 +9360,7 @@ if (travelContext && travelContext.label !== 'normal') {
 reasons.push({
 type: 'travel_fatigue',
 icon: '✈️',
-text: `Voyage : ${travelContext.travel_km != null ? Math.round(travelContext.travel_km) + 'km' : 'distance inconnue'}, fuseau ${travelContext.timezone_delta ?? '—'}h, fatigue ${travelContext.penalty}.`,
+text: `Voyage : ${travelContext.travel_km != null ? Math.round(travelContext.travel_km) + 'km' : 'distance inconnue'}, fuseau ${travelContext.timezone_delta ?? '—'}h. Signal affiché mais ignoré dans le modèle principal.`,
 });
 }
 if (scheduleDensityContext && (scheduleDensityContext.home_label !== 'normal' || scheduleDensityContext.away_label !== 'normal')) {
@@ -11291,6 +11565,7 @@ const whyHtml = `
           <button type="button" class="why-bet__tech" data-why-tech-toggle>Voir les détails techniques</button>
         </footer>
       </section>`;
+const v38PronoSheetHtml = typeof buildV38PronoSheet === 'function' ? buildV38PronoSheet(match, pred, whyBest) : '';
 const advancedStatsHtml = (() => {
 const formSeq = (side) => {
 const src = side?.team_form_l10 || side?.form10 || side?.form_stats?.last10 || side?.form_stats?.results || side?.form || '';
@@ -11365,6 +11640,7 @@ return Array.from(byPlayer.entries()).slice(0, 3).map(([name, rows]) => `<b>${es
         </details>`;
 })();
 body.innerHTML = `
+      ${v38PronoSheetHtml}
       ${whyHtml}
       ${buildV4ContextBadges(match, pred)}
       <div class="teams-big">
@@ -13372,7 +13648,10 @@ ${match.surface ? `<div class="kv"><div class="k">Surface</div><div class="v">${
       if (sections.length < 3) return;  // pas la peine pour 1-2 sections
       const cat = (txt) => {
         const t = (txt || '').toLowerCase();
-        if (t.includes('transparence') || t.includes('source des donn')) return 'transparence';
+        if (t.includes('source') || t.includes('provenance') || t.includes('transparence')) return 'sources';
+        if (t.includes('marchés alternatifs') || t.includes('marches alternatifs') || t.includes('alternatif')) return 'alternatifs';
+        if (t.includes('historique') || t.includes('résultat') || t.includes('resultat')) return 'historique';
+        if (t.includes('pourquoi')) return 'pourquoi';
         if (t.includes('risque')) return 'risques';
         if (t.includes('marché') || t.includes('marches')) return 'cotes';
         if (t.includes('pronostic') || t.includes('contexte') || t.includes('information')) return 'synthese';
@@ -13385,14 +13664,17 @@ ${match.surface ? `<div class="kv"><div class="k">Surface</div><div class="v">${
       };
       const tabsOrder = [
         ['synthese', '🎯 Synthèse'],
-        ['signaux', '📡 Signaux'],
         ['cotes', '💰 Cotes'],
+        ['pourquoi', '🧠 Pourquoi ce pick'],
+        ['signaux', '📡 Signaux'],
+        ['alternatifs', '🧩 Marchés alternatifs'],
+        ['historique', '📈 Historique'],
         ['risques', '⚠️ Risques'],
-        ['transparence', '🔍 Transparence'],
+        ['sources', '🔍 Sources'],
         ['h2h', '⚔️ H2H'],
         ['stats', '📊 Stats'],
       ];
-      const tabSections = { synthese: [], signaux: [], cotes: [], risques: [], transparence: [], h2h: [], stats: [] };
+      const tabSections = { synthese: [], cotes: [], pourquoi: [], signaux: [], alternatifs: [], historique: [], risques: [], sources: [], h2h: [], stats: [] };
       sections.forEach(sec => {
         const h4 = sec.querySelector('h4');
         if (!h4) {
@@ -13492,7 +13774,7 @@ ${match.surface ? `<div class="kv"><div class="k">Surface</div><div class="v">${
         }
       };
       toggle.addEventListener('click', () => setExpanded(shell.hidden));
-      setExpanded(false);
+      setExpanded(true);
     })();
 
     // scroll vertical (qui faisait jusqu'à 5400px sur foot top-5). Sur ≤720px,
@@ -15958,12 +16240,12 @@ if (injuryAngle) badges.push('blessures');
 if (angles.some(a => a?.type === 'schedule_congestion')) badges.push('fatigue');
 if (angles.some(a => a?.type === 'lookahead')) badges.push('lookahead');
 let rareDirectional = 0;
-const directionalAngles = angles.filter(a => ['injury_imbalance', 'travel_extreme', 'back_to_back_travel', 'schedule_congestion', 'lookahead'].includes(String(a?.type || '')));
+const directionalAngles = angles.filter(a => ['injury_imbalance', 'schedule_congestion', 'lookahead'].includes(String(a?.type || '')));
 directionalAngles.forEach(a => {
 const relation = v37PickRelationToTeam(m, pick, a.team, a.side);
 const strength = Math.max(0.2, Math.min(1, Number(a.strength || 0.5)));
 if (relation === 'backs') {
-rareDirectional -= (a.type === 'travel_extreme' || a.type === 'back_to_back_travel') ? 7 * strength : 5 * strength;
+rareDirectional -= 5 * strength;
 } else if (relation === 'opposes') {
 rareDirectional += (a.type === 'lookahead') ? 1.5 * strength : 4 * strength;
 }
@@ -16291,8 +16573,10 @@ return null;
 const investmentScoreValue = Number(c.investment?.score || 0);
 const intel = v37OpportunityFor(m, tier, rel, edge, ev, odd, c, pred);
 const opportunityBadges = edgeCapped ? ['Edge plafonné'].concat(intel.badges || []) : (intel.badges || []);
+const oddValidation = typeof validatePickOdd === 'function' ? validatePickOdd(m, c, pred) : { status: c.exact ? 'verified' : 'missing' };
 return {
 m, pred, best: c, tier: tier.id, strict: tier.strict, odd, rel, edge, ev, rawEdge, rawEv, edgeCapped, edgeAnomaly,
+oddValidation,
 pickUid: v37PickUid(m, c),
 label: c.shortLabel || c.label || pred.pick?.label || 'Pick',
 labelFull: c.label || pred.pick?.label || 'Pick',
@@ -16639,9 +16923,11 @@ marketInfo: source === 'winamax_exact' ? '' : 'Cote indicative issue du flux dis
 source,
 exact: source === 'winamax_exact'
 };
+candidate.oddValidation = typeof validatePickOdd === 'function' ? validatePickOdd(m, candidate, pred) : { status: source === 'winamax_exact' ? 'verified' : 'missing' };
 const intel = v37OpportunityFor(m, tier, rel, edge, ev, odd, candidate, pred);
 out.push({
 m, pred, best: candidate, tier: tier.id, strict: false, odd, rel, edge, ev,
+oddValidation: candidate.oddValidation,
 pickUid: v37PickUid(m, candidate),
 label: candidate.shortLabel,
 labelFull: candidate.label,
@@ -16903,11 +17189,12 @@ const edgePct = Math.round(p.edge * 1000) / 10;
 const evPct = Math.round(p.ev * 1000) / 10;
 const timeLabel = fmtTime(p.m.date);
 const title = `${v36TeamName(home)} - ${v36TeamName(away)}`;
+const oddMeta = p.oddValidation || (typeof validatePickOdd === 'function' ? validatePickOdd(p.m, p.best || p, p.pred) : { status: p.best?.exact ? 'verified' : 'missing' });
 return `<button type="button" class="v36-pick-card" data-tone="${esc(tier.tone)}" data-big-detail="${esc(String(p.m.id || ''))}" data-pick-uid="${esc(p.pickUid || '')}" data-pick-label="${esc(p.labelFull || p.label || '')}" data-pick-odd="${esc(p.odd.toFixed(2))}">
           <span class="v36-pick-card__meta"><b>${esc(sportLabel(p.m.sport || ''))}</b><em>${esc(timeLabel)}</em></span>
           <strong>${esc(title)}</strong>
           <span class="v36-pick-card__bet"><b data-tooltip="${esc(p.marketTooltip || p.labelFull || p.label)}">${esc(p.labelMobile || p.label)}</b><em>${v37BlindOddHtml(p.odd)}</em></span>
-          <span class="v36-pick-card__signals"><i>${relPct}% conf.</i><i>${v37BlindEdgeHtml(p.edge)}</i><i>${evPct >= 0 ? '+' : ''}${evPct}% EV</i></span>
+          <span class="v36-pick-card__signals"><i>${relPct}% conf.</i><i>${v37BlindEdgeHtml(p.edge)}</i><i>${evPct >= 0 ? '+' : ''}${evPct}% EV</i>${typeof v38OddStatusChip === 'function' ? v38OddStatusChip(oddMeta) : ''}</span>
         </button>`;
 };
 const v36TierBadge = (tierId, compact) => {
@@ -16968,13 +17255,15 @@ const sameMatchCount = v37VisibleMatchCounts.get(v37MatchKeyForPick(p)) || 0;
 const scoreClass = p.opportunity >= 80 ? 'is-high' : p.opportunity >= 60 ? 'is-mid' : p.opportunity >= 40 ? 'is-low' : 'is-muted';
 const scoreAdvice = p.opportunity >= 80 ? 'Conviction forte' : p.opportunity >= 60 ? 'Bon pari' : p.opportunity >= 40 ? 'Acceptable' : 'Peu fiable';
 const indicativeBadge = p.best?.source === 'cote_indicative' ? '<small class="v37-source-badge" title="Cote indicative : vérifie le prix final chez Winamax">indicatif</small>' : '';
+const oddMeta = p.oddValidation || (typeof validatePickOdd === 'function' ? validatePickOdd(p.m, p.best || p, p.pred) : { status: p.best?.exact ? 'verified' : 'missing' });
+const oddBadge = typeof v38OddStatusChip === 'function' ? v38OddStatusChip(oddMeta) : '';
 return `<tr class="v36-table-row ${soon ? 'is-imminent' : ''} ${sameMatchCount > 1 ? 'is-same-match' : ''} ${p.dataOnly ? 'is-data-only' : ''}" data-tone="${esc(tier.tone)}" data-big-detail="${esc(String(p.m.id || ''))}" data-pick-uid="${esc(p.pickUid || '')}" data-pick-label="${esc(p.labelFull || p.label || '')}" data-pick-odd="${esc(p.odd.toFixed(2))}" title="${esc(v36ReasonTooltip(p))}">
           <td class="v36-cell-sport"><span>${sportIcon(p.m.sport || '')}</span><b>${esc(sportLabel(p.m.sport || '').slice(0, 9))}</b></td>
           <td class="v36-cell-date">${esc(v37DateLabel(p.m.date))}</td>
           <td>${esc(fmtTime(p.m.date))}</td>
           <td class="v36-cell-league">${esc(league)}</td>
           <td class="v36-cell-match">${v36MatchTitleHtml(p)}${sameMatchCount > 1 ? `<span class="v37-match-multi">+${sameMatchCount - 1} autre pick</span>` : ''}</td>
-          <td class="v36-cell-pick"><b data-tooltip="${esc(pickHelp)}">${esc(p.label)}</b>${p.marketInfo ? `<span aria-hidden="true" data-tooltip="${esc(p.marketInfo)}" style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;margin-left:6px;border-radius:50%;border:1px solid var(--border);color:var(--text-dim);font-size:10px;font-weight:800;">?</span>` : ''}<em>${esc(marketName)}</em>${indicativeBadge}</td>
+          <td class="v36-cell-pick"><b data-tooltip="${esc(pickHelp)}">${esc(p.label)}</b>${p.marketInfo ? `<span aria-hidden="true" data-tooltip="${esc(p.marketInfo)}" style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;margin-left:6px;border-radius:50%;border:1px solid var(--border);color:var(--text-dim);font-size:10px;font-weight:800;">?</span>` : ''}<em>${esc(marketName)}</em><span style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:5px;">${oddBadge}${indicativeBadge}<i class="v38-open-analysis">analyse complète</i></span></td>
           <td class="v36-num v36-odd">${v37BlindOddHtml(p.odd)}</td>
           <td class="v36-num">${relPct}%</td>
           <td class="v36-num ${p.edge >= 0 ? 'is-pos' : 'is-neg'}"><span data-tooltip="Edge (avantage) : l'edge mesure si la cote est sous-évaluée par le marché. Plus c'est haut, mieux c'est.">${v37BlindEdgeHtml(p.edge)}</span></td>
@@ -16987,12 +17276,13 @@ const v36MobileCard = (p) => {
 const tier = v36TierById[p.tier] || v36TierDefs[0];
 const result = v37ResultForPick(p);
 const sameMatchCount = v37VisibleMatchCounts.get(v37MatchKeyForPick(p)) || 0;
+const oddMeta = p.oddValidation || (typeof validatePickOdd === 'function' ? validatePickOdd(p.m, p.best || p, p.pred) : { status: p.best?.exact ? 'verified' : 'missing' });
 return `<button type="button" class="v36-table-card ${sameMatchCount > 1 ? 'is-same-match' : ''}" data-tone="${esc(tier.tone)}" data-big-detail="${esc(String(p.m.id || ''))}" data-pick-uid="${esc(p.pickUid || '')}" data-pick-label="${esc(p.labelFull || p.label || '')}" data-pick-odd="${esc(p.odd.toFixed(2))}">
           <span class="v36-table-card__top"><b>${sportIcon(p.m.sport || '')} ${esc(v37DateLabel(p.m.date))} · ${esc(fmtTime(p.m.date))}</b>${v36TierBadge(p.tier, true)}</span>
           <strong>${v36MatchTitleHtml(p)}</strong>
           <em class="v36-table-card__league">${esc(p.m.league_name || p.m.league || '')}</em>
           <span class="v36-table-card__line"><i data-tooltip="${esc(p.marketTooltip || p.labelFull || p.label)}">${esc(p.labelMobile || p.label)}</i><b>${v37BlindOddHtml(p.odd)}</b><b>${Math.round(p.rel * 100)}%</b><b>${v37BlindEdgeHtml(p.edge)}</b></span>
-          <span class="v36-table-card__signals"><i data-tooltip="${esc(p.opportunityTooltip || '')}" title="${esc(p.opportunityTooltip || '')}" aria-label="${esc(p.opportunityTooltip || `Score d'opportunité ${p.opportunity || 0}/100`)}">Score ${esc(String(p.opportunity || 0))}/100 · ${esc(p.opportunity >= 80 ? 'Conviction forte' : p.opportunity >= 60 ? 'Bon pari' : p.opportunity >= 40 ? 'Acceptable' : 'Peu fiable')}</i>${p.best?.source === 'cote_indicative' ? '<i>Cote indicative</i>' : ''}${sameMatchCount > 1 ? `<i>+${sameMatchCount - 1} autre pick même match</i>` : ''}${(p.opportunityBadges || []).slice(0, 2).map(x => `<i data-tooltip="${esc(v37BadgeTooltip(x))}" title="${esc(v37BadgeTooltip(x))}">${esc(x)}</i>`).join('')}</span>
+          <span class="v36-table-card__signals"><i data-tooltip="${esc(p.opportunityTooltip || '')}" title="${esc(p.opportunityTooltip || '')}" aria-label="${esc(p.opportunityTooltip || `Score d'opportunité ${p.opportunity || 0}/100`)}">Score ${esc(String(p.opportunity || 0))}/100 · ${esc(p.opportunity >= 80 ? 'Conviction forte' : p.opportunity >= 60 ? 'Bon pari' : p.opportunity >= 40 ? 'Acceptable' : 'Peu fiable')}</i>${typeof v38OddStatusChip === 'function' ? v38OddStatusChip(oddMeta) : ''}${p.best?.source === 'cote_indicative' ? '<i>Cote indicative</i>' : ''}${sameMatchCount > 1 ? `<i>+${sameMatchCount - 1} autre pick même match</i>` : ''}${(p.opportunityBadges || []).slice(0, 2).map(x => `<i data-tooltip="${esc(v37BadgeTooltip(x))}" title="${esc(v37BadgeTooltip(x))}">${esc(x)}</i>`).join('')}</span>
           ${v37HistoryMode ? `<span class="v36-table-card__signals">${v37ResultBadge(result)}</span>` : ''}
         </button>`;
 };
@@ -17228,6 +17518,56 @@ const v37SportPicksSection = v37SportPicksHtml ? `<section class="v37-sport-pick
         </header>
         <div class="v37-sport-picks__grid">${v37SportPicksHtml}</div>
       </section>` : '';
+const v38TopParisEligible = (p) => {
+const meta = p?.oddValidation || (typeof validatePickOdd === 'function' ? validatePickOdd(p?.m, p?.best || p, p?.pred) : { status: 'missing' });
+p.oddValidation = meta;
+if (_dataIsStale || p?.dataOnly || p?.edgeAnomaly) return false;
+if (!['verified', 'changed'].includes(String(meta.status || ''))) return false;
+if (!(Number(p?.odd || 0) >= 1.30)) return false;
+if (!(Number(p?.opportunity || p?.score || 0) >= 45)) return false;
+if (Number(p?.rawEdge || p?.edge || 0) > v37EdgeAnomalyThreshold) return false;
+return true;
+};
+const v38TopParis = (() => {
+const out = [];
+const seenMatches = new Set();
+const marketCounts = new Map();
+const ranked = v37SortedDiverse
+.filter(v38TopParisEligible)
+.slice()
+.sort((a, b) => (b.opportunity - a.opportunity) || (b.edge - a.edge) || (a.ts - b.ts));
+for (const p of ranked) {
+const matchKey = v37MatchKeyForPick(p);
+if (seenMatches.has(matchKey)) continue;
+const family = v37MarketFamilyKey(p);
+const count = marketCounts.get(family) || 0;
+if (count >= 3) continue;
+seenMatches.add(matchKey);
+marketCounts.set(family, count + 1);
+out.push(p);
+if (out.length >= 12) break;
+}
+return out;
+})();
+try { window.__v38TopParis = v38TopParis; } catch(e) { swallowError(e); }
+const v38TopParisSection = `<section class="v38-top-paris" aria-label="Top Paris du jour" data-v38-top-paris>
+        <header>
+          <div><span>TOP PARIS</span><strong>Top Paris du jour</strong><em>${_dataIsStale ? 'Data ancienne : aucun pick recommandé fort.' : 'Shortlist limitée aux cotes Winamax vérifiées, sans doublon match.'}</em></div>
+          <b style="color:var(--accent);font-variant-numeric:tabular-nums;">${v38TopParis.length}/12</b>
+        </header>
+        ${v38TopParis.length ? `<div class="v38-top-paris__grid">${v38TopParis.map((p, idx) => {
+const { home, away } = getSides(p.m);
+const reason = (p.opportunityBadges || []).slice(0, 2).join(' · ') || (p.edge >= 0 ? `Edge +${(p.edge * 100).toFixed(1)}pt` : 'Score modèle prioritaire');
+const caution = p.opportunity >= 80 ? 'Top confiance' : p.edge >= 0.06 ? 'Meilleure value' : p.odd >= 3 ? 'Cote intéressante' : p.tier === 'safe' ? 'Pick prudent' : p.tier === 'out' ? 'Outsider surveillé' : 'Bon pick';
+return `<button type="button" class="v38-top-card" data-top-paris-card data-odd-status="${esc(p.oddValidation?.status || 'missing')}" data-big-detail="${esc(String(p.m.id || ''))}" data-pick-uid="${esc(p.pickUid || '')}">
+              <span class="v38-top-card__meta"><i>#${idx + 1} · ${esc(caution)}</i><i>${esc(fmtTime(p.m.date))}</i></span>
+              <strong>${esc(v36TeamName(home))} - ${esc(v36TeamName(away))}</strong>
+              <span class="v38-top-card__pick"><span>${esc(p.labelMobile || p.label)}</span><b>@${Number(p.odd || 0).toFixed(2)}</b></span>
+              <p>${esc(reason)} · score ${esc(String(p.opportunity || 0))}/100 · conf ${Math.round(Number(p.rel || 0) * 100)}% · edge ${p.edge >= 0 ? '+' : ''}${(p.edge * 100).toFixed(1)}pt</p>
+              <span class="v38-top-card__chips">${v38OddStatusChip(p.oddValidation)}<i>${esc((v36TierById[p.tier] || {}).label || p.tier || 'tier')}</i><i>analyse complète</i></span>
+            </button>`;
+}).join('')}</div>` : `<p style="margin:0;color:var(--text-dim);font-size:13px;line-height:1.45;">Aucun top pick recommandé avec cote vérifiée sur ce scope. Le tableau complet reste consultable en lecture prudente.</p>`}
+      </section>`;
 const v37SignedPct = (value, digits = 2) => {
 const n = Number(value || 0);
 return `${n >= 0 ? '+' : ''}${n.toFixed(digits)}%`;
@@ -17470,6 +17810,7 @@ wrap.innerHTML = `
           ${v37TiltBanner}
           ${v37DailySection}
           ${v37PersonalPicksHtml}
+          ${v38TopParisSection}
           <div class="v36-home-grid">
             ${v36TableHtml}
             <aside class="v36-home-rail" aria-label="Radar temps reel">
@@ -19708,7 +20049,13 @@ wrap.querySelectorAll('[data-big-detail]').forEach(btn => {
 btn.addEventListener('click', (e) => {
 e.preventDefault();
 const m = bbfMatchById(btn.dataset.bigDetail || btn.dataset.matchId);
-if (m && typeof openDetail === 'function') openDetail(m);
+if (m && typeof openDetail === 'function') {
+const pickUid = btn.dataset.pickUid || '';
+const selected = pickUid && wrap.__v37PickByUid && typeof wrap.__v37PickByUid.get === 'function'
+? wrap.__v37PickByUid.get(pickUid)
+: null;
+openDetail(m, selected ? { selectedPick: selected.best || selected } : undefined);
+}
 });
 });
 wrap.querySelectorAll('[data-winamax-click]').forEach(a => {
