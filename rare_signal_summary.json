@@ -1,25 +1,26 @@
 {
-  "generated_at": "2026-05-07T00:04:12Z",
+  "generated_at": "2026-05-07T00:07:51Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 75,
+    "active_events": 76,
     "actionable": 22,
-    "watch": 5,
-    "risk": 48,
+    "watch": 4,
+    "risk": 50,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 19,
       "travel_extreme": 9,
       "back_to_back_travel": 18,
-      "signal_conflict": 8,
+      "market_move": 6,
+      "signal_conflict": 9,
       "market_uncertain": 43
     },
     "by_quality": {
       "actionable": 22,
-      "watch": 5,
-      "risk": 48
+      "risk": 50,
+      "watch": 4
     }
   },
   "active_actionable": [
@@ -258,6 +259,24 @@
       "context": "2 match dans les 48h + 1928 km de voyage"
     },
     {
+      "event_id": "401815246",
+      "date": "2026-05-07T17:05Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Washington Nationals",
+      "away": "Minnesota Twins",
+      "match": "Washington Nationals - Minnesota Twins",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Minnesota Twins",
+      "side": "away",
+      "strength": 0.951,
+      "context": "4 match dans les 48h + 1504 km de voyage"
+    },
+    {
       "event_id": "401815258",
       "date": "2026-05-08T23:10Z",
       "sport": "baseball",
@@ -274,24 +293,6 @@
       "side": "away",
       "strength": 0.916,
       "context": "1 match dans les 48h + 1928 km de voyage"
-    },
-    {
-      "event_id": "401815246",
-      "date": "2026-05-07T17:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Washington Nationals",
-      "away": "Minnesota Twins",
-      "match": "Washington Nationals - Minnesota Twins",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Minnesota Twins",
-      "side": "away",
-      "strength": 0.911,
-      "context": "2 match dans les 48h + 1504 km de voyage"
     },
     {
       "event_id": "401871328",
@@ -344,8 +345,8 @@
       "direction": "fade",
       "team": "Cleveland Guardians",
       "side": "away",
-      "strength": 0.834,
-      "context": "2 match dans les 48h + 1118 km de voyage"
+      "strength": 0.874,
+      "context": "4 match dans les 48h + 1118 km de voyage"
     },
     {
       "event_id": "401856891",
@@ -422,24 +423,6 @@
   ],
   "active_watch": [
     {
-      "event_id": "401815249",
-      "date": "2026-05-07T18:20Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Chicago Cubs",
-      "away": "Cincinnati Reds",
-      "match": "Chicago Cubs - Cincinnati Reds",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Chicago Cubs",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 11-8"
-    },
-    {
       "event_id": "401871412",
       "date": "2026-05-08T00:00Z",
       "sport": "hockey",
@@ -514,6 +497,24 @@
   ],
   "active_risk": [
     {
+      "event_id": "401815249",
+      "date": "2026-05-07T18:20Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Chicago Cubs",
+      "away": "Cincinnati Reds",
+      "match": "Chicago Cubs - Cincinnati Reds",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.929,
+      "context": "Signaux opposes: Chicago Cubs fade 1.40, Cincinnati Reds fade 1.35 -> prudence"
+    },
+    {
       "event_id": "401871161",
       "date": "2026-05-08T23:00Z",
       "sport": "basketball",
@@ -529,7 +530,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 15.4%"
+      "context": "marge bookmaker anormale 15.9%"
     },
     {
       "event_id": "747320",
@@ -1051,7 +1052,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 15.4%"
+      "context": "marge bookmaker anormale 15.9%"
     },
     {
       "event_id": "401870615",
@@ -1123,7 +1124,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 15.4%"
+      "context": "marge bookmaker anormale 15.9%"
     },
     {
       "event_id": "401866570",
@@ -1285,7 +1286,25 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 15.4%"
+      "context": "marge bookmaker anormale 15.9%"
+    },
+    {
+      "event_id": "401815244",
+      "date": "2026-05-07T22:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Philadelphia Phillies",
+      "away": "Athletics",
+      "match": "Philadelphia Phillies - Athletics",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.52,
+      "context": "Signaux opposes: Philadelphia Phillies fade 0.80, Athletics fade 0.80 -> prudence"
     },
     {
       "event_id": "401871336",
