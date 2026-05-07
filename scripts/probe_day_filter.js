@@ -54,9 +54,28 @@ function check(label, ok, detail) {
 }
 
 async function clickDateChip(page, selector) {
-  await page.locator(selector).first().waitFor({ state: 'visible', timeout: 5000 });
+  const deadline = Date.now() + 5000;
+  while (Date.now() < deadline) {
+    const visible = await page.evaluate((sel) => Array.from(document.querySelectorAll(sel)).some(el => {
+      const rect = el.getBoundingClientRect();
+      const style = window.getComputedStyle(el);
+      return rect.width > 0 && rect.height > 0 && style.display !== 'none' && style.visibility !== 'hidden';
+    }), selector);
+    if (visible) break;
+    await page.waitForTimeout(100);
+  }
+  const isVisible = await page.evaluate((sel) => Array.from(document.querySelectorAll(sel)).some(el => {
+    const rect = el.getBoundingClientRect();
+    const style = window.getComputedStyle(el);
+    return rect.width > 0 && rect.height > 0 && style.display !== 'none' && style.visibility !== 'hidden';
+  }), selector);
+  if (!isVisible) throw new Error(`date chip not visible: ${selector}`);
   await page.evaluate((sel) => {
-    const el = document.querySelector(sel);
+    const el = Array.from(document.querySelectorAll(sel)).find(node => {
+      const rect = node.getBoundingClientRect();
+      const style = window.getComputedStyle(node);
+      return rect.width > 0 && rect.height > 0 && style.display !== 'none' && style.visibility !== 'hidden';
+    });
     if (!el) throw new Error(`date chip not found: ${sel}`);
     el.scrollIntoView({ block: 'center', inline: 'nearest' });
     el.click();
@@ -95,7 +114,11 @@ async function clickDateChip(page, selector) {
   await page.goto(`http://127.0.0.1:${port}/pronostics.html#dashboard?date=all`, { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(1200);
 
-  const chips = await page.evaluate(() => Array.from(document.querySelectorAll('[data-v37-day]')).map(btn => ({
+  const chips = await page.evaluate(() => Array.from(document.querySelectorAll('[data-v37-day]')).filter(btn => {
+    const rect = btn.getBoundingClientRect();
+    const style = window.getComputedStyle(btn);
+    return rect.width > 0 && rect.height > 0 && style.display !== 'none' && style.visibility !== 'hidden';
+  }).map(btn => ({
     value: btn.dataset.v37Day || '',
     label: (btn.textContent || '').replace(/\s+/g, ' ').trim()
   })));
@@ -123,7 +146,11 @@ async function clickDateChip(page, selector) {
       return {
         hashDate: new URLSearchParams((location.hash || '').split('?')[1] || '').get('date') || '',
         storedDate: stored.date || '',
-        activeValues: Array.from(document.querySelectorAll('[data-v37-day].is-active')).map(btn => btn.dataset.v37Day || ''),
+        activeValues: Array.from(document.querySelectorAll('[data-v37-day].is-active')).filter(btn => {
+          const rect = btn.getBoundingClientRect();
+          const style = window.getComputedStyle(btn);
+          return rect.width > 0 && rect.height > 0 && style.display !== 'none' && style.visibility !== 'hidden';
+        }).map(btn => btn.dataset.v37Day || ''),
         autoHorizonNotice: document.body.innerText.includes('Vue élargie aux 7 prochains jours')
       };
     });

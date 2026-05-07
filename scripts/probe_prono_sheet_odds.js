@@ -88,12 +88,15 @@ function check(label, ok, detail) {
     const topSection = document.querySelector('[data-v38-top-paris]');
     const rail = document.querySelector('.v36-home-rail');
     const rows = Array.from(document.querySelectorAll('.v36-picks-table tbody tr'));
+    const invalidTopOddCards = Array.from(document.querySelectorAll('[data-top-paris-card]'))
+      .filter(el => !['verified', 'changed'].includes(el.getAttribute('data-odd-status') || ''));
     const resultHeader = Array.from(document.querySelectorAll('.v36-picks-table th')).some(th => /Résultat/i.test(th.textContent || ''));
     const beginnerCopy = Array.from(document.querySelectorAll('.v37-beginner-copy')).map(el => (el.textContent || '').trim()).filter(Boolean);
     return {
       hasTable: !!table,
       tableOnly: !!shell && !topSection && !rail,
       rows: rows.length,
+      invalidTopOddCount: invalidTopOddCards.length,
       resultHeader,
       beginnerCopyCount: beginnerCopy.length,
       sampleBeginnerCopy: beginnerCopy[0] || '',
@@ -102,6 +105,7 @@ function check(label, ok, detail) {
   });
   check('Accueil renders the table as the main content', homeState.hasTable && homeState.rows > 0, JSON.stringify(homeState));
   check('Accueil is table-only, with extra dashboard blocks moved away', homeState.tableOnly, JSON.stringify(homeState));
+  check('No Top Paris card has an invalid odd status', homeState.invalidTopOddCount === 0, JSON.stringify(homeState));
   check('Today table exposes result column for passed/live/upcoming picks', homeState.resultHeader, JSON.stringify(homeState));
   check('Rows include beginner-friendly explanation text', homeState.beginnerCopyCount > 0 && /Lecture simple|alerte/i.test(homeState.sampleBeginnerCopy), homeState.sampleBeginnerCopy);
 
