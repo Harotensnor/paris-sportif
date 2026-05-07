@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-07T07:11:58Z",
+  "generated_at": "2026-05-07T09:17:34Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 53,
+    "active_events": 54,
     "expired_sample": 0,
     "by_type": {
       "schedule_congestion": 32,
       "travel_extreme": 15,
       "back_to_back_travel": 16,
-      "lookahead": 67
+      "lookahead": 69
     },
     "by_decision": {
-      "abstain": 28,
+      "abstain": 29,
       "lean_home": 21,
       "lean_away": 4
     },
     "lean_home": 21,
     "lean_away": 4,
-    "abstain": 28,
+    "abstain": 29,
     "monitor": 0
   },
   "active": [
@@ -498,10 +498,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.098,
-        "away_score": 0.375,
+        "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Nottingham Forest (+0.38)",
+        "reason": "Direction nette: Nottingham Forest (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -514,12 +514,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.473
           }
         ]
       }
@@ -642,6 +636,58 @@
             "type": "market_move",
             "direction": "drift",
             "strength": 1.0
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401871353",
+      "source_event_ids": [
+        "401871353"
+      ],
+      "kickoff": "2026-05-08T19:00Z",
+      "sport": "football",
+      "league_code": "championship",
+      "league_name": "Championship",
+      "home": "Hull City",
+      "away": "Millwall",
+      "match": "Hull City - Millwall",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: Hull City 0.15, Millwall 0.15",
+      "pressure_score": 0.667,
+      "home_fade": 0.15,
+      "away_fade": 0.15,
+      "travel_score": 0,
+      "lookahead_score": 0.667,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours",
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.098,
+        "away_score": -0.098,
+        "home_fade": 0.15,
+        "away_fade": 0.15,
+        "reason": "Direction nette: Millwall (-0.10)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
           }
         ]
       }
@@ -2890,22 +2936,16 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.15,
-        "away_score": 0.76,
+        "away_score": 0.052,
         "home_fade": 0.15,
         "away_fade": 0.0,
-        "reason": "Direction nette: Shakhtar Donetsk (+0.76)",
+        "reason": "Direction nette: Shakhtar Donetsk (+0.05)",
         "detail": [
           {
             "side": "home",
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.707
           }
         ]
       }

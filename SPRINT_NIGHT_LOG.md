@@ -1840,3 +1840,8 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Trimmed long runtime-only comments from legacy-app.js after the bundle gate reported 1702 KB, just above the overnight 1700 KB target.
 - Kept the JavaScript logic untouched, restamped the legacy asset hash, refreshed the CSP hash and bumped the shell cache.
 - Rechecked syntax and bundle size so the bundle now lands under 1700 KB with the same runtime behavior.
+
+### v37.149 — Cron data resync
+- Merged the latest main cron tick after GitHub marked the PR dirty again.
+- Kept the QA runtime and bundle cleanup structure, took fresh health/night metrics from main, then restamped assets and cache.
+- Preserved the fresh Winamax/data sidecars while keeping v37.148 runtime behavior intact.
