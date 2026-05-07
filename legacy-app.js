@@ -820,7 +820,7 @@ overlay.innerHTML = `
       <div style="background:var(--panel);border:1px solid var(--border-2);border-radius:var(--r-lg);max-width:480px;width:100%;padding:var(--space-6);box-shadow:var(--shadow-lg);">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4);">
           <h3 style="margin:0;font-size:var(--fs-lg);">⌨️ Raccourcis clavier</h3>
-          <button id="kbd-close" style="background:var(--panel-3);border:1px solid var(--border);border-radius:var(--r-sm);padding:6px 12px;cursor:pointer;color:var(--text);font-family:inherit;">✕</button>
+          <button id="kbd-close" type="button" aria-label="Fermer les raccourcis clavier" style="background:var(--panel-3);border:1px solid var(--border);border-radius:var(--r-sm);padding:6px 12px;cursor:pointer;color:var(--text);font-family:inherit;">✕</button>
         </div>
         <div style="display:grid;gap:8px;font-size:var(--fs-sm);">
           ${[
@@ -10650,7 +10650,7 @@ const aC = l.m.competitors && l.m.competitors.find(c => c.home_away === 'away') 
 const hName = hC.name || hC.short || '?';
 const aName = aC.name || aC.short || '?';
 const faceHtml = l.scorer.pid
-? `<img loading="lazy" decoding="async" src="https://img.sofascore.com/api/v1/player/${l.scorer.pid}/image" alt="" style="width:36px;height:36px;border-radius:50%;object-fit:cover;background:var(--bg);border:1px solid var(--border);flex-shrink:0;" data-fallback-mode="hide">`
+? `<img loading="lazy" decoding="async" src="https://img.sofascore.com/api/v1/player/${l.scorer.pid}/image" alt="" aria-hidden="true" style="width:36px;height:36px;border-radius:50%;object-fit:cover;background:var(--bg);border:1px solid var(--border);flex-shrink:0;" data-fallback-mode="hide">`
 : `<div style="width:36px;height:36px;border-radius:50%;background:var(--bg);border:1px solid var(--border);display:grid;place-items:center;font-size:13px;font-weight:700;color:var(--text-dim);flex-shrink:0;">${esc((l.scorer.name||'?').split(/\s+/).slice(-1)[0]?.[0]||'?')}</div>`;
 return `
           <div style="display:grid;grid-template-columns:36px 1fr auto auto;gap:12px;padding:10px 12px;border-bottom:1px solid var(--border);align-items:center;">
@@ -11368,7 +11368,7 @@ body.innerHTML = `
       ${buildV4ContextBadges(match, pred)}
       <div class="teams-big">
         <div class="side">
-          ${home?.logo ? `<img src="${esc(home.logo)}" alt="" loading="lazy" decoding="async" data-fallback-mode="hide">` : ''}
+          ${home?.logo ? `<img src="${esc(home.logo)}" alt="" aria-hidden="true" loading="lazy" decoding="async" data-fallback-mode="hide">` : ''}
           <div class="name">${esc(home?.name || '—')}</div>
           <div class="rec">${esc(getRecord(home) || '')}${stdH ? ` · #${esc(stdH.rank)} au classement · ${esc(stdH.points || 0)} pts` : ''}</div>
           ${(() => { const f = derivedForm(home); return f ? renderForm(f, true) : ''; })()}
@@ -11377,7 +11377,7 @@ body.innerHTML = `
           ${isFinal ? `<div class="score">${esc(home?.score ?? '')} - ${esc(away?.score ?? '')}</div>` : '<div>VS</div>'}
         </div>
         <div class="side">
-          ${away?.logo ? `<img src="${esc(away.logo)}" alt="" loading="lazy" decoding="async" data-fallback-mode="hide">` : ''}
+          ${away?.logo ? `<img src="${esc(away.logo)}" alt="" aria-hidden="true" loading="lazy" decoding="async" data-fallback-mode="hide">` : ''}
           <div class="name">${esc(away?.name || '—')}</div>
           <div class="rec">${esc(getRecord(away) || '')}${stdA ? ` · #${esc(stdA.rank)} au classement · ${esc(stdA.points || 0)} pts` : ''}</div>
           ${(() => { const f = derivedForm(away); return f ? renderForm(f, true) : ''; })()}
@@ -14517,7 +14517,7 @@ div.innerHTML = `
           <h3 id="__stake-prompt-title" style="margin:0 0 6px;font-size:16px;color:var(--text);font-weight:700;">💰 ${esc(label)}</h3>
           <div style="font-size:12px;color:var(--text-dim);margin-bottom:12px;">Mise suggérée par Kelly. Modifie si tu veux.</div>
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:14px;">
-            <input id="__stake-input" type="number" step="0.10" min="0.10" max="10000" value="${esc(suggested)}" autofocus style="flex:1;padding:10px 12px;background:var(--panel-2,rgba(255,255,255,.04));border:1px solid var(--border-2);color:var(--text);border-radius:8px;font-size:16px;font-variant-numeric:tabular-nums;">
+            <input id="__stake-input" type="number" aria-label="Montant de la mise en euros" step="0.10" min="0.10" max="10000" value="${esc(suggested)}" autofocus style="flex:1;padding:10px 12px;background:var(--panel-2,rgba(255,255,255,.04));border:1px solid var(--border-2);color:var(--text);border-radius:8px;font-size:16px;font-variant-numeric:tabular-nums;">
             <span style="color:var(--text-dim);font-size:14px;">€</span>
           </div>
           <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;">
@@ -16908,7 +16908,7 @@ return `<span class="v36-tier-badge" data-tone="${esc(tier.tone)}" aria-label="$
 };
 const v36LogoFallback = (team) => (v36TeamName(team) || '?').slice(0, 1);
 const v36Logo = (team) => team?.logo
-? `<img class="v36-logo-img" src="${esc(team.logo)}" alt="" loading="lazy" decoding="async" width="16" height="16" data-fallback="${esc(v36LogoFallback(team))}">`
+? `<img class="v36-logo-img" src="${esc(team.logo)}" alt="" aria-hidden="true" loading="lazy" decoding="async" width="16" height="16" data-fallback="${esc(v36LogoFallback(team))}">`
 : `<span>${esc(v36LogoFallback(team))}</span>`;
 const v36MatchTitleHtml = (p) => {
 const { home, away } = getSides(p.m);
@@ -18669,8 +18669,8 @@ const wxUrl = (primary.m && primary.m.winamax && primary.m.winamax.url) ? primar
 const matchId = String(primary.m && primary.m.id || '');
 const market = (primary.best && primary.best.market) || '1n2';
 const pickKey = (primary.best && primary.best.key) || (primary.pred && primary.pred.pick && primary.pred.pick.key) || '';
-const logoHome = primary.homeLogo ? `<img src="${esc(primary.homeLogo)}" alt="" loading="lazy" decoding="async" data-fallback-mode="hide">` : '<span></span>';
-const logoAway = primary.awayLogo ? `<img src="${esc(primary.awayLogo)}" alt="" loading="lazy" decoding="async" data-fallback-mode="hide">` : '<span></span>';
+const logoHome = primary.homeLogo ? `<img src="${esc(primary.homeLogo)}" alt="" aria-hidden="true" loading="lazy" decoding="async" data-fallback-mode="hide">` : '<span></span>';
+const logoAway = primary.awayLogo ? `<img src="${esc(primary.awayLogo)}" alt="" aria-hidden="true" loading="lazy" decoding="async" data-fallback-mode="hide">` : '<span></span>';
 return `
           <article class="dash-cockpit__pick interactive" data-match-id="${esc(matchId)}" role="button" tabindex="0">
             <div class="dash-cockpit__pick-head">
@@ -19134,8 +19134,8 @@ ${ticket(attack, 'Ticket attaque')}
         const minutes = Math.round((bbfSafeTs(p.m) - bbfNowMs) / 60000);
         const timeLabel = minutes > 0 && minutes < 120 ? `dans ${minutes} min` : (typeof fmtTime === 'function' ? fmtTime(p.m.date) : '');
         const initials = (team) => String(bbfTeamName(team)).split(/\s+/).filter(Boolean).slice(0,2).map(w => w[0]).join('').toUpperCase() || '•';
-        const logo = (team) => team?.logo ? `<img src="${esc(team.logo)}" alt="" loading="lazy" decoding="async" data-fallback-text="${esc(initials(team))}">` : `<span>${esc(initials(team))}</span>`;
-        const backdropLogo = (team) => team?.logo ? `<img src="${esc(team.logo)}" alt="" loading="lazy" decoding="async" data-fallback-mode="remove">` : '';
+        const logo = (team) => team?.logo ? `<img src="${esc(team.logo)}" alt="" aria-hidden="true" loading="lazy" decoding="async" data-fallback-text="${esc(initials(team))}">` : `<span>${esc(initials(team))}</span>`;
+        const backdropLogo = (team) => team?.logo ? `<img src="${esc(team.logo)}" alt="" aria-hidden="true" loading="lazy" decoding="async" data-fallback-mode="remove">` : '';
         const heroBackdrop = mode === 'hero' ? `<div class="bbf-card__backdrop" aria-hidden="true">${backdropLogo(home)}${backdropLogo(away)}</div>` : '';
         const centerTime = mode === 'hero' && typeof fmtTime === 'function' ? fmtTime(p.m.date) : 'vs';
         const sm = p.m?.smart_money;
@@ -19255,7 +19255,7 @@ const bbfDetectedMatchesHtml = bbfDetectedMatches.total ? `
         </section>` : '';
 const bbfScorerCard = (s) => {
 const imgFallback = esc(String(s.name || '?').split(/\s+/).filter(Boolean).slice(0,2).map(w => w[0]).join('').toUpperCase() || '•');
-const img = s.pid ? `<img src="https://img.sofascore.com/api/v1/player/${esc(String(s.pid))}/image" alt="" loading="lazy" decoding="async" data-fallback-text="${imgFallback}">` : `<span>${imgFallback}</span>`;
+const img = s.pid ? `<img src="https://img.sofascore.com/api/v1/player/${esc(String(s.pid))}/image" alt="" aria-hidden="true" loading="lazy" decoding="async" data-fallback-text="${imgFallback}">` : `<span>${imgFallback}</span>`;
 const odd = s.impliedOdd ? `@${Number(s.impliedOdd).toFixed(2)}` : 'cote à vérifier';
 const href = s.url ? (/^https?:/i.test(String(s.url)) ? String(s.url) : `https://www.winamax.fr${String(s.url)}`) : '';
 return `<article class="bbf-scorer" data-match-id="${esc(String(s.mId || ''))}">
@@ -19789,8 +19789,8 @@ try {
 const sides = (typeof getSides === 'function') ? getSides(heroPick.m) : { home: null, away: null };
 const hL = sides.home?.logo;
 const aL = sides.away?.logo;
-const hImg = hL ? `<img src="${esc(hL)}" alt="" loading="lazy" decoding="async" data-fallback-mode="hide" style="width:36px;height:36px;border-radius:6px;background:rgba(255,255,255,.04);padding:2px;vertical-align:middle;margin-right:8px;">` : '';
-const aImg = aL ? `<img src="${esc(aL)}" alt="" loading="lazy" decoding="async" data-fallback-mode="hide" style="width:36px;height:36px;border-radius:6px;background:rgba(255,255,255,.04);padding:2px;vertical-align:middle;margin-left:8px;">` : '';
+const hImg = hL ? `<img src="${esc(hL)}" alt="" aria-hidden="true" loading="lazy" decoding="async" data-fallback-mode="hide" style="width:36px;height:36px;border-radius:6px;background:rgba(255,255,255,.04);padding:2px;vertical-align:middle;margin-right:8px;">` : '';
+const aImg = aL ? `<img src="${esc(aL)}" alt="" aria-hidden="true" loading="lazy" decoding="async" data-fallback-mode="hide" style="width:36px;height:36px;border-radius:6px;background:rgba(255,255,255,.04);padding:2px;vertical-align:middle;margin-left:8px;">` : '';
 return `${hImg}${esc(heroPick.homeName)}<span class="ed-hero__vs"> vs </span>${esc(heroPick.awayName)}${aImg}`;
 } catch(e) {
 return `${esc(heroPick.homeName)} <span class="ed-hero__vs">vs</span> ${esc(heroPick.awayName)}`;
@@ -20159,10 +20159,10 @@ return `
 </div>
 </div>
 <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px;line-height:1.25;">
-${p.homeLogo ? `<img src="${esc(p.homeLogo)}" alt="" style="width:22px;height:22px;object-fit:contain;flex-shrink:0;" loading="lazy" decoding="async">` : ''}
+${p.homeLogo ? `<img src="${esc(p.homeLogo)}" alt="" aria-hidden="true" style="width:22px;height:22px;object-fit:contain;flex-shrink:0;" loading="lazy" decoding="async">` : ''}
 <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(p.homeName)}</span>
 <span style="color:var(--text-dim);font-weight:400;">vs</span>
-${p.awayLogo ? `<img src="${esc(p.awayLogo)}" alt="" style="width:22px;height:22px;object-fit:contain;flex-shrink:0;" loading="lazy" decoding="async">` : ''}
+${p.awayLogo ? `<img src="${esc(p.awayLogo)}" alt="" aria-hidden="true" style="width:22px;height:22px;object-fit:contain;flex-shrink:0;" loading="lazy" decoding="async">` : ''}
 <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(p.awayName)}</span>
 </div>
 <div style="font-size:16px;color:var(--brand);font-weight:700;margin:10px 0 4px;">→ ${esc(pickLabel)}</div>
@@ -20281,10 +20281,10 @@ return `
 </div>`;
                   })()}
                   <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">
-            ${hLogo ? `<img src="${esc(hLogo)}" alt="" loading="lazy" decoding="async" style="width:24px;height:24px;object-fit:contain;border-radius:4px;background:rgba(255,255,255,.04);padding:1px;">` : ''}
+            ${hLogo ? `<img src="${esc(hLogo)}" alt="" aria-hidden="true" loading="lazy" decoding="async" style="width:24px;height:24px;object-fit:contain;border-radius:4px;background:rgba(255,255,255,.04);padding:1px;">` : ''}
                     <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(hN)}</span>
                     <span style="color:var(--text-dim);font-weight:400;">vs</span>
-            ${aLogo ? `<img src="${esc(aLogo)}" alt="" loading="lazy" decoding="async" style="width:24px;height:24px;object-fit:contain;border-radius:4px;background:rgba(255,255,255,.04);padding:1px;">` : ''}
+            ${aLogo ? `<img src="${esc(aLogo)}" alt="" aria-hidden="true" loading="lazy" decoding="async" style="width:24px;height:24px;object-fit:contain;border-radius:4px;background:rgba(255,255,255,.04);padding:1px;">` : ''}
                     <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(aN)}</span>
                   </div>
                   <div style="font-size:13px;color:var(--brand);font-weight:700;margin-bottom:10px;">→ ${esc(pickLbl)}</div>
@@ -22207,7 +22207,7 @@ const url = (p.m.winamax && p.m.winamax.url) || 'https://www.winamax.fr/paris-sp
 const rowId = String(p.m.id || '');
 const compareActive = compareSet.has(rowId);
 const resBadge = isFini ? (p.res === 'won' ? '<span style="padding:3px 10px;background:rgba(52,211,153,.15);color:var(--accent);font-weight:700;font-size:11px;border-radius:999px;">✓ GAGNÉ</span>' : p.res === 'lost' ? '<span style="padding:3px 10px;background:rgba(248,113,113,.15);color:#fca5a5;font-weight:700;font-size:11px;border-radius:999px;">✗ PERDU</span>' : '<span style="padding:3px 10px;background:rgba(148,163,184,.15);color:#94a3b8;font-weight:600;font-size:11px;border-radius:999px;">? n/a</span>') : '';
-const teamLogo = (src) => src ? `<img src="${esc(src)}" alt="" style="width:22px;height:22px;object-fit:contain;border-radius:3px;" loading="lazy" decoding="async">` : '<span style="display:inline-block;width:22px;height:22px;"></span>';
+const teamLogo = (src) => src ? `<img src="${esc(src)}" alt="" aria-hidden="true" style="width:22px;height:22px;object-fit:contain;border-radius:3px;" loading="lazy" decoding="async">` : '<span style="display:inline-block;width:22px;height:22px;"></span>';
 const _cntLabel = (() => {
 const ko = new Date(p.m.date).getTime();
 if (!isFinite(ko)) return '';
@@ -22292,7 +22292,7 @@ const rowId = String(p.m.id || '');
 const league = p.m.league_name || p.m.league || '';
 const sportEm = { football:'⚽', tennis:'🎾', basketball:'🏀', hockey:'🏒', baseball:'⚾', 'american-football':'🏈', mma:'🥊', golf:'⛳', racing:'🏎️', rugby:'🏉' }[p.m.sport] || '🎯';
 const teamLogo = (src, name) => src
-? `<img src="${esc(src)}" alt="" width="24" height="24" style="width:24px;height:24px;object-fit:contain;border-radius:4px;flex:0 0 auto;" loading="lazy" decoding="async">`
+? `<img src="${esc(src)}" alt="" aria-hidden="true" width="24" height="24" style="width:24px;height:24px;object-fit:contain;border-radius:4px;flex:0 0 auto;" loading="lazy" decoding="async">`
 : `<span aria-hidden="true" style="width:24px;height:24px;border-radius:6px;background:rgba(255,255,255,.08);border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:var(--text-dim);flex:0 0 auto;">${esc(String(name || '?').slice(0,2).toUpperCase())}</span>`;
 const dateLabel = (() => {
 try {
@@ -23342,7 +23342,7 @@ ROI = bénéfice net ÷ mise totale, à mise plate 1€/pari. Un ROI négatif su
             return `
 <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin:0 4px 8px;font-size:12px;">
 <span class="u-text-dim">Granularité</span>
-<select id="cred-bins-select" style="background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:6px;padding:5px 8px;font-size:12px;cursor:pointer;font-family:inherit;">
+<select id="cred-bins-select" aria-label="Granularité des bins de calibration" style="background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:6px;padding:5px 8px;font-size:12px;cursor:pointer;font-family:inherit;">
 <option value="5">5 bins (gros tableaux)</option>
 <option value="10" selected>10 bins (défaut)</option>
 <option value="20">20 bins (fin grain)</option>
@@ -23874,7 +23874,7 @@ return `
               const posIcon = s.pos === 'F' ? '⚔️' : s.pos === 'M' ? '🎯' : s.pos === 'D' ? '🛡️' : '🧤';
               // is known ; falls back to the position emoji when not available.
               const faceHtml = s.pid
-                ? `<img loading="lazy" decoding="async" src="https://img.sofascore.com/api/v1/player/${s.pid}/image" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;background:var(--bg);border:1px solid var(--border);" data-fallback-text="${esc(posIcon)}" data-fallback-style="font-size:14px;width:28px;height:28px;display:grid;place-items:center;">`
+                ? `<img loading="lazy" decoding="async" src="https://img.sofascore.com/api/v1/player/${s.pid}/image" alt="" aria-hidden="true" style="width:28px;height:28px;border-radius:50%;object-fit:cover;background:var(--bg);border:1px solid var(--border);" data-fallback-text="${esc(posIcon)}" data-fallback-style="font-size:14px;width:28px;height:28px;display:grid;place-items:center;">`
                 : `<div style="font-size:14px;width:28px;height:28px;display:grid;place-items:center;">${posIcon}</div>`;
               return `
 <div style="display:grid;grid-template-columns:28px 1fr auto auto;gap:10px;padding:7px 10px;border-bottom:1px solid var(--border);align-items:center;">

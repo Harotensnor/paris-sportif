@@ -18,6 +18,9 @@ REQUIRED = [
     "scripts/audit_innerhtml_safety.py",
     "scripts/audit_fetch_tracking.py",
     "scripts/audit_all_probes_wired.py",
+    "scripts/audit_a11y_aria_labels.py",
+    "scripts/audit_image_alts.py",
+    "scripts/audit_color_contrast.py",
     "scripts/audit_qa_workflows.py",
     "scripts/audit_qa_matrix_versions.py",
 ]

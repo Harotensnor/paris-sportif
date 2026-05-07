@@ -1646,3 +1646,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix: remove 14 unreferenced helper functions with a guarded ref-count codemod, then restamp legacy hash/footer/SW.
 - Verrou: `node --check legacy-app.js`, `check_bundle_size.py`, and full QA gate after cleanup.
 - Chiffres: legacy bundle 1732.9 KB -> 1697.9 KB, below the 1700 KB target.
+
+## Sprint v37.117 — AUTO 10/10 a11y static guards
+- Symptom: button/input labels, decorative images, and token contrast had no dedicated CI guard.
+- Cause: modal ARIA was locked, but broader static a11y checks were still only implicit in browser audits.
+- Fix: add conservative label, image-alt, and color-contrast audits; name exposed controls and hide decorative logos.
+- Verrou: `audit_a11y_aria_labels.py`, `audit_image_alts.py`, `audit_color_contrast.py` wired into QA gate + e2e drift.
+- Chiffres: 54/54 pytest, 43/43 QA gates, 7/7 probes critiques, bundle legacy 1698.4 KB.
