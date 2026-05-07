@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-07T19:55:19Z",
+  "generated_at": "2026-05-07T19:57:56Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -491,11 +491,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -1.548,
-        "away_score": -0.467,
-        "home_fade": 1.95,
-        "away_fade": 1.15,
-        "reason": "Direction nette: Carolina Hurricanes (-0.47)",
+        "home_score": -0.898,
+        "away_score": 0.183,
+        "home_fade": 0.95,
+        "away_fade": 0.15,
+        "reason": "Direction nette: Carolina Hurricanes (+0.18)",
         "detail": [
           {
             "side": "home",
@@ -514,18 +514,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
           }
         ]
       }
@@ -2027,13 +2015,13 @@
         "Deplacement estime 2513 km, decalage ~1.8h"
       ],
       "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
+        "status": "net",
+        "net_side": "away",
         "home_score": -1.029,
-        "away_score": 0.322,
+        "away_score": -0.468,
         "home_fade": 1.36,
         "away_fade": 0.944,
-        "reason": "Signaux mitigés: avantage net trop faible (San Diego Padres -1.03, St. Louis Cardinals +0.32)",
+        "reason": "Direction nette: St. Louis Cardinals (-0.47)",
         "detail": [
           {
             "side": "home",
@@ -2052,12 +2040,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.79
           },
           {
             "side": "away",
