@@ -71,20 +71,18 @@
   code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: .92em; background: rgba(167,139,250,.1); padding: 1px 5px; border-radius: 4px; }
   header.topbar {
     position: sticky; top: 0; z-index: 50;
-    background: #08080a; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    background: rgba(8,8,10,.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid rgba(255,255,255,.06);
     padding: 12px 20px;
     display: flex; align-items: center; justify-content: space-between;
   }
   .brand { display: flex; align-items: center; gap: 8px; font-weight: 800; letter-spacing: -.5px; color: inherit; }
   .brand-logo { font-size: 22px; }
-  .brand-text { font-size: 17px; color: #f8fafc; }
+  .brand-text { font-size: 17px; }
   .topbar nav a { margin-left: 16px; font-size: 13.5px; color: #a3a3aa; font-weight: 500; min-height: 36px; display: inline-flex; align-items: center; }
   .topbar nav a:hover { color: #e6ebf2; text-decoration: none; }
   main { max-width: 1100px; margin: 0 auto; padding: 16px 20px 60px; }
-  .breadcrumb { font-size: 12px; color: #9ba1ac; margin-top: 14px; }
-  .breadcrumb a { color: #c4b5fd; text-decoration: underline; text-underline-offset: 2px; font-weight: 800; }
-  main a { text-decoration: underline; text-underline-offset: 2px; font-weight: 800; }
+  .breadcrumb { font-size: 12px; color: #6b6b73; margin-top: 14px; }
   .uppercase-pill {
     display: inline-block; font-size: 11px; color: #34d399;
     text-transform: uppercase; letter-spacing: 1.4px; font-weight: 700;
@@ -176,37 +174,13 @@
   footer.site-footer nav a { margin: 0 10px; color: #a3a3aa; }
   @media (prefers-color-scheme: light) {
     html, body { background: #f5f5f7; color: #08080a; }
-    header.topbar, .topbar { background: #f5f5f7; border-bottom-color: rgba(0,0,0,.12); color: #111827; }
-    .brand, .brand-text { color: #111827; }
-    .topbar nav a { color: #374151; }
-    .breadcrumb { color: #374151; }
-    .breadcrumb a { color: #4c1d95; }
-    .breadcrumb span { color: #374151 !important; }
-    .uppercase-pill { color: #047857; }
-    .lead { color: #374151; }
-    .meta-banner { color: #374151; }
-    main p[style] { color: #374151 !important; }
-    main a { color: #4c1d95; }
-    footer.site-footer nav a { color: #374151; }
+    .topbar { background: rgba(245,245,247,.85); border-bottom-color: rgba(0,0,0,.08); }
+    .topbar nav a { color: #444; }
     .kpi-card, table { background: #fff; border-color: rgba(0,0,0,.08); color: #2a2a30; }
-    .kpi-label, .kpi-sub { color: #374151; }
     .kpi-value { color: #08080a; }
-    .kpi-value.neu { color: #5b21b6; }
-    .kpi-value.pos, tbody .pos { color: #047857 !important; }
-    .kpi-value.neg, tbody .neg { color: #b91c1c !important; }
-    tbody .neu { color: #92400e !important; }
-    h4 { color: #111827 !important; }
-    main li { color: #374151 !important; }
-    main > div span[style*="font-size:10.5px"] { color: #374151 !important; }
-    main > div[style*="rgba(255,255,255,.02)"] span { color: #374151 !important; }
-    .danger-banner { color: #374151 !important; }
-    .danger-banner strong, .meta-banner strong, main p strong { color: #111827 !important; }
     h2 { color: #08080a; }
-    h2 .subtle { color: #374151; }
     thead th { background: rgba(0,0,0,.03); color: #444; border-bottom-color: rgba(0,0,0,.08); }
     tbody td { color: #2a2a30; border-bottom-color: rgba(0,0,0,.04); }
-    tbody td[style] { color: #374151 !important; }
-    tbody td span { color: #374151 !important; }
     code { background: rgba(167,139,250,.15); }
   }
   @media (max-width: 600px) {
@@ -634,9 +608,9 @@
     headers.forEach((th, idx) => {
       if (th.dataset.sortable === 'false') return;
       th.style.cursor = 'pointer';
+      th.setAttribute('role', 'button');
       th.setAttribute('tabindex', '0');
       th.setAttribute('aria-sort', 'none');
-      th.setAttribute('aria-label', `${th.textContent.trim()} : trier la table`);
       th.title = 'Cliquer pour trier';
       const onSort = () => {
         const tbody = table.querySelector('tbody');
