@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-07T22:28:14Z",
+  "generated_at": "2026-05-07T22:33:20Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -584,6 +584,42 @@
             "whip": 1.32
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Tampa Bay Rays",
+          "pitcher": "Jesse Scholtens",
+          "label": "Jesse Scholtens plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.6023,
+          "fair_odds": 1.66,
+          "expected_strikeouts": 4.95,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 6.75,
+            "era": 3.18,
+            "whip": 1.15,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Tampa Bay Rays",
+          "pitcher": "Jesse Scholtens",
+          "label": "Jesse Scholtens ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5603,
+          "fair_odds": 1.78,
+          "expected_hr_allowed": 0.579,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 0.79,
+            "era": 3.18,
+            "whip": 1.15
+          },
+          "side": "away"
         }
       ]
     },
@@ -1372,6 +1408,52 @@
       ]
     },
     {
+      "event_id": "401815273",
+      "kickoff": "2026-05-09T20:10Z",
+      "league": "MLB",
+      "match": "Tampa Bay Rays at Boston Red Sox",
+      "home": "Boston Red Sox",
+      "away": "Tampa Bay Rays",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Tampa Bay Rays",
+          "pitcher": "Nick Martinez",
+          "label": "Nick Martinez moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.6257,
+          "fair_odds": 1.6,
+          "expected_strikeouts": 4.0,
+          "projected_ip": 6.0,
+          "inputs": {
+            "k9": 6.0,
+            "era": 1.71,
+            "whip": 1.02,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Tampa Bay Rays",
+          "pitcher": "Nick Martinez",
+          "label": "Nick Martinez ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6527,
+          "fair_odds": 1.53,
+          "expected_hr_allowed": 0.427,
+          "projected_ip": 6.0,
+          "inputs": {
+            "hr9": 0.64,
+            "era": 1.71,
+            "whip": 1.02
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
       "event_id": "401815274",
       "kickoff": "2026-05-09T20:10Z",
       "league": "MLB",
@@ -1956,7 +2038,7 @@
       ]
     }
   ],
-  "props": 94,
+  "props": 98,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
