@@ -1744,3 +1744,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix: re-query each chip with a fresh locator, scroll it into view, then wait for hash, storage and active chip alignment.
 - Verrou: probe_day_filter now covers every rendered date chip without flaky 7-day fallback reports.
 - Chiffres: probe_day_filter OK, probe_all_pages 41/41, 45/45 QA gates, 61/61 pytest.
+
+## Sprint v37.131 — AUTO 10/10 main data sync
+- Symptom: PR merge checks ran against a fresher main snapshot than local branch probes.
+- Cause: refresh-data added 28 data commits after the branch merge-base, shifting health/night truth timestamps.
+- Fix: merge main data, preserve branch runtime assets, restamp hashes, regenerate night_metrics and health from data.js.
+- Verrou: audit_data_truth enforces data.js, health.json and night_metrics.json freshness alignment.
+- Chiffres: 45/45 QA gates, desktop shard 1/3 91/91, console matrix 32/32, probe_day_filter OK.
