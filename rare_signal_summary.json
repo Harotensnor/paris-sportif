@@ -1,26 +1,26 @@
 {
-  "generated_at": "2026-05-07T15:53:30Z",
+  "generated_at": "2026-05-07T16:28:19Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 65,
-    "actionable": 24,
+    "active_events": 62,
+    "actionable": 23,
     "watch": 2,
-    "risk": 39,
+    "risk": 37,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 17,
       "travel_extreme": 7,
       "back_to_back_travel": 16,
       "signal_conflict": 6,
-      "market_uncertain": 33,
+      "market_uncertain": 32,
       "market_move": 2
     },
     "by_quality": {
-      "actionable": 24,
+      "actionable": 23,
       "watch": 2,
-      "risk": 39
+      "risk": 37
     }
   },
   "active_actionable": [
@@ -95,6 +95,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 5-11"
+    },
+    {
+      "event_id": "401871412",
+      "date": "2026-05-08T00:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Philadelphia Flyers",
+      "away": "Carolina Hurricanes",
+      "match": "Philadelphia Flyers - Carolina Hurricanes",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 2.40 -> 3.05 (-27.1%)"
     },
     {
       "event_id": "401815252",
@@ -313,24 +331,6 @@
       "context": "3 match dans les 48h + 1118 km de voyage"
     },
     {
-      "event_id": "401871412",
-      "date": "2026-05-08T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Philadelphia Flyers",
-      "away": "Carolina Hurricanes",
-      "match": "Philadelphia Flyers - Carolina Hurricanes",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Philadelphia Flyers",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 4-0"
-    },
-    {
       "event_id": "401856894",
       "date": "2026-05-09T19:30Z",
       "sport": "basketball",
@@ -437,24 +437,6 @@
       "side": "away",
       "strength": 0.757,
       "context": "1 match dans les 48h + 1135 km de voyage"
-    },
-    {
-      "event_id": "750209",
-      "date": "2026-05-09T17:00Z",
-      "sport": "football",
-      "league_code": "superlig",
-      "league_name": "Süper Lig",
-      "home": "Galatasaray",
-      "away": "Antalyaspor",
-      "match": "Galatasaray - Antalyaspor",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "draw",
-      "strength": 0.667,
-      "context": "Cote draw: 6.25 -> 7.00 (-12.0%)"
     }
   ],
   "active_watch": [
@@ -713,24 +695,6 @@
       "context": "marge bookmaker anormale 18.2%"
     },
     {
-      "event_id": "401842710",
-      "date": "2026-05-10T14:30Z",
-      "sport": "football",
-      "league_code": "allsvenskan",
-      "league_name": "Allsvenskan",
-      "home": "BK Häcken",
-      "away": "Malmö FF",
-      "match": "BK Häcken - Malmö FF",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 19.1%"
-    },
-    {
       "event_id": "741272",
       "date": "2026-05-10T14:45Z",
       "sport": "football",
@@ -783,24 +747,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.7%"
-    },
-    {
-      "event_id": "741266",
-      "date": "2026-05-10T14:45Z",
-      "sport": "football",
-      "league_code": "eredivisie",
-      "league_name": "Eredivisie",
-      "home": "Go Ahead Eagles",
-      "away": "PSV Eindhoven",
-      "match": "Go Ahead Eagles - PSV Eindhoven",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 19.0%"
     },
     {
       "event_id": "741267",
