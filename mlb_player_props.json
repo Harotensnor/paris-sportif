@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-07T19:18:08Z",
+  "generated_at": "2026-05-07T19:22:39Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401871498",
-      "kickoff": "2026-05-07T19:10Z",
-      "league": "MLB",
-      "match": "New York Mets at Colorado Rockies",
-      "home": "Colorado Rockies",
-      "away": "New York Mets",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Colorado Rockies",
-          "pitcher": "Jose Quintana",
-          "label": "Jose Quintana moins de 2,5 strikeouts",
-          "line": 2.5,
-          "pick": "under",
-          "probability": 0.6744,
-          "fair_odds": 1.48,
-          "expected_strikeouts": 1.98,
-          "projected_ip": 4.18,
-          "inputs": {
-            "k9": 4.26,
-            "era": 3.91,
-            "whip": 1.3,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Colorado Rockies",
-          "pitcher": "Jose Quintana",
-          "label": "Jose Quintana concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5628,
-          "fair_odds": 1.78,
-          "expected_hr_allowed": 0.827,
-          "projected_ip": 4.18,
-          "inputs": {
-            "hr9": 1.78,
-            "era": 3.91,
-            "whip": 1.3
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "New York Mets",
-          "pitcher": "Christian Scott",
-          "label": "Christian Scott plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5,
-          "fair_odds": 2.0,
-          "expected_strikeouts": 4.5,
-          "projected_ip": 3.0,
-          "inputs": {
-            "k9": 13.5,
-            "era": 4.05,
-            "whip": 1.2,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "New York Mets",
-          "pitcher": "Christian Scott",
-          "label": "Christian Scott ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6376,
-          "fair_odds": 1.57,
-          "expected_hr_allowed": 0.45,
-          "projected_ip": 3.0,
-          "inputs": {
-            "hr9": 1.35,
-            "era": 4.05,
-            "whip": 1.2
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815251",
       "kickoff": "2026-05-07T19:40Z",
@@ -706,7 +624,7 @@
       ]
     }
   ],
-  "props": 34,
+  "props": 30,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
