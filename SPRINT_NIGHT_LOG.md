@@ -1737,3 +1737,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix: require the expected visible wrap and realign Combinés/Bilan/Historique/Backtest/Santé/Alertes wraps.
 - Verrou: probe_all_pages now fails on stale visible content from the previous route and missing Performance tabs.
 - Chiffres: probe_all_pages 41/41 expected, desktop shards 3/3 green, mobile shards 3/3 green.
+
+## Sprint v37.130 — AUTO 10/10 day filter probe
+- Symptom: day-filter probe reported a false J+4 failure while the UI persisted the exact date.
+- Cause: the probe reused a pre-snapshotted selector across dashboard re-renders and read state before it settled.
+- Fix: re-query each chip with a fresh locator, scroll it into view, then wait for hash, storage and active chip alignment.
+- Verrou: probe_day_filter now covers every rendered date chip without flaky 7-day fallback reports.
+- Chiffres: probe_day_filter OK, probe_all_pages 41/41, 45/45 QA gates, 61/61 pytest.

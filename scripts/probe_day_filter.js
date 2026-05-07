@@ -86,8 +86,19 @@ function check(label, ok, detail) {
   check('today chip maps to Paris ISO date', Boolean(todayChip), `today=${todayIso}`);
 
   for (const chip of chips) {
-    await page.click(`[data-v37-day="${chip.value}"]`);
-    await page.waitForTimeout(500);
+    const selector = `[data-v37-day="${chip.value}"]`;
+    const target = page.locator(selector).first();
+    await target.waitFor({ state: 'visible', timeout: 5000 });
+    await target.scrollIntoViewIfNeeded();
+    await target.click({ timeout: 5000 });
+    await page.waitForFunction((value) => {
+      let stored = {};
+      try { stored = JSON.parse(localStorage.getItem('paris_sportif_v36_home_filter') || '{}') || {}; }
+      catch (e) { stored = {}; }
+      const hashDate = new URLSearchParams((location.hash || '').split('?')[1] || '').get('date') || '';
+      const activeValues = Array.from(document.querySelectorAll('[data-v37-day].is-active')).map(btn => btn.dataset.v37Day || '');
+      return hashDate === value && stored.date === value && activeValues.length === 1 && activeValues[0] === value;
+    }, chip.value, { timeout: 3000 }).catch(() => {});
     const state = await page.evaluate(() => {
       let stored = {};
       try { stored = JSON.parse(localStorage.getItem('paris_sportif_v36_home_filter') || '{}') || {}; }
