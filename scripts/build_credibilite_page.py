@@ -195,59 +195,8 @@ PAGE_TEMPLATE = '''<!DOCTYPE html>
   .legend .swatch {{ display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }}
   footer.site-footer {{ border-top: 1px solid rgba(255,255,255,.06); margin-top: 40px; padding: 24px 20px; text-align: center; font-size: 12.5px; color: #c5c5cc; }}
   footer.site-footer nav a {{ margin: 0 10px; color: #d4d4dc; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }}
-  @media (prefers-color-scheme: light) {{
-    html, body {{ background: #f5f5f7; color: #08080a; }}
-    /* a11y light-mode contrast: footer + breadcrumb + lead links */
-    footer.site-footer nav a {{ color: #4b5563 !important; text-decoration: underline; }}
-    footer.site-footer {{ color: #4b5563 !important; }}
-    .breadcrumb {{ color: #4b5563 !important; }}
-    .breadcrumb a {{ color: #4338ca !important; text-decoration: underline; }}
-    .lead a, main p a {{ color: #4338ca !important; text-decoration: underline; }}
-    .lead {{ color: #2a2a30 !important; }}
-    .topbar {{ background: rgba(245,245,247,.85); border-bottom-color: rgba(0,0,0,.08); }}
-    .topbar nav a {{ color: #444; }}
-    .kpi-card, table, section.card {{ background: #fff; border-color: rgba(0,0,0,.08); color: #2a2a30; }}
-    .kpi-value, h2 {{ color: #08080a; }}
-    thead th {{ background: rgba(0,0,0,.03); color: #444; border-bottom-color: rgba(0,0,0,.08); }}
-    code {{ background: rgba(167,139,250,.15); }}
-  }}
-  @media (max-width: 600px) {{
-    h1 {{ font-size: 26px; }}
-    h2 {{ font-size: 18px; }}
-    .topbar nav {{ display: none; }}
-    .kpi-strip {{ grid-template-columns: 1fr 1fr; }}
-  }}
-</style>
-</head>
-<body>
-<header class="topbar" role="banner">
-  <a href="./" class="brand" aria-label="Retour à l'accueil Paris-Sportif">
-    <span class="brand-logo">🎯</span>
-    <span class="brand-text">Paris-Sportif</span>
-  </a>
-  <nav aria-label="Pages éditoriales">
-    <a href="./">Accueil</a>
-    <a href="methodologie.html">Méthodologie</a>
-    <a href="backtest.html">Backtest</a>
-    <a href="academie.html">Académie</a>
-    <a href="legal.html">Légal</a>
-  </nav>
-</header>
-
-<main>
-  <nav class="breadcrumb" aria-label="Fil d'ariane">
-    <a href="./">Accueil</a> ›
-    <span style="color:#9ba1ac;">Crédibilité</span>
-  </nav>
-
-  <span class="uppercase-pill">Calibration probabiliste</span>
-  <h1>🎚️ Le modèle est-il honnête ?</h1>
-  <p class="lead">Le test ultime d'un modèle de probabilité : <strong>quand il dit "70% de chance", est-ce que 70% de ces prédictions gagnent vraiment ?</strong> Si oui, le modèle est calibré (honnête). Sinon, ses pourcentages sont du bruit.</p>
-
-  <div class="kpi-strip">
-    <div class="kpi-card">
-      <div class="kpi-label">Picks évalués</div>
-      <div class="kpi-value">{n}</div>
+  .contrib-prompt a, main p a, p a, li a {{ text-decoration: underline !important; }}
+</div>
       <div class="kpi-sub">{date_start} → {date_end}</div>
     </div>
     <div class="kpi-card">

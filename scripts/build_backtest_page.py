@@ -691,6 +691,7 @@ PAGE_TEMPLATE = '''<!DOCTYPE html>
   .pos {{ color: #34d399; font-weight: 600; }}
   .neg {{ color: #f87171; font-weight: 600; }}
   .neu {{ color: #fbbf24; font-weight: 500; }}
+  .contrib-prompt a, main p a, p a, li a {{ text-decoration: underline !important; }}
 
   table {{
     width: 100%; border-collapse: collapse; margin: 0 0 16px;
@@ -713,101 +714,7 @@ PAGE_TEMPLATE = '''<!DOCTYPE html>
     border-bottom: 1px solid rgba(255,255,255,.08);
     z-index: 1;
   }}
-  @media (prefers-color-scheme: light) {{
-    thead th {{ background: #fafafa; background-image: linear-gradient(rgba(0,0,0,.02), rgba(0,0,0,.02)); }}
-  }}
-  tbody td {{
-    padding: 10px 12px;
-    border-bottom: 1px solid rgba(255,255,255,.04);
-    color: #c5c5cc;
-  }}
-  tbody tr:last-child td {{ border-bottom: none; }}
-  tbody td:nth-child(2), tbody td:nth-child(3), tbody td:nth-child(4),
-  tbody td:nth-child(5), tbody td:nth-child(6), tbody td:nth-child(7) {{
-    text-align: right;
-  }}
-
-  .meta-banner {{
-    margin: 0 0 22px; padding: 14px 16px;
-    background: rgba(167,139,250,.08);
-    border: 1px solid rgba(167,139,250,.25);
-    border-left: 3px solid #a78bfa;
-    border-radius: 0 10px 10px 0;
-    font-size: 13px; color: #c5c5cc;
-  }}
-  .danger-banner {{
-    margin: 24px 0 0; padding: 14px 16px;
-    background: rgba(248,113,113,.06);
-    border: 1px solid rgba(248,113,113,.25);
-    border-left: 3px solid #f87171;
-    border-radius: 0 10px 10px 0;
-    font-size: 13px; color: #c5c5cc;
-  }}
-  .danger-banner strong {{ color: #fca5a5; }}
-  footer.site-footer {{
-    border-top: 1px solid rgba(255,255,255,.06);
-    margin-top: 40px; padding: 24px 20px;
-    text-align: center; font-size: 12.5px; color: #6b6b73;
-  }}
-  footer.site-footer nav a {{ margin: 0 10px; color: #a3a3aa; }}
-  @media (prefers-color-scheme: light) {{
-    html, body {{ background: #f5f5f7; color: #08080a; }}
-    /* a11y light-mode contrast: footer + breadcrumb + lead links */
-    footer.site-footer nav a {{ color: #4b5563 !important; text-decoration: underline; }}
-    footer.site-footer {{ color: #4b5563 !important; }}
-    .breadcrumb {{ color: #4b5563 !important; }}
-    .breadcrumb a {{ color: #4338ca !important; text-decoration: underline; }}
-    .lead a, main p a {{ color: #4338ca !important; text-decoration: underline; }}
-    .lead {{ color: #2a2a30 !important; }}
-    .topbar {{ background: rgba(245,245,247,.85); border-bottom-color: rgba(0,0,0,.08); }}
-    .topbar nav a {{ color: #444; }}
-    .kpi-card, table {{ background: #fff; border-color: rgba(0,0,0,.08); color: #2a2a30; }}
-    .kpi-value {{ color: #08080a; }}
-    h2 {{ color: #08080a; }}
-    thead th {{ background: rgba(0,0,0,.03); color: #444; border-bottom-color: rgba(0,0,0,.08); }}
-    tbody td {{ color: #2a2a30; border-bottom-color: rgba(0,0,0,.04); }}
-    code {{ background: rgba(167,139,250,.15); }}
-  }}
-  @media (max-width: 600px) {{
-    h1 {{ font-size: 28px; }}
-    h2 {{ font-size: 18px; }}
-    .topbar nav {{ display: none; }}
-    .kpi-strip {{ grid-template-columns: 1fr 1fr; }}
-    table {{ font-size: 12px; }}
-    table thead th, table tbody td {{ padding: 6px 8px; }}
-  }}
-</style>
-</head>
-<body>
-<header class="topbar" role="banner">
-  <a href="./" class="brand" aria-label="Retour à l'accueil Paris-Sportif">
-    <span class="brand-logo">🎯</span>
-    <span class="brand-text">Paris-Sportif</span>
-  </a>
-  <nav aria-label="Pages éditoriales">
-    <a href="./">Accueil</a>
-    <a href="methodologie.html">Méthodologie</a>
-    <a href="academie.html">Académie</a>
-    <a href="legal.html">Légal</a>
-  </nav>
-</header>
-
-<main>
-  <nav class="breadcrumb" aria-label="Fil d'ariane">
-    <a href="./">Accueil</a> ›
-    <span style="color:#9ba1ac;">Backtest</span>
-  </nav>
-
-  <span class="uppercase-pill">Performance vérifiable · cron hebdo</span>
-  <h1>📈 Backtest du modèle</h1>
-  <p class="lead">
-    Performance réelle du modèle <code>predictMatch()</code> rejouée chaque dimanche sur tous les picks réglés depuis l'archivage
-    (<code>results_archive.jsonl</code> + <code>data.js</code>). Vrai modèle exécuté via <code>scripts/model_loader.py</code>,
-    pas une réimplémentation simplifiée.
-  </p>
-
-  <div class="meta-banner">
-    📅 Période : <b>{date_start}</b> → <b>{date_end}</b><br>
+</b> → <b>{date_end}</b><br>
     🔄 Régénéré : <b>{generated_human}</b><br>
     📦 Sources brutes : <a href="backtest_report_v2.json">backtest_report_v2.json</a> · <a href="backtest_report_v2.md">.md</a> · <a href="results_archive.jsonl">results_archive.jsonl</a>
   </div>

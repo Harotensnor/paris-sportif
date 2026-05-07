@@ -31003,15 +31003,17 @@ ses paris sur le site (ni manuel, ni import). -->
     if (prefs.consentLocalStorage === 'accepted' || prefs.consentLocalStorage === 'declined') return;
     // BUG-FIX 2026-05-07 — `userPrefs` est écrit dès le boot (lang, etc.)
     // donc le détecter dans legacyKeys auto-acceptait le consentement RGPD
-    // sur une visite fraiche. On exclut `userPrefs` du check : seuls les
-    // keys typiquement écrits par l'usage du site signent un user legacy.
-    // `bankroll` est aussi un userPrefs.bankroll (numeric), donc on le check
-    // aussi en sous-prop pour les users qui avaient seulement réglé bankroll.
+    // sur une visite fraiche. On considère "legacy" UNIQUEMENT si l'user a
+    // une trace d'usage réel (level/onboardingDone choisis, bankroll réglé,
+    // ou clés legacy hors-userPrefs). Une visite fraiche avec `lang:'en'`
+    // seul ne déclenche plus l'auto-accept.
     const legacyKeys = ['currentPage', 'bankroll', 'paris_sportif_tracked_bets', 'agentRules'];
+    const userPrefsUsageMarkers = ['level', 'onboardingDone', 'agentSeen', 'pushNotifs'];
     const hasLegacy = legacyKeys.some(k => {
       const v = localStorage.getItem(k);
       return v != null && v !== '' && v !== '{}' && v !== '[]';
-    }) || (typeof prefs.bankroll === 'number' && prefs.bankroll > 0);
+    }) || (typeof prefs.bankroll === 'number' && prefs.bankroll > 0)
+       || userPrefsUsageMarkers.some(m => prefs[m] != null && prefs[m] !== false);
     if (hasLegacy) {
       prefs.consentLocalStorage = 'accepted';
       try { localStorage.setItem('userPrefs', JSON.stringify(prefs)); } catch(e) { swallowError(e); }
