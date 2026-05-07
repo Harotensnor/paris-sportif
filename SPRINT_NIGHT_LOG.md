@@ -1639,3 +1639,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix: merge latest `origin/main`, keep the keyboard probe and QA runtime ordering, then restamp assets/footer/SW.
 - Verrou: `audit_data_truth.py`, `stamp_asset_hashes.py --check`, and `probe_keyboard_navigation.js`.
 - Chiffres: resync on data 2026-05-07T00:34Z, footer/SW v37.115.
+
+## Sprint v37.116 — AUTO 10/10 bundle dead-code trim
+- Symptom: `legacy-app.js` was still near the hard bundle target at 1732.9 KB.
+- Cause: old narrative and CSV helper functions had only their declaration reference left after the routed UX rewrite.
+- Fix: remove 14 unreferenced helper functions with a guarded ref-count codemod, then restamp legacy hash/footer/SW.
+- Verrou: `node --check legacy-app.js`, `check_bundle_size.py`, and full QA gate after cleanup.
+- Chiffres: legacy bundle 1732.9 KB -> 1697.9 KB, below the 1700 KB target.
