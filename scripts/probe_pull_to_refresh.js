@@ -81,6 +81,44 @@ async function indicatorState(page) {
   });
 }
 
+async function waitRefreshing(page, timeout = 1200) {
+  return page.waitForFunction(() => {
+    const el = document.querySelector('.ptr-indicator');
+    return el && el.classList.contains('refreshing');
+  }, null, { timeout }).then(() => true).catch(() => false);
+}
+
+async function dispatchDomPull(page) {
+  await page.evaluate(() => {
+    window.scrollTo(0, 0);
+    const makeTouch = y => ({
+      identifier: 1,
+      target: document.body,
+      clientX: 180,
+      clientY: y,
+      pageX: 180,
+      pageY: y,
+      screenX: 180,
+      screenY: y,
+      radiusX: 4,
+      radiusY: 4,
+      force: 1
+    });
+    const emit = (type, y, active) => {
+      const touch = active ? makeTouch(y) : null;
+      const ev = new Event(type, { bubbles: true, cancelable: true });
+      Object.defineProperty(ev, 'touches', { value: touch ? [touch] : [] });
+      Object.defineProperty(ev, 'targetTouches', { value: touch ? [touch] : [] });
+      Object.defineProperty(ev, 'changedTouches', { value: [makeTouch(y)] });
+      document.dispatchEvent(ev);
+    };
+    emit('touchstart', 8, true);
+    emit('touchmove', 56, true);
+    emit('touchmove', 118, true);
+    emit('touchend', 118, false);
+  });
+}
+
 async function dispatchPull(page) {
   const client = await page.context().newCDPSession(page);
   await client.send('Input.dispatchTouchEvent', {
@@ -98,6 +136,7 @@ async function dispatchPull(page) {
   });
   await page.waitForTimeout(80);
   await client.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  if (!(await waitRefreshing(page))) await dispatchDomPull(page);
 }
 
 (async () => {
@@ -114,6 +153,9 @@ async function dispatchPull(page) {
     userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148'
   });
   await ctx.addInitScript(() => {
+    if (!('ontouchstart' in window)) {
+      Object.defineProperty(window, 'ontouchstart', { value: null, configurable: true });
+    }
     localStorage.setItem('paris_sportif_onboarded_v1', '1');
     localStorage.setItem('paris_sportif_onboarded_v2', '1');
     localStorage.setItem('userPrefs', JSON.stringify({

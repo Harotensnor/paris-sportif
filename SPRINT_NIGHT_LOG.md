@@ -1800,3 +1800,8 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Merged the next refresh-data tick from main after the QA data-truth fix.
 - Rebuilt night metrics and health from the merged data.js snapshot.
 - Locked by qa_gate_report plus day-filter and nav-stability probes.
+
+### v37.141 — Pull refresh probe stabilization
+- Kept the real CDP touch gesture path and added a DOM touch fallback for Ubuntu headless CI.
+- Seeded the mobile touch capability before app boot so the production gesture handler always wires.
+- Locked by probe_pull_to_refresh, probe wiring audits and the full QA gate report.
