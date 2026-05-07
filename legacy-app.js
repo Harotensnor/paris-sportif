@@ -5622,12 +5622,41 @@ player_strength: Number(row[15]) || 0,
 v5: true,
 };
 }
+function _bayesianV5AggregatePrior(row, level, sport, league, teamName) {
+if (!row || !Number.isFinite(Number(row.prior_xG)) || !Number.isFinite(Number(row.prior_xGA))) return null;
+const sample = Number(row.sample_size || row.weighted_sample || 0) || 0;
+const rel = Number(row.prior_reliability);
+return {
+key: `${level}|${row.key || [sport, league].filter(Boolean).join('|')}`,
+team_name: teamName || row.key || level,
+sport: sport || String(row.key || '').split('|')[0] || 'unknown',
+league: league || String(row.key || '').split('|')[1] || level,
+prior_xG: Number(row.prior_xG),
+prior_xGA: Number(row.prior_xGA),
+prior_winrate_home: Number(row.prior_winrate_home) || 0.5,
+prior_winrate_away: Number(row.prior_winrate_away) || 0.5,
+prior_btts_rate: Number(row.prior_btts_rate) || 0,
+prior_over25_rate: Number(row.prior_over25_rate) || 0,
+sample_size: sample,
+weighted_sample: Number(row.weighted_sample || sample) || sample,
+shrink_team: level === 'team' ? 1 : 0,
+shrink_league: level === 'league' ? 0.7 : 0,
+shrink_sport: level === 'sport' ? 1 : level === 'league' ? 0.3 : 0,
+prior_reliability: Number.isFinite(rel) && rel > 0 ? rel : Math.max(0.08, Math.min(0.82, sample / (sample + 35))),
+player_strength: 0,
+fallback: level !== 'team',
+fallback_level: level,
+v5: true,
+};
+}
 function _getBayesianV5Index() {
 const data = window.BAYESIAN_PRIORS_V5 || null;
 if (__bayesianV5IndexRef === data && __bayesianV5Index) return __bayesianV5Index;
 const exact = new Map();
 const bySportName = new Map();
 const byName = new Map();
+const byLeague = new Map();
+const bySport = new Map();
 const rows = Array.isArray(data?.teams)
 ? data.teams.map(_bayesianV5FromTuple)
 : Object.entries(data?.teams || {}).map(([key, value]) => ({ key, ...value }));
@@ -5647,10 +5676,23 @@ if (!byName.has(nameKey) || (prior.sample_size || 0) > (byName.get(nameKey)?.sam
 byName.set(nameKey, prior);
 }
 }
+for (const [key, value] of Object.entries(data?.leagues || {})) {
+const rawKey = String(value?.key || key || '').toLowerCase();
+const [sport, league] = rawKey.split('|');
+const prior = _bayesianV5AggregatePrior({ key: rawKey, ...value }, 'league', sport, league, null);
+if (prior) byLeague.set(rawKey, prior);
+}
+for (const [key, value] of Object.entries(data?.sports || {})) {
+const sport = String(value?.key || key || '').toLowerCase();
+const prior = _bayesianV5AggregatePrior({ key: sport, ...value }, 'sport', sport, 'sport_mean', null);
+if (prior) bySport.set(sport, prior);
+}
 __bayesianV5Index = {
 exact,
 bySportName,
 byName,
+byLeague,
+bySport,
 generated_at: data?.generated_at || null,
 coverage: data?.coverage || {},
 decay: data?.decay || {},
@@ -5677,6 +5719,10 @@ for (const nameKey of candidates) {
 const anyMatch = idx.byName.get(nameKey);
 if (anyMatch) return anyMatch;
 }
+const leagueFallback = idx.byLeague.get(`${sport}|${league}`);
+if (leagueFallback) return _bayesianV5AggregatePrior(leagueFallback, 'league', sport, league, side.name || side.short || side.abbr || null);
+const sportFallback = idx.bySport.get(sport);
+if (sportFallback) return _bayesianV5AggregatePrior(sportFallback, 'sport', sport, 'sport_mean', side.name || side.short || side.abbr || null);
 return null;
 }
 function getBayesianV5DebugSummary() {
@@ -6255,12 +6301,63 @@ function poissonComponent(match) {
 if (match.sport !== 'football') return null;
 const { home, away } = getSides(match);
 if (!home || !away) return null;
+const HOME_ADV = 1.25;
+const priorOnlyPoisson = () => {
+const hPriorV5 = getBayesianPriorV5(match, home);
+const aPriorV5 = getBayesianPriorV5(match, away);
+const hPrior = hPriorV5 || getTeamPrior(match, home);
+const aPrior = aPriorV5 || getTeamPrior(match, away);
+if (!hPrior || !aPrior || !Number.isFinite(hPrior.prior_xG) || !Number.isFinite(hPrior.prior_xGA) || !Number.isFinite(aPrior.prior_xG) || !Number.isFinite(aPrior.prior_xGA)) return null;
+let lamH = Math.max(0.2, ((hPrior.prior_xG + aPrior.prior_xGA) / 2) * HOME_ADV);
+let lamA = Math.max(0.2, ((aPrior.prior_xG + hPrior.prior_xGA) / 2) / HOME_ADV);
+const minSample = Math.min(Number(hPrior.sample_size) || 0, Number(aPrior.sample_size) || 0);
+const v5Reliability = Math.min(Number(hPrior.prior_reliability) || 0, Number(aPrior.prior_reliability) || 0);
+const v5Weight = Number.isFinite(v5Reliability) && v5Reliability > 0
+? Math.max(0.10, Math.min(0.42, 0.16 + v5Reliability * 0.28))
+: 0.10;
+const wPrior = hPrior.v5 && aPrior.v5 ? v5Weight : (minSample >= 10 ? 0.4 : minSample >= 5 ? 0.2 : 0.12);
+const stadiumEffect = getStadiumEffect(match);
+if (stadiumEffect?.goal_adjustment) {
+lamH = Math.max(0.2, lamH + stadiumEffect.goal_adjustment / 2);
+lamA = Math.max(0.2, lamA + stadiumEffect.goal_adjustment / 2);
+}
+const starImpact = getStarImpact(match);
+if (starImpact?.active) {
+lamH = Math.max(0.2, lamH - (Number(starImpact.homeGoalPenalty) || 0));
+lamA = Math.max(0.2, lamA - (Number(starImpact.awayGoalPenalty) || 0));
+}
+const probs = poissonProbs(lamH, lamA);
+if (!probs) return null;
+return {
+...probs,
+lamH,
+lamA,
+fbrefBlend: { source: 'bayesian_prior_only', sample: minSample },
+bayesianPrior: {
+weight: wPrior,
+version: hPrior.v5 && aPrior.v5 ? 'V5 hierarchical' : 'V4 team',
+homeSample: Number(hPrior.sample_size) || 0,
+awaySample: Number(aPrior.sample_size) || 0,
+homeFallback: !!hPrior.fallback,
+awayFallback: !!aPrior.fallback,
+homeShrinkage: hPrior.v5 ? { team: hPrior.shrink_team, league: hPrior.shrink_league, sport: hPrior.shrink_sport } : null,
+awayShrinkage: aPrior.v5 ? { team: aPrior.shrink_team, league: aPrior.shrink_league, sport: aPrior.shrink_sport } : null,
+playerStrength: hPrior.v5 || aPrior.v5 ? Math.max(Number(hPrior.player_strength) || 0, Number(aPrior.player_strength) || 0) : 0,
+lamH_prior: Math.round(lamH * 1000) / 1000,
+lamA_prior: Math.round(lamA * 1000) / 1000,
+generated_at: hPrior.v5 && aPrior.v5 ? _getBayesianV5Index()?.generated_at || null : _getTeamPriorIndex()?.generated_at || null,
+source: 'prior_only',
+},
+starImpact,
+stadiumEffect,
+extendedStats: getTeamStatsExtendedContext(match),
+};
+};
 const hX = standingsXG(match, home);
 const aX = standingsXG(match, away);
-if (!hX || !aX) return null;
+if (!hX || !aX) return priorOnlyPoisson();
 const lgAvg = leagueAvgGoals(match.league_code);
-if (!lgAvg || lgAvg <= 0) return null;
-const HOME_ADV = 1.25;
+if (!lgAvg || lgAvg <= 0) return priorOnlyPoisson();
 const hAtt = hX.scored / lgAvg;
 const aAtt = aX.scored / lgAvg;
 const hDef = hX.conceded / lgAvg;
@@ -31406,6 +31503,13 @@ root.style.filter = '';
 const meta = document.getElementById('theme-color-meta');
 const themeMeta = { light: '#f5f5f7', ocean: '#051925', sunset: '#211008', forest: '#061a12', mono: '#000000' };
 if (meta) meta.setAttribute('content', themeMeta[effective] || '#08080a');
+const v36Theme = effective === 'light'
+? { bg: '#f5f5f7', surface: '#ffffff', surface2: '#f2f2f4', line: 'rgba(0,0,0,.10)' }
+: { bg: '#050608', surface: '#0b0f14', surface2: '#101720', line: 'rgba(236,244,255,.10)' };
+root.style.setProperty('--v36-bg', v36Theme.bg);
+root.style.setProperty('--v36-surface', v36Theme.surface);
+root.style.setProperty('--v36-surface-2', v36Theme.surface2);
+root.style.setProperty('--v36-line', v36Theme.line);
 const tt = document.getElementById('theme-toggle');
 if (tt) {
 tt.textContent = storedTheme === 'auto' || storedTheme === 'system' ? '🌓' : storedTheme === 'light' ? '☀️' : storedTheme === 'ocean' ? '🌊' : storedTheme === 'sunset' ? '🌅' : storedTheme === 'forest' ? '🌲' : storedTheme === 'mono' ? '◐' : '🌙';

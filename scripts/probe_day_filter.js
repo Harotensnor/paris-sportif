@@ -45,6 +45,16 @@ function check(label, ok, detail) {
   if (!ok) failures.push({ label, detail });
 }
 
+async function clickDateChip(page, selector) {
+  await page.locator(selector).first().waitFor({ state: 'visible', timeout: 5000 });
+  await page.evaluate((sel) => {
+    const el = document.querySelector(sel);
+    if (!el) throw new Error(`date chip not found: ${sel}`);
+    el.scrollIntoView({ block: 'center', inline: 'nearest' });
+    el.click();
+  }, selector);
+}
+
 (async () => {
   const server = await startServer();
   const port = server.address().port;
@@ -59,7 +69,9 @@ function check(label, ok, detail) {
         onboardingDone: true,
         consentLocalStorage: 'accepted'
       }));
-    } catch (e) {}
+    } catch (e) {
+      window.__probeDayFilterSetupError = e && e.message ? e.message : String(e);
+    }
   });
 
   const page = await ctx.newPage();
@@ -87,14 +99,11 @@ function check(label, ok, detail) {
 
   for (const chip of chips) {
     const selector = `[data-v37-day="${chip.value}"]`;
-    const target = page.locator(selector).first();
-    await target.waitFor({ state: 'visible', timeout: 5000 });
-    await target.scrollIntoViewIfNeeded();
-    await target.click({ timeout: 5000 });
+    await clickDateChip(page, selector);
     await page.waitForFunction((value) => {
       let stored = {};
       try { stored = JSON.parse(localStorage.getItem('paris_sportif_v36_home_filter') || '{}') || {}; }
-      catch (e) { stored = {}; }
+      catch (e) { stored = { parseError: e && e.message ? e.message : String(e) }; }
       const hashDate = new URLSearchParams((location.hash || '').split('?')[1] || '').get('date') || '';
       const activeValues = Array.from(document.querySelectorAll('[data-v37-day].is-active')).map(btn => btn.dataset.v37Day || '');
       return hashDate === value && stored.date === value && activeValues.length === 1 && activeValues[0] === value;
@@ -102,7 +111,7 @@ function check(label, ok, detail) {
     const state = await page.evaluate(() => {
       let stored = {};
       try { stored = JSON.parse(localStorage.getItem('paris_sportif_v36_home_filter') || '{}') || {}; }
-      catch (e) { stored = {}; }
+      catch (e) { stored = { parseError: e && e.message ? e.message : String(e) }; }
       return {
         hashDate: new URLSearchParams((location.hash || '').split('?')[1] || '').get('date') || '',
         storedDate: stored.date || '',

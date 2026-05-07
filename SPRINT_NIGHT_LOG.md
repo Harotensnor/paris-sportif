@@ -1758,3 +1758,15 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix: merge latest main snapshot, keep branch runtime shell, restamp assets, regenerate health and night_metrics.
 - Verrou: audit_data_truth and audit_asset_hashes re-check generated freshness plus shell hash consistency.
 - Chiffres: health data 3min old before final gates, branch caught up to origin/main at merge-base.
+
+## Sprint v37.133 — AUTO 10/10 theme cycle
+- Symptom: the light theme updated storage and meta theme-color but Accueil kept a black dashboard background.
+- Cause: the v36 dashboard shell uses dedicated CSS variables that were not synced by the runtime theme switcher.
+- Fix: propagate light/dark values for the v36 background, surface and border tokens inside _applyTheme.
+- Verrou: probe_theme_cycle catches visual background/meta divergence across dark, light and auto.
+- Chiffres: probe_theme_cycle green, pull-to-refresh probe green, asset hash and SW cache restamped.
+
+### v37.134 — V5 prior fallback + theme shell
+- Light theme now updates the v36 dashboard surface tokens instead of leaving Accueil visually black.
+- V5 Bayesian priors now fall back team -> league -> sport and can drive football Poisson when raw xG is absent.
+- Locked by model-v5-priors plus Chromium desktop shard 2/3 in CI-like single-worker mode.
