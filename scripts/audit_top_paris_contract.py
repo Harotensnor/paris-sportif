@@ -20,16 +20,17 @@ def main():
     for status in ("verified", "changed", "stale", "mismatch", "missing", "suspicious"):
         require(legacy, f"{status}:", f"odd status {status}")
 
-    require(legacy, "window.__v38TopParisAudit", "public audit surface")
-    require(legacy, "data-v38-top-audit", "visible audit panel")
-    require(legacy, "duplicate_match", "duplicate-match exclusion")
-    require(legacy, "market_cap", "market cap exclusion")
-    require(legacy, "Pourquoi pas plus de top picks", "empty/top audit copy")
-    require(legacy, "['verified', 'changed'].includes", "verified-only top gate")
+    require(legacy, "v38FindWinamaxOdd", "strict Winamax odd lookup")
+    require(legacy, "marché, sélection et ligne retrouvés dans Winamax", "strict verified copy")
+    require(legacy, "v37CanAutoHorizonLowPool = false", "no automatic 7-day expansion")
+    require(legacy, "v37ShowResultColumn", "today result column")
+    require(legacy, "v37BeginnerPickText", "beginner row explanation")
+    require(legacy, "data-home-table-only", "homepage table-only shell")
 
-    require(probe, "Top Paris audit rendered", "probe audit assertion")
-    require(probe, "Top Paris audit selected count matches cards", "probe count assertion")
-    require(probe, "Top Paris cards use only verified/changed odds", "probe odds assertion")
+    require(probe, "Accueil is table-only", "probe table-only assertion")
+    require(probe, "Today table exposes result column", "probe result column assertion")
+    require(probe, "Rows include beginner-friendly explanation text", "probe beginner copy assertion")
+    require(probe, "Modal shows odd validation status", "probe odd validation assertion")
     require(smoke, "probe_prono_sheet_odds.js", "smoke workflow wiring")
 
     print("[top-paris-contract] OK")

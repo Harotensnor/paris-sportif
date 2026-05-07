@@ -1880,3 +1880,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Loads the shared v38 prono styles during dashboard render, not only when the modal opens.
 - Extended `probe_prono_sheet_odds.js` to assert the dashboard Top Paris grid and audit grid computed styles.
 - Restamped asset hashes and service worker cache so the styled block is visible after refresh.
+
+### v37.170 — Accueil table-only and stricter odds
+- Reduced Accueil to the betting table only so the first screen is no longer crowded by side panels and promo blocks.
+- Made Aujourd'hui the default scope, disabled automatic 7-day expansion, and kept today's passed/live/upcoming picks visible with a result column.
+- Tightened odd validation: a pick is verified only when market, selection and line are found in the Winamax markets attached to the match.
+- Added beginner-readable explanations inside each row so the table says what to do in plain French, not only numbers.
+- Updated the prono-sheet smoke probe to lock the table-only homepage and beginner/result copy.
