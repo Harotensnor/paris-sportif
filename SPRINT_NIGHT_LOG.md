@@ -1723,3 +1723,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Fix: stabilize visible probes, release compact containment, move context menus to the top layer, enlarge modal targets.
 - Verrou: mobile shard 2/3 plus modal sync, signal balance, long-press, sticky filters and touch-target specs.
 - Chiffres: 61/61 pytest, mobile shard 2/3 90/90, bundle 1692.8 KB, footer/SW v37.127.
+
+## Sprint v37.128 — AUTO 10/10 mobile shard three
+- Symptom: mobile shard 3/3 failed on profile theme/mode probes and topbar/footer snapshots.
+- Cause: onboarding overlay could intercept profile clicks, while visual baselines included dynamic chrome.
+- Fix: pre-stamp onboarding completion in profile probes, freeze dynamic chrome, refresh mobile baselines.
+- Verrou: mobile shard 3/3, profile mode/theme probes, topbar/footer visual snapshots, QA gate.
+- Chiffres: 61/61 pytest, 45/45 QA gates, mobile shard 3/3 90/90, night metrics fresh.

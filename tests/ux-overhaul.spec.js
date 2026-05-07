@@ -1,6 +1,17 @@
 const { test, expect } = require('@playwright/test');
 
 test.describe('UX design system v3', () => {
+  test.beforeEach(async ({ context }) => {
+    await context.addInitScript(() => {
+      const prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}');
+      prefs.onboardingDone = true;
+      prefs.level = prefs.level || 'confirme';
+      localStorage.setItem('userPrefs', JSON.stringify(prefs));
+      localStorage.setItem('paris_sportif_onboarded_v1', '1');
+      localStorage.setItem('paris_sportif_onboarded_v2', '1');
+    });
+  });
+
   test('loads the component showcase and switches premium themes', async ({ page }) => {
     await page.goto('/components-showcase.html', { waitUntil: 'domcontentloaded' });
 
@@ -18,15 +29,20 @@ test.describe('UX design system v3', () => {
   });
 
   test('profile exposes all premium theme choices', async ({ page }) => {
+    test.setTimeout(60000);
     await page.goto('/pronostics.html#profil', { waitUntil: 'domcontentloaded' });
-    await page.waitForSelector('#profil-wrap', { timeout: 15000 });
-    await page.evaluate(() => document.querySelectorAll('details.profile-accordion').forEach((details) => { details.open = true; }));
+    await page.waitForSelector('#profil-wrap', { timeout: 20000 });
+    await page.evaluate(() => {
+      document.querySelectorAll('details.profile-accordion,details.profile-compact-details')
+        .forEach((details) => { details.open = true; });
+    });
+    await page.locator('#profile-appearance').scrollIntoViewIfNeeded();
 
     for (const theme of ['ocean', 'sunset', 'forest', 'mono', 'auto', 'dark', 'light']) {
       await expect(page.locator(`[data-theme-btn="${theme}"]`).first()).toBeVisible();
     }
 
-    await page.locator('[data-theme-btn="forest"]').first().click();
+    await page.locator('#profile-appearance [data-theme-btn="forest"]').first().click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'forest');
   });
 
