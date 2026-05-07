@@ -144,7 +144,12 @@ async function collectRouteSnapshots(page, port, mode) {
   }
   const desktop = await collectRouteSnapshots(desktopPage, port, 'desktop');
   const desktopBase = desktop[0];
-  check('desktop baseline is sidebar', desktopBase.display === 'flex' && desktopBase.flexDirection === 'column' && desktopBase.position === 'fixed',
+  // v37.165 — nav passé de sidebar verticale (column/fixed) à topbar horizontale (row/sticky).
+  // On accepte les 2 mises en page tant qu'elles sont stables entre routes.
+  check('desktop baseline nav is present',
+    desktopBase.display === 'flex'
+    && (desktopBase.flexDirection === 'column' || desktopBase.flexDirection === 'row')
+    && (desktopBase.position === 'fixed' || desktopBase.position === 'sticky'),
     JSON.stringify(desktopBase));
   for (const snap of desktop.slice(1)) {
     check(`desktop nav stable on ${snap.route}`, sameDesktopNav(desktopBase, snap),
