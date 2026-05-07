@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-07T01:32:03Z",
+  "generated_at": "2026-05-07T01:36:21Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -119,13 +119,13 @@
         "3 matchs sur les 7 derniers jours"
       ],
       "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
-        "home_score": 0.36,
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.64,
         "away_score": -1.18,
         "home_fade": 1.2,
         "away_fade": 1.6,
-        "reason": "Signaux mitigés: avantage net trop faible (Chicago Cubs +0.36, Cincinnati Reds -1.18)",
+        "reason": "Direction nette: Chicago Cubs (-0.64)",
         "detail": [
           {
             "side": "home",
@@ -144,12 +144,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
           },
           {
             "side": "away",
@@ -351,13 +345,13 @@
         "3 matchs sur les 7 derniers jours"
       ],
       "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": 0.351,
-        "away_score": -0.39,
-        "home_fade": 0.6,
+        "status": "net",
+        "net_side": "away",
+        "home_score": -1.131,
+        "away_score": -0.131,
+        "home_fade": 1.341,
         "away_fade": 0.6,
-        "reason": "Signaux opposes: Philadelphia 76ers fade 0.60, New York Knicks fade 0.60 -> prudence",
+        "reason": "Direction nette: New York Knicks (-0.13)",
         "detail": [
           {
             "side": "home",
@@ -374,7 +368,7 @@
           {
             "side": "home",
             "type": "market_move",
-            "direction": "steam",
+            "direction": "drift",
             "strength": 0.741
           }
         ]
@@ -410,12 +404,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
-        "home_score": -0.44,
-        "away_score": -1.25,
+        "net_side": "away",
+        "home_score": -0.79,
+        "away_score": -0.25,
         "home_fade": 1.0,
-        "away_fade": 1.6,
-        "reason": "Direction nette: Buffalo Sabres (-0.44)",
+        "away_fade": 0.6,
+        "reason": "Direction nette: Montreal Canadiens (-0.25)",
         "detail": [
           {
             "side": "home",
@@ -434,12 +428,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
           }
         ]
       }
@@ -700,12 +688,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
-        "home_score": 0.643,
-        "away_score": -0.098,
-        "home_fade": 0.15,
+        "net_side": "away",
+        "home_score": -0.838,
+        "away_score": 0.162,
+        "home_fade": 0.891,
         "away_fade": 0.15,
-        "reason": "Direction nette: Philadelphia 76ers (+0.64)",
+        "reason": "Direction nette: New York Knicks (+0.16)",
         "detail": [
           {
             "side": "home",
@@ -722,7 +710,7 @@
           {
             "side": "home",
             "type": "market_move",
-            "direction": "steam",
+            "direction": "drift",
             "strength": 0.741
           }
         ]
@@ -758,12 +746,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
-        "home_score": -0.148,
-        "away_score": -0.957,
+        "net_side": "away",
+        "home_score": -0.498,
+        "away_score": 0.043,
         "home_fade": 0.55,
-        "away_fade": 1.15,
-        "reason": "Direction nette: Buffalo Sabres (-0.15)",
+        "away_fade": 0.15,
+        "reason": "Direction nette: Montreal Canadiens (+0.04)",
         "detail": [
           {
             "side": "home",
@@ -782,12 +770,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
           }
         ]
       }
@@ -1192,12 +1174,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
-        "home_score": 0.643,
-        "away_score": -0.098,
-        "home_fade": 0.15,
+        "net_side": "away",
+        "home_score": -0.838,
+        "away_score": 0.162,
+        "home_fade": 0.891,
         "away_fade": 0.15,
-        "reason": "Direction nette: Philadelphia 76ers (+0.64)",
+        "reason": "Direction nette: New York Knicks (+0.16)",
         "detail": [
           {
             "side": "home",
@@ -1214,7 +1196,7 @@
           {
             "side": "home",
             "type": "market_move",
-            "direction": "steam",
+            "direction": "drift",
             "strength": 0.741
           }
         ]
@@ -1250,12 +1232,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "away",
-        "home_score": -0.957,
-        "away_score": -0.148,
-        "home_fade": 1.15,
+        "net_side": "home",
+        "home_score": 0.043,
+        "away_score": -0.498,
+        "home_fade": 0.15,
         "away_fade": 0.55,
-        "reason": "Direction nette: Buffalo Sabres (-0.15)",
+        "reason": "Direction nette: Montreal Canadiens (+0.04)",
         "detail": [
           {
             "side": "home",
@@ -1274,12 +1256,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
           }
         ]
       }
@@ -1476,12 +1452,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": 0.643,
+        "net_side": "home",
+        "home_score": 0.162,
+        "away_score": -0.838,
         "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Philadelphia 76ers (+0.64)",
+        "away_fade": 0.891,
+        "reason": "Direction nette: New York Knicks (+0.16)",
         "detail": [
           {
             "side": "home",
@@ -1498,7 +1474,7 @@
           {
             "side": "away",
             "type": "market_move",
-            "direction": "steam",
+            "direction": "drift",
             "strength": 0.741
           }
         ]
@@ -1534,12 +1510,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "away",
-        "home_score": -0.957,
-        "away_score": -0.148,
-        "home_fade": 1.15,
+        "net_side": "home",
+        "home_score": 0.043,
+        "away_score": -0.498,
+        "home_fade": 0.15,
         "away_fade": 0.55,
-        "reason": "Direction nette: Buffalo Sabres (-0.15)",
+        "reason": "Direction nette: Montreal Canadiens (+0.04)",
         "detail": [
           {
             "side": "home",
@@ -1558,12 +1534,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
           }
         ]
       }
@@ -2443,11 +2413,11 @@
       "global_resolution": {
         "status": "mixed",
         "net_side": null,
-        "home_score": -0.705,
-        "away_score": -0.998,
-        "home_fade": 1.6,
-        "away_fade": 2.558,
-        "reason": "Signaux mitigés: avantage net trop faible (Miami Marlins -0.70, Baltimore Orioles -1.00)",
+        "home_score": 1.645,
+        "away_score": -3.348,
+        "home_fade": 0.6,
+        "away_fade": 3.558,
+        "reason": "Signaux mitigés: avantage net trop faible (Miami Marlins +1.65, Baltimore Orioles -3.35)",
         "detail": [
           {
             "side": "home",
@@ -2470,13 +2440,13 @@
           {
             "side": "home",
             "type": "market_move",
-            "direction": "drift",
+            "direction": "steam",
             "strength": 1.0
           },
           {
             "side": "away",
             "type": "market_move",
-            "direction": "steam",
+            "direction": "drift",
             "strength": 1.0
           },
           {
@@ -2777,19 +2747,31 @@
         "2 match dans les 48h + 2632 km de voyage"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.914,
-        "away_score": -2.612,
-        "home_fade": 0.0,
+        "status": "mixed",
+        "net_side": null,
+        "home_score": -0.086,
+        "away_score": -1.463,
+        "home_fade": 1.0,
         "away_fade": 2.612,
-        "reason": "Direction nette: Colorado Rockies (+0.91)",
+        "reason": "Signaux mitigés: avantage net trop faible (Colorado Rockies -0.09, New York Mets -1.46)",
         "detail": [
           {
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.799
           },
           {
             "side": "away",
