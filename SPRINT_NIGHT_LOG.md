@@ -1810,3 +1810,8 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Merged the latest refresh-data tick from main to remove the dirty PR merge state.
 - Rebuilt night metrics and health from the fresh data.js snapshot.
 - Kept the v37 shell and pull-to-refresh probe fix while bumping the footer and cache stamp.
+
+### v37.143 — Cron catch-up second pass
+- Merged the next refresh-data tick from main before GitHub could create a clean PR merge commit.
+- Rebuilt night metrics and health, restamped sidecar hashes and cache version.
+- Kept the deterministic pull-to-refresh probe and v37 shell intact.
