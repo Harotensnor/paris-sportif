@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-07T01:36:21Z",
+  "generated_at": "2026-05-07T01:42:11Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -119,13 +119,13 @@
         "3 matchs sur les 7 derniers jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.64,
+        "status": "mixed",
+        "net_side": null,
+        "home_score": 0.36,
         "away_score": -1.18,
         "home_fade": 1.2,
         "away_fade": 1.6,
-        "reason": "Direction nette: Chicago Cubs (-0.64)",
+        "reason": "Signaux mitigés: avantage net trop faible (Chicago Cubs +0.36, Cincinnati Reds -1.18)",
         "detail": [
           {
             "side": "home",
@@ -144,6 +144,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
           },
           {
             "side": "away",
@@ -2411,13 +2417,13 @@
         "3 match dans les 48h + 1539 km de voyage"
       ],
       "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
-        "home_score": 1.645,
-        "away_score": -3.348,
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.295,
+        "away_score": -2.348,
         "home_fade": 0.6,
-        "away_fade": 3.558,
-        "reason": "Signaux mitigés: avantage net trop faible (Miami Marlins +1.65, Baltimore Orioles -3.35)",
+        "away_fade": 2.558,
+        "reason": "Direction nette: Miami Marlins (+0.30)",
         "detail": [
           {
             "side": "home",
@@ -2435,18 +2441,6 @@
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
             "strength": 1.0
           },
           {
@@ -2750,10 +2744,10 @@
         "status": "mixed",
         "net_side": null,
         "home_score": -0.086,
-        "away_score": -1.463,
+        "away_score": -1.262,
         "home_fade": 1.0,
         "away_fade": 2.612,
-        "reason": "Signaux mitigés: avantage net trop faible (Colorado Rockies -0.09, New York Mets -1.46)",
+        "reason": "Signaux mitigés: avantage net trop faible (Colorado Rockies -0.09, New York Mets -1.26)",
         "detail": [
           {
             "side": "away",
@@ -2771,7 +2765,7 @@
             "side": "away",
             "type": "market_move",
             "direction": "steam",
-            "strength": 0.799
+            "strength": 1.0
           },
           {
             "side": "away",
