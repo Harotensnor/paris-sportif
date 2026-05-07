@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-07T20:14:51Z",
+  "generated_at": "2026-05-07T20:17:24Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -2997,13 +2997,13 @@
         "Deplacement estime 2513 km, decalage ~1.8h"
       ],
       "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
+        "status": "net",
+        "net_side": "away",
         "home_score": -1.029,
-        "away_score": 0.322,
+        "away_score": -0.468,
         "home_fade": 1.36,
         "away_fade": 0.944,
-        "reason": "Signaux mitigés: avantage net trop faible (San Diego Padres -1.03, St. Louis Cardinals +0.32)",
+        "reason": "Direction nette: St. Louis Cardinals (-0.47)",
         "detail": [
           {
             "side": "home",
@@ -3022,12 +3022,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.79
           },
           {
             "side": "away",
