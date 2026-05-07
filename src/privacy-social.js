@@ -104,6 +104,9 @@
     document.body.appendChild(el);
     setTimeout(() => el.remove(), 3600);
   }
+  function reportPrivacyError(context, error) {
+    if (typeof window.logSafeError === 'function') window.logSafeError(context, error);
+  }
   function safeBtoaUtf8(value) {
     const bytes = new TextEncoder().encode(value);
     let binary = '';
@@ -122,7 +125,8 @@
   function decodePayload(encoded) {
     try {
       return JSON.parse(safeAtobUtf8(encoded));
-    } catch (_) {
+    } catch (error) {
+      reportPrivacyError('privacy combo decode', error);
       return null;
     }
   }
@@ -266,7 +270,9 @@
     };
     try {
       if (typeof window._loadUserBets === 'function') add(window._loadUserBets());
-    } catch (_) {}
+    } catch (error) {
+      reportPrivacyError('privacy load user bets', error);
+    }
     ['paris_sportif_tracked_bets', 'paris_sportif_user_bets', 'myBets', 'trackedBets'].forEach(key => add(readJson(key, null)));
     const seen = new Set();
     return collected
@@ -547,7 +553,7 @@
     doc.write(html);
     doc.close();
     setTimeout(() => {
-      try { frame.contentWindow.focus(); frame.contentWindow.print(); } catch (_) {}
+      try { frame.contentWindow.focus(); frame.contentWindow.print(); } catch (error) { reportPrivacyError('privacy pdf print', error); }
       setTimeout(() => frame.remove(), 1500);
     }, 250);
     toast('Rapport PDF pret dans la fenetre impression.', 'success');
@@ -604,7 +610,7 @@
     const reader = new FileReader();
     reader.onload = () => {
       let payload = null;
-      try { payload = JSON.parse(String(reader.result || '{}')); } catch (_) {}
+      try { payload = JSON.parse(String(reader.result || '{}')); } catch (error) { reportPrivacyError('privacy import parse', error); }
       if (!payload || !payload.schema || !payload.localStorage || typeof payload.localStorage !== 'object') {
         showModal('Import impossible', '<p>Le fichier ne correspond pas au schema de sauvegarde Paris-Sportif.</p>');
         return;

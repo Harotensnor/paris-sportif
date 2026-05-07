@@ -18,7 +18,11 @@ async function openContextMenu(page) {
   await dispatchTouch(page, '.v36-table-card', 'touchend', 190, 520);
 }
 
-test('mobile long-press card menu exposes favorite compare track and open actions', async ({ page }) => {
+test('mobile long-press card menu exposes favorite compare track and open actions', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'Mobile-only long-press invariant.');
+  await page.addInitScript(() => {
+    localStorage.setItem('userPrefs', JSON.stringify({ onboardingDone: true, level: 'confirme' }));
+  });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/pronostics.html?debug=1');
   await page.waitForFunction(() => document.querySelector('.v36-table-card[data-big-detail][data-pick-uid]'), null, { timeout: 15000 });

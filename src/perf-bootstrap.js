@@ -21,6 +21,10 @@ function createWorker(path) {
 
 const workers = {};
 
+function reportPerfError(context, error) {
+  if (typeof window.logSafeError === 'function') window.logSafeError(context, error);
+}
+
 function setupWorkers() {
   if (!('Worker' in window)) return workers;
   for (const [name, path] of Object.entries(WORKER_PATHS)) {
@@ -100,7 +104,9 @@ function setupLongTaskTracking() {
         if (state.last.length > 20) state.last.shift();
       }
     }).observe({ type: 'longtask', buffered: true });
-  } catch (error) {}
+  } catch (error) {
+    reportPerfError('perf longtask observer', error);
+  }
   window.__longTasks = () => ({ ...state, last: state.last.slice() });
 }
 
@@ -114,10 +120,12 @@ function setupVitalsV2() {
       const rows = Array.isArray(arr) ? arr : [];
       rows.push({ ...session, longTasks: window.__longTasks ? window.__longTasks() : null });
       localStorage.setItem(storageKey, JSON.stringify(rows.slice(-maxSessions)));
-    } catch (error) {}
+    } catch (error) {
+      reportPerfError('perf vitals save', error);
+    }
   };
   const observe = (type, callback, opts = {}) => {
-    try { new PerformanceObserver((list) => list.getEntries().forEach(callback)).observe({ type, buffered: true, ...opts }); } catch (error) {}
+    try { new PerformanceObserver((list) => list.getEntries().forEach(callback)).observe({ type, buffered: true, ...opts }); } catch (error) { reportPerfError(`perf observer ${type}`, error); }
   };
   observe('largest-contentful-paint', (entry) => { session.LCP = Math.round(entry.startTime || 0); });
   observe('paint', (entry) => { if (entry.name === 'first-contentful-paint') session.FCP = Math.round(entry.startTime || 0); });
@@ -127,7 +135,9 @@ function setupVitalsV2() {
   try {
     const nav = performance.getEntriesByType?.('navigation')?.[0];
     if (nav) session.TTFB = Math.round(nav.responseStart || 0);
-  } catch (error) {}
+  } catch (error) {
+    reportPerfError('perf navigation timing', error);
+  }
   let persisted = false;
   const once = () => { if (!persisted) { persisted = true; save(); } };
   addEventListener('pagehide', once);
@@ -179,7 +189,9 @@ function setupDataBackups() {
       }
       localStorage.setItem(storageKey, String(Date.now()));
       window.dispatchEvent(new CustomEvent('ps:data-backup', { detail: { ts } }));
-    } catch (error) {}
+    } catch (error) {
+      reportPerfError('perf data backup', error);
+    }
   };
 
   const schedule = window.requestIdleCallback || ((fn) => setTimeout(fn, 2500));

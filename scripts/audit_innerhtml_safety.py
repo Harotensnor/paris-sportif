@@ -16,7 +16,14 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def main() -> None:
-    app = (ROOT / "app.js").read_text(encoding="utf-8")
+    # v37.017 split: the runtime that owns innerHTML lives in legacy-app.js,
+    # while app.js is now a 30-line shell loader. Prefer legacy-app.js when
+    # present and fall back to app.js so the audit keeps working in either
+    # layout.
+    target = ROOT / "legacy-app.js"
+    if not target.exists():
+        target = ROOT / "app.js"
+    app = target.read_text(encoding="utf-8")
     assignments = len(re.findall(r"\.innerHTML\s*=", app))
     required = [
         "function sanitizeTrustedHTML",

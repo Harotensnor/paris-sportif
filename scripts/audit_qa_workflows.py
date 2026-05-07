@@ -1,0 +1,123 @@
+#!/usr/bin/env python3
+"""Ensure the dedicated QA and monitoring workflows stay installed."""
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+WORKFLOWS = ROOT / ".github" / "workflows"
+
+
+def _text(name: str) -> str:
+    path = WORKFLOWS / name
+    return path.read_text(encoding="utf-8", errors="replace") if path.exists() else ""
+
+
+def main() -> int:
+    findings: list[str] = []
+    qa = _text("qa-gates.yml")
+    synthetic = _text("synthetic-monitor.yml")
+    post = _text("post-deploy-health.yml")
+    backtest = _text("backtest-pr.yml")
+    e2e = _text("e2e.yml")
+
+    if not qa:
+        findings.append(".github/workflows/qa-gates.yml missing")
+    else:
+        header = qa.split("\njobs:", 1)[0]
+        if "${{ matrix." in header:
+            findings.append("qa-gates.yml uses matrix context before jobs are created")
+        for needle in (
+            "strategy:",
+            "matrix:",
+            "os:",
+            "python-version:",
+            "node-version:",
+            "'3.13'",
+            "'18'",
+            "'22'",
+            "scripts/qa_gate_report.py",
+            "audit_asset_hashes.py",
+            "audit_all_probes_wired.py",
+            "actions/upload-artifact@v4",
+            "'sw.js'",
+            "backtest_strategies.json",
+            "prob_calibration.json",
+            "tier_calibration.json",
+            "calibration_method.js",
+            ".github/workflows/qa-gates.yml",
+            ".github/workflows/synthetic-monitor.yml",
+            ".github/workflows/post-deploy-health.yml",
+        ):
+            if needle not in qa:
+                findings.append(f"qa-gates.yml missing {needle}")
+
+    if not synthetic:
+        findings.append(".github/workflows/synthetic-monitor.yml missing")
+    else:
+        for needle in (
+            "*/15 * * * *",
+            "scripts/synthetic_monitor.py",
+            "actions/upload-artifact@v4",
+            ".github/workflows/synthetic-monitor.yml",
+        ):
+            if needle not in synthetic:
+                findings.append(f"synthetic-monitor.yml missing {needle}")
+
+    if not post:
+        findings.append(".github/workflows/post-deploy-health.yml missing")
+    else:
+        for needle in (
+            "scripts/synthetic_monitor.py",
+            "ENABLE_AUTO_ROLLBACK",
+            "contents: write",
+            ".github/workflows/post-deploy-health.yml",
+        ):
+            if needle not in post:
+                findings.append(f"post-deploy-health.yml missing {needle}")
+
+    if not backtest:
+        findings.append(".github/workflows/backtest-pr.yml missing")
+    else:
+        for needle in (
+            "'legacy-app.js'",
+            "'prob_calibration.json'",
+            "'calibration_method.json'",
+            "git checkout origin/main -- legacy-app.js app.js",
+            "MIN_BACKTEST_N",
+            "pr_n=",
+            "main_n=",
+            "Backtest ROI gate skipped: insufficient sample",
+        ):
+            if needle not in backtest:
+                findings.append(f"backtest-pr.yml missing {needle}")
+
+    if not e2e:
+        findings.append(".github/workflows/e2e.yml missing")
+    else:
+        for needle in (
+            "timeout-minutes: 25",
+            "strategy:",
+            "matrix:",
+            "project: [chromium-desktop, mobile-chromium]",
+            "shard-index: [1, 2, 3]",
+            "shard-total: [3]",
+            "if [ -f package-lock.json ]; then npm ci; else npm install; fi",
+            "npx playwright test --project=${{ matrix.project }} --shard=${{ matrix.shard-index }}/${{ matrix.shard-total }}",
+            "playwright-report-${{ matrix.project }}-${{ matrix.shard-index }}of${{ matrix.shard-total }}",
+        ):
+            if needle not in e2e:
+                findings.append(f"e2e.yml missing {needle}")
+
+    if findings:
+        print("[qa-workflows] FAIL")
+        for item in findings:
+            print(f"- {item}")
+        return 1
+    print("[qa-workflows] OK (QA, synthetic monitor and post-deploy health workflows present)")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

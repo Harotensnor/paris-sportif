@@ -18,7 +18,7 @@
      manifest-src 'self', upgrade-insecure-requests, plausible.io et
      cloudflareinsights pour analytics opt-in. `frame-ancestors` ne marche pas
      en meta CSP (header HTTP only), donc on ne le met pas ici. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-pa4usEMoTXe8ZDWYhSfcZgpBc7pZm06GlvK88xcN5P8=' 'sha256-et3zcLjrlerq+0ra7BBZ+Lu/TCNaz6zINNMRoySgV8Y=' 'sha256-UB8kj8R7TEMzyS5SIVd03Ijhe3k2ZKjkPiGo17AxlkI=' 'sha256-TntT6RHEVVDBaGJGZp97+MNGXAmuGoumyTi1Cul5VSI=' 'sha256-PeMbW+FaFFjBHp0lLPNkemQWsQC/b9N9fOSxC7TYzqc=' 'sha256-U90J6JiY/oIUgnIUS+wUKblZgwUczFwJFoOngAC9ABQ=' 'sha256-xekpL1L+0+uan2Z/c6dVRMvu7tcOj4RAyc4/gMFxzJ4=' 'sha256-S+3UbhI66FBwvf8ZN/6v6urCJD6sv/CpB2KUrO03xyg=' 'sha256-chp+kaIqPdKfQR8/KVk3tv39DJ2nuNcrGX2UvyX77QI=' https://plausible.io https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://a.espncdn.com https://a1.espncdn.com https://a2.espncdn.com https://a3.espncdn.com https://a4.espncdn.com https://www.gstatic.com https://img.sofascore.com; connect-src 'self' https://api.clubelo.com https://sports.core.api.espn.com https://site.api.espn.com https://plausible.io https://cloudflareinsights.com; font-src 'self' data:; base-uri 'self'; form-action 'self'; object-src 'none'; media-src 'none'; worker-src 'self'; manifest-src 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://plausible.io https://static.cloudflareinsights.com 'sha256-S+3UbhI66FBwvf8ZN/6v6urCJD6sv/CpB2KUrO03xyg=' 'sha256-J6PxX9dYPGCjC0wlPIuoXl/ygft4MgsWXbilvza32Ts=' 'sha256-TntT6RHEVVDBaGJGZp97+MNGXAmuGoumyTi1Cul5VSI=' 'sha256-PeMbW+FaFFjBHp0lLPNkemQWsQC/b9N9fOSxC7TYzqc=' 'sha256-U90J6JiY/oIUgnIUS+wUKblZgwUczFwJFoOngAC9ABQ=' 'sha256-xekpL1L+0+uan2Z/c6dVRMvu7tcOj4RAyc4/gMFxzJ4='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://a.espncdn.com https://a1.espncdn.com https://a2.espncdn.com https://a3.espncdn.com https://a4.espncdn.com https://www.gstatic.com https://img.sofascore.com; connect-src 'self' https://api.clubelo.com https://sports.core.api.espn.com https://site.api.espn.com https://plausible.io https://cloudflareinsights.com; font-src 'self' data:; base-uri 'self'; form-action 'self'; object-src 'none'; media-src 'none'; worker-src 'self'; manifest-src 'self'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <!-- AUDIT-2026-04-27 (Sprint 12 #29) — Sécurité possible via meta tags.
      GH Pages ne permet pas de custom HTTP headers ; on garde uniquement les
@@ -136,12 +136,12 @@
 <link rel="dns-prefetch" href="//img.sofascore.com">
 <link rel="preconnect" href="https://img.sofascore.com" crossorigin>
 <link rel="preload" href="data_lite_72h.json" as="fetch" type="application/json" crossorigin>
-<link rel="modulepreload" href="src/perf-bootstrap.js?v=c9b155da">
+<link rel="modulepreload" href="src/perf-bootstrap.js?v=ba6f182f">
 <!-- v35.324 — CSS chargé sans handler inline pour préparer CSP strict. -->
-<link rel="preload" href="app.css?v=e6dccde2" as="style">
-<link rel="stylesheet" href="app.css?v=e6dccde2">
-<link rel="stylesheet" href="app-design-v3.css?v=2650e92e">
-<link rel="stylesheet" href="print.css?v=8bb11566" media="print">
+<link rel="preload" href="app.css?v=85f39233" as="style">
+<link rel="stylesheet" href="app.css?v=85f39233">
+<link rel="stylesheet" href="app-design-v3.css?v=d41915cb">
+<link rel="stylesheet" href="print.css?v=313105b5" media="print">
 <style id="perf-critical-css">
   :root{color-scheme:dark;--perf-bg:#08090d;--perf-panel:#11141b;--perf-border:rgba(255,255,255,.09);--perf-text:#f1f3f9;--perf-brand:#b6a0ff}
   html,body{margin:0;background:var(--bg,var(--perf-bg));color:var(--text,var(--perf-text));font-family:"Inter","SF Pro Text",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
@@ -153,6 +153,7 @@
 <style id="v36-mobile-compact-cards">
 @media (max-width:720px) {
   body.agent-home main#main-content { padding: 10px 10px 96px !important; }
+  body.v36-mobile-filter-compact main#main-content { contain: none !important; }
   body.agent-home .v36-home-shell { gap: 12px !important; }
   body.agent-home .v36-dayline { padding: 14px !important; border-radius: 12px !important; }
   body.agent-home .v36-dayline h1 { font-size: 20px !important; line-height: 1.15 !important; letter-spacing: 0 !important; }
@@ -278,7 +279,8 @@
   body.agent-home .v36-match-name { display: inline-flex; max-width: 100%; align-items: center; gap: 5px; flex-wrap: wrap; }
   body.agent-home .v36-match-name b { max-width: 118px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   body.agent-home .v36-match-name i { width: 18px; height: 18px; flex: 0 0 18px; }
-  body.agent-home.v36-mobile-filter-compact .v36-filter-strip {
+  body.agent-home.v36-mobile-filter-compact .v36-filter-strip,
+  body.v36-mobile-filter-compact .v36-filter-strip {
     position: fixed !important;
     top: calc(var(--rg-height,32px) + 54px) !important;
     left: 8px !important;
@@ -291,14 +293,17 @@
     box-shadow: 0 10px 28px rgba(0,0,0,.34);
   }
   body.agent-home.v36-mobile-filter-compact .v36-filter-strip > div,
+  body.v36-mobile-filter-compact .v36-filter-strip > div,
   body.agent-home.v36-mobile-filter-compact .v37-day-nav {
     gap: 5px !important;
     overflow-x: auto !important;
     scrollbar-width: none;
   }
   body.agent-home.v36-mobile-filter-compact .v36-filter-strip > div::-webkit-scrollbar,
+  body.v36-mobile-filter-compact .v36-filter-strip > div::-webkit-scrollbar,
   body.agent-home.v36-mobile-filter-compact .v37-day-nav::-webkit-scrollbar { display: none; }
   body.agent-home.v36-mobile-filter-compact .v36-filter-chip,
+  body.v36-mobile-filter-compact .v36-filter-chip,
   body.agent-home.v36-mobile-filter-compact .v37-day-chip {
     min-height: 48px !important;
     max-width: 48px;
@@ -309,6 +314,7 @@
     flex: 0 0 auto;
   }
   body.agent-home.v36-mobile-filter-compact .v36-filter-chip.is-active,
+  body.v36-mobile-filter-compact .v36-filter-chip.is-active,
   body.agent-home.v36-mobile-filter-compact .v37-day-chip.is-active { max-width: 136px; }
   .ptr-indicator.ready {
     border-color: color-mix(in srgb,var(--accent) 54%,rgba(236,244,255,.16)) !important;
@@ -357,12 +363,13 @@
     box-shadow: 0 1px 0 rgba(255,255,255,.08) inset;
   }
   .modal-drag-handle:active { cursor: grabbing; }
+  #detail-modal .modal-drag-handle { min-height: 52px !important; height: 52px !important; }
   #detail-modal .modal-close,
   #detail-modal a,
-  #detail-modal button { min-height: 48px !important; min-width: 48px !important; }
+  #detail-modal button { min-height: 52px !important; min-width: 52px !important; }
   .v36-context-menu {
     position: fixed;
-    z-index: 190;
+    z-index: 10020;
     width: min(284px, calc(100vw - 24px));
     display: grid;
     gap: 6px;
@@ -496,11 +503,12 @@
   .boot-shell__card--wide strong { width:88%; height:38px; }
   @media (min-width:960px) {
     .topbar-brand { width:224px; }
-    body.agent-inside nav.topbar-nav {
-      display:flex!important; flex-direction:column; gap:4px;
-      position:fixed; left:0; top:calc(60px + var(--rg-height)); bottom:0;
-      width:240px; box-sizing:border-box; padding:14px 10px 28px;
-      overflow:auto; z-index:40; background:var(--panel); border-right:1px solid var(--border);
+    body.agent-inside nav.topbar-nav.v36-sidebar,
+    body.agent-home nav.topbar-nav.v36-sidebar {
+      display:flex !important; flex-direction:column !important; gap:4px !important;
+      position:fixed !important; left:0 !important; right:auto !important; top:calc(60px + var(--rg-height)) !important; bottom:0 !important;
+      width:240px !important; margin:0 !important; box-sizing:border-box; padding:14px 10px 28px !important;
+      overflow:auto !important; z-index:40; background:var(--panel); border-right:1px solid var(--border); border-bottom:0 !important; border-radius:0 !important;
     }
     nav.topbar-nav.v36-sidebar { gap:8px; padding:18px 12px 28px; }
     .v36-nav-item { width:100%; min-height:60px; display:grid; grid-template-columns:38px 1fr; align-items:center; gap:10px; padding:10px 12px; border-radius:12px; border:1px solid transparent; background:transparent; color:var(--text-dim); text-align:left; }
@@ -509,19 +517,8 @@
     .v36-nav-copy { display:grid; gap:3px; min-width:0; }
     .v36-nav-copy strong { font-size:14px; }
     .v36-nav-copy em { font-size:11px; font-style:normal; color:var(--text-dim2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    body.agent-inside .content main { padding-left:264px!important; max-width:none; }
-    body.agent-home nav.topbar-nav.v36-sidebar {
-      display:flex!important; flex-direction:row; position:sticky; left:auto; right:auto; bottom:auto;
-      top:calc(60px + var(--rg-height)); width:min(1900px, calc(100% - 36px));
-      margin:0 auto 10px; padding:8px 18px; overflow-x:auto; overflow-y:visible;
-      border-right:0; border-bottom:1px solid var(--border); border-radius:0 0 18px 18px;
-    }
-    body.agent-home nav.topbar-nav.v36-sidebar .v36-nav-item {
-      width:auto; min-width:150px; min-height:44px; grid-template-columns:28px minmax(0,1fr); padding:7px 10px;
-    }
-    body.agent-home nav.topbar-nav.v36-sidebar .v36-nav-ico { width:28px; height:28px; border-radius:9px; font-size:14px; }
-    body.agent-home nav.topbar-nav.v36-sidebar .v36-nav-copy em { display:none; }
-    body.agent-home main#main-content { padding-left:18px!important; max-width:none; }
+    body.agent-inside .content main,
+    body.agent-home .content main { padding-left:264px!important; max-width:none; }
     body.agent-home .bbf-left-rail { display:none!important; }
     body.agent-home .bbf-layout { grid-template-columns:minmax(0,1fr) 300px!important; }
     body.agent-inside nav.topbar-nav .page-btn,
@@ -547,9 +544,7 @@
     }
   }
   @media (min-width:1440px) {
-    body.agent-home nav.topbar-nav:not(.v36-sidebar) { display:none!important; }
-    body.agent-home nav.topbar-nav.v36-sidebar { display:flex!important; }
-    body.agent-home main#main-content { padding-left:18px!important; padding-right:18px!important; max-width:none; }
+    body.agent-home main#main-content { padding-right:18px!important; max-width:none; }
   }
   @media (max-width:720px) {
     :root { --rg-height:28px; }
@@ -576,7 +571,7 @@
      n'est chargé QU'APRÈS consentement explicite (cf. _maybeEnableAnalytics).
      Pas de tracking par défaut. -->
 <script src="analytics.config.js" defer></script>
-<noscript><link rel="stylesheet" href="app.css?v=e6dccde2"><link rel="stylesheet" href="app-design-v3.css?v=2650e92e"></noscript>
+<noscript><link rel="stylesheet" href="app.css?v=85f39233"><link rel="stylesheet" href="app-design-v3.css?v=d41915cb"></noscript>
 <script>
   // v22 — Init theme / contrast / reader BEFORE body render (évite le flash)
   (function() {
@@ -638,7 +633,7 @@
   // pour debug console. AUCUN envoi réseau — l'utilisateur peut consulter
   // ou exporter ses données, et c'est tout.
   //
-  // Pourquoi inline pré-legacy-app.js?v=1e3d3d19 ? Il faut s'enregistrer AVANT le LCP/FCP
+  // Pourquoi inline pré-bundle ? Il faut s'enregistrer AVANT le LCP/FCP
   // pour les capter. Le bundle web-vitals officiel pèse 5 KB ; ici on
   // tombe à ~1.5 KB grâce à l'usage direct de PerformanceObserver.
   //
@@ -848,6 +843,7 @@
         <span aria-hidden="true">🔔</span>
         <span class="v36-alert-dot" aria-hidden="true"></span>
       </button>
+      <button id="health-indicator" class="v36-icon-btn v36-health-btn" type="button" aria-label="Santé du pipeline de données" title="Santé du pipeline : chargement…">●</button>
       <button type="button" class="v36-profile-btn page-btn" data-page="profil" aria-label="Ouvrir le profil et les réglages" title="Profil">
         <span aria-hidden="true">👤</span>
         <span>Profil</span>
@@ -860,7 +856,6 @@
         </div>
         <input type="date" id="date" class="date-picker" aria-label="Sélectionner une date">
         <button id="level-toggle" class="theme-toggle" type="button" aria-label="Basculer niveau (débutant / confirmé / pro)" title="Niveau d'expérience · clic pour cycler">🎯</button>
-        <button id="health-indicator" class="theme-toggle" type="button" aria-label="Santé du pipeline de données" title="Santé du pipeline : chargement…" style="font-size:9px;">●</button>
         <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Basculer thème clair/sombre" title="Thème (Maj+T)">🌙</button>
       </div>
     </div>
@@ -868,11 +863,8 @@
     <button class="topbar-menu" id="hamburger" aria-label="Menu" aria-controls="page-nav" aria-expanded="false">☰</button>
   </div>
 
-  <!-- v31.7.51 — Sports sub-bar retirée (audit chantier 4.2 cleanup).
-       La page "simples" qui utilisait cette nav n'est plus dans aucun
-       sous-menu visible. Les filtres par sport sont maintenant inline
-       dans les pages "Tous"/"Top"/"Buteurs". `currentSport` JS reste
-       initialisé à 'football' par défaut. -->
+  <!-- v31.7.51 — Sports sub-bar retirée. Les filtres par sport sont inline
+       dans les pages de pronostics. -->
 </header>
 
 <!-- v31.5.1 — Nav restructurée : 5 hubs catégorisés (Pronos / Ma perf /
@@ -1031,46 +1023,11 @@
       </div>
     </div>
 
-    <!-- IIII : COACH IA SIMPLES QUICK-TAKE -->
-    <div id="ia-simples-wrap"></div>
-
-    <!-- SUMMARY -->
-    <div class="summary-bar" id="summary-bar"></div>
-
     <!-- FILTERS -->
     <div class="filters" id="filters"></div>
 
-    <!-- TOP PICKS -->
-    <div id="top-picks-wrap"></div>
-
     <!-- COMBINÉS -->
     <div id="combines-wrap"></div>
-
-    <!-- LEAGUES -->
-    <section data-panel="football" id="panel-football">
-      <div id="content-football"></div>
-    </section>
-    <section data-panel="tennis" id="panel-tennis" class="hidden">
-      <div id="content-tennis"></div>
-    </section>
-    <section data-panel="basketball" id="panel-basketball" class="hidden">
-      <div id="content-basketball"></div>
-    </section>
-    <section data-panel="hockey" id="panel-hockey" class="hidden">
-      <div id="content-hockey"></div>
-    </section>
-    <section data-panel="american-football" id="panel-american-football" class="hidden">
-      <div id="content-american-football"></div>
-    </section>
-    <section data-panel="mma" id="panel-mma" class="hidden">
-      <div id="content-mma"></div>
-    </section>
-    <section data-panel="golf" id="panel-golf" class="hidden">
-      <div id="content-golf"></div>
-    </section>
-    <section data-panel="racing" id="panel-racing" class="hidden">
-      <div id="content-racing"></div>
-    </section>
   </main>
 
   <!-- v30 — RGPD : bannière cookies/consentement localStorage. Affichée tant
@@ -1096,7 +1053,7 @@
       <div class="footer-brand">
         <span class="footer-logo">🎯</span>
         <span class="footer-text">Paris-Sportif</span>
-        <span class="footer-version" id="footer-version" role="button" tabindex="0" style="cursor:pointer;" title="Voir les nouveautés v37.026">v37.026</span>
+<span class="footer-version" id="footer-version" role="button" tabindex="0" style="cursor:pointer;color:var(--text);font-weight:900;opacity:1;" title="Voir les nouveautés v37.152">v37.152</span>
       </div>
       <nav class="footer-links" aria-label="Liens du site">
         <a href="https://github.com/Harotensnor/paris-sportif" target="_blank" rel="noopener" class="footer-link" title="Code source sur GitHub">
@@ -1182,53 +1139,53 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="data_lite.js?v=ad20d379"></script>
-<script src="team_priors.js?v=11cb015c"></script>
-<script src="bayesian_priors.js?v=a8a2a782"></script>
-<script src="season_phase.js?v=2e14d28b"></script>
-<script src="star_players.js?v=06fabd7c"></script>
-<script src="football_player_props.js?v=c66b144d"></script>
-<script src="nba_player_props.js?v=458a95df"></script>
-<script src="xg_decay_params.js?v=c12b43f9"></script>
-<script src="team_travel.js?v=0531e34e"></script>
-<script src="schedule_density.js?v=7f4d9066"></script>
-<script src="referee_stats.js?v=f97068c3"></script>
-<script src="tennis_elo_surface.js?v=ca9a2859"></script>
-<script src="goalie_pitcher_context.js?v=26b2b1f0"></script>
-<script src="stadium_effects.js?v=59ba8826"></script>
-<script src="coach_tenure.js?v=cde016ac"></script>
-<script src="derbies.js?v=e4d558e2"></script>
-<script src="team_stats_extended.js?v=44e78609"></script>
-<script src="total_corners.js?v=f21c5812"></script>
-<script src="total_cards.js?v=c2e10705"></script>
-<script src="total_fouls.js?v=e41f7aac"></script>
-<script src="mlb_player_props.js?v=0f71499f"></script>
-<script src="nhl_playoff_markets.js?v=9b80b4c8"></script>
-<script src="app-i18n.js?v=6bad7ddf" defer></script>
-<script src="lightgbm_weights.js?v=acc94279"></script>
-<script src="stacking_meta_weights.js?v=d3779a93"></script>
-<script src="feature_engineering_v5.js?v=df2bfa11"></script>
-<script src="model_versions.js?v=e1698777"></script>
-<script src="feature_drift_v5.js?v=951026df"></script>
-<script src="calibration_method.js?v=daca389a"></script>
-<script src="ensemble_adaptive_weights.js?v=f802d3c7"></script>
-<script src="cold_start_v5.js?v=d2edd8dc"></script>
-<script src="multitask_v5.js?v=a2d764c8"></script>
-<script src="backtest_deep_v5.js?v=be7d058e"></script>
-<script src="adversarial_validation.js?v=c1aaf593"></script>
-<script src="sports_coverage_extended.js?v=1ad353fa"></script>
-<script type="module" src="src/perf-bootstrap.js?v=c9b155da"></script>
-<script src="legacy-app.js?v=1e3d3d19" defer></script>
-<script src="app.js?v=1e3d3d19" defer></script>
+<script src="data_lite.js?v=4534543b"></script>
+<script src="team_priors.js?v=c21b478e"></script>
+<script src="bayesian_priors.js?v=0bbae5b3"></script>
+<script src="season_phase.js?v=de408ff4"></script>
+<script src="star_players.js?v=c631769a"></script>
+<script src="football_player_props.js?v=53e3cd03"></script>
+<script src="nba_player_props.js?v=cb63f958"></script>
+<script src="xg_decay_params.js?v=54c82a97"></script>
+<script src="team_travel.js?v=7c7d64f2"></script>
+<script src="schedule_density.js?v=0e12cdb1"></script>
+<script src="referee_stats.js?v=a02d7ce0"></script>
+<script src="tennis_elo_surface.js?v=25dfda78"></script>
+<script src="goalie_pitcher_context.js?v=eefa190d"></script>
+<script src="stadium_effects.js?v=d2d4b566"></script>
+<script src="coach_tenure.js?v=9323bcbc"></script>
+<script src="derbies.js?v=24b67559"></script>
+<script src="team_stats_extended.js?v=b7faf64f"></script>
+<script src="total_corners.js?v=b091ac27"></script>
+<script src="total_cards.js?v=5acb9c2d"></script>
+<script src="total_fouls.js?v=704c27cd"></script>
+<script src="mlb_player_props.js?v=9bfc9f86"></script>
+<script src="nhl_playoff_markets.js?v=35ef9589"></script>
+<script src="app-i18n.js?v=84f1f252" defer></script>
+<script src="lightgbm_weights.js?v=1b6f69f2"></script>
+<script src="stacking_meta_weights.js?v=6b1dd744"></script>
+<script src="feature_engineering_v5.js?v=43df7f65"></script>
+<script src="model_versions.js?v=c27d9ae3"></script>
+<script src="feature_drift_v5.js?v=96435452"></script>
+<script src="calibration_method.js?v=277470bf"></script>
+<script src="ensemble_adaptive_weights.js?v=b7f9ce2e"></script>
+<script src="cold_start_v5.js?v=473d6b42"></script>
+<script src="multitask_v5.js?v=62a22955"></script>
+<script src="backtest_deep_v5.js?v=0bb0a6cb"></script>
+<script src="adversarial_validation.js?v=38534b29"></script>
+<script src="sports_coverage_extended.js?v=4ade1530"></script>
+<script type="module" src="src/perf-bootstrap.js?v=ba6f182f"></script>
+<script src="src/qa-runtime.js?v=c82e1da1" defer></script>
+<script src="legacy-app.js?v=da5488d5" defer></script>
+<script src="app.js?v=81dcedea" defer></script>
 
 <!-- enhancements v20 -->
-<script src="app-enhancements.js?v=232799b3" defer></script>
-<script src="vendor/qrcode-generator.js?v=18ae399f" defer></script>
-<script src="src/privacy-social.js?v=9a5fd730" defer></script>
-<script src="vendor/lunr.min.js?v=0c50d900" defer></script>
-<script src="src/docs-onboarding.js?v=126cb665" defer></script>
-<script src="src/local-analytics.js?v=a824f04b" defer></script>
-<script src="src/qa-runtime.js?v=9b7f06a8" defer></script>
+<script src="app-enhancements.js?v=4be786de" defer></script>
+<script src="vendor/qrcode-generator.js?v=76889b58" defer></script>
+<script src="src/privacy-social.js?v=0e95e472" defer></script>
+<script src="vendor/lunr.min.js?v=cdc94cd3" defer></script>
+<script src="src/docs-onboarding.js?v=375fccf2" defer></script>
+<script src="src/local-analytics.js?v=322bf49b" defer></script>
 
 <script>
 // v23 — Système de tooltip pédagogique global (?)

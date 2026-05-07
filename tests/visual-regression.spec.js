@@ -26,6 +26,23 @@ async function expectScreenshotIfBaseline(testInfo, locator, name, options) {
   await expect(locator).toHaveScreenshot(name, options);
 }
 
+async function freezeDynamicChrome(page) {
+  await page.evaluate(() => {
+    const version = document.getElementById('footer-version');
+    if (version) {
+      version.textContent = 'vTEST';
+      version.setAttribute('title', 'Voir les nouveautés');
+    }
+    const update = document.getElementById('footer-last-update');
+    if (update) {
+      update.textContent = '📅 Données il y a 5 min';
+      update.setAttribute('title', 'Dernière actualisation des données');
+    }
+    document.querySelectorAll('[aria-live], .toast, .trust-strip, #search-suggest')
+      .forEach((el) => { el.setAttribute('hidden', ''); });
+  });
+}
+
 test.beforeEach(async ({ context, page }) => {
   await context.addInitScript(() => {
     try {
@@ -47,6 +64,7 @@ test.describe('Visual regression — pages statiques', () => {
     await page.waitForLoadState('domcontentloaded');
     await page.waitForFunction(() => window.PRONOSTICS_DATA != null, { timeout: 10000 }).catch(() => {});
     await page.waitForTimeout(800);
+    await freezeDynamicChrome(page);
     const topbar = page.locator('header.topbar').first();
     if (await topbar.count() === 0) test.skip(true, 'optional visual section missing: legacy topbar');
     await expectScreenshotIfBaseline(testInfo, topbar, 'topbar-dashboard.png', {
@@ -58,6 +76,8 @@ test.describe('Visual regression — pages statiques', () => {
   test('site footer ANJ', async ({ page }, testInfo) => {
     await page.goto('/pronostics.html');
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(800);
+    await freezeDynamicChrome(page);
     const footer = page.locator('footer.site-footer').first();
     await footer.scrollIntoViewIfNeeded();
     await page.waitForTimeout(300);

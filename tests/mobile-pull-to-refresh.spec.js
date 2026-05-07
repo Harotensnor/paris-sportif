@@ -12,7 +12,11 @@ async function dispatchTouch(page, selector, type, x, y) {
   }, { selector, type, x, y });
 }
 
-test('mobile pull-to-refresh gives haptic ready state and refresh confirmation', async ({ page }) => {
+test('mobile pull-to-refresh gives haptic ready state and refresh confirmation', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'Mobile-only pull-to-refresh invariant.');
+  await page.addInitScript(() => {
+    localStorage.setItem('userPrefs', JSON.stringify({ onboardingDone: true, level: 'confirme' }));
+  });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/pronostics.html?debug=1');
   await page.waitForFunction(() => window.PRONOSTICS_DATA && document.querySelector('.v36-home-shell'), null, { timeout: 15000 });
