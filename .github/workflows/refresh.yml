@@ -107,8 +107,32 @@ jobs:
             (python3 fetch_injuries_soccer.py || true) > /tmp/fetch_inj_soc.log 2>&1 &
             (python3 fetch_lineups_soccer.py || true) > /tmp/fetch_lineups.log 2>&1 &
           fi
-          # fetch_v3: every hour (full ESPN sweep)
-          if [ $MIN_MOD60 -lt 5 ]; then
+          # fetch_v3: every hour, and immediately if data.js is already stale.
+          # BUG-006 (2026-05-08): the fatal freshness guard runs every tick, but
+          # fetch_v3 was only hourly. If the hour run is cancelled or queued too
+          # long, every non-hour run fails freshness without even attempting a
+          # full rebuild. Force the sweep once data.js crosses the same 30 min
+          # threshold used by check_pipeline_freshness.py.
+          DATA_AGE_MIN=$(python3 - <<'PY'
+          import datetime as dt
+          import pathlib
+          import re
+
+          path = pathlib.Path('../data.js')
+          try:
+              text = path.read_text(encoding='utf-8', errors='ignore')
+              match = re.search(r'"generated_at"\s*:\s*"([^"]+)"', text)
+              if not match:
+                  raise ValueError('generated_at missing')
+              generated = dt.datetime.fromisoformat(match.group(1).replace('Z', '+00:00'))
+              now = dt.datetime.now(dt.timezone.utc)
+              print(max(0, int((now - generated).total_seconds() // 60)))
+          except Exception:
+              print(99999)
+          PY
+          )
+          echo "data.js age before fetch_v3: ${DATA_AGE_MIN}min"
+          if [ $MIN_MOD60 -lt 5 ] || [ "${DATA_AGE_MIN:-99999}" -gt 30 ]; then
             (python3 fetch_v3.py || true) > /tmp/fetch_v3.log 2>&1 &
           fi
           # fetch_team_stats: every 4h (slow ~4min)
