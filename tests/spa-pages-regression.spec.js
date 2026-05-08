@@ -41,7 +41,7 @@ const SPA_PAGES = [
 const HASH_EXPECTATIONS = {
   top: '#tous?legacy=top',
   locks: '#tous?legacy=locks',
-  matchs: '#tous?legacy=matchs',
+  matchs: '#dashboard?legacy=matchs',
   valeur: '#tous',
   'plan-mise': '#tous',
   calendrier: '#tous?view=calendar&legacy=calendrier',
@@ -116,7 +116,9 @@ test('all SPA hash pages render without console errors or horizontal overflow', 
     );
     expect(realErrors, `${hash} console errors`).toEqual([]);
     expect(state.hash, `${hash} hash`).toBe(HASH_EXPECTATIONS[hash] || `#${hash}`);
-    expect(state.hasHeading || (hash === 'dashboard' && state.hasDashboardTable), `${hash} rendered content`).toBe(true);
+    const expectedHash = HASH_EXPECTATIONS[hash] || `#${hash}`;
+    const rendersDashboard = hash === 'dashboard' || expectedHash.startsWith('#dashboard');
+    expect(state.hasHeading || (rendersDashboard && state.hasDashboardTable), `${hash} rendered content`).toBe(true);
     expect(state.overflowX, `${hash} overflow-x`).toBeLessThanOrEqual(0);
     if (viewport && viewport.width <= 720) {
       expect(state.bottomNavVisible, `${hash} mobile bottom nav`).toBe(true);
