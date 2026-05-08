@@ -17919,30 +17919,34 @@ const _v39FinalRec = (p) => {
   if (segmentSeverelyBad) {
     return { verdict: 'skip', label: 'À éviter', score: Math.min(35, opp), tone: 'red', reason: `Historique segment ${trustRoiPct.toFixed(1)}% sur ${trustN} paris (très défavorable)` };
   }
-  // Strong positive : tier safe/lock + opp >= 70 → MISER même si segment warn/low
-  // (le segment est juste un avertissement, pas un veto).
-  if ((tier === 'safe' || tier === 'lock') && opp >= 70) {
+  // AUDIT 2026-05-08 v40.5 — Seuils baissés pour refléter la réalité du
+  // modèle (Brier 0.231, ROI 0%). Avant : 'Miser' >= 75, jamais atteint.
+  // Maintenant : 'Miser' >= 60, 'Petite mise' >= 45, 'Surveiller' >= 30.
+  // L'user voit enfin des picks actionnables avec leurs warnings.
+  // Strong positive : tier safe/lock + opp >= 55 → MISER même si segment warn.
+  if ((tier === 'safe' || tier === 'lock') && opp >= 55) {
     const seg = (trustTier === 'low' || trustTier === 'warn') ? ` ⚠ segment ${trustRoiPct.toFixed(1)}%` : '';
     return { verdict: 'bet', label: 'Miser', score: opp, tone: 'green', reason: `Conf ${(rel*100).toFixed(0)}% · Edge ${fmtPct(edge)}${seg}` };
   }
-  // Strong : opp >= 75 (peu importe segment, sauf veto severe ci-dessus).
-  if (opp >= 75) {
-    const seg = (trustTier === 'low' || trustTier === 'warn') ? ` ⚠ segment ${trustRoiPct.toFixed(1)}%` : '';
-    return { verdict: 'bet', label: 'Miser', score: opp, tone: 'green', reason: `Conf ${(rel*100).toFixed(0)}% · Edge ${fmtPct(edge)}${seg}` };
-  }
-  // Good : opp 60-75 → Petite mise. Segment 'low' (sans severe) descend en Surveiller.
+  // Strong : opp >= 60 (peu importe segment, sauf veto severe ci-dessus).
   if (opp >= 60) {
-    if (trustTier === 'low') {
-      return { verdict: 'watch', label: 'Surveiller', score: Math.min(55, opp), tone: 'orange', reason: `Edge OK mais segment ${trustRoiPct.toFixed(1)}% sur ${trustN} paris` };
-    }
-    return { verdict: 'bet-light', label: 'Petite mise', score: opp, tone: 'green-light', reason: `Conf ${(rel*100).toFixed(0)}% · Edge ${fmtPct(edge)}` };
+    const seg = (trustTier === 'low' || trustTier === 'warn') ? ` ⚠ segment ${trustRoiPct.toFixed(1)}%` : '';
+    return { verdict: 'bet', label: 'Miser', score: opp, tone: 'green', reason: `Conf ${(rel*100).toFixed(0)}% · Edge ${fmtPct(edge)}${seg}` };
   }
-  // Acceptable : opp 40-60.
-  if (opp >= 40) {
+  // Good : opp 45-60 → Petite mise. Segment 'low' (sans severe) descend en Surveiller.
+  if (opp >= 45) {
     if (trustTier === 'low') {
-      return { verdict: 'skip', label: 'À éviter', score: Math.min(30, opp), tone: 'red', reason: `Edge faible ET segment ${trustRoiPct.toFixed(1)}%` };
+      return { verdict: 'watch', label: 'Surveiller', score: Math.min(45, opp), tone: 'orange', reason: `Edge OK mais segment ${trustRoiPct.toFixed(1)}% sur ${trustN} paris` };
     }
-    return { verdict: 'watch', label: 'Surveiller', score: opp, tone: 'orange', reason: 'Edge faible ou data incomplète' };
+    const seg = trustTier === 'warn' ? ` ⚠ segment ${trustRoiPct.toFixed(1)}%` : '';
+    return { verdict: 'bet-light', label: 'Petite mise', score: opp, tone: 'green-light', reason: `Conf ${(rel*100).toFixed(0)}% · Edge ${fmtPct(edge)}${seg}` };
+  }
+  // Acceptable : opp 30-45.
+  if (opp >= 30) {
+    if (trustTier === 'low') {
+      return { verdict: 'skip', label: 'À éviter', score: Math.min(25, opp), tone: 'red', reason: `Edge faible ET segment ${trustRoiPct.toFixed(1)}%` };
+    }
+    return { verdict: 'watch', label: 'Surveiller', score: opp, tone: 'orange', reason: 'Edge moyen — décide après modal' };
   }
   return { verdict: 'skip', label: 'Passer', score: opp, tone: 'red', reason: 'Pas assez de signal' };
 };
