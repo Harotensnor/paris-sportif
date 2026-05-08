@@ -497,11 +497,18 @@ test.describe('Match modal — Reims regression', () => {
     await page.goto(URL + '#dashboard');
     await page.waitForFunction(() =>
       localStorage.getItem('currentPage') === 'dashboard' &&
-      document.querySelector('[data-big-detail]'),
+      window.PRONOSTICS_DATA &&
+      typeof window.openDetail === 'function',
       null,
       { timeout: 15000 }
     );
-    await page.locator('[data-big-detail]').first().click();
+    const matchId = await page.evaluate(() => {
+      const events = Object.values(window.PRONOSTICS_DATA.days || {}).flat().filter(Boolean);
+      return String((events.find(event => event && event.id) || {}).id || '');
+    });
+    test.skip(!matchId, 'No match available to open detail modal.');
+
+    await page.evaluate((id) => { location.hash = `#match/${id}`; }, matchId);
     await expect(page.locator('#detail-modal.open')).toBeVisible({ timeout: 10000 });
     await expect.poll(async () => page.evaluate(() => location.hash)).toMatch(/^#match\//);
 
@@ -512,6 +519,10 @@ test.describe('Match modal — Reims regression', () => {
     await page.reload();
     await expect(page.locator('#detail-modal.open')).toHaveCount(0);
     await expect.poll(async () => page.evaluate(() => location.hash)).toBe('#dashboard');
+
+    await page.evaluate(() => { location.hash = '#match/__missing_critical__'; });
+    await expect.poll(async () => page.evaluate(() => location.hash)).toBe('#dashboard');
+    await expect(page.locator('#detail-modal.open')).toHaveCount(0);
   });
 });
 

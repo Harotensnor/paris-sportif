@@ -89,6 +89,17 @@ def _compact_markets_for_frontend(odds_block: dict) -> tuple[dict, dict]:
     if not isinstance(odds_block, dict):
         return compact, meta
 
+    # data.js is loaded by the app shell when a user forces a refresh. Keep it
+    # to core dashboard markets only; detailed per-match rows remain available
+    # in winamax_markets.json for offline audits/backtests.
+    keep_scalar_keys = {
+        '1n2',
+        'ou25',
+        'btts',
+        'dnb',
+        'ht_1n2',
+    }
+
     all_rows = odds_block.get('all_markets')
     if isinstance(all_rows, list) and all_rows:
         keys = sorted({
@@ -99,13 +110,12 @@ def _compact_markets_for_frontend(odds_block: dict) -> tuple[dict, dict]:
         meta.update({
             'full_markets_available': True,
             'full_markets_count': len(all_rows),
-            'full_market_keys': keys[:80],
+            'full_market_keys': keys[:12],
         })
 
     for key, value in odds_block.items():
-        if key == 'all_markets':
-            continue
-        compact[key] = value
+        if key in keep_scalar_keys:
+            compact[key] = value
     return compact, meta
 
 

@@ -84,12 +84,17 @@ body {
     top: calc(var(--rg-height, 32px) + 244px) !important;
     z-index: 45 !important;
   }
+  body.agent-home .v36-picks-table:has(.v36-tier-empty) {
+    min-height: calc(100vh + 40px) !important;
+  }
 }
 /* BUG-004/011: keep secondary pages attached to the top chrome. */
 .filters:empty{display:none!important;margin:0!important}
 #performance-wrap .page-wrap{padding-top:0}
 #performance-wrap .page-header{padding-top:14px;padding-bottom:14px;margin-bottom:14px}
 #compare-wrap>div{padding-top:0!important}
+#compare-wrap .page-tabs{padding-top:0!important;padding-bottom:4px!important;margin-bottom:6px!important}
+#compare-wrap .page-tabs+div{margin-top:0!important}
 #sante-wrap>div{padding-top:0!important}
 #sante-wrap .section-header.top-picks{margin-top:0!important}
 /* BUG-009: dashboard table controls follow the light theme instead of dark hardcoded surfaces. */
@@ -227,4 +232,78 @@ html[data-theme="light"]{--surface-0:#f5f5f7;--surface-1:#ffffff;--surface-2:#fb
     width:clamp(420px,38vw,720px)!important;
     max-width:calc(100vw - 48px)!important;
   }
+}
+
+/* v37.189 — Round 2 audit: tablet nav, sticky toolbar and command palette. */
+@media (min-width:721px) and (max-width:1100px){
+  body.agent-home #mobile-bottom-nav,
+  body.agent-inside #mobile-bottom-nav,
+  body.agent-home .mobile-bottom-nav,
+  body.agent-inside .mobile-bottom-nav{
+    display:flex!important;
+    position:fixed!important;
+    left:12px!important;
+    right:12px!important;
+    bottom:10px!important;
+    height:60px!important;
+    min-height:60px!important;
+    align-items:center!important;
+    justify-content:space-around!important;
+    gap:6px!important;
+    padding:6px!important;
+    border:1px solid var(--border-2)!important;
+    border-radius:16px!important;
+    background:color-mix(in srgb,var(--panel) 92%,transparent)!important;
+    box-shadow:0 18px 46px rgba(0,0,0,.38)!important;
+    backdrop-filter:blur(16px)!important;
+    -webkit-backdrop-filter:blur(16px)!important;
+    z-index:90!important;
+  }
+  #mobile-bottom-nav .mbn-btn{
+    flex:1 1 0!important;
+    min-width:0!important;
+    min-height:48px!important;
+    border-radius:12px!important;
+    justify-content:center!important;
+  }
+  body.agent-home main#main-content,
+  body.agent-inside main#main-content{
+    padding-bottom:88px!important;
+  }
+}
+@media (min-width:721px){
+  body.agent-home .v36-table-panel,
+  body.agent-home .v36-table-scroll{
+    overflow:visible!important;
+  }
+  body.agent-home .v36-table-toolbar{
+    position:sticky!important;
+    top:calc(var(--rg-height,32px) + 64px)!important;
+    z-index:58!important;
+  }
+  body.agent-home .v36-picks-table thead th{
+    position:sticky!important;
+    top:calc(var(--rg-height,32px) + 174px)!important;
+    z-index:57!important;
+  }
+  body.agent-home .v36-picks-table:has(.v36-tier-empty){
+    min-height:calc(100vh + 40px)!important;
+  }
+}
+@media (min-width:960px){
+  body.agent-home .v36-table-toolbar{
+    top:calc(var(--rg-height,32px) + 112px)!important;
+  }
+  body.agent-home .v36-picks-table thead th{
+    top:calc(var(--rg-height,32px) + 244px)!important;
+  }
+}
+#search-suggest,
+.cmd-palette,
+.command-palette{
+  left:50vw!important;
+  inset-inline-start:50vw!important;
+  margin-left:0!important;
+  margin-right:0!important;
+  transform:translate3d(-50%,0,0)!important;
 }
