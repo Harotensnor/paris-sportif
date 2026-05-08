@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-08T22:42:33Z",
+  "generated_at": "2026-05-08T22:51:30Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815255",
-      "kickoff": "2026-05-08T22:40Z",
-      "league": "MLB",
-      "match": "Colorado Rockies at Philadelphia Phillies",
-      "home": "Philadelphia Phillies",
-      "away": "Colorado Rockies",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Philadelphia Phillies",
-          "pitcher": "Jesús Luzardo",
-          "label": "Jesús Luzardo moins de 7,5 strikeouts",
-          "line": 7.5,
-          "pick": "under",
-          "probability": 0.5562,
-          "fair_odds": 1.8,
-          "expected_strikeouts": 7.2,
-          "projected_ip": 5.74,
-          "inputs": {
-            "k9": 11.29,
-            "era": 5.09,
-            "whip": 1.28,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Philadelphia Phillies",
-          "pitcher": "Jesús Luzardo",
-          "label": "Jesús Luzardo ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5667,
-          "fair_odds": 1.76,
-          "expected_hr_allowed": 0.568,
-          "projected_ip": 5.74,
-          "inputs": {
-            "hr9": 0.89,
-            "era": 5.09,
-            "whip": 1.28
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Colorado Rockies",
-          "pitcher": "Chase Dollander",
-          "label": "Chase Dollander moins de 7,5 strikeouts",
-          "line": 7.5,
-          "pick": "under",
-          "probability": 0.5134,
-          "fair_odds": 1.95,
-          "expected_strikeouts": 7.43,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 10.13,
-            "era": 3.38,
-            "whip": 1.15,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Colorado Rockies",
-          "pitcher": "Chase Dollander",
-          "label": "Chase Dollander concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5054,
-          "fair_odds": 1.98,
-          "expected_hr_allowed": 0.704,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 0.96,
-            "era": 3.38,
-            "whip": 1.15
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815254",
       "kickoff": "2026-05-08T23:05Z",
@@ -3288,7 +3206,7 @@
       ]
     }
   ],
-  "props": 158,
+  "props": 154,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
