@@ -667,8 +667,17 @@
     showModal('Vue sauvegardée', `<p>${esc(view.name)} est disponible dans ton dashboard local.</p>`);
   }
   function injectSavedViews() {
-    const wrap = $('#filters') || $('#main-content');
-    if (pageSlug() !== 'tous' || !wrap || $('[data-la-saved-views]', wrap)) return;
+    const existing = $all('[data-la-saved-views]');
+    if (pageSlug() !== 'tous') {
+      existing.forEach(node => node.remove());
+      return;
+    }
+    const wrap = $('#filters');
+    if (!wrap) return;
+    existing.forEach(node => {
+      if (!wrap.contains(node)) node.remove();
+    });
+    if ($('[data-la-saved-views]', wrap)) return;
     const prefs = mergePrefs();
     const box = document.createElement('div');
     box.className = 'la-card';
