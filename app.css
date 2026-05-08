@@ -85,3 +85,10 @@ body {
     z-index: 45 !important;
   }
 }
+/* BUG-004/011: keep secondary pages attached to the top chrome. */
+.filters:empty{display:none!important;margin:0!important}
+#performance-wrap .page-wrap{padding-top:0}
+#performance-wrap .page-header{padding-top:14px;padding-bottom:14px;margin-bottom:14px}
+#compare-wrap>div{padding-top:0!important}
+#sante-wrap>div{padding-top:0!important}
+#sante-wrap .section-header.top-picks{margin-top:0!important}
