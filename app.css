@@ -421,3 +421,35 @@ html[data-theme="light"]{--surface-0:#f5f5f7;--surface-1:#ffffff;--surface-2:#fb
   border-color:var(--brand-border);
   color:var(--brand);
 }
+
+/* AUDIT 2026-05-08 user feedback : tableau Dashboard pas joli ni organisé.
+   Cause : 3 classes CSS utilisées en HTML mais jamais stylées → leur
+   contenu s'étalait inline en blob illisible ("Forte86% modele",
+   "Correcte59% modele", "60Bon pariSignal stableData fraîche"…).
+   Ce bloc force la structure verticale + hiérarchie visuelle. */
+.v36-picks-table td{vertical-align:top;padding:8px 8px}
+.v36-picks-table tbody tr{transition:background .12s ease}
+.v36-cell-pick{min-width:240px;max-width:340px}
+.v36-cell-pick b{display:block;max-width:none;white-space:normal;line-height:1.25;font-size:12.5px;margin-bottom:3px}
+.v36-cell-pick em{display:block;color:var(--text-dim);font-style:normal;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.v37-beginner-copy{display:block;color:var(--text-dim);font-size:10.5px;line-height:1.4;margin:4px 0 6px;font-weight:500}
+.v37-readable-metric{display:flex;flex-direction:column;align-items:flex-end;line-height:1.15;gap:1px}
+.v37-readable-metric b{font-size:13px;font-weight:900;color:var(--text);font-style:normal}
+.v37-readable-metric em{font-size:9.5px;font-weight:600;color:var(--text-dim);font-style:normal;text-transform:none;letter-spacing:0}
+.v37-readable-metric.is-pos b{color:#21c77a}
+.v37-readable-metric.is-neg b{color:#ff6b4a}
+.v36-num.v36-odd{font-size:14.5px;font-weight:1000;color:var(--text)}
+.v37-opportunity{min-width:38px;height:24px;font-size:12px}
+.v37-score-advice{display:block;margin-top:4px;font-size:10.5px;color:var(--text-dim);font-style:normal;font-weight:600;text-align:right}
+.v37-intel-chips{display:flex;justify-content:flex-end;gap:4px;margin-top:5px;flex-wrap:wrap}
+.v37-intel-chips i{display:inline-flex;align-items:center;height:16px;padding:0 6px;border-radius:999px;background:rgba(236,244,255,.06);border:1px solid rgba(236,244,255,.10);font-style:normal;font-size:9.5px;font-weight:700;color:#aebdce;max-width:none;white-space:nowrap}
+.v38-open-analysis{display:inline-flex;align-items:center;height:18px;padding:0 8px;margin-left:auto;border-radius:999px;background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.22);color:var(--brand);font-style:normal;font-size:9.5px;font-weight:900;text-transform:uppercase;letter-spacing:.4px}
+.v36-cell-pick > span:last-child{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-top:5px}
+.v36-cell-match{font-weight:700;color:var(--text)}
+.v36-cell-sport b{font-size:10.5px;font-weight:800}
+.v36-cell-date{font-size:11px;color:var(--text-dim);font-weight:700}
+.v36-cell-league{font-size:10.5px;color:var(--text-dim);font-weight:700;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (min-width:1100px){
+  .v36-picks-table tbody tr{border-bottom:1px solid rgba(236,244,255,.04)}
+  .v36-picks-table tbody tr:hover{background:linear-gradient(90deg,rgba(167,139,250,.06),transparent 60%)}
+}
