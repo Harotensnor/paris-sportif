@@ -341,6 +341,10 @@ jobs:
           # Frontend l'utilise pour annoter chaque pick avec un signal
           # "✓ segment validé +X%" / "⚠ segment perdant -Y%". ~15 KB.
           python3 build_segment_trust.py || true
+          # AUDIT 2026-05-08 v39.3 — Détecte les incohérences cotes :
+          # vig anormale, cotes extrêmes, contradictions BTTS vs Poisson
+          # 1n2+OU. Sortie prono_consistency_report.json (~5-15 KB).
+          python3 audit_prono_consistency.py || true
           # v31.7.4 — OG images (1200x630 PNG) pour pages statiques. Cheap (~3s).
           python3 build_og_images.py || true
           # v35.13 — Sitemap dynamique depuis git log + routes SPA principales.
