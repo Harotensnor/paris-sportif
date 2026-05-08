@@ -5059,6 +5059,46 @@ return true;
 return false;
 };
 
+// AUDIT 2026-05-09 v42.E.5 — Détection arbitrage cross-bookmaker.
+// Si surebet (1/o1 + 1/o2 + 1/o3 < 1) → opportunité garantie.
+// Compare Winamax vs odds_consensus (~30 books moyenne) vs pinnacle_signal.
+function detectArbitrage(match) {
+  if (!match) return null;
+  const wnxN12 = match?.winamax?.markets?.['1n2'];
+  const consensus = match?.odds_consensus;
+  const pinnacle = match?.pinnacle_signal;
+  if (!wnxN12) return null;
+  // Pour chaque side, prendre la PLUS HAUTE cote disponible.
+  const sources = { winamax: wnxN12 };
+  if (consensus) sources.consensus = consensus;
+  if (pinnacle) sources.pinnacle = pinnacle;
+  const bestPerSide = { home: 0, draw: 0, away: 0 };
+  const bestSourcePerSide = {};
+  for (const [src, odds] of Object.entries(sources)) {
+    for (const side of ['home', 'draw', 'away']) {
+      const v = Number(odds[side]);
+      if (Number.isFinite(v) && v > bestPerSide[side]) {
+        bestPerSide[side] = v;
+        bestSourcePerSide[side] = src;
+      }
+    }
+  }
+  if (!bestPerSide.home || !bestPerSide.away) return null;
+  // Sum of inverse odds. Si < 1 → arbitrage.
+  let sumInv = 1 / bestPerSide.home + 1 / bestPerSide.away;
+  if (bestPerSide.draw) sumInv += 1 / bestPerSide.draw;
+  const isArb = sumInv < 1;
+  const arbProfit = isArb ? Math.round((1 - sumInv) * 1000) / 10 : 0;  // % profit garanti
+  return {
+    isArb,
+    arbProfit,
+    bestPerSide,
+    bestSourcePerSide,
+    sumInverse: Math.round(sumInv * 10000) / 10000,
+  };
+}
+try { window.detectArbitrage = detectArbitrage; } catch(e) { swallowError(e); }
+
 function buildComboVariants(picks, opts) {
 opts = opts || {};
 const minCorr = 0.4;  // skip combos avec haute corrélation
@@ -5098,12 +5138,30 @@ const outsiders = picks.filter(p => {
   const edge = Number(p.edge || 0);
   return p.tier === 'out' || (odd >= 5 && edge >= 0.05);
 }).sort((a, b) => (b.edge || 0) - (a.edge || 0));
+// AUDIT 2026-05-09 v42.E.3 — Outsider XL : 4-leg et 5-leg combos avec
+// contrainte plus stricte (corr < 0.3) pour vraie indépendance.
+const lowCorrComboXL = (filtered, legs, strictCorr) => {
+  const sel = [];
+  for (const p of filtered) {
+    if (sel.length >= legs) break;
+    const ok = sel.every(s => combinationCorrelation(s, p) < strictCorr);
+    if (ok) sel.push(p);
+  }
+  if (sel.length < legs) return null;
+  const corrAvg = sel.length > 1
+    ? (sel.reduce((acc, s, i) => i === 0 ? acc : acc + combinationCorrelation(sel[0], s), 0) / (sel.length - 1))
+    : 0;
+  const totalOdd = sel.reduce((acc, p) => acc * (p.odd || 1), 1);
+  return { picks: sel, corrAvg, totalOdd, n: sel.length };
+};
 return {
 safe: lowCorrCombo(safe),
 bestEdge: lowCorrCombo(bestEdge),
 buts: lowCorrCombo(buts),
 tomorrow: lowCorrCombo(tomorrow),
 outsider: lowCorrCombo(outsiders),
+outsider4: lowCorrComboXL(outsiders, 4, 0.30),  // v42.E.3 : 4-leg outsider XL
+outsider5: lowCorrComboXL(outsiders, 5, 0.30),  // v42.E.3 : 5-leg outsider XL
 };
 }
 try { window.buildComboVariants = buildComboVariants; } catch(e) { swallowError(e); }
@@ -11704,7 +11762,11 @@ const variants = buildComboVariants(picksAll);
 const variantConfigs = [
 // AUDIT 2026-05-09 v40.13 — Outsider en première position : c'est le seul
 // edge prouvé du modèle (+183% ROI sur 356 paris solo, +121% strategy).
-{ k: 'outsider', emoji: '💎', label: 'Combiné Outsider · ROI +121%', desc: 'tier=Out (cote ≥5 + edge ≥5pt) — l\'edge prouvé du backtest', color: '#34d399' },
+{ k: 'outsider', emoji: '💎', label: 'Combiné Outsider 3 jambes · ROI +121%', desc: 'tier=Out (cote ≥5 + edge ≥5pt) — l\'edge prouvé du backtest', color: '#34d399' },
+// AUDIT 2026-05-09 v42.E.3 — Outsider XL 4 et 5 jambes : multiplie la cote
+// × 100-1000 sans dégrader l'edge si events indépendants. Risque élevé.
+{ k: 'outsider4', emoji: '💎💎', label: 'Combiné Outsider XL · 4 jambes', desc: '4 outsiders, corr<0.3 (events indépendants). Cote totale × 100-500.', color: '#fbbf24' },
+{ k: 'outsider5', emoji: '💎💎💎', label: 'Combiné Outsider Lottery · 5 jambes', desc: '5 outsiders, max edge. Cote totale × 500-2000. Mise minimale.', color: '#f87171' },
 { k: 'safe', emoji: '🔒', label: 'Combiné Safe', desc: 'Uniquement des locks (≥70% confiance)', color: 'var(--tier-lock, #fbbf24)' },
 { k: 'bestEdge', emoji: '⭐', label: 'Combiné Best Edge', desc: 'Tri par edge décroissant', color: 'var(--accent, #22c55e)' },
 { k: 'buts', emoji: '⚽', label: 'Combiné Buts', desc: 'Marchés OU 2.5 / BTTS uniquement', color: 'var(--brand, #a78bfa)' },
