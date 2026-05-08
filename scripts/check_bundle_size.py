@@ -10,7 +10,8 @@ lib externe complète, ou regex fail qui inline tout data.js dans
 pronostics.html, etc.).
 
 Budgets (basés sur la taille actuelle + headroom raisonnable) :
-  app.js          : 1750 KB
+  app.js          :   20 KB (wrapper)
+  legacy-app.js   : 1800 KB
   app.css         :  300 KB
   pronostics.html : 1150 KB (contient le LITE blob)
   sw.js           :   15 KB
@@ -40,8 +41,8 @@ BUDGETS_KB = {
     # v34.11 — Rebaseline après extraction app.js/app.css + lazy data :
     # le garde-fou restait calé sur une ancienne taille et faisait échouer
     # toute la CI alors que le budget Lighthouse contrôle déjà le poids réel.
-    'app.js':                    1750,
-    'legacy-app.js':             1750,
+    'app.js':                      20,
+    'legacy-app.js':             1800,
     'app.css':                    300,
     'pronostics.html':           1150,
     'sw.js':                       15,
