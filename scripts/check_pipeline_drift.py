@@ -42,6 +42,11 @@ EXCLUDED = {
     'backtest_baselines.py',    # outil de recherche, pas en prod
     'check_pipeline_drift.py',  # ce script lui-même
     'check_no_conflict_markers.py',  # CI safety net, pas pipeline
+    'io_compressed.py',         # v40.0 : helper partagé read/write JSON .gz
+    # v40.0 : exclusivement cron (auth GitHub Releases via secrets.GITHUB_TOKEN
+    # qui n'est pas dispo en local). En local on garde winamax_markets.json
+    # sur disque entre runs.
+    'sync_winamax_markets_release.py',
 }
 
 

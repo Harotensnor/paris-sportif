@@ -76,6 +76,12 @@ def append_trace(script_name, rc, elapsed, tail):
 # internally too; the cadence here mostly gates how often we *try*.
 FETCH_STAGES = [
     # (script, ticks, timeout)
+    # AUDIT 2026-05-09 v40.17 — sync_winamax_markets_release.py est volontairement
+    # PAS dans cette liste : il prend un argument positional (download/upload) que
+    # auto_refresh.py ne sait pas passer. En local on garde winamax_markets.json
+    # sur disque (pas de purge). En prod GH Actions, refresh.yml l'invoque
+    # explicitement avec `download` au boot et `upload` à la fin. Ce désync
+    # est documenté dans check_pipeline_drift.py exclusions ci-dessous.
     ('fetch_live.py',              1,   60),
     ('fetch_sofascore_events.py',   1,   90),
     ('fetch_winamax_catalog.py',    1,   60),   # <2s typical
