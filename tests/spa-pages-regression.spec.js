@@ -24,6 +24,7 @@ const SPA_PAGES = [
   'credibilite',
   'backtest',
   'academie',
+  'methodologie',
   'profil',
   'sante',
   'legal',
@@ -38,22 +39,23 @@ const SPA_PAGES = [
 ];
 
 const HASH_EXPECTATIONS = {
-  top: '#dashboard',
-  locks: '#dashboard',
-  matchs: '#dashboard',
+  top: '#tous?legacy=top',
+  locks: '#tous?legacy=locks',
+  matchs: '#tous?legacy=matchs',
   valeur: '#tous',
   'plan-mise': '#tous',
-  calendrier: '#tous?view=calendar',
+  calendrier: '#tous?view=calendar&legacy=calendrier',
   combines: '#combines',
   buteurs: '#buteurs',
   compare: '#compare',
-  favoris: '#profil',
+  methodologie: '#academie?legacy=methodologie',
+  favoris: '#profil?legacy=favoris',
   alertes: '#alertes',
   bilan: '#bilan',
   historique: '#historique',
   backtest: '#backtest',
   credibilite: '#credibilite',
-  simulator: '#profil',
+  simulator: '#profil?legacy=simulator',
   sante: '#sante',
   legal: '#profil',
   montantes: '#montantes',
@@ -102,6 +104,7 @@ test('all SPA hash pages render without console errors or horizontal overflow', 
       return {
         hash: location.hash,
         hasHeading: [...document.querySelectorAll('h1,h2,h3')].some(visible),
+        hasDashboardTable: !!document.querySelector('.v36-home-shell .v36-picks-table, .v36-home-shell [data-v36-row]'),
         overflowX: document.documentElement.scrollWidth - document.documentElement.clientWidth,
         bottomNavVisible: !bottom || innerWidth > 720 || (getComputedStyle(bottom).display === 'flex' && br.width > 300 && br.height > 40),
       };
@@ -113,7 +116,7 @@ test('all SPA hash pages render without console errors or horizontal overflow', 
     );
     expect(realErrors, `${hash} console errors`).toEqual([]);
     expect(state.hash, `${hash} hash`).toBe(HASH_EXPECTATIONS[hash] || `#${hash}`);
-    expect(state.hasHeading, `${hash} heading`).toBe(true);
+    expect(state.hasHeading || (hash === 'dashboard' && state.hasDashboardTable), `${hash} rendered content`).toBe(true);
     expect(state.overflowX, `${hash} overflow-x`).toBeLessThanOrEqual(0);
     if (viewport && viewport.width <= 720) {
       expect(state.bottomNavVisible, `${hash} mobile bottom nav`).toBe(true);
@@ -126,7 +129,7 @@ test('mobile bottom nav highlights the right intent for deep pages', async ({ pa
 
   const cases = [
     ['#dashboard', 'Accueil'],
-    ['#locks', 'Accueil'],
+    ['#locks', 'Tous'],
     ['#tous', 'Tous'],
     ['#historique', 'Mes paris'],
     ['#simulator', 'Plus'],

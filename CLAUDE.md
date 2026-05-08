@@ -827,9 +827,16 @@ Hygiène moderne :
   x peut être une string corrompue ('abc'). 'abc' || 0 → 'abc' (truthy)
   qui casse les `.toFixed()` ensuite. Helper `_normNum` partout dans
   renderBet et co.
-- **`location.hash`** : 4 valeurs supportées au boot (#dashboard, #locks,
-  #bilan, #combines, etc.) pour les PWA shortcuts du manifest. Listener
-  hashchange pour back/forward.
+- **`location.hash`** : pages SPA réelles au boot = `#dashboard`, `#tous`,
+  `#performance`, `#academie`, `#profil`, `#combines`, `#bilan`,
+  `#historique`, etc. Les anciens liens sont redirigés explicitement par
+  `LEGACY_HASHES` : `#top` → `#tous?legacy=top`, `#locks` →
+  `#tous?legacy=locks`, `#matchs` → `#tous?legacy=matchs`,
+  `#methodologie` → `#academie?legacy=methodologie`, `#favoris` →
+  `#profil?legacy=favoris`, `#simulator` →
+  `#profil?legacy=simulator`, `#calendrier` →
+  `#tous?view=calendar&legacy=calendrier`. Listener hashchange pour
+  back/forward.
 - **Théme 3-state** : `userPrefs.theme` ∈ {dark, light, auto}. `auto`
   résout via `prefers-color-scheme` au boot pré-body + écoute le change
   en live. Cycle Maj+T = dark → light → auto → dark.
