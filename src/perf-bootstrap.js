@@ -153,6 +153,7 @@ function setupVitalsV2() {
 
 function setupDataBackups() {
   if (!('indexedDB' in window)) return;
+  if (window.__ENABLE_FULL_DATA_BACKUP !== true) return;
   const dbName = 'paris_sportif_data_backups_v1';
   const storageKey = 'paris_sportif_last_data_backup_at';
   const everyMs = 24 * 60 * 60 * 1000;

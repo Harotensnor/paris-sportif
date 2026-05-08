@@ -595,6 +595,13 @@ url.searchParams.delete('match');
 history.replaceState(null, '', url.pathname + (url.search ? url.search : '') + fallback);
 } catch(e) { swallowError(e); }
 }
+function _clearMissingMatchHash(matchId) {
+try {
+_rememberDetailReturnHash();
+_restoreDetailReturnHash();
+if (typeof toast === 'function') toast(`Match introuvable (${String(matchId || '').slice(0, 32)})`, 'warn');
+} catch(e) { swallowError(e); }
+}
 function _setUserNavHash(newHash) {
 try {
 if (!newHash || location.hash === newHash) return;
@@ -638,6 +645,7 @@ return;
 }
 }
 } catch(e) { /* swallow */ }
+_clearMissingMatchHash(targetId);
 return;
 }
 const p = _pageFromHash();
@@ -11476,6 +11484,10 @@ window._leagueLogoMark404 = _leagueLogoMark404;
 
   function openDetail(match, detailOptions) {
     _rememberDetailReturnHash();
+    if (!match || typeof match !== 'object' || match.id == null) {
+      _clearMissingMatchHash(match && match.id);
+      return false;
+    }
     const { home, away } = getSides(match);
     const detailOpts = detailOptions && typeof detailOptions === 'object' ? detailOptions : {};
     const pred = predictMatch(match);
@@ -14821,11 +14833,10 @@ if (match && typeof openDetail === 'function') setTimeout(() => openDetail(match
 const closeDetailModal = () => {
 const m = document.getElementById('detail-modal');
 if (!m) return;
-const wasOpen = m.classList.contains('open');
 let shouldRestoreHash = false;
 try {
 const url = new URL(location.href);
-shouldRestoreHash = wasOpen && (/^#match\//.test(location.hash || '') || url.searchParams.has('match'));
+shouldRestoreHash = /^#match\//.test(location.hash || '') || url.searchParams.has('match');
 } catch(e) { swallowError(e); }
 m.classList.remove('open');
 m.setAttribute('aria-hidden', 'true');
@@ -15147,9 +15158,12 @@ location.reload();
 }
 }
 
-async function pollData() {
+async function pollData(forceOrOptions) {
 if (__refreshInFlight) return;
 __refreshInFlight = true;
+const pollOptions = (forceOrOptions && typeof forceOrOptions === 'object')
+? forceOrOptions
+: { force: Boolean(forceOrOptions) };
 const ind = document.getElementById('refresh-indicator');
 if (ind) ind.classList.add('refreshing');
 try {
@@ -15174,6 +15188,7 @@ _lite: cur._lite === false ? false : true,
 }
 } catch(eFast) { swallowError(eFast); }
 if (!fresh) {
+if (pollOptions.liteOnly) throw new Error('lite refresh unavailable');
 const url = `data.js?t=${Date.now()}`;
 const resp = await fetch(url, { cache: 'no-store' });
 if (!resp.ok) throw new Error('HTTP ' + resp.status);
@@ -15518,7 +15533,7 @@ setTimeout(() => banner.remove(), 30000);
 } catch(e){ shouldPollAtBoot = true; }
 if (shouldPollAtBoot) {
 lastPoll = Date.now();
-pollData();
+pollData({ liteOnly: true, reason: 'boot-stale' });
 }
 __refreshTimer = setInterval(() => {
 const now = Date.now();
@@ -16025,18 +16040,9 @@ if (k <= 0) { return; } // pas d'edge → pas de mise
       wrap.innerHTML = '<div style="padding:60px;text-align:center;color:var(--text-dim);">Chargement…</div>';
       return;
     }
-    if (data._lite && typeof _ensureFullData === 'function' && wrap && wrap.dataset.dashboardFullQueued !== '1') {
-      wrap.dataset.dashboardFullQueued = '1';
-      setTimeout(() => {
-        _ensureFullData().then(() => {
-          delete wrap.dataset.dashboardFullQueued;
-          if (wrap && document.body.contains(wrap) && currentPage === 'dashboard') _scheduleDashboardRender(wrap, 'full-data');
-        }).catch(() => { delete wrap.dataset.dashboardFullQueued; if (wrap) wrap.dataset.dashboardFullFailed = '1'; });
-      }, 600);
-    }
-    if (data._lite && wrap && wrap.dataset.dashboardFullFailed !== '1') {
-      wrap.innerHTML = '<section class="v37-empty-pool-help is-info" style="margin:16px;"><strong>Chargement du tableau complet</strong><span>Les données rapides sont visibles, mais les 300+ matchs complets arrivent. Le tableau se remplit automatiquement dans quelques secondes.</span></section>';
-      return;
+    if (wrap) {
+      if (data._lite) wrap.dataset.dashboardDataMode = 'lite';
+      else delete wrap.dataset.dashboardDataMode;
     }
     const todayIso = parisDateISO(new Date());
     const now = new Date();
@@ -24852,11 +24858,13 @@ const esc2 = (typeof esc === 'function') ? esc : (s) => String(s).replace(/[&<>"
       const raw = localStorage.getItem(BOOT_STEP_KEY);
       const saved = raw ? JSON.parse(raw) : null;
       if (saved && Array.isArray(saved.done)) saved.done.forEach(step => completed.add(step));
+      if (saved && saved.active === 'done') ORDER.forEach(step => completed.add(step));
     } catch(e) { swallowError(e); }
     const save = () => {
       try {
+        const allDone = ORDER.every(step => completed.has(step));
         localStorage.setItem(BOOT_STEP_KEY, JSON.stringify({
-          active: active || 'idle',
+          active: allDone ? 'done' : (active || 'idle'),
           done: Array.from(completed),
           updated_at: new Date().toISOString()
         }));
@@ -32927,6 +32935,7 @@ return;
 }
 }
 }
+if (typeof _clearMissingMatchHash === 'function') _clearMissingMatchHash(targetId);
 } catch(_) { swallowError(_); }
 }, 300);
 

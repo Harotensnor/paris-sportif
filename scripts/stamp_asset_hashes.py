@@ -12,7 +12,7 @@ from urllib.parse import unquote, urlparse
 ROOT = Path(__file__).resolve().parents[1]
 HTML = ROOT / "pronostics.html"
 ASSET_RE = re.compile(
-    r"(?P<prefix>\b(?:src|href)=['\"])(?P<asset>[^'\"?#]+)\?v=(?P<stamp>[a-f0-9]{8})(?P<suffix>['\"])",
+    r"(?P<prefix>\b(?:src|href|data-ps-lazy-script)=['\"])(?P<asset>[^'\"?#]+)\?v=(?P<stamp>[a-f0-9]{8})(?P<suffix>['\"])",
     re.IGNORECASE,
 )
 
