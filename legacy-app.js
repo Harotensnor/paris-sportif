@@ -5490,11 +5490,34 @@ home_over_35: _poissonOver(lamH, 3),
 away_over_25: _poissonOver(lamA, 2),
 away_over_35: _poissonOver(lamA, 3),
 };
+// AUDIT 2026-05-09 v41.8 — Hockey : Period totals + First period winner.
+// Buts par période avec multipliers empiriques (1st: 0.95, 2nd: 1.0, 3rd: 1.05).
+const lamH_p1 = lamH / 3 * 0.95;
+const lamA_p1 = lamA / 3 * 0.95;
+let pH_p1 = 0, pX_p1 = 0, pA_p1 = 0;
+for (let hh = 0; hh <= 6; hh++) {
+  for (let aa = 0; aa <= 6; aa++) {
+    const p = poissonPmf(hh, lamH_p1) * poissonPmf(aa, lamA_p1);
+    if (hh > aa) pH_p1 += p;
+    else if (hh < aa) pA_p1 += p;
+    else pX_p1 += p;
+  }
+}
+const firstPeriod = { home: pH_p1, draw: pX_p1, away: pA_p1 };
+const periodTotals = [0.5, 1.5, 2.5].map(line => {
+  const lamPeriod = (lamH + lamA) / 3;
+  const cutoff = Math.floor(line);
+  let pUnder = 0;
+  for (let k = 0; k <= cutoff; k++) {
+    pUnder += poissonPmf(k, lamPeriod);
+  }
+  return { line, pOver: 1 - pUnder, pUnder, label: `Période plus de ${line} buts` };
+});
 return {
 kind: 'exact',
 items: top.map(s => ({ home: s.home, away: s.away, prob: s.prob, label: `${s.home}-${s.away}` })),
 caption: `${baseCap}${extras} (modèle statistique).`,
-markets: { totals, puckLine, teamTotals, lamH, lamA },
+markets: { totals, puckLine, teamTotals, lamH, lamA, firstPeriod, periodTotals },
 };
 }
 
@@ -5549,13 +5572,32 @@ return { line, pOver: phiCdf(z), pUnder: 1 - phiCdf(z), label: `F5 plus de ${lin
 });
 const baseCap = `Projection MLB sur ${Math.min(h.sample, a.sample)} derniers matchs`;
 const extras = captionExtras.length ? ` + ${captionExtras.join(', ')}` : '';
+// AUDIT 2026-05-09 v41.9 — NRFI / YRFI (No/Yes Run First Inning) MLB.
+// La 1ère manche représente ~10% des runs total. Poisson runs/inning :
+// lambda_1st = (projH + projA) * 0.105.
+const lam1st = total * 0.105;
+const pNoRun1st = Math.exp(-lam1st);
+const nrfi = {
+  yes: pNoRun1st,
+  no: 1 - pNoRun1st,
+};
+// Innings 1-3 : ~30% du total
+const lamFirst3 = total * 0.30;
+const inningTotals = [1.5, 2.5].map(line => {
+  // Approx Poisson cumul
+  let pUnder = 0;
+  for (let k = 0; k <= Math.floor(line); k++) {
+    pUnder += Math.exp(-lamFirst3) * Math.pow(lamFirst3, k) / (function fact(n) { let r = 1; for (let i = 2; i <= n; i++) r *= i; return r; })(k);
+  }
+  return { line, pOver: 1 - pUnder, pUnder, label: `1-3 manches plus de ${line} runs` };
+});
 return {
 kind: 'baseball',
 items: [{ home: Math.round(projH), away: Math.round(projA), prob: 1, label: `${Math.round(projH)}-${Math.round(projA)}` }],
 total: Math.round(total * 10) / 10,
 margin: Math.round(margin * 10) / 10,
 caption: `${baseCap}${extras} (Gaussienne approx σ_total≈${sigmaTotal}).`,
-markets: { totals, runLine, totalsF5, sigmaTotal, sigmaMargin },
+markets: { totals, runLine, totalsF5, sigmaTotal, sigmaMargin, nrfi, inningTotals },
 };
 }
 
@@ -5618,6 +5660,21 @@ const HOME_ADV = 2.5; // ~2.5 pts d'home-court, consensus NBA.
       share: w / quarterWeightSum,
       lines: derivedTotals(total * (w / quarterWeightSum), 5.5),
     }));
+    // AUDIT 2026-05-09 v41.7 — Quarter winner + First Half winner.
+    // Margin par quart ≈ margin total / 4. Sigma quarter ~5.
+    const sigmaQuarter = 5.5;
+    const sigmaHalf = 8;
+    const quarterMarginExpected = margin / 4;  // approximation linéaire
+    const halfMarginExpected = margin / 2;
+    const quarterWinner = {
+      home: phiCdf(quarterMarginExpected / sigmaQuarter),
+      draw: 1 - phiCdf((Math.abs(quarterMarginExpected) + 0.5) / sigmaQuarter) - (1 - phiCdf((Math.abs(quarterMarginExpected) - 0.5) / sigmaQuarter)),
+      away: 1 - phiCdf((quarterMarginExpected + 0.5) / sigmaQuarter),
+    };
+    const firstHalfWinner = {
+      home: phiCdf(halfMarginExpected / sigmaHalf),
+      away: 1 - phiCdf(halfMarginExpected / sigmaHalf),
+    };
     const handicapLines = margin >= 0 ? [3.5, 5.5, 7.5, 9.5] : [-3.5, -5.5, -7.5, -9.5];
     const handicaps = handicapLines.map(spread => {
       // P(marge_home > spread) = P((projH - projA) > spread)
@@ -5638,7 +5695,7 @@ const HOME_ADV = 2.5; // ~2.5 pts d'home-court, consensus NBA.
       total,
       margin,
       caption: `${baseCap}${extras} (± ~8 pts par équipe en NBA).`,
-      markets: { totals: totalsMarkets, firstHalfTotals, quarterTotals, quarterTotalsByQuarter, handicaps, sigmaTotal, sigmaMargin },
+      markets: { totals: totalsMarkets, firstHalfTotals, quarterTotals, quarterTotalsByQuarter, handicaps, sigmaTotal, sigmaMargin, quarterWinner, firstHalfWinner },
     };
   }
 
@@ -5729,12 +5786,31 @@ const HOME_ADV = 2.5; // ~2.5 pts d'home-court, consensus NBA.
       const pOver = 1 / (1 + Math.exp(-1.702 * z));
       return { line, label: `Plus de ${line} jeux/set`, pOver, pUnder: 1 - pOver };
     });
+    // AUDIT 2026-05-09 v41.6 — Tennis : First set winner + Tie-break y/n.
+    // First set winner = pSetH directement (chaque set indépendant en théorie).
+    const firstSet = {
+      home: pSetH,
+      away: q,
+    };
+    // Tie-break dans le match : approx via P(au moins un set tight).
+    // Un set tight ≈ pSet entre 0.45 et 0.55. Au-delà, TB rare.
+    // Si pSetH ∈ [0.40, 0.60] → forte chance ≥1 TB. Sinon faible.
+    const tightness = 1 - Math.abs(pSetH - 0.5) * 2;  // [0,1]
+    const pTBperSet = 0.10 + tightness * 0.20;  // 10% si one-sided, 30% si tight
+    const numSets = bestOf === 3 ? 2.4 : 4.0;  // attendu ~ midpoint
+    const pNoTB = Math.pow(1 - pTBperSet, numSets);
+    const tiebreak = {
+      yes: 1 - pNoTB,
+      no: pNoTB,
+    };
     return {
       kind: 'tennis',
       bestOf,
       items: items.slice(0, bestOf === 3 ? 3 : 4),
       caption: `Probabilités par nombre de sets (best-of-${bestOf}) dérivées de la proba de victoire.`,
       games: { avgGames, avgSets, avgGamesPerSet, lines: games, setLines, sigma },
+      firstSet,
+      tiebreak,
     };
   }
   try { window.tennisScorePrediction = tennisScorePrediction; } catch(e) { swallowError(e); }
