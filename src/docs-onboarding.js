@@ -87,7 +87,7 @@
     modal.innerHTML = `
       <section class="docs-dialog" tabindex="-1">
         <header><h2>${esc(title)}</h2><button type="button" class="docs-close" data-docs-close aria-label="Fermer">×</button></header>
-        <main>${body}</main>
+        <div class="docs-dialog-body">${body}</div>
         <footer>${footer || '<button type="button" class="docs-btn" data-docs-close>OK</button>'}</footer>
       </section>
     `;
