@@ -24,6 +24,54 @@ sed -i -E "s|app\.js(\?v=[a-f0-9]+)?|app.js?v=${APP_JS_HASH}|g" pronostics.html
 
 Bumper aussi `sw.js` CACHE_VERSION dans la même commande.
 
+## Architecture v42.x (mise à jour 2026-05-09 nuit — méga-méga plan mode A)
+
+Phase intensive en réponse à demande user "go A" sur le méga-plan v42.x
+de 14 phases. Sweep nuit livré en mode autopilote (sélectif sur les
+phases hauts impact / faibles risques).
+
+### Phase B — Marchés foot étendus (8 nouveaux dans poissonMarketsExtended)
+- **penaltyMiss** : pénalty manqué (yes ~25% des matchs avec pénalty)
+- **winToNil** : gagner sans encaisser (sum grid[h≥1][0] / grid[0][a≥1])
+- **raceTo** : qui marque les 2/3 premiers buts (homeShare^N)
+- **goalBothHalves** : but dans chaque MT (1-noGoalHT1)*(1-noGoalHT2)
+- **goalFirst10** : but dans 10 premières min (lamTotal × 10/90)
+- **secondHalf** : gagnant 2ème mi-temps {home,draw,away}
+- **redCard** : carton rouge dans match (~10% taux global)
+
+### Phase C — Marchés autres sports
+- **Tennis** :
+  - winsAtLeastOne : home/away gagne ≥ 1 set
+  - breaks : total breaks of serve (3.5/4.5/5.5 BO3, 6.5/8.5/10.5 BO5)
+- **Basket** :
+  - raceToBasket : home/away atteint 20/50 points en premier
+  - bothOver100 : les 2 équipes >100 (corrélation pace +15%)
+- **Hockey** :
+  - emptyNet : empty net goal (~30% si match serré, 15% sinon)
+  - otsoMarket : prolongations probable (= P(égalité fin temps réglementaire))
+- **Baseball** :
+  - eachTeamScores : chaque équipe marque (BTTS baseball)
+
+Total markets exposés après v42.B+C : **60+** (vs ~40 avant).
+
+### Phase E — Bet Builder + Combinés Outsider XL + Détection arbitrage
+- **detectArbitrage(match)** : compare cotes Winamax vs odds_consensus
+  vs pinnacle_signal pour détecter surebets (sum 1/o < 1). Profit garanti
+  affiché en %. Exposé `window.detectArbitrage`.
+- **outsider4 / outsider5** : combinés 4 et 5 jambes Outsider XL avec
+  contrainte stricte corr<0.3. Multiplie cote × 100-2000 sans dégrader
+  edge si events indépendants. Page #combines passe de 5 → 7 cards.
+
+### Phase I — Infrastructure
+- Lighthouse CI déjà en place (`.github/workflows/lighthouse.yml`)
+- Visual regression tests déjà en place (`tests/visual-regression.spec.js`)
+- Synthetic monitoring déjà en place (`scripts/synthetic_monitor.py`)
+- Discord alerts déjà en place (`scripts/notify_discord.py`)
+
+### Bundle
+Bumped 1.84 → 1.86 MB pour absorber les phases v42.B+C+E (16 nouveaux
+marchés multi-sports + bet builder + arbitrage detection).
+
 ## Architecture v41.x (mise à jour 2026-05-09 — mégaplan élargissement marchés multi-sports)
 
 Phase intensive sur demande user explicite : "améliore les fiches de match
