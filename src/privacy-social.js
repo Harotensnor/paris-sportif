@@ -890,7 +890,7 @@
     renderAll();
     handleComboHash();
     if (new URLSearchParams(location.search || '').has('docsNoTour')) localStorage.setItem(STORAGE.ack, '1');
-    showPrivacyModal(false);
+    if (!window.__psBootSequence) showPrivacyModal(false);
     const root = $('#app') || document.body;
     const observer = new MutationObserver(renderSoon);
     observer.observe(root, { childList: true, subtree: true });

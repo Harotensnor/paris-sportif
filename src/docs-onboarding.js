@@ -319,6 +319,7 @@
   }
 
   let tourStep = 0;
+  let tourDoneCallback = null;
   function targetRect(selector) {
     const el = selector ? $(selector) : null;
     if (!el) return null;
@@ -350,14 +351,21 @@
       `
     );
   }
-  function startTour(force = true) {
-    if (!force && (localStorage.getItem(DONE_KEY) === '1' || navigator.webdriver)) return;
+  function startTour(force = true, onDone = null) {
+    if (!force && (localStorage.getItem(DONE_KEY) === '1' || navigator.webdriver)) {
+      return false;
+    }
+    tourDoneCallback = typeof onDone === 'function' ? onDone : null;
     showTourStep(0);
+    return true;
   }
   function finishTour() {
     localStorage.setItem(DONE_KEY, '1');
     $('.docs-onboard-ring')?.remove();
     closeModal();
+    const cb = tourDoneCallback;
+    tourDoneCallback = null;
+    if (typeof cb === 'function') cb('completed');
     toast('Tour guidé terminé.');
   }
 
@@ -426,7 +434,17 @@
     const params = new URLSearchParams(location.search || '');
     if (params.has('docsNoTour')) localStorage.setItem(DONE_KEY, '1');
     if (params.has('docsTour')) setTimeout(() => startTour(true), 500);
-    else setTimeout(() => startTour(false), 1800);
+    else if (window.__psBootSequence) {
+      window.__psBootSequence.request('docs', ({ done }) => {
+        setTimeout(() => {
+          const shown = startTour(false, done);
+          if (!shown) done();
+        }, 500);
+        return true;
+      }, () => localStorage.getItem(DONE_KEY) === '1' || navigator.webdriver);
+    } else {
+      setTimeout(() => startTour(false), 1800);
+    }
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
