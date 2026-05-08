@@ -317,7 +317,12 @@ test.describe('Date nav', () => {
     await page.goto(URL + '#dashboard');
     const dayNav = page.locator('.v37-day-nav');
     await expect(dayNav).toBeVisible({ timeout: 10000 });
-    await expect(dayNav.locator('[data-v37-day]')).toHaveCount(9);
+    await expect(dayNav.locator('[data-v37-day]')).toHaveCount(5);
+    const labels = await dayNav.locator('[data-v37-day] b').evaluateAll(els =>
+      els.map(el => (el.textContent || '').trim())
+    );
+    expect(labels).toEqual(['7 jours', 'J-2', 'Hier', "Aujourd'hui", 'Demain']);
+    expect(labels.join(' ')).not.toMatch(/J\+2|J\+3|J\+4|J\+5/);
     await dayNav.getByRole('button', { name: /Hier/i }).click();
     await expect.poll(async () => page.evaluate(() => {
       const f = JSON.parse(localStorage.getItem('paris_sportif_v36_home_filter') || '{}');
@@ -329,6 +334,93 @@ test.describe('Date nav', () => {
       const f = JSON.parse(localStorage.getItem('paris_sportif_v36_home_filter') || '{}');
       return f.date || '';
     })).toBe(today);
+  });
+});
+
+test.describe('Audit UX polish', () => {
+  test('BUG-014 centers Ctrl+K search palette on secondary pages', async ({ page, viewport }) => {
+    test.skip(viewport && viewport.width < 900, 'Desktop command-palette audit.');
+    await page.goto(URL + '#academie');
+    await page.waitForFunction(() => document.querySelector('#search'), null, { timeout: 10000 });
+
+    await page.keyboard.press('Control+K');
+    await page.locator('#search').fill('paris');
+    await expect(page.locator('#search-suggest')).toBeVisible({ timeout: 5000 });
+
+    const box = await page.locator('#search-suggest').boundingBox();
+    const width = await page.evaluate(() => window.innerWidth);
+    expect(box).not.toBeNull();
+    expect(Math.abs((box.x + box.width / 2) - (width / 2))).toBeLessThan(24);
+    expect(box.width).toBeLessThanOrEqual(740);
+  });
+
+  test('BUG-015/016/017/018/019/020/021/022 dashboard minor UX regressions stay fixed', async ({ page, viewport }) => {
+    test.skip(viewport && viewport.width < 900, 'Desktop audit viewport.');
+    await page.setViewportSize({ width: 1707, height: 900 });
+    await page.goto(URL + '#dashboard');
+    await page.waitForFunction(() =>
+      document.querySelector('.v37-day-nav') &&
+      document.querySelector('.v36-table-toolbar') &&
+      document.querySelector('nav.topbar-nav .v36-nav-item[data-page="performance"]'),
+      null,
+      { timeout: 15000 }
+    );
+
+    const riskText = await page.locator('.rg-risk-bar').evaluate(el =>
+      (el.textContent || '').replace(/\s+/g, ' ').trim()
+    );
+    expect(riskText).toContain('Jouer comporte des risques : endettement, isolement, dépendance.');
+
+    await expect(page.locator('nav.topbar-nav .v36-nav-item[data-page="performance"]')).toContainText(/Mes paris/i);
+    await expect(page.locator('nav.topbar-nav .v36-nav-item[data-page="performance"]')).toContainText(/Performance/i);
+
+    const cta = page.locator('.v37-track-inline').first();
+    if (await cta.count()) {
+      const box = await cta.boundingBox();
+      expect(box.width).toBeLessThanOrEqual(300);
+    }
+
+    const checkbox = await page.locator('.v37-live-toggle input[type="checkbox"]').evaluate(el => {
+      const rect = el.getBoundingClientRect();
+      const cs = getComputedStyle(el);
+      return {
+        width: Math.round(rect.width),
+        height: Math.round(rect.height),
+        borderWidth: parseFloat(cs.borderTopWidth),
+        borderStyle: cs.borderTopStyle,
+      };
+    });
+    expect(checkbox.width).toBeLessThanOrEqual(24);
+    expect(checkbox.height).toBeLessThanOrEqual(24);
+    expect(checkbox.borderWidth).toBeGreaterThanOrEqual(1);
+    expect(checkbox.borderStyle).not.toBe('none');
+
+    const badge = await page.locator('#count-sante-alerts').evaluate(el => ({
+      text: (el.textContent || '').trim(),
+      title: el.getAttribute('title') || '',
+      aria: el.getAttribute('aria-label') || '',
+      kind: el.getAttribute('data-badge-kind') || '',
+    }));
+    expect(badge.kind).toBe('site-health-alerts');
+    expect(`${badge.title} ${badge.aria}`).toMatch(/alerte|Aucune/i);
+    expect(badge.text).toMatch(/^$|^[0-9]$|^9\+$/);
+
+    const stale = await page.evaluate(() => {
+      if (typeof window.__v37IsStaleLive !== 'function') return null;
+      return window.__v37IsStaleLive({
+        live: true,
+        date: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
+      });
+    });
+    expect(stale).toBe(true);
+
+    const trigger = page.locator('[data-big-detail]').first();
+    test.skip(await trigger.count() === 0, 'No pick available to open detail modal.');
+    await trigger.click();
+    await expect(page.locator('#detail-modal.open, .modal-backdrop.open')).toBeVisible({ timeout: 5000 });
+    const modalWidth = await page.locator('#detail-modal .modal').evaluate(el => el.getBoundingClientRect().width);
+    expect(modalWidth).toBeGreaterThanOrEqual(600);
+    expect(modalWidth).toBeLessThanOrEqual(740);
   });
 });
 

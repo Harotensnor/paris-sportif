@@ -118,3 +118,78 @@ html[data-theme="light"] .v36-table-row:hover,
 html[data-theme="light"] .v36-table-row:focus{background:color-mix(in srgb,var(--tier) 10%,var(--surface-2))!important}
 html[data-theme="light"] .v37-track-inline{background:var(--accent-soft)!important;border-color:color-mix(in srgb,var(--accent) 38%,var(--border))!important;color:var(--accent-2)!important}
 html[data-theme="light"]{--surface-0:#f5f5f7;--surface-1:#ffffff;--surface-2:#fbfbfd;--surface-3:#f2f2f4;--surface-hover:#ececf0}
+
+/* BUG-014/016/017/021/022: compact command palette, controls, stale-live badge and detail modal. */
+#search-suggest,
+.cmd-palette,
+.command-palette{
+  position:fixed!important;
+  top:112px!important;
+  left:50%!important;
+  right:auto!important;
+  transform:translateX(-50%)!important;
+  width:min(720px,calc(100vw - 32px))!important;
+  max-height:min(560px,calc(100vh - 140px))!important;
+  overflow:auto!important;
+  z-index:180!important;
+}
+.v37-track-inline{
+  width:auto!important;
+  max-width:280px!important;
+  justify-self:center!important;
+  align-self:center!important;
+  margin:8px auto!important;
+  padding:0 14px!important;
+}
+.v36-table-toolbar .v37-track-inline{
+  flex:0 0 auto!important;
+}
+.v37-live-toggle{
+  align-items:center!important;
+  gap:8px!important;
+}
+.v37-live-toggle input[type="checkbox"]{
+  appearance:none!important;
+  -webkit-appearance:none!important;
+  display:inline-grid!important;
+  place-content:center!important;
+  width:22px!important;
+  height:22px!important;
+  min-width:22px!important;
+  min-height:22px!important;
+  margin:0!important;
+  border:1px solid var(--border-2)!important;
+  border-radius:6px!important;
+  background:var(--surface-1,var(--panel))!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04)!important;
+}
+.v37-live-toggle input[type="checkbox"]::after{
+  content:"";
+  width:10px;
+  height:10px;
+  border-radius:3px;
+  background:var(--brand);
+  transform:scale(0);
+  transition:transform .12s ease;
+}
+.v37-live-toggle input[type="checkbox"]:checked{
+  border-color:var(--brand)!important;
+  background:var(--brand-soft)!important;
+}
+.v37-live-toggle input[type="checkbox"]:checked::after{
+  transform:scale(1);
+}
+.v37-live-toggle span{
+  line-height:1!important;
+}
+.v37-result--stale-live{
+  background:rgba(245,158,11,.16)!important;
+  border-color:rgba(245,158,11,.38)!important;
+  color:var(--warn)!important;
+}
+@media (min-width:900px){
+  #detail-modal .modal{
+    width:clamp(420px,38vw,720px)!important;
+    max-width:calc(100vw - 48px)!important;
+  }
+}
