@@ -24,6 +24,98 @@ sed -i -E "s|app\.js(\?v=[a-f0-9]+)?|app.js?v=${APP_JS_HASH}|g" pronostics.html
 
 Bumper aussi `sw.js` CACHE_VERSION dans la même commande.
 
+## Architecture v40.x (mise à jour 2026-05-09 — gros sweep nuit du 2026-05-08)
+
+Phase intensive de 15 versions sur 24h, déclenchée par feedback user
+"je veux pas de paris à cote pas validée mais c'est pas une raison pour
+fait sauter un paris". Réorganise validation cote, verdict, infrastructure
+git, mode strict, surfacing Outsider.
+
+### Infrastructure git (v40.0)
+- **winamax_markets.json (~90 MB) externalisé sur GitHub Releases**
+  `data-cache` rolling tag, asset `winamax_markets.json.gz` (~5 MB compressed).
+  `scripts/sync_winamax_markets_release.py` (download/upload) + workflow
+  refresh.yml restore au boot + upload en fin. Avant : 90 MB × 288
+  commits/jour = 25 GB/jour ajoutés à l'historique git. Maintenant : zéro.
+- **5 sidecars > 1 MB compressés .json.gz** : footballdata, bayesian_priors,
+  team_priors, tennis_ratings, team_form. Helper `scripts/io_compressed.py`
+  (read_json/write_json transparents). Compression 7-11% → ~9 MB
+  économisés/commit. 12 scripts Python migrés (writers + readers).
+- **git filter-repo --invert-paths** : purge winamax_markets.json de
+  l'historique. Backup tag `pre-purge-v40-20260508-192730` poussé. Repo
+  local 3.7 GB → 159 MB (×23 réduction). Shallow clone : 55 MB.
+
+### Validation cote Winamax (v40.0 → v40.4)
+- **`v38OddTopEligible` accepte 'changed' avec drift < 25%**. Avant :
+  exigeait status='verified' OU 'changed' avec markets fetched < 30 min.
+  Conséquence : 7/10 picks Serie B/La Liga 2 flagués "Cote à vérifier"
+  même quand Winamax actuel diffère ~10% du snapshot. Maintenant :
+  drift = |cur-odd|/max(odd,cur) < 0.25 = OK.
+- **`v36PickPoolRaw` mute `c.odd → currentOdd` Winamax** quand drift
+  acceptable, recalcule edge/EV cohérents, re-valide pour badge 'verified'.
+- **`v37DataOnlyPool`** (fallback) utilise désormais Winamax direct via
+  `m.winamax.markets['1n2']` au lieu de `pred.odds.home/away/draw` (qui
+  pouvait être DraftKings/B365).
+- **side='home/away/draw' + raw** sur candidate data-only pour matcher
+  `v38FindWinamaxOdd`. Bug racine : v38OddSideAliases regex anchorées
+  `/^home$/` failaient sur row collecté concaténé `'home home home'`.
+- **Veto segment assoupli** : avant 'low' (ROI<-5% sur ≥10 paris) AUTO
+  "À éviter". Maintenant veto seulement si SEVERE (ROI<-10% ET n≥30).
+  Sinon segment perdant = chip warning ⚠ à côté du verdict.
+- **Cap data-only opp 68 → 80** : avant les data fiable plafonnaient sous
+  le seuil "Miser" (75) → impossibilité technique d'avoir une recommandation
+  forte sur fallback.
+
+### Verdict + UX (v40.5 → v40.11)
+- **Seuils baissés** : Miser opp ≥75 → 60, Petite mise ≥60 → 45,
+  Surveiller ≥40 → 30. Reflète Brier 0.231 du modèle (rarement très
+  confiant).
+- **Footer-version stamped** avec BUILD_ID complet à chaque push :
+  `v40.0-YYYYMMDD-HHMMSS`. `stamp_asset_hashes.py` injecte le timestamp
+  dans `<span id="footer-version">`. JS `syncFooterVersion` détecte
+  pattern et laisse la valeur stamped. User voit la build active d'un
+  coup d'œil.
+- **Workflow race fix** : retry loop du `git push` re-stamp les asset
+  hashes après `pull --rebase` (avant : si app.js VERSION bumpée pendant
+  cron, les stamps cron's overwritaient la nouvelle version → cache stale
+  serving old code).
+- **Fallback live pick** : v37DataOnlyPool génère `predPick = {key,
+  prob:1/odd, label:'Pick auto'}` depuis le favori Winamax si pred.skip
+  (typique pour matchs LIVE). Permet d'afficher tous les matchs avec leur
+  cote actuelle même quand le modèle est conservatif.
+- **Outsider override** : `_v39FinalRec` retourne 'Miser (Outsider 💎)'
+  auto quand tier='out' OR (cote≥5 AND edge≥5pt). Score 80, ignore le
+  veto segment trust. Backtest officiel prouve +183% ROI sur 356 paris.
+- **Outsider sort priority** : peu importe le tri user, les Outsiders
+  sont toujours en haut du tableau (v40OutsiderRank).
+- **Bannière 💎 stratégique** : "Stratégie active : Outsider-only · ROI
+  historique +121%" + scanner 7 jours qui surface top 8 outsiders
+  (cote ≥5 + edge ≥5pt) cliquables.
+- **Strict mode (default ON)** : tableau ne montre que les verdicts
+  'bet' / 'bet-light' (Miser / Petite mise). Tout le reste caché sous
+  toggle "+ N non-misables cachés". Adaptive : si 0 misable, désactive
+  auto pour ne pas afficher tableau vide.
+- **Threshold v37DataOnlyScanPool 10 → 1** : avant le fallback retournait
+  [] direct si <11 matchs scope (typique le soir quand matchs finis
+  sortent de exactBookable). Maintenant active dès 1 match.
+
+### Polish (v40.12 → v40.15)
+- **Fix H1 duplication noscript** (audit ChatGPT) : `<h1>JavaScript
+  requis</h1>` du noscript → `<h2>`. Le seul H1 du document devient
+  "Pronostics du jour".
+- **Combiné Outsider page #combines** : `buildComboVariants` expose
+  désormais variante 'outsider' qui sélectionne les picks tier='out'
+  avec corr<0.4. 5e card sur la page Combinés (au-dessus de Safe).
+  Multiplie les cotes ×25-150 sans dégrader edge si events indépendants.
+- **Tests Playwright `tests/v40-features.spec.js`** : 7 tests defensifs
+  (skip si helpers/data manquent en CI) couvrant footer-version pattern,
+  v38OddTopEligible drift, _v39FinalRec Outsider override,
+  buildComboVariants outsider variant, H1 unicité, bannière Outsider,
+  sw CACHE_VERSION pattern.
+- **CLV widget temps réel** : `#trust-clv` dans la trust-strip lit
+  `clv_summary.json.summary.mean_clv_pct`, affiche "+0.20%" en vert
+  ou "-0.50%" en rouge. Mesure si on bat le marché en moyenne.
+
 ## Architecture v31.7.177 (mise à jour 2026-04-28 — Sprints 82-90 brief 16-parties complet)
 
 Réponse au brief "fait tout sans exception" — couverture des 16 parties.
