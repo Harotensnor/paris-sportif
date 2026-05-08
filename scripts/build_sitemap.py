@@ -4,9 +4,14 @@
 Régénère sitemap.xml à chaque cron tick avec :
 - Landing page (priority 1.0)
 - Pages éditoriales statiques (priority 0.7-0.9)
-- Pages générées (backtest, credibilite) (priority 0.7)
-- Pronostics SPA (priority 0.6) — hash routes pour les SPA pages
+- Pages générées (backtest, credibilite) (priority 0.85)
+- Pronostics dashboard URL canonique (priority 0.95)
 - RSS feed (priority 0.5)
+
+AUDIT 2026-05-08 : retrait des 268 hash-anchors (SPA routes + match routes).
+Googlebot traite les fragments comme l'URL canonique sans hash, donc lister
+`/pronostics.html#dashboard` etc. = 268 doublons qui brûlent le crawl budget.
+On ne garde que les URLs réellement canoniques.
 
 Lastmod calculé depuis git log, fallback mtime du fichier source.
 
@@ -70,30 +75,14 @@ STATIC_URLS = [
 ]
 
 
-SPA_ROUTES = [
-    ('dashboard', 0.95, 'daily'),
-    ('tous', 0.92, 'daily'),
-    ('performance', 0.82, 'daily'),
-    ('academie', 0.74, 'weekly'),
-    ('profil', 0.62, 'weekly'),
-    ('sante', 0.58, 'daily'),
-    ('montantes', 0.56, 'weekly'),
-    ('legal', 0.42, 'yearly'),
-]
-
+# AUDIT 2026-05-08 : SPA_ROUTES retirées du sitemap. Googlebot traite
+# `/pronostics.html#dashboard` comme `/pronostics.html`, donc les 8 routes
+# hash devenaient 8 doublons noyant les 7 URLs canoniques. La nav interne
+# du site reste fonctionnelle, c'est juste le sitemap qui est nettoyé.
 
 # Liste structurée pour facile maintenance
 URLS = STATIC_URLS + [
-    {'loc': '/pronostics.html', 'priority': 0.95, 'changefreq': 'daily', 'lastmod_src': ['pronostics.html', 'app.js']},
-    *[
-        {
-            'loc': f'/pronostics.html#{route}',
-            'priority': priority,
-            'changefreq': changefreq,
-            'lastmod_src': ['pronostics.html', 'app.js'],
-        }
-        for route, priority, changefreq in SPA_ROUTES
-    ],
+    {'loc': '/pronostics.html', 'priority': 0.95, 'changefreq': 'daily', 'lastmod_src': ['pronostics.html', 'legacy-app.js', 'app.js']},
 ]
 
 
@@ -112,34 +101,10 @@ def _data_lastmod() -> str:
     return _lastmod('data.js')
 
 
-def _match_urls() -> list[dict]:
-    try:
-        raw = DATA_JS.read_text(encoding='utf-8')
-        m = re.search(r'PRONOSTICS_DATA\s*=\s*(\{.*\})\s*;?\s*$', raw, re.DOTALL)
-        if not m:
-            return []
-        data = json.loads(m.group(1))
-    except Exception:
-        return []
-    seen = set()
-    out = []
-    lastmod = _data_lastmod()
-    for events in (data.get('days') or {}).values():
-        for ev in events or []:
-            mid = str(ev.get('id') or '').strip()
-            if not mid or mid in seen:
-                continue
-            w = ev.get('winamax') or {}
-            if w.get('available') is not True or not w.get('match_id'):
-                continue
-            seen.add(mid)
-            out.append({
-                'loc': f'/pronostics.html#match/{mid}/synthese',
-                'priority': 0.50,
-                'changefreq': 'daily',
-                'lastmod': lastmod,
-            })
-    return out
+# AUDIT 2026-05-08 : _match_urls() retiré. Les hash routes
+# `/pronostics.html#match/{id}/synthese` étaient 260 doublons en plus.
+# Le crawl Google ne les distingue pas de `/pronostics.html`, et la fiche
+# détail est de toute façon dynamique (data fraîche cron 5 min, ID volatile).
 
 
 def _url_lastmod(u: dict) -> str:
@@ -147,7 +112,7 @@ def _url_lastmod(u: dict) -> str:
 
 
 def main() -> int:
-    urls = URLS + _match_urls()
+    urls = URLS
     lines = ['<?xml version="1.0" encoding="UTF-8"?>',
              '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
     for u in urls:
@@ -159,7 +124,7 @@ def main() -> int:
         lines.append('  </url>')
     lines.append('</urlset>')
     OUT.write_text('\n'.join(lines) + '\n', encoding='utf-8')
-    print(f'sitemap.xml regenerated : {len(urls)} URLs ({len(urls) - len(URLS)} match routes)')
+    print(f'sitemap.xml regenerated : {len(urls)} URLs canoniques (hash routes retirées AUDIT 2026-05-08)')
     return 0
 
 

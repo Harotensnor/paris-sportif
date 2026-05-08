@@ -50,6 +50,14 @@ REPORT_MD = ROOT / 'backtest_report_v2.md'
 CALIBRATION_SEGMENTS_JSON = ROOT / 'calibration_per_sport_league.json'
 CALIBRATION_MARKETS_JSON = ROOT / 'calibration_per_sport_league_market.json'
 BANKROLL_SIM_JSON = ROOT / 'bankroll_simulation.json'
+# AUDIT 2026-05-08 (P0.1) — Fallback CLV : compute_clv.py produit un fichier
+# avec opening/closing/clv_pct par match × side. backtest_v2 lit ce dico en
+# secours quand `event.closing_odds` est absent (cas typique car snapshot_odds
+# ne re-écrit pas l'event lui-même). Avant ce fix, n_with_clv était toujours
+# 0 et avg_clv_pct toujours None, alors qu'il y a 31 matchs/72 observations
+# de CLV dispo dans clv_history.json. Sans cette mesure, impossible de juger
+# objectivement si le modèle bat le marché.
+CLV_HISTORY_JSON = ROOT / 'clv_history.json'
 
 COTE_BUCKETS = [
     ('heavy_fav',   0.0, 1.50),
@@ -137,6 +145,54 @@ def load_odds_history() -> dict:
                 continue
             latest[mid] = ts
             out[mid] = {'home': home, 'away': away, 'draw': draw}
+    return out
+
+
+def load_clv_history() -> dict[str, dict]:
+    """Charge clv_history.json et renvoie {match_id: {home, away, draw, sport, league_code}}
+    avec closing_odd par side. Sert de fallback à `event.closing_odds` qui n'est
+    presque jamais peuplé directement sur l'event (snapshot_odds.py n'écrit pas
+    en arrière sur l'event). Avec ce fallback, le backtest peut calculer le CLV
+    pour les events listés dans clv_history.records[].
+
+    Format de clv_history.json (cf scripts/compute_clv.py) :
+    {
+      "records": [
+        {
+          "id": "747317",
+          "sides": {
+            "home": {"opening_odd": 1.39, "closing_odd": 1.37, "clv_pct": 1.14},
+            "draw": {...},
+            "away": {...}
+          }
+        }, ...
+      ]
+    }
+    """
+    if not CLV_HISTORY_JSON.exists():
+        return {}
+    try:
+        d = json.loads(CLV_HISTORY_JSON.read_text(encoding='utf-8'))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    out: dict[str, dict] = {}
+    for rec in d.get('records') or []:
+        mid = str(rec.get('id') or '')
+        if not mid:
+            continue
+        sides = rec.get('sides') or {}
+        closing = {}
+        for side_key in ('home', 'draw', 'away'):
+            side = sides.get(side_key) or {}
+            c = side.get('closing_odd')
+            try:
+                c = float(c) if c is not None else None
+            except (TypeError, ValueError):
+                c = None
+            if c and c > 1:
+                closing[side_key] = c
+        if closing:
+            out[mid] = closing
     return out
 
 
@@ -281,8 +337,11 @@ def run_backtest(opts) -> dict:
     pron_data = load_pronostics_data()
     odds_hist = load_odds_history()
     archive = load_results_archive()
+    clv_hist = load_clv_history()
     print(f"[backtest] odds_history : {len(odds_hist)} entries", file=sys.stderr)
     print(f"[backtest] results_archive : {len(archive)} entries", file=sys.stderr)
+    print(f"[backtest] clv_history : {len(clv_hist)} entries (fallback closing_odds)",
+          file=sys.stderr)
 
     loader.set_data(pron_data, odds_history=odds_hist)
 
@@ -384,6 +443,17 @@ def run_backtest(opts) -> dict:
         # CLV_pct = (our_odds / closing_odds - 1) × 100
         closing_odds_obj = ev.get('closing_odds') or {}
         closing_cote = closing_odds_obj.get(pick_side)
+        # AUDIT 2026-05-08 (P0.1) — fallback CLV via clv_history.json.
+        # `event.closing_odds` est rarement peuplé (snapshot_odds.py n'écrit
+        # pas en arrière sur l'event source), mais clv_history.json
+        # contient l'opening + closing par match × side. On lit en
+        # secours pour mesurer le CLV — sans ça, n_with_clv reste à 0.
+        if not (closing_cote and closing_cote > 1):
+            clv_lookup = clv_hist.get(str(ev.get('id') or ''))
+            if clv_lookup:
+                fallback = clv_lookup.get(pick_side)
+                if fallback and fallback > 1:
+                    closing_cote = fallback
         clv_pct = None
         if closing_cote and closing_cote > 1:
             clv_pct = (cote / closing_cote - 1) * 100

@@ -14947,15 +14947,21 @@ if (match && typeof openDetail === 'function') setTimeout(() => openDetail(match
 }
 
 const closeDetailModal = () => {
-const m = document.getElementById('detail-modal');
-if (!m) return;
+// AUDIT 2026-05-08 (P0.3) — toujours nettoyer le hash si on est sur
+// `#match/...` ou ?match=, même si l'élément modal a déjà été retiré
+// par un autre flow (rerender de page, route change, etc.). Avant ce fix,
+// le `if (!m) return` court-circuitait le restore et l'utilisateur restait
+// avec un hash orphelin → reload rouvrait une modal vide.
 let shouldRestoreHash = false;
 try {
 const url = new URL(location.href);
 shouldRestoreHash = /^#match\//.test(location.hash || '') || url.searchParams.has('match');
 } catch(e) { swallowError(e); }
+const m = document.getElementById('detail-modal');
+if (m) {
 m.classList.remove('open');
 m.setAttribute('aria-hidden', 'true');
+}
 if (window._modalTrapRelease) {
 try { window._modalTrapRelease(); } catch(e) { swallowError(e); }
 window._modalTrapRelease = null;
@@ -29291,10 +29297,22 @@ const santeFold = (title, html) => !html ? '' : `<details class="sante-fold"><su
 const navBadge = document.getElementById('count-sante-alerts');
 if (navBadge) {
 const n = warnCount + critCount;
+// AUDIT 2026-05-08 (P1.4 / BUG-R8) — restaurer la tooltip que ce setter
+// dupliqué effaçait. L'autre setter (L15716) la posait au boot mais
+// renderSantePage la sautait. Maintenant cohérent.
+const navPlural = n > 1 ? 's' : '';
+const navCritPlural = critCount > 1 ? 's' : '';
+const navTitle = n
+  ? `${n} alerte${navPlural} santé site en attente${critCount ? `, dont ${critCount} critique${navCritPlural}` : ''}.`
+  : 'Aucune alerte santé site en attente.';
 navBadge.textContent = n;
 navBadge.style.display = n ? '' : 'none';
 navBadge.style.background = critCount > 0 ? 'rgba(248,113,113,.25)' : 'rgba(234,179,8,.25)';
 navBadge.style.color = critCount > 0 ? '#f87171' : '#eab308';
+navBadge.title = navTitle;
+navBadge.setAttribute('aria-label', navTitle);
+const navParent = navBadge.closest('[data-page]');
+if (navParent) navParent.title = navTitle;
 }
 
 const statusPill = (s) => {

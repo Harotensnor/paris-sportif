@@ -35,6 +35,24 @@ def parse_dt(value: Any) -> datetime | None:
         return None
 
 
+# AUDIT 2026-05-08 — race condition tolérée (P0.5).
+# `build_health.py` calcule à T0 quand data.js a generated_at=X.
+# Puis `inject_data_in_html.py` re-stamp data.js avec generated_at=X+~2min.
+# Sur la fenêtre du même cron tick, l'écart est < 5 min : on tolère.
+TIMESTAMP_TOLERANCE_S = 300  # 5 minutes
+
+
+def timestamps_close(a: Any, b: Any) -> bool:
+    """Return True when a and b are equal strings or within TIMESTAMP_TOLERANCE_S."""
+    if a == b:
+        return True
+    da = parse_dt(a)
+    db = parse_dt(b)
+    if da is None or db is None:
+        return False
+    return abs((da - db).total_seconds()) <= TIMESTAMP_TOLERANCE_S
+
+
 def iter_events(data: dict[str, Any]) -> list[dict[str, Any]]:
     return [
         ev
@@ -102,10 +120,10 @@ def main() -> int:
     truth = winamax_truth(data)
     if night.get("source_of_truth") != "data.js":
         errors.append("night_metrics.source_of_truth must be data.js")
-    if night.get("data_generated_at") != data_generated_at:
+    if not timestamps_close(night.get("data_generated_at"), data_generated_at):
         errors.append(
             f"night_metrics data_generated_at={night.get('data_generated_at')} "
-            f"differs from data.js generated_at={data_generated_at}"
+            f"differs from data.js generated_at={data_generated_at} (>5min)"
         )
     now = datetime.now(timezone.utc)
     today = now.date().isoformat()
@@ -116,12 +134,12 @@ def main() -> int:
     if health_truth and health_truth.get("source_of_truth") != "data.js":
         errors.append("health.data_truth.source_of_truth must be data.js")
     health_generated = health_truth.get("data_generated_at") or health.get("data_generated_at")
-    if health_generated and health_generated != data_generated_at:
+    if health_generated and not timestamps_close(health_generated, data_generated_at):
         errors.append(
-            f"health data_generated_at={health_generated} differs from data.js generated_at={data_generated_at}"
+            f"health data_generated_at={health_generated} differs from data.js generated_at={data_generated_at} (>5min)"
         )
     night_events = night.get("events") if isinstance(night.get("events"), dict) else {}
-    if night.get("data_generated_at") == data_generated_at:
+    if timestamps_close(night.get("data_generated_at"), data_generated_at):
         for key in ("winamax_available", "winamax_exact", "winamax_exact_ratio"):
             if not same_value(night_events.get(key), truth.get(key)):
                 errors.append(f"night_metrics.{key}={night_events.get(key)} differs from data.js truth={truth.get(key)}")
