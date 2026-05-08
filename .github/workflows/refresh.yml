@@ -511,6 +511,26 @@ jobs:
             fi
             echo "Push rejected (attempt $attempt) — pulling --rebase and retrying."
             git pull --rebase --autostash -X theirs origin main
+            # AUDIT 2026-05-08 v40 — Race condition fix : si l'autre push a
+            # bumped app.js VERSION (ex: v39.1 → v40.0), nos stamps en cache
+            # busting de pronostics.html sont périmés et pointent sur des
+            # hashes invalides. On re-stamp APRÈS le rebase pour repartir
+            # sur la nouvelle réalité, puis on amend le commit.
+            APP_VERSION_RESYNC=$(python3 - <<'PY'
+          import re
+          from pathlib import Path
+          m = re.search(r"VERSION\s*=\s*['\"](v\d+(?:\.\d+)?)['\"]", Path('app.js').read_text(encoding='utf-8', errors='ignore'))
+          print(m.group(1) if m else 'v0')
+          PY
+          )
+            BUILD_ID_RESYNC="${APP_VERSION_RESYNC}-$(date -u +'%Y%m%d-%H%M%S')"
+            python3 scripts/stamp_asset_hashes.py --build-id "$BUILD_ID_RESYNC" || true
+            sed -i "s|^const CACHE_VERSION = .*|const CACHE_VERSION = 'paris-sportif-${BUILD_ID_RESYNC}';|" sw.js
+            git add pronostics.html sw.js
+            if ! git diff --cached --quiet; then
+              git commit --amend --no-edit
+              echo "Re-stamped after rebase with build_id ${BUILD_ID_RESYNC}."
+            fi
           done
           echo "Push still failing after 3 retries — surfacing as a job failure."
           exit 1
