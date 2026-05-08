@@ -17514,7 +17514,17 @@ const pred = predictMatch(m);
 if (!pred?.pick) continue;
 const odds = pred.odds || getMatchOdds(m, m.sport === 'football');
 const pk = pred.pick.key;
-const odd = Number(pk === '1' ? odds?.home : pk === '2' ? odds?.away : odds?.draw);
+// AUDIT 2026-05-08 v40.2 — Si Winamax 1N2 est dispo pour ce match, on PRÉFÈRE
+// la cote Winamax directe (et on marque source='winamax_exact'). Avant : on
+// prenait toujours `odds.home/away/draw` issu du snapshot/pred, et si ça ne
+// venait pas de Winamax, source='cote_indicative' → validatePickOdd
+// retournait 'missing' (line 3988) → COTE SUSPECTE permanent même quand
+// Winamax a la cote. Maintenant : Winamax direct = priorité, validation
+// passe sur 'verified' immédiatement.
+const wnxN12 = m?.winamax?.markets?.['1n2'];
+const wnxOddRaw = wnxN12 ? Number(pk === '1' ? wnxN12.home : pk === '2' ? wnxN12.away : wnxN12.draw) : NaN;
+const useWnx = Number.isFinite(wnxOddRaw) && wnxOddRaw > 1.01;
+const odd = useWnx ? wnxOddRaw : Number(pk === '1' ? odds?.home : pk === '2' ? odds?.away : odds?.draw);
 const rel = Number(pred.pick?.prob ?? pred.reliability ?? 0);
 if (!(odd >= 1.30) || !(rel > 0)) continue;
 const edge = rel - 1 / odd;
@@ -17523,7 +17533,7 @@ const tier = v36TierForCandidate({ odd, rel, edge, ev }) || {
 id: odd < 1.50 ? 'safe' : odd < 2.00 ? 'solid' : odd < 3.00 ? 'value' : odd < 5.00 ? 'big' : 'out',
 strict: false
 };
-const source = odds?._fromWinamax ? 'winamax_exact' : 'cote_indicative';
+const source = useWnx ? 'winamax_exact' : (odds?._fromWinamax ? 'winamax_exact' : 'cote_indicative');
 const candidate = {
 market: '1n2',
 key: pk,
