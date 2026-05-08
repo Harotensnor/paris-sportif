@@ -631,7 +631,12 @@ def _select_priority_matches(existing_markets: dict, data_js_data: dict) -> list
             if details_at:
                 try:
                     last = datetime.fromisoformat(str(details_at).replace('Z', '+00:00'))
-                    if has_details and last > cutoff: continue  # déjà fresh
+                    if has_details and last > cutoff:
+                        validated_at = now_utc.isoformat()
+                        existing_entry['details_validated_at'] = validated_at
+                        existing_entry['markets_validated_at'] = validated_at
+                        existing_entry['validation_source'] = 'ttl_skip'
+                        continue  # déjà fresh
                 except Exception:
                     pass
             n_markets = len(existing_odds)
@@ -765,7 +770,11 @@ def main() -> int:
         for k, v in markets.items():
             if k not in existing_odds:
                 existing_odds[k] = v
-        matches_dict[mid]['details_fetched_at'] = datetime.now(timezone.utc).isoformat()
+        fetched_at = datetime.now(timezone.utc).isoformat()
+        matches_dict[mid]['details_fetched_at'] = fetched_at
+        matches_dict[mid]['details_validated_at'] = fetched_at
+        matches_dict[mid]['markets_validated_at'] = fetched_at
+        matches_dict[mid]['validation_source'] = 'fetch'
         n_enriched += 1
         if (i + 1) % 5 == 0:
             print(f'  [{i+1}/{len(targets)}] enriched: {n_enriched} so far', flush=True)
