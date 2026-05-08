@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-08T21:27:41Z",
+  "generated_at": "2026-05-08T21:33:02Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -1379,6 +1379,42 @@
       "home": "Boston Red Sox",
       "away": "Tampa Bay Rays",
       "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Boston Red Sox",
+          "pitcher": "Payton Tolle",
+          "label": "Payton Tolle moins de 7,5 strikeouts",
+          "line": 7.5,
+          "pick": "under",
+          "probability": 0.5064,
+          "fair_odds": 1.97,
+          "expected_strikeouts": 7.47,
+          "projected_ip": 5.73,
+          "inputs": {
+            "k9": 11.72,
+            "era": 2.04,
+            "whip": 0.74,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Boston Red Sox",
+          "pitcher": "Payton Tolle",
+          "label": "Payton Tolle ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.7226,
+          "fair_odds": 1.38,
+          "expected_hr_allowed": 0.325,
+          "projected_ip": 5.73,
+          "inputs": {
+            "hr9": 0.51,
+            "era": 2.04,
+            "whip": 0.74
+          },
+          "side": "home"
+        },
         {
           "market": "pitcher_strikeouts",
           "team": "Tampa Bay Rays",
@@ -3216,7 +3252,7 @@
       ]
     }
   ],
-  "props": 154,
+  "props": 156,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

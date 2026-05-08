@@ -1,26 +1,26 @@
 {
-  "generated_at": "2026-05-08T21:28:09Z",
+  "generated_at": "2026-05-08T21:33:30Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 65,
-    "actionable": 42,
-    "watch": 8,
-    "risk": 15,
+    "active_events": 66,
+    "actionable": 41,
+    "watch": 7,
+    "risk": 18,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 40,
-      "market_move": 10,
       "travel_extreme": 18,
       "market_uncertain": 11,
-      "signal_conflict": 12,
-      "back_to_back_travel": 29
+      "market_move": 2,
+      "signal_conflict": 11,
+      "back_to_back_travel": 30
     },
     "by_quality": {
-      "actionable": 42,
-      "watch": 8,
-      "risk": 15
+      "actionable": 41,
+      "watch": 7,
+      "risk": 18
     }
   },
   "active_actionable": [
@@ -79,24 +79,6 @@
       "context": "Absences severes 10-3"
     },
     {
-      "event_id": "401815257",
-      "date": "2026-05-08T23:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Cleveland Guardians",
-      "away": "Minnesota Twins",
-      "match": "Cleveland Guardians - Minnesota Twins",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 1.0,
-      "context": "Cote away: 2.23 -> 1.82 (+18.4%)"
-    },
-    {
       "event_id": "401815261",
       "date": "2026-05-08T23:40Z",
       "sport": "baseball",
@@ -113,24 +95,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 6-12"
-    },
-    {
-      "event_id": "401871425",
-      "date": "2026-05-09T01:30Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Anaheim Ducks",
-      "away": "Vegas Golden Knights",
-      "match": "Anaheim Ducks - Vegas Golden Knights",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 1.93 -> 2.40 (-24.6%)"
     },
     {
       "event_id": "401815267",
@@ -745,6 +709,24 @@
       "context": "1 match dans les 48h + 1135 km de voyage"
     },
     {
+      "event_id": "401871421",
+      "date": "2026-05-15T04:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Minnesota Wild",
+      "away": "Colorado Avalanche",
+      "match": "Minnesota Wild - Colorado Avalanche",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Colorado Avalanche",
+      "side": "away",
+      "strength": 0.757,
+      "context": "1 match dans les 48h + 1135 km de voyage"
+    },
+    {
       "event_id": "401815272",
       "date": "2026-05-09T22:10Z",
       "sport": "baseball",
@@ -819,6 +801,24 @@
       "context": "Absences severes 5-8"
     },
     {
+      "event_id": "401815257",
+      "date": "2026-05-08T23:15Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Cleveland Guardians",
+      "away": "Minnesota Twins",
+      "match": "Cleveland Guardians - Minnesota Twins",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Minnesota Twins",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 3-6"
+    },
+    {
       "event_id": "401871413",
       "date": "2026-05-09T22:00Z",
       "sport": "hockey",
@@ -889,42 +889,6 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 3-0"
-    },
-    {
-      "event_id": "401856890",
-      "date": "2026-05-08T23:30Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "New York Liberty",
-      "away": "Connecticut Sun",
-      "match": "New York Liberty - Connecticut Sun",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.476,
-      "context": "Cote away: 5.25 -> 4.80 (+8.6%)"
-    },
-    {
-      "event_id": "401815262",
-      "date": "2026-05-08T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Milwaukee Brewers",
-      "away": "New York Yankees",
-      "match": "Milwaukee Brewers - New York Yankees",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.451,
-      "context": "Cote away: 1.76 -> 1.62 (+8.1%)"
     }
   ],
   "active_risk": [
@@ -1091,6 +1055,24 @@
       "context": "marge bookmaker anormale 18.8%"
     },
     {
+      "event_id": "748956",
+      "date": "2026-05-15T18:30Z",
+      "sport": "football",
+      "league_code": "laliga2",
+      "league_name": "La Liga 2",
+      "home": "Castellón",
+      "away": "Cádiz",
+      "match": "Castellón - Cádiz",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.6%"
+    },
+    {
       "event_id": "401815258",
       "date": "2026-05-08T23:10Z",
       "sport": "baseball",
@@ -1197,6 +1179,42 @@
       "side": null,
       "strength": 0.45,
       "context": "Signaux opposes: Anaheim Ducks fade 0.60, Vegas Golden Knights fade 0.60 -> prudence"
+    },
+    {
+      "event_id": "401871157",
+      "date": "2026-05-15T04:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "Minnesota Timberwolves",
+      "away": "San Antonio Spurs",
+      "match": "Minnesota Timberwolves - San Antonio Spurs",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.45,
+      "context": "Signaux opposes: Minnesota Timberwolves fade 0.60, San Antonio Spurs fade 0.60 -> prudence"
+    },
+    {
+      "event_id": "401871338",
+      "date": "2026-05-15T04:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "Cleveland Cavaliers",
+      "away": "Detroit Pistons",
+      "match": "Cleveland Cavaliers - Detroit Pistons",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.45,
+      "context": "Signaux opposes: Cleveland Cavaliers fade 0.60, Detroit Pistons fade 0.60 -> prudence"
     }
   ],
   "expired_sample": []
