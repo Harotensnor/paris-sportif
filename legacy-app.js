@@ -3801,8 +3801,21 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     const status = String(meta?.status || 'missing');
     if (status === 'verified') return true;
     if (status !== 'changed') return false;
-    const age = Number(meta?.ageMin);
-    return Number.isFinite(age) && age <= 30 && Number.isFinite(Number(meta?.currentOdd));
+    const odd = Number(meta?.odd);
+    const cur = Number(meta?.currentOdd);
+    if (!Number.isFinite(cur) || cur <= 1.01) return false;
+    // AUDIT 2026-05-08 v40 — drift jusqu'à 25% accepté.
+    // Avant : 'changed' n'était valide que si markets fetch < 30 min ET
+    // currentOdd finite. Conséquence : 7/10 picks Serie B / La Liga 2
+    // étaient flaggés "Cote à vérifier" même quand la cote Winamax actuelle
+    // est ~10% différente (cas typique : snapshot externe → Winamax).
+    // Maintenant : on accepte 'changed' si la dérive est raisonnable
+    // (< 25% de la cote la plus haute). Le consumer (v36TableRow,
+    // _v39FinalRec) doit lire oddMeta.currentOdd pour afficher la VRAIE
+    // cote Winamax au lieu de l'ancienne.
+    if (!Number.isFinite(odd)) return true; // pas d'ancien prix → on fait confiance au currentOdd
+    const drift = Math.abs(cur - odd) / Math.max(odd, cur);
+    return drift < 0.25;
   }
   try { window.v38OddTopEligible = v38OddTopEligible; } catch(e) { swallowError(e); }
 
@@ -17127,11 +17140,13 @@ return true;
 })
 .map(c => {
 const rel = Number(c.rel || c.prob || 0);
-const odd = Number(c.odd || 0);
+// AUDIT 2026-05-08 v40 — odd/edge/ev en `let` car réajustés ci-dessous
+// si la cote Winamax a bougé (status='changed' acceptable).
+let odd = Number(c.odd || 0);
 const rawEdge = Number.isFinite(Number(c.edge)) ? Number(c.edge) : (rel - 1 / odd);
 const rawEv = Number.isFinite(Number(c.ev)) ? Number(c.ev) : (rel * odd - 1);
-const edge = v37CapEdge(rawEdge);
-const ev = v37CapEv(rawEv);
+let edge = v37CapEdge(rawEdge);
+let ev = v37CapEv(rawEv);
 const edgeCapped = Math.abs(rawEdge - edge) > 0.0001;
 const edgeAnomaly = rawEdge > v37EdgeAnomalyThreshold;
 const tier = v36TierForCandidate({ ...c, edge, ev });
@@ -17143,7 +17158,30 @@ return null;
 }
 const investmentScoreValue = Number(c.investment?.score || 0);
 const intel = v37OpportunityFor(m, tier, rel, edge, ev, odd, c, pred);
-const oddValidation = typeof validatePickOdd === 'function' ? validatePickOdd(m, c, pred) : { status: c.exact ? 'verified' : 'missing' };
+let oddValidation = typeof validatePickOdd === 'function' ? validatePickOdd(m, c, pred) : { status: c.exact ? 'verified' : 'missing' };
+// AUDIT 2026-05-08 v40 — Si la cote a été ajustée chez Winamax ('changed' acceptable),
+// on met à jour le `odd` affiché et tous les calculs qui suivent (edge, EV, opportunity)
+// pour refléter le prix réel jouable. Sinon on affichait une cote stale + badge "à
+// vérifier" alors que la cote Winamax est connue.
+if (oddValidation && oddValidation.status === 'changed' && typeof v38OddTopEligible === 'function' && v38OddTopEligible(oddValidation)) {
+  const cur = Number(oddValidation.currentOdd);
+  if (Number.isFinite(cur) && cur > 1.01) {
+    odd = cur;
+    if (c) { c.odd = cur; c.displayedOdd = cur; }
+    // Recalcul minimal d'edge et EV pour rester cohérent avec la nouvelle cote.
+    const probHere = Number(c?.prob ?? c?.probability ?? pred?.pick?.prob ?? 0);
+    if (probHere > 0 && probHere < 1) {
+      edge = probHere - (1 / cur);
+      ev = probHere * cur - 1;
+    }
+    // Re-run validation pour que le badge montre 'verified' (vert) plutôt que
+    // 'changed' (orange "Cote changée") — la cote affichée == cote Winamax actuelle.
+    if (typeof validatePickOdd === 'function') {
+      const refreshed = validatePickOdd(m, c, pred);
+      if (refreshed) oddValidation = refreshed;
+    }
+  }
+}
 const opportunity = v37ApplyOddPriorityCap(intel.score, oddValidation);
 const oddState = v37OddPriorityState(oddValidation);
 const oddBadgeLabel = oddState === 'blocked' && typeof v38OddStatusMeta === 'function'
