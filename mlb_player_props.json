@@ -1,71 +1,8 @@
 {
-  "generated_at": "2026-05-08T22:17:03Z",
+  "generated_at": "2026-05-08T22:24:22Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815256",
-      "kickoff": "2026-05-08T22:10Z",
-      "league": "MLB",
-      "match": "Houston Astros at Cincinnati Reds",
-      "home": "Cincinnati Reds",
-      "away": "Houston Astros",
-      "props": [
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Cincinnati Reds",
-          "pitcher": "Nick Lodolo",
-          "label": "Nick Lodolo ne concède pas de home run",
-          "pick": "no",
-          "probability": 1.0,
-          "fair_odds": 1.01,
-          "expected_hr_allowed": 0.0,
-          "projected_ip": 3.0,
-          "inputs": {
-            "hr9": 0.0,
-            "era": 0.0,
-            "whip": 1.0
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Houston Astros",
-          "pitcher": "Mike Burrows",
-          "label": "Mike Burrows moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5948,
-          "fair_odds": 1.68,
-          "expected_strikeouts": 5.08,
-          "projected_ip": 5.31,
-          "inputs": {
-            "k9": 8.6,
-            "era": 5.97,
-            "whip": 1.65,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Houston Astros",
-          "pitcher": "Mike Burrows",
-          "label": "Mike Burrows concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6763,
-          "fair_odds": 1.48,
-          "expected_hr_allowed": 1.128,
-          "projected_ip": 5.31,
-          "inputs": {
-            "hr9": 1.91,
-            "era": 5.97,
-            "whip": 1.65
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815255",
       "kickoff": "2026-05-08T22:40Z",
@@ -3315,7 +3252,7 @@
       ]
     }
   ],
-  "props": 159,
+  "props": 156,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
