@@ -6041,6 +6041,52 @@ const resultBtts = {
 '2_yes': p2_btts_yes, '2_no': p2_btts_no,
 };
 
+// AUDIT 2026-05-09 v41.1 — Penalty markets.
+// Hypothèse : ~25% des matchs avec ≥2 buts ont au moins un pénalty marqué.
+// Conditioner sur P(over 1.5) qui inclut tous les scénarios buts.
+// Source des taux par ligue : footballdata.json league_calibration.penalty_rate.
+const _penaltyBaseRate = 0.25; // fallback global, override par ligue si dispo
+const pAtLeastOneGoal = 1 - Math.exp(-(lamH + lamA));
+const penaltyYes = pAtLeastOneGoal * _penaltyBaseRate;
+const penaltyMarket = {
+  yes: Math.max(0, Math.min(1, penaltyYes)),
+  no: Math.max(0, Math.min(1, 1 - penaltyYes)),
+};
+
+// AUDIT 2026-05-09 v41.2 — Score groups.
+// Agrège la grille Poisson en 3 zones : low (0-1 buts), mid (2-3), high (4+).
+let pGroupLow = 0, pGroupMid = 0, pGroupHigh = 0;
+for (let h = 0; h <= maxGoals; h++) {
+  for (let a = 0; a <= maxGoals; a++) {
+    const total = h + a;
+    const p = grid[h][a];
+    if (total <= 1) pGroupLow += p;
+    else if (total <= 3) pGroupMid += p;
+    else pGroupHigh += p;
+  }
+}
+const scoreGroups = { low: pGroupLow, mid: pGroupMid, high: pGroupHigh };
+
+// AUDIT 2026-05-09 v41.3 — Score exact mi-temps (top 5).
+const htScoresGrid = [];
+for (let h = 0; h <= maxGoals; h++) {
+  for (let a = 0; a <= maxGoals; a++) {
+    const p = poissonPmf(h, lamH_HT) * poissonPmf(a, lamA_HT);
+    if (p > 0.005) htScoresGrid.push({ h, a, p });
+  }
+}
+htScoresGrid.sort((x, y) => y.p - x.p);
+const topScoresHT = htScoresGrid.slice(0, 5);
+
+// AUDIT 2026-05-09 v41.4 — Clean sheet markets.
+// home_clean = away ne marque pas (a=0). away_clean = home ne marque pas.
+const cleanSheetHome = Math.exp(-lamA);
+const cleanSheetAway = Math.exp(-lamH);
+const cleanSheet = {
+  home: cleanSheetHome,
+  away: cleanSheetAway,
+};
+
 return {
 p1, pX, p2,
 doubleChance: { p1X, pX2, p12 },
@@ -6058,6 +6104,11 @@ ouHT05,         // 1ère mi-temps Over/Under 0.5 buts
 ouHT15,         // 1ère mi-temps Over/Under 1.5 buts
 bttsBothHalves, // BTTS oui en 1ère MT et en 2e MT
 resultBtts,     // 1X2 × BTTS combiné
+// AUDIT 2026-05-09 v41.1-4 — nouveaux marchés étendus
+penalty: penaltyMarket,    // pénalty marqué oui/non
+scoreGroups,               // groupes score (low/mid/high)
+topScoresHT,               // top 5 score exact mi-temps
+cleanSheet,                // clean sheet home/away
 };
 }
 try { window.poissonMarketsExtended = poissonMarketsExtended; } catch(e) { swallowError(e); }
@@ -13081,6 +13132,14 @@ ext.doubleChance.prob >= 0.65 ? extChip(`Double chance ${ext.doubleChance.label}
 (ext.resultBtts && ext.resultBtts.prob >= 0.30) ? extChip(ext.resultBtts.label, ext.resultBtts.prob, '🎯 Résultat + BTTS combo', 'rgba(52,211,153,.08)', 'rgba(52,211,153,.25)', '#6ee7b7') : '',
 (ext.firstGoal && ext.firstGoal.prob >= 0.30) ? extChip(ext.firstGoal.label, ext.firstGoal.prob, '🥇 Première équipe à marquer', 'rgba(250,204,21,.08)', 'rgba(250,204,21,.25)', '#fde047') : '',
 (ext.lastGoal && ext.lastGoal.prob >= 0.30) ? extChip(ext.lastGoal.label, ext.lastGoal.prob, '🏁 Dernière équipe à marquer', 'rgba(96,165,250,.08)', 'rgba(96,165,250,.25)', '#93c5fd') : '',
+// AUDIT 2026-05-09 v41 — Nouveaux marchés étendus visibles dans le modal :
+// pénalty / score groups / score exact mi-temps / clean sheet.
+(ext.raw?.penalty && ext.raw.penalty.yes >= 0.20) ? extChip(`Pénalty marqué (oui)`, ext.raw.penalty.yes, '🎯 Pénalty marqué', 'rgba(248,113,113,.08)', 'rgba(248,113,113,.25)', '#fca5a5') : '',
+(ext.raw?.scoreGroups && ext.raw.scoreGroups.high >= 0.30) ? extChip(`Match prolifique (4+ buts)`, ext.raw.scoreGroups.high, '⚽⚽ Match haut score', 'rgba(168,85,247,.08)', 'rgba(168,85,247,.25)', '#d8b4fe') : '',
+(ext.raw?.scoreGroups && ext.raw.scoreGroups.low >= 0.45) ? extChip(`Match faible buts (0-1)`, ext.raw.scoreGroups.low, '🛡️ Match fermé', 'rgba(148,163,184,.08)', 'rgba(148,163,184,.25)', '#cbd5e1') : '',
+(ext.raw?.topScoresHT?.[0] && ext.raw.topScoresHT[0].p >= 0.18) ? extChip(`Score MT le + probable ${ext.raw.topScoresHT[0].h}-${ext.raw.topScoresHT[0].a}`, ext.raw.topScoresHT[0].p, '⏱️ Score exact mi-temps', 'rgba(251,191,36,.08)', 'rgba(251,191,36,.25)', '#fde68a') : '',
+(ext.raw?.cleanSheet && ext.raw.cleanSheet.home >= 0.40) ? extChip(`Clean sheet domicile`, ext.raw.cleanSheet.home, '🛡️ Clean sheet', 'rgba(34,197,94,.08)', 'rgba(34,197,94,.25)', '#86efac') : '',
+(ext.raw?.cleanSheet && ext.raw.cleanSheet.away >= 0.40) ? extChip(`Clean sheet extérieur`, ext.raw.cleanSheet.away, '🛡️ Clean sheet', 'rgba(34,197,94,.08)', 'rgba(34,197,94,.25)', '#86efac') : '',
 ].filter(Boolean).join('') : '';
 const htftGrid = (ext && Array.isArray(ext.htftAll) && ext.htftAll.length)
 ? `<div data-market-panel="htft-all" style="margin-top:10px;padding:10px;border:1px solid rgba(244,114,182,.22);background:rgba(244,114,182,.06);border-radius:8px;">
