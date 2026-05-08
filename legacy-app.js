@@ -17543,11 +17543,34 @@ source,
 exact: source === 'winamax_exact'
 };
 candidate.oddValidation = typeof validatePickOdd === 'function' ? validatePickOdd(m, candidate, pred) : { status: source === 'winamax_exact' ? 'verified' : 'missing' };
-const intel = v37OpportunityFor(m, tier, rel, edge, ev, odd, candidate, pred);
+// AUDIT 2026-05-08 v40 — Même mutation que v36PickPoolRaw : si la cote
+// Winamax est connue ('changed' avec drift < 25%), on met à jour la cote
+// affichée pour le pick "data fiable" pour qu'il montre la vraie cote
+// jouable. Sinon les fallback restaient toujours flaggés "Cote à vérifier"
+// alors que Winamax a un prix valide (ex: Levante 1n2 @1.52 dérivé de
+// Winamax actuel @1.41 = drift acceptable).
+let oddDataOnly = odd;
+let edgeDataOnly = edge;
+let evDataOnly = ev;
+if (candidate.oddValidation && candidate.oddValidation.status === 'changed' && typeof v38OddTopEligible === 'function' && v38OddTopEligible(candidate.oddValidation)) {
+  const cur = Number(candidate.oddValidation.currentOdd);
+  if (Number.isFinite(cur) && cur > 1.01) {
+    oddDataOnly = cur;
+    candidate.odd = cur;
+    candidate.displayedOdd = cur;
+    edgeDataOnly = rel - 1 / cur;
+    evDataOnly = rel * cur - 1;
+    if (typeof validatePickOdd === 'function') {
+      const refreshed = validatePickOdd(m, candidate, pred);
+      if (refreshed) candidate.oddValidation = refreshed;
+    }
+  }
+}
+const intel = v37OpportunityFor(m, tier, rel, edgeDataOnly, evDataOnly, oddDataOnly, candidate, pred);
 const opportunity = v37ApplyOddPriorityCap(Math.max(20, Math.min(68, intel.score || Math.round(rel * 70))), candidate.oddValidation);
 const oddState = v37OddPriorityState(candidate.oddValidation);
 out.push({
-m, pred, best: candidate, tier: tier.id, strict: false, odd, rel, edge, ev,
+m, pred, best: candidate, tier: tier.id, strict: false, odd: oddDataOnly, rel, edge: edgeDataOnly, ev: evDataOnly,
 oddValidation: candidate.oddValidation,
 pickUid: v37PickUid(m, candidate),
 label: candidate.shortLabel,
