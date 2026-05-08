@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-08T23:43:09Z",
+  "generated_at": "2026-05-08T23:48:36Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -124,8 +124,8 @@
       "global_resolution": {
         "status": "abstain",
         "net_side": null,
-        "home_score": -0.488,
-        "away_score": 0.404,
+        "home_score": 0.334,
+        "away_score": -0.488,
         "home_fade": 0.75,
         "away_fade": 0.75,
         "reason": "Signaux opposes: New York Knicks fade 0.75, Philadelphia 76ers fade 0.75 -> prudence",
@@ -155,10 +155,10 @@
             "strength": 0.15
           },
           {
-            "side": "away",
+            "side": "home",
             "type": "market_move",
             "direction": "steam",
-            "strength": 0.892
+            "strength": 0.821
           }
         ]
       }
@@ -509,10 +509,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.195,
-        "away_score": -0.195,
+        "away_score": 0.273,
         "home_fade": 0.3,
         "away_fade": 0.3,
-        "reason": "Direction nette: Chicago Cubs (-0.20)",
+        "reason": "Direction nette: Chicago Cubs (+0.27)",
         "detail": [
           {
             "side": "home",
@@ -525,6 +525,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.468
           }
         ]
       }
@@ -560,8 +566,8 @@
       "global_resolution": {
         "status": "abstain",
         "net_side": null,
-        "home_score": 0.502,
-        "away_score": -0.39,
+        "home_score": -0.39,
+        "away_score": 0.431,
         "home_fade": 0.6,
         "away_fade": 0.6,
         "reason": "Signaux opposes: Philadelphia 76ers fade 0.60, New York Knicks fade 0.60 -> prudence",
@@ -579,10 +585,10 @@
             "strength": 0.6
           },
           {
-            "side": "home",
+            "side": "away",
             "type": "market_move",
             "direction": "steam",
-            "strength": 0.892
+            "strength": 0.821
           }
         ]
       }
@@ -894,13 +900,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Vegas Golden Knights (-0.10)",
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.747,
+        "away_score": -0.747,
+        "home_fade": 1.15,
+        "away_fade": 1.15,
+        "reason": "Signaux opposes: Anaheim Ducks fade 1.15, Vegas Golden Knights fade 1.15 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -913,6 +919,18 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
@@ -1323,12 +1341,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
-        "home_score": 0.794,
-        "away_score": -0.098,
+        "net_side": "away",
+        "home_score": -0.098,
+        "away_score": 0.724,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Philadelphia 76ers (+0.79)",
+        "reason": "Direction nette: New York Knicks (+0.72)",
         "detail": [
           {
             "side": "home",
@@ -1343,10 +1361,10 @@
             "strength": 0.15
           },
           {
-            "side": "home",
+            "side": "away",
             "type": "market_move",
             "direction": "steam",
-            "strength": 0.892
+            "strength": 0.821
           }
         ]
       }
@@ -2018,11 +2036,11 @@
       "global_resolution": {
         "status": "mixed",
         "net_side": null,
-        "home_score": -0.27,
-        "away_score": -0.958,
-        "home_fade": 1.089,
+        "home_score": -0.331,
+        "away_score": -0.937,
+        "home_fade": 1.15,
         "away_fade": 2.34,
-        "reason": "Signaux mitigés: avantage net trop faible (Philadelphia Phillies -0.27, Colorado Rockies -0.96)",
+        "reason": "Signaux mitigés: avantage net trop faible (Philadelphia Phillies -0.33, Colorado Rockies -0.94)",
         "detail": [
           {
             "side": "home",
@@ -2046,7 +2064,7 @@
             "side": "home",
             "type": "market_move",
             "direction": "drift",
-            "strength": 0.939
+            "strength": 1.0
           },
           {
             "side": "away",
@@ -2509,10 +2527,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.99,
-        "away_score": -0.429,
+        "away_score": 0.019,
         "home_fade": 1.3,
         "away_fade": 0.884,
-        "reason": "Direction nette: St. Louis Cardinals (-0.43)",
+        "reason": "Direction nette: St. Louis Cardinals (+0.02)",
         "detail": [
           {
             "side": "home",
@@ -2531,6 +2549,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.448
           },
           {
             "side": "away",
@@ -2809,11 +2833,11 @@
       "global_resolution": {
         "status": "mixed",
         "net_side": null,
-        "home_score": -0.173,
-        "away_score": -0.861,
-        "home_fade": 0.939,
+        "home_score": -0.234,
+        "away_score": -0.84,
+        "home_fade": 1.0,
         "away_fade": 2.19,
-        "reason": "Signaux mitigés: avantage net trop faible (Philadelphia Phillies -0.17, Colorado Rockies -0.86)",
+        "reason": "Signaux mitigés: avantage net trop faible (Philadelphia Phillies -0.23, Colorado Rockies -0.84)",
         "detail": [
           {
             "side": "away",
@@ -2825,7 +2849,7 @@
             "side": "home",
             "type": "market_move",
             "direction": "drift",
-            "strength": 0.939
+            "strength": 1.0
           },
           {
             "side": "away",
