@@ -354,7 +354,16 @@ jobs:
         # uniquement quand le fichier change, donc les sidecars et modules
         # évoluent sans servir de cache stale.
         run: |
-          python3 scripts/stamp_asset_hashes.py
+          APP_VERSION=$(python3 - <<'PY'
+          import re
+          from pathlib import Path
+          m = re.search(r"VERSION\s*=\s*['\"](v\d+(?:\.\d+)?)['\"]", Path('app.js').read_text(encoding='utf-8', errors='ignore'))
+          print(m.group(1) if m else 'v0')
+          PY
+          )
+          BUILD_ID="${APP_VERSION}-$(date -u +'%Y%m%d-%H%M%S')"
+          echo "ASSET_BUILD_ID=${BUILD_ID}" >> "$GITHUB_ENV"
+          python3 scripts/stamp_asset_hashes.py --build-id "$BUILD_ID"
           python3 scripts/audit_asset_hashes.py
 
       - name: Stamp sw.js CACHE_VERSION
@@ -362,7 +371,7 @@ jobs:
         # the fresh pronostics.html + data.js instead of serving stale cache.
         # Only stamped when other files actually changed (see next step).
         run: |
-          BUILD_ID=$(date -u +'%Y%m%d-%H%M%S')
+          BUILD_ID="${ASSET_BUILD_ID:-v0-$(date -u +'%Y%m%d-%H%M%S')}"
           sed -i "s|^const CACHE_VERSION = .*|const CACHE_VERSION = 'paris-sportif-${BUILD_ID}';|" sw.js
 
       # AUDIT-2026-04-27 (Sprint 32 #37 + Sprint 45 #21) — Auto-rollback complet.
