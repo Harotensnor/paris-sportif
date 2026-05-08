@@ -12961,10 +12961,12 @@ ext.doubleChance.prob >= 0.65 ? extChip(`Double chance ${ext.doubleChance.label}
 (ext.halfTime && ext.halfTime.prob >= 0.50) ? extChip(`Mi-temps : ${ext.halfTime.label}`, ext.halfTime.prob, '⏱️ Mi-temps', 'rgba(56,189,248,.08)', 'rgba(56,189,248,.25)', '#7dd3fc') : '',
 (ext.ou15.prob >= 0.70) ? extChip(ext.ou15.label, ext.ou15.prob, '⚽ O/U 1.5', 'rgba(139,92,246,.08)', 'rgba(139,92,246,.25)', '#a78bfa') : '',
 (ext.ou35.prob >= 0.55) ? extChip(ext.ou35.label, ext.ou35.prob, '⚽ O/U 3.5', 'rgba(139,92,246,.08)', 'rgba(139,92,246,.25)', '#a78bfa') : '',
-(ext.dnb && ext.dnb.prob >= 0.60) ? extChip(ext.dnb.label, ext.dnb.prob, '🎯 DNB (Draw No Bet)', 'rgba(251,146,60,.08)', 'rgba(251,146,60,.25)', '#fb923c') : '',
-(ext.asianHandicap && ext.asianHandicap.prob >= 0.62) ? extChip(ext.asianHandicap.label, ext.asianHandicap.prob, '⚖️ Asian Handicap', 'rgba(34,211,238,.08)', 'rgba(34,211,238,.25)', '#22d3ee') : '',
-(ext.asianHandicapQuarter && ext.asianHandicapQuarter.prob >= 0.58) ? extChip(ext.asianHandicapQuarter.label, ext.asianHandicapQuarter.prob, '⚖️ AH quart-point', 'rgba(34,211,238,.08)', 'rgba(34,211,238,.25)', '#67e8f9') : '',
-(ext.asianTotalQuarter && ext.asianTotalQuarter.prob >= 0.56) ? extChip(ext.asianTotalQuarter.label, ext.asianTotalQuarter.prob, '⚽ Total asiatique', 'rgba(20,184,166,.08)', 'rgba(20,184,166,.25)', '#5eead4') : '',
+// AUDIT 2026-05-08 — chips DNB / AH quart / total asiatique masqués (mise remboursable).
+// L'AH "ligne entière" reste autorisé seulement si la ligne est .5 (binaire pur).
+'',
+(ext.asianHandicap && ext.asianHandicap.prob >= 0.62 && (() => { const l = Math.abs(Number(ext.asianHandicap.line || 0)); const f = l - Math.floor(l); return Math.abs(f - 0.5) < 1e-6; })()) ? extChip(ext.asianHandicap.label, ext.asianHandicap.prob, '⚖️ Asian Handicap', 'rgba(34,211,238,.08)', 'rgba(34,211,238,.25)', '#22d3ee') : '',
+'',
+'',
 (ext.htft && ext.htft.prob >= 0.20) ? extChip(ext.htft.label, ext.htft.prob, '⏱️ HT/FT (Mi-temps/Final)', 'rgba(244,114,182,.08)', 'rgba(244,114,182,.25)', '#f472b6') : '',
 (ext.ouHT05 && ext.ouHT05.prob >= 0.65) ? extChip(ext.ouHT05.label, ext.ouHT05.prob, '⚽ Buts en 1ère MT', 'rgba(167,139,250,.08)', 'rgba(167,139,250,.25)', '#c4b5fd') : '',
 (ext.ouHT15 && ext.ouHT15.prob >= 0.55) ? extChip(ext.ouHT15.label, ext.ouHT15.prob, '⚽ Buts en 1ère MT', 'rgba(167,139,250,.08)', 'rgba(167,139,250,.25)', '#c4b5fd') : '',
@@ -13211,8 +13213,10 @@ return `
 const alternativesHtml = (() => {
 const best = detailSelectedPick || ((typeof selectBestMarket === 'function') ? selectBestMarket(match, pred) : null);
 if (!best || !best.allCandidates) return '';
-const cands = best.allCandidates;
-const contradictedCands = Array.isArray(best.contradictedCandidates) ? best.contradictedCandidates : [];
+// AUDIT 2026-05-08 — exclut DNB et handicaps remboursables de la liste.
+const refundFilter = (c) => typeof window._v37IsRefundMarket === 'function' && window._v37IsRefundMarket(c);
+const cands = best.allCandidates.filter(c => !refundFilter(c));
+const contradictedCands = (Array.isArray(best.contradictedCandidates) ? best.contradictedCandidates : []).filter(c => !refundFilter(c));
 if (cands.length < 2 && !contradictedCands.length) return '';
 const marketEmoji = { '1n2': '🏆', 'ou25': '⚽', 'ou15': '⚽', 'ou35': '⚽', 'btts': '🔄', 'doubleChance': '🎯', 'exactScore': '🎯', 'dnb': '🎯', 'teamTotal': '⚽', 'cornersTotal': '🚩', 'cardsTotal': '🟨', 'ht_1n2': '⏱️', 'htTotal': '⏱️', 'resultBtts': '🎯', 'ah': '⚖️', 'basketTotal': '🏀', 'basketFirstHalfTotal': '🏀', 'basketQuarterTotal': '🏀', 'basketHandicap': '🏀', 'hockeyTotal': '🏒', 'puckLine': '🏒', 'baseballTotal': '⚾', 'baseballF5Total': '⚾', 'runLine': '⚾', 'tennisGames': '🎾' };
 const evMin = (typeof window.advFilters !== 'undefined' && window.advFilters.evMin) || 0;
