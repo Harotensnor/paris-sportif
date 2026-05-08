@@ -1,8 +1,11 @@
 import { nextIdle } from './utils.js';
 
+// AUDIT 2026-05-08 (P1.6) — `data_lite_72h.json` retiré du prefetch :
+// le sidecar n'était jamais réellement fetché par le runtime, juste préfetché
+// au hover (1.9 MB de bande passante gaspillée par hover desktop sur Wi-Fi
+// rapide). On garde les sources effectivement consommées.
 const NEXT_PAGE_HINTS = new Map([
-  ['dashboard', ['data_lite_72h.json', 'health.json']],
-  ['tous', ['data_lite_72h.json']],
+  ['dashboard', ['health.json']],
   ['performance', ['health.json', 'picks_history_summary.json']],
   ['profil', ['i18n.json']],
   ['sports-tous', ['sports_coverage_extended.js']],
