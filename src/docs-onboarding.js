@@ -92,7 +92,17 @@
       </section>
     `;
     modal.addEventListener('click', (event) => {
-      if (event.target === modal || event.target.closest('[data-docs-close]')) closeModal();
+      if (event.target === modal || event.target.closest('[data-docs-close]')) {
+        // AUDIT 2026-05-08 : si le modal courant est le tour guidé,
+        // dismisser via × ou backdrop = équivalent à terminer le tour
+        // (sinon le tour réapparaît à chaque reload). finishTour() set
+        // DONE_KEY + appelle le callback de progression boot_step.
+        if (tourDoneCallback || $('[data-docs-tour-next], [data-docs-tour-skip]')) {
+          finishTour();
+        } else {
+          closeModal();
+        }
+      }
     });
     document.body.appendChild(modal);
     $('.docs-dialog', modal)?.focus();
