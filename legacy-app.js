@@ -17586,7 +17586,11 @@ if (candidate.oddValidation && candidate.oddValidation.status === 'changed' && t
   }
 }
 const intel = v37OpportunityFor(m, tier, rel, edgeDataOnly, evDataOnly, oddDataOnly, candidate, pred);
-const opportunity = v37ApplyOddPriorityCap(Math.max(20, Math.min(68, intel.score || Math.round(rel * 70))), candidate.oddValidation);
+// AUDIT 2026-05-08 v40.4 — cap data-only étendu 68 → 80. Avant les picks
+// data fiable plafonnaient à 68, en dessous du seuil "Miser" (75) → user
+// n'avait jamais de recommandation forte sur fallback. Maintenant les data
+// fiable peuvent atteindre "Petite mise" voire "Miser" si l'edge le justifie.
+const opportunity = v37ApplyOddPriorityCap(Math.max(20, Math.min(80, intel.score || Math.round(rel * 75))), candidate.oddValidation);
 const oddState = v37OddPriorityState(candidate.oddValidation);
 out.push({
 m, pred, best: candidate, tier: tier.id, strict: false, odd: oddDataOnly, rel, edge: edgeDataOnly, ev: evDataOnly,
@@ -17902,27 +17906,42 @@ const _v39FinalRec = (p) => {
   if (!oddOk) {
     return { verdict: 'check', label: 'Cote à vérifier', score: Math.min(40, opp), tone: 'amber', reason: 'Cote non confirmée Winamax — refuser ou re-vérifier' };
   }
-  // Veto 2 : segment historique perdant.
-  if (trustTier === 'low') {
-    return { verdict: 'skip', label: 'À éviter', score: Math.min(35, opp), tone: 'red', reason: `Historique segment ${trust.roi_pct.toFixed(1)}% sur ${trust.n} paris` };
+  // AUDIT 2026-05-08 v40.4 — Veto segment assoupli.
+  // Avant : 'low' (ROI < -5% sur ≥10 paris) → AUTO "À éviter", 'warn' → AUTO
+  // "Prudent". Conséquence : 4/5 picks Demain "À éviter" parce que la segment
+  // BTTS-no foot fait -7.7% sur 69 paris. L'user n'a rien à parier.
+  // Maintenant : segment perdant n'est un VETO que si très grave (ROI < -10%
+  // ET n ≥ 30) OU si le pick est faible par ailleurs (opp < 60). Sinon on
+  // laisse passer le verdict normal et on warn via le badge segment trust.
+  const trustRoiPct = Number(trust?.roi_pct || 0);
+  const trustN = Number(trust?.n || 0);
+  const segmentSeverelyBad = trustTier === 'low' && trustRoiPct < -10 && trustN >= 30;
+  if (segmentSeverelyBad) {
+    return { verdict: 'skip', label: 'À éviter', score: Math.min(35, opp), tone: 'red', reason: `Historique segment ${trustRoiPct.toFixed(1)}% sur ${trustN} paris (très défavorable)` };
   }
-  if (trustTier === 'warn') {
-    return { verdict: 'watch', label: 'Prudent', score: Math.max(30, Math.min(55, opp)), tone: 'orange', reason: `Segment instable ${trust.roi_pct.toFixed(1)}%` };
-  }
-  // Strong positive : tier safe/lock + opp >= 70.
+  // Strong positive : tier safe/lock + opp >= 70 → MISER même si segment warn/low
+  // (le segment est juste un avertissement, pas un veto).
   if ((tier === 'safe' || tier === 'lock') && opp >= 70) {
-    return { verdict: 'bet', label: 'Miser', score: opp, tone: 'green', reason: `Conf ${(rel*100).toFixed(0)}% · Edge ${fmtPct(edge)}` };
+    const seg = (trustTier === 'low' || trustTier === 'warn') ? ` ⚠ segment ${trustRoiPct.toFixed(1)}%` : '';
+    return { verdict: 'bet', label: 'Miser', score: opp, tone: 'green', reason: `Conf ${(rel*100).toFixed(0)}% · Edge ${fmtPct(edge)}${seg}` };
   }
-  // Strong : opp >= 75.
+  // Strong : opp >= 75 (peu importe segment, sauf veto severe ci-dessus).
   if (opp >= 75) {
-    return { verdict: 'bet', label: 'Miser', score: opp, tone: 'green', reason: `Conf ${(rel*100).toFixed(0)}% · Edge ${fmtPct(edge)}` };
+    const seg = (trustTier === 'low' || trustTier === 'warn') ? ` ⚠ segment ${trustRoiPct.toFixed(1)}%` : '';
+    return { verdict: 'bet', label: 'Miser', score: opp, tone: 'green', reason: `Conf ${(rel*100).toFixed(0)}% · Edge ${fmtPct(edge)}${seg}` };
   }
-  // Good : opp 60-75.
+  // Good : opp 60-75 → Petite mise. Segment 'low' (sans severe) descend en Surveiller.
   if (opp >= 60) {
+    if (trustTier === 'low') {
+      return { verdict: 'watch', label: 'Surveiller', score: Math.min(55, opp), tone: 'orange', reason: `Edge OK mais segment ${trustRoiPct.toFixed(1)}% sur ${trustN} paris` };
+    }
     return { verdict: 'bet-light', label: 'Petite mise', score: opp, tone: 'green-light', reason: `Conf ${(rel*100).toFixed(0)}% · Edge ${fmtPct(edge)}` };
   }
   // Acceptable : opp 40-60.
   if (opp >= 40) {
+    if (trustTier === 'low') {
+      return { verdict: 'skip', label: 'À éviter', score: Math.min(30, opp), tone: 'red', reason: `Edge faible ET segment ${trustRoiPct.toFixed(1)}%` };
+    }
     return { verdict: 'watch', label: 'Surveiller', score: opp, tone: 'orange', reason: 'Edge faible ou data incomplète' };
   }
   return { verdict: 'skip', label: 'Passer', score: opp, tone: 'red', reason: 'Pas assez de signal' };
