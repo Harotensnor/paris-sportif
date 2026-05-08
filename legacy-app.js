@@ -8128,6 +8128,21 @@ setText('trust-roi', (roiPct >= 0 ? '+' : '') + roiPct.toFixed(1) + '%');
 setText('trust-brier', (overall.brier || 0).toFixed(3));
 setText('trust-n', overall.n);
 }
+// AUDIT 2026-05-09 v40.15 — CLV moyen depuis clv_summary.json (chargé async).
+// Si dispo, on remplit #trust-clv avec mean_clv_pct + couleur green/red.
+try {
+  const clvData = (window.__v37ClvSummaryState && window.__v37ClvSummaryState.data) || null;
+  const meanClv = Number(clvData?.summary?.mean_clv_pct);
+  if (Number.isFinite(meanClv)) {
+    const sign = meanClv >= 0 ? '+' : '';
+    setText('trust-clv', `${sign}${meanClv.toFixed(2)}%`);
+    const el = document.getElementById('trust-clv');
+    if (el) {
+      el.style.color = meanClv >= 0 ? '#34d399' : '#f87171';
+      el.style.fontWeight = '700';
+    }
+  }
+} catch (e) { /* swallowError(e); */ }
 delete strip.dataset.dismissed;
 strip.classList.remove('hidden');
 _updateTrustStripHeight();
