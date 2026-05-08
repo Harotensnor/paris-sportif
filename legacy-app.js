@@ -3863,6 +3863,28 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     const dataAge = typeof getDataAge === 'function' ? getDataAge().minutes : 9999;
     const verifiedAt = wx.markets_fetched_at || window.PRONOSTICS_DATA?.generated_at || null;
     const marketAgeMin = v38OddSnapshotAgeMin(verifiedAt);
+    // v37.182 — Cote staleness kickoff-aware. Avant : `dataAge > 240` ET
+    // `marketAgeMin > 180` flaggaient TOUS les picks "Cote ancienne" dès que
+    // la pipeline data avait > 4h de retard, même pour des matchs prévus
+    // plusieurs jours plus tard où la cote Winamax bouge à peine. On scale
+    // désormais la fenêtre de tolérance avec la proximité du kickoff :
+    //   - Match dans <4h     → 180 min (strict, cote peut bouger)
+    //   - Match dans 4-24h   → 360 min (cote stable mais à revérifier)
+    //   - Match dans 24-72h  → 720 min (12h, cote très stable)
+    //   - Match >72h         → 1440 min (24h, peu de bookmakers ajustent si tôt)
+    // Plus un global guard: si dataAge dépasse 24h, on flag stale quoi qu'il
+    // arrive (signal d'alerte que la pipeline est tombée pour de bon).
+    const kickoffMs = (() => {
+      const t = new Date(match?.date || 0).getTime();
+      return Number.isFinite(t) && t > 0 ? t : null;
+    })();
+    const minutesUntilKickoff = kickoffMs ? Math.max(0, Math.round((kickoffMs - Date.now()) / 60000)) : null;
+    let staleThreshold;
+    if (minutesUntilKickoff == null) staleThreshold = 360; // sans kickoff connu, médian
+    else if (minutesUntilKickoff <= 240) staleThreshold = 180;
+    else if (minutesUntilKickoff <= 1440) staleThreshold = 360;
+    else if (minutesUntilKickoff <= 4320) staleThreshold = 720;
+    else staleThreshold = 1440;
     const base = {
       status: 'missing',
       odd: Number.isFinite(odd) ? odd : null,
@@ -3872,12 +3894,14 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
       line: c.line ?? c.raw?.line ?? null,
       verifiedAt,
       ageMin: marketAgeMin,
+      staleThreshold,
+      minutesUntilKickoff,
       reason: '',
     };
     if (!(odd > 1.01) || odd > 50) return { ...base, status: 'suspicious', reason: 'cote hors bornes' };
     if (!wx.available || !wx.match_id || !markets || !Object.keys(markets).length) return { ...base, status: 'missing', reason: 'match Winamax ou marchés absents' };
-    if (dataAge > 240) return { ...base, status: 'stale', reason: `data ${Math.round(dataAge / 60)}h` };
-    if (marketAgeMin > 180) return { ...base, status: 'stale', reason: `marchés Winamax vérifiés il y a ${Math.round(marketAgeMin / 60)}h` };
+    if (dataAge > 1440) return { ...base, status: 'stale', reason: `data ${Math.round(dataAge / 60)}h (pipeline en attente)` };
+    if (marketAgeMin > staleThreshold) return { ...base, status: 'stale', reason: `marchés Winamax vérifiés il y a ${Math.round(marketAgeMin / 60)}h (kickoff dans ${minutesUntilKickoff != null ? Math.round(minutesUntilKickoff / 60) + 'h' : '?'})` };
     if (c.suspect || Number(c.edge || 0) > 0.30) return { ...base, status: 'suspicious', reason: c.suspectReason || 'edge anormal' };
     if (c.source !== 'winamax_exact' || c.exact === false) return { ...base, status: 'missing', reason: 'cote indicative non liée Winamax exact' };
     const found = v38FindWinamaxOdd(match, c);
@@ -16122,7 +16146,14 @@ const _dashboardNowMs = Number.isFinite(_dashboardGeneratedMs) && Number.isFinit
 const _dataAgeMin = (typeof getDataAge === 'function')
 ? getDataAge(data, { nowMs: _dashboardNowMs }).minutes
 : (data.generated_at ? Math.floor((_dashboardNowMs - _dashboardGeneratedMs)/60000) : 9999);
-const _dataIsStale = _dataAgeMin > 240; // 4h
+// v37.182 — Bumpe le seuil "stale" de 4h → 24h. Avant, dès que le cron data
+// avait > 4h de retard, _dataIsStale=true vidait Top Paris, perSport7d,
+// allTodayRaw, butsDuMatch et coupait l'affichage des picks. Conséquence :
+// site inutilisable lors d'un blip pipeline. Maintenant on tolère 24h ; le
+// refresh-indicator + l'affichage per-pick (validatePickOdd) signalent déjà
+// la fraîcheur sans bloquer l'expérience. Au-delà de 24h, le mode "data
+// figée" reste pertinent (informations pré-match probablement obsolètes).
+const _dataIsStale = _dataAgeMin > 1440; // 24h
 
 {
 const v36FilterKey = 'paris_sportif_v36_home_filter';
