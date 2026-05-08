@@ -45,14 +45,16 @@ test.describe('privacy-first social layer', () => {
     expect(audit.externalServices).toEqual([]);
 
     await page.evaluate(() => window.__psPrivacySocial.showQrShare());
-    await expect(page.locator('.privacy-dialog')).toContainText('Partager ce combine en QR');
+    await expect(page.locator('.privacy-dialog')).toContainText('Partager ce combiné en QR');
     await expect(page.locator('.privacy-qr svg')).toBeVisible();
   });
 
   test('adds local profile and personal report panels', async ({ page }) => {
     await page.goto(URL + '#profil');
     await expect(page.locator('[data-privacy-profile]')).toBeVisible({ timeout: 10_000 });
-    await expect(page.locator('[data-privacy-profile]')).toContainText('Profil prive local');
+    await expect(page.locator('[data-privacy-profile]')).toContainText('Profil privé local');
+    await expect(page.locator('[data-privacy-profile]')).toContainText('rang basé sur volume');
+    await expect(page.locator('[data-privacy-profile]')).toContainText('sport le plus joué');
     await expect(page.locator('[data-privacy-profile]')).toContainText('Badges locaux');
     await expect(page.locator('[data-privacy-profile]')).toContainText('Comparer avec des amis');
 
@@ -66,7 +68,8 @@ test.describe('privacy-first social layer', () => {
     await page.goto(URL);
     await page.waitForFunction(() => Boolean(window.__psPrivacySocial));
     await page.evaluate(() => window.__psPrivacySocial.showPrivacyModal());
-    await expect(page.locator('.privacy-dialog')).toContainText('Confidentialite locale');
+    await expect(page.locator('.privacy-dialog')).toContainText('Confidentialité locale');
+    await expect(page.locator('.privacy-dialog')).toContainText('tu déclenches toi-même');
     await expect(page.locator('.privacy-dialog')).toContainText('Aucun serveur applicatif');
   });
 });

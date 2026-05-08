@@ -28,7 +28,7 @@
   const BADGES = [
     ['first_bet', 'Premier pari', 'Un pari suivi au compteur.', s => s.total >= 1],
     ['ten_bets', '10 paris', 'Dix paris suivis.', s => s.total >= 10],
-    ['fifty_bets', '50 paris', 'Volume serieux.', s => s.total >= 50],
+    ['fifty_bets', '50 paris', 'Volume sérieux.', s => s.total >= 50],
     ['hundred_bets', '100 paris', 'Historique solide.', s => s.total >= 100],
     ['win_streak_3', 'Serie 3', 'Trois gains consecutifs.', s => s.winStreak >= 3],
     ['win_streak_5', 'Serie 5', 'Cinq gains consecutifs.', s => s.winStreak >= 5],
@@ -46,18 +46,18 @@
     ['value_hunter', 'Value hunter', 'Au moins 10 picks Valeur.', s => (s.tiers.value || 0) >= 10],
     ['big_odds', 'Big odds', 'Au moins 5 picks Big odds.', s => (s.tiers.big || 0) >= 5],
     ['outsider', 'Outsider', 'Au moins 3 outsiders suivis.', s => (s.tiers.out || 0) >= 3],
-    ['football_focus', 'Foot focus', 'Le foot represente 20+ paris.', s => (s.bySport.football || s.bySport.foot || 0) >= 20],
-    ['tennis_focus', 'Tennis focus', 'Le tennis represente 10+ paris.', s => (s.bySport.tennis || 0) >= 10],
-    ['nba_focus', 'NBA focus', 'Basket/NBA represente 10+ paris.', s => ((s.bySport.basketball || 0) + (s.bySport.nba || 0)) >= 10],
-    ['low_tilt', 'Anti-tilt', 'Aucune serie de pertes de 5+.', s => s.settled >= 20 && s.lossStreak < 5],
-    ['recover', 'Recovery', 'PNL positif apres une serie de pertes.', s => s.pnl > 0 && s.lossStreak >= 3],
+    ['football_focus', 'Foot focus', 'Le foot représente 20+ paris.', s => (s.bySport.football || s.bySport.foot || 0) >= 20],
+    ['tennis_focus', 'Tennis focus', 'Le tennis représente 10+ paris.', s => (s.bySport.tennis || 0) >= 10],
+    ['nba_focus', 'NBA focus', 'Basket/NBA représente 10+ paris.', s => ((s.bySport.basketball || 0) + (s.bySport.nba || 0)) >= 10],
+    ['low_tilt', 'Anti-tilt', 'Aucune série de pertes de 5+.', s => s.settled >= 20 && s.lossStreak < 5],
+    ['recover', 'Recovery', 'PNL positif après une série de pertes.', s => s.pnl > 0 && s.lossStreak >= 3],
     ['monthly_goal', 'Objectif mensuel', 'Objectif ROI mensuel atteint.', s => s.goalReached],
     ['clv_positive', 'CLV positif', 'CLV moyenne positive.', s => s.avgClv > 0],
     ['morning', 'Matinal', 'Au moins 10 paris avant midi.', s => (s.hours.morning || 0) >= 10],
-    ['night', 'Nocturne', 'Au moins 10 paris apres 20h.', s => (s.hours.night || 0) >= 10],
-    ['steady_stake', 'Mise stable', 'Mise moyenne coherente sur 20+ paris.', s => s.settled >= 20 && s.avgStake > 0 && s.stakeVariance < s.avgStake * 1.5],
-    ['pdf_export', 'Archiviste', 'Export PDF genere au moins une fois.', () => localStorage.getItem('ps_pdf_exported_v1') === '1'],
-    ['data_export', 'Backup hero', 'Export donnees genere au moins une fois.', () => localStorage.getItem('ps_user_data_exported_v1') === '1']
+    ['night', 'Nocturne', 'Au moins 10 paris après 20h.', s => (s.hours.night || 0) >= 10],
+    ['steady_stake', 'Mise stable', 'Mise moyenne cohérente sur 20+ paris.', s => s.settled >= 20 && s.avgStake > 0 && s.stakeVariance < s.avgStake * 1.5],
+    ['pdf_export', 'Archiviste', 'Export PDF généré au moins une fois.', () => localStorage.getItem('ps_pdf_exported_v1') === '1'],
+    ['data_export', 'Backup hero', 'Export données généré au moins une fois.', () => localStorage.getItem('ps_user_data_exported_v1') === '1']
   ].map(([id, title, desc, test]) => ({ id, title, desc, test }));
 
   function $(sel, root = document) { return root.querySelector(sel); }
@@ -147,7 +147,7 @@
       return;
     }
     makeBlobDownload('paris-sportif-lien-partage.txt', 'text/plain;charset=utf-8', text);
-    toast('Clipboard indisponible : lien exporte en fichier texte.', 'info');
+    toast('Clipboard indisponible : lien exporté en fichier texte.', 'info');
   }
 
   function injectStyle() {
@@ -252,7 +252,7 @@
       league: String(raw.league || raw.competition || 'Ligue inconnue'),
       tier: normalizeTier(raw.tier || raw.level || raw.bucket),
       market: String(raw.market_key || raw.market || raw.type || 'marche'),
-      selection: String(raw.selection || raw.pick || raw.label || 'Selection'),
+      selection: String(raw.selection || raw.pick || raw.label || 'Sélection'),
       stake: Number.isFinite(stake) ? stake : 0,
       odd: Number.isFinite(odd) ? odd : 0,
       result,
@@ -415,7 +415,7 @@
 
   function qrSvgFor(url) {
     if (typeof window.qrcode !== 'function') {
-      return `<div class="privacy-mini">QR indisponible : la bibliotheque locale n'est pas chargee.</div>`;
+      return `<div class="privacy-mini">QR indisponible : la bibliothèque locale n'est pas chargée.</div>`;
     }
     const qr = window.qrcode(0, 'M');
     qr.addData(url);
@@ -446,7 +446,7 @@
     const encoded = encodePayload(payload);
     const url = `${location.origin}${location.pathname}#combo/${encoded}`;
     const body = `
-      <p>Ce QR contient uniquement les donnees du combine encodees dans l'URL. Aucun upload, aucun serveur, aucune collecte.</p>
+      <p>Ce QR contient uniquement les données du combiné encodées dans l'URL. Aucun upload, aucun serveur, aucune collecte.</p>
       <div class="privacy-qr">${qrSvgFor(url)}</div>
       <div class="privacy-mini"><strong>${esc(payload.title)}</strong><p>${esc(payload.text.slice(0, 320))}${payload.text.length > 320 ? '...' : ''}</p></div>
     `;
@@ -455,7 +455,7 @@
       <button type="button" class="privacy-btn secondary" data-privacy-copy-link>Copier le lien</button>
       <button type="button" class="privacy-btn" data-privacy-close>OK</button>
     `;
-    showModal('Partager ce combine en QR', body, footer, modal => {
+    showModal('Partager ce combiné en QR', body, footer, modal => {
       $('[data-privacy-export-combo]', modal).addEventListener('click', () => {
         makeBlobDownload('combine-paris-sportif.json', 'application/json;charset=utf-8', JSON.stringify(payload, null, 2));
       });
@@ -475,7 +475,7 @@
       : `<pre style="white-space:pre-wrap;font:inherit;">${esc(payload.text || '')}</pre>`;
     showModal(
       'Combine recu',
-      `<p>Lecture locale depuis le hash de l'URL. Rien n'a ete telecharge depuis un serveur.</p><div class="privacy-mini"><strong>${esc(payload.title || 'Combiné')}</strong>${legs}</div>`,
+      `<p>Lecture locale depuis le hash de l'URL. Rien n'a été téléchargé depuis un serveur.</p><div class="privacy-mini"><strong>${esc(payload.title || 'Combiné')}</strong>${legs}</div>`,
       '<button type="button" class="privacy-btn secondary" data-privacy-copy-shared>Copier le contenu</button><button type="button" class="privacy-btn" data-privacy-close>Fermer</button>',
       modal => {
         $('[data-privacy-copy-shared]', modal).addEventListener('click', () => copyText(payload.text || payload.title || 'Combiné Paris-Sportif'));
@@ -490,11 +490,11 @@
     panel.className = 'privacy-card';
     panel.setAttribute('data-privacy-combo-share', '1');
     panel.innerHTML = `
-      <h2>Partage prive du combine</h2>
-      <p>Genere un QR code local qui encode le combine dans l'URL. Aucun compte, aucun serveur, aucune collecte.</p>
+      <h2>Partage privé du combiné</h2>
+      <p>Génère un QR code local qui encode le combiné dans l'URL. Aucun compte, aucun serveur, aucune collecte.</p>
       <div class="privacy-actions">
         <button type="button" class="privacy-btn" data-privacy-share-combo>Partager via QR</button>
-        <button type="button" class="privacy-btn secondary" data-privacy-privacy>Confidentialite</button>
+        <button type="button" class="privacy-btn secondary" data-privacy-privacy>Confidentialité</button>
       </div>
     `;
     wrap.prepend(panel);
@@ -530,18 +530,18 @@
       @media print{body{padding:16mm}.no-print{display:none}}
     </style></head><body>
       <h1>Rapport personnel Paris-Sportif</h1>
-      <p>Genere localement le ${new Date().toLocaleString('fr-FR')}. Aucune donnee envoyee.</p>
+      <p>Généré localement le ${new Date().toLocaleString('fr-FR')}. Aucune donnée envoyée.</p>
       <div class="grid">
-        <div class="card"><strong>${stats.settled}</strong><br>paris regles</div>
+        <div class="card"><strong>${stats.settled}</strong><br>paris réglés</div>
         <div class="card"><strong>${pct(stats.roi)}</strong><br>ROI</div>
         <div class="card"><strong>${money(stats.pnl)}</strong><br>P&L</div>
         <div class="card"><strong>${pct(stats.wr)}</strong><br>Win rate</div>
       </div>
-      <h2>Historique recent</h2>
-      <table><thead><tr><th>Date</th><th>Sport</th><th>Selection</th><th>Mise</th><th>Resultat</th><th>P&L</th></tr></thead><tbody>
+      <h2>Historique récent</h2>
+      <table><thead><tr><th>Date</th><th>Sport</th><th>Sélection</th><th>Mise</th><th>Résultat</th><th>P&L</th></tr></thead><tbody>
         ${stats.settledBets.slice(-40).reverse().map(b => `<tr><td>${esc(b.ts.slice(0, 10))}</td><td>${esc(b.sport)}</td><td>${esc(b.selection)}</td><td>${esc(String(b.stake))}</td><td>${esc(b.result)}</td><td>${money(b.pnl)}</td></tr>`).join('')}
       </tbody></table>
-      <h2>Synthese</h2>
+      <h2>Synthèse</h2>
       <p>Sport favori : ${esc(topEntry(stats.bySport, 'aucun'))}. Ligue favorite : ${esc(topEntry(stats.byLeague, 'aucune'))}. Tier favori : ${esc(topEntry(stats.tiers, 'aucun'))}. Mise moyenne : ${money(stats.avgStake).replace('+', '')}.</p>
       <button class="no-print" onclick="window.print()">Imprimer / enregistrer en PDF</button>
     </body></html>`;
@@ -556,7 +556,7 @@
       try { frame.contentWindow.focus(); frame.contentWindow.print(); } catch (error) { reportPrivacyError('privacy pdf print', error); }
       setTimeout(() => frame.remove(), 1500);
     }, 250);
-    toast('Rapport PDF pret dans la fenetre impression.', 'success');
+    toast('Rapport PDF prêt dans la fenêtre impression.', 'success');
   }
   function injectBilan() {
     const wrap = $('#bilan-wrap') || $('#performance-wrap');
@@ -568,17 +568,17 @@
     panel.setAttribute('data-privacy-bilan', '1');
     panel.innerHTML = `
       <h2>Rapport personnel local</h2>
-      <p>Streaks, calendrier P&L et export PDF sont calcules depuis tes paris suivis dans ce navigateur.</p>
+      <p>Streaks, calendrier P&L et export PDF sont calculés depuis tes paris suivis dans ce navigateur.</p>
       <div class="privacy-grid">
-        <div class="privacy-mini"><strong>${stats.winStreak}</strong><p>plus longue serie gagnante</p></div>
-        <div class="privacy-mini"><strong>${stats.lossStreak}</strong><p>plus longue serie perdante</p></div>
+        <div class="privacy-mini"><strong>${stats.winStreak}</strong><p>plus longue série gagnante</p></div>
+        <div class="privacy-mini"><strong>${stats.lossStreak}</strong><p>plus longue série perdante</p></div>
         <div class="privacy-mini"><strong>${esc(rank.label)} · ${rank.score}/100</strong><p>rang local</p></div>
         <div class="privacy-mini"><strong>${money(stats.pnl)}</strong><p>P&L suivi</p></div>
       </div>
       ${buildHeatmap(stats)}
       <div class="privacy-actions">
         <button type="button" class="privacy-btn" data-privacy-export-pdf>Export PDF</button>
-        <button type="button" class="privacy-btn secondary" data-privacy-show-year>Mon annee</button>
+        <button type="button" class="privacy-btn secondary" data-privacy-show-year>Mon année</button>
       </div>
     `;
     wrap.prepend(panel);
@@ -601,7 +601,7 @@
     }
     localStorage.setItem('ps_user_data_exported_v1', '1');
     makeBlobDownload(`paris-sportif-donnees-${new Date().toISOString().slice(0, 10)}.json`, 'application/json;charset=utf-8', JSON.stringify(payload, null, 2));
-    toast('Export local genere.', 'success');
+    toast('Export local généré.', 'success');
   }
   function shouldExportKey(key) {
     return PRIVATE_PREFIXES.some(prefix => String(key).startsWith(prefix)) || PRIVATE_KEYS.includes(key);
@@ -612,13 +612,13 @@
       let payload = null;
       try { payload = JSON.parse(String(reader.result || '{}')); } catch (error) { reportPrivacyError('privacy import parse', error); }
       if (!payload || !payload.schema || !payload.localStorage || typeof payload.localStorage !== 'object') {
-        showModal('Import impossible', '<p>Le fichier ne correspond pas au schema de sauvegarde Paris-Sportif.</p>');
+        showModal('Import impossible', '<p>Le fichier ne correspond pas au schéma de sauvegarde Paris-Sportif.</p>');
         return;
       }
       localStorage.setItem(STORAGE.importDraft, JSON.stringify(payload));
       showModal(
-        'Importer mes donnees',
-        `<p>Fichier valide : ${esc(payload.schema)} exporte le ${esc(payload.exported_at || 'date inconnue')}.</p><p><strong>Fusionner</strong> conserve tes donnees actuelles et ajoute les cles du fichier. <strong>Remplacer</strong> efface d'abord les donnees locales Paris-Sportif.</p>`,
+        'Importer mes données',
+        `<p>Fichier valide : ${esc(payload.schema)} exporté le ${esc(payload.exported_at || 'date inconnue')}.</p><p><strong>Fusionner</strong> conserve tes données actuelles et ajoute les clés du fichier. <strong>Remplacer</strong> efface d'abord les données locales Paris-Sportif.</p>`,
         '<button type="button" class="privacy-btn secondary" data-privacy-import-merge>Fusionner</button><button type="button" class="privacy-btn danger" data-privacy-import-replace>Remplacer</button><button type="button" class="privacy-btn secondary" data-privacy-close>Annuler</button>'
       );
     };
@@ -716,19 +716,19 @@
     panel.className = 'privacy-card';
     panel.setAttribute('data-privacy-profile', '1');
     panel.innerHTML = `
-      <h2>Profil prive local</h2>
+      <h2>Profil privé local</h2>
       <p>Badges, rang, objectifs et comparaisons restent dans ce navigateur. Partage seulement si tu exportes un fichier ou scannes un QR.</p>
       <div class="privacy-grid">
-        <div class="privacy-mini"><span class="privacy-rank">${esc(rank.label)} · ${rank.score}/100</span><p>rang base sur volume, ROI et diversite</p></div>
+        <div class="privacy-mini"><span class="privacy-rank">${esc(rank.label)} · ${rank.score}/100</span><p>rang basé sur volume, ROI et diversité</p></div>
         <div class="privacy-mini"><strong>${pct(stats.monthRoi)}</strong><p>objectif mensuel ${pct(stats.goalTarget)}</p><div style="height:8px;background:rgba(148,163,184,.18);border-radius:999px;overflow:hidden"><i style="display:block;height:100%;width:${goalProgress}%;background:var(--accent,#10b981)"></i></div></div>
-        <div class="privacy-mini"><strong>${esc(topEntry(stats.bySport, 'aucun'))}</strong><p>sport le plus joue</p></div>
+        <div class="privacy-mini"><strong>${esc(topEntry(stats.bySport, 'aucun'))}</strong><p>sport le plus joué</p></div>
         <div class="privacy-mini"><strong>${esc(topEntry(stats.tiers, 'aucun'))}</strong><p>tier favori</p></div>
       </div>
       <div class="privacy-grid">
-        <div class="privacy-mini"><strong>${esc(prev ? money(stats.pnl - prev.pnl) : 'Premier mois')}</strong><p>evolution vs snapshot precedent</p></div>
+        <div class="privacy-mini"><strong>${esc(prev ? money(stats.pnl - prev.pnl) : 'Premier mois')}</strong><p>évolution vs snapshot précédent</p></div>
         <div class="privacy-mini"><strong>${money(stats.avgStake).replace('+', '')}</strong><p>mise moyenne</p></div>
         <div class="privacy-mini"><strong>${esc(topEntry(stats.byLeague, 'aucune'))}</strong><p>ligue favorite</p></div>
-        <div class="privacy-mini"><strong>${stats.hours.morning}/${stats.hours.afternoon}/${stats.hours.night}</strong><p>matin / apres-midi / soir</p></div>
+        <div class="privacy-mini"><strong>${stats.hours.morning}/${stats.hours.afternoon}/${stats.hours.night}</strong><p>matin / après-midi / soir</p></div>
       </div>
       <h3 style="margin-top:18px">Badges locaux (${getUnlocked(stats).length}/${BADGES.length})</h3>
       <div class="privacy-badge-grid">${renderBadges(stats)}</div>
@@ -736,18 +736,18 @@
       <div class="privacy-grid">
         <input class="privacy-input" data-privacy-friend-name placeholder="Nom">
         <input class="privacy-input" data-privacy-friend-bets type="number" min="0" placeholder="Paris">
-        <input class="privacy-input" data-privacy-friend-wins type="number" min="0" placeholder="Gagnes">
+        <input class="privacy-input" data-privacy-friend-wins type="number" min="0" placeholder="Gagnés">
         <input class="privacy-input" data-privacy-friend-stake type="number" min="0" step="0.01" placeholder="Mise totale">
         <input class="privacy-input" data-privacy-friend-pnl type="number" step="0.01" placeholder="P&L">
       </div>
       <div class="privacy-actions"><button type="button" class="privacy-btn" data-privacy-add-friend>Ajouter au leaderboard local</button></div>
       ${renderFriends(stats)}
-      <h3 style="margin-top:18px">Donnees et confidentialite</h3>
+      <h3 style="margin-top:18px">Données et confidentialité</h3>
       <div class="privacy-actions">
-        <button type="button" class="privacy-btn secondary" data-privacy-export-user>Exporter mes donnees</button>
-        <button type="button" class="privacy-btn secondary" data-privacy-import-user>Importer mes donnees</button>
+        <button type="button" class="privacy-btn secondary" data-privacy-export-user>Exporter mes données</button>
+        <button type="button" class="privacy-btn secondary" data-privacy-import-user>Importer mes données</button>
         <button type="button" class="privacy-btn secondary" data-privacy-privacy>Voir la politique locale</button>
-        <button type="button" class="privacy-btn danger" data-privacy-forget>Effacer toutes mes donnees</button>
+        <button type="button" class="privacy-btn danger" data-privacy-forget>Effacer toutes mes données</button>
       </div>
       <input type="file" accept="application/json,.json" data-privacy-import-file hidden>
     `;
@@ -759,16 +759,16 @@
     const sorted = stats.settledBets.slice().sort((a, b) => (b.pnl || 0) - (a.pnl || 0));
     const best = sorted[0];
     const worst = sorted[sorted.length - 1];
-    showModal('Mon annee', `
+    showModal('Mon année', `
       <div class="privacy-grid">
-        <div class="privacy-mini"><strong>${stats.settled}</strong><p>paris regles</p></div>
+        <div class="privacy-mini"><strong>${stats.settled}</strong><p>paris réglés</p></div>
         <div class="privacy-mini"><strong>${pct(stats.roi)}</strong><p>ROI annuel</p></div>
         <div class="privacy-mini"><strong>${esc(topEntry(stats.bySport, 'aucun'))}</strong><p>sport favori</p></div>
         <div class="privacy-mini"><strong>${money(stats.pnl)}</strong><p>P&L</p></div>
       </div>
       <div class="privacy-grid">
-        <div class="privacy-mini"><strong>Meilleur pari</strong><p>${best ? `${esc(best.selection)} · ${money(best.pnl)}` : 'Pas encore de pari regle.'}</p></div>
-        <div class="privacy-mini"><strong>Pire pari</strong><p>${worst ? `${esc(worst.selection)} · ${money(worst.pnl)}` : 'Pas encore de pari regle.'}</p></div>
+        <div class="privacy-mini"><strong>Meilleur pari</strong><p>${best ? `${esc(best.selection)} · ${money(best.pnl)}` : 'Pas encore de pari réglé.'}</p></div>
+        <div class="privacy-mini"><strong>Pire pari</strong><p>${worst ? `${esc(worst.selection)} · ${money(worst.pnl)}` : 'Pas encore de pari réglé.'}</p></div>
       </div>
     `);
   }
@@ -776,8 +776,8 @@
     if (!force && navigator.webdriver) return;
     if (!force && localStorage.getItem(STORAGE.ack) === '1') return;
     showModal(
-      'Confidentialite locale',
-      `<p><strong>Tout reste dans ton navigateur.</strong> Les badges, comparaisons, exports, QR codes et objectifs utilisent localStorage, IndexedDB ou des fichiers que tu declenches toi-meme.</p>
+      'Confidentialité locale',
+      `<p><strong>Tout reste dans ton navigateur.</strong> Les badges, comparaisons, exports, QR codes et objectifs utilisent localStorage, IndexedDB ou des fichiers que tu déclenches toi-même.</p>
        <ul>
         <li>Aucun serveur applicatif.</li>
         <li>Aucun analytics tiers, aucun cookie de tracking.</li>
@@ -797,8 +797,8 @@
     const run = () => clearPrivateData(true);
     if (typeof window._showConfirm === 'function') {
       window._showConfirm({
-        title: 'Effacer toutes mes donnees locales ?',
-        message: 'Cela supprime paris suivis, preferences, badges, amis, objectifs et sauvegardes locales Paris-Sportif.',
+        title: 'Effacer toutes mes données locales ?',
+        message: 'Cela supprime paris suivis, préférences, badges, amis, objectifs et sauvegardes locales Paris-Sportif.',
         confirmText: 'Effacer',
         cancelText: 'Annuler',
         danger: true,
@@ -806,8 +806,8 @@
       });
     } else {
       showModal(
-        'Effacer toutes mes donnees locales ?',
-        '<p>Cette action supprime les donnees Paris-Sportif de ce navigateur. Aucune copie distante n existe.</p>',
+        'Effacer toutes mes données locales ?',
+        '<p>Cette action supprime les données Paris-Sportif de ce navigateur. Aucune copie distante n’existe.</p>',
         '<button type="button" class="privacy-btn danger" data-privacy-forget-now>Effacer</button><button type="button" class="privacy-btn secondary" data-privacy-close>Annuler</button>',
         modal => $('[data-privacy-forget-now]', modal).addEventListener('click', run)
       );
