@@ -5,6 +5,7 @@ ROOT = Path(__file__).resolve().parents[1]
 LEGACY = ROOT / "legacy-app.js"
 PROBE = ROOT / "scripts" / "probe_prono_sheet_odds.js"
 SMOKE = ROOT / ".github" / "workflows" / "smoke.yml"
+LOCAL_ANALYTICS = ROOT / "src" / "local-analytics.js"
 
 
 def require(text, needle, label):
@@ -16,6 +17,7 @@ def main():
     legacy = LEGACY.read_text(encoding="utf-8")
     probe = PROBE.read_text(encoding="utf-8")
     smoke = SMOKE.read_text(encoding="utf-8")
+    local_analytics = LOCAL_ANALYTICS.read_text(encoding="utf-8")
 
     for status in ("verified", "changed", "stale", "mismatch", "missing", "suspicious"):
         require(legacy, f"{status}:", f"odd status {status}")
@@ -35,10 +37,14 @@ def main():
     require(probe, "Rows include beginner-friendly explanation text", "probe beginner copy assertion")
     require(probe, "Modal shows odd validation status", "probe odd validation assertion")
     require(probe, "No Top Paris card has an invalid odd status", "probe top odd assertion")
+    require(probe, "Accueil defaults to Aujourd’hui", "probe dashboard today default assertion")
     require(smoke, "probe_prono_sheet_odds.js", "smoke workflow wiring")
+    require(local_analytics, "$('[data-la-dashboard-panel]')?.remove();", "no local analytics panel on dashboard")
 
     if "const g = window.PRONOSTICS_DATA?.today" in legacy:
         raise SystemExit("[top-paris-contract] FAIL todayISO must use the real Europe/Paris date, not stale data.today")
+    if "${v37DecisionGuideHtml}" in legacy or "${v37TierLegendHtml}" in legacy:
+        raise SystemExit("[top-paris-contract] FAIL dashboard table must not render guide/legend before the table")
 
     print("[top-paris-contract] OK")
 

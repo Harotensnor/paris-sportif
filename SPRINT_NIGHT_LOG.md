@@ -1901,3 +1901,10 @@ Active log keeps the latest 50 sprints. Older entries live in SPRINT_NIGHT_LOG_A
 - Added explicit `odd_changed_not_recent` rejection in the Top Paris audit so old changed prices cannot enter recommendations.
 - Extended the prono-sheet probe to assert Top Paris never contains invalid odd statuses.
 - Added pytest/static contracts for Paris-local today and fresh odd eligibility.
+
+### v37.173 — Homepage table focus
+- Removed the local-personalisation panel from Accueil and kept it on the dedicated personal routes.
+- Removed the bulky decision guide and confidence legend from the homepage table header.
+- Forced plain `#dashboard` loads back to the real Paris-local Aujourd'hui, even if an old localStorage state had saved 7 jours.
+- Extended the prono-sheet probe to catch dashboard panel regressions and stale 7-day defaults.
+- Added static contracts so Accueil stays table-first after future local analytics changes.
