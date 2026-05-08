@@ -52,6 +52,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from winamax_map import _norm
+from io_compressed import write_json as _write_json_gz
 
 ROOT = Path(__file__).resolve().parent.parent
 CACHE_DIR = ROOT / '.cache' / 'footballdata'
@@ -322,10 +323,12 @@ def main() -> int:
         'matches': all_matches,
         'league_calibration': leagues_calibration,
     }
-    OUTPUT.write_text(json.dumps(payload, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+    # AUDIT 2026-05-08 v40 — gzip pour réduire l'historique git (~3.3 MB → ~0.7 MB).
+    # Lecteurs migrés en parallèle vers io_compressed.read_json() qui auto-détecte .gz.
+    written = _write_json_gz(OUTPUT, payload)
     print(f'[{now:%H:%M:%S}] footballdata: {len(all_matches)} matches across '
-          f'{len(leagues_calibration)} leagues → {OUTPUT.name} '
-          f'({OUTPUT.stat().st_size // 1024} KB)', flush=True)
+          f'{len(leagues_calibration)} leagues → {written.name} '
+          f'({written.stat().st_size // 1024} KB)', flush=True)
     return 0
 
 

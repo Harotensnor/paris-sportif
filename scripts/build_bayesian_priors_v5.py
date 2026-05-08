@@ -17,10 +17,15 @@ from __future__ import annotations
 import json
 import math
 import re
+import sys
 from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+
+HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE)) if str(HERE) not in sys.path else None
+from io_compressed import write_json as _write_json_gz
 
 ROOT = Path(__file__).resolve().parent.parent
 TEAM_PRIORS = ROOT / "team_priors.json"
@@ -43,6 +48,15 @@ def now_iso() -> str:
 
 
 def read_json(path: Path, default: Any) -> Any:
+    # AUDIT 2026-05-08 v40 — fallback sur .gz pour sidecars compressés.
+    import gzip as _gzip
+    gz = path.with_name(path.name + ".gz")
+    if gz.exists():
+        try:
+            with _gzip.open(gz, "rt", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            pass
     if not path.exists():
         return default
     try:
@@ -297,7 +311,8 @@ def browser_payload(payload: dict[str, Any]) -> dict[str, Any]:
 
 def main() -> int:
     payload = build()
-    OUT_JSON.write_text(json.dumps(payload, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
+    # AUDIT 2026-05-08 v40 — gzip bayesian_priors.json (~2.8 MB → ~0.7 MB).
+    _write_json_gz(OUT_JSON, payload)
     js = browser_payload(payload)
     OUT_JS.write_text(
         "window.BAYESIAN_PRIORS_V5=" + json.dumps(js, ensure_ascii=False, separators=(",", ":")) + ";\n",

@@ -31,6 +31,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from winamax_map import _norm, _name_tokens
+from io_compressed import read_json as _read_json_any, exists_any as _exists_any
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA_JS = ROOT / 'data.js'
@@ -63,11 +64,12 @@ def get_sides(ev: dict) -> tuple[str, str]:
 
 
 def main() -> int:
-    if not FOOTBALLDATA.exists():
-        print(f'[patch_footballdata] {FOOTBALLDATA.name} missing — run '
+    # AUDIT 2026-05-08 v40 — accepte .gz ou plain (cf io_compressed).
+    if not _exists_any(FOOTBALLDATA):
+        print(f'[patch_footballdata] {FOOTBALLDATA.name}(.gz) missing — run '
               f'fetch_footballdata.py first. Skip.', flush=True)
         return 0
-    fd = json.loads(FOOTBALLDATA.read_text(encoding='utf-8'))
+    fd = _read_json_any(FOOTBALLDATA)
     matches: dict[str, dict] = fd.get('matches') or {}
     league_cal: dict[str, dict] = fd.get('league_calibration') or {}
     if not matches and not league_cal:

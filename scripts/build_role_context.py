@@ -25,7 +25,13 @@ def _date_key(value: str | None) -> str:
 
 
 def _load_json(name: str) -> dict[str, Any]:
+    # AUDIT 2026-05-08 v40 — accepte .gz (sidecars compressés).
+    import gzip as _gzip
     path = ROOT / name
+    gz = path.with_name(path.name + ".gz")
+    if gz.exists():
+        with _gzip.open(gz, "rt", encoding="utf-8") as f:
+            return json.load(f)
     return json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
 
 

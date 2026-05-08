@@ -18,7 +18,16 @@ def iso_now() -> str:
 
 
 def read_json(path: str, default: Any) -> Any:
+    # AUDIT 2026-05-08 v40 — fallback sur .gz pour sidecars compressés.
+    import gzip as _gzip
     p = ROOT / path
+    gz = p.with_name(p.name + ".gz")
+    if gz.exists():
+        try:
+            with _gzip.open(gz, "rt", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            pass
     if not p.exists():
         return default
     try:
@@ -28,9 +37,14 @@ def read_json(path: str, default: Any) -> Any:
 
 
 def sha(path: str) -> str | None:
+    # AUDIT 2026-05-08 v40 — sha sur le .gz si plain absent.
     p = ROOT / path
     if not p.exists():
-        return None
+        gz = p.with_name(p.name + ".gz")
+        if gz.exists():
+            p = gz
+        else:
+            return None
     h = hashlib.sha256()
     h.update(p.read_bytes())
     return h.hexdigest()[:12]

@@ -32,6 +32,10 @@ except ImportError:
     import urllib.request
     cr = None  # graceful degradation, we'll use urllib
 
+HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE)) if str(HERE) not in sys.path else None
+from io_compressed import write_json as _write_json_gz
+
 ROOT = Path(__file__).resolve().parent.parent
 DATA_JS = ROOT / 'data.js'
 OUT = ROOT / 'team_form.json'
@@ -262,7 +266,9 @@ def main():
                     cache[key] = info
                     written += 1
 
-    OUT.write_text(json.dumps(cache, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+    # AUDIT 2026-05-08 v40 — gzip OUT (~1.1 MB → ~0.3 MB) pour réduire la croissance git.
+    # EXTENDED_OUT reste plain (plus petit, frontend ne le fetch pas).
+    _write_json_gz(OUT, cache)
     EXTENDED_OUT.write_text(
         json.dumps(_build_extended_stats(cache), ensure_ascii=False, separators=(',', ':')),
         encoding='utf-8'

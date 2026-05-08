@@ -575,11 +575,27 @@ PIPELINE_DRIFT_EXCLUDED = {
 
 
 def _age_min(path: Path) -> int | None:
+    # AUDIT 2026-05-08 v40 — fallback sur .gz si plain absent (sidecars compressés).
     if not path.exists():
+        gz = path.with_name(path.name + '.gz')
+        if gz.exists():
+            mtime = gz.stat().st_mtime
+            now = datetime.now(timezone.utc).timestamp()
+            return max(0, int((now - mtime) / 60))
         return None
     mtime = path.stat().st_mtime
     now = datetime.now(timezone.utc).timestamp()
     return max(0, int((now - mtime) / 60))
+
+
+def _read_source_json(path: Path):
+    """AUDIT 2026-05-08 v40 — lit JSON depuis path.gz ou path plain."""
+    import gzip as _gzip
+    gz = path.with_name(path.name + '.gz')
+    if gz.exists():
+        with _gzip.open(gz, 'rt', encoding='utf-8') as f:
+            return json.load(f)
+    return json.loads(path.read_text(encoding='utf-8'))
 
 
 def _data_generated_age_min() -> int | None:
@@ -897,7 +913,7 @@ def main() -> int:
             continue
         entry: dict = {'age_min': age}
         try:
-            d = json.loads(path.read_text(encoding='utf-8'))
+            d = _read_source_json(path)
             counts = counter(d) or {}
             entry.update(counts)
             src_status = d.get('status') if isinstance(d, dict) else None

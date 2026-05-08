@@ -50,6 +50,15 @@ jobs:
       - name: Install deps
         run: pip install -r pip-requirements.txt --break-system-packages
 
+      # AUDIT 2026-05-08 v40 — winamax_markets.json (~90 MB) externalisé
+      # sur GitHub Releases (rolling tag `data-cache`). Restore au boot
+      # pour que fetch_winamax_match_details puisse merger sur l'existant
+      # (TTL respecté). No-op silencieux si la release est absente.
+      - name: Restore winamax_markets cache from GitHub Releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 scripts/sync_winamax_markets_release.py download || true
+
       # v33.27 — PARALLÈLE : les fetchers indépendants tournent simultanément.
       # Avant : ~3min en séquentiel. Après : ~30-45s (limité par le plus lent).
       # Tous écrivent leur propre JSON, pas de race-condition possible.
@@ -355,6 +364,11 @@ jobs:
           python3 finalize_inline.py || true
           python3 check_pipeline_health.py --max-age-min 30
           python3 check_pipeline_freshness.py --max-age-min 30
+          # AUDIT 2026-05-08 v40 — Push winamax_markets.json (~90 MB) sur
+          # GitHub Releases (tag rolling `data-cache`). Plus commité dans
+          # git (cf .gitignore + git rm --cached). Le prochain run cron
+          # restaure depuis la release au boot.
+          GH_TOKEN="${{ secrets.GITHUB_TOKEN }}" python3 sync_winamax_markets_release.py upload || true
           # v35.407 — Bundle guard: app.js must stay below 1.6 MB after the
           # V36/V37 cleanup. Fails fast if a sprint reintroduces dead code.
           python3 audit_bundle_size.py
@@ -427,7 +441,7 @@ jobs:
           # fresh in the runner but never reached main.
           for path in \
             data.js data_lite.js pronostics.html app.css app.js odds_history.jsonl \
-            injuries_soccer.json injuries_multisport.json winamax_catalog.json winamax_markets.json team_stats.json \
+            injuries_soccer.json injuries_multisport.json winamax_catalog.json team_stats.json \
             lineups_soccer.json lineups_multisport.json xg_coverage.json match_previews.json clubelo.json weather.json fbref_xg.json xg_team_stats.json \
             weather_geo_cache.json referees_soccer.json health.json night_metrics.json \
             data_today.json data_manifest.json team_form.json form_stats_extended.json h2h_extended.json \
@@ -439,7 +453,8 @@ jobs:
             lightgbm_weights.json lightgbm_weights.js \
             rugby_markets.json niche_markets.json mlb_player_props.json nhl_playoff_markets.json tennis_challenger_watchlist.json football_expansion_watchlist.json sports_expansion_audit.json \
             boosted_odds.json \
-            results_archive.jsonl tennis_ratings.json footballdata.json \
+            results_archive.jsonl tennis_ratings.json.gz footballdata.json.gz \
+            bayesian_priors.json.gz team_priors.json.gz team_form.json.gz \
             mlb_pitchers.json nhl_stats.json backtest.html feed.xml \
             credibilite.html stadiums.json dixon_coles_rho.json index.html \
             nba_team_stats.json team_strengths.json team_strengths_mle.json \

@@ -331,12 +331,15 @@ def migration_plan(data: dict[str, Any], spec: SourceSpec) -> dict[str, Any] | N
 
 def validate_source(spec: SourceSpec, state: dict[str, Any]) -> dict[str, Any]:
     path = ROOT / spec.filename
+    # AUDIT 2026-05-08 v40 — fallback sur .gz pour sidecars compressés.
+    gz_path = path.with_name(path.name + ".gz")
+    effective_path = path if path.exists() else (gz_path if gz_path.exists() else path)
     started = utc_now()
     result: dict[str, Any] = {
         "source": spec.name,
         "file": spec.filename,
         "schema_version_target": SCHEMA_VERSION,
-        "present": path.exists(),
+        "present": effective_path.exists(),
         "status": "unknown",
         "items": 0,
         "issues": [],
@@ -344,14 +347,19 @@ def validate_source(spec: SourceSpec, state: dict[str, Any]) -> dict[str, Any]:
         "health_score": 0,
     }
     trace = {"ts": now_iso(), "script": "data_integrity_monitor.py", "source": spec.name, "output": spec.filename, "status": "unknown", "duration_ms": 0}
-    if not path.exists():
+    if not effective_path.exists():
         result["status"] = "critical" if spec.critical else "warning"
         result["issues"].append(issue("error", spec.name, "missing_file", f"{spec.filename} absent"))
         trace["status"] = "missing"
         return result | {"trace": trace}
 
     try:
-        raw = path.read_bytes()
+        if effective_path.suffix == ".gz":
+            import gzip as _gzip
+            with _gzip.open(effective_path, "rb") as f:
+                raw = f.read()
+        else:
+            raw = effective_path.read_bytes()
         data = json.loads(raw.decode("utf-8"))
         if not isinstance(data, dict):
             raise ValueError("root is not an object")
@@ -364,9 +372,9 @@ def validate_source(spec: SourceSpec, state: dict[str, Any]) -> dict[str, Any]:
 
     result["schema_version"] = schema_version_of(data)
     result["migration"] = migration_plan(data, spec)
-    result["size_bytes"] = path.stat().st_size
-    result["sha256"] = sha256_file(path)
-    result["age_min"] = max(0, round((utc_now().timestamp() - path.stat().st_mtime) / 60))
+    result["size_bytes"] = effective_path.stat().st_size
+    result["sha256"] = sha256_file(effective_path)
+    result["age_min"] = max(0, round((utc_now().timestamp() - effective_path.stat().st_mtime) / 60))
     result["generated_at"] = data.get("generated_at")
     result["items"] = (spec.item_counter or (lambda _: 0))(data)
 
