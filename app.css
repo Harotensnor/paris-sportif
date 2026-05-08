@@ -92,3 +92,29 @@ body {
 #compare-wrap>div{padding-top:0!important}
 #sante-wrap>div{padding-top:0!important}
 #sante-wrap .section-header.top-picks{margin-top:0!important}
+/* BUG-009: dashboard table controls follow the light theme instead of dark hardcoded surfaces. */
+html[data-theme="light"] .v36-table-panel{background:var(--surface-1)!important;border-color:var(--border)!important;box-shadow:var(--shadow-sm)!important}
+html[data-theme="light"] .v36-table-toolbar{background:var(--surface-1)!important;border-bottom-color:var(--border)!important}
+html[data-theme="light"] .v36-table-toolbar strong{color:var(--text)!important}
+html[data-theme="light"] .v36-table-toolbar span{color:var(--text-dim)!important}
+html[data-theme="light"] .v36-table-search,
+html[data-theme="light"] .v37-day-chip,
+html[data-theme="light"] .v37-date-picker,
+html[data-theme="light"] .v37-live-toggle,
+html[data-theme="light"] .v36-sort-btn,
+html[data-theme="light"] .v37-blind-toggle{background:var(--surface-2)!important;border-color:var(--border)!important;color:var(--text)!important}
+html[data-theme="light"] .v36-table-search span,
+html[data-theme="light"] .v37-day-chip span,
+html[data-theme="light"] .v37-date-picker span,
+html[data-theme="light"] .v37-live-toggle span{color:var(--text-dim)!important}
+html[data-theme="light"] .v36-table-search input{color:var(--text)!important}
+html[data-theme="light"] .v37-day-chip.is-active,
+html[data-theme="light"] .v36-sort-btn.is-active,
+html[data-theme="light"] .v37-blind-toggle.is-active{background:var(--accent-soft)!important;border-color:color-mix(in srgb,var(--accent) 45%,var(--border))!important;color:var(--accent-2)!important}
+html[data-theme="light"] .v36-picks-table thead th{background:var(--surface-2)!important;border-bottom-color:var(--border)!important;color:var(--text-dim)!important}
+html[data-theme="light"] .v36-picks-table td{border-bottom-color:var(--border)!important;color:var(--text-2)!important}
+html[data-theme="light"] .v36-table-row{background:var(--surface-1)!important}
+html[data-theme="light"] .v36-table-row:hover,
+html[data-theme="light"] .v36-table-row:focus{background:color-mix(in srgb,var(--tier) 10%,var(--surface-2))!important}
+html[data-theme="light"] .v37-track-inline{background:var(--accent-soft)!important;border-color:color-mix(in srgb,var(--accent) 38%,var(--border))!important;color:var(--accent-2)!important}
+html[data-theme="light"]{--surface-0:#f5f5f7;--surface-1:#ffffff;--surface-2:#fbfbfd;--surface-3:#f2f2f4;--surface-hover:#ececf0}

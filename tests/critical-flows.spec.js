@@ -186,6 +186,53 @@ test.describe('Theme toggle', () => {
     await page.locator('[data-theme-btn="dark"]').evaluate(el => el.click());
     await expect.poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem('userPrefs') || '{}').theme)).toBe('dark');
   });
+
+  test('BUG-009 light theme covers dashboard table controls', async ({ page }) => {
+    await page.addInitScript(() => {
+      const prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}');
+      prefs.theme = 'light';
+      prefs.onboardingDone = true;
+      localStorage.setItem('userPrefs', JSON.stringify(prefs));
+    });
+    await page.goto(URL + '#dashboard');
+    await page.waitForFunction(() =>
+      document.documentElement.dataset.theme === 'light' &&
+      document.querySelector('.v36-table-panel') &&
+      document.querySelector('.v37-day-chip') &&
+      document.querySelector('.v36-picks-table thead th'),
+      null,
+      { timeout: 15000 }
+    );
+
+    const colors = await page.evaluate(() => {
+      const rgb = (value) => {
+        const m = String(value || '').match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([0-9.]+))?/);
+        if (!m) return [0, 0, 0];
+        const alpha = m[4] == null ? 1 : Number(m[4]);
+        const base = [Number(m[1]), Number(m[2]), Number(m[3])];
+        return base.map(n => Math.round(n * alpha + 255 * (1 - alpha)));
+      };
+      const lum = (selector, prop = 'backgroundColor') => {
+        const el = document.querySelector(selector);
+        if (!el) return 0;
+        const [r, g, b] = rgb(getComputedStyle(el)[prop]);
+        return Math.round((r + g + b) / 3);
+      };
+      return {
+        panel: lum('.v36-table-panel'),
+        toolbar: lum('.v36-table-toolbar'),
+        header: lum('.v36-picks-table thead th'),
+        chip: lum('.v37-day-chip'),
+        cta: lum('.v37-track-inline'),
+      };
+    });
+
+    expect(colors.panel).toBeGreaterThan(215);
+    expect(colors.toolbar).toBeGreaterThan(215);
+    expect(colors.header).toBeGreaterThan(215);
+    expect(colors.chip).toBeGreaterThan(215);
+    expect(colors.cta).toBeGreaterThan(190);
+  });
 });
 
 test.describe('Tous page', () => {
