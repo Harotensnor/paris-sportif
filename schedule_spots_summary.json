@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-08T23:18:09Z",
+  "generated_at": "2026-05-08T23:29:47Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 71,
+    "active_events": 68,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 99,
-      "travel_extreme": 22,
+      "lookahead": 93,
+      "travel_extreme": 21,
       "back_to_back_travel": 30,
       "schedule_congestion": 20
     },
     "by_decision": {
-      "abstain": 31,
-      "lean_home": 38,
+      "abstain": 29,
+      "lean_home": 37,
       "lean_away": 2
     },
-    "lean_home": 38,
+    "lean_home": 37,
     "lean_away": 2,
-    "abstain": 31,
+    "abstain": 29,
     "monitor": 0
   },
   "active": [
@@ -125,7 +125,7 @@
         "status": "abstain",
         "net_side": null,
         "home_score": -0.488,
-        "away_score": 0.267,
+        "away_score": 0.404,
         "home_fade": 0.75,
         "away_fade": 0.75,
         "reason": "Signaux opposes: New York Knicks fade 0.75, Philadelphia 76ers fade 0.75 -> prudence",
@@ -158,7 +158,7 @@
             "side": "away",
             "type": "market_move",
             "direction": "steam",
-            "strength": 0.754
+            "strength": 0.892
           }
         ]
       }
@@ -316,122 +316,6 @@
       }
     },
     {
-      "event_id": "401815259",
-      "source_event_ids": [
-        "401815259"
-      ],
-      "kickoff": "2026-05-08T23:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Miami Marlins",
-      "away": "Washington Nationals",
-      "match": "Miami Marlins - Washington Nationals",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Miami Marlins 0.30, Washington Nationals 0.30",
-      "pressure_score": 1.333,
-      "home_fade": 0.3,
-      "away_fade": 0.3,
-      "travel_score": 0,
-      "lookahead_score": 1.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.015,
-        "away_score": -0.795,
-        "home_fade": 0.3,
-        "away_fade": 0.9,
-        "reason": "Direction nette: Miami Marlins (+0.01)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815257",
-      "source_event_ids": [
-        "401815257"
-      ],
-      "kickoff": "2026-05-08T23:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Cleveland Guardians",
-      "away": "Minnesota Twins",
-      "match": "Cleveland Guardians - Minnesota Twins",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Cleveland Guardians 0.30, Minnesota Twins 0.30",
-      "pressure_score": 1.333,
-      "home_fade": 0.3,
-      "away_fade": 0.3,
-      "travel_score": 0,
-      "lookahead_score": 1.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.015,
-        "away_score": -0.795,
-        "home_fade": 0.3,
-        "away_fade": 0.9,
-        "reason": "Direction nette: Cleveland Guardians (+0.01)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815261",
       "source_event_ids": [
         "401815261"
@@ -460,13 +344,13 @@
         "2 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
+        "status": "mixed",
+        "net_side": null,
         "home_score": 0.155,
-        "away_score": -1.195,
+        "away_score": -0.622,
         "home_fade": 0.3,
         "away_fade": 1.3,
-        "reason": "Direction nette: Kansas City Royals (+0.15)",
+        "reason": "Signaux mitigés: avantage net trop faible (Kansas City Royals +0.15, Detroit Tigers -0.62)",
         "detail": [
           {
             "side": "home",
@@ -485,6 +369,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.573
           }
         ]
       }
@@ -521,10 +411,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.195,
-        "away_score": -0.195,
+        "away_score": 0.37,
         "home_fade": 0.3,
         "away_fade": 0.3,
-        "reason": "Direction nette: New York Yankees (-0.20)",
+        "reason": "Direction nette: New York Yankees (+0.37)",
         "detail": [
           {
             "side": "home",
@@ -537,6 +427,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.565
           }
         ]
       }
@@ -625,10 +521,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.195,
-        "away_score": -0.195,
+        "away_score": 0.273,
         "home_fade": 0.3,
         "away_fade": 0.3,
-        "reason": "Direction nette: Chicago Cubs (-0.20)",
+        "reason": "Direction nette: Chicago Cubs (+0.27)",
         "detail": [
           {
             "side": "home",
@@ -641,6 +537,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.468
           }
         ]
       }
@@ -676,7 +578,7 @@
       "global_resolution": {
         "status": "abstain",
         "net_side": null,
-        "home_score": 0.364,
+        "home_score": 0.502,
         "away_score": -0.39,
         "home_fade": 0.6,
         "away_fade": 0.6,
@@ -698,7 +600,7 @@
             "side": "home",
             "type": "market_move",
             "direction": "steam",
-            "strength": 0.754
+            "strength": 0.892
           }
         ]
       }
@@ -1010,13 +912,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Vegas Golden Knights (-0.10)",
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.747,
+        "away_score": -0.747,
+        "home_fade": 1.15,
+        "away_fade": 1.15,
+        "reason": "Signaux opposes: Anaheim Ducks fade 1.15, Vegas Golden Knights fade 1.15 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -1029,6 +931,18 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
@@ -1440,11 +1354,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.657,
+        "home_score": 0.794,
         "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Philadelphia 76ers (+0.66)",
+        "reason": "Direction nette: Philadelphia 76ers (+0.79)",
         "detail": [
           {
             "side": "home",
@@ -1462,7 +1376,7 @@
             "side": "home",
             "type": "market_move",
             "direction": "steam",
-            "strength": 0.754
+            "strength": 0.892
           }
         ]
       }
@@ -2134,11 +2048,11 @@
       "global_resolution": {
         "status": "mixed",
         "net_side": null,
-        "home_score": -0.331,
-        "away_score": -0.937,
-        "home_fade": 1.15,
+        "home_score": -0.27,
+        "away_score": -0.958,
+        "home_fade": 1.089,
         "away_fade": 2.34,
-        "reason": "Signaux mitigés: avantage net trop faible (Philadelphia Phillies -0.33, Colorado Rockies -0.94)",
+        "reason": "Signaux mitigés: avantage net trop faible (Philadelphia Phillies -0.27, Colorado Rockies -0.96)",
         "detail": [
           {
             "side": "home",
@@ -2162,7 +2076,7 @@
             "side": "home",
             "type": "market_move",
             "direction": "drift",
-            "strength": 1.0
+            "strength": 0.939
           },
           {
             "side": "away",
@@ -2625,10 +2539,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.99,
-        "away_score": -0.429,
+        "away_score": 0.019,
         "home_fade": 1.3,
         "away_fade": 0.884,
-        "reason": "Direction nette: St. Louis Cardinals (-0.43)",
+        "reason": "Direction nette: St. Louis Cardinals (+0.02)",
         "detail": [
           {
             "side": "home",
@@ -2647,6 +2561,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.448
           },
           {
             "side": "away",
@@ -2835,72 +2755,6 @@
       }
     },
     {
-      "event_id": "401815258",
-      "source_event_ids": [
-        "401815258"
-      ],
-      "kickoff": "2026-05-08T23:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Boston Red Sox",
-      "away": "Tampa Bay Rays",
-      "match": "Boston Red Sox - Tampa Bay Rays",
-      "decision": "lean_home",
-      "net_team": "Boston Red Sox",
-      "reason": "Tampa Bay Rays plus penalise par calendrier/voyage (0.75 vs 0.30)",
-      "pressure_score": 1.782,
-      "home_fade": 0.3,
-      "away_fade": 0.748,
-      "travel_score": 0.448,
-      "lookahead_score": 1.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "travel_extreme": 1
-      },
-      "contexts": [
-        "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours",
-        "Deplacement estime 1928 km, decalage ~0.8h"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.638,
-        "away_score": -0.433,
-        "home_fade": 0.9,
-        "away_fade": 0.748,
-        "reason": "Signaux opposes: Boston Red Sox fade 0.90, Tampa Bay Rays fade 0.75 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.448
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815294",
       "source_event_ids": [
         "401815294"
@@ -2991,11 +2845,11 @@
       "global_resolution": {
         "status": "mixed",
         "net_side": null,
-        "home_score": -0.234,
-        "away_score": -0.84,
-        "home_fade": 1.0,
+        "home_score": -0.173,
+        "away_score": -0.861,
+        "home_fade": 0.939,
         "away_fade": 2.19,
-        "reason": "Signaux mitigés: avantage net trop faible (Philadelphia Phillies -0.23, Colorado Rockies -0.84)",
+        "reason": "Signaux mitigés: avantage net trop faible (Philadelphia Phillies -0.17, Colorado Rockies -0.86)",
         "detail": [
           {
             "side": "away",
@@ -3007,7 +2861,7 @@
             "side": "home",
             "type": "market_move",
             "direction": "drift",
-            "strength": 1.0
+            "strength": 0.939
           },
           {
             "side": "away",
