@@ -113,6 +113,44 @@ test.describe('Sticky layout', () => {
     expect(state.tableHead.top).toBeGreaterThanOrEqual(state.toolbar.bottom - 4);
     expect(state.tableHead.top).toBeLessThan(state.toolbar.bottom + 90);
   });
+
+  test('BUG-004/011 keeps secondary page headers above the fold', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'Desktop audit viewport regression.');
+    const cases = [
+      ['performance', '#performance-wrap .page-h1', '#performance-wrap [data-perf-tab]'],
+      ['compare', '#compare-wrap h1', null],
+      ['sante', '#sante-wrap .page-h1', null],
+    ];
+    for (const [hash, headingSelector, secondarySelector] of cases) {
+      await page.goto(URL + '#' + hash);
+      await page.waitForFunction((selector) => {
+        const el = document.querySelector(selector);
+        if (!el) return false;
+        const rect = el.getBoundingClientRect();
+        return rect.width > 0 && rect.height > 0;
+      }, headingSelector, { timeout: 15000 });
+      await page.waitForTimeout(hash === 'performance' ? 1400 : 600);
+      const state = await page.evaluate(({ headingSelector, secondarySelector }) => {
+        const metric = selector => {
+          const el = selector ? document.querySelector(selector) : null;
+          if (!el) return null;
+          const r = el.getBoundingClientRect();
+          return { y: Math.round(r.top), bottom: Math.round(r.bottom) };
+        };
+        return {
+          heading: metric(headingSelector),
+          secondary: metric(secondarySelector),
+          filtersVisible: (() => {
+            const filters = document.getElementById('filters');
+            return !!filters && getComputedStyle(filters).display !== 'none' && filters.getBoundingClientRect().height > 0;
+          })(),
+        };
+      }, { headingSelector, secondarySelector });
+      expect(state.heading.y, `${hash} heading y`).toBeLessThan(320);
+      expect(state.filtersVisible, `${hash} empty filters hidden`).toBe(false);
+      if (secondarySelector) expect(state.secondary.y, `${hash} sub-tabs y`).toBeLessThan(440);
+    }
+  });
 });
 
 test.describe('Hub navigation', () => {

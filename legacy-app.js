@@ -26853,7 +26853,7 @@ return `
     // site (ni manuel, ni import Winamax). Tout le tracking utilisateur
     // a été désactivé.
     // tous les autres comme onglets internes (cf. renderPerformancePage).
-    const suiviPages = ['performance', 'historique', 'bilan', 'backtest'];
+    const suiviPages = ['historique', 'bilan', 'backtest'];
     const isSuivi = suiviPages.includes(currentPage);
     let suiviNav = document.getElementById('suivi-subnav');
     if (isSuivi) {
@@ -27926,11 +27926,10 @@ wrap.innerHTML = `
           <h1 class="page-h1">🎯 Performance</h1>
           <div class="u-text-md u-text-dim">Synthèse du modèle sur ${n} pari${n > 1 ? 's' : ''} simulé${n > 1 ? 's' : ''}. Drill-down dans les onglets : Historique, Bilan, Backtest.</div>
           ${archiveNote}
+          ${subTabsHtml}
         </div>
 
         ${_healthWidget}
-
-        ${subTabsHtml}
 
         ${userPnlHeatmapHtml}
         ${bankrollProjectorHtml}
