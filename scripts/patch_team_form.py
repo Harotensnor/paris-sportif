@@ -7,7 +7,12 @@ stable L10 fields used by the model and health checks.
 """
 import json
 import re
+import sys
 from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE)) if str(HERE) not in sys.path else None
+from io_compressed import read_json as _read_json_any, exists_any as _exists_any
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA_JS = ROOT / 'data.js'
@@ -16,10 +21,11 @@ FORM = ROOT / 'team_form.json'
 
 
 def main():
-    if not DATA_JS.exists() or not FORM.exists():
-        print('[patch_team_form] missing data.js or team_form.json, skipping.')
+    # AUDIT 2026-05-08 v40 — accepte .gz ou plain.
+    if not DATA_JS.exists() or not _exists_any(FORM):
+        print('[patch_team_form] missing data.js or team_form.json(.gz), skipping.')
         return
-    cache = json.loads(FORM.read_text(encoding='utf-8'))
+    cache = _read_json_any(FORM)
     if not cache:
         print('[patch_team_form] empty cache, nothing to patch.')
         return

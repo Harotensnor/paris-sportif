@@ -55,6 +55,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from winamax_map import _norm
+from io_compressed import write_json as _write_json_gz
 
 ROOT = Path(__file__).resolve().parent.parent
 CACHE_DIR = ROOT / '.cache' / 'tennis_sackmann'
@@ -333,10 +334,11 @@ def main() -> int:
         'players': ratings,
         'h2h': h2h,
     }
-    OUTPUT.write_text(json.dumps(payload, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+    # AUDIT 2026-05-08 v40 — gzip (~1.1 MB → ~0.3 MB).
+    written = _write_json_gz(OUTPUT, payload)
     print(f'[{now:%H:%M:%S}] tennis_sackmann: {len(ratings)} players · '
-          f'{len(h2h)} h2h pairs → {OUTPUT.name} '
-          f'({OUTPUT.stat().st_size // 1024} KB)', flush=True)
+          f'{len(h2h)} h2h pairs → {written.name} '
+          f'({written.stat().st_size // 1024} KB)', flush=True)
     return 0
 
 

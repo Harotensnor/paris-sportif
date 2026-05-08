@@ -15,10 +15,15 @@ from __future__ import annotations
 import json
 import math
 import re
+import sys
 from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+
+HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE)) if str(HERE) not in sys.path else None
+from io_compressed import write_json as _write_json_gz
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA_JS = ROOT / "data.js"
@@ -333,7 +338,8 @@ def main() -> int:
         "teams": teams,
         "league_averages": league_avg,
     }
-    OUT_JSON.write_text(json.dumps(out, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    # AUDIT 2026-05-08 v40 — gzip team_priors.json (~1.4 MB → ~0.4 MB).
+    _write_json_gz(OUT_JSON, out)
     js_payload = browser_payload(out)
     OUT_JS.write_text(
         "window.TEAM_PRIORS=" + json.dumps(js_payload, ensure_ascii=False, separators=(",", ":")) + ";\n",

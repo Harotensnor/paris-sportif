@@ -33,6 +33,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from winamax_map import _norm, _name_tokens
+from io_compressed import read_json as _read_json_any, exists_any as _exists_any
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA_JS = ROOT / 'data.js'
@@ -131,11 +132,12 @@ def _h2h_key(a: str, b: str) -> str:
 
 
 def main() -> int:
-    if not RATINGS.exists():
-        print(f'[patch_tennis_features] {RATINGS.name} missing — run '
+    # AUDIT 2026-05-08 v40 — accepte .gz (cf io_compressed).
+    if not _exists_any(RATINGS):
+        print(f'[patch_tennis_features] {RATINGS.name}(.gz) missing — run '
               f'fetch_tennis_sackmann.py first. Skip.', flush=True)
         return 0
-    ratings = json.loads(RATINGS.read_text(encoding='utf-8'))
+    ratings = _read_json_any(RATINGS)
     players = ratings.get('players') or {}
     h2h_pairs = ratings.get('h2h') or {}
     if not players:

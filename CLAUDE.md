@@ -876,9 +876,26 @@ push `data: auto-refresh <UTC>` toutes les 5 min.
 `data.js`, `odds_history.jsonl`, `clubelo.json`, `injuries_soccer.json`,
 `lineups_soccer.json`, `referees_soccer.json`, `team_stats.json`,
 `weather.json`, `weather_geo_cache.json`, `winamax_catalog.json`,
-`winamax_markets.json`, `backtest_report.json`, `backtest_report.md`,
+`backtest_report.json`, `backtest_report.md`,
 `backtest_report_v2.json`, `backtest_report_v2.md`, `health.json`.
 Tous commités car c'est la "base de données" du site statique.
+
+**`winamax_markets.json` (~90 MB)** est volontairement EXCLU du tracking
+git depuis v40 (audit 2026-05-08). Stocké sur une GitHub Release rolling
+`data-cache` (asset `winamax_markets.json.gz`). Le workflow refresh.yml
+le télécharge au boot via `scripts/sync_winamax_markets_release.py download`
+et le ré-uploade en fin de pipeline. Aucun consumer frontend : seul
+`patch_winamax_markets.py` le lit pour injecter la version compactée dans
+`data.js`. Avant : 90 MB × 288 commits/jour = 25 GB/jour ajoutés à
+l'historique git (repo .git → 3.7 GB). Maintenant : zéro impact historique.
+
+**Sidecars `.json.gz` compressés** (v40, audit 2026-05-08) — Plusieurs
+fichiers > 1 MB sont stockés en gzip pour réduire la taille des commits :
+`odds_history.jsonl.gz`, `footballdata.json.gz`, `bayesian_priors.json.gz`,
+`results_archive.jsonl.gz`, `picks_history_summary.json.gz`,
+`team_priors.json.gz`. Les scripts Python lisent transparent via
+`scripts/io_compressed.py` (helper auto-detect .gz). Compression typique
+3-5× → ~25 MB économisés/commit.
 
 ## Tests
 
