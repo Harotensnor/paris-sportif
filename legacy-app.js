@@ -3861,7 +3861,17 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     const wx = match?.winamax || {};
     const markets = wx.markets || {};
     const dataAge = typeof getDataAge === 'function' ? getDataAge().minutes : 9999;
-    const verifiedAt = wx.markets_fetched_at || window.PRONOSTICS_DATA?.generated_at || null;
+    // v37.183 — verifiedAt = plus RECENT des deux. Avant on prenait
+    // wx.markets_fetched_at en priorite meme quand il etait plus vieux que
+    // data.generated_at. Consequence : si fetch_winamax_match_details TTL=1h
+    // skippe un match (cote inchangee), markets_fetched_at restait a hier soir
+    // alors que la pipeline globale a re-tourne il y a 5 min. Picks faussement
+    // stale. Le plus recent timestamp reflete "a quel moment on a confirme
+    // que ce marche existe" — quand le cron global passe, on confirme.
+    const wxMarketsMs = wx.markets_fetched_at ? new Date(wx.markets_fetched_at).getTime() : 0;
+    const dataGenMs = window.PRONOSTICS_DATA?.generated_at ? new Date(window.PRONOSTICS_DATA.generated_at).getTime() : 0;
+    const verifiedAtMs = Math.max(wxMarketsMs, dataGenMs);
+    const verifiedAt = verifiedAtMs > 0 ? new Date(verifiedAtMs).toISOString() : (wx.markets_fetched_at || window.PRONOSTICS_DATA?.generated_at || null);
     const marketAgeMin = v38OddSnapshotAgeMin(verifiedAt);
     // v37.182 — Cote staleness kickoff-aware. Avant : `dataAge > 240` ET
     // `marketAgeMin > 180` flaggaient TOUS les picks "Cote ancienne" dès que
