@@ -17512,7 +17512,11 @@ const v37PickRowKey = (p) => p?.pickUid || `${v37MatchKeyForPick(p)}|${p?.tier |
 const v37DataOnlyScanPool = v37ScanPool;
 const v37DataOnlyPool = (() => {
 const fillTarget = Math.max(0, v37DenseMinimumRows - v36PickPool.length);
-if (!fillTarget || v37DataOnlyScanPool.length <= 10) return [];
+// AUDIT 2026-05-08 v40.10 — Threshold abaissé 10 → 1. Avant : si moins de
+// 11 matchs dans scope (typique : Hier/Aujourd'hui le soir où les matchs
+// finis sortent de exactBookable), v37DataOnlyPool retournait [] direct
+// → 0 lignes. Maintenant on essaie même avec 1 match dispo.
+if (!fillTarget || v37DataOnlyScanPool.length < 1) return [];
 const out = [];
 const pickedMatches = new Set(v36PickPool.map(p => v37MatchKeyForPick(p)));
 for (const m of v37DataOnlyScanPool) {
@@ -17698,7 +17702,7 @@ const v37RenderPool = v37SortedDiverse.length ? v37SortedDiverse.concat(v37DataO
 // User : "je voie énormément de paris avec passer pas assez de signal".
 // Ces picks (verdict='skip', opp<30) polluent la lecture sans valeur. On les
 // cache, mais on les compte pour proposer un toggle "voir matchs faibles".
-const v40HideWeakPicks = (() => {
+const v40HideWeakPrefRaw = (() => {
   try {
     const raw = localStorage.getItem('v40_hideWeakPicks');
     return raw === null ? true : raw === '1' || raw === 'true';
@@ -17714,6 +17718,12 @@ const v40IsWeakPick = (p) => {
   return Number(p?.opportunity || 0) < 30;
 };
 const v40WeakCount = v37RenderPool.filter(v40IsWeakPick).length;
+// AUDIT 2026-05-08 v40.10 — Si après filtrage il ne reste < 3 picks (cas
+// typique : Hier/Aujourd'hui avec matchs finis = tous "weak"), on désactive
+// auto le filtre pour ne pas afficher "Mode secours actif: le tableau est
+// vide". Mieux vaut montrer 10 picks weak que 0 picks utiles.
+const v40StrongCount = v37RenderPool.length - v40WeakCount;
+const v40HideWeakPicks = v40HideWeakPrefRaw && v40StrongCount >= 3;
 const v40RenderPoolFiltered = v40HideWeakPicks ? v37RenderPool.filter(p => !v40IsWeakPick(p)) : v37RenderPool;
 const v36TableRows = v37EnsureTierCoverage(v40RenderPoolFiltered.slice(0, v37DenseRowLimit), v40RenderPoolFiltered);
 const v36UpcomingAll = terminalScanPool
