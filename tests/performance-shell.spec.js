@@ -34,4 +34,25 @@ test.describe('Performance shell', () => {
     await expect(page.locator('link[rel="preload"][href*="data_lite_72h.json"]')).toHaveCount(1);
     await expect(page.locator('style#perf-critical-css')).toHaveCount(1);
   });
+
+  test('BUG-008 defers dashboard table work until the shell is alive', async ({ page }) => {
+    await page.goto('/pronostics.html#dashboard', { waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => Boolean(window.PS_ESM), null, { timeout: 15000 });
+    await page.waitForFunction(() =>
+      document.querySelector('#dashboard-wrap')?.dataset.dashboardRenderedOnce === '1' &&
+      document.querySelectorAll('.v36-picks-table tbody tr.v36-table-row').length > 0,
+      null,
+      { timeout: 15000 }
+    );
+
+    const state = await page.evaluate(() => ({
+      renderedOnce: document.querySelector('#dashboard-wrap')?.dataset.dashboardRenderedOnce,
+      rows: document.querySelectorAll('.v36-picks-table tbody tr.v36-table-row').length,
+      hasLongTaskProbe: typeof window.__longTasks === 'function',
+    }));
+
+    expect(state.renderedOnce).toBe('1');
+    expect(state.rows).toBeGreaterThan(0);
+    expect(state.hasLongTaskProbe).toBeTruthy();
+  });
 });

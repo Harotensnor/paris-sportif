@@ -15988,7 +15988,27 @@ if (k <= 0) { return; } // pas d'edge → pas de mise
     return bits.join('. ') + '.';
   }
 
+  function _scheduleDashboardRender(wrap, reason) {
+    if (!wrap || !document.body.contains(wrap)) return;
+    if (wrap.dataset.dashboardIdleQueued === '1') return;
+    wrap.dataset.dashboardIdleQueued = '1';
+    wrap.dataset.dashboardIdleReason = reason || 'idle';
+    const run = () => {
+      delete wrap.dataset.dashboardIdleQueued;
+      if (wrap && document.body.contains(wrap) && currentPage === 'dashboard') renderDashboardPage(wrap);
+    };
+    if (typeof requestIdleCallback === 'function') {
+      requestIdleCallback(run, { timeout: 500 });
+    } else {
+      requestAnimationFrame(() => setTimeout(run, 0));
+    }
+  }
+
   function renderDashboardPage(wrap) {
+    if (wrap) {
+      delete wrap.dataset.dashboardIdleQueued;
+      wrap.dataset.dashboardRenderedOnce = '1';
+    }
     const data = window.PRONOSTICS_DATA;
     if (!data || !data.days) {
       wrap.innerHTML = '<div style="padding:60px;text-align:center;color:var(--text-dim);">Chargement…</div>';
@@ -15999,7 +16019,7 @@ if (k <= 0) { return; } // pas d'edge → pas de mise
       setTimeout(() => {
         _ensureFullData().then(() => {
           delete wrap.dataset.dashboardFullQueued;
-          if (wrap && document.body.contains(wrap) && currentPage === 'dashboard') renderDashboardPage(wrap);
+          if (wrap && document.body.contains(wrap) && currentPage === 'dashboard') _scheduleDashboardRender(wrap, 'full-data');
         }).catch(() => { delete wrap.dataset.dashboardFullQueued; if (wrap) wrap.dataset.dashboardFullFailed = '1'; });
       }, 600);
     }
@@ -16140,7 +16160,7 @@ state.data = { league: null, marketBias: null, angles: null, rare: null, rareSum
 state.loaded = true;
 }).finally(() => {
 state.loading = false;
-if (wrap && document.body.contains(wrap) && currentPage === 'dashboard') renderDashboardPage(wrap);
+if (wrap && document.body.contains(wrap) && currentPage === 'dashboard') _scheduleDashboardRender(wrap, 'intel-data');
 });
 }
 return state;
@@ -16158,7 +16178,7 @@ fetchTracked(`clv_summary.json?v=${bucket}`, { cache: 'default' }, 'page')
 .catch(() => { state.data = null; state.loaded = true; })
 .finally(() => {
 state.loading = false;
-if (wrap && document.body.contains(wrap) && currentPage === 'dashboard') renderDashboardPage(wrap);
+if (wrap && document.body.contains(wrap) && currentPage === 'dashboard') _scheduleDashboardRender(wrap, 'clv-data');
 });
 }
 return state;
@@ -16672,6 +16692,20 @@ const v37BuildScanPool = (dateFilter) => {
 const historyMode = v37IsHistoryDate(dateFilter);
 return terminalScanPool.filter(m => v37DateMatchesFor(m, dateFilter) && v37PickIsVisibleByClockFor(m, dateFilter, historyMode));
 };
+const v37PrioritizeDashboardScanPool = (pool, limit) => {
+const list = Array.isArray(pool) ? pool.slice() : [];
+if (!limit || list.length <= limit) return list;
+const score = (m) => {
+const ts = new Date(m?.date || 0).getTime();
+const safeTs = Number.isFinite(ts) ? ts : 0;
+const live = !!(m?.live || m?.status === 'STATUS_IN_PROGRESS');
+if (live) return -2_000_000_000_000 + safeTs;
+if (!m?.completed && !_isMatchEffectivelyDone(m) && safeTs >= _dashboardNowMs) return Math.abs(safeTs - _dashboardNowMs);
+if (m?.completed || _isMatchEffectivelyDone(m)) return 2_000_000_000_000 + Math.abs(_dashboardNowMs - safeTs);
+return 3_000_000_000_000 + Math.abs(safeTs - _dashboardNowMs);
+};
+return list.sort((a, b) => score(a) - score(b)).slice(0, limit);
+};
 const v36TeamName = (team) => team?.short || team?.displayName || team?.name || '?';
 const v37StableMatchKey = (m) => {
 if (!m) return '';
@@ -16761,6 +16795,9 @@ const v37ReadableMetricHtml = (metric, tone) => `<span class="v37-readable-metri
 let v37ScanPool = v37BuildScanPool(v37DateFilter);
 const v37InitialDateFilter = v37DateFilter;
 const v37InitialScanPoolLength = v37ScanPool.length;
+const v37DashboardScanLimit = v37DateFilter === 'all' ? 96 : 64;
+const v37ScanPoolCappedFrom = v37ScanPool.length > v37DashboardScanLimit ? v37ScanPool.length : 0;
+v37ScanPool = v37PrioritizeDashboardScanPool(v37ScanPool, v37DashboardScanLimit);
 const v37MinDenseDailyScanPool = 60;
 const v37CanAutoHorizonLowPool = false;
 if (v37CanAutoHorizonLowPool && v37ScanPool.length < v37MinDenseDailyScanPool) {
@@ -17301,7 +17338,7 @@ const v36Next = v36UpcomingAll.slice(0, 6);
 const v37ScopeLabel = v37IsAllHorizon ? '7 prochains jours' : v37DateLabel(v37DateFilter);
 const v37DisplayTotal = v36TableRows.length;
 const v37QualifiedMatchCount = new Set(v36PickPool.map(p => v37MatchKeyForPick(p))).size;
-const v37ScopeMatchDenominator = v37ScanPool.length || terminalScanPool.length;
+const v37ScopeMatchDenominator = v37InitialScanPoolLength || v37ScanPool.length || terminalScanPool.length;
 const v37QualificationRate = v37ScopeMatchDenominator ? Math.round((v37QualifiedMatchCount / v37ScopeMatchDenominator) * 100) : 0;
 const v36CoverageLine = `${v37DisplayTotal} lignes visibles · ${v37QualifiedMatchCount}/${v37ScopeMatchDenominator} matchs du scope avec pick (${v37QualificationRate}%) · ${v36PickPool.length} picks qualifies · ${v37DataOnlyPool.length} lignes data · ${v36UpcomingAll.length} a venir · ${v37LiveAll.length} live · ${v37FinishedAll.length} termines · data ${_dataAgeMin} min`;
 const v37CountBy = (rows, keyFn, limit) => Object.entries((rows || []).reduce((acc, row) => {
@@ -17381,6 +17418,8 @@ terminalScanPool: terminalScanPool.length,
 v37ScanPool: v37ScanPool.length,
 v37InitialDateFilter,
 v37InitialScanPoolLength,
+v37ScanPoolCappedFrom,
+v37DashboardScanLimit,
 v37MinDenseDailyScanPool,
 v37DenseMinimumRows,
 v37HashDate,
@@ -17717,7 +17756,7 @@ fetchTracked('boosted_odds.json?t=' + Math.floor(Date.now() / 300000), { cache: 
 .catch(() => { window.__v36BoostedOddsData = { status: 'unavailable', boosts: [] }; })
 .finally(() => {
 window.__v36BoostedOddsLoading = false;
-if (wrap && document.body.contains(wrap) && currentPage === 'dashboard') renderDashboardPage(wrap);
+if (wrap && document.body.contains(wrap) && currentPage === 'dashboard') _scheduleDashboardRender(wrap, 'boosted-odds');
 });
 }
 const v36BoostData = window.__v36BoostedOddsData || null;
@@ -26982,7 +27021,10 @@ dashWrap.id = 'dashboard-wrap';
 (document.querySelector('main') || document.body).appendChild(dashWrap);
 }
 dashWrap.style.display = isDashboard ? '' : 'none';
-if (isDashboard) renderDashboardPage(dashWrap);
+if (isDashboard) {
+if (dashWrap.dataset.dashboardRenderedOnce === '1') renderDashboardPage(dashWrap);
+else _scheduleDashboardRender(dashWrap, 'initial');
+}
 document.body.classList.toggle('agent-home', isDashboard);
 document.body.classList.toggle('agent-inside', !isDashboard);
 const _rb = document.getElementById('agent-return-btn');
