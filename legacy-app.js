@@ -15566,10 +15566,21 @@ const n = h.checks.filter(c => c.status === 'warn' || c.status === 'crit').lengt
 const critN = h.checks.filter(c => c.status === 'crit').length;
 const badge = document.getElementById('count-sante-alerts');
 if (!badge) return;
-badge.textContent = n;
+const label = n > 9 ? '9+' : String(n);
+const plural = n > 1 ? 's' : '';
+const critPlural = critN > 1 ? 's' : '';
+const title = n
+  ? `${n} alerte${plural} santé site en attente${critN ? `, dont ${critN} critique${critPlural}` : ''}.`
+  : 'Aucune alerte santé site en attente.';
+badge.textContent = label;
 badge.style.display = n ? '' : 'none';
 badge.style.background = critN > 0 ? 'rgba(248,113,113,.25)' : 'rgba(234,179,8,.25)';
 badge.style.color = critN > 0 ? '#f87171' : '#eab308';
+badge.title = title;
+badge.setAttribute('aria-label', title);
+badge.dataset.badgeKind = 'site-health-alerts';
+const navItem = badge.closest('[data-page]');
+if (navItem) navItem.title = title;
 }
 
 
@@ -17548,10 +17559,17 @@ if (p.opportunity >= 60) return 'Lecture simple : pari jouable, mais pas automat
 if (p.edge >= 0.04) return 'Lecture simple : il y a de la value, mais le risque reste plus haut. À jouer petit ou à surveiller.';
 return 'Lecture simple : avantage faible ou données incomplètes. À lire pour info, pas une priorité.';
 };
+const v37IsStaleLive = (m) => {
+const live = !!(m?.live || String(m?.status || '') === 'STATUS_IN_PROGRESS');
+if (!live) return false;
+const kickoff = new Date(m?.date || 0).getTime();
+return Number.isFinite(kickoff) && (_dashboardNowMs - kickoff) > 5 * 60 * 60 * 1000;
+};
+try { window.__v37IsStaleLive = v37IsStaleLive; } catch(e) { /* test hook only */ }
 const v37ResultForPick = (p) => {
 if (!v37ShowResultColumn) return null;
 const status = String(p.m?.status || '');
-if (p.m?.live || status === 'STATUS_IN_PROGRESS') return 'live';
+if (p.m?.live || status === 'STATUS_IN_PROGRESS') return v37IsStaleLive(p.m) ? 'stale_live' : 'live';
 if (!p.m?.completed) return _isMatchEffectivelyDone(p.m) ? 'void' : 'pending';
 let res = null;
 try {
@@ -17569,6 +17587,7 @@ if (res === 'won') return '<span class="v37-result v37-result--won">Gagné</span
 if (res === 'lost') return '<span class="v37-result v37-result--lost">Perdu</span>';
 if (res === 'void') return '<span class="v37-result v37-result--void">Remboursé</span>';
 if (res === 'live') return '<span class="v37-result v37-result--live">LIVE</span>';
+if (res === 'stale_live') return '<span class="v37-result v37-result--stale-live" title="Statut live non rafraîchi depuis plus de 5h : résultat à vérifier.">STALE LIVE</span>';
 return '<span class="v37-result v37-result--pending">À venir</span>';
 };
 const v36TableRow = (p, idx) => {
@@ -17636,10 +17655,6 @@ const v37DayNavHtml = `<section class="v37-day-nav" aria-label="Navigation jour 
         ${v37DayChip('Hier', v37AddDays(todayIso, -1), v37DateLabel(v37AddDays(todayIso, -1)))}
         ${v37DayChip("Aujourd'hui", todayIso, v37DateLabel(todayIso))}
         ${v37DayChip('Demain', v37AddDays(todayIso, 1), v37DateLabel(v37AddDays(todayIso, 1)))}
-        ${v37DayChip('J+2', v37AddDays(todayIso, 2), v37DateLabel(v37AddDays(todayIso, 2)))}
-        ${v37DayChip('J+3', v37AddDays(todayIso, 3), v37DateLabel(v37AddDays(todayIso, 3)))}
-        ${v37DayChip('J+4', v37AddDays(todayIso, 4), v37DateLabel(v37AddDays(todayIso, 4)))}
-        ${v37DayChip('J+5', v37AddDays(todayIso, 5), v37DateLabel(v37AddDays(todayIso, 5)))}
         <label class="v37-date-picker"><span>Date</span><input type="date" data-v37-date-input value="${esc(v37DateFilter === 'all' ? todayIso : v37DateFilter)}"></label>
         <label class="v37-live-toggle"><input type="checkbox" data-v37-live-toggle ${v37IncludeLive ? 'checked' : ''}><span>Inclure LIVE</span></label>
       </section>`;
