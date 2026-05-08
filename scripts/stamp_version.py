@@ -20,6 +20,7 @@ drift the first deep probe found.
 """
 from __future__ import annotations
 
+import argparse
 import re
 import subprocess
 import sys
@@ -57,11 +58,27 @@ def stamp_html(target: str) -> bool:
         return False
     text = HTML.read_text(encoding="utf-8")
     new = re.sub(
-        r'(<span\b(?=[^>]*\bid="footer-version"\b)[^>]*\btitle="Voir les nouveautés )v\d+\.\d+("[^>]*>)v\d+\.\d+(</span>)',
+        r'(<span\b(?=[^>]*\bid="footer-version")[^>]*\btitle="Voir les nouveautés )v\d+\.\d+("[^>]*>)v\d+\.\d+(</span>)',
         rf'\g<1>{target}\g<2>{target}\g<3>',
         text,
         count=1,
     )
+    if new == text:
+        def repl(match: re.Match[str]) -> str:
+            open_tag = re.sub(
+                r'title="Voir les nouveautés v\d+\.\d+"',
+                f'title="Voir les nouveautés {target}"',
+                match.group(1),
+                count=1,
+            )
+            return f"{open_tag}{target}{match.group(2)}"
+
+        new = re.sub(
+            r'(<span\b(?=[^>]*\bid="footer-version")[^>]*>)v\d+\.\d+(</span>)',
+            repl,
+            text,
+            count=1,
+        )
     if new != text:
         HTML.write_text(new, encoding="utf-8")
         return True
@@ -72,20 +89,19 @@ def stamp_app_js(target: str) -> bool:
     if not APP_JS.exists():
         return False
     text = APP_JS.read_text(encoding="utf-8")
-    new = re.sub(
-        r"version:\s*'v\d+\.\d+'",
-        f"version: '{target}'",
-        text,
-        count=1,
-    )
+    new = re.sub(r"const\s+VERSION\s*=\s*'v\d+\.\d+'", f"const VERSION = '{target}'", text, count=1)
+    new = re.sub(r"version:\s*'v\d+\.\d+'", f"version: '{target}'", new, count=1)
     if new != text:
         APP_JS.write_text(new, encoding="utf-8")
         return True
     return False
 
 
-def main() -> int:
-    target = latest_version_from_git()
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--target", help="Version à écrire, par exemple v37.187")
+    args = parser.parse_args(argv)
+    target = args.target or latest_version_from_git()
     if not target:
         print("[stamp_version] could not derive version from git history", file=sys.stderr)
         return 0  # do not break the cron — version is cosmetic
