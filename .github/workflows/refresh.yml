@@ -170,8 +170,12 @@ jobs:
           # v35.26 — Top-up léger des pages match Winamax à CHAQUE refresh.
           # Le catalog tournament garde le 1N2, puis ce passage remplit
           # progressivement O/U, handicaps, BTTS, score exact, totals, etc.
-          # TTL 1h = pas de re-hit inutile des matchs déjà détaillés.
-          WINAMAX_DETAILS_CAP=300 WINAMAX_DETAILS_SLEEP=0.10 python3 fetch_winamax_match_details.py --limit 300 --ttl-hours 1 --horizon-days 30 || true
+          # AUDIT 2026-05-08 v39.2 — TTL baissé 1h → 0.5h pour valider plus
+          # agressivement les cotes des marchés secondaires. User feedback :
+          # "je veux pas de paris à cote pas validée". Le frontend filtre
+          # désormais sur v38OddTopEligible — donc plus on valide vite, plus
+          # de picks sont visibles dans le dashboard.
+          WINAMAX_DETAILS_CAP=400 WINAMAX_DETAILS_SLEEP=0.10 python3 fetch_winamax_match_details.py --limit 400 --ttl-hours 0.5 --horizon-days 30 || true
           python3 patch_winamax_markets.py || true
           # v33.30 — Fetchers pour données qu'on patchera ensuite via patch_all_quick.
           python3 fetch_tennis_sackmann.py || true
@@ -184,7 +188,9 @@ jobs:
             # basket, baseball, hockey, MMA) sur le pool exact priorisé.
             # Tourne toutes les 15 min, après que patch_winamax_markets a
             # mis match_id sur les events ESPN.
-            WINAMAX_DETAILS_CAP=900 WINAMAX_DETAILS_SLEEP=0.10 python3 fetch_winamax_match_details.py --limit 900 --ttl-hours 1 --horizon-days 30 || true
+            # v39.2 : limite augmentée 900 → 1000 + TTL 0.5h pour mieux
+            # rattraper les cotes "à vérifier".
+            WINAMAX_DETAILS_CAP=1000 WINAMAX_DETAILS_SLEEP=0.10 python3 fetch_winamax_match_details.py --limit 1000 --ttl-hours 0.5 --horizon-days 30 || true
             python3 patch_winamax_markets.py || true   # re-patch pour appliquer les nouveaux markets
           fi
           # v33.30 — MEGA-PATCHER : applique 13 enrichissements légers en
