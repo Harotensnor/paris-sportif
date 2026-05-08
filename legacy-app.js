@@ -3619,6 +3619,12 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
       .v38-open-analysis{display:inline-flex;margin-top:6px;color:var(--brand);font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.04em}
       .v37-beginner-copy{display:block;margin-top:6px;color:var(--text-dim);font-size:11px;line-height:1.35;max-width:360px}
       .v37-beginner-copy b{color:var(--text);font-weight:900}
+      .v37-readable-metric{display:inline-flex;flex-direction:column;gap:2px;align-items:flex-end;min-width:84px;line-height:1.1}
+      .v37-readable-metric b{font-size:12px;color:var(--text);font-weight:950;white-space:nowrap}
+      .v37-readable-metric em{font-size:10px;color:var(--text-dim2);font-style:normal;white-space:nowrap}
+      .v36-table-row.is-odd-blocked{opacity:.78}
+      .v36-table-row.is-odd-blocked .v37-opportunity{filter:saturate(.6)}
+      .v36-table-card.is-odd-blocked{border-color:rgba(245,158,11,.26)}
       @media (max-width:720px){.v38-prono-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.v38-prono-hero h3{font-size:20px}.v38-alt-table{font-size:11px}.v38-alt-table th:nth-child(4),.v38-alt-table td:nth-child(4){display:none}}
     `;
     document.head.appendChild(st);
@@ -3628,7 +3634,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     const map = {
       verified: { label: 'Cote validée', tone: 'good', detail: 'Prix exact retrouvé dans les marchés Winamax du match.' },
       changed: { label: 'Cote changée', tone: 'warn', detail: 'Le prix Winamax a changé depuis l’affichage initial : prudence, seule une vérification récente peut rester jouable.' },
-      stale: { label: 'Cote ancienne', tone: 'warn', detail: 'La cote provient d’un snapshot trop ancien : prudence avant action.' },
+      stale: { label: 'Cote ancienne', tone: 'warn', detail: 'Snapshot trop ancien : ce pick n’est pas prioritaire tant que la cote Winamax n’est pas revérifiée.' },
       mismatch: { label: 'Cote suspecte', tone: 'bad', detail: 'La sélection ou la ligne ne correspond pas proprement au marché Winamax.' },
       missing: { label: 'Non vérifiée', tone: 'bad', detail: 'Aucun prix Winamax exact n’a été retrouvé pour ce pick.' },
       suspicious: { label: 'Cote suspecte', tone: 'bad', detail: 'Prix ou edge anormal : vérifier le mapping avant de miser.' },
@@ -3822,6 +3828,21 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     return 'À éviter';
   }
 
+  function v38PronoAction(score, edge, oddMeta) {
+    const status = String(oddMeta?.status || 'missing');
+    if (!v38OddTopEligible(oddMeta)) {
+      const reason = v38OddStatusMeta(status).detail || oddMeta?.reason || 'Cote non validée.';
+      return {
+        label: status === 'stale' ? 'Ne pas prioriser' : 'Vérifier avant pari',
+        text: reason,
+        stake: '0 € tant que la cote n’est pas confirmée',
+      };
+    }
+    if (score >= 80 && edge >= 0.03) return { label: 'Priorité haute', text: 'Cote retrouvée et signaux alignés. Mise raisonnable, pas de sur-exposition.', stake: 'Mise normale selon bankroll' };
+    if (score >= 60) return { label: 'Jouable', text: 'Pick correct, mais la marge n’est pas énorme. Rester discipliné.', stake: 'Mise réduite' };
+    return { label: 'Lecture seule', text: 'Signal utile pour suivre le match, pas assez propre pour être prioritaire.', stake: 'Pas de mise automatique' };
+  }
+
   function v38MissingSignals(match, pred, candidate) {
     const rows = [];
     const add = (ok, label, missing) => rows.push(ok ? `${label} disponible` : missing);
@@ -3874,6 +3895,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     const oddMeta = validatePickOdd(match, candidate, pred);
     const history = v38SegmentHistory(match, candidate);
     const verdict = v38PickVerdict(score, edge, oddMeta);
+    const action = v38PronoAction(score, edge, oddMeta);
     const implied = odd > 1 ? 1 / odd : 0;
     const alternatives = (() => {
       try {
@@ -3914,6 +3936,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
             <p>${esc(sportLabel(match.sport || ''))} · ${esc(match.league_name || match.league || 'Ligue inconnue')} · ${esc(fmtTime(match.date))}</p>
             <h3>${esc(candidate.label || pred.pick?.label || 'Pari recommandé')} ${odd ? `<span>@${odd.toFixed(2)}</span>` : ''}</h3>
             <p>${esc(home?.name || 'Domicile')} vs ${esc(away?.name || 'Extérieur')} · verdict : <b>${esc(verdict)}</b></p>
+            <p><b>${esc(action.label)}</b> · ${esc(action.text)}</p>
           </div>
           <div>${v38OddStatusChip(oddMeta)}</div>
         </div>
@@ -3924,6 +3947,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
           ${infoCard('Edge', `${edge >= 0 ? '+' : ''}${(edge * 100).toFixed(1)}pt`, 'Écart modèle vs bookmaker')}
           ${infoCard('Tier', esc(candidate.tier || candidate.discipline?.label || '—'), 'Niveau de risque/gain')}
           ${infoCard('Cote', odd ? `@${odd.toFixed(2)}` : '—', v38OddStatusMeta(oddMeta.status).label)}
+          ${infoCard('Mise', esc(action.stake), esc(action.label))}
         </div>
       </section>
       <section class="section v38-prono-section">
@@ -3939,6 +3963,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
         <h4>Pourquoi ce pick</h4>
         <div class="v38-info-grid">
           ${infoCard('Prix juste', `${Math.round(rel * 100)}% modèle vs ${Math.round(implied * 100)}% marché`, `Le modèle voit ${edge >= 0 ? 'un avantage' : 'peu de value'} de ${edge >= 0 ? '+' : ''}${(edge * 100).toFixed(1)}pt.`)}
+          ${infoCard('Action conseillée', esc(action.label), esc(action.text))}
           ${infoCard('Raison principale', esc(signalsPositive[0] || reasons[0] || 'Signal principal non disponible'), esc(signalsPositive[1] || 'Aucun second signal fort détecté.'))}
           ${infoCard('Risque principal', esc(risks[0] || 'Aucun risque majeur détecté sur ce snapshot'), 'Réduire la mise si ce point te gêne.')}
         </div>
@@ -16632,6 +16657,37 @@ if (odd >= 3.00 && odd < 5.00 && conf >= 0.18 && edge >= 0.03) return { id: 'big
 if (odd >= 5.00 && conf >= 0.06 && edge >= 0.05) return { id: 'out', strict: edge >= 0.10 };
 return null;
 };
+const v37OddPriorityState = (meta) => {
+const status = String(meta?.status || 'missing');
+if (status === 'verified') return 'ok';
+if (status === 'changed' && typeof v38OddTopEligible === 'function' && v38OddTopEligible(meta)) return 'watch';
+return 'blocked';
+};
+const v37OddPriorityRank = (p) => {
+const state = v37OddPriorityState(p?.oddValidation);
+return state === 'ok' ? 0 : state === 'watch' ? 1 : 2;
+};
+const v37ApplyOddPriorityCap = (score, meta) => {
+const n = Math.max(0, Math.min(100, Number(score) || 0));
+const state = v37OddPriorityState(meta);
+if (state === 'ok') return n;
+if (state === 'watch') return Math.min(n, 72);
+const status = String(meta?.status || 'missing');
+if (status === 'stale') return Math.min(n, 38);
+if (status === 'changed') return Math.min(n, 49);
+return Math.min(n, 34);
+};
+const v37ReadableConfidence = (rel) => {
+const pct = Math.round(Number(rel || 0) * 100);
+const label = pct >= 70 ? 'Forte' : pct >= 58 ? 'Correcte' : pct >= 45 ? 'Moyenne' : 'Fragile';
+return { label, detail: `${pct}% modele` };
+};
+const v37ReadableEdge = (edge) => {
+const pct = Number(edge || 0) * 100;
+const label = pct >= 8 ? 'Gros avantage' : pct >= 4 ? 'Avantage' : pct >= 1.5 ? 'Petit plus' : pct >= 0 ? 'Faible' : 'Defavorable';
+return { label, detail: `${pct >= 0 ? '+' : ''}${pct.toFixed(1)}pt vs cote` };
+};
+const v37ReadableMetricHtml = (metric, tone) => `<span class="v37-readable-metric ${tone ? `is-${esc(tone)}` : ''}"><b>${esc(metric.label)}</b><em>${esc(metric.detail)}</em></span>`;
 let v37ScanPool = v37BuildScanPool(v37DateFilter);
 const v37InitialDateFilter = v37DateFilter;
 const v37InitialScanPoolLength = v37ScanPool.length;
@@ -16728,8 +16784,17 @@ return null;
 }
 const investmentScoreValue = Number(c.investment?.score || 0);
 const intel = v37OpportunityFor(m, tier, rel, edge, ev, odd, c, pred);
-const opportunityBadges = edgeCapped ? ['Edge plafonné'].concat(intel.badges || []) : (intel.badges || []);
 const oddValidation = typeof validatePickOdd === 'function' ? validatePickOdd(m, c, pred) : { status: c.exact ? 'verified' : 'missing' };
+const opportunity = v37ApplyOddPriorityCap(intel.score, oddValidation);
+const oddState = v37OddPriorityState(oddValidation);
+const oddBadgeLabel = oddState === 'blocked' && typeof v38OddStatusMeta === 'function'
+? v38OddStatusMeta(oddValidation.status).label
+: '';
+const opportunityBadges = [
+...(oddBadgeLabel ? [oddBadgeLabel] : []),
+...(edgeCapped ? ['Edge plafonné'] : []),
+...(intel.badges || [])
+];
 return {
 m, pred, best: c, tier: tier.id, strict: tier.strict, odd, rel, edge, ev, rawEdge, rawEv, edgeCapped, edgeAnomaly,
 oddValidation,
@@ -16743,11 +16808,11 @@ marketName: c.marketName || c.market || '',
 market: c.market || '1n2',
 line: c.line ?? '',
 pickKey: c.pickValue || c.pickKey || c.key || pred.pick?.key || '',
-opportunity: intel.score,
+opportunity,
 opportunityBadges,
-opportunityTooltip: edgeCapped ? `${intel.tooltip} · Edge brut ${(rawEdge * 100).toFixed(1)}% plafonné à ${(edge * 100).toFixed(1)}% pour éviter un faux signal.` : intel.tooltip,
+opportunityTooltip: `${intel.tooltip}${edgeCapped ? ` · Edge brut ${(rawEdge * 100).toFixed(1)}% plafonné à ${(edge * 100).toFixed(1)}% pour éviter un faux signal.` : ''}${oddState === 'blocked' ? ` · Cote non prioritaire : ${v38OddStatusMeta(oddValidation.status).detail}` : ''}`,
 ts: new Date(m.date || 0).getTime(),
-score: (tier.strict ? 24 : 0) + Math.min(60, investmentScoreValue) * 0.55 + intel.score * 0.7 + Math.max(-12, edge * 70) + rel * 6 - (edgeAnomaly ? 18 : 0) - (pred.abstain?.active ? 12 : 0)
+score: (tier.strict ? 24 : 0) + Math.min(60, investmentScoreValue) * 0.55 + opportunity * 0.7 + Math.max(-12, edge * 70) + rel * 6 - (edgeAnomaly ? 18 : 0) - (pred.abstain?.active ? 12 : 0) - (oddState === 'blocked' ? 30 : oddState === 'watch' ? 6 : 0)
 };
 })
 .filter(Boolean)
@@ -16973,12 +17038,13 @@ v37Reject('filtre_localstorage_reset');
 const v36CountsAll = Object.fromEntries(v36TierDefs.map(t => [t.id, v36PickPool.filter(p => p.tier === t.id).length]));
 const v36Total = v36Filtered.length;
 const v36Sorted = v36Filtered.slice().sort((a, b) => {
-if (v36Sort === 'date' || v36Sort === 'time') return (a.ts - b.ts) || (v36TierRank[a.tier] - v36TierRank[b.tier]) || (b.odd - a.odd);
-if (v36Sort === 'odd') return (b.odd - a.odd) || (v36TierRank[a.tier] - v36TierRank[b.tier]) || (a.ts - b.ts);
-if (v36Sort === 'conf') return (b.rel - a.rel) || (b.edge - a.edge) || (a.ts - b.ts);
-if (v36Sort === 'edge') return (b.edge - a.edge) || (b.odd - a.odd) || (a.ts - b.ts);
-if (v36Sort === 'score') return (b.opportunity - a.opportunity) || (b.edge - a.edge) || (a.ts - b.ts);
-return (v36TierRank[a.tier] - v36TierRank[b.tier]) || (b.odd - a.odd) || (b.edge - a.edge) || (a.ts - b.ts);
+const oddRank = v37OddPriorityRank(a) - v37OddPriorityRank(b);
+if (v36Sort === 'date' || v36Sort === 'time') return (a.ts - b.ts) || oddRank || (v36TierRank[a.tier] - v36TierRank[b.tier]) || (b.odd - a.odd);
+if (v36Sort === 'odd') return oddRank || (b.odd - a.odd) || (v36TierRank[a.tier] - v36TierRank[b.tier]) || (a.ts - b.ts);
+if (v36Sort === 'conf') return oddRank || (b.rel - a.rel) || (b.edge - a.edge) || (a.ts - b.ts);
+if (v36Sort === 'edge') return oddRank || (b.edge - a.edge) || (b.odd - a.odd) || (a.ts - b.ts);
+if (v36Sort === 'score') return oddRank || (b.opportunity - a.opportunity) || (b.edge - a.edge) || (a.ts - b.ts);
+return oddRank || (v36TierRank[a.tier] - v36TierRank[b.tier]) || (b.opportunity - a.opportunity) || (b.odd - a.odd) || (b.edge - a.edge) || (a.ts - b.ts);
 });
 const v37ApplyTopMarketDiversity = (rows) => {
 const list = Array.isArray(rows) ? rows.slice() : [];
@@ -17081,6 +17147,8 @@ exact: source === 'winamax_exact'
 };
 candidate.oddValidation = typeof validatePickOdd === 'function' ? validatePickOdd(m, candidate, pred) : { status: source === 'winamax_exact' ? 'verified' : 'missing' };
 const intel = v37OpportunityFor(m, tier, rel, edge, ev, odd, candidate, pred);
+const opportunity = v37ApplyOddPriorityCap(Math.max(20, Math.min(68, intel.score || Math.round(rel * 70))), candidate.oddValidation);
+const oddState = v37OddPriorityState(candidate.oddValidation);
 out.push({
 m, pred, best: candidate, tier: tier.id, strict: false, odd, rel, edge, ev,
 oddValidation: candidate.oddValidation,
@@ -17094,11 +17162,11 @@ marketName: candidate.marketName,
 market: '1n2',
 line: '',
 pickKey: pk,
-opportunity: Math.max(20, Math.min(68, intel.score || Math.round(rel * 70))),
-opportunityBadges: ['data fiable'],
-opportunityTooltip: `Ligne data-only : aucun pick haut-conviction ne passe les seuils. Cote ${source === 'winamax_exact' ? 'Winamax' : 'indicative'} à vérifier avant action.`,
+opportunity,
+opportunityBadges: oddState === 'blocked' ? ['data fiable', v38OddStatusMeta(candidate.oddValidation.status).label] : ['data fiable'],
+opportunityTooltip: `Ligne data-only : aucun pick haut-conviction ne passe les seuils. Cote ${source === 'winamax_exact' ? 'Winamax' : 'indicative'} à vérifier avant action.${oddState === 'blocked' ? ` ${v38OddStatusMeta(candidate.oddValidation.status).detail}` : ''}`,
 ts: new Date(m.date || 0).getTime(),
-score: Math.max(20, Math.min(70, (rel * 80) + Math.max(-10, edge * 100))),
+score: Math.max(10, Math.min(70, (rel * 80) + Math.max(-10, edge * 100) - (oddState === 'blocked' ? 28 : oddState === 'watch' ? 6 : 0))),
 dataOnly: true
 });
 pickedMatches.add(matchKey);
@@ -17316,18 +17384,7 @@ const v37DenseFallbackHtml = (v36PickPool.length > 0 && v37DataOnlyPool.length >
         <span>${v36PickPool.length} picks qualifiés seulement sur ce scope ; ${v37DataOnlyPool.length} matchs data fiables ont été ajoutés pour atteindre une lecture exploitable. Les lignes "data fiable" restent à vérifier chez Winamax.</span>
       </section>` : '';
 const v37FilterResetHtml = v37FilterResetNotice ? `<section class="v37-empty-pool-help is-info"><strong>Filtres corriges</strong><span>${esc(v37FilterResetNotice)}</span></section>` : '';
-const v37DecisionGuideSeen = safeLocalStorageGet('paris_sportif_decision_guide_seen', '') === '1';
-const v37DecisionGuideHtml = `<details class="v37-decision-guide" ${v37DecisionGuideSeen ? '' : 'open'} data-v37-decision-guide>
-        <summary>Comment choisir un pari <span>score, tier, cote : l'ordre simple</span></summary>
-        <ol>
-          <li><b>Score 0-100</b> : combine tous les signaux. 70+ = très solide, 60-69 = jouable, moins = mise réduite.</li>
-          <li><b>Tier</b> : Sûr = peu de risque, Solide = équilibre, Big odds / Outsider = gros gain mais plus de variance.</li>
-          <li><b>Cote</b> : choisis selon ton appétit risque. @1.30 = prudent, @5.00+ = outsider.</li>
-          <li><b>Edge (avantage)</b> : dit si la cote semble sous-évaluée. Plus c'est haut, mieux c'est.</li>
-          <li class="novice-only"><b>Pourquoi cette cote ?</b> La cote traduit le risque vu par le marché : @2.00 veut dire environ 50% implicite. Si notre modèle voit 56%, le pari a un petit avantage.</li>
-          <li class="expert-only"><b>Mode expert</b> : priorise score, edge, EV et Kelly ; les aides longues sont repliées pour garder le tableau dense.</li>
-        </ol>
-      </details>`;
+const v37DecisionGuideHtml = '';
 const v36FilterButton = (kind, value, label, active) => `<button type="button" class="v36-filter-chip ${active ? 'is-active' : ''}" data-v36-filter="${esc(kind)}" data-v36-value="${esc(value)}">${label}</button>`;
 const v36SortButton = (value, label) => `<button type="button" class="v36-sort-btn ${v36Sort === value ? 'is-active' : ''}" data-v36-sort="${esc(value)}">${esc(label)}</button>`;
 const v36QuickButton = (action, label, active) => `<button type="button" class="${active ? 'is-active' : ''}" data-v36-quick="${esc(action)}">${esc(label)}</button>`;
@@ -17416,13 +17473,16 @@ const pickHelp = p.marketTooltip || p.marketInfo || p.labelFull || p.label;
 const marketName = p.marketName || p.market || '';
 const intelBadges = (p.opportunityBadges || []).map(x => `<i data-tooltip="${esc(v37BadgeTooltip(x))}" title="${esc(v37BadgeTooltip(x))}">${esc(x)}</i>`).join('');
 const sameMatchCount = v37VisibleMatchCounts.get(v37MatchKeyForPick(p)) || 0;
-const scoreClass = p.opportunity >= 80 ? 'is-high' : p.opportunity >= 60 ? 'is-mid' : p.opportunity >= 40 ? 'is-low' : 'is-muted';
-const scoreAdvice = p.opportunity >= 80 ? 'Conviction forte' : p.opportunity >= 60 ? 'Bon pari' : p.opportunity >= 40 ? 'Acceptable' : 'Peu fiable';
 const indicativeBadge = p.best?.source === 'cote_indicative' ? '<small class="v37-source-badge" title="Cote indicative : vérifie le prix final chez Winamax">indicatif</small>' : '';
 const oddMeta = p.oddValidation || (typeof validatePickOdd === 'function' ? validatePickOdd(p.m, p.best || p, p.pred) : { status: p.best?.exact ? 'verified' : 'missing' });
+const oddState = v37OddPriorityState(oddMeta);
+const scoreClass = oddState === 'blocked' ? 'is-muted' : p.opportunity >= 80 ? 'is-high' : p.opportunity >= 60 ? 'is-mid' : p.opportunity >= 40 ? 'is-low' : 'is-muted';
+const scoreAdvice = oddState === 'blocked' ? 'Cote a verifier' : oddState === 'watch' ? 'Surveiller la cote' : p.opportunity >= 80 ? 'Conviction forte' : p.opportunity >= 60 ? 'Bon pari' : p.opportunity >= 40 ? 'Acceptable' : 'Peu fiable';
 const oddBadge = typeof v38OddStatusChip === 'function' ? v38OddStatusChip(oddMeta) : '';
 const beginnerText = v37BeginnerPickText(p, oddMeta);
-return `<tr class="v36-table-row ${soon ? 'is-imminent' : ''} ${sameMatchCount > 1 ? 'is-same-match' : ''} ${p.dataOnly ? 'is-data-only' : ''}" data-tone="${esc(tier.tone)}" data-big-detail="${esc(String(p.m.id || ''))}" data-pick-uid="${esc(p.pickUid || '')}" data-pick-label="${esc(p.labelFull || p.label || '')}" data-pick-odd="${esc(p.odd.toFixed(2))}" title="${esc(v36ReasonTooltip(p))}">
+const confMetric = v37ReadableConfidence(p.rel);
+const edgeMetric = v37ReadableEdge(p.edge);
+return `<tr class="v36-table-row ${soon ? 'is-imminent' : ''} ${sameMatchCount > 1 ? 'is-same-match' : ''} ${p.dataOnly ? 'is-data-only' : ''} ${oddState === 'blocked' ? 'is-odd-blocked' : ''}" data-tone="${esc(tier.tone)}" data-big-detail="${esc(String(p.m.id || ''))}" data-pick-uid="${esc(p.pickUid || '')}" data-pick-label="${esc(p.labelFull || p.label || '')}" data-pick-odd="${esc(p.odd.toFixed(2))}" title="${esc(v36ReasonTooltip(p))}">
           <td class="v36-cell-sport"><span>${sportIcon(p.m.sport || '')}</span><b>${esc(sportLabel(p.m.sport || '').slice(0, 9))}</b></td>
           <td class="v36-cell-date">${esc(v37DateLabel(p.m.date))}</td>
           <td>${esc(fmtTime(p.m.date))}</td>
@@ -17430,8 +17490,8 @@ return `<tr class="v36-table-row ${soon ? 'is-imminent' : ''} ${sameMatchCount >
           <td class="v36-cell-match">${v36MatchTitleHtml(p)}${sameMatchCount > 1 ? `<span class="v37-match-multi">+${sameMatchCount - 1} autre pick</span>` : ''}</td>
           <td class="v36-cell-pick"><b data-tooltip="${esc(pickHelp)}">${esc(p.label)}</b>${p.marketInfo ? `<span aria-hidden="true" data-tooltip="${esc(p.marketInfo)}" style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;margin-left:6px;border-radius:50%;border:1px solid var(--border);color:var(--text-dim);font-size:10px;font-weight:800;">?</span>` : ''}<em>${esc(marketName)}</em><small class="v37-beginner-copy">${esc(beginnerText)}</small><span style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:5px;">${oddBadge}${indicativeBadge}<i class="v38-open-analysis">analyse complète</i></span></td>
           <td class="v36-num v36-odd">${v37BlindOddHtml(p.odd)}</td>
-          <td class="v36-num">${relPct}%</td>
-          <td class="v36-num ${p.edge >= 0 ? 'is-pos' : 'is-neg'}"><span data-tooltip="Edge (avantage) : l'edge mesure si la cote est sous-évaluée par le marché. Plus c'est haut, mieux c'est.">${v37BlindEdgeHtml(p.edge)}</span></td>
+          <td class="v36-num">${v37ReadableMetricHtml(confMetric)}</td>
+          <td class="v36-num ${p.edge >= 0 ? 'is-pos' : 'is-neg'}"><span data-tooltip="Avantage : écart entre notre modèle et la cote. Positif = la cote semble mieux payée que le risque réel.">${v37BlindMode ? v37BlindEdgeHtml(p.edge) : v37ReadableMetricHtml(edgeMetric, p.edge >= 0 ? 'pos' : 'neg')}</span></td>
           <td class="v36-num"><span class="v37-opportunity ${scoreClass}" data-score="${esc(String(p.opportunity || 0))}" data-tooltip="${esc(p.opportunityTooltip || '')}" title="${esc(p.opportunityTooltip || '')}" aria-label="${esc(p.opportunityTooltip || `Score d'opportunité ${p.opportunity || 0}/100`)}" tabindex="0">${esc(String(p.opportunity || 0))}</span><em class="v37-score-advice">${esc(scoreAdvice)}</em>${intelBadges ? `<span class="v37-intel-chips">${intelBadges}</span>` : ''}</td>
           <td>${v36TierBadge(p.tier, true)}</td>
           ${v37ShowResultColumn ? `<td>${v37ResultBadge(result)}</td>` : ''}
@@ -17442,26 +17502,21 @@ const tier = v36TierById[p.tier] || v36TierDefs[0];
 const result = v37ResultForPick(p);
 const sameMatchCount = v37VisibleMatchCounts.get(v37MatchKeyForPick(p)) || 0;
 const oddMeta = p.oddValidation || (typeof validatePickOdd === 'function' ? validatePickOdd(p.m, p.best || p, p.pred) : { status: p.best?.exact ? 'verified' : 'missing' });
+const oddState = v37OddPriorityState(oddMeta);
 const beginnerText = v37BeginnerPickText(p, oddMeta);
-return `<button type="button" class="v36-table-card ${sameMatchCount > 1 ? 'is-same-match' : ''}" data-tone="${esc(tier.tone)}" data-big-detail="${esc(String(p.m.id || ''))}" data-pick-uid="${esc(p.pickUid || '')}" data-pick-label="${esc(p.labelFull || p.label || '')}" data-pick-odd="${esc(p.odd.toFixed(2))}">
+const confMetric = v37ReadableConfidence(p.rel);
+const edgeMetric = v37ReadableEdge(p.edge);
+return `<button type="button" class="v36-table-card ${sameMatchCount > 1 ? 'is-same-match' : ''} ${oddState === 'blocked' ? 'is-odd-blocked' : ''}" data-tone="${esc(tier.tone)}" data-big-detail="${esc(String(p.m.id || ''))}" data-pick-uid="${esc(p.pickUid || '')}" data-pick-label="${esc(p.labelFull || p.label || '')}" data-pick-odd="${esc(p.odd.toFixed(2))}">
           <span class="v36-table-card__top"><b>${sportIcon(p.m.sport || '')} ${esc(v37DateLabel(p.m.date))} · ${esc(fmtTime(p.m.date))}</b>${v36TierBadge(p.tier, true)}</span>
           <strong>${v36MatchTitleHtml(p)}</strong>
           <em class="v36-table-card__league">${esc(p.m.league_name || p.m.league || '')}</em>
-          <span class="v36-table-card__line"><i data-tooltip="${esc(p.marketTooltip || p.labelFull || p.label)}">${esc(p.labelMobile || p.label)}</i><b>${v37BlindOddHtml(p.odd)}</b><b>${Math.round(p.rel * 100)}%</b><b>${v37BlindEdgeHtml(p.edge)}</b></span>
+          <span class="v36-table-card__line"><i data-tooltip="${esc(p.marketTooltip || p.labelFull || p.label)}">${esc(p.labelMobile || p.label)}</i><b>${v37BlindOddHtml(p.odd)}</b><b>${esc(confMetric.label)}</b><b>${v37BlindMode ? v37BlindEdgeHtml(p.edge) : esc(edgeMetric.label)}</b></span>
           <small class="v37-beginner-copy">${esc(beginnerText)}</small>
-          <span class="v36-table-card__signals"><i data-tooltip="${esc(p.opportunityTooltip || '')}" title="${esc(p.opportunityTooltip || '')}" aria-label="${esc(p.opportunityTooltip || `Score d'opportunité ${p.opportunity || 0}/100`)}">Score ${esc(String(p.opportunity || 0))}/100 · ${esc(p.opportunity >= 80 ? 'Conviction forte' : p.opportunity >= 60 ? 'Bon pari' : p.opportunity >= 40 ? 'Acceptable' : 'Peu fiable')}</i>${typeof v38OddStatusChip === 'function' ? v38OddStatusChip(oddMeta) : ''}${p.best?.source === 'cote_indicative' ? '<i>Cote indicative</i>' : ''}${sameMatchCount > 1 ? `<i>+${sameMatchCount - 1} autre pick même match</i>` : ''}${(p.opportunityBadges || []).slice(0, 2).map(x => `<i data-tooltip="${esc(v37BadgeTooltip(x))}" title="${esc(v37BadgeTooltip(x))}">${esc(x)}</i>`).join('')}</span>
+          <span class="v36-table-card__signals"><i data-tooltip="${esc(p.opportunityTooltip || '')}" title="${esc(p.opportunityTooltip || '')}" aria-label="${esc(p.opportunityTooltip || `Score d'opportunité ${p.opportunity || 0}/100`)}">Priorité ${esc(String(p.opportunity || 0))}/100 · ${esc(oddState === 'blocked' ? 'cote à vérifier' : p.opportunity >= 80 ? 'Conviction forte' : p.opportunity >= 60 ? 'Bon pari' : p.opportunity >= 40 ? 'Acceptable' : 'Peu fiable')}</i>${typeof v38OddStatusChip === 'function' ? v38OddStatusChip(oddMeta) : ''}${p.best?.source === 'cote_indicative' ? '<i>Cote indicative</i>' : ''}${sameMatchCount > 1 ? `<i>+${sameMatchCount - 1} autre pick même match</i>` : ''}${(p.opportunityBadges || []).slice(0, 2).map(x => `<i data-tooltip="${esc(v37BadgeTooltip(x))}" title="${esc(v37BadgeTooltip(x))}">${esc(x)}</i>`).join('')}</span>
           ${v37ShowResultColumn ? `<span class="v36-table-card__signals">${v37ResultBadge(result)}</span>` : ''}
         </button>`;
 };
-const v37TierLegendHtml = `<details class="v37-tier-legend" open>
-        <summary>Niveaux de confiance <span>clique un niveau pour filtrer</span></summary>
-        <div>
-          ${v36TierDefs.map(t => `<button type="button" class="${v36Filter.tier === t.id ? 'is-active' : ''}" data-tone="${esc(t.tone)}" data-v36-filter="tier" data-v36-value="${esc(t.id)}">
-${v36TierBadge(t.id, false)} <span>${esc(t.range)} · ${esc(t.desc)}</span>
-</button>`).join('')}
-        </div>
-        <p class="v37-score-legend"><b>Score d'opportunité (0-100)</b> : combine edge, confiance, stabilité du signal, fraîcheur data, biais marché, timing de cote, signaux rares, qualité data et profil Théo. 80+ = priorité, 60-79 = intéressant, 40-59 = prudence.</p>
-      </details>`;
+const v37TierLegendHtml = '';
 const v37DayChip = (label, value, deltaLabel) => {
 const active = v37DateFilter === value;
 return `<button type="button" class="v37-day-chip ${active ? 'is-active' : ''}" data-v37-day="${esc(value)}"><b>${esc(label)}</b>${deltaLabel ? `<span>${esc(deltaLabel)}</span>` : ''}</button>`;
@@ -17557,15 +17612,15 @@ const v36TableHtml = `<section class="v36-table-panel" aria-label="Tableau dense
             ${v36SortButton('date', 'Date')}
             ${v36SortButton('time', 'Heure')}
             ${v36SortButton('odd', 'Cote')}
-            ${v36SortButton('conf', 'Conf')}
-            ${v36SortButton('edge', 'Edge (avantage)')}
-            ${v36SortButton('score', 'Score')}
+            ${v36SortButton('conf', 'Chances')}
+            ${v36SortButton('edge', 'Avantage')}
+            ${v36SortButton('score', 'Priorité')}
           </div>
         </header>
         <div class="v36-table-scroll">
           <table class="v36-picks-table">
             <thead><tr>
-              <th>Sport</th><th>${v36SortButton('date', 'Date')}</th><th>${v36SortButton('time', 'Heure')}</th><th>Ligue</th><th>Match</th><th>Pari</th><th data-tooltip="Cote : combien tu gagnes pour 1 euro misé. @1.85 = 0.85 euro net si gagné.">${v36SortButton('odd', 'Cote')}</th><th data-tooltip="Conf : probabilité estimée par notre modèle. 65% veut dire environ 65 chances sur 100 selon les données.">${v36SortButton('conf', 'Conf')}</th><th data-tooltip="Edge (avantage) : avantage statistique vs marché. +5% = la cote vaut environ 5% de plus que le risque réel.">${v36SortButton('edge', 'Edge (avantage)')}</th><th data-tooltip="Score : note globale 0-100. Plus haut = meilleur pick car le score combine confiance, edge, fraîcheur data, timing et signaux.">${v36SortButton('score', 'Score')}</th><th data-tooltip="Tier : niveau de risque/gain. Sûr et Solide sont prudents, Big odds et Outsider cherchent plus de rendement.">${v36SortButton('tier', 'Tier')}</th>${v37ShowResultColumn ? '<th>Résultat</th>' : ''}
+              <th>Sport</th><th>${v36SortButton('date', 'Date')}</th><th>${v36SortButton('time', 'Heure')}</th><th>Ligue</th><th>Match</th><th>Pari</th><th data-tooltip="Cote : combien tu gagnes pour 1 euro misé. @1.85 = 0.85 euro net si gagné.">${v36SortButton('odd', 'Cote')}</th><th data-tooltip="Chances : probabilité estimée par notre modèle, traduite en lecture simple.">${v36SortButton('conf', 'Chances')}</th><th data-tooltip="Avantage : écart statistique vs marché. Positif = la cote semble mieux payée que le risque réel.">${v36SortButton('edge', 'Avantage')}</th><th data-tooltip="Priorité : note globale 0-100. Une cote ancienne ou non vérifiée plafonne cette note.">${v36SortButton('score', 'Priorité')}</th><th data-tooltip="Risque : niveau de risque/gain. Sûr et Solide sont prudents, Big odds et Outsider cherchent plus de rendement.">${v36SortButton('tier', 'Risque')}</th>${v37ShowResultColumn ? '<th>Résultat</th>' : ''}
             </tr></thead>
             <tbody>${v36TableRows.length ? v36TableRows.map(v36TableRow).join('') : `<tr><td colspan="${v37ShowResultColumn ? '12' : '11'}"><div class="v36-tier-empty">Aucun pick pour ce filtre. Retire un sport, une heure ou une recherche.</div></td></tr>`}</tbody>
           </table>
@@ -25763,7 +25818,7 @@ return `
       savePrefs({ pushNotifs: next });
       try {
         if (next && 'serviceWorker' in navigator && location.protocol.startsWith('http')) {
-          await navigator.serviceWorker.register('sw.js').catch(() => null);
+          await navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(reg => { try { reg.update(); } catch(e) { swallowError(e); } return reg; }).catch(() => null);
         }
       } catch(e) { swallowError(e); }
       try { if (typeof window._syncBrowserNotifUI === 'function') window._syncBrowserNotifUI(); } catch(e) { swallowError(e); }
@@ -31703,7 +31758,9 @@ return;
 }
 gcSeenLocks();
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-const _registerSW = () => navigator.serviceWorker.register('sw.js').catch(() => {});
+const _registerSW = () => navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
+.then(reg => { try { reg.update(); } catch(e) { swallowError(e); } return reg; })
+.catch(() => {});
 if ('requestIdleCallback' in window) {
 requestIdleCallback(_registerSW, { timeout: 5000 });
 } else {

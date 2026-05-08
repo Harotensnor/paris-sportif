@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
-from urllib.parse import urljoin
+from urllib.parse import urlencode, urljoin, urlparse, urlunparse, parse_qsl
 
 DEFAULT_URL = "https://harotensnor.github.io/paris-sportif/pronostics.html"
 ROOT = Path(__file__).resolve().parents[1]
@@ -18,10 +18,21 @@ DEFAULT_OUT = ROOT / ".cache" / "synthetic-monitor.json"
 
 
 def _fetch(url: str, timeout: int) -> tuple[int, str]:
-    req = Request(url, headers={"User-Agent": "paris-sportif-synthetic-monitor/1.0"})
+    req = Request(url, headers={
+        "User-Agent": "paris-sportif-synthetic-monitor/1.0",
+        "Cache-Control": "no-cache",
+        "Pragma": "no-cache",
+    })
     with urlopen(req, timeout=timeout) as response:
         body = response.read().decode("utf-8", errors="replace")
         return int(response.status), body
+
+
+def _cache_busted(url: str) -> str:
+    parsed = urlparse(url)
+    query = dict(parse_qsl(parsed.query, keep_blank_values=True))
+    query["_monitor"] = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
+    return urlunparse(parsed._replace(query=urlencode(query)))
 
 
 def _parse_iso(value: str) -> datetime | None:
@@ -76,7 +87,7 @@ def main(argv: list[str] | None = None) -> int:
         "errors": [],
     }
     try:
-        status, text = _fetch(args.url, args.timeout)
+        status, text = _fetch(_cache_busted(args.url), args.timeout)
         payload["http_status"] = status
         if status >= 400:
             payload["errors"].append(f"http_status={status}")
@@ -85,7 +96,7 @@ def main(argv: list[str] | None = None) -> int:
         )
         generated = _extract_generated_at(text)
         if not generated:
-            data_url = urljoin(args.url, "data.js")
+            data_url = _cache_busted(urljoin(args.url, "data.js"))
             data_status, data_text = _fetch(data_url, args.timeout)
             payload["data_js_status"] = data_status
             if data_status >= 400:

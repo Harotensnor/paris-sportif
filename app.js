@@ -1,6 +1,7 @@
 (function () {
   'use strict';
 
+  const VERSION = 'v37.174';
   const startedAt = performance.now();
   const chunks = {
     esm: 'src/perf-bootstrap.js',
@@ -12,13 +13,34 @@
     ],
   };
 
+  function syncFooterVersion() {
+    const footer = document.getElementById('footer-version');
+    document.documentElement.dataset.psAppVersion = VERSION;
+    window.PS_APP_VERSION = VERSION;
+    if (!footer) return null;
+    const previous = (footer.textContent || '').trim();
+    footer.dataset.appVersion = VERSION;
+    if (previous !== VERSION) {
+      footer.dataset.versionDrift = previous || 'missing';
+      footer.textContent = VERSION;
+    }
+    footer.title = `Voir les nouveautés ${VERSION}`;
+    return {
+      previous,
+      current: VERSION,
+      driftFixed: Boolean(previous && previous !== VERSION),
+    };
+  }
+
   function ready() {
+    const footerVersion = syncFooterVersion();
     window.PS_APP_SHELL = {
-      version: 'v37.173',
+      version: VERSION,
       startedAt,
       readyAt: performance.now(),
       bootMs: Math.round(performance.now() - startedAt),
       chunks,
+      footerVersion,
       esmReady: Boolean(window.PS_ESM),
       legacyReady: Boolean(window.predictMatch && window.__testAPI),
     };

@@ -13,6 +13,7 @@ REQUIRED = [
     "scripts/audit_data_truth.py",
     "scripts/audit_qa_runtime.py",
     "scripts/audit_asset_hashes.py",
+    "scripts/audit_site_version.py",
     "scripts/audit_line_endings.py",
     "scripts/audit_no_empty_catch_legacy.py",
     "scripts/audit_privacy_features.py",

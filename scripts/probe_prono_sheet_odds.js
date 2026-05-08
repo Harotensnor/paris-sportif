@@ -80,7 +80,7 @@ function check(label, ok, detail) {
     }
   });
 
-  await page.goto(`http://127.0.0.1:${port}/pronostics.html#dashboard`, { waitUntil: 'domcontentloaded' });
+  await page.goto(`http://127.0.0.1:${port}/pronostics.html?debug=1&fakeAgeMin=5#dashboard`, { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(1600);
 
   const homeState = await page.evaluate(() => {
@@ -89,6 +89,7 @@ function check(label, ok, detail) {
     const topSection = document.querySelector('[data-v38-top-paris]');
     const rail = document.querySelector('.v36-home-rail');
     const localPanel = document.querySelector('[data-la-dashboard-panel]');
+    const discoveryCard = document.querySelector('[data-la-discovery]');
     const decisionGuide = document.querySelector('[data-v37-decision-guide]');
     const tierLegend = document.querySelector('.v37-tier-legend');
     const rows = Array.from(document.querySelectorAll('.v36-picks-table tbody tr'));
@@ -96,16 +97,22 @@ function check(label, ok, detail) {
       .filter(el => !['verified', 'changed'].includes(el.getAttribute('data-odd-status') || ''));
     const resultHeader = Array.from(document.querySelectorAll('.v36-picks-table th')).some(th => /Résultat/i.test(th.textContent || ''));
     const beginnerCopy = Array.from(document.querySelectorAll('.v37-beginner-copy')).map(el => (el.textContent || '').trim()).filter(Boolean);
+    const readableMetrics = Array.from(document.querySelectorAll('.v37-readable-metric b')).map(el => (el.textContent || '').trim()).filter(Boolean);
+    const blockedRows = Array.from(document.querySelectorAll('.v36-table-row.is-odd-blocked'));
+    const stalePriorityRows = blockedRows.filter(row => /Conviction forte|Bon pari/i.test(row.textContent || ''));
     const todayIso = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
     const activeDateValue = document.querySelector('[data-v37-day].is-active')?.getAttribute('data-v37-day') || '';
     return {
       hasTable: !!table,
-      tableOnly: !!shell && !topSection && !rail && !localPanel && !decisionGuide && !tierLegend,
+      tableOnly: !!shell && !topSection && !rail && !localPanel && !discoveryCard && !decisionGuide && !tierLegend,
       rows: rows.length,
       invalidTopOddCount: invalidTopOddCards.length,
       resultHeader,
       beginnerCopyCount: beginnerCopy.length,
       sampleBeginnerCopy: beginnerCopy[0] || '',
+      readableMetricCount: readableMetrics.length,
+      readableMetricSample: readableMetrics.slice(0, 8),
+      stalePriorityCount: stalePriorityRows.length,
       activeDateValue,
       todayIso,
       text: table ? (table.innerText || '').slice(0, 220) : ''
@@ -117,6 +124,8 @@ function check(label, ok, detail) {
   check('No Top Paris card has an invalid odd status', homeState.invalidTopOddCount === 0, JSON.stringify(homeState));
   check('Today table exposes result column for passed/live/upcoming picks', homeState.resultHeader, JSON.stringify(homeState));
   check('Rows include beginner-friendly explanation text', homeState.beginnerCopyCount > 0 && /Lecture simple|alerte/i.test(homeState.sampleBeginnerCopy), homeState.sampleBeginnerCopy);
+  check('Table uses readable metric labels, not only raw percentages', homeState.readableMetricCount > 0 && /Forte|Correcte|Moyenne|Avantage|Petit plus|Faible/i.test(homeState.readableMetricSample.join(' ')), JSON.stringify(homeState));
+  check('Old or unverified odds are never labelled as priority rows', homeState.stalePriorityCount === 0, JSON.stringify(homeState));
 
   const opened = await page.evaluate(() => {
     const target = document.querySelector('[data-top-paris-card]') ||
