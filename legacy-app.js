@@ -4077,8 +4077,11 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     const implied = odd > 1 ? 1 / odd : 0;
     const alternatives = (() => {
       try {
+        // AUDIT 2026-05-08 — exclut DNB et handicaps remboursables des alternatives.
+        const isRefund = (c) => typeof window._v37IsRefundMarket === 'function' && window._v37IsRefundMarket(c);
         return buildMarketCandidates(match, pred, { requireExact: false })
           .filter(c => marketCandidateSignature(c) !== marketCandidateSignature(candidate))
+          .filter(c => !isRefund(c))
           .slice(0, 10);
       } catch(e) { return []; }
     })();
