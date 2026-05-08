@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-08T22:14:10Z",
+  "generated_at": "2026-05-08T22:17:03Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -11,6 +11,23 @@
       "home": "Cincinnati Reds",
       "away": "Houston Astros",
       "props": [
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Cincinnati Reds",
+          "pitcher": "Nick Lodolo",
+          "label": "Nick Lodolo ne concède pas de home run",
+          "pick": "no",
+          "probability": 1.0,
+          "fair_odds": 1.01,
+          "expected_hr_allowed": 0.0,
+          "projected_ip": 3.0,
+          "inputs": {
+            "hr9": 0.0,
+            "era": 0.0,
+            "whip": 1.0
+          },
+          "side": "home"
+        },
         {
           "market": "pitcher_strikeouts",
           "team": "Houston Astros",
@@ -3250,9 +3267,55 @@
           "side": "away"
         }
       ]
+    },
+    {
+      "event_id": "401815291",
+      "kickoff": "2026-05-10T23:20Z",
+      "league": "MLB",
+      "match": "Detroit Tigers at Kansas City Royals",
+      "home": "Kansas City Royals",
+      "away": "Detroit Tigers",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Kansas City Royals",
+          "pitcher": "Noah Cameron",
+          "label": "Noah Cameron plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5236,
+          "fair_odds": 1.91,
+          "expected_strikeouts": 4.6,
+          "projected_ip": 5.2,
+          "inputs": {
+            "k9": 7.96,
+            "era": 5.4,
+            "whip": 1.61,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Kansas City Royals",
+          "pitcher": "Noah Cameron",
+          "label": "Noah Cameron concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5598,
+          "fair_odds": 1.79,
+          "expected_hr_allowed": 0.82,
+          "projected_ip": 5.2,
+          "inputs": {
+            "hr9": 1.42,
+            "era": 5.4,
+            "whip": 1.61
+          },
+          "side": "home"
+        }
+      ]
     }
   ],
-  "props": 156,
+  "props": 159,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
