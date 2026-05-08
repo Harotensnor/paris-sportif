@@ -831,7 +831,7 @@ Hygiène moderne :
   `#performance`, `#academie`, `#profil`, `#combines`, `#bilan`,
   `#historique`, etc. Les anciens liens sont redirigés explicitement par
   `LEGACY_HASHES` : `#top` → `#tous?legacy=top`, `#locks` →
-  `#tous?legacy=locks`, `#matchs` → `#tous?legacy=matchs`,
+  `#tous?legacy=locks`, `#matchs` → `#dashboard?legacy=matchs`,
   `#methodologie` → `#academie?legacy=methodologie`, `#favoris` →
   `#profil?legacy=favoris`, `#simulator` →
   `#profil?legacy=simulator`, `#calendrier` →
