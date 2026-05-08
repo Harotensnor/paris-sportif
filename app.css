@@ -80,9 +80,12 @@ body {
     z-index: 46 !important;
   }
   body.agent-home .v36-picks-table thead th {
-    position: sticky !important;
-    top: calc(var(--rg-height, 32px) + 304px) !important;
-    z-index: 45 !important;
+    position: static !important;
+    top: auto !important;
+    z-index: auto !important;
+  }
+  body.agent-home .v36-picks-table thead {
+    display: none !important;
   }
   body.agent-home .v36-picks-table:has(.v36-tier-empty) {
     min-height: calc(100vh + 40px) !important;
@@ -157,6 +160,10 @@ html[data-theme="light"]{--surface-0:#f5f5f7;--surface-1:#ffffff;--surface-2:#fb
   max-width:100%!important;
   min-width:0!important;
   grid-template-columns:minmax(0,1fr) minmax(180px,260px) auto!important;
+  background:var(--surface-1)!important;
+  border-bottom:1px solid var(--border)!important;
+  box-shadow:0 18px 34px rgba(0,0,0,.28)!important;
+  backdrop-filter:none!important;
 }
 @media (min-width:960px){
   body.agent-home .v37-day-nav,
@@ -285,9 +292,12 @@ html[data-theme="light"]{--surface-0:#f5f5f7;--surface-1:#ffffff;--surface-2:#fb
     z-index:58!important;
   }
   body.agent-home .v36-picks-table thead th{
-    position:sticky!important;
-    top:calc(var(--rg-height,32px) + 258px)!important;
-    z-index:57!important;
+    position:static!important;
+    top:auto!important;
+    z-index:auto!important;
+  }
+  body.agent-home .v36-picks-table thead{
+    display:none!important;
   }
   body.agent-home .v36-picks-table:has(.v36-tier-empty){
     min-height:calc(100vh + 40px)!important;
@@ -328,7 +338,8 @@ html[data-theme="light"]{--surface-0:#f5f5f7;--surface-1:#ffffff;--surface-2:#fb
     padding:0 10px!important;
   }
   body.agent-home .v36-picks-table thead th{
-    top:calc(var(--rg-height,32px) + 310px)!important;
+    position:static!important;
+    top:auto!important;
   }
 }
 @media (min-width:960px){
@@ -336,7 +347,8 @@ html[data-theme="light"]{--surface-0:#f5f5f7;--surface-1:#ffffff;--surface-2:#fb
     top:calc(var(--rg-height,32px) + 112px)!important;
   }
   body.agent-home .v36-picks-table thead th{
-    top:calc(var(--rg-height,32px) + 304px)!important;
+    position:static!important;
+    top:auto!important;
   }
 }
 #search-suggest,

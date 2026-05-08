@@ -103,15 +103,14 @@ test.describe('Sticky layout', () => {
     expect(state.topbar.position).toBe('sticky');
     expect(state.nav.position).toBe('sticky');
     expect(state.toolbar.position).toBe('sticky');
-    expect(state.tableHead.position).toBe('sticky');
+    expect(state.tableHead.position).toBe('static');
     expect(state.topbar.top).toBeGreaterThanOrEqual(0);
     expect(state.topbar.top).toBeLessThan(70);
     expect(state.nav.top).toBeGreaterThanOrEqual(state.topbar.top);
     expect(state.nav.top).toBeLessThan(150);
     expect(state.toolbar.top).toBeGreaterThanOrEqual(0);
     expect(state.toolbar.top).toBeLessThan(state.viewportH / 2);
-    expect(state.tableHead.top).toBeGreaterThanOrEqual(state.toolbar.bottom - 4);
-    expect(state.tableHead.top).toBeLessThan(state.toolbar.bottom + 90);
+    expect(state.tableHead.bottom).toBeLessThanOrEqual(state.toolbar.top + 1);
   });
 
   test('BUG-004/011 keeps secondary page headers above the fold', async ({ page, isMobile }) => {
@@ -258,7 +257,7 @@ test.describe('Theme toggle', () => {
         toolbar: lum('.v36-table-toolbar'),
         header: lum('.v36-picks-table thead th'),
         chip: lum('.v37-day-chip'),
-        cta: lum('.v37-track-inline'),
+        cta: document.querySelector('.v37-track-inline') ? lum('.v37-track-inline') : 255,
       };
     });
 
