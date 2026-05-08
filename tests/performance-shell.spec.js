@@ -31,7 +31,7 @@ test.describe('Performance shell', () => {
   test('ships critical resource hints', async ({ page }) => {
     await page.goto('/pronostics.html#dashboard', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('link[rel="modulepreload"][href*="src/perf-bootstrap.js"]')).toHaveCount(1);
-    await expect(page.locator('link[rel="preload"][href*="data_lite_72h.json"]')).toHaveCount(1);
+    await expect(page.locator('link[rel="preload"][href*="data_lite_72h.json"]')).toHaveCount(0);
     await expect(page.locator('style#perf-critical-css')).toHaveCount(1);
   });
 

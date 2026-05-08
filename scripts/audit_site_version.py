@@ -43,7 +43,7 @@ def main() -> None:
     require("version: VERSION", app, "PS_APP_SHELL version constant")
     if footer_version != app_version or footer_title != app_version:
         fail(f"footer={footer_version}/{footer_title} app={app_version}")
-    if not re.fullmatch(r"paris-sportif-\d{8}-\d{6}", sw_version):
+    if not re.fullmatch(r"paris-sportif-(?:v\d+(?:\.\d+)?-)?\d{8}-\d{6}", sw_version):
         fail(f"CACHE_VERSION is not stamped: {sw_version}")
     if "updateViaCache: 'none'" not in legacy:
         fail("service worker registration must bypass HTTP cache")
