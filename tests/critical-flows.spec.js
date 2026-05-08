@@ -284,12 +284,13 @@ test.describe('Match modal — Reims regression', () => {
 
 // v30 — Tests for last batch of features
 test.describe('Hash navigation (PWA shortcuts)', () => {
-  test('location.hash=#locks redirects to dashboard V37', async ({ page }) => {
+  test('legacy #locks hash redirects explicitly to Tous locks intent', async ({ page }) => {
     await page.goto(URL + '#locks');
     await expect.poll(async () =>
       await page.evaluate(() => localStorage.getItem('currentPage'))
-    ).toBe('dashboard');
-    await expect(page.locator('.v36-home-shell')).toBeVisible({ timeout: 10000 });
+    ).toBe('tous');
+    await expect.poll(async () => page.evaluate(() => location.hash)).toBe('#tous?legacy=locks');
+    await expect(page.locator('[data-tous-tab]').first()).toBeVisible({ timeout: 10000 });
   });
 });
 

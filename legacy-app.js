@@ -495,19 +495,36 @@ const PAGE_ALIASES = {
 'women-football': 'foot-feminin',
 'nfl-playoffs': 'nfl',
 };
+const LEGACY_HASHES = {
+top: { page: 'tous', hash: '#tous?legacy=top', label: 'Tous · top picks' },
+locks: { page: 'tous', hash: '#tous?legacy=locks', label: 'Tous · locks' },
+matchs: { page: 'tous', hash: '#tous?legacy=matchs', label: 'Tous les matchs' },
+methodologie: { page: 'academie', hash: '#academie?legacy=methodologie', label: 'Académie · méthodologie' },
+favoris: { page: 'profil', hash: '#profil?legacy=favoris', label: 'Profil · favoris' },
+simulator: { page: 'profil', hash: '#profil?legacy=simulator', label: 'Profil · simulateur bankroll', scrollTo: 'profile-bankroll-simulator' },
+calendrier: { page: 'tous', hash: '#tous?view=calendar&legacy=calendrier', label: 'Tous · calendrier' },
+};
 function _pageFromHash() {
 try {
 const rawHash = (location.hash || '').replace(/^#/, '').trim();
 let h = rawHash.split('?')[0];
-if (h === 'calendrier') {
-h = 'tous';
-try { history.replaceState(null, '', location.pathname + location.search + '#tous?view=calendar'); } catch(e) { swallowError(e); }
-}
 if (h === 'montante-jour' || h === 'montante-weekend' || h === 'montante-semaine') {
 try { localStorage.setItem('montanteType', h.replace('montante-', '')); } catch(e) { swallowError(e); }
 }
-if (h === 'simulator') {
-try { localStorage.setItem('profilScrollTo', 'profile-bankroll-simulator'); } catch(e) { swallowError(e); }
+if (LEGACY_HASHES[h]) {
+const legacy = LEGACY_HASHES[h];
+if (legacy.scrollTo) {
+try { localStorage.setItem('profilScrollTo', legacy.scrollTo); } catch(e) { swallowError(e); }
+}
+try {
+if (location.hash !== legacy.hash) history.replaceState(null, '', location.pathname + location.search + legacy.hash);
+} catch(e) { swallowError(e); }
+try {
+setTimeout(() => {
+if (typeof toast === 'function') toast(`Ancien lien #${h} redirigé vers ${legacy.label}.`, 'info');
+}, 250);
+} catch(e) { swallowError(e); }
+h = legacy.page;
 }
 if (PAGE_ALIASES[h]) {
 h = PAGE_ALIASES[h];
@@ -517,6 +534,7 @@ return VALID_PAGES.includes(h) ? h : null;
 } catch(e) { return null; }
 }
 try { window.PAGE_ALIASES = PAGE_ALIASES; } catch(e) { swallowError(e); }
+try { window.LEGACY_HASHES = LEGACY_HASHES; } catch(e) { swallowError(e); }
 const STATIC_REDIRECT_PAGES = new Set([]);
 let currentPage = (() => {
 const fromHash = _pageFromHash();
@@ -554,7 +572,21 @@ logSafeError('navigation push hash', e);
 try { location.hash = newHash; } catch(err) { logSafeError('navigation fallback hash', err); }
 }
 }
+function _routeForPageTarget(target) {
+const raw = String(target || '').trim().replace(/^#/, '');
+const hashKey = raw.split('?')[0];
+const legacy = LEGACY_HASHES[hashKey];
+if (legacy) return { page: legacy.page, hash: legacy.hash, scrollTo: legacy.scrollTo || '', legacy: hashKey };
+const resolved = PAGE_ALIASES[hashKey] || hashKey;
+const keepQuery = raw.includes('?') && resolved === hashKey;
+return { page: resolved, hash: keepQuery ? `#${raw}` : `#${resolved}` };
+}
+function _applyRouteSideEffects(route) {
+if (!route || !route.scrollTo) return;
+try { localStorage.setItem('profilScrollTo', route.scrollTo); } catch(e) { swallowError(e); }
+}
 try { window._buildMatchShareUrl = _buildMatchShareUrl; } catch(e) { swallowError(e); }
+try { window._routeForPageTarget = _routeForPageTarget; } catch(e) { swallowError(e); }
 window.addEventListener('hashchange', () => {
 const matchHashMatch = (location.hash || '').match(/^#match\/([^/]+)(?:\/(\w+))?$/);
 if (matchHashMatch) {
@@ -14645,9 +14677,11 @@ input.value = label;
 searchTerm = label;
 try { _saveRecentSearch(label); } catch(e) { swallowError(e); }
 if (kind === 'page' && action) {
-currentPage = PAGE_ALIASES[action] || action;
+const route = _routeForPageTarget(action);
+currentPage = route.page;
+_applyRouteSideEffects(route);
 try { localStorage.setItem('currentPage', currentPage); } catch(e) { swallowError(e); }
-_setUserNavHash('#' + currentPage);
+_setUserNavHash(route.hash);
 box.style.display = 'none';
 if (typeof applyPageView === 'function') applyPageView(); else render();
 return;
@@ -24340,9 +24374,11 @@ wrap.innerHTML = `
 wrap.querySelectorAll('[data-sports-route]').forEach(btn => {
 btn.addEventListener('click', () => {
 const target = btn.getAttribute('data-sports-route') || 'sports-tous';
-currentPage = PAGE_ALIASES[target] || target;
+const route = _routeForPageTarget(target);
+currentPage = route.page;
+_applyRouteSideEffects(route);
 try { localStorage.setItem('currentPage', currentPage); } catch(e) { swallowError(e); }
-_setUserNavHash('#' + currentPage);
+_setUserNavHash(route.hash);
 applyPageView();
 window.scrollTo({ top: 0, behavior: 'smooth' });
 });
@@ -26802,11 +26838,12 @@ return `
       `).join('');
       suiviNav.querySelectorAll('[data-suivi-page]').forEach(b => {
         b.addEventListener('click', () => {
-        currentPage = PAGE_ALIASES[b.dataset.suiviPage] || b.dataset.suiviPage;
+        const route = _routeForPageTarget(b.dataset.suiviPage);
+        currentPage = route.page;
+        _applyRouteSideEffects(route);
           try { localStorage.setItem('currentPage', currentPage); } catch(e) { swallowError(e); }
           try {
-            const newHash = '#' + currentPage;
-            _setUserNavHash(newHash);
+            _setUserNavHash(route.hash);
           } catch(e) { swallowError(e); }
           applyPageView();
         });
@@ -31919,13 +31956,14 @@ document.addEventListener('click', (ev) => {
 const btn = ev.target && ev.target.closest && ev.target.closest('.page-btn');
 if (!btn || !btn.dataset || !btn.dataset.page) return;
 const requestedPage = btn.dataset.page;
-currentPage = PAGE_ALIASES[requestedPage] || requestedPage;
+const route = _routeForPageTarget(requestedPage);
+currentPage = route.page;
+_applyRouteSideEffects(route);
 if (!STATIC_REDIRECT_PAGES.has(currentPage)) {
 try { localStorage.setItem('currentPage', currentPage); } catch(e) { swallowError(e); }
 }
 try {
-const targetHash = requestedPage === 'calendrier' ? '#tous?view=calendar' : '#' + currentPage;
-_setUserNavHash(targetHash);
+_setUserNavHash(route.hash);
 } catch(e) { swallowError(e); }
 applyPageView();
 _ensureScoringOddsHistoryForPage(currentPage);
@@ -32616,11 +32654,12 @@ if (!target) return;
 const navBtn = document.querySelector(`.page-btn[data-page="${target}"]`);
 if (navBtn) navBtn.click();
 else {
-const resolved = (typeof PAGE_ALIASES !== 'undefined' && PAGE_ALIASES[target]) ? PAGE_ALIASES[target] : target;
-if (typeof VALID_PAGES !== 'undefined' && VALID_PAGES.includes(resolved)) {
-currentPage = resolved;
-try { localStorage.setItem('currentPage', resolved); } catch(e) { swallowError(e); }
-try { history.replaceState(null, '', location.pathname + location.search + '#' + resolved); } catch(e) { swallowError(e); }
+const route = _routeForPageTarget(target);
+if (typeof VALID_PAGES !== 'undefined' && VALID_PAGES.includes(route.page)) {
+currentPage = route.page;
+_applyRouteSideEffects(route);
+try { localStorage.setItem('currentPage', route.page); } catch(e) { swallowError(e); }
+try { history.replaceState(null, '', location.pathname + location.search + route.hash); } catch(e) { swallowError(e); }
 if (typeof applyPageView === 'function') applyPageView();
 }
 }
