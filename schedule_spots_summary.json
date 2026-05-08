@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-08T10:55:16Z",
+  "generated_at": "2026-05-08T10:58:18Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -59,7 +59,7 @@
         "status": "abstain",
         "net_side": null,
         "home_score": -0.589,
-        "away_score": 0.003,
+        "away_score": -0.575,
         "home_fade": 0.9,
         "away_fade": 0.89,
         "reason": "Signaux opposes: Philadelphia Phillies fade 0.90, Colorado Rockies fade 0.89 -> prudence",
@@ -81,12 +81,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.577
           },
           {
             "side": "away",
@@ -582,10 +576,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.195,
-        "away_score": 0.253,
+        "away_score": -0.195,
         "home_fade": 0.3,
         "away_fade": 0.3,
-        "reason": "Direction nette: Minnesota Twins (+0.25)",
+        "reason": "Direction nette: Minnesota Twins (-0.20)",
         "detail": [
           {
             "side": "home",
@@ -598,12 +592,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.448
           }
         ]
       }
@@ -640,10 +628,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.195,
-        "away_score": 0.378,
+        "away_score": -0.195,
         "home_fade": 0.3,
         "away_fade": 0.3,
-        "reason": "Direction nette: Detroit Tigers (+0.38)",
+        "reason": "Direction nette: Detroit Tigers (-0.20)",
         "detail": [
           {
             "side": "home",
@@ -656,12 +644,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.573
           }
         ]
       }
@@ -748,12 +730,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
-        "home_score": 0.287,
+        "net_side": "away",
+        "home_score": -0.195,
         "away_score": -0.195,
         "home_fade": 0.3,
         "away_fade": 0.3,
-        "reason": "Direction nette: Chicago White Sox (+0.29)",
+        "reason": "Direction nette: Seattle Mariners (-0.20)",
         "detail": [
           {
             "side": "home",
@@ -766,12 +748,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.3
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.482
           }
         ]
       }
@@ -1068,10 +1044,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.098,
-        "away_score": 0.458,
+        "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Millwall (+0.46)",
+        "reason": "Direction nette: Millwall (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -1084,12 +1060,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.556
           }
         ]
       }
@@ -2857,13 +2827,13 @@
         "Deplacement estime 2513 km, decalage ~1.8h"
       ],
       "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
+        "status": "net",
+        "net_side": "home",
         "home_score": 0.01,
-        "away_score": -0.197,
+        "away_score": -0.779,
         "home_fade": 0.3,
         "away_fade": 0.884,
-        "reason": "Signaux mitigés: avantage net trop faible (San Diego Padres +0.01, St. Louis Cardinals -0.20)",
+        "reason": "Direction nette: San Diego Padres (+0.01)",
         "detail": [
           {
             "side": "home",
@@ -2876,12 +2846,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.582
           },
           {
             "side": "away",
