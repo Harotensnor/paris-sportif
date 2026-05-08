@@ -17534,10 +17534,16 @@ id: odd < 1.50 ? 'safe' : odd < 2.00 ? 'solid' : odd < 3.00 ? 'value' : odd < 5.
 strict: false
 };
 const source = useWnx ? 'winamax_exact' : (odds?._fromWinamax ? 'winamax_exact' : 'cote_indicative');
+// AUDIT 2026-05-08 v40.3 — pkSide en 'home'/'away'/'draw' (pas '1'/'2'/'X').
+// Sans ça, v38FindWinamaxOdd → matchSide échoue parce que v38OddSideAliases
+// attend des regex anchored. Le main pool y arrive via c.raw.label='home'
+// (set par _v35AddCandidate). Pour le data-only, on doit reproduire ce pattern.
+const pkSide = pk === '1' ? 'home' : pk === '2' ? 'away' : 'draw';
 const candidate = {
 market: '1n2',
 key: pk,
 pickKey: pk,
+side: pkSide,
 rel,
 prob: rel,
 odd,
@@ -17550,7 +17556,10 @@ marketName: source === 'winamax_exact' ? '1N2' : '1N2 · cote indicative',
 marketTooltip: source === 'winamax_exact' ? 'Marché principal 1N2.' : 'Cote indicative : à vérifier chez Winamax avant de jouer.',
 marketInfo: source === 'winamax_exact' ? '' : 'Cote indicative issue du flux disponible, pas un prix Winamax exact.',
 source,
-exact: source === 'winamax_exact'
+exact: source === 'winamax_exact',
+// raw avec label='home'/'away'/'draw' pour que labelTokens dans v38FindWinamaxOdd
+// inclue le mot-clé et matche le rowLabel ('home') du Winamax row.
+raw: { market: '1n2', side: pkSide, label: pkSide, odd }
 };
 candidate.oddValidation = typeof validatePickOdd === 'function' ? validatePickOdd(m, candidate, pred) : { status: source === 'winamax_exact' ? 'verified' : 'missing' };
 // AUDIT 2026-05-08 v40 — Même mutation que v36PickPoolRaw : si la cote
