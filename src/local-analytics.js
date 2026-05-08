@@ -373,7 +373,7 @@
     modal.innerHTML = `
       <section class="la-dialog" tabindex="-1">
         <header><h2>${esc(title)}</h2><button type="button" class="la-close" data-la-close aria-label="Fermer">×</button></header>
-        <main>${body}</main>
+        <div class="la-dialog-body">${body}</div>
         <footer>${footer || '<button type="button" class="la-btn" data-la-close>OK</button>'}</footer>
       </section>
     `;

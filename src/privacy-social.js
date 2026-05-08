@@ -204,7 +204,7 @@
           <h2>${esc(title)}</h2>
           <button type="button" class="privacy-close" data-privacy-close aria-label="Fermer">×</button>
         </header>
-        <main>${bodyHtml}</main>
+        <div class="privacy-dialog-body">${bodyHtml}</div>
         <footer>${footerHtml || '<button type="button" class="privacy-btn secondary" data-privacy-close>Fermer</button>'}</footer>
       </section>
     `;
