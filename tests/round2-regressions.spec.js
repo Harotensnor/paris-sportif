@@ -116,10 +116,11 @@ test('NEW-B and BUG-001 keep tablet nav visible and toolbar sticky', async ({ pa
     return {
       position: styles.position,
       top: Math.round(rect.top),
+      bottom: Math.round(rect.bottom),
     };
   });
-  expect(tableHead.position).toBe('sticky');
-  expect(tableHead.top).toBeGreaterThanOrEqual(toolbar.bottom - 8);
+  expect(tableHead.position).toBe('static');
+  expect(tableHead.bottom).toBeLessThanOrEqual(toolbar.top + 1);
 });
 
 test('NEW-D preserves completed boot_step across reloads', async ({ page }) => {
