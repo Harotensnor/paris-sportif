@@ -280,6 +280,27 @@ test.describe('Match modal — Reims regression', () => {
     expect(text).not.toMatch(/undefined/i);
     expect(text.trim()).not.toBe('vs');
   });
+
+  test('BUG-005 Escape closes detail modal and restores dashboard hash', async ({ page }) => {
+    await page.goto(URL + '#dashboard');
+    await page.waitForFunction(() =>
+      localStorage.getItem('currentPage') === 'dashboard' &&
+      document.querySelector('[data-big-detail]'),
+      null,
+      { timeout: 15000 }
+    );
+    await page.locator('[data-big-detail]').first().click();
+    await expect(page.locator('#detail-modal.open')).toBeVisible({ timeout: 10000 });
+    await expect.poll(async () => page.evaluate(() => location.hash)).toMatch(/^#match\//);
+
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#detail-modal.open')).toHaveCount(0);
+    await expect.poll(async () => page.evaluate(() => location.hash)).toBe('#dashboard');
+
+    await page.reload();
+    await expect(page.locator('#detail-modal.open')).toHaveCount(0);
+    await expect.poll(async () => page.evaluate(() => location.hash)).toBe('#dashboard');
+  });
 });
 
 // v30 — Tests for last batch of features
