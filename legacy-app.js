@@ -3861,7 +3861,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     const wx = match?.winamax || {};
     const markets = wx.markets || {};
     const dataAge = typeof getDataAge === 'function' ? getDataAge().minutes : 9999;
-    // v37.183 — verifiedAt = plus RECENT des deux. Avant on prenait
+    // v37.183b — verifiedAt force max(markets_fetched, generated_at). Avant on prenait
     // wx.markets_fetched_at en priorite meme quand il etait plus vieux que
     // data.generated_at. Consequence : si fetch_winamax_match_details TTL=1h
     // skippe un match (cote inchangee), markets_fetched_at restait a hier soir
