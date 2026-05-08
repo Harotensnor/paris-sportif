@@ -163,6 +163,12 @@ jobs:
           # fetch_weather + fetch_referees + fetch_clubelo + fetch_understat_xg : self-throttled, parallèle
           (python3 fetch_weather.py || true) > /tmp/fetch_weather.log 2>&1 &
           (python3 fetch_referees_soccer.py || true) > /tmp/fetch_refs.log 2>&1 &
+          # AUDIT 2026-05-09 v41.10 — The Odds API aggregator (~30 bookmakers).
+          # No-op silencieux si secret THE_ODDS_API_KEY absent. Free tier 500/mois.
+          # Cadence : 1×/2h pour respecter le quota (12 runs/jour × 30 = 360/mois).
+          if [ $HOUR_MOD4 -eq 0 ] && [ $MIN_MOD15 -lt 5 ]; then
+            (THE_ODDS_API_KEY="${{ secrets.THE_ODDS_API_KEY }}" python3 fetch_odds_aggregator.py || true) > /tmp/fetch_odds_agg.log 2>&1 &
+          fi
           # Wait pour TOUS les jobs background lancés
           wait
           echo "=== fetch_weather ==="; cat /tmp/fetch_weather.log 2>/dev/null | tail -2 || true
@@ -212,6 +218,9 @@ jobs:
           python3 patch_understat_xg.py || true
           python3 patch_fbref_xg.py || true
           python3 patch_smart_money.py || true
+          # AUDIT 2026-05-09 v41.10 — Inject odds_aggregated.json sur events
+          # data.js (consensus + Pinnacle signals). No-op si fichier absent.
+          python3 patch_odds_aggregator.py || true
           python3 build_public_team_stats.py || true
             python3 build_lineups_multisport.py || true
             python3 build_xg_coverage.py || true

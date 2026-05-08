@@ -82,6 +82,9 @@ FETCH_STAGES = [
     # sur disque (pas de purge). En prod GH Actions, refresh.yml l'invoque
     # explicitement avec `download` au boot et `upload` à la fin. Ce désync
     # est documenté dans check_pipeline_drift.py exclusions ci-dessous.
+    # AUDIT 2026-05-09 v41.10 — The Odds API aggregator (no-op sans clé).
+    # Cadence 24 ticks (~2h) pour respecter free tier 500/mois.
+    ('fetch_odds_aggregator.py',   24, 60),
     ('fetch_live.py',              1,   60),
     ('fetch_sofascore_events.py',   1,   90),
     ('fetch_winamax_catalog.py',    1,   60),   # <2s typical
@@ -133,6 +136,9 @@ PATCH_STAGES = [
     ('patch_understat_xg.py',       1,   30),
     ('patch_fbref_xg.py',           1,   30),
     ('patch_smart_money.py',        1,   30),
+    # AUDIT 2026-05-09 v41.10 — Patch consensus + Pinnacle signals.
+    # No-op silencieux si odds_aggregated.json absent (cf fetch_odds_aggregator).
+    ('patch_odds_aggregator.py',    1,   30),
     # v35.352 — Builders cron ajoutés dans l'auto-refresh pour éviter que
     # local et prod divergent sur les insights modèle / profils / marchés.
     ('build_public_team_stats.py',  1,   30),
