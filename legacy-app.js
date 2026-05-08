@@ -16546,9 +16546,12 @@ if (Array.isArray(arr) && arr.length < max) arr.push(item);
 let v37FilterResetNotice = '';
 let v37AutoHorizonReason = '';
 const v37HashDate = v37HashParams.get('date') || '';
-const v37StoredDate = v36Filter.date || todayIso;
-let v37DateSource = v37HashDate ? 'url' : (v36Filter.date ? 'localStorage' : 'default');
-let v37DateFilter = (/^\d{4}-\d{2}-\d{2}$/.test(v37HashDate) || v37HashDate === 'all') ? v37HashDate : v37StoredDate;
+let v37DateSource = v37HashDate ? 'url' : 'default';
+let v37DateFilter = (/^\d{4}-\d{2}-\d{2}$/.test(v37HashDate) || v37HashDate === 'all') ? v37HashDate : todayIso;
+if (!v37HashDate && v36Filter.date !== todayIso) {
+v36Filter.date = todayIso;
+try { localStorage.setItem(v36FilterKey, JSON.stringify(v36Filter)); } catch(e) { swallowError(e); }
+}
 const v37IncludeLive = v36Filter.includeLive === true || v36Filter.includeLive === '1';
 const v37IsHistoryDate = (dateFilter) => /^\d{4}-\d{2}-\d{2}$/.test(String(dateFilter || '')) && dateFilter < todayIso;
 let v37HistoryMode = v37IsHistoryDate(v37DateFilter);
@@ -17538,8 +17541,6 @@ const v36TableHtml = `<section class="v36-table-panel" aria-label="Tableau dense
         ${v37FilterResetHtml}
         ${v37EmptyPoolHelpHtml}
         ${v37DenseFallbackHtml}
-        ${v37DecisionGuideHtml}
-        ${v37TierLegendHtml}
         ${v37DayNavHtml}
         <header class="v36-table-toolbar">
           <div>

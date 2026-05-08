@@ -601,25 +601,7 @@
   }
 
   function injectDashboardPanel() {
-    if (pageSlug() !== 'dashboard') return;
-    const wrap = $('#top-picks-wrap') || $('#main-content');
-    if (!wrap || $('[data-la-dashboard-panel]', wrap)) return;
-    const prefs = aggregatePrefs();
-    const picks = bestPersonalPicks(3);
-    const panel = document.createElement('section');
-    panel.className = 'la-card';
-    panel.setAttribute('data-la-dashboard-panel', '1');
-    panel.innerHTML = `
-      <h2>Personnalisation locale</h2>
-      <p>Basée sur tes pages et picks ouverts. Stockage local uniquement.</p>
-      <div class="la-grid">
-        <div class="la-mini"><strong>${esc(topKey(prefs.sports))}</strong><p>sport préféré détecté</p></div>
-        <div class="la-mini"><strong>${esc(userSegment(prefs))}</strong><p>segment local</p></div>
-        <div class="la-mini"><strong>${picks.length}</strong><p>picks match pour toi visibles</p></div>
-      </div>
-      <div class="la-actions"><a class="la-btn" href="#my-dashboard">Mon dashboard</a><a class="la-btn secondary" href="#activity">Activity</a></div>
-    `;
-    wrap.prepend(panel);
+    $('[data-la-dashboard-panel]')?.remove();
   }
   function injectAdaptiveNav() {
     const nav = $('#page-nav');
