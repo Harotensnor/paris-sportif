@@ -13452,6 +13452,55 @@ return `
             </div>
           `;
 })();
+// AUDIT 2026-05-09 v41.15 — Section "💰 Sharp money & consensus".
+// Lit ev.odds_consensus + ev.pinnacle_signal + ev.sharp_disagree (injectés
+// par patch_odds_aggregator.py si THE_ODDS_API_KEY config). Affiche side-by-side
+// le consensus marché vs Pinnacle (proxy sharp money). Quand ils diffèrent
+// >5%, c'est un signal fort que les sharps voient autre chose que le grand public.
+const sharpMoneyHtml = (() => {
+  const cons = match?.odds_consensus || null;
+  const pin = match?.pinnacle_signal || null;
+  const disagree = match?.sharp_disagree || null;
+  if (!cons && !pin) return '';
+  const sides = ['home', 'draw', 'away'];
+  const sideLabel = (s) => s === 'home' ? '🏠 Domicile' : s === 'draw' ? '🤝 Nul' : '✈️ Extérieur';
+  const fmtOdd = (v) => v ? Number(v).toFixed(2) : '—';
+  const rows = sides.map(s => {
+    const c = cons?.[s];
+    const p = pin?.[s];
+    const d = disagree?.[s];
+    if (!c && !p) return '';
+    const dCue = d === 'pinnacle_lower' ? '<span style="color:#34d399;font-size:11px;font-weight:700;">⬇ sharp</span>' :
+                 d === 'pinnacle_higher' ? '<span style="color:#f87171;font-size:11px;font-weight:700;">⬆ sharp</span>' : '';
+    return `<tr>
+      <td style="padding:6px 8px;font-size:12.5px;color:var(--text);">${sideLabel(s)}</td>
+      <td style="padding:6px 8px;font-size:12.5px;text-align:center;color:var(--text-dim);font-variant-numeric:tabular-nums;">${fmtOdd(c)}</td>
+      <td style="padding:6px 8px;font-size:13px;text-align:center;color:var(--text);font-weight:700;font-variant-numeric:tabular-nums;">${fmtOdd(p)}</td>
+      <td style="padding:6px 8px;text-align:center;">${dCue}</td>
+    </tr>`;
+  }).filter(Boolean).join('');
+  if (!rows) return '';
+  return `
+            <div class="section">
+              <h4>💰 Sharp money & consensus marché</h4>
+              <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">Compare la cote moyenne de ~30 bookmakers (consensus) vs <b>Pinnacle</b> (sharp money). Quand Pinnacle ≠ consensus de >5%, c'est un signal fort que les pros voient autre chose que le grand public.</div>
+              <table style="width:100%;border-collapse:collapse;background:var(--panel);border-radius:var(--r-sm);overflow:hidden;">
+                <thead>
+                  <tr style="background:rgba(255,255,255,.04);">
+                    <th style="padding:8px;font-size:11px;text-align:left;color:var(--text-dim);font-weight:700;text-transform:uppercase;letter-spacing:.4px;">Côté</th>
+                    <th style="padding:8px;font-size:11px;text-align:center;color:var(--text-dim);font-weight:700;text-transform:uppercase;letter-spacing:.4px;">Consensus</th>
+                    <th style="padding:8px;font-size:11px;text-align:center;color:var(--text-dim);font-weight:700;text-transform:uppercase;letter-spacing:.4px;">Pinnacle 🎯</th>
+                    <th style="padding:8px;font-size:11px;text-align:center;color:var(--text-dim);font-weight:700;text-transform:uppercase;letter-spacing:.4px;">Signal</th>
+                  </tr>
+                </thead>
+                <tbody>${rows}</tbody>
+              </table>
+              <div style="margin-top:8px;font-size:10.5px;color:var(--text-dim2);font-style:italic;line-height:1.4;">
+                ⬇ sharp = Pinnacle a une cote plus basse que le consensus → les sharps adorent ce côté. ⬆ sharp = Pinnacle plus haute → ils fuient. Source : The Odds API (~30 bookmakers).
+              </div>
+            </div>
+          `;
+})();
 const alternativesHtml = (() => {
 const best = detailSelectedPick || ((typeof selectBestMarket === 'function') ? selectBestMarket(match, pred) : null);
 if (!best || !best.allCandidates) return '';
@@ -13559,7 +13608,7 @@ return `
             </div>
           `;
 })();
-return risksHtml + transparenceHtml + alternativesHtml + (hasContextSection ? `
+return risksHtml + transparenceHtml + sharpMoneyHtml + alternativesHtml + (hasContextSection ? `
         <div class="section">
           <h4>🌐 Contexte extérieur</h4>
           <div class="two-cols">

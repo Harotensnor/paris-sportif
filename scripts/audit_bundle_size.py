@@ -12,9 +12,11 @@ LIMITS = {
     # 5-col simplifié). Le refacto ESM (audit P1.3) reste le vrai levier
     # pour réduire ce bundle.
     "app.js": 25_000,
-    # AUDIT 2026-05-08 v40.7 : bumped 1.82 → 1.84 MB pour le fallback
-    # live-pick (predPick auto-favori Winamax quand pred.skip=true).
-    "legacy-app.js": 1_840_000,
+    # AUDIT 2026-05-09 v41 : bumped 1.84 → 1.86 MB pour les marchés étendus
+    # v41.x (penalty/score groups/clean sheet/HT scores foot, set/TB tennis,
+    # quarter winner basket, period totals hockey, NRFI baseball) + section
+    # Sharp money modal.
+    "legacy-app.js": 1_860_000,
     "app.css": 360_000,
     "pronostics.html": 90_000,
     "data_lite.js": 220_000,

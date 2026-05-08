@@ -42,9 +42,10 @@ BUDGETS_KB = {
     # le garde-fou restait calé sur une ancienne taille et faisait échouer
     # toute la CI alors que le budget Lighthouse contrôle déjà le poids réel.
     'app.js':                      20,
-    # AUDIT 2026-05-08 v40.7 : bumped 1820→1840 KB pour fallback
-    # live-pick (predPick auto-favori Winamax si pred.skip).
-    'legacy-app.js':             1840,
+    # AUDIT 2026-05-09 v41 : bumped 1840→1860 KB pour marchés v41.x
+    # (penalty/score groups foot, set/TB tennis, quarter basket, period
+    # hockey, NRFI baseball) + section Sharp money modal.
+    'legacy-app.js':             1860,
     'app.css':                    300,
     'pronostics.html':           1150,
     'sw.js':                       15,
