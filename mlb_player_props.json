@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-08T20:01:39Z",
+  "generated_at": "2026-05-08T20:07:04Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -1208,6 +1208,88 @@
       ]
     },
     {
+      "event_id": "401815269",
+      "kickoff": "2026-05-09T20:05Z",
+      "league": "MLB",
+      "match": "Athletics Athletics at Baltimore Orioles",
+      "home": "Baltimore Orioles",
+      "away": "Athletics",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Baltimore Orioles",
+          "pitcher": "Shane Baz",
+          "label": "Shane Baz plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.538,
+          "fair_odds": 1.86,
+          "expected_strikeouts": 4.66,
+          "projected_ip": 5.6,
+          "inputs": {
+            "k9": 7.49,
+            "era": 4.99,
+            "whip": 1.54,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Baltimore Orioles",
+          "pitcher": "Shane Baz",
+          "label": "Shane Baz ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5677,
+          "fair_odds": 1.76,
+          "expected_hr_allowed": 0.566,
+          "projected_ip": 5.6,
+          "inputs": {
+            "hr9": 0.91,
+            "era": 4.99,
+            "whip": 1.54
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Athletics",
+          "pitcher": "Aaron Civale",
+          "label": "Aaron Civale plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.5806,
+          "fair_odds": 1.72,
+          "expected_strikeouts": 3.81,
+          "projected_ip": 5.17,
+          "inputs": {
+            "k9": 6.63,
+            "era": 2.95,
+            "whip": 1.34,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Athletics",
+          "pitcher": "Aaron Civale",
+          "label": "Aaron Civale ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5694,
+          "fair_odds": 1.76,
+          "expected_hr_allowed": 0.563,
+          "projected_ip": 5.17,
+          "inputs": {
+            "hr9": 0.98,
+            "era": 2.95,
+            "whip": 1.34
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
       "event_id": "401815271",
       "kickoff": "2026-05-09T20:10Z",
       "league": "MLB",
@@ -1576,6 +1658,88 @@
             "hr9": 0.7,
             "era": 3.72,
             "whip": 1.06
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815275",
+      "kickoff": "2026-05-09T23:05Z",
+      "league": "MLB",
+      "match": "Chicago Cubs at Texas Rangers",
+      "home": "Texas Rangers",
+      "away": "Chicago Cubs",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Texas Rangers",
+          "pitcher": "Jack Leiter",
+          "label": "Jack Leiter moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5738,
+          "fair_odds": 1.74,
+          "expected_strikeouts": 6.14,
+          "projected_ip": 5.43,
+          "inputs": {
+            "k9": 10.18,
+            "era": 5.45,
+            "whip": 1.37,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Texas Rangers",
+          "pitcher": "Jack Leiter",
+          "label": "Jack Leiter concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6326,
+          "fair_odds": 1.58,
+          "expected_hr_allowed": 1.001,
+          "projected_ip": 5.43,
+          "inputs": {
+            "hr9": 1.66,
+            "era": 5.45,
+            "whip": 1.37
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Chicago Cubs",
+          "pitcher": "Edward Cabrera",
+          "label": "Edward Cabrera moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5538,
+          "fair_odds": 1.81,
+          "expected_strikeouts": 5.26,
+          "projected_ip": 5.87,
+          "inputs": {
+            "k9": 8.06,
+            "era": 3.27,
+            "whip": 1.28,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Chicago Cubs",
+          "pitcher": "Edward Cabrera",
+          "label": "Edward Cabrera concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5089,
+          "fair_odds": 1.97,
+          "expected_hr_allowed": 0.711,
+          "projected_ip": 5.87,
+          "inputs": {
+            "hr9": 1.09,
+            "era": 3.27,
+            "whip": 1.28
           },
           "side": "away"
         }
@@ -1956,6 +2120,52 @@
       ]
     },
     {
+      "event_id": "401815281",
+      "kickoff": "2026-05-10T01:05Z",
+      "league": "MLB",
+      "match": "Pittsburgh Pirates at San Francisco Giants",
+      "home": "San Francisco Giants",
+      "away": "Pittsburgh Pirates",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Pittsburgh Pirates",
+          "pitcher": "Bubba Chandler",
+          "label": "Bubba Chandler moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5168,
+          "fair_odds": 1.93,
+          "expected_strikeouts": 4.43,
+          "projected_ip": 4.86,
+          "inputs": {
+            "k9": 8.21,
+            "era": 4.76,
+            "whip": 1.5,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Pittsburgh Pirates",
+          "pitcher": "Bubba Chandler",
+          "label": "Bubba Chandler concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5095,
+          "fair_odds": 1.96,
+          "expected_hr_allowed": 0.712,
+          "projected_ip": 4.86,
+          "inputs": {
+            "hr9": 1.32,
+            "era": 4.76,
+            "whip": 1.5
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
       "event_id": "401815279",
       "kickoff": "2026-05-10T01:10Z",
       "league": "MLB",
@@ -2114,6 +2324,88 @@
             "hr9": 0.26,
             "era": 4.15,
             "whip": 1.7
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815284",
+      "kickoff": "2026-05-10T17:35Z",
+      "league": "MLB",
+      "match": "Athletics Athletics at Baltimore Orioles",
+      "home": "Baltimore Orioles",
+      "away": "Athletics",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Baltimore Orioles",
+          "pitcher": "Chris Bassitt",
+          "label": "Chris Bassitt plus de 2,5 strikeouts",
+          "line": 2.5,
+          "pick": "over",
+          "probability": 0.6075,
+          "fair_odds": 1.65,
+          "expected_strikeouts": 2.86,
+          "projected_ip": 4.57,
+          "inputs": {
+            "k9": 5.63,
+            "era": 5.91,
+            "whip": 1.91,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Baltimore Orioles",
+          "pitcher": "Chris Bassitt",
+          "label": "Chris Bassitt ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6527,
+          "fair_odds": 1.53,
+          "expected_hr_allowed": 0.427,
+          "projected_ip": 4.57,
+          "inputs": {
+            "hr9": 0.84,
+            "era": 5.91,
+            "whip": 1.91
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Athletics",
+          "pitcher": "Luis Severino",
+          "label": "Luis Severino moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5341,
+          "fair_odds": 1.87,
+          "expected_strikeouts": 5.35,
+          "projected_ip": 5.39,
+          "inputs": {
+            "k9": 8.93,
+            "era": 4.15,
+            "whip": 1.48,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Athletics",
+          "pitcher": "Luis Severino",
+          "label": "Luis Severino ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5366,
+          "fair_odds": 1.86,
+          "expected_hr_allowed": 0.623,
+          "projected_ip": 5.39,
+          "inputs": {
+            "hr9": 1.04,
+            "era": 4.15,
+            "whip": 1.48
           },
           "side": "away"
         }
@@ -2586,6 +2878,134 @@
       ]
     },
     {
+      "event_id": "401815290",
+      "kickoff": "2026-05-10T18:35Z",
+      "league": "MLB",
+      "match": "Chicago Cubs at Texas Rangers",
+      "home": "Texas Rangers",
+      "away": "Chicago Cubs",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Texas Rangers",
+          "pitcher": "Jacob deGrom",
+          "label": "Jacob deGrom plus de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "over",
+          "probability": 0.526,
+          "fair_odds": 1.9,
+          "expected_strikeouts": 6.63,
+          "projected_ip": 5.31,
+          "inputs": {
+            "k9": 11.23,
+            "era": 3.11,
+            "whip": 1.01,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Texas Rangers",
+          "pitcher": "Jacob deGrom",
+          "label": "Jacob deGrom concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5702,
+          "fair_odds": 1.75,
+          "expected_hr_allowed": 0.844,
+          "projected_ip": 5.31,
+          "inputs": {
+            "hr9": 1.43,
+            "era": 3.11,
+            "whip": 1.01
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Chicago Cubs",
+          "pitcher": "Jameson Taillon",
+          "label": "Jameson Taillon moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5873,
+          "fair_odds": 1.7,
+          "expected_strikeouts": 5.11,
+          "projected_ip": 5.73,
+          "inputs": {
+            "k9": 8.03,
+            "era": 4.24,
+            "whip": 1.14,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Chicago Cubs",
+          "pitcher": "Jameson Taillon",
+          "label": "Jameson Taillon concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.7897,
+          "fair_odds": 1.27,
+          "expected_hr_allowed": 1.559,
+          "projected_ip": 5.73,
+          "inputs": {
+            "hr9": 2.45,
+            "era": 4.24,
+            "whip": 1.14
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815296",
+      "kickoff": "2026-05-10T20:05Z",
+      "league": "MLB",
+      "match": "Pittsburgh Pirates at San Francisco Giants",
+      "home": "San Francisco Giants",
+      "away": "Pittsburgh Pirates",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Pittsburgh Pirates",
+          "pitcher": "Bubba Chandler",
+          "label": "Bubba Chandler moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5168,
+          "fair_odds": 1.93,
+          "expected_strikeouts": 4.43,
+          "projected_ip": 4.86,
+          "inputs": {
+            "k9": 8.21,
+            "era": 4.76,
+            "whip": 1.5,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Pittsburgh Pirates",
+          "pitcher": "Bubba Chandler",
+          "label": "Bubba Chandler concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5095,
+          "fair_odds": 1.96,
+          "expected_hr_allowed": 0.712,
+          "projected_ip": 4.86,
+          "inputs": {
+            "hr9": 1.32,
+            "era": 4.76,
+            "whip": 1.5
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
       "event_id": "401815294",
       "kickoff": "2026-05-10T20:10Z",
       "league": "MLB",
@@ -2796,7 +3216,7 @@
       ]
     }
   ],
-  "props": 134,
+  "props": 154,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
