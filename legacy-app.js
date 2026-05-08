@@ -24848,10 +24848,50 @@ return `
                   returnTime = when.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit', timeZone:'Europe/Paris' });
                 }
               } catch(e) { swallowError(e); }
-              return `<div style="margin-top:12px;padding:12px 14px;background:var(--info-soft);border:1px solid rgba(96,165,250,.25);border-radius:var(--r);font-size:12px;color:var(--text-2);line-height:1.5;">
+              // AUDIT 2026-05-08 — fallback star_players quand pas de compo.
+              // Avant : message "EN ATTENTE" sans aucune projection. Maintenant
+              // on extrait les attaquants vedettes des 2 équipes depuis star_players.json
+              // (top buteurs saison) et on les affiche avec g/match comme estimation
+              // approximative. C'est mieux que rien.
+              const starFallback = (() => {
+                try {
+                  const sp = window.STAR_PLAYERS_DATA || window.__starPlayers;
+                  if (!sp) return '';
+                  const teams = sp.teams || sp.by_team || {};
+                  const norm = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                  const homeKey = norm(home && (home.name || home.short));
+                  const awayKey = norm(away && (away.name || away.short));
+                  const homeTeam = teams[homeKey] || (homeKey ? Object.values(teams).find(t => norm(t.team) === homeKey) : null);
+                  const awayTeam = teams[awayKey] || (awayKey ? Object.values(teams).find(t => norm(t.team) === awayKey) : null);
+                  const collect = (t, side) => (t && Array.isArray(t.players) ? t.players : [])
+                    .filter(p => Number(p.goals_per_match || 0) > 0 && (p.position === 'F' || p.position === 'M'))
+                    .slice(0, 4)
+                    .map(p => ({ ...p, _side: side, _teamName: t.team }));
+                  const stars = [...collect(homeTeam, 'home'), ...collect(awayTeam, 'away')]
+                    .sort((a, b) => Number(b.goals_per_match || 0) - Number(a.goals_per_match || 0))
+                    .slice(0, 5);
+                  if (!stars.length) return '';
+                  return `<div style="margin-top:12px;background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;">
+<div style="padding:10px 12px;background:var(--panel-3);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px;">
+<div style="font-size:12px;font-weight:700;color:var(--text);">⭐ Top buteurs saison (estimation)</div>
+<div style="font-size:10px;color:var(--text-dim);">en attendant les compos</div>
+</div>
+${stars.map(s => `<div style="display:grid;grid-template-columns:1fr auto;gap:10px;padding:7px 10px;border-bottom:1px solid var(--border);align-items:center;">
+<div style="min-width:0;">
+<div style="font-size:13px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(s.name || '?')}<span style="color:var(--text-dim);font-size:10px;font-weight:500;margin-left:6px;">${s.position || ''} · ${esc(s._teamName || '')}</span></div>
+<div style="font-size:10.5px;color:var(--text-dim2);">${Number(s.goals_per_match || 0).toFixed(2)} but/match · ${Number(s.xG_per_match || 0).toFixed(2)} xG/match</div>
+</div>
+<div style="font-size:11px;color:var(--text-dim);font-variant-numeric:tabular-nums;">saison</div>
+</div>`).join('')}
+<div style="padding:8px 12px;font-size:10.5px;color:var(--text-dim);background:var(--panel-2);line-height:1.4;">Estimation basée sur les statistiques de la saison. Vérifiée par les compositions 1h avant le coup d'envoi.</div>
+</div>`;
+                } catch(e) { return ''; }
+              })();
+              const fallbackBlock = starFallback || `<div style="margin-top:12px;padding:12px 14px;background:var(--info-soft);border:1px solid rgba(96,165,250,.25);border-radius:var(--r);font-size:12px;color:var(--text-2);line-height:1.5;">
 <div style="font-weight:700;color:var(--info);margin-bottom:3px;">⏳ Prono joueurs buteurs : bientôt dispo</div>
 <div>Les compositions officielles sont annoncées <b>1 heure avant le coup d'envoi</b>${returnTime ? ` — reviens vers <b>${returnTime}</b>` : ''}. D'ici là, on ne peut pas estimer qui va marquer.</div>
 </div>`;
+              return fallbackBlock;
             }
             const top = scorers.slice(0, 5);
             const rows = top.map(s => {
@@ -30052,16 +30092,27 @@ return lines.map(l => `<div style="margin:6px 0;">${l}</div>`).join('');
 
 
 function suggestCombineIA(allEvents, targetSize) {
+try { window.suggestCombineIA = suggestCombineIA; } catch(e) { swallowError(e); }
 targetSize = targetSize || 3;
 const now = Date.now();
+// AUDIT 2026-05-08 v2 — user reportait "je ne vois plus de combinés".
+// Iter 1 : isLock OR (rel>=65% AND edge>=3pt) → toujours pas assez sur prod.
+// Iter 2 : on accepte tout pick avec rel >= 55% ET edge >= 0 (any positive
+// value, même petit) ET cote >= 1.30. Le tri "rel × log(odd)" sélectionnera
+// toujours les meilleurs en premier — le filtre permissif ne dilue donc pas.
 const candidates = (allEvents || []).filter(m => {
 if (!m.winamax || m.winamax.available !== true) return false;
 const t = new Date(m.date).getTime();
 if (isNaN(t) || t <= now) return false;
 const pred = predictMatch(m);
-if (!pred || !pred.pick || !pred.isLock || pred.skip) return false;
+if (!pred || !pred.pick || pred.skip) return false;
+const rel = Number(pred.reliability ?? pred.pick.prob ?? 0);
 const odd = pred.odds && (pred.pick.key === '1' ? pred.odds.home : pred.pick.key === '2' ? pred.odds.away : pred.odds.draw);
-if (!odd || odd < 1.05) return false;
+if (!odd || odd < 1.30) return false;
+const edge = rel - 1 / odd;
+// Plus permissif : accepter tier "value" (rel >= 50% AND edge >= 0)
+const isQualified = pred.isLock || (rel >= 0.55 && edge >= 0);
+if (!isQualified) return false;
 return true;
 }).map(m => {
 const pred = predictMatch(m);
@@ -30070,7 +30121,7 @@ return { m, pred, odd, rel: pred.reliability ?? pred.pick.prob };
 });
 
 if (candidates.length < 2) {
-return { legs: [], totalOdd: null, reason: 'Pas assez de locks Winamax avec cotes pour composer un combiné.' };
+return { legs: [], totalOdd: null, reason: 'Pas assez de picks haute confiance + value avec cotes Winamax pour composer un combiné.' };
 }
 
 candidates.sort((a, b) => (b.rel * Math.log(b.odd)) - (a.rel * Math.log(a.odd)));
@@ -30088,7 +30139,7 @@ usedKeys.add(key);
 }
 
 if (picked.length < 2) {
-return { legs: [], totalOdd: null, reason: 'Les locks du moment sont trop concentrés sur une même ligue/journée — pas de diversification possible.' };
+return { legs: [], totalOdd: null, reason: 'Pas assez de picks haute confiance non corrélés pour composer un combiné optimal aujourd\'hui.' };
 }
 
 const totalOdd = picked.reduce((p, l) => p * l.odd, 1);
