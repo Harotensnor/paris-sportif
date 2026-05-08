@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-08T23:29:22Z",
+  "generated_at": "2026-05-08T23:33:57Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -503,42 +503,6 @@
       "home": "Los Angeles Dodgers",
       "away": "Atlanta Braves",
       "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Los Angeles Dodgers",
-          "pitcher": "Roki Sasaki",
-          "label": "Roki Sasaki moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5589,
-          "fair_odds": 1.79,
-          "expected_strikeouts": 4.26,
-          "projected_ip": 4.7,
-          "inputs": {
-            "k9": 8.16,
-            "era": 5.97,
-            "whip": 1.67,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Los Angeles Dodgers",
-          "pitcher": "Roki Sasaki",
-          "label": "Roki Sasaki concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.7304,
-          "fair_odds": 1.37,
-          "expected_hr_allowed": 1.311,
-          "projected_ip": 4.7,
-          "inputs": {
-            "hr9": 2.51,
-            "era": 5.97,
-            "whip": 1.67
-          },
-          "side": "home"
-        },
         {
           "market": "pitcher_strikeouts",
           "team": "Atlanta Braves",
@@ -2832,7 +2796,7 @@
       ]
     }
   ],
-  "props": 136,
+  "props": 134,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
