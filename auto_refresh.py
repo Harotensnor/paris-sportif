@@ -230,6 +230,9 @@ PATCH_STAGES = [
     # v31 — Static credibilite.html (calibration + Brier + log-loss + SVG).
     # Lit backtest_report_v2.json, produit credibilite.html. ~0.3s.
     ('build_credibilite_page.py',   1,   15),
+    # AUDIT 2026-05-08 — segment_trust.json synthèse perf historique par
+    # segment, lit par le frontend pour annoter les picks affichés.
+    ('build_segment_trust.py',      1,   15),
     # v31.7.4 — OG images (1200x630 PNG) pour pages statiques. ~3s.
     ('build_og_images.py',          5,   30),
     # v35.13 — Sitemap dynamique (git lastmod + routes SPA).

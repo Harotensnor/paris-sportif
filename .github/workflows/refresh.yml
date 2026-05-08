@@ -330,6 +330,11 @@ jobs:
           python3 build_feed.py || true
           # v31 — Static credibilite.html (calibration + Brier + log-loss).
           python3 build_credibilite_page.py || true
+          # AUDIT 2026-05-08 — segment_trust.json synthèse ROI/WR par
+          # sport/ligue/cote_bucket/tier depuis backtest_report_v2.json.
+          # Frontend l'utilise pour annoter chaque pick avec un signal
+          # "✓ segment validé +X%" / "⚠ segment perdant -Y%". ~15 KB.
+          python3 build_segment_trust.py || true
           # v31.7.4 — OG images (1200x630 PNG) pour pages statiques. Cheap (~3s).
           python3 build_og_images.py || true
           # v35.13 — Sitemap dynamique depuis git log + routes SPA principales.

@@ -7980,6 +7980,69 @@ __probCalibrationLoaded = true;
 return __probCalibrationPromise;
 }
 try { window._loadProbCalibration = _loadProbCalibration; } catch(e) { swallowError(e); }
+
+// AUDIT 2026-05-08 — segment_trust.json : performance historique par
+// sport / ligue / cote_bucket / tier / sport×ligue×marché. Permet
+// d'annoter chaque pick affiché avec un signal de confiance basé sur
+// le ROI réel mesuré du segment, pas seulement l'edge théorique.
+let __segmentTrustLoaded = false;
+let __segmentTrustPromise = null;
+async function _loadSegmentTrust() {
+if (__segmentTrustLoaded || __segmentTrustPromise) return __segmentTrustPromise;
+__segmentTrustPromise = (async () => {
+try {
+const r = await fetch('segment_trust.json?v=' + Math.floor(Date.now() / (60 * 60 * 1000)), { cache: 'default' });
+if (!r.ok) { __segmentTrustLoaded = true; return; }
+window.__segmentTrust = await r.json();
+__segmentTrustLoaded = true;
+} catch(e) { __segmentTrustLoaded = true; }
+})();
+return __segmentTrustPromise;
+}
+try { window._loadSegmentTrust = _loadSegmentTrust; } catch(e) { swallowError(e); }
+
+// Helper qui retourne {tier, label, roi_pct, n, scope, findings[]} pour un pick.
+// tier ∈ {high, good, neutral, warn, low, uncertain}. Pour l'UI on n'affiche
+// QUE les tiers high/good (positif fort) et warn/low (alerte). Le neutre/uncertain
+// est silencieux pour ne pas bruiter l'interface.
+function _v37PickSegmentTrust(match, pick) {
+const st = window.__segmentTrust;
+if (!st || !match) return null;
+const sport = String(match.sport || '').toLowerCase();
+const league = String(match.league_code || '').toLowerCase();
+const odd = Number((pick && (pick.odd || pick.best?.odd)) || 0);
+let bucket = '';
+if (odd > 1.01 && odd < 1.50) bucket = 'heavy_fav';
+else if (odd < 2.00) bucket = 'fav';
+else if (odd < 2.80) bucket = 'toss_up';
+else if (odd < 4.50) bucket = 'dog';
+else if (odd >= 4.50) bucket = 'heavy_dog';
+const sportT = (st.by_sport || {})[sport];
+const leagueT = (st.by_league || {})[league];
+const bucketT = (st.by_cote_bucket || {})[bucket];
+// Calibration group is sport:scope (e.g. football:top5)
+const TOP5 = new Set(['eng.1','esp.1','ger.1','ita.1','fra.1']);
+const calibGrp = sport === 'football' ? `football:${TOP5.has(league) ? 'top5' : 'other'}` : `${sport}:all`;
+const calibT = (st.by_calibration_group || {})[calibGrp];
+const findings = [];
+if (calibT && calibT.trust !== 'uncertain') findings.push({ scope: 'segment', ...calibT });
+if (leagueT && leagueT.trust !== 'uncertain' && (leagueT.n || 0) >= 5) findings.push({ scope: 'league', ...leagueT });
+if (sportT && sportT.trust !== 'uncertain') findings.push({ scope: 'sport', ...sportT });
+if (bucketT && bucketT.trust !== 'uncertain') findings.push({ scope: 'cote', ...bucketT });
+if (!findings.length) return null;
+const tierWeight = { low: 5, warn: 4, high: 3, good: 2, neutral: 1, uncertain: 0 };
+findings.sort((a, b) => (tierWeight[b.trust] || 0) - (tierWeight[a.trust] || 0));
+const dom = findings[0];
+return {
+tier: dom.trust,
+label: dom.trust_label,
+roi_pct: dom.flat_roi_pct,
+n: dom.n,
+scope: dom.scope,
+findings: findings.slice(0, 3),
+};
+}
+try { window._v37PickSegmentTrust = _v37PickSegmentTrust; } catch(e) { swallowError(e); }
 // Runtime helper: map a raw model probability to its empirically-calibrated
 // counterpart using the histogram binning from build_prob_calibration.py.
 // Prefer sport-specific bins when sample size is usable, otherwise fall back
@@ -8008,12 +8071,12 @@ return _capPublicProbValue(corrected);
 }
 try { window._calibrateProb = _calibrateProb; } catch(e) { swallowError(e); }
 _loadModelCalibration();
-// Schedule prob calibration load on idle so it's ready by the time the
-// dashboard or credibilité page wants to display the curve.
+// Schedule prob calibration + segment trust loads on idle so ready
+// by the time the dashboard or detail modal wants to display them.
 if (typeof requestIdleCallback === 'function') {
-requestIdleCallback(() => { try { _loadProbCalibration(); } catch(e) { swallowError(e); } }, { timeout: 4000 });
+requestIdleCallback(() => { try { _loadProbCalibration(); _loadSegmentTrust(); } catch(e) { swallowError(e); } }, { timeout: 4000 });
 } else {
-setTimeout(() => { try { _loadProbCalibration(); } catch(e) { swallowError(e); } }, 1500);
+setTimeout(() => { try { _loadProbCalibration(); _loadSegmentTrust(); } catch(e) { swallowError(e); } }, 1500);
 }
 
 function _populateTrustStrip(rep) {
@@ -17727,6 +17790,26 @@ if (p.opportunity >= 60) return 'Lecture simple : pari jouable, mais pas automat
 if (p.edge >= 0.04) return 'Lecture simple : il y a de la value, mais le risque reste plus haut. À jouer petit ou à surveiller.';
 return 'Lecture simple : avantage faible ou données incomplètes. À lire pour info, pas une priorité.';
 };
+// AUDIT 2026-05-08 — badge segment_trust : retourne le HTML d'un chip
+// "✓ +7% baseball" (vert) ou "⚠ -10% hockey" (rouge) si le segment de
+// ce pick a un signal historique fort (high/low). Silencieux pour les
+// tiers neutre/uncertain afin de ne pas bruiter l'UI.
+const v37SegmentTrustChip = (p) => {
+if (!p || !p.m) return '';
+const trust = (typeof window._v37PickSegmentTrust === 'function') ? window._v37PickSegmentTrust(p.m, p) : null;
+if (!trust) return '';
+const tier = trust.tier;
+if (tier !== 'high' && tier !== 'low' && tier !== 'warn' && tier !== 'good') return '';
+const isPos = tier === 'high' || tier === 'good';
+const icon = isPos ? '✓' : '⚠';
+const sign = trust.roi_pct >= 0 ? '+' : '';
+const scopeLabel = trust.scope === 'segment' ? '' : trust.scope === 'sport' ? '' : ` ${trust.scope}`;
+const tooltip = `Historique segment (${trust.scope}) : ${sign}${trust.roi_pct.toFixed(1)}% ROI sur ${trust.n} paris settled.`;
+const bg = isPos ? 'rgba(33,199,122,.10)' : 'rgba(248,113,113,.10)';
+const border = isPos ? 'rgba(33,199,122,.32)' : 'rgba(248,113,113,.32)';
+const fg = isPos ? '#21c77a' : '#ff6b4a';
+return `<i class="v37-segment-trust" data-trust-tier="${tier}" data-tooltip="${esc(tooltip)}" title="${esc(tooltip)}" style="display:inline-flex;align-items:center;gap:3px;height:18px;padding:0 7px;border-radius:999px;background:${bg};border:1px solid ${border};color:${fg};font-style:normal;font-size:9.5px;font-weight:900;letter-spacing:.2px;">${icon} ${sign}${trust.roi_pct.toFixed(1)}%${scopeLabel}</i>`;
+};
 const v37IsStaleLive = (m) => {
 const live = !!(m?.live || String(m?.status || '') === 'STATUS_IN_PROGRESS');
 if (!live) return false;
@@ -17784,7 +17867,7 @@ return `<tr class="v36-table-row ${soon ? 'is-imminent' : ''} ${sameMatchCount >
           <td>${esc(fmtTime(p.m.date))}</td>
           <td class="v36-cell-league">${esc(league)}</td>
           <td class="v36-cell-match">${v36MatchTitleHtml(p)}${sameMatchCount > 1 ? `<span class="v37-match-multi">+${sameMatchCount - 1} autre pick</span>` : ''}</td>
-          <td class="v36-cell-pick"><b data-tooltip="${esc(pickHelp)}">${esc(p.label)}</b>${p.marketInfo ? `<span aria-hidden="true" data-tooltip="${esc(p.marketInfo)}" style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;margin-left:6px;border-radius:50%;border:1px solid var(--border);color:var(--text-dim);font-size:10px;font-weight:800;">?</span>` : ''}<em>${esc(marketName)}</em><small class="v37-beginner-copy">${esc(beginnerText)}</small><span style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:5px;">${oddBadge}${indicativeBadge}<i class="v38-open-analysis">analyse complète</i></span></td>
+          <td class="v36-cell-pick"><b data-tooltip="${esc(pickHelp)}">${esc(p.label)}</b>${p.marketInfo ? `<span aria-hidden="true" data-tooltip="${esc(p.marketInfo)}" style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;margin-left:6px;border-radius:50%;border:1px solid var(--border);color:var(--text-dim);font-size:10px;font-weight:800;">?</span>` : ''}<em>${esc(marketName)}</em><small class="v37-beginner-copy">${esc(beginnerText)}</small><span style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:5px;">${oddBadge}${indicativeBadge}${v37SegmentTrustChip(p)}<i class="v38-open-analysis">analyse complète</i></span></td>
           <td class="v36-num v36-odd">${v37BlindOddHtml(p.odd)}</td>
           <td class="v36-num">${v37ReadableMetricHtml(confMetric)}</td>
           <td class="v36-num ${p.edge >= 0 ? 'is-pos' : 'is-neg'}"><span data-tooltip="Avantage : écart entre notre modèle et la cote. Positif = la cote semble mieux payée que le risque réel.">${v37BlindMode ? v37BlindEdgeHtml(p.edge) : v37ReadableMetricHtml(edgeMetric, p.edge >= 0 ? 'pos' : 'neg')}</span></td>
@@ -17808,7 +17891,7 @@ return `<button type="button" class="v36-table-card ${sameMatchCount > 1 ? 'is-s
           <em class="v36-table-card__league">${esc(p.m.league_name || p.m.league || '')}</em>
           <span class="v36-table-card__line"><i data-tooltip="${esc(p.marketTooltip || p.labelFull || p.label)}">${esc(p.labelMobile || p.label)}</i><b>${v37BlindOddHtml(p.odd)}</b><b>${esc(confMetric.label)}</b><b>${v37BlindMode ? v37BlindEdgeHtml(p.edge) : esc(edgeMetric.label)}</b></span>
           <small class="v37-beginner-copy">${esc(beginnerText)}</small>
-          <span class="v36-table-card__signals"><i data-tooltip="${esc(p.opportunityTooltip || '')}" title="${esc(p.opportunityTooltip || '')}" aria-label="${esc(p.opportunityTooltip || `Score d'opportunité ${p.opportunity || 0}/100`)}">Priorité ${esc(String(p.opportunity || 0))}/100 · ${esc(oddState === 'blocked' ? 'cote à vérifier' : p.opportunity >= 80 ? 'Conviction forte' : p.opportunity >= 60 ? 'Bon pari' : p.opportunity >= 40 ? 'Acceptable' : 'Peu fiable')}</i>${typeof v38OddStatusChip === 'function' ? v38OddStatusChip(oddMeta) : ''}${p.best?.source === 'cote_indicative' ? '<i>Cote indicative</i>' : ''}${sameMatchCount > 1 ? `<i>+${sameMatchCount - 1} autre pick même match</i>` : ''}${(p.opportunityBadges || []).slice(0, 2).map(x => `<i data-tooltip="${esc(v37BadgeTooltip(x))}" title="${esc(v37BadgeTooltip(x))}">${esc(x)}</i>`).join('')}</span>
+          <span class="v36-table-card__signals"><i data-tooltip="${esc(p.opportunityTooltip || '')}" title="${esc(p.opportunityTooltip || '')}" aria-label="${esc(p.opportunityTooltip || `Score d'opportunité ${p.opportunity || 0}/100`)}">Priorité ${esc(String(p.opportunity || 0))}/100 · ${esc(oddState === 'blocked' ? 'cote à vérifier' : p.opportunity >= 80 ? 'Conviction forte' : p.opportunity >= 60 ? 'Bon pari' : p.opportunity >= 40 ? 'Acceptable' : 'Peu fiable')}</i>${typeof v38OddStatusChip === 'function' ? v38OddStatusChip(oddMeta) : ''}${p.best?.source === 'cote_indicative' ? '<i>Cote indicative</i>' : ''}${sameMatchCount > 1 ? `<i>+${sameMatchCount - 1} autre pick même match</i>` : ''}${v37SegmentTrustChip(p)}${(p.opportunityBadges || []).slice(0, 2).map(x => `<i data-tooltip="${esc(v37BadgeTooltip(x))}" title="${esc(v37BadgeTooltip(x))}">${esc(x)}</i>`).join('')}</span>
           ${v37ShowResultColumn ? `<span class="v36-table-card__signals">${v37ResultBadge(result)}</span>` : ''}
         </button>`;
 };
