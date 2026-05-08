@@ -16162,6 +16162,13 @@ if (k <= 0) { return; } // pas d'edge → pas de mise
       wrap.innerHTML = '<div style="padding:60px;text-align:center;color:var(--text-dim);">Chargement…</div>';
       return;
     }
+    // AUDIT 2026-05-08 — fix tableau vide au boot : dashboard force lite→full.
+    if (data._lite && typeof _ensureFullData === 'function' && wrap && !wrap.dataset.dashFullRequested) {
+      wrap.dataset.dashFullRequested = '1';
+      _ensureFullData().then(full => {
+        if (full && document.body.contains(wrap) && currentPage === 'dashboard') renderDashboardPage(wrap);
+      }).catch(() => { delete wrap.dataset.dashFullRequested; });
+    }
     if (wrap) {
       if (data._lite) wrap.dataset.dashboardDataMode = 'lite';
       else delete wrap.dataset.dashboardDataMode;
