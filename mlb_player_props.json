@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-08T19:46:57Z",
+  "generated_at": "2026-05-08T19:54:10Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -126,6 +126,88 @@
             "hr9": 0.96,
             "era": 3.38,
             "whip": 1.15
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815254",
+      "kickoff": "2026-05-08T23:05Z",
+      "league": "MLB",
+      "match": "Athletics Athletics at Baltimore Orioles",
+      "home": "Baltimore Orioles",
+      "away": "Athletics",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Baltimore Orioles",
+          "pitcher": "Kyle Bradish",
+          "label": "Kyle Bradish plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.6123,
+          "fair_odds": 1.63,
+          "expected_strikeouts": 5.0,
+          "projected_ip": 4.86,
+          "inputs": {
+            "k9": 9.26,
+            "era": 5.03,
+            "whip": 1.82,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Baltimore Orioles",
+          "pitcher": "Kyle Bradish",
+          "label": "Kyle Bradish concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5095,
+          "fair_odds": 1.96,
+          "expected_hr_allowed": 0.712,
+          "projected_ip": 4.86,
+          "inputs": {
+            "hr9": 1.32,
+            "era": 5.03,
+            "whip": 1.82
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Athletics",
+          "pitcher": "Jacob Lopez",
+          "label": "Jacob Lopez plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.5864,
+          "fair_odds": 1.71,
+          "expected_strikeouts": 3.83,
+          "projected_ip": 5.0,
+          "inputs": {
+            "k9": 6.9,
+            "era": 6.6,
+            "whip": 1.9,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Athletics",
+          "pitcher": "Jacob Lopez",
+          "label": "Jacob Lopez concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6321,
+          "fair_odds": 1.58,
+          "expected_hr_allowed": 1.0,
+          "projected_ip": 5.0,
+          "inputs": {
+            "hr9": 1.8,
+            "era": 6.6,
+            "whip": 1.9
           },
           "side": "away"
         }
@@ -670,6 +752,88 @@
       ]
     },
     {
+      "event_id": "401815260",
+      "kickoff": "2026-05-09T00:05Z",
+      "league": "MLB",
+      "match": "Chicago Cubs at Texas Rangers",
+      "home": "Texas Rangers",
+      "away": "Chicago Cubs",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Texas Rangers",
+          "pitcher": "Jack Leiter",
+          "label": "Jack Leiter moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5738,
+          "fair_odds": 1.74,
+          "expected_strikeouts": 6.14,
+          "projected_ip": 5.43,
+          "inputs": {
+            "k9": 10.18,
+            "era": 5.45,
+            "whip": 1.37,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Texas Rangers",
+          "pitcher": "Jack Leiter",
+          "label": "Jack Leiter concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6326,
+          "fair_odds": 1.58,
+          "expected_hr_allowed": 1.001,
+          "projected_ip": 5.43,
+          "inputs": {
+            "hr9": 1.66,
+            "era": 5.45,
+            "whip": 1.37
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Chicago Cubs",
+          "pitcher": "Edward Cabrera",
+          "label": "Edward Cabrera moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5538,
+          "fair_odds": 1.81,
+          "expected_strikeouts": 5.26,
+          "projected_ip": 5.87,
+          "inputs": {
+            "k9": 8.06,
+            "era": 3.27,
+            "whip": 1.28,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Chicago Cubs",
+          "pitcher": "Edward Cabrera",
+          "label": "Edward Cabrera concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5089,
+          "fair_odds": 1.97,
+          "expected_hr_allowed": 0.711,
+          "projected_ip": 5.87,
+          "inputs": {
+            "hr9": 1.09,
+            "era": 3.27,
+            "whip": 1.28
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
       "event_id": "401815265",
       "kickoff": "2026-05-09T01:40Z",
       "league": "MLB",
@@ -910,6 +1074,52 @@
             "hr9": 2.7,
             "era": 8.1,
             "whip": 2.7
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815266",
+      "kickoff": "2026-05-09T02:15Z",
+      "league": "MLB",
+      "match": "Pittsburgh Pirates at San Francisco Giants",
+      "home": "San Francisco Giants",
+      "away": "Pittsburgh Pirates",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Pittsburgh Pirates",
+          "pitcher": "Braxton Ashcraft",
+          "label": "Braxton Ashcraft moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5291,
+          "fair_odds": 1.89,
+          "expected_strikeouts": 6.36,
+          "projected_ip": 5.89,
+          "inputs": {
+            "k9": 9.72,
+            "era": 3.02,
+            "whip": 1.08,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Pittsburgh Pirates",
+          "pitcher": "Braxton Ashcraft",
+          "label": "Braxton Ashcraft ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6537,
+          "fair_odds": 1.53,
+          "expected_hr_allowed": 0.425,
+          "projected_ip": 5.89,
+          "inputs": {
+            "hr9": 0.65,
+            "era": 3.02,
+            "whip": 1.08
           },
           "side": "away"
         }
@@ -2586,7 +2796,7 @@
       ]
     }
   ],
-  "props": 124,
+  "props": 134,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

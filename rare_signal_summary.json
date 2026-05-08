@@ -1,26 +1,26 @@
 {
-  "generated_at": "2026-05-08T19:47:17Z",
+  "generated_at": "2026-05-08T19:54:31Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 51,
-    "actionable": 37,
-    "watch": 9,
-    "risk": 5,
+    "active_events": 50,
+    "actionable": 36,
+    "watch": 10,
+    "risk": 4,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 29,
-      "market_move": 39,
-      "travel_extreme": 15,
-      "market_uncertain": 7,
-      "signal_conflict": 7,
-      "back_to_back_travel": 23
+      "injury_imbalance": 32,
+      "market_move": 37,
+      "travel_extreme": 16,
+      "market_uncertain": 5,
+      "signal_conflict": 9,
+      "back_to_back_travel": 21
     },
     "by_quality": {
-      "actionable": 37,
-      "watch": 9,
-      "risk": 5
+      "actionable": 36,
+      "watch": 10,
+      "risk": 4
     }
   },
   "active_actionable": [
@@ -59,6 +59,42 @@
       "side": "home",
       "strength": 1.0,
       "context": "Cote home: 1.74 -> 2.20 (-26.4%)"
+    },
+    {
+      "event_id": "401815254",
+      "date": "2026-05-08T23:05Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Baltimore Orioles",
+      "away": "Athletics",
+      "match": "Baltimore Orioles - Athletics",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Baltimore Orioles",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 9-3"
+    },
+    {
+      "event_id": "401815257",
+      "date": "2026-05-08T23:15Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Cleveland Guardians",
+      "away": "Minnesota Twins",
+      "match": "Cleveland Guardians - Minnesota Twins",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 1.0,
+      "context": "Cote away: 2.23 -> 1.82 (+18.4%)"
     },
     {
       "event_id": "401815261",
@@ -113,6 +149,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 8-3"
+    },
+    {
+      "event_id": "401815266",
+      "date": "2026-05-09T02:15Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "San Francisco Giants",
+      "away": "Pittsburgh Pirates",
+      "match": "San Francisco Giants - Pittsburgh Pirates",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "San Francisco Giants",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 11-2"
     },
     {
       "event_id": "401871335",
@@ -385,42 +439,6 @@
       "context": "Absences severes 8-3"
     },
     {
-      "event_id": "401815291",
-      "date": "2026-05-10T23:20Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Kansas City Royals",
-      "away": "Detroit Tigers",
-      "match": "Kansas City Royals - Detroit Tigers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Detroit Tigers",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 6-12"
-    },
-    {
-      "event_id": "401871355",
-      "date": "2026-05-11T19:00Z",
-      "sport": "football",
-      "league_code": "championship",
-      "league_name": "Championship",
-      "home": "Millwall",
-      "away": "Hull City",
-      "match": "Millwall - Hull City",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "draw",
-      "strength": 1.0,
-      "context": "Cote draw: 3.15 -> 2.35 (+25.4%)"
-    },
-    {
       "event_id": "401815288",
       "date": "2026-05-10T17:35Z",
       "sport": "baseball",
@@ -601,24 +619,6 @@
       "context": "1 match dans les 48h + 1186 km de voyage"
     },
     {
-      "event_id": "401871419",
-      "date": "2026-05-11T04:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Minnesota Wild",
-      "away": "Colorado Avalanche",
-      "match": "Minnesota Wild - Colorado Avalanche",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Colorado Avalanche",
-      "side": "away",
-      "strength": 0.757,
-      "context": "1 match dans les 48h + 1135 km de voyage"
-    },
-    {
       "event_id": "401815272",
       "date": "2026-05-09T22:10Z",
       "sport": "baseball",
@@ -635,24 +635,6 @@
       "side": "away",
       "strength": 0.733,
       "context": "1 match dans les 48h + 1015 km de voyage"
-    },
-    {
-      "event_id": "401815259",
-      "date": "2026-05-08T23:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Miami Marlins",
-      "away": "Washington Nationals",
-      "match": "Miami Marlins - Washington Nationals",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "away",
-      "strength": 0.731,
-      "context": "Cote away: 1.90 -> 2.15 (-13.2%)"
     },
     {
       "event_id": "401815264",
@@ -693,24 +675,6 @@
   ],
   "active_watch": [
     {
-      "event_id": "401815257",
-      "date": "2026-05-08T23:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Cleveland Guardians",
-      "away": "Minnesota Twins",
-      "match": "Cleveland Guardians - Minnesota Twins",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.623,
-      "context": "Cote away: 2.05 -> 1.82 (+11.2%)"
-    },
-    {
       "event_id": "401815255",
       "date": "2026-05-08T22:40Z",
       "sport": "baseball",
@@ -729,6 +693,24 @@
       "context": "Absences severes 3-6"
     },
     {
+      "event_id": "401815259",
+      "date": "2026-05-08T23:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Miami Marlins",
+      "away": "Washington Nationals",
+      "match": "Miami Marlins - Washington Nationals",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Washington Nationals",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 5-8"
+    },
+    {
       "event_id": "401871413",
       "date": "2026-05-09T22:00Z",
       "sport": "hockey",
@@ -745,24 +727,6 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 3-0"
-    },
-    {
-      "event_id": "401871414",
-      "date": "2026-05-11T23:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Carolina Hurricanes",
-      "away": "Philadelphia Flyers",
-      "match": "Carolina Hurricanes - Philadelphia Flyers",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Philadelphia Flyers",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 0-3"
     },
     {
       "event_id": "747767",
@@ -801,6 +765,24 @@
       "context": "Cote away: 3.55 -> 3.20 (+9.9%)"
     },
     {
+      "event_id": "401815262",
+      "date": "2026-05-08T23:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Milwaukee Brewers",
+      "away": "New York Yankees",
+      "match": "Milwaukee Brewers - New York Yankees",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.539,
+      "context": "Cote away: 1.79 -> 1.62 (+9.7%)"
+    },
+    {
       "event_id": "401866309",
       "date": "2026-05-09T14:00Z",
       "sport": "football",
@@ -817,6 +799,24 @@
       "side": "away",
       "strength": 0.505,
       "context": "Cote away: 4.40 -> 4.80 (-9.1%)"
+    },
+    {
+      "event_id": "401856892",
+      "date": "2026-05-09T02:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Seattle Storm",
+      "away": "Golden State Valkyries",
+      "match": "Seattle Storm - Golden State Valkyries",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.479,
+      "context": "Cote home: 2.90 -> 2.65 (+8.6%)"
     },
     {
       "event_id": "401856895",
@@ -909,24 +909,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 19.2%"
-    },
-    {
-      "event_id": "401842707",
-      "date": "2026-05-11T17:00Z",
-      "sport": "football",
-      "league_code": "allsvenskan",
-      "league_name": "Allsvenskan",
-      "home": "IK Sirius",
-      "away": "Örgryte IS",
-      "match": "IK Sirius - Örgryte IS",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.3%"
     },
     {
       "event_id": "401815258",
