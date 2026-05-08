@@ -563,6 +563,38 @@ if (!cleanId) return location.href;
 const suffix = tab ? `/${encodeURIComponent(String(tab))}` : '';
 return `${base}#match/${encodeURIComponent(cleanId)}${suffix}`;
 }
+function _fallbackPageHashForDetail() {
+try {
+const page = (typeof currentPage !== 'undefined' && currentPage && VALID_PAGES.includes(currentPage))
+? currentPage
+: (localStorage.getItem('currentPage') || 'dashboard');
+return `#${VALID_PAGES.includes(page) ? page : 'dashboard'}`;
+} catch(e) {
+return '#dashboard';
+}
+}
+function _rememberDetailReturnHash() {
+try {
+const currentHash = location.hash || '';
+if (currentHash && !/^#match\//.test(currentHash)) {
+window._previousDetailPageHash = currentHash;
+return;
+}
+if (!window._previousDetailPageHash || /^#match\//.test(window._previousDetailPageHash)) {
+window._previousDetailPageHash = _fallbackPageHashForDetail();
+}
+} catch(e) { swallowError(e); }
+}
+function _restoreDetailReturnHash() {
+try {
+let fallback = window._previousDetailPageHash || _fallbackPageHashForDetail();
+if (!fallback || /^#match\//.test(fallback)) fallback = _fallbackPageHashForDetail();
+if (!fallback.startsWith('#')) fallback = '#' + fallback.replace(/^#/, '');
+const url = new URL(location.href);
+url.searchParams.delete('match');
+history.replaceState(null, '', url.pathname + (url.search ? url.search : '') + fallback);
+} catch(e) { swallowError(e); }
+}
 function _setUserNavHash(newHash) {
 try {
 if (!newHash || location.hash === newHash) return;
@@ -11443,6 +11475,7 @@ window._leagueLogoMark404 = _leagueLogoMark404;
   }
 
   function openDetail(match, detailOptions) {
+    _rememberDetailReturnHash();
     const { home, away } = getSides(match);
     const detailOpts = detailOptions && typeof detailOptions === 'object' ? detailOptions : {};
     const pred = predictMatch(match);
@@ -14787,6 +14820,13 @@ if (match && typeof openDetail === 'function') setTimeout(() => openDetail(match
 
 const closeDetailModal = () => {
 const m = document.getElementById('detail-modal');
+if (!m) return;
+const wasOpen = m.classList.contains('open');
+let shouldRestoreHash = false;
+try {
+const url = new URL(location.href);
+shouldRestoreHash = wasOpen && (/^#match\//.test(location.hash || '') || url.searchParams.has('match'));
+} catch(e) { swallowError(e); }
 m.classList.remove('open');
 m.setAttribute('aria-hidden', 'true');
 if (window._modalTrapRelease) {
@@ -14794,11 +14834,7 @@ try { window._modalTrapRelease(); } catch(e) { swallowError(e); }
 window._modalTrapRelease = null;
 }
 try {
-const url = new URL(location.href);
-if (url.searchParams.has('match')) {
-url.searchParams.delete('match');
-history.replaceState(null, '', url.pathname + (url.search ? url.search : '') + url.hash);
-}
+if (shouldRestoreHash) _restoreDetailReturnHash();
 } catch(e) { swallowError(e); }
 };
 window.openDetail = openDetail;
