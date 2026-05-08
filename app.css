@@ -537,4 +537,29 @@ html[data-theme="light"]{--surface-0:#f5f5f7;--surface-1:#ffffff;--surface-2:#fb
 /* Backward-compat hide pour les anciennes classes que nous ne créons plus */
 .v38-table .v36-cell-sport,.v38-table .v36-cell-date,.v38-table .v36-cell-league:not(.v38-meta-league){display:none}
 
+/* AUDIT 2026-05-08 v39 — Recommandation finale unifiée.
+   User : "il me faut UN SEUL indicateur qui me dit si je peux miser dessus
+   ou pas". On supprime les colonnes Confiance / Edge / Score / Tier
+   séparées. À leur place : une seule colonne "Recommandation" avec un
+   badge gros lisible (verdict + raison courte). Combine toutes les
+   sources de signal : confiance modèle, edge, score d'opportunité, tier,
+   segment_trust historique, cote validée. */
+.v39-th-rec{text-align:left!important;padding-left:14px!important;min-width:200px}
+.v39-cell-rec{padding:12px 14px!important;min-width:200px;max-width:260px;text-align:left}
+.v39-rec-cell{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.v39-rec-badge{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;font-size:13.5px;font-weight:1000;letter-spacing:.2px;line-height:1;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,.20)}
+.v39-rec-icon{font-size:14px;line-height:1;font-weight:1000}
+.v39-rec-label{line-height:1}
+.v39-rec-reason{font-size:11px;color:var(--text-dim);font-weight:600;line-height:1.3;max-width:240px}
+.v39-table-row[data-verdict="bet"] .v39-rec-badge{box-shadow:0 0 0 2px rgba(33,199,122,.18),0 1px 4px rgba(0,0,0,.30)}
+.v39-table-row .v39-rec-cell[data-verdict="check"]{opacity:.85}
+
+/* Hover effect adapt to v39 */
+.v39-table-row:has(.v39-rec-cell[data-verdict="bet"]):hover{background:linear-gradient(90deg,rgba(33,199,122,.08),transparent 65%)}
+.v39-table-row:has(.v39-rec-cell[data-verdict="skip"]):hover{background:linear-gradient(90deg,rgba(248,113,113,.06),transparent 65%)}
+
+/* Mobile cards — also show single recommendation badge.
+   On garde les cards mobile mais on ajoute le badge reco en proéminent. */
+.v36-table-card .v39-rec-badge{align-self:flex-start;margin-top:8px}
+
 /* Mobile : la table est cachée, cards sont utilisées (pas d'override mobile nécessaire) */

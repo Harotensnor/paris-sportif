@@ -17107,6 +17107,16 @@ if (typeof window._v37IsRefundMarket === 'function' && window._v37IsRefundMarket
 v37Reject('marche_remboursement', m, c?.market || '');
 return false;
 }
+// AUDIT 2026-05-08 v39 — User : "je veux pas de paris à cote pas validée".
+// On exige donc une cote Winamax verified ou changed-récent (≤30min).
+// Le pick reste visible dans #tous (page exploration) mais pas dans le
+// dashboard principal. Les status missing/blocked/stale/divergent sont
+// rejetés ici.
+const _oddMeta = c.oddValidation || (typeof validatePickOdd === 'function' ? validatePickOdd(m, c, pred) : null);
+if (typeof v38OddTopEligible === 'function' && !v38OddTopEligible(_oddMeta)) {
+v37Reject('cote_non_validee', m, `${c?.market || ''} status=${_oddMeta?.status || 'missing'}`);
+return false;
+}
 return true;
 })
 .filter(c => {
@@ -17790,6 +17800,75 @@ if (p.opportunity >= 60) return 'Lecture simple : pari jouable, mais pas automat
 if (p.edge >= 0.04) return 'Lecture simple : il y a de la value, mais le risque reste plus haut. À jouer petit ou à surveiller.';
 return 'Lecture simple : avantage faible ou données incomplètes. À lire pour info, pas une priorité.';
 };
+// AUDIT 2026-05-08 v39 — Recommandation finale unifiée.
+// User : "il me faut UN SEUL indicateur qui me dit si je peux miser
+// dessus ou pas". Combine cote validation + confiance + edge + score
+// d'opportunité + tier + segment trust historique en un verdict :
+// 'bet' (miser) / 'bet-light' (mise prudente) / 'watch' (surveiller) /
+// 'check' (cote à vérifier) / 'skip' (passer).
+const _v39FinalRec = (p) => {
+  if (!p || !p.m) return { verdict: 'skip', label: 'Passer', score: 0, tone: 'red', reason: '' };
+  const oddMeta = p.oddValidation || (typeof validatePickOdd === 'function' ? validatePickOdd(p.m, p.best || p, p.pred) : null);
+  const oddOk = typeof v38OddTopEligible === 'function' ? v38OddTopEligible(oddMeta) : true;
+  const rel = Number(p.rel || 0);
+  const edge = Number(p.edge || 0);
+  const opp = Number(p.opportunity || 0);
+  const tier = String(p.tier || 'lowconf');
+  const trust = (typeof window._v37PickSegmentTrust === 'function') ? window._v37PickSegmentTrust(p.m, p.best || p) : null;
+  const trustTier = trust?.tier || 'uncertain';
+  const fmtPct = (n) => (n >= 0 ? '+' : '') + (n * 100).toFixed(1) + 'pt';
+  // Veto 1 : cote non validée → "Cote à vérifier" (n'apparaît normalement pas
+  // dans le dashboard car filtre upstream, mais safety net).
+  if (!oddOk) {
+    return { verdict: 'check', label: 'Cote à vérifier', score: Math.min(40, opp), tone: 'amber', reason: 'Cote non confirmée Winamax — refuser ou re-vérifier' };
+  }
+  // Veto 2 : segment historique perdant.
+  if (trustTier === 'low') {
+    return { verdict: 'skip', label: 'À éviter', score: Math.min(35, opp), tone: 'red', reason: `Historique segment ${trust.roi_pct.toFixed(1)}% sur ${trust.n} paris` };
+  }
+  if (trustTier === 'warn') {
+    return { verdict: 'watch', label: 'Prudent', score: Math.max(30, Math.min(55, opp)), tone: 'orange', reason: `Segment instable ${trust.roi_pct.toFixed(1)}%` };
+  }
+  // Strong positive : tier safe/lock + opp >= 70.
+  if ((tier === 'safe' || tier === 'lock') && opp >= 70) {
+    return { verdict: 'bet', label: 'Miser', score: opp, tone: 'green', reason: `Conf ${(rel*100).toFixed(0)}% · Edge ${fmtPct(edge)}` };
+  }
+  // Strong : opp >= 75.
+  if (opp >= 75) {
+    return { verdict: 'bet', label: 'Miser', score: opp, tone: 'green', reason: `Conf ${(rel*100).toFixed(0)}% · Edge ${fmtPct(edge)}` };
+  }
+  // Good : opp 60-75.
+  if (opp >= 60) {
+    return { verdict: 'bet-light', label: 'Petite mise', score: opp, tone: 'green-light', reason: `Conf ${(rel*100).toFixed(0)}% · Edge ${fmtPct(edge)}` };
+  }
+  // Acceptable : opp 40-60.
+  if (opp >= 40) {
+    return { verdict: 'watch', label: 'Surveiller', score: opp, tone: 'orange', reason: 'Edge faible ou data incomplète' };
+  }
+  return { verdict: 'skip', label: 'Passer', score: opp, tone: 'red', reason: 'Pas assez de signal' };
+};
+try { window._v39FinalRec = _v39FinalRec; } catch(e) { swallowError(e); }
+
+// AUDIT 2026-05-08 v39 — Badge HTML pour la recommandation finale.
+const v39RecBadge = (p) => {
+  const r = _v39FinalRec(p);
+  const tones = {
+    'green': { bg: 'rgba(33,199,122,.18)', bd: 'rgba(33,199,122,.45)', fg: '#21c77a', icon: '✓' },
+    'green-light': { bg: 'rgba(56,189,248,.14)', bd: 'rgba(56,189,248,.40)', fg: '#7dd3fc', icon: '↗' },
+    'orange': { bg: 'rgba(246,183,60,.16)', bd: 'rgba(246,183,60,.42)', fg: '#fbbf24', icon: '⚠' },
+    'amber': { bg: 'rgba(251,146,60,.16)', bd: 'rgba(251,146,60,.42)', fg: '#fb923c', icon: '?' },
+    'red': { bg: 'rgba(248,113,113,.16)', bd: 'rgba(248,113,113,.42)', fg: '#ff6b4a', icon: '✗' },
+  };
+  const t = tones[r.tone] || tones.red;
+  const tooltip = `${r.label} · ${r.reason}`;
+  return `<div class="v39-rec-cell" data-verdict="${esc(r.verdict)}" data-tooltip="${esc(tooltip)}" title="${esc(tooltip)}">
+<div class="v39-rec-badge" style="background:${t.bg};border:1.5px solid ${t.bd};color:${t.fg};">
+<span class="v39-rec-icon">${t.icon}</span><span class="v39-rec-label">${esc(r.label)}</span>
+</div>
+<div class="v39-rec-reason">${esc(r.reason)}</div>
+</div>`;
+};
+
 // AUDIT 2026-05-08 — badge segment_trust : retourne le HTML d'un chip
 // "✓ +7% baseball" (vert) ou "⚠ -10% hockey" (rouge) si le segment de
 // ce pick a un signal historique fort (high/low). Silencieux pour les
@@ -17861,7 +17940,7 @@ const oddBadge = typeof v38OddStatusChip === 'function' ? v38OddStatusChip(oddMe
 const beginnerText = v37BeginnerPickText(p, oddMeta);
 const confMetric = v37ReadableConfidence(p.rel);
 const edgeMetric = v37ReadableEdge(p.edge);
-return `<tr class="v36-table-row v38-table-row ${soon ? 'is-imminent' : ''} ${sameMatchCount > 1 ? 'is-same-match' : ''} ${p.dataOnly ? 'is-data-only' : ''} ${oddState === 'blocked' ? 'is-odd-blocked' : ''}" data-tone="${esc(tier.tone)}" data-big-detail="${esc(String(p.m.id || ''))}" data-pick-uid="${esc(p.pickUid || '')}" data-pick-label="${esc(p.labelFull || p.label || '')}" data-pick-odd="${esc(p.odd.toFixed(2))}" title="${esc(v36ReasonTooltip(p))}">
+return `<tr class="v36-table-row v38-table-row v39-table-row ${soon ? 'is-imminent' : ''} ${sameMatchCount > 1 ? 'is-same-match' : ''} ${p.dataOnly ? 'is-data-only' : ''} ${oddState === 'blocked' ? 'is-odd-blocked' : ''}" data-tone="${esc(tier.tone)}" data-big-detail="${esc(String(p.m.id || ''))}" data-pick-uid="${esc(p.pickUid || '')}" data-pick-label="${esc(p.labelFull || p.label || '')}" data-pick-odd="${esc(p.odd.toFixed(2))}" title="${esc(v36ReasonTooltip(p))}">
           <td class="v36-cell-meta v38-cell-meta">
             <div class="v38-meta-top"><span class="v38-meta-sport" aria-hidden="true">${sportIcon(p.m.sport || '')}</span><b class="v38-meta-when">${esc(v37DateLabel(p.m.date))} · ${esc(fmtTime(p.m.date))}</b><em class="v38-meta-league">${esc(league)}</em></div>
             <strong class="v38-meta-teams">${v36MatchTitleHtml(p)}</strong>
@@ -17875,10 +17954,7 @@ return `<tr class="v36-table-row v38-table-row ${soon ? 'is-imminent' : ''} ${sa
             <span class="v38-pick-chips">${oddBadge}${indicativeBadge}${v37SegmentTrustChip(p)}<i class="v38-open-analysis">analyse</i></span>
           </td>
           <td class="v36-num v36-odd v38-cell-odd">${v37BlindOddHtml(p.odd)}</td>
-          <td class="v36-num v38-cell-conf">${v37ReadableMetricHtml(confMetric)}</td>
-          <td class="v36-num v38-cell-edge ${p.edge >= 0 ? 'is-pos' : 'is-neg'}"><span data-tooltip="Avantage : écart entre notre modèle et la cote. Positif = la cote semble mieux payée que le risque réel.">${v37BlindMode ? v37BlindEdgeHtml(p.edge) : v37ReadableMetricHtml(edgeMetric, p.edge >= 0 ? 'pos' : 'neg')}</span></td>
-          <td class="v36-num v38-cell-score"><span class="v37-opportunity ${scoreClass}" data-score="${esc(String(p.opportunity || 0))}" data-tooltip="${esc(p.opportunityTooltip || '')}" title="${esc(p.opportunityTooltip || '')}" aria-label="${esc(p.opportunityTooltip || `Score d'opportunité ${p.opportunity || 0}/100`)}" tabindex="0">${esc(String(p.opportunity || 0))}</span><em class="v37-score-advice">${esc(scoreAdvice)}</em>${intelBadges ? `<span class="v37-intel-chips">${intelBadges}</span>` : ''}</td>
-          <td class="v38-cell-tier">${v36TierBadge(p.tier, true)}</td>
+          <td class="v39-cell-rec">${v39RecBadge(p)}</td>
           ${v37ShowResultColumn ? `<td class="v38-cell-result">${v37ResultBadge(result)}</td>` : ''}
         </tr>`;
 };
@@ -17891,13 +17967,13 @@ const oddState = v37OddPriorityState(oddMeta);
 const beginnerText = v37BeginnerPickText(p, oddMeta);
 const confMetric = v37ReadableConfidence(p.rel);
 const edgeMetric = v37ReadableEdge(p.edge);
-return `<button type="button" class="v36-table-card ${sameMatchCount > 1 ? 'is-same-match' : ''} ${oddState === 'blocked' ? 'is-odd-blocked' : ''}" data-tone="${esc(tier.tone)}" data-big-detail="${esc(String(p.m.id || ''))}" data-pick-uid="${esc(p.pickUid || '')}" data-pick-label="${esc(p.labelFull || p.label || '')}" data-pick-odd="${esc(p.odd.toFixed(2))}">
+return `<button type="button" class="v36-table-card v39-card ${sameMatchCount > 1 ? 'is-same-match' : ''} ${oddState === 'blocked' ? 'is-odd-blocked' : ''}" data-tone="${esc(tier.tone)}" data-big-detail="${esc(String(p.m.id || ''))}" data-pick-uid="${esc(p.pickUid || '')}" data-pick-label="${esc(p.labelFull || p.label || '')}" data-pick-odd="${esc(p.odd.toFixed(2))}">
           <span class="v36-table-card__top"><b>${sportIcon(p.m.sport || '')} ${esc(v37DateLabel(p.m.date))} · ${esc(fmtTime(p.m.date))}</b>${v36TierBadge(p.tier, true)}</span>
           <strong>${v36MatchTitleHtml(p)}</strong>
           <em class="v36-table-card__league">${esc(p.m.league_name || p.m.league || '')}</em>
-          <span class="v36-table-card__line"><i data-tooltip="${esc(p.marketTooltip || p.labelFull || p.label)}">${esc(p.labelMobile || p.label)}</i><b>${v37BlindOddHtml(p.odd)}</b><b>${esc(confMetric.label)}</b><b>${v37BlindMode ? v37BlindEdgeHtml(p.edge) : esc(edgeMetric.label)}</b></span>
+          <span class="v36-table-card__line"><i data-tooltip="${esc(p.marketTooltip || p.labelFull || p.label)}">${esc(p.labelMobile || p.label)}</i><b>${v37BlindOddHtml(p.odd)}</b></span>
+          ${v39RecBadge(p)}
           <small class="v37-beginner-copy">${esc(beginnerText)}</small>
-          <span class="v36-table-card__signals"><i data-tooltip="${esc(p.opportunityTooltip || '')}" title="${esc(p.opportunityTooltip || '')}" aria-label="${esc(p.opportunityTooltip || `Score d'opportunité ${p.opportunity || 0}/100`)}">Priorité ${esc(String(p.opportunity || 0))}/100 · ${esc(oddState === 'blocked' ? 'cote à vérifier' : p.opportunity >= 80 ? 'Conviction forte' : p.opportunity >= 60 ? 'Bon pari' : p.opportunity >= 40 ? 'Acceptable' : 'Peu fiable')}</i>${typeof v38OddStatusChip === 'function' ? v38OddStatusChip(oddMeta) : ''}${p.best?.source === 'cote_indicative' ? '<i>Cote indicative</i>' : ''}${sameMatchCount > 1 ? `<i>+${sameMatchCount - 1} autre pick même match</i>` : ''}${v37SegmentTrustChip(p)}${(p.opportunityBadges || []).slice(0, 2).map(x => `<i data-tooltip="${esc(v37BadgeTooltip(x))}" title="${esc(v37BadgeTooltip(x))}">${esc(x)}</i>`).join('')}</span>
           ${v37ShowResultColumn ? `<span class="v36-table-card__signals">${v37ResultBadge(result)}</span>` : ''}
         </button>`;
 };
@@ -17999,18 +18075,15 @@ const v36TableHtml = `<section class="v36-table-panel" aria-label="Tableau dense
           </div>
         </header>
         <div class="v36-table-scroll">
-          <table class="v36-picks-table v38-table">
+          <table class="v36-picks-table v38-table v39-table">
             <thead><tr>
               <th class="v38-th-meta">${v36SortButton('date', 'Match')}</th>
               <th class="v38-th-pick">Pari</th>
               <th class="v38-th-num" data-tooltip="Cote : combien tu gagnes pour 1 euro misé. @1.85 = 0.85 euro net si gagné.">${v36SortButton('odd', 'Cote')}</th>
-              <th class="v38-th-num" data-tooltip="Chances : probabilité estimée par notre modèle.">${v36SortButton('conf', 'Confiance')}</th>
-              <th class="v38-th-num" data-tooltip="Avantage : écart statistique vs marché. Positif = la cote paie plus que le risque réel.">${v36SortButton('edge', 'Edge')}</th>
-              <th class="v38-th-num" data-tooltip="Priorité : note globale 0-100. Une cote ancienne ou non vérifiée plafonne cette note.">${v36SortButton('score', 'Score')}</th>
-              <th class="v38-th-tier" data-tooltip="Tier : Sûr/Solide prudents, Big odds/Outsider plus de rendement.">${v36SortButton('tier', 'Tier')}</th>
+              <th class="v39-th-rec" data-tooltip="Recommandation : verdict combiné Priorité : note globale 0-100, Edge, Confiance, Tier, Segment historique, Cote validée. Vert = miser. Bleu = petite mise. Orange = surveiller. Rouge = passer.">${v36SortButton('score', 'Recommandation')}</th>
               ${v37ShowResultColumn ? '<th class="v38-th-tier">Résultat</th>' : ''}
             </tr></thead>
-            <tbody>${v36TableRows.length ? v36TableRows.map(v36TableRow).join('') : `<tr><td colspan="${v37ShowResultColumn ? '8' : '7'}"><div class="v36-tier-empty">Aucun pick pour ce filtre. Retire un sport, une heure ou une recherche.</div></td></tr>`}</tbody>
+            <tbody>${v36TableRows.length ? v36TableRows.map(v36TableRow).join('') : `<tr><td colspan="${v37ShowResultColumn ? '5' : '4'}"><div class="v36-tier-empty">Aucun pick pour ce filtre. Retire un sport, une heure ou une recherche.</div></td></tr>`}</tbody>
           </table>
         </div>
         <div class="v36-table-cards">${v36TableRows.length ? v36TableRows.map(v36MobileCard).join('') : `<div class="v36-tier-empty">Aucun pick pour ce filtre.</div>`}</div>
