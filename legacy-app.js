@@ -5513,11 +5513,31 @@ const periodTotals = [0.5, 1.5, 2.5].map(line => {
   }
   return { line, pOver: 1 - pUnder, pUnder, label: `Période plus de ${line} buts` };
 });
+// AUDIT 2026-05-09 v42.C.7 — Empty net goal (~30% si écart ≤2 fin match).
+// Match serré (margin < 1.5 abs) → forte chance d'empty net.
+const expectedMargin = Math.abs(lamH - lamA);
+const emptyNetRate = expectedMargin < 1.5 ? 0.30 : 0.15;
+const emptyNet = { yes: emptyNetRate, no: 1 - emptyNetRate };
+// v42.C.8 — OT/SO market : si match serré, plus de chances de prolongations.
+// Approximation : P(égalité fin temps réglementaire) = pX (déjà calculé via grid).
+const pRegulationDraw = (() => {
+  let p = 0;
+  for (let hh = 0; hh <= 12; hh++) {
+    for (let aa = 0; aa <= 12; aa++) {
+      if (hh === aa) p += poissonPmf(hh, lamH) * poissonPmf(aa, lamA);
+    }
+  }
+  return p;
+})();
+const otsoMarket = {
+  yes: pRegulationDraw,  // match va en OT
+  no: 1 - pRegulationDraw,
+};
 return {
 kind: 'exact',
 items: top.map(s => ({ home: s.home, away: s.away, prob: s.prob, label: `${s.home}-${s.away}` })),
 caption: `${baseCap}${extras} (modèle statistique).`,
-markets: { totals, puckLine, teamTotals, lamH, lamA, firstPeriod, periodTotals },
+markets: { totals, puckLine, teamTotals, lamH, lamA, firstPeriod, periodTotals, emptyNet, otsoMarket },
 };
 }
 
@@ -5591,13 +5611,22 @@ const inningTotals = [1.5, 2.5].map(line => {
   }
   return { line, pOver: 1 - pUnder, pUnder, label: `1-3 manches plus de ${line} runs` };
 });
+// AUDIT 2026-05-09 v42.C.9 — Each team to score (BTTS baseball).
+// projH > 0.5 et projA > 0.5 sont quasi-toujours vrais en MLB.
+// Vraie info : P(au moins 1 run chaque côté).
+const pHomeScores = 1 - Math.exp(-projH);
+const pAwayScores = 1 - Math.exp(-projA);
+const eachTeamScores = {
+  yes: pHomeScores * pAwayScores,
+  no: 1 - (pHomeScores * pAwayScores),
+};
 return {
 kind: 'baseball',
 items: [{ home: Math.round(projH), away: Math.round(projA), prob: 1, label: `${Math.round(projH)}-${Math.round(projA)}` }],
 total: Math.round(total * 10) / 10,
 margin: Math.round(margin * 10) / 10,
 caption: `${baseCap}${extras} (Gaussienne approx σ_total≈${sigmaTotal}).`,
-markets: { totals, runLine, totalsF5, sigmaTotal, sigmaMargin, nrfi, inningTotals },
+markets: { totals, runLine, totalsF5, sigmaTotal, sigmaMargin, nrfi, inningTotals, eachTeamScores },
 };
 }
 
@@ -5675,6 +5704,23 @@ const HOME_ADV = 2.5; // ~2.5 pts d'home-court, consensus NBA.
       home: phiCdf(halfMarginExpected / sigmaHalf),
       away: 1 - phiCdf(halfMarginExpected / sigmaHalf),
     };
+    // AUDIT 2026-05-09 v42.C.4 — Race to N points + Both teams over 100.
+    // P(team scores N first) ≈ team_share^bigger_factor.
+    const homeShare = total > 0 ? projH / total : 0.5;
+    const awayShare = 1 - homeShare;
+    const raceToBasket = {
+      home_first_20: Math.pow(homeShare, 1.5),  // ajustement sub-linéaire
+      away_first_20: Math.pow(awayShare, 1.5),
+      home_first_50: Math.pow(homeShare, 2.5),
+      away_first_50: Math.pow(awayShare, 2.5),
+    };
+    // v42.C.5 — Both teams over 100 (corrélation positive : pace match).
+    const pHome100 = phiCdf((projH - 100) / 12);
+    const pAway100 = phiCdf((projA - 100) / 12);
+    const bothOver100 = {
+      yes: pHome100 * pAway100 * 1.15,  // boost pour pace match corrélation
+      no: 1 - (pHome100 * pAway100 * 1.15),
+    };
     const handicapLines = margin >= 0 ? [3.5, 5.5, 7.5, 9.5] : [-3.5, -5.5, -7.5, -9.5];
     const handicaps = handicapLines.map(spread => {
       // P(marge_home > spread) = P((projH - projA) > spread)
@@ -5695,7 +5741,7 @@ const HOME_ADV = 2.5; // ~2.5 pts d'home-court, consensus NBA.
       total,
       margin,
       caption: `${baseCap}${extras} (± ~8 pts par équipe en NBA).`,
-      markets: { totals: totalsMarkets, firstHalfTotals, quarterTotals, quarterTotalsByQuarter, handicaps, sigmaTotal, sigmaMargin, quarterWinner, firstHalfWinner },
+      markets: { totals: totalsMarkets, firstHalfTotals, quarterTotals, quarterTotalsByQuarter, handicaps, sigmaTotal, sigmaMargin, quarterWinner, firstHalfWinner, raceToBasket, bothOver100 },
     };
   }
 
@@ -5803,6 +5849,22 @@ const HOME_ADV = 2.5; // ~2.5 pts d'home-court, consensus NBA.
       yes: 1 - pNoTB,
       no: pNoTB,
     };
+    // AUDIT 2026-05-09 v42.C.1 — Player to win at least 1 set.
+    // home_at_least_1 = 1 - P(perdre 2-0 ou 3-0)
+    // away_at_least_1 = 1 - P(perdre 2-0 ou 3-0 inverse)
+    const winsAtLeastOne = {
+      home: 1 - Math.pow(q, bestOf === 3 ? 2 : 3),
+      away: 1 - Math.pow(pSetH, bestOf === 3 ? 2 : 3),
+    };
+    // AUDIT 2026-05-09 v42.C.2 — Total breaks of serve (approx).
+    // Tightness élevée → plus de breaks. Avg breaks per match : 3-4 (BO3) / 6-8 (BO5).
+    const avgBreaks = bestOf === 3 ? 3 + tightness * 2 : 6 + tightness * 3;
+    const breaksLines = bestOf === 3 ? [3.5, 4.5, 5.5] : [6.5, 8.5, 10.5];
+    const breaks = breaksLines.map(line => {
+      const z = (avgBreaks - line) / 2.0;
+      const pOver = 1 / (1 + Math.exp(-1.702 * z));
+      return { line, label: `Plus de ${line} breaks`, pOver, pUnder: 1 - pOver };
+    });
     return {
       kind: 'tennis',
       bestOf,
@@ -5811,6 +5873,8 @@ const HOME_ADV = 2.5; // ~2.5 pts d'home-court, consensus NBA.
       games: { avgGames, avgSets, avgGamesPerSet, lines: games, setLines, sigma },
       firstSet,
       tiebreak,
+      winsAtLeastOne,        // v42.C.1
+      breaks: { avgBreaks, lines: breaks }, // v42.C.2
     };
   }
   try { window.tennisScorePrediction = tennisScorePrediction; } catch(e) { swallowError(e); }
@@ -6163,6 +6227,57 @@ const cleanSheet = {
   away: cleanSheetAway,
 };
 
+// AUDIT 2026-05-09 v42.B — PHASE B Marchés foot complets (8 nouveaux).
+// v42.B.1 — Penalty miss (conditioner sur penalty.yes).
+const _PEN_MISS_RATE = 0.25; // ~25% des pénalty manqués globalement
+const penaltyMiss = {
+  yes: penaltyYes * _PEN_MISS_RATE,
+  no: 1 - (penaltyYes * _PEN_MISS_RATE),
+};
+
+// v42.B.2 — Win to nil (gagner sans encaisser).
+let winToNilHome = 0, winToNilAway = 0;
+for (let h = 1; h <= maxGoals; h++) winToNilHome += grid[h][0];
+for (let a = 1; a <= maxGoals; a++) winToNilAway += grid[0][a];
+const winToNil = { home: winToNilHome, away: winToNilAway };
+
+// v42.B.4 — Race to N goals (qui marque les 2 premiers / 3 premiers buts).
+// Approx via shares de goals : home_share = lamH/(lamH+lamA), idem away.
+const homeGoalShareR = (lamH + lamA) > 0 ? lamH / (lamH + lamA) : 0.5;
+const awayGoalShareR = 1 - homeGoalShareR;
+const raceTo = {
+  home_first_2: Math.pow(homeGoalShareR, 2),
+  away_first_2: Math.pow(awayGoalShareR, 2),
+  home_first_3: Math.pow(homeGoalShareR, 3),
+  away_first_3: Math.pow(awayGoalShareR, 3),
+};
+
+// v42.B.5 — Goal in both halves (chaque mi-temps a au moins 1 but).
+const pNoGoalHT1 = Math.exp(-(lamH_HT + lamA_HT));
+const pNoGoalHT2 = Math.exp(-(lamH_2H + lamA_2H));
+const goalBothHalves = {
+  yes: (1 - pNoGoalHT1) * (1 - pNoGoalHT2),
+  no: 1 - (1 - pNoGoalHT1) * (1 - pNoGoalHT2),
+};
+
+// v42.B.6 — Goal first 10 min (~10/90 du lambda total).
+const lamFirst10 = (lamH + lamA) * (10 / 90);
+const goalFirst10 = {
+  yes: 1 - Math.exp(-lamFirst10),
+  no: Math.exp(-lamFirst10),
+};
+
+// v42.B.8 — Second half winner (calcul direct from p1_2H/pX_2H/p2_2H).
+const secondHalf = { home: p1_2H, draw: pX_2H, away: p2_2H };
+
+// v42.B.12 — Match with red card (taux ligue ~10% en moyenne).
+// TODO: customize par ligue via footballdata.json.red_cards_per_match
+const redCardRate = 0.10;
+const redCard = {
+  yes: redCardRate,
+  no: 1 - redCardRate,
+};
+
 return {
 p1, pX, p2,
 doubleChance: { p1X, pX2, p12 },
@@ -6185,6 +6300,14 @@ penalty: penaltyMarket,    // pénalty marqué oui/non
 scoreGroups,               // groupes score (low/mid/high)
 topScoresHT,               // top 5 score exact mi-temps
 cleanSheet,                // clean sheet home/away
+// AUDIT 2026-05-09 v42.B — PHASE B (8 nouveaux marchés foot)
+penaltyMiss,               // pénalty manqué oui/non
+winToNil,                  // gagner sans encaisser home/away
+raceTo,                    // course aux 2/3 premiers buts
+goalBothHalves,            // au moins 1 but dans chaque mi-temps
+goalFirst10,               // but dans les 10 premières min
+secondHalf,                // gagnant 2ème mi-temps {home,draw,away}
+redCard,                   // carton rouge dans le match oui/non
 };
 }
 try { window.poissonMarketsExtended = poissonMarketsExtended; } catch(e) { swallowError(e); }
