@@ -233,6 +233,11 @@ PATCH_STAGES = [
     # AUDIT 2026-05-08 — segment_trust.json synthèse perf historique par
     # segment, lit par le frontend pour annoter les picks affichés.
     ('build_segment_trust.py',      1,   15),
+    # AUDIT 2026-05-08 v39.3 — détection incohérences cotes (vig anormale,
+    # cotes extrêmes, contradictions BTTS vs Poisson 1n2+OU). Sortie
+    # prono_consistency_report.json — utile pour debug et pour flagger les
+    # matchs avec value cachée (BTTS marché < BTTS Poisson dérivé = signal).
+    ('audit_prono_consistency.py',  1,   15),
     # v31.7.4 — OG images (1200x630 PNG) pour pages statiques. ~3s.
     ('build_og_images.py',          5,   30),
     # v35.13 — Sitemap dynamique (git lastmod + routes SPA).
