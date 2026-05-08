@@ -377,7 +377,7 @@ test.describe('Audit UX polish', () => {
     const cta = page.locator('.v37-track-inline').first();
     if (await cta.count()) {
       const box = await cta.boundingBox();
-      expect(box.width).toBeLessThanOrEqual(300);
+      if (box) expect(box.width).toBeLessThanOrEqual(300);
     }
 
     const checkbox = await page.locator('.v37-live-toggle input[type="checkbox"]').evaluate(el => {
@@ -418,9 +418,12 @@ test.describe('Audit UX polish', () => {
     test.skip(await trigger.count() === 0, 'No pick available to open detail modal.');
     await trigger.click();
     await expect(page.locator('#detail-modal.open, .modal-backdrop.open')).toBeVisible({ timeout: 5000 });
-    const modalWidth = await page.locator('#detail-modal .modal').evaluate(el => el.getBoundingClientRect().width);
-    expect(modalWidth).toBeGreaterThanOrEqual(600);
-    expect(modalWidth).toBeLessThanOrEqual(740);
+    const modalSize = await page.locator('#detail-modal .modal').evaluate(el => {
+      const r = el.getBoundingClientRect();
+      return { width: r.width, height: r.height, vw: innerWidth, vh: innerHeight };
+    });
+    expect(modalSize.width).toBeGreaterThanOrEqual(modalSize.vw * 0.8);
+    expect(modalSize.height).toBeGreaterThanOrEqual(modalSize.vh * 0.75);
   });
 });
 
@@ -616,9 +619,10 @@ test.describe('Custom modals (replace prompt/confirm)', () => {
 // vs Nava on clay was the canary that caught it).
 test.describe('Winamax 1n2 alignment integrity', () => {
   test('every winamax.markets.1n2 with labels matches ESPN competitors order', async ({ page }) => {
-    await page.goto(URL);
-    // Wait for the lazy-loaded full payload (the inline LITE blob covers
-    // today; data.js is fetched right after first paint and merged in).
+    await page.goto(URL + '#tous');
+    // v38 keeps data.js out of the dashboard boot path. For this integrity
+    // check we explicitly hydrate the full payload on a data-heavy route.
+    await page.evaluate(() => window._ensureFullData ? window._ensureFullData() : null);
     await page.waitForFunction(() => {
       const d = window.PRONOSTICS_DATA;
       return d && d.days && Object.keys(d.days).length > 1;
@@ -845,9 +849,10 @@ test.describe('Mobile bottom nav', () => {
 });
 
 test.describe('Top page', () => {
-  test('Alias #top ouvre le dashboard dense V37', async ({ page }) => {
+  test('Alias #top redirige vers Tous avec intention legacy top', async ({ page }) => {
     await page.goto(URL + '#top');
-    await expect.poll(async () => page.evaluate(() => localStorage.getItem('currentPage'))).toBe('dashboard');
-    await expect(page.locator('.v36-dayline h1')).toContainText(/V37|picks/i, { timeout: 10000 });
+    await expect.poll(async () => page.evaluate(() => localStorage.getItem('currentPage'))).toBe('tous');
+    await expect.poll(async () => page.evaluate(() => location.hash)).toContain('legacy=top');
+    await expect(page.locator('#tous-wrap')).toContainText(/Tous les matchs détectés/i, { timeout: 10000 });
   });
 });

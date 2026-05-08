@@ -495,6 +495,76 @@ const PAGE_ALIASES = {
 'women-football': 'foot-feminin',
 'nfl-playoffs': 'nfl',
 };
+const ROUTE_META = {
+dashboard: { title: 'Pronostics du jour' },
+tous: { title: 'Tous les matchs détectés' },
+performance: { title: 'Performance modèle' },
+academie: { title: 'Comprendre les bons paris' },
+profil: { title: 'Profil et réglages' },
+buteurs: { title: 'Buteurs et joueurs' },
+combines: { title: 'Combinés' },
+sante: { title: 'Santé du site' },
+alertes: { title: 'Alertes' },
+credibilite: { title: 'Crédibilité du modèle' },
+bilan: { title: 'Bilan' },
+historique: { title: 'Historique' },
+backtest: { title: 'Backtest' },
+montantes: { title: 'Montantes séquentielles' },
+compare: { title: 'Comparer 2 jours' },
+'sports-tous': { title: 'Sports étendus' },
+rugby: { title: 'Rugby' },
+handball: { title: 'Handball' },
+volley: { title: 'Volley' },
+esport: { title: 'Esport' },
+combat: { title: 'Sports de combat' },
+cyclisme: { title: 'Cyclisme' },
+ski: { title: 'Sports d’hiver' },
+athle: { title: 'Athlétisme' },
+'tennis-challenger': { title: 'Tennis Challenger' },
+'foot-feminin': { title: 'Football féminin' },
+nfl: { title: 'NFL' },
+};
+function _routeMeta(page) {
+const key = PAGE_ALIASES[String(page || '')] || page || 'dashboard';
+const meta = ROUTE_META[key] || { title: String(key || 'Paris-Sportif') };
+return { ...meta, description: meta.description || `${meta.title} sur Paris-Sportif : pronostics sportifs lisibles, prudents et vérifiés.` };
+}
+function _syncRouteMeta(page) {
+try {
+const meta = _routeMeta(page);
+const main = document.querySelector('main') || document.body;
+let h1 = document.getElementById('spa-route-h1');
+if (!h1) {
+h1 = document.createElement('h1');
+h1.id = 'spa-route-h1';
+h1.className = 'sr-only';
+h1.setAttribute('data-route-h1', '1');
+main.insertBefore(h1, main.firstChild || null);
+}
+h1.textContent = meta.title;
+h1.dataset.page = String(page || 'dashboard');
+document.title = `${meta.title} · Paris-Sportif`;
+let desc = document.querySelector('meta[name="description"]');
+if (!desc) {
+desc = document.createElement('meta');
+desc.setAttribute('name', 'description');
+document.head.appendChild(desc);
+}
+desc.setAttribute('content', meta.description);
+document.documentElement.dataset.route = String(page || 'dashboard');
+} catch(e) { swallowError(e); }
+}
+function _setRouteWrapActive(wrap, active) {
+if (!wrap) return;
+try {
+wrap.hidden = !active;
+if ('inert' in wrap) wrap.inert = !active;
+wrap.setAttribute('aria-hidden', active ? 'false' : 'true');
+wrap.style.display = active ? '' : 'none';
+} catch(e) {
+try { wrap.style.display = active ? '' : 'none'; } catch(err) { swallowError(err); }
+}
+}
 const LEGACY_HASHES = {
 top: { page: 'tous', hash: '#tous?legacy=top', label: 'Tous · top picks' },
 locks: { page: 'tous', hash: '#tous?legacy=locks', label: 'Tous · locks' },
@@ -3869,8 +3939,10 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     // stale. Le plus recent timestamp reflete "a quel moment on a confirme
     // que ce marche existe" — quand le cron global passe, on confirme.
     const wxMarketsMs = wx.markets_fetched_at ? new Date(wx.markets_fetched_at).getTime() : 0;
+    const wxMarketsValidatedMs = wx.markets_validated_at ? new Date(wx.markets_validated_at).getTime() : 0;
+    const wxDetailsValidatedMs = wx.details_validated_at ? new Date(wx.details_validated_at).getTime() : 0;
     const dataGenMs = window.PRONOSTICS_DATA?.generated_at ? new Date(window.PRONOSTICS_DATA.generated_at).getTime() : 0;
-    const verifiedAtMs = Math.max(wxMarketsMs, dataGenMs);
+    const verifiedAtMs = Math.max(wxMarketsMs, wxMarketsValidatedMs, wxDetailsValidatedMs, dataGenMs);
     const verifiedAt = verifiedAtMs > 0 ? new Date(verifiedAtMs).toISOString() : (wx.markets_fetched_at || window.PRONOSTICS_DATA?.generated_at || null);
     const marketAgeMin = v38OddSnapshotAgeMin(verifiedAt);
     // v37.182 — Cote staleness kickoff-aware. Avant : `dataAge > 240` ET
@@ -4151,7 +4223,13 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
       if (Math.abs((b.ev || 0) - (a.ev || 0)) > 0.005) return (b.ev || 0) - (a.ev || 0);
       return (b.edge || 0) - (a.edge || 0);
     });
-    return _v35AttachConsistency(sorted[0], candidates);
+    for (const candidate of sorted) {
+      const oddMeta = (typeof validatePickOdd === 'function') ? validatePickOdd(match, candidate, pred) : { status: candidate.exact ? 'verified' : 'missing' };
+      candidate.oddValidation = oddMeta;
+      if (typeof v38OddTopEligible === 'function' && !v38OddTopEligible(oddMeta)) continue;
+      return _v35AttachConsistency(candidate, candidates);
+    }
+    return null;
   }
   try { window.selectBestMarket = selectBestMarket; } catch(e) { swallowError(e); }
 
@@ -11522,6 +11600,9 @@ window._leagueLogoMark404 = _leagueLogoMark404;
       _clearMissingMatchHash(match && match.id);
       return false;
     }
+    try {
+      window.dispatchEvent(new CustomEvent('ps:need-lazy-signals', { detail: { packs: ['detail', 'football', 'props'], reason: 'open-detail' } }));
+    } catch(e) { swallowError(e); }
     const { home, away } = getSides(match);
     const detailOpts = detailOptions && typeof detailOptions === 'object' ? detailOptions : {};
     const pred = predictMatch(match);
@@ -11548,7 +11629,7 @@ document.getElementById('detail-league').textContent = `${match.league_name}${ma
 try {
 const _wxBtn = document.getElementById('detail-winamax-cta');
 if (_wxBtn) {
-const _wxUrl = (match.winamax && match.winamax.url) || '';
+const _wxUrl = (typeof buildWinamaxLink === 'function') ? buildWinamaxLink(match) : ((match.winamax && match.winamax.url) || '');
 if (_wxUrl) {
 _wxBtn.href = _wxUrl;
 _wxBtn.style.display = 'inline-flex';
@@ -13986,10 +14067,11 @@ ${match.surface ? `<div class="kv"><div class="k">Surface</div><div class="v">${
       const initialTab = (hashMatch && tabSections[hashMatch[1]]?.length) ? hashMatch[1] : 'synthese';
       const chipsHtml = visibleTabs
         .map(([k, label]) =>
-          `<button type="button" class="md-tab" data-mtab-toggle="${k}" role="tab" aria-selected="${k === initialTab}" tabindex="${k === initialTab ? '0' : '-1'}">${label}</button>`
+          `<button type="button" class="md-tab v38-detail-tab" data-mtab-toggle="${k}" data-v38-detail-tab="${k}" role="tab" aria-selected="${k === initialTab}" tabindex="${k === initialTab ? '0' : '-1'}">${label}</button>`
         ).join('');
       const nav = document.createElement('div');
-      nav.className = 'md-tabs';
+      nav.className = 'md-tabs v38-detail-tabs';
+      nav.setAttribute('data-component', 'detail-tabs');
       nav.setAttribute('role', 'tablist');
       nav.setAttribute('aria-label', 'Onglets du détail match');
       nav.innerHTML = chipsHtml;
@@ -26939,6 +27021,7 @@ return `
     const isMontantes = isMontante;
     const isPerformance = currentPage === 'performance';
     const isSportsCoverage = SPORTS_COVERAGE_PAGES.includes(currentPage);
+    _syncRouteMeta(currentPage);
     const _renderPageSkeleton = (wrap, label, title, count = 4) => {
       if (!wrap || wrap.dataset.skeletonSeen === currentPage) return;
       wrap.dataset.skeletonSeen = currentPage;
@@ -26993,7 +27076,7 @@ return `
     }
 
 const comb = document.getElementById('combines-wrap');
-if (comb) comb.style.display = isCombines ? '' : 'none';
+if (comb) _setRouteWrapActive(comb, isCombines);
 if (isCombines && typeof renderCombines === 'function') {
   try { renderCombines(); } catch(e) { swallowError(e); }
 }
@@ -27004,7 +27087,7 @@ historiqueWrap = document.createElement('div');
 historiqueWrap.id = 'historique-wrap';
 (document.querySelector('main') || document.body).appendChild(historiqueWrap);
 }
-historiqueWrap.style.display = isHistorique ? '' : 'none';
+_setRouteWrapActive(historiqueWrap, isHistorique);
 if (isHistorique) {
 renderHistoriquePage(historiqueWrap);
 if (window.PRONOSTICS_DATA && window.PRONOSTICS_DATA._lite && typeof window._ensureFullData === 'function') {
@@ -27019,7 +27102,7 @@ compareWrap = document.createElement('div');
 compareWrap.id = 'compare-wrap';
 (document.querySelector('main') || document.body).appendChild(compareWrap);
 }
-compareWrap.style.display = isCompare ? '' : 'none';
+_setRouteWrapActive(compareWrap, isCompare);
 if (isCompare) {
 renderComparePage(compareWrap);
 if (window.PRONOSTICS_DATA && window.PRONOSTICS_DATA._lite && typeof window._ensureFullData === 'function') {
@@ -27034,16 +27117,16 @@ perfWrap = document.createElement('div');
 perfWrap.id = 'performance-wrap';
 (document.querySelector('main') || document.body).appendChild(perfWrap);
 }
-perfWrap.style.display = isPerformance ? '' : 'none';
+_setRouteWrapActive(perfWrap, isPerformance);
 if (isPerformance) {
 try { renderPerformancePage(perfWrap); } catch(e) { prodWarn('renderPerformancePage failed', e); }
 if (window.PRONOSTICS_DATA && window.PRONOSTICS_DATA._lite && typeof window._ensureFullData === 'function' && perfWrap.dataset.fullDataQueued !== '1') {
 perfWrap.dataset.fullDataQueued = '1';
 setTimeout(() => {
-if (!document.body.contains(perfWrap) || perfWrap.style.display === 'none') { delete perfWrap.dataset.fullDataQueued; return; }
+if (!document.body.contains(perfWrap) || perfWrap.hidden || perfWrap.style.display === 'none') { delete perfWrap.dataset.fullDataQueued; return; }
 window._ensureFullData().then(() => {
 delete perfWrap.dataset.fullDataQueued;
-if (perfWrap.style.display !== 'none') { try { renderPerformancePage(perfWrap); } catch(e) { prodWarn('renderPerformancePage failed', e); } }
+if (!perfWrap.hidden && perfWrap.style.display !== 'none') { try { renderPerformancePage(perfWrap); } catch(e) { prodWarn('renderPerformancePage failed', e); } }
 }).catch(() => { delete perfWrap.dataset.fullDataQueued; });
 }, 12000);
 }
@@ -27057,7 +27140,7 @@ bilanWrap = document.createElement('div');
 bilanWrap.id = 'bilan-wrap';
 (document.querySelector('main') || document.body).appendChild(bilanWrap);
 }
-bilanWrap.style.display = isBilan ? '' : 'none';
+_setRouteWrapActive(bilanWrap, isBilan);
 if (isBilan) {
 renderBilanPage(bilanWrap);
 if (window.PRONOSTICS_DATA && window.PRONOSTICS_DATA._lite && typeof window._ensureFullData === 'function') {
@@ -27072,7 +27155,7 @@ santeWrap = document.createElement('div');
 santeWrap.id = 'sante-wrap';
 (document.querySelector('main') || document.body).appendChild(santeWrap);
 }
-santeWrap.style.display = (currentPage === 'sante') ? '' : 'none';
+_setRouteWrapActive(santeWrap, currentPage === 'sante');
 if (currentPage === 'sante') {
 _renderPageSkeleton(santeWrap, 'Santé', 'Santé data');
 requestAnimationFrame(() => renderSantePage(santeWrap));
@@ -27084,7 +27167,7 @@ dashWrap = document.createElement('div');
 dashWrap.id = 'dashboard-wrap';
 (document.querySelector('main') || document.body).appendChild(dashWrap);
 }
-dashWrap.style.display = isDashboard ? '' : 'none';
+_setRouteWrapActive(dashWrap, isDashboard);
 if (isDashboard) {
 if (dashWrap.dataset.dashboardRenderedOnce === '1') renderDashboardPage(dashWrap);
 else _scheduleDashboardRender(dashWrap, 'initial');
@@ -27107,7 +27190,7 @@ alertesWrap = document.createElement('div');
 alertesWrap.id = 'alertes-wrap';
 (document.querySelector('main') || document.body).appendChild(alertesWrap);
 }
-alertesWrap.style.display = isAlertes ? '' : 'none';
+_setRouteWrapActive(alertesWrap, isAlertes);
 if (isAlertes) renderAlertesPage(alertesWrap);
 
 let buteursWrap = document.getElementById('buteurs-wrap');
@@ -27116,7 +27199,7 @@ buteursWrap = document.createElement('div');
 buteursWrap.id = 'buteurs-wrap';
 (document.querySelector('main') || document.body).appendChild(buteursWrap);
 }
-buteursWrap.style.display = isButeurs ? '' : 'none';
+_setRouteWrapActive(buteursWrap, isButeurs);
 if (isButeurs) renderButeursPage(buteursWrap);
 
 let sportsCoverageWrap = document.getElementById('sports-coverage-wrap');
@@ -27125,7 +27208,7 @@ sportsCoverageWrap = document.createElement('div');
 sportsCoverageWrap.id = 'sports-coverage-wrap';
 (document.querySelector('main') || document.body).appendChild(sportsCoverageWrap);
 }
-sportsCoverageWrap.style.display = isSportsCoverage ? '' : 'none';
+_setRouteWrapActive(sportsCoverageWrap, isSportsCoverage);
 if (isSportsCoverage) renderSportsCoveragePage(sportsCoverageWrap, currentPage);
 
 let academieWrap = document.getElementById('academie-wrap');
@@ -27134,7 +27217,7 @@ academieWrap = document.createElement('div');
 academieWrap.id = 'academie-wrap';
 (document.querySelector('main') || document.body).appendChild(academieWrap);
 }
-academieWrap.style.display = isAcademie ? '' : 'none';
+_setRouteWrapActive(academieWrap, isAcademie);
 if (isAcademie) {
 _renderPageSkeleton(academieWrap, 'Méthode', 'Méthode & académie', 3);
 requestAnimationFrame(() => renderAcademiePage(academieWrap));
@@ -27146,7 +27229,7 @@ backtestWrap = document.createElement('div');
 backtestWrap.id = 'backtest-wrap';
 (document.querySelector('main') || document.body).appendChild(backtestWrap);
 }
-backtestWrap.style.display = isBacktest ? '' : 'none';
+_setRouteWrapActive(backtestWrap, isBacktest);
 if (isBacktest) {
 renderBacktestPage(backtestWrap);
 if (window.PRONOSTICS_DATA && window.PRONOSTICS_DATA._lite && typeof window._ensureFullData === 'function') {
@@ -27160,7 +27243,7 @@ profilWrap = document.createElement('div');
 profilWrap.id = 'profil-wrap';
 (document.querySelector('main') || document.body).appendChild(profilWrap);
 }
-profilWrap.style.display = isProfil ? '' : 'none';
+_setRouteWrapActive(profilWrap, isProfil);
 if (isProfil) {
 _renderPageSkeleton(profilWrap, 'Profil', 'Profil & bankroll', 3);
 requestAnimationFrame(() => {
@@ -27186,7 +27269,7 @@ montanteWrap = document.createElement('div');
 montanteWrap.id = 'montante-wrap';
 (document.querySelector('main') || document.body).appendChild(montanteWrap);
 }
-montanteWrap.style.display = isMontante ? '' : 'none';
+_setRouteWrapActive(montanteWrap, isMontante);
 if (isMontante) {
 _renderPageSkeleton(montanteWrap, 'Montantes', 'Montantes séquentielles', 3);
 let type = 'jour';
@@ -27236,7 +27319,7 @@ tousWrap = document.createElement('div');
 tousWrap.id = 'tous-wrap';
 (document.querySelector('main') || document.body).appendChild(tousWrap);
 }
-tousWrap.style.display = isTous ? '' : 'none';
+_setRouteWrapActive(tousWrap, isTous);
 if (isTous) renderTousPage(tousWrap);
 
 let credWrap = document.getElementById('credibilite-wrap');
@@ -27245,7 +27328,7 @@ credWrap = document.createElement('div');
 credWrap.id = 'credibilite-wrap';
 (document.querySelector('main') || document.body).appendChild(credWrap);
 }
-credWrap.style.display = isCredibilite ? '' : 'none';
+_setRouteWrapActive(credWrap, isCredibilite);
 if (isCredibilite) renderCredibilitePage(credWrap);
 
 document.querySelectorAll('.page-btn').forEach(b => {
@@ -28031,8 +28114,8 @@ wrap.innerHTML = `
           <div class="lbl-tiny u-text-brand">Performance · ${esc(tabs.find(t => t.k === currentTab)?.lbl || 'Vue globale')}</div>
           <h1 class="page-h1">🎯 Performance</h1>
           <div class="u-text-md u-text-dim">Synthèse du modèle sur ${n} pari${n > 1 ? 's' : ''} simulé${n > 1 ? 's' : ''}. Drill-down dans les onglets : Historique, Bilan, Backtest.</div>
-          ${archiveNote}
           ${subTabsHtml}
+          ${archiveNote}
         </div>
 
         ${_healthWidget}
@@ -32800,7 +32883,7 @@ if (_pwaDismissBtn) _pwaDismissBtn.addEventListener('click', () => { _pwaSnooze(
 const versionBadge = document.getElementById('footer-version');
 if (versionBadge) {
 const _showWhatsNew = () => {
-const html = '<div style="text-align:left;padding:8px 0;"><h3 style="margin:0 0 12px;font-size:18px;color:var(--text);">Nouveautés v35</h3><p style="font-size:13px;color:var(--text-2);line-height:1.5;margin:0;">Tableau V37 dense, score opportunité, marchés Winamax exacts, filtres sûrs et diagnostic data intégré.</p></div>';
+const html = '<div style="text-align:left;padding:8px 0;"><h3 style="margin:0 0 12px;font-size:18px;color:var(--text);">Nouveautés v38</h3><p style="font-size:13px;color:var(--text-2);line-height:1.5;margin:0;">Accueil plus rapide, fiche prono plein écran, cotes non vérifiées bloquées et routes mieux lisibles.</p></div>';
 const existing = document.getElementById('__whatsnew-modal');
 if (existing) { existing.remove(); return; }
 const div = document.createElement('div');
