@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-08T23:48:36Z",
+  "generated_at": "2026-05-08T23:52:07Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 68,
+    "active_events": 65,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 93,
+      "lookahead": 87,
       "travel_extreme": 21,
       "back_to_back_travel": 30,
       "schedule_congestion": 20
     },
     "by_decision": {
-      "abstain": 29,
+      "abstain": 26,
       "lean_home": 37,
       "lean_away": 2
     },
     "lean_home": 37,
     "lean_away": 2,
-    "abstain": 29,
+    "abstain": 26,
     "monitor": 0
   },
   "active": [
@@ -122,13 +122,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "abstain",
+        "status": "mixed",
         "net_side": null,
-        "home_score": 0.334,
-        "away_score": -0.488,
+        "home_score": 0.862,
+        "away_score": -1.488,
         "home_fade": 0.75,
-        "away_fade": 0.75,
-        "reason": "Signaux opposes: New York Knicks fade 0.75, Philadelphia 76ers fade 0.75 -> prudence",
+        "away_fade": 1.75,
+        "reason": "Signaux mitigés: avantage net trop faible (New York Knicks +0.86, Philadelphia 76ers -1.49)",
         "detail": [
           {
             "side": "home",
@@ -158,7 +158,13 @@
             "side": "home",
             "type": "market_move",
             "direction": "steam",
-            "strength": 0.821
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
@@ -316,168 +322,6 @@
       }
     },
     {
-      "event_id": "401815261",
-      "source_event_ids": [
-        "401815261"
-      ],
-      "kickoff": "2026-05-08T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Kansas City Royals",
-      "away": "Detroit Tigers",
-      "match": "Kansas City Royals - Detroit Tigers",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Kansas City Royals 0.30, Detroit Tigers 0.30",
-      "pressure_score": 1.333,
-      "home_fade": 0.3,
-      "away_fade": 0.3,
-      "travel_score": 0,
-      "lookahead_score": 1.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.155,
-        "away_score": -1.195,
-        "home_fade": 0.3,
-        "away_fade": 1.3,
-        "reason": "Direction nette: Kansas City Royals (+0.15)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815262",
-      "source_event_ids": [
-        "401815262"
-      ],
-      "kickoff": "2026-05-08T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Milwaukee Brewers",
-      "away": "New York Yankees",
-      "match": "Milwaukee Brewers - New York Yankees",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Milwaukee Brewers 0.30, New York Yankees 0.30",
-      "pressure_score": 1.333,
-      "home_fade": 0.3,
-      "away_fade": 0.3,
-      "travel_score": 0,
-      "lookahead_score": 1.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.195,
-        "away_score": -0.195,
-        "home_fade": 0.3,
-        "away_fade": 0.3,
-        "reason": "Direction nette: New York Yankees (-0.20)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815263",
-      "source_event_ids": [
-        "401815263"
-      ],
-      "kickoff": "2026-05-08T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Chicago White Sox",
-      "away": "Seattle Mariners",
-      "match": "Chicago White Sox - Seattle Mariners",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Chicago White Sox 0.30, Seattle Mariners 0.30",
-      "pressure_score": 1.333,
-      "home_fade": 0.3,
-      "away_fade": 0.3,
-      "travel_score": 0,
-      "lookahead_score": 1.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.195,
-        "away_score": -0.195,
-        "home_fade": 0.3,
-        "away_fade": 0.3,
-        "reason": "Direction nette: Seattle Mariners (-0.20)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815260",
       "source_event_ids": [
         "401815260"
@@ -564,13 +408,13 @@
         "3 matchs sur les 7 derniers jours"
       ],
       "global_resolution": {
-        "status": "abstain",
+        "status": "mixed",
         "net_side": null,
-        "home_score": -0.39,
-        "away_score": 0.431,
-        "home_fade": 0.6,
+        "home_score": -1.39,
+        "away_score": 0.96,
+        "home_fade": 1.6,
         "away_fade": 0.6,
-        "reason": "Signaux opposes: Philadelphia 76ers fade 0.60, New York Knicks fade 0.60 -> prudence",
+        "reason": "Signaux mitigés: avantage net trop faible (Philadelphia 76ers -1.39, New York Knicks +0.96)",
         "detail": [
           {
             "side": "home",
@@ -585,10 +429,16 @@
             "strength": 0.6
           },
           {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
             "side": "away",
             "type": "market_move",
             "direction": "steam",
-            "strength": 0.821
+            "strength": 1.0
           }
         ]
       }
@@ -1342,11 +1192,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.098,
-        "away_score": 0.724,
-        "home_fade": 0.15,
+        "home_score": -1.097,
+        "away_score": 1.252,
+        "home_fade": 1.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: New York Knicks (+0.72)",
+        "reason": "Direction nette: New York Knicks (+1.25)",
         "detail": [
           {
             "side": "home",
@@ -1361,10 +1211,16 @@
             "strength": 0.15
           },
           {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
             "side": "away",
             "type": "market_move",
             "direction": "steam",
-            "strength": 0.821
+            "strength": 1.0
           }
         ]
       }

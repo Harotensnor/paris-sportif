@@ -1,47 +1,29 @@
 {
-  "generated_at": "2026-05-08T23:48:36Z",
+  "generated_at": "2026-05-08T23:52:08Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 61,
-    "actionable": 40,
+    "active_events": 58,
+    "actionable": 42,
     "watch": 5,
-    "risk": 16,
+    "risk": 11,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 33,
-      "market_move": 16,
+      "market_move": 19,
       "market_uncertain": 12,
-      "signal_conflict": 14,
+      "signal_conflict": 12,
+      "injury_imbalance": 32,
       "travel_extreme": 16,
       "back_to_back_travel": 29
     },
     "by_quality": {
-      "actionable": 40,
       "watch": 5,
-      "risk": 16
+      "actionable": 42,
+      "risk": 11
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815261",
-      "date": "2026-05-08T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Kansas City Royals",
-      "away": "Detroit Tigers",
-      "match": "Kansas City Royals - Detroit Tigers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Detroit Tigers",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 6-12"
-    },
     {
       "event_id": "401871425",
       "date": "2026-05-09T01:30Z",
@@ -166,7 +148,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 1.42 -> 12.50 (-780.3%)"
+      "context": "Cote home: 1.42 -> 10.50 (-639.4%)"
     },
     {
       "event_id": "401815276",
@@ -292,7 +274,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 1.42 -> 12.50 (-780.3%)"
+      "context": "Cote home: 1.42 -> 10.50 (-639.4%)"
     },
     {
       "event_id": "401815283",
@@ -329,6 +311,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 6-14"
+    },
+    {
+      "event_id": "401871162",
+      "date": "2026-05-10T19:30Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "Philadelphia 76ers",
+      "away": "New York Knicks",
+      "match": "Philadelphia 76ers - New York Knicks",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 1.62 -> 1.96 (-21.0%)"
     },
     {
       "event_id": "401815296",
@@ -418,7 +418,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 2.70 -> 1.33 (+50.7%)"
+      "context": "Cote home: 2.70 -> 1.30 (+51.9%)"
     },
     {
       "event_id": "401815291",
@@ -439,6 +439,24 @@
       "context": "Absences severes 6-12"
     },
     {
+      "event_id": "401871163",
+      "date": "2026-05-12T04:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "New York Knicks",
+      "away": "Philadelphia 76ers",
+      "match": "New York Knicks - Philadelphia 76ers",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 2.30 -> 1.56 (+32.2%)"
+    },
+    {
       "event_id": "401871407",
       "date": "2026-05-12T23:00Z",
       "sport": "hockey",
@@ -454,7 +472,25 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 2.70 -> 1.33 (+50.7%)"
+      "context": "Cote home: 2.70 -> 1.30 (+51.9%)"
+    },
+    {
+      "event_id": "401871164",
+      "date": "2026-05-14T04:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "Philadelphia 76ers",
+      "away": "New York Knicks",
+      "match": "Philadelphia 76ers - New York Knicks",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 1.62 -> 1.96 (-21.0%)"
     },
     {
       "event_id": "401871408",
@@ -472,7 +508,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 2.15 -> 6.50 (-202.3%)"
+      "context": "Cote home: 2.15 -> 6.75 (-214.0%)"
     },
     {
       "event_id": "401815288",
@@ -875,24 +911,6 @@
       "context": "marge bookmaker anormale 19.2%"
     },
     {
-      "event_id": "401871162",
-      "date": "2026-05-10T19:30Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Philadelphia 76ers",
-      "away": "New York Knicks",
-      "match": "Philadelphia 76ers - New York Knicks",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 15.1%"
-    },
-    {
       "event_id": "401842707",
       "date": "2026-05-11T17:00Z",
       "sport": "football",
@@ -909,24 +927,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.3%"
-    },
-    {
-      "event_id": "401871163",
-      "date": "2026-05-12T04:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "New York Knicks",
-      "away": "Philadelphia 76ers",
-      "match": "New York Knicks - Philadelphia 76ers",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 15.1%"
     },
     {
       "event_id": "401867713",
@@ -1019,24 +1019,6 @@
       "context": "marge bookmaker anormale 18.8%"
     },
     {
-      "event_id": "401871164",
-      "date": "2026-05-14T04:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Philadelphia 76ers",
-      "away": "New York Knicks",
-      "match": "Philadelphia 76ers - New York Knicks",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 15.1%"
-    },
-    {
       "event_id": "401871156",
       "date": "2026-05-12T04:00Z",
       "sport": "basketball",
@@ -1089,42 +1071,6 @@
       "side": null,
       "strength": 0.45,
       "context": "Signaux opposes: Anaheim Ducks fade 0.60, Vegas Golden Knights fade 0.60 -> prudence"
-    },
-    {
-      "event_id": "401871157",
-      "date": "2026-05-15T04:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Minnesota Timberwolves",
-      "away": "San Antonio Spurs",
-      "match": "Minnesota Timberwolves - San Antonio Spurs",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "signal_conflict",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.45,
-      "context": "Signaux opposes: Minnesota Timberwolves fade 0.60, San Antonio Spurs fade 0.60 -> prudence"
-    },
-    {
-      "event_id": "401871338",
-      "date": "2026-05-15T04:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Cleveland Cavaliers",
-      "away": "Detroit Pistons",
-      "match": "Cleveland Cavaliers - Detroit Pistons",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "signal_conflict",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.45,
-      "context": "Signaux opposes: Cleveland Cavaliers fade 0.60, Detroit Pistons fade 0.60 -> prudence"
     }
   ],
   "expired_sample": []
