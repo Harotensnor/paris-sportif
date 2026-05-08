@@ -1,7 +1,7 @@
 (function localAnalyticsModule() {
   'use strict';
 
-  const VERSION = 'v37.021';
+  const VERSION = 'v38.0';
   const TELEMETRY_KEY = 'usage_telemetry';
   const PREFS_KEY = 'usage_telemetry_prefs';
   const USER_KEY = 'usage_telemetry_user_id';
@@ -474,8 +474,9 @@
     const prefs = mergePrefs();
     const seen = new Set();
     const ordered = prefs.modules
-      .filter(id => DASHBOARD_MODULES.includes(id) && !seen.has(id) && seen.add(id));
+      .filter(id => DASHBOARD_MODULES.includes(id) && (id !== 'views' || prefs.savedViews.length > 0) && !seen.has(id) && seen.add(id));
     DASHBOARD_MODULES.forEach(id => {
+      if (id === 'views' && prefs.savedViews.length === 0) return;
       if (!seen.has(id)) ordered.push(id);
     });
     return ordered;
@@ -679,6 +680,10 @@
     });
     if ($('[data-la-saved-views]', wrap)) return;
     const prefs = mergePrefs();
+    if (!prefs.savedViews.length) {
+      existing.forEach(node => node.remove());
+      return;
+    }
     const box = document.createElement('div');
     box.className = 'la-card';
     box.setAttribute('data-la-saved-views', '1');
