@@ -33,3 +33,22 @@ winamax_v20_admin.log
 # un commit historique de data.js est largement suffisant.
 # Si backup explicit voulu, push manuellement avec git add -f.
 archives/
+
+# AUDIT 2026-05-08 v40 — winamax_markets.json (~90 MB) externalisé sur
+# GitHub Releases (tag rolling `data-cache`). Avant : commité à chaque
+# tick cron (288×/jour × 90 MB = 25 GB/jour ajoutés à l'historique git
+# → repo .git pesait 3.7 GB). Maintenant : pipeline télécharge depuis
+# Release au boot, regénère/merge, ré-uploade à la fin. Aucun consumer
+# frontend (uniquement Python pipeline → patch_winamax_markets.py
+# l'injecte dans data.js qui reste committed).
+winamax_markets.json
+
+# AUDIT 2026-05-08 v40 — Sidecars > 1 MB stockés en .json.gz. Voir
+# scripts/io_compressed.py (helper read_json/write_json auto-détectent
+# le .gz). Compression 7-11% → ~9 MB économisés par commit cron.
+# Les .gz correspondants SONT trackés (cf workflow refresh.yml).
+footballdata.json
+bayesian_priors.json
+team_priors.json
+tennis_ratings.json
+team_form.json

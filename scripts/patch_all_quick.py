@@ -386,6 +386,17 @@ def _save_data(data: dict) -> int:
 
 
 def _load_json(path: Path) -> dict | None:
+    # AUDIT 2026-05-08 v40 — auto-fallback sur .gz pour les sidecars compressés
+    # (footballdata, team_form, tennis_ratings, etc.). Le .gz est essayé en
+    # priorité si présent, sinon plain.
+    import gzip
+    gz = path.with_name(path.name + '.gz')
+    if gz.exists():
+        try:
+            with gzip.open(gz, 'rt', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception:
+            pass
     if not path.exists():
         return None
     try:
