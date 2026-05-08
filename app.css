@@ -58,3 +58,30 @@
     margin: 0 auto !important;
   }
 }
+
+/* BUG-001: keep body out of the scroll/overflow chain so sticky headers use the viewport. */
+body {
+  overflow-x: visible !important;
+  overflow-y: visible !important;
+}
+
+@media (min-width: 960px) {
+  body.agent-home .v36-table-panel {
+    overflow: visible !important;
+  }
+  body.agent-home .v36-table-scroll {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  body.agent-home .v36-table-toolbar {
+    position: sticky !important;
+    top: calc(var(--rg-height, 32px) + 112px) !important;
+    z-index: 46 !important;
+  }
+  body.agent-home .v36-picks-table thead th {
+    position: sticky !important;
+    top: calc(var(--rg-height, 32px) + 227px) !important;
+    z-index: 45 !important;
+  }
+}
