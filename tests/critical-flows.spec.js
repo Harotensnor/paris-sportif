@@ -55,6 +55,66 @@ test.describe('Boot', () => {
   });
 });
 
+test.describe('Sticky layout', () => {
+  test('BUG-001 keeps dashboard sticky chrome attached to the viewport', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'Desktop sticky stack is covered here; mobile filters have their own sticky spec.');
+    await page.goto(URL + '#dashboard');
+    await page.waitForFunction(() =>
+      window.PRONOSTICS_DATA &&
+      document.querySelector('header.topbar') &&
+      document.querySelector('nav.topbar-nav.v36-sidebar') &&
+      document.querySelector('.v36-table-toolbar') &&
+      document.querySelector('.v36-picks-table thead th'),
+      null,
+      { timeout: 15000 }
+    );
+
+    await page.evaluate(() => window.scrollTo(0, 900));
+    await page.waitForFunction(() => window.scrollY > 500, null, { timeout: 5000 });
+
+    const state = await page.evaluate(() => {
+      const metric = (selector) => {
+        const el = document.querySelector(selector);
+        if (!el) return null;
+        const rect = el.getBoundingClientRect();
+        const styles = getComputedStyle(el);
+        return {
+          top: Math.round(rect.top),
+          bottom: Math.round(rect.bottom),
+          height: Math.round(rect.height),
+          position: styles.position,
+          display: styles.display,
+        };
+      };
+      return {
+        scrollY: Math.round(window.scrollY),
+        viewportH: window.innerHeight,
+        bodyOverflowY: getComputedStyle(document.body).overflowY,
+        bodyOverflowX: getComputedStyle(document.body).overflowX,
+        topbar: metric('header.topbar'),
+        nav: metric('nav.topbar-nav.v36-sidebar'),
+        toolbar: metric('.v36-table-toolbar'),
+        tableHead: metric('.v36-picks-table thead th'),
+      };
+    });
+
+    expect(state.bodyOverflowY).toBe('visible');
+    expect(state.bodyOverflowX).toBe('visible');
+    expect(state.topbar.position).toBe('sticky');
+    expect(state.nav.position).toBe('sticky');
+    expect(state.toolbar.position).toBe('sticky');
+    expect(state.tableHead.position).toBe('sticky');
+    expect(state.topbar.top).toBeGreaterThanOrEqual(0);
+    expect(state.topbar.top).toBeLessThan(70);
+    expect(state.nav.top).toBeGreaterThanOrEqual(state.topbar.top);
+    expect(state.nav.top).toBeLessThan(150);
+    expect(state.toolbar.top).toBeGreaterThanOrEqual(0);
+    expect(state.toolbar.top).toBeLessThan(state.viewportH / 2);
+    expect(state.tableHead.top).toBeGreaterThanOrEqual(state.toolbar.bottom - 4);
+    expect(state.tableHead.top).toBeLessThan(state.toolbar.bottom + 90);
+  });
+});
+
 test.describe('Hub navigation', () => {
   test('Explorer hub opens dropdown and item navigates to "Tous"', async ({ page }) => {
     await page.goto(URL);
