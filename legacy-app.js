@@ -17698,33 +17698,36 @@ keys.add(v37PickRowKey(candidate));
 return out;
 };
 const v37RenderPool = v37SortedDiverse.length ? v37SortedDiverse.concat(v37DataOnlyPool) : v37DataOnlyPool;
-// AUDIT 2026-05-08 v40.9 — Filtre "Passer pas assez de signal" caché par défaut.
-// User : "je voie énormément de paris avec passer pas assez de signal".
-// Ces picks (verdict='skip', opp<30) polluent la lecture sans valeur. On les
-// cache, mais on les compte pour proposer un toggle "voir matchs faibles".
-const v40HideWeakPrefRaw = (() => {
+// AUDIT 2026-05-08 v40.11 — Mode strict : seuls les picks misables.
+// User : "je veux voir que des prono sur lesquels je peux misé".
+// On garde uniquement verdict 'bet' (Miser) ou 'bet-light' (Petite mise).
+// Tout le reste (Surveiller, À éviter, Passer, Cote à vérifier) est caché.
+// Toggle pour voir tout via localStorage.v40_strictMode (default true).
+const v40StrictMode = (() => {
   try {
-    const raw = localStorage.getItem('v40_hideWeakPicks');
+    const raw = localStorage.getItem('v40_strictMode');
     return raw === null ? true : raw === '1' || raw === 'true';
   } catch (e) { return true; }
 })();
-const v40IsWeakPick = (p) => {
+const v40PickVerdict = (p) => {
   try {
     if (typeof _v39FinalRec === 'function') {
       const r = _v39FinalRec(p);
-      return r && r.verdict === 'skip';
+      return r ? r.verdict : null;
     }
   } catch (e) { swallowError(e); }
-  return Number(p?.opportunity || 0) < 30;
+  return Number(p?.opportunity || 0) >= 45 ? 'bet-light' : 'skip';
 };
-const v40WeakCount = v37RenderPool.filter(v40IsWeakPick).length;
-// AUDIT 2026-05-08 v40.10 — Si après filtrage il ne reste < 3 picks (cas
-// typique : Hier/Aujourd'hui avec matchs finis = tous "weak"), on désactive
-// auto le filtre pour ne pas afficher "Mode secours actif: le tableau est
-// vide". Mieux vaut montrer 10 picks weak que 0 picks utiles.
-const v40StrongCount = v37RenderPool.length - v40WeakCount;
-const v40HideWeakPicks = v40HideWeakPrefRaw && v40StrongCount >= 3;
-const v40RenderPoolFiltered = v40HideWeakPicks ? v37RenderPool.filter(p => !v40IsWeakPick(p)) : v37RenderPool;
+const v40IsBettable = (p) => {
+  const v = v40PickVerdict(p);
+  return v === 'bet' || v === 'bet-light';
+};
+const v40BettableCount = v37RenderPool.filter(v40IsBettable).length;
+const v40HiddenCount = v37RenderPool.length - v40BettableCount;
+// Adaptive : si strictMode mais < 1 pick misable → désactive pour ne pas avoir
+// un tableau vide. Sinon strict respecté.
+const v40StrictApplied = v40StrictMode && v40BettableCount >= 1;
+const v40RenderPoolFiltered = v40StrictApplied ? v37RenderPool.filter(v40IsBettable) : v37RenderPool;
 const v36TableRows = v37EnsureTierCoverage(v40RenderPoolFiltered.slice(0, v37DenseRowLimit), v40RenderPoolFiltered);
 const v36UpcomingAll = terminalScanPool
 .filter(m => new Date(m?.date || 0).getTime() > _dashboardNowMs && !m.completed)
@@ -17894,9 +17897,56 @@ const v37DenseFallbackHtml = (v36PickPool.length > 0 && v37DataOnlyPool.length >
 // fait +183% ROI sur 356 paris — la stratégie #1 du site. Les autres tiers
 // (safe/solid/value) perdent -14% à -19%. On affiche cette vérité au user
 // pour qu'il sache où concentrer ses mises au lieu de se disperser.
+// AUDIT 2026-05-08 v40.11 — Scanner multi-jours pour les Outsiders.
+// User : "va chercher encore plus de signaux et de data pour me proposer
+// plus de prono". On parcourt les 7 prochains jours de data.days, on
+// détecte tous les outsiders qualifiés (cote ≥5 + edge ≥5pt OU tier='out')
+// et on les liste dans la bannière comme top opportunities.
+const v40MultiDayOutsiders = (() => {
+  const out = [];
+  try {
+    const days = (window.PRONOSTICS_DATA?.days) || {};
+    const today = (window.PRONOSTICS_DATA?.today) || todayIso;
+    const candidatesDates = Object.keys(days).filter(d => d >= today).sort().slice(0, 7);
+    for (const day of candidatesDates) {
+      const evs = days[day] || [];
+      for (const m of evs) {
+        try {
+          if (!isWinamaxBookable(m)) continue;
+          const pred = predictMatch(m);
+          if (!pred?.pick) continue;
+          const cands = (typeof buildMarketCandidates === 'function')
+            ? buildMarketCandidates(m, pred, { requireExact: true }) : [];
+          for (const c of (cands || [])) {
+            const odd = Number(c?.odd || 0);
+            const rel = Number(c?.rel || c?.prob || 0);
+            if (!(odd >= 5) || !(rel > 0)) continue;
+            const edge = rel - 1 / odd;
+            if (edge < 0.05) continue;
+            // Format minimal pour l'UI
+            const sides = (typeof getSides === 'function') ? getSides(m) : null;
+            out.push({
+              m, pred, c,
+              odd, rel, edge,
+              dayLabel: day,
+              titleHtml: sides ? `${esc(v36TeamName ? v36TeamName(sides.home) : sides.home?.name || '?')} - ${esc(v36TeamName ? v36TeamName(sides.away) : sides.away?.name || '?')}` : '?',
+              labelText: c.label || c.shortLabel || pred.pick.label || 'Pick',
+            });
+          }
+        } catch (e) { swallowError(e); }
+      }
+    }
+    out.sort((a, b) => b.edge - a.edge);
+  } catch (e) { swallowError(e); }
+  return out.slice(0, 8);
+})();
+const v40OutsiderListHtml = v40MultiDayOutsiders.length
+  ? `<div style="margin-top:10px;display:grid;gap:6px;">${v40MultiDayOutsiders.map(o => `<a href="#dashboard?date=${esc(o.dayLabel)}" data-big-detail="${esc(String(o.m.id || ''))}" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 10px;background:rgba(15,15,20,0.5);border:1px solid rgba(45,212,168,0.2);border-radius:8px;font-size:12.5px;color:var(--text);text-decoration:none;cursor:pointer;"><b style="color:var(--text-dim);font-size:11px;min-width:60px;">${esc(o.dayLabel.slice(5))}</b><span style="flex:1;">${o.titleHtml} · <em style="color:var(--accent);">${esc(o.labelText)}</em></span><b style="color:#34d399;">@${o.odd.toFixed(2)}</b><b style="color:#34d399;font-size:11px;">+${(o.edge*100).toFixed(1)}pt edge</b></a>`).join('')}</div>`
+  : '';
 const v40OutsiderBannerHtml = `<section class="v37-empty-pool-help" style="background:linear-gradient(135deg,rgba(45,212,168,0.12),rgba(123,134,247,0.08));border:1px solid rgba(45,212,168,0.4);">
         <strong>💎 Stratégie active : Outsider-only · ROI historique +121%</strong>
-        <span style="font-size:13px;line-height:1.5;">Le backtest officiel prouve que les picks <b>tier Outsider</b> (cote ≥5 + edge ≥5pt) font <b style="color:#34d399;">+183% ROI sur 356 paris</b>. Les tiers Safe/Solid/Value perdent -14% à -19%. Cherche en priorité les picks marqués <b style="color:#34d399;">"Miser (Outsider 💎)"</b> ci-dessous — c'est ton vrai edge. Ignore les "À éviter" segment perdant.</span>
+        <span style="font-size:13px;line-height:1.5;">Le backtest officiel prouve que les picks <b>tier Outsider</b> (cote ≥5 + edge ≥5pt) font <b style="color:#34d399;">+183% ROI sur 356 paris</b>. Les tiers Safe/Solid/Value perdent -14% à -19%.${v40MultiDayOutsiders.length ? ` <b style="color:#34d399;">${v40MultiDayOutsiders.length} outsider${v40MultiDayOutsiders.length>1?'s':''} qualifié${v40MultiDayOutsiders.length>1?'s':''} détecté${v40MultiDayOutsiders.length>1?'s':''} sur les 7 prochains jours :</b>` : ' Aucun outsider qualifié sur les 7 prochains jours actuellement.'}</span>
+        ${v40OutsiderListHtml}
       </section>`;
 const v37FilterResetHtml = v37FilterResetNotice ? `<section class="v37-empty-pool-help is-info"><strong>Filtres corriges</strong><span>${esc(v37FilterResetNotice)}</span></section>` : '';
 const v37DecisionGuideHtml = '';
@@ -18243,7 +18293,7 @@ const v36TableHtml = `<section class="v36-table-panel" aria-label="Tableau dense
         <header class="v36-table-toolbar">
           <div>
             <strong>${v36TableRows.length} lignes · ${esc(v37ScopeLabel)}</strong>
-            <span>${v36PickPool.length} picks qualifiés${v37DataOnlyPool.length ? ` · ${v37DataOnlyPool.length} lignes data fiable` : ''} · ${v36TierDefs.map(t => `${v36CountsAll[t.id] || 0} ${t.label}`).join(' · ')} · ${v36TableRows.length}/${v37RenderPool.length || v36TableRows.length} lignes rendues${v40WeakCount > 0 ? ` · <button type="button" data-v40-toggle-weak style="background:none;border:1px solid var(--text-dim);color:var(--text-dim);padding:2px 8px;border-radius:6px;font-size:11px;cursor:pointer;">${v40HideWeakPicks ? `+ ${v40WeakCount} matchs faibles cachés` : `– cacher ${v40WeakCount} matchs faibles`}</button>` : ''}</span>
+            <span>${v36PickPool.length} picks qualifiés${v37DataOnlyPool.length ? ` · ${v37DataOnlyPool.length} lignes data fiable` : ''} · ${v40BettableCount} <b style="color:#34d399;">misables</b>${v36TableRows.length !== v37RenderPool.length ? ` · ${v36TableRows.length}/${v37RenderPool.length} affichés` : ` · ${v36TableRows.length} affichés`}${v40HiddenCount > 0 ? ` · <button type="button" data-v40-toggle-strict style="background:none;border:1px solid var(--text-dim);color:var(--text-dim);padding:2px 8px;border-radius:6px;font-size:11px;cursor:pointer;">${v40StrictApplied ? `+ ${v40HiddenCount} non-misables cachés` : `Mode strict (cacher ${v40HiddenCount})`}</button>` : ''}</span>
           </div>
           <label class="v36-table-search"><span>Search</span><input type="search" data-v36-search value="${esc(v36Search)}" placeholder="Équipe, ligue, marché"></label>
           <button type="button" class="v37-blind-toggle ${v37BlindMode ? 'is-active' : ''}" data-v37-blind aria-pressed="${v37BlindMode ? 'true' : 'false'}" data-tooltip="Cache cote et edge dans le dashboard pour lire l'analyse avant le rendement.">
@@ -18794,14 +18844,14 @@ try { localStorage.setItem(v36FilterKey, JSON.stringify(next)); } catch(e) { swa
 renderDashboardPage(wrap);
 });
 }
-// AUDIT 2026-05-08 v40.9 — Toggle pour afficher/cacher les "Passer pas assez de signal".
-const v40WeakToggle = wrap.querySelector('[data-v40-toggle-weak]');
-if (v40WeakToggle) {
-  v40WeakToggle.addEventListener('click', () => {
+// AUDIT 2026-05-08 v40.11 — Toggle mode strict (uniquement Miser/Petite mise).
+const v40StrictToggle = wrap.querySelector('[data-v40-toggle-strict]');
+if (v40StrictToggle) {
+  v40StrictToggle.addEventListener('click', () => {
     try {
-      const cur = localStorage.getItem('v40_hideWeakPicks');
-      const isHidden = cur === null ? true : (cur === '1' || cur === 'true');
-      localStorage.setItem('v40_hideWeakPicks', isHidden ? '0' : '1');
+      const cur = localStorage.getItem('v40_strictMode');
+      const isStrict = cur === null ? true : (cur === '1' || cur === 'true');
+      localStorage.setItem('v40_strictMode', isStrict ? '0' : '1');
     } catch (e) { swallowError(e); }
     renderDashboardPage(wrap);
   });
