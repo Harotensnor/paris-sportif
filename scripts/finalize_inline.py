@@ -116,17 +116,17 @@ def main():
         encoding='utf-8',
     )
 
-    # Sprint 61 — data_lite_72h.json : flat list of events on today/J+1/J+2.
-    # Permet aux clients de fetch un payload moyen (~600 KB) au lieu du
-    # data.js complet (1.4 MB) pour les vues 72h sans frapper l'archive
-    # complète 14j+. Utilisé en backup si le LITE inline est insuffisant.
-    lite_72h_events = []
-    for k in scope_72h_keys:
-        lite_72h_events.extend(days.get(k, []))
-    DATA_LITE_72H.write_text(
-        json.dumps(lite_72h_events, ensure_ascii=False, separators=(',', ':')),
-        encoding='utf-8',
-    )
+    # AUDIT 2026-05-08 (P1.6) — data_lite_72h.json supprimé. Le sidecar
+    # 1.9 MB était généré à chaque cron tick mais JAMAIS lu par le
+    # frontend (seul `src/pages.js` ajoutait un <link rel="prefetch">,
+    # qui était lui-même retiré). Le manifest garde `event_counts_lite_72h`
+    # pour la traçabilité du scope LITE, mais le contenu lui-même n'a
+    # plus de consommateur.
+    if DATA_LITE_72H.exists():
+        try:
+            DATA_LITE_72H.unlink()
+        except OSError:
+            pass
 
     # 2. data_manifest.json — list of available days + meta
     manifest = {
@@ -145,8 +145,7 @@ def main():
     )
 
     # 3. LITE boot blob — v35.112 : today only.
-    # Le sidecar data_lite_72h.json reste disponible pour un fetch futur, mais
-    # le premier chargement doit éviter le poids J+1/J+2 pour remonter Lighthouse.
+    # Le premier chargement doit éviter le poids J+1/J+2 pour remonter Lighthouse.
     boot_events = sorted(
         today_events,
         key=lambda m: (not ((m.get('winamax') or {}).get('available')), m.get('date') or ''),
@@ -187,14 +186,13 @@ def main():
 
     full_size_kb = DATA_JS.stat().st_size / 1024
     today_size_kb = DATA_TODAY.stat().st_size / 1024
-    lite_72h_size_kb = DATA_LITE_72H.stat().st_size / 1024
     lite_js_kb = DATA_LITE_JS.stat().st_size / 1024
     n_boot_events = sum(len(v) for v in lite_days.values())
     n_lite_72h_events = sum(len(v) for v in lite_72h_days.values())
     print(
         f'[finalize_inline] today={today} scope={scope_72h_keys[0]}..{scope_72h_keys[-1]} '
         f'| full={full_size_kb:.0f} KB | today.json={today_size_kb:.0f} KB '
-        f'| 72h.json={lite_72h_size_kb:.0f} KB ({n_lite_72h_events} events) '
+        f'| 72h scope={n_lite_72h_events} events (sidecar retiré audit P1.6) '
         f'| data_lite.js={lite_js_kb:.0f} KB ({n_boot_events} boot events) '
         f'| total days={len(manifest["days"])}',
         flush=True,
