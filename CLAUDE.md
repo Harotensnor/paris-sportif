@@ -24,6 +24,73 @@ sed -i -E "s|app\.js(\?v=[a-f0-9]+)?|app.js?v=${APP_JS_HASH}|g" pronostics.html
 
 Bumper aussi `sw.js` CACHE_VERSION dans la même commande.
 
+## Architecture v41.x (mise à jour 2026-05-09 — mégaplan élargissement marchés multi-sports)
+
+Phase intensive sur demande user explicite : "améliore les fiches de match
+et les pronostique , et ajoute des signaux et contexte ou va les chercher ,
+élargie le marché tout est autorisé , je veux un marché ultra complet
+tout sport [...] élargie le marché foot a fond les but sur pénalty par
+exemple sa peux marché sa, ou les score multiple et les buteur ou joueur
+decisif".
+
+### Phase 1 — Marchés foot étendus (v41.1)
+- **Penalty markets** : `pred.markets.extended.penalty.{yes,no}`. Conditionne
+  P(over 1.5) avec taux pénalty ligue (~25% par défaut). Chip rouge "🎯
+  Pénalty marqué (oui)" si yes ≥ 20%.
+- **Score groups** : `scoreGroups.{low,mid,high}`. Agrège grille Poisson
+  en 3 zones (0-1 / 2-3 / 4+). Chips "Match prolifique 4+" et "Match
+  fermé 0-1" selon seuils.
+- **Top scores mi-temps** : `topScoresHT[0..4]` via lambdas HT (×0.45).
+  Chip "Score MT le + probable X-Y".
+- **Clean sheet** : `cleanSheet.{home,away}` via Math.exp(-lamA/lamH).
+  Chips "Clean sheet domicile/extérieur" si ≥ 40%.
+
+### Phase 2 — Marchés autres sports (v41.2)
+- **Tennis** (`tennisScorePrediction`) : `firstSet.{home,away}` direct
+  depuis pSetH ; `tiebreak.{yes,no}` via tightness × numSets attendu.
+- **Basket** (`basketScoreProjection`) : `quarterWinner.{home,draw,away}`
+  via Gaussienne σ=5.5 sur margin/4 ; `firstHalfWinner.{home,away}` σ=8
+  sur margin/2.
+- **Hockey** (`hockeyScorePrediction`) : `firstPeriod.{home,draw,away}`
+  via Poisson lamH/3 × 0.95 ; `periodTotals` OU 0.5/1.5/2.5 par période.
+- **Baseball** (`baseballScoreProjection`) : `nrfi.{yes,no}` (No Run
+  First Inning) via Poisson λ_1st = total × 0.105 ; `inningTotals` OU
+  1.5/2.5 sur innings 1-3 (λ × 0.30).
+
+### Phase 3 — Data sources externes (v41.3)
+- **The Odds API** (https://the-odds-api.com) — free tier 500/mois,
+  ~30 bookmakers (Pinnacle, DraftKings, FanDuel, BetMGM, etc.).
+- `scripts/fetch_odds_aggregator.py` — fetch SPORTS list (10 ligues),
+  parse h2h markets, calcule consensus = moyenne, dump
+  `odds_aggregated.json`. **No-op silencieux si secret
+  `THE_ODDS_API_KEY` non défini**.
+- `scripts/patch_odds_aggregator.py` — matche events Winamax via
+  (norm_home, norm_away, date), injecte `ev.odds_consensus` + 
+  `ev.pinnacle_signal` + `ev.sharp_disagree` (Pinnacle ≠ consensus
+  de >5%).
+- Pipeline : `refresh.yml` fetch toutes les 2h (HOUR_MOD4=0), patch
+  séquentiel après les autres patches.
+- Activation : ajouter `THE_ODDS_API_KEY` dans Settings > Secrets >
+  Actions.
+
+### Phase 4 — Modal détail enrichi (v41.4)
+- Section **"💰 Sharp money & consensus marché"** dans la modal,
+  catégorisée 'sources'. Affiche side-by-side :
+  - Cote consensus (~30 bookmakers) — sentiment public
+  - Cote Pinnacle — sharp money proxy
+  - Signal ⬇/⬆ sharp si écart >5% (visualise reverse line movement)
+- Visible uniquement si `ev.odds_consensus` ou `ev.pinnacle_signal`
+  injectés (sinon section masquée).
+
+### Phase 5 — Visual polish (v41.5)
+- Bannière 💎 Outsider refondue : header avec icône drop-shadow glow +
+  badge pill "ROI +121%", 3 stat tiles inline (Tier rentable /
+  Échantillon 356 paris / N qualifiés sur 7j), radial gradient overlay.
+
+### Bundle
+Bumped 1.84 → 1.86 MB pour absorber les phases v41.1-5 (marchés étendus
+multi-sports + section sharp money modal).
+
 ## Architecture v40.x (mise à jour 2026-05-09 — gros sweep nuit du 2026-05-08)
 
 Phase intensive de 15 versions sur 24h, déclenchée par feedback user
