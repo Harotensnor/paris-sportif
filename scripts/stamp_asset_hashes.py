@@ -94,6 +94,27 @@ def stamp_text(text: str, build_id: str | None = None) -> tuple[str, int]:
     return ASSET_RE.sub(repl, text), changed
 
 
+def _stamp_footer_version(text: str, build_id: str) -> tuple[str, bool]:
+    """AUDIT 2026-05-08 v40.6 — Stamp footer-version span with BUILD_ID.
+
+    L'user voulait voir la version changer en bas à gauche à chaque push pour
+    savoir où on en est. Avant le footer affichait le VERSION constant
+    ('v40.0') stable entre déploys. Maintenant on injecte le BUILD_ID
+    complet (ex: 'v40.0-20260508-211000') qui bump à chaque stamp donc
+    visible immédiat.
+    """
+    # Pattern : <span class="footer-version" id="footer-version" ... title="Voir les nouveautés vXX.Y">vXX.Y</span>
+    span_re = re.compile(
+        r'(<span\s+class="footer-version"\s+id="footer-version"[^>]*?title="Voir les nouveautés )([^"]+)("[^>]*>)([^<]+)(</span>)',
+        re.DOTALL,
+    )
+    new_text, count = span_re.subn(
+        lambda m: f"{m.group(1)}{build_id}{m.group(3)}{build_id}{m.group(5)}",
+        text,
+    )
+    return new_text, count > 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--check", action="store_true", help="fail if any stamped asset is stale")
@@ -115,10 +136,14 @@ def main(argv: list[str] | None = None) -> int:
     if args.build_id:
         build_id = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S") if str(args.build_id).lower() in {"auto", "timestamp", "now"} else re.sub(r"[^A-Za-z0-9._-]+", "-", str(args.build_id))[:64]
     new_text, changed = stamp_text(text, build_id=build_id)
-    if changed:
+    footer_changed = False
+    if build_id:
+        new_text, footer_changed = _stamp_footer_version(new_text, build_id)
+    if changed or footer_changed:
         HTML.write_text(new_text, encoding="utf-8")
     suffix = f" with build {build_id}" if build_id else ""
-    print(f"[asset-hashes] stamped {changed} references{suffix}")
+    extras = " + footer" if footer_changed else ""
+    print(f"[asset-hashes] stamped {changed} references{suffix}{extras}")
     return 0
 
 

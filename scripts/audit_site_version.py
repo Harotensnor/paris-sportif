@@ -36,12 +36,19 @@ def main() -> None:
     sw = SW.read_text(encoding="utf-8")
 
     app_version = one(r"const\s+VERSION\s*=\s*'(v\d+\.\d+)'", app, "app VERSION")
-    footer_version = one(r'id="footer-version"[^>]*>(v\d+\.\d+)</span>', html, "footer version")
-    footer_title = one(r'id="footer-version"[^>]*title="Voir les nouveautés (v\d+\.\d+)"', html, "footer title")
+    # AUDIT 2026-05-08 v40.6 — footer accepte désormais soit "vXX.Y" plain
+    # soit "vXX.Y-YYYYMMDD-HHMMSS" (BUILD_ID stamped par stamp_asset_hashes).
+    # Permet à l'user de voir la version bumper à chaque push.
+    footer_version = one(r'id="footer-version"[^>]*>(v\d+\.\d+(?:-\d{8}-\d{6})?)</span>', html, "footer version")
+    footer_title = one(r'id="footer-version"[^>]*title="Voir les nouveautés (v\d+\.\d+(?:-\d{8}-\d{6})?)"', html, "footer title")
     sw_version = one(r"const\s+CACHE_VERSION\s*=\s*'([^']+)'", sw, "SW cache version")
 
     require("version: VERSION", app, "PS_APP_SHELL version constant")
-    if footer_version != app_version or footer_title != app_version:
+    # Le footer peut soit matcher exactement app_version (ex: 'v40.0' plain)
+    # soit commencer par app_version suivi de '-YYYYMMDD-HHMMSS' (stamped).
+    fv_ok = footer_version == app_version or footer_version.startswith(f"{app_version}-")
+    ft_ok = footer_title == app_version or footer_title.startswith(f"{app_version}-")
+    if not fv_ok or not ft_ok:
         fail(f"footer={footer_version}/{footer_title} app={app_version}")
     if not re.fullmatch(r"paris-sportif-(?:v\d+(?:\.\d+)?-)?\d{8}-\d{6}", sw_version):
         fail(f"CACHE_VERSION is not stamped: {sw_version}")

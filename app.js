@@ -14,12 +14,28 @@
   };
 
   function syncFooterVersion() {
+    // AUDIT 2026-05-08 v40.6 — Si le footer a été stamped avec un BUILD_ID
+    // complet (ex: 'v40.0-20260508-211000') par stamp_asset_hashes.py, on
+    // le LAISSE tel quel pour que l'user voit le timestamp du déploy.
+    // Sinon (texte = juste 'vXX.Y' plain), on overwrite avec VERSION runtime.
     const footer = document.getElementById('footer-version');
     document.documentElement.dataset.psAppVersion = VERSION;
     window.PS_APP_VERSION = VERSION;
     if (!footer) return null;
     const previous = (footer.textContent || '').trim();
     footer.dataset.appVersion = VERSION;
+    const isBuildStamped = /^v\d+\.\d+-\d{8}-\d{6}$/.test(previous);
+    if (isBuildStamped) {
+      // HTML est stamped → on ne touche pas. Juste record la valeur visible.
+      window.PS_BUILD_LABEL = previous;
+      footer.title = `Build ${previous} · base ${VERSION}`;
+      return {
+        previous,
+        current: previous,
+        driftFixed: false,
+      };
+    }
+    // HTML pas stamped → behavior original (overwrite avec VERSION).
     if (previous !== VERSION) {
       footer.dataset.versionDrift = previous || 'missing';
       footer.textContent = VERSION;
