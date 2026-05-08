@@ -18155,9 +18155,38 @@ const v40MultiDayOutsiders = (() => {
 const v40OutsiderListHtml = v40MultiDayOutsiders.length
   ? `<div style="margin-top:10px;display:grid;gap:6px;">${v40MultiDayOutsiders.map(o => `<a href="#dashboard?date=${esc(o.dayLabel)}" data-big-detail="${esc(String(o.m.id || ''))}" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 10px;background:rgba(15,15,20,0.5);border:1px solid rgba(45,212,168,0.2);border-radius:8px;font-size:12.5px;color:var(--text);text-decoration:none;cursor:pointer;"><b style="color:var(--text-dim);font-size:11px;min-width:60px;">${esc(o.dayLabel.slice(5))}</b><span style="flex:1;">${o.titleHtml} · <em style="color:var(--accent);">${esc(o.labelText)}</em></span><b style="color:#34d399;">@${o.odd.toFixed(2)}</b><b style="color:#34d399;font-size:11px;">+${(o.edge*100).toFixed(1)}pt edge</b></a>`).join('')}</div>`
   : '';
-const v40OutsiderBannerHtml = `<section class="v37-empty-pool-help" style="background:linear-gradient(135deg,rgba(45,212,168,0.12),rgba(123,134,247,0.08));border:1px solid rgba(45,212,168,0.4);">
-        <strong>💎 Stratégie active : Outsider-only · ROI historique +121%</strong>
-        <span style="font-size:13px;line-height:1.5;">Le backtest officiel prouve que les picks <b>tier Outsider</b> (cote ≥5 + edge ≥5pt) font <b style="color:#34d399;">+183% ROI sur 356 paris</b>. Les tiers Safe/Solid/Value perdent -14% à -19%.${v40MultiDayOutsiders.length ? ` <b style="color:#34d399;">${v40MultiDayOutsiders.length} outsider${v40MultiDayOutsiders.length>1?'s':''} qualifié${v40MultiDayOutsiders.length>1?'s':''} détecté${v40MultiDayOutsiders.length>1?'s':''} sur les 7 prochains jours :</b>` : ' Aucun outsider qualifié sur les 7 prochains jours actuellement.'}</span>
+// AUDIT 2026-05-09 v41.21 — Bannière 💎 plus stylée avec stats live.
+// Avant : texte plain. Maintenant : header gradient + 3 stats inline +
+// shimmer animation sur le badge ROI pour attirer l'œil.
+const v40OutsiderBannerHtml = `<section class="v37-empty-pool-help v41-outsider-banner" style="background:linear-gradient(135deg,rgba(45,212,168,0.18) 0%,rgba(123,134,247,0.12) 50%,rgba(45,212,168,0.10) 100%);border:1px solid rgba(45,212,168,0.5);position:relative;overflow:hidden;">
+        <div style="position:absolute;top:0;right:0;width:120px;height:120px;background:radial-gradient(circle at center,rgba(45,212,168,0.25) 0%,transparent 70%);pointer-events:none;"></div>
+        <strong style="display:flex;align-items:center;gap:8px;font-size:14px;">
+          <span style="font-size:18px;filter:drop-shadow(0 0 6px rgba(45,212,168,0.6));">💎</span>
+          Stratégie Outsider-only
+          <span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;background:rgba(45,212,168,0.18);border:1px solid rgba(45,212,168,0.5);border-radius:999px;font-size:11px;font-weight:800;color:#34d399;letter-spacing:0.4px;">ROI +121% historique</span>
+        </strong>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:12px 0;font-size:12px;">
+          <div style="padding:8px 10px;background:rgba(15,15,20,0.4);border-radius:6px;border:1px solid rgba(45,212,168,0.2);">
+            <div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.3px;">Tier rentable</div>
+            <div style="font-size:14px;font-weight:800;color:#34d399;">Outsider</div>
+            <div style="font-size:10.5px;color:var(--text-dim2);">cote ≥5 · edge ≥5pt</div>
+          </div>
+          <div style="padding:8px 10px;background:rgba(15,15,20,0.4);border-radius:6px;border:1px solid rgba(45,212,168,0.2);">
+            <div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.3px;">Échantillon</div>
+            <div style="font-size:14px;font-weight:800;color:var(--text);">356 paris</div>
+            <div style="font-size:10.5px;color:var(--text-dim2);">backtest réel</div>
+          </div>
+          <div style="padding:8px 10px;background:rgba(15,15,20,0.4);border-radius:6px;border:1px solid rgba(45,212,168,0.2);">
+            <div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.3px;">7 prochains jours</div>
+            <div style="font-size:14px;font-weight:800;color:${v40MultiDayOutsiders.length ? '#34d399' : 'var(--text-dim2)'};">${v40MultiDayOutsiders.length} qualifié${v40MultiDayOutsiders.length > 1 ? 's' : ''}</div>
+            <div style="font-size:10.5px;color:var(--text-dim2);">${v40MultiDayOutsiders.length ? 'voir liste ↓' : 'rare statistiquement'}</div>
+          </div>
+        </div>
+        <div style="font-size:12px;line-height:1.5;color:var(--text-dim);">
+          Tiers Safe/Solid/Value perdent <b style="color:#f87171;">-14% à -19%</b>. Cherche les picks
+          <b style="color:#34d399;background:rgba(45,212,168,0.12);padding:1px 5px;border-radius:3px;">"Miser (Outsider 💎)"</b>
+          dans le tableau — c'est ton vrai edge.
+        </div>
         ${v40OutsiderListHtml}
       </section>`;
 const v37FilterResetHtml = v37FilterResetNotice ? `<section class="v37-empty-pool-help is-info"><strong>Filtres corriges</strong><span>${esc(v37FilterResetNotice)}</span></section>` : '';
