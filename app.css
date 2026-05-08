@@ -453,3 +453,19 @@ html[data-theme="light"]{--surface-0:#f5f5f7;--surface-1:#ffffff;--surface-2:#fb
   .v36-picks-table tbody tr{border-bottom:1px solid rgba(236,244,255,.04)}
   .v36-picks-table tbody tr:hover{background:linear-gradient(90deg,rgba(167,139,250,.06),transparent 60%)}
 }
+
+/* AUDIT 2026-05-08 — Indicateur visuel scroll horizontal sur mobile.
+   Détecté : .page-tabs (combines/buteurs/performance/compare), .v37-day-nav
+   (dashboard) et .v36-sort-strip (table sort) scrollent bien horizontalement
+   mais sans indicateur, l'utilisateur mobile ne sait pas qu'il y a plus à voir.
+   Pattern : mask-image fade right edge + scroll-snap-type x proximity.
+   Réutilise la convention déjà appliquée à #suivi-subnav / #pronos-subnav. */
+@media (max-width:720px){
+  .page-tabs,.v37-day-nav,.v36-sort-strip,.md-tabs{
+    mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent);
+    -webkit-mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent);
+    scroll-snap-type:x proximity;
+    -webkit-overflow-scrolling:touch;
+  }
+  .page-tabs > *,.v37-day-nav > *,.v36-sort-strip > *,.md-tabs > *{scroll-snap-align:start}
+}
