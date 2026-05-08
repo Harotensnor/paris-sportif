@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-08T22:27:52Z",
+  "generated_at": "2026-05-08T22:33:31Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -1778,6 +1778,42 @@
             "whip": 1.06
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Detroit Tigers",
+          "pitcher": "Ty Madden",
+          "label": "Ty Madden plus de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "over",
+          "probability": 0.5433,
+          "fair_odds": 1.84,
+          "expected_strikeouts": 6.72,
+          "projected_ip": 4.8,
+          "inputs": {
+            "k9": 12.6,
+            "era": 0.0,
+            "whip": 0.8,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Detroit Tigers",
+          "pitcher": "Ty Madden",
+          "label": "Ty Madden ne concède pas de home run",
+          "pick": "no",
+          "probability": 1.0,
+          "fair_odds": 1.01,
+          "expected_hr_allowed": 0.0,
+          "projected_ip": 4.8,
+          "inputs": {
+            "hr9": 0.0,
+            "era": 0.0,
+            "whip": 0.8
+          },
+          "side": "away"
         }
       ]
     },
@@ -3252,7 +3288,7 @@
       ]
     }
   ],
-  "props": 156,
+  "props": 158,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
