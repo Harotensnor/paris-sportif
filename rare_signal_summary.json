@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-08T14:45:14Z",
+  "generated_at": "2026-05-08T15:08:29Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
@@ -12,10 +12,9 @@
     "by_type": {
       "injury_imbalance": 27,
       "travel_extreme": 15,
-      "market_uncertain": 27,
-      "market_move": 4,
-      "signal_conflict": 15,
-      "back_to_back_travel": 26
+      "signal_conflict": 13,
+      "back_to_back_travel": 29,
+      "market_uncertain": 25
     },
     "by_quality": {
       "actionable": 34,
@@ -43,24 +42,6 @@
       "context": "Absences severes 7-14"
     },
     {
-      "event_id": "401871405",
-      "date": "2026-05-08T23:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Buffalo Sabres",
-      "away": "Montreal Canadiens",
-      "match": "Buffalo Sabres - Montreal Canadiens",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 1.74 -> 2.15 (-23.5%)"
-    },
-    {
       "event_id": "401815261",
       "date": "2026-05-08T23:40Z",
       "sport": "baseball",
@@ -77,24 +58,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 5-12"
-    },
-    {
-      "event_id": "401871425",
-      "date": "2026-05-09T01:30Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Anaheim Ducks",
-      "away": "Vegas Golden Knights",
-      "match": "Anaheim Ducks - Vegas Golden Knights",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 1.93 -> 2.35 (-22.0%)"
     },
     {
       "event_id": "401815267",
@@ -367,6 +330,24 @@
       "context": "Absences severes 5-12"
     },
     {
+      "event_id": "401815273",
+      "date": "2026-05-09T20:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Boston Red Sox",
+      "away": "Tampa Bay Rays",
+      "match": "Boston Red Sox - Tampa Bay Rays",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Tampa Bay Rays",
+      "side": "away",
+      "strength": 0.996,
+      "context": "2 match dans les 48h + 1928 km de voyage"
+    },
+    {
       "event_id": "401815288",
       "date": "2026-05-10T17:35Z",
       "sport": "baseball",
@@ -385,8 +366,8 @@
       "context": "2 match dans les 48h + 1928 km de voyage"
     },
     {
-      "event_id": "401815273",
-      "date": "2026-05-09T20:10Z",
+      "event_id": "401815258",
+      "date": "2026-05-08T23:10Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
@@ -401,6 +382,24 @@
       "side": "away",
       "strength": 0.916,
       "context": "1 match dans les 48h + 1928 km de voyage"
+    },
+    {
+      "event_id": "401871328",
+      "date": "2026-05-10T00:30Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "Los Angeles Lakers",
+      "away": "Oklahoma City Thunder",
+      "match": "Los Angeles Lakers - Oklahoma City Thunder",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Oklahoma City Thunder",
+      "side": "away",
+      "strength": 0.91,
+      "context": "1 match dans les 48h + 1899 km de voyage"
     },
     {
       "event_id": "401871330",
@@ -1199,24 +1198,6 @@
       "context": "marge bookmaker anormale 18.8%"
     },
     {
-      "event_id": "401815258",
-      "date": "2026-05-08T23:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Boston Red Sox",
-      "away": "Tampa Bay Rays",
-      "match": "Boston Red Sox - Tampa Bay Rays",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "signal_conflict",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.503,
-      "context": "Signaux opposes: Boston Red Sox fade 0.70, Tampa Bay Rays fade 0.75 -> prudence"
-    },
-    {
       "event_id": "401871156",
       "date": "2026-05-12T04:00Z",
       "sport": "basketball",
@@ -1287,6 +1268,24 @@
       "side": null,
       "strength": 0.488,
       "context": "Signaux opposes: Vegas Golden Knights fade 0.75, Anaheim Ducks fade 0.75 -> prudence"
+    },
+    {
+      "event_id": "401871337",
+      "date": "2026-05-13T04:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "Detroit Pistons",
+      "away": "Cleveland Cavaliers",
+      "match": "Detroit Pistons - Cleveland Cavaliers",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.488,
+      "context": "Signaux opposes: Detroit Pistons fade 0.75, Cleveland Cavaliers fade 0.75 -> prudence"
     },
     {
       "event_id": "401871164",
