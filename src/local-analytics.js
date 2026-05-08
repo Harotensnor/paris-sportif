@@ -623,6 +623,10 @@
     $('[data-la-discovery]')?.remove();
   }
   function maybeFeatureDiscovery() {
+    if (pageSlug() === 'dashboard') {
+      removeDiscoveryCard();
+      return;
+    }
     if (detailModalOpen() || $('.la-modal')) {
       removeDiscoveryCard();
       return;

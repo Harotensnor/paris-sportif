@@ -104,15 +104,15 @@ async function runCase(browser, label, ageMin) {
       ? window.getDataAge(window.PRONOSTICS_DATA)
       : { minutes: null, state: 'missing' };
     const staleText = /(Données anciennes|Données en retard|lecture seule|Pipeline en panne)/i.test(body);
-    const denseText = /V37\s*:\s*\d+\s+(?:picks|lignes)\s+affich/i.test(body);
+    const tableVisible = !!document.querySelector('.v36-table-panel .v36-picks-table');
     const footerText = document.querySelector('#footer-data-age, .footer-data-age')?.innerText || '';
-    return { age, staleText, denseText, footerText, generatedAt: window.PRONOSTICS_DATA?.generated_at || null };
+    return { age, staleText, tableVisible, footerText, generatedAt: window.PRONOSTICS_DATA?.generated_at || null };
   });
   check(`${label}: generated_at rewritten`, state.generatedAt === iso, JSON.stringify(state));
   if (ageMin <= 30) {
     check(`${label}: getDataAge fresh`, state.age.minutes <= 30 && state.age.state === 'fresh', JSON.stringify(state.age));
     check(`${label}: no stale warning visible`, !state.staleText, JSON.stringify(state));
-    check(`${label}: dashboard data banner visible`, state.denseText, JSON.stringify(state));
+    check(`${label}: dashboard table visible`, state.tableVisible, JSON.stringify(state));
   } else {
     check(`${label}: getDataAge down`, state.age.minutes > 240 && state.age.state === 'down', JSON.stringify(state.age));
     check(`${label}: stale warning visible`, state.staleText, JSON.stringify(state));

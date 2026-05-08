@@ -57,8 +57,8 @@ def stamp_html(target: str) -> bool:
         return False
     text = HTML.read_text(encoding="utf-8")
     new = re.sub(
-        r'<span class="footer-version" id="footer-version" role="button" tabindex="0" style="cursor:pointer;" title="Voir les nouveautés v\d+\.\d+">v\d+\.\d+</span>',
-        f'<span class="footer-version" id="footer-version" role="button" tabindex="0" style="cursor:pointer;" title="Voir les nouveautés {target}">{target}</span>',
+        r'(<span\b(?=[^>]*\bid="footer-version"\b)[^>]*\btitle="Voir les nouveautés )v\d+\.\d+("[^>]*>)v\d+\.\d+(</span>)',
+        rf'\g<1>{target}\g<2>{target}\g<3>',
         text,
         count=1,
     )

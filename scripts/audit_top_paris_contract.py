@@ -30,6 +30,9 @@ def main():
     require(legacy, "v37CanAutoHorizonLowPool = false", "no automatic 7-day expansion")
     require(legacy, "v37ShowResultColumn", "today result column")
     require(legacy, "v37BeginnerPickText", "beginner row explanation")
+    require(legacy, "v37ApplyOddPriorityCap", "stale odd priority cap")
+    require(legacy, "v37ReadableMetricHtml", "beginner-readable table metrics")
+    require(legacy, "updateViaCache: 'none'", "service worker cache bypass")
     require(legacy, "data-home-table-only", "homepage table-only shell")
 
     require(probe, "Accueil is table-only", "probe table-only assertion")
@@ -40,11 +43,15 @@ def main():
     require(probe, "Accueil defaults to Aujourd’hui", "probe dashboard today default assertion")
     require(smoke, "probe_prono_sheet_odds.js", "smoke workflow wiring")
     require(local_analytics, "$('[data-la-dashboard-panel]')?.remove();", "no local analytics panel on dashboard")
+    require(local_analytics, "if (pageSlug() === 'dashboard')", "no discovery overlay on dashboard")
+    require(local_analytics, "removeDiscoveryCard();", "dashboard discovery removal")
 
     if "const g = window.PRONOSTICS_DATA?.today" in legacy:
         raise SystemExit("[top-paris-contract] FAIL todayISO must use the real Europe/Paris date, not stale data.today")
     if "${v37DecisionGuideHtml}" in legacy or "${v37TierLegendHtml}" in legacy:
         raise SystemExit("[top-paris-contract] FAIL dashboard table must not render guide/legend before the table")
+    if "Comment choisir un pari" in legacy or 'class="v37-tier-legend"' in legacy:
+        raise SystemExit("[top-paris-contract] FAIL dead guide/legend markup must stay out of the homepage bundle")
 
     print("[top-paris-contract] OK")
 

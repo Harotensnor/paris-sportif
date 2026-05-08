@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 
@@ -28,5 +29,28 @@ def test_dashboard_is_table_first_without_extra_panels():
     assert "v37DateFilter = (/^\\d{4}-\\d{2}-\\d{2}$/.test(v37HashDate) || v37HashDate === 'all') ? v37HashDate : todayIso" in legacy
     assert "${v37DecisionGuideHtml}" not in legacy
     assert "${v37TierLegendHtml}" not in legacy
+    assert "Comment choisir un pari" not in legacy
+    assert 'class="v37-tier-legend"' not in legacy
     assert "$('[data-la-dashboard-panel]')?.remove();" in analytics
+    assert "if (pageSlug() === 'dashboard')" in analytics
+    assert "removeDiscoveryCard();" in analytics
     assert "wrap.prepend(panel)" not in analytics
+
+
+def test_stale_odds_are_capped_and_not_prioritized():
+    legacy = LEGACY.read_text(encoding="utf-8")
+    assert "function v38PronoAction(score, edge, oddMeta)" in legacy
+    assert "v37ApplyOddPriorityCap" in legacy
+    assert "if (status === 'stale') return Math.min(n, 38)" in legacy
+    assert "return oddRank || (v36TierRank[a.tier]" in legacy
+    assert "Cote ancienne" in legacy
+
+
+def test_footer_version_is_driven_by_app_shell():
+    app = (ROOT / "app.js").read_text(encoding="utf-8")
+    html = (ROOT / "pronostics.html").read_text(encoding="utf-8")
+    app_version = re.search(r"const VERSION = '(v\d+\.\d+)'", app).group(1)
+    footer_version = re.search(r'id="footer-version"[^>]*>(v\d+\.\d+)</span>', html).group(1)
+    assert "version: VERSION" in app
+    assert "syncFooterVersion" in app
+    assert footer_version == app_version
