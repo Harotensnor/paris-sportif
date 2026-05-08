@@ -34,6 +34,19 @@ function rewriteGeneratedAt(text, iso) {
   );
 }
 
+// AUDIT 2026-05-08 (P0.5b) — Avant ce fix, la probe ne réécrivait que
+// data_lite.js / data.js. Mais le boot poll lit aussi `data_manifest.json`
+// (cf. legacy-app.js _pollData), dont le `generated_at` OVERRIDE la valeur
+// initiale via Object spread. Résultat : la simulation `stale-data` ne
+// produisait jamais une vraie data stale → la probe était systématiquement
+// rouge. On réécrit désormais tous les vecteurs cohérents.
+function rewriteManifestGeneratedAt(text, iso) {
+  return text.replace(
+    /"generated_at"\s*:\s*"[^"]+"/,
+    `"generated_at":"${iso}"`
+  );
+}
+
 function startServer(ageMin) {
   const iso = new Date(Date.now() - ageMin * 60000).toISOString();
   return new Promise((resolve, reject) => {
@@ -56,6 +69,13 @@ function startServer(ageMin) {
         res.setHeader('Cache-Control', 'no-store');
         if (url === '/data_lite.js' || url === '/data.js') {
           const body = rewriteGeneratedAt(fs.readFileSync(filePath, 'utf8'), iso);
+          res.end(body);
+          return;
+        }
+        if (url === '/data_manifest.json') {
+          // AUDIT 2026-05-08 (P0.5b) — réécrire manifest aussi sinon _pollData
+          // override la timestamp côté frontend.
+          const body = rewriteManifestGeneratedAt(fs.readFileSync(filePath, 'utf8'), iso);
           res.end(body);
           return;
         }

@@ -19,7 +19,15 @@ ALLOWLIST = {
         "data volume",
         "tri select est couvert en desktop",
         "Aucun evenement disponible",
+        # AUDIT 2026-05-08 (P0.7) : 3 skips conditionnels viewport-aware ou
+        # data-aware légitimes qui n'étaient pas allowlistés.
+        "Desktop sticky stack",
+        "await trigger.count",
+        "No match available to open detail modal",
     },
+    "local-analytics.spec.js": {"Desktop overlap regression"},
+    "round2-regressions.spec.js": {"Aucun match disponible dans le dataset local"},
+    "v38-regressions.spec.js": {"No match in lite data"},
     "plan-1000-helpers.spec.js": {"reliable physical Escape key"},
     "unit-helpers.spec.js": {"focus clavier des tooltips", "mobile utilise le long press"},
     "spa-pages-regression.spec.js": {"Mobile-only test"},
