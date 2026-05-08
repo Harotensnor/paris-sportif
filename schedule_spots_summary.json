@@ -1,28 +1,176 @@
 {
-  "generated_at": "2026-05-07T23:46:44Z",
+  "generated_at": "2026-05-08T10:09:22Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 70,
+    "active_events": 71,
     "expired_sample": 0,
     "by_type": {
       "lookahead": 101,
-      "travel_extreme": 23,
-      "schedule_congestion": 26,
-      "back_to_back_travel": 28
+      "schedule_congestion": 36,
+      "travel_extreme": 21,
+      "back_to_back_travel": 29
     },
     "by_decision": {
-      "abstain": 32,
-      "lean_home": 33,
-      "lean_away": 5
+      "abstain": 36,
+      "lean_home": 32,
+      "lean_away": 3
     },
-    "lean_home": 33,
-    "lean_away": 5,
-    "abstain": 32,
+    "lean_home": 32,
+    "lean_away": 3,
+    "abstain": 36,
     "monitor": 0
   },
   "active": [
+    {
+      "event_id": "401815255",
+      "source_event_ids": [
+        "401815255"
+      ],
+      "kickoff": "2026-05-08T22:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Philadelphia Phillies",
+      "away": "Colorado Rockies",
+      "match": "Philadelphia Phillies - Colorado Rockies",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: Philadelphia Phillies 0.90, Colorado Rockies 0.89",
+      "pressure_score": 2.523,
+      "home_fade": 0.9,
+      "away_fade": 0.89,
+      "travel_score": 0.59,
+      "lookahead_score": 1.333,
+      "congestion_score": 0.6,
+      "types": {
+        "schedule_congestion": 1,
+        "lookahead": 2,
+        "travel_extreme": 1
+      },
+      "contexts": [
+        "3 matchs sur les 7 derniers jours",
+        "2 match important/proche dans les 3 jours",
+        "2 match important/proche dans les 3 jours",
+        "Deplacement estime 2535 km, decalage ~2.0h"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.379,
+        "away_score": -1.175,
+        "home_fade": 0.9,
+        "away_fade": 1.49,
+        "reason": "Direction nette: Philadelphia Phillies (-0.38)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.59
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815274",
+      "source_event_ids": [
+        "401815274"
+      ],
+      "kickoff": "2026-05-09T20:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Miami Marlins",
+      "away": "Washington Nationals",
+      "match": "Miami Marlins - Washington Nationals",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: Miami Marlins 0.95, Washington Nationals 0.98",
+      "pressure_score": 2.294,
+      "home_fade": 0.95,
+      "away_fade": 0.977,
+      "travel_score": 0.827,
+      "lookahead_score": 0.667,
+      "congestion_score": 0.8,
+      "types": {
+        "schedule_congestion": 1,
+        "lookahead": 2,
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "4 matchs sur les 7 derniers jours",
+        "1 match important/proche dans les 3 jours",
+        "1 match important/proche dans les 3 jours",
+        "1 match dans les 48h + 1487 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.328,
+        "away_score": -1.445,
+        "home_fade": 0.95,
+        "away_fade": 1.777,
+        "reason": "Direction nette: Miami Marlins (-0.33)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.8
+          },
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.8
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 0.827
+          }
+        ]
+      }
+    },
     {
       "event_id": "401815289",
       "source_event_ids": [
@@ -49,7 +197,7 @@
         "back_to_back_travel": 1
       },
       "contexts": [
-        "6 matchs sur les 7 derniers jours",
+        "5 matchs sur les 7 derniers jours",
         "2 match dans les 48h + 1487 km de voyage"
       ],
       "global_resolution": {
@@ -83,20 +231,20 @@
       }
     },
     {
-      "event_id": "401871336",
+      "event_id": "401871156",
       "source_event_ids": [
-        "401871336"
+        "401871156"
       ],
-      "kickoff": "2026-05-12T00:00Z",
+      "kickoff": "2026-05-12T04:00Z",
       "sport": "basketball",
       "league_code": "nba",
       "league_name": "NBA",
-      "home": "Cleveland Cavaliers",
-      "away": "Detroit Pistons",
-      "match": "Cleveland Cavaliers - Detroit Pistons",
+      "home": "San Antonio Spurs",
+      "away": "Minnesota Timberwolves",
+      "match": "San Antonio Spurs - Minnesota Timberwolves",
       "decision": "abstain",
       "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Cleveland Cavaliers 0.75, Detroit Pistons 0.75",
+      "reason": "Fatigue/agenda des deux cotes: San Antonio Spurs 0.75, Minnesota Timberwolves 0.75",
       "pressure_score": 1.867,
       "home_fade": 0.75,
       "away_fade": 0.75,
@@ -120,7 +268,275 @@
         "away_score": -0.488,
         "home_fade": 0.75,
         "away_fade": 0.75,
-        "reason": "Signaux opposes: Cleveland Cavaliers fade 0.75, Detroit Pistons fade 0.75 -> prudence",
+        "reason": "Signaux opposes: San Antonio Spurs fade 0.75, Minnesota Timberwolves fade 0.75 -> prudence",
+        "detail": [
+          {
+            "side": "home",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401871163",
+      "source_event_ids": [
+        "401871163"
+      ],
+      "kickoff": "2026-05-12T04:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "New York Knicks",
+      "away": "Philadelphia 76ers",
+      "match": "New York Knicks - Philadelphia 76ers",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: New York Knicks 0.75, Philadelphia 76ers 0.75",
+      "pressure_score": 1.867,
+      "home_fade": 0.75,
+      "away_fade": 0.75,
+      "travel_score": 0,
+      "lookahead_score": 0.667,
+      "congestion_score": 1.2,
+      "types": {
+        "schedule_congestion": 2,
+        "lookahead": 2
+      },
+      "contexts": [
+        "3 matchs sur les 7 derniers jours",
+        "1 match important/proche dans les 3 jours",
+        "3 matchs sur les 7 derniers jours",
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.488,
+        "away_score": -0.488,
+        "home_fade": 0.75,
+        "away_fade": 0.75,
+        "reason": "Signaux opposes: New York Knicks fade 0.75, Philadelphia 76ers fade 0.75 -> prudence",
+        "detail": [
+          {
+            "side": "home",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401871407",
+      "source_event_ids": [
+        "401871407"
+      ],
+      "kickoff": "2026-05-12T23:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Montreal Canadiens",
+      "away": "Buffalo Sabres",
+      "match": "Montreal Canadiens - Buffalo Sabres",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: Montreal Canadiens 0.75, Buffalo Sabres 0.75",
+      "pressure_score": 1.867,
+      "home_fade": 0.75,
+      "away_fade": 0.75,
+      "travel_score": 0,
+      "lookahead_score": 0.667,
+      "congestion_score": 1.2,
+      "types": {
+        "schedule_congestion": 2,
+        "lookahead": 2
+      },
+      "contexts": [
+        "3 matchs sur les 7 derniers jours",
+        "1 match important/proche dans les 3 jours",
+        "3 matchs sur les 7 derniers jours",
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.488,
+        "away_score": -0.488,
+        "home_fade": 0.75,
+        "away_fade": 0.75,
+        "reason": "Signaux opposes: Montreal Canadiens fade 0.75, Buffalo Sabres fade 0.75 -> prudence",
+        "detail": [
+          {
+            "side": "home",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401871427",
+      "source_event_ids": [
+        "401871427"
+      ],
+      "kickoff": "2026-05-13T01:30Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Vegas Golden Knights",
+      "away": "Anaheim Ducks",
+      "match": "Vegas Golden Knights - Anaheim Ducks",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: Vegas Golden Knights 0.75, Anaheim Ducks 0.75",
+      "pressure_score": 1.867,
+      "home_fade": 0.75,
+      "away_fade": 0.75,
+      "travel_score": 0,
+      "lookahead_score": 0.667,
+      "congestion_score": 1.2,
+      "types": {
+        "schedule_congestion": 2,
+        "lookahead": 2
+      },
+      "contexts": [
+        "3 matchs sur les 7 derniers jours",
+        "1 match important/proche dans les 3 jours",
+        "3 matchs sur les 7 derniers jours",
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.488,
+        "away_score": -0.488,
+        "home_fade": 0.75,
+        "away_fade": 0.75,
+        "reason": "Signaux opposes: Vegas Golden Knights fade 0.75, Anaheim Ducks fade 0.75 -> prudence",
+        "detail": [
+          {
+            "side": "home",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401871337",
+      "source_event_ids": [
+        "401871337"
+      ],
+      "kickoff": "2026-05-13T04:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "Detroit Pistons",
+      "away": "Cleveland Cavaliers",
+      "match": "Detroit Pistons - Cleveland Cavaliers",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: Detroit Pistons 0.75, Cleveland Cavaliers 0.75",
+      "pressure_score": 1.867,
+      "home_fade": 0.75,
+      "away_fade": 0.75,
+      "travel_score": 0,
+      "lookahead_score": 0.667,
+      "congestion_score": 1.2,
+      "types": {
+        "schedule_congestion": 2,
+        "lookahead": 2
+      },
+      "contexts": [
+        "3 matchs sur les 7 derniers jours",
+        "1 match important/proche dans les 3 jours",
+        "3 matchs sur les 7 derniers jours",
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.488,
+        "away_score": -0.488,
+        "home_fade": 0.75,
+        "away_fade": 0.75,
+        "reason": "Signaux opposes: Detroit Pistons fade 0.75, Cleveland Cavaliers fade 0.75 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -428,58 +844,6 @@
       }
     },
     {
-      "event_id": "401871337",
-      "source_event_ids": [
-        "401871337"
-      ],
-      "kickoff": "2026-05-13T04:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Detroit Pistons",
-      "away": "Cleveland Cavaliers",
-      "match": "Detroit Pistons - Cleveland Cavaliers",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Detroit Pistons 0.60, Cleveland Cavaliers 0.60",
-      "pressure_score": 1.2,
-      "home_fade": 0.6,
-      "away_fade": 0.6,
-      "travel_score": 0,
-      "lookahead_score": 0,
-      "congestion_score": 1.2,
-      "types": {
-        "schedule_congestion": 2
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "3 matchs sur les 7 derniers jours"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.39,
-        "away_score": -0.39,
-        "home_fade": 0.6,
-        "away_fade": 0.6,
-        "reason": "Signaux opposes: Detroit Pistons fade 0.60, Cleveland Cavaliers fade 0.60 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401871415",
       "source_event_ids": [
         "401871415"
@@ -510,11 +874,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -1.19,
-        "away_score": -0.11,
-        "home_fade": 1.4,
+        "home_score": -0.99,
+        "away_score": -0.18,
+        "home_fade": 1.2,
         "away_fade": 0.6,
-        "reason": "Direction nette: Carolina Hurricanes (-0.11)",
+        "reason": "Direction nette: Carolina Hurricanes (-0.18)",
         "detail": [
           {
             "side": "home",
@@ -532,7 +896,7 @@
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.8
+            "strength": 0.6
           }
         ]
       }
@@ -694,71 +1058,105 @@
       }
     },
     {
-      "event_id": "401871412",
+      "event_id": "401871157",
       "source_event_ids": [
-        "401871412"
+        "401871157"
       ],
-      "kickoff": "2026-05-08T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Philadelphia Flyers",
-      "away": "Carolina Hurricanes",
-      "match": "Philadelphia Flyers - Carolina Hurricanes",
+      "kickoff": "2026-05-15T04:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "Minnesota Timberwolves",
+      "away": "San Antonio Spurs",
+      "match": "Minnesota Timberwolves - San Antonio Spurs",
       "decision": "abstain",
       "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Philadelphia Flyers 0.15, Carolina Hurricanes 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
+      "reason": "Fatigue/agenda des deux cotes: Minnesota Timberwolves 0.60, San Antonio Spurs 0.60",
+      "pressure_score": 1.2,
+      "home_fade": 0.6,
+      "away_fade": 0.6,
       "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
+      "lookahead_score": 0,
+      "congestion_score": 1.2,
       "types": {
-        "lookahead": 2
+        "schedule_congestion": 2
       },
       "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
+        "3 matchs sur les 7 derniers jours",
+        "3 matchs sur les 7 derniers jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -1.548,
-        "away_score": -0.467,
-        "home_fade": 1.95,
-        "away_fade": 1.15,
-        "reason": "Direction nette: Carolina Hurricanes (-0.47)",
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.39,
+        "away_score": -0.39,
+        "home_fade": 0.6,
+        "away_fade": 0.6,
+        "reason": "Signaux opposes: Minnesota Timberwolves fade 0.60, San Antonio Spurs fade 0.60 -> prudence",
         "detail": [
           {
             "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
+            "type": "schedule_congestion",
             "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
+            "strength": 0.6
           },
           {
             "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401871338",
+      "source_event_ids": [
+        "401871338"
+      ],
+      "kickoff": "2026-05-15T04:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "Cleveland Cavaliers",
+      "away": "Detroit Pistons",
+      "match": "Cleveland Cavaliers - Detroit Pistons",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: Cleveland Cavaliers 0.60, Detroit Pistons 0.60",
+      "pressure_score": 1.2,
+      "home_fade": 0.6,
+      "away_fade": 0.6,
+      "travel_score": 0,
+      "lookahead_score": 0,
+      "congestion_score": 1.2,
+      "types": {
+        "schedule_congestion": 2
+      },
+      "contexts": [
+        "3 matchs sur les 7 derniers jours",
+        "3 matchs sur les 7 derniers jours"
+      ],
+      "global_resolution": {
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.39,
+        "away_score": -0.39,
+        "home_fade": 0.6,
+        "away_fade": 0.6,
+        "reason": "Signaux opposes: Cleveland Cavaliers fade 0.60, Detroit Pistons fade 0.60 -> prudence",
+        "detail": [
+          {
+            "side": "home",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
           }
         ]
       }
@@ -1106,11 +1504,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.898,
-        "away_score": 0.183,
-        "home_fade": 0.95,
+        "home_score": -0.698,
+        "away_score": 0.112,
+        "home_fade": 0.75,
         "away_fade": 0.15,
-        "reason": "Direction nette: Carolina Hurricanes (+0.18)",
+        "reason": "Direction nette: Carolina Hurricanes (+0.11)",
         "detail": [
           {
             "side": "home",
@@ -1128,7 +1526,7 @@
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.8
+            "strength": 0.6
           }
         ]
       }
@@ -1580,11 +1978,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.183,
-        "away_score": -0.898,
+        "home_score": 0.112,
+        "away_score": -0.698,
         "home_fade": 0.15,
-        "away_fade": 0.95,
-        "reason": "Direction nette: Carolina Hurricanes (+0.18)",
+        "away_fade": 0.75,
+        "reason": "Direction nette: Carolina Hurricanes (+0.11)",
         "detail": [
           {
             "side": "home",
@@ -1602,26 +2000,26 @@
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.8
+            "strength": 0.6
           }
         ]
       }
     },
     {
-      "event_id": "401871163",
+      "event_id": "401871336",
       "source_event_ids": [
-        "401871163"
+        "401871336"
       ],
-      "kickoff": "2026-05-12T04:00Z",
+      "kickoff": "2026-05-12T00:00Z",
       "sport": "basketball",
       "league_code": "nba",
       "league_name": "NBA",
-      "home": "New York Knicks",
-      "away": "Philadelphia 76ers",
-      "match": "New York Knicks - Philadelphia 76ers",
+      "home": "Cleveland Cavaliers",
+      "away": "Detroit Pistons",
+      "match": "Cleveland Cavaliers - Detroit Pistons",
       "decision": "abstain",
       "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: New York Knicks 0.15, Philadelphia 76ers 0.15",
+      "reason": "Fatigue/agenda des deux cotes: Cleveland Cavaliers 0.15, Detroit Pistons 0.15",
       "pressure_score": 0.667,
       "home_fade": 0.15,
       "away_fade": 0.15,
@@ -1642,111 +2040,7 @@
         "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Philadelphia 76ers (-0.10)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401871407",
-      "source_event_ids": [
-        "401871407"
-      ],
-      "kickoff": "2026-05-12T23:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Montreal Canadiens",
-      "away": "Buffalo Sabres",
-      "match": "Montreal Canadiens - Buffalo Sabres",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Montreal Canadiens 0.15, Buffalo Sabres 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Buffalo Sabres (-0.10)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401871427",
-      "source_event_ids": [
-        "401871427"
-      ],
-      "kickoff": "2026-05-13T01:30Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Vegas Golden Knights",
-      "away": "Anaheim Ducks",
-      "match": "Vegas Golden Knights - Anaheim Ducks",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Vegas Golden Knights 0.15, Anaheim Ducks 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Anaheim Ducks (-0.10)",
+        "reason": "Direction nette: Detroit Pistons (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -1777,13 +2071,13 @@
       "match": "Philadelphia Phillies - Colorado Rockies",
       "decision": "lean_home",
       "net_team": "Philadelphia Phillies",
-      "reason": "Colorado Rockies plus penalise par calendrier/voyage (1.74 vs 1.15)",
-      "pressure_score": 3.256,
-      "home_fade": 1.15,
+      "reason": "Colorado Rockies plus penalise par calendrier/voyage (1.74 vs 0.95)",
+      "pressure_score": 3.056,
+      "home_fade": 0.95,
       "away_fade": 1.74,
       "travel_score": 1.59,
       "lookahead_score": 0.667,
-      "congestion_score": 1.0,
+      "congestion_score": 0.8,
       "types": {
         "schedule_congestion": 1,
         "lookahead": 2,
@@ -1791,7 +2085,7 @@
         "back_to_back_travel": 1
       },
       "contexts": [
-        "5 matchs sur les 7 derniers jours",
+        "4 matchs sur les 7 derniers jours",
         "1 match important/proche dans les 3 jours",
         "1 match important/proche dans les 3 jours",
         "Deplacement estime 2535 km, decalage ~2.0h"
@@ -1799,17 +2093,17 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.331,
-        "away_score": -1.937,
-        "home_fade": 1.15,
+        "home_score": -0.131,
+        "away_score": -2.007,
+        "home_fade": 0.95,
         "away_fade": 2.34,
-        "reason": "Direction nette: Philadelphia Phillies (-0.33)",
+        "reason": "Direction nette: Philadelphia Phillies (-0.13)",
         "detail": [
           {
             "side": "home",
             "type": "schedule_congestion",
             "direction": "fade",
-            "strength": 1.0
+            "strength": 0.8
           },
           {
             "side": "home",
@@ -1993,80 +2287,6 @@
       }
     },
     {
-      "event_id": "401815255",
-      "source_event_ids": [
-        "401815255"
-      ],
-      "kickoff": "2026-05-08T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Philadelphia Phillies",
-      "away": "Colorado Rockies",
-      "match": "Philadelphia Phillies - Colorado Rockies",
-      "decision": "lean_away",
-      "net_team": "Colorado Rockies",
-      "reason": "Philadelphia Phillies plus penalise par calendrier/voyage (1.10 vs 0.89)",
-      "pressure_score": 2.723,
-      "home_fade": 1.1,
-      "away_fade": 0.89,
-      "travel_score": 0.59,
-      "lookahead_score": 1.333,
-      "congestion_score": 0.8,
-      "types": {
-        "schedule_congestion": 1,
-        "lookahead": 2,
-        "travel_extreme": 1
-      },
-      "contexts": [
-        "4 matchs sur les 7 derniers jours",
-        "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours",
-        "Deplacement estime 2535 km, decalage ~2.0h"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.579,
-        "away_score": -1.105,
-        "home_fade": 1.1,
-        "away_fade": 1.49,
-        "reason": "Direction nette: Philadelphia Phillies (-0.58)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.59
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815258",
       "source_event_ids": [
         "401815258"
@@ -2241,7 +2461,7 @@
         "back_to_back_travel": 1
       },
       "contexts": [
-        "6 matchs sur les 7 derniers jours",
+        "5 matchs sur les 7 derniers jours",
         "Deplacement estime 2535 km, decalage ~2.0h",
         "2 match dans les 48h + 2535 km de voyage"
       ],
@@ -2345,80 +2565,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.91
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815274",
-      "source_event_ids": [
-        "401815274"
-      ],
-      "kickoff": "2026-05-09T20:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Miami Marlins",
-      "away": "Washington Nationals",
-      "match": "Miami Marlins - Washington Nationals",
-      "decision": "lean_away",
-      "net_team": "Washington Nationals",
-      "reason": "Miami Marlins plus penalise par calendrier/voyage (1.15 vs 0.98)",
-      "pressure_score": 2.494,
-      "home_fade": 1.15,
-      "away_fade": 0.977,
-      "travel_score": 0.827,
-      "lookahead_score": 0.667,
-      "congestion_score": 1.0,
-      "types": {
-        "schedule_congestion": 1,
-        "lookahead": 2,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "5 matchs sur les 7 derniers jours",
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "1 match dans les 48h + 1487 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.528,
-        "away_score": -1.375,
-        "home_fade": 1.15,
-        "away_fade": 1.777,
-        "reason": "Direction nette: Miami Marlins (-0.53)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.827
           }
         ]
       }
@@ -2646,80 +2792,6 @@
       }
     },
     {
-      "event_id": "401871329",
-      "source_event_ids": [
-        "401871329"
-      ],
-      "kickoff": "2026-05-12T02:30Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Los Angeles Lakers",
-      "away": "Oklahoma City Thunder",
-      "match": "Los Angeles Lakers - Oklahoma City Thunder",
-      "decision": "lean_home",
-      "net_team": "Los Angeles Lakers",
-      "reason": "Oklahoma City Thunder plus penalise par calendrier/voyage (1.19 vs 0.75)",
-      "pressure_score": 2.308,
-      "home_fade": 0.75,
-      "away_fade": 1.192,
-      "travel_score": 0.442,
-      "lookahead_score": 0.667,
-      "congestion_score": 1.2,
-      "types": {
-        "schedule_congestion": 2,
-        "lookahead": 2,
-        "travel_extreme": 1
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "1 match important/proche dans les 3 jours",
-        "3 matchs sur les 7 derniers jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.333,
-        "away_score": -0.929,
-        "home_fade": 0.75,
-        "away_fade": 1.192,
-        "reason": "Direction nette: Los Angeles Lakers (-0.33)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.442
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815282",
       "source_event_ids": [
         "401815282"
@@ -2789,72 +2861,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815252",
-      "source_event_ids": [
-        "401815252"
-      ],
-      "kickoff": "2026-05-08T02:00Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Diego Padres",
-      "away": "St. Louis Cardinals",
-      "match": "San Diego Padres - St. Louis Cardinals",
-      "decision": "lean_home",
-      "net_team": "San Diego Padres",
-      "reason": "St. Louis Cardinals plus penalise par calendrier/voyage (0.94 vs 0.36)",
-      "pressure_score": 2.184,
-      "home_fade": 0.36,
-      "away_fade": 0.944,
-      "travel_score": 0.584,
-      "lookahead_score": 1.6,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "travel_extreme": 1
-      },
-      "contexts": [
-        "3 match important/proche dans les 3 jours",
-        "3 match important/proche dans les 3 jours",
-        "Deplacement estime 2513 km, decalage ~1.8h"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -1.029,
-        "away_score": -0.468,
-        "home_fade": 1.36,
-        "away_fade": 0.944,
-        "reason": "Direction nette: St. Louis Cardinals (-0.47)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.584
           }
         ]
       }
@@ -2987,72 +2993,6 @@
             "type": "travel_extreme",
             "direction": "fade",
             "strength": 0.804
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815259",
-      "source_event_ids": [
-        "401815259"
-      ],
-      "kickoff": "2026-05-08T23:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Miami Marlins",
-      "away": "Washington Nationals",
-      "match": "Miami Marlins - Washington Nationals",
-      "decision": "lean_away",
-      "net_team": "Washington Nationals",
-      "reason": "Miami Marlins plus penalise par calendrier/voyage (1.10 vs 0.30)",
-      "pressure_score": 2.133,
-      "home_fade": 1.1,
-      "away_fade": 0.3,
-      "travel_score": 0,
-      "lookahead_score": 1.333,
-      "congestion_score": 0.8,
-      "types": {
-        "schedule_congestion": 1,
-        "lookahead": 2
-      },
-      "contexts": [
-        "4 matchs sur les 7 derniers jours",
-        "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.715,
-        "away_score": -0.715,
-        "home_fade": 1.1,
-        "away_fade": 1.1,
-        "reason": "Signaux opposes: Miami Marlins fade 1.10, Washington Nationals fade 1.10 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
           }
         ]
       }
@@ -3261,6 +3201,132 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.91
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401871421",
+      "source_event_ids": [
+        "401871421"
+      ],
+      "kickoff": "2026-05-15T04:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Minnesota Wild",
+      "away": "Colorado Avalanche",
+      "match": "Minnesota Wild - Colorado Avalanche",
+      "decision": "lean_home",
+      "net_team": "Minnesota Wild",
+      "reason": "Colorado Avalanche plus penalise par calendrier/voyage (1.36 vs 0.60)",
+      "pressure_score": 1.957,
+      "home_fade": 0.6,
+      "away_fade": 1.357,
+      "travel_score": 0.757,
+      "lookahead_score": 0,
+      "congestion_score": 1.2,
+      "types": {
+        "schedule_congestion": 2,
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "3 matchs sur les 7 derniers jours",
+        "3 matchs sur les 7 derniers jours",
+        "1 match dans les 48h + 1135 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.125,
+        "away_score": -1.147,
+        "home_fade": 0.6,
+        "away_fade": 1.357,
+        "reason": "Direction nette: Minnesota Wild (-0.13)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 0.757
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815259",
+      "source_event_ids": [
+        "401815259"
+      ],
+      "kickoff": "2026-05-08T23:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Miami Marlins",
+      "away": "Washington Nationals",
+      "match": "Miami Marlins - Washington Nationals",
+      "decision": "lean_away",
+      "net_team": "Washington Nationals",
+      "reason": "Miami Marlins plus penalise par calendrier/voyage (0.90 vs 0.30)",
+      "pressure_score": 1.933,
+      "home_fade": 0.9,
+      "away_fade": 0.3,
+      "travel_score": 0,
+      "lookahead_score": 1.333,
+      "congestion_score": 0.6,
+      "types": {
+        "schedule_congestion": 1,
+        "lookahead": 2
+      },
+      "contexts": [
+        "3 matchs sur les 7 derniers jours",
+        "2 match important/proche dans les 3 jours",
+        "2 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.515,
+        "away_score": -0.785,
+        "home_fade": 0.9,
+        "away_fade": 1.1,
+        "reason": "Signaux opposes: Miami Marlins fade 0.90, Washington Nationals fade 1.10 -> prudence",
+        "detail": [
+          {
+            "side": "home",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.8
           }
         ]
       }
@@ -3629,6 +3695,66 @@
       }
     },
     {
+      "event_id": "401871420",
+      "source_event_ids": [
+        "401871420"
+      ],
+      "kickoff": "2026-05-13T04:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Colorado Avalanche",
+      "away": "Minnesota Wild",
+      "match": "Colorado Avalanche - Minnesota Wild",
+      "decision": "lean_home",
+      "net_team": "Colorado Avalanche",
+      "reason": "Minnesota Wild plus penalise par calendrier/voyage (0.91 vs 0.15)",
+      "pressure_score": 1.424,
+      "home_fade": 0.15,
+      "away_fade": 0.907,
+      "travel_score": 0.757,
+      "lookahead_score": 0.667,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2,
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours",
+        "1 match important/proche dans les 3 jours",
+        "1 match dans les 48h + 1135 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.167,
+        "away_score": -0.854,
+        "home_fade": 0.15,
+        "away_fade": 0.907,
+        "reason": "Direction nette: Colorado Avalanche (+0.17)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 0.757
+          }
+        ]
+      }
+    },
+    {
       "event_id": "401815276",
       "source_event_ids": [
         "401815276"
@@ -3761,20 +3887,20 @@
       }
     },
     {
-      "event_id": "401871327",
+      "event_id": "401871329",
       "source_event_ids": [
-        "401871327"
+        "401871329"
       ],
-      "kickoff": "2026-05-08T01:30Z",
+      "kickoff": "2026-05-12T02:30Z",
       "sport": "basketball",
       "league_code": "nba",
       "league_name": "NBA",
-      "home": "Oklahoma City Thunder",
-      "away": "Los Angeles Lakers",
-      "match": "Oklahoma City Thunder - Los Angeles Lakers",
+      "home": "Los Angeles Lakers",
+      "away": "Oklahoma City Thunder",
+      "match": "Los Angeles Lakers - Oklahoma City Thunder",
       "decision": "lean_home",
-      "net_team": "Oklahoma City Thunder",
-      "reason": "Los Angeles Lakers plus penalise par calendrier/voyage (0.59 vs 0.15)",
+      "net_team": "Los Angeles Lakers",
+      "reason": "Oklahoma City Thunder plus penalise par calendrier/voyage (0.59 vs 0.15)",
       "pressure_score": 1.108,
       "home_fade": 0.15,
       "away_fade": 0.592,
@@ -3797,7 +3923,7 @@
         "away_score": -0.539,
         "home_fade": 0.15,
         "away_fade": 0.592,
-        "reason": "Direction nette: Oklahoma City Thunder (+0.06)",
+        "reason": "Direction nette: Los Angeles Lakers (+0.06)",
         "detail": [
           {
             "side": "home",
@@ -4014,51 +4140,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.813
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401871420",
-      "source_event_ids": [
-        "401871420"
-      ],
-      "kickoff": "2026-05-13T04:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Colorado Avalanche",
-      "away": "Minnesota Wild",
-      "match": "Colorado Avalanche - Minnesota Wild",
-      "decision": "lean_home",
-      "net_team": "Colorado Avalanche",
-      "reason": "Minnesota Wild plus penalise par calendrier/voyage (0.76 vs 0.00)",
-      "pressure_score": 0.757,
-      "home_fade": 0.0,
-      "away_fade": 0.757,
-      "travel_score": 0.757,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match dans les 48h + 1135 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.265,
-        "away_score": -0.757,
-        "home_fade": 0.0,
-        "away_fade": 0.757,
-        "reason": "Direction nette: Colorado Avalanche (+0.26)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.757
           }
         ]
       }
