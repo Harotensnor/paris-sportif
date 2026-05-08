@@ -17694,7 +17694,28 @@ keys.add(v37PickRowKey(candidate));
 return out;
 };
 const v37RenderPool = v37SortedDiverse.length ? v37SortedDiverse.concat(v37DataOnlyPool) : v37DataOnlyPool;
-const v36TableRows = v37EnsureTierCoverage(v37RenderPool.slice(0, v37DenseRowLimit), v37RenderPool);
+// AUDIT 2026-05-08 v40.9 — Filtre "Passer pas assez de signal" caché par défaut.
+// User : "je voie énormément de paris avec passer pas assez de signal".
+// Ces picks (verdict='skip', opp<30) polluent la lecture sans valeur. On les
+// cache, mais on les compte pour proposer un toggle "voir matchs faibles".
+const v40HideWeakPicks = (() => {
+  try {
+    const raw = localStorage.getItem('v40_hideWeakPicks');
+    return raw === null ? true : raw === '1' || raw === 'true';
+  } catch (e) { return true; }
+})();
+const v40IsWeakPick = (p) => {
+  try {
+    if (typeof _v39FinalRec === 'function') {
+      const r = _v39FinalRec(p);
+      return r && r.verdict === 'skip';
+    }
+  } catch (e) { swallowError(e); }
+  return Number(p?.opportunity || 0) < 30;
+};
+const v40WeakCount = v37RenderPool.filter(v40IsWeakPick).length;
+const v40RenderPoolFiltered = v40HideWeakPicks ? v37RenderPool.filter(p => !v40IsWeakPick(p)) : v37RenderPool;
+const v36TableRows = v37EnsureTierCoverage(v40RenderPoolFiltered.slice(0, v37DenseRowLimit), v40RenderPoolFiltered);
 const v36UpcomingAll = terminalScanPool
 .filter(m => new Date(m?.date || 0).getTime() > _dashboardNowMs && !m.completed)
 .sort((a, b) => new Date(a?.date || 0).getTime() - new Date(b?.date || 0).getTime());
@@ -18212,7 +18233,7 @@ const v36TableHtml = `<section class="v36-table-panel" aria-label="Tableau dense
         <header class="v36-table-toolbar">
           <div>
             <strong>${v36TableRows.length} lignes · ${esc(v37ScopeLabel)}</strong>
-            <span>${v36PickPool.length} picks qualifiés${v37DataOnlyPool.length ? ` · ${v37DataOnlyPool.length} lignes data fiable` : ''} · ${v36TierDefs.map(t => `${v36CountsAll[t.id] || 0} ${t.label}`).join(' · ')} · ${v36TableRows.length}/${v37RenderPool.length || v36TableRows.length} lignes rendues</span>
+            <span>${v36PickPool.length} picks qualifiés${v37DataOnlyPool.length ? ` · ${v37DataOnlyPool.length} lignes data fiable` : ''} · ${v36TierDefs.map(t => `${v36CountsAll[t.id] || 0} ${t.label}`).join(' · ')} · ${v36TableRows.length}/${v37RenderPool.length || v36TableRows.length} lignes rendues${v40WeakCount > 0 ? ` · <button type="button" data-v40-toggle-weak style="background:none;border:1px solid var(--text-dim);color:var(--text-dim);padding:2px 8px;border-radius:6px;font-size:11px;cursor:pointer;">${v40HideWeakPicks ? `+ ${v40WeakCount} matchs faibles cachés` : `– cacher ${v40WeakCount} matchs faibles`}</button>` : ''}</span>
           </div>
           <label class="v36-table-search"><span>Search</span><input type="search" data-v36-search value="${esc(v36Search)}" placeholder="Équipe, ligue, marché"></label>
           <button type="button" class="v37-blind-toggle ${v37BlindMode ? 'is-active' : ''}" data-v37-blind aria-pressed="${v37BlindMode ? 'true' : 'false'}" data-tooltip="Cache cote et edge dans le dashboard pour lire l'analyse avant le rendement.">
@@ -18762,6 +18783,18 @@ else next.blind = true;
 try { localStorage.setItem(v36FilterKey, JSON.stringify(next)); } catch(e) { swallowError(e); }
 renderDashboardPage(wrap);
 });
+}
+// AUDIT 2026-05-08 v40.9 — Toggle pour afficher/cacher les "Passer pas assez de signal".
+const v40WeakToggle = wrap.querySelector('[data-v40-toggle-weak]');
+if (v40WeakToggle) {
+  v40WeakToggle.addEventListener('click', () => {
+    try {
+      const cur = localStorage.getItem('v40_hideWeakPicks');
+      const isHidden = cur === null ? true : (cur === '1' || cur === 'true');
+      localStorage.setItem('v40_hideWeakPicks', isHidden ? '0' : '1');
+    } catch (e) { swallowError(e); }
+    renderDashboardPage(wrap);
+  });
 }
 wrap.querySelectorAll('[data-v36-sort]').forEach(btn => {
 btn.addEventListener('click', () => {
