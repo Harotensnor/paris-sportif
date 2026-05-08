@@ -1,38 +1,38 @@
 {
-  "generated_at": "2026-05-07T23:46:47Z",
-  "calculated_at": "2026-05-07T23:46:47Z",
+  "generated_at": "2026-05-08T10:09:25Z",
+  "calculated_at": "2026-05-08T10:09:25Z",
   "source_of_truth": "data.js",
-  "data_generated_at": "2026-05-07T23:44:49.547956Z",
-  "data_today_field": "2026-05-07",
+  "data_generated_at": "2026-05-08T10:06:22.891690Z",
+  "data_today_field": "2026-05-08",
   "events": {
-    "total": 268,
-    "upcoming": 260,
-    "winamax_available": 268,
-    "winamax_exact": 268,
+    "total": 274,
+    "upcoming": 249,
+    "winamax_available": 274,
+    "winamax_exact": 274,
     "winamax_exact_ratio": 1.0,
-    "markets_more_than_1n2": 268,
-    "form_l10": 153,
-    "h2h": 118,
-    "lineups": 86,
+    "markets_more_than_1n2": 227,
+    "form_l10": 160,
+    "h2h": 0,
+    "lineups": 97,
     "football_lineups": 43,
-    "starter_signals": 86,
-    "clubelo": 103,
-    "weather": 172,
-    "injuries": 82,
-    "referee": 62,
+    "starter_signals": 97,
+    "clubelo": 104,
+    "weather": 173,
+    "injuries": 86,
+    "referee": 63,
     "referee_named": 0,
-    "referee_context": 62,
-    "referee_signal": 62,
+    "referee_context": 63,
+    "referee_signal": 63,
     "fd_calibration": 0,
     "fd_closing_odds": 0,
-    "xg": 91,
+    "xg": 94,
     "smart_money": 0
   },
   "signal_health": {
     "referee": {
-      "effective_events": 62,
+      "effective_events": 63,
       "named_events": 0,
-      "context_events": 62,
+      "context_events": 63,
       "note": "referee is effective coverage: named referee or referee_context usable by the model."
     },
     "smart_money": {
@@ -44,51 +44,33 @@
   "winamax_markets": {
     "matches": 886,
     "detailed_market_matches": 886,
-    "detailed_ratio_vs_exact": 3.306,
+    "detailed_ratio_vs_exact": 3.2336,
     "gap_to_50pct_exact": 0,
     "recommended_detail_fetch_cap": 90,
     "detail_by_sport": {
       "baseball": {
-        "exact": 42,
-        "detailed": 42,
-        "families": {
-          "baseball_total": 42,
-          "match_winner": 42,
-          "run_line": 42
-        },
-        "detailed_ratio": 1.0
+        "exact": 36,
+        "detailed": 0,
+        "families": {},
+        "detailed_ratio": 0.0
       },
       "basketball": {
         "exact": 23,
-        "detailed": 23,
+        "detailed": 20,
         "families": {
-          "basket_handicap": 23,
-          "basket_total": 23,
-          "match_winner": 23,
-          "basket_team_total": 20,
           "dnb": 20,
-          "dnb_rows": 20,
-          "ht_1n2": 20,
-          "ht_1n2_rows": 20
+          "ht_1n2": 20
         },
-        "detailed_ratio": 1.0
+        "detailed_ratio": 0.8696
       },
       "football": {
-        "exact": 179,
-        "detailed": 179,
+        "exact": 174,
+        "detailed": 174,
         "families": {
-          "dnb": 179,
-          "match_winner": 179,
-          "dnb_rows": 177,
-          "double_chance": 174,
-          "btts": 171,
-          "btts_rows": 171,
-          "exact_score_rows": 171,
-          "exact_scores": 171,
-          "ht_1n2": 171,
-          "ht_1n2_rows": 171,
-          "ht_ou": 171,
-          "ht_ou05": 171
+          "dnb": 174,
+          "btts": 166,
+          "ht_1n2": 166,
+          "ou25": 166
         },
         "detailed_ratio": 1.0
       },
@@ -97,42 +79,16 @@
         "detailed": 16,
         "families": {
           "btts": 16,
-          "btts_rows": 16,
-          "dnb": 16,
-          "dnb_rows": 16,
-          "double_chance": 16,
-          "exact_score_rows": 16,
-          "exact_scores": 16,
-          "hockey_total": 16,
-          "match_winner": 16,
-          "ou": 16,
-          "ou45": 16,
-          "ou55": 16
+          "dnb": 16
         },
         "detailed_ratio": 1.0
       }
     },
     "market_family_counts": {
-      "match_winner": 260,
-      "dnb": 215,
-      "dnb_rows": 213,
-      "ht_1n2": 191,
-      "ht_1n2_rows": 191,
-      "double_chance": 190,
-      "btts": 187,
-      "btts_rows": 187,
-      "exact_score_rows": 187,
-      "exact_scores": 187,
-      "ou": 187,
-      "ou45": 187,
-      "team_total": 185,
-      "ou35": 175,
-      "ht_ou": 171,
-      "ht_ou05": 171,
-      "ht_ou15": 171,
-      "ou15": 171,
-      "ou25": 171,
-      "handicap": 169
+      "dnb": 210,
+      "ht_1n2": 186,
+      "btts": 182,
+      "ou25": 166
     }
   },
   "backtest": {
