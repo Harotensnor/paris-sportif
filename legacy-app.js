@@ -17511,9 +17511,30 @@ try {
 const matchKey = v37StableMatchKey(m);
 if (pickedMatches.has(matchKey)) continue;
 const pred = predictMatch(m);
-if (!pred?.pick) continue;
-const odds = pred.odds || getMatchOdds(m, m.sport === 'football');
-const pk = pred.pick.key;
+// AUDIT 2026-05-08 v40.7 — User : "je veux tout maintenant pas demain".
+// Avant : si pred.pick est null (ex: live match où le modèle skip car
+// cotes dynamiques), on continue → match invisible. Maintenant : si Winamax
+// a une 1n2 cote on génère un pick fallback depuis le favori Winamax pour
+// que le match s'affiche au moins avec sa cote actuelle + statut live.
+let predPick = pred?.pick;
+if (!predPick) {
+  const wnxN12Live = m?.winamax?.markets?.['1n2'];
+  if (wnxN12Live && Number.isFinite(Number(wnxN12Live.home))) {
+    // Choisit le favori (cote la plus basse) parmi home / draw / away.
+    const candidates = [
+      { key: '1', odd: Number(wnxN12Live.home) },
+      { key: 'X', odd: Number(wnxN12Live.draw) },
+      { key: '2', odd: Number(wnxN12Live.away) },
+    ].filter(c => Number.isFinite(c.odd) && c.odd > 1.01);
+    candidates.sort((a, b) => a.odd - b.odd);
+    if (candidates.length) {
+      predPick = { key: candidates[0].key, prob: 1 / candidates[0].odd, label: 'Pick auto (live/skip)' };
+    }
+  }
+}
+if (!predPick) continue;
+const odds = pred?.odds || getMatchOdds(m, m.sport === 'football');
+const pk = predPick.key;
 // AUDIT 2026-05-08 v40.2 — Si Winamax 1N2 est dispo pour ce match, on PRÉFÈRE
 // la cote Winamax directe (et on marque source='winamax_exact'). Avant : on
 // prenait toujours `odds.home/away/draw` issu du snapshot/pred, et si ça ne
@@ -17525,7 +17546,7 @@ const wnxN12 = m?.winamax?.markets?.['1n2'];
 const wnxOddRaw = wnxN12 ? Number(pk === '1' ? wnxN12.home : pk === '2' ? wnxN12.away : wnxN12.draw) : NaN;
 const useWnx = Number.isFinite(wnxOddRaw) && wnxOddRaw > 1.01;
 const odd = useWnx ? wnxOddRaw : Number(pk === '1' ? odds?.home : pk === '2' ? odds?.away : odds?.draw);
-const rel = Number(pred.pick?.prob ?? pred.reliability ?? 0);
+const rel = Number(predPick.prob ?? pred?.pick?.prob ?? pred?.reliability ?? 0);
 if (!(odd >= 1.30) || !(rel > 0)) continue;
 const edge = rel - 1 / odd;
 const ev = rel * odd - 1;
@@ -17549,9 +17570,9 @@ prob: rel,
 odd,
 edge,
 ev,
-label: pred.pick.label || 'Pick data',
-shortLabel: pred.pick.label || 'Pick data',
-mobileLabel: pred.pick.label || 'Pick data',
+label: predPick.label || pred?.pick?.label || 'Pick data',
+shortLabel: predPick.label || pred?.pick?.label || 'Pick data',
+mobileLabel: predPick.label || pred?.pick?.label || 'Pick data',
 marketName: source === 'winamax_exact' ? '1N2' : '1N2 · cote indicative',
 marketTooltip: source === 'winamax_exact' ? 'Marché principal 1N2.' : 'Cote indicative : à vérifier chez Winamax avant de jouer.',
 marketInfo: source === 'winamax_exact' ? '' : 'Cote indicative issue du flux disponible, pas un prix Winamax exact.',
