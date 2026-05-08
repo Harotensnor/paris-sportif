@@ -17861,19 +17861,25 @@ const oddBadge = typeof v38OddStatusChip === 'function' ? v38OddStatusChip(oddMe
 const beginnerText = v37BeginnerPickText(p, oddMeta);
 const confMetric = v37ReadableConfidence(p.rel);
 const edgeMetric = v37ReadableEdge(p.edge);
-return `<tr class="v36-table-row ${soon ? 'is-imminent' : ''} ${sameMatchCount > 1 ? 'is-same-match' : ''} ${p.dataOnly ? 'is-data-only' : ''} ${oddState === 'blocked' ? 'is-odd-blocked' : ''}" data-tone="${esc(tier.tone)}" data-big-detail="${esc(String(p.m.id || ''))}" data-pick-uid="${esc(p.pickUid || '')}" data-pick-label="${esc(p.labelFull || p.label || '')}" data-pick-odd="${esc(p.odd.toFixed(2))}" title="${esc(v36ReasonTooltip(p))}">
-          <td class="v36-cell-sport"><span>${sportIcon(p.m.sport || '')}</span><b>${esc(sportLabel(p.m.sport || '').slice(0, 9))}</b></td>
-          <td class="v36-cell-date">${esc(v37DateLabel(p.m.date))}</td>
-          <td>${esc(fmtTime(p.m.date))}</td>
-          <td class="v36-cell-league">${esc(league)}</td>
-          <td class="v36-cell-match">${v36MatchTitleHtml(p)}${sameMatchCount > 1 ? `<span class="v37-match-multi">+${sameMatchCount - 1} autre pick</span>` : ''}</td>
-          <td class="v36-cell-pick"><b data-tooltip="${esc(pickHelp)}">${esc(p.label)}</b>${p.marketInfo ? `<span aria-hidden="true" data-tooltip="${esc(p.marketInfo)}" style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;margin-left:6px;border-radius:50%;border:1px solid var(--border);color:var(--text-dim);font-size:10px;font-weight:800;">?</span>` : ''}<em>${esc(marketName)}</em><small class="v37-beginner-copy">${esc(beginnerText)}</small><span style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:5px;">${oddBadge}${indicativeBadge}${v37SegmentTrustChip(p)}<i class="v38-open-analysis">analyse complète</i></span></td>
-          <td class="v36-num v36-odd">${v37BlindOddHtml(p.odd)}</td>
-          <td class="v36-num">${v37ReadableMetricHtml(confMetric)}</td>
-          <td class="v36-num ${p.edge >= 0 ? 'is-pos' : 'is-neg'}"><span data-tooltip="Avantage : écart entre notre modèle et la cote. Positif = la cote semble mieux payée que le risque réel.">${v37BlindMode ? v37BlindEdgeHtml(p.edge) : v37ReadableMetricHtml(edgeMetric, p.edge >= 0 ? 'pos' : 'neg')}</span></td>
-          <td class="v36-num"><span class="v37-opportunity ${scoreClass}" data-score="${esc(String(p.opportunity || 0))}" data-tooltip="${esc(p.opportunityTooltip || '')}" title="${esc(p.opportunityTooltip || '')}" aria-label="${esc(p.opportunityTooltip || `Score d'opportunité ${p.opportunity || 0}/100`)}" tabindex="0">${esc(String(p.opportunity || 0))}</span><em class="v37-score-advice">${esc(scoreAdvice)}</em>${intelBadges ? `<span class="v37-intel-chips">${intelBadges}</span>` : ''}</td>
-          <td>${v36TierBadge(p.tier, true)}</td>
-          ${v37ShowResultColumn ? `<td>${v37ResultBadge(result)}</td>` : ''}
+return `<tr class="v36-table-row v38-table-row ${soon ? 'is-imminent' : ''} ${sameMatchCount > 1 ? 'is-same-match' : ''} ${p.dataOnly ? 'is-data-only' : ''} ${oddState === 'blocked' ? 'is-odd-blocked' : ''}" data-tone="${esc(tier.tone)}" data-big-detail="${esc(String(p.m.id || ''))}" data-pick-uid="${esc(p.pickUid || '')}" data-pick-label="${esc(p.labelFull || p.label || '')}" data-pick-odd="${esc(p.odd.toFixed(2))}" title="${esc(v36ReasonTooltip(p))}">
+          <td class="v36-cell-meta v38-cell-meta">
+            <div class="v38-meta-top"><span class="v38-meta-sport" aria-hidden="true">${sportIcon(p.m.sport || '')}</span><b class="v38-meta-when">${esc(v37DateLabel(p.m.date))} · ${esc(fmtTime(p.m.date))}</b><em class="v38-meta-league">${esc(league)}</em></div>
+            <strong class="v38-meta-teams">${v36MatchTitleHtml(p)}</strong>
+            ${sameMatchCount > 1 ? `<span class="v37-match-multi">+${sameMatchCount - 1} autre pick</span>` : ''}
+          </td>
+          <td class="v36-cell-pick v38-cell-pick">
+            <b data-tooltip="${esc(pickHelp)}">${esc(p.label)}</b>
+            ${p.marketInfo ? `<span class="v38-pick-info-hint" aria-hidden="true" data-tooltip="${esc(p.marketInfo)}">?</span>` : ''}
+            <em class="v38-pick-market">${esc(marketName)}</em>
+            <small class="v37-beginner-copy">${esc(beginnerText)}</small>
+            <span class="v38-pick-chips">${oddBadge}${indicativeBadge}${v37SegmentTrustChip(p)}<i class="v38-open-analysis">analyse</i></span>
+          </td>
+          <td class="v36-num v36-odd v38-cell-odd">${v37BlindOddHtml(p.odd)}</td>
+          <td class="v36-num v38-cell-conf">${v37ReadableMetricHtml(confMetric)}</td>
+          <td class="v36-num v38-cell-edge ${p.edge >= 0 ? 'is-pos' : 'is-neg'}"><span data-tooltip="Avantage : écart entre notre modèle et la cote. Positif = la cote semble mieux payée que le risque réel.">${v37BlindMode ? v37BlindEdgeHtml(p.edge) : v37ReadableMetricHtml(edgeMetric, p.edge >= 0 ? 'pos' : 'neg')}</span></td>
+          <td class="v36-num v38-cell-score"><span class="v37-opportunity ${scoreClass}" data-score="${esc(String(p.opportunity || 0))}" data-tooltip="${esc(p.opportunityTooltip || '')}" title="${esc(p.opportunityTooltip || '')}" aria-label="${esc(p.opportunityTooltip || `Score d'opportunité ${p.opportunity || 0}/100`)}" tabindex="0">${esc(String(p.opportunity || 0))}</span><em class="v37-score-advice">${esc(scoreAdvice)}</em>${intelBadges ? `<span class="v37-intel-chips">${intelBadges}</span>` : ''}</td>
+          <td class="v38-cell-tier">${v36TierBadge(p.tier, true)}</td>
+          ${v37ShowResultColumn ? `<td class="v38-cell-result">${v37ResultBadge(result)}</td>` : ''}
         </tr>`;
 };
 const v36MobileCard = (p) => {
@@ -17993,11 +17999,18 @@ const v36TableHtml = `<section class="v36-table-panel" aria-label="Tableau dense
           </div>
         </header>
         <div class="v36-table-scroll">
-          <table class="v36-picks-table">
+          <table class="v36-picks-table v38-table">
             <thead><tr>
-              <th>Sport</th><th>${v36SortButton('date', 'Date')}</th><th>${v36SortButton('time', 'Heure')}</th><th>Ligue</th><th>Match</th><th>Pari</th><th data-tooltip="Cote : combien tu gagnes pour 1 euro misé. @1.85 = 0.85 euro net si gagné.">${v36SortButton('odd', 'Cote')}</th><th data-tooltip="Chances : probabilité estimée par notre modèle, traduite en lecture simple.">${v36SortButton('conf', 'Chances')}</th><th data-tooltip="Avantage : écart statistique vs marché. Positif = la cote semble mieux payée que le risque réel.">${v36SortButton('edge', 'Avantage')}</th><th data-tooltip="Priorité : note globale 0-100. Une cote ancienne ou non vérifiée plafonne cette note.">${v36SortButton('score', 'Priorité')}</th><th data-tooltip="Risque : niveau de risque/gain. Sûr et Solide sont prudents, Big odds et Outsider cherchent plus de rendement.">${v36SortButton('tier', 'Risque')}</th>${v37ShowResultColumn ? '<th>Résultat</th>' : ''}
+              <th class="v38-th-meta">${v36SortButton('date', 'Match')}</th>
+              <th class="v38-th-pick">Pari</th>
+              <th class="v38-th-num" data-tooltip="Cote : combien tu gagnes pour 1 euro misé. @1.85 = 0.85 euro net si gagné.">${v36SortButton('odd', 'Cote')}</th>
+              <th class="v38-th-num" data-tooltip="Chances : probabilité estimée par notre modèle.">${v36SortButton('conf', 'Confiance')}</th>
+              <th class="v38-th-num" data-tooltip="Avantage : écart statistique vs marché. Positif = la cote paie plus que le risque réel.">${v36SortButton('edge', 'Edge')}</th>
+              <th class="v38-th-num" data-tooltip="Priorité : note globale 0-100. Une cote ancienne ou non vérifiée plafonne cette note.">${v36SortButton('score', 'Score')}</th>
+              <th class="v38-th-tier" data-tooltip="Tier : Sûr/Solide prudents, Big odds/Outsider plus de rendement.">${v36SortButton('tier', 'Tier')}</th>
+              ${v37ShowResultColumn ? '<th class="v38-th-tier">Résultat</th>' : ''}
             </tr></thead>
-            <tbody>${v36TableRows.length ? v36TableRows.map(v36TableRow).join('') : `<tr><td colspan="${v37ShowResultColumn ? '12' : '11'}"><div class="v36-tier-empty">Aucun pick pour ce filtre. Retire un sport, une heure ou une recherche.</div></td></tr>`}</tbody>
+            <tbody>${v36TableRows.length ? v36TableRows.map(v36TableRow).join('') : `<tr><td colspan="${v37ShowResultColumn ? '8' : '7'}"><div class="v36-tier-empty">Aucun pick pour ce filtre. Retire un sport, une heure ou une recherche.</div></td></tr>`}</tbody>
           </table>
         </div>
         <div class="v36-table-cards">${v36TableRows.length ? v36TableRows.map(v36MobileCard).join('') : `<div class="v36-tier-empty">Aucun pick pour ce filtre.</div>`}</div>

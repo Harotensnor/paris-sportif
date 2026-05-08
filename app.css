@@ -469,3 +469,72 @@ html[data-theme="light"]{--surface-0:#f5f5f7;--surface-1:#ffffff;--surface-2:#fb
   }
   .page-tabs > *,.v37-day-nav > *,.v36-sort-strip > *,.md-tabs > *{scroll-snap-align:start}
 }
+
+/* AUDIT 2026-05-08 — Refonte complète du tableau Dashboard.
+   Avant : 12 colonnes denses (sport, date, heure, ligue, match, pari,
+   cote, chances, avantage, priorité, risque, résultat) — chaque cellule
+   était cramped, hiérarchie visuelle plate, beaucoup de bruit.
+   Après : 7 colonnes (8 avec résultat) avec hiérarchie typo claire.
+   La colonne 1 "Match" combine sport+date+heure+ligue+équipes en stack
+   organisé. Cote en gros, score en pill compact, edge avec couleur. */
+
+.v38-table thead th{
+  background:linear-gradient(180deg,rgba(11,15,20,.95),rgba(11,15,20,.85));
+  color:#9aaabc;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.10em;
+  text-transform:uppercase;
+  padding:10px 10px 9px;
+  border-bottom:1px solid rgba(236,244,255,.10);
+  white-space:nowrap;
+}
+.v38-table thead .v38-th-num{text-align:right}
+.v38-table thead .v38-th-meta{padding-left:14px;text-align:left}
+.v38-table tbody td{padding:12px 10px;vertical-align:top;border-bottom:1px solid rgba(236,244,255,.045)}
+.v38-table tbody td:first-child{padding-left:14px}
+.v38-table tbody tr:hover{background:linear-gradient(90deg,color-mix(in srgb,var(--tier,#a78bfa) 8%,rgba(255,255,255,.015)),transparent 65%)}
+
+/* Col 1 — Match meta block */
+.v38-cell-meta{min-width:240px;max-width:320px}
+.v38-meta-top{display:flex;align-items:center;gap:7px;margin-bottom:5px;font-size:10.5px;color:var(--text-dim);font-weight:700}
+.v38-meta-sport{font-size:13px;line-height:1}
+.v38-meta-when{color:var(--text);font-weight:800;font-size:11px;font-variant-numeric:tabular-nums}
+.v38-meta-league{font-style:normal;color:var(--text-dim);font-weight:600;font-size:10.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:130px}
+.v38-meta-teams{display:block;font-size:13.5px;font-weight:800;color:var(--text);line-height:1.25;letter-spacing:-.1px}
+
+/* Col 2 — Pari */
+.v38-cell-pick{min-width:230px;max-width:340px}
+.v38-cell-pick > b{display:block;font-size:13px;font-weight:800;color:#f5f8ff;line-height:1.25;margin-bottom:2px}
+.v38-pick-info-hint{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;border:1px solid var(--border-2);color:var(--text-dim);font-size:9px;font-weight:800;margin-left:6px;vertical-align:middle}
+.v38-pick-market{display:block;color:var(--text-dim);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;margin:2px 0 5px;font-style:normal}
+.v38-cell-pick .v37-beginner-copy{display:block;color:var(--text-dim);font-size:10.5px;line-height:1.4;margin:5px 0 7px;font-weight:500}
+.v38-pick-chips{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-top:5px}
+
+/* Col 3 — Cote (la star du tableau). Spécificité accrue pour battre l'ancienne
+   règle .v36-num.v36-odd qui forçait 14.5px. */
+.v38-table td.v38-cell-odd,
+.v38-table .v36-num.v36-odd.v38-cell-odd{font-size:18px!important;font-weight:1000;color:var(--text);text-align:right;font-variant-numeric:tabular-nums;letter-spacing:-.4px;padding-right:14px!important}
+
+/* Col 4 — Confiance + Col 5 — Edge */
+.v38-cell-conf,.v38-cell-edge{text-align:right;min-width:90px}
+.v38-cell-conf .v37-readable-metric,.v38-cell-edge .v37-readable-metric{align-items:flex-end}
+.v38-cell-conf .v37-readable-metric b{font-size:13.5px;font-weight:900}
+.v38-cell-edge.is-pos .v37-readable-metric b{color:#21c77a}
+.v38-cell-edge.is-neg .v37-readable-metric b{color:#ff6b4a}
+
+/* Col 6 — Score + advice + intel chips */
+.v38-cell-score{text-align:right;min-width:120px;max-width:160px}
+.v38-cell-score .v37-opportunity{min-width:42px;height:26px;font-size:13px;font-weight:1000}
+.v38-cell-score .v37-score-advice{display:block;margin-top:5px;font-size:10px;font-weight:700;color:var(--text-dim);text-align:right}
+.v38-cell-score .v37-intel-chips{margin-top:6px}
+.v38-cell-score .v37-intel-chips i{max-width:none;font-size:9px}
+
+/* Col 7 — Tier badge */
+.v38-cell-tier{text-align:center;min-width:72px}
+.v38-cell-result{text-align:center;min-width:80px}
+
+/* Backward-compat hide pour les anciennes classes que nous ne créons plus */
+.v38-table .v36-cell-sport,.v38-table .v36-cell-date,.v38-table .v36-cell-league:not(.v38-meta-league){display:none}
+
+/* Mobile : la table est cachée, cards sont utilisées (pas d'override mobile nécessaire) */
