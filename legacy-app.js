@@ -28664,10 +28664,28 @@ function renderPicksHistoryArchivePage(wrap, archive) {
     return sum;
   }, 0);
   const HIST_PICKS_PER_DAY = 200;
-  const dayHtml = pastDays.slice(0, 14).map(d => {
-    const allPicks = d.picks || [];
-    const picks = allPicks.slice(0, HIST_PICKS_PER_DAY);
-    const truncated = allPicks.length > HIST_PICKS_PER_DAY ? allPicks.length - HIST_PICKS_PER_DAY : 0;
+  const HIST_PICKS_PER_PAGE = 50;
+  const flatPicks = pastDays.flatMap(d => (d.picks || []).slice(0, HIST_PICKS_PER_DAY).map(p => ({ ...p, __day: d, __date: d.date || '' })));
+  const totalVisiblePicks = flatPicks.length;
+  const totalPages = Math.max(1, Math.ceil(totalVisiblePicks / HIST_PICKS_PER_PAGE));
+  const currentPage = (() => {
+    try {
+      const raw = parseInt(localStorage.getItem('historiqueArchivePage') || '1', 10);
+      return Math.min(totalPages, Math.max(1, Number.isFinite(raw) ? raw : 1));
+    } catch(e) { return 1; }
+  })();
+  if (currentPage > totalPages) {
+    try { localStorage.setItem('historiqueArchivePage', String(totalPages)); } catch(e) { swallowError(e); }
+  }
+  const pageStart = (currentPage - 1) * HIST_PICKS_PER_PAGE;
+  const pagePicks = flatPicks.slice(pageStart, pageStart + HIST_PICKS_PER_PAGE);
+  const pageGroups = pagePicks.reduce((acc, pick) => {
+    const key = String(pick.__date || '');
+    if (!acc.has(key)) acc.set(key, { day: pick.__day || { date: key }, picks: [] });
+    acc.get(key).picks.push(pick);
+    return acc;
+  }, new Map());
+  const dayHtml = Array.from(pageGroups.values()).map(({ day: d, picks }) => {
     const settledN = Number(d.won || 0) + Number(d.lost || 0) + Number(d.void || 0);
     const wrDay = (Number(d.won || 0) + Number(d.lost || 0)) ? Math.round((Number(d.won || 0) / (Number(d.won || 0) + Number(d.lost || 0))) * 100) : null;
     const plCol = Number(d.pl_units || 0) > 0 ? 'var(--accent)' : Number(d.pl_units || 0) < 0 ? 'var(--danger)' : 'var(--text-dim)';
@@ -28700,10 +28718,15 @@ function renderPicksHistoryArchivePage(wrap, archive) {
       <div class="hist-day-body">
         <div class="hist-pick-head"><div></div><div>Match</div><div>Marché</div><div>Pick</div><div>Cote</div><div>Proba</div><div>Edge</div><div class="u-text-right">Résultat</div></div>
         ${rows || '<div class="bilan-empty">Aucun pick archivé sur cette journée.</div>'}
-        ${truncated > 0 ? `<div style="padding:10px 14px;text-align:center;font-size:11.5px;color:var(--text-dim2);font-style:italic;">+ ${truncated} pick${truncated > 1 ? 's' : ''} archivé${truncated > 1 ? 's' : ''} non affiché${truncated > 1 ? 's' : ''} (cap d'affichage à ${HIST_PICKS_PER_DAY} par jour)</div>` : ''}
       </div>
     </section>`;
   }).join('');
+  const paginationHtml = totalVisiblePicks > HIST_PICKS_PER_PAGE ? `
+    <div class="hist-pagination" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:14px 0 18px;padding:12px 14px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--panel);">
+      <button type="button" data-hist-page="${currentPage - 1}" ${currentPage <= 1 ? 'disabled' : ''} style="min-height:38px;padding:0 12px;border-radius:8px;border:1px solid var(--border);background:var(--panel-2);color:var(--text);font-weight:850;cursor:pointer;">← Précédent</button>
+      <div style="color:var(--text-dim);font-size:12.5px;font-weight:750;text-align:center;">Page <b class="u-text">${currentPage}/${totalPages}</b> · ${pagePicks.length} pick${pagePicks.length > 1 ? 's' : ''} affiché${pagePicks.length > 1 ? 's' : ''} sur ${totalVisiblePicks}</div>
+      <button type="button" data-hist-page="${currentPage + 1}" ${currentPage >= totalPages ? 'disabled' : ''} style="min-height:38px;padding:0 12px;border-radius:8px;border:1px solid var(--border);background:var(--panel-2);color:var(--text);font-weight:850;cursor:pointer;">Suivant →</button>
+    </div>` : '';
   wrap.innerHTML = `<div class="page-wrap">
     <div class="page-header">
       <div class="lbl-tiny u-text-brand">Archives persistantes du modèle</div>
@@ -28716,8 +28739,18 @@ function renderPicksHistoryArchivePage(wrap, archive) {
       <div class="bilan-kpi"><div class="kpi-label">Win Rate</div><div class="kpi-value">${wr == null ? '—' : `${wr}%`}</div><div class="kpi-sub">${wins}W · ${losses}L</div></div>
       <div class="bilan-kpi"><div class="kpi-label">P&L flat</div><div class="kpi-value" style="color:${pl >= 0 ? 'var(--accent)' : 'var(--danger)'}">${pl >= 0 ? '+' : ''}${pl.toFixed(2)}u</div><div class="kpi-sub">hors void</div></div>
     </div>
+    ${paginationHtml}
     <div class="hist-day-list">${dayHtml || '<div class="bilan-empty">Archive encore vide.</div>'}</div>
+    ${paginationHtml}
   </div>`;
+  wrap.querySelectorAll('[data-hist-page]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const next = Math.min(totalPages, Math.max(1, parseInt(btn.dataset.histPage || '1', 10) || 1));
+      try { localStorage.setItem('historiqueArchivePage', String(next)); } catch(e) { swallowError(e); }
+      renderPicksHistoryArchivePage(wrap, archive);
+      try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch(e) { swallowError(e); }
+    });
+  });
 }
 
 

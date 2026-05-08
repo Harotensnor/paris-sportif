@@ -153,6 +153,41 @@ test.describe('Sticky layout', () => {
   });
 });
 
+test.describe('Historique archive', () => {
+  test('BUG-010 paginates the archive instead of rendering a 100k px page', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'Desktop audit viewport regression.');
+    await page.goto(URL + '#historique');
+    await page.waitForFunction(() =>
+      localStorage.getItem('currentPage') === 'historique' &&
+      (document.querySelector('.hist-pick-row') || document.querySelector('.bilan-empty')),
+      null,
+      { timeout: 15000 }
+    );
+
+    const firstPage = await page.evaluate(() => ({
+      scrollHeight: document.documentElement.scrollHeight,
+      rows: document.querySelectorAll('.hist-pick-row').length,
+      hasPager: !!document.querySelector('.hist-pagination [data-hist-page]'),
+      pageLabel: document.querySelector('.hist-pagination')?.textContent || '',
+    }));
+
+    expect(firstPage.scrollHeight).toBeLessThan(30000);
+    expect(firstPage.rows).toBeLessThanOrEqual(50);
+
+    if (firstPage.hasPager && /Page\s+1\//i.test(firstPage.pageLabel)) {
+      const next = page.locator('.hist-pagination [data-hist-page]:not([disabled])').filter({ hasText: /Suivant/i }).first();
+      await next.click();
+      await page.waitForFunction(() => localStorage.getItem('historiqueArchivePage') === '2', null, { timeout: 5000 });
+      const secondPage = await page.evaluate(() => ({
+        scrollHeight: document.documentElement.scrollHeight,
+        rows: document.querySelectorAll('.hist-pick-row').length,
+      }));
+      expect(secondPage.scrollHeight).toBeLessThan(30000);
+      expect(secondPage.rows).toBeLessThanOrEqual(50);
+    }
+  });
+});
+
 test.describe('Hub navigation', () => {
   test('Explorer hub opens dropdown and item navigates to "Tous"', async ({ page }) => {
     await page.goto(URL);
