@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-08T10:09:22Z",
+  "generated_at": "2026-05-08T10:23:05Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -13,164 +13,16 @@
       "back_to_back_travel": 29
     },
     "by_decision": {
-      "abstain": 36,
+      "abstain": 34,
       "lean_home": 32,
-      "lean_away": 3
+      "lean_away": 5
     },
     "lean_home": 32,
-    "lean_away": 3,
-    "abstain": 36,
+    "lean_away": 5,
+    "abstain": 34,
     "monitor": 0
   },
   "active": [
-    {
-      "event_id": "401815255",
-      "source_event_ids": [
-        "401815255"
-      ],
-      "kickoff": "2026-05-08T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Philadelphia Phillies",
-      "away": "Colorado Rockies",
-      "match": "Philadelphia Phillies - Colorado Rockies",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Philadelphia Phillies 0.90, Colorado Rockies 0.89",
-      "pressure_score": 2.523,
-      "home_fade": 0.9,
-      "away_fade": 0.89,
-      "travel_score": 0.59,
-      "lookahead_score": 1.333,
-      "congestion_score": 0.6,
-      "types": {
-        "schedule_congestion": 1,
-        "lookahead": 2,
-        "travel_extreme": 1
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours",
-        "Deplacement estime 2535 km, decalage ~2.0h"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.379,
-        "away_score": -1.175,
-        "home_fade": 0.9,
-        "away_fade": 1.49,
-        "reason": "Direction nette: Philadelphia Phillies (-0.38)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.59
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815274",
-      "source_event_ids": [
-        "401815274"
-      ],
-      "kickoff": "2026-05-09T20:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Miami Marlins",
-      "away": "Washington Nationals",
-      "match": "Miami Marlins - Washington Nationals",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Miami Marlins 0.95, Washington Nationals 0.98",
-      "pressure_score": 2.294,
-      "home_fade": 0.95,
-      "away_fade": 0.977,
-      "travel_score": 0.827,
-      "lookahead_score": 0.667,
-      "congestion_score": 0.8,
-      "types": {
-        "schedule_congestion": 1,
-        "lookahead": 2,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "4 matchs sur les 7 derniers jours",
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "1 match dans les 48h + 1487 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.328,
-        "away_score": -1.445,
-        "home_fade": 0.95,
-        "away_fade": 1.777,
-        "reason": "Direction nette: Miami Marlins (-0.33)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.827
-          }
-        ]
-      }
-    },
     {
       "event_id": "401815289",
       "source_event_ids": [
@@ -197,7 +49,7 @@
         "back_to_back_travel": 1
       },
       "contexts": [
-        "5 matchs sur les 7 derniers jours",
+        "6 matchs sur les 7 derniers jours",
         "2 match dans les 48h + 1487 km de voyage"
       ],
       "global_resolution": {
@@ -2071,13 +1923,13 @@
       "match": "Philadelphia Phillies - Colorado Rockies",
       "decision": "lean_home",
       "net_team": "Philadelphia Phillies",
-      "reason": "Colorado Rockies plus penalise par calendrier/voyage (1.74 vs 0.95)",
-      "pressure_score": 3.056,
-      "home_fade": 0.95,
+      "reason": "Colorado Rockies plus penalise par calendrier/voyage (1.74 vs 1.15)",
+      "pressure_score": 3.256,
+      "home_fade": 1.15,
       "away_fade": 1.74,
       "travel_score": 1.59,
       "lookahead_score": 0.667,
-      "congestion_score": 0.8,
+      "congestion_score": 1.0,
       "types": {
         "schedule_congestion": 1,
         "lookahead": 2,
@@ -2085,7 +1937,7 @@
         "back_to_back_travel": 1
       },
       "contexts": [
-        "4 matchs sur les 7 derniers jours",
+        "5 matchs sur les 7 derniers jours",
         "1 match important/proche dans les 3 jours",
         "1 match important/proche dans les 3 jours",
         "Deplacement estime 2535 km, decalage ~2.0h"
@@ -2093,17 +1945,17 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.131,
-        "away_score": -2.007,
-        "home_fade": 0.95,
+        "home_score": -0.331,
+        "away_score": -1.937,
+        "home_fade": 1.15,
         "away_fade": 2.34,
-        "reason": "Direction nette: Philadelphia Phillies (-0.13)",
+        "reason": "Direction nette: Philadelphia Phillies (-0.33)",
         "detail": [
           {
             "side": "home",
             "type": "schedule_congestion",
             "direction": "fade",
-            "strength": 0.8
+            "strength": 1.0
           },
           {
             "side": "home",
@@ -2287,6 +2139,80 @@
       }
     },
     {
+      "event_id": "401815255",
+      "source_event_ids": [
+        "401815255"
+      ],
+      "kickoff": "2026-05-08T22:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Philadelphia Phillies",
+      "away": "Colorado Rockies",
+      "match": "Philadelphia Phillies - Colorado Rockies",
+      "decision": "lean_away",
+      "net_team": "Colorado Rockies",
+      "reason": "Philadelphia Phillies plus penalise par calendrier/voyage (1.10 vs 0.89)",
+      "pressure_score": 2.723,
+      "home_fade": 1.1,
+      "away_fade": 0.89,
+      "travel_score": 0.59,
+      "lookahead_score": 1.333,
+      "congestion_score": 0.8,
+      "types": {
+        "schedule_congestion": 1,
+        "lookahead": 2,
+        "travel_extreme": 1
+      },
+      "contexts": [
+        "4 matchs sur les 7 derniers jours",
+        "2 match important/proche dans les 3 jours",
+        "2 match important/proche dans les 3 jours",
+        "Deplacement estime 2535 km, decalage ~2.0h"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.579,
+        "away_score": -1.105,
+        "home_fade": 1.1,
+        "away_fade": 1.49,
+        "reason": "Direction nette: Philadelphia Phillies (-0.58)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.8
+          },
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.59
+          }
+        ]
+      }
+    },
+    {
       "event_id": "401815258",
       "source_event_ids": [
         "401815258"
@@ -2461,7 +2387,7 @@
         "back_to_back_travel": 1
       },
       "contexts": [
-        "5 matchs sur les 7 derniers jours",
+        "6 matchs sur les 7 derniers jours",
         "Deplacement estime 2535 km, decalage ~2.0h",
         "2 match dans les 48h + 2535 km de voyage"
       ],
@@ -2565,6 +2491,80 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.91
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815274",
+      "source_event_ids": [
+        "401815274"
+      ],
+      "kickoff": "2026-05-09T20:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Miami Marlins",
+      "away": "Washington Nationals",
+      "match": "Miami Marlins - Washington Nationals",
+      "decision": "lean_away",
+      "net_team": "Washington Nationals",
+      "reason": "Miami Marlins plus penalise par calendrier/voyage (1.15 vs 0.98)",
+      "pressure_score": 2.494,
+      "home_fade": 1.15,
+      "away_fade": 0.977,
+      "travel_score": 0.827,
+      "lookahead_score": 0.667,
+      "congestion_score": 1.0,
+      "types": {
+        "schedule_congestion": 1,
+        "lookahead": 2,
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "5 matchs sur les 7 derniers jours",
+        "1 match important/proche dans les 3 jours",
+        "1 match important/proche dans les 3 jours",
+        "1 match dans les 48h + 1487 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.528,
+        "away_score": -1.375,
+        "home_fade": 1.15,
+        "away_fade": 1.777,
+        "reason": "Direction nette: Miami Marlins (-0.53)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 1.0
+          },
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.8
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 0.827
           }
         ]
       }
@@ -2998,6 +2998,72 @@
       }
     },
     {
+      "event_id": "401815259",
+      "source_event_ids": [
+        "401815259"
+      ],
+      "kickoff": "2026-05-08T23:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Miami Marlins",
+      "away": "Washington Nationals",
+      "match": "Miami Marlins - Washington Nationals",
+      "decision": "lean_away",
+      "net_team": "Washington Nationals",
+      "reason": "Miami Marlins plus penalise par calendrier/voyage (1.10 vs 0.30)",
+      "pressure_score": 2.133,
+      "home_fade": 1.1,
+      "away_fade": 0.3,
+      "travel_score": 0,
+      "lookahead_score": 1.333,
+      "congestion_score": 0.8,
+      "types": {
+        "schedule_congestion": 1,
+        "lookahead": 2
+      },
+      "contexts": [
+        "4 matchs sur les 7 derniers jours",
+        "2 match important/proche dans les 3 jours",
+        "2 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.715,
+        "away_score": -0.715,
+        "home_fade": 1.1,
+        "away_fade": 1.1,
+        "reason": "Signaux opposes: Miami Marlins fade 1.10, Washington Nationals fade 1.10 -> prudence",
+        "detail": [
+          {
+            "side": "home",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.8
+          },
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.8
+          }
+        ]
+      }
+    },
+    {
       "event_id": "401815273",
       "source_event_ids": [
         "401815273"
@@ -3261,72 +3327,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.757
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815259",
-      "source_event_ids": [
-        "401815259"
-      ],
-      "kickoff": "2026-05-08T23:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Miami Marlins",
-      "away": "Washington Nationals",
-      "match": "Miami Marlins - Washington Nationals",
-      "decision": "lean_away",
-      "net_team": "Washington Nationals",
-      "reason": "Miami Marlins plus penalise par calendrier/voyage (0.90 vs 0.30)",
-      "pressure_score": 1.933,
-      "home_fade": 0.9,
-      "away_fade": 0.3,
-      "travel_score": 0,
-      "lookahead_score": 1.333,
-      "congestion_score": 0.6,
-      "types": {
-        "schedule_congestion": 1,
-        "lookahead": 2
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.515,
-        "away_score": -0.785,
-        "home_fade": 0.9,
-        "away_fade": 1.1,
-        "reason": "Signaux opposes: Miami Marlins fade 0.90, Washington Nationals fade 1.10 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
           }
         ]
       }
