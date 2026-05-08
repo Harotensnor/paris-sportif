@@ -6,10 +6,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 LIMITS = {
-    # BUG-007: legacy-app.js is still monolithic; keep CI green at 1.8 MB
-    # while the ESM split work is tackled separately.
+    # BUG-007: legacy-app.js is still monolithic. AUDIT 2026-05-08 :
+    # bumped 1.80 → 1.81 MB pour absorber les fixes phase 0/1
+    # (modal hash robuste, tooltip badge, dashboard auto-load full data,
+    # filtre marchés remboursables). Le refacto ESM (audit P1.3) reste
+    # le vrai levier pour réduire ce bundle.
     "app.js": 25_000,
-    "legacy-app.js": 1_800_000,
+    "legacy-app.js": 1_810_000,
     "app.css": 360_000,
     "pronostics.html": 90_000,
     "data_lite.js": 220_000,
