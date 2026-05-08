@@ -24715,18 +24715,99 @@ const esc2 = (typeof esc === 'function') ? esc : (s) => String(s).replace(/[&<>"
     catch(e) { return []; }
   }
 
+  const BOOT_STEP_KEY = 'boot_step';
+  function _bootSequence() {
+    const ORDER = ['consent', 'onboarding', 'docs'];
+    const tasks = new Map();
+    const completed = new Set();
+    let active = null;
+    let running = false;
+    try {
+      const raw = localStorage.getItem(BOOT_STEP_KEY);
+      const saved = raw ? JSON.parse(raw) : null;
+      if (saved && Array.isArray(saved.done)) saved.done.forEach(step => completed.add(step));
+    } catch(e) { swallowError(e); }
+    const save = () => {
+      try {
+        localStorage.setItem(BOOT_STEP_KEY, JSON.stringify({
+          active: active || 'idle',
+          done: Array.from(completed),
+          updated_at: new Date().toISOString()
+        }));
+      } catch(e) { swallowError(e); }
+    };
+    const isDone = (name) => {
+      const task = tasks.get(name);
+      if (!task) return false;
+      if (completed.has(name)) return true;
+      if (typeof task.isDone === 'function') {
+        try {
+          if (task.isDone()) {
+            completed.add(name);
+            save();
+            return true;
+          }
+        } catch(e) { swallowError(e); }
+      }
+      return false;
+    };
+    const complete = (name) => {
+      if (name) completed.add(name);
+      active = null;
+      running = false;
+      save();
+      setTimeout(run, 250);
+    };
+    const run = () => {
+      if (running || active) return;
+      const next = ORDER.find(name => tasks.has(name) && !isDone(name));
+      if (!next) {
+        active = 'done';
+        save();
+        active = null;
+        return;
+      }
+      const task = tasks.get(next);
+      active = next;
+      running = true;
+      save();
+      try {
+        const shown = task.handler({ done: () => complete(next), step: next });
+        if (shown === false) complete(next);
+      } catch(e) {
+        swallowError(e);
+        complete(next);
+      }
+    };
+    return {
+      request(name, handler, isDoneFn) {
+        if (!name || typeof handler !== 'function') return;
+        tasks.set(name, { handler, isDone: isDoneFn });
+        setTimeout(run, 0);
+      },
+      complete,
+      current() {
+        return { active, done: Array.from(completed) };
+      }
+    };
+  }
+  window.__psBootSequence = window.__psBootSequence || _bootSequence();
+
 
   // Le premier contact doit expliquer le flux réel : voir le gros pari,
   // comprendre pourquoi, puis ouvrir Winamax sans noyer le visiteur.
-  function showOnboardingModal() {
+  function showOnboardingModal(options = {}) {
     try {
       const prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}');
       if (
         prefs.onboardingDone ||
         localStorage.getItem('paris_sportif_onboarded_v1') === '1' ||
         localStorage.getItem('paris_sportif_onboarded_v2') === '1'
-      ) return;
-      if (document.querySelector('.onboard-overlay')) return;
+      ) {
+        if (typeof options.onDone === 'function') options.onDone('already_done');
+        return false;
+      }
+      if (document.querySelector('.onboard-overlay')) return true;
 
       const overlay = document.createElement('div');
       overlay.className = 'onboard-overlay';
@@ -24876,6 +24957,7 @@ const esc2 = (typeof esc === 'function') ? esc : (s) => String(s).replace(/[&<>"
         setTimeout(() => {
           try { if (typeof _initConsentBanner === 'function') _initConsentBanner(); } catch(e) { swallowError(e); }
         }, 600);
+        if (typeof options.onDone === 'function') options.onDone(skipped ? 'skipped' : 'completed');
       };
 
       document.body.appendChild(overlay);
@@ -24896,7 +24978,12 @@ const esc2 = (typeof esc === 'function') ? esc : (s) => String(s).replace(/[&<>"
       document.addEventListener('keydown', onOnboardingKeydown, true);
       cleanupOnboardingKeyboard = () => document.removeEventListener('keydown', onOnboardingKeydown, true);
       renderStep();
-    } catch(e) { if (typeof prodWarn === 'function') prodWarn('onboarding_open_failed', e); }
+      return true;
+    } catch(e) {
+      if (typeof prodWarn === 'function') prodWarn('onboarding_open_failed', e);
+      if (typeof options.onDone === 'function') options.onDone('error');
+      return false;
+    }
   }
 
 
@@ -31581,10 +31668,17 @@ ses paris sur le site (ni manuel, ni import). -->
                    || localStorage.getItem('paris_sportif_onboarded_v2') === '1';
     return onboarded;
   }
-  function _initConsentBanner() {
+  function _initConsentBanner(options = {}) {
     let prefs = {};
     try { prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}'); } catch(e) { swallowError(e); }
-    if (prefs.consentLocalStorage === 'accepted' || prefs.consentLocalStorage === 'declined') return;
+    const finishConsent = (value) => {
+      try { localStorage.setItem('ps_privacy_ack_v2', '1'); } catch(e) { swallowError(e); }
+      if (typeof options.onDone === 'function') options.onDone(value || 'done');
+    };
+    if (prefs.consentLocalStorage === 'accepted' || prefs.consentLocalStorage === 'declined') {
+      finishConsent(prefs.consentLocalStorage);
+      return false;
+    }
     // BUG-FIX 2026-05-07 — `userPrefs` est écrit dès le boot (lang, etc.)
     // donc le détecter dans legacyKeys auto-acceptait le consentement RGPD
     // sur une visite fraiche. On considère "legacy" UNIQUEMENT si l'user a
@@ -31601,13 +31695,20 @@ ses paris sur le site (ni manuel, ni import). -->
     if (hasLegacy) {
       prefs.consentLocalStorage = 'accepted';
       try { localStorage.setItem('userPrefs', JSON.stringify(prefs)); } catch(e) { swallowError(e); }
-      return;
+      finishConsent('accepted');
+      return false;
     }
     // ré-appelle _initConsentBanner après le choix de niveau → cascade propre.
-    if (!_shouldShowConsentBanner()) return;
+    if (!options.force && !_shouldShowConsentBanner()) return false;
     const banner = document.getElementById('consent-banner');
-    if (!banner) return;
+    if (!banner) {
+      finishConsent('missing_banner');
+      return false;
+    }
     banner.style.display = 'block';
+    banner.__psConsentDone = finishConsent;
+    if (banner.dataset.consentBound === '1') return true;
+    banner.dataset.consentBound = '1';
     const set = (val) => {
       try {
         const p = JSON.parse(localStorage.getItem('userPrefs') || '{}');
@@ -31616,6 +31717,7 @@ ses paris sur le site (ni manuel, ni import). -->
         localStorage.setItem('userPrefs', JSON.stringify(p));
       } catch(e) { swallowError(e); }
       banner.style.display = 'none';
+      try { banner.__psConsentDone && banner.__psConsentDone(val); } catch(e) { swallowError(e); }
     };
     banner.querySelector('#consent-accept')?.addEventListener('click', () => {
       set('accepted');
@@ -31653,8 +31755,20 @@ ses paris sur le site (ni manuel, ni import). -->
         }
       }
     });
+    return true;
   }
-  _initConsentBanner();
+  if (window.__psBootSequence) {
+    window.__psBootSequence.request('consent', ({ done }) => _initConsentBanner({ force: true, onDone: done }), () => {
+      try {
+        const prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}');
+        return prefs.consentLocalStorage === 'accepted' || prefs.consentLocalStorage === 'declined';
+      } catch(e) {
+        return false;
+      }
+    });
+  } else {
+    _initConsentBanner();
+  }
   // (uniquement si Théo a configuré PLAUSIBLE_DOMAIN ou CLOUDFLARE_TOKEN).
   _maybeEnableAnalytics();
 
@@ -32233,6 +32347,38 @@ if (b) { b.setAttribute('aria-expanded', 'false'); b.focus(); }
 });
 
 try {
+const onboardingDone = () => {
+try {
+const prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}');
+return !!prefs.onboardingDone
+|| localStorage.getItem('paris_sportif_onboarded_v1') === '1'
+|| localStorage.getItem('paris_sportif_onboarded_v2') === '1';
+} catch(e) {
+return false;
+}
+};
+const openOnboardingWhenQuiet = (done) => {
+const launch = () => {
+if (document.querySelector('.modal.show, .modal[open], #share-modal.show, .docs-modal, .privacy-modal')) {
+setTimeout(launch, 300);
+return;
+}
+try {
+const shown = typeof showOnboardingModal === 'function'
+? showOnboardingModal({ onDone: done })
+: false;
+if (!shown) done();
+} catch(e) {
+swallowError(e);
+done();
+}
+};
+setTimeout(launch, 800);
+return true;
+};
+if (window.__psBootSequence) {
+window.__psBootSequence.request('onboarding', ({ done }) => openOnboardingWhenQuiet(done), onboardingDone);
+} else {
 let _userInteracted = false;
 const _markInteract = () => { _userInteracted = true; };
 document.addEventListener('click', _markInteract, { once: true, capture: true });
@@ -32246,12 +32392,12 @@ document.removeEventListener('keydown', _markInteract, true);
 document.removeEventListener('pointerdown', _markInteract, true);
 document.removeEventListener('touchstart', _markInteract, true);
 window.removeEventListener('scroll', _markInteract);
-if (_userInteracted) return;  // user is doing something, don't interrupt
-        // Don't open if any modal is already on screen (lock unlock, help, etc.)
+if (_userInteracted) return;
 if (document.querySelector('.modal.show, .modal[open], #share-modal.show')) return;
 try { if (typeof showOnboardingModal === 'function') showOnboardingModal(); } catch(e) { swallowError(e); }
 };
 setTimeout(_runOnboarding, 800);
+}
 } catch(e) { swallowError(e); }
 
 document.addEventListener('keydown', (ev) => {
