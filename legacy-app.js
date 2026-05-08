@@ -4207,7 +4207,9 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     const candidates = buildMarketCandidates(match, pred, { requireExact: true });
     if (!candidates.length) return null;
     const minOdd = opts.minOdd || ((typeof getUserOddMin === 'function') ? getUserOddMin() : 2.00);
-    const allowed = candidates.filter(c => !isBlockedHandicapMarket(c) && Number(c.odd) >= minOdd);
+    // AUDIT 2026-05-08 — selectBestMarket exclut les marchés à mise remboursée.
+    const isRefund = (c) => typeof window._v37IsRefundMarket === 'function' && window._v37IsRefundMarket(c);
+    const allowed = candidates.filter(c => !isBlockedHandicapMarket(c) && !isRefund(c) && Number(c.odd) >= minOdd);
     if (!allowed.length) return null;
     const pool = allowed.filter(c =>
       c.source === 'winamax_exact'
@@ -16875,6 +16877,18 @@ const v37CapEdge = (value) => {
 const n = Number(value);
 return Number.isFinite(n) ? Math.max(-0.25, Math.min(v37EdgeDisplayCap, n)) : 0;
 };
+// AUDIT 2026-05-08 — exclut DNB + handicap line 0/quart (mise remboursable).
+const _v37IsRefundMarket = (c) => {
+if (!c || c.market === 'dnb') return !!c;
+if (c.market !== 'handicap') return false;
+const a = Math.abs(Number(c.line));
+if (!(a >= 0)) return false;
+if (a < 1e-6) return true;
+const f = a - Math.floor(a);
+return Math.abs(f - 0.25) < 1e-6 || Math.abs(f - 0.75) < 1e-6;
+};
+try { window._v37IsRefundMarket = _v37IsRefundMarket; } catch(e) { swallowError(e); }
+
 const v37CapEv = (value) => {
 const n = Number(value);
 return Number.isFinite(n) ? Math.max(-0.25, Math.min(0.35, n)) : -1;
@@ -17018,6 +17032,11 @@ const ranked = candidateList
 const odd = Number(c?.odd || 0);
 if (!c) { v37Reject('empty_candidate', m); return false; }
 if (!(odd >= 1.30)) { v37Reject('odd_lt_130', m, c?.label || c?.market || ''); return false; }
+// AUDIT 2026-05-08 — pas de marché à mise remboursée (DNB, handicap 0/quart).
+if (typeof window._v37IsRefundMarket === 'function' && window._v37IsRefundMarket(c)) {
+v37Reject('marche_remboursement', m, c?.market || '');
+return false;
+}
 return true;
 })
 .filter(c => {
