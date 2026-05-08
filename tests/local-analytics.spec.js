@@ -52,4 +52,23 @@ test.describe('local analytics personalisation', () => {
     expect(result.audit).toBe(0);
     expect(result.hasSendBeacon).toBe(false);
   });
+
+  test('BUG-012 removes saved views card outside Tous', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'Desktop overlap regression.');
+    await page.goto(`${URL}#tous`);
+    await page.waitForFunction(() => Boolean(window.__localAnalyticsAudit));
+    await expect(page.locator('[data-la-saved-views]')).toBeVisible({ timeout: 10000 });
+
+    await page.goto(`${URL}#bilan`);
+    await expect(page.locator('[data-la-saved-views]')).toHaveCount(0, { timeout: 10000 });
+    const overlap = await page.evaluate(() => {
+      const heading = document.querySelector('#bilan-wrap .page-h1, #bilan-wrap h1');
+      const saved = document.querySelector('[data-la-saved-views]');
+      if (!heading || !saved) return false;
+      const a = heading.getBoundingClientRect();
+      const b = saved.getBoundingClientRect();
+      return !(b.right < a.left || b.left > a.right || b.bottom < a.top || b.top > a.bottom);
+    });
+    expect(overlap).toBe(false);
+  });
 });
