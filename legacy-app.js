@@ -4460,8 +4460,8 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     if (typeof toast === 'function') toast(`✓ Pari ${stake.toFixed(0)}€ @${odd.toFixed(2)} enregistré`, 'success');
     btn.dataset.trackedBetId = betId || '';
   }, true);
-  // AUDIT 2026-05-09 v45.3 — Bulk track handler.
-  document.addEventListener('click', (e) => {
+  // AUDIT 2026-05-09 v45.3 — Bulk track handler + v47.1 hedge protection.
+  document.addEventListener('click', async (e) => {
     const btn = e.target && e.target.closest ? e.target.closest('[data-v45-bulk-track]') : null;
     if (!btn || e.defaultPrevented) return;
     e.preventDefault();
@@ -4471,6 +4471,21 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     if (!Array.isArray(payload) || !payload.length) {
       if (typeof toast === 'function') toast('Aucun pick à tracker', 'warn');
       return;
+    }
+    // v47.1 — Hedge protection : warn user si même match listé 2x dans payload
+    // (ex: outcome conflict, sur-allocation). Confirme avant tracker.
+    const matchCounts = {};
+    payload.forEach(p => { matchCounts[p.matchId] = (matchCounts[p.matchId] || 0) + 1; });
+    const duplicateMatches = Object.entries(matchCounts).filter(([_, n]) => n > 1);
+    if (duplicateMatches.length > 0 && typeof window._showConfirm === 'function') {
+      const ok = await window._showConfirm({
+        title: '⚠ Hedge / sur-allocation détecté',
+        body: `${duplicateMatches.length} match${duplicateMatches.length>1?'s':''} a${duplicateMatches.length>1?'nt':''} 2+ picks dans la liste. Cela revient à miser plusieurs fois sur le même match (sur-exposition). Continuer ?`,
+        confirmLabel: 'Continuer quand même',
+        cancelLabel: 'Annuler',
+        danger: true
+      });
+      if (!ok) return;
     }
     let added = 0;
     for (const item of payload) {
@@ -18961,6 +18976,65 @@ window._v45SetStakeMode = (mode) => {
     document.dispatchEvent(new CustomEvent('v45:stake-mode-changed', { detail: { mode } }));
   } catch (e) {}
 };
+// AUDIT 2026-05-09 v47.1 — A/B test framework léger.
+// Permet de tester variants côté frontend (ex: "verdict_threshold_22" vs
+// "verdict_threshold_18", "card_layout_v1" vs "card_layout_v2") en
+// assignant aléatoirement un variant stable par user (localStorage),
+// puis en logant les outcomes via _ab.track(experiment, outcome).
+window._ab = {
+  // Get variant for an experiment (50/50 split by default)
+  variant(experiment, weights = { A: 0.5, B: 0.5 }) {
+    try {
+      const key = `paris_sportif_ab_${experiment}`;
+      let v = localStorage.getItem(key);
+      if (!v) {
+        const r = Math.random();
+        let cum = 0;
+        for (const [name, w] of Object.entries(weights)) {
+          cum += w;
+          if (r < cum) { v = name; break; }
+        }
+        v = v || 'A';
+        localStorage.setItem(key, v);
+      }
+      return v;
+    } catch (e) { return 'A'; }
+  },
+  // Log an outcome for an experiment+variant (ex: bet won/lost, click, etc.)
+  track(experiment, outcome, metadata = {}) {
+    try {
+      const key = 'paris_sportif_ab_events_v1';
+      const raw = localStorage.getItem(key);
+      const arr = raw ? JSON.parse(raw) : [];
+      arr.push({
+        ts: Date.now(),
+        experiment,
+        variant: window._ab.variant(experiment),
+        outcome,
+        metadata
+      });
+      // Ring buffer 500 events
+      if (arr.length > 500) arr.splice(0, arr.length - 500);
+      localStorage.setItem(key, JSON.stringify(arr));
+    } catch (e) {}
+  },
+  // Get summary stats for an experiment
+  stats(experiment) {
+    try {
+      const events = JSON.parse(localStorage.getItem('paris_sportif_ab_events_v1') || '[]');
+      const filtered = events.filter(e => e.experiment === experiment);
+      const byVariant = {};
+      filtered.forEach(e => {
+        const v = e.variant || 'A';
+        if (!byVariant[v]) byVariant[v] = { n: 0, outcomes: {} };
+        byVariant[v].n++;
+        byVariant[v].outcomes[e.outcome] = (byVariant[v].outcomes[e.outcome] || 0) + 1;
+      });
+      return { experiment, total: filtered.length, byVariant };
+    } catch (e) { return { error: e.message }; }
+  }
+};
+
 window._v45RecommendedStake = (bankroll, rel, odd) => {
   if (window._v45StakeMode() === 'kelly') {
     if (typeof window.kellyFraction === 'function') {
