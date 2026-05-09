@@ -20153,14 +20153,28 @@ const aggressivePicksEnriched = aggressivePicks.map(_enrichPick);
 // settled) prouve que tier='out' ou cote≥5+edge≥5pt = +121% ROI sur 356 paris,
 // max_dd 3% — la stratégie #1 historiquement. On surface ces picks avant tout
 // le reste, avec badge "+121% ROI prouvé" et styling distinct (gold).
-const outsiderPicks = _dataIsStale ? [] : (allTodayRaw || [])
-  .filter(x => !x.m.live && !x.m.completed && _notStarted(x.m))
-  .filter(x => {
-    const odd = Number(x.odd || 0);
-    const edge = Number(x.edge || 0);
-    return x.tier === 'out' || (odd >= 5 && edge >= 0.05);
-  })
-  .filter(x => !x.investment || x.investment.action !== 'skip')
+// v43.1 — Élargi à 7j si today vide (l'user voit toujours du contenu).
+const _v43OutsiderFilter = (x) => {
+  if (!x || !x.m) return false;
+  if (x.m.live || x.m.completed) return false;
+  if (typeof _notStarted === 'function' && !_notStarted(x.m)) return false;
+  const odd = Number(x.odd || 0);
+  const edge = Number(x.edge || 0);
+  if (!(x.tier === 'out' || (odd >= 5 && edge >= 0.05))) return false;
+  if (x.investment && x.investment.action === 'skip') return false;
+  return true;
+};
+const _v43ValueFilter = (x) => {
+  if (!x || !x.m) return false;
+  if (x.m.live || x.m.completed) return false;
+  if (typeof _notStarted === 'function' && !_notStarted(x.m)) return false;
+  if (Number(x.edge || 0) < 0.05) return false;
+  if (Number(x.odd || 0) < 1.40) return false;
+  if (x.investment && x.investment.action === 'skip') return false;
+  return true;
+};
+let outsiderPicks = _dataIsStale ? [] : (allTodayRaw || [])
+  .filter(_v43OutsiderFilter)
   .sort((a, b) => {
     const ea = Number(a.edge || 0);
     const eb = Number(b.edge || 0);
@@ -20169,17 +20183,77 @@ const outsiderPicks = _dataIsStale ? [] : (allTodayRaw || [])
   })
   .slice(0, 6)
   .map(_enrichPick);
+const _v43ScopeOutsider = (() => {
+  if (outsiderPicks.length || _dataIsStale) return null;
+  // Today has zero outsider qualifying picks → étendre à 7j en re-classifiant
+  // depuis predictMatch. C'est ce qui assure que la section reste utile.
+  if (typeof getScopedEvents !== 'function' || typeof predictMatch !== 'function') return null;
+  try {
+    const scoped = getScopedEvents('7d', { requireExact: false }) || [];
+    const enriched = scoped.map(m => {
+      try {
+        if (m.live || m.completed) return null;
+        const pred = predictMatch(m);
+        if (!pred || !pred.pick || pred.skip) return null;
+        const best = (typeof _agentBestPick === 'function') ? _agentBestPick(m, pred) : null;
+        const odd = best ? best.odd : (pred.odds && (pred.pick.key === '1' ? pred.odds.home : pred.pick.key === '2' ? pred.odds.away : pred.odds.draw));
+        if (!odd || odd <= 1.01) return null;
+        const rel = best ? best.rel : (pred.reliability ?? pred.pick.prob);
+        if (!rel || rel <= 0) return null;
+        const edge = rel - 1/odd;
+        const tier = (pred.tier || '');
+        if (!(tier === 'out' || (odd >= 5 && edge >= 0.05))) return null;
+        const investment = (best && best.investment) || (typeof investmentScore === 'function' ? investmentScore(rel, odd, null, { market: best ? best.market : '1n2' }) : null);
+        if (investment && investment.action === 'skip') return null;
+        const ev = (typeof expectedValue === 'function') ? expectedValue(rel, odd) : (rel*odd-1);
+        return { m, pred, odd, rel, edge, ev, investment, best, tier };
+      } catch(e) { return null; }
+    }).filter(Boolean);
+    return enriched.slice().sort((a, b) => (Number(b.edge || 0) - Number(a.edge || 0)) || (Number(b.odd||0)-Number(a.odd||0))).slice(0, 6).map(_enrichPick);
+  } catch (e) { return null; }
+})();
+if (!outsiderPicks.length && Array.isArray(_v43ScopeOutsider) && _v43ScopeOutsider.length) {
+  outsiderPicks = _v43ScopeOutsider;
+}
 // AUDIT 2026-05-09 v43.B — Value picks (edge ≥5pt, hors outsider).
 // +33.1% ROI prouvé sur 1251 paris. 2e meilleure stratégie.
 const outsiderIds = new Set(outsiderPicks.map(x => x.m.id));
-const valuePicks = _dataIsStale ? [] : (allTodayRaw || [])
+let valuePicks = _dataIsStale ? [] : (allTodayRaw || [])
   .filter(x => !outsiderIds.has(x.m.id))
-  .filter(x => !x.m.live && !x.m.completed && _notStarted(x.m))
-  .filter(x => Number(x.edge || 0) >= 0.05 && Number(x.odd || 0) >= 1.40)
-  .filter(x => !x.investment || x.investment.action !== 'skip')
+  .filter(_v43ValueFilter)
   .sort((a, b) => Number(b.edge || 0) - Number(a.edge || 0))
   .slice(0, 6)
   .map(_enrichPick);
+const _v43ScopeValue = (() => {
+  if (valuePicks.length || _dataIsStale) return null;
+  if (typeof getScopedEvents !== 'function' || typeof predictMatch !== 'function') return null;
+  try {
+    const scoped = getScopedEvents('7d', { requireExact: false }) || [];
+    const enriched = scoped.map(m => {
+      try {
+        if (m.live || m.completed) return null;
+        if (outsiderIds.has(m.id)) return null;
+        const pred = predictMatch(m);
+        if (!pred || !pred.pick || pred.skip) return null;
+        const best = (typeof _agentBestPick === 'function') ? _agentBestPick(m, pred) : null;
+        const odd = best ? best.odd : (pred.odds && (pred.pick.key === '1' ? pred.odds.home : pred.pick.key === '2' ? pred.odds.away : pred.odds.draw));
+        if (!odd || odd <= 1.40) return null;
+        const rel = best ? best.rel : (pred.reliability ?? pred.pick.prob);
+        if (!rel || rel <= 0) return null;
+        const edge = rel - 1/odd;
+        if (edge < 0.05) return null;
+        const investment = (best && best.investment) || (typeof investmentScore === 'function' ? investmentScore(rel, odd, null, { market: best ? best.market : '1n2' }) : null);
+        if (investment && investment.action === 'skip') return null;
+        const ev = (typeof expectedValue === 'function') ? expectedValue(rel, odd) : (rel*odd-1);
+        return { m, pred, odd, rel, edge, ev, investment, best };
+      } catch(e) { return null; }
+    }).filter(Boolean);
+    return enriched.slice().sort((a, b) => Number(b.edge || 0) - Number(a.edge || 0)).slice(0, 6).map(_enrichPick);
+  } catch (e) { return null; }
+})();
+if (!valuePicks.length && Array.isArray(_v43ScopeValue) && _v43ScopeValue.length) {
+  valuePicks = _v43ScopeValue;
+}
 const valueIds = new Set(valuePicks.map(x => x.m.id));
 const shownIds = new Set([
 ...outsiderPicks.map(x => x.m.id),
@@ -21949,8 +22023,10 @@ ${items}
           </div>` ;
         })() : ''}
 
-        ${(outsiderPicks.length || valuePicks.length) ? (() => {
+        ${(!_dataIsStale) ? (() => {
           // AUDIT 2026-05-09 v43.B — Section "Stratégies prouvées".
+          // v43.1 : ALWAYS render quand data fresh (même 0 picks → empty state
+          // avec explainer ROI). User voit toujours la promesse stat du site.
           // Backtest leaderboard 1932 picks settled, ROI vérifié.
           const v43ModeOn = (typeof window.v43ProfitableMode === 'function') ? window.v43ProfitableMode() : false;
           const renderProvenCard = (p, kind) => {
