@@ -19349,12 +19349,14 @@ const v37RenderPool = v37SortedDiverse.length ? v37SortedDiverse.concat(v37DataO
 // User : "je veux voir que des prono sur lesquels je peux misé".
 // On garde uniquement verdict 'bet' (Miser) ou 'bet-light' (Petite mise).
 // Tout le reste (Surveiller, À éviter, Passer, Cote à vérifier) est caché.
-// Toggle pour voir tout via localStorage.v40_strictMode (default true).
+// v53.6 — User feedback "beaucoup trop peu de pronostics pour autant de
+// rencontres" : default → false. L'user voit TOUS les picks détectés
+// (en mode "lecture exploratoire"). Toggle pour basculer en mode prudent.
 const v40StrictMode = (() => {
   try {
     const raw = localStorage.getItem('v40_strictMode');
-    return raw === null ? true : raw === '1' || raw === 'true';
-  } catch (e) { return true; }
+    return raw === null ? false : raw === '1' || raw === 'true';
+  } catch (e) { return false; }
 })();
 // AUDIT 2026-05-09 v42.fix4 — v40PickVerdict utilise window._v39FinalRec
 // (plus stable que la const TDZ-able _v39FinalRec). Fallback aligné sur
