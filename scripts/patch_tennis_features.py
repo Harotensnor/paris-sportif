@@ -188,6 +188,7 @@ def main() -> int:
                     'fatigue_14d': p.get('matches_14d') or 0,
                     'last10': p.get('last10') or '',
                     'wins_last10': p.get('wins_last10') or 0,
+                    'surface_last10': p.get('surface_last10') or {},
                     'rank': p.get('rank'),
                     'tour': p.get('tour'),
                     'n_matches': p.get('n_matches') or 0,

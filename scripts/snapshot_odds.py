@@ -216,6 +216,52 @@ def snapshot(event, now_iso):
     return True
 
 
+def mature_snapshot(event, now_dt, now_iso):
+    """v52.4 — CLV optimization (CLV_INVESTIGATION 2026-05-09 finding).
+    Capture a "mature" odds snapshot at T<=4h pre-kickoff (idempotent — only
+    written once). The early `odds_snapshot` is captured as soon as we discover
+    the match (often T-24h+) and represents the price 24-48h before kickoff.
+    The 1n2 CLV is -3.23% partly because the snapshot is too early to capture
+    sharp money / news-driven line moves. This `mature_snapshot` field gives
+    the bilan a closer-to-closing baseline for CLV calculation while keeping
+    the original `odds_snapshot` for backwards compatibility."""
+    if event.get('mature_snapshot') and (event['mature_snapshot'].get('home') or event['mature_snapshot'].get('away')):
+        return False
+    raw = event.get('date')
+    if not raw:
+        return False
+    try:
+        iso = raw.replace('Z', '+00:00')
+        ko = datetime.fromisoformat(iso)
+        if ko.tzinfo is None:
+            ko = ko.replace(tzinfo=timezone.utc)
+    except (ValueError, TypeError):
+        return False
+    delta_min = (ko - now_dt).total_seconds() / 60.0
+    # Window: [kickoff-240min, kickoff+15min]. The 4h pre-window captures the
+    # "decision time" price after most line moves but before the match starts.
+    if delta_min > 240 or delta_min < -15:
+        return False
+    # Prefer Winamax exact prices when available
+    winamax_snap = _build_winamax_snapshot(event, now_iso)
+    if winamax_snap:
+        winamax_snap['minutes_to_ko'] = round(delta_min, 1)
+        event['mature_snapshot'] = winamax_snap
+        return True
+    h, d, a, prov = best_odds_from_array(event.get('odds') or [])
+    if not h and not a:
+        return False
+    event['mature_snapshot'] = {
+        'captured_at': now_iso,
+        'minutes_to_ko': round(delta_min, 1),
+        'home': round(float(h), 3) if h else None,
+        'draw': round(float(d), 3) if d else None,
+        'away': round(float(a), 3) if a else None,
+        'provider': prov,
+    }
+    return True
+
+
 def closing_snapshot(event, now_dt, now_iso):
     """Capture the closing odds (≤10 min to kickoff). Idempotent — once written,
     never overwritten. The JS side can use this to compute CLV against the
@@ -260,12 +306,14 @@ def main():
     now_iso = now_dt.isoformat()
     grand_total = 0
     grand_snaps = 0
+    grand_matures = 0
     grand_closes = 0
     for path in DATA_PATHS:
         if not path.exists():
             continue
         d = load_data(path)
         new_snaps = 0
+        new_matures = 0
         new_closes = 0
         total = 0
         for day_key, events in d.get('days', {}).items():
@@ -273,14 +321,17 @@ def main():
                 total += 1
                 if snapshot(ev, now_iso):
                     new_snaps += 1
+                if mature_snapshot(ev, now_dt, now_iso):
+                    new_matures += 1
                 if closing_snapshot(ev, now_dt, now_iso):
                     new_closes += 1
         save_data(d, path)
         grand_total += total
         grand_snaps += new_snaps
+        grand_matures += new_matures
         grand_closes += new_closes
-        print(f'[snapshot_odds] {path.name} total={total} new_or_reprioritized_snapshots={new_snaps} new_closing={new_closes}')
-    print(f'[snapshot_odds] all total={grand_total} new_or_reprioritized_snapshots={grand_snaps} new_closing={grand_closes}')
+        print(f'[snapshot_odds] {path.name} total={total} new_or_reprioritized_snapshots={new_snaps} new_mature_T-4h={new_matures} new_closing={new_closes}')
+    print(f'[snapshot_odds] all total={grand_total} new_or_reprioritized_snapshots={grand_snaps} new_mature_T-4h={grand_matures} new_closing={grand_closes}')
 
 
 if __name__ == '__main__':

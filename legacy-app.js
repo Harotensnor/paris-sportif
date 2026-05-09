@@ -4324,6 +4324,36 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
   }
   try { window.selectBestMarket = selectBestMarket; } catch(e) { swallowError(e); }
 
+  // v52.3 — CLV history badge per market+odd.
+  // Source : docs/CLV_INVESTIGATION_2026-05-09.md (1378 picks analyzed).
+  // Returns { tone: 'pos'|'neu'|'neg', label, title } or null.
+  function clvBadgeForMarket(market, odd) {
+    const m = String(market || '').toLowerCase();
+    const o = Number(odd) || 0;
+    // Outsider 5.00+ : +85.17% CLV (200 picks). Tous marchés confondus.
+    if (o >= 5.00) {
+      return { tone: 'pos', label: '💎 Outsider value', title: 'Cote ≥ 5.00 → +85% CLV moyen historique (200 picks)' };
+    }
+    // htTotal (mi-temps OU) : +53.68% CLV (385 picks).
+    if (m.includes('httotal') || m === 'ht_ou' || m === 'halftimetotal') {
+      return { tone: 'pos', label: '🟢 CLV+ historique', title: 'Mi-temps OU : +54% CLV moyen (385 picks historiques)' };
+    }
+    // DNB : +6.78% CLV (112 picks).
+    if (m === 'dnb') {
+      return { tone: 'pos', label: '🟢 CLV+ léger', title: 'Draw No Bet : +7% CLV moyen (112 picks historiques)' };
+    }
+    // 1n2 cote < 1.50 → zone neutre/négative.
+    if ((m === '1n2' || m === 'matchwinner') && o > 0 && o < 1.50) {
+      return { tone: 'neg', label: '⚠️ CLV faible', title: 'Favoris 1n2 < 1.50 : zone neutre, pas de value moyenne' };
+    }
+    // 1n2 en général : -3.23% CLV (229 picks). LEAK identifié.
+    if (m === '1n2' || m === 'matchwinner') {
+      return { tone: 'neg', label: '🔴 CLV- historique', title: '1n2 : -3.2% CLV moyen (229 picks). Marché trop efficient.' };
+    }
+    return null;
+  }
+  try { window.clvBadgeForMarket = clvBadgeForMarket; } catch(e) { swallowError(e); }
+
   // Correlation score for combo warnings: same match/sport/league/team/time.
   function combinationCorrelation(p1, p2) {
     if (!p1 || !p2 || !p1.match || !p2.match) return 0;
@@ -9878,6 +9908,21 @@ const pFormHome = Math.max(0.20, Math.min(0.80, 0.5 + 0.5 * Math.tanh(diff * 1.2
 components.push({ w: adaptiveW('Forme L10', 0.20), pH: pFormHome, pD: 0, pA: 1 - pFormHome,
 name: 'Forme L10', icon: '🔥' });
 }
+// v52.3 — Forme surface L10 : pondère la forme spécifique à la surface du match
+// (différent de l'Elo surface qui est cumulatif lifetime). Sample size ≥3 chacun.
+const _surf = tf.surface;
+if (hF && aF && _surf && hF.surface_last10 && aF.surface_last10) {
+  const hSL = hF.surface_last10[_surf];
+  const aSL = aF.surface_last10[_surf];
+  if (hSL && aSL && (hSL.matches || 0) >= 3 && (aSL.matches || 0) >= 3) {
+    const hSurfWR = (hSL.wins || 0) / Math.max((hSL.last10 || '').length, 1);
+    const aSurfWR = (aSL.wins || 0) / Math.max((aSL.last10 || '').length, 1);
+    const surfDiff = hSurfWR - aSurfWR;
+    const pSurfFormHome = Math.max(0.25, Math.min(0.75, 0.5 + 0.5 * Math.tanh(surfDiff * 1.0)));
+    components.push({ w: adaptiveW('Forme surface', 0.15), pH: pSurfFormHome, pD: 0, pA: 1 - pSurfFormHome,
+      name: `Forme ${_surf} L10`, icon: _surf === 'Clay' ? '🟧' : _surf === 'Grass' ? '🟩' : '🏆' });
+  }
+}
 if (hF && aF) {
 const fH = hF.fatigue_14d || 0;
 const fA = aF.fatigue_14d || 0;
@@ -13744,9 +13789,23 @@ ${(!weather && !ref && !meetingsCount) ? '<span class="u-text-dim2">Pas de condi
           } else if (dqWeak) {
             warn = ` <span class="u-text-warn">⚠ Qualité data faible (${dq.score}/${dq.max}) — ${dq.items.filter(i => !i.ok).slice(0,2).map(i => i.label).join(', ')}.</span>`;
           }
+          // v52.3 — CLV badge per market+odd (CLV_INVESTIGATION findings).
+          // Fallback : si verdictBest=null, pred.pick est toujours 1n2, donc on
+          // utilise '1n2' pour que le badge "🔴 CLV-" s'affiche correctement.
+          const clvMarket = verdictBest?.market || '1n2';
+          const clvBadge = (typeof window.clvBadgeForMarket === 'function')
+            ? window.clvBadgeForMarket(clvMarket, verdictOdd) : null;
+          const clvBadgeHtml = clvBadge ? (() => {
+            const colors = clvBadge.tone === 'pos'
+              ? 'background:rgba(52,211,153,.16);border:1px solid rgba(52,211,153,.4);color:var(--accent)'
+              : clvBadge.tone === 'neg'
+              ? 'background:rgba(252,165,165,.14);border:1px solid rgba(252,165,165,.4);color:#fca5a5'
+              : 'background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.3);color:var(--text-dim)';
+            return ` <span title="${esc(clvBadge.title)}" style="${colors};padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;letter-spacing:.3px;white-space:nowrap;">${clvBadge.label}</span>`;
+          })() : '';
           return `<div style="background:linear-gradient(135deg, rgba(167,139,250,.08), rgba(52,211,153,.05));border:1px solid rgba(167,139,250,.20);border-left:3px solid var(--brand);padding:14px 18px;border-radius:0 10px 10px 0;font-size:14px;line-height:1.55;color:var(--text);margin-bottom:14px;">
             <div style="font-size:10.5px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;">⚡ Verdict en 1 ligne</div>
-            ${lead}${detail}${warn}
+            ${lead}${clvBadgeHtml}${detail}${warn}
           </div>`;
         })();
         return `
@@ -23355,9 +23414,10 @@ ${items}
   </div>
   ${outsiderPicks.length ? `
   <div style="margin-bottom:16px;">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
       <div style="font-size:13px;color:#f59e0b;text-transform:uppercase;letter-spacing:.6px;font-weight:800;">💎 Outsiders du jour</div>
       <span style="background:#f59e0b;color:#fff;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:800;">${outsiderPicks.length} dispo</span>
+      <span title="docs/CLV_INVESTIGATION_2026-05-09.md — 200 picks 5.00+ ont +85% CLV moyen historique" style="background:rgba(52,211,153,.16);border:1px solid rgba(52,211,153,.4);color:var(--accent);padding:2px 8px;border-radius:999px;font-size:10px;font-weight:800;">💎 CLV +85% prouvé</span>
       <span style="margin-left:auto;font-size:11px;color:var(--text-dim);">cote ≥ 5 · edge ≥ 5pt · max_dd 3% historique</span>
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;">
