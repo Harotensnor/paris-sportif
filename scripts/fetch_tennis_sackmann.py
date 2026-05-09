@@ -186,6 +186,12 @@ def build_ratings(matches: list[tuple[str, dict]]) -> tuple[dict, dict]:
     elo_surface: dict[tuple[str, str], float] = defaultdict(lambda: INITIAL_ELO)  # (player, surface)
     last_match_dates: dict[str, datetime] = {}
     last_results: dict[str, list[str]] = defaultdict(list)  # newest at the END
+    # v52.1 — Plan Pronostics Phase 2.4 : per-surface form L10
+    # Tennis : la performance varie énormément par surface (Nadal sur clay vs hard,
+    # Federer sur grass vs clay). last10 GLOBAL était déjà tracked (last_results),
+    # mais last10 PER SURFACE manquait — c'est un signal majeur que les bookies
+    # exploitent et que notre modèle peut maintenant aussi.
+    last_results_by_surface: dict[tuple[str, str], list[str]] = defaultdict(list)  # (player, surface) -> list[W/L]
     n_matches: dict[str, int] = defaultdict(int)
     raw_names: dict[str, str] = {}
     tour_of: dict[str, str] = {}
@@ -220,6 +226,9 @@ def build_ratings(matches: list[tuple[str, dict]]) -> tuple[dict, dict]:
         last_match_dates[lnorm] = date
         last_results[wnorm].append('W')
         last_results[lnorm].append('L')
+        # v52.1 — track per-surface form
+        last_results_by_surface[(wnorm, surface)].append('W')
+        last_results_by_surface[(lnorm, surface)].append('L')
         n_matches[wnorm] += 1
         n_matches[lnorm] += 1
         raw_names[wnorm] = wn
@@ -275,11 +284,23 @@ def build_ratings(matches: list[tuple[str, dict]]) -> tuple[dict, dict]:
             if v is not None and v != INITIAL_ELO:
                 surf_dict[surf] = round(v, 1)
         last10 = ''.join(last_results[norm][-10:])
+        # v52.1 — per-surface last10 (Plan Pronostics Phase 2.4)
+        surface_last10 = {}
+        for surf in ('Hard', 'Clay', 'Grass', 'Carpet'):
+            surf_results = last_results_by_surface.get((norm, surf)) or []
+            if len(surf_results) >= 3:
+                last_n = ''.join(surf_results[-10:])
+                surface_last10[surf] = {
+                    'last10': last_n,
+                    'wins': last_n.count('W'),
+                    'matches': len(surf_results),
+                }
         out[norm] = {
             'name': raw_names[norm],
             'tour': tour_of[norm],
             'elo': round(eg, 1),
             'surface_elo': surf_dict,
+            'surface_last10': surface_last10,  # v52.1
             'matches_14d': matches_14d[norm],
             'last10': last10,
             'wins_last10': last10.count('W'),
