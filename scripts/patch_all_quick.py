@@ -834,24 +834,59 @@ def patch_fbref_xg(data: dict) -> int:
 
 
 def patch_team_stats(data: dict) -> int:
-    """Enrich foot events with team_stats (last-5 form/goals)."""
+    """Enrich foot events with team_stats (last-5 form/goals).
+
+    v49 — Audit point E (form_stats 0% coverage) : ce patcher utilisait
+    `ts.get('by_team')` mais le fichier team_stats.json schema v2 utilise
+    `teams` keyé par `lc:tid`. Le patcher dédié patch_team_stats.py utilise
+    la bonne logique (composite key + cleanup contamination + cross-sport
+    guard). Ici on appelle directement la fonction du patcher dédié pour
+    éviter la duplication.
+    """
     ts = _load_json(ROOT / 'team_stats.json')
     if not ts:
         return 0
-    by_team = ts.get('by_team') or {}
-    if not by_team:
+    teams_idx = ts.get('teams') or ts.get('by_team') or {}
+    if not teams_idx:
         return 0
+    schema_v2 = ts.get('schema_version') == 2 or any(':' in k for k in teams_idx)
     n = 0
     for evs in (data.get('days') or {}).values():
         for ev in (evs or []):
-            if ev.get('sport') != 'football':
+            if ev.get('completed'):
                 continue
+            ev_lc = ev.get('league_code') or ''
+            ev_sport = ev.get('sport') or ''
             for c in (ev.get('competitors') or []):
-                key = _norm(c.get('name') or '')
-                stats = by_team.get(key)
-                if stats:
-                    c['team_stats'] = stats
-                    n += 1
+                tid = str(c.get('id') or '')
+                if not tid:
+                    continue
+                # Composite key (schema v2) puis fallback v1.
+                s = None
+                if schema_v2 and ev_lc:
+                    s = teams_idx.get(f'{ev_lc}:{tid}')
+                if s is None:
+                    s = teams_idx.get(tid)
+                if not s or s.get('played5', 0) == 0:
+                    continue
+                # Sport guard.
+                stats_sport = s.get('sport') or ''
+                if stats_sport and ev_sport:
+                    matches = (
+                        stats_sport == ev_sport
+                        or (stats_sport == 'soccer' and ev_sport == 'football')
+                    )
+                    if not matches:
+                        continue
+                c['form_stats'] = {
+                    'played5': s.get('played5'),
+                    'wins5': s.get('wins5'), 'draws5': s.get('draws5'), 'losses5': s.get('losses5'),
+                    'gf5': s.get('gf5'), 'ga5': s.get('ga5'),
+                    'avg_gf5': s.get('avg_gf5'), 'avg_ga5': s.get('avg_ga5'),
+                    'cleans5': s.get('cleans5'), 'failed_to_score5': s.get('failed_to_score5'),
+                }
+                c['last5'] = s.get('last5') or []
+                n += 1
     return n
 
 
