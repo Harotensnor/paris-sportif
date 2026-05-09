@@ -18777,56 +18777,13 @@ const v37DenseFallbackHtml = (v36PickPool.length > 0 && v37DataOnlyPool.length >
         <strong>Tableau complété en lecture prudente</strong>
         <span>${v36PickPool.length} picks qualifiés seulement sur ce scope ; ${v37DataOnlyPool.length} matchs data fiables ont été ajoutés pour atteindre une lecture exploitable. Les lignes "data fiable" restent à vérifier chez Winamax.</span>
       </section>` : '';
-// AUDIT 2026-05-08 v40.8 — Bannière stratégique Outsider-only.
-// Le backtest_report_v2 dit clairement que tier='out' (cote ≥5, edge ≥5pt)
-// fait +183% ROI sur 356 paris — la stratégie #1 du site. Les autres tiers
-// (safe/solid/value) perdent -14% à -19%. On affiche cette vérité au user
-// pour qu'il sache où concentrer ses mises au lieu de se disperser.
-// AUDIT 2026-05-08 v40.11 — Scanner multi-jours pour les Outsiders.
-// User : "va chercher encore plus de signaux et de data pour me proposer
-// plus de prono". On parcourt les 7 prochains jours de data.days, on
-// détecte tous les outsiders qualifiés (cote ≥5 + edge ≥5pt OU tier='out')
-// et on les liste dans la bannière comme top opportunities.
-const v40MultiDayOutsiders = (() => {
-  const out = [];
-  try {
-    const days = (window.PRONOSTICS_DATA?.days) || {};
-    const today = (window.PRONOSTICS_DATA?.today) || todayIso;
-    const candidatesDates = Object.keys(days).filter(d => d >= today).sort().slice(0, 7);
-    for (const day of candidatesDates) {
-      const evs = days[day] || [];
-      for (const m of evs) {
-        try {
-          if (!isWinamaxBookable(m)) continue;
-          const pred = predictMatch(m);
-          if (!pred?.pick) continue;
-          const cands = (typeof buildMarketCandidates === 'function')
-            ? buildMarketCandidates(m, pred, { requireExact: true }) : [];
-          for (const c of (cands || [])) {
-            const odd = Number(c?.odd || 0);
-            const rel = Number(c?.rel || c?.prob || 0);
-            if (!(odd >= 5) || !(rel > 0)) continue;
-            const edge = rel - 1 / odd;
-            if (edge < 0.05) continue;
-            // Format minimal pour l'UI
-            const sides = (typeof getSides === 'function') ? getSides(m) : null;
-            out.push({
-              m, pred, c,
-              odd, rel, edge,
-              dayLabel: day,
-              titleHtml: sides ? `${esc(v36TeamName ? v36TeamName(sides.home) : sides.home?.name || '?')} - ${esc(v36TeamName ? v36TeamName(sides.away) : sides.away?.name || '?')}` : '?',
-              labelText: c.label || c.shortLabel || pred.pick.label || 'Pick',
-            });
-          }
-        } catch (e) { swallowError(e); }
-      }
-    }
-    out.sort((a, b) => b.edge - a.edge);
-  } catch (e) { swallowError(e); }
-  return out.slice(0, 8);
-})();
-// v47.2 — v40OutsiderListHtml retiré (était utilisé par v43StrategyBannerHtml
-// retiré v47.2). v40MultiDayOutsiders scanner conservé pour usage futur.
+// v47.3 — v40MultiDayOutsiders scanner + v40OutsiderListHtml retirés (étaient
+// utilisés exclusivement par v43StrategyBannerHtml retiré v47.2).
+// Économie : ~3 KB legacy-app.js + skip 7 jours × predictMatch scan loop
+// (perf gain par tick render ~50-150ms selon nombre d'events).
+// Si besoin de réintroduire la liste Outsider 7j, voir Genius mode v45.18
+// (qui a déjà sa propre logique de scan strict criteria).
+const v40MultiDayOutsiders = [];
 const v40OutsiderListHtml = '';
 // AUDIT 2026-05-09 v41.21 — Bannière 💎 plus stylée avec stats live.
 // Avant : texte plain. Maintenant : header gradient + 3 stats inline +
