@@ -9980,6 +9980,60 @@ components.push({ w: adaptiveW('Pitcher partant', 0.20), pH: pPitcherHome, pD: 0
 name: 'Pitcher partant', icon: '⚾' });
 pitcherStats = { home: hp, away: ap, era_diff: eraDiff };
 }
+// v51.0 — Plan Pronostics Phase 2.2 : signaux MLB additionnels.
+// 1. WHIP diff (walks + hits per inning) — stable measure of pitcher quality
+// 2. K/9 diff (strikeouts per 9 innings) — dominant pitchers vs hitters
+// 3. Park factor (static map) — Coors Field / Petco Park etc.
+const PARK_FACTORS = {
+  // Pitcher-friendly (-): runs scored below average
+  'COL': 1.20, 'TEX': 1.10, 'CIN': 1.07, 'BAL': 1.05, 'BOS': 1.05,
+  // Hitter-friendly (+): runs scored above average
+  'SD': 0.88, 'OAK': 0.92, 'SF': 0.93, 'SEA': 0.94, 'MIA': 0.95,
+};
+if (hp && ap) {
+  // WHIP diff
+  if (typeof hp.whip === 'number' && typeof ap.whip === 'number' && (hp.ip||0)>=10 && (ap.ip||0)>=10) {
+    const whipDiff = ap.whip - hp.whip;  // positive = home better
+    const pWhipHome = Math.max(0.35, Math.min(0.65, 0.5 + 0.10 * whipDiff));
+    components.push({ w: adaptiveW('WHIP MLB', 0.10), pH: pWhipHome, pD: 0, pA: 1 - pWhipHome,
+      name: 'WHIP pitcher', icon: '🎯' });
+  }
+  // K/9 diff
+  if (typeof hp.k9 === 'number' && typeof ap.k9 === 'number' && (hp.ip||0)>=10 && (ap.ip||0)>=10) {
+    const k9Diff = hp.k9 - ap.k9;  // positive = home better
+    const pK9Home = Math.max(0.40, Math.min(0.60, 0.5 + 0.015 * k9Diff));
+    components.push({ w: adaptiveW('K/9 MLB', 0.08), pH: pK9Home, pD: 0, pA: 1 - pK9Home,
+      name: 'K/9 pitcher', icon: '⚡' });
+  }
+  // Park factor : home team's park favors hitters/pitchers
+  const homeAbbr = (match.competitors||[]).find(c=>c.home_away==='home')?.abbr;
+  const parkFactor = PARK_FACTORS[homeAbbr];
+  if (parkFactor) {
+    // Park factor doesn't directly affect 1n2 but shifts slightly home advantage.
+    // Coors (1.20) → home offense exploits → +1.5% home advantage.
+    const parkShift = (parkFactor - 1.0) * 0.075;
+    const pParkHome = Math.max(0.45, Math.min(0.55, 0.5 + parkShift));
+    components.push({ w: adaptiveW('Park factor', 0.05), pH: pParkHome, pD: 0, pA: 1 - pParkHome,
+      name: `Park ${homeAbbr} (${parkFactor})`, icon: '🏟️' });
+  }
+}
+// Recent form via competitor.form10 (last 10 wins ratio)
+const baseballHomeC = (match.competitors||[]).find(c=>c.home_away==='home');
+const baseballAwayC = (match.competitors||[]).find(c=>c.home_away==='away');
+if (baseballHomeC && baseballAwayC) {
+  const hForm = String(baseballHomeC.form10 || baseballHomeC.team_form_l10 || '');
+  const aForm = String(baseballAwayC.form10 || baseballAwayC.team_form_l10 || '');
+  if (hForm.length >= 5 && aForm.length >= 5) {
+    const winR = (s) => {
+      const wins = (s.match(/W/g) || []).length;
+      return s.length > 0 ? wins / s.length : 0.5;
+    };
+    const formDiff = winR(hForm.slice(0, 10)) - winR(aForm.slice(0, 10));
+    const pFormHome = Math.max(0.40, Math.min(0.60, 0.5 + 0.20 * formDiff));
+    components.push({ w: adaptiveW('Forme L10 MLB', 0.10), pH: pFormHome, pD: 0, pA: 1 - pFormHome,
+      name: 'Forme L10 MLB', icon: '📈' });
+  }
+}
 }
 if (components.length) {
 const totW = components.reduce((s,c) => s + c.w, 0);
