@@ -19414,13 +19414,12 @@ const _v45GeniusFilter = (p) => {
   const odd = Number(p.odd || 0);
   const rel = Number(p.rel || 0);
   const edge = Number(p.edge || 0);
-  if (edge < 0.07) return false;
   if (rel < 0.55) return false;
-  if (odd < 1.50 || odd > 8.0) return false;
+  // v53.5 — cote relâchée 1.50 → 1.30 (les value sur favoris court @1.40
+  // étaient bloqués alors qu'ils ont edge +17pt. Mathématiquement EV+
+  // reste solide tant que edge ≥ 5pt).
+  if (odd < 1.30 || odd > 8.0) return false;
   // v53.1 — cote eligible uniquement si verified/changed (drift OK).
-  // AVANT : v38OddTopEligible reject tout `status:stale` → 0 Genius picks dès
-  // que data > 4h (typique de la prod). Maintenant on ACCEPTE 'stale' avec
-  // disclaimer "à vérifier" plutôt que faire disparaître le bandeau.
   const oddMeta = p.oddValidation;
   if (oddMeta && oddMeta.status === 'suspicious') return false;
   // Match dans 24h prochaines (pas de matchs trop loin)
@@ -19428,12 +19427,26 @@ const _v45GeniusFilter = (p) => {
   const now = Date.now();
   if (!ko || ko < now) return false; // déjà commencé
   if (ko - now > 30 * 3600 * 1000) return false; // > 30h, trop loin
-  // Segment trust check (skip si severement low)
+  // v53.5 — Net edge approach. AVANT : segment trust < -5% rejetait tout pick
+  // sur segment historiquement perdant, peu importe l'edge. Résultat : 0
+  // picks Genius en prod alors que le tableau dessous montre 7 "Miser (Value)".
+  // MAINTENANT : on calcule net_edge = edge - max(0, -segment_roi) pour
+  // savoir si la value compense la dérive segment. Net_edge ≥ 5pt = OK.
+  let segPenalty = 0;
   try {
     const trust = (typeof window._v37PickSegmentTrust === 'function')
       ? window._v37PickSegmentTrust(p.m, p.best || p) : null;
-    if (trust && trust.tier === 'low' && Number(trust.roi_pct || 0) < -5) return false;
+    if (trust) {
+      const segRoi = Number(trust.roi_pct || 0);
+      if (segRoi < 0) segPenalty = Math.abs(segRoi) / 100;  // ex: -7.7% → 0.077
+      // Hard reject si trust catastrophique (< -25%)
+      if (segRoi < -25 && (trust.tier === 'low')) return false;
+    }
   } catch (e) {}
+  const netEdge = edge - segPenalty;
+  // Critère : edge brut ≥ 12pt (margin élevée masque tout segment) OR
+  // net_edge ≥ 5pt (la value couvre la perte historique segment).
+  if (edge < 0.12 && netEdge < 0.05) return false;
   return true;
 };
 const v45GeniusPicks = (() => {
