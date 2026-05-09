@@ -18128,9 +18128,21 @@ const v40PickVerdict = (p) => {
   } catch (e) { swallowError(e); }
   return Number(p?.opportunity || 0) >= 45 ? 'bet-light' : 'skip';
 };
+// AUDIT 2026-05-09 v42.fix2 — User signale "1 pari aujourd'hui c'est peu lol".
+// Élargir le strict mode pour inclure aussi les picks "Surveiller" (verdict
+// 'watch') qui ont un edge solide (≥5pt). Logique : si le modèle dit que
+// l'edge dépasse 5pt, c'est mathématiquement bon à parier petit même si
+// l'opportunity score est sous 45 (cas typique : data quality moyenne mais
+// edge clair).
 const v40IsBettable = (p) => {
   const v = v40PickVerdict(p);
-  return v === 'bet' || v === 'bet-light';
+  if (v === 'bet' || v === 'bet-light') return true;
+  // Bridge case : Surveiller avec edge ≥ 5pt = effectivement misable (petit).
+  if (v === 'watch') {
+    const edge = Number(p?.edge || 0);
+    if (edge >= 0.05) return true;
+  }
+  return false;
 };
 const v40BettableCount = v37RenderPool.filter(v40IsBettable).length;
 const v40HiddenCount = v37RenderPool.length - v40BettableCount;
@@ -18510,16 +18522,19 @@ const _v39FinalRec = (p) => {
     const seg = (trustTier === 'low' || trustTier === 'warn') ? ` ⚠ segment ${trustRoiPct.toFixed(1)}%` : '';
     return { verdict: 'bet', label: 'Miser', score: opp, tone: 'green', reason: `Conf ${(rel*100).toFixed(0)}% · Edge ${fmtPct(edge)}${seg}` };
   }
-  // Good : opp 45-60 → Petite mise. Segment 'low' (sans severe) descend en Surveiller.
-  if (opp >= 45) {
+  // AUDIT 2026-05-09 v42.fix2 — Élargir Petite mise : seuil baissé 45 → 38.
+  // User : "1 pari aujourd'hui c'est peu". Élargit la zone "Petite mise"
+  // pour surfacer plus de candidats actionnables tout en gardant les
+  // safeguards segment.
+  if (opp >= 38) {
     if (trustTier === 'low') {
       return { verdict: 'watch', label: 'Surveiller', score: Math.min(45, opp), tone: 'orange', reason: `Edge OK mais segment ${trustRoiPct.toFixed(1)}% sur ${trustN} paris` };
     }
     const seg = trustTier === 'warn' ? ` ⚠ segment ${trustRoiPct.toFixed(1)}%` : '';
     return { verdict: 'bet-light', label: 'Petite mise', score: opp, tone: 'green-light', reason: `Conf ${(rel*100).toFixed(0)}% · Edge ${fmtPct(edge)}${seg}` };
   }
-  // Acceptable : opp 30-45.
-  if (opp >= 30) {
+  // Acceptable : opp 25-38 (baissé aussi pour matcher).
+  if (opp >= 25) {
     if (trustTier === 'low') {
       return { verdict: 'skip', label: 'À éviter', score: Math.min(25, opp), tone: 'red', reason: `Edge faible ET segment ${trustRoiPct.toFixed(1)}%` };
     }
