@@ -591,8 +591,11 @@ PAGE_TEMPLATE = '''<!DOCTYPE html>
 <meta property="og:title" content="Backtest — Performance vérifiable du modèle Paris-Sportif">
 <meta property="og:description" content="WR {wr_str} · ROI flat {roi_str} · Brier {brier_str} · {n} picks · backtest hebdo">
 <meta property="og:url" content="https://harotensnor.github.io/paris-sportif/backtest.html">
-<meta property="og:image" content="https://harotensnor.github.io/paris-sportif/icon-512.png">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://harotensnor.github.io/paris-sportif/og-backtest.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Backtest — Paris-Sportif">
+<meta name="twitter:description" content="Performance vérifiable du modèle : ROI, Win Rate, Brier, calibration sur 600+ picks réglés. Indexable et reproductible.">
+<meta name="twitter:image" content="https://harotensnor.github.io/paris-sportif/og-backtest.png">
 <meta name="theme-color" content="#08080a">
 
 <script type="application/ld+json">
