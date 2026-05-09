@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-09T04:35:28Z",
+  "generated_at": "2026-05-09T04:39:34Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -2257,13 +2257,13 @@
         "Deplacement estime 3100 km, decalage ~2.3h"
       ],
       "global_resolution": {
-        "status": "mixed",
+        "status": "abstain",
         "net_side": null,
-        "home_score": 0.705,
-        "away_score": -1.538,
+        "home_score": -0.645,
+        "away_score": -0.538,
         "home_fade": 0.95,
-        "away_fade": 1.871,
-        "reason": "Signaux mitigés: avantage net trop faible (Los Angeles Dodgers +0.70, Atlanta Braves -1.54)",
+        "away_fade": 0.871,
+        "reason": "Signaux opposes: Los Angeles Dodgers fade 0.95, Atlanta Braves fade 0.87 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -2282,18 +2282,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
           },
           {
             "side": "away",
