@@ -4608,7 +4608,8 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     } catch (err) { /* swallowError */ }
   }, true);
   // v45.13 — CSV export + reset bets handlers.
-  document.addEventListener('click', (e) => {
+  // v50.2 — Marqué async pour permettre `await window._showConfirm` dans le clearBtn handler ci-dessous.
+  document.addEventListener('click', async (e) => {
     const exportBtn = e.target && e.target.closest ? e.target.closest('[data-v45-export-bets]') : null;
     if (exportBtn) {
       e.preventDefault();
