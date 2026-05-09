@@ -343,6 +343,15 @@ def lookup_catalog(event: dict) -> dict | None:
         if _leagues_match(league_name, t.get('tournament_name') or ''):
             candidates.append(t)
 
+    # Stage 1c (v52.9 — tennis fix) : si league_name ne matche pas, pour le
+    # tennis, on tente un match PLAYER-LEVEL contre tous les tennis tournaments.
+    # Raison : ESPN appelle Rome "Internazionali BNL d'Italia" / Madrid "Mutua
+    # Madrid Open" / etc, alors que Winamax les nomme "Rome", "Madrid", etc.
+    # Le match-level resolution suffit à identifier le bon tournoi via le couple
+    # (home, away) joueurs. C'est plus robuste que d'aliaser ~70 tournois.
+    if not candidates and sport == 'tennis':
+        candidates = list(tourns)
+
     if not candidates:
         return {
             'available': False,
