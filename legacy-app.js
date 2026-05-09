@@ -19477,7 +19477,7 @@ const v45GeniusBannerHtml = (() => {
         <div style="font-size:13px;line-height:1.6;color:var(--text-dim);margin-top:10px;">
           <b style="color:var(--text);">Aucun pick "Genius" qualifié aujourd'hui.</b> Le modèle est conservateur — c'est OK,
           un jour sans pari fiable est mieux qu'un pari forcé. Critères stricts :
-          edge ≥ 7pt + conf ≥ 55% + cote 1.50-8.0 + segment trust positif + match &lt; 30h.
+          edge ≥ 12pt OU net edge ≥ 5pt (segment-aware) + conf ≥ 55% + cote 1.30-8.0 + match &lt; 30h.
         </div>
         <div style="margin-top:10px;padding:8px 10px;background:rgba(15,15,20,.4);border-radius:6px;font-size:11px;color:var(--text-dim2);line-height:1.5;">
           ⚠ <b>Honnêteté</b> : aucun pari n'est "garanti gagnant". L'objectif est <b>+EV long terme</b>
@@ -19520,7 +19520,7 @@ const v45GeniusBannerHtml = (() => {
       <strong style="display:flex;align-items:center;gap:8px;font-size:14px;flex-wrap:wrap;">
         <span style="font-size:20px;">🧠</span>
         Genius Mode · TOP ${v45GeniusPicks.length} pick${v45GeniusPicks.length > 1 ? 's' : ''} du jour
-        <span style="padding:2px 8px;background:rgba(168,85,247,.2);border:1px solid rgba(168,85,247,.5);border-radius:999px;font-size:11px;font-weight:800;color:#a855f7;">edge ≥7pt · conf ≥55% · segment positif</span>
+        <span style="padding:2px 8px;background:rgba(168,85,247,.2);border:1px solid rgba(168,85,247,.5);border-radius:999px;font-size:11px;font-weight:800;color:#a855f7;">edge ≥12pt ou net ≥5pt · conf ≥55%</span>
       </strong>
       <div style="font-size:12px;color:var(--text-dim);margin:8px 0 12px;line-height:1.5;">
         Filtrage ULTRA strict : seuls les picks avec marge mathématique élevée + données fiables.
