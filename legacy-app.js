@@ -8440,15 +8440,32 @@ setText('trust-n', overall.n);
 // v42 fix : kick off un fetch direct ici car v37ClvState (dans renderDashboardPage)
 // n'est pas garanti d'être chargé quand updateTrustStrip s'exécute. On
 // fetch indépendamment + cache 5min + update setText quand data arrive.
+// AUDIT 2026-05-09 v45.B — CLV widget richer.
+// Avant : mean_clv_pct (observations level, -0.03%) → trompeur.
+// Maintenant : pick_mean_clv_pct (pick level, -0.77%) + tooltip détaillé +
+// indicateur target (+1% = sharp threshold).
 const _setClvWidget = (clvData) => {
-  const meanClv = Number(clvData?.summary?.mean_clv_pct);
-  if (!Number.isFinite(meanClv)) return;
-  const sign = meanClv >= 0 ? '+' : '';
-  setText('trust-clv', `${sign}${meanClv.toFixed(2)}%`);
+  const summary = clvData?.summary || {};
+  const pickClv = Number(summary.pick_mean_clv_pct);
+  const positiveRate = Number(summary.positive_clv_rate);
+  const nPicks = Number(summary.n_pick_clv_observations);
+  // Fallback : si pick-level absent, fallback sur observation-level (legacy).
+  const useClv = Number.isFinite(pickClv) ? pickClv : Number(summary.mean_clv_pct);
+  if (!Number.isFinite(useClv)) return;
+  const sign = useClv >= 0 ? '+' : '';
+  setText('trust-clv', `${sign}${useClv.toFixed(2)}%`);
   const el = document.getElementById('trust-clv');
   if (el) {
-    el.style.color = meanClv >= 0 ? '#34d399' : '#f87171';
+    // Color tier : > +0.5% green, > 0% pale green, > -1% orange, else red.
+    const color = useClv >= 0.5 ? '#34d399' : useClv >= 0 ? '#a3e635' : useClv >= -1 ? '#fbbf24' : '#f87171';
+    el.style.color = color;
     el.style.fontWeight = '700';
+    // Update tooltip on parent span
+    const parent = el.closest('.trust-strip-stat');
+    if (parent && Number.isFinite(positiveRate)) {
+      const status = useClv >= 1 ? 'beat the market' : useClv >= 0 ? 'breakeven CLV' : useClv >= -1 ? 'légèrement en dessous' : 'edge insuffisant';
+      parent.title = `CLV pick-level : ${sign}${useClv.toFixed(2)}% sur ${nPicks || '?'} paris · ${positiveRate.toFixed(1)}% positifs · target sharp = +1% · status : ${status}`;
+    }
   }
 };
 // Tente d'abord avec le state existant (sync hit si déjà chargé)
@@ -8703,6 +8720,28 @@ return p;
 }
 try { window.SUPPORTED_SPORTS = SUPPORTED_SPORTS; } catch(e) { swallowError(e); }
 try { window.MODEL_PROB_CAP = MODEL_PROB_CAP; } catch(e) { swallowError(e); }
+// AUDIT 2026-05-09 v45.A — Platt scaling boost sur bins underconfident.
+// Backtest_report_v2 ECE bins (n=639 skip tier) :
+//   prob 60-70% : predicted 64.5% / actual 69.7% (gap +5.2pt sous-confident)
+//   prob 70-80% : predicted 74.2% / actual 80.5% (gap +6.3pt sous-confident)
+//   prob 50-60% : predicted 54.6% / actual 56.7% (gap +2.0pt léger)
+// Le modèle SOUS-ESTIME systématiquement les picks 50-80%. Conséquence :
+// rel insuffisant → opp insuffisant → verdict skip ou watch. On corrige
+// par une fonction de scaling piecewise linéaire qui respecte les bornes
+// observées et reste stable hors plage (pas de boost extrapolé sauvage).
+function _v45PlattBoost(rel) {
+  if (!Number.isFinite(rel) || rel <= 0 || rel >= 1) return rel;
+  // Boost factors mesurés sur 639 picks settled :
+  // [0.5, 0.6) → +2.0pt
+  // [0.6, 0.7) → +5.2pt (cap 5pt safety)
+  // [0.7, 0.8) → +6.3pt (cap 6pt safety)
+  // outside → no change
+  if (rel < 0.50) return rel;
+  if (rel < 0.60) return Math.min(0.95, rel + 0.020);
+  if (rel < 0.70) return Math.min(0.95, rel + 0.050);
+  if (rel < 0.80) return Math.min(0.95, rel + 0.060);
+  return rel; // 80%+ left as-is, n=15 trop petit pour calibrer
+}
 function _applyCalibration(p, match) {
 if (!p || !isFinite(p.reliability) || p.calibrated) {
 return _capModelProbability(_markSuspectIfHugeEdge(p, match));
@@ -8711,9 +8750,11 @@ const sport = match && match.sport ? match.sport : null;
 const leagueCode = match && match.league_code ? match.league_code : null;
 const adjusted = _calibrateProb(p.reliability, sport, leagueCode, '1n2');
 const adjustedV5 = applyCalibrationMethodV5(adjusted, sport);
-const out = adjustedV5 === p.reliability
+// v45.A — Apply Platt boost AFTER existing calibration (orthogonal corrections).
+const adjustedPlatt = _v45PlattBoost(adjustedV5);
+const out = adjustedPlatt === p.reliability
 ? p
-: { ...p, reliability: adjustedV5, reliability_raw: p.reliability, calibrated: true, calibration_v5: adjustedV5 !== adjusted };
+: { ...p, reliability: adjustedPlatt, reliability_raw: p.reliability, calibrated: true, calibration_v5: adjustedV5 !== adjusted, calibration_platt_v45: adjustedPlatt !== adjustedV5 };
 return _capModelProbability(_markSuspectIfHugeEdge(out, match));
 }
 function _capModelProbability(p) {
@@ -15697,7 +15738,7 @@ div.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-
 div.innerHTML = `
         <div style="background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:24px;width:min(360px,94vw);box-shadow:0 16px 48px rgba(0,0,0,.5);">
           <h3 id="__stake-prompt-title" style="margin:0 0 6px;font-size:16px;color:var(--text);font-weight:700;">💰 ${esc(label)}</h3>
-          <div style="font-size:12px;color:var(--text-dim);margin-bottom:12px;">Mise suggérée par Kelly. Modifie si tu veux.</div>
+          <div style="font-size:12px;color:var(--text-dim);margin-bottom:12px;">Mise suggérée FLAT 1u (Kelly bankrupted -30% en backtest historique).</div>
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:14px;">
             <input id="__stake-input" type="number" aria-label="Montant de la mise en euros" step="0.10" min="0.10" max="10000" value="${esc(suggested)}" autofocus style="flex:1;padding:10px 12px;background:var(--panel-2,rgba(255,255,255,.04));border:1px solid var(--border-2);color:var(--text);border-radius:8px;font-size:16px;font-variant-numeric:tabular-nums;">
             <span style="color:var(--text-dim);font-size:14px;">€</span>
@@ -20246,23 +20287,45 @@ if (bs !== as) return bs - as;
 return (b.rel * b.odd - 1) - (a.rel * a.odd - 1);
 })
 .slice(0, 6);
+// AUDIT 2026-05-09 v45.C — Pivot Kelly → FLAT 1u par défaut.
+// Backtest_strategies.json prouve que Kelly_full = -30% ROI / max_dd 99.99%
+// (total wipeout) et flat = +19% ROI. Le default doit être FLAT 1u (= 1% du
+// bankroll). Mode Kelly reste accessible via toggle pour usage avancé.
+const _v45StakeMode = (() => {
+  try {
+    const m = localStorage.getItem('v45_stake_mode');
+    if (m === 'kelly') return 'kelly';
+    return 'flat'; // default
+  } catch (e) { return 'flat'; }
+})();
+const _v45FlatStake = (bk) => Math.max(1, Math.round((Number(bk) || 100) * 0.01));
 const _enrichPick = (x) => {
 const xx = x.best ? { ...x, odd: x.best.odd, rel: x.best.rel, edge: x.best.edge } : x;
 const investment = xx.investment || investmentScore(xx.rel, xx.odd, (() => {
 try { return (typeof computeDataQuality === 'function') ? computeDataQuality(xx.m) : null; }
 catch(e) { return null; }
 })(), { market: xx.best ? xx.best.market : '1n2' });
-const kRaw = (typeof kellyFraction === 'function') ? kellyFraction(xx.rel, xx.odd, 0.25) : 0;
-const k = investment && isFinite(investment.cappedKelly) ? Math.min(kRaw, investment.cappedKelly) : kRaw;
-let stake = userBankroll * k;
-const capAbs = userBankroll * 0.10;
-if (stake > capAbs) stake = capAbs;
-stake = Math.max(1, Math.round(stake));
+let stake;
+if (_v45StakeMode === 'kelly') {
+  // Mode legacy : Kelly fractionnel cap 10% (à utiliser conscientiseé).
+  const kRaw = (typeof kellyFraction === 'function') ? kellyFraction(xx.rel, xx.odd, 0.25) : 0;
+  const k = investment && isFinite(investment.cappedKelly) ? Math.min(kRaw, investment.cappedKelly) : kRaw;
+  stake = userBankroll * k;
+  const capAbs = userBankroll * 0.10;
+  if (stake > capAbs) stake = capAbs;
+  stake = Math.max(1, Math.round(stake));
+} else {
+  // Mode FLAT par défaut (recommandé) : 1% du bankroll = 1u.
+  stake = _v45FlatStake(userBankroll);
+}
 const gain = stake * (xx.odd - 1);
 const ev = (xx.rel > 0 && xx.odd > 1) ? (xx.rel * xx.odd - 1) : 0;
 const { home, away } = (typeof getSides === 'function') ? getSides(xx.m) : { home: {}, away: {} };
-return { ...xx, stake, gain, ev, investment, homeName: home?.name || '?', awayName: away?.name || '?', homeLogo: home?.logo || '', awayLogo: away?.logo || '' };
+return { ...xx, stake, gain, ev, investment, homeName: home?.name || '?', awayName: away?.name || '?', homeLogo: home?.logo || '', awayLogo: away?.logo || '', stakeMode: _v45StakeMode };
 };
+try { window._v45FlatStake = _v45FlatStake; } catch(e) { swallowError(e); }
+try { window._v45StakeMode = () => _v45StakeMode; } catch(e) { swallowError(e); }
+try { window._v45SetStakeMode = (m) => { try { localStorage.setItem('v45_stake_mode', m === 'kelly' ? 'kelly' : 'flat'); } catch(e) {} }; } catch(e) { swallowError(e); }
 const prudentPicksEnriched = prudentPicks.map(_enrichPick);
 const aggressivePicksEnriched = aggressivePicks.map(_enrichPick);
 // AUDIT 2026-05-09 v43.B — Outsider du jour. Backtest leaderboard (1932 picks
