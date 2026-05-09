@@ -8567,6 +8567,36 @@ try {
     .then(j => { if (j) _setClvWidget(j); })
     .catch(() => {});
 } catch (e) { /* swallowError(e); */ }
+// AUDIT 2026-05-09 v45.14 — Daily user P&L widget (24h glissant).
+try {
+  if (typeof window._loadUserBets === 'function') {
+    const bets = window._loadUserBets() || [];
+    const cutoff = Date.now() - 24*3600*1000;
+    let pnl = 0, settled = 0, won = 0;
+    bets.forEach(b => {
+      if (!b.settled) return;
+      const ts = Number(b.settledTs || b.ts || 0);
+      if (ts < cutoff) return;
+      settled++;
+      if (b.result === 'won') won++;
+      pnl += Number(b.pnl || 0);
+    });
+    const el = document.getElementById('trust-user-daily');
+    if (el) {
+      if (settled === 0) {
+        el.textContent = '—';
+        el.style.color = 'var(--text-dim)';
+      } else {
+        const sign = pnl >= 0 ? '+' : '';
+        el.textContent = `${sign}${pnl.toFixed(2)}€`;
+        el.style.color = pnl >= 0 ? '#10b981' : '#ef4444';
+        el.style.fontWeight = '700';
+        const parent = el.closest('.trust-strip-stat');
+        if (parent) parent.title = `P&L 24h glissant : ${sign}${pnl.toFixed(2)}€ sur ${settled} paris settled (${won}W).`;
+      }
+    }
+  }
+} catch (e) { /* swallowError(e); */ }
 // AUDIT 2026-05-09 v45.5 — Paper trading forward ROI widget.
 try {
   const paperBucket = Math.floor(Date.now() / (5 * 60 * 1000));
