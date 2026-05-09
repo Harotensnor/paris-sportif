@@ -18128,19 +18128,16 @@ const v40PickVerdict = (p) => {
   } catch (e) { swallowError(e); }
   return Number(p?.opportunity || 0) >= 45 ? 'bet-light' : 'skip';
 };
-// AUDIT 2026-05-09 v42.fix2 — User signale "1 pari aujourd'hui c'est peu lol".
-// Élargir le strict mode pour inclure aussi les picks "Surveiller" (verdict
-// 'watch') qui ont un edge solide (≥5pt). Logique : si le modèle dit que
-// l'edge dépasse 5pt, c'est mathématiquement bon à parier petit même si
-// l'opportunity score est sous 45 (cas typique : data quality moyenne mais
-// edge clair).
+// AUDIT 2026-05-09 v42.fix3 — Pool reste maigre, abaisse encore le bridge
+// edge 5pt → 3pt pour surfacer plus de candidats les jours où le modèle
+// est conservatif. Conservé safeguards segment trust low.
 const v40IsBettable = (p) => {
   const v = v40PickVerdict(p);
   if (v === 'bet' || v === 'bet-light') return true;
-  // Bridge case : Surveiller avec edge ≥ 5pt = effectivement misable (petit).
+  // Bridge case : Surveiller avec edge ≥ 3pt = misable petit (au lieu de 5pt).
   if (v === 'watch') {
     const edge = Number(p?.edge || 0);
-    if (edge >= 0.05) return true;
+    if (edge >= 0.03) return true;
   }
   return false;
 };
@@ -18522,11 +18519,11 @@ const _v39FinalRec = (p) => {
     const seg = (trustTier === 'low' || trustTier === 'warn') ? ` ⚠ segment ${trustRoiPct.toFixed(1)}%` : '';
     return { verdict: 'bet', label: 'Miser', score: opp, tone: 'green', reason: `Conf ${(rel*100).toFixed(0)}% · Edge ${fmtPct(edge)}${seg}` };
   }
-  // AUDIT 2026-05-09 v42.fix2 — Élargir Petite mise : seuil baissé 45 → 38.
-  // User : "1 pari aujourd'hui c'est peu". Élargit la zone "Petite mise"
-  // pour surfacer plus de candidats actionnables tout en gardant les
-  // safeguards segment.
-  if (opp >= 38) {
+  // AUDIT 2026-05-09 v42.fix3 — Seuil 38 → 32. User signale toujours pool
+  // maigre (1 misable sur 30). Le modèle est conservatif sur les opp scores
+  // mais les picks restent qualité (edge ≥3pt). Diluer light pour avoir
+  // 3-5 candidats min par jour. Quality safeguard via segment trust still.
+  if (opp >= 32) {
     if (trustTier === 'low') {
       return { verdict: 'watch', label: 'Surveiller', score: Math.min(45, opp), tone: 'orange', reason: `Edge OK mais segment ${trustRoiPct.toFixed(1)}% sur ${trustN} paris` };
     }
