@@ -29121,23 +29121,13 @@ academieWrap.id = 'academie-wrap';
 }
 _setRouteWrapActive(academieWrap, isAcademie);
 if (isAcademie) {
+// v46.4 — Render synchrone direct (RAF callback ne firait pas fiablement
+// → wrap restait au skeleton 851b en production).
 _renderPageSkeleton(academieWrap, 'Méthode', 'Méthode & académie', 3);
-// v46.3 — Try/catch + retry pour diagnostiquer pourquoi acad reste 851b skeleton
-requestAnimationFrame(() => {
-  try {
-    renderAcademiePage(academieWrap);
-    if (academieWrap && academieWrap.innerHTML.length < 2000) {
-      // Render didn't produce content, try direct call once more
-      setTimeout(() => {
-        try { renderAcademiePage(academieWrap); } catch (e) {
-          if (typeof prodWarn === 'function') prodWarn('renderAcademiePage retry failed:', e.message || e);
-        }
-      }, 100);
-    }
-  } catch (e) {
-    if (typeof prodWarn === 'function') prodWarn('renderAcademiePage initial failed:', e.message || e);
-  }
-});
+try { renderAcademiePage(academieWrap); }
+catch (e) {
+  if (typeof prodWarn === 'function') prodWarn('renderAcademiePage failed:', e.message || e);
+}
 }
 // v46.3 — Expose render functions sur window pour debug + appel manuel.
 try { window.renderAcademiePage = renderAcademiePage; } catch (e) {}
