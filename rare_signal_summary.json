@@ -1,28 +1,46 @@
 {
-  "generated_at": "2026-05-09T17:05:50Z",
+  "generated_at": "2026-05-09T17:16:18Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 85,
-    "actionable": 41,
+    "actionable": 42,
     "watch": 4,
-    "risk": 40,
+    "risk": 39,
     "expired_sample": 0,
     "by_type": {
+      "injury_imbalance": 37,
       "travel_extreme": 12,
       "back_to_back_travel": 31,
-      "injury_imbalance": 36,
-      "market_uncertain": 33,
+      "market_uncertain": 32,
       "signal_conflict": 8
     },
     "by_quality": {
-      "actionable": 41,
+      "actionable": 42,
       "watch": 4,
-      "risk": 40
+      "risk": 39
     }
   },
   "active_actionable": [
+    {
+      "event_id": "747767",
+      "date": "2026-05-09T18:00Z",
+      "sport": "football",
+      "league_code": "fra.2",
+      "league_name": "Ligue 2",
+      "home": "Saint-Étienne",
+      "away": "SC Amiens",
+      "match": "Saint-Étienne - SC Amiens",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Saint-Étienne",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 5-0"
+    },
     {
       "event_id": "401815268",
       "date": "2026-05-09T19:07Z",
@@ -853,7 +871,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 14.4%"
+      "context": "marge bookmaker anormale 15.5%"
     },
     {
       "event_id": "401842707",
@@ -889,7 +907,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 14.4%"
+      "context": "marge bookmaker anormale 15.5%"
     },
     {
       "event_id": "401867713",
@@ -979,7 +997,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 14.4%"
+      "context": "marge bookmaker anormale 15.5%"
     },
     {
       "event_id": "748956",
@@ -1412,24 +1430,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 19.2%"
-    },
-    {
-      "event_id": "401864050",
-      "date": "2026-05-16T15:00Z",
-      "sport": "football",
-      "league_code": "bundesligaautriche",
-      "league_name": "Bundesliga Autriche",
-      "home": "Wolfsberger",
-      "away": "WSG Swarovski Tirol",
-      "match": "Wolfsberger - WSG Swarovski Tirol",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 19.4%"
     },
     {
       "event_id": "401871337",
