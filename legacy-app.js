@@ -18573,6 +18573,34 @@ window.v43FilterByProfitable = (picks) => {
   return picks.filter(window.v43IsProfitable);
 };
 
+// AUDIT 2026-05-09 v45.C — FLAT staking helpers exposés globalement.
+// Backtest_strategies prouve flat = +19% ROI vs Kelly = -30% (max_dd 100%).
+// Default 'flat' = 1% bankroll par pick. Mode 'kelly' reste accessible.
+window._v45FlatStake = (bankroll) => Math.max(1, Math.round((Number(bankroll) || 100) * 0.01));
+window._v45StakeMode = () => {
+  try {
+    const m = localStorage.getItem('v45_stake_mode');
+    return m === 'kelly' ? 'kelly' : 'flat';
+  } catch (e) { return 'flat'; }
+};
+window._v45SetStakeMode = (mode) => {
+  try {
+    localStorage.setItem('v45_stake_mode', mode === 'kelly' ? 'kelly' : 'flat');
+    document.dispatchEvent(new CustomEvent('v45:stake-mode-changed', { detail: { mode } }));
+  } catch (e) {}
+};
+window._v45RecommendedStake = (bankroll, rel, odd) => {
+  if (window._v45StakeMode() === 'kelly') {
+    if (typeof window.kellyFraction === 'function') {
+      const k = window.kellyFraction(rel, odd, 0.25);
+      const cap = (Number(bankroll) || 100) * 0.10;
+      const stake = Math.min(cap, (Number(bankroll) || 100) * k);
+      return Math.max(1, Math.round(stake));
+    }
+  }
+  return window._v45FlatStake(bankroll);
+};
+
 // AUDIT 2026-05-08 v39 — Recommandation finale unifiée.
 // User : "il me faut UN SEUL indicateur qui me dit si je peux miser
 // dessus ou pas". Combine cote validation + confiance + edge + score
@@ -18955,9 +18983,11 @@ const v43StrategyBannerHtml = `<section class="v37-empty-pool-help v43-strategy-
             ${v43ValueListHtml}
           </div>
         </div>
-        <div style="margin-top:10px;padding:8px 12px;background:rgba(15,15,20,0.5);border-radius:6px;font-size:11px;color:var(--text-dim);line-height:1.5;">
-          <b style="color:var(--text);">Rappel :</b> mise <b style="color:#10b981;">FLAT 1u</b> recommandée (Kelly bankrupted -30% en backtest, max_dd 99.99%).
-          Tiers Safe/Solid restent affichés mais sont <b style="color:#ef4444;">historiquement perdants</b>.
+        <div style="margin-top:10px;padding:10px 12px;background:rgba(15,15,20,0.5);border-radius:6px;font-size:11px;color:var(--text-dim);line-height:1.5;display:flex;flex-wrap:wrap;align-items:center;gap:10px;">
+          <span><b style="color:var(--text);">Rappel :</b> mise <b style="color:#10b981;">FLAT 1u</b> recommandée (Kelly bankrupted -30% en backtest, max_dd 99.99%).</span>
+          <span style="color:var(--text-dim2);">Sur ${userBankroll}€ bankroll → 1u = <b style="color:#10b981;">${(typeof window._v45FlatStake === 'function') ? window._v45FlatStake(userBankroll) : Math.round(userBankroll*0.01)}€</b>/pick.</span>
+          <button type="button" onclick="window._v45SetStakeMode(window._v45StakeMode() === 'kelly' ? 'flat' : 'kelly');location.reload();" style="margin-left:auto;padding:3px 10px;background:${(typeof window._v45StakeMode === 'function' && window._v45StakeMode() === 'kelly') ? 'rgba(239,68,68,.2)' : 'rgba(16,185,129,.18)'};border:1px solid ${(typeof window._v45StakeMode === 'function' && window._v45StakeMode() === 'kelly') ? '#ef4444' : '#10b981'};color:${(typeof window._v45StakeMode === 'function' && window._v45StakeMode() === 'kelly') ? '#ef4444' : '#10b981'};border-radius:999px;font-size:10.5px;font-weight:700;cursor:pointer;">${(typeof window._v45StakeMode === 'function' && window._v45StakeMode() === 'kelly') ? '⚠️ Mode Kelly (à éviter)' : '✓ Mode FLAT 1u'}</button>
+          <div style="flex:0 0 100%;color:#ef4444;font-size:10.5px;">Tiers Safe/Solid restent affichés mais sont <b>historiquement perdants</b>.</div>
         </div>
       </section>`;
 
