@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-09T16:44:52Z",
+  "generated_at": "2026-05-09T16:50:11Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -1696,42 +1696,6 @@
             "whip": 1.09
           },
           "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Minnesota Twins",
-          "pitcher": "Taj Bradley",
-          "label": "Taj Bradley plus de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "over",
-          "probability": 0.5003,
-          "fair_odds": 2.0,
-          "expected_strikeouts": 6.5,
-          "projected_ip": 5.88,
-          "inputs": {
-            "k9": 9.96,
-            "era": 2.87,
-            "whip": 1.19,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Minnesota Twins",
-          "pitcher": "Taj Bradley",
-          "label": "Taj Bradley ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5344,
-          "fair_odds": 1.87,
-          "expected_hr_allowed": 0.627,
-          "projected_ip": 5.88,
-          "inputs": {
-            "hr9": 0.96,
-            "era": 2.87,
-            "whip": 1.19
-          },
-          "side": "away"
         }
       ]
     },
@@ -2284,7 +2248,7 @@
       ]
     }
   ],
-  "props": 110,
+  "props": 108,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
