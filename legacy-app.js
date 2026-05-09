@@ -9878,6 +9878,89 @@ nhlStats.away_goalie = aT.goalie;
 }
 }
 }
+// v50.9 — Plan Pronostics Phase 2.1 : signaux NBA dans predictMatch.
+// Avant : aucun signal NBA dans predictMatch (juste form basique). Maintenant :
+// - W/L record diff (ESPN records.summary)
+// - Win pct diff (nba_team_stats.json via patch_nba_team_stats v50.3)
+// - Recent form L10 weighted
+// - Home court advantage (NBA = ~3.5pt → ~5% win prob)
+let nbaStats = null;
+if (match.sport === 'basketball' && match.league_code === 'nba') {
+  const comps = match.competitors || [];
+  const homeC = comps.find(c => c.home_away === 'home') || comps[0];
+  const awayC = comps.find(c => c.home_away === 'away') || comps[1];
+  if (homeC && awayC) {
+    // Win pct via nba_stats (patch_nba_team_stats) ou records ESPN.
+    const homeStats = homeC.nba_stats || {};
+    const awayStats = awayC.nba_stats || {};
+    let homeWP = Number(homeStats.win_pct);
+    let awayWP = Number(awayStats.win_pct);
+    if (!Number.isFinite(homeWP) || !Number.isFinite(awayWP)) {
+      // Fallback : parse ESPN records.summary "W-L"
+      const _parseWL = (records) => {
+        const total = (records || []).find(r => /total|all/i.test(r.type || r.name || ''));
+        if (!total) return null;
+        const m = String(total.summary || '').match(/(\d+)-(\d+)/);
+        if (!m) return null;
+        const w = parseInt(m[1]);
+        const l = parseInt(m[2]);
+        return w + l > 0 ? w / (w + l) : null;
+      };
+      homeWP = _parseWL(homeC.records) || 0.5;
+      awayWP = _parseWL(awayC.records) || 0.5;
+    }
+    // Diff de win pct → proba.
+    const wpDiff = homeWP - awayWP;
+    // NBA home court advantage : ~5% win prob boost.
+    const HOME_ADVANTAGE = 0.055;
+    const pWPHome = Math.max(0.30, Math.min(0.70, 0.5 + 0.45 * wpDiff + HOME_ADVANTAGE));
+    components.push({ w: adaptiveW('Bilan NBA', 0.30), pH: pWPHome, pD: 0, pA: 1 - pWPHome,
+      name: 'Bilan W-L NBA', icon: '🏀' });
+    // Recent form L10 (WWLWLWWLWW format from form_stats or form10).
+    const homeForm = String(homeC.form10 || homeC.team_form_l10 || homeC.form || '');
+    const awayForm = String(awayC.form10 || awayC.team_form_l10 || awayC.form || '');
+    if (homeForm.length >= 5 && awayForm.length >= 5) {
+      const winRatio = (s) => {
+        const wins = (s.match(/W/g) || []).length;
+        return s.length > 0 ? wins / s.length : 0.5;
+      };
+      const hRecent = winRatio(homeForm.slice(0, 10));
+      const aRecent = winRatio(awayForm.slice(0, 10));
+      const formDiff = hRecent - aRecent;
+      const pFormHome = Math.max(0.35, Math.min(0.65, 0.5 + 0.30 * formDiff));
+      components.push({ w: adaptiveW('Forme L10 NBA', 0.20), pH: pFormHome, pD: 0, pA: 1 - pFormHome,
+        name: 'Forme L10 NBA', icon: '📈' });
+    }
+    // Streak (winning/losing) — bonus ou malus modéré.
+    const homeStreak = homeStats.streak || '';
+    const awayStreak = awayStats.streak || '';
+    if (homeStreak && awayStreak) {
+      const _streakNum = (s) => {
+        const m = String(s).match(/(W|L)(\d+)/i);
+        if (!m) return 0;
+        const sign = m[1].toUpperCase() === 'W' ? 1 : -1;
+        return sign * Math.min(10, parseInt(m[2]));
+      };
+      const hStr = _streakNum(homeStreak);
+      const aStr = _streakNum(awayStreak);
+      const streakDiff = hStr - aStr;
+      if (Math.abs(streakDiff) >= 3) {
+        const pStreakHome = Math.max(0.40, Math.min(0.60, 0.5 + 0.015 * streakDiff));
+        components.push({ w: adaptiveW('Streak NBA', 0.10), pH: pStreakHome, pD: 0, pA: 1 - pStreakHome,
+          name: 'Streak (W/L) NBA', icon: '🔥' });
+      }
+    }
+    nbaStats = {
+      home_wp: Math.round(homeWP * 1000) / 1000,
+      away_wp: Math.round(awayWP * 1000) / 1000,
+      wp_diff: Math.round(wpDiff * 1000) / 1000,
+      home_form10: homeForm.slice(0, 10),
+      away_form10: awayForm.slice(0, 10),
+      home_streak: homeStreak,
+      away_streak: awayStreak,
+    };
+  }
+}
 let pitcherStats = null;
 if (match.sport === 'baseball' && match.mlb_pitchers) {
 const mp = match.mlb_pitchers;
