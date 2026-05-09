@@ -13752,18 +13752,16 @@ ${(!weather && !ref && !meetingsCount) ? '<span class="u-text-dim2">Pas de condi
           const dq = (typeof computeDataQuality === 'function') ? computeDataQuality(match) : null;
           const dqWeak = dq && dq.score <= 2;
           if (!top3.length && !risk && !dqWeak) return '';
-          // v52.2 — Audit user feedback : verdict + "Notre pronostic" affichaient
-          // pred.pick (raw 1n2) tandis que "Pourquoi ce pari" affichait
-          // _agentBestPick (souvent autre marché après v52.0 multiplier).
-          // Résultat : modale schizophrène pour l'user (ex: "1 · Clermont" en haut,
-          // "Domicile ou Nul" en bas, deux paris différents !).
-          // Fix : utiliser _agentBestPick ici aussi pour cohérence.
-          // Si _agentBestPick retourne un autre marché, on l'affiche → cohérence
-          // avec la section "Pourquoi ce pari" qui utilise déjà whyBest.
-          const verdictBest = (() => {
-            try { return (typeof _agentBestPick === 'function') ? _agentBestPick(match, pred) : null; }
-            catch(e) { return null; }
-          })();
+          // v52.6 — Aligne le verdict sur whyBest (calculé plus haut via
+          // _agentBestPick). User screenshots 2026-05-09 montraient le bug :
+          // - Synthèse : "Domicile ou Nul @1.56" (utilise whyBest)
+          // - Verdict  : "1 · Clermont Foot @2.60" (utilisait pred.pick.label)
+          // Fix : réutiliser `whyBest` (déjà calculé ligne ~13080) pour
+          // garantir verdict ↔ synthèse ↔ "Pourquoi ce pari" cohérence
+          // sur le même pick. _agentBestPick (qui produit whyBest) reçoit
+          // maintenant le CLV multiplier v52.0 pour pousser DC/htTotal/DNB
+          // au-dessus de 1n2 (cf v52.6 patch _agentBestPick).
+          const verdictBest = whyBest;
           const verdictLabel = verdictBest?.label || pred.pick.label;
           const verdictRel = Number(verdictBest?.rel ?? verdictBest?.prob ?? pred.reliability ?? pred.pick.prob);
           const verdictOdd = Number(verdictBest?.odd || pickOdd || 0);
@@ -17245,9 +17243,24 @@ c.source === 'winamax_exact'
 && c.edge > 0
 );
 const pool = investable.length ? investable : candidates;
+// v52.6 — CLV multiplier (parité avec selectBestMarket v52.0).
+// Sans ce multiplier, _agentBestPick rankait 1n2 trop haut, divergeant
+// de selectBestMarket. Résultat : la synthèse (qui utilise whyBest =
+// _agentBestPick) et le verdict (qui utilise selectBestMarket) pouvaient
+// pointer 2 marchés différents pour le même match.
+const _clvMul = (mk) => {
+  const mm = String(mk || '').toLowerCase();
+  if (mm.includes('httotal') || mm === 'ht_ou' || mm === 'halftimetotal') return 1.30;
+  if (mm === 'dnb') return 1.10;
+  if (mm === 'ou' || mm === 'ou25' || mm === 'ou15' || mm === 'ou35') return 1.05;
+  if (mm === 'btts') return 1.00;
+  if (mm === 'teamtotal') return 0.98;
+  if (mm === '1n2' || mm === 'matchwinner') return 0.85;
+  return 1.00;
+};
 pool.sort((a,b) => {
-const as = a.investment ? a.investment.score : 0;
-const bs = b.investment ? b.investment.score : 0;
+const as = (a.investment ? a.investment.score : 0) * _clvMul(a.market);
+const bs = (b.investment ? b.investment.score : 0) * _clvMul(b.market);
 if (bs !== as) return bs - as;
 if (Math.abs((b.ev || 0) - (a.ev || 0)) > 0.005) return (b.ev || 0) - (a.ev || 0);
 return (b.edge || 0) - (a.edge || 0);
