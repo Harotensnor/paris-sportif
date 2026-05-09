@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-09T07:31:40Z",
+  "generated_at": "2026-05-09T13:19:57Z",
   "method": "Dixon-Coles MLE grid search (ρ ∈ [-0.30, 0.10] step 0.005), λ_h, λ_a fixés à moyenne empirique par ligue. CI 95% via LR test.",
   "min_matches": 40,
   "default_rho": -0.13,
@@ -47,12 +47,12 @@
       "reason": "n=18 < 40"
     },
     "aus.1": {
-      "n": 8,
+      "n": 10,
       "rho_measured": null,
       "rho_literature": -0.12,
       "rho_used": -0.12,
       "source": "literature_fallback",
-      "reason": "n=8 < 40"
+      "reason": "n=10 < 40"
     },
     "aut.1": {
       "n": 11,
@@ -447,12 +447,12 @@
       "reason": "n=19 < 40"
     },
     "ger.2": {
-      "n": 18,
+      "n": 21,
       "rho_measured": null,
       "rho_literature": -0.11,
       "rho_used": -0.11,
       "source": "literature_fallback",
-      "reason": "n=18 < 40"
+      "reason": "n=21 < 40"
     },
     "ger.dfb_pokal": {
       "n": 1,
@@ -471,12 +471,12 @@
       "reason": "n=10 < 40"
     },
     "idn.1": {
-      "n": 20,
+      "n": 21,
       "rho_measured": null,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=20 < 40"
+      "reason": "n=21 < 40"
     },
     "ileaguechampionshipg": {
       "n": 1,
@@ -535,12 +535,17 @@
       "reason": "n=28 < 40"
     },
     "jpn.1": {
-      "n": 39,
-      "rho_measured": null,
+      "n": 40,
+      "rho_measured": -0.19,
       "rho_literature": -0.12,
       "rho_used": -0.12,
       "source": "literature_fallback",
-      "reason": "n=39 < 40"
+      "reason": "CI trop large (0.400) ou fit nul",
+      "log_lik": -112.86,
+      "ci_lo": -0.3,
+      "ci_hi": 0.1,
+      "lambda_h": 1.525,
+      "lambda_a": 1.2
     },
     "laliga2": {
       "n": 3,
