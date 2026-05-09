@@ -9,7 +9,7 @@
   // Si rebase race-conditions reset cette ligne, la valeur en repo reste celle
   // du dernier commit win (souvent cron auto-commit). Pas un bug, juste un
   // artifact des contraintes git race + GH Pages CDN refresh ~10min.
-  const VERSION = 'v52.2';
+  const VERSION = 'v52.1';
   const startedAt = performance.now();
   const chunks = {
     esm: 'src/perf-bootstrap.js',
