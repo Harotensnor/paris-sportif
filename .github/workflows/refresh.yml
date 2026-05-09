@@ -165,8 +165,11 @@ jobs:
           (python3 fetch_referees_soccer.py || true) > /tmp/fetch_refs.log 2>&1 &
           # AUDIT 2026-05-09 v41.10 — The Odds API aggregator (~30 bookmakers).
           # No-op silencieux si secret THE_ODDS_API_KEY absent. Free tier 500/mois.
-          # Cadence : 1×/2h pour respecter le quota (12 runs/jour × 30 = 360/mois).
-          if [ $HOUR_MOD4 -eq 0 ] && [ $MIN_MOD15 -lt 5 ]; then
+          # v47.4 — Cadence assouplie : 1×/2h (avant 1×/4h). Quota free 500/mois,
+          # 12 runs/jour × 30 = 360/mois → safe. Permet du multi-book live qui
+          # bouge typiquement toutes les 1-2h sur Pinnacle / consensus.
+          MIN_MOD30=$(( $(date +%M) % 30 ))
+          if [ $(( $(date +%H) % 2 )) -eq 0 ] && [ $MIN_MOD30 -lt 10 ]; then
             (THE_ODDS_API_KEY="${{ secrets.THE_ODDS_API_KEY }}" python3 fetch_odds_aggregator.py || true) > /tmp/fetch_odds_agg.log 2>&1 &
           fi
           # Wait pour TOUS les jobs background lancés
