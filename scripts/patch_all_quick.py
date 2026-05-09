@@ -891,12 +891,18 @@ def patch_team_stats(data: dict) -> int:
 
 
 def patch_footballdata(data: dict) -> int:
-    """Enrich foot events with football-data.co.uk closing odds."""
+    """Enrich foot events with football-data.co.uk closing odds.
+
+    v50.3 — Audit silent failures : le patcher lisait `fd.get('by_match')` mais
+    le fichier footballdata.json.gz a clé `matches` (9518 entrées indexées
+    `home|away|YYYY-MM-DD`). Schema mismatch comme team_stats v50.0. Fix :
+    fallback `matches` → `by_match` pour transition.
+    """
     fd = _load_json(ROOT / 'footballdata.json')
     if not fd:
         return 0
     n = 0
-    by_match = fd.get('by_match') or {}
+    by_match = fd.get('matches') or fd.get('by_match') or {}
     if not by_match:
         return 0
     for evs in (data.get('days') or {}).values():
@@ -977,21 +983,37 @@ def patch_nhl_stats(data: dict) -> int:
 
 
 def patch_nba_team_stats(data: dict) -> int:
-    """Enrich NBA events with team stats from ESPN."""
+    """Enrich NBA events with team stats from ESPN.
+
+    v50.3 — Audit silent failures : le patcher lisait `ns.get('by_team')` indexé
+    par `_norm(name)` mais le fichier a `teams` indexé par abréviation (DET,
+    BOS, etc). Schema mismatch comme team_stats v50.0 + footballdata v50.3.
+    Fix : lookup par abbr d'abord, fallback _norm(name).
+    """
     ns = _load_json(ROOT / 'nba_team_stats.json')
     if not ns:
         return 0
-    by_team = ns.get('by_team') or {}
-    if not by_team:
+    teams_idx = ns.get('teams') or ns.get('by_team') or {}
+    if not teams_idx:
         return 0
+    # Build a name-based index for fallback (some sources may index by name).
+    by_name = {}
+    for k, v in teams_idx.items():
+        if isinstance(v, dict):
+            nm = v.get('name', '')
+            if nm:
+                by_name[_norm(nm)] = v
     n = 0
     for evs in (data.get('days') or {}).values():
         for ev in (evs or []):
             if ev.get('league_code') != 'nba':
                 continue
             for c in (ev.get('competitors') or []):
-                key = _norm(c.get('name') or '')
-                stats = by_team.get(key)
+                # Try abbr first (DET, BOS, etc.), fallback to normalized name.
+                abbr = (c.get('abbr') or '').upper()
+                stats = teams_idx.get(abbr) if abbr else None
+                if not stats:
+                    stats = by_name.get(_norm(c.get('name') or ''))
                 if stats:
                     c['nba_stats'] = stats
                     n += 1

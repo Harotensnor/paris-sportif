@@ -80,6 +80,20 @@ jobs:
       - name: Install Python test runner
         run: python -m pip install pytest
 
+      # v50.3 — Audit 2026-05-09 : v49.9 a déployé legacy-app.js avec une SyntaxError
+      # (await dans handler non-async ligne 4651). Le site est resté cassé ~30 min
+      # parce qu'aucun check syntaxe ne tournait avant deploy. Maintenant : node --check
+      # sur les bundles JS critiques en premier, et c'est BLOQUANT (fail-fast).
+      - name: JS syntax check (fail fast)
+        run: |
+          echo "Validating JS syntax for critical bundles..."
+          node --check legacy-app.js && echo "  legacy-app.js OK"
+          node --check app.js && echo "  app.js OK"
+          node --check sw.js && echo "  sw.js OK"
+          if [ -f app-enhancements.js ]; then node --check app-enhancements.js && echo "  app-enhancements.js OK"; fi
+          if [ -f app-i18n.js ]; then node --check app-i18n.js && echo "  app-i18n.js OK"; fi
+          echo "All JS bundles syntax OK"
+
       - name: Fast QA gate
         run: python scripts/qa_gate_report.py
 
