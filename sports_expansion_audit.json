@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-09T00:00:46Z",
+  "generated_at": "2026-05-09T00:05:57Z",
   "source": "local data.js + sports sidecars",
   "status": "ok",
   "sections": {
@@ -19,13 +19,23 @@
       "data_events": 0,
       "sofascore_events": 3,
       "samples": [],
-      "derived_events": 14,
-      "derived_markets": 84
+      "derived_events": 17,
+      "derived_markets": 102
     },
     "J4_baseball_major_props_pool": {
-      "data_events": 45,
+      "data_events": 47,
       "sofascore_events": 46,
       "samples": [
+        {
+          "event": "Tampa Bay Rays at Boston Red Sox",
+          "league": "MLB",
+          "code": "mlb"
+        },
+        {
+          "event": "St. Louis Cardinals at San Diego Padres",
+          "league": "MLB",
+          "code": "mlb"
+        },
         {
           "event": "Houston Astros at Cincinnati Reds",
           "league": "MLB",
@@ -40,19 +50,9 @@
           "event": "Athletics Athletics at Baltimore Orioles",
           "league": "MLB",
           "code": "mlb"
-        },
-        {
-          "event": "Los Angeles Angels at Toronto Blue Jays",
-          "league": "MLB",
-          "code": "mlb"
-        },
-        {
-          "event": "Tampa Bay Rays at Boston Red Sox",
-          "league": "MLB",
-          "code": "mlb"
         }
       ],
-      "pitcher_records": 83,
+      "pitcher_records": 55,
       "player_prop_events": 35,
       "player_props": 122
     },
@@ -92,26 +92,16 @@
       "sofascore_events": 20,
       "samples": [
         {
-          "event": "Nacional at Deportes Tolima",
-          "league": "Copa Libertadores",
-          "code": "conmebol.libertadores"
+          "event": "Manchester City at Chelsea",
+          "league": "FA Cup",
+          "code": "eng.fa_cup"
         }
       ]
     },
     "J7_asie_latam": {
-      "data_events": 11,
+      "data_events": 10,
       "sofascore_events": 66,
       "samples": [
-        {
-          "event": "Qingdao Hainiu at Wuhan Three Towns",
-          "league": "Chinese Super League",
-          "code": "chn.1"
-        },
-        {
-          "event": "Nacional at Deportes Tolima",
-          "league": "Copa Libertadores",
-          "code": "conmebol.libertadores"
-        },
         {
           "event": "Chongqing Tonglianglong at Shanghai Shenhua",
           "league": "Chinese Super League",
@@ -124,6 +114,16 @@
         },
         {
           "event": "Wuhan Three Towns at Qingdao West Coast",
+          "league": "Chinese Super League",
+          "code": "chn.1"
+        },
+        {
+          "event": "Shandong Taishan at Shenzhen Xinpengcheng",
+          "league": "Chinese Super League",
+          "code": "chn.1"
+        },
+        {
+          "event": "Yunnan Yukun at Liaoning Tieren",
           "league": "Chinese Super League",
           "code": "chn.1"
         }
