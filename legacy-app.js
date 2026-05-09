@@ -9918,6 +9918,34 @@ nhlStats.home_goalie = hT.goalie;
 nhlStats.away_goalie = aT.goalie;
 }
 }
+// v51.6 — Advanced NHL team stats (patch_nhl_advanced v51.5).
+const hockeyHomeC = (match.competitors || []).find(c => c.home_away === 'home');
+const hockeyAwayC = (match.competitors || []).find(c => c.home_away === 'away');
+if (hockeyHomeC && hockeyAwayC) {
+  const hAdv = hockeyHomeC.nhl_advanced || {};
+  const aAdv = hockeyAwayC.nhl_advanced || {};
+  // Power play % differential : team avec PP% supérieur capitalise plus sur penalties
+  if (hAdv.power_play_pct && aAdv.power_play_pct) {
+    const ppDiff = hAdv.power_play_pct - aAdv.power_play_pct;
+    const pPpHome = Math.max(0.45, Math.min(0.55, 0.5 + 0.20 * ppDiff));
+    components.push({ w: adaptiveW('PP% NHL', 0.08), pH: pPpHome, pD: 0, pA: 1 - pPpHome,
+      name: 'Power Play % NHL', icon: '⚡' });
+  }
+  // Penalty kill % : meilleur PK = défense penalties supérieure
+  if (hAdv.penalty_kill_pct && aAdv.penalty_kill_pct) {
+    const pkDiff = hAdv.penalty_kill_pct - aAdv.penalty_kill_pct;
+    const pPkHome = Math.max(0.45, Math.min(0.55, 0.5 + 0.20 * pkDiff));
+    components.push({ w: adaptiveW('PK% NHL', 0.06), pH: pPkHome, pD: 0, pA: 1 - pPkHome,
+      name: 'Penalty Kill % NHL', icon: '🛡️' });
+  }
+  // Face-off win % : possession control
+  if (hAdv.face_off_win_pct && aAdv.face_off_win_pct) {
+    const fowDiff = hAdv.face_off_win_pct - aAdv.face_off_win_pct;
+    const pFowHome = Math.max(0.47, Math.min(0.53, 0.5 + 0.10 * fowDiff));
+    components.push({ w: adaptiveW('FOW% NHL', 0.04), pH: pFowHome, pD: 0, pA: 1 - pFowHome,
+      name: 'Face-Off Win % NHL', icon: '🏒' });
+  }
+}
 }
 // v50.9 — Plan Pronostics Phase 2.1 : signaux NBA dans predictMatch.
 // Avant : aucun signal NBA dans predictMatch (juste form basique). Maintenant :
