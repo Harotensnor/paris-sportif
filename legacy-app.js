@@ -28981,7 +28981,14 @@ const comb = document.getElementById('combines-wrap');
 if (comb) _setRouteWrapActive(comb, isCombines);
 if (isCombines && typeof renderCombines === 'function') {
   try { renderCombines(); } catch(e) { swallowError(e); }
+  // v46.5 — Retry render quand full data arrive (combines avait pas le pattern
+  // _ensureFullData().then(re-render) que historique/perf/bilan ont).
+  if (window.PRONOSTICS_DATA && window.PRONOSTICS_DATA._lite && typeof window._ensureFullData === 'function') {
+    window._ensureFullData().then(() => { try { renderCombines(); } catch(e) { swallowError(e); } }).catch(() => {});
+  }
 }
+// v46.5 — Expose renderCombines pour debug + invocation manuelle.
+try { window.renderCombines = renderCombines; } catch (e) {}
 
 let historiqueWrap = document.getElementById('historique-wrap');
 if (!historiqueWrap) {
