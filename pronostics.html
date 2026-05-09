@@ -923,7 +923,7 @@
       <div class="v36-hidden-controls" aria-hidden="true">
         <div class="date-nav">
           <button id="prev-day" type="button" title="Jour précédent" aria-label="Aller au jour précédent">◀</button>
-          <button id="today-btn" class="today-btn" title="Aujourd'hui">Aujourd'hui</button>
+          <button type="button" id="today-btn" class="today-btn" title="Aujourd'hui">Aujourd'hui</button>
           <button id="next-day" type="button" title="Jour suivant" aria-label="Aller au jour suivant">▶</button>
         </div>
         <input type="date" id="date" class="date-picker" aria-label="Sélectionner une date">
@@ -931,7 +931,7 @@
       </div>
     </div>
 
-    <button class="topbar-menu" id="hamburger" aria-label="Menu" aria-controls="page-nav" aria-expanded="false">☰</button>
+    <button type="button" class="topbar-menu" id="hamburger" aria-label="Menu" aria-controls="page-nav" aria-expanded="false">☰</button>
   </div>
 
   <!-- v31.7.51 — Sports sub-bar retirée. Les filtres par sport sont inline
@@ -978,24 +978,24 @@
      + combinés côté Picks, matchs/compare côté Explorer, simulateur côté
      Performance. Les deeplinks/bookmarks restent préservés. -->
 <nav class="topbar-nav v36-sidebar" id="page-nav" aria-label="Navigation principale">
-  <button class="page-btn v36-nav-item active" data-page="dashboard">
+  <button type="button" class="page-btn v36-nav-item active" data-page="dashboard">
     <span class="v36-nav-ico" aria-hidden="true">⌂</span>
     <span class="v36-nav-copy"><strong>Accueil</strong><em>5 niveaux de cotes</em></span>
     <span class="count" id="count-dashboard-actions" style="display:none;"></span>
   </button>
-  <button class="page-btn v36-nav-item" data-page="tous">
+  <button type="button" class="page-btn v36-nav-item" data-page="tous">
     <span class="v36-nav-ico" aria-hidden="true">≡</span>
     <span class="v36-nav-copy"><strong>Tous</strong><em>Marchés filtrables</em></span>
   </button>
-  <button class="page-btn v36-nav-item" data-page="performance">
+  <button type="button" class="page-btn v36-nav-item" data-page="performance">
     <span class="v36-nav-ico" aria-hidden="true">↗</span>
     <span class="v36-nav-copy"><strong>Mes paris</strong><em>Performance, historique</em></span>
   </button>
-  <button class="page-btn v36-nav-item" data-page="academie">
+  <button type="button" class="page-btn v36-nav-item" data-page="academie">
     <span class="v36-nav-ico" aria-hidden="true">?</span>
     <span class="v36-nav-copy"><strong>Méthode</strong><em>Comprendre les picks</em></span>
   </button>
-  <button class="page-btn v36-nav-item" data-page="profil">
+  <button type="button" class="page-btn v36-nav-item" data-page="profil">
     <span class="v36-nav-ico" aria-hidden="true">⚙</span>
     <span class="v36-nav-copy"><strong>Réglages</strong><em>Profil, data, alertes</em></span>
     <span class="count" id="count-sante-alerts" title="Alertes santé non lues"></span>
@@ -1060,7 +1060,7 @@
 
 <div class="content">
   <main id="main-content" tabindex="-1">
-    <button class="agent-return" id="agent-return-btn" aria-label="Retour à l'Accueil">
+    <button type="button" class="agent-return" id="agent-return-btn" aria-label="Retour à l'Accueil">
       <span style="font-size:14px;line-height:1;">←</span>
       <span>Retour à l'Accueil</span>
     </button>
@@ -1213,7 +1213,7 @@
           <span style="opacity:.65;font-size:11px;">↗</span>
         </a>
         <button id="share-detail" type="button" class="modal-close" aria-label="Partager ce match" title="Partager — copie un lien vers ce match" style="padding:6px 10px;font-size:13px;">📤 Partager</button>
-        <button class="modal-close" id="close-detail" aria-label="Fermer la fenêtre de détails">Fermer ✕</button>
+        <button type="button" class="modal-close" id="close-detail" aria-label="Fermer la fenêtre de détails">Fermer ✕</button>
       </div>
     </div>
     <div class="modal-body" id="detail-body"></div>
@@ -1447,7 +1447,7 @@
     if (!best) {
       overlay.innerHTML = `
         <div class="qb-card">
-          <button class="close" data-close aria-label="Fermer">×</button>
+          <button type="button" class="close" data-close aria-label="Fermer">×</button>
           <h2>🎯 Que parier maintenant ?</h2>
           <div class="empty">
             <div style="font-size:40px;margin-bottom:10px;">🤷</div>
@@ -1481,7 +1481,7 @@
     // confiance + la raison, et ferme.
     overlay.innerHTML = `
       <div class="qb-card">
-        <button class="close" data-close aria-label="Fermer">×</button>
+        <button type="button" class="close" data-close aria-label="Fermer">×</button>
         <h2>🎯 Meilleur pari maintenant</h2>
         <div class="team">${esc(homeName)} vs ${esc(awayName)}</div>
         <div class="meta">${hour ? hour + ' · ' : ''}${esc(m.league_name || m.league_code || '')} · cote @${odd.toFixed(2)}</div>
@@ -1494,7 +1494,7 @@
         <div class="reason">💡 ${reason}</div>
 
         <div class="cta" style="justify-content:flex-end;">
-          <button class="secondary" data-close>Fermer</button>
+          <button type="button" class="secondary" data-close>Fermer</button>
         </div>
       </div>`;
 

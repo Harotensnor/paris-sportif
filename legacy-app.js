@@ -4646,7 +4646,16 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     if (clearBtn) {
       e.preventDefault();
       e.stopPropagation();
-      const ok = confirm('Reset complet des paris suivis ? Cette action est irréversible.');
+      // v49 — Audit point : utiliser _showConfirm pour cohérence PWA standalone (le natif confirm() est bloqué iOS Safari standalone).
+      const ok = (typeof window._showConfirm === 'function')
+        ? await window._showConfirm({
+            title: '🗑 Reset complet des paris suivis ?',
+            body: 'Cette action est irréversible.',
+            confirmLabel: 'Reset',
+            cancelLabel: 'Annuler',
+            danger: true,
+          })
+        : window.confirm('Reset complet des paris suivis ? Cette action est irréversible.');
       if (!ok) return;
       try {
         localStorage.removeItem('paris_sportif_user_bets');
@@ -35280,13 +35289,21 @@ try {
           cta.textContent = 'Ajouter à l\'écran';
           cta.title = 'iOS : tape sur Partager ⬆ puis "Sur l\'écran d\'accueil"';
           cta.removeAttribute('data-pwa-install-cta');
-          cta.addEventListener('click', (e) => {
+          cta.addEventListener('click', async (e) => {
             e.preventDefault();
-            if (typeof toast === 'function') {
-              toast('iOS : tape sur Partager ⬆ en bas puis "Sur l\'écran d\'accueil"', 'info');
-            } else {
-              alert('Pour installer sur iOS :\n1. Tape sur Partager ⬆ en bas\n2. Choisis "Sur l\'écran d\'accueil"');
+            // v49.9 — Audit re-check : alert() bloqué en PWA standalone iOS Safari.
+            // Préfère _showConfirm modal custom + fallback toast au lieu de alert().
+            if (typeof window._showConfirm === 'function') {
+              await window._showConfirm({
+                title: '📱 Installer sur iOS',
+                body: 'Pour installer Paris-Sportif sur ton iPhone/iPad :<br><br>1. Tape sur le bouton <b>Partager ⬆</b> en bas de Safari<br>2. Choisis <b>"Sur l\'écran d\'accueil"</b><br>3. Confirme avec "Ajouter"<br><br><span style="color:var(--text-dim);font-size:12px;">L\'app fonctionnera offline et apparaîtra comme une vraie app native.</span>',
+                confirmLabel: 'OK, j\'ai compris',
+                cancelLabel: 'Plus tard',
+              });
+            } else if (typeof toast === 'function') {
+              toast('iOS : tape sur Partager ⬆ en bas puis "Sur l\'écran d\'accueil"', 'info', { duration: 6000 });
             }
+            // Pas de fallback alert() — iOS standalone le bloque silencieusement.
           });
         }
       }
