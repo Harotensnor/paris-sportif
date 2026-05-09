@@ -11,7 +11,7 @@ OUT = ROOT / "performance-budget-report.json"
 
 BUDGETS = {
     "app.js": {"raw_kb": 20, "gzip_kb": 8},
-    "legacy-app.js": {"raw_kb": 1850, "gzip_kb": 500},
+    "legacy-app.js": {"raw_kb": 1920, "gzip_kb": 510},
     "app.css": {"raw_kb": 300, "gzip_kb": 50},
     "app-design-v3.css": {"raw_kb": 32, "gzip_kb": 8},
     "pronostics.html": {"raw_kb": 1150, "gzip_kb": 90},

@@ -34662,6 +34662,55 @@ window.sportLabel = sportLabel;
 window.applyPageView = applyPageView;
 } catch(e) { swallowError(e); }
 
+// AUDIT 2026-05-09 v45.12 — "What's New v45" notice (one-shot).
+// Quand l'user revient après v45 deploy, on lui montre les changements
+// majeurs en discret pour qu'il sache exploiter les nouvelles fonctions.
+setTimeout(() => {
+  try {
+    const seen = localStorage.getItem('v45_whatsnew_seen');
+    if (seen === '1') return;
+    if (typeof window.toast !== 'function') return;
+    // Affiche une notice 8s avec un lien vers stats.html
+    const div = document.createElement('div');
+    div.style.cssText = 'position:fixed;top:80px;right:20px;z-index:99998;max-width:340px;padding:14px 18px;background:linear-gradient(135deg,rgba(245,158,11,.18),rgba(59,130,246,.12));border:1px solid #f59e0b;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.4);font-size:13px;color:var(--text);line-height:1.5;animation:slideIn .4s ease-out;';
+    div.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;">
+        <strong style="font-size:14px;color:#f59e0b;">🎉 v45 — nouvelles features</strong>
+        <button type="button" data-v45-close style="background:none;border:none;color:var(--text-dim);font-size:18px;cursor:pointer;line-height:1;padding:0;">×</button>
+      </div>
+      <ul style="margin:0;padding-left:18px;font-size:12px;">
+        <li><b>Calibration boostée</b> : Platt +5/+6pt + per-league offsets</li>
+        <li><b>FLAT 1u par défaut</b> (Kelly historique -30% banni)</li>
+        <li><b>Bouton Bulk Track</b> : ajoute tous les misables d'un clic</li>
+        <li><b>CLV pick-level</b> visible dans le bandeau du haut</li>
+        <li><b>Paper trading log</b> : forward proof immutable</li>
+        <li><b>Sharp money badge</b> 🦈 sur les picks</li>
+        <li><b>Notifications</b> : 💎 Outsider / 🎯 Value / 📊 Flat</li>
+      </ul>
+      <a href="stats.html" style="display:inline-block;margin-top:8px;padding:5px 10px;background:#f59e0b;color:#08080a;border-radius:6px;font-size:11px;font-weight:700;text-decoration:none;">📊 Voir stats publiques →</a>`;
+    document.body.appendChild(div);
+    div.querySelector('[data-v45-close]')?.addEventListener('click', () => {
+      div.style.animation = 'slideOut .3s ease-in forwards';
+      setTimeout(() => div.remove(), 300);
+      localStorage.setItem('v45_whatsnew_seen', '1');
+    });
+    setTimeout(() => {
+      if (div.parentNode) {
+        div.style.animation = 'slideOut .3s ease-in forwards';
+        setTimeout(() => div.remove(), 300);
+        localStorage.setItem('v45_whatsnew_seen', '1');
+      }
+    }, 12000);
+    // Inject CSS keyframes once
+    if (!document.getElementById('v45-whatsnew-style')) {
+      const s = document.createElement('style');
+      s.id = 'v45-whatsnew-style';
+      s.textContent = '@keyframes slideIn{from{transform:translateX(120%);opacity:0;}to{transform:translateX(0);opacity:1;}}@keyframes slideOut{to{transform:translateX(120%);opacity:0;}}';
+      document.head.appendChild(s);
+    }
+  } catch (e) { /* swallow */ }
+}, 4500);
+
 setTimeout(() => {
 try {
 const initMatchHash = (location.hash || '').match(/^#match\/([^/]+)/);
