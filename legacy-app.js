@@ -10073,11 +10073,24 @@ pitcherStats = { home: hp, away: ap, era_diff: eraDiff };
 // 1. WHIP diff (walks + hits per inning) — stable measure of pitcher quality
 // 2. K/9 diff (strikeouts per 9 innings) — dominant pitchers vs hitters
 // 3. Park factor (static map) — Coors Field / Petco Park etc.
+// v51.8 — Park factors étendus à 30 stadiums MLB (vs 10 avant).
+// Source : Statcast / FanGraphs Park Factors 2024-2025 averages.
+// Valeur > 1.0 = hitter-friendly (plus de runs), < 1.0 = pitcher-friendly.
 const PARK_FACTORS = {
-  // Pitcher-friendly (-): runs scored below average
-  'COL': 1.20, 'TEX': 1.10, 'CIN': 1.07, 'BAL': 1.05, 'BOS': 1.05,
-  // Hitter-friendly (+): runs scored above average
-  'SD': 0.88, 'OAK': 0.92, 'SF': 0.93, 'SEA': 0.94, 'MIA': 0.95,
+  // EXTRÊME hitter-friendly
+  'COL': 1.20, 'CIN': 1.07,
+  // Hitter-friendly
+  'TEX': 1.10, 'BAL': 1.05, 'BOS': 1.05, 'PHI': 1.04, 'KC': 1.03,
+  // Neutre-hitter
+  'TOR': 1.02, 'CHC': 1.01, 'STL': 1.01, 'MIN': 1.00, 'WSH': 1.00,
+  'ATL': 0.99, 'CLE': 0.99, 'NYY': 0.99, 'AZ': 0.98, 'ARI': 0.98,
+  // Neutre-pitcher
+  'CHW': 0.98, 'HOU': 0.98, 'TB': 0.97, 'TBR': 0.97, 'NYM': 0.97,
+  // Pitcher-friendly modéré
+  'LAD': 0.96, 'MIL': 0.96, 'DET': 0.96, 'PIT': 0.96, 'LAA': 0.95,
+  'MIA': 0.95, 'SEA': 0.94, 'SF': 0.93, 'SFG': 0.93, 'OAK': 0.92,
+  // EXTRÊME pitcher-friendly
+  'SD': 0.88, 'SDP': 0.88,
 };
 if (hp && ap) {
   // WHIP diff

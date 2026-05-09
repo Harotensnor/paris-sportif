@@ -76,6 +76,16 @@ LEAGUES: dict[str, int] = {
     'ita.2': 24,   # Serie B
     'ger.2': 44,   # 2. Bundesliga
     'fra.2': 182,  # Ligue 2
+    # Tier 3 (v51.8 — élargissement coverage injuries)
+    'aut.1': 45,   # Austrian Bundesliga
+    'gre.1': 185,  # Greek SuperLeague
+    'jpn.1': 196,  # J-League
+    'mls.1': 242,  # MLS
+    'bra.1': 325,  # Brasileirão
+    # Coupes (assignations souvent disponibles plus tôt)
+    'uefa.champions': 7,
+    'uefa.europa': 679,
+    'uefa.europa.conf': 17015,
 }
 
 REASON_LABELS = {

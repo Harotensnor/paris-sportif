@@ -74,6 +74,12 @@ LEAGUES: dict[str, int] = {
     'uefa.champions': 7,
     'uefa.europa': 679,
     'uefa.europa.conf': 17015,
+    # Tier 3 (v51.8 — élargissement coverage referees)
+    'aut.1': 45,        # Austrian Bundesliga
+    'gre.1': 185,       # Greek SuperLeague
+    'jpn.1': 196,       # J-League
+    'mls.1': 242,       # MLS
+    'bra.1': 325,       # Brasileirão
 }
 
 
