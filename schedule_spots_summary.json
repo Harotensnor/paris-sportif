@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-05-09T04:50:46Z",
+  "generated_at": "2026-05-09T04:54:02Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 50,
+    "active_events": 48,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 62,
-      "travel_extreme": 18,
-      "back_to_back_travel": 20,
+      "lookahead": 60,
+      "travel_extreme": 16,
+      "back_to_back_travel": 19,
       "schedule_congestion": 14
     },
     "by_decision": {
       "abstain": 19,
-      "lean_home": 28,
+      "lean_home": 26,
       "lean_away": 3
     },
-    "lean_home": 28,
+    "lean_home": 26,
     "lean_away": 3,
     "abstain": 19,
     "monitor": 0
@@ -1483,77 +1483,6 @@
       }
     },
     {
-      "event_id": "401815296",
-      "source_event_ids": [
-        "401815296"
-      ],
-      "kickoff": "2026-05-10T20:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Pittsburgh Pirates",
-      "match": "San Francisco Giants - Pittsburgh Pirates",
-      "decision": "lean_home",
-      "net_team": "San Francisco Giants",
-      "reason": "Pittsburgh Pirates plus penalise par calendrier/voyage (1.85 vs 0.00)",
-      "pressure_score": 1.845,
-      "home_fade": 0.0,
-      "away_fade": 1.845,
-      "travel_score": 1.845,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "Deplacement estime 3634 km, decalage ~2.8h",
-        "1 match dans les 48h + 3634 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
-        "home_score": 0.996,
-        "away_score": -2.495,
-        "home_fade": 1.0,
-        "away_fade": 2.845,
-        "reason": "Signaux mitigés: avantage net trop faible (San Francisco Giants +1.00, Pittsburgh Pirates -2.50)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.845
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815283",
       "source_event_ids": [
         "401815283"
@@ -1701,31 +1630,19 @@
         "1 match dans les 48h + 3100 km de voyage"
       ],
       "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
-        "home_score": 1.152,
-        "away_score": -2.441,
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.198,
+        "away_score": -1.441,
         "home_fade": 0.8,
-        "away_fade": 2.721,
-        "reason": "Signaux mitigés: avantage net trop faible (Los Angeles Dodgers +1.15, Atlanta Braves -2.44)",
+        "away_fade": 1.721,
+        "reason": "Direction nette: Los Angeles Dodgers (-0.20)",
         "detail": [
           {
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
           },
           {
             "side": "away",
@@ -1916,72 +1833,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815281",
-      "source_event_ids": [
-        "401815281"
-      ],
-      "kickoff": "2026-05-10T01:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Pittsburgh Pirates",
-      "match": "San Francisco Giants - Pittsburgh Pirates",
-      "decision": "lean_home",
-      "net_team": "San Francisco Giants",
-      "reason": "Pittsburgh Pirates plus penalise par calendrier/voyage (1.00 vs 0.15)",
-      "pressure_score": 1.512,
-      "home_fade": 0.15,
-      "away_fade": 0.995,
-      "travel_score": 0.845,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "travel_extreme": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "Deplacement estime 3634 km, decalage ~2.8h"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.802,
-        "away_score": -0.593,
-        "home_fade": 1.15,
-        "away_fade": 0.995,
-        "reason": "Signaux opposes: San Francisco Giants fade 1.15, Pittsburgh Pirates fade 1.00 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.845
           }
         ]
       }
