@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-09T05:22:04Z",
+  "generated_at": "2026-05-09T05:26:48Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -1070,6 +1070,88 @@
       ]
     },
     {
+      "event_id": "401815281",
+      "kickoff": "2026-05-10T01:05Z",
+      "league": "MLB",
+      "match": "Pittsburgh Pirates at San Francisco Giants",
+      "home": "San Francisco Giants",
+      "away": "Pittsburgh Pirates",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "San Francisco Giants",
+          "pitcher": "Tyler Mahle",
+          "label": "Tyler Mahle plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5823,
+          "fair_odds": 1.72,
+          "expected_strikeouts": 4.86,
+          "projected_ip": 5.14,
+          "inputs": {
+            "k9": 8.5,
+            "era": 5.0,
+            "whip": 1.53,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "San Francisco Giants",
+          "pitcher": "Tyler Mahle",
+          "label": "Tyler Mahle concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5756,
+          "fair_odds": 1.74,
+          "expected_hr_allowed": 0.857,
+          "projected_ip": 5.14,
+          "inputs": {
+            "hr9": 1.5,
+            "era": 5.0,
+            "whip": 1.53
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Pittsburgh Pirates",
+          "pitcher": "Bubba Chandler",
+          "label": "Bubba Chandler moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5168,
+          "fair_odds": 1.93,
+          "expected_strikeouts": 4.43,
+          "projected_ip": 4.86,
+          "inputs": {
+            "k9": 8.21,
+            "era": 4.76,
+            "whip": 1.5,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Pittsburgh Pirates",
+          "pitcher": "Bubba Chandler",
+          "label": "Bubba Chandler concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5095,
+          "fair_odds": 1.96,
+          "expected_hr_allowed": 0.712,
+          "projected_ip": 4.86,
+          "inputs": {
+            "hr9": 1.32,
+            "era": 4.76,
+            "whip": 1.5
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
       "event_id": "401815279",
       "kickoff": "2026-05-10T01:10Z",
       "league": "MLB",
@@ -2120,7 +2202,7 @@
       ]
     }
   ],
-  "props": 102,
+  "props": 106,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
