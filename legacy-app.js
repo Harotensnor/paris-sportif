@@ -12407,14 +12407,20 @@ const whyRel = Number(whyBest?.rel ?? whyBest?.prob ?? pred?.reliability ?? pred
 const whyEdge = whyOdd > 1 ? whyRel - 1 / whyOdd : 0;
 const whyEv = whyRel && whyOdd ? whyRel * whyOdd - 1 : 0;
 const whyLabel = whyBest?.label || pred?.pick?.label || 'Pari conseillé';
+// AUDIT 2026-05-09 v46.1 — Modal "Pourquoi ce pari" : Kelly → FLAT 1u.
+// User a constaté l'incohérence "Mise FLAT 1u" dans Genius card vs
+// "3€ Kelly protégé" dans modal. Pivot v45.C maintenant appliqué partout.
 const whyStake = (() => {
 try {
-const bankroll = Number(localStorage.getItem('userBankroll') || 50) || 50;
-const kRaw = (typeof kellyFraction === 'function') ? kellyFraction(whyRel, whyOdd, 0.25) : 0;
-const capped = whyBest?.investment && isFinite(whyBest.investment.cappedKelly) ? Math.min(kRaw, whyBest.investment.cappedKelly) : kRaw;
-return Math.max(1, Math.round(bankroll * Math.max(0, Math.min(0.06, capped || 0))));
+  if (typeof window._v45RecommendedStake === 'function') {
+    const bk = Number(localStorage.getItem('userBankroll') || 100) || 100;
+    return window._v45RecommendedStake(bk, whyRel, whyOdd);
+  }
+  const bankroll = Number(localStorage.getItem('userBankroll') || 100) || 100;
+  return Math.max(1, Math.round(bankroll * 0.01));
 } catch(e) { return 1; }
 })();
+const whyStakeMode = (typeof window._v45StakeMode === 'function') ? window._v45StakeMode() : 'flat';
 const whySignalState = { for: [], against: [], resolution: null };
 const whyReasons = (() => {
 const arr = [];
@@ -12594,7 +12600,7 @@ const whyHtml = `
           <div class="why-bet__stake">
             <span>Mise suggérée</span>
             <strong>${whyStake}€</strong>
-            <em>Kelly protégé</em>
+            <em>${whyStakeMode === 'kelly' ? 'Kelly ⚠ -30% hist' : 'FLAT 1u (recommandé)'}</em>
           </div>
         </div>
         <ol>${whyDecisionReasons.map(r => `<li><b>${esc(r.label)}</b><span>${esc(r.text)}</span></li>`).join('')}</ol>
@@ -18482,7 +18488,7 @@ const v45GeniusBannerHtml = (() => {
       const gain = _u * (odd - 1);
       const rankColors = ['#a855f7', '#3b82f6', '#10b981'];
       const rankColor = rankColors[idx] || '#888';
-      return `<a href="#match/${esc(String(p.m.id||''))}" data-big-detail="${esc(String(p.m.id||''))}" style="display:flex;flex-direction:column;padding:14px 16px;background:linear-gradient(135deg,${rankColor}1a,transparent);border:1.5px solid ${rankColor};border-radius:10px;text-decoration:none;color:var(--text);position:relative;cursor:pointer;">
+      return `<a href="#match/${esc(String(p.m.id||''))}" data-big-detail="${esc(String(p.m.id||''))}" data-pick-uid="${esc(p.pickUid || '')}" data-pick-label="${esc(p.labelFull || p.label || '')}" data-pick-odd="${esc(odd.toFixed(2))}" style="display:flex;flex-direction:column;padding:14px 16px;background:linear-gradient(135deg,${rankColor}1a,transparent);border:1.5px solid ${rankColor};border-radius:10px;text-decoration:none;color:var(--text);position:relative;cursor:pointer;">
         <div style="position:absolute;top:6px;right:8px;width:28px;height:28px;border-radius:50%;background:${rankColor};color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;">#${idx+1}</div>
         <div style="font-size:11px;color:var(--text-dim);font-weight:600;padding-right:34px;">${esc(dLbl)} · ${esc(tLbl)} · ${esc(lg)}</div>
         <div style="font-size:15px;font-weight:800;color:var(--text);margin-top:4px;padding-right:34px;">${esc(hN)} vs ${esc(aN)}</div>
@@ -18520,7 +18526,26 @@ const v45GeniusBannerHtml = (() => {
 // un tableau vide. Sinon strict respecté.
 const v40StrictApplied = v40StrictMode && v40BettableCount >= 1;
 const v40RenderPoolFiltered = v40StrictApplied ? v37RenderPool.filter(v40IsBettable) : v37RenderPool;
-const v36TableRows = v37EnsureTierCoverage(v40RenderPoolFiltered.slice(0, v37DenseRowLimit), v40RenderPoolFiltered);
+// v46.1 — Déduplication même match : 1 pick par match (le meilleur edge).
+// User : "Bastia-Le Mans listé 3 fois" → confusion + sur-allocation potentielle.
+const _v46DedupeByMatch = (rows) => {
+  if (!Array.isArray(rows) || rows.length === 0) return rows;
+  const byMatch = new Map();
+  for (const p of rows) {
+    if (!p || !p.m || !p.m.id) continue;
+    const key = String(p.m.id);
+    const existing = byMatch.get(key);
+    if (!existing) { byMatch.set(key, p); continue; }
+    // Garde le pick avec le meilleur edge (tie-breaker : opportunity score)
+    const ea = Number(p.edge || 0);
+    const eb = Number(existing.edge || 0);
+    if (ea > eb) byMatch.set(key, p);
+    else if (ea === eb && Number(p.opportunity || 0) > Number(existing.opportunity || 0)) byMatch.set(key, p);
+  }
+  return Array.from(byMatch.values());
+};
+const v40RenderPoolDeduped = _v46DedupeByMatch(v40RenderPoolFiltered);
+const v36TableRows = v37EnsureTierCoverage(v40RenderPoolDeduped.slice(0, v37DenseRowLimit), v40RenderPoolDeduped);
 const v36UpcomingAll = terminalScanPool
 .filter(m => new Date(m?.date || 0).getTime() > _dashboardNowMs && !m.completed)
 .sort((a, b) => new Date(a?.date || 0).getTime() - new Date(b?.date || 0).getTime());
@@ -18941,11 +18966,17 @@ const _v39FinalRec = (p) => {
     const seg = (trustTier === 'low' || trustTier === 'warn') ? ` ⚠ segment ${trustRoiPct.toFixed(1)}%` : '';
     return { verdict: 'bet', label: 'Miser (Value 🎯)', score: Math.max(70, opp), tone: 'green', reason: `Value rentable historiquement (+33% ROI sur 1251 paris) · Conf ${(rel*100).toFixed(0)}% · Edge ${fmtPct(edge)}${seg}` };
   }
-  // v43.4 — Veto severe : seuil durci à -15% sur n≥50 (avant -10%/n≥30).
-  // L'user veut + de picks. Le segment veto restait strict sur petits samples.
-  const segmentSeverelyBad = trustTier === 'low' && trustRoiPct < -15 && trustN >= 50;
+  // v46.1 — Veto durci : retour -10%/n30 (user constate Chinese League -16.6%
+  // segment + pick recommandé "Petite mise" = incohérent). Mieux vaut skip
+  // sur sample assez gros que recommander un perdant historique.
+  const segmentSeverelyBad = trustTier === 'low' && trustRoiPct < -10 && trustN >= 30;
   if (segmentSeverelyBad) {
     return { verdict: 'skip', label: 'À éviter', score: Math.min(35, opp), tone: 'red', reason: `Historique segment ${trustRoiPct.toFixed(1)}% sur ${trustN} paris (très défavorable)` };
+  }
+  // v46.1 — Warning fort si segment moyen-bad (-7% à -10%) sur grand sample
+  const segmentMediumBad = trustTier === 'low' && trustRoiPct < -7 && trustN >= 50;
+  if (segmentMediumBad) {
+    return { verdict: 'watch', label: 'Surveiller (segment ⚠)', score: Math.min(40, opp), tone: 'orange', reason: `Edge OK mais segment ${trustRoiPct.toFixed(1)}% sur ${trustN} paris — preuve historique négative` };
   }
   // AUDIT 2026-05-08 v40.5 — Seuils baissés pour refléter la réalité du
   // modèle (Brier 0.231, ROI 0%). Avant : 'Miser' >= 75, jamais atteint.
@@ -19192,11 +19223,13 @@ const v45UserBetsState = (() => {
 })();
 const v45BulkTrackBtn = (() => {
   try {
-    const eligibles = (v40RenderPoolFiltered || v36TableRows).filter(p => p && Number(p.odd || 0) > 1.05 && (typeof v40IsBettable === 'function' ? v40IsBettable(p) : true));
+    // v46.1 — Bulk track restreint aux picks GENIUS uniquement (TOP 3 strict).
+    // User : "tracker tous les 17 picks = stratégie absurde, encourage l'over-bet".
+    // Discipline FLAT = sélection rigoureuse, pas du bouquet en bloc.
+    const eligibles = (v45GeniusPicks && v45GeniusPicks.length) ? v45GeniusPicks : [];
     if (!eligibles.length) return '';
     const stake = (typeof window._v45FlatStake === 'function') ? window._v45FlatStake(parseFloat(localStorage.getItem('userBankroll') || '100') || 100) : 1;
-    const count = Math.min(20, eligibles.length); // cap 20 pour éviter overflow
-    const bulkPayload = eligibles.slice(0, count).map(p => ({
+    const bulkPayload = eligibles.map(p => ({
       matchId: v37StableMatchKey(p.m),
       market: (p.best && p.best.market) || p.market || '1n2',
       pickKey: (p.best && (p.best.key || p.best.pickKey || p.best.pickValue || p.best.side)) || p.pickKey || p.label || '',
@@ -19206,7 +19239,7 @@ const v45BulkTrackBtn = (() => {
     })).filter(x => x.matchId && x.pickKey && x.odd > 1);
     if (!bulkPayload.length) return '';
     const payloadStr = encodeURIComponent(JSON.stringify(bulkPayload));
-    return `<button type="button" data-v45-bulk-track="${payloadStr}" data-tooltip="Enregistre les ${bulkPayload.length} picks misables avec FLAT 1u (${stake}€) chacun." style="min-height:40px;border:1px solid #f59e0b;background:linear-gradient(135deg,rgba(245,158,11,.18),rgba(245,158,11,.06));color:#f59e0b;border-radius:999px;padding:0 14px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;white-space:nowrap;">📋 Tracker tous les ${bulkPayload.length} picks (1u = ${stake}€)</button>`;
+    return `<button type="button" data-v45-bulk-track="${payloadStr}" data-tooltip="Enregistre uniquement les ${bulkPayload.length} picks Genius (TOP strict criteria) avec FLAT 1u (${stake}€) chacun. Discipline FLAT = sélection rigoureuse." style="min-height:40px;border:1px solid #a855f7;background:linear-gradient(135deg,rgba(168,85,247,.18),rgba(168,85,247,.06));color:#a855f7;border-radius:999px;padding:0 14px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;white-space:nowrap;">🧠 Tracker Genius (${bulkPayload.length}×${stake}€)</button>`;
   } catch (e) { return ''; }
 })();
 const v45PnlChip = (() => {
