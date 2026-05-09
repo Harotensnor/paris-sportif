@@ -1,18 +1,19 @@
 name: backtest-v2
 
-# Hebdomadaire : dimanche 03:00 UTC. Fenêtre calme (0 run refresh-data
-# concurrents sur cette minute → pas de conflit de push). Durée ~1-3 min
-# selon la taille de odds_history.jsonl.
+# v45.17 : QUOTIDIEN à 04:00 UTC (06:00 Paris) — user feedback "647 picks
+# réglés depuis longtemps sa a pas bougé". Avant : hebdo dimanche → n_total
+# n'incrémentait qu'1×/sem alors que les matchs se règlent en continu.
+# Daily est OK : workflow ~1-3 min, fenêtre calme avant refresh-data.
 #
-# Ce workflow évalue la VRAIE fonction predictMatch (depuis pronostics.html)
+# Ce workflow évalue la VRAIE fonction predictMatch (depuis app.js + legacy)
 # via mini-racer — pas une baseline de marché, pas une duplication Python.
-# Une seule source de vérité : pronostics.html.
+# Une seule source de vérité : pronostics.html / app.js / legacy-app.js.
 #
 # Le rapport (backtest_report_v2.{json,md}) est committé dans le repo pour
 # que Théo puisse le lire directement sur GitHub/GH Pages.
 on:
   schedule:
-    - cron: '0 3 * * 0'
+    - cron: '0 4 * * *'
   workflow_dispatch: {}
 
 permissions:
