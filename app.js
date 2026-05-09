@@ -1,7 +1,15 @@
 (function () {
   'use strict';
 
-  const VERSION = 'v49.7';
+  // VERSION = label runtime. Le footer visible est stamped par le cron via
+  // stamp_asset_hashes.py (BUILD_ID = VERSION + timestamp). Si VERSION ici
+  // diffère du footer, c'est NORMAL : le cron lit cette constante puis stamp
+  // le footer avec timestamp. Conséquence : un push manuel met VERSION = vX.Y
+  // mais le footer ne reflète vX.Y qu'au prochain cron tick (~5 min).
+  // Si rebase race-conditions reset cette ligne, la valeur en repo reste celle
+  // du dernier commit win (souvent cron auto-commit). Pas un bug, juste un
+  // artifact des contraintes git race + GH Pages CDN refresh ~10min.
+  const VERSION = 'v49.8';
   const startedAt = performance.now();
   const chunks = {
     esm: 'src/perf-bootstrap.js',

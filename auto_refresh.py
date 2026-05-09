@@ -254,6 +254,11 @@ PATCH_STAGES = [
     # prono_consistency_report.json — utile pour debug et pour flagger les
     # matchs avec value cachée (BTTS marché < BTTS Poisson dérivé = signal).
     ('audit_prono_consistency.py',  1,   15),
+    # v49 — Audit tech debt counter (CSS !important, inline styles, sprint naming).
+    # Daily à 00:00 UTC en prod. Local : tous les ~8h de ticks (~2880 min).
+    ('audit_tech_debt.py',          576, 60),
+    # v49 — Audit SEO validators (OG/Twitter/RSS/sitemap).
+    ('audit_seo_validators.py',     576, 60),
     # v31.7.4 — OG images (1200x630 PNG) pour pages statiques. ~3s.
     ('build_og_images.py',          5,   30),
     # v35.13 — Sitemap dynamique (git lastmod + routes SPA).
