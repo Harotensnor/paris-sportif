@@ -19428,7 +19428,7 @@ const v36TableHtml = `<section class="v36-table-panel" aria-label="Tableau dense
         <header class="v36-table-toolbar">
           <div>
             <strong>${v36TableRows.length} lignes · ${esc(v37ScopeLabel)}</strong>
-            <span>${v36PickPool.length} picks · ${v40BettableCount} <b style="color:#34d399;">misables</b>${v40HiddenCount > 0 ? ` · <button type="button" data-v40-toggle-strict style="background:none;border:1px solid var(--text-dim);color:var(--text-dim);padding:2px 8px;border-radius:6px;font-size:11px;cursor:pointer;">${v40StrictApplied ? `+${v40HiddenCount} cachés` : `cacher ${v40HiddenCount}`}</button>` : ''}</span>
+            <span>${v36PickPool.length} pick${v36PickPool.length > 1 ? 's' : ''}${v37DataOnlyPool.length ? ` + ${v37DataOnlyPool.length} data fiable` : ''} · ${v40BettableCount} <b style="color:#34d399;">misable${v40BettableCount > 1 ? 's' : ''}</b>${v40HiddenCount > 0 ? ` · <button type="button" data-v40-toggle-strict style="background:none;border:1px solid var(--text-dim);color:var(--text-dim);padding:2px 8px;border-radius:6px;font-size:11px;cursor:pointer;">${v40StrictApplied ? `+${v40HiddenCount} cachés` : `cacher ${v40HiddenCount}`}</button>` : ''}</span>
           </div>
           <label class="v36-table-search"><span>Search</span><input type="search" data-v36-search value="${esc(v36Search)}" placeholder="Équipe, ligue, marché"></label>
           ${/* v46.0 — v37BlindToggle + v37TrackFirstButton retirés (redondants
