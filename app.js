@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const VERSION = 'v45.2';
+  const VERSION = 'v45.3';
   const startedAt = performance.now();
   const chunks = {
     esm: 'src/perf-bootstrap.js',

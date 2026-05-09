@@ -4460,6 +4460,42 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     if (typeof toast === 'function') toast(`✓ Pari ${stake.toFixed(0)}€ @${odd.toFixed(2)} enregistré`, 'success');
     btn.dataset.trackedBetId = betId || '';
   }, true);
+  // AUDIT 2026-05-09 v45.3 — Bulk track handler.
+  document.addEventListener('click', (e) => {
+    const btn = e.target && e.target.closest ? e.target.closest('[data-v45-bulk-track]') : null;
+    if (!btn || e.defaultPrevented) return;
+    e.preventDefault();
+    e.stopPropagation();
+    let payload = [];
+    try { payload = JSON.parse(decodeURIComponent(btn.dataset.v45BulkTrack || '[]')); } catch (err) {}
+    if (!Array.isArray(payload) || !payload.length) {
+      if (typeof toast === 'function') toast('Aucun pick à tracker', 'warn');
+      return;
+    }
+    let added = 0;
+    for (const item of payload) {
+      try {
+        if (!item.matchId || !item.pickKey || !(Number(item.odd) > 1)) continue;
+        window._addUserBet(item.matchId, item.market || '1n2', item.pickKey, item.label || '', Number(item.odd), Number(item.stake) || 1);
+        added++;
+      } catch (err) {}
+    }
+    if (typeof toast === 'function') toast(`📋 ${added} paris ajoutés au suivi · Voir le Bilan`, 'success', { duration: 3500 });
+    btn.disabled = true;
+    btn.innerHTML = `✓ ${added} paris trackés`;
+    btn.style.opacity = '.6';
+    btn.style.cursor = 'default';
+    // Re-render dashboard to update P&L chip
+    setTimeout(() => {
+      try { if (typeof window.renderDashboardPage === 'function' && document.querySelector('main')) window.renderDashboardPage(document.querySelector('main')); } catch(err) {}
+    }, 600);
+  }, true);
+  // v45.3 — Auto-settle on data load (and dispatch event).
+  if (typeof window._settleUserBets === 'function') {
+    document.addEventListener('ps:app-shell-ready', () => {
+      try { window._settleUserBets(); } catch (err) {}
+    });
+  }
   window._settleUserBets = function() {
     // Met à jour les paris en attente avec leur résultat si dispo
     const data = window.PRONOSTICS_DATA;
@@ -18865,6 +18901,68 @@ if (!matchId || !pickKey) return '';
 return `<button type="button" class="v37-track-inline action-focus-trackbet" data-match-id="${esc(matchId)}" data-market="${esc(market)}" data-pick-key="${esc(pickKey)}" data-pick-label="${esc(p.labelFull || p.label || 'Pick')}" data-odd="${Number(p.odd || 0)}" data-stake="1" data-tooltip="Enregistre ce pick dans ton suivi personnel sans quitter le tableau." style="min-height:40px;border:1px solid rgba(45,212,168,.38);background:rgba(45,212,168,.10);color:var(--accent);border-radius:999px;padding:0 12px;font-size:11px;font-weight:950;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;white-space:nowrap;">J'ai parié le pick #1</button>`;
 } catch(e) { return ''; }
 })();
+// AUDIT 2026-05-09 v45.3 — Bulk track + P&L counter.
+// User : "trackedBets count: 0" → personne n'utilise le tracker. Friction
+// trop haute (clic sur chaque pick). Solution : 1 bouton qui tracke TOUS
+// les misables d'un coup avec FLAT 1u + counter live pour engagement.
+const v45UserBetsState = (() => {
+  try {
+    const bets = (typeof _loadUserBets === 'function') ? _loadUserBets() : [];
+    const todayStart = (() => { const d = new Date(); d.setHours(0,0,0,0); return d.getTime(); })();
+    const stats = { total: bets.length, settled: 0, won: 0, lost: 0, void: 0, pending: 0, pnl: 0, pnlToday: 0, todayBets: 0, todayWins: 0, todayLost: 0 };
+    bets.forEach(b => {
+      const ts = Number(b.ts || 0);
+      const isToday = ts >= todayStart;
+      if (b.settled) {
+        stats.settled++;
+        if (b.result === 'won') stats.won++;
+        else if (b.result === 'lost') stats.lost++;
+        else stats.void++;
+        stats.pnl += Number(b.pnl || 0);
+        if (isToday) stats.pnlToday += Number(b.pnl || 0);
+      } else {
+        stats.pending++;
+      }
+      if (isToday) {
+        stats.todayBets++;
+        if (b.result === 'won') stats.todayWins++;
+        else if (b.result === 'lost') stats.todayLost++;
+      }
+    });
+    return stats;
+  } catch (e) { return { total: 0, settled: 0, pending: 0, pnl: 0, pnlToday: 0, todayBets: 0 }; }
+})();
+const v45BulkTrackBtn = (() => {
+  try {
+    const eligibles = (v40RenderPoolFiltered || v36TableRows).filter(p => p && Number(p.odd || 0) > 1.05 && (typeof v40IsBettable === 'function' ? v40IsBettable(p) : true));
+    if (!eligibles.length) return '';
+    const stake = (typeof window._v45FlatStake === 'function') ? window._v45FlatStake(parseFloat(localStorage.getItem('userBankroll') || '100') || 100) : 1;
+    const count = Math.min(20, eligibles.length); // cap 20 pour éviter overflow
+    const bulkPayload = eligibles.slice(0, count).map(p => ({
+      matchId: v37StableMatchKey(p.m),
+      market: (p.best && p.best.market) || p.market || '1n2',
+      pickKey: (p.best && (p.best.key || p.best.pickKey || p.best.pickValue || p.best.side)) || p.pickKey || p.label || '',
+      label: p.labelFull || p.label || 'Pick',
+      odd: Number(p.odd || 0),
+      stake: stake
+    })).filter(x => x.matchId && x.pickKey && x.odd > 1);
+    if (!bulkPayload.length) return '';
+    const payloadStr = encodeURIComponent(JSON.stringify(bulkPayload));
+    return `<button type="button" data-v45-bulk-track="${payloadStr}" data-tooltip="Enregistre les ${bulkPayload.length} picks misables avec FLAT 1u (${stake}€) chacun." style="min-height:40px;border:1px solid #f59e0b;background:linear-gradient(135deg,rgba(245,158,11,.18),rgba(245,158,11,.06));color:#f59e0b;border-radius:999px;padding:0 14px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;white-space:nowrap;">📋 Tracker tous les ${bulkPayload.length} picks (1u = ${stake}€)</button>`;
+  } catch (e) { return ''; }
+})();
+const v45PnlChip = (() => {
+  if (!v45UserBetsState.total) return '';
+  const pnlSign = v45UserBetsState.pnl >= 0 ? '+' : '';
+  const pnlColor = v45UserBetsState.pnl >= 0 ? '#10b981' : '#ef4444';
+  const todaySign = v45UserBetsState.pnlToday >= 0 ? '+' : '';
+  const todayColor = v45UserBetsState.pnlToday >= 0 ? '#10b981' : '#ef4444';
+  return `<a href="#bilan" data-page="bilan" data-tooltip="Voir le bilan complet de tes paris" style="min-height:40px;display:inline-flex;align-items:center;gap:8px;padding:0 12px;border:1px solid var(--border);background:rgba(15,15,20,.4);color:var(--text);border-radius:999px;font-size:11px;font-weight:700;text-decoration:none;cursor:pointer;white-space:nowrap;">
+    <span style="color:var(--text-dim);">📊 ${v45UserBetsState.pending} en cours</span>
+    ${v45UserBetsState.settled > 0 ? `<span style="color:${pnlColor};">·</span><span style="color:${pnlColor};">${pnlSign}${v45UserBetsState.pnl.toFixed(0)}€ all-time</span>` : ''}
+    ${v45UserBetsState.todayBets > 0 ? `<span style="color:var(--text-dim2);">·</span><span style="color:${todayColor};">${todaySign}${v45UserBetsState.pnlToday.toFixed(0)}€ aujourd'hui</span>` : ''}
+  </a>`;
+})();
 const v37PersonalPicksHtml = (() => {
 if (!v37Coach || Number(v37Coach.total || 0) < 10 || !v36Sorted.length) return '';
 const rows = v36Sorted
@@ -19018,6 +19116,8 @@ const v36TableHtml = `<section class="v36-table-panel" aria-label="Tableau dense
             <span>Mode blind</span><b>${v37BlindMode ? 'ON' : 'OFF'}</b>
           </button>
           ${v37TrackFirstButton}
+          ${v45BulkTrackBtn}
+          ${v45PnlChip}
           <div class="v36-sort-strip" aria-label="Tri tableau">
             ${v36SortButton('tier', 'Tier')}
             ${v36SortButton('date', 'Date')}
