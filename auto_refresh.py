@@ -180,6 +180,8 @@ PATCH_STAGES = [
     ('build_health.py',             1,   15),
     # v45.5 — Paper trading forward log (snapshots + settles).
     ('paper_trade_log.py',          1,   30),
+    # v45.14 — Discord morning digest (8h Paris time, 1x/jour).
+    ('notify_discord_digest.py',    1,   12),
     ('audit_data_truth.py',          1,   15),
     ('validate_data_quality.py',     1,   15),
     ('data_integrity_monitor.py',    1,   20),

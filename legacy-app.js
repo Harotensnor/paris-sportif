@@ -8792,23 +8792,41 @@ try { window.MODEL_PROB_CAP = MODEL_PROB_CAP; } catch(e) { swallowError(e); }
 //   prob 60-70% : predicted 64.5% / actual 69.7% (gap +5.2pt sous-confident)
 //   prob 70-80% : predicted 74.2% / actual 80.5% (gap +6.3pt sous-confident)
 //   prob 50-60% : predicted 54.6% / actual 56.7% (gap +2.0pt léger)
-// Le modèle SOUS-ESTIME systématiquement les picks 50-80%. Conséquence :
-// rel insuffisant → opp insuffisant → verdict skip ou watch. On corrige
-// par une fonction de scaling piecewise linéaire qui respecte les bornes
-// observées et reste stable hors plage (pas de boost extrapolé sauvage).
 function _v45PlattBoost(rel) {
   if (!Number.isFinite(rel) || rel <= 0 || rel >= 1) return rel;
-  // Boost factors mesurés sur 639 picks settled :
-  // [0.5, 0.6) → +2.0pt
-  // [0.6, 0.7) → +5.2pt (cap 5pt safety)
-  // [0.7, 0.8) → +6.3pt (cap 6pt safety)
-  // outside → no change
   if (rel < 0.50) return rel;
   if (rel < 0.60) return Math.min(0.95, rel + 0.020);
   if (rel < 0.70) return Math.min(0.95, rel + 0.050);
   if (rel < 0.80) return Math.min(0.95, rel + 0.060);
-  return rel; // 80%+ left as-is, n=15 trop petit pour calibrer
+  return rel;
 }
+// AUDIT 2026-05-09 v45.7 — Per-league calibration offsets.
+// Backtest_report_v2.by_league (n>=15 par ligue) montre des biais
+// systématiques de prediction par ligue. Half-correction appliquée
+// (offset = -avg_edge/200) pour garder safety net en cas de drift.
+// Ligues avec offset négatif : modèle SUR-confident → reduce rel.
+// Ligues avec offset positif : modèle SOUS-confident → boost rel.
+const _V45_LEAGUE_OFFSETS = {
+  'mlb': 0.0151,           // n=74 avg_edge -3.02% -> boost (model underconfident)
+  'nba': 0.0222,           // n=24 avg_edge -4.44% -> boost
+  'nhl': 0.0135,           // n=21 avg_edge -2.71% -> boost
+  'eng.3': 0.0088,         // n=27 avg_edge -1.76% -> boost
+  'esp.2': 0.0098,         // n=16 avg_edge -1.97% -> boost
+  'conmebol.libertadores': 0.0108, // n=16 avg_edge -2.16% -> boost
+  'jpn.1': -0.0135,        // n=24 avg_edge +2.70% -> reduce (overconfident)
+  'fra.2': -0.0073,        // n=18 avg_edge +1.47% -> reduce
+  'chn.1': -0.0072         // n=16 avg_edge +1.44% -> reduce
+};
+function _v45LeagueOffset(rel, leagueCode) {
+  if (!Number.isFinite(rel) || rel <= 0 || rel >= 1) return rel;
+  const offset = _V45_LEAGUE_OFFSETS[String(leagueCode || '').toLowerCase()];
+  if (!offset) return rel;
+  // Apply offset but cap to [0.05, 0.95] to avoid extreme values.
+  return Math.max(0.05, Math.min(0.95, rel + offset));
+}
+try { window._v45PlattBoost = _v45PlattBoost; } catch(e) {}
+try { window._v45LeagueOffset = _v45LeagueOffset; } catch(e) {}
+try { window._V45_LEAGUE_OFFSETS = _V45_LEAGUE_OFFSETS; } catch(e) {}
 function _applyCalibration(p, match) {
 if (!p || !isFinite(p.reliability) || p.calibrated) {
 return _capModelProbability(_markSuspectIfHugeEdge(p, match));
@@ -8819,9 +8837,11 @@ const adjusted = _calibrateProb(p.reliability, sport, leagueCode, '1n2');
 const adjustedV5 = applyCalibrationMethodV5(adjusted, sport);
 // v45.A — Apply Platt boost AFTER existing calibration (orthogonal corrections).
 const adjustedPlatt = _v45PlattBoost(adjustedV5);
-const out = adjustedPlatt === p.reliability
+// v45.7 — Apply per-league offset on top of Platt.
+const adjustedLeague = _v45LeagueOffset(adjustedPlatt, leagueCode);
+const out = adjustedLeague === p.reliability
 ? p
-: { ...p, reliability: adjustedPlatt, reliability_raw: p.reliability, calibrated: true, calibration_v5: adjustedV5 !== adjusted, calibration_platt_v45: adjustedPlatt !== adjustedV5 };
+: { ...p, reliability: adjustedLeague, reliability_raw: p.reliability, calibrated: true, calibration_v5: adjustedV5 !== adjusted, calibration_platt_v45: adjustedPlatt !== adjustedV5, calibration_league_v45: adjustedLeague !== adjustedPlatt };
 return _capModelProbability(_markSuspectIfHugeEdge(out, match));
 }
 function _capModelProbability(p) {
@@ -18865,7 +18885,15 @@ return `<tr class="v36-table-row v38-table-row v39-table-row ${soon ? 'is-immine
             <span class="v38-pick-chips">${oddBadge}${indicativeBadge}${v37SegmentTrustChip(p)}<i class="v38-open-analysis">analyse</i></span>
           </td>
           <td class="v36-num v36-odd v38-cell-odd">${v37BlindOddHtml(p.odd)}</td>
-          <td class="v39-cell-rec">${v39RecBadge(p)}</td>
+          <td class="v39-cell-rec">${v39RecBadge(p)}${(() => {
+            // v45.8 — Sharp money badge si pred.sharp_money aligned avec pick
+            const sm = p.pred?.sharp_money;
+            if (!sm) return '';
+            const aligned = sm.aligned_with_pick;
+            if (!aligned) return '';
+            const drop = Number(sm.odd_drop_pct || 0);
+            return `<span title="Sharp money sur notre côté : cote en baisse de ${drop.toFixed(1)}% (Pinnacle / sharp books). +${Math.round(Number(sm.nudge||0)*100)}pt nudge appliqué." style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;margin-left:6px;background:rgba(168,85,247,.18);border:1px solid rgba(168,85,247,.45);border-radius:999px;font-size:10px;font-weight:800;color:#a855f7;white-space:nowrap;">🦈 Sharp -${drop.toFixed(0)}%</span>`;
+          })()}</td>
           ${v37ShowResultColumn ? `<td class="v38-cell-result">${v37ResultBadge(result)}</td>` : ''}
         </tr>`;
 };

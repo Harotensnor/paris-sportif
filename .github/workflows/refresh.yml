@@ -277,6 +277,8 @@ jobs:
           python3 build_health.py || true
           # v45.5 — Paper trading forward log (snapshots + auto-settles).
           python3 paper_trade_log.py || true
+          # v45.14 — Discord morning digest (8h Paris time, idempotent).
+          python3 notify_discord_digest.py || true
           python3 audit_data_truth.py || true
           python3 validate_data_quality.py || true
           python3 data_integrity_monitor.py || true

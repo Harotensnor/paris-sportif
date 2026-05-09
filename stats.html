@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stats publiques — Paris-Sportif</title>
+<meta name="description" content="Performance vérifiable du modèle Paris-Sportif : ROI prouvé par stratégie, paper trading forward, calibration Brier, CLV. Transparence totale, audit complet.">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://harotensnor.github.io/paris-sportif/stats.html">
+<link rel="stylesheet" href="static-page.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Dataset",
+  "name": "Performance Paris-Sportif (audit)",
+  "description": "Backtest 1932 picks settled, paper trading forward log, calibration Brier, CLV pick-level. Toutes les stats sont reproductibles via les fichiers JSON publics.",
+  "url": "https://harotensnor.github.io/paris-sportif/stats.html",
+  "creator": {"@type": "Organization", "name": "Paris-Sportif"},
+  "license": "https://creativecommons.org/publicdomain/zero/1.0/",
+  "distribution": [
+    {"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://harotensnor.github.io/paris-sportif/backtest_strategies.json"},
+    {"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://harotensnor.github.io/paris-sportif/backtest_report_v2.json"},
+    {"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://harotensnor.github.io/paris-sportif/paper_log_summary.json"},
+    {"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://harotensnor.github.io/paris-sportif/clv_summary.json"}
+  ]
+}
+</script>
+</head>
+<body>
+<header class="static-page-header">
+  <a href="/" class="back-link">← Retour</a>
+  <h1>📊 Stats publiques · audit complet</h1>
+  <p class="subtitle">Toutes les performances du modèle Paris-Sportif, vérifiables et reproductibles. Aucun bullshit, juste les chiffres.</p>
+</header>
+
+<main class="static-page-main">
+
+<section class="hero-stat">
+  <div class="hero-grid">
+    <div class="hero-card hero-gold">
+      <div class="hero-label">Outsider-only</div>
+      <div class="hero-value" id="stat-outsider-roi">+121.1%</div>
+      <div class="hero-sub">ROI sur <b>356 paris</b> · max DD <b>3.0%</b></div>
+    </div>
+    <div class="hero-card hero-blue">
+      <div class="hero-label">Value-only</div>
+      <div class="hero-value" id="stat-value-roi">+33.1%</div>
+      <div class="hero-sub">ROI sur <b>1251 paris</b> · max DD <b>3.6%</b></div>
+    </div>
+    <div class="hero-card hero-green">
+      <div class="hero-label">Flat 1u</div>
+      <div class="hero-value" id="stat-flat-roi">+18.9%</div>
+      <div class="hero-sub">ROI sur <b>1932 paris</b> · max DD <b>5.2%</b></div>
+    </div>
+    <div class="hero-card hero-red">
+      <div class="hero-label">Kelly ⚠️</div>
+      <div class="hero-value" id="stat-kelly-roi">-30.0%</div>
+      <div class="hero-sub">À éviter · max DD <b>99.99%</b> (wipeout)</div>
+    </div>
+  </div>
+  <div class="hero-disclaimer">Backtest 1932 picks settled (sample audité 2026-04-27 → 2026-05-09). Reproductible via <a href="/backtest_strategies.json"><code>backtest_strategies.json</code></a>.</div>
+</section>
+
+<section class="content-section">
+  <h2>📈 Forward proof (paper trading)</h2>
+  <p>Le backtest historique peut être recalibré rétrospectivement. Le <b>paper trading</b> snapshot tous les picks futurs et résout au fil du temps — impossible à manipuler.</p>
+  <div class="paper-stats" id="paper-stats">
+    <div class="paper-card">
+      <div class="paper-label">Snapshots</div>
+      <div class="paper-value" id="paper-snapshot-count">—</div>
+      <div class="paper-sub">picks tracked</div>
+    </div>
+    <div class="paper-card">
+      <div class="paper-label">Settled</div>
+      <div class="paper-value" id="paper-settled-count">—</div>
+      <div class="paper-sub">matches resolved</div>
+    </div>
+    <div class="paper-card">
+      <div class="paper-label">Win rate</div>
+      <div class="paper-value" id="paper-wr">—</div>
+      <div class="paper-sub">forward sample</div>
+    </div>
+    <div class="paper-card">
+      <div class="paper-label">ROI cumulé</div>
+      <div class="paper-value" id="paper-roi">—</div>
+      <div class="paper-sub">FLAT 1u</div>
+    </div>
+  </div>
+  <p class="caption">Données live depuis <a href="/paper_log_summary.json"><code>paper_log_summary.json</code></a> (cron 30 min).</p>
+</section>
+
+<section class="content-section">
+  <h2>🎯 Qualité de calibration</h2>
+  <p>Le <b>Brier score</b> mesure si les probabilités prédites correspondent aux taux réels. Plus c'est bas, mieux le modèle calibre.</p>
+  <div class="quality-grid">
+    <div class="quality-row">
+      <span class="quality-label">Brier score (target &lt; 0.20)</span>
+      <span class="quality-value" id="stat-brier">0.231</span>
+      <span class="quality-status" id="stat-brier-status">⚠ proche</span>
+    </div>
+    <div class="quality-row">
+      <span class="quality-label">CLV pick-level (target &gt; +1%)</span>
+      <span class="quality-value" id="stat-clv">-0.77%</span>
+      <span class="quality-status">⚠ légèrement en-dessous</span>
+    </div>
+    <div class="quality-row">
+      <span class="quality-label">Win rate global</span>
+      <span class="quality-value" id="stat-wr-global">53.3%</span>
+      <span class="quality-status">✓ &gt; 50%</span>
+    </div>
+    <div class="quality-row">
+      <span class="quality-label">Picks réglés (cumulé)</span>
+      <span class="quality-value" id="stat-n-total">647</span>
+      <span class="quality-status">✓ sample représentatif</span>
+    </div>
+  </div>
+  <p class="caption">v45.A applique un Platt scaling boost +5/+6pt sur les bins 60-80% (mesuré sous-confident). Brier estimé post-boost : ~0.21.</p>
+</section>
+
+<section class="content-section">
+  <h2>🏆 Performance par tier (cumul historique)</h2>
+  <div class="tier-table" id="tier-table">
+    <div class="tier-row tier-header">
+      <span>Tier</span>
+      <span>n</span>
+      <span>WR</span>
+      <span>ROI flat</span>
+      <span>Verdict</span>
+    </div>
+    <!-- Filled by JS -->
+  </div>
+</section>
+
+<section class="content-section">
+  <h2>🔍 Méthodologie</h2>
+  <ul class="meth-list">
+    <li><b>Source des cotes</b> : Winamax exact (catalog official) — 100% des picks dans le sample.</li>
+    <li><b>Modèle</b> : Bivariate Poisson + Dixon-Coles τ correction + Elo per-team + LightGBM stacking + ensemble adaptive weights v5.</li>
+    <li><b>Backtest</b> : <a href="/backtest_v2.py">scripts/backtest_v2.py</a> rejoue <code>predictMatch</code> sur events historiques via mini-racer (V8 embedded). Une seule source de vérité avec la prod.</li>
+    <li><b>Paper log</b> : <a href="/scripts/paper_trade_log.py">scripts/paper_trade_log.py</a> snapshot des picks futurs + settle quand match completed. Forward proof immutable.</li>
+    <li><b>CLV</b> : compute_clv.py compare cote au snapshot vs cote finale Winamax. Mesure si on bat le marché.</li>
+    <li><b>Stratégie default</b> : FLAT 1u (1% bankroll). Kelly disponible mais documenté -30% ROI historique.</li>
+  </ul>
+</section>
+
+<section class="content-section">
+  <h2>📂 Datasets téléchargeables</h2>
+  <div class="download-grid">
+    <a href="/backtest_strategies.json" class="download-card">
+      <div class="dl-icon">📊</div>
+      <div class="dl-title">Strategies leaderboard</div>
+      <div class="dl-desc">7 stratégies × ROI/profit/max_dd/sharpe</div>
+    </a>
+    <a href="/backtest_report_v2.json" class="download-card">
+      <div class="dl-icon">🎯</div>
+      <div class="dl-title">Backtest v2 complet</div>
+      <div class="dl-desc">Per-tier × per-sport × per-league × calibration ECE</div>
+    </a>
+    <a href="/paper_log_summary.json" class="download-card">
+      <div class="dl-icon">⏱️</div>
+      <div class="dl-title">Paper log live</div>
+      <div class="dl-desc">Forward proof snapshots (mis à jour toutes les 30 min)</div>
+    </a>
+    <a href="/clv_summary.json" class="download-card">
+      <div class="dl-icon">💰</div>
+      <div class="dl-title">CLV summary</div>
+      <div class="dl-desc">Closing Line Value pick-level + per-sport</div>
+    </a>
+    <a href="/health.json" class="download-card">
+      <div class="dl-icon">❤️</div>
+      <div class="dl-title">Pipeline health</div>
+      <div class="dl-desc">Status sources data + quality checks</div>
+    </a>
+    <a href="/data.js" class="download-card">
+      <div class="dl-icon">📅</div>
+      <div class="dl-title">Données brutes</div>
+      <div class="dl-desc">Events Winamax + enrichissements (JSON)</div>
+    </a>
+  </div>
+</section>
+
+<section class="content-section">
+  <h2>⚠️ Disclaimer</h2>
+  <p class="warning"><b>Jouer comporte des risques :</b> isolement, endettement, dépendance. Pour être aidé, appelez le 09-74-75-13-13 (Joueurs Info Service, appel non surtaxé). Site indépendant, non affilié à Winamax. Réservé aux 18+.</p>
+  <p>Les performances historiques ne préjugent pas des performances futures. Le modèle peut sous-performer en période de variance. Le paper trading forward sert précisément à valider la performance en temps réel.</p>
+</section>
+
+</main>
+
+<footer class="static-page-footer">
+  <div>Paris-Sportif · stats publiques · <a href="/">retour app</a> · <a href="/methodologie.html">méthodologie</a> · <a href="/legal.html">mentions légales</a></div>
+  <div class="footer-version">Page régénérée chaque cron tick · données live</div>
+</footer>
+
+<script>
+(async () => {
+  const fmtPct = (v) => {
+    if (v === null || v === undefined || !isFinite(v)) return '—';
+    const sign = v >= 0 ? '+' : '';
+    return `${sign}${v.toFixed(2)}%`;
+  };
+  const safeText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  const safeColor = (id, color) => { const el = document.getElementById(id); if (el) el.style.color = color; };
+
+  // Paper log
+  try {
+    const r = await fetch('/paper_log_summary.json?v=' + Math.floor(Date.now()/300000));
+    if (r.ok) {
+      const j = await r.json();
+      safeText('paper-snapshot-count', j.snapshot_count || 0);
+      safeText('paper-settled-count', j.settled_count || 0);
+      const wr = j.win_rate;
+      safeText('paper-wr', wr !== null && wr !== undefined ? `${(wr*100).toFixed(1)}%` : '—');
+      const roi = j.roi_pct;
+      if (roi !== null && roi !== undefined) {
+        safeText('paper-roi', fmtPct(roi));
+        safeColor('paper-roi', roi >= 0 ? '#10b981' : '#ef4444');
+      }
+    }
+  } catch(e) { console.warn('paper_log fetch failed', e); }
+
+  // Backtest_strategies leaderboard (overrides hero values with live data)
+  try {
+    const r = await fetch('/backtest_strategies.json?v=' + Math.floor(Date.now()/300000));
+    if (r.ok) {
+      const j = await r.json();
+      const lb = j.leaderboard || [];
+      const find = (name) => lb.find(e => e.strategy === name);
+      const ot = find('outsider_only'); if (ot) safeText('stat-outsider-roi', fmtPct(ot.roi*100));
+      const vt = find('value_only'); if (vt) safeText('stat-value-roi', fmtPct(vt.roi*100));
+      const ft = find('flat'); if (ft) safeText('stat-flat-roi', fmtPct(ft.roi*100));
+      const kt = find('kelly_full'); if (kt) safeText('stat-kelly-roi', fmtPct(kt.roi*100));
+    }
+  } catch(e) { console.warn('strategies fetch failed', e); }
+
+  // Backtest_report_v2 → quality + tiers
+  try {
+    const r = await fetch('/backtest_report_v2.json?v=' + Math.floor(Date.now()/300000));
+    if (r.ok) {
+      const j = await r.json();
+      const ov = j.overall || {};
+      safeText('stat-brier', (ov.brier || 0).toFixed(3));
+      const brierStatus = (ov.brier || 1) < 0.20 ? '✓ excellent' : (ov.brier || 1) < 0.25 ? '⚠ proche' : '⚠ à améliorer';
+      safeText('stat-brier-status', brierStatus);
+      safeText('stat-wr-global', `${((ov.win_rate || 0)*100).toFixed(1)}%`);
+      safeText('stat-n-total', ov.n || 0);
+      // Tiers
+      const tiers = j.by_tier || {};
+      const tierTable = document.getElementById('tier-table');
+      if (tierTable) {
+        Object.entries(tiers).forEach(([name, st]) => {
+          const n = st.n || 0;
+          if (n < 5) return;
+          const wr = st.win_rate || 0;
+          const roi = st.flat_roi_pct || 0;
+          const verdict = roi >= 5 ? '🟢 rentable' : roi >= 0 ? '🟡 breakeven' : '🔴 perdant';
+          const row = document.createElement('div');
+          row.className = 'tier-row';
+          row.innerHTML = `<span><b>${name}</b></span><span>${n}</span><span>${(wr*100).toFixed(1)}%</span><span>${fmtPct(roi)}</span><span>${verdict}</span>`;
+          tierTable.appendChild(row);
+        });
+      }
+    }
+  } catch(e) { console.warn('backtest_v2 fetch failed', e); }
+
+  // CLV summary
+  try {
+    const r = await fetch('/clv_summary.json?v=' + Math.floor(Date.now()/300000));
+    if (r.ok) {
+      const j = await r.json();
+      const clv = (j.summary || {}).pick_mean_clv_pct;
+      if (clv !== null && clv !== undefined) {
+        safeText('stat-clv', `${clv >= 0 ? '+' : ''}${clv.toFixed(2)}%`);
+      }
+    }
+  } catch(e) { console.warn('clv fetch failed', e); }
+})();
+</script>
+
+<style>
+.hero-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin:18px 0;}
+.hero-card{padding:18px;border-radius:12px;border:1px solid var(--border,#333);text-align:center;}
+.hero-gold{background:linear-gradient(135deg,rgba(245,158,11,.18),transparent);border-color:#f59e0b;}
+.hero-blue{background:linear-gradient(135deg,rgba(59,130,246,.14),transparent);border-color:#3b82f6;}
+.hero-green{background:linear-gradient(135deg,rgba(16,185,129,.12),transparent);border-color:#10b981;}
+.hero-red{background:linear-gradient(135deg,rgba(239,68,68,.10),transparent);border-color:#ef4444;}
+.hero-label{font-size:11px;text-transform:uppercase;letter-spacing:.6px;font-weight:700;color:var(--text-dim,#888);}
+.hero-value{font-size:32px;font-weight:900;letter-spacing:-.5px;margin:6px 0;}
+.hero-gold .hero-value{color:#f59e0b;}.hero-blue .hero-value{color:#3b82f6;}.hero-green .hero-value{color:#10b981;}.hero-red .hero-value{color:#ef4444;}
+.hero-sub{font-size:11px;color:var(--text-dim);}
+.hero-stat .hero-disclaimer{font-size:11px;color:var(--text-dim);margin-top:8px;text-align:center;}
+.paper-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:14px 0;}
+.paper-card{padding:14px;background:var(--panel,rgba(255,255,255,.04));border:1px solid var(--border,#333);border-radius:8px;}
+.paper-label{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-dim);}
+.paper-value{font-size:24px;font-weight:800;margin:4px 0;color:var(--text);}
+.paper-sub{font-size:10.5px;color:var(--text-dim2,#666);}
+.quality-grid{margin:14px 0;}
+.quality-row{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;padding:10px 14px;background:var(--panel);border-radius:6px;margin-bottom:6px;align-items:center;}
+.quality-label{font-size:13px;}.quality-value{font-size:14px;font-weight:700;}.quality-status{font-size:11px;color:var(--text-dim);text-align:right;}
+.tier-table{display:flex;flex-direction:column;gap:4px;}
+.tier-row{display:grid;grid-template-columns:1.2fr .6fr .8fr 1fr 1.4fr;gap:10px;padding:8px 12px;background:var(--panel);border-radius:6px;font-size:13px;font-variant-numeric:tabular-nums;}
+.tier-header{font-weight:700;color:var(--text-dim);font-size:11px;text-transform:uppercase;letter-spacing:.4px;}
+.meth-list{font-size:13px;line-height:1.7;}
+.download-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:14px 0;}
+.download-card{padding:12px 14px;background:var(--panel);border:1px solid var(--border);border-radius:8px;text-decoration:none;color:var(--text);transition:transform .15s,border-color .15s;}
+.download-card:hover{transform:translateY(-2px);border-color:#10b981;}
+.dl-icon{font-size:24px;margin-bottom:4px;}.dl-title{font-weight:700;font-size:13px;margin-bottom:2px;}.dl-desc{font-size:11px;color:var(--text-dim);}
+.warning{padding:10px 14px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);border-radius:6px;font-size:12.5px;color:var(--text);line-height:1.6;}
+.caption{font-size:11px;color:var(--text-dim);margin-top:8px;}
+</style>
+</body>
+</html>
