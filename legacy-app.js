@@ -18908,7 +18908,8 @@ const v36TableHtml = `<section class="v36-table-panel" aria-label="Tableau dense
         ${v37FilterResetHtml}
         ${v37EmptyPoolHelpHtml}
         ${v37DenseFallbackHtml}
-        ${v40OutsiderBannerHtml}
+        ${/* v43.3 — v40OutsiderBannerHtml retiré : v43StrategyBannerHtml supersede
+              (couvre Outsider + Value + Flat + Kelly warning + multi-day lists). */ ''}
         ${v43StrategyBannerHtml}
         ${v37DayNavHtml}
         <header class="v36-table-toolbar">
