@@ -121,10 +121,50 @@ Script Python morning digest 7h-9h Paris time, 1x/jour. Filtre Outsider
 selon type. Wired dans auto_refresh + refresh.yml. No-op sans
 DISCORD_WEBHOOK_DIGEST_URL.
 
+**Phase v45.13 — Bilan user_bets section + sparkline + CSV export**
+Section "v45 · Tes paris suivis" en tête de Bilan (avant le bilan modèle).
+Empty state si 0 paris : message + CTA dashboard. Sinon stats : P&L cumulatif
++ WR + ROI + 7d/30d + total stake + avg + sparkline SVG cumulative PnL sur
+30 derniers paris settled. Boutons 📥 Export CSV (download avec headers
+id/match/market/odd/stake/etc) + 🗑 Reset (avec confirmation).
+
+**Phase v45.14 — Daily P&L widget trust strip (24h glissant)**
+6e widget dans la trust-strip : "P&L 24h" affiche P&L user sur 24h
+glissants. Color tier vert/rouge. Tooltip : "P&L 24h glissant : +X€ sur
+N paris settled (kW gagnés)".
+
+**Phase v45.15 — Dead code removal v40OutsiderBannerHtml (-2 KB)**
+v40OutsiderBannerHtml retiré du DOM rendering en v43.3 mais const
+restait défini. Const = '' (string vide). Économie 2 KB legacy-app.js
+(1864 → 1862). v40OutsiderListHtml conservé car réutilisé.
+
+**État final v45.15** (vérifié Chrome) :
+- 8 helpers globaux exposés (`_v45FlatStake`, `v43ProfitableMode`,
+  `v43ClassifyPick`, `_settleUserBets`, `_addUserBet`,
+  `_v45PlattBoost`, `_v45LeagueOffset`, `_v45RecommendedStake`)
+- 6 widgets trust-strip : Big Bets / ROI flat / Brier / picks / CLV /
+  Paper ROI / P&L 24h
+- v43 banner Stratégies gagnantes du jour (Outsider/Value/Flat/Kelly⚠)
+- FLAT 1u toggle + bankroll display
+- Bulk track button (jusqu'à 20 paris en 1 clic)
+- Sharp money 🦈 badge sur cards (when aligned)
+- /stats.html public (16 KB, 7 sections, JSON-LD Dataset)
+- Bilan user_bets section + sparkline P&L + CSV export + Reset
+- What's New v45 notice (one-shot, 12s, dismissable)
+- Notifications strategy-aware (💎 Outsider / 🎯 Value / 📊 Flat)
+- Discord digest matin (notify_discord_digest.py 8h Paris)
+- Paper trading log (forward proof, paper_log.jsonl + summary.json)
+- Calibration : Platt boost +5/+6pt + 9 ligues offsets
+
+**Bundle final** : legacy-app.js 1862/1920 KB (97%), app.css 284/300 KB.
+Headroom 58 KB pour futures features avant refacto ESM split obligatoire.
+
 **Backlog encore ouvert** :
-- Bankroll history graph (sparkline P&L over time)
-- Refacto bundle ESM (legacy-app.js 1849/1920 KB, 70 KB de marge)
+- Refacto bundle ESM (legacy-app.js → modules core/pages/markets/etc)
 - A/B test framework + monitoring tier-3
+- Multi-bookmaker comparison (best odds across 5+ books)
+- Live odds tracker (line movement throughout the day)
+- Hedge protection alerts
 
 ## Architecture v43.x (mise à jour 2026-05-09 — refonte stratégie données-prouvées)
 
