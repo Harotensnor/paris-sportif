@@ -4496,6 +4496,56 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
       try { window._settleUserBets(); } catch (err) {}
     });
   }
+  // v45.13 — CSV export + reset bets handlers.
+  document.addEventListener('click', (e) => {
+    const exportBtn = e.target && e.target.closest ? e.target.closest('[data-v45-export-bets]') : null;
+    if (exportBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      try {
+        const bets = window._loadUserBets() || [];
+        if (!bets.length) {
+          if (typeof window.toast === 'function') window.toast('Aucun pari à exporter', 'warn');
+          return;
+        }
+        const headers = ['id', 'matchId', 'market', 'key', 'label', 'odd', 'stake', 'ts', 'iso_date', 'settled', 'result', 'pnl', 'settledTs'];
+        const rows = bets.map(b => headers.map(h => {
+          if (h === 'iso_date') return b.ts ? new Date(b.ts).toISOString() : '';
+          const v = b[h];
+          if (v === null || v === undefined) return '';
+          const s = String(v).replace(/"/g, '""');
+          return s.includes(',') || s.includes('"') || s.includes('\n') ? `"${s}"` : s;
+        }).join(','));
+        const csv = [headers.join(','), ...rows].join('\n');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `paris-sportif-user-bets-${new Date().toISOString().slice(0,10)}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 200);
+        if (typeof window.toast === 'function') window.toast(`📥 ${bets.length} paris exportés CSV`, 'success');
+      } catch (err) {
+        if (typeof window.toast === 'function') window.toast('Erreur export CSV', 'error');
+      }
+      return;
+    }
+    const clearBtn = e.target && e.target.closest ? e.target.closest('[data-v45-clear-bets]') : null;
+    if (clearBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      const ok = confirm('Reset complet des paris suivis ? Cette action est irréversible.');
+      if (!ok) return;
+      try {
+        localStorage.removeItem('paris_sportif_user_bets');
+        if (typeof window.toast === 'function') window.toast('🗑 Paris réinitialisés', 'success');
+        setTimeout(() => location.reload(), 600);
+      } catch (err) {
+        if (typeof window.toast === 'function') window.toast('Erreur reset', 'error');
+      }
+    }
+  }, true);
   window._settleUserBets = function() {
     // Met à jour les paris en attente avec leur résultat si dispo
     const data = window.PRONOSTICS_DATA;
@@ -31868,6 +31918,117 @@ function renderBilanPage(wrap) {
 const data = window.PRONOSTICS_DATA;
 if (!data || !data.days) { wrap.innerHTML = '<div class="bilan-empty">Pas de données de bilan.</div>'; return; }
 
+// AUDIT 2026-05-09 v45.13 — User bets section au top du Bilan.
+// Avant : Bilan = bilan modèle abstrait. Maintenant : USER bets first
+// (ce qui intéresse vraiment l'user) + section modèle dessous.
+const v45UserBetsBilanHtml = (() => {
+  try {
+    if (typeof window._loadUserBets !== 'function') return '';
+    const bets = window._loadUserBets() || [];
+    if (!bets.length) {
+      return `<section style="padding:18px 20px;background:linear-gradient(135deg,rgba(245,158,11,.08),transparent);border:1px solid rgba(245,158,11,.4);border-radius:12px;margin-bottom:18px;">
+        <div style="font-size:11px;color:#f59e0b;text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">v45 · Tes paris suivis</div>
+        <div style="font-size:18px;font-weight:800;margin-bottom:8px;">📋 Aucun pari suivi pour le moment</div>
+        <div style="font-size:13px;color:var(--text-dim);line-height:1.6;margin-bottom:10px;">
+          Pour voir tes stats personnelles, clique sur <b>"📋 Tracker tous les N picks"</b> dans la table de l'accueil. Chaque pari se règle automatiquement quand le match termine.
+        </div>
+        <a href="#dashboard" data-page="dashboard" style="display:inline-block;padding:6px 14px;background:#f59e0b;color:#08080a;border-radius:999px;font-size:11px;font-weight:700;text-decoration:none;">→ Aller au dashboard</a>
+      </section>`;
+    }
+    // Settle pending bets first
+    if (typeof window._settleUserBets === 'function') {
+      try { window._settleUserBets(); } catch(e) {}
+    }
+    const now = Date.now();
+    const dayMs = 24*3600*1000;
+    const stats = { total: bets.length, settled: 0, won: 0, lost: 0, void: 0, pending: 0, pnl: 0, pnl7d: 0, pnl30d: 0, totalStake: 0 };
+    bets.forEach(b => {
+      const ts = Number(b.ts || 0);
+      const ageDays = (now - ts) / dayMs;
+      stats.totalStake += Number(b.stake || 0);
+      if (b.settled) {
+        stats.settled++;
+        if (b.result === 'won') stats.won++;
+        else if (b.result === 'lost') stats.lost++;
+        else stats.void++;
+        const pnl = Number(b.pnl || 0);
+        stats.pnl += pnl;
+        if (ageDays <= 7) stats.pnl7d += pnl;
+        if (ageDays <= 30) stats.pnl30d += pnl;
+      } else {
+        stats.pending++;
+      }
+    });
+    const wr = (stats.won + stats.lost) > 0 ? (stats.won / (stats.won + stats.lost)) * 100 : 0;
+    const roi = stats.totalStake > 0 ? (stats.pnl / stats.totalStake) * 100 : 0;
+    // Sparkline cumulative PnL (last 30 settled bets)
+    const settledSorted = bets.filter(b => b.settled).sort((a, b) => (a.settledTs || a.ts) - (b.settledTs || b.ts));
+    const recent = settledSorted.slice(-30);
+    let cumulative = 0;
+    const points = recent.map((b, i) => {
+      cumulative += Number(b.pnl || 0);
+      return { i, pnl: cumulative };
+    });
+    let svg = '';
+    if (points.length >= 2) {
+      const minPnl = Math.min(0, ...points.map(p => p.pnl));
+      const maxPnl = Math.max(0, ...points.map(p => p.pnl));
+      const range = Math.max(1, maxPnl - minPnl);
+      const w = 240, h = 60, pad = 4;
+      const path = points.map((p, i) => {
+        const x = pad + (i / (points.length - 1)) * (w - 2*pad);
+        const y = h - pad - ((p.pnl - minPnl) / range) * (h - 2*pad);
+        return (i === 0 ? 'M' : 'L') + x.toFixed(1) + ' ' + y.toFixed(1);
+      }).join(' ');
+      const lastY = h - pad - ((points[points.length-1].pnl - minPnl) / range) * (h - 2*pad);
+      const zeroY = h - pad - ((0 - minPnl) / range) * (h - 2*pad);
+      const color = cumulative >= 0 ? '#10b981' : '#ef4444';
+      svg = `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" style="overflow:visible;">
+        <line x1="0" y1="${zeroY}" x2="${w}" y2="${zeroY}" stroke="var(--border)" stroke-dasharray="2,2" stroke-width="1"/>
+        <path d="${path}" fill="none" stroke="${color}" stroke-width="2"/>
+        <circle cx="${pad + (points.length-1) / Math.max(1,points.length-1) * (w-2*pad)}" cy="${lastY}" r="3" fill="${color}"/>
+      </svg>`;
+    }
+    const sign = stats.pnl >= 0 ? '+' : '';
+    const pnlColor = stats.pnl >= 0 ? '#10b981' : '#ef4444';
+    return `<section style="padding:18px 20px;background:linear-gradient(135deg,rgba(16,185,129,.08),transparent);border:1px solid var(--border);border-radius:12px;margin-bottom:18px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:14px;margin-bottom:14px;">
+        <div>
+          <div style="font-size:11px;color:#10b981;text-transform:uppercase;letter-spacing:1.4px;font-weight:700;">v45 · Tes paris suivis</div>
+          <div style="font-size:24px;font-weight:800;margin-top:2px;">📊 P&L cumulatif <b style="color:${pnlColor};">${sign}${stats.pnl.toFixed(2)}€</b></div>
+          <div style="font-size:12px;color:var(--text-dim);margin-top:4px;">${stats.settled} réglés · ${stats.pending} en cours · ${stats.won}W ${stats.lost}L ${stats.void}V · WR ${wr.toFixed(1)}% · ROI ${roi >= 0 ? '+' : ''}${roi.toFixed(1)}%</div>
+        </div>
+        <div style="text-align:right;">
+          ${svg}
+          ${svg ? `<div style="font-size:10px;color:var(--text-dim);margin-top:2px;">30 derniers paris</div>` : '<div style="font-size:11px;color:var(--text-dim);">Pas assez de paris réglés pour graph</div>'}
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;font-size:12px;">
+        <div style="padding:8px 10px;background:var(--panel);border-radius:6px;">
+          <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;">7 jours</div>
+          <div style="font-size:14px;font-weight:800;color:${stats.pnl7d >= 0 ? '#10b981' : '#ef4444'};">${stats.pnl7d >= 0 ? '+' : ''}${stats.pnl7d.toFixed(2)}€</div>
+        </div>
+        <div style="padding:8px 10px;background:var(--panel);border-radius:6px;">
+          <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;">30 jours</div>
+          <div style="font-size:14px;font-weight:800;color:${stats.pnl30d >= 0 ? '#10b981' : '#ef4444'};">${stats.pnl30d >= 0 ? '+' : ''}${stats.pnl30d.toFixed(2)}€</div>
+        </div>
+        <div style="padding:8px 10px;background:var(--panel);border-radius:6px;">
+          <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;">Total mises</div>
+          <div style="font-size:14px;font-weight:800;color:var(--text);">${stats.totalStake.toFixed(2)}€</div>
+        </div>
+        <div style="padding:8px 10px;background:var(--panel);border-radius:6px;">
+          <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;">Avg stake</div>
+          <div style="font-size:14px;font-weight:800;color:var(--text);">${stats.total > 0 ? (stats.totalStake / stats.total).toFixed(2) : '0.00'}€</div>
+        </div>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+        <button type="button" data-v45-export-bets style="padding:6px 12px;background:var(--panel);border:1px solid var(--border);color:var(--text);border-radius:999px;font-size:11px;font-weight:600;cursor:pointer;">📥 Export CSV</button>
+        <button type="button" data-v45-clear-bets style="padding:6px 12px;background:rgba(239,68,68,.10);border:1px solid rgba(239,68,68,.4);color:#ef4444;border-radius:999px;font-size:11px;font-weight:600;cursor:pointer;">🗑 Reset</button>
+      </div>
+    </section>`;
+  } catch (e) { return ''; }
+})();
+
 const completed = [];
 Object.values(data.days).forEach(arr => (arr || []).forEach(m => {
 if (m.completed) completed.push(m);
@@ -32857,6 +33018,7 @@ return `
 
 wrap.innerHTML = `
       <div class="page-wrap">
+        ${v45UserBetsBilanHtml}
         <div class="page-header">
           <div style="position:absolute;top:0;left:0;width:40px;height:3px;background:${_modelRoi == null ? 'var(--text-dim)' : _modelRoi >= 0 ? 'var(--accent)' : 'var(--danger)'};border-radius:0 0 2px 2px;"></div>
           <div style="font-size:11px;color:${_modelRoi == null ? 'var(--text-dim)' : _modelRoi >= 0 ? 'var(--accent)' : 'var(--danger)'};text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Performance du modèle · ${model.bets || 0} pari${(model.bets||0)>1?'s':''}</div>
