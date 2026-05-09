@@ -64,7 +64,14 @@ jobs:
       # Tous écrivent leur propre JSON, pas de race-condition possible.
       # Les patches restent séquentiels (eux écrivent tous data.js).
       - name: Fetch pipeline (parallèle)
+        shell: bash --noprofile --norc {0}
         run: |
+          # v47.7 — Disable set -e default (GH Actions strict mode kill au moindre
+          # exit ≠ 0, alors qu'on a explicitement '|| true' partout).
+          # Les heredocs Python ou shell expressions transient errors faisaient
+          # planter tout le step. Sans set -e, on propage seulement les vrais kills.
+          set +e
+          set +o pipefail
           cd scripts
           # v47.5 — Timeout 180s par fetcher pour empêcher hang (un fetcher
           # qui pend bloquait tout le step 'wait' pendant 10 min → step KILL).
