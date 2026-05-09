@@ -4071,12 +4071,18 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
       return Number.isFinite(t) && t > 0 ? t : null;
     })();
     const minutesUntilKickoff = kickoffMs ? Math.max(0, Math.round((kickoffMs - Date.now()) / 60000)) : null;
+    // v53.1 — Seuils relâchés. Avant : kickoff<=4h → 180min stale →
+    // dès que data > 3h, TOUS les picks proches kickoff étaient tagged
+    // "Cote ancienne" → 0 picks Genius / "À vérifier" sur tout le tableau.
+    // En prod, le cron tick tous les 5min mais le commit Git + CDN refresh
+    // peut prendre 10-20min. La marge 180min était trop serrée. Maintenant
+    // 240min (4h) pour matchs proches, 480min (8h) pour day-ahead.
     let staleThreshold;
-    if (minutesUntilKickoff == null) staleThreshold = 360; // sans kickoff connu, médian
-    else if (minutesUntilKickoff <= 240) staleThreshold = 180;
-    else if (minutesUntilKickoff <= 1440) staleThreshold = 360;
-    else if (minutesUntilKickoff <= 4320) staleThreshold = 720;
-    else staleThreshold = 1440;
+    if (minutesUntilKickoff == null) staleThreshold = 480;  // sans kickoff connu, médian
+    else if (minutesUntilKickoff <= 240) staleThreshold = 240;  // proches : 4h
+    else if (minutesUntilKickoff <= 1440) staleThreshold = 480;  // < 24h : 8h
+    else if (minutesUntilKickoff <= 4320) staleThreshold = 720;  // 24-72h : 12h
+    else staleThreshold = 1440;  // > 72h : 24h
     const base = {
       status: 'missing',
       odd: Number.isFinite(odd) ? odd : null,
@@ -19277,9 +19283,12 @@ const _v45GeniusFilter = (p) => {
   if (edge < 0.07) return false;
   if (rel < 0.55) return false;
   if (odd < 1.50 || odd > 8.0) return false;
-  // Cote validated
+  // v53.1 — cote eligible uniquement si verified/changed (drift OK).
+  // AVANT : v38OddTopEligible reject tout `status:stale` → 0 Genius picks dès
+  // que data > 4h (typique de la prod). Maintenant on ACCEPTE 'stale' avec
+  // disclaimer "à vérifier" plutôt que faire disparaître le bandeau.
   const oddMeta = p.oddValidation;
-  if (typeof v38OddTopEligible === 'function' && oddMeta && !v38OddTopEligible(oddMeta)) return false;
+  if (oddMeta && oddMeta.status === 'suspicious') return false;
   // Match dans 24h prochaines (pas de matchs trop loin)
   const ko = p.ts || (p.m && p.m.date ? new Date(p.m.date).getTime() : 0);
   const now = Date.now();
@@ -30630,7 +30639,12 @@ const subTabsHtml = `
 <button data-perf-tab="${t.k}" style="padding:7px 14px;border-radius:var(--r-sm);border:1px solid ${currentTab === t.k ? 'var(--brand)' : 'transparent'};background:${currentTab === t.k ? 'var(--brand-soft)' : 'transparent'};color:${currentTab === t.k ? 'var(--brand)' : 'var(--text-2)'};font-weight:600;font-size:13px;cursor:pointer;">${esc(t.lbl)}</button>
 `).join('')}
       </div>`;
-const byPeriod = bt.by_period || bt.byPeriod || {};
+// v53.1 — by_period vit dans backtest_report_markets.json (généré par
+// backtest_by_market.py), pas dans backtest_report_v2.json. Avant : empty
+// state systématique sur l'onglet "Par période" parce qu'on lisait le mauvais
+// fichier. Maintenant on fallback sur __backtestReportMarkets.
+const _mktRepFallback = window.__backtestReportMarkets || {};
+const byPeriod = bt.by_period || bt.byPeriod || _mktRepFallback.by_period || {};
 const byCote = bt.by_cote_bucket || bt.byCote || {};
 const _healthWidget = (() => {
 try {
