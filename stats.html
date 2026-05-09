@@ -58,7 +58,7 @@
       <div class="hero-sub">À éviter · max DD <b>99.99%</b> (wipeout)</div>
     </div>
   </div>
-  <div class="hero-disclaimer">Backtest 1932 picks settled (sample audité 2026-04-27 → 2026-05-09). Reproductible via <a href="/backtest_strategies.json"><code>backtest_strategies.json</code></a>.</div>
+  <div class="hero-disclaimer">Backtest 1932 picks settled (sample audité 2026-04-27 → 2026-05-09). Reproductible via <a href="backtest_strategies.json"><code>backtest_strategies.json</code></a>.</div>
 </section>
 
 <section class="content-section">
@@ -86,7 +86,7 @@
       <div class="paper-sub">FLAT 1u</div>
     </div>
   </div>
-  <p class="caption">Données live depuis <a href="/paper_log_summary.json"><code>paper_log_summary.json</code></a> (cron 30 min).</p>
+  <p class="caption">Données live depuis <a href="paper_log_summary.json"><code>paper_log_summary.json</code></a> (cron 30 min).</p>
 </section>
 
 <section class="content-section">
@@ -136,8 +136,8 @@
   <ul class="meth-list">
     <li><b>Source des cotes</b> : Winamax exact (catalog official) — 100% des picks dans le sample.</li>
     <li><b>Modèle</b> : Bivariate Poisson + Dixon-Coles τ correction + Elo per-team + LightGBM stacking + ensemble adaptive weights v5.</li>
-    <li><b>Backtest</b> : <a href="/backtest_v2.py">scripts/backtest_v2.py</a> rejoue <code>predictMatch</code> sur events historiques via mini-racer (V8 embedded). Une seule source de vérité avec la prod.</li>
-    <li><b>Paper log</b> : <a href="/scripts/paper_trade_log.py">scripts/paper_trade_log.py</a> snapshot des picks futurs + settle quand match completed. Forward proof immutable.</li>
+    <li><b>Backtest</b> : <a href="backtest_v2.py">scripts/backtest_v2.py</a> rejoue <code>predictMatch</code> sur events historiques via mini-racer (V8 embedded). Une seule source de vérité avec la prod.</li>
+    <li><b>Paper log</b> : <a href="scripts/paper_trade_log.py">scripts/paper_trade_log.py</a> snapshot des picks futurs + settle quand match completed. Forward proof immutable.</li>
     <li><b>CLV</b> : compute_clv.py compare cote au snapshot vs cote finale Winamax. Mesure si on bat le marché.</li>
     <li><b>Stratégie default</b> : FLAT 1u (1% bankroll). Kelly disponible mais documenté -30% ROI historique.</li>
   </ul>
@@ -146,32 +146,32 @@
 <section class="content-section">
   <h2>📂 Datasets téléchargeables</h2>
   <div class="download-grid">
-    <a href="/backtest_strategies.json" class="download-card">
+    <a href="backtest_strategies.json" class="download-card">
       <div class="dl-icon">📊</div>
       <div class="dl-title">Strategies leaderboard</div>
       <div class="dl-desc">7 stratégies × ROI/profit/max_dd/sharpe</div>
     </a>
-    <a href="/backtest_report_v2.json" class="download-card">
+    <a href="backtest_report_v2.json" class="download-card">
       <div class="dl-icon">🎯</div>
       <div class="dl-title">Backtest v2 complet</div>
       <div class="dl-desc">Per-tier × per-sport × per-league × calibration ECE</div>
     </a>
-    <a href="/paper_log_summary.json" class="download-card">
+    <a href="paper_log_summary.json" class="download-card">
       <div class="dl-icon">⏱️</div>
       <div class="dl-title">Paper log live</div>
       <div class="dl-desc">Forward proof snapshots (mis à jour toutes les 30 min)</div>
     </a>
-    <a href="/clv_summary.json" class="download-card">
+    <a href="clv_summary.json" class="download-card">
       <div class="dl-icon">💰</div>
       <div class="dl-title">CLV summary</div>
       <div class="dl-desc">Closing Line Value pick-level + per-sport</div>
     </a>
-    <a href="/health.json" class="download-card">
+    <a href="health.json" class="download-card">
       <div class="dl-icon">❤️</div>
       <div class="dl-title">Pipeline health</div>
       <div class="dl-desc">Status sources data + quality checks</div>
     </a>
-    <a href="/data.js" class="download-card">
+    <a href="data.js" class="download-card">
       <div class="dl-icon">📅</div>
       <div class="dl-title">Données brutes</div>
       <div class="dl-desc">Events Winamax + enrichissements (JSON)</div>
@@ -188,7 +188,7 @@
 </main>
 
 <footer class="static-page-footer">
-  <div>Paris-Sportif · stats publiques · <a href="/">retour app</a> · <a href="/methodologie.html">méthodologie</a> · <a href="/legal.html">mentions légales</a></div>
+  <div>Paris-Sportif · stats publiques · <a href="/">retour app</a> · <a href="methodologie.html">méthodologie</a> · <a href="legal.html">mentions légales</a></div>
   <div class="footer-version">Page régénérée chaque cron tick · données live</div>
 </footer>
 
@@ -204,7 +204,7 @@
 
   // Paper log
   try {
-    const r = await fetch('/paper_log_summary.json?v=' + Math.floor(Date.now()/300000));
+    const r = await fetch('paper_log_summary.json?v=' + Math.floor(Date.now()/300000));
     if (r.ok) {
       const j = await r.json();
       safeText('paper-snapshot-count', j.snapshot_count || 0);
@@ -221,7 +221,7 @@
 
   // Backtest_strategies leaderboard (overrides hero values with live data)
   try {
-    const r = await fetch('/backtest_strategies.json?v=' + Math.floor(Date.now()/300000));
+    const r = await fetch('backtest_strategies.json?v=' + Math.floor(Date.now()/300000));
     if (r.ok) {
       const j = await r.json();
       const lb = j.leaderboard || [];
@@ -235,7 +235,7 @@
 
   // Backtest_report_v2 → quality + tiers
   try {
-    const r = await fetch('/backtest_report_v2.json?v=' + Math.floor(Date.now()/300000));
+    const r = await fetch('backtest_report_v2.json?v=' + Math.floor(Date.now()/300000));
     if (r.ok) {
       const j = await r.json();
       const ov = j.overall || {};
@@ -265,7 +265,7 @@
 
   // CLV summary
   try {
-    const r = await fetch('/clv_summary.json?v=' + Math.floor(Date.now()/300000));
+    const r = await fetch('clv_summary.json?v=' + Math.floor(Date.now()/300000));
     if (r.ok) {
       const j = await r.json();
       const clv = (j.summary || {}).pick_mean_clv_pct;
