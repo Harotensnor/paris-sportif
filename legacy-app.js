@@ -8436,20 +8436,33 @@ setText('trust-roi', (roiPct >= 0 ? '+' : '') + roiPct.toFixed(1) + '%');
 setText('trust-brier', (overall.brier || 0).toFixed(3));
 setText('trust-n', overall.n);
 }
-// AUDIT 2026-05-09 v40.15 — CLV moyen depuis clv_summary.json (chargé async).
-// Si dispo, on remplit #trust-clv avec mean_clv_pct + couleur green/red.
-try {
-  const clvData = (window.__v37ClvSummaryState && window.__v37ClvSummaryState.data) || null;
+// AUDIT 2026-05-09 v40.15 + v42.fix — CLV moyen depuis clv_summary.json.
+// v42 fix : kick off un fetch direct ici car v37ClvState (dans renderDashboardPage)
+// n'est pas garanti d'être chargé quand updateTrustStrip s'exécute. On
+// fetch indépendamment + cache 5min + update setText quand data arrive.
+const _setClvWidget = (clvData) => {
   const meanClv = Number(clvData?.summary?.mean_clv_pct);
-  if (Number.isFinite(meanClv)) {
-    const sign = meanClv >= 0 ? '+' : '';
-    setText('trust-clv', `${sign}${meanClv.toFixed(2)}%`);
-    const el = document.getElementById('trust-clv');
-    if (el) {
-      el.style.color = meanClv >= 0 ? '#34d399' : '#f87171';
-      el.style.fontWeight = '700';
-    }
+  if (!Number.isFinite(meanClv)) return;
+  const sign = meanClv >= 0 ? '+' : '';
+  setText('trust-clv', `${sign}${meanClv.toFixed(2)}%`);
+  const el = document.getElementById('trust-clv');
+  if (el) {
+    el.style.color = meanClv >= 0 ? '#34d399' : '#f87171';
+    el.style.fontWeight = '700';
   }
+};
+// Tente d'abord avec le state existant (sync hit si déjà chargé)
+try {
+  const cached = (window.__v37ClvSummaryState && window.__v37ClvSummaryState.data) || null;
+  if (cached) _setClvWidget(cached);
+} catch (e) { /* swallowError(e); */ }
+// Fetch direct au cas où (toujours bon de re-confirmer)
+try {
+  const clvBucket = Math.floor(Date.now() / (5 * 60 * 1000));
+  fetch(`clv_summary.json?v=${clvBucket}`, { cache: 'default' })
+    .then(r => r.ok ? r.json() : null)
+    .then(j => { if (j) _setClvWidget(j); })
+    .catch(() => {});
 } catch (e) { /* swallowError(e); */ }
 delete strip.dataset.dismissed;
 strip.classList.remove('hidden');
@@ -18280,7 +18293,13 @@ if (v37DebugOn) {
 try { prodLog('[v37 debug]', { ...v37DebugState, sampleMatches: v37DebugMatches() }); } catch(e) { swallowError(e); }
 }
 const v37DebugPanelHtml = v37DebugOn ? `<section class="v37-debug-panel" data-v37-debug-panel><b>Debug tableau V37</b><span>Filtres actifs · Raisons de rejet · 10 premiers matchs scannes</span><pre tabindex="0" aria-label="Données de diagnostic du tableau">${esc(JSON.stringify({ ...v37DebugState, sampleMatches: v37DebugMatches() }, null, 2))}</pre></section>` : '';
-const v37EmptyPoolHelpHtml = (!v36PickPool.length && terminalScanPool.length > 10) ? `<section class="v37-empty-pool-help">
+// AUDIT 2026-05-09 v42.fix — Le message "Mode secours" était alarmant
+// alors que les picks data-only sont désormais souvent misables (verdict
+// 'bet'/'bet-light' grâce au v40 Winamax-direct + Outsider override).
+// Affiche uniquement quand 0 misables (vrai cas dégénéré). Si ≥1 misable,
+// la bannière 💎 v40.8 et le compteur "X misables" suffisent.
+const _v42HasMisables = (typeof v40BettableCount === 'number' && v40BettableCount > 0);
+const v37EmptyPoolHelpHtml = (!v36PickPool.length && terminalScanPool.length > 10 && !_v42HasMisables) ? `<section class="v37-empty-pool-help">
         <strong>Mode secours actif : le tableau ne reste jamais vide.</strong>
         <span>${terminalScanPool.length} matchs sont disponibles. ${v37DataOnlyPool.length ? `${v37DataOnlyPool.length} matchs data-only sont affiches avec cote a verifier.` : 'La liste complete reste accessible dans Tous.'}</span>
         <button type="button" class="page-btn" data-page="tous">Voir tous les matchs</button>
