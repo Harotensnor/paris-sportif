@@ -8594,6 +8594,23 @@ if (lowSample || trivialRoi) {
   setText('trust-roi', (roiPct >= 0 ? '+' : '') + roiPct.toFixed(1) + '%');
 }
 setText('trust-brier', (overall.brier || 0).toFixed(3));
+// v48 fix — Audit point #16 : Brier 0.231 paraît proche de 0.25 (random)
+// → user pense que le modèle est mauvais. Ajout tooltip avec interprétation
+// contextuelle (référentiel 1X2 : 0.20-0.22 = normal, < 0.18 = bon).
+try {
+  const brier = overall.brier || 0;
+  const brierStat = document.getElementById('trust-brier')?.closest('.trust-strip-stat');
+  if (brierStat) {
+    let interp = '';
+    if (brier <= 0) interp = 'Pas encore d\'observations';
+    else if (brier < 0.18) interp = 'Excellent (modèle bien calibré)';
+    else if (brier < 0.21) interp = 'Bon (au-dessus de la médiane des modèles 1X2)';
+    else if (brier < 0.23) interp = 'Acceptable (zone normale 1X2)';
+    else if (brier < 0.25) interp = 'Limite (proche du baseline aléatoire)';
+    else interp = 'Mauvais (sous la baseline aléatoire 0.25)';
+    brierStat.title = `Brier score = ${brier.toFixed(3)} · ${interp}\nRéférence 1X2 : 0.25 (random) / 0.21 (médiane modèles) / 0.18 (bon).\nPlus c'est BAS, mieux c'est calibré.`;
+  }
+} catch (e) {}
 setText('trust-n', overall.n);
 // v45.17 — Tooltip avec date de regeneration du backtest pour transparence.
 try {
