@@ -4286,9 +4286,30 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
       && c.ev > 0
       && c.edge > 0
     );
+    // v52.0 — CLV-aware market preference (Plan Phase 3, CLV_INVESTIGATION findings).
+    // Données CLV pick-level montrent grande disparité entre marchés :
+    //   htTotal      : +53.68% CLV → boost
+    //   outsider 5+  : +85.17% CLV → boost MAX (mais gestion via tier 'out' v43)
+    //   ou           : +3.41% CLV → neutre
+    //   teamTotal    : +1.67% CLV → légère pénalité
+    //   1n2          : -3.23% CLV → PÉNALITÉ
+    //   btts         : 0.0% CLV   → neutre
+    // Multiplier appliqué sur le score pour favoriser les marchés à CLV+ historique.
+    const _CLV_MARKET_MULTIPLIER = (market) => {
+      const m = String(market || '').toLowerCase();
+      if (m.includes('httotal') || m === 'ht_ou' || m === 'halftimetotal') return 1.30;  // +30%
+      if (m === 'dnb') return 1.10;
+      if (m === 'ou' || m === 'ou25' || m === 'ou15' || m === 'ou35') return 1.05;
+      if (m === 'btts') return 1.00;
+      if (m === 'teamtotal') return 0.98;
+      if (m === '1n2' || m === 'matchwinner') return 0.85;  // -15% pénalité
+      return 1.00;
+    };
     const sorted = (pool.length ? pool : allowed).slice();
     sorted.sort((a, b) => {
-      const ai = a.investment?.score || 0, bi = b.investment?.score || 0;
+      const aMul = _CLV_MARKET_MULTIPLIER(a.market);
+      const bMul = _CLV_MARKET_MULTIPLIER(b.market);
+      const ai = (a.investment?.score || 0) * aMul, bi = (b.investment?.score || 0) * bMul;
       if (bi !== ai) return bi - ai;
       if (Math.abs((b.ev || 0) - (a.ev || 0)) > 0.005) return (b.ev || 0) - (a.ev || 0);
       return (b.edge || 0) - (a.edge || 0);
