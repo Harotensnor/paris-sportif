@@ -14859,6 +14859,28 @@ ${match.surface ? `<div class="kv"><div class="k">Surface</div><div class="v">${
       if (whyBlock) whyBlock.setAttribute('data-mtab-always', 'true');
       const header = body.querySelector('.teams-big');
       if (header) header.setAttribute('data-mtab-always', 'true');
+      // v48 fix — Audit point #13 : l'onglet H2H disparaissait sur les matchs
+      // sans h2h scrapé (TennisExplorer absent, derbies obscurs, etc.) →
+      // l'utilisateur pensait que l'onglet buggait. Maintenant : injecter une
+      // section placeholder "Pas de H2H disponible" pour que l'onglet reste
+      // toujours visible et que l'utilisateur sache que cette donnée existe
+      // (juste pas pour ce match). Idem pour les autres tabs essentiels.
+      ['h2h', 'cotes', 'risques'].forEach(essentialKey => {
+        if (!tabSections[essentialKey].length) {
+          const placeholder = document.createElement('section');
+          placeholder.setAttribute('data-mtab', essentialKey);
+          placeholder.setAttribute('data-mtab-placeholder', 'true');
+          const labels = { h2h: 'H2H (face-à-face)', cotes: 'Cotes', risques: 'Risques' };
+          const reasons = {
+            h2h: 'Aucune confrontation directe disponible — soit ce sport ne fournit pas l\'historique, soit les équipes ne se sont jamais affrontées récemment.',
+            cotes: 'Les cotes pré-match ne sont pas encore figées (snapshot Winamax pas encore pris).',
+            risques: 'Aucun signal de risque détecté pour ce match (confiance OK, météo OK, fatigue OK, effectif OK).'
+          };
+          placeholder.innerHTML = `<h4>${labels[essentialKey] || essentialKey}</h4><p style="color:var(--text-dim);font-size:13px;margin:8px 0 0;">${reasons[essentialKey]}</p>`;
+          body.appendChild(placeholder);
+          tabSections[essentialKey].push(placeholder);
+        }
+      });
       // Ne montrer les chips que pour les catégories non vides
       const visibleTabs = tabsOrder.filter(([k]) => tabSections[k].length > 0);
       if (visibleTabs.length < 2) return;  // 1 seul onglet utile = pas la peine
