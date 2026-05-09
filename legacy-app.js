@@ -642,7 +642,9 @@ const STATIC_REDIRECT_PAGES = new Set([]);
 let currentPage = (() => {
 const fromHash = _pageFromHash();
 if (fromHash) return fromHash;
-let stored = localStorage.getItem('currentPage');
+// v53.0 — Safari private mode jette SecurityError sur localStorage. Wrap.
+let stored = null;
+try { stored = localStorage.getItem('currentPage'); } catch(e) { /* private mode */ }
 if (stored && PAGE_ALIASES[stored]) stored = PAGE_ALIASES[stored];
 if (stored && VALID_PAGES.includes(stored) && !STATIC_REDIRECT_PAGES.has(stored)) return stored;
 if (stored && STATIC_REDIRECT_PAGES.has(stored)) {
@@ -789,7 +791,10 @@ imgAltObserver.observe(document.documentElement, { childList: true, subtree: tru
 } catch(e) { swallowError(e); }
 
 let bankroll = (() => {
-const v = parseFloat(localStorage.getItem('bankroll'));
+// v53.0 — Safari private mode SecurityError protection.
+let raw = null;
+try { raw = localStorage.getItem('bankroll'); } catch(e) { /* private mode */ }
+const v = parseFloat(raw);
 return isFinite(v) && v > 0 ? v : 100;
 })();
 const BANKROLL_MIN = 1, BANKROLL_MAX = 1_000_000;
@@ -11628,7 +11633,10 @@ return null;
 const { home, away } = getSides(match);
 const hs = parseInt(home?.score ?? '', 10);
 const as = parseInt(away?.score ?? '', 10);
-const key = pred.pick.key;
+// v53.0 — pred.pick peut être null sur les matchs VOID/RETIRED où predictMatch
+// retourne {skip:true, pick:null}. Avant : TypeError "Cannot read properties of null".
+const key = pred?.pick?.key;
+if (!key) return null;
 if (isNaN(hs) || isNaN(as)) {
 const homeWinner = home?.winner === true;
 const awayWinner = away?.winner === true;
@@ -35417,7 +35425,9 @@ const initPrefs = JSON.parse(localStorage.getItem('userPrefs') || '{}');
 _currentTheme = UX_THEME_CHOICES.includes(initPrefs.theme) ? initPrefs.theme : 'dark';
 _applyTheme(_currentTheme);
 } catch(e) { _applyTheme('dark'); }
-try { setInterval(() => _applyTheme(_currentTheme), 600000); } catch(e) { swallowError(e); }
+// v53.0 — Retiré : setInterval(_applyTheme, 600000) tournait toutes les 10 min
+// pour rien. Le listener prefers-color-scheme below couvre déjà les changements
+// système. Coût économisé : 144 reflows/jour pour zéro bénéfice fonctionnel.
 try {
 const mql = window.matchMedia('(prefers-color-scheme: light)');
 const _onSysChange = () => { if (_currentTheme === 'auto' || _currentTheme === 'system') _applyTheme(_currentTheme); };
