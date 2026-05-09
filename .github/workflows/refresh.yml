@@ -247,6 +247,9 @@ jobs:
             python3 fetch_mlb_pitchers.py || true
             python3 fetch_nhl_stats.py || true
             python3 fetch_nba_team_stats.py || true
+            # v51.2 — NBA advanced stats via ESPN team-level endpoint (Plan Pronostics Phase 2.1).
+            # Self-throttled 60min, fournit AST/REB/STL/BLK + AST/TO ratio per team.
+            python3 fetch_nba_advanced.py || true
             # v35 — Markets étendus Winamax multi-sports (foot, tennis,
             # basket, baseball, hockey, MMA) sur le pool exact priorisé.
             # Tourne toutes les 15 min, après que patch_winamax_markets a
@@ -540,6 +543,7 @@ jobs:
             odds_aggregated.json \
             paper_log.jsonl paper_log_summary.json picks_history.jsonl picks_history_summary.json \
             backtest_report_v2.json backtest_report_v2.md calibration_per_sport_league.json calibration_per_sport_league_market.json bankroll_simulation.json \
+            nba_advanced.json audit_patch_contracts.json \
             audit_tech_debt.json audit_tech_debt.md audit_seo_validators.json audit_seo_validators.md
           do
             if [ -e "$path" ]; then
