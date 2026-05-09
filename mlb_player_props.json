@@ -1,136 +1,8 @@
 {
-  "generated_at": "2026-05-09T02:10:12Z",
+  "generated_at": "2026-05-09T02:15:15Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815264",
-      "kickoff": "2026-05-09T02:10Z",
-      "league": "MLB",
-      "match": "Atlanta Braves at Los Angeles Dodgers",
-      "home": "Los Angeles Dodgers",
-      "away": "Atlanta Braves",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Atlanta Braves",
-          "pitcher": "Spencer Strider",
-          "label": "Spencer Strider plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5173,
-          "fair_odds": 1.93,
-          "expected_strikeouts": 5.58,
-          "projected_ip": 3.1,
-          "inputs": {
-            "k9": 16.2,
-            "era": 8.1,
-            "whip": 2.7,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Atlanta Braves",
-          "pitcher": "Spencer Strider",
-          "label": "Spencer Strider concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6054,
-          "fair_odds": 1.65,
-          "expected_hr_allowed": 0.93,
-          "projected_ip": 3.1,
-          "inputs": {
-            "hr9": 2.7,
-            "era": 8.1,
-            "whip": 2.7
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815266",
-      "kickoff": "2026-05-09T02:15Z",
-      "league": "MLB",
-      "match": "Pittsburgh Pirates at San Francisco Giants",
-      "home": "San Francisco Giants",
-      "away": "Pittsburgh Pirates",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "San Francisco Giants",
-          "pitcher": "Landen Roupp",
-          "label": "Landen Roupp moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5879,
-          "fair_odds": 1.7,
-          "expected_strikeouts": 6.07,
-          "projected_ip": 5.6,
-          "inputs": {
-            "k9": 9.76,
-            "era": 3.18,
-            "whip": 1.06,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "San Francisco Giants",
-          "pitcher": "Landen Roupp",
-          "label": "Landen Roupp ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.8667,
-          "fair_odds": 1.15,
-          "expected_hr_allowed": 0.143,
-          "projected_ip": 5.6,
-          "inputs": {
-            "hr9": 0.23,
-            "era": 3.18,
-            "whip": 1.06
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Pittsburgh Pirates",
-          "pitcher": "Braxton Ashcraft",
-          "label": "Braxton Ashcraft moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5291,
-          "fair_odds": 1.89,
-          "expected_strikeouts": 6.36,
-          "projected_ip": 5.89,
-          "inputs": {
-            "k9": 9.72,
-            "era": 3.02,
-            "whip": 1.08,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Pittsburgh Pirates",
-          "pitcher": "Braxton Ashcraft",
-          "label": "Braxton Ashcraft ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6537,
-          "fair_odds": 1.53,
-          "expected_hr_allowed": 0.425,
-          "projected_ip": 5.89,
-          "inputs": {
-            "hr9": 0.65,
-            "era": 3.02,
-            "whip": 1.08
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815268",
       "kickoff": "2026-05-09T19:07Z",
@@ -2412,7 +2284,7 @@
       ]
     }
   ],
-  "props": 116,
+  "props": 110,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
