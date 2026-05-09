@@ -5204,6 +5204,40 @@ return true;
 return false;
 };
 
+// v49 — Audit point #1 : détection odds anomaly (Winamax très éloigné du consensus).
+// Symptôme observé : Cagliari vs Udinese — Winamax @1.46 (Udinese fav) vs Consensus @3.97
+// → Winamax serve des cotes LIVE prises pour pré-match. Pred massivement biaisé.
+// Solution : si différence pct > 30%, flag le pick comme "stale_odds" pour exclusion
+// des recommandations fortes.
+function detectOddsAnomaly(match) {
+  if (!match) return null;
+  const wnx = match?.winamax?.markets?.['1n2'];
+  const cons = match?.odds_consensus;
+  if (!wnx || !cons) return null;
+  const sides = ['home', 'draw', 'away'];
+  let maxDiffPct = 0;
+  let worstSide = '';
+  for (const side of sides) {
+    const w = Number(wnx[side] || 0);
+    const c = Number(cons[side] || 0);
+    if (!w || !c) continue;
+    const diff = Math.abs(w - c) / Math.max(c, 0.01);
+    if (diff > maxDiffPct) {
+      maxDiffPct = diff;
+      worstSide = side;
+    }
+  }
+  return {
+    maxDiffPct,
+    worstSide,
+    isAnomalous: maxDiffPct > 0.30,        // > 30% diff = suspect
+    isCriticalAnomaly: maxDiffPct > 0.60,  // > 60% diff = data corruption probable
+    winamax: wnx,
+    consensus: cons,
+  };
+}
+try { window.detectOddsAnomaly = detectOddsAnomaly; } catch(e) { swallowError(e); }
+
 // AUDIT 2026-05-09 v42.E.5 — Détection arbitrage cross-bookmaker.
 // Si surebet (1/o1 + 1/o2 + 1/o3 < 1) → opportunité garantie.
 // Compare Winamax vs odds_consensus (~30 books moyenne) vs pinnacle_signal.
@@ -8965,6 +8999,37 @@ const ageH = (Date.now() - d) / 3600000;
 return ageH > 6;
 }
 try { window._isMatchEffectivelyDone = _isMatchEffectivelyDone; } catch(e) { swallowError(e); }
+// v49 — Audit point #21 : 12 events live n'étaient pas flagués → affichés dans
+// "À venir" alors qu'ils ont commencé. Helper qui détecte score>0 sur match
+// past-kickoff même si .live/.status pas encore set par le fetcher.
+function _isMatchLikelyLive(m) {
+  if (!m) return false;
+  if (m.live || m.status === 'STATUS_IN_PROGRESS') return true;
+  if (m.completed || m.status === 'STATUS_FINAL') return false;
+  const d = m.date ? new Date(m.date).getTime() : 0;
+  if (!isFinite(d) || d === 0) return false;
+  const minutesPast = (Date.now() - d) / 60000;
+  // 0-360 min past kickoff = active match window (foot 90+et, hockey 60+OT, NBA 48+OT, MLB 9 inn variable)
+  if (minutesPast <= 0 || minutesPast > 360) return false;
+  const comps = m.competitors || [];
+  for (const c of comps) {
+    const s = String(c.score || '').trim();
+    if (s && s !== '0' && s !== '-' && Number(s) > 0) return true;
+  }
+  return false;
+}
+try { window._isMatchLikelyLive = _isMatchLikelyLive; } catch(e) { swallowError(e); }
+function _hasMatchKickedOff(m) {
+  // v49 — Match a été dépassé par son kickoff, peu importe l'état completed/live.
+  // Utilisé pour filtrer "À venir" qui doit exclure live + completed + just-started.
+  if (!m) return false;
+  if (m.completed || m.live || m.status === 'STATUS_IN_PROGRESS' || m.status === 'STATUS_FINAL') return true;
+  const d = m.date ? new Date(m.date).getTime() : 0;
+  if (!isFinite(d) || d === 0) return false;
+  if (Date.now() > d) return true;
+  return false;
+}
+try { window._hasMatchKickedOff = _hasMatchKickedOff; } catch(e) { swallowError(e); }
 function predictMatch(match) {
 const cur = window.PRONOSTICS_DATA;
 if (__predCacheRef !== cur) { __predCache = new Map(); __predCacheRef = cur; }
@@ -9062,6 +9127,23 @@ prob: nextPickProb,
 }
 function _markSuspectIfHugeEdge(p, match) {
 if (!p || !p.pick || !p.odds) return p;
+// v49 — Audit point #1 : si Winamax 1N2 diverge fortement du consensus marché
+// (>60% diff sur le side recommandé), c'est presque toujours des cotes LIVE
+// captées comme pré-match. On marque suspect ET on dégrade la confiance.
+try {
+  const anomaly = (typeof detectOddsAnomaly === 'function') ? detectOddsAnomaly(match) : null;
+  if (anomaly && anomaly.isCriticalAnomaly) {
+    return {
+      ...p,
+      suspect: true,
+      suspect_reason: 'odds_anomaly_winamax_vs_consensus',
+      odds_anomaly: anomaly,
+      lowConf: true,
+      reliability_raw_uncapped: p.reliability,
+      reliability: Math.min(p.reliability || 0, 0.49), // force lowConf threshold
+    };
+  }
+} catch(e) {}
 const k = p.pick.key;
 const odd = k === '1' ? p.odds.home : k === '2' ? p.odds.away : p.odds.draw;
 if (!odd || odd <= 1) return p;
@@ -24359,13 +24441,21 @@ const today = dayMap[todayIso] || [];
 const allMatches = Object.values(dayMap).flatMap(arr => Array.isArray(arr) ? arr : []).filter(Boolean);
 const nowTs = Date.now();
 const isTousSettled = (m) => Boolean(m && (m.completed || _isMatchEffectivelyDone(m)));
+// v49 — Audit point #21 : si un match a déjà été pricé par son kickoff (started)
+// OU détecté live via score, on l'exclut de "À venir". Avant : 12 matchs live
+// avec score 0-1 etc. apparaissaient toujours en "À venir" car .live pas set.
 const isTousStarted = (m) => {
 const ts = new Date(m && m.date).getTime();
-return Number.isFinite(ts) && ts < nowTs - 60000 && !isTousSettled(m);
+const past = Number.isFinite(ts) && ts < nowTs - 60000;
+const likelyLive = (typeof _isMatchLikelyLive === 'function') && _isMatchLikelyLive(m);
+return (past || likelyLive) && !isTousSettled(m);
 };
 const isTousUpcoming = (m) => {
 const ts = new Date(m && m.date).getTime();
-return Number.isFinite(ts) && ts >= nowTs - 60000 && !isTousSettled(m);
+if (!Number.isFinite(ts)) return false;
+if (isTousSettled(m)) return false;
+if (typeof _isMatchLikelyLive === 'function' && _isMatchLikelyLive(m)) return false;
+return ts >= nowTs - 60000;
 };
 const isTousWinamax = (m) => Boolean(m && m.winamax && m.winamax.available === true);
 const _tousMode = (() => {
@@ -29836,10 +29926,17 @@ const roiColor = roi == null ? 'var(--text)' : Number(roi) >= 0.02 ? 'var(--acce
 const brierColor = brier == null ? 'var(--text)' : Number(brier) <= 0.18 ? 'var(--accent, #22c55e)' : Number(brier) <= 0.25 ? 'var(--warn, #c79b00)' : Number(brier) <= 0.30 ? 'var(--warn,#fbbf24)' : 'var(--danger, #ef4444)';
 const brierLabel = brier == null ? '' : Number(brier) <= 0.18 ? 'Calibration excellente' : Number(brier) <= 0.22 ? 'Calibration bonne' : Number(brier) <= 0.25 ? 'Calibration correcte' : Number(brier) <= 0.30 ? 'À surveiller' : 'Insuffisant';
 const perTier = bt.by_tier || {};
+// v49 — Audit point #3 : 99% des picks classés 'skip' (data manquante backtest).
+// Avant : "skip" tier mélangé avec les vrais tiers (lock/big_bet/standard) dans
+// l'affichage Performance/Tier → user voit 639 'skip' avec 0% ROI, 8 'standard'
+// avec 87.5% WR → impression que le modèle ne classifie rien correctement.
+// Maintenant : on EXCLUT 'skip' (= picks non analysés, métadonnées manquantes)
+// du tableau. Compte affiché en note séparée pour transparence.
+const skipTier = perTier.skip || {};
 const tierRows = Object.entries(perTier)
-.filter(([k, v]) => v && (v.n || 0) > 0)
+.filter(([k, v]) => k !== 'skip' && v && (v.n || 0) > 0)
 .sort((a, b) => {
-const order = { lock: 0, premium: 1, value: 2, standard: 3, low: 4 };
+const order = { lock: 0, premium: 1, big_bet: 1, value: 2, standard: 3, low: 4, lowconf: 4 };
 return (order[a[0]] ?? 5) - (order[b[0]] ?? 5);
 });
 const currentTab = _getPerfTab();
