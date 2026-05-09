@@ -8566,14 +8566,18 @@ const overall = rep.overall || {};
 const tiers = rep.by_tier || {};
 const bigBets = tiers.big_bet || {};
 const locks = tiers.lock || {};
-const headlineTier = Object.prototype.hasOwnProperty.call(bigBets, 'n') ? bigBets : locks;
+// v48 fix — Avant : `hasOwnProperty(bigBets, 'n')` était true même quand n=0,
+// résultant en label "Big Bets" + WR "0" alors qu'il n'y avait aucun big bet.
+// Maintenant : on affiche Big Bets seulement si n > 0, sinon fallback sur Locks.
+const hasBigBets = (bigBets.n || 0) > 0;
+const headlineTier = hasBigBets ? bigBets : locks;
 const setText = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
 const firstLabel = document.querySelector('#trust-locks-wr + .trust-strip-lbl');
-if (firstLabel) firstLabel.textContent = Object.prototype.hasOwnProperty.call(bigBets, 'n') ? 'Big Bets' : 'locks WR';
+if (firstLabel) firstLabel.textContent = hasBigBets ? 'Big Bets' : 'locks WR';
 if (headlineTier.n > 0) {
 setText('trust-locks-wr', Math.round((headlineTier.win_rate || 0) * 100) + '%');
 } else {
-setText('trust-locks-wr', '0');
+setText('trust-locks-wr', '—');
 }
 if (overall.n > 0) {
 const roiPct = overall.flat_roi_pct || 0;
@@ -18568,7 +18572,7 @@ const v45GeniusBannerHtml = (() => {
     return `<section class="v37-empty-pool-help" style="background:linear-gradient(135deg,rgba(168,85,247,.10),rgba(59,130,246,.08));border:1px solid rgba(168,85,247,.5);">
       <strong style="display:flex;align-items:center;gap:8px;font-size:14px;flex-wrap:wrap;">
         <span style="font-size:20px;">🧠</span>
-        Genius Mode · TOP ${v45GeniusPicks.length} picks du jour
+        Genius Mode · TOP ${v45GeniusPicks.length} pick${v45GeniusPicks.length > 1 ? 's' : ''} du jour
         <span style="padding:2px 8px;background:rgba(168,85,247,.2);border:1px solid rgba(168,85,247,.5);border-radius:999px;font-size:11px;font-weight:800;color:#a855f7;">edge ≥7pt · conf ≥55% · segment positif</span>
       </strong>
       <div style="font-size:12px;color:var(--text-dim);margin:8px 0 12px;line-height:1.5;">
@@ -24674,16 +24678,20 @@ const compareSet = new Set(compareIds);
 const comparePicks = compareIds.map(id => allPicks.find(p => String(p.m?.id || '') === id)).filter(Boolean);
 
 const activeTab = (() => {
+// v48 fix — Avant : `if (validKeys.includes(saved)) return saved` court-circuitait
+// SANS vérifier si le tab a des items. Conséquence : un user qui a cliqué une fois
+// sur "Finis" (saved='finished') tombait toujours sur Finis même avec 50 pending.
+// Maintenant : on respecte le saved SEULEMENT s'il a des items, sinon fallback
+// pending → inprogress → finished. Default first-visit = pending.
 let saved = 'pending';
 try { saved = localStorage.getItem('tousTab') || 'pending'; } catch(e) { swallowError(e); }
 const counts = { pending: displayPending.length, inprogress: displayInProgress.length, finished: displayFinished.length };
 const validKeys = ['pending', 'inprogress', 'finished'];
-if (validKeys.includes(saved)) return saved;
-if (counts[saved] > 0) return saved;
+if (validKeys.includes(saved) && counts[saved] > 0) return saved;
 if (counts.pending > 0) return 'pending';
 if (counts.inprogress > 0) return 'inprogress';
 if (counts.finished > 0) return 'finished';
-return saved; // tout est vide → garder la préférence
+return validKeys.includes(saved) ? saved : 'pending'; // tout vide → afficher empty state
 })();
 const tousMobile = typeof matchMedia === 'function' && matchMedia('(max-width:720px)').matches;
 const defaultCoverageLimit = isCoveragePreset ? (tousMobile ? 220 : 260) : Number.POSITIVE_INFINITY;
