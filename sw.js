@@ -33,11 +33,12 @@ const PRECACHE_ASSETS = [
   'pronostics.html',
   // v31 — app.css extrait depuis pronostics.html (audit ChatGPT).
   // v35.295 — app.js sort du precache : 1.6MB ne doit pas bloquer l'install PWA.
-  // Il reste servi en stale-while-revalidate au premier chargement puis en offline.
+  // v49 — Audit point #44 : legacy-app.js (1.9 MB) sort aussi pour accélérer
+  // l'install PWA. Tous deux servis en stale-while-revalidate (fetch handler).
+  // Trade-off : si user va offline IMMÉDIATEMENT après install, legacy-app.js
+  // pas dispo. En usage normal (visite avant offline), 1er load cache, puis OK.
   'app.css',
   'app-design-v3.css',
-  'app.js',
-  'legacy-app.js',
   'src/perf-bootstrap.js',
   'src/utils.js',
   'src/model.js',
@@ -67,7 +68,12 @@ const PRECACHE_ASSETS = [
 
 // Pages éditoriales : seulement ~5% des sessions visitent ces pages.
 // Pas pré-cachées (économie ~80KB au boot) mais cache-first au premier hit.
+// v49 — app.js + legacy-app.js sortent du precache pour accélérer l'install
+// (~2 MB économisés). Restent dans LAZY_CACHE_FIRST pour matching offline
+// après 1er load (servis stale-while-revalidate au runtime).
 const LAZY_CACHE_FIRST = [
+  'app.js',
+  'legacy-app.js',
   'methodologie.html',
   'academie.html',
   'comment-lire-un-prono.html',
