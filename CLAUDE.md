@@ -88,6 +88,44 @@ Bundle budget bumped 1860→1920 KB pour absorber Sprint v45 complet.
 - D : Refacto bundle ESM split (8-10h) — préventif, repoussé
 - H : UX simplifié dashboard 3-sections — futur sprint dédié
 
+**Phase v45.7 — Per-league calibration offsets** (`_v45LeagueOffset`)
+Backtest_report_v2.by_league (n>=15 par ligue) calibration map :
+mlb +1.5pt, nba +2.2pt, nhl +1.4pt boost (model underconfident)
+jpn.1 -1.4pt, fra.2 -0.7pt, chn.1 -0.7pt reduce (model overconfident)
++ 3 autres ligues. Appliqué après Platt boost.
+
+**Phase v45.8 — Sharp money badge cards**
+Ajout d'un badge "🦈 Sharp -X%" violet (rgba(168,85,247)) dans la cellule
+v39RecBadge quand `pred.sharp_money.aligned_with_pick === true`. Tooltip
+indique drop% et nudge appliqué.
+
+**Phase v45.10 — /stats.html public**
+Page publique 16 KB, 7 sections : Hero ROI / Forward proof / Calibration /
+Per-tier / Méthodologie / Datasets téléchargeables / Disclaimer. Live
+fetches backtest_strategies.json + backtest_report_v2.json + paper_log_summary.json
++ clv_summary.json. Ajouté à sitemap.xml priority 0.95 changefreq hourly.
+
+**Phase v45.11 — Fix relative URLs stats.html**
+URLs absolues `/backtest_strategies.json` cassées sur GH Pages (root
+domain au lieu de /paris-sportif/). Sed s|href="/[a-z]|href="| sur tous
+les liens internes data + JS fetches.
+
+**Phase v45.12 — What's New v45 notice**
+Toast top-right (12s, dismissable) qui annonce les 7 features clés v45
+au user qui revient. Persist localStorage `v45_whatsnew_seen='1'`.
+Lien direct vers /stats.html.
+
+**Phase v45.14 — notify_discord_digest.py**
+Script Python morning digest 7h-9h Paris time, 1x/jour. Filtre Outsider
+(cote≥5+edge≥5pt) + Value (edge>=4pt). Embed Discord coloré gold/blue
+selon type. Wired dans auto_refresh + refresh.yml. No-op sans
+DISCORD_WEBHOOK_DIGEST_URL.
+
+**Backlog encore ouvert** :
+- Bankroll history graph (sparkline P&L over time)
+- Refacto bundle ESM (legacy-app.js 1849/1920 KB, 70 KB de marge)
+- A/B test framework + monitoring tier-3
+
 ## Architecture v43.x (mise à jour 2026-05-09 — refonte stratégie données-prouvées)
 
 Réponse au feedback "revoie complètement la stratégie du site et du modèle
