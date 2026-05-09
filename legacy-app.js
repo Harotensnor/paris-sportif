@@ -3469,6 +3469,27 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
         _v35AddCandidate(out, row, p, market, `${row.side}:${row.line}`, row.label || `${market} ${row.line}`);
       }
     }
+    // v52.8 — Marchés Winamax non encore câblés (audit 2026-05-09).
+    // mma_rounds / mma_goes_distance / tennis_handicap. Pas de modèle dédié,
+    // donc fallback no-vig devig pour estimer la proba implicite équitable.
+    for (const row of _v35Rows(wxMk.mma_rounds)) {
+      if (match.sport && match.sport !== 'mma' && match.sport !== 'combat' && match.sport !== 'boxing') continue;
+      const p = _v35NoVigProb(row, wxMk.mma_rounds);
+      const key = `MMA_R_${row.side === 'over' ? 'O' : 'U'}${row.line}`;
+      _v35AddCandidate(out, row, p, 'mmaRounds', key, `${row.side === 'over' ? 'Plus' : 'Moins'} de ${row.line} rounds`);
+    }
+    for (const row of _v35Rows(wxMk.mma_goes_distance)) {
+      if (match.sport && match.sport !== 'mma' && match.sport !== 'combat' && match.sport !== 'boxing') continue;
+      const p = _v35NoVigProb(row, wxMk.mma_goes_distance);
+      const key = row.side === 'yes' ? 'MMA_DIST_Y' : 'MMA_DIST_N';
+      _v35AddCandidate(out, row, p, 'mmaGoesDistance', key, row.side === 'yes' ? 'Combat va à son terme' : 'Combat finit avant la limite');
+    }
+    for (const row of _v35Rows(wxMk.tennis_handicap)) {
+      if (match.sport && match.sport !== 'tennis') continue;
+      const p = _v35NoVigProb(row, wxMk.tennis_handicap);
+      const key = `TENN_HCP_${row.side}:${row.line}`;
+      _v35AddCandidate(out, row, p, 'tennisHandicap', key, row.label || `Handicap tennis ${row.side} ${row.line}`);
+    }
 
     const scored = out.map(c => scoreMarketCandidate(c, match, pred)).filter(Boolean);
     scored.sort((a, b) => {
