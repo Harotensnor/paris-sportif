@@ -20840,6 +20840,73 @@ const v37IntelCount = Number(v37Intel.angles?.summary?.angles || 0) + Number(v37
 const v37IntelFallback = v37IntelState.loading
 ? '<div class="v36-tier-empty">Chargement des insights modèle…</div>'
 : '<div class="v36-tier-empty">Insights modèle indisponibles pour ce snapshot.</div>';
+// v53.9 — Hero accueil : statement + top edge + counts + live + leagues.
+// User : "améliore la page d'accueil encore plus".
+const _heroAccueil = (() => {
+  try {
+    const todayIsoLocal = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+    const todayEvents = (data.days?.[todayIsoLocal] || []).filter(m => m && m.id && !/TBD|Winner/i.test((m.competitors || []).map(c => c.name).join(' ')));
+    let predicted = 0, genius = 0, value = 0, liveCount = 0;
+    let topEdgeMatch = null, topEdge = 0;
+    const leagueCounts = {};
+    const now = Date.now();
+    for (const m of todayEvents) {
+      if (m.live || m.status === 'STATUS_IN_PROGRESS') liveCount++;
+      const ko = m.date ? new Date(m.date).getTime() : 0;
+      if (m.completed || ko < now - 6 * 3600 * 1000) continue;
+      let pred = null;
+      try { pred = predictMatch(m); } catch (e) {}
+      if (!pred || pred.skip) continue;
+      const best = (typeof selectBestMarket === 'function') ? selectBestMarket(m, pred) : null;
+      if (!best) continue;
+      predicted++;
+      const edge = Number(best.edge || 0);
+      const rel = Number(best.rel || 0);
+      const odd = Number(best.odd || 0);
+      if (edge >= 0.05) value++;
+      if ((edge >= 0.12 || (edge >= 0.07 && rel >= 0.55)) && odd >= 1.30 && odd <= 8.0) genius++;
+      if (edge > topEdge) {
+        topEdge = edge;
+        topEdgeMatch = { m, best, edge, rel, odd };
+      }
+      const lg = m.league_name || m.league_code || '?';
+      leagueCounts[lg] = (leagueCounts[lg] || 0) + 1;
+    }
+    const topLeagues = Object.entries(leagueCounts).sort((a, b) => b[1] - a[1]).slice(0, 3);
+    if (predicted === 0 && liveCount === 0) return '';
+    const sides = topEdgeMatch ? (typeof getSides === 'function' ? getSides(topEdgeMatch.m) : { home: {}, away: {} }) : null;
+    const topMatchLabel = sides ? `${(sides.home?.short || sides.home?.name || '?')} vs ${(sides.away?.short || sides.away?.name || '?')}` : '';
+    return `
+      <section style="padding:18px 20px;margin-bottom:14px;background:linear-gradient(135deg,rgba(167,139,250,.10),rgba(52,211,153,.04));border:1px solid rgba(167,139,250,.25);border-radius:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+          <div style="flex:1;min-width:300px;">
+            <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;">Aujourd'hui · ${todayIsoLocal}</div>
+            <div style="font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.5px;line-height:1.2;margin-top:3px;">
+              ${predicted} prono${predicted > 1 ? 's' : ''} détecté${predicted > 1 ? 's' : ''}${value > 0 ? ` · <span style="color:var(--accent);">${value} value (edge ≥5pt)</span>` : ''}${genius > 0 ? ` · <span style="color:#a855f7;">${genius} 🧠 Genius</span>` : ''}
+            </div>
+            ${topEdgeMatch ? `
+              <div style="font-size:13px;color:var(--text-2);margin-top:6px;">
+                💎 Top edge : <b>${esc(topMatchLabel)}</b> — <b style="color:var(--accent);">+${(topEdge * 100).toFixed(1)}pt</b> sur ${esc(topEdgeMatch.best.label || '?')} @${topEdgeMatch.odd.toFixed(2)}
+                <button type="button" data-cal14-day="${esc(todayIsoLocal)}" data-big-detail="${esc(String(topEdgeMatch.m.id))}" style="margin-left:8px;background:var(--brand);color:#fff;border:none;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700;cursor:pointer;">→ Voir</button>
+              </div>
+            ` : ''}
+            ${topLeagues.length ? `
+              <div style="font-size:12px;color:var(--text-dim);margin-top:6px;">
+                Top ligues : ${topLeagues.map(([lg, n]) => `<b style="color:var(--text-2);">${esc(lg.slice(0, 22))}</b> (${n})`).join(' · ')}
+              </div>
+            ` : ''}
+          </div>
+          ${liveCount > 0 ? `
+            <div style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.4);padding:8px 14px;border-radius:8px;text-align:center;">
+              <div style="font-size:11px;color:#ef4444;text-transform:uppercase;letter-spacing:.5px;font-weight:700;">🔴 LIVE</div>
+              <div style="font-size:24px;font-weight:900;color:#ef4444;line-height:1;">${liveCount}</div>
+              <div style="font-size:10px;color:#fca5a5;">en cours</div>
+            </div>
+          ` : ''}
+        </div>
+      </section>`;
+  } catch (e) { return ''; }
+})();
 // v53.8 — Widget 14 jours (J-7 → J+7) ajouté avant v36TableHtml.
 // User : "je veux voir une semaine de prono et une semaine en arrière
 // d'historique (résultat des prono jour par jour)".
@@ -20908,9 +20975,22 @@ const _calendar14d = (() => {
       </section>`;
   } catch (e) { return ''; }
 })();
+// v53.9 — Quick filter chips au-dessus du tableau (toggle Genius / Value /
+// Tout — affiche le subset pertinent dans la table principale).
+const _quickFilters = `
+  <div style="display:flex;gap:8px;flex-wrap:wrap;padding:10px 0 12px;align-items:center;">
+    <span style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;font-weight:700;">Filtre rapide :</span>
+    <button type="button" data-quick-filter="all" style="padding:6px 12px;background:var(--panel);border:1px solid var(--border);color:var(--text);border-radius:999px;font-size:12px;font-weight:600;cursor:pointer;">📋 Tous</button>
+    <button type="button" data-quick-filter="genius" style="padding:6px 12px;background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.4);color:#a855f7;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;">🧠 Genius (edge ≥7pt)</button>
+    <button type="button" data-quick-filter="value" style="padding:6px 12px;background:rgba(52,211,153,.15);border:1px solid rgba(52,211,153,.4);color:var(--accent);border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;">💎 Value (edge ≥5pt)</button>
+    <button type="button" data-quick-filter="locks" style="padding:6px 12px;background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.4);color:var(--warn);border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;">🔒 Locks (conf ≥75%)</button>
+    <button type="button" data-quick-filter="outsiders" style="padding:6px 12px;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.4);color:#f59e0b;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;">💎 Outsiders (cote ≥5)</button>
+  </div>`;
 wrap.innerHTML = `
         <div class="v36-home-shell" data-home-table-only>
+          ${_heroAccueil}
           ${_calendar14d}
+          ${_quickFilters}
           ${v36TableHtml}
         </div>`;
 const v37GuideDetails = wrap.querySelector('[data-v37-decision-guide]');
@@ -20984,6 +21064,25 @@ wrap.querySelectorAll('[data-cal14-day]').forEach(btn => {
     // Smooth scroll to table for context
     const table = wrap.querySelector('.v36-table-panel, [data-v36-table]');
     if (table) try { table.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch(e) {}
+  });
+});
+// v53.9 — Quick filter chips : applique advFilters depuis dashboard.
+wrap.querySelectorAll('[data-quick-filter]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const kind = btn.dataset.quickFilter || 'all';
+    try {
+      const cur = JSON.parse(localStorage.getItem('advFilters') || '{}') || {};
+      // Reset value-related flags
+      cur.valueOnly = false; cur.evMin = 0; cur.minRel = 0; cur.minOdd = null;
+      if (kind === 'genius') { cur.valueOnly = true; cur.evMin = 0.07; cur.minRel = 0.55; }
+      else if (kind === 'value') { cur.valueOnly = true; cur.evMin = 0.05; }
+      else if (kind === 'locks') { cur.minRel = 0.75; }
+      else if (kind === 'outsiders') { cur.minOdd = 5.0; }
+      localStorage.setItem('advFilters', JSON.stringify(cur));
+      if (window.advFilters) Object.assign(window.advFilters, cur);
+    } catch(e) { swallowError(e); }
+    if (typeof toast === 'function') toast(`Filtre ${kind} actif`, 'info', { duration: 2200 });
+    renderDashboardPage(wrap);
   });
 });
 const v37LiveInput = wrap.querySelector('[data-v37-live-toggle]');
