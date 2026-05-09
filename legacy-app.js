@@ -8581,7 +8581,18 @@ setText('trust-locks-wr', '—');
 }
 if (overall.n > 0) {
 const roiPct = overall.flat_roi_pct || 0;
-setText('trust-roi', (roiPct >= 0 ? '+' : '') + roiPct.toFixed(1) + '%');
+// v48 fix — Audit point #5 : "+0.0% ROI flat" trompait l'utilisateur (paraît
+// suspect mais peut être réel sur petit échantillon). Maintenant : si N<30 ou
+// ROI exactement 0.0 avec ROI absolu < 0.5pt, on affiche "—" + tooltip.
+const lowSample = overall.n < 30;
+const trivialRoi = Math.abs(roiPct) < 0.05; // <0.05% = bruit
+if (lowSample || trivialRoi) {
+  setText('trust-roi', '—');
+  const stat = document.getElementById('trust-roi')?.closest('.trust-strip-stat');
+  if (stat) stat.title = lowSample ? `Échantillon trop petit (${overall.n} picks) — ROI fiable à partir de 30+` : `ROI ≈ 0 (variance normale sur ${overall.n} picks)`;
+} else {
+  setText('trust-roi', (roiPct >= 0 ? '+' : '') + roiPct.toFixed(1) + '%');
+}
 setText('trust-brier', (overall.brier || 0).toFixed(3));
 setText('trust-n', overall.n);
 // v45.17 — Tooltip avec date de regeneration du backtest pour transparence.
@@ -23116,7 +23127,20 @@ ${otherOpportunities.length ? `
              "Grands matchs sans pick" qui montrait les mêmes en bas. Maintenant :
              cette section = SEULEMENT ceux avec prono fort. La 2e section reste
              pour les sans-pick. Plus de doublon visuel. -->
-        ${(() => { const _strongOnly = (topImportantMatches || []).filter(item => item.status && item.status.code === 'strong'); return _strongOnly.length ? `
+        ${(() => {
+          // v48 fix — Audit point #9 : Bastia × 5 mentions car heroPick + topPicks +
+          // prudent + aggressive + "Prochains gros matchs" affichaient tous le même match
+          // sans cross-section dedup. On exclut maintenant les matchs déjà rendus au-dessus.
+          const _alreadyShownIds = new Set([
+            heroPick?.m?.id,
+            ...(topPicks || []).map(x => x.m?.id),
+            ...(prudentPicksEnriched || []).map(x => x.m?.id),
+            ...(aggressivePicksEnriched || []).map(x => x.m?.id),
+          ].filter(Boolean).map(String));
+          const _strongOnly = (topImportantMatches || []).filter(item =>
+            item.status && item.status.code === 'strong' && !_alreadyShownIds.has(String(item.m?.id))
+          );
+          return _strongOnly.length ? `
 <div style="padding:36px 0 24px;border-top:1px solid var(--border);">
 <div style="margin-bottom:14px;display:flex;align-items:end;justify-content:space-between;flex-wrap:wrap;gap:8px;">
 <div>
