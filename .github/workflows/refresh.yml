@@ -411,6 +411,11 @@ jobs:
           # Frontend l'utilise pour annoter chaque pick avec un signal
           # "✓ segment validé +X%" / "⚠ segment perdant -Y%". ~15 KB.
           python3 build_segment_trust.py || true
+          # v49 — Audit tech debt counter (CSS !important, inline styles, sprint naming).
+          # Daily à 00:00 UTC pour tracker progression dette technique.
+          if [ "$(date -u +'%H')" = "00" ] && [ $MIN_MOD60 -lt 5 ]; then
+            python3 audit_tech_debt.py || true
+          fi
           # v49 — Audit point #2 : workflow backtest.yml dédié quotidien à 04:00 UTC
           # n'a pas tourné depuis 6 jours (silent failure ou GH Actions cron skip).
           # Backup : on relance backtest_v2.py ici toutes les 4h depuis refresh.yml.
@@ -533,7 +538,8 @@ jobs:
             og-default.png og-backtest.png og-credibilite.png og-methodologie.png sitemap.xml \
             odds_aggregated.json \
             paper_log.jsonl paper_log_summary.json picks_history.jsonl picks_history_summary.json \
-            backtest_report_v2.json backtest_report_v2.md calibration_per_sport_league.json calibration_per_sport_league_market.json bankroll_simulation.json
+            backtest_report_v2.json backtest_report_v2.md calibration_per_sport_league.json calibration_per_sport_league_market.json bankroll_simulation.json \
+            audit_tech_debt.json audit_tech_debt.md
           do
             if [ -e "$path" ]; then
               git add "$path"
