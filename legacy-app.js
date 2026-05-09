@@ -416,6 +416,10 @@ bookmakerMode = mode;
 winamaxOnly = mode !== 'all';
 try { localStorage.setItem(BOOKMAKER_MODE_KEY, mode); } catch(e){ logSafeError('save bookmakerMode', e); }
 try { window.bookmakerMode = mode; } catch(e){ logSafeError('expose bookmakerMode', e); }
+// v52.7 — Le toggle 3-state était cosmétique avant : changeait la state mais
+// ne re-renderait rien. Maintenant on déclenche un re-render pour que
+// l'user voit immédiatement les matchs ajoutés/retirés.
+try { if (typeof applyPageView === 'function') applyPageView(); } catch(e){ logSafeError('bookmakerMode rerender', e); }
 }
 if (bookmakerMode === 'all') winamaxOnly = false;
 function isBookableInMode(match, mode) {
@@ -524,14 +528,43 @@ athle: { title: 'Athlétisme' },
 'foot-feminin': { title: 'Football féminin' },
 nfl: { title: 'NFL' },
 };
+// v52.7 — Titres explicites pour les alias legacy (matchs/calendrier/favoris).
+// Avant : #matchs → alias dashboard → H1 "Pronostics du jour" (incorrect contextuel).
+// Après : on garde l'aliasing pour le routing mais le H1/title reflète l'intent
+// de l'user qui a tapé le hash.
+const LEGACY_ALIAS_TITLES = {
+  matchs: 'Tous les matchs détectés',
+  'matchs-detectes': 'Tous les matchs détectés',
+  calendrier: 'Calendrier 7 jours',
+  favoris: 'Favoris & alertes',
+  methodologie: 'Méthodologie',
+  'comment-lire': 'Comment lire un prono',
+  'comment-lire-un-prono': 'Comment lire un prono',
+};
 function _routeMeta(page) {
-const key = PAGE_ALIASES[String(page || '')] || page || 'dashboard';
-const meta = ROUTE_META[key] || { title: String(key || 'Paris-Sportif') };
+const raw = String(page || '');
+const aliasTitle = LEGACY_ALIAS_TITLES[raw];
+const key = PAGE_ALIASES[raw] || page || 'dashboard';
+const baseMeta = ROUTE_META[key] || { title: String(key || 'Paris-Sportif') };
+const meta = aliasTitle ? { ...baseMeta, title: aliasTitle } : baseMeta;
 return { ...meta, description: meta.description || `${meta.title} sur Paris-Sportif : pronostics sportifs lisibles, prudents et vérifiés.` };
 }
 function _syncRouteMeta(page) {
 try {
-const meta = _routeMeta(page);
+// v52.7 — Si l'URL hash a un alias legacy (matchs/calendrier/favoris),
+// on préfère son titre explicite plutôt que celui de la page canonique
+// résolue (sinon "#matchs" affiche "Pronostics du jour" alors qu'il est
+// alias vers dashboard). Le routing pousse `?legacy=X` dans l'URL après
+// résolution, donc on lit X soit dans la query string, soit dans le
+// hash brut quand l'user vient de taper #matchs et que le rewrite n'a
+// pas encore eu lieu.
+const rawHash = String(location.hash || '').replace(/^#/, '');
+const beforeQuery = rawHash.split('?')[0];
+const queryStr = rawHash.includes('?') ? rawHash.split('?')[1] : '';
+const legacyMatch = queryStr.match(/(?:^|&)legacy=([^&]+)/);
+const legacyKey = legacyMatch ? decodeURIComponent(legacyMatch[1]) : beforeQuery;
+const aliasOverride = LEGACY_ALIAS_TITLES[legacyKey];
+const meta = aliasOverride ? { ..._routeMeta(page), title: aliasOverride } : _routeMeta(page);
 const main = document.querySelector('main') || document.body;
 let h1 = document.getElementById('spa-route-h1');
 if (!h1) {
@@ -12233,7 +12266,16 @@ const rel = usableMarket ? marketPick.prob : pred ? (pred.reliability ?? pred.pi
 return { m, pred, rawPred, odd, startIn, rel, marketPick: usableMarket ? marketPick : null };
 })
 .filter(x => x.pred && x.pred.pick && x.odd && !x.pred.skip)
-.filter(x => x.startIn !== null && x.startIn >= minMinutes && (maxMinutes < 0 || x.startIn <= maxMinutes));
+.filter(x => x.startIn !== null && x.startIn >= minMinutes && (maxMinutes < 0 || x.startIn <= maxMinutes))
+// v52.7 — User toggle "EV+ uniquement" / "EV min" doit s'appliquer aux combinés.
+// Avant : passesValueFilter câblé seulement page Tous, donc l'user activait
+// le toggle et voyait quand même des combinés sans value. Maintenant le filtre
+// remonte au niveau pool partagé entre safe/balanced/bold/lockCombo.
+.filter(x => {
+  if (typeof passesValueFilter !== 'function') return true;
+  const proxy = { prob: x.rel, odd: x.odd, edge: x.rel != null && x.odd > 1 ? x.rel - 1/x.odd : 0 };
+  return passesValueFilter(proxy);
+});
 
 const dedupCorrelated = (candidates, { sameLeague = true } = {}) => {
 const picked = [];
@@ -14938,7 +14980,7 @@ return `
 <span style="text-align:center;">${haIco}</span>
 <span style="text-align:center;padding:1px 0;border-radius:3px;background:${resBg};color:${resCol};font-weight:700;">${esc(r.result || '—')}</span>
 <span style="color:var(--text,#e6ebf2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(r.opp || '—')}</span>
-<span style="text-align:center;font-variant-numeric:tabular-nums;font-weight:600;color:var(--text,#e6ebf2);">${r.gf}-${r.ga}</span>
+<span style="text-align:center;font-variant-numeric:tabular-nums;font-weight:600;color:var(--text,#e6ebf2);">${(r.gf != null && r.ga != null) ? `${r.gf}-${r.ga}` : (r.score || '—')}</span>
 <span></span>
 </div>`;
                 }).join('')}
@@ -21424,6 +21466,7 @@ const prudentPicks = _dataIsStale ? [] : allTodayRaw
 .filter(x => !topIds.has(x.m.id))
 .filter(x => !x.m.live && !x.m.completed && _notStarted(x.m))
 .filter(x => x.rel >= 0.70 && x.odd >= 1.40 && x.odd <= 1.85 && x.edge >= 0.02 && x.investment && x.investment.action !== 'skip')
+.filter(x => typeof passesValueFilter === 'function' ? passesValueFilter(x) : true)
 .sort((a, b) => {
 const bs = b.investment ? b.investment.score : 0;
 const as = a.investment ? a.investment.score : 0;
@@ -21459,6 +21502,7 @@ return { m, pred, odd, rel, edge, ev: expectedValue(rel, odd), investment, best 
 && (x.edge >= 0.05 || (x.rel * x.odd - 1) >= 0.12))
 .filter(x => x.investment && x.investment.action !== 'skip' && x.investment.score >= 50)
 .filter(x => !_losingSports.has(x.m.sport))
+.filter(x => typeof passesValueFilter === 'function' ? passesValueFilter(x) : true)
 .filter((x, i, arr) => arr.findIndex(y => y.m.id === x.m.id) === i)  // dédup
 .sort((a, b) => {
 const bs = b.investment ? b.investment.score : 0;
