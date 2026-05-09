@@ -87,18 +87,21 @@ LEAGUES: dict[str, int] = {
     'ita.2': 24,        # Serie B
     'ger.2': 44,        # 2. Bundesliga
     'fra.2': 182,       # Ligue 2
-    # Tier 3 (ajout v51.8 — élargissement coverage)
-    'aut.1': 45,                # Austrian Bundesliga
-    'gre.1': 185,               # Greek SuperLeague
-    'jpn.1': 196,               # J-League
-    'mls.1': 242,               # MLS (USA)
-    'bra.1': 325,               # Brasileirão Série A
-    'arg.1': 155,               # Liga Argentina (Primera División)
-    'chn.1': 1085,              # Chinese Super League
-    # Coupes européennes (signal majeur sur fenêtres KO/groupes)
+    # v53.3 — User : "compositions pour chaque rencontre". Extension tier-3.
+    # Catalog Sofascore vérifié 2026-05-10. Couverture football mondiale.
+    'aut.1': 45,        # Bundesliga Autriche
+    'swe.1': 40,        # Allsvenskan
+    'gre.1': 185,       # Super League Grèce
+    'mex.1': 11621,     # Liga MX
+    'jpn.1': 196,       # J1 League
+    'bra.1': 325,       # Brasileirão
+    'arg.1': 155,       # Liga Profesional Argentine
+    'chn.1': 649,       # Chinese Super League
+    'usa.1': 242,       # MLS
+    # Compétitions UEFA — gros volume pré-match user-visible
     'uefa.champions': 7,        # UEFA Champions League
     'uefa.europa': 679,         # UEFA Europa League
-    'uefa.europa.conf': 17015,  # UEFA Europa Conference League
+    'uefa.europa.conf': 17015,  # UEFA Conference League
 }
 
 # Position code mapping (Sofascore uses single letters: G/D/M/F).

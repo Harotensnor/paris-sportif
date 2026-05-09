@@ -76,13 +76,17 @@ LEAGUES: dict[str, int] = {
     'ita.2': 24,   # Serie B
     'ger.2': 44,   # 2. Bundesliga
     'fra.2': 182,  # Ligue 2
-    # Tier 3 (v51.8 — élargissement coverage injuries)
-    'aut.1': 45,   # Austrian Bundesliga
-    'gre.1': 185,  # Greek SuperLeague
-    'jpn.1': 196,  # J-League
-    'mls.1': 242,  # MLS
+    # Tier 3 (v53.3 — extension globale)
+    'aut.1': 45,   # Bundesliga Autriche
+    'swe.1': 40,   # Allsvenskan
+    'gre.1': 185,  # Super League Grèce
+    'mex.1': 11621,# Liga MX
+    'jpn.1': 196,  # J1 League
     'bra.1': 325,  # Brasileirão
-    # Coupes (assignations souvent disponibles plus tôt)
+    'arg.1': 155,  # Liga Profesional Argentine
+    'chn.1': 649,  # Chinese Super League
+    'usa.1': 242,  # MLS
+    # Compétitions UEFA
     'uefa.champions': 7,
     'uefa.europa': 679,
     'uefa.europa.conf': 17015,
@@ -262,46 +266,6 @@ def collect(selected_leagues: set[str] | None = None, pages: int = 3,
     }
 
 
-def merge_existing_injuries(fresh: dict) -> dict:
-    """v50.4 — Retain previously collected injuries when Sofascore rate-limits.
-
-    Audit 2026-05-09 : le cron tournait sur GH Actions et Sofascore IP-bannait
-    les runners. Résultat : fresh = `teams: {}` qui écrasait l'existant. Les
-    autres scrapers Sofascore (lineups, referees) ont déjà cette logique de merge.
-    Cette fonction reproduit le pattern : on garde l'ancien si le nouveau est vide.
-    """
-    old: dict = {}
-    if OUT.exists():
-        try:
-            old = json.loads(OUT.read_text(encoding='utf-8'))
-        except Exception:
-            old = {}
-    old_teams = old.get('teams') or {}
-    fresh_teams = fresh.get('teams') or {}
-    if not isinstance(old_teams, dict):
-        old_teams = {}
-    if not isinstance(fresh_teams, dict):
-        fresh_teams = {}
-    # Merge : prefer fresh, fallback old. Si fresh has 0 teams, return old entirely.
-    merged_teams = dict(old_teams)
-    merged_teams.update(fresh_teams)
-
-    old_scanned = old.get('scanned_teams') or {}
-    fresh_scanned = fresh.get('scanned_teams') or {}
-    merged_scanned = dict(old_scanned)
-    if isinstance(fresh_scanned, dict):
-        merged_scanned.update(fresh_scanned)
-
-    out = dict(fresh)
-    out['teams'] = merged_teams
-    out['scanned_teams'] = merged_scanned
-    out['merged_from_existing'] = bool(old_teams)
-    # Override status si on a retenu du contenu malgré un fresh vide.
-    if not fresh_teams and merged_teams:
-        out['status'] = 'retained_existing_injuries'
-    return out
-
-
 def main() -> int:
     global DEBUG
     ap = argparse.ArgumentParser(description='Fetch Sofascore soccer injuries/missing players.')
@@ -314,9 +278,6 @@ def main() -> int:
     selected = {x.strip() for x in args.top_leagues.split(',') if x.strip()} or None
     data = collect(selected_leagues=selected, pages=max(1, args.pages),
                    hours_ahead=max(1, args.hours_ahead))
-    # v50.4 — Merge avec l'existant pour ne pas écraser les data quand le fetch
-    # actuel est vide (Sofascore rate-limit GH Actions runners).
-    data = merge_existing_injuries(data)
     OUT.write_text(json.dumps(data, ensure_ascii=False, separators=(',', ':')),
                    encoding='utf-8')
     print(f'  wrote {OUT} ({OUT.stat().st_size / 1024:.1f}KB)', flush=True)

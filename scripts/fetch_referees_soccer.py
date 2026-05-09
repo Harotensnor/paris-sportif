@@ -70,16 +70,20 @@ LEAGUES: dict[str, int] = {
     'ita.2': 24,
     'ger.2': 44,
     'fra.2': 182,
+    # Tier 3 (v53.3 — extension globale compositions/blessures/arbitre)
+    'aut.1': 45,
+    'swe.1': 40,
+    'gre.1': 185,
+    'mex.1': 11621,
+    'jpn.1': 196,
+    'bra.1': 325,
+    'arg.1': 155,
+    'chn.1': 649,
+    'usa.1': 242,
     # Europe cups. Referee assignments are often published earlier here.
     'uefa.champions': 7,
     'uefa.europa': 679,
     'uefa.europa.conf': 17015,
-    # Tier 3 (v51.8 — élargissement coverage referees)
-    'aut.1': 45,        # Austrian Bundesliga
-    'gre.1': 185,       # Greek SuperLeague
-    'jpn.1': 196,       # J-League
-    'mls.1': 242,       # MLS
-    'bra.1': 325,       # Brasileirão
 }
 
 
@@ -128,8 +132,8 @@ def current_season_id(tournament_id: int) -> int | None:
     return seasons[0].get('id') if seasons else None
 
 
-def upcoming_fixtures(tournament_id: int, season_id: int, pages: int = 5,
-                      hours_ahead: int = 168) -> list[dict]:
+def upcoming_fixtures(tournament_id: int, season_id: int, pages: int = 2,
+                      hours_ahead: int = 72) -> list[dict]:
     """v31.7.208 — Filter cutoff. Referees are assigned ~24-72h before
     kickoff. Beyond that the field is null on Sofascore. Cutting at 72h
     halves the per-league fixture count, ensures the run fits in GHA's
@@ -186,8 +190,8 @@ def referee_for_event(event_id: int) -> dict | None:
     }
 
 
-def collect(selected_leagues: set[str] | None = None, pages: int = 5,
-            hours_ahead: int = 168) -> dict:
+def collect(selected_leagues: set[str] | None = None, pages: int = 3,
+            hours_ahead: int = 96) -> dict:
     t0 = time.time()
     print(f'[{datetime.now():%H:%M:%S}] Sofascore soccer referees scrape', flush=True)
     events: dict[str, dict] = {}
