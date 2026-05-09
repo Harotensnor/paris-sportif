@@ -4472,8 +4472,16 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
       if (typeof toast === 'function') toast('Aucun pick à tracker', 'warn');
       return;
     }
+    // v47.2 — Si bankroll pas set, ouvrir prompt pour la définir.
+    const bkRaw = localStorage.getItem('userBankroll');
+    if (!bkRaw && typeof window._showStakePrompt === 'function') {
+      const promptResult = await window._showStakePrompt('100', 'Ta bankroll initiale en € ? (1u = 1% de ce montant)');
+      if (promptResult === null) return; // user cancelled
+      const bk = Math.max(10, Math.min(10000, parseFloat(promptResult) || 100));
+      try { localStorage.setItem('userBankroll', String(bk)); } catch (er) {}
+      if (typeof window.toast === 'function') window.toast(`✓ Bankroll = ${bk}€ · 1u = ${Math.max(1, Math.round(bk*0.01))}€`, 'info', { duration: 2500 });
+    }
     // v47.1 — Hedge protection : warn user si même match listé 2x dans payload
-    // (ex: outcome conflict, sur-allocation). Confirme avant tracker.
     const matchCounts = {};
     payload.forEach(p => { matchCounts[p.matchId] = (matchCounts[p.matchId] || 0) + 1; });
     const duplicateMatches = Object.entries(matchCounts).filter(([_, n]) => n > 1);
@@ -4484,6 +4492,18 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
         confirmLabel: 'Continuer quand même',
         cancelLabel: 'Annuler',
         danger: true
+      });
+      if (!ok) return;
+    }
+    // v47.2 — Confirmation summary avant le commit final
+    if (payload.length >= 3 && typeof window._showConfirm === 'function') {
+      const stake = (typeof window._v45FlatStake === 'function') ? window._v45FlatStake(parseFloat(localStorage.getItem('userBankroll') || '100') || 100) : 1;
+      const totalStake = payload.length * stake;
+      const ok = await window._showConfirm({
+        title: `📋 Confirmer ${payload.length} paris ?`,
+        body: `Mise totale : <b>${totalStake}€</b> (${payload.length} × ${stake}€). Si tous perdent : -${totalStake}€. Si tous gagnent : variable selon cotes.`,
+        confirmLabel: `✓ Tracker les ${payload.length} paris`,
+        cancelLabel: 'Annuler'
       });
       if (!ok) return;
     }
@@ -18805,9 +18825,9 @@ const v40MultiDayOutsiders = (() => {
   } catch (e) { swallowError(e); }
   return out.slice(0, 8);
 })();
-const v40OutsiderListHtml = v40MultiDayOutsiders.length
-  ? `<div style="margin-top:10px;display:grid;gap:6px;">${v40MultiDayOutsiders.map(o => `<a href="#dashboard?date=${esc(o.dayLabel)}" data-big-detail="${esc(String(o.m.id || ''))}" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 10px;background:rgba(15,15,20,0.5);border:1px solid rgba(45,212,168,0.2);border-radius:8px;font-size:12.5px;color:var(--text);text-decoration:none;cursor:pointer;"><b style="color:var(--text-dim);font-size:11px;min-width:60px;">${esc(o.dayLabel.slice(5))}</b><span style="flex:1;">${o.titleHtml} · <em style="color:var(--accent);">${esc(o.labelText)}</em></span><b style="color:#34d399;">@${o.odd.toFixed(2)}</b><b style="color:#34d399;font-size:11px;">+${(o.edge*100).toFixed(1)}pt edge</b></a>`).join('')}</div>`
-  : '';
+// v47.2 — v40OutsiderListHtml retiré (était utilisé par v43StrategyBannerHtml
+// retiré v47.2). v40MultiDayOutsiders scanner conservé pour usage futur.
+const v40OutsiderListHtml = '';
 // AUDIT 2026-05-09 v41.21 — Bannière 💎 plus stylée avec stats live.
 // Avant : texte plain. Maintenant : header gradient + 3 stats inline +
 // shimmer animation sur le badge ROI pour attirer l'œil.
@@ -19425,118 +19445,15 @@ return `<section class="v37-personal-strip" aria-label="Suggestions personnalis�
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:9px;">${cards}</div>
       </section>`;
 })();
-// AUDIT 2026-05-09 v43.2 — Banner v43 "Stratégies prouvées rentables".
-// Branche au scope du v36TableHtml (le seul rendu actif du dashboard, voir
-// early-return ligne ~19660). Liste séparée Outsiders+Value dérivée du
-// scan multi-jours. Toggle Mode profitable persisté localStorage.
-const v43MultiDayValue = (() => {
-  const out = [];
-  try {
-    const days = (window.PRONOSTICS_DATA?.days) || {};
-    const today = (window.PRONOSTICS_DATA?.today) || todayIso;
-    const candidatesDates = Object.keys(days).filter(d => d >= today).sort().slice(0, 7);
-    const outsiderIdSet = new Set((v40MultiDayOutsiders || []).map(o => String(o.m.id)));
-    for (const day of candidatesDates) {
-      const evs = days[day] || [];
-      for (const m of evs) {
-        try {
-          if (outsiderIdSet.has(String(m.id))) continue;
-          if (!isWinamaxBookable(m)) continue;
-          const pred = predictMatch(m);
-          if (!pred?.pick) continue;
-          const cands = (typeof buildMarketCandidates === 'function')
-            ? buildMarketCandidates(m, pred, { requireExact: true }) : [];
-          let bestC = null;
-          for (const c of (cands || [])) {
-            const odd = Number(c?.odd || 0);
-            const rel = Number(c?.rel || c?.prob || 0);
-            if (!(odd >= 1.40) || !(rel > 0)) continue;
-            const edge = rel - 1 / odd;
-            if (edge < 0.05) continue;
-            if (odd >= 5) continue; // celle-ci serait déjà outsider
-            // v45.4 — DNB penalty : -3pt edge equivalent. Le user trouve
-            // "nul remboursé" confus quand 1n2 dispo. On garde DNB candidat
-            // mais avec un handicap pour préférer 1n2 / OU / BTTS.
-            const marketKey = String(c?.market || '').toLowerCase();
-            const isDnb = marketKey === 'dnb' || (c?.label || '').includes('nul remboursé');
-            const adjustedEdge = isDnb ? edge - 0.03 : edge;
-            if (!bestC || adjustedEdge > bestC.adjustedEdge) bestC = { c, odd, rel, edge, adjustedEdge };
-          }
-          if (!bestC) continue;
-          const sides = (typeof getSides === 'function') ? getSides(m) : null;
-          out.push({
-            m, pred, c: bestC.c,
-            odd: bestC.odd, rel: bestC.rel, edge: bestC.edge,
-            dayLabel: day,
-            titleHtml: sides ? `${esc(v36TeamName ? v36TeamName(sides.home) : sides.home?.name || '?')} - ${esc(v36TeamName ? v36TeamName(sides.away) : sides.away?.name || '?')}` : '?',
-            labelText: bestC.c.label || bestC.c.shortLabel || pred.pick.label || 'Pick',
-          });
-        } catch (e) { swallowError(e); }
-      }
-    }
-    out.sort((a, b) => b.edge - a.edge);
-  } catch (e) { swallowError(e); }
-  return out.slice(0, 8);
-})();
-const v43ProfMode = (typeof window.v43ProfitableMode === 'function') ? window.v43ProfitableMode() : false;
-const v43ValueListHtml = v43MultiDayValue.length
-  ? `<div style="margin-top:10px;display:grid;gap:6px;">${v43MultiDayValue.map(o => `<a href="#dashboard?date=${esc(o.dayLabel)}" data-big-detail="${esc(String(o.m.id || ''))}" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 10px;background:rgba(15,15,20,0.5);border:1px solid rgba(59,130,246,0.25);border-radius:8px;font-size:12.5px;color:var(--text);text-decoration:none;cursor:pointer;"><b style="color:var(--text-dim);font-size:11px;min-width:60px;">${esc(o.dayLabel.slice(5))}</b><span style="flex:1;">${o.titleHtml} · <em style="color:#3b82f6;">${esc(o.labelText)}</em></span><b style="color:#3b82f6;">@${o.odd.toFixed(2)}</b><b style="color:#3b82f6;font-size:11px;">+${(o.edge*100).toFixed(1)}pt edge</b></a>`).join('')}</div>`
-  : `<div style="margin-top:10px;padding:10px 12px;background:rgba(15,15,20,0.4);border:1px dashed rgba(59,130,246,0.3);border-radius:6px;color:var(--text-dim);font-size:11.5px;">Aucun pick Value qualifié sur les 7 prochains jours (edge ≥5pt, cote 1.40-5.00). Le modèle est conservateur cette semaine.</div>`;
-const v43StrategyBannerHtml = `<section class="v37-empty-pool-help v43-strategy-banner" style="background:linear-gradient(135deg,rgba(245,158,11,0.10) 0%,rgba(59,130,246,0.10) 50%,rgba(16,185,129,0.08) 100%);border:1px solid rgba(245,158,11,0.40);position:relative;overflow:hidden;">
-        <div style="position:absolute;top:0;right:0;width:140px;height:140px;background:radial-gradient(circle at center,rgba(245,158,11,0.20) 0%,transparent 70%);pointer-events:none;"></div>
-        <strong style="display:flex;align-items:center;gap:8px;font-size:14px;flex-wrap:wrap;">
-          <span style="font-size:18px;filter:drop-shadow(0 0 6px rgba(245,158,11,0.6));">🎯</span>
-          <span>Stratégies gagnantes du jour</span>
-          <span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;background:rgba(245,158,11,0.18);border:1px solid rgba(245,158,11,0.5);border-radius:999px;font-size:11px;font-weight:800;color:#f59e0b;letter-spacing:0.4px;">v43 · backtesté 1932 paris</span>
-          <button type="button" data-v46-action="toggle-profitable-mode" style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;padding:5px 11px;background:${v43ProfMode ? 'rgba(245,158,11,0.18)' : 'rgba(15,15,20,0.5)'};border:1px solid ${v43ProfMode ? '#f59e0b' : 'var(--border)'};color:${v43ProfMode ? '#f59e0b' : 'var(--text)'};border-radius:999px;font-size:11px;font-weight:700;cursor:pointer;">${v43ProfMode ? '✓ Mode profitable activé' : 'Activer mode profitable'}</button>
-        </strong>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:12px 0;font-size:12px;">
-          <div style="padding:8px 10px;background:rgba(15,15,20,0.4);border-radius:6px;border:1px solid rgba(245,158,11,0.25);">
-            <div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.3px;">Outsider-only</div>
-            <div style="font-size:14px;font-weight:800;color:#f59e0b;">+121% ROI</div>
-            <div style="font-size:10.5px;color:var(--text-dim2);">356 paris · max_dd 3%</div>
-          </div>
-          <div style="padding:8px 10px;background:rgba(15,15,20,0.4);border-radius:6px;border:1px solid rgba(59,130,246,0.25);">
-            <div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.3px;">Value-only</div>
-            <div style="font-size:14px;font-weight:800;color:#3b82f6;">+33% ROI</div>
-            <div style="font-size:10.5px;color:var(--text-dim2);">1251 paris · max_dd 3.5%</div>
-          </div>
-          <div style="padding:8px 10px;background:rgba(15,15,20,0.4);border-radius:6px;border:1px solid rgba(16,185,129,0.25);">
-            <div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.3px;">Flat 1u</div>
-            <div style="font-size:14px;font-weight:800;color:#10b981;">+19% ROI</div>
-            <div style="font-size:10.5px;color:var(--text-dim2);">1932 paris · max_dd 5%</div>
-          </div>
-          <div style="padding:8px 10px;background:rgba(15,15,20,0.3);border-radius:6px;border:1px solid rgba(239,68,68,0.25);">
-            <div style="font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.3px;">Kelly / Sharp ⚠</div>
-            <div style="font-size:14px;font-weight:800;color:#ef4444;">-19% à -30%</div>
-            <div style="font-size:10.5px;color:var(--text-dim2);">à éviter (max_dd 99%)</div>
-          </div>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:14px;">
-          <div>
-            <div style="font-size:13px;font-weight:800;color:#f59e0b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">💎 Outsiders 7j (${v40MultiDayOutsiders.length})</div>
-            ${v40OutsiderListHtml || '<div style="padding:10px 12px;background:rgba(15,15,20,0.4);border:1px dashed rgba(245,158,11,0.3);border-radius:6px;color:var(--text-dim);font-size:11.5px;">Aucun pick Outsider qualifié sur les 7 prochains jours.</div>'}
-          </div>
-          <div>
-            <div style="font-size:13px;font-weight:800;color:#3b82f6;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">🎯 Value 7j (${v43MultiDayValue.length})</div>
-            ${v43ValueListHtml}
-          </div>
-        </div>
-        ${(() => {
-          // v45.1 fix : lire bankroll depuis localStorage directement (userBankroll
-          // const est défini PLUS BAS dans renderDashboardPage donc TDZ ici).
-          let _bk = 100;
-          try { const v = parseFloat(localStorage.getItem('userBankroll')); if (isFinite(v) && v > 0) _bk = v; } catch (e) {}
-          const _u = (typeof window._v45FlatStake === 'function') ? window._v45FlatStake(_bk) : Math.max(1, Math.round(_bk * 0.01));
-          const _isKelly = (typeof window._v45StakeMode === 'function' && window._v45StakeMode() === 'kelly');
-          return `<div style="margin-top:10px;padding:10px 12px;background:rgba(15,15,20,0.5);border-radius:6px;font-size:11px;color:var(--text-dim);line-height:1.5;display:flex;flex-wrap:wrap;align-items:center;gap:10px;">
-          <span><b style="color:var(--text);">Rappel :</b> mise <b style="color:#10b981;">FLAT 1u</b> recommandée (Kelly bankrupted -30% en backtest, max_dd 99.99%).</span>
-          <span style="color:var(--text-dim2);">Sur ${_bk}€ bankroll → 1u = <b style="color:#10b981;">${_u}€</b>/pick.</span>
-          <button type="button" data-v46-action="toggle-stake-mode" style="margin-left:auto;padding:3px 10px;background:${_isKelly ? 'rgba(239,68,68,.2)' : 'rgba(16,185,129,.18)'};border:1px solid ${_isKelly ? '#ef4444' : '#10b981'};color:${_isKelly ? '#ef4444' : '#10b981'};border-radius:999px;font-size:10.5px;font-weight:700;cursor:pointer;">${_isKelly ? '⚠️ Mode Kelly (à éviter)' : '✓ Mode FLAT 1u'}</button>
-          <div style="flex:0 0 100%;color:#ef4444;font-size:10.5px;">Tiers Safe/Solid restent affichés mais sont <b>historiquement perdants</b>.</div>
-        </div>`;
-        })()}
-      </section>`;
+// v47.2 — v43MultiDayValue scanner retiré (utilisé seulement par
+// v43StrategyBannerHtml retiré v45.16 + v47.2). Économie ~2 KB.
+// La logique reste dispo si besoin via window.v43ProfitableMode + filtres
+// du Genius mode v45.18 (TOP 3 strict criteria).
+const v43MultiDayValue = [];
+// v47.2 — v43StrategyBannerHtml retiré complètement (était dead code depuis v45.16
+// "sa sert arien"). Économie ~2.5 KB legacy-app.js.
+// Si besoin de réintroduire la banner, voir le commit 9375c2f50 v45.16.
+const v43StrategyBannerHtml = '';
 
 const v36TableHtml = `<section class="v36-table-panel" aria-label="Tableau dense des propositions">
         ${v45GeniusBannerHtml}
