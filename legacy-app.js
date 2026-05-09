@@ -4312,9 +4312,32 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
       const market1 = p1.market || '1n2';
       const market2 = p2.market || '1n2';
       if (market1 === market2) return 1.0;
-      if ((market1 === '1n2' && market2 === 'doubleChance') ||
-          (market1 === 'doubleChance' && market2 === '1n2')) return 0.95;
-      return 0.6;
+      // v50.7 — Audit "élargir les marchés" : raffiner les corrélations cross-market.
+      // Avant : default 0.6 pour tout même-match cross-market. Mais corners/cards/exact_score
+      // peuvent être combinés intelligemment avec 1n2 (corrélation faible-modérée).
+      // Maintenant : graduate par paire de marchés.
+      const pair = [market1, market2].sort().join('|');
+      // Hautement corrélés (redondants) — bloquer
+      if (pair === '1n2|doubleChance' || pair === 'doubleChance|1n2') return 0.95;
+      if (pair === '1n2|dnb' || pair === 'dnb|1n2') return 0.92;
+      if (pair === 'doubleChance|dnb' || pair === 'dnb|doubleChance') return 0.85;
+      if (pair === 'btts|exactScore' || pair === 'exactScore|btts') return 0.85;
+      if (pair === 'ou25|exactScore' || pair === 'exactScore|ou25') return 0.85;
+      // Modérés (overlap partiel) — autoriser combo léger
+      if (pair === '1n2|ou25' || pair === 'ou25|1n2') return 0.55;
+      if (pair === '1n2|btts' || pair === 'btts|1n2') return 0.50;
+      if (pair === 'ou25|btts' || pair === 'btts|ou25') return 0.65;
+      if (pair === '1n2|exactScore' || pair === 'exactScore|1n2') return 0.75;
+      // Indépendants ou faiblement corrélés — combo OK
+      // corners / cards / xg / fouls indépendants du résultat 1n2/btts/ou
+      const indepMarkets = ['cornersTotal', 'cardsTotal', 'corners_ou', 'cards_ou'];
+      if (indepMarkets.includes(market1) || indepMarkets.includes(market2)) return 0.30;
+      // Mi-temps + fin de match : corrélé mais pas redondant
+      if (pair.includes('ht_') || pair.includes('halfTime')) return 0.45;
+      // Team total + score exact : très corrélé
+      if (pair === 'exactScore|teamTotal' || pair === 'teamTotal|exactScore') return 0.80;
+      // Default same-match cross-market : modéré
+      return 0.55;
     }
     let corr = 0;
     if (m1.sport === m2.sport) corr += 0.15;
