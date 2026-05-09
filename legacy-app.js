@@ -8521,6 +8521,16 @@ const roiPct = overall.flat_roi_pct || 0;
 setText('trust-roi', (roiPct >= 0 ? '+' : '') + roiPct.toFixed(1) + '%');
 setText('trust-brier', (overall.brier || 0).toFixed(3));
 setText('trust-n', overall.n);
+// v45.17 — Tooltip avec date de regeneration du backtest pour transparence.
+try {
+  const genAt = bt.generated_at;
+  if (genAt) {
+    const ageH = Math.round((Date.now() - new Date(genAt).getTime()) / 3600000);
+    const fresh = ageH < 26 ? 'frais' : ageH < 50 ? 'récent' : ageH < 200 ? `il y a ${Math.round(ageH/24)}j` : 'à régénérer';
+    const stat = document.getElementById('trust-n')?.closest('.trust-strip-stat');
+    if (stat) stat.title = `${overall.n} picks réglés cumulés · backtest ${fresh} (${ageH}h) · cron quotidien 04:00 UTC. Range : ${(bt.date_range && bt.date_range.start || '').slice(0,10)} → ${(bt.date_range && bt.date_range.end || '').slice(0,10)}.`;
+  }
+} catch (e) {}
 }
 // AUDIT 2026-05-09 v40.15 + v42.fix — CLV moyen depuis clv_summary.json.
 // v42 fix : kick off un fetch direct ici car v37ClvState (dans renderDashboardPage)
