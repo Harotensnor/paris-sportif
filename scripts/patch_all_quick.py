@@ -1041,6 +1041,110 @@ def patch_tennis_features(data: dict) -> int:
     return n
 
 
+def patch_nba_advanced(data: dict) -> int:
+    """v51.5 — Inject NBA advanced stats (ESPN team-level) sur competitors NBA."""
+    adv = _load_json(ROOT / 'nba_advanced.json')
+    if not adv:
+        return 0
+    teams_idx = adv.get('teams') or {}
+    if not teams_idx:
+        return 0
+    n = 0
+    for evs in (data.get('days') or {}).values():
+        for ev in (evs or []):
+            if ev.get('sport') != 'basketball' or ev.get('league_code') != 'nba':
+                continue
+            for c in (ev.get('competitors') or []):
+                abbr = (c.get('abbr') or '').upper()
+                stats = teams_idx.get(abbr)
+                if stats:
+                    # Add as nested 'advanced' sub-key (don't overwrite existing nba_stats)
+                    c['nba_advanced'] = {
+                        'avgPoints': stats.get('avgPoints'),
+                        'avgFieldGoalPct': stats.get('avgFieldGoalPct'),
+                        'avg3PointPct': stats.get('avg3PointPct'),
+                        'avgAssists': stats.get('avgAssists'),
+                        'avgRebounds': stats.get('avgRebounds'),
+                        'avgSteals': stats.get('avgSteals'),
+                        'avgBlocks': stats.get('avgBlocks'),
+                        'avgTurnovers': stats.get('avgTurnovers'),
+                        'assistTurnoverRatio': stats.get('assistTurnoverRatio'),
+                        'avgPointsAgainst': stats.get('avgPointsAgainst'),
+                        'efg_approx': stats.get('efg_approx'),
+                        'pace_proxy': stats.get('pace_proxy'),
+                    }
+                    n += 1
+    return n
+
+
+def patch_mlb_advanced(data: dict) -> int:
+    """v51.5 — Inject MLB advanced team stats (ESPN team-level) sur competitors MLB."""
+    adv = _load_json(ROOT / 'mlb_advanced.json')
+    if not adv:
+        return 0
+    teams_idx = adv.get('teams') or {}
+    if not teams_idx:
+        return 0
+    n = 0
+    for evs in (data.get('days') or {}).values():
+        for ev in (evs or []):
+            if ev.get('sport') != 'baseball' or ev.get('league_code') != 'mlb':
+                continue
+            for c in (ev.get('competitors') or []):
+                abbr = (c.get('abbr') or '').upper()
+                stats = teams_idx.get(abbr)
+                if stats:
+                    c['mlb_advanced'] = {
+                        'team_OPS': stats.get('batting_OPS'),
+                        'team_AVG': stats.get('batting_avg'),
+                        'team_OBP': stats.get('batting_OBP'),
+                        'team_SLG': stats.get('batting_SLG'),
+                        'team_HR': stats.get('batting_HR'),
+                        'team_R': stats.get('batting_R'),
+                        'team_K': stats.get('batting_K'),
+                        'team_ERA': stats.get('pitching_ERA'),
+                        'team_WHIP': stats.get('pitching_WHIP'),
+                        'team_K9': stats.get('pitching_K9'),
+                        'team_FPCT': stats.get('fielding_FPCT'),
+                        'team_E': stats.get('fielding_E'),
+                        'runs_per_game': stats.get('runs_per_game'),
+                        'runs_against_per_game': stats.get('runs_against_per_game'),
+                    }
+                    n += 1
+    return n
+
+
+def patch_nhl_advanced(data: dict) -> int:
+    """v51.5 — Inject NHL advanced team stats (ESPN team-level) sur competitors NHL."""
+    adv = _load_json(ROOT / 'nhl_advanced.json')
+    if not adv:
+        return 0
+    teams_idx = adv.get('teams') or {}
+    if not teams_idx:
+        return 0
+    n = 0
+    for evs in (data.get('days') or {}).values():
+        for ev in (evs or []):
+            if ev.get('sport') != 'hockey' or ev.get('league_code') != 'nhl':
+                continue
+            for c in (ev.get('competitors') or []):
+                abbr = (c.get('abbr') or '').upper()
+                stats = teams_idx.get(abbr)
+                if stats:
+                    c['nhl_advanced'] = {
+                        'goals_per_game': stats.get('goals_per_game'),
+                        'goals_against_per_game': stats.get('goals_against_per_game'),
+                        'shots_per_game': stats.get('shots_per_game'),
+                        'shots_against_per_game': stats.get('shots_against_per_game'),
+                        'power_play_pct': stats.get('power_play_pct'),
+                        'penalty_kill_pct': stats.get('penalty_kill_pct'),
+                        'save_pct': stats.get('save_pct'),
+                        'face_off_win_pct': stats.get('face_off_win_pct'),
+                    }
+                    n += 1
+    return n
+
+
 # ============================================================
 # MAIN
 # ============================================================
@@ -1061,6 +1165,10 @@ PATCHES = [
     ('nhl_stats', patch_nhl_stats),
     ('nba_team_stats', patch_nba_team_stats),
     ('tennis_features', patch_tennis_features),
+    # v51.5 — advanced stats injection (Plan Pronostics Phase 2.1)
+    ('nba_advanced', patch_nba_advanced),
+    ('mlb_advanced', patch_mlb_advanced),
+    ('nhl_advanced', patch_nhl_advanced),
 ]
 
 

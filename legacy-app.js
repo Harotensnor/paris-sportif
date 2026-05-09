@@ -10000,6 +10000,26 @@ if (match.sport === 'basketball' && match.league_code === 'nba') {
       home_streak: homeStreak,
       away_streak: awayStreak,
     };
+    // v51.6 — Advanced stats NBA (patch_nba_advanced v51.5).
+    const homeAdv = homeC.nba_advanced || {};
+    const awayAdv = awayC.nba_advanced || {};
+    if (homeAdv.efg_approx && awayAdv.efg_approx) {
+      // eFG diff : team avec meilleure shooting efficiency a l'avantage offensif
+      const efgDiff = homeAdv.efg_approx - awayAdv.efg_approx;
+      // eFG diff de 5pp = ~5% win prob shift (high)
+      const pEfgHome = Math.max(0.40, Math.min(0.60, 0.5 + 1.0 * efgDiff));
+      components.push({ w: adaptiveW('eFG% NBA', 0.15), pH: pEfgHome, pD: 0, pA: 1 - pEfgHome,
+        name: 'Shooting eFG% NBA', icon: '🎯' });
+      nbaStats.home_efg = homeAdv.efg_approx;
+      nbaStats.away_efg = awayAdv.efg_approx;
+    }
+    if (homeAdv.assistTurnoverRatio && awayAdv.assistTurnoverRatio) {
+      // AST/TO ratio diff : ball control différentiel
+      const astToDiff = homeAdv.assistTurnoverRatio - awayAdv.assistTurnoverRatio;
+      const pAstHome = Math.max(0.45, Math.min(0.55, 0.5 + 0.10 * astToDiff));
+      components.push({ w: adaptiveW('AST/TO NBA', 0.08), pH: pAstHome, pD: 0, pA: 1 - pAstHome,
+        name: 'Assist/Turnover NBA', icon: '🎨' });
+    }
   }
 }
 let pitcherStats = null;
@@ -10073,6 +10093,25 @@ if (baseballHomeC && baseballAwayC) {
     const pFormHome = Math.max(0.40, Math.min(0.60, 0.5 + 0.20 * formDiff));
     components.push({ w: adaptiveW('Forme L10 MLB', 0.10), pH: pFormHome, pD: 0, pA: 1 - pFormHome,
       name: 'Forme L10 MLB', icon: '📈' });
+  }
+  // v51.6 — Advanced MLB team stats (patch_mlb_advanced v51.5).
+  const hAdv = baseballHomeC.mlb_advanced || {};
+  const aAdv = baseballAwayC.mlb_advanced || {};
+  if (hAdv.team_OPS && aAdv.team_OPS) {
+    // OPS diff : meilleure offense → plus de runs marqués
+    const opsDiff = hAdv.team_OPS - aAdv.team_OPS;
+    const pOpsHome = Math.max(0.42, Math.min(0.58, 0.5 + 0.40 * opsDiff));
+    components.push({ w: adaptiveW('OPS team MLB', 0.10), pH: pOpsHome, pD: 0, pA: 1 - pOpsHome,
+      name: 'OPS team MLB', icon: '⚾' });
+  }
+  if (hAdv.runs_per_game && aAdv.runs_against_per_game && hAdv.runs_against_per_game && aAdv.runs_per_game) {
+    // Run differential: home (off) vs away (def) and vice versa
+    const homeNet = hAdv.runs_per_game - aAdv.runs_against_per_game;
+    const awayNet = aAdv.runs_per_game - hAdv.runs_against_per_game;
+    const netDiff = homeNet - awayNet;
+    const pRunDiff = Math.max(0.40, Math.min(0.60, 0.5 + 0.04 * netDiff));
+    components.push({ w: adaptiveW('Run diff MLB', 0.08), pH: pRunDiff, pD: 0, pA: 1 - pRunDiff,
+      name: 'Run differential MLB', icon: '📊' });
   }
 }
 }
