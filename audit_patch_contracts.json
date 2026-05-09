@@ -1,0 +1,175 @@
+{
+  "generated_at_unix": 1778342385,
+  "total_contracts": 13,
+  "ok": 13,
+  "empty": 0,
+  "schema_mismatch": 0,
+  "missing": 0,
+  "malformed": 0,
+  "results": [
+    {
+      "file": "weather.json",
+      "reader": "patch_weather",
+      "expected_keys": [
+        "matches"
+      ],
+      "min_entries": 1,
+      "status": "ok",
+      "detail": "matches: 1290 entries OK",
+      "matched_key": "matches",
+      "entries": 1290
+    },
+    {
+      "file": "referees_soccer.json",
+      "reader": "patch_referees",
+      "expected_keys": [
+        "events"
+      ],
+      "min_entries": 1,
+      "status": "ok",
+      "detail": "events: 106 entries OK",
+      "matched_key": "events",
+      "entries": 106
+    },
+    {
+      "file": "lineups_soccer.json",
+      "reader": "patch_lineups",
+      "expected_keys": [
+        "events"
+      ],
+      "min_entries": 1,
+      "status": "ok",
+      "detail": "events: 97 entries OK",
+      "matched_key": "events",
+      "entries": 97
+    },
+    {
+      "file": "injuries_soccer.json",
+      "reader": "patch_soccer_injuries",
+      "expected_keys": [
+        "teams",
+        "scanned_teams"
+      ],
+      "min_entries": 0,
+      "status": "ok",
+      "detail": "teams: 124 entries OK",
+      "matched_key": "teams",
+      "entries": 124
+    },
+    {
+      "file": "injuries_multisport.json",
+      "reader": "patch_injuries",
+      "expected_keys": [
+        "teams"
+      ],
+      "min_entries": 1,
+      "status": "ok",
+      "detail": "teams: 129 entries OK",
+      "matched_key": "teams",
+      "entries": 129
+    },
+    {
+      "file": "clubelo.json",
+      "reader": "patch_clubelo",
+      "expected_keys": [
+        "clubs",
+        "by_team"
+      ],
+      "min_entries": 1,
+      "status": "ok",
+      "detail": "clubs: 630 entries OK",
+      "matched_key": "clubs",
+      "entries": 630
+    },
+    {
+      "file": "team_form.json",
+      "reader": "patch_team_form",
+      "expected_keys": [
+        "by_team",
+        "baseball:mlb:1"
+      ],
+      "min_entries": 1,
+      "status": "ok",
+      "detail": "baseball:mlb:1: 5 entries OK",
+      "matched_key": "baseball:mlb:1",
+      "entries": 5
+    },
+    {
+      "file": "fbref_xg.json",
+      "reader": "patch_fbref_xg",
+      "expected_keys": [
+        "by_team"
+      ],
+      "min_entries": 1,
+      "status": "ok",
+      "detail": "by_team: 112 entries OK",
+      "matched_key": "by_team",
+      "entries": 112
+    },
+    {
+      "file": "team_stats.json",
+      "reader": "patch_team_stats",
+      "expected_keys": [
+        "teams",
+        "by_team"
+      ],
+      "min_entries": 1,
+      "status": "ok",
+      "detail": "teams: 116 entries OK",
+      "matched_key": "teams",
+      "entries": 116
+    },
+    {
+      "file": "footballdata.json",
+      "reader": "patch_footballdata",
+      "expected_keys": [
+        "matches",
+        "by_match"
+      ],
+      "min_entries": 1,
+      "status": "ok",
+      "detail": "matches: 9518 entries OK",
+      "matched_key": "matches",
+      "entries": 9518
+    },
+    {
+      "file": "mlb_pitchers.json",
+      "reader": "patch_mlb_pitchers",
+      "expected_keys": [
+        "matches",
+        "by_match"
+      ],
+      "min_entries": 1,
+      "status": "ok",
+      "detail": "matches: 31 entries OK",
+      "matched_key": "matches",
+      "entries": 31
+    },
+    {
+      "file": "nhl_stats.json",
+      "reader": "patch_nhl_stats",
+      "expected_keys": [
+        "teams",
+        "by_team"
+      ],
+      "min_entries": 1,
+      "status": "ok",
+      "detail": "teams: 32 entries OK",
+      "matched_key": "teams",
+      "entries": 32
+    },
+    {
+      "file": "nba_team_stats.json",
+      "reader": "patch_nba_team_stats",
+      "expected_keys": [
+        "teams",
+        "by_team"
+      ],
+      "min_entries": 1,
+      "status": "ok",
+      "detail": "teams: 30 entries OK",
+      "matched_key": "teams",
+      "entries": 30
+    }
+  ]
+}

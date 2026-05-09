@@ -94,6 +94,14 @@ jobs:
           if [ -f app-i18n.js ]; then node --check app-i18n.js && echo "  app-i18n.js OK"; fi
           echo "All JS bundles syntax OK"
 
+      # v50.4 — Audit 2026-05-09 : v50.0/v50.3 ont trouvé 3 schema mismatches
+      # silencieux (team_stats, footballdata, nba_team_stats) — coverage 0% pendant
+      # des semaines parce qu'aucun gate ne validait que les patchers lisaient les
+      # bonnes clés. audit_patch_contracts.py compare expected vs actual et fail-fast.
+      - name: Patch source contract audit (fail fast)
+        run: python scripts/audit_patch_contracts.py --strict
+        continue-on-error: true  # informatif pour l'instant, peut devenir bloquant après stabilisation
+
       - name: Fast QA gate
         run: python scripts/qa_gate_report.py
 
