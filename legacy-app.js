@@ -33832,8 +33832,11 @@ const b = h.querySelector('.hub-btn');
 if (b) b.setAttribute('aria-expanded', 'false');
 });
 });
-const NOTIF_EDGE_THRESHOLD = 0.10;       // edge ≥10pt = "forte valeur"
-const NOTIF_CONF_THRESHOLD = 0.55;       // garde-fou : ignore les flukes faible conf
+// AUDIT 2026-05-09 v45.6 — Seuils alignés avec stratégies prouvées
+// (backtest_strategies.json leaderboard) : Outsider +121% ROI requires
+// cote≥5+edge≥5pt, Value +33% ROI requires edge≥5pt. Notify les 2.
+const NOTIF_EDGE_THRESHOLD = 0.05;       // baisse 0.10→0.05 (= seuil Value strategy)
+const NOTIF_CONF_THRESHOLD = 0.45;       // baisse 0.55→0.45 (Platt boost compense)
 const _openNotifTarget = (url) => {
 const target = url || (location.origin + location.pathname + '#dashboard');
 try {
@@ -33930,14 +33933,27 @@ if (!odd) continue;
 const rel = pred.reliability ?? pred.pick.prob;
 const edge = rel - 1/odd;
 if (edge < NOTIF_EDGE_THRESHOLD || rel < NOTIF_CONF_THRESHOLD) continue;
+// v45.6 — Tag Outsider vs Value selon stratégie matched.
+const _isOutsider = (pred.tier === 'out' || (odd >= 5 && edge >= 0.05));
+const _isValue = !_isOutsider && edge >= 0.05;
+const _strategy = _isOutsider ? 'outsider' : _isValue ? 'value' : 'flat';
 const { home, away } = (typeof getSides === 'function') ? getSides(m) : { home: {}, away: {} };
 fresh.push({ id: String(m.id), home: (home && home.name) || '?', away: (away && away.name) || '?',
-edge, rel, odd, label: pred.pick.label || 'Pick' });
+edge, rel, odd, label: pred.pick.label || 'Pick', strategy: _strategy });
 }
 if (!fresh.length) return;
+// v45.6 — Priorité Outsider > Value > autres pour les 3 slots.
+fresh.sort((a, b) => {
+  const sa = a.strategy === 'outsider' ? 0 : a.strategy === 'value' ? 1 : 2;
+  const sb = b.strategy === 'outsider' ? 0 : b.strategy === 'value' ? 1 : 2;
+  if (sa !== sb) return sa - sb;
+  return b.edge - a.edge;
+});
 fresh.slice(0, 3).forEach(p => {
 try {
-_nativeNotify(`💎 Pari forte valeur : ${p.home} vs ${p.away}`, {
+const _emoji = p.strategy === 'outsider' ? '💎' : p.strategy === 'value' ? '🎯' : '📊';
+const _stratLbl = p.strategy === 'outsider' ? 'Outsider +121% ROI' : p.strategy === 'value' ? 'Value +33% ROI' : 'Flat';
+_nativeNotify(`${_emoji} ${_stratLbl} : ${p.home} vs ${p.away}`, {
 body: `→ ${p.label} @${p.odd.toFixed(2)} · edge +${Math.round(p.edge*100)}pt · conf ${Math.round(p.rel*100)}%`,
 icon: 'icon-192.png',
 badge: 'icon.svg',
