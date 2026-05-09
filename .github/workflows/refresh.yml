@@ -183,17 +183,28 @@ jobs:
           # Maintenant : fetch SYNC inline (~5-10s) si secret défini.
           export THE_ODDS_API_KEY="${{ secrets.THE_ODDS_API_KEY }}"
           MIN_MOD30=$(( $(date +%M) % 30 ))
-          NEED_INITIAL_AGG=$([ ! -f ../odds_aggregated.json ] && echo 1 || echo 0)
+          # v47.9 — Initial seed se déclenche uniquement si fichier absent OU >24h.
+          # Avant : `[ ! -f ]` → dès que le fichier est présent dans le workspace
+          # checkout, on skip. Mais comme le fichier n'était pas dans la commit
+          # allowlist (bug v47.8), il était absent à chaque cron run → seed re-fire
+          # toutes les 5 min → quota free tier (500/mois) cramé en ~6h.
+          # Maintenant : allowlist fixée + ne re-fire que si vraiment vieux.
+          NEED_INITIAL_AGG=0
+          if [ ! -f ../odds_aggregated.json ]; then
+            NEED_INITIAL_AGG=1
+          elif [ $(find ../odds_aggregated.json -mmin +1440 2>/dev/null | wc -l) -eq 1 ]; then
+            NEED_INITIAL_AGG=1
+          fi
           if [ -z "$THE_ODDS_API_KEY" ]; then
             echo "[odds-agg] secret non défini, skip"
           elif [ $(( $(date +%H) % 2 )) -eq 0 ] && [ $MIN_MOD30 -lt 10 ]; then
             echo "[odds-agg] window 2h fire (HOUR%2=0 MIN%30<10)"
             timeout 60 python3 fetch_odds_aggregator.py 2>&1 | tail -10
           elif [ "$NEED_INITIAL_AGG" = "1" ]; then
-            echo "[odds-agg] Initial seed (file absent) → fire SYNC"
+            echo "[odds-agg] Initial seed (file absent ou >24h) → fire SYNC"
             timeout 60 python3 fetch_odds_aggregator.py 2>&1 | tail -10
           else
-            echo "[odds-agg] hors fenêtre, skip"
+            echo "[odds-agg] hors fenêtre, skip (file present + recent)"
           fi
           ls -la ../odds_aggregated.json 2>&1 || echo "[odds-agg] file not present"
           # Wait pour TOUS les jobs background lancés
@@ -499,7 +510,8 @@ jobs:
             credibilite.html stadiums.json dixon_coles_rho.json index.html \
             nba_team_stats.json team_strengths.json team_strengths_mle.json \
             ci_heartbeat.json sofascore_events.json clv_history.json clv_summary.json \
-            og-default.png og-backtest.png og-credibilite.png og-methodologie.png sitemap.xml
+            og-default.png og-backtest.png og-credibilite.png og-methodologie.png sitemap.xml \
+            odds_aggregated.json
           do
             if [ -e "$path" ]; then
               git add "$path"
