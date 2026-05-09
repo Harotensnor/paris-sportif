@@ -18119,14 +18119,24 @@ const v40StrictMode = (() => {
     return raw === null ? true : raw === '1' || raw === 'true';
   } catch (e) { return true; }
 })();
+// AUDIT 2026-05-09 v42.fix4 — v40PickVerdict utilise window._v39FinalRec
+// (plus stable que la const TDZ-able _v39FinalRec). Fallback aligné sur
+// le nouveau seuil 32 (au lieu de 45) pour cohérence avec _v39FinalRec.
 const v40PickVerdict = (p) => {
   try {
-    if (typeof _v39FinalRec === 'function') {
-      const r = _v39FinalRec(p);
+    const fn = (typeof window !== 'undefined' && window._v39FinalRec) || (typeof _v39FinalRec === 'function' ? _v39FinalRec : null);
+    if (fn) {
+      const r = fn(p);
       return r ? r.verdict : null;
     }
   } catch (e) { swallowError(e); }
-  return Number(p?.opportunity || 0) >= 45 ? 'bet-light' : 'skip';
+  // Fallback aligné v42.fix3 : opp >= 32 = bet-light, edge >= 3pt = bridge.
+  const opp = Number(p?.opportunity || 0);
+  const edge = Number(p?.edge || 0);
+  if (opp >= 60) return 'bet';
+  if (opp >= 32) return 'bet-light';
+  if (edge >= 0.03) return 'watch';
+  return 'skip';
 };
 // AUDIT 2026-05-09 v42.fix3 — Pool reste maigre, abaisse encore le bridge
 // edge 5pt → 3pt pour surfacer plus de candidats les jours où le modèle
