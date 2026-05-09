@@ -4496,6 +4496,30 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
       try { window._settleUserBets(); } catch (err) {}
     });
   }
+  // v46.3 — Delegated handler pour data-v46-action (replace inline onclick
+  // qui étaient strippés par sanitizeTrustedHTML → 60+ warnings logs).
+  document.addEventListener('click', (e) => {
+    const btn = e.target && e.target.closest ? e.target.closest('[data-v46-action]') : null;
+    if (!btn || e.defaultPrevented) return;
+    const action = btn.dataset.v46Action;
+    if (!action) return;
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      if (action === 'toggle-profitable-mode') {
+        if (typeof window.v43SetProfitableMode === 'function') {
+          window.v43SetProfitableMode(!window.v43ProfitableMode());
+          location.reload();
+        }
+      } else if (action === 'toggle-stake-mode') {
+        if (typeof window._v45SetStakeMode === 'function') {
+          const cur = window._v45StakeMode();
+          window._v45SetStakeMode(cur === 'kelly' ? 'flat' : 'kelly');
+          location.reload();
+        }
+      }
+    } catch (err) { /* swallowError */ }
+  }, true);
   // v45.13 — CSV export + reset bets handlers.
   document.addEventListener('click', (e) => {
     const exportBtn = e.target && e.target.closest ? e.target.closest('[data-v45-export-bets]') : null;
@@ -19390,7 +19414,7 @@ const v43StrategyBannerHtml = `<section class="v37-empty-pool-help v43-strategy-
           <span style="font-size:18px;filter:drop-shadow(0 0 6px rgba(245,158,11,0.6));">🎯</span>
           <span>Stratégies gagnantes du jour</span>
           <span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;background:rgba(245,158,11,0.18);border:1px solid rgba(245,158,11,0.5);border-radius:999px;font-size:11px;font-weight:800;color:#f59e0b;letter-spacing:0.4px;">v43 · backtesté 1932 paris</span>
-          <button type="button" onclick="window.v43SetProfitableMode(!window.v43ProfitableMode());location.reload();" style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;padding:5px 11px;background:${v43ProfMode ? 'rgba(245,158,11,0.18)' : 'rgba(15,15,20,0.5)'};border:1px solid ${v43ProfMode ? '#f59e0b' : 'var(--border)'};color:${v43ProfMode ? '#f59e0b' : 'var(--text)'};border-radius:999px;font-size:11px;font-weight:700;cursor:pointer;">${v43ProfMode ? '✓ Mode profitable activé' : 'Activer mode profitable'}</button>
+          <button type="button" data-v46-action="toggle-profitable-mode" style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;padding:5px 11px;background:${v43ProfMode ? 'rgba(245,158,11,0.18)' : 'rgba(15,15,20,0.5)'};border:1px solid ${v43ProfMode ? '#f59e0b' : 'var(--border)'};color:${v43ProfMode ? '#f59e0b' : 'var(--text)'};border-radius:999px;font-size:11px;font-weight:700;cursor:pointer;">${v43ProfMode ? '✓ Mode profitable activé' : 'Activer mode profitable'}</button>
         </strong>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:12px 0;font-size:12px;">
           <div style="padding:8px 10px;background:rgba(15,15,20,0.4);border-radius:6px;border:1px solid rgba(245,158,11,0.25);">
@@ -19434,7 +19458,7 @@ const v43StrategyBannerHtml = `<section class="v37-empty-pool-help v43-strategy-
           return `<div style="margin-top:10px;padding:10px 12px;background:rgba(15,15,20,0.5);border-radius:6px;font-size:11px;color:var(--text-dim);line-height:1.5;display:flex;flex-wrap:wrap;align-items:center;gap:10px;">
           <span><b style="color:var(--text);">Rappel :</b> mise <b style="color:#10b981;">FLAT 1u</b> recommandée (Kelly bankrupted -30% en backtest, max_dd 99.99%).</span>
           <span style="color:var(--text-dim2);">Sur ${_bk}€ bankroll → 1u = <b style="color:#10b981;">${_u}€</b>/pick.</span>
-          <button type="button" onclick="window._v45SetStakeMode(window._v45StakeMode() === 'kelly' ? 'flat' : 'kelly');location.reload();" style="margin-left:auto;padding:3px 10px;background:${_isKelly ? 'rgba(239,68,68,.2)' : 'rgba(16,185,129,.18)'};border:1px solid ${_isKelly ? '#ef4444' : '#10b981'};color:${_isKelly ? '#ef4444' : '#10b981'};border-radius:999px;font-size:10.5px;font-weight:700;cursor:pointer;">${_isKelly ? '⚠️ Mode Kelly (à éviter)' : '✓ Mode FLAT 1u'}</button>
+          <button type="button" data-v46-action="toggle-stake-mode" style="margin-left:auto;padding:3px 10px;background:${_isKelly ? 'rgba(239,68,68,.2)' : 'rgba(16,185,129,.18)'};border:1px solid ${_isKelly ? '#ef4444' : '#10b981'};color:${_isKelly ? '#ef4444' : '#10b981'};border-radius:999px;font-size:10.5px;font-weight:700;cursor:pointer;">${_isKelly ? '⚠️ Mode Kelly (à éviter)' : '✓ Mode FLAT 1u'}</button>
           <div style="flex:0 0 100%;color:#ef4444;font-size:10.5px;">Tiers Safe/Solid restent affichés mais sont <b>historiquement perdants</b>.</div>
         </div>`;
         })()}
@@ -22719,7 +22743,7 @@ ${items}
       <div style="font-size:24px;font-weight:800;letter-spacing:-0.6px;color:var(--text);line-height:1.15;">🎯 Stratégies gagnantes du jour</div>
       <div style="font-size:12px;color:var(--text-dim);margin-top:4px;">Outsider <b style="color:#f59e0b;">+121% ROI</b> sur 356 paris · Value <b style="color:#3b82f6;">+33% ROI</b> sur 1251 paris (backtest 1932 picks)</div>
     </div>
-    <button type="button" onclick="window.v43SetProfitableMode(!window.v43ProfitableMode());location.reload();" style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:${v43ModeOn ? 'rgba(245,158,11,.18)' : 'var(--panel)'};border:1px solid ${v43ModeOn ? '#f59e0b' : 'var(--border)'};color:${v43ModeOn ? '#f59e0b' : 'var(--text)'};border-radius:999px;font-size:11px;font-weight:700;cursor:pointer;">${v43ModeOn ? '✓ Mode profitable activé' : 'Activer mode profitable'}</button>
+    <button type="button" data-v46-action="toggle-profitable-mode" style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:${v43ModeOn ? 'rgba(245,158,11,.18)' : 'var(--panel)'};border:1px solid ${v43ModeOn ? '#f59e0b' : 'var(--border)'};color:${v43ModeOn ? '#f59e0b' : 'var(--text)'};border-radius:999px;font-size:11px;font-weight:700;cursor:pointer;">${v43ModeOn ? '✓ Mode profitable activé' : 'Activer mode profitable'}</button>
   </div>
   ${outsiderPicks.length ? `
   <div style="margin-bottom:16px;">
@@ -29098,8 +29122,25 @@ academieWrap.id = 'academie-wrap';
 _setRouteWrapActive(academieWrap, isAcademie);
 if (isAcademie) {
 _renderPageSkeleton(academieWrap, 'Méthode', 'Méthode & académie', 3);
-requestAnimationFrame(() => renderAcademiePage(academieWrap));
+// v46.3 — Try/catch + retry pour diagnostiquer pourquoi acad reste 851b skeleton
+requestAnimationFrame(() => {
+  try {
+    renderAcademiePage(academieWrap);
+    if (academieWrap && academieWrap.innerHTML.length < 2000) {
+      // Render didn't produce content, try direct call once more
+      setTimeout(() => {
+        try { renderAcademiePage(academieWrap); } catch (e) {
+          if (typeof prodWarn === 'function') prodWarn('renderAcademiePage retry failed:', e.message || e);
+        }
+      }, 100);
+    }
+  } catch (e) {
+    if (typeof prodWarn === 'function') prodWarn('renderAcademiePage initial failed:', e.message || e);
+  }
+});
 }
+// v46.3 — Expose render functions sur window pour debug + appel manuel.
+try { window.renderAcademiePage = renderAcademiePage; } catch (e) {}
 
 let backtestWrap = document.getElementById('backtest-wrap');
 if (!backtestWrap) {
