@@ -24,6 +24,70 @@ sed -i -E "s|app\.js(\?v=[a-f0-9]+)?|app.js?v=${APP_JS_HASH}|g" pronostics.html
 
 Bumper aussi `sw.js` CACHE_VERSION dans la même commande.
 
+## Architecture v45.x (mise à jour 2026-05-09 — sprint plan ultime exécuté)
+
+Sprint de transformation lancé en mode autopilote sur le plan ultime
+v45 (audit complet + 10 phases priorisées). Phases P0/P1/P2 livrées :
+
+**Phase A (v45.0) — Calibration Platt scaling** (`_v45PlattBoost`)
+Backtest ECE bins 639 picks révèle que le modèle SOUS-ESTIME les picks
+50-80% (gap +5/+6pt actuel vs prédit). Boost piecewise linéaire :
+- rel ∈ [0.50, 0.60) → +2.0pt
+- rel ∈ [0.60, 0.70) → +5.0pt
+- rel ∈ [0.70, 0.80) → +6.0pt
+- 80%+ left as-is (n=15 trop petit)
+Appliqué après `applyCalibrationMethodV5` dans `_applyCalibration`.
+
+**Phase B (v45.0) — CLV widget pick-level** (`_setClvWidget`)
+Avant : `mean_clv_pct` (-0.03% obs-level, trompeur). Maintenant :
+`pick_mean_clv_pct` (-0.77% sur 247 paris, target sharp +1%). Color
+tier vert/lime/orange/rouge selon distance au target. Tooltip enrichi
+avec positive_clv_rate + n_paris + status.
+
+**Phase C (v45.0-v45.2) — Pivot Kelly → FLAT 1u**
+Backtest prouve Kelly_full = -30% ROI / max_dd 99.99% vs flat = +19%.
+Helpers globaux : `_v45FlatStake(bk)`, `_v45StakeMode()`,
+`_v45SetStakeMode(m)`, `_v45RecommendedStake(bk, rel, odd)`.
+`_enrichPick` route vers FLAT par défaut. Banner v43 footer enrichi
+avec affichage bankroll + toggle button "Mode FLAT 1u" / "Mode Kelly
+(à éviter)" + warning Kelly historique.
+
+**Phase F (v45.3) — Bulk track + P&L chip** (toolbar)
+- Bouton "📋 Tracker tous les N picks (1u = X€)" : ajoute jusqu'à 20
+  paris en 1 clic, FLAT 1u depuis bankroll.
+- Chip P&L : "📊 N en cours · ±X€ all-time · ±Y€ aujourd'hui" cliquable
+  vers Bilan.
+- Auto-settle hook sur `ps:app-shell-ready` : résout tous les paris
+  sur matchs completed sans intervention user.
+
+**Phase G (v45.4) — DNB market penalty**
+Value scanner `v43MultiDayValue` pénalise les marchés DNB (-3pt edge)
+pour préférer 1n2 / OU / BTTS quand edge comparable. Le user trouvait
+"nul remboursé" confus.
+
+**Phase I (v45.5) — Paper trading forward log**
+- `scripts/paper_trade_log.py` snapshots fav-side baseline picks +
+  auto-settle quand matchs completed → `paper_log.jsonl` +
+  `paper_log_summary.json`.
+- Wired dans auto_refresh.py + refresh.yml (cadence 30 ticks).
+- Frontend : widget `trust-paper-roi` dans la trust-strip qui affiche
+  ROI cumulé forward (différent du backtest historique recalibré).
+  "0/178" pending au premier run, ROI réel à mesure des matchs.
+
+**Phase E (v45.6) — Notifications strategy-aware**
+Système `_maybeNotifyHighEdgePicks` enrichi :
+- Seuils baissés : edge 0.10→0.05 (= Value strategy), conf 0.55→0.45
+  (Platt boost compense).
+- Tag stratégique : 💎 Outsider / 🎯 Value / 📊 Flat selon match.
+- Tri prioritaire Outsider > Value > autres pour les 3 slots.
+- Body : "→ {Pick} @{cote} · edge +Xpt · conf Y%"
+
+Bundle budget bumped 1860→1920 KB pour absorber Sprint v45 complet.
+
+**Phases restantes (backlog v45.D + v45.7+)**
+- D : Refacto bundle ESM split (8-10h) — préventif, repoussé
+- H : UX simplifié dashboard 3-sections — futur sprint dédié
+
 ## Architecture v43.x (mise à jour 2026-05-09 — refonte stratégie données-prouvées)
 
 Réponse au feedback "revoie complètement la stratégie du site et du modèle
