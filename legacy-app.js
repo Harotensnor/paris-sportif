@@ -4216,7 +4216,21 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
           const cRel = Number(c.rel ?? c.prob ?? 0);
           const cEdge = Number.isFinite(Number(c.edge)) ? Number(c.edge) : (cOdd > 1 ? cRel - 1 / cOdd : 0);
           const why = marketCandidateSignature(c) === marketCandidateSignature(candidate) ? 'pick principal' : (cEdge > edge ? 'meilleure value brute, à comparer au risque' : 'moins fort que le pick principal');
-          return `<tr><td><b>${esc(c.label || c.shortLabel || c.market || 'Marché')}</b><br><span class="u-text-dim">${esc(c.marketName || c.market || '')}</span></td><td>@${cOdd.toFixed(2)}</td><td>${cEdge >= 0 ? '+' : ''}${(cEdge * 100).toFixed(1)}pt</td><td>${v38OddStatusChip(meta)}</td><td>${esc(why)}</td></tr>`;
+          // v49 — Audit point #28 : badge "expérimental" sur marchés sans backtest tracking.
+          // DNB, Asian Handicap, Score Exact n'ont pas encore de ROI per-market.
+          const untestedMarkets = ['dnb', 'doubleChance', 'doubleChanceAll', 'asianHandicap', 'asianHandicapAll', 'exactScore', 'exactScoreAll', 'halfTime', 'halfTimeAll', 'teamTotal', 'teamTotals'];
+          const isUntested = untestedMarkets.includes(c.market) || untestedMarkets.includes(c.marketKey);
+          const expBadge = isUntested ? '<span title="Marché non backtesté — résultats historiques pas encore tracés en ROI" style="display:inline-block;margin-left:4px;padding:1px 6px;background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.4);border-radius:999px;font-size:10px;color:#a855f7;font-weight:700;">🔬 exp.</span>' : '';
+          // Audit point #20 : détecter contradictions logiques entre alternatives et pick principal.
+          let contradictionBadge = '';
+          try {
+            if (typeof _arePicksContradictory === 'function' && marketCandidateSignature(c) !== marketCandidateSignature(candidate)) {
+              if (_arePicksContradictory(candidate, c)) {
+                contradictionBadge = ' <span title="Contradiction logique avec le pick principal (ex: BTTS Oui + Score 1-0)" style="display:inline-block;margin-left:4px;padding:1px 6px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.4);border-radius:999px;font-size:10px;color:#ef4444;font-weight:700;">⚠ contradiction</span>';
+              }
+            }
+          } catch (e) {}
+          return `<tr><td><b>${esc(c.label || c.shortLabel || c.market || 'Marché')}</b>${expBadge}${contradictionBadge}<br><span class="u-text-dim">${esc(c.marketName || c.market || '')}</span></td><td>@${cOdd.toFixed(2)}</td><td>${cEdge >= 0 ? '+' : ''}${(cEdge * 100).toFixed(1)}pt</td><td>${v38OddStatusChip(meta)}</td><td>${esc(why)}</td></tr>`;
         }).join('')}</tbody></table>` : '<p class="u-text-dim">Aucun marché alternatif fiable détecté sur ce snapshot.</p>'}
       </section>
       <section class="section v38-prono-section">
@@ -5247,6 +5261,63 @@ return false;
 // → Winamax serve des cotes LIVE prises pour pré-match. Pred massivement biaisé.
 // Solution : si différence pct > 30%, flag le pick comme "stale_odds" pour exclusion
 // des recommandations fortes.
+// v49 — Audit point #20 : détecter contradictions logiques entre 2 picks
+// d'un même match. Ex : "BTTS Oui" + "Score 1-0" = impossible (away ne marque pas).
+// "Plus 2.5 buts" + "Score 0-0" = impossible (0 buts <  2.5).
+// Conservative : on ne flag que les contradictions évidentes pour éviter les faux positifs.
+function _arePicksContradictory(pickA, pickB) {
+  if (!pickA || !pickB) return false;
+  const mA = pickA.market || pickA.marketKey || '';
+  const mB = pickB.market || pickB.marketKey || '';
+  const kA = pickA.key || pickA.pickKey || '';
+  const kB = pickB.key || pickB.pickKey || '';
+  // Helper : extract goals from exact score key (e.g. "1-0", "2-1", "score_exact_2_1")
+  const parseScore = (key) => {
+    const k = String(key).replace(/[^\d-]/g, '').match(/(\d+)-(\d+)/);
+    return k ? [parseInt(k[1]), parseInt(k[2])] : null;
+  };
+  // Pick OU 2.5 + Score Exact
+  if ((mA === 'ou25' || mA === 'over25') && (mB === 'exactScore' || mB === 'exactScoreAll' || mB === 'score')) {
+    const sc = parseScore(kB);
+    if (sc) {
+      const total = sc[0] + sc[1];
+      if (kA === 'over' && total < 3) return true; // OU 2.5 over + score total < 3
+      if (kA === 'under' && total >= 3) return true; // OU 2.5 under + score total ≥ 3
+    }
+  }
+  // Reverse case (alternative score → main pick OU)
+  if ((mB === 'ou25' || mB === 'over25') && (mA === 'exactScore' || mA === 'exactScoreAll' || mA === 'score')) {
+    return _arePicksContradictory(pickB, pickA);
+  }
+  // BTTS Yes + Score with one team at 0
+  if ((mA === 'btts' || mA === 'goal') && (mB === 'exactScore' || mB === 'exactScoreAll' || mB === 'score')) {
+    const sc = parseScore(kB);
+    if (sc && kA === 'yes') {
+      if (sc[0] === 0 || sc[1] === 0) return true;
+    }
+    if (sc && kA === 'no') {
+      if (sc[0] >= 1 && sc[1] >= 1) return true;
+    }
+  }
+  if ((mB === 'btts' || mB === 'goal') && (mA === 'exactScore' || mA === 'exactScoreAll' || mA === 'score')) {
+    return _arePicksContradictory(pickB, pickA);
+  }
+  // 1n2 home + Score Away winning
+  if (mA === '1n2' && (mB === 'exactScore' || mB === 'exactScoreAll' || mB === 'score')) {
+    const sc = parseScore(kB);
+    if (sc) {
+      if (kA === '1' && sc[1] > sc[0]) return true; // home pick + away score higher
+      if (kA === '2' && sc[0] > sc[1]) return true; // away pick + home score higher
+      if (kA === 'X' && sc[0] !== sc[1]) return true; // draw + non-draw score
+    }
+  }
+  if (mB === '1n2' && (mA === 'exactScore' || mA === 'exactScoreAll' || mA === 'score')) {
+    return _arePicksContradictory(pickB, pickA);
+  }
+  return false;
+}
+try { window._arePicksContradictory = _arePicksContradictory; } catch(e) { swallowError(e); }
+
 function detectOddsAnomaly(match) {
   if (!match) return null;
   const wnx = match?.winamax?.markets?.['1n2'];
@@ -8658,12 +8729,20 @@ const roiPct = overall.flat_roi_pct || 0;
 // ROI exactement 0.0 avec ROI absolu < 0.5pt, on affiche "—" + tooltip.
 const lowSample = overall.n < 30;
 const trivialRoi = Math.abs(roiPct) < 0.05; // <0.05% = bruit
+// v49 — Audit point #27 : afficher la baseline always_fav pour comparaison
+// honnête. Si baseline > modèle → on l'affiche dans le tooltip pour que
+// l'user voit que stratégie naïve "miser favori" peut battre le modèle.
+const baselineFav = Number(overall.baseline_always_fav_roi_pct || 0);
+const baselineNote = (Number.isFinite(baselineFav) && baselineFav !== 0) ?
+  `\nBaseline "toujours favori" : ${baselineFav >= 0 ? '+' : ''}${baselineFav.toFixed(1)}% ${baselineFav > roiPct ? '(✗ baseline bat le modèle)' : '(✓ modèle au-dessus baseline)'}` : '';
 if (lowSample || trivialRoi) {
   setText('trust-roi', '—');
   const stat = document.getElementById('trust-roi')?.closest('.trust-strip-stat');
-  if (stat) stat.title = lowSample ? `Échantillon trop petit (${overall.n} picks) — ROI fiable à partir de 30+` : `ROI ≈ 0 (variance normale sur ${overall.n} picks)`;
+  if (stat) stat.title = (lowSample ? `Échantillon trop petit (${overall.n} picks) — ROI fiable à partir de 30+` : `ROI ≈ 0 (variance normale sur ${overall.n} picks)`) + baselineNote;
 } else {
   setText('trust-roi', (roiPct >= 0 ? '+' : '') + roiPct.toFixed(1) + '%');
+  const stat = document.getElementById('trust-roi')?.closest('.trust-strip-stat');
+  if (stat) stat.title = `ROI Flat = ${roiPct >= 0 ? '+' : ''}${roiPct.toFixed(2)}% sur ${overall.n} picks${baselineNote}`;
 }
 setText('trust-brier', (overall.brier || 0).toFixed(3));
 // v48 fix — Audit point #16 : Brier 0.231 paraît proche de 0.25 (random)
@@ -8712,9 +8791,39 @@ const _setClvWidget = (clvData) => {
   const useClv = Number.isFinite(pickClv) ? pickClv : Number(summary.mean_clv_pct);
   if (!Number.isFinite(useClv)) return;
   const sign = useClv >= 0 ? '+' : '';
-  setText('trust-clv', `${sign}${useClv.toFixed(2)}%`);
+  // v49 — Audit point #6 : CLV trend indicator.
+  // Compare le CLV courant à la valeur stockée précédemment (localStorage).
+  // Affiche une flèche ↑ ↓ → selon la trajectoire (vs il y a 1 jour).
+  let trend = '';
+  let trendColor = '';
+  try {
+    const prevRaw = localStorage.getItem('paris_sportif_clv_history_v1');
+    const prev = prevRaw ? JSON.parse(prevRaw) : { samples: [] };
+    const samples = Array.isArray(prev.samples) ? prev.samples : [];
+    // Append current sample (max 30 days)
+    const now = Date.now();
+    samples.push({ ts: now, clv: useClv });
+    while (samples.length > 30) samples.shift();
+    localStorage.setItem('paris_sportif_clv_history_v1', JSON.stringify({ samples }));
+    // Find sample 1 day ago (or oldest if <1d)
+    const dayAgo = now - 24 * 3600 * 1000;
+    const refSample = samples.find(s => s.ts < dayAgo) || samples[0];
+    if (refSample && refSample.clv !== undefined) {
+      const delta = useClv - refSample.clv;
+      if (Math.abs(delta) >= 0.05) {
+        trend = delta > 0 ? '↑' : '↓';
+        trendColor = delta > 0 ? '#34d399' : '#f87171';
+      } else {
+        trend = '→';
+        trendColor = '#94a3b8';
+      }
+    }
+  } catch (e) {}
+  const trendHtml = trend ? ` <span style="color:${trendColor};font-size:0.85em;" title="Tendance vs il y a 24h">${trend}</span>` : '';
+  // Use innerHTML to allow trend arrow inline
   const el = document.getElementById('trust-clv');
   if (el) {
+    el.innerHTML = `${sign}${useClv.toFixed(2)}%${trendHtml}`;
     // Color tier : > +0.5% green, > 0% pale green, > -1% orange, else red.
     const color = useClv >= 0.5 ? '#34d399' : useClv >= 0 ? '#a3e635' : useClv >= -1 ? '#fbbf24' : '#f87171';
     el.style.color = color;
@@ -8723,8 +8832,10 @@ const _setClvWidget = (clvData) => {
     const parent = el.closest('.trust-strip-stat');
     if (parent && Number.isFinite(positiveRate)) {
       const status = useClv >= 1 ? 'beat the market' : useClv >= 0 ? 'breakeven CLV' : useClv >= -1 ? 'légèrement en dessous' : 'edge insuffisant';
-      parent.title = `CLV pick-level : ${sign}${useClv.toFixed(2)}% sur ${nPicks || '?'} paris · ${positiveRate.toFixed(1)}% positifs · target sharp = +1% · status : ${status}`;
+      parent.title = `CLV pick-level : ${sign}${useClv.toFixed(2)}% sur ${nPicks || '?'} paris · ${positiveRate.toFixed(1)}% positifs · target sharp = +1% · status : ${status}\nTendance ${trend || 'flat'} vs hier.`;
     }
+  } else {
+    setText('trust-clv', `${sign}${useClv.toFixed(2)}%`);
   }
 };
 // Tente d'abord avec le state existant (sync hit si déjà chargé)
@@ -15683,6 +15794,28 @@ if (current === q) renderSearchSuggest(current);
 });
 }
 const idx = buildSearchIndex();
+// v49 — Audit point #42 : ajout fuzzy matching pour typos (PSG-Bayren → PSG-Bayern).
+// Levenshtein simple : si la query a 4+ chars et n'a aucun match exact/partial,
+// on autorise 1-2 erreurs de frappe. Cap sur les items courts pour éviter le bruit.
+const _levDist = (a, b, maxDist) => {
+  if (Math.abs(a.length - b.length) > maxDist) return maxDist + 1;
+  const m = a.length, n = b.length;
+  if (m === 0) return n;
+  if (n === 0) return m;
+  let prev = new Array(n + 1).fill(0).map((_, i) => i);
+  for (let i = 1; i <= m; i++) {
+    let curr = [i, ...new Array(n).fill(0)];
+    let rowMin = i;
+    for (let j = 1; j <= n; j++) {
+      const cost = a[i-1] === b[j-1] ? 0 : 1;
+      curr[j] = Math.min(prev[j] + 1, curr[j-1] + 1, prev[j-1] + cost);
+      if (curr[j] < rowMin) rowMin = curr[j];
+    }
+    if (rowMin > maxDist) return maxDist + 1;
+    prev = curr;
+  }
+  return prev[n];
+};
 const hits = idx.items
 .map(it => {
 const label = it.label.toLowerCase();
@@ -15691,6 +15824,22 @@ if (label === q) score = 0;
 else if (label.startsWith(q)) score = 1;
 else if (label.includes(' ' + q) || label.includes('-' + q)) score = 2;
 else if (label.includes(q)) score = 3;
+else if (q.length >= 4 && label.length <= 60) {
+  // Fuzzy : check substring distance against words in label
+  const words = label.split(/[\s\-_]+/);
+  let bestDist = 99;
+  for (const w of words) {
+    if (Math.abs(w.length - q.length) > 2) continue;
+    const dist = _levDist(w, q, 2);
+    if (dist <= 2 && dist < bestDist) bestDist = dist;
+  }
+  // Also try whole label if shorter than 20 chars
+  if (bestDist > 2 && label.length <= 30) {
+    const dist = _levDist(label.slice(0, q.length + 2), q, 2);
+    if (dist <= 2) bestDist = dist;
+  }
+  score = bestDist <= 2 ? (4 + bestDist) : 99;
+}
 else score = 99;
 return { it, score };
 })
@@ -35097,6 +35246,44 @@ _pwaHideBanner();
 _pwaSnooze(365); // une fois installé, plus jamais demander
 if (typeof toast === 'function') toast('🎉 App installée — bon paris !', 'success');
 });
+// v49 — Audit point #43 : iOS Safari ne déclenche jamais beforeinstallprompt
+// (ils utilisent leur propre flow "Ajouter à l'écran d'accueil" via menu share).
+// On détecte iOS standalone-eligible et on affiche un message custom expliquant
+// la procédure manuelle. Sinon iOS users sont confused car aucun prompt n'arrive.
+try {
+  const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent || '') && !window.MSStream;
+  const isStandalone = (window.navigator.standalone === true) || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+  if (isIOS && !isStandalone && !_pwaIsSnoozed()) {
+    // Apply same engagement gates as Android flow (visitCount + pagesSeen).
+    setTimeout(() => {
+      let visitCount = 0;
+      try { visitCount = parseInt(localStorage.getItem('pwaVisitCount') || '0', 10); } catch(e) {}
+      let pagesSeen = [];
+      try { pagesSeen = JSON.parse(localStorage.getItem('pwaPagesSeen') || '[]') || []; } catch(e) {}
+      if (visitCount < 2 || pagesSeen.length < 3) return;
+      // Show custom iOS install hint banner
+      const banner = document.getElementById('pwa-install-banner');
+      if (banner) {
+        banner.style.display = 'block';
+        // Override CTA to iOS-specific instructions
+        const cta = banner.querySelector('[data-pwa-install-cta]');
+        if (cta) {
+          cta.textContent = 'Ajouter à l\'écran';
+          cta.title = 'iOS : tape sur Partager ⬆ puis "Sur l\'écran d\'accueil"';
+          cta.removeAttribute('data-pwa-install-cta');
+          cta.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (typeof toast === 'function') {
+              toast('iOS : tape sur Partager ⬆ en bas puis "Sur l\'écran d\'accueil"', 'info');
+            } else {
+              alert('Pour installer sur iOS :\n1. Tape sur Partager ⬆ en bas\n2. Choisis "Sur l\'écran d\'accueil"');
+            }
+          });
+        }
+      }
+    }, 65000);
+  }
+} catch (e) { /* swallow */ }
 const _pwaGoBtn = document.getElementById('pwa-install-go');
 const _pwaLaterBtn = document.getElementById('pwa-install-later');
 const _pwaDismissBtn = document.getElementById('pwa-install-dismiss');
