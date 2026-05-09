@@ -1,12 +1,49 @@
 {
-  "generated_at": "2026-05-09T00:57:46Z",
+  "generated_at": "2026-05-09T01:08:34Z",
   "source": "data.js event.smart_money derived from odds_history",
-  "status": "empty",
+  "status": "ok",
   "summary": {
-    "active": 0,
-    "expired_sample": 0,
-    "by_type": {}
+    "active": 1,
+    "expired_sample": 1,
+    "by_type": {
+      "balanced_steam": 1,
+      "underdog_steam": 1
+    }
   },
-  "active": [],
-  "expired_sample": []
+  "active": [
+    {
+      "event_id": "401856892",
+      "kickoff": "2026-05-09T02:00Z",
+      "sport": "basketball",
+      "league": "wnba",
+      "match": "Golden State Valkyries at Seattle Storm",
+      "side": "home",
+      "pick_key": "1",
+      "type": "underdog_steam",
+      "reason": "Cote outsider compressee de 9.7%",
+      "odd_open": 3.1,
+      "odd_latest": 2.8,
+      "odd_drop_pct": 9.68,
+      "confidence": 0.877,
+      "snapshots": 6
+    }
+  ],
+  "expired_sample": [
+    {
+      "event_id": "401871161",
+      "kickoff": "2026-05-08T23:00Z",
+      "sport": "basketball",
+      "league": "nba",
+      "match": "New York Knicks at Philadelphia 76ers",
+      "side": "home",
+      "pick_key": "1",
+      "type": "balanced_steam",
+      "reason": "Mouvement cote net 14.0% sur home",
+      "odd_open": 1.847,
+      "odd_latest": 1.588,
+      "odd_drop_pct": 14.03,
+      "confidence": 0.95,
+      "snapshots": 6
+    }
+  ]
 }

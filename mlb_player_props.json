@@ -1,8 +1,300 @@
 {
-  "generated_at": "2026-05-09T00:57:18Z",
+  "generated_at": "2026-05-09T01:08:06Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
+    {
+      "event_id": "401815265",
+      "kickoff": "2026-05-09T01:40Z",
+      "league": "MLB",
+      "match": "New York Mets at Arizona Diamondbacks",
+      "home": "Arizona Diamondbacks",
+      "away": "New York Mets",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Arizona Diamondbacks",
+          "pitcher": "Merrill Kelly",
+          "label": "Merrill Kelly moins de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "under",
+          "probability": 0.5002,
+          "fair_odds": 2.0,
+          "expected_strikeouts": 3.5,
+          "projected_ip": 4.75,
+          "inputs": {
+            "k9": 6.63,
+            "era": 9.95,
+            "whip": 2.32,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Arizona Diamondbacks",
+          "pitcher": "Merrill Kelly",
+          "label": "Merrill Kelly concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.7766,
+          "fair_odds": 1.29,
+          "expected_hr_allowed": 1.499,
+          "projected_ip": 4.75,
+          "inputs": {
+            "hr9": 2.84,
+            "era": 9.95,
+            "whip": 2.32
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "New York Mets",
+          "pitcher": "Clay Holmes",
+          "label": "Clay Holmes moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5291,
+          "fair_odds": 1.89,
+          "expected_strikeouts": 4.38,
+          "projected_ip": 6.03,
+          "inputs": {
+            "k9": 6.54,
+            "era": 1.69,
+            "whip": 0.98,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "New York Mets",
+          "pitcher": "Clay Holmes",
+          "label": "Clay Holmes ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6557,
+          "fair_odds": 1.53,
+          "expected_hr_allowed": 0.422,
+          "projected_ip": 6.03,
+          "inputs": {
+            "hr9": 0.63,
+            "era": 1.69,
+            "whip": 0.98
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815267",
+      "kickoff": "2026-05-09T01:45Z",
+      "league": "MLB",
+      "match": "St. Louis Cardinals at San Diego Padres",
+      "home": "San Diego Padres",
+      "away": "St. Louis Cardinals",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "San Diego Padres",
+          "pitcher": "Randy Vásquez",
+          "label": "Randy Vásquez moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5866,
+          "fair_odds": 1.7,
+          "expected_strikeouts": 5.11,
+          "projected_ip": 5.59,
+          "inputs": {
+            "k9": 8.24,
+            "era": 3.2,
+            "whip": 1.17,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "San Diego Padres",
+          "pitcher": "Randy Vásquez",
+          "label": "Randy Vásquez ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.565,
+          "fair_odds": 1.77,
+          "expected_hr_allowed": 0.571,
+          "projected_ip": 5.59,
+          "inputs": {
+            "hr9": 0.92,
+            "era": 3.2,
+            "whip": 1.17
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "St. Louis Cardinals",
+          "pitcher": "Dustin May",
+          "label": "Dustin May plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.5076,
+          "fair_odds": 1.97,
+          "expected_strikeouts": 3.53,
+          "projected_ip": 5.17,
+          "inputs": {
+            "k9": 6.14,
+            "era": 5.15,
+            "whip": 1.53,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "St. Louis Cardinals",
+          "pitcher": "Dustin May",
+          "label": "Dustin May ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6536,
+          "fair_odds": 1.53,
+          "expected_hr_allowed": 0.425,
+          "projected_ip": 5.17,
+          "inputs": {
+            "hr9": 0.74,
+            "era": 5.15,
+            "whip": 1.53
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815264",
+      "kickoff": "2026-05-09T02:10Z",
+      "league": "MLB",
+      "match": "Atlanta Braves at Los Angeles Dodgers",
+      "home": "Los Angeles Dodgers",
+      "away": "Atlanta Braves",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Atlanta Braves",
+          "pitcher": "Spencer Strider",
+          "label": "Spencer Strider plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5173,
+          "fair_odds": 1.93,
+          "expected_strikeouts": 5.58,
+          "projected_ip": 3.1,
+          "inputs": {
+            "k9": 16.2,
+            "era": 8.1,
+            "whip": 2.7,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Atlanta Braves",
+          "pitcher": "Spencer Strider",
+          "label": "Spencer Strider concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6054,
+          "fair_odds": 1.65,
+          "expected_hr_allowed": 0.93,
+          "projected_ip": 3.1,
+          "inputs": {
+            "hr9": 2.7,
+            "era": 8.1,
+            "whip": 2.7
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815266",
+      "kickoff": "2026-05-09T02:15Z",
+      "league": "MLB",
+      "match": "Pittsburgh Pirates at San Francisco Giants",
+      "home": "San Francisco Giants",
+      "away": "Pittsburgh Pirates",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "San Francisco Giants",
+          "pitcher": "Landen Roupp",
+          "label": "Landen Roupp moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5879,
+          "fair_odds": 1.7,
+          "expected_strikeouts": 6.07,
+          "projected_ip": 5.6,
+          "inputs": {
+            "k9": 9.76,
+            "era": 3.18,
+            "whip": 1.06,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "San Francisco Giants",
+          "pitcher": "Landen Roupp",
+          "label": "Landen Roupp ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.8667,
+          "fair_odds": 1.15,
+          "expected_hr_allowed": 0.143,
+          "projected_ip": 5.6,
+          "inputs": {
+            "hr9": 0.23,
+            "era": 3.18,
+            "whip": 1.06
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Pittsburgh Pirates",
+          "pitcher": "Braxton Ashcraft",
+          "label": "Braxton Ashcraft moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5291,
+          "fair_odds": 1.89,
+          "expected_strikeouts": 6.36,
+          "projected_ip": 5.89,
+          "inputs": {
+            "k9": 9.72,
+            "era": 3.02,
+            "whip": 1.08,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Pittsburgh Pirates",
+          "pitcher": "Braxton Ashcraft",
+          "label": "Braxton Ashcraft ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6537,
+          "fair_odds": 1.53,
+          "expected_hr_allowed": 0.425,
+          "projected_ip": 5.89,
+          "inputs": {
+            "hr9": 0.65,
+            "era": 3.02,
+            "whip": 1.08
+          },
+          "side": "away"
+        }
+      ]
+    },
     {
       "event_id": "401815268",
       "kickoff": "2026-05-09T19:07Z",
@@ -1079,6 +1371,42 @@
       "props": [
         {
           "market": "pitcher_strikeouts",
+          "team": "San Francisco Giants",
+          "pitcher": "Tyler Mahle",
+          "label": "Tyler Mahle plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5823,
+          "fair_odds": 1.72,
+          "expected_strikeouts": 4.86,
+          "projected_ip": 5.14,
+          "inputs": {
+            "k9": 8.5,
+            "era": 5.0,
+            "whip": 1.53,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "San Francisco Giants",
+          "pitcher": "Tyler Mahle",
+          "label": "Tyler Mahle concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5756,
+          "fair_odds": 1.74,
+          "expected_hr_allowed": 0.857,
+          "projected_ip": 5.14,
+          "inputs": {
+            "hr9": 1.5,
+            "era": 5.0,
+            "whip": 1.53
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
           "team": "Pittsburgh Pirates",
           "pitcher": "Bubba Chandler",
           "label": "Bubba Chandler moins de 4,5 strikeouts",
@@ -1919,6 +2247,42 @@
       "props": [
         {
           "market": "pitcher_strikeouts",
+          "team": "San Francisco Giants",
+          "pitcher": "Tyler Mahle",
+          "label": "Tyler Mahle plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5823,
+          "fair_odds": 1.72,
+          "expected_strikeouts": 4.86,
+          "projected_ip": 5.14,
+          "inputs": {
+            "k9": 8.5,
+            "era": 5.0,
+            "whip": 1.53,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "San Francisco Giants",
+          "pitcher": "Tyler Mahle",
+          "label": "Tyler Mahle concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5756,
+          "fair_odds": 1.74,
+          "expected_hr_allowed": 0.857,
+          "projected_ip": 5.14,
+          "inputs": {
+            "hr9": 1.5,
+            "era": 5.0,
+            "whip": 1.53
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
           "team": "Pittsburgh Pirates",
           "pitcher": "Bubba Chandler",
           "label": "Bubba Chandler moins de 4,5 strikeouts",
@@ -2212,7 +2576,7 @@
       ]
     }
   ],
-  "props": 106,
+  "props": 124,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
