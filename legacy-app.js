@@ -19219,9 +19219,10 @@ const v36TableHtml = `<section class="v36-table-panel" aria-label="Tableau dense
         ${v37FilterResetHtml}
         ${v37EmptyPoolHelpHtml}
         ${v37DenseFallbackHtml}
-        ${/* v43.3 — v40OutsiderBannerHtml retiré : v43StrategyBannerHtml supersede
-              (couvre Outsider + Value + Flat + Kelly warning + multi-day lists). */ ''}
-        ${v43StrategyBannerHtml}
+        ${/* v45.16 — v43StrategyBannerHtml retiré sur demande user "sa sert arien".
+              Le banner reste construit (const) pour réutilisation potentielle, mais
+              n'est plus injecté dans le rendu. Les helpers v43Strategies/v45*
+              restent disponibles globalement. */ ''}
         ${v37DayNavHtml}
         <header class="v36-table-toolbar">
           <div>
