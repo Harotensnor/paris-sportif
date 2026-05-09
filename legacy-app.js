@@ -20840,8 +20840,77 @@ const v37IntelCount = Number(v37Intel.angles?.summary?.angles || 0) + Number(v37
 const v37IntelFallback = v37IntelState.loading
 ? '<div class="v36-tier-empty">Chargement des insights modèle…</div>'
 : '<div class="v36-tier-empty">Insights modèle indisponibles pour ce snapshot.</div>';
+// v53.8 — Widget 14 jours (J-7 → J+7) ajouté avant v36TableHtml.
+// User : "je veux voir une semaine de prono et une semaine en arrière
+// d'historique (résultat des prono jour par jour)".
+const _calendar14d = (() => {
+  try {
+    const days = [];
+    const todayDate = new Date();
+    todayDate.setHours(0, 0, 0, 0);
+    const FRENCH_DOW = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+    for (let offset = -7; offset <= 7; offset++) {
+      const d = new Date(todayDate);
+      d.setDate(d.getDate() + offset);
+      const iso = d.toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+      const events = (data.days?.[iso] || []).filter(m => m && m.id && !/TBD|Winner/i.test((m.competitors || []).map(c => c.name).join(' ')));
+      const isPast = offset < 0;
+      const isToday = offset === 0;
+      let evCount = events.length;
+      let completedCount = events.filter(m => m.completed).length;
+      // Compute light past results (only for past days, fast)
+      let won = 0, lost = 0, pl = 0;
+      if (isPast && completedCount > 0) {
+        for (const m of events) {
+          if (!m.completed) continue;
+          let pred = null;
+          try { pred = predictMatch(m); } catch (e) {}
+          if (!pred || pred.skip) continue;
+          let res = null;
+          try { res = (typeof evaluateModelPick === 'function') ? evaluateModelPick(m, pred) : null; } catch (e) {}
+          if (res === 'won') {
+            won++;
+            const odd = pred.odds && (pred.pick.key === '1' ? pred.odds.home : pred.pick.key === '2' ? pred.odds.away : pred.odds.draw);
+            pl += (Number(odd || 1.7) - 1);
+          } else if (res === 'lost') { lost++; pl -= 1; }
+        }
+      }
+      const roi = (won + lost) > 0 ? (pl / (won + lost) * 100) : null;
+      days.push({ iso, offset, dow: FRENCH_DOW[d.getDay()], date: d.getDate(), month: d.getMonth() + 1, evCount, completedCount, won, lost, pl, roi, isPast, isToday });
+    }
+    const cellsHtml = days.map(d => {
+      const tone = d.isToday ? 'rgba(168,85,247,.20)' : d.isPast ? (d.roi != null ? (d.roi > 5 ? 'rgba(52,211,153,.18)' : d.roi < -5 ? 'rgba(252,165,165,.14)' : 'rgba(251,191,36,.10)') : 'rgba(255,255,255,.04)') : 'rgba(167,139,250,.08)';
+      const border = d.isToday ? '2px solid var(--brand)' : '1px solid var(--border)';
+      const stats = d.isPast
+        ? (d.completedCount > 0
+            ? (d.roi != null
+                ? `<div style="font-size:11px;font-weight:800;color:${d.roi > 0 ? 'var(--accent)' : '#fca5a5'};">${d.won}V·${d.lost}D</div><div style="font-size:9.5px;color:${d.roi > 0 ? 'var(--accent)' : '#fca5a5'};">${d.roi >= 0 ? '+' : ''}${d.roi.toFixed(0)}%</div>`
+                : `<div style="font-size:10px;color:var(--text-dim);">${d.completedCount} settled</div>`)
+            : '<div style="font-size:10px;color:var(--text-dim2);">—</div>')
+        : (d.evCount > 0
+            ? `<div style="font-size:11px;font-weight:800;color:var(--brand);">${d.evCount}</div><div style="font-size:9.5px;color:var(--text-dim);">match${d.evCount > 1 ? 's' : ''}</div>`
+            : '<div style="font-size:10px;color:var(--text-dim2);">—</div>');
+      return `<button type="button" data-cal14-day="${esc(d.iso)}" title="${esc(d.iso)} — ${d.evCount} match(s)${d.isPast && d.completedCount ? `, ${d.completedCount} settled${d.roi != null ? `, ROI ${d.roi.toFixed(1)}%` : ''}` : ''}" style="padding:6px 4px;background:${tone};border:${border};border-radius:6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:64px;justify-content:center;transition:all .15s;">
+        <div style="font-size:9.5px;color:${d.isPast ? 'var(--text-dim)' : 'var(--text)'};text-transform:uppercase;letter-spacing:.5px;font-weight:700;">${d.dow} ${d.date}/${d.month}</div>
+        ${stats}
+      </button>`;
+    }).join('');
+    return `
+      <section style="padding:16px 0 12px;margin-bottom:14px;border-bottom:1px solid var(--border);">
+        <div style="margin-bottom:10px;">
+          <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;">Vue 14 jours</div>
+          <div style="font-size:18px;font-weight:800;color:var(--text);letter-spacing:-.4px;line-height:1.2;">📅 Historique 7j + Pronos 7j à venir</div>
+          <div style="font-size:11.5px;color:var(--text-dim);margin-top:3px;">Clique un jour pour filtrer le tableau · ROI calculé sur résultats settled</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(15,minmax(0,1fr));gap:4px;">
+          ${cellsHtml}
+        </div>
+      </section>`;
+  } catch (e) { return ''; }
+})();
 wrap.innerHTML = `
         <div class="v36-home-shell" data-home-table-only>
+          ${_calendar14d}
           ${v36TableHtml}
         </div>`;
 const v37GuideDetails = wrap.querySelector('[data-v37-decision-guide]');
@@ -20904,6 +20973,19 @@ try { history.replaceState(null, '', location.pathname + location.search + `#das
 renderDashboardPage(wrap);
 });
 }
+// v53.8 — Click sur cellule du calendrier 14 jours → filtrer la date.
+wrap.querySelectorAll('[data-cal14-day]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const value = btn.dataset.cal14Day || todayIso;
+    const next = { ...v36Filter, date: value };
+    try { localStorage.setItem(v36FilterKey, JSON.stringify(next)); } catch(e) { swallowError(e); }
+    try { history.replaceState(null, '', location.pathname + location.search + `#dashboard?date=${encodeURIComponent(value)}`); } catch(e) { swallowError(e); }
+    renderDashboardPage(wrap);
+    // Smooth scroll to table for context
+    const table = wrap.querySelector('.v36-table-panel, [data-v36-table]');
+    if (table) try { table.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch(e) {}
+  });
+});
 const v37LiveInput = wrap.querySelector('[data-v37-live-toggle]');
 if (v37LiveInput) {
 v37LiveInput.addEventListener('change', () => {
@@ -22992,6 +23074,57 @@ ${bbfRailStats.map(([label, value, tone]) => `<div data-tone="${tone}"><span>${e
 </div>
 </section>
 </aside>`;
+      // v53.8 — Widget calendrier 14 jours (J-7 → J+7) avec V/D/ROI past +
+      // counts upcoming. Position : avant bbfMainHtml pour TDZ-safe.
+      // Compute heavy en arrière-plan : pour pas bloquer le render initial,
+      // on calcule UNIQUEMENT les counts (pas predictMatch) — assez pour
+      // afficher la grille 14 jours avec event count par jour.
+      const _calendar14d = (() => {
+        try {
+          const days = [];
+          const todayDate = new Date();
+          todayDate.setHours(0, 0, 0, 0);
+          const FRENCH_DOW = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+          for (let offset = -7; offset <= 7; offset++) {
+            const d = new Date(todayDate);
+            d.setDate(d.getDate() + offset);
+            const iso = d.toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+            const events = (data.days?.[iso] || []).filter(m => !/TBD|Winner/i.test((m.competitors || []).map(c => c.name).join(' ')));
+            const isPast = offset < 0;
+            const isToday = offset === 0;
+            // Light counts only : nb events bookable (Winamax exact) + completed
+            let evCount = 0, completedCount = 0;
+            for (const m of events) {
+              if (!(m && m.id)) continue;
+              evCount++;
+              if (m.completed) completedCount++;
+            }
+            days.push({ iso, offset, dow: FRENCH_DOW[d.getDay()], date: d.getDate(), month: d.getMonth() + 1, evCount, completedCount, isPast, isToday });
+          }
+          const cellsHtml = days.map(d => {
+            const tone = d.isToday ? 'rgba(168,85,247,.20)' : d.isPast ? 'rgba(255,255,255,.04)' : 'rgba(167,139,250,.08)';
+            const border = d.isToday ? '2px solid var(--brand)' : '1px solid var(--border)';
+            const stats = d.evCount > 0
+              ? `<div style="font-size:11px;font-weight:800;color:${d.isPast ? 'var(--text-dim)' : 'var(--brand)'};">${d.evCount}</div>${d.isPast ? `<div style="font-size:9.5px;color:var(--text-dim2);">${d.completedCount} settled</div>` : ''}`
+              : '<div style="font-size:10px;color:var(--text-dim2);">—</div>';
+            return `<button type="button" data-cal14-day="${esc(d.iso)}" title="${esc(d.iso)} : ${d.evCount} match(s)" style="padding:6px 4px;background:${tone};border:${border};border-radius:6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:60px;justify-content:center;">
+              <div style="font-size:9.5px;color:${d.isPast ? 'var(--text-dim)' : 'var(--text)'};text-transform:uppercase;letter-spacing:.5px;font-weight:700;">${d.dow} ${d.date}/${d.month}</div>
+              ${stats}
+            </button>`;
+          }).join('');
+          return `
+            <section style="padding:14px 0 6px;">
+              <div style="margin-bottom:8px;">
+                <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;">Vue 14 jours</div>
+                <div style="font-size:18px;font-weight:800;color:var(--text);letter-spacing:-.4px;line-height:1.2;">📅 Historique 7j + Pronos 7j à venir</div>
+                <div style="font-size:11.5px;color:var(--text-dim);margin-top:3px;">Nombre de matchs par jour · clique pour filtrer le tableau</div>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(15,minmax(0,1fr));gap:4px;">
+                ${cellsHtml}
+              </div>
+            </section>`;
+        } catch (e) { return ''; }
+      })();
       const bbfMainHtml = `
 <div class="bbf-shell" data-phase="big-bets-first">
 <section class="bbf-command" aria-live="polite">
@@ -23000,6 +23133,7 @@ ${bbfRailStats.map(([label, value, tone]) => `<div data-tone="${tone}"><span>${e
 ${bbfFocusButton}
 </section>
 ${bbfOffline}
+${bbfFocusOnly ? '' : (typeof _calendar14d !== 'undefined' ? _calendar14d : '')}
 ${bbfFocusOnly ? '' : bbfAlertHtml}
 ${bbfFocusOnly ? '' : bbfQuickActions}
 ${bbfFocusOnly ? '' : bbfShareNotice}
@@ -23280,10 +23414,92 @@ renderDashboardPage(wrap);
 return;
 }
 
+// v53.8 — User : "je veux voir une semaine de prono et une semaine en
+// arrière d'historique (résultat des prono jour par jour)".
+// Widget 14 jours : J-7 → J+7 avec stats par jour (V/D/Push, ROI past,
+// counts upcoming).
+const _calendar14d = (() => {
+  try {
+    const days = [];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const FRENCH_DOW = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+    for (let offset = -7; offset <= 7; offset++) {
+      const d = new Date(today);
+      d.setDate(d.getDate() + offset);
+      const iso = d.toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+      const events = (data.days?.[iso] || []).filter(m => !/TBD|Winner/i.test((m.competitors || []).map(c => c.name).join(' ')));
+      const isPast = offset < 0;
+      const isToday = offset === 0;
+      // Compute picks settled / pending per day
+      let picks = 0, won = 0, lost = 0, pushed = 0, pending = 0, pl = 0;
+      for (const m of events) {
+        let pred = null;
+        try { pred = predictMatch(m); } catch (e) {}
+        if (!pred || pred.skip) continue;
+        const best = (typeof selectBestMarket === 'function') ? selectBestMarket(m, pred) : null;
+        if (!best) continue;
+        picks++;
+        const odd = Number(best.odd || 0);
+        if (m.completed) {
+          let res = null;
+          try { res = (typeof evaluateMarketPick === 'function') ? evaluateMarketPick(m, best.market || '1n2', best.pickKey || best.key || '') : null; } catch (e) {}
+          if (!res) {
+            try { res = evaluateModelPick(m, pred); } catch (e) { res = null; }
+          }
+          if (res === 'won') { won++; pl += (odd - 1); }
+          else if (res === 'lost') { lost++; pl -= 1; }
+          else if (res === 'void') pushed++;
+          else pending++;
+        } else {
+          pending++;
+        }
+      }
+      const roi = (won + lost) > 0 ? (pl / (won + lost) * 100) : null;
+      days.push({ iso, offset, dow: FRENCH_DOW[d.getDay()], date: d.getDate(), month: d.getMonth() + 1, picks, won, lost, pushed, pending, pl, roi, isPast, isToday });
+    }
+    // v53.8 — Toujours afficher le widget (même si 0 picks) pour donner
+    // la visibilité 14 jours quand data fraîche. Si pas de picks, cellules
+    // affichent "—" et c'est OK.
+    const cellsHtml = days.map(d => {
+      const tone = d.isToday ? 'rgba(168,85,247,.20)' : d.isPast ? (d.roi != null ? (d.roi > 5 ? 'rgba(52,211,153,.18)' : d.roi < -5 ? 'rgba(252,165,165,.14)' : 'rgba(251,191,36,.10)') : 'rgba(255,255,255,.04)') : 'rgba(167,139,250,.08)';
+      const border = d.isToday ? '2px solid var(--brand)' : '1px solid var(--border)';
+      const labelClr = d.isPast ? 'var(--text-dim)' : 'var(--text)';
+      const stats = d.isPast ?
+        (d.picks > 0
+          ? `<div style="font-size:10.5px;font-weight:800;color:${d.roi != null ? (d.roi > 0 ? 'var(--accent)' : d.roi < 0 ? '#fca5a5' : 'var(--text-dim)') : 'var(--text-dim)'};">${d.won}V · ${d.lost}D${d.pushed ? ` · ${d.pushed}P` : ''}</div>${d.roi != null ? `<div style="font-size:10px;color:${d.roi > 0 ? 'var(--accent)' : '#fca5a5'};">ROI ${d.roi >= 0 ? '+' : ''}${d.roi.toFixed(0)}%</div>` : ''}`
+          : '<div style="font-size:10px;color:var(--text-dim2);">—</div>')
+        :
+        (d.picks > 0
+          ? `<div style="font-size:11px;font-weight:800;color:var(--brand);">${d.picks} pick${d.picks > 1 ? 's' : ''}</div>${d.pending > 0 && d.isToday ? `<div style="font-size:10px;color:var(--text-dim);">${d.pending} à venir</div>` : ''}`
+          : '<div style="font-size:10px;color:var(--text-dim2);">—</div>');
+      return `<button type="button" data-cal14-day="${esc(d.iso)}" title="${esc(d.iso)} : ${d.picks} pick(s)${d.isPast ? `, ROI ${d.roi != null ? d.roi.toFixed(1) + '%' : '—'}` : ''}" style="padding:6px 4px;background:${tone};border:${border};border-radius:6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:60px;justify-content:center;">
+        <div style="font-size:9.5px;color:${labelClr};text-transform:uppercase;letter-spacing:.5px;font-weight:700;">${d.dow} ${d.date}/${d.month}</div>
+        ${stats}
+      </button>`;
+    }).join('');
+    return `
+      <section style="padding:16px 0 8px;">
+        <div style="display:flex;justify-content:space-between;align-items:end;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+          <div>
+            <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;">Vue 14 jours</div>
+            <div style="font-size:18px;font-weight:800;color:var(--text);letter-spacing:-.4px;line-height:1.2;">📅 Historique 7j + Pronos 7j à venir</div>
+            <div style="font-size:11.5px;color:var(--text-dim);margin-top:3px;">Clique un jour pour filtrer le tableau · ROI calculé sur picks settled (V+D)</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(15,1fr);gap:4px;">
+          ${cellsHtml}
+        </div>
+      </section>`;
+  } catch (e) { return ''; }
+})();
+
 wrap.innerHTML = `
       <div style="max-width:1500px;margin:0 auto;padding:0 20px;font-variant-numeric:tabular-nums;">
 
         ${_dashboardCockpit}
+
+        ${_calendar14d}
 
         ${_terminalMarketPanel}
 
