@@ -415,6 +415,7 @@ jobs:
           # Daily à 00:00 UTC pour tracker progression dette technique.
           if [ "$(date -u +'%H')" = "00" ] && [ $MIN_MOD60 -lt 5 ]; then
             python3 audit_tech_debt.py || true
+            python3 audit_seo_validators.py || true
           fi
           # v49 — Audit point #2 : workflow backtest.yml dédié quotidien à 04:00 UTC
           # n'a pas tourné depuis 6 jours (silent failure ou GH Actions cron skip).
@@ -539,7 +540,7 @@ jobs:
             odds_aggregated.json \
             paper_log.jsonl paper_log_summary.json picks_history.jsonl picks_history_summary.json \
             backtest_report_v2.json backtest_report_v2.md calibration_per_sport_league.json calibration_per_sport_league_market.json bankroll_simulation.json \
-            audit_tech_debt.json audit_tech_debt.md
+            audit_tech_debt.json audit_tech_debt.md audit_seo_validators.json audit_seo_validators.md
           do
             if [ -e "$path" ]; then
               git add "$path"
