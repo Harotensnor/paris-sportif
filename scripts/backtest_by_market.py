@@ -33,15 +33,44 @@ DATA_JS = ROOT / 'data.js'
 REPORT_JSON = ROOT / 'backtest_report_markets.json'
 
 # Marchés secondaires à évaluer. Mapping vers la clé pred.markets.
+# v51.9 — Plan Pronostics Phase 3.1 : étendu aux marchés v50.5 (5 → 21+).
 SECONDARY_MARKETS = [
+    # Foot — base v31.7.154
     ('ou25', 'Over/Under 2.5'),
     ('btts', 'Both teams to score'),
     ('ou15', 'Over/Under 1.5'),
     ('ou35', 'Over/Under 3.5'),
     ('doubleChance', 'Double Chance'),
     ('exactScore', 'Score exact'),
+    # Foot — v51.9 ajout (alignés avec keep_scalar_keys patch_winamax_markets)
+    ('dnb', 'Draw No Bet'),
+    ('ht_1n2', 'Mi-temps 1N2'),
+    ('ht_ou', 'Mi-temps Over/Under'),
+    ('teamTotal', 'Total buts par équipe'),
+    ('resultBtts', 'Résultat + BTTS'),
+    ('handicap', 'Handicap européen'),
+    ('cornersTotal', 'Total corners'),
+    ('cardsTotal', 'Total cartons'),
+    # Basket — base
     ('basketTotal', 'Basket — Total points'),
     ('basketHandicap', 'Basket — Handicap'),
+    # Basket — v51.9 ajout
+    ('basket_team_total', 'Basket — Total équipe'),
+    ('basket_quarter_total', 'Basket — Total quart-temps'),
+    ('basket_first_half_total', 'Basket — Total mi-temps'),
+    # Baseball — v51.9 ajout
+    ('baseballTotal', 'Baseball — Total runs'),
+    ('runLine', 'Baseball — Run line'),
+    ('baseballTotalF5', 'Baseball — Total F5'),
+    # Hockey — v51.9 ajout
+    ('hockeyTotal', 'Hockey — Total buts'),
+    ('puckLine', 'Hockey — Puck line'),
+    # Tennis — v51.9 ajout
+    ('tennisGames', 'Tennis — Total jeux'),
+    ('tennisHandicap', 'Tennis — Handicap'),
+    # MMA — v51.9 ajout
+    ('mmaRounds', 'MMA — Total rounds'),
+    ('mmaGoesDistance', 'MMA — Va à son terme'),
 ]
 
 
