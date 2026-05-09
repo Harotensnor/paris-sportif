@@ -38,17 +38,7 @@ jobs:
           # and data commits every run, that stale SHA can be behind main by the
           # time the job actually starts. Always checkout the live branch head.
           ref: main
-          # v48 fix — fetch-depth: 1 cassait build_sitemap.py qui appelle
-          # `git log -1 --format=%cs -- <file>` pour le lastmod par-fichier.
-          # Avec depth 1, seul HEAD est visible → toutes les queries retournent
-          # la date du dernier commit data (today) → sitemap.xml affiche
-          # 2026-05-09 pour TOUS les fichiers, y compris legal.html qui n'a pas
-          # été touché depuis le 2026-05-02. Mauvais signal SEO (Google voit
-          # toutes les pages "modifiées le même jour" → moins fiable).
-          # legal.html dernier commit ≈ 3 jours = ~864 commits cron derrière
-          # → depth: 0 (full history) requis. Coût : ~50-100 MB clone vs ~10 MB.
-          # GitHub Actions unmetered pour repos publics, donc OK.
-          fetch-depth: 0
+          fetch-depth: 1
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/setup-python@v5
@@ -74,44 +64,32 @@ jobs:
       # Tous écrivent leur propre JSON, pas de race-condition possible.
       # Les patches restent séquentiels (eux écrivent tous data.js).
       - name: Fetch pipeline (parallèle)
-        shell: bash --noprofile --norc {0}
         run: |
-          # v47.7 — Disable set -e default (GH Actions strict mode kill au moindre
-          # exit ≠ 0, alors qu'on a explicitement '|| true' partout).
-          # Les heredocs Python ou shell expressions transient errors faisaient
-          # planter tout le step. Sans set -e, on propage seulement les vrais kills.
-          set +e
-          set +o pipefail
           cd scripts
-          # v47.5 — Timeout 180s par fetcher pour empêcher hang (un fetcher
-          # qui pend bloquait tout le step 'wait' pendant 10 min → step KILL).
-          # AUDIT 2026-05-09 : le step 'Fetch parallèle' échouait toutes les
-          # 5 min en cancelled/failure. Ajout timeout permet aux fetchers
-          # rapides de réussir même si un fetcher est pendu.
-          (timeout 180 python3 fetch_live.py || true) > /tmp/fetch_live.log 2>&1 &
+          # Group A : fetchers heavy en parallèle (background avec &)
+          (python3 fetch_live.py || true) > /tmp/fetch_live.log 2>&1 &
           PID_LIVE=$!
-          (timeout 180 python3 fetch_sofascore_events.py || true) > /tmp/fetch_sofa.log 2>&1 &
+          (python3 fetch_sofascore_events.py || true) > /tmp/fetch_sofa.log 2>&1 &
           PID_SOFA=$!
-          (timeout 180 python3 fetch_winamax_catalog.py || true) > /tmp/fetch_wnx.log 2>&1 &
+          (python3 fetch_winamax_catalog.py || true) > /tmp/fetch_wnx.log 2>&1 &
           PID_WNX=$!
-          (timeout 180 python3 fetch_h2h.py || true) > /tmp/fetch_h2h.log 2>&1 &
+          (python3 fetch_h2h.py || true) > /tmp/fetch_h2h.log 2>&1 &
           PID_H2H=$!
-          (timeout 180 python3 fetch_forebet.py || true) > /tmp/fetch_forebet.log 2>&1 &
+          (python3 fetch_forebet.py || true) > /tmp/fetch_forebet.log 2>&1 &
           PID_FOREBET=$!
-          (timeout 180 python3 fetch_tennis_odds.py || true) > /tmp/fetch_tennis.log 2>&1 &
+          (python3 fetch_tennis_odds.py || true) > /tmp/fetch_tennis.log 2>&1 &
           PID_TENNIS=$!
-          (timeout 180 python3 fetch_rus_odds.py || true) > /tmp/fetch_rus.log 2>&1 &
+          (python3 fetch_rus_odds.py || true) > /tmp/fetch_rus.log 2>&1 &
           PID_RUS=$!
-          (timeout 180 python3 fetch_injuries.py || true) > /tmp/fetch_inj.log 2>&1 &
+          (python3 fetch_injuries.py || true) > /tmp/fetch_inj.log 2>&1 &
           PID_INJ=$!
-          (timeout 180 python3 fetch_clubelo.py || true) > /tmp/fetch_clubelo.log 2>&1 &
+          (python3 fetch_clubelo.py || true) > /tmp/fetch_clubelo.log 2>&1 &
           PID_ELO=$!
-          (timeout 180 python3 fetch_understat_xg.py || true) > /tmp/fetch_xg.log 2>&1 &
+          (python3 fetch_understat_xg.py || true) > /tmp/fetch_xg.log 2>&1 &
           PID_XG=$!
-          (timeout 180 python3 fetch_fbref_xg.py || true) > /tmp/fetch_fbref_xg.log 2>&1 &
+          (python3 fetch_fbref_xg.py || true) > /tmp/fetch_fbref_xg.log 2>&1 &
           PID_FBREF_XG=$!
-          # Wait pour TOUS — chaque process a son propre timeout 180s donc
-          # max bloc 3 min, tous les fetchers réussis sont commit.
+          # Wait pour TOUS et imprime les logs (mêmes timeouts implicites = pas de limite ici)
           wait $PID_LIVE $PID_SOFA $PID_WNX $PID_H2H $PID_FOREBET $PID_TENNIS $PID_RUS $PID_INJ $PID_ELO $PID_XG $PID_FBREF_XG
           echo "=== fetch_live ==="; cat /tmp/fetch_live.log | tail -3
           echo "=== fetch_sofascore ==="; cat /tmp/fetch_sofa.log | tail -3
@@ -185,38 +163,6 @@ jobs:
           # fetch_weather + fetch_referees + fetch_clubelo + fetch_understat_xg : self-throttled, parallèle
           (python3 fetch_weather.py || true) > /tmp/fetch_weather.log 2>&1 &
           (python3 fetch_referees_soccer.py || true) > /tmp/fetch_refs.log 2>&1 &
-          # AUDIT 2026-05-09 v41.10 — The Odds API aggregator (~30 bookmakers).
-          # No-op silencieux si secret THE_ODDS_API_KEY absent. Free tier 500/mois.
-          # v47.8 — Cadence + initial seed avec fetch SYNCHRONE.
-          # Bug v47.5 : le fetch initial était lancé en bg mais pas dans la
-          # liste 'wait' → orphaned + killed à la fin du step.
-          # Maintenant : fetch SYNC inline (~5-10s) si secret défini.
-          export THE_ODDS_API_KEY="${{ secrets.THE_ODDS_API_KEY }}"
-          MIN_MOD30=$(( $(date +%M) % 30 ))
-          # v47.9 — Initial seed se déclenche uniquement si fichier absent OU >24h.
-          # Avant : `[ ! -f ]` → dès que le fichier est présent dans le workspace
-          # checkout, on skip. Mais comme le fichier n'était pas dans la commit
-          # allowlist (bug v47.8), il était absent à chaque cron run → seed re-fire
-          # toutes les 5 min → quota free tier (500/mois) cramé en ~6h.
-          # Maintenant : allowlist fixée + ne re-fire que si vraiment vieux.
-          NEED_INITIAL_AGG=0
-          if [ ! -f ../odds_aggregated.json ]; then
-            NEED_INITIAL_AGG=1
-          elif [ $(find ../odds_aggregated.json -mmin +1440 2>/dev/null | wc -l) -eq 1 ]; then
-            NEED_INITIAL_AGG=1
-          fi
-          if [ -z "$THE_ODDS_API_KEY" ]; then
-            echo "[odds-agg] secret non défini, skip"
-          elif [ $(( $(date +%H) % 2 )) -eq 0 ] && [ $MIN_MOD30 -lt 10 ]; then
-            echo "[odds-agg] window 2h fire (HOUR%2=0 MIN%30<10)"
-            timeout 60 python3 fetch_odds_aggregator.py 2>&1 | tail -10
-          elif [ "$NEED_INITIAL_AGG" = "1" ]; then
-            echo "[odds-agg] Initial seed (file absent ou >24h) → fire SYNC"
-            timeout 60 python3 fetch_odds_aggregator.py 2>&1 | tail -10
-          else
-            echo "[odds-agg] hors fenêtre, skip (file present + recent)"
-          fi
-          ls -la ../odds_aggregated.json 2>&1 || echo "[odds-agg] file not present"
           # Wait pour TOUS les jobs background lancés
           wait
           echo "=== fetch_weather ==="; cat /tmp/fetch_weather.log 2>/dev/null | tail -2 || true
@@ -247,13 +193,10 @@ jobs:
             python3 fetch_mlb_pitchers.py || true
             python3 fetch_nhl_stats.py || true
             python3 fetch_nba_team_stats.py || true
-            # v51.2 — NBA advanced stats via ESPN team-level endpoint (Plan Pronostics Phase 2.1).
-            # Self-throttled 60min, fournit AST/REB/STL/BLK + AST/TO ratio per team.
-            python3 fetch_nba_advanced.py || true
-            # v51.3 — MLB advanced (batting OPS, pitching ERA team, fielding FPCT, runs/game).
-            python3 fetch_mlb_advanced.py || true
-            # v51.4 — NHL advanced (goals/game, save%, PP%, PK%, FOW%).
-            python3 fetch_nhl_advanced.py || true
+            # v52.5 — Advanced team stats (NBA eFG/AST/TO, MLB OPS/runs, NHL
+            # PP%/PK%/FOW%) qui activent les 3 branches dead du frontend
+            # (legacy-app.js v51.6).
+            python3 fetch_advanced_stats.py --sport all || true
             # v35 — Markets étendus Winamax multi-sports (foot, tennis,
             # basket, baseball, hockey, MMA) sur le pool exact priorisé.
             # Tourne toutes les 15 min, après que patch_winamax_markets a
@@ -272,10 +215,9 @@ jobs:
           python3 patch_all_quick.py || true
           python3 patch_understat_xg.py || true
           python3 patch_fbref_xg.py || true
+          # v52.5 — Inject NBA/MLB/NHL advanced team stats sur competitor.{nba,mlb,nhl}_advanced
+          python3 patch_advanced_stats.py || true
           python3 patch_smart_money.py || true
-          # AUDIT 2026-05-09 v41.10 — Inject odds_aggregated.json sur events
-          # data.js (consensus + Pinnacle signals). No-op si fichier absent.
-          python3 patch_odds_aggregator.py || true
           python3 build_public_team_stats.py || true
             python3 build_lineups_multisport.py || true
             python3 build_xg_coverage.py || true
@@ -330,10 +272,6 @@ jobs:
           # then fail if data.js/night_metrics/health disagree silently.
           python3 measure_night_metrics.py || true
           python3 build_health.py || true
-          # v45.5 — Paper trading forward log (snapshots + auto-settles).
-          python3 paper_trade_log.py || true
-          # v45.14 — Discord morning digest (8h Paris time, idempotent).
-          python3 notify_discord_digest.py || true
           python3 audit_data_truth.py || true
           python3 validate_data_quality.py || true
           python3 data_integrity_monitor.py || true
@@ -418,22 +356,6 @@ jobs:
           # Frontend l'utilise pour annoter chaque pick avec un signal
           # "✓ segment validé +X%" / "⚠ segment perdant -Y%". ~15 KB.
           python3 build_segment_trust.py || true
-          # v49 — Audit tech debt counter (CSS !important, inline styles, sprint naming).
-          # Daily à 00:00 UTC pour tracker progression dette technique.
-          if [ "$(date -u +'%H')" = "00" ] && [ $MIN_MOD60 -lt 5 ]; then
-            python3 audit_tech_debt.py || true
-            python3 audit_seo_validators.py || true
-          fi
-          # v49 — Audit point #2 : workflow backtest.yml dédié quotidien à 04:00 UTC
-          # n'a pas tourné depuis 6 jours (silent failure ou GH Actions cron skip).
-          # Backup : on relance backtest_v2.py ici toutes les 4h depuis refresh.yml.
-          # Coût ~1-3 min, mais critique pour que backtest_report_v2.json reste frais.
-          if [ $HOUR_MOD4 -eq 0 ] && [ $MIN_MOD60 -lt 5 ]; then
-            echo "[backtest-v2] 4h tick → running backtest_v2.py inline"
-            pip install mini-racer --break-system-packages 2>&1 | tail -3 || true
-            timeout 600 python3 backtest_v2.py 2>&1 | tail -10 || echo "[backtest-v2] failed (non-blocking)"
-            ls -la ../backtest_report_v2.json 2>&1 || true
-          fi
           # AUDIT 2026-05-08 v39.3 — Détecte les incohérences cotes :
           # vig anormale, cotes extrêmes, contradictions BTTS vs Poisson
           # 1n2+OU. Sortie prono_consistency_report.json (~5-15 KB).
@@ -541,14 +463,9 @@ jobs:
             bayesian_priors.json.gz team_priors.json.gz team_form.json.gz \
             mlb_pitchers.json nhl_stats.json backtest.html feed.xml \
             credibilite.html stadiums.json dixon_coles_rho.json index.html \
-            nba_team_stats.json team_strengths.json team_strengths_mle.json \
+            nba_team_stats.json nba_advanced.json mlb_advanced.json nhl_advanced.json team_strengths.json team_strengths_mle.json \
             ci_heartbeat.json sofascore_events.json clv_history.json clv_summary.json \
-            og-default.png og-backtest.png og-credibilite.png og-methodologie.png sitemap.xml \
-            odds_aggregated.json \
-            paper_log.jsonl paper_log_summary.json picks_history.jsonl picks_history_summary.json \
-            backtest_report_v2.json backtest_report_v2.md calibration_per_sport_league.json calibration_per_sport_league_market.json bankroll_simulation.json \
-            nba_advanced.json mlb_advanced.json nhl_advanced.json audit_patch_contracts.json \
-            audit_tech_debt.json audit_tech_debt.md audit_seo_validators.json audit_seo_validators.md
+            og-default.png og-backtest.png og-credibilite.png og-methodologie.png sitemap.xml
           do
             if [ -e "$path" ]; then
               git add "$path"
@@ -600,26 +517,6 @@ jobs:
             fi
             echo "Push rejected (attempt $attempt) — pulling --rebase and retrying."
             git pull --rebase --autostash -X theirs origin main
-            # AUDIT 2026-05-08 v40 — Race condition fix : si l'autre push a
-            # bumped app.js VERSION (ex: v39.1 → v40.0), nos stamps en cache
-            # busting de pronostics.html sont périmés et pointent sur des
-            # hashes invalides. On re-stamp APRÈS le rebase pour repartir
-            # sur la nouvelle réalité, puis on amend le commit.
-            APP_VERSION_RESYNC=$(python3 - <<'PY'
-          import re
-          from pathlib import Path
-          m = re.search(r"VERSION\s*=\s*['\"](v\d+(?:\.\d+)?)['\"]", Path('app.js').read_text(encoding='utf-8', errors='ignore'))
-          print(m.group(1) if m else 'v0')
-          PY
-          )
-            BUILD_ID_RESYNC="${APP_VERSION_RESYNC}-$(date -u +'%Y%m%d-%H%M%S')"
-            python3 scripts/stamp_asset_hashes.py --build-id "$BUILD_ID_RESYNC" || true
-            sed -i "s|^const CACHE_VERSION = .*|const CACHE_VERSION = 'paris-sportif-${BUILD_ID_RESYNC}';|" sw.js
-            git add pronostics.html sw.js
-            if ! git diff --cached --quiet; then
-              git commit --amend --no-edit
-              echo "Re-stamped after rebase with build_id ${BUILD_ID_RESYNC}."
-            fi
           done
           echo "Push still failing after 3 retries — surfacing as a job failure."
           exit 1

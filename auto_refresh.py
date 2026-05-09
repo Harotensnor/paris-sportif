@@ -76,15 +76,6 @@ def append_trace(script_name, rc, elapsed, tail):
 # internally too; the cadence here mostly gates how often we *try*.
 FETCH_STAGES = [
     # (script, ticks, timeout)
-    # AUDIT 2026-05-09 v40.17 — sync_winamax_markets_release.py est volontairement
-    # PAS dans cette liste : il prend un argument positional (download/upload) que
-    # auto_refresh.py ne sait pas passer. En local on garde winamax_markets.json
-    # sur disque (pas de purge). En prod GH Actions, refresh.yml l'invoque
-    # explicitement avec `download` au boot et `upload` à la fin. Ce désync
-    # est documenté dans check_pipeline_drift.py exclusions ci-dessous.
-    # AUDIT 2026-05-09 v41.10 — The Odds API aggregator (no-op sans clé).
-    # Cadence 24 ticks (~2h) pour respecter free tier 500/mois.
-    ('fetch_odds_aggregator.py',   24, 60),
     ('fetch_live.py',              1,   60),
     ('fetch_sofascore_events.py',   1,   90),
     ('fetch_winamax_catalog.py',    1,   60),   # <2s typical
@@ -115,6 +106,7 @@ FETCH_STAGES = [
     ('fetch_mlb_pitchers.py',      5,   60),   # MLB Stats API probable pitchers, 6h cache
     ('fetch_nhl_stats.py',        10,   60),   # NHL official API team stats + starting goalie, 10min cache
     ('fetch_nba_team_stats.py',    5,   30),
+    ('fetch_advanced_stats.py',   12,  120),   # v52.5 — NBA/MLB/NHL advanced (eFG, OPS, PP%/PK%/FOW%), 1h cache
     # v35.352 — Alignement avec le cron: sources publiques metadata/Allemagne.
     # Les scripts sont self-throttled, donc les appeler localement ne force pas
     # un hit réseau à chaque tick.
@@ -135,10 +127,8 @@ PATCH_STAGES = [
     ('patch_all_quick.py',          1,   30),
     ('patch_understat_xg.py',       1,   30),
     ('patch_fbref_xg.py',           1,   30),
+    ('patch_advanced_stats.py',     1,   30),  # v52.5 — Inject NBA/MLB/NHL advanced stats
     ('patch_smart_money.py',        1,   30),
-    # AUDIT 2026-05-09 v41.10 — Patch consensus + Pinnacle signals.
-    # No-op silencieux si odds_aggregated.json absent (cf fetch_odds_aggregator).
-    ('patch_odds_aggregator.py',    1,   30),
     # v35.352 — Builders cron ajoutés dans l'auto-refresh pour éviter que
     # local et prod divergent sur les insights modèle / profils / marchés.
     ('build_public_team_stats.py',  1,   30),
@@ -178,10 +168,6 @@ PATCH_STAGES = [
     ('measure_night_metrics.py',    1,   15),
     # Pipeline status snapshot (health.json) — runs every tick, cheap.
     ('build_health.py',             1,   15),
-    # v45.5 — Paper trading forward log (snapshots + settles).
-    ('paper_trade_log.py',          1,   30),
-    # v45.14 — Discord morning digest (8h Paris time, 1x/jour).
-    ('notify_discord_digest.py',    1,   12),
     ('audit_data_truth.py',          1,   15),
     ('validate_data_quality.py',     1,   15),
     ('data_integrity_monitor.py',    1,   20),
@@ -254,11 +240,6 @@ PATCH_STAGES = [
     # prono_consistency_report.json — utile pour debug et pour flagger les
     # matchs avec value cachée (BTTS marché < BTTS Poisson dérivé = signal).
     ('audit_prono_consistency.py',  1,   15),
-    # v49 — Audit tech debt counter (CSS !important, inline styles, sprint naming).
-    # Daily à 00:00 UTC en prod. Local : tous les ~8h de ticks (~2880 min).
-    ('audit_tech_debt.py',          576, 60),
-    # v49 — Audit SEO validators (OG/Twitter/RSS/sitemap).
-    ('audit_seo_validators.py',     576, 60),
     # v31.7.4 — OG images (1200x630 PNG) pour pages statiques. ~3s.
     ('build_og_images.py',          5,   30),
     # v35.13 — Sitemap dynamique (git lastmod + routes SPA).
