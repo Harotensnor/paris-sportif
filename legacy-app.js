@@ -9786,6 +9786,47 @@ if (hrComp)    components.push({ w: adaptiveW('Domicile/Ext.', 0.30), pH: hrComp
 if (recScore)  components.push({ w: adaptiveW('Bilan saison', 0.30), pH: recScore.pH,pD: recScore.pD||0,pA: recScore.pA,name: 'Bilan saison',  icon: '📈' });
 if (eloComp)   components.push({ w: adaptiveW('Force', 0.30), pH: eloComp.pH, pD: eloComp.pD||0, pA: eloComp.pA, name: 'Force',         icon: '💪' });
 if (h2hComp)   components.push({ w: adaptiveW('Face-à-face', 0.25), pH: h2hComp.pH, pD: h2hComp.pD||0, pA: h2hComp.pA, name: 'Face-à-face',   icon: '⚔️' });
+
+// v51.1 — Plan Pronostics Phase 2.3 : signaux foot extras (referee, weather, lineups).
+// Wire-up des signaux scrapés mais sous-utilisés dans predictMatch.
+if (match.sport === 'football') {
+  // Referee strictness : refs sévères = plus de cartons home (avantage défensif),
+  // moins de buts. Effet modéré. Source : match.referee.cardsPerGame (Sofascore).
+  const ref = match.referee;
+  if (ref && typeof ref.cardsPerGame === 'number' && (ref.games || 0) >= 30) {
+    const cardsAvg = ref.cardsPerGame;
+    // League moyenne ~3.5 cartons/match. >4.5 = sévère (-3% home, +1% away)
+    if (cardsAvg >= 4.5) {
+      const refShift = -0.025;  // home perd un peu d'avantage avec ref sévère
+      const pRefHome = 0.5 + refShift;
+      components.push({ w: adaptiveW('Arbitre sévère', 0.05), pH: pRefHome, pD: 0, pA: 1 - pRefHome,
+        name: `Arbitre ${ref.name || ''} (${cardsAvg.toFixed(1)}c/g)`, icon: '🟨' });
+    } else if (cardsAvg <= 2.5) {
+      // Ref permissif favorise jeu offensif → légère hausse home
+      const pRefHome = 0.515;
+      components.push({ w: adaptiveW('Arbitre permissif', 0.04), pH: pRefHome, pD: 0, pA: 0.485,
+        name: `Arbitre ${ref.name || ''} (${cardsAvg.toFixed(1)}c/g)`, icon: '🟢' });
+    }
+  }
+  // Weather : precip > 5mm ou vent > 30 km/h → affecte jeu offensif
+  // Source : match.weather (Open-Meteo).
+  const w = match.weather;
+  if (w && (typeof w.precip_mm === 'number' || typeof w.wind_kmh === 'number')) {
+    const precipBad = (w.precip_mm || 0) >= 5;
+    const windBad = (w.wind_kmh || 0) >= 30;
+    if (precipBad || windBad) {
+      // Mauvaise météo réduit le jeu offensif → home advantage diminue (+favori joueurs résistants)
+      // Effet : -1.5% home, légèrement plus de nul
+      const pWeatherHome = 0.485;
+      components.push({ w: adaptiveW('Météo défavorable', 0.04), pH: pWeatherHome, pD: 0, pA: 0.515,
+        name: precipBad ? `Pluie ${w.precip_mm}mm` : `Vent ${w.wind_kmh}km/h`, icon: precipBad ? '🌧️' : '💨' });
+    }
+  }
+  // Lineups confirmation : si compositions confirmées des 2 équipes (≥10 titulaires
+  // chacune), bonus marginal de fiabilité (1% sur reliability via formNudge after).
+  // Pas de shift de pH/pA, juste boost reliability via _v45ReliabilityNudge.
+  // (handled implicitly via final adjustments — pas de component séparé)
+}
 const _hasSackmann = match.sport === 'tennis' && match.tennis_features
 && (match.tennis_features.home || match.tennis_features.away);
 if (match.sport === 'tennis' && !_hasSackmann && home?.rank && away?.rank) {
