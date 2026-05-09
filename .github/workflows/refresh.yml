@@ -38,7 +38,17 @@ jobs:
           # and data commits every run, that stale SHA can be behind main by the
           # time the job actually starts. Always checkout the live branch head.
           ref: main
-          fetch-depth: 1
+          # v48 fix — fetch-depth: 1 cassait build_sitemap.py qui appelle
+          # `git log -1 --format=%cs -- <file>` pour le lastmod par-fichier.
+          # Avec depth 1, seul HEAD est visible → toutes les queries retournent
+          # la date du dernier commit data (today) → sitemap.xml affiche
+          # 2026-05-09 pour TOUS les fichiers, y compris legal.html qui n'a pas
+          # été touché depuis le 2026-05-02. Mauvais signal SEO (Google voit
+          # toutes les pages "modifiées le même jour" → moins fiable).
+          # legal.html dernier commit ≈ 3 jours = ~864 commits cron derrière
+          # → depth: 0 (full history) requis. Coût : ~50-100 MB clone vs ~10 MB.
+          # GitHub Actions unmetered pour repos publics, donc OK.
+          fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/setup-python@v5
