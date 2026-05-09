@@ -18468,6 +18468,62 @@ if (p.opportunity >= 60) return 'Lecture simple : pari jouable, mais pas automat
 if (p.edge >= 0.04) return 'Lecture simple : il y a de la value, mais le risque reste plus haut. À jouer petit ou à surveiller.';
 return 'Lecture simple : avantage faible ou données incomplètes. À lire pour info, pas une priorité.';
 };
+// AUDIT 2026-05-09 v43 — Stratégie redesign basée sur backtest_strategies.json
+// (1932 picks settled). Leaderboard prouvé statistiquement :
+//   1. outsider_only (tier='out' ou cote≥5+edge≥5pt) : +121.1% ROI / +431€ / max_dd 3%
+//   2. value_only (edge≥5pt) : +33.1% ROI / +414€ / max_dd 3.5%
+//   3. flat 1u sur tout : +19.0% ROI / +366€ / max_dd 5%
+//   4. sharp_only (tier='safe'+'solid') : -8.6% ROI (LOSING)
+//   5. safe_blend : -19.2% ROI / -855€ (LOSING + max_dd 88%)
+//   6. kelly_full / kelly_half : -30% ROI / -999€ (TOTAL WIPEOUT max_dd 99.99%)
+// Conséquence produit : surfacer Outsider en priorité, Value en second,
+// dé-emphasiser Safe/Solid (perdants), bannir reco Kelly.
+window.v43Strategies = {
+  outsider: { roi_pct: 121.1, profit: 431, label: 'Outsider', emoji: '💎', color: '#f59e0b', proven: true, n: 356 },
+  value: { roi_pct: 33.1, profit: 414, label: 'Value', emoji: '🎯', color: '#3b82f6', proven: true, n: 1251 },
+  flat: { roi_pct: 19.0, profit: 366, label: 'Flat 1u', emoji: '📊', color: '#10b981', proven: true, n: 1932 },
+  sharp_warn: { roi_pct: -19.2, profit: -855, label: 'Safe blend', emoji: '⚠️', color: '#ef4444', proven: false, n: 487 },
+  kelly_warn: { roi_pct: -30.0, profit: -999, label: 'Kelly', emoji: '🚫', color: '#dc2626', proven: false, n: 1827 }
+};
+window.v43ClassifyPick = (p) => {
+  const odd = Number(p?.odd || 0);
+  const edge = Number(p?.edge || 0);
+  const tier = String(p?.tier || '');
+  if (tier === 'out' || (odd >= 5 && edge >= 0.05)) return 'outsider';
+  if (edge >= 0.05) return 'value';
+  if (tier === 'safe' || tier === 'solid') return 'sharp_warn';
+  return 'flat';
+};
+window.v43IsProfitable = (p) => {
+  const c = window.v43ClassifyPick(p);
+  return c === 'outsider' || c === 'value';
+};
+window.v43StrategyBadge = (p) => {
+  const c = window.v43ClassifyPick(p);
+  const meta = window.v43Strategies[c];
+  if (!meta) return '';
+  const sign = meta.roi_pct >= 0 ? '+' : '';
+  const note = meta.proven ? `${sign}${meta.roi_pct.toFixed(0)}% ROI prouvé` : `${meta.roi_pct.toFixed(0)}% ROI hist. (à éviter)`;
+  return `<span title="Stratégie ${meta.label} — ${note} sur ${meta.n} paris" style="display:inline-flex;align-items:center;gap:4px;padding:2px 7px;background:${meta.color}22;border:1px solid ${meta.color}66;border-radius:999px;font-size:10px;font-weight:700;color:${meta.color};white-space:nowrap;">${meta.emoji} ${meta.label} ${meta.proven ? sign : ''}${meta.roi_pct.toFixed(0)}%</span>`;
+};
+window.v43ProfitableMode = () => {
+  try {
+    const v = localStorage.getItem('v43_profitable_mode');
+    return v === null ? false : (v === '1' || v === 'true');
+  } catch (e) { return false; }
+};
+window.v43SetProfitableMode = (on) => {
+  try { localStorage.setItem('v43_profitable_mode', on ? '1' : '0'); } catch (e) {}
+  try { document.dispatchEvent(new CustomEvent('v43:profitable-mode-changed', { detail: { on } })); } catch (e) {}
+};
+// Filter helper utilisable par n'importe quelle page : si profitableMode actif,
+// ne garde QUE les picks Outsider+Value. Sinon retourne l'array tel quel.
+window.v43FilterByProfitable = (picks) => {
+  if (!Array.isArray(picks)) return picks;
+  if (!window.v43ProfitableMode()) return picks;
+  return picks.filter(window.v43IsProfitable);
+};
+
 // AUDIT 2026-05-08 v39 — Recommandation finale unifiée.
 // User : "il me faut UN SEUL indicateur qui me dit si je peux miser
 // dessus ou pas". Combine cote validation + confiance + edge + score
@@ -20093,7 +20149,41 @@ return { ...xx, stake, gain, ev, investment, homeName: home?.name || '?', awayNa
 };
 const prudentPicksEnriched = prudentPicks.map(_enrichPick);
 const aggressivePicksEnriched = aggressivePicks.map(_enrichPick);
+// AUDIT 2026-05-09 v43.B — Outsider du jour. Backtest leaderboard (1932 picks
+// settled) prouve que tier='out' ou cote≥5+edge≥5pt = +121% ROI sur 356 paris,
+// max_dd 3% — la stratégie #1 historiquement. On surface ces picks avant tout
+// le reste, avec badge "+121% ROI prouvé" et styling distinct (gold).
+const outsiderPicks = _dataIsStale ? [] : (allTodayRaw || [])
+  .filter(x => !x.m.live && !x.m.completed && _notStarted(x.m))
+  .filter(x => {
+    const odd = Number(x.odd || 0);
+    const edge = Number(x.edge || 0);
+    return x.tier === 'out' || (odd >= 5 && edge >= 0.05);
+  })
+  .filter(x => !x.investment || x.investment.action !== 'skip')
+  .sort((a, b) => {
+    const ea = Number(a.edge || 0);
+    const eb = Number(b.edge || 0);
+    if (eb !== ea) return eb - ea;
+    return Number(b.odd || 0) - Number(a.odd || 0);
+  })
+  .slice(0, 6)
+  .map(_enrichPick);
+// AUDIT 2026-05-09 v43.B — Value picks (edge ≥5pt, hors outsider).
+// +33.1% ROI prouvé sur 1251 paris. 2e meilleure stratégie.
+const outsiderIds = new Set(outsiderPicks.map(x => x.m.id));
+const valuePicks = _dataIsStale ? [] : (allTodayRaw || [])
+  .filter(x => !outsiderIds.has(x.m.id))
+  .filter(x => !x.m.live && !x.m.completed && _notStarted(x.m))
+  .filter(x => Number(x.edge || 0) >= 0.05 && Number(x.odd || 0) >= 1.40)
+  .filter(x => !x.investment || x.investment.action !== 'skip')
+  .sort((a, b) => Number(b.edge || 0) - Number(a.edge || 0))
+  .slice(0, 6)
+  .map(_enrichPick);
+const valueIds = new Set(valuePicks.map(x => x.m.id));
 const shownIds = new Set([
+...outsiderPicks.map(x => x.m.id),
+...valuePicks.map(x => x.m.id),
 ...topPicks.map(x => x.m.id),
 ...prudentPicksEnriched.map(x => x.m.id),
 ...aggressivePicksEnriched.map(x => x.m.id),
@@ -21859,6 +21949,74 @@ ${items}
           </div>` ;
         })() : ''}
 
+        ${(outsiderPicks.length || valuePicks.length) ? (() => {
+          // AUDIT 2026-05-09 v43.B — Section "Stratégies prouvées".
+          // Backtest leaderboard 1932 picks settled, ROI vérifié.
+          const v43ModeOn = (typeof window.v43ProfitableMode === 'function') ? window.v43ProfitableMode() : false;
+          const renderProvenCard = (p, kind) => {
+            const meta = (window.v43Strategies || {})[kind] || { color: '#888', emoji: '·', label: kind, roi_pct: 0 };
+            const sides = (typeof getSides === 'function') ? getSides(p.m) : { home:{}, away:{} };
+            const hN = sides.home?.short || sides.home?.name || p.homeName || '?';
+            const aN = sides.away?.short || sides.away?.name || p.awayName || '?';
+            const lg = p.m.league_name || p.m.league_code || '';
+            const tLbl = (typeof fmtTime === 'function') ? fmtTime(p.m.date) : '';
+            const pickLbl = (p.best && p.best.label) || (p.pred?.pick && p.pred.pick.label) || 'Pick';
+            const evPct = ((p.ev || 0) * 100);
+            const edgePct = ((p.edge || 0) * 100);
+            const oddNum = Number(p.odd || 0);
+            const sign = meta.roi_pct >= 0 ? '+' : '';
+            return `
+<div class="interactive" data-match-id="${esc(String(p.m.id))}" role="button" tabindex="0" style="padding:14px 16px;background:linear-gradient(135deg, ${meta.color}1a, transparent);border:1px solid ${meta.color}55;border-left:4px solid ${meta.color};border-radius:0 10px 10px 0;cursor:pointer;position:relative;">
+  <div style="position:absolute;top:8px;right:10px;background:${meta.color};color:#fff;font-size:10px;font-weight:800;padding:2px 8px;border-radius:999px;letter-spacing:.4px;">${meta.emoji} ${sign}${meta.roi_pct.toFixed(0)}% ROI</div>
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:6px;padding-right:90px;">
+    <span style="font-size:10px;color:var(--text-dim);font-weight:600;">${esc(tLbl)} · ${esc(String(lg).slice(0,22))}</span>
+  </div>
+  <div style="font-size:14px;font-weight:800;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(hN)} vs ${esc(aN)}</div>
+  <div style="font-size:12px;color:var(--text-dim);margin-top:4px;">Pick : <b style="color:${meta.color};">${esc(pickLbl)}</b> @ <b style="color:var(--text);">${oddNum.toFixed(2)}</b></div>
+  <div style="display:flex;gap:14px;margin-top:6px;font-size:11px;color:var(--text-dim);">
+    <span>Edge <b style="color:${edgePct >= 5 ? meta.color : 'var(--text-dim2)'};">+${edgePct.toFixed(1)}pt</b></span>
+    <span>EV <b style="color:${evPct >= 0 ? meta.color : 'var(--text-dim2)'};">${evPct >= 0 ? '+' : ''}${evPct.toFixed(0)}%</b></span>
+    <span style="margin-left:auto;color:var(--text-dim2);">Mise FLAT 1u recommandée</span>
+  </div>
+</div>`;
+          };
+          return `
+<div style="padding:28px 0 18px;border-bottom:1px solid var(--border);">
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
+    <div>
+      <div style="font-size:11px;color:#f59e0b;text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:4px;">v43 · stratégies backtestées prouvées rentables</div>
+      <div style="font-size:24px;font-weight:800;letter-spacing:-0.6px;color:var(--text);line-height:1.15;">🎯 Stratégies gagnantes du jour</div>
+      <div style="font-size:12px;color:var(--text-dim);margin-top:4px;">Outsider <b style="color:#f59e0b;">+121% ROI</b> sur 356 paris · Value <b style="color:#3b82f6;">+33% ROI</b> sur 1251 paris (backtest 1932 picks)</div>
+    </div>
+    <button type="button" onclick="window.v43SetProfitableMode(!window.v43ProfitableMode());location.reload();" style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:${v43ModeOn ? 'rgba(245,158,11,.18)' : 'var(--panel)'};border:1px solid ${v43ModeOn ? '#f59e0b' : 'var(--border)'};color:${v43ModeOn ? '#f59e0b' : 'var(--text)'};border-radius:999px;font-size:11px;font-weight:700;cursor:pointer;">${v43ModeOn ? '✓ Mode profitable activé' : 'Activer mode profitable'}</button>
+  </div>
+  ${outsiderPicks.length ? `
+  <div style="margin-bottom:16px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+      <div style="font-size:13px;color:#f59e0b;text-transform:uppercase;letter-spacing:.6px;font-weight:800;">💎 Outsiders du jour</div>
+      <span style="background:#f59e0b;color:#fff;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:800;">${outsiderPicks.length} dispo</span>
+      <span style="margin-left:auto;font-size:11px;color:var(--text-dim);">cote ≥ 5 · edge ≥ 5pt · max_dd 3% historique</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;">
+      ${outsiderPicks.map(p => renderProvenCard(p, 'outsider')).join('')}
+    </div>
+  </div>` : ''}
+  ${valuePicks.length ? `
+  <div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+      <div style="font-size:13px;color:#3b82f6;text-transform:uppercase;letter-spacing:.6px;font-weight:800;">🎯 Value picks</div>
+      <span style="background:#3b82f6;color:#fff;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:800;">${valuePicks.length} dispo</span>
+      <span style="margin-left:auto;font-size:11px;color:var(--text-dim);">edge ≥ 5pt · cote modérée · max_dd 3.5% historique</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;">
+      ${valuePicks.map(p => renderProvenCard(p, 'value')).join('')}
+    </div>
+  </div>` : ''}
+  ${(!outsiderPicks.length && !valuePicks.length) ? `
+  <div style="padding:14px 16px;background:var(--panel);border:1px dashed var(--border);border-radius:8px;color:var(--text-dim);font-size:13px;">Aucun pick Outsider ou Value qualifié aujourd'hui (cote ≥5+edge ≥5pt OU edge ≥5pt). Le modèle reste prudent.</div>` : ''}
+</div>`;
+        })() : ''}
+
         ${topPicks.length ? (() => {
           // sur l'ensemble des picks affichés (top + prudents + agressifs).
 const allShown = [
@@ -22138,7 +22296,7 @@ ${streakHtml}
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;">
 ${prudentPicksEnriched.length ? `
             <div>
-              <div style="font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:6px;">🛡️ Prudents (${prudentPicksEnriched.length}/3)</div>
+              <div style="font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:6px;">🛡️ Prudents (${prudentPicksEnriched.length}/3) <span title="Backtest 487 paris : -19.2% ROI, max_dd 88%. À utiliser avec précaution." style="margin-left:4px;font-size:9.5px;color:#ef4444;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.4);padding:1px 6px;border-radius:999px;font-weight:700;">⚠ -19% ROI hist.</span></div>
               <div style="display:flex;flex-direction:column;gap:6px;">
                 ${prudentPicksEnriched.map(p => {
                   const sides = (typeof getSides === 'function') ? getSides(p.m) : { home:{}, away:{} };

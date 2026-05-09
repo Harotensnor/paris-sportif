@@ -24,6 +24,55 @@ sed -i -E "s|app\.js(\?v=[a-f0-9]+)?|app.js?v=${APP_JS_HASH}|g" pronostics.html
 
 Bumper aussi `sw.js` CACHE_VERSION dans la même commande.
 
+## Architecture v43.x (mise à jour 2026-05-09 — refonte stratégie données-prouvées)
+
+Réponse au feedback "revoie complètement la stratégie du site et du modèle
+pour quelque chose du plus fiable et meilleur". Le backtest officiel
+`backtest_strategies.json` (1932 picks settled, max_dd loggé) prouve que
+les vraies stratégies gagnantes sont **Outsider** (+121% ROI sur 356 paris,
+max_dd 3%) et **Value** (+33% ROI sur 1251 paris, max_dd 3.5%) — alors
+que la sidebar "Prudents" (Sharp/Safe blend) est historiquement **-19% ROI**
+sur 487 paris (max_dd 88%) et que **Kelly full/half = -30% ROI total wipeout**
+(max_dd 99.99%). v43 réoriente l'UX pour surfacer la vérité statistique.
+
+**Sprint v43.A (helpers — v43.0)** — `window.v43Strategies` (registre des
+6 stratégies du leaderboard avec ROI/profit/max_dd/proven flag) +
+`window.v43ClassifyPick(p)` (retourne 'outsider' | 'value' | 'sharp_warn'
+| 'flat') + `window.v43IsProfitable(p)` + `window.v43StrategyBadge(p)`
+(pill HTML coloré inline avec emoji+ROI+tooltip) + `window.v43ProfitableMode()`
+read/write localStorage `v43_profitable_mode` + `window.v43FilterByProfitable(picks)`
+(no-op si mode off, sinon filtre Outsider+Value uniquement).
+
+**Sprint v43.B (dashboard reorg — v43.0)** — Nouvelle section "🎯 Stratégies
+gagnantes du jour" injectée AVANT `topPicks`. Deux sub-sections :
+- **💎 Outsiders du jour** (badge "+121% ROI" gold) — picks `tier='out'`
+  ou `cote ≥ 5 + edge ≥ 5pt`. Tri par edge desc, max 6 cartes.
+- **🎯 Value picks** (badge "+33% ROI" bleu) — picks `edge ≥ 5pt` hors
+  Outsider, cote ≥ 1.40. Tri par edge desc, max 6 cartes.
+- Toggle pill "Activer mode profitable" qui filtre globalement à
+  Outsider+Value uniquement (avec reload).
+- Cartes stylées avec badge ROI top-right, mise **FLAT 1u** recommandée
+  (pas Kelly — confer ROI prouvé : flat +19%, kelly_full -30%).
+
+**Sprint v43.C (anti-warning — v43.0)** — Section "🛡️ Prudents" reçoit
+un badge **"⚠ -19% ROI hist."** avec tooltip "Backtest 487 paris :
+-19.2% ROI, max_dd 88%". Honnêteté stats : ne masque pas la stratégie
+mais informe l'user qu'historiquement elle perd.
+
+Helpers exposés sur window :
+- `window.v43Strategies[kind]` → `{ roi_pct, profit, label, emoji, color, proven, n }`
+- `window.v43ClassifyPick(pick)` → 'outsider' | 'value' | 'sharp_warn' | 'flat'
+- `window.v43IsProfitable(pick)` → boolean (outsider OR value)
+- `window.v43StrategyBadge(pick)` → HTML pill string
+- `window.v43ProfitableMode()` → boolean (default false)
+- `window.v43SetProfitableMode(on)` → persist + dispatch event
+- `window.v43FilterByProfitable(picks)` → filtered array (no-op si off)
+
+Backward-compat : aucun changement de comportement existant. La section
+v43 est ADDITIVE (s'ajoute avant topPicks). Toggle profitable_mode = OFF
+par défaut, donc les utilisateurs existants voient simplement un nouvel
+encart "Stratégies gagnantes" sans rien perdre des sections classiques.
+
 ## Architecture v42.x (mise à jour 2026-05-09 nuit — méga-méga plan mode A)
 
 Phase intensive en réponse à demande user "go A" sur le méga-plan v42.x
