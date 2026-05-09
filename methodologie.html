@@ -228,23 +228,25 @@
 
   <h2 id="sources">📚 Sources de données</h2>
   <section class="card">
-    <p style="color:#6b6b73;">Toutes les sources ci-dessous sont publiques. Le code des fetchers est dans <code>scripts/fetch_*.py</code> sur le repo.</p>
+    <p style="color:#6b6b73;">Toutes les sources ci-dessous sont publiques. Le code des fetchers est dans <code>scripts/fetch_*.py</code> sur le repo. La colonne Coverage indique le pourcentage d'events ayant la donnée injectée — basé sur les dernières 24h. Les sources avec coverage faible reflètent des limitations API (top-5 leagues OK, tier-2 non couvert).</p>
     <table>
       <thead><tr>
-        <th>Source</th><th>Sport(s)</th><th>Apport</th><th>Cadence</th>
+        <th>Source</th><th>Sport(s)</th><th>Apport</th><th>Cadence</th><th>Coverage live</th>
       </tr></thead>
       <tbody>
-        <tr><td><b>ESPN</b> (scoreboard + core API)</td><td>Tous</td><td>Calendrier, scores live, cotes ML, classements, blessures US</td><td>5 min</td></tr>
-        <tr><td><b>Sofascore</b></td><td>Foot top-5</td><td>Compositions, blessures, arbitres</td><td>2 h</td></tr>
-        <tr><td><b>Winamax catalog</b></td><td>Tous</td><td>Cotes 1N2 (publiques, sans login)</td><td>5 min</td></tr>
-        <tr><td><b>ClubElo</b></td><td>Foot</td><td>Elo des clubs (sur ~30 ans d'historique)</td><td>20 h</td></tr>
-        <tr><td><b>Jeff Sackmann</b> (tennis_atp / tennis_wta)</td><td>Tennis</td><td>Elo + Elo surface + L10 + fatigue + H2H</td><td>24 h</td></tr>
-        <tr><td><b>Football-Data.co.uk</b></td><td>Foot 14 ligues</td><td>Closing odds + calibration ligue (BTTS, +2.5, avg goals)</td><td>6 h</td></tr>
-        <tr><td><b>MLB Stats API</b></td><td>Baseball</td><td>Pitcher partant probable + ERA/WHIP/K9/BB9</td><td>15 min</td></tr>
-        <tr><td><b>NHL API</b></td><td>Hockey</td><td>Pace (GF/GA), goalie SV%, splits home/road</td><td>15 min</td></tr>
-        <tr><td><b>Open-Meteo</b></td><td>Foot</td><td>Météo prévue au coup d'envoi (température, pluie, vent)</td><td>30 min</td></tr>
+        <tr><td><b>ESPN</b> (scoreboard + core API)</td><td>Tous</td><td>Calendrier, scores live, cotes ML, classements, blessures US</td><td>5 min</td><td>~100% (calendrier+scores)</td></tr>
+        <tr><td><b>Sofascore</b></td><td>Foot top-5</td><td>Compositions, blessures, arbitres</td><td>2 h</td><td>Lineups ~24% football · arbitres 0% (limitation source actuelle)</td></tr>
+        <tr><td><b>Winamax catalog</b></td><td>Tous</td><td>Cotes 1N2 (publiques, sans login)</td><td>5 min</td><td>~98% Winamax-exact</td></tr>
+        <tr><td><b>ClubElo</b></td><td>Foot</td><td>Elo des clubs (sur ~30 ans d'historique)</td><td>20 h</td><td>~44% (top-5 OK, tier-2 absent)</td></tr>
+        <tr><td><b>Jeff Sackmann</b> (tennis_atp / tennis_wta)</td><td>Tennis</td><td>Elo + Elo surface + L10 + fatigue + H2H</td><td>24 h</td><td>ATP/WTA OK, Challenger partiel</td></tr>
+        <tr><td><b>Football-Data.co.uk</b></td><td>Foot 14 ligues</td><td>Closing odds + calibration ligue (BTTS, +2.5, avg goals)</td><td>6 h</td><td>14 ligues couvertes</td></tr>
+        <tr><td><b>MLB Stats API</b></td><td>Baseball</td><td>Pitcher partant probable + ERA/WHIP/K9/BB9</td><td>15 min</td><td>~94%</td></tr>
+        <tr><td><b>NHL API</b></td><td>Hockey</td><td>Pace (GF/GA), goalie SV%, splits home/road</td><td>15 min</td><td>~90%</td></tr>
+        <tr><td><b>Open-Meteo</b></td><td>Foot</td><td>Météo prévue au coup d'envoi (température, pluie, vent)</td><td>30 min</td><td>~66% football</td></tr>
+        <tr><td><b>The Odds API</b> (v41.10)</td><td>Foot/MLB/NBA/NHL/ATP</td><td>Consensus ~30 bookmakers + Pinnacle (sharp money signal)</td><td>2 h (free tier 500/mois)</td><td>~18% (couvre 9 sport_keys)</td></tr>
       </tbody>
     </table>
+    <p style="color:#6b6b73;font-size:13px;margin-top:8px;"><strong>Limites assumées</strong> : aucune source n'est garantie 100%. ESPN peut être down, Sofascore peut bloquer, Winamax peut suspendre un marché. Le modèle dégrade gracieusement quand un signal manque (fallback sur priors par ligue / médiane historique).</p>
   </section>
 
   <h2 id="pipeline">⚙️ Pipeline</h2>
