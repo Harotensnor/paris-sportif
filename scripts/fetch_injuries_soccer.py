@@ -86,6 +86,19 @@ LEAGUES: dict[str, int] = {
     'arg.1': 155,  # Liga Profesional Argentine
     'chn.1': 649,  # Chinese Super League
     'usa.1': 242,  # MLS
+    # v53.4 — Extension supplémentaire
+    'aus.1': 136,  # A-League Men
+    'nor.1': 20,   # Eliteserien Norvège
+    'den.1': 39,   # Danish Superliga
+    'pol.1': 202,  # Ekstraklasa Pologne
+    'sau.1': 955,  # Saudi Pro League
+    'egy.1': 808,  # Egyptian Premier
+    'rus.1': 203,  # Russian Premier
+    'cro.1': 579,  # SuperSport Premijer Liga (Croatie)
+    'eng.w.1': 1044,    # FA Women's Super League
+    'fra.w.1': 1139,    # Première Ligue Féminine
+    'usa.w.1': 1690,    # NWSL
+    'uefa.w.champions': 696,  # UEFA Women's CL
     # Compétitions UEFA
     'uefa.champions': 7,
     'uefa.europa': 679,

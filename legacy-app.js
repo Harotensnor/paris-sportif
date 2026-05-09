@@ -6125,6 +6125,53 @@ markets: { totals, runLine, totalsF5, sigmaTotal, sigmaMargin, nrfi, inningTotal
 };
 }
 
+// v53.4 — NFL Gaussian projection dédié (avant : tombait sur tennisScorePrediction).
+// Hypothèses : last5 attaque/défense, home-advantage 3pts (NFL classique),
+// σ_total ≈ 13.5 (high variance dans NFL via gros écarts blowouts/upsets),
+// σ_margin ≈ 13.0 (similaire). Lignes typiques : totaux 38.5-51.5, spreads ±3/7.
+function nflScoreProjection(match) {
+  if (match.sport !== 'football-american' && match.sport !== 'nfl') return null;
+  const { home, away } = getSides(match);
+  const h = last5Rates(home), a = last5Rates(away);
+  if (!h || !a) return null;
+  const HOME_ADV = 2.5;  // NFL home advantage en points (consensus 2-3)
+  const projH = (h.scored + a.conceded) / 2 + HOME_ADV;
+  const projA = (a.scored + h.conceded) / 2;
+  const total = projH + projA;
+  const margin = projH - projA;
+  const sigmaTotal = 13.5;
+  const sigmaMargin = 13.0;
+  const phiCdf = (z) => 1 / (1 + Math.exp(-1.702 * z));
+  const totals = [38.5, 41.5, 44.5, 47.5, 51.5].map(line => {
+    const z = (total - line) / sigmaTotal;
+    return { line, pOver: phiCdf(z), pUnder: 1 - phiCdf(z), label: `Plus de ${line} pts` };
+  });
+  const spreads = [3, 7, 10].map(s => ({
+    line: s,
+    home_minus: phiCdf((margin - s) / sigmaMargin),
+    home_plus: 1 - phiCdf((margin - (-s)) / sigmaMargin),
+    away_minus: phiCdf((-margin - s) / sigmaMargin),
+    away_plus: 1 - phiCdf((-margin - (-s)) / sigmaMargin),
+    label: `Spread ±${s}`,
+  }));
+  const teamTotalsHome = [20.5, 23.5, 27.5].map(line => {
+    const z = (projH - line) / (sigmaTotal / Math.sqrt(2));
+    return { line, side: 'home', pOver: phiCdf(z), pUnder: 1 - phiCdf(z) };
+  });
+  const teamTotalsAway = [17.5, 20.5, 23.5].map(line => {
+    const z = (projA - line) / (sigmaTotal / Math.sqrt(2));
+    return { line, side: 'away', pOver: phiCdf(z), pUnder: 1 - phiCdf(z) };
+  });
+  return {
+    kind: 'nfl',
+    items: [{ home: Math.round(projH), away: Math.round(projA), prob: 1, label: `${Math.round(projH)}-${Math.round(projA)}` }],
+    total: Math.round(total * 10) / 10,
+    margin: Math.round(margin * 10) / 10,
+    caption: `Projection NFL last5 attaque/défense (Gaussienne σ_total≈${sigmaTotal}, home-adv +${HOME_ADV}pts).`,
+    markets: { totals, spreads, teamTotals: { home: teamTotalsHome, away: teamTotalsAway }, sigmaTotal, sigmaMargin },
+  };
+}
+
 function basketScoreProjection(match) {
 if (match.sport !== 'basketball') return null;
 const { home, away } = getSides(match);
@@ -11453,6 +11500,8 @@ if (poi) return poissonTopScores(poi.lamH, poi.lamA, 10, 6, match.league_code);
 if (match.sport === 'hockey') return hockeyScorePrediction(match);
 if (match.sport === 'basketball') return basketScoreProjection(match);
 if (match.sport === 'baseball') return baseballScoreProjection(match);
+// v53.4 — NFL projection dédiée (avant : fallback tennisScorePrediction = bidon).
+if (match.sport === 'football-american' || match.sport === 'nfl') return nflScoreProjection(match);
 if (match.sport === 'tennis') {
 const ph = best_pick[2] === '1' ? best_pick[1] : (1 - best_pick[1]);
 return tennisScorePrediction(match, ph);

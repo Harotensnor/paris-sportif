@@ -191,6 +191,8 @@ jobs:
           python3 fetch_footballdata.py || true
           if [ $MIN_MOD15 -lt 5 ]; then
             python3 fetch_mlb_pitchers.py || true
+            # v53.4 — Statcast pitcher metrics (xwOBA, K%, barrel%, exit velo)
+            python3 fetch_baseball_savant.py || true
             python3 fetch_nhl_stats.py || true
             python3 fetch_nba_team_stats.py || true
             # v52.5 — Advanced team stats (NBA eFG/AST/TO, MLB OPS/runs, NHL
@@ -461,7 +463,7 @@ jobs:
             boosted_odds.json \
             results_archive.jsonl tennis_ratings.json.gz footballdata.json.gz \
             bayesian_priors.json.gz team_priors.json.gz team_form.json.gz \
-            mlb_pitchers.json nhl_stats.json backtest.html feed.xml \
+            mlb_pitchers.json baseball_savant.json nhl_stats.json backtest.html feed.xml \
             credibilite.html stadiums.json dixon_coles_rho.json index.html \
             nba_team_stats.json nba_advanced.json mlb_advanced.json nhl_advanced.json team_strengths.json team_strengths_mle.json \
             ci_heartbeat.json sofascore_events.json clv_history.json clv_summary.json \

@@ -104,6 +104,7 @@ FETCH_STAGES = [
     ('fetch_tennis_sackmann.py',   1,   60),   # ATP/WTA Elo + surface + fatigue, 24h cache
     ('fetch_footballdata.py',     180,   60),   # closing odds + league calibration, 6h cache; local 3h probe
     ('fetch_mlb_pitchers.py',      5,   60),   # MLB Stats API probable pitchers, 6h cache
+    ('fetch_baseball_savant.py',  60,  300),   # v53.4 — Statcast pitcher metrics, 5h cache
     ('fetch_nhl_stats.py',        10,   60),   # NHL official API team stats + starting goalie, 10min cache
     ('fetch_nba_team_stats.py',    5,   30),
     ('fetch_advanced_stats.py',   12,  120),   # v52.5 — NBA/MLB/NHL advanced (eFG, OPS, PP%/PK%/FOW%), 1h cache
