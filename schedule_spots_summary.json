@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-09T13:37:04Z",
+  "generated_at": "2026-05-09T13:40:39Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -634,11 +634,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -1.348,
-        "away_score": -0.537,
-        "home_fade": 1.75,
-        "away_fade": 1.15,
-        "reason": "Direction nette: Carolina Hurricanes (-0.54)",
+        "home_score": -0.698,
+        "away_score": 0.112,
+        "home_fade": 0.75,
+        "away_fade": 0.15,
+        "reason": "Direction nette: Carolina Hurricanes (+0.11)",
         "detail": [
           {
             "side": "home",
@@ -657,18 +657,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
           }
         ]
       }
@@ -980,13 +968,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.747,
-        "away_score": -0.747,
-        "home_fade": 1.15,
-        "away_fade": 1.15,
-        "reason": "Signaux opposes: Minnesota Wild fade 1.15, Colorado Avalanche fade 1.15 -> prudence",
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.098,
+        "away_score": -0.098,
+        "home_fade": 0.15,
+        "away_fade": 0.15,
+        "reason": "Direction nette: Colorado Avalanche (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -999,18 +987,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
           }
         ]
       }
