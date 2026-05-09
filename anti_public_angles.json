@@ -1,12 +1,48 @@
 {
-  "generated_at": "2026-05-09T06:11:08Z",
+  "generated_at": "2026-05-09T06:15:02Z",
   "source": "data.js event.smart_money derived from odds_history",
-  "status": "empty",
+  "status": "ok",
   "summary": {
-    "active": 0,
+    "active": 2,
     "expired_sample": 0,
-    "by_type": {}
+    "by_type": {
+      "balanced_steam": 1,
+      "underdog_steam": 1
+    }
   },
-  "active": [],
+  "active": [
+    {
+      "event_id": "401864043",
+      "kickoff": "2026-05-09T15:00Z",
+      "sport": "football",
+      "league": "bundesligaautriche",
+      "match": "Wolfsberger at SV Josko Ried",
+      "side": "home",
+      "pick_key": "1",
+      "type": "balanced_steam",
+      "reason": "Mouvement cote net 8.7% sur home",
+      "odd_open": 2.3,
+      "odd_latest": 2.1,
+      "odd_drop_pct": 8.7,
+      "confidence": 0.799,
+      "snapshots": 4
+    },
+    {
+      "event_id": "750206",
+      "kickoff": "2026-05-09T17:00Z",
+      "sport": "football",
+      "league": "superlig",
+      "match": "Kayserispor at Alanyaspor",
+      "side": "away",
+      "pick_key": "2",
+      "type": "underdog_steam",
+      "reason": "Cote outsider compressee de 8.3%",
+      "odd_open": 3.0,
+      "odd_latest": 2.75,
+      "odd_drop_pct": 8.33,
+      "confidence": 0.788,
+      "snapshots": 4
+    }
+  ],
   "expired_sample": []
 }
