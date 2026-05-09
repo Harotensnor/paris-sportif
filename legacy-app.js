@@ -8593,19 +8593,33 @@ try {
     });
     const el = document.getElementById('trust-user-daily');
     if (el) {
+      const parent = el.closest('.trust-strip-stat');
       if (settled === 0) {
-        el.textContent = '—';
-        el.style.color = 'var(--text-dim)';
+        // v46.0 — Auto-hide widget vide pour declutter trust strip
+        if (parent) parent.style.display = 'none';
+        const prevSep = parent && parent.previousElementSibling;
+        if (prevSep && prevSep.classList.contains('trust-strip-sep')) prevSep.style.display = 'none';
       } else {
         const sign = pnl >= 0 ? '+' : '';
         el.textContent = `${sign}${pnl.toFixed(2)}€`;
         el.style.color = pnl >= 0 ? '#10b981' : '#ef4444';
         el.style.fontWeight = '700';
-        const parent = el.closest('.trust-strip-stat');
         if (parent) parent.title = `P&L 24h glissant : ${sign}${pnl.toFixed(2)}€ sur ${settled} paris settled (${won}W).`;
       }
     }
   }
+} catch (e) { /* swallowError(e); */ }
+// v46.0 — Auto-hide paper widget si "0/N" pending (no proof yet)
+try {
+  setTimeout(() => {
+    const paperEl = document.getElementById('trust-paper-roi');
+    if (paperEl && (paperEl.textContent || '').match(/^0\//)) {
+      const parent = paperEl.closest('.trust-strip-stat');
+      if (parent) parent.style.display = 'none';
+      const prevSep = parent && parent.previousElementSibling;
+      if (prevSep && prevSep.classList.contains('trust-strip-sep')) prevSep.style.display = 'none';
+    }
+  }, 2000);
 } catch (e) { /* swallowError(e); */ }
 // AUDIT 2026-05-09 v45.5 — Paper trading forward ROI widget.
 try {
@@ -19359,23 +19373,18 @@ const v36TableHtml = `<section class="v36-table-panel" aria-label="Tableau dense
         <header class="v36-table-toolbar">
           <div>
             <strong>${v36TableRows.length} lignes · ${esc(v37ScopeLabel)}</strong>
-            <span>${v36PickPool.length} picks qualifiés${v37DataOnlyPool.length ? ` · ${v37DataOnlyPool.length} lignes data fiable` : ''} · ${v40BettableCount} <b style="color:#34d399;">misables</b>${v36TableRows.length !== v37RenderPool.length ? ` · ${v36TableRows.length}/${v37RenderPool.length} affichés` : ` · ${v36TableRows.length} affichés`}${v40HiddenCount > 0 ? ` · <button type="button" data-v40-toggle-strict style="background:none;border:1px solid var(--text-dim);color:var(--text-dim);padding:2px 8px;border-radius:6px;font-size:11px;cursor:pointer;">${v40StrictApplied ? `+ ${v40HiddenCount} non-misables cachés` : `Mode strict (cacher ${v40HiddenCount})`}</button>` : ''}</span>
+            <span>${v36PickPool.length} picks · ${v40BettableCount} <b style="color:#34d399;">misables</b>${v40HiddenCount > 0 ? ` · <button type="button" data-v40-toggle-strict style="background:none;border:1px solid var(--text-dim);color:var(--text-dim);padding:2px 8px;border-radius:6px;font-size:11px;cursor:pointer;">${v40StrictApplied ? `+${v40HiddenCount} cachés` : `cacher ${v40HiddenCount}`}</button>` : ''}</span>
           </div>
           <label class="v36-table-search"><span>Search</span><input type="search" data-v36-search value="${esc(v36Search)}" placeholder="Équipe, ligue, marché"></label>
-          <button type="button" class="v37-blind-toggle ${v37BlindMode ? 'is-active' : ''}" data-v37-blind aria-pressed="${v37BlindMode ? 'true' : 'false'}" data-tooltip="Cache cote et edge dans le dashboard pour lire l'analyse avant le rendement.">
-            <span>Mode blind</span><b>${v37BlindMode ? 'ON' : 'OFF'}</b>
-          </button>
-          ${v37TrackFirstButton}
+          ${/* v46.0 — v37BlindToggle + v37TrackFirstButton retirés (redondants
+                avec bulk track). Sort buttons réduits 7 → 4. */ ''}
           ${v45BulkTrackBtn}
           ${v45PnlChip}
           <div class="v36-sort-strip" aria-label="Tri tableau">
-            ${v36SortButton('tier', 'Tier')}
-            ${v36SortButton('date', 'Date')}
-            ${v36SortButton('time', 'Heure')}
-            ${v36SortButton('odd', 'Cote')}
-            ${v36SortButton('conf', 'Chances')}
-            ${v36SortButton('edge', 'Avantage')}
             ${v36SortButton('score', 'Priorité')}
+            ${v36SortButton('edge', 'Avantage')}
+            ${v36SortButton('odd', 'Cote')}
+            ${v36SortButton('date', 'Date')}
           </div>
         </header>
         <div class="v36-table-scroll">
