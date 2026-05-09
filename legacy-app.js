@@ -18983,12 +18983,20 @@ const v43StrategyBannerHtml = `<section class="v37-empty-pool-help v43-strategy-
             ${v43ValueListHtml}
           </div>
         </div>
-        <div style="margin-top:10px;padding:10px 12px;background:rgba(15,15,20,0.5);border-radius:6px;font-size:11px;color:var(--text-dim);line-height:1.5;display:flex;flex-wrap:wrap;align-items:center;gap:10px;">
+        ${(() => {
+          // v45.1 fix : lire bankroll depuis localStorage directement (userBankroll
+          // const est défini PLUS BAS dans renderDashboardPage donc TDZ ici).
+          let _bk = 100;
+          try { const v = parseFloat(localStorage.getItem('userBankroll')); if (isFinite(v) && v > 0) _bk = v; } catch (e) {}
+          const _u = (typeof window._v45FlatStake === 'function') ? window._v45FlatStake(_bk) : Math.max(1, Math.round(_bk * 0.01));
+          const _isKelly = (typeof window._v45StakeMode === 'function' && window._v45StakeMode() === 'kelly');
+          return `<div style="margin-top:10px;padding:10px 12px;background:rgba(15,15,20,0.5);border-radius:6px;font-size:11px;color:var(--text-dim);line-height:1.5;display:flex;flex-wrap:wrap;align-items:center;gap:10px;">
           <span><b style="color:var(--text);">Rappel :</b> mise <b style="color:#10b981;">FLAT 1u</b> recommandée (Kelly bankrupted -30% en backtest, max_dd 99.99%).</span>
-          <span style="color:var(--text-dim2);">Sur ${userBankroll}€ bankroll → 1u = <b style="color:#10b981;">${(typeof window._v45FlatStake === 'function') ? window._v45FlatStake(userBankroll) : Math.round(userBankroll*0.01)}€</b>/pick.</span>
-          <button type="button" onclick="window._v45SetStakeMode(window._v45StakeMode() === 'kelly' ? 'flat' : 'kelly');location.reload();" style="margin-left:auto;padding:3px 10px;background:${(typeof window._v45StakeMode === 'function' && window._v45StakeMode() === 'kelly') ? 'rgba(239,68,68,.2)' : 'rgba(16,185,129,.18)'};border:1px solid ${(typeof window._v45StakeMode === 'function' && window._v45StakeMode() === 'kelly') ? '#ef4444' : '#10b981'};color:${(typeof window._v45StakeMode === 'function' && window._v45StakeMode() === 'kelly') ? '#ef4444' : '#10b981'};border-radius:999px;font-size:10.5px;font-weight:700;cursor:pointer;">${(typeof window._v45StakeMode === 'function' && window._v45StakeMode() === 'kelly') ? '⚠️ Mode Kelly (à éviter)' : '✓ Mode FLAT 1u'}</button>
+          <span style="color:var(--text-dim2);">Sur ${_bk}€ bankroll → 1u = <b style="color:#10b981;">${_u}€</b>/pick.</span>
+          <button type="button" onclick="window._v45SetStakeMode(window._v45StakeMode() === 'kelly' ? 'flat' : 'kelly');location.reload();" style="margin-left:auto;padding:3px 10px;background:${_isKelly ? 'rgba(239,68,68,.2)' : 'rgba(16,185,129,.18)'};border:1px solid ${_isKelly ? '#ef4444' : '#10b981'};color:${_isKelly ? '#ef4444' : '#10b981'};border-radius:999px;font-size:10.5px;font-weight:700;cursor:pointer;">${_isKelly ? '⚠️ Mode Kelly (à éviter)' : '✓ Mode FLAT 1u'}</button>
           <div style="flex:0 0 100%;color:#ef4444;font-size:10.5px;">Tiers Safe/Solid restent affichés mais sont <b>historiquement perdants</b>.</div>
-        </div>
+        </div>`;
+        })()}
       </section>`;
 
 const v36TableHtml = `<section class="v36-table-panel" aria-label="Tableau dense des propositions">
