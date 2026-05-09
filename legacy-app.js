@@ -13707,17 +13707,32 @@ ${(!weather && !ref && !meetingsCount) ? '<span class="u-text-dim2">Pas de condi
           const dq = (typeof computeDataQuality === 'function') ? computeDataQuality(match) : null;
           const dqWeak = dq && dq.score <= 2;
           if (!top3.length && !risk && !dqWeak) return '';
-          const rel = pred.reliability ?? pred.pick.prob;
-          const edge = pickOdd ? valueBetEdge(rel, pickOdd) : null;
+          // v52.2 — Audit user feedback : verdict + "Notre pronostic" affichaient
+          // pred.pick (raw 1n2) tandis que "Pourquoi ce pari" affichait
+          // _agentBestPick (souvent autre marché après v52.0 multiplier).
+          // Résultat : modale schizophrène pour l'user (ex: "1 · Clermont" en haut,
+          // "Domicile ou Nul" en bas, deux paris différents !).
+          // Fix : utiliser _agentBestPick ici aussi pour cohérence.
+          // Si _agentBestPick retourne un autre marché, on l'affiche → cohérence
+          // avec la section "Pourquoi ce pari" qui utilise déjà whyBest.
+          const verdictBest = (() => {
+            try { return (typeof _agentBestPick === 'function') ? _agentBestPick(match, pred) : null; }
+            catch(e) { return null; }
+          })();
+          const verdictLabel = verdictBest?.label || pred.pick.label;
+          const verdictRel = Number(verdictBest?.rel ?? verdictBest?.prob ?? pred.reliability ?? pred.pick.prob);
+          const verdictOdd = Number(verdictBest?.odd || pickOdd || 0);
+          const rel = verdictRel || (pred.reliability ?? pred.pick.prob);
+          const edge = verdictOdd ? valueBetEdge(rel, verdictOdd) : null;
           const edgePct = edge != null ? Math.round(edge * 100) : null;
           const isValue = edge != null && edge >= 0.05;
           let lead = '';
           if (isValue) {
-            lead = `<b class="u-text-accent">${esc(pred.pick.label)}</b> avec <b>${edgePct >= 0 ? '+' : ''}${edgePct}pt d'avantage marché</b>.`;
+            lead = `<b class="u-text-accent">${esc(verdictLabel)}</b> avec <b>${edgePct >= 0 ? '+' : ''}${edgePct}pt d'avantage marché</b>.`;
           } else if (rel >= 0.70) {
-            lead = `<b class="u-text-accent">${esc(pred.pick.label)}</b>, pari sûr (${(rel*100).toFixed(0)}% conf.).`;
+            lead = `<b class="u-text-accent">${esc(verdictLabel)}</b>, pari sûr (${(rel*100).toFixed(0)}% conf.).`;
           } else {
-            lead = `<b class="u-text">${esc(pred.pick.label)}</b> recommandé (${(rel*100).toFixed(0)}% conf.).`;
+            lead = `<b class="u-text">${esc(verdictLabel)}</b> recommandé (${(rel*100).toFixed(0)}% conf.).`;
           }
           let detail = '';
           if (top3.length) {
