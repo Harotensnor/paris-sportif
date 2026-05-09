@@ -66,30 +66,35 @@ jobs:
       - name: Fetch pipeline (parallèle)
         run: |
           cd scripts
-          # Group A : fetchers heavy en parallèle (background avec &)
-          (python3 fetch_live.py || true) > /tmp/fetch_live.log 2>&1 &
+          # v47.5 — Timeout 180s par fetcher pour empêcher hang (un fetcher
+          # qui pend bloquait tout le step 'wait' pendant 10 min → step KILL).
+          # AUDIT 2026-05-09 : le step 'Fetch parallèle' échouait toutes les
+          # 5 min en cancelled/failure. Ajout timeout permet aux fetchers
+          # rapides de réussir même si un fetcher est pendu.
+          (timeout 180 python3 fetch_live.py || true) > /tmp/fetch_live.log 2>&1 &
           PID_LIVE=$!
-          (python3 fetch_sofascore_events.py || true) > /tmp/fetch_sofa.log 2>&1 &
+          (timeout 180 python3 fetch_sofascore_events.py || true) > /tmp/fetch_sofa.log 2>&1 &
           PID_SOFA=$!
-          (python3 fetch_winamax_catalog.py || true) > /tmp/fetch_wnx.log 2>&1 &
+          (timeout 180 python3 fetch_winamax_catalog.py || true) > /tmp/fetch_wnx.log 2>&1 &
           PID_WNX=$!
-          (python3 fetch_h2h.py || true) > /tmp/fetch_h2h.log 2>&1 &
+          (timeout 180 python3 fetch_h2h.py || true) > /tmp/fetch_h2h.log 2>&1 &
           PID_H2H=$!
-          (python3 fetch_forebet.py || true) > /tmp/fetch_forebet.log 2>&1 &
+          (timeout 180 python3 fetch_forebet.py || true) > /tmp/fetch_forebet.log 2>&1 &
           PID_FOREBET=$!
-          (python3 fetch_tennis_odds.py || true) > /tmp/fetch_tennis.log 2>&1 &
+          (timeout 180 python3 fetch_tennis_odds.py || true) > /tmp/fetch_tennis.log 2>&1 &
           PID_TENNIS=$!
-          (python3 fetch_rus_odds.py || true) > /tmp/fetch_rus.log 2>&1 &
+          (timeout 180 python3 fetch_rus_odds.py || true) > /tmp/fetch_rus.log 2>&1 &
           PID_RUS=$!
-          (python3 fetch_injuries.py || true) > /tmp/fetch_inj.log 2>&1 &
+          (timeout 180 python3 fetch_injuries.py || true) > /tmp/fetch_inj.log 2>&1 &
           PID_INJ=$!
-          (python3 fetch_clubelo.py || true) > /tmp/fetch_clubelo.log 2>&1 &
+          (timeout 180 python3 fetch_clubelo.py || true) > /tmp/fetch_clubelo.log 2>&1 &
           PID_ELO=$!
-          (python3 fetch_understat_xg.py || true) > /tmp/fetch_xg.log 2>&1 &
+          (timeout 180 python3 fetch_understat_xg.py || true) > /tmp/fetch_xg.log 2>&1 &
           PID_XG=$!
-          (python3 fetch_fbref_xg.py || true) > /tmp/fetch_fbref_xg.log 2>&1 &
+          (timeout 180 python3 fetch_fbref_xg.py || true) > /tmp/fetch_fbref_xg.log 2>&1 &
           PID_FBREF_XG=$!
-          # Wait pour TOUS et imprime les logs (mêmes timeouts implicites = pas de limite ici)
+          # Wait pour TOUS — chaque process a son propre timeout 180s donc
+          # max bloc 3 min, tous les fetchers réussis sont commit.
           wait $PID_LIVE $PID_SOFA $PID_WNX $PID_H2H $PID_FOREBET $PID_TENNIS $PID_RUS $PID_INJ $PID_ELO $PID_XG $PID_FBREF_XG
           echo "=== fetch_live ==="; cat /tmp/fetch_live.log | tail -3
           echo "=== fetch_sofascore ==="; cat /tmp/fetch_sofa.log | tail -3
