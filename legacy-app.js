@@ -7861,11 +7861,16 @@ return { ...probs, lamH, lamA, fbrefBlend, bayesianPrior, starImpact, stadiumEff
 let __congestionCache = null;
 let __congestionCacheRef = null;
 let __venueTimelineCache = null;
+// v53.2 — Cache des fixtures par équipe avec league_code pour détecter les
+// rotations (B-team) : si une équipe a un gros match (UCL/UEL/Coupe) dans
+// les ±4 jours autour de ce match, elle fait probablement tourner.
+let __teamFixturesCache = null;
 function getCongestionMap() {
 const cur = window.PRONOSTICS_DATA;
 if (__congestionCacheRef !== cur) {
 __congestionCache = new Map();
 __venueTimelineCache = new Map();
+__teamFixturesCache = new Map();
 const days = cur?.days || {};
 for (const dkey in days) {
 const list = days[dkey] || [];
@@ -7885,15 +7890,65 @@ arr.push(t);
 let varr = __venueTimelineCache.get(key);
 if (!varr) { varr = []; __venueTimelineCache.set(key, varr); }
 varr.push({ ts: t, hostAbbr, sport: m.sport });
+let farr = __teamFixturesCache.get(key);
+if (!farr) { farr = []; __teamFixturesCache.set(key, farr); }
+farr.push({ ts: t, league_code: m.league_code || '', league_name: m.league_name || '', sport: m.sport, match_id: m.id });
 }
 }
 }
 for (const arr of __congestionCache.values()) arr.sort((a, b) => a - b);
 for (const arr of __venueTimelineCache.values()) arr.sort((a, b) => a.ts - b.ts);
+for (const arr of __teamFixturesCache.values()) arr.sort((a, b) => a.ts - b.ts);
 __congestionCacheRef = cur;
 }
 return __congestionCache;
 }
+
+// v53.2 — rotationContext(teamName, matchTime) : détecte si la team a un
+// gros match (UCL / UEL / Conference / Coupe nationale) dans les ±4 jours
+// autour de matchTime → rotation likely → effectif réduit → pénalité.
+// Retourne { hasBigRecent, hasBigUpcoming, penalty 0..0.06 }.
+const _BIG_MATCH_PATTERNS = [
+  /uefa.champ/i, /champions.league/i, /^uefa.cl$/i,
+  /uefa.europa/i, /europa.league/i, /^uefa.el$/i,
+  /uefa.confer/i, /^uefa.conf/i,
+  /coupe.france|coupe.fra/i, /coupe.italie|coppa.italia/i,
+  /copa.del.rey|copa.rey/i, /coupe.allemagne|dfb.pokal/i,
+  /coupe.angleterre|fa.cup|efl.cup/i,
+];
+function _isBigMatch(league_code, league_name) {
+  const s = `${league_code || ''} ${league_name || ''}`.toLowerCase();
+  return _BIG_MATCH_PATTERNS.some(re => re.test(s));
+}
+function rotationContext(teamName, matchTime) {
+  if (!teamName || !matchTime) return { hasBigRecent: false, hasBigUpcoming: false, penalty: 0 };
+  getCongestionMap();
+  const arr = __teamFixturesCache?.get(teamName) || [];
+  if (!arr.length) return { hasBigRecent: false, hasBigUpcoming: false, penalty: 0 };
+  const dayMs = 24 * 3600 * 1000;
+  const recentStart = matchTime - 4 * dayMs;
+  const upcomingEnd = matchTime + 4 * dayMs;
+  let bigRecent = null, bigUpcoming = null;
+  for (const f of arr) {
+    if (f.ts >= matchTime - 60000 && f.ts <= matchTime + 60000) continue; // c'est ce match
+    if (!_isBigMatch(f.league_code, f.league_name)) continue;
+    if (f.ts >= recentStart && f.ts < matchTime && !bigRecent) bigRecent = f;
+    else if (f.ts > matchTime && f.ts <= upcomingEnd && !bigUpcoming) bigUpcoming = f;
+  }
+  // Pénalité : -3% si gros match récent OR à venir, -5% si les deux.
+  let penalty = 0;
+  if (bigRecent) penalty += 0.03;
+  if (bigUpcoming) penalty += 0.03;
+  if (bigRecent && bigUpcoming) penalty = 0.05; // cap combined
+  return {
+    hasBigRecent: !!bigRecent,
+    hasBigUpcoming: !!bigUpcoming,
+    bigRecent: bigRecent ? { league_name: bigRecent.league_name, days_ago: Math.round((matchTime - bigRecent.ts) / dayMs * 10) / 10 } : null,
+    bigUpcoming: bigUpcoming ? { league_name: bigUpcoming.league_name, days_ahead: Math.round((bigUpcoming.ts - matchTime) / dayMs * 10) / 10 } : null,
+    penalty,
+  };
+}
+try { window.rotationContext = rotationContext; } catch(e) { swallowError(e); }
 function lastVenueBeforeMatch(teamName, matchTime, lookbackDays = 14) {
 if (!teamName || !matchTime) return null;
 getCongestionMap();  // ensures __venueTimelineCache is built
@@ -9610,6 +9665,22 @@ const aPen = Math.max(0, aCnt - 1) * 0.015 + aCnt3 * 0.010;
 congestionNudge = Math.max(-0.04, Math.min(0.04, aPen - hPen));
 congestionStats = { home: hCnt, away: aCnt, home_3d: hCnt3, away_3d: aCnt3 };
 }
+// v53.2 — Rotation/B-team detection : si UCL/UEL/Coupe ±4j, équipe fait
+// tourner. Pénalité forte (jusqu'à 5%) sur le côté concerné.
+const hRot = (typeof rotationContext === 'function') ? rotationContext(home?.name, matchTime) : null;
+const aRot = (typeof rotationContext === 'function') ? rotationContext(away?.name, matchTime) : null;
+if ((hRot && hRot.penalty > 0) || (aRot && aRot.penalty > 0)) {
+  const hPen = hRot?.penalty || 0;
+  const aPen = aRot?.penalty || 0;
+  // Net nudge : favorise le côté QUI N'A PAS de rotation. Si home rotate = home plus faible.
+  const rotNudge = Math.max(-0.05, Math.min(0.05, aPen - hPen));
+  congestionNudge = Math.max(-0.07, Math.min(0.07, (congestionNudge || 0) + rotNudge));
+  congestionStats = congestionStats || {};
+  congestionStats.rotation = {
+    home: hRot && hRot.penalty > 0 ? { recent: hRot.bigRecent, upcoming: hRot.bigUpcoming, pen: hRot.penalty } : null,
+    away: aRot && aRot.penalty > 0 ? { recent: aRot.bigRecent, upcoming: aRot.bigUpcoming, pen: aRot.penalty } : null,
+  };
+}
 
 const hDays = daysSinceLastMatch(home?.name, matchTime);
 const aDays = daysSinceLastMatch(away?.name, matchTime);
@@ -9782,14 +9853,28 @@ const luA = away && away.lineup;
 if (luH || luA) {
 const hConf = !!(luH && luH.confirmed);
 const aConf = !!(luA && luA.confirmed);
-if (hConf && aConf) lineupBoost = 0.025;       // both confirmed
-else if (hConf || aConf) lineupBoost = 0.012;  // one confirmed
-else lineupBoost = -0.010;                      // both predicted only
+// v53.2 — Lineup boost ×2 (était trop faible). User feedback :
+// "tu prends pas trop en compte la composition... c'est le plus important presque".
+// Confirmed lineups sont LE signal pré-match le plus important — un star
+// out, une équipe B annoncée, change radicalement les probas.
+if (hConf && aConf) lineupBoost = 0.05;        // both confirmed (était 0.025)
+else if (hConf || aConf) lineupBoost = 0.025;  // one confirmed (était 0.012)
+else lineupBoost = -0.020;                      // both predicted only (était -0.010)
 lineupStats = {
 homeConfirmed: hConf,
 awayConfirmed: aConf,
 boost: Math.round(lineupBoost * 1000) / 1000,
 };
+}
+// v53.2 — Pénalité lineup manquante quand kickoff < 6h (devrait être dispo).
+// Avant : silent skip si pas de lineup. Maintenant : pénalité reliability.
+if (!luH && !luA && match.date) {
+  const minToKickoff = (Date.parse(match.date) - Date.now()) / 60000;
+  if (minToKickoff > 0 && minToKickoff < 360) {  // < 6h, on devrait avoir
+    lineupBoost -= 0.030;  // -3% reliability sur match imminent sans lineup
+    lineupStats = lineupStats || {};
+    lineupStats.lineupMissingNearKickoff = true;
+  }
 }
 }
 
