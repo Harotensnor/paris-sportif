@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-09T02:19:49Z",
+  "generated_at": "2026-05-09T02:23:20Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -476,13 +476,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
+        "status": "mixed",
+        "net_side": null,
         "home_score": 0.252,
-        "away_score": -1.097,
+        "away_score": -0.613,
         "home_fade": 0.15,
         "away_fade": 1.15,
-        "reason": "Direction nette: Cincinnati Reds (+0.25)",
+        "reason": "Signaux mitigés: avantage net trop faible (Cincinnati Reds +0.25, Houston Astros -0.61)",
         "detail": [
           {
             "side": "home",
@@ -501,6 +501,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.484
           }
         ]
       }
@@ -594,11 +600,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.698,
-        "away_score": 0.112,
-        "home_fade": 0.75,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Carolina Hurricanes (+0.11)",
+        "home_score": -1.348,
+        "away_score": -0.537,
+        "home_fade": 1.75,
+        "away_fade": 1.15,
+        "reason": "Direction nette: Carolina Hurricanes (-0.54)",
         "detail": [
           {
             "side": "home",
@@ -617,6 +623,18 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
@@ -922,13 +940,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Colorado Avalanche (-0.10)",
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.747,
+        "away_score": -0.747,
+        "home_fade": 1.15,
+        "away_fade": 1.15,
+        "reason": "Signaux opposes: Minnesota Wild fade 1.15, Colorado Avalanche fade 1.15 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -941,6 +959,18 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
@@ -1080,11 +1110,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.597,
+        "home_score": 0.902,
         "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Minnesota Timberwolves (+0.60)",
+        "reason": "Direction nette: Minnesota Timberwolves (+0.90)",
         "detail": [
           {
             "side": "home",
@@ -1102,7 +1132,7 @@
             "side": "home",
             "type": "market_move",
             "direction": "steam",
-            "strength": 0.694
+            "strength": 1.0
           }
         ]
       }
@@ -1313,10 +1343,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.098,
-        "away_score": 0.597,
+        "away_score": 0.902,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Minnesota Timberwolves (+0.60)",
+        "reason": "Direction nette: Minnesota Timberwolves (+0.90)",
         "detail": [
           {
             "side": "home",
@@ -1334,7 +1364,7 @@
             "side": "away",
             "type": "market_move",
             "direction": "steam",
-            "strength": 0.694
+            "strength": 1.0
           }
         ]
       }
@@ -1854,19 +1884,25 @@
         "1 match dans les 48h + 3634 km de voyage"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.354,
+        "status": "mixed",
+        "net_side": null,
+        "home_score": 0.237,
         "away_score": -1.495,
         "home_fade": 1.0,
         "away_fade": 1.845,
-        "reason": "Direction nette: San Francisco Giants (-0.35)",
+        "reason": "Signaux mitigés: avantage net trop faible (San Francisco Giants +0.24, Pittsburgh Pirates -1.50)",
         "detail": [
           {
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.591
           },
           {
             "side": "away",
@@ -2031,25 +2067,19 @@
         "1 match dans les 48h + 3100 km de voyage"
       ],
       "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
-        "home_score": 0.358,
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.198,
         "away_score": -1.441,
         "home_fade": 0.8,
         "away_fade": 1.721,
-        "reason": "Signaux mitigés: avantage net trop faible (Los Angeles Dodgers +0.36, Atlanta Braves -1.44)",
+        "reason": "Direction nette: Los Angeles Dodgers (-0.20)",
         "detail": [
           {
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.556
           },
           {
             "side": "away",
@@ -2289,7 +2319,7 @@
       "global_resolution": {
         "status": "abstain",
         "net_side": null,
-        "home_score": -0.802,
+        "home_score": -0.092,
         "away_score": -0.593,
         "home_fade": 1.15,
         "away_fade": 0.995,
@@ -2312,6 +2342,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.71
           },
           {
             "side": "away",
@@ -2605,13 +2641,13 @@
         "Deplacement estime 3100 km, decalage ~2.3h"
       ],
       "global_resolution": {
-        "status": "abstain",
+        "status": "mixed",
         "net_side": null,
-        "home_score": -0.645,
-        "away_score": -0.538,
-        "home_fade": 0.95,
+        "home_score": -1.22,
+        "away_score": 0.663,
+        "home_fade": 1.525,
         "away_fade": 0.871,
-        "reason": "Signaux opposes: Los Angeles Dodgers fade 0.95, Atlanta Braves fade 0.87 -> prudence",
+        "reason": "Signaux mitigés: avantage net trop faible (Los Angeles Dodgers -1.22, Atlanta Braves +0.66)",
         "detail": [
           {
             "side": "home",
@@ -2630,6 +2666,18 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 0.575
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
           },
           {
             "side": "away",
@@ -2732,11 +2780,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 1.669,
-        "away_score": -2.287,
+        "home_score": 0.319,
+        "away_score": -1.287,
         "home_fade": 0.15,
-        "away_fade": 2.34,
-        "reason": "Direction nette: Philadelphia Phillies (+1.67)",
+        "away_fade": 1.34,
+        "reason": "Direction nette: Philadelphia Phillies (+0.32)",
         "detail": [
           {
             "side": "home",
@@ -2755,18 +2803,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
           },
           {
             "side": "away",
