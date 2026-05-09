@@ -92,12 +92,50 @@ def _compact_markets_for_frontend(odds_block: dict) -> tuple[dict, dict]:
     # data.js is loaded by the app shell when a user forces a refresh. Keep it
     # to core dashboard markets only; detailed per-match rows remain available
     # in winamax_markets.json for offline audits/backtests.
+    # v50.5 — Élargissement marchés (audit user "élargir les marchés") :
+    # Winamax scrape ~1200 marchés par event football, mais data.js n'exposait
+    # que 5. Ajout de marchés populaires :
+    #   - corners_ou : total corners (très populaire foot)
+    #   - cards_ou : total cartons (popularité +++)
+    #   - team_total : total buts par équipe
+    #   - result_btts : résultat + BTTS combiné (populaire combiné)
+    #   - ht_ou : Mi-temps Over/Under
+    #   - exact_score : score exact (top 5 plus probables)
+    #   - handicap / basket_handicap / puck_line / baseball_handicap : handicaps
+    #   - basket_total / basket_team_total / basket_quarter_total : NBA totals
+    #   - basket_first_half_total : 1ère mi-temps NBA
+    #   - baseball_total / baseball_f5_total : MLB totals
+    #   - tennis_games : tennis total jeux
+    #   - mma_rounds / mma_goes_distance : MMA markets
+    #   - team_total : total buts par équipe foot
+    #   - ou (générique multi-lignes 1.5/2.5/3.5) : OU plusieurs lignes
+    # Coût estimé : data.js passe de ~1.7 MB à ~2.5-3 MB (acceptable inline).
+    # Si trop : reduce les exact_score à top 5 only, qui représente la majorité.
     keep_scalar_keys = {
-        '1n2',
-        'ou25',
-        'btts',
-        'dnb',
-        'ht_1n2',
+        # Tier 1 — core 5 marchés (existants)
+        '1n2', 'match_winner',
+        'ou', 'ou15', 'ou25', 'ou35',
+        'btts', 'btts_rows',
+        'dnb', 'dnb_rows',
+        'ht_1n2', 'ht_1n2_rows',
+        # v50.5 — Tier 2 marchés foot étendus (high value)
+        'ht_ou',
+        'team_total',                    # nb buts par équipe
+        'result_btts',                   # résultat + BTTS combiné (populaire combiné)
+        'exact_score',                   # score exact (top 5)
+        'double_chance', 'dc',           # double chance
+        'handicap',                      # handicap européen (sport football)
+        # Corners (foot)
+        'corners_ou', 'corners_ou75', 'corners_ou85', 'corners_ou95', 'corners_ou105', 'corners_ou115',
+        # Cartons (foot)
+        'cards_ou', 'cards_ou25', 'cards_ou35', 'cards_ou45', 'cards_ou55',
+        # Tier 3 marchés multi-sports
+        'basket_total', 'basket_team_total', 'basket_quarter_total', 'basket_first_half_total',
+        'basket_handicap',
+        'baseball_total', 'baseball_f5_total', 'baseball_handicap',
+        'puck_line',
+        'tennis_games', 'tennis_handicap',
+        'mma_rounds', 'mma_goes_distance',
     }
 
     all_rows = odds_block.get('all_markets')
