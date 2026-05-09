@@ -521,7 +521,8 @@ jobs:
             nba_team_stats.json team_strengths.json team_strengths_mle.json \
             ci_heartbeat.json sofascore_events.json clv_history.json clv_summary.json \
             og-default.png og-backtest.png og-credibilite.png og-methodologie.png sitemap.xml \
-            odds_aggregated.json
+            odds_aggregated.json \
+            paper_log.jsonl paper_log_summary.json picks_history.jsonl picks_history_summary.json
           do
             if [ -e "$path" ]; then
               git add "$path"
