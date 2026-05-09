@@ -8,13 +8,18 @@ name: refresh-data
 on:
   schedule:
     - cron: '*/5 10-23 * * *'    # day: every 5 min (limite GitHub Actions)
-    # v53.6 — User feedback "aucun prono dans la nuit". Avant : 15min
-    # night → MLB/NBA US-evening (Europe night) avaient des cotes stale,
-    # rejetées par v38 staleness check. Maintenant : 5min night TOUJOURS.
-    # Coût : 12 ticks/h × 10h night × ~3min/run = ~6h Actions/j (≈ 180h/mois,
-    # bien sous les 2000h free tier).
-    - cron: '*/5 0-9 * * *'      # night: every 5 min (was 15)
+    # v54.1 — Cron night ajusté à 10min (v53.6 essayait 5min mais le pipeline
+    # prenait ~5min → 2 runs concurrents → race git push → "Pipeline en panne".
+    # 10min laisse marge confortable + concurrency group ci-dessous évite
+    # tout overlap résiduel.
+    - cron: '*/10 0-9 * * *'     # night: every 10 min
   workflow_dispatch: {}
+
+# v54.1 — Concurrency lock : un seul run de refresh-data à la fois.
+# Empêche 2 ticks cron qui se chevauchent de race sur git push.
+concurrency:
+  group: paris-sportif-refresh-data
+  cancel-in-progress: false
 
 permissions:
   contents: write
