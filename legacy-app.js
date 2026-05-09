@@ -14163,6 +14163,31 @@ ${reasons.length ? `
                 ${reasons.map(r => `<li style="display:flex;gap:10px;padding:8px 10px;background:rgba(255,255,255,.02);border-radius:6px;font-size:13px;line-height:1.4;"><span style="font-size:15px;">${r.icon}</span><span style="color:var(--text,#e6ebf2);">${esc(r.text)}</span></li>`).join('')}
               </ul>
             </div>` : ''}
+${(() => {
+  // v54.0 — Confidence breakdown bar : viz horizontal des composants
+  // de la prédiction (poids relatifs des signaux).
+  try {
+    const comps = pred.explain?.components || pred.components || [];
+    if (!Array.isArray(comps) || comps.length === 0) return '';
+    const totalW = comps.reduce((s, c) => s + Math.abs(Number(c.w || c.weight || 0)), 0);
+    if (totalW <= 0) return '';
+    const palette = ['#a855f7', '#34d399', '#fbbf24', '#3b82f6', '#ef4444', '#f97316', '#06b6d4', '#ec4899'];
+    const sorted = comps.slice().sort((a, b) => Math.abs(Number(b.w || b.weight || 0)) - Math.abs(Number(a.w || a.weight || 0))).slice(0, 8);
+    const bar = sorted.map((c, i) => {
+      const pct = (Math.abs(Number(c.w || c.weight || 0)) / totalW) * 100;
+      return `<div style="flex:${pct.toFixed(2)};background:${palette[i % palette.length]};min-width:2px;" title="${esc(c.name || '?')} : ${pct.toFixed(1)}% du poids modèle"></div>`;
+    }).join('');
+    const legend = sorted.map((c, i) => {
+      const pct = (Math.abs(Number(c.w || c.weight || 0)) / totalW) * 100;
+      return `<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--text-2);"><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:${palette[i % palette.length]};"></span>${esc((c.icon || '') + ' ' + (c.name || '?')).slice(0, 22)} <b style="color:var(--text-dim);">${pct.toFixed(0)}%</b></span>`;
+    }).join('');
+    return `<div class="u-mt-3" style="padding:12px 14px;background:rgba(167,139,250,.05);border:1px solid rgba(167,139,250,.18);border-radius:8px;">
+      <div class="lbl-tiny-mb">📊 Composition de la confiance</div>
+      <div style="display:flex;height:14px;border-radius:6px;overflow:hidden;margin-bottom:8px;background:rgba(255,255,255,.04);">${bar}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px 14px;">${legend}</div>
+    </div>`;
+  } catch(e) { return ''; }
+})()}
 ${pred.reliabilityMeta ? (() => {
 const rm = pred.reliabilityMeta;
 const consensusPct = rm.agreement != null ? Math.round(rm.agreement*100) : null;
@@ -20840,15 +20865,18 @@ const v37IntelCount = Number(v37Intel.angles?.summary?.angles || 0) + Number(v37
 const v37IntelFallback = v37IntelState.loading
 ? '<div class="v36-tier-empty">Chargement des insights modèle…</div>'
 : '<div class="v36-tier-empty">Insights modèle indisponibles pour ce snapshot.</div>';
-// v53.9 — Hero accueil : statement + top edge + counts + live + leagues.
+// v53.9/v54.0 — Hero accueil : statement + top edge + counts + live + leagues + sports + compare hier.
 // User : "améliore la page d'accueil encore plus".
 const _heroAccueil = (() => {
   try {
     const todayIsoLocal = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+    const yesterdayDate = new Date(); yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+    const yesterdayIso = yesterdayDate.toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
     const todayEvents = (data.days?.[todayIsoLocal] || []).filter(m => m && m.id && !/TBD|Winner/i.test((m.competitors || []).map(c => c.name).join(' ')));
     let predicted = 0, genius = 0, value = 0, liveCount = 0;
     let topEdgeMatch = null, topEdge = 0;
     const leagueCounts = {};
+    const sportCounts = {};
     const now = Date.now();
     for (const m of todayEvents) {
       if (m.live || m.status === 'STATUS_IN_PROGRESS') liveCount++;
@@ -20871,11 +20899,44 @@ const _heroAccueil = (() => {
       }
       const lg = m.league_name || m.league_code || '?';
       leagueCounts[lg] = (leagueCounts[lg] || 0) + 1;
+      const sp = m.sport || 'autre';
+      sportCounts[sp] = (sportCounts[sp] || 0) + 1;
     }
     const topLeagues = Object.entries(leagueCounts).sort((a, b) => b[1] - a[1]).slice(0, 3);
+    // v54.0 — Sport icons grid + compare hier.
+    const SPORT_ICONS = { football: '⚽', tennis: '🎾', basketball: '🏀', hockey: '🏒', baseball: '⚾', 'football-american': '🏈', mma: '🥊', combat: '🥊', rugby: '🏉' };
+    const sportRows = Object.entries(sportCounts).sort((a, b) => b[1] - a[1]);
+    // Compare hier
+    let yWon = 0, yLost = 0, yPicks = 0;
+    for (const m of (data.days?.[yesterdayIso] || [])) {
+      if (!m.completed) continue;
+      let pred = null;
+      try { pred = predictMatch(m); } catch (e) {}
+      if (!pred || pred.skip) continue;
+      yPicks++;
+      let res = null;
+      try { res = (typeof evaluateModelPick === 'function') ? evaluateModelPick(m, pred) : null; } catch (e) {}
+      if (res === 'won') yWon++;
+      else if (res === 'lost') yLost++;
+    }
+    const yRoi = (yWon + yLost) > 0 ? ((yWon * 1.7 - 1 - yLost) / (yWon + yLost) * 100) : null;  // approx
     if (predicted === 0 && liveCount === 0) return '';
     const sides = topEdgeMatch ? (typeof getSides === 'function' ? getSides(topEdgeMatch.m) : { home: {}, away: {} }) : null;
     const topMatchLabel = sides ? `${(sides.home?.short || sides.home?.name || '?')} vs ${(sides.away?.short || sides.away?.name || '?')}` : '';
+    const sportGridHtml = sportRows.length ? `
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;">
+        ${sportRows.map(([sp, n]) => `<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:999px;font-size:12px;color:var(--text-2);font-weight:600;">${SPORT_ICONS[sp] || '🎯'} ${esc(sp.slice(0, 12))} <b style="color:var(--brand);">${n}</b></span>`).join('')}
+      </div>` : '';
+    const compareHierHtml = yPicks > 0 ? (() => {
+      const dPicks = predicted - yPicks;
+      const arrow = dPicks > 0 ? '↗' : dPicks < 0 ? '↘' : '→';
+      const dPicksColor = dPicks >= 0 ? 'var(--accent)' : '#fca5a5';
+      const yRoiTone = yRoi != null ? (yRoi > 0 ? 'var(--accent)' : '#fca5a5') : 'var(--text-dim)';
+      return `<div style="font-size:12px;color:var(--text-dim);margin-top:8px;">
+        Hier : <b style="color:var(--text-2);">${yWon}V·${yLost}D</b> · ROI <b style="color:${yRoiTone};">${yRoi != null ? `${yRoi >= 0 ? '+' : ''}${yRoi.toFixed(0)}%` : '—'}</b>
+        · vs aujourd'hui <b style="color:${dPicksColor};">${arrow} ${dPicks >= 0 ? '+' : ''}${dPicks} pick${Math.abs(dPicks) > 1 ? 's' : ''}</b>
+      </div>`;
+    })() : '';
     return `
       <section style="padding:18px 20px;margin-bottom:14px;background:linear-gradient(135deg,rgba(167,139,250,.10),rgba(52,211,153,.04));border:1px solid rgba(167,139,250,.25);border-radius:12px;">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
@@ -20895,6 +20956,8 @@ const _heroAccueil = (() => {
                 Top ligues : ${topLeagues.map(([lg, n]) => `<b style="color:var(--text-2);">${esc(lg.slice(0, 22))}</b> (${n})`).join(' · ')}
               </div>
             ` : ''}
+            ${compareHierHtml}
+            ${sportGridHtml}
           </div>
           ${liveCount > 0 ? `
             <div style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.4);padding:8px 14px;border-radius:8px;text-align:center;">
@@ -20962,6 +21025,22 @@ const _calendar14d = (() => {
         ${stats}
       </button>`;
     }).join('');
+    // v54.0 — Footer agrégé : aggregate 7j past + count upcoming
+    const past7d = days.filter(d => d.isPast);
+    const totalWon = past7d.reduce((s, d) => s + (d.won || 0), 0);
+    const totalLost = past7d.reduce((s, d) => s + (d.lost || 0), 0);
+    const totalPl = past7d.reduce((s, d) => s + (d.pl || 0), 0);
+    const aggRoi = (totalWon + totalLost) > 0 ? (totalPl / (totalWon + totalLost) * 100) : null;
+    const upcoming7d = days.filter(d => !d.isPast && !d.isToday);
+    const totalUpcoming = upcoming7d.reduce((s, d) => s + (d.evCount || 0), 0);
+    const aggHtml = `<div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);font-size:11.5px;">
+      <div style="color:var(--text-dim);">
+        🕒 7j passés : <b style="color:var(--text-2);">${totalWon}V·${totalLost}D</b> · ROI moy <b style="color:${aggRoi != null ? (aggRoi > 0 ? 'var(--accent)' : '#fca5a5') : 'var(--text-dim)'};">${aggRoi != null ? `${aggRoi >= 0 ? '+' : ''}${aggRoi.toFixed(1)}%` : '—'}</b>
+      </div>
+      <div style="color:var(--text-dim);">
+        📅 7j à venir : <b style="color:var(--brand);">${totalUpcoming}</b> match${totalUpcoming > 1 ? 's' : ''} planifié${totalUpcoming > 1 ? 's' : ''}
+      </div>
+    </div>`;
     return `
       <section style="padding:16px 0 12px;margin-bottom:14px;border-bottom:1px solid var(--border);">
         <div style="margin-bottom:10px;">
@@ -20972,6 +21051,7 @@ const _calendar14d = (() => {
         <div style="display:grid;grid-template-columns:repeat(15,minmax(0,1fr));gap:4px;">
           ${cellsHtml}
         </div>
+        ${aggHtml}
       </section>`;
   } catch (e) { return ''; }
 })();
