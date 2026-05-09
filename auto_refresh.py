@@ -178,6 +178,8 @@ PATCH_STAGES = [
     ('measure_night_metrics.py',    1,   15),
     # Pipeline status snapshot (health.json) — runs every tick, cheap.
     ('build_health.py',             1,   15),
+    # v45.5 — Paper trading forward log (snapshots + settles).
+    ('paper_trade_log.py',          1,   30),
     ('audit_data_truth.py',          1,   15),
     ('validate_data_quality.py',     1,   15),
     ('data_integrity_monitor.py',    1,   20),

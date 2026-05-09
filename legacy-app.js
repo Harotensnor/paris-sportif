@@ -8517,6 +8517,37 @@ try {
     .then(j => { if (j) _setClvWidget(j); })
     .catch(() => {});
 } catch (e) { /* swallowError(e); */ }
+// AUDIT 2026-05-09 v45.5 — Paper trading forward ROI widget.
+try {
+  const paperBucket = Math.floor(Date.now() / (5 * 60 * 1000));
+  fetch(`paper_log_summary.json?v=${paperBucket}`, { cache: 'default' })
+    .then(r => r.ok ? r.json() : null)
+    .then(j => {
+      if (!j) return;
+      const roi = Number(j.roi_pct);
+      const settled = Number(j.settled_count || 0);
+      const pending = Number(j.pending_count || 0);
+      const won = Number(j.won || 0);
+      const lost = Number(j.lost || 0);
+      const el = document.getElementById('trust-paper-roi');
+      if (!el) return;
+      if (settled === 0) {
+        el.textContent = `0/${pending}`;
+        el.style.color = 'var(--text-dim)';
+      } else {
+        const sign = roi >= 0 ? '+' : '';
+        el.textContent = `${sign}${roi.toFixed(1)}%`;
+        const color = roi >= 5 ? '#34d399' : roi >= 0 ? '#a3e635' : roi >= -5 ? '#fbbf24' : '#f87171';
+        el.style.color = color;
+        el.style.fontWeight = '700';
+      }
+      const parent = el.closest('.trust-strip-stat');
+      if (parent) {
+        parent.title = `Paper trading forward : ${won}W ${lost}L sur ${settled} settled (+${pending} pending). ROI cumulé ${roi !== null ? (roi >= 0 ? '+' : '') + roi.toFixed(2) + '%' : 'NA'}. Snapshots depuis ${(j.generated_at || '').slice(0,10)}.`;
+      }
+    })
+    .catch(() => {});
+} catch (e) { /* swallowError(e); */ }
 delete strip.dataset.dismissed;
 strip.classList.remove('hidden');
 _updateTrustStripHeight();
@@ -19019,7 +19050,13 @@ const v43MultiDayValue = (() => {
             const edge = rel - 1 / odd;
             if (edge < 0.05) continue;
             if (odd >= 5) continue; // celle-ci serait déjà outsider
-            if (!bestC || edge > bestC.edge) bestC = { c, odd, rel, edge };
+            // v45.4 — DNB penalty : -3pt edge equivalent. Le user trouve
+            // "nul remboursé" confus quand 1n2 dispo. On garde DNB candidat
+            // mais avec un handicap pour préférer 1n2 / OU / BTTS.
+            const marketKey = String(c?.market || '').toLowerCase();
+            const isDnb = marketKey === 'dnb' || (c?.label || '').includes('nul remboursé');
+            const adjustedEdge = isDnb ? edge - 0.03 : edge;
+            if (!bestC || adjustedEdge > bestC.adjustedEdge) bestC = { c, odd, rel, edge, adjustedEdge };
           }
           if (!bestC) continue;
           const sides = (typeof getSides === 'function') ? getSides(m) : null;
