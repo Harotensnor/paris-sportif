@@ -2164,6 +2164,44 @@ function BetStrengthBadge(p, extraClass = '') {
 const strength = getBetStrengthMeta(p);
 return `<span class="bbf-strength bet-strength-badge ${strength.cls}${extraClass ? ` ${esc(extraClass)}` : ''}" title="${esc(strength.title)}" aria-label="${esc(strength.label)}">${strength.heat} ${esc(strength.label)}</span>`;
 }
+// v49 — Audit point #1 + #10 : badge data-quality pour signaler picks suspects.
+// Cas : odds_anomaly (Winamax très éloigné consensus), vig anormale (>15%),
+// signaux essentiels manquants. Permet à l'utilisateur de comprendre POURQUOI
+// un pick est "RISQUÉ" plutôt qu'avoir juste l'étiquette générique.
+function DataQualityBadge(p) {
+  if (!p || !p.pred) return '';
+  const pred = p.pred;
+  const m = p.m || {};
+  const flags = [];
+  // Suspect odds (anomaly v49)
+  if (pred.suspect && pred.odds_anomaly && pred.odds_anomaly.isCriticalAnomaly) {
+    const diff = (pred.odds_anomaly.maxDiffPct * 100).toFixed(0);
+    flags.push({ icon: '⚠', label: 'Cotes atypiques', title: `Winamax diverge ${diff}% du consensus marché — possiblement live odds capturées comme pré-match` });
+  } else if (pred.suspect && pred.suspect_reason === 'market_gap_>15pt_capped') {
+    flags.push({ icon: '⚠', label: 'Edge capé', title: 'Edge >15pt cappé pour éviter sur-confidence (modèle vs marché trop éloignés)' });
+  }
+  // Vig anormale (>15%)
+  try {
+    const wnx = m.winamax?.markets?.['1n2'];
+    if (wnx && wnx.home && wnx.away) {
+      const vig = (1/wnx.home + (wnx.draw ? 1/wnx.draw : 0) + 1/wnx.away) - 1;
+      if (vig > 0.15) {
+        flags.push({ icon: '🚨', label: `Vig ${(vig*100).toFixed(0)}%`, title: `Vig anormalement haute (Winamax normal: 5-7%) — odds possiblement stale ou bookmaker en mode protection` });
+      }
+    }
+  } catch (e) {}
+  // Live match (mais pas flagué)
+  try {
+    if (typeof _isMatchLikelyLive === 'function' && _isMatchLikelyLive(m) && !m.live) {
+      flags.push({ icon: '🔴', label: 'Live (non flagué)', title: 'Match probablement en cours (score>0) mais le fetcher ne l\'a pas marqué live' });
+    }
+  } catch (e) {}
+  if (!flags.length) return '';
+  return flags.map(f =>
+    `<span class="data-quality-badge" title="${esc(f.title)}" style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border:1px solid var(--warn,#f59e0b);background:rgba(245,158,11,.10);color:var(--warn,#f59e0b);border-radius:999px;font-size:10px;font-weight:700;cursor:help;">${f.icon} ${esc(f.label)}</span>`
+  ).join('');
+}
+try { window.DataQualityBadge = DataQualityBadge; } catch(e) { swallowError(e); }
 function fmtMarketAdvantage(edge, decimals = 1) {
 const n = Number(edge) * 100;
 if (!isFinite(n)) return 'Avantage non mesuré';
@@ -18697,7 +18735,7 @@ const v45GeniusBannerHtml = (() => {
           <span>EV <b style="color:${rankColor};">${ev>=0?'+':''}${ev.toFixed(0)}%</b></span>
         </div>
         <div style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--border);font-size:11px;color:var(--text-dim);">
-          Mise FLAT 1u = <b style="color:var(--text);">${_u}€</b> · gain potentiel <b style="color:#10b981;">+${gain.toFixed(0)}€</b> · perte max <b style="color:#ef4444;">-${_u}€</b>
+          <span title="1u (1 unité) = 1% de ta bankroll. Avec bankroll ${(_u*100).toFixed(0)}€, 1u = ${_u}€." style="border-bottom:1px dotted var(--text-dim2);cursor:help;">Mise FLAT 1u = <b style="color:var(--text);">${_u}€</b></span> · gain potentiel <b style="color:#10b981;">+${gain.toFixed(0)}€</b> · perte max <b style="color:#ef4444;">-${_u}€</b>
         </div>
       </a>`;
     }).join('');
@@ -18709,7 +18747,8 @@ const v45GeniusBannerHtml = (() => {
       </strong>
       <div style="font-size:12px;color:var(--text-dim);margin:8px 0 12px;line-height:1.5;">
         Filtrage ULTRA strict : seuls les picks avec marge mathématique élevée + données fiables.
-        Mise <b style="color:#10b981;">FLAT 1u (${_u}€)</b> sur chaque, indépendamment de la cote.
+        Mise <b style="color:#10b981;" title="1u = 1 unité = 1% de ta bankroll. Bankroll ${(_u*100).toFixed(0)}€ → 1u = ${_u}€.">FLAT 1u (${_u}€)</b> sur chaque, indépendamment de la cote.
+        <br><span style="font-size:10px;color:var(--text-dim2);">💡 1u (1 unité) = 1% bankroll. Avec ${(_u*100).toFixed(0)}€ de bankroll, 1u = ${_u}€.</span>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;">
         ${cards}
@@ -22836,7 +22875,7 @@ ${items}
       <div style="font-size:24px;font-weight:800;letter-spacing:-0.6px;color:var(--text);line-height:1.15;">🎯 Stratégies gagnantes du jour</div>
       <div style="font-size:12px;color:var(--text-dim);margin-top:4px;">Outsider <b style="color:#f59e0b;">+121% ROI</b> sur 356 paris · Value <b style="color:#3b82f6;">+33% ROI</b> sur 1251 paris (backtest 1932 picks)</div>
     </div>
-    <button type="button" data-v46-action="toggle-profitable-mode" style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:${v43ModeOn ? 'rgba(245,158,11,.18)' : 'var(--panel)'};border:1px solid ${v43ModeOn ? '#f59e0b' : 'var(--border)'};color:${v43ModeOn ? '#f59e0b' : 'var(--text)'};border-radius:999px;font-size:11px;font-weight:700;cursor:pointer;">${v43ModeOn ? '✓ Mode profitable activé' : 'Activer mode profitable'}</button>
+    <button type="button" data-v46-action="toggle-profitable-mode" title="Mode profitable : ${v43ModeOn ? 'Actuellement ACTIVÉ' : 'Actuellement DÉSACTIVÉ'} — Quand activé, le dashboard ne montre QUE les picks correspondant aux 3 stratégies prouvées rentables (Outsider tier='out', Value edge≥5pt, Solid). Les autres picks sont cachés. Backtest : Outsider +121% ROI, Value +33%, Flat +19%." style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:${v43ModeOn ? 'rgba(245,158,11,.18)' : 'var(--panel)'};border:1px solid ${v43ModeOn ? '#f59e0b' : 'var(--border)'};color:${v43ModeOn ? '#f59e0b' : 'var(--text)'};border-radius:999px;font-size:11px;font-weight:700;cursor:pointer;">${v43ModeOn ? '✓ Mode profitable activé' : 'Activer mode profitable'}</button>
   </div>
   ${outsiderPicks.length ? `
   <div style="margin-bottom:16px;">
@@ -24960,6 +24999,8 @@ const confColor = p.rel >= 0.70 ? 'var(--accent)' : p.rel >= 0.60 ? '#fbbf24' : 
 const edgeColor = p.edge > 0.10 ? 'var(--accent)' : p.edge > 0.05 ? '#fbbf24' : p.edge < 0 ? 'var(--danger)' : 'var(--text-dim)';
 const pickLabel = p.label || p.labelFull || p.pred?.pick?.label || 'Pick';
 const strengthBadge = BetStrengthBadge(p, 'bet-strength-badge--tous');
+// v49 — Audit point #1 + #10 : Data quality badge (cotes atypiques, vig anormale, live non flagué).
+const qualityBadge = (typeof DataQualityBadge === 'function') ? DataQualityBadge(p) : '';
 let _coteSrc = '';
 const _o = p.pred && p.pred.odds;
 if (_o) {
@@ -25058,7 +25099,7 @@ return `<div class="tous-row" data-match-id="${esc(rowId)}" data-match-date="${e
           <div style="display:flex;align-items:center;gap:8px;font-size:14.5px;color:var(--text);font-weight:900;min-width:0;">
             ${teamLogo(hLogo)}<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">${esc(hn)} vs ${esc(an)}</span>${teamLogo(aLogo)}<span style="display:inline-flex;align-items:center;min-height:22px;padding:2px 7px;border:1px solid var(--border);border-radius:999px;color:var(--text-dim);font-size:10.5px;font-weight:800;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${sportEm} ${esc(league || 'Ligue')}</span>
           </div>
-          <div style="font-size:12px;color:var(--brand);font-weight:600;margin-top:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${strengthBadge}<span>→ ${esc(pickLabel)}</span>${(() => {
+          <div style="font-size:12px;color:var(--brand);font-weight:600;margin-top:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${strengthBadge}${qualityBadge}<span>→ ${esc(pickLabel)}</span>${(() => {
             if (typeof renderStreakBadge !== 'function') return '';
             const _comps = p.m.competitors || [];
             const _home = _comps.find(c => c.home_away === 'home') || _comps[0];
