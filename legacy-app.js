@@ -20305,14 +20305,23 @@ openBigDetail(trigger);
 }
 try {
 if (window.__v37DashboardRefreshTimer) clearInterval(window.__v37DashboardRefreshTimer);
+// AUDIT 2026-05-09 v46.6 — Auto-refresh moins agressif (30s → 90s) + skip
+// si data n'a pas changé. Audit perf : long tasks 700-800ms à chaque
+// renderDashboardPage = 9.3s cumul en 4 min. Data cron refresh = 5 min,
+// donc 90s = 3-4 renders par cycle data, suffisant.
+window.__v37DashboardLastDataTs = window.PRONOSTICS_DATA?.generated_at || '';
 window.__v37DashboardRefreshTimer = setInterval(() => {
 if (!wrap || !document.body.contains(wrap) || currentPage !== 'dashboard') {
 clearInterval(window.__v37DashboardRefreshTimer);
 window.__v37DashboardRefreshTimer = null;
 return;
 }
+// Skip si data n'a pas changé (économise un re-render coûteux 700ms)
+const curTs = window.PRONOSTICS_DATA?.generated_at || '';
+if (curTs === window.__v37DashboardLastDataTs) return;
+window.__v37DashboardLastDataTs = curTs;
 renderDashboardPage(wrap);
-}, 30000);
+}, 90000);
 } catch(e) { swallowError(e); }
 return;
 }
