@@ -10355,16 +10355,20 @@ return thinSports.has(match.sport)
 : reliability >= 0.70;
 })(),
 lowConf: reliability < 0.50,
+// AUDIT 2026-05-09 v43.4 — User : "j'ai 5 misables/jour, je veux 15-30".
+// Skip threshold baissé 0.50 → 0.42 pour surfacer plus de candidats. Les
+// picks rel 0.42-0.50 auront lowConf=true (badge warning) mais ne seront
+// plus auto-skip. Le verdict downstream filtre via opportunity score.
 skip: abstain.active
-|| reliability < 0.50
+|| reliability < 0.42
 || ensembleMissing
 || (match.sport === 'tennis'
 && !match.tennis_features
 && home?.rank && away?.rank
 && Math.abs(Math.log(Number(away.rank)) - Math.log(Number(home.rank))) < 0.30)
-|| (best && reliability < 0.75 && (() => {
+|| (best && reliability < 0.65 && (() => {
 const _po = best_pick[2] === '1' ? best.home : best_pick[2] === '2' ? best.away : best.draw;
-return typeof _po === 'number' && _po > 0 && _po <= 1.5;
+return typeof _po === 'number' && _po > 0 && _po <= 1.4;
 })()),
 isLockStrict: reliability >= 0.75,
 abstain,
@@ -18130,24 +18134,28 @@ const v40PickVerdict = (p) => {
       return r ? r.verdict : null;
     }
   } catch (e) { swallowError(e); }
-  // Fallback aligné v42.fix3 : opp >= 32 = bet-light, edge >= 3pt = bridge.
+  // Fallback aligné v43.4 : opp >= 22 = bet-light, edge >= 2.5pt = bridge.
   const opp = Number(p?.opportunity || 0);
   const edge = Number(p?.edge || 0);
-  if (opp >= 60) return 'bet';
-  if (opp >= 32) return 'bet-light';
-  if (edge >= 0.03) return 'watch';
+  const oddN = Number(p?.odd || 0);
+  const relN = Number(p?.rel || 0);
+  // Value override fallback (mirror _v39FinalRec)
+  if (edge >= 0.05 && relN >= 0.40 && oddN >= 1.40) return 'bet';
+  if (opp >= 50) return 'bet';
+  if (opp >= 22) return 'bet-light';
+  if (edge >= 0.025 && relN >= 0.45 && oddN >= 1.30) return 'bet-light';
+  if (opp >= 14) return 'watch';
   return 'skip';
 };
-// AUDIT 2026-05-09 v42.fix3 — Pool reste maigre, abaisse encore le bridge
-// edge 5pt → 3pt pour surfacer plus de candidats les jours où le modèle
-// est conservatif. Conservé safeguards segment trust low.
+// AUDIT 2026-05-09 v43.4 — Bridge encore plus large : edge ≥ 2pt sur watch
+// = misable. User demande 15-30 picks/j, le bridge à 3pt restait restrictif.
 const v40IsBettable = (p) => {
   const v = v40PickVerdict(p);
   if (v === 'bet' || v === 'bet-light') return true;
-  // Bridge case : Surveiller avec edge ≥ 3pt = misable petit (au lieu de 5pt).
+  // Bridge : Surveiller avec edge ≥ 2pt = misable petit.
   if (v === 'watch') {
     const edge = Number(p?.edge || 0);
-    if (edge >= 0.03) return true;
+    if (edge >= 0.02) return true;
   }
   return false;
 };
@@ -18567,40 +18575,49 @@ const _v39FinalRec = (p) => {
   if (isOutsiderQualified) {
     return { verdict: 'bet', label: 'Miser (Outsider 💎)', score: Math.max(80, opp), tone: 'green', reason: `Outsider rentable historiquement (+183% ROI sur 356 paris) · Conf ${(rel*100).toFixed(0)}% · Edge ${fmtPct(edge)}` };
   }
-  const segmentSeverelyBad = trustTier === 'low' && trustRoiPct < -10 && trustN >= 30;
+  // AUDIT 2026-05-09 v43.4 — VALUE OVERRIDE.
+  // Backtest officiel (backtest_strategies.json leaderboard) prouve que
+  // value_only (edge ≥ 5pt) fait +33.1% ROI sur 1251 paris (max_dd 3.5%).
+  // C'est la 2e stratégie la + profitable. Donc tout pick edge ≥ 5pt avec
+  // rel ≥ 0.40 (filtre minimal de qualité) doit être promu Miser auto.
+  // User feedback : "ont passe a coté de paris qui passe facilement" — c'est
+  // exactement ces value picks que les seuils opp masquaient.
+  if (edge >= 0.05 && rel >= 0.40 && oddNum >= 1.40) {
+    const seg = (trustTier === 'low' || trustTier === 'warn') ? ` ⚠ segment ${trustRoiPct.toFixed(1)}%` : '';
+    return { verdict: 'bet', label: 'Miser (Value 🎯)', score: Math.max(70, opp), tone: 'green', reason: `Value rentable historiquement (+33% ROI sur 1251 paris) · Conf ${(rel*100).toFixed(0)}% · Edge ${fmtPct(edge)}${seg}` };
+  }
+  // v43.4 — Veto severe : seuil durci à -15% sur n≥50 (avant -10%/n≥30).
+  // L'user veut + de picks. Le segment veto restait strict sur petits samples.
+  const segmentSeverelyBad = trustTier === 'low' && trustRoiPct < -15 && trustN >= 50;
   if (segmentSeverelyBad) {
     return { verdict: 'skip', label: 'À éviter', score: Math.min(35, opp), tone: 'red', reason: `Historique segment ${trustRoiPct.toFixed(1)}% sur ${trustN} paris (très défavorable)` };
   }
   // AUDIT 2026-05-08 v40.5 — Seuils baissés pour refléter la réalité du
   // modèle (Brier 0.231, ROI 0%). Avant : 'Miser' >= 75, jamais atteint.
   // Maintenant : 'Miser' >= 60, 'Petite mise' >= 45, 'Surveiller' >= 30.
-  // L'user voit enfin des picks actionnables avec leurs warnings.
-  // Strong positive : tier safe/lock + opp >= 55 → MISER même si segment warn.
-  if ((tier === 'safe' || tier === 'lock') && opp >= 55) {
+  // v43.4 baisse encore : 60→50 / 32→22 / 25→14. User want 15-30 picks/jour.
+  // Strong positive : tier safe/lock + opp >= 50 → MISER même si segment warn.
+  if ((tier === 'safe' || tier === 'lock') && opp >= 45) {
     const seg = (trustTier === 'low' || trustTier === 'warn') ? ` ⚠ segment ${trustRoiPct.toFixed(1)}%` : '';
     return { verdict: 'bet', label: 'Miser', score: opp, tone: 'green', reason: `Conf ${(rel*100).toFixed(0)}% · Edge ${fmtPct(edge)}${seg}` };
   }
-  // Strong : opp >= 60 (peu importe segment, sauf veto severe ci-dessus).
-  if (opp >= 60) {
+  // Strong : opp >= 50 (peu importe segment, sauf veto severe ci-dessus).
+  if (opp >= 50) {
     const seg = (trustTier === 'low' || trustTier === 'warn') ? ` ⚠ segment ${trustRoiPct.toFixed(1)}%` : '';
     return { verdict: 'bet', label: 'Miser', score: opp, tone: 'green', reason: `Conf ${(rel*100).toFixed(0)}% · Edge ${fmtPct(edge)}${seg}` };
   }
-  // AUDIT 2026-05-09 v42.fix3 — Seuil 38 → 32. User signale toujours pool
-  // maigre (1 misable sur 30). Le modèle est conservatif sur les opp scores
-  // mais les picks restent qualité (edge ≥3pt). Diluer light pour avoir
-  // 3-5 candidats min par jour. Quality safeguard via segment trust still.
-  if (opp >= 32) {
-    if (trustTier === 'low') {
-      return { verdict: 'watch', label: 'Surveiller', score: Math.min(45, opp), tone: 'orange', reason: `Edge OK mais segment ${trustRoiPct.toFixed(1)}% sur ${trustN} paris` };
-    }
-    const seg = trustTier === 'warn' ? ` ⚠ segment ${trustRoiPct.toFixed(1)}%` : '';
+  // v43.4 — Petite mise seuil 32→22, et ne plus downgrade auto vers watch
+  // pour low trust (juste warn dans le label).
+  if (opp >= 22) {
+    const seg = (trustTier === 'low' || trustTier === 'warn') ? ` ⚠ segment ${trustRoiPct.toFixed(1)}%` : '';
     return { verdict: 'bet-light', label: 'Petite mise', score: opp, tone: 'green-light', reason: `Conf ${(rel*100).toFixed(0)}% · Edge ${fmtPct(edge)}${seg}` };
   }
-  // Acceptable : opp 25-38 (baissé aussi pour matcher).
-  if (opp >= 25) {
-    if (trustTier === 'low') {
-      return { verdict: 'skip', label: 'À éviter', score: Math.min(25, opp), tone: 'red', reason: `Edge faible ET segment ${trustRoiPct.toFixed(1)}%` };
-    }
+  // v43.4 — Edge bridge : si edge ≥ 2.5pt même opp faible → bet-light.
+  // Sinon Surveiller jusqu'à opp 14, sinon skip.
+  if (edge >= 0.025 && rel >= 0.45 && oddNum >= 1.30) {
+    return { verdict: 'bet-light', label: 'Petite mise', score: Math.max(25, opp), tone: 'green-light', reason: `Edge ${fmtPct(edge)} positif · Conf ${(rel*100).toFixed(0)}%` };
+  }
+  if (opp >= 14) {
     return { verdict: 'watch', label: 'Surveiller', score: opp, tone: 'orange', reason: 'Edge moyen — décide après modal' };
   }
   return { verdict: 'skip', label: 'Passer', score: opp, tone: 'red', reason: 'Pas assez de signal' };
